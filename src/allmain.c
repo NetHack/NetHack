@@ -221,17 +221,18 @@ moveloop()
 
 		    if(!u.uinvulnerable) {
 			if(Teleportation && !rn2(85)) {
-#ifdef REDO
 			    xchar old_ux = u.ux, old_uy = u.uy;
-#endif
 			    tele();
-#ifdef REDO
 			    if (u.ux != old_ux || u.uy != old_uy) {
+				if (!next_to_u()) {
+				    check_leash(old_ux, old_uy);
+				}
+#ifdef REDO
 				/* clear doagain keystrokes */
 				pushch(0);
 				savech(0);
-			    }
 #endif
+			    }
 			}
 			/* delayed change may not be valid anymore */
 			if ((change == 1 && !Polymorph) ||
