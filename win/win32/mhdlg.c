@@ -559,17 +559,15 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 		/* reset content and populate the list */
 		SendMessage(control_role, CB_RESETCONTENT, 0, 0); 
 		for (i = 0; roles[i].name.m; i++) {
-			if (ok_role(i, initrace, initgend, initalign)) {
-			    if (initgend>=0 && flags.female && roles[i].name.f)
-					ind = SendMessage(control_role, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(roles[i].name.f, wbuf, sizeof(wbuf)) );
-				else 
-					ind = SendMessage(control_role, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(roles[i].name.m, wbuf, sizeof(wbuf)) );
+			if (initgend>=0 && flags.female && roles[i].name.f)
+				ind = SendMessage(control_role, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(roles[i].name.f, wbuf, sizeof(wbuf)) );
+			else 
+				ind = SendMessage(control_role, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(roles[i].name.m, wbuf, sizeof(wbuf)) );
 
-				SendMessage(control_role, CB_SETITEMDATA, (WPARAM)ind, (LPARAM)i );
-				if( i==initrole ) { 
-					SendMessage(control_role, CB_SETCURSEL, (WPARAM)ind, (LPARAM)0 );
-					valid_opt = 1;
-				}
+			SendMessage(control_role, CB_SETITEMDATA, (WPARAM)ind, (LPARAM)i );
+			if( i==initrole ) { 
+				SendMessage(control_role, CB_SETCURSEL, (WPARAM)ind, (LPARAM)0 );
+				valid_opt = 1;
 			}
 		}
 		

@@ -196,6 +196,12 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				(GetNHApp()->bWindowsLocked? MF_CHECKED : MF_UNCHECKED)
 			);
 
+			CheckMenuItem(
+				GetMenu(hWnd), 
+				IDM_SETTING_AUTOLAYOUT, 
+				GetNHApp()->bAutoLayout? MF_CHECKED : MF_UNCHECKED
+			);
+
 			/* store handle to the mane menu in the application record */
 			GetNHApp()->hMainWnd = hWnd;
 		break;
@@ -530,7 +536,6 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			mswin_select_map_mode(iflags.wc_map_mode);
 		
 		child = GetNHApp()->windowlist[msg_param->wid].win;
-		if( child ) mswin_layout_main_window(child);
 	} break;
 
 	}
@@ -559,6 +564,7 @@ void mswin_layout_main_window(HWND changed_child)
 	SIZE msg_size;
 	POINT map_org;
 	SIZE map_size;
+	SIZE menu_size;
 	HWND wnd_status, wnd_msg;
 	PNHMainWindow  data;
 
@@ -579,6 +585,19 @@ void mswin_layout_main_window(HWND changed_child)
 			mswin_message_window_size(wnd_msg, &msg_size);
 		} else {
 			msg_size.cx = msg_size.cy = 0;
+		}
+
+		/* find all menu windows and calculate the size */
+		menu_size.cx = menu_size.cy = 0;
+		for( i=0; i<MAXWINDOWS; i++ ) {
+			SIZE tmp_size;
+			if( GetNHApp()->windowlist[i].win 
+				&& !GetNHApp()->windowlist[i].dead
+				&& GetNHApp()->windowlist[i].type == NHW_MENU ) {
+				mswin_menu_window_size(GetNHApp()->windowlist[i].win , &tmp_size);
+				menu_size.cx = max(menu_size.cx, tmp_size.cx);
+				menu_size.cy = max(menu_size.cy, tmp_size.cy);
+			}
 		}
 
 		/* set window positions */
@@ -676,10 +695,11 @@ void mswin_layout_main_window(HWND changed_child)
 		GetNHApp()->rtMsgWindow.right    = msg_org.x + msg_size.cx;
 		GetNHApp()->rtMsgWindow.bottom   = msg_org.y + msg_size.cy;
 
-		GetNHApp()->rtMenuWindow.left    = map_org.x + map_size.cx*2/3;
-		GetNHApp()->rtMenuWindow.top     = map_org.y;
-		GetNHApp()->rtMenuWindow.right   = map_org.x + map_size.cx;
-		GetNHApp()->rtMenuWindow.bottom  = map_org.y + map_size.cy;
+		/*  map_width/4 < menu_width < map_width*2/3 */
+		GetNHApp()->rtMenuWindow.left    = GetNHApp()->rtMapWindow.right - min(map_size.cx*2/3, max(map_size.cx/4, menu_size.cx));
+		GetNHApp()->rtMenuWindow.top     = GetNHApp()->rtMapWindow.top;
+		GetNHApp()->rtMenuWindow.right   = GetNHApp()->rtMapWindow.right;
+		GetNHApp()->rtMenuWindow.bottom  = GetNHApp()->rtMapWindow.bottom;
 
 		GetNHApp()->rtInvenWindow.left   = GetNHApp()->rtMenuWindow.left;
 		GetNHApp()->rtInvenWindow.top    = GetNHApp()->rtMenuWindow.top;
@@ -711,6 +731,8 @@ void mswin_layout_main_window(HWND changed_child)
 					  );
 		}
 	}
+	if( IsWindow(changed_child) ) 
+		SetForegroundWindow(changed_child);
 }
 
 LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -784,9 +806,15 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
 
 		case IDM_SETTING_AUTOLAYOUT:
-			GetNHApp()->bAutoLayout = TRUE;
+			GetNHApp()->bAutoLayout = !GetNHApp()->bAutoLayout;
 			mswin_layout_main_window(NULL);
-			GetNHApp()->bAutoLayout = FALSE;
+
+			/* Update menu item check-mark */
+			CheckMenuItem(
+				GetMenu(GetNHApp()->hMainWnd), 
+				IDM_SETTING_AUTOLAYOUT, 
+				GetNHApp()->bAutoLayout? MF_CHECKED : MF_UNCHECKED
+			);
 			break;
 
 		case IDM_SETTING_LOCKWINDOWS:
@@ -901,7 +929,6 @@ void mswin_menu_check_intf_mode()
         CheckMenuItem(hMenu, IDM_NHMODE, MF_CHECKED);
     else
         CheckMenuItem(hMenu, IDM_NHMODE, MF_UNCHECKED);
-
 }
 
 void mswin_select_map_mode(int mode)

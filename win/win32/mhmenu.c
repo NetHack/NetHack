@@ -47,10 +47,12 @@ typedef struct mswin_nethack_menu_window {
 			BOOL			 counting;			/* counting flag */
 			char			 prompt[QBUFSZ]; 		/* menu prompt */
 			int			 tab_stop_size[NUMTABS];/* tabstops to align option values */
+			int			 menu_cx;		/* menu width */
 		} menu;
 
 		struct menu_text {
 			TCHAR*			text;
+			SIZE			text_box_size;
 		} text;
 	};
 	int result;
@@ -500,9 +502,12 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case MSNH_MSG_PUTSTR: 
 	{
 		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
-		HWND   text_view;
+		HWND	text_view;
 		TCHAR	wbuf[BUFSZ];
-		size_t text_size;
+		size_t	text_size;
+		RECT	text_rt;
+		HGDIOBJ saveFont;
+		HDC		hdc;
 
 		if( data->type!=MENU_TYPE_TEXT )
 			SetMenuType(hWnd, MENU_TYPE_TEXT);
@@ -523,6 +528,16 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		text_view = GetDlgItem(hWnd, IDC_MENU_TEXT);
 		if( !text_view ) panic("cannot get text view window");
 		SetWindowText(text_view, data->text.text);
+
+		/* calculate dimensions of the added line of text */
+		hdc = GetDC(text_view);
+		saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
+		SetRect(&text_rt, 0, 0, 0, 0);
+		DrawText(hdc, msg_data->text, strlen(msg_data->text), &text_rt, DT_CALCRECT | DT_TOP | DT_LEFT | DT_NOPREFIX | DT_SINGLELINE);
+		data->text.text_box_size.cx = max(text_rt.right - text_rt.left, data->text.text_box_size.cx);
+		data->text.text_box_size.cy += text_rt.bottom - text_rt.top;
+		SelectObject(hdc, saveFont);
+		ReleaseDC(text_view, hdc);
 	} break;
 
 	case MSNH_MSG_STARTMENU:
@@ -550,6 +565,8 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		HDC hDC;
 		int column;
 		HFONT saveFont;
+		LONG menuitemwidth = 0;
+		TEXTMETRIC tm;
 		
 		if( data->type!=MENU_TYPE_MENU ) break;
 		if( strlen(msg_data->str)==0 ) break;
@@ -572,6 +589,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		/* calculate tabstop size */
 		hDC = GetDC(hWnd);
 		saveFont = SelectObject(hDC, mswin_get_font(NHW_MENU, msg_data->attr, hDC, FALSE));
+		GetTextMetrics(hDC, &tm);
 		p1 = data->menu.items[new_item].str;
 		p = strchr(data->menu.items[new_item].str, '\t');
 		column = 0;
@@ -588,8 +606,15 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			);
 			data->menu.tab_stop_size[column] =
 				max( data->menu.tab_stop_size[column], drawRect.right - drawRect.left );
+
+			menuitemwidth += data->menu.tab_stop_size[column];
+
 			if (p != NULL) *p = '\t';
 			else /* last string so, */ break;
+
+			/* add the separation only when not the last item */
+			/* in the last item, we break out of the loop, in the statement just above */
+			menuitemwidth += TAB_SEPARATION;
 
 			++column;
 			p1 = p + 1;
@@ -597,6 +622,12 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		}
 		SelectObject(hDC, saveFont);
 		ReleaseDC(hWnd, hDC);
+
+		/* calculate new menu width */
+		data->menu.menu_cx = max(
+			data->menu.menu_cx, 
+			2*TILE_X + menuitemwidth + (tm.tmAveCharWidth+tm.tmOverhang)*12
+		);
 
 		/* increment size */
 		data->menu.size++;
@@ -630,7 +661,6 @@ void LayoutMenu(HWND hWnd)
 
 	/* get window coordinates */
 	GetClientRect(hWnd, &clrt );
-
 
 	// OK button
 	if( data->is_active ) {
@@ -678,6 +708,15 @@ void LayoutMenu(HWND hWnd)
 	} else {
 		sz_elem.cy = (clrt.bottom - clrt.top) - 2*MENU_MARGIN;
 	}
+
+	if( data->type == MENU_TYPE_MENU ) {
+		ListView_SetColumnWidth(
+			GetMenuControl(hWnd), 
+			0, 
+			max(clrt.right - clrt.left - GetSystemMetrics(SM_CXVSCROLL), data->menu.menu_cx ) 
+		);
+	}
+
 	MoveWindow(GetMenuControl(hWnd), pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
 }
 /*-----------------------------------------------------------------------------*/
@@ -1002,7 +1041,11 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		RECT client_rt;
 
 		GetClientRect(lpdis->hwndItem, &client_rt);
-		SetRect( &drawRect, client_rt.left, lpdis->rcItem.top, client_rt.right, lpdis->rcItem.bottom );
+		SetRect( &drawRect, 
+				  client_rt.left, 
+				  lpdis->rcItem.top, 
+				  client_rt.left + ListView_GetColumnWidth(lpdis->hwndItem, 0),
+				  lpdis->rcItem.bottom );
 		DrawFocusRect(lpdis->hDC, &drawRect);
 	}
 
@@ -1332,82 +1375,36 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 /*-----------------------------------------------------------------------------*/
 void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 {
-    TEXTMETRIC tm;
 	HWND control;
-	HGDIOBJ saveFont;
-	HDC hdc;
 	PNHMenuWindow data;
-	int i;
 	RECT rt, wrt;
 	int extra_cx;
-
-	GetClientRect(hWnd, &rt);
-	sz->cx = rt.right - rt.left;
-	sz->cy = rt.bottom - rt.top;
-
-	GetWindowRect(hWnd, &wrt);
-	extra_cx = (wrt.right-wrt.left) - sz->cx;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	if(data) {
 		control = GetMenuControl(hWnd);
-		hdc = GetDC(control);
+
+		/* get the control size */
+		GetClientRect(control, &rt);
+		sz->cx = rt.right - rt.left;
+		sz->cy = rt.bottom - rt.top;
+
+		/* calculate "extra" space around the control */
+		GetWindowRect(hWnd, &wrt);
+		extra_cx = (wrt.right-wrt.left) - sz->cx;
 
 		if( data->type==MENU_TYPE_MENU ) {
-			/* Calculate the width of the list box. */
-			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
-			GetTextMetrics(hdc, &tm);
-			for(i=0; i<data->menu.size; i++ ) {
-				LONG menuitemwidth = 0;
-				int column;
-				char *p, *p1;
-
-				p1 = data->menu.items[i].str;
-				p = strchr(data->menu.items[i].str, '\t');
-				column = 0;
-				for (;;) {
-					TCHAR wbuf[BUFSZ];
-					RECT tabRect;
-					SetRect ( &tabRect, 0, 0, 1, 1 );
-					if (p != NULL) *p = '\0'; /* for time being, view tab field as zstring */
-					DrawText(hdc,
-						NH_A2W(p1, wbuf, BUFSZ),
-						strlen(p1),
-						&tabRect,
-						DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_SINGLELINE
-					);
-					/* it probably isn't necessary to recompute the tab width now, but do so
-					 * just in case, honoring the previously computed value
-					 */
-					menuitemwidth += max(data->menu.tab_stop_size[column],
-					    tabRect.right - tabRect.left);
-					if (p != NULL) *p = '\t';
-					else /* last string so, */ break;
-					/* add the separation only when not the last item */
-					/* in the last item, we break out of the loop, in the statement just above */
-					menuitemwidth += TAB_SEPARATION;
-					++column;
-					p1 = p + 1;
-					p = strchr(p1, '\t');
-				}
-
-				sz->cx = max(sz->cx, 
-					(LONG)(2*TILE_X + menuitemwidth + tm.tmAveCharWidth*12 + tm.tmOverhang));
-			}
-			SelectObject(hdc, saveFont);
+			sz->cx = max(sz->cx, data->menu.menu_cx + GetSystemMetrics(SM_CXVSCROLL) );
 		} else {
-			/* Calculate the width of the text box. */
-			RECT text_rt;
-			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
-			GetTextMetrics(hdc, &tm);
-			SetRect(&text_rt, 0, 0, sz->cx, sz->cy);
-			DrawText(hdc, data->text.text, _tcslen(data->text.text), &text_rt, DT_CALCRECT | DT_TOP | DT_LEFT | DT_NOPREFIX);
-			sz->cx = max(sz->cx, text_rt.right - text_rt.left + 5*tm.tmAveCharWidth + tm.tmOverhang);
-			SelectObject(hdc, saveFont);
+			/* Use the width of the text box */
+			sz->cx = max( sz->cx, data->text.text_box_size.cx + 2*GetSystemMetrics(SM_CXVSCROLL));
 		}
 		sz->cx += extra_cx;
-
-		ReleaseDC(control, hdc);
+	} else { 
+		/* uninitilized window */
+		GetClientRect(hWnd, &rt);
+		sz->cx = rt.right - rt.left;
+		sz->cy = rt.bottom - rt.top;
 	}
 }
 /*-----------------------------------------------------------------------------*/

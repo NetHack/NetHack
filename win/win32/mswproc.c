@@ -817,6 +817,7 @@ void mswin_display_nhwindow(winid wid, BOOLEAN_P block)
 	if (GetNHApp()->windowlist[wid].win != NULL)
 	{
 		ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
+		mswin_layout_main_window(GetNHApp()->windowlist[wid].win);
 		if (GetNHApp()->windowlist[wid].type == NHW_MENU) {
 			MENU_ITEM_P* p;
 			mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win, PICK_NONE, &p, TRUE);
@@ -2521,11 +2522,6 @@ void mswin_update_window_placement(int type, LPRECT rt)
 		!EqualRect(rt_conf, rt) ) 
 	{
 		*rt_conf = *rt;
-
-		/* if window changed size while the game is in progess -
-		   it was most likely resized by the user */
-		if( program_state.something_worth_saving )
-			GetNHApp()->bAutoLayout = FALSE;
 	}
 }
 
