@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)botl.c	3.4	1996/07/15	*/
+/*	SCCS Id: @(#)botl.c	3.4	2003/11/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -447,8 +447,8 @@ bot()
 	anything curr, prev;
 	boolean valset[MAXBLSTATS];
 
-	idx = (++idx % 2);
-	idx_p = ((idx+1) % 2);
+	idx_p = idx;
+	idx   = 1 - idx;	/* 0 -> 1, 1 -> 0 */
 
 	/* clear the "value set" indicators */
 	(void) memset((genericptr_t)valset, 0, MAXBLSTATS * sizeof(boolean));
