@@ -495,7 +495,7 @@ winid endwin;
 		otmp->rknown = 1;
 	    /* assumes artifacts don't have quan>1 */
 	    Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
-		!otmp->oartifact ? "The " : "",
+		the_unique_obj(otmp) ? "The " : "",
 		otmp->oartifact ? artifact_name(xname(otmp), &dummy) :
 			OBJ_NAME(objects[otmp->otyp]),
 		arti_cost(otmp), currency(2L), 

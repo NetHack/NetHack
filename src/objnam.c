@@ -10,9 +10,6 @@
 #define NUMOBUF 12
 
 STATIC_DCL char *FDECL(strprepend,(char *,const char *));
-#ifdef OVL0
-static boolean FDECL(the_unique_obj, (struct obj *obj));
-#endif
 #ifdef OVLB
 static boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
 #endif
@@ -491,7 +488,7 @@ struct obj *obj;
 #ifdef OVL0
 
 /* used for naming "the unique_item" instead of "a unique_item" */
-static boolean
+boolean
 the_unique_obj(obj)
 register struct obj *obj;
 {
