@@ -1,11 +1,11 @@
-/*	SCCS Id: @(#)tile2bmp.c	3.4	2002/02/24	*/
+/*	SCCS Id: @(#)tile2bmp.c	3.4	2002/03/14	*/
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 
 /*
  * Edit History:
  *
- *	Initial Creation			M.Allison   94/01/11
+ *	Initial Creation			M.Allison   1994/01/11
  *
  */
 
@@ -13,7 +13,7 @@
 
 #include "hack.h"
 #include "tile.h"
-#ifndef __DJGPP__
+#ifndef __GNUC__
 #include "win32api.h"
 #endif
 
@@ -48,7 +48,7 @@ extern char *FDECL(tilename, (int, int));
 #define PACK
 #endif 
 
-#if defined(__DJGPP__)
+#ifdef __GNUC__
 typedef struct tagBMIH {
         unsigned long   biSize;
         long       	biWidth;
@@ -85,7 +85,7 @@ typedef struct tagRGBQ {
 #define BI_RLE8       1L
 #define BI_RLE4       2L
 #define BI_BITFIELDS  3L
-#endif /* defined(__DJGPP__) */
+#endif /* __GNUC__ */
 
 #pragma pack(1)
 struct tagBMP{
