@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	SCCS Id: @(#)Makefile.src	3.4	2002/03/02
+#	SCCS Id: @(#)Makefile.src	3.4	2003/02/13
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -293,8 +293,8 @@ $(CONFIG_H) : $(INC)config.h $(INC)config1.h $(INC)tradstdc.h $(INC)global.h \
 		$(INC)coord.h $(INC)vmsconf.h $(INC)system.h \
 		$(INC)unixconf.h $(INC)os2conf.h $(INC)micro.h \
 		$(INC)pcconf.h $(INC)tosconf.h $(INC)amiconf.h \
-		$(INC)macconf.h $(INC)beconf.h $(INC)ntconf.h \
-		$(INC)nhlan.h
+		$(INC)macconf.h $(INC)beconf.h $(INC)wceconf.h \
+		$(INC)ntconf.h $(INC)nhlan.h
 	$(TOUCH) $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \
@@ -307,7 +307,7 @@ $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \
 		$(INC)you.h $(INC)attrib.h $(INC)monst.h $(INC)skills.h \
 		$(INC)onames.h $(INC)timeout.h $(INC)trap.h \
 		$(INC)flag.h $(INC)rm.h $(INC)vision.h \
-		$(INC)display.h $(INC)engrave.h $(INC)rect.h $(inc)region.h \
+		$(INC)display.h $(INC)engrave.h $(INC)rect.h $(INC)region.h \
 		$(INC)winprocs.h $(INC)wintty.h $(INC)trampoli.h
 	$(TOUCH) $(HACK_H)
 #	VMS-specific code
@@ -342,7 +342,7 @@ winmesg.obj :	$(X11)winmesg.c $(INC)xwindow.h $(HACK_H) $(INC)winX.h
 winmisc.obj :	$(X11)winmisc.c $(HACK_H) $(INC)func_tab.h $(INC)winX.h
 winstat.obj :	$(X11)winstat.c $(HACK_H) $(INC)winX.h
 wintext.obj :	$(X11)wintext.c $(HACK_H) $(INC)winX.h $(INC)xwindow.h
-winval.obj :	$(X11)winval.c $(CONFIG_H) $(INC)winX.h
+winval.obj :	$(X11)winval.c $(HACK_H) $(INC)winX.h
 tile.obj :	$(SRC)tile.c $(HACK_H)
 monstr.obj :	monstr.c $(CONFIG_H)
 vis_tab.obj :	vis_tab.c $(CONFIG_H) $(INC)vis_tab.h
@@ -398,7 +398,8 @@ mkobj.obj :	mkobj.c $(HACK_H)
 mkroom.obj :	mkroom.c $(HACK_H)
 mon.obj :	mon.c $(HACK_H) $(INC)mfndpos.h $(INC)edog.h
 mondata.obj :	mondata.c $(HACK_H) $(INC)eshk.h $(INC)epri.h
-monmove.obj :	monmove.c $(HACK_H) $(INC)mfndpos.h $(INC)artifact.h
+monmove.obj :	monmove.c $(HACK_H) $(INC)mfndpos.h $(INC)artifact.h \
+		$(INC)epri.h
 monst.obj :	monst.c $(CONFIG_H) $(INC)permonst.h $(INC)align.h \
 		$(INC)monattk.h $(INC)monflag.h $(INC)monsym.h \
 		$(INC)dungeon.h $(INC)eshk.h $(INC)vault.h \
@@ -454,7 +455,7 @@ weapon.obj :	weapon.c $(HACK_H)
 were.obj :	were.c $(HACK_H)
 wield.obj :	wield.c $(HACK_H)
 windows.obj :	windows.c $(HACK_H) $(INC)wingem.h $(INC)winGnome.h
-wizard.obj :	wizard.c $(HACK_H) $(INC)qtext.h
+wizard.obj :	wizard.c $(HACK_H) $(INC)qtext.h $(INC)epri.h
 worm.obj :	worm.c $(HACK_H) $(INC)lev.h
 worn.obj :	worn.c $(HACK_H)
 write.obj :	write.c $(HACK_H)
