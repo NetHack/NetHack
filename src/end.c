@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.4	2002/08/22	*/
+/*	SCCS Id: @(#)end.c	3.4	2002/10/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -197,18 +197,19 @@ register struct monst *mtmp;
 		Strcat(buf, "the ");
 	    killer_format = KILLED_BY;
 	}
+	/* _the_ <invisible> <distorted> ghost of Dudley */
+	if (mtmp->data == &mons[PM_GHOST] && mtmp->mnamelth) {
+		Strcat(buf, "the ");
+		killer_format = KILLED_BY;
+	}
 	if (mtmp->minvis)
 		Strcat(buf, "invisible ");
 	if (distorted)
 		Strcat(buf, "hallucinogen-distorted ");
 
 	if(mtmp->data == &mons[PM_GHOST]) {
-		char *gn = NAME(mtmp);
-		if (!distorted && !mtmp->minvis && *gn) {
-			Strcat(buf, "the ");
-			killer_format = KILLED_BY;
-		}
-		Sprintf(eos(buf), (*gn ? "ghost of %s" : "ghost%s"), gn);
+		Strcat(buf, "ghost");
+		if (mtmp->mnamelth) Sprintf(eos(buf), " of %s", NAME(mtmp));
 	} else if(mtmp->isshk) {
 		Sprintf(eos(buf), "%s %s, the shopkeeper",
 			(mtmp->female ? "Ms." : "Mr."), shkname(mtmp));
