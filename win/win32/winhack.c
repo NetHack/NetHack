@@ -16,12 +16,15 @@
 #define SHARED_DCL extern
 #endif
 
-SHARED_DCL char orgdir[PATHLEN];	/* also used in pcsys.c, amidos.c */
-
 extern void FDECL(nethack_exit,(int));
 
 // Global Variables:
 NHWinApp _nethack_app;
+
+#ifdef __BORLANDC__
+#define _stricmp(s1,s2)     stricmp(s1,s2)
+#define _strdup(s1)         strdup(s1)
+#endif
 
 // Foward declarations of functions included in this code module:
 BOOL				InitInstance(HINSTANCE, int);

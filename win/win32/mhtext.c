@@ -7,11 +7,13 @@
 #include "mhmsg.h"
 #include "mhfont.h"
 
+PNHWinApp GetNHApp(void);
+
 typedef struct mswin_nethack_text_window {
 	TCHAR*  window_text;
 } NHTextWindow, *PNHTextWindow;
 
-LRESULT CALLBACK	TextWndProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK	TextWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void LayoutText(HWND hwnd);
 
@@ -71,7 +73,7 @@ void mswin_display_text_window (HWND hWnd)
 	GetNHApp()->hMenuWnd = NULL;
 }
     
-LRESULT CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HWND control;
 	HDC hdc;

@@ -48,11 +48,11 @@ extern short glyph2tile[];
 
 #define NHMENU_IS_SELECTABLE(item) ((item).identifier.a_obj!=NULL)
 
-LRESULT CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
-static LRESULT onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
-static LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
-static LRESULT onListChar(HWND hWnd, HWND hwndList, WORD ch);
+static BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
+static BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
+static BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch);
 static void LayoutMenu(HWND hwnd);
 static void SetMenuType(HWND hwnd, int type);
 static void SetMenuListType(HWND hwnd, int now);
@@ -210,7 +210,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 	return ret_val;
 }
    
-LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMenuWindow data;
 	int nItem;
@@ -550,7 +550,7 @@ HWND GetMenuControl(HWND hWnd)
 }
 
 
-LRESULT onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
+BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     LPMEASUREITEMSTRUCT lpmis; 
     TEXTMETRIC tm;
@@ -578,7 +578,7 @@ LRESULT onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
-LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
+BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     LPDRAWITEMSTRUCT lpdis; 
 	PNHMenuItem item;
@@ -688,7 +688,7 @@ LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
-LRESULT onListChar(HWND hWnd, HWND hwndList, WORD ch)
+BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 {
 	int i = 0;
 	PNHMenuWindow data;

@@ -1,5 +1,9 @@
 //Microsoft Developer Studio generated resource script.
 //
+#if defined(__BORLANDC__)
+LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
+#endif
+
 #include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS

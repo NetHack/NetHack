@@ -17,7 +17,7 @@ struct getlin_data {
 	size_t		result_size;
 };
 
-LRESULT CALLBACK	GetlinDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK	GetlinDlgProc(HWND, UINT, WPARAM, LPARAM);
 
 int mswin_getlin_window (
 	const char *question, 
@@ -47,7 +47,7 @@ int mswin_getlin_window (
 	return ret;
 }
     
-LRESULT CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct getlin_data* data;
 	RECT   main_rt, dlg_rt;
@@ -117,7 +117,7 @@ struct extcmd_data {
 	int*		selection;
 };
 
-LRESULT CALLBACK	ExtCmdDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK	ExtCmdDlgProc(HWND, UINT, WPARAM, LPARAM);
 
 int mswin_ext_cmd_window (int* selection)
 {
@@ -141,7 +141,7 @@ int mswin_ext_cmd_window (int* selection)
 	return ret;
 }
     
-LRESULT CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct extcmd_data* data;
 	RECT   main_rt, dlg_rt;
@@ -231,7 +231,7 @@ struct plsel_data {
 	int*	selection;
 };
 
-LRESULT CALLBACK	PlayerSelectorDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK	PlayerSelectorDlgProc(HWND, UINT, WPARAM, LPARAM);
 static void 		plselInitDialog(HWND hWnd);
 static void			plselAdjustLists(HWND hWnd, int changed_opt);
 static int			plselFinalSelection(HWND hWnd, int* selection);
@@ -258,7 +258,7 @@ int mswin_player_selection_window ( int* selection )
 	return ret;
 }
 
-LRESULT CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct plsel_data* data;
 	RECT   main_rt, dlg_rt;
