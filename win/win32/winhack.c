@@ -44,7 +44,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	int argc;
 	char* argv[MAX_CMDLINE_PARAM];
 	size_t len;
-	TCHAR* p;
+	TCHAR *p, *p2;
 	TCHAR wbuf[BUFSZ];
 	char buf[BUFSZ];
 
@@ -79,8 +79,15 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	}
 
 	/* get command line parameters */	
-	p = _tcstok(GetCommandLine(), TEXT(" "));
-	for( argc=0; p && argc<MAX_CMDLINE_PARAM; argc++ ) {
+	argc = 0;
+	p = GetCommandLine();
+	if (p && *p == _T('"')) {
+		p2 = _tcschr(p + 1, _T('"'));
+		p = p2 + 2;
+		argc = 1;
+	}
+	p = _tcstok(p, TEXT(" "));
+	for( ; p && argc<MAX_CMDLINE_PARAM; argc++ ) {
 		len = _tcslen(p);
 		if( len>0 ) {
 			argv[argc] = _strdup( NH_W2A(p, buf, BUFSZ) );
