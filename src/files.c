@@ -1530,7 +1530,15 @@ const char *filename;
 		Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
 	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 		return(fp);
-	else if (errno != ENOENT) {
+# if defined(__APPLE__)
+	/* try an alternative */
+	if (envp) {
+		Sprintf(tmp_config, "%s/%s", envp, "Library/Preferences/NetHack Defaults");
+		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+			return(fp);
+	}
+# endif
+	if (errno != ENOENT) {
 		/* e.g., problems when setuid NetHack can't search home
 		 * directory restricted to user */
 		raw_printf("Couldn't open default config file %s (%d).",
