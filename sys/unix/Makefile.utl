@@ -72,11 +72,11 @@
 
 # flags for Linux
 #   compile normally
-# CFLAGS = -O2 -fomit-frame-pointer -I../include -I/usr/X11/include
-# LFLAGS = -L/usr/X11/lib
+# CFLAGS = -O2 -fomit-frame-pointer -I../include
+# LFLAGS = -L/usr/X11R6/lib
 #   OR compile backwards compatible a.out format
-# CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include -I/usr/X11/include
-# LFLAGS = -b i486-linuxaout -L/usr/X11/lib
+# CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include
+# LFLAGS = -b i486-linuxaout -L/usr/X11R6/lib
 
 # flags for BeOS using the command line
 # remember to uncomment flex and bison below

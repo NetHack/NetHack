@@ -117,11 +117,11 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 
 # flags for Linux
 #   compile normally
-# CFLAGS = -O2 -fomit-frame-pointer -I../include -I/usr/X11/include
-# LFLAGS = -L/usr/X11/lib
+# CFLAGS = -O2 -fomit-frame-pointer -I../include
+# LFLAGS = -L/usr/X11R6/lib
 #   OR compile backwards compatible a.out format
-# CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include -I/usr/X11/include
-# LFLAGS = -b i486-linuxaout -L/usr/X11/lib
+# CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include
+# LFLAGS = -b i486-linuxaout -L/usr/X11R6/lib
 
 # flags for BeOS
 #   on a Mac/BeBox:
@@ -212,7 +212,7 @@ WINOBJ = $(WINTTYOBJ)
 # Systos needs -lcurses16 if you use -mshort
 # AIX 3.1 on RS/6000 likes -lcurses if TERMINFO defined in unixconf.h
 # and -ltermcap otherwise
-# Linux uses -ltermcap or -lncurses
+# Linux uses -lncurses (newer) or -ltermcap (older)
 # Be uses -ltermcap
 #
 # libraries for tty ports

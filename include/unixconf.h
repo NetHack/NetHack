@@ -174,7 +174,7 @@
 #define DEF_MAILREADER	"/usr/ucb/Mail"
 #  endif
 #else
-# if defined(SYSV) || defined(DGUX) || defined(HPUX)
+# if (defined(SYSV) || defined(DGUX) || defined(HPUX)) && !defined(LINUX)
 #  if defined(M_XENIX) || defined(__FreeBSD__)
 #define DEF_MAILREADER	"/usr/bin/mail"
 #  else
