@@ -2686,7 +2686,8 @@ move_on:
 			    (!ltmp && cltmp && only_partially_your_contents) ?
 			     " your items in" : (!ltmp && cltmp) ? " the contents of" : "",
 			    obj->unpaid ? "the" : "your", xname(obj),
-			    (obj->quan == 1L && !only_partially_your_contents) ?
+			    (obj->quan == 1L &&
+			    !(!ltmp && cltmp && only_partially_your_contents)) ?
 			    "it" : "them");
 		} else  qbuf[0] = '\0';		/* just to pacify lint */
 
@@ -2704,7 +2705,7 @@ move_on:
 			    subfrombill(obj, shkp);
 			    pay(-offer, shkp);
 			    shk_names_obj(shkp, obj, (sell_how != SELL_NORMAL) ?
-			    	    only_partially_your_contents ?
+				    (!ltmp && cltmp && only_partially_your_contents) ?
 			    	    "sold some items inside %s for %ld gold pieces%s.%s" :
 				    "sold %s for %ld gold piece%s.%s" :
 	       "relinquish %s and receive %ld gold piece%s in compensation.%s",
