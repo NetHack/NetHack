@@ -1,0 +1,929 @@
+-----------------------------------------------------------------------------
+Buglist: actual bugs that may get fixed someday
+-----------------------------------------------------------------------------
+
+=============================================================================
+Using the '>' command to end controlled levitation doesn't set the
+Heart of Ahriman's invocation timeout, allowing the player to resume
+levitating immediately via #invoke.
+
+A funny thing happened at the portal to Rodney's tower. Wearing
+levitation boots, I floated onto the portal, and was ported to the
+tower. Then I took off my boots, and got "You activated the magic
+portal!", but no immediate teleport. I was able to make one more
+move, stepping off the portal, and _then_ the teleport happened.
+I reproduced this in wizard mode - only levitation boots work that
+way, the ring doesn't. It turns out that after landing on the portal
+it is possible to take one action (which could be a time-taking move,
+but also checking the inventory or somesuch) before the teleport
+actually takes place. [mhed@nym.alias.net]
+
+Moving when strained or overtaxed was supposedly intended to cause
+HP loss. allmain.c. But it looks like the flags.mv is set (in cmd.c) 
+only for multiple movement commands, not when walking step by step.
+A wizmode test confirmed that HP loss happened only when multi-running; 
+simple walking resulted in HP regeneration.  The same reason (flags.mv)
+is probably responsible for the steed being affected by the character's 
+speed boots when walking step by step. 
+> if (wtcap > MOD_ENCUMBER && flags.mv) {
+>    if(!(wtcap < EXT_ENCUMBER ? moves%30 : moves%10)) {
+>       if (Upolyd && u.mh > 1) {
+>                u.mh--;
+>       } else if (!Upolyd && u.uhp > 1) {
+>                u.uhp--;
+>       } else {
+>                You("pass out from exertion!");
+>                exercise(A_CON, FALSE);
+>                fall_asleep(-10, FALSE);
+>       }
+>    }
+> }
+[mhed@nym.alias.net]
+
+Prisoners for the Dark One's dungeon? 
+[psmith@spod-central.org]
+
+Yanked towards water with grappling hook but don't fall in?
+[psmith@spod-central.org]
+
+Drain life requires you to reach floor to wipe an engraving.
+[psmith@spod-central.org]
+
+Orc monsters should be given poison res? [psmith@spod-central.org]
+
+Ninja monsters should get multishot bonuses with yumi-ya? 
+[psmith@spod-central.org]
+
+Chromatic Dragon should have reflection? [psmith@spod-central.org]
+
+stone-to-flesh monsters' inventory? [psmith@spod-central.org]
+
+Releasing your pet from a bear trap by displacing is silly.
+[eino.keskitalo@purkki.mbnet.fi]
+
+When punished, being teleported always places the iron ball underneath you
+even when you land at a spot that's within range of the current ball&chain
+position.  Since the teleport mechanism is used for crawling out of water,
+this can produce an even stranger effect:  if you're carrying the attached
+ball when you step into water and it happens to be chosen as an item to
+drop in order to lighten your load, it will end up crawling out of the
+water with you.  (Ie, it will end up underneath you on land rather than in
+the adjacent water where it was actually dropped.)
+
+Monster spellcasting is in serious need of overhaul.
+Clerical spell `case 1' has ``if (...) {} /* else fall into default */''
+but the default case has been moved away so the comment is a lie.
+Monsters which cast spells automatically "cast at thin air" if they don't know
+where you are.  In fact, castmu() includes undirected spells (healing) which
+should still be possible under these circumstances.
+The higher level a monster is, the more likely it becomes to cast the wimpy
+"default" spell.  This is particularly silly for the Wizard who has a higher
+level each time he's reincarnated.  Beyond that, spell using monsters ought
+to pick their spells intelligently rather than randomly, especially once
+they learn that their target is magic resistant.
+
+Recoil from throwing while levitating won't trigger every type of trap.
+Some were checked for and added in 3.3.2 (magic_portal, fire, pits et al on
+Sokoban), but there are others that you can bypass just by throwing
+something in the opposite direction.
+
+When a wand of striking hits a boulder or statue sitting on the down 
+staircase, the resulting rubble/contents should have a chance of
+falling down the stairs. (Possibly the same situation for trapdoors/holes).
+
+Individually scattering objects that fall down stairs and holes is 
+inefficient when multiple objects are migrating. It might be better to place 
+all of the migrating objects that are being scattered onto a special obj 
+chain which scatter() could easily be changed to accomodate.
+
+Occasionally an eating attempt which gets interrupted will produce a
+food object that is not flagged as partially eaten, even though it did
+get split out of a merged group.  (Observed in both 3.1.3 and 3.2.2), 
+for ordinary food rations carried in the player's inventory.)
+
+Occasionally player will get messages about become encumbered while eating,
+when they didn't begin eating encumbered, but they return to proper encum-
+berance when finished eating.  There is also a problem with partly eaten
+food rations carrying the wrong nutritional value (player can start out weak,
+get interrupted, finish the partly eaten ration, and end up satiated) which is
+likely the same bug.
+
+For "traditional" menu style, pickup and #loot/apply can't accept an 'm'
+response to bring up a menu upon request when all items involved are of
+the same class, because the prompt where that response is allowed only
+gets issued when multiple classes are present.
+
+Slower decay for corpses on ice has been re-implemented, but slowing down
+the rate at which they become unfit for consumption has to be looked at.
+
+Several special levels exhibit lit-wall anomalies.
+
+float_down() messages conflict with drown() and lava_effects() messages.
+There's a kludge in place to keep drown() messages from causing duplicate and
+out-or-order float_down() messages, but lava_effects() has cases where you can
+float_down w/o any messages being printed at all.  These should be very rare,
+but it should still get fixed in a less kludgy way.
+
+The resistance delays are very slow on some machines and fine on others, with
+no apparent pattern.  There is a proposal to do timing in a different manner.
+
+Monsters do not get affected by special properties of many types of armor,
+like levitation boots.  They do get affected by speed boots, but do not
+consider such items to be any better than other shoes which grant 1 point
+of AC when deciding whether to wear them.
+
+Corpses buried under ice ought to be handled as if they were inside an
+ice box.
+
+If you dig through the walls of two shops at the same time, only one shk
+will come seeking payment for damage. If you then beat him back into his
+shop, leaving the other shop behind, the angry shopkeeper suddenly calms 
+down and welcomes you to his shop.
+
+Throwing, dropping, or kicking a land mine object ought to have a chance
+of setting it off.  Ditto for hitting it with striking magic or rolling
+a boulder over it.  Likewise for armed land mine traps.
+
+There are several TODOs and one fixme still in the code.  They tend to stay
+around for a long time.
+
+Teleporting while using tiles may place you one tile beyond the edge of
+the display screen, and place the crosshair on empty space.
+
+Engraving requiring multiple turns ought to be recoded as an occupation
+so that it could become interruptable.
+
+Being punished on the Plane of Water does not work correctly.  The ball
+& chain always remain at your current location whether you're dragging
+them around or whether you're just floating along with an air bubble.
+(This is bad, but better than the previous behavior of panicking when
+an air bubble tried to move them.)
+
+Monster extinction is now a little better, but some cases are not covered
+which would logically not "use up" the supply of wild monsters.  Monster
+cloning is explicitly such a case; there are some cases that have been
+missed for now.
+
+Some of the new monsters (especially water monsters) never appear at random.
+
+"The combat suddenly awakens you" printed when player was asleep from a
+sleeping gas trap and woke up.  No combat was present.
+
+The region code displays a fog cloud glyph for clouds, but '/' identifies it
+as a vortex.
+
+Reported but unconfirmed bugs:
+-- Strange things happen to items in chests pets carry downstairs.
+-- Several reports of core dumps when monsters resist an effect.
+-- There seem to be more reports of death by trickery than can be accounted
+   for by misset NETWORKs.
+-- newexplevel() called rnd(-1).  I seem to remember this being a Xenix
+   compiler bug, but I'm not sure.
+-- Reports of minor terminal weirdnesses especially after NetHack dies after
+   catching a signal.
+-- Reported problem with loss of hit points for no apparent reason until
+   player was left with 1 out of 1 hit points.
+-- Walking around in the Gnomish Town, when I suddenly noticed my cat
+   wasn't following me around anymore. It appeared to be hanging around
+   somewhere near an outer wall of a food shop, on the other side of which
+   was lying a tripe ration and would not move. [Boudewijn Waijers]
+-- Monsters were displayed as 'I' (unseen monster) but were referred to by
+   name.  [Irina]
+-- A wand of secret door detection self-identified while engraving even
+   though it didn't find anything.  [Irina]
+
+Riding bugs:
+-- If you have see invisible and your invisible steed becomes truly 
+   invisible (potion timeout or ring removal) we need to revert to 
+   showing the player in that situation. The u.usteed check in the 
+   display_self() macro could become u.usteed && !u.usteed.minvis 
+   to accomodate that.
+-- Land mine traps cause wounded legs when the character is riding, and 
+   don't do any harm to the steed.  
+-- Wielding Stormbringer while riding should result in it attacking
+   your steed on occasion.
+-- There are several inappropriate items around riding a steed
+   with wounded legs: 
+   -Dexterity is periodically abused.
+   -Wounded legs are a minor prayer trouble.
+   -Wounded legs are considered an unfixable unicorn horn trouble.
+   -Falling/being thrown from steed doesn't incur usual wounded-legs DEX hit.
+-- The steed might want to wander about when you are paralyzed (of course the
+   knight's well-trained pony wouldn't)
+   [eino.keskitalo@purkki.mbnet.fi]
+
+
+Platform specific bugs:
+-----------------------
+MAC
+      - Doesn't work well when switching between foreground and background.
+      - Gives a "type 1" error for some people on startup (unconfirmed --
+	may be due to MW compiler bug).
+MSDOS
+      - The Rogue level is unable to use the proper characters for armor or
+	rings, since they would get interpreted as control characters.
+      - "RAMDISK" feature in defaults.nh hasn't worked for some time 
+	and is past much of its usefulness. A temp directory would be 
+	more appropriate.
+      - The MSC7 compile results in "stack plus data exceeds 640k" messages.
+      - Clearing the screen doesn't necessarily work.  For instance, a bad
+	options line can leave "Hit <Enter> to continue." on the bottom of the
+	screen, which ^R will not redraw.
+      - Compiling without DLB using DJGPP does not work with the supplied
+	Makefile.
+      - On the djgpp version, a large number of arguments to "nethack -s"
+	can crash the program.  "nethack -s *" in a directory with a lot of
+	filenames can trigger this problem.
+      - set_bonestemp_name() needs to be fixed for the #if MICRO configuration.  
+        It currently uses the device+directory path for level files, but bones 
+        can be placed elsewhere so renaming from the temp name to the final 
+        bones file name isn't reliable.
+NT
+      - With console window larger than 80x25 (80x43) some commands that 
+	display text underneath the map don't clear to eol, so you get 
+	stray chars left there (?a, ?b, ?c, ?g and ?i, but not others).
+      - When a game is started on a console larger than 80x25, the game
+	only occupies the first 25 lines, leaving whatever junk happened
+	to be on the screen prior to starting NetHack still there.
+Unix
+
+X11
+      - It is possible to get a prompt which does not vanish from the screen.
+      - Anything which gives two prompts in a row at which one may type a single
+        character, has a several second delay between when the single character is
+        read for the first prompt and the first prompt is erased, and the second prompt
+        is printed.
+
+tty
+
+Guidebook
+      - various mentions of spellcasting are all based on the old system
+        rather than the present wizard patch implementation.
+
+------------------------------------------------------------------------------
+Problems/tradeoffs which are probably not going to get fixed
+------------------------------------------------------------------------------
+Some quest messages get delivered when they no longer make sense, such as
+the dying threat of a quest nemesis being given after it's been beheaded,
+petrified, or disintegrated.  Likewise, at least one of the quests gives
+"you sense the presence of the {quest artifact}" message upon return to
+the goal level, even when it happens to already be in your possession.
+
+If a quest leader gets polymorphed and then killed before quest completion,
+the code which suppresses the call for assistance when he's dead doesn't
+notice.
+
+Energy monsters, like yellow lights, ghosts, and wraiths, are treated like
+solid monsters inappropriately in several ways.
+
+Because there is no record of which squares a leash is in, leashed
+pets can follow you through a different door than you left a room
+from, or teleport through a door you closed between yourself and it.
+
+"baby red dragon", &c. is a kludge.  The "correct" way to do it would be to
+use monsters with a small mlevel for baby monsters, but this has several
+problems such as name_to_mon() not working, random generation being unable to
+create them earlier, and inability to create them with worse armor classes or
+attacks which do less damage.
+
+The "/" command, when used on areas outside of rooms, guesses (dark part of
+a room) incorrectly. Correcting will require a new glyph type (ie, unknown
+or unexplored area).
+
+There are hooks for invisible objects, but they're not really implemented.  It
+has complicated ramifications involving which monsters can see and pick them
+up (and whether the player notices), ensuring snakes cannot hide under them,
+and whether they can be taken out of containers.
+
+Missile weapons not hitting their targets always drop to the floor where
+the targets are.  What should happen is that it sometimes drops and sometimes
+whizzes by (possibly to hit a monster behind it) depending on several factors:
+Is the monster's AC because of scales, hide, etc... (so missiles which "miss"
+actually hit and dropped but didn't injure) or is it because the monster is
+small and quick (so the missile whizzed by)?  Is the monster flying or on the
+ground?  Is the player levitating?  Is the player unusually short or tall
+(i.e., if the player is polymorphed), etc....
+
+There is a problem with alignment: if you change alignment, peaceful monsters
+all stay the same and killing them is now bad for your new alignment--and thus
+good for your old alignment.  The "obvious" solution is to change the
+peacefulness and relative alignment of the monsters whenever your alignment
+changes.  This does not work because since monsters only have a percentage
+chance of peacefulness due to alignment, you can change and change back,
+whereupon the monster peacefulness will be distributed differently than when
+you started.  This also ignores monsters on other levels, whose peacefulness
+distribution would not change--for consistency, if you changed from lawful to
+chaotic and back, since peacefulness of monsters on your own level got
+redistributed, so would peacefulness on those other levels.
+
+You can open/close doors diagonally, but cannot enter them diagonally.  This
+seems inconsistent.  [Comment:  The main reason why this is blocked is
+because of shop behavior.  Allowing diagonal entry will nullify the body
+block by the shk, when you carry unpaid items.  If diagonal moves are
+allowed, shopkeepers should close the door when you're inside.  IM]
+
+Some of the data.base descriptions are either misleading or downright false
+when applied to the NetHack monsters.  (I'd hate to try counting the number of
+times people posted to rec.games.hack mentioning using a mirror on a
+cockatrice, for instance).  On the other hand, these descriptions are based
+on the traditional properties of monsters, so it's not clear people are trying
+things based on the descriptions.
+
+Monsters cannot use AD_STCK or AD_WRAP on other monsters.  The complications
+are too great, and would add little to the game.
+
+Polymorphed players, as well as monsters, who swallow monsters either totally
+digest them or immediately regurgitate them; unlike monsters who swallow
+players, they cannot have their victim inside them for several moves.
+
+You cannot stop eating, transcribing, or removing armor, save the game, restore
+it, then expect to continue.  These use static data structures which aren't
+saved.
+
+Problems can arise when your movement is being stopped by two different
+things, both of which use nomul() and/or nomovemsg.  (Still possible, though
+much less likely.)
+
+There is no option to not hit certain monsters such as floating eyes.  This
+is not likely to be "fixed" as the resulting risk is inherited directly from
+rogue's floating eyes and ice monsters.
+
+If you're blind, or the swallower is invisible, you still see the interior
+of a monster when swallowed. [I think that the monster should show up when
+blind.  After all, you can feel it around you.  For invisible swallowers,
+it depends on what is meant by invisible.  If invisible means "bend light
+around you" then the interior _should_ show up.  If invisible means "you
+are transparent" then the interior should not be displayed, and, in fact,
+the dungeon should be displayed around the hero.  -Dean]
+
+The color display on color screens is not really integrated into object
+visibility.  Seeing the color does not cause dknown to be set even for a
+colored object.  Similarly, if dknown is not set (i.e. when blind) the object
+shows up in color anyway.
+
+The monster movement rate is also used to decide when the monster attacks.
+Therefore, a monster with half normal movement rate (6") also attacks only
+half the time.  This gets ridiculous in some cases (mimics, puddings), as
+well as making soldiers less tough than they probably were meant to be.
+The monster difficulty level calculation doesn't take into account infrequent
+attacks due to a low movement rate, either, and many monsters are obvious
+ports from AD&D where the rate does _not_ reduce the number of attacks.
+The fix itself is fairly simple, but some balance testing will be needed.
+
+The Amulet of Yendor and artifacts are not allowed in containers; it becomes
+harder to check if you are carrying one, harder for monsters to steal one,
+and a pain to handle if the container gets destroyed.
+
+Polymorphed players who end up in doors or walls upon rehumanization, and have
+2 places to go to, can go to either of them.
+
+The !verbose option has not been tested for a long time.  A quick test shows
+that most messages except for hitting a monster are unaffected by it.  It
+should be either removed, or modified to do something useful.
+
+Invisible monster markers ('I') use the hero's memory (levl[x][y].glyph).
+So does remembering what objects are on the ground.  This means that the
+presence of an unseen monster causes the player to forget what was on the
+ground.
+
+Kicked objects which hit other objects give a message when the other objects
+are on a hole and don't fall, but not when there is no hole, even though the
+exact same thing happens.  This is intentional.
+
+If someone identifies a ring by wearing it, while blind, dknown is not set.
+This means that they can put on, say, a ring of levitation, levitate, and know
+what other rings of levitation are without knowing this one, until they become
+unblinded and recognize the type.  There is no real way to fix this because
+there is no way to say "they don't know that this type is associated with this
+material now, but they'll know it as soon as they can see".
+
+Shades cannot be attacked by players unless they have silver or blessed
+weapons.  Monsters who attack shades are not subject to similar restrictions.
+
+The idea of giants carrying boulders, and the idea of boulders being huge
+objects that block passages, really don't mesh very well.  At worst, a boulder
+fills the full height of a passage and for a giant to carry one is the
+equivalent of a human carrying a boulder his own height in a passage no higher
+than the boulder is tall.  At best, the grid squares are taller than they are
+wide, and it is still the equivalent of a human carrying a rock that is at
+least two feet wide, not to mention that you can't fly or levitate over the
+boulder and giants that carry them don't block light.
+-------------------------------------------------------------------------
+3.'s Doomed Agenda  (which doesn't mean they're reserved!)
+-------------------------------------------------------------------------
+Integration:
+    Allow crystal balls to detect furniture types.
+
+    #offer items to shopkeeper in shops for price quotes.
+
+    #force doors.
+
+    open (#force, #loot) boxes next to you, bags in inventory.
+
+    Integrate cans of grease more.  Fumbling with greased objects.
+    Towels degreasing objects.  Greased shields of reflection and mirrors
+    don't reflect well.  Greasy paper and cloth are especially combustible.
+
+    Non-swimmers move extra slow underwater.  Being underwater reduces
+    AC.  Lighting works differently underwater.
+
+    Mark food dipped in potions of sickness as poisoned, and cause
+    players/monsters that eat it to take damage accordingly.  (Here,
+    Spot!  I have this nice tripe ration for you!)
+
+Artifacts:
+    Magicbane drains magic.
+
+    Make Stormbringer willfully steer you toward monters when you're
+    stunned, on some occasions curse itself when it doesn't want to be
+    unwielded, and turn on you if you still wield it at the end of the
+    astral level or summon brethren to the chaotic minions.  "Blood and
+    souls for my lord Arioch!"  Perhaps mark Stormbringer kills as
+    unsacrificible, and give Stormy some of the XP.
+
+    Excalibur breaks when used for evil or after being stolen from a
+    shop, but can be repaired by dipping in an appropiate place if your
+    alignment is good.  And/or refuses to attack peaceful creatures.
+
+    Perhaps replace Dragonbane with Dragonslicer.
+
+    Consider unique, less useful Saberhagen swords like the healing
+    sword or the one that only touches your opponent's weapon.
+
+Religion:
+    Using a non-aligned artifact is bad religion.
+
+    Greater alignment adjustments for killing very tame monsters (such
+    as your children), and adjustments for killing angels.
+
+    Lower or remove alignment bonus for killing monsters much weaker
+    than you that don't pose much challenge.
+
+    Moloch's wrath is nastier than your gods'.
+
+    Sacrificing temple priests should be more than the ordinary human
+    sacrifice.  Sacrificing angels should be special too.  Sacrificing
+    the Wizard of Yendor should be extraordinary.  Perhaps just a lesser
+    demon for sacrificing some humans, and demon lords for sacrificing
+    priests. The Wizard, hmm...
+
+    At same level where gods would give you a passtune, have gods help you
+    find an unfound portal on the level.
+
+    Consider tameness of corpses when eating.  Fix tameness reset by cloning.
+
+Special levels:
+    Install homeless demon lords in their own distinct lairs, with
+    appropriate monsters surrounding them.  Add support for the Styx
+    level.
+
+    Level compiler wishlist:
+        monster inventory
+        desecrated altars
+        special level filler lit option
+        wall on left edge bug when non-rock filler used
+
+    Special levels of special sizes.  Small tower levels only stored as
+    a small region.  Perhaps the bigroom level is larger than the normal
+    screen size, so with clipping you only see one or two walls at once.
+
+Balance:
+    Adjust object creation probabilities and monster equipment by level,
+    so there is a progression from "low level" objects up near the
+    entrance and "higher level" objects the deeper you go.  Don't
+    generate figurines on high levels for the same reason as not making
+    statue traps; who needs a figurine of a newt?  [No to the first!
+    I've played Moria.  Waiting for those two rings of speed at 2500
+    feet was a *pain*. --KAA]
+
+    Balance fountain/sink effects on low levels (restrict them to deeper
+    ones?) like preventing water moccasins and water demons from
+    happening, as with exploding doors.
+
+    Make quest leaders and nemeses less prone to instant deaths, and/or
+    tone down instant deaths in the game (beheading/bisecting, stoning,
+    eating, crushing, burying, drowning).
+
+Monsters:
+    Make intelligent monsters use wands of teleport on you if you're at
+    where they're going (like demon lords to up stairs, or if you're
+    standing on a quest artifact).
+
+    Lawful pets don't attack lawful creatures.
+
+    Keraunophobic pets.  Photophobic monsters.
+
+    Give Wizard of Yendor magic resistance, and make quest monsters and
+    demon lords less prone to instant death.  (Perhaps give some quest
+    monsters reflection objects.  Perhaps make the Amulet of Yendor turn
+    weapons like the vorpal blade.)
+
+    mfloat/mlevit for levitated monsters, make monsters wearing levitation
+    boots levitate (extend floating monster checks for traps, picking up
+    objects, &c.).
+
+    Separate monster sleep from paralysis.
+
+    Jellocubes can eat doors.
+
+    Allow shamans to animate corpses into zombies.
+
+    Orcus animates the dead.
+
+    Perhaps shopkeepers could fill in pits too.  Players who vandalize
+    the store while shopkeepers are repairing other vandalism makes 'em
+    angry.
+
+    Killing shopkeepers/priests makes watchmen angry.
+
+    Make shopkeepers smarter in general, using their weapons and armor
+    when angry, lowering their awesome strength and AC commensurate to their
+    initial equipment, picking up their stock in trade (and perhaps gold) when
+    they leave their shop (dropping it when they return), and making them
+    attack monsters looting their shops (ones carrying unpaid objects).
+
+    Make shopkeepers catch their wares when thrown.  (And throw credit cards
+    back.)  Make guards catch gold and put it back in the vault.
+
+    Make vampires change to bats and vice versa.
+
+    Perhaps give Kops a distance bonus when throwing pies.
+
+    Lizards hide.
+
+    Give orcs something to #chat about.
+
+    Monsters shy away if you're too tough.
+
+    Correct marilith weapon attacks.
+
+    Smart monsters loot containers.  Dwarves could force containers with
+    their pick-axes.
+
+    Some monsters have natural enemies, that they will avoid/be attacked
+    by (rat -> cat -> dog).  Your rat and cat may be tame, but they
+    would chase and fight.
+
+    Set real destinations for monsters instead of aimless wandering,
+    especially dwarves, so their tunnels have direction.
+
+    Allow zombies/mummies/skeletons/etc. of many types with a monster
+    number field like objects.
+
+    Make Nazgul the heavies they should be.
+
+    Monster wishes.  [Are you mad?  --KAA]
+
+    Kops attach iron balls.
+
+    When grid bugs grow up, they split into clones.
+
+Objects:
+    ocan field for general object cancellation.
+
+    Perhaps allow low-damage bullwhips to strike two positions away.
+
+Game play:
+    Make starting under MS-DOS initialize IBMgraphics and lit_corridor
+    TRUE, and maybe video:autodetect, when appropriate.
+
+    Display a helpful message pointing you to the right command if you
+    try to remove armor instead of take off, or take off rings instead
+    of remove.  Or apply wands, books, scrolls, etc.  (Or just do what
+    you meant.)
+
+    Divide score by # times killed.
+
+    "A" to select among all for Drop, identify, and other ggetobj() calls.
+
+    Commands from inventory menu.
+
+    Highlight low HP
+
+    Command to wait until you are healed up.  ("g."?)
+
+    Touch type mode to shift [hjkl] to [jkl;].
+
+    Null options unset.
+
+    Separate put-in and take-out commands.  Or open . on chests.
+
+    Break some of the object classes into separate groups, like
+    containers to "]", ammo to "\", cadavers from other food, gems from
+    other rocks.
+
+    Perhaps use special background colors (or outline tiles) for glyphs
+    of tame or seen invisible monsters.
+
+    Let cave dwellers detect rotten food for another class difference.
+
+    Name objects on ground, for all those kicked loadstones.
+
+    "Feel apprehensive..." warning adjectives
+
+Realism:
+    Prevent snakes/giant spiders from hiding under gems or other too-small
+    objects.
+
+    Limit large mimics to large objects and small mimics to smaller ones
+    and from doors.
+
+    Limit the merging of food so that very fresh and very spoiled food
+    don't mix.
+
+    Eating zombies and mummies should likely make you sick.
+
+    Make exploding drawbridges do explosion damage, not instant kills.
+    Perhaps be pinned by drawbridges (and boulders) that fall on you.
+    Perhaps add junk objects like broken doors/drawbridges.
+
+    Make certain wild animals like jackals eat corpses left lying around,
+    and perhaps only aggressive when hungry (but hunger is only measured
+    for pets now).
+
+    An acid blob should corrode what it picks up, and maybe what it
+    passes over on the floor.
+
+    Trap doors ought to go to consistent places in the next level, but
+    what about branching dungeons?  Make holes in the floor and holes in
+    the ceiling deterministic dungeon features.
+
+    Weapon traps (dart, arrow) should have a finite supply of missiles.
+    (Perhaps darts buried in the floor?  Or in the wall if we prevent
+    such traps in the middle of the floor.)
+
+    Open tins that rot like corpses and that pets can eat.  Partly-eaten
+    tins are open.
+
+    Damp swamps that damage scrolls and books and maybe rust items left
+    there a long time.
+
+    Damp scrolls that can't be written on until they dry.
+
+    Embedded gems in rings and jeweled items left behind by eating.
+
+    Use pick-axes on iron chains.
+
+    Use axe as an axe to chop up doors, chests, etc.
+
+    Split AC into evasion AC and damage AC, so that dragons are easy to
+    hit (low evasion AC) but hard to hurt (high damage AC), to make
+    combat seem more realistic, with some indication of ineffectual
+    blows.
+
+    Split encumbrance into weight and bulk (which affects how much you
+    can put in containers, and a direct limit on carrying capacity).
+
+Atmosphere:
+    Perhaps make all class-specific anachronisms like credit cards,
+    Hawaiian shirts, expensive cameras, fedoras, stethoscopes all 0
+    random creation probability.
+
+    Change fake mail on micros to a note from the Wizard or a bill from
+    a shopkeeper triggered in the appropriate circumstances.
+
+    Put in a special message for huge special-level shops.
+
+    Draw out poison effects with a Poisoned timeout.
+
+    Have awakened monsters in special rooms growl() to wake other nearby
+    monsters.
+
+    Some newly-generated monsters tend to appear on stairways, others to
+    appear in pools, etc.
+
+    Put a chest of sunken treasure underwater, now that we can specify chest
+    contents (there are other treasure chests that need this already).
+
+    Creaky doors which wake monsters.  Graveyards should usually have
+    creaky doors.
+
+    Players killed and eaten leave bones or partially-eaten corpses.
+
+    Greedy killers snarf your gold.  Nymphs should take everything.
+    Shopkeepers pick up gold dropped in their shops.
+
+    Make general "Wow!" function for pline hallucination interjections
+    for variety.
+
+    Make A.S. -> engravings that point to stairs
+
+Spell casting enhancements:
+
+    Add something like bracers of defense so that spell casters do not have
+    to wear armor.
+
+    Add some sort of a "mute" spell to silence monster's cursing abilities,
+    and players spell casting abilities.
+
+    Make a detect magic spell.	There are hooks marking magic items in
+    objects[] for this.
+
+Silly:
+    Cute hallucination message about bowling when throwing an iron ball.
+
+    "alligator shoes".
+
+    If you quit in the Wizard of Yendor's presence, he calls you a wimp.
+
+    Hallucinated fist fights have sound effects.  Pow!  Wham!  Biff!
+    Sock!  Krak!  Boom!  Zap!  [Blame Kibo, it was his idea!]
+
+Glyphs:
+    Redraw mail daemon, grid bug
+
+    Moat different from pool
+
+    Object classes
+
+    Floor engravings
+
+    Use in discovery list?
+
+    A couple hallucinated monsters
+
+    Directed objects (missiles pointing each direction like boomerangs,
+    could flip three horizontal/vertical/diagonal tiles as appropriate).
+
+    Quantities of objects -- ex. 1 dart, (few darts,) many darts
+
+    General large pile glyph
+
+    Individual monster statues & corpses (& tins?)
+
+    Glowing?
+
+    Pillars for Delphi temple
+
+New:
+    Use flint stone with metal object to light candles.
+
+    Beholders with gaze attacks and anti-magic line of sight (or wimp
+    out and just create them by beholder zaps).  Sleep and slow eyes
+    aren't beams.  Blinding would probably only work on the center eye,
+    Anti-magic is the difficult part.  The right way is to have anti-
+    magic field bits for each square on the level.  Players and monsters
+    standing in the area would be temporarily cancelled.  Spells and
+    zaps in or through the square fizzle and magic scrolls and potions
+    don't work.  Plusses don't add.  Also unpoly a la protection from
+    shape changers.  Perhaps Wizards can recognize them.  Antimagic
+    traps could be replaced with anti-magic squares.  Magical monsters
+    should avoid.
+
+    Add a wooden sword (bokken/bokutou?) to the game, naturally safe
+    from rust or corrosion (but maybe digested when used against a
+    jellocube).
+
+    Magic mouth engraving/trap for special levels.  Either
+    engraving-like messages, or just standard discouragements like "Go
+    away.", "Scram.", "Beat it.", "Get out.", "None shall pass.", etc.
+    Perhaps even putting one on a statue.
+
+Diablo tribute:
+    New monster that throws balls of molten lava (that they generate 
+    out of thin air) which would at least be different from anything 
+    we've presently got.  There are some others which act as hiders 
+    (in Diablo, rather than really hide they rely on just being hard 
+    to see when stationary against the murky background display) which 
+    become active if you get too close or hit them with a ranged attack 
+    and become dormant again when you move away.  The difference from 
+    our existing hiders is that they act more like bats once they're 
+    active, instead of being really slow moving engulfers or mimics.
+    The venom code may allow for this.  A new lava "venom" sharing the
+    same class for generated-on-demand-liquid seems like the right 
+    place anyway.
+
+
+Rename #ifdef SOUNDS -> NOISES
+
+Disintegrate object after it becomes completely corroded?
+
+Don't put food in statues of stoned creatures.
+
+Cancel intrinsics.
+
+Zapping a wand wields it like a pick-axe.
+
+Glowing Orcrist as a light source.
+
+Make statue traps trapped objects, triggered after you step on their
+position.  Perhaps bear traps too, but make them turn invisible.
+
+Use oerosion for rings/gems damaged by engraving.  [Perhaps also damp
+scrolls? goopy towels?]
+
+Tourist search for lost Luggage.
+
+Eating wood/iron golems whole, should iron golems really be poisonous?
+
+Put -DWIZARD -DHACKDIR comments in makefiles.
+
+Perhaps allow different poisoned weapon effects for different potions.
+Change "Interesting..." since it suggests something happens when nothing
+does.
+
+Allow you, by #chat, to have shopkeepers identify objects in their specialty
+for you, for a fee.  (500zm?)
+
+Dallying with seducers unsets your u.uvirgin bit, which would cause unicorns
+to more actively avoid your company.
+
+Hallucinate objects (on floor with /, swung/thrown at you...).
+
+Horn of Geryon summons minotaurs.
+
+Beheading Medusa with vorpal blade.
+
+-------------------------------------------------------------------------
+Ken's Doomed Agenda (see, I can have one too...)
+-------------------------------------------------------------------------
+Add a wand of wonder (like the AD&D item).
+
+Shopkeepers angered when you break their door should be calmable by repairing
+the door (using a wand of locking or a spell of wizard lock).
+
+Add SCR_ENCHANT_WEAPON, SCR_REMOVE_CURSE, SCR_ENCHANT_ARMOR, SCR_DESTROY_ARMOR
+to items usable by monsters.
+
+Add one (or more) magic items that are mostly useful for monsters against
+players (though players _could_ use them).
+
+The code contains several sections which were necessary when removing a
+fire resistance item (weapon, armor, ring) was instant death in Hell.  These
+could use removal.
+
+Soldiers have no logical reason to possess elven cloaks.  Either create a new,
+nonspecial, cloak for this purpose, or change the leather jacket to a cloak
+and use it.
+
+Likewise, leather gloves make little sense as healer items.  Add "surgical
+gloves" with no base AC protection.
+
+Effects for the blessed scrolls/potions with effects that are absent:
+-- destroy armor: (see controversial item section)
+
+"Welcome to Experience Level ___" for pets.
+
+What are all those pieces of glass doing in the dungeon?  Possibly replace
+with "worthless colored rock" or specific worthless rock type (quartz,
+feldspar, etc.)
+
+Container capacity limits (say, didn't we already have these once?)
+
+Potions should, logically, not suddenly have their flasks disappear when you
+drink them.  The main challenge in doing this is to make sure this does not
+produce infinite supplies of polymorph fodder and holy water fodder.
+-----------------------------------------------------
+controversial items
+-----------------------------------------------------
+Allow scrolls of destroy armor to enable the player to select the (worn)
+item to be destroyed if they are blessed.
+
+Wild carnivores should eat corpses.
+
+If all '#' commands are to be typed with a single letter, hitting backspace
+should erase the entire command, instead of requiring the player to hit several
+backspaces to do so.
+
+When you wear things which get identified by putting them on, they get
+identified before being put on, so the on-message prints out the identified
+type.  Whether this is reasonable can be argued either way.
+
+Monsters with AT_WEAP attacks do damage equal to the sum of their non-weapon
+damage and the damage done by the weapon.  Players polymorphed into such
+monsters only do the weapon damage, with no additions.  This is arguably
+necessary for game balance.
+
+Very_small non-flyers should have a penalty to hit levitated creatures.  But
+this is a lot of work, causes no apparent difference (unless the penalty is
+really large), requires too much extra code and special cases (i.e. a
+monster with long tentacles or jumping ability shouldn't get the penalty),
+and adds nothing to the game, so why put it in?
+
+Charged rings should be priced by their charge.
+Wands should be marked down when at 0 charges.
+Maybe mark down diluted potions as well.
+
+A hit that misses due to AC should be taken by the armor.  The armor should
+turn the blade, absorb the blow, or whatever, with various messages for each
+circumstance.  In addition, it would be nice if armor accumulated damage,
+and after enough of it, became degraded or useless (or just destroyed).
+I imagine an object "hit point" (entropy?) field, which might also be a logical
+place to mark wet scrolls, diluted potions, and rotten corpses.
+
+Various food items: mushroom, sandwich, tortilla, cheese, asian pear, pill,
+and holy wafer.  Most of them because they are not needed and the latter
+because of it's potential to offend.
+
+"Wallet of Perseus" bag of holding may be found in statue of Perseus on 
+Medusa level.
+
+Any addition of firearms met with strong opposition.
+
+Flyswatters and paddles; designed to be effective against insects.
+
+Fishing pole; added grapple hook instead.
+
+
+
+
