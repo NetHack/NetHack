@@ -1,0 +1,133 @@
+General Fixes and Modified Features
+-----------------------------------
+give invocation message when teleporting onto invocation position
+flying players with water breathing may retrieve things from water
+remove message inconsistently assuming players can be mindless
+monsters wear best armor (not first armor) and may switch armors
+god doesn't give "strayed" message when your god is angry but a different god
+	is the one giving the message
+divine wrath can hit engulfer if you are swallowed
+plug minor topten and oracle memory leaks
+monster throwing must allow for 0 damage (cream pies, non-silver vs. shades)
+break drawbridge if wand of striking is zapped down at open bridge or either
+	up or down at its portcullis
+wand of striking zapped at ceiling might cause a rock to drop (like digging)
+wand of striking hitting a secret door with expose and break it
+zapping {teleportation,cancellation,make invisible,polymorph} down affects
+	any existing engraving similarly to writing with such wands
+monsters may use fire horns and frost horns
+Guidebook.mn now formats backslashes correctly when using GNU groff tools
+Add missing trident case to weapon type categorization.
+Fix weapon proficiency handling for missiles.
+accept "armour" spelling again for marker use (when writing was disconnected
+	from wishing, this got lost)
+restrict writing scrolls and books by description
+give better feedback for some writing results
+whirly/wall-passing monsters should not be immune to falling rocks
+relearn spellbook even when spell already known (object amnesia fix)
+objects that have been called something but not ID'd are subject to amnesia
+ask what to call unknown spellbook which crumbles to dust when mis-read
+bullwhip only tries to get you out of a pit when you're in a pit
+humanoids, gnomes, and ogres now eat; fungi and jellies don't
+centaurs, giants, and various others can respond to #chat
+potion of paralysis doesn't inherit prior nomovemsg
+#naming a nameable artifact when the object already had a name of the same
+	length didn't create an artifact
+applying unID'd potion of oil is possible even not carrying any other items
+	eligible to be applied
+make potion of oil become known after lighting it via apply
+fix remaining inconsistency which allowed diluted water
+don't let breaking a wand of digging on castle level produce holes, just pits
+make Nazgul's sleep gas actually put victims temporarily to sleep
+applying a carried, unlocked, trapped chest will set off the trap
+explosion due to #untrap failure on trapped door destroys it
+shouldn't hear curse/bless status of unseen scroll being read by monster
+give some variation in the amount of time it takes a corpse to rot away
+breakable objects hitting the ceiling or the hero's head will now break
+undead turning now gives credit to player for destroyed monsters
+undead turning now brings dead eggs back to hatchable status
+code added to support hatching of all eggs in a merged group of eggs
+fix display updating at egg's former location when floor egg hatches
+fix learning of egg type for hatched eggs
+statue traps created with monster inventory inside them
+probing shows contents of everything with contents, not just statues
+spells of healing and extra healing don't make target monster angry
+use cornuthaum cancellation factor
+can't kick underwater objects from land or vice versa
+objects falling through holes/trapdoors to random destinations obey arrival
+	restrictions imposed by special levels
+being bare-handed counts as wrong projector when throwing projectiles
+reduce the range that Mjollnir can be thrown
+keep Medusa from continuing to move after she's been killed by reflection
+	of her own gaze (fixes relmon panic)
+medusa's reflected gaze won't affect it if it has amulet/shield of reflection
+eating amulet of strangulation can choke when not satiated; also not gluttony
+intelligent pets hold onto one pick-axe and one unicorn horn
+keep exploding boulders from land mines from hitting you with "a rocks"
+objects carried by migrating monsters have no location
+more robust parsing of user-supplied option names; trailing characters matter
+don't generate spellbooks inside statues of tiny monsters
+treat Medusa level statues as petrified monsters (can't be stone-resistant,
+	and have inventory)
+Medusa doesn't gaze more than once per round
+data.base: eliminate duplication of Orcrist/goblin king entry
+handle luck conferring artifacts correctly (both inventory and enlightenment)
+prevent arming land mines and bear traps in various inappropriate locations
+prevent easy shop exit by having shopkeeper disarm and pick up trap objects
+oilskin cloaks allow defender to slip away from grabbing attacker
+make reading the cursed Book of the Dead riskier
+enchanting stat-affecting armor now identifies it
+fix crash caused by specifying "pickup_types" without a value in config file
+	or NETHACKOPTIONS (avoid attempt to use menu prior to interface init)
+kicking at empty lit corridor with lit_corridor enabled doesn't redraw as unlit
+when starting out with an oil lamp, make pre-discovered potions of oil show up
+	in the discoveries list so that their varying description is available
+being crowned Hand of Elbereth enables minimal longsword proficiency even when
+	Excalibur isn't bestowed
+bare-handed and martial arts weapon skill rankings use names instead of numbers
+
+
+Platform- and/or Interface-Specific Fixes
+-----------------------------------------
+tty: reduce alloc/free activity done for message history
+tty: windowtype:unsupported_value pauses between listing allowed value(s)
+	and proceding under default interface
+X11: free allocated memory during pre-exit cleanup
+X11: display help when DLB is enabled
+X11: fix popup inventory window shown for 'i' response to "what type of
+	object?" prompt with menustyle={T,C}
+DLB: avoid excessive fseek calls (major performance hit for MSDOS)
+MFLOPPY: wasn't safe to enter endgame!  traps, timers, and other level-
+	specific data ended up being inherited from level 1
+MSDOS: now can re-enter game after chdir'ing in shell from "!"
+MSDOS: fix it so -H allows starting a healer game, rather than usage statement
+MSDOS: display cursor during input prompts, not just when in the map
+MSDOS: fix several cursor-related glitches when moving the display
+MSDOS: prevent the use of F3,F4, and F5 before the map window is ready
+MSDOS: make flags.BIOS and flags.rawio the default when VGA tiles are used
+TERMINFO: colors were wrong for some systems, such as Linux
+Amiga: count substitute tiles properly
+MAC: avoid MW 68K struct copy optimization bug (in all developer releases up
+	to and including DR9) by adjusting our structures so it doesn't
+	occur
+MAC: fix crash when trying to drag scrollbar
+MAC: add UPP setup for UserItem FrameItem()
+MAC: boost partitions to 2M minimum
+
+
+General New Features
+--------------------
+#qualifications command eliminated; subsumed into #enhance
+OEXTRA temporary compile-time option
+menu support for group accelerators to choose objects by class
+lev_comp supports specification of percentage chance for monsters and objects
+wielding Sunsword provides protection from light-induced blindness
+interactive setting of options via menu (Per Liboriussen, liborius@daimi.aau.dk)
+
+
+Platform- and/or Interface-Specific New Features
+------------------------------------------------
+MSDOS: Add support for preloading all tiles in protected mode environments
+MSDOS: Add support and initial tty Makefile for yet another compiler (Symantec)
+BeOS: preliminary support for new BeBox platform; initially tty only
+
