@@ -61,7 +61,7 @@ static struct Bool_Opt
 	{"BIOS", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 #ifdef INSURANCE
-	{"checkpoint", &flags.ins_chkpt, TRUE, DISP_IN_GAME},
+	{"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_GAME},
 #else
 	{"checkpoint", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
@@ -77,11 +77,11 @@ static struct Bool_Opt
 # endif
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},
 #ifdef TERMLIB
-	{"DECgraphics", &iflags.DECgraphics, FALSE, DISP_IN_GAME},
+	{"DECgraphics", &iflags.DECgraphics, FALSE, SET_IN_GAME},
 #else
 	{"DECgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-	{"eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, DISP_IN_GAME},	/*WC*/
+	{"eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_GAME},	/*WC*/
 #ifdef TTY_GRAPHICS
 	{"extmenu", &iflags.extmenu, FALSE, SET_IN_GAME},
 #else
@@ -93,7 +93,7 @@ static struct Bool_Opt
 	{"fast_map", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
 	{"female", &flags.female, FALSE, DISP_IN_GAME},
-	{"fixinv", &flags.invlet_constant, TRUE, DISP_IN_GAME},
+	{"fixinv", &flags.invlet_constant, TRUE, SET_IN_GAME},
 #ifdef AMIFLUSH
 	{"flush", &flags.amiflush, FALSE, SET_IN_GAME},
 #else
@@ -102,7 +102,7 @@ static struct Bool_Opt
 	{"help", &flags.help, TRUE, SET_IN_GAME},
 	{"hilite_pet",    &iflags.wc_hilite_pet, FALSE, SET_IN_GAME},	/*WC*/
 #ifdef ASCIIGRAPH
-	{"IBMgraphics", &iflags.IBMgraphics, FALSE, DISP_IN_GAME},
+	{"IBMgraphics", &iflags.IBMgraphics, FALSE, SET_IN_GAME},
 #else
 	{"IBMgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
@@ -111,7 +111,7 @@ static struct Bool_Opt
 	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
 	{"lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME},
 #ifdef MAC_GRAPHICS_ENV
-	{"Macgraphics", &iflags.MACgraphics, TRUE, DISP_IN_GAME},
+	{"Macgraphics", &iflags.MACgraphics, TRUE, SET_IN_GAME},
 #else
 	{"Macgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
