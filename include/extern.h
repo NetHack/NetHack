@@ -2084,6 +2084,9 @@ E boolean FDECL(check_version, (struct version_info *,
 				const char *,BOOLEAN_P));
 E unsigned long FDECL(get_feature_notice_ver, (char *));
 E unsigned long NDECL(get_current_feature_ver);
+#ifdef RUNTIME_PORT_ID
+E void FDECL(append_port_id, (char *));
+#endif
 
 /* ### video.c ### */
 

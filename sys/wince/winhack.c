@@ -340,4 +340,11 @@ void win32_abort()
 	abort();
 }
 
+void
+append_port_id(buf)
+char *buf;
+{
+	char *portstr = PORT_CE_PLATFORM " " PORT_CE_CPU;
+	Sprintf(eos(buf), " %s", portstr);
+}
 

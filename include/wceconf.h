@@ -74,6 +74,37 @@
 
 #define PORT_HELP	"porthelp"
 
+#if defined(WIN_CE_POCKETPC)
+#	define PORT_CE_PLATFORM "Pocket PC"
+#elif defined(WIN_CE_PS2xx)
+#	define PORT_CE_PLATFORM "Palm-size PC 2.11"
+#elif defined(WIN_CE_HPCPRO)
+#	define PORT_CE_PLATFORM "H/PC Pro 2.11"
+#elif defined(WIN_CE_SMARTPHONE)
+#	define PORT_CE_PLATFORM "Smartphone 2002"
+#endif
+
+#if defined(ARM)
+#	define PORT_CE_CPU "ARM"
+#elif defined(PPC)
+#	define PORT_CE_CPU "PPC"
+#elif defined(ALPHA)
+#	define PORT_CE_CPU "ALPHA"
+#elif defined(SH3)
+#	define PORT_CE_CPU "SH3"
+#elif defined(SH4)
+#	define PORT_CE_CPU "SH4"
+#elif defined(MIPS)
+#	define PORT_CE_CPU "MIPS"
+#elif defined(X86)
+#	define PORT_CE_CPU "X86"
+#else
+#	error Only ARM, PPC, ALPHA, SH3, SH4, MIPS and X86 supported
+#endif
+
+#define RUNTIME_PORT_ID	/* trigger run-time port identification since
+			   Makedefs is bootstrapped on a cross-platform. */
+
 #include <string.h>	/* Provides prototypes of strncmpi(), etc.     */
 #ifdef STRNCMPI
 #define strncmpi(a,b,c) _strnicmp(a,b,c)
