@@ -1680,6 +1680,7 @@ long timeout;
 	coord cc;
 	boolean cansee_spot, silent, okay_spot;
 	boolean redraw = FALSE;
+	boolean suppress_see = FALSE;
 	char monnambuf[BUFSZ], carriedby[BUFSZ];
 
 	if (!figurine) {
@@ -1705,28 +1706,53 @@ long timeout;
 	cansee_spot = cansee(cc.x, cc.y);
 	mtmp = make_familiar(figurine, cc.x, cc.y, TRUE);
 	if (mtmp) {
-	    Sprintf(monnambuf, "%s",a_monnam(mtmp));
+	    char and_vanish[BUFSZ];
+	    struct obj *mshelter = level.objects[mtmp->mx][mtmp->my];
+	    Sprintf(monnambuf, "%s",an(m_monnam(mtmp)));
+
+	    and_vanish[0] = '\0';
+	    if ((mtmp->minvis && !See_invisible) ||
+		(mtmp->data->mlet == S_MIMIC &&
+		 mtmp->m_ap_type != M_AP_NOTHING))
+			suppress_see = TRUE;
+
+	    if (mtmp->mundetected) {
+		if (hides_under(mtmp->data) && mshelter) {
+	    		Sprintf(and_vanish, " and %s under %s",
+	    			locomotion(mtmp->data, "crawl"),
+	    			doname(mshelter));
+		} else if (mtmp->data->mlet == S_MIMIC ||
+				mtmp->data->mlet == S_EEL) {
+			suppress_see = TRUE;
+	    	} else
+	    		Strcpy(and_vanish, " and vanish");
+	    }
+
 	    switch (figurine->where) {
 		case OBJ_INVENT:
-		    if (Blind)
+		    if (Blind || suppress_see)
 			You_feel("%s %s from your pack!", something,
 			    locomotion(mtmp->data,"drop"));
 		    else
-			You("see %s %s out of your pack!",
+			You("see %s %s out of your pack%s!",
 			    monnambuf,
-			    locomotion(mtmp->data,"drop"));
+			    locomotion(mtmp->data,"drop"),
+			    and_vanish);
 		    break;
 
 		case OBJ_FLOOR:
 		    if (cansee_spot && !silent) {
-			You("suddenly see a figurine transform into %s!",
-				monnambuf);
+			if (suppress_see)
+				pline("%s suddenly vanishes!", an(xname(figurine)));
+			else
+				You("suddenly see a figurine transform into %s%s!",
+					monnambuf, and_vanish);
 			redraw = TRUE;	/* update figurine's map location */
 		    }
 		    break;
 
 		case OBJ_MINVENT:
-		    if (cansee_spot && !silent) {
+		    if (cansee_spot && !silent && !suppress_see) {
 			struct monst *mon;
 			mon = figurine->ocarry;
 			/* figurine carring monster might be invisible */
@@ -1738,8 +1764,9 @@ long timeout;
 			    Strcpy(carriedby, "empty water");
 			else
 			    Strcpy(carriedby, "thin air");
-			You("see %s %s out of %s!", monnambuf,
-			    locomotion(mtmp->data, "drop"), carriedby);
+			You("see %s %s out of %s%s!", monnambuf,
+			    locomotion(mtmp->data, "drop"), carriedby,
+			    and_vanish);
 		    }
 		    break;
 #if 0
