@@ -601,20 +601,8 @@ boolean
 is_autopickup_exception(obj)
 struct obj *obj;
 {
-	/* The pickup exceptions are a series of null-terminated
-	 * pattern string to match the item description against.
-	 * The list ends with a double null terminator.
-	 *
-	 * You can only match against the strings that would shown
-	 * in an inventory display, not the specific exact object
-	 * name, unless that object was fully identified.
-	 * For example, if you specified pattern "loadstone", and
-	 * you had never identified "loadstone", it wouldn't match
-	 * when you came across a loadstone, because it would be
-	 * identified as "a gray stone".  You could match on
-	 * "gray stone" for an exception to autopickup, of course,
-	 * and decide manually.  This is in keeping with autopickup
-	 * being an interface convenience only.
+	/*
+	 *  Does the text description of this match an exception?
 	 */
 	char *objdesc = makesingular(xname(obj));
 	struct autopickup_exception *ape = iflags.autopickup_exceptions;
