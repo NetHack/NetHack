@@ -83,12 +83,12 @@ _       travel  move via a shortest-path algorithm to a point on the map
 Keyboards that have a meta key can also use these extended commands
 via the meta modifier instead of the # prefix:
 
-M-?             Display extended command help (if the platform allows this)
+M-?             display extended command help (if the platform allows this)
 M-2     twoweapon toggle two-weapon combat (unless number_pad is enabled)
 M-a     adjust  adjust inventory letters
 M-c     chat    talk to someone
 M-d     dip     dip an object into something
-M-e     enhance advance or check weapons skills
+M-e     enhance advance or check weapons or spell skills
 M-f     force   force a lock
 M-i     invoke  invoke an object's special powers
 M-j     jump    jump to another location

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.4	2004/01/09	*/
+/*	SCCS Id: @(#)cmd.c	3.4	2004/10/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1545,10 +1545,11 @@ static const struct func_tab cmdlist[] = {
 struct ext_func_tab extcmdlist[] = {
 	{"adjust", "adjust inventory letters", doorganize, TRUE},
 	{"chat", "talk to someone", dotalk, TRUE},	/* converse? */
-	{"conduct", "list which challenges you have adhered to", doconduct, TRUE},
+	{"conduct", "list voluntary challenges you have maintained",
+						doconduct, TRUE},
 	{"dip", "dip an object into something", dodip, FALSE},
-	{"enhance", "advance or check weapons skills", enhance_weapon_skill,
-							TRUE},
+	{"enhance", "advance or check weapons and spell skills",
+						enhance_weapon_skill, TRUE},
 	{"force", "force a lock", doforce, FALSE},
 	{"invoke", "invoke an object's powers", doinvoke, TRUE},
 	{"jump", "jump to a location", dojump, FALSE},
