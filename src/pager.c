@@ -656,8 +656,15 @@ do_look(quick)
 	}
 
 	/* handle optional boulder symbol as a special case */ 
-	if (iflags.bouldersym && sym == iflags.bouldersym)
+	if (iflags.bouldersym && sym == iflags.bouldersym) {
+	    if (!found) {
+		firstmatch = "boulder";
+		Sprintf(out_str, "%c       %s", sym, an(firstmatch));
+		found++;
+	    } else {
 		found += append_str(out_str, "boulder");
+	    }
+	}
 	
 	/*
 	 * If we are looking at the screen, follow multiple possibilities or
