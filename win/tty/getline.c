@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)getline.c	3.4	1996/01/27	*/
+/*	SCCS Id: @(#)getline.c	3.4	2002/10/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -214,6 +214,7 @@ tty_get_ext_cmd()
 #else
 	hooked_tty_getlin("#", buf, ext_cmd_getlin_hook);
 #endif
+	(void) mungspaces(buf);
 	if (buf[0] == 0 || buf[0] == '\033') return -1;
 
 	for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
