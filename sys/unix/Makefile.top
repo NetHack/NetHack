@@ -138,6 +138,9 @@ rip.xpm:
 mapbg.xpm:
 	(cd dat ; $(MAKE) mapbg.xpm )
 
+nhsplash.xpm:
+	( cd dat ; $(MAKE) nhsplash.xpm )
+
 nh16.img:
 	( cd util ; $(MAKE) tile2img.ttp )
 	( cd dat ; $(MAKE) nh16.img )

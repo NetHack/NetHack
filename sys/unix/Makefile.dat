@@ -43,6 +43,9 @@ rip.xpm: ../win/X11/rip.xpm
 mapbg.xpm: ../win/gnome/mapbg.xpm
 	cp ../win/gnome/mapbg.xpm mapbg.xpm
 
+nhsplash.xpm: ../win/Qt/nhsplash.xpm
+	cp ../win/Qt/nhsplash.xpm nhsplash.xpm
+
 ../util/tile2img.ttp:
 	(cd ../util ; make tile2img.ttp)
 
