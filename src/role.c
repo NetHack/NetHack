@@ -108,9 +108,9 @@ const struct Role roles[] = {
 	{"Empiric",        0},
 	{"Embalmer",       0},
 	{"Dresser",        0},
-	{"Medici ossium",  0},
+	{"Medicus ossium", "Medica ossium"},
 	{"Herbalist",      0},
-	{"Magister",       0},
+	{"Magister",       "Magistra"},
 	{"Physician",      0},
 	{"Chirurgeon",     0} },
 	"_Athena", "Hermes", "Poseidon", /* Greek */
@@ -135,8 +135,8 @@ const struct Role roles[] = {
 	{"Sergeant",    0},
 	{"Knight",      0},
 	{"Banneret",    0},
-	{"Chevalier",   0},
-	{"Seignieur",   0},
+	{"Chevalier",   "Chevaliere"},
+	{"Seignieur",   "Dame"},
 	{"Paladin",     0} },
 	"Lugh", "_Brigit", "Manannan Mac Lir", /* Celtic */
 	"Kni", "Camelot Castle", "the Isle of Glass",
