@@ -50,8 +50,11 @@ When using tiles, you have the option of defining USE_XPM in config.h.
 This causes NetHack to use the XPM file format for the "x11tiles" file
 rather than a custom format.  Since the XPM format can be processed by
 existing tools such as PBMPlus and XV, you can modify the tiles to suit
-your environment.  For example, you may magnify them for display on
-high-resolution screens using the following command:
+your environment.  However, you need to make sure the number of tiles
+in each row of the image remains the same (currently 40), as the code
+depends on this to calculate the size of each tile. For example, you may
+magnify them for display on high-resolution screens using the following
+command:
     xpmtoppm x11tiles | pnmscale -xscale 1 -yscale 1.6875 |
         pnmdepth 255 | ppmquant 100 | ppmtoxpm >x11tiles_big.xpm
 To use XPM, you must have the free XPM libraries installed in your system.

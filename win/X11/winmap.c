@@ -306,7 +306,8 @@ init_tiles(wp)
     }
 
     /* assume a fixed number of tiles per row */
-    if (tile_image->width % TILES_PER_ROW != 0) {
+    if (tile_image->width % TILES_PER_ROW != 0 ||
+	tile_image->width <= TILES_PER_ROW) {
 	Sprintf(buf,
 		"%s is not a multiple of %d (number of tiles/row) pixels wide",
 		appResources.tile_file, TILES_PER_ROW);
@@ -317,20 +318,16 @@ init_tiles(wp)
 	goto tiledone;
     }
 
-    /* infer tile dimensions from image size, assume square tiles */
+    /* infer tile dimensions from image size and TILES_PER_ROW */
     image_width = tile_image->width;
     image_height = tile_image->height;
-    tile_width = image_width / TILES_PER_ROW;
-    tile_height = tile_width;
-    tile_count = (image_width * image_height) / (tile_width * tile_height);
 
-    if (tile_count < total_tiles_used) {
-	Sprintf(buf, "%s incomplete, expecting %d tiles, found %d",
-		appResources.tile_file, total_tiles_used, tile_count);
-	X11_raw_print(buf);
-	result = FALSE;
-	goto tiledone;
+    tile_count = total_tiles_used;
+    if ((tile_count % TILES_PER_ROW) != 0) {
+	tile_count += TILES_PER_ROW - (tile_count % TILES_PER_ROW);
     }
+    tile_width = image_width / TILES_PER_ROW;
+    tile_height = image_height / (tile_count / TILES_PER_ROW);
 #else
     /* any less than 16 colours makes tiles useless */
     ddepth = DefaultDepthOfScreen(screen);

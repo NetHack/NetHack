@@ -221,8 +221,8 @@ ghack_init_map_window ( )
 		      gnome_canvas_image_get_type (),
 		      "x",      (double) x,
 		      "y",      (double) y,
-		      "width",  (double) ghack_glyph_height(),
-		      "height", (double) ghack_glyph_width(),
+		      "width",  (double) ghack_glyph_width(),
+		      "height", (double) ghack_glyph_height(),
 		      "anchor", GTK_ANCHOR_NORTH_WEST,
 		      NULL) );
 	}
@@ -234,8 +234,7 @@ ghack_init_map_window ( )
     g_warning("Bummer! Failed to load the pet_mark image!");
   }
   else {
-      gdk_imlib_render(petmark, petmark->rgb_width,
-	  petmark->rgb_height);
+      gdk_imlib_render(petmark, petmark->rgb_width, petmark->rgb_height);
 
       /* ghack_map.overlay is an array of canvas images used to
        * overlay tile images...
@@ -573,8 +572,8 @@ ghack_reinit_map_window ( )
 		      gnome_canvas_image_get_type (),
 		      "x",      (double) x,
 		      "y",      (double) y,
-		      "width",  (double) ghack_glyph_height(),
-		      "height", (double) ghack_glyph_width(),
+		      "width",  (double) ghack_glyph_width(),
+		      "height", (double) ghack_glyph_height(),
 		      "anchor", GTK_ANCHOR_NORTH_WEST,
 		      NULL) );
       }
