@@ -127,11 +127,7 @@ doread()
 	if (scroll->otyp == SCR_MAIL) confused = FALSE;
 #endif
 	if(scroll->oclass == SPBOOK_CLASS) {
-	    if(confused) {
-		You("cannot grasp the meaning of this tome.");
-		return(0);
-	    } else
-		return(study_book(scroll));
+	    return(study_book(scroll));
 	}
 	scroll->in_use = TRUE;	/* scroll, not spellbook, now being read */
 	if(scroll->otyp != SCR_BLANK_PAPER) {
