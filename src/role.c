@@ -1368,13 +1368,15 @@ role_init()
 	if (!validrace(flags.initrole, flags.initrace))
 	    flags.initrace = randrace(flags.initrole);
 
-	/* Check for a valid gender.  Try flags.igend first. */
+	/* Check for a valid gender.  If new game, check both initgend
+	 * and female.  On restore, assume flags.female is correct. */
+	if (flags.pantheon == -1) {	/* new game */
+	    if (!validgend(flags.initrole, flags.initrace, flags.female))
+		flags.female = !flags.female;
+	}
 	if (!validgend(flags.initrole, flags.initrace, flags.initgend))
-	    /* Use flags.female second.  Note that there is no way
-	     * to check for an unspecified gender.
-	     */
+	    /* Note that there is no way to check for an unspecified gender. */
 	    flags.initgend = flags.female;
-	/* Don't change flags.female; this may be a restore */
 
 	/* Check for a valid alignment */
 	if (!validalign(flags.initrole, flags.initrace, flags.initalign))
