@@ -1,0 +1,431 @@
+; SCCS Id: @(#)schema3.MSC	3.3	 2000/07/31
+; Copyright (c) NetHack PC Development Team, 2000
+;
+; NetHack Overlay Schema
+; This overlay schema is for use only when NetHack is built
+; using packaged-functions for function-level linking.
+;
+; Overlay tuning level: 0
+;
+functions:0 _main _dosave0 _moveloop _bputc _bwrite _random _rn2 _newsym _show_glyph _on_level _txt_gotoxy _txt_get_cursor
+functions:0 _xputc _txt_xputc _t_at _tty_curs _acurr _dist2 _tty_print_glyph _isok _back_to_glyph
+functions:0 _show_map_spot _adjust_cursor_flags _lowc _g_putch _has_color _is_pool _mread
+functions:0 _is_lava _welded _magic_map_background _end_glyphout _visible_region_at _domove 
+functions:0 _engr_at _rnd _run_regions _mcalcmove _depth _done _distmin _does_block _eos 
+functions:0 _move _move_bc _in_rooms _map_background _map_invisible _map_location _alloc
+functions:0 _impossible _in_container _in_fcorridor _In_hell _In_mines _in_or_out_menu _In_quest
+functions:0 _do_positionbar _iswall _iswall_or_stone _itimeout _is_solid _Is_special
+functions:0 _is_swallow_sym _check_here _check_leash _check_map_spot _check_pos 
+functions:0 _monsndx _m_move _lcase _tty_create_nhwindow _tty_delay_output _tty_destroy_nhwindow 
+functions:0 _tty_dismiss_nhwindow _gender _genl_outrip _get_cost _get_free_room_loc _get_level 
+functions:0 _get_location _get_map _get_mleash
+;
+functions:1 _move_update _movebubbles _movecmd _movemon _moverock _movobj _mpickgold
+functions:1 _doaltarobj _doapply _dobreathe _docall _docast
+;
+functions:2 _do_vicinity_map
+functions:3 _pcmain
+functions:4 _spell_let_to_idx _cursed_book _deadbook _learn _getspell _spelltypemnemonic
+functions:5 _dospellmenu _percent_success _throwspell _cast_protection _isqrt
+;
+functions:6 _a_gname _a_gname_at _a_monnam _abon _abuse_dog _accessible _activate_statue_trap
+functions:7 _add_branch _add_damage _add_debug_extended_commands _add_door _add_id_mapping _add_level
+functions:8 _add_menu_cmd_alias _add_one_tobill _add_rect _add_room _add_subroom _add_to_billobjs _add_to_buried _add_to_container
+functions:9 _add_to_migration _add_to_minv _add_valid_menu_class _add_weapon_skill _addinv _addtobill _addtopl _addupbill
+functions:10 _Adjmonnam
+functions:11 _align_gname
+functions:12 _altar_wrath _Amonnam _amulet _Amulet_off _Amulet_on _An _an _angry_guards
+functions:13 _angry_priest _angry_shk_exists _any_light_source _aobjnam _append_slash _append_str _Armor_gone _Armor_off
+functions:14 _Armor_on _armor_to_dragon _armoroff _arti_invoke _artifact_exists _artifact_hit _artifact_name _artiname
+functions:15 _artitouch _askchain _assign_graphics _assign_level _assign_rnd_level _assign_rogue_graphics _assign_soundcard _assign_video
+functions:16 _assign_videocolors _assign_videoshades _assigninvlet _at_dgn_entrance _attach_egg_hatch_timeout _attack _attack_checks _attacks
+functions:17 _awaken_monsters _awaken_soldiers
+functions:18 _backfire _backsp _bad_location _bad_negation _bad_rock _badoption _bail _ballfall
+functions:19 _bc_order _bclose _bcsign _beg _begin_burn _bflush _bhit _bhitm
+functions:20 _bhito _bhitpile _big_to_little _bill_box_content _bill_dummy_object _bite _bless _blessorcurse
+functions:21 _Blindf_off _Blindf_on _block_door _block_entry _block_point _blow_up_landmine _body_part _boolopt_only_initial
+functions:22 _boomhit _Boots_off _Boots_on _bot _bot1 _bot2 _boulder_hits_pool _bound_digging
+functions:23 _boxlock _br_string _break_armor _break_statue _breakarm _breakmsg
+functions:24 _breakobj _breaks _breaksink _breaktest _breamu _bribe _bufoff _bufon
+functions:25 _build_room _burn_floor_paper _burn_object _burnarmor _bury_an_obj _bury_objs _buzz _buzzmu
+functions:26 _Can_dig_down
+functions:27 _Can_fall_thru _can_make_bones _can_ooze _can_pray _can_reach_floor _Can_rise_up _can_track
+functions:28 _cancel_bonesfile _cancel_don _cancel_item _cancel_monst _candle_light_range _canletgo _cant_create _canwearobj
+functions:29 _carry_count _carrying _castmu _ceiling _center _change_inv_order _change_luck _change_sex
+functions:30 _charm_monsters _charm_snakes _chat_with_guardian _chat_with_leader _chat_with_nemesis _chdirx _chdrive _cheapest_item
+functions:31 _check_capacity _check_contained _check_credit _check_recordfile
+functions:32 _check_room _check_shop_obj _check_special_room _check_unpaid _check_unpaid_usage _check_version _checkfile _chest_shatter_msg
+functions:33 _chest_trap _choke _choke_dialogue _choose_classes_menu _choose_windows _christen_monst _chwepon _ck_bag
+functions:34 _ckmailstatus _ckunpaid _cl_end _cl_eos _classmon _clear_fcorr _clear_glyph_buffer
+functions:35 _clear_id_mapping _clear_level_structures _clear_path _clear_screen _clear_stale_map _clear_unpaid _clearlocks _clearpriests
+functions:36 _click_to_cmd _Cloak_off _Cloak_on _clone_mon _cloneu _clonewiz _close_drawbridge _close_library
+functions:37 _closed_door _CloseTileFile _cls _cmov _cnv_trap_obj _co_false _collect_obj_classes _com_pager
+functions:38 _commit_bonesfile _compactify _compress _compress_bonesfile _compress_str _comspec_exists _confdir _construct_qtlist
+functions:39 _consume_offering _contained _contained_cost _contained_gold _container_contents _container_weight _convert_arg _convert_line
+functions:40 _copybones _copyfile _corpse_chance _corpse_xname _corr _correct_branch_type _cost _cost_per_charge
+functions:41 _costly_cancel _costly_gold _costly_spot _could_seduce _count_categories _count_obj _count_unpaid _count_wsegs
+functions:42 _counter_were _courtmon _cpostfx _cprefx _create_altar _create_bonesfile _create_corridor _create_critters
+functions:43 _create_door _create_drawbridge _create_engraving _create_feature _create_gold _create_levelfile _create_monster _create_mplayers
+functions:44 _create_object _create_particular _create_polymon _create_room _create_savefile _create_secret_door _create_stairs _create_subroom
+functions:45 _create_trap _create_worm_tail _curr_mon_load _currentlevel_rewrite _curs_on_u _curse _cursed _cursed_object_at
+functions:46 _cursetxt _cuss _cutworm _cvt_sdoor_to_door _d _damageum _dbon _ddocall
+functions:47 _ddoinv _dead_species _dealloc_obj _decl_init _deepest_lev_reached _def_char_to_monclass _def_char_to_objclass _def_raw_print
+functions:48 _defends _deferred_goto _del_engr _del_engr_at _del_light_source _delallobj _delete_bonesfile _delete_contents
+functions:49 _delete_levelfile _delete_savefile _delfloortrap _deliver_by_pline _deliver_by_window _delobj _deltrap _demon_talk
+functions:50 _demonpet _destroy_arm _destroy_drawbridge _destroy_item _destroy_mitem _dev_name _dig
+functions:51 _dig_check _dig_corridor _dig_point _dig_typ _digactualhole _dighole _digit _dipfountain
+functions:52 _disable_ctrlP _disarm_beartrap _disarm_landmine _disarm_shooting_trap _disarm_squeaky_board _discard_minvent _disclose _discover_object
+functions:53 _diseasemu _display_binventory _display_cinventory _display_gamewindows _display_inventory _display_minventory
+functions:54 _distant_name _distfleeck _disturb _djinni_from_bottle _dlb_cleanup _dlb_fclose
+functions:55 _dlb_fgets _dlb_fopen _dlb_fread _dlb_fseek _dlb_ftell _dlb_init _dlord _dmgtype
+functions:56 _dmgval _dmonsfree _dmore _dname_to_dnum _do_break_wand _do_clear_area _do_comp _do_dknown_of
+functions:57 _do_earthquake _do_entity _do_genocide _do_improvisation _do_light_sources _do_look _do_mapping _do_mname
+functions:57 _vga_xputg _vga_xputs _video_update_positionbar _view_from _view_init _visctrl _vision_init _vision_recalc
+functions:58 _do_oname _do_osshock _do_play_instrument _do_reset_eat _do_room_or_subroom _do_storms _do_takeoff
+functions:60 _doclose _doconfuse _doconsult _docorner _docrt _doddoremarm _doddrop _dodip
+functions:61 _adjust_prefix _build_plselection_prompt _duplicate_opt_detection _enter_explore_mode _maybe_wail
+functions:62 _doextcmd _doextlist _doextversion _dofindgem _dofiretrap _doforce _dog_eat _dog_goal
+functions:63 _dog_hunger _dog_invent _dog_move _dog_nutrition _dogfood _dogushforth _dohelp _dohide
+functions:64 _dohistory _doidtrap _doinvbill _doinvoke _dojump _dokick _dolook _doloot
+functions:65 _domagicportal 
+functions:66 _done_eating _done_in_by _done_intr _done1 _done2 _donning _donull _doopen
+functions:67 _doorganize _doorlock _dopay _dopayobj _dopickup _dopotion _dopramulet _doprarm
+functions:68 _dopray _doprev_message _doprgold _doprring _doprtool _doprwep _doputon _doquickwhatis
+functions:69 _doread _dorecover _doredraw _doremove _doremring _dorub _dosacrifice _dosave
+functions:70 _dosdoor _dosearch _dosearch0 _doseduce _doset _doset_add_menu _dosh
+functions:71 _dosinkfall _dosinkring _dosit _dosounds _dospinweb _dospit _dosummon _dotakeoff
+functions:72 _dotalk _dotele _dothrow _dotogglepickup _dotrap _doturn _dotypeinv _dounpaid
+functions:73 _dountrap _doup _doversion _dovspell _dowaterdemon _dowaternymph _dowatersnakes _dowear
+functions:74 _dowhatdoes _dowhatis _dowield _dowipe _down_gate _dowrite _dozap _dprince
+functions:75 _drag_ball _drag_down _drain_en _DrawCursor _drinkfountain _drinksink _drop _drop_ball
+functions:76 _drop_throw _drop_to _drop_upon_death _drop_weapon _DROPPABLES _dropped_container _dropx _dropy
+functions:77 _drown _dryup _dtoxy _dungeon_branch _dunlev _dunlevs_in_dungeon _e_at _e_died
+functions:78 _e_jumps _e_missed _e_nam _E_phrase _e_survives_at _eataccessory _eatcorpse _eaten_stat
+functions:79 _eatfood _eatmdone _eatspecial _egg_type_from_parent _emergency_disrobe _enable_ctrlP _encumber_msg _end_burn
+functions:80 _end_engulf
+;functions:81 
+functions:82 _exclam _exepath _exerchk _exercise _exerper _exist_artifact _expels _experience
+functions:83 _explmm _explmu _explode _explum _expulsion _ext_cmd_getlin_hook _extend_spine _extract_nexthere
+functions:84 _extract_nobj _fall_asleep _fall_through _feel_cockatrice _feel_location _fightm _filesize_nh _fill_pit
+functions:85 _nh_getenv _promptsep _rigid_role_checks _set_duplicate_opt_detection _tool_in_use
+functions:86 _find_drawbridge _find_hell _find_lev_obj _find_level _find_mac _find_mid _find_misc _find_offensive
+functions:87 _find_oid _find_roll_to_hit _find_skates _find_unpaid _finddpos _findfirst_file _findgd _findit
+functions:88 _findnext_file _findone _findpriest _finish_map _finish_paybill _fix_stair_rooms _fix_worst_trouble _fixup_special
+functions:89 _flash_hits_mon _float_down _float_up _floating_above _flood_fill_rm _flooreffects _floorfood _flush_screen _term_start_color
+functions:90 _flushout _fmt_ptr _food_detect _food_disappears _food_xname _foodword _fopen_config_file _fopen_datafile
+functions:91 _fopenp _forcelock _forget_levels _forget_map _forget_objects _forget_traps _foundfile_buffer _fpostfx
+functions:92 _fprefx _fracture_rock _free_dungeons _free_rooms _free_ttlist _free_window_info _freediskspace _freedynamicdata
+functions:93 _freefruitchn _freehand _freeinv _friday_13th _fruitadd _fry_by_god _fully_identify_obj _g_at
+functions:94 _gainstr _gameDiskPrompt _gazemm _gazemu _gd_move _gd_sound _gem_accept
+functions:95 _display_artifact_score _display_warning _dlb_fgetc _doattributes _dochug _dochugw
+functions:96 _fill_point _fill_room _fill_zoo _fillholetyp _find_ac _find_branch _find_branch_room _find_defensive
+functions:96 _get_mon_location _get_mplname _get_obj_location _get_rect _get_rect_ind _get_room_loc _get_scr_size _get_shop_item
+functions:97 _get_uchars _get_unused_cs _get_valuables _get_wall_for_db _get_wet _get_wormno _getbones _getdir
+functions:98 _gethungry 
+functions:99 _gettty _getversionstring _getyear _ggetobj _ghitm _ghod_hitsu _ghost_from_bottle _ghostfruit
+functions:100 _givit _glibr _Gloves_off _Gloves_on _glyph_at _god_zaps_you _gods_angry _gods_upset
+functions:101 _godvoice _gold_detect _golemeffects _golemhp _goodfruit _goodpos _goto_hell _goto_level
+functions:102 _gr_finish _gr_init _graphics_opts _grddead _grease_protect _grow_up _growl _growl_sound
+functions:103 _guardname _gulpmm _gulpmu _gulpum _gush _hack_artifacts _has_dnstairs
+functions:104 _has_shrine _has_upstairs _hatch_egg _hates_silver _have_lizard _hcolor _heal_legs _healup
+functions:105 _Hear_again _Helmet_off _Helmet_on _help_menu _help_monster_out _hero_breaks _hidden_gold _HideCursor
+functions:106 _highc _histemple_at _hit _hitfloor _hitmm _hitmsg _hitmu _hitum
+functions:107 _hitval _hmon _hmon_hitmon _hmonas _hold_another_object _holetime _home _home_shk
+functions:108 _homebase _hooked_tty_getlin _hot_pursuit _hurtarmor _hurtle _identify _identify_pack _impact_drop
+functions:110 _in_trouble _In_V_tower _In_W_tower _in_your_sanctuary _incr_itimeout _induced_align _inherits _inhishop
+functions:111 _init_artifacts _init_attr _init_dungeons _init_fill _init_level _init_map _init_objects
+functions:112 _init_oracles _init_rect _init_rumors _init_ttycolor _init_uhunger _initedog _initoptions _initrack
+functions:113 _initworm _insert_branch _insert_timer _inside_room _inside_shop _instapetrify _intemple _interesting_to_discover
+functions:114 _intermed _intervene _intrinsic_possible _inv_cnt _inv_weight _invault _invdisp_nothing _inven_inuse
+functions:115 _invert_all _invert_all_on_page _Invocation_lev _invocation_message _invocation_pos _Is_botlevel _Is_branchlev _is_chargeable
+functions:116 _is_db_wall _is_drawbridge_wall _is_edible _is_fainted _is_flammable _is_fshk _is_home_elemental _is_ice
+;functions:117 
+functions:118 _is_worn _is_worn_by_type _isbig _isclearpath 
+functions:119 _itimeout_incr _its_dead _itsstuck _Japanese_item_name _join _join_map _jump _keepdogs
+functions:119 _sticks _still_chewing _stock_room _stolen_container _stolen_value _stone_luck _stoned_dialogue _stop_occupation
+functions:120 _kick_monster _kick_object _kickdmg _kickstr _kill_egg _kill_eggs _kill_genocided_monsters _killed
+functions:121 _kind_name _known_hitum _kops_gone _l_monnam _lantern_message _launch_obj _lava_effects 
+functions:122 _ldrname _leader_speaks _leaderless _learn_egg_type _ledger_no _ledger_to_dlev _ledger_to_dnum
+functions:123 _left_side _lesshungry _let_to_name _letter _lev_by_name _level_difficulty _level_distance _level_range
+functions:124 _level_tele _level_tele_trap _levl_follower _lifesaved_monster _lift_object _light_cocktail _light_region _lined_up
+functions:125 _linedup _list_genocided _list_vanquished _litroom _litter _little_to_big _llord _lminion
+functions:126 _load_common_data _load_maze _load_one_engraving _load_one_monster _load_one_object _load_qtlist _load_rooms _load_special
+functions:127 _loadfruitchn _lock_action _lock_file _locomotion _lookaround _lookat _lookup_id_mapping _lose_weapon_skill
+functions:128 _losedogs _losehp _losespells _losestr _losexp _m_arrival
+functions:129 _m_carrying _m_detach _m_dowear _m_dowear_type _m_initgrp _m_initinv _m_initthrow _m_initweap
+functions:130 _m_lose_armor 
+functions:131 _m_useup _make_angry_shk _make_blinded _make_confused _make_corpse _make_engr_at _make_familiar _make_hallucinated
+functions:132 _make_happy_shk _make_lockname _make_niches _make_sick _make_stunned _make_vomiting _makecorridors _makedog
+functions:133 _makekops _makelevel _makemaz _makemon _makeniche _makeplural _makerogueghost _makeroguerooms
+functions:134 _makerooms
+functions:135 _map_menu_cmd _map_object _map_trap _match_optname _mattackm _mattacku _max_capacity _max_mon_load
+functions:136 _max_passive_dmg _max_rank_sz _maxledgerno _may_dig _may_passwall _maybe_write_ls _maybe_write_timer _mayberem
+functions:137 _maze0xy _maze1xy _mazexy _mb_trapped _mbag_explodes _mbhit _mbhitm _mcalcdistress
+functions:138 _md_rush _md_start _md_stop _mdig_tunnel _meatgold
+functions:139 _meatobj _melt_ice _menu_drop _menu_identify _menu_loot _menu_remarm _mergable _merge_choice
+functions:140 _merged _mfndpos _midnight _migrate_to_level _mineralize _minit _miniwalk _minstapetrify
+functions:140 _On_stairs _on_start _On_W_tower_level _oname _onbill _online2 _only_here _onlyspace
+functions:141 _mintrap 
+functions:142 _mk_bubble _mk_knox_portal _mk_mplayer _mk_named_object _mk_roamer _mk_tt_object _mkaltar _mkbox_cnts
+functions:143 _mkcavearea _mkcavepos _mkclass _mkcorpstat _mkfount _mkgold _mkgoldobj _mkinvokearea
+functions:144 _mkinvpos _mklev _mkmap _mkobj _mkobj_at _mkportal _mkroll_launch _mkroom
+functions:145 _mkshobj_at _mkshop _mksink _mksobj _mksobj_at _mkstairs _mkswamp _mktemple
+functions:146 _mktrap _mkundead _mkzoo _mlevel_tele_trap _mlifesaver _mnearto _mnexto _mon_arrive
+functions:147 _mon_break_armor _mon_catchup_elapsed_time _mon_chain _mon_has_amulet _mon_has_arti _mon_has_special _mon_invent_chain _mon_is_local
+functions:148 _mon_nam _mon_nam_too _mon_owns _mon_reflects _mon_regen _mon_set_minvis _mon_to_stone _mon_wield_item
+functions:149 _mondead _mondied _mongets _mongone _monkilled _Monnam _monnear 
+functions:150 _monst_init _monster_detect _monster_nearby _monstinroom _monstone _monstr_init _more _more_experienced
+functions:151 _morehungry _morguemon _move_gold _move_into_trap _move_special
+functions:153 _mpickobj 
+functions:154 _mselftouch _msg_in _msleep _msmsg _mstatusline _msummon _mswings _mswingsm
+functions:155 _mtele_trap _mungspaces _munstone _mv_bubble _mvault_tele _mzapmsg _n_or_more _name_to_mon
+functions:156 _nameshk _nartifact_exist _nasty _ndemon _near_capacity _nemdead _nemesis_speaks _neminame
+functions:157 _nethack_exit _new_light_source _new_were _newcham _newexplevel _newgame _newhp _newmail
+functions:158 _newman _newuexp _newuhs _next_level _next_opt _next_shkp _next_to_u
+functions:159 _nexttodoor _nh_timeout _nhusage _night _nmcpy _no_bones_level _noattacks _nocmov
+functions:160 _nohandglow _noises _nomul _Norep _not_capable _not_fully_identified _number_leashed _o_in
+functions:161 _o_on _o_unleash _obfree _obj_chain _obj_delivery _obj_extract_self _obj_here _obj_ice_effects
+functions:162 _obj_is_burning _obj_is_local _obj_is_pname _obj_merge_light_sources _obj_move_light_source _obj_move_timers _obj_resists _obj_sanity_check
+functions:163 _obj_sheds_light _obj_shudders _obj_split_light_source _obj_split_timers _obj_stop_timers _obj_to_let _object_detect _objects_init
+functions:164 _observable_depth _obstructed _oc_to_str _occupied _off_msg _ohitmon _oinit _ok_to_quest
+functions:165 _okay
+functions:167 _onquest _onscary _open_bonesfile _open_drawbridge _open_levelfile _open_library _open_savefile _openit
+functions:168 _openone _OpenTileFile _opentin _option_help _oselect _other_mon_has_arti _otransit_msg
+functions:169 _out_container _outentry _outheader _outoracle _outrumor _p_coaligned _pacify_guards _pacify_shk
+functions:170 _panic _parent_dlevel _parent_dnum _parse _parse_config_line _parseoptions _pass_one _pass_three
+functions:171 _pass_two _passive _passivemm _passiveum _pay _pay_for_damage _paybill _paygd
+functions:172 _pckeys _peace_minded _peek_at_iced_corpse_age _peffects _pet_type _pgetchar _phase_of_the_moon
+functions:173 _pick_level _pick_lock _pick_obj _pick_room _picked_container _picking_at _picking_lock _picklock
+functions:174 _pickup _pickup_object _place_branch _place_level _place_lregion _place_niche _place_object _place_worm_tail_randomly
+functions:175 _place_wsegs _placebc _playwoRAMdisk _pleased _pline _pline_The _plnamesuffix _pluslvl
+functions:176 _pmatch _poisoned _poisontell _poly_gender _poly_obj _poly_when_stoned _polyman _polymon
+functions:177 _polyself _polyuse _port_help _pos_to_room _positionbar _possible_places _possibly_unwield _potionbreathe
+functions:178 _potionhit _prayer_done _precheck _prev_level _pri_move _price_quote _priest_talk _priestini
+functions:179 _priestname _print_branch _print_dungeon _print_queue _prinv _probe_monster _process_menu_window _process_text_window
+functions:180 _pronoun_gender _protects _prscore _punish _pushch _put_monsters_to_sleep _putsyms
+functions:181 _qt_montype _qt_pager _query_category _query_classes _query_objlist _quest_chat _quest_info
+functions:182 _quest_stat_check _quest_talk _random_dir _random_engraving _random_teleport_level _ranged_attk
+functions:183 _rank _rank_of _raw_printf _read_config_file _read_engr_at _readchar _readentry
+functions:184 _readmail _readobjnam _ReadPlanarTileFile _ReadPlanarTileFile_O _ReadTileFileHeader _reassign _recalc_wt _recharge
+functions:185 _record_exists _redist_attr _redotoplin _regularize _rehumanize _rejectoption _relink_light_sources _relink_timers
+functions:186 _relmon _remember_topl _remove_damage _remove_object _remove_rect _remove_timer _remove_worm
+functions:187 _removetopl _reorder_invent _repair_damage _replmon _replshk _rescham _reset_attribute_clock
+functions:188 _reset_eat _reset_faint _reset_hostility _reset_occupations _reset_pick _reset_remarm _reset_rndmonst _reset_trapset
+functions:189 _resetobjs _resist _resists_blnd _resists_drli _resists_magm _rest_engravings _rest_room _rest_rooms
+functions:190 _rest_worm _restartcham _restdamage _restfakecorr _restgamestate _restlevchn _restlevelfile _restlevelstate
+functions:191 _restmonchn _restnames _restobjchn _restore_artifacts _restore_attrib _restore_dungeon _restore_light_sources _restore_oracles
+functions:192 _restore_saved_game _restore_timers _restore_waterlevel _restpriest _restrap _restrict_name _restshk _resurrect
+functions:193 _reverse _revive _revive_corpse _revive_egg _revive_mon _revive_nasty _reward_untrap _rhack
+functions:194 _right_side _rile_shk _Ring_gone _Ring_off _Ring_off_or_gone _Ring_on _rloc _rloc_engr
+functions:195 _rloc_pos_ok _rloc_to _rloco _rm_waslit _rnd_class _rnd_defensive_item
+functions:196 _rnd_misc_item _rnd_offensive_item _rnd_rect _rndcurse _rnddoor _rndexp _rndghostname _rndmonnam
+functions:197 _rndmonnum _rndmonst _rndtrap _rne _rnl _rnz _rogue_vision _roguecorr
+functions:198 _roguejoin _roguename _rot_corpse _rot_organic _rottenfood _rounddiv _row_refresh _run_timers
+functions:199 _rust_dmg _s_suffix _safe_teleds _saleable _same_price _sanity_check _save_artifacts _save_currentstate
+functions:200 _save_dungeon _save_engravings _save_light_sources _save_oracles _save_room _save_rooms _save_savefile_name _save_timers
+functions:201 _save_waterlevel _save_worm _savebones _savech _savedamage _saveDiskPrompt _savefruitchn _savegamestate
+functions:202 _savelev _savelev0 _savelevchn _savelife _savemonchn _savenames _saveobjchn _savestateinlock
+functions:203 _savetrapchn _scatter _schedule_goto _score_wanted _search_door _search_special _searches_for_item _see_lamp_flicker
+functions:204 _see_monsters _see_objects _see_traps _see_wsegs _seemimic _seetrap _seffects _select_hwep
+functions:205 _select_off _select_rwep _selftouch _sellobj _sellobj_state _sengr_at _sense_trap
+functions:206 _set_all_on_page _set_apparxy _set_artifact_intrinsic _set_bc _set_bonesfile_name _set_bonestemp_name _set_corn _set_cost
+functions:207 _set_crosswall _set_entity _set_item_state _set_itimeout _set_levelfile_name _set_lit _set_lock_and_bones _set_malign
+functions:208 _set_mimic_blocking _set_mimic_sym _set_mon_data _set_moreluck _set_occupation _set_repo_loc _set_residency _set_savefile_name
+functions:209 _set_seenv _set_trap _set_twall _set_uasmon _set_wall _set_wall_property _set_wall_state _set_wear
+functions:210 _set_wounded_legs _set_wportal _setclipped _setftty _setgemprobs _setmangry _setnotworn _setpaid
+functions:211 _setrandom _settrack _settty _setup_waterlevel _setuwep _setworn _sgn _Shield_off
+functions:212 _shieldeff _ship_object _shk_chat _shk_embellish _shk_move _shk_names_obj _shk_owns _shk_your
+functions:213 _Shk_Your _shkcatch _shkgone _shkinit _shkname _sho_obj_return_to_u _shop_debt _shop_keeper
+functions:214 _shop_object _shopdig _shopper_financial_report _shrine_pos _shrink_worm _shuffle
+functions:215 _shuffle_all _shuffle_tiles _simple_look _singular _sitoa _skill_advance _skill_init _skill_level_name
+functions:216 _skinback _sleep_monst _slept_monst _slip_or_trip _sliparm _slots_required _snuff_candle _snuff_light_source
+functions:217 _snuff_lit _sobj_at _some_armor _somegold _somex _somexy _somey _sort_rooms
+functions:218 _sort_valuables _sp_lev_shuffle _spec_ability _spec_abon _spec_applies _spec_dbon _spell_damage_bonus _spell_hit_bonus
+functions:219 _spell_skilltype _spelleffects _spitmu _splatter_burning_oil _split_mon _split_rects _splitbill _splitobj
+functions:220 _spoteffects _squadmon _srandom _stackobj _standoutbeg _standoutend _start_corpse_timeout _start_eating
+functions:221 _start_engulf _start_timer _start_tin _steal _steal_it _stealamulet _stealarm _stealgold
+functions:223 _stop_timer _store_version _strange_feeling _strategy _string_for_env_opt _string_for_opt _strncmpi _strprepend
+functions:224 _strstri _study_book _stumble_onto_mimic _sub_one_frombill _subfrombill _substitute_tiles _summon_minion _surface
+functions:225 _swallow_to_glyph _swapin_file _swapout_oldest _switch_graphics _switchar _t_warn
+functions:226 _tabexpand _tactics _take_gold _take_off _tamedog _target_on _tele _tele_jump_ok
+functions:227 _tele_restrict _tele_trap _teleds _teleok _teleport_pet _temple_occupied _tended_shop _term_end_attr
+functions:228 _term_end_color
+functions:229 _The _this_type_only _thitm _thitmonst _thitu _throw_gold _throwing_weapon _throwit
+functions:230 _thrwmu _tileview _timed_occupation _timer_is_local _timer_sanity_check _tinnable _title_to_mon _tmp_at
+functions:231 _topl_putsym _topologize _topten _topten_print _topten_print_bold _toss_up _toss_wsegs _touch_artifact
+functions:232 _touchfood _trap_detect _trickery _try_disarm _try_lift _trycall _tt_oname _tty_add_menu
+functions:233 _tty_askname _tty_clear_nhwindow _tty_cliparound 
+functions:234 _tty_display_file _tty_display_nhwindow _tty_doprev_message _tty_end_menu _tty_end_screen _tty_exit_nhwindows _tty_get_ext_cmd _tty_get_nh_event
+functions:235 _tty_getlin _tty_init_nhwindows _tty_mark_synch _tty_message_menu _tty_nh_poskey _tty_nhbell _tty_nhgetch _tty_number_pad
+functions:236 _tty_player_selection _tty_raw_print _tty_raw_print_bold _tty_resume_nhwindows _tty_select_menu
+functions:237 _tty_start_menu _tty_start_screen _tty_startup _tty_suspend_nhwindows _tty_update_inventory _tty_yn_function
+functions:238 _txt_backsp _txt_cl_end _txt_cl_eos _txt_clear_screen _txt_get_scr_size _txt_monoadapt_check
+functions:239 _txt_nhbell _txt_startup _u_entered_shop _u_gname _u_init
+functions:240 _u_left_shop _u_on_dnstairs _u_on_newpos _u_on_sstairs _u_on_upstairs _u_slip_free _u_slow_down _u_teleport_mon
+functions:241 _u_to_e _u_wipe_engr _ugolemeffects _um_dist _unbless _unblock_point _uncommon _uncompress
+functions:242 _unconscious _uncurse _undead_to_corpse _under_ground _under_water _undiscover_object _unearth_objs _unfaint
+functions:243 _unleash_all _unload_qtlist _unlock_file _unmap_object _unmul _unpaid_cost _unplacebc _unpunish
+functions:244 _unrestrict_weapon_skill _unset_all_on_page _unsetup_waterlevel _unstuck _untrap _untrap_prob _unturn_dead _update_mon_intrinsics
+functions:245 _update_topl _uptodate _urustm _use_bell _use_camera _use_candelabrum _use_candle _use_container
+functions:246 _use_crystal_ball _use_defensive _use_figurine _use_grease _use_lamp _use_leash _use_magic_whistle _use_mirror
+functions:247 _use_misc _use_offensive _use_pick_axe _use_skill _use_stethoscope _use_tinning_kit _use_towel _use_trap
+functions:248 _use_unicorn_horn _use_whip _use_whistle _useup _useupall _useupf _ustatusline _uunstick
+functions:249 _uwepgone _vault_occupied _vault_tele _verbalize _vga_backsp _vga_cl_end _vga_cl_eos _vga_clear_screen
+functions:250 _vga_cliparound _vga_detect _vga_DisplayCell _vga_DisplayCell_O _vga_DrawCursor _vga_Finish _vga_FontPtrs _vga_get_scr_size
+functions:251 _vga_gotoloc _vga_HideCursor _vga_Init _vga_overview _vga_redrawmap _vga_refresh _vga_SetPalette _vga_SwitchMode
+functions:252 _vga_traditional _vga_tty_end_screen _vga_tty_startup _vga_update_positionbar _vga_userpan _vga_WriteChar _vga_WriteStr _vga_xputc
+functions:254 _vision_reset _dodiscovered _dodoor _dodown _dodrink _dodrop _doeat _doengrave
+functions:255 _wallification _wallify_map _wallify_vault _wantdoor  _watch_on_duty _water_damage _water_friction
+functions:256 _water_prayer _weapon_dam_bonus _weapon_hit_bonus _weapon_type _wearing_armor _weffects _weight
+functions:257 _weight_cap
+functions:258 _whimper _wield_tool _wildmiss _win_tty_init _wipe_engr_at _wipeoff _wipeout_text
+functions:259 _wiz_detect _wiz_genesis _wiz_identify _wiz_level_tele _wiz_light_sources _wiz_map _wiz_show_seenv _wiz_show_vision
+functions:260 _wiz_show_wmodes _wiz_timeout_queue _wiz_where _wiz_wish _wizdead _worm_known _worm_move _worm_nomove
+functions:261 _wormgone _wormhitu _worn_wield_only _write_ls _writeentry _wrong_elem_type _x_monnam _xcrypt _xkilled _xlev_to_rank _xname _xprname 
+functions:263 _xytod _yelp _yname _Yname2 _You _you_aggravate _You_cant _You_feel _you_have _You_hear _you_unwere _you_were _Your _zap_dig
+functions:265 _zap_hit _zap_over_floor _zap_updown _zapdir_to_glyph _zapnodir _zappable _zapyourself _zhitm _zhitu _put_lregion_here _role_init 
+; tuning
+; this was 23
+functions:266 _bp_to_obj
+; the next two were 238
+functions:268 _aggravate
+; the following were 118
+;functions:269 
+; the following were 261
+;functions:270  
+functions:271 _xputg 
+functions:272 _xputs _xwaitforspace
+; the following were 158
+functions:273 _enermod _enlightenment
+; the following was 214
+;functions:274 _enter_explore_mode
+; the following were 26
+functions:275 _bydoor 
+functions:276 _calc_capacity _call_kops _calm_nymphs
+functions:277 _can_advance _can_be_hatched 
+functions:278 _can_carry
+; the following were 239
+functions:279  _equipname
+functions:280 _txt_xputs
+; the following were 80
+functions:281 _enexto
+;functions:282 
+functions:283 _enhance_weapon_skill 
+; the following were 165
+functions:284 _okdoor
+functions:285 _omon_adj
+functions:286 _on_goal
+functions:287 _on_ground 
+functions:288 _b_trapped
+functions:289 _on_locate 
+functions:290 _on_msg
+; the following were 182
+functions:291 _y_monnam 
+; the following were 195
+;functions:293 
+; the following were 225
+functions:294 _erode_armor
+functions:295 _swallowed
+; the following were 233
+functions:296 _erode_weapon
+; the following were 7
+functions:298 _acurrstr
+; the following were 17
+functions:299 _attacktype
+functions:300 _attrcurse
+functions:301 _automiss
+functions:302 _autopick 
+; the following were 10
+functions:303 _adj_abon
+functions:304 _adj_lev
+functions:305 _adjabil 
+functions:306 _adjalign
+functions:307 _adjattrib 
+; was 53
+functions:308 _display_monster
+functions:309 _error
+; was 117
+;functions:310 
+functions:311 _is_ok_location
+;functions:312 
+functions:313 _is_pure
+functions:314 _is_quest_artifact 
+; was 236
+functions:316 _tty_putstr _tty_putsym 
+; was 81
+functions:318 _escapes
+functions:319 _erase_menu_or_text 
+functions:320 _eraseall
+; tuning 2
+; was 269
+functions:321 _weldmsg _were_change _were_summon 
+functions:322 _where_name _which_armor _which_arti
+functions:325 _term_end_raw_bold 
+functions:326 _term_start_attr
+;functions:327 
+functions:328 _term_start_raw_bold 
+functions:329 _terminate
+functions:330 _tgetch 
+functions:331 _the
+functions:332 _m_monnam 
+functions:333 _domagictrap _domindblast _domonability 
+functions:334 _m_respond
+functions:335 _m_slips_free 
+functions:336 _m_throw 
+functions:337 _m_to_e 
+functions:338 _m_unleash
+functions:339 _mpickstuff
+functions:340 _mplayer_talk 
+functions:341 _mpoisons_subj
+functions:342 _mquaffmsg
+functions:343 _miss
+functions:344 _mreadmsg
+functions:345 _mrustm
+functions:346 _vomit _vomiting_dialogue 
+functions:347 _wake_nearby 
+functions:348 _wake_nearto 
+functions:349 _wakeup 
+functions:350 _walkfrom 
+functions:351 _wall_angle
+functions:352 _able_to_loot _add_artifact_score _add_mon_to_reg _add_rect_to_reg _add_region _addinv_core1
+functions:352 _addinv_core2 _age_spells _align_gtitle _align_shift  _align_str _all_but_uchain 
+functions:353 _allow_all _allow_category  _already_wearing _already_wearing2 _angrygods
+functions:354 _animate_statue _antholemon _arti_speak _assign_warnings _attach_fig_transform_timeout _blocked_boulder
+functions:355 _book_substitution _burn_away_slime _can_blnd _can_ride _can_saddle _can_twoweapon
+functions:356 _carry_obj_effects _clear_regions _container_at _coyotename _create_gas_cloud _create_region
+functions:357 _describe_level _dfeature_at _dig_up_grave _discover_artifact _dismount_steed _disp_artifact_discoveries
+functions:359 _doconduct _dofire _doprinuse _doride _doswapweapon _dotwoweapon
+functions:360 _dowieldquiver _drain_item _exercise_steed _expire_gas_cloud _extcmd_via_menu _feature_alert_opts
+functions:361 _fig_transform _figurine_location_checks _final_level _find_trap _finish_quest _fix_petrification
+functions:362 _food_substitution _fqname _free_invbuf _free_region _free_youbuf _freeinv_core
+functions:363 _fuzzymatch _get_compopt_value _get_current_feature_ver _get_feature_notice_ver _get_mtraits _getlev 
+functions:364 _getlock _getobj  _getpos  _give_may_advance_msg _Goodbye _halu_gname
+functions:365 _Hello _hurtle_step _hurtmarmor _in_out_region _initialspell _inside_gas_cloud
+functions:366 _inside_rect _inside_region _kick_steed _look_here _m_in_out_region _make_grave
+functions:367 _mbodypart _mdamagem _mdamageu _minimal_enlightenment _mk_mplayer_armor _mm_aggression
+functions:368 _mon_adjust_speed _mon_animal_list _mon_beside _mon_in_region _montraits _mount_steed
+functions:369 _noit_mon_nam _noit_Monnam _noncoalignment _num_genocides _obj_attach_mid _obj_timer_checks
+functions:370 _obj_typename _ok_align _ok_gend _ok_race _ok_role _ordin
+functions:371 _pick_align _pick_animal _pick_gend _pick_nasty _pick_race _pick_role
+functions:372 _place_monster _pm_to_cham _prisoner_speaks _process_options _randalign _randgend
+functions:373 _randrace _randrole _realloc_obj _relobj _remove_mon_from_reg _remove_region
+functions:374 _remove_worn_item _replace_object _reset_oattached_mids _rest_regions _restore_cham _rnd_treefruit_at
+functions:375 _save_regions _select_newcham_form _self_invis_message _setuqwep _setuswapwep _show_conduct
+functions:376 _show_region _simple_typename _slime_dialogue _sokoban_detect _spec_m2 _special_handling
+functions:377 _str2align _str2gend _str2race _str2role _There _throw_obj
+functions:378 _tmiss _tty_update_positionbar _tty_wait_synch  _undiscovered_artifact _untwoweapon _update_mlstmv
+functions:379 _update_monster_region _update_player_regions _uqwepgone _ureflects _use_grapple _use_pole
+functions:380 _use_saddle _uswapwepgone _uwep_skill_type _validalign _validgend _validrace
+functions:381 _validrole _violated_vegetarian _walk_path _warning_opts _wary_dog _welcome
+functions:382 _write_timer _yyyymmdd _zap_steed
+functions:383 _getprice _getreturn _getrumor _gettrack
+functions:384 _ini_inv _knows_object _knows_class _restricted_spell_discipline _ready_weapon
+functions:385 _doname _Doname2
+functions:386 _minwater 
+functions:387 _missmm 
+functions:388 _missmu 
+functions:389 _missum 
+functions:390 _mixtype _mk_artifact
+functions:391 _makesingular 
+functions:392 _maketrap _makevtele _makewish 
+
