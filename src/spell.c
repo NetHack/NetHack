@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.4	2002/02/12	*/
+/*	SCCS Id: @(#)spell.c	3.4	2002/03/27	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -212,8 +212,15 @@ struct obj *book2;
 	    pline_The("invocation fails!");
 	    pline("At least one of your artifacts is cursed...");
 	} else if(arti1_primed && arti2_primed) {
+	    unsigned soon = (unsigned) d(2,6);	/* time til next intervene() */
+
+	    /* successful invocation */
 	    mkinvokearea();
 	    u.uevent.invoked = 1;
+	    /* in case you haven't killed the Wizard yet, behave as if
+	       you just did */
+	    u.uevent.udemigod = 1;	/* wizdead() */
+	    if (!u.udg_cnt || u.udg_cnt > soon) u.udg_cnt = soon;
 	} else {	/* at least one artifact not prepared properly */
 	    You("have a feeling that %s is amiss...", something);
 	    goto raise_dead;
