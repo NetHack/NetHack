@@ -95,7 +95,6 @@ E void NDECL(set_moreluck);
 E void NDECL(restore_attrib);
 E void FDECL(exercise, (int,BOOLEAN_P));
 E void NDECL(exerchk);
-E void NDECL(reset_attribute_clock);
 E void FDECL(init_attr, (int));
 E void NDECL(redist_attr);
 E void FDECL(adjabil, (int,int));

@@ -75,6 +75,7 @@ struct context_info {
 	unsigned startingpet_mid;
 	int	 warnlevel;
 	int	 djinni_count, ghost_count;	/* potion effect tuning */
+	long next_attrib_check;	/* next attribute check */
 	long stethoscope_move;
 	short stethoscope_movement;
 	boolean  travel;	/* find way automatically to u.tx,u.ty */
