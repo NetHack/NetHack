@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.4	2003/01/02	*/
+/*	SCCS Id: @(#)mhitm.c	3.4	2004/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1263,18 +1263,6 @@ mdamagem(magr, mdef, mattk)
 	    return (MM_DEF_DIED | (grow_up(magr,mdef) ? 0 : MM_AGR_DIED));
 	}
 	return(MM_HIT);
-}
-
-int
-noattacks(ptr)			/* returns 1 if monster doesn't attack */
-	struct	permonst *ptr;
-{
-	int i;
-
-	for(i = 0; i < NATTK; i++)
-		if(ptr->mattk[i].aatyp) return(0);
-
-	return(1);
 }
 
 /* `mon' is hit by a sleep attack; return 1 if it's affected, 0 otherwise */

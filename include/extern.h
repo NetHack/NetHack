@@ -996,7 +996,6 @@ E int FDECL(mattackm, (struct monst *,struct monst *));
 #ifdef BARGETHROUGH
 E int FDECL(mdisplacem, (struct monst *,struct monst *,BOOLEAN_P));
 #endif
-E int FDECL(noattacks, (struct permonst *));
 E int FDECL(sleep_monst, (struct monst *,int,int));
 E void FDECL(slept_monst, (struct monst *));
 E long FDECL(attk_protection, (int));
@@ -1203,6 +1202,7 @@ E void FDECL(decide_to_shapeshift, (struct monst *,int));
 E void FDECL(set_mon_data, (struct monst *,struct permonst *,int));
 E struct attack *FDECL(attacktype_fordmg, (struct permonst *,int,int));
 E boolean FDECL(attacktype, (struct permonst *,int));
+E boolean FDECL(noattacks, (struct permonst *));
 E boolean FDECL(poly_when_stoned, (struct permonst *));
 E boolean FDECL(resists_drli, (struct monst *));
 E boolean FDECL(resists_magm, (struct monst *));

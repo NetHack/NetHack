@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)mondata.c	3.4	2004/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,6 +44,25 @@ struct permonst *ptr;
 int atyp;
 {
     return attacktype_fordmg(ptr, atyp, AD_ANY) ? TRUE : FALSE;
+}
+
+/* returns TRUE if monster doesn't attack, FALSE if it does */
+boolean
+noattacks(ptr)
+struct permonst *ptr;
+{
+    int i;
+    struct attack *mattk = ptr->mattk;
+
+    for (i = 0; i < NATTK; i++) {
+	/* AT_BOOM "passive attack" (gas spore's explosion upon death)
+	   isn't an attack as far as our callers are concerned */
+	if (mattk[i].aatyp == AT_BOOM) continue;
+
+	if (mattk[i].aatyp) return FALSE;
+    }
+
+    return TRUE;
 }
 
 boolean
