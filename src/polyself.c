@@ -1174,7 +1174,7 @@ int part;
 	    return horse_parts[part];
 	if (mptr->mlet == S_EEL && mptr != &mons[PM_JELLYFISH])
 	    return fish_parts[part];
-	if (slithy(mptr))
+	if (slithy(mptr) || (mptr->mlet == S_DRAGON && part == HAIR))
 	    return snake_parts[part];
 	if (mptr->mlet == S_EYE)
 	    return sphere_parts[part];
