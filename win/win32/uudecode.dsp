@@ -64,7 +64,7 @@ echo decoding mnselcnt (mnselcnt.uu to mnselcnt.bmp)	\
 ..\..\util\uudecode.exe mnselcnt.uu	\
 echo decoding mnunsel (mnunsel.uu to mnunsel.bmp)	\
 ..\..\util\uudecode.exe mnunsel.uu	\
-echo decoding mnsel (petmark.uu to petmark.bmp)	\
+echo decoding petmark (petmark.uu to petmark.bmp)	\
 ..\..\util\uudecode.exe petmark.uu	\
 chdir ..\..\binary
 
@@ -106,7 +106,7 @@ echo decoding mnselcnt (mnselcnt.uu to mnselcnt.bmp)	\
 ..\..\util\uudecode.exe mnselcnt.uu	\
 echo decoding mnunsel (mnunsel.uu to mnunsel.bmp)	\
 ..\..\util\uudecode.exe mnunsel.uu	\
-echo decoding mnsel (petmark.uu to petmark.bmp)	\
+echo decoding petmark (petmark.uu to petmark.bmp)	\
 ..\..\util\uudecode.exe petmark.uu	\
 chdir ..\..\binary
 
