@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.4	2002/03/09	*/
+/*	SCCS Id: @(#)extern.h	3.4	2002/03/29	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1844,7 +1844,7 @@ E long FDECL(somegold, (long));
 E long NDECL(somegold);
 #endif
 E void FDECL(stealgold, (struct monst *));
-E void FDECL(remove_worn_item, (struct obj *));
+E void FDECL(remove_worn_item, (struct obj *,BOOLEAN_P));
 E int FDECL(steal, (struct monst *, char *));
 E int FDECL(mpickobj, (struct monst *,struct obj *));
 E void FDECL(stealamulet, (struct monst *));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.4	2002/02/21	*/
+/*	SCCS Id: @(#)dothrow.c	3.4	2002/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -167,13 +167,8 @@ int shotlimit;
 		otmp = splitobj(obj, 1L);
 	    } else {
 		otmp = obj;
-		if (otmp->owornmask && otmp != uball)
-		    remove_worn_item(otmp);
-		else if ((obj->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER)) != 0) {
-		    /* wielded ball, special case */
-		    setworn((struct obj *)0,
-			    (obj->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER)));
-		}
+		if (otmp->owornmask)
+		    remove_worn_item(otmp, FALSE);
 	    }
 	    freeinv(otmp);
 	    throwit(otmp, wep_mask, twoweap);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2002/01/19	*/
+/*	SCCS Id: @(#)shk.c	3.4	2002/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -103,8 +103,10 @@ long amount;
 	return 0L;
     }
 
-    if (ygold->quan > amount) ygold = splitobj(ygold, amount);
-    else if (ygold->owornmask) remove_worn_item(ygold);		/* quiver */
+    if (ygold->quan > amount)
+	ygold = splitobj(ygold, amount);
+    else if (ygold->owornmask)
+	remove_worn_item(ygold, FALSE);		/* quiver */
     freeinv(ygold);
     add_to_minv(mon, ygold);
     flags.botl = 1;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2002/02/17	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2002/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2350,7 +2350,7 @@ const char *str;
 			/* obj == uarmh */
 			hairbuf);
 	}
-	remove_worn_item(obj);
+	remove_worn_item(obj, TRUE);
 }
 #endif  /* SEDUCE */
 

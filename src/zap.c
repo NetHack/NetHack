@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)zap.c	3.4	2002/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1343,7 +1343,7 @@ poly_obj(obj, id)
 	/* for now, take off worn items being polymorphed */
 	if (obj_location == OBJ_INVENT) {
 	    if (id == STRANGE_OBJECT)
-		remove_worn_item(obj);
+		remove_worn_item(obj, TRUE);
 	    else {
 		/* This is called only for stone to flesh.  It's a lot simpler
 		 * than it otherwise might be.  We don't need to check for
@@ -1351,7 +1351,7 @@ poly_obj(obj, id)
 		 * any) and only three worn masks are possible.
 		 */
 		otmp->owornmask = obj->owornmask;
-		remove_worn_item(obj);
+		remove_worn_item(obj, TRUE);
 		setworn(otmp, otmp->owornmask);
 		if (otmp->owornmask & LEFT_RING)
 		    uleft = otmp;

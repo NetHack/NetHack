@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.4	2002/01/04	*/
+/*	SCCS Id: @(#)steal.c	3.4	2002/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -172,8 +172,9 @@ botm:   stealoid = 0;
 /* An object you're wearing has been taken off by a monster (theft or
    seduction).  Also used if a worn item gets transformed (stone to flesh). */
 void
-remove_worn_item(obj)
+remove_worn_item(obj, unchain_ball)
 struct obj *obj;
+boolean unchain_ball;	/* whether to unpunish or just unwield */
 {
 	if (donning(obj))
 	    cancel_don();
@@ -198,19 +199,21 @@ struct obj *obj;
 	    Ring_gone(obj);
 	} else if (obj->owornmask & W_TOOL) {
 	    Blindf_off(obj);
-	} else if (obj->owornmask & (W_BALL|W_CHAIN)) {
-	    unpunish();
 	} else if (obj->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER)) {
 	    if (obj == uwep)
 		uwepgone();
-	    else if (obj == uswapwep)
+	    if (obj == uswapwep)
 		uswapwepgone();
-	    else if (obj == uquiver)
+	    if (obj == uquiver)
 		uqwepgone();
 	}
 
-	/* catchall */
-	if (obj->owornmask) setnotworn(obj);
+	if (obj->owornmask & (W_BALL|W_CHAIN)) {
+	    if (unchain_ball) unpunish();
+	} else if (obj->owornmask) {
+	    /* catchall */
+	    setnotworn(obj);
+	}
 }
 
 /* Returns 1 when something was stolen (or at least, when N should flee now)
@@ -333,19 +336,19 @@ gotobj:
 		case AMULET_CLASS:
 		case RING_CLASS:
 		case FOOD_CLASS: /* meat ring */
-		    remove_worn_item(otmp);
+		    remove_worn_item(otmp, TRUE);
 		    break;
 		case ARMOR_CLASS:
 		    armordelay = objects[otmp->otyp].oc_delay;
 		    /* Stop putting on armor which has been stolen. */
 		    if (donning(otmp)) {
-			remove_worn_item(otmp);
+			remove_worn_item(otmp, TRUE);
 			break;
 		    } else if (monkey_business) {
 			/* animals usually don't have enough patience
 			   to take off items which require extra time */
 			if (armordelay >= 1 && rn2(10)) goto cant_take;
-			remove_worn_item(otmp);
+			remove_worn_item(otmp, TRUE);
 			break;
 		    } else {
 			int curssv = otmp->cursed;
@@ -370,7 +373,7 @@ gotobj:
 			named++;
 			/* the following is to set multi for later on */
 			nomul(-armordelay);
-			remove_worn_item(otmp);
+			remove_worn_item(otmp, TRUE);
 			otmp->cursed = curssv;
 			if(multi < 0){
 				/*
@@ -391,7 +394,7 @@ gotobj:
 		}
 	}
 	else if (otmp->owornmask)
-	    remove_worn_item(otmp);
+	    remove_worn_item(otmp, TRUE);
 
 	/* do this before removing it from inventory */
 	if (objnambuf) Strcpy(objnambuf, yname(otmp));
@@ -487,7 +490,7 @@ struct monst *mtmp;
 
     if (otmp) { /* we have something to snatch */
 	if (otmp->owornmask)
-	    remove_worn_item(otmp);
+	    remove_worn_item(otmp, TRUE);
 	freeinv(otmp);
 	/* mpickobj wont merge otmp because none of the above things
 	   to steal are mergable */
