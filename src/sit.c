@@ -91,7 +91,7 @@ dosit()
 		    You("sit in the lava!");
 		    u.utrap += rnd(4);
 		    losehp(d(2,10), "sitting in lava", KILLED_BY);
-		} else if(u.utraptype == TT_INFLOOR) {
+		} else if(u.utraptype == TT_INFLOOR || u.utraptype == TT_BURIEDBALL) {
 		    You_cant("maneuver to sit!");
 		    u.utrap++;
 		}

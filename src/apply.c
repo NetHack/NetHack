@@ -817,6 +817,10 @@ struct obj **optr;
 		    unpunish();
 		    res = 1;
 		}
+		else if (u.utrap && u.utraptype == TT_BURIEDBALL) {
+		    buried_ball_to_freedom();
+		    res = 1;
+		}
 		res += openit();
 		switch (res) {
 		  case 0:  pline(nothing_happens); break;
@@ -1315,9 +1319,12 @@ int magic; /* 0=Physical, otherwise skill level */
 		    You("pull yourself above the lava!");
 		    u.utrap = 0;
 		    return 1;
+		case TT_BURIEDBALL:
 		case TT_INFLOOR:
-		    You("strain your %s, but you're still stuck in the floor.",
-			makeplural(body_part(LEG)));
+		    You("strain your %s, but you're still %s.",
+			makeplural(body_part(LEG)),
+			(u.utraptype == TT_INFLOOR) ? "stuck in the floor" :
+			"attached to the buried ball");
 		    set_wounded_legs(LEFT_SIDE, rn1(10, 11));
 		    set_wounded_legs(RIGHT_SIDE, rn1(10, 11));
 		    return 1;

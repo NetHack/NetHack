@@ -1039,6 +1039,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	if (Lifesaved)
 		enl_msg("Your life ", "will be", "would have been", " saved");
 	if (u.twoweap) you_are("wielding two weapons at once");
+	if (u.utraptype == TT_BURIEDBALL) you_are("fastened to a buried ball");
 
 	/*** Miscellany ***/
 	if (Luck) {

@@ -241,6 +241,9 @@ E void FDECL(bury_objs, (int,int));
 E void FDECL(unearth_objs, (int,int));
 E void FDECL(rot_organic, (genericptr_t, long));
 E void FDECL(rot_corpse, (genericptr_t, long));
+E struct obj *FDECL(buried_ball, (coord *));
+E void NDECL(buried_ball_to_punishment);
+E void NDECL(buried_ball_to_freedom);
 #if 0
 E void FDECL(bury_monst, (struct monst *));
 E void NDECL(bury_you);

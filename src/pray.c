@@ -174,7 +174,8 @@ in_trouble()
 	/*
 	 * minor troubles
 	 */
-	if(Punished) return(TROUBLE_PUNISHED);
+	if(Punished || (u.utrap && u.utraptype == TT_BURIEDBALL))
+		return(TROUBLE_PUNISHED);
 	if (Cursed_obj(uarmg, GAUNTLETS_OF_FUMBLING) ||
 		Cursed_obj(uarmf, FUMBLE_BOOTS))
 	    return TROUBLE_FUMBLING;
@@ -372,7 +373,10 @@ register int trouble;
 	 */
 	    case TROUBLE_PUNISHED:
 		    Your("chain disappears.");
-		    unpunish();
+		    if(u.utrap && u.utraptype == TT_BURIEDBALL)
+			buried_ball_to_freedom();
+		    else
+			unpunish();
 		    break;
 	    case TROUBLE_FUMBLING:
 		    if (Cursed_obj(uarmg, GAUNTLETS_OF_FUMBLING))

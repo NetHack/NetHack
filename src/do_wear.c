@@ -1243,13 +1243,17 @@ boolean noisy;
 					   "rear hooves" which sounds odd */
 	    err++;
 	} else if (u.utrap && (u.utraptype == TT_BEARTRAP ||
-				u.utraptype == TT_INFLOOR)) {
+				u.utraptype == TT_INFLOOR ||
+				u.utraptype == TT_BURIEDBALL)) {
 	    if (u.utraptype == TT_BEARTRAP) {
 		if (noisy) Your("%s is trapped!", body_part(FOOT));
-	    } else {
+	    } else if (u.utraptype == TT_INFLOOR) {
 		if (noisy) Your("%s are stuck in the %s!",
 				makeplural(body_part(FOOT)),
 				surface(u.ux, u.uy));
+	    } else { /*TT_BURIEDBALL*/
+		if (noisy) Your("%s is attached to the buried ball!",
+				body_part(LEG));
 	    }
 	    err++;
 	} else

@@ -944,6 +944,11 @@ register struct obj	*sobj;
 		    }
 		}
 		if(Punished && !confused) unpunish();
+		if(u.utrap && u.utraptype == TT_BURIEDBALL) {
+			buried_ball_to_freedom();
+			pline_The("clasp on your %s vanishes.",
+				body_part(LEG));
+		}
 		update_inventory();
 		break;
 	    }
@@ -1733,20 +1738,29 @@ void
 punish(sobj)
 register struct obj	*sobj;
 {
+	struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_IRON_BALL) ?
+				 sobj : (struct obj *)0;
 	/* KMH -- Punishment is still okay when you are riding */
-	You("are being punished for your misbehavior!");
+	if (!reuse_ball) You("are being punished for your misbehavior!");
 	if(Punished){
 		Your("iron ball gets heavier.");
 		uball->owt += 160 * (1 + sobj->cursed);
 		return;
 	}
 	if (amorphous(youmonst.data) || is_whirly(youmonst.data) || unsolid(youmonst.data)) {
-		pline("A ball and chain appears, then falls away.");
-		dropy(mkobj(BALL_CLASS, TRUE));
+		if (!reuse_ball) {
+			pline("A ball and chain appears, then falls away.");
+			dropy(mkobj(BALL_CLASS, TRUE));
+		} else {
+			dropy(reuse_ball);
+		}
 		return;
 	}
 	setworn(mkobj(CHAIN_CLASS, TRUE), W_CHAIN);
-	setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
+	if (!reuse_ball)
+		setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
+	else
+		setworn(reuse_ball, W_BALL);
 	uball->spe = 1;		/* special ball (see save) */
 
 	/*

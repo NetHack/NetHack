@@ -653,7 +653,7 @@ xchar x, y;
 	struct trap *t;
 	const char *pullmsg = "The ball pulls you out of the %s!";
 
-	if (u.utrap && u.utraptype != TT_INFLOOR) {
+	if (u.utrap && u.utraptype != TT_INFLOOR && u.utraptype != TT_BURIEDBALL) {
 	    switch(u.utraptype) {
 	    case TT_PIT:
 		pline(pullmsg, "pit");

@@ -1178,19 +1178,24 @@ domove()
 #endif
 			You("disentangle yourself.");
 		    }
-		} else if (u.utraptype == TT_INFLOOR) {
+		} else if (u.utraptype == TT_INFLOOR ||
+			   u.utraptype == TT_BURIEDBALL) {
 		    if(--u.utrap) {
 			if(flags.verbose) {
-			    predicament = "stuck in the";
+			    predicament = (u.utraptype == TT_INFLOOR) ?
+					"stuck in the" : "attached to the";
 #ifdef STEED
 			    if (u.usteed)
 				Norep("%s is %s %s.",
 				      upstart(y_monnam(u.usteed)),
-				      predicament, surface(u.ux, u.uy));
+				      predicament,
+				      (u.utraptype == TT_INFLOOR) ?
+					surface(u.ux, u.uy) : "buried ball");
 			    else
 #endif
 			    Norep("You are %s %s.", predicament,
-				  surface(u.ux, u.uy));
+			    	  (u.utraptype == TT_INFLOOR) ?
+				  surface(u.ux, u.uy) : "buried ball");
 			}
 		    } else {
 #ifdef STEED
@@ -1199,7 +1204,11 @@ domove()
 				  upstart(y_monnam(u.usteed)));
 			else
 #endif
-			You("finally wiggle free.");
+			You("finally wiggle %s.",
+				u.utraptype == TT_INFLOOR ?
+				"free" : "the ball free");
+			if (u.utraptype == TT_BURIEDBALL)
+				buried_ball_to_punishment();
 		    }
 		} else {
 		    if(flags.verbose) {

@@ -492,6 +492,9 @@ int ttyp;
 	boolean at_u = (x == u.ux) && (y == u.uy);
 	boolean wont_fall = Levitation || Flying;
 
+	if (u.utrap && u.utraptype == TT_BURIEDBALL)
+		buried_ball_to_punishment();
+
 	/* these furniture checks were in dighole(), but wand
 	   breaking bypasses that routine and calls us directly */
 	if (IS_FOUNTAIN(lev->typ)) {
@@ -1277,6 +1280,84 @@ zap_dig()
 	return;
 }
 
+struct obj *
+buried_ball(cc)
+coord *cc;
+{
+	xchar check_x, check_y;
+	struct obj *otmp, *otmp2;
+	if (u.utraptype == TT_BURIEDBALL)
+	    for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
+		otmp2 = otmp->nobj;
+		if (otmp->otyp != HEAVY_IRON_BALL) continue;
+		/* try the exact location first */
+		if (otmp->ox == cc->x && otmp->oy == cc->y)
+		    return otmp;
+		/* Now try the vicinity */
+		/*
+		 * (x-2,y-2)       (x+2,y-2)
+		 *           (x,y)
+		 * (x-2,y+2)       (x+2,y+2)
+		 */
+		for (check_x = cc->x-2; check_x <= cc->x+2; ++check_x)
+		    for (check_y = cc->y-2; check_y <= cc->y+2; ++check_y) {
+			if (check_x == cc->x && check_y == cc->y) continue;
+		        if (isok(check_x, check_y) &&
+			    (otmp->ox == check_x && otmp->oy == check_y)) {
+			   	cc->x = check_x;
+			   	cc->y = check_y;
+				return otmp;
+			}
+		    }
+	    }
+	return (struct obj *)0;
+}
+
+void
+buried_ball_to_punishment()
+{
+	coord cc;
+	struct obj *ball;
+	cc.x = u.ux; cc.y = u.uy;
+	ball = buried_ball(&cc);
+	if (ball) {
+		obj_extract_self(ball);
+#if 0
+		/* rusting buried metallic objects is not implemented yet */
+		if (ball->timed)
+			(void) stop_timer(RUST_METAL, (genericptr_t)ball);
+#endif
+		punish(ball);	/* use ball as flag for unearthed buried ball */
+		u.utrap = 0;
+		u.utraptype = 0;
+		del_engr_at(cc.x, cc.y);
+		newsym(cc.x, cc.y);
+	}
+}
+
+void
+buried_ball_to_freedom()
+{
+	coord cc;
+	struct obj *ball;
+	cc.x = u.ux; cc.y = u.uy;
+	ball = buried_ball(&cc);
+	if (ball) {
+		obj_extract_self(ball);
+#if 0
+		/* rusting buried metallic objects is not implemented yet */
+		if (ball->timed)
+			(void) stop_timer(RUST_METAL, (genericptr_t)ball);
+#endif
+		place_object(ball, cc.x, cc.y);
+		stackobj(ball);
+		u.utrap = 0;
+		u.utraptype = 0;
+		del_engr_at(cc.x, cc.y);
+		newsym(cc.x, cc.y);
+	}
+}
+
 /* move objects from fobj/nexthere lists to buriedobjlist, keeping position */
 /* information */
 struct obj *
@@ -1289,8 +1370,12 @@ bury_an_obj(otmp)
 #ifdef DEBUG
 	pline("bury_an_obj: %s", xname(otmp));
 #endif
-	if (otmp == uball)
+	if (otmp == uball) {
 		unpunish();
+		u.utrap = rn1(50,20);
+		u.utraptype = TT_BURIEDBALL;
+		pline_The("iron ball gets buried!");
+	}
 	/* after unpunish(), or might get deallocated chain */
 	otmp2 = otmp->nexthere;
 	/*
@@ -1329,6 +1414,13 @@ bury_an_obj(otmp)
 	    (void) start_timer((under_ice ? 0L : 250L) + (long)rnd(250),
 			       TIMER_OBJECT, ROT_ORGANIC, (genericptr_t)otmp);
 	}
+#if 0
+	/* rusting of buried metal not yet implemented */
+	else if (is_rustprone(otmp)) {
+	    (void) start_timer((long)rnd(otmp->otyp == HEAVY_IRON_BALL ? 1500 : 250),
+			       TIMER_OBJECT, RUST_METAL, (genericptr_t)otmp);
+	}
+#endif
 	add_to_buried(otmp);
 	return(otmp2);
 }
@@ -1356,19 +1448,26 @@ void
 unearth_objs(x, y)
 int x, y;
 {
-	struct obj *otmp, *otmp2;
+	struct obj *otmp, *otmp2, *bball;
+	coord cc;
 
 #ifdef DEBUG
 	pline("unearth_objs: at %d, %d", x, y);
 #endif
+	cc.x = x; cc.y = y;
+	bball = buried_ball(&cc);
 	for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
 		otmp2 = otmp->nobj;
 		if (otmp->ox == x && otmp->oy == y) {
-		    obj_extract_self(otmp);
-		    if (otmp->timed)
-			(void) stop_timer(ROT_ORGANIC, (genericptr_t)otmp);
-		    place_object(otmp, x, y);
-		    stackobj(otmp);
+		    if (bball && otmp == bball && u.utraptype == TT_BURIEDBALL)
+		    	buried_ball_to_punishment();
+		    else {
+			obj_extract_self(otmp);
+			if (otmp->timed)
+			    (void) stop_timer(ROT_ORGANIC, (genericptr_t)otmp);
+			place_object(otmp, x, y);
+			stackobj(otmp);
+		    }
 		}
 	}
 	del_engr_at(x, y);

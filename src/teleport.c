@@ -231,9 +231,15 @@ teleds(nux, nuy, allow_drag)
 register int nux,nuy;
 boolean allow_drag;
 {
-	boolean ball_active = (Punished && uball->where != OBJ_FREE),
-		ball_still_in_range = FALSE;
+	boolean ball_active, ball_still_in_range;
 
+	if (u.utraptype == TT_BURIEDBALL) {
+		/* unearth it */
+		buried_ball_to_punishment();
+	}
+	ball_active = (Punished && uball->where != OBJ_FREE),
+		ball_still_in_range = FALSE;
+	
 	/* If they have to move the ball, then drag if allow_drag is true;
 	 * otherwise they are teleporting, so unplacebc().  
 	 * If they don't have to move the ball, then always "drag" whether or
@@ -646,6 +652,9 @@ level_tele()
 	    }
 	}
 
+	if (u.utrap && u.utraptype == TT_BURIEDBALL)
+		buried_ball_to_punishment();
+
 	if (!next_to_u()) {
 		You(shudder_for_moment);
 		return;
@@ -765,6 +774,9 @@ domagicportal(ttmp)
 register struct trap *ttmp;
 {
 	struct d_level target_level;
+
+	if (u.utrap && u.utraptype == TT_BURIEDBALL)
+		buried_ball_to_punishment();
 
 	if (!next_to_u()) {
 		You(shudder_for_moment);

@@ -524,9 +524,15 @@ int	mntmp;
 	    (is_pool(u.ux,u.uy) || is_lava(u.ux,u.uy))) ||
 	   (Underwater && !Swimming))
 	    spoteffects(TRUE);
-	if (Passes_walls && u.utrap && u.utraptype == TT_INFLOOR) {
+	if (Passes_walls && u.utrap &&
+	    (u.utraptype == TT_INFLOOR || u.utraptype == TT_BURIEDBALL)) {
 	    u.utrap = 0;
-	    pline_The("rock seems to no longer trap you.");
+	    if (u.utraptype == TT_INFLOOR)
+		pline_The("rock seems to no longer trap you.");
+	    else {
+		pline_The("buried ball is no longer bound to you.");
+		buried_ball_to_freedom();
+	    }
 	} else if (likes_lava(youmonst.data) && u.utrap && u.utraptype == TT_LAVA) {
 	    u.utrap = 0;
 	    pline_The("lava now feels soothing.");
@@ -535,6 +541,9 @@ int	mntmp;
 	    if (Punished) {
 		You("slip out of the iron chain.");
 		unpunish();
+	    } else if (u.utrap && u.utraptype == TT_BURIEDBALL) {
+		You("slip free of the buried ball and chain.");
+	        buried_ball_to_freedom();
 	    }
 	}
 	if (u.utrap && (u.utraptype == TT_WEB || u.utraptype == TT_BEARTRAP) &&
@@ -771,6 +780,11 @@ int
 doremove()
 {
 	if (!Punished) {
+		if (u.utrap && u.utraptype == TT_BURIEDBALL) {
+		    pline_The("ball and chain are buried firmly in the %s.",
+				surface(u.ux, u.uy));
+		    return(0);
+		}
 		You("are not chained to anything!");
 		return(0);
 	}
