@@ -72,6 +72,7 @@ static char nullstr[] = "";
 char erase_char,kill_char;
 
 static char currentcolor = FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_BLUE;
+static char noninvertedcurrentcolor = FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_BLUE;
 static char currenthilite = 0;
 static char currentbackground = 0;
 static boolean colorchange = TRUE;
@@ -759,6 +760,7 @@ term_start_attr(int attr)
     switch(attr){
         case ATR_INVERSE:
 		if (iflags.wc_inverse) {
+ 		   noninvertedcurrentcolor = currentcolor;
 		   /* Suggestion by Lee Berger */
 		   if ((currentcolor & (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED)) ==
 			(FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED))
@@ -791,13 +793,14 @@ term_end_attr(int attr)
     switch(attr){
 
         case ATR_INVERSE:
-        	if (iflags.wc_inverse) {
-		   if (currentcolor == 0)
-			currentcolor = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED;
-		   currentbackground = 0; 
-		   colorchange = TRUE;
-		   break;
-		} /* else */
+       	  if (iflags.wc_inverse) {
+			if (currentcolor == 0 && noninvertedcurrentcolor != 0)
+				currentcolor = noninvertedcurrentcolor;
+			noninvertedcurrentcolor = 0;
+		    currentbackground = 0;
+		    colorchange = TRUE;
+		    break;
+		  } /* else */
 		/*FALLTHRU*/
         case ATR_ULINE:
         case ATR_BOLD:
