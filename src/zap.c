@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)zap.c	3.5	2005/03/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3891,8 +3891,23 @@ void
 fracture_rock(obj)	/* fractured by pick-axe or wand of striking */
 register struct obj *obj;		   /* no texts here! */
 {
+	xchar x, y;
+	boolean by_you = !context.mon_moving;
+
+	if (by_you && get_obj_location(obj, &x, &y, 0) && costly_spot(x, y)) {
+	    struct monst *shkp = 0;
+	    char objroom = *in_rooms(x, y, SHOPBASE);
+
+	    if (billable(&shkp, obj, objroom, FALSE)) {
+		/* shop message says "you owe <shk> <$> for it!" so we need
+		   to precede that with a message explaining what "it" is */
+		You("fracture %s %s.", s_suffix(shkname(shkp)), xname(obj));
+		breakobj(obj, x, y, TRUE, FALSE); /* charges for shop goods */
+	    }
+	}
+
 	/* A little Sokoban guilt... */
-	if (obj->otyp == BOULDER && In_sokoban(&u.uz) && !context.mon_moving)
+	if (by_you && obj->otyp == BOULDER && In_sokoban(&u.uz))
 	    change_luck(-1);
 
 	obj->otyp = ROCK;
@@ -3922,6 +3937,7 @@ register struct obj *obj;
 	/* [obj is assumed to be on floor, so no get_obj_location() needed] */
 	struct trap *trap = t_at(obj->ox, obj->oy);
 	struct obj *item;
+	boolean by_you = !context.mon_moving;
 
 	if (trap && trap->ttyp == STATUE_TRAP &&
 		activate_statue_trap(trap, obj->ox, obj->oy, TRUE))
@@ -3931,7 +3947,7 @@ register struct obj *obj;
 	    obj_extract_self(item);
 	    place_object(item, obj->ox, obj->oy);
 	}
-	if (Role_if(PM_ARCHEOLOGIST) && !context.mon_moving && (obj->spe & STATUE_HISTORIC)) {
+	if (by_you && Role_if(PM_ARCHEOLOGIST) && (obj->spe & STATUE_HISTORIC)) {
 	    You_feel("guilty about damaging such a historic statue.");
 	    adjalign(-1);
 	}

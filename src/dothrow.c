@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2005/03/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,7 +13,6 @@ STATIC_DCL int FDECL(gem_accept, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(tmiss, (struct obj *, struct monst *));
 STATIC_DCL int FDECL(throw_gold, (struct obj *));
 STATIC_DCL void FDECL(check_shop_obj, (struct obj *,XCHAR_P,XCHAR_P,BOOLEAN_P));
-STATIC_DCL void FDECL(breakobj, (struct obj *,XCHAR_P,XCHAR_P,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void FDECL(breakmsg, (struct obj *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(toss_up,(struct obj *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(throwing_weapon, (struct obj *));
@@ -1567,13 +1566,15 @@ xchar x, y;		/* object location (ox, oy may not be right) */
  * Unconditionally break an object. Assumes all resistance checks
  * and break messages have been delivered prior to getting here.
  */
-STATIC_OVL void
+void
 breakobj(obj, x, y, hero_caused, from_invent)
 struct obj *obj;
 xchar x, y;		/* object location (ox, oy may not be right) */
 boolean hero_caused;	/* is this the hero's fault? */
 boolean from_invent;
 {
+	boolean fracture = FALSE;
+
 	switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
 		case MIRROR:
 			if (hero_caused)
@@ -1606,7 +1607,16 @@ boolean from_invent;
 			if (hero_caused && obj->spe && obj->corpsenm >= LOW_PM)
 			    change_luck((schar) -min(obj->quan, 5L));
 			break;
+		case BOULDER:
+		case STATUE:
+			/* caller will handle object disposition;
+			   we're just doing the shop theft handling */
+			fracture = TRUE;
+			break;
+		default:
+			break;
 	}
+
 	if (hero_caused) {
 	    if (from_invent) {
 		if (*u.ushops)
@@ -1632,7 +1642,7 @@ boolean from_invent;
 		}
 	    }
 	}
-	delobj(obj);
+	if (!fracture) delobj(obj);
 }
 
 /*

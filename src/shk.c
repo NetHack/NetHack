@@ -58,8 +58,6 @@ STATIC_DCL void FDECL(rouse_shk, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(remove_damage, (struct monst *, BOOLEAN_P));
 STATIC_DCL void FDECL(sub_one_frombill, (struct obj *, struct monst *));
 STATIC_DCL void FDECL(add_one_tobill, (struct obj *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(billable, (struct monst **,struct obj *,
-				    CHAR_P,BOOLEAN_P));
 STATIC_DCL void FDECL(dropped_container, (struct obj *, struct monst *,
 				      BOOLEAN_P));
 STATIC_DCL void FDECL(add_to_billobjs, (struct obj *));
@@ -2140,7 +2138,7 @@ const char *arg;
 }
 
 /* decide whether a shopkeeper thinks an item belongs to her */
-STATIC_OVL boolean
+boolean
 billable(shkpp, obj, roomno, reset_nocharge)
 struct monst **shkpp;	/* in: non-null if shk has been validated; out: shk */
 struct obj *obj;
