@@ -677,7 +677,7 @@ tty_askname()
 		 wins[BASE_WINDOW]->cury - 1);
 	ct = 0;
 	while((c = tty_nhgetch()) != '\n') {
-		if(c == EOF) error("End of input\n");
+		if(c == EOF) c = '\033';
 		if (c == '\033') { ct = 0; break; }  /* continue outer loop */
 #if defined(WIN32CON)
 		if (c == '\003') bail("^C abort.\n");
@@ -2520,6 +2520,7 @@ tty_nhgetch()
     i = tgetch();
 #endif
     if (!i) i = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
+    else if (i == EOF) i = '\033'; /* same for EOF */
     if (ttyDisplay && ttyDisplay->toplin == 1)
 	ttyDisplay->toplin = 2;
     return i;
@@ -2546,8 +2547,8 @@ tty_nh_poskey(x, y, mod)
     if (WIN_MESSAGE != WIN_ERR && wins[WIN_MESSAGE])
 	    wins[WIN_MESSAGE]->flags &= ~WIN_STOP;
     i = ntposkey(x, y, mod);
-    if (!i && mod && *mod == 0)
-    	i = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
+    if (!i && mod && (*mod == 0 || *mod == EOF))
+    	i = '\033'; /* map NUL or EOF to ESC, nethack doesn't expect either */
     if (ttyDisplay && ttyDisplay->toplin == 1)
 		ttyDisplay->toplin = 2;
     return i;

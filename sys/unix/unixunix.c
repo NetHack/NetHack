@@ -155,19 +155,23 @@ getlock()
 		    (void) printf("\nThere is already a game in progress under your name.");
 		    (void) printf("  Destroy old game? [yn] ");
 		    (void) fflush(stdout);
-		    c = getchar();
-		    (void) putchar(c);
-		    (void) fflush(stdout);
-		    while (getchar() != '\n') ; /* eat rest of line and newline */
+		    if ((c = getchar()) != EOF) {
+			int tmp;
+
+			(void) putchar(c);
+			(void) fflush(stdout);
+			while ((tmp = getchar()) != '\n' && tmp != EOF)
+			    ; /* eat rest of line and newline */
+		    }
 		}
-		if(c == 'y' || c == 'Y')
+		if(c == 'y' || c == 'Y') {
 			if(eraseoldlocks())
 				goto gotlock;
 			else {
 				unlock_file(HLOCK);
 				error("Couldn't destroy old game.");
 			}
-		else {
+		} else {
 			unlock_file(HLOCK);
 			error("%s", "");
 		}

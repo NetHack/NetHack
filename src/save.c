@@ -91,6 +91,11 @@ int sig_unused;
 #  endif
 # else	/* SAVEONHANGUP */
 	if (!program_state.done_hup++) {
+#  ifndef SAFERHANGUP
+	    /* When using SAFERHANGUP, the done_hup flag it tested in rhack
+	     * and actual hangup behavior occurs then.  This is 'safer'
+	     * because it disallows certain cheats and also protects
+	     * against losing objects in the process of being thrown. */
 	    if (program_state.something_worth_saving)
 		(void) dosave0();
 #  ifdef VMS
@@ -102,9 +107,9 @@ int sig_unused;
 		clearlocks();
 		terminate(EXIT_FAILURE);
 	    }
+#  endif /* !SAFERHANGUP */
 	}
 # endif
-	return;
 }
 #endif
 

@@ -41,6 +41,9 @@ win32gui: better handling of "more" prompt for messages that would have scrolled
 win32gui: set correct checkmark on "Lock Windows" menu item on startup
 win32gui: redraw message window on resizing (it does not update properly otherwise)
 win32gui: fixed copy/paste error in read registry settings function
+platforms that support hangup: SAFERHANGUP to avoid losing objects in transit
+	between lists when hangup occurs, and also avoid cheats due to
+	well-timed hangups to stop a long melee
 
 
 General New Features

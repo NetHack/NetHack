@@ -158,7 +158,7 @@ gnome_player_selection()
 	if (sel >= 0) sel = pickmap[sel];
 	else if (sel == ROLE_NONE) {		/* Quit */
 	    clearlocks();
-	    gnome_exit_nhwindows(0);
+	    gtk_exit(0);
 	}
 	free(choices);
 	free(pickmap);
@@ -212,7 +212,7 @@ gnome_player_selection()
 	    if (sel >= 0) sel = pickmap[sel];
 	    else if (sel == ROLE_NONE) { /* Quit */
 		clearlocks();
-		gnome_exit_nhwindows(0);
+		gtk_exit(0);
 	    }
 	    flags.initrace = sel;
 	    free(choices);
@@ -267,7 +267,7 @@ gnome_player_selection()
 	    if (sel >= 0) sel = pickmap[sel];
 	    else if (sel == ROLE_NONE) { /* Quit */
 		clearlocks();
-		gnome_exit_nhwindows(0);
+		gtk_exit(0);
 	    }
 	    flags.initgend = sel;
 	    free(choices);
@@ -320,7 +320,7 @@ gnome_player_selection()
 	    if (sel >= 0) sel = pickmap[sel];
 	    else if (sel == ROLE_NONE) { /* Quit */
 		clearlocks();
-		gnome_exit_nhwindows(0);
+		gtk_exit(0);
 	    }
 	    flags.initalign = sel;
 	    free(choices);
@@ -350,7 +350,7 @@ void gnome_askname()
     /* Quit if they want to quit... */
     if (ret==-1)
       {
-        gnome_exit_nhwindows(0);
+	gtk_exit(0);
       }
 }
 
@@ -369,8 +369,7 @@ void gnome_get_nh_event()
 */
 void gnome_exit_nhwindows(const char *str)
 {
-	gtk_exit (0);
-	terminate(EXIT_SUCCESS);
+	/* gtk cannot do this without exiting the program, do nothing */
 }
 
 /* Prepare the window to be suspended. */
@@ -398,19 +397,17 @@ void gnome_resume_nhwindows()
 winid 
 gnome_create_nhwindow(int type)
 {
+    winid i = 0;
 
-  winid i = 0;
+    /* Return the next available winid */
 
-/* Return the next available winid
- */
-
-  for (i=0; i<MAXWINDOWS; i++)
-      if (gnome_windowlist[i].win == NULL)
-          break;
-  if (i == MAXWINDOWS)
-      g_error ("ERROR:  No windows available...\n");
-  gnome_create_nhwindow_by_id( type, i);
-  return i;
+    for (i=0; i<MAXWINDOWS; i++)
+	if (gnome_windowlist[i].win == NULL)
+	    break;
+    if (i == MAXWINDOWS)
+	g_error ("ERROR:  No windows available...\n");
+    gnome_create_nhwindow_by_id( type, i);
+    return i;
 }
 
 void
@@ -910,8 +907,10 @@ int gnome_nhgetch()
 
     g_askingQuestion = 1;
     /* Process events until a key press event arrives. */
-    while ( g_numKeys == 0 ) 
+    while ( g_numKeys == 0 ) {
+	if (program_state.done_hup) return '\033';
 	gtk_main_iteration();
+    }
     
     theFirst = g_list_first( g_keyBuffer);
     g_keyBuffer = g_list_remove_link(g_keyBuffer, theFirst);
@@ -944,8 +943,10 @@ int gnome_nh_poskey(int *x, int *y, int *mod)
     
     g_askingQuestion = 0;
     /* Process events until a key or map-click arrives. */
-    while ( g_numKeys == 0 && g_numClicks == 0 )
+    while ( g_numKeys == 0 && g_numClicks == 0 ) {
+	if (program_state.done_hup) return '\033';
 	gtk_main_iteration();
+    }
     
     if (g_numKeys > 0) {
 	int key;

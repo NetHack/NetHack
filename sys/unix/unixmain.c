@@ -163,9 +163,28 @@ char *argv[];
 	 * It seems you really want to play.
 	 */
 	u.uhp = 1;	/* prevent RIP on early quits */
+#ifdef SA_RESTART
+	/* don't want reads to restart.  If SA_RESTART is defined, we know
+	 * sigaction exists and can be used to ensure reads won't restart.
+	 * If it's not defined, assume reads do not restart.  If reads restart
+	 * and a signal occurs, the game won't do anything until the read
+	 * succeeds (or the stream returns EOF, which might not happen if
+	 * reading from, say, a window manager). */
+	{
+	    struct sigaction sact;
+
+	    (void) memset((char*) &sact, 0, sizeof(struct sigaction));
+	    sact.sa_handler = (SIG_RET_TYPE)hangup;
+	    (void) sigaction(SIGHUP, &sact, (struct sigaction*)0);
+#ifdef SIGXCPU
+	    (void) sigaction(SIGXCPU, &sact, (struct sigaction*)0);
+#endif
+	}
+#else
 	(void) signal(SIGHUP, (SIG_RET_TYPE) hangup);
 #ifdef SIGXCPU
 	(void) signal(SIGXCPU, (SIG_RET_TYPE) hangup);
+#endif
 #endif
 
 	process_options(argc, argv);	/* command line options */

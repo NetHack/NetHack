@@ -146,7 +146,7 @@ STATIC_PTR boolean NDECL(minimal_enlightenment);
 
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
-#ifdef UNIX
+#if defined(UNIX) || defined(SAFERHANGUP)
 static void NDECL(end_of_input);
 #endif
 
@@ -1794,6 +1794,9 @@ register char *cmd;
 		firsttime = (cmd == 0);
 
 	iflags.menu_requested = FALSE;
+#ifdef SAFERHANGUP
+	if (program_state.done_hup) end_of_input();
+#endif
 	if (firsttime) {
 		flags.nopick = 0;
 		cmd = parse();
@@ -2375,15 +2378,17 @@ parse()
 	return(in_line);
 }
 
-#ifdef UNIX
+#if defined(UNIX) || defined(SAFERHANGUP)
 static
 void
 end_of_input()
 {
 	exit_nhwindows("End of input?");
 #ifndef NOSAVEONHANGUP
-	if (!program_state.done_hup++ && program_state.something_worth_saving)
-	    (void) dosave0();
+# ifndef SAFERHANGUP
+	if (!program_state.done_hup++)
+#endif
+	    if (program_state.something_worth_saving) (void) dosave0();
 #endif
 	clearlocks();
 	terminate(EXIT_SUCCESS);
@@ -2420,8 +2425,14 @@ readchar()
 	    } while (--cnt && sym == EOF);
 	}
 # endif /* NR_OF_EOFS */
-	if (sym == EOF)
+	if (sym == EOF) {
+# ifndef SAFERHANGUP
 	    end_of_input();
+# else
+	    program_state.done_hup++;
+	    sym = '\033';
+# endif
+	}
 #endif /* UNIX */
 
 	if(sym == 0) {

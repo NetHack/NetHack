@@ -120,6 +120,15 @@ int nhgetch()	-- Returns a single character input from the user.
 		   will be the routine the OS provides to read a character.
 		   Returned character _must_ be non-zero and it must be
                    non meta-zero too (zero with the meta-bit set).
+		-- If platform uses it, should check program_state.done_hup
+		   and immediately return ASCII 033 (escape) if it is.
+		   This is required if the window-port supports SAFERHANGUP.
+		-- ASCII 033 must also be returned rather than EOF (applies
+		   mainly to the tty window-port).
+		-- The program_state.done_hup flag can be set asynchronously
+		   when SAFERHANGUP is defined and in that case, nhgetch()
+		   needs to detect that the value of program_state.done_hup
+		   changed and also return ASCII 033 in this case.
 int nh_poskey(int *x, int *y, int *mod)
 		-- Returns a single character input from the user or a
 		   a positioning event (perhaps from a mouse).  If the
@@ -133,6 +142,7 @@ int nh_poskey(int *x, int *y, int *mod)
 		   The different click types can map to whatever the
 		   hardware supports.  If no mouse is supported, this
 		   routine always returns a non-zero character.
+		-- Otherwise follows the same behavior as nhgetch().
 
 B.  High-level routines:
 

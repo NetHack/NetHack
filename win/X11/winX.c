@@ -55,6 +55,10 @@
 #include "patchlevel.h"
 #endif
 
+#ifndef NO_SIGNAL
+#include <signal.h>
+#endif
+
 /* Should be defined in <X11/Intrinsic.h> but you never know */
 #ifndef XtSpecificationRelease
 #define XtSpecificationRelease 0
@@ -88,6 +92,9 @@ int click_x, click_y, click_button;	/* Click position on a map window   */
 					/* (filled by set_button_values()). */
 int updated_inventory;
 
+#ifndef NO_SIGNAL
+static XtSignalId X11_sig_id;
+#endif
 
 /* Interface definition, for windows.c */
 struct window_procs X11_procs = {
@@ -162,7 +169,10 @@ static void FDECL(X11_hangup, (Widget, XEvent*, String*, Cardinal*));
 static int FDECL(input_event, (int));
 static void FDECL(win_visible, (Widget,XtPointer,XEvent *,Boolean *));
 static void NDECL(init_standard_windows);
-
+#if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
+static void FDECL(X11_sig, (int));
+static void FDECL(X11_sig_cb, (XtPointer, XtSignalId*));
+#endif
 
 /*
  * Local variables.
@@ -603,6 +613,32 @@ X11_create_nhwindow(type)
 
     if (!x_inited)
 	panic("create_nhwindow:  windows not initialized");
+
+#if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
+    /* set up our own signal handlers on the first call.  Can't do this in
+     * X11_init_nhwindows because unixmain sets its handler after calling
+     * all the init routines. */
+    if (X11_sig_id == 0) {
+	X11_sig_id = XtAppAddSignal(app_context, X11_sig_cb, (XtPointer)0);
+#ifdef SA_RESTART
+	{
+	    struct sigaction sact;
+
+	    (void) memset((char*) &sact, 0, sizeof(struct sigaction));
+	    sact.sa_handler = (SIG_RET_TYPE)X11_sig;
+	    (void) sigaction(SIGHUP, &sact, (struct sigaction*)0);
+#ifdef SIGXCPU
+	    (void) sigaction(SIGXCPU, &sact, (struct sigaction*)0);
+#endif
+	}
+#else
+	(void) signal(SIGHUP, (SIG_RET_TYPE) X11_sig);
+#ifdef SIGXCPU
+	(void) signal(SIGXCPU, (SIG_RET_TYPE) X11_sig);
+#endif
+#endif
+    }
+#endif
 
     /*
      * We have already created the standard message, map, and status
@@ -1064,6 +1100,36 @@ void X11_exit_nhwindows(dummy)
 	X11_destroy_nhwindow(WIN_MESSAGE);
 }
 
+#if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
+void
+X11_sig(sig)  /* Unix signal handler */
+int sig;
+{
+    XtNoticeSignal(X11_sig_id);
+    hangup(sig);
+}
+
+void
+X11_sig_cb(not_used, id)
+	XtPointer not_used;
+	XtSignalId* id;
+{
+    XEvent event;
+    XClientMessageEvent *mesg;
+
+    /* Set up a fake message to the event handler. */
+    mesg = (XClientMessageEvent *) &event;
+    mesg->type = ClientMessage;
+    mesg->message_type = XA_STRING;
+    mesg->format = 8;
+
+    XSendEvent(XtDisplay(window_list[WIN_MAP].w),
+	       XtWindow(window_list[WIN_MAP].w),
+	       False,
+	       NoEventMask,
+	       (XEvent*) mesg);
+}
+#endif
 
 /* delay_output ------------------------------------------------------------ */
 

@@ -256,6 +256,14 @@
 #define SUSPEND		/* let ^Z suspend the game */
 #endif
 
+/*
+ * Define SAFERHANGUP to delay hangup processing until the main command
+ * loop. 'safer' because it avoids certain cheats and also avoids losing
+ * objects being thrown when the hangup occurs.  All unix windowports
+ * support SAFERHANGUP (couldn't define it here otherwise).
+ */
+#define SAFERHANGUP
+
 
 #if defined(BSD) || defined(ULTRIX)
 #include <sys/time.h>

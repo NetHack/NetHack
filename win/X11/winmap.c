@@ -1622,6 +1622,10 @@ x_event(exit_condition)
 		    inptr = (inptr+1) % INBUF_SIZE;
 		    /* pkey(retval); */
 		    keep_going = FALSE;
+		} else if (program_state.done_hup) {
+		    retval = '\033';
+		    inptr = (inptr+1) % INBUF_SIZE;
+		    keep_going = FALSE;
 		}
 		break;
 	    case EXIT_ON_KEY_OR_BUTTON_PRESS:
@@ -1636,6 +1640,10 @@ x_event(exit_condition)
 			inptr = (inptr+1) % INBUF_SIZE;
 			/* pkey(retval); */
 		    }
+		    keep_going = FALSE;
+		} else if (program_state.done_hup) {
+		    retval = '\033';
+		    inptr = (inptr+1) % INBUF_SIZE;
 		    keep_going = FALSE;
 		}
 		break;

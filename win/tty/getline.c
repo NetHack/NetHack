@@ -58,12 +58,7 @@ getlin_hook_proc hook;
 		(void) fflush(stdout);
 		Sprintf(toplines, "%s ", query);
 		Strcat(toplines, obufp);
-		if((c = Getchar()) == EOF) {
-#ifndef NEWAUTOCOMP
-			*bufp = 0;
-#endif /* not NEWAUTOCOMP */
-			break;
-		}
+		if((c = Getchar()) == EOF) c = '\033';
 		if(c == '\033') {
 			*obufp = c;
 			obufp[1] = 0;
@@ -183,6 +178,11 @@ register const char *s;	/* chars allowed besides return */
 
     while((c = tty_nhgetch()) != '\n') {
 	if(iflags.cbreak) {
+	    if (c == EOF || c == '\033') {
+		ttyDisplay->dismiss_more = 1;
+		morc = '\033';
+		break;
+	    }
 	    if ((s && index(s,c)) || c == x) {
 		morc = (char) c;
 		break;
