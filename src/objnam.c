@@ -951,13 +951,13 @@ const char *str;
     return tmp;
 }
 
-/* returns "count xname(otmp)" or just xname(otmp) if count == 1 */
+/* returns "count cxname(otmp)" or just cxname(otmp) if count == 1 */
 char *
 aobjnam(otmp,verb)
 register struct obj *otmp;
 register const char *verb;
 {
-	register char *bp = xname(otmp);
+	register char *bp = cxname(otmp);
 	char prefix[PREFIX];
 
 	if(otmp->quan != 1L) {
@@ -972,7 +972,7 @@ register const char *verb;
 	return(bp);
 }
 
-/* like aobjnam, but prepend "The", not count */
+/* like aobjnam, but prepend "The", not count, and use xname */
 char *
 Tobjnam(otmp, verb)
 register struct obj *otmp;
