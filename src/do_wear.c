@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2003/03/10	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2003/05/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -996,8 +996,9 @@ dotakeoff()
 			      uskin->otyp >= GRAY_DRAGON_SCALES ?
 				"dragon scales are" : "dragon scale mail is");
 		else
-		    pline("Not wearing any armor.%s", iflags.cmdassist ?
-			" Use 'R' command to remove accessories." : "");
+		    pline("Not wearing any armor.%s", (iflags.cmdassist && 
+				(uleft || uright || uamul || ublindf)) ?
+			  "  Use 'R' command to remove accessories." : "");
 		return 0;
 	}
 	if (armorpieces > 1)
@@ -1041,8 +1042,13 @@ doremring()
 	MOREACC(ublindf);
 
 	if(!Accessories) {
-		pline("Not wearing any accessories.%s", iflags.cmdassist ?
-			" Use 'T' command to take off non-accessories." : "");
+		pline("Not wearing any accessories.%s", (iflags.cmdassist &&
+			    (uarm || uarmc ||
+#ifdef TOURIST
+			     uarmu ||
+#endif
+			     uarms || uarmh || uarmg || uarmf)) ?
+		      "  Use 'T' command to take off armor." : "");
 		return(0);
 	}
 	if (Accessories != 1) otmp = getobj(accessories, "remove");

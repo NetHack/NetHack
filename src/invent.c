@@ -1094,32 +1094,35 @@ silly_thing(word, otmp)
 const char *word;
 struct obj *otmp;
 {
-	int otyp = otmp->otyp;
-	boolean domsg = FALSE;
-	const char *s1, *s2, *s3;
-	const char *what = (otmp->quan > 1L) ? "one of those" : "that";
-	if ((!strcmp(word, "wear") || !strcmp(word, "take off")) &&
-		(otmp->oclass == RING_CLASS ||
-		(otmp->oclass == FOOD_CLASS && otmp->otyp == MEAT_RING) ||
-		(otmp->oclass == TOOL_CLASS &&
-		 (otyp == BLINDFOLD || otyp == TOWEL || otyp == LENSES)))) {
-			if (!strcmp(word, "wear")) {
-	    			s1 = "P"; s2 = "put"; s3 = " on"; domsg = TRUE;
-			} else {
-				s1 = "R"; s2 = "remove"; s3 = ""; domsg = TRUE;
-			}
-	} else if ((!strcmp(word, "put on") || !strcmp(word, "remove")) &&
-		(otmp->oclass == ARMOR_CLASS)) {
-			if (!strcmp(word, "remove")) {
-	    			s1 = "T"; s2 = "take"; s3 = " off"; domsg = TRUE;
-			} else {
-	    			s1 = "W"; s2 = "wear"; s3 = ""; domsg = TRUE;
-			}
+	const char *s1, *s2, *s3, *what;
+	int ocls = otmp->oclass, otyp = otmp->otyp;
+
+	s1 = s2 = s3 = 0;
+	/* check for attempted use of accessory commands ('P','R') on armor
+	   and for corresponding armor commands ('W','T') on accessories */
+	if (ocls == ARMOR_CLASS) {
+	    if (!strcmp(word, "put on"))
+		s1 = "W", s2 = "wear", s3 = "";
+	    else if (!strcmp(word, "remove"))
+		s1 = "T", s2 = "take", s3 = " off";
+	} else if ((ocls == RING_CLASS || otyp == MEAT_RING) ||
+		ocls == AMULET_CLASS ||
+		(otyp == BLINDFOLD || otyp == TOWEL || otyp == LENSES)) {
+	    if (!strcmp(word, "wear"))
+		s1 = "P", s2 = "put", s3 = " on";
+	    else if (!strcmp(word, "take off"))
+		s1 = "R", s2 = "remove", s3 = "";
 	}
-	if (domsg)
-		pline("Use the '%s' command to %s %s%s.", s1, s2, what, s3);
-	else
-		pline(silly_thing_to, word);
+	if (s1) {
+	    what = "that";
+	    /* quantity for armor and accessory objects is always 1,
+	       but some things should be referred to as plural */
+	    if (otyp == LENSES || is_gloves(otmp) || is_boots(otmp))
+		what = "those";
+	    pline("Use the '%s' command to %s %s%s.", s1, s2, what, s3);
+	} else {
+	    pline(silly_thing_to, word);
+	}
 }
 
 #endif /* OVL1 */
