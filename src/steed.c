@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)steed.c	3.4	2002/10/10	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,13 @@ static NEARDATA const char steeds[] = {
 };
 
 STATIC_DCL boolean FDECL(landing_spot, (coord *, int));
+
+/* caller has decided that hero can't reach something while mounted */
+void
+rider_cant_reach()
+{
+     You("aren't skilled enough to reach from %s.", y_monnam());
+}
 
 /*** Putting the saddle on ***/
 

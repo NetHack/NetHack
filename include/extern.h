@@ -1876,6 +1876,7 @@ E struct obj *FDECL(findgold, (struct obj *));
 /* ### steed.c ### */
 
 #ifdef STEED
+E void NDECL(rider_cant_reach);
 E boolean FDECL(can_saddle, (struct monst *));
 E int FDECL(use_saddle, (struct obj *));
 E boolean FDECL(can_ride, (struct monst *));

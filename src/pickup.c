@@ -1369,8 +1369,7 @@ int x, y;
 	if (!can_reach_floor()) {
 #ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
-			You("aren't skilled enough to reach from %s.",
-				mon_nam(u.usteed));
+			rider_cant_reach(); /* not skilled enough to reach */
 		else
 #endif
 			You("cannot reach the %s.", surface(x, y));

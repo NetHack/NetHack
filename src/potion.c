@@ -593,7 +593,7 @@ peffects(otmp)
 		if (Free_action)
 		    You("stiffen momentarily.");
 		else {
-		    if (Levitation||Is_airlevel(&u.uz)||Is_waterlevel(&u.uz))
+		    if (Levitation || Is_airlevel(&u.uz)||Is_waterlevel(&u.uz))
 			You("are motionlessly suspended.");
 #ifdef STEED
 		    else if (u.usteed)
@@ -1546,9 +1546,14 @@ dodip()
 		tmp = (here == POOL) ? "pool" : "moat";
 		Sprintf(qbuf, "Dip it into the %s?", tmp);
 		if (yn(qbuf) == 'y') {
-		    if (Levitation)
+		    if (Levitation) {
 			floating_above(tmp);
-		    else {
+#ifdef STEED
+		    } else if (u.usteed && !is_swimmer(u.usteed->data) &&
+			    P_SKILL(P_RIDING) < P_BASIC) {
+			rider_cant_reach(); /* not skilled enough to reach */
+#endif
+		    } else {
 			(void) get_wet(obj);
 			if (obj->otyp == POT_ACID) useup(obj);
 		    }
