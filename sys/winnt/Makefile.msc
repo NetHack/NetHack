@@ -601,9 +601,8 @@ $(O)nhdefkey.def:
 	@echo    KeyHandlerName >>$@
 
 $(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
-	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $@
-	$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
+	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
@@ -616,9 +615,8 @@ $(O)nh340key.def:
 	@echo    KeyHandlerName >>$@
 
 $(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
-	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $@
-	$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
+	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
