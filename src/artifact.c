@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.4	2002/10/07	*/
+/*	SCCS Id: @(#)artifact.c 3.4	2002/12/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1278,13 +1278,16 @@ arti_invoke(obj)
 	  }
 	}
     } else {
-	long cprop = (u.uprops[oart->inv_prop].extrinsic ^= W_ARTI);
-	boolean on = (cprop & W_ARTI) != 0; /* true if invoked prop just set */
+	long eprop = (u.uprops[oart->inv_prop].extrinsic ^= W_ARTI),
+	     iprop = u.uprops[oart->inv_prop].intrinsic;
+	boolean on = (eprop & W_ARTI) != 0; /* true if invoked prop just set */
 
 	if(on && obj->age > monstermoves) {
 	    /* the artifact is tired :-) */
 	    u.uprops[oart->inv_prop].extrinsic ^= W_ARTI;
 	    You_feel("that %s is ignoring you.", the(xname(obj)));
+	    /* can't just keep repeatedly trying */
+	    obj->age += (long) d(3,10);
 	    return 1;
 	} else if(!on) {
 	    /* when turning off property, determine downtime */
@@ -1292,7 +1295,7 @@ arti_invoke(obj)
 	    obj->age = monstermoves + rnz(100);
 	}
 
-	if(cprop & ~W_ARTI) {
+	if ((eprop & ~W_ARTI) || iprop) {
 nothing_special:
 	    /* you had the property from some other source too */
 	    if (carried(obj))
@@ -1311,15 +1314,13 @@ nothing_special:
 	    } else (void) float_down(I_SPECIAL|TIMEOUT, W_ARTI);
 	    break;
 	case INVIS:
-	    if (!See_invisible && !Blind) {
-		newsym(u.ux,u.uy);
-		if (on) {
-		    Your("body takes on a %s transparency...",
-			 Hallucination ? "normal" : "strange");
-		} else {
-		    Your("body seems to unfade...");
-		}
-	    } else goto nothing_special;
+	    if (BInvis || Blind) goto nothing_special;
+	    newsym(u.ux, u.uy);
+	    if (on)
+		Your("body takes on a %s transparency...",
+		     Hallucination ? "normal" : "strange");
+	    else
+		Your("body seems to unfade...");
 	    break;
 	}
     }
