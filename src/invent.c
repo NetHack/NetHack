@@ -770,7 +770,9 @@ register const char *let,*word;
 #endif
 
 	/* Equivalent of an "ugly check" for gold */
-	if (usegold && !strcmp(word, "eat") && !metallivorous(youmonst.data))
+	if (usegold && !strcmp(word, "eat") &&
+	    (!metallivorous(youmonst.data)
+	     || youmonst.data == &mons[PM_RUST_MONSTER]))
 #ifndef GOLDOBJ
 		usegold = allowgold = FALSE;
 #else
