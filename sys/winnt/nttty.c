@@ -677,7 +677,7 @@ cl_eos()
 		cl_end();
 #else
 	if (GetConsoleScreenBufferInfo(hConOut,&csbi)) {
-	    int ccnt;
+	    DWORD ccnt;
 	    COORD newcoord;
 	    
 	    newcoord.X = 0;
