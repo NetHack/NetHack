@@ -222,8 +222,12 @@ mattackm(magr, mdef)
     if (mdef->mundetected) {
 	mdef->mundetected = 0;
 	newsym(mdef->mx, mdef->my);
-	if(canseemon(mdef) && !sensemon(mdef))
-	    pline("Suddenly, you notice %s.", a_monnam(mdef));
+	if(canseemon(mdef) && !sensemon(mdef)) {
+	    if (u.usleep) You("dream of %s.",
+				(mdef->data->geno & G_UNIQ) ?
+				mon_nam(mdef) : makeplural(mon_nam(mdef)));
+	    else pline("Suddenly, you notice %s.", a_monnam(mdef));
+	}
     }
 
     /* Elves hate orcs. */
