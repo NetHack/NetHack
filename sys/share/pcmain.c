@@ -565,7 +565,7 @@ nhusage()
 	buf1[0] = '\0';
 	bufptr = buf1;
 
-#define ADD_USAGE(s)	if (strlen(buf1) < ((BUFSZ - strlen(s)) + 1)) Strcat(bufptr, s);
+#define ADD_USAGE(s)	if ((strlen(buf1) + strlen(s)) < (BUFSZ - 1)) Strcat(bufptr, s);
 
 	/* -role still works for those cases which aren't already taken, but
 	 * is deprecated and will not be listed here.
