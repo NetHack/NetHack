@@ -692,6 +692,7 @@ struct attack *mattk;
     case PM_FLAMING_SPHERE:
     case PM_FIRE_VORTEX:
     case PM_FIRE_ELEMENTAL:
+    case PM_SALAMANDER:
 	what = "already on fire";
 	break;
     case PM_WATER_ELEMENTAL:

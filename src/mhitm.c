@@ -1093,9 +1093,7 @@ mdamagem(magr, mdef, mattk)
 		break;
 	    case AD_SLIM:
 		if (cancelled) break;	/* physical damage only */
-		if (!rn2(4) && mdef->data != &mons[PM_FIRE_VORTEX] &&
-				mdef->data != &mons[PM_FIRE_ELEMENTAL] &&
-				mdef->data != &mons[PM_SALAMANDER] &&
+		if (!rn2(4) && !flaming(mdef->data) &&
 				mdef->data != &mons[PM_GREEN_SLIME]) {
 		    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, vis);
 		    mdef->mstrategy &= ~STRAT_WAITFORU;

@@ -1482,9 +1482,7 @@ dopois:
 	    case AD_SLIM:    
 		hitmsg(mtmp, mattk);
 		if (!uncancelled) break;
-		if (youmonst.data == &mons[PM_FIRE_VORTEX] ||
-				youmonst.data == &mons[PM_SALAMANDER] ||
-				youmonst.data == &mons[PM_FIRE_ELEMENTAL]) {
+		if (flaming(youmonst.data)) {
 		    pline_The("slime burns away!");
 		    dmg = 0;
 		} else if (Unchanging ||

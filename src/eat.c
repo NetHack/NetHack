@@ -471,10 +471,7 @@ register int pm;
 		    return;
 		}
 	    case PM_GREEN_SLIME:
-		if (!Slimed && !Unchanging &&
-			youmonst.data != &mons[PM_FIRE_VORTEX] &&
-			youmonst.data != &mons[PM_FIRE_ELEMENTAL] &&
-			youmonst.data != &mons[PM_SALAMANDER] &&
+		if (!Slimed && !Unchanging && !flaming(youmonst.data) &&
 			youmonst.data != &mons[PM_GREEN_SLIME]) {
 		    You("don't feel very well.");
 		    Slimed = 10L;
@@ -1728,10 +1725,7 @@ struct obj *otmp;
 				!poly_when_stoned(youmonst.data));
 
 		if (mnum == PM_GREEN_SLIME)
-		    stoneorslime = (!Unchanging &&
-			youmonst.data != &mons[PM_FIRE_VORTEX] &&
-			youmonst.data != &mons[PM_FIRE_ELEMENTAL] &&
-			youmonst.data != &mons[PM_SALAMANDER] &&
+		    stoneorslime = (!Unchanging && !flaming(youmonst.data) &&
 			youmonst.data != &mons[PM_GREEN_SLIME]);
 
 		if (cadaver && mnum != PM_LIZARD && mnum != PM_LICHEN) {

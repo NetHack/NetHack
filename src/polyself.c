@@ -407,8 +407,7 @@ int	mntmp;
 		You("no longer feel sick.");
 	}
 	if (Slimed) {
-	    if (mntmp == PM_FIRE_VORTEX || mntmp == PM_FIRE_ELEMENTAL ||
-		mntmp == PM_SALAMANDER || mntmp == PM_FLAMING_SPHERE) {
+	    if (flaming(youmonst.data)) {
 		pline_The("slime burns away!");
 		Slimed = 0L;
 		context.botl = 1;
