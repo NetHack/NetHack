@@ -30,7 +30,8 @@ Version     _WIN_32IE   Platform/IE
 */
 #define MIN_COMCTLMAJOR 4
 #define MIN_COMCTLMINOR 71
-#define COMCTL_URL "http://www.microsoft.com/msdownload/ieplatform/ie/comctrlx86.asp"
+#define INSTALL_NOTES "http://www.nethack.org/v340/ports/download-win.html#cc"
+/*#define COMCTL_URL "http://www.microsoft.com/msdownload/ieplatform/ie/comctrlx86.asp"*/
 
 extern void FDECL(nethack_exit,(int));
 static TCHAR* _get_cmd_arg(TCHAR* pCmdLine);
@@ -98,19 +99,20 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     if (FAILED(GetComCtlVersion(&major, &minor)))
     {
         char buf[TBUFSZ];
-        sprintf(buf, "Cannot load common control library.\n"
-              "Visit %s\n"
-              "to download the common control library.", COMCTL_URL);
+        Sprintf(buf, "Cannot load common control library.\n%s\%s"
+              "For further information, refer to the installation notes at",
+		INSTALL_NOTES);
         panic(buf);
     }
     if (major < MIN_COMCTLMAJOR
         || (major == MIN_COMCTLMAJOR && minor < MIN_COMCTLMINOR))
     {
         char buf[TBUFSZ];
-        sprintf(buf, "Common control library is outdated.\n"
-              "NetHack requires at least version %d.%d\n"
-              "Visit %s\n"
-              "for an updated version.", MIN_COMCTLMAJOR, MIN_COMCTLMINOR, COMCTL_URL);
+        Sprintf(buf, "Common control library is outdated.\n%s %d.%d\n%s\n%s"
+              "NetHack requires at least version ",
+	      MIN_COMCTLMAJOR, MIN_COMCTLMINOR,
+	      "For further information, refer to the installation notes at",
+		INSTALL_NOTES);
         panic(buf);
     }
 	ZeroMemory(&InitCtrls, sizeof(InitCtrls));
