@@ -1,9 +1,10 @@
-#       SCCS Id: @(#)Makefile.nt       3.3     2002/01/25
-#       Copyright (c) NetHack PC Development Team 1993-2002
+#       SCCS Id: @(#)Makefile.nt       3.3     2002/01/22
+#       Copyright (c) NetHack PC Development Team 1993-2001
 #
-#       NetHack 3.3.x Makefile for MS Visual C++ V6.x (SP3 and above) and MS NMAKE
+#       NetHack 3.3.x Makefile for MS Visual C++ V6.x and above and MS NMAKE
 #  
 #       Win32 Compilers Tested:
+#                              - Microsoft 32 bit Visual C++ V4.x
 #                              - Microsoft 32 bit Visual C++ V6.0 SP3, SP4
 #
 #	This is used for building a TTY version of NetHack using WIN32 Console
@@ -60,6 +61,7 @@ WSHR  = ..\win\share # Tile support files
 #
 
 OBJ     = o
+
 
 #
 #==========================================
@@ -194,12 +196,10 @@ LFLAGSU	= $(LFLAGSBASEC)
 #==========================================
 
 LFLAGSBASE = $(linkdebug) $(conflags) $(conlibsmt)
-CFLAGSC	 = $(CFLAGSBASE) $(TILEDEF) $(DLBFLG) /DWIN32CON
-CFLAGSU	 = $(CFLAGSBASE) $(TILEDEF) $(DLBFLG)
+CFLAGS	 = $(CFLAGSBASE) $(TILEDEF) $(DLBFLG)
 NHLFLAGS1 = /NODEFAULTLIB /INCREMENTAL:NO /PDB:"$(GAME).PDB" /RELEASE /NOLOGO
 NHLFLAGS2 = /MAP:"$(GAME).MAP" /MACHINE:$(CPU) -IGNORE:505 
-
-!IF "$(GRAPHICAL)"=="Y"
+!IF ("$(GRAPHICAL)"=="Y")
 LFLAGS	= $(LFLAGSBASEG) $(NHLFLAGS1) $(NHLFLAGS2)
 !ELSE
 LFLAGS	= $(LFLAGSBASEC) $(NHLFLAGS1) $(NHLFLAGS2)
@@ -469,6 +469,9 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	@if exist $(GAMEDIR)\$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)\$(GAME).pdb to conserve space
 	-copy $(NTSYS)\winnt.cnf   $(GAMEDIR)\defaults.nh
 	copy $(U)recover.exe  $(GAMEDIR)
+! IF ("$(TILEDEF)"!="")
+        if exist $(TILEBMP) copy $(TILEBMP) $(GAMEDIR)
+! ENDIF
 	echo install done > $@
 
 #	copy $(NTSYS)\winnt.hlp    $(GAMEDIR)
@@ -512,13 +515,17 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
 		$(SRC)\monstr.c		$(SRC)\vis_tab.c  \
 		$(U)lev_comp.exe	$(INCL)\vis_tab.h \
-		$(U)dgn_comp.exe $(U)recover.exe  $(TILEUTIL)
+		$(U)dgn_comp.exe $(U)recover.exe
              @echo utilities made >$@
 	     @echo utilities made.
 
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
+!IF "$(GRAPHICAL)"=="Y"
+$(TILERES): $(TILEBMP) $(WIN32)\winhack.rc
+	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
+!ENDIF
 
 #==========================================
 #  The main target.
@@ -549,7 +556,6 @@ tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 #  DO NOT INDENT THE << below!
 #
 
-!IF "$(GRAPHICAL)"=="Y"
 $(GAMEFILE) : $(ALLOBJ) $(TILERES)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
@@ -557,26 +563,11 @@ $(GAMEFILE) : $(ALLOBJ) $(TILERES)
 		$(ALLOBJ:^	=^
 		) $(TILERES)
 <<
-!ELSE
-$(GAMEFILE) : $(ALLOBJ)
-	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
-	@echo Linking....
-	@$(link) $(LFLAGS) -out:$@ @<<$(GAME).lnk
-		$(ALLOBJ:^	=^
-		) 
-<<
-!ENDIF
 	@if exist $(O)install.tag del $(O)install.tag
 	@if exist $(GAMEDIR)\$(GAME).bak del $(GAMEDIR)\$(GAME).bak
 
 $(GAME)_.ico : $(NTSYS)\$(GAME).ico
 	@copy $(NTSYS)\$(GAME).ico $@
-
-!IF "$(GRAPHICAL)"=="Y"
-$(TILERES): $(TILEBMP) $(WIN32)\winhack.rc
-	@$(rc) /l 0x409 /d "_DEBUG" /fo$@ /i$(WIN32) $(WIN32)\winhack.rc
-!ENDIF
-
 #
 #  Secondary Targets.
 #
@@ -761,7 +752,7 @@ envchk:
 	   @echo Warning, the CL Environment variable is defined:
 	   @echo CL=$(CL)
 !	ENDIF
-!	IF "$(TILEGAME)"!=""
+!   IF "$(GRAPHICAL)"=="Y"
 	   @echo ----
 	   @echo NOTE: This build will include tile support.
 	   @echo ----
@@ -877,9 +868,13 @@ $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
 		)
 <<
 
+!IF "$(GRAPHICAL)"=="Y"
 $(TILEBMP): $(TILEUTIL) $(TILEFILES)
 	@echo Creating binary tile files (this may take some time)
 	@$(U)tile2bmp $(TILEBMP)
+!ELSE
+$(TILEBMP):
+!ENDIF
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
     @echo Linking $@...
