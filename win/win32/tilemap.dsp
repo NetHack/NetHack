@@ -126,6 +126,10 @@ SOURCE=..\include\config1.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\context.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\coord.h
 # End Source File
 # Begin Source File

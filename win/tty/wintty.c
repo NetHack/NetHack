@@ -988,7 +988,7 @@ tty_clear_nhwindow(window)
 	break;
     case NHW_MAP:
 	/* cheap -- clear the whole thing and tell nethack to redraw botl */
-	flags.botlx = 1;
+	context.botlx = 1;
 	/* fall into ... */
     case NHW_BASE:
 	clear_screen();
@@ -1766,7 +1766,7 @@ tty_putstr(window, attr, str)
 
     case NHW_STATUS:
 	ob = &cw->data[cw->cury][j = cw->curx];
-	if(flags.botlx) *ob = 0;
+	if(context.botlx) *ob = 0;
 	if(!cw->cury && (int)strlen(str) >= CO) {
 	    /* the characters before "St:" are unnecessary */
 	    nb = index(str, ':');
@@ -1776,7 +1776,7 @@ tty_putstr(window, attr, str)
 	nb = str;
 	for(i = cw->curx+1, n0 = cw->cols; i < n0; i++, nb++) {
 	    if(!*nb) {
-		if(*ob || flags.botlx) {
+		if(*ob || context.botlx) {
 		    /* last char printed may be in middle of line */
 		    tty_curs(WIN_STATUS, i, cw->cury);
 		    cl_end();
@@ -2281,7 +2281,7 @@ docorner(xmin, ymax)
     end_glyphout();
     if (ymax >= (int) wins[WIN_STATUS]->offy) {
 					/* we have wrecked the bottom line */
-	flags.botlx = 1;
+	context.botlx = 1;
 	bot();
     }
 }
