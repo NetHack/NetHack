@@ -577,7 +577,7 @@ const char *
 currency(amount)
 long amount;
 {
-	if (amount == 1) return "zorkmid";
+	if (amount == 1L) return "zorkmid";
 	else return "zorkmids";
 }
 
