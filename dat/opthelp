@@ -1,0 +1,205 @@
+Boolean options not under specific compile flags (with default values in []):
+(You can learn which options exist in your version by checking your current
+option setting, which is reached via the 'O' cmd.)
+
+autopickup     automatically pick up objects you move over        [TRUE]
+autoquiver     when firing with an empty quiver, select some
+               suitable inventory weapon to fill the quiver       [FALSE]
+BIOS           allow the use of IBM ROM BIOS calls                [FALSE]
+confirm        ask before hitting tame or peaceful monsters       [TRUE]
+DECgraphics    use DEC/VT line-drawing characters for the dungeon [FALSE]
+eight_bit_tty  send 8-bit characters straight to terminal         [FALSE]
+extmenu        use a menu for selecting extended commands (#)     [FALSE]
+fixinv         try to retain the same letter for the same object  [TRUE]
+help           print all available info when using the / command  [TRUE]
+IBMgraphics    use IBM extended characters for the dungeon        [FALSE]
+ignintr        ignore interrupt signal, including breaks          [FALSE]
+legacy         print introductory message                         [TRUE]
+lit_corridor   show a dark corridor as lit if in sight            [FALSE]
+mail           enable the mail daemon                             [TRUE]
+null           allow nulls to be sent to your terminal            [TRUE]
+               try turning this option off (forcing NetHack to use its own
+               delay code) if moving objects seem to teleport across rooms
+number_pad     use the number keys to move instead of yuhjklbn    [FALSE]
+perm_invent    keep inventory in a permanent window               [FALSE]
+prayconfirm    use confirmation prompt when #pray command issued  [TRUE]
+pushweapon     when wielding a new weapon, put your previously
+               wielded weapon into the secondary weapon slot      [FALSE]
+rawio          allow the use of raw I/O                           [FALSE]
+rest_on_space  count the space bar as a rest character            [FALSE]
+safe_pet       prevent you from (knowingly) attacking your pet(s) [TRUE]
+silent         don't use your terminal's bell sound               [TRUE]
+sortpack       group similar kinds of objects in inventory        [TRUE]
+sound          enable messages about what your character hears    [TRUE]
+               (note: this has nothing to do with your computer's audio
+               capabilities, and the game resets it periodically)
+sparkle        display sparkly effect for resisted magical        [TRUE]
+               attacks (e.g. fire attack on fire-resistant monster)
+standout       use standout mode for --More-- on messages         [FALSE]
+time           display elapsed game time, in moves                [FALSE]
+tombstone      print tombstone when you die                       [TRUE]
+toptenwin      print topten in a window rather than stdout        [FALSE]
+verbose        print more commentary during the game              [TRUE]
+
+
+
+There are further boolean options controlled by compilation flags.
+
+Boolean option if INSURANCE was set at compile time:
+checkpoint save game state after each level change, for possible  [TRUE]
+           recovery after program crash
+
+Boolean option if NEWS was set at compile time:
+news       print any news from game administrator on startup      [TRUE]
+
+Boolean option if MFLOPPY was set at compile time:
+checkspace check free disk space before writing files to disk     [TRUE]
+
+Boolean option if EXP_ON_BOTL was set at compile time:
+showexp    display your accumulated experience points             [FALSE]
+
+Boolean option if SCORE_ON_BOTL was set at compile time:
+showscore  display your approximate accumulated score             [FALSE]
+
+Boolean options if TEXTCOLOR was set at compile time:
+color      use different colors for objects on screen   [TRUE for micros]
+hilite_pet display pets in a highlighted manner                   [FALSE]
+
+Boolean option if TIMED_DELAY was set at compile time (tty interface only):
+timed_delay    on unix and VMS, use a timer instead of sending
+               extra screen output when attempting to pause for
+               display effect.  on MSDOS without the termcap
+               lib, whether or not to pause for visual effect.    [TRUE]
+
+Boolean option if USE_TILES was set at compile time (MSDOS protected mode only):
+preload_tiles  control whether tiles get pre-loaded into RAM at the
+               start of the game.  Doing so enhances performance
+               of the tile graphics, but uses more memory.        [TRUE]
+
+Any Boolean option can be negated by prefixing it with a '!' or 'no'.
+
+
+Compound options are written as option_name:option_value.
+
+Compound options which can be set during the game are:
+
+boulder       override the default boulder symbol with another default:`
+disclose      the types of information you want offered at the end of the
+              game  [all]
+fruit         the name of a fruit you enjoy eating  [slime mold]
+              (basically a whimsy which NetHack uses from time to time).
+menustyle     user interface for selection of multiple objects:
+              Traditional -- one object at a time prompting;
+              Combination -- prompt for classes of interest, then menu;
+              Partial     -- skip class prompt, use menu of all objects;
+              Full        -- menu for classes of interest, then object menu;
+              only the first letter ('T','C','P','F') matters; 'N' (None)
+              is a synonym for 'T', as is boolean style negation  [Full]
+packorder     a list of default symbols for kinds of objects that gives the
+              order in which your pack will be displayed  [")[%?+!=/(*`0_]
+              (If you specify only some kinds of items, the others from the
+              default order will be appended to the end.)
+pickup_burden when you pick up an item that exceeds this encumberance
+              level (Unburdened, Burdened, streSsed, straiNed, overTaxed,
+              or overLoaded), you will be asked if you want to continue. [S]
+pickup_types  a list of default symbols for kinds of objects to autopickup
+              when that option is on  [all]
+scores        the parts of the score list you wish to see when the game ends
+              You choose a combination of top scores, scores around the top
+              scores, and all of your own scores.  [!own/3 top/2 around]
+suppress_alert disable various version-specific warnings about changes
+              in game play or the user interface, such as notification given
+              for the 'Q' command that quitting is now done via #quit
+              (e.g., use suppress_alert:3.3.1 to stop that and any other
+              notifications added in that version or earlier) default: (none)
+
+Compound options which may be set only on startup are:
+
+align      Your starting alignment (align:lawful, align:neutral,
+           or align:chaotic).  You may specify just the first letter.  [RANDOM]
+catname    the name of your first cat  [NONE]
+dogname    the name of your first dog  [NONE]
+dungeon    a list of symbols to be used in place of the default ones for
+           drawing the dungeon.
+           The symbols are subjected to a fair amount of processing, so
+           that you can use C-style escapes such as \n or \081 as well as
+           indicate control characters by ^x or meta characters by \Mx.
+           As usual, \ can force the next character to be taken literally.
+           Since many of the default symbols are overloaded, they are
+           given here by name instead of symbol, with some added notes:
+           stone                               (solid rock, normally ' ')
+           vwall hwall tlcorn trcorn blcorn brcorn      (room boundaries)
+           crwall tuwall tdwall tlwall trwall (wallified maze characters)
+           nodoor vodoor hodoor      (no, vertical, horizontal open door)
+           vcdoor hcdoor               (vertical, horizontal closed door)
+           ironbars tree room darkcorr litcorr
+           upstair dnstair upladder dnladder
+           altar grave throne sink fountain pool ice lava
+           vodbridge hodbridge     (vertical, horizontal open drawbridge)
+           vcdbridge hcdbridge   (vertical, horizontal closed drawbridge)
+           air cloud water
+           default:  \ |--------||.-|++##.##<><>_\\#{}.}..##\ #}
+effects    like dungeon, but for special effects symbols
+           vbeam hbeam lslant rslant                  (generic zap beams)
+           digbeam flashbeam      (special beams for digging and cameras)
+           boomleft boomright                                (boomerangs)
+           ss1 ss2 ss3 ss4                           (shielding sequence)
+           sw_topl, sw_topm, sw_topr,                  (swallow, top row)
+           sw_midl, sw_midr,            (swallow, middle row [no center])
+           sw_botl, sw_botm, sw_botr                (swallow, bottom row)
+           extl extm extr                      (explosion matrix top row)
+           exml exmm exmr                   (explosion matrix middle row)
+           exbl exbm exbr                   (explosion matrix bottom row)
+           default:  |-\\/*!)(0#@*/-\\||\\-//-\\|\ |\\-/
+gender     Your starting gender (gender:male or gender:female).
+           You may specify just the first letter.  Although you can
+           still denote your gender using the "male" and "female"
+           options, the "gender" option will take precedence.  [RANDOM]
+horsename  the name of your first horse  [NONE]
+menu_*     create single character accelerators for menu commands.  Below
+           is a list of all commands.  Each is followed by a list of window-
+           ports that implement them:  'x' is X11, 't' is tty, 'g' is Gem,
+           'a' is Amiga.
+           menu_deselect_all  deselect all items in a menu [-](gxta)
+           menu_deselect_page deselect all items on this page of a menu [\](gta)
+           menu_first_page    jump to the first page in a menu [^](gta)
+           menu_invert_all    invert all items in a menu [@](gxta)
+           menu_invert_page   invert all items on this page of a menu [~](gta)
+           menu_last_page     jump to the last page in a menu [|](gta)
+           menu_next_page     goto the next menu page [>](gta)
+           menu_previous_page goto the previous menu page [<](gta)
+           menu_search        search for a menu item [:](gxa)
+           menu_select_all    select all items in a menu [.](gxta)
+           menu_select_page   select all items on this page of a menu [,](gta)
+monsters   like dungeon, but for monster symbols
+           default:  abcdefghijklmnopqrstuvwxyz
+                     ABCDEFGHIJKLMNOPQRSTUVWXYZ@\ \\&;:~]
+msghistory number of top line messages to save [20]
+name       the name of your character  [obtained by asking the system or
+           the player]
+objects    like dungeon, but for object symbols
+           default:  ])[="(%!?+/$*`0_.
+pettype    your preferred type of pet (cat or dog), if your character
+           class uses both types  [RANDOM]
+race       Your starting race (e.g., race:Human, race:Elf).  [RANDOM]
+role       Your starting role (e.g., role:Barbarian, role:Valk).
+           Although you can specify just the first letter(s), it will
+           choose only the first role it finds that matches; thus, it
+           is recommended that you spell out as much of the role name
+           as possible.  You can also still denote your role by
+           appending it to the "name" option (e.g., name:Vic-V), but the
+           "role" option will take precedence.  [RANDOM]
+traps      like dungeon, but for trap symbols
+           arrow_trap dart_trap falling_rock_trap squeaky_board
+           bear_trap land_mine rolling_boulder_trap sleeping_gas_trap
+           rust_trap fire_trap pit spiked_pit hole trap_door
+           teleportation_trap level_teleporter magic_portal web statue_trap
+           magic_trap anti_magic_trap polymorph_trap
+           default:  ^^^^^^^^^^^^^^^^^"^^^^
+windowtype windowing system to be used  [depends on operating system]
+
+
+Some sample options lists are:
+!autopickup,!tombstone,name:Gandalf,scores:own/3 top/2 around
+female,nonews,dogname:Rover,dungeon: |--------||.-|++.##<><>_\\#{}.}..## #}
+rest_on_space,!verbose,menustyle:traditional
