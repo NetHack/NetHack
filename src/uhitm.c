@@ -896,7 +896,9 @@ int thrown;
 	if (jousting) {
 	    You("joust %s%s",
 			 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
-	    mhurtle(mon, u.dx, u.dy, 1);
+	    /* avoid migrating a dead monster */
+	    if (mon->mhp > tmp)
+		mhurtle(mon, u.dx, u.dy, 1);
 	    hittxt = TRUE;
 	} else
 #endif
@@ -908,7 +910,9 @@ int thrown;
 		if (canspotmon(mon))
 		    pline("%s %s from your powerful strike!", Monnam(mon),
 			  makeplural(stagger(mon->data, "stagger")));
-		mhurtle(mon, u.dx, u.dy, 1);
+		/* avoid migrating a dead monster */
+		if (mon->mhp > tmp)
+		    mhurtle(mon, u.dx, u.dy, 1);
 		hittxt = TRUE;
 	    }
 	}
