@@ -536,6 +536,12 @@ feel_location(x, y)
 	     * underneath if already seen.  Otherwise, show the appropriate
 	     * floor symbol.
 	     *
+	     * Similarly, if the hero digs a hole in a wall.  In this case,
+	     * there's no reason to assume anything was underneath, so
+	     * just show the appropriate floor symbol.  If something was
+	     * embedded in the wall, the glyph will probably already
+	     * reflect that.  Don't change the symbol in this case.
+	     *
 	     * This isn't quite correct.  If the boulder was on top of some
 	     * other objects they should be seen once the boulder is removed.
 	     * However, we have no way of knowing that what is there now
@@ -551,6 +557,11 @@ feel_location(x, y)
 					       cmap_to_glyph(S_stone);
 		    show_glyph(x,y,lev->glyph);
 		}
+	    } else if (lev->glyph >= cmap_to_glyph(S_stone) &&
+		       lev->glyph < cmap_to_glyph(S_room)) {
+		lev->glyph = lev->waslit ? cmap_to_glyph(S_room) :
+					   cmap_to_glyph(S_stone);
+		show_glyph(x,y,lev->glyph);
 	    }
 	} else {
 	    /* We feel it (I think hallways are the only things left). */
