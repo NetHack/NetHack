@@ -341,7 +341,7 @@ mattacku(mtmp)
 
 	if (u.uundetected && !range2 && foundyou && !u.uswallow) {
 		u.uundetected = 0;
-		if (is_hider(youmonst.data)) {
+		if (is_hider(youmonst.data) && u.umonnum != PM_TRAPPER) {
 		    coord cc; /* maybe we need a unexto() function? */
 		    struct obj *obj;
 
@@ -355,15 +355,18 @@ mattacku(mtmp)
 			set_apparxy(mtmp);
 			newsym(u.ux,u.uy);
 		    } else {
-			pline("%s is killed by a falling %s (you)!",
-					Monnam(mtmp), youmonst.data->mname);
-			killed(mtmp);
+			const char *verb =
+			    nonliving(mtmp->data) ? "destroyed" : "killed";
+			
+			pline("%s is %s by a falling %s (you)!",
+			      Monnam(mtmp), verb, youmonst.data->mname);
+			xkilled(mtmp, 0);
 			newsym(u.ux,u.uy);
 			if (mtmp->mhp > 0) return 0;
 			else return 1;
 		    }
 		    if (youmonst.data->mlet != S_PIERCER)
-			return(0);	/* trappers don't attack */
+			return(0);	/* lurkers don't attack */
 
 		    obj = which_armor(mtmp, WORN_HELMET);
 		    if (obj && is_metallic(obj)) {
@@ -391,14 +394,15 @@ mattacku(mtmp)
 			 */
 			struct obj *obj = level.objects[u.ux][u.uy];
 
-			if (obj ||
+			if (obj || u.umonnum == PM_TRAPPER ||
 			      (youmonst.data->mlet == S_EEL && is_pool(u.ux, u.uy))) {
 			    int save_spe = 0; /* suppress warning */
 			    if (obj) {
 				save_spe = obj->spe;
 				if (obj->otyp == EGG) obj->spe = 0;
 			    }
-			    if (youmonst.data->mlet == S_EEL)
+			    if (youmonst.data->mlet == S_EEL ||
+				u.umonnum == PM_TRAPPER)
 		pline("Wait, %s!  There's a hidden %s named %s there!",
 				m_monnam(mtmp), youmonst.data->mname, plname);
 			    else

@@ -51,6 +51,9 @@ update display if bestowed a spellbook while unable to see invisible self
 use small pool of static buffers for mon_nam() and Monnam()
 Acknowledge Schroedinger's cat at end of game
 grammar fixes for applying stethoscope to corpses and statues
+player polymorphed as a ceiling hider cannot reach the floor, but
+	automatically unhide on #sit
+trappers do not hide on the ceiling
 
 
 Platform- and/or Interface-Specific Fixes

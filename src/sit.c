@@ -50,7 +50,10 @@ dosit()
 	}
 #endif
 
-	if(!can_reach_floor())	{
+	if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER)
+	    u.uundetected = 0;		/* no longer on the ceiling */
+
+	if (!can_reach_floor()) {
 	    if (Levitation)
 		You("tumble in place.");
 	    else
