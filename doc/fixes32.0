@@ -1,0 +1,344 @@
+protect the Amulet and invocation tools from being destroyed when a
+	disintegrated monster's inventory gets deleted
+prevent the Amulet and invocation tools from being buried, similar to box
+	behavior (Book of the Dead would rot away as paper when buried)
+don't let polymorphed players eat any of the invocation tools
+pets are no longer highlighted when hallucinating
+keep glass gems from shattering in chests
+return errors from dgn_comp and lev_comp when called for
+fix hallucinated fruit juice message
+fix several monsters conveying inappropriate resistances
+fix misspellings of "Assassins' Guild" and "Minion of Huhetotl"
+set personal name flag for Pelias and Thoth Amon; clear it for Chromatic Dragon
+don't say "Picking the lock..." when using a skeleton key
+give feedback when applying key to current location but no boxes are present
+can't manipulate floor locks (chests) while levitating
+don't crash onto sink if permanently levitating due to eating a ring
+avoid resuming interrupted lock operation on chest that's been polymorphed
+wide-angle disintegration Beams O' Wrath disintegrate non-resistant
+	shields and armor
+don't access zapped wand after it's been destroyed by divine lightning bolt
+separate graphics symbols for each trap, differently-colored traps
+allow wishes for greased objects, correct wishes for "poisoned
+	rustproof" objects
+damage was calculated incorrectly when hitting with statues and boulders
+allow digging to finish when digging statues embedded in undiggable walls
+list identified invocation tools as "the item" instead of "a item"
+ignore rknown for unerodable objects when determining if it's fully identified
+flush output after eating mimic so '$' appears right away
+update botl for spell power after ^T or #invoke of "energy boost" artifact
+correct hunger check when casting spells
+correct various messages
+fix deliberately jumping into Stronghold trap doors
+make random level changes while escaping with Amulet more equitable
+when mysterious force randomly picks a location on the current level, send
+	player into Wizard's tower if and only if already inside that tower
+any level change from one tower level to another preserves occupancy state
+mysterious force won't kick in when using portal to go up into Wizard's tower
+avoid "bad cursor position" situation when mystery force or cursed gain
+	level potion causes level change within the Wizard's tower
+don't allow the Wizard to be resurrected on the Astral level
+only list "likely" objects when prompting for what to #invoke
+reset encumbrance and movement rate during successful prayer, in case it
+	cures lycanthropy
+prevent cursed weapon that slips when thrown by monster from embedding in stone
+ki-rin is not humanoid
+all elves can see invisible
+gain intrinisics from eating amulets
+lose divine protection by killing co-aligned priests or converting alignment
+have quest leader check for absolute alignment as well as for piousness
+fix tombstone message when dying from kicking door while levitating
+bite, &c. attacks on displaced images said "swings wildly and misses"
+calculate score before creating bones, otherwise gold in bags gets overlooked
+Unique monsters no longer placed in bones files
+for blessed genocide, don't report failure for other classes' quest monsters
+could get both compressed and uncompressed explore mode save files
+ZEROCOMP's bwrite ignored possibility of write failure
+mimics imitating fruit caused "Bad fruit #0" on help commands
+fix off by one bug in level teleport trap destination for monsters
+if g.cube eats a non-empty container, engulf contents rather than devour them
+allow wizard to use blessed genocide of '*' to wipe out all monsters on level
+when digging a hole in ice, don't describe it as digging in the "floor"
+	and unearth any objects buried there even when it refills with water
+when digging in a pit trap which ends up filling with water instead of
+	becoming trap door, remove the trap; likewise for overflowing fountains
+can't dig pits under drawbridge portcullis; break bridge if hole would be made
+can't dig while caught in a web
+don't "swing your pick-axe through thin air" if target location is a web
+mark webs as seen when "monster is caught in a web" message is given
+whirly monsters pass through webs; some huge monsters tear them
+Sting cuts through webs
+have shk use plural if called for when referring to player's pick-axe(s)
+fix price stated by shk when picking up container holding merged items
+fix price stated by shk for #chat when standing on a container
+don't adjust food price due to hunger when player is selling, only when buying
+don't double bill shop corpses turned into tins
+don't make mundane objects known when they're outside the shk's expertise
+change to have shks possibly identify items sold for credit just like for cash
+when player sells something to broke shk for credit, don't offer more for it
+	in credit than will be charged for it if player buys the item back
+when selling items in shop, don't try to adjust message/prompt based on COLNO
+when dying in shop entrance, make sure inventory in bones data is placed all
+	the way inside the shop, hence owned by the shk
+make shk notice when shop door destroyed by wand or spell or digging downward
+reset unpaid objects if shk poly'd into jumpy monster teleports out of shop
+fix handling for shop objects kicked or thrown from one shop into another
+	and for shop objects hit by cancellation beam
+add potions of oil; lamps can be refilled with them
+dipping rusty weapons in potions of oil removes rust
+allowing drinking from surrounding water if you are underwater
+fix non-merging potions of water due to water damage's incompatible dilution
+fix mon-merging scrolls of blank paper due to SCR_SCARE_MONSTER's spe usage
+fix D(ropping) subset of wielded darts,&c (worn mask got out of synch)
+fix #adjust merging wielded darts,&c into non-wielded ones
+allow #adjust when fixinv option disabled
+fix getobj's '?' help displaying one item when fixinv option disabled
+don't give characters with maxed out luck complete immunity to water damage
+don't allow AC -17 or better to provide invulnerability to zap attacks
+kicking cockatrices while barefooted will stone you
+change to inhibit displacement from operating through solid walls
+fix mblinded assignment for monsters hit by potion fumes
+give runesword same damage adjustments as broadsword
+extra verbosity for attacks caused by Stormbringer
+allow ghosts to step on garlic
+don't let vampires step on altars
+don't let monsters jump into polymorph traps covered by boulders, unless
+	they can carry such, pass through, or squeeze under
+giants polymorphed into something else must drop any boulders being carried
+giants in pits become untrapped if a boulder is pushed in
+prevent traps from being generated on ladders
+don't "detect trigger hidden in soil" for previously detected land mine
+exploding and crashing doors wake up nearby monsters
+factor rings of increase damage into kicking damage
+handle omitted case for ball movement that would leave chain in odd position
+returning to stairs on top row of map is valid (fixes rogue quest bug)
+avoid giving "sad feeling" message for pet if lifesaving prevents its death
+don't rot away Rider's corpse if something is standing on it at revival time
+kill any engulfer (including poly'd player) trying to digest a Rider
+give Riders non-zero nutritional value so tinning kit doesn't ignore them
+save & restore u.usick_cause properly
+an eating pet can continue & finish eating while you're off its level
+fix object names: "a Dark One corpse", "statue of a Wizard of Yendor"
+killer_format: poisoned "by Pestilence", not "by a Pestilence"; ditto Juiblex
+killer prefix might be wrong after having been life-saved
+fix to avoid "invisible invisible {Priest|Minion of Whoever}" on tombstone
+fix bug with cold-resistant monsters attacking jellies (etc.)
+fix possible panics when restoring while swallowed or held
+when taming, make holder/swallower let go even if it just becomes peaceful
+reset area of visibility when hurtling backwards from recoil while levitating
+don't let hostile monsters who follow up/down stairs share final ascension
+add bodypart(HAIR) to correct some inappropriate messages
+display monsters inventory (if any) when mon zapped with wand of probing
+display inventory of encased items in statues zapped with wand of probing
+display inventory of buried items below, by zapping wand of probing downwards
+set dknown bit for all objects hit by probing beam
+add ceiling function to alter the ceiling messages appropriately
+fix 3.1.2's fix for reseting certain class-specific artifact properties
+add selection menus to pickup and some apply functions
+pre-menu container interface:  don't let "%a" select all objects if no food
+	is present; make user's "<missing class(es)> a" become "A" instead
+wake up monsters hit by potions thrown by other monsters
+suppress vault hint messages if player is in the vault
+make lev_comp check full object and monster names ([ring of] "protection" in
+	objects[] was matching "protection from shape changers" in .des file)
+guarantee that stairs down from Juiblex swamp level always get created
+	[sometimes got impossible("couldn't place lregion type 0")]
+prevent a three room level which has the stairs to the mines from also having
+	a special room [so that those stairs can't end up placed in a shop]
+allow quest nemeses and other invocation tool guardians to wield artifacts
+Mitre of Holiness is not a weapon
+don't give "heat and smoke are gone" message when entering Vlad's tower if
+	arriving from somewhere other than Gehennom (portal via W's quest arti)
+when a wielded cockatrice corpse rots away, set `unweapon' so that
+	further combat will elicit "bashing with gloved hands" message
+fix behaviour of wielded eggs (breaking, stoning, etc)
+tiny chance for "queen bee" eggs, rather than always killer bee eggs
+change Tourist quest home base to Ankh-Morpork
+prevent activated statue traps from creating hidden monsters
+handle activated statue being the only object poly'd player is hiding under
+prevent reference to unseen underwater object when hiding monster attacks
+don't pluralize name when smelling opened tin of unique monster's meat
+make tins of unique monster's meat be empty in bones file
+don't leave a corpse in bones file if killed by disintegration breath
+don't leave a corpse when monsters disintegrate other monsters
+any food could be tinned (yielding giant ant meat) when corpse in inventory
+destroy all boulders in invocation area when creating stairs down to sanctum
+boulders landing on previously seen trapdoors will plug them instead of
+	falling through or settling on top
+boulders on ice which gets melted will fill pool as if dropped
+don't let dead or sleeping priests give temple greetings
+chatting wakes up sleeping priests
+don't exercise wisdom when making prediscovered objects known during init
+don't generate any generic giants (mummy/zombie placeholder) on castle level
+pets and g.cubes will polymorph if they eat chameleon corpses
+slippery ice (temporary fumbling) only lasts until the next move
+avoid leash limbo if quest leader ejects you while leashed pet's not adjacent
+	(ditto other unconventional level changes, like W's quest artifact)
+release attached leash if poly'd player eats it
+crash fix:  handle other forms of monster-induced level change besides quest
+	ejection (swallower expels onto portal, level teleporter, trap door)
+fix magic mapping of previously mapped maze walls dug away out of view
+assorted drawbridge fixes (kill credit, auto-pickup, drown survival handling)
+passtune becomes fully known once successfully played
+wiping out engravings leaves partial letters
+wipe random letters of trap engravings ("ad aerarium", "Vlad was here")
+eating wolfsbane while in werecritter form rehumanizes in addition to purifying
+don't penalize player (shop charges in general; bad luck for mirror) when
+	a monster breaks something with a wand of striking
+when loading bones, keep track of unique monsters to avoid their duplication
+don't allow a demon prince to summon two copies of a unique demon lord
+enlightenment luck display ("extra", "reduced") did not agree with actual luck
+avoid duplicate spellbooks in character's initial inventory (affects priest)
+fix pets moving reluctantly onto cursed objects
+can't #loot while overtaxed
+time passes when items disappear on use of a cursed bag of holding
+#offer cannot convert or destroy an unaligned altar
+MUSEr's reflecting shield or amulet shouldn't become known when not seen
+fix check for wearing shield when monsters wield two-handed weapons
+don't restrict MUSE scimitar usage to strong monsters
+make dwarves less eager to switch back and forth between weapon and pick-axe
+clip swallow display at left & right map borders
+prevent recoil [hurtle() while levitating] when caught in a trap
+downward zap which freezes water or lava shouldn't bounce back up
+Vorpal Blade: don't let damage penalty (very low strength, negatively charged
+	ring of increase damage) prevent beheaded monster from dying
+make sure player polymorphed into jabberwock is vulnerable to beheading
+make sure that when "The fiery blade burns the shade!" that it actually does
+	damage (double-damage for non-silver must do at least 1hp damage)
+prevent divide by zero crash when hitting tame shade with non-silver weapon
+don't lose alignment when throwing gems to/at peaceful unicorns
+don't apply grease to worn armor if it's covered by other armor
+fix unnaming monsters via `C <space(s)>'
+fix calling object types via `#name n <anything w/ trailing space(s)>'
+fix off by one problem when shuffling some descriptions (scroll label "KIRJE"
+	and "thick" spellbook never used; breathing amulet always "octagonal")
+exploding land mines can scatter or destroy objects at the trap location
+add rolling boulder traps
+try harder to make monster hit point and level gain avoid anomalous losses
+reduce odds of undead corpses on castle level and priest quest home level,
+	to make it harder to lure wraiths to more favorable spot
+can't polymorph large piles of rocks into gems
+hit point gain from nurse healing throttled substantially
+make cursed bells be much less effective as instruments of abuse
+fully implement object charges for Bell of Opening
+allow '%' as destination on rogue level when specifying position by map feature
+fire traps can burn up scrolls and spellbooks on the floor
+fix inverted cancellation check for AD_SLOW and AD_DREN damage
+bullwhips can be applied to disarm monsters and hero
+bullwhips can be applied by hero to haul themself out of a pit
+ensure that thrown potions hit their mark if you are swallowed
+attempting to engrave on an altar causes altar_wrath
+differentiate between a hole and a trapdoor, digging always makes a hole
+check the right hit point values when polymorphed and encumbered
+improve guard behaviour in vaults when player is blind
+prevent dwarves from digging while wielding cursed weapons
+displacing a pet mimic unhides it
+'(' shows the proper tools as in use
+improve shk's handling of pick-axe damage and taming
+aging of items in ice boxes left in bones files
+fix genocide of '@' while polymorphed
+add gender to some unique monsters
+disallow digging down while phasing through non-diggable walls
+general fixes to various message sequencing problems
+prevent shopkeeper names from showing up while you are hallucinating
+prevent paralyzed pets from picking up items
+jellies for Juiblex, not Jabberwocks (done properly this time)
+rust monsters can't eat rustproofed objects
+general fixes to inventory merging of items
+monster inventory undergoes merging too; potentially affects probing and theft
+monsters ignore items they want to pick up that are on 'Elbereth'
+bows wielded by monsters now do proper (low) damage
+even nymphs may not pick up rider corpses
+treat cockatrice corpses in multiple item piles the same as one item piles
+"PACKORDER" feedback incorrect on parsing failure
+you can no longer choke on liquid
+stethoscope on secret doors displays properly when blind
+monster-hurled potions no longer produce quaff messages (or djinn)
+giant eels now hide with mundetected, not invisibility
+eels on the plane of water don't hide and aren't negatively impacted by being
+	out of water
+don't give the big point bonus for eels if player is wearing breathing amulet
+fix display bug (newsym after Wait! message)
+temple priests now wear their cloaks
+Orcus is no longer peaceful (had been made so by bad bribery check)
+'uskin' save and restore done properly
+don't improperly adjust int & wis for stolen non-worn P quest artifact
+don't allow Vorpal Blade to behead a monster when it swallowed you
+golems are not living and don't "die" in messages
+fix "Rocky solidifies.  Now it's Rocky!"
+polymorphing into a flesh golem, which gets petrified by turning into a stone
+	golem, now works when stoned
+correct "killed by a died"
+allow the Wizard to come back and harass at his next reincarnation time even
+	if he's been left alive on some other level (fixes "paralysis" cheat)
+make monsters subject to "mysterious force" in Gehnnom while climbing stairs
+	with the Amulet, so that once the Wizard has stolen it, his retreat
+	when wounded doesn't become an easy way to carry it up
+changing attributes immediately checks encumber messages
+confused monsters get confused SCR_TELEPORTATION effects
+fixed "choked on eating too rich a meal"
+kicked objects won't stop at stairs if they don't fall
+general fixes to stealing from monster carrying cockatrice corpse
+a nymph who polymorphs herself while you're frozen during a multi-turn armor
+	theft can't complete the theft if transformed into non-stealer monster
+consistent corpse probability no matter what killed monster (also removes a
+	loophole allowing permanent rider death)
+MUSE monsters no longer wield weapon same as (not better than) current one
+incubi/succubi have hands, not claws
+make #jump be ineffective on air and water levels
+allow multiple sickness causes; vomiting only cures those involving food
+#prayer reward: give books for not-yet-known spells preference to known ones
+marker use no longer uses wishing interface, fixing several obscure bugs
+archeologists' and rogues' initial sack starts out empty
+candelabra "has now" 7 candles fixed.
+kicked objects would set dknown when the kick caused an injury, even though
+	safely kicked objects wouldn't
+make cloaks subject to burning
+make exposed shirts subject to burning and rotting; greased ones defend
+	against wrap attacks
+all types of fire damage affect worn armor [adds explosions, fire traps, and
+	zapping yourself to previously handled zap/breath attacks by monsters]
+for explosions, destroy carried objects before killing player [affects bones]
+replace triggered land mine with pit before doing damage [bones]
+black dragon breath no longer referred to as "death" instead of disintegration
+don't make ring of gain strength known when gauntlets of power mask its effect
+can't have "slippery minor currents" or similar silly nohands body parts
+proper support for polymorphed players using wrap attacks
+cannibalism reduces luck as well as causing aggravation
+picking up an item which will merge works even when all 52 slots in use
+moving through diagonal openings checks how much you're carrying, not how much
+	free space you have left
+monsters have same restrictions as players moving through diagonal openings
+picking up subset of heavy group works for picking one and gets feedback right
+taking subset of heavy merged group out of containers works the same as
+	picking up subset of heavy merged group from floor
+when putting gold into containers, don't count its weight twice, thereby
+	messing up the status line's encumbrance feedback
+fix the option parser's handling of attempting to negate string values
+teleporting a monster on a trap with a magic whistle sets the trap off
+iron ball dragging no longer confuses autopickup
+cumulative temporary intrinsic increments can't spill over into permanent bits
+eating food shouldn't give messages for intermediate states
+don't make wand of death become known after casting finger of death at yourself
+ignore case when checking artifacts against wish- or #name-specified name
+ignore confusion when reading scrolls of mail
+exploding runes for spellbook read failure doesn't imply that book explodes
+divine rescue from strangling destroys worn amulet of strangulation
+boulders pushed on level teleporters will level teleport; also, make one random
+	level teleport function to keep all level teleports consistent
+
+MSDOS: add fake mail daemon
+MSDOS: add VGA tiles to tty port
+VMS: switch to lint-free, non-GPL'd termcap support code
+X11: map behind popup edges was occasionally not refreshed
+X11: allow permanent inventory window
+X11: when using tiles, highlight pets with "heart" overlay (should be changed
+	to honor the `hilite_pet' run-time option)
+X11: click-in-message-windows crash fixed
+tty: fix panic when freeing endwin
+tty: fix <ctrl/P> behavior when recalled text needs to wrap beyond top line
+tty: allow selection from single line "help menu" (getobj's '?' response)
+tty: don't format data.base with hardcoded tabs that are ugly on non-tty ports
+tty: get rid of extra NHW_MENU space (improperly added when the menu was longer
+	than the screen)
+tty: fix repeated "who are you?" prompting at game startup
