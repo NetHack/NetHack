@@ -400,6 +400,12 @@ register struct monst *mtmp;
 	    if (cansee(mtmp->mx,mtmp->my)) {
 		    pline("%s drowns.", Monnam(mtmp));
 	    }
+	    if (u.ustuck && u.uswallow && u.ustuck == mtmp) {
+	    /* This can happen after a purple worm plucks you off a
+		flying steed while you are over water. */
+		pline("%s sinks as water rushes in and flushes you out.",
+			Monnam(mtmp));
+	    }
 	    mondead(mtmp);
 	    if (mtmp->mhp > 0) {
 		rloc(mtmp);
