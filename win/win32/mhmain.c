@@ -829,6 +829,9 @@ void mswin_menu_check_intf_mode()
 void mswin_select_map_mode(int mode)
 {
 	PNHMainWindow  data;
+	winid map_id;
+
+	map_id = WIN_MAP;
 	data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
 
 	/* override for Rogue level */
@@ -866,7 +869,15 @@ void mswin_select_map_mode(int mode)
 	}
 
 	iflags.wc_map_mode = mode;
-	mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), mode);
+	
+	/* 
+	** first, check if WIN_MAP has been inialized.
+	** If not - attempt to retrieve it by type, then check it again
+	*/
+	if( map_id==WIN_ERR ) 
+		map_id = mswin_winid_from_type(NHW_MAP);
+	if( map_id!=WIN_ERR )
+		mswin_map_mode(mswin_hwnd_from_winid(map_id), mode);
 }
 
 static struct t_menu2mapmode {

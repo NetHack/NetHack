@@ -146,6 +146,9 @@ void mswin_init_nhwindows(int* argc, char** argv)
 #endif
     mswin_nh_input_init();
 
+	/* set it to WIN_ERR so we can detect attempts to
+	   use this ID before it is inialized */
+	WIN_MAP = WIN_ERR;
 
     /* Read Windows settings from the reqistry */
     mswin_read_reg();
@@ -406,17 +409,19 @@ void mswin_clear_nhwindow(winid wid)
         (wid < MAXWINDOWS) &&
         (GetNHApp()->windowlist[wid].win != NULL))
     {
-         SendMessage( 
+#ifdef REINCARNATION
+		if( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
+			if( Is_rogue_level(&u.uz) ) 
+				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
+			else 
+				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), iflags.wc_map_mode);
+		}
+#endif
+
+		SendMessage( 
 			 GetNHApp()->windowlist[wid].win, 
 			 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CLEAR_WINDOW, (LPARAM)NULL );
-    }
-
-#ifdef REINCARNATION
-    if( Is_rogue_level(&u.uz) ) 
-		mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
-	else 
-		mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), iflags.wc_map_mode);
-#endif
+	}
 }
 
 /* -- Display the window on the screen.  If there is data

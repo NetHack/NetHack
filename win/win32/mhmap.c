@@ -178,7 +178,6 @@ int mswin_map_mode(HWND hWnd, int mode)
 	SIZE mapSize;
 
 	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	if (!data) return mode;
 	if( mode == data->mapMode ) return mode;
 	
 	oldMode = data->mapMode;
