@@ -525,6 +525,8 @@ D%u - drop only unpaid food.
 Kick something (usually a door).
 .lp e
 Eat food.
+.\" Make sure Elbereth is not hyphenated below, the exact spelling matters
+.hw Elbereth
 .lp E
 Engrave a message on the floor.
 Engraving the word ``Elbereth'' will cause most monsters to not attack
