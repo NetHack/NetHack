@@ -123,11 +123,11 @@ tty_startup(wid, hgt)
 int *wid, *hgt;
 {
 /*	int twid = origcsbi.dwSize.X; */
-	int twid = origcsbi.srWindow.Right - origcsbi.srWindow.Left;
+	int twid = origcsbi.srWindow.Right - origcsbi.srWindow.Left + 1;
 
 	if (twid > 80) twid = 80;
 	*wid = twid;
-	*hgt = origcsbi.srWindow.Bottom - origcsbi.srWindow.Top;
+	*hgt = origcsbi.srWindow.Bottom - origcsbi.srWindow.Top + 1;
 	set_option_mod_status("mouse_support", SET_IN_GAME);
 }
 
