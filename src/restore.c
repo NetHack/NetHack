@@ -542,6 +542,8 @@ register int fd;
 	int rtmp;
 	struct obj *otmp;
 
+	mread(fd, (genericptr_t) plname, PL_NSIZ);
+
 	restoring = TRUE;
 	getlev(fd, 0, (xchar)0, FALSE);
 	if (!restgamestate(fd, &stuckid, &steedid)) {
@@ -621,6 +623,7 @@ register int fd;
 	(void) lseek(fd, (off_t)0, 0);
 #endif
 	(void) uptodate(fd, (char *)0);		/* skip version info */
+	mread(fd, (genericptr_t) plname, PL_NSIZ);
 	getlev(fd, 0, (xchar)0, FALSE);
 	(void) close(fd);
 

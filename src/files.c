@@ -19,6 +19,10 @@
 #include <errno.h>
 #endif
 
+#if defined(UNIX)
+#include <dirent.h>
+#endif
+
 #if defined(UNIX) || defined(VMS)
 #include <errno.h>
 # ifndef SKIP_ERRNO
@@ -803,6 +807,77 @@ restore_saved_game()
 	}
 	return fd;
 }
+
+static char*
+plname_from_file(filename)
+const char* filename;
+{
+    int fd;
+    char* result = 0;
+
+    Strcpy(SAVEF,filename);
+#ifdef COMPRESS_EXTENSION
+    SAVEF[strlen(SAVEF)-strlen(COMPRESS_EXTENSION)] = '\0';
+#endif
+    uncompress(SAVEF);
+    if ((fd = open_savefile()) >= 0) {
+	if (uptodate(fd, filename)) {
+	    char tplname[PL_NSIZ];
+	    mread(fd, (genericptr_t) tplname, PL_NSIZ);
+	    result = strdup(tplname);
+	}
+	(void) close(fd);
+    }
+    compress(SAVEF);
+
+    return result;
+}
+
+char**
+get_saved_games()
+{
+#ifdef UNIX
+    int myuid=getuid();
+    struct dirent **namelist;
+    int n = scandir("save", &namelist, 0, alphasort);;
+    if ( n > 0 ) {
+	int i,j=0;
+	char** result = (char**)malloc((n+1)*sizeof(char*)); /* at most */
+	for (i=0; i<n; i++) {
+	    int uid;
+	    char name[NAME_MAX];
+	    if ( sscanf( namelist[i]->d_name, "%d%s", &uid, name ) == 2 ) {
+		if ( uid == myuid ) {
+		    char filename[BUFSZ];
+		    char* r;
+		    Sprintf(filename,"save/%d%s",uid,name);
+		    r = plname_from_file(filename);
+		    if ( r ) {
+			result[j++] = r;
+		    }
+		}
+	    }
+	}
+	result[j++] = 0;
+	return result;
+    } else
+#endif
+    {
+	return 0;
+    }
+}
+
+void
+free_saved_games(saved)
+char** saved;
+{
+    if ( saved ) {
+	int i=0;
+	while (saved[i]) free(saved[i++]);
+	free(saved);
+    }
+}
+
 
 /* ----------  END SAVE FILE HANDLING ----------- */
 

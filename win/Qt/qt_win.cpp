@@ -2844,7 +2844,10 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 	if (dialog->result()<0)
 	    qApp->enter_loop();
     }
-    dialog->hide();
+    //if ( (nhid != WIN_INVEN || !flags.perm_invent) ) // doesn't work yet
+    {
+	dialog->hide();
+    }
     int result=dialog->result();
 
     // Consume ^M (which QDialog steals for default button)
@@ -4463,57 +4466,13 @@ int NetHackQtSavedGameSelector::choose()
     return exec()-2;
 }
 
-static char** get_saved_names()
-{
-    int myuid=getuid();
-    struct dirent **namelist;
-    int n = scandir("save", &namelist, 0, alphasort);;
-    if ( n > 0 ) {
-	int i,j=0;
-	char** result = (char**)malloc((n+1)*sizeof(char*)); /* at most */
-	for (i=0; i<n; i++) {
-	    int uid;
-	    char name[NAME_MAX];
-	    if ( sscanf( namelist[i]->d_name, "%d%s", &uid, name ) == 2 ) {
-		if ( uid == myuid ) {
-		    /* Name should be stored in save file, but currently we
-			have to extract it from the filename, which loses
-			information (eg. "/", "_", and "." characters are lost. */
-		    int k;
-		    char* end = strstr(name,".gz");
-		    if ( !end ) end = strstr(name,".Z");
-		    if ( end ) *end = 0;
-		    /* "_" most likely means " ", which certainly looks nicer */
-		    for (k=0; name[k]; k++)
-			if ( name[k]=='_' )
-			    name[k]=' ';
-		    result[j++] = strdup(name);
-		}
-	    }
-	}
-	result[j++] = 0;
-	return result;
-    } else {
-	return 0;
-    }
-}
-
-static void free_saved_names(char** saved)
-{
-    if ( saved ) {
-	int i=0;
-	while (saved[i]) free(saved[i++]);
-	free(saved);
-    }
-}
-
 void NetHackQtBind::qt_askname()
 {
     have_asked = TRUE;
 
     // We do it all here, and nothing in askname
 
-    char** saved = get_saved_names();
+    char** saved = get_saved_games();
     int ch = -1;
     if ( saved && *saved ) {
 	if ( splash ) splash->hide();
@@ -4522,7 +4481,7 @@ void NetHackQtBind::qt_askname()
 	if ( ch >= 0 )
 	    strcpy(plname,saved[ch]);
     }
-    free_saved_names(saved);
+    free_saved_games(saved);
 
     switch (ch) {
       case -1:
@@ -4605,6 +4564,8 @@ winid NetHackQtBind::qt_create_nhwindow(int type)
     break; case NHW_TEXT:
 	window=new NetHackQtTextWindow(keybuffer);
     }
+
+    window->nhid = id;
 
     // Note: use of isHidden does not work with Qt 2.1
     if ( splash 
@@ -4736,6 +4697,10 @@ void NetHackQtBind::qt_update_inventory()
 {
     if (main)
 	main->updateInventory();
+    /* doesn't work yet
+    if (program_state.something_worth_saving && flags.perm_invent)
+        display_inventory(NULL, FALSE);
+    */
 }
 
 void NetHackQtBind::qt_mark_synch()

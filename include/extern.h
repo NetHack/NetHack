@@ -642,6 +642,8 @@ E void NDECL(read_wizkit);
 #endif
 E void FDECL(paniclog, (const char *, const char *));
 E int FDECL(validate_prefix_locations, (char *));
+E char** NDECL(get_saved_games);
+E void FDECL(free_saved_games, (char**));
 
 /* ### fountain.c ### */
 
