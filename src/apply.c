@@ -2332,8 +2332,7 @@ use_grapple (obj)
 	}
 
 	/* What did you hit? */
-	switch (rn2(5))
-	{
+	switch (rn2(5)) {
 	case 0:	/* Trap */
 	    /* FIXME -- untrap needs to deal with non-adjacent traps */
 	    break;
@@ -2361,9 +2360,13 @@ use_grapple (obj)
 	    }
 	    /* FALL THROUGH */
 	case 3:	/* Surface */
-	    You("are yanked toward the %s!",
-			surface(cc.x, cc.y));
-	    hurtle(sgn(cc.x-u.ux), sgn(cc.y-u.uy), 1, FALSE);
+	    if (IS_AIR(levl[cc.x][cc.y].typ) || is_pool(cc.x, cc.y))
+		pline_The("hook slices through the %s.", surface(cc.x, cc.y));
+	    else {
+		You("are yanked toward the %s!", surface(cc.x, cc.y));
+		hurtle(sgn(cc.x-u.ux), sgn(cc.y-u.uy), 1, FALSE);
+		spoteffects();
+	    }
 	    return (1);
 	default:	/* Yourself (oops!) */
 	    if (P_SKILL(typ) <= P_BASIC) {
