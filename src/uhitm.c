@@ -1188,7 +1188,10 @@ register struct attack *mattk;
 		    pd == &mons[PM_PAPER_GOLEM]) {
 		    if (!Blind)
 		    	pline("%s burns completely!", Monnam(mdef));
-		    xkilled(mdef,0);
+		    xkilled(mdef,2);
+		    tmp = 0;
+		    break;
+		    /* Don't return yet; keep hp<1 and tmp=0 for pet msg */
 		}
 		tmp += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
 		tmp += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
