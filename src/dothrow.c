@@ -990,18 +990,25 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 			if(cansee(bhitpos.x, bhitpos.y))
 			    newsym(bhitpos.x,bhitpos.y);
 		    } else {
-			int dmg = rnd(4);
-			if (Blind)
-			    pline("%s your %s!",
-				  Tobjnam(obj, "hit"), body_part(ARM));
-			else
-			    pline("%s back toward you, hitting your %s!",
-				  Tobjnam(obj, "fly"), body_part(ARM));
-			(void) artifact_hit((struct monst *) 0, &youmonst,
-					    obj, &dmg, 0);
-			losehp(dmg, xname(obj), KILLED_BY);
-			if(ship_object(obj, u.ux, u.uy, FALSE))
-		            return;
+			int dmg = rn2(2);
+			if (!dmg) {
+			    pline(Blind ? "%s lands %s your %s." :
+					"%s back to you, landing %s your %s.",
+				  Blind ? Something : Tobjnam(obj, "return"),
+				  Levitation ? "beneath" : "at",
+				  makeplural(body_part(FOOT)));
+			} else {
+			    dmg += rnd(3);
+			    pline(Blind ? "%s your %s!" :
+					"%s back toward you, hitting your %s!",
+				  Tobjnam(obj, Blind ? "hit" : "fly"),
+				  body_part(ARM));
+			    (void) artifact_hit((struct monst *)0,
+						&youmonst, obj, &dmg, 0);
+			    losehp(dmg, xname(obj), KILLED_BY);
+			}
+			if (ship_object(obj, u.ux, u.uy, FALSE))
+			    return;
 			dropy(obj);
 		    }
 		    return;

@@ -721,14 +721,6 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	if (youattack && youdefend) {
 	    impossible("attacking yourself with weapon?");
 	    return FALSE;
-	} else if (!spec_dbon_applies) {
-	    if (youdefend && Slimed && attacks(AD_FIRE, otmp)) {
-		pline_The("fiery blade hits you.");
-		burn_away_slime();
-		return TRUE;
-	    }
-	    /* since damage bonus didn't apply, nothing more to do */
-	    return FALSE;
 	}
 
 	realizes_damage = (youdefend || vis);
@@ -736,9 +728,11 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	/* the four basic attacks: fire, cold, shock and missiles */
 	if (attacks(AD_FIRE, otmp)) {
 	    if (realizes_damage)
-		pline_The("fiery blade %s %s!",
+		pline_The("fiery blade %s %s%c",
+			!spec_dbon_applies ? "hits" :
 			(mdef->data == &mons[PM_WATER_ELEMENTAL]) ?
-			"vaporizes part of" : "burns", hittee);
+			"vaporizes part of" : "burns",
+			hittee, !spec_dbon_applies ? '.' : '!');
 	    if (!rn2(4)) (void) destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
 	    if (!rn2(4)) (void) destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
 	    if (!rn2(7)) (void) destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
@@ -747,15 +741,19 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	}
 	if (attacks(AD_COLD, otmp)) {
 	    if (realizes_damage)
-		pline_The("ice-cold blade freezes %s!", hittee);
+		pline_The("ice-cold blade %s %s%c",
+			!spec_dbon_applies ? "hits" : "freezes",
+			hittee, !spec_dbon_applies ? '.' : '!');
 	    if (!rn2(4)) (void) destroy_mitem(mdef, POTION_CLASS, AD_COLD);
 	    return realizes_damage;
 	}
 	if (attacks(AD_ELEC, otmp)) {
 	    if (realizes_damage) {
-		if (youattack && otmp != uwep)
-		    pline("%s %s!", Tobjnam(otmp, "hit"), hittee);
-		pline("Lightning strikes %s!", hittee);
+		if (youattack ? otmp != uwep : !spec_dbon_applies)
+		    pline("%s %s%c", Tobjnam(otmp, "hit"),
+			  hittee, !spec_dbon_applies ? '.' : '!');
+		if (spec_dbon_applies)
+		    pline("Lightning strikes %s!", hittee);
 	    }
 	    if (!rn2(5)) (void) destroy_mitem(mdef, RING_CLASS, AD_ELEC);
 	    if (!rn2(5)) (void) destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
@@ -763,11 +761,19 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	}
 	if (attacks(AD_MAGM, otmp)) {
 	    if (realizes_damage) {
-		if (youattack && otmp != uwep)
-		    pline("%s %s!", Tobjnam(otmp, "hit"), hittee);
-		pline("A hail of magic missiles strikes %s!", hittee);
+		if (youattack ? otmp != uwep : !spec_dbon_applies)
+		    pline("%s %s%c", Tobjnam(otmp, "hit"),
+			  hittee, !spec_dbon_applies ? '.' : '!');
+		if (spec_dbon_applies)
+		    pline("A hail of magic missiles strikes %s!", hittee);
 	    }
 	    return realizes_damage;
+	}
+
+	if (!spec_dbon_applies) {
+	    /* since damage bonus didn't apply, nothing more to do;  
+	       no further attacks have side-effects on inventory */
+	    return FALSE;
 	}
 
 	/*

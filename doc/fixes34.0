@@ -434,7 +434,7 @@ halve air elemental damage to compensate for side effect of speed system
 strengthen Death; weaken Famine, Pestilence, and Demogorgon
 pet purple worms get nutrition from engulfing attack
 throwing an artifact upwards will trigger artifact hit effects when it falls
-being hit by Fire Brand when not resistant stops the turning-into-slime process
+being hit by Fire Brand stops the turning-into-slime process
 monsters hitting other monsters can split puddings with weapons
 be consistent with checking for iron weapons when splitting puddings
 
@@ -550,12 +550,12 @@ new window-port preference options added, and some existing options
 made each of the end disclosure options customizable to "prompt;default no",
 	"prompt;default yes", "show it without prompt", and 
 	"don't show it and don't prompt"
-add female role level names "Medica ossium", "Magistra", "Chevaliere",  
-	and "Dame"
+add female role level names "Medica ossium", "Magistra", "Chevaliere", "Dame"
 more feedback about skill advancement from #enhance command
 USER_SOUNDS compilation option to enable use of SOUND and SOUNDDIR variables
 	in the config file for user-specified sound clips for
 	user-specified, regex-based message patterns
+resistance does not protect inventory from artifacts (cold vs Frost Brand,&c)
 
 
 Platform- and/or Interface-Specific New Features
