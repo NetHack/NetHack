@@ -1385,21 +1385,24 @@ struct monst *mtmp;
 	struct obj *lifesave = mlifesaver(mtmp);
 
 	if (lifesave) {
-		/* not canseemon; amulets are on the head, so you don't want */
-		/* to show this for a long worm with only a tail visible. */
-		/* Nor do you check invisibility, because glowing and disinte- */
-		/* grating amulets are always visible. */
+		/* not canseemon; amulets are on the head, so you don't want
+		 * to show this for a long worm with only a tail visible.
+		 * Nor do you check invisibility, because glowing and
+		 * disintegrating amulets are always visible. */
 		if (cansee(mtmp->mx, mtmp->my)) {
-			pline("But wait...");
-			pline("%s medallion begins to glow!",
-				s_suffix(Monnam(mtmp)));
-			makeknown(AMULET_OF_LIFE_SAVING);
+		    pline("But wait...");
+		    pline("%s medallion begins to glow!",
+			  s_suffix(Monnam(mtmp)));
+		    makeknown(AMULET_OF_LIFE_SAVING);
+		    /* amulet is visible, but monster might not be */
+		    if (canseemon(mtmp)) {
 			if (attacktype(mtmp->data, AT_EXPL)
 			    || attacktype(mtmp->data, AT_BOOM))
-				pline("%s reconstitutes!", Monnam(mtmp));
+			    pline("%s reconstitutes!", Monnam(mtmp));
 			else
-				pline("%s looks much better!", Monnam(mtmp));
-			pline_The("medallion crumbles to dust!");
+			    pline("%s looks much better!", Monnam(mtmp));
+		    }
+		    pline_The("medallion crumbles to dust!");
 		}
 		m_useup(mtmp, lifesave);
 		mtmp->mcanmove = 1;
