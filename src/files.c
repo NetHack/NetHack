@@ -956,13 +956,13 @@ const char* filename;
        (eg. "/", "_", and "." characters are lost. */
     int k;
     int uid;
-    char name[NAME_MAX];
+    char name[64]; /* more than PL_NSIZ */
 #ifdef COMPRESS_EXTENSION
 #define EXTSTR COMPRESS_EXTENSION
 #else
 #define EXTSTR ""
 #endif
-    if ( sscanf( filename, "%*[^/]/%d%[^.]" EXTSTR, &uid, name ) == 2 ) {
+    if ( sscanf( filename, "%*[^/]/%d%63[^.]" EXTSTR, &uid, name ) == 2 ) {
 #undef EXTSTR
     /* "_" most likely means " ", which certainly looks nicer */
 	for (k=0; name[k]; k++)
@@ -989,8 +989,8 @@ get_saved_games()
 	char** result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
 	for (i=0; i<n; i++) {
 	    int uid;
-	    char name[NAME_MAX];
-	    if ( sscanf( namelist[i]->d_name, "%d%s", &uid, name ) == 2 ) {
+	    char name[64]; /* more than PL_NSIZ */
+	    if ( sscanf( namelist[i]->d_name, "%d%63s", &uid, name ) == 2 ) {
 		if ( uid == myuid ) {
 		    char filename[BUFSZ];
 		    char* r;
