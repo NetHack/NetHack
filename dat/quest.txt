@@ -3071,13 +3071,13 @@ Amulet interferes with mine.  I hope for your success."
 %Cc Wiz 00001
 You are suddenly in familiar surroundings.  You notice what appears to
 be a large, squat stone structure nearby.  Wait!  That looks like the
-tower of your old master, %l.
+tower of your former teacher, %l.
 
 However, things are not the same as when you were last here.  Mists and
 areas of unexplained darkness surround the tower.  There is movement in
 the shadows.
 
-Your master would never allow such unaesthetic forms to surround the
+Your teacher would never allow such unaesthetic forms to surround the
 tower...  unless something were dreadfully wrong!
 %E
 %Cp Wiz 00002
