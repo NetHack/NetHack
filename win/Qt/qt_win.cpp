@@ -4382,7 +4382,7 @@ NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
 
     QLabel* logo = new QLabel(this); vbl->addWidget(logo);
     logo->setAlignment(AlignCenter);
-    logo->setPixmap(QPixmap("nethack.png"));
+    logo->setPixmap(QPixmap("nhsplash.xpm"));
     QLabel* attr = new QLabel("by Warwick Allison and the NetHack DevTeam",this);
     attr->setAlignment(AlignCenter);
     vbl->addWidget(attr);
