@@ -941,7 +941,7 @@ dokick()
 
 		    if(Levitation) goto dumb;
 		    if(rn2(5)) {
-			if(flags.soundok)
+			if(!Deaf)
 			    pline("Klunk!  The pipes vibrate noisily.");
 			else pline("Klunk!");
 			exercise(A_DEX, TRUE);

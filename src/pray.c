@@ -1304,7 +1304,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
     } /* real Amulet */
 
     if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
-	    if (flags.soundok)
+	    if (!Deaf)
 		You_hear("a nearby thunderclap.");
 	    if (!otmp->known) {
 		You("realize you have made a %s.",
@@ -1564,11 +1564,6 @@ dopray()
 	    return 0;
 
     u.uconduct.gnostic++;
-    /* Praying implies that the hero is conscious and since we have
-       no deafness attribute this implies that all verbalized messages
-       can be heard.  So, in case the player has used the 'O' command
-       to toggle this accessible flag off, force it to be on. */
-    flags.soundok = 1;
 
     /* set up p_type and p_alignment */
     if (!can_pray(TRUE)) return 0;

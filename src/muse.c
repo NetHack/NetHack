@@ -126,7 +126,7 @@ struct obj *obj;
 	if (obj->oclass == WAND_CLASS && obj->cursed && !rn2(100)) {
 	    int dam = d(obj->spe+2, 6);
 
-	    if (flags.soundok) {
+	    if (!Deaf) {
 		if (vis) pline("%s zaps %s, which suddenly explodes!",
 			Monnam(mon), an(xname(obj)));
 		else You_hear("a zap and an explosion in the distance.");
@@ -150,7 +150,7 @@ struct obj *otmp;
 boolean self;
 {
 	if (!canseemon(mtmp)) {
-		if (flags.soundok)
+		if (!Deaf)
 			You_hear("a %s zap.",
 					(distu(mtmp->mx,mtmp->my) <= (BOLT_LIM+1)*(BOLT_LIM+1)) ?
 					"nearby" : "distant");
@@ -173,7 +173,7 @@ struct obj *otmp;
 	short saverole;
 	unsigned savebknown;
 
-	if (!vismon && !flags.soundok)
+	if (!vismon && Deaf)
 	    return;		/* no feedback */
 
 	otmp->dknown = 1;  /* seeing or hearing it read reveals its label */
@@ -211,7 +211,7 @@ struct obj *otmp;
 		otmp->dknown = 1;
 		pline("%s drinks %s!", Monnam(mtmp), singular(otmp, doname));
 	} else
-		if (flags.soundok)
+		if (!Deaf)
 			You_hear("a chugging sound.");
 }
 
@@ -561,7 +561,7 @@ struct monst *mtmp;
 	case MUSE_BUGLE:
 		if (vismon)
 			pline("%s plays %s!", Monnam(mtmp), doname(otmp));
-		else if (flags.soundok)
+		else if (!Deaf)
 			You_hear("a bugle playing reveille!");
 		awaken_soldiers();
 		return 2;
@@ -667,7 +667,7 @@ mon_tele:
 				surface(mtmp->mx, mtmp->my));
 		    pline("%s %s through...", Monnam(mtmp),
 			  is_flyer(mtmp->data) ? "dives" : "falls");
-		} else if (flags.soundok)
+		} else if (!Deaf)
 			You_hear("%s crash through the %s.", something,
 				surface(mtmp->mx, mtmp->my));
 		/* we made sure that there is a level for mtmp to go to */
@@ -1376,7 +1376,7 @@ struct monst *mtmp;
 				    if(is_metallic(helmet)) {
 					if (canspotmon(mtmp2))
 					    pline("Fortunately, %s is wearing a hard helmet.", mon_nam(mtmp2));
-					else if (flags.soundok)
+					else if (!Deaf)
 					    You_hear("a clanging sound.");
 					if (mdmg > 2) mdmg = 2;
 				    } else {
@@ -2140,7 +2140,7 @@ boolean stoning;
 		    (obj->otyp == POT_ACID) ? "quaff" : "eat",
 		    distant_name(obj,doname));
 	obj->quan = save_quan;
-    } else if (flags.soundok)
+    } else if (!Deaf)
 	You_hear("%s.", (obj->otyp == POT_ACID) ? "drinking" : "chewing");
     m_useup(mon, obj);
     if (((obj->otyp == POT_ACID) || acidic(&mons[obj->corpsenm])) &&

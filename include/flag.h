@@ -15,6 +15,7 @@
  */
 
 struct flag {
+	boolean  acoustics;	/* allow dungeon sound messages */
 #ifdef AMIFLUSH
 	boolean  altmeta;	/* use ALT keys as META */
 	boolean  amiflush;	/* kill typeahead */
@@ -66,7 +67,6 @@ struct flag {
 #endif
 	boolean  silent;	/* whether the bell rings or not */
 	boolean  sortpack;	/* sorted inventory */
-	boolean  soundok;	/* ok to tell about sounds heard */
 	boolean  sparkle;	/* show "resisting" special FX (Scott Bigham) */
 	boolean  standout;	/* use standout for --More-- */
 	boolean  time;		/* display elapsed 'time' */

@@ -503,8 +503,10 @@ resurrect()
 	if (mtmp) {
 		mtmp->msleeping = mtmp->mtame = mtmp->mpeaceful = 0;
 		set_malign(mtmp);
-		pline("A voice booms out...");
-		verbalize("So thou thought thou couldst %s me, fool.", verb);
+		if (!Deaf) {
+		    pline("A voice booms out...");
+		    verbalize("So thou thought thou couldst %s me, fool.", verb);
+		}
 	}
 
 }
@@ -594,6 +596,8 @@ void
 cuss(mtmp)
 register struct monst	*mtmp;
 {
+	if (Deaf)
+	    return;
 	if (mtmp->iswiz) {
 	    if (!rn2(5))  /* typical bad guy action */
 		pline("%s laughs fiendishly.", Monnam(mtmp));

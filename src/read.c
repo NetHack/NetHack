@@ -1211,7 +1211,7 @@ register struct obj	*sobj;
 				    if(is_metallic(helmet)) {
 					if (canspotmon(mtmp))
 					    pline("Fortunately, %s is wearing a hard helmet.", mon_nam(mtmp));
-					else if (flags.soundok)
+					else if (!Deaf)
 					    You_hear("a clanging sound.");
 					if (mdmg > 2) mdmg = 2;
 				    } else {
@@ -1661,7 +1661,7 @@ int how;
 		if (is_demon(ptr)) adjalign(sgn(u.ualign.type));
 
 		if(!(ptr->geno & G_GENO)) {
-			if(flags.soundok) {
+			if(!Deaf) {
 	/* fixme: unconditional "caverns" will be silly in some circumstances */
 			    if(flags.verbose)
 			pline("A thunderous voice booms through the caverns:");

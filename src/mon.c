@@ -673,7 +673,7 @@ meatmetal(mtmp)
 		    if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
 			pline("%s eats %s!", Monnam(mtmp),
 				distant_name(otmp,doname));
-		    else if (flags.soundok && flags.verbose)
+		    else if (!Deaf && flags.verbose)
 			You_hear("a crunching sound.");
 		    mtmp->meating = otmp->owt/2 + 1;
 		    /* Heal up to the object's weight in hp */
@@ -754,7 +754,7 @@ meatobj(mtmp)		/* for gelatinous cubes */
 		if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
 		    pline("%s eats %s!", Monnam(mtmp),
 			    distant_name(otmp, doname));
-		else if (flags.soundok && flags.verbose)
+		else if (!Deaf && flags.verbose)
 		    You_hear("a slurping sound.");
 		/* Heal up to the object's weight in hp */
 		if (mtmp->mhp < mtmp->mhpmax) {
@@ -807,7 +807,7 @@ meatobj(mtmp)		/* for gelatinous cubes */
 	if (ecount > 0) {
 	    if (cansee(mtmp->mx, mtmp->my) && flags.verbose && buf[0])
 		pline("%s", buf);
-	    else if (flags.soundok && flags.verbose)
+	    else if (!Deaf && flags.verbose)
 	    	You_hear("%s slurping sound%s.",
 			ecount == 1 ? "a" : "several",
 			ecount == 1 ? "" : "s");
@@ -1488,7 +1488,7 @@ boolean was_swallowed;			/* digestion */
 			if (Half_physical_damage) tmp = (tmp+1) / 2;
 			losehp(tmp, killer_buf, KILLED_BY_AN);
 		    } else {
-			if (flags.soundok) You_hear("an explosion.");
+			if (!Deaf) You_hear("an explosion.");
 			magr->mhp -= tmp;
 			if (magr->mhp < 1) mondied(magr);
 			if (magr->mhp < 1) { /* maybe lifesaved */
@@ -2033,7 +2033,7 @@ m_respond(mtmp)
 register struct monst *mtmp;
 {
     if(mtmp->data->msound == MS_SHRIEK) {
-	if(flags.soundok) {
+	if(!Deaf) {
 	    pline("%s shrieks.", Monnam(mtmp));
 	    stop_occupation();
 	}
@@ -2072,7 +2072,7 @@ register struct monst *mtmp;
 	if (couldsee(mtmp->mx, mtmp->my)) {
 		if (humanoid(mtmp->data) || mtmp->isshk || mtmp->isgd)
 		    pline("%s gets angry!", Monnam(mtmp));
-		else if (flags.verbose && flags.soundok) growl(mtmp);
+		else if (flags.verbose && !Deaf) growl(mtmp);
 	}
 
 	/* attacking your own quest leader will anger his or her guardians */
@@ -2726,7 +2726,7 @@ register boolean silent;
 			else if(!Blind)
 				You("see %sangry guard%s approaching!",
 				  sct == 1 ? "an " : "", sct > 1 ? "s" : "");
-		} else if(flags.soundok)
+		} else if(!Deaf)
 			You_hear("the shrill sound of a guard's whistle.");
 	    }
 	    return(TRUE);

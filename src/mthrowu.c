@@ -605,7 +605,7 @@ register struct attack *mattk;
 
 	if(mtmp->mcan) {
 
-	    if(flags.soundok)
+	    if(!Deaf)
 		pline("A dry rattle comes from %s throat.",
 		                      s_suffix(mon_nam(mtmp)));
 	    return 0;
@@ -646,7 +646,7 @@ breamu(mtmp, mattk)			/* monster breathes at you (ranged) */
 	if(lined_up(mtmp)) {
 
 	    if(mtmp->mcan) {
-		if(flags.soundok) {
+		if(!Deaf) {
 		    if(canseemon(mtmp))
 			pline("%s coughs.", Monnam(mtmp));
 		    else

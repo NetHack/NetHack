@@ -1139,10 +1139,10 @@ dopois:
 		hitmsg(mtmp, mattk);
 		if(!rn2(3)) {
 		    if (mtmp->mcan) {
-			if (flags.soundok)
+			if (!Deaf)
 			    You_hear("a cough from %s!", mon_nam(mtmp));
 		    } else {
-			if (flags.soundok)
+			if (!Deaf)
 			    You_hear("%s hissing!", s_suffix(mon_nam(mtmp)));
 			if(!rn2(10) ||
 			    (flags.moonphase == NEW_MOON && !have_lizard())) {
@@ -1375,7 +1375,7 @@ dopois:
 		    dmg = 0;
 		} else {
 		    if (Role_if(PM_HEALER)) {
-			if (flags.soundok && !(moves % 5))
+			if (!Deaf && !(moves % 5))
 		      verbalize("Doc, I can't help you unless you cooperate.");
 			dmg = 0;
 		    } else hitmsg(mtmp, mattk);
@@ -1385,7 +1385,7 @@ dopois:
 		hitmsg(mtmp, mattk);
 		if(!night() && mdat == &mons[PM_GREMLIN]) break;
 		if(!mtmp->mcan && !rn2(10)) {
-		    if (flags.soundok) {
+		    if (!Deaf) {
 			if (Blind) You_hear("laughter.");
 			else       pline("%s chuckles.", Monnam(mtmp));
 		    }

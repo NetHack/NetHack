@@ -1040,7 +1040,7 @@ genericptr_t num;
 		    if(distu(zx, zy) < 3) b_trapped("door", 0);
 		    else Norep("You %s an explosion!",
 				cansee(zx, zy) ? "see" :
-				   (flags.soundok ? "hear" :
+				   (!Deaf ? "hear" :
 						"feel the shock of"));
 		    wake_nearto(zx, zy, 11*11);
 		    levl[zx][zy].doormask = D_NODOOR;

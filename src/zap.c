@@ -3590,7 +3590,7 @@ boolean *shopdamage;
 			else
 				Norep("The water freezes.");
 			newsym(x,y);
-		    } else if(flags.soundok && !lava)
+		    } else if(!Deaf && !lava)
 			You_hear("a crackling sound.");
 
 		    if (x == u.ux && y == u.uy) {
@@ -3676,7 +3676,7 @@ boolean *shopdamage;
 		    } else if (sense_txt) {
 			You(sense_txt);
 		    } else if (hear_txt) {
-			if (flags.soundok) You_hear(hear_txt);
+			if (!Deaf) You_hear(hear_txt);
 		    }
 		    if (picking_at(x, y)) {
 			stop_occupation();

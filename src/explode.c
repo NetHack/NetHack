@@ -220,7 +220,7 @@ int expltype;
 		str = "explosion";
 		generic = TRUE;
 	    }
-	    if (flags.soundok) You_hear("a blast.");
+	    if (!Deaf) You_hear("a blast.");
 	}
 
     if (dam)

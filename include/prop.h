@@ -6,6 +6,7 @@
 #define PROP_H
 
 /*** What the properties are ***/
+/* Resistances to troubles */
 #define FIRE_RES		 1
 #define COLD_RES		 2
 #define SLEEP_RES		 3
@@ -15,65 +16,72 @@
 #define ACID_RES		 7
 #define STONE_RES		 8
 /* note: for the first eight properties, MR_xxx == (1 << (xxx_RES - 1)) */
-#define ADORNED			 9
-#define REGENERATION		10
-#define SEARCHING		11
-#define SEE_INVIS		12
-#define INVIS			13
-#define TELEPORT		14
-#define TELEPORT_CONTROL	15
-#define POLYMORPH		16
-#define POLYMORPH_CONTROL	17
-#define LEVITATION		18
-#define STEALTH			19
-#define AGGRAVATE_MONSTER	20
-#define CONFLICT		21
-#define PROTECTION		22
-#define PROT_FROM_SHAPE_CHANGERS 23
-#define WARNING			24
-#define TELEPAT			25
-#define FAST			26
-#define STUNNED			27
-#define CONFUSION		28
-#define SICK			29
-#define BLINDED			30
-#define SLEEPING		31
-#define WOUNDED_LEGS		32
-#define STONED			33
-#define STRANGLED		34
-#define HALLUC			35
-#define HALLUC_RES		36
-#define FUMBLING		37
-#define JUMPING			38
-#define WWALKING		39
-#define HUNGER			40
-#define GLIB			41
-#define REFLECTING		42
-#define LIFESAVED		43
-#define ANTIMAGIC		44
-#define DISPLACED		45
-#define CLAIRVOYANT		46
-#define VOMITING		47
-#define ENERGY_REGENERATION	48
-#define MAGICAL_BREATHING	49
-#define HALF_SPDAM		50
-#define HALF_PHDAM		51
-#define SICK_RES		52
-#define DRAIN_RES		53
-#define WARN_UNDEAD		54
-#define INVULNERABLE		55
-#define FREE_ACTION		56
-#define SWIMMING		57
-#define SLIMED			58
-#define FIXED_ABIL		59
-#define FLYING			60
-#define UNCHANGING		61
-#define PASSES_WALLS		62
-#define SLOW_DIGESTION		63
-#define INFRAVISION		64
-#define WARN_OF_MON		65
-#define DETECT_MONSTERS		66
-#define LAST_PROP		(DETECT_MONSTERS)
+#define DRAIN_RES		 9
+#define SICK_RES		10
+#define INVULNERABLE		11
+#define ANTIMAGIC		12
+/* Troubles */
+#define STUNNED			13
+#define CONFUSION		14
+#define BLINDED			15
+#define DEAF			16
+#define SICK			17
+#define STONED			18
+#define STRANGLED		19
+#define VOMITING		20
+#define GLIB			21
+#define SLIMED			22
+#define HALLUC			23
+#define HALLUC_RES		24
+#define FUMBLING		25
+#define WOUNDED_LEGS		26
+#define SLEEPING		27
+#define HUNGER			28
+/* Vision and senses */
+#define SEE_INVIS		29
+#define TELEPAT			30
+#define WARNING			31
+#define WARN_OF_MON		32
+#define WARN_UNDEAD		33
+#define SEARCHING		34
+#define CLAIRVOYANT		35
+#define INFRAVISION		36
+#define DETECT_MONSTERS		37
+/* Appearance and behavior */
+#define ADORNED			38
+#define INVIS			39
+#define DISPLACED		40
+#define STEALTH			41
+#define AGGRAVATE_MONSTER	42
+#define CONFLICT		43
+/* Transportation */
+#define JUMPING			44
+#define TELEPORT		45
+#define TELEPORT_CONTROL	46
+#define LEVITATION		47
+#define FLYING			48
+#define WWALKING		49
+#define SWIMMING		50
+#define MAGICAL_BREATHING	51
+#define PASSES_WALLS		52
+/* Physical attributes */
+#define SLOW_DIGESTION		53
+#define HALF_SPDAM		54
+#define HALF_PHDAM		55
+#define REGENERATION		56
+#define ENERGY_REGENERATION	57
+#define PROTECTION		58
+#define PROT_FROM_SHAPE_CHANGERS 59
+#define POLYMORPH		60
+#define POLYMORPH_CONTROL	61
+#define UNCHANGING		62
+#define FAST			63
+#define REFLECTING		64
+#define FREE_ACTION		65
+#define FIXED_ABIL		66
+#define LIFESAVED		67
+#define LAST_PROP		(LIFESAVED)
+
 
 /*** Where the properties come from ***/
 /* Definitions were moved here from obj.h and you.h */

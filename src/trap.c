@@ -1769,7 +1769,7 @@ register struct monst *mtmp;
 			    } else {
 				if((mptr == &mons[PM_OWLBEAR]
 				    || mptr == &mons[PM_BUGBEAR])
-				   && flags.soundok)
+				   && !Deaf)
 				    You_hear("the roaring of an angry bear!");
 			    }
 			}
@@ -2460,8 +2460,10 @@ domagictrap()
 		if (!Blind) Your(vision_clears);
 	  } else if (!Blind) {
 		You("see a flash of light!");
-	  }  else
+	  } else if (!Deaf) {
 		You_hear("a deafening roar!");
+	  }
+	  incr_itimeout(&HDeaf, rn1(20,30));
 	  while(cnt--)
 		(void) makemon((struct permonst *) 0, u.ux, u.uy, NO_MM_FLAGS);
 	}

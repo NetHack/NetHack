@@ -39,6 +39,7 @@ static struct Bool_Opt
 	boolean	*addr, initvalue;
 	int optflags;
 } boolopt[] = {
+	{"acoustics", &flags.acoustics, TRUE, SET_IN_GAME},
 #ifdef AMIGA
 	{"altmeta", &flags.altmeta, TRUE, DISP_IN_GAME},
 #else
@@ -175,7 +176,6 @@ static struct Bool_Opt
 	{"silent", &flags.silent, TRUE, SET_IN_GAME},
 	{"softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE},
 	{"sortpack", &flags.sortpack, TRUE, SET_IN_GAME},
-	{"sound", &flags.soundok, TRUE, SET_IN_GAME},
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
 	{"standout", &flags.standout, FALSE, SET_IN_GAME},
 	{"splash_screen",     &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/

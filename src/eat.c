@@ -1157,7 +1157,9 @@ no_opener:
 int
 Hear_again()		/* called when waking up after fainting */
 {
-	flags.soundok = 1;
+	/* Chance of deafness going away while fainted/sleepeing/etc. */
+	if (!rn2(2))
+	    set_itimeout(&HDeaf, 0L);
 	return 0;
 }
 
@@ -1177,6 +1179,8 @@ struct obj *obj;
 		if (!Blind) Your(vision_clears);
 	} else if(!rn2(3)) {
 		const char *what, *where;
+		int duration = rnd(10);
+
 		if (!Blind)
 		    what = "goes",  where = "dark";
 		else if (Levitation || Is_airlevel(&u.uz) ||
@@ -1189,8 +1193,8 @@ struct obj *obj;
 #endif
 			   surface(u.ux,u.uy);
 		pline_The("world spins and %s %s.", what, where);
-		flags.soundok = 0;
-		nomul(-rnd(10));
+		incr_itimeout(&HDeaf, duration);
+		nomul(-duration);
 		nomovemsg = "You are conscious again.";
 		afternmv = Hear_again;
 		return(1);
@@ -2211,7 +2215,7 @@ sync_hunger()
 
 	if(is_fainted()) {
 
-		flags.soundok = 0;
+		!Deaf = 0;
 		nomul(-10+(u.uhunger/10));
 		nomovemsg = "You regain consciousness.";
 		afternmv = unfaint;
@@ -2273,11 +2277,13 @@ boolean incr;
 		if(is_fainted()) newhs = FAINTED;
 		if(u.uhs <= WEAK || rn2(20-u.uhunger/10) >= 19) {
 			if(!is_fainted() && multi >= 0 /* %% */) {
+				int duration = 10-(u.uhunger/10);
+
 				/* stop what you're doing, then faint */
 				stop_occupation();
 				You("faint from lack of food.");
-				flags.soundok = 0;
-				nomul(-10+(u.uhunger/10));
+				incr_itimeout(&HDeaf, duration);
+				nomul(-duration);
 				nomovemsg = "You regain consciousness.";
 				afternmv = unfaint;
 				newhs = FAINTED;

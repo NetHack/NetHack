@@ -202,6 +202,7 @@ dosit()
 			{
 			register int cnt = rnd(10);
 
+			/* Magical voice not affected by deafness */
 			pline("A voice echoes:");
 			verbalize("Thy audience hath been summoned, %s!",
 				  flags.female ? "Dame" : "Sire");
@@ -210,12 +211,14 @@ dosit()
 			break;
 			}
 		    case 8:
+			/* Magical voice not affected by deafness */
 			pline("A voice echoes:");
 			verbalize("By thy Imperious order, %s...",
 				  flags.female ? "Dame" : "Sire");
 			do_genocide(5);	/* REALLY|ONTHRONE, see do_genocide() */
 			break;
 		    case 9:
+			/* Magical voice not affected by deafness */
 			pline("A voice echoes:");
 	verbalize("A curse upon thee for sitting upon this most holy throne!");
 			if (Luck > 0)  {

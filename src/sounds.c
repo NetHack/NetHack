@@ -36,7 +36,7 @@ dosounds()
 #endif
     struct monst *mtmp;
 
-    if (!flags.soundok || u.uswallow || Underwater) return;
+    if (Deaf || !flags.acoustics || u.uswallow || Underwater) return;
 
     hallu = Hallucination ? 1 : 0;
 
@@ -423,7 +423,7 @@ register struct monst *mtmp;
     char verbuf[BUFSZ];
 
     /* presumably nearness and sleep checks have already been made */
-    if (!flags.soundok) return(0);
+    if (Deaf) return(0);
     if (is_silent(ptr)) return(0);
 
     /* Make sure its your role's quest quardian; adjust if not */
@@ -816,10 +816,8 @@ int
 dotalk()
 {
     int result;
-    boolean save_soundok = flags.soundok;
-    flags.soundok = 1;	/* always allow sounds while chatting */
+
     result = dochat();
-    flags.soundok = save_soundok;
     return result;
 }
 
@@ -844,6 +842,10 @@ dochat()
     }
     if (Underwater) {
 	Your("speech is unintelligible underwater.");
+	return(0);
+    }
+    if (Deaf) {
+	pline("How can you hold a conversation when you cannot hear?");
 	return(0);
     }
 

@@ -173,6 +173,8 @@ There VA_DECL(const char *,line)
 void
 You_hear VA_DECL(const char *,line)
 	char *tmp;
+
+	if (Deaf || flags.acoustics) return;
 	VA_START(line);
 	VA_INIT(line, const char *);
 	if (Underwater)
@@ -185,11 +187,15 @@ You_hear VA_DECL(const char *,line)
 	VA_END();
 }
 
+/* Print a message inside double-quotes.
+ * The caller is responsible for checking deafness.
+ * Gods can speak directly to you in spite of deafness.
+ */
 /*VARARGS1*/
 void
 verbalize VA_DECL(const char *,line)
 	char *tmp;
-	if (!flags.soundok) return;
+
 	VA_START(line);
 	VA_INIT(line, const char *);
 	tmp = You_buf((int)strlen(line) + sizeof "\"\"");

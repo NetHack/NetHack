@@ -289,7 +289,9 @@ fnd:
 	}
 	verbalize("I don't know you.");
 #ifndef GOLDOBJ
-	if (!u.ugold && !hidden_gold())
+	if (Deaf)
+	    ;
+	else if (!u.ugold && !hidden_gold())
 	    verbalize("Please follow me.");
 	else {
 	    if (!u.ugold)
@@ -299,7 +301,9 @@ fnd:
 	}
 #else
         umoney = money_cnt(invent);
-	if (!umoney && !hidden_gold())
+	if (Deaf)
+	    ;
+	else if (!umoney && !hidden_gold())
 	    verbalize("Please follow me.");
 	else {
 	    if (!umoney)
@@ -476,7 +480,7 @@ register struct monst *grd;
 	if(egrd->fcend == 1) {
 	    if(u_in_vault &&
 			(u_carry_gold || um_dist(grd->mx, grd->my, 1))) {
-		if(egrd->warncnt == 3)
+		if(egrd->warncnt == 3 && !Deaf)
 			verbalize("I repeat, %sfollow me!",
 				u_carry_gold ? (
 #ifndef GOLDOBJ
@@ -491,7 +495,8 @@ register struct monst *grd;
 		if(egrd->warncnt == 7) {
 			m = grd->mx;
 			n = grd->my;
-			verbalize("You've been warned, knave!");
+			if (!Deaf)
+			    verbalize("You've been warned, knave!");
 			mnexto(grd);
 			levl[m][n].typ = egrd->fakecorr[0].ftyp;
 			newsym(m,n);
@@ -521,7 +526,8 @@ letknow:
 			    g_monnam(grd));
 		    return(-1);
 		} else {
-		    verbalize("Well, begone.");
+		    if (!Deaf)
+			verbalize("Well, begone.");
 		    wallify_vault(grd);
 		    egrd->gddone = 1;
 		    goto cleanup;
@@ -548,10 +554,12 @@ letknow:
 		}
 		if(egrd->warncnt < 6) {
 			egrd->warncnt = 6;
-			verbalize("Drop all your gold, scoundrel!");
+			if (!Deaf)
+			    verbalize("Drop all your gold, scoundrel!");
 			return(0);
 		} else {
-			verbalize("So be it, rogue!");
+			if (!Deaf)
+			    verbalize("So be it, rogue!");
 			grd->mpeaceful = 0;
 			return(-1);
 		}
@@ -582,7 +590,8 @@ letknow:
 		} else {
 		    /* just for insurance... */
 		    if (MON_AT(m, n) && m != grd->mx && n != grd->my) {
-			verbalize("Out of my way, scum!");
+			if (!Deaf)
+			    verbalize("Out of my way, scum!");
 			(void) rloc(m_at(m, n), FALSE);
 		    }
 		    remove_monster(grd->mx, grd->my);
@@ -606,7 +615,8 @@ letknow:
 		}
 	}
 	if(um_dist(grd->mx, grd->my, 1) || egrd->gddone) {
-		if(!egrd->gddone && !rn2(10)) verbalize("Move along!");
+		if(!egrd->gddone && !rn2(10) && !Deaf)
+		    verbalize("Move along!");
 		restfakecorr(grd);
 		return(0);	/* didn't move */
 	}

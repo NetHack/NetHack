@@ -521,7 +521,7 @@ int thrown;
 			     mon->data == &mons[PM_WATCH_CAPTAIN]));
 	result = hmon_hitmon(mon, obj, thrown);
 	if (mon->ispriest && !rn2(2)) ghod_hitsu(mon);
-	if (anger_guards) (void)angry_guards(!flags.soundok);
+	if (anger_guards) (void)angry_guards(!!Deaf);
 	return result;
 }
 

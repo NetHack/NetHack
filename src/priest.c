@@ -328,7 +328,7 @@ register int roomno;
 		sanctum = (priest->data == &mons[PM_HIGH_PRIEST] &&
 			   (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
 		can_speak = (priest->mcanmove && !priest->msleeping &&
-			     flags.soundok);
+			     !Deaf);
 		if (can_speak) {
 		    unsigned save_priest = priest->ispriest;
 		    /* don't reveal the altar's owner upon temple entry in

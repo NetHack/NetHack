@@ -65,7 +65,7 @@ boolean undirected;
 
 	    pline("%s points %s.", Monnam(mtmp), point_msg);
 	} else if ((!(moves % 4) || !rn2(4))) {
-	    if (flags.soundok) Norep("You hear a mumbled curse.");
+	    if (!Deaf) Norep("You hear a mumbled curse.");
 	}
 }
 
@@ -225,7 +225,7 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 
 	nomul(0);
 	if(rn2(ml*10) < (mtmp->mconf ? 100 : 20)) {	/* fumbled attack */
-	    if (canseemon(mtmp) && flags.soundok)
+	    if (canseemon(mtmp) && !Deaf)
 		pline_The("air crackles around %s.", mon_nam(mtmp));
 	    return(0);
 	}

@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.69 $ $Date: 2003/08/14 11:04:25 $
+% $Revision: 1.70 $ $Date: 2003/09/27 15:55:35 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2033,6 +2033,10 @@ Some of the options listed may be inactive in your dungeon.
 
 \blist{}
 %.lp
+\item[\ib{acoustics}]
+Enable messages about what your character hears (default on).
+Note that this has nothing to do with your computer's audio capabilities.
+%.lp
 \item[\ib{align}]
 Your starting alignment ({\tt align:lawful}, {\tt align:neutral},
 or {\tt align:chaotic}).  You may specify just the first letter.
@@ -2497,12 +2501,6 @@ Suppress terminal beeps (default on).
 %.lp
 \item[\ib{sortpack}]
 Sort the pack contents by type when displaying inventory (default on).
-%.lp
-\item[\ib{sound}]
-Enable messages about what your character hears (default on).
-Note that this has nothing to do with your computer's audio capabilities.
-This option is only partly under player control.  The game toggles it
-off and on during and after sleep, for example.
 %.lp
 \item[\ib{standout}]
 Boldface monsters and ``{\tt --More--}'' (default off).

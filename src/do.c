@@ -86,7 +86,7 @@ boolean pushing;
 			There("is a large splash as %s %s the %s.",
 			      the(xname(otmp)), fills_up? "fills":"falls into",
 			      what);
-		    } else if (flags.soundok)
+		    } else if (!Deaf)
 			You_hear("a%s splash.", lava ? " sizzling" : "");
 		    wake_nearto(rx, ry, 40);
 		}
@@ -184,7 +184,7 @@ const char *verb;
 	} else if (is_pool(x, y)) {
 		/* Reasonably bulky objects (arbitrary) splash when dropped.
 		 * Stuff dropped near fountains always misses */
-		if (Blind && flags.soundok && ((x == u.ux) && (y == u.uy)) &&
+		if (Blind && !Deaf && ((x == u.ux) && (y == u.uy)) &&
 		    weight(obj) > 9) {
 		    pline("Splash!");
 		    map_background(x, y, 0);
@@ -196,7 +196,7 @@ const char *verb;
 		(t = t_at(x,y)) != 0 && t->tseen &&
 			(t->ttyp==PIT || t->ttyp==SPIKED_PIT)) {
 		/* you escaped a pit and are standing on the precipice */
-		if (Blind && flags.soundok)
+		if (Blind && !Deaf)
 			You_hear("%s %s downwards.",
 				The(xname(obj)), otense(obj, "tumble"));
 		else

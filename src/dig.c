@@ -1040,7 +1040,7 @@ watch_dig(mtmp, x, y, zap)
 	    if (mtmp) {
 		if(zap || context.digging.warned) {
 		    verbalize("Halt, vandal!  You're under arrest!");
-		    (void) angry_guards(!(flags.soundok));
+		    (void) angry_guards(!!Deaf);
 		} else {
 		    const char *str;
 
@@ -1104,7 +1104,7 @@ register struct monst *mtmp;
 
 	if (IS_WALL(here->typ)) {
 	    /* KMH -- Okay on arboreal levels (room walls are still stone) */
-	    if (flags.soundok && flags.verbose && !rn2(5))
+	    if (!Deaf && flags.verbose && !rn2(5))
 		You_hear("crashing rock.");
 	    if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
 		add_damage(mtmp->mx, mtmp->my, 0L);

@@ -563,7 +563,7 @@ struct entity *etmp;
 		    if (e_inview)
 			pline("%s crushed by the falling portcullis!",
 			      E_phrase(etmp, "are"));
-		    else if (flags.soundok)
+		    else if (!Deaf)
 			You_hear("a crushing sound.");
 		    e_died(etmp, e_inview? 3 : 2, CRUSHING);
 		    /* no corpse */
@@ -684,7 +684,7 @@ struct entity *etmp;
 		pline("%s on drawbridge square", E_phrase(etmp, "are"));
 #endif
 		if (is_pool(etmp->ex, etmp->ey) && !e_inview)
-			if (flags.soundok)
+			if (!Deaf)
 				You_hear("a splash.");
 		if (e_survives_at(etmp, etmp->ex, etmp->ey)) {
 			if (e_inview && !is_flyer(etmp->edata) &&
@@ -759,7 +759,7 @@ int x,y;
 	do_entity(&(occupants[0]));		/* Do set_entity after first */
 	set_entity(x2, y2, &(occupants[1]));	/* do_entity for worm tail */
 	do_entity(&(occupants[1]));
-	if(OBJ_AT(x,y) && flags.soundok)
+	if(OBJ_AT(x,y) && !Deaf)
 	    You_hear("smashing and crushing.");
 	(void) revive_nasty(x,y,(char *)0);
 	(void) revive_nasty(x2,y2,(char *)0);
@@ -838,13 +838,13 @@ int x,y;
 			if (cansee(x2,y2))
 			    pline_The("portcullis of the drawbridge falls into the %s!",
 				  lava ? "lava" : "moat");
-			else if (flags.soundok)
+			else if (!Deaf)
 				You_hear("a loud *SPLASH*!");
 		} else {
 			if (cansee(x,y))
 			    pline_The("drawbridge collapses into the %s!",
 				  lava ? "lava" : "moat");
-			else if (flags.soundok)
+			else if (!Deaf)
 				You_hear("a loud *SPLASH*!");
 		}
 		lev1->typ = lava ? LAVAPOOL : MOAT;
@@ -901,7 +901,7 @@ int x,y;
 				pline("%s hit by a huge chunk of metal!",
 				      E_phrase(etmp1, "are"));
 			} else {
-			    if (flags.soundok && !is_u(etmp1) && !is_pool(x,y))
+			    if (!Deaf && !is_u(etmp1) && !is_pool(x,y))
 				You_hear("a crushing sound.");
 #ifdef D_DEBUG
 			    else

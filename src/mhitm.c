@@ -57,7 +57,7 @@ noises(magr, mattk)
 {
 	boolean farq = (distu(magr->mx, magr->my) > 15);
 
-	if(flags.soundok && (farq != far_noise || moves-noisetime > 10)) {
+	if(!Deaf && (farq != far_noise || moves-noisetime > 10)) {
 		far_noise = farq;
 		noisetime = moves;
 		You_hear("%s%s.",
@@ -621,7 +621,7 @@ mdamagem(magr, mdef, mattk)
 			You(brief_feeling, "queasy");
 		    return MM_AGR_DIED;
 		}
-		if(flags.verbose && flags.soundok) verbalize("Burrrrp!");
+		if(flags.verbose && !Deaf) verbalize("Burrrrp!");
 		tmp = mdef->mhp;
 		/* Use up amulet of life saving */
 		if (!!(obj = mlifesaver(mdef))) m_useup(mdef, obj);
@@ -934,7 +934,7 @@ mdamagem(magr, mdef, mattk)
 			    return (MM_DEF_DIED | (grow_up(magr,mdef) ?
 							0 : MM_AGR_DIED));
 		    }
-		    if (flags.soundok) {
+		    if (!Deaf) {
 			    if (!vis) You_hear("laughter.");
 			    else pline("%s chuckles.", Monnam(magr));
 		    }
