@@ -17,9 +17,10 @@ take_gold()
 		flags.botl = 1;
 	}
 #else
-        struct obj *otmp;
+        struct obj *otmp, *nobj;
 	int lost_money = 0;
-	for (otmp = invent; otmp; otmp = otmp->nobj) {
+	for (otmp = invent; otmp; otmp = nobj) {
+		nobj = otmp->nobj;
 		if (otmp->oclass == COIN_CLASS) {
 			lost_money = 1;
 			delobj(otmp);

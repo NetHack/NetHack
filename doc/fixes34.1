@@ -224,6 +224,8 @@ make sure that missing file trickery in wizard mode which is discovered during
 	level change doesn't try to keep going after discarding current level
 contribution by Adam Wozniak adds several const & changes some char* to char[]
 fix impossible when hitting/jousting a monster causes it to be killed twice
+fix a GOLDOBJ crash/hang in take_gold() that could be triggered by reading a
+	cursed spellbook, or by sitting on a throne
 
 
 Platform- and/or Interface-Specific Fixes
