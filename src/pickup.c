@@ -2467,14 +2467,37 @@ STATIC_OVL void
 tipcontainer(box)
 struct obj *box;	/* or bag */
 {
+    boolean empty_it = FALSE;
+
     if (box->olocked) {
 	pline("It's locked.");
+    } else if (box->otrapped) {
+	/* we're not reaching inside but we're still handling it... */
+	(void) chest_trap(box, HAND, FALSE);
+	/* even if the trap fails, you've used up this turn */
+	if (multi >= 0) {	/* in case we didn't become paralyzed */
+	    nomul(-1);
+	    nomovemsg = "";
+	}
     } else if (box->otyp == BAG_OF_TRICKS && box->spe > 0) {
 	/* apply (not loot) this bag; uses up one charge */
 	bagotricks(box);
+    } else if (box->spe) {
+	char yourbuf[BUFSZ];
+
+	observe_quantum_cat(box);
+	if (!Has_contents(box))	/* evidently a live cat came out */
+	    /* container type of "large box" is inferred */
+	    pline("%s box is now empty.", Shk_Your(yourbuf, box));
+	else			/* holds cat corpse or other random stuff */
+	    empty_it = TRUE;
     } else if (!Has_contents(box)) {
 	pline("It's empty.");
     } else {
+	empty_it = TRUE;
+    }
+
+    if (empty_it) {
 	struct obj *otmp, *nobj;
 	boolean verbose = FALSE,
 		highdrop = !can_reach_floor(),
@@ -2507,8 +2530,9 @@ struct obj *box;	/* or bag */
 		dropy(otmp);
 	    }
 	}
-	if (loss)
+	if (loss)	/* magic bag lost some shop goods */
 	    You("owe %ld %s for lost merchandise.", loss, currency(loss));
+	box->owt = weight(box);	/* mbag_item_gone() doesn't update this */
 	if (held) (void)encumber_msg();
     }
 }
