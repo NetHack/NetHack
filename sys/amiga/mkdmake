@@ -1,0 +1,14 @@
+GE/$@/%(left)/
+GE/$</%(right)/
+GE/\#/#/
+39(F B/#SFD_INSTEAD / ; E/#SFD_INSTEAD // ; N ; D )
+REWIND
+CG
+9(F P/#SFD_BEGIN/; D ; GE /##// ; F P/#SFD_ELSE/ ; CG ; DF P/#SFD_END/ ; D )
+Q
+
+	SCCS Id: @(#)mkdmake	3.3	96/02/17
+Copyright (c) Andrew Church, Olney, Maryland, 1994,1996.
+NetHack may be freely redistributed.  See license for details.
+
+See IV.B.4 of Install.ami for instructions on using this file.
