@@ -58,6 +58,7 @@ non-magical whistles do not work underwater
 try to restrict whistles and musical instruments to monsters that can blow
 thrown potions can sometimes hit a steed's saddle
 sync default documentation of "null" option with the code
+tripping over a cockatrice corpse didn't petrify, even when not wearing boots
 
 
 Platform- and/or Interface-Specific Fixes

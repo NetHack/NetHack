@@ -649,6 +649,12 @@ slip_or_trip()
 	    } else {
 		You("trip over %s.", what);
 	    }
+	    if (!uarmf && otmp->otyp == CORPSE &&
+		touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
+		Sprintf(killer.name, "tripping over %s corpse",
+			an(mons[otmp->corpsenm].mname));
+		instapetrify(killer.name);
+	    }
 	} else if (rn2(3) && is_ice(u.ux, u.uy)) {
 	    pline("%s %s%s on the ice.",
 #ifdef STEED
