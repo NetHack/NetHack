@@ -445,6 +445,9 @@ boolean artif;
 	    case SLIME_MOLD:
 		otmp->spe = current_fruit;
 		break;
+	    case KELP_FROND:
+		otmp->quan = (long) rnd(2);
+		break;
 	    }
 	    if (otmp->otyp == CORPSE || otmp->otyp == MEAT_RING) break;
 	    /* fall into next case */
@@ -452,7 +455,6 @@ boolean artif;
 	case GEM_CLASS:
 		if (otmp->otyp == LOADSTONE) curse(otmp);
 		else if (otmp->otyp == ROCK) otmp->quan = (long) rn1(6,6);
-		else if (otmp->otyp == KELP_FROND) otmp->quan = (long) rnd(2);
 		else if (otmp->otyp != LUCKSTONE && !rn2(6)) otmp->quan = 2L;
 		else otmp->quan = 1L;
 		break;
