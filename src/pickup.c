@@ -1687,14 +1687,17 @@ register struct obj *obj;
 	      pline_The("stone%s won't leave your person.", plur(obj->quan));
 		return 0;
 	} else if (obj->otyp == AMULET_OF_YENDOR ||
+		   obj->otyp == FAKE_AMULET_OF_YENDOR ||
 		   obj->otyp == CANDELABRUM_OF_INVOCATION ||
 		   obj->otyp == BELL_OF_OPENING ||
 		   obj->otyp == SPE_BOOK_OF_THE_DEAD) {
 	/* Prohibit Amulets in containers; if you allow it, monsters can't
 	 * steal them.  It also becomes a pain to check to see if someone
 	 * has the Amulet.  Ditto for the Candelabrum, the Bell and the Book.
+	 * The fake amulet too because otherwise it's too easy to distinguish.
 	 */
-	    pline("%s cannot be confined in such trappings.", The(xname(obj)));
+	    pline("%s is enchanted to resist confinement.",
+	    		The(xname(obj)));
 	    return 0;
 	} else if (obj->otyp == LEASH && obj->leashmon != 0) {
 		pline("%s attached to your pet.", Tobjnam(obj, "are"));
