@@ -21,7 +21,7 @@ static NEARDATA struct obj *book;	/* last/current book being xscribed */
 	((char)((spell < 26) ? ('a' + spell) : ('A' + spell - 26)))
 
 STATIC_DCL int FDECL(spell_let_to_idx, (CHAR_P));
-STATIC_DCL void FDECL(cursed_book, (int));
+STATIC_DCL boolean FDECL(cursed_book, (struct obj *bp));
 STATIC_DCL void FDECL(deadbook, (struct obj *));
 STATIC_PTR int NDECL(learn);
 STATIC_DCL boolean FDECL(getspell, (int *));
@@ -102,10 +102,13 @@ char ilet;
     return -1;
 }
 
-STATIC_OVL void
-cursed_book(lev)
-	register int	lev;
+/* TRUE: book should be destroyed by caller */
+STATIC_OVL boolean
+cursed_book(bp)
+	struct obj *bp;
 {
+	int lev = objects[bp->otyp].oc_level;
+
 	switch(rn2(lev)) {
 	case 0:
 		You_feel("a wrenching sensation.");
@@ -145,9 +148,12 @@ cursed_book(lev)
 			     Blind ? "feel" : "look");
 		    break;
 		}
+		/* temp disable in_use; death should not destroy the book */
+		bp->in_use = FALSE;
 		losestr(Poison_resistance ? rn1(2,1) : rn1(4,3));
 		losehp(rnd(Poison_resistance ? 6 : 10),
 		       "contact-poisoned spellbook", KILLED_BY_AN);
+		bp->in_use = TRUE;
 		break;
 	case 6:
 		if(Antimagic) {
@@ -156,14 +162,14 @@ cursed_book(lev)
 		} else {
 		    pline("As you read the book, it %s in your %s!",
 			  explodes, body_part(FACE));
-		    losehp (2*rnd(10)+5, "exploding rune", KILLED_BY_AN);
+		    losehp(2*rnd(10)+5, "exploding rune", KILLED_BY_AN);
 		}
-		break;
+		return TRUE;
 	default:
 		rndcurse();
 		break;
 	}
-	return;
+	return FALSE;
 }
 
 /* special effects for The Book of the Dead */
@@ -335,7 +341,11 @@ learn()
 	if (i == MAXSPELL) impossible("Too many spells memorized!");
 
 	if (book->cursed) {	/* maybe a demon cursed it */
-		cursed_book(objects[booktype].oc_level);
+	    if (cursed_book(book)) {
+		useup(book);
+		book = 0;
+		return 0;
+	    }
 	}
 	if (costly) check_unpaid(book);
 	book = 0;
@@ -417,11 +427,12 @@ register struct obj *spellbook;
 		}
 
 		if (too_hard) {
-		    cursed_book(objects[booktype].oc_level);
+		    boolean gone = cursed_book(spellbook);
+
 		    nomul(delay);			/* study time */
 		    delay = 0;
-		    if(!rn2(3)) {
-			pline_The("spellbook crumbles to dust!");
+		    if(gone || !rn2(3)) {
+			if (!gone) pline_The("spellbook crumbles to dust!");
 			if (!objects[spellbook->otyp].oc_name_known &&
 				!objects[spellbook->otyp].oc_uname)
 			    docall(spellbook);
