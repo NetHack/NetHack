@@ -6,7 +6,7 @@
 
 #ifdef TTY_GRAPHICS
 
-#if !defined(MSDOS) && !defined(MAC)
+#if !defined(MAC)
 #define NEWAUTOCOMP
 #endif
 

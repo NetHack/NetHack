@@ -686,17 +686,11 @@ tty_askname()
 			if(ct) {
 				ct--;
 #if defined(MICRO) || defined(WIN32CON)
-# if defined(WIN32CON)
+# if defined(WIN32CON) || defined(MSDOS)
 				backsp();       /* \b is visible on NT */
 				(void) putchar(' ');
 				backsp();
 # else
-#  if defined(MSDOS)
-				if (iflags.grmode) {
-					backsp();
-				} else
-
-#  endif
 				msmsg("\b \b");
 # endif
 #else

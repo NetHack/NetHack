@@ -126,20 +126,11 @@ txt_backsp()
 
 	int86(DOS_EXT_FUNC, &regs, &regs);
 
-	txt_xputc(' ',attrib_text_normal);
-
-	regs.h.dl = 0x01;		  /* one column */
-	regs.h.ah = CURSOR_LEFT;
-	regs.h.cl = DIRECT_CON_IO;
-
-	(void) int86(DOS_EXT_FUNC, &regs, &regs);
 #  else
 	int col,row;
 
 	txt_get_cursor(&col, &row);
 	if (col > 0) col = col-1;
-	txt_gotoxy(col,row);
-	txt_xputc(' ',attrib_text_normal);
 	txt_gotoxy(col,row);
 #  endif
 }

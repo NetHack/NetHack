@@ -228,8 +228,6 @@ vga_backsp()
 
 	if (col > 0) col = col-1;
 	vga_gotoloc(col,row);
-	vga_xputc(' ',g_attribute);
-	vga_gotoloc(col,row);
 }
 
 # endif /* OVLB */
