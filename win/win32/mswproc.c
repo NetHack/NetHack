@@ -882,11 +882,6 @@ void mswin_destroy_nhwindow(winid wid)
 		return;
     }
 
-	if (GetNHApp()->windowlist[wid].type == NHW_TEXT) {
-		/* this type takes care of themself */
-		return;
-	}
-
     if (wid != -1) {
 		if( !GetNHApp()->windowlist[wid].dead &&
 			GetNHApp()->windowlist[wid].win != NULL ) 

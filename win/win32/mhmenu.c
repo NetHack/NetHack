@@ -9,6 +9,7 @@
 #include "mhmain.h"
 #include "mhmsg.h"
 #include "mhfont.h"
+#include "mhdlg.h"
 
 #define MENU_MARGIN			0
 #define NHMENU_STR_SIZE     BUFSZ
@@ -1038,7 +1039,10 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 			char buf[BUFSZ];
 			
 			reset_menu_count(hwndList, data);
-			mswin_getlin("Search for:", buf);
+			if( mswin_getlin_window("Search for:", buf, BUFSZ)==IDCANCEL ) {
+				strcpy(buf, "\033");
+			}
+			SetFocus(hwndList);	// set focus back to the list control
 			if (!*buf || *buf == '\033') return -2;
 			for(i=0; i<data->menu.size; i++ ) {
 				if( NHMENU_IS_SELECTABLE(data->menu.items[i])
