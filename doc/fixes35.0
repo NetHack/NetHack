@@ -47,6 +47,7 @@ make it possible for the code to recognize your starting pet throughout the
 	game via is_starting_pet(mon) macro
 healers notice when a wand of undead turning revives a monster so the
 	wand is then identified
+update display if bestowed a spellbook while unable to see invisible self
 
 
 Platform- and/or Interface-Specific Fixes

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.4	2003/03/23	*/
+/*	SCCS Id: @(#)pray.c	3.4	2003/10/26	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -748,8 +748,8 @@ gcrownu()
 	} else if (!already_exists) {
 	    obj = mksobj(RUNESWORD, FALSE, FALSE);
 	    obj = oname(obj, artiname(ART_STORMBRINGER));
-	    at_your_feet(An(swordbuf));
 	    obj->spe = 1;
+	    at_your_feet(An(swordbuf));
 	    dropy(obj);
 	    u.ugifts++;
 	}
@@ -989,7 +989,6 @@ pleased(g_align)
 	    struct obj *otmp;
 	    int sp_no, trycnt = u.ulevel + 1;
 
-	    at_your_feet("An object");
 	    /* not yet known spells given preference over already known ones */
 	    /* Also, try to grant a spell for which there is a skill slot */
 	    otmp = mkobj(SPBOOK_CLASS, TRUE);
@@ -1007,7 +1006,9 @@ pleased(g_align)
 		otmp->otyp = rnd_class(bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
 	    }
 	    bless(otmp);
+	    at_your_feet("A spellbook");
 	    place_object(otmp, u.ux, u.uy);
+	    newsym(u.ux, u.uy);
 	    break;
 	}
 	default:	impossible("Confused deity!");
@@ -1472,8 +1473,8 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		    if (otmp->spe < 0) otmp->spe = 0;
 		    if (otmp->cursed) uncurse(otmp);
 		    otmp->oerodeproof = TRUE;
-		    dropy(otmp);
 		    at_your_feet("An object");
+		    dropy(otmp);
 		    godvoice(u.ualign.type, "Use my gift wisely!");
 		    u.ugifts++;
 		    u.ublesscnt = rnz(300 + (50 * nartifacts));
