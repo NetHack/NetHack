@@ -598,6 +598,12 @@ boolean called;
 
 	buf[0] = 0;
 
+	/* unseen monsters, etc.  Use "it" */
+	if (do_it) {
+	    Strcpy(buf, "it");
+	    return buf;
+	}
+
 	/* priests and minions: don't even use this function */
 	if (mtmp->ispriest || mtmp->isminion) {
 	    char priestnambuf[BUFSZ];
@@ -614,12 +620,6 @@ boolean called;
 	    if (article == ARTICLE_NONE && !strncmp(name, "the ", 4))
 		name += 4;
 	    return strcpy(buf, name);
-	}
-
-	/* unseen monsters, etc.  Use "it" */
-	if (do_it) {
-	    Strcpy(buf, "it");
-	    return buf;
 	}
 
 	/* Shopkeepers: use shopkeeper name.  For normal shopkeepers, just
