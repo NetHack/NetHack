@@ -1595,8 +1595,7 @@ register struct attack *mattk;
 	    for (otmp = mdef->minvent; otmp; otmp = otmp->nobj)
 		(void) snuff_lit(otmp);
 
-	    if((!touch_petrifies(mdef->data) || Stone_resistance) &&
-		    (Unchanging || mdef->data != &mons[PM_GREEN_SLIME])) {
+	    if(!touch_petrifies(mdef->data) || Stone_resistance) {
 #ifdef LINT	/* static char msgbuf[BUFSZ]; */
 		char msgbuf[BUFSZ];
 #else
@@ -1658,6 +1657,14 @@ register struct attack *mattk;
 				nomul(-tmp);
 				nomovemsg = msgbuf;
 			    } else pline("%s", msgbuf);
+			    if (mdef->data == &mons[PM_GREEN_SLIME]) {
+				Sprintf(msgbuf, "%s isn't sitting well with you.",
+					The(mdef->data->mname));
+				if (!Unchanging) {
+					Slimed = 5L;
+					flags.botl = 1;
+				}
+			    } else
 			    exercise(A_CON, TRUE);
 			}
 			end_engulf();
