@@ -502,6 +502,12 @@ const struct Align aligns[] = {
 	{"evil",	"unaligned",	"Una",	0,		A_NONE}
 };
 
+/* Filters */
+static struct {
+	boolean roles[SIZE(roles)];
+	short mask;
+} filter;
+
 STATIC_DCL char * FDECL(promptsep, (char *, int));
 STATIC_DCL int FDECL(role_gendercount, (int));
 STATIC_DCL int FDECL(race_alignmentcount, (int));
@@ -773,6 +779,8 @@ int rolenum, racenum, gendnum, alignnum;
 	if (alignnum >= 0 && alignnum < ROLE_ALIGNS &&
 		!(allow & aligns[alignnum].allow & ROLE_ALIGNMASK))
 	    return FALSE;
+	if (filter.roles[rolenum])
+	    return FALSE;
 	return TRUE;
     } else {
 	for (i = 0; i < SIZE(roles)-1; i++) {
@@ -839,6 +847,8 @@ int rolenum, racenum, gendnum, alignnum;
 	if (alignnum >= 0 && alignnum < ROLE_ALIGNS &&
 		!(allow & aligns[alignnum].allow & ROLE_ALIGNMASK))
 	    return FALSE;
+	if (filter.mask & races[racenum].selfmask)
+	    return FALSE;
 	return TRUE;
     } else {
 	for (i = 0; i < SIZE(races)-1; i++) {
@@ -903,6 +913,8 @@ int rolenum, racenum, gendnum, alignnum;
 	if (racenum >= 0 && racenum < SIZE(races)-1 &&
 		!(allow & races[racenum].allow & ROLE_GENDMASK))
 	    return FALSE;
+	if (filter.mask & genders[gendnum].allow)
+	    return FALSE;
 	return TRUE;
     } else {
 	for (i = 0; i < ROLE_GENDERS; i++) {
@@ -964,6 +976,8 @@ int rolenum, racenum, gendnum, alignnum;
 	    return FALSE;
 	if (racenum >= 0 && racenum < SIZE(races)-1 &&
 		!(allow & races[racenum].allow & ROLE_ALIGNMASK))
+	    return FALSE;
+	if (filter.mask & aligns[alignnum].allow)
 	    return FALSE;
 	return TRUE;
     } else {
@@ -1042,6 +1056,26 @@ rigid_role_checks()
 	     flags.initgend = pick_gend(flags.initrole, flags.initrace,
 						flags.initalign, PICK_RIGID);
     }
+}
+
+boolean
+setrolefilter(bufp)
+char *bufp;
+{
+	int i;
+	boolean reslt = TRUE;
+
+	if ((i=str2role(bufp)) != ROLE_NONE && i != ROLE_RANDOM)
+		filter.roles[i] = TRUE;
+	else if ((i=str2race(bufp)) != ROLE_NONE && i != ROLE_RANDOM)
+		filter.mask |= races[i].selfmask;
+	else if ((i=str2gend(bufp)) != ROLE_NONE && i != ROLE_RANDOM)
+		filter.mask |= genders[i].allow;
+	else if ((i=str2align(bufp)) != ROLE_NONE && i != ROLE_RANDOM)
+		filter.mask |= aligns[i].allow;
+	else
+		reslt = FALSE;
+	return reslt;
 }
 
 #define BP_ALIGN	0

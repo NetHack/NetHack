@@ -441,7 +441,8 @@ STATIC_DCL int FDECL(feature_alert_opts, (char *, const char *));
 STATIC_DCL const char *FDECL(get_compopt_value, (const char *, char *));
 STATIC_DCL boolean FDECL(special_handling, (const char *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(warning_opts, (char *,const char *));
-STATIC_DCL void FDECL(duplicate_opt_detection, (const char *, int));
+STATIC_DCL boolean FDECL(duplicate_opt_detection, (const char *, int));
+STATIC_DCL void FDECL(complain_about_duplicate, (const char *, int));
 
 STATIC_OVL void FDECL(wc_set_font_name, (int, char *));
 STATIC_OVL int FDECL(wc_set_window_colors, (char *));
@@ -933,12 +934,40 @@ int on_or_off;
 	} 
 }
 
-STATIC_OVL void
-duplicate_opt_detection(opts, bool_or_comp)
+STATIC_OVL boolean
+duplicate_opt_detection(opts, iscompound)
 const char *opts;
-int bool_or_comp;	/* 0 == boolean option, 1 == compound */
+int iscompound;	/* 0 == boolean option, 1 == compound */
 {
 	int i, *optptr;
+	if (!iscompound && iflags.opt_booldup && initial && from_file) {
+	    for (i = 0; boolopt[i].name; i++) {
+		if (match_optname(opts, boolopt[i].name, 3, FALSE)) {
+			optptr = iflags.opt_booldup + i;
+			*optptr += 1;
+			if (*optptr > 1) return TRUE;
+			else return FALSE;
+		}
+	    }
+	} else if (iscompound && iflags.opt_compdup && initial && from_file) {
+	    for (i = 0; compopt[i].name; i++) {
+		if (match_optname(opts, compopt[i].name,
+				strlen(compopt[i].name), TRUE)) {
+			optptr = iflags.opt_compdup + i;
+			*optptr += 1;
+			if (*optptr > 1) return TRUE;
+			else return FALSE;
+		}
+	    }
+	}
+	return FALSE;
+}
+
+STATIC_OVL void
+complain_about_duplicate(opts, iscompound)
+const char *opts;
+int iscompound;		/* 0 == boolean option, 1 == compound */
+{
 #if defined(MAC)
 	/* the Mac has trouble dealing with the output of messages while
 	 * processing the config file.  That should get fixed one day.
@@ -946,35 +975,12 @@ int bool_or_comp;	/* 0 == boolean option, 1 == compound */
 	 */
 	return;
 #endif
-	if ((bool_or_comp == 0) && iflags.opt_booldup && initial && from_file) {
-	    for (i = 0; boolopt[i].name; i++) {
-		if (match_optname(opts, boolopt[i].name, 3, FALSE)) {
-			optptr = iflags.opt_booldup + i;
-			if (*optptr == 1) {
-			    raw_printf(
-				"\nWarning - Boolean option specified multiple times: %s.\n",
-					opts);
-			        wait_synch();
-			}
-			*optptr += 1;
-			break; /* don't match multiple options */
-		}
-	    }
-	} else if ((bool_or_comp == 1) && iflags.opt_compdup && initial && from_file) {
-	    for (i = 0; compopt[i].name; i++) {
-		if (match_optname(opts, compopt[i].name, strlen(compopt[i].name), TRUE)) {
-			optptr = iflags.opt_compdup + i;
-			if (*optptr == 1) {
-			    raw_printf(
-				"\nWarning - compound option specified multiple times: %s.\n",
-					compopt[i].name);
-			        wait_synch();
-			}
-			*optptr += 1;
-			break; /* don't match multiple options */
-		}
-	    }
-	}
+
+	raw_printf(
+		"\nWarning - %s option specified multiple times: %s.\n",
+		iscompound ? "compound" : "boolean", opts);
+	wait_synch();
+	return;
 }
 
 void
@@ -984,7 +990,7 @@ boolean tinitial, tfrom_file;
 {
 	register char *op;
 	unsigned num;
-	boolean negated;
+	boolean negated, duplicate;
 	int i;
 	const char *fullname;
 
@@ -1016,12 +1022,11 @@ boolean tinitial, tfrom_file;
 	if (match_optname(opts, "colour", 5, FALSE))
 		Strcpy(opts, "color");	/* fortunately this isn't longer */
 
-	if (!match_optname(opts, "subkeyvalue", 11, TRUE)) /* allow multiple */
-	duplicate_opt_detection(opts, 1);	/* 1 means compound opts */
-
 	/* special boolean options */
 
 	if (match_optname(opts, "female", 3, FALSE)) {
+		if (duplicate_opt_detection(opts,0))
+			complain_about_duplicate(opts,0);
 		if(!initial && flags.female == negated)
 			pline("That is not anatomically possible.");
 		else
@@ -1030,6 +1035,8 @@ boolean tinitial, tfrom_file;
 	}
 
 	if (match_optname(opts, "male", 4, FALSE)) {
+		if (duplicate_opt_detection(opts,0))
+			complain_about_duplicate(opts,0);
 		if(!initial && flags.female != negated)
 			pline("That is not anatomically possible.");
 		else
@@ -1047,8 +1054,115 @@ boolean tinitial, tfrom_file;
 
 	/* compound options */
 
+	/* This first batch can be duplicated if their values are negated */
+
+	/* align:string */
+	fullname = "align";
+	if (match_optname(opts, fullname, sizeof("align")-1, TRUE)) {
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+			boolean val_negated = FALSE;
+			while ((*op == '!') || !strncmpi(op, "no", 2)) {
+				if (*op == '!') op++; else op += 2;
+				val_negated = !val_negated;
+			}
+			if (val_negated) {
+				if (!setrolefilter(op))
+					badoption(opts);
+			} else {
+				if (duplicate_opt_detection(opts,1))
+					complain_about_duplicate(opts,1);
+				if ((flags.initalign = str2align(op)) == ROLE_NONE)
+					badoption(opts);
+			}
+		}
+		return;
+	}
+
+	/* role:string or character:string */
+	fullname = "role";
+	if (match_optname(opts, fullname, 4, TRUE) ||
+	    match_optname(opts, (fullname = "character"), 4, TRUE)) {
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+			boolean val_negated = FALSE;
+			while ((*op == '!') || !strncmpi(op, "no", 2)) {
+				if (*op == '!') op++; else op += 2;
+				val_negated = !val_negated;
+			}
+			if (val_negated) {
+				if (!setrolefilter(op))
+					badoption(opts);
+			} else {
+				if (duplicate_opt_detection(opts,1))
+					complain_about_duplicate(opts,1);
+				if ((flags.initrole = str2role(op)) == ROLE_NONE)
+					badoption(opts);
+				else  /* Backwards compatibility */
+					nmcpy(pl_character, op, PL_NSIZ);
+			}
+		}
+		return;
+	}
+
+	/* race:string */
+	fullname = "race";
+	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+			boolean val_negated = FALSE;
+			while ((*op == '!') || !strncmpi(op, "no", 2)) {
+				if (*op == '!') op++; else op += 2;
+				val_negated = !val_negated;
+			}
+			if (val_negated) {
+				if (!setrolefilter(op))
+					badoption(opts);
+			} else {
+				if (duplicate_opt_detection(opts,1))
+					complain_about_duplicate(opts,1);
+				if ((flags.initrace = str2race(op)) == ROLE_NONE)
+					badoption(opts);
+				else /* Backwards compatibility */
+					pl_race = *op;
+			}
+		}
+		return;
+	}
+
+	/* gender:string */
+	fullname = "gender";
+	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+			boolean val_negated = FALSE;
+			while ((*op == '!') || !strncmpi(op, "no", 2)) {
+				if (*op == '!') op++; else op += 2;
+				val_negated = !val_negated;
+			}
+			if (val_negated) {
+				if (!setrolefilter(op))
+					badoption(opts);
+			} else {
+				if (duplicate_opt_detection(opts,1))
+					complain_about_duplicate(opts,1);
+				if ((flags.initgend = str2gend(op)) == ROLE_NONE)
+					badoption(opts);
+				else
+					flags.female = flags.initgend;
+			}
+		}
+		return;
+	}
+
+	/* We always check for duplicates on the remaining compound options,
+	   although individual option processing can choose to complain or not */
+
+	duplicate = duplicate_opt_detection(opts,1);	/* 1 means check compounds */
+
 	fullname = "pettype";
 	if (match_optname(opts, fullname, 3, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if ((op = string_for_env_opt(fullname, opts, negated)) != 0) {
 		    if (negated) bad_negation(fullname, TRUE);
 		    else switch (*op) {
@@ -1076,6 +1190,7 @@ boolean tinitial, tfrom_file;
 
 	fullname = "catname";
 	if (match_optname(opts, fullname, 3, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(catname, op, PL_PSIZ);
@@ -1084,6 +1199,7 @@ boolean tinitial, tfrom_file;
 
 	fullname = "dogname";
 	if (match_optname(opts, fullname, 3, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(dogname, op, PL_PSIZ);
@@ -1092,6 +1208,7 @@ boolean tinitial, tfrom_file;
 
 	fullname = "horsename";
 	if (match_optname(opts, fullname, 5, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(horsename, op, PL_PSIZ);
@@ -1101,6 +1218,7 @@ boolean tinitial, tfrom_file;
 	fullname = "number_pad";
 	if (match_optname(opts, fullname, 10, TRUE)) {
 		boolean compat = (strlen(opts) <= 10);
+		if (duplicate) complain_about_duplicate(opts,1);
 		number_pad(iflags.num_pad ? 1 : 0);
 		op = string_for_opt(opts, (compat || !initial));
 		if (!op) {
@@ -1129,6 +1247,7 @@ boolean tinitial, tfrom_file;
 
 	fullname = "runmode";
 	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 			flags.runmode = RUN_TPORT;
 		} else if ((op = string_for_opt(opts, FALSE)) != 0) {
@@ -1148,6 +1267,7 @@ boolean tinitial, tfrom_file;
 
 	fullname = "msghistory";
 	if (match_optname(opts, fullname, 3, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_env_opt(fullname, opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.msg_history = negated ? 0 : atoi(op);
@@ -1161,6 +1281,7 @@ boolean tinitial, tfrom_file;
 	/* allow option to be silently ignored by non-tty ports */
 #ifdef TTY_GRAPHICS
 		int tmp;
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (!(op = string_for_opt(opts, TRUE))) {
 		    tmp = negated ? 's' : 'f';
 		} else {
@@ -1228,6 +1349,7 @@ boolean tinitial, tfrom_file;
 				badoption(opts);
 				return;
 			}
+			if (duplicate) complain_about_duplicate(opts,1);
 			if (opttype > 0 && !negated &&
 			    (op = string_for_opt(opts, FALSE)) != 0) {
 			    switch(opttype)  {
@@ -1270,6 +1392,7 @@ boolean tinitial, tfrom_file;
 							) {
 	    int color_number, color_incr;
 
+	    if (duplicate) complain_about_duplicate(opts,1);
 # ifdef MAC
 	    if (match_optname(opts, "hicolor", 3, TRUE)) {
 		if (negated) {
@@ -1339,6 +1462,7 @@ boolean tinitial, tfrom_file;
 
 	if (match_optname(opts, "fruit", 2, TRUE)) {
 		char empty_str = '\0';
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if (negated) {
 		    if (op) {
@@ -1380,24 +1504,28 @@ goodfruit:
 	/* graphics:string */
 	fullname = "graphics";
 	if (match_optname(opts, fullname, 2, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else graphics_opts(opts, fullname, MAXPCHARS, 0);
 		return;
 	}
 	fullname = "dungeon";
 	if (match_optname(opts, fullname, 2, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else graphics_opts(opts, fullname, MAXDCHARS, 0);
 		return;
 	}
 	fullname = "traps";
 	if (match_optname(opts, fullname, 2, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else graphics_opts(opts, fullname, MAXTCHARS, MAXDCHARS);
 		return;
 	}
 	fullname = "effects";
 	if (match_optname(opts, fullname, 2, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else
 		 graphics_opts(opts, fullname, MAXECHARS, MAXDCHARS+MAXTCHARS);
@@ -1409,6 +1537,7 @@ goodfruit:
 	if (match_optname(opts, fullname, 7, TRUE)) {
 		int length;
 
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 		    bad_negation(fullname, FALSE);
 		    return;
@@ -1440,6 +1569,7 @@ goodfruit:
 	if (match_optname(opts, fullname, 8, TRUE)) {
 		int length;
 
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 		    bad_negation(fullname, FALSE);
 		    return;
@@ -1459,6 +1589,7 @@ goodfruit:
 	}
 	fullname = "warnings";
 	if (match_optname(opts, fullname, 5, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else warning_opts(opts, fullname);
 		return;
@@ -1467,6 +1598,7 @@ goodfruit:
 	fullname = "boulder";
 	if (match_optname(opts, fullname, 7, TRUE)) {
 		int clash = 0;
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 		    bad_negation(fullname, FALSE);
 		    return;
@@ -1498,55 +1630,17 @@ goodfruit:
 	/* name:string */
 	fullname = "name";
 	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(plname, op, PL_NSIZ);
 		return;
 	}
 
-	/* role:string or character:string */
-	fullname = "role";
-	if (match_optname(opts, fullname, 4, TRUE) ||
-	    match_optname(opts, (fullname = "character"), 4, TRUE)) {
-		if (negated) bad_negation(fullname, FALSE);
-		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-			if ((flags.initrole = str2role(op)) == ROLE_NONE)
-				badoption(opts);
-			else  /* Backwards compatibility */
-				nmcpy(pl_character, op, PL_NSIZ);
-		}
-		return;
-	}
-
-	/* race:string */
-	fullname = "race";
-	if (match_optname(opts, fullname, 4, TRUE)) {
-		if (negated) bad_negation(fullname, FALSE);
-		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-			if ((flags.initrace = str2race(op)) == ROLE_NONE)
-				badoption(opts);
-			else /* Backwards compatibility */
-				pl_race = *op;
-		}
-		return;
-	}
-
-	/* gender:string */
-	fullname = "gender";
-	if (match_optname(opts, fullname, 4, TRUE)) {
-		if (negated) bad_negation(fullname, FALSE);
-		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-			if ((flags.initgend = str2gend(op)) == ROLE_NONE)
-				badoption(opts);
-			else
-				flags.female = flags.initgend;
-		}
-		return;
-	}
-
 	/* altkeyhandler:string */
 	fullname = "altkeyhandler";
 	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, negated))) {
 #ifdef WIN32CON
@@ -1580,6 +1674,7 @@ goodfruit:
 	 * align_message:[left|top|right|bottom] */
 	fullname = "align_message";
 	if (match_optname(opts, fullname, sizeof("align_message")-1, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if (op && !negated) {
 		    if (!strncmpi (op, "left", sizeof("left")-1))
@@ -1595,19 +1690,10 @@ goodfruit:
 		} else if (negated) bad_negation(fullname, TRUE);
 		return;
 	}
-	/* align:string */
-	fullname = "align";
-	if (match_optname(opts, fullname, sizeof("align")-1, TRUE)) {
-		if (negated) bad_negation(fullname, FALSE);
-		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
-			if ((flags.initalign = str2align(op)) == ROLE_NONE)
-				badoption(opts);
-		return;
-	}
-
 	/* the order to list the pack */
 	fullname = "packorder";
 	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 		    bad_negation(fullname, FALSE);
 		    return;
@@ -1621,6 +1707,7 @@ goodfruit:
 	/* maximum burden picked up before prompt (Warren Cheung) */
 	fullname = "pickup_burden";
 	if (match_optname(opts, fullname, 8, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 			bad_negation(fullname, FALSE);
 			return;
@@ -1665,6 +1752,7 @@ goodfruit:
 		int oc_sym;
 		boolean badopt = FALSE, compat = (strlen(opts) <= 6), use_menu;
 
+		if (duplicate) complain_about_duplicate(opts,1);
 		oc_to_str(flags.pickup_types, tbuf);
 		flags.pickup_types[0] = '\0';	/* all */
 		op = string_for_opt(opts, (compat || !initial));
@@ -1722,6 +1810,7 @@ goodfruit:
 	 * player_selection: dialog | prompts */
 	fullname = "player_selection";
 	if (match_optname(opts, fullname, sizeof("player_selection")-1, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if (op && !negated) {
 		    if (!strncmpi (op, "dialog", sizeof("dialog")-1))
@@ -1759,6 +1848,7 @@ goodfruit:
 		boolean badopt = FALSE;
 		int idx, prefix_val;
 
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, TRUE);
 		if (op && negated) {
 			bad_negation("disclose", TRUE);
@@ -1815,6 +1905,7 @@ goodfruit:
 
 	/* scores:5t[op] 5a[round] o[wn] */
 	if (match_optname(opts, "scores", 4, TRUE)) {
+	    if (duplicate) complain_about_duplicate(opts,1);
 	    if (negated) {
 		bad_negation("scores", FALSE);
 		return;
@@ -1854,6 +1945,7 @@ goodfruit:
 
 	fullname = "suppress_alert";
 	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if (negated) bad_negation(fullname, FALSE);
 		else if (op) (void) feature_alert_opts(op,fullname);
@@ -1865,6 +1957,7 @@ goodfruit:
 	fullname = "videocolors";
 	if (match_optname(opts, fullname, 6, TRUE) ||
 	    match_optname(opts, "videocolours", 10, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 			bad_negation(fullname, FALSE);
 			return;
@@ -1879,6 +1972,7 @@ goodfruit:
 	/* videoshades:string */
 	fullname = "videoshades";
 	if (match_optname(opts, fullname, 6, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 			bad_negation(fullname, FALSE);
 			return;
@@ -1896,6 +1990,7 @@ goodfruit:
 	/* video:string -- must be after longer tests */
 	fullname = "video";
 	if (match_optname(opts, fullname, 5, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 			bad_negation(fullname, FALSE);
 			return;
@@ -1911,6 +2006,7 @@ goodfruit:
 	/* soundcard:string -- careful not to match boolean 'sound' */
 	fullname = "soundcard";
 	if (match_optname(opts, fullname, 6, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 			bad_negation(fullname, FALSE);
 			return;
@@ -1929,6 +2025,7 @@ goodfruit:
 			ascii16x12|ascii12x16|ascii10x18|fit_to_screen] */
 	fullname = "map_mode";
 	if (match_optname(opts, fullname, sizeof("map_mode")-1, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if (op && !negated) {
 		    if (!strncmpi (op, "tiles", sizeof("tiles")-1))
@@ -1962,6 +2059,7 @@ goodfruit:
 	 * scroll_amount:nn */
 	fullname = "scroll_amount";
 	if (match_optname(opts, fullname, sizeof("scroll_amount")-1, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.wc_scroll_amount = negated ? 1 : atoi(op);
@@ -1972,6 +2070,7 @@ goodfruit:
 	 * scroll_margin:nn */
 	fullname = "scroll_margin";
 	if (match_optname(opts, fullname, sizeof("scroll_margin")-1, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.wc_scroll_margin = negated ? 5 : atoi(op);
@@ -1980,6 +2079,7 @@ goodfruit:
 	}
 	fullname = "subkeyvalue";
 	if (match_optname(opts, fullname, 5, TRUE)) {
+		/* no duplicate complaint here */
 		if (negated) bad_negation(fullname, FALSE);
 		else {
 #if defined(WIN32CON)
@@ -1993,6 +2093,7 @@ goodfruit:
 	 * tile_width:nn */
 	fullname = "tile_width";
 	if (match_optname(opts, fullname, sizeof("tile_width")-1, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.wc_tile_width = negated ? 0 : atoi(op);
@@ -2003,6 +2104,7 @@ goodfruit:
 	 * tile_file:name */
 	fullname = "tile_file";
 	if (match_optname(opts, fullname, sizeof("tile_file")-1, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if ((op = string_for_opt(opts, FALSE)) != 0) {
 			if (iflags.wc_tile_file) free(iflags.wc_tile_file);
 			iflags.wc_tile_file = (char *)alloc(strlen(op) + 1);
@@ -2014,6 +2116,7 @@ goodfruit:
 	 * tile_height:nn */
 	fullname = "tile_height";
 	if (match_optname(opts, fullname, sizeof("tile_height")-1, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.wc_tile_height = negated ? 0 : atoi(op);
@@ -2024,6 +2127,7 @@ goodfruit:
 	 * vary_msgcount:nn */
 	fullname = "vary_msgcount";
 	if (match_optname(opts, fullname, sizeof("vary_msgcount")-1, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.wc_vary_msgcount = negated ? 0 : atoi(op);
@@ -2032,6 +2136,7 @@ goodfruit:
 	}
 	fullname = "windowtype";
 	if (match_optname(opts, fullname, 3, TRUE)) {
+	    if (duplicate) complain_about_duplicate(opts,1);
 	    if (negated) {
 		bad_negation(fullname, FALSE);
 		return;
@@ -2049,6 +2154,7 @@ goodfruit:
          */
 	fullname = "windowcolors";
 	if (match_optname(opts, fullname, 7, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if ((op = string_for_opt(opts, FALSE)) != 0) {
 			if (!wc_set_window_colors(op))
 				badoption(opts);
@@ -2061,6 +2167,7 @@ goodfruit:
 		int tmp;
 		boolean val_required = (strlen(opts) > 5 && !negated);
 
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (!(op = string_for_opt(opts, !val_required))) {
 		    if (val_required) return; /* string_for_opt gave feedback */
 		    tmp = negated ? 'n' : 'f';
@@ -2089,6 +2196,7 @@ goodfruit:
 
 	fullname = "menu_headings";
 	if (match_optname(opts, fullname, 12, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) {
 			bad_negation(fullname, FALSE);
 			return;
@@ -2110,6 +2218,7 @@ goodfruit:
 	/* check for menu command mapping */
 	for (i = 0; i < NUM_MENU_CMDS; i++) {
 	    fullname = default_menu_cmd_info[i].name;
+	    if (duplicate) complain_about_duplicate(opts,1);
 	    if (match_optname(opts, fullname, (int)strlen(fullname), TRUE)) {
 		if (negated)
 		    bad_negation(fullname, FALSE);
@@ -2142,6 +2251,7 @@ goodfruit:
 #if defined(STATUS_VIA_WINDOWPORT) && defined(STATUS_HILITES)
 	/* hilite fields in status prompt */
 	if (match_optname(opts, "hilite_status", 13, TRUE)) {
+		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, TRUE);
 		if (op && negated) {
 			clear_status_hilites();
@@ -2176,7 +2286,9 @@ goodfruit:
 
 			*(boolopt[i].addr) = !negated;
 
-			duplicate_opt_detection(boolopt[i].name, 0);
+			/* 0 means boolean opts */
+			if (duplicate_opt_detection(boolopt[i].name, 0))
+			    complain_about_duplicate(boolopt[i].name,0);
 
 #if defined(TERMLIB) || defined(ASCIIGRAPH) || defined(MAC_GRAPHICS_ENV)
 			if (FALSE

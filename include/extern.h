@@ -1802,6 +1802,7 @@ E const char *FDECL(Hello, (struct monst *));
 E const char *NDECL(Goodbye);
 E char *FDECL(build_plselection_prompt, (char *, int, int, int, int, int));
 E char *FDECL(root_plselection_prompt, (char *, int, int, int, int, int));
+E boolean FDECL(setrolefilter, (char *));
 
 /* ### rumors.c ### */
 
