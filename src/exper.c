@@ -74,7 +74,7 @@ experience(mtmp, nk)	/* return # of exp points for mtmp after nk killed */
 	    if(tmp2 > AD_PHYS && tmp2 < AD_BLND) tmp += 2*mtmp->m_lev;
 	    else if((tmp2 == AD_DRLI) || (tmp2 == AD_STON) ||
 	    		(tmp2 == AD_SLIM)) tmp += 50;
-	    else if(tmp != AD_PHYS) tmp += mtmp->m_lev;
+	    else if(tmp2 != AD_PHYS) tmp += mtmp->m_lev;
 		/* extra heavy damage bonus */
 	    if((int)(ptr->mattk[i].damd * ptr->mattk[i].damn) > 23)
 		tmp += mtmp->m_lev;
