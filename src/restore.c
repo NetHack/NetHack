@@ -30,6 +30,7 @@ STATIC_DCL boolean FDECL(restgamestate, (int, unsigned int *, unsigned int *));
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
 STATIC_DCL int FDECL(restlevelfile, (int,XCHAR_P));
 STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
+STATIC_DCL struct obj *FDECL(gold_in, (struct obj *));
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -269,6 +270,9 @@ boolean ghostly;
 			/* restore monster back pointer */
 			for (obj = mtmp->minvent; obj; obj = obj->nobj)
 				obj->ocarry = mtmp;
+#ifndef GOLDOBJ
+			put_gold_back(&mtmp->minvent, &mtmp->mgold);
+#endif
 		}
 		if (mtmp->mw) {
 			struct obj *obj;
@@ -388,6 +392,9 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	restore_timers(fd, RANGE_GLOBAL, FALSE, 0L);
 	restore_light_sources(fd);
 	invent = restobjchn(fd, FALSE, FALSE);
+#ifndef GOLDOBJ
+	put_gold_back(&invent, &u.ugold);
+#endif
 	migrating_objs = restobjchn(fd, FALSE, FALSE);
 	migrating_mons = restmonchn(fd, FALSE);
 	mread(fd, (genericptr_t) mvitals, sizeof(mvitals));
@@ -1073,5 +1080,39 @@ register unsigned int len;
 	}
 }
 #endif /* ZEROCOMP */
+#ifndef GOLDOBJ
+/*
+ * Takes all of the gold objects out of the invent or
+ * mtmp->minvent chain and puts it into either
+ * u.ugold or mtmp->mgold.
+ */
+void
+put_gold_back(head_ptr, goldptr)
+struct obj **head_ptr;
+long *goldptr;
+{
+	struct obj *goldobj;
+	long gld = 0L;
+
+	while ((goldobj = gold_in(*head_ptr))) {
+		gld += goldobj->quan;
+		extract_nobj(goldobj, head_ptr);
+		dealloc_obj(goldobj);
+	}
+	if (gld) *goldptr += gld;
+}
+
+STATIC_OVL struct obj *
+gold_in(chn)
+struct obj *chn;
+{
+	struct obj *otmp;
+
+	for(otmp = chn; otmp; otmp = otmp->nobj)
+		if(otmp->otyp == GOLD_PIECE)
+			return(otmp);
+	return((struct obj *) 0);
+}
+#endif /*GOLDOBJ*/
 
 /*restore.c*/

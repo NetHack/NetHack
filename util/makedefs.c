@@ -409,7 +409,9 @@ do_rumors()
 /*
  * Use this to explicitly mask out features during version checks.
  */
-#define IGNORED_FEATURES	( 0L )
+#define IGNORED_FEATURES	( 0L \
+				| (1L << 12)	/* GOLDOBJ */ \
+				)
 
 static void
 make_version()

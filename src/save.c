@@ -280,6 +280,16 @@ register int fd, mode;
 	uid = getuid();
 	bwrite(fd, (genericptr_t) &uid, sizeof uid);
 	bwrite(fd, (genericptr_t) &flags, sizeof(struct flag));
+#ifndef GOLDOBJ
+	if (u.ugold) {
+		struct obj *goldobj = mksobj(GOLD_PIECE, FALSE, FALSE);
+		goldobj->quan = u.ugold;
+		goldobj->where = OBJ_INVENT;
+		u.ugold = 0L;
+		goldobj->nobj = invent;
+		invent = goldobj;
+	}
+#endif
 	bwrite(fd, (genericptr_t) &u, sizeof(struct you));
 
 	/* must come before migrating_objs and migrating_mons are freed */
@@ -287,6 +297,10 @@ register int fd, mode;
 	save_light_sources(fd, mode, RANGE_GLOBAL);
 
 	saveobjchn(fd, invent, mode);
+#ifndef GOLDOBJ
+	if (!release_data(mode))
+		put_gold_back(&invent, &u.ugold);
+#endif
 	saveobjchn(fd, migrating_objs, mode);
 	savemonchn(fd, migrating_mons, mode);
 	if (release_data(mode)) {
@@ -881,10 +895,25 @@ register struct monst *mtmp;
 		mtmp->mnum = monsndx(mtmp->data);
 		xl = mtmp->mxlth + mtmp->mnamelth;
 		bwrite(fd, (genericptr_t) &xl, sizeof(int));
+#ifndef GOLDOBJ
+		if (mtmp->mgold) {
+			struct obj *goldobj = mksobj(GOLD_PIECE, FALSE, FALSE);
+			goldobj->quan = mtmp->mgold;
+			goldobj->ocarry = mtmp;
+			goldobj->where = OBJ_MINVENT;
+			mtmp->mgold = 0L;
+			goldobj->nobj = mtmp->minvent;
+			mtmp->minvent = goldobj;
+		}
+#endif
 		bwrite(fd, (genericptr_t) mtmp, xl + sizeof(struct monst));
 	    }
 	    if (mtmp->minvent)
 		saveobjchn(fd,mtmp->minvent,mode);
+#ifndef GOLDOBJ
+	    if (!release_data(mode))
+		put_gold_back(&mtmp->minvent, &mtmp->mgold);
+#endif
 	    if (release_data(mode))
 		dealloc_monst(mtmp);
 	    mtmp = mtmp2;

@@ -1672,6 +1672,9 @@ E int FDECL(mread, (int,genericptr_t,unsigned int));
 #else
 E void FDECL(mread, (int,genericptr_t,unsigned int));
 #endif
+#ifndef GOLDOBJ
+E void FDECL(put_gold_back, (struct obj **,long *));
+#endif
 
 /* ### rip.c ### */
 
