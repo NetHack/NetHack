@@ -1333,8 +1333,12 @@ int style;
 		    }
 		    if (otyp == BOULDER &&
 		       (otmp2 = sobj_at(BOULDER, bhitpos.x, bhitpos.y)) != 0) {
-			char *bmsg =
-				" as one boulder sets another in motion";
+			char *bmsg = " as one boulder sets another in motion";
+
+			if (!isok(bhitpos.x + dx, bhitpos.y + dy) || !dist ||
+			    IS_ROCK(levl[bhitpos.x + dx][bhitpos.y + dy].typ))
+			    bmsg = " as one boulder hits another";
+			    
 		    	You_hear("a loud crash%s!",
 				cansee(bhitpos.x, bhitpos.y) ? bmsg : "");
 			obj_extract_self(otmp2);
