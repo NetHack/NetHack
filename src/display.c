@@ -681,6 +681,8 @@ newsym(x,y)
 		/* also gets rid of any invisibility glyph */
 		display_monster(x, y, mon, see_it ? PHYSICALLY_SEEN : DETECTED, worm_tail);
 	    }
+	    else if (mon && mon_warning(mon) && !is_worm_tail(mon))
+	        display_warning(mon);
 	    else if (glyph_is_invisible(levl[x][y].glyph))
 		map_invisible(x, y);
 	    else
