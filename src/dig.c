@@ -212,7 +212,8 @@ dig()
 	register struct rm *lev;
 	register xchar dpx = digging.pos.x, dpy = digging.pos.y;
 	register boolean ispick = uwep && is_pick(uwep);
-	const char *verb = (!uwep || is_pick(uwep)) ? "dig into" : "chop";
+	const char *verb =
+	    (!uwep || is_pick(uwep)) ? "dig into" : "chop through";
 
 	lev = &levl[dpx][dpy];
 	/* perhaps a nymph stole your pick-axe while you were busy digging */
