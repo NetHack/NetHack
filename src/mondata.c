@@ -370,8 +370,19 @@ int
 max_passive_dmg(mdef, magr)
     register struct monst *mdef, *magr;
 {
-    int	i, dmg = 0;
+    int	i, dmg = 0, multi = 0;
     uchar adtyp;
+
+    /* each attack by magr can result in passive damage */
+    for(i = 0; i < NATTK; i++)
+	switch (magr->data->mattk[i].aatyp) {
+	case AT_CLAW: case AT_BITE: case AT_KICK: case AT_BUTT: case AT_TUCH:
+	case AT_STNG: case AT_HUGS: case AT_ENGL: case AT_TENT: case AT_WEAP:
+	    multi++;
+	    break;
+	default:
+	    break;
+	}
 
     for(i = 0; i < NATTK; i++)
 	if(mdef->data->mattk[i].aatyp == AT_NONE ||
@@ -387,7 +398,7 @@ max_passive_dmg(mdef, magr)
 		dmg *= mdef->data->mattk[i].damd;
 	    } else dmg = 0;
 
-	    return dmg;
+	    return dmg * multi;
 	}
     return 0;
 }
