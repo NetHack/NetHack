@@ -1329,9 +1329,7 @@ boolean pick;
 stillinwater:;
 	if (!Levitation && !u.ustuck && !Flying) {
 	    /* limit recursive calls through teleds() */
-	    if(is_lava(u.ux,u.uy) && lava_effects())
-		    return;
-	    if (is_pool(u.ux, u.uy)) {
+	    if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) {
 #ifdef STEED
 		if (u.usteed && !is_flyer(u.usteed->data) &&
 			!is_floater(u.usteed->data) &&
@@ -1343,7 +1341,9 @@ stillinwater:;
 			pick = FALSE;
 		} else
 #endif
-		if (!Wwalking && drown())
+		if (is_lava(u.ux, u.uy)) {
+		    if (lava_effects()) return;
+		} else if (!Wwalking && drown())
 		    return;
 	    }
 	}
