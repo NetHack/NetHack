@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.4	2002/04/06	*/
+/*	SCCS Id: @(#)mondata.c	3.4	2002/12/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -662,6 +662,17 @@ const char *def;
 		def
 	       );
 
+}
+
+/* return a phrase describing the effect of fire attack on a type of monster */
+const char *
+on_fire(mptr, mattk)
+struct permonst *mptr;
+struct attack *mattk;
+{
+    return (mptr == &mons[PM_WATER_ELEMENTAL]) ? "boiling" :
+	   (mptr == &mons[PM_FLAMING_SPHERE]) ? "already on fire" :
+	   (mattk->aatyp == AT_HUGS) ? "being roasted" : "on fire";
 }
 
 #endif /* OVLB */

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2002/10/17	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2002/12/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -914,13 +914,7 @@ hitmu(mtmp, mattk)
 	    case AD_FIRE:
 		hitmsg(mtmp, mattk);
 		if (uncancelled) {
-		    pline("You're %s!",
-			  youmonst.data == &mons[PM_WATER_ELEMENTAL] ?
-				"boiling" :
-			  youmonst.data == &mons[PM_FLAMING_SPHERE] ?
-				"already on fire" :
-			  mattk->aatyp == AT_HUGS ? "being roasted" :
-			  "on fire");
+		    pline("You're %s!", on_fire(youmonst.data, mattk));
 		    if (youmonst.data == &mons[PM_STRAW_GOLEM] ||
 		        youmonst.data == &mons[PM_PAPER_GOLEM]) {
 			    You("roast!");

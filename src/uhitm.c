@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2002/11/29	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2002/12/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1251,11 +1251,7 @@ register struct attack *mattk;
 	    case AD_FIRE:
 		if (!Blind)
 		    pline("%s is %s!", Monnam(mdef),
-			  mdef->data == &mons[PM_WATER_ELEMENTAL] ? "boiling" :
-			  mdef->data == &mons[PM_FLAMING_SPHERE] ?
-				"already on fire" :
-			  mattk->aatyp == AT_HUGS ?
-				"being roasted" : "on fire");
+			  on_fire(mdef->data, mattk));
 		if (pd == &mons[PM_STRAW_GOLEM] ||
 		    pd == &mons[PM_PAPER_GOLEM]) {
 		    if (!Blind)
