@@ -60,7 +60,7 @@ LINK32=link.exe
 OutDir=.\Release
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
-PostBuild_Cmds=copy $(OutDir)\NetHackW.exe ..\binary \
+PostBuild_Cmds=copy $(OutDir)\NetHackW.exe ..\binary	\
 copy ..\dat\nhdat ..\binary	\
 copy ..\dat\license ..\binary	\
 if exist tiles.bmp copy tiles.bmp ..\binary	\
@@ -101,7 +101,7 @@ OutDir=.\Debug
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
 PostBuild_Cmds=if NOT exist ..\binary\*.* mkdir ..\binary	\
-copy $(OutDir)\NetHackW.exe ..\binary \
+copy $(OutDir)\NetHackW.exe ..\binary	\
 copy ..\dat\nhdat ..\binary	\
 copy ..\dat\license ..\binary	\
 if exist tiles.bmp copy tiles.bmp ..\binary	\
