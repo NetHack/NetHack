@@ -783,6 +783,7 @@ struct attack *mattk;
 	    if (obj->greased && !rn2(2)) {
 		pline_The("grease wears off.");
 		obj->greased = 0;
+		update_inventory();
 	    }
 	    return TRUE;
 	}
