@@ -55,6 +55,34 @@ char *argv[];
 #endif
 	boolean exact_username;
 
+#if defined(__APPLE__)
+	/* special hack to change working directory to a resource fork when
+	   running from finder --sam */
+#define MAC_PATH_VALUE ".app/Contents/MacOS/"
+	char mac_cwd[1024], *mac_exe = argv[0], *mac_tmp;
+	int arg0_len = strlen(mac_exe), mac_tmp_len;
+	getcwd(mac_cwd, 1024);
+	if(mac_exe[0] == '/' && !strcmp(mac_cwd, "/")) {
+	    if((mac_exe = strrchr(mac_exe, '/')))
+		mac_exe++;
+	    else
+		mac_exe = argv[0];
+	    mac_tmp_len = (strlen(mac_exe) * 2) + strlen(MAC_PATH_VALUE);
+	    if(mac_tmp_len <= arg0_len) {
+		mac_tmp = malloc(mac_tmp_len + 1);
+		sprintf(mac_tmp, "%s%s%s", mac_exe, MAC_PATH_VALUE, mac_exe);
+		if(!strcmp(argv[0] + (arg0_len - mac_tmp_len), mac_tmp)) {
+		    if(arg0_len - mac_tmp_len > mac_tmp_len - 1)
+			mac_tmp = realloc(mac_tmp, arg0_len - mac_tmp_len);
+		    strncpy(mac_tmp, argv[0], arg0_len - mac_tmp_len);
+		    mac_tmp[arg0_len - mac_tmp_len] = '\0';
+		    chdir(mac_tmp);
+		}
+		free(mac_tmp);
+	    }
+	}
+#endif
+
 	hname = argv[0];
 	hackpid = getpid();
 	(void) umask(0777 & ~FCMASK);
