@@ -3369,6 +3369,7 @@ register int fall;
 		if ((obj->owornmask & ~(W_SWAPWEP|W_QUIVER)) != 0 ||
 			(obj == uswapwep && u.twoweap) ||
 			(obj->otyp == LEASH && obj->leashmon)) continue;
+		setnotworn(obj);
 		freeinv(obj);
 		subfrombill(obj, shkp);
 		(void) add_to_minv(shkp, obj);	/* may free obj */
