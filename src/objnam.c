@@ -1602,9 +1602,10 @@ struct alt_spellings {
  * return null.
  */
 struct obj *
-readobjnam(bp, no_wish)
+readobjnam(bp, no_wish, noisy)
 register char *bp;
 struct obj *no_wish;
+boolean noisy;
 {
 	register char *p;
 	register int i;
@@ -1944,7 +1945,8 @@ struct obj *no_wish;
 						) cnt=5000;
 		if (cnt < 1) cnt=1;
 #ifndef GOLDOBJ
-		pline("%d gold piece%s.", cnt, plur(cnt));
+		if (noisy)
+		    pline("%d gold piece%s.", cnt, plur(cnt));
 		u.ugold += cnt;
 		flags.botl=1;
 		return (&zeroobj);
@@ -2162,7 +2164,8 @@ srch:
 				if((trap == TRAPDOOR || trap == HOLE)
 				      && !Can_fall_thru(&u.uz)) trap = ROCKTRAP;
 				(void) maketrap(u.ux, u.uy, trap);
-				pline("%s.", An(tname));
+				if (noisy)
+				    pline("%s.", An(tname));
 				return(&zeroobj);
 			}
 		}
@@ -2173,14 +2176,16 @@ srch:
 			level.flags.nfountains++;
 			if(!strncmpi(bp, "magic ", 6))
 				levl[u.ux][u.uy].blessedftn = 1;
-			pline("A %sfountain.",
+			if (noisy)
+			    pline("A %sfountain.",
 			      levl[u.ux][u.uy].blessedftn ? "magic " : "");
 			newsym(u.ux, u.uy);
 			return(&zeroobj);
 		}
 		if(!BSTRCMP(bp, p-6, "throne")) {
 			levl[u.ux][u.uy].typ = THRONE;
-			pline("A throne.");
+			if (noisy)
+			    pline("A throne.");
 			newsym(u.ux, u.uy);
 			return(&zeroobj);
 		}
@@ -2188,7 +2193,8 @@ srch:
 		if(!BSTRCMP(bp, p-4, "sink")) {
 			levl[u.ux][u.uy].typ = SINK;
 			level.flags.nsinks++;
-			pline("A sink.");
+			if (noisy)
+			    pline("A sink.");
 			newsym(u.ux, u.uy);
 			return &zeroobj;
 		}
@@ -2196,7 +2202,8 @@ srch:
 		if(!BSTRCMP(bp, p-4, "pool")) {
 			levl[u.ux][u.uy].typ = POOL;
 			del_engr_at(u.ux, u.uy);
-			pline("A pool.");
+			if (noisy)
+			    pline("A pool.");
 			/* Must manually make kelp! */
 			water_damage(level.objects[u.ux][u.uy], FALSE, TRUE);
 			newsym(u.ux, u.uy);
@@ -2205,7 +2212,8 @@ srch:
 		if (!BSTRCMP(bp, p-4, "lava")) {  /* also matches "molten lava" */
 			levl[u.ux][u.uy].typ = LAVAPOOL;
 			del_engr_at(u.ux, u.uy);
-			pline("A pool of molten lava.");
+			if (noisy)
+			    pline("A pool of molten lava.");
 			if (!(Levitation || Flying)) (void) lava_effects();
 			newsym(u.ux, u.uy);
 			return &zeroobj;
@@ -2226,21 +2234,24 @@ srch:
 		    else /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
 			al = (!rn2(6)) ? A_NONE : rn2((int)A_LAWFUL+2) - 1;
 		    levl[u.ux][u.uy].altarmask = Align2amask( al );
-		    pline("%s altar.", An(align_str(al)));
+		    if (noisy)
+			pline("%s altar.", An(align_str(al)));
 		    newsym(u.ux, u.uy);
 		    return(&zeroobj);
 		}
 
 		if(!BSTRCMP(bp, p-5, "grave") || !BSTRCMP(bp, p-9, "headstone")) {
 		    make_grave(u.ux, u.uy, (char *) 0);
-		    pline("A grave.");
+		    if (noisy)
+			pline("A grave.");
 		    newsym(u.ux, u.uy);
 		    return(&zeroobj);
 		}
 
 		if(!BSTRCMP(bp, p-4, "tree")) {
 		    levl[u.ux][u.uy].typ = TREE;
-		    pline("A tree.");
+		    if (noisy)
+			pline("A tree.");
 		    newsym(u.ux, u.uy);
 		    block_point(u.ux, u.uy);
 		    return &zeroobj;
@@ -2248,7 +2259,8 @@ srch:
 
 		if(!BSTRCMP(bp, p-4, "bars")) {
 		    levl[u.ux][u.uy].typ = IRONBARS;
-		    pline("Iron bars.");
+		    if (noisy)
+			pline("Iron bars.");
 		    newsym(u.ux, u.uy);
 		    return &zeroobj;
 		}
@@ -2543,8 +2555,9 @@ typfnd:
 	    artifact_exists(otmp, ONAME(otmp), FALSE);
 	    obfree(otmp, (struct obj *) 0);
 	    otmp = &zeroobj;
-	    pline(
-	     "For a moment, you feel %s in your %s, but it disappears!",
+	    if (noisy)
+		pline(
+		  "For a moment, you feel %s in your %s, but it disappears!",
 		  something,
 		  makeplural(body_part(HAND)));
 	}

@@ -1676,7 +1676,7 @@ read_wizkit()
 	while (fgets(buf, 4*BUFSZ, fp)) {
 		if ((ep = index(buf, '\n'))) *ep = '\0';
 		if (buf[0]) {
-			otmp = readobjnam(buf, (struct obj *)0);
+			otmp = readobjnam(buf, (struct obj *)0, FALSE);
 			if (otmp) {
 			    if (otmp != &zeroobj)
 				otmp = addinv(otmp);
