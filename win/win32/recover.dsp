@@ -54,7 +54,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 OutDir=.\Release
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy $(OutDir)\recover.exe ..\binary
+PostBuild_Cmds=copy $(OutDir)\recover.exe ..\binary	\
+if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "recover - Win32 Debug"
@@ -85,7 +86,8 @@ LINK32=link.exe
 OutDir=.\Debug
 SOURCE="$(InputPath)"
 PostBuild_Desc=install exe
-PostBuild_Cmds=copy $(OutDir)\recover.exe ..\binary
+PostBuild_Cmds=copy $(OutDir)\recover.exe ..\binary	\
+if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt
 # End Special Build Tool
 
 !ENDIF 
