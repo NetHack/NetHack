@@ -1026,9 +1026,12 @@ struct obj **optr;
 		use_lamp(obj);
 		return;
 	} else {
-		if ((long)otmp->spe + obj->quan > 7L)
+		if ((long)otmp->spe + obj->quan > 7L) {
 		    obj = splitobj(obj, 7L - (long)otmp->spe);
-		else *optr = 0;
+		    /* avoid a gramatical error if obj->quan gets
+		       reduced to 1 candle from more than one */
+		    s = (obj->quan != 1) ? "candles" : "candle";
+		} else *optr = 0;
 		You("attach %ld%s %s to %s.",
 		    obj->quan, !otmp->spe ? "" : " more",
 		    s, the(xname(otmp)));
