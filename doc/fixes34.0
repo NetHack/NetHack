@@ -530,6 +530,7 @@ add Tom Friedetzky's BUC-patch with some alterations to the original
 add wizard #poly and #levelchange (originally levelgain; Dylan O'Donnell),
 add Jason Short's additional lenses use patch
 add new Gnomish Mines levels from Kelly Bailey's patch
+add Ken Arnold's patch to show unpaid item prices in inventory
 jousting by players wielding a lance while riding
 Knights start with lance rather than spear
 can start game without a pet via pettype:none (Dylan O'Donnell)

@@ -747,8 +747,11 @@ ring:
 			Strcat(bp, " (alternate weapon; not wielded)");
 	}
 	if(obj->owornmask & W_QUIVER) Strcat(bp, " (in quiver)");
-	if(obj->unpaid)
-		Strcat(bp, " (unpaid)");
+	if(obj->unpaid) {
+		long quotedprice = unpaid_cost(obj);
+		Sprintf(eos(bp), " (unpaid, %ld %s)",
+			quotedprice, currency(quotedprice));
+	}
 	if (!strncmp(prefix, "a ", 2) &&
 			index(vowels, *(prefix+2) ? *(prefix+2) : *bp)
 			&& (*(prefix+2) || (strncmp(bp, "uranium", 7)
