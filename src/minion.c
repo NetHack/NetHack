@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)minion.c	3.4	2002/12/16	*/
+/*	SCCS Id: @(#)minion.c	3.4	2003/01/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -147,6 +147,7 @@ register struct monst *mtmp;
 	if (uwep && uwep->oartifact == ART_EXCALIBUR) {
 	    pline("%s looks very angry.", Amonnam(mtmp));
 	    mtmp->mpeaceful = mtmp->mtame = 0;
+	    set_malign(mtmp);
 	    newsym(mtmp->mx, mtmp->my);
 	    return 0;
 	}
@@ -173,11 +174,12 @@ register struct monst *mtmp;
 
 	if (!demand) {		/* you have no gold */
 	    mtmp->mpeaceful = 0;
+	    set_malign(mtmp);
 	    return 0;
 	} else {
 	    /* make sure that the demand is unmeetable if the monster
-	       has the Amulet, preventing it from being satisified and
-	       removed from the game (along with said Amulet...) */
+	       has the Amulet, preventing monster from being satisified
+	       and removed from the game (along with said Amulet...) */
 	    if (mon_has_amulet(mtmp))
 		demand = cash + (long)rn1(1000,40);
 
@@ -187,15 +189,14 @@ register struct monst *mtmp;
 	    if ((offer = bribe(mtmp)) >= demand) {
 		pline("%s vanishes, laughing about cowardly mortals.",
 		      Amonnam(mtmp));
+	    } else if (offer > 0L && (long)rnd(40) > (demand - offer)) {
+		pline("%s scowls at you menacingly, then vanishes.",
+		      Amonnam(mtmp));
 	    } else {
-		if ((long)rnd(40) > (demand - offer)) {
-		    pline("%s scowls at you menacingly, then vanishes.",
-			  Amonnam(mtmp));
-		} else {
-		    pline("%s gets angry...", Amonnam(mtmp));
-		    mtmp->mpeaceful = 0;
-		    return 0;
-		}
+		pline("%s gets angry...", Amonnam(mtmp));
+		mtmp->mpeaceful = 0;
+		set_malign(mtmp);
+		return 0;
 	    }
 	}
 	mongone(mtmp);
