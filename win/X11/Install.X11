@@ -40,6 +40,12 @@ replacement font), you will need to have the win/share files and change
 the VARDATND setting in the top Makefile to contain the tile files before
 you do your 'make all'.
 
+If you get a linker error referring to `substitute_tiles' then most
+likely you have overlooked the WINSRC, WINOBJ, WINLIB step above.
+Alternatively, you are building with more than one non-tty interface
+specified but haven't followed the direction in src/Makefile to remove
+all but one instance of tile.o from the WINxxxOBJ values used for WINOBJ.
+
 When using tiles, you have the option of defining USE_XPM in config.h.
 This causes NetHack to use the XPM file format for the "x11tiles" file
 rather than a custom format.  Since the XPM format can be processed by
