@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)data.base	3.4	2002/12/17
+#	SCCS Id: @(#)data.base	3.4	2002/12/28
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -567,6 +567,22 @@ kitten
 	yellow and white, none was missing.  Very sleek and fat did
 	the cats appear, and sonorous with purring content.
 		[ The Cats of Ulthar, by H.P. Lovecraft ]
+# this one doesn't work very well for dwarven and gnomish cavemen
+cave*man
+human cave*man
+	Now it was light enough to leave.  Moon-Watcher picked up
+	the shriveled corpse and dragged it after him as he bent
+	under the low overhang of the cave.  Once outside, he
+	threw the body over his shoulder and stood upright - the
+	only animal in all this world able to do so.
+	Among his kind, Moon-Watcher was almost a giant.  He was
+	nearly five feet high, and though badly undernourished
+	weighed over a hundred pounds.  His hairy, muscular body
+	was halfway between ape and man, but his head was already
+	much nearer to man than ape.  The forehead was low, and
+	there were ridges over the eye sockets, yet he unmistakably
+	held in his genes the promise of humanity.
+		[ 2001: A Space Odyssey, by Arthur C. Clarke ]
 *centaur
 	Of all the monsters put together by the Greek imagination
 	the Centaurs (Kentauroi) constituted a class in themselves.
@@ -980,7 +996,7 @@ doppelganger
 		[ Tarzan of the Apes, by Edgar Rice Burroughs ]
 ~dwarf ??m*
 dwarf*
-dwarven cave*man
+dwar* cave*man
 	Dwarfs have faces like men (ugly men, with wrinkled, leathery
 	skins), but are generally either flat-footed, duck-footed, or
 	have feet pointing backwards.  They are of the earth, earthy,
@@ -1074,8 +1090,6 @@ electric eel
 ~elf ??m*
 *elf*
 elvenking
-elven cave*man
-elven healer
 	The Elves sat round the fire upon the grass or upon the sawn
 	rings of old trunks.  Some went to and fro bearing cups and
 	pouring drinks; others brought food on heaped plates and
@@ -1359,12 +1373,11 @@ giant humanoid
 	boulders as weapons, hurling them over large distances.  All
 	types of giants share a love for men - roasted, boiled, or
 	fried.  Their table manners are legendary.
-# note: "gnomish wizard" is a monster; caveman and healer lack role entries
+# note: "gnomish wizard" is a monster; cave*man entry doesn't fit nonhumans
 ~gnome ??m*
 gnome*
 gnomish wizard
-gnomish cave*man
-gnomish healer
+gnom* cave*man
 	...  And then a gnome came by, carrying a bundle, an old
 	fellow three times as large as an imp and wearing clothes of
 	a sort, especially a hat.  And he was clearly just as frightened
@@ -1543,6 +1556,31 @@ hachi
 	time to see Jack running off with his harp.
 		[ Jack and the Beanstalk, from English Fairy Tales,
 		  by Joseph Jacobs ]
+healer
+* healer
+attendant
+doctor
+physician
+	I swear by Apollo the physician, and Aesculapius, and Health,
+	and All-heal, and all the gods and goddesses, that, according
+	to my ability and judgment, I will keep this Oath and this
+	stipulation -- to reckon him who taught me this Art equally dear
+	to me as my parents, to share my substance with him, and relieve
+	his necessities if required; to look upon his offspring in the
+	same footing as my own brothers, and to teach them this art, if
+	they shall wish to learn it, without fee or stipulation; and
+	that by precept, lecture, and every other mode of instruction,
+	I will impart a knowledge of the Art to my own sons, and those
+	of my teachers, and to disciples bound by a stipulation and oath
+	according to the law of medicine, but to none others.  I will
+	follow that system of regimen which, according to my ability and
+	judgment, I consider for the benefit of my patients, and abstain
+	from whatever is deleterious and mischievous.  [...]
+		[ Hippocrates' Oath, translated by Francis Adams ]
+
+	PHYSICIAN, n.  One upon whom we set our hopes when ill and our
+	dogs when well.
+		[ The Devil's Dictionary, by Ambrose Bierce ]
 heart of ahriman
 	The other three drew in their breath sharply, and the dark,
 	powerful man who stood at the head of the sarcophagus whispered:
@@ -1741,19 +1779,8 @@ humanoid
 	hostile, they may even band together to raid and pillage
 	human settlements.
 human
-human cave*man
-human healer
-human monk
-acolyte
-apprentice
-attendant
-cave*man
 chieftain
 guard
-healer
-grand master
-master kaen
-monk
 ninja
 nurse
 page
@@ -2548,6 +2575,47 @@ mol?ch
 	family, and will cut him off, and all that go a whoring after
 	him, to commit whoredom with Molech, from among their people.
 		[ Leviticus 20:1-5 ]
+monk
+* monk
+grand master
+master kaen
+	One day, an army general invited the Buddhist monk I-Hsiu
+	(literally, "One Rest") to his military head office for a
+	dinner.  I-Hsiu was not accustomed to wearing luxurious
+	clothings and so he just put on an old ordinary casual
+	robe to go to the military base.  To him, "form is void".
+
+	As he approached the base, two soldiers appeared before him
+	and shouted, "Where does this beggar came from?  Identify
+	yourself!  You do not have permission to be around here!"
+
+	"My name is I-Hsiu Dharma Master.  I am invited by your
+	general for a supper."
+
+	The two soldiers examined the monk closely and said, "You
+	liar.  How come my general invites such a shabby monk to
+	dinner?  He invites the very solemn venerable I-Hsiu to our
+	base for a great ceremony today, not you.  Now, get out!"
+
+	I-Hsiu was unable to convince the soldiers that he was
+	indeed the invited guest, so he returned to the temple
+	and changed to a very formal solemn ceremonial robe for
+	the dinner.  And as he returned to the military base, the
+	soldiers observed that he was such a great Buddhist monk,
+	let him in with honour.
+
+	At the dinner, I-Hsiu sat in front of the table full of
+	food but, instead of putting the food into his month, he
+	picked up the food with his chopsticks and put it into
+	his sleeves.  The general was curious, and whispered to
+	him, "This is very embarrassing.  Do you want to take
+	some food back to the temple?  I will order the cook to
+	prepare some take out orders for you."  "No" replied the
+	monk.  "When I came here, I was not allowed into the
+	base by your soldiers until I wear this ceremonial robe.
+	You do not invite me for a dinner.  You invite my robe.
+	Therefore, my robe is eating the food, not me."
+		[ Dining with a General - a Zen Buddhism Koan ]
 monkey
 	"Listen, man-cub," said the Bear, and his voice rumbled like
 	thunder on a hot night.  "I have taught thee all the Law of
@@ -3023,6 +3091,7 @@ poseido*n
 		[ The Devil's Dictionary, by Ambrose Bierce ]
 priest*
 * priest*
+acolyte
 	[...]  For the two priests were talking exactly like priests,
 	piously, with learning and leisure, about the most aerial
 	enigmas of theology.  The little Essex priest spoke the more
@@ -4140,6 +4209,7 @@ web
 ~gnomish wizard
 wizard
 * wizard
+apprentice
 	Ebenezum walked before me along the closest thing we could
 	find to a path in these overgrown woods.  Every few paces he
 	would pause, so that I, burdened with a pack stuffed with
