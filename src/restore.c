@@ -484,10 +484,14 @@ xchar ltmp;
 #endif
 {
 	register int nfd;
+	char whynot[BUFSZ];
 
-	nfd = create_levelfile(ltmp);
-
-	if (nfd < 0)	panic("Cannot open temp level %d!", ltmp);
+	nfd = create_levelfile(ltmp, whynot);
+	if (nfd < 0) {
+		/* BUG: should suppress any attempt to write a panic
+		   save file if file creation is now failing... */
+		panic("restlevelfile: %s", whynot);
+	}
 #ifdef MFLOPPY
 	if (!savelev(nfd, ltmp, COUNT_SAVE)) {
 
@@ -675,11 +679,13 @@ register int fd;
 }
 
 void
-trickery()
+trickery(reason)
+char *reason;
 {
 	pline("Strange, this map is not as I remember it.");
 	pline("Somebody is trying some trickery here...");
 	pline("This game is void.");
+	killer = reason;
 	done(TRICKED);
 }
 
@@ -719,16 +725,18 @@ boolean ghostly;
 #else
 	mread(fd, (genericptr_t) &dlvl, sizeof(dlvl));
 #endif
-	if((pid && pid != hpid) || (lev && dlvl != lev)) {
+	if ((pid && pid != hpid) || (lev && dlvl != lev)) {
+	    char trickbuf[BUFSZ];
+
+	    if (pid && pid != hpid)
+		Sprintf(trickbuf, "PID (%d) doesn't match saved PID (%d)!",
+			hpid, pid);
+	    else
+		Sprintf(trickbuf, "This is level %d, not %d!", dlvl, lev);
 #ifdef WIZARD
-		if (wizard) {
-			if (pid && pid != hpid)
-				pline("PID (%d) doesn't match saved PID (%d)!", hpid, pid);
-			else if (lev && dlvl != lev)
-				pline("This is level %d, not %d!", dlvl, lev);
-		}
+	    if (wizard) pline(trickbuf);
 #endif
-		trickery();
+	    trickery(trickbuf);
 	}
 
 #ifdef RLECOMP

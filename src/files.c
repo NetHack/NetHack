@@ -15,8 +15,17 @@
 #include <fcntl.h>
 #endif
 
-#if defined(NOCWD_ASSUMPTIONS)
 #include <errno.h>
+#ifdef _MSC_VER	/* MSC 6.0 defines errno quite differently */
+# if (_MSC_VER >= 600)
+#  define SKIP_ERRNO
+# endif
+#endif
+#ifndef SKIP_ERRNO
+# ifdef _DCC
+const
+# endif
+extern int errno;
 #endif
 
 #if defined(UNIX) && defined(QT_GRAPHICS)
@@ -24,10 +33,6 @@
 #endif
 
 #if defined(UNIX) || defined(VMS)
-#include <errno.h>
-# ifndef SKIP_ERRNO
-extern int errno;
-# endif
 #include <signal.h>
 #endif
 
@@ -404,12 +409,14 @@ int lev;
 }
 
 int
-create_levelfile(lev)
+create_levelfile(lev, errbuf)
 int lev;
+char errbuf[];
 {
 	int fd;
 	const char *fq_lock;
 
+	if (errbuf) *errbuf = '\0';
 	set_levelfile_name(lock, lev);
 	fq_lock = fqname(lock, LEVELPREFIX, 0);
 
@@ -434,18 +441,24 @@ int lev;
 
 	if (fd >= 0)
 	    level_info[lev].flags |= LFILE_EXISTS;
+	else if (errbuf)	/* failure explanation */
+	    Sprintf(errbuf,
+		    "Cannot create file \"%s\" for level %d (errno %d).",
+		    lock, lev, errno);
 
 	return fd;
 }
 
 
 int
-open_levelfile(lev)
+open_levelfile(lev, errbuf)
 int lev;
+char errbuf[];
 {
 	int fd;
 	const char *fq_lock;
 
+	if (errbuf) *errbuf = '\0';
 	set_levelfile_name(lock, lev);
 	fq_lock = fqname(lock, LEVELPREFIX, 0);
 #ifdef MFLOPPY
@@ -463,6 +476,15 @@ int lev;
 # endif
 	fd = open(fq_lock, O_RDONLY | O_BINARY, 0);
 #endif
+
+	/* for failure, return an explanation that our caller can use;
+	   settle for `lock' instead of `fq_lock' because the latter
+	   might end up being too big for nethack's BUFSZ */
+	if (fd < 0 && errbuf)
+	    Sprintf(errbuf,
+		    "Cannot open file \"%s\" for level %d (errno %d).",
+		    lock, lev, errno);
+
 	return fd;
 }
 
@@ -553,7 +575,7 @@ int fd;
 {
  	if (lftrack.fd == fd) {
 		really_close();	/* close it, but reopen it to hold it */
-		fd = open_levelfile(0);
+		fd = open_levelfile(0, (char *)0);
 		lftrack.nethack_thinks_it_is_open = FALSE;
 		return 0;
 	}
@@ -2180,7 +2202,7 @@ recover_savefile()
 	xchar levc;
 	struct version_info version_data;
 	int processed[256];
-	char savename[SAVESIZE];
+	char savename[SAVESIZE], errbuf[BUFSZ];
 
 	for (lev = 0; lev < 256; lev++)
 		processed[lev] = 0;
@@ -2191,9 +2213,9 @@ recover_savefile()
 	 *	name of save file nethack would have created
 	 *	and game state
 	 */
-	gfd = open_levelfile(0);
+	gfd = open_levelfile(0, errbuf);
 	if (gfd < 0) {
-	    raw_printf("Cannot open level 0 for %s.\n", lock);
+	    raw_printf("%s\n", errbuf);
 	    return FALSE;
 	}
 	if (read(gfd, (genericptr_t) &hpid, sizeof hpid) != sizeof hpid) {
@@ -2232,9 +2254,9 @@ recover_savefile()
 	    return FALSE;
 	}
 
-	lfd = open_levelfile(savelev);
+	lfd = open_levelfile(savelev, errbuf);
 	if (lfd < 0) {
-	    raw_printf("\nCannot open level of save for %s.\n", lock);
+	    raw_printf("\n%s\n", errbuf);
 	    (void)close(gfd);
 	    (void)close(sfd);
 	    delete_savefile();
@@ -2273,7 +2295,7 @@ recover_savefile()
 		 * maximum level number (for the endlevel) must be < 256
 		 */
 		if (lev != savelev) {
-			lfd = open_levelfile(lev);
+			lfd = open_levelfile(lev, (char *)0);
 			if (lfd >= 0) {
 				/* any or all of these may not exist */
 				levc = (xchar) lev;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pcmain.c	3.4	1997/01/22	*/
+/*	SCCS Id: @(#)pcmain.c	3.4	2002/08/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -338,7 +338,7 @@ char *argv[];
 
 	/* Set up level 0 file to keep the game state.
 	 */
-	fd = create_levelfile(0);
+	fd = create_levelfile(0, (char *)0);
 	if (fd < 0) {
 		raw_print("Cannot create lock file");
 	} else {

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.4	2002/03/29	*/
+/*	SCCS Id: @(#)extern.h	3.4	2002/08/22	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -605,8 +605,8 @@ E void FDECL(store_version, (int));
 E void NDECL(set_lock_and_bones);
 #endif
 E void FDECL(set_levelfile_name, (char *,int));
-E int FDECL(create_levelfile, (int));
-E int FDECL(open_levelfile, (int));
+E int FDECL(create_levelfile, (int,char *));
+E int FDECL(open_levelfile, (int,char *));
 E void FDECL(delete_levelfile, (int));
 E void NDECL(clearlocks);
 E int FDECL(create_bonesfile, (d_level*,char **));
@@ -1643,7 +1643,7 @@ E NhRegion* FDECL(create_gas_cloud, (XCHAR_P, XCHAR_P, int, int));
 
 E void FDECL(inven_inuse, (BOOLEAN_P));
 E int FDECL(dorecover, (int));
-E void NDECL(trickery);
+E void FDECL(trickery, (char *));
 E void FDECL(getlev, (int,int,XCHAR_P,BOOLEAN_P));
 E void NDECL(minit);
 E boolean FDECL(lookup_id_mapping, (unsigned, unsigned *));

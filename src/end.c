@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.4	2001/09/24	*/
+/*	SCCS Id: @(#)end.c	3.4	2002/08/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -549,6 +549,19 @@ int how;
 	struct obj *corpse = (struct obj *)0;
 	long umoney;
 
+	if (how == TRICKED) {
+	    if (killer) {
+		paniclog("trickery", killer);
+		killer = 0;
+	    }
+#ifdef WIZARD
+	    if (wizard) {
+		You("are a very tricky wizard, it seems.");
+		return;
+	    }
+#endif
+	}
+
 	/* kilbuf: used to copy killer in case it comes from something like
 	 *	xname(), which would otherwise get overwritten when we call
 	 *	xname() when listing possessions
@@ -561,12 +574,7 @@ int how;
 		killer_format = KILLED_BY;
 	Strcpy(kilbuf, (!killer || how >= PANICKED ? deaths[how] : killer));
 	killer = kilbuf;
-#ifdef WIZARD
-	if (wizard && how == TRICKED) {
-		You("are a very tricky wizard, it seems.");
-		return;
-	}
-#endif
+
 	if (how < PANICKED) u.umortality++;
 	if (Lifesaved && (how <= GENOCIDED)) {
 		pline("But wait...");

@@ -7,19 +7,6 @@
 #include "hack.h"
 #include "lev.h"
 
-#include <errno.h>
-#ifdef _MSC_VER	/* MSC 6.0 defines errno quite differently */
-# if (_MSC_VER >= 600)
-#  define SKIP_ERRNO
-# endif
-#endif
-#ifndef SKIP_ERRNO
-#ifdef _DCC
-const
-#endif
-extern int errno;
-#endif
-
 #ifdef SINKS
 # ifdef OVLB
 STATIC_DCL void FDECL(trycall, (struct obj *));
@@ -838,14 +825,14 @@ STATIC_OVL int
 currentlevel_rewrite()
 {
 	register int fd;
+	char whynot[BUFSZ];
 
 	/* since level change might be a bit slow, flush any buffered screen
 	 *  output (like "you fall through a trap door") */
 	mark_synch();
 
-	fd = create_levelfile(ledger_no(&u.uz));
-
-	if(fd < 0) {
+	fd = create_levelfile(ledger_no(&u.uz), whynot);
+	if (fd < 0) {
 		/*
 		 * This is not quite impossible: e.g., we may have
 		 * exceeded our quota. If that is the case then we
@@ -853,8 +840,7 @@ currentlevel_rewrite()
 		 * Another possibility is that the directory was not
 		 * writable.
 		 */
-		pline("Cannot create level file for level %d.",
-						ledger_no(&u.uz));
+		pline("%s", whynot);
 		return -1;
 	}
 
@@ -914,6 +900,7 @@ boolean at_stairs, falling, portal;
 		familiar = FALSE;
 	boolean new = FALSE;	/* made a new level? */
 	struct monst *mtmp;
+	char whynot[BUFSZ];
 
 	if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
 		newlevel->dlevel = dunlevs_in_dungeon(newlevel);
@@ -1049,11 +1036,11 @@ boolean at_stairs, falling, portal;
 		new = TRUE;	/* made the level */
 	} else {
 		/* returning to previously visited level; reload it */
-		fd = open_levelfile(new_ledger);
+		fd = open_levelfile(new_ledger, whynot);
 		if (fd < 0) {
-			pline("Cannot open file (#%d) for level %d (errno %d).",
-					(int) new_ledger, depth(&u.uz), errno);
+			pline("%s", whynot);
 			pline("Probably someone removed it.");
+			killer = whynot;
 			done(TRICKED);
 			/* we'll reach here if running in wizard mode */
 			error("Cannot continue this game.");
