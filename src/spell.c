@@ -350,7 +350,7 @@ register struct obj *spellbook;
 	register boolean confused = (Confusion != 0);
 	boolean too_hard = FALSE;
 
-	if (delay && spellbook == book &&
+	if (delay && !confused && spellbook == book &&
 		    /* handle the sequence: start reading, get interrupted,
 		       have book become erased somehow, resume reading it */
 		    booktype != SPE_BLANK_PAPER) {
@@ -398,7 +398,8 @@ register struct obj *spellbook;
 			    - 2*objects[booktype].oc_level
 			    + ((ublindf && ublindf->otyp == LENSES) ? 2 : 0);
 			/* only wizards know if a spell is too difficult */
-			if (Role_if(PM_WIZARD) && read_ability < 20) {
+			if (Role_if(PM_WIZARD) && read_ability < 20 &&
+			    !confused) {
 			    char qbuf[QBUFSZ];
 			    Sprintf(qbuf,
 		      "This spellbook is %sdifficult to comprehend. Continue?",
