@@ -55,7 +55,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=Packaging via DLB
-PostBuild_Cmds=echo pushd ..\dat	pushd ..\dat	chdir	 echo data >dlb.lst	 echo oracles >>dlb.lst	 echo options >>dlb.lst	 echo quest.dat >>dlb.lst	 echo rumors >>dlb.lst	 echo help >>dlb.lst	 echo hh >>dlb.lst	 echo cmdhelp >>dlb.lst	 echo history >>dlb.lst	 echo opthelp >>dlb.lst	 echo wizhelp >>dlb.lst	 echo dungeon >>dlb.lst	 echo license >>dlb.lst	 for %%N in (*.lev) do echo %%N >>dlb.lst	 ..\util\dlb_main.exe cIf dlb.lst nhdat	 echo popd	popd	echo if NOT exist ..\binary\*.* mkdir ..\binary	 if NOT exist ..\binary\*.* mkdir ..\binary
+PostBuild_Cmds=echo chdir ..\dat	chdir ..\dat	chdir	 echo data >dlb.lst	 echo oracles >>dlb.lst	 echo options >>dlb.lst	 echo quest.dat >>dlb.lst	 echo rumors >>dlb.lst	 echo help >>dlb.lst	 echo hh >>dlb.lst	 echo cmdhelp >>dlb.lst	 echo history >>dlb.lst	 echo opthelp >>dlb.lst	 echo wizhelp >>dlb.lst	 echo dungeon >>dlb.lst	 echo license >>dlb.lst	 for %%N in (*.lev) do echo %%N >>dlb.lst	 ..\util\dlb_main.exe cIf dlb.lst nhdat	 echo chdir ..\build	chdir ..\build	echo if NOT exist ..\binary\*.* mkdir ..\binary	 if NOT exist ..\binary\*.* mkdir ..\binary
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "dlb_main - Win32 Debug"
@@ -84,7 +84,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=Packaging via dlb
-PostBuild_Cmds=echo pushd ..\dat	pushd ..\dat	chdir	 echo data >dlb.lst	 echo oracles >>dlb.lst	 echo options >>dlb.lst	 echo quest.dat >>dlb.lst	 echo rumors >>dlb.lst	 echo help >>dlb.lst	 echo hh >>dlb.lst	 echo cmdhelp >>dlb.lst	 echo history >>dlb.lst	 echo opthelp >>dlb.lst	 echo wizhelp >>dlb.lst	 echo dungeon >>dlb.lst	 echo license >>dlb.lst	 for %%N in (*.lev) do echo %%N >>dlb.lst	 ..\util\dlb_main.exe cIf dlb.lst nhdat	echo popd	popd	echo if NOT exist ..\binary\*.* mkdir ..\binary	if NOT exist ..\binary\*.* mkdir ..\binary
+PostBuild_Cmds=echo chdir ..\dat	chdir ..\dat	chdir	 echo data >dlb.lst	 echo oracles >>dlb.lst	 echo options >>dlb.lst	 echo quest.dat >>dlb.lst	 echo rumors >>dlb.lst	 echo help >>dlb.lst	 echo hh >>dlb.lst	 echo cmdhelp >>dlb.lst	 echo history >>dlb.lst	 echo opthelp >>dlb.lst	 echo wizhelp >>dlb.lst	 echo dungeon >>dlb.lst	 echo license >>dlb.lst	 for %%N in (*.lev) do echo %%N >>dlb.lst	 ..\util\dlb_main.exe cIf dlb.lst nhdat	echo chdir ..\build	chdir ..\build	echo if NOT exist ..\binary\*.* mkdir ..\binary	if NOT exist ..\binary\*.* mkdir ..\binary
 # End Special Build Tool
 
 !ENDIF 

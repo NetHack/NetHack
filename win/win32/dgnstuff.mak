@@ -43,7 +43,7 @@ clean:
 	   copy $(YTABH) ..\include\dgn_comp.h
 	   @del $(YTABC)
 	   @del $(YTABH)
-	   chdir ..\src
+	   chdir ..\build
 !ENDIF
 
 ..\util\dgn_lex.c: ..\util\dgn_comp.l
@@ -55,5 +55,5 @@ clean:
 	   $(LEX) dgn_comp.l
 	   copy $(LEXYYC) $@
 	   @del $(LEXYYC)
-	   chdir ..\src
+	   chdir ..\build
 !ENDIF

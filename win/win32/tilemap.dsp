@@ -55,7 +55,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=Generating src\tile.c
-PostBuild_Cmds=chdir ..\src	..\util\tilemap.exe	chdir ..\build
+PostBuild_Cmds=echo chdir ..\src	chdir ..\src	..\util\tilemap.exe	echo chdir ..\build	chdir ..\build
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "tilemap - Win32 Debug"
@@ -84,7 +84,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=Generating src\tile.c
-PostBuild_Cmds=echo pushd ..\src	pushd ..\src	..\util\tilemap.exe	popd	echo popd
+PostBuild_Cmds=echo chdir ..\src	chdir ..\src	..\util\tilemap.exe	echo chdir ..\build	chdir ..\build
 # End Special Build Tool
 
 !ENDIF 

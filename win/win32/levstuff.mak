@@ -36,13 +36,13 @@ clean:
 	   @copy ..\sys\share\lev_yacc.c ..\util\lev_yacc.c
 	   @copy ..\sys\share\lev_comp.h ..\include\lev_comp.h
 !ELSE
-	   pushd ..\util
+	   chdir ..\util
 	   $(YACC) -d lev_comp.y
 	   copy $(YTABC) $@
 	   copy $(YTABH) ..\include\lev_comp.h
 	   @del $(YTABC)
 	   @del $(YTABH)
-	   popd
+	   chdir ..\build
 !ENDIF
 
 ..\util\lev_lex.c: ..\util\lev_comp.l
@@ -50,10 +50,10 @@ clean:
 	   @echo Using pre-built lev_lex.c
 	   @copy ..\sys\share\lev_lex.c $@
 !ELSE
-	   pushd ..\util
+	   chdir ..\util
 	   $(LEX) lev_comp.l
 	   copy $(LEXYYC) $@
 	   @del $(LEXYYC)
-	   popd
+	   chdir ..\build
 !ENDIF
 

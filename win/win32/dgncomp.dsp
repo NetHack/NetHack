@@ -55,7 +55,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=dgncomp
-PostBuild_Cmds=echo Building dungeon	echo pushd ..\dat	pushd ..\dat	echo ..\util\dgn_comp.exe dungeon.pdf	..\util\dgn_comp.exe dungeon.pdf	echo popd	popd
+PostBuild_Cmds=echo Building dungeon	echo chdir ..\dat	chdir ..\dat	echo ..\util\dgn_comp.exe dungeon.pdf	..\util\dgn_comp.exe dungeon.pdf	echo chdir ..\build	chdir ..\build
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "dgncomp - Win32 Debug"
@@ -84,7 +84,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=dgncomp
-PostBuild_Cmds=echo Building dungeon	echo pushd ..\dat	pushd ..\dat	echo ..\util\dgn_comp.exe dungeon.pdf	..\util\dgn_comp.exe dungeon.pdf	echo popd	popd
+PostBuild_Cmds=echo Building dungeon	echo chdir ..\dat	chdir ..\dat	echo ..\util\dgn_comp.exe dungeon.pdf	..\util\dgn_comp.exe dungeon.pdf	echo chdir ..\build	chdir ..\build
 # End Special Build Tool
 
 !ENDIF 
