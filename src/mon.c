@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.3	2001/09/06	*/
+/*	SCCS Id: @(#)mon.c	3.3	2002/01/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2153,6 +2153,14 @@ struct monst *mon;
 		if (!rn2(3)) mndx = pick_animal();
 		break;
 	    case CHAM_ORDINARY:
+	      {
+		struct obj *m_armr = which_armor(mon, W_ARM);
+
+		if (m_armr && Is_dragon_scales(m_armr))
+		    mndx = Dragon_scales_to_pm(m_armr) - mons;
+		else if (m_armr && Is_dragon_mail(m_armr))
+		    mndx = Dragon_mail_to_pm(m_armr) - mons;
+	      }
 		break;
 	}
 #ifdef WIZARD

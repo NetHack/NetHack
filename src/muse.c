@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.3	2001/11/19	*/
+/*	SCCS Id: @(#)muse.c	3.3	2002/01/07	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -19,6 +19,7 @@ boolean m_using = FALSE;
  * don't know not to read scrolls, etc....
  */
 
+STATIC_DCL struct permonst *FDECL(muse_newcham_mon, (struct monst *));
 STATIC_DCL int FDECL(precheck, (struct monst *,struct obj *));
 STATIC_DCL void FDECL(mzapmsg, (struct monst *,struct obj *,BOOLEAN_P));
 STATIC_DCL void FDECL(mreadmsg, (struct monst *,struct obj *));
@@ -1637,6 +1638,23 @@ struct monst *mtmp;
 #undef nomore
 }
 
+/* type of monster to polymorph into; defaults to one suitable for the
+   current level rather than the totally arbitrary choice of newcham() */
+static struct permonst *
+muse_newcham_mon(mon)
+struct monst *mon;
+{
+	struct obj *m_armr;
+
+	if ((m_armr = which_armor(mon, W_ARM)) != 0) {
+	    if (Is_dragon_scales(m_armr))
+		return Dragon_scales_to_pm(m_armr);
+	    else if (Is_dragon_mail(m_armr))
+		return Dragon_mail_to_pm(m_armr);
+	}
+	return rndmonst();
+}
+
 int
 use_misc(mtmp)
 struct monst *mtmp;
@@ -1735,13 +1753,13 @@ skipmsg:
 	case MUSE_WAN_POLYMORPH:
 		mzapmsg(mtmp, otmp, TRUE);
 		otmp->spe--;
-		(void) newcham(mtmp, rndmonst(), TRUE);
+		(void) newcham(mtmp, muse_newcham_mon(mtmp), TRUE);
 		if (oseen) makeknown(WAN_POLYMORPH);
 		return 2;
 	case MUSE_POT_POLYMORPH:
 		mquaffmsg(mtmp, otmp);
 		if (vismon) pline("%s suddenly mutates!", Monnam(mtmp));
-		(void) newcham(mtmp, rndmonst(), FALSE);
+		(void) newcham(mtmp, muse_newcham_mon(mtmp), FALSE);
 		if (oseen) makeknown(POT_POLYMORPH);
 		m_useup(mtmp, otmp);
 		return 2;
@@ -1999,7 +2017,8 @@ const char *str;
 	    if (str)
 		pline(str, s_suffix(mon_nam(mon)), "armor");
 	    return TRUE;
-	} else if (mon->data == &mons[PM_SILVER_DRAGON]) {
+	} else if (mon->data == &mons[PM_SILVER_DRAGON] ||
+		mon->data == &mons[PM_CHROMATIC_DRAGON]) {
 	    /* Silver dragons only reflect when mature; babies do not */
 	    if (str)
 		pline(str, s_suffix(mon_nam(mon)), "scales");

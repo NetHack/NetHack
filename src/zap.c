@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.3	2001/12/29	*/
+/*	SCCS Id: @(#)zap.c	3.3	2002/01/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -178,7 +178,10 @@ struct obj *otmp;
 		       it guard against involuntary polymorph attacks too... */
 		    shieldeff(mtmp->mx, mtmp->my);
 		} else if (!resist(mtmp, otmp->oclass, 0, NOTELL)) {
-		    if (!rn2(25)) {
+		    /* natural shapechangers aren't affected by system shock
+		       (unless protection from shapechangers is interfering
+		       with their metabolism...) */
+		    if (mtmp->cham == CHAM_ORDINARY && !rn2(25)) {
 			if (canseemon(mtmp)) {
 			    pline("%s shudders!", Monnam(mtmp));
 			    makeknown(otyp);
@@ -4029,9 +4032,14 @@ retry:
 	u.uconduct.wishes++;
 
 	if (otmp != &zeroobj) {
-	    if(otmp->oartifact && !touch_artifact(otmp,&youmonst))
-		dropy(otmp);
-	    else
+	    /* in case touching this object turns out to be fatal */
+	    place_object(otmp, u.ux, u.uy);
+
+	    if (otmp->oartifact && !touch_artifact(otmp,&youmonst)) {
+		obj_extract_self(otmp);	/* remove it from the floor */
+		dropy(otmp);		/* now put it back again :-) */
+	    } else {
+		obj_extract_self(otmp);
 		/* The(aobjnam()) is safe since otmp is unidentified -dlc */
 		(void) hold_another_object(otmp, u.uswallow ?
 				       "Oops!  %s out of your reach!" :
@@ -4042,6 +4050,7 @@ retry:
 					     Is_airlevel(&u.uz) || u.uinwater ?
 						   "slip" : "drop")),
 				       (const char *)0);
+	    }
 	    u.ublesscnt += rn1(100,50);  /* the gods take notice */
 	}
 }

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.3	2001/09/05	*/
+/*	SCCS Id: @(#)worn.c	3.3	2002/01/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -530,7 +530,13 @@ boolean polyspot;
 
 	if (breakarm(mdat)) {
 	    if ((otmp = which_armor(mon, W_ARM)) != 0) {
-		if (vis)
+		if ((Is_dragon_scales(otmp) &&
+			mdat == Dragon_scales_to_pm(otmp)) ||
+		    (Is_dragon_mail(otmp) && mdat == Dragon_mail_to_pm(otmp)))
+		    ;	/* no message here;
+			   "the dragon merges with his scaly armor" is odd
+			   and the monster's previous form is already gone */
+		else if (vis)
 		    pline("%s breaks out of %s armor!", Monnam(mon), ppronoun);
 		else
 		    You_hear("a cracking sound.");
