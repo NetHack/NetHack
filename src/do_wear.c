@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2002/08/03	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1782,6 +1782,8 @@ do_takeoff()
 	return(otmp);
 }
 
+static const char *disrobing = "";
+
 STATIC_PTR
 int
 take_off()
@@ -1810,7 +1812,7 @@ take_off()
 	todelay = 0;
 
 	if (taking_off == 0L) {
-	  You("finish disrobing.");
+	  You("finish %s.", disrobing);
 	  return 0;
 	} else if (taking_off == W_WEP) {
 	  todelay = 1;
@@ -1863,7 +1865,7 @@ take_off()
 	 */
 	if (todelay>0) todelay--;
 
-	set_occupation(take_off, "disrobing", 0);
+	set_occupation(take_off, disrobing, 0);
 	return(1);		/* get busy */
 }
 
@@ -1871,6 +1873,7 @@ void
 reset_remarm()
 {
 	taking_off = takeoff_mask = 0L;
+	disrobing = nul;
 }
 
 /* the 'A' command */
@@ -1880,8 +1883,8 @@ doddoremarm()
     int result = 0;
 
     if (taking_off || takeoff_mask) {
-	You("continue disrobing.");
-	set_occupation(take_off, "disrobing", 0);
+	You("continue %s.", disrobing);
+	set_occupation(take_off, disrobing, 0);
 	(void) take_off();
 	return 0;
     } else if (!uwep && !uswapwep && !uquiver && !uamul && !ublindf &&
@@ -1895,8 +1898,15 @@ doddoremarm()
 	    (result = ggetobj("take off", select_off, 0, FALSE, (unsigned *)0)) < -1)
 	result = menu_remarm(result);
 
-    if (takeoff_mask)
+    if (takeoff_mask) {
+	/* default activity for armor and/or accessories,
+	   possibly combined with weapons */
+	disrobing = "disrobing";
+	/* specific activity when handling weapons only */
+	if (!(takeoff_mask & ~(W_WEP|W_SWAPWEP|W_QUIVER)))
+	    disrobing = "disarming";
 	(void) take_off();
+    }
     /* The time to perform the command is already completely accounted for
      * in take_off(); if we return 1, that would add an extra turn to each
      * disrobe.
