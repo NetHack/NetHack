@@ -55,7 +55,7 @@ boolean pushing;
 	    impossible("Not a boulder?");
 	else if (!Is_waterlevel(&u.uz) && (is_pool(rx,ry) || is_lava(rx,ry))) {
 	    boolean lava = is_lava(rx,ry), fills_up;
-	    const char *what = lava ? "lava" : "water";
+	    const char *what = waterbody_name(rx,ry);
 	    schar ltyp = levl[rx][ry].typ;
 	    int chance = rn2(10);		/* water: 90%; lava: 10% */
 	    fills_up = lava ? chance == 0 : chance != 0;
@@ -88,8 +88,7 @@ boolean pushing;
 
 			There("is a large splash as %s %s the %s.",
 			      the(xname(otmp)), fills_up? "fills":"falls into",
-			      lava ? "lava" : ltyp==POOL ? "pool" :
-			      moat ? "moat" : "water");
+			      what);
 		    } else if (flags.soundok)
 			You_hear("a%s splash.", lava ? " sizzling" : "");
 		    wake_nearto(rx, ry, 40);

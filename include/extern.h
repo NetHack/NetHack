@@ -1033,6 +1033,7 @@ E void NDECL(movebubbles);
 E void NDECL(water_friction);
 E void FDECL(save_waterlevel, (int,int));
 E void FDECL(restore_waterlevel, (int));
+E const char *FDECL(waterbody_name, (XCHAR_P,XCHAR_P));
 
 /* ### mkobj.c ### */
 
