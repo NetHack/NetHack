@@ -16,7 +16,7 @@ typedef struct mswin_nethack_status_window {
 
 static TCHAR szStatusWindowClass[] = TEXT("MSNHStatusWndClass");
 LRESULT CALLBACK	StatusWndProc(HWND, UINT, WPARAM, LPARAM);
-static void register_status_window_class();
+static void register_status_window_class(void);
 
 HWND mswin_init_status_window () {
 	static int run_once = 0;

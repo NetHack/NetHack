@@ -9,6 +9,7 @@ STATIC_PTR int NDECL(prayer_done);
 STATIC_DCL int NDECL(in_trouble);
 STATIC_DCL void FDECL(fix_worst_trouble,(int));
 STATIC_DCL void FDECL(angrygods,(ALIGNTYP_P));
+STATIC_DCL void FDECL(at_your_feet, (const char *));
 #ifdef ELBERETH
 STATIC_DCL void NDECL(gcrownu);
 #endif	/*ELBERETH*/

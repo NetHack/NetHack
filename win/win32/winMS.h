@@ -57,10 +57,10 @@ typedef struct mswin_nhwindow_app {
 
 	char*		saved_text;
 } NHWinApp, *PNHWinApp;
-extern PNHWinApp GetNHApp();
 
 #define E extern
 
+E PNHWinApp GetNHApp(void);
 E struct window_procs mswin_procs;
 
 #undef E

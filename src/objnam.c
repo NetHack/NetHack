@@ -15,6 +15,7 @@ static boolean FDECL(the_unique_obj, (struct obj *obj));
 #ifdef OVLB
 static boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
 #endif
+static void FDECL(add_erosion_words, (struct obj*, char*));
 
 struct Jitem {
 	int item;

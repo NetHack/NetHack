@@ -31,7 +31,7 @@ typedef struct mswin_nethack_map_window {
 
 static TCHAR szNHMapWindowClass[] = TEXT("MSNethackMapWndClass");
 LRESULT CALLBACK	MapWndProc(HWND, UINT, WPARAM, LPARAM);
-static void register_map_window_class();
+static void register_map_window_class(void);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);

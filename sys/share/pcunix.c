@@ -29,6 +29,10 @@ static struct stat buf;
 static struct stat hbuf;
 # endif
 
+#ifdef PC_LOCKING
+static int NDECL(eraseoldlocks);
+#endif
+
 void
 gethdate(name)
 char *name;

@@ -8,7 +8,7 @@
 #include "config.h"
 #include "global.h"
 
-HWND mswin_init_status_window ();
+HWND mswin_init_status_window (void);
 void mswin_status_window_size (HWND hWnd, LPSIZE sz);
 
 #endif /* MSWINStatusWindow_h */

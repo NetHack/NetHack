@@ -13,7 +13,7 @@
 #define NHWND_ALIGN_TOP     2
 #define NHWND_ALIGN_BOTTOM  3
 
-HWND mswin_init_main_window ();
+HWND mswin_init_main_window (void);
 void mswin_layout_main_window(HWND changed_child);
 
 #endif /* MSWINMainWindow_h */

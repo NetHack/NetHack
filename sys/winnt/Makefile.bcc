@@ -1,7 +1,7 @@
-#   SCCS Id: @(#)Makefile.bcc       3.4     2002/01/23
+#   SCCS Id: @(#)Makefile.bcc       3.4     2002/02/04
 #   Copyright (c) NetHack PC Development Team 1993-2002
 #
-#   NetHack 3.4.x Makefile for Borland C++ V5.5 and above and Borland's MAKE
+#   NetHack 3.4.x Makefile for Borland C++ V5.5.1 and above and Borland's MAKE
 #  
 #   Win32 Compilers Tested:
 #                              - Borland C++ 5.5.1 for Win32
@@ -13,14 +13,14 @@
 #   root, but this can be changed by modifying the bccroot and related
 #   variables.
 #
-#	This is used for building a TTY or graphical version of NetHack using
+#   This is used for building a TTY or graphical version of NetHack using
 #   WIN32 Console I/O and API routines only.
 #
 #   In addition to your C compiler,
 #
-#     if you want to change           you will need a
+#     if you want to change     you will need a
 #     files with suffix               workalike for
-#              .y                           yacc   (such as bison)
+#              .y                          yacc   (such as bison)
 #              .l                           lex    (such as flex)
 #
 #
@@ -46,8 +46,15 @@ APPVER = 4.0
 
 # Graphical interface
 # Set to Y for a graphical version
+# Set to anything else (or undefine) for a tty version
 
-GRAPHICAL = Y
+#GRAPHICAL = Y
+
+# Debug
+# Set to Y for Debug support (to produce full map files, listing files, and debug information)
+# Set to anything else (or undefine) for a "release" version
+
+DEBUG = Y
 
 !IF "$(APPVER)" == "4.0"
 MAKE_WINVER = 0x0400
@@ -60,11 +67,17 @@ rc     = $(bccbin)\brc32
 link   = $(bccbin)\ilink32
 implib = $(bccbin)\tlib
 
-cflags = -c -D_X86_=1 -DWINVER=$(MAKE_WINVER) -q -I$(bccinc) -w-pia -w-rch
+cflags = -c -D_X86_=1 -DWINVER=$(MAKE_WINVER) -q -I$(bccinc) -w-pia -w-rch -w-par -w-aus
 cdebug = -y -v -O2
 cvarsmt  = -DWIN32 -D_WIN32 -D_MT 
 lflags  = 
+!IF "$(DEBUG)" == "Y"
 linkdebug = /v /m /s 
+cdebug = -v -y -Q
+!ELSE
+linkdebug = /C /Gn
+cdebug =
+!ENDIF
 startobj = $(bcclib)\c0x32.obj
 !IF "$(GRAPHICAL)" == "Y"
 verlflags = /Gn /Gz /q -L$(bcclib) /c  /Tpe /V$(APPVER)
@@ -80,11 +93,7 @@ libsmt  = $(bcclib)\cw32mt.lib $(bcclib)\import32.lib
 #  It must be present prior to compilation.
 
 GAME    = NetHack                 # Game Name
-!IF "$(GRAPHICAL)" == "Y"
-GAMEDIR = \games\nethackwin	      # Game directory
-!ELSE
-GAMEDIR = \games\nethacktty       # Game directory
-!ENDIF
+GAMEDIR = ..\binary               # Game directory
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -472,28 +481,6 @@ DATABASE = $(DAT)\data.base
 GAMEFILE = $(GAMEDIR)\$(GAME).exe
 
 #==========================================
-# Create directory for holding object files
-#==========================================
-
-$(O)obj.tag:
-	@if not exist $(O)*.* mkdir $(OBJ)
-	@echo directory $(OBJ) created >$@
-
-#==========================================
-# Notify of any CL environment variables
-# in effect since they change the compiler
-# options.
-#==========================================
-
-graphicschk:
-!	IF "$(GRAPHICAL)"=="Y"
-	   @echo ----
-	   @echo NOTE: This build will include tile support.
-	   @echo ----
-!	ENDIF
-	@echo graphicschk > graphicschk
-
-#==========================================
 #=============== TARGETS ==================
 #==========================================
 
@@ -536,9 +523,6 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	@if exist $(GAMEDIR)\$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)\$(GAME).pdb to conserve space
 	-copy $(NTSYS)\winnt.cnf   $(GAMEDIR)\defaults.nh
 	copy $(U)recover.exe  $(GAMEDIR)
-! IF ("$(GRAPHICAL)"=="Y")
-    if exist $(TILEBMP) copy $(TILEBMP) $(GAMEDIR)
-! ENDIF
 	echo install done > $@
 
 #	copy $(NTSYS)\winnt.hlp    $(GAMEDIR)
@@ -609,6 +593,29 @@ $(GAMEFILE) : $(ALLOBJ) $(TILERES) $(SRC)\uuid.lib
 
 $(GAME)_.ico : $(NTSYS)\$(GAME).ico
 	@copy $(NTSYS)\$(GAME).ico $@
+
+#==========================================
+# Create directory for holding object files
+#==========================================
+
+$(O)obj.tag:
+	@if not exist $(O)*.* mkdir $(OBJ)
+	@echo directory $(OBJ) created >$@
+
+#==========================================
+# Notify of any CL environment variables
+# in effect since they change the compiler
+# options.
+#==========================================
+
+graphicschk:
+!	IF "$(GRAPHICAL)"=="Y"
+	   @echo ----
+	   @echo NOTE: This build will include tile support.
+	   @echo ----
+!	ENDIF
+	@echo graphicschk > graphicschk
+
 #
 #  Secondary Targets.
 #

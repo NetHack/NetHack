@@ -161,7 +161,7 @@ void
 nt_regularize(s)	/* normalize file name */
 register char *s;
 {
-	register char *lp;
+	register unsigned char *lp;
 
 	for (lp = s; *lp; lp++)
 	    if ( *lp == '?' || *lp == '"' || *lp == '\\' ||
@@ -176,11 +176,10 @@ register char *s;
 char *get_username(lan_username_size)
 int *lan_username_size;
 {
-	static char username_buffer[BUFSZ];
+	static TCHAR username_buffer[BUFSZ];
 	unsigned int status;
-	int i = 0;
+	DWORD i = BUFSZ - 1;
 
-	i = BUFSZ - 1;
 	/* i gets updated with actual size */
 	status = GetUserName(username_buffer, &i);		
 	if (status) username_buffer[i] = '\0';

@@ -35,7 +35,7 @@ typedef struct mswin_nethack_message_window {
 
 static TCHAR szMessageWindowClass[] = TEXT("MSNHMessageWndClass");
 LRESULT CALLBACK	NHMessageWndProc(HWND, UINT, WPARAM, LPARAM);
-static void register_message_window_class();
+static void register_message_window_class(void);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 #ifndef MSG_WRAP_TEXT

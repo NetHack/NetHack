@@ -28,7 +28,7 @@ extern void logDebug(const char *fmt, ...);
 void logDebug(const char *fmt, ...) { }
 #endif
 
-static void mswin_main_loop();
+static void mswin_main_loop(void);
 
 /* Interface definition, for windows.c */
 struct window_procs mswin_procs = {

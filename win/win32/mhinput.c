@@ -19,7 +19,7 @@ static int nhi_read_pos = 0;
 static int nhi_write_pos = 0;
 
 /* initialize input queue */
-void mswin_nh_input_init() 
+void mswin_nh_input_init(void)
 {
 	if( !nhi_init_input ) {
 		nhi_init_input = 1;

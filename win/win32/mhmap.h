@@ -9,7 +9,7 @@
 #include "global.h"
 
 
-HWND mswin_init_map_window ();
+HWND mswin_init_map_window (void);
 void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw);
 
 #define NHMAP_VIEW_TILES			0 

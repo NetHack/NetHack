@@ -25,7 +25,7 @@ LRESULT CALLBACK	MainWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 static LRESULT  onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void		onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
-static void		register_main_window_class();
+static void		register_main_window_class(void);
 static void		select_map_mode(int map_mode);
 static int		menuid2mapmode(int menuid);
 static int		mapmode2menuid(int map_mode);

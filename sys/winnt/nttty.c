@@ -147,7 +147,7 @@ tty_end_screen()
 	clear_screen();
 	if (GetConsoleScreenBufferInfo(hConOut,&csbi))
 	{
-	    int ccnt;
+	    DWORD ccnt;
 	    COORD newcoord;
 	    
 	    newcoord.X = 0;
@@ -189,7 +189,7 @@ void
 nttty_open()
 {
         HANDLE hStdOut;
-        long cmode;
+        DWORD cmode;
         long mask;
         
 	/* Initialize the function pointer that points to
@@ -332,6 +332,8 @@ static const char *extendedlist = "acdefijlmnopqrstuvw?2";
 
 #define inmap(x)	(SCANLO <= (x) && (x) < SCANLO + SIZE(scanmap))
 
+int FDECL(process_keystroke, (INPUT_RECORD *ir, boolean *valid));
+
 int process_keystroke(ir, valid)
 INPUT_RECORD *ir;
 boolean *valid;
@@ -389,8 +391,8 @@ boolean *valid;
 int
 tgetch()
 {
-	int count;
-	int valid = 0;
+	DWORD count;
+	boolean valid = 0;
 	int ch;
 	valid = 0;
 	while (!valid)
@@ -406,13 +408,13 @@ int
 ntposkey(x, y, mod)
 int *x, *y, *mod;
 {
-	int count;
+	DWORD count;
 	unsigned short int scan;
 	unsigned char ch;
 	unsigned long shiftstate;
 	int altseq;
 	int done = 0;
-	int valid = 0;
+	boolean valid = 0;
 	while (!done)
 	{
 	    count = 0;
@@ -453,7 +455,7 @@ nttty_kbhit()
 {
 	int done = 0;	/* true =  "stop searching"        */
 	int retval;	/* true =  "we had a match"        */
-	int count;
+	DWORD count;
 	unsigned short int scan;
 	unsigned char ch;
 	unsigned long shiftstate;
@@ -515,7 +517,7 @@ void
 xputc(c)
 char c;
 {
-	int count;
+	DWORD count;
 
 	if (colorchange) {
 		SetConsoleTextAttribute(hConOut,
@@ -529,7 +531,7 @@ void
 xputs(s)
 const char *s;
 {
-	int count;
+	DWORD count;
 	if (colorchange) {
 		SetConsoleTextAttribute(hConOut,
 			(currentcolor | currenthilite | currentbackground));
@@ -547,7 +549,7 @@ g_putch(in_ch)
 int in_ch;
 {
     char ch = (char)in_ch;
-    int count = 1;
+    DWORD count = 1;
     int tcolor;
     int bckgnd = currentbackground;
 
@@ -563,7 +565,7 @@ int in_ch;
 void
 cl_end()
 {
-		int count;
+		DWORD count;
 
 		ntcoord.X = ttyDisplay->curx;
 		ntcoord.Y = ttyDisplay->cury;
@@ -583,7 +585,7 @@ void
 clear_screen()
 {
 	if (GetConsoleScreenBufferInfo(hConOut,&csbi)) {
-	    int ccnt;
+	    DWORD ccnt;
 	    COORD newcoord;
 	    
 	    newcoord.X = 0;
