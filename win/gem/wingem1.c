@@ -915,6 +915,8 @@ mar_set_dir_keys()
 	}
 }
 
+extern int total_tiles_used;	/* tile.c */
+
 int
 mar_gem_init()
 {
@@ -963,30 +965,44 @@ mar_gem_init()
 	if(max_w/status_font.cw<COLNO-1)
 		mar_set_fontbyid(NHW_STATUS,small_font_id,-small_font);
 	status_w=min(max_w/status_font.cw-3,MSGLEN);
-	if(planes>0 && planes<9)
+
+	if(planes>0 && planes<9){
 		normal_palette=(short *)m_alloc(3*colors*sizeof(short));
 		get_colors(x_handle,normal_palette, colors);
-	if(planes<4){
-		bild_fehler=depack_img(Tilefile?Tilefile:"NH2.IMG",&tile_image);
-	}else{
-		bild_fehler=depack_img(Tilefile?Tilefile:"NH16.IMG",&tile_image);
-		if(!bild_fehler)
-			if(tile_image.planes>1)
-				img_set_colors(x_handle, tile_image.palette, tile_image.planes);
-#if 0
-			else{
-				int mypalette[]={};
-				img_set_colors(x_handle, mypalette, 4);
-			}
-#endif
 	}
 
-	if(bild_fehler ){
+loadimg:
+	bild_fehler=depack_img(Tilefile?Tilefile:(planes>=4)?"NH16.IMG":"NH2.IMG",&tile_image);
+	if(bild_fehler){
 		z_ob=zz_oblist[ABOUT];
 		ob_undraw_dialog(z_ob,0,0,0,0);
 		ob_hide(z_ob,OKABOUT,FALSE);
 		img_error(bild_fehler);
 		return(0);
+	}
+	if(tile_image.img_w%Tile_width || tile_image.img_h%Tile_heigth){
+		Tilefile=NULL;
+		Tile_width=Tile_heigth=16;
+		printf("size didn't match.\n");
+		goto loadimg;
+	}
+	if((tile_image.img_w/Tile_width)*(tile_image.img_h/Tile_heigth)<total_tiles_used){
+		Tilefile=NULL;
+		Tile_width=Tile_heigth=16;
+		printf("Too few Tiles in Image.\n");
+		goto loadimg;
+	}
+	Tiles_per_line=tile_image.img_w/Tile_width;
+
+	if(planes>=4){
+		if(tile_image.planes>1)
+			img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+#if 0
+		else{
+			int mypalette[]={};
+			img_set_colors(x_handle, mypalette, 4);
+		}
+#endif
 	}
 
 	mfdb(&Tile_bilder, (int *)tile_image.addr, tile_image.img_w, tile_image.img_h, 1, tile_image.planes);
@@ -1106,6 +1122,13 @@ int x, y;
 void mar_cliparound(void);
 void mar_map_curs_weiter(void)
 {
+	static int once=TRUE;
+
+	if(once){
+		redraw_window(Gem_nhwindow[WIN_STATUS].gw_window,NULL);
+		redraw_window(Gem_nhwindow[WIN_MESSAGE].gw_window,NULL);
+		once=FALSE;
+	}
 	mar_curs(map_cursx+1,map_cursy);
 	mar_cliparound();
 }
@@ -2147,6 +2170,7 @@ winid wind;
 			p_Gw->gw_window->min_h=z_ob[ROOT].ob_height;
 			window_size(p_Gw->gw_window,&p_Gw->gw_place);
 			p_Gw->gw_dirty=TRUE;
+			add_dirty_rect(dr_stat,&p_Gw->gw_place);
 		}
 		while(get_dirty_rect(dr_stat,&area)){
 			area.g_x=(area.g_x+p_Gw->gw_window->work.g_x+2*status_font.cw+6)&~7;
