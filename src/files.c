@@ -293,6 +293,7 @@ int whichprefix, buffnum;
 }
 
 /* reasonbuf must be at least BUFSZ, supplied by caller */
+/*ARGSUSED*/
 int
 validate_prefix_locations(reasonbuf)
 char *reasonbuf;
@@ -923,6 +924,7 @@ restore_saved_game()
 	return fd;
 }
 
+/*ARGSUSED*/
 static char*
 plname_from_file(filename)
 const char* filename;
@@ -1014,8 +1016,8 @@ char** saved;
 {
     if ( saved ) {
 	int i=0;
-	while (saved[i]) free(saved[i++]);
-	free(saved);
+	while (saved[i]) free((genericptr_t)saved[i++]);
+	free((genericptr_t)saved);
     }
 }
 

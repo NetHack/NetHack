@@ -577,7 +577,7 @@ mdamagem(magr, mdef, mattk)
 	boolean cancelled;
 
 	if (touch_petrifies(pd) && !resists_ston(magr)) {
-	    long protector = attk_protection(mattk->aatyp),
+	    long protector = attk_protection((int)mattk->aatyp),
 		 wornitems = magr->misc_worn_check;
 
 	    /* wielded weapon gives same protection as gloves here */

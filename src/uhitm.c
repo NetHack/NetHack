@@ -711,6 +711,7 @@ int thrown;
 			        shk_your(yourbuf, obj));
 			useup(obj);
 			return(TRUE);
+			/*NOTREACHED*/
 			break;
 #endif
 		    case CORPSE:		/* fixed by polder@cs.vu.nl */
@@ -2138,7 +2139,7 @@ uchar aatyp;
 	    break;
 	  case AD_STON:
 	    if (mhit) {		/* successful attack */
-		long protector = attk_protection(aatyp);
+		long protector = attk_protection((int)aatyp);
 
 		/* hero using monsters' AT_MAGC attack is hitting hand to
 		   hand rather than casting a spell */

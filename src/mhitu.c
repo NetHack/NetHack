@@ -2434,7 +2434,7 @@ register struct attack *mattk;
 		goto assess_dmg;
 	    case AD_STON: /* cockatrice */
 	    {
-		long protector = attk_protection(mattk->aatyp),
+		long protector = attk_protection((int)mattk->aatyp),
 		     wornitems = mtmp->misc_worn_check;
 
 		/* wielded weapon gives same protection as gloves here */

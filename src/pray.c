@@ -353,6 +353,7 @@ register int trouble;
 		    else if (Cursed_obj(uarmf, FUMBLE_BOOTS))
 			otmp = uarmf;
 		    goto decurse;
+		    /*NOTREACHED*/
 		    break;
 	    case TROUBLE_CURSED_ITEMS:
 		    otmp = worst_cursed_item();

@@ -1153,7 +1153,7 @@ register struct obj *otmp;
 		break;
 	case WAN_CANCELLATION:
 	case SPE_CANCELLATION:
-		cancel_monst(mtmp, otmp, FALSE, TRUE, FALSE);
+		(void) cancel_monst(mtmp, otmp, FALSE, TRUE, FALSE);
 		break;
 	}
 	if (reveal_invis) {

@@ -805,7 +805,7 @@ boolean guess;
 		u.dy = sgn(u.ty - u.uy);
 		if (test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE))
 		    return TRUE;
-		goto done;
+		goto found;
 	    }
 	    tx = px;
 	    ty = py;
@@ -819,7 +819,7 @@ boolean guess;
 	return FALSE;
     }
 
-done:
+found:
     u.dx = 0;
     u.dy = 0;
     nomul(0);
