@@ -45,7 +45,7 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfItalic			=	FALSE;		         // italic attribute option
 		lgfnt.lfUnderline		=	FALSE;			     // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-		lgfnt.lfCharSet			=	DEFAULT_CHARSET;     // character set identifier
+		lgfnt.lfCharSet			=	OEM_CHARSET;     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
@@ -63,7 +63,7 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
 		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;				// strikeout attribute option
-		lgfnt.lfCharSet			=	DEFAULT_CHARSET;     // character set identifier
+		lgfnt.lfCharSet			=	OEM_CHARSET;     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
@@ -81,7 +81,7 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
 		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-		lgfnt.lfCharSet			=	DEFAULT_CHARSET;     // character set identifier
+		lgfnt.lfCharSet			=	OEM_CHARSET;     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
@@ -98,30 +98,12 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
 		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-		lgfnt.lfCharSet			=	DEFAULT_CHARSET;     // character set identifier
+		lgfnt.lfCharSet			=	OEM_CHARSET;     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
 		lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
 		/* lgfnt.lfFaceName */
-		break;
-
-	case NHW_MAP:
-		lgfnt.lfHeight			=	-TILE_Y;			 // height of font
-		lgfnt.lfWidth			=	-TILE_X;		     // average character width
-		lgfnt.lfEscapement		=	0;					 // angle of escapement
-		lgfnt.lfOrientation		=	0;					 // base-line orientation angle
-		lgfnt.lfWeight			=	FW_NORMAL;			 // font weight
-		lgfnt.lfItalic			=	FALSE;			     // italic attribute option
-		lgfnt.lfUnderline		=	FALSE;				 // underline attribute option
-		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-		lgfnt.lfCharSet			=	DEFAULT_CHARSET;	     // character set identifier
-														// we need OEM charset for Rogue level
-		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
-		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
-		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
-		lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
-		_tcscpy( lgfnt.lfFaceName, TEXT("Terminal"));
 		break;
 	}
 

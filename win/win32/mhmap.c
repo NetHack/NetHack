@@ -6,8 +6,8 @@
 #include "mhmap.h"
 #include "mhmsg.h"
 #include "mhinput.h"
-#include "mhfont.h"
 
+#define NHMAP_FONT_NAME TEXT("Terminal")
 #define MAXWINDOWTEXT 255
 
 extern short glyph2tile[];
@@ -156,7 +156,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 	lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
 	lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
-	_tcscpy(lgfnt.lfFaceName, TEXT("Terminal"));
+	_tcscpy(lgfnt.lfFaceName, NHMAP_FONT_NAME);
 	data->hMapFont = CreateFontIndirect(&lgfnt);
 
 	mswin_cliparound(data->xCur, data->yCur);

@@ -741,7 +741,7 @@ static const uchar r_oc_syms[MAXOCLASSES] = {
 static const uchar IBM_r_oc_syms[MAXOCLASSES] = {	/* a la EPYX Rogue */
 /* 0*/	'\0',
 	ILLOBJ_SYM,
-#  if defined(MSDOS) || defined(WIN32) || defined(OS2)
+#  if defined(MSDOS) || defined(OS2) || ( defined(WIN32) && !defined(MSWIN_GRAPHICS) )
 	0x18,			/* weapon: up arrow */
 /*	0x0a, */ ARMOR_SYM,	/* armor:  Vert rect with o */
 /*	0x09, */ RING_SYM,	/* ring:   circle with arrow */
@@ -799,6 +799,9 @@ boolean is_rlevel;
 #  if defined(USE_TILES) && defined(MSDOS)
 		&& !iflags.grmode
 #  endif
+#  if defined(MSWIN_GRAPHICS)
+		&& 0
+#  endif
 				)
 	    monsyms[S_HUMAN] = 0x01; /* smiley face */
 # endif
@@ -842,6 +845,7 @@ boolean is_rlevel;
 	    showsyms[S_litcorr] = 0xb2;
 	    showsyms[S_upstair] = 0xf0; /* Greek Xi */
 	    showsyms[S_dnstair] = 0xf0;
+#ifndef MSWIN_GRAPHICS
 	    showsyms[S_arrow_trap] = 0x04; /* diamond (cards) */
 	    showsyms[S_dart_trap] = 0x04;
 	    showsyms[S_falling_rock_trap] = 0x04;
@@ -864,6 +868,7 @@ boolean is_rlevel;
 	    showsyms[S_magic_trap] = 0x04;
 	    showsyms[S_anti_magic_trap] = 0x04;
 	    showsyms[S_polymorph_trap] = 0x04;
+#endif
 	}
 #endif /* ASCIIGRAPH */
 
