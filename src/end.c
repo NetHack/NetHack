@@ -379,7 +379,7 @@ boolean taken;
 			for (obj = invent; obj; obj = obj->nobj) {
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
-			    if (Is_container(obj))
+			    if (Is_container(obj) || obj->otyp == STATUE)
 				obj->cknown = obj->lknown = 1;
 			}
 			(void) display_inventory((char *)0, TRUE);
@@ -991,7 +991,7 @@ boolean identified, all_containers;
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown =
 			    obj->dknown = obj->rknown = 1;
-			    if (Is_container(obj))
+			    if (Is_container(obj) || obj->otyp == STATUE)
 				obj->cknown = obj->lknown = 1;
 			}
 			putstr(tmpwin, 0, doname(obj));
