@@ -8108,7 +8108,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 426 (gray / flint)
+# tile 426 (gray / touchstone)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -8127,7 +8127,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 427 (gray / touchstone)
+# tile 427 (gray / flint)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
