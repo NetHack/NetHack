@@ -121,11 +121,12 @@ void
 tty_startup(wid, hgt)
 int *wid, *hgt;
 {
-	int twid = origcsbi.dwSize.X;
+/*	int twid = origcsbi.dwSize.X; */
+	int twid = origcsbi.srWindow.Right - origcsbi.srWindow.Left;
 
 	if (twid > 80) twid = 80;
 	*wid = twid;
-	*hgt = origcsbi.dwSize.Y;
+	*hgt = origcsbi.srWindow.Bottom - origcsbi.srWindow.Top;
 }
 
 void
@@ -589,7 +590,7 @@ clear_screen()
 	    newcoord.Y = 0;
 	    FillConsoleOutputAttribute(hConOut,
 	    		FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-	    		CO * LI,
+	    		csbi.dwSize.X * csbi.dwSize.Y,
 	    		newcoord, &ccnt);
 	    newcoord.X = 0;
 	    newcoord.Y = 0;
@@ -655,14 +656,33 @@ tty_delay_output()
 void
 cl_eos()
 {
-
-		register int cy = ttyDisplay->cury+1;
+	    register int cy = ttyDisplay->cury+1;		
+#if 0
 		while(cy <= LI-2) {
 			cl_end();
 			xputc('\n');
 			cy++;
 		}
 		cl_end();
+#else
+	if (GetConsoleScreenBufferInfo(hConOut,&csbi)) {
+	    int ccnt;
+	    COORD newcoord;
+	    
+	    newcoord.X = 0;
+	    newcoord.Y = ttyDisplay->cury;
+	    FillConsoleOutputAttribute(hConOut,
+	    		FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+	    		csbi.dwSize.X * csbi.dwSize.Y - cy,
+	    		newcoord, &ccnt);
+	    newcoord.X = 0;
+	    newcoord.Y = ttyDisplay->cury;
+	    FillConsoleOutputCharacter(hConOut,' ',
+			csbi.dwSize.X * csbi.dwSize.Y - cy,
+			newcoord, &ccnt);
+	}
+	colorchange = TRUE;
+#endif
 		tty_curs(BASE_WINDOW, (int)ttyDisplay->curx+1,
 						(int)ttyDisplay->cury);
 }
