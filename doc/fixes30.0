@@ -1,0 +1,164 @@
+$RCSfile$ $Revision$ $Date$
+
+[This is a partial list supplied by Ken Arromdee long after the fact]
+
+General Fixes and Modified Features
+-----------------------------------
+dropping a weapon, then picking it up while blind causes it become 
+	unidentified but it remains that way after your vision returns
+when blind and feeling the floor, the objects then on the floor should
+	have their characteristics become unknown
+zapping a wand of probing at yourself works, however using a stethoscope
+	on yourself does not
+trolls that come back to life don't retain their names
+if you look at what is on the ground and there is more than a screenful,
+	quantities are not printed (i.e. "food rations")
+if pickup was off and you moved onto a spot with both engraving and objects,
+	you got told what the engraving was twice
+if a Keystone Kop threw a pie and the pie hit a shopkeeper, the shopkeeper
+	became angry
+"two handed sword" is spelled with and without a hyphen in various places
+trying to descend stairs while levitating gives a message where "You're"
+	is misspelled as "Your"
+the 'V' command gives a history that is not quite correct; it wasn't 
+	Ken Arromdee that merged PC Hack and Unix Hack; rather, PC Hack 
+	was derived from Unix Hack by Don Kneller.  It was (I think) 
+	Mike Stephenson who merged the many Hack versions.
+the uranium wand gets described as "an" uranium wand
+potions which have been both called and identified have the called instead
+	of the identified name printed out
+status line at the bottom of the screen is formatted strangely for the
+	first 10 moves; after 10 moves it becomes normal
+if you polymorph yourself into a rockmole, you are unable to dig through
+	rock
+a stethoscope or wand of probing, used on a monster, printed out a format
+	with spaces in it (such as %-3d instead of %d) causing such messages
+	to be longer than necessary
+the number printed out for damage by stethoscope or wand of probing is 
+	completely incorrect
+sometimes your dog would turn into a bat (retaining the same name and 
+	tameness) when saving and restoring,going down and back up
+	and in bones levels
+ghosts on bones levels are replaced by little dogs
+if you are polymorphed and drink a potion of healing which raises your
+	maximum monster hit points, your current hit points only are raised, so
+	you may have (for instance) 37 out of 36 hit points
+when you pick up something from a shop, the message is something like
+	"For you, kind sir, only 5 for this <garbage>" on systems where
+	pointer is not the same size as integer
+removing a leash from a dog produces garbage, and also can sometimes
+	crash the game
+when the Wizard is mentioned, you get garbage
+if you tame a wild dog, and then try to hit it, the safe-attack routine
+	says "You stop to avoid hitting .", or sometimes garbage
+when you are invisible but can see invisible, drinking at a fountain which
+	dries up causes your symbol to be erased from the screen.
+pushing an enormous rock onto a teleport trap deletes it instead of 
+	teleporting it
+sometimes returning to human form from a polymorph would leave you with 
+	only 1 current hit point left
+sometimes polymorphing would leave you with an 18/** strength
+if you used a stethoscope on a wall and a creature moved into the revealed
+	door before you did, when creature moved off, the door was replaced
+	by a wall symbol again, until you walked through it
+playing a game with fountain symbols set to one character, and restoring it
+	using a configuration file having them set to a different character,
+	leaves the fountain symbols as the old character
+problem with food poisoning and blindness where you could end up permanently 
+	blind, not even reversible by healing etc.
+you could not wish for a C-ration or K-ration due to lowercase conversion
+zapping a wand of death at yourself, and the death touch of a demon
+	prince, killed you even if you were polymorphed into an undead,
+	but bouncing death rays didn't
+if you threw an object in a shop, it landed on the floor still unpaid
+	zapping a wand of cancellation at yourself turned all your objects to
+	-1 instead of +0; -1 was only needed for wands (since cancelling wands 
+	to +0 allowed a sneaky way of getting infinite wishes)
+#remove command is incorrectly described as removing a cursed
+	object, but it actually removes only iron balls
+at least some messages given for special abilities when you are polymorphed
+	printed out the monster type even if you were blind
+wishing for a scroll of mail, with MAIL undefined, is permitted but
+	reading the scroll gave an "impossible" error message; change it to
+	read: "This seems to be junk mail directed to the finder of the Eye 
+	of Larn."
+if you were blind, effects of scrolls, et al, still said things such as
+	"Your mace glows green for a moment," "Your left ring glows white"
+the message "The xan pricks your ___ leg" still mentions the type of
+	monster (xan) when you are blind
+polymorphing could change your gender, but when the game ended you were 
+	still described as a "Cave-man" or "Priest" instead of 
+	"Cave-woman" or "Priestess"
+if you got rocks by using a pick-axe on an enormous rock, the rocks 
+	started out blessed
+if you escaped from a shop by throwing your iron ball to the exit, the ball
+	would stay unpaid
+any object thrown in a shop stayed unpaid, and you had to
+	pick the object up again and then drop it for it to become paid
+if you were invisible but could see invisible, when you drank from a fountain
+	that dried up, your symbol got erased from the screen
+several times colors were mentioned (i.e. black glows when you pray too much)
+	but the colors weren't always changed for hallucination
+if punished and your chain and 1 other object is on the floor, you
+	get asked if you want to pick up a specific type of object, 
+	and the chain is given as one of the possible objects
+if you polymorph into a "new man", your energy points never change
+trolls, when killed, can leave bodies or objects, but they should
+	always leave bodies so they can regenerate back to life, 
+	whether or not they left objects
+demon prince demanding bribe gets randomly relocated instead of being placed 
+	next to you
+if you polymorph another tool into a magic marker, the marker always starts
+	out dried out
+hallucination has the problem that if you do something which takes no time,
+	the monsters still change
+if you tried drinking at a fountain while levitating, you got asked if you 
+	wanted to drink, and then you weren't allowed to do it, and 
+	the fountain could still dry up
+if you were fire resistant and a magic trap produced a tower of flame, you 
+	also get a second message (a shiver...)
+when restoring a game, if there was an error, your saved game still vanishd
+	for some errors
+pets were always referred to as "him" in the leash code
+stethoscope in the up or down direction while swallowed referred to "floor" 
+	and "ceiling" instead of to the monster that swallowed you
+if you could not save a game, the screen cleared and you were told to 
+	"Continue or Quit", but if you typed C, the game thought you just 
+	gave it a Call command
+you could get told "that spellbook was a mimic" even if mimic was on a wall
+if you were turning to stone and you polymorphed yourself into a 'c', you 
+	still died from the stoning
+if you interrupted the program before it finished loading a saved game,
+	you were asked if you want your possessions identified
+"ctmp" was mistakenly used in MHITU.C when being hit by a rust monster
+	rusting your helmet but it should have been "!mtmp->mcan"
+
+
+Platform- and/or Interface-Specific Fixes
+-----------------------------------------
+PC: often the same character class, and same player name, will end up
+	getting 2 scores on the high score list
+PC: if your name contained a period and you were playing on a PC, you would
+	 have problems saving games since your save-file name still contained
+	 2 periods and would thus be illegal; change periods to underscores 
+	when figuring out what the save file should be called
+PC: if you polymorphed into a "new man", and changed your name, when you saved
+	your game the game was still saved under a filename derived from your
+	old name, and to restore that game you had to specify your old name
+
+General New Features
+--------------------
+when polymorphed into a giant you are now able to pick up and
+	throw rocks by giving infinite carrying capacity
+give the Healer a pair of gloves (the most logical piece of armor
+	for a physician to start out with)
+give the Healer a lot of money to start with (doctors are supposedly
+	rich, you see)
+have the Healer start out with the healing, cure blindness spells 
+	already known
+create a "trial mode", similar to Wizard Mode where you get a wand of wishing
+	with charges and you can't get on the high score list
+if you are standing on a trapdoor and you type a '>' symbol,
+	print "You jump down the hole." and go down to the next level
+
+
