@@ -649,6 +649,7 @@ $(GAMEDIR)\nhdefkey.dll : $(O)nhdefkey.o
 	@echo EXPORTS >nhdefkey.def
 	@echo    ProcessKeystroke >>nhdefkey.def
 	@echo    NHkbhit >>nhdefkey.def
+	@echo    CheckInput >>nhdefkey.def
 	@echo    SourceWhere >>nhdefkey.def
 	@echo    SourceAuthor >>nhdefkey.def
 	@echo    KeyHandlerName >>nhdefkey.def
