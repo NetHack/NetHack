@@ -232,7 +232,8 @@ short hor, vert;
 	SetPort (_mt_window);
 	SetOrigin (-1, -1);
 	
-	font_size = (iflags.large_font && !small_screen) ? 12 : 9;
+	font_size = iflags.wc_fontsiz_map ? iflags.wc_fontsiz_map :
+		(iflags.large_font && !small_screen) ? 12 : 9;
 	if (init_tty_number (_mt_window, win_fonts [NHW_MAP], font_size, CO, LI) != noErr)
 		error("_mt_init_stuff: Couldn't init tty.");
 

@@ -59,12 +59,7 @@ char def;
  *   If resp is NULL, any single character is accepted and returned.
  */
 {
-#if ENABLE_MAC_POPUP
-	if (iflags.popup_dialog)
-		return popup_yn_function(query, resp, def);
-	else
-#endif
 		return topl_yn_function(query, resp, def);
 }
 
-/*topl.c*/
+/* mactopl.c */

@@ -1,3 +1,19 @@
+#include <MacTypes.r>
+#include "date.h"
+#include "patchlevel.h"
+
+resource 'vers' (1, purgeable) {
+	VERSION_MAJOR, (VERSION_MINOR<<4) | PATCHLEVEL, final, EDITLEVEL, verUS,
+	VERSION_STRING,
+	VERSION_STRING
+};
+
+resource 'vers' (2, purgeable) {
+	VERSION_MAJOR, (VERSION_MINOR<<4) | PATCHLEVEL, final, EDITLEVEL, verUS,
+	VERSION_STRING,
+	"devteam@nethack.org"
+};
+
 read 'File' (1000,"cmdhelp") ":dat:cmdhelp";
 read 'File' (1001,"help") ":dat:help";
 read 'File' (1002,"hh") ":dat:hh";
@@ -30,31 +46,38 @@ read 'File' (1028,"medusa-2.lev") ":lib:medusa-2.lev";
 read 'File' (1029,"minefill.lev") ":lib:minefill.lev";
 read 'File' (1030,"minend-1.lev") ":lib:minend-1.lev";
 read 'File' (1031,"minend-2.lev") ":lib:minend-2.lev";
-read 'File' (1032,"minetn-1.lev") ":lib:minetn-1.lev";
-read 'File' (1033,"minetn-2.lev") ":lib:minetn-2.lev";
-read 'File' (1034,"options") ":lib:options";
-read 'File' (1035,"oracle.lev") ":lib:oracle.lev";
-read 'File' (1036,"oracles") ":lib:oracles";
-read 'File' (1037,"orcus.lev") ":lib:orcus.lev";
-read 'File' (1038,"quest.dat") ":lib:quest.dat";
-read 'File' (1039,"rumors") ":lib:rumors";
-read 'File' (1040,"sanctum.lev") ":lib:sanctum.lev";
-read 'File' (1041,"soko1-1.lev") ":lib:soko1-1.lev";
-read 'File' (1042,"soko1-2.lev") ":lib:soko1-2.lev";
-read 'File' (1043,"soko2-1.lev") ":lib:soko2-1.lev";
-read 'File' (1044,"soko2-2.lev") ":lib:soko2-2.lev";
-read 'File' (1045,"soko3-1.lev") ":lib:soko3-1.lev";
-read 'File' (1046,"soko3-2.lev") ":lib:soko3-2.lev";
-read 'File' (1047,"soko4-1.lev") ":lib:soko4-1.lev";
-read 'File' (1048,"soko4-2.lev") ":lib:soko4-2.lev";
-read 'File' (1049,"tower1.lev") ":lib:tower1.lev";
-read 'File' (1050,"tower2.lev") ":lib:tower2.lev";
-read 'File' (1051,"tower3.lev") ":lib:tower3.lev";
-read 'File' (1052,"valley.lev") ":lib:valley.lev";
-read 'File' (1053,"water.lev") ":lib:water.lev";
-read 'File' (1054,"wizard1.lev") ":lib:wizard1.lev";
-read 'File' (1055,"wizard2.lev") ":lib:wizard2.lev";
-read 'File' (1056,"wizard3.lev") ":lib:wizard3.lev";
+read 'File' (1032,"minend-3.lev") ":lib:minend-3.lev";
+read 'File' (1033,"minend-4.lev") ":lib:minend-4.lev";
+read 'File' (1034,"minetn-1.lev") ":lib:minetn-1.lev";
+read 'File' (1035,"minetn-2.lev") ":lib:minetn-2.lev";
+read 'File' (1036,"minetn-3.lev") ":lib:minetn-3.lev";
+read 'File' (1037,"minetn-4.lev") ":lib:minetn-4.lev";
+read 'File' (1038,"minetn-5.lev") ":lib:minetn-5.lev";
+read 'File' (1039,"minetn-6.lev") ":lib:minetn-6.lev";
+read 'File' (1040,"minetn-7.lev") ":lib:minetn-7.lev";
+read 'File' (1041,"options") ":lib:options";
+read 'File' (1042,"oracle.lev") ":lib:oracle.lev";
+read 'File' (1043,"oracles") ":lib:oracles";
+read 'File' (1044,"orcus.lev") ":lib:orcus.lev";
+read 'File' (1045,"quest.dat") ":lib:quest.dat";
+read 'File' (1046,"rumors") ":lib:rumors";
+read 'File' (1047,"sanctum.lev") ":lib:sanctum.lev";
+read 'File' (1048,"soko1-1.lev") ":lib:soko1-1.lev";
+read 'File' (1049,"soko1-2.lev") ":lib:soko1-2.lev";
+read 'File' (1050,"soko2-1.lev") ":lib:soko2-1.lev";
+read 'File' (1051,"soko2-2.lev") ":lib:soko2-2.lev";
+read 'File' (1052,"soko3-1.lev") ":lib:soko3-1.lev";
+read 'File' (1053,"soko3-2.lev") ":lib:soko3-2.lev";
+read 'File' (1054,"soko4-1.lev") ":lib:soko4-1.lev";
+read 'File' (1055,"soko4-2.lev") ":lib:soko4-2.lev";
+read 'File' (1056,"tower1.lev") ":lib:tower1.lev";
+read 'File' (1057,"tower2.lev") ":lib:tower2.lev";
+read 'File' (1058,"tower3.lev") ":lib:tower3.lev";
+read 'File' (1059,"valley.lev") ":lib:valley.lev";
+read 'File' (1060,"water.lev") ":lib:water.lev";
+read 'File' (1061,"wizard1.lev") ":lib:wizard1.lev";
+read 'File' (1062,"wizard2.lev") ":lib:wizard2.lev";
+read 'File' (1063,"wizard3.lev") ":lib:wizard3.lev";
 read 'File' (1100,"Arc-fila.lev") ":lib:Arc-fila.lev";
 read 'File' (1101,"Arc-filb.lev") ":lib:Arc-filb.lev";
 read 'File' (1102,"Arc-goal.lev") ":lib:Arc-goal.lev";

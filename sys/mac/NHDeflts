@@ -1,23 +1,35 @@
-# SCCS Id: @(#)NetHack Defaults	3.3	99/11/20
-# Copyright (c) 1999 by Dean Luick, Mark Modrall, and Kevin Hugo
+# SCCS Id: @(#)NetHack Defaults	3.4	2002/03/15
+# Copyright (c) 2002 by Dean Luick, Mark Modrall, and Kevin Hugo
 # NetHack may be freely redistributed.  See license for details.
 #
 # Default settings for the Macintosh port of NetHack.
-# Comment lines begin with a `#' character.
+# Lines beginning with a `#' character are "comments" and are
+# ignored all the way to the end of the line.  Using this
+# method, some of the lines below have been disabled so you
+# can see an example without having those options actually
+# set.  Remove the `#' character to "uncomment" the line and
+# allow those options to take effect.
 
 
 ### Display ###
 # Uncomment for the traditional single-window tty interface
 #OPTIONS=win:tty
 
-# Font size and style (use HackFont or NewHackFont)
-OPTIONS=!large,fontmap:NewHackFont
+# Boulder symbol
+#OPTIONS=boulder:0
 
-# Color and background
-OPTIONS=color,background:white,use_stone:1
+# Color
+OPTIONS=color
 
-# Obsolete way to obtain reverse video; use background:black instead
-#OPTIONS=palette:000/c22/2c2/ca0/22c/a2a/2aa/ccc/999/f00/0f0/dd0/00f/d0d/0dd/fff/999/444/622/62c/-222
+# Fonts
+#OPTIONS=font_map:NewHackFont,font_size_map:9
+#OPTIONS=font_menu:geneva,font_size_menu:9
+#OPTIONS=font_message:PSHackFont,font_size_message:9
+#OPTIONS=font_status:monaco,font_size_status:9
+#OPTIONS=font_text:geneva,font_size_text:9
+
+# Don't make dark corridors look like lit corridors
+OPTIONS=!lit_corridor
 
 # Enable sound and beeps
 OPTIONS=sound,!silent
@@ -30,8 +42,14 @@ OPTIONS=sound,!silent
 # Save game state periodically in case of crashes (recommended)
 OPTIONS=checkpoint
 
+# How to prompt for things after death
+#OPTIONS=disclose:+i na -v yg nc
+
 # Show tombstone and top scores at death
 OPTIONS=tombstone,scores:10t/3a/o
+
+# Show top ten list in its own window
+#OPTIONS=toptenwin
 
 
 ### User input and feedback ###
@@ -39,24 +57,33 @@ OPTIONS=tombstone,scores:10t/3a/o
 # (traditional, combination, partial, or full)
 OPTIONS=menustyle:full
 
-# Display a little more information with some commands
-OPTIONS=verbose
+# Extended (`#') commands by menu
+#OPTIONS=extmenu
 
-# Pause for --more-- and make it boldface
-OPTIONS=page_wait,standout
-
-# Allow spacebar as rest command
-#OPTIONS=rest_on_space
+# Increase the number of message lines remembered
+#OPTIONS=msghistory:60
 
 # Enable the number pad keys
 OPTIONS=number_pad
 
+# Pause for --more-- and make it boldface
+OPTIONS=page_wait,standout
+
+# Ask for confirmation with the #pray command
+OPTIONS=prayconfirm
+
+# Allow spacebar as rest command
+#OPTIONS=rest_on_space
+
 # Display experience, score, and time on status line
 OPTIONS=showexp,showscore,time
 
-# Use popup windows for yes/no questions
-# This is likely to go away in future releases
-#OPTIONS=popup_dialog
+# Turn off animations
+#OPTIONS=!sparkle
+
+# Display a little more information with some commands
+#OPTIONS=suppress_alert:3.3.0
+OPTIONS=verbose
 
 
 ### Character ###
@@ -76,18 +103,59 @@ OPTIONS=showexp,showscore,time
 
 
 ### Inventory ###
+# Automatically dig if wielding a pick
+#OPTIONS=autodig
+
 # Disable autopickup (toggle it with the `@' command)
-#OPTIONS=!autopickup
+#OPTIONS=!autopickup,pickup_types:$*
+
+# Automatically fill the quiver
+#OPTIONS=autoquiver
 
 # Don't use fixed inventory letters
 OPTIONS=!fixinv,perm_invent,sortpack
 
+# What you want to call slime molds
+#OPTIONS=fruit:grape
+
+# Desired inventory display order
+#OPTIONS=packorder:)[(
+
+# How much you're willing to carry without confirmation
+#OPTIONS=pickup_burden:B
+
+# Put weapon in secondary slot when wielding another
+#OPTIONS=pushweapon
+
 
 ### Pets ###
 # What to call your starting pet, and its type
-OPTIONS=dogname:Quinn,catname:Vladimir,horsename:Silver,pettype:dog
+#OPTIONS=dogname:Quinn,catname:Vladimir,horsename:Silver,pettype:dog
 
 # Don't intentionally attack your pets
 OPTIONS=confirm,!hilite_pet,safe_pet
+
+
+### Unused options ###
+
+# Now obsolete
+#
+# background, large_font, popup_dialog, use_stone
+
+# Obsolete way to obtain reverse video; use at your own risk
+#OPTIONS=palette:000/c22/2c2/ca0/22c/a2a/2aa/ccc/999/f00/0f0/dd0/00f/d0d/0dd/fff/999/444/622/62c/-222
+
+# Options used in tty window mode, but not mac window mode
+#
+# menu_..., msg_window, timed_delay, use_inverse, vary_msgcount
+
+# Options used by other ports but not Macintosh:
+#
+# align_message, align_status, ascii_map, BIOS, checkspace,
+# decgraphics, eight_bit_tty, ibmgraphics, ignintr, mail,
+# map_mode, null, player_selection, preload_tiles, rawio,
+# splash_screen, tiled_map, tile_..., videocolors, videoshades,
+# windowcolors
+
 
 # End-of-file

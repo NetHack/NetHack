@@ -1,11 +1,11 @@
-            Macintosh-specific help file for NetHack 3.3
+            Macintosh-specific help file for NetHack 3.4
 
 The following are options, features, or concerns specific to the
-Macintosh port of NetHack 3.3.  Bug reports, suggestions, comments,
+MacOS Classic port of NetHack.  Bug reports, suggestions, comments,
 and so on, should be addressed to:
 
     To: nethack-bugs@nethack.org
-    Subject: Mac NetHack 3.3
+    Subject: Mac NetHack 3.4
 
 or you can use our on-line bug reporting form at
 
@@ -17,10 +17,10 @@ and so on).
 
 
 === Configuration of a playground
-    NetHack 3.3 is packaged in a Dungeon Folder which includes:
+    NetHack is packaged in a Dungeon Folder which includes:
         NetHack - the application file itself.
         NetHack Defaults - text file for default option settings.
-        license - licensing terms for nethack.
+        License - licensing terms for nethack.
         Guidebook - description of the game in long format.
         Recover - the application to restore save files from crashed games.
     Previous versions had a large number of data files in the Dungeon
@@ -50,6 +50,7 @@ and so on).
     and answer the "Who are you?" dialog with the player name of
     the saved game in the Dungeon Folder.
 
+
 === Windows
     The Dungeon Map and Message windows are the essential windows used
     during window-mode play.  During tty-mode play there is only one
@@ -68,23 +69,13 @@ and so on).
     window positions are saved in a file labelled "NetHack Windows"
     in the appropriate preferences folder.
 
+
 === Default options
     The following options are specific to the Macintosh port:
     background:  - black or white
     MACgraphics  - use enhanced dungeon map symbols [TRUE]
-    large_font   - use 12 point font instead of 9 point font [FALSE]
-    popup_dialog - use real dialogs for question prompts [FALSE]
     page_wait    - display  --MORE--  after messages [TRUE]
-    use_stone:#  - use a background pattern for the dungeon.
 
-    large_font is currently a pre-game option and has no effect
-    after the Dungeon Map window is created.
-
-	use_stone is also a pre-game option.  The number parameter
-    specifies which pattern to use.  If the number is 0 or
-    greater than the number of available patterns, it has no
-    effect.
-        
     Default options may be set by editing the NetHack Defaults text
     file (using SimpleText or your favorite editor).  The following
     notation is used:

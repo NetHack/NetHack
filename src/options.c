@@ -68,7 +68,7 @@ static struct Bool_Opt
 	{"color",         &iflags.wc_color, FALSE, SET_IN_GAME},	/*WC*/
 # endif
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},
-#ifdef TERMLIB
+#if defined(TERMLIB) && !defined(MAC_GRAPHICS_ENV)
 	{"DECgraphics", &iflags.DECgraphics, FALSE, SET_IN_GAME},
 #else
 	{"DECgraphics", (boolean *)0, FALSE, SET_IN_FILE},
@@ -98,8 +98,12 @@ static struct Bool_Opt
 #else
 	{"IBMgraphics", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+#ifndef MAC
 	{"ignintr", &flags.ignintr, FALSE, SET_IN_GAME},
-	{"large_font", &iflags.wc_large_font, FALSE, SET_IN_GAME},	/*WC*/
+#else
+	{"ignintr", (boolean *)0, FALSE, SET_IN_FILE},
+#endif
+	{"large_font", &iflags.wc_large_font, FALSE, SET_IN_FILE},	/*WC*/
 	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
 	{"lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME},
 #ifdef MAC_GRAPHICS_ENV
@@ -3014,7 +3018,7 @@ struct wc_Opt wc_options[] = {
 	{"color", WC_COLOR},
 	{"eight_bit_tty", WC_EIGHT_BIT_IN},
 	{"hilite_pet", WC_HILITE_PET},
-	{"large_font", WC_LARGE_FONT},
+	{"large_font", WC_LARGE_FONT},	/* now obsolete */
 	{"popup_dialog", WC_POPUP_DIALOG},
 	{"preload_tiles", WC_PRELOAD_TILES},
 	{"tiled_map", WC_TILED_MAP},

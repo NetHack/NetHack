@@ -626,9 +626,12 @@ got1 :
 
 	if (kind == NHW_MESSAGE) {
 		aWin->font_number = win_fonts [NHW_MESSAGE];
-		aWin->font_size = iflags.large_font ? 12 : 9;
+		aWin->font_size = iflags.wc_fontsiz_message? iflags.wc_fontsiz_message :
+			iflags.large_font ? 12 : 9;
 		if (!top_line) {
 			const Rect out_of_scr = {10000, 10000, 10100, 10100};
+			TextFont(aWin->font_number);
+			TextSize(aWin->font_size);
 			TextFace(bold);
 			top_line = TENew(&out_of_scr, &out_of_scr);
 			TEActivate(top_line);
@@ -636,7 +639,7 @@ got1 :
 		}
 	} else {
 		aWin->font_number = win_fonts [NHW_TEXT];
-		aWin->font_size = 9;
+		aWin->font_size = iflags.wc_fontsiz_text ? iflags.wc_fontsiz_text : 9;
 	}
 
 	TextFont (aWin->font_number); 
@@ -2488,7 +2491,10 @@ try_key_queue (char *bufp) {
 /* Interface definition, for windows.c */
 struct window_procs mac_procs = {
 	"mac",
-	WC_ASCII_MAP|WC_COLOR|WC_LARGE_FONT,
+	WC_COLOR | WC_HILITE_PET |
+	WC_LARGE_FONT |	/*  obsolete */
+	WC_FONT_MAP | WC_FONT_MENU | WC_FONT_MESSAGE | WC_FONT_STATUS | WC_FONT_TEXT |
+	WC_FONTSIZ_MAP | WC_FONTSIZ_MENU | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_TEXT,
 	mac_init_nhwindows,
 	mac_unimplemented,	/* see macmenu.c:mac_askname() for player selection */
 	mac_askname,

@@ -8,6 +8,8 @@
 #include "macpopup.h"
 #include "func_tab.h"
 
+extern int NDECL(extcmd_via_menu);	/* cmd.c */
+
 typedef Boolean FDECL ((* key_func), (unsigned char));
 
 int
@@ -48,13 +50,7 @@ topl_getlin(const char *query, char *bufp, Boolean ext) {
  */
 void
 mac_getlin(const char *query, char *bufp) {
-
-#if ENABLE_MAC_POPUP
-	if (iflags.popup_dialog)
-		popup_getlin (query, bufp);
-	else
-#endif
-		topl_getlin (query, bufp, false);
+	topl_getlin (query, bufp, false);
 }
 
 
@@ -67,6 +63,7 @@ mac_get_ext_cmd() {
 	char bufp[BUFSZ];
 	int i;
 
+	if (iflags.extmenu) return extcmd_via_menu();
 	topl_getlin("# ", bufp, true);
 	for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
 		if (!strcmp(bufp, extcmdlist[i].ef_txt)) break;
