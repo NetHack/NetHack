@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.4	2002/05/10	*/
+/*	SCCS Id: @(#)eat.c	3.4	2002/09/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -776,6 +776,18 @@ register int pm;
 	if (eatmbuf) (void)eatmdone();
 
 	switch(pm) {
+	    case PM_NEWT:
+		/* MRKR: "eye of newt" may give small magical energy boost */
+		if (rn2(3) || 3 * u.uen <= 2 * u.uenmax) {
+		    You_feel("a mild buzz.");
+		    u.uen += rnd(3);
+		    if (u.uen > u.uenmax) {
+			if (!rn2(3)) u.uenmax++;
+			u.uen = u.uenmax;
+		    }
+		    flags.botl = 1;
+		}
+		break;
 	    case PM_WRAITH:
 		pluslvl(FALSE);
 		break;
