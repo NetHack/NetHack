@@ -206,7 +206,7 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 			? "destroyed" : "killed");
 		/* don't blame hero for unknown rolling boulder trap */
 		if (!context.mon_moving &&
-		    (otmp->otyp != BOULDER || range >= 0 || !otmp->otrapped))
+		    (otmp->otyp != BOULDER || range >= 0 || otmp->otrapped))
 		    xkilled(mtmp,0);
 		else mondied(mtmp);
 	    }
