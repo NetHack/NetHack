@@ -328,8 +328,8 @@ BOOL CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		/* init dialog */
 		plselInitDialog(hWnd);
 
-		/* set focus on the name field */
-		SetFocus(GetDlgItem(hWnd, IDC_PLSEL_NAME));
+		/* set focus on the role checkbox (random) field */
+		SetFocus(GetDlgItem(hWnd, IDC_PLSEL_ROLE_RANDOM));
 
 		/* tell windows we set the focus */
 		return FALSE;
