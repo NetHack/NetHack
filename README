@@ -114,7 +114,11 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
                 Windows 95/98/NT/2000/XP
         Intel Pentium or better (or clone) running BeOS 4.5
         Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
-        Pocket PC devices running Windows CE 3.0 and higher.
+
+    NetHack 3.4 will also run on the following, but a cross-compiler hosted
+    on another platform, such as win32, is required to build from source.
+
+        Pocket PC devices running Windows CE 3.0 and higher
         H/PC Pro devices running Windows CE 2.11 and higher.
 	Palm Size PC 1.1 devices running Windows CE 2.11
 
@@ -167,20 +171,19 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
                         - - - - - - - - - - -
 
-If you have problems building the game, or you find bugs in it, the
-development team may be reached at
-
-                    nethack-bugs@nethack.org
+If you have problems building the game, or you find bugs in it, we recommend 
+filing a bug report from our "Contact Us" web page at:
+    http://www.nethack.org/ 
 
 When sending correspondence, please observe the following:
 o Please be sure to include your machine type, OS, and patchlevel.
-o Never send binary files (e.g. save files or bones files) to the
-  nethack-bugs address.  Whichever platform you are using, only a small
-  minority of the development team has access to it, and you will rapidly
-  annoy the others.  If you have found a bug and think that your save file
-  would aid in solving the problem, send us a description in words of the
-  problem, your machine type, your operating system, and the version of
-  NetHack.  Tell us that you have a save file, but do not actually send it.
+o Never send us binary files (e.g. save files or bones files). Whichever 
+  platform you are using, only a small minority of the development team has 
+  access to it, and you will rapidly annoy the others.  If you have found 
+  a bug and think that your save file would aid in solving the problem, 
+  send us a description in words of the problem, your machine type, your 
+  operating system, and the version of NetHack.  Tell us that you have a 
+  save file, but do not actually send it.
   In the rare case that we think your save file would be helpful, you will
   be contacted by a member of the development team with the address of a
   specific person to send the save file to.
@@ -190,17 +193,19 @@ o Though we make an effort to reply to each bug report, it may take some
 o We don't give hints for playing the game.
 o Don't bother to ask when the next version will be out.  You will not get
   a reply.
-Alternatively, you may fill out the bug report form on our web
-page at http://www.nethack.org/.
 
-Patches especially should be directed to this address.  If you've changed
-something to get NetHack to run on your system, it's likely that others have
-done it by making slightly different modifications.  By routing your patches
-through the development team, we should be able to avoid making everyone else
-choose among variant patches claiming to do the same thing, to keep most of
-the copies of 3.4 synchronized by means of official patches, and to maintain
-the painfully-created file organization.  (This process has been working since
-the time when everyone just posted their own patches to 2.3.  At that time,
+If you don't have access to the world wide web, or if you want to submit
+a patch for the NetHack source code via email directly, you can direct it 
+to this address:
+    nethack-bugs (at) nethack.org
+
+If you've changed something to get NetHack to run on your system, it's likely
+that others have done it by making slightly different modifications.  By routing 
+your patches through the development team, we should be able to avoid making 
+everyone else choose among variant patches claiming to do the same thing, to keep
+most of the copies of 3.4 synchronized by means of official patches, and to 
+maintain the painfully-created file organization.  (This process has been working
+since the time when everyone just posted their own patches to 2.3.  At that time,
 there were no archived bug-fixes to give to people who got 2.3 after its initial
 release, so the same bugs kept being discovered by new batches of people.)
 We have been successful in preventing this from happening since the 3.0
