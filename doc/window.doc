@@ -356,14 +356,14 @@ status_enablefield(int fldindex, char fldname, char fieldfmt, boolean enable)
 		   BL_LEVELDESC, BL_EXP, BL_CONDITION
 		-- There are MAXBLSTATS status fields (from botl.h)
 status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
-		-- update the value of a status field
+		-- update the value of a status field.
 		-- the fldindex identifies which field is changing and
 		   is an integer index value from botl.h
 		-- fldindex could be any one of the following from botl.h:
 		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
 		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
 		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
-		   BL_LEVELDESC, BL_EXP, BL_CONDITION, 
+		   BL_LEVELDESC, BL_EXP, BL_CONDITION
 		-- fldindex could also be BL_FLUSH (-1), which is not really
 		   a field index, but is a special trigger to tell the 
 		   windowport that it should redisplay all its status fields,
@@ -378,6 +378,11 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
 			BL_MASK_HALLU		0x00000010L
 			BL_MASK_STUNNED		0x00000020L
 			BL_MASK_SLIMED		0x00000040L
+		-- The value passed for BL_GOLD includes a leading
+		   symbol for GOLD "$:nnn". If the window port needs to use 
+		   the textual gold amount without the leading "$:" the port 
+		   will have to add 2 to the passed "ptr" for the BL_GOLD case.
+
 status_finish() -- called when it is time for the window port to tear down
 		   the status display and free allocated memory, etc.
 

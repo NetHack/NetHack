@@ -316,7 +316,7 @@ struct istat_s {
 #define percentage(current, maximum)	((100 * current) / maximum)
 #define percentagel(current, maximum)	((int)((100L * current) / maximum))
 
-/* If entries are added to this, botl.h will required updating too */
+/* If entries are added to this, botl.h will require updating too */
 struct istat_s blstats[2][MAXBLSTATS] = {
 	{
 	{ 0L, P_STR, (genericptr_t)0, (char *)0, 80, 0},	/*  0 BL_TITLE */
@@ -369,9 +369,11 @@ boolean reassessment;	/* TRUE = just reassess fields w/o other initialization*/
 		(*windowprocs.win_status_init)();
 	}
 	for (i = 0; i < MAXBLSTATS; ++i) {
-		if ((i == BL_SCORE && !flags.showscore) ||
-		    (i == BL_EXP   && !flags.showexp) ||
-		    (i == BL_TIME  && !flags.time))
+		if ((i == BL_SCORE && !flags.showscore)	||
+		    (i == BL_EXP   && !flags.showexp)	||
+		    (i == BL_TIME  && !flags.time)	||
+		    (i == BL_HD    && !Upolyd)		||
+		    ((i == BL_XP || i == BL_EXP) && Upolyd))
 			status_enablefield(i, fieldnames[i], fieldfmts[i], FALSE);
 		else
 			status_enablefield(i, fieldnames[i], fieldfmts[i], TRUE);
@@ -535,6 +537,14 @@ bot()
 #else
 		   money_cnt(invent);
 #endif
+	/*
+	 * The tty port needs to display the current symbol for gold
+	 * as a field header, so to accomodate that we pass gold with
+	 * that already included. If a window port needs to use the text
+	 * gold amount without the leading "$:" the port will have to
+	 * add 2 to the value pointer it was passed in status_update()
+	 * for the BL_GOLD case.
+	 */
 	Sprintf(blstats[idx][BL_GOLD].val, "%c:%ld",
 			oc_syms[COIN_CLASS], *(blstats[idx][BL_GOLD].ptr.a_lptr));
 	valset[BL_GOLD] = TRUE;		/* indicate val already set */
@@ -612,7 +622,8 @@ bot()
 		if (((i == BL_SCORE) && !flags.showscore) ||
 		    ((i == BL_EXP)   && !flags.showexp)   ||
 		    ((i == BL_TIME)  && !flags.time)      ||
-		    ((i == BL_HD)    && !Upolyd))
+		    ((i == BL_HD)    && !Upolyd)	  ||
+		    ((i == BL_XP || i == BL_EXP) && Upolyd))
 			continue;
 		ptype = blstats[idx][i].ptype;
 		switch (ptype) {
@@ -772,8 +783,8 @@ genericptr_t ptr;
 		};
 	int fieldorder2[] = {
 		 BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX,
-		 BL_ENE, BL_ENEMAX, BL_AC, BL_XP, BL_EXP, BL_TIME,
-		 BL_HUNGER,BL_CAP, BL_CONDITION, -1
+		 BL_ENE, BL_ENEMAX, BL_AC, BL_XP, BL_EXP, BL_HD,
+		 BL_TIME, BL_HUNGER,BL_CAP, BL_CONDITION, -1
 		};
 
 	if (idx != BL_FLUSH) {
