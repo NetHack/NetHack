@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2004/06/23	*/
+/*	SCCS Id: @(#)shk.c	3.4	2004/11/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2412,8 +2412,11 @@ register boolean peaceful, silent;
 
 	    value += stolen_container(obj, shkp, value, ininv);
 	    if(!ininv) gvalue += contained_gold(obj);
-	} else if (!obj->no_charge && saleable(shkp, obj)) {
-	    value += get_cost(obj, shkp);
+	} else if (!obj->no_charge) {
+	    /* treat items inside containers as "saleable" */
+	    if ((saleable(shkp, obj) || obj->where == OBJ_CONTAINED) &&
+		    (obj->oclass != FOOD_CLASS || !obj->oeaten))
+		value += obj->quan * get_cost(obj, shkp);
 	}
 
 	if(gvalue + value == 0L) return(0L);
