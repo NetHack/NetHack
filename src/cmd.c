@@ -132,6 +132,9 @@ STATIC_DCL void FDECL(mon_invent_chain, (winid, const char *, struct monst *, lo
 STATIC_DCL void FDECL(mon_chain, (winid, const char *, struct monst *, long *, long *));
 STATIC_DCL void FDECL(contained, (winid, const char *, long *, long *));
 STATIC_PTR int NDECL(wiz_show_stats);
+#  ifdef PORT_DEBUG
+STATIC_DCL int NDECL(wiz_port_debug);
+#  endif
 # endif
 STATIC_PTR int NDECL(enter_explore_mode);
 STATIC_PTR int NDECL(doattributes);
@@ -1499,6 +1502,9 @@ struct ext_func_tab extcmdlist[] = {
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
+#ifdef PORT_DEBUG
+	{(char *)0, (char *)0, donull, TRUE},
+#endif
 	{(char *)0, (char *)0, donull, TRUE},
         {(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
@@ -1518,6 +1524,9 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 	{"monpolycontrol", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
 	{"panic", "test panic routine (fatal to game)", wiz_panic, TRUE},
 	{"polyself", "polymorph self", wiz_polyself, TRUE},
+#ifdef PORT_DEBUG
+	{"portdebug", "wizard port debug command", wiz_port_debug, TRUE},
+#endif
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
 	{"timeout", "look at timeout queue", wiz_timeout_queue, TRUE},
@@ -2387,6 +2396,54 @@ dotravel()
 	readchar_queue = cmd;
 	return 0;
 }
+
+#ifdef PORT_DEBUG
+# ifdef WIN32CON
+extern void NDECL(win32con_debug_keystrokes);
+# endif
+
+int
+wiz_port_debug()
+{
+	int n, k;
+	winid win;
+	anything any;
+	int item = 'a';
+	int num_menu_selections;
+	struct menu_selection_struct {
+		char *menutext;
+		void NDECL((*fn));
+	} menu_selections[] = {
+#ifdef WIN32CON
+		{"test win32 keystrokes", win32con_debug_keystrokes},
+#endif
+		{(char *)0, (void NDECL((*)))0}		/* array terminator */
+	};
+
+	num_menu_selections = SIZE(menu_selections) - 1;
+	if (num_menu_selections > 0) {
+		menu_item *pick_list;
+		win = create_nhwindow(NHW_MENU);
+		start_menu(win);
+		for (k=0; k < num_menu_selections; ++k) {
+			any.a_int = k+1;
+			add_menu(win, NO_GLYPH, &any, item++, 0, ATR_NONE,
+				menu_selections[k].menutext, MENU_UNSELECTED);
+		}
+		end_menu(win, "Which port debugging feature?");
+		n = select_menu(win, PICK_ONE, &pick_list);
+		destroy_nhwindow(win);
+		if (n > 0) {
+			n = pick_list[0].item.a_int - 1;
+			free((genericptr_t) pick_list);
+			/* execute the function */
+			(*menu_selections[n].fn)();
+		}
+	} else
+		pline("No port-specific debug capability defined.");
+	return 0;
+}
+# endif /*PORT_DEBUG*/
 
 #endif /* OVL0 */
 

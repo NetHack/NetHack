@@ -321,34 +321,34 @@ static const struct pad {
 };
 
 #define inmap(x,vk)	(((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
- 
-int FDECL(process_keystroke, (INPUT_RECORD *ir, boolean *valid));
 
-int process_keystroke(ir, valid)
+static BYTE KeyState[256];
+ 
+int FDECL(process_keystroke, (INPUT_RECORD *ir, boolean *valid, int portdebug));
+
+int process_keystroke(ir, valid, portdebug)
 INPUT_RECORD *ir;
 boolean *valid;
+int portdebug;
 {
-	int metaflags = 0;
+	int metaflags = 0, k;
 	int keycode, vk;
-	unsigned char ch;
+	unsigned char ch, pre_ch;
 	unsigned short int scan;
 	unsigned long shiftstate;
 	int altseq = 0;
 	const struct pad *kpad;
 
-#if 0
-	/* sanity check, but caller should have checked already */
-	if (ir->EventType != KEY_EVENT) {
-		if (valid) *valid = 0;
-		return 0;
-	}
-#endif
 	shiftstate = 0L;
-	ch    = ir->Event.KeyEvent.uChar.AsciiChar;
+	ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
 	scan  = ir->Event.KeyEvent.wVirtualScanCode;
 	vk    = ir->Event.KeyEvent.wVirtualKeyCode;
 	keycode = MapVirtualKey(vk, 2);
 	shiftstate = ir->Event.KeyEvent.dwControlKeyState;
+	KeyState[VK_SHIFT]   = (shiftstate & SHIFT_PRESSED) ? 0x81 : 0;
+	KeyState[VK_CONTROL] = (shiftstate & (LEFT_CTRL_PRESSED|RIGHT_CTRL_PRESSED)) ?
+				0x81 : 0;
+	KeyState[VK_CAPITAL] = (shiftstate & CAPSLOCK_ON) ? 0x81 : 0;
 
 	if (shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)) {
 		if (ch || inmap(keycode,vk)) altseq = 1;
@@ -387,7 +387,36 @@ boolean *valid;
 		if (vk == 0xBF) ch = M('?');
 		else ch = M(tolower(keycode));
         }
-        return (ch == '\r') ? '\n' : ch;
+	/* Attempt to work better with international keyboards. */
+	else {
+		WORD chr[2];
+		k = ToAscii(vk, scan, KeyState, chr, 0);
+		if (k <= 2)
+		    switch(k) {
+			case 2:  /* two characters */
+				ch = (unsigned char)chr[1];
+				*valid = TRUE;
+				break;
+			case 1:  /* one character */
+				ch = (unsigned char)chr[0];
+				*valid = TRUE;
+				break;
+			case 0:  /* no translation */
+			default: /* negative */
+				*valid = FALSE;
+		    }
+	}
+	if (ch == '\r') ch = '\n';
+#ifdef PORT_DEBUG
+	if (portdebug) {
+		char buf[BUFSZ];
+		Sprintf(buf,
+	"PORTDEBUG: ch=%u, scan=%u, vk=%d, pre=%d, shiftstate=0x%X (ESC to end)\n",
+			ch, scan, vk, pre_ch, shiftstate);
+		xputs(buf);
+	}
+#endif
+	return ch;
 }
 
 int
@@ -397,11 +426,10 @@ tgetch()
 	boolean valid = 0;
 	int ch;
 	valid = 0;
-	while (!valid)
-	{
+	while (!valid) {
 	   ReadConsoleInput(hConIn,&ir,1,&count);
 	   if ((ir.EventType == KEY_EVENT) && ir.Event.KeyEvent.bKeyDown)
-		ch = process_keystroke(&ir, &valid);
+		ch = process_keystroke(&ir, &valid, 0);
 	}
 	return ch;
 }
@@ -420,7 +448,7 @@ int *x, *y, *mod;
 	    ReadConsoleInput(hConIn,&ir,1,&count);
 	    if (count > 0) {
 		if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
-			keystroke = process_keystroke(&ir, &valid);
+			keystroke = process_keystroke(&ir, &valid, 0);
 			if (valid) return keystroke;
 		} else if (ir.EventType == MOUSE_EVENT) {
 			if ((ir.Event.MouseEvent.dwEventFlags == 0) &&
@@ -891,4 +919,21 @@ const char *pref;
 	}
 	return;
 }
+
+#ifdef PORT_DEBUG
+void
+win32con_debug_keystrokes()
+{
+	DWORD count;
+	boolean valid = 0;
+	int ch;
+	xputs("\n");
+	while (!valid || ch != 27) {
+	   ReadConsoleInput(hConIn,&ir,1,&count);
+	   if ((ir.EventType == KEY_EVENT) && ir.Event.KeyEvent.bKeyDown)
+		ch = process_keystroke(&ir, &valid, 1);
+	}
+	(void)doredraw();
+}
+#endif
 #endif /* WIN32CON */

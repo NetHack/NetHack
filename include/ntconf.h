@@ -55,6 +55,10 @@
 
 #define PORT_HELP	"porthelp"
 
+#ifdef WIN32CON
+#define PORT_DEBUG	/* include ability to debug international keyboard issues */
+#endif
+
 /* The following is needed for prototypes of certain functions */
 #if defined(_MSC_VER)
 #include <process.h>	/* Provides prototypes of exit(), spawn()      */
