@@ -1303,7 +1303,7 @@ boolean at_stairs, falling, portal;
 
 	/* the message from your quest leader */
 	if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest") &&
-		!(u.uevent.qexpelled || u.uevent.qcompleted || leaderless())) {
+		!(u.uevent.qexpelled || u.uevent.qcompleted || quest_status.leader_is_dead)) {
 
 		if (u.uevent.qcalled) {
 			com_pager(Role_if(PM_ROGUE) ? 4 : 3);

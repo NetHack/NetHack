@@ -1553,7 +1553,6 @@ E void NDECL(unload_qtlist);
 E short FDECL(quest_info, (int));
 E const char *NDECL(ldrname);
 E boolean FDECL(is_quest_artifact, (struct obj*));
-E boolean NDECL(leaderless);
 E void FDECL(com_pager, (int));
 E void FDECL(qt_pager, (int));
 E struct permonst *NDECL(qt_montype);

@@ -209,15 +209,6 @@ homebase()	/* return your role leader's location */
 	return(urole.homebase);
 }
 
-boolean
-leaderless()	/* return true iff leader is dead */
-{
-	int i = urole.ldrnum;
-	/* BUG: This doesn't take the possibility of resurrection
-		via wand or spell of undead turning into account. */
-	return (boolean)(mvitals[i].died > 0);
-}
-
 STATIC_OVL struct qtmsg *
 msg_in(qtm_list, msgnum)
 struct qtmsg *qtm_list;

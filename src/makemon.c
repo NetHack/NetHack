@@ -845,6 +845,8 @@ register int	mmflags;
 	mtmp->m_id = flags.ident++;
 	if (!mtmp->m_id) mtmp->m_id = flags.ident++;	/* ident overflowed */
 	set_mon_data(mtmp, ptr, 0);
+	if (mtmp->data->msound == MS_LEADER)
+	    quest_status.leader_m_id = mtmp->m_id;
 	mtmp->mxlth = xlth;
 	mtmp->mnum = mndx;
 

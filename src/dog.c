@@ -740,6 +740,9 @@ register struct obj *obj;
 	    (is_demon(mtmp->data) && !is_demon(youmonst.data)) ||
 	    (obj && dogfood(mtmp, obj) >= MANFOOD)) return (struct monst *)0;
 
+	if (mtmp->m_id == quest_status.leader_m_id)
+	    return((struct monst *)0);
+
 	/* make a new monster which has the pet extension */
 	mtmp2 = newmonst(sizeof(struct edog) + mtmp->mnamelth);
 	*mtmp2 = *mtmp;

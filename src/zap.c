@@ -465,7 +465,11 @@ coord *cc;
 		mtmp2->mhp = mtmp2->mhpmax;
 		/* Get these ones from mtmp */
 		mtmp2->minvent = mtmp->minvent; /*redundant*/
-		mtmp2->m_id = mtmp->m_id;
+		/* monster ID is available if the monster died in the current
+		   game, but should be zero if the corpse was in a bones level
+		   (we cleared it when loading bones) */
+		if (!mtmp2->m_id)
+		    mtmp2->m_id = mtmp->m_id;
 		mtmp2->mx   = mtmp->mx;
 		mtmp2->my   = mtmp->my;
 		mtmp2->mux  = mtmp->mux;
@@ -642,6 +646,10 @@ register struct obj *obj;
 			/* Monster retains its name */
 			if (obj->onamelth)
 			    mtmp = christen_monst(mtmp, ONAME(obj));
+			/* flag the quest leader as alive. */
+			if (mtmp->data->msound == MS_LEADER || mtmp->m_id ==
+				quest_status.leader_m_id)
+			    quest_status.leader_is_dead = FALSE;
 		    }
 		}
 		if (mtmp) {

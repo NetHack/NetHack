@@ -943,7 +943,12 @@ boolean ghostly;
 {
     struct obj *otmp;
     unsigned oldid, nid;
-    for (otmp = fobj; otmp; otmp = otmp->nobj)
+    for (otmp = fobj; otmp; otmp = otmp->nobj) {
+	if (ghostly && otmp->oattached == OATTACHED_MONST && otmp->oxlth) {
+	    struct monst *mtmp = (struct monst *)otmp->oextra;
+
+	    mtmp->m_id = 0;
+	}
 	if (ghostly && otmp->oattached == OATTACHED_M_ID) {
 	    (void) memcpy((genericptr_t)&oldid, (genericptr_t)otmp->oextra,
 								sizeof(oldid));
@@ -953,6 +958,7 @@ boolean ghostly;
 	    else
 		otmp->oattached = OATTACHED_NOTHING;
 	}
+    }
 }
 
 

@@ -104,7 +104,8 @@ STATIC_VAR short cham_to_pm[] = {
 #define REVIVER(ptr)	(is_rider(ptr) || ptr->mlet == S_TROLL)
 
 #define KEEPTRAITS(mon)	(mon->isshk || mon->mtame || \
-			 (mon->data->geno & G_UNIQ) || REVIVER(mon->data))
+			 (mon->data->geno & G_UNIQ) || REVIVER(mon->data) || \
+			 (mon->m_id == quest_status.leader_m_id))
 
 /* Creates a monster corpse, a "special" corpse, or nothing if it doesn't
  * leave corpses.  Monsters which leave "special" corpses should have
@@ -1352,6 +1353,10 @@ register struct monst *mtmp;
 	 */
 	tmp = monsndx(mtmp->data);
 	if (mvitals[tmp].died < 255) mvitals[tmp].died++;
+
+	/* if it's a (possibly polymorphed) quest leader, mark him as dead */
+	if (mtmp->m_id == quest_status.leader_m_id)
+	    quest_status.leader_is_dead = TRUE;
 #ifdef MAIL
 	/* if the mail daemon dies, no more mail delivery.  -3. */
 	if (tmp == PM_MAIL_DAEMON) mvitals[tmp].mvflags |= G_GENOD;
@@ -1733,7 +1738,7 @@ cleanup:
 	newexplevel();		/* will decide if you go up */
 
 	/* adjust alignment points */
-	if (mdat->msound == MS_LEADER) {		/* REAL BAD! */
+	if (mtmp->m_id == quest_status.leader_m_id) {		/* REAL BAD! */
 	    adjalign(-(u.ualign.record+(int)ALIGNLIM/2));
 	    pline("That was %sa bad idea...",
 	    		u.uevent.qcompleted ? "probably " : "");

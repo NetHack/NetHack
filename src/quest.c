@@ -341,8 +341,11 @@ void
 quest_chat(mtmp)
 	register struct monst *mtmp;
 {
+    if (mtmp->m_id == Qstat(leader_m_id)) {
+	chat_with_leader();
+	return;
+    }
     switch(mtmp->data->msound) {
-	    case MS_LEADER:	chat_with_leader(); break;
 	    case MS_NEMESIS:	chat_with_nemesis(); break;
 	    case MS_GUARDIAN:	chat_with_guardian(); break;
 	    default:	impossible("quest_chat: Unknown quest character %s.",
@@ -354,8 +357,11 @@ void
 quest_talk(mtmp)
 	register struct monst *mtmp;
 {
+    if (mtmp->m_id == Qstat(leader_m_id)) {
+	leader_speaks(mtmp);
+	return;
+    }
     switch(mtmp->data->msound) {
-	    case MS_LEADER:	leader_speaks(mtmp); break;
 	    case MS_NEMESIS:	nemesis_speaks(); break;
 	    case MS_DJINNI:	prisoner_speaks(mtmp); break;
 	    default:		break;

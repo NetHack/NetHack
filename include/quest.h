@@ -25,6 +25,11 @@ struct q_score {			/* Quest "scorecard" */
 	Bitfield(touched_artifact,1);	/* for a special message */
 	Bitfield(offered_artifact,1);	/* offered to leader */
 	Bitfield(got_thanks,1);		/* final message from leader */
+
+	/* keep track of leader presence/absence even if leader is
+	   polymorphed, raised from dead, etc */
+	Bitfield(leader_is_dead,1);
+	unsigned leader_m_id;
 };
 
 #define MAX_QUEST_TRIES  7	/* exceed this and you "fail" */
