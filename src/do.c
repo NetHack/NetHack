@@ -72,13 +72,17 @@ boolean pushing;
 	    fills_up = lava ? chance == 0 : chance != 0;
 
 	    if (fills_up) {
+		struct trap *ttmp = t_at(rx, ry);
+
 		if (ltyp == DRAWBRIDGE_UP) {
 		    levl[rx][ry].drawbridgemask &= ~DB_UNDER; /* clear lava */
 		    levl[rx][ry].drawbridgemask |= DB_FLOOR;
 		} else
 		    levl[rx][ry].typ = ROOM;
 
+		if (ttmp) (void) delfloortrap(ttmp);
 		bury_objs(rx, ry);
+		
 		newsym(rx,ry);
 		if (pushing) {
 		    You("push %s into the %s.", the(xname(otmp)), what);
