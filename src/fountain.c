@@ -289,11 +289,13 @@ drinkfountain()
 
 		case 25: /* See invisible */
 
-			if (Blind && Invisible) {
-			    You("feel very self-conscious.");
-			    pline("Then it passes.");
-			} else if (Invisible) { /* but not Blind */
-			    You("feel transparent.");
+			if (Blind) {
+			    if (Invisible) {
+				You("feel transparent.");
+			    } else {
+			    	You("feel very self-conscious.");
+			    	pline("Then it passes.");
+			    }
 			} else {
 			   You("see an image of someone stalking you.");
 			   pline("But it disappears.");
