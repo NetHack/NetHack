@@ -485,7 +485,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		p = strchr(data->menu.items[new_item].str, '\t');
 		while( p ) {
 			data->menu.tab_stop_size = 
-				max( data->menu.tab_stop_size, p - p1 );
+				max( data->menu.tab_stop_size, p - p1 + 1 );
 			p1 = p;
 			p = strchr(p+1, '\t');
 		}
