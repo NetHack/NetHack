@@ -604,7 +604,7 @@ NetHackQtSettings::NetHackQtSettings(int w, int h) :
 #ifdef WS_WIN
     normalfixed("courier new"),
 #else
-    normalfixed("helvetica"), // ################# normally fixed, just testing
+    normalfixed("fixed"),
 #endif
     large("times"),
     theglyphs(0)
