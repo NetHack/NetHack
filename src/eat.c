@@ -834,7 +834,7 @@ register int pm;
 		/* fall into next case */
 	    case PM_SMALL_MIMIC:
 		tmp += 20;
-		if (youmonst.data->mlet != S_MIMIC) {
+		if (youmonst.data->mlet != S_MIMIC && !Unchanging) {
 		    char buf[BUFSZ];
 		    You_cant("resist the temptation to mimic a pile of gold.");
 #ifdef STEED
