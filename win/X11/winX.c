@@ -1489,7 +1489,7 @@ X11_display_file(str, complain)
     XtSetArg(args[num_args], XtNscrollHorizontal,
 				XawtextScrollWhenNeeded);	num_args++;
     XtSetArg(args[num_args], XtNscrollVertical,
-				XawtextScrollWhenNeeded);	num_args++;
+				XawtextScrollAlways);		num_args++;
     XtSetArg(args[num_args], XtNtype, XawAsciiString);		num_args++;
     XtSetArg(args[num_args], XtNstring, textlines);		num_args++;
     XtSetArg(args[num_args], XtNdisplayCaret, False);		num_args++;
