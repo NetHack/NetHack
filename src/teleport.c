@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)teleport.c	3.4	2003/05/31	*/
+/*	SCCS Id: @(#)teleport.c	3.4	2003/08/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1196,10 +1196,13 @@ random_teleport_level()
 	 * --KAA
 	 * 3.4.2: explicitly handle quest here too, to fix the problem of
 	 * monsters sometimes level teleporting out of it into main dungeon.
+	 * Also prevent monsters reaching the Sanctum prior to invocation.
 	 */
 	min_depth = In_quest(&u.uz) ? dungeons[u.uz.dnum].depth_start : 1;
 	max_depth = dunlevs_in_dungeon(&u.uz) +
 			(dungeons[u.uz.dnum].depth_start - 1);
+	/* can't reach the Sanctum if the invocation hasn't been performed */
+	if (Inhell && !u.uevent.invoked) max_depth -= 1;
 
 	/* Get a random value relative to the current dungeon */
 	/* Range is 1 to current+3, current not counting */
