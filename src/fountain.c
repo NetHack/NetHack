@@ -530,8 +530,9 @@ drinksink()
 			else {
 				mtmp = makemon(&mons[PM_SEWER_RAT],
 						u.ux, u.uy, NO_MM_FLAGS);
-				pline("Eek!  There's %s in the sink!",
-					Blind ? "something squirmy" :
+				if (mtmp) pline("Eek!  There's %s in the sink!",
+					(Blind || !canspotmon(mtmp)) ?
+					"something squirmy" :
 					a_monnam(mtmp));
 			}
 			break;
