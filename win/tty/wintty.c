@@ -1745,8 +1745,7 @@ tty_putstr(window, attr, str)
     }
 
     if(str == (const char*)0 ||
-	( (cw->flags & WIN_CANCELLED) && 
-	  (cw->type != NHW_MESSAGE || !iflags.prevmsg_window) ))
+	((cw->flags & WIN_CANCELLED) && (cw->type != NHW_MESSAGE)))
 	return;
     if(cw->type != NHW_MESSAGE)
 	str = compress_str(str);

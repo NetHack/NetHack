@@ -165,8 +165,7 @@ update_topl(bp)
 	/* If there is room on the line, print message on same line */
 	/* But messages like "You die..." deserve their own line */
 	n0 = strlen(bp);
-	if( (ttyDisplay->toplin == 1 || 
-		(cw->flags & WIN_STOP && iflags.prevmsg_window)) &&
+	if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP)) &&
 	    cw->cury == 0 &&
 	    n0 + (int)strlen(toplines) + 3 < CO-8 &&  /* room for --More-- */
 	    (notdied = strncmp(bp, "You die", 7))) {
@@ -176,7 +175,7 @@ update_topl(bp)
 		if(!(cw->flags & WIN_STOP))
 		    addtopl(bp);
 		return;
-	} else if (!(cw->flags & WIN_STOP && !iflags.prevmsg_window)) {
+	} else if (!(cw->flags & WIN_STOP)) {
 	    if(ttyDisplay->toplin == 1) more();
 	    else if(cw->cury) {	/* for when flags.toplin == 2 && cury > 1 */
 		docorner(1, cw->cury+1); /* reset cury = 0 if redraw screen */
