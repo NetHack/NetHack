@@ -1,11 +1,10 @@
-@REM  SCCS Id: @(#)nhsetup.bat      2002/01/25
+@REM  SCCS Id: @(#)nhsetup.bat      2002/02/28
 @REM  Copyright (c) NetHack PC Development Team 1993, 1996, 2002
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.nt for details
 @REM
 @echo off
 
-set err_nouu=
 set err_copy=
 set opt=
 
@@ -27,13 +26,6 @@ goto err_set
 
 :do_tty
 set opt=NetHack for NT Console
-if exist .\nethack.ico goto hasicon
-if exist .\nhico.uu uudecode nhico.uu >nul
-if exist .\nethack.ico goto hasicon
-set err_nouu=Y
-goto done
-:hasicon
-echo NetHack icon exists ok.
 echo "Copying Makefile.NT to ..\..\src\Makefile"
 copy makefile.NT ..\..\src\Makefile >nul
 echo Makefile copied ok.
@@ -68,71 +60,8 @@ copy ..\..\win\win32\tile2bmp.dsp  ..\..\build >nul
 copy ..\..\win\win32\tiles.dsp     ..\..\build >nul
 copy ..\..\win\win32\tiles.mak     ..\..\build >nul
 copy ..\..\win\win32\tilemap.dsp   ..\..\build >nul
+copy ..\..\win\win32\uudecode.dsp   ..\..\build >nul
 copy ..\..\win\win32\nethackw.dsp   ..\..\build >nul
-
-echo.
-echo "Decoding/Copying a couple of bitmaps"
-if exist ..\..\win\win32\mnsel.bmp goto hasmnsel2
-if exist .\mnsel.bmp goto hasmnsel1
-if exist ..\..\win\win32\mnsel.uu uudecode ..\..\win\win32\mnsel.uu >nul
-if exist .\mnsel.bmp goto hasmnsel1
-echo Error - No UUDECODE utility to decode ..\..\win\win32\mnsel.uu
-goto hasmnsel2
-:hasmnsel1
-echo copy .\mnsel.bmp ..\..\win\win32
-copy .\mnsel.bmp ..\..\win\win32
-:hasmnsel2
-if NOT exist ..\..\win\win32\mnsel.bmp set err_nouu=Y
-
-if exist ..\..\win\win32\mnunsel.bmp goto hasmnuns2
-if exist .\mnunsel.bmp goto hasmnuns1
-if exist ..\..\win\win32\mnunsel.uu uudecode ..\..\win\win32\mnunsel.uu >nul
-if exist .\mnunsel.bmp goto hasmnuns1
-echo Error - No UUDECODE utility to decode ..\..\win\win32\mnunsel.uu
-goto hasmnuns2
-:hasmnuns1
-echo copy .\mnunsel.bmp ..\..\win\win32
-copy .\mnunsel.bmp ..\..\win\win32
-:hasmnuns2
-if NOT exist ..\..\win\win32\mnunsel.bmp set err_nouu=Y
-
-if exist ..\..\win\win32\mnselcnt.bmp goto hasmnselcnt2
-if exist .\mnselcnt.bmp goto hasmnselcnt1
-if exist ..\..\win\win32\mnselcnt.uu uudecode ..\..\win\win32\mnselcnt.uu >nul
-if exist .\mnselcnt.bmp goto hasmnselcnt1
-echo Error - No UUDECODE utility to decode ..\..\win\win32\mnselcnt.uu
-goto hasmnselcnt2
-:hasmnselcnt1
-echo copy .\mnselcnt.bmp ..\..\win\win32
-copy .\mnselcnt.bmp ..\..\win\win32
-:hasmnselcnt2
-if NOT exist ..\..\win\win32\mnselcnt.bmp set err_nouu=Y
-
-if exist ..\..\win\win32\petmark.bmp goto haspm2
-if exist .\petmark.bmp goto haspm1
-if exist ..\..\win\win32\petmark.uu uudecode ..\..\win\win32\petmark.uu >nul
-if exist .\petmark.bmp goto haspm1
-echo Error - No UUDECODE utility to decode ..\..\win\win32\petmark.uu
-goto haspm2
-:haspm1
-echo copy .\petmark.bmp ..\..\win\win32
-copy .\petmark.bmp ..\..\win\win32
-:haspm2
-if NOT exist ..\..\win\win32\petmark.bmp set err_nouu=Y
-
-echo "Decoding/Copying ICONS"
-if exist ..\..\win\win32\nethack.ico goto hasicon2
-if exist .\nethack.ico goto hasicon1
-if exist .\nhico.uu uudecode nhico.uu >nul
-if exist .\nethack.ico goto hasicon1
-echo Error - No UUDECODE utility to decode nhico.uu
-goto hasicon2
-:hasicon1
-echo.
-echo copy .\nethack.ico ..\..\win\win32
-copy .\nethack.ico ..\..\win\win32
-:hasicon2
-if NOT exist ..\..\win\win32\nethack.ico set err_nouu=Y
 
 goto done
 
@@ -176,14 +105,9 @@ goto end
 :done
 echo done!
 echo.
-if "%err_nouu%"=="" echo Proceed with the next step documented in Install.nt
-if "%err_nouu%"=="" echo  for building %opt%.
+echo Proceed with the next step documented in Install.nt
+echo  for building %opt%.
 echo.
-if "%err_nouu%"=="" goto fini
-echo Apparently you have no UUDECODE utility in your path.  
-echo You need a UUDECODE utility in order to turn several .uu files
-echo into their decoded binary versions.
-echo Check "Install.nt" for a list of prerequisites for building NetHack.
 
 :fini
 :end

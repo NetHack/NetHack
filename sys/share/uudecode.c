@@ -72,6 +72,8 @@ static char sccsid[] = "@(#)uudecode.c	5.5 (Berkeley) 7/6/88";
 #  endif
 #  include <sys/types.h>   /* MSDOS, WIN32, or UNIX */
 #  include <sys/stat.h>
+#  include <string.h>
+#  include <stdlib.h>
 #endif
 
 static void decode(FILE *, FILE *);
@@ -224,6 +226,7 @@ int n;
 		putc(c3, f);
 }
 
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32)
 /*
  * Return the ptr in sp at which the character c appears;
  * NULL if not found
@@ -243,4 +246,5 @@ register char *sp, c;
 	} while (*sp++);
 	return(NULL);
 }
+#endif
 

@@ -96,6 +96,42 @@ Package=<4>
 
 ###############################################################################
 
+Project: "nethackw"=.\build\nethackw.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name dgncomp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dlb_main
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name levcomp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name makedefs
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name recover
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name tilemap
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name tiles
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name uudecode
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "recover"=.\build\recover.dsp - Package Owner=<4>
 
 Package=<5>
@@ -153,7 +189,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "nethackw"=.\build\nethackw.dsp - Package Owner=<4>
+Project: "uudecode"=.\build\uudecode.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -161,27 +197,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name dgncomp
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name dlb_main
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name levcomp
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name makedefs
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name recover
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name tilemap
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name tiles
-    End Project Dependency
 }}}
 
 ###############################################################################
