@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.4	2002/08/12	*/
+/*	SCCS Id: @(#)cmd.c	3.4	2002/09/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -140,6 +140,7 @@ STATIC_PTR void NDECL(minimal_enlightenment);
 
 #ifdef OVLB
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *));
+STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
 #ifdef UNIX
 static void NDECL(end_of_input);
 #endif
@@ -763,6 +764,43 @@ const char *start, *middle, *end;
 	putstr(en_win, 0, buf);
 }
 
+/* format increased damage or chance to hit */
+static char *
+enlght_combatinc(inctyp, incamt, final, outbuf)
+const char *inctyp;
+int incamt, final;
+char *outbuf;
+{
+	char numbuf[24];
+	const char *modif, *bonus;
+
+	if (final
+#ifdef WIZARD
+		|| wizard
+#endif
+	  ) {
+	    Sprintf(numbuf, "%s%d",
+		    (incamt > 0) ? "+" : "", incamt);
+	    modif = (const char *) numbuf;
+	} else {
+	    int absamt = abs(incamt);
+
+	    if (absamt <= 3) modif = "small";
+	    else if (absamt <= 6) modif = "moderate";
+	    else if (absamt <= 12) modif = "large";
+	    else modif = "huge";
+	}
+	bonus = (incamt > 0) ? "bonus" : "penalty";
+	/* "bonus to hit" vs "damage bonus" */
+	if (!strcmp(inctyp, "damage")) {
+	    const char *ctmp = inctyp;
+	    inctyp = bonus;
+	    bonus = ctmp;
+	}
+	Sprintf(outbuf, "%s %s %s", an(modif), bonus, inctyp);
+	return outbuf;
+}
+
 void
 enlightenment(final)
 int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
@@ -927,17 +965,10 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	}
 
 	/*** Physical attributes ***/
-	/* added by JDS */
-	if (u.uhitinc) {
-		Sprintf(buf, "a %s%d %s to hit", u.uhitinc > 0 ? "+" : "",
-			u.uhitinc, u.uhitinc > 0 ? "bonus" : "penalty");
-		you_have(buf);
-	}
-	if (u.udaminc) {
-		Sprintf(buf, "a %s%d damage %s", u.udaminc > 0 ? "+" : "",
-			u.udaminc, u.udaminc > 0 ? "bonus" : "penalty");
-		you_have(buf);
-	}
+	if (u.uhitinc)
+	    you_have(enlght_combatinc("to hit", u.uhitinc, final, buf));
+	if (u.udaminc)
+	    you_have(enlght_combatinc("damage", u.udaminc, final, buf));
 	if (Slow_digestion) you_have("slower digestion");
 	if (Regeneration) enl_msg("You regenerate", "", "d", "");
 	if (u.uspellprot || Protection) you_are("protected");
