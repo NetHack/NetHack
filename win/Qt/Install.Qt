@@ -1,0 +1,60 @@
+Installing NetHack with a Qt or KDE interface
+---------------------------------------------
+
+This document describes the installation of NetHack with a Qt interface
+on X11.  The Qt interface is an alternative to the Athena-widgets interface
+found in ../X11.  You can download Qt for UNIX from http://www.troll.no.
+You need Qt 2.0 or later to use this code.
+
+There are no explicit UNIX dependencies in this code, but we only regularly
+test it under UNIX.  If you have Qt for Windows, that should also work.
+
+To use this code:
+
+   1. follow the directions for the UNIX installation (in ../../sys/unix)
+      to create the Makefiles.
+
+   2. ../../include/config.h
+
+        define QT_GRAPHICS (search for it).  You can comment out
+        TTY_GRAPHICS if you want to, or leave it in to support both
+        interfaces (in which case be sure you have the right curses
+        libraries etc. required for that interface).
+
+   3. ../../src/Makefile
+
+	ensure your QTDIR environment variable was set correctly when
+	you installed Qt - $QTDIR/include/qwidget.h should exist, for
+	example.
+
+	ensure CXX and LD are set to the compiler and linker you need
+	for compiling and linking C++ software (e.g., set both to g++).
+
+        add $(WINQTSRC), $(WINQTOBJ), and $(WINQTLIB) to WINSRC, WINOBJ,
+        and WINLIB respectively, and compile.  This will give you an
+        executable supporting both Qt and tty windowing.
+
+   4. ../../Makefile (the top-level makefile)
+
+        change the VARDATND setting to contain the files "x11tiles"
+        and "rip.xpm".
+
+   5. Follow all the instructions in ../../sys/unix/Install.unx for
+      the remainder of the installation process.
+
+   6. Consider adding the lines below to your .nethackrc, as they are
+      likely to give the best interface for this window port:
+
+        OPTIONS=name:player,number_pad,menustyle:partial,!time,showexp
+        OPTIONS=hilite_pet,toptenwin,msghistory:200,windowtype:Qt
+
+
+If you are using KDE, you may want to also try the KDE version. It just
+uses the KDE menubar and follows other KDE conventions - there is no
+extra functionality. To do so, first ensure that you have KDE 2.x
+libraries on your system (in 1999 KDE 1.x was the norm); then, add
+$(KDECXXFLAGS) to the CXXFLAGS definition, $(KDELFLAGS) to the LFLAGS
+definition and $(WINKDELIB) to WINLIB.  Some additional files here -
+knh-mini.xpm, knh.xpm, and knethack.lnk are useful if you want to
+install "knethack" in the KDE games directory.  
+
