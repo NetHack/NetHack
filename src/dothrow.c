@@ -1091,8 +1091,7 @@ struct monst *mon;
        An attentive player will still notice that this is different from
        an arrow just landing short of any target (no message in that case),
        so will realize that there is a valid target here anyway. */
-    if (!cansee(bhitpos.x, bhitpos.y) ||
-	    (mon->m_ap_type && mon->m_ap_type != M_AP_MONSTER))
+    if (!canseemon(mon) || (mon->m_ap_type && mon->m_ap_type != M_AP_MONSTER))
 	pline("%s misses.", The(missile));
     else
 	miss(missile, mon);
