@@ -417,7 +417,7 @@ int pid;
     pe32.dwSize = sizeof(PROCESSENTRY32); 
     if (Process32First(hProcessSnap, &pe32)) { 
         do {
-            if (pe32.th32ProcessID == (unsigned)pid &&
+            if (pe32.th32ProcessID == (unsigned)pid && pe32.szExeFile &&
             	(!strcmpi(pe32.szExeFile, "nethack.exe") ||
             	 !strcmpi(pe32.szExeFile, "nethackw.exe")))
 	    bRet = TRUE;
