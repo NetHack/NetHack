@@ -1295,7 +1295,7 @@ boolean shop_floor_obj;
 		/* penalty for breaking eggs laid by you */
 		if (otmp->otyp == EGG && otmp->spe && otmp->corpsenm >= LOW_PM)
 		    change_luck((schar) -min(otmp->quan, 5L));
-		result = "splatt";
+		result = "splat";
 	    }
 	    You_hear("a muffled %s.",result);
 	    obj_extract_self(otmp);
