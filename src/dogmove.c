@@ -14,8 +14,9 @@ STATIC_DCL int FDECL(dog_invent,(struct monst *,struct edog *,int));
 STATIC_DCL int FDECL(dog_goal,(struct monst *,struct edog *,int,int,int));
 
 STATIC_DCL struct obj *FDECL(DROPPABLES, (struct monst *));
-STATIC_DCL boolean FDECL(can_reach_food,(struct monst *,XCHAR_P,XCHAR_P,XCHAR_P,
-    XCHAR_P));
+STATIC_DCL boolean FDECL(can_reach_location,(struct monst *,XCHAR_P,XCHAR_P,
+    XCHAR_P,XCHAR_P));
+STATIC_DCL boolean FDECL(could_reach_item,(struct monst *, XCHAR_P,XCHAR_P));
 
 STATIC_OVL struct obj *
 DROPPABLES(mon)
@@ -285,13 +286,14 @@ int udist;
 									){
 		int edible = dogfood(mtmp, obj);
 
-		if (edible <= CADAVER ||
+		if ((edible <= CADAVER ||
 			/* starving pet is more aggressive about eating */
-			(edog->mhpmax_penalty && edible == ACCFOOD))
+			(edog->mhpmax_penalty && edible == ACCFOOD)) &&
+		    could_reach_item(mtmp, obj->ox, obj->oy))
 		    return dog_eat(mtmp, obj, omx, omy, FALSE);
 
 		if(can_carry(mtmp, obj) && !obj->cursed &&
-			!is_pool(mtmp->mx,mtmp->my)) {
+			could_reach_item(mtmp, obj->ox, obj->oy)) {
 		    if(rn2(20) < edog->apport+3) {
 			if (rn2(udist) || !rn2(edog->apport)) {
 			    if (cansee(omx, omy) && flags.verbose)
@@ -372,8 +374,11 @@ int after, udist, whappr;
 		    if (cursed_object_at(nx, ny) &&
 			    !(edog->mhpmax_penalty && otyp < MANFOOD))
 			continue;
-		    if (otyp < MANFOOD &&
-			    can_reach_food(mtmp, mtmp->mx, mtmp->my, nx, ny)) {
+		    /* skip completely unreacheable goals */
+		    if (!could_reach_item(mtmp, nx, ny) ||
+		        !can_reach_location(mtmp, mtmp->mx, mtmp->my, nx, ny))
+			continue;
+		    if (otyp < MANFOOD) {
 			if (otyp < gtyp || DDIST(nx,ny) < DDIST(gx,gy)) {
 			    gx = nx;
 			    gy = ny;
@@ -780,15 +785,28 @@ dognext:
 	return(1);
 }
 
-/* Hack to prevent a dog from being endlessly stuck near a piece of food that
+/* check if a monster could pick up objects from a location */
+STATIC_OVL boolean
+could_reach_item(mon, nx, ny)
+struct monst *mon;
+xchar nx, ny;
+{
+    if ((!is_pool(nx,ny) || is_swimmer(mon->data)) &&
+	(!is_lava(nx,ny) || likes_lava(mon->data)) &&
+	(!sobj_at(BOULDER,nx,ny) || throws_rocks(mon->data)))
+    	return TRUE;
+    return FALSE;
+}
+
+/* Hack to prevent a dog from being endlessly stuck near an object that
  * it can't reach, such as caught in a teleport scroll niche.  It recursively
- * checks to see if the squares inbetween are good.  The checking could be a
+ * checks to see if the squares in between are good.  The checking could be a
  * little smarter; a full check would probably be useful in m_move() too.
  * Since the maximum food distance is 5, this should never be more than 5 calls
  * deep.
  */
-STATIC_OVL  boolean
-can_reach_food(mon, mx, my, fx, fy)
+STATIC_OVL boolean
+can_reach_location(mon, mx, my, fx, fy)
 struct monst *mon;
 xchar mx, my, fx, fy;
 {
@@ -811,13 +829,9 @@ xchar mx, my, fx, fy;
 	    if (IS_DOOR(levl[i][j].typ) &&
 				(levl[i][j].doormask & (D_CLOSED | D_LOCKED)))
 		continue;
-	    if (is_pool(i, j) && !is_swimmer(mon->data))
+	    if (!could_reach_item(mon, i, j))
 		continue;
-	    if (is_lava(i, j) && !likes_lava(mon->data))
-		continue;
-	    if (sobj_at(BOULDER,i,j) && !throws_rocks(mon->data))
-		continue;
-	    if (can_reach_food(mon, i, j, fx, fy))
+	    if (can_reach_location(mon, i, j, fx, fy))
 		return TRUE;
 	}
     }
