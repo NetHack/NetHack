@@ -1858,12 +1858,16 @@ dodip()
 	if ((obj->otyp == UNICORN_HORN || obj->otyp == AMETHYST) &&
 	    (mixture = mixtype(obj, potion)) != 0) {
 		char oldbuf[BUFSZ], newbuf[BUFSZ];
+		short old_otyp = potion->otyp;
+		boolean old_dknown = FALSE;
 		boolean more_than_one = potion->quan > 1;
 
 		oldbuf[0] = '\0';
-		if (potion->dknown)
+		if (potion->dknown) {
+		    old_dknown = TRUE;
 		    Sprintf(oldbuf, "%s ",
 			    hcolor(OBJ_DESCR(objects[potion->otyp])));
+		}
 		/* with multiple merged potions, split off one and
 		   just clear it */
 		if (potion->quan > 1L) {
@@ -1893,6 +1897,15 @@ dodip()
 		    pline_The("%spotion%s %s.", oldbuf,
 			      more_than_one ? " that you dipped into" : "",
 			      newbuf);
+		    if(!objects[old_otyp].oc_uname &&
+			!objects[old_otyp].oc_name_known && old_dknown) {
+			struct obj fakeobj;
+			fakeobj = zeroobj;
+			fakeobj.dknown = 1;
+			fakeobj.otyp = old_otyp;
+			fakeobj.oclass = POTION_CLASS;
+			docall(&fakeobj);
+		    }
 		}
 		obj_extract_self(singlepotion);
 		singlepotion = hold_another_object(singlepotion,
