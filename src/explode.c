@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)explode.c	3.4	2002/11/10	*/
+/*	SCCS Id: @(#)explode.c	3.4	2003/10/21	*/
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,6 +18,13 @@ static int expl[3][3] = {
  * they don't supply enough information--was it a player or a monster that
  * did it, and with a wand, spell, or breath weapon?  Object types share both
  * these disadvantages....
+ *
+ * Important note about Half_physical_damage:
+ *	Unlike losehp() , explode() makes the Half_physical_damage adjustments
+ *	itself, so the caller should never have done that ahead of time.
+ *	It has to be done this way because the damage value is applied to
+ *	things beside the player. Care is taken within explode() to ensure
+ *	that Half_physical_damage only affects the damage applied to the hero.
  */
 void
 explode(x, y, type, dam, olet, expltype)
@@ -39,6 +46,7 @@ int expltype;
 		/* 0=normal explosion, 1=do shieldeff, 2=do nothing */
 	boolean shopdamage = FALSE;
 	boolean generic = FALSE;
+	boolean physical_dmg = FALSE;
 
 	if (olet == WAND_CLASS)		/* retributive strike */
 		switch (Role_switch) {
@@ -64,6 +72,7 @@ int expltype;
 				olet == SCROLL_CLASS ?	"tower of flame" :
 							"fireball";
 			adtyp = AD_FIRE;
+			physical_dmg = TRUE;
 			break;
 		case 2: str = "ball of cold";
 			adtyp = AD_COLD;
@@ -94,7 +103,7 @@ int expltype;
 
 		if (i+x-1 == u.ux && j+y-1 == u.uy) {
 		    switch(adtyp) {
-			case AD_PHYS:                        
+			case AD_PHYS:
 				explmask[i][j] = 0;
 				break;
 			case AD_MAGM:
@@ -119,6 +128,7 @@ int expltype;
 				break;
 			case AD_ACID:
 				explmask[i][j] = !!Acid_resistance;
+				physical_dmg = TRUE;
 				break;
 			default:
 				impossible("explosion type %d?", adtyp);
@@ -313,8 +323,8 @@ int expltype;
 		if (Invulnerable) {
 		    damu = 0;
 		    You("are unharmed!");
-		} else if (Half_physical_damage && adtyp == AD_PHYS)
-		    damu = (damu+1) / 2;
+		} else if (adtyp == AD_PHYS || physical_dmg)
+		    damu = Maybe_Half_Phys(damu);
 		if (adtyp == AD_FIRE) (void) burnarmor(&youmonst);
 		destroy_item(SCROLL_CLASS, (int) adtyp);
 		destroy_item(SPBOOK_CLASS, (int) adtyp);

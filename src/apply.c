@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2003/05/25	*/
+/*	SCCS Id: @(#)apply.c	3.4	2003/10/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2611,6 +2611,7 @@ do_break_wand(obj)
     boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
+    boolean physical_dmg = FALSE;
 
     Strcpy(the_wand, yname(obj));
     Sprintf(confirm, "Are you really sure you want to break %s?",
@@ -2736,7 +2737,7 @@ do_break_wand(obj)
 		damage = zapyourself(obj, FALSE);
 		if (damage) {
 		    Sprintf(buf, "killed %sself by breaking a wand", uhim());
-		    losehp(damage, buf, NO_KILLER_PREFIX);
+		    losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
 		}
 		if (context.botl) bot();		/* blindness */
 	    } else if ((mon = m_at(x, y)) != 0) {

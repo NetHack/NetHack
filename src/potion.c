@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2002/10/02	*/
+/*	SCCS Id: @(#)potion.c	3.4	2003/10/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -876,7 +876,7 @@ peffects(otmp)
 				good_for_you = TRUE;
 			    } else {
 				You("burn your %s.", body_part(FACE));
-				losehp(d(Fire_resistance ? 1 : 3, 4),
+				losehp(Maybe_Half_Phys(d(Fire_resistance ? 1 : 3, 4)),
 				       "burning potion of oil", KILLED_BY_AN);
 			    }
 			} else if(otmp->cursed)

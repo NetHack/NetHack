@@ -146,6 +146,13 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 /* special mhpmax value when loading bones monster to flag as extinct or genocided */
 #define DEFUNCT_MONSTER	(-100)
 
+/* macro form of adjustments of physical damage based on Half_physical_damage.
+ * Can be used on-the-fly with the 1st parameter to losehp() if you don't
+ * need to retain the dmg value beyond that call scope.
+ * Take care to ensure it doesn't get used more than once in other instances.
+ */
+#define Maybe_Half_Phys(dmg)	((Half_physical_damage) ? (((dmg) + 1) / 2) : (dmg))
+
 /* flags for special ggetobj status returns */
 #define ALL_FINISHED	  0x01  /* called routine already finished the job */
 
