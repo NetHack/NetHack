@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2002/07/27	*/
+/*	SCCS Id: @(#)hack.c	3.4	2002/09/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -453,6 +453,13 @@ dosinkfall()
 	if (is_floater(youmonst.data) || (HLevitation & FROMOUTSIDE)) {
 	    You("wobble unsteadily for a moment.");
 	} else {
+	    long save_ELev = ELevitation, save_HLev = HLevitation;
+
+	    /* fake removal of levitation in advance so that final
+	       disclosure will be right in case this turns out to
+	       be fatal; fortunately the fact that rings and boots
+	       are really still worn has no effect on bones data */
+	    ELevitation = HLevitation = 0L;
 	    You("crash to the floor!");
 	    losehp(rn1(8, 25 - (int)ACURR(A_CON)),
 		   fell_on_sink, NO_KILLER_PREFIX);
@@ -464,6 +471,8 @@ dosinkfall()
 		    losehp(rnd(3), fell_on_sink, NO_KILLER_PREFIX);
 		    exercise(A_CON, FALSE);
 		}
+	    ELevitation = save_ELev;
+	    HLevitation = save_HLev;
 	}
 
 	ELevitation &= ~W_ARTI;
