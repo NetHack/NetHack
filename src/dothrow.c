@@ -1633,6 +1633,11 @@ struct obj *obj;
 	register struct monst *mon;
 
 	if(!u.dx && !u.dy && !u.dz) {
+#ifndef GOLDOBJ
+		u.ugold += obj->quan;
+		flags.botl = 1;
+		dealloc_obj(obj);
+#endif
 		You("cannot throw gold at yourself.");
 		return(0);
 	}
