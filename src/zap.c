@@ -3441,10 +3441,12 @@ register int dx,dy;
 		dy = -dy;
 	    } else {
 		if(isok(sx,lsy) && ZAP_POS(rmn = levl[sx][lsy].typ) &&
+		   !closed_door(sx,lsy) &&
 		   (IS_ROOM(rmn) || (isok(sx+dx,lsy) &&
 				     ZAP_POS(levl[sx+dx][lsy].typ))))
 		    bounce = 1;
 		if(isok(lsx,sy) && ZAP_POS(rmn = levl[lsx][sy].typ) &&
+		   !closed_door(lsx,sy) &&
 		   (IS_ROOM(rmn) || (isok(lsx,sy+dy) &&
 				     ZAP_POS(levl[lsx][sy+dy].typ))))
 		    if(!bounce || rn2(2))
