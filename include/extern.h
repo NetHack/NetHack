@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.4	2002/08/22	*/
+/*	SCCS Id: @(#)extern.h	3.4	2003/01/02	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -954,6 +954,7 @@ E struct monst *NDECL(cloneu);
 E void FDECL(expels, (struct monst *,struct permonst *,BOOLEAN_P));
 E struct attack *FDECL(getmattk, (struct permonst *,int,int *,struct attack *));
 E int FDECL(mattacku, (struct monst *));
+E int FDECL(magic_negation, (struct monst *));
 E int FDECL(gazemu, (struct monst *,struct attack *));
 E void FDECL(mdamageu, (struct monst *,int));
 E int FDECL(could_seduce, (struct monst *,struct monst *,struct attack *));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2002/12/09	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2003/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -789,6 +789,51 @@ struct attack *mattk;
 	return FALSE;
 }
 
+/* armor that sufficiently covers the body might be able to block magic */
+int
+magic_negation(mon)
+struct monst *mon;
+{
+	struct obj *armor;
+	int armpro = 0;
+
+	armor = (mon == &youmonst) ? uarm : which_armor(mon, W_ARM);
+	if (armor && armpro < objects[armor->otyp].a_can)
+	    armpro = objects[armor->otyp].a_can;
+	armor = (mon == &youmonst) ? uarmc : which_armor(mon, W_ARMC);
+	if (armor && armpro < objects[armor->otyp].a_can)
+	    armpro = objects[armor->otyp].a_can;
+	armor = (mon == &youmonst) ? uarmh : which_armor(mon, W_ARMH);
+	if (armor && armpro < objects[armor->otyp].a_can)
+	    armpro = objects[armor->otyp].a_can;
+
+	/* armor types for shirt, gloves, shoes, and shield don't currently
+	   provide any magic cancellation but we might as well be complete */
+#ifdef TOURIST
+	armor = (mon == &youmonst) ? uarmu : which_armor(mon, W_ARMU);
+	if (armor && armpro < objects[armor->otyp].a_can)
+	    armpro = objects[armor->otyp].a_can;
+#endif
+	armor = (mon == &youmonst) ? uarmg : which_armor(mon, W_ARMG);
+	if (armor && armpro < objects[armor->otyp].a_can)
+	    armpro = objects[armor->otyp].a_can;
+	armor = (mon == &youmonst) ? uarmf : which_armor(mon, W_ARMF);
+	if (armor && armpro < objects[armor->otyp].a_can)
+	    armpro = objects[armor->otyp].a_can;
+	armor = (mon == &youmonst) ? uarms : which_armor(mon, W_ARMS);
+	if (armor && armpro < objects[armor->otyp].a_can)
+	    armpro = objects[armor->otyp].a_can;
+
+#ifdef STEED
+	/* this one is really a stretch... */
+	armor = (mon == &youmonst) ? 0 : which_armor(mon, W_SADDLE);
+	if (armor && armpro < objects[armor->otyp].a_can)
+	    armpro = objects[armor->otyp].a_can;
+#endif
+
+	return armpro;
+}
+
 /*
  * hitmu: monster hits you
  *	  returns 2 if monster dies (e.g. "yellow light"), 1 otherwise
@@ -842,13 +887,7 @@ hitmu(mtmp, mattk)
 /*	Use uncancelled when the cancellation factor takes into account certain
  *	armor's special magic protection.  Otherwise just use !mtmp->mcan.
  */
-	armpro = 0;
-	if (uarm && armpro < objects[uarm->otyp].a_can)
-		armpro = objects[uarm->otyp].a_can;
-	if (uarmc && armpro < objects[uarmc->otyp].a_can)
-		armpro = objects[uarmc->otyp].a_can;
-	if (uarmh && armpro < objects[uarmh->otyp].a_can)
-		armpro = objects[uarmh->otyp].a_can;
+	armpro = magic_negation(&youmonst);
 	uncancelled = !mtmp->mcan && ((rn2(3) >= armpro) || !rn2(50));
 
 	permdmg = 0;
@@ -1053,14 +1092,15 @@ dopois:
 	    case AD_PLYS:
 		hitmsg(mtmp, mattk);
 		if (uncancelled && multi >= 0 && !rn2(3)) {
-	    	if (Free_action) You("momentarily stiffen.");            
-	    	else {
-	    	    if (Blind) You("are frozen!");
-	    	    else You("are frozen by %s!", mon_nam(mtmp));
-	    	    nomovemsg = 0;	/* default: "you can move again" */
-	    	    nomul(-rnd(10));
-	    	    exercise(A_DEX, FALSE);
-	    	}
+		    if (Free_action) {
+			You("momentarily stiffen.");            
+		    } else {
+			if (Blind) You("are frozen!");
+			else You("are frozen by %s!", mon_nam(mtmp));
+			nomovemsg = 0;	/* default: "you can move again" */
+			nomul(-rnd(10));
+			exercise(A_DEX, FALSE);
+		    }
 		}
 		break;
 	    case AD_DRLI:
@@ -1076,6 +1116,7 @@ dopois:
 		/* This case is too obvious to ignore, but Nethack is not in
 		 * general very good at considering height--most short monsters
 		 * still _can_ attack you when you're flying or mounted.
+		 * [FIXME: why can't a flying attacker overcome this?]
 		 */
 		  if (
 #ifdef STEED
@@ -1084,9 +1125,11 @@ dopois:
 				    Levitation || Flying) {
 		    pline("%s tries to reach your %s %s!", Monnam(mtmp),
 			  sidestr, body_part(LEG));
+		    dmg = 0;
 		  } else if (mtmp->mcan) {
 		    pline("%s nuzzles against your %s %s!", Monnam(mtmp),
 			  sidestr, body_part(LEG));
+		    dmg = 0;
 		  } else {
 		    if (uarmf) {
 			if (rn2(2) && (uarmf->otyp == LOW_BOOTS ||
@@ -1099,6 +1142,7 @@ dopois:
 			else {
 			    pline("%s scratches your %s boot!", Monnam(mtmp),
 				sidestr);
+			    dmg = 0;
 			    break;
 			}
 		    } else pline("%s pricks your %s %s!", Monnam(mtmp),
@@ -1120,7 +1164,7 @@ dopois:
 			    You_hear("%s hissing!", s_suffix(mon_nam(mtmp)));
 			if(!rn2(10) ||
 			    (flags.moonphase == NEW_MOON && !have_lizard())) {
-do_stone:
+ do_stone:
 			    if (!Stoned && !Stone_resistance
 				    && !(poly_when_stoned(youmonst.data) &&
 					polymon(PM_STONE_GOLEM))) {
@@ -1295,6 +1339,11 @@ do_stone:
 		hurtarmor(AD_DCAY);
 		break;
 	    case AD_HEAL:
+		/* a cancelled nurse is just an ordinary monster */
+		if (mtmp->mcan) {
+		    hitmsg(mtmp, mattk);
+		    break;
+		}
 		if(!uwep
 #ifdef TOURIST
 		   && !uarmu

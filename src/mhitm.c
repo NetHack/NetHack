@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.4	2002/12/09	*/
+/*	SCCS Id: @(#)mhitm.c	3.4	2003/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -573,7 +573,8 @@ mdamagem(magr, mdef, mattk)
 	struct obj *obj;
 	char buf[BUFSZ];
 	struct permonst *pa = magr->data, *pd = mdef->data;
-	int num, tmp = d((int)mattk->damn, (int)mattk->damd);
+	int armpro, num, tmp = d((int)mattk->damn, (int)mattk->damd);
+	boolean cancelled;
 
 	if (touch_petrifies(pd) && !resists_ston(magr)) {
 	    long protector = attk_protection(mattk->aatyp),
@@ -596,6 +597,10 @@ mdamagem(magr, mdef, mattk)
 		return MM_AGR_DIED;
 	    }
 	}
+
+	/* cancellation factor is the same as when attacking the hero */
+	armpro = magic_negation(mdef);
+	cancelled = magr->mcan || !((rn2(3) >= armpro) || !rn2(50));
 
 	switch(mattk->adtyp) {
 	    case AD_DGST:
@@ -650,18 +655,24 @@ mdamagem(magr, mdef, mattk)
 		    pline("%s %s for a moment.", Monnam(mdef),
 			  makeplural(stagger(mdef->data, "stagger")));
 		mdef->mstun = 1;
-		/* fall through */
+		goto physical;
+	    case AD_LEGS:
+		if (magr->mcan) {
+		    tmp = 0;
+		    break;
+		}
+		goto physical;
 	    case AD_WERE:
 	    case AD_HEAL:
-	    case AD_LEGS:
 	    case AD_PHYS:
-		if (mattk->aatyp == AT_KICK && thick_skinned(pd))
-			tmp = 0;
-		else if(mattk->aatyp == AT_WEAP) {
+ physical:
+		if (mattk->aatyp == AT_KICK && thick_skinned(pd)) {
+		    tmp = 0;
+		} else if(mattk->aatyp == AT_WEAP) {
 		    if(otmp) {
 			if (otmp->otyp == CORPSE &&
 				touch_petrifies(&mons[otmp->corpsenm]))
-			    goto do_stone_goto_label;
+			    goto do_stone;
 			tmp += dmgval(otmp, mdef);
 			if (otmp->oartifact) {
 			    (void)artifact_hit(magr,mdef, otmp, &tmp, dieroll);
@@ -682,7 +693,7 @@ mdamagem(magr, mdef, mattk)
 		}
 		break;
 	    case AD_FIRE:
-		if (magr->mcan) {
+		if (cancelled) {
 		    tmp = 0;
 		    break;
 		}
@@ -713,7 +724,7 @@ mdamagem(magr, mdef, mattk)
 		tmp += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
 		break;
 	    case AD_COLD:
-		if (magr->mcan) {
+		if (cancelled) {
 		    tmp = 0;
 		    break;
 		}
@@ -729,7 +740,7 @@ mdamagem(magr, mdef, mattk)
 		tmp += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
 		break;
 	    case AD_ELEC:
-		if (magr->mcan) {
+		if (cancelled) {
 		    tmp = 0;
 		    break;
 		}
@@ -762,7 +773,8 @@ mdamagem(magr, mdef, mattk)
 		if (!rn2(6)) erode_obj(MON_WEP(mdef), TRUE, TRUE);
 		break;
 	    case AD_RUST:
-		if (!magr->mcan && pd == &mons[PM_IRON_GOLEM]) {
+		if (magr->mcan) break;
+		if (pd == &mons[PM_IRON_GOLEM]) {
 			if (vis) pline("%s falls to pieces!", Monnam(mdef));
 			mondied(mdef);
 			if (mdef->mhp > 0) return 0;
@@ -776,13 +788,15 @@ mdamagem(magr, mdef, mattk)
 		tmp = 0;
 		break;
 	    case AD_CORR:
+		if (magr->mcan) break;
 		hurtmarmor(mdef, AD_CORR);
 		mdef->mstrategy &= ~STRAT_WAITFORU;
 		tmp = 0;
 		break;
 	    case AD_DCAY:
-		if (!magr->mcan && (pd == &mons[PM_WOOD_GOLEM] ||
-		    pd == &mons[PM_LEATHER_GOLEM])) {
+		if (magr->mcan) break;
+		if (pd == &mons[PM_WOOD_GOLEM] ||
+		    pd == &mons[PM_LEATHER_GOLEM]) {
 			if (vis) pline("%s falls to pieces!", Monnam(mdef));
 			mondied(mdef);
 			if (mdef->mhp > 0) return 0;
@@ -796,9 +810,10 @@ mdamagem(magr, mdef, mattk)
 		tmp = 0;
 		break;
 	    case AD_STON:
-do_stone_goto_label:
+		if (magr->mcan) break;
+ do_stone:
 		/* may die from the acid if it eats a stone-curing corpse */
-		if (munstone(mdef, FALSE)) goto label2;
+		if (munstone(mdef, FALSE)) goto post_stone;
 		if (poly_when_stoned(pd)) {
 			mon_to_stone(mdef);
 			tmp = 0;
@@ -807,7 +822,7 @@ do_stone_goto_label:
 		if (!resists_ston(mdef)) {
 			if (vis) pline("%s turns to stone!", Monnam(mdef));
 			monstone(mdef);
-label2:			if (mdef->mhp > 0) return 0;
+ post_stone:		if (mdef->mhp > 0) return 0;
 			else if (mdef->mtame && !vis)
 			    You(brief_feeling, "peculiarly sad");
 			return (MM_DEF_DIED | (grow_up(magr,mdef) ?
@@ -816,7 +831,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		tmp = (mattk->adtyp == AD_STON ? 0 : 1);
 		break;
 	    case AD_TLPT:
-		if (!magr->mcan && tmp < mdef->mhp && !tele_restrict(mdef)) {
+		if (!cancelled && tmp < mdef->mhp && !tele_restrict(mdef)) {
 		    char mdef_Monnam[BUFSZ];
 		    /* save the name before monster teleports, otherwise
 		       we'll get "it" in the suddenly disappears message */
@@ -832,7 +847,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		}
 		break;
 	    case AD_SLEE:
-		if (!magr->mcan && !mdef->msleeping &&
+		if (!cancelled && !mdef->msleeping &&
 			sleep_monst(mdef, rnd(10), -1)) {
 		    if (vis) {
 			Strcpy(buf, Monnam(mdef));
@@ -843,7 +858,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		}
 		break;
 	    case AD_PLYS:
-		if(!magr->mcan && mdef->mcanmove) {
+		if(!cancelled && mdef->mcanmove) {
 		    if (vis) {
 			Strcpy(buf, Monnam(mdef));
 			pline("%s is frozen by %s.", buf, mon_nam(magr));
@@ -854,7 +869,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		}
 		break;
 	    case AD_SLOW:
-		if (!magr->mcan && vis && mdef->mspeed != MSLOW) {
+		if (!cancelled && mdef->mspeed != MSLOW) {
 		    unsigned int oldspeed = mdef->mspeed;
 
 		    mon_adjust_speed(mdef, -1, (struct obj *)0);
@@ -956,7 +971,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		}
 		break;
 	    case AD_DRLI:
-		if (rn2(2) && !resists_drli(mdef)) {
+		if (!cancelled && !rn2(3) && !resists_drli(mdef)) {
 			tmp = d(2,6);
 			if (vis)
 			    pline("%s suddenly seems weaker!", Monnam(mdef));
@@ -972,13 +987,13 @@ label2:			if (mdef->mhp > 0) return 0;
 #endif
 	    case AD_SITM:	/* for now these are the same */
 	    case AD_SEDU:
+		if (magr->mcan) break;
 		/* find an object to steal, non-cursed if magr is tame */
-		for (obj = mdef->minvent; obj; obj = obj->nobj) {
+		for (obj = mdef->minvent; obj; obj = obj->nobj)
 		    if (!magr->mtame || !obj->cursed)
 			break;
-		}
 
-		if (!magr->mcan && obj) {
+		if (obj) {
 			char onambuf[BUFSZ], mdefnambuf[BUFSZ];
 
 			/* make a special x_monnam() call that never omits
@@ -1027,7 +1042,7 @@ label2:			if (mdef->mhp > 0) return 0;
 	    case AD_DRST:
 	    case AD_DRDX:
 	    case AD_DRCO:
-		if (!magr->mcan && !rn2(8)) {
+		if (!cancelled && !rn2(8)) {
 		    if (vis)
 			pline("%s %s was poisoned!", s_suffix(Monnam(magr)),
 			      mpoisons_subj(magr, mattk));
@@ -1075,18 +1090,25 @@ label2:			if (mdef->mhp > 0) return 0;
 			          s_suffix(Monnam(mdef)));
 		break;
 	    case AD_SLIM:
-	    	if (!rn2(4) && mdef->data != &mons[PM_FIRE_VORTEX] &&
-	    			mdef->data != &mons[PM_FIRE_ELEMENTAL] &&
-	    			mdef->data != &mons[PM_SALAMANDER] &&
-	    			mdef->data != &mons[PM_GREEN_SLIME]) {
-	    	    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, vis);
+		if (cancelled) break;	/* physical damage only */
+		if (!rn2(4) && mdef->data != &mons[PM_FIRE_VORTEX] &&
+				mdef->data != &mons[PM_FIRE_ELEMENTAL] &&
+				mdef->data != &mons[PM_SALAMANDER] &&
+				mdef->data != &mons[PM_GREEN_SLIME]) {
+		    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, vis);
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
-	    	    tmp = 0;
-	    	}
-	    	break;
+		    tmp = 0;
+		}
+		break;
 	    case AD_STCK:
+		if (cancelled) tmp = 0;
+		break;
 	    case AD_WRAP: /* monsters cannot grab one another, it's too hard */
-	    case AD_ENCH: /* There's no msomearmor() function, so just do damage */
+		if (magr->mcan) tmp = 0;
+		break;
+	    case AD_ENCH:
+		/* there's no msomearmor() function, so just do damage */
+	     /* if (cancelled) break; */
 		break;
 	    default:	tmp = 0;
 			break;

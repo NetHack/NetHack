@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2002/12/26	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2003/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1241,6 +1241,12 @@ register struct attack *mattk;
 {
 	register struct permonst *pd = mdef->data;
 	register int	tmp = d((int)mattk->damn, (int)mattk->damd);
+	int armpro;
+	boolean negated;
+
+	armpro = magic_negation(mdef);
+	/* since hero can't be cancelled, only defender's armor applies */
+	negated = !((rn2(3) >= armpro) || !rn2(50));
 
 	if (is_demon(youmonst.data) && !rn2(13) && !uwep
 		&& u.umonnum != PM_SUCCUBUS && u.umonnum != PM_INCUBUS
@@ -1254,11 +1260,17 @@ register struct attack *mattk;
 		    pline("%s %s for a moment.", Monnam(mdef),
 			  makeplural(stagger(mdef->data, "stagger")));
 		mdef->mstun = 1;
-		/* fall through to next case */
-	    case AD_WERE:	    /* no effect on monsters */
-	    case AD_HEAL:
+		goto physical;
 	    case AD_LEGS:
+	     /* if (u.ucancelled) { */
+	     /*    tmp = 0;	    */
+	     /*    break;	    */
+	     /* }		    */
+		goto physical;
+	    case AD_WERE:	    /* no special effect on monsters */
+	    case AD_HEAL:	    /* likewise */
 	    case AD_PHYS:
+ physical:
 		if(mattk->aatyp == AT_WEAP) {
 		    if(uwep) tmp = 0;
 		} else if(mattk->aatyp == AT_KICK) {
@@ -1273,13 +1285,17 @@ register struct attack *mattk;
 		}
 		break;
 	    case AD_FIRE:
+		if (negated) {
+		    tmp = 0;
+		    break;
+		}
 		if (!Blind)
 		    pline("%s is %s!", Monnam(mdef),
 			  on_fire(mdef->data, mattk));
 		if (pd == &mons[PM_STRAW_GOLEM] ||
 		    pd == &mons[PM_PAPER_GOLEM]) {
 		    if (!Blind)
-		    	pline("%s burns completely!", Monnam(mdef));
+			pline("%s burns completely!", Monnam(mdef));
 		    xkilled(mdef,2);
 		    tmp = 0;
 		    break;
@@ -1298,6 +1314,10 @@ register struct attack *mattk;
 		tmp += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
 		break;
 	    case AD_COLD:
+		if (negated) {
+		    tmp = 0;
+		    break;
+		}
 		if (!Blind) pline("%s is covered in frost!", Monnam(mdef));
 		if (resists_cold(mdef)) {
 		    shieldeff(mdef->mx, mdef->my);
@@ -1309,6 +1329,10 @@ register struct attack *mattk;
 		tmp += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
 		break;
 	    case AD_ELEC:
+		if (negated) {
+		    tmp = 0;
+		    break;
+		}
 		if (!Blind) pline("%s is zapped!", Monnam(mdef));
 		tmp += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
 		if (resists_elec(mdef)) {
@@ -1365,8 +1389,8 @@ register struct attack *mattk;
 		tmp = 0;
 		break;
 	    case AD_TLPT:
-		if(tmp <= 0) tmp = 1;
-		if(tmp < mdef->mhp) {
+		if (tmp <= 0) tmp = 1;
+		if (!negated && tmp < mdef->mhp) {
 		    char nambuf[BUFSZ];
 		    boolean u_saw_mon = canseemon(mdef);
 		    /* record the name before losing sight of monster */
@@ -1403,7 +1427,7 @@ register struct attack *mattk;
 		tmp = 0;
 		break;
 	    case AD_DRLI:
-		if (rn2(2) && !resists_drli(mdef)) {
+		if (!negated && !rn2(3) && !resists_drli(mdef)) {
 			int xtmp = d(2,6);
 			pline("%s suddenly seems weaker!", Monnam(mdef));
 			mdef->mhpmax -= xtmp;
@@ -1412,8 +1436,8 @@ register struct attack *mattk;
 				xkilled(mdef,0);
 			} else
 				mdef->m_lev--;
+			tmp = 0;
 		}
-		tmp = 0;
 		break;
 	    case AD_RUST:
 		if (pd == &mons[PM_IRON_GOLEM]) {
@@ -1439,7 +1463,7 @@ register struct attack *mattk;
 	    case AD_DRST:
 	    case AD_DRDX:
 	    case AD_DRCO:
-		if (!rn2(8)) {
+		if (!negated && !rn2(8)) {
 		    Your("%s was poisoned!", mpoisons_subj(&youmonst, mattk));
 		    if (resists_poison(mdef))
 			pline_The("poison doesn't seem to affect %s.",
@@ -1498,7 +1522,7 @@ register struct attack *mattk;
 		exercise(A_WIS, TRUE);
 		break;
 	    case AD_STCK:
-		if (!sticks(mdef->data))
+		if (!negated && !sticks(mdef->data))
 		    u.ustuck = mdef; /* it's now stuck to you */
 		break;
 	    case AD_WRAP:
@@ -1529,34 +1553,53 @@ register struct attack *mattk;
 		} else tmp = 0;
 		break;
 	    case AD_PLYS:
-		if (mdef->mcanmove && !rn2(3) && tmp < mdef->mhp) {
+		if (!negated && mdef->mcanmove && !rn2(3) && tmp < mdef->mhp) {
 		    if (!Blind) pline("%s is frozen by you!", Monnam(mdef));
 		    mdef->mcanmove = 0;
 		    mdef->mfrozen = rnd(10);
 		}
 		break;
 	    case AD_SLEE:
-		if (!mdef->msleeping && sleep_monst(mdef, rnd(10), -1)) {
+		if (!negated && !mdef->msleeping &&
+			    sleep_monst(mdef, rnd(10), -1)) {
 		    if (!Blind)
 			pline("%s is put to sleep by you!", Monnam(mdef));
 		    slept_monst(mdef);
 		}
 		break;
 	    case AD_SLIM:
-	    	if (!rn2(4) && mdef->data != &mons[PM_FIRE_VORTEX] &&
-	    			mdef->data != &mons[PM_FIRE_ELEMENTAL] &&
-	    			mdef->data != &mons[PM_SALAMANDER] &&
-	    			mdef->data != &mons[PM_GREEN_SLIME]) {
-	    	    You("turn %s into slime.", mon_nam(mdef));
-	    	    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE);
-	    	    tmp = 0;
-	    	}
-	    	break;
+		if (negated) break;	/* physical damage only */
+		if (!rn2(4) && mdef->data != &mons[PM_FIRE_VORTEX] &&
+				mdef->data != &mons[PM_FIRE_ELEMENTAL] &&
+				mdef->data != &mons[PM_SALAMANDER] &&
+				mdef->data != &mons[PM_GREEN_SLIME]) {
+		    You("turn %s into slime.", mon_nam(mdef));
+		    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE);
+		    tmp = 0;
+		}
+		break;
 	    case AD_ENCH:	/* KMH -- remove enchantment (disenchanter) */
-			/* There's no msomearmor() function, so just do damage */
-			break;
+		/* there's no msomearmor() function, so just do damage */
+	     /* if (negated) break; */
+		break;
+	    case AD_SLOW:
+		if (!negated && mdef->mspeed != MSLOW) {
+		    unsigned int oldspeed = mdef->mspeed;
+
+		    mon_adjust_speed(mdef, -1, (struct obj *)0);
+		    if (mdef->mspeed != oldspeed && canseemon(mdef))
+			pline("%s slows down.", Monnam(mdef));
+		}
+		break;
+	    case AD_CONF:
+		if (!mdef->mconf) {
+		    if (canseemon(mdef))
+			pline("%s looks confused.", Monnam(mdef));
+		    mdef->mconf = 1;
+		}
+		break;
 	    default:	tmp = 0;
-			break;
+		break;
 	}
 
 	mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
