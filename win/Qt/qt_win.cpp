@@ -3576,7 +3576,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 
     game->insertItem("Qt settings...",1000);
     help->insertItem("About Qt NetHack...",2000);
-    help->insertItem("NetHack Guidebook...",3000);
+    //help->insertItem("NetHack Guidebook...",3000);
     help->insertSeparator();
 
     count=0;
@@ -3748,7 +3748,7 @@ void NetHackQtMainWindow::doMenuItem(int id)
 	    QTextBrowser browser(&dlg);
 	    NetHackMimeSourceFactory ms;
 	    browser.setMimeSourceFactory(&ms);
-	    browser.setSource(QDir::currentDirPath()+"/Guidebook-qpe.html");
+	    browser.setSource(QDir::currentDirPath()+"/Guidebook.html");
 	    if ( qt_compact_mode )
 		dlg.showMaximized();
 	    dlg.exec();
