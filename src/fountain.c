@@ -391,7 +391,8 @@ register struct obj *obj;
 		if(in_town(u.ux, u.uy))
 		    (void) angry_guards(FALSE);
 		return;
-	} else (void) get_wet(obj);
+	} else if (get_wet(obj) && !rn2(2))
+		return;
 
 	/* Acid and water don't mix */
 	if (obj->otyp == POT_ACID) {

@@ -1438,16 +1438,6 @@ register struct obj *obj;
 
 	/* (Rusting shop goods ought to be charged for.) */
 	switch (obj->oclass) {
-	    case WEAPON_CLASS:
-		if (!obj->oerodeproof && is_rustprone(obj) &&
-		    (obj->oeroded < MAX_ERODE) && !rn2(2)) {
-			pline("%s some%s.",
-			      Yobjnam2(obj, "rust"),
-			      obj->oeroded ? " more" : "what");
-			obj->oeroded++;
-			update_inventory();
-			return TRUE;
-		} else break;
 	    case POTION_CLASS:
 		if (obj->otyp == POT_WATER) return FALSE;
 		/* KMH -- Water into acid causes an explosion */
@@ -1518,6 +1508,20 @@ register struct obj *obj;
 			}
 			return TRUE;
 		}
+		break;
+	    case WEAPON_CLASS:
+	    /* Just "fall through" to generic rustprone check for now. */
+	    /* fall through */
+	    default:
+		if (!obj->oerodeproof && is_rustprone(obj) &&
+		    (obj->oeroded < MAX_ERODE) && !rn2(2)) {
+			pline("%s %s some%s.",
+			      Your_buf, aobjnam(obj, "rust"),
+			      obj->oeroded ? " more" : "what");
+			obj->oeroded++;
+			update_inventory();
+			return TRUE;
+		} else break;
 	}
 	pline("%s wet.", Yobjnam2(obj, "get"));
 	return FALSE;
@@ -1562,6 +1566,20 @@ dodip()
 		    }
 		    return 1;
 		}
+		break;
+	    case WEAPON_CLASS:
+	    /* Just "fall through" to generic rustprone check for now. */
+	    /* fall through */
+	    default:
+		if (!obj->oerodeproof && is_rustprone(obj) &&
+		    (obj->oeroded < MAX_ERODE) && !rn2(2)) {
+			pline("%s %s some%s.",
+			      Your_buf, aobjnam(obj, "rust"),
+			      obj->oeroded ? " more" : "what");
+			obj->oeroded++;
+			update_inventory();
+			return TRUE;
+		} else break;
 	}
 
 	if(!(potion = getobj(beverages, "dip into")))
