@@ -1,12 +1,8 @@
-/*	SCCS Id: @(#)read.c	3.4	2003/11/29	*/
+/*	SCCS Id: @(#)read.c	3.4	2004/05/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-/* KMH -- Copied from pray.c; this really belongs in a header file */
-#define DEVOUT 14
-#define STRIDENT 4
 
 #define Your_Own_Role(mndx) \
 	((mndx) == urole.malenum || \
@@ -799,7 +795,10 @@ register struct obj	*sobj;
 			known = TRUE;
 		} else {	/* armor and scroll both cursed */
 		    pline("%s.", Yobjnam2(otmp, "vibrate"));
-		    if (otmp->spe >= -6) otmp->spe--;
+		    if (otmp->spe >= -6) {
+			otmp->spe += -1;
+			adj_abon(otmp, -1);
+		    }
 		    make_stunned(HStun + rn1(10, 10), TRUE);
 		}
 	    }
