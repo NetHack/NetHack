@@ -106,7 +106,8 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 		data->xPageSize = COLNO+1;  /* disable scroll bar */
 	else
 		data->xPageSize = wnd_size.cx/data->xScrTile;
-	if( wnd_size.cx/data->xScrTile >= COLNO ) {
+
+	if( data->xPageSize >= COLNO ) {
 		data->xPos = 0;
 		GetNHApp()->bNoHScroll = TRUE;
 	} else {
@@ -128,7 +129,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	else
 		data->yPageSize = wnd_size.cy/data->yScrTile;
 
-	if( wnd_size.cy/data->yScrTile >= ROWNO ) {
+	if( data->yPageSize >= ROWNO ) {
 		data->yPos = 0;
 		GetNHApp()->bNoVScroll = TRUE;
 	} else {
