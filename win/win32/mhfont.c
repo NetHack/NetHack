@@ -26,7 +26,7 @@ void mswin_init_splashfonts(HWND hWnd)
 	HFONT fnt = NULL;
 	LOGFONT lgfnt;
 	ZeroMemory( &lgfnt, sizeof(lgfnt) );
-	lgfnt.lfHeight		= -60*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
+	lgfnt.lfHeight		= -80;	 // height of font
 	lgfnt.lfWidth		=	0;				     // average character width
 	lgfnt.lfEscapement	=	0;					 // angle of escapement
 	lgfnt.lfOrientation		=	0;					 // base-line orientation angle
@@ -41,7 +41,7 @@ void mswin_init_splashfonts(HWND hWnd)
 	lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
 	NH_A2W( "Times New Roman", lgfnt.lfFaceName, LF_FACESIZE);
 	version_splash_font = CreateFontIndirect(&lgfnt);
-	lgfnt.lfHeight		= -12*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
+	lgfnt.lfHeight		= -16;	 // height of font
 	extrainfo_splash_font = CreateFontIndirect(&lgfnt);
 	ReleaseDC(hWnd, hdc);
 }
