@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.77 $ $Date: 2003/11/22 04:25:26 $
+% $Revision: 1.78 $ $Date: 2003/11/23 21:51:15 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.4)}
-\date{November 15, 2003}
+\date{November 25, 2003}
 
 \maketitle
 
@@ -1168,6 +1168,65 @@ monster will arrive on the staircase and you will end up nearby.
 %.pg
 Ladders serve the same purpose as staircases, and the two types of
 inter-level connections are nearly indistinguishable during game play.
+
+%.hn 2
+\subsection*{Shops and shopping}
+
+%.pg
+Occasionally you will run across a room with a shopkeeper near the door
+and many items laying on the floor.  You can buy items by picking them
+up and then using the `{\tt p}' command.  You can inquire about the price
+of an item prior to picking it up by using the ``{\tt \#chat}'' command
+while standing on it.  Using an item prior to paying for it will incur a
+charge, and the shopkeeper won't allow you to leave the shop until you
+have paid any debt you owe.
+
+%.pg
+You can sell items to a shopkeeper by dropping them to the floor while
+inside a shop.  You will either be offered an amount of gold and asked
+whether you're willing to sell, or you'll be told that the shopkeeper
+isn't interested (generally, your item needs to be compatible with the
+type of merchandize carried by the shop).
+
+%.pg
+If you drop something in a shop by accident, the shopkeeper will usually
+claim ownership without offering any compensation.  You'll have to buy
+it back if you want to reclaim it.
+
+%.pg
+Shopkeepers sometimes run out of money.  When that happens, you'll be
+offered credit instead of gold when you try to sell something.  Credit
+can be used to pay for purchases, but it is only good in the shop where
+it was obtained; other shopkeepers won't honor it.  (If you happen to
+find a ``credit card'' in the dungeon, don't bother trying to use it in
+shops; shopkeepers will not accept it.)
+
+%.hn 3
+\subsubsection*{Shop idiosyncracies}
+
+%.pg
+Several aspects of shop behavior might be unexpected.
+
+\begin{itemize}
+% note: a bullet is the default item label so we could omit [$\bullet$] here
+%.lp \(bu 2
+\item[$\bullet$]
+The price of a given item can vary due to a variety of factors.
+%.lp \(bu 2
+\item[$\bullet$]
+A shopkeeper treats the spot immediately inside the door as if it were
+outside the shop.
+%.lp \(bu 2
+\item[$\bullet$]
+While the shopkeeper watches you like a hawk, he will generally ignore
+any other customers.
+%.lp \(bu 2
+\item[$\bullet$]
+If a shop is ``closed for inventory'', it will not open of its own accord.
+%.lp \(bu 2
+\item[$\bullet$]
+Shops do not get restocked with new items, regardless of inventory depletion.
+\end{itemize}
 
 %.hn 1
 \section{Monsters}
