@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sit.c	3.4	2000/11/09	*/
+/*	SCCS Id: @(#)sit.c	3.4	2002/07/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -270,8 +270,8 @@ dosit()
 
 	    if (!rn2(3) && IS_THRONE(levl[u.ux][u.uy].typ)) {
 		/* may have teleported */
-		pline_The("throne vanishes in a puff of logic.");
 		levl[u.ux][u.uy].typ = ROOM;
+		pline_The("throne vanishes in a puff of logic.");
 		newsym(u.ux,u.uy);
 	    }
 

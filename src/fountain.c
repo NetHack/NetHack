@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)fountain.c	3.4	2001/09/06	*/
+/*	SCCS Id: @(#)fountain.c	3.4	2002/07/10	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -179,10 +179,11 @@ boolean isyou;
 				return;
 		}
 #endif
-		if (cansee(x,y)) pline_The("fountain dries up!");
+		/* replace the fountain with ordinary floor */
 		levl[x][y].typ = ROOM;
 		levl[x][y].looted = 0;
 		levl[x][y].blessedftn = 0;
+		if (cansee(x,y)) pline_The("fountain dries up!");
 		/* The location is seen if the hero/monster is invisible */
 		/* or felt if the hero is blind.			 */
 		newsym(x, y);
