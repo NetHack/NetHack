@@ -48,6 +48,10 @@ extern int errno;
 #undef _POSIX_
 #endif
 
+#if defined(__DJGPP__)
+#include <limits.h>
+#endif
+
 #ifdef PREFIXES_IN_USE
 #define FQN_NUMBUF 4
 static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
