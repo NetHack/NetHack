@@ -1567,19 +1567,6 @@ dodip()
 		    return 1;
 		}
 		break;
-	    case WEAPON_CLASS:
-	    /* Just "fall through" to generic rustprone check for now. */
-	    /* fall through */
-	    default:
-		if (!obj->oerodeproof && is_rustprone(obj) &&
-		    (obj->oeroded < MAX_ERODE) && !rn2(2)) {
-			pline("%s %s some%s.",
-			      Your_buf, aobjnam(obj, "rust"),
-			      obj->oeroded ? " more" : "what");
-			obj->oeroded++;
-			update_inventory();
-			return TRUE;
-		} else break;
 	}
 
 	if(!(potion = getobj(beverages, "dip into")))
