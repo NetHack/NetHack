@@ -335,6 +335,7 @@ typedef unsigned char	uchar;
 #if !defined(MAC)
 # define CLIPPING	/* allow smaller screens -- ERS */
 #endif
+#define BARGETHROUGH	/* allow some monster to move others out of their way */
 
 #ifdef REDO
 # define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */

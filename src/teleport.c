@@ -416,6 +416,9 @@ tele()
 
 	if ((u.uhave.amulet || On_W_tower_level(&u.uz)) && !rn2(3)) {
 	    You_feel("disoriented for a moment.");
+#ifdef WIZARD
+	    if (wizard && yn("Override?") != 'y')
+#endif
 	    return;
 	}
 	if ((Teleport_control && !Stunned)

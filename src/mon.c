@@ -14,6 +14,9 @@
 
 STATIC_DCL boolean FDECL(restrap,(struct monst *));
 STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));
+#ifdef BARGETHROUGH
+STATIC_DCL long FDECL(mm_displacement, (struct monst *,struct monst *));
+#endif
 STATIC_DCL int NDECL(pick_animal);
 STATIC_DCL int FDECL(select_newcham_form, (struct monst *));
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
@@ -1092,11 +1095,24 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 				struct monst *mtmp2 = m_at(nx, ny);
 				long mmflag = flag | mm_aggression(mon, mtmp2);
 
+#ifndef BARGETHROUGH
 				if (!(mmflag & ALLOW_M)) continue;
 				info[cnt] |= ALLOW_M;
 				if (mtmp2->mtame) {
 					if (!(mmflag & ALLOW_TM)) continue;
 					info[cnt] |= ALLOW_TM;
+#else /* BARGETHROUGH */
+				if (mmflag & ALLOW_M) {
+					info[cnt] |= ALLOW_M;
+					if (mtmp2->mtame) {
+						if (!(mmflag & ALLOW_TM)) continue;
+						info[cnt] |= ALLOW_TM;
+					}
+				} else {
+					mmflag = flag | mm_displacement(mon, mtmp2);
+					if (!(mmflag & ALLOW_MDISP)) continue;
+					info[cnt] |= ALLOW_MDISP;
+#endif /* BARGETHROUGH */
 				}
 			}
 			/* Note: ALLOW_SANCT only prevents movement, not */
@@ -1198,6 +1214,25 @@ struct monst *magr,	/* monster that is currently deciding where to move */
 	   support those. */
 	return 0L;
 }
+
+#ifdef BARGETHROUGH
+/* Monster displacing another monster out of the way */
+STATIC_OVL long
+mm_displacement(magr, mdef)
+struct monst *magr,	/* monster that is currently deciding where to move */
+	     *mdef;	/* another monster which is next to it */
+{
+	struct permonst *pa = magr->data;
+	struct permonst *pd = mdef->data;
+	if ((pa->mflags3 & M3_DISPLACES) &&
+	    !is_longworm(pd)		 &&		/* no displacing longworms  */
+	    !mdef->mtrapped		 &&		/* complex to do right      */
+	    (is_rider(pa) ||				/* riders can move anything */
+	      pa->msize >= pd->msize))			/* same or smaller only     */
+		return ALLOW_MDISP;
+	return 0L;
+}
+#endif /* BARGETHROUGH */
 
 boolean
 monnear(mon, x, y)

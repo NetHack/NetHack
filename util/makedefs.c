@@ -676,6 +676,9 @@ static const char *build_opts[] = {
 #ifdef MAIL
 		"mail daemon",
 #endif
+#ifdef BARGETHROUGH
+		"monsters moving monsters",
+#endif
 #ifdef GNUDOS
 		"MSDOS protected mode",
 #endif

@@ -48,13 +48,19 @@ register struct monst *mon;
 
 static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
 
+#ifndef BARGETHROUGH
 STATIC_OVL boolean FDECL(cursed_object_at, (int, int));
+#endif /* not BARGETHROUGH */
 
 STATIC_VAR xchar gtyp, gx, gy;	/* type and position of dog's current goal */
 
 STATIC_PTR void FDECL(wantdoor, (int, int, genericptr_t));
 
+#ifdef BARGETHROUGH
+boolean
+#else
 STATIC_OVL boolean
+#endif
 cursed_object_at(x, y)
 int x, y;
 {
@@ -489,6 +495,9 @@ register int after;	/* this is extra fast monster movement */
 	struct obj *obj = (struct obj *) 0;
 	xchar otyp;
 	boolean has_edog, cursemsg[9], do_eat = FALSE;
+#ifdef BARGETHROUGH
+	boolean better_with_displacing = FALSE;
+#endif
 	xchar nix, niy;		/* position mtmp is (considering) moving to */
 	register int nx, ny;	/* temporary coordinates */
 	xchar cnt, uncursedcnt, chcnt;
@@ -546,6 +555,9 @@ register int after;	/* this is extra fast monster movement */
 	if (passes_walls(mtmp->data)) allowflags |= (ALLOW_ROCK | ALLOW_WALL);
 	if (passes_bars(mtmp->data)) allowflags |= ALLOW_BARS;
 	if (throws_rocks(mtmp->data)) allowflags |= ALLOW_ROCK;
+#ifdef BARGETHROUGH
+	if (is_displacer(mtmp->data)) allowflags |= ALLOW_MDISP;
+#endif
 	if (Conflict && !resist(mtmp, RING_CLASS, 0, 0)) {
 	    allowflags |= ALLOW_U;
 	    if (!has_edog) {
@@ -590,10 +602,19 @@ register int after;	/* this is extra fast monster movement */
 	uncursedcnt = 0;
 	for (i = 0; i < cnt; i++) {
 		nx = poss[i].x; ny = poss[i].y;
+#ifdef BARGETHROUGH
+		if (MON_AT(nx,ny) && !((info[i] & ALLOW_M) || info[i] & ALLOW_MDISP))
+			continue;
+#else
 		if (MON_AT(nx,ny) && !(info[i] & ALLOW_M)) continue;
+#endif
 		if (cursed_object_at(nx, ny)) continue;
 		uncursedcnt++;
 	}
+
+#ifdef BARGETHROUGH
+	better_with_displacing = should_displace(mtmp,poss,info,cnt,gx,gy);
+#endif
 
 	chcnt = 0;
 	chi = -1;
@@ -645,9 +666,19 @@ register int after;	/* this is extra fast monster movement */
 			mstatus = mattackm(mtmp2, mtmp);  /* return attack */
 			if (mstatus & MM_DEF_DIED) return 2;
 		    }
-
 		    return 0;
 		}
+#ifdef BARGETHROUGH
+		if ((info[i] & ALLOW_MDISP) && MON_AT(nx, ny) &&
+			better_with_displacing &&
+			!undesirable_disp(mtmp,nx,ny)) {
+		    int mstatus;
+		    register struct monst *mtmp2 = m_at(nx,ny);
+		    mstatus = mdisplacem(mtmp, mtmp2, FALSE);	/* displace monster */
+		    if (mstatus && MM_DEF_DIED) return 2;
+  		    return 0;
+  		}
+#endif /* BARGETHROUGH */
 
 		{   /* Dog avoids harmful traps, but perhaps it has to pass one
 		     * in order to follow player.  (Non-harmful traps do not

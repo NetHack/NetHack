@@ -168,10 +168,9 @@ fightm(mtmp)		/* have monsters fight each other */
 	return 0;
 }
 
+#ifdef BARGETHROUGH
 /*
- * mattackm() -- a monster attacks another monster.
- *
- * This function returns a result bitfield:
+ * mattackm() and mdisplacem() below both return a result bitfield:
  *
  *	    --------- aggressor died
  *	   /  ------- defender died
@@ -184,6 +183,112 @@ fightm(mtmp)		/* have monsters fight each other */
  *	0x1	MM_HIT
  *	0x0	MM_MISS
  *
+ */
+
+/*
+ * mdisplacem() -- a monster moves another monster out of the way.
+ */
+int
+mdisplacem(magr, mdef, quietly)
+register struct monst *magr,*mdef;
+boolean quietly;
+{
+	struct permonst *pa, *pd;
+	struct monst *mon;			/* displaced monster */
+	int tx = mdef->mx, ty = mdef->my;	/* destination */
+	int fx = magr->mx, fy = magr->my; 	/* current location */
+	boolean struck = FALSE;
+	
+	pa = magr->data;  pd = mdef->data;
+
+	/* The 1 in 7 failure below matches the chance in attack()
+	 * for pet displacement.
+	 */
+	if (!rn2(7)) return(MM_MISS);
+
+	/* Grid bugs cannot displace at an angle. */
+	if (pa == &mons[PM_GRID_BUG] && magr->mx != mdef->mx
+						&& magr->my != mdef->my)
+		return(MM_MISS);
+
+
+	/* undetected monsters become un-hidden if they are displaced */
+	if (mdef->mundetected)
+		mdef->mundetected = 0;
+
+	/*
+	 * Set up the visibility of action.
+	 * You can observe monster displacement if you can see both of
+	 * the monsters involved.
+	 */
+	vis = (canspotmon(magr) && canspotmon(mdef));
+
+
+	if (touch_petrifies(pd) && !resists_ston(magr)) {
+		if (which_armor(magr, W_ARMG) != 0) {
+			if (poly_when_stoned(pa)) {
+			    mon_to_stone(magr);
+			    return MM_HIT; /* no damage during the polymorph */
+			}
+			if (!quietly && canspotmon(magr))
+				pline("%s turns to stone!", Monnam(magr));
+			monstone(magr);
+			if (magr->mhp > 0) return 0;
+			else if (magr->mtame && !vis)
+			    You(brief_feeling, "peculiarly sad");
+			return MM_AGR_DIED;
+	        }
+	}
+
+	if (m_at(fx, fy) == magr)
+		remove_monster(fx, fy);		/* pick up from orig position */
+	if ((mon = m_at(tx, ty)) == mdef) {
+		if (!quietly && (vis))
+			pline("%s moves %s out of %s way!",
+				Monnam(magr), mon_nam(mdef),
+				is_rider(pa) ? "the" : mhis(magr));
+		remove_monster(tx, ty);
+	}
+	place_monster(magr,tx,ty);	/* put magr down */
+
+	/* Restore original mon */
+	if (mon) {
+	    if ((mon->mx != tx) || (mon->my != ty))
+		place_worm_seg(mon, fx, fy);
+	    else
+		place_monster(mon, fx, fy);
+	    struck = TRUE;
+	} else 
+	    remove_monster(fx, fy);	/* shouldn't happen */
+	newsym(fx,fy);			/* see it */
+	newsym(tx,ty);			/*   all happen */
+	flush_screen(0);		/* make sure it shows up */
+
+	/*
+	 *  Wake up the displaced defender.
+	 */
+	mdef->msleeping = 0;
+	
+	return(struck ? MM_HIT : MM_MISS);
+}
+#endif /* BARGETHROUGH */
+
+/*
+ * mattackm() -- a monster attacks another monster.
+#ifndef BARGETHROUGH
+ *
+ *	    --------- aggressor died
+ *	   /  ------- defender died
+ *	  /  /  ----- defender was hit
+ *	 /  /  /
+ *	x  x  x
+ *
+ *	0x4	MM_AGR_DIED
+ *	0x2	MM_DEF_DIED
+ *	0x1	MM_HIT
+ *	0x0	MM_MISS
+ *
+#endif
  * Each successive attack has a lower probability of hitting.  Some rely on the
  * success of previous attacks.  ** this doen't seem to be implemented -dl **
  *

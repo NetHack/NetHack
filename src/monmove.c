@@ -570,6 +570,52 @@ register struct monst *mtmp;
 	return(FALSE);
 }
 
+#ifdef BARGETHROUGH
+/*
+ * should_displace()
+ *
+ * Displacement of another monster is a last resort and only
+ * used on approach. If there are better ways to get to target,
+ * those should be used instead. This function does that evaluation.
+ */
+boolean
+should_displace(mtmp, poss, info, cnt, gx, gy)
+struct monst *mtmp;
+coord *poss;	/* coord poss[9] */
+long *info;	/* long info[9] */
+int cnt;
+xchar gx, gy;
+{
+	int shortest_with_displacing = -1;
+	int shortest_without_displacing = -1;
+	int count_without_displacing = 0;
+	register int i, nx, ny;
+	int ndist;
+
+	for (i = 0; i < cnt; i++) {
+		nx = poss[i].x; ny = poss[i].y;
+		ndist = dist2(nx,ny,gx,gy);
+		if (MON_AT(nx,ny) &&
+			(info[i] & ALLOW_MDISP) && !(info[i] & ALLOW_M) &&
+			!undesirable_disp(mtmp,nx,ny)) {
+			if (shortest_with_displacing == -1 ||
+			    (ndist < shortest_with_displacing))
+				shortest_with_displacing = ndist;
+		} else {
+			if ((shortest_without_displacing == -1) ||
+			    (ndist < shortest_without_displacing))
+				shortest_without_displacing = ndist;
+			count_without_displacing++;
+		}
+        }
+	if (shortest_with_displacing > -1 &&
+	    (shortest_with_displacing < shortest_without_displacing ||
+	    !count_without_displacing))
+		return TRUE;
+	return FALSE;
+}
+#endif /* BARGETHROUGH */
+
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
  * 1: moved, possibly can attack.
@@ -589,6 +635,9 @@ register int after;
 	boolean can_open=0, can_unlock=0, doorbuster=0;
 	boolean uses_items=0, setlikes=0;
 	boolean avoid=FALSE;
+#ifdef BARGETHROUGH
+	boolean better_with_displacing = FALSE;
+#endif
 	struct permonst *ptr;
 	struct monst *mtoo;
 	schar mmoved = 0;	/* not strictly nec.: chi >= 0 will do */
@@ -909,12 +958,19 @@ not_special:
 		for(i = 0; i < cnt; i++)
 		    if(!(info[i] & NOTONL)) avoid=TRUE;
 	    }
-
+#ifdef BARGETHROUGH
+	    better_with_displacing = should_displace(mtmp,poss,info,cnt,gx,gy);
+#endif
 	    for(i=0; i < cnt; i++) {
 		if (avoid && (info[i] & NOTONL)) continue;
 		nx = poss[i].x;
 		ny = poss[i].y;
 
+#ifdef BARGETHROUGH
+		if (MON_AT(nx,ny) &&
+			(info[i] & ALLOW_MDISP) && !(info[i] & ALLOW_M) &&
+			!better_with_displacing) continue;
+#endif
 		if (appr != 0) {
 		    mtrk = &mtmp->mtrack[0];
 		    for(j=0; j < jcnt; mtrk++, j++)
@@ -1009,6 +1065,19 @@ not_special:
 		}
 		return 3;
 	    }
+
+#ifdef BARGETHROUGH
+	    if((info[chi] & ALLOW_MDISP)) {
+		struct monst *mtmp2;
+		int mstatus;
+		mtmp2 = m_at(nix,niy);
+		mstatus = mdisplacem(mtmp, mtmp2, FALSE);
+		if ((mstatus & MM_AGR_DIED) || (mstatus & MM_DEF_DIED))
+			return 2;
+		if (mstatus & MM_HIT) return 1;
+		return 3;
+	    }
+#endif /* BARGETHROUGH */
 
 	    if (!m_in_out_region(mtmp,nix,niy))
 	        return 3;
@@ -1286,6 +1355,41 @@ found_you:
 	mtmp->mux = mx;
 	mtmp->muy = my;
 }
+
+#ifdef BARGETHROUGH
+/*
+ * mon-to-mon displacement is a deliberate "get out of my way" act,
+ * not an accidental bump, so we don't consider mstun or mconf in
+ * undesired_disp().
+ *
+ * We do consider many other things about the target and its
+ * location however.
+ */
+boolean
+undesirable_disp(mtmp, x, y)
+struct monst *mtmp;
+xchar x,y;
+{
+	struct permonst *mdat = mtmp->data;
+	boolean is_pet = (mtmp && mtmp->mtame && !mtmp->isminion);
+	struct trap *trap = t_at(x,y);
+
+	 if (is_pet) {
+		/* Pets avoid a trap if you've seen it usually. */
+		if (trap && trap->tseen && rn2(40))
+		 	return TRUE;
+		/* Pets avoid cursed locations */
+		if (cursed_object_at(x,y))
+			return TRUE;
+	 }
+	 /* Monsters avoid a trap if they've seen that type before */
+	 else if (trap && rn2(40) &&
+			(mtmp->mtrapseen & (1 << (trap->ttyp -1))) != 0)
+	 	return TRUE;
+
+	 return FALSE;
+}
+#endif /* BARGETHROUGH */
 
 boolean
 can_ooze(mtmp)
