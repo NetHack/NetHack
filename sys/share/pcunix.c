@@ -117,7 +117,12 @@ getlock()
 	if((fd = open(fq_lock,0)) == -1) {
 		if(errno == ENOENT) goto gotlock;    /* no such file */
 		chdirx(orgdir, 0);
+#if defined(WIN32)
+		error("Bad directory or name: %s\n%s\n",
+				fq_lock, strerror(errno));
+#else
 		perror(fq_lock);
+#endif
 		unlock_file(HLOCK); 
 		error("Cannot open %s", fq_lock);
 	}

@@ -209,9 +209,16 @@ error VA_DECL(const char *,s)
 	VA_INIT(s, const char *);
 	/* error() may get called before tty is initialized */
 	if (iflags.window_inited) end_screen();
-	putchar('\n');
-	Vprintf(s,VA_ARGS);
-	putchar('\n');
+	if (!strncmpi(windowprocs.name, "tty", 3)) {
+		putchar('\n');
+		Vprintf(s,VA_ARGS);
+		putchar('\n');
+	} else {
+		char buf[BUFSZ];
+		(void) vsprintf(buf, s, VA_ARGS);
+		Strcat(buf, "\n");
+		raw_printf(buf);
+	}
 	VA_END();
 	exit(EXIT_FAILURE);
 }
