@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)dothrow.c	3.4	2003/01/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -215,7 +215,7 @@ dothrow()
 static void
 autoquiver()
 {
-	register struct obj *otmp, *oammo = 0, *omissile = 0, *omisc = 0;
+	struct obj *otmp, *oammo = 0, *omissile = 0, *omisc = 0, *altammo = 0;
 
 	if (uquiver)
 	    return;
@@ -233,6 +233,8 @@ autoquiver()
 			 objects[otmp->otyp].oc_material == GLASS)) {
 		if (uslinging())
 		    oammo = otmp;
+		else if (ammo_and_launcher(otmp, uswapwep))
+		    altammo = otmp;
 		else if (!omisc)
 		    omisc = otmp;
 	    } else if (otmp->oclass == GEM_CLASS) {
@@ -242,6 +244,8 @@ autoquiver()
 		if (ammo_and_launcher(otmp, uwep))
 		    /* Ammo matched with launcher (bow and arrow, crossbow and bolt) */
 		    oammo = otmp;
+		else if (ammo_and_launcher(otmp, uswapwep))
+		    altammo = otmp;
 		else
 		    /* Mismatched ammo (no better than an ordinary weapon) */
 		    omisc = otmp;
@@ -263,6 +267,8 @@ autoquiver()
 	    setuqwep(oammo);
 	else if (omissile)
 	    setuqwep(omissile);
+	else if (altammo)
+	    setuqwep(altammo);
 	else if (omisc)
 	    setuqwep(omisc);
 

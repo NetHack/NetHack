@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2002/12/13	*/
+/*	SCCS Id: @(#)invent.c	3.4	2003/01/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -405,39 +405,35 @@ const char *drop_fmt, *drop_arg, *hold_msg;
 	    }
 	}
 	if (Fumbling) {
-		if (drop_fmt) pline(drop_fmt, drop_arg);
-		dropy(obj);
+	    if (drop_fmt) pline(drop_fmt, drop_arg);
+	    dropy(obj);
 	} else {
-		long oquan = obj->quan;
-		int prev_encumbr = near_capacity();	/* before addinv() */
+	    long oquan = obj->quan;
+	    int prev_encumbr = near_capacity();	/* before addinv() */
 
-		/* encumbrance only matters if it would now become worse
-		   than max( current_value, stressed ) */
-		if (prev_encumbr < MOD_ENCUMBER) prev_encumbr = MOD_ENCUMBER;
-		if (drop_arg) {
-			/* addinv() may redraw the entire inventory, overwriting
-			 * drop_arg when it comes from something like doname()
-			 */
-			Strcpy(buf, drop_arg);
-			drop_arg = buf;
-		}
-		obj = addinv(obj);
-		if (inv_cnt() > 52
+	    /* encumbrance only matters if it would now become worse
+	       than max( current_value, stressed ) */
+	    if (prev_encumbr < MOD_ENCUMBER) prev_encumbr = MOD_ENCUMBER;
+	    /* addinv() may redraw the entire inventory, overwriting
+	       drop_arg when it comes from something like doname() */
+	    if (drop_arg) drop_arg = strcpy(buf, drop_arg);
+
+	    obj = addinv(obj);
+	    if (inv_cnt() > 52
 		    || ((obj->otyp != LOADSTONE || !obj->cursed)
 			&& near_capacity() > prev_encumbr)) {
-			if (drop_fmt) pline(drop_fmt, drop_arg);
-			/* undo any merge which took place */
-			if (obj->quan > oquan) {
-			    obj = splitobj(obj, oquan);
-			}
-			dropx(obj);
-		} else {
-			if (flags.autoquiver && !uquiver &&
-			    (is_missile(obj) ||
-			     (uwep && ammo_and_launcher(obj, uwep))))
-			    setuqwep(obj);
-			if (hold_msg || drop_fmt) prinv(hold_msg, obj, oquan);
-		}
+		if (drop_fmt) pline(drop_fmt, drop_arg);
+		/* undo any merge which took place */
+		if (obj->quan > oquan) obj = splitobj(obj, oquan);
+		dropx(obj);
+	    } else {
+		if (flags.autoquiver && !uquiver && !obj->owornmask &&
+			(is_missile(obj) ||
+			    ammo_and_launcher(obj, uwep) ||
+			    ammo_and_launcher(obj, uswapwep)))
+		    setuqwep(obj);
+		if (hold_msg || drop_fmt) prinv(hold_msg, obj, oquan);
+	    }
 	}
 	return obj;
 }

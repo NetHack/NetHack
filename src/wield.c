@@ -331,18 +331,20 @@ int
 dowieldquiver()
 {
 	register struct obj *newquiver;
-
+	const char *quivee_types = (uslinging() ||
+		  (uswapwep && objects[uswapwep->otyp].oc_skill == P_SLING)) ?
+				  bullets : ready_objs;
 
 	/* Since the quiver isn't in your hands, don't check cantwield(), */
 	/* will_weld(), touch_petrifies(), etc. */
 	multi = 0;
 
 	/* Because 'Q' used to be quit... */
-	if (!flags.suppress_alert || flags.suppress_alert < FEATURE_NOTICE_VER(3,3,0))
+	if (flags.suppress_alert < FEATURE_NOTICE_VER(3,3,0))
 		pline("Note: Please use #quit if you wish to exit the game.");
 
 	/* Prompt for a new quiver */
-	if (!(newquiver = getobj(uslinging() ? bullets : ready_objs, "ready")))
+	if (!(newquiver = getobj(quivee_types, "ready")))
 		/* Cancelled */
 		return (0);
 
