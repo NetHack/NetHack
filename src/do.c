@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.4	2002/05/31	*/
+/*	SCCS Id: @(#)do.c	3.4	2002/08/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -987,6 +987,7 @@ boolean at_stairs, falling, portal;
 	fill_pit(u.ux, u.uy);
 	u.ustuck = 0;				/* idem */
 	u.uinwater = 0;
+	u.uundetected = 0;	/* not hidden, even if means are available */
 	keepdogs(FALSE);
 	if (u.uswallow)				/* idem */
 		u.uswldtim = u.uswallow = 0;
