@@ -2189,7 +2189,8 @@ register int num;
 			context.victual.fullwarn = TRUE;
 			if (context.victual.canchoke && context.victual.reqtime > 1) {
 			    /* a one-gulp food will not survive a stop */
-			    if (yn_function("Stop eating?",ynchars,'y')=='y') {
+			    if (yn_function("Continue eating?",
+						ynchars,'n') != 'y') {
 				reset_eat();
 				nomovemsg = (char *)0;
 			    }

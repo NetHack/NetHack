@@ -2,6 +2,7 @@ $RCSfile$ $Revision$ $Date$
 
 General Fixes and Modified Features
 -----------------------------------
+change the dreaded "Stop eating?" to "Continue eating?" with default "no"
 setmangry should not be called when a monster enters a bones region
 bad capitalization of msg when charging for something that catches light
 missing opthelp for use_inverse
