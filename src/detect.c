@@ -313,9 +313,14 @@ register struct obj	*sobj;
 	    char buf[BUFSZ];
 	    Sprintf(buf, "Your %s twitches%s.", body_part(NOSE),
 			(sobj->blessed && !u.uedibility) ? " then starts to tingle" : "");
-	    strange_feeling(sobj, buf);
-	    if (sobj->blessed && !u.uedibility)
+	    if (sobj->blessed && !u.uedibility) {
+		boolean savebeginner = flags.beginner;	/* prevent non-delivery of */
+		flags.beginner = FALSE;			/* 	message            */
+		strange_feeling(sobj, buf);
+		flags.beginner = savebeginner;
 		u.uedibility = 1;
+	    } else
+		strange_feeling(sobj, buf);
 	}
 	return !stale;
     } else if (!ct) {
