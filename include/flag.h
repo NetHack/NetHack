@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)flag.h	3.4	2000/01/19	*/
+/*	SCCS Id: @(#)flag.h	3.4	2002/07/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -258,6 +258,7 @@ struct instance_flags {
 	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */
 	boolean  showrace;	/* show hero glyph by race rather than by role */
 	boolean  travelcmd;	/* allow travel command */
+	int	 runmode;	/* update screen display during run moves */
 };
 
 /*
@@ -281,5 +282,11 @@ struct instance_flags {
 
 extern NEARDATA struct flag flags;
 extern NEARDATA struct instance_flags iflags;
+
+/* runmode options */
+#define RUN_TPORT	0	/* don't update display until movement stops */
+#define RUN_LEAP	1	/* update display every 7 steps */
+#define RUN_STEP	2	/* update display every single step */
+#define RUN_CRAWL	3	/* walk w/ extra delay after each update */
 
 #endif /* FLAG_H */

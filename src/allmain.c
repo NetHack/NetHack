@@ -408,8 +408,12 @@ moveloop()
 	    flags.botl = 1;
 
 	if (vision_full_recalc) vision_recalc(0);	/* vision! */
-	if (multi && multi%7 == 0)
+	/* when running in non-tport mode, this gets done through domove() */
+	if ((!flags.run || iflags.runmode == RUN_TPORT) &&
+		(multi && (!flags.travel ? !(multi % 7) : !(moves % 7L)))) {
+	    if (flags.time && flags.run) flags.botl = 1;
 	    display_nhwindow(WIN_MAP, FALSE);
+	}
     }
 }
 

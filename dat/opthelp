@@ -107,6 +107,13 @@ pickup_burden when you pick up an item that exceeds this encumberance
               or overLoaded), you will be asked if you want to continue. [S]
 pickup_types  a list of default symbols for kinds of objects to autopickup
               when that option is on  [all]
+runmode       controls how often the map window is updated when performing
+              multi-step movement (various running modes or travel command):
+              teleport -- don't update map until movement stops;
+              run      -- periodically update map (interval is seven steps);
+              walk     -- update map after every step;
+              crawl    -- like walk, but delay after making each step.
+              (This only affects screen display, not actual movement.)  [run]
 scores        the parts of the score list you wish to see when the game ends
               You choose a combination of top scores, scores around the top
               scores, and all of your own scores.  [!own/3 top/2 around]

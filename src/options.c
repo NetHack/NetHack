@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)options.c	3.4	2002/07/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -283,6 +283,8 @@ static struct Comp_Opt
 						PL_CSIZ, DISP_IN_GAME },
 	{ "role",     "your starting role (e.g., Barbarian, Valkyrie)",
 						PL_CSIZ, DISP_IN_GAME },
+	{ "runmode", "display updating frequency when `running' or `travelling'",
+						sizeof "teleport", SET_IN_GAME },
 	{ "scores",   "the parts of the score list you wish to see",
 						32, SET_IN_GAME },
 	{ "scroll_margin", "scroll map when this far from the edge", 20, DISP_IN_GAME }, /*WC*/
@@ -475,6 +477,7 @@ initoptions()
 	flags.end_own = FALSE;
 	flags.end_top = 3;
 	flags.end_around = 2;
+	iflags.runmode = RUN_LEAP;
 	iflags.msg_history = 20;
 #ifdef TTY_GRAPHICS
 	iflags.prevmsg_window = 's';
@@ -1047,6 +1050,25 @@ boolean tinitial, tfrom_file;
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(horsename, op, PL_PSIZ);
+		return;
+	}
+
+	fullname = "runmode";
+	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (negated) {
+			iflags.runmode = RUN_TPORT;
+		} else if ((op = string_for_opt(opts, FALSE)) != 0) {
+		    if (!strncmpi(op, "teleport", strlen(op)))
+			iflags.runmode = RUN_TPORT;
+		    else if (!strncmpi(op, "run", strlen(op)))
+			iflags.runmode = RUN_LEAP;
+		    else if (!strncmpi(op, "walk", strlen(op)))
+			iflags.runmode = RUN_STEP;
+		    else if (!strncmpi(op, "crawl", strlen(op)))
+			iflags.runmode = RUN_CRAWL;
+		    else
+			badoption(opts);
+		}
 		return;
 	}
 
@@ -2114,6 +2136,9 @@ static NEARDATA const char *burdentype[] = {
 	"strained", "overtaxed", "overloaded"
 };
 
+static NEARDATA const char *runmodes[] = {
+	"teleport", "run", "walk", "crawl"
+};
 
 /*
  * Convert the given string of object classes to a string of default object
@@ -2368,8 +2393,8 @@ boolean setinitial,setfromfile;
     char buf[BUFSZ];
     boolean retval = FALSE;
     
-    /* Special handling of menustyle, pickup_burden, and pickup_types, disclose
-       and msg_window options. */
+    /* Special handling of menustyle, pickup_burden, and pickup_types,
+       disclose, runmode, and msg_window options. */
     if (!strcmp("menustyle", optname)) {
 	const char *style_name;
 	menu_item *style_pick = (menu_item *)0;
@@ -2475,6 +2500,24 @@ boolean setinitial,setfromfile;
 		destroy_nhwindow(tmpwin);
 	    }
 	}
+	retval = TRUE;
+    } if (!strcmp("runmode", optname)) {
+	const char *mode_name;
+	menu_item *mode_pick = (menu_item *)0;
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	for (i = 0; i < SIZE(runmodes); i++) {
+		mode_name = runmodes[i];
+		any.a_int = i + 1;
+		add_menu(tmpwin, NO_GLYPH, &any, *mode_name, 0,
+			 ATR_NONE, mode_name, MENU_UNSELECTED);
+	}
+	end_menu(tmpwin, "Select run/travel display mode:");
+	if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
+		iflags.runmode = mode_pick->item.a_int - 1;
+		free((genericptr_t)mode_pick);
+	}
+	destroy_nhwindow(tmpwin);
 	retval = TRUE;
     } 
 #ifdef TTY_GRAPHICS
@@ -2672,6 +2715,8 @@ char *buf;
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
 	else if (!strcmp(optname, "role"))
 		Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
+	else if (!strcmp(optname, "runmode"))
+		Sprintf(buf, "%s", runmodes[iflags.runmode]);
 	else if (!strcmp(optname, "scores")) {
 		Sprintf(buf, "%d top/%d around%s", flags.end_top,
 				flags.end_around, flags.end_own ? "/own" : "");

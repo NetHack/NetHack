@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2002/04/06	*/
+/*	SCCS Id: @(#)hack.c	3.4	2002/07/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1366,6 +1366,21 @@ domove()
 	if (cause_delay) {
 	    nomul(-2);
 	    nomovemsg = "";
+	}
+
+	if (flags.run && iflags.runmode != RUN_TPORT) {
+	    /* display every step or every 7th step depending upon mode */
+	    if (iflags.runmode != RUN_LEAP || !(moves % 7L)) {
+		if (flags.time) flags.botl = 1;
+		curs_on_u();
+		delay_output();
+		if (iflags.runmode == RUN_CRAWL) {
+		    delay_output();
+		    delay_output();
+		    delay_output();
+		    delay_output();
+		}
+	    }
 	}
 }
 
