@@ -3632,7 +3632,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	{ act2,	"Up\t<",                "<", 3},
 	{ act2,	"Wipe face\tAlt+W",       "\367", 3},
 
-	{ magic,	"Quaff potion\tq",      "q?", 3},
+	{ magic,	"Quaff potion\tq?",      "q?", 3},
 	{ magic,	"Read scroll/book\tr?", "r?", 3},
 	{ magic,	"Zap wand\tz?",         "z?", 3},
 	{ magic,	"Zap spell\tShift+Z",        "Z", 3},
@@ -3651,7 +3651,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	{ help,		0, 0, 3},
 	{ help,		"What is here\t:",      ":", 3},
 	{ help,		"What is there\t;",      ";", 3},
-	{ help,		"What is...\t/",        "/y", 2},
+	{ help,		"What is...\t/y",        "/y", 2},
 	{ help,		0, 0, 1},
 
 	{ info,		"Inventory\ti",         "i", 3},
