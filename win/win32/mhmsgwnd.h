@@ -13,3 +13,4 @@ void mswin_message_window_size (HWND hWnd, LPSIZE sz);
 
 
 #endif /* MSWINMessageWindow_h */
+

@@ -16,7 +16,8 @@
 #define MAXWINDOWS 15
 #endif
 
-#define NHW_RIP  32
+#define NHW_RIP		32
+#define NHW_INVEN	33
 
 #ifndef TILE_X
 #define TILE_X 16
@@ -77,6 +78,15 @@ typedef struct mswin_nhwindow_app {
 	LONG	regMainBottom;
 	LONG	regMainRight;
 	DWORD   regMainShowState;
+
+	BOOL		bAutoLayout;
+	RECT		rtMapWindow;
+	RECT		rtMsgWindow;
+	RECT		rtStatusWindow;
+	RECT		rtMenuWindow;
+	RECT		rtTextWindow;
+	RECT		rtInvenWindow;
+	BOOL		bWindowsLocked;		/* TRUE if windows are "locked" - no captions */
 } NHWinApp, *PNHWinApp;
 
 #define E extern
@@ -151,6 +161,9 @@ void mswin_read_reg(void);
 void mswin_destroy_reg(void);
 void mswin_write_reg(void);
 
+void mswin_get_window_placement(int type, LPRECT rt);
+void mswin_update_window_placement(int type, LPRECT rt);
+
 extern HBRUSH menu_bg_brush;
 extern HBRUSH menu_fg_brush;
 extern HBRUSH text_bg_brush;
@@ -198,3 +211,4 @@ extern COLORREF message_fg_color;
 #endif
 
 #endif /* WINmswin_H */
+

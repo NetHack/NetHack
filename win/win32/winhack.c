@@ -113,6 +113,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	_nethack_app.bNoVScroll = FALSE;
 	_nethack_app.saved_text = strdup("");
 
+	_nethack_app.bAutoLayout = TRUE;
+	_nethack_app.bWindowsLocked = TRUE;
+
     // init controls
     if (FAILED(GetComCtlVersion(&major, &minor)))
     {

@@ -12,3 +12,4 @@ HWND mswin_init_text_window (void);
 void mswin_display_text_window (HWND hwnd);
 
 #endif /* MSWINTextWindow_h */
+

@@ -13,3 +13,4 @@ int mswin_ext_cmd_window (int* selection);
 int  mswin_player_selection_window(int* selection);
 
 #endif /* MSWINDlgWindow_h */
+

@@ -33,3 +33,4 @@ PMSNHEvent	mswin_input_pop(void);
 PMSNHEvent	mswin_input_peek(void);
 
 #endif /* MSWINInput_h */
+

@@ -27,6 +27,7 @@ static void		onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void		register_main_window_class(void);
 static int		menuid2mapmode(int menuid);
 static int		mapmode2menuid(int map_mode);
+static void		nhlock_windows( BOOL lock );
 
 HWND mswin_init_main_window () {
 	static int run_once = 0;
@@ -77,8 +78,8 @@ HWND mswin_init_main_window () {
     }
     else
         ShowWindow(ret, SW_SHOWDEFAULT);
-    UpdateWindow(ret);
 
+    UpdateWindow(ret);
 	return ret;
 }
 
@@ -535,9 +536,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 void mswin_layout_main_window(HWND changed_child)
 {
 	winid i;
-	POINT pt;
 	RECT client_rt, wnd_rect;
-	SIZE menu_size;
 	POINT status_org;
 	SIZE status_size;
 	POINT msg_org;
@@ -547,144 +546,153 @@ void mswin_layout_main_window(HWND changed_child)
 	HWND wnd_status, wnd_msg;
 	PNHMainWindow  data;
 
-	GetClientRect(GetNHApp()->hMainWnd, &client_rt);
-	data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
+	if( GetNHApp()->bAutoLayout ) {
+		GetClientRect(GetNHApp()->hMainWnd, &client_rt);
+		data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
 
-	/* get sizes of child windows */
-	wnd_status = mswin_hwnd_from_winid(WIN_STATUS);
-	if( IsWindow(wnd_status) ) { 
-		mswin_status_window_size(wnd_status, &status_size);
-	} else {
-		status_size.cx = status_size.cy = 0;
+		/* get sizes of child windows */
+		wnd_status = mswin_hwnd_from_winid(WIN_STATUS);
+		if( IsWindow(wnd_status) ) { 
+			mswin_status_window_size(wnd_status, &status_size);
+		} else {
+			status_size.cx = status_size.cy = 0;
+		}
+
+		wnd_msg = mswin_hwnd_from_winid(WIN_MESSAGE);
+		if( IsWindow(wnd_msg) ) { 
+			mswin_message_window_size(wnd_msg, &msg_size);
+		} else {
+			msg_size.cx = msg_size.cy = 0;
+		}
+
+		/* set window positions */
+		SetRect(&wnd_rect, client_rt.left, client_rt.top, client_rt.right, client_rt.bottom);
+		switch(iflags.wc_align_status) {
+		case ALIGN_LEFT:
+			status_size.cx = (wnd_rect.right-wnd_rect.left)/4;
+			status_size.cy = (wnd_rect.bottom-wnd_rect.top); // that won't look good
+			status_org.x = wnd_rect.left;
+			status_org.y = wnd_rect.top;
+			wnd_rect.left += status_size.cx;
+			break;
+
+		case ALIGN_RIGHT:  
+			status_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
+			status_size.cy = (wnd_rect.bottom-wnd_rect.top); // that won't look good
+			status_org.x = wnd_rect.right - status_size.cx;
+			status_org.y = wnd_rect.top;
+			wnd_rect.right -= status_size.cx;
+			break;
+
+		case ALIGN_TOP:    
+			status_size.cx = (wnd_rect.right-wnd_rect.left);
+			status_org.x = wnd_rect.left;
+			status_org.y = wnd_rect.top;
+			wnd_rect.top += status_size.cy;
+			break;
+
+		case ALIGN_BOTTOM:
+		default:
+			status_size.cx = (wnd_rect.right-wnd_rect.left);
+			status_org.x = wnd_rect.left;
+			status_org.y = wnd_rect.bottom - status_size.cy;
+			wnd_rect.bottom -= status_size.cy;
+			break;
+		}
+
+		switch(iflags.wc_align_message) {
+		case ALIGN_LEFT:
+			msg_size.cx = (wnd_rect.right-wnd_rect.left)/4;
+			msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
+			msg_org.x = wnd_rect.left;
+			msg_org.y = wnd_rect.top;
+			wnd_rect.left += msg_size.cx;
+			break;
+
+		case ALIGN_RIGHT:  
+			msg_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
+			msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
+			msg_org.x = wnd_rect.right - msg_size.cx;
+			msg_org.y = wnd_rect.top;
+			wnd_rect.right -= msg_size.cx;
+			break;
+
+		case ALIGN_TOP:    
+			msg_size.cx = (wnd_rect.right-wnd_rect.left);
+			msg_org.x = wnd_rect.left;
+			msg_org.y = wnd_rect.top;
+			wnd_rect.top += msg_size.cy;
+			break;
+
+		case ALIGN_BOTTOM:
+		default:
+			msg_size.cx = (wnd_rect.right-wnd_rect.left);
+			msg_org.x = wnd_rect.left;
+			msg_org.y = wnd_rect.bottom - msg_size.cy;
+			wnd_rect.bottom -= msg_size.cy;
+			break;
+		}
+
+		/* map window */
+		map_org.x = wnd_rect.left;
+		map_org.y = wnd_rect.top;
+		map_size.cx = wnd_rect.right - wnd_rect.left;
+		map_size.cy = wnd_rect.bottom - wnd_rect.top;
+
+
+		GetNHApp()->rtStatusWindow.left  = status_org.x;
+		GetNHApp()->rtStatusWindow.top   = status_org.y;
+		GetNHApp()->rtStatusWindow.right = status_org.x + status_size.cx;
+		GetNHApp()->rtStatusWindow.bottom= status_org.y + status_size.cy;
+
+		GetNHApp()->rtTextWindow.left    = map_org.x;
+		GetNHApp()->rtTextWindow.top     = map_org.y;
+		GetNHApp()->rtTextWindow.right   = map_org.x + (wnd_rect.right - wnd_rect.left);
+		GetNHApp()->rtTextWindow.bottom  = map_org.y + map_size.cy;
+
+		GetNHApp()->rtMapWindow.left     = map_org.x;
+		GetNHApp()->rtMapWindow.top      = map_org.y;
+		GetNHApp()->rtMapWindow.right    = map_org.x + map_size.cx;
+		GetNHApp()->rtMapWindow.bottom   = map_org.y + map_size.cy;
+
+		GetNHApp()->rtMsgWindow.left     = msg_org.x;
+		GetNHApp()->rtMsgWindow.top      = msg_org.y;
+		GetNHApp()->rtMsgWindow.right    = msg_org.x + msg_size.cx;
+		GetNHApp()->rtMsgWindow.bottom   = msg_org.y + msg_size.cy;
+
+		GetNHApp()->rtMenuWindow.left    = map_org.x + map_size.cx*2/3;
+		GetNHApp()->rtMenuWindow.top     = map_org.y;
+		GetNHApp()->rtMenuWindow.right   = map_org.x + map_size.cx;
+		GetNHApp()->rtMenuWindow.bottom  = map_org.y + map_size.cy;
+
+		GetNHApp()->rtInvenWindow.left   = GetNHApp()->rtMenuWindow.left;
+		GetNHApp()->rtInvenWindow.top    = GetNHApp()->rtMenuWindow.top;
+		GetNHApp()->rtInvenWindow.right  = GetNHApp()->rtMenuWindow.right; 
+		GetNHApp()->rtInvenWindow.bottom = GetNHApp()->rtMenuWindow.bottom;
+
+		/* adjust map window size only if perm_invent is set */
+		if( flags.perm_invent )
+			GetNHApp()->rtMapWindow.right = GetNHApp()->rtMenuWindow.left;
 	}
-
-	wnd_msg = mswin_hwnd_from_winid(WIN_MESSAGE);
-	if( IsWindow(wnd_msg) ) { 
-		mswin_message_window_size(wnd_msg, &msg_size);
-	} else {
-		msg_size.cx = msg_size.cy = 0;
-	}
-
-	/* set window positions */
-	SetRect(&wnd_rect, client_rt.left, client_rt.top, client_rt.right, client_rt.bottom);
-	switch(iflags.wc_align_status) {
-	case ALIGN_LEFT:
-		status_size.cx = (wnd_rect.right-wnd_rect.left)/4;
-		status_size.cy = (wnd_rect.bottom-wnd_rect.top); // that won't look good
-		status_org.x = wnd_rect.left;
-		status_org.y = wnd_rect.top;
-		wnd_rect.left += status_size.cx;
-		break;
-
-	case ALIGN_RIGHT:  
-		status_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
-		status_size.cy = (wnd_rect.bottom-wnd_rect.top); // that won't look good
-		status_org.x = wnd_rect.right - status_size.cx;
-		status_org.y = wnd_rect.top;
-		wnd_rect.right -= status_size.cx;
-		break;
-
-	case ALIGN_TOP:    
-		status_size.cx = (wnd_rect.right-wnd_rect.left);
-		status_org.x = wnd_rect.left;
-		status_org.y = wnd_rect.top;
-		wnd_rect.top += status_size.cy;
-		break;
-
-	case ALIGN_BOTTOM:
-	default:
-		status_size.cx = (wnd_rect.right-wnd_rect.left);
-		status_org.x = wnd_rect.left;
-		status_org.y = wnd_rect.bottom - status_size.cy;
-		wnd_rect.bottom -= status_size.cy;
-		break;
-	}
-
-	switch(iflags.wc_align_message) {
-	case ALIGN_LEFT:
-		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4;
-		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
-		msg_org.x = wnd_rect.left;
-		msg_org.y = wnd_rect.top;
-		wnd_rect.left += msg_size.cx;
-		break;
-
-	case ALIGN_RIGHT:  
-		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
-		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
-		msg_org.x = wnd_rect.right - msg_size.cx;
-		msg_org.y = wnd_rect.top;
-		wnd_rect.right -= msg_size.cx;
-		break;
-
-	case ALIGN_TOP:    
-		msg_size.cx = (wnd_rect.right-wnd_rect.left);
-		msg_org.x = wnd_rect.left;
-		msg_org.y = wnd_rect.top;
-		wnd_rect.top += msg_size.cy;
-		break;
-
-	case ALIGN_BOTTOM:
-	default:
-		msg_size.cx = (wnd_rect.right-wnd_rect.left);
-		msg_org.x = wnd_rect.left;
-		msg_org.y = wnd_rect.bottom - msg_size.cy;
-		wnd_rect.bottom -= msg_size.cy;
-		break;
-	}
-
-	map_org.x = wnd_rect.left;
-	map_org.y = wnd_rect.top;
-	map_size.cx = wnd_rect.right - wnd_rect.left;
-	map_size.cy = wnd_rect.bottom - wnd_rect.top;
 
 	/* go through the windows list and adjust sizes */
 	for( i=0; i<MAXWINDOWS; i++ ) {
 		if(GetNHApp()->windowlist[i].win && !GetNHApp()->windowlist[i].dead) {
-			switch( GetNHApp()->windowlist[i].type ) {
-			case NHW_STATUS:
-				MoveWindow(GetNHApp()->windowlist[i].win, 
-					       status_org.x,
-						   status_org.y,
-						   status_size.cx, 
-						   status_size.cy, 
-						   TRUE );
-				break;
+			RECT rt;
+			/* kludge - inventory window should have its own type (same as menu-text
+			   as a matter of fact) */
+			if( flags.perm_invent && i==WIN_INVEN )
+				mswin_get_window_placement(NHW_INVEN, &rt);
+			else
+				mswin_get_window_placement(GetNHApp()->windowlist[i].type, &rt);
 
-			case NHW_TEXT: // same as the map window
-			case NHW_MAP:
-				MoveWindow(GetNHApp()->windowlist[i].win, 
-					       map_org.x, 
-						   map_org.y,
-						   map_size.cx, 
-						   map_size.cy, 
-						   TRUE );
-				break;
-
-			case NHW_MESSAGE:
-				MoveWindow(GetNHApp()->windowlist[i].win, 
-					       msg_org.x, 
-						   msg_org.y,
-						   msg_size.cx, 
-						   msg_size.cy, 
-						   TRUE );
-				break;
-
-			case NHW_MENU:
-				mswin_menu_window_size(GetNHApp()->windowlist[i].win, &menu_size);
-				menu_size.cx = min(menu_size.cx, (client_rt.right-client_rt.left));
-
-				pt.x = map_org.x + max(0, (int)(map_size.cx-menu_size.cx));
-				pt.y = map_org.y;
-				MoveWindow(GetNHApp()->windowlist[i].win, 
-						   pt.x, 
-						   pt.y,
-						   min(menu_size.cx, map_size.cx), 
-						   map_size.cy, 
-						   TRUE );
-				break;
-			}
-			ShowWindow(GetNHApp()->windowlist[i].win, SW_SHOW);
+			MoveWindow(GetNHApp()->windowlist[i].win, 
+					   rt.left,
+					   rt.top,
+					   rt.right - rt.left, 
+					   rt.bottom - rt.top, 
+					   TRUE 
+					  );
 		}
 	}
 }
@@ -758,6 +766,17 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 "NetHack", MB_OK | MB_ICONINFORMATION);
             break;
         }
+
+		case IDM_SETTING_AUTOLAYOUT:
+			GetNHApp()->bAutoLayout = TRUE;
+			mswin_layout_main_window(NULL);
+			GetNHApp()->bAutoLayout = FALSE;
+			break;
+
+		case IDM_SETTING_LOCKWINDOWS:
+			nhlock_windows( !GetNHApp()->bWindowsLocked );
+			break;
+
 		case IDM_HELP_LONG:	
 			display_file(HELP, TRUE);  
 			break;
@@ -956,4 +975,38 @@ int	mapmode2menuid(int map_mode)
 	for( p = _menu2mapmode; p->mapMode!=-1; p++ ) 
 		if(p->mapMode==map_mode ) return p->menuID;
 	return -1;
+}
+
+void nhlock_windows( BOOL lock ) 
+{
+	int i;
+
+	/* go through the windows list and adjust sizes */
+	for( i=0; i<MAXWINDOWS; i++ ) {
+		if( IsWindow(GetNHApp()->windowlist[i].win) && !GetNHApp()->windowlist[i].dead) {
+			DWORD style;
+			style = GetWindowLong(GetNHApp()->windowlist[i].win, GWL_STYLE);
+			if( lock )	style &= ~WS_CAPTION;
+			else		style |= WS_CAPTION;
+			SetWindowLong(GetNHApp()->windowlist[i].win, GWL_STYLE, style);
+			SetWindowPos(
+				GetNHApp()->windowlist[i].win, 
+				NULL, 
+				0, 
+				0, 
+				0, 
+				0,
+				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
+			);
+		}
+	}
+
+	/* update menu */
+	GetNHApp()->bWindowsLocked = lock;
+	CheckMenuItem(
+		GetMenu(GetNHApp()->hMainWnd),
+		IDM_SETTING_LOCKWINDOWS,
+		MF_BYCOMMAND | 
+		(lock? MF_CHECKED : MF_UNCHECKED)
+	);
 }

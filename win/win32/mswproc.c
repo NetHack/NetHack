@@ -241,7 +241,8 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	mswin_color_from_string(iflags.wc_backgrnd_status, &status_bg_brush, &status_bg_color);
 	mswin_color_from_string(iflags.wc_backgrnd_text, &text_bg_brush, &text_bg_color);
 
- if (iflags.wc_splash_screen) mswin_display_splash_window(FALSE);
+	if (iflags.wc_splash_screen) mswin_display_splash_window(FALSE);
+		
 	iflags.window_inited = TRUE;
 }
 
@@ -813,9 +814,10 @@ void mswin_display_nhwindow(winid wid, BOOLEAN_P block)
 	logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
 	if (GetNHApp()->windowlist[wid].win != NULL)
 	{
+		ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
 		if (GetNHApp()->windowlist[wid].type == NHW_MENU) {
 			MENU_ITEM_P* p;
-			mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win, PICK_NONE, &p);
+			mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win, PICK_NONE, &p, TRUE);
 		} if (GetNHApp()->windowlist[wid].type == NHW_TEXT) {
 			mswin_display_text_window(GetNHApp()->windowlist[wid].win);
 		} if (GetNHApp()->windowlist[wid].type == NHW_RIP) {
@@ -1163,7 +1165,13 @@ int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 		(wid < MAXWINDOWS) &&
 		(GetNHApp()->windowlist[wid].win != NULL))
 	{
-		nReturned = mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win, how, selected);
+		ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
+		nReturned = mswin_menu_window_select_menu(
+			GetNHApp()->windowlist[wid].win, 
+			how, 
+			selected, 
+			!(flags.perm_invent && wid==WIN_INVEN && how==PICK_NONE) /* don't activate inventory window if perm_invent is on */
+			);
 	}
     return nReturned;
 }
@@ -1176,6 +1184,10 @@ int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 void mswin_update_inventory()
 {
 	logDebug("mswin_update_inventory()\n");
+	if( flags.perm_invent &&
+		program_state.something_worth_saving &&
+		iflags.window_inited && 
+		WIN_INVEN!=WIN_ERR ) display_inventory(NULL, FALSE);
 }
 
 /*
@@ -1984,6 +1996,7 @@ void mswin_popup_display(HWND hWnd, int* done_indicator)
 
 	/* bring menu window on top */
 	SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	SetFocus(hWnd);
 
 	/* go into message loop */
 	while( IsWindow(hWnd) && 
@@ -2022,10 +2035,8 @@ void mswin_popup_destroy(HWND hWnd)
 	}
 	DrawMenuBar( GetNHApp()->hMainWnd );
 
-	SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW);
+	ShowWindow(hWnd, SW_HIDE);
 	GetNHApp()->hPopupWnd = NULL;
-	mswin_window_mark_dead( mswin_winid_from_handle(hWnd) );
-	DestroyWindow(hWnd);
 
 	mswin_layout_main_window(hWnd);
 
@@ -2067,6 +2078,27 @@ logDebug(const char *fmt, ...)
 #define MAINRIGHTKEY        "MainRight"
 #define MAINTOPKEY          "MainTop"
 #define MAINBOTTOMKEY       "MainBottom"
+#define MAINAUTOLAYOUT		"AutoLayout"
+#define MAPLEFT				"MapLeft"
+#define MAPRIGHT			"MapRight"
+#define MAPTOP				"MapTop"
+#define MAPBOTTOM			"MapBottom"
+#define MSGLEFT				"MsgLeft"
+#define MSGRIGHT			"MsgRight"
+#define MSGTOP				"MsgTop"
+#define MSGBOTTOM			"MsgBottom"
+#define STATUSLEFT			"StatusLeft"
+#define STATUSRIGHT			"StatusRight"
+#define STATUSTOP			"StatusTop"
+#define STATUSBOTTOM		"StatusBottom"
+#define MENULEFT			"MenuLeft"
+#define MENURIGHT			"MenuRight"
+#define MENUTOP				"MenuTop"
+#define MENUBOTTOM			"MenuBottom"
+#define TEXTLEFT			"TextLeft"
+#define TEXTRIGHT			"TextRight"
+#define TEXTTOP				"TextTop"
+#define TEXTBOTTOM			"TextBottom"
 
 /* #define all the subkeys here */
 #define INTFKEY "Interface"
@@ -2076,6 +2108,7 @@ mswin_read_reg()
 {
     HKEY key;
     DWORD size;
+	DWORD safe_buf;
     char keystring[MAX_PATH];
 
     sprintf(keystring, "%s\\%s\\%s\\%s", 
@@ -2091,20 +2124,63 @@ mswin_read_reg()
         return;
 
     size = sizeof(DWORD);
-    /* Read the keys here. */
-    RegQueryValueEx(key, INTFKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regNetHackMode)), &size);
-    /* Main window placement */
-    RegQueryValueEx(key, MAINSHOWSTATEKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainShowState)), &size);
-    RegQueryValueEx(key, MAINMINXKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainMinX)), &size);
-    RegQueryValueEx(key, MAINMINYKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainMinY)), &size);
-    RegQueryValueEx(key, MAINMAXXKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainMaxX)), &size);
-    RegQueryValueEx(key, MAINMAXYKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainMaxY)), &size);
-    RegQueryValueEx(key, MAINLEFTKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainLeft)), &size);
-    RegQueryValueEx(key, MAINRIGHTKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainRight)), &size);
-    RegQueryValueEx(key, MAINTOPKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainTop)), &size);
-    RegQueryValueEx(key, MAINBOTTOMKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainBottom)), &size);
+
+#define NHGETREG_DWORD(name, val) \
+	RegQueryValueEx(key, (name), 0, NULL, (unsigned char *)(&safe_buf), &size); (val) = safe_buf;
+
+        /* read the keys here */
+        NHGETREG_DWORD(INTFKEY, GetNHApp()->regNetHackMode);
+
+        /* read window placement */
+        NHGETREG_DWORD(MAINSHOWSTATEKEY, GetNHApp()->regMainShowState);
+        NHGETREG_DWORD(MAINMINXKEY, GetNHApp()->regMainMinX);
+        NHGETREG_DWORD(MAINMINYKEY, GetNHApp()->regMainMinY);
+        NHGETREG_DWORD(MAINMAXXKEY, GetNHApp()->regMainMaxX);
+        NHGETREG_DWORD(MAINMAXYKEY, GetNHApp()->regMainMaxY);
+        NHGETREG_DWORD(MAINLEFTKEY, GetNHApp()->regMainLeft);
+        NHGETREG_DWORD(MAINRIGHTKEY, GetNHApp()->regMainRight);
+        NHGETREG_DWORD(MAINTOPKEY, GetNHApp()->regMainTop);
+        NHGETREG_DWORD(MAINBOTTOMKEY, GetNHApp()->regMainBottom);
+
+		NHGETREG_DWORD(MAINAUTOLAYOUT, GetNHApp()->bAutoLayout);
+		NHGETREG_DWORD(MAPLEFT, GetNHApp()->rtMapWindow.left);
+		NHGETREG_DWORD(MAPRIGHT, GetNHApp()->rtMapWindow.right);
+		NHGETREG_DWORD(MAPTOP, GetNHApp()->rtMapWindow.top);
+		NHGETREG_DWORD(MAPBOTTOM, GetNHApp()->rtMapWindow.bottom);
+		NHGETREG_DWORD(MSGLEFT, GetNHApp()->rtMsgWindow.left);
+		NHGETREG_DWORD(MSGRIGHT, GetNHApp()->rtMsgWindow.right);
+		NHGETREG_DWORD(MSGTOP, GetNHApp()->rtMsgWindow.top);
+		NHGETREG_DWORD(MSGBOTTOM, GetNHApp()->rtMsgWindow.bottom);
+		NHGETREG_DWORD(STATUSLEFT, GetNHApp()->rtStatusWindow.left);
+		NHGETREG_DWORD(STATUSRIGHT, GetNHApp()->rtStatusWindow.right);
+		NHGETREG_DWORD(STATUSTOP, GetNHApp()->rtStatusWindow.top);
+		NHGETREG_DWORD(STATUSBOTTOM, GetNHApp()->rtStatusWindow.bottom);
+		NHGETREG_DWORD(MENULEFT, GetNHApp()->rtMenuWindow.left);
+		NHGETREG_DWORD(MENURIGHT, GetNHApp()->rtMenuWindow.right);
+		NHGETREG_DWORD(MENUTOP, GetNHApp()->rtMenuWindow.top);
+		NHGETREG_DWORD(MENUBOTTOM, GetNHApp()->rtMenuWindow.bottom);
+		NHGETREG_DWORD(TEXTLEFT, GetNHApp()->rtTextWindow.left);
+		NHGETREG_DWORD(TEXTRIGHT, GetNHApp()->rtTextWindow.right);
+		NHGETREG_DWORD(TEXTTOP, GetNHApp()->rtTextWindow.top);
+		NHGETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtTextWindow.bottom);
+		NHGETREG_DWORD(TEXTLEFT, GetNHApp()->rtInvenWindow.left);
+		NHGETREG_DWORD(TEXTRIGHT, GetNHApp()->rtInvenWindow.right);
+		NHGETREG_DWORD(TEXTTOP, GetNHApp()->rtInvenWindow.top);
+		NHGETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
+#undef NHGETREG_DWORD
     
     RegCloseKey(key);
+
+	/* check the data for validity */
+	if( IsRectEmpty(&GetNHApp()->rtMapWindow) ||
+		IsRectEmpty(&GetNHApp()->rtMsgWindow) ||
+		IsRectEmpty(&GetNHApp()->rtStatusWindow) ||
+		IsRectEmpty(&GetNHApp()->rtMenuWindow) ||
+		IsRectEmpty(&GetNHApp()->rtTextWindow) ||
+		IsRectEmpty(&GetNHApp()->rtInvenWindow) ) 
+	{
+		GetNHApp()->bAutoLayout = TRUE;
+	}
 }
 
 void
@@ -2116,6 +2192,7 @@ mswin_write_reg()
     if (GetNHApp()->saveRegistrySettings)
     {
         char keystring[MAX_PATH];
+		DWORD safe_buf;
 
         sprintf(keystring, "%s\\%s\\%s\\%s", 
             CATEGORYKEY, COMPANYKEY, PRODUCTKEY, SETTINGSKEY);
@@ -2126,18 +2203,49 @@ mswin_write_reg()
                 REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, &disposition);
         }
 
+#define NHSETREG_DWORD(name, val) \
+		RegSetValueEx(key, (name), 0, REG_DWORD, (unsigned char *)((safe_buf=(val)), &safe_buf), sizeof(DWORD));
+
         /* Write the keys here */
-        RegSetValueEx(key, INTFKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regNetHackMode)), sizeof(DWORD));
+        NHSETREG_DWORD(INTFKEY, GetNHApp()->regNetHackMode);
+
         /* Main window placement */
-        RegSetValueEx(key, MAINSHOWSTATEKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainShowState)), sizeof(DWORD));
-        RegSetValueEx(key, MAINMINXKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainMinX)), sizeof(DWORD));
-        RegSetValueEx(key, MAINMINYKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainMinY)), sizeof(DWORD));
-        RegSetValueEx(key, MAINMAXXKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainMaxX)), sizeof(DWORD));
-        RegSetValueEx(key, MAINMAXYKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainMaxY)), sizeof(DWORD));
-        RegSetValueEx(key, MAINLEFTKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainLeft)), sizeof(DWORD));
-        RegSetValueEx(key, MAINRIGHTKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainRight)), sizeof(DWORD));
-        RegSetValueEx(key, MAINTOPKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainTop)), sizeof(DWORD));
-        RegSetValueEx(key, MAINBOTTOMKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainBottom)), sizeof(DWORD));
+        NHSETREG_DWORD(MAINSHOWSTATEKEY, GetNHApp()->regMainShowState);
+        NHSETREG_DWORD(MAINMINXKEY, GetNHApp()->regMainMinX);
+        NHSETREG_DWORD(MAINMINYKEY, GetNHApp()->regMainMinY);
+        NHSETREG_DWORD(MAINMAXXKEY, GetNHApp()->regMainMaxX);
+        NHSETREG_DWORD(MAINMAXYKEY, GetNHApp()->regMainMaxY);
+        NHSETREG_DWORD(MAINLEFTKEY, GetNHApp()->regMainLeft);
+        NHSETREG_DWORD(MAINRIGHTKEY, GetNHApp()->regMainRight);
+        NHSETREG_DWORD(MAINTOPKEY, GetNHApp()->regMainTop);
+        NHSETREG_DWORD(MAINBOTTOMKEY, GetNHApp()->regMainBottom);
+
+		NHSETREG_DWORD(MAINAUTOLAYOUT, GetNHApp()->bAutoLayout);
+		NHSETREG_DWORD(MAPLEFT, GetNHApp()->rtMapWindow.left);
+		NHSETREG_DWORD(MAPRIGHT, GetNHApp()->rtMapWindow.right);
+		NHSETREG_DWORD(MAPTOP, GetNHApp()->rtMapWindow.top);
+		NHSETREG_DWORD(MAPBOTTOM, GetNHApp()->rtMapWindow.bottom);
+		NHSETREG_DWORD(MSGLEFT, GetNHApp()->rtMsgWindow.left);
+		NHSETREG_DWORD(MSGRIGHT, GetNHApp()->rtMsgWindow.right);
+		NHSETREG_DWORD(MSGTOP, GetNHApp()->rtMsgWindow.top);
+		NHSETREG_DWORD(MSGBOTTOM, GetNHApp()->rtMsgWindow.bottom);
+		NHSETREG_DWORD(STATUSLEFT, GetNHApp()->rtStatusWindow.left);
+		NHSETREG_DWORD(STATUSRIGHT, GetNHApp()->rtStatusWindow.right);
+		NHSETREG_DWORD(STATUSTOP, GetNHApp()->rtStatusWindow.top);
+		NHSETREG_DWORD(STATUSBOTTOM, GetNHApp()->rtStatusWindow.bottom);
+		NHSETREG_DWORD(MENULEFT, GetNHApp()->rtMenuWindow.left);
+		NHSETREG_DWORD(MENURIGHT, GetNHApp()->rtMenuWindow.right);
+		NHSETREG_DWORD(MENUTOP, GetNHApp()->rtMenuWindow.top);
+		NHSETREG_DWORD(MENUBOTTOM, GetNHApp()->rtMenuWindow.bottom);
+		NHSETREG_DWORD(TEXTLEFT, GetNHApp()->rtTextWindow.left);
+		NHSETREG_DWORD(TEXTRIGHT, GetNHApp()->rtTextWindow.right);
+		NHSETREG_DWORD(TEXTTOP, GetNHApp()->rtTextWindow.top);
+		NHSETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtTextWindow.bottom);
+		NHSETREG_DWORD(TEXTLEFT, GetNHApp()->rtInvenWindow.left);
+		NHSETREG_DWORD(TEXTRIGHT, GetNHApp()->rtInvenWindow.right);
+		NHSETREG_DWORD(TEXTTOP, GetNHApp()->rtInvenWindow.top);
+		NHSETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
+#undef NHSETREG_DWORD
 
         RegCloseKey(key);
     }
@@ -2291,3 +2399,80 @@ static void mswin_color_from_string(char *colorstring, HBRUSH* brushptr, COLORRE
 	*brushptr = CreateSolidBrush(*colorptr);
 	brush_table[max_brush++] = *brushptr;
 }
+
+void mswin_get_window_placement(int type, LPRECT rt)
+{
+    switch (type) {
+    case NHW_MAP:
+		*rt = GetNHApp()->rtMapWindow;
+		break;
+
+    case NHW_MESSAGE:
+		*rt = GetNHApp()->rtMsgWindow;
+		break;
+
+    case NHW_STATUS:
+		*rt = GetNHApp()->rtStatusWindow;
+		break;
+
+    case NHW_MENU:
+		*rt = GetNHApp()->rtMenuWindow;
+		break;
+
+    case NHW_TEXT:
+		*rt = GetNHApp()->rtTextWindow;
+		break;
+
+    case NHW_INVEN:
+		*rt = GetNHApp()->rtInvenWindow;
+		break;
+
+	default:
+		SetRect(rt, 0, 0, 0, 0);
+		break;
+	}
+}
+
+void mswin_update_window_placement(int type, LPRECT rt)
+{
+	LPRECT rt_conf = NULL;
+
+    switch (type) {
+    case NHW_MAP:
+		rt_conf = &GetNHApp()->rtMapWindow;
+		break;
+
+    case NHW_MESSAGE:
+		rt_conf = &GetNHApp()->rtMsgWindow;
+		break;
+
+    case NHW_STATUS:
+		rt_conf = &GetNHApp()->rtStatusWindow;
+		break;
+
+    case NHW_MENU:
+		rt_conf = &GetNHApp()->rtMenuWindow;
+		break;
+
+    case NHW_TEXT:
+		rt_conf = &GetNHApp()->rtTextWindow;
+		break;
+    
+	case NHW_INVEN:
+		rt_conf = &GetNHApp()->rtInvenWindow;
+		break;
+	}
+	
+	if( rt_conf && 
+		!IsRectEmpty(rt) &&
+		!EqualRect(rt_conf, rt) ) 
+	{
+		*rt_conf = *rt;
+
+		/* if window changed size while the game is in progess -
+		   it was most likely resized by the user */
+		if( program_state.something_worth_saving )
+			GetNHApp()->bAutoLayout = FALSE;
+	}
+}
+

@@ -410,6 +410,8 @@ char *argv[];
 		if (discover)
 			You("are in non-scoring discovery mode.");
 
+		update_inventory();
+
 		if (discover || wizard) {
 			if(yn("Do you want to keep the save file?") == 'n'){
 				(void) delete_savefile();
@@ -428,6 +430,7 @@ not_recovered:
 		set_wear();
 		(void) pickup(1);
 		read_engr_at(u.ux,u.uy);
+		update_inventory();
 	}
 
 #ifndef NO_SIGNAL

@@ -19,3 +19,4 @@ int mswin_map_mode(HWND hWnd, int mode);
 #define DEF_CLIPAROUND_AMOUNT  1
 
 #endif /* MSWINMapWindow_h */
+

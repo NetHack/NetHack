@@ -59,6 +59,8 @@ typedef struct mswin_nethack_menu_window {
 	HBITMAP bmpChecked;
 	HBITMAP bmpCheckedCount;
 	HBITMAP bmpNotChecked;
+
+	BOOL	is_active;
 } NHMenuWindow, *PNHMenuWindow;
 
 extern short glyph2tile[];
@@ -86,7 +88,16 @@ static BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch);
 /*-----------------------------------------------------------------------------*/
 HWND mswin_init_menu_window (int type) {
 	HWND ret;
+	RECT rt;
 
+	/* get window position */
+	if( GetNHApp()->bAutoLayout ) {
+		SetRect( &rt, 0, 0, 0, 0);
+	} else {
+		mswin_get_window_placement(NHW_MENU, &rt);
+	}
+
+	/* create menu window object */
 	ret = CreateDialog(
 			GetNHApp()->hApp,
 			MAKEINTRESOURCE(IDD_MENU),
@@ -96,12 +107,28 @@ HWND mswin_init_menu_window (int type) {
 	if( !ret ) {
 		panic("Cannot create menu window");
 	}
-	
+
+	/* move it in the predefined position */
+	if( !GetNHApp()->bAutoLayout ) {
+		MoveWindow(ret, rt.left, rt.top, rt.right - rt.left, rt.bottom - rt.top, TRUE);
+	}
+
+	/* Set window caption */
+	SetWindowText(ret, "Menu/Text");
+
+	if( !GetNHApp()->bWindowsLocked ) {
+		DWORD style;
+		style = GetWindowLong(ret, GWL_STYLE);
+		style |= WS_CAPTION;
+		SetWindowLong(ret, GWL_STYLE, style);
+		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+	}
+
 	SetMenuType(ret, type);
 	return ret;
 }
 /*-----------------------------------------------------------------------------*/
-int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
+int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected, BOOL activate)
 {
 	PNHMenuWindow data;
 	int ret_val;
@@ -114,6 +141,14 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 	ret_val = -1;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+
+	/* force activate for certain menu types */
+	if( data->type == MENU_TYPE_MENU &&
+		(how == PICK_ONE || how == PICK_ANY) ) {
+		activate = TRUE;
+	}
+
+	data->is_active = activate;
 
 	/* set menu type */
 	SetMenuListType(hWnd, how);
@@ -156,7 +191,14 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 		reset_menu_count(NULL, data);
 	}
 
-	mswin_popup_display(hWnd, &data->done);
+	LayoutMenu(hWnd);	// show dialog buttons	
+
+	if( activate ) {
+		mswin_popup_display(hWnd, &data->done);
+	} else {
+		SetFocus(GetNHApp()->hMainWnd);
+		mswin_layout_main_window(hWnd);
+	}
 
 	/* get the result */
 	if( data->result != -1 ) {
@@ -193,8 +235,11 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 		}
 	}
 
-	mswin_popup_destroy(hWnd);
-
+	if( activate ) {
+		data->is_active = FALSE;
+		LayoutMenu(hWnd);	// hide dialog buttons	
+		mswin_popup_destroy(hWnd);
+	}
 	return ret_val;
 }
 /*-----------------------------------------------------------------------------*/   
@@ -219,6 +264,7 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		data->bmpChecked = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_SEL));
 		data->bmpCheckedCount = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_SEL_COUNT));
 		data->bmpNotChecked = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_UNSEL));
+		data->is_active = FALSE;
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 
 		/* set font for the text cotrol */
@@ -235,16 +281,35 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
            which shows on Alt-Tab */
         LoadString(GetNHApp()->hApp, IDS_APP_TITLE, title, MAX_LOADSTRING);
         SetWindowText(hWnd, title);
-	break;
+
+		/* set focus to text control for now */
+		SetFocus(control);
+	return FALSE;
 
 	case WM_MSNH_COMMAND:
 		onMSNHCommand(hWnd, wParam, lParam);
 	break;
 
-	case WM_SIZE:
+	case WM_SIZE: {
+		RECT	rt;
 		LayoutMenu(hWnd);
-	return FALSE;
+		GetWindowRect(hWnd, &rt);
+		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
+		if( flags.perm_invent && mswin_winid_from_handle(hWnd)==WIN_INVEN )
+			mswin_update_window_placement(NHW_INVEN, &rt);
+		else
+			mswin_update_window_placement(NHW_MENU, &rt);
+	} return FALSE;
 
+	case WM_MOVE: {
+		RECT rt;
+		GetWindowRect(hWnd, &rt);
+		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
+		mswin_update_window_placement(NHW_MENU, &rt);
+	} return FALSE;
+	
 	case WM_CLOSE:
 	    if (program_state.gameover) {
 		data->result = -1;
@@ -375,10 +440,13 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	} break;
 
 	case WM_SETFOCUS:
-		if( hWnd!=GetNHApp()->hPopupWnd ) {
-			SetFocus(GetNHApp()->hPopupWnd );
+		if( hWnd!=GetNHApp()->hPopupWnd) {
+			SetFocus(GetNHApp()->hMainWnd);
+		} else {
+			if( IsWindow(GetMenuControl(hWnd)) )
+				SetFocus(GetMenuControl(hWnd));
 		}
-	break;
+	return FALSE;
 	
     case WM_MEASUREITEM: 
 		if( wParam==IDC_MENU_LIST )
@@ -562,28 +630,55 @@ void LayoutMenu(HWND hWnd)
 
 	/* get window coordinates */
 	GetClientRect(hWnd, &clrt );
-	
-	/* set window placements */
-	GetWindowRect(menu_ok, &rt);
-	sz_ok.cx = (clrt.right - clrt.left)/2 - 2*MENU_MARGIN;
-	sz_ok.cy = rt.bottom-rt.top;
-	pt_ok.x = clrt.left + MENU_MARGIN;
-	pt_ok.y = clrt.bottom - MENU_MARGIN - sz_ok.cy;
 
-	GetWindowRect(menu_cancel, &rt);
-	sz_cancel.cx = (clrt.right - clrt.left)/2 - 2*MENU_MARGIN;
-	sz_cancel.cy = rt.bottom-rt.top;
-	pt_cancel.x = (clrt.left + clrt.right)/2 + MENU_MARGIN;
-	pt_cancel.y = clrt.bottom - MENU_MARGIN - sz_cancel.cy;
 
+	// OK button
+	if( data->is_active ) {
+		GetWindowRect(menu_ok, &rt);
+		if( data->type == MENU_TYPE_TEXT ||
+			(data->type == MENU_TYPE_MENU && data->how == PICK_NONE ) ) {
+			sz_ok.cx = (clrt.right - clrt.left) - 2*MENU_MARGIN;
+		} else {
+			sz_ok.cx = (clrt.right - clrt.left)/2 - 2*MENU_MARGIN;
+		}
+		sz_ok.cy = rt.bottom-rt.top;
+		pt_ok.x = clrt.left + MENU_MARGIN;
+		pt_ok.y = clrt.bottom - MENU_MARGIN - sz_ok.cy;
+		ShowWindow(menu_ok, SW_SHOW);
+		MoveWindow(menu_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE );
+	} else {
+		sz_ok.cx = sz_ok.cy = 0;
+		pt_ok.x = pt_ok.y = 0;
+		ShowWindow(menu_ok, SW_HIDE);
+	}
+
+	// CANCEL button
+	if( data->is_active &&
+		!( data->type == MENU_TYPE_TEXT ||
+		  (data->type == MENU_TYPE_MENU && data->how == PICK_NONE ) ) ) {
+		GetWindowRect(menu_ok, &rt);
+		sz_cancel.cx = (clrt.right - clrt.left)/2 - 2*MENU_MARGIN;
+		pt_cancel.x = (clrt.left + clrt.right)/2 + MENU_MARGIN;
+		sz_cancel.cy = rt.bottom - rt.top;
+		pt_cancel.y = clrt.bottom - MENU_MARGIN - sz_cancel.cy;
+		ShowWindow(menu_cancel, SW_SHOW);
+		MoveWindow(menu_cancel, pt_cancel.x, pt_cancel.y, sz_cancel.cx, sz_cancel.cy, TRUE );
+	} else {
+		sz_cancel.cx = sz_cancel.cy = 0;
+		pt_cancel.x = pt_cancel.y = 0;
+		ShowWindow(menu_cancel, SW_HIDE);
+	}
+
+	// main menu control
 	pt_elem.x = clrt.left + MENU_MARGIN;
 	pt_elem.y = clrt.top + MENU_MARGIN;
 	sz_elem.cx = (clrt.right - clrt.left) - 2*MENU_MARGIN;
-	sz_elem.cy = min(pt_cancel.y, pt_ok.y) - 2*MENU_MARGIN;
-
+	if( data->is_active ) {
+		sz_elem.cy = (clrt.bottom - clrt.top) - max(sz_ok.cy, sz_cancel.cy) - 3*MENU_MARGIN;
+	} else {
+		sz_elem.cy = (clrt.bottom - clrt.top) - 2*MENU_MARGIN;
+	}
 	MoveWindow(GetMenuControl(hWnd), pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
-	MoveWindow(menu_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE );
-	MoveWindow(menu_cancel, pt_cancel.x, pt_cancel.y, sz_cancel.cx, sz_cancel.cy, TRUE );
 }
 /*-----------------------------------------------------------------------------*/
 void SetMenuType(HWND hWnd, int type)
@@ -602,13 +697,13 @@ void SetMenuType(HWND hWnd, int type)
 		EnableWindow(list, FALSE);
 		EnableWindow(text, TRUE);
 		ShowWindow(text, SW_SHOW);
-		SetFocus(text);
+		if( data->is_active ) SetFocus(text);
 	} else {
 		ShowWindow(text, SW_HIDE);
 		EnableWindow(text, FALSE);
 		EnableWindow(list, TRUE);
 		ShowWindow(list, SW_SHOW);
-		SetFocus(list);
+		if( data->is_active ) SetFocus(list);
 	}
 	LayoutMenu(hWnd);
 }
@@ -708,7 +803,7 @@ void SetMenuListType(HWND hWnd, int how)
 			panic("cannot insert menu item");
 		}
 	}
-	SetFocus(control);
+	if( data->is_active ) SetFocus(control);
 }
 /*-----------------------------------------------------------------------------*/
 HWND GetMenuControl(HWND hWnd)
@@ -1057,7 +1152,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 			if( mswin_getlin_window("Search for:", buf, BUFSZ)==IDCANCEL ) {
 				strcpy(buf, "\033");
 			}
-			SetFocus(hwndList);	// set focus back to the list control
+			if( data->is_active ) SetFocus(hwndList);	// set focus back to the list control
 			if (!*buf || *buf == '\033') return -2;
 			for(i=0; i<data->menu.size; i++ ) {
 				if( NHMENU_IS_SELECTABLE(data->menu.items[i])
@@ -1377,6 +1472,11 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 		bUpdateFocusItem = TRUE;
 	break;
 
+	case WM_SETFOCUS:
+		if( GetParent(hWnd)!=GetNHApp()->hPopupWnd) {
+			SetFocus(GetNHApp()->hMainWnd);
+		}
+	return FALSE;
 	}
 
 	if(	bUpdateFocusItem ) {
@@ -1446,3 +1546,4 @@ LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 		return 0;
 }
 /*-----------------------------------------------------------------------------*/
+

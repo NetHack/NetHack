@@ -48,20 +48,29 @@ static COLORREF nhcolor_to_RGB(int c);
 HWND mswin_init_map_window () {
 	static int run_once = 0;
 	HWND ret;
+	RECT rt;
 
 	if( !run_once ) {
 		register_map_window_class();
 		run_once = 1;
 	}
-	
+
+	/* get window position */
+	if( GetNHApp()->bAutoLayout ) {
+		SetRect( &rt, 0, 0, 0, 0);
+	} else {
+		mswin_get_window_placement(NHW_MAP, &rt);
+	}
+
+	/* create map window object */
 	ret = CreateWindow(
 			szNHMapWindowClass,		/* registered class name */
 			NULL,					/* window name */
-			WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPSIBLINGS, /* window style */
-			0,  /* horizontal position of window - set it later */
-			0,  /* vertical position of window - set it later */
-			0,  /* window width - set it later */
-			0,  /* window height - set it later*/
+			WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPSIBLINGS | WS_SIZEBOX, /* window style */
+			rt.left,				/* horizontal position of window */
+			rt.top,					/* vertical position of window */
+			rt.right - rt.left,		/* window width */
+			rt.bottom - rt.top,		/* window height */
 			GetNHApp()->hMainWnd,	/* handle to parent or owner window */
 			NULL,					/* menu handle or child identifier */
 			GetNHApp()->hApp,		/* handle to application instance */
@@ -69,6 +78,10 @@ HWND mswin_init_map_window () {
 	if( !ret ) {
 		panic("Cannot create map window");
 	}
+
+	/* Set window caption */
+	SetWindowText(ret, "Map");
+
 	return ret;
 }
 
@@ -349,6 +362,7 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
     case WM_SIZE: 
     { 
+		RECT	rt;
 		SIZE size;
 
 		if( data->bFitToScreenMode ) {
@@ -360,8 +374,22 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 			size.cy = data->yScrTile*ROWNO;
 		}
 		mswin_map_stretch(hWnd, &size, TRUE);
+
+		/* update window placement */
+		GetWindowRect(hWnd, &rt);
+		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
+		mswin_update_window_placement(NHW_MAP, &rt);
     } 
     break; 
+
+	case WM_MOVE: {
+		RECT rt;
+		GetWindowRect(hWnd, &rt);
+		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
+		mswin_update_window_placement(NHW_MAP, &rt);
+	} return FALSE;
 
 	case WM_LBUTTONDOWN:
 		NHEVENT_MS( 
@@ -974,3 +1002,4 @@ void nhapply_image_transparent(
 		DeleteDC(hdcObject);
 		DeleteDC(hdcSave);
 }
+

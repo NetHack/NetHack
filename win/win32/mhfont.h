@@ -14,3 +14,4 @@ void mswin_destroy_splashfonts(void);
 UINT mswin_charset(void);
 
 #endif /* MSWINFont_h */
+

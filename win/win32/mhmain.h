@@ -14,3 +14,4 @@ void mswin_select_map_mode(int map_mode);
 void mswin_menu_check_intf_mode(void);
 
 #endif /* MSWINMainWindow_h */
+

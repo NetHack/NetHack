@@ -25,7 +25,16 @@ static void LayoutText(HWND hwnd);
 HWND mswin_init_text_window () {
 	HWND ret;
 	PNHTextWindow data;
+	RECT  rt;
 
+	/* get window position */
+	if( GetNHApp()->bAutoLayout ) {
+		SetRect( &rt, 0, 0, 0, 0);
+	} else {
+		mswin_get_window_placement(NHW_TEXT, &rt);
+	}
+
+	/* create text widnow object */
 	ret = CreateDialog(
 			GetNHApp()->hApp,
 			MAKEINTRESOURCE(IDD_NHTEXT),
@@ -34,9 +43,24 @@ HWND mswin_init_text_window () {
 	);
 	if( !ret ) panic("Cannot create text window");
 
+	/* move it in the predefined position */
+	if( !GetNHApp()->bAutoLayout ) {
+		MoveWindow(ret, rt.left, rt.top, rt.right - rt.left, rt.bottom - rt.top, TRUE);
+	}
+
+	/* Set window caption */
+	SetWindowText(ret, "Text");
+	if( !GetNHApp()->bWindowsLocked ) {
+		DWORD style;
+		style = GetWindowLong(ret, GWL_STYLE);
+		style |= WS_CAPTION;
+		SetWindowLong(ret, GWL_STYLE, style);
+		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+	}
+
+	/* create and set window data */
 	data = (PNHTextWindow)malloc(sizeof(NHTextWindow));
 	if( !data ) panic("out of memory");
-
 	ZeroMemory(data, sizeof(NHTextWindow));
 	SetWindowLong(ret, GWL_USERDATA, (LONG)data);
 	return ret;
@@ -95,9 +119,24 @@ BOOL CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		onMSNHCommand(hWnd, wParam, lParam);
 	break;
 
-	case WM_SIZE:
+	case WM_SIZE: {
+		RECT	rt;
+
+		GetWindowRect(hWnd, &rt);
+		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
+		mswin_update_window_placement(NHW_TEXT, &rt);
+
 		LayoutText(hWnd);
-	return FALSE;
+	} return FALSE;
+
+	case WM_MOVE: {
+		RECT rt;
+		GetWindowRect(hWnd, &rt);
+		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
+		mswin_update_window_placement(NHW_TEXT, &rt);
+	} return FALSE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) 
@@ -252,3 +291,4 @@ LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	else 
 		return 0;
 }
+

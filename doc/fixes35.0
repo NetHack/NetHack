@@ -13,6 +13,8 @@ expert fireball/cone of cold could not target a monster seen only with
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+win32gui: better handling of "more" prompt for messages that would have scrolled
+	off the window
 
 
 General New Features
@@ -21,3 +23,6 @@ General New Features
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------
+win32gui: support perm_invent
+win32gui: menu option to add/remove windows captions
+

@@ -25,28 +25,39 @@ HWND mswin_init_status_window () {
 	static int run_once = 0;
 	HWND ret;
 	NHStatusWindow* data;
+	RECT  rt;
 
 	if( !run_once ) {
 		register_status_window_class( );
 		run_once = 1;
 	}
-	
+
+	/* get window position */
+	if( GetNHApp()->bAutoLayout ) {
+		SetRect( &rt, 0, 0, 0, 0);
+	} else {
+		mswin_get_window_placement(NHW_STATUS, &rt);
+	}
+
+	/* create status window object */
 	ret = CreateWindow(                                
 			szStatusWindowClass,
 			NULL,
-			WS_CHILD | WS_DISABLED | WS_CLIPSIBLINGS,
-			0,  /* x position */
-			0,  /* y position */
-			0,  /* x-size - we will set it later */
-			0,  /* y-size - we will set it later */
+			WS_CHILD | WS_CLIPSIBLINGS | WS_SIZEBOX,
+			rt.left,				/* horizontal position of window */
+			rt.top,					/* vertical position of window */
+			rt.right - rt.left,		/* window width */
+			rt.bottom - rt.top,		/* window height */
 			GetNHApp()->hMainWnd,
 			NULL,
 			GetNHApp()->hApp,
 			NULL );
 	if( !ret ) panic("Cannot create status window");
-	
-	EnableWindow(ret, FALSE);
 
+	/* Set window caption */
+	SetWindowText(ret, "Status");
+
+	/* create window data */	
 	data = (PNHStatusWindow)malloc(sizeof(NHStatusWindow));
 	if( !data ) panic("out of memory");
 
@@ -92,8 +103,6 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
 			strncpy(data->window_text[data->index], msg_data->text, 
 				    MAXWINDOWTEXT);
-			strncat(data->window_text[data->index], "\n", 
-				    MAXWINDOWTEXT-strlen(data->window_text[data->index]));
 			data->index = (data->index+1) % NHSW_LINES;
 			InvalidateRect(hWnd, NULL, TRUE);
 			break;
@@ -136,6 +145,22 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			EndPaint(hWnd, &ps);
 		} break;
 
+	case WM_SIZE: {
+		RECT	rt;
+		GetWindowRect(hWnd, &rt);
+		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
+		mswin_update_window_placement(NHW_STATUS, &rt);
+	} return FALSE;
+
+	case WM_MOVE: {
+		RECT rt;
+		GetWindowRect(hWnd, &rt);
+		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
+		mswin_update_window_placement(NHW_STATUS, &rt);
+	} return FALSE;
+
 	case WM_DESTROY:
 		free(data);
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
@@ -168,9 +193,10 @@ void mswin_status_window_size (HWND hWnd, LPSIZE sz)
 		saveFont = SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));
 		GetTextMetrics(hdc, &tm);
 
-		sz->cy = tm.tmHeight * NHSW_LINES;
+		sz->cy = tm.tmHeight * NHSW_LINES + 2*GetSystemMetrics(SM_CYSIZEFRAME);
 
 		SelectObject(hdc, saveFont);
 		ReleaseDC(hWnd, hdc);
 	}
 }
+

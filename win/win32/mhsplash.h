@@ -11,3 +11,4 @@
 void mswin_display_splash_window (BOOL);
 
 #endif /* MSWINSplashWindow_h */
+

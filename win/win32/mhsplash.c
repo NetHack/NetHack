@@ -32,7 +32,6 @@ void mswin_display_splash_window (BOOL show_ver)
 {
 	MSG msg;
 	RECT rt;
-	HWND mapWnd;
 	RECT splashrt;
 	RECT clientrt;
 	RECT controlrt;
@@ -44,8 +43,6 @@ void mswin_display_splash_window (BOOL show_ver)
 	if( !hWnd ) panic("Cannot create Splash window");
 	mswin_init_splashfonts(hWnd);
 	GetNHApp()->hPopupWnd = hWnd;
-	mapWnd = mswin_hwnd_from_winid(WIN_MAP);
-	if( !IsWindow(mapWnd) ) mapWnd = GetNHApp()->hMainWnd;
 	/* Get control size */
 	GetWindowRect (GetDlgItem(hWnd, IDOK), &controlrt);
 	controlrt.right -= controlrt.left;
@@ -60,7 +57,7 @@ void mswin_display_splash_window (BOOL show_ver)
 	splashrt.right += SPLASH_WIDTH + SPLASH_OFFSET_X * 2 - clientrt.right;
 	splashrt.bottom += SPLASH_HEIGHT + controlrt.bottom + SPLASH_OFFSET_Y * 3 - clientrt.bottom;
 	/* Place the window centered */
-	GetWindowRect(mapWnd, &rt);
+	GetWindowRect(GetNHApp()->hMainWnd, &rt);
 	rt.left += (rt.right - rt.left - splashrt.right) / 2;
 	rt.top += (rt.bottom - rt.top - splashrt.bottom) / 2;
 	MoveWindow(hWnd, rt.left, rt.top, splashrt.right, splashrt.bottom, TRUE);
@@ -91,7 +88,6 @@ void mswin_display_splash_window (BOOL show_ver)
      /* Show news, if any */
      FILE *nf;
 
-     iflags.news = 0; /* prevent newgame() from re-displaying news */
      nf = fopen(NEWS, "r");
      if (nf != NULL) {
   char *buf = NULL;
@@ -228,3 +224,4 @@ BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 	}
 	return FALSE;
 }
+

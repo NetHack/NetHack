@@ -263,3 +263,4 @@ void mswin_finish_rip_text(winid wid)
 {
 	SendMessage (mswin_hwnd_from_winid(wid), WM_MSNH_COMMAND,  MSNH_MSG_DIED, 0);
 }
+

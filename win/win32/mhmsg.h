@@ -60,3 +60,4 @@ typedef struct mswin_nhmsg_end_menu {
 } MSNHMsgEndMenu, *PMSNHMsgEndMenu;
 
 #endif
+
