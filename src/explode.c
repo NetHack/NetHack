@@ -301,7 +301,7 @@ int expltype;
 			/* KMH -- Don't blame the player for pets killing gas spores */
 			if (!flags.mon_moving) killed(mtmp);
 			else monkilled(mtmp, "", (int)adtyp);
-		}
+		} else if (!flags.mon_moving) setmangry(mtmp);
 	}
 
 	/* Do your injury last */
