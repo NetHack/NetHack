@@ -557,9 +557,6 @@ E void FDECL(lesshungry, (int));
 E boolean NDECL(is_fainted);
 E void NDECL(reset_faint);
 E void NDECL(violated_vegetarian);
-#if 0
-E void NDECL(sync_hunger);
-#endif
 E void FDECL(newuhs, (BOOLEAN_P));
 E struct obj *FDECL(floorfood, (const char *,int));
 E void NDECL(vomit);

@@ -437,9 +437,6 @@ stop_occupation()
 		    You("stop %s.", occtxt);
 		occupation = 0;
 		context.botl = 1; /* in case u.uhs changed */
-/* fainting stops your occupation, there's no reason to sync.
-		sync_hunger();
-*/
 #ifdef REDO
 		nomul(0);
 		pushch(0);

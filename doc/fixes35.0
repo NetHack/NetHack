@@ -154,3 +154,4 @@ all fields in flags struct are unconditionally present
 monst cham field now a short and uses mons[] index
 rearrange some monster ordering to follow rule #2 listed at top of monst.c
 change region player_flags to more appropriate unsigned int instead of boolean
+remove remains of sync_hunger, which has been ifdef'd out for years
