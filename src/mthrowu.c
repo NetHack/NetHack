@@ -186,7 +186,7 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 	    if (ismimic) seemimic(mtmp);
 	    mtmp->msleeping = 0;
 	    if (vis) hit(distant_name(otmp,mshot_xname), mtmp, exclam(damage));
-	    else if (verbose) pline("It is hit%s", exclam(damage));
+	    else if (verbose) pline("%s is hit%s", Monnam(mtmp), exclam(damage));
 
 	    if (otmp->opoisoned && is_poisonable(otmp)) {
 		if (resists_poison(mtmp)) {
@@ -221,7 +221,7 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 	    if (mtmp->mhp < 1) {
 		if (vis || verbose)
 		    pline("%s is %s!", Monnam(mtmp),
-			(nonliving(mtmp->data) || !vis)
+			(nonliving(mtmp->data) || !canspotmon(mtmp))
 			? "destroyed" : "killed");
 		/* don't blame hero for unknown rolling boulder trap */
 		if (!flags.mon_moving &&
