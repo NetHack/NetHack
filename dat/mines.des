@@ -221,7 +221,7 @@ MONSTER: 'G', "gnome", random
 RANDOM_CORRIDORS
 
 
-# Minetown variant 3 by K Bailey (cheepicus@hotmail.com)
+# Minetown variant 3 by Kelly Bailey
 #
 LEVEL: "minetn-3"
 ROOM: "ordinary",lit,(3,3),(center,center),(31,15)
@@ -311,7 +311,7 @@ MONSTER: 'G', "gnome", random
 RANDOM_CORRIDORS
 
 
-# Minetown variant 4 by K Bailey (cheepicus@hotmail.com)
+# Minetown variant 4 by Kelly Bailey
 #
 LEVEL: "minetn-4"
 ROOM: "ordinary",lit,(3,3),(center,center),(30,15)
@@ -393,7 +393,7 @@ MONSTER: 'G', "gnome", random
 RANDOM_CORRIDORS
 
 
-# "Grotto Town" by K Bailey (cheepicus@hotmail.com)
+# "Grotto Town" by Kelly Bailey
 #
 MAZE: "minetn-5",' '
 GEOMETRY:center,center
@@ -493,7 +493,7 @@ DOOR:closed,(31,05)
 ALTAR:(31,03),align[0],shrine
 
 
-# "Bustling Town" by K Bailey (cheepicus@hotmail.com)
+# "Bustling Town" by Kelly Bailey
 #
 MAZE: "minetn-6",' '
 INIT_MAP:'.','-',true,true,lit,true
@@ -566,7 +566,7 @@ MONSTER: '@', "watch captain", random, peaceful
 MONSTER: '@', "watch captain", random, peaceful
 
 
-# "Bazaar Town" by K Bailey (cheepicus@hotmail.com)
+# "Bazaar Town" by Kelly Bailey
 #
 LEVEL: "minetn-7"
 ROOM: "ordinary" , lit, (3,3), (center,center), (30,15)
@@ -905,7 +905,7 @@ MONSTER:'h',"dwarf",random
 MONSTER:'h',random,random
 
 
-# "Catacombs" by K Bailey (cheepicus@hotmail.com)
+# "Catacombs" by Kelly Bailey
 # Relies on some very specific behavior of MAZEWALK.
 #
 MAZE:"minend-3",'-'
