@@ -14,8 +14,6 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 #include "tcap.h"
 #include <ctype.h>
 #endif
-#include "patchlevel.h"
-#include "date.h"
 
 #define WINTYPELEN 16
 
@@ -2328,7 +2326,7 @@ doset_add_menu(win, option, indexoffset)
     else
 	Sprintf(buf, fmtstr_doset_add_menu_tab, option, value);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
- }
+}
 
 /* Changing options via menu by Per Liboriussen */
 int
@@ -2336,9 +2334,6 @@ doset()
 {
 	char buf[BUFSZ], buf2[BUFSZ];
 	int i, pass, boolcount, pick_cnt, pick_idx, opt_indx;
-#ifdef VERSION_COMPATIBILITY
-	unsigned long uver;
-#endif
 	boolean *bool_p;
 	winid tmpwin;
 	anything any;
@@ -2434,19 +2429,6 @@ doset()
 	for (i = 0; i < PREFIX_COUNT; i++)
 		doset_add_menu(tmpwin, fqn_prefix_names[i], 0);
 #endif
-#ifdef VERSION_COMPATIBILITY
-	uver = VERSION_COMPATIBILITY;
-	Sprintf(buf, "Accepted bones file range: version %lu.%lu.%lu-%lu to %s.",
-		((uver & 0xFF000000L) >> 24), ((uver & 0x00FF0000L) >> 16),
-		((uver & 0x0000FF00L) >> 8), (uver & 0x000000FFL),
-		VERSION_STRING);
-#else
-	Sprintf(buf, "Bones files accepted from version %s only.",
-		VERSION_STRING);
-#endif
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
-
 	end_menu(tmpwin, "Set what options?");
 	need_redraw = FALSE;
 	if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list)) > 0) {
