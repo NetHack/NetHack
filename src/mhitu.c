@@ -502,7 +502,7 @@ mattacku(mtmp)
 							an(mdat->mname));
 			    	else
 			    		Sprintf(buf, "%s appear",
-							s_suffix(mdat->mname));
+							makeplural(mdat->mname));
 				pline("%s%s!", upstart(buf), from_nowhere);
 			    }
 			} /* else no help came; but you didn't know it tried */
