@@ -125,6 +125,13 @@ BOOL CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 			DestroyWindow(hWnd);
 			SetFocus(GetNHApp()->hMainWnd);
 			return TRUE;
+          case IDC_TEXT_CONTROL:
+            switch (HIWORD(wParam))
+            {
+              case EN_SETFOCUS:
+                HideCaret((HWND)lParam);
+                return TRUE;
+            }
 		}
 	break;
 
@@ -203,13 +210,32 @@ LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 {
 	switch(message) {
 
-	/* close on space */
 	case WM_KEYDOWN:
-		if( wParam==VK_SPACE ) {
-			PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
+		switch (wParam)
+        {
+    	/* close on space in Windows mode
+           page down on space in NetHack mode */
+        case VK_SPACE:
+            if (GetNHApp()->regNetHackMode)
+                SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
+            else
+			    PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
+            return 0;
+        case VK_NEXT:
+            SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
+            return 0;
+        case VK_PRIOR:
+            SendMessage(hWnd, EM_SCROLL, SB_PAGEUP, 0);
+            return 0;
+        case VK_UP:
+            SendMessage(hWnd, EM_SCROLL, SB_LINEUP, 0);
+            return 0;
+        case VK_DOWN:
+            SendMessage(hWnd, EM_SCROLL, SB_LINEDOWN, 0);
+            return 0;
+
 		}
 	break;
-
 	}
 
 	if( editControlWndProc ) 

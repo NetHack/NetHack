@@ -306,6 +306,14 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			data->done = 1;
 			data->result = 0;
 		return TRUE;
+
+        case IDC_MENU_TEXT:
+          switch (HIWORD(wParam))
+          {
+            case EN_SETFOCUS:
+              HideCaret((HWND)lParam);
+              return TRUE;
+          }
 		}
 	} break;
 
@@ -1012,23 +1020,33 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	return -2;
 
 	case ' ':
-		/* ends menu for PICK_ONE/PICK_NONE
-		   select item for PICK_ANY */
-		if( data->how==PICK_ONE || data->how==PICK_NONE ) {
-			data->done = 1;
-			data->result = 0;
-			return -2;
-		} else if( data->how==PICK_ANY ) {
-			i = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
-			if( i>=0 ) {
-				SelectMenuItem(
-					hwndList, 
-					data, 
-					i, 
-					NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
-				);
-			}
-		}
+        if (GetNHApp()->regNetHackMode) {
+            /* NetHack mode: Scroll down one page */
+		    topIndex = ListView_GetTopIndex( hwndList );
+		    pageSize = ListView_GetCountPerPage( hwndList );
+		    i = min(topIndex+pageSize, data->menu.size-1);
+		    ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+		    ListView_EnsureVisible(hwndList, i, FALSE);
+        	return -2;
+        } else {
+		    /* Windows mode: ends menu for PICK_ONE/PICK_NONE
+		       select item for PICK_ANY */
+		    if( data->how==PICK_ONE || data->how==PICK_NONE ) {
+			    data->done = 1;
+			    data->result = 0;
+			    return -2;
+		    } else if( data->how==PICK_ANY ) {
+			    i = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
+			    if( i>=0 ) {
+				    SelectMenuItem(
+					    hwndList, 
+					    data, 
+					    i, 
+					    NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
+				    );
+			    }
+		    }
+        }
 	break;
 
 	default:
@@ -1270,15 +1288,35 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 		return 0;
 }
 /*-----------------------------------------------------------------------------*/
-/* Text control window proc - implements close on space */
+/* Text control window proc - implements scrolling without a cursor */
 LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message) {
 
-	/* close on space */
 	case WM_KEYDOWN:
-		if( wParam==VK_SPACE ) {
-			PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
+		switch (wParam)
+        {
+    	/* close on space in Windows mode
+           page down on space in NetHack mode */
+        case VK_SPACE:
+            if (GetNHApp()->regNetHackMode)
+                SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
+            else
+			    PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
+            return 0;
+        case VK_NEXT:
+            SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
+            return 0;
+        case VK_PRIOR:
+            SendMessage(hWnd, EM_SCROLL, SB_PAGEUP, 0);
+            return 0;
+        case VK_UP:
+            SendMessage(hWnd, EM_SCROLL, SB_LINEUP, 0);
+            return 0;
+        case VK_DOWN:
+            SendMessage(hWnd, EM_SCROLL, SB_LINEDOWN, 0);
+            return 0;
+
 		}
 	break;
 
