@@ -121,9 +121,8 @@ that constantly growing bug list, 3.3 proved stable enough to last for
 more than a year and a half.
 
 
-The 3.4 development team initially consisted of Michael Allison, Ken Arromdee, 
-David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, 
-Kevin Hugo, Steve Linhart, Ken Lorber, Dean Luick, Pat Rankin, Eric Smith, 
+The 3.4 development team initially consisted of Michael Allison, Ken Arromdee,
+David Cohrs, Jessie Collet, Kevin Hugo, Ken Lorber, Dean Luick, Pat Rankin,
 Mike Stephenson, Janet Walz, and Paul Winner, with Warwick Allison joining
 just before the release of NetHack 3.4.0 in March 2002.
 
@@ -138,7 +137,7 @@ Paul Winner and Yitzhak Sapir provided encouragement.
 Dean Luick, Mark Modrall, and Kevin Hugo maintained and enhanced the
 Macintosh port of 3.4.
 
-Michael Allison, Dave Cohrs, Alex Kompel, Dion Nicolaas, and Yitzhak Sapir 
+Michael Allison, David Cohrs, Alex Kompel, Dion Nicolaas, and Yitzhak Sapir 
 maintained and enhanced 3.4 for the Microsoft Windows platform. Alex Kompel 
 contributed a new graphical interface for the Windows port.
 
