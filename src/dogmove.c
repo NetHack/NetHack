@@ -191,23 +191,8 @@ boolean devour;
 	    delobj(obj);
 
 	if (poly) {
-	    char oldpet[BUFSZ];
-#ifdef STEED
-	    long mw = mtmp->misc_worn_check;
-
-	    mtmp->misc_worn_check &= ~W_SADDLE;
-#endif
-	    Strcpy(oldpet, Monnam(mtmp));
-#ifdef STEED
-	    mtmp->misc_worn_check = mw;
-#endif
-	    if (newcham(mtmp, (struct permonst *)0, FALSE) &&
-			cansee(mtmp->mx, mtmp->my)) {
-		uchar save_mnamelth = mtmp->mnamelth;
-		mtmp->mnamelth = 0;
-		pline("%s turns into %s!", oldpet, a_monnam(mtmp));
-		mtmp->mnamelth = save_mnamelth;
-	    }
+	    (void) newcham(mtmp, (struct permonst *)0, FALSE,
+			   cansee(mtmp->mx, mtmp->my));
 	}
 	/* limit "instant" growth to prevent potential abuse */
 	if (grow && (int) mtmp->m_lev < (int)mtmp->data->mlevel + 15) {

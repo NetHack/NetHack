@@ -191,7 +191,7 @@ struct obj *otmp;
 			/* no corpse after system shock */
 			xkilled(mtmp, 3);
 		    } else if (newcham(mtmp, (struct permonst *)0,
-				       (otyp != POT_POLYMORPH))) {
+				       (otyp != POT_POLYMORPH), FALSE)) {
 			if (!Hallucination && canspotmon(mtmp))
 			    makeknown(otyp);
 		    }
@@ -293,7 +293,7 @@ struct obj *otmp;
 		if (monsndx(mtmp->data) == PM_STONE_GOLEM) {
 		    char *name = Monnam(mtmp);
 		    /* turn into flesh golem */
-		    if (newcham(mtmp, &mons[PM_FLESH_GOLEM], FALSE)) {
+		    if (newcham(mtmp, &mons[PM_FLESH_GOLEM], FALSE, FALSE)) {
 			if (canseemon(mtmp))
 			    pline("%s turns to flesh!", name);
 		    } else {

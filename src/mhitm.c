@@ -1072,8 +1072,7 @@ label2:			if (mdef->mhp > 0) return 0;
 	    			mdef->data != &mons[PM_FIRE_ELEMENTAL] &&
 	    			mdef->data != &mons[PM_SALAMANDER] &&
 	    			mdef->data != &mons[PM_GREEN_SLIME]) {
-	    	    if (vis) pline("%s turns into slime.", Monnam(mdef));
-	    	    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE);
+	    	    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, vis);
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
 	    	    tmp = 0;
 	    	}

@@ -1090,7 +1090,8 @@ struct obj *otmp;
 		case POLY_TRAP: 
 		    if (!resists_magm(mtmp)) {
 			if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-			(void) newcham(mtmp, (struct permonst *)0, FALSE);
+			(void) newcham(mtmp, (struct permonst *)0,
+				       FALSE, FALSE);
 			if (!can_saddle(mtmp) || !can_ride(mtmp)) {
 				dismount_steed(DISMOUNT_POLY);
 			} else {
@@ -1888,7 +1889,8 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 		    if (resists_magm(mtmp)) {
 			shieldeff(mtmp->mx, mtmp->my);
 		    } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-			(void) newcham(mtmp, (struct permonst *)0, FALSE);
+			(void) newcham(mtmp, (struct permonst *)0,
+				       FALSE, FALSE);
 			if (in_sight) seetrap(trap);
 		    }
 		    break;

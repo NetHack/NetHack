@@ -1453,7 +1453,7 @@ register struct attack *mattk;
 	    			mdef->data != &mons[PM_SALAMANDER] &&
 	    			mdef->data != &mons[PM_GREEN_SLIME]) {
 	    	    You("turn %s into slime.", mon_nam(mdef));
-	    	    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE);
+	    	    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE);
 	    	    tmp = 0;
 	    	}
 	    	break;

@@ -462,7 +462,7 @@ mcalcdistress()
 
 	/* possibly polymorph shapechangers and lycanthropes */
 	if (mtmp->cham && !rn2(6))
-	    (void) newcham(mtmp, (struct permonst *)0, FALSE);
+	    (void) newcham(mtmp, (struct permonst *)0, FALSE, FALSE);
 	were_change(mtmp);
 
 	/* gradually time out temporary problems */
@@ -642,7 +642,8 @@ meatmetal(mtmp)
 			delobj(otmp);
 			ptr = mtmp->data;
 			if (poly) {
-			    if (newcham(mtmp, (struct permonst *)0, FALSE))
+			    if (newcham(mtmp, (struct permonst *)0,
+					FALSE, FALSE))
 				ptr = mtmp->data;
 			} else if (grow) {
 			    ptr = grow_up(mtmp, (struct monst *)0);
@@ -727,7 +728,8 @@ meatobj(mtmp)		/* for gelatinous cubes */
 		delobj(otmp);		/* munch */
 		ptr = mtmp->data;
 		if (poly) {
-		    if (newcham(mtmp, (struct permonst *)0, FALSE)) ptr = mtmp->data;
+		    if (newcham(mtmp, (struct permonst *)0, FALSE, FALSE))
+			ptr = mtmp->data;
 		} else if (grow) {
 		    ptr = grow_up(mtmp, (struct monst *)0);
 		} else if (heal) {
@@ -1803,7 +1805,7 @@ mon_to_stone(mtmp)
 	/* it's a golem, and not a stone golem */
 	if(canseemon(mtmp))
 	    pline("%s solidifies...", Monnam(mtmp));
-	if (newcham(mtmp, &mons[PM_STONE_GOLEM], FALSE)) {
+	if (newcham(mtmp, &mons[PM_STONE_GOLEM], FALSE, FALSE)) {
 	    if(canseemon(mtmp))
 		pline("Now it's %s.", an(mtmp->data->mname));
 	} else {
@@ -2091,7 +2093,8 @@ rescham()
 		mcham = (int) mtmp->cham;
 		if (mcham) {
 			mtmp->cham = CHAM_ORDINARY;
-			(void) newcham(mtmp, &mons[cham_to_pm[mcham]], FALSE);
+			(void) newcham(mtmp, &mons[cham_to_pm[mcham]],
+				       FALSE, FALSE);
 		}
 		if(is_were(mtmp->data) && mtmp->data->mlet != S_HUMAN)
 			new_were(mtmp);
@@ -2134,7 +2137,7 @@ struct monst *mon;
 	    mcham = (int) mon->cham;
 	    if (mcham) {
 		mon->cham = CHAM_ORDINARY;
-		(void) newcham(mon, &mons[cham_to_pm[mcham]], FALSE);
+		(void) newcham(mon, &mons[cham_to_pm[mcham]], FALSE, FALSE);
 	    } else if (is_were(mon->data) && !is_human(mon->data)) {
 		new_were(mon);
 	    }
@@ -2254,14 +2257,23 @@ struct monst *mon;
 
 /* make a chameleon look like a new monster; returns 1 if it actually changed */
 int
-newcham(mtmp, mdat, polyspot)
+newcham(mtmp, mdat, polyspot, msg)
 struct monst *mtmp;
 struct permonst *mdat;
 boolean polyspot;	/* change is the result of wand or spell of polymorph */
+boolean msg;		/* "The oldmon turns into a newmon!" */
 {
 	int mhp, hpn, hpd;
 	int mndx, tryct;
 	struct permonst *olddata = mtmp->data;
+	char oldname[BUFSZ];
+
+	if (msg) {
+	    /* like Monnam() but never mention saddle */
+	    Strcpy(oldname, x_monnam(mtmp, ARTICLE_THE, (char *)0,
+				     SUPPRESS_SADDLE, FALSE));
+	    oldname[0] = highc(oldname[0]);
+	}
 
 	/* mdat = 0 -> caller wants a random monster shape */
 	tryct = 0;
@@ -2392,6 +2404,15 @@ boolean polyspot;	/* change is the result of wand or spell of polymorph */
 	}
 
 	newsym(mtmp->mx,mtmp->my);
+
+	if (msg) {
+	    uchar save_mnamelth = mtmp->mnamelth;
+	    mtmp->mnamelth = 0;
+	    pline("%s turns into %s!", oldname,
+		  mdat == &mons[PM_GREEN_SLIME] ? "slime" :
+		  x_monnam(mtmp, ARTICLE_A, (char*)0, SUPPRESS_SADDLE, FALSE));
+	    mtmp->mnamelth = save_mnamelth;
+	}
 
 	mon_break_armor(mtmp, polyspot);
 	if (!(mtmp->misc_worn_check & W_ARMG))
@@ -2543,7 +2564,7 @@ kill_genocided_monsters()
 	    mndx = monsndx(mtmp->data);
 	    if ((mvitals[mndx].mvflags & G_GENOD) || kill_cham[mtmp->cham]) {
 		if (mtmp->cham && !kill_cham[mtmp->cham])
-		    (void) newcham(mtmp, (struct permonst *)0, FALSE);
+		    (void) newcham(mtmp, (struct permonst *)0, FALSE, FALSE);
 		else
 		    mondead(mtmp);
 	    }
