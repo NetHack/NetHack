@@ -1539,7 +1539,8 @@ glibr()
 		/* changed so cursed rings don't fall off, GAN 10/30/86 */
 		Your("%s off your %s.",
 			(leftfall && rightfall) ? "rings slip" : "ring slips",
-			makeplural(body_part(FINGER)));
+			(leftfall && rightfall) ? makeplural(body_part(FINGER)) :
+			body_part(FINGER));
 		xfl++;
 		if (leftfall) {
 			otmp = uleft;
