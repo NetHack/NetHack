@@ -933,6 +933,10 @@ doengrave()
 				       "write in");
 		eloc = is_ice(u.ux,u.uy) ? "frost" : "dust";
 		break;
+	    case HEADSTONE:
+		everb = (oep && !eow ? "add to the epitaph on" :
+				       "engrave on");
+		break;
 	    case ENGRAVE:
 		everb = (oep && !eow ? "add to the engraving in" :
 				       "engrave in");
