@@ -112,6 +112,8 @@ struct obj *otmp;
 #ifdef STEED
 	struct obj *obj;
 #endif
+	boolean disguised_mimic = (mtmp->data->mlet == S_MIMIC &&
+				   mtmp->m_ap_type != M_AP_NOTHING);
 
 	if (u.uswallow && mtmp == u.ustuck)
 	    reveal_invis = FALSE;
@@ -263,9 +265,17 @@ struct obj *otmp;
 		    mtmp->mblinded = 0;
 		    mtmp->mcansee = 1;
 		}
-		if (canseemon(mtmp))
-		    pline("%s looks%s better.", Monnam(mtmp),
-			  otyp == SPE_EXTRA_HEALING ? " much" : "" );
+		if (canseemon(mtmp)) {
+		    if (disguised_mimic) {
+			if (mtmp->m_ap_type == M_AP_OBJECT &&
+				mtmp->mappearance == STRANGE_OBJECT)
+				/* it can do better now */
+				set_mimic_sym(mtmp);
+			else
+				mimic_hit_msg(mtmp, otyp);
+		    } else pline("%s looks%s better.", Monnam(mtmp),
+					otyp == SPE_EXTRA_HEALING ? " much" : "" );
+		}
 		if (mtmp->mtame || mtmp->mpeaceful) {
 		    adjalign(Role_if(PM_HEALER) ? 1 : sgn(u.ualign.type));
 		}

@@ -2701,6 +2701,28 @@ pacify_guards()
 	    mtmp->mpeaceful = 1;
 	}
 }
+
+void
+mimic_hit_msg(mtmp, otyp)
+struct monst *mtmp;
+short otyp;
+{
+	short ap = mtmp->mappearance;
+
+	switch(mtmp->m_ap_type) {
+	    case M_AP_NOTHING:			
+	    case M_AP_FURNITURE:
+	    case M_AP_MONSTER:
+		break;
+	    case M_AP_OBJECT:
+		if (otyp == SPE_HEALING || otyp == SPE_EXTRA_HEALING) {
+		    pline("%s seems a more vivid %s than before.",
+				The(simple_typename(ap)),
+				c_obj_colors[objects[ap].oc_color]);
+		}
+		break;
+	}
+}
 #endif /* OVLB */
 
 /*mon.c*/
