@@ -3135,7 +3135,13 @@ boolean force;
 			You("cannot deal with traps while trapped!");
 			return 1;
 		}
-		switch(ttmp->ttyp) {
+		There("is %s here.", an(defsyms[trap_to_defsym(ttmp->ttyp)].explanation));
+
+		switch (ynq(ttmp->ttyp == WEB ? "Remove it?" : "Disarm it?")) {
+		  case 'q': return(0);
+		  case 'n': trap_skipped = TRUE; break;
+		  case 'y':
+		    switch(ttmp->ttyp) {
 			case BEAR_TRAP:
 			case WEB:
 				return disarm_holdingtrap(ttmp);
@@ -3161,7 +3167,8 @@ boolean force;
 			default:
 				You("cannot disable %s trap.", (u.dx || u.dy) ? "that" : "this");
 				return 0;
-		} /* end switch */
+		    }
+		}
 	} /* end if */
 
 	if(!u.dx && !u.dy) {
