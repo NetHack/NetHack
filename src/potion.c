@@ -871,7 +871,7 @@ peffects(otmp)
 		break;
 	case POT_POLYMORPH:
 		You_feel("a little %s.", Hallucination ? "normal" : "strange");
-		if (!Unchanging) polyself();
+		if (!Unchanging) polyself(FALSE);
 		break;
 	default:
 		impossible("What a funny potion! (%u)", otmp->otyp);
@@ -979,7 +979,7 @@ boolean your_fault;
 		break;
 	case POT_POLYMORPH:
 		You_feel("a little %s.", Hallucination ? "normal" : "strange");
-		if (!Unchanging && !Antimagic) polyself();
+		if (!Unchanging && !Antimagic) polyself(FALSE);
 		break;
 	case POT_ACID:
 		if (!Acid_resistance) {

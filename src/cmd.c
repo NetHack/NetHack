@@ -115,7 +115,9 @@ STATIC_PTR int NDECL(wiz_map);
 STATIC_PTR int NDECL(wiz_genesis);
 STATIC_PTR int NDECL(wiz_where);
 STATIC_PTR int NDECL(wiz_detect);
+STATIC_PTR int NDECL(wiz_polyself);
 STATIC_PTR int NDECL(wiz_level_tele);
+STATIC_PTR int NDECL(wiz_level_gain);
 STATIC_PTR int NDECL(wiz_show_seenv);
 STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
@@ -560,6 +562,36 @@ wiz_mon_polycontrol()
 	iflags.mon_polycontrol = !iflags.mon_polycontrol;
 	pline("Monster polymorph control is %s.", iflags.mon_polycontrol ? "on" : "off");
 	return 0;
+}
+
+STATIC_PTR int
+wiz_level_gain()
+{
+        char buf[BUFSZ];
+        int newlevel;
+
+        if (u.ulevel >= MAXULEV) {
+               You("are already as experienced as you can get.");
+               return 0;
+        }
+        getlin("To what experience level do you want to be raised?", buf);
+        (void) sscanf(buf, "%d", &newlevel);
+        if (newlevel <= 0) {
+               pline(Never_mind);
+        } else if (newlevel <= u.ulevel) {
+               You("are already that experienced.");
+        } else {
+               if (newlevel > MAXULEV) newlevel = MAXULEV;
+               while (u.ulevel < newlevel) pluslvl(FALSE);
+        }
+        return 0;
+}
+
+STATIC_PTR int
+wiz_polyself()
+{
+        polyself(TRUE);
+        return 0;
 }
 
 STATIC_PTR int
@@ -1359,6 +1391,8 @@ struct ext_func_tab extcmdlist[] = {
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
+        {(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 #ifdef DEBUG
 	{(char *)0, (char *)0, donull, TRUE},
@@ -1370,8 +1404,10 @@ struct ext_func_tab extcmdlist[] = {
 
 #if defined(WIZARD)
 static const struct ext_func_tab debug_extcmdlist[] = {
+        {"levelgain", "gain experience levels", wiz_level_gain, TRUE},
 	{"light sources", "show mobile light sources", wiz_light_sources, TRUE},
 	{"monpoly_control", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
+        {"poly", "polymorph self", wiz_polyself, TRUE},
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
 	{"timeout", "look at timeout queue", wiz_timeout_queue, TRUE},

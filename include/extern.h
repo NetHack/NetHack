@@ -1450,7 +1450,7 @@ E void NDECL(self_invis_message);
 
 E void NDECL(set_uasmon);
 E void NDECL(change_sex);
-E void NDECL(polyself);
+E void FDECL(polyself, (BOOLEAN_P));
 E int FDECL(polymon, (int));
 E void NDECL(rehumanize);
 E int NDECL(dobreathe);

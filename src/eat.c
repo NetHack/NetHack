@@ -857,7 +857,7 @@ register int pm;
 	 /* case PM_SANDESTIN: */
 		if (!Unchanging) {
 		    You_feel("a change coming over you.");
-		    polyself();
+		    polyself(FALSE);
 		}
 		break;
 	    case PM_MIND_FLAYER:

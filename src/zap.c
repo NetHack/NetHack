@@ -1913,7 +1913,7 @@ boolean ordinary;
 		    	makeknown(WAN_POLYMORPH);
 		case SPE_POLYMORPH:
 		    if (!Unchanging)
-		    	polyself();
+		    	polyself(FALSE);
 		    break;
 
 		case WAN_CANCELLATION:

@@ -243,7 +243,7 @@ moveloop()
 				    stop_occupation();
 				else
 				    nomul(0);
-				if (change == 1) polyself();
+				if (change == 1) polyself(FALSE);
 				else you_were();
 				change = 0;
 			    }

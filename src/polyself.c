@@ -210,7 +210,8 @@ dead: /* we come directly here if their experience level went to 0 or less */
 }
 
 void
-polyself()
+polyself(forcecontrol)
+boolean forcecontrol;     
 {
 	char buf[BUFSZ];
 	int old_light, new_light;
@@ -222,7 +223,7 @@ polyself()
 	boolean iswere = (u.ulycn >= LOW_PM || is_were(youmonst.data));
 	boolean isvamp = (youmonst.data->mlet == S_VAMPIRE || u.umonnum == PM_VAMPIRE_BAT);
 
-	if(!Polymorph_control && !draconian && !iswere && !isvamp) {
+        if(!Polymorph_control && !forcecontrol && !draconian && !iswere && !isvamp) {
 	    if (rn2(20) > ACURR(A_CON)) {
 		You(shudder_for_moment);
 		losehp(rnd(30), "system shock", KILLED_BY_AN);
@@ -232,7 +233,7 @@ polyself()
 	}
 	old_light = Upolyd ? emits_light(youmonst.data) : 0;
 
-	if (Polymorph_control) {
+	if (Polymorph_control || forcecontrol) {
 		do {
 			getlin("Become what kind of monster? [type the name]",
 				buf);
