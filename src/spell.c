@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.4	2002/07/12	*/
+/*	SCCS Id: @(#)spell.c	3.4	2003/01/17	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,6 +30,7 @@ STATIC_DCL boolean FDECL(dospellmenu, (const char *,int,int *));
 STATIC_DCL int FDECL(percent_success, (int));
 STATIC_DCL int NDECL(throwspell);
 STATIC_DCL void NDECL(cast_protection);
+STATIC_DCL void FDECL(spell_backfire, (int));
 STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
 STATIC_DCL int FDECL(isqrt, (int));
 
@@ -679,6 +680,35 @@ cast_protection()
 	}
 }
 
+/* attempting to cast a forgotten spell will cause disorientation */
+STATIC_OVL void
+spell_backfire(spell)
+int spell;
+{
+    long duration = (long)((spellev(spell) + 1) * 3);	 /* 6..24 */
+
+    /* prior to 3.4.1, the only effect was confusion; it still predominates */
+    switch (rn2(10)) {
+    case 0:
+    case 1:
+    case 2:
+    case 3: make_confused(duration, FALSE);			/* 40% */
+	    break;
+    case 4:
+    case 5:
+    case 6: make_confused(2L * duration / 3L, FALSE);		/* 30% */
+	    make_stunned(duration / 3L, FALSE);
+	    break;
+    case 7:
+    case 8: make_stunned(2L * duration / 3L, FALSE);		/* 20% */
+	    make_confused(duration / 3L, FALSE);
+	    break;
+    case 9: make_stunned(duration, FALSE);			/* 10% */
+	    break;
+    }
+    return;
+}
+
 int
 spelleffects(spell, atme)
 int spell;
@@ -697,7 +727,7 @@ boolean atme;
 	if (spellknow(spell) <= 0) {
 	    Your("knowledge of this spell is twisted.");
 	    pline("It invokes nightmarish images in your mind...");
-	    make_confused((long)spellev(spell) * 3, FALSE);
+	    spell_backfire(spell);
 	    return(0);
 	} else if (spellknow(spell) <= 100) {
 	    You("strain to recall the spell.");
