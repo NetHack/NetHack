@@ -901,7 +901,7 @@ struct monst *mtmp;
 {
 	struct permonst *pm = mtmp->data;
 	int difficulty = monstr[(monsndx(pm))];
-	int try = 0;
+	int trycnt = 0;
 
 	if(is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
 			|| pm->mlet == S_GHOST
@@ -913,7 +913,7 @@ struct monst *mtmp;
 	switch (rn2(8 + (difficulty > 3) + (difficulty > 6) +
 				(difficulty > 8))) {
 		case 6: case 9:
-			if (level.flags.noteleport && ++try < 2)
+			if (level.flags.noteleport && ++trycnt < 2)
 			    goto try_again;
 			if (!rn2(3)) return WAN_TELEPORTATION;
 			/* else FALLTHRU */
