@@ -373,7 +373,7 @@ void rsrc_dlb_cleanup(void) {
 }
 
 boolean rsrc_dlb_fopen(dlb *dp, const char *name, const char *mode) {
-#if defined(applec) || defined(__MWERKS__)
+#if defined(__SC__) || defined(__MRC__)
 # pragma unused(mode)
 #endif
 	Str255 pname;

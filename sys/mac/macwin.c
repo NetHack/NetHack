@@ -200,7 +200,7 @@ Boolean CheckNhWin (WindowPtr mac_win) {
 
 static pascal OSErr
 AppleEventHandler (const AppleEvent* inAppleEvent, AppleEvent* outAEReply, long inRefCon) {
-#if defined(applec) || defined(__MWERKS__)
+#if defined(__SC__) || defined(__MRC__)
 # pragma unused(outAEReply,inRefCon)
 #endif
 	Size     actualSize;
@@ -1164,7 +1164,7 @@ mac_number_pad (int pad) {
 
 void
 trans_num_keys(EventRecord *theEvent) {
-#if defined(applec) || defined(__MWERKS__)
+#if defined(__SC__) || defined(__MRC__)
 # pragma unused(theEvent)
 #endif
 /* KMH -- Removed this translation.
@@ -1196,7 +1196,7 @@ trans_num_keys(EventRecord *theEvent) {
  */
 static void
 GeneralKey (EventRecord *theEvent, WindowPtr theWindow) {
-#if defined(applec) || defined(__MWERKS__)
+#if defined(__SC__) || defined(__MRC__)
 # pragma unused(theWindow)
 #endif
 #if 0
@@ -1833,7 +1833,7 @@ macCursorTerm (EventRecord *theEvent, WindowPtr theWindow, RgnHandle mouseRgn) {
 
 static void
 GeneralCursor (EventRecord *theEvent, WindowPtr theWindow, RgnHandle mouseRgn) {
-#if defined(applec) || defined(__MWERKS__)
+#if defined(__SC__) || defined(__MRC__)
 # pragma unused(theWindow)
 #endif
 	Rect r = {-1, -1, 2, 2};
@@ -2116,7 +2116,7 @@ mac_delay_output(void) {
 #ifdef CLIPPING
 static void
 mac_cliparound (int x, int y) {
-#if defined(applec) || defined(__MWERKS__)
+#if defined(__SC__) || defined(__MRC__)
 # pragma unused(x,y)
 #endif
 	/* TODO */
@@ -2278,7 +2278,7 @@ mac_start_menu (winid win) {
 
 void
 mac_add_menu (winid win, int glyph, const anything *any, CHAR_P menuChar, CHAR_P groupAcc, int attr, const char *inStr, int preselected) {
-#if defined(applec) || defined(__MWERKS__)
+#if defined(__SC__) || defined(__MRC__)
 # pragma unused(glyph)
 #endif
 	NhWindow *aWin = &theWindows [win];
@@ -2462,7 +2462,7 @@ mac_unimplemented (void) {
 
 static void
 mac_suspend_nhwindows (const char *foo) {
-#if defined(applec) || defined(__MWERKS__)
+#if defined(__SC__) || defined(__MRC__)
 # pragma unused(foo)
 #endif
 	/*	Can't really do that :-)		*/

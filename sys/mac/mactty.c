@@ -1021,7 +1021,7 @@ short blink_cursor (WindowPtr window, long when) {
  */
 short
 image_tty (EventRecord *theEvent, WindowPtr window) {
-#if defined(applec) || defined(__MWERKS__)
+#if defined(__SC__) || defined(__MRC__)
 # pragma unused(theEvent)
 #endif
 RECORD_EXISTS (record);
