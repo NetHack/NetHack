@@ -54,6 +54,7 @@ static BOOL FDECL(CtrlHandler, (DWORD));
 
 /* dynamic keystroke handling .DLL support */
 typedef int (__stdcall * PROCESS_KEYSTROKE)(
+    HANDLE,
     INPUT_RECORD *,
     boolean *,
     BOOLEAN_P,
@@ -63,6 +64,16 @@ typedef int (__stdcall * PROCESS_KEYSTROKE)(
 typedef int (__stdcall * NHKBHIT)(
     HANDLE,
     INPUT_RECORD *
+);
+
+typedef int (__stdcall * CHECKINPUT)(
+	HANDLE,
+	INPUT_RECORD *,
+	int *,
+	BOOLEAN_P,
+	int,
+	int *,
+	coord *
 );
 
 typedef int (__stdcall * SOURCEWHERE)(
@@ -81,6 +92,7 @@ typedef int (__stdcall * KEYHANDLERNAME)(
 HANDLE hLibrary;
 PROCESS_KEYSTROKE pProcessKeystroke;
 NHKBHIT pNHkbhit;
+CHECKINPUT pCheckInput;
 SOURCEWHERE pSourceWhere;
 SOURCEAUTHOR pSourceAuthor;
 KEYHANDLERNAME pKeyHandlerName;
@@ -192,6 +204,7 @@ tty_end_screen()
 			csbi.dwSize.X * csbi.dwSize.Y,
 			newcoord, &ccnt);
 	}
+	FlushConsoleInputBuffer(hConIn);
 }
 
 extern boolean getreturn_disable;	/* from sys/share/pcsys.c */
@@ -285,7 +298,7 @@ boolean *valid;
 boolean numberpad;
 int portdebug;
 {
-	int ch = pProcessKeystroke(ir, valid, numberpad, portdebug);
+	int ch = pProcessKeystroke(hConIn, ir, valid, numberpad, portdebug);
 	/* check for override */
 	if (ch && ch < MAX_OVERRIDES && key_overrides[ch])
 		ch = key_overrides[ch];
@@ -323,64 +336,25 @@ get_scr_size()
 int
 tgetch()
 {
+	int mod;
+	coord cc;
 	DWORD count;
-	boolean valid = 0;
-	int ch;
-	valid = 0;
-	while (!valid) {
-	   ReadConsoleInput(hConIn,&ir,1,&count);
-	   if ((ir.EventType == KEY_EVENT) && ir.Event.KeyEvent.bKeyDown)
-		ch = process_keystroke(&ir, &valid, iflags.num_pad, 0);
-	}
-	return ch;
+	return pCheckInput(hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
 }
 
 int
 ntposkey(x, y, mod)
 int *x, *y, *mod;
 {
+	int ch;
+	coord cc;
 	DWORD count;
-	int keystroke = 0;
-	int done = 0;
-	boolean valid = 0;
-	while (!done)
-	{
-	    count = 0;
-	    ReadConsoleInput(hConIn,&ir,1,&count);
-	    if (count > 0) {
-		if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
-			keystroke = process_keystroke(&ir, &valid, iflags.num_pad, 0);
-			if (valid) return keystroke;
-		} else if (ir.EventType == MOUSE_EVENT) {
-			if ((ir.Event.MouseEvent.dwEventFlags == 0) &&
-		   	    (ir.Event.MouseEvent.dwButtonState & MOUSEMASK)) {
-			  	*x = ir.Event.MouseEvent.dwMousePosition.X + 1;
-			  	*y = ir.Event.MouseEvent.dwMousePosition.Y - 1;
-
-			  	if (ir.Event.MouseEvent.dwButtonState & LEFTBUTTON)
-		  	       		*mod = CLICK_1;
-			  	else if (ir.Event.MouseEvent.dwButtonState & RIGHTBUTTON)
-					*mod = CLICK_2;
-#if 0	/* middle button */			       
-				else if (ir.Event.MouseEvent.dwButtonState & MIDBUTTON)
-			      		*mod = CLICK_3;
-#endif 
-			       return 0;
-			}
-	        }
-#if 0
-		/* We ignore these types of console events */
-	        else if (ir.EventType == FOCUS_EVENT) {
-	        }
-	        else if (ir.EventType == MENU_EVENT) {
-	        }
-#endif
-		} else 
-			done = 1;
+	ch = pCheckInput(hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
+	if (!ch) {
+		*x = cc.x;
+		*y = cc.y;
 	}
-	/* NOTREACHED */
-	*mod = 0;
-	return 0;
+	return ch;
 }
 
 void
@@ -869,6 +843,8 @@ load_keyboard_handler()
 		   (PROCESS_KEYSTROKE) GetProcAddress (hLibrary, TEXT ("ProcessKeystroke"));
 		   pNHkbhit =
 		   (NHKBHIT) GetProcAddress (hLibrary, TEXT ("NHkbhit"));
+		   pCheckInput =
+		   (CHECKINPUT) GetProcAddress (hLibrary, TEXT ("CheckInput"));
 		   pSourceWhere =
 		   (SOURCEWHERE) GetProcAddress (hLibrary, TEXT ("SourceWhere"));
 		   pSourceAuthor =
@@ -886,6 +862,8 @@ load_keyboard_handler()
 		if (hLibrary) {
 		   pProcessKeystroke =
 		   (PROCESS_KEYSTROKE) GetProcAddress (hLibrary, TEXT ("ProcessKeystroke"));
+		   pCheckInput =
+		   (CHECKINPUT) GetProcAddress (hLibrary, TEXT ("CheckInput"));
 		   pNHkbhit =
 		   (NHKBHIT) GetProcAddress (hLibrary, TEXT ("NHkbhit"));
 		   pSourceWhere =

@@ -28,6 +28,8 @@ extern INPUT_RECORD ir;
 char dllname[512];
 char *shortdllname;
 
+static INPUT_RECORD bogus_key;
+
 int WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 {
 	char dlltmpname[512];
@@ -39,6 +41,15 @@ int WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 		tmp2++;
 		shortdllname = tmp2;
 	}
+	/* A bogus key that will be filtered when received, to keep ReadConsole
+	 * from blocking */
+	bogus_key.EventType = KEY_EVENT;
+	bogus_key.Event.KeyEvent.bKeyDown = 1;
+	bogus_key.Event.KeyEvent.wRepeatCount = 1;
+	bogus_key.Event.KeyEvent.wVirtualKeyCode = 0;
+	bogus_key.Event.KeyEvent.wVirtualScanCode = 0;
+	bogus_key.Event.KeyEvent.uChar.AsciiChar = (uchar)0x80;
+	bogus_key.Event.KeyEvent.dwControlKeyState = 0;
 	return TRUE;
 }
 
@@ -52,6 +63,7 @@ int WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 
 #define PADKEYS 	(KEYPADHI - KEYPADLO + 1)
 #define iskeypad(x)	(KEYPADLO <= (x) && (x) <= KEYPADHI)
+#define isnumkeypad(x)	(KEYPADLO <= (x) && (x) <= 0x51 && (x) != 0x4A && (x) != 0x4E)
 
 /*
  * Keypad keys are translated to the normal values below.
@@ -93,10 +105,36 @@ static const struct pad {
 
 #define inmap(x,vk)	(((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
 
-static BYTE KeyState[256];
+/* Use process_keystroke for key commands, process_keystroke2 for prompts */
+/* int FDECL(process_keystroke, (INPUT_RECORD *ir, boolean *valid, int portdebug)); */
+int FDECL(process_keystroke2, (HANDLE,INPUT_RECORD *ir, boolean *valid));
+static int FDECL(is_altseq, (unsigned long shiftstate));
+
+static int
+is_altseq(shiftstate)
+unsigned long shiftstate;
+{
+    /* We need to distinguish the Alt keys from the AltGr key.
+     * On NT-based Windows, AltGr signals as right Alt and left Ctrl together;
+     * on 95-based Windows, AltGr signals as right Alt only.
+     * So on NT, we signal Alt if either Alt is pressed and left Ctrl is not,
+     * and on 95, we signal Alt for left Alt only. */
+    switch (shiftstate & (RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED)) {
+	case LEFT_ALT_PRESSED:
+	case LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED:
+	    return 1;
+
+	case RIGHT_ALT_PRESSED:
+	case RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED:
+	    return (GetVersion() & 0x80000000) == 0;
+
+        default:
+            return 0;
+    }
+}
 
 int __declspec(dllexport) __stdcall
-ProcessKeystroke(hConIn,ir, valid, numberpad, portdebug)
+ProcessKeystroke(hConIn, ir, valid, numberpad, portdebug)
 HANDLE hConIn;
 INPUT_RECORD *ir;
 boolean *valid;
@@ -110,6 +148,7 @@ int portdebug;
 	unsigned long shiftstate;
 	int altseq = 0;
 	const struct pad *kpad;
+	DWORD count;
 
 	shiftstate = 0L;
 	ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
@@ -117,12 +156,14 @@ int portdebug;
 	vk    = ir->Event.KeyEvent.wVirtualKeyCode;
 	keycode = MapVirtualKey(vk, 2);
 	shiftstate = ir->Event.KeyEvent.dwControlKeyState;
-	KeyState[VK_SHIFT]   = (shiftstate & SHIFT_PRESSED) ? 0x81 : 0;
-	KeyState[VK_CONTROL] = (shiftstate & (LEFT_CTRL_PRESSED|RIGHT_CTRL_PRESSED)) ?
-				0x81 : 0;
-	KeyState[VK_CAPITAL] = (shiftstate & CAPSLOCK_ON) ? 0x81 : 0;
+	if (scan == 0 && vk == 0) {
+	    /* It's the bogus_key */
+	    ReadConsoleInput(hConIn,ir,1,&count);
+	    *valid = FALSE;
+	    return 0;
+	}
 
-	if (shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)) {
+	if (is_altseq(shiftstate)) {
 		if (ch || inmap(keycode,vk)) altseq = 1;
 		else altseq = -1;	/* invalid altseq */
 	}
@@ -144,6 +185,7 @@ int portdebug;
          *      left control key was pressed with the keystroke.
          */
         if (iskeypad(scan)) {
+	    ReadConsoleInput(hConIn,ir,1,&count);
             kpad = numberpad ? numpad : keypad;
             if (shiftstate & SHIFT_PRESSED) {
                 ch = kpad[scan - KEYPADLO].shift;
@@ -156,41 +198,174 @@ int portdebug;
             }
         }
         else if (altseq > 0) { /* ALT sequence */
+		ReadConsoleInput(hConIn,ir,1,&count);
 		if (vk == 0xBF) ch = M('?');
 		else ch = M(tolower(keycode));
         }
+	else if (ch < 32 && !isnumkeypad(scan)) {
+		/* Control code; ReadConsole seems to filter some of these,
+		 * including ESC */
+		ReadConsoleInput(hConIn,ir,1,&count);
+	}
 	/* Attempt to work better with international keyboards. */
 	else {
-		WORD chr[2];
-		k = ToAscii(vk, scan, KeyState, chr, 0);
-		if (k <= 2)
-		    switch(k) {
-			case 2:  /* two characters */
-				ch = (unsigned char)chr[1];
-				*valid = TRUE;
-				break;
-			case 1:  /* one character */
-				ch = (unsigned char)chr[0];
-				*valid = TRUE;
-				break;
-			case 0:  /* no translation */
-			default: /* negative */
-				*valid = FALSE;
-		    }
+		CHAR ch2;
+		DWORD written;
+		/* The bogus_key guarantees that ReadConsole will return,
+		 * and does not itself do anything */
+		WriteConsoleInput(hConIn, &bogus_key, 1, &written);
+		ReadConsole(hConIn,&ch2,1,&count,NULL);
+		/* Prevent high characters from being interpreted as alt
+		 * sequences; also filter the bogus_key */
+		if (ch2 & 0x80)
+		    *valid = FALSE;
+		else
+		    ch = ch2;
+                if (ch == 0) *valid = FALSE;
 	}
 	if (ch == '\r') ch = '\n';
 #ifdef PORT_DEBUG
 	if (portdebug) {
 		char buf[BUFSZ];
 		Sprintf(buf,
-	"PORTDEBUG (%s): ch=%u, sc=%u, vk=%d, pre=%d, sh=0x%X, ta=%d (ESC to end)",
-			shortdllname, ch, scan, vk, pre_ch, shiftstate, k);
+	"PORTDEBUG: ch=%u, scan=%u, vk=%d, pre=%d, shiftstate=0x%X (ESC to end)\n",
+			ch, scan, vk, pre_ch, shiftstate);
 		fprintf(stdout, "\n%s", buf);
 	}
 #endif
 	return ch;
 }
 
+int process_keystroke2(hConIn, ir, valid)
+HANDLE hConIn;
+INPUT_RECORD *ir;
+boolean *valid;
+{
+	/* Use these values for the numeric keypad */
+	static const char keypad_nums[] = "789-456+1230.";
+
+	unsigned char ch;
+	int vk;
+	unsigned short int scan;
+	unsigned long shiftstate;
+	int altseq;
+	DWORD count;
+
+	ch    = ir->Event.KeyEvent.uChar.AsciiChar;
+	vk    = ir->Event.KeyEvent.wVirtualKeyCode;
+	scan  = ir->Event.KeyEvent.wVirtualScanCode;
+	shiftstate = ir->Event.KeyEvent.dwControlKeyState;
+
+	if (scan == 0 && vk == 0) {
+	    /* It's the bogus_key */
+	    ReadConsoleInput(hConIn,ir,1,&count);
+	    *valid = FALSE;
+	    return 0;
+	}
+
+	altseq = is_altseq(shiftstate);
+	if (ch || (iskeypad(scan)) || altseq)
+		*valid = TRUE;
+	/* if (!valid) return 0; */
+    	/*
+	 * shiftstate can be checked to see if various special
+         * keys were pressed at the same time as the key.
+         * Currently we are using the ALT & SHIFT & CONTROLS.
+         *
+         *           RIGHT_ALT_PRESSED, LEFT_ALT_PRESSED,
+         *           RIGHT_CTRL_PRESSED, LEFT_CTRL_PRESSED,
+         *           SHIFT_PRESSED,NUMLOCK_ON, SCROLLLOCK_ON,
+         *           CAPSLOCK_ON, ENHANCED_KEY
+         *
+         * are all valid bit masks to use on shiftstate.
+         * eg. (shiftstate & LEFT_CTRL_PRESSED) is true if the
+         *      left control key was pressed with the keystroke.
+         */
+        if (iskeypad(scan) && !altseq) {
+	    ReadConsoleInput(hConIn,ir,1,&count);
+            ch = keypad_nums[scan - KEYPADLO];
+        }
+	else if (ch < 32 && !isnumkeypad(scan)) {
+	    	/* Control code; ReadConsole seems to filter some of these,
+		 * including ESC */
+		ReadConsoleInput(hConIn,ir,1,&count);
+	}
+	/* Attempt to work better with international keyboards. */
+	else {
+		CHAR ch2;
+		ReadConsole(hConIn,&ch2,1,&count,NULL);
+		ch = ch2 & 0xFF;
+                if (ch == 0) *valid = FALSE;
+	}
+	if (ch == '\r') ch = '\n';
+	return ch;
+}
+
+int __declspec(dllexport) __stdcall
+CheckInput(hConIn, ir, count, numpad, mode, mod, cc)
+HANDLE hConIn;
+INPUT_RECORD *ir;
+int *count, *mod;
+boolean numpad;
+coord *cc;
+{
+	int ch;
+	boolean valid = 0, done = 0;
+	while (!done) {
+    	   *count = 0;
+	   WaitForSingleObject(hConIn, INFINITE);
+	   PeekConsoleInput(hConIn,ir,1,count);
+	   if (mode == 0) {
+		if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
+			ch = process_keystroke2(hConIn, ir, &valid);
+			done = valid;
+		} else
+			ReadConsoleInput(hConIn,ir,1,count);
+	   } else {
+	   	ch = 0;
+	        if (count > 0) {
+		    if (ir->EventType == KEY_EVENT && ir->Event.KeyEvent.bKeyDown) {
+			ch = ProcessKeystroke(hConIn, ir, &valid, numpad,
+#ifdef PORTDEBUG
+						1);
+#else
+						0);
+#endif
+			if (valid) return ch;
+		    } else {
+			ReadConsoleInput(hConIn,ir,1,count);
+			if (ir->EventType == MOUSE_EVENT) {
+			    if ((ir->Event.MouseEvent.dwEventFlags == 0) &&
+		   	        (ir->Event.MouseEvent.dwButtonState & MOUSEMASK)) {
+			  	cc->x = ir->Event.MouseEvent.dwMousePosition.X + 1;
+			  	cc->y = ir->Event.MouseEvent.dwMousePosition.Y - 1;
+
+			  	if (ir->Event.MouseEvent.dwButtonState & LEFTBUTTON)
+		  	       		*mod = CLICK_1;
+			  	else if (ir->Event.MouseEvent.dwButtonState & RIGHTBUTTON)
+					*mod = CLICK_2;
+#if 0	/* middle button */			       
+				else if (ir->Event.MouseEvent.dwButtonState & MIDBUTTON)
+			      		*mod = CLICK_3;
+#endif 
+			       return 0;
+			    }
+		        }
+#if 0
+			/* We ignore these types of console events */
+		        else if (ir->EventType == FOCUS_EVENT) {
+		        }
+		        else if (ir->EventType == MENU_EVENT) {
+		        }
+#endif
+		    }
+	        } else 
+		    done = 1;
+	   }
+	}
+	*mod = 0;
+	return ch;
+}
 
 int __declspec(dllexport) __stdcall
 NHkbhit(hConIn, ir)
@@ -217,7 +392,7 @@ INPUT_RECORD *ir;
 			shiftstate = ir->Event.KeyEvent.dwControlKeyState;
 			vk = ir->Event.KeyEvent.wVirtualKeyCode;
 			keycode = MapVirtualKey(vk, 2);
-			if (shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)) {
+			if (is_altseq(shiftstate)) {
 				if  (ch || inmap(keycode,vk)) altseq = 1;
 				else altseq = -1;	/* invalid altseq */
 			}
@@ -242,53 +417,6 @@ INPUT_RECORD *ir;
 	return retval;
 }
 
-int __declspec(dllexport) __stdcall
-CheckInput(hConIn, ir, count, numpad, mode, mod, cc)
-HANDLE hConIn;
-INPUT_RECORD *ir;
-int *count; 
-boolean numpad;
-int mode;
-int *mod;
-coord *cc;
-{
-	int ch;
-	boolean valid = 0, done = 0;
-	while (!done) {
-		ReadConsoleInput(hConIn,ir,1,count);
-		if (mode == 0) {
-		    if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
-			ch = ProcessKeystroke(hConIn, ir, &valid, numpad, 0);
-			done = valid;
-		    }
-		} else {
-		    if (count > 0) {
-			if (ir->EventType == KEY_EVENT && ir->Event.KeyEvent.bKeyDown) {
-			    ch = ProcessKeystroke(hConIn, ir, &valid, numpad, 0);
-			    if (valid) return ch;
-			} else if (ir->EventType == MOUSE_EVENT) {
-			    if ((ir->Event.MouseEvent.dwEventFlags == 0) &&
-		   	        (ir->Event.MouseEvent.dwButtonState & MOUSEMASK)) {
-			  	    cc->x = ir->Event.MouseEvent.dwMousePosition.X + 1;
-			  	    cc->y = ir->Event.MouseEvent.dwMousePosition.Y - 1;
-
-				    if (ir->Event.MouseEvent.dwButtonState & LEFTBUTTON)
-		  	       		*mod = CLICK_1;
-				    else if (ir->Event.MouseEvent.dwButtonState & RIGHTBUTTON)
-					*mod = CLICK_2;
-#if 0	/* middle button */
-				    else if (ir->Event.MouseEvent.dwButtonState & MIDBUTTON)
-			      		*mod = CLICK_3;
-#endif 
-			           return 0;
-			    }
-	        	}
-		    } else 
-			done = 1;
-		}
-	}
-	return mode ? 0 : ch;
-}
 
 int __declspec(dllexport) __stdcall
 SourceWhere(buf)

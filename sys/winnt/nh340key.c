@@ -88,7 +88,8 @@ static const struct pad {
 #define inmap(x,vk)	(((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
 
 int __declspec(dllexport) __stdcall
-ProcessKeystroke(ir, valid, numberpad, portdebug)
+ProcessKeystroke(hConIn, ir, valid, numberpad, portdebug)
+HANDLE hConIn;
 INPUT_RECORD *ir;
 boolean *valid;
 boolean numberpad;
@@ -209,6 +210,53 @@ INPUT_RECORD *ir;
 	return retval;
 }
 
+int __declspec(dllexport) __stdcall
+CheckInput(hConIn, ir, count, numpad, mode, mod, cc)
+HANDLE hConIn;
+INPUT_RECORD *ir;
+int *count; 
+boolean numpad;
+int mode;
+int *mod;
+coord *cc;
+{
+	int ch;
+	boolean valid = 0, done = 0;
+	while (!done) {
+		ReadConsoleInput(hConIn,ir,1,count);
+		if (mode == 0) {
+		    if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
+			ch = ProcessKeystroke(hConIn, ir, &valid, numpad, 0);
+			done = valid;
+		    }
+		} else {
+		    if (count > 0) {
+			if (ir->EventType == KEY_EVENT && ir->Event.KeyEvent.bKeyDown) {
+			    ch = ProcessKeystroke(hConIn, ir, &valid, numpad, 0);
+			    if (valid) return ch;
+			} else if (ir->EventType == MOUSE_EVENT) {
+			    if ((ir->Event.MouseEvent.dwEventFlags == 0) &&
+		   	        (ir->Event.MouseEvent.dwButtonState & MOUSEMASK)) {
+			  	    cc->x = ir->Event.MouseEvent.dwMousePosition.X + 1;
+			  	    cc->y = ir->Event.MouseEvent.dwMousePosition.Y - 1;
+
+				    if (ir->Event.MouseEvent.dwButtonState & LEFTBUTTON)
+		  	       		*mod = CLICK_1;
+				    else if (ir->Event.MouseEvent.dwButtonState & RIGHTBUTTON)
+					*mod = CLICK_2;
+#if 0	/* middle button */
+				    else if (ir->Event.MouseEvent.dwButtonState & MIDBUTTON)
+			      		*mod = CLICK_3;
+#endif 
+			           return 0;
+			    }
+	        	}
+		    } else 
+			done = 1;
+		}
+	}
+	return mode ? 0 : ch;
+}
 
 int __declspec(dllexport) __stdcall
 SourceWhere(buf)

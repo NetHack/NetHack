@@ -576,7 +576,7 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 $(GAMEFILE) : $(ALLOBJ) $(NHRES)
 !ELSE
 $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag \
-		$(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll
+		$(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll $(GAMEDIR)\nhraykey.dll
 !ENDIF
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
@@ -596,6 +596,7 @@ $(O)nhdefkey.def:
 	@echo EXPORTS >$@
 	@echo    ProcessKeystroke >>$@
 	@echo    NHkbhit >>$@
+	@echo    CheckInput >>$@
 	@echo    SourceWhere >>$@
 	@echo    SourceAuthor >>$@
 	@echo    KeyHandlerName >>$@
@@ -610,11 +611,27 @@ $(O)nh340key.def:
 	@echo EXPORTS >$@
 	@echo    ProcessKeystroke >>$@
 	@echo    NHkbhit >>$@
+	@echo    CheckInput >>$@
 	@echo    SourceWhere >>$@
 	@echo    SourceAuthor >>$@
 	@echo    KeyHandlerName >>$@
 
 $(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
+	@echo Linking $@
+	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
+		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
+		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
+
+$(O)nhraykey.def:
+	@echo EXPORTS >$@
+	@echo    ProcessKeystroke >>$@
+	@echo    NHkbhit >>$@
+	@echo    CheckInput >>$@
+	@echo    SourceWhere >>$@
+	@echo    SourceAuthor >>$@
+	@echo    KeyHandlerName >>$@
+
+$(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
 	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
