@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monst.h	3.4	1999/01/04	*/
+/*	SCCS Id: @(#)monst.h	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,6 +42,8 @@ struct monst {
 	struct permonst *data;
 	unsigned m_id;
 	short mnum;		/* permanent monster index number */
+	short cham;		/* if shapeshifter, orig mons[] idx goes here */
+#define CHAM_ORDINARY	0	/* not a shapechanger */
 	short movement;		/* movement points (derived from permonst definition and added effects */
 	uchar m_lev;		/* adjusted difficulty level of monster */
 	aligntyp malign;	/* alignment of this monster, relative to the
@@ -67,48 +69,43 @@ struct monst {
 	Bitfield(minvis,1);	/* currently invisible */
 	Bitfield(invis_blkd,1); /* invisibility blocked */
 	Bitfield(perminvis,1);	/* intrinsic minvis value */
-	Bitfield(cham,3);	/* shape-changer */
-/* note: lychanthropes are handled elsewhere */
-#define CHAM_ORDINARY		0	/* not a shapechanger */
-#define CHAM_CHAMELEON		1	/* animal */
-#define CHAM_DOPPELGANGER	2	/* demi-human */
-#define CHAM_SANDESTIN		3	/* demon */
-#define CHAM_MAX_INDX		CHAM_SANDESTIN
+	Bitfield(mcan,1);	/* has been cancelled */
+	Bitfield(mburied,1);	/* has been buried */
 	Bitfield(mundetected,1);	/* not seen in present hiding place */
 				/* implies one of M1_CONCEAL or M1_HIDE,
 				 * but not mimic (that is, snake, spider,
 				 * trapper, piercer, eel)
 				 */
 
-	Bitfield(mcan,1);	/* has been cancelled */
-	Bitfield(mburied,1);	/* has been buried */
 	Bitfield(mspeed,2);	/* current speed */
 	Bitfield(permspeed,2);	/* intrinsic mspeed value */
 	Bitfield(mrevived,1);	/* has been revived from the dead */
 	Bitfield(mavenge,1);	/* did something to deserve retaliation */
-
 	Bitfield(mflee,1);	/* fleeing */
-	Bitfield(mfleetim,7);	/* timeout for mflee */
-
 	Bitfield(mcansee,1);	/* cansee 1, temp.blinded 0, blind 0 */
-	Bitfield(mblinded,7);	/* cansee 0, temp.blinded n, blind 0 */
 
-	Bitfield(mcanmove,1);	/* paralysis, similar to mblinded */
-	Bitfield(mfrozen,7);
-
+	Bitfield(mfleetim,7);	/* timeout for mflee */
 	Bitfield(msleeping,1);	/* asleep until woken */
+
+	Bitfield(mblinded,7);	/* cansee 0, temp.blinded n, blind 0 */
 	Bitfield(mstun,1);	/* stunned (off balance) */
+
+	Bitfield(mfrozen,7);
+	Bitfield(mcanmove,1);	/* paralysis, similar to mblinded */
+
 	Bitfield(mconf,1);	/* confused */
 	Bitfield(mpeaceful,1);	/* does not attack unprovoked */
 	Bitfield(mtrapped,1);	/* trapped in a pit, web or bear trap */
 	Bitfield(mleashed,1);	/* monster is on a leash */
 	Bitfield(isshk,1);	/* is shopkeeper */
 	Bitfield(isminion,1);	/* is a minion */
-
 	Bitfield(isgd,1);	/* is guard */
 	Bitfield(ispriest,1);	/* is a priest */
+
 	Bitfield(iswiz,1);	/* is the Wizard of Yendor */
 	Bitfield(wormno,5);	/* at most 31 worms on any level */
+				/* 2 free bits */
+
 #define MAX_NUM_WORMS	32	/* should be 2^(wormno bitfield size) */
 
 	long mstrategy;		/* for monsters with mflag3: current strategy */

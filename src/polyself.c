@@ -225,13 +225,14 @@ dead: /* we come directly here if their experience level went to 0 or less */
 }
 
 void
-polyself(forcecontrol)
-boolean forcecontrol;     
+polyself(psflags)
+int psflags;     
 {
 	char buf[BUFSZ];
 	int old_light, new_light;
 	int mntmp = NON_PM;
 	int tries=0;
+	boolean forcecontrol = (psflags == 1);
 	boolean draconian = (uarm &&
 				uarm->otyp >= GRAY_DRAGON_SCALE_MAIL &&
 				uarm->otyp <= YELLOW_DRAGON_SCALES);

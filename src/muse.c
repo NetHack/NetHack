@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.4	2002/12/23	*/
+/*	SCCS Id: @(#)muse.c	3.4	2004/06/12	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1588,7 +1588,8 @@ struct monst *mtmp;
 	if(dist2(x, y, mtmp->mux, mtmp->muy) > 36)
 		return FALSE;
 
-	if (!stuck && !immobile && !mtmp->cham && monstr[monsndx(mdat)] < 6) {
+	if (!stuck && !immobile &&
+		(mtmp->cham == CHAM_ORDINARY) && monstr[monsndx(mdat)] < 6) {
 	  boolean ignore_boulders = (verysmall(mdat) ||
 				     throws_rocks(mdat) ||
 				     passes_walls(mdat));
@@ -1658,13 +1659,15 @@ struct monst *mtmp;
 			m.has_misc = MUSE_POT_SPEED;
 		}
 		nomore(MUSE_WAN_POLYMORPH);
-		if(obj->otyp == WAN_POLYMORPH && obj->spe > 0 && !mtmp->cham
+		if(obj->otyp == WAN_POLYMORPH && obj->spe > 0
+				&& (mtmp->cham == CHAM_ORDINARY)
 				&& monstr[monsndx(mdat)] < 6) {
 			m.misc = obj;
 			m.has_misc = MUSE_WAN_POLYMORPH;
 		}
 		nomore(MUSE_POT_POLYMORPH);
-		if(obj->otyp == POT_POLYMORPH && !mtmp->cham
+		if(obj->otyp == POT_POLYMORPH
+				&& (mtmp->cham == CHAM_ORDINARY)
 				&& monstr[monsndx(mdat)] < 6) {
 			m.misc = obj;
 			m.has_misc = MUSE_POT_POLYMORPH;

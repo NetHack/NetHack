@@ -251,7 +251,7 @@ moveloop()
 				    stop_occupation();
 				else
 				    nomul(0);
-				if (change == 1) polyself(FALSE);
+				if (change == 1) polyself(0);
 				else you_were();
 				change = 0;
 			    }

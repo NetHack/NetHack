@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2003/11/26	*/
+/*	SCCS Id: @(#)potion.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -918,7 +918,7 @@ peffects(otmp)
 		break;
 	case POT_POLYMORPH:
 		You_feel("a little %s.", Hallucination ? "normal" : "strange");
-		if (!Unchanging) polyself(FALSE);
+		if (!Unchanging) polyself(0);
 		break;
 	default:
 		impossible("What a funny potion! (%u)", otmp->otyp);
@@ -1055,7 +1055,7 @@ boolean your_fault;
 		break;
 	case POT_POLYMORPH:
 		You_feel("a little %s.", Hallucination ? "normal" : "strange");
-		if (!Unchanging && !Antimagic) polyself(FALSE);
+		if (!Unchanging && !Antimagic) polyself(0);
 		break;
 	case POT_ACID:
 		if (!Acid_resistance) {

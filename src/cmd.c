@@ -636,7 +636,7 @@ wiz_panic()
 STATIC_PTR int
 wiz_polyself()
 {
-        polyself(TRUE);
+        polyself(1);
         return 0;
 }
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2003/11/26	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -467,14 +467,14 @@ mattacku(mtmp)
 	}
 
 /*	Special demon handling code */
-	if(!mtmp->cham && is_demon(mdat) && !range2
+	if((mtmp->cham == CHAM_ORDINARY) && is_demon(mdat) && !range2
 	   && mtmp->data != &mons[PM_BALROG]
 	   && mtmp->data != &mons[PM_SUCCUBUS]
 	   && mtmp->data != &mons[PM_INCUBUS])
 	    if(!mtmp->mcan && !rn2(13))	msummon(mtmp);
 
 /*	Special lycanthrope handling code */
-	if(!mtmp->cham && is_were(mdat) && !range2) {
+	if((mtmp->cham == CHAM_ORDINARY) && is_were(mdat) && !range2) {
 
 	    if(is_human(mdat)) {
 		if(!rn2(5 - (night() * 2)) && !mtmp->mcan) new_were(mtmp);

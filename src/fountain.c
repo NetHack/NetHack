@@ -581,7 +581,7 @@ drinksink()
 		case 10: pline("This water contains toxic wastes!");
 			if (!Unchanging) {
 				You("undergo a freakish metamorphosis!");
-				polyself(FALSE);
+				polyself(0);
 			}
 			break;
 		/* more odd messages --JJB */

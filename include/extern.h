@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.4	2003/03/14	*/
+/*	SCCS Id: @(#)extern.h	3.4	2004/06/12	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1187,6 +1187,7 @@ E void NDECL(restartcham);
 E void FDECL(restore_cham, (struct monst *));
 E boolean FDECL(hideunder, (struct monst*));
 E void FDECL(mon_animal_list, (BOOLEAN_P));
+E int FDECL(select_newcham_form, (struct monst *));
 E int FDECL(newcham, (struct monst *,struct permonst *,BOOLEAN_P,BOOLEAN_P));
 E int FDECL(can_be_hatched, (int));
 E int FDECL(egg_type_from_parent, (int,BOOLEAN_P));
@@ -1580,7 +1581,7 @@ E void NDECL(self_invis_message);
 
 E void NDECL(set_uasmon);
 E void NDECL(change_sex);
-E void FDECL(polyself, (BOOLEAN_P));
+E void FDECL(polyself, (int));
 E int FDECL(polymon, (int));
 E void NDECL(rehumanize);
 E int NDECL(dobreathe);

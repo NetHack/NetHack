@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/12/26	*/
+/*	SCCS Id: @(#)trap.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1100,7 +1100,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		    deltrap(trap);	/* delete trap before polymorph */
 		    newsym(u.ux,u.uy);	/* get rid of trap symbol */
 		    You_feel("a change coming over you.");
-		    polyself(FALSE);
+		    polyself(0);
 		}
 		break;
 	    }

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2003/11/26	*/
+/*	SCCS Id: @(#)zap.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -634,7 +634,7 @@ register struct obj *obj;
 		    mtmp = makemon(&mons[montype], x, y,
 				   NO_MINVENT | MM_NOWAIT);
 		    if (mtmp) {
-			if (mtmp->cham == CHAM_DOPPELGANGER) {
+			if (mtmp->cham == PM_DOPPELGANGER) {
 			    /* change shape to match the corpse */
 			    (void) newcham(mtmp, mptr, FALSE, FALSE);
 			} else if (mtmp->data->mlet == S_ZOMBIE) {
@@ -1983,7 +1983,7 @@ boolean ordinary;
 		    	makeknown(WAN_POLYMORPH);
 		case SPE_POLYMORPH:
 		    if (!Unchanging)
-		    	polyself(FALSE);
+		    	polyself(0);
 		    break;
 
 		case WAN_CANCELLATION:
