@@ -1363,6 +1363,8 @@ E char *FDECL(vtense, (const char *,const char *));
 E char *FDECL(Doname2, (struct obj *));
 E char *FDECL(yname, (struct obj *));
 E char *FDECL(Yname2, (struct obj *));
+E char *FDECL(ysimple_name, (struct obj *));
+E char *FDECL(Ysimple_name2, (struct obj *));
 E char *FDECL(makeplural, (const char *));
 E char *FDECL(makesingular, (const char *));
 E struct obj *FDECL(readobjnam, (char *,struct obj *,BOOLEAN_P));

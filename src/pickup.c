@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2003/04/26	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2003/05/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -538,7 +538,9 @@ menu_pickup:
 
 		if (!all_of_a_type) {
 		    char qbuf[BUFSZ];
-		    Sprintf(qbuf, "Pick up %s?", doname(obj));
+		    Sprintf(qbuf, "Pick up %s?",
+			safe_qbuf(qbuf, sizeof("Pick up ?"), doname(obj),
+					an(simple_typename(obj->otyp)), something));
 		    switch ((obj->quan < 2L) ? ynaq(qbuf) : ynNaq(qbuf)) {
 		    case 'q': goto end_query;	/* out 2 levels */
 		    case 'n': continue;
@@ -1476,7 +1478,10 @@ lootcont:
 	    nobj = cobj->nexthere;
 
 	    if (Is_container(cobj)) {
-		Sprintf(qbuf, "There is %s here, loot it?", doname(cobj));
+		Sprintf(qbuf, "There is %s here, loot it?",
+			safe_qbuf(qbuf, sizeof("There is  here, loot it?"),
+			     doname(cobj), an(simple_typename(cobj->otyp)),
+			     "a container"));
 		c = ynq(qbuf);
 		if (c == 'q') return (timepassed);
 		if (c == 'n') continue;
@@ -2056,8 +2061,9 @@ register int held;
 	if (!cnt)
 	    Sprintf(emptymsg, "%s is empty.", Yname2(obj));
 	if (cnt || flags.menu_style == MENU_FULL) {
-	    Sprintf(qbuf, "Do you want to take %s out of %s?",
-		    something, yname(obj));
+	    Strcpy(qbuf, "Do you want to take something out of ");
+	    Sprintf(eos(qbuf), "%s?",
+		    safe_qbuf(qbuf, 1, yname(obj), ysimple_name(obj), "it"));
 	    if (flags.menu_style != MENU_TRADITIONAL) {
 		if (flags.menu_style == MENU_FULL) {
 		    int t;

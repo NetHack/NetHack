@@ -1171,6 +1171,32 @@ struct obj *obj;
 	return s;
 }
 
+/* returns "your simple_typename(obj->otyp)"
+ * or "Foobar's simple_typename(obj->otyp)"
+ * or "the simple_typename(obj-otyp)"
+ */
+char *
+ysimple_name(obj)
+struct obj *obj;
+{
+	char *outbuf = nextobuf();
+	char *s = shk_your(outbuf, obj);	/* assert( s == outbuf ); */
+	int space_left = BUFSZ - strlen(s) - sizeof " ";
+
+	return strncat(strcat(s, " "), simple_typename(obj->otyp), space_left);
+}
+
+/* capitalized variant of ysimple_name() */
+char *
+Ysimple_name2(obj)
+struct obj *obj;
+{
+	char *s = ysimple_name(obj);
+
+	*s = highc(*s);
+	return s;
+}
+
 static const char *wrp[] = {
 	"wand", "ring", "potion", "scroll", "gem", "amulet",
 	"spellbook", "spell book",
