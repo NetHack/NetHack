@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.4	2002/07/25	*/
+/*	SCCS Id: @(#)dokick.c	3.4	2002/09/18	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -406,6 +406,37 @@ xchar x, y;
 				    costly_spot(x, y));
 	insider = (*u.ushops && inside_shop(u.ux, u.uy) &&
 				    *in_rooms(x, y, SHOPBASE) == *u.ushops);
+	isgold = (kickobj->oclass == COIN_CLASS);
+
+	if (IS_ROCK(levl[x][y].typ) || closed_door(x, y)) {
+	    if ((!martial() && rn2(20) > ACURR(A_DEX)) ||
+		    IS_ROCK(levl[u.ux][u.uy].typ) || closed_door(u.ux, u.uy)) {
+		if (Blind)
+		    pline("It doesn't come loose.");
+		else
+		    pline("%s %sn't come loose.",
+			  The(distant_name(kickobj, xname)),
+			  otense(kickobj, "do"));
+		return (!rn2(3) || martial());
+	    }
+	    if (Blind)
+		pline("It comes loose.");
+	    else
+		pline("%s %s loose.",
+		      The(distant_name(kickobj, xname)),
+		      otense(kickobj, "come"));
+	    obj_extract_self(kickobj);
+	    newsym(x, y);
+	    if (costly && (!costly_spot(u.ux, u.uy) ||
+		    !index(u.urooms, *in_rooms(x, y, SHOPBASE))))
+		addtobill(kickobj, FALSE, FALSE, FALSE);
+	    if (!flooreffects(kickobj, u.ux, u.uy, "fall")) {
+		place_object(kickobj, u.ux, u.uy);
+		stackobj(kickobj);
+		newsym(u.ux, u.uy);
+	    }
+	    return 1;
+	}
 
 	/* a box gets a chance of breaking open here */
 	if(Is_box(kickobj)) {
@@ -477,35 +508,6 @@ xchar x, y;
 
 	/* fragile objects should not be kicked */
 	if (hero_breaks(kickobj, kickobj->ox, kickobj->oy, FALSE)) return 1;
-
-	if (IS_ROCK(levl[x][y].typ) || closed_door(x, y)) {
-		if ((!martial() && rn2(20) > ACURR(A_DEX))
-				 || IS_ROCK(levl[u.ux][u.uy].typ)
-				 || closed_door(u.ux, u.uy)) {
-			if (Blind) pline("It doesn't come loose.");
-			else pline("%s %sn't come loose.",
-				The(distant_name(kickobj, xname)),
-				otense(kickobj, "do"));
-			return(!rn2(3) || martial());
-		}
-		if (Blind) pline("It comes loose.");
-		else pline("%s %s loose.",
-			   The(distant_name(kickobj, xname)),
-			   otense(kickobj, "come"));
-		obj_extract_self(kickobj);
-		newsym(x, y);
-		if (costly && (!costly_spot(u.ux, u.uy)
-			       || !index(u.urooms, *in_rooms(x, y, SHOPBASE))))
-			addtobill(kickobj, FALSE, FALSE, FALSE);
-		if(!flooreffects(kickobj,u.ux,u.uy,"fall")) {
-		    place_object(kickobj, u.ux, u.uy);
-		    stackobj(kickobj);
-		    newsym(u.ux, u.uy);
-		}
-		return(1);
-	}
-
-	isgold = (kickobj->oclass == COIN_CLASS);
 
 	/* too heavy to move.  range is calculated as potential distance from
 	 * player, so range == 2 means the object may move up to one square
