@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)teleport.c	3.4	2003/08/11	*/
+/*	SCCS Id: @(#)teleport.c	3.4	2003/12/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -239,7 +239,7 @@ boolean allow_drag;
 	}
 	ball_active = (Punished && uball->where != OBJ_FREE),
 		ball_still_in_range = FALSE;
-	
+
 	/* If they have to move the ball, then drag if allow_drag is true;
 	 * otherwise they are teleporting, so unplacebc().  
 	 * If they don't have to move the ball, then always "drag" whether or
@@ -614,29 +614,28 @@ level_tele()
 		if (wizard && !strcmp(buf,"?")) {
 		    schar destlev = 0;
 		    xchar destdnum = 0;
-		    if ((newlev = (int)print_dungeon(TRUE, &destlev, &destdnum))) {
-			char buf[BUFSZ];
-			newlevel.dnum = destdnum;
-			newlevel.dlevel = destlev;
-			if (In_endgame(&newlevel) && !In_endgame(&u.uz)) {
-				Sprintf(buf,
-				    "Destination is earth level");
-				if (!u.uhave.amulet) {
-					struct obj *obj;
-					obj = mksobj(AMULET_OF_YENDOR,
-							TRUE, FALSE);
-					if (obj) {
-						obj = addinv(obj);
-						Strcat(buf, " with the amulet");
-					}
-				}
-				assign_level(&newlevel, &earth_level);
-				pline("%s.", buf);
+
+		    newlev = (int)print_dungeon(TRUE, &destlev, &destdnum);
+		    if (!newlev) return;
+
+		    newlevel.dnum = destdnum;
+		    newlevel.dlevel = destlev;
+		    if (In_endgame(&newlevel) && !In_endgame(&u.uz)) {
+			Sprintf(buf, "Destination is earth level");
+			if (!u.uhave.amulet) {
+			    struct obj *obj = mksobj(AMULET_OF_YENDOR,
+						     TRUE, FALSE);
+			    if (obj) {
+				obj = addinv(obj);
+				Strcat(buf, " with the amulet");
+			    }
 			}
-			force_dest = TRUE;
-		    } else return;
+			assign_level(&newlevel, &earth_level);
+			pline("%s.", buf);
+		    }
+		    force_dest = TRUE;
 		} else
-#endif
+#endif /*WIZARD*/
 		if ((newlev = lev_by_name(buf)) == 0) newlev = atoi(buf);
 	    } while (!newlev && !digit(buf[0]) &&
 		     (buf[0] != '-' || !digit(buf[1])) &&
@@ -658,7 +657,7 @@ level_tele()
 		done(DIED);
 		pline("An energized cloud of dust begins to coalesce.");
 		Your("body rematerializes%s.", invent ?
-			", and you gather up all your possessions" : "");			
+			", and you gather up all your possessions" : "");
 		return;
 	    }
 

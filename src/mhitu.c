@@ -492,7 +492,8 @@ mattacku(mtmp)
 				You_feel("hemmed in.");
 			} else pline("But none comes.");
 		} else {
-			char *from_nowhere;
+			const char *from_nowhere;
+
 			if (!Deaf) {
 				pline("%s %s!", Something,
 					makeplural(growl_sound(mtmp)));
