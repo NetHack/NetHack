@@ -1426,7 +1426,8 @@ register struct obj *obj;
 	    can->blessed = obj->blessed;
 	    can->owt = weight(can);
 	    can->known = 1;
-	    can->spe = -1;  /* Mark tinned tins. No spinach allowed... */
+	    /* Mark tinned tins. No spinach allowed... */
+	    set_tin_variety(can, HOMEMADE_TIN);
 	    if (carried(corpse)) {
 		if (corpse->unpaid)
 		    verbalize(you_buy_it);
