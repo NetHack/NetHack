@@ -1486,8 +1486,8 @@ struct ext_func_tab extcmdlist[] = {
 #if defined(WIZARD)
 static const struct ext_func_tab debug_extcmdlist[] = {
 	{"levelchange", "change experience level", wiz_level_change, TRUE},
-	{"light sources", "show mobile light sources", wiz_light_sources, TRUE},
-	{"monpoly_control", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
+	{"lightsources", "show mobile light sources", wiz_light_sources, TRUE},
+	{"monpolycontrol", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
 	{"panic", "test panic routine (fatal to game)", wiz_panic, TRUE},
 	{"poly", "polymorph self", wiz_polyself, TRUE},
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
