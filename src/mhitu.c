@@ -316,7 +316,11 @@ mattacku(mtmp)
 		/* Might be attacking your image around the corner, or
 		 * invisible, or you might be blind....
 		 */
-
+	boolean mimickobj = (youmonst.m_ap_type == M_AP_OBJECT && 
+				(youmonst.mappearance > STRANGE_OBJECT &&
+				 youmonst.mappearance < NUM_OBJECTS));
+		/* you are mimicking an object */
+	
 	if(!ranged) nomul(0);
 	if(mtmp->mhp <= 0 || (Underwater && !is_swimmer(mtmp->data)))
 	    return(0);
@@ -438,15 +442,15 @@ mattacku(mtmp)
 		return(0);
 	}
 
-	/* player might be mimicking gold */
-	if (youmonst.m_ap_type == M_AP_OBJECT
-		&& youmonst.mappearance == GOLD_PIECE
-		&& !range2 && foundyou && !u.uswallow) {
+	/* player might be mimicking an object */
+	if (mimickobj && !range2 && foundyou && !u.uswallow) {
 	    if (!youseeit)
-		 pline("%s %s!", Something, likes_gold(mtmp->data) ?
+		 pline("%s %s!", Something,
+			(likes_gold(mtmp->data) && youmonst.mappearance == GOLD_PIECE) ?
 			"tries to pick you up" : "disturbs you");
-	    else pline("Wait, %s!  That gold is really %s named %s!",
+	    else pline("Wait, %s!  That %s is really %s named %s!",
 			m_monnam(mtmp),
+			mimic_obj_name(&youmonst),
 			an(mons[u.umonnum].mname),
 			plname);
 	    if (multi < 0) {	/* this should always be the case */
@@ -454,7 +458,7 @@ mattacku(mtmp)
 		Sprintf(buf, "You appear to be %s again.",
 			Upolyd ? (const char *) an(youmonst.data->mname) :
 			    (const char *) "yourself");
-		unmul(buf);	/* immediately stop mimicking gold */
+		unmul(buf);	/* immediately stop mimicking */
 	    }
 	    return 0;
 	}

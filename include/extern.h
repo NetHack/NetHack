@@ -1359,6 +1359,7 @@ E char *FDECL(makesingular, (const char *));
 E struct obj *FDECL(readobjnam, (char *,struct obj *,BOOLEAN_P));
 E int FDECL(rnd_class, (int,int));
 E const char *FDECL(cloak_simple_name, (struct obj *));
+E const char *FDECL(mimic_obj_name, (struct monst *));
 
 /* ### options.c ### */
 

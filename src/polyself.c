@@ -33,8 +33,9 @@ polyman(fmt, arg)
 const char *fmt, *arg;
 {
 	boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
-		was_mimicking_gold = (youmonst.m_ap_type == M_AP_OBJECT
-				      && youmonst.mappearance == GOLD_PIECE);
+		was_mimicking = (youmonst.m_ap_type == M_AP_OBJECT &&
+		 		(youmonst.mappearance > STRANGE_OBJECT &&
+				 youmonst.mappearance < NUM_OBJECTS));
 	boolean was_blind = !!Blind;
 
 	if (Upolyd) {
@@ -52,7 +53,7 @@ const char *fmt, *arg;
 
 	if (sticky) uunstick();
 	find_ac();
-	if (was_mimicking_gold) {
+	if (was_mimicking) {
 	    if (multi < 0) unmul("");
 	} else {
 	    /*
@@ -331,6 +332,9 @@ int	mntmp;
 {
 	boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
 		was_blind = !!Blind, dochange = FALSE;
+	boolean was_mimicking = (youmonst.m_ap_type == M_AP_OBJECT &&
+		 		(youmonst.mappearance > STRANGE_OBJECT &&
+				 youmonst.mappearance < NUM_OBJECTS));
 	int mlvl;
 
 	if (mvitals[mntmp].mvflags & G_GENOD) {	/* allow G_EXTINCT */
@@ -356,9 +360,8 @@ int	mntmp;
 		flags.female = u.mfemale;
 	}
 
-	if (youmonst.m_ap_type == M_AP_OBJECT &&
-		youmonst.mappearance == GOLD_PIECE) {
-	    /* stop mimicking gold immediately */
+	if (was_mimicking) {
+	    /* stop mimicking immediately */
 	    if (multi < 0) unmul("");
 	} else if (mons[mntmp].mlet != S_MIMIC) {
 	    /* as in polyman() */
