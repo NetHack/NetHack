@@ -761,10 +761,7 @@ racial_exception(mon, obj)
 struct monst *mon;
 struct obj *obj;
 {
-    struct permonst *ptr;
-
-    if (mon == &youmonst && !Upolyd) ptr = &mons[urace.malenum];
-    else ptr = mon->data;
+    const struct permonst *ptr = raceptr(mon);
 
     /* Acceptable Exceptions: */
     /* Allow hobbits to wear elven armor - LoTR */
