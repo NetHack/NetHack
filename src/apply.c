@@ -2362,7 +2362,9 @@ use_pole (obj)
 	} else if (distu(cc.x, cc.y) < min_range) {
 	    pline("Too close!");
 	    return (res);
-	} else if (!cansee(cc.x, cc.y)) {
+	} else if (!cansee(cc.x, cc.y) &&
+		   ((mtmp = m_at(cc.x, cc.y)) == (struct monst *)0 ||
+		    !canseemon(mtmp))) {
 	    You(cant_see_spot);
 	    return (res);
 	}
