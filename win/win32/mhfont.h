@@ -8,7 +8,6 @@
 
 #include "winMS.h"
 
-HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc);
-void mswin_destroy_font( HGDIOBJ fnt );
+HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace);
 
 #endif /* MSWINFont_h */

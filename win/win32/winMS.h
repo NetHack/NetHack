@@ -28,6 +28,11 @@
 /* tile background color */
 #define TILE_BK_COLOR RGB(71, 108, 108)
 
+/* minimum/maximum font size (in points - 1/72 inch) */
+#define NHFONT_DEFAULT_SIZE 9
+#define NHFONT_SIZE_MIN 3
+#define NHFONT_SIZE_MAX 20
+
 typedef struct mswin_nhwindow_data {
   HWND	      win;
   int		  type;
@@ -44,16 +49,15 @@ typedef struct mswin_nhwindow_app {
 
 	HBITMAP		bmpTiles;
 	HBITMAP		bmpPetMark;
+	HBITMAP		bmpMapTiles; /* custom tiles bitmap */
+	int			mapTile_X;	/* tile width */
+	int			mapTile_Y;	/* tile height */
+	int			mapTilesPerLine;	/* number of tile per row in the bitmap */
 
 	boolean		bNoHScroll;	/* disable cliparound for horizontal grid (map) */
 	boolean		bNoVScroll; /* disable cliparound for vertical grid (map) */
 
-	int			mapDisplayMode;		/* regular map display mode */
 	int			mapDisplayModeSave;	/* saved map display mode */
-	int			mapCliparoundMargin;	/* when to scroll display */
-
-	int			winStatusAlign;		/* alignment of the status window */
-	int			winMessageAlign;	/* alignment of the status window */
 
 	char*		saved_text;
 } NHWinApp, *PNHWinApp;

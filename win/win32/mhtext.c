@@ -92,7 +92,7 @@ BOOL CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		}
 
 		hdc = GetDC(control);
-		SendMessage(control, WM_SETFONT, (WPARAM)mswin_create_font(NHW_TEXT, ATR_NONE, hdc), 0);
+		SendMessage(control, WM_SETFONT, (WPARAM)mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE), 0);
 		ReleaseDC(control, hdc);
 
 		/* subclass edit control */

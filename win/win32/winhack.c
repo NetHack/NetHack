@@ -31,6 +31,7 @@ BOOL				InitInstance(HINSTANCE, int);
 
 extern void FDECL(pcmain, (int,char **));
 static void __cdecl mswin_moveloop(void *);
+static BOOL initMapTiles(void);
 
 #define MAX_CMDLINE_PARAM 255
 
@@ -56,13 +57,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	if( _nethack_app.bmpTiles==NULL ) panic("cannot load tiles bitmap");
 	_nethack_app.bmpPetMark = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PETMARK));
 	if( _nethack_app.bmpPetMark==NULL ) panic("cannot load pet mark bitmap");
+	_nethack_app.bmpMapTiles = _nethack_app.bmpTiles;
+	_nethack_app.mapTile_X = TILE_X;
+	_nethack_app.mapTile_Y = TILE_Y;
+	_nethack_app.mapTilesPerLine = TILES_PER_LINE;
+
 	_nethack_app.bNoHScroll = FALSE;
 	_nethack_app.bNoVScroll = FALSE;
-	_nethack_app.mapDisplayMode = NHMAP_VIEW_TILES;
-	_nethack_app.winStatusAlign = NHWND_ALIGN_BOTTOM;
-	_nethack_app.winMessageAlign = NHWND_ALIGN_TOP;
-	_nethack_app.mapCliparoundMargin = DEF_CLIPAROUND_MARGIN;
-	_nethack_app.saved_text = strdup(TEXT(""));
+	_nethack_app.saved_text = strdup("");
 
 	// init controls
 	ZeroMemory(&InitCtrls, sizeof(InitCtrls));
@@ -91,6 +93,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	argv[0] = _strdup(NH_W2A(wbuf, buf, BUFSZ));
 
 	pcmain(argc,argv);
+
+	/* initialize map tiles bitmap */
+	initMapTiles();
 
 	moveloop();
 
@@ -131,70 +136,66 @@ PNHWinApp GetNHApp()
 	return &_nethack_app;
 }
 
-/* options */
-struct t_win32_opt_int {
-	const char* val;
-	int   opt;
-};
-static struct t_win32_opt_int _win32_map_mode[] = 
+BOOL initMapTiles(void)
 {
-	{ "tiles", NHMAP_VIEW_TILES				},
-	{ "ascii4x6", NHMAP_VIEW_ASCII4x6		},	
-	{ "ascii6x8", NHMAP_VIEW_ASCII6x8		},	
-	{ "ascii8x8", NHMAP_VIEW_ASCII8x8		},	
-	{ "ascii16x8", NHMAP_VIEW_ASCII16x8		},
-	{ "ascii7x12", NHMAP_VIEW_ASCII7x12		},
-	{ "ascii8x12", NHMAP_VIEW_ASCII8x12		},
-	{ "ascii16x12", NHMAP_VIEW_ASCII16x12	},	
-	{ "ascii12x16", NHMAP_VIEW_ASCII12x16	},	
-	{ "ascii10x18", NHMAP_VIEW_ASCII10x18	},	
-	{ "fit_to_screen", NHMAP_VIEW_FIT_TO_SCREEN	},
-	{ NULL, -1 }
-};
+	HBITMAP hBmp;
+	BITMAP  bm;
+	TCHAR   wbuf[MAX_PATH];
+	int     tl_num;
+	SIZE    map_size;
+	extern int total_tiles_used;
 
-static struct t_win32_opt_int _win32_align[] = 
-{
-	{ "left", NHWND_ALIGN_LEFT },
-	{ "right", NHWND_ALIGN_RIGHT },
-	{ "top", NHWND_ALIGN_TOP },
-	{ "bottom", NHWND_ALIGN_BOTTOM },
-	{ NULL, -1 }
-};
+	/* no file - no tile */
+	if( !(iflags.wc_tile_file && *iflags.wc_tile_file) ) 
+		return TRUE;
 
-int set_win32_option( const char * name, const char * val)
-{
-	struct t_win32_opt_int* p;
-	if( _stricmp(name, "win32_map_mode")==0 ) {
-		for( p=_win32_map_mode; p->val; p++ ) {
-			if( _stricmp(p->val, val)==0 ){
-				GetNHApp()->mapDisplayMode = p->opt;
-				return 1;
-			}
-		}
-		return 0;
-	} else if( _stricmp(name, "win32_align_status")==0 ) {
-		for( p=_win32_align; p->val; p++ ) {
-			if( _stricmp(p->val, val)==0 ) {
-				GetNHApp()->winStatusAlign = p->opt;
-				return 1;
-			}
-		}
-		return 0;
-	} else if( _stricmp(name, "win32_align_message")==0 ) {
-		for( p=_win32_align; p->val; p++ ) {
-			if( _stricmp(p->val, val)==0 ) {
-				GetNHApp()->winMessageAlign = p->opt;
-				return 1;
-			}
-		}
-		return 0;
-	} else if( _stricmp(name, "win32_map_cliparound_margin")==0 ) {
-		int tmp = atoi(val);
-		/* Alex, this range should be revisited and groundtruthed */
-		if( tmp >= DEF_CLIPAROUND_MARGIN && tmp < COLNO/2) {
-			GetNHApp()->mapCliparoundMargin = tmp;
-			return 1;
-		}
+	/* load bitmap */
+	hBmp = LoadImage(
+				GetNHApp()->hApp, 
+				NH_A2W(iflags.wc_tile_file, wbuf, MAX_PATH),
+				IMAGE_BITMAP,
+				0,
+				0,
+				LR_LOADFROMFILE | LR_DEFAULTSIZE 
+			);
+	if( hBmp==NULL ) {
+		raw_print("Cannot load tiles from the file. Reverting back to default.");
+		return FALSE;
 	}
-	return 0;
+
+	/* calculate tile dimensions */
+	GetObject(hBmp, sizeof(BITMAP), (LPVOID)&bm);
+	if( bm.bmWidth%iflags.wc_tile_width ||
+		bm.bmHeight%iflags.wc_tile_height ) {
+		DeleteObject(hBmp);
+		raw_print("Tiles bitmap does not match tile_width and tile_height options. Reverting back to default.");
+		return FALSE;
+	}
+
+	tl_num = (bm.bmWidth/iflags.wc_tile_width)*
+		     (bm.bmHeight/iflags.wc_tile_height);
+	if( tl_num<total_tiles_used ) {
+		DeleteObject(hBmp);
+		raw_print("Number of tiles in the bitmap is less than required by the game. Reverting back to default.");
+		return FALSE;
+	}
+
+	/* set the tile information */
+	if( GetNHApp()->bmpMapTiles!=GetNHApp()->bmpTiles ) {
+		DeleteObject(GetNHApp()->bmpMapTiles);
+	}
+
+	GetNHApp()->bmpMapTiles = hBmp;
+	GetNHApp()->mapTile_X = iflags.wc_tile_width;
+	GetNHApp()->mapTile_Y = iflags.wc_tile_height;
+	GetNHApp()->mapTilesPerLine = bm.bmWidth / iflags.wc_tile_width;
+
+	map_size.cx = GetNHApp()->mapTile_X * COLNO;
+	map_size.cy = GetNHApp()->mapTile_Y * ROWNO;
+	mswin_map_stretch(
+		mswin_hwnd_from_winid(WIN_MAP),
+		&map_size,
+		TRUE 
+	);
+	return TRUE;
 }

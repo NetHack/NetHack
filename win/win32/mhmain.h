@@ -8,11 +8,6 @@
 
 #include "winMS.h"
 
-#define NHWND_ALIGN_LEFT	0 
-#define NHWND_ALIGN_RIGHT   1
-#define NHWND_ALIGN_TOP     2
-#define NHWND_ALIGN_BOTTOM  3
-
 HWND mswin_init_main_window (void);
 void mswin_layout_main_window(HWND changed_child);
 

@@ -61,7 +61,8 @@ HWND mswin_init_message_window () {
 	style = WS_CHILD | WS_CLIPSIBLINGS | WS_VSCROLL	| WS_HSCROLL;
 #endif
 
-	ret = CreateWindow(                                            
+	ret = CreateWindowEx(
+			WS_EX_CLIENTEDGE,
 			szMessageWindowClass,	/* registered class name */
 			NULL,					/* window name */			
 			style, /* window style */
@@ -422,7 +423,6 @@ void onPaint(HWND hWnd)
 				x = data->xChar * (4 - data->xPos); 
 			}
 
-
 			if( strlen(data->window_text[i].text)>0 ) {
 				/* convert to UNICODE */
 				NH_A2W(data->window_text[i].text, wbuf, sizeof(wbuf));
@@ -434,7 +434,7 @@ void onPaint(HWND hWnd)
 				draw_rt.top = y - data->yChar;
 				draw_rt.bottom = y;
 
-				oldFont = SelectObject(hdc, mswin_create_font(NHW_MESSAGE, data->window_text[i].attr, hdc));
+				oldFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, data->window_text[i].attr, hdc, FALSE));
 
 #ifdef MSG_WRAP_TEXT				
 				DrawText(hdc, wbuf, wlen, &draw_rt, DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
@@ -444,7 +444,7 @@ void onPaint(HWND hWnd)
 #else
 				DrawText(hdc, wbuf, wlen, &draw_rt, DT_NOPREFIX );
 #endif
-				mswin_destroy_font(SelectObject(hdc, oldFont));
+				SelectObject(hdc, oldFont);
 
 				y -= draw_rt.bottom - draw_rt.top;
 			} else {
@@ -487,7 +487,7 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     /* Get the handle to the client area's device context. */
     hdc = prepareDC( GetDC(hWnd) ); 
-	saveFont = SelectObject(hdc, mswin_create_font(NHW_MESSAGE, ATR_NONE, hdc));
+	saveFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, FALSE));
 
     /* Extract font dimensions from the text metrics. */
     GetTextMetrics (hdc, &tm); 
@@ -497,7 +497,7 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	data->xPage = 1;
 
     /* Free the device context.  */
-	mswin_destroy_font(SelectObject(hdc, saveFont));
+	SelectObject(hdc, saveFont);
     ReleaseDC (hWnd, hdc); 
 }
 

@@ -34,7 +34,10 @@ static void mswin_main_loop(void);
 struct window_procs mswin_procs = {
     "MSWIN",
     WC_COLOR|WC_HILITE_PET|WC_ALIGN_MESSAGE|WC_ALIGN_STATUS|
-	WC_INVERSE|WC_SCROLL_MARGIN|WC_MAP_MODE,
+	WC_INVERSE|WC_SCROLL_MARGIN|WC_MAP_MODE|
+	WC_FONT_MESSAGE|WC_FONT_STATUS|WC_FONT_MENU|WC_FONT_TEXT|
+	WC_FONTSIZ_MESSAGE|WC_FONTSIZ_STATUS|WC_FONTSIZ_MENU|WC_FONTSIZ_TEXT|
+	WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE,
     mswin_init_nhwindows,
     mswin_player_selection,
     mswin_askname,
@@ -268,7 +271,7 @@ void mswin_clear_nhwindow(winid wid)
     if( Is_rogue_level(&u.uz) ) 
 		mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
 	else 
-		mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), GetNHApp()->mapDisplayMode);
+		mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), iflags.wc_map_mode);
 #endif
 }
 
@@ -869,7 +872,7 @@ char mswin_yn_function(const char *question, const char *choices,
              ((def == 'y') ? MB_DEFBUTTON1 :
               (def == 'n') ? MB_DEFBUTTON2 : MB_DEFBUTTON3));
         free(text);
-		GetNHApp()->saved_text = strdup(TEXT(""));
+		GetNHApp()->saved_text = strdup("");
         return box_result == IDYES ? 'y' : box_result == IDNO ? 'n' : '\033';
     }
 

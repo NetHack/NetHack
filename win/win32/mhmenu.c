@@ -223,6 +223,8 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMenuWindow data;
+	HWND control;
+	HDC  hdc;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch (message) 
@@ -239,9 +241,15 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		data->bmpNotChecked = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_UNSEL));
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 
+		/* set font for the text cotrol */
+		control = GetDlgItem(hWnd, IDC_MENU_TEXT);
+		hdc = GetDC(control);
+		SendMessage(control, WM_SETFONT, (WPARAM)mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE), (LPARAM)0);
+		ReleaseDC(control, hdc);
+
 		/* subclass edit control */
-		editControlWndProc = (WNDPROC)GetWindowLong(GetDlgItem(hWnd, IDC_MENU_TEXT), GWL_WNDPROC);
-		SetWindowLong(GetDlgItem(hWnd, IDC_MENU_TEXT), GWL_WNDPROC, (LONG)NHMenuTextWndProc);
+		editControlWndProc = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
+		SetWindowLong(control, GWL_WNDPROC, (LONG)NHMenuTextWndProc);
 	break;
 
 	case WM_MSNH_COMMAND:
@@ -667,14 +675,14 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	GetClientRect(GetMenuControl(hWnd), &list_rect);
 
 	hdc = GetDC(GetMenuControl(hWnd));
-	saveFont = SelectObject(hdc, mswin_create_font(NHW_MENU, ATR_INVERSE, hdc));
+	saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_INVERSE, hdc, FALSE));
 	GetTextMetrics(hdc, &tm);
 
     /* Set the height of the list box items. */
     lpmis->itemHeight = max(tm.tmHeight, TILE_Y)+2;
 	lpmis->itemWidth = list_rect.right - list_rect.left;
 
-	mswin_destroy_font(SelectObject(hdc, saveFont));
+	SelectObject(hdc, saveFont);
 	ReleaseDC(GetMenuControl(hWnd), hdc);
 	return TRUE;
 }
@@ -703,7 +711,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     item = &data->menu.items[lpdis->itemID];
 
 	tileDC = CreateCompatibleDC(lpdis->hDC);
-	saveFont = SelectObject(lpdis->hDC, mswin_create_font(NHW_MENU, item->attr, lpdis->hDC));
+	saveFont = SelectObject(lpdis->hDC, mswin_get_font(NHW_MENU, item->attr, lpdis->hDC, FALSE));
     GetTextMetrics(lpdis->hDC, &tm);
 
 	x = lpdis->rcItem.left + 1;
@@ -776,7 +784,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				_stprintf(wbuf, TEXT("Count: %d"), data->menu.items[lpdis->itemID].count );
 			}
 
-			SelectObject(lpdis->hDC, mswin_create_font(NHW_MENU, ATR_BLINK, lpdis->hDC));
+			SelectObject(lpdis->hDC, mswin_get_font(NHW_MENU, ATR_BLINK, lpdis->hDC, FALSE));
 
 			/* calculate text rectangle */
 			SetRect( &drawRect, client_rt.left, lpdis->rcItem.top, client_rt.right, lpdis->rcItem.bottom );
@@ -800,7 +808,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		DrawFocusRect(lpdis->hDC, &drawRect);
 	}
 
-	mswin_destroy_font(SelectObject(lpdis->hDC, saveFont));
+	SelectObject(lpdis->hDC, saveFont);
 	DeleteDC(tileDC);
 	return TRUE;
 }
@@ -1075,30 +1083,43 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 {
     TEXTMETRIC tm;
+	HWND control;
 	HGDIOBJ saveFont;
 	HDC hdc;
 	PNHMenuWindow data;
 	int i;
 	RECT rt;
 
-	GetWindowRect(hWnd, &rt);
+	GetClientRect(hWnd, &rt);
 	sz->cx = rt.right - rt.left;
 	sz->cy = rt.bottom - rt.top;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	if(data && data->type==MENU_TYPE_MENU ) {
-		hdc = GetDC(GetMenuControl(hWnd));
-		saveFont = SelectObject(hdc, mswin_create_font(NHW_MENU, ATR_NONE, hdc));
-		GetTextMetrics(hdc, &tm);
+	if(data) {
+		control = GetMenuControl(hWnd);
+		hdc = GetDC(control);
 
-		/* Set the height of the list box items. */
-		for(i=0; i<data->menu.size; i++ ) {
-			sz->cx = max(sz->cx, 
-				(LONG)(2*TILE_X + tm.tmMaxCharWidth*(strlen(data->menu.items[i].str)+10)));
+		if( data->type==MENU_TYPE_MENU ) {
+			/* Set the height of the list box items. */
+			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
+			GetTextMetrics(hdc, &tm);
+			for(i=0; i<data->menu.size; i++ ) {
+				sz->cx = max(sz->cx, 
+					(LONG)(2*TILE_X + tm.tmAveCharWidth*(strlen(data->menu.items[i].str)+12) + tm.tmOverhang));
+			}
+			SelectObject(hdc, saveFont);
+		} else {
+			RECT text_rt;
+			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
+			GetTextMetrics(hdc, &tm);
+			SetRect(&text_rt, 0, 0, sz->cx, sz->cy);
+			DrawText(hdc, data->text.text, _tcslen(data->text.text), &text_rt, DT_CALCRECT | DT_TOP | DT_LEFT | DT_NOPREFIX);
+			sz->cx = max(sz->cx, text_rt.right - text_rt.left + 5*tm.tmAveCharWidth + tm.tmOverhang);
+			SelectObject(hdc, saveFont);
 		}
+		sz->cx += GetSystemMetrics(SM_CXVSCROLL) + 2*GetSystemMetrics(SM_CXSIZEFRAME);
 
-		mswin_destroy_font(SelectObject(hdc, saveFont));
-		ReleaseDC(GetMenuControl(hWnd), hdc);
+		ReleaseDC(control, hdc);
 	}
 }
 

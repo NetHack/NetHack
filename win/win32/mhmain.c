@@ -290,7 +290,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		HWND child;
 
 		if( GetNHApp()->windowlist[msg_param->wid].type == NHW_MAP )
-			select_map_mode(GetNHApp()->mapDisplayMode);
+			select_map_mode(iflags.wc_map_mode);
 		
 		child = GetNHApp()->windowlist[msg_param->wid].win;
 		if( child ) mswin_layout_main_window(child);
@@ -347,8 +347,8 @@ void mswin_layout_main_window(HWND changed_child)
 
 	/* set window positions */
 	SetRect(&wnd_rect, client_rt.left, client_rt.top, client_rt.right, client_rt.bottom);
-	switch(GetNHApp()->winStatusAlign) {
-	case NHWND_ALIGN_LEFT:
+	switch(iflags.wc_align_status) {
+	case ALIGN_LEFT:
 		status_size.cx = (wnd_rect.right-wnd_rect.left)/4;
 		status_size.cy = (wnd_rect.bottom-wnd_rect.top); // that won't look good
 		status_org.x = wnd_rect.left;
@@ -356,7 +356,7 @@ void mswin_layout_main_window(HWND changed_child)
 		wnd_rect.left += status_size.cx;
 		break;
 
-	case NHWND_ALIGN_RIGHT:  
+	case ALIGN_RIGHT:  
 		status_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
 		status_size.cy = (wnd_rect.bottom-wnd_rect.top); // that won't look good
 		status_org.x = wnd_rect.right - status_size.cx;
@@ -364,14 +364,14 @@ void mswin_layout_main_window(HWND changed_child)
 		wnd_rect.right -= status_size.cx;
 		break;
 
-	case NHWND_ALIGN_TOP:    
+	case ALIGN_TOP:    
 		status_size.cx = (wnd_rect.right-wnd_rect.left);
 		status_org.x = wnd_rect.left;
 		status_org.y = wnd_rect.top;
 		wnd_rect.top += status_size.cy;
 		break;
 
-	case NHWND_ALIGN_BOTTOM:
+	case ALIGN_BOTTOM:
 	default:
 		status_size.cx = (wnd_rect.right-wnd_rect.left);
 		status_org.x = wnd_rect.left;
@@ -380,8 +380,8 @@ void mswin_layout_main_window(HWND changed_child)
 		break;
 	}
 
-	switch(GetNHApp()->winMessageAlign) {
-	case NHWND_ALIGN_LEFT:
+	switch(iflags.wc_align_message) {
+	case ALIGN_LEFT:
 		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4;
 		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
 		msg_org.x = wnd_rect.left;
@@ -389,7 +389,7 @@ void mswin_layout_main_window(HWND changed_child)
 		wnd_rect.left += msg_size.cx;
 		break;
 
-	case NHWND_ALIGN_RIGHT:  
+	case ALIGN_RIGHT:  
 		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
 		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
 		msg_org.x = wnd_rect.right - msg_size.cx;
@@ -397,14 +397,14 @@ void mswin_layout_main_window(HWND changed_child)
 		wnd_rect.right -= msg_size.cx;
 		break;
 
-	case NHWND_ALIGN_TOP:    
+	case ALIGN_TOP:    
 		msg_size.cx = (wnd_rect.right-wnd_rect.left);
 		msg_org.x = wnd_rect.left;
 		msg_org.y = wnd_rect.top;
 		wnd_rect.top += msg_size.cy;
 		break;
 
-	case NHWND_ALIGN_BOTTOM:
+	case ALIGN_BOTTOM:
 	default:
 		msg_size.cx = (wnd_rect.right-wnd_rect.left);
 		msg_org.x = wnd_rect.left;
@@ -615,7 +615,7 @@ void select_map_mode(int mode)
     if( Is_rogue_level(&u.uz) ) return;
 #endif
 
-	GetNHApp()->mapDisplayMode = mode;
+	iflags.wc_map_mode = mode;
 	mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), mode);
 }
 
@@ -624,17 +624,17 @@ static struct t_menu2mapmode {
 	int mapMode;
 } _menu2mapmode[] = 
 {
-	{ IDM_MAP_TILES, NHMAP_VIEW_TILES },
-	{ IDM_MAP_ASCII4X6, NHMAP_VIEW_ASCII4x6 },
-	{ IDM_MAP_ASCII6X8, NHMAP_VIEW_ASCII6x8 },
-	{ IDM_MAP_ASCII8X8, NHMAP_VIEW_ASCII8x8 },
-	{ IDM_MAP_ASCII16X8, NHMAP_VIEW_ASCII16x8 },
-	{ IDM_MAP_ASCII7X12, NHMAP_VIEW_ASCII7x12 },
-	{ IDM_MAP_ASCII8X12, NHMAP_VIEW_ASCII8x12 },
-	{ IDM_MAP_ASCII12X16, NHMAP_VIEW_ASCII12x16 },
-	{ IDM_MAP_ASCII16X12, NHMAP_VIEW_ASCII16x12 },
-	{ IDM_MAP_ASCII10X18, NHMAP_VIEW_ASCII10x18 },
-	{ IDM_MAP_FIT_TO_SCREEN, NHMAP_VIEW_FIT_TO_SCREEN },
+	{ IDM_MAP_TILES, MAP_MODE_TILES },
+	{ IDM_MAP_ASCII4X6, MAP_MODE_ASCII4x6 },
+	{ IDM_MAP_ASCII6X8, MAP_MODE_ASCII6x8 },
+	{ IDM_MAP_ASCII8X8, MAP_MODE_ASCII8x8 },
+	{ IDM_MAP_ASCII16X8, MAP_MODE_ASCII16x8 },
+	{ IDM_MAP_ASCII7X12, MAP_MODE_ASCII7x12 },
+	{ IDM_MAP_ASCII8X12, MAP_MODE_ASCII8x12 },
+	{ IDM_MAP_ASCII12X16, MAP_MODE_ASCII16x12 },
+	{ IDM_MAP_ASCII16X12, MAP_MODE_ASCII12x16 },
+	{ IDM_MAP_ASCII10X18, MAP_MODE_ASCII10x18 },
+	{ IDM_MAP_FIT_TO_SCREEN, MAP_MODE_ASCII_FIT_TO_SCREEN },
 	{ -1, -1 }
 };
 

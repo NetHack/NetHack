@@ -16,28 +16,36 @@ static int font_table_size = 0;
 
 #define NHFONT_CODE(win, attr) (((attr&0xFF)<<8)|(win_type&0xFF))
 
+static void __cdecl font_table_cleanup(void);
 
 /* create font based on window type, charater attributes and
    window device context */
-HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
+HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 {
 	HFONT fnt = NULL;
 	LOGFONT lgfnt;
 	int font_size;
-	int i;
+	int font_index;
+	static BOOL once = FALSE;
+
+	if( !once ) {
+		once = TRUE;
+		atexit(font_table_cleanup);
+	}
 
 	ZeroMemory( &lgfnt, sizeof(lgfnt) );
 
 	/* try find font in the table */
-	for(i=0; i<font_table_size; i++) {
-		if(NHFONT_CODE(win_type, attr)==font_table[i].code) {
-			return font_table[i].hFont;
-		}
-	}
+	for(font_index=0; font_index<font_table_size; font_index++)
+		if(NHFONT_CODE(win_type, attr)==font_table[font_index].code)
+			break;
+
+	if( !replace && font_index<font_table_size )
+		return font_table[font_index].hFont;
 
 	switch(win_type) {
 	case NHW_STATUS:
-		lgfnt.lfHeight			=	-8*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
+		lgfnt.lfHeight			=	-iflags.wc_fontsiz_status*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
 		lgfnt.lfWidth			=	0;				     // average character width
 		lgfnt.lfEscapement		=	0;					 // angle of escapement
 		lgfnt.lfOrientation		=	0;					 // base-line orientation angle
@@ -49,13 +57,17 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
-		lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
-		/* lgfnt.lfFaceName */
+		if( iflags.wc_font_status &&
+			*iflags.wc_font_status ) {
+			lgfnt.lfPitchAndFamily = DEFAULT_PITCH;		 // pitch and family
+			NH_A2W( iflags.wc_font_status, lgfnt.lfFaceName, LF_FACESIZE);
+		} else {
+			lgfnt.lfPitchAndFamily = FIXED_PITCH;		 // pitch and family
+		}
 		break;
 
 	case NHW_MENU:
-		font_size = (attr==ATR_INVERSE)? 8 : 8;
-		lgfnt.lfHeight			=	-font_size*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
+		lgfnt.lfHeight			=	-iflags.wc_fontsiz_menu*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
 		lgfnt.lfWidth			=	0;				     // average character width
 		lgfnt.lfEscapement		=	0;					 // angle of escapement
 		lgfnt.lfOrientation		=	0;					 // base-line orientation angle
@@ -67,12 +79,17 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
-		lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
-		/* lgfnt.lfFaceName */
+		if( iflags.wc_font_menu &&
+			*iflags.wc_font_menu ) {
+			lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
+			NH_A2W( iflags.wc_font_menu, lgfnt.lfFaceName, LF_FACESIZE);
+		} else {
+			lgfnt.lfPitchAndFamily = FIXED_PITCH;		 // pitch and family
+		}
 		break;
 
 	case NHW_MESSAGE:
-		font_size = (attr==ATR_INVERSE)? 10 : 9;
+		font_size = (attr==ATR_INVERSE)? iflags.wc_fontsiz_message+1 : iflags.wc_fontsiz_message;
 		lgfnt.lfHeight			=	-font_size*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
 		lgfnt.lfWidth			=	0;				     // average character width
 		lgfnt.lfEscapement		=	0;					 // angle of escapement
@@ -85,12 +102,17 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
-		lgfnt.lfPitchAndFamily	=	VARIABLE_PITCH;		 // pitch and family
-		/* lgfnt.lfFaceName */
+		if( iflags.wc_font_message &&
+			*iflags.wc_font_message ) {
+			lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
+			NH_A2W( iflags.wc_font_message, lgfnt.lfFaceName, LF_FACESIZE);
+		} else {
+			lgfnt.lfPitchAndFamily	= VARIABLE_PITCH;		 // pitch and family
+		}
 		break;
 
 	case NHW_TEXT:
-		lgfnt.lfHeight			=	-8*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
+		lgfnt.lfHeight			=	-iflags.wc_fontsiz_text*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
 		lgfnt.lfWidth			=	0;				     // average character width
 		lgfnt.lfEscapement		=	0;					 // angle of escapement
 		lgfnt.lfOrientation		=	0;					 // base-line orientation angle
@@ -102,30 +124,37 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
-		lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
-		/* lgfnt.lfFaceName */
+		if( iflags.wc_font_text &&
+			*iflags.wc_font_text ) {
+			lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
+			NH_A2W( iflags.wc_font_text, lgfnt.lfFaceName, LF_FACESIZE);
+		} else {
+			lgfnt.lfPitchAndFamily	= FIXED_PITCH;		 // pitch and family
+		}
 		break;
 	}
 
 	fnt = CreateFontIndirect(&lgfnt);
 
 	/* add font to the table */
-	if( font_table_size>=MAXFONTS ) panic( "font table overflow!" );
+	if( font_index==font_table_size ) {
+		if( font_table_size>=MAXFONTS ) panic( "font table overflow!" );
+		font_table_size++;
+	} else {
+		DeleteObject(font_table[font_index].hFont);
+	}
 
-	font_table[font_table_size].code = NHFONT_CODE(win_type, attr);
-	font_table[font_table_size].hFont = fnt;
-	font_table_size++;
-
+	font_table[font_index].code = NHFONT_CODE(win_type, attr);
+	font_table[font_index].hFont = fnt;
 	return fnt;
 }
 
-/* dispose the font object */
-void mswin_destroy_font( HGDIOBJ fnt )
+void __cdecl font_table_cleanup(void)
 {
-	/* do nothing - we are going to reuse the font,
-	   then it will destroyed when application exits 
-	  (at least I hope it will) */
-
-	/* if(fnt) DeleteObject(fnt); */
+	int i;
+	for(i=0; i<font_table_size; i++) {
+		DeleteObject(font_table[i].hFont);
+	}
+	font_table_size = 0;
 }
 

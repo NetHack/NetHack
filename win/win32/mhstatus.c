@@ -111,7 +111,7 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			hdc = BeginPaint(hWnd, &ps);
 			GetClientRect(hWnd, &rt);
 			
-			oldFont = SelectObject(hdc, mswin_create_font(NHW_STATUS, ATR_NONE, hdc));
+			oldFont = SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));
 			
 			for(i=0; i<NHSW_LINES; i++ ) {
 				GetTextExtentPoint32(hdc, NH_A2W(data->window_text[i], wbuf, sizeof(wbuf)), strlen(data->window_text[i]), &sz);
@@ -120,7 +120,7 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 				rt.top += sz.cy;
 			}
 
-			mswin_destroy_font(SelectObject(hdc, oldFont));
+			SelectObject(hdc, oldFont);
 			
 			EndPaint(hWnd, &ps);
 		} break;
@@ -154,12 +154,12 @@ void mswin_status_window_size (HWND hWnd, LPSIZE sz)
 	data = (PNHStatusWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	if(data) {
 		hdc = GetDC(hWnd);
-		saveFont = SelectObject(hdc, mswin_create_font(NHW_STATUS, ATR_NONE, hdc));
+		saveFont = SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));
 		GetTextMetrics(hdc, &tm);
 
 		sz->cy = tm.tmHeight * NHSW_LINES;
 
-		mswin_destroy_font(SelectObject(hdc, saveFont));
+		SelectObject(hdc, saveFont);
 		ReleaseDC(hWnd, hdc);
 	}
 }

@@ -91,8 +91,8 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	
 	/* set new screen tile size */
 	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	data->xScrTile = ((data->mapMode==NHMAP_VIEW_FIT_TO_SCREEN)? wnd_size.cx : lpsz->cx) / COLNO;
-	data->yScrTile = ((data->mapMode==NHMAP_VIEW_FIT_TO_SCREEN)? wnd_size.cy : lpsz->cy) / ROWNO;
+	data->xScrTile = ((data->mapMode==MAP_MODE_ASCII_FIT_TO_SCREEN)? wnd_size.cx : lpsz->cx) / COLNO;
+	data->yScrTile = ((data->mapMode==MAP_MODE_ASCII_FIT_TO_SCREEN)? wnd_size.cy : lpsz->cy) / ROWNO;
 
 	/* set map origin point */
 	data->map_orig.x = max(0, client_rt.left + (wnd_size.cx - data->xScrTile*COLNO)/2 );
@@ -102,7 +102,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	data->map_orig.y -= data->map_orig.y % data->yScrTile;
 
 	/* adjust horizontal scroll bar */
-	if( data->mapMode==NHMAP_VIEW_FIT_TO_SCREEN )
+	if( data->mapMode==MAP_MODE_ASCII_FIT_TO_SCREEN )
 		data->xPageSize = COLNO+1;  /* disable scroll bar */
 	else
 		data->xPageSize = wnd_size.cx/data->xScrTile;
@@ -124,7 +124,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
     SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
 
 	/* adjust vertical scroll bar */
-	if( data->mapMode==NHMAP_VIEW_FIT_TO_SCREEN )
+	if( data->mapMode==MAP_MODE_ASCII_FIT_TO_SCREEN )
 		data->yPageSize = ROWNO+1;   /* disable scroll bar */
 	else
 		data->yPageSize = wnd_size.cy/data->yScrTile;
@@ -184,61 +184,61 @@ int mswin_map_mode(HWND hWnd, int mode)
 
 	switch( data->mapMode ) {
 
-	case NHMAP_VIEW_ASCII4x6:
+	case MAP_MODE_ASCII4x6:
 		data->bAsciiMode = TRUE;
 		mapSize.cx = 4*COLNO;
 		mapSize.cy = 6*ROWNO;
 	break;
 
-	case NHMAP_VIEW_ASCII6x8:
+	case MAP_MODE_ASCII6x8:
 		data->bAsciiMode = TRUE;
 		mapSize.cx = 6*COLNO;
 		mapSize.cy = 8*ROWNO;
 	break;
 
-	case NHMAP_VIEW_ASCII8x8:
+	case MAP_MODE_ASCII8x8:
 		data->bAsciiMode = TRUE;
 		mapSize.cx = 8*COLNO;
 		mapSize.cy = 8*ROWNO;
 	break;
 
-	case NHMAP_VIEW_ASCII16x8:
+	case MAP_MODE_ASCII16x8:
 		data->bAsciiMode = TRUE;
 		mapSize.cx = 16*COLNO;
 		mapSize.cy = 8*ROWNO;
 	break;
 
-	case NHMAP_VIEW_ASCII7x12:
+	case MAP_MODE_ASCII7x12:
 		data->bAsciiMode = TRUE;
 		mapSize.cx = 7*COLNO;
 		mapSize.cy = 12*ROWNO;
 	break;
 
-	case NHMAP_VIEW_ASCII8x12:
+	case MAP_MODE_ASCII8x12:
 		data->bAsciiMode = TRUE;
 		mapSize.cx = 8*COLNO;
 		mapSize.cy = 12*ROWNO;
 	break;
 
-	case NHMAP_VIEW_ASCII16x12:
+	case MAP_MODE_ASCII16x12:
 		data->bAsciiMode = TRUE;
 		mapSize.cx = 16*COLNO;
 		mapSize.cy = 12*ROWNO;
 	break;
 
-	case NHMAP_VIEW_ASCII12x16:
+	case MAP_MODE_ASCII12x16:
 		data->bAsciiMode = TRUE;
 		mapSize.cx = 12*COLNO;
 		mapSize.cy = 16*ROWNO;
 	break;
 
-	case NHMAP_VIEW_ASCII10x18:
+	case MAP_MODE_ASCII10x18:
 		data->bAsciiMode = TRUE;
 		mapSize.cx = 10*COLNO;
 		mapSize.cy = 18*ROWNO;
 	break;
 
-	case NHMAP_VIEW_FIT_TO_SCREEN: {
+	case MAP_MODE_ASCII_FIT_TO_SCREEN: {
 		RECT client_rt;
 		GetClientRect(hWnd, &client_rt);
 		mapSize.cx = client_rt.right - client_rt.left;
@@ -247,11 +247,11 @@ int mswin_map_mode(HWND hWnd, int mode)
 		data->bAsciiMode = TRUE;
 	} break;
 
-	case NHMAP_VIEW_TILES:
+	case MAP_MODE_TILES:
 	default:
 		data->bAsciiMode = FALSE;
-		mapSize.cx = TILE_X*COLNO;
-		mapSize.cy = TILE_Y*ROWNO;
+		mapSize.cx = GetNHApp()->mapTile_X*COLNO;
+		mapSize.cy = GetNHApp()->mapTile_Y*ROWNO;
 	break;
 	}
 
@@ -320,7 +320,7 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     { 
 		SIZE size;
 
-		if( data->mapMode == NHMAP_VIEW_FIT_TO_SCREEN ) {
+		if( data->mapMode == MAP_MODE_ASCII_FIT_TO_SCREEN ) {
 			size.cx = LOWORD(lParam);
 			size.cy = HIWORD(lParam);
 		} else {
@@ -384,7 +384,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		PMSNHMsgClipAround msg_data = (PMSNHMsgClipAround)lParam;
 		int x, y;
 		BOOL scroll_x, scroll_y;
-		int mcam = GetNHApp()->mapCliparoundMargin;
+		int mcam = iflags.wc_scroll_margin;
 
 		/* calculate if you should clip around */
 		scroll_x =  
@@ -481,8 +481,8 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	data->bAsciiMode = FALSE;
 
-	data->xScrTile = TILE_X;
-	data->yScrTile = TILE_Y;
+	data->xScrTile = GetNHApp()->mapTile_X;
+	data->yScrTile = GetNHApp()->mapTile_Y;
 
 	SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 }
@@ -554,7 +554,7 @@ void onPaint(HWND hWnd)
 		} else {
 			/* prepare tiles DC for mapping */
 			tileDC = CreateCompatibleDC(hDC);
-			saveBmp = SelectObject(tileDC, GetNHApp()->bmpTiles);
+			saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
 
 			/* draw the map */
 			for(i=paint_rt.left; i<paint_rt.right; i++) 
@@ -565,8 +565,8 @@ void onPaint(HWND hWnd)
 					RECT glyph_rect;
 
 					ntile = glyph2tile[ data->map[i][j] ];
-					t_x = (ntile % TILES_PER_LINE)*TILE_X;
-					t_y = (ntile / TILES_PER_LINE)*TILE_Y;
+					t_x = (ntile % GetNHApp()->mapTilesPerLine)*GetNHApp()->mapTile_X;
+					t_y = (ntile / GetNHApp()->mapTilesPerLine)*GetNHApp()->mapTile_Y;
 					
 					nhcoord2display(data, i, j, &glyph_rect);
 
@@ -579,11 +579,11 @@ void onPaint(HWND hWnd)
 						tileDC,
 						t_x,
 						t_y,
-						TILE_X, 
-						TILE_Y, 
+						GetNHApp()->mapTile_X, 
+						GetNHApp()->mapTile_Y, 
 						SRCCOPY 
 					);
-					if( glyph_is_pet(data->map[i][j]) && iflags.hilite_pet ) {
+					if( glyph_is_pet(data->map[i][j]) && iflags.wc_hilite_pet ) {
 						/* apply pet mark transparently over 
 						   pet image */
 						HDC hdcPetMark;

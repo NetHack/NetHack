@@ -1904,6 +1904,7 @@ goodfruit:
 			iflags.wc_tile_file = (char *)alloc(strlen(op) + 1);
 			Strcpy(iflags.wc_tile_file, op);
 		}
+		return;
 	}
 	/* WINCAP
 	 * tile_height:nn */
@@ -2531,10 +2532,10 @@ char *buf;
 				   iflags.wc_align_message == ALIGN_RIGHT   ? "right" :
 				   "unknown");
 	else if (!strcmp(optname,"align_status"))
-		Sprintf(buf, "%s", iflags.wc_align_message == ALIGN_TOP     ? "top" :
-				   iflags.wc_align_message == ALIGN_LEFT    ? "left" :
-				   iflags.wc_align_message == ALIGN_BOTTOM  ? "bottom" :
-				   iflags.wc_align_message == ALIGN_RIGHT   ? "right" :
+		Sprintf(buf, "%s", iflags.wc_align_status == ALIGN_TOP     ? "top" :
+				   iflags.wc_align_status == ALIGN_LEFT    ? "left" :
+				   iflags.wc_align_status == ALIGN_BOTTOM  ? "bottom" :
+				   iflags.wc_align_status == ALIGN_RIGHT   ? "right" :
 				   "unknown");
 	else if (!strcmp(optname,"align"))
 		Sprintf(buf, "%s", rolestring(flags.initalign, aligns, adj));
