@@ -2398,6 +2398,7 @@ end_of_input()
 #endif
 	    if (program_state.something_worth_saving) (void) dosave0();
 #endif
+	exit_nhwindows((char *)0);
 	clearlocks();
 	terminate(EXIT_SUCCESS);
 }
