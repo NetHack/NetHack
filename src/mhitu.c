@@ -482,9 +482,10 @@ mattacku(mtmp)
 
 	    if(!rn2(10) && !mtmp->mcan) {
 	    	int numseen, numhelp;
-		char buf[BUFSZ];
+		char buf[BUFSZ], genericwere[BUFSZ];
 
-		numhelp = were_summon(mdat, FALSE, &numseen);
+		Strcpy(genericwere, "creature");
+		numhelp = were_summon(mdat, FALSE, &numseen, genericwere);
 		if (youseeit) {
 			pline("%s summons help!", Monnam(mtmp));
 			if (numhelp > 0) {
@@ -504,10 +505,10 @@ mattacku(mtmp)
 			    else {
 				if (numseen == 1)
 			    		Sprintf(buf, "%s appears",
-							an(mdat->mname));
+							an(genericwere));
 			    	else
 			    		Sprintf(buf, "%s appear",
-							makeplural(mdat->mname));
+							makeplural(genericwere));
 				pline("%s%s!", upstart(buf), from_nowhere);
 			    }
 			} /* else no help came; but you didn't know it tried */

@@ -82,10 +82,11 @@ register struct monst *mon;
 }
 
 int
-were_summon(ptr,yours,visible)	/* were-creature (even you) summons a horde */
+were_summon(ptr,yours,visible,genbuf)	/* were-creature (even you) summons a horde */
 register struct permonst *ptr;
 register boolean yours;
 int *visible;			/* number of visible helpers created */
+char *genbuf;
 {
 	register int i, typ, pm = monsndx(ptr);
 	register struct monst *mtmp;
@@ -100,14 +101,17 @@ int *visible;			/* number of visible helpers created */
 		case PM_WERERAT:
 		case PM_HUMAN_WERERAT:
 			typ = rn2(3) ? PM_SEWER_RAT : rn2(3) ? PM_GIANT_RAT : PM_RABID_RAT ;
+			if (genbuf) Strcpy(genbuf, "rat");
 			break;
 		case PM_WEREJACKAL:
 		case PM_HUMAN_WEREJACKAL:
 			typ = PM_JACKAL;
+			if (genbuf) Strcpy(genbuf, "jackal");
 			break;
 		case PM_WEREWOLF:
 		case PM_HUMAN_WEREWOLF:
 			typ = rn2(5) ? PM_WOLF : PM_WINTER_WOLF ;
+			if (genbuf) Strcpy(genbuf, "wolf");
 			break;
 		default:
 			continue;
