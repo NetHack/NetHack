@@ -178,6 +178,11 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 /* Flags to control dotrap() in trap.c */
 #define NOWEBMSG	0x01	/* suppress stumble into web message */
 
+/* Flags to control test_move in hack.c */
+#define DO_MOVE		0	/* really doing the move */
+#define TEST_MOVE	1	/* test a normal move (move there next) */
+#define TEST_TRAV	2	/* test a future travel location */
+
 /*** some utility macros ***/
 #define yn(query) yn_function(query,ynchars, 'n')
 #define ynq(query) yn_function(query,ynqchars, 'q')

@@ -12,7 +12,7 @@ STATIC_DCL int FDECL(still_chewing,(XCHAR_P,XCHAR_P));
 #ifdef SINKS
 STATIC_DCL void NDECL(dosinkfall);
 #endif
-STATIC_DCL void NDECL(findtravelpath);
+STATIC_DCL boolean FDECL(findtravelpath, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(monstinroom, (struct permonst *,int));
 
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
@@ -526,22 +526,27 @@ xchar x, y;
 #endif /* OVL1 */
 #ifdef OVL3
 
-/* return TRUE if (dx,dy) is an OK place to move */
+/* return TRUE if (dx,dy) is an OK place to move
+ * mode is one of DO_MOVE, TEST_MOVE or TEST_TRAV
+ */
 boolean 
-test_move(ux, uy, dx, dy, test_only)
+test_move(ux, uy, dx, dy, mode)
 int ux, uy, dx, dy;
-boolean test_only;
+int mode;
 {
     int x = ux+dx;
     int y = uy+dy;
     register struct rm *tmpr = &levl[x][y];
     register struct rm *ust;
 
+    /* if this is the next step, must treat as if TEST_MOVE were used */
+    if (mode == TEST_TRAV && distmin(x, y, u.ux, u.uy) <= 1) mode = TEST_MOVE;
+
     /*
      *  Check for physical obstacles.  First, the place we are going.
      */
     if (IS_ROCK(tmpr->typ) || tmpr->typ == IRONBARS) {
-	if (Blind && !test_only) feel_location(x,y);
+	if (Blind && mode == DO_MOVE) feel_location(x,y);
 	if (Passes_walls && may_passwall(x,y)) {
 	    ;	/* do nothing */
 	} else if (tmpr->typ == IRONBARS) {
@@ -549,34 +554,34 @@ boolean test_only;
 		return FALSE;
 	} else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
 	    /* Eat the rock. */
-	    if (!test_only && still_chewing(x,y)) return FALSE;
+	    if (mode == DO_MOVE && still_chewing(x,y)) return FALSE;
 	} else if (flags.autodig && !flags.run && !flags.nopick &&
 		   uwep && is_pick(uwep)) {
 	/* MRKR: Automatic digging when wielding the appropriate tool */
-	    if (!test_only)
+	    if (mode == DO_MOVE)
 		(void) use_pick_axe2(uwep);
 	    return FALSE;
 	} else {
-	    if ( !test_only ) {
+	    if (mode == DO_MOVE) {
 		if (Is_stronghold(&u.uz) && is_db_wall(x,y))
 		    pline_The("drawbridge is up!");
 		if (Passes_walls && !may_passwall(x,y) && In_sokoban(&u.uz))
-	    		pline_The("Sokoban walls resist your ability.");
+		    pline_The("Sokoban walls resist your ability.");
 	    }
 	    return FALSE;
 	}
     } else if (IS_DOOR(tmpr->typ)) {
 	if (closed_door(x,y)) {
-	    if (Blind && !test_only) feel_location(x,y);
+	    if (Blind && mode == DO_MOVE) feel_location(x,y);
 	    if (Passes_walls)
 		;	/* do nothing */
 	    else if (can_ooze(&youmonst)) {
-		if ( !test_only ) You("ooze under the door.");
+		if (mode == DO_MOVE) You("ooze under the door.");
 	    } else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
 		/* Eat the door. */
-		if (!test_only && still_chewing(x,y)) return FALSE;
+		if (mode == DO_MOVE && still_chewing(x,y)) return FALSE;
 	    } else {
-		if ( !test_only ) {
+		if (mode == DO_MOVE) {
 		    if (amorphous(youmonst.data))
 			You("try to ooze under the door, but can't squeeze your possessions through.");
 		    else if (x == ux || y == uy) {
@@ -596,7 +601,7 @@ boolean test_only;
 			} else pline("That door is closed.");
 		    }
 		}
-		return FALSE;
+		if (mode != TEST_TRAV) return FALSE;
 	    }
 	} else if (dx && dy && !Passes_walls
 		    && ((tmpr->doormask & ~D_BROKEN)
@@ -605,7 +610,7 @@ boolean test_only;
 #endif
 				    || block_door(x,y))) {
 	    /* Diagonal moves into a door are not allowed. */
-	    if ( Blind && !test_only )
+	    if (Blind && mode == DO_MOVE)
 		feel_location(x,y);
 	    return FALSE;
 	}
@@ -614,20 +619,26 @@ boolean test_only;
 	    && bad_rock(youmonst.data,ux,y) && bad_rock(youmonst.data,x,uy)) {
 	/* Move at a diagonal. */
 	if (In_sokoban(&u.uz)) {
-	    if ( !test_only )
+	    if (mode == DO_MOVE)
 		You("cannot pass that way.");
 	    return FALSE;
 	}
 	if (bigmonst(youmonst.data)) {
-	    if ( !test_only )
+	    if (mode == DO_MOVE)
 		Your("body is too large to fit through.");
 	    return FALSE;
 	}
 	if (invent && (inv_weight() + weight_cap() > 600)) {
-	    if ( !test_only )
+	    if (mode == DO_MOVE)
 		You("are carrying too much to get through.");
 	    return FALSE;
 	}
+    }
+    /* pick a path that does not require crossing a trap */
+    if (flags.run == 8 && mode != DO_MOVE) {
+	struct trap* t = t_at(x, y);
+
+	if (t && t->tseen) return FALSE;
     }
 
     ust = &levl[ux][uy];
@@ -645,80 +656,152 @@ boolean test_only;
     }
 
     if (sobj_at(BOULDER,x,y) && (In_sokoban(&u.uz) || !Passes_walls)) {
-	if (!(Blind || Hallucination) && (flags.run >= 2))
+	if (!(Blind || Hallucination) && (flags.run >= 2) && mode != TEST_TRAV)
 	    return FALSE;
-	if (!test_only) {
+	if (mode == DO_MOVE) {
 	    /* tunneling monsters will chew before pushing */
 	    if (tunnels(youmonst.data) && !needspick(youmonst.data) &&
 		!In_sokoban(&u.uz)) {
 		if (still_chewing(x,y)) return FALSE;
 	    } else
 		if (moverock() < 0) return FALSE;
+	} else if (mode == TEST_TRAV) {
+	    struct obj* obj;
+
+	    /* don't pick two boulders in a row, unless there's a way thru */
+	    if (sobj_at(BOULDER,ux,uy) && !In_sokoban(&u.uz)) {
+		if (!Passes_walls &&
+		    !(tunnels(youmonst.data) && !needspick(youmonst.data)) &&
+		    !carrying(PICK_AXE) && !carrying(DWARVISH_MATTOCK) &&
+		    !((obj = carrying(WAN_DIGGING)) &&
+		      !objects[obj->otyp].oc_name_known))
+		    return FALSE;
+	    }
 	}
-	/* test_only will assume you'll be able to push it when you get there... */
+	/* assume you'll be able to push it when you get there... */
     }
 
     /* OK, it is a legal place to move. */
     return TRUE;
 }
 
-static void findtravelpath()
+/*
+ * Find a path from the destination (u.tx,u.ty) back to (u.ux,u.uy).
+ * A shortest path is returned.  If guess is TRUE, consider various
+ * inaccessible locations as valid intermediate path points.
+ * Returns TRUE if a path was found.
+ */
+static boolean
+findtravelpath(guess)
+boolean guess;
 {
-    if ( u.tx != u.ux || u.ty != u.uy ) {
+    if (u.tx != u.ux || u.ty != u.uy) {
 	xchar travel[COLNO][ROWNO];
 	xchar travelstepx[2][COLNO*ROWNO];
 	xchar travelstepy[2][COLNO*ROWNO];
-	int n=1;
-	int set=0;
-	int dia=1;
+	xchar tx, ty, ux, uy;
+	int n = 1;			/* max offset in travelsteps */
+	int set = 0;			/* two sets current and previous */
+	int radius = 1;			/* search radius */
+	int i;
 
-	(void) memset((genericptr_t)travel,0,sizeof(travel));
+	/* If guessing, first find an "obvious" goal location.  The obvious
+	 * goal is the position the player knows of, or might figure out
+	 * (couldsee) that is closest to the target on a straight path.
+	 */
+	if (guess) {
+	    tx = u.ux; ty = u.uy; ux = u.tx; uy = u.ty;
+	} else {
+	    tx = u.tx; ty = u.ty; ux = u.ux; uy = u.uy;
+	}
 
-	travelstepx[0][0] = u.tx;
-	travelstepy[0][0] = u.ty;
-	while ( n ) {
-	    int i;
-	    int nn=0;
-	    for (i=0; i<n; i++) {
+    noguess:
+	(void) memset((genericptr_t)travel, 0, sizeof(travel));
+	travelstepx[0][0] = tx;
+	travelstepy[0][0] = ty;
+
+	while (n != 0) {
+	    int nn = 0;
+
+	    for (i = 0; i < n; i++) {
 		int dir;
 		int x = travelstepx[set][i];
 		int y = travelstepy[set][i];
 		static int ordered[] = { 0, 2, 4, 6, 1, 3, 5, 7 };
-		for (dir=0; dir<8; dir++) {
+
+		for (dir = 0; dir < 8; dir++) {
 		    int nx = x+xdir[ordered[dir]];
 		    int ny = y+ydir[ordered[dir]];
-    /*printf("try %d,%d\n",nx,ny);*/
-		    if ( isok(nx,ny) && test_move( x, y, nx-x, ny-y, 1 ) ) {
-			if ( nx == u.ux && ny == u.uy ) {
-			    u.dx = x-u.ux;
-			    u.dy = y-u.uy;
-	/*printf("found\n");*/
-	/*printf("findtravelpath %d,%d -> %d,%d by %d,%d\n",u.ux,u.uy,u.tx,u.ty,u.dx,u.dy);
-	*/
-			    return;
-			} else {
-	/*printf("%d %d %d",isok(nx,ny), !travel[nx][ny], ACCESSIBLE(levl[nx][ny].typ));*/
-			    if ( !travel[nx][ny] ) {
-				travelstepx[1-set][nn]=nx;
-				travelstepy[1-set][nn]=ny;
-				travel[nx][ny]=dia;
-				nn++;
+
+		    if (!isok(nx, ny)) continue;
+		    if (test_move(x, y, nx-x, ny-y, TEST_TRAV) &&
+			(levl[nx][ny].seenv || (!Blind && couldsee(nx, ny)))) {
+			if (nx == ux && ny == uy) {
+			    if (!guess) {
+				u.dx = x-ux;
+				u.dy = y-uy;
+				if (x == u.tx && y == u.ty) {
+				    nomul(0);
+				    /* reset run so domove run checks work */
+				    flags.run = 8;
+				}
+				return TRUE;
 			    }
+			} else if (!travel[nx][ny]) {
+			    travelstepx[1-set][nn] = nx;
+			    travelstepy[1-set][nn] = ny;
+			    travel[nx][ny] = radius;
+			    nn++;
 			}
 		    }
 		}
 	    }
+	    
 	    n = nn;
 	    set = 1-set;
-	    dia++;
+	    radius++;
 	}
 
-	/* give up */
+	/* if guessing, find best location in travel matrix and go there */
+	if (guess) {
+	    int px = tx, py = ty;	/* pick location */
+	    int dist, d;
+
+	    dist = distmin(ux, uy, tx, ty);
+	    for (tx = 1; tx < COLNO; ++tx)
+		for (ty = 0; ty < ROWNO; ++ty)
+		    if (travel[tx][ty]) {
+			d = distmin(ux, uy, tx, ty);
+			if (d < dist && couldsee(ux, uy)) {
+			    px = tx; py = ty; dist = d;
+			}
+		    }
+
+	    if (px == u.ux && py == u.uy) {
+		/* no guesses, just go in the general direction */
+		u.dx = sgn(u.tx - u.ux);
+		u.dy = sgn(u.ty - u.uy);
+		if (test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE))
+		    return TRUE;
+		goto done;
+	    }
+	    tx = px;
+	    ty = py;
+	    ux = u.ux;
+	    uy = u.uy;
+	    set = 0;
+	    n = radius = 1;
+	    guess = FALSE;
+	    goto noguess;
+	}
+	return FALSE;
     }
 
+done:
     u.dx = 0;
     u.dy = 0;
     nomul(0);
+    return FALSE;
 }
 
 void
@@ -736,8 +819,9 @@ domove()
 
 	u_wipe_engr(rnd(5));
 
-	if ( flags.travel )
-	    findtravelpath();
+	if (flags.travel)
+	    if (!findtravelpath(FALSE))
+		(void) findtravelpath(TRUE);
 
 	if(((wtcap = near_capacity()) >= OVERLOADED
 	    || (wtcap > SLT_ENCUMBER &&
@@ -823,7 +907,10 @@ domove()
 			nomul(0);
 			return;
 		}
-		if((trap = t_at(x, y)) && trap->tseen) {
+		if (((trap = t_at(x, y)) && trap->tseen) ||
+		    (Blind && !Levitation && !Flying &&
+		     !is_clinger(youmonst.data) &&
+		     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv)) {
 			if(flags.run >= 2) {
 				nomul(0);
 				flags.move = 0;
@@ -1121,7 +1208,7 @@ domove()
 		return;
 	}
 
-	if ( !test_move( u.ux, u.uy, x-u.ux, y-u.uy, 0 ) ) {
+	if (!test_move(u.ux, u.uy, x-u.ux, y-u.uy, DO_MOVE)) {
 	    flags.move = 0;
 	    nomul(0);
 	    return;

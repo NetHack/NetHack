@@ -1977,7 +1977,7 @@ click_to_cmd(x, y, mod)
 
         dir = xytod(x, y);
 
-        if (!m_at(u.ux+x, u.uy+y) && !test_move(u.ux, u.uy, x, y, 1)) {
+	if (!m_at(u.ux+x, u.uy+y) && !test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
             cmd[1] = (iflags.num_pad ? ndir[dir] : sdir[dir]);
             cmd[2] = 0;
             if (IS_DOOR(levl[u.ux+x][u.uy+y].typ)) {

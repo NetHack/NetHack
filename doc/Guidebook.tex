@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.39 $ $Date: 2002/03/31 07:19:43 $
+% $Revision: 1.40 $ $Date: 2002/04/04 03:44:18 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -638,7 +638,10 @@ Prefix:  Same as `{\tt g}', but forking of corridors is not considered
 interesting.
 %.lp
 \item[\tb{_}]
-Travel to a map location via a shortest-path algorithm. Stops on most of 
+Travel to a map location via a shortest-path algorithm.  The shortest path
+is computed over map locations the hero knows about (e.g. seen or
+previously traversed).  If there is no known path, a guess is made instead.
+Stops on most of 
 the same conditions as the `G' command, but without picking up
 objects, similar to the `M' command.  For ports with mouse 
 support, the command is also invoked when a mouse-click takes place on a 

@@ -476,7 +476,10 @@ Prefix:  move until something interesting is found.
 .lp "G[yuhjklbn] or <CONTROL->[yuhjklbn]
 Prefix:  same as `g', but forking of corridors is not considered interesting.
 .lp _
-Travel to a map location via a shortest-path algorithm. Stops on most of 
+Travel to a map location via a shortest-path algorithm.  The shortest path
+is computed over map locations the hero knows about (e.g. seen or
+previously traversed).  If there is no known path, a guess is made instead.
+Stops on most of
 the same conditions as the `G' command, but without picking up
 objects, similar to the `M' command.  For ports with mouse 
 support, the command is also invoked when a mouse-click takes place on a 
