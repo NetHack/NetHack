@@ -35,7 +35,7 @@ STATIC_DCL boolean FDECL(place_niche,(struct mkroom *,int*,int*,int*));
 STATIC_DCL void FDECL(makeniche,(int));
 STATIC_DCL void NDECL(make_niches);
 
-STATIC_PTR int FDECL(do_comp,(const genericptr,const genericptr));
+STATIC_PTR int FDECL( CFDECLSPEC do_comp,(const genericptr,const genericptr));
 
 STATIC_DCL void FDECL(dosdoor,(XCHAR_P,XCHAR_P,struct mkroom *,int));
 STATIC_DCL void FDECL(join,(int,int,BOOLEAN_P));
@@ -56,7 +56,7 @@ static boolean made_branch;	/* used only during level creation */
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
 STATIC_PTR int
-do_comp(vx,vy)
+CFDECLSPEC do_comp(vx,vy)
 const genericptr vx;
 const genericptr vy;
 {
