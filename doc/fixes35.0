@@ -79,6 +79,7 @@ flyers can get out of pits more easily than non-flyers
 allow use of the < command to try to exit a pit
 clean up messages when you stop levitation while riding a flying steed
 account for all attacks when determining max_passive_dmg
+dipping in acid can erode the dipped object
 
 
 Platform- and/or Interface-Specific Fixes

@@ -2417,17 +2417,17 @@ struct attack *mattk;		/* null means we find one internally */
 
 	case AD_ACID:
 	    if(!rn2(6)) {
-		erode_obj(obj, TRUE, FALSE);
+		(void) erode_obj(obj, TRUE, FALSE, FALSE);
 	    }
 	    break;
 	case AD_RUST:
 	    if(!mon->mcan) {
-		erode_obj(obj, FALSE, FALSE);
+		(void) erode_obj(obj, FALSE, FALSE, FALSE);
 	    }
 	    break;
 	case AD_CORR:
 	    if(!mon->mcan) {
-		erode_obj(obj, TRUE, FALSE);
+		(void) erode_obj(obj, TRUE, FALSE, FALSE);
 	    }
 	    break;
 	case AD_ENCH:

@@ -597,20 +597,23 @@ untwoweapon()
 	return;
 }
 
-/* Maybe rust object, or corrode it if acid damage is called for */
-void
-erode_obj(target, acid_dmg, fade_scrolls)
+/* Maybe rust object, or corrode it if acid damage is called for.
+ * Returns TRUE if something happened. */
+boolean
+erode_obj(target, acid_dmg, fade_scrolls, for_dip)
 struct obj *target;		/* object (e.g. weapon or armor) to erode */
 boolean acid_dmg;
 boolean fade_scrolls;
+boolean for_dip;
 {
 	int erosion;
 	struct monst *victim;
 	boolean vismon;
 	boolean visobj;
+	boolean ret = FALSE;
 
 	if (!target)
-	    return;
+	    return FALSE;
 	victim = carried(target) ? &youmonst :
 	    mcarried(target) ? target->ocarry : (struct monst *)0;
 	vismon = victim && (victim != &youmonst) && canseemon(victim);
@@ -620,6 +623,7 @@ boolean fade_scrolls;
 
 	if (target->greased) {
 	    grease_protect(target,(char *)0,victim);
+	    ret = TRUE;
 	} else if (target->oclass == SCROLL_CLASS) {
 	    if(fade_scrolls && target->otyp != SCR_BLANK_PAPER
 #ifdef MAIL
@@ -633,15 +637,16 @@ boolean fade_scrolls;
 		}
 		target->otyp = SCR_BLANK_PAPER;
 		target->spe = 0;
+		ret = TRUE;
 	    }
 	} else if (target->oerodeproof ||
 		(acid_dmg ? !is_corrodeable(target) : !is_rustprone(target))) {
 	    if (flags.verbose || !(target->oerodeproof && target->rknown)) {
-		if ((victim == &youmonst) || vismon)
+		if (((victim == &youmonst) || vismon) && !for_dip)
 		    pline("%s not affected.", Yobjnam2(target, "are"));
-		/* no message if not carried */
+		/* no message if not carried or dipping */
 	    }
-	    if (target->oerodeproof) target->rknown = TRUE;
+	    if (target->oerodeproof) target->rknown = !for_dip;
 	} else if (erosion < MAX_ERODE) {
 	    if ((victim == &youmonst) || vismon || visobj)
 		pline("%s%s!", Yobjnam2(target, acid_dmg ? "corrode" : "rust"),
@@ -651,8 +656,9 @@ boolean fade_scrolls;
 		target->oeroded2++;
 	    else
 		target->oeroded++;
+	    ret = TRUE;
 	} else {
-	    if (flags.verbose) {
+	    if (flags.verbose && !for_dip) {
 		if (victim == &youmonst)
 		    pline("%s completely %s.",
 			Yobjnam2(target, Blind ? "feel" : "look"),
@@ -663,6 +669,8 @@ boolean fade_scrolls;
 			acid_dmg ? "corroded" : "rusty");
 	    }
 	}
+
+	return ret;
 }
 
 int

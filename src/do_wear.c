@@ -1734,7 +1734,7 @@ boolean acid_dmg;
 	struct obj *otmph = some_armor(victim);
 
 	if (otmph && (otmph != uarmf)) {
-	    erode_obj(otmph, acid_dmg, FALSE);
+	    (void) erode_obj(otmph, acid_dmg, FALSE, FALSE);
 	    if (carried(otmph)) update_inventory();
 	}
 }

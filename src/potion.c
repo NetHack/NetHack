@@ -1888,6 +1888,11 @@ dodip()
 	    }
 	}
 
+	if (potion->otyp == POT_ACID) {
+	    if (erode_obj(obj, TRUE, FALSE, TRUE))
+		goto poof;
+	}
+
 	if (potion->otyp == POT_OIL) {
 	    boolean wisx = FALSE;
 	    if (potion->lamplit) {	/* burning */
