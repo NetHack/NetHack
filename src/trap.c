@@ -409,7 +409,7 @@ int *fail_reason;
 	struct monst *mon = 0;
 	struct obj *item;
 	coord cc;
-	boolean historic = (Role_if(PM_ARCHEOLOGIST) && !flags.mon_moving && statue->spe);
+	boolean historic = (Role_if(PM_ARCHEOLOGIST) && !flags.mon_moving && (statue->spe & STATUE_HISTORIC));
 
 	if (statue->oxlth && statue->oattached == OATTACHED_MONST) {
 	    cc.x = x,  cc.y = y;
@@ -440,6 +440,11 @@ int *fail_reason;
 	    return (struct monst *)0;
 	}
 
+	/* allow statues to be of a specific gender */
+	if (statue->spe & STATUE_MALE)
+	    mon->female = FALSE;
+	else if (statue->spe & STATUE_FEMALE)
+	    mon->female = TRUE;
 	/* if statue has been named, give same name to the monster */
 	if (statue->onamelth)
 	    mon = christen_monst(mon, ONAME(statue));

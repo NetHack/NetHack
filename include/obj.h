@@ -33,7 +33,11 @@ struct obj {
 				   marks your eggs, spinach tins
 				   royal coffers for a court ( == 2)
 				   tells which fruit a fruit is
-				   special for uball and amulet %% BAH */
+				   special for uball and amulet
+				   historic and gender for statues */
+#define STATUE_HISTORIC 0x01
+#define STATUE_MALE     0x02
+#define STATUE_FEMALE   0x04
 	char	oclass;		/* object class */
 	char	invlet;		/* designation in inventory */
 	char	oartifact;	/* artifact array index */

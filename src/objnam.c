@@ -367,7 +367,7 @@ register struct obj *obj;
 	    case ROCK_CLASS:
 		if (typ == STATUE)
 		    Sprintf(buf, "%s%s of %s%s",
-			(Role_if(PM_ARCHEOLOGIST) && obj->spe) ? "historic " : "" ,
+			(Role_if(PM_ARCHEOLOGIST) && (obj->spe & STATUE_HISTORIC)) ? "historic " : "" ,
 			actualn,
 			type_is_pname(&mons[obj->corpsenm]) ? "" :
 			  (mons[obj->corpsenm].geno & G_UNIQ) ? "the " :
@@ -2507,7 +2507,7 @@ typfnd:
 		case STATUE: otmp->corpsenm = mntmp;
 			if (Has_contents(otmp) && verysmall(&mons[mntmp]))
 			    delete_contents(otmp);	/* no spellbook */
-			otmp->spe = ishistoric;
+			otmp->spe = ishistoric ? STATUE_HISTORIC : 0;
 			break;
 		case SCALE_MAIL:
 			/* Dragon mail - depends on the order of objects */

@@ -53,7 +53,7 @@ BRANCH:levregion(01,00,79,20),(30,06,46,13)
 # Non diggable walls
 NON_DIGGABLE:(30,06,46,13)
 # Objects
-CONTAINER:'`',"statue",(36,10),uncursed,"knight",1,"Perseus"
+CONTAINER:'`',"statue",(36,10),uncursed,"knight",3,"Perseus"
 OBJECT[75%]:'[',"shield of reflection",contained,cursed,+0
 OBJECT[25%]:'[',"levitation boots",contained,random,+0
 OBJECT[50%]:')',"scimitar",contained,blessed,+2
@@ -151,7 +151,7 @@ BRANCH:levregion(01,00,79,20),(59,01,73,17)
 NON_DIGGABLE:(01,02,06,17)
 NON_DIGGABLE:(60,02,73,17)
 # Objects
-CONTAINER:'`',"statue",(68,10),uncursed,"knight",1,"Perseus"
+CONTAINER:'`',"statue",(68,10),uncursed,"knight",3,"Perseus"
 OBJECT[25%]:'[',"shield of reflection",contained,cursed,+0
 OBJECT[75%]:'[',"levitation boots",contained,random,+0
 OBJECT[50%]:')',"scimitar",contained,blessed,+2
