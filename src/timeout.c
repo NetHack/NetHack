@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.4	2000/09/28	*/
+/*	SCCS Id: @(#)timeout.c	3.4	2002/10/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -367,6 +367,13 @@ boolean wakeup_msg;
 {
 	stop_occupation();
 	nomul(how_long);
+	/* generally don't notice sounds while sleeping */
+	if (wakeup_msg && multi == how_long) {
+	    /* caller can follow with a direct call to Hear_again() if
+	       there's a need to override this when wakeup_msg is true */
+	    flags.soundok = 0;
+	    afternmv = Hear_again;	/* this won't give any messages */
+	}
 	/* early wakeup from combat won't be possible until next monster turn */
 	u.usleep = monstermoves;
 	nomovemsg = wakeup_msg ? "You wake up." : You_can_move_again;

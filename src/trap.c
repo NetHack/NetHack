@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2002/08/29	*/
+/*	SCCS Id: @(#)trap.c	3.4	2002/10/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -685,9 +685,7 @@ unsigned trflags;
 		    break;
 		}
 		pline("A cloud of gas puts you to sleep!");
-		flags.soundok = 0;
 		fall_asleep(-rnd(25), TRUE);
-		afternmv = Hear_again;
 #ifdef STEED
 		(void) steedintrap(trap, (struct obj *)0);
 #endif
