@@ -1,0 +1,330 @@
+
+
+
+DGN_COMP(6)                   1995                    DGN_COMP(6)
+
+
+
+NAME
+     dgn_comp - NetHack dungeon compiler
+
+SYNOPSIS
+     dgn_comp [ file ]
+
+     If no arguments are given, it reads standard input.
+
+DESCRIPTION
+     Dgn_comp is a dungeon compiler for NetHack version  3.2  and
+     higher.  It takes a description file as an argument and pro-
+     duces a dungeon "script" that is to be loaded by NetHack  at
+     runtime.
+
+     The purpose of this tool is to provide  NetHack  administra-
+     tors and implementors with a convenient way to create a cus-
+     tom dungeon for the game, without having  to  recompile  the
+     entire world.
+
+GRAMMAR
+     DUNGEON: name bonesmarker ( base , rand ) [ %age ]
+
+     where name is the dungeon name, bonesmarker is a letter  for
+     marking  bones  files, ( base , rand ) is the number of lev-
+     els, and %age is its percentage chance  of  being  generated
+     (if absent, 100% chance).
+
+     DESCRIPTION: tag
+
+     where tag is currently one of HELLISH, MAZELIKE,  or  ROGUE-
+     LIKE.
+
+     ALIGNMENT |  LEVALIGN:  [  lawful  |  neutral  |  chaotic  |
+     unaligned ]
+
+     gives  the  alignment  of  the  dungeon/level  (default   is
+     unaligned).
+
+     ENTRY: level
+
+     the dungeon entry point.  The dungeon connection attaches at
+     this  level  of the given dungeon.  If the value of level is
+     negative, the entry level is calculated from the  bottom  of
+     the  dungeon, with -1 being the last level.  If this line is
+     not present  in  a  dungeon  description,  the  entry  level
+     defaults to 1.
+
+     PROTOFILE: name
+
+     the prototypical  name  for  dungeon  level  files  in  this
+     dungeon.   For  example,  the PROTOFILE name for the dungeon
+     Vlad's Tower is tower.
+
+
+
+Dec                      Last change: 12                        1
+
+
+
+
+
+
+DGN_COMP(6)                   1995                    DGN_COMP(6)
+
+
+
+     LEVEL: name bonesmarker @ ( base , rand ) [ %age ]
+
+     where name is the level name, bonesmarker is  a  letter  for
+     marking  bones  files,  (  base , rand ) is the location and
+     %age is the generation percentage, as above.
+
+     RNDLEVEL: name bonesmarker @ (  base  ,  rand  )  [  %age  ]
+     rndlevs
+
+     where name is the level name, bonesmarker is  a  letter  for
+     marking  bones  files, ( base , rand ) is the location, %age
+     is the generation percentage, as above, and rndlevs  is  the
+     number of similar levels available to choose from.
+
+     CHAINLEVEL: name bonesmarker prev_name + ( base , rand  )  [
+     %age ]
+
+     where name is the level name, bonesmarker is  a  letter  for
+     marking  bones  files,  prev_name  is  the  name  of a level
+     defined previously, ( base , rand ) is the offset  from  the
+     level being chained from, and %age is the generation percen-
+     tage.
+
+     RNDCHAINLEVEL: name bonesmarker prev_name + ( base , rand  )
+     [ %age ] rndlevs
+
+     where name is the level name, bonesmarker is  a  letter  for
+     marking  bones  files,  prev_name  is  the  name  of a level
+     defined previously, ( base , rand ) is the offset  from  the
+     level being chained from, %age is the generation percentage,
+     and rndlevs is the number of  similar  levels  available  to
+     choose from.
+
+     LEVELDESC: type
+
+     where type is the level type, (see DESCRIPTION, above).  The
+     type  is used to override any pre-set value used to describe
+     the entire dungeon, for this level only.
+
+     BRANCH: name @ ( base , rand ) [ stair | no_up |  no_down  |
+     portal ] [ up | down ]
+
+     where name is the name of the dungeon to branch  to,  and  (
+     base  ,  rand ) is the location of the branch.  The last two
+     optional arguments are the branch type and branch direction.
+     The  type  of  a branch can be a two-way stair connection, a
+     one-way stair connection, or  a  magic  portal.   A  one-way
+     stair  is  described  by  the  types no_up and no_down which
+     specify which  stair  direction  is  missing.   The  default
+     branch  type  is  stair.   The  direction for a stair can be
+     either up or down; direction is not applicable  to  portals.
+     The default direction is down.
+
+
+
+Dec                      Last change: 12                        2
+
+
+
+
+
+
+DGN_COMP(6)                   1995                    DGN_COMP(6)
+
+
+
+     CHAINBRANCH: name prev_name + ( base ,  rand  )  [  stair  |
+     no_up | no_down | portal ] [ up | down ]
+
+     where name  is  the  name  of  the  dungeon  to  branch  to,
+     prev_name  is  the  name of a previously defined level and (
+     base , rand ) is the offset from  the  level  being  chained
+     from.   The  optional branch type and direction are the same
+     as described above.
+
+GENERIC RULES
+     Each dungeon must have a unique bonesmarker , and each  spe-
+     cial level must have a bonesmarker unique within its dungeon
+     (letters may be  reused  in  different  dungeons).   If  the
+     bonesmarker  has  the  special  value "none", no bones files
+     will be created for that level or dungeon.
+
+     The value base may be in the range  of  1  to  MAXLEVEL  (as
+     defined in global.h ).
+
+     The value rand may be in the range of -1 to MAXLEVEL.
+
+     If  rand  is  -1  it  will  be  replaced  with   the   value
+     (num_dunlevs(dungeon)  -  base) during the load process (ie.
+     from here to the end of the dungeon).
+
+     If rand is 0 the level is located absolutely at base.
+
+     Branches don't have  a  probability.   Dungeons  do.   If  a
+     dungeon  fails  to  be generated during load, all its levels
+     and branches are skipped.
+
+     No level or branch may be chained from a level with  a  per-
+     centage  generation  probability.   This  is to prevent non-
+     resolution during the load.  In addition, no branch  may  be
+     made from a dungeon with a percentage generation probability
+     for the same reason.
+
+     As a general rule using the dungeon compiler:
+
+     If a dungeon has a protofile name associated  with  it  (eg.
+     tower) that file will be used.
+
+     If a special level is present, it will  override  the  above
+     rule and the appropriate file will be loaded.
+
+     If neither of the above are present, the standard  generator
+     will take over and make a "normal" level.
+
+     A level alignment, if present, will override  the  alignment
+     of the dungeon that it exists within.
+
+
+
+
+
+Dec                      Last change: 12                        3
+
+
+
+
+
+
+DGN_COMP(6)                   1995                    DGN_COMP(6)
+
+
+
+EXAMPLE
+     Here  is  the  current  syntax  of  the  dungeon  compiler's
+     "language":
+
+
+     #
+     #       The dungeon description file for the "standard" original
+     #       3.0 NetHack.
+     #
+     DUNGEON:        "The Dungeons of Doom" "D" (25, 5)
+     LEVEL:          "rogue" "none" @ (15, 4)
+     LEVEL:          "oracle" "none" @ (5, 7)
+     LEVEL:          "bigroom" "B" @ (12, 3) 15
+     LEVEL:          "medusa" "none" @ (20, 5)
+     CHAINLEVEL:     "castle" "medusa" + (1, 4)
+     CHAINBRANCH:    "Hell" "castle" + (0, 0) no_down
+     BRANCH:         "The Astral Plane" @ (1, 0) no_down up
+
+     DUNGEON:        "Hell" "H" (25, 5)
+     DESCRIPTION:    mazelike
+     DESCRIPTION:    hellish
+     BRANCH:         "Vlad's Tower" @ (13, 5) up
+     LEVEL:          "wizard" "none" @ (15, 10)
+     LEVEL:          "fakewiz" "A" @ (5, 5)
+     LEVEL:          "fakewiz" "B" @ (10, 5)
+     LEVEL:          "fakewiz" "C" @ (15, 5)
+     LEVEL:          "fakewiz" "D" @ (20, 5)
+     LEVEL:          "fakewiz" "E" @ (25, 5)
+
+     DUNGEON:        "Vlad's Tower" "T" (3, 0)
+     PROTOFILE:      "tower"
+     DESCRIPTION:    mazelike
+     ENTRY:          -1
+
+     DUNGEON:        "The Astral Plane" "A" (1, 0)
+     DESCRIPTION:    mazelike
+     PROTOFILE:      "endgame"
+
+     NOTES:
+     Lines beginning with '#' are considered comments.
+     A special level must be explicitly aligned.   The  alignment
+     of  the  dungeon it is in only applies to non-special levels
+     within that dungeon.
+
+AUTHOR
+     M. Stephenson (from the level  compiler  by  Jean-Christophe
+     Collet).
+
+SEE ALSO
+     lev_comp(6), nethack(6)
+
+
+
+
+
+Dec                      Last change: 12                        4
+
+
+
+
+
+
+DGN_COMP(6)                   1995                    DGN_COMP(6)
+
+
+
+BUGS
+     Probably infinite.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Dec                      Last change: 12                        5
+
+
+
