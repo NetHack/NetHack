@@ -912,8 +912,10 @@ register struct obj *otmp;
 		if (Punished) set_bc(0);
 	    }
 	} else if (was_blind) {
-	    changed = TRUE;	/* !Blind */
-	    You("can see again.");
+	    if (!gulp_blnd_check()) {
+		changed = TRUE;	/* !Blind */
+		You("can see again.");
+	    }
 	}
 	if (changed) {
 	    /* blindness has just been toggled */

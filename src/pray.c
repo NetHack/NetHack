@@ -187,7 +187,10 @@ in_trouble()
 	}
 #endif
 
-	if (Blinded > 1 && haseyes(youmonst.data)) return(TROUBLE_BLIND);
+	if (Blinded > 1 && haseyes(youmonst.data) &&
+	    (!u.uswallow ||
+	     !attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
+	    return(TROUBLE_BLIND);
 	for(i=0; i<A_MAX; i++)
 	    if(ABASE(i) < AMAX(i)) return(TROUBLE_POISONED);
 	if(Wounded_legs

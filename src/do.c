@@ -1580,8 +1580,10 @@ wipeoff()
 	if (!Blinded) {
 		pline("You've got the glop off.");
 		u.ucreamed = 0;
-		Blinded = 1;
-		make_blinded(0L,TRUE);
+		if (!gulp_blnd_check()) {
+		    Blinded = 1;
+		    make_blinded(0L,TRUE);
+		}
 		return(0);
 	} else if (!u.ucreamed) {
 		Your("%s feels clean now.", body_part(FACE));

@@ -22,6 +22,10 @@ apply weapon skill to-hit bonus or penalty to bare-handed attacks
 only give monk's "cumbersome armor" message when the armor penalty causes
 	an attack to miss
 identified touchstone can rub on gold like the data.base entry says
+dust vortex-induced blindness should kick in immediately when blindfold
+	is removed or glop is wiped off
+prayer/unicorn-horn won't fix blindness while still engulfed in a dust
+	vortex since it will just return immediately
 
 
 Platform- and/or Interface-Specific Fixes

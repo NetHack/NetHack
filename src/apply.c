@@ -134,21 +134,23 @@ use_towel(obj)
 	}
 
 	if (Glib) {
-		Glib = 0;
-		You("wipe off your %s.", makeplural(body_part(HAND)));
-		return 1;
+	    Glib = 0;
+	    You("wipe off your %s.", makeplural(body_part(HAND)));
+	    return 1;
 	} else if(u.ucreamed) {
-		Blinded -= u.ucreamed;
-		u.ucreamed = 0;
+	    Blinded -= u.ucreamed;
+	    u.ucreamed = 0;
 
-		if (!Blinded) {
-			pline("You've got the glop off.");
-			Blinded = 1;
-			make_blinded(0L,TRUE);
-		} else {
-			Your("%s feels clean now.", body_part(FACE));
+	    if (!Blinded) {
+		pline("You've got the glop off.");
+		if (!gulp_blnd_check()) {
+		    Blinded = 1;
+		    make_blinded(0L,TRUE);
 		}
-		return 1;
+	    } else {
+		Your("%s feels clean now.", body_part(FACE));
+	    }
+	    return 1;
 	}
 
 	Your("%s and %s are already clean.",
@@ -1476,7 +1478,10 @@ struct obj *obj;
 
 	/* collect property troubles */
 	if (Sick) prop_trouble(SICK);
-	if (Blinded > (long)u.ucreamed) prop_trouble(BLINDED);
+	if (Blinded > (long)u.ucreamed &&
+	    !(u.uswallow &&
+	      attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
+	    prop_trouble(BLINDED);
 	if (HHallucination) prop_trouble(HALLUC);
 	if (Vomiting) prop_trouble(VOMITING);
 	if (HConfusion) prop_trouble(CONFUSION);

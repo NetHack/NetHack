@@ -1638,7 +1638,9 @@ register struct obj *otmp;
 		    you_unwere(TRUE);
 		break;
 	    case CARROT:
-		make_blinded((long)u.ucreamed,TRUE);
+		if (!u.uswallow ||
+		    !attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND))
+		    make_blinded((long)u.ucreamed,TRUE);
 		break;
 	    case FORTUNE_COOKIE:
 		outrumor(bcsign(otmp), BY_COOKIE);

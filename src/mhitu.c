@@ -1588,6 +1588,24 @@ dopois:
 #endif /* OVL1 */
 #ifdef OVLB
 
+/* An interface for use when taking a blindfold off, for example,
+ * to see if an engulfing attack should immediately take affect, like
+ * a passive attack. TRUE if engulfing blindness occurred */
+boolean
+gulp_blnd_check()
+{
+	struct attack *mattk;
+
+	if (!Blinded && u.uswallow &&
+	    (mattk = attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)) &&
+	    can_blnd(u.ustuck, &youmonst, mattk->aatyp, (struct obj*)0)) {
+	    ++u.uswldtim;		/* compensate for gulpmu change */
+	    (void) gulpmu(u.ustuck, mattk);
+	    return TRUE;
+	}
+	return FALSE;
+}
+
 STATIC_OVL int
 gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 	register struct monst *mtmp;
