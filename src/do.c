@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.4	2003/04/25	*/
+/*	SCCS Id: @(#)do.c	3.4	2003/12/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -406,20 +406,18 @@ register const char *word;
 		return(FALSE);
 	}
 	if (obj->otyp == LOADSTONE && obj->cursed) {
-		if (*word)
-			pline("For some reason, you cannot %s the stone%s!",
-				word, plur(obj->quan));
-		/* Kludge -- see invent.c */
-		if (obj->corpsenm) {
-			struct obj *otmp;
-
-			otmp = obj;
-			obj = obj->nobj;
-			obj->quan += otmp->quan;
-			obj->owt = weight(obj);
-			freeinv(otmp);
-			obfree(otmp, obj);
+		/* getobj() kludge sets corpsenm to user's specified count
+		   when refusing to split a stack of cursed loadstones */
+		if (*word) {
+			/* getobj() ignores a count for throwing since that is
+			   implicitly forced to be 1; replicate its kludge... */
+			if (!strcmp(word, "throw") && obj->quan > 1L)
+			    obj->corpsenm = 1;
+			pline("For some reason, you cannot %s%s the stone%s!",
+			      word, obj->corpsenm ? " any of" : "",
+			      plur(obj->quan));
 		}
+		obj->corpsenm = 0;		/* reset */
 		obj->bknown = 1;
 		return(FALSE);
 	}
@@ -694,14 +692,20 @@ int retry;
 	    for (i = 0; i < n; i++) {
 		otmp = pick_list[i].item.a_obj;
 		cnt = pick_list[i].count;
-		if (cnt < otmp->quan && !welded(otmp) &&
-			(!otmp->cursed || otmp->otyp != LOADSTONE)) {
+		if (cnt < otmp->quan) {
+		    if (welded(otmp)) {
+			;	/* don't split */
+		    } else if (otmp->otyp == LOADSTONE && otmp->cursed) {
+			/* same kludge as getobj(), for canletgo()'s use */
+			otmp->corpsenm = (int) cnt;	/* don't split */
+		    } else {
 #ifndef GOLDOBJ
-		    if (otmp->oclass == COIN_CLASS)
-			(void) splitobj(otmp, otmp->quan - cnt);
-		    else
+			if (otmp->oclass == COIN_CLASS)
+			    (void) splitobj(otmp, otmp->quan - cnt);
+			else
 #endif
-		    otmp = splitobj(otmp, cnt);
+			    otmp = splitobj(otmp, cnt);
+		    }
 		}
 		n_dropped += drop(otmp);
 	    }

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2003/11/18	*/
+/*	SCCS Id: @(#)invent.c	3.4	2003/12/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1065,14 +1065,12 @@ register const char *let,*word;
 	if(allowcnt == 2) {	/* cnt given */
 	    if(cnt == 0) return (struct obj *)0;
 	    if(cnt != otmp->quan) {
-		otmp = splitobj(otmp, cnt);
-		/* Very ugly kludge necessary to prevent someone from trying
-		 * to drop one of several loadstones and having the loadstone
-		 * now be separate.
-		 */
-		if (!strcmp(word, "drop") &&
-		    otmp->otyp == LOADSTONE && otmp->cursed)
-		    otmp->corpsenm = otmp->invlet;
+		/* don't split a stack of cursed loadstones */
+		if (otmp->otyp == LOADSTONE && otmp->cursed)
+		    /* kludge for canletgo()'s can't-drop-this message */
+		    otmp->corpsenm = (int) cnt;
+		else
+		    otmp = splitobj(otmp, cnt);
 	    }
 	}
 	return(otmp);
