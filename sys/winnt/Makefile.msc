@@ -572,7 +572,12 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 #  DO NOT INDENT THE << below!
 #
 
-$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll
+!IF "$(GRAPHICAL)"=="Y"
+$(GAMEFILE) : $(ALLOBJ) $(NHRES)
+!ELSE
+$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag \
+		$(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll
+!ENDIF
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
 	$(link) $(LFLAGS) user32.lib winmm.lib -out:$@ @<<$(GAME).lnk
@@ -582,6 +587,11 @@ $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll
 	@if exist $(O)install.tag del $(O)install.tag
 	@if exist $(GAMEDIR)\$(GAME).bak del $(GAMEDIR)\$(GAME).bak
 
+$(O)gamedir.tag:
+	@if not exist $(GAMEDIR)\*.* echo creating directory $(GAMEDIR)
+	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
+	@echo directory created > $@
+
 $(O)nhdefkey.def:
 	@echo EXPORTS >$@
 	@echo    ProcessKeystroke >>$@
@@ -590,12 +600,12 @@ $(O)nhdefkey.def:
 	@echo    SourceAuthor >>$@
 	@echo    KeyHandlerName >>$@
 
-$(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)$(@B).def
+$(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $@
 	$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
-		-out:$@ $(O)$(@B).o
+		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 $(O)nh340key.def:
 	@echo EXPORTS >$@
@@ -605,12 +615,12 @@ $(O)nh340key.def:
 	@echo    SourceAuthor >>$@
 	@echo    KeyHandlerName >>$@
 
-$(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)$(@B).def
+$(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $@
 	$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
-		-out:$@ $(O)$(@B).o
+		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 #
 #  Secondary Targets.
@@ -1077,6 +1087,10 @@ spotless: clean
 	if exist $(SRC)\vis_tab.c       del $(SRC)\vis_tab.c
 	if exist $(U)recover.exe        del $(U)recover.exe
 	if exist nhdat.			del nhdat.
+	if exist $(O)obj.tag            del $(O)obj.tag
+	if exist $(O)gamedir.tag        del $(O)gamedir.tag
+	if exist $(O)nh*key.lib         del $(O)nh*key.lib
+	if exist $(O)nh*key.exp         del $(O)nh*key.exp
 
 clean:
 	if exist $(O)*.o del $(O)*.o
@@ -1086,6 +1100,7 @@ clean:
 	if exist $(U)dgn_comp.exe  del $(U)dgn_comp.exe
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
+	if exist $(O)install.tag   del $(O)install.tag
 ! IF ("$(WINPFLAG)"!="")
 	if exist $(TILEBMP16)        del $(TILEBMP16)
 	if exist $(TILEBMP32)        del $(TILEBMP32)
@@ -1209,7 +1224,7 @@ $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
 	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\wintext.c
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
 	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winval.c
-$(O)tile.o: tile.c $(HACK_H)
+$(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnmain.h
 	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnaskstr.c
