@@ -1938,8 +1938,9 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	     * all handled in the != FOOD_CLASS case, above */
 	    switch (objects[otmp->otyp].oc_material) {
 	    case FLESH:
-		if (otmp->otyp == EGG) {
-		    u.uconduct.unvegan++;
+		u.uconduct.unvegan++;
+		if (otmp->otyp != EGG) {
+		    violated_vegetarian();
 		}
 		break;
 
