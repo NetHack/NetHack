@@ -542,6 +542,7 @@ made each of the end disclosure options customizable to "prompt;default no",
 	"don't show it and don't prompt"
 add female role level names "Medica ossium", "Magistra", "Chevaliere",  
 	and "Dame"
+more feedback about skill advancement from #enhance command
 
 
 Platform- and/or Interface-Specific New Features

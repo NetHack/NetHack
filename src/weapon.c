@@ -95,6 +95,8 @@ int skill;
 #endif	/* OVLB */
 
 STATIC_DCL boolean FDECL(can_advance, (int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(could_advance, (int));
+STATIC_DCL boolean FDECL(peaked_skill, (int));
 STATIC_DCL int FDECL(slots_required, (int));
 
 #ifdef OVL1
@@ -763,6 +765,7 @@ int skill;
 }
 
 /* return true if this skill can be advanced */
+/*ARGSUSED*/
 STATIC_OVL boolean
 can_advance(skill, speedy)
 int skill;
@@ -779,6 +782,30 @@ boolean speedy;
 	    && u.weapon_slots >= slots_required(skill)));
 }
 
+/* return true if this skill could be advanced if more slots were available */
+STATIC_OVL boolean
+could_advance(skill)
+int skill;
+{
+    return !P_RESTRICTED(skill)
+	    && P_SKILL(skill) < P_MAX_SKILL(skill) && (
+	    (P_ADVANCE(skill) >=
+		(unsigned) practice_needed_to_advance(P_SKILL(skill))
+	    && u.skills_advanced < P_SKILL_LIMIT));
+}
+
+/* return true if this skill has reached its maximum and there's been enough
+   practice to become eligible for the next step if that had been possible */
+STATIC_OVL boolean
+peaked_skill(skill)
+int skill;
+{
+    return !P_RESTRICTED(skill)
+	    && P_SKILL(skill) >= P_MAX_SKILL(skill) && (
+	    (P_ADVANCE(skill) >=
+		(unsigned) practice_needed_to_advance(P_SKILL(skill))));
+}
+
 STATIC_OVL void
 skill_advance(skill)
 int skill;
@@ -788,8 +815,8 @@ int skill;
     u.skill_record[u.skills_advanced++] = skill;
     /* subtly change the advance message to indicate no more advancement */
     You("are now %s skilled in %s.",
-    	P_SKILL(skill) >= P_MAX_SKILL(skill) ? "most" : "more",
-    	P_NAME(skill));
+	P_SKILL(skill) >= P_MAX_SKILL(skill) ? "most" : "more",
+	P_NAME(skill));
 }
 
 static struct skill_range {
@@ -812,13 +839,14 @@ static struct skill_range {
 int
 enhance_weapon_skill()
 {
-    int pass, i, n, len, longest, to_advance;
-    char buf[BUFSZ], buf2[BUFSZ];
+    int pass, i, n, len, longest,
+	to_advance, eventually_advance, maxxed_cnt;
+    char buf[BUFSZ], sklnambuf[BUFSZ];
+    const char *prefix;
     menu_item *selected;
     anything any;
     winid win;
     boolean speedy = FALSE;
-
 
 #ifdef WIZARD
 	if (wizard && yn("Advance skills without practice?") == 'y')
@@ -827,14 +855,43 @@ enhance_weapon_skill()
 
 	do {
 	    /* find longest available skill name, count those that can advance */
-	    for (longest = 0, to_advance = 0, i = 0; i < P_NUM_SKILLS; i++) {
-		if (!P_RESTRICTED(i) && (len = strlen(P_NAME(i))) > longest)
+	    to_advance = eventually_advance = maxxed_cnt = 0;
+	    for (longest = 0, i = 0; i < P_NUM_SKILLS; i++) {
+		if (P_RESTRICTED(i)) continue;
+		if ((len = strlen(P_NAME(i))) > longest)
 		    longest = len;
 		if (can_advance(i, speedy)) to_advance++;
+		else if (could_advance(i)) eventually_advance++;
+		else if (peaked_skill(i)) maxxed_cnt++;
 	    }
 
 	    win = create_nhwindow(NHW_MENU);
 	    start_menu(win);
+
+	    /* start with a legend if any entries will be annotated
+	       with "*" or "#" below */
+	    if (eventually_advance > 0 || maxxed_cnt > 0) {
+		any.a_int = 0;
+		if (eventually_advance > 0) {
+		    Sprintf(buf,
+			    "(Skill%s flagged by \"*\" may be enhanced %s.)",
+			    plur(eventually_advance),
+			    (u.ulevel < MAXULEV) ?
+				"when you're more experienced" :
+				"if skill slots become available");
+		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+			     buf, MENU_UNSELECTED);
+		}
+		if (maxxed_cnt > 0) {
+		    Sprintf(buf,
+		  "(Skill%s flagged by \"#\" cannot be enhanced any further.)",
+			    plur(maxxed_cnt));
+		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+			     buf, MENU_UNSELECTED);
+		}
+		add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+			     "", MENU_UNSELECTED);
+	    }
 
 	    /* List the skills, making ones that could be advanced
 	       selectable.  List the miscellaneous skills first.
@@ -855,28 +912,38 @@ enhance_weapon_skill()
 		 * The 12 is the longest skill level name.
 		 * The "    " is room for a selection letter and dash, "a - ".
 		 */
+		if (can_advance(i, speedy))
+		    prefix = "";	/* will be preceded by menu choice */
+		else if (could_advance(i))
+		    prefix = "  * ";
+		else if (peaked_skill(i))
+		    prefix = "  # ";
+		else
+		    prefix = (to_advance + eventually_advance +
+				maxxed_cnt > 0) ? "    " : "";
+		(void) skill_level_name(i, sklnambuf);
 #ifdef WIZARD
 		if (wizard)
-		    Sprintf(buf2, " %s%-*s %-12s %4d(%4d)",
-			    to_advance == 0 || can_advance(i, speedy) ? "" : "    " ,
-			    longest, P_NAME(i),
-			    skill_level_name(i, buf),
-			    P_ADVANCE(i), practice_needed_to_advance(P_SKILL(i)));
+		    Sprintf(buf, " %s%-*s %-12s %5d(%4d)",
+			    prefix, longest, P_NAME(i), sklnambuf,
+			    P_ADVANCE(i),
+			    practice_needed_to_advance(P_SKILL(i)));
 		else
 #endif
-		    Sprintf(buf2, " %s %-*s [%s]",
-			    to_advance == 0 || can_advance(i, speedy) ? "" : "    ",
-			    longest, P_NAME(i),
-			    skill_level_name(i, buf));
+		    Sprintf(buf, " %s %-*s [%s]",
+			    prefix, longest, P_NAME(i), sklnambuf);
 
 		any.a_int = can_advance(i, speedy) ? i+1 : 0;
-		add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf2, MENU_UNSELECTED);
+		add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+			 buf, MENU_UNSELECTED);
 	    }
 
-	    Strcpy(buf, to_advance ? "Pick a skill to advance:" : "Current skills:");
+	    Strcpy(buf, (to_advance > 0) ? "Pick a skill to advance:" :
+					   "Current skills:");
 #ifdef WIZARD
-	    if (wizard && !speedy) Sprintf(eos(buf), "  (%d slot%s available)",
-				u.weapon_slots, plur(u.weapon_slots));
+	    if (wizard && !speedy)
+		Sprintf(eos(buf), "  (%d slot%s available)",
+			u.weapon_slots, plur(u.weapon_slots));
 #endif
 	    end_menu(win, buf);
 	    n = select_menu(win, to_advance ? PICK_ONE : PICK_NONE, &selected);
