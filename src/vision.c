@@ -1519,7 +1519,9 @@ clear_path(col1,row1,col2,row2)
 	    q3_path(row1,col1,row2,col2,cleardone);
 	}
     }
+#ifdef MACRO_CPATH
 cleardone:
+#endif
     return((boolean)result);
 }
 
@@ -1664,6 +1666,9 @@ right_side(row, cb_row, cb_col, fb_row, fb_col, left, right_mark, limits)
     char *row_max;		/* right most */
     int		  lim_max;	/* right most limit of circle */
 
+#ifdef GCC_WARN
+    rowp = 0;
+#endif
     nrow    = row + step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
     if(!vis_func) {
@@ -1916,6 +1921,9 @@ left_side(row, cb_row, cb_col, fb_row, fb_col, left_mark, right, limits)
     char *row_max;		/* right most */
     int		  lim_min;
 
+#ifdef GCC_WARN
+    rowp = 0;
+#endif
     nrow    = row + step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
     if(!vis_func) {
