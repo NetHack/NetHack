@@ -478,6 +478,10 @@ whoami() {
 	 */
 	register char *s;
 
+#if defined(__APPLE__)
+	/* Unixisms just confuse the user */
+	(void) strncpy(plname, "player", sizeof(plname)-1);
+#else
 	if (*plname) return FALSE;
 	if(/* !*plname && */ (s = nh_getenv("USER")))
 		(void) strncpy(plname, s, sizeof(plname)-1);
@@ -485,6 +489,7 @@ whoami() {
 		(void) strncpy(plname, s, sizeof(plname)-1);
 	if(!*plname && (s = getlogin()))
 		(void) strncpy(plname, s, sizeof(plname)-1);
+#endif
 	return TRUE;
 }
 
