@@ -601,7 +601,7 @@ char *buf;
 	else if (IS_SINK(maploc->typ)) what = "a sink";
 #endif
 	else if (IS_ALTAR(maploc->typ)) what = "an altar";
-	else if (IS_DRAWBRIDGE(maploc->typ)) what = "the drawbridge";
+	else if (IS_DRAWBRIDGE(maploc->typ)) what = "a drawbridge";
 	else if (maploc->typ == STAIRS) what = "the stairs";
 	else if (maploc->typ == LADDER) what = "a ladder";
 	else if (maploc->typ == IRONBARS) what = "an iron bar";
@@ -612,7 +612,7 @@ char *buf;
 int
 dokick()
 {
-	register int x, y;
+	int x, y;
 	int avrg_attrib;
 	register struct monst *mtmp;
 	boolean no_kick = FALSE;
@@ -993,17 +993,17 @@ ouch:
 		    exercise(A_DEX, FALSE);
 		    exercise(A_STR, FALSE);
 		    if (Blind) feel_location(x,y); /* we know we hit it */
+		    if (is_drawbridge_wall(x,y) >= 0) {
+			pline_The("drawbridge is unaffected.");
+			/* update maploc to refer to the drawbridge */
+			(void) find_drawbridge(&x,&y);
+			maploc = &levl[x][y];
+		    }
 		    if(!rn2(3)) set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
 		    losehp(rnd(ACURR(A_CON) > 15 ? 3 : 5), kickstr(buf),
 			KILLED_BY);
 		    if(Is_airlevel(&u.uz) || Levitation)
 			hurtle(-u.dx, -u.dy, rn1(2,4), TRUE); /* assume it's heavy */
-		    return(1);
-		}
-		if (is_drawbridge_wall(x,y) >= 0) {
-		    pline_The("drawbridge is unaffected.");
-		    if(Levitation)
-			hurtle(-u.dx, -u.dy, rn1(2,4), TRUE); /* it's heavy */
 		    return(1);
 		}
 		goto dumb;
