@@ -1682,7 +1682,7 @@ dodip()
 	}
 	potion->in_use = TRUE;		/* assume it will be used up */
 	if(potion->otyp == POT_WATER) {
-		boolean useeit = !Blind;
+		boolean useeit = !Blind || (obj == ublindf && Blindfolded_only);
 		if (potion->blessed) {
 			if (obj->cursed) {
 				if (useeit)

@@ -396,7 +396,7 @@ decurse:
 			return;
 		    }
 		    uncurse(otmp);
-		    if (!Blind) {
+		    if (!Blind || (otmp == ublindf && Blindfolded_only)) {
 			pline("%s %s.", what ? what :
 				(const char *)Yobjnam2(otmp, "softly glow"),
 			      hcolor(NH_AMBER));

@@ -100,6 +100,9 @@
 		 !(ublindf && ublindf->oartifact == ART_EYES_OF_THE_OVERWORLD))
 		/* ...the Eyes operate even when you really are blind
 		    or don't have any eyes */
+#define Blindfolded_only (!Blinded && haseyes(youmonst.data) && Blindfolded && \
+		 !(ublindf && ublindf->oartifact == ART_EYES_OF_THE_OVERWORLD))
+		/* blind because of a blindfold, and *only* that */
 
 #define Sick			u.uprops[SICK].intrinsic
 #define Stoned			u.uprops[STONED].intrinsic
