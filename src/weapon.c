@@ -908,7 +908,9 @@ enhance_weapon_skill()
 
 		if (P_RESTRICTED(i)) continue;
 		/*
-		 * Sigh, this assumes a monospaced font.
+		 * Sigh, this assumes a monospaced font unless
+		 * iflags.menu_tab_sep is set in which case it puts
+		 * tabs between columns.
 		 * The 12 is the longest skill level name.
 		 * The "    " is room for a selection letter and dash, "a - ".
 		 */
@@ -923,16 +925,26 @@ enhance_weapon_skill()
 				maxxed_cnt > 0) ? "    " : "";
 		(void) skill_level_name(i, sklnambuf);
 #ifdef WIZARD
-		if (wizard)
-		    Sprintf(buf, " %s%-*s %-12s %5d(%4d)",
+		if (wizard) {
+		    if (!iflags.menu_tab_sep)
+			Sprintf(buf, " %s%-*s %-12s %5d(%4d)",
 			    prefix, longest, P_NAME(i), sklnambuf,
 			    P_ADVANCE(i),
 			    practice_needed_to_advance(P_SKILL(i)));
-		else
+		    else
+			Sprintf(buf, " %s%s\t%s\t%5d(%4d)",
+			    prefix, P_NAME(i), sklnambuf,
+			    P_ADVANCE(i),
+			    practice_needed_to_advance(P_SKILL(i)));
+		 } else {
 #endif
-		    Sprintf(buf, " %s %-*s [%s]",
+		    if (!iflags.menu_tab_sep)
+			Sprintf(buf, " %s %-*s [%s]",
 			    prefix, longest, P_NAME(i), sklnambuf);
-
+		    else
+			Sprintf(buf, " %s%s\t[%s]",
+			    prefix, P_NAME(i), sklnambuf);
+		}
 		any.a_int = can_advance(i, speedy) ? i+1 : 0;
 		add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
 			 buf, MENU_UNSELECTED);
