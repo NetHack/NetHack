@@ -541,6 +541,8 @@ E void FDECL(food_substitution, (struct obj *,struct obj *));
 E void NDECL(fix_petrification);
 E void FDECL(consume_oeaten, (struct obj *,int));
 E boolean FDECL(maybe_finished_meal, (BOOLEAN_P));
+E void FDECL(set_tin_variety, (struct obj *,int));
+E int FDECL(tin_variety_txt, (char *,int *));
 
 /* ### end.c ### */
 

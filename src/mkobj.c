@@ -425,12 +425,13 @@ boolean artif;
 	    case TIN:
 		otmp->corpsenm = NON_PM;	/* empty (so far) */
 		if (!rn2(6))
-		    otmp->spe = 1;		/* spinach */
+		    set_tin_variety(otmp, SPINACH_TIN);
 		else for (tryct = 200; tryct > 0; --tryct) {
 		    mndx = undead_to_corpse(rndmonnum());
 		    if (mons[mndx].cnutrit &&
 			    !(mvitals[mndx].mvflags & G_NOCORPSE)) {
 			otmp->corpsenm = mndx;
+			set_tin_variety(otmp, 0);
 			break;
 		    }
 		}

@@ -1772,6 +1772,7 @@ boolean from_user;
 #endif
 	int halfeaten, mntmp, contents;
 	int islit, unlabeled, ishistoric, isdiluted;
+	int tmp, tinv, tvariety;
 	struct fruit *f;
 	int ftype = current_fruit;
 	char fruitbuf[BUFSZ];
@@ -1801,6 +1802,7 @@ boolean from_user;
 #endif
 		ispoisoned = isgreased = eroded = eroded2 = erodeproof =
 		halfeaten = islit = unlabeled = ishistoric = isdiluted = 0;
+	tvariety = -1;
 	mntmp = NON_PM;
 #define UNDEFINED 0
 #define EMPTY 1
@@ -2013,7 +2015,12 @@ boolean from_user;
 	if (!strstri(bp, "wand ")
 	 && !strstri(bp, "spellbook ")
 	 && !strstri(bp, "finger ")) {
-	    if ((p = strstri(bp, " of ")) != 0
+	    if (((p = strstri(bp, "tin of ")) != 0) &&
+	    	(tmp = tin_variety_txt(p+7, &tinv)) &&
+		(mntmp = name_to_mon(p+7+tmp)) >= LOW_PM) {
+		*(p+3) = 0;
+		tvariety = tinv;
+	    } else if ((p = strstri(bp, " of ")) != 0
 		&& (mntmp = name_to_mon(p+4)) >= LOW_PM)
 		*p = 0;
 	}
@@ -2682,6 +2689,15 @@ typfnd:
 	if (isdiluted && otmp->oclass == POTION_CLASS &&
 			otmp->otyp != POT_WATER)
 		otmp->odiluted = 1;
+
+	/* set tin variety */
+	if (otmp->otyp == TIN && tvariety >= 0 && 
+		(rn2(4)
+#ifdef WIZARD
+			|| wizard
+#endif
+					))
+		set_tin_variety(otmp, tvariety);
 
 	if (name) {
 		const char *aname;

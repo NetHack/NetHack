@@ -252,6 +252,12 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define NOSE 17
 #define STOMACH 18
 
+/* indexes for some special tin types */
+#define ROTTEN_TIN 4
+#define HOMEMADE_TIN 5
+#define FRENCH_FRIED_TIN 11
+#define SPINACH_TIN (-1)
+
 /* Flags to control menus */
 #define MENUTYPELEN sizeof("traditional ")
 #define MENU_TRADITIONAL 0
