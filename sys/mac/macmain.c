@@ -9,7 +9,7 @@
 #include "macwin.h"
 #include "mactty.h"
 
-#if !TARGET_API_MAC_CARBON
+#if 1 /*!TARGET_API_MAC_CARBON*/
 #include <OSUtils.h>
 #include <files.h>
 #include <Types.h>
@@ -135,7 +135,7 @@ main (void)
 
 	if (discover)
 		You("are in non-scoring discovery mode.");
-	context.move = 0;
+	flags.move = 0;
 
 	UndimMenuBar (); /* Yes, this is the place for it (!) */
 	

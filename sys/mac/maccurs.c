@@ -6,7 +6,7 @@
 #include "mactty.h"
 #include "macwin.h"
 
-#if !TARGET_API_MAC_CARBON
+#if 1 /*!TARGET_API_MAC_CARBON*/
 #include <Folders.h>
 #include <TextUtils.h>
 #include <Resources.h>

@@ -767,8 +767,8 @@ void mac_askname ()
 	}
 	SetPort(oldport);
 	DisposeDialog(askdialog);
-	DisposeRoutineDescriptor(filter);
-	DisposeRoutineDescriptor(redraw);
+	DisposeModalFilterUPP(filter);
+	DisposeUserItemUPP(redraw);
 
 	/* Process the mode */
 #ifdef WIZARD

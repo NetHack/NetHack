@@ -13,7 +13,7 @@
 #include "mactty.h"
 #include "wintty.h"
 
-#if !TARGET_API_MAC_CARBON
+#if 1 /*!TARGET_API_MAC_CARBON*/
 #include <LowMem.h>
 #include <AppleEvents.h>
 #include <Gestalt.h>
@@ -28,7 +28,7 @@
  *	Local variables and functions
  */
 
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 static EventTypeSpec baseevents[] = {
 	{ kEventClassKeyboard, kEventRawKeyDown },
 	{ kEventClassKeyboard, kEventRawKeyRepeat },
@@ -225,10 +225,12 @@ Boolean small_screen = 0;
 static int FDECL(filter_scroll_key,(const int, NhWindow *));
 
 
+#if 1//!TARGET_API_MAC_CARBON
 static void FDECL(DoScrollBar,(Point, short, ControlHandle, NhWindow *));
+#endif
 static pascal void FDECL(MoveScrollBar, (ControlHandle, short));
 
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 typedef void (*CbFunc) (EventRecord *, WindowPtr);
 typedef short (*CbUpFunc) (EventRecord *, WindowPtr);
 typedef void (*CbCursFunc) (EventRecord *, WindowPtr, RgnHandle);
@@ -462,7 +464,7 @@ InitMac(void) {
 	/* Create the "record" file, if necessary */
 	check_recordfile("");
 
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 	/* Create event handler universal procedure pointers */
 	dispatcher = GetEventDispatcherTarget();
 	baseupp = NewEventHandlerUPP(BaseEvent);
@@ -566,21 +568,38 @@ SanePositions (void)
 {
 #if TARGET_API_MAC_CARBON
 	Rect rbase, rmsg;
-	UInt16 height;
+	SInt16 i, width, height;
 
 
-	ConstrainWindowToScreen(_mt_window, kWindowStructureRgn,
+	ConstrainWindowToScreen(_mt_window, kWindowContentRgn,
 		kWindowConstrainMoveRegardlessOfFit, NULL, NULL);
-	GetWindowBounds(_mt_window, kWindowStructureRgn, &rbase);
-	GetWindowBounds(theWindows[NHW_MESSAGE].its_window, kWindowStructureRgn, &rmsg);
+	GetWindowBounds(_mt_window, kWindowContentRgn, &rbase);
+	if (RetrievePosition(kMapWindow, &rbase.top, &rbase.left))
+		MoveWindow(_mt_window, rbase.left, rbase.top, TRUE);
+
+	GetWindowBounds(theWindows[NHW_MESSAGE].its_window, kWindowContentRgn, &rmsg);
 	height = rmsg.bottom - rmsg.top;
 	rmsg.top = rbase.bottom+2;
 	rmsg.bottom = rmsg.top + height;
 	rmsg.left = rbase.left;
 	rmsg.right = rbase.right;
-	SetWindowBounds(theWindows[NHW_MESSAGE].its_window, kWindowStructureRgn, &rmsg);
-	ConstrainWindowToScreen(theWindows[NHW_MESSAGE].its_window, kWindowStructureRgn,
+	RetrievePosition(kMessageWindow, &rmsg.top, &rmsg.left);
+	if (RetrieveSize(kMessageWindow, rmsg.top, rmsg.left, &height, &width)) {
+		rmsg.right = rmsg.left + width;
+		rmsg.bottom = rmsg.top + height;
+	}
+	SetWindowBounds(theWindows[NHW_MESSAGE].its_window, kWindowContentRgn, &rmsg);
+	ConstrainWindowToScreen(theWindows[NHW_MESSAGE].its_window, kWindowContentRgn,
 		kWindowConstrainMoveRegardlessOfFit, NULL, NULL);
+	DrawScrollbar(&theWindows[NHW_MESSAGE]);
+
+	for (i = 0; i < NUM_MACWINDOWS; i++)
+		if (i != WIN_STATUS && i != WIN_MESSAGE && i != WIN_MAP &&
+			i != BASE_WINDOW && theWindows[i].its_window) {
+			/* FIXME */
+			ConstrainWindowToScreen(theWindows[i].its_window, kWindowContentRgn,
+				kWindowConstrainMoveRegardlessOfFit, NULL, NULL);
+		}
 #else
 	short left, top, width, height;
 	int ix, numText = 0, numMenu = 0;
@@ -672,8 +691,9 @@ SanePositions (void)
 void
 mac_init_nhwindows (int *argcp, char **argv)
 {
+	Rect r;
 #if !TARGET_API_MAC_CARBON
-	Rect r, scr = (*GetGrayRgn())->rgnBBox;
+	Rect scr = (*GetGrayRgn())->rgnBBox;
 	small_screen = scr.bottom - scr.top <= (iflags.large_font ? 12*40 : 9*40);
 #endif
 
@@ -699,7 +719,7 @@ mac_init_nhwindows (int *argcp, char **argv)
 	mac_create_nhwindow(NHW_BASE);
 	tty_create_nhwindow(NHW_MESSAGE);
 
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 	/* Resize and reposition the message window */
 	RetrievePosition(kMessageWindow, &r.top, &r.left);
 	RetrieveSize(kMessageWindow, r.top, r.left, &r.bottom, &r.right);
@@ -765,7 +785,7 @@ got1 :
 		get_tty_metrics(aWin->its_window, &x_sz, &y_sz, &x_sz_p, &y_sz_p,
 					 &aWin->font_number, &aWin->font_size,
 					 &aWin->char_width, &aWin->row_height);
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 		InstallWindowEventHandler(aWin->its_window, baseupp,
 			sizeof(baseevents)/sizeof(EventTypeSpec), baseevents,
 			(void *)aWin, NULL);
@@ -786,7 +806,7 @@ got1 :
 	aWin->x_curs = aWin->y_curs = 0;
 	aWin->drawn = TRUE;
 	mac_clear_nhwindow (i);
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 	switch (kind) {
 	case NHW_MESSAGE:
 		InstallWindowEventHandler(aWin->its_window, msgupp,
@@ -927,8 +947,7 @@ mac_clear_nhwindow (winid win) {
 
 static Boolean
 ClosingWindowChar(const int c) {
-	return c == CHAR_ESC || c == CHAR_BLANK || c == CHAR_LF || c == CHAR_CR ||
-			c == 'q';
+	return (c == CHAR_ESC || c == CHAR_BLANK || c == CHAR_LF || c == CHAR_CR);
 }
 
 
@@ -986,7 +1005,7 @@ enter_topl_mode(char *query) {
 
 void
 leave_topl_mode(char *answer) {
-	unsigned char *ap, *bp;
+	/*unsigned*/ char *ap, *bp;
 
 	int ans_len = (*top_line)->teLength - topl_query_len;
 	NhWindow *aWin = theWindows + WIN_MESSAGE;
@@ -1205,7 +1224,7 @@ adjust_window_pos(NhWindow *aWin, short width, short height)
 	MoveWindow(theWindow, r.left, r.top, false);
 	SizeWindow(theWindow, width, height, true);
 	ConstrainWindowToScreen(theWindow, kWindowStructureRgn,
-		kWindowConstrainMoveRegardlessOfFit, NULL, NULL);
+		kWindowConstrainMayResize|kWindowConstrainMoveRegardlessOfFit, NULL, NULL);
 #else
 	Rect scr_r = (*GetGrayRgn())->rgnBBox;
 	const Rect win_ind = {2, 2, 3, 3};
@@ -1323,7 +1342,7 @@ mac_destroy_nhwindow (winid win) {
 	}
 	if (win == WIN_INVEN || win == WIN_MESSAGE) {
 		if (iflags.window_inited) {
-			if (flags.tombstone && killer.name[0]) {
+			if (flags.tombstone && killer[0]) {
 				/* Prepare for the coming of the tombstone window. */
 				win_fonts [NHW_TEXT] = kFontIDMonaco;
 			}
@@ -1460,7 +1479,7 @@ ListCoordinateToItem (NhWindow *aWin, short Row) {
 
 static pascal void
 MoveScrollBar (ControlHandle theBar, short part) {
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 	EventRecord fake;
 #endif
 	Rect r;
@@ -1508,7 +1527,7 @@ MoveScrollBar (ControlHandle theBar, short part) {
 		InvalWindowRgn(theWin, rgn);
 		BeginUpdate(theWin);
 	}
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 	switch (GetWindowKind(theWin) - WIN_BASE_KIND) {
 	case NHW_MESSAGE:
 		MsgUpdate(GetNhWin(theWin));
@@ -1530,7 +1549,7 @@ MoveScrollBar (ControlHandle theBar, short part) {
 }
 
 
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 static void
 DoScrollBar (Point p, short code, ControlHandle theBar, NhWindow *aWin)
 {
@@ -1634,7 +1653,10 @@ mac_get_nh_event(void) {
 	if (!iflags.window_inited)
 		return;
 
-	(void) WaitNextEvent (everyEvent, &anEvent, -1, gMouseRgn);
+#if TARGET_API_MAC_CARBON
+	QDFlushPortBuffer(GetWindowPort(_mt_window), NULL);
+#endif
+	(void) WaitNextEvent (everyEvent, &anEvent, 1, gMouseRgn);
 	HandleEvent(&anEvent);
 	return;
 }
@@ -1647,7 +1669,7 @@ mac_nhgetch(void) {
 	EventRecord anEvent;
 
 
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 	/* We want to take care of keys in the buffer as fast as
 	 * possible
 	 */
@@ -1672,6 +1694,9 @@ mac_nhgetch(void) {
 #endif
 
 	do {
+#if TARGET_API_MAC_CARBON
+		QDFlushPortBuffer(GetWindowPort(_mt_window), NULL);
+#endif
 #if 0//TARGET_API_MAC_CARBON
 		EventRef event;
 
@@ -2098,10 +2123,10 @@ BaseClick(NhWindow *wind, Point pt, UInt32 modifiers)
 	if (strchr(topl_resp, *click_to_cmd(pt.h, pt.v, clicked_mod)))
 		nhbell();
 	else {
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 		if (cursor_locked)
 			while (WaitMouseUp())
-				SystemTask();
+				/*SystemTask()*/;
 #endif
 
 		gClickedToMove = TRUE;
@@ -2137,7 +2162,7 @@ BaseCursor(NhWindow *wind, Point pt)
 }
 
 
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 static pascal OSStatus
 BaseEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
 {
@@ -2420,7 +2445,7 @@ MsgUpdate(NhWindow *wind)
 }
 
 
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 static pascal OSStatus
 MsgEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
 {
@@ -2645,7 +2670,7 @@ MenwUpdate(NhWindow *wind)
 }
 
 
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 static pascal OSStatus
 MenwEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
 {
@@ -2823,7 +2848,7 @@ TextUpdate(NhWindow *wind)
 }
 
 
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 static pascal OSStatus
 TextEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
 {
@@ -2911,7 +2936,7 @@ macClickText (EventRecord *theEvent, WindowPtr theWindow) {
  *	Global events
  */
 
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 static pascal OSStatus
 GlobalEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
 {
@@ -2995,7 +3020,7 @@ HandleClick (EventRecord *theEvent) {
 	
 	switch (code) {
 	case inContent :
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 		if (not_inSelect) {
 			int kind = GetWindowKind(theWindow) - WIN_BASE_KIND;
 			winCursorFuncs [kind] (theEvent, theWindow, gMouseRgn);
@@ -3057,7 +3082,7 @@ HandleClick (EventRecord *theEvent) {
 }
 
 
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 
 static short
 GeneralUpdate (EventRecord *theEvent, WindowPtr theWindow) {
@@ -3075,6 +3100,9 @@ HandleUpdate (EventRecord *theEvent) {
 	WindowPtr theWindow = (WindowPtr) theEvent->message;
 	NhWindow *aWin = GetNhWin (theWindow);
 	Rect r;
+#if 1//!TARGET_API_MAC_CARBON
+	EventRecord fake;
+#endif
 
 
 	char existing_update_region = FALSE;
@@ -3088,7 +3116,7 @@ HandleUpdate (EventRecord *theEvent) {
 	GetWindowBounds(theWindow, kWindowContentRgn, &r);
 	OffsetRect(&r, -r.left, -r.top);
 	EraseRect(&r);
-#if TARGET_API_MAC_CARBON
+#if 0//TARGET_API_MAC_CARBON
 	switch (GetWindowKind(theWindow) - WIN_BASE_KIND) {
 	case NHW_BASE:
 	case NHW_MAP:
@@ -3106,7 +3134,7 @@ HandleUpdate (EventRecord *theEvent) {
 		break;
 	}
 #else
-	winUpdateFuncs [GetWindowKind(theWin) - WIN_BASE_KIND] (&fake, theWin);
+	winUpdateFuncs[GetWindowKind(theWindow) - WIN_BASE_KIND](&fake, theWindow);
 #endif
 
 	if (theWindow == _mt_window && existing_update_region) {
@@ -3117,7 +3145,7 @@ HandleUpdate (EventRecord *theEvent) {
 }
 
 
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 
 static void
 GeneralCursor (EventRecord *theEvent, WindowPtr theWindow, RgnHandle mouseRgn) {
@@ -3148,7 +3176,7 @@ DoOsEvt (EventRecord *theEvent) {
 			OffsetRect (&r, theEvent->where.h, theEvent->where.v);
 			RectRgn (gMouseRgn, &r);
 		} else {
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 			int kind = GetWindowKind(win) - WIN_BASE_KIND;
 			if (kind >= 0 && kind <= NHW_TEXT) {
 				winCursorFuncs [kind] (theEvent, win, gMouseRgn);
@@ -3165,7 +3193,7 @@ DoOsEvt (EventRecord *theEvent) {
 void
 HandleEvent (EventRecord *theEvent) {
 	switch (theEvent->what) {
-#if !TARGET_API_MAC_CARBON
+#if 1//!TARGET_API_MAC_CARBON
 	case autoKey:
 	case keyDown:
 		HandleKey(theEvent);
@@ -3260,17 +3288,6 @@ struct window_procs mac_procs = {
 	0, //    mac_end_screen,
 	genl_outrip,
 	genl_preference_update,
-	genl_getmsghistory,
-	genl_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
-	genl_status_init,
-	genl_status_finish,
-	genl_status_enablefield,
-	genl_status_update,
-# ifdef STATUS_HILITES
-	genl_status_threshold,
-# endif
-#endif
 };
 
 /*macwin.c*/

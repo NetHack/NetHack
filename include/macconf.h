@@ -53,9 +53,16 @@
  * include the relevant files in the relevant .c files instead !
  */
 #if TARGET_API_MAC_CARBON
-  /* Avoid including <CarbonCore/fp.h> -- it has a conflicting expl() */
-# define __FP__
-# include <Carbon/Carbon.h>
+# ifdef GNUC
+   /* Avoid including <CarbonCore/fp.h> -- it has a conflicting expl() */
+#  define __FP__
+#  include <Carbon/Carbon.h>
+# else
+   /* Avoid including <fenv.h> -- it uses GENERATINGPOWERPC */
+#  define __FENV__
+#  include <machine/types.h>
+#  include <Carbon.h>
+# endif
 #else
 # include <MacTypes.h>
 #endif
@@ -73,7 +80,7 @@
 extern void error(const char *,...);
 
 #if !defined(O_WRONLY)
-# ifdef __MWERKS__
+# if defined(__MWERKS__) && !TARGET_API_MAC_CARBON
 #  include <unix.h>
 # endif
 # include <fcntl.h>

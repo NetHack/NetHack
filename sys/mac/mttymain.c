@@ -11,6 +11,7 @@
 #if !TARGET_API_MAC_CARBON
 #include <Palettes.h>
 #endif
+#include <Gestalt.h>
 
 #define MT_WINDOW 135
 #define MT_WIDTH 80

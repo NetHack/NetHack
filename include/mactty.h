@@ -44,7 +44,7 @@
 #undef red			/* undef internal color const strings from decl */
 #undef green
 #undef blue
-#if !TARGET_API_MAC_CARBON
+#if 1 /*!TARGET_API_MAC_CARBON*/
 # include <windows.h>
 #endif
 

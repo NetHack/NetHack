@@ -17,10 +17,12 @@
 #include "hack.h"
 #include "mactty.h"
 #include "macwin.h"
-#if !TARGET_API_MAC_CARBON
+#if 1 /*!TARGET_API_MAC_CARBON*/
 # include <Sound.h>
 # include <Resources.h>
-#else
+#endif
+
+#ifndef freqDurationCmd
 # define freqDurationCmd 40
 #endif
 

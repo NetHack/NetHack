@@ -137,6 +137,7 @@ static int lockptr;
 #endif
 
 #ifdef MAC
+# undef unlink
 # define unlink macunlink
 #endif
 
