@@ -5,7 +5,8 @@ It is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.2 and 3.3.1.  This version is primarily a bug fix release.
 
 Here is a brief overview of new additions and changes in the game.
-To give more would be cheating, wouldn't it?
+There are many more changes and surprises beyond those listed here, 
+but to give more would be cheating, wouldn't it?
 
 o Many, many bug fixes and tweaks
 o Enhanced config file processing and player selection prompts for some ports
@@ -14,8 +15,23 @@ o Objects merge in containers
 o Wish for "nothing", and genocide "none" to preserve your conduct
 o Several small refinements to race/role separation
 o Config file BOULDER option to specify the symbol for displaying boulders
+o New travel command which is particularly helpful for mouse navigation on
+  handheld computers
 o Mac: command-key shortcuts in the player selection dialog
 o Amiga: screenmode requester
+o Win32: new graphical port contributed by Alex Kompel
+
+We've also included variations of the following patches
+contributed by members of the NetHack community at large:
+
+o Scott Bigham's new T-shirt messages and his option to turn off 
+  resistance display effects
+o Malcolm Ryan's option for "autodig"
+o Jay Tilton's full-screen message window display via control-P
+o Dylan O'Donnell's multishot bonus with yumi and ya for ninjas
+o Tom Friedetzky's blessed/uncursed/cursed selection patch for menustyle:full
+o Jason Short's additonal lens uses
+o Kelly Bailey's Gnomish Mines changes
 
 Carried forward
 o The Gnome toolkit interface is still considered an experimental option
@@ -108,8 +124,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         IBM PC compatibles running MS-DOS with Microsoft C, Borland C++ 3.1, or
                 DJGPP.  It is recommended to have at least an 80386 processor.
         IBM PS/2 and AT compatibles running OS/2 - 2.0 and up with GCC emx
-        Intel 80386 or greater (or clone) and DEC Alpha desktop machines
-                running Windows NT
+        Intel 80386 or greater (or clone) running Windows 95/98/NT/2000/XP
         Intel 80386 or greater (or clone) boxes running Linux, BSDI, or
 		Windows 95,98,2000
 	Intel Pentium or better (or clone) running BeOS 4.5
@@ -152,13 +167,18 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
     With the demise of Windows NT on the DEC Alpha, no attempt has been
     made to build NetHack 3.3.2 on that platform.
+
+    No attempt has been made to build or run NetHack 3.3.2 on Windows
+    Millenium.  It may work, but then again it may not.
     
     A build for Intel 80286 machines and DOS "real mode" overlaid versions 
     has been produced for 3.3.2, with a marginal attempt at tuning it for 
     suitable performance.  If someone has access to real-mode compiler and 
     lots of spare time on their hands, you may be able to enhance the 
     performance even further.  We don't know how well it runs on a real
-    80286 since we no longer have access to one.
+    80286 since we no longer have access to one.  We have had some reports
+    of it running out of memory quite abruptly on levels with many monsters,
+    rendering the game in progress useless. Use it at your own risk.
 
                         - - - - - - - - - - -
 
@@ -186,7 +206,7 @@ o We don't give hints for playing the game.
 o Don't bother to ask when the next version will be out.  You will not get
   a reply.
 Alternatively, you may fill out the bug report form on our web
-page at www.nethack.org.
+page at http://www.nethack.org.
 
 Patches especially should be directed to this address.  If you've changed
 something to get NetHack to run on your system, it's likely that others have
