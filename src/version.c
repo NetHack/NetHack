@@ -14,14 +14,18 @@
 #include "patchlevel.h"
 #endif
 
-#define BETA_INFO " [beta16]"
+#define BETA_INFO "[beta16]"
 
 /* fill and return the given buffer with the nethack version string */
 char *
 getversionstring(buf)
 char *buf;
 {
-	return strcpy(buf, VERSION_ID);
+	 Strcpy(buf, VERSION_ID);
+#if defined(BETA) && defined(BETA_INFO)
+	 Sprintf(eos(buf), " %s", BETA_INFO);
+#endif
+	return buf;
 }
 
 int
@@ -29,12 +33,7 @@ doversion()
 {
 	char buf[BUFSZ];
 
-	pline("%s%s", getversionstring(buf),
-#if defined(BETA) && defined(BETA_INFO)
-		BETA_INFO);
-#else
-		"");
-#endif
+	pline("%s", getversionstring(buf));
 	return 0;
 }
 

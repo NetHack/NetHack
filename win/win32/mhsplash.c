@@ -85,12 +85,6 @@ void mswin_display_splash_window (BOOL show_ver)
       char buf[BUFSZ];
 
   getversionstring(buf);
-  sprintf(eos(buf), "%s",
-#if defined(BETA) && defined(BETA_INFO)
-      BETA_INFO);
-#else
-      "");
-#endif
   SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), buf);
 
  } else {
