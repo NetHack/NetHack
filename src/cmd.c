@@ -572,7 +572,7 @@ wiz_level_change()
     int newlevel;
     int ret;
 
-    getlin("To what experience level do you want to be raised?", buf);
+    getlin("To what experience level do you want to be set?", buf);
     (void)mungspaces(buf);
     if (buf[0] == '\033' || buf[0] == '\0') ret = 0;
     else ret = sscanf(buf, "%d", &newlevel);
