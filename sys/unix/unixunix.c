@@ -219,6 +219,21 @@ register char *s;
 #endif
 }
 
+#if defined(TIMED_DELAY) && !defined(msleep) && defined(SYSV)
+#include <poll.h>
+
+void
+msleep(msec)
+unsigned msec;				/* milliseconds */
+{
+	struct pollfd unused;
+	int msecs = msec;		/* poll API is signed */
+
+	if (msecs < 0) msecs = 0;	/* avoid infinite sleep */
+	(void) poll(&unused, (unsigned long)0, msecs);
+}
+#endif /* TIMED_DELAY for SYSV */
+
 #ifdef SHELL
 int
 dosh()

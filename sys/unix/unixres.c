@@ -61,6 +61,10 @@ uid_t *ruid, *euid, *suid;
 
 #   else	/* SYS_getresuid */
 
+#ifdef SVR4
+#include <sys/stat.h>
+#endif /* SVR4 */
+
 static int
 real_getresuid(ruid, euid, suid)
 uid_t *ruid, *euid, *suid;
