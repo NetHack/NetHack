@@ -163,6 +163,7 @@ static void
 centerOnMain( QWidget* w )
 {
     QWidget* m = qApp->mainWidget();
+    if (!m) m = qApp->desktop();
     QPoint p = m->mapToGlobal(QPoint(0,0));
     w->move( p.x() + m->width()/2  - w->width()/2,
               p.y() + m->height()/2 - w->height()/2 );
