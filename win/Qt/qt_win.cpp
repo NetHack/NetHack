@@ -2028,7 +2028,8 @@ void NetHackQtLabelledIcon::setFont(const QFont& f)
 }
 void NetHackQtLabelledIcon::show()
 {
-    if (isHidden()) highlight(hl_bad);
+    // Note: use of isHidden does not work with Qt 2.1
+    if (!isVisible()) highlight(hl_bad);
     QWidget::show();
 }
 void NetHackQtLabelledIcon::highlightWhenChanging()
@@ -4538,7 +4539,8 @@ winid NetHackQtBind::qt_create_nhwindow(int type)
 	window=new NetHackQtTextWindow(keybuffer);
     }
 
-    if ( splash && !main->isHidden() ) {
+    // Note: use of isHidden does not work with Qt 2.1
+    if (splash && main->isVisible()) {
 	delete splash;
 	splash = 0;
     }
