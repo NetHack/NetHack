@@ -249,6 +249,8 @@ public:
 	virtual void ClipAround(int x,int y);
 	virtual void PrintGlyph(int x,int y,int glyph);
 	virtual void UseRIP(int how);
+
+	int nhid;
 };
 
 class NetHackQtGlyphs {
