@@ -509,7 +509,7 @@ winid endwin;
 	    value = arti_cost(otmp);	/* zorkmid value */
 	    points = value * 5 / 2;	/* score value */
 	    if (counting) {
-		u.rexp += points;
+		u.urexp += points;
 	    } else {
 		makeknown(otmp->otyp);
 		otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
