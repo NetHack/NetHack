@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2002/04/12	*/
+/*	SCCS Id: @(#)shk.c	3.4	2002/09/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3303,14 +3303,17 @@ shopdig(fall)
 register int fall;
 {
     register struct monst *shkp = shop_keeper(*u.ushops);
-    int lang = 0;
-    char *grabs = "grabs";
+    int lang;
+    const char *grabs = "grabs";
 
     if(!shkp) return;
 
     /* 0 == can't speak, 1 == makes animal noises, 2 == speaks */
-    if (!is_silent(shkp->data) && shkp->data->msound <= MS_ANIMAL)
-    	lang = 1;
+    lang = 0;
+    if (shkp->msleeping || !shkp->mcanmove || is_silent(shkp->data))
+	;	/* lang stays 0 */
+    else if (shkp->data->msound <= MS_ANIMAL)
+	lang = 1;
     else if (shkp->data->msound >= MS_HUMANOID)
 	lang = 2;
 
