@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.59 $ $Date: 2002/12/17 11:19:45 $
+% $Revision: 1.60 $ $Date: 2003/01/11 17:21:42 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.4)}
-\date{January 11, 2003}
+\date{February 12, 2003}
 
 \maketitle
 
@@ -753,7 +753,8 @@ Pay your shopping bill.
 Put on a ring or other accessory (amulet, blindfold).
 %.lp
 \item[\tb{\^{}P}]
-Repeat previous message (subsequent {\tt \^{}P}'s repeat earlier messages).
+Repeat previous message.  Subsequent {\tt \^{}P}'s repeat earlier messages.
+The behavior can be varied via the msg_window option.
 %.lp
 \item[\tb{q}]
 Quaff (drink) a potion.
@@ -2354,7 +2355,7 @@ Allows you to change the way recalled messages are displayed.
 
 %.sd
 %.si
-{\tt s} --- single message (the default prior to 3.4.0).\\
+{\tt s} --- single message (default, this was the behavior before 3.4.0).\\
 {\tt c} --- combination, two messages as {\it single\/}, then as {\it full\/}.\\
 {\tt f} --- full window, oldest message first.\\
 {\tt r} --- full window, newest message first.

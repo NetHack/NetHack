@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "January 11, 2003
+.ds f2 "February 12, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -570,7 +570,8 @@ Pay your shopping bill.
 .lp P
 Put on a ring or other accessory (amulet, blindfold).
 .lp ^P
-Repeat previous message (subsequent ^P's repeat earlier messages).
+Repeat previous message.  Subsequent ^P's repeat earlier messages.
+The behavior can be varied via the msg_window option.
 .lp q
 Quaff (drink) a potion.
 .lp Q
@@ -1916,7 +1917,7 @@ Allows you to change the way recalled messages are displayed.
 The possible values are:
 .sd
 .si
-s - single message (the default prior to 3.4.0).
+s - single message (default, this was the behavior before 3.4.0).
 c - combination, two messages as `single', then as `full'.
 f - full window, oldest message first.
 r - full window, newest message first.

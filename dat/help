@@ -124,6 +124,7 @@ Commands:
         p       Pay your shopping bill.
         P       Put on an accessory (ring, amulet, etc).
         ^P      Repeat last message (subsequent ^P's repeat earlier messages).
+                The behavior can be varied via the msg_window option.
         q       Drink (quaff) a potion.
         Q       Select ammunition for quiver.
         r       Read a scroll or spellbook.

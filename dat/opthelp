@@ -214,10 +214,11 @@ windowtype windowing system to be used  [depends on operating system]
 
 Compound option if TTY_GRAPHICS was set at compile time:
 msg_window the type of message window to use:
-           Single      -- One message at a time
-           Full        -- Full window with all saved top line messages
-           Reverse     -- Same as full, but messages printed most-recent-first
-           Combination -- Two single messages, then as full
+           single      -- One message at a time
+           full        -- Full window with all saved top line messages
+           reverse     -- Same as full, but messages printed most-recent-first
+           combination -- Two single messages, then as full
+           default:  single
 
 Some sample options lists are:
 !autopickup,!tombstone,name:Gandalf,scores:own/3 top/2 around
