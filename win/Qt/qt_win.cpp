@@ -2734,9 +2734,9 @@ int NetHackQtMenuWindow::cellWidth(int col)
 {
     switch (col) {
      case 0:
-	return 20;
+	return fontMetrics().width("All ");
     break; case 1:
-	return 16;
+	return fontMetrics().width(" m ");
     break; case 2:
 	return qt_settings->glyphs().width();
     break; case 3:
@@ -2983,6 +2983,8 @@ void NetHackQtMenuWindow::ToggleSelect(int i)
 {
     if (item[i].Selectable()) {
 	item[i].selected = !item[i].selected;
+	if ( !item[i].selected )
+	    item[i].count=-1;
 	updateCell(i,3);
 	if (how==PICK_ONE) {
 	    dialog->Accept();
@@ -3006,11 +3008,20 @@ void NetHackQtMenuWindow::paintCell(QPainter* painter, int row, int col)
 
     switch (col) {
      case 0:
-	if (i.count>=0) {
-	    char text[16];
-	    sprintf(text,"%d",i.count);
+	if ( i.ch || i.attr!=ATR_INVERSE ) {
+	    QString text;
+	    if ( i.selected && i.count == -1 ) {
+		if ( i.str[0]>='0' && i.str[0]<='9' )
+		    text = "All";
+		else
+		    text = "*";
+	    } else if ( i.count<0 ) {
+		text = "-";
+	    } else {
+		text.sprintf("%d",i.count);
+	    }
 	    painter->drawText(0,0,cellWidth(col),cellHeight(),
-		AlignHCenter|AlignVCenter,text);
+	    AlignHCenter|AlignVCenter,text);
 	}
     break; case 1:
 	if ((signed char)i.ch >= 0) {
@@ -3088,6 +3099,7 @@ void NetHackQtMenuWindow::mousePressEvent(QMouseEvent* event)
 	    pressed=row;
 	    was_sel=item[row].selected;
 	    ToggleSelect(row);
+	    updateCell(row,0);
 	}
     }
 }
