@@ -228,6 +228,13 @@ extern void NDECL(toggle_mouse_support);
 
 extern int FDECL(set_win32_option, (const char *, const char *));
 
+/* 
+ * 3.4.3 addition - Stuff to help the user with some common, yet significant errors 
+ * Let's make it NOP for now
+ */
+#define interject_assistance(_1,_2,_3,_4)
+#define interject(_1)
+
 /* Missing definitions */
 extern int		mswin_have_input();
 #define kbhit	mswin_have_input
