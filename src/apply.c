@@ -1825,15 +1825,17 @@ use_stone(tstone)
 struct obj *tstone;
 {
     struct obj *obj;
-    const char *streak_color = 0;
-    static const char scritch[] = "\"scritch, scritch\"",
-	    ambiguous_scratch[] = "You make scratch marks on the stone.";
+    boolean do_scratch;
+    const char *streak_color;
+    char stonebuf[QBUFSZ];
+    static const char scritch[] = "\"scritch, scritch\"";
     static char allowall[3] = { GOLD_CLASS, ALL_CLASSES, 0 };
 #ifndef GOLDOBJ
     struct obj goldobj;
 #endif
 
-    if ((obj = getobj(allowall, "rub on the stone")) == 0)
+    Sprintf(stonebuf, "rub on the stone%s", plur(tstone->quan));
+    if ((obj = getobj(allowall, stonebuf)) == 0)
 	return;
 #ifndef GOLDOBJ
     if (obj->oclass == GOLD_CLASS) {
@@ -1844,12 +1846,12 @@ struct obj *tstone;
     }
 #endif
 
-    if (obj == tstone) {
+    if (obj == tstone && obj->quan == 1) {
 	You_cant("rub %s on itself.", the(xname(obj)));
 	return;
     }
 
-    if (tstone->cursed &&
+    if (tstone->otyp == TOUCHSTONE && tstone->cursed &&
 	    obj->oclass == GEM_CLASS && !is_graystone(obj) &&
 	    !obj_resists(obj, 80, 100)) {
 	if (Blind)
@@ -1874,15 +1876,35 @@ struct obj *tstone;
 	return;
     }
 
+    do_scratch = FALSE;
+    streak_color = 0;
+
     switch (obj->oclass) {
     case GEM_CLASS:	/* these have class-specific handling below */
     case RING_CLASS:
-	break;
+	if (tstone->otyp != TOUCHSTONE) {
+	    do_scratch = TRUE;
+	} else if (obj->oclass == GEM_CLASS && (tstone->blessed ||
+		(!tstone->cursed &&
+		    (Role_if(PM_ARCHEOLOGIST) || Race_if(PM_GNOME))))) {
+	    makeknown(TOUCHSTONE);
+	    makeknown(obj->otyp);
+	    prinv((char *)0, obj, 0L);
+	    return;
+	} else {
+	    /* either a ring or the touchstone was not effective */
+	    if (objects[obj->otyp].oc_material == GLASS) {
+		do_scratch = TRUE;
+		break;
+	    }
+	}
+	streak_color = c_obj_colors[objects[obj->otyp].oc_color];
+	break;		/* gem or ring */
 
     default:
 	switch (objects[obj->otyp].oc_material) {
 	case CLOTH:
-	    pline_The("stone looks a little more polished now.");
+	    pline("%s a little more polished now.", Tobjnam(tstone, "look"));
 	    return;
 	case LIQUID:
 	    if (!obj->known)		/* note: not "whetstone" */
@@ -1892,59 +1914,40 @@ struct obj *tstone;
 	    return;
 	case WAX:
 	    streak_color = "waxy";
-	    goto see_streaks;	/* okay even if not touchstone */
+	    break;		/* okay even if not touchstone */
 	case WOOD:
 	    streak_color = "wooden";
-	    goto see_streaks;	/* okay even if not touchstone */
+	    break;		/* okay even if not touchstone */
 	case GOLD:
+	    do_scratch = TRUE;	/* scratching and streaks */
 	    streak_color = "golden";
-	    goto see_streaks;
+	    break;
 	case SILVER:
+	    do_scratch = TRUE;	/* scratching and streaks */
 	    streak_color = "silvery";
-	    goto see_streaks;
+	    break;
 	default:
+	    /* Objects passing the is_flimsy() test will not
+	       scratch a stone.  They will leave streaks on
+	       non-touchstones and touchstones alike. */
+	    if (is_flimsy(obj))
+		streak_color = c_obj_colors[objects[obj->otyp].oc_color];
+	    else
+		do_scratch = (tstone->otyp != TOUCHSTONE);
 	    break;
 	}
-	break;  /* default oclass */
+	break;		/* default oclass */
     }
 
-    if (is_flimsy(obj)) {
-	/* Objects passing the is_flimsy() test will not
-	   scratch a stone.  They will leave streaks on
-	   non-touchstones and touchstones alike. */
-	streak_color = c_obj_colors[objects[obj->otyp].oc_color];
-	goto see_streaks;
-    }
-
-    if (tstone->otyp != TOUCHSTONE) {
-	pline(ambiguous_scratch);
-	return;
-    }
-
-    switch (obj->oclass) {
-    case GEM_CLASS:
-	if (tstone->blessed || (!tstone->cursed &&
-		(Role_if(PM_ARCHEOLOGIST) || Race_if(PM_GNOME)))) {
-	    makeknown(TOUCHSTONE);
-	    makeknown(obj->otyp);
-	    prinv((char *)0, obj, 0L);
-	    return;
-	}
-	/* FALLTHROUGH */
-    case RING_CLASS:
-	if (objects[obj->otyp].oc_material == GLASS) {
-	    pline(ambiguous_scratch); /* yet not ambiguous if a known touchstone */
-	    return;
-	}
-	streak_color = c_obj_colors[objects[obj->otyp].oc_color];
-	break;
-    default:
+    Sprintf(stonebuf, "stone%s", plur(tstone->quan));
+    if (do_scratch)
+	pline("You make %s%sscratch marks on the %s.",
+	      streak_color ? streak_color : (const char *)"",
+	      streak_color ? " " : "", stonebuf);
+    else if (streak_color)
+	pline("You see %s streaks on the %s.", streak_color, stonebuf);
+    else
 	pline(scritch);
-	return;
-    }
-
- see_streaks:
-    pline("You see %s streaks on the stone.", streak_color);
     return;
 }
 
