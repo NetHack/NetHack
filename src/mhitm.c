@@ -203,7 +203,7 @@ mattackm(magr, mdef)
     struct permonst *pa, *pd;
 
     if (!magr || !mdef) return(MM_MISS);		/* mike@genat */
-    if (!magr->mcanmove) return(MM_MISS);		/* riv05!a3 */
+    if (!magr->mcanmove || magr->msleeping) return(MM_MISS);
     pa = magr->data;  pd = mdef->data;
 
     /* Grid bugs cannot attack at an angle. */
