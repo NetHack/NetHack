@@ -507,7 +507,7 @@ int spellnum;
 		spellnum == 4 || spellnum == 2 || spellnum == 1)
 	    return TRUE;
     } else if (adtyp == AD_CLRC) {
-	if (spellnum == 9 || spellnum == 8 | spellnum == 2 || spellnum == 1)
+	if (spellnum == 9 || spellnum == 8 || spellnum == 2 || spellnum == 1)
 	    return TRUE;
     }
     return FALSE;
