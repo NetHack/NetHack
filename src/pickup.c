@@ -1792,11 +1792,11 @@ register struct obj *obj;
 	}
 
 	if (current_container) {
-	    Strcpy(buf, the(xname(current_container)));
-	    You("put %s into %s.", doname(obj), buf);
-
 	    (void) add_to_container(current_container, obj);
 	    current_container->owt = weight(current_container);
+
+	    Strcpy(buf, the(xname(current_container)));
+	    You("put %s into %s.", doname(obj), buf);
 	}
 	if (is_gold) bot(); /* update gold piece count immediately */
 
