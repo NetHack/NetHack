@@ -304,7 +304,7 @@ nh_timeout()
 			break;
 		case HALLUC:
 			HHallucination = 1;
-			make_hallucinated(0L, TRUE, 0L);
+			(void) make_hallucinated(0L, TRUE, 0L);
 			stop_occupation();
 			break;
 		case SLEEPING:

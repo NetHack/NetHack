@@ -3734,7 +3734,7 @@ boolean disarm;
 				    stagger(youmonst.data, "stagger"));
 			}
 			make_stunned(HStun + rn1(7, 16),FALSE);
-			make_hallucinated(HHallucination + rn1(5, 16),FALSE,0L);
+			(void) make_hallucinated(HHallucination + rn1(5, 16),FALSE,0L);
 			break;
 		default: impossible("bad chest trap");
 			break;

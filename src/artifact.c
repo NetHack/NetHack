@@ -408,7 +408,7 @@ long wp_mask;
 	     * that can print a message--need to guard against being printed
 	     * when restoring a game
 	     */
-	    make_hallucinated((long)!on, restoring ? FALSE : TRUE, wp_mask);
+	    (void) make_hallucinated((long)!on, restoring ? FALSE : TRUE, wp_mask);
 	}
 	if (spfx & SPFX_ESP) {
 	    if(on) ETelepat |= wp_mask;

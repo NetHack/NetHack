@@ -1869,9 +1869,11 @@ common:
 			 u.umonnum == PM_VIOLET_FUNGUS ||
 			 dmgtype(youmonst.data, AD_STUN));
 		if (!not_affected) {
+		    boolean chg;
 		    if (!Hallucination)
-			You("are freaked by a blast of kaleidoscopic light!");
-		    make_hallucinated(HHallucination + (long)tmp,FALSE,0L);
+			You("are caught in a blast of kaleidoscopic light!");
+		    chg = make_hallucinated(HHallucination + (long)tmp,FALSE,0L);
+		    You("%s.", chg ? "are freaked out" : "seem unaffected");
 		}
 		break;
 

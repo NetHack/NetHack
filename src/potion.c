@@ -247,7 +247,7 @@ boolean talk;
 	}
 }
 
-void
+boolean
 make_hallucinated(xtime, talk, mask)
 long xtime;	/* nonzero if this is an attempt to turn on hallucination */
 boolean talk;
@@ -305,6 +305,7 @@ long mask;	/* nonzero if resistance status should change by mask */
 	    context.botl = 1;
 	    if (talk) pline(message, verb);
 	}
+	return changed;
 }
 
 STATIC_OVL void
@@ -450,7 +451,7 @@ peffects(otmp)
 		break;
 	case POT_HALLUCINATION:
 		if (Hallucination || Halluc_resistance) nothing++;
-		make_hallucinated(itimeout_incr(HHallucination,
+		(void) make_hallucinated(itimeout_incr(HHallucination,
 					   rn1(200, 600 - 300 * bcsign(otmp))),
 				  TRUE, 0L);
 		break;
@@ -700,7 +701,7 @@ peffects(otmp)
 		}
 		if(Hallucination) {
 			You("are shocked back to your senses!");
-			make_hallucinated(0L,FALSE,0L);
+			(void) make_hallucinated(0L,FALSE,0L);
 		}
 		break;
 	case POT_CONFUSION:
@@ -805,7 +806,7 @@ peffects(otmp)
 		healup(d(6 + 2 * bcsign(otmp), 8),
 		       otmp->blessed ? 5 : !otmp->cursed ? 2 : 0,
 		       !otmp->cursed, TRUE);
-		make_hallucinated(0L,TRUE,0L);
+		(void) make_hallucinated(0L,TRUE,0L);
 		exercise(A_CON, TRUE);
 		exercise(A_STR, TRUE);
 		break;
@@ -819,7 +820,7 @@ peffects(otmp)
 		    u.ulevelmax -= 1;
 		    pluslvl(FALSE);
 		}
-		make_hallucinated(0L,TRUE,0L);
+		(void) make_hallucinated(0L,TRUE,0L);
 		exercise(A_STR, TRUE);
 		exercise(A_CON, TRUE);
 		break;

@@ -1470,7 +1470,7 @@ struct obj *obj;
 		    break;
 	    case 4: (void) adjattrib(rn2(A_MAX), -1, FALSE);
 		    break;
-	    case 5: make_hallucinated(HHallucination + lcount, TRUE, 0L);
+	    case 5: (void) make_hallucinated(HHallucination + lcount, TRUE, 0L);
 		    break;
 	    }
 	    return;
@@ -1550,7 +1550,7 @@ struct obj *obj;
 		did_prop++;
 		break;
 	    case prop2trbl(HALLUC):
-		make_hallucinated(0L, TRUE, 0L);
+		(void) make_hallucinated(0L, TRUE, 0L);
 		did_prop++;
 		break;
 	    case prop2trbl(VOMITING):
