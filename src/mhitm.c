@@ -151,6 +151,16 @@ fightm(mtmp)		/* have monsters fight each other */
 		     */
 		    if (has_u_swallowed) return 0;
 
+		    /* Allow attacked monsters a chance to hit back. Primarily
+		     * to allow monsters that resist conflict to respond.
+		     */
+		    if ((result & MM_HIT) && !(result & MM_DEF_DIED) &&
+			rn2(4) && mon->movement >= NORMAL_SPEED) {
+			mon->movement -= NORMAL_SPEED;
+			notonhead = 0;
+			(void) mattackm(mon, mtmp);	/* return attack */
+		    }
+
 		    return ((result & MM_HIT) ? 1 : 0);
 		}
 	    }
