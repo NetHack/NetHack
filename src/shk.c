@@ -78,7 +78,7 @@ static void FDECL(rob_shop, (struct monst *));
 /*
     Transfer money from inventory to monster when paying
     shopkeepers, priests, oracle, succubus, & other demons.
-    Simple qith only gold coins.
+    Simple with only gold coins.
     This routine will handle money changing when multiple
     coin types is implemented, only appropriate
     monsters will pay change.  (Peaceful shopkeepers, priests
