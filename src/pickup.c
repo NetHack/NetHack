@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2003/04/02	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2003/04/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1789,7 +1789,10 @@ register struct obj *obj;
 			if (rot_alarm) obj->norevive = 1;
 		}
 	} else if (Is_mbag(current_container) && mbag_explodes(obj, 0)) {
-		You("are blasted by a magical explosion!");
+		/* explicitly mention what item is triggering the explosion */
+		pline(
+	      "As you put %s inside, you are blasted by a magical explosion!",
+		      doname(obj));
 		/* did not actually insert obj yet */
 		if (was_unpaid) addtobill(obj, FALSE, FALSE, TRUE);
 		obfree(obj, (struct obj *)0);
