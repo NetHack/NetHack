@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/04/30	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/02/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1208,7 +1208,6 @@ struct trap *trap;
 	/* caller may subsequently fill pit, e.g. with a boulder */
 	trap->ttyp = PIT;		/* explosion creates a pit */
 	trap->madeby_u = FALSE;		/* resulting pit isn't yours */
-	seetrap(trap);			/* and it isn't concealed */
 }
 
 #endif /* OVLB */
@@ -3378,7 +3377,9 @@ boolean force;
 	if(!u.dx && !u.dy) {
 	    for(otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
 		if(Is_box(otmp)) {
-		    Sprintf(qbuf, "There is %s here. Check it for traps?", doname(otmp));
+		    Sprintf(qbuf, "There is %s here. Check it for traps?",
+			safe_qbuf("", sizeof("There is  here. Check it for traps?"),
+				doname(otmp), an(simple_typename(otmp->otyp)), "a box"));
 		    switch (ynq(qbuf)) {
 			case 'q': return(0);
 			case 'n': continue;
