@@ -127,8 +127,10 @@ lookat(x, y, buf, monbuf)
 
 		/* newsym lets you know of the trap, so mention it here */
 		if (tt == BEAR_TRAP || tt == PIT ||
-		    tt == SPIKED_PIT ||tt == WEB)
-		    Strcat(buf, ", trapped");
+		    tt == SPIKED_PIT ||tt == WEB) {
+		    Strcat(buf, ", trapped in ");
+		    Strcat(buf, defsyms[trap_to_defsym(tt)].explanation);
+		}
 	    }
 
 	    {
