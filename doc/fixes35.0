@@ -16,6 +16,11 @@ paper, straw and wood golems resist cold
 the options lootabc, showrace, travelcmd, and runmode are now saved
 use mons[] array offsets in mnum field in save file rather than storing
 	the ptr and calculating the distance from beginning of array
+two-weapon combat makes two attacks instead of having one attack hit with
+	each weapon
+apply weapon skill to-hit bonus or penalty to bare-handed attacks
+only give monk's "cumbersome armor" message when the armor penalty causes
+	an attack to miss
 
 
 Platform- and/or Interface-Specific Fixes

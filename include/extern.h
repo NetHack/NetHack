@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.4	2003/03/10	*/
+/*	SCCS Id: @(#)extern.h	3.4	2003/03/14	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2016,11 +2016,11 @@ E void NDECL(u_init);
 E void FDECL(hurtmarmor,(struct monst *,int));
 E boolean FDECL(attack_checks, (struct monst *,struct obj *));
 E void FDECL(check_caitiff, (struct monst *));
-E schar FDECL(find_roll_to_hit, (struct monst *));
+E int FDECL(find_roll_to_hit, (struct monst *,int,struct obj *,int *,int *));
 E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *,struct obj *,int));
 E int FDECL(damageum, (struct monst *,struct attack *));
-E void FDECL(missum, (struct monst *,struct attack *));
+E void FDECL(missum, (struct monst *,struct attack *,BOOLEAN_P));
 E int FDECL(passive, (struct monst *,BOOLEAN_P,int,UCHAR_P));
 E void FDECL(passive_obj, (struct monst *,struct obj *,struct attack *));
 E void FDECL(stumble_onto_mimic, (struct monst *));

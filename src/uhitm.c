@@ -1,12 +1,13 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2003/02/18	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2003/03/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(known_hitum, (struct monst *,int *,struct attack *));
+STATIC_DCL boolean FDECL(known_hitum, (struct monst *,struct obj *,
+				       int *,int,int,struct attack *));
 STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
-STATIC_DCL boolean FDECL(hitum, (struct monst *,int,struct attack *));
+STATIC_DCL boolean FDECL(hitum, (struct monst *,struct attack *));
 STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *,struct obj *,int));
 #ifdef STEED
 STATIC_DCL int FDECL(joust, (struct monst *,struct obj *));
@@ -17,7 +18,7 @@ STATIC_DCL int FDECL(explum, (struct monst *,struct attack *));
 STATIC_DCL void FDECL(start_engulf, (struct monst *));
 STATIC_DCL void NDECL(end_engulf);
 STATIC_DCL int FDECL(gulpum, (struct monst *,struct attack *));
-STATIC_DCL boolean FDECL(hmonas, (struct monst *,int));
+STATIC_DCL boolean FDECL(hmonas, (struct monst *));
 STATIC_DCL void FDECL(nohandglow, (struct monst *));
 STATIC_DCL boolean FDECL(shade_aware, (struct obj *));
 
@@ -226,27 +227,34 @@ struct monst *mtmp;
 	}
 }
 
-schar
-find_roll_to_hit(mtmp)
+int
+find_roll_to_hit(mtmp, aatyp, weapon, attk_count, role_roll_penalty)
 register struct monst *mtmp;
+int aatyp;		/* usually AT_WEAP or AT_KICK */
+struct obj *weapon;	/* uwep or uswapwep or NULL */
+int *attk_count, *role_roll_penalty;
 {
-	schar tmp;
-	int tmp2;
+	int tmp, tmp2;
+
+	*role_roll_penalty = 0;	/* default is `none' */
 
 	tmp = 1 + Luck + abon() + find_mac(mtmp) + u.uhitinc +
 		maybe_polyd(youmonst.data->mlevel, u.ulevel);
 
-	check_caitiff(mtmp);
+	/* some actions should occur only once during multiple attacks */
+	if (!(*attk_count)++) {
+	    /* knight's chivalry */
+	    check_caitiff(mtmp);
 
-/*	attacking peaceful creatures is bad for the samurai's giri */
-	if (Role_if(PM_SAMURAI) && mtmp->mpeaceful &&
-	    u.ualign.record > -10) {
-	    You("dishonorably attack the innocent!");
-	    adjalign(-1);
+	    /* attacking peaceful creatures is bad for the samurai's giri */
+	    if (Role_if(PM_SAMURAI) && mtmp->mpeaceful &&
+		    u.ualign.record > -10) {
+		You("dishonorably attack the innocent!");
+		adjalign(-1);
+	    }
 	}
 
-/*	Adjust vs. (and possibly modify) monster state.		*/
-
+	/* adjust vs. (and possibly modify) monster state */
 	if(mtmp->mstun) tmp += 2;
 	if(mtmp->mflee) tmp += 2;
 
@@ -261,29 +269,34 @@ register struct monst *mtmp;
 			mtmp->mfrozen = 0;
 		}
 	}
-	if (is_orc(mtmp->data) && maybe_polyd(is_elf(youmonst.data),
-			Race_if(PM_ELF)))
-	    tmp++;
-	if(Role_if(PM_MONK) && !Upolyd) {
-	    if (uarm) {
-		Your("armor is rather cumbersome...");
-		tmp -= urole.spelarmr;
-	    } else if (!uwep && !uarms) {
-		tmp += (u.ulevel / 3) + 2;
-	    }
-	}
 
-/*	with a lot of luggage, your agility diminishes */
+	/* role/race adjustments */
+	if (Role_if(PM_MONK) && !Upolyd) {
+	    if (uarm)
+		tmp -= (*role_roll_penalty = urole.spelarmr);
+	    else if (!uwep && !uarms)
+		tmp += (u.ulevel / 3) + 2;
+	}
+	if (is_orc(mtmp->data) &&
+		maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF)))
+	    tmp++;
+
+	/* encumbrance: with a lot of luggage, your agility diminishes */
 	if ((tmp2 = near_capacity()) != 0) tmp -= (tmp2*2) - 1;
 	if (u.utrap) tmp -= 3;
-/*	Some monsters have a combination of weapon attacks and non-weapon
- *	attacks.  It is therefore wrong to add hitval to tmp; we must add
- *	it only for the specific attack (in hmonas()).
- */
-	if (uwep && !Upolyd) {
-		tmp += hitval(uwep, mtmp);
-		tmp += weapon_hit_bonus(uwep);
+
+	/*
+	 * hitval applies if making a weapon attack while wielding a weapon;
+	 * weapon_hit_bonus applies if doing a weapon attack even bare-handed
+	 * or if kicking as martial artist
+	 */
+	if (aatyp == AT_WEAP || aatyp == AT_CLAW) {
+	    if (weapon) tmp += hitval(weapon, mtmp);
+	    tmp += weapon_hit_bonus(weapon);
+	} else if (aatyp == AT_KICK && martial_bonus()) {
+	    tmp += weapon_hit_bonus((struct obj *)0);
 	}
+
 	return tmp;
 }
 
@@ -387,11 +400,10 @@ register struct monst *mtmp;
 	   mtmp->mx != u.ux+u.dx || mtmp->my != u.uy+u.dy)) /* it moved */
 		return(FALSE);
 
-	tmp = find_roll_to_hit(mtmp);
 	if (Upolyd)
-		(void) hmonas(mtmp, tmp);
+		(void) hmonas(mtmp);
 	else
-		(void) hitum(mtmp, tmp, youmonst.data->mattk);
+		(void) hitum(mtmp, youmonst.data->mattk);
 	mtmp->mstrategy &= ~STRAT_WAITMASK;
 
 atk_done:
@@ -408,10 +420,13 @@ atk_done:
 	return(TRUE);
 }
 
+/* really hit target monster; returns TRUE if it still lives */
 STATIC_OVL boolean
-known_hitum(mon, mhit, uattk)	/* returns TRUE if monster still lives */
+known_hitum(mon, weapon, mhit, rollneeded, armorpenalty, uattk)
 register struct monst *mon;
-register int *mhit;
+struct obj *weapon;
+int *mhit;
+int rollneeded, armorpenalty;	/* for monks */
 struct attack *uattk;
 {
 	register boolean malive = TRUE;
@@ -423,31 +438,27 @@ struct attack *uattk;
 	}
 
 	if(!*mhit) {
-	    missum(mon, uattk);
+	    missum(mon, uattk, (rollneeded + armorpenalty > dieroll));
 	} else {
 	    int oldhp = mon->mhp,
 		x = u.ux + u.dx, y = u.uy + u.dy;
+	    long oldweaphit = u.uconduct.weaphit;
 
 	    /* KMH, conduct */
-	    if (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+	    if (weapon &&
+		    (weapon->oclass == WEAPON_CLASS || is_weptool(weapon)))
 		u.uconduct.weaphit++;
 
 	    /* we hit the monster; be careful: it might die or
 	       be knocked into a different location */
 	    notonhead = (mon->mx != x || mon->my != y);
-	    malive = hmon(mon, uwep, 0);
-	    /* this assumes that Stormbringer was uwep not uswapwep */ 
-	    if (malive && u.twoweap && !override_confirmation &&
-		    m_at(x, y) == mon)
-		malive = hmon(mon, uswapwep, 0);
+	    malive = hmon(mon, weapon, 0);
 	    if (malive) {
 		/* monster still alive */
 		if(!rn2(25) && mon->mhp < mon->mhpmax/2
 			    && !(u.uswallow && mon == u.ustuck)) {
 		    /* maybe should regurgitate if swallowed? */
-		    if(!rn2(3)) {
-			monflee(mon, rnd(100), FALSE, TRUE);
-		    } else monflee(mon, 0, FALSE, TRUE);
+		    monflee(mon, !rn2(3) ? rnd(100) : 0, FALSE, TRUE);
 
 		    if(u.ustuck == mon && !u.uswallow && !sticks(youmonst.data))
 			u.ustuck = 0;
@@ -457,28 +468,42 @@ struct attack *uattk;
 		if (mon->mhp == oldhp) {
 		    *mhit = 0;
 		    /* a miss does not break conduct */
-		    if (uwep &&
-			(uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
-			--u.uconduct.weaphit;
+		    u.uconduct.weaphit = oldweaphit;
 		}
 		if (mon->wormno && *mhit)
-		    cutworm(mon, x, y, uwep);
+		    cutworm(mon, x, y, weapon);
 	    }
 	}
 	return(malive);
 }
 
+/* hit target monster; returns TRUE if it still lives */
 STATIC_OVL boolean
-hitum(mon, tmp, uattk)		/* returns TRUE if monster still lives */
+hitum(mon, uattk)
 struct monst *mon;
-int tmp;
 struct attack *uattk;
 {
 	boolean malive;
+	int armorpenalty, attknum = 0,
+	    x = u.ux + u.dx, y = u.uy + u.dy,
+	    tmp = find_roll_to_hit(mon, uattk->aatyp, uwep,
+				   &attknum, &armorpenalty);
 	int mhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
 
 	if(tmp > dieroll) exercise(A_DEX, TRUE);
-	malive = known_hitum(mon, &mhit, uattk);
+	malive = known_hitum(mon, uwep, &mhit, tmp, armorpenalty, uattk);
+	/* second attack for two-weapon combat; won't occur if Stormbringer
+	   overrode confirmation (assumes Stormbringer is primary weapon)
+	   or if the monster was killed or knocked to different location */
+	if (u.twoweap && !override_confirmation &&
+		malive && m_at(x, y) == mon) {
+	    tmp = find_roll_to_hit(mon, uattk->aatyp, uswapwep,
+				   &attknum, &armorpenalty);
+	    mhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
+	    malive = known_hitum(mon, uswapwep, &mhit,
+			   tmp, armorpenalty, uattk);
+	}
+
 	(void) passive(mon, mhit, malive, AT_WEAP);
 	return(malive);
 }
@@ -1876,10 +1901,14 @@ register struct attack *mattk;
 }
 
 void
-missum(mdef,mattk)
+missum(mdef, mattk, wouldhavehit)
 register struct monst *mdef;
 register struct attack *mattk;
+boolean wouldhavehit;
 {
+	if (wouldhavehit) /* monk is missing due to penalty for wearing suit */
+		Your("armor is rather cumbersome...");
+
 	if (could_seduce(&youmonst, mdef, mattk))
 		You("pretend to be friendly to %s.", mon_nam(mdef));
 	else if(canspotmon(mdef) && flags.verbose)
@@ -1891,17 +1920,16 @@ register struct attack *mattk;
 }
 
 STATIC_OVL boolean
-hmonas(mon, tmp)		/* attack monster as a monster. */
+hmonas(mon)		/* attack monster as a monster. */
 register struct monst *mon;
-register int tmp;
 {
 	struct attack *mattk, alt_attk;
-	int	i, sum[NATTK], hittmp = 0;
-	int	nsum = 0;
-	int	dhit = 0;
+	struct obj *weapon;
+	boolean altwep = FALSE;
+	int i, tmp, armorpenalty, sum[NATTK],
+	    nsum = 0, dhit = 0, attknum = 0;
 
 	for(i = 0; i < NATTK; i++) {
-
 	    sum[i] = 0;
 	    mattk = getmattk(youmonst.data, i, sum, &alt_attk);
 	    switch(mattk->aatyp) {
@@ -1916,21 +1944,21 @@ use_weapon:
 	 * we currently allow the player to get each of these as a weapon
 	 * attack.  Is this really desirable?
 	 */
-			if (uwep) {
-			    hittmp = hitval(uwep, mon);
-			    hittmp += weapon_hit_bonus(uwep);
-			    tmp += hittmp;
-			}
+			/* approximate two-weapon mode */
+			weapon = (altwep && uswapwep) ? uswapwep : uwep;
+			altwep = !altwep;   /* toggle for next attack */
+			tmp = find_roll_to_hit(mon, AT_WEAP, weapon,
+					       &attknum, &armorpenalty);
 			dhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
-			/* KMH -- Don't accumulate to-hit bonuses */
-			if (uwep) tmp -= hittmp;
 			/* Enemy dead, before any special abilities used */
-			if (!known_hitum(mon,&dhit,mattk)) {
+			if (!known_hitum(mon, weapon, &dhit,
+					 tmp, armorpenalty, mattk)) {
 			    sum[i] = 2;
 			    break;
 			} else sum[i] = dhit;
 			/* might be a worm that gets cut in half */
-			if (m_at(u.ux+u.dx, u.uy+u.dy) != mon) return((boolean)(nsum != 0));
+			if (m_at(u.ux+u.dx, u.uy+u.dy) != mon)
+			    return (boolean)(nsum != 0);
 			/* Do not print "You hit" message, since known_hitum
 			 * already did it.
 			 */
@@ -1939,7 +1967,8 @@ use_weapon:
 				sum[i] = damageum(mon,mattk);
 			break;
 		case AT_CLAW:
-			if (i==0 && uwep && !cantwield(youmonst.data)) goto use_weapon;
+			if (i == 0 && uwep && !cantwield(youmonst.data))
+			    goto use_weapon;
 #ifdef SEDUCE
 			/* succubi/incubi are humanoid, but their _second_
 			 * attack is AT_CLAW, not their first...
@@ -1953,8 +1982,13 @@ use_weapon:
 		case AT_TUCH:
 		case AT_BUTT:
 		case AT_TENT:
-			if (i==0 && uwep && (youmonst.data->mlet==S_LICH)) goto use_weapon;
-			if ((dhit = (tmp > rnd(20) || u.uswallow)) != 0) {
+			if (i == 0 && uwep && youmonst.data->mlet == S_LICH)
+			    goto use_weapon;
+			tmp = find_roll_to_hit(mon, mattk->aatyp,
+					       (struct obj *)0,
+					       &attknum, &armorpenalty);
+			dhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
+			if (dhit) {
 			    int compat;
 
 			    if (!u.uswallow &&
@@ -1991,8 +2025,10 @@ use_weapon:
 				    Your("tentacles suck %s.", mon_nam(mon));
 			    else You("hit %s.", mon_nam(mon));
 			    sum[i] = damageum(mon, mattk);
-			} else
-			    missum(mon, mattk);
+			} else {
+			    missum(mon, mattk,
+				   (tmp + armorpenalty > dieroll));
+			}
 			break;
 
 		case AT_HUGS:
@@ -2025,6 +2061,9 @@ use_weapon:
 			break;
 
 		case AT_ENGL:
+			tmp = find_roll_to_hit(mon, mattk->aatyp,
+					       (struct obj *)0,
+					       &attknum, &armorpenalty);
 			if((dhit = (tmp > rnd(20+i)))) {
 				wakeup(mon);
 				if (mon->data == &mons[PM_SHADE])
@@ -2042,8 +2081,9 @@ use_weapon:
 					mdamageu(mon, rnd(8));
 				    }
 				}
-			} else
-				missum(mon, mattk);
+			} else {
+				missum(mon, mattk, FALSE);
+			}
 			break;
 
 		case AT_MAGC:

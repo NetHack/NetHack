@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)dokick.c	3.4	2003/03/14	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -135,8 +135,9 @@ register xchar x, y;
 	 */
 	if (Upolyd && attacktype(youmonst.data, AT_KICK)) {
 	    struct attack *uattk;
-	    int sum;
-	    schar tmp = find_roll_to_hit(mon);
+	    int sum, kickdieroll, armorpenalty, attknum = 0,
+		tmp = find_roll_to_hit(mon, AT_KICK, (struct obj *)0,
+				       &attknum, &armorpenalty);
 
 	    for (i = 0; i < NATTK; i++) {
 		/* first of two kicks might have provoked counterattack
@@ -153,14 +154,14 @@ register xchar x, y;
 		       and shades have no passive counterattack */
 		    Your("%s %s.", kick_passes_thru, mon_nam(mon));
 		    break;	/* skip any additional kicks */
-		} else if (tmp > rnd(20)) {
+		} else if (tmp > (kickdieroll = rnd(20))) {
 		    You("kick %s.", mon_nam(mon));
 		    sum = damageum(mon, uattk);
 		    (void)passive(mon, (boolean)(sum > 0), (sum != 2), AT_KICK);
 		    if (sum == 2)
 			break;		/* Defender died */
 		} else {
-		    missum(mon, uattk);
+		    missum(mon, uattk, (tmp + armorpenalty > kickdieroll));
 		    (void)passive(mon, 0, 1, AT_KICK);
 		}
 	    }
