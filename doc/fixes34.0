@@ -283,7 +283,7 @@ breaking an unpaid wand of teleportation wouldn't result in the proper charge
 next_shkp() was used inconsistently, potentially triggering an endless loop
 chaotic wizards usually get a spellbook when crowned, just like neutral ones
 monk quest: fix the two inaccessible chambers on the locate level
-rogue quest: fix the two inaccessible chambers on the home level;
+rogue quest: fix the four inaccessible chambers on the home level;
 	link the two inaccessible chambers on the locate level and provide
 	a means of escaping from them; on the goal level, link most
 	chambers together, resulting in just four disconnected regions,
