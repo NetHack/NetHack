@@ -89,7 +89,8 @@ boolean complain;
 			  (VERSION_FEATURES & ~IGNORED_FEATURES) ||
 #endif
 		   version_data->entity_count != VERSION_SANITY1 ||
-		   version_data->struct_sizes != VERSION_SANITY2) {
+		   version_data->struct_sizes1 != VERSION_SANITY2 ||
+		   version_data->struct_sizes2 != VERSION_SANITY3) {
 	    if (complain)
 		pline("Configuration incompatibility for file \"%s\".",
 		      filename);
@@ -131,7 +132,7 @@ int fd;
 {
 	const static struct version_info version_data = {
 			VERSION_NUMBER, VERSION_FEATURES,
-			VERSION_SANITY1, VERSION_SANITY2
+			VERSION_SANITY1, VERSION_SANITY2, VERSION_SANITY3
 	};
 
 	bufoff(fd);

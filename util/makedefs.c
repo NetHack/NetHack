@@ -16,6 +16,7 @@
 #include "obj.h"
 #include "monst.h"
 #include "you.h"
+#include "context.h"
 #include "flag.h"
 #include "dlb.h"
 
@@ -49,7 +50,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.4\t2002/02/03";
+static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.5\t2004/02/01";
 #endif
 
 	/* names of files to be generated */
@@ -498,10 +499,17 @@ make_version()
 	/*
 	 * Value used for compiler (word size/field alignment/padding) check.
 	 */
-	version.struct_sizes = (((unsigned long)sizeof (struct flag)  << 24) |
+	version.struct_sizes1 = (((unsigned long)sizeof (struct context_info)  << 24) |
 				((unsigned long)sizeof (struct obj)   << 17) |
 				((unsigned long)sizeof (struct monst) << 10) |
 				((unsigned long)sizeof (struct you)));
+	version.struct_sizes2 = (((unsigned long)sizeof (struct flag)  << 10) |
+				/* free bits in here */
+#ifdef SYSFLAGS
+				((unsigned long)sizeof (struct sysflag)));
+#else
+				((unsigned long)0L));
+#endif
 	return;
 }
 
@@ -553,7 +561,7 @@ do_date()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.4\t2002/02/03 */\n\n");
+	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.5\t2004/02/01 */\n\n");
 	Fprintf(ofp,Dont_Edit_Code);
 
 #ifdef KR1ED
@@ -584,7 +592,9 @@ do_date()
 	Fprintf(ofp,"#define VERSION_SANITY1 0x%08lx%s\n",
 		version.entity_count, ul_sfx);
 	Fprintf(ofp,"#define VERSION_SANITY2 0x%08lx%s\n",
-		version.struct_sizes, ul_sfx);
+		version.struct_sizes1, ul_sfx);
+	Fprintf(ofp,"#define VERSION_SANITY3 0x%08lx%s\n",
+		version.struct_sizes2, ul_sfx);
 	Fprintf(ofp,"\n");
 	Fprintf(ofp,"#define VERSION_STRING \"%s\"\n", version_string(buf));
 	Fprintf(ofp,"#define VERSION_ID \\\n \"%s\"\n",
@@ -1391,7 +1401,7 @@ do_permonst()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)pm.h\t3.4\t2002/02/03 */\n\n");
+	Fprintf(ofp,"/*\tSCCS Id: @(#)pm.h\t3.5\t2004/02/01 */\n\n");
 	Fprintf(ofp,Dont_Edit_Code);
 	Fprintf(ofp,"#ifndef PM_H\n#define PM_H\n");
 
@@ -1707,7 +1717,7 @@ do_objs()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)onames.h\t3.4\t2002/02/03 */\n\n");
+	Fprintf(ofp,"/*\tSCCS Id: @(#)onames.h\t3.5\t2004/02/01 */\n\n");
 	Fprintf(ofp,Dont_Edit_Code);
 	Fprintf(ofp,"#ifndef ONAMES_H\n#define ONAMES_H\n\n");
 
