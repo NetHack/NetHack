@@ -103,7 +103,6 @@ static int lockptr;
 #endif
 
 #ifdef USER_SOUNDS
-extern int FDECL(add_sound_mapping, (const char* mapping));
 extern char *sounddir;
 #endif
 
@@ -1522,6 +1521,15 @@ char		*tmp_levels;
 		return 0;
 	return 1;
 }
+
+#ifdef USER_SOUNDS
+boolean
+can_read_file(filename)
+const char *filename;
+{
+	return (access(filename, 4) == 0);
+}
+#endif /* USER_SOUNDS */
 
 void
 read_config_file(filename)

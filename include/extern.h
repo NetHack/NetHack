@@ -630,6 +630,9 @@ E void FDECL(compress, (const char *));
 E void FDECL(uncompress, (const char *));
 E boolean FDECL(lock_file, (const char *,int,int));
 E void FDECL(unlock_file, (const char *));
+#ifdef USER_SOUNDS
+E boolean FDECL(can_read_file, (const char *));
+#endif
 E void FDECL(read_config_file, (const char *));
 E void FDECL(check_recordfile, (const char *));
 #if defined(WIZARD)
@@ -1793,7 +1796,9 @@ E void FDECL(yelp, (struct monst *));
 E void FDECL(whimper, (struct monst *));
 E void FDECL(beg, (struct monst *));
 E int NDECL(dotalk);
-
+#ifdef USER_SOUNDS
+E int FDECL(add_sound_mapping, (const char *));
+#endif
 
 /* ### sys/msdos/sound.c ### */
 
