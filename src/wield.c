@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.4	2001/12/23	*/
+/*	SCCS Id: @(#)wield.c	3.4	2002/04/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -613,8 +613,9 @@ chwepon(otmp, amount)
 register struct obj *otmp;
 register int amount;
 {
-	register const char *color = hcolor((amount < 0) ? Black : blue);
-	register const char *xtime;
+	const char *color = hcolor((amount < 0) ? Black : blue);
+	const char *xtime;
+	int otyp = STRANGE_OBJECT;
 
 	if(!uwep || (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))) {
 		char buf[BUFSZ];
@@ -626,11 +627,14 @@ register int amount;
 		return(0);
 	}
 
+	if (otmp && otmp->oclass == SCROLL_CLASS) otyp = otmp->otyp;
+
 	if(uwep->otyp == WORM_TOOTH && amount >= 0) {
 		uwep->otyp = CRYSKNIFE;
 		uwep->oerodeproof = 0;
 		Your("weapon seems sharper now.");
 		uwep->cursed = 0;
+		if (otyp != STRANGE_OBJECT) makeknown(otyp);
 		return(1);
 	}
 
@@ -638,6 +642,7 @@ register int amount;
 		uwep->otyp = WORM_TOOTH;
 		uwep->oerodeproof = 0;
 		Your("weapon seems duller now.");
+		if (otyp != STRANGE_OBJECT && otmp->bknown) makeknown(otyp);
 		return(1);
 	}
 
@@ -656,9 +661,7 @@ register int amount;
 	    else
 		Your("%s.", aobjnam(uwep, "evaporate"));
 
-	    while(uwep)		/* let all of them disappear */
-				/* note: uwep->quan = 1 is nogood if unpaid */
-		useup(uwep);
+	    useupall(uwep);	/* let all of them disappear */
 	    return(1);
 	}
 	if (!Blind) {
@@ -666,6 +669,9 @@ register int amount;
 	    Your("%s %s for a %s.",
 		 aobjnam(uwep, amount == 0 ? "violently glow" : "glow"),
 		 color, xtime);
+	    if (otyp != STRANGE_OBJECT && uwep->known &&
+		    (amount > 0 || (amount < 0 && otmp->bknown)))
+		makeknown(otyp);
 	}
 	uwep->spe += amount;
 	if(amount > 0) uwep->cursed = 0;
