@@ -42,7 +42,17 @@ struct monst *mtmp;
 	if (mtmp) {
 	    struct monst *mtmp2 = m_at(x,y);
 
-	    if (mtmp2 && mtmp2 != mtmp)
+	    /* Be careful with long worms.  A monster may be placed back in
+	     * its own location.  Normally, if m_at() returns the same monster
+	     * that we're trying to place, the monster is being placed in its
+	     * own location.  However, that is not correct for worm segments,
+	     * because all the segments of the worm return the same m_at().
+	     * Actually we overdo the check a little bit--a worm can't be placed
+	     * in its own location, period.  If we just checked for mtmp->mx
+	     * != x || mtmp->my != y, we'd miss the case where we're called
+	     * to place the worm segment and the worm's head is at x,y.
+	     */
+	    if (mtmp2 && (mtmp2 != mtmp || mtmp->wormno))
 		return FALSE;
 
 	    mdat = mtmp->data;
