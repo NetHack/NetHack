@@ -276,17 +276,18 @@ Setting Up
                              |
         -----------------------------------------/ /--------------- 
         |     |    |      |     |   |      |           |       |
-       util  dat  doc  include src sys    win      winhacknt binary
+       util  dat  doc  include src sys    win        build    binary
                                     |      |
                                   ------   -----
                                   |    |       |    
                                share  winnt  win32
  
-    Those last two (winhacknt and binary) are created during the
-    build.  They are not disributed as part of the source distribution.
-    nhsetup.bat moves many files into the "winhacknt" directory, and
-    "binary" will house everything you need to place the game after
-    building.
+    Those last two (build and binary) are created during the building
+    process.  They are not disributed as part of the NetHack source 
+    distribution.  nhsetup.bat creates the build directory and moves 
+    a few files into it, including the Visual C project files.
+    The "binary" directory will house everything you need to play the 
+    game after building is complete.
 
     Check the file "Files" in your top level directory for an exact
     listing of what file is in which directory.  In order for the
@@ -297,8 +298,8 @@ Setting Up
 3.  Start the Visual C IDE. In the Visual C IDE Menus, choose:
         File | Open Workspace
 
-4.  In the Visual C "Open Workspace" dialog box, navigate to your nethack
-    source directory, specifically the winhacknt subdirectory. 
+4.  In the Visual C "Open Workspace" dialog box, navigate to the top
+    of  your NetHack source directory.
  
     In there, highlight "nethack.dsw" and click on Open.
 

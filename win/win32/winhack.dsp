@@ -45,7 +45,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -78,7 +78,7 @@ PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Yu"stdafx.h" /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -94,7 +94,7 @@ LINK32=link.exe
 OutDir=.\Debug
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
-PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
+PostBuild_Cmds=if NOT exist ..\binary\*.* mkdir ..\binary	copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "winhack - Win32 Unicode Release"
@@ -113,7 +113,7 @@ PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /FD /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -148,7 +148,7 @@ PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /FD /GZ /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -163,8 +163,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 OutDir=.\Unicode_Debug
 SOURCE="$(InputPath)"
-PostBuild_Desc=Install exe
-PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
+PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist ..\src\tiles.bmp copy ..\src\tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
 # End Special Build Tool
 
 !ENDIF 
