@@ -1705,22 +1705,44 @@ long timeout;
 	cansee_spot = cansee(cc.x, cc.y);
 	mtmp = make_familiar(figurine, cc.x, cc.y, TRUE);
 	if (mtmp) {
-	    Sprintf(monnambuf, "%s",a_monnam(mtmp));
+	    char hidebuf[BUFSZ];
+	    struct obj *mshelter;
+	    /*
+	     * We're suppressing "it" here because if
+	     * the monster ends up undetected, the "it"
+	     * makes no sense since monnambuf is only
+	     * used in "You see <mon>" type messages.
+	     *
+	     * It has been suggested that it might be
+	     * better to have the transformed figurine
+	     * monster wait until the next turn before
+	     * hiding, but that is currently not implemented.
+	     */
+	    Sprintf(monnambuf, "%s",
+			x_monnam(mtmp, ARTICLE_A, (char *)0,
+				 SUPPRESS_IT, FALSE));
+	    if (mtmp->mundetected) {
+		if ((mshelter = level.objects[mtmp->mx][mtmp->my]) != 0)
+	    		Sprintf(hidebuf, " and %s under %s",
+	    			locomotion(mtmp->data, "crawl"),	    			doname(mshelter));
+	    	else
+	    		Strcpy(hidebuf, " and hide");
+	    } else hidebuf[0] = '\0';
+
 	    switch (figurine->where) {
 		case OBJ_INVENT:
 		    if (Blind)
 			You_feel("%s %s from your pack!", something,
 			    locomotion(mtmp->data,"drop"));
 		    else
-			You("see %s %s out of your pack!",
-			    monnambuf,
-			    locomotion(mtmp->data,"drop"));
+			You("see %s %s out of your pack%s!",
+			    monnambuf, locomotion(mtmp->data,"drop"), hidebuf);
 		    break;
 
 		case OBJ_FLOOR:
 		    if (cansee_spot && !silent) {
-			You("suddenly see a figurine transform into %s!",
-				monnambuf);
+			You("suddenly see a figurine transform into %s%s!",
+				monnambuf, hidebuf);
 			redraw = TRUE;	/* update figurine's map location */
 		    }
 		    break;
@@ -1738,8 +1760,9 @@ long timeout;
 			    Strcpy(carriedby, "empty water");
 			else
 			    Strcpy(carriedby, "thin air");
-			You("see %s %s out of %s!", monnambuf,
-			    locomotion(mtmp->data, "drop"), carriedby);
+			You("see %s %s out of %s%s!", monnambuf,
+			    locomotion(mtmp->data, "drop"), carriedby,
+			    hidebuf);
 		    }
 		    break;
 #if 0
