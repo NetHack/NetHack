@@ -3,7 +3,6 @@ $RCSfile$ $Revision$ $Date$
 General Fixes and Modified Features
 -----------------------------------
 setmangry should not be called when a monster enters a bones region
-avoid panic when secondary weapon is cursed while generating bones level
 typos fixed in data.base
 bad capitalization of msg when charging for something that catches light
 missing opthelp for use_inverse
@@ -11,8 +10,6 @@ missing opthelp for use_inverse
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
-Gnome: compilation problems on Redhat 7.2 and 8.0
-unix: Makefile.utl would put OBJDIR objects in the wrong directory
 
 
 General New Features
