@@ -2267,7 +2267,10 @@ struct obj *obj;
 			pline("Snatching %s is a fatal mistake.", kbuf);
 			instapetrify(kbuf);
 		    }
-		    otmp = hold_another_object(otmp, "You drop %s!",
+		    if (!touch_artifact(otmp, &youmonst))
+			dropy(otmp);
+		    else
+			otmp = hold_another_object(otmp, "You drop %s!",
 					       doname(otmp), (const char *)0);
 		    break;
 		default:
