@@ -109,7 +109,7 @@ void mswin_display_splash_window (BOOL show_ver)
 			line[len + 1] = '\0';
 			len++;
 		    }
-		    if (strsize + (int)len > bufsize)
+		    if (strsize + (int)len + 1 > bufsize)
 		    {
 			bufsize += BUFSZ;
 			buf = realloc(buf, bufsize);
@@ -140,7 +140,7 @@ void mswin_display_splash_window (BOOL show_ver)
 			    line[len + 1] = '\0';
 			    len++;
 			}
-			if (strsize + (int)len > bufsize)
+			if (strsize + (int)len + 1 > bufsize)
 			{
 			    bufsize += BUFSZ;
 			    buf = realloc(buf, bufsize);
