@@ -1907,7 +1907,8 @@ If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
 .lp pettype
 Specify the type of your initial pet, if you are playing a character class
-that uses multiple types of pets.  Possible values are ``cat'' and ``dog''.
+that uses multiple types of pets; or choose to have no initial pet at all.
+Possible values are ``cat'', ``dog'' and ``none''.
 Cannot be set with the `O' command.
 .lp pickup_burden
 When you pick up an item that would exceed this encumbrance

@@ -184,7 +184,7 @@ name       the name of your character  [obtained by asking the system or
 objects    like dungeon, but for object symbols
            default:  ])[="(%!?+/$*`0_.
 pettype    your preferred type of pet (cat or dog), if your character
-           class uses both types  [RANDOM]
+           class uses both types; or none for no pet  [RANDOM]
 race       Your starting race (e.g., race:Human, race:Elf).  [RANDOM]
 role       Your starting role (e.g., role:Barbarian, role:Valk).
            Although you can specify just the first letter(s), it will

@@ -1058,11 +1058,15 @@ boolean tinitial, tfrom_file;
 			case 'F':
 			    preferred_pet = 'c';
 			    break;
+			case 'n':	/* no pet */
+			case 'N':
+			    preferred_pet = 'n';
+			    break;
 			default:
 			    pline("Unrecognized pet type '%s'", op);
 			    break;
 		    }
-		} else if (negated) preferred_pet = 0;
+		} else if (negated) preferred_pet = 'n';
 		return;
 	}
 
@@ -2262,7 +2266,8 @@ char *buf;
 #endif
 	else if (!strcmp(optname, "pettype")) 
 		Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :
-				(preferred_pet == 'd') ? "dog" : "random" );
+				(preferred_pet == 'd') ? "dog" :
+				(preferred_pet == 'n') ? "none" : "random");
 	else if (!strcmp(optname, "pickup_burden"))
 		Sprintf(buf, "%s", burdentype[flags.pickup_burden] );
 	else if (!strcmp(optname, "pickup_types")) {
