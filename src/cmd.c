@@ -2113,20 +2113,34 @@ const char *msg;
 		putstr(win, 0, "");
 	    }
 	}
-	if (iflags.num_pad) {
-		putstr(win, 0, "Valid direction keys (with number_pad on) are:");
-		putstr(win, 0, "          7  8  9");
-		putstr(win, 0, "           \\ | / ");
-		putstr(win, 0, "          4- . -6");
-		putstr(win, 0, "           / | \\ ");
-		putstr(win, 0, "          1  2  3");
+	if (iflags.num_pad && u.umonnum == PM_GRID_BUG) {
+	    putstr(win, 0, "Valid direction keys in your current form (with number_pad on) are:");
+	    putstr(win, 0, "             8   ");
+	    putstr(win, 0, "             |   ");
+	    putstr(win, 0, "          4- . -6");
+	    putstr(win, 0, "             |   ");
+	    putstr(win, 0, "             2   ");
+	} else if (u.umonnum == PM_GRID_BUG) {
+	    putstr(win, 0, "Valid direction keys in your current form are:");
+	    putstr(win, 0, "             k   ");
+	    putstr(win, 0, "             |   ");
+	    putstr(win, 0, "          h- . -l");
+	    putstr(win, 0, "             |   ");
+	    putstr(win, 0, "             j   ");
+	} else if (iflags.num_pad) {
+	    putstr(win, 0, "Valid direction keys (with number_pad on) are:");
+	    putstr(win, 0, "          7  8  9");
+	    putstr(win, 0, "           \\ | / ");
+	    putstr(win, 0, "          4- . -6");
+	    putstr(win, 0, "           / | \\ ");
+	    putstr(win, 0, "          1  2  3");
 	} else {
-		putstr(win, 0, "Valid direction keys are:");
-		putstr(win, 0, "          y  k  u");
-		putstr(win, 0, "           \\ | / ");
-		putstr(win, 0, "          h- . -l");
-		putstr(win, 0, "           / | \\ ");
-		putstr(win, 0, "          b  j  n");
+	    putstr(win, 0, "Valid direction keys are:");
+	    putstr(win, 0, "          y  k  u");
+	    putstr(win, 0, "           \\ | / ");
+	    putstr(win, 0, "          h- . -l");
+	    putstr(win, 0, "           / | \\ ");
+	    putstr(win, 0, "          b  j  n");
 	};
 	putstr(win, 0, "");
 	putstr(win, 0, "          <  up");
