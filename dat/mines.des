@@ -786,7 +786,7 @@ MONSTER:'h',"dwarf",random
 MONSTER:'h',random,random
 
 
-# Mine end level variant 1
+# Mine end level variant 2
 # "Gnome King's Wine Cellar"
 #
 MAZE: "minend-2", ' '
