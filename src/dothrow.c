@@ -1309,11 +1309,26 @@ register struct obj   *obj;
 		   sometimes disappear when thrown */
 		if (objects[otyp].oc_skill < P_NONE &&
 				objects[otyp].oc_skill > -P_BOOMERANG &&
-				!objects[otyp].oc_magic && rn2(3)) {
-		    if (*u.ushops)
-			check_shop_obj(obj, bhitpos.x,bhitpos.y, TRUE);
-		    obfree(obj, (struct obj *)0);
-		    return 1;
+				!objects[otyp].oc_magic) {
+		    /* we were breaking 2/3 of everything unconditionally.
+		     * we still don't want anything to survive unconditionally,
+		     * but we need ammo to stay around longer on average.
+		     */
+		    int broken, chance;
+		    chance = 3 + greatest_erosion(obj) - obj->spe;
+		    if (chance > 1)
+			broken = rn2(chance);
+		    else
+			broken = !rn2(4);
+		    if (obj->blessed && !rnl(4))
+			broken = 0;
+
+		    if (broken) {
+			if (*u.ushops)
+			    check_shop_obj(obj, bhitpos.x,bhitpos.y, TRUE);
+			obfree(obj, (struct obj *)0);
+			return 1;
+		    }
 		}
 		passive_obj(mon, obj, (struct attack *)0);
 	    } else {
