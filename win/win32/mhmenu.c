@@ -795,7 +795,6 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int x, y;
 	TCHAR wbuf[BUFSZ];
 	RECT drawRect;
-	DRAWTEXTPARAMS dtp;
 	COLORREF OldBg, OldFg, NewBg;
 	char *p, *p1;
 	int column;
@@ -1270,7 +1269,6 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 	PNHMenuWindow data;
 	int i;
 	RECT rt;
-	TCHAR wbuf[BUFSZ];
 
 	GetClientRect(hWnd, &rt);
 	sz->cx = rt.right - rt.left;
@@ -1286,8 +1284,6 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
 			GetTextMetrics(hdc, &tm);
 			for(i=0; i<data->menu.size; i++ ) {
-				DRAWTEXTPARAMS dtp;
-				RECT drawRect;
 				LONG menuitemwidth = 0;
 				int column;
 				char *p, *p1;
