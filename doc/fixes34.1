@@ -400,7 +400,7 @@ win32: allow error save files to be generated
 win32: strip illegal file name characters from plname and replace with '_'
 win32: don't let recover build a save file out of level files belonging 
 	to an active NetHack.exe or NetHackw.exe process
-win32: SELF_RECOVER to let NetHack itself recover aborted games
+win32,winCE: SELF_RECOVER to let NetHack itself recover aborted games
 win32gui: make error() work; it was essentially non-operative in 3.4.0
 win32gui: fix alignment of columns in menu windows
 win32gui: Window menu File|Save worked during #quit disclosure processing
