@@ -125,7 +125,7 @@ PPPPPPPP...............PPPPPPPP
 PPPPPPPPPPP........PPPPPPPPPPPP
 ENDMAP
 # Dungeon Description
-REGION:(03,00,26,09),lit,"ordinary"
+REGION:(00,00,30,09),lit,"ordinary"
 REGION:(12,03,20,06),lit,"temple"
 # Doors
 DOOR:closed,(09,04)
