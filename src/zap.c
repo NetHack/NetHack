@@ -2324,14 +2324,20 @@ struct obj *obj;	/* wand or spell */
 		pline("Blood drips on your %s.", body_part(FACE));
 	    } else if (u.dz > 0 && !OBJ_AT(u.ux, u.uy)) {
 		/*
-		Print this message only if there wasn't ice or an engraving
-		affected here.
+		Print this message only if there wasn't an engraving
+		affected here.  If water or ice, act like waterlevel case.
 		*/
 		e = engr_at(u.ux, u.uy);
-		if (!(e && e->engr_type == ENGRAVE) && !is_ice(u.ux, u.uy))
-		    pline("Blood pools at your %s.",
-			  makeplural(body_part(FOOT)));
+		if (!(e && e->engr_type == ENGRAVE)) {
+		    if (is_pool(u.ux, u.uy) || is_ice(u.ux, u.uy))
+			pline(nothing_happens);
+		    else
+			pline("Blood %ss %s your %s.",
+			      is_lava(u.ux, u.uy) ? "boil" : "pool",
+			      Levitation ? "beneath" : "at",
+			      makeplural(body_part(FOOT)));
 		}
+	    }
 	    break;
 	default:
 	    break;
