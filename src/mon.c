@@ -2368,6 +2368,9 @@ boolean polyspot;	/* change is the result of wand or spell of polymorph */
 					mtmp->mhp = 1;  /* almost dead */
 				}
 				expels(mtmp, olddata, FALSE);
+			} else {
+				/* update swallow glyphs for new monster */
+				swallowed(0);
 			}
 		} else if (!sticks(mdat) && !sticks(youmonst.data))
 			unstuck(mtmp);
