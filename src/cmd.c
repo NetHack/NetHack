@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.4	2002/09/01	*/
+/*	SCCS Id: @(#)cmd.c	3.4	2002/10/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -438,6 +438,7 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
 }
 #endif
 
+/* #monster command - use special monster ability while polymorphed */
 STATIC_PTR int
 domonability()
 {
@@ -487,6 +488,8 @@ enter_explore_mode()
 }
 
 #ifdef WIZARD
+
+/* ^W command - wish for something */
 STATIC_PTR int
 wiz_wish()	/* Unlimited wishes for debug mode by Paul Polderman */
 {
@@ -502,6 +505,7 @@ wiz_wish()	/* Unlimited wishes for debug mode by Paul Polderman */
 	return 0;
 }
 
+/* ^I command - identify hero's inventory */
 STATIC_PTR int
 wiz_identify()
 {
@@ -510,23 +514,29 @@ wiz_identify()
 	return 0;
 }
 
-/* reveal the level map and any traps on it */
+/* ^F command - reveal the level map and any traps on it */
 STATIC_PTR int
 wiz_map()
 {
 	if (wizard) {
 	    struct trap *t;
+	    long save_Hconf = HConfusion,
+		 save_Hhallu = HHallucination;
 
+	    HConfusion = HHallucination = 0L;
 	    for (t = ftrap; t != 0; t = t->ntrap) {
 		t->tseen = 1;
 		map_trap(t, TRUE);
 	    }
 	    do_mapping();
+	    HConfusion = save_Hconf;
+	    HHallucination = save_Hhallu;
 	} else
 	    pline("Unavailable command '^F'.");
 	return 0;
 }
 
+/* ^G command - generate monster(s); a count prefix will be honored */
 STATIC_PTR int
 wiz_genesis()
 {
@@ -535,6 +545,7 @@ wiz_genesis()
 	return 0;
 }
 
+/* ^O command - display dungeon layout */
 STATIC_PTR int
 wiz_where()
 {
@@ -543,6 +554,7 @@ wiz_where()
 	return 0;
 }
 
+/* ^E command - detect unseen (secret doors, traps, hidden monsters) */
 STATIC_PTR int
 wiz_detect()
 {
@@ -551,6 +563,7 @@ wiz_detect()
 	return 0;
 }
 
+/* ^V command - level teleport */
 STATIC_PTR int
 wiz_level_tele()
 {
@@ -559,6 +572,7 @@ wiz_level_tele()
 	return 0;
 }
 
+/* #monpolycontrol command - choose new form for shapechangers, polymorphees */
 STATIC_PTR int
 wiz_mon_polycontrol()
 {
@@ -568,7 +582,7 @@ wiz_mon_polycontrol()
     return 0;
 }
 
-/* #levelchange command */
+/* #levelchange command - adjust hero's experience level */
 STATIC_PTR int
 wiz_level_change()
 {
@@ -608,6 +622,7 @@ wiz_level_change()
     return 0;
 }
 
+/* #panic command - test program's panic handling */
 STATIC_PTR int
 wiz_panic()
 {
@@ -616,6 +631,7 @@ wiz_panic()
         return 0;
 }
 
+/* #polyself command - change hero's form */
 STATIC_PTR int
 wiz_polyself()
 {
@@ -623,6 +639,7 @@ wiz_polyself()
         return 0;
 }
 
+/* #seenv command */
 STATIC_PTR int
 wiz_show_seenv()
 {
@@ -664,6 +681,7 @@ wiz_show_seenv()
 	return 0;
 }
 
+/* #vision command */
 STATIC_PTR int
 wiz_show_vision()
 {
@@ -700,6 +718,7 @@ wiz_show_vision()
 	return 0;
 }
 
+/* #wmode command */
 STATIC_PTR int
 wiz_show_wmodes()
 {
@@ -1489,7 +1508,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 	{"lightsources", "show mobile light sources", wiz_light_sources, TRUE},
 	{"monpolycontrol", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
 	{"panic", "test panic routine (fatal to game)", wiz_panic, TRUE},
-	{"poly", "polymorph self", wiz_polyself, TRUE},
+	{"polyself", "polymorph self", wiz_polyself, TRUE},
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
 	{"timeout", "look at timeout queue", wiz_timeout_queue, TRUE},
