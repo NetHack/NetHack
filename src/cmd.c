@@ -2336,7 +2336,7 @@ end_of_input()
 {
 	exit_nhwindows("End of input?");
 #ifndef NOSAVEONHANGUP
-	if (!program_state.done_hup++)
+	if (!program_state.done_hup++ && program_state.something_worth_saving)
 	    (void) dosave0();
 #endif
 	clearlocks();
