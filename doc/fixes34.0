@@ -432,6 +432,7 @@ Vlad should want the Candelabrum
 if you float_down on a trap in which you're already trapped, don't retrap
 applying whip toward hidden mimic displays mimic name before "Wait!" message
 stealing a container didn't multiply cost of stolen contained objects by quan
+halve air elemental damage to compensate for side effect of speed system
 
 
 Platform- and/or Interface-Specific Fixes
