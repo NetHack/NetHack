@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.4	2002/03/24	*/
+/*	SCCS Id: @(#)polyself.c	3.4	2002/06/23	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -83,6 +83,10 @@ const char *fmt, *arg;
 	    }
 	    done(GENOCIDED);
 	}
+
+	if (u.twoweap && !could_twoweap(youmonst.data))
+	    untwoweapon();
+
 	if (was_blind && !Blind) {	/* reverting from eyeless */
 	    Blinded = 1L;
 	    make_blinded(0L, TRUE);	/* remove blindness */
