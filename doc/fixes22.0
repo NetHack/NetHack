@@ -1,0 +1,353 @@
+		NetHack Fixes List	Revision 2.2
+
+Fixes and Modified Features
+---------------------------
+Guidebook.mn	New file "Guide to the Mazes of Menace". By Eric Raymond.
+Guidebook	A file for preparation using the "mn" macros supplied with
+		the 2.11 news release, as well as an ascii version of the
+		same. 
+
+NetHack.cnf	Sample configuration file for the PC. (creps@silver)
+
+Makefiles	Corrected problem in which the linking was done on build and
+(unix/xenix)	on install. (Contributed by Janet Walz - walz@mimsy)
+
+Makefile.att	Added a makefile for the AT&T Unix PC using shared libraries.
+		(Contributed by ahby@umn-cs)
+
+Makefile.pc	Streamlined compilation of main.o, tty.o, and unix.o
+Makefile.tcc	(Contributed by polder@cs.vu.nl).
+
+data.base	deletion of duplicate lines and spelling fixes. (sweet@scubed)
+
+invent.c	REDO problem with "What do you want to..." text fixed.
+		down stairway identification fixed.
+		Alloc "buf" to allow for variable length HI/HE. (tom@uw-warp)
+
+engrave.c	Correction to "feel" code. (mike@genat)
+		Corrected switch for message determination. (patrickm@hpisof0)
+		BURN'ed engravings made un-erasable again. (kyrimis@princeton)
+
+pri.c		Added colour highliting functions (sweet@scubed)
+
+prisym.c	changed "symbol.room" to "ROOM_SYM" (one I missed)
+		(Ralf.Brown@b.gp.cs.cmu.edu)
+		Changed "dirlet()" to return an int. (maartenj@cs.vu.nl)
+
+msdos.c		Changed "symbol" to "showsyms" (Ralf.Brown@b.gp.cs.cmu.edu)
+		Fixed up REDO & IBMBIOS stuff. (Kevin Sweet - sweet@scubed)
+
+do.c		Dropping gold asked for only when gold posessed. (walz@mimsy)
+		Potential unsigned value problem fixed (u.ucreamed)
+		Added leash dropping code. (maartenj@cs.vu.nl)
+		Blind modifications for blindfolding.  (eric@snark)
+		Value wrap fixed for u.ucreamed
+
+fight.c		Dog's name now used in hitting avoidence message. (walz@mimsy)
+		Variable initialization fixed w.r.t. #ifdef / #else.
+		(Reported by Erwin Unruh - unruh@infbs)
+		Added giant rats and kobolds back into code. (sweet@scubed)
+
+spell.c		Potential unsigned value problem fixed (u.ulevel).
+		Typos corrected. (Tom May - tom@uw-warp)
+		Blind modifications for blindfolding.  (eric@snark)
+
+shk.c		"inshop" crash bug corrected (many sources).
+		extern declaration of carrying() moved to avoid a Turbo-C
+		type mismatch msg. (Ralf.Brown@b.gp.cs.cmu.edu)
+		Added new "online()" which executes faster. (tom@uw-warp)
+		Blind modifications for blindfolding.  (eric@snark)
+		Added item pricing shopkeeper talk.
+		(Idea from a hacked up 1.0.1 source sent in by michael@stb)
+		Cleaned up Kops code. (sweet@scubed)
+
+mhitu.c		Argument mismatches fixed. (walz@mimsy)
+		Scorpion/spider mixup fix. (William LeFebvre - phil@rice.edu)
+		Blind modifications for blindfolding.  (eric@snark)
+
+potion.c	Argument mismatch fixed. (walz@mimsy)
+		Blind modifications for blindfolding.  (eric@snark)
+		Poison handling made more dependant on poison resistance.
+		(From an idea by Steve Creps - creps@silver)
+
+mklev.c		Fixed up installation of vamp traps. (sweet@scubed)
+
+makemon.c	Monster creation location bug fixed. (walz@mimsy)
+		Monster creation crash fixed. (many sources)
+		Monster posessions bug fixed. (S. Wrammerfors stewr@obelix)
+		Added giant rats and kobolds back into code. (sweet@scubed)
+
+hack.c		"Elbereth" effectiveness increased under "HARD" option to
+		be reasonable. (walz@mimsy)
+		Declaration of "register struct monst *m_at()" fixed. (many)
+		Typo fixed. (tom@uw-warp)
+		Fixed scroll of scare monster pickup problems (and giveaway)
+		(polder@cs.vu.nl)
+		Documentation modifications for blindfolding.  (eric@snark)
+
+ioctl.c		ioctl call for SET changed to function properly under
+
+unixtty.c	Sys V R3 mods.  (tom@uw-warp)
+
+decl.c		in_doagain initialized. (many sources)
+
+wield.c		Ability to remove cursed weapons w. w- removed. (many sources)
+
+options.c	Major rewrite of options help.  Now uses pager.  (mike@genat)
+		Rewrote GRAPHICS setup. (maartenj@cs.vu.nl)
+		Allowed reassignment of inventory order #ifdef DGK
+		(polder@cs.vu.nl)
+
+pray.c		Fixed mk_obj of spellbook under all conditions to make book
+		if "SPELLS" defined, and scroll otherwise. (unruh@infbs)
+		Fixed typo in "gods angry" text. (tom@uw-warp)
+		Fixed blessing code. (Simon Brown - simon@its63b)
+		Blind modifications for blindfolding.  (eric@snark)
+
+zap.c		Potion of invis. breakage message improved. (unruh@infbs)
+		Added WAN_PROBING to "zapyourself".
+		Changed "dirlet()" to return an int. (maartenj@cs.vu.nl)
+		Fixed cancellation code to work properly on wands (spe
+		set to -1 instead of 0) this means no infinite wands of
+		wishing. (Ron Wessels - ron@utcsri)
+		Fixed bug in "buzz()" causing crash when destroying a
+		trapper from inside with a wand/spell.  (mike@genat)
+		Added fcn to destroy wands with zero charges. (sweet@scubed)
+
+pcmain.c	Added a routine to zero out the fileinfo array in order to
+		prevent crashes on level change. (ralf@b.gp.cs.cmu.edu)
+		Added chdir to HACKDIR before looking for .CNF file.
+		Added call "uptodate(savefile)". (polder@cs.vu.nl)
+
+pager.c		changed "cornline()" to use xputs for HI/HE. (tom@uw-warp)
+		added choice for dowhatis() to allow letter or cursor object
+		selection. (polder@cs.vu.nl)
+
+cmd.c		Added ^W (wish) and ^I (ident-all) commands for WIZARD-mode.
+		(Paul Polderman - polder@cs.vu.nl)
+		Added "Z" as alternate to "# cast" (Eric Raymond - eric@snark)
+
+u_init.c	Expanded a tab which didn't show in raw mode.
+		Changed trobj.trotyp to "unsigned short" to avoid >255
+		problems. (Maarten Jan Huisjes - maartenj@cs.vu.nl)
+		Removed wand of wishing from WIZARD's inventory (due to
+		the above cmd additions). (polder@cs.vu.nl)
+		Fixed declaration of leash. (simon@its63b)
+		Beefed up Wizard class.
+		Added Wakizashi for Samurai.
+		Added holy water for Priest(ess)es.
+		Modifications to provide blindfolds.  (eric@snark)
+
+end.c		changed inventory identification on death to list form.
+		(polder@cs.vu.nl)
+		added hallucination effects to done_in_by()
+		added posession of amulet flag for scoreboard (sweet@scubed)
+
+wizard.c	corrected "nasties" decl. (maartenj@cs.vu.nl)
+		Blind modifications for blindfolding.  (eric@snark)
+
+do_wear.c	Prot. from shape changers logic fixed. (maartenj@cs.vu.nl)
+
+lev.c		Prot. from shape changers logic fixed. (maartenj@cs.vu.nl)
+
+mon.c		Inserted cast to fix compiler warning. (maartenj@cs.vu.nl)
+		Nymphs now leave potions of object detection when killed.
+		Kops now don't leave treasure behind. (sweet@scubed)
+
+topl.c		Changed size of "toplines" to avoid overflow in "parseoptions"
+		when help is asked for. (probably n/a) (maartenj@cs.vu.nl)
+
+topten.c	Added longer death descriptions, including name of
+		shopkeeper who killed character.  (many sources)
+
+termcap.c	Changed allocation of HI/HO for copying SI/SO to allow room
+		for null.  (maartenj@cs.vu.nl)
+		Added PCHack 3.61 termcap stuff.
+		Added colour highliting code. (sweet@scubed)
+
+version.c	Expanded a tab for rawmode io. (maartenj@cs.vu.nl)
+
+objnam.c	Allow the WIZARD to wish for really excessive objects.
+		(polder@cs.vu.nl)
+
+makedefs.c	Added "freopen" which works (MSC 4.0 drops first couple
+		of lines).  Solves missing #define AMULET... problem.
+		(Nathan Glasser - nathan@mit-eddie)
+
+rnd.c		Changed around random number generation:
+		BSD uses "random()". (Paul Eggert - eggert@grand)
+		SYSV uses "lrand48()". (mike@genat from above)
+
+eat.c		Changed "choke()" code to waste food rather than choke on
+		it #ifndef HARD. (Allan Pratt - apratt@atari)
+		Blind modifications for blindfolding.  (eric@snark)
+
+objects.h	added blindfold object (tool).  (eric@snark)
+
+you.h		changed Blind/BLIND to Blinded/Blinded
+		added Blindfolded/BLINDFOLDED
+		redefined Blind in terms of above parameters.  (eric@snark)
+
+apply.c		added blindfold code.  (eric@snark)
+
+timeout.c	Blind modifications for blindfolding.  (eric@snark)
+
+sit.c		Blind modifications for blindfolding.  (eric@snark)
+
+trap.c		Blind modifications for blindfolding.  (eric@snark)
+		Level teleportation to hell fixed so that it will not
+		do so unless character has Fire_resistance. (many sources)
+		Added polymorph trap. (many sources)
+
+monmove.c	added check on presence of "fobj" before atl() call
+		to avoid potential segmentation problem with ROCKMOLE.
+		(Reported by Doug Rudoff - doug@wiley)
+
+various files	Fixed typos.  Also converted British English words to
+		American English for uniformity.  (Original list of typos
+		submitted by Steve Creps - creps@silver)
+
+
+New Features
+------------
+  1)	New flags in "config.h" (some of these were included in 1.4f):
+
+	COM_COMPL	Command line completion by John S. Bien
+	GRAPHICS	Funky screen character support (Eric S. Raymond)
+	HACKOPTIONS	Support DGK-style HACKOPTIONS processing (ESR)
+	RPH		Various hacks by Richard P. Hughey
+	KJSMODS		Various changes made by Kevin Sweet
+	BVH		Additions by Bruce Holloway
+
+	In addition, in an MSDOS enviornment, when GRAPHICS is defined:
+
+	MSDOSCOLOR	Colour highlighting of monsters, etc.
+
+	Of the above, I haven't tested HACKOPTIONS and MSDOSCOLOR.  If you
+	find bugs in these, send me the reports.
+
+  2)	New objects:
+
+	blindfold - allows you to avoid the gaze of a Floating Eye and to
+		    use your telepathy on command if you have it.
+
+	mirror - scares monsters if you use it on them (and other uses).
+
+	ring of polymorph - (usually cursed) forces random polymorphs.
+
+	ring of polymorph control - prevents system shock and allows choice of
+				    creature to polymorph into.
+
+  3)	New Files:
+
+	- A new set of documentation, the "Guidebook to the Mazes of Menace"
+	has been supplied by Eric S. Raymond.  The guidebook is written for
+	nroff using the "mn" macro set supplied with Bnews 2.11 or greater.
+	Since not everyone has these macros, I have run the guidebook through
+	nroff, and supplied it in flat ascii format as well.  [Moderator's
+	note: because of past problems, I ran the formatted version
+	through "col -b" before passing it on to remove ^H's, etc.  -br]
+
+	- A copy of "HACK.CNF" which has been renamed "NetHack.cnf" was
+	supplied by Steve Creps. The file decl.c has been updated to reflect
+	this change.
+
+	- A new "Makefile" for the AT&T Unix machines has been added.
+
+	- I was hoping to get documentation on "NANSI.SYS" as well, but got
+	no responses to the mail I sent the author, direct and via Bill
+	Randle at tekred.  As per usual, I will gladly publish any relevant
+	documentation I get.
+
+  4)	Major game changes:
+
+	- Shop generation has been significantly changed.  A new structure
+	has been introduced which allows shops (except the "general" type)
+	to have up to three different types of object inside.  There is also
+	a new "distribution pattern" parameter which tells the generation
+	code how to lay out the shop (this is preliminary to the addition of
+	two new types of shop, the temple and barracks - more on this later).
+
+	- Shopkeepers will now tell you how much they expect for each object
+	you pick up.  This gives you the ability to haggle with the merchant
+	in question by dropping and picking up objects until you are more or
+	less satisfied with the price.  I have re-written "getprice()" in
+	shk.c in an attempt to make sure that you cannot actually sell any
+	particular object for more than the shopkeeper will charge for it.
+
+	- Another change to shopkeepers has them potentially getting angry if
+	you stay beside them after not paying your bill.  Each they time they
+	ask you to pay up, there is a chance they will decide they don't like
+	people who don't pay...
+
+	- A new monster, the hydra, has been added (as you have probably seen
+	on the net).  I haven't had much chance to test out this feature of
+	the game.  Mirrors have also been added, and seem to work quite well.
+
+	- Changes have been made to the object ocurrence chances in objects.h,
+	so that the relatively rare tools, etc. have at least a 1% chance of
+	showing up.
+
+	- Throwing and zapping code has been modified so that there is a
+	chance that said can be done through a doorway.  Bolts can still
+	bounce however...
+
+	- The infamous and dreaded makemon() bug has been eliminated.  In
+	addition to this, "r"ats and "K"obolds have been added back into the
+	game.  "K"ops no longer leave treasure (just what they were carrying,
+	plus maybe a club or whistle).
+
+	- Two new "super"swords have been added.  They are the katana named
+	"Snickersnee" which is +5 on damage (due to sharpness), and the long
+	sword "Excalibur" which is +rnd(10) to hit, +5 on damage, and has a
+	couple of other features I won't go into right now.  The only way
+	for a character to get "Excalibur" is as a gift from someone.  You
+	cannot write the word "Excalibur" on things for some reason...
+
+	- There have been two additions to disallow infinite wand charges.
+	First of all, wands with less than zero charges will automatically
+	turn to dust (thanks to Kevin Sweet).  Next, a wand of cancellation
+	will set the number of charges in the wand to -1, which will make it
+	forever useless, (thanks to Ron Wessels).
+
+  5)	Minor game changes:
+
+	- The fountain code has been tightened slightly so you can no longer
+	dip objects into a fountain or drink from one while you are floating
+	in mid-air due to levitation.
+
+	- Teleporting to hell via a teleportation trap will no longer occur
+	if the character does not have fire resistance.  I found this just
+	too arbitrary a way to die (and so did several other people who com-
+	plained about it).
+
+	- A new trap, the "polymorph" trap has been added by Richard Hughey.
+	It's inclusion is dependant on having "KAA" defined.
+
+	- In wizard mode, the wizard player has infinite wishes, and the
+	ability to instantly identify everything (s)he is carrying. The wizard
+	player is also no longer limited by the standard multiple / bonus res-
+	trictions on objects wished for.
+
+	- Random number generation has been changed around to make it (I hope)
+	more unpredictable.
+
+	- A large number of typos have been fixed, and all of the British
+	spellings converted to American.  I would like to see a shell script
+	to allow conversion back (or something like that) in the future.
+
+	- I have done a "make depend" for the makefiles to reflect a slight
+	restructuring in the order of inclusion of header files.
+
+  6)	Future additions:
+
+	- Steve Creps is working on "barracks" and "soldier" code which is
+	now ready for addition.  I have added the "soldier" side into the
+	game, but haven't really tested it.  Steve will be adding the
+	"barracks" section in and sending me the resulting patches.  There
+	will be a minor (read patch) release as soon as he can get the code
+	integrated into this release and sent up here to me.
+
+	- There are also several other new room projects in the works which
+	should be able to be included in that minor release, along with any
+	bug reports that are made in the interim.
