@@ -2188,7 +2188,7 @@ static void mswin_color_from_string(char *colorstring, HBRUSH* brushptr, COLORRE
 		blue_value *= 16;
 		blue_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
 
-		*colorptr = RGB(red_value, blue_value, green_value);
+		*colorptr = RGB(red_value, green_value, blue_value);
 	} else {
 	    while (*ctv_ptr->colorstring && stricmp(ctv_ptr->colorstring, colorstring))
 		++ctv_ptr;
