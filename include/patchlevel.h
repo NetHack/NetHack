@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2004/12/29	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2005/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,7 +16,7 @@
 #define EDITLEVEL	18
 
 #define COPYRIGHT_BANNER_A \
-"NetHack, Copyright 1985-2004"
+"NetHack, Copyright 1985-2005"
 
 #define COPYRIGHT_BANNER_B \
 "         By Stichting Mathematisch Centrum and M. Stephenson."
@@ -40,7 +40,7 @@
 /* Version 3.5.x */
 
 /*
- *  NetHack 3.5.0, March NN, NNNN
+ *  NetHack 3.5.0, October NN, NNNN
  *
  */
 
