@@ -45,7 +45,7 @@ dowaterdemon() /* Water demon */
 {
     register struct monst *mtmp;
 
-    if(mvitals[PM_WATER_DEMON].mvflags & G_GONE) {
+    if(!(mvitals[PM_WATER_DEMON].mvflags & G_GONE)) {
 	if((mtmp = makemon(&mons[PM_WATER_DEMON],u.ux,u.uy, NO_MM_FLAGS))) {
 	    if (!Blind)
 		You("unleash %s!", a_monnam(mtmp));
