@@ -13,7 +13,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL	1
+#define EDITLEVEL	2
 
 #define COPYRIGHT_BANNER_A \
 "NetHack, Copyright 1985-2003"
@@ -34,7 +34,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x03040100L
+#define VERSION_COMPATIBILITY 0x03040200L
 #endif
 
 /*****************************************************************************/

@@ -28,8 +28,6 @@ struct flag {
 #ifdef MAIL
 	boolean  biff;		/* enable checking for mail */
 #endif
-	boolean  botl;		/* partially redo status line */
-	boolean  botlx;		/* print an entirely new bottom line */
 	boolean  confirm;	/* confirm before hitting tame monsters */
 	boolean  debug;		/* in debugging mode */
 #define wizard	 flags.debug
@@ -40,8 +38,7 @@ struct flag {
 #endif
 #define discover flags.explore
 	boolean  female;
-	boolean  forcefight;
-	boolean  friday13;	/* it's Friday the 13th */
+ 	boolean  friday13;	/* it's Friday the 13th */
 	boolean  help;		/* look in data file for info about stuff */
 	boolean  ignintr;	/* ignore interrupts */
 #ifdef INSURANCE
@@ -50,13 +47,7 @@ struct flag {
 	boolean  invlet_constant; /* let objects keep their inventory symbol */
 	boolean  legacy;	/* print game entry "story" */
 	boolean  lit_corridor;	/* show a dark corr as lit if it is in sight */
-	boolean  made_amulet;
-	boolean  mon_moving;	/* monsters' turn to move */
-	boolean  move;
-	boolean  mv;
-	boolean  bypasses;	/* bypass flag is set on at least one fobj */
 	boolean  nap;		/* `timed_delay' option for display effects */
-	boolean  nopick;	/* do not pickup objects (as when running) */
 	boolean  null;		/* OK to send nulls to the terminal */
 #ifdef MAC
 	boolean  page_wait;	/* put up a --More-- after a page of messages */
@@ -84,19 +75,10 @@ struct flag {
 	boolean  verbose;	/* max battle info */
 	boolean  prayconfirm;	/* confirm before praying */
 	int	 end_top, end_around;	/* describe desired score list */
-	unsigned ident;		/* social security number for each monster */
 	unsigned moonphase;
 	unsigned long suppress_alert;
 #define NEW_MOON	0
 #define FULL_MOON	4
-	unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
-	boolean  travel;	/* find way automatically to u.tx,u.ty */
-	unsigned run;		/* 0: h (etc), 1: H (etc), 2: fh (etc) */
-				/* 3: FH, 4: ff+, 5: ff-, 6: FF+, 7: FF- */
-				/* 8: travel */
-	unsigned long warntype; /* warn_of_mon monster type M2 */
-	int	 warnlevel;
-	int	 djinni_count, ghost_count;	/* potion effect tuning */
 	int	 pickup_burden;		/* maximum burden before prompt */
 	char	 inv_order[MAXOCLASSES];
 	char	 pickup_types[MAXOCLASSES];

@@ -198,14 +198,6 @@ E NEARDATA schar tbx, tby;		/* set in mthrowu.c */
 
 E NEARDATA struct multishot { int n, i; short o; boolean s; } m_shot;
 
-E NEARDATA struct dig_info {		/* apply.c, hack.c */
-	int	effort;
-	d_level level;
-	coord	pos;
-	long lastdigtime;
-	boolean down, chew, warned, quiet;
-} digging;
-
 E NEARDATA long moves, monstermoves;
 E NEARDATA long wailmsg;
 
