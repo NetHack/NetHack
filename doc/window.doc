@@ -118,7 +118,8 @@ get_nh_event()	-- Does window event processing (e.g. exposure events).
 int nhgetch()	-- Returns a single character input from the user.
 		-- In the tty window-port, nhgetch() assumes that tgetch()
 		   will be the routine the OS provides to read a character.
-		   Returned character _must_ be non-zero.
+		   Returned character _must_ be non-zero and it must be
+                   non meta-zero too (zero with the meta-bit set).
 int nh_poskey(int *x, int *y, int *mod)
 		-- Returns a single character input from the user or a
 		   a positioning event (perhaps from a mouse).  If the
