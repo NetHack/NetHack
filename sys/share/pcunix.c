@@ -111,7 +111,7 @@ getlock()
 	}
 
 	/* regularize(lock); */ /* already done in pcmain */
-	Sprintf(tbuf,fqname(lock, LEVELPREFIX, 0));
+	Sprintf(tbuf,"%s",fqname(lock, LEVELPREFIX, 0));
 	set_levelfile_name(lock, 0);
 	fq_lock = fqname(lock, LEVELPREFIX, 1);
 	if((fd = open(fq_lock,0)) == -1) {
