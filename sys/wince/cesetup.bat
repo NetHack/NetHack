@@ -69,6 +69,7 @@ copy winhack.rc   ..\..\wince\winhack.rc
 copy winhcksp.rc  ..\..\wince\winhack_sp.rc
 copy winmain.c    ..\..\wince\winmain.c
 copy winMS.h      ..\..\wince\winMS.h
+copy cesound.c    ..\..\wince\cesound.c
 echo.
 echo Proceed with the following steps:
 echo.

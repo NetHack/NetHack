@@ -311,6 +311,22 @@ int __cdecl rename( const char *oldname, const char *newname )
 	return !MoveFile(f1, f2);
 }
 
+int __cdecl access( const char *path, int mode )
+{
+	DWORD attr;
+	WCHAR f[MAX_PATH+1];
+	ZeroMemory(f, sizeof(f));
+	MultiByteToWideChar(CP_ACP, 0, path, -1, f, MAX_PATH);
+	
+	attr = GetFileAttributes(f);
+	if( attr == (DWORD)-1 )	return -1;
+
+	if ( (attr & FILE_ATTRIBUTE_READONLY) && (mode & 2) )
+		return -1;
+	else
+        return 0;
+}
+
 int chdir( const char *dirname )
 {
 	ZeroMemory(_nh_cwd, sizeof(_nh_cwd));

@@ -26,6 +26,7 @@ typedef struct mswin_menu_item {
 	BOOLEAN_P		presel;
 	int				count;
 	BOOL			has_focus;
+	BOOL			has_tab;
 } NHMenuItem, *PNHMenuItem;
 
 typedef struct mswin_nethack_menu_window {
@@ -562,33 +563,38 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		data->menu.items[new_item].presel = msg_data->presel;
 
 		/* calculate tabstop size */
-		hDC = GetDC(hWnd);
-		saveFont = SelectObject(hDC, mswin_get_font(NHW_MENU, msg_data->attr, hDC, FALSE));
-		p1 = data->menu.items[new_item].str;
 		p = strchr(data->menu.items[new_item].str, '\t');
-		column = 0;
-		for (;;) {
-			TCHAR wbuf[BUFSZ];
-			RECT drawRect;
-			SetRect ( &drawRect, 0, 0, 1, 1 );
-			if (p != NULL) *p = '\0'; /* for time being, view tab field as zstring */
-			DrawText(hDC,
-				NH_A2W(p1, wbuf, BUFSZ),
-				strlen(p1),
-				&drawRect,
-				DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_EXPANDTABS | DT_SINGLELINE
-			);
-			data->menu.tab_stop_size[column] =
-				max( data->menu.tab_stop_size[column], drawRect.right - drawRect.left );
-			if (p != NULL) *p = '\t';
-			else /* last string so, */ break;
+		if( p ) {
+			data->menu.items[new_item].has_tab = TRUE;
+			hDC = GetDC(hWnd);
+			saveFont = SelectObject(hDC, mswin_get_font(NHW_MENU, msg_data->attr, hDC, FALSE));
+			p1 = data->menu.items[new_item].str;
+			column = 0;
+			for (;;) {
+				TCHAR wbuf[BUFSZ];
+				RECT drawRect;
+				SetRect ( &drawRect, 0, 0, 1, 1 );
+				if (p != NULL) *p = '\0'; /* for time being, view tab field as zstring */
+				DrawText(hDC,
+					NH_A2W(p1, wbuf, BUFSZ),
+					strlen(p1),
+					&drawRect,
+					DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_EXPANDTABS | DT_SINGLELINE
+				);
+				data->menu.tab_stop_size[column] =
+					max( data->menu.tab_stop_size[column], drawRect.right - drawRect.left );
+				if (p != NULL) *p = '\t';
+				else /* last string so, */ break;
 
-			++column;
-			p1 = p + 1;
-			p = strchr(p1, '\t');
+				++column;
+				p1 = p + 1;
+				p = strchr(p1, '\t');
+			}
+			SelectObject(hDC, saveFont);
+			ReleaseDC(hWnd, hDC);
+		} else {
+			data->menu.items[new_item].has_tab = FALSE;
 		}
-		SelectObject(hDC, saveFont);
-		ReleaseDC(hWnd, hDC);
 
 		/* increment size */
 		data->menu.size++;
@@ -913,30 +919,40 @@ LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	x += TILE_X + 5;
 
 	/* draw item text */
-	p1 = item->str;
-	p = strchr(item->str, '\t');
-	column = 0;
-	SetRect( &drawRect, x, lpdis->rcItem.top, min(x + data->menu.tab_stop_size[0], lpdis->rcItem.right),
-	    lpdis->rcItem.bottom );
-	for (;;) {
+	if( item->has_tab ) {
+		p1 = item->str;
+		p = strchr(item->str, '\t');
+		column = 0;
+		SetRect( &drawRect, x, lpdis->rcItem.top, min(x + data->menu.tab_stop_size[0], lpdis->rcItem.right),
+			lpdis->rcItem.bottom );
+		for (;;) {
+			TCHAR wbuf[BUFSZ];
+			if (p != NULL) *p = '\0'; /* for time being, view tab field as zstring */
+			DrawText(lpdis->hDC,
+				NH_A2W(p1, wbuf, BUFSZ),
+				strlen(p1),
+				&drawRect,
+				DT_LEFT | DT_VCENTER | DT_SINGLELINE
+			);
+			if (p != NULL) *p = '\t';
+			else /* last string so, */ break;
+
+			p1 = p + 1;
+			p = strchr(p1, '\t');
+			drawRect.left = drawRect.right + TAB_SEPARATION;
+			++column;
+			drawRect.right = min (drawRect.left + data->menu.tab_stop_size[column], lpdis->rcItem.right);
+		}
+	} else {
 		TCHAR wbuf[BUFSZ];
-		if (p != NULL) *p = '\0'; /* for time being, view tab field as zstring */
+		SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom);
 		DrawText(lpdis->hDC,
-			NH_A2W(p1, wbuf, BUFSZ),
-			strlen(p1),
+			NH_A2W(item->str, wbuf, BUFSZ),
+			strlen(item->str),
 			&drawRect,
 			DT_LEFT | DT_VCENTER | DT_SINGLELINE
 		);
-		if (p != NULL) *p = '\t';
-		else /* last string so, */ break;
-
-		p1 = p + 1;
-		p = strchr(p1, '\t');
-		drawRect.left = drawRect.right + TAB_SEPARATION;
-		++column;
-		drawRect.right = min (drawRect.left + data->menu.tab_stop_size[column], lpdis->rcItem.right);
 	}
-
 
 	/* draw focused item */
 	if( item->has_focus ) {

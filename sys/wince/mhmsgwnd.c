@@ -4,6 +4,7 @@
 #include "winMS.h"
 #include "mhmsgwnd.h"
 #include "mhmsg.h"
+#include "mhcmd.h"
 #include "mhfont.h"
 #include "mhcolor.h"
 
@@ -31,6 +32,8 @@ typedef struct mswin_nethack_message_window {
 	int  xMax;        /* maximum horizontal scrolling position */
 	int  yMax;        /* maximum vertical scrolling position */
 	int	 xPage;		  /* page size of horizontal scroll bar */
+    int  lines_last_turn; /* lines added during the last turn */
+	int  dont_care;	  /* flag the the user does not care if messages are lost */
  } NHMessageWindow, *PNHMessageWindow;
 
 static TCHAR szMessageWindowClass[] = TEXT("MSNHMessageWndClass");
@@ -43,7 +46,10 @@ static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 #endif
 static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
-static HDC prepareDC( HDC hdc );
+
+#ifdef USER_SOUNDS
+extern void play_sound_for_message(const char* str);
+#endif
 
 HWND mswin_init_message_window () {
 	static int run_once = 0;
@@ -165,14 +171,14 @@ LRESULT CALLBACK NHMessageWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 			SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
 #endif
 		
-			data->yMax = MSG_LINES - MSG_VISIBLE_LINES - 1;
+			data->yMax = MSG_LINES-1;
  			data->yPos = min(data->yPos, data->yMax);
 
 			ZeroMemory(&si, sizeof(si));
 			si.cbSize = sizeof(si); 
 			si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
-			si.nMin   = 0; 
-			si.nMax   = MSG_LINES; 
+			si.nMin   = MSG_VISIBLE_LINES; 
+			si.nMax   = data->yMax + MSG_VISIBLE_LINES - 1; 
 			si.nPage  = MSG_VISIBLE_LINES;
 			si.nPos   = data->yPos;
 			SetScrollInfo(hWnd, SB_VERT, &si, TRUE); 
@@ -226,23 +232,75 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         si.nPos   = data->yPos; 
         SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 
+		/* deal with overflows */
+		data->lines_last_turn++;
+		if( !data->dont_care && data->lines_last_turn>=MSG_LINES-2 ) {
+			char c;
+			BOOL done;
+
+			/* append "--More--" to the message window text (cannot call putstr 
+			   here - infinite recursion) */
+			memmove(&data->window_text[0],
+					&data->window_text[1],
+					(MSG_LINES-1)*sizeof(data->window_text[0]));
+			data->window_text[MSG_LINES-1].attr = ATR_NONE;
+			strncpy(data->window_text[MSG_LINES-1].text, "--More--", MAXWINDOWTEXT);
+			
+			/* update window content */
+			InvalidateRect(hWnd, NULL, TRUE);
+
+#if defined(WIN_CE_SMARTPHONE)
+			NHSPhoneSetKeypadFromString( "\033- <>" );
+#endif
+
+			done = FALSE;
+			while( !done ) {
+				int x, y, mod;
+				c = mswin_nh_poskey(&x, &y, &mod);
+				switch (c) {
+					/* ESC indicates that we can safely discard any further messages during this turn */
+					case '\033':
+						data->dont_care = 1;
+						done = TRUE;
+					break;
+
+					case '<':
+						SendMessage(hWnd, WM_VSCROLL, MAKEWPARAM(SB_LINEUP, 0), (LPARAM)NULL); 
+					break;
+
+					case '>':
+						SendMessage(hWnd, WM_VSCROLL, MAKEWPARAM(SB_LINEDOWN, 0), (LPARAM)NULL); 
+					break;
+
+					/* continue scrolling on any key */
+					default:
+						data->lines_last_turn = 0;
+						done = TRUE;
+					break;
+				}
+			}
+
+#if defined(WIN_CE_SMARTPHONE)
+			NHSPhoneSetKeypadDefault();
+#endif
+			/* remove "--More--" from the message window text */
+			data->window_text[MSG_LINES-1].attr = ATR_NONE;
+			strncpy(data->window_text[MSG_LINES-1].text, " ", MAXWINDOWTEXT);
+		}
+			
 		/* update window content */
 		InvalidateRect(hWnd, NULL, TRUE);
+
+#ifdef USER_SOUNDS
+		play_sound_for_message(msg_data->text);
+#endif
 	}
 	break;
 
 	case MSNH_MSG_CLEAR_WINDOW:
-	{
-		MSNHMsgPutstr data;
-
-		/* append an empty line to the message window (send message to itself) */
-		data.attr = ATR_NONE;
-		data.text = " ";
-		onMSNHCommand(hWnd, (WPARAM)MSNH_MSG_PUTSTR, (LPARAM)&data);
-
-		InvalidateRect(hWnd, NULL, TRUE);
-		break;
-	}
+		data->lines_last_turn = 0;
+		data->dont_care = 0;
+	break;
 	}
 }
 
@@ -302,7 +360,8 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// of the scroll box, and update the window. UpdateWindow 
 	// sends the WM_PAINT message. 
 
-	if (yInc = max(-data->yPos, min(yInc, data->yMax - data->yPos))) 
+	if (yInc = max( MSG_VISIBLE_LINES - data->yPos, 
+		            min(yInc, data->yMax - data->yPos))) 
 	{ 
 		data->yPos += yInc; 
 		/* ScrollWindowEx(hWnd, 0, -data->yChar * yInc, 
@@ -419,8 +478,8 @@ void onPaint(HWND hWnd)
 	GetClientRect(hWnd, &client_rt);
 
 	if( !IsRectEmpty(&ps.rcPaint) ) {
-		FirstLine = max (0, data->yPos + ps.rcPaint.top/data->yChar - 1); 
-		LastLine = min (MSG_LINES-1, data->yPos + ps.rcPaint.bottom/data->yChar); 
+		FirstLine = max (0, data->yPos - (client_rt.bottom - ps.rcPaint.top)/data->yChar + 1); 
+		LastLine = min (MSG_LINES-1, data->yPos - (client_rt.bottom - ps.rcPaint.bottom)/data->yChar); 
 		y = min( ps.rcPaint.bottom, client_rt.bottom - 2); 
  		for (i=LastLine; i>=FirstLine; i--) { 
 			if( i==MSG_LINES-1 ) {
@@ -495,7 +554,7 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 
     /* Get the handle to the client area's device context. */
-    hdc = prepareDC( GetDC(hWnd) ); 
+    hdc = GetDC(hWnd); 
 	saveFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, FALSE));
 
     /* Extract font dimensions from the text metrics. */
@@ -509,13 +568,6 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	SelectObject(hdc, saveFont);
     ReleaseDC (hWnd, hdc); 
 }
-
-HDC prepareDC( HDC hdc )
-{
-	// set font here
-	return hdc;
-}
-
 
 void mswin_message_window_size (HWND hWnd, LPSIZE sz)
 {

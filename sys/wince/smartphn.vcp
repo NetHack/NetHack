@@ -1062,6 +1062,133 @@ DEP_CPP_BOTL_=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\cesound.c
+
+!IF  "$(CFG)" == "nethack_smartphone - Win32 (WCE ARM) SPhoneRelease"
+
+DEP_CPP_CESOU=\
+	"..\include\align.h"\
+	"..\include\amiconf.h"\
+	"..\include\attrib.h"\
+	"..\include\beconf.h"\
+	"..\include\color.h"\
+	"..\include\config.h"\
+	"..\include\config1.h"\
+	"..\include\coord.h"\
+	"..\include\decl.h"\
+	"..\include\display.h"\
+	"..\include\dungeon.h"\
+	"..\include\engrave.h"\
+	"..\include\extern.h"\
+	"..\include\flag.h"\
+	"..\include\global.h"\
+	"..\include\hack.h"\
+	"..\include\macconf.h"\
+	"..\include\micro.h"\
+	"..\include\mkroom.h"\
+	"..\include\monattk.h"\
+	"..\include\mondata.h"\
+	"..\include\monflag.h"\
+	"..\include\monst.h"\
+	"..\include\monsym.h"\
+	"..\include\nhlan.h"\
+	"..\include\ntconf.h"\
+	"..\include\obj.h"\
+	"..\include\objclass.h"\
+	"..\include\onames.h"\
+	"..\include\os2conf.h"\
+	"..\include\pcconf.h"\
+	"..\include\permonst.h"\
+	"..\include\pm.h"\
+	"..\include\prop.h"\
+	"..\include\quest.h"\
+	"..\include\rect.h"\
+	"..\include\region.h"\
+	"..\include\rm.h"\
+	"..\include\skills.h"\
+	"..\include\spell.h"\
+	"..\include\system.h"\
+	"..\include\timeout.h"\
+	"..\include\tosconf.h"\
+	"..\include\tradstdc.h"\
+	"..\include\trampoli.h"\
+	"..\include\trap.h"\
+	"..\include\unixconf.h"\
+	"..\include\vision.h"\
+	"..\include\vmsconf.h"\
+	"..\include\wceconf.h"\
+	"..\include\winprocs.h"\
+	"..\include\wintty.h"\
+	"..\include\wintype.h"\
+	"..\include\you.h"\
+	"..\include\youprop.h"\
+	
+
+!ELSEIF  "$(CFG)" == "nethack_smartphone - Win32 (WCE x86) SPhoneDebug"
+
+DEP_CPP_CESOU=\
+	"..\include\align.h"\
+	"..\include\amiconf.h"\
+	"..\include\attrib.h"\
+	"..\include\beconf.h"\
+	"..\include\color.h"\
+	"..\include\config.h"\
+	"..\include\config1.h"\
+	"..\include\coord.h"\
+	"..\include\decl.h"\
+	"..\include\display.h"\
+	"..\include\dungeon.h"\
+	"..\include\engrave.h"\
+	"..\include\extern.h"\
+	"..\include\flag.h"\
+	"..\include\global.h"\
+	"..\include\hack.h"\
+	"..\include\macconf.h"\
+	"..\include\micro.h"\
+	"..\include\mkroom.h"\
+	"..\include\monattk.h"\
+	"..\include\mondata.h"\
+	"..\include\monflag.h"\
+	"..\include\monst.h"\
+	"..\include\monsym.h"\
+	"..\include\nhlan.h"\
+	"..\include\ntconf.h"\
+	"..\include\obj.h"\
+	"..\include\objclass.h"\
+	"..\include\onames.h"\
+	"..\include\os2conf.h"\
+	"..\include\pcconf.h"\
+	"..\include\permonst.h"\
+	"..\include\pm.h"\
+	"..\include\prop.h"\
+	"..\include\quest.h"\
+	"..\include\rect.h"\
+	"..\include\region.h"\
+	"..\include\rm.h"\
+	"..\include\skills.h"\
+	"..\include\spell.h"\
+	"..\include\system.h"\
+	"..\include\timeout.h"\
+	"..\include\tosconf.h"\
+	"..\include\tradstdc.h"\
+	"..\include\trampoli.h"\
+	"..\include\trap.h"\
+	"..\include\unixconf.h"\
+	"..\include\vision.h"\
+	"..\include\vmsconf.h"\
+	"..\include\wceconf.h"\
+	"..\include\winprocs.h"\
+	"..\include\wintty.h"\
+	"..\include\wintype.h"\
+	"..\include\you.h"\
+	"..\include\youprop.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\cmd.c
 
 !IF  "$(CFG)" == "nethack_smartphone - Win32 (WCE ARM) SPhoneRelease"
@@ -16996,3 +17123,4 @@ SOURCE=..\wince\winMS.h
 # End Group
 # End Target
 # End Project
+

@@ -41,6 +41,8 @@
 
 #define NOTSTDC		/* no strerror() */
 
+#define USER_SOUNDS
+
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.
@@ -243,6 +245,7 @@ int __cdecl read(int, void *, unsigned int);
 int __cdecl unlink(const char *);
 int __cdecl write(int, const void *, unsigned int);
 int __cdecl rename(const char *, const char *);
+int __cdecl access(const char *, int);
 
 #ifdef DeleteFile
 #undef DeleteFile
@@ -254,6 +257,9 @@ char *getcwd( char *buffer, int maxlen );
 
 /* __stdlib.h__ */
 #define abort()  (void)TerminateProcess(GetCurrentProcess(), 0)
+#ifndef strdup
+#define strdup _strdup
+#endif
 
 /* sys/stat.h */
 #define S_IWRITE  GENERIC_WRITE
