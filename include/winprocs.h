@@ -8,6 +8,7 @@
 struct window_procs {
     const char *name;
     unsigned long wincap;	/* window port capability options supported */
+    unsigned long wincap2;	/* additional window port capability options supported */
     void FDECL((*win_init_nhwindows), (int *, char **));
     void NDECL((*win_player_selection));
     void NDECL((*win_askname));
@@ -172,6 +173,10 @@ extern NEARDATA struct window_procs windowprocs;
 #define WC_PLAYER_SELECTION  0x40000000L /* 31 background color for message window    */
 #define WC_MOUSE_SUPPORT 0x80000000L	/* 32 mouse support                          */
 					/* no free bits */
+
+#define WC2_FULLSCREEN		0x01L	/* 01 mouse support                          */
+#define WC2_SOFTKEYBOARD	0x02L	/* 02 software keyboard                      */
+					/* 30 free bits */
 
 #define ALIGN_LEFT	1
 #define ALIGN_RIGHT	2

@@ -23,6 +23,7 @@ extern void tty_raw_print_bold(const char *);
 struct window_procs Gnome_procs = {
     "Gnome",
     WC_COLOR|WC_HILITE_PET|WC_INVERSE,
+    0L,
     gnome_init_nhwindows,
     gnome_player_selection,
     gnome_askname,

@@ -2495,6 +2495,7 @@ struct window_procs mac_procs = {
 	WC_LARGE_FONT |	/*  obsolete */
 	WC_FONT_MAP | WC_FONT_MENU | WC_FONT_MESSAGE | WC_FONT_STATUS | WC_FONT_TEXT |
 	WC_FONTSIZ_MAP | WC_FONTSIZ_MENU | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_TEXT,
+	0L,
 	mac_init_nhwindows,
 	mac_unimplemented,	/* see macmenu.c:mac_askname() for player selection */
 	mac_askname,

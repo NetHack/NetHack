@@ -30,6 +30,7 @@ struct window_procs amii_procs =
 {
     "amii",
     WC_COLOR|WC_HILITE_PET|WC_INVERSE,
+    0L,
     amii_init_nhwindows,
     amii_player_selection,
     amii_askname,
@@ -88,6 +89,7 @@ struct window_procs amiv_procs =
 {
     "amitile",
     WC_COLOR|WC_HILITE_PET|WC_INVERSE,
+    0L,
     amii_init_nhwindows,
     amii_player_selection,
     amii_askname,

@@ -261,6 +261,8 @@ struct instance_flags {
 				   		in the message window */
 	boolean wc_eight_bit_input;	/* allow eight bit input               */
 	boolean wc_mouse_support;	/* allow mouse support */
+	boolean wc2_fullscreen;		/* run fullscreen */
+	boolean wc2_softkeyboard;	/* use software keyboard */
 
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 clicklook;	/* allow right-clicking for look */

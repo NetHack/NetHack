@@ -99,6 +99,7 @@ static struct Bool_Opt
 #else
 	{"flush", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
 	{"help", &flags.help, TRUE, SET_IN_GAME},
 	{"hilite_pet",    &iflags.wc_hilite_pet, FALSE, SET_IN_GAME},	/*WC*/
 #ifdef ASCIIGRAPH
@@ -172,6 +173,7 @@ static struct Bool_Opt
 	{"showscore", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"silent", &flags.silent, TRUE, SET_IN_GAME},
+	{"softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE},
 	{"sortpack", &flags.sortpack, TRUE, SET_IN_GAME},
 	{"sound", &flags.soundok, TRUE, SET_IN_GAME},
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
@@ -433,6 +435,8 @@ STATIC_OVL void FDECL(wc_set_font_name, (int, char *));
 STATIC_OVL int FDECL(wc_set_window_colors, (char *));
 STATIC_OVL boolean FDECL(is_wc_option, (const char *));
 STATIC_OVL boolean FDECL(wc_supported, (const char *));
+STATIC_OVL boolean FDECL(is_wc2_option, (const char *));
+STATIC_OVL boolean FDECL(wc2_supported, (const char *));
 
 /* check whether a user-supplied option string is a proper leading
    substring of a particular option name; option string might have
@@ -2355,6 +2359,8 @@ doset()
 #endif
 		    if (is_wc_option(boolopt[i].name) &&
 			!wc_supported(boolopt[i].name)) continue;
+		    if (is_wc2_option(boolopt[i].name) &&
+			!wc2_supported(boolopt[i].name)) continue;
 		    any.a_int = (pass == 0) ? 0 : i + 1;
 		    if (!iflags.menu_tab_sep)
 			Sprintf(buf, "%s%-13s [%s]",
@@ -2406,6 +2412,9 @@ doset()
 		    	else if (is_wc_option(compopt[i].name) &&
 					!wc_supported(compopt[i].name))
 		    		continue;
+		    	else if (is_wc2_option(compopt[i].name) &&
+					!wc2_supported(compopt[i].name))
+		    		continue;
 		    	else
 				doset_add_menu(tmpwin, compopt[i].name,
 					(pass == DISP_IN_GAME) ? 0 : indexoffset);
@@ -2433,7 +2442,8 @@ doset()
 		    Sprintf(buf, "%s%s", *boolopt[opt_indx].addr ? "!" : "",
 			    boolopt[opt_indx].name);
 		    parseoptions(buf, setinitial, fromfile);
-		    if (wc_supported(boolopt[opt_indx].name))
+		    if (wc_supported(boolopt[opt_indx].name) ||
+		    	wc2_supported(boolopt[opt_indx].name))
 			preference_update(boolopt[opt_indx].name);
 		} else {
 		    /* compound option */
@@ -2449,7 +2459,8 @@ doset()
 			/* pass the buck */
 			parseoptions(buf, setinitial, fromfile);
 		    }
-		    if (wc_supported(compopt[opt_indx].name))
+		    if (wc_supported(compopt[opt_indx].name) ||
+			wc2_supported(compopt[opt_indx].name))
 			preference_update(compopt[opt_indx].name);
 		}
 	    }
@@ -3300,6 +3311,12 @@ struct wc_Opt wc_options[] = {
 	{(char *)0, 0L}
 };
 
+struct wc_Opt wc2_options[] = {
+	{"fullscreen", WC2_FULLSCREEN},
+	{"softkeyboard", WC2_SOFTKEYBOARD},
+	{(char *)0, 0L}
+};
+
 
 /*
  * If a port wants to change or ensure that the
@@ -3348,7 +3365,7 @@ int status;
 {
 	int k = 0;
 	if (status < SET_IN_FILE || status > SET_IN_GAME) {
-		impossible("set_option_mod_status: status out of range %d.",
+		impossible("set_wc_option_mod_status: status out of range %d.",
 			   status);
 		return;
 	}
@@ -3386,6 +3403,63 @@ const char *optnam;
 	}
 	return FALSE;
 }
+
+
+/*
+ * You can set several wc2_options in one call to
+ * set_wc2_option_mod_status() by setting
+ * the appropriate bits for each option that you
+ * are setting in the optmask argument
+ * prior to calling.
+ *    example: set_wc2_option_mod_status(WC2_FULLSCREEN|WC2_SOFTKEYBOARD, SET_IN_FILE);
+ */
+
+void
+set_wc2_option_mod_status(optmask, status)
+unsigned long optmask;
+int status;
+{
+	int k = 0;
+	if (status < SET_IN_FILE || status > SET_IN_GAME) {
+		impossible("set_wc2_option_mod_status: status out of range %d.",
+			   status);
+		return;
+	}
+	while (wc2_options[k].wc_name) {
+		if (optmask & wc2_options[k].wc_bit) {
+			set_option_mod_status(wc2_options[k].wc_name, status);
+		}
+		k++;
+	}
+}
+
+STATIC_OVL boolean
+is_wc2_option(optnam)
+const char *optnam;
+{
+	int k = 0;
+	while (wc2_options[k].wc_name) {
+		if (strcmp(wc2_options[k].wc_name, optnam) == 0)
+			return TRUE;
+		k++;
+	}
+	return FALSE;
+}
+
+STATIC_OVL boolean
+wc2_supported(optnam)
+const char *optnam;
+{
+	int k = 0;
+	while (wc2_options[k].wc_name) {
+		if (!strcmp(wc2_options[k].wc_name, optnam) &&
+		    (windowprocs.wincap2 & wc2_options[k].wc_bit))
+			return TRUE;
+		k++;
+	}
+	return FALSE;
+}
+
 
 STATIC_OVL void
 wc_set_font_name(wtype, fontname)

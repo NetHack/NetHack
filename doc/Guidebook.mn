@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "June 29, 2003
+.ds f2 "July 16, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2139,6 +2139,8 @@ NetHack should use this size font for the message window.
 NetHack should use this size font for the status window.
 .lp font_size_text	
 NetHack should use this size font for text windows.
+.lp fullscreen
+NetHack should try and display on the entire screen rather than in a window.
 .lp hilite_pet
 Visually distinguish pets from similar animals (default off).
 The behavior of this option depends on the type of windowing you use.
@@ -2166,6 +2168,8 @@ when the hero reaches the scroll_margin.
 .lp scroll_margin
 NetHack should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
+.lp softkeyboard
+Display an onscreen keyboard.  Handhelds are most likely to support this option.
 .lp splash_screen
 NetHack should display an opening splash screen when it starts up (default yes).
 .lp tiled_map	

@@ -404,17 +404,17 @@ and from the command line for some settings.
 
 The wincap preference settings all have their underlying values stored
 in iflags fields.  The names of the wincap related fields are all pre-
-fixed with wc_ to make it easy to identify them.  Your window port can
-access the fields directly.
+fixed with wc_ or wc2_ to make it easy to identify them.  Your window 
+port can access the fields directly.
 
 Your window port identifies what options it will react to and support
-by setting bits in the window_procs wincap mask. See section IX for
-details of where the wincap mask resides. 
+by setting bits in the window_procs wincap mask and/or wincap2 mask. 
+See section IX for details of where the wincap masks reside. 
 
 Two things control whether any preference setting appears in the 
 'O' command options menu during the game:
  1. The option must be marked as being supported by having its 
-    bit set in the window_procs wincap mask.
+    bit set in the window_procs wincap or wincap2 mask.
  2. The option must have its optflag field set to SET_IN_GAME in order
     to be able to set the option, or marked DISP_IN_GAME if you just
     want to reveal what the option is set to. 
@@ -423,26 +423,28 @@ within NetHack.
 
 The default values for the optflag field for all the options are 
 hard-coded into the option in options.c.  The default value for 
-the options can be altered by calling 
+the wc_ options can be altered by calling 
 	set_wc_option_mod_status(optmask, status)
-specifying the option modification status to one of SET_IN_FILE, 
+The default value for the wc2_ options can be altered by calling 
+	set_wc2_option_mod_status(optmask, status)
+In each case, set the option modification status to one of SET_IN_FILE, 
 DISP_IN_GAME, or SET_IN_GAME.
 
-The setting of any wincap option is handled by the NetHack core option
-processing code. You do not have to provide a parser in your window 
-port, nor should you set the values for the iflags.wc_* fields 
-directly within the port code. The port code should honor whatever
-values were put there by the core when processing options, either
-in the config file, or by the 'O' command.  
+The setting of any wincap or wincap2 option is handled by the NetHack 
+core option processing code. You do not have to provide a parser in 
+your window port, nor should you set the values for the 
+iflags.wc_* and iflags.wc2_* fields directly within the port code. 
+The port code should honor whatever values were put there by the core 
+when processing options, either in the config file, or by the 'O' command.  
 
 You may be wondering what values your window port will find in the 
-iflags.wc_* fields for options that the user has not specified
-in his/her config file. Put another way, how does you port code
+iflags.wc_* and iflags.wc2_* fields for options that the user has not 
+specified in his/her config file. Put another way, how does you port code
 tell if an option has not been set? The next paragraph explains that.
 
 If the core does not set an option, it will still be initialized 
 to its default value. Those default values for the 
-iflags.wc_* fields are:
+iflags.wc_* and iflags.wc_* fields are:
 
  o All boolean fields are initialized to the starting 
    value specified for that option in the boolopt array in 
@@ -460,9 +462,10 @@ iflags.wc_* fields are:
    that in your window-port code before using such a pointer, or 
    you'll end up triggering a nasty fault.
 
-Here are the wincap preference settings that your port can choose
+Here are the wincap and wincap2 preference settings that your port can choose
 to support:
 
+  wincap
   +--------------------+--------------------+--------------------+--------+
   |                    |                    | iflags field       | data   |
   | player option      | bit in wincap mask |   for value        | type   |
@@ -507,6 +510,15 @@ to support:
   |  mouse             | WC_MOUSE_SUPPORT   | wc_mouse_support   |boolean |
   +--------------------+--------------------+--------------------+--------+
 
+  wincap2
+  +--------------------+--------------------+--------------------+--------+
+  |                    |                    | iflags field       | data   |
+  | player option      | bit in wincap mask |   for value        | type   |
+  |--------------------+--------------------+--------------------+--------+
+  |  fullscreen        | WC2_FULLSCREEN     | wc2_fullscreen     |boolean |
+  |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
+  +--------------------+--------------------+--------------------+--------+
+
 align_message	-- where to place message window (top, bottom, left, right)
 align_status	-- where to place status window (top, bottom, left, right).
 ascii_map	-- port should display an ascii map if it can.
@@ -523,6 +535,7 @@ font_size_status-- port should use this size font for the status window.
 font_size_text	-- port should use this size font for text windows.
 font_status	-- port should use a font by this name for status window.
 font_text	-- port should use a font by this name for text windows.
+fullscreen      -- port should try to use the whole screen.
 hilite_pet	-- port should mark pets in some special way on the map.
 map_mode	-- port should display the map in the manner specified.
 player_selection
@@ -532,6 +545,7 @@ preload_tiles	-- port should preload tiles into memory.
 scroll_amount   -- scroll this amount when scroll_margin is reached.
 scroll_margin	-- port should scroll the display when the hero or cursor
 		   is this number of cells away from the edge of the window.
+softkeyboard    -- handhelds should display an on-screen keyboard if possible.
 splash_screen   -- port should/should not display an opening splashscreen.
 tiled_map	-- port should display a tiled map if it can.
 tile_width	-- port should display tiles with this width or round to closest
@@ -562,7 +576,15 @@ the user.
 Functions available for the window port to call:
 
 set_wc_option_mod_status(optmask, status)
-		-- Adjust the optflag field for a set of options to 
+		-- Adjust the optflag field for a set of wincap options to 
+		   specify whether the port wants the option to appear 
+		   in the 'O' command options menu, The second parameter,
+		   "status" can be set to SET_IN_FILE, DISP_IN_GAME,
+		   or SET_IN_GAME (SET_IN_FILE implies that the option
+		   is completely hidden during the game).
+
+set_wc2_option_mod_status(optmask, status)
+		-- Adjust the optflag field for a set of wincap2 options to 
 		   specify whether the port wants the option to appear 
 		   in the 'O' command options menu, The second parameter,
 		   "status" can be set to SET_IN_FILE, DISP_IN_GAME,
@@ -581,11 +603,13 @@ set_option_mod_status(optnam, status)
 Adding a new wincap option:
 
 To add a new wincap option, please follow all these steps:
-	1. Add the option to the wincap preference settings table above.
+	1. Add the option to the wincap preference settings table above. Since
+	   wincap is full, your option will likely target wincap2 field.
 	2. Add the description to the paragraph below the chart.
-	3. Add the WC_ to the bit list in include/winprocs.h (if there is room).
-	4. Add the wc_ field(s) to the iflags structure in flag.h.
-	5. Add the name and value to wc_options[] in options.c
+	3. Add the WC_ or WC2_ to the bit list in include/winprocs.h 
+	   (in wincap2 if there is no room in wincap).
+	4. Add the wc_ or wc2_ field(s) to the iflags structure in flag.h.
+	5. Add the name and value to wc_options[] or wc2_options[] in options.c
 	6. Add an appropriate parser to parseoptions() in options.c.
 	7. Add code to display current value to get_compopt_value() in options.c.
 	8. Document the option in Guidebook.mn and Guidebook.tex.

@@ -93,6 +93,7 @@ int updated_inventory;
 struct window_procs X11_procs = {
     "X11",
     WC_COLOR|WC_HILITE_PET,
+    0L,
     X11_init_nhwindows,
     X11_player_selection,
     X11_askname,
