@@ -3392,7 +3392,13 @@ boolean force;
 			case 'q': return(0);
 			case 'n': continue;
 		    }
-
+#ifdef STEED
+		    if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
+			You("aren't skilled enough to reach from %s.",
+				mon_nam(u.usteed));
+			return(0);
+		    }
+#endif
 		    if((otmp->otrapped && (force || (!confused
 				&& rn2(MAXULEV + 1 - u.ulevel) < 10)))
 		       || (!force && confused && !rn2(3))) {

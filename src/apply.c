@@ -1817,12 +1817,14 @@ static struct trapinfo {
 	struct obj *tobj;
 	xchar tx, ty;
 	int time_needed;
+	boolean force_bungle;
 } trapinfo;
 
 void
 reset_trapset()
 {
 	trapinfo.tobj = 0;
+	trapinfo.force_bungle = 0;
 }
 
 /* touchstones - by Ken Arnold */
@@ -2021,7 +2023,38 @@ struct obj *otmp;
 	    trapinfo.time_needed += (tmp > 12) ? 1 : (tmp > 7) ? 2 : 4;
 	/*[fumbling and/or confusion and/or cursed object check(s)
 	   should be incorporated here instead of in set_trap]*/
+#ifdef STEED
+	if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
+	    char buf[BUFSZ];
+	    boolean chance;
 
+	    if (Fumbling || otmp->cursed) chance = (rnl(10) > 3);
+	    else  chance = (rnl(10) > 5);
+	    You("aren't very skilled at reaching from %s.",
+		mon_nam(u.usteed));
+	    Sprintf(buf, "Continue your attempt to set %s?",
+		the(defsyms[trap_to_defsym(what_trap(ttyp))].explanation));
+	    if(yn(buf) == 'y') {
+		if (chance) {
+			switch(ttyp) {
+			    case LANDMINE:	/* set it off */
+			    	trapinfo.time_needed = 0;
+			    	trapinfo.force_bungle = TRUE;
+				break;
+			    case BEAR_TRAP:	/* drop it without arming it */
+				reset_trapset();
+				You("drop %s!",
+			  the(defsyms[trap_to_defsym(what_trap(ttyp))].explanation));
+				dropx(otmp);
+				return;
+			}
+		}
+	    } else {
+	    	reset_trapset();
+		return;
+	    }
+	}
+#endif
 	You("begin setting %s %s.",
 	    shk_your(buf, otmp),
 	    defsyms[trap_to_defsym(what_trap(ttyp))].explanation);
@@ -2055,9 +2088,11 @@ set_trap()
 	    if (*in_rooms(u.ux,u.uy,SHOPBASE)) {
 		add_damage(u.ux, u.uy, 0L);		/* schedule removal */
 	    }
-	    You("finish arming %s.",
-		the(defsyms[trap_to_defsym(what_trap(ttyp))].explanation));
-	    if ((otmp->cursed || Fumbling) && (rnl(10) > 5)) dotrap(ttmp, 0);
+	    if (!trapinfo.force_bungle)
+		You("finish arming %s.",
+			the(defsyms[trap_to_defsym(what_trap(ttyp))].explanation));
+	    if (((otmp->cursed || Fumbling) && (rnl(10) > 5)) || trapinfo.force_bungle)
+		dotrap(ttmp, 0);
 	} else {
 	    /* this shouldn't happen */
 	    Your("trap setting attempt fails.");
