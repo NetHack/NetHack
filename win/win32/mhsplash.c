@@ -16,27 +16,31 @@ PNHWinApp GetNHApp(void);
 BOOL CALLBACK NHSplashWndProc(HWND, UINT, WPARAM, LPARAM);
 
 #define SPLASH_WIDTH		440
-#define SPLASH_HEIGHT  301
+#define SPLASH_HEIGHT  322
 #define SPLASH_VERSION_X		290
 #define SPLASH_VERSION_Y		10
-#define SPLASH_EXTRA_X_BEGIN	15
-#define SPLASH_EXTRA_X_END	415
-#define SPLASH_EXTRA_Y		150
 #define SPLASH_OFFSET_X		10
 #define SPLASH_OFFSET_Y		10
 
 extern HFONT version_splash_font;
-extern HFONT extrainfo_splash_font;
 
 void mswin_display_splash_window (BOOL show_ver)
 {
 	MSG msg;
-	RECT rt;
+	int left, top;
 	RECT splashrt;
 	RECT clientrt;
 	RECT controlrt;
 	HWND hWnd;
- int buttop;
+	int buttop;
+	int strsize = 0;
+	int bufsize = BUFSZ;
+	char *buf = malloc(bufsize);
+	
+	if (buf == NULL)
+	    panic("out of memory");
+	buf[0] = '\0';
+	
 
 	hWnd = CreateDialog(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_SPLASH),
 	    GetNHApp()->hMainWnd, NHSplashWndProc);
@@ -57,82 +61,115 @@ void mswin_display_splash_window (BOOL show_ver)
 	splashrt.right += SPLASH_WIDTH + SPLASH_OFFSET_X * 2 - clientrt.right;
 	splashrt.bottom += SPLASH_HEIGHT + controlrt.bottom + SPLASH_OFFSET_Y * 3 - clientrt.bottom;
 	/* Place the window centered */
-	GetWindowRect(GetNHApp()->hMainWnd, &rt);
-	rt.left += (rt.right - rt.left - splashrt.right) / 2;
-	rt.top += (rt.bottom - rt.top - splashrt.bottom) / 2;
-	MoveWindow(hWnd, rt.left, rt.top, splashrt.right, splashrt.bottom, TRUE);
- /* Place the OK control */
+	/* On the screen, not on the parent window */
+	left = (GetSystemMetrics(SM_CXSCREEN) - splashrt.right) / 2;
+	top = (GetSystemMetrics(SM_CYSCREEN) - splashrt.bottom) / 2;
+	MoveWindow(hWnd, left, top, splashrt.right, splashrt.bottom, TRUE);
+	/* Place the OK control */
 	GetClientRect (hWnd, &clientrt);
 	MoveWindow (GetDlgItem(hWnd, IDOK),
 	    (clientrt.right - clientrt.left - controlrt.right) / 2,
 	    clientrt.bottom - controlrt.bottom - SPLASH_OFFSET_Y,
 	    controlrt.right, controlrt.bottom, TRUE);
- buttop = clientrt.bottom - controlrt.bottom - SPLASH_OFFSET_Y;
- /* Place the text control */
- GetWindowRect (GetDlgItem(hWnd, IDC_EXTRAINFO), &controlrt);
- controlrt.right -= controlrt.left;
- controlrt.bottom -= controlrt.top;
- GetClientRect (hWnd, &clientrt);
- MoveWindow (GetDlgItem(hWnd, IDC_EXTRAINFO),
-     clientrt.left + SPLASH_OFFSET_X,
-     buttop - controlrt.bottom - SPLASH_OFFSET_Y,
-     clientrt.right - 2 * SPLASH_OFFSET_X, controlrt.bottom, TRUE);
- if (show_ver) {
-     /* Show complete version informatoin */
-      char buf[BUFSZ];
+	buttop = clientrt.bottom - controlrt.bottom - SPLASH_OFFSET_Y;
+	/* Place the text control */
+	GetWindowRect (GetDlgItem(hWnd, IDC_EXTRAINFO), &controlrt);
+	controlrt.right -= controlrt.left;
+	controlrt.bottom -= controlrt.top;
+	GetClientRect (hWnd, &clientrt);
+	MoveWindow (GetDlgItem(hWnd, IDC_EXTRAINFO),
+	    clientrt.left + SPLASH_OFFSET_X,
+	    buttop - controlrt.bottom - SPLASH_OFFSET_Y,
+	    clientrt.right - 2 * SPLASH_OFFSET_X, controlrt.bottom, TRUE);
 
-  getversionstring(buf);
-  SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), buf);
+	/* Fill the text control */
+	Sprintf (buf, "%s\r\n%s\r\n%s\r\n\r\n", COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B,
+             COPYRIGHT_BANNER_C);
+	strsize = strlen(buf);
 
- } else {
-     /* Show news, if any */
-     FILE *nf;
+	if (show_ver) {
+	    /* Show complete version information */
+	    dlb *f;
 
-     nf = fopen(NEWS, "r");
-     if (nf != NULL) {
-  char *buf = NULL;
-  int bufsize = 0;
-  int strsize = 0;
-  char line[LLEN + 1];
+	    getversionstring(buf + strsize);
+	    strcat(buf, "\r\n\r\n");
+	    strsize = strlen(buf);
 
-  while (fgets(line, LLEN, nf)) {
-      size_t len;
-      len = strlen(line);
-      if (line[len - 1] == '\n') {
-   line[len - 1] = '\r';
-   line[len] = '\n';
-   line[len + 1] = '\0';
-   len++;
-      }
-      if (strsize + (int)len > bufsize)
-      {
-   bufsize += BUFSZ;
-   buf = realloc(buf, bufsize);
-   if (buf == NULL)
-       panic("out of memory");
-   if (strsize == 0)
-       buf[0] = '\0';
-      }
-      strcat(buf, line);
-      strsize += len;
-  }
-  (void) fclose(nf);
-  SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), buf);
-  free(buf);
-     }
-     else
-  SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), "No news.");
- }
+	    /* Add compile options */
+	    f = dlb_fopen(OPTIONS_USED, RDTMODE);
+	    if (f) {
+		char line[LLEN + 1];
+		
+		while (dlb_fgets(line, LLEN, f)) {
+		    size_t len;
+		    len = strlen(line);
+		    if (len > 0 && line[len - 1] == '\n') {
+			line[len - 1] = '\r';
+			line[len] = '\n';
+			line[len + 1] = '\0';
+			len++;
+		    }
+		    if (strsize + (int)len > bufsize)
+		    {
+			bufsize += BUFSZ;
+			buf = realloc(buf, bufsize);
+			if (buf == NULL)
+			    panic("out of memory");
+		    }
+		    strcat(buf, line);
+		    strsize += len;
+		}
+		(void) dlb_fclose(f);
+	    }
+	} else {
+	    /* Show news, if any */
+	    if (iflags.news) {	    
+		FILE *nf;
+
+		iflags.news = 0; /* prevent newgame() from re-displaying news */
+		nf = fopen(NEWS, "r");
+		if (nf != NULL) {
+		    char line[LLEN + 1];
+		    
+		    while (fgets(line, LLEN, nf)) {
+			size_t len;
+			len = strlen(line);
+			if (len > 0 && line[len - 1] == '\n') {
+			    line[len - 1] = '\r';
+			    line[len] = '\n';
+			    line[len + 1] = '\0';
+			    len++;
+			}
+			if (strsize + (int)len > bufsize)
+			{
+			    bufsize += BUFSZ;
+			    buf = realloc(buf, bufsize);
+			    if (buf == NULL)
+				panic("out of memory");
+			}
+			strcat(buf, line);
+			strsize += len;
+		    }
+		    (void) fclose(nf);
+		}
+		else
+		{
+		    strcat(buf, "No news.");
+		}
+	    }
+	}
+	SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), buf);
+	free(buf);
 	ShowWindow(hWnd, SW_SHOW);
 
-	while( IsWindow(hWnd) &&
-		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
-		if( !IsDialogMessage(hWnd, &msg) ) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
+    	while( IsWindow(hWnd) &&	
+		GetMessage(&msg, NULL, 0, 0)!=0 ) {
+	    if( !IsDialogMessage(hWnd, &msg) ) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	    }
 	}
-
+	
 	GetNHApp()->hPopupWnd = NULL;
 	mswin_destroy_splashfonts();
 }
@@ -155,7 +192,6 @@ BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 	case WM_PAINT:
 	{
 		char VersionString[BUFSZ];
-		char InfoString[BUFSZ];
 		RECT rt;
 		HDC hdcBitmap;
 		HANDLE OldBitmap;
@@ -189,22 +225,6 @@ BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		    DT_LEFT | DT_NOPREFIX | DT_CALCRECT);
 		DrawText (hdc, VersionString, strlen(VersionString), &rt,
 		    DT_LEFT | DT_NOPREFIX);
-
-		/* Print copyright banner */
-
-		SetTextColor (hdc, RGB(255, 255, 255));
-		Sprintf (InfoString, "%s\n%s\n%s\n", COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B,
-		    COPYRIGHT_BANNER_C);
-		SelectObject(hdc, extrainfo_splash_font);
-		rt.left = SPLASH_EXTRA_X_BEGIN;
-		rt.right = SPLASH_EXTRA_X_END;
-		rt.bottom = rt.top = SPLASH_EXTRA_Y;
-		DrawText (hdc, InfoString, strlen(InfoString), &rt,
-		    DT_LEFT | DT_NOPREFIX | DT_LEFT | DT_VCENTER | DT_CALCRECT);
-		DrawText (hdc, InfoString, strlen(InfoString), &rt,
-		    DT_LEFT | DT_NOPREFIX | DT_LEFT | DT_VCENTER);
-
-		SelectObject(hdc, OldFont);
 		EndPaint (hWnd, &ps);
 	}
 	break;

@@ -14,7 +14,6 @@ static struct font_table_entry {
 } font_table[MAXFONTS] ;
 static int font_table_size = 0;
 HFONT version_splash_font;
-HFONT extrainfo_splash_font;
 
 #define NHFONT_CODE(win, attr) (((attr&0xFF)<<8)|(win_type&0xFF))
 
@@ -41,15 +40,12 @@ void mswin_init_splashfonts(HWND hWnd)
 	lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
 	NH_A2W( "Times New Roman", lgfnt.lfFaceName, LF_FACESIZE);
 	version_splash_font = CreateFontIndirect(&lgfnt);
-	lgfnt.lfHeight		= -16;	 // height of font
-	extrainfo_splash_font = CreateFontIndirect(&lgfnt);
 	ReleaseDC(hWnd, hdc);
 }
 
 void mswin_destroy_splashfonts()
 {
 	DeleteObject (version_splash_font);
-	DeleteObject (extrainfo_splash_font);
 }
 
 /* create font based on window type, charater attributes and

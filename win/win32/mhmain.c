@@ -138,13 +138,13 @@ numpad[KEY_LAST][3] = {
 	{'9', M('9'), '9'}, /* 9 */
 	{'m', C('p'), C('p')}, /* - */
 	{'4', M('4'), '4'}, /* 4 */
-	{'5', M('5'), '5'}, /* 5 */
+	{'g', 'G', 'g'}, /* 5 */
 	{'6', M('6'), '6'}, /* 6 */
 	{'+', 'P', C('p')}, /* + */
 	{'1', M('1'), '1'}, /* 1 */
 	{'2', M('2'), '2'}, /* 2 */
 	{'3', M('3'), '3'}, /* 3 */
-	{'0', M('0'), '0'}, /* Ins */
+	{'i', 'I', C('i')}, /* Ins */
 	{'.', ':', ':'} /* Del */
 };
 
@@ -438,7 +438,8 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
             
             wp.length = sizeof(wp);
             if (GetWindowPlacement(hWnd, &wp)) {
-                GetNHApp()->regMainShowState = wp.showCmd;
+                GetNHApp()->regMainShowState = (wp.showCmd == SW_SHOWMAXIMIZED 
+		    ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL);
 
                 GetNHApp()->regMainMinX = wp.ptMinPosition.x;
                 GetNHApp()->regMainMinY = wp.ptMinPosition.y;
@@ -472,9 +473,15 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			    NHEVENT_KBD('\033'); /* and send keyboard input as if user pressed ESC */
 			    /* additional code for this is done in menu and rip windows */
 			}
+			else if (!program_state.something_worth_saving)
+			{
+			    /* User exited before the game started, e.g. during splash display */
+			    /* Just get out. */
+			    bail((char *)0);
+			}
 			else
 			{
-			    switch(MessageBox(hWnd, TEXT("Save?"), TEXT("NetHack for Windows"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
+			    switch (NHMessageBox(hWnd, TEXT("Save?"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
 			    case IDYES: NHEVENT_KBD('y'); dosave(); break;
 			    case IDNO: NHEVENT_KBD('q'); done(QUIT); break;
 			    case IDCANCEL: break;
@@ -761,9 +768,9 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         {
             mswin_destroy_reg();
             /* Notify the user that windows settings will not be saved this time. */
-            MessageBox(GetNHApp()->hMainWnd, 
+            NHMessageBox(GetNHApp()->hMainWnd, 
                 "Your Windows Settings will not be stored when you exit this time.", 
-                "NetHack", MB_OK | MB_ICONINFORMATION);
+                MB_OK | MB_ICONINFORMATION);
             break;
         }
 
