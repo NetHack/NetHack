@@ -912,7 +912,7 @@ dokick()
 			    You_hear("a gushing sound.");
 			else
 			    pline("A %s ooze gushes up from the drain!",
-					 hcolor(Black));
+					 hcolor(NH_BLACK));
 			(void) makemon(&mons[PM_BLACK_PUDDING],
 					 x, y, NO_MM_FLAGS);
 			exercise(A_DEX, TRUE);

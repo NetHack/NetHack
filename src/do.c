@@ -213,7 +213,7 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 
 	if ((obj->blessed || obj->cursed) && obj->oclass != COIN_CLASS) {
 		There("is %s flash as %s %s the altar.",
-			an(hcolor(obj->blessed ? amber : Black)),
+			an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)),
 			doname(obj), otense(obj, "hit"));
 		if (!Hallucination) obj->bknown = 1;
 	} else {
@@ -345,10 +345,10 @@ giveback:
 		    break;
 		case RIN_PROTECTION:
 		    pline_The("sink glows %s for a moment.",
-			    hcolor((obj->spe<0) ? Black : silver));
+			    hcolor((obj->spe<0) ? NH_BLACK : NH_SILVER));
 		    break;
 		case RIN_WARNING:
-		    pline_The("sink glows %s for a moment.", hcolor(White));
+		    pline_The("sink glows %s for a moment.", hcolor(NH_WHITE));
 		    break;
 		case RIN_TELEPORTATION:
 		    pline_The("sink momentarily vanishes.");

@@ -321,7 +321,7 @@ Helmet_on()
 			pline("%s for a moment.", Tobjnam(uarmh, "vibrate"));
 		    else
 			pline("%s %s for a moment.",
-			      Tobjnam(uarmh, "glow"), hcolor(Black));
+			      Tobjnam(uarmh, "glow"), hcolor(NH_BLACK));
 		    curse(uarmh);
 		}
 		flags.botl = 1;		/* reveal new alignment or INT & WIS */

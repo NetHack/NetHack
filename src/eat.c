@@ -1037,7 +1037,7 @@ opentin()		/* called during each move whilst opening a tin */
 	} else {
 	    if (tin.tin->cursed)
 		pline("It contains some decaying%s%s substance.",
-			Blind ? "" : " ", Blind ? "" : hcolor(green));
+			Blind ? "" : " ", Blind ? "" : hcolor(NH_GREEN));
 	    else
 		pline("It contains spinach.");
 

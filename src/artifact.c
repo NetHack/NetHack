@@ -1044,7 +1044,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 			if (vis) {
 			    if(otmp->oartifact == ART_STORMBRINGER)
 				pline_The("%s blade draws the life from %s!",
-				      hcolor(Black),
+				      hcolor(NH_BLACK),
 				      mon_nam(mdef));
 			    else
 				pline("%s draws the life from %s!",
@@ -1071,7 +1071,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 				    "unholy blade" : "object");
 			else if (otmp->oartifact == ART_STORMBRINGER)
 				pline_The("%s blade drains your life!",
-				      hcolor(Black));
+				      hcolor(NH_BLACK));
 			else
 				pline("%s drains your life!",
 				      The(distant_name(otmp, xname)));

@@ -2283,13 +2283,13 @@ struct monst *mon;
 		if (Blind)
 			Your("%s stop tingling.", hands);
 		else
-			Your("%s stop glowing %s.", hands, hcolor(red));
+			Your("%s stop glowing %s.", hands, hcolor(NH_RED));
 	} else {
 		if (Blind)
 			pline_The("tingling in your %s lessens.", hands);
 		else
 			Your("%s no longer glow so brightly %s.", hands,
-				hcolor(red));
+				hcolor(NH_RED));
 	}
 	u.umconf--;
 }

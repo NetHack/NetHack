@@ -1571,7 +1571,7 @@ dodip()
 				    pline("%s %s %s.",
 					  Your_buf,
 					  aobjnam(obj, "softly glow"),
-					  hcolor(amber));
+					  hcolor(NH_AMBER));
 				uncurse(obj);
 				obj->bknown=1;
 	poof:
@@ -1582,7 +1582,7 @@ dodip()
 				return(1);
 			} else if(!obj->blessed) {
 				if (useeit) {
-				    tmp = hcolor(light_blue);
+				    tmp = hcolor(NH_LIGHT_BLUE);
 				    pline("%s %s with a%s %s aura.",
 					  Your_buf,
 					  aobjnam(obj, "softly glow"),
@@ -1604,7 +1604,7 @@ dodip()
 				goto poof;
 			} else if(!obj->cursed) {
 				if (useeit) {
-				    tmp = hcolor(Black);
+				    tmp = hcolor(NH_BLACK);
 				    pline("%s %s with a%s %s aura.",
 					  Your_buf,
 					  aobjnam(obj, "glow"),

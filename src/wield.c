@@ -620,7 +620,7 @@ chwepon(otmp, amount)
 register struct obj *otmp;
 register int amount;
 {
-	const char *color = hcolor((amount < 0) ? Black : blue);
+	const char *color = hcolor((amount < 0) ? NH_BLACK : NH_BLUE);
 	const char *xtime;
 	int otyp = STRANGE_OBJECT;
 

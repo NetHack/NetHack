@@ -337,7 +337,7 @@ decurse:
 			    Your("%s %s.",
 				 what ? what :
 				 (const char *)aobjnam(otmp, "softly glow"),
-				 hcolor(amber));
+				 hcolor(NH_AMBER));
 		    update_inventory();
 		    break;
 	    case TROUBLE_POISONED:
@@ -445,7 +445,7 @@ aligntyp resp_god;
 	    if (!Disint_resistance)
 		fry_by_god(resp_god);
 	    else {
-		You("bask in its %s glow for a minute...", Black);
+		You("bask in its %s glow for a minute...", NH_BLACK);
 		godvoice(resp_god, "I believe it not!");
 	    }
 	    if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
@@ -517,7 +517,7 @@ aligntyp resp_god;
 	    case 5:	gods_angry(resp_god);
 			if (!Blind && !Antimagic)
 			    pline("%s glow surrounds you.",
-				  An(hcolor(Black)));
+				  An(hcolor(NH_BLACK)));
 			rndcurse();
 			break;
 	    case 7:
@@ -664,7 +664,7 @@ gcrownu()
       {
 	char swordbuf[BUFSZ];
 
-	Sprintf(swordbuf, "%s sword", hcolor(Black));
+	Sprintf(swordbuf, "%s sword", hcolor(NH_BLACK));
 	if (class_gift != STRANGE_OBJECT) {
 	    ;		/* already got bonus above */
 	} else if (in_hand) {
@@ -785,7 +785,7 @@ pleased(g_align)
 		    uwep->bknown = TRUE;
 		    if (!Blind)
 			Your("%s %s%s.", aobjnam(uwep, "softly glow"),
-			     hcolor(amber), repair_buf);
+			     hcolor(NH_AMBER), repair_buf);
 		    else You_feel("the power of %s over your %s.",
 			u_gname(), xname(uwep));
 		    *repair_buf = '\0';
@@ -795,7 +795,7 @@ pleased(g_align)
 		    if (!Blind)
 			Your("%s with %s aura%s.",
 			     aobjnam(uwep, "softly glow"),
-			     an(hcolor(light_blue)), repair_buf);
+			     an(hcolor(NH_LIGHT_BLUE)), repair_buf);
 		    else You_feel("the blessing of %s over your %s.",
 			u_gname(), xname(uwep));
 		    *repair_buf = '\0';
@@ -835,7 +835,7 @@ pleased(g_align)
 	    /* Otherwise, falls into next case */
 	case 2:
 	    if (!Blind)
-		You("are surrounded by %s glow.", an(hcolor(golden)));
+		You("are surrounded by %s glow.", an(hcolor(NH_GOLDEN)));
 	    /* if any levels have been lost (and not yet regained),
 	       treat this effect like blessed full healing */
 	    if (u.ulevel < u.ulevelmax) {
@@ -860,13 +860,13 @@ pleased(g_align)
 	    if (Blind)
 		You_feel("the power of %s.", u_gname());
 	    else You("are surrounded by %s aura.",
-		     an(hcolor(light_blue)));
+		     an(hcolor(NH_LIGHT_BLUE)));
 	    for(otmp=invent; otmp; otmp=otmp->nobj) {
 		if (otmp->cursed) {
 		    uncurse(otmp);
 		    if (!Blind) {
 			Your("%s %s.", aobjnam(otmp, "softly glow"),
-			     hcolor(amber));
+			     hcolor(NH_AMBER));
 			otmp->bknown = TRUE;
 			++any;
 		    }
@@ -973,7 +973,7 @@ water_prayer(bless_water)
 	      ((other && changed > 1L) ? "Some of the" :
 					(other ? "One of the" : "The")),
 	      ((other || changed > 1L) ? "s" : ""), (changed > 1L ? "" : "s"),
-	      (bless_water ? hcolor(light_blue) : hcolor(Black)));
+	      (bless_water ? hcolor(NH_LIGHT_BLUE) : hcolor(NH_BLACK)));
     }
     return((boolean)(changed > 0L));
 }
@@ -1109,7 +1109,7 @@ dosacrifice()
 		if (altaralign == A_CHAOTIC && u.ualign.type != A_CHAOTIC) {
 		    pline(
 		     "The blood floods the altar, which vanishes in %s cloud!",
-			  an(hcolor(Black)));
+			  an(hcolor(NH_BLACK)));
 		    levl[u.ux][u.uy].typ = ROOM;
 		    levl[u.ux][u.uy].altarmask = 0;
 		    if(Invisible) newsym(u.ux, u.uy);
@@ -1311,8 +1311,8 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		    if (!Blind)
 			pline_The("altar glows %s.",
 			      hcolor(
-			      u.ualign.type == A_LAWFUL ? White :
-			      u.ualign.type ? Black : (const char *)"gray"));
+			      u.ualign.type == A_LAWFUL ? NH_WHITE :
+			      u.ualign.type ? NH_BLACK : (const char *)"gray"));
 
 		    if (rnl(u.ulevel) > 6 && u.ualign.record > 0 &&
 		       rnd(u.ualign.record) > (3*ALIGNLIM)/4)

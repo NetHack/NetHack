@@ -270,7 +270,7 @@ int curse_bless;
 		    wand_explode(obj);
 		    return;
 		}
-		if (obj->spe >= lim) p_glow2(obj,blue);
+		if (obj->spe >= lim) p_glow2(obj, NH_BLUE);
 		else p_glow1(obj);
 	    }
 
@@ -341,7 +341,7 @@ int curse_bless;
 			else
 				obj->spe += n;
 		    }
-		    p_glow2(obj,blue);
+		    p_glow2(obj, NH_BLUE);
 		} else {
 		    n = rn1(5,10);		/* 5..15 */
 		    if (obj->spe + n <= 50)
@@ -353,7 +353,7 @@ int curse_bless;
 			else
 				obj->spe += n;
 		    }
-		    p_glow2(obj,White);
+		    p_glow2(obj, NH_WHITE);
 		}
 		break;
 	    case OIL_LAMP:
@@ -368,7 +368,7 @@ int curse_bless;
 		} else if (is_blessed) {
 		    obj->spe = 1;
 		    obj->age = 1500;
-		    p_glow2(obj,blue);
+		    p_glow2(obj, NH_BLUE);
 		} else {
 		    obj->spe = 1;
 		    obj->age += 750;
@@ -380,7 +380,7 @@ int curse_bless;
 		if (is_cursed) stripspe(obj);
 		else if (is_blessed) {
 		    obj->spe = 6;
-		    p_glow2(obj,blue);
+		    p_glow2(obj, NH_BLUE);
 		} else {
 		    if (obj->spe < 5) {
 			obj->spe++;
@@ -397,7 +397,7 @@ int curse_bless;
 			obj->spe += rn1(10, 6);
 		    else obj->spe += rn1(5, 6);
 		    if (obj->spe > 50) obj->spe = 50;
-		    p_glow2(obj,blue);
+		    p_glow2(obj, NH_BLUE);
 		} else {
 		    obj->spe += rnd(5);
 		    if (obj->spe > 50) obj->spe = 50;
@@ -414,7 +414,7 @@ int curse_bless;
 		} else if (is_blessed) {
 		    obj->spe += d(2,4);
 		    if (obj->spe > 20) obj->spe = 20;
-		    p_glow2(obj,blue);
+		    p_glow2(obj, NH_BLUE);
 		} else {
 		    obj->spe += rnd(4);
 		    if (obj->spe > 20) obj->spe = 20;
@@ -698,7 +698,7 @@ register struct obj	*sobj;
 			    Your("%s %s covered by a %s %s %s!",
 				xname(otmp), otense(otmp, "are"),
 				sobj->cursed ? "mottled" : "shimmering",
-				hcolor(sobj->cursed ? Black : golden),
+				 hcolor(sobj->cursed ? NH_BLACK : NH_GOLDEN),
 				sobj->cursed ? "glow" :
 				  (is_shield(otmp) ? "layer" : "shield"));
 			}
@@ -732,7 +732,7 @@ register struct obj	*sobj;
 		     otense(otmp, Blind ? "vibrate" : "glow"),
 		     (!Blind && !same_color) ? " " : nul,
 		     (Blind || same_color) ? nul :
-			hcolor(sobj->cursed ? Black : silver),
+			hcolor(sobj->cursed ? NH_BLACK : NH_SILVER),
 		     otense(otmp, "evaporate"));
 			if(is_cloak(otmp)) (void) Cloak_off();
 			if(is_boots(otmp)) (void) Boots_off();
@@ -768,7 +768,7 @@ register struct obj	*sobj;
 		        s == 0 ? "violently " : nul,
 			otense(otmp, Blind ? "vibrate" : "glow"),
 			(!Blind && !same_color) ? " " : nul,
-			(Blind || same_color) ? nul : hcolor(sobj->cursed ? Black : silver),
+			(Blind || same_color) ? nul : hcolor(sobj->cursed ? NH_BLACK : NH_SILVER),
 			  (s*s>1) ? "while" : "moment");
 		otmp->cursed = sobj->cursed;
 		if (!otmp->blessed || sobj->cursed)
@@ -797,7 +797,7 @@ register struct obj	*sobj;
 				return(1);
 			}
 			otmp->oerodeproof = sobj->cursed;
-			p_glow2(otmp,purple);
+			p_glow2(otmp, NH_PURPLE);
 			break;
 		}
 		if(!sobj->cursed || !otmp || !otmp->cursed) {
@@ -825,11 +825,11 @@ register struct obj	*sobj;
 			Your("%s begin to %s%s.",
 			    makeplural(body_part(HAND)),
 			    Blind ? "tingle" : "glow ",
-			    Blind ? nul : hcolor(purple));
+			    Blind ? nul : hcolor(NH_PURPLE));
 			make_confused(HConfusion + rnd(100),FALSE);
 		    } else {
 			pline("A %s%s surrounds your %s.",
-			    Blind ? nul : hcolor(red),
+			    Blind ? nul : hcolor(NH_RED),
 			    Blind ? "faint buzz" : " glow",
 			    body_part(HEAD));
 			make_confused(0L,TRUE);
@@ -839,7 +839,7 @@ register struct obj	*sobj;
 			Your("%s%s %s%s.",
 			makeplural(body_part(HAND)),
 			Blind ? "" : " begin to glow",
-			Blind ? (const char *)"tingle" : hcolor(red),
+			Blind ? (const char *)"tingle" : hcolor(NH_RED),
 			u.umconf ? " even more" : "");
 			u.umconf++;
 		    } else {
@@ -851,7 +851,7 @@ register struct obj	*sobj;
 			    Your("%s glow a%s brilliant %s.",
 				makeplural(body_part(HAND)),
 				u.umconf ? "n even more" : "",
-				hcolor(red));
+				hcolor(NH_RED));
 			/* after a while, repeated uses become less effective */
 			if (u.umconf >= 40)
 			    u.umconf++;
@@ -948,7 +948,7 @@ register struct obj	*sobj;
 			    Your("%s covered by a %s %s %s!",
 				aobjnam(uwep, "are"),
 				sobj->cursed ? "mottled" : "shimmering",
-				hcolor(sobj->cursed ? purple : golden),
+				hcolor(sobj->cursed ? NH_PURPLE : NH_GOLDEN),
 				sobj->cursed ? "glow" : "shield");
 			}
 			if (uwep->oerodeproof && (uwep->oeroded || uwep->oeroded2)) {

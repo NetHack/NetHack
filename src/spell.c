@@ -625,7 +625,7 @@ cast_protection()
 
 	if (gain > 0) {
 	    if (!Blind) {
-		const char *hgolden = hcolor(golden);
+		const char *hgolden = hcolor(NH_GOLDEN);
 
 		if (u.uspellprot)
 		    pline_The("%s haze around you becomes more dense.",

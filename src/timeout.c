@@ -100,7 +100,7 @@ choke_dialogue()
 		const char *str = choke_texts[SIZE(choke_texts)-i];
 
 		if (index(str, '%'))
-		    pline(str, hcolor(blue));
+		    pline(str, hcolor(NH_BLUE));
 		else
 		    pline(str);
 	    }
@@ -128,7 +128,7 @@ slime_dialogue()
 	    if (index(str, '%')) {
 		if (i == 4L) {	/* "you are turning green" */
 		    if (!Blind)	/* [what if you're already green?] */
-			pline(str, hcolor(green));
+			pline(str, hcolor(NH_GREEN));
 		} else
 		    pline(str, an(Hallucination ? rndmonnam() : "green slime"));
 	    } else
@@ -202,7 +202,7 @@ nh_timeout()
 		u.uspellprot--;
 		find_ac();
 		if (!Blind)
-		    Norep("The %s haze around you %s.", hcolor(golden),
+		    Norep("The %s haze around you %s.", hcolor(NH_GOLDEN),
 			  u.uspellprot ? "becomes less dense" : "disappears");
 	    }
 	}

@@ -286,7 +286,7 @@ warn_effects()
 	if(!Blind && uwep &&
 	    (warnlevel > lastwarnlev || moves > lastwarntime + warnDelay)) {
 	    Your("%s %s!", aobjnam(uwep, "glow"),
-		hcolor(light_blue));
+		hcolor(NH_LIGHT_BLUE));
 	    lastwarnlev = warnlevel;
 	    lastwarntime = moves;
 	}
