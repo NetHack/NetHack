@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.4	2003/12/04	*/
+/*	SCCS Id: @(#)dothrow.c	3.4	2004/11/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -733,6 +733,8 @@ struct obj *obj;
 boolean hitsroof;
 {
     const char *almost;
+    boolean petrifier = ((obj->otyp == EGG || obj->otyp == CORPSE) &&
+			 touch_petrifies(&mons[obj->corpsenm]));
     /* note: obj->quan == 1 */
 
     if (hitsroof) {
@@ -767,10 +769,15 @@ boolean hitsroof;
 	obj = 0;	/* it's now gone */
 	switch (otyp) {
 	case EGG:
-		if (touch_petrifies(&mons[ocorpsenm]) &&
-		    !uarmh && !Stone_resistance &&
-		    !(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)))
-		goto petrify;
+		if (petrifier && !Stone_resistance &&
+			!(poly_when_stoned(youmonst.data) &&
+			    polymon(PM_STONE_GOLEM))) {
+		    /* egg ends up "all over your face"; perhaps
+		       visored helmet should still save you here */
+		    if (uarmh) Your("%s fails to protect you.",
+				    helm_simple_name(uarmh));
+		    goto petrify;
+		}
 	case CREAM_PIE:
 	case BLINDING_VENOM:
 		pline("You've got it all over your %s!", body_part(FACE));
@@ -812,20 +819,21 @@ boolean hitsroof;
 	    if (less_damage && dmg < (Upolyd ? u.mh : u.uhp)) {
 		if (!artimsg)
 		    pline("Fortunately, you are wearing a hard helmet.");
-	    } else if (flags.verbose &&
-		    !(obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])))
-		pline("%s does not protect you.", Yname2(uarmh));
-	} else if (obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])) {
-	    if (!Stone_resistance &&
-		    !(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
- petrify:
-		killer.format = KILLED_BY;
-		Strcpy(killer.name, "elementary physics"); /* "what goes up..." */
-		You("turn to stone.");
-		if (obj) dropy(obj);	/* bypass most of hitfloor() */
-		done(STONING);
-		return obj ? TRUE : FALSE;
+	    /* helmet definitely protects you when it blocks petrification */
+	    } else if (!petrifier) {
+		if (flags.verbose)
+		    Your("%s does not protect you.", helm_simple_name(uarmh));
 	    }
+	} else if (petrifier && !Stone_resistance &&
+		!(poly_when_stoned(youmonst.data) &&
+		    polymon(PM_STONE_GOLEM))) {
+ petrify:
+	    killer.format = KILLED_BY;
+	    Strcpy(killer.name, "elementary physics"); /* "what goes up..." */
+	    You("turn to stone.");
+	    if (obj) dropy(obj);	/* bypass most of hitfloor() */
+	    done(STONING);
+	    return obj ? TRUE : FALSE;
 	}
 	hitfloor(obj);
 	losehp(Maybe_Half_Phys(dmg), "falling object", KILLED_BY_AN);
@@ -1739,7 +1747,8 @@ struct obj *obj;
 	pline_The("gold hits the %s, then falls back on top of your %s.",
 		    ceiling(u.ux,u.uy), body_part(HEAD));
 		    /* some self damage? */
-		    if(uarmh) pline("Fortunately, you are wearing a helmet!");
+		    if (uarmh) pline("Fortunately, you are wearing %s!",
+				     an(helm_simple_name(uarmh)));
 		}
 		bhitpos.x = u.ux;
 		bhitpos.y = u.uy;
