@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.4	2002/04/16	*/
+/*	SCCS Id: @(#)wield.c	3.4	2002/05/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -407,9 +407,14 @@ can_twoweapon()
 	struct obj *otmp;
 
 #define NOT_WEAPON(obj) (!is_weptool(obj) && obj->oclass != WEAPON_CLASS)
-	if (!could_twoweap(youmonst.data))
-		You_cant("use two weapons in your current form.");
-	else if (!uwep || !uswapwep)
+	if (!could_twoweap(youmonst.data)) {
+		if (Upolyd)
+		    You_cant("use two weapons in your current form.");
+		else
+		    pline("%s aren't able to use two weapons at once.",
+			  makeplural((flags.female && urole.name.f) ?
+				     urole.name.f : urole.name.m));
+	} else if (!uwep || !uswapwep)
 		Your("%s%s%s empty.", uwep ? "left " : uswapwep ? "right " : "",
 			body_part(HAND), (!uwep && !uswapwep) ? "s are" : " is");
 	else if (NOT_WEAPON(uwep) || NOT_WEAPON(uswapwep)) {
