@@ -1744,8 +1744,6 @@ skipmsg:
 		   different methods of maintaining speed ratings:
 		   player's character becomes "very fast" temporarily;
 		   monster becomes "one stage faster" permanently */
-		if (vismon)
-		    pline("%s is suddenly moving faster.", Monnam(mtmp));
 		if (oseen) makeknown(POT_SPEED);
 		mon_adjust_speed(mtmp, 1);
 		m_useup(mtmp, otmp);

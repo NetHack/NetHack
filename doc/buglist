@@ -50,18 +50,6 @@ stone-to-flesh monsters' inventory? [psmith@spod-central.org]
 Releasing your pet from a bear trap by displacing is silly.
 [eino.keskitalo@purkki.mbnet.fi]
 
-Monster spellcasting is in serious need of overhaul.
-Clerical spell `case 1' has ``if (...) {} /* else fall into default */''
-but the default case has been moved away so the comment is a lie.
-Monsters which cast spells automatically "cast at thin air" if they don't know
-where you are.  In fact, castmu() includes undirected spells (healing) which
-should still be possible under these circumstances.
-The higher level a monster is, the more likely it becomes to cast the wimpy
-"default" spell.  This is particularly silly for the Wizard who has a higher
-level each time he's reincarnated.  Beyond that, spell using monsters ought
-to pick their spells intelligently rather than randomly, especially once
-they learn that their target is magic resistant.
-
 Recoil from throwing while levitating won't trigger every type of trap.
 Some were checked for and added in 3.3.2 (magic_portal, fire, pits et al on
 Sokoban), but there are others that you can bypass just by throwing

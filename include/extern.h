@@ -904,7 +904,7 @@ E void FDECL(mapglyph, (int, int *, int *, unsigned *, int, int));
 
 /* ### mcastu.c ### */
 
-E int FDECL(castmu, (struct monst *,struct attack *));
+E int FDECL(castmu, (struct monst *,struct attack *,BOOLEAN_P,BOOLEAN_P));
 E int FDECL(buzzmu, (struct monst *,struct attack *));
 
 /* ### mhitm.c ### */

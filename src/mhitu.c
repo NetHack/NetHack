@@ -616,20 +616,12 @@ mattacku(mtmp)
 		case AT_MAGC:
 			if (range2)
 			    sum[i] = buzzmu(mtmp, mattk);
-			else
+			else {
 			    if (foundyou)
-				sum[i] = castmu(mtmp, mattk);
+				sum[i] = castmu(mtmp, mattk, TRUE, TRUE);
 			    else
-				pline("%s casts a spell at %s!",
-					youseeit ? Monnam(mtmp) : "It",
-					levl[mtmp->mux][mtmp->muy].typ == WATER
-					    ? "empty water" : "thin air");
-				/* FIXME: castmu includes spells that are not
-				 * cast at the player and thus should be
-				 * possible whether the monster knows your
-				 * location or not.
-				 * --KAA
-				 */
+				sum[i] = castmu(mtmp, mattk, TRUE, FALSE);
+			}
 			break;
 
 		default:		/* no attack */

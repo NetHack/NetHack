@@ -2505,13 +2505,8 @@ int damtype, dam;
 	return;
     }
     if (slow) {
-	if (mon->mspeed != MSLOW) {
-	    unsigned int oldspeed = mon->mspeed;
-
+	if (mon->mspeed != MSLOW)
 	    mon_adjust_speed(mon, -1);
-	    if (mon->mspeed != oldspeed && cansee(mon->mx, mon->my))
-		pline("%s seems to be moving slower.", Monnam(mon));
-	}
     }
     if (heal) {
 	if (mon->mhp < mon->mhpmax) {

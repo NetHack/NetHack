@@ -776,7 +776,9 @@ register struct obj *obj;
 		} else switch (rn2(3)) {
 			default:
 				break;
-			case 1: mon_adjust_speed(mtmp, 2);
+			case 1: in_mklev = TRUE; /* don't print messages */
+				mon_adjust_speed(mtmp, 2);
+				in_mklev = FALSE;
 				break;
 			case 2: /* no explanation; it just happens... */
 				nomovemsg = "";

@@ -446,6 +446,7 @@ register struct monst *mtmp;
 		}
 	}
 toofar:
+
 	/* If monster is nearby you, and has to wield a weapon, do so.   This
 	 * costs the monster a move, of course.
 	 */
@@ -484,6 +485,24 @@ toofar:
 #endif
 	   (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz) ||
 	   (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
+		/* Possibly cast an undirected spell if not attacking you */
+		/* note that most of the time castmu() will pick a directed
+		   spell and do nothing, so the monster moves normally */
+		/* arbitrary distance restriction to keep monster far away
+		   from you from having cast dozens of sticks-to-snakes
+		   or similar spells by the time you reach it */
+		if (dist2(mtmp->mx, mtmp->my, u.ux, u.uy) <= 64 && !mtmp->mspec_used) {
+		    struct attack *a;
+
+		    for (a = &mdat->mattk[0]; a < &mdat->mattk[NATTK]; a++) {
+			if (a->aatyp == AT_MAGC && (a->adtyp == AD_SPEL || a->adtyp == AD_CLRC)) {
+			    if (castmu(mtmp, a, FALSE, FALSE)) {
+				tmp = 3;
+				break;
+			    }
+			}
+		    }
+		}
 
 		tmp = m_move(mtmp, 0);
 		distfleeck(mtmp,&inrange,&nearby,&scared);	/* recalc */

@@ -147,6 +147,8 @@ int adjust;	/* positive => increase speed, negative => decrease */
 {
     struct obj *otmp;
 
+    int oldspeed = mon->mspeed;
+
     switch (adjust) {
      case  2:
 	mon->permspeed = MFAST;
@@ -173,6 +175,13 @@ int adjust;	/* positive => increase speed, negative => decrease */
 	mon->mspeed = MFAST;
     else
 	mon->mspeed = mon->permspeed;
+
+    if (!in_mklev && mon->mspeed != oldspeed && canseemon(mon)) {
+	if (adjust > 0)
+	    pline("%s is suddenly moving faster.", Monnam(mon));
+	else
+	    pline("%s seems to be moving slower.", Monnam(mon));
+    }
 }
 
 /* armor put on or taken off; might be magical variety */
