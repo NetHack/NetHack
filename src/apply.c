@@ -2377,7 +2377,7 @@ STATIC_OVL int
 use_grapple (obj)
 	struct obj *obj;
 {
-	int res = 0, typ, max_range = 4;
+	int res = 0, typ, max_range = 4, tohit;
 	coord cc;
 	struct monst *mtmp;
 	struct obj *otmp;
@@ -2406,15 +2406,46 @@ use_grapple (obj)
 	else if (P_SKILL(typ) == P_SKILLED) max_range = 5;
 	else max_range = 8;
 	if (distu(cc.x, cc.y) > max_range) {
-		pline("Too far!");
-		return (res);
+	    pline("Too far!");
+	    return (res);
 	} else if (!cansee(cc.x, cc.y)) {
-		You(cant_see_spot);
-		return (res);
+	    You(cant_see_spot);
+	    return (res);
+	}
+
+	/* What do you want to hit? */
+	tohit = rn2(5);
+	if (typ != P_NONE && P_SKILL(typ) >= P_SKILLED) {
+	    winid tmpwin = create_nhwindow(NHW_MENU);
+	    anything any;
+	    char buf[BUFSZ];
+	    menu_item *selected;
+
+	    any.a_void = 0;	/* set all bits to zero */
+	    any.a_int = 1;	/* use index+1 (cant use 0) as identifier */
+	    start_menu(tmpwin);
+	    any.a_int++;
+	    Sprintf(buf, "an object on the %s", surface(cc.x, cc.y));
+	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+			 buf, MENU_UNSELECTED);
+	    any.a_int++;
+	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+			"a monster", MENU_UNSELECTED);
+	    any.a_int++;
+	    Sprintf(buf, "the %s", surface(cc.x, cc.y));
+	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+			 buf, MENU_UNSELECTED);
+	    end_menu(tmpwin, "Aim for what?");
+	    tohit = rn2(4);
+	    if (select_menu(tmpwin, PICK_ONE, &selected) > 0 &&
+			rn2(P_SKILL(typ) > P_SKILLED ? 20 : 2))
+		tohit = selected[0].item.a_int - 1;
+	    free((genericptr_t)selected);
+	    destroy_nhwindow(tmpwin);
 	}
 
 	/* What did you hit? */
-	switch (rn2(5)) {
+	switch (tohit) {
 	case 0:	/* Trap */
 	    /* FIXME -- untrap needs to deal with non-adjacent traps */
 	    break;
