@@ -629,8 +629,9 @@ boolean so;
 		}
 		Sprintf(eos(linebuf), fmt, arg);
 	    } else {
-		Sprintf(eos(linebuf), " in %s on level %d",
-			dungeons[t1->deathdnum].dname, t1->deathlev);
+		Sprintf(eos(linebuf), " in %s", dungeons[t1->deathdnum].dname);
+		if (t1->deathdnum != knox_level.dnum)
+		    Sprintf(eos(linebuf), " on level %d", t1->deathlev);
 		if (t1->deathlev != t1->maxlvl)
 		    Sprintf(eos(linebuf), " [max %d]", t1->maxlvl);
 	    }
