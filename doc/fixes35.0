@@ -6,6 +6,7 @@ setmangry should not be called when a monster enters a bones region
 typos fixed in data.base
 bad capitalization of msg when charging for something that catches light
 missing opthelp for use_inverse
+Never say "It moves only reluctantly"
 
 
 Platform- and/or Interface-Specific Fixes

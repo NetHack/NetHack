@@ -705,6 +705,7 @@ register int after;	/* this is extra fast monster movement */
 newdogpos:
 	if (nix != omx || niy != omy) {
 		struct obj *mw_tmp;
+		boolean wasseen;
 
 		if (info[chi] & ALLOW_U) {
 			if (mtmp->mleashed) { /* play it safe */
@@ -736,10 +737,11 @@ newdogpos:
 			return 0;
 		}
 		/* insert a worm_move() if worms ever begin to eat things */
+		wasseen = canseemon(mtmp);
 		remove_monster(omx, omy);
 		place_monster(mtmp, nix, niy);
-		if (cursemsg[chi] && (cansee(omx,omy) || cansee(nix,niy)))
-			pline("%s moves only reluctantly.", Monnam(mtmp));
+		if (cursemsg[chi] && (wasseen || canseemon(mtmp)))
+			pline("%s moves only reluctantly.", noit_Monnam(mtmp));
 		for (j=MTSZ-1; j>0; j--) mtmp->mtrack[j] = mtmp->mtrack[j-1];
 		mtmp->mtrack[0].x = omx;
 		mtmp->mtrack[0].y = omy;
