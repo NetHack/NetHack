@@ -4,7 +4,7 @@
 .ds vr "NetHack 3.3
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "January 14, 2002
+.ds f2 "January 22, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2303,8 +2303,8 @@ Gil Neiger	Merlyn LeRoy	Tom West
 Greg Laskin	Michael Allison	Warren Cheung
 Greg Olson	Michael Feir	Warwick Allison
 Gregg Wonderly	Michael Hamel	Yitzhak Sapir
-Hao-yang Wang	Michael Sokolov	
-Helge Hafting	Mike Engber	
+Hao-yang Wang	Michael Sokolov
+Helge Hafting	Mike Engber
 .\"TABLE_END  Do not delete this line.
 .TE
 .ed

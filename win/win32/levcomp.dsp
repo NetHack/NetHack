@@ -54,8 +54,32 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=levcomp
-PostBuild_Cmds=echo Building special levels	echo chdir ..\dat	chdir ..\dat	 echo arch.des	..\util\levcomp.exe arch.des	 echo barb.des	..\util\levcomp.exe barb.des	 echo bigroom.des	..\util\levcomp.exe bigroom.des	 echo castle.des	..\util\levcomp.exe castle.des	 echo caveman.des	..\util\levcomp.exe caveman.des	 echo endgame.des	..\util\levcomp.exe endgame.des	 echo gehennom.des	..\util\levcomp.exe gehennom.des	 echo healer.des	..\util\levcomp.exe healer.des	 echo knight.des	..\util\levcomp.exe knight.des	 echo knox.des	..\util\levcomp.exe knox.des	 echo medusa.des	..\util\levcomp.exe medusa.des	 echo mines.des	..\util\levcomp.exe mines.des	 echo monk.des	..\util\levcomp.exe monk.des	 echo oracle.des	..\util\levcomp.exe oracle.des	 echo priest.des	..\util\levcomp.exe priest.des	 echo ranger.des	..\util\levcomp.exe ranger.des	 echo rogue.des	..\util\levcomp.exe rogue.des	 echo samurai.des	..\util\levcomp.exe samurai.des	 echo sokoban.des	..\util\levcomp.exe sokoban.des	 echo tourist.des	..\util\levcomp.exe tourist.des	 echo tower.des	..\util\levcomp.exe tower.des	 echo valkyrie.des	..\util\levcomp.exe valkyrie.des	 echo wizard .des	..\util\levcomp.exe wizard.des	 echo yendor.des\
- 	..\util\levcomp.exe yendor.des	 echo chdir ..\build	chdir ..\build
+PostBuild_Cmds=echo Building special levels	echo chdir ..\dat	chdir ..\dat	 \
+echo arch.des	..\util\levcomp.exe arch.des	 \
+echo barb.des	..\util\levcomp.exe barb.des	 \
+echo bigroom.des	..\util\levcomp.exe bigroom.des	 \
+echo castle.des	..\util\levcomp.exe castle.des	 \
+echo caveman.des	..\util\levcomp.exe caveman.des	 \
+echo endgame.des	..\util\levcomp.exe endgame.des	 \
+echo gehennom.des	..\util\levcomp.exe gehennom.des	 \
+echo healer.des	..\util\levcomp.exe healer.des	 \
+echo knight.des	..\util\levcomp.exe knight.des	 \
+echo knox.des	..\util\levcomp.exe knox.des	 \
+echo medusa.des	..\util\levcomp.exe medusa.des	 \
+echo mines.des	..\util\levcomp.exe mines.des	 \
+echo monk.des	..\util\levcomp.exe monk.des	 \
+echo oracle.des	..\util\levcomp.exe oracle.des	 \
+echo priest.des	..\util\levcomp.exe priest.des	 \
+echo ranger.des	..\util\levcomp.exe ranger.des	 \
+echo rogue.des	..\util\levcomp.exe rogue.des	 \
+echo samurai.des	..\util\levcomp.exe samurai.des	 \
+echo sokoban.des	..\util\levcomp.exe sokoban.des	 \
+echo tourist.des	..\util\levcomp.exe tourist.des	 \
+echo tower.des	..\util\levcomp.exe tower.des	 \
+echo valkyrie.des	..\util\levcomp.exe valkyrie.des	 \
+echo wizard .des	..\util\levcomp.exe wizard.des	 \
+echo yendor.des	..\util\levcomp.exe yendor.des	 \
+echo chdir ..\build	chdir ..\build
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "levcomp - Win32 Debug"
@@ -84,8 +108,32 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=levcomp
-PostBuild_Cmds=echo Building special levels	echo chdir ..\dat	chdir ..\dat	 echo arch.des	..\util\levcomp.exe arch.des	 echo barb.des	..\util\levcomp.exe barb.des	 echo bigroom.des	..\util\levcomp.exe bigroom.des	 echo castle.des	..\util\levcomp.exe castle.des	 echo caveman.des	..\util\levcomp.exe caveman.des	 echo endgame.des	..\util\levcomp.exe endgame.des	 echo gehennom.des	..\util\levcomp.exe gehennom.des	 echo healer.des	..\util\levcomp.exe healer.des	 echo knight.des	..\util\levcomp.exe knight.des	 echo knox.des	..\util\levcomp.exe knox.des	 echo medusa.des	..\util\levcomp.exe medusa.des	 echo mines.des	..\util\levcomp.exe mines.des	 echo monk.des	..\util\levcomp.exe monk.des	 echo oracle.des	..\util\levcomp.exe oracle.des	 echo priest.des	..\util\levcomp.exe priest.des	 echo ranger.des	..\util\levcomp.exe ranger.des	 echo rogue.des	..\util\levcomp.exe rogue.des	 echo samurai.des	..\util\levcomp.exe samurai.des	 echo sokoban.des	..\util\levcomp.exe sokoban.des	 echo tourist.des	..\util\levcomp.exe tourist.des	 echo tower.des	..\util\levcomp.exe tower.des	 echo valkyrie.des	..\util\levcomp.exe valkyrie.des	 echo wizard .des	..\util\levcomp.exe wizard.des	 echo yendor.des\
- 	..\util\levcomp.exe yendor.des	 echo chdir ..\build	chdir ..\build
+PostBuild_Cmds=echo Building special levels	echo chdir ..\dat	chdir ..\dat	 \
+echo arch.des	..\util\levcomp.exe arch.des	 \
+echo barb.des	..\util\levcomp.exe barb.des	 \
+echo bigroom.des	..\util\levcomp.exe bigroom.des	 \
+echo castle.des	..\util\levcomp.exe castle.des	 \
+echo caveman.des	..\util\levcomp.exe caveman.des	 \
+echo endgame.des	..\util\levcomp.exe endgame.des	 \
+echo gehennom.des	..\util\levcomp.exe gehennom.des	 \
+echo healer.des	..\util\levcomp.exe healer.des	 \
+echo knight.des	..\util\levcomp.exe knight.des	 \
+echo knox.des	..\util\levcomp.exe knox.des	 \
+echo medusa.des	..\util\levcomp.exe medusa.des	 \
+echo mines.des	..\util\levcomp.exe mines.des	 \
+echo monk.des	..\util\levcomp.exe monk.des	 \
+echo oracle.des	..\util\levcomp.exe oracle.des	 \
+echo priest.des	..\util\levcomp.exe priest.des	 \
+echo ranger.des	..\util\levcomp.exe ranger.des	 \
+echo rogue.des	..\util\levcomp.exe rogue.des	 \
+echo samurai.des	..\util\levcomp.exe samurai.des	 \
+echo sokoban.des	..\util\levcomp.exe sokoban.des	 \
+echo tourist.des	..\util\levcomp.exe tourist.des	 \
+echo tower.des	..\util\levcomp.exe tower.des	 \
+echo valkyrie.des	..\util\levcomp.exe valkyrie.des	 \
+echo wizard .des	..\util\levcomp.exe wizard.des	 \
+echo yendor.des	..\util\levcomp.exe yendor.des	 \
+echo chdir ..\build	chdir ..\build
 # End Special Build Tool
 
 !ENDIF 
