@@ -1512,6 +1512,7 @@ dopois:
 		    pline_The("slime burns away!");
 		    dmg = 0;
 		} else if (Unchanging ||
+				noncorporeal(youmonst.data) ||
 				youmonst.data == &mons[PM_GREEN_SLIME]) {
 		    You("are unaffected.");
 		    dmg = 0;

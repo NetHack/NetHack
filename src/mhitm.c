@@ -1213,6 +1213,7 @@ mdamagem(magr, mdef, mattk)
 	    case AD_SLIM:
 		if (cancelled) break;	/* physical damage only */
 		if (!rn2(4) && !flaming(mdef->data) &&
+				!noncorporeal(mdef->data) &&
 				mdef->data != &mons[PM_GREEN_SLIME]) {
 		    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, vis);
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
