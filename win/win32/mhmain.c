@@ -188,6 +188,15 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			data->mapAcsiiModeSave = MAP_MODE_ASCII12x16;
 			SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 
+			/* update menu items */
+			CheckMenuItem(
+				GetMenu(hWnd),
+				IDM_SETTING_LOCKWINDOWS,
+				MF_BYCOMMAND | 
+				(GetNHApp()->bWindowsLocked? MF_CHECKED : MF_UNCHECKED)
+			);
+
+			/* store handle to the mane menu in the application record */
 			GetNHApp()->hMainWnd = hWnd;
 		break;
 

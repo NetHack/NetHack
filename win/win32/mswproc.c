@@ -2294,10 +2294,10 @@ mswin_write_reg()
 		NHSETREG_DWORD(TEXTRIGHT, GetNHApp()->rtTextWindow.right);
 		NHSETREG_DWORD(TEXTTOP, GetNHApp()->rtTextWindow.top);
 		NHSETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtTextWindow.bottom);
-		NHSETREG_DWORD(TEXTLEFT, GetNHApp()->rtInvenWindow.left);
-		NHSETREG_DWORD(TEXTRIGHT, GetNHApp()->rtInvenWindow.right);
-		NHSETREG_DWORD(TEXTTOP, GetNHApp()->rtInvenWindow.top);
-		NHSETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
+		NHSETREG_DWORD(INVENTLEFT, GetNHApp()->rtInvenWindow.left);
+		NHSETREG_DWORD(INVENTRIGHT, GetNHApp()->rtInvenWindow.right);
+		NHSETREG_DWORD(INVENTTOP, GetNHApp()->rtInvenWindow.top);
+		NHSETREG_DWORD(INVENTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
 #undef NHSETREG_DWORD
 
         RegCloseKey(key);

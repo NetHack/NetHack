@@ -212,6 +212,9 @@ LRESULT CALLBACK NHMessageWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
 		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
 		mswin_update_window_placement(NHW_MESSAGE, &rt);
+
+		/* redraw window - it does not handle incremental resizing too well */
+		InvalidateRect(hWnd, NULL, TRUE);
     } 
     break; 
 
