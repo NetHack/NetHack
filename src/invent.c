@@ -760,6 +760,7 @@ register const char *let,*word;
 	boolean usegold = FALSE;	/* can't use gold because its illegal */
 	boolean allowall = FALSE;
 	boolean allownone = FALSE;
+	boolean useboulder = FALSE;
 	xchar foox = 0;
 	long cnt;
 	boolean prezero = FALSE;
@@ -793,6 +794,11 @@ register const char *let,*word;
 	 */
 	if(allowall && !strcmp(word, "read")) allowall = FALSE;
 
+	/* another ugly check: show boulders (not statues) */
+	if(*let == WEAPON_CLASS &&
+	   !strcmp(word, "throw") && throws_rocks(youmonst.data))
+	    useboulder = TRUE;
+
 	if(allownone) *bp++ = '-';
 #ifndef GOLDOBJ
 	if(allowgold) *bp++ = def_oc_syms[COIN_CLASS];
@@ -811,6 +817,7 @@ register const char *let,*word;
 #ifdef GOLDOBJ
 		|| (usegold && otmp->invlet == GOLD_SYM)
 #endif
+		|| (useboulder && otmp->otyp == BOULDER)
 		) {
 		register int otyp = otmp->otyp;
 		bp[foo++] = otmp->invlet;
