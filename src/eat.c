@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2004/11/17	*/
+/*	SCCS Id: @(#)eat.c	3.5	2005/01/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -415,14 +415,23 @@ boolean message;
 	context.victual.fullwarn = context.victual.eating = context.victual.doreset = FALSE;
 }
 
+/* eating a corpse or egg of one's own species is usually naughty */
 STATIC_OVL boolean
 maybe_cannibal(pm, allowmsg)
 int pm;
 boolean allowmsg;
 {
-	if (!CANNIBAL_ALLOWED() && your_race(&mons[pm])) {
+	struct permonst *fptr = &mons[pm];	/* food type */
+
+	if (!CANNIBAL_ALLOWED() &&
+		/* non-cannibalistic heroes shouldn't eat own species ever
+		   and also shouldn't eat current species when polymorphed
+		   (even if having the form of something which doesn't care
+		   about cannibalism--hero's innate traits aren't altered) */
+		(your_race(fptr) ||
+		    (Upolyd && same_race(youmonst.data, fptr)))) {
 		if (allowmsg) {
-			if (Upolyd)
+			if (Upolyd && your_race(fptr))
 				You("have a bad feeling deep inside.");
 			You("cannibal!  You will regret this!");
 		}
