@@ -1445,7 +1445,7 @@ against %n."
 "Call upon %d when your need is greatest.  You will be answered."
 %E
 %Cp Mon 00032
-"Remember that use the elementals' strength against them!"
+"Remember to use the elementals' strength against them!"
 %E
 %Cp Mon 00033
 "Do not lose faith, %p.  If you do so, %n will grow stronger."
