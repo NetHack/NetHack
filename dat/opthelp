@@ -42,6 +42,8 @@ standout       use standout mode for --More-- on messages         [FALSE]
 time           display elapsed game time, in moves                [FALSE]
 tombstone      print tombstone when you die                       [TRUE]
 toptenwin      print topten in a window rather than stdout        [FALSE]
+travel         enable the command to travel to a map location via [TRUE]
+               a shortest-path algorithm, usually invoked by '_'.
 verbose        print more commentary during the game              [TRUE]
 
 
@@ -86,7 +88,7 @@ Compound options are written as option_name:option_value.
 
 Compound options which can be set during the game are:
 
-boulder       override the default boulder symbol with another default:`
+boulder       override the default boulder symbol with another default: [`]
 disclose      the types of information you want offered at the end of the
               game  [all]
 fruit         the name of a fruit you enjoy eating  [slime mold]
@@ -121,7 +123,7 @@ suppress_alert disable various version-specific warnings about changes
               in game play or the user interface, such as notification given
               for the 'Q' command that quitting is now done via #quit
               (e.g., use suppress_alert:3.3.1 to stop that and any other
-              notifications added in that version or earlier) default: (none)
+              notifications added in that version or earlier) default: [(none)]
 
 Compound options which may be set only on startup are:
 
@@ -166,8 +168,6 @@ gender     Your starting gender (gender:male or gender:female).
            still denote your gender using the "male" and "female"
            options, the "gender" option will take precedence.  [RANDOM]
 horsename  the name of your first horse  [NONE]
-lootabc    Use the old `a', `b', and `c' keyboard shortcuts when looting, 
-           rather than the mnemonics `o', `i', and `b'.
 menu_*     create single character accelerators for menu commands.  Below
            is a list of all commands.  Each is followed by a list of window-
            ports that implement them:  'x' is X11, 't' is tty, 'g' is Gem,
@@ -201,9 +201,6 @@ role       Your starting role (e.g., role:Barbarian, role:Valk).
            as possible.  You can also still denote your role by
            appending it to the "name" option (e.g., name:Vic-V), but the
            "role" option will take precedence.  [RANDOM]
-showrace   Display yourself as the glyph for your race, rather than the glyph
-           for your role.  Note that this setting affects only the appearance 
-           of the display, not the way the game treats you.
 traps      like dungeon, but for trap symbols
            arrow_trap dart_trap falling_rock_trap squeaky_board
            bear_trap land_mine rolling_boulder_trap sleeping_gas_trap
@@ -211,8 +208,6 @@ traps      like dungeon, but for trap symbols
            teleportation_trap level_teleporter magic_portal web statue_trap
            magic_trap anti_magic_trap polymorph_trap
            default:  ^^^^^^^^^^^^^^^^^"^^^^
-travel     enable/disable the command to travel to a map location via a 
-           shortest-path algorithm, usually invoked by '_'.  
 
 windowtype windowing system to be used  [depends on operating system]
 
