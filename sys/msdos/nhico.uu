@@ -1,0 +1,25 @@
+section 1 of uuencode 4.13 of file NETHACK.ICO    by R.E.M.
+
+begin 644 NETHACK.ICO
+M```!``$`("`0``````#H`@``%@```"@````@````0`````$`!```````@`(`.
+M``````````````````````````````"```"`````@(``@````(``@`"`@```6
+M@("``,#`P````/\``/\```#__P#_````_P#_`/__``#___\`]F9F9F9F9F9F*
+M9F9F9F9F9O]F9F9F9F9F9F9F9F9F9F;_B(B(B(B(B(B(B(B(B&9F_XB(B(B(D
+MB(B(B(B(B(AF9O^(B(B(A555B(B(B(B(9F;_B(B(B`!5!8B(B(B(B&9F_XB('
+MB(@```6(B(B(B(AF9O^(B%554`!56(B(B(B(9F;_B(N[N[`.XU6(B(B(B&9F[
+M_XB[N[L`ONXU6(B(B(AF9O^+N[N[N[ONXUB(B(B(9F;_B[N[N[N[ONY3B(B(N
+MB&9F_XN[NYF9F[ONXSB(B(AF9O^+N[F9F9F[ONXSB(B(9F;_B[N9F9F9F[ON?
+MXSB(B&9F_XNYF9F9F9F[7NXSB(AF9O^+N9F9F9F9NUCNXSB(9F;_B[F9F9F9J
+MF;M8CNXSB&9F_XNYF9F9F9F[6(CNXXAF9O^+N9F9F9F9NUB(CNZ(9F;_B[N9]
+MF9F9F[M8B(CNB&9F_XN[N9F9F;N[6(B(B(AF9O^+N[N9F9N[NUB(B(B(9F;_R
+MB[N[N[N[N[M8B(B(B&9F_XN[N[N[N[N[B(B(B(AF9O^+NXB(B(B+NXB(B(B(F
+M9F;_B[B(B(B(B+N(B(B(B&9F_XB(B(B(B(B(B(B(B(AF9O^(B(B(B(B(B(B(J
+MB(B(9F;_B(B(B(B(B(B(B(B(B&9F___________________V9O__________%
+M__________\`````````````````````````````````````````````````R
+M`````````````````````````````````````````````````````````````
+M`````````````````````````````````````````````````````````````
+!`````
+``
+end
+sum -r/size 23881/1107 section (from "begin" to "end")
+sum -r/size 55184/766 entire input file
