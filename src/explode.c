@@ -314,7 +314,8 @@ int expltype;
 		if (Invulnerable) {
 		    damu = 0;
 		    You("are unharmed!");
-		}
+		} else if (Half_physical_damage && adtyp == AD_PHYS)
+		    damu = (damu+1) / 2;
 		if (adtyp == AD_FIRE) (void) burnarmor(&youmonst);
 		destroy_item(SCROLL_CLASS, (int) adtyp);
 		destroy_item(SPBOOK_CLASS, (int) adtyp);

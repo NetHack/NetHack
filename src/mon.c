@@ -1419,13 +1419,13 @@ boolean was_swallowed;			/* digestion */
 	    	else if(mdat->mattk[i].damd)
 	    	    tmp = d((int)mdat->mlevel+1, (int)mdat->mattk[i].damd);
 	    	else tmp = 0;
-		if (Half_physical_damage) tmp = (tmp+1) / 2;
 		if (was_swallowed && magr) {
 		    if (magr == &youmonst) {
 			There("is an explosion in your %s!",
 			      body_part(STOMACH));
 			Sprintf(killer_buf, "%s explosion",
 				s_suffix(mdat->mname));
+			if (Half_physical_damage) tmp = (tmp+1) / 2;
 			losehp(tmp, killer_buf, KILLED_BY_AN);
 		    } else {
 			if (flags.soundok) You_hear("an explosion.");
