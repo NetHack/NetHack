@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2003/10/25	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2003/12/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,7 +49,7 @@
 /*****************************************************************************/
 /* Version 3.4.x */
 
-/*  Patch 3, November 30, 2003
+/*  Patch 3, December 5, 2003
  *  Several dozen general bug fixes
  *  Correct several inconsistencies
  *  Handle level completely filled with monsters better
@@ -57,6 +57,7 @@
  *  win32gui player selection fixes
  *  X11 player selection fixes, one of which could be fatal
  *  Eliminated a gold-in-shop-container cheat
+ *  Include bones file version compatibility info in options file
  *  Synchronize save files and compression algorithms among various Mac ports
  */
 
