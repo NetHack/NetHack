@@ -1,0 +1,402 @@
+.TH DGN_COMP 6 "12 Dec 1995"
+.UC 4
+.SH NAME
+dgn_comp \- NetHack dungeon compiler
+.SH SYNOPSIS
+.B dgn_comp
+[
+.I file
+]
+.PP
+If no arguments are given, it reads standard input.
+.SH DESCRIPTION
+.PP
+.I Dgn_comp
+is a dungeon compiler for NetHack version 3.2 and higher.  It
+takes a description file as an argument and produces a dungeon "script" 
+that is to be loaded by NetHack at runtime.
+.PP
+The purpose of this tool is to provide NetHack administrators and
+implementors with a convenient way to create a custom dungeon for the
+game, without having to recompile the entire world.
+.SH GRAMMAR
+.PP
+DUNGEON: 
+.B name
+.B bonesmarker
+(
+.B base
+,
+.B rand
+) [
+.B %age
+]
+.PP
+where
+.B name
+is the dungeon name,
+.B bonesmarker
+is a letter for marking bones files, (
+.B base
+, 
+.B rand
+) is the number of levels, and
+.B %age
+is its percentage chance of being generated (if absent, 100% chance).
+
+DESCRIPTION:
+.B tag
+.PP
+where
+.B tag
+is currently one of
+.BR HELLISH ,
+.BR MAZELIKE ,
+or
+.BR ROGUELIKE .
+
+ALIGNMENT | LEVALIGN: [
+.B lawful
+|
+.B neutral
+|
+.B chaotic
+|
+.B unaligned
+]
+.PP
+gives the alignment of the dungeon/level (default is unaligned).
+
+ENTRY:
+.B level
+.PP
+the dungeon entry point.  The dungeon connection attaches at this
+level of the given dungeon.
+If the value of
+.B level
+is negative, the entry level is calculated from the bottom of the
+dungeon, with -1 being the last level.
+If this line is not present in a dungeon description, the entry level
+defaults to 1.
+
+PROTOFILE:
+.B name
+.PP
+the prototypical name for dungeon level files in this dungeon.
+For example, the PROTOFILE name for the dungeon
+.I Vlad's Tower
+is
+.IR tower .
+
+LEVEL:
+.B name
+.B bonesmarker
+@ (
+.B base
+,
+.B rand
+) [
+.B %age
+]
+.PP
+where
+.B name
+is the level name,
+.B bonesmarker
+is a letter for marking bones files, (
+.B base
+, 
+.B rand
+) is the location and
+.B %age
+is the generation percentage, as above.
+
+RNDLEVEL:
+.B name
+.B bonesmarker
+@ (
+.B base
+,
+.B rand
+)
+[
+.B %age
+]
+.B rndlevs
+.PP
+where
+.B name
+is the level name,
+.B bonesmarker
+is a letter for marking bones files, (
+.B base
+, 
+.B rand
+) is the location,
+.B %age
+is the generation percentage, as above, and
+.B rndlevs
+is the number of similar levels available to choose from.
+
+CHAINLEVEL:
+.B name
+.B bonesmarker
+.B prev_name
++ (
+.B base
+,
+.B rand
+) [
+.B %age
+]
+.PP
+where
+.B name
+is the level name,
+.B bonesmarker
+is a letter for marking bones files,
+.B prev_name
+is the name of a level defined previously, (
+.B base
+,
+.B rand
+) is the
+.I offset
+from the level being chained from, and
+.B %age
+is the generation percentage.
+
+RNDCHAINLEVEL:
+.B name
+.B bonesmarker
+.B prev_name
++ (
+.B base
+,
+.B rand
+) [
+.B %age
+]
+.B rndlevs
+.PP
+where
+.B name
+is the level name,
+.B bonesmarker
+is a letter for marking bones files,
+.B prev_name
+is the name of a level defined previously, (
+.B base
+,
+.B rand
+) is the
+.I offset
+from the level being chained from,
+.B %age
+is the generation percentage, and
+.B rndlevs
+is the number of similar levels available to choose from.
+
+LEVELDESC:
+.B type
+.PP
+where
+.B type
+is the level type, (see DESCRIPTION, above). The
+.B type
+is used to override any pre-set value used to describe the entire dungeon,
+for this level only.
+
+BRANCH:
+.B name
+@ (
+.B base
+,
+.B rand
+) [
+.B stair
+|
+.B no_up
+|
+.B no_down
+|
+.B portal
+] [
+.B up
+|
+.B down
+]
+.PP
+where
+.B name
+is the name of the dungeon to branch to, and (
+.B base
+,
+.B rand
+) is the location of the branch.
+The last two optional arguments are
+the branch type and branch direction.
+The type of a branch can be a two-way stair connection,
+a one-way stair connection, or a magic portal.
+A one-way stair is described by the types
+.B no_up
+and
+.B no_down
+which specify which stair direction is missing.
+The default branch type is
+.BR stair .
+The direction for a stair can be either up or down; direction is not
+applicable to portals.  The default direction is
+.BR down .
+
+CHAINBRANCH:
+.B name
+.B prev_name
++ (
+.B base
+,
+.B rand
+) [
+.B stair
+|
+.B no_up
+|
+.B no_down
+|
+.B portal
+] [
+.B up
+|
+.B down
+]
+.PP
+where
+.B name
+is the name of the dungeon to branch to,
+.B prev_name
+is the name of a previously defined
+.B level
+and (
+.B base
+,
+.B rand
+) is the
+.I offset
+from the level being chained from.
+The optional branch type and direction are the same as described above.
+.SH GENERIC RULES
+.PP
+Each dungeon must have a unique
+.B bonesmarker ,
+and each special level must have a
+.B bonesmarker
+unique within its dungeon (letters may be reused in different dungeons).
+If the
+.B bonesmarker
+has the special value "none", no bones files will be created for that
+level or dungeon.
+.PP
+The value
+.B base
+may be in the range of 1 to
+.B MAXLEVEL
+(as defined in
+.I global.h
+).
+.PP
+The value
+.B rand
+may be in the range of -1 to
+.BR MAXLEVEL .
+.PP
+If
+.B rand
+is -1 it will be replaced with the value (num_dunlevs(dungeon) - base)
+during the load process (ie. from here to the end of the dungeon).
+.PP
+If
+.B rand
+is 0 the level is located absolutely at
+.BR base .
+.PP
+Branches don't have a probability.  Dungeons do.  If a dungeon fails
+to be generated during load, all its levels and branches are skipped.
+.PP
+No level or branch may be chained from a level with a percentage generation
+probability.  This is to prevent non-resolution during the load.
+In addition, no branch may be made from a dungeon with a percentage
+generation probability for the same reason.
+.PP
+As a general rule using the dungeon compiler:
+.PP
+If a dungeon has a
+.B protofile
+name associated with it
+.RI ( eg.
+.BR tower )
+that file will be used.
+.PP
+If a special level is present, it will override the above rule and
+the appropriate file will be loaded.
+.PP
+If neither of the above are present, the standard generator will
+take over and make a "normal" level.
+.PP
+A level alignment, if present, will override
+the alignment of the dungeon that it exists within.
+.SH EXAMPLE
+.PP
+Here is the current syntax of the dungeon compiler's "language":
+
+.LP
+.nf
+.ta +8n +8n +8n
+#
+#	The dungeon description file for the "standard" original
+#	3.0 NetHack.
+#
+DUNGEON:	"The Dungeons of Doom" "D" (25, 5)
+LEVEL:		"rogue" "none" @ (15, 4)
+LEVEL:		"oracle" "none" @ (5, 7)
+LEVEL:		"bigroom" "B" @ (12, 3) 15
+LEVEL:		"medusa" "none" @ (20, 5)
+CHAINLEVEL:	"castle" "medusa" + (1, 4)
+CHAINBRANCH:	"Hell" "castle" + (0, 0) no_down
+BRANCH:		"The Astral Plane" @ (1, 0) no_down up
+
+DUNGEON:	"Hell" "H" (25, 5)
+DESCRIPTION:	mazelike
+DESCRIPTION:	hellish
+BRANCH:		"Vlad's Tower" @ (13, 5) up
+LEVEL:		"wizard" "none" @ (15, 10)
+LEVEL:		"fakewiz" "A" @ (5, 5)
+LEVEL:		"fakewiz" "B" @ (10, 5)
+LEVEL:		"fakewiz" "C" @ (15, 5)
+LEVEL:		"fakewiz" "D" @ (20, 5)
+LEVEL:		"fakewiz" "E" @ (25, 5)
+
+DUNGEON:	"Vlad's Tower" "T" (3, 0)
+PROTOFILE:	"tower"
+DESCRIPTION:	mazelike
+ENTRY:		-1
+
+DUNGEON:	"The Astral Plane" "A" (1, 0)
+DESCRIPTION:	mazelike
+PROTOFILE:	"endgame"
+.fi
+.PP
+.I NOTES:
+.br
+Lines beginning with '#' are considered comments.
+.br
+A special level must be explicitly aligned.  The alignment of the dungeon
+it is in only applies to non-special levels within that dungeon.
+.SH AUTHOR
+.PP
+M. Stephenson (from the level compiler by Jean-Christophe Collet).
+.SH "SEE ALSO"
+.PP
+lev_comp(6), nethack(6)
+.SH BUGS
+.PP
+Probably infinite.
