@@ -779,9 +779,12 @@ unsigned trflags;
 	    case RUST_TRAP:
 		seetrap(trap);
 		if (u.umonnum == PM_IRON_GOLEM) {
+		    int dam = u.mhmax;
+
 		    pline("%s you!", A_gush_of_water_hits);
 		    You("are covered with rust!");
-		    rehumanize();
+		    if (Half_physical_damage) dam = (dam+1) / 2;
+		    losehp(dam, "rusting away", KILLED_BY);
 		    break;
 		} else if (u.umonnum == PM_GREMLIN && rn2(3)) {
 		    pline("%s you!", A_gush_of_water_hits);
