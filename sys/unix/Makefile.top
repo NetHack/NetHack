@@ -41,8 +41,8 @@ SHELLDIR = $(PREFIX)/games
 
 # per discussion in Install.X11 and Install.Qt
 VARDATND = 
-# VARDATND = x11tiles pet_mark.xbm
-# VARDATND = x11tiles pet_mark.xbm rip.xpm
+# VARDATND = x11tiles NetHack.ad pet_mark.xbm
+# VARDATND = x11tiles NetHack.ad pet_mark.xbm rip.xpm
 # for Atari/Gem
 # VARDATND = nh16.img title.img GEM_RSC.RSC rip.img
 # for BeOS
@@ -134,6 +134,9 @@ x11tiles: $(GAME)
 beostiles: $(GAME)
 	( cd util ; $(MAKE) tile2beos )
 	( cd dat ; $(MAKE) beostiles )
+
+NetHack.ad: $(GAME)
+	( cd dat ; $(MAKE) NetHack.ad )
 
 pet_mark.xbm:
 	( cd dat ; $(MAKE) pet_mark.xbm )

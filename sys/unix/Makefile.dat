@@ -41,6 +41,9 @@ nhtiles.bmp: ../util/tile2bmp ../win/share/monsters.txt ../win/share/objects.txt
 				../win/share/other.txt
 	../util/tile2bmp $@
 
+NetHack.ad: ../win/X11/NetHack.ad
+	cp ../win/X11/NetHack.ad NetHack.ad
+
 pet_mark.xbm: ../win/X11/pet_mark.xbm
 	cp ../win/X11/pet_mark.xbm pet_mark.xbm
 
@@ -138,4 +141,4 @@ dungeon: dungeon.def ../util/makedefs ../util/dgn_comp
 spotless:
 	-rm -f spec_levs quest_levs *.lev $(VARDAT) dungeon dungeon.pdf
 	-rm -f nhdat x11tiles beostiles pet_mark.xbm rip.xpm mapbg.xpm
-	-rm -f rip.img GEM_RSC.RSC title.img nh16.img
+	-rm -f rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad

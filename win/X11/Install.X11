@@ -109,14 +109,10 @@ prepend an appropriate -I<idirectory> parameter to CFLAGS and a
 find the include and library files for X11.
 
 
-Finally, you should also install the NetHack.ad file as NetHack in the
-normal X11 applications defaults directory.  Alternatively, each person may
-append the contents of this file to their .Xdefaults or .Xresources file,
-depending on how your system is configured and the version of X11 you are
-using.  A second alternative is copy NetHack.ad to NetHack in GAMEDIR
-(from the top Makefile) and add a line to nethack.sh specifying this
-additional applications defaults directory:
-	XAPPLRESDIR=$HACKDIR; export XAPPLRESDIR
+Finally, to ensure NetHack's windows look the way they were intended to
+look, make sure the top Makefile VARDATND also contains NetHack.ad.  If it
+does, running nethack will automatically take the appropriate steps to
+cause this file to be used to initialize NetHack's X11 resources.
 
 
 Three icon suggestions to the window manager are supported:  nh72, nh56,

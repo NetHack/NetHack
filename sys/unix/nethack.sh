@@ -6,6 +6,15 @@ export HACKDIR
 HACK=$HACKDIR/nethack
 MAXNROFPLAYERS=4
 
+# Since Nethack.ad is installed in HACKDIR, add it to XUSERFILESEARCHPATH
+case "x$XUSERFILESEARCHPATH" in
+x)	XUSERFILESEARCHPATH="$HACKDIR/%N.ad"
+	;;
+*)	XUSERFILESEARCHPATH="$XUSERFILESEARCHPATH:$HACKDIR/%N.ad"
+	;;
+esac
+export XUSERFILESEARCHPATH
+
 # see if we can find the full path name of PAGER, so help files work properly
 # assume that if someone sets up a special variable (HACKPAGER) for NetHack,
 # it will already be in a form acceptable to NetHack

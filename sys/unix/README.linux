@@ -38,10 +38,11 @@ it to your home directory as .nethackrc and modifying it to your liking.
 If you are running X11 copy the nh10.pcf and ibm.pcf font files from
 /usr/games/lib/nethackdir to a X11 fonts directory (such as
 /usr/X11/lib/X11/fonts/misc) and run "mkfontdir", then restart X
-windows to load them.  Also consider copying NetHack.ad to
-/usr/X11/lib/X11/app-defaults/NetHack or adding its contents to your
-.Xdefaults or .Xresources.
-
+windows to load them.  If you prefer to use the graphical tiles,
+add the following to your .Xdefaults or .Xresources file:
+	NetHack.tile_file: x11tiles
+You may need to run "xrdb -merge $HOME/.Xdefaults" (or .Xresources) after
+doing this.
 
 The official Linux binary is set up to run setgid games, which allows
 multiple users on your system to play the game and prevents cheating by
