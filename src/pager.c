@@ -443,7 +443,7 @@ do_look(quick)
     boolean from_screen;	/* question from the screen */
     boolean need_to_look;	/* need to get explan. from glyph */
     boolean hit_trap;		/* true if found trap explanation */
-    int skipped_venom = 0;	/* non-zero if we ignored "splash of venom" */
+    int skipped_venom;		/* non-zero if we ignored "splash of venom" */
     static const char *mon_interior = "the interior of a monster";
 
     if (quick) {
@@ -480,6 +480,7 @@ do_look(quick)
 	/* Reset some variables. */
 	need_to_look = FALSE;
 	pm = (struct permonst *)0;
+	skipped_venom = 0;
 	found = 0;
 	out_str[0] = '\0';
 
