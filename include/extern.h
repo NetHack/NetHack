@@ -2287,6 +2287,7 @@ E struct obj *FDECL(which_armor, (struct monst *,long));
 E void FDECL(mon_break_armor, (struct monst *,BOOLEAN_P));
 E void FDECL(bypass_obj, (struct obj *));
 E void NDECL(clear_bypasses);
+E int FDECL(racial_exception, (struct monst *, struct obj *));
 
 /* ### write.c ### */
 

@@ -5,7 +5,7 @@
 #include "hack.h"
 
 STATIC_DCL void FDECL(m_lose_armor, (struct monst *,struct obj *));
-STATIC_DCL void FDECL(m_dowear_type, (struct monst *,long,BOOLEAN_P));
+STATIC_DCL void FDECL(m_dowear_type, (struct monst *,long, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL int FDECL(extra_pref, (struct monst *, struct obj *));
 
 const struct worn {
@@ -360,6 +360,7 @@ m_dowear(mon, creation)
 register struct monst *mon;
 boolean creation;
 {
+#define RACE_EXCEPTION TRUE
 	/* Note the restrictions here are the same as in dowear in do_wear.c
 	 * except for the additional restriction on intelligence.  (Players
 	 * are always intelligent, even if polymorphed).
@@ -372,31 +373,34 @@ boolean creation;
 	    (mon->data->mlet != S_MUMMY && mon->data != &mons[PM_SKELETON])))
 		return;
 
-	m_dowear_type(mon, W_AMUL, creation);
+	m_dowear_type(mon, W_AMUL, creation, FALSE);
 #ifdef TOURIST
 	/* can't put on shirt if already wearing suit */
 	if (!cantweararm(mon->data) || (mon->misc_worn_check & W_ARM))
-	    m_dowear_type(mon, W_ARMU, creation);
+	    m_dowear_type(mon, W_ARMU, creation, FALSE);
 #endif
 	/* treating small as a special case allows
 	   hobbits, gnomes, and kobolds to wear cloaks */
 	if (!cantweararm(mon->data) || mon->data->msize == MZ_SMALL)
-	    m_dowear_type(mon, W_ARMC, creation);
-	m_dowear_type(mon, W_ARMH, creation);
+	    m_dowear_type(mon, W_ARMC, creation, FALSE);
+	m_dowear_type(mon, W_ARMH, creation, FALSE);
 	if (!MON_WEP(mon) || !bimanual(MON_WEP(mon)))
-	    m_dowear_type(mon, W_ARMS, creation);
-	m_dowear_type(mon, W_ARMG, creation);
+	    m_dowear_type(mon, W_ARMS, creation, FALSE);
+	m_dowear_type(mon, W_ARMG, creation, FALSE);
 	if (!slithy(mon->data) && mon->data->mlet != S_CENTAUR)
-	    m_dowear_type(mon, W_ARMF, creation);
+	    m_dowear_type(mon, W_ARMF, creation, FALSE);
 	if (!cantweararm(mon->data))
-	    m_dowear_type(mon, W_ARM, creation);
+	    m_dowear_type(mon, W_ARM, creation, FALSE);
+	else
+	    m_dowear_type(mon, W_ARM, creation, RACE_EXCEPTION);
 }
 
 STATIC_OVL void
-m_dowear_type(mon, flag, creation)
+m_dowear_type(mon, flag, creation, racialexception)
 struct monst *mon;
 long flag;
 boolean creation;
+boolean racialexception;
 {
 	struct obj *old, *best, *obj;
 	int m_delay = 0;
@@ -439,6 +443,7 @@ boolean creation;
 		    break;
 		case W_ARM:
 		    if (!is_suit(obj)) continue;
+		    if (racialexception && (racial_exception(mon, obj) < 1)) continue;
 		    break;
 	    }
 	    if (obj->owornmask) continue;
@@ -491,6 +496,7 @@ outer_break:
 	best->owornmask |= flag;
 	update_mon_intrinsics(mon, best, TRUE, creation);
 }
+#undef RACE_EXCEPTION
 
 struct obj *
 which_armor(mon, flag)
@@ -740,6 +746,34 @@ struct obj *obj;
 	if (obj->otyp == SPEED_BOOTS && mon->permspeed != MFAST)
 	    return 20;
     }
+    return 0;
+}
+
+/*
+ * Exceptions to things based on race. Correctly checks polymorphed player race.
+ * Returns:
+ *	 0 No exception, normal rules apply.
+ * 	 1 If the race/object combination is acceptable.
+ *	-1 If the race/object combination is unacceptable.
+ */
+int
+racial_exception(mon, obj)
+struct monst *mon;
+struct obj *obj;
+{
+    struct permonst *ptr;
+
+    if (mon == &youmonst && !Upolyd) ptr = &mons[urace.malenum];
+    else ptr = mon->data;
+
+    /* Acceptable Exceptions: */
+    /* Allow hobbits to wear elven armor - LoTR */
+    if (ptr == &mons[PM_HOBBIT] && is_elven_armor(obj))
+	return 1;
+    /* Unacceptable Exceptions: */
+    /* Checks for object that certain races should never use go here */
+    /*	return -1; */
+
     return 0;
 }
 /*worn.c*/

@@ -1177,7 +1177,8 @@ boolean noisy;
 	    is_suit(otmp) ? c_suit : 0;
     if (which && cantweararm(youmonst.data) &&
 	    /* same exception for cloaks as used in m_dowear() */
-	    (which != c_cloak || youmonst.data->msize != MZ_SMALL)) {
+	    (which != c_cloak || youmonst.data->msize != MZ_SMALL) &&
+	    (racial_exception(&youmonst, otmp) < 1)) {
 	if (noisy) pline_The("%s will not fit on your body.", which);
 	return 0;
     } else if (otmp->owornmask & W_ARMOR) {

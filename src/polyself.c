@@ -590,7 +590,7 @@ break_armor()
 	}
 #endif
     } else if (sliparm(youmonst.data)) {
-	if ((otmp = uarm) != 0) {
+	if (((otmp = uarm) != 0) && (racial_exception(&youmonst, otmp) < 1)) {
 		if (donning(otmp)) cancel_don();
 		Your("armor falls around you!");
 		(void) Armor_gone();

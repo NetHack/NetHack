@@ -17,13 +17,6 @@
 
 #ifdef OVLB
 
-/* elven armor vibrates warningly when enchanted beyond a limit */
-#define is_elven_armor(optr)	((optr)->otyp == ELVEN_LEATHER_HELM\
-				|| (optr)->otyp == ELVEN_MITHRIL_COAT\
-				|| (optr)->otyp == ELVEN_CLOAK\
-				|| (optr)->otyp == ELVEN_SHIELD\
-				|| (optr)->otyp == ELVEN_BOOTS)
-
 boolean	known;
 
 static NEARDATA const char readable[] =
@@ -711,6 +704,7 @@ register struct obj	*sobj;
 			}
 			break;
 		}
+		/* elven armor vibrates warningly when enchanted beyond a limit */
 		special_armor = is_elven_armor(otmp) ||
 			(Role_if(PM_WIZARD) && otmp->otyp == CORNUTHAUM);
 		if (sobj->cursed)
