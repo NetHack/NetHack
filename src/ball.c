@@ -390,9 +390,9 @@ boolean *cause_delay;
 /* Don't ever move the chain into solid rock.  If we have to, then instead
  * undo the move_bc() and jump to the drag ball code.
  */
-#define SKIP_TO_DRAG do { *chainx = oldchainx; *chainy = oldchainy; \
+#define SKIP_TO_DRAG { *chainx = oldchainx; *chainy = oldchainy; \
     move_bc(0, *bc_control, *ballx, *bally, *chainx, *chainy); \
-    goto drag; } while(0)
+    goto drag; } 
 	    switch(dist2(x, y, uball->ox, uball->oy)) {
 		/* two spaces diagonal from ball, move chain inbetween */
 		case 8:
