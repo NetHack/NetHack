@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)priest.c	3.4	2001/11/07	*/
+/*	SCCS Id: @(#)priest.c	3.4	2002/11/06	*/
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -338,13 +338,20 @@ register int roomno;
 			   (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
 		can_speak = (priest->mcanmove && !priest->msleeping &&
 			     flags.soundok);
-		if (can_speak)
+		if (can_speak) {
+		    unsigned save_priest = priest->ispriest;
+		    /* don't reveal the altar's owner upon temple entry in
+		       the endgame; for the Sanctum, the next message names
+		       Moloch so suppress the "of Moloch" for him here too */
+		    if (sanctum && !Hallucination) priest->ispriest = 0;
 		    pline("%s intones:",
-			  (!Blind ? Monnam(priest) : "A nearby voice"));
+			canseemon(priest) ? Monnam(priest) : "A nearby voice");
+		    priest->ispriest = save_priest;
+		}
 		msg2 = 0;
 		if(sanctum && Is_sanctum(&u.uz)) {
 		    if(priest->mpeaceful) {
-			msg1 = "Infidel, you entered Moloch's Sanctum!";
+			msg1 = "Infidel, you have entered Moloch's Sanctum!";
 			msg2 = "Be gone!";
 			priest->mpeaceful = 0;
 			set_malign(priest);
