@@ -61,6 +61,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	_nethack_app.mapDisplayMode = NHMAP_VIEW_TILES;
 	_nethack_app.winStatusAlign = NHWND_ALIGN_BOTTOM;
 	_nethack_app.winMessageAlign = NHWND_ALIGN_TOP;
+	_nethack_app.mapCliparoundMargin = DEF_CLIPAROUND_MARGIN;
 
 	// init controls
 	ZeroMemory(&InitCtrls, sizeof(InitCtrls));
@@ -190,6 +191,13 @@ int set_win32_option( const char * name, const char * val)
 			}
 		}
 		return 0;
+	} else if( _stricmp(name, "win32_map_cliparound_margin")==0 ) {
+		int tmp = atoi(val);
+		/* Alex, this range should be revisited and groundtruthed */
+		if( tmp >= DEF_CLIPAROUND_MARGIN && tmp < COLNO/2) {
+			GetNHApp()->mapCliparoundMargin = tmp;
+			return 1;
+		}
 	}
 	return 0;
 }

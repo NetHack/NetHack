@@ -1787,6 +1787,20 @@ goodfruit:
 			badoption(opts);
 		return;
 	}
+	/* win32_map_cliparound_margin:nn */
+	fullname = "win32_map_cliparound_margin";
+	if (match_optname(opts, fullname, sizeof("win32_map_cliparound_margin")-1, TRUE)) {
+		if (negated) {
+			bad_negation(fullname, FALSE);
+			return;
+		}
+		else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+			return;
+		}
+		if (!set_win32_option(fullname, opts))
+			badoption(opts);
+		return;
+	}
 #endif /* MSWIN_GRAPHICS */
 
 	fullname = "windowtype";

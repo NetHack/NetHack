@@ -50,6 +50,7 @@ typedef struct mswin_nhwindow_app {
 
 	int			mapDisplayMode;		/* regular map display mode */
 	int			mapDisplayModeSave;	/* saved map display mode */
+	int			mapCliparoundMargin;	/* when to scroll display */
 
 	int			winStatusAlign;		/* alignment of the status window */
 	int			winMessageAlign;	/* alignment of the status window */

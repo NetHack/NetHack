@@ -11,7 +11,6 @@
 
 #define NHMAP_FONT_NAME TEXT("Terminal")
 #define MAXWINDOWTEXT 255
-#define CLIPAROUND_MARGIN  5
 
 extern short glyph2tile[];
 
@@ -384,37 +383,38 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		PMSNHMsgClipAround msg_data = (PMSNHMsgClipAround)lParam;
 		int x, y;
 		BOOL scroll_x, scroll_y;
+		int mcam = GetNHApp()->mapCliparoundMargin;
 
 		/* calculate if you should clip around */
 		scroll_x =  
 			!GetNHApp()->bNoHScroll &&
-			( msg_data->x<(data->xPos+CLIPAROUND_MARGIN) ||
-			  msg_data->x>(data->xPos+data->xPageSize-CLIPAROUND_MARGIN) );
+			( msg_data->x<(data->xPos+mcam) ||
+			  msg_data->x>(data->xPos+data->xPageSize-mcam) );
 		scroll_y =  
 			!GetNHApp()->bNoVScroll &&
-			( msg_data->y<(data->yPos+CLIPAROUND_MARGIN) ||
-			  msg_data->y>(data->yPos+data->yPageSize-CLIPAROUND_MARGIN) );
+			( msg_data->y<(data->yPos+mcam) ||
+			  msg_data->y>(data->yPos+data->yPageSize-mcam) );
 		
 		/* get page size and center horizontally on x-position */
 		if( scroll_x ) {
-			if( data->xPageSize<=2*CLIPAROUND_MARGIN ) {
+			if( data->xPageSize<=2*mcam ) {
 				x = max(0, min(COLNO, msg_data->x - data->xPageSize/2));
 			} else if( msg_data->x < data->xPos+data->xPageSize/2 ) {
-				x = max(0, min(COLNO, msg_data->x - CLIPAROUND_MARGIN));
+				x = max(0, min(COLNO, msg_data->x - mcam));
 			} else {
-				x = max(0, min(COLNO, msg_data->x - data->xPageSize + CLIPAROUND_MARGIN));
+				x = max(0, min(COLNO, msg_data->x - data->xPageSize + mcam));
 			}
 			SendMessage( hWnd, WM_HSCROLL, (WPARAM)MAKELONG(SB_THUMBTRACK, x), (LPARAM)NULL	);
 		}
 
 		/* get page size and center vertically on y-position */
 		if( scroll_y ) {
-			if( data->yPageSize<=2*CLIPAROUND_MARGIN ) {
+			if( data->yPageSize<=2*mcam ) {
 				y = max(0, min(ROWNO, msg_data->y - data->yPageSize/2));
 			} else if( msg_data->y < data->yPos+data->yPageSize/2 ) {
-				y = max(0, min(ROWNO, msg_data->y - CLIPAROUND_MARGIN));
+				y = max(0, min(ROWNO, msg_data->y - mcam));
 			} else {
-				y = max(0, min(ROWNO, msg_data->y - data->yPageSize + CLIPAROUND_MARGIN));
+				y = max(0, min(ROWNO, msg_data->y - data->yPageSize + mcam));
 			}
 			SendMessage( hWnd, WM_VSCROLL, (WPARAM)MAKELONG(SB_THUMBTRACK, y), (LPARAM)NULL );
 		}

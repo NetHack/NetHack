@@ -28,4 +28,6 @@ int mswin_map_mode(HWND hWnd, int mode);
 
 #define ROGUE_LEVEL_MAP_MODE		NHMAP_VIEW_ASCII12x16	
 
+#define DEF_CLIPAROUND_MARGIN  5
+
 #endif /* MSWINMapWindow_h */
