@@ -1,11 +1,13 @@
-/*	SCCS Id: @(#)pray.c	3.4	2002/09/09	*/
+/*	SCCS Id: @(#)pray.c	3.4	2002/10/06	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "epri.h"
+#include "artifact.h"
 
 STATIC_PTR int NDECL(prayer_done);
+STATIC_DCL struct obj *NDECL(worst_cursed_item);
 STATIC_DCL int NDECL(in_trouble);
 STATIC_DCL void FDECL(fix_worst_trouble,(int));
 STATIC_DCL void FDECL(angrygods,(ALIGNTYP_P));
@@ -22,6 +24,9 @@ STATIC_DCL void FDECL(gods_upset,(ALIGNTYP_P));
 STATIC_DCL void FDECL(consume_offering,(struct obj *));
 STATIC_DCL boolean FDECL(water_prayer,(BOOLEAN_P));
 STATIC_DCL boolean FDECL(blocked_boulder,(int,int));
+
+/* simplify a few tests */
+#define Cursed_obj(obj,typ) ((obj) && (obj)->otyp == (typ) && (obj)->cursed)
 
 /*
  * Logic behind deities and altars and such:
@@ -59,6 +64,13 @@ static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
 #define FERVENT 9
 #define STRIDENT 4
 
+/*
+ * The actual trouble priority is determined by the order of the
+ * checks performed in in_trouble() rather than by these numeric
+ * values, so keep that code and these values synchronized in
+ * order to have the values be meaningful.
+ */
+
 #define TROUBLE_STONED 12
 #define TROUBLE_SLIMED 11
 #define TROUBLE_STRANGLED 10
@@ -69,18 +81,20 @@ static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
 #define TROUBLE_LYCANTHROPE 5
 #define TROUBLE_COLLAPSING 4
 #define TROUBLE_STUCK_IN_WALL 3
-#define TROUBLE_CURSED_BLINDFOLD 2
-#define TROUBLE_CURSED_LEVITATION 1
+#define TROUBLE_CURSED_LEVITATION 2
+#define TROUBLE_CURSED_BLINDFOLD 1
 
 #define TROUBLE_PUNISHED (-1)
-#define TROUBLE_CURSED_ITEMS (-2)
-#define TROUBLE_BLIND (-3)
-#define TROUBLE_POISONED (-4)
-#define TROUBLE_WOUNDED_LEGS (-5)
-#define TROUBLE_HUNGRY (-6)
-#define TROUBLE_STUNNED (-7)
-#define TROUBLE_CONFUSED (-8)
-#define TROUBLE_HALLUCINATION (-9)
+#define TROUBLE_FUMBLING (-2)
+#define TROUBLE_CURSED_ITEMS (-3)
+#define TROUBLE_SADDLE (-4)
+#define TROUBLE_BLIND (-5)
+#define TROUBLE_POISONED (-6)
+#define TROUBLE_WOUNDED_LEGS (-7)
+#define TROUBLE_HUNGRY (-8)
+#define TROUBLE_STUNNED (-9)
+#define TROUBLE_CONFUSED (-10)
+#define TROUBLE_HALLUCINATION (-11)
 
 /* We could force rehumanize of polyselfed people, but we can't tell
    unintentional shape changes from the other kind. Oh well. */
@@ -115,6 +129,9 @@ in_trouble()
 #define FAINTED		5
 #define STARVED		6
 
+	/*
+	 * major troubles
+	 */
 	if(Stoned) return(TROUBLE_STONED);
 	if(Slimed) return(TROUBLE_SLIMED);
 	if(Strangled) return(TROUBLE_STRANGLED);
@@ -136,36 +153,28 @@ in_trouble()
 	if (count == 8 && !Passes_walls)
 		return(TROUBLE_STUCK_IN_WALL);
 
-	if((uarmf && uarmf->otyp==LEVITATION_BOOTS && uarmf->cursed) ||
+	if (Cursed_obj(uarmf, LEVITATION_BOOTS) ||
 		stuck_ring(uleft, RIN_LEVITATION) ||
 		stuck_ring(uright, RIN_LEVITATION))
 		return(TROUBLE_CURSED_LEVITATION);
 	if(Blindfolded && ublindf->cursed) return(TROUBLE_CURSED_BLINDFOLD);
 
+	/*
+	 * minor troubles
+	 */
 	if(Punished) return(TROUBLE_PUNISHED);
-	for(otmp=invent; otmp; otmp=otmp->nobj)
-		if((otmp->otyp==LOADSTONE || otmp->otyp==LUCKSTONE) &&
-			otmp->cursed)
-		    return(TROUBLE_CURSED_ITEMS);
-	if((uarmh && uarmh->cursed) ||	/* helmet */
-	   (uarms && uarms->cursed) ||	/* shield */
-	   (uarmg && uarmg->cursed) ||	/* gloves */
-	   (uarm && uarm->cursed) ||	/* armor */
-	   (uarmc && uarmc->cursed) ||	/* cloak */
-	   (uarmf && uarmf->cursed && uarmf->otyp != LEVITATION_BOOTS) ||
-					/* boots */
-	   (ublindf && ublindf->otyp == LENSES && ublindf->cursed) ||
-	   				/* lenses: blindfold is TROUBLE_CURSED_BLINDFOLD */
-#ifdef TOURIST
-	   (uarmu && uarmu->cursed) ||  /* shirt */
+	if (Cursed_obj(uarmg, GAUNTLETS_OF_FUMBLING) ||
+		Cursed_obj(uarmf, FUMBLE_BOOTS))
+	    return TROUBLE_FUMBLING;
+	if (worst_cursed_item()) return TROUBLE_CURSED_ITEMS;
+#ifdef STEED
+	if (u.usteed) {	/* can't voluntarily dismount from a cursed saddle */
+	    otmp = which_armor(u.usteed, W_SADDLE);
+	    if (Cursed_obj(otmp, SADDLE)) return TROUBLE_SADDLE;
+	}
 #endif
-	   (welded(uwep)) ||
-	   (uleft && uleft->cursed && uleft->otyp != RIN_LEVITATION) ||
-	   (uright && uright->cursed && uright->otyp != RIN_LEVITATION) ||
-	   (uamul && uamul->cursed))
-	    return(TROUBLE_CURSED_ITEMS);
 
-	if(Blinded > 1) return(TROUBLE_BLIND);
+	if (Blinded > 1 && haseyes(youmonst.data)) return(TROUBLE_BLIND);
 	for(i=0; i<A_MAX; i++)
 	    if(ABASE(i) < AMAX(i)) return(TROUBLE_POISONED);
 	if(Wounded_legs
@@ -177,12 +186,69 @@ in_trouble()
 	if(HStun) return (TROUBLE_STUNNED);
 	if(HConfusion) return (TROUBLE_CONFUSED);
 	if(Hallucination) return(TROUBLE_HALLUCINATION);
-
 	return(0);
 }
 
-const char leftglow[] = "left ring softly glows";
-const char rightglow[] = "right ring softly glows";
+/* select an item for TROUBLE_CURSED_ITEMS */
+STATIC_OVL struct obj *
+worst_cursed_item()
+{
+    register struct obj *otmp;
+
+    /* if strained or worse, check for loadstone first */
+    if (near_capacity() >= HVY_ENCUMBER) {
+	for (otmp = invent; otmp; otmp = otmp->nobj)
+	    if (Cursed_obj(otmp, LOADSTONE)) return otmp;
+    }
+    /* weapon takes precedence if it is interfering
+       with taking off a ring or shield */
+    if (welded(uwep) &&					/* weapon */
+	    (uright || (bimanual(uwep) && (uleft || uarms)))) {
+	otmp = uwep;
+    /* gloves come next, due to rings */
+    } else if (uarmg && uarmg->cursed) {		/* gloves */
+	otmp = uarmg;
+    /* then shield due to two handed weapons and spells */
+    } else if (uarms && uarms->cursed) {		/* shield */
+	otmp = uarms;
+    /* then cloak due to body armor */
+    } else if (uarmc && uarmc->cursed) {		/* cloak */
+	otmp = uarmc;
+    } else if (uarm && uarm->cursed) {			/* suit */
+	otmp = uarm;
+    } else if (uarmh && uarmh->cursed) {		/* helmet */
+	otmp = uarmh;
+    } else if (uarmf && uarmf->cursed) {		/* boots */
+	otmp = uarmf;
+#ifdef TOURIST
+    } else if (uarmu && uarmu->cursed) {		/* shirt */
+	otmp = uarmu;
+#endif
+    } else if (uamul && uamul->cursed) {		/* amulet */
+	otmp = uamul;
+    } else if (uleft && uleft->cursed) {		/* left ring */
+	otmp = uleft;
+    } else if (uright && uright->cursed) {		/* right ring */
+	otmp = uright;
+    } else if (ublindf && ublindf->cursed) {		/* eyewear */
+	otmp = ublindf;	/* must be non-blinding lenses */
+    /* if weapon wasn't handled above, do it now */
+    } else if (welded(uwep)) {				/* weapon */
+	otmp = uwep;
+    /* active secondary weapon even though it isn't welded */
+    } else if (uswapwep && uswapwep->cursed && u.twoweap) {
+	otmp = uswapwep;
+    /* all worn items ought to be handled by now */
+    } else {
+	for (otmp = invent; otmp; otmp = otmp->nobj) {
+	    if (!otmp->cursed) continue;
+	    if (otmp->otyp == LOADSTONE || otmp->otyp == LUCKSTONE ||
+		    (otmp->oartifact && spec_ability(otmp, SPFX_LUCK)))
+		break;
+	}
+    }
+    return otmp;
+}
 
 STATIC_OVL void
 fix_worst_trouble(trouble)
@@ -191,6 +257,8 @@ register int trouble;
 	int i;
 	struct obj *otmp = 0;
 	const char *what = (const char *)0;
+	static NEARDATA const char leftglow[] = "left ring softly glows",
+				   rightglow[] = "right ring softly glows";
 
 	switch (trouble) {
 	    case TROUBLE_STONED:
@@ -259,8 +327,7 @@ register int trouble;
 		    (void) safe_teleds(FALSE);
 		    break;
 	    case TROUBLE_CURSED_LEVITATION:
-		    if (uarmf && uarmf->otyp == LEVITATION_BOOTS &&
-			    uarmf->cursed) {
+		    if (Cursed_obj(uarmf, LEVITATION_BOOTS)) {
 			otmp = uarmf;
 		    } else if ((otmp = stuck_ring(uleft,RIN_LEVITATION)) !=0) {
 			if (otmp == uleft) what = leftglow;
@@ -274,67 +341,35 @@ register int trouble;
 	    case TROUBLE_LYCANTHROPE:
 		    you_unwere(TRUE);
 		    break;
+	/*
+	 */
 	    case TROUBLE_PUNISHED:
 		    Your("chain disappears.");
 		    unpunish();
 		    break;
+	    case TROUBLE_FUMBLING:
+		    if (Cursed_obj(uarmg, GAUNTLETS_OF_FUMBLING))
+			otmp = uarmg;
+		    else if (Cursed_obj(uarmf, FUMBLE_BOOTS))
+			otmp = uarmf;
+		    goto decurse;
+		    break;
 	    case TROUBLE_CURSED_ITEMS:
-		    /* weapon takes precedence if it interferes
-		       with taking off a ring or shield */
-		    if (welded(uwep) &&			/* weapon */
-			(uright || (bimanual(uwep) && (uleft || uarms))))
-			    otmp = uwep;
-		    /* gloves come next, due to rings */
-		    else if (uarmg && uarmg->cursed)	/* gloves */
-			    otmp = uarmg;
-		    /* then shield due to two handed weapons and spells */
-		    else if (uarms && uarms->cursed)	/* shield */
-			    otmp = uarms;
-		    /* then cloak due to body armor */
-		    else if (uarmc && uarmc->cursed)	/* cloak */
-			    otmp = uarmc;
-		    else if (uarm && uarm->cursed)	/* armor */
-			    otmp = uarm;
-		    else if (uarmh && uarmh->cursed)	/* helmet */
-			    otmp = uarmh;
-		    else if (uarmf && uarmf->cursed)	/* boots */
-			    otmp = uarmf;
-#ifdef TOURIST
-		    else if (uarmu && uarmu->cursed)	/* shirt */
-			    otmp = uarmu;
-#endif
-		    /* (perhaps amulet should take precedence over rings?) */
-		    else if (uleft && uleft->cursed) {
-			    otmp = uleft;
-			    what = leftglow;
-		    } else if (uright && uright->cursed) {
-			    otmp = uright;
-			    what = rightglow;
-		    } else if (uamul && uamul->cursed) /* amulet */
-			    otmp = uamul;
-		    else if (ublindf && ublindf->cursed) /* eyewear */
-			    otmp = ublindf;  /* must be non-blinding lenses */
-		    /* if weapon wasn't handled above, do it now */
-		    else if (welded(uwep))		/* weapon */
-			    otmp = uwep;
-		    else {
-			    for(otmp=invent; otmp; otmp=otmp->nobj)
-				if ((otmp->otyp==LOADSTONE ||
-				     otmp->otyp==LUCKSTONE) && otmp->cursed)
-					break;
-		    }
+		    otmp = worst_cursed_item();
+		    if (otmp == uright) what = rightglow;
+		    else if (otmp == uleft) what = leftglow;
 decurse:
 		    if (!otmp) {
 			impossible("fix_worst_trouble: nothing to uncurse.");
 			return;
 		    }
 		    uncurse(otmp);
-		    otmp->bknown = TRUE;
-		    if (!Blind)
-			    Your("%s %s.",
-				 what ? what :
-				 (const char *)aobjnam(otmp, "softly glow"),
-				 hcolor(NH_AMBER));
+		    if (!Blind) {
+			Your("%s %s.", what ? what :
+				(const char *)aobjnam(otmp, "softly glow"),
+			     hcolor(NH_AMBER));
+			otmp->bknown = TRUE;
+		    }
 		    update_inventory();
 		    break;
 	    case TROUBLE_POISONED:
@@ -351,14 +386,17 @@ decurse:
 		    (void) encumber_msg();
 		    break;
 	    case TROUBLE_BLIND:
-	    	    {
-	    	    	int num_eyes = eyecount(youmonst.data);
-			Your("%s feel%s better.",
-			     (num_eyes == 1) ? body_part(EYE) : makeplural(body_part(EYE)),
-			     (num_eyes == 1) ? "s" : "");
-			make_blinded(0L,FALSE);
-			break;
-		    }
+		{
+		    int num_eyes = eyecount(youmonst.data);
+		    const char *eye = body_part(EYE);
+
+		    Your("%s feel%s better.",
+			 (num_eyes == 1) ? eye : makeplural(eye),
+			 (num_eyes == 1) ? "s" : "");
+		    u.ucreamed = 0;
+		    make_blinded(0L,FALSE);
+		    break;
+		}
 	    case TROUBLE_WOUNDED_LEGS:
 		    heal_legs();
 		    break;
@@ -372,6 +410,19 @@ decurse:
 		    pline ("Looks like you are back in Kansas.");
 		    make_hallucinated(0L,FALSE,0L);
 		    break;
+#ifdef STEED
+	    case TROUBLE_SADDLE:
+		    otmp = which_armor(u.usteed, W_SADDLE);
+		    uncurse(otmp);
+		    if (!Blind) {
+			pline("%s %s %s.",
+			      s_suffix(upstart(y_monnam(u.usteed))),
+			      aobjnam(otmp, "softly glow"),
+			      hcolor(NH_AMBER));
+			otmp->bknown = TRUE;
+		    }
+		    break;
+#endif
 	}
 }
 
@@ -744,7 +795,7 @@ pleased(g_align)
 	} else {
 	    int action = rn1(Luck + (on_altar() ? 3 + on_shrine() : 2), 1);
 
-	    if (!on_altar()) action = min(action, 2);
+	    if (!on_altar()) action = min(action, 3);
 	    if (u.ualign.record < STRIDENT)
 		action = (u.ualign.record > 0 || !rnl(2)) ? 1 : 0;
 

@@ -360,6 +360,25 @@ rndcurse()			/* curse a few inventory items at random! */
 	    }
 	    update_inventory();
 	}
+
+#ifdef STEED
+	/* treat steed's saddle as extended part of hero's inventory */
+	if (u.usteed && !rn2(4) &&
+		(otmp = which_armor(u.usteed, W_SADDLE)) != 0 &&
+		!otmp->cursed) {	/* skip if already cursed */
+	    if (otmp->blessed)
+		unbless(otmp);
+	    else
+		curse(otmp);
+	    if (!Blind) {
+		pline("%s %s %s.",
+		      s_suffix(upstart(y_monnam(u.usteed))),
+		      aobjnam(otmp, "glow"),
+		      hcolor(otmp->cursed ? NH_BLACK : (const char *)"brown"));
+		otmp->bknown = TRUE;
+	    }
+	}
+#endif	/*STEED*/
 }
 
 void
