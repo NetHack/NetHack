@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vault.c	3.4	2002/08/06	*/
+/*	SCCS Id: @(#)vault.c	3.4	2002/11/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -367,20 +367,24 @@ STATIC_OVL void
 wallify_vault(grd)
 struct monst *grd;
 {
-	int x, y;
+	int x, y, typ;
 	int vlt = EGD(grd)->vroom;
 	char tmp_viz;
-	xchar lowx = rooms[vlt].lx, hix = rooms[vlt].hx;
-	xchar lowy = rooms[vlt].ly, hiy = rooms[vlt].hy;
-	register struct obj *gold;
-	register boolean fixed = FALSE;
-	register boolean movedgold = FALSE;
+	xchar lox = rooms[vlt].lx - 1, hix = rooms[vlt].hx + 1,
+	      loy = rooms[vlt].ly - 1, hiy = rooms[vlt].hy + 1;
+	struct monst *mon;
+	struct obj *gold;
+	struct trap *trap;
+	boolean fixed = FALSE;
+	boolean movedgold = FALSE;
 
-	for(x = lowx-1; x <= hix+1; x++)
-	    for(y = lowy-1; y <= hiy+1; y += (hiy-lowy+2)) {
-		if(!IS_WALL(levl[x][y].typ) && !in_fcorridor(grd, x, y)) {
-		    if(MON_AT(x, y) && grd->mx != x && grd->my != y) {
-			struct monst *mon = m_at(x,y);
+	for (x = lox; x <= hix; x++)
+	    for (y = loy; y <= hiy; y++) {
+		/* if not on the room boundary, skip ahead */
+		if (x != lox && x != hix && y != loy && y != hiy) continue;
+
+		if (!IS_WALL(levl[x][y].typ) && !in_fcorridor(grd, x, y)) {
+		    if ((mon = m_at(x, y)) != 0 && mon != grd) {
 			if (mon->mtame) yelp(mon);
 			rloc(mon);
 		    }
@@ -388,43 +392,22 @@ struct monst *grd;
 			move_gold(gold, EGD(grd)->vroom);
 			movedgold = TRUE;
 		    }
-		    if(x == lowx-1 && y == lowy-1)
-			levl[x][y].typ = TLCORNER;
-		    else if(x == hix+1 && y == lowy-1)
-			levl[x][y].typ = TRCORNER;
-		    else if(x == lowx-1 && y == hiy+1)
-			levl[x][y].typ = BLCORNER;
-		    else if(x == hix+1 && y == hiy+1)
-			levl[x][y].typ = BRCORNER;
-		    else levl[x][y].typ = HWALL;
-
+		    if ((trap = t_at(x, y)) != 0)
+			deltrap(trap);
+		    if (x == lox)
+			typ = (y == loy) ? TLCORNER :
+			      (y == hiy) ? BLCORNER : VWALL;
+		    else if (x == hix)
+			typ = (y == loy) ? TRCORNER :
+			      (y == hiy) ? BRCORNER : VWALL;
+		    else  /* not left or right side, must be top or bottom */
+			typ = HWALL;
+		    levl[x][y].typ = typ;
 		    levl[x][y].doormask = 0;
 		    /*
 		     * hack: player knows walls are restored because of the
 		     * message, below, so show this on the screen.
 		     */
-		    tmp_viz = viz_array[y][x];
-		    viz_array[y][x] = IN_SIGHT|COULD_SEE;
-		    newsym(x,y);
-		    viz_array[y][x] = tmp_viz;
-		    block_point(x,y);
-		    fixed = TRUE;
-		}
-	    }
-	for(x = lowx-1; x <= hix+1; x += (hix-lowx+2))
-	    for(y = lowy; y <= hiy; y++) {
-		if(!IS_WALL(levl[x][y].typ) && !in_fcorridor(grd, x, y)) {
-		    if(MON_AT(x, y) && grd->mx != x && grd->my != y) {
-			struct monst *mon = m_at(x,y);
-			if (mon->mtame) yelp(mon);
-			rloc(mon);
-		    }
-		    if ((gold = g_at(x, y)) != 0) {
-			move_gold(gold, EGD(grd)->vroom);
-			movedgold = TRUE;
-		    }
-		    levl[x][y].typ = VWALL;
-		    levl[x][y].doormask = 0;
 		    tmp_viz = viz_array[y][x];
 		    viz_array[y][x] = IN_SIGHT|COULD_SEE;
 		    newsym(x,y);
