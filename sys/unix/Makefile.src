@@ -473,8 +473,8 @@ monstr.c: $(MAKEDEFS)
 	@( cd ../util ; $(MAKE) ../src/monstr.c )
 ../include/vis_tab.h: $(MAKEDEFS)
 	@( cd ../util ; $(MAKE) ../include/vis_tab.h )
-vis_tab.c: $(MAKEDEFS)
-	@( cd ../util ; $(MAKE) ../src/vis_tab.c )
+# makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
+vis_tab.c: ../include/vis_tab.h
 tile.c: ../win/share/tilemap.c $(HACK_H)
 	@( cd ../util ; $(MAKE) ../src/tile.c )
 

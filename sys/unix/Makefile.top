@@ -90,42 +90,45 @@ $(GAME):
 all:	$(GAME) Guidebook $(VARDAT) dungeon spec_levs check-dlb
 	@echo "Done."
 
+# Note: many of the dependencies below are here to allow parallel make
+# to generate valid output
+
 Guidebook:
 	( cd doc ; $(MAKE) Guidebook )
 
 manpages:
 	( cd doc ; $(MAKE) manpages )
 
-data:
+data: $(GAME)
 	( cd dat ; $(MAKE) data )
 
-rumors:
+rumors: $(GAME)
 	( cd dat ; $(MAKE) rumors )
 
-oracles:
+oracles: $(GAME)
 	( cd dat ; $(MAKE) oracles )
 
 #	Note: options should have already been made with make, but...
-options:
+options: $(GAME)
 	( cd dat ; $(MAKE) options )
 
-quest.dat:
+quest.dat: $(GAME)
 	( cd dat ; $(MAKE) quest.dat )
 
-spec_levs:
+spec_levs: dungeon
 	( cd util ; $(MAKE) lev_comp )
 	( cd dat ; $(MAKE) spec_levs )
 	( cd dat ; $(MAKE) quest_levs )
 
-dungeon:
+dungeon: $(GAME)
 	( cd util ; $(MAKE) dgn_comp )
 	( cd dat ; $(MAKE) dungeon )
 
-x11tiles:
+x11tiles: $(GAME)
 	( cd util ; $(MAKE) tile2x11 )
 	( cd dat ; $(MAKE) x11tiles )
 
-beostiles:
+beostiles: $(GAME)
 	( cd util ; $(MAKE) tile2beos )
 	( cd dat ; $(MAKE) beostiles )
 
@@ -141,7 +144,7 @@ mapbg.xpm:
 nhsplash.xpm:
 	( cd dat ; $(MAKE) nhsplash.xpm )
 
-nh16.img:
+nh16.img: $(GAME)
 	( cd util ; $(MAKE) tile2img.ttp )
 	( cd dat ; $(MAKE) nh16.img )
 
@@ -151,8 +154,7 @@ GEM_RSC.RSC:
 title.img:
 	( cd dat ; $(MAKE) title.img )
 
-check-dlb:
-	( cd dat; $(MAKE) options )
+check-dlb: options
 	@if egrep -s librarian dat/options ; then $(MAKE) dlb ; else true ; fi
 
 dlb:
