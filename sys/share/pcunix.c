@@ -175,7 +175,7 @@ getlock()
 			backsp();       /* \b is visible on NT */
 			(void) putchar(' ');
 			backsp();
- # else
+# else
 			msmsg("\b \b");
 # endif
 			ct = 0;
