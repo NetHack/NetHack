@@ -447,7 +447,8 @@ int *fail_reason;
 	else if (cause == ANIMATE_SHATTER)
 	    pline("Instead of shattering, the statue suddenly comes alive!");
 	else /* cause == ANIMATE_NORMAL */
-	    You("find %s posing as a statue.", a_monnam(mon));
+	    You("find %s posing as a statue.",
+		canspotmon(mon) ? a_monnam(mon) : something);
 	/* avoid hiding under nothing */
 	if (x == u.ux && y == u.uy &&
 		Upolyd && hides_under(youmonst.data) && !OBJ_AT(x, y))
