@@ -1523,14 +1523,14 @@ long *abil;
 	wornbits = (wornmask & *abil);
 
 	for(obj = invent; obj; obj = obj->nobj) {		
-	    if(obj->oartifact) {
+	    if(obj->oartifact && ((abil != &EWarn_of_mon) || context.warntype.obj)) {
 		register const struct artifact *art = get_artifact(obj);
 		if (art) {
 		    if (dtyp &&
 			(art->cary.adtyp == dtyp || art->defn.adtyp == dtyp))
 				return obj;
 		    if (spfx && ((art->cspfx & spfx) == spfx ||
-				(art->spfx &spfx) == spfx))
+				(art->spfx & spfx) == spfx))
 				return obj;
 		}
 	    } else {

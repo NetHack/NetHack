@@ -991,7 +991,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 		    (context.warntype.polyd & M2_ORC) ? "orcs" :
 		    (context.warntype.polyd & M2_DEMON) ? "demons" :
 		    "certain monsters");
-		you_are(buf,from_what(WARN_OF_MON));
+		you_are(buf,"");
 	}
 	if (Warn_of_mon && context.warntype.speciesidx) {
 		Sprintf(buf, "aware of the presence of %s",
