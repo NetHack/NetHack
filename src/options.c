@@ -391,7 +391,9 @@ static boolean initial, from_file;
 STATIC_DCL void FDECL(doset_add_menu, (winid,const char *,int));
 STATIC_DCL void FDECL(nmcpy, (char *, const char *, int));
 STATIC_DCL void FDECL(escapes, (const char *, char *));
+#if 0
 STATIC_DCL int FDECL(boolopt_only_initial, (int));
+#endif
 STATIC_DCL void FDECL(rejectoption, (const char *));
 STATIC_DCL void FDECL(badoption, (const char *));
 STATIC_DCL char *FDECL(string_for_opt, (char *,BOOLEAN_P));

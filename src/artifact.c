@@ -1349,8 +1349,8 @@ struct obj *otmp;
 {
 	if (!otmp->oartifact)
 	    return ((long)objects[otmp->otyp].oc_cost);
-	else if (artilist[otmp->oartifact].cost)
-	    return (artilist[otmp->oartifact].cost);
+	else if (artilist[(int) otmp->oartifact].cost)
+	    return (artilist[(int) otmp->oartifact].cost);
 	else
 	    return (100L * (long)objects[otmp->otyp].oc_cost);
 }
