@@ -15,6 +15,7 @@
 
 STATIC_PTR int NDECL(eatmdone);
 STATIC_PTR int NDECL(eatfood);
+STATIC_PTR void FDECL(costly_tin, (const char*));
 STATIC_PTR int NDECL(opentin);
 STATIC_PTR int NDECL(unfaint);
 
@@ -957,6 +958,27 @@ violated_vegetarian()
     return;
 }
 
+/* common code to check and possibly charge for 1 context.tin.tin,
+ * will split() context.tin.tin if necessary */
+STATIC_PTR
+void
+costly_tin(verb)
+	const char* verb;		/* if 0, the verb is "open" */
+{
+	if(((!carried(context.tin.tin) &&
+	     costly_spot(context.tin.tin->ox, context.tin.tin->oy) &&
+	     !context.tin.tin->no_charge)
+	    || context.tin.tin->unpaid)) {
+	    verbalize("You %s it, you bought it!", verb ? verb : "open");
+	    if(context.tin.tin->quan > 1L) {
+		context.tin.tin = splitobj(context.tin.tin, 1L);
+		if (context.tin.tin)
+		    context.tin.o_id = context.tin.tin->o_id;
+	    }
+	    bill_dummy_object(context.tin.tin);
+	}
+}
+
 STATIC_PTR
 int
 opentin()		/* called during each move whilst opening a tin */
@@ -977,6 +999,7 @@ opentin()		/* called during each move whilst opening a tin */
 	if(context.tin.tin->otrapped ||
 	   (context.tin.tin->cursed && context.tin.tin->spe != -1 && !rn2(8))) {
 		b_trapped("tin", 0);
+		costly_tin("destroyed");
 		goto use_me;
 	}
 	You("succeed in opening the tin.");
@@ -984,6 +1007,7 @@ opentin()		/* called during each move whilst opening a tin */
 	    if (context.tin.tin->corpsenm == NON_PM) {
 		pline("It turns out to be empty.");
 		context.tin.tin->dknown = context.tin.tin->known = TRUE;
+		costly_tin((const char*)0);
 		goto use_me;
 	    }
 	    r = context.tin.tin->cursed ? ROTTEN_TIN :	/* always rotten if cursed */
@@ -1007,6 +1031,7 @@ opentin()		/* called during each move whilst opening a tin */
 	    if (yn("Eat it?") == 'n') {
 		if (!Hallucination) context.tin.tin->dknown = context.tin.tin->known = TRUE;
 		if (flags.verbose) You("discard the open tin.");
+		costly_tin((const char*)0);
 		goto use_me;
 	    }
 	    /* in case stop_occupation() was called on previous meal */
@@ -1025,20 +1050,11 @@ opentin()		/* called during each move whilst opening a tin */
 		violated_vegetarian();
 
 	    context.tin.tin->dknown = context.tin.tin->known = TRUE;
-	    cprefx(context.tin.tin->corpsenm); cpostfx(context.tin.tin->corpsenm);
+	    cprefx(context.tin.tin->corpsenm);
+	    cpostfx(context.tin.tin->corpsenm);
 
-	    if(((!carried(context.tin.tin) && costly_spot(context.tin.tin->ox, context.tin.tin->oy) &&
-		 !context.tin.tin->no_charge)
-		|| context.tin.tin->unpaid)) {
-		verbalize("You open it, you bought it!");
-		/* charge for one at pre-eating cost */
-		if(context.tin.tin->quan > 1L) {
-			context.tin.tin = splitobj(context.tin.tin, 1L);
-			if (context.tin.tin)
-				context.tin.o_id = context.tin.tin->o_id;
-		}
-		bill_dummy_object(context.tin.tin);
-	    }
+	    /* charge for one at pre-eating cost */
+	    costly_tin((const char*)0);
 
 	    /* check for vomiting added by GAN 01/16/87 */
 	    if(tintxts[r].nut < 0) make_vomiting((long)rn1(15,10), FALSE);
@@ -1062,22 +1078,12 @@ opentin()		/* called during each move whilst opening a tin */
 		    context.tin.tin->dknown = context.tin.tin->known = TRUE;
 		if (flags.verbose)
 		    You("discard the open tin.");
+		costly_tin((const char*)0);
 		goto use_me;
 	    }
 
 	    context.tin.tin->dknown = context.tin.tin->known = TRUE;
-	    if(((!carried(context.tin.tin) && costly_spot(context.tin.tin->ox, context.tin.tin->oy) &&
-		 !context.tin.tin->no_charge)
-		|| context.tin.tin->unpaid)) {
-		verbalize("You open it, you bought it!");
-		/* charge for one at pre-eating cost */
-		if(context.tin.tin->quan > 1L) {
-			context.tin.tin = splitobj(context.tin.tin, 1L);
-			if (context.tin.tin)
-				context.tin.o_id = context.tin.tin->o_id;
-		}
-		bill_dummy_object(context.tin.tin);
-	    }
+	    costly_tin((const char*)0);
 
 	    if (!context.tin.tin->cursed)
 		pline("This makes you feel like %s!",
