@@ -4182,7 +4182,7 @@ NetHackQtGlyphs::NetHackQtGlyphs()
         tiles_per_row = TILES_PER_ROW;
         if (img.width()%tiles_per_row) {
             impossible("Tile file \"%s\" has %d columns, not multiple of row count (%d)",
-               tile_file, img.height(), tiles_per_row);
+               tile_file, img.width(), tiles_per_row);
         }
     }
     int rows = ((total_tiles_used+tiles_per_row-1) / tiles_per_row);
