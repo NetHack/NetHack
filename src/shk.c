@@ -1566,13 +1566,15 @@ static coord repo_location;	/* repossession context */
 /* routine called after dying (or quitting) */
 boolean
 paybill(croaked)
-boolean croaked;
+int croaked;	/* -1: escaped dungeon; 0: quit; 1: died */
 {
 	register struct monst *mtmp, *mtmp2, *resident= (struct monst *)0;
 	register boolean taken = FALSE;
 	register int numsk = 0;
 
-	/* if we escaped from the dungeon, shopkeepers can't reach us */
+	/* if we escaped from the dungeon, shopkeepers can't reach us;
+	   shops don't occur on level 1, but this could happen if hero
+	   level teleports out of the dungeon and manages not to die */
 	if (croaked < 0) return FALSE;
 
 	/* this is where inventory will end up if any shk takes it */
