@@ -502,7 +502,7 @@ int spellnum;
 	boolean reflects;
 
 	pline("A bolt of lightning strikes down at you from above!");
-	reflects = ureflects("It bounces off your %s.", "");
+	reflects = ureflects("It bounces off your %s%s.", "");
 	if (reflects || Shock_resistance) {
 	    shieldeff(u.ux, u.uy);
 	    dmg = 0;
