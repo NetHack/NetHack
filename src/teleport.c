@@ -567,6 +567,7 @@ level_tele()
 	d_level newlevel;
 	const char *escape_by_flying = 0;	/* when surviving dest of -N */
 	char buf[BUFSZ];
+	boolean force_dest = FALSE;
 
 	if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
 #ifdef WIZARD
@@ -608,7 +609,29 @@ level_tele()
 		}
 #ifdef WIZARD
 		if (wizard && !strcmp(buf,"?")) {
-		    newlev = print_dungeon(TRUE);
+		    schar destlev = 0;
+		    xchar destdnum = 0;
+		    if ((newlev = (int)print_dungeon(TRUE, &destlev, &destdnum))) {
+			char buf[BUFSZ];
+			newlevel.dnum = destdnum;
+			newlevel.dlevel = destlev;
+			if (In_endgame(&newlevel) && !In_endgame(&u.uz)) {
+				Sprintf(buf,
+				    "Destination is earth level");
+				if (!u.uhave.amulet) {
+					struct obj *obj;
+					obj = mksobj(AMULET_OF_YENDOR,
+							TRUE, FALSE);
+					if (obj) {
+						obj = addinv(obj);
+						Strcat(buf, " with the amulet");
+					}
+				}
+				assign_level(&newlevel, &earth_level);
+				pline("%s.", buf);
+			}
+			force_dest = TRUE;
+		    } else return;
 		} else
 #endif
 		if ((newlev = lev_by_name(buf)) == 0) newlev = atoi(buf);
@@ -686,7 +709,7 @@ level_tele()
 
 	killer.name[0] = 0;		/* still alive, so far... */
 
-	if (newlev < 0) {
+	if (newlev < 0 && !force_dest) {
 		if (*u.ushops0) {
 		    /* take unpaid inventory items off of shop bills */
 		    in_mklev = TRUE;	/* suppress map update */
@@ -748,6 +771,9 @@ level_tele()
 	} else if (u.uz.dnum == medusa_level.dnum &&
 	    newlev >= dungeons[u.uz.dnum].depth_start +
 						dunlevs_in_dungeon(&u.uz)) {
+#ifdef WIZARD
+	    if (!(wizard && force_dest))
+#endif
 	    find_hell(&newlevel);
 	} else {
 	    /* if invocation did not yet occur, teleporting into
@@ -770,6 +796,9 @@ level_tele()
 	     * we must translate newlev to a number relative to the
 	     * current dungeon.
 	     */
+#ifdef WIZARD
+	    if (!(wizard && force_dest))
+#endif
 	    get_level(&newlevel, newlev);
 	}
 	schedule_goto(&newlevel, FALSE, FALSE, 0, (char *)0, (char *)0);
