@@ -2612,7 +2612,6 @@ do_break_wand(obj)
     boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
-    boolean physical_dmg = FALSE;
 
     Strcpy(the_wand, yname(obj));
     Sprintf(confirm, "Are you really sure you want to break %s?",
