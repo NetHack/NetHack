@@ -37,3 +37,4 @@
 #define IDC_STATIC      (-1)
 
 #endif //__NEWRES_H__
+

@@ -83,3 +83,4 @@ PMSNHEvent mswin_input_peek()
 	}
 	return retval;
 }
+

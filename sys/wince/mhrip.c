@@ -14,3 +14,4 @@ void mswin_display_RIP_window (HWND hWnd)
 {
 	mswin_display_text_window(hWnd);
 }
+

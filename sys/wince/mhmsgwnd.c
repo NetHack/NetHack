@@ -588,3 +588,4 @@ void mswin_message_window_size (HWND hWnd, LPSIZE sz)
 			     data->yChar * MSG_VISIBLE_LINES + 4;
 	}
 }
+

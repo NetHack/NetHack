@@ -14,3 +14,4 @@ void mswin_layout_main_window(HWND changed_child);
 void mswin_select_map_mode(int map_mode);
 
 #endif /* MSWINMainWindow_h */
+

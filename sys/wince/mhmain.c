@@ -1110,3 +1110,4 @@ HMENU _get_main_menu(UINT menu_id)
 #endif
 	return hmenuMap;
 }
+
