@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2003/12/22	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2004/08/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -812,8 +812,12 @@ struct obj *otmp;
 boolean ignore_oquan;	/* to force singular */
 {
 	char *nambuf = nextobuf();
+	int mndx = otmp->corpsenm;
+	const char *mname = (mndx != NON_PM) ? mons[mndx].mname :
+				(const char *)"thing";	/* shouldn't happen */
 
-	Sprintf(nambuf, "%s corpse", mons[otmp->corpsenm].mname);
+	if (type_is_pname(&mons[mndx])) mname = s_suffix(mname);
+	Sprintf(nambuf, "%s corpse", mname);
 
 	if (ignore_oquan || otmp->quan < 2)
 	    return nambuf;

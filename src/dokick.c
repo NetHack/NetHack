@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)dokick.c	3.4	2004/08/02	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1470,7 +1470,7 @@ long num;
 	Sprintf(obuf, "%s%s",
 		 (otmp->otyp == CORPSE &&
 			type_is_pname(&mons[otmp->corpsenm])) ? "" : "The ",
-		 xname(otmp));
+		 cxname(otmp));
 
 	if(num) { /* means: other objects are impacted */
 	    Sprintf(eos(obuf), " %s %s object%s",
