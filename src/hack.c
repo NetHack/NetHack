@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)hack.c	3.4	2003/04/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -134,11 +134,13 @@ moverock()
 		switch(ttmp->ttyp) {
 		case LANDMINE:
 		    if (rn2(10)) {
-			pline("KAABLAMM!!!  %s %s land mine.",
-				Tobjnam(otmp, "trigger"),
-				ttmp->madeby_u ? "your" : "a");
 			obj_extract_self(otmp);
 			place_object(otmp, rx, ry);
+			unblock_point(sx, sy);
+			newsym(sx, sy);
+			pline("KAABLAMM!!!  %s %s land mine.",
+			      Tobjnam(otmp, "trigger"),
+			      ttmp->madeby_u ? "your" : "a");
 			blow_up_landmine(ttmp);
 			/* if the boulder remains, it should fill the pit */
 			fill_pit(u.ux, u.uy);
