@@ -1021,7 +1021,7 @@ char yn_function(const char *ques, const char *choices, char default)
 char gnome_yn_function(const char *question, const char *choices,
 		CHAR_P def)
 {
-    char ch;
+    int ch;
     int result=-1;
     char message[BUFSZ];
     char yn_esc_map='\033';
