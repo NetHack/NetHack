@@ -865,7 +865,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 {
 	int i = 0;
 	PNHMenuWindow data;
-	int topIndex, pageSize;
+	int curIndex, topIndex, pageSize;
 	boolean is_accelerator = FALSE;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
@@ -886,16 +886,24 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	case MENU_NEXT_PAGE:
 		topIndex = ListView_GetTopIndex( hwndList );
 		pageSize = ListView_GetCountPerPage( hwndList );
-		i = min(topIndex+pageSize, data->menu.size-1);
+        curIndex = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
+        /* Focus down one page */
+		i = min(curIndex+pageSize, data->menu.size-1);
 		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+        /* Scrollpos down one page */
+        i = min(topIndex+(2*pageSize - 1), data->menu.size-1);
 		ListView_EnsureVisible(hwndList, i, FALSE);
 	return -2;
 
 	case MENU_PREVIOUS_PAGE:
 		topIndex = ListView_GetTopIndex( hwndList );
 		pageSize = ListView_GetCountPerPage( hwndList );
-		i = max(topIndex-pageSize, 0);
+        curIndex = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
+        /* Focus up one page */
+		i = max(curIndex-pageSize, 0);
 		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+        /* Scrollpos up one page */
+		i = max(topIndex-pageSize, 0);
 		ListView_EnsureVisible(hwndList, i, FALSE);
 	break;
 
@@ -1020,13 +1028,32 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	return -2;
 
 	case ' ':
+    {
         if (GetNHApp()->regNetHackMode) {
-            /* NetHack mode: Scroll down one page */
+            /* NetHack mode: Scroll down one page,
+               ends menu when on last page. */
+            SCROLLINFO si;
+
+            si.cbSize = sizeof(SCROLLINFO);
+            si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
+            GetScrollInfo(hwndList, SB_VERT, &si);
+            if ((si.nPos + (int)si.nPage) > (si.nMax - si.nMin)) {
+                /* We're at the bottom: dismiss. */
+                data->done = 1;
+			    data->result = 0;
+                return -2;
+            }
+            /* We're not at the bottom: page down. */
 		    topIndex = ListView_GetTopIndex( hwndList );
 		    pageSize = ListView_GetCountPerPage( hwndList );
-		    i = min(topIndex+pageSize, data->menu.size-1);
+            curIndex = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
+            /* Focus down one page */
+		    i = min(curIndex+pageSize, data->menu.size-1);
 		    ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+            /* Scrollpos down one page */
+            i = min(topIndex+(2*pageSize - 1), data->menu.size-1);
 		    ListView_EnsureVisible(hwndList, i, FALSE);
+
         	return -2;
         } else {
 		    /* Windows mode: ends menu for PICK_ONE/PICK_NONE
@@ -1047,6 +1074,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 			    }
 		    }
         }
+    }
 	break;
 
 	default:
@@ -1299,11 +1327,20 @@ LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
     	/* close on space in Windows mode
            page down on space in NetHack mode */
         case VK_SPACE:
-            if (GetNHApp()->regNetHackMode)
+        {   
+            SCROLLINFO si;
+
+            si.cbSize = sizeof(SCROLLINFO);
+            si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
+            GetScrollInfo(hWnd, SB_VERT, &si);
+            /* If nethackmode and not at the end of the list */
+            if (GetNHApp()->regNetHackMode &&
+                    (si.nPos + (int)si.nPage) <= (si.nMax - si.nMin))
                 SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
             else
 			    PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
             return 0;
+        }
         case VK_NEXT:
             SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
             return 0;

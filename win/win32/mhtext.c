@@ -216,11 +216,20 @@ LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
     	/* close on space in Windows mode
            page down on space in NetHack mode */
         case VK_SPACE:
-            if (GetNHApp()->regNetHackMode)
+        {   
+            SCROLLINFO si;
+
+            si.cbSize = sizeof(SCROLLINFO);
+            si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
+            GetScrollInfo(hWnd, SB_VERT, &si);
+            /* If nethackmode and not at the end of the list */
+            if (GetNHApp()->regNetHackMode &&
+                    (si.nPos + (int)si.nPage) <= (si.nMax - si.nMin))
                 SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
             else
 			    PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
             return 0;
+        }
         case VK_NEXT:
             SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
             return 0;
