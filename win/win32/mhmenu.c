@@ -1007,6 +1007,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		RECT client_rt;
 
 		GetClientRect(lpdis->hwndItem, &client_rt);
+		client_rt.right = min(client_rt.right, lpdis->rcItem.right);
 		if( NHMENU_IS_SELECTABLE(*item) && 
 			data->menu.items[lpdis->itemID].count!=0 &&
 			item->glyph != NO_GLYPH ) {
