@@ -1,4 +1,4 @@
-/* SCCS Id: @(#)amistack.c	3.4	2000/05/03			*/
+/* SCCS Id: @(#)amistack.c	3.5	2000/05/03			*/
 /* Copyright (c) Janne Salmijärvi, Tampere, Finland, 2000		*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 

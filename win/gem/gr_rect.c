@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)gr_rect.c	3.4	2001/12/10				*/
+/*	SCCS Id: @(#)gr_rect.c	3.5	2001/12/10				*/
 /* Copyright (c) Christian Bressler, 2001					*/
 /* NetHack may be freely redistributed.  See license for details. */
 /* This is an almost exact copy of qt_clust.cpp */

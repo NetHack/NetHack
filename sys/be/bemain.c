@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bemain.c	3.4	1998/07/15	*/
+/*	SCCS Id: @(#)bemain.c	3.5	1998/07/15	*/
 /* Copyright (c) Dean Luick, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 

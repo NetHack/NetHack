@@ -1,5 +1,5 @@
-#	SCCS Id: @(#)Makefile.os2	3.4.1	1996/10/29
-#	OS/2 NetHack 3.4.1 Makefile for OS/2 versions 1.x and 2.x
+#	SCCS Id: @(#)Makefile.os2	3.5	1996/10/29
+#	OS/2 NetHack 3.5 Makefile for OS/2 versions 1.x and 2.x
 #	Copyright (C) 1990, 1991, 1992, 1993, 1996 Timo Hakulinen
 #
 #	Several compilers exist for OS/2 but, currently only GCC emx is tested
@@ -175,7 +175,7 @@ WINSHARE= $(NHSRC)\win\share	# Shared system files
 
 OBJ	= \tmp\obj		# Object files
 TEMP	= \tmp\bin		# Temporary files during make process
-GAMEDIR = \games\nh341x11	# Game directory
+GAMEDIR = \games\nh350x11	# Game directory
 PLIBP	= c:\emx\lib		# Protected mode C libraries
 RLIBP	= c:\emx\lib		# Possible real mode C libraries
 
@@ -184,7 +184,7 @@ RLIBP	= c:\emx\lib		# Possible real mode C libraries
 #
 
 GAME	= nethack
-GAMEDES = "NetHack 3.4.1"
+GAMEDES = "NetHack 3.5.0"
 
 #
 #	The uppermost two lines for MSC, the middle two for GCC, and

@@ -1,4 +1,4 @@
- /*	SCCS Id: @(#)nttty.c	3.4	$Date$   */
+ /*	SCCS Id: @(#)nttty.c	3.5	$Date$   */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 

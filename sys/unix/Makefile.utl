@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-#	SCCS Id: @(#)Makefile.utl	3.4	1997/04/19
+#	SCCS Id: @(#)Makefile.utl	3.5	1997/04/19
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used

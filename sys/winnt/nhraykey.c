@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)nhraykey.c	3.4	$Date$   */
+/*	SCCS Id: @(#)nhraykey.c	3.5	$Date$   */
 /* Copyright (c) NetHack PC Development Team 2003                      */
 /* NetHack may be freely redistributed.  See license for details.      */
 

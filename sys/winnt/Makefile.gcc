@@ -1,7 +1,7 @@
-#   SCCS Id: @(#)Makefile.gcc       3.4     $Date$
+#   SCCS Id: @(#)Makefile.gcc       3.5     $Date$
 #   Copyright (c) NetHack PC Development Team 1993-2003
 #
-#   NetHack 3.4.x Makefile for MinGW
+#   NetHack 3.5.x Makefile for MinGW
 #
 #   Win32 Compilers Tested:
 #                  - MinGW 1.0 (gcc version 2.95.3-6) (Console NetHack only)

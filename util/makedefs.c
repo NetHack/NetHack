@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makedefs.c	3.4	2002/08/14	*/
+/*	SCCS Id: @(#)makedefs.c	3.5	2002/08/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */

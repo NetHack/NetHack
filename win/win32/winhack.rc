@@ -342,13 +342,13 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "NetHack for Windows - Graphical Interface\0"
-            VALUE "FileVersion", "3.4.2\0"
+            VALUE "FileVersion", "3.5.0\0"
             VALUE "InternalName", "NetHackW\0"
-            VALUE "LegalCopyright", "Copyright (C) 1985 - 2003.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details.\0"
+            VALUE "LegalCopyright", "Copyright (C) 1985 - 2005.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details.\0"
             VALUE "OriginalFilename", "NetHackW.exe\0"
-            VALUE "PrivateBuild", "030825\0"
+            VALUE "PrivateBuild", "050201\0"
             VALUE "ProductName", "NetHack\0"
-            VALUE "ProductVersion", "3.4.2\0"
+            VALUE "ProductVersion", "3.5.0\0"
         END
     END
     BLOCK "VarFileInfo"

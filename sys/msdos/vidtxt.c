@@ -1,4 +1,4 @@
-/*   SCCS Id: @(#)vidtxt.c   3.4     1994/04/04                     */
+/*   SCCS Id: @(#)vidtxt.c   3.5     1994/04/04                     */
 /*   Copyright (c) NetHack PC Development Team 1993                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

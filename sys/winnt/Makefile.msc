@@ -1,7 +1,7 @@
-#       SCCS Id: @(#)Makefile.msc       3.4     $Date$
+#       SCCS Id: @(#)Makefile.msc       3.5     $Date$
 #       Copyright (c) NetHack PC Development Team 1993-2003
 #
-#       NetHack 3.4.x Makefile for MS Visual C++ V6.x and above and MS NMAKE
+#       NetHack 3.5.x Makefile for MS Visual C++ V6.x and above and MS NMAKE
 #  
 #       Win32 Compilers Tested:
 #                              - Microsoft 32 bit Visual C++ V4.x

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)xpm2img.c	3.4	2002/03/17	*/
+/*	SCCS Id: @(#)xpm2img.c	3.5	2002/03/17	*/
 /*   Copyright (c) Christian Bressler 2002                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /* This is mainly a reworked tile2bmp.c + xpm2iff.c -- Marvin */

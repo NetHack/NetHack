@@ -85,7 +85,7 @@
 Notes:
 
 1.  Save files and bones files from previous versions will not work with
-    NetHack 3.4.  Don't bother trying to keep them.
+    NetHack 3.5.  Don't bother trying to keep them.
 
 2.  To install an update of this version of NetHack after changing something,
     type 'make update' from the main directory.  If you created the new

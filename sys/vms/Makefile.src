@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	SCCS Id: @(#)Makefile.src	3.4	2003/02/13
+#	SCCS Id: @(#)Makefile.src	3.5	2003/02/13
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -90,7 +90,7 @@ RANDOBJ = random.obj
 # Other things that have to be reconfigured are in vmsconf.h,
 # and config.h
 
-VERSION  = 3.4.3
+VERSION  = 3.5.0
 
 MAKEDEFS = $(UTL)makedefs.exe;
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsunix.c	3.4	2001/07/27	*/
+/*	SCCS Id: @(#)vmsunix.c	3.5	2001/07/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

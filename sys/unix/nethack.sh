@@ -1,5 +1,5 @@
 #!/bin/sh
-#	SCCS Id: @(#)nethack.sh	3.4	1990/02/26
+#	SCCS Id: @(#)nethack.sh	3.5	1990/02/26
 
 HACKDIR=/usr/games/lib/nethackdir
 export HACKDIR

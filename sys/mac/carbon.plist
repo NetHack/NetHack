@@ -7,22 +7,22 @@
 	<key>CFBundleIdentifier</key>
 	<string>org.nethack.carbon</string>
 	<key>CFBundleLongVersionString</key>
-	<string>3.4.3 © 1985-2004 devteam@nethack.org</string>
+	<string>3.5.0 © 1985-2005 devteam@nethack.org</string>
 	<key>CFBundleName</key>
 	<string>NetHack</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.4.3</string>
+	<string>3.5.0</string>
 	<key>CFBundleSignature</key>
 	<string>NHak</string>
 	<key>CFBundleVersion</key>
-	<string>3.4.3</string>
+	<string>3.5.0</string>
 	<key>LSPrefersCarbon</key>
 	<true/>
 	<key>NSAppleScriptEnabled</key>
 	<false/>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 1985-2004 devteam@nethack.org</string>
+	<string>© 1985-2005 devteam@nethack.org</string>
 </dict>
 </plist>

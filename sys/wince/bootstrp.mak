@@ -1,4 +1,4 @@
-#       SCCS Id: @(#)bootstrp.mak       3.4     2002/03/24
+#       SCCS Id: @(#)bootstrp.mak       3.5     2002/03/24
 #       Copyright (c) Michael Allison
 #
 #       NetHack Windows CE bootstrap file for MS Visual C++ V6.x and 
@@ -162,7 +162,7 @@ DGNCOMPOBJS    = $(O)dgn_yacc.o	$(O)dgn_$(LEX).o $(O)dgn_main.o \
 TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 
 #
-# These are not invoked during a normal game build in 3.4.0
+# These are not invoked during a normal game build in 3.5.0
 #
 TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
 		 $(O)decl.o	$(O)monst.o	$(O)objects.o

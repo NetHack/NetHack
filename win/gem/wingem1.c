@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wingem1.c	3.4	1999/12/10	*/
+/*	SCCS Id: @(#)wingem1.c	3.5	1999/12/10	*/
 /* Copyright (c) Christian Bressler 1999 	  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,7 +42,7 @@ typedef signed char	xchar;
 #undef NDECL
 #undef FDECL
 
-static char nullstr[]="",  md[]="NetHack 3.4.2", strCancel[]="Cancel", strOk[]="Ok", strText[]="Text";
+static char nullstr[]="",  md[]="NetHack 3.5.0", strCancel[]="Cancel", strOk[]="Ok", strText[]="Text";
 
 extern winid WIN_MESSAGE, WIN_MAP, WIN_STATUS, WIN_INVEN;
 

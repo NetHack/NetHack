@@ -4,12 +4,12 @@
        NetHack may be freely redistributed.  See license for details.
        ==============================================================
               Instructions for compiling and installing
-		     NetHack 3.4 on a DOS system
+		     NetHack 3.5 on a DOS system
          ======================================================
-                   (or, How to make PC NetHack 3.4)
+                   (or, How to make PC NetHack 3.5)
                  Last revision: $Date$
 
-Credit for a runnable full PC NetHack 3.4 goes to the PC Development team
+Credit for a runnable full PC NetHack 3.5 goes to the PC Development team
 of Paul Winner, Kevin Smolkowski, Michael Allison, Yitzhak Sapir, Bill Dyer, 
 Timo Hakulinen, Yamamoto Keizo, Mike Threepoint, Mike Stephenson, 
 Stephen White, Ken Washikita and Janet Walz.  The present port is based
@@ -49,7 +49,7 @@ I.  Dispelling the Myths:
 
     The unsupported sys/msdos/Makefile.MSC was for the old 16 bit
     Microsoft Visual C 1.52c compiler and has not been made compliant
-    with 3.4.x.
+    with 3.5.x.
 
     You may find it useful to obtain copies of lex (flex) and yacc (bison
     or byacc).  While not strictly necessary to compile nethack, they are 
@@ -245,7 +245,7 @@ Appendix B - DJGPP Compiler (gcc ported to msdos)
 
 Appendix C - Additional Notes
 
-1)  Save files and bones files from versions of NetHack prior to 3.4.0 will not
+1)  Save files and bones files from versions of NetHack prior to 3.5.0 will not
     work with this NetHack.  Don't bother trying to keep them.
 
 2)  To install an update of NetHack after changing something, type 'make' 
