@@ -162,35 +162,129 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
             switch (wParam) 
             { 
 			case VK_LEFT:
-				NHEVENT_KBD(KEYTABLE(KEY_W));
+				if( GetKeyState(VK_CONTROL)&0x80 ) {
+					/* scroll map window one line left */
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_HSCROLL,
+						MAKEWPARAM(SB_LINEUP, 0),
+						(LPARAM)NULL
+					);
+				} else {
+					NHEVENT_KBD(KEYTABLE(KEY_W));
+				}
 			return 0;
 
 			case VK_RIGHT:
-				NHEVENT_KBD(KEYTABLE(KEY_E));
+				if( GetKeyState(VK_CONTROL)&0x80 ) {
+					/* scroll map window one line right */
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_HSCROLL,
+						MAKEWPARAM(SB_LINEDOWN, 0),
+						(LPARAM)NULL
+					);
+				} else {
+					NHEVENT_KBD(KEYTABLE(KEY_E));
+				}
 			return 0;
 
 			case VK_UP:
-				NHEVENT_KBD(KEYTABLE(KEY_N));
+				if( GetKeyState(VK_CONTROL)&0x80 ) {
+					/* scroll map window one line up */
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_VSCROLL,
+						MAKEWPARAM(SB_LINEUP, 0),
+						(LPARAM)NULL
+					);
+				} else {
+					NHEVENT_KBD(KEYTABLE(KEY_N));
+				}
 			return 0;
 
 			case VK_DOWN:
-				NHEVENT_KBD(KEYTABLE(KEY_S));
+				if( GetKeyState(VK_CONTROL)&0x80 ) {
+					/* scroll map window one line down */
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_VSCROLL,
+						MAKEWPARAM(SB_LINEDOWN, 0),
+						(LPARAM)NULL
+					);
+				} else {
+					NHEVENT_KBD(KEYTABLE(KEY_S));
+				}
 			return 0;
 
 			case VK_HOME:
-				NHEVENT_KBD(KEYTABLE(KEY_NW));
+				if( GetKeyState(VK_CONTROL)&0x80 ) {
+					/* scroll map window to upper left corner */
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_VSCROLL,
+						MAKEWPARAM(SB_THUMBTRACK, 0),
+						(LPARAM)NULL
+					);
+
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_HSCROLL,
+						MAKEWPARAM(SB_THUMBTRACK, 0),
+						(LPARAM)NULL
+					);
+				} else {
+					NHEVENT_KBD(KEYTABLE(KEY_NW));
+				}
 			return 0;
 
 			case VK_END:
-				NHEVENT_KBD(KEYTABLE(KEY_SW));
+				if( GetKeyState(VK_CONTROL)&0x80 ) {
+					/* scroll map window to lower right corner */
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_VSCROLL,
+						MAKEWPARAM(SB_THUMBTRACK, ROWNO),
+						(LPARAM)NULL
+					);
+
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_HSCROLL,
+						MAKEWPARAM(SB_THUMBTRACK, COLNO),
+						(LPARAM)NULL
+					);
+				} else {
+					NHEVENT_KBD(KEYTABLE(KEY_SW));
+				}
 			return 0;
 
 			case VK_PRIOR:
-				NHEVENT_KBD(KEYTABLE(KEY_NE));
+				if( GetKeyState(VK_CONTROL)&0x80 ) {
+					/* scroll map window one page up */
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_VSCROLL,
+						MAKEWPARAM(SB_PAGEUP, 0),
+						(LPARAM)NULL
+					);
+				} else {
+					NHEVENT_KBD(KEYTABLE(KEY_NE));
+				}
 			return 0;
 
 			case VK_NEXT:
-				NHEVENT_KBD(KEYTABLE(KEY_SE));
+				if( GetKeyState(VK_CONTROL)&0x80 ) {
+					/* scroll map window one page down */
+					SendMessage(
+						mswin_hwnd_from_winid(WIN_MAP),
+						WM_VSCROLL,
+						MAKEWPARAM(SB_PAGEDOWN, 0),
+						(LPARAM)NULL
+					);
+				} else {
+					NHEVENT_KBD(KEYTABLE(KEY_SE));
+				}
 			return 0;
 
 			case VK_DECIMAL:
@@ -209,6 +303,14 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 			case VK_ADD:
 				NHEVENT_KBD(KEYTABLE(KEY_PLUS));
+			return 0;
+
+			case VK_F3:
+				mswin_select_map_mode(MAP_MODE_TILES);
+			return 0;
+
+			case VK_F4:
+				mswin_select_map_mode(MAP_MODE_ASCII_FIT_TO_SCREEN);
 			return 0;
 
 			default: {
