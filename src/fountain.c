@@ -152,9 +152,7 @@ boolean isyou;
 {
 	if (IS_FOUNTAIN(levl[x][y].typ) &&
 	    (!rn2(3) || FOUNTAIN_IS_WARNED(x,y))) {
-		s_level *slev = Is_special(&u.uz);
-		if(isyou && slev && slev->flags.town &&
-		   !FOUNTAIN_IS_WARNED(x,y)) {
+		if(isyou && in_town(x, y) && !FOUNTAIN_IS_WARNED(x,y)) {
 			struct monst *mtmp;
 			SET_FOUNTAIN_WARNED(x,y);
 			/* Warn about future fountain use. */
@@ -188,7 +186,7 @@ boolean isyou;
 		/* or felt if the hero is blind.			 */
 		newsym(x, y);
 		level.flags.nfountains--;
-		if(isyou && slev && slev->flags.town)
+		if(isyou && in_town(x, y))
 		    (void) angry_guards(FALSE);
 	}
 }
@@ -362,7 +360,6 @@ register struct obj *obj;
 	    && u.ulevel >= 5 && !rn2(6)
 	    && !obj->oartifact
 	    && !exist_artifact(LONG_SWORD, artiname(ART_EXCALIBUR))) {
-		s_level *slev = Is_special(&u.uz);
 
 		if (u.ualign.type != A_LAWFUL) {
 			/* Ha!  Trying to cheat her. */
@@ -389,7 +386,7 @@ register struct obj *obj;
 		levl[u.ux][u.uy].looted = 0;
 		if(Invisible) newsym(u.ux, u.uy);
 		level.flags.nfountains--;
-		if(slev && slev->flags.town)
+		if(in_town(u.ux, u.uy))
 		    (void) angry_guards(FALSE);
 		return;
 	} else (void) get_wet(obj);

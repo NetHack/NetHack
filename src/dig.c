@@ -1006,10 +1006,9 @@ watch_dig(mtmp, x, y, zap)
     xchar x, y;
     boolean zap;
 {
-	s_level *slev = Is_special(&u.uz);
 	struct rm *lev = &levl[x][y];
 
-	if (slev && slev->flags.town &&
+	if (in_town(x, y) &&
 	    (closed_door(x, y) || lev->typ == SDOOR ||
 	     IS_WALL(lev->typ) || IS_FOUNTAIN(lev->typ))) {
 	    if (!mtmp) {

@@ -1576,6 +1576,31 @@ register int typewanted;
 	return(ptr);
 }
 
+/* is (x,y) in a town? */
+boolean
+in_town(x, y)
+register int x, y;
+{
+	s_level *slev = Is_special(&u.uz);
+	register struct mkroom *sroom;
+	boolean has_subrooms = FALSE;
+
+	if (!slev || !slev->flags.town) return FALSE;
+
+	/*
+	 * See if (x,y) is in a room with subrooms, if so, assume it's the
+	 * town.  If there are no subrooms, the whole level is in town.
+	 */
+	for (sroom = &rooms[0]; sroom->hx > 0; sroom++) {
+	    if (sroom->nsubrooms > 0) {
+		has_subrooms = TRUE;
+		if (inside_room(sroom, x, y)) return TRUE;
+	    }
+	}
+
+	return !has_subrooms;
+}
+
 STATIC_OVL void
 move_update(newlev)
 register boolean newlev;

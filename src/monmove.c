@@ -48,10 +48,9 @@ STATIC_OVL void
 watch_on_duty(mtmp)
 register struct monst *mtmp;
 {
-	register s_level *slev = Is_special(&u.uz);
 	int	x, y;
 
-	if(slev && slev->flags.town && mtmp->mpeaceful &&
+	if(mtmp->mpeaceful && in_town(u.ux+u.dx, u.uy+u.dy) &&
 	   mtmp->mcansee && m_canseeu(mtmp) && !rn2(3)) {
 
 	    if(picking_lock(&x, &y) && IS_DOOR(levl[x][y].typ) &&

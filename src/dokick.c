@@ -591,7 +591,6 @@ dokick()
 	register int x, y;
 	int avrg_attrib;
 	register struct monst *mtmp;
-	s_level *slev;
 	boolean no_kick = FALSE;
 	char buf[BUFSZ];
 
@@ -1016,7 +1015,7 @@ dumb:
 		    add_damage(x, y, 400L);
 		    pay_for_damage("break");
 		}
-		if ((slev = Is_special(&u.uz)) && slev->flags.town)
+		if (in_town(x, y))
 		  for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 		    if (DEADMONSTER(mtmp)) continue;
 		    if((mtmp->data == &mons[PM_WATCHMAN] ||
@@ -1036,7 +1035,7 @@ dumb:
 	    if (Blind) feel_location(x,y);	/* we know we hit it */
 	    exercise(A_STR, TRUE);
 	    pline("WHAMMM!!!");
-	    if ((slev = Is_special(&u.uz)) && slev->flags.town)
+	    if (in_town(x, y))
 		for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 		    if (DEADMONSTER(mtmp)) continue;
 		    if ((mtmp->data == &mons[PM_WATCHMAN] ||
