@@ -350,7 +350,11 @@ exerper()
 
 		if(Sick || Vomiting)     exercise(A_CON, FALSE);
 		if(Confusion || Hallucination)		exercise(A_WIS, FALSE);
-		if(Wounded_legs || Fumbling || HStun)	exercise(A_DEX, FALSE);
+		if((Wounded_legs 
+#ifdef STEED
+		    && !u.usteed
+#endif
+			    ) || Fumbling || HStun)	exercise(A_DEX, FALSE);
 	}
 }
 

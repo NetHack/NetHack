@@ -790,6 +790,14 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 		Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
 		you_have(buf);
 	}
+#if defined(WIZARD) && defined(STEED)
+	if (Wounded_legs && u.usteed && wizard) {
+	    Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0, 
+		    SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
+	    *buf = highc(*buf);
+	    enl_msg(buf, " has", " had", " wounded legs");
+	}
+#endif
 	if (Sleeping) enl_msg("You ", "fall", "fell", " asleep");
 	if (Hunger) enl_msg("You hunger", "", "ed", " rapidly");
 

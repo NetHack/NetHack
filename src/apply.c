@@ -2703,7 +2703,11 @@ int unfixable_trouble_count(is_horn)
 
 	if (Stoned) unfixable_trbl++;
 	if (Strangled) unfixable_trbl++;
-	if (Wounded_legs) unfixable_trbl++;
+	if (Wounded_legs
+#ifdef STEED
+		    && !u.usteed
+#endif
+				) unfixable_trbl++;
 	if (Slimed) unfixable_trbl++;
 	/* lycanthropy is not desirable, but it doesn't actually make you feel
 	   bad */

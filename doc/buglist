@@ -152,16 +152,8 @@ Riding bugs:
    showing the player in that situation. The u.usteed check in the 
    display_self() macro could become u.usteed && !u.usteed.minvis 
    to accomodate that.
--- Land mine traps cause wounded legs when the character is riding, and 
-   don't do any harm to the steed.  
 -- Wielding Stormbringer while riding should result in it attacking
    your steed on occasion.
--- There are several inappropriate items around riding a steed
-   with wounded legs: 
-   -Dexterity is periodically abused.
-   -Wounded legs are a minor prayer trouble.
-   -Wounded legs are considered an unfixable unicorn horn trouble.
-   -Falling/being thrown from steed doesn't incur usual wounded-legs DEX hit.
 -- The steed might want to wander about when you are paralyzed (of course the
    knight's well-trained pony wouldn't)
    [eino.keskitalo@purkki.mbnet.fi]

@@ -974,9 +974,23 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 			    already_seen ? a_your[trap->madeby_u] : "",
 			    already_seen ? " land mine" : "it");
 		} else {
+#ifdef STEED
+		    /* prevent landmine from killing steed, throwing you to
+		     * the ground, and you being affected again by the same
+		     * mine because it hasn't been deleted yet
+		     */
+		    static boolean recursive_mine = FALSE;
+
+		    if (recursive_mine) break;
+#endif
 		    seetrap(trap);
 		    pline("KAABLAMM!!!  You triggered %s land mine!",
 					    a_your[trap->madeby_u]);
+#ifdef STEED
+		    recursive_mine = TRUE;
+		    (void) steedintrap(trap, (struct obj *)0);
+		    recursive_mine = FALSE;
+#endif
 		    set_wounded_legs(LEFT_SIDE, rn1(35, 41));
 		    set_wounded_legs(RIGHT_SIDE, rn1(35, 41));
 		    exercise(A_DEX, FALSE);
@@ -1057,6 +1071,11 @@ struct obj *otmp;
 				      Monnam(mtmp));
 			    }
 			}
+			steedhit = TRUE;
+			break;
+		case LANDMINE:
+			if (thitm(0, mtmp, (struct obj *)0, rnd(16)))
+			    trapkilled = TRUE;
 			steedhit = TRUE;
 			break;
 		case PIT:
