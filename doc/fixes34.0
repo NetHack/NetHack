@@ -429,6 +429,7 @@ avoid giving odd "the bat is moving faster" when seeing a bat created
 	in gehennom and inaccurate "the monster is moving slower" when
 	a monster puts on speed boots.
 gold detection "materially poor" message inappropriate if you have hidden_gold()
+cannot reflect back an invisible umber hulk or medusa's attack
 
 
 

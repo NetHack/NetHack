@@ -683,7 +683,8 @@ struct obj *obj;
 	} else if (mlet == S_VAMPIRE || mlet == S_GHOST) {
 	    if (vis)
 		pline ("%s doesn't have a reflection.", Monnam(mtmp));
-	} else if(!mtmp->mcan && mtmp->data == &mons[PM_MEDUSA]) {
+	} else if(!mtmp->mcan && !mtmp->minvis &&
+					mtmp->data == &mons[PM_MEDUSA]) {
 		if (mon_reflects(mtmp, "The gaze is reflected away by %s %s!"))
 			return 1;
 		if (vis)
@@ -694,9 +695,6 @@ struct obj *obj;
 					mtmp->data == &mons[PM_FLOATING_EYE]) {
 		int tmp = d((int)mtmp->m_lev, (int)mtmp->data->mattk[0].damd);
 		if (!rn2(4)) tmp = 120;
-	/* Note: floating eyes cannot use their abilities while invisible,
-	 * but Medusa and umber hulks can.
-	 */
 		if (vis)
 			pline("%s is frozen by its reflection.", Monnam(mtmp));
 		else You_hear("%s stop moving.",something);
@@ -704,7 +702,8 @@ struct obj *obj;
 		if ( (int) mtmp->mfrozen + tmp > 127)
 			mtmp->mfrozen = 127;
 		else mtmp->mfrozen += tmp;
-	} else if(!mtmp->mcan && mtmp->data == &mons[PM_UMBER_HULK]) {
+	} else if(!mtmp->mcan && !mtmp->minvis &&
+					mtmp->data == &mons[PM_UMBER_HULK]) {
 		if (vis)
 			pline ("%s confuses itself!", Monnam(mtmp));
 		mtmp->mconf = 1;
