@@ -441,6 +441,7 @@ prevent corpses of undead creatures just killed by undead turning from being
 	instantly revived by the same undead turning attack
 allow fake player monsters to handle artifacts that don't match alignment/role
 chaotic monsters can use Stormbringer; lawful monsters can use Excalibur
+No "corridor disappears" message if Vault guard dies off-level
 
 
 Platform- and/or Interface-Specific Fixes

@@ -26,6 +26,8 @@ register boolean forceshow;
 	register int fcx, fcy, fcbeg;
 	register struct monst *mtmp;
 
+	if (!on_level(&(EGD(grd)->gdlevel), &u.uz)) return TRUE;
+
 	while((fcbeg = EGD(grd)->fcbeg) < EGD(grd)->fcend) {
 		fcx = EGD(grd)->fakecorr[fcbeg].fx;
 		fcy = EGD(grd)->fakecorr[fcbeg].fy;
