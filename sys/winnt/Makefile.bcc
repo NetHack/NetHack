@@ -1,6 +1,10 @@
 #   SCCS Id: @(#)Makefile.bcc       3.4     $Date$
 #   Copyright (c) NetHack PC Development Team 1993-2003
 #
+#
+# IMPORTANT NOTE: This Makefile has not been tested for 3.4.2.
+#
+#
 #   NetHack 3.4.x Makefile for Borland C++ V5.5.1 and above and Borland's MAKE
 #  
 #   Win32 Compilers Tested:
@@ -384,7 +388,7 @@ RECOVOBJS      = $(O)recover.o
 TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 
 #
-# These are not invoked during a normal game build in 3.4.1
+# These are not invoked during a normal game build in 3.4
 #
 TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
 		 $(O)decl.o	$(O)monst.o	$(O)objects.o
@@ -607,7 +611,8 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 $(SRC)\uuid.lib: $(bcclib)\uuid.lib
 	@copy $(bcclib)\uuid.lib $@
 
-$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(SRC)\uuid.lib
+$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(SRC)\uuid.lib \
+		$(GAMEDIR)\nhdefkey.dll
 	@echo Linking....
 	@$(link) $(lflags) $(startobjg) $(ALLOBJ), $@, $(GAME).map,$(libsmt),,$(NHRES)
 	@if exist $(O)install.tag del $(O)install.tag
@@ -637,6 +642,31 @@ graphicschk:
 	   @echo ----
 !	ENDIF
 	@echo graphicschk > graphicschk
+
+
+$(GAMEDIR)\nhdefkey.dll : $(O)nhdefkey.o
+	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
+	@echo EXPORTS >nhdefkey.def
+	@echo    ProcessKeystroke >>nhdefkey.def
+	@echo    NHkbhit >>nhdefkey.def
+	@echo    SourceWhere >>nhdefkey.def
+	@echo    SourceAuthor >>nhdefkey.def
+	@echo    KeyHandlerName >>nhdefkey.def
+	@echo Linking $@
+	$(link) $(linkdebug) /Gn /Gz /q -L$(bcclib) /c  /aa /Tpd /V$(APPVER) -L$(bcclib) -v \
+	    c0d32.obj $(O)nhdefkey.o, $@,nhdefkey.map,$(libsmt),nhdefkey.def
+
+$(GAMEDIR)\nh340key.dll : $(O)nh340key.o
+	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
+	@echo EXPORTS >nh340key.def
+	@echo    ProcessKeystroke >>nh340key.def
+	@echo    NHkbhit >>nh340key.def
+	@echo    SourceWhere >>nh340key.def
+	@echo    SourceAuthor >>nh340key.def
+	@echo    KeyHandlerName >>nh340key.def
+	@echo Linking $@
+	$(link) $(linkdebug) /Gn /Gz /q -L$(bcclib) /c  /aa /Tpd /V$(APPVER) -L$(bcclib) -v \
+	    c0d32.obj $(O)nh340key.o, $@,nh340key.map,$(libsmt),nh340key.def
 
 #
 #  Secondary Targets.
