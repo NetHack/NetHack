@@ -709,7 +709,8 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		   break;
 
 		case IDM_SAVE:
-		   dosave();
+		   if (!program_state.gameover && !program_state.done_hup) dosave();
+		   else MessageBeep(0);
 		   break;
 
 		case IDM_MAP_TILES:
