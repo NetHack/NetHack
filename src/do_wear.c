@@ -993,7 +993,8 @@ dotakeoff()
 			      uskin->otyp >= GRAY_DRAGON_SCALES ?
 				"dragon scales are" : "dragon scale mail is");
 		else
-		    pline("Not wearing any armor.");
+		    pline("Not wearing any armor.%s", iflags.cmdassist ?
+			" Use 'R' command to remove accessories." : "");
 		return 0;
 	}
 	if (armorpieces > 1)
@@ -1037,7 +1038,8 @@ doremring()
 	MOREACC(ublindf);
 
 	if(!Accessories) {
-		pline("Not wearing any accessories.");
+		pline("Not wearing any accessories.%s", iflags.cmdassist ?
+			" Use 'T' command to take off non-accessories." : "");
 		return(0);
 	}
 	if (Accessories != 1) otmp = getobj(accessories, "remove");

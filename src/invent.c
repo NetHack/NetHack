@@ -20,6 +20,7 @@ STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
 STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
 static char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
+STATIC_DCL void FDECL(silly_thing, (const char *,const char *,struct obj *));
 #ifdef OVLB
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
@@ -1058,7 +1059,7 @@ register const char *let,*word;
 	   && !(usegold && otmp->oclass == COIN_CLASS)
 #endif
 	   ) {
-		pline(silly_thing_to, word);
+		silly_thing(let, word, otmp);
 		return((struct obj *)0);
 	}
 	if(allowcnt == 2) {	/* cnt given */
@@ -1075,6 +1076,39 @@ register const char *let,*word;
 	    }
 	}
 	return(otmp);
+}
+
+STATIC_OVL void
+silly_thing(let, word, otmp)
+const char *let, *word;
+struct obj *otmp;
+{
+	int otyp = otmp->otyp;
+	boolean domsg = FALSE;
+	const char *s1, *s2, *s3;
+	const char *what = (otmp->quan > 1L) ? "one of those" : "that";
+	if ((!strcmp(word, "wear") || !strcmp(word, "take off")) &&
+		(otmp->oclass == RING_CLASS ||
+		(otmp->oclass == FOOD_CLASS && otmp->otyp == MEAT_RING) ||
+		(otmp->oclass == TOOL_CLASS &&
+		 (otyp == BLINDFOLD || otyp == TOWEL || otyp == LENSES)))) {
+			if (!strcmp(word, "wear")) {
+	    			s1 = "P"; s2 = "put"; s3 = " on"; domsg = TRUE;
+			} else {
+				s1 = "R"; s2 = "remove"; s3 = ""; domsg = TRUE;
+			}
+	} else if ((!strcmp(word, "put on") || !strcmp(word, "remove")) &&
+		(otmp->oclass == ARMOR_CLASS)) {
+			if (!strcmp(word, "remove")) {
+	    			s1 = "T"; s2 = "take"; s3 = " off"; domsg = TRUE;
+			} else {
+	    			s1 = "W"; s2 = "wear"; s3 = ""; domsg = TRUE;
+			}
+	}
+	if (domsg)
+		pline("Use the '%s' command to %s %s%s.", s1, s2, what, s3);
+	else
+		pline(silly_thing_to, word);
 }
 
 #endif /* OVL1 */

@@ -912,7 +912,7 @@ int thrown;
 	    tmp = 0;
 	    if (mdat == &mons[PM_SHADE]) {
 		if (!hittxt) {
-		    char *what = unconventional[0] ? unconventional : "attack";
+		    const char *what = unconventional[0] ? unconventional : "attack";
 		    Your("%s %s harmlessly through %s.",
 		    	what, vtense(what, "pass"),
 			mon_nam(mon));
