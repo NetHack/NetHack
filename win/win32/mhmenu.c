@@ -262,6 +262,15 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		LayoutMenu(hWnd);
 	return FALSE;
 
+	case WM_CLOSE:
+	    if (program_state.gameover) {
+		data->result = -1;
+		data->done = 1;
+		program_state.stopprint++;
+		return TRUE;
+	    } else
+	        return FALSE;
+
 	case WM_COMMAND: 
 	{
 		switch (LOWORD(wParam)) 

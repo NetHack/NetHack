@@ -10,6 +10,14 @@
 #define RIP_WIDTH	400
 #define RIP_HEIGHT	200
 
+#define RIP_GRAVE_HEIGHT 	120
+#define RIP_GRAVE_WIDTH		115
+#define RIP_GRAVE_X		90
+#define RIP_GRAVE_Y		60
+
+#define RIP_OFFSET_X		10
+#define RIP_OFFSET_Y		10
+
 PNHWinApp GetNHApp(void);
 
 typedef struct mswin_nethack_text_window {
@@ -61,9 +69,9 @@ void mswin_display_RIP_window (HWND hWnd)
 	GetWindowRect(hWnd, &riprt);
 	GetClientRect (hWnd, &clientrect);
 	textrect = clientrect;
-	textrect.top += 10;
-	textrect.left += 10;
-	textrect.right -= 10;
+	textrect.top += RIP_OFFSET_Y;
+	textrect.left += RIP_OFFSET_X;
+	textrect.right -= RIP_OFFSET_X;
 	if (data->window_text)
 	{
 	    hdc = GetDC (hWnd);
@@ -72,14 +80,14 @@ void mswin_display_RIP_window (HWND hWnd)
 	    ReleaseDC(hWnd, hdc);
 	}
 	if (textrect.right - textrect.left > RIP_WIDTH)
-	    clientrect.right = textrect.right + 10 - clientrect.right;
+	    clientrect.right = textrect.right + RIP_OFFSET_X - clientrect.right;
 	else
-	    clientrect.right = textrect.left + 20 + RIP_WIDTH - clientrect.right;
-	clientrect.bottom = textrect.bottom + RIP_HEIGHT + 10 - clientrect.bottom;
+	    clientrect.right = textrect.left + 2 * RIP_OFFSET_X + RIP_WIDTH - clientrect.right;
+	clientrect.bottom = textrect.bottom + RIP_HEIGHT + RIP_OFFSET_Y - clientrect.bottom;
 	GetWindowRect (GetDlgItem(hWnd, IDOK), &textrect);
 	textrect.right -= textrect.left;
 	textrect.bottom -= textrect.top;
-	clientrect.bottom += textrect.bottom + 10;
+	clientrect.bottom += textrect.bottom + RIP_OFFSET_Y;
 	riprt.right -= riprt.left;
 	riprt.bottom -= riprt.top;
 	riprt.right += clientrect.right;
@@ -91,7 +99,7 @@ void mswin_display_RIP_window (HWND hWnd)
 	GetClientRect (hWnd, &clientrect);
 	MoveWindow (GetDlgItem(hWnd, IDOK),
 	    (clientrect.right - clientrect.left - textrect.right) / 2,
-	    clientrect.bottom - textrect.bottom - 10, textrect.right, textrect.bottom, TRUE);
+	    clientrect.bottom - textrect.bottom - RIP_OFFSET_Y, textrect.right, textrect.bottom, TRUE);
 	ShowWindow(hWnd, SW_SHOW);
 
 	while( IsWindow(hWnd) &&
@@ -141,9 +149,9 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		SetBkMode (hdc, TRANSPARENT);
 		GetClientRect (hWnd, &clientrect);
 		textrect = clientrect;
-		textrect.top += 10;
-		textrect.left += 10;
-		textrect.right -= 10;
+		textrect.top += RIP_OFFSET_Y;
+		textrect.left += RIP_OFFSET_X;
+		textrect.right -= RIP_OFFSET_X;
 		if (data->window_text)
 		{
 			DrawText (hdc, data->window_text, strlen(data->window_text), &textrect,
@@ -159,10 +167,10 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		SetBkMode (hdc, TRANSPARENT);
 		if (data->rip_text)
 		{
-			textrect.left += 90 + bitmap_offset;
-			textrect.top = textrect.bottom + 60;
-			textrect.right = textrect.left + 115;
-			textrect.bottom = textrect.top + 120;
+			textrect.left += RIP_GRAVE_X + bitmap_offset;
+			textrect.top = textrect.bottom + RIP_GRAVE_Y;
+			textrect.right = textrect.left + RIP_GRAVE_WIDTH;
+			textrect.bottom = textrect.top + RIP_GRAVE_HEIGHT;
 			DrawText (hdc, data->rip_text, strlen(data->rip_text), &textrect,
 				DT_CENTER | DT_VCENTER | DT_NOPREFIX | DT_WORDBREAK);
 		}
@@ -176,7 +184,6 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		switch (LOWORD(wParam))
         {
           case IDOK:
-		  case IDCANCEL:
 			mswin_window_mark_dead(mswin_winid_from_handle(hWnd));
 			if( GetNHApp()->hMainWnd==hWnd )
 				GetNHApp()->hMainWnd=NULL;
@@ -185,6 +192,17 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			return TRUE;
 		}
 	break;
+
+	case WM_CLOSE:
+	    /* if we get this here, we saved the bones so we can just force a quit */
+
+	    mswin_window_mark_dead(mswin_winid_from_handle(hWnd));
+	    if( GetNHApp()->hMainWnd==hWnd )
+		GetNHApp()->hMainWnd=NULL;
+	    DestroyWindow(hWnd);
+	    SetFocus(GetNHApp()->hMainWnd);
+	    program_state.stopprint++;
+	    return TRUE;
 
 	case WM_DESTROY:
 		if( data ) {

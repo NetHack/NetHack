@@ -408,10 +408,21 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		case WM_CLOSE: 
 		{
 			/* exit gracefully */
-			switch(MessageBox(hWnd, TEXT("Save?"), TEXT("NetHack for Windows"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
-			case IDYES:	NHEVENT_KBD('y'); dosave(); break;
-			case IDNO: NHEVENT_KBD('q'); done(QUIT); break;
-			case IDCANCEL: break;
+			if (program_state.gameover)
+			{
+			    /* assume the user really meant this, as the game is already over... */
+			    /* to make sure we still save bones, just set stop printing flag */
+			    program_state.stopprint++;
+			    NHEVENT_KBD('\033'); /* and send keyboard input as if user pressed ESC */
+			    /* additional code for this is done in menu and rip windows */
+			}
+			else
+			{
+			    switch(MessageBox(hWnd, TEXT("Save?"), TEXT("NetHack for Windows"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
+			    case IDYES: NHEVENT_KBD('y'); dosave(); break;
+			    case IDNO: NHEVENT_KBD('q'); done(QUIT); break;
+			    case IDCANCEL: break;
+			    }
 			}
 		} return 0;
 
