@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)extern.h	3.5	2004/06/12	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

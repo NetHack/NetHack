@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)winprocs.h 3.4	2003/01/08	*/
+/*	SCCS Id: @(#)winprocs.h 3.5	2003/01/08	*/
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

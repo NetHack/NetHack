@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)context.h	3.4	$Date$	*/
+/*	SCCS Id: @(#)context.h	3.5	$Date$	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)region.h	3.4	2004/12/29	*/
+/*	SCCS Id: @(#)region.h	3.5	2004/12/29	*/
 /* Copyright (c) 1996 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 

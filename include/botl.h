@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)botl.h 3.4	$Date$	*/
+/*	SCCS Id: @(#)botl.h 3.5	$Date$	*/
 /* Copyright (c) Michael Allison, 2003				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

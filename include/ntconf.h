@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)ntconf.h	3.4	2002/03/10	*/
+/*	SCCS Id: @(#)ntconf.h	3.5	2002/03/10	*/
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
 
