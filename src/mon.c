@@ -259,6 +259,8 @@ register struct monst *mtmp;
 	 *  could be killed and leave a corpse.  If a hider then hid
 	 *  underneath it, you could be told the corpse type of a
 	 *  monster that you never knew was there without this.
+	 *  The code in hitmu() substitutes the word "something"
+	 *  if the corpses obj->dknown is 0.
 	 */
 	if (Blind && !sensemon(mtmp)) obj->dknown = 0;
 
