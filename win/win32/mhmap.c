@@ -815,7 +815,7 @@ void nhglyph2charcolor(short g, uchar* ch, int* color)
 COLORREF nhcolor_to_RGB(int c)
 {
 	switch(c) {
-	case CLR_BLACK:			return RGB(85, 85, 85);
+	case CLR_BLACK:			return RGB( 85,  85,   85);		
 	case CLR_RED:			return RGB(255,   0,   0);		
 	case CLR_GREEN:			return RGB(  0, 128,   0);		
 	case CLR_BROWN:			return RGB(165,  42,   42);

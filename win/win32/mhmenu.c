@@ -7,7 +7,6 @@
 #include "mhmain.h"
 #include "mhmsg.h"
 #include "mhfont.h"
-#include <commctrl.h>
 
 #define MENU_MARGIN			0
 #define NHMENU_STR_SIZE     BUFSZ
@@ -35,6 +34,7 @@ typedef struct mswin_nethack_menu_window {
 			PNHMenuItem		 items;			/* menu items */
 			char			 gacc[QBUFSZ];	/* group accelerators */
 			BOOL			 counting;		/* counting flag */
+			char			 prompt[QBUFSZ]; /* menu prompt */
 		} menu;
 
 		struct menu_text {
@@ -468,6 +468,17 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 		data->menu.size++;
 	} break;
+
+	case MSNH_MSG_ENDMENU:
+	{
+		PMSNHMsgEndMenu msg_data = (PMSNHMsgEndMenu)lParam;
+		if( msg_data->text ) {
+			strncpy( data->menu.prompt, msg_data->text, sizeof(data->menu.prompt)-1 );
+		} else {
+			ZeroMemory(data->menu.prompt, sizeof(data->menu.prompt));
+		}
+	} break;
+
 	}
 }
 
@@ -558,21 +569,25 @@ void SetMenuListType(HWND hWnd, int how)
 	switch(how) {
 	case PICK_NONE: 
 		dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD 
-			| WS_VSCROLL | WS_HSCROLL | LVS_REPORT | LVS_NOCOLUMNHEADER 
+			| WS_VSCROLL | WS_HSCROLL | LVS_REPORT  
 			| LVS_OWNERDRAWFIXED | LVS_SINGLESEL; 
 		break;
 	case PICK_ONE: 
 		dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD 
-			| WS_VSCROLL | WS_HSCROLL | LVS_REPORT | LVS_NOCOLUMNHEADER 
+			| WS_VSCROLL | WS_HSCROLL | LVS_REPORT  
 			| LVS_OWNERDRAWFIXED | LVS_SINGLESEL; 
 		break;
 	case PICK_ANY: 
 		dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD 
-			| WS_VSCROLL | WS_HSCROLL | LVS_REPORT | LVS_NOCOLUMNHEADER 
+			| WS_VSCROLL | WS_HSCROLL | LVS_REPORT  
 			| LVS_OWNERDRAWFIXED | LVS_SINGLESEL; 
 		break;
 	default: panic("how should be one of PICK_NONE, PICK_ONE or PICK_ANY");
 	};
+
+	if( strlen(data->menu.prompt)==0 ) {
+		dwStyles |= LVS_NOCOLUMNHEADER ;
+	}
 
 	GetWindowRect(GetDlgItem(hWnd, IDC_MENU_LIST), &rt);
 	DestroyWindow(GetDlgItem(hWnd, IDC_MENU_LIST));
@@ -598,8 +613,9 @@ void SetMenuListType(HWND hWnd, int how)
 
 	/* add column to the list view */
 	ZeroMemory(&lvcol, sizeof(lvcol));
-	lvcol.mask = LVCF_WIDTH;
-	lvcol.cx = 1024;
+	lvcol.mask = LVCF_WIDTH | LVCF_TEXT;
+	lvcol.cx = GetSystemMetrics(SM_CXFULLSCREEN);
+	lvcol.pszText = NH_A2W(data->menu.prompt, wbuf, BUFSZ);
 	ListView_InsertColumn(control, 0, &lvcol);
 
 	/* add items to the list view */
@@ -926,6 +942,8 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 							i, 
 							-1
 						);
+						ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+						ListView_EnsureVisible(hwndList, i, FALSE);
 						break;
 					}
 				}
@@ -1021,6 +1039,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 								NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
 							);
 							ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+							ListView_EnsureVisible(hwndList, i, FALSE);
 							return -2;
 						} else if( data->how == PICK_ONE ) {
 							SelectMenuItem(
@@ -1060,7 +1079,7 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	if(data && data->type==MENU_TYPE_MENU ) {
 		hdc = GetDC(GetMenuControl(hWnd));
-		saveFont = SelectObject(hdc, mswin_create_font(NHW_MENU, ATR_INVERSE, hdc));
+		saveFont = SelectObject(hdc, mswin_create_font(NHW_MENU, ATR_NONE, hdc));
 		GetTextMetrics(hdc, &tm);
 
 		/* Set the height of the list box items. */

@@ -122,10 +122,6 @@
 # define USE_STDARG
 # define NEED_VARARGS
 
-/* ARM - the processor; avoids conflict with ARM in hack.h */
-# ifdef ARM
-# undef ARM
-# endif
 #endif
 
 

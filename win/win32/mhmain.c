@@ -79,7 +79,7 @@ void register_main_window_class()
 
 	RegisterClass(&wcex);
 }
-    
+
 /*
  * Keypad keys are translated to the normal values below.
  * Shifted keypad keys are translated to the
@@ -87,55 +87,56 @@ void register_main_window_class()
  */
 
 enum KEY_INDEXES {
-	KEY_NW, KEY_N, KEY_NE, KEY_MINUS,
-	KEY_W, KEY_STAY, KEY_E, KEY_PLUS,
-	KEY_SW, KEY_S, KEY_SE,
-	KEY_INV, KEY_WAITLOOK,
-	KEY_LAST};
+KEY_NW, KEY_N, KEY_NE, KEY_MINUS,
+KEY_W, KEY_STAY, KEY_E, KEY_PLUS,
+KEY_SW, KEY_S, KEY_SE,
+KEY_INV, KEY_WAITLOOK,
+KEY_LAST};
 
-	static const unsigned char
-	/* normal, shift, control */
- keypad[KEY_LAST][3] = {
-			{'y', 'Y', C('y')},		/* 7 */
-			{'k', 'K', C('k')},		/* 8 */
-			{'u', 'U', C('u')},		/* 9 */
-			{'m', C('p'), C('p')},	/* - */
-			{'h', 'H', C('h')},		/* 4 */
-			{'g', 'g', 'g'},		/* 5 */
-			{'l', 'L', C('l')},		/* 6 */
-			{'p', 'P', C('p')},		/* + */
-			{'b', 'B', C('b')},		/* 1 */
-			{'j', 'J', C('j')},		/* 2 */
-			{'n', 'N', C('n')},		/* 3 */
-			{'i', 'I', C('i')},		/* Ins */
-			{'.', ':', ':'}			/* Del */
-}, numpad[KEY_LAST][3] = {
-			{'7', M('7'), '7'},		/* 7 */
-			{'8', M('8'), '8'},		/* 8 */
-			{'9', M('9'), '9'},		/* 9 */
-			{'m', C('p'), C('p')},	/* - */
-			{'4', M('4'), '4'},		/* 4 */
-			{'g', 'G', 'g'},		/* 5 */
-			{'6', M('6'), '6'},		/* 6 */
-			{'p', 'P', C('p')},		/* + */
-			{'1', M('1'), '1'},		/* 1 */
-			{'2', M('2'), '2'},		/* 2 */
-			{'3', M('3'), '3'},		/* 3 */
-			{'i', 'I', C('i')},		/* Ins */
-			{'.', ':', ':'}			/* Del */
+static const unsigned char
+/* normal, shift, control */
+keypad[KEY_LAST][3] = {
+	{'y', 'Y', C('y')}, /* 7 */
+	{'k', 'K', C('k')}, /* 8 */
+	{'u', 'U', C('u')}, /* 9 */
+	{'m', C('p'), C('p')}, /* - */
+	{'h', 'H', C('h')}, /* 4 */
+	{'g', 'g', 'g'}, /* 5 */
+	{'l', 'L', C('l')}, /* 6 */
+	{'p', 'P', C('p')}, /* + */
+	{'b', 'B', C('b')}, /* 1 */
+	{'j', 'J', C('j')}, /* 2 */
+	{'n', 'N', C('n')}, /* 3 */
+	{'i', 'I', C('i')}, /* Ins */
+	{'.', ':', ':'} /* Del */
+}, 
+numpad[KEY_LAST][3] = {
+	{'7', M('7'), '7'}, /* 7 */
+	{'8', M('8'), '8'}, /* 8 */
+	{'9', M('9'), '9'}, /* 9 */
+	{'m', C('p'), C('p')}, /* - */
+	{'4', M('4'), '4'}, /* 4 */
+	{'g', 'G', 'g'}, /* 5 */
+	{'6', M('6'), '6'}, /* 6 */
+	{'p', 'P', C('p')}, /* + */
+	{'1', M('1'), '1'}, /* 1 */
+	{'2', M('2'), '2'}, /* 2 */
+	{'3', M('3'), '3'}, /* 3 */
+	{'i', 'I', C('i')}, /* Ins */
+	{'.', ':', ':'} /* Del */
 };
 
 
 #define STATEON(x) ((GetKeyState(x) & 0xFFFE) != 0)
 #define KEYTABLE(x) ((iflags.num_pad ? numpad : keypad)[x] \
-			[(STATEON(VK_SHIFT) ? 1 : STATEON(VK_CONTROL) ? 2 : 0)])
-
+[(STATEON(VK_SHIFT) ? 1 : STATEON(VK_CONTROL) ? 2 : 0)])
+  
+    
 /*
 //  FUNCTION: WndProc(HWND, unsigned, WORD, LONG)
 //
 //  PURPOSE:  Processes messages for the main window.
 */
-
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMainWindow data;
@@ -161,63 +162,73 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			/* translate arrow keys into nethack commands */
             switch (wParam) 
             { 
-            case VK_LEFT: 
+			case VK_LEFT:
 				NHEVENT_KBD(KEYTABLE(KEY_W));
-                return 0; 
+			return 0;
 
-            case VK_RIGHT: 
+			case VK_RIGHT:
 				NHEVENT_KBD(KEYTABLE(KEY_E));
-                return 0; 
+			return 0;
 
-            case VK_UP: 
+			case VK_UP:
 				NHEVENT_KBD(KEYTABLE(KEY_N));
-                return 0; 
+			return 0;
 
-            case VK_DOWN: 
+			case VK_DOWN:
 				NHEVENT_KBD(KEYTABLE(KEY_S));
-                return 0; 
+			return 0;
 
-            case VK_HOME: 
+			case VK_HOME:
 				NHEVENT_KBD(KEYTABLE(KEY_NW));
-                return 0; 
+			return 0;
 
-            case VK_END: 
+			case VK_END:
 				NHEVENT_KBD(KEYTABLE(KEY_SW));
-                return 0; 
+			return 0;
 
-            case VK_PRIOR: 
+			case VK_PRIOR:
 				NHEVENT_KBD(KEYTABLE(KEY_NE));
-                return 0; 
+			return 0;
 
-            case VK_NEXT: 
+			case VK_NEXT:
 				NHEVENT_KBD(KEYTABLE(KEY_SE));
-                return 0; 
+			return 0;
 
 			case VK_DECIMAL:
-            case VK_DELETE: 
+			case VK_DELETE:
 				NHEVENT_KBD(KEYTABLE(KEY_WAITLOOK));
-                return 0; 
+			return 0;
 
 			case VK_INSERT:
 			case VK_NUMPAD0:
 				NHEVENT_KBD(KEYTABLE(KEY_INV));
-				return 0;
+			return 0;
 
 			case VK_SUBTRACT:
-				return 0;
 				NHEVENT_KBD(KEYTABLE(KEY_MINUS));
+			return 0;
 
 			case VK_ADD:
-				return 0;
 				NHEVENT_KBD(KEYTABLE(KEY_PLUS));
-            }
-			return 1;
-		} break;
+			return 0;
 
-		case WM_CHAR:
-			/* all characters go to nethack */
-			NHEVENT_KBD(wParam);
-		return 0;
+			default: {
+				WORD c[4];
+				BYTE kbd_state[256];
+				
+				ZeroMemory(kbd_state, sizeof(kbd_state));
+				ZeroMemory(c, sizeof(c));
+				GetKeyboardState(kbd_state);
+				
+				if( ToAscii( LOWORD(wParam), 0, kbd_state, c, 0)==1 ) {
+					NHEVENT_KBD(c[0]);
+					return 0;
+				} else {
+					return 1;
+				}
+			} 
+			}
+		} break;
 
 		case WM_COMMAND:
 			/* process commands - menu commands mostly */
@@ -226,6 +237,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			else
 				return 0;
 
+		case WM_MOVE:
 		case WM_SIZE:
 			mswin_layout_main_window(NULL);
 			break;

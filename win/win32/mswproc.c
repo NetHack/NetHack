@@ -580,15 +580,18 @@ end_menu(window, prompt)
 */
 void mswin_end_menu(winid wid, const char *prompt)
 {
-	TCHAR wbuf[255];
 	logDebug("mswin_end_menu(%d, %s)\n", wid, prompt);
-	if ((wid >= 0) &&
+	if ((wid >= 0) && 
 		(wid < MAXWINDOWS) &&
 		(GetNHApp()->windowlist[wid].win != NULL))
 	{
-		SetWindowText (
-			 GetNHApp()->windowlist[wid].win,
-			 NH_A2W(prompt, wbuf ,sizeof(wbuf))
+		MSNHMsgEndMenu data;
+		ZeroMemory(&data, sizeof(data));
+		data.text = prompt;
+
+		SendMessage( 
+			 GetNHApp()->windowlist[wid].win, 
+			 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_ENDMENU, (LPARAM)&data
 		);
 	}
 }

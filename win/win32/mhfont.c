@@ -54,7 +54,7 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		break;
 
 	case NHW_MENU:
-		font_size = (attr==ATR_INVERSE)? 7 : 7;
+		font_size = (attr==ATR_INVERSE)? 8 : 8;
 		lgfnt.lfHeight			=	-font_size*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
 		lgfnt.lfWidth			=	0;				     // average character width
 		lgfnt.lfEscapement		=	0;					 // angle of escapement

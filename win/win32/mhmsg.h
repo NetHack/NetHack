@@ -15,6 +15,7 @@
 #define MSNH_MSG_STARTMENU		105
 #define MSNH_MSG_ADDMENU		106
 #define MSNH_MSG_CURSOR			107
+#define MSNH_MSG_ENDMENU		108
 
 typedef struct mswin_nhmsg_add_wnd {
   winid		  wid;
@@ -50,5 +51,9 @@ typedef struct mswin_nhmsg_cursor {
   int			x;
   int			y;
 } MSNHMsgCursor, *PMSNHMsgCursor;
+
+typedef struct mswin_nhmsg_end_menu {
+	const char* text;
+} MSNHMsgEndMenu, *PMSNHMsgEndMenu;
 
 #endif
