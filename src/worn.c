@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.4	2002/01/07	*/
+/*	SCCS Id: @(#)worn.c	3.4	2002/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -141,17 +141,19 @@ struct monst *mon;
 }
 
 void
-mon_adjust_speed(mon, adjust)
+mon_adjust_speed(mon, adjust, obj)
 struct monst *mon;
 int adjust;	/* positive => increase speed, negative => decrease */
+struct obj *obj;	/* item to make known if effect can be seen */
 {
     struct obj *otmp;
-
+    boolean give_msg = !in_mklev;
     unsigned int oldspeed = mon->mspeed;
 
     switch (adjust) {
      case  2:
 	mon->permspeed = MFAST;
+	give_msg = FALSE;	/* special case monster creation */
 	break;
      case  1:
 	if (mon->permspeed == MSLOW) mon->permspeed = 0;
@@ -165,6 +167,7 @@ int adjust;	/* positive => increase speed, negative => decrease */
 	break;
      case -2:
 	mon->permspeed = MSLOW;
+	give_msg = FALSE;	/* (not currently used) */
 	break;
     }
 
@@ -176,11 +179,21 @@ int adjust;	/* positive => increase speed, negative => decrease */
     else
 	mon->mspeed = mon->permspeed;
 
-    if (!in_mklev && mon->mspeed != oldspeed && canseemon(mon)) {
-	if (adjust > 0)
-	    pline("%s is suddenly moving faster.", Monnam(mon));
+    if (give_msg && mon->mspeed != oldspeed && canseemon(mon)) {
+	/* fast to slow (skipping intermediate state) or vice versa */
+	const char *howmuch = (mon->mspeed + oldspeed == MFAST + MSLOW) ?
+				"much " : "";
+
+	if (adjust > 0 || mon->mspeed == MFAST)
+	    pline("%s is suddenly moving %sfaster.", Monnam(mon), howmuch);
 	else
-	    pline("%s seems to be moving slower.", Monnam(mon));
+	    pline("%s seems to be moving %sslower.", Monnam(mon), howmuch);
+
+	/* might discover an object if we see the speed change happen, but
+	   avoid making possibly forgotten book known when casting its spell */
+	if (obj != 0 && obj->dknown &&
+		objects[obj->otyp].oc_class != SPBOOK_CLASS)
+	    makeknown(obj->otyp);
     }
 }
 
@@ -205,7 +218,7 @@ boolean on;
 	    mon->minvis = !mon->invis_blkd;
 	    break;
 	 case FAST:
-	    mon_adjust_speed(mon, 0);
+	    mon_adjust_speed(mon, 0, obj);
 	    break;
 	/* properties handled elsewhere */
 	 case ANTIMAGIC:
@@ -240,7 +253,7 @@ boolean on;
 	    mon->minvis = mon->perminvis;
 	    break;
 	 case FAST:
-	    mon_adjust_speed(mon, 0);
+	    mon_adjust_speed(mon, 0, obj);
 	    break;
 	 case FIRE_RES:
 	 case COLD_RES:

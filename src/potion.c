@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2002/01/15	*/
+/*	SCCS Id: @(#)potion.c	3.4	2002/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1058,7 +1058,7 @@ boolean your_fault;
 		break;
 	case POT_SPEED:
 		angermon = FALSE;
-		mon_adjust_speed(mon, 1);
+		mon_adjust_speed(mon, 1, obj);
 		break;
 	case POT_BLINDNESS:
 		if(haseyes(mon->data)) {

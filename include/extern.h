@@ -2238,7 +2238,7 @@ E boolean FDECL(worm_known, (struct monst *));
 E void FDECL(setworn, (struct obj *,long));
 E void FDECL(setnotworn, (struct obj *));
 E void FDECL(mon_set_minvis, (struct monst *));
-E void FDECL(mon_adjust_speed, (struct monst *,int));
+E void FDECL(mon_adjust_speed, (struct monst *,int,struct obj *));
 E void FDECL(update_mon_intrinsics, (struct monst *,struct obj *,BOOLEAN_P));
 E int FDECL(find_mac, (struct monst *));
 E void FDECL(m_dowear, (struct monst *,BOOLEAN_P));

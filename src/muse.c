@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.4	2002/01/07	*/
+/*	SCCS Id: @(#)muse.c	3.4	2002/02/07	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1738,7 +1738,7 @@ skipmsg:
 	case MUSE_WAN_SPEED_MONSTER:
 		mzapmsg(mtmp, otmp, TRUE);
 		otmp->spe--;
-		mon_adjust_speed(mtmp, 1);
+		mon_adjust_speed(mtmp, 1, otmp);
 		return 2;
 	case MUSE_POT_SPEED:
 		mquaffmsg(mtmp, otmp);
@@ -1746,8 +1746,7 @@ skipmsg:
 		   different methods of maintaining speed ratings:
 		   player's character becomes "very fast" temporarily;
 		   monster becomes "one stage faster" permanently */
-		if (oseen) makeknown(POT_SPEED);
-		mon_adjust_speed(mtmp, 1);
+		mon_adjust_speed(mtmp, 1, otmp);
 		m_useup(mtmp, otmp);
 		return 2;
 	case MUSE_WAN_POLYMORPH:

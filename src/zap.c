@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2002/01/07	*/
+/*	SCCS Id: @(#)zap.c	3.4	2002/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -139,7 +139,7 @@ struct obj *otmp;
 	case WAN_SLOW_MONSTER:
 	case SPE_SLOW_MONSTER:
 		if (!resist(mtmp, otmp->oclass, 0, NOTELL)) {
-			mon_adjust_speed(mtmp, -1);
+			mon_adjust_speed(mtmp, -1, otmp);
 			m_dowear(mtmp, FALSE); /* might want speed boots */
 			if (u.uswallow && (mtmp == u.ustuck) &&
 			    is_whirly(mtmp->data)) {
@@ -151,7 +151,7 @@ struct obj *otmp;
 		break;
 	case WAN_SPEED_MONSTER:
 		if (!resist(mtmp, otmp->oclass, 0, NOTELL)) {
-			mon_adjust_speed(mtmp, 1);
+			mon_adjust_speed(mtmp, 1, otmp);
 			m_dowear(mtmp, FALSE); /* might want speed boots */
 		}
 		break;
@@ -609,7 +609,7 @@ register struct obj *obj;
 				       NO_MINVENT|MM_NOWAIT);
 			if (mtmp) {
 				mtmp->mhp = mtmp->mhpmax = 100;
-				mon_adjust_speed(mtmp, 2);	/* MFAST */
+				mon_adjust_speed(mtmp, 2, (struct obj *)0); /* MFAST */
 			}
 		} else {
 		    if (obj->oxlth && (obj->oattached == OATTACHED_MONST)) {

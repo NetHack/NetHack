@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2002/01/18	*/
+/*	SCCS Id: @(#)apply.c	3.4	2002/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -778,9 +778,8 @@ register struct obj *obj;
 		} else switch (rn2(3)) {
 			default:
 				break;
-			case 1: in_mklev = TRUE; /* don't print messages */
-				mon_adjust_speed(mtmp, 2);
-				in_mklev = FALSE;
+			case 1:
+				mon_adjust_speed(mtmp, 2, (struct obj *)0);
 				break;
 			case 2: /* no explanation; it just happens... */
 				nomovemsg = "";

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.4	2000/07/29	*/
+/*	SCCS Id: @(#)mhitm.c	3.4	2002/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -805,7 +805,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		if (!magr->mcan && vis && mdef->mspeed != MSLOW) {
 		    unsigned int oldspeed = mdef->mspeed;
 
-		    mon_adjust_speed(mdef, -1);
+		    mon_adjust_speed(mdef, -1, (struct obj *)0);
 		    if (mdef->mspeed != oldspeed && vis)
 			pline("%s slows down.", Monnam(mdef));
 		}

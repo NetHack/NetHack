@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mcastu.c	3.4	2002/01/10	*/
+/*	SCCS Id: @(#)mcastu.c	3.4	2002/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -427,7 +427,7 @@ int spellnum;
 	dmg = 0;
 	break;
     case MGC_HASTE_SELF:
-	mon_adjust_speed(mtmp, 1);
+	mon_adjust_speed(mtmp, 1, (struct obj *)0);
 	dmg = 0;
 	break;
     case MGC_CURE_SELF:

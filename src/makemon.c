@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.4	2001/11/07	*/
+/*	SCCS Id: @(#)makemon.c	3.4	2002/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -928,7 +928,7 @@ register int	mmflags;
 			break;
 		case S_BAT:
 			if (Inhell && is_bat(ptr))
-			    mon_adjust_speed(mtmp, 2);
+			    mon_adjust_speed(mtmp, 2, (struct obj *)0);
 			break;
 	}
 	if ((ct = emits_light(mtmp->data)) > 0)
