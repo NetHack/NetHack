@@ -893,7 +893,7 @@ register int	mmflags;
 	if (In_sokoban(&u.uz) && !mindless(ptr))  /* know about traps here */
 	    mtmp->mtrapseen = (1L << (PIT - 1)) | (1L << (HOLE - 1));
 	if (ptr->msound == MS_LEADER)		/* leader knows about portal */
-	    mtmp->mtrapseen |= (1 << (MAGIC_PORTAL-1));
+	    mtmp->mtrapseen |= (1L << (MAGIC_PORTAL-1));
 
 	place_monster(mtmp, x, y);
 	mtmp->mcansee = mtmp->mcanmove = TRUE;
