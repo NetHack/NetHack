@@ -675,7 +675,7 @@ tty_askname()
 		if (c == '\b' || c == '\177') {
 			if(ct) {
 				ct--;
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32CON)
 # if defined(WIN32CON)
 				backsp();       /* \b is visible on NT */
 # else
@@ -700,7 +700,7 @@ tty_askname()
 		if(c < 'A' || (c > 'Z' && c < 'a') || c > 'z') c = '_';
 #endif
 		if (ct < (int)(sizeof plname) - 1) {
-#if defined(MICRO)
+#if defined(MICRO) || defined(WIN32CON)
 # if defined(MSDOS)
 			if (iflags.grmode) {
 				(void) putchar(c);
@@ -2442,7 +2442,7 @@ tty_raw_print(str)
     const char *str;
 {
     if(ttyDisplay) ttyDisplay->rawprint++;
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32CON)
     msmsg("%s\n", str);
 #else
     puts(str); (void) fflush(stdout);
@@ -2455,13 +2455,13 @@ tty_raw_print_bold(str)
 {
     if(ttyDisplay) ttyDisplay->rawprint++;
     term_start_raw_bold();
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32CON)
     msmsg("%s", str);
 #else
     (void) fputs(str, stdout);
 #endif
     term_end_raw_bold();
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32CON)
     msmsg("\n");
 #else
     puts("");

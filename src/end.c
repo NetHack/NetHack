@@ -58,7 +58,11 @@ extern void FDECL(nethack_exit,(int));
 # ifdef SYSV
 # define NH_abort()	(void) abort()
 # else
+#  ifdef WIN32
+# define NH_abort()	win32_abort()
+#  else
 # define NH_abort()	abort()
+#  endif
 # endif
 #endif
 
@@ -266,12 +270,10 @@ panic VA_DECL(const char *, str)
 #if defined(WIZARD) && !defined(MICRO)
 # if defined(NOTIFY_NETHACK_BUGS)
 	if (!wizard)
-	    raw_printf("Report error to \"%s\".\n%s.\n",
-			"nethack-bugs@nethack.org",
-			!program_state.something_worth_saving ? "" :
-			"An error save file will be created.\n");
+	    raw_printf("Report the following error to \"%s\".",
+			"nethack-bugs@nethack.org");
 	else if (program_state.something_worth_saving)
-	    raw_print("\nAn error save file will be created.\n");
+	    raw_print("\nError save file being written.\n");
 # else
 	if (!wizard)
 	    raw_printf("Report error to \"%s\"%s.",
@@ -293,7 +295,7 @@ panic VA_DECL(const char *, str)
 	    Vsprintf(buf,str,VA_ARGS);
 	    raw_print(buf);
 	}
-#if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE))
+#if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32))
 	if (wizard)
 	    NH_abort();	/* generate core dump */
 #endif
