@@ -178,5 +178,6 @@ struct monst {
 #define MON_NOWEP(mon)	((mon)->mw = (struct obj *)0)
 
 #define DEADMONSTER(mon)	((mon)->mhp < 1)
+#define is_starting_pet(mon)	((mon)->m_id == context.startingpet_mid)
 
 #endif /* MONST_H */

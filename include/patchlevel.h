@@ -13,7 +13,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL	5
+#define EDITLEVEL	6
 
 #define COPYRIGHT_BANNER_A \
 "NetHack, Copyright 1985-2003"
