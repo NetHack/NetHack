@@ -1146,12 +1146,23 @@ light_cocktail(obj)
 	    begin_burn(obj, FALSE);
 }
 
-static NEARDATA const char cuddly[] = { TOOL_CLASS, 0 };
+static NEARDATA const char cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 };
 
 int
 dorub()
 {
 	struct obj *obj = getobj(cuddly, "rub");
+
+	if (obj && obj->oclass == GEM_CLASS) {
+	    if (obj->otyp == FLINT || obj->otyp == LUCKSTONE ||
+		obj->otyp == LOADSTONE || obj->otyp == TOUCHSTONE) {
+		use_stone(obj);
+		return 1;
+	    } else {
+		pline("Sorry, I don't know how to use that.");
+		return 0;
+	    }
+	}
 
 	if(!obj || (obj != uwep && !wield_tool(obj))) return 0;
 

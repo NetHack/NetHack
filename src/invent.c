@@ -817,9 +817,12 @@ register const char *let,*word;
 		|| (!strcmp(word, "tin") &&
 		    (otyp != CORPSE || !tinnable(otmp)))
 		|| (!strcmp(word, "rub") &&
-		    (otmp->oclass == TOOL_CLASS &&
-		     otyp != OIL_LAMP && otyp != MAGIC_LAMP &&
-		     otyp != BRASS_LANTERN))
+		    ((otmp->oclass == TOOL_CLASS &&
+		      otyp != OIL_LAMP && otyp != MAGIC_LAMP &&
+		      otyp != BRASS_LANTERN) ||
+		     (otmp->oclass == GEM_CLASS &&
+		      otyp != LUCKSTONE && otyp != LOADSTONE &&
+		      otyp != TOUCHSTONE && otyp != FLINT)))
 		|| ((!strcmp(word, "use or apply") ||
 			!strcmp(word, "untrap with")) &&
 		     /* Picks, axes, pole-weapons, bullwhips */
