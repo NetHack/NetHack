@@ -1949,6 +1949,9 @@ boolean from_user;
 		}
 		as++;
 	}
+	/* can't use spellings list for this one due to shuffling */
+	if (!strcmpi(bp, "grey spellbook"))
+		*(bp + 2) = 'a';
     }
 
 	/* dragon scales - assumes order of dragons */
