@@ -1346,8 +1346,11 @@ flush_screen(cursor_on_u)
      *	    flush_screen->print_glyph->impossible->pline->flush_screen
      */
     static   boolean flushing = 0;
+    static   boolean delay_flushing = 0;
     register int x,y;
 
+    if (cursor_on_u == -1) delay_flushing = !delay_flushing;
+    if (delay_flushing) return;
     if (flushing) return;	/* if already flushing then return */
     flushing = 1;
 

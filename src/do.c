@@ -1094,6 +1094,7 @@ boolean at_stairs, falling, portal;
 	/* do this prior to level-change pline messages */
 	vision_reset();		/* clear old level's line-of-sight */
 	vision_full_recalc = 0;	/* don't let that reenable vision yet */
+	flush_screen(-1);	/* ensure all map flushes are postponed */
 
 	if (portal && !In_endgame(&u.uz)) {
 	    /* find the portal on the new level */
@@ -1243,7 +1244,7 @@ boolean at_stairs, falling, portal;
 	/* Reset the screen. */
 	vision_reset();		/* reset the blockages */
 	docrt();		/* does a full vision recalc */
-	flush_screen(1);
+	flush_screen(-1);
 
 	/*
 	 *  Move all plines beyond the screen reset.
