@@ -341,7 +341,7 @@ tgetch()
 	int mod;
 	coord cc;
 	DWORD count;
-	nocmov(ttyDisplay->curx, ttyDisplay->cury);
+	if (iflags.window_inited) nocmov(ttyDisplay->curx, ttyDisplay->cury);
 	return (program_state.done_hup) ?
 		'\033' :
 		pCheckInput(hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
@@ -411,6 +411,7 @@ const char *s;
 	FillConsoleOutputAttribute(hConOut,attr,slen,cursor,&acount);
 	WriteConsoleOutputCharacter(hConOut,s,slen,cursor,&ccount);
 }
+
 
 /*
  * Overrides winntty.c function of the same name
@@ -874,6 +875,62 @@ load_keyboard_handler()
 		}
 		exit(EXIT_FAILURE);
 	}
+}
+
+static COORD msmsgcursor = {0,4};	/* avoid copyright notice */
+
+void
+nttty_close()
+{
+	msmsgcursor.X = 0;
+	msmsgcursor.Y = 0;
+#if 0
+	if (GetConsoleScreenBufferInfo(hConOut,&csbi)) {
+	    DWORD ccnt;
+	    FillConsoleOutputAttribute(hConOut,
+	    		FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+	    		csbi.dwSize.X * csbi.dwSize.Y,
+	    		msmsgcursor, &ccnt);
+	    FillConsoleOutputCharacter(hConOut,' ',
+			csbi.dwSize.X * csbi.dwSize.Y,
+			msmsgcursor, &ccnt);
+	}
+#endif
+}
+
+/* this is used when window system isn't initialized yet */
+void
+msmsg VA_DECL(const char *, fmt)
+	char buf[BUFSZ];
+	int slen, k, ac, cc;
+
+	VA_START(fmt);
+	VA_INIT(fmt, const char *);
+	Vsprintf(buf, fmt, VA_ARGS);
+	VA_END();
+
+	slen = strlen(buf);
+	SetConsoleCursorPosition(hConOut, msmsgcursor);
+	for (k = 0; k < slen; ++k) {
+		switch(buf[k]) {
+			case '\n':
+				msmsgcursor.Y = msmsgcursor.Y++ % 24;
+				msmsgcursor.X = 0;
+				break;
+			case '\r':
+				msmsgcursor.Y = 0;
+				msmsgcursor.X = 0;
+				break;
+			default:
+				FillConsoleOutputAttribute(hConOut,attr,1,
+							msmsgcursor,&ac);
+				WriteConsoleOutputCharacter(hConOut,&buf[k],1,
+							msmsgcursor,&cc);
+				msmsgcursor.X++;
+		}
+		SetConsoleCursorPosition(hConOut, msmsgcursor);
+	}
+	return;
 }
 
 #endif /* WIN32CON */

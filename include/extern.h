@@ -1333,6 +1333,7 @@ E void NDECL(lan_mail_terminate);
 E void NDECL(get_scr_size);
 E int NDECL(nttty_kbhit);
 E void NDECL(nttty_open);
+E void NDECL(nttty_close);
 E void NDECL(nttty_rubout);
 E int NDECL(tgetch);
 E int FDECL(ntposkey,(int *, int *, int *));

@@ -408,6 +408,7 @@ const char *str;
 	return;
 }
 
+#ifndef WIN32CON
 void
 msmsg VA_DECL(const char *, fmt)
 	VA_START(fmt);
@@ -421,6 +422,7 @@ msmsg VA_DECL(const char *, fmt)
 	VA_END();
 	return;
 }
+#endif
 
 /*
  * Follow the PATH, trying to fopen the file.

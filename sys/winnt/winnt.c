@@ -224,12 +224,38 @@ void Delay(int ms)
 	(void)Sleep(ms);
 }
 
+#ifdef WIN32CON
+extern void NDECL(backsp);
+#endif
+
 void win32_abort()
 {
-
 #ifdef WIZARD
-   	if (wizard)
-		DebugBreak();
+	int c, ci, ct;
+   	if (wizard) {
+# ifdef WIN32CON
+   	    if (!iflags.window_inited)
+		c = 'n';
+		ct = 0;
+		msmsg("Execute debug breakpoint wizard?");
+		while ((ci=nhgetch()) != '\n') {
+		    if (ct > 0) {
+			backsp();       /* \b is visible on NT */
+			(void) putchar(' ');
+			backsp();
+			ct = 0;
+			c = 'n';
+		    }
+		    if (ci == 'y' || ci == 'n' || ci == 'Y' || ci == 'N') {
+		    	ct = 1;
+		        c = ci;
+		        msmsg("%c",c);
+		    }
+		}
+		if (c == 'y')
+			DebugBreak();
+	}
+# endif
 #endif
 	abort();
 }
