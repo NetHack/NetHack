@@ -651,7 +651,7 @@ register struct obj *obj;
 		    		    if (canseemon(ghost))
 		    		  	pline("%s is suddenly drawn into its former body!",
 						Monnam(ghost));
-				    mongone(ghost);
+				    mondead(ghost);
 				    recorporealization = TRUE;
 				    newsym(x2, y2);
 			    }
