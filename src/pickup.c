@@ -1429,6 +1429,8 @@ doloot()	/* loot a container on the floor. */
 lootcont:
 
     if (container_at(x, y, FALSE)) {
+	boolean any = FALSE;
+
 	if (!able_to_loot(x, y)) return 0;
 	for (cobj = level.objects[x][y]; cobj; cobj = nobj) {
 	    nobj = cobj->nexthere;
@@ -1438,6 +1440,7 @@ lootcont:
 		c = ynq(qbuf);
 		if (c == 'q') return (timepassed);
 		if (c == 'n') continue;
+		any = TRUE;
 
 		if (cobj->olocked) {
 		    pline("Hmmm, it seems to be locked.");
@@ -1460,6 +1463,7 @@ lootcont:
 		if (multi < 0) return 1;		/* chest trap */
 	    }
 	}
+	if (any) c = 'y';
     } else if (Confusion) {
 #ifndef GOLDOBJ
 	if (u.ugold){
