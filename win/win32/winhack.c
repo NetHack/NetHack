@@ -49,7 +49,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
 	/* init applicatio structure */
 	_nethack_app.hApp = hInstance;
-	_nethack_app.hAccelTable = LoadAccelerators(hInstance, (LPCTSTR)IDC_WINHACK);
+	_nethack_app.hAccelTable = LoadAccelerators(hInstance, (LPCTSTR)IDC_NETHACKW);
 	_nethack_app.hMainWnd = NULL;
 	_nethack_app.hPopupWnd = NULL;
 	_nethack_app.bmpTiles = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_TILES));

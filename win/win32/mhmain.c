@@ -71,21 +71,71 @@ void register_main_window_class()
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
 	wcex.hInstance		= GetNHApp()->hApp;
-	wcex.hIcon			= LoadIcon(GetNHApp()->hApp, (LPCTSTR)IDI_WINHACK);
+	wcex.hIcon			= LoadIcon(GetNHApp()->hApp, (LPCTSTR)IDI_NETHACKW);
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= (TCHAR*)IDC_WINHACK;
+	wcex.lpszMenuName	= (TCHAR*)IDC_NETHACKW;
 	wcex.lpszClassName	= szMainWindowClass;
 
 	RegisterClass(&wcex);
 }
     
-    
+/*
+ * Keypad keys are translated to the normal values below.
+ * Shifted keypad keys are translated to the
+ *    shift values below.
+ */
+
+enum KEY_INDEXES {
+	KEY_NW, KEY_N, KEY_NE, KEY_MINUS,
+	KEY_W, KEY_STAY, KEY_E, KEY_PLUS,
+	KEY_SW, KEY_S, KEY_SE,
+	KEY_INV, KEY_WAITLOOK,
+	KEY_LAST};
+
+	static const unsigned char
+	/* normal, shift, control */
+ keypad[KEY_LAST][3] = {
+			{'y', 'Y', C('y')},		/* 7 */
+			{'k', 'K', C('k')},		/* 8 */
+			{'u', 'U', C('u')},		/* 9 */
+			{'m', C('p'), C('p')},	/* - */
+			{'h', 'H', C('h')},		/* 4 */
+			{'g', 'g', 'g'},		/* 5 */
+			{'l', 'L', C('l')},		/* 6 */
+			{'p', 'P', C('p')},		/* + */
+			{'b', 'B', C('b')},		/* 1 */
+			{'j', 'J', C('j')},		/* 2 */
+			{'n', 'N', C('n')},		/* 3 */
+			{'i', 'I', C('i')},		/* Ins */
+			{'.', ':', ':'}			/* Del */
+}, numpad[KEY_LAST][3] = {
+			{'7', M('7'), '7'},		/* 7 */
+			{'8', M('8'), '8'},		/* 8 */
+			{'9', M('9'), '9'},		/* 9 */
+			{'m', C('p'), C('p')},	/* - */
+			{'4', M('4'), '4'},		/* 4 */
+			{'g', 'G', 'g'},		/* 5 */
+			{'6', M('6'), '6'},		/* 6 */
+			{'p', 'P', C('p')},		/* + */
+			{'1', M('1'), '1'},		/* 1 */
+			{'2', M('2'), '2'},		/* 2 */
+			{'3', M('3'), '3'},		/* 3 */
+			{'i', 'I', C('i')},		/* Ins */
+			{'.', ':', ':'}			/* Del */
+};
+
+
+#define STATEON(x) ((GetKeyState(x) & 0xFFFE) != 0)
+#define KEYTABLE(x) ((iflags.num_pad ? numpad : keypad)[x] \
+			[(STATEON(VK_SHIFT) ? 1 : STATEON(VK_CONTROL) ? 2 : 0)])
+
 /*
 //  FUNCTION: WndProc(HWND, unsigned, WORD, LONG)
 //
 //  PURPOSE:  Processes messages for the main window.
 */
+
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMainWindow data;
@@ -112,40 +162,54 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
             switch (wParam) 
             { 
             case VK_LEFT: 
-				NHEVENT_KBD('4')
+				NHEVENT_KBD(KEYTABLE(KEY_W));
                 return 0; 
 
             case VK_RIGHT: 
-				NHEVENT_KBD('6')
+				NHEVENT_KBD(KEYTABLE(KEY_E));
                 return 0; 
 
             case VK_UP: 
-				NHEVENT_KBD('8')
+				NHEVENT_KBD(KEYTABLE(KEY_N));
                 return 0; 
 
             case VK_DOWN: 
-				NHEVENT_KBD('2')
+				NHEVENT_KBD(KEYTABLE(KEY_S));
                 return 0; 
 
             case VK_HOME: 
-				NHEVENT_KBD('7')
+				NHEVENT_KBD(KEYTABLE(KEY_NW));
                 return 0; 
 
             case VK_END: 
-				NHEVENT_KBD('1')
+				NHEVENT_KBD(KEYTABLE(KEY_SW));
                 return 0; 
 
             case VK_PRIOR: 
-				NHEVENT_KBD('9')
+				NHEVENT_KBD(KEYTABLE(KEY_NE));
                 return 0; 
 
             case VK_NEXT: 
-				NHEVENT_KBD('3')
+				NHEVENT_KBD(KEYTABLE(KEY_SE));
                 return 0; 
 
+			case VK_DECIMAL:
             case VK_DELETE: 
-				NHEVENT_KBD('.')
+				NHEVENT_KBD(KEYTABLE(KEY_WAITLOOK));
                 return 0; 
+
+			case VK_INSERT:
+			case VK_NUMPAD0:
+				NHEVENT_KBD(KEYTABLE(KEY_INV));
+				return 0;
+
+			case VK_SUBTRACT:
+				return 0;
+				NHEVENT_KBD(KEYTABLE(KEY_MINUS));
+
+			case VK_ADD:
+				return 0;
+				NHEVENT_KBD(KEYTABLE(KEY_PLUS));
             }
 			return 1;
 		} break;
@@ -177,7 +241,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		case WM_CLOSE: 
 		{
 			/* exit gracefully */
-			switch(MessageBox(hWnd, TEXT("Save?"), TEXT("WinHack"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
+			switch(MessageBox(hWnd, TEXT("Save?"), TEXT("NetHack for Windows"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
 			case IDYES:	NHEVENT_KBD('y'); dosave(); break;
 			case IDNO: NHEVENT_KBD('q'); done(QUIT); break;
 			case IDCANCEL: break;

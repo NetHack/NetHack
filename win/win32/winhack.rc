@@ -35,14 +35,14 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_WINHACK             ICON    DISCARDABLE     "NETHACK.ICO"
+IDI_NETHACKW            ICON    DISCARDABLE     "NETHACK.ICO"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDC_WINHACK MENU DISCARDABLE 
+IDC_NETHACKW MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
@@ -85,7 +85,7 @@ END
 // Accelerator
 //
 
-IDC_WINHACK ACCELERATORS MOVEABLE PURE 
+IDC_NETHACKW ACCELERATORS MOVEABLE PURE
 BEGIN
     "?",            IDM_ABOUT,              ASCII,  ALT
     "/",            IDM_ABOUT,              ASCII,  ALT
@@ -118,9 +118,12 @@ BEGIN
 END
 
 IDD_MENU DIALOGEX 0, 0, 187, 153
-STYLE WS_POPUP | WS_CLIPSIBLINGS | WS_THICKFRAME
+STYLE WS_POPUP | WS_CLIPSIBLINGS | WS_THICKFRAME | WS_CAPTION
 EXSTYLE WS_EX_CLIENTEDGE | WS_EX_CONTROLPARENT | WS_EX_STATICEDGE
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
+#ifndef __BORLANDC__
+	, 0, 0, 0x1
+#endif
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,7,132,50,14,BS_FLAT
     PUSHBUTTON      "Cancel",IDCANCEL,130,132,50,14,BS_FLAT
@@ -275,7 +278,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_APP_TITLE           "NetHack for Windows - Graphical Port"
-    IDC_WINHACK             "WINHACK"
+    IDC_NETHACKW            "NETHACKW"
 END
 
 #endif    // English (U.S.) resources

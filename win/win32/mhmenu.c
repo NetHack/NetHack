@@ -7,6 +7,7 @@
 #include "mhmain.h"
 #include "mhmsg.h"
 #include "mhfont.h"
+#include <commctrl.h>
 
 #define MENU_MARGIN			0
 #define NHMENU_STR_SIZE     BUFSZ
@@ -312,7 +313,7 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			} break;
 
 			case NM_CLICK: {
-				LPNMITEMACTIVATE lpnmitem = (LPNMITEMACTIVATE) lParam;
+				LPNMLISTVIEW lpnmitem = (LPNMLISTVIEW) lParam;
 				if( lpnmitem->iItem==-1 ) return 0;
 				if( data->how==PICK_ANY ) {
 					SelectMenuItem(
