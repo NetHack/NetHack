@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #endif
 #ifdef WIN32
+#include <errno.h>
 #include "win32api.h"
 #endif
 
@@ -19,10 +20,6 @@
 extern int FDECL(vms_creat, (const char *,unsigned));
 extern int FDECL(vms_open, (const char *,int,unsigned));
 #endif	/* VMS */
-
-#if defined(WIN32) && !defined(WIN_CE)
-static boolean is_NetHack_process(pid);
-#endif
 
 int FDECL(restore_savefile, (char *));
 void FDECL(set_levelfile_name, (int));
@@ -224,6 +221,16 @@ char *basename;
 	(void) strcpy(lock, basename);
 	gfd = open_levelfile(0);
 	if (gfd < 0) {
+#if defined(WIN32) && !defined(WIN_CE)
+ 	    if(errno == EACCES) {
+	  	Fprintf(stderr,
+			"\nThere are files from a game in progress under your name.");
+		Fprintf(stderr,"\nThe files are locked or inaccessible.");
+		Fprintf(stderr,"\nPerhaps the other game is still running?\n");
+	    } else
+	  	Fprintf(stderr,
+			"\nTrouble accessing level 0 (errno = %d).\n", errno);
+#endif
 	    Fprintf(stderr, "Cannot open level 0 for %s.\n", basename);
 	    return(-1);
 	}
@@ -234,15 +241,6 @@ char *basename;
 	    Close(gfd);
 	    return(-1);
 	}
-#if defined(WIN32) && !defined(WIN_CE)
-	if (is_NetHack_process(hpid)) {
-		Fprintf(stderr, "%s\n%s%s%s\n",
-	   "Those level files belong to an active NetHack process and cannot be recovered.",
-		"recovery for \"", basename, "\" aborting.");
-		Close(gfd);
-		return(-1);
-	}
-#endif
 	if (read(gfd, (genericptr_t) &savelev, sizeof(savelev))
 							!= sizeof(savelev)) {
 	    Fprintf(stderr,
@@ -395,55 +393,6 @@ void nhce_message(FILE* f, const char* str, ...)
     va_end(ap);
 
 	MessageBox(NULL, NH_A2W(buf, wbuf, NHSTR_BUFSIZE), TEXT("Recover"), MB_OK);
-}
-#endif
-
-#if defined(WIN32) && !defined(WIN_CE)
-#include <tlhelp32.h>
-
-boolean
-is_NetHack_process(pid) 
-int pid;
-{ 
-    HANDLE hProcessSnap = NULL; 
-    PROCESSENTRY32 pe32      = {0};
-    boolean bRet      = FALSE; 
-    HINSTANCE hinstLib; 
-    genericptr_t ProcTest; 
-    BOOL fFreeResult; 
- 
-    hinstLib = LoadLibrary("KERNEL32"); 
-    if (hinstLib != NULL)  { 
-        ProcTest = (genericptr_t) GetProcAddress(hinstLib, "Process32Next"); 
-        if (!ProcTest) {
-		fFreeResult = FreeLibrary(hinstLib);
-		return FALSE;
-        }
-        fFreeResult = FreeLibrary(hinstLib); 
-    } 
-     
- 
-    hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); 
-    if (hProcessSnap == INVALID_HANDLE_VALUE) 
-        return FALSE; 
- 
-    /*  Set size of the processentry32 structure before using it. */
-    pe32.dwSize = sizeof(PROCESSENTRY32); 
-    if (Process32First(hProcessSnap, &pe32)) { 
-        do {
-            if (pe32.th32ProcessID == (unsigned)pid && pe32.szExeFile &&
-	       ((strlen(pe32.szExeFile) >= 12 &&
-		 !strcmpi(&pe32.szExeFile[strlen(pe32.szExeFile) - 12], "nethackw.exe")) ||
-		(strlen(pe32.szExeFile) >= 11 &&
-        	 !strcmpi(&pe32.szExeFile[strlen(pe32.szExeFile) - 11], "nethack.exe"))))
-	    bRet = TRUE;
-        }
-        while (Process32Next(hProcessSnap, &pe32)); 
-    } 
-    else 
-        bRet = FALSE;
-    CloseHandle(hProcessSnap); 
-    return bRet; 
 }
 #endif
 

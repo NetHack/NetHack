@@ -33,6 +33,7 @@ STATIC_DCL void FDECL(start_tin, (struct obj *));
 STATIC_DCL int FDECL(eatcorpse, (struct obj *));
 STATIC_DCL void FDECL(start_eating, (struct obj *));
 STATIC_DCL void FDECL(fprefx, (struct obj *));
+STATIC_DCL void FDECL(accessory_has_effect, (struct obj *));
 STATIC_DCL void FDECL(fpostfx, (struct obj *));
 STATIC_DCL int NDECL(bite);
 STATIC_DCL int FDECL(edibility_prompts, (struct obj *));
