@@ -34,11 +34,13 @@ STATIC_DCL void FDECL(use_stone, (struct obj *));
 STATIC_PTR int NDECL(set_trap);		/* occupation callback */
 STATIC_DCL int FDECL(use_whip, (struct obj *));
 STATIC_DCL int FDECL(use_pole, (struct obj *));
+STATIC_DCL int FDECL(use_cream_pie, (struct obj *));
 STATIC_DCL int FDECL(use_grapple, (struct obj *));
 STATIC_DCL int FDECL(do_break_wand, (struct obj *));
 STATIC_DCL boolean FDECL(figurine_location_checks,
 				(struct obj *, coord *, BOOLEAN_P));
 STATIC_DCL boolean NDECL(uhave_graystone);
+STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 
 #ifdef	AMIGA
 void FDECL( amii_speaker, ( struct obj *, char *, int ) );
@@ -2382,6 +2384,44 @@ use_pole (obj)
 	return (1);
 }
 
+STATIC_OVL int
+use_cream_pie(obj)
+struct obj *obj;
+{
+	boolean wasblind = Blind;
+	boolean wascreamed = u.ucreamed;
+	boolean several = FALSE;
+
+	if (obj->quan > 1L) {
+		several = TRUE;
+		obj = splitobj(obj, 1L);
+	}
+	if (Hallucination)
+		You("give yourself a facial.");
+	else
+		pline("You immerse your %s in %s%s.", body_part(FACE),
+			several ? "one of " : "",
+			several ? makeplural(the(xname(obj))) : the(xname(obj)));
+	if(can_blnd((struct monst*)0, &youmonst, AT_WEAP, obj)) {
+		int blindinc = rnd(25);
+		u.ucreamed += blindinc;
+		make_blinded(Blinded + (long)blindinc, FALSE);
+		if (!Blind || (Blind && wasblind))
+			pline("There's %ssticky goop all over your %s.",
+				wascreamed ? "more " : "",
+				body_part(FACE));
+		else /* Blind  && !wasblind */
+			You_cant("see through all the sticky goop on your %s.",
+				body_part(FACE));
+	}
+	if (obj->unpaid) {
+		verbalize("You used it, you bought it!");
+		bill_dummy_object(obj);
+	}
+	obj_extract_self(obj);
+	delobj(obj);
+	return(0);
+}
 
 STATIC_OVL int
 use_grapple (obj)
@@ -2662,15 +2702,33 @@ uhave_graystone()
 	return FALSE;
 }
 
+STATIC_OVL void
+add_class(cl, class)
+char *cl;
+char class;
+{
+	char tmp[2];
+	tmp[0] = class;
+	tmp[1] = '\0';
+	Strcat(cl, tmp);
+}
+
 int
 doapply()
 {
 	register struct obj *obj;
 	register int res = 1;
+	char class_list[MAXOCLASSES];
 
 	if(check_capacity((char *)0)) return (0);
-	obj = getobj(carrying(POT_OIL) || uhave_graystone()
-		? tools_too : tools, "use or apply");
+
+	if (carrying(POT_OIL) || uhave_graystone())
+		Strcpy(class_list, tools_too);
+	else
+		Strcpy(class_list, tools);
+	if (carrying(CREAM_PIE)) add_class(class_list, FOOD_CLASS);
+
+	obj = getobj(class_list, "use or apply");
 	if(!obj) return 0;
 
 	if (obj->oclass == WAND_CLASS)
@@ -2687,6 +2745,9 @@ doapply()
 			ublindf->otyp == TOWEL ?     "covered by a towel" :
 			ublindf->otyp == BLINDFOLD ? "wearing a blindfold" :
 						     "wearing lenses");
+		break;
+	case CREAM_PIE:
+		res = use_cream_pie(obj);
 		break;
 	case BULLWHIP:
 		res = use_whip(obj);

@@ -871,6 +871,7 @@ register const char *let,*word;
 			be offered as a choice when already discovered */
 		     (otyp != POT_OIL || !otmp->dknown ||
 		      !objects[POT_OIL].oc_name_known))
+		|| (otmp->oclass == FOOD_CLASS && otyp != CREAM_PIE)
 		|| (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
 		|| (!strcmp(word, "invoke") &&
 		    (!otmp->oartifact && !objects[otyp].oc_unique &&
