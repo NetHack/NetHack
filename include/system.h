@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)system.h	3.4	2001/12/07	*/
+/*	SCCS Id: @(#)system.h	3.4	2003/11/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -222,6 +222,7 @@ E char *FDECL(getcwd, (char *,int));
 #ifdef ULTRIX
 E int FDECL(close, (int));
 E int FDECL(atoi, (const char *));
+E long FDECL(atol, (const char *));
 E int FDECL(chdir, (const char *));
 # if !defined(ULTRIX_CC20) && !defined(__GNUC__)
 E int FDECL(chmod, (const char *,int));
@@ -247,6 +248,7 @@ E int FDECL(abs, (int));
 # endif
 E int FDECL(atexit, (void (*)(void)));
 E int FDECL(atoi, (const char *));
+E long FDECL(atol, (const char *));
 E int FDECL(chdir, (const char *));
 E int FDECL(chown, (const char *,unsigned,unsigned));
 # ifdef __DECC_VER

@@ -16,6 +16,15 @@ const char * const enc_stat[] = {
 };
 
 #ifdef STATUS_VIA_WINDOWPORT
+struct istat_s {
+	long time;
+	unsigned anytype;
+	anything a;
+	char *val;
+	int valwidth;
+	int idxmax;
+};
+
 STATIC_DCL void NDECL(init_blstats);
 STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
 STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
@@ -305,15 +314,6 @@ bot()
 }
 
 #else	/* STATUS_VIA_WINDOWPORT */
-
-struct istat_s {
-	long time;
-	unsigned anytype;
-	anything a;
-	char *val;
-	int valwidth;
-	int idxmax;
-};
 
 /* If entries are added to this, botl.h will require updating too */
 struct istat_s blstats[2][MAXBLSTATS] = {
