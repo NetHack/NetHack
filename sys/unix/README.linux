@@ -62,7 +62,7 @@ Steps used to build this binary release, in addition to the basic
 instructions found in sys/unix/Install.unx.  The step numbers below
 correspond to the step numbers in sys/unix/Install.unx.
 
-System:  gcc-3.2, XFree86-libs-4.2.0, ncurses-5.2, glibc-2.2.93 (GLIBC_2.3)
+System:  gcc-3.2, XFree86-libs-4.2.1, ncurses-5.2, glibc-2.3.2 (GLIBC_2.3)
 
 3.  Edit include/config.h and include/unixconf.h
     config.h: define X11_GRAPHICS window support.
@@ -96,7 +96,7 @@ System:  gcc-3.2, XFree86-libs-4.2.0, ncurses-5.2, glibc-2.2.93 (GLIBC_2.3)
 		  FILEPERM = 0664
 		  EXEPERM = 0755
 		  DIRPERM = 0775
-		  VARDATND = x11tiles pet_mark.xbm rip.xpm
+		  VARDATND = x11tiles NetHack.ad pet_mark.xbm rip.xpm
 
     make all; su; make install
 
