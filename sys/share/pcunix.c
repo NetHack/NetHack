@@ -88,6 +88,9 @@ eraseoldlocks()
 		(void) unlink(fqname(lock, LEVELPREFIX, 0));
 	}
 	set_levelfile_name(lock, 0);
+#ifdef HOLD_LOCKFILE_OPEN
+	really_close();
+#endif
 	if(unlink(fqname(lock, LEVELPREFIX, 0)))
 		return 0;				/* cannot remove it */
 	return(1);					/* success! */
@@ -122,6 +125,15 @@ getlock()
 		chdirx(orgdir, 0);
 # endif
 # if defined(WIN32)
+#  if defined(HOLD_LOCKFILE_OPEN)
+ 		if(errno == EACCES) {
+	  		msmsg("\nThere are files from a game in progress under your name.");
+			msmsg(
+		"\nThe files are locked or inaccessible. Is the other game still running?");
+			unlock_file(HLOCK);
+			error("Cannot open %s", fq_lock);
+ 		} else
+#  endif
 		error("Bad directory or name: %s\n%s\n",
 				fq_lock, strerror(errno));
 # else

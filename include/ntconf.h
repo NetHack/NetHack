@@ -19,6 +19,8 @@
 #define PC_LOCKING		/* Prevent overwrites of aborted or in-progress games */
 				/* without first receiving confirmation. */
 
+#define HOLD_LOCKFILE_OPEN	/* Keep an exclusive lock on the .0 file */
+
 #define SELF_RECOVER		/* Allow the game itself to recover from an aborted game */
 
 /*

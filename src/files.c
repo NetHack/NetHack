@@ -84,6 +84,17 @@ char SAVEF[SAVESIZE];	/* holds relative path of save file from playground */
 char SAVEP[SAVESIZE];	/* holds path of directory for save file */
 #endif
 
+#ifdef HOLD_LOCKFILE_OPEN
+struct level_ftrack {
+int fd;					/* file descriptor for level file     */
+int oflag;				/* open flags                         */
+boolean nethack_thinks_it_is_open;	/* Does NetHack think it's open?       */
+} lftrack;
+# if defined(WIN32)
+#include <share.h>
+# endif
+#endif /*HOLD_LOCKFILE_OPEN*/
+
 #ifdef WIZARD
 #define WIZKIT_MAX 128
 static char wizkit[WIZKIT_MAX];
@@ -135,7 +146,9 @@ STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #ifdef SELF_RECOVER
 STATIC_DCL boolean FDECL(copy_bytes, (int, int));
 #endif
-
+#ifdef HOLD_LOCKFILE_OPEN
+STATIC_DCL int FDECL(open_levelfile_exclusively, (const char *, int, int));
+#endif
 
 /*
  * fname_encode()
@@ -404,6 +417,12 @@ int lev;
 	/* Use O_TRUNC to force the file to be shortened if it already
 	 * exists and is currently longer.
 	 */
+# ifdef HOLD_LOCKFILE_OPEN
+	if (lev == 0)
+		fd = open_levelfile_exclusively(fq_lock, lev,
+				O_WRONLY |O_CREAT | O_TRUNC | O_BINARY);
+	else
+# endif
 	fd = open(fq_lock, O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 #else
 # ifdef MAC
@@ -437,6 +456,11 @@ int lev;
 #ifdef MAC
 	fd = macopen(fq_lock, O_RDONLY | O_BINARY, LEVL_TYPE);
 #else
+# ifdef HOLD_LOCKFILE_OPEN
+	if (lev == 0)
+		fd = open_levelfile_exclusively(fq_lock, lev, O_RDONLY | O_BINARY );
+	else
+# endif
 	fd = open(fq_lock, O_RDONLY | O_BINARY, 0);
 #endif
 	return fd;
@@ -453,6 +477,9 @@ int lev;
 	 */
 	if (lev == 0 || (level_info[lev].flags & LFILE_EXISTS)) {
 		set_levelfile_name(lock, lev);
+#ifdef HOLD_LOCKFILE_OPEN
+		if (lev == 0) really_close();
+#endif
 		(void) unlink(fqname(lock, LEVELPREFIX, 0));
 		level_info[lev].flags &= ~LFILE_EXISTS;
 	}
@@ -478,6 +505,62 @@ clearlocks()
 #endif
 }
 
+#ifdef HOLD_LOCKFILE_OPEN
+STATIC_OVL int
+open_levelfile_exclusively(name, lev, oflag)
+const char *name;
+int lev, oflag;
+{
+	int reslt, fd;
+	if (lftrack.fd) {
+		/* check for compatible access */
+		if (lftrack.oflag == oflag) {
+			fd = lftrack.fd;
+			reslt = lseek(fd, 0L, SEEK_SET);
+			if (reslt == -1L)
+			    panic("open_levelfile_exclusively: lseek failed %d", reslt);
+			lftrack.nethack_thinks_it_is_open = TRUE;
+		} else {
+			really_close();
+			fd = sopen(name, oflag,_SH_DENYRW, FCMASK);
+			lftrack.fd = fd;
+			lftrack.oflag = oflag;
+			lftrack.nethack_thinks_it_is_open = TRUE;
+		}
+	} else {
+			fd = sopen(name, oflag,_SH_DENYRW, FCMASK);
+			lftrack.fd = fd;
+			lftrack.oflag = oflag;
+			if (fd)
+			    lftrack.nethack_thinks_it_is_open = TRUE;
+	}
+	return fd;
+}
+
+void
+really_close()
+{
+	int fd = lftrack.fd;
+	lftrack.nethack_thinks_it_is_open = FALSE;
+	lftrack.fd = 0;
+	lftrack.oflag = 0;
+	(void)_close(fd);
+	return;
+}
+
+close(fd)
+int fd;
+{
+ 	if (lftrack.fd == fd) {
+		really_close();	/* close it, but reopen it to hold it */
+		fd = open_levelfile(0);
+		lftrack.nethack_thinks_it_is_open = FALSE;
+		return 0;
+	}
+	return _close(fd);
+}
+#endif
+	
 /* ----------  END LEVEL FILE HANDLING ----------- */
 
 
@@ -2119,14 +2202,6 @@ recover_savefile()
 	    (void)close(gfd);
 	    return FALSE;
 	}
-#if defined(WIN32) && !defined(WIN_CE)
-	if (is_NetHack_process(hpid)) {
-		raw_printf(
-	  "\nThe level files belong to an active NetHack process and cannot be recovered.");
-		(void)close(gfd);
-		return FALSE;
-	}
-#endif
 	if (read(gfd, (genericptr_t) &savelev, sizeof(savelev))
 							!= sizeof(savelev)) {
 	    raw_printf("\nCheckpointing was not in effect for %s -- recovery impossible.\n",
@@ -2216,6 +2291,9 @@ recover_savefile()
 	}
 	(void)close(sfd);
 
+#ifdef HOLD_LOCKFILE_OPEN
+	really_close();
+#endif
 	/*
 	 * We have a successful savefile!
 	 * Only now do we erase the level files.

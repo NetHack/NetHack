@@ -647,6 +647,9 @@ E void FDECL(free_saved_games, (char**));
 #ifdef SELF_RECOVER
 E boolean NDECL(recover_savefile);
 #endif
+#ifdef HOLD_LOCKFILE_OPEN
+E void NDECL(really_close);
+#endif
 
 /* ### fountain.c ### */
 
@@ -1236,9 +1239,6 @@ E char *FDECL(get_username, (int *));
 E void FDECL(nt_regularize, (char *));
 E int NDECL((*nt_kbhit));
 E void FDECL(Delay, (int));
-#  if !defined(WIN_CE)
-E boolean FDECL(is_NetHack_process, (int));
-#  endif /* !WIN_CE */
 # endif /* WIN32 */
 #endif /* MICRO || WIN32 */
 
