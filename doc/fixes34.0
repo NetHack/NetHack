@@ -455,6 +455,8 @@ don't slap against the floor while riding and eating bad food
 got rid of "nori" (since it doesn't really translate "kelp frond" accurately)
 engraving in fog-covered location on in the Wizard quest said you
 	engraved in air, not dust
+dipping non-weapons into burning potions of oil had no effect
+dipping arrows into burning potions resulted in rust damage
 
 
 Platform- and/or Interface-Specific Fixes
@@ -576,6 +578,7 @@ USER_SOUNDS compilation option to enable use of SOUND and SOUNDDIR variables
 resistance does not protect inventory from artifacts (cold vs Frost Brand,&c)
 phrase the prompts for P and R commands using "put on" and "remove" as the
 	actions rather than repeating W and T commands' "wear" and "take off"
+dipping candles, et al, into burning potions lights them
 
 
 Platform- and/or Interface-Specific New Features

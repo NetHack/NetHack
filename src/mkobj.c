@@ -1045,12 +1045,12 @@ is_flammable(otmp)
 register struct obj *otmp;
 {
 	int otyp = otmp->otyp;
+	int omat = objects[otyp].oc_material;
 
 	if (objects[otyp].oc_oprop == FIRE_RES || otyp == WAN_FIRE)
 		return FALSE;
 
-	return((boolean)(objects[otyp].oc_material <= WOOD &&
-			objects[otyp].oc_material != LIQUID));
+	return((boolean)((omat <= WOOD && omat != LIQUID) || omat == PLASTIC));
 }
 
 boolean

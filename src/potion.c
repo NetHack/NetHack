@@ -1733,18 +1733,20 @@ dodip()
 	    }
 	}
 
-	if (potion->otyp == POT_OIL &&
-		(obj->oclass == WEAPON_CLASS || is_weptool(obj))) {
+	if (potion->otyp == POT_OIL) {
 	    boolean wisx = FALSE;
 	    if (potion->lamplit) {	/* burning */
 		int omat = objects[obj->otyp].oc_material;
-		if (obj->oerodeproof || obj_resists(obj, 5, 95) ||
-			/* `METAL' should not be confused with is_metallic() */
-			omat == METAL || omat == MITHRIL || omat == BONE) {
+		/* the code here should be merged with fire_damage */
+		if (catch_lit(obj)) {
+		    /* catch_lit does all the work if true */
+		} else if (obj->oerodeproof || obj_resists(obj, 5, 95) ||
+			   !is_flammable(obj) || obj->oclass == FOOD_CLASS) {
 		    pline("%s %s to burn for a moment.",
 			  Yname2(obj), otense(obj, "seem"));
 		} else {
-		    if (omat == PLASTIC) obj->oeroded = MAX_ERODE;
+		    if ((omat == PLASTIC || omat == PAPER) && !obj->oartifact)
+			obj->oeroded = MAX_ERODE;
 		    pline_The("burning oil %s %s.",
 			    obj->oeroded == MAX_ERODE ? "destroys" : "damages",
 			    yname(obj));
@@ -1753,8 +1755,12 @@ dodip()
 			obfree(obj, (struct obj *)0);
 			obj = (struct obj *) 0;
 		    } else {
-			/* should check for and do something about
-			   damaging unpaid shop goods here */
+			/* we know it's carried */
+			if (obj->unpaid) {
+			    /* create a dummy duplicate to put on bill */
+			    verbalize("You burnt it, you bought it!");
+			    bill_dummy_object(obj);
+			}
 			obj->oeroded++;
 		    }
 		}
@@ -1762,6 +1768,9 @@ dodip()
 		pline_The("potion spills and covers your %s with oil.",
 			  makeplural(body_part(FINGER)));
 		incr_itimeout(&Glib, d(2,10));
+	    } else if (obj->oclass != WEAPON_CLASS && !is_weptool(obj)) {
+		/* the following cases apply only to weapons */
+		goto more_dips;
 	    /* Oil removes rust and corrosion, but doesn't unburn.
 	     * Arrows, etc are classed as metallic due to arrowhead
 	     * material, but dipping in oil shouldn't repair them.
@@ -1785,6 +1794,7 @@ dodip()
 	    useup(potion);
 	    return 1;
 	}
+    more_dips:
 
 	/* Allow filling of MAGIC_LAMPs to prevent identification by player */
 	if ((obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP) &&
