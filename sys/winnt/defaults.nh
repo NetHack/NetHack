@@ -7,10 +7,34 @@
 # To change the configuration, comment out the unwanted lines, and
 # uncomment the configuration you want.
 
-# Use the IBM character set rather than just plain ascii characters.
+# *** OPTIONS ***
+#
+# Use the IBM character set rather than just plain ascii characters
+# for tty window-port.
 OPTIONS=IBMGraphics
 
-# *** OPTIONS ***
+# Set some options to control graphical window-port (these will
+# be safely and silently ignored by the tty port)
+#
+# Map window settings
+# possible map_mode options include: tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|
+#                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
+#                                    ascii10x18|ascii_fit_to_screen
+OPTIONS=map_mode:tiles,scroll_margin:5
+#
+# Message window settings
+OPTIONS=align_message:top,hilite_pet
+#
+# Menu settings
+OPTIONS=font_menu:Arial,font_size_menu:9,menu_tab_sep
+#
+# Status window settings
+OPTIONS=font_size_status:10
+#
+# Other
+OPTIONS=font_size_text:9,font_size_message:9,toptenwin
+
+# *** Personal Preferences ***
 # Some options to set personal preferences.  Uncomment and change these to
 # suit your personal preference.  If several people are to use the same
 # configuration, options like these should not be set.
@@ -28,7 +52,7 @@ OPTIONS=IBMGraphics
 # General options.  You might also set "silent" so as not to attract
 # the boss's attention.
 #
-OPTIONS=time,noshowexp,number_pad,lit_corridor,rest_on_space,toptenwin
+OPTIONS=time,noshowexp,number_pad,lit_corridor,rest_on_space
 #
 # If you want to get rid of "use #quit to quit..." use:
 #OPTIONS=suppress_alert:3.3.1
