@@ -2014,6 +2014,10 @@ register int held;
 		    char menuprompt[QBUFSZ];
 		    boolean outokay = (cnt != 0);
 		    boolean inokay = (invent != 0);
+		    if (!outokay && !inokay) {
+			pline("%s You don't have anything to put in.", emptymsg);
+			return used;
+		    }
 		    menuprompt[0] = '\0';
 		    if (!cnt) Sprintf(menuprompt, "%s ", emptymsg);
 		    Strcat(menuprompt, "Do what?");
