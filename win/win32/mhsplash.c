@@ -88,11 +88,8 @@ BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 	case WM_INITDIALOG:
 	    /* set text control font */
 		hdc = GetDC(hWnd);
-		hdc = GetDC(hWnd);
 		SendMessage(hWnd, WM_SETFONT,
 			(WPARAM)mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE), 0);
-		ReleaseDC(hWnd, hdc);
-
 		ReleaseDC(hWnd, hdc);
 
 		SetFocus(GetDlgItem(hWnd, IDOK));
