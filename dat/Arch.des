@@ -260,8 +260,8 @@ MONSTER:'M',random,random
 #
 #	The "goal" level for the quest.
 #
-#	Here you meet Minion of Huhetol your nemesis monster.  You have to
-#	defeat Minion of Huhetol in combat to gain the artifact you have
+#	Here you meet Minion of Huhetotl your nemesis monster.  You have to
+#	defeat Minion of Huhetotl in combat to gain the artifact you have
 #	been assigned to retrieve.
 #
 
@@ -318,7 +318,7 @@ REGION:(52,13,52,15),unlit,"ordinary"
 STAIR:(38,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
-# The altar of Set.  Unattended.
+# The altar of Huhetotl.  Unattended.
 ALTAR:(50,14),chaos,altar
 # Objects
 OBJECT:'(',"crystal ball",(50,14),blessed,5,"The Orb of Detection"
