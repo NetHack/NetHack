@@ -1455,7 +1455,6 @@ long *abil;
 		{&EPoison_resistance, AD_DRST},
 	};
 	int k;
-	long adtyp = 0;
 
 	for (k = 0; k < SIZE(abil2adtyp); k++) {
 		if (abil2adtyp[k].abil == abil)
@@ -1486,7 +1485,6 @@ long *abil;
 		{&EReflecting, SPFX_REFLECT},
 	};
 	int k;
-	long spfx = 0L;
 
 	for (k = 0; k < SIZE(abil2spfx); k++) {
 		if (abil2spfx[k].abil == abil)
