@@ -137,7 +137,6 @@ static struct Bool_Opt
 	{"news", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"null", &flags.null, TRUE, SET_IN_GAME},
-	{"number_pad", &iflags.num_pad, FALSE, SET_IN_GAME},
 #ifdef MAC
 	{"page_wait", &flags.page_wait, TRUE, SET_IN_GAME},
 #else
@@ -268,6 +267,7 @@ static struct Comp_Opt
 # endif
 	{ "name",     "your character's name (e.g., name:Merlin-W)",
 						PL_NSIZ, DISP_IN_GAME },
+	{ "number_pad", "use the number pad", 1, SET_IN_GAME},
 	{ "objects",  "the symbols to use for objects",
 						MAXOCLASSES, SET_IN_FILE },
 	{ "packorder", "the inventory order of the items in your pack",
@@ -1064,6 +1064,35 @@ boolean tinitial, tfrom_file;
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(horsename, op, PL_PSIZ);
+		return;
+	}
+
+	fullname = "number_pad";
+	if (match_optname(opts, fullname, 10, TRUE)) {
+		boolean compat = (strlen(opts) <= 10);
+		number_pad(iflags.num_pad ? 1 : 0);
+		op = string_for_opt(opts, (compat || !initial));
+		if (!op) {
+		    if (compat || negated || initial) {
+			/* for backwards compatibility, "number_pad" without a
+			   value is a synonym for number_pad:1 */
+			iflags.num_pad = !negated;
+			if (iflags.num_pad) iflags.num_pad_mode = 0;
+		    }
+		    return;
+		}
+		if (negated) {
+		    bad_negation("number_pad", TRUE);
+		    return;
+		}
+		if (*op == '1' || *op == '2') {
+			iflags.num_pad = 1;
+			if (*op == '2') iflags.num_pad_mode = 1;
+			else iflags.num_pad_mode = 0;
+		} else if (*op == '0') {
+			iflags.num_pad = 0;
+			iflags.num_pad_mode = 0;
+		} else badoption(opts);
 		return;
 	}
 
@@ -2131,9 +2160,6 @@ goodfruit:
 			    else lan_mail_finish();
 			}
 #endif
-			else if ((boolopt[i].addr) == &iflags.num_pad)
-			    number_pad(iflags.num_pad ? 1 : 0);
-
 			else if ((boolopt[i].addr) == &flags.lit_corridor) {
 			    /*
 			     * All corridor squares seen via night vision or

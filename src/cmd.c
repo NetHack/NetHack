@@ -1792,7 +1792,18 @@ register char *cmd;
 		flags.move = FALSE;
 		return;		/* probably we just had an interrupt */
 	}
-
+	if (iflags.num_pad && iflags.num_pad_mode == 1) {
+		/* This handles very old inconsistent DOS/Windows behaviour
+		 * in a new way: earlier, the keyboard handler mapped these,
+		 * which caused counts to be strange when entered from the
+		 * number pad. Now do not map them until here. 
+		 */
+		switch (*cmd) {
+		    case '5':       *cmd = 'g'; break;
+		    case M('5'):    *cmd = 'G'; break;
+		    case M('0'):    *cmd = 'I'; break;
+        	}
+        }
 	/* handle most movement commands */
 	do_walk = do_rush = prefix_seen = FALSE;
 	flags.travel = 0;

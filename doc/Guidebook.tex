@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.64 $ $Date: 2003/04/05 02:14:51 $
+% $Revision: 1.65 $ $Date: 2003/05/12 03:05:00 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.4)}
-\date{May 11, 2003}
+\date{June 5, 2003}
 
 \maketitle
 
@@ -2387,7 +2387,9 @@ in setting this with the `{\tt O}' command.
 Send padding nulls to the terminal (default off).
 %.lp
 \item[\ib{number\_pad}]
-Use the number keys to move instead of {\tt [yuhjklbn]} (default off).
+Use the number keys to move instead of {\tt [yuhjklbn]} (default 0 or off).
+(number\_pad:2 invokes the old DOS behaviour where `{\tt 5}' means `{\tt g}', 
+meta-`{\tt 5}' means `{\tt G}',  and meta-`{\tt 0}' means `{\tt I}'.)
 %.lp
 \item[\ib{objects}]
 Set the characters used to display object classes (default

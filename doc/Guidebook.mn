@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "May 11, 2003
+.ds f2 "June 5, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1943,7 +1943,9 @@ in setting this with the `O' command.
 .lp "null    "
 Send padding nulls to the terminal (default off).
 .lp number_pad
-Use the number keys to move instead of [yuhjklbn] (default off).
+Use the number keys to move instead of [yuhjklbn] (default 0 or off).
+(number_pad:2 invokes the old DOS behaviour where `5' means `g', meta-`5'
+means `G',  and meta-`0' means `I'.)
 .lp objects
 Set the characters used to display object classes
 (default ``])[="(%!?+/$*`0_.'').
