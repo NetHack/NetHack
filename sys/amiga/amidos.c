@@ -80,7 +80,7 @@ int
 dosh()
 {
     int i;
-    char buf[ 500 ];
+    char buf[ BUFSZ ];
     extern struct ExecBase *SysBase;
 
     /* Only under 2.0 and later ROMs do we have System() */

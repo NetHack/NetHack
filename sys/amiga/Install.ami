@@ -54,7 +54,7 @@ I.C. Credits
     Greg Olson, Mike Passaretti, and Gregg Wonderly polished and extended
     the 3.0 and 3.1 ports.  Andrew Church, Ken Lorber, and Gregg Wonderly
     are responsible for the 3.2 port.  Janne Salmijärvi resurrected the
-    amigaport for 3.3.
+    amigaport for 3.3 and Teemu Suikki joined before 3.4.0.
 
 II. Using Amiga NetHack 3.4
     Run NetHack from the shell or from some tool that allows that,
@@ -71,10 +71,10 @@ II.A. Sources of Information
     menu or by pressing Help key.
 
 II.B. The Amiga NetHack WorkBench Front End
-    3.4.0 no longer supports HackWB.
+    Starting from 3.3.0 HackWB is not supported.
 
 II.C. The Amiga NetHack CLI Front End
-    3.4.0 no longer supports CLI Front End either.
+    Starting from 3.3.0 CLI Front end is not supported either.
 
     Instead, use the main binary.  See NetHack.txt file for the standard Unix
     flags for NetHack.  In addition to those flags, Amiga NetHack accepts
@@ -102,6 +102,8 @@ II.D. Amiga-Specific Information for NetHack
     while counting or deselect and reselect the item.  The default
     is to drop all selected items (as before).
 
+    For other options how to configure the screen setting and colors refer
+    to Nethack.cnf.
 
 III. Installing Amiga NetHack 3.4
 

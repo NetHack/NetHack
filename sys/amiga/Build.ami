@@ -1,6 +1,6 @@
 
-                         Compiling Amiga NetHack 3.2
-                Last Revision: 5 November 1996 for NetHack 3.2.2
+                         Compiling Amiga NetHack 3.4
+                Last Revision: 21 February 2002 for NetHack 3.4.0
 
 
    We would like to thank each and every one of the people who took
@@ -15,35 +15,38 @@ I. Introduction
 
     If you have problems with compilation, installation, or think you have
     found a bug in the game, please report it by electronic mail to the
-    development group at nethack-bugs@linc.cis.upenn.edu, where it will
-    be routed to the appropriate person.  Include your configuration, the
-    version of NetHack you are playing (use the 'v' command or see
+    development group at nethack-bugs@nethack.org, where it will be routed
+    to the appropriate person.  Include your configuration, the version of
+    NetHack you are playing (use the 'v' command or see
     include/patchlevel.h), and as much specific information as possible.
     As NetHack runs on many different machines, be sure to mention that you
-    are playing the Amiga version.
+    are playing the Amiga version and also mention if you are using the
+    version for mc68k or ppc.
 
     If you want to find out about distributing NetHack, read the license
     (in NetHack:license or type ?i during the game).
 
-II. Compiling Amiga NetHack 3.2
+II. Compiling Amiga NetHack 3.4
 
 II.A. Compilation Overview
     Compiling NetHack is not very hard - basically you do a little
     configuration and start make.  It does, however, require a good amount
-    of disk space - almost 7 meg (and subject to change; more if you are
-    not doing the simple compile - more on that later).  It also needs a
-    good bit of memory, especially for linking.
+    of disk space and time.  It also needs a good bit of memory, especially
+    for linking.  
 
 II.B. Basic Compilation
 
-    NetHack can be built with SAS/C version 6.55 or the commercial version
-    of DICE.  The "official" compiler for NetHack 3.2 is SAS/C 6.55 - we
-    have dropped support for SAS/C 5.x.
+    NetHack can be built with SAS/C version 6.5x.  The commercial version
+    of DICE might work, but NetHack version 3.2.2 or later haven't been
+    compiled with it.  The "official" compiler for NetHack 3.4 is SAS/C 6.58
+    - we have dropped support for SAS/C 5.x.
 
     The Manx/Aztec port has not been tested recently and is certainly
     broken.  Anyone managing to compile NetHack with this compiler is
     encouraged to submit context diffs of the required changes.  When last
     tested, NetHack required version 5.0B of that compiler.
+
+    Compiling with gcc should also work.
 
 II.B.1. Introduction to Compiling NetHack
     Before doing any compilation, read the README files distributed with
@@ -76,28 +79,27 @@ II.B.1. Introduction to Compiling NetHack
     positions - most will be in dlb archives (if DLB was defined in config.h).
     The first make run should be done in NH:obj and the make install should be
     done in NetHack:; for both runs, the makefile is NH:sys/amiga/Makefile.ami
-    (or NH:sys/amiga/DMakefile for DMake).
+    (or NH:sys/amiga/DMakefile for DMake and NH:sys/amiga/Makefile.agc for
+    gcc).
 
     Note that not all the source is simple C code.  If you are modifying
     lev_comp or dgn_comp you may need bison and/or flex (depending on what
-    modifications you are making).  If you wish to modify the Intuition
-    windows in HackWB, the (uuencoded) PowerWindows files are provided.  You
-    do not need any of these tools to simply build NetHack - all the C output
-    files are provided in the source distribution.  Also, the ifchange
-    script requires a version of diff that produces standard Unix format
-    context diffs for proper operation - the version shipped with SAS/C
-    is not sufficient.
+    modifications you are making).  You do not need any of these tools to
+    simply build NetHack - all the C output files are provided in the source
+    distribution.  Also, the ifchange script requires a version of diff that
+    produces standard Unix format context diffs for proper operation - the
+    version shipped with SAS/C is not sufficient.
 
     If you do not have bison and flex, copy the files from sys/share.  The
     include files go in include/ and the C files go in util/.  If the compile
     fails due to prototype errors for malloc and realloc, try deleting
     the first line of lev_comp.c and dgn_comp.c.
 
-II.B.2. Compiling NetHack with SAS/C version 6.55
+II.B.2. Compiling NetHack with SAS/C version 6.58
 
     NOTE WELL - Amiga NetHack has dropped support for SAS/C version 5.
-    This version of NetHack was developed with SAS/C 6.55.  Earlier versions
-    of the compiler are known to cause problems - don't use them.
+    This version of NetHack was developed with SAS/C 6.58.  Earlier versions
+    than version of the compiler are known to cause problems - don't use them.
 
     A couple of notes and warnings from the SAS/C users on the team:
 
@@ -105,7 +107,6 @@ II.B.2. Compiling NetHack with SAS/C version 6.55
 	  file upon catching various internal disasters.  That is why the
 	  debug=l flag is in the makefile.  This adds about 270K to the disk
 	  image, but it does not increase the run time memory requirements.
-          (But note that this is not useful for split binaries - see below.)
 
 	* The 5.10b optimizer did not produce correct code for NetHack.  The
 	  current optimizer has not been tested.
@@ -143,25 +144,3 @@ II.B.3.	Compiling NetHack with the commercial version of DICE
 
     During compilation, DICE will output a lot of warnings; they can be
     safely ignored.
-
-II.C. Advanced Compilation
-    As mentioned above, NetHack is very large.  There are several
-    techniques under development by the Amiga NetHack Team for dealing
-    with the situation.  As they are completed, they will be documented
-    here.  Before attempting any of them, you MUST do a "normal" build
-    as documented above; the techniques described below require the
-    auxiliary files from a normal build to form a complete NetHack
-    installation.
-
-II.C.1. Splitter
-    Splitter addresses two problems with NetHack: first, the long startup
-    time of the game, and second, the size of the binary (which will not fit
-    on a single floppy disk).  See the file sys/amiga/splitter/split.doc for
-    information on splitter.  The normal install target in Makefile.ami will
-    build the split version of NetHack as part of the normal install process;
-    the front ends will run from either the normal version (HackExe:NetHack)
-    or, preferably, from the split version (NetHack.c#?  NetHack.d#?) - the
-    decision is based on the presence (or absence) of HackExe:NetHack.dir.
-    Note that the contents of NetHack.dir after a build will generally not
-    be the correct contents for a floppy based system.
-
