@@ -436,7 +436,7 @@ long nmv;		/* number of moves */
 	if (mtmp->mstun    && rn2(imv + 1) > 10/2) mtmp->mstun = 0;
 
 	/* might finish eating or be able to use special ability again */
-	if (imv > mtmp->meating) mtmp->meating = 0;
+	if (imv > mtmp->meating) finish_meating(mtmp);
 	else mtmp->meating -= imv;
 	if (imv > mtmp->mspec_used) mtmp->mspec_used = 0;
 	else mtmp->mspec_used -= imv;
@@ -837,7 +837,8 @@ boolean was_dead;
     struct edog *edog;
     boolean quietly = was_dead;
 
-    mtmp->meating = 0;
+    finish_meating(mtmp);
+
     if (!mtmp->mtame) return;
     edog = !mtmp->isminion ? EDOG(mtmp) : 0;
 

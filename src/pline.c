@@ -305,6 +305,21 @@ register struct monst *mtmp;
 	}
 	else if (mtmp->mpeaceful) Strcat(info, ", peaceful");
 	if (mtmp->meating)	  Strcat(info, ", eating");
+	if (mtmp->meating && !mtmp->cham &&
+	    mtmp->mappearance && mtmp->m_ap_type) {
+	    	Sprintf(eos(info), ", mimicing %s",
+		    (mtmp->m_ap_type == M_AP_FURNITURE) ?
+			an(defsyms[mtmp->mappearance].explanation) :
+		    (mtmp->m_ap_type == M_AP_OBJECT &&
+				OBJ_DESCR(objects[mtmp->mappearance])) ?
+			an(OBJ_DESCR(objects[mtmp->mappearance])) :
+		    (mtmp->m_ap_type == M_AP_OBJECT &&
+				OBJ_NAME(objects[mtmp->mappearance])) ?
+			an(OBJ_NAME(objects[mtmp->mappearance])) :
+		    (mtmp->m_ap_type == M_AP_MONSTER) ?
+			an(mons[mtmp->mappearance].mname) :
+			something);
+	}
 	if (mtmp->mcan)		  Strcat(info, ", cancelled");
 	if (mtmp->mconf)	  Strcat(info, ", confused");
 	if (mtmp->mblinded || !mtmp->mcansee)

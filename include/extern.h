@@ -422,6 +422,7 @@ E int FDECL(dog_move, (struct monst *,int));
 #ifdef USE_TRAMPOLI
 E void FDECL(wantdoor, (int,int,genericptr_t));
 #endif
+E void FDECL(finish_meating,(struct monst *));
 
 /* ### dokick.c ### */
 

@@ -2098,7 +2098,7 @@ wakeup(mtmp)
 register struct monst *mtmp;
 {
 	mtmp->msleeping = 0;
-	mtmp->meating = 0;	/* assume there's no salvagable food left */
+	finish_meating(mtmp);
 	setmangry(mtmp);
 	if(mtmp->m_ap_type) seemimic(mtmp);
 	else if (context.forcefight && !context.mon_moving && mtmp->mundetected) {

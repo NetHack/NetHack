@@ -17,6 +17,7 @@ STATIC_DCL struct obj *FDECL(DROPPABLES, (struct monst *));
 STATIC_DCL boolean FDECL(can_reach_location,(struct monst *,XCHAR_P,XCHAR_P,
     XCHAR_P,XCHAR_P));
 STATIC_DCL boolean FDECL(could_reach_item,(struct monst *, XCHAR_P,XCHAR_P));
+STATIC_DCL void FDECL(quickmimic, (struct monst *));
 
 STATIC_OVL struct obj *
 DROPPABLES(mon)
@@ -124,10 +125,17 @@ boolean devour;
 	register struct edog *edog = EDOG(mtmp);
 	boolean poly = FALSE, grow = FALSE, heal = FALSE;
 	int nutrit;
+	boolean deadmimic = FALSE;
 
 	if(edog->hungrytime < monstermoves)
 	    edog->hungrytime = monstermoves;
 	nutrit = dog_nutrition(mtmp, obj);
+
+	deadmimic = (obj->otyp == CORPSE &&
+		     (obj->corpsenm == PM_SMALL_MIMIC ||
+		      obj->corpsenm == PM_LARGE_MIMIC ||
+		      obj->corpsenm == PM_GIANT_MIMIC));
+
 	poly = polyfodder(obj);
 	grow = mlevelgain(obj);
 	heal = mhealup(obj);
@@ -192,11 +200,13 @@ boolean devour;
 	    (void) newcham(mtmp, (struct permonst *)0, FALSE,
 			   cansee(mtmp->mx, mtmp->my));
 	}
+
 	/* limit "instant" growth to prevent potential abuse */
 	if (grow && (int) mtmp->m_lev < (int)mtmp->data->mlevel + 15) {
 	    if (!grow_up(mtmp, (struct monst *)0)) return 2;
 	}
 	if (heal) mtmp->mhp = mtmp->mhpmax;
+	if (deadmimic) quickmimic(mtmp);
 	return 1;
 }
 
@@ -851,6 +861,81 @@ genericptr_t distance;
 	gy = y;
 	*(int*)distance = ndist;
     }
+}
+
+
+static struct qmchoices {
+	int mndx;			/* type of pet, 0 means any  */
+	char mlet;			/* symbol of pet, 0 means any */
+	unsigned mappearance;		/* mimic this */
+	uchar m_ap_type;		/* what is the thing it is mimicing? */
+} qm[] = {
+	/* Things that some pets might be thinking about at the time */
+	{PM_LITTLE_DOG, 0, PM_KITTEN,	  M_AP_MONSTER},
+	{PM_LARGE_DOG,  0, PM_LARGE_CAT,  M_AP_MONSTER},
+	{PM_KITTEN,     0, PM_LITTLE_DOG, M_AP_MONSTER},
+	{PM_LARGE_CAT,  0, PM_LARGE_DOG,  M_AP_MONSTER},
+	{PM_HOUSECAT,   0, PM_DOG, 	  M_AP_MONSTER},
+	{PM_DOG,        0, PM_HOUSECAT,   M_AP_MONSTER},
+	{PM_HOUSECAT,   0, PM_GIANT_RAT,  M_AP_MONSTER},
+#ifdef SINKS
+	{0, S_DOG, SINK, M_AP_FURNITURE},	/* sorry, no fire hydrants in NetHack */
+#endif
+	{0, 0, TRIPE_RATION, M_AP_OBJECT},	/* leave this at end */
+};
+
+void
+finish_meating(mtmp)
+struct monst *mtmp;
+{
+	mtmp->meating = 0;
+	if (mtmp->m_ap_type && mtmp->mappearance && !mtmp->cham) {
+		/* was eating a mimic and now appearance needs resetting */
+		mtmp->m_ap_type = 0;
+		mtmp->mappearance = 0;
+		newsym(mtmp->mx, mtmp->my);
+	}
+}
+
+STATIC_OVL void
+quickmimic(mtmp)
+struct monst *mtmp;
+{
+	int idx = 0, trycnt = 5;
+	char buf[BUFSZ];
+
+	if (Protection_from_shape_changers || Blind || !mtmp->meating) return;
+
+	do {
+		idx = rn2(SIZE(qm));
+		if (qm[idx].mndx != 0 && monsndx(mtmp->data) == qm[idx].mndx)
+			break;
+		if (qm[idx].mlet != 0 && mtmp->data->mlet == qm[idx].mlet)
+			break;
+		if (qm[idx].mndx == 0 && qm[idx].mlet == 0)
+			break;
+	} while (--trycnt > 0);
+	if (trycnt == 0) idx = SIZE(qm)-1;
+	if (!idx) return;	/* impossible */
+
+	Strcpy(buf, mon_nam(mtmp));
+
+	mtmp->m_ap_type = qm[idx].m_ap_type;
+	mtmp->mappearance = qm[idx].mappearance;
+
+	newsym(mtmp->mx,mtmp->my);
+	You("see %s appear where %s was!",
+		(mtmp->m_ap_type == M_AP_FURNITURE) ?
+			an(defsyms[mtmp->mappearance].explanation) :
+		(mtmp->m_ap_type == M_AP_OBJECT &&
+				OBJ_DESCR(objects[mtmp->mappearance])) ?
+			an(OBJ_DESCR(objects[mtmp->mappearance])) :
+		(mtmp->m_ap_type == M_AP_OBJECT &&
+				OBJ_NAME(objects[mtmp->mappearance])) ?
+			an(OBJ_NAME(objects[mtmp->mappearance])) :
+		(mtmp->m_ap_type == M_AP_MONSTER) ?
+			an(mons[mtmp->mappearance].mname) : something, buf);
+	display_nhwindow(WIN_MAP, TRUE);
 }
 
 /*dogmove.c*/

@@ -141,7 +141,10 @@ boolean digest_meal;
 	    (moves % 20 == 0 || regenerates(mon->data))) mon->mhp++;
 	if (mon->mspec_used) mon->mspec_used--;
 	if (digest_meal) {
-	    if (mon->meating) mon->meating--;
+	    if (mon->meating) {
+		mon->meating--;
+		if (mon->meating <= 0) finish_meating(mon);
+	    }
 	}
 }
 
@@ -603,6 +606,7 @@ register int after;
 
 	if (mtmp->meating) {
 	    mtmp->meating--;
+	    if (mtmp->meating <= 0) finish_meating(mtmp);
 	    return 3;			/* still eating */
 	}
 	if (hides_under(ptr) && OBJ_AT(mtmp->mx, mtmp->my) && rn2(10))

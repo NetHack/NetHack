@@ -250,7 +250,7 @@ register struct obj *gold;
                 long value = gold->quan * objects[gold->otyp].oc_cost;
 #endif
 		mtmp->msleeping = 0;
-		mtmp->meating = 0;
+		finish_meating(mtmp);
 		if(!rn2(4)) setmangry(mtmp); /* not always pleasing */
 
 		/* greedy monsters catch gold */
