@@ -1083,14 +1083,18 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 
     // Randomize race and role, unless specified in config
     int ro = flags.initrole;
-    if (ro == -1) {
+    if (ro == ROLE_NONE || ro == ROLE_RANDOM) {
 	ro = rn2(nrole);
-	fully_specified_role = FALSE;
+	if (flags.initrole != ROLE_RANDOM) {
+	    fully_specified_role = FALSE;
+	}
     }
     int ra = flags.initrace;
-    if (ra == -1) {
+    if (ra == ROLE_NONE || ra == ROLE_RANDOM) {
 	ra = rn2(nrace);
-	fully_specified_role = FALSE;
+	if (flags.initrace != ROLE_RANDOM) {
+	    fully_specified_role = FALSE;
+	}
     }
 
     // make sure we have a valid combination, honoring 
@@ -1098,21 +1102,26 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     bool choose_race_first;
 #ifdef QT_CHOOSE_RACE_FIRST
     choose_race_first = TRUE;
-    if (flags.initrole != -1 && flags.initrace == -1) {
+    if (flags.initrole >= 0 && flags.initrace < 0) {
 	choose_race_first = FALSE;
     }
 #else
     choose_race_first = FALSE;
-    if (flags.initrace != -1 && flags.initrole == -1) {
+    if (flags.initrace >= 0 && flags.initrole < 0) {
 	choose_race_first = TRUE;
     }
 #endif
     while (!validrace(ro,ra)) {
-	fully_specified_role = FALSE;
 	if (choose_race_first) {
 	    ro = rn2(nrole);
+	    if (flags.initrole != ROLE_RANDOM) {
+	        fully_specified_role = FALSE;
+	    }
 	} else {
 	    ra = rn2(nrace);
+	    if (flags.initrace != ROLE_RANDOM) {
+	        fully_specified_role = FALSE;
+	    }
 	}
     }
 
