@@ -164,6 +164,9 @@ getlin(const char *ques, char *input)
 		-- getlin() must call flush_screen(1) before doing anything.
 		-- This uses the top line in the tty window-port, other
 		   ports might use a popup.
+		-- getlin() can assume the input buffer is at least BUFSZ
+		   bytes in size and must truncate inputs to fit, including
+		   the nul character.
 int get_ext_cmd(void)
 		-- Get an extended command in a window-port specific way.
 		   An index into extcmdlist[] is returned on a successful
