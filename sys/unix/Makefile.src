@@ -719,7 +719,7 @@ dothrow.o: dothrow.c $(HACK_H)
 drawing.o: drawing.c $(HACK_H) ../include/tcap.h
 dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
 eat.o: eat.c $(HACK_H)
-end.o: end.c $(HACK_H) ../include/eshk.h ../include/dlb.h
+end.o: end.c $(HACK_H) ../include/eshk.h ../include/lev.h ../include/dlb.h
 engrave.o: engrave.c $(HACK_H) ../include/lev.h
 exper.o: exper.c $(HACK_H)
 explode.o: explode.c $(HACK_H)

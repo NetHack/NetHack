@@ -1063,7 +1063,7 @@ $(O)dungeon.o:  $(NHS)dungeon.c $(HDEP) $(I)dgn_file.h $(I)dlb.h
 
 $(O)eat.o:  $(NHS)eat.c $(HDEP)
 
-$(O)end.o:  $(NHS)end.c $(HDEP) $(I)eshk.h $(I)dlb.h
+$(O)end.o:  $(NHS)end.c $(HDEP) $(I)eshk.h $(I)lev.h $(I)dlb.h
 
 $(O)engrave.o:  $(NHS)engrave.c $(HDEP) $(I)lev.h
 

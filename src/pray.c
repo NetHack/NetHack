@@ -279,13 +279,10 @@ register int trouble;
 		    You_feel("more limber.");
 		    Stoned = 0;
 		    context.botl = 1;
-		    delayed_killer = 0;
+		    dealloc_killer(find_delayed_killer(STONED));
 		    break;
 	    case TROUBLE_SLIMED:
-		    pline_The("slime disappears.");
-		    Slimed = 0;
-		    context.botl = 1;
-		    delayed_killer = 0;
+		    make_slimed(0L, "The slime disappears.");
 		    break;
 	    case TROUBLE_STRANGLED:
 		    if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
@@ -544,12 +541,9 @@ STATIC_OVL void
 fry_by_god(resp_god)
 aligntyp resp_god;
 {
-	char killerbuf[64];
-
 	You("fry to a crisp.");
-	killer_format = KILLED_BY;
-	Sprintf(killerbuf, "the wrath of %s", align_gname(resp_god));
-	killer = killerbuf;
+	killer.format = KILLED_BY;
+	Sprintf(killer.name, "the wrath of %s", align_gname(resp_god));
 	done(DIED);
 }
 

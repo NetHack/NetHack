@@ -1852,7 +1852,6 @@ struct obj *obj;
 boolean ordinary;
 {
 	int	damage = 0;
-	char buf[BUFSZ];
 
 	switch(obj->otyp) {
 		case WAN_STRIKING:
@@ -2030,9 +2029,8 @@ boolean ordinary;
 			  : "You seem no deader than before.");
 			break;
 		    }
-		    Sprintf(buf, "shot %sself with a death ray", uhim());
-		    killer = buf;
-		    killer_format = NO_KILLER_PREFIX;
+		    Sprintf(killer.name,"shot %sself with a death ray",uhim());
+		    killer.format = NO_KILLER_PREFIX;
 		    You("irradiate yourself with pure energy!");
 		    You("die.");
 		    makeknown(obj->otyp);
@@ -3110,8 +3108,8 @@ xchar sx, sy;
 		You("aren't affected.");
 		break;
 	    }
-	    killer_format = KILLED_BY_AN;
-	    killer = fltxt;
+	    killer.format = KILLED_BY_AN;
+	    Strcpy(killer.name, fltxt ? fltxt : "");
 	    /* when killed by disintegration breath, don't leave corpse */
 	    u.ugrave_arise = (type == -ZT_BREATH(ZT_DEATH)) ? -3 : NON_PM;
 	    done(DIED);

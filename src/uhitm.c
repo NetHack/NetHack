@@ -1519,7 +1519,7 @@ register struct attack *mattk;
 		    if (!Unchanging && mdef->data == &mons[PM_GREEN_SLIME]) {
 			if (!Slimed) {
 			    You("suck in some slime and don't feel very well.");
-			    Slimed = 10L;
+			    make_slimed(10L, (char*) 0);
 			}
 		    }
 		    break;
@@ -1536,8 +1536,7 @@ register struct attack *mattk;
 		u.uconduct.food++;
 		if (touch_petrifies(mdef->data) && !Stone_resistance && !Stoned) {
 		    Stoned = 5;
-		    killer_format = KILLED_BY_AN;
-		    delayed_killer = mdef->data->mname;
+		    delayed_killer(STONED, KILLED_BY_AN, mdef->data->mname);
 		}
 		if (!vegan(mdef->data))
 		    u.uconduct.unvegan++;
@@ -1765,10 +1764,9 @@ register struct attack *mattk;
 			if (is_rider(mdef->data)) {
 			 pline("Unfortunately, digesting any of it is fatal.");
 			    end_engulf();
-			    Sprintf(msgbuf, "unwisely tried to eat %s",
+			    Sprintf(killer.name, "unwisely tried to eat %s",
 				    mdef->data->mname);
-			    killer = msgbuf;
-			    killer_format = NO_KILLER_PREFIX;
+			    killer.format = NO_KILLER_PREFIX;
 			    done(DIED);
 			    return 0;		/* lifesaved */
 			}
@@ -1818,8 +1816,7 @@ register struct attack *mattk;
 				Sprintf(msgbuf, "%s isn't sitting well with you.",
 					The(mdef->data->mname));
 				if (!Unchanging) {
-					Slimed = 5L;
-					context.botl = 1;
+				    make_slimed(5L, (char*) 0);
 				}
 			    } else
 			    exercise(A_CON, TRUE);

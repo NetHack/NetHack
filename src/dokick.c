@@ -426,17 +426,14 @@ xchar x, y;
 
 	if(kickobj->otyp == CORPSE && touch_petrifies(&mons[kickobj->corpsenm])
 			&& !Stone_resistance && !uarmf) {
-	    char kbuf[BUFSZ];
-
 	    You("kick the %s with your bare %s.",
 		corpse_xname(kickobj, TRUE), makeplural(body_part(FOOT)));
 	    if (!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
 		You("turn to stone...");
-		killer_format = KILLED_BY;
+		killer.format = KILLED_BY;
 		/* KMH -- otmp should be kickobj */
-		Sprintf(kbuf, "kicking %s without boots",
+		Sprintf(killer.name, "kicking %s without boots",
 			an(corpse_xname(kickobj, TRUE)));
-		killer = kbuf;
 		done(STONING);
 	    }
 	}

@@ -332,8 +332,8 @@ int spellnum;
 	    if (Hallucination) {
 		You("have an out of body experience.");
 	    } else {
-		killer_format = KILLED_BY_AN;
-		killer = "touch of death";
+		killer.format = KILLED_BY_AN;
+		Strcpy(killer.name, "touch of death");
 		done(DIED);
 	    }
 	} else {

@@ -96,8 +96,8 @@ int shotlimit;
 		    touch_petrifies(&mons[obj->corpsenm]))) {
 		You("throw the %s corpse with your bare %s.",
 		    mons[obj->corpsenm].mname, body_part(HAND));
-		Sprintf(killer_buf, "%s corpse", an(mons[obj->corpsenm].mname));
-		instapetrify(killer_buf);
+		Sprintf(killer.name, "%s corpse", an(mons[obj->corpsenm].mname));
+		instapetrify(killer.name);
 	}
 	if (welded(obj)) {
 		weldmsg(obj);
@@ -801,8 +801,8 @@ boolean hitsroof;
 	    if (!Stone_resistance &&
 		    !(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
  petrify:
-		killer_format = KILLED_BY;
-		killer = "elementary physics";	/* "what goes up..." */
+		killer.format = KILLED_BY;
+		Strcpy(killer.name, "elementary physics"); /* "what goes up..." */
 		You("turn to stone.");
 		if (obj) dropy(obj);	/* bypass most of hitfloor() */
 		done(STONING);

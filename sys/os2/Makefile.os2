@@ -1550,7 +1550,7 @@ $(OBJ)\dungeon.o  : $(SRC)\$(CB) $(HACK_H) $(INCL)\dgn_file.h
 	$(SRCCC)
 $(OBJ)\eat.o      : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
-$(OBJ)\end.o      : $(SRC)\$(CB) $(HACK_H) $(INCL)\eshk.h
+$(OBJ)\end.o      : $(SRC)\$(CB) $(HACK_H) $(INCL)\eshk.h $(INCL)\lev.h
 	$(SRCCC)
 $(OBJ)\engrave.o  : $(SRC)\$(CB) $(HACK_H) $(INCL)\lev.h
 	$(SRCCC)

@@ -1483,10 +1483,10 @@ boolean was_swallowed;			/* digestion */
 		    if (magr == &youmonst) {
 			There("is an explosion in your %s!",
 			      body_part(STOMACH));
-			Sprintf(killer_buf, "%s explosion",
+			Sprintf(killer.name, "%s explosion",
 				s_suffix(mdat->mname));
 			if (Half_physical_damage) tmp = (tmp+1) / 2;
-			losehp(tmp, killer_buf, KILLED_BY_AN);
+			losehp(tmp, killer.name, KILLED_BY_AN);
 		    } else {
 			if (!Deaf) You_hear("an explosion.");
 			magr->mhp -= tmp;
@@ -1502,9 +1502,8 @@ boolean was_swallowed;			/* digestion */
 		    return FALSE;
 		}
 
-	    	Sprintf(killer_buf, "%s explosion", s_suffix(mdat->mname));
-	    	killer = killer_buf;
-	    	killer_format = KILLED_BY_AN;
+	    	Sprintf(killer.name, "%s explosion", s_suffix(mdat->mname));
+	    	killer.format = KILLED_BY_AN;
 	    	explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_NOXIOUS); 
 	    	return (FALSE);
 	    }
@@ -2018,8 +2017,8 @@ int  typ, fatal;
 		losehp(i, pname, kprefix);
 	}
 	if(u.uhp < 1) {
-		killer_format = kprefix;
-		killer = pname;
+		killer.format = kprefix;
+		Strcpy(killer.name, pname);
 		/* "Poisoned by a poisoned ___" is redundant */
 		done(strstri(pname, "poison") ? DIED : POISONING);
 	}
@@ -2315,21 +2314,21 @@ struct monst *mon;
 		break;
 	}
 #ifdef WIZARD
-	/* For debugging only: allow control of polymorphed monster; not saved */
+	/* For debugging: allow control of polymorphed monster; not saved */
 	if (wizard && iflags.mon_polycontrol) {
-		char pprompt[BUFSZ], buf[BUFSZ];
-		int tries = 0;
-		do {
-			Sprintf(pprompt,
-				"Change %s into what kind of monster? [type the name]",
-				mon_nam(mon));
-			getlin(pprompt,buf);
-			mndx = name_to_mon(buf);
-			if (mndx < LOW_PM)
-				You("cannot polymorph %s into that.", mon_nam(mon));
-			else break;
-		} while(++tries < 5);
-		if (tries==5) pline(thats_enough_tries);
+	    char pprompt[BUFSZ], buf[BUFSZ];
+	    int tries = 0;
+	    do {
+		Sprintf(pprompt,
+			"Change %s into what kind of monster? [type the name]",
+			mon_nam(mon));
+		getlin(pprompt,buf);
+		mndx = name_to_mon(buf);
+		if (mndx < LOW_PM)
+		    You("cannot polymorph %s into that.", mon_nam(mon));
+		else break;
+	    } while(++tries < 5);
+	    if (tries==5) pline(thats_enough_tries);
 	}
 #endif /*WIZARD*/
 	if (mndx == NON_PM) mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);

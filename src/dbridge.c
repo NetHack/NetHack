@@ -370,18 +370,18 @@ int dest, how;
 {
 	if (is_u(etmp)) {
 		if (how == DROWNING) {
-			killer = 0;	/* drown() sets its own killer */
+			killer.name[0] = 0; /* drown() sets its own killer */
 			(void) drown();
 		} else if (how == BURNING) {
-			killer = 0;	/* lava_effects() sets its own killer */
+			killer.name[0] = 0; /* lava_effects() sets own killer */
 			(void) lava_effects();
 		} else {
 			coord xy;
 
 			/* use more specific killer if specified */
-			if (!killer) {
-			    killer_format = KILLED_BY_AN;
-			    killer = "falling drawbridge";
+			if (!killer.name[0]) {
+			    killer.format = KILLED_BY_AN;
+			    Strcpy(killer.name, "falling drawbridge");
 			}
 			done(how);
 			/* So, you didn't die */
@@ -399,7 +399,7 @@ int dest, how;
 		/* we might have crawled out of the moat to survive */
 		etmp->ex = u.ux,  etmp->ey = u.uy;
 	} else {
-		killer = 0;
+		killer.name[0] = 0;
 		/* fake "digested to death" damage-type suppresses corpse */
 #define mk_message(dest) ((dest & 1) ? "" : (char *)0)
 #define mk_corpse(dest)  ((dest & 2) ? AD_DGST : AD_PHYS)
@@ -671,8 +671,8 @@ struct entity *etmp;
 				      E_phrase(etmp, "disappear"));
 		}
 		if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
-			killer_format = KILLED_BY_AN;
-			killer = "closing drawbridge";
+			killer.format = KILLED_BY_AN;
+			Strcpy(killer.name, "closing drawbridge");
 			e_died(etmp, 0, CRUSHING);	       /* no message */
 			return;
 		}
@@ -710,8 +710,8 @@ struct entity *etmp;
 				  E_phrase(etmp, "fall"),
 				  lava ? "lava" : "moat");
 		    }
-		killer_format = NO_KILLER_PREFIX;
-		killer = "fell from a drawbridge";
+		killer.format = NO_KILLER_PREFIX;
+		Strcpy(killer.name, "fell from a drawbridge");
 		e_died(etmp, e_inview ? 3 : 2,      /* CRUSHING is arbitrary */
 		       (is_pool(etmp->ex, etmp->ey)) ? DROWNING :
 		       (is_lava(etmp->ex, etmp->ey)) ? BURNING :
@@ -880,8 +880,8 @@ int x,y;
 			if (e_inview)
 				pline("%s blown apart by flying debris.",
 				      E_phrase(etmp2, "are"));
-			killer_format = KILLED_BY_AN;
-			killer = "exploding drawbridge";
+			killer.format = KILLED_BY_AN;
+			Strcpy(killer.name, "exploding drawbridge");
 			e_died(etmp2, e_inview? 3 : 2, CRUSHING); /*no corpse*/
 		}	     /* nothing which is vulnerable can survive this */
 	}
@@ -909,8 +909,8 @@ int x,y;
 				      E_phrase(etmp1, "die"));
 #endif
 			}
-			killer_format = KILLED_BY_AN;
-			killer = "collapsing drawbridge";
+			killer.format = KILLED_BY_AN;
+			Strcpy(killer.name, "collapsing drawbridge");
 			e_died(etmp1, e_inview? 3 : 2, CRUSHING); /*no corpse*/
 			if(lev1->typ == MOAT) do_entity(etmp1);
 		}

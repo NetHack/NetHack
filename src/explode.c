@@ -31,7 +31,7 @@ int expltype;
 	boolean starting = 1;
 	boolean visible, any_shield;
 	int uhurt = 0; /* 0=unhurt, 1=items damaged, 2=you and items damaged */
-	const char *str;
+	const char *str = (const char *) 0;
 	int idamres, idamnonres;
 	struct monst *mtmp;
 	uchar adtyp;
@@ -53,8 +53,7 @@ int expltype;
 		}
 
 	if (olet == MON_EXPLODE) {
-	    str = killer;
-	    killer = 0;		/* set again later as needed */
+	    str = killer.name;
 	    adtyp = AD_PHYS;
 	} else
 	switch (abs(type) % 10) {
@@ -338,22 +337,23 @@ int expltype;
 		    } else {
 			if (olet == MON_EXPLODE) {
 			    /* killer handled by caller */
-			    if (str != killer_buf && !generic)
-				Strcpy(killer_buf, str);
-			    killer_format = KILLED_BY_AN;
+			    if (generic)
+				killer.name[0] = 0;
+			    else if (str != killer.name)
+				Strcpy(killer.name, str);
+			    killer.format = KILLED_BY_AN;
 			} else if (type >= 0 && olet != SCROLL_CLASS) {
-			    killer_format = NO_KILLER_PREFIX;
-			    Sprintf(killer_buf, "caught %sself in %s own %s",
+			    killer.format = NO_KILLER_PREFIX;
+			    Sprintf(killer.name, "caught %sself in %s own %s",
 				    uhim(), uhis(), str);
 			} else if (!strncmpi(str,"tower of flame", 8) ||
 				   !strncmpi(str,"fireball", 8)) {
-			    killer_format = KILLED_BY_AN;
-			    Strcpy(killer_buf, str);
+			    killer.format = KILLED_BY_AN;
+			    Strcpy(killer.name, str);
 			} else {
-			    killer_format = KILLED_BY;
-			    Strcpy(killer_buf, str);
+			    killer.format = KILLED_BY;
+			    Strcpy(killer.name, str);
 			}
-			killer = killer_buf;
 			/* Known BUG: BURNING suppresses corpse in bones data,
 			   but done does not handle killer reason correctly */
 			done((adtyp == AD_FIRE) ? BURNING : DIED);

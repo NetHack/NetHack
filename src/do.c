@@ -1072,7 +1072,7 @@ boolean at_stairs, falling, portal;
 		if (fd < 0) {
 			pline("%s", whynot);
 			pline("Probably someone removed it.");
-			killer = whynot;
+			Strcpy(killer.name, whynot);
 			done(TRICKED);
 			/* we'll reach here if running in wizard mode */
 			error("Cannot continue this game.");

@@ -144,11 +144,8 @@ void
 burn_away_slime()
 {
 	if (Slimed) {
-	    pline_The("slime that covers you is burned away!");
-	    Slimed = 0L;
-	    context.botl = 1;
+	    make_slimed(0L, "The slime that covers you is burned away!");
 	}
-	return;
 }
 
 
@@ -156,6 +153,7 @@ void
 nh_timeout()
 {
 	register struct prop *upp;
+	struct kinfo *kptr;
 	int sleeptime;
 	int m_idx;
 	int baseluck = (flags.moonphase == FULL_MOON) ? 1 : 0;
@@ -211,29 +209,28 @@ nh_timeout()
 
 	for(upp = u.uprops; upp < u.uprops+SIZE(u.uprops); upp++)
 	    if((upp->intrinsic & TIMEOUT) && !(--upp->intrinsic & TIMEOUT)) {
+		kptr = find_delayed_killer(upp - u.uprops);
 		switch(upp - u.uprops){
 		case STONED:
-			if (delayed_killer && !killer) {
-				killer = delayed_killer;
-				delayed_killer = 0;
+			if (kptr && kptr->name[0]) {
+			    killer.format = kptr->format;
+			    Strcpy(killer.name, kptr->name);
+			} else {
+			    killer.format = NO_KILLER_PREFIX;
+			    Strcpy(killer.name, "killed by petrification");
 			}
-			if (!killer) {
-				/* leaving killer_format would make it
-				   "petrified by petrification" */
-				killer_format = NO_KILLER_PREFIX;
-				killer = "killed by petrification";
-			}
+			dealloc_killer(kptr);
 			done(STONING);
 			break;
 		case SLIMED:
-			if (delayed_killer && !killer) {
-				killer = delayed_killer;
-				delayed_killer = 0;
+			if (kptr && kptr->name[0]) {
+			    killer.format = kptr->format;
+			    Strcpy(killer.name, kptr->name);
+			} else {
+			    killer.format = NO_KILLER_PREFIX;
+			    Strcpy(killer.name, "turned into green slime");
 			}
-			if (!killer) {
-				killer_format = NO_KILLER_PREFIX;
-				killer = "turned into green slime";
-			}
+			dealloc_killer(kptr);
 			done(TURNED_SLIME);
 			break;
 		case VOMITING:
@@ -241,15 +238,21 @@ nh_timeout()
 			break;
 		case SICK:
 			You("die from your illness.");
-			killer_format = KILLED_BY_AN;
-			killer = u.usick_cause;
-			if ((m_idx = name_to_mon(killer)) >= LOW_PM) {
+			if (kptr && kptr->name[0]) {
+			    killer.format = kptr->format;
+			    Strcpy(killer.name, kptr->name);
+			} else {
+			    killer.format = KILLED_BY_AN;
+			    killer.name[0] = 0; /* take the default */
+			}
+			dealloc_killer(kptr);
+
+			if ((m_idx = name_to_mon(killer.name)) >= LOW_PM) {
 			    if (type_is_pname(&mons[m_idx])) {
-				killer_format = KILLED_BY;
+				killer.format = KILLED_BY;
 			    } else if (mons[m_idx].geno & G_UNIQ) {
-				killer = the(killer);
-				Strcpy(u.usick_cause, killer);
-				killer_format = KILLED_BY;
+				Strcpy(killer.name, the(killer.name));
+				killer.format = KILLED_BY;
 			    }
 			}
 			u.usick_type = 0;
@@ -318,8 +321,9 @@ nh_timeout()
 			(void) float_down(I_SPECIAL|TIMEOUT, 0L);
 			break;
 		case STRANGLED:
-			killer_format = KILLED_BY;
-			killer = (u.uburied) ? "suffocation" : "strangulation";
+			killer.format = KILLED_BY;
+			Strcpy(killer.name,
+			       (u.uburied) ? "suffocation" : "strangulation");
 			done(DIED);
 			break;
 		case FUMBLING:

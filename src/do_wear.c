@@ -537,10 +537,7 @@ Amulet_on()
 	case FAKE_AMULET_OF_YENDOR:
 		break;
 	case AMULET_OF_UNCHANGING:
-		if (Slimed) {
-		    Slimed = 0;
-		    context.botl = 1;
-		}
+		if (Slimed) make_slimed(0L, (char *)0);
 		break;
 	case AMULET_OF_CHANGE:
 	    {

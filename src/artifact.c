@@ -1210,7 +1210,7 @@ arti_invoke(obj)
 		else u.uhp += healamt;
 	    }
 	    if(Sick) make_sick(0L,(char *)0,FALSE,SICK_ALL);
-	    if(Slimed) Slimed = 0L;
+	    if(Slimed) make_slimed(0L, (char *)0);
 	    if (Blinded > creamed) make_blinded(creamed, FALSE);
 	    context.botl = 1;
 	    break;

@@ -631,8 +631,8 @@ level_tele()
 		    is_silent(youmonst.data) ? "writhe" : "scream");
 		display_nhwindow(WIN_MESSAGE, FALSE);
 		You("cease to exist.");
-		killer_format = NO_KILLER_PREFIX;
-		killer = "committed suicide";
+		killer.format = NO_KILLER_PREFIX;
+		Strcpy(killer.name, "committed suicide");
 		done(DIED);
 		return;
 	    }
@@ -685,7 +685,7 @@ level_tele()
 	}
 #endif
 
-	killer = 0;		/* still alive, so far... */
+	killer.name[0] = 0;		/* still alive, so far... */
 
 	if (newlev < 0) {
 		if (*u.ushops0) {
@@ -699,8 +699,8 @@ level_tele()
 		if (newlev <= -10) {
 			You("arrive in heaven.");
 			verbalize("Thou art early, but we'll admit thee.");
-			killer_format = NO_KILLER_PREFIX;
-			killer = "went to heaven prematurely";
+			killer.format = NO_KILLER_PREFIX;
+			Strcpy(killer.name, "went to heaven prematurely");
 		} else if (newlev == -9) {
 			You_feel("deliriously happy. ");
 			pline("(In fact, you're on Cloud 9!) ");
@@ -708,7 +708,7 @@ level_tele()
 		} else
 			You("are now high above the clouds...");
 
-		if (killer) {
+		if (killer.name[0]) {
 		    ;		/* arrival in heaven is pending */
 		} else if (Levitation) {
 		    escape_by_flying = "float gently down to earth";
@@ -717,15 +717,14 @@ level_tele()
 		} else {
 		    pline("Unfortunately, you don't know how to fly.");
 		    You("plummet a few thousand feet to your death.");
-		    Sprintf(buf,
+		    Sprintf(killer.name,
 			  "teleported out of the dungeon and fell to %s death",
 			    uhis());
-		    killer = buf;
-		    killer_format = NO_KILLER_PREFIX;
+		    killer.format = NO_KILLER_PREFIX;
 		}
 	}
 
-	if (killer) {	/* the chosen destination was not survivable */
+	if (killer.name[0]) {	/* the chosen destination was not survivable */
 	    d_level lsav;
 
 	    /* set specific death location; this also suppresses bones */

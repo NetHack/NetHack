@@ -925,11 +925,7 @@ boolean atme;
 		break;
 	case SPE_CURE_SICKNESS:
 		if (Sick) You("are no longer ill.");
-		if (Slimed) {
-		    pline_The("slime disappears!");
-		    Slimed = 0;
-		 /* context.botl = 1; -- healup() handles this */
-		}
+		if (Slimed) make_slimed(0L, "The slime disappears!");
 		healup(0, 0, TRUE, FALSE);
 		break;
 	case SPE_CREATE_FAMILIAR:

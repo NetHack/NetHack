@@ -2137,8 +2137,8 @@ const char *str;
 	if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
 	    return;
 	You("turn to stone...");
-	killer_format = KILLED_BY;
-	killer = str;
+	killer.format = KILLED_BY;
+	if (str != killer.name) Strcpy(killer.name, str ? str : "");
 	done(STONING);
 }
 
@@ -2902,9 +2902,10 @@ drown()
 	}
 	u.uinwater = 1;
 	You("drown.");
-	killer_format = KILLED_BY_AN;
-	killer = (levl[u.ux][u.uy].typ == POOL || Is_medusa_level(&u.uz)) ?
-	    "pool of water" : "moat";
+	killer.format = KILLED_BY_AN;
+	Strcpy(killer.name,
+	       (levl[u.ux][u.uy].typ == POOL || Is_medusa_level(&u.uz)) ?
+	       "pool of water" : "moat");
 	done(DROWNING);
 	/* oops, we're still alive.  better get out of the water. */
 	while (!safe_teleds(TRUE)) {
@@ -3924,8 +3925,8 @@ lava_effects()
 
 	/* s/he died... */
 	u.uhp = -1;
-	killer_format = KILLED_BY;
-	killer = lava_killer;
+	killer.format = KILLED_BY;
+	Strcpy(killer.name, lava_killer);
 	You("burn to a crisp...");
 	done(BURNING);
 	while (!safe_teleds(TRUE)) {

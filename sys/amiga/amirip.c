@@ -152,19 +152,19 @@ int how;
     BltBitMap(*tbmp, 0, 0, rp->BitMap, xoff, yoff, tomb_bmhd.w, tomb_bmhd.h, 0xc0, 0xff, NULL);
 
     /* Put together death description */
-    switch (killer_format) {
+    switch (killer.format) {
     default:
 	impossible("bad killer format?");
     case KILLED_BY_AN:
 	Strcpy(buf, killed_by_prefix[how]);
-	Strcat(buf, an(killer));
+	Strcat(buf, an(killer.name));
 	break;
     case KILLED_BY:
 	Strcpy(buf, killed_by_prefix[how]);
-	Strcat(buf, killer);
+	Strcat(buf, killer.name);
 	break;
     case NO_KILLER_PREFIX:
-	Strcpy(buf, killer);
+	Strcpy(buf, killer.name);
 	break;
     }
 
@@ -205,19 +205,19 @@ int how;
     tomb_text(buf);
 
     /* Put together death description */
-    switch (killer_format) {
+    switch (killer.format) {
     default:
 	impossible("bad killer format?");
     case KILLED_BY_AN:
 	Strcpy(buf, killed_by_prefix[how]);
-	Strcat(buf, an(killer));
+	Strcat(buf, an(killer.name));
 	break;
     case KILLED_BY:
 	Strcpy(buf, killed_by_prefix[how]);
-	Strcat(buf, killer);
+	Strcat(buf, killer.name);
 	break;
     case NO_KILLER_PREFIX:
-	Strcpy(buf, killer);
+	Strcpy(buf, killer.name);
 	break;
     }
 

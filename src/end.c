@@ -6,6 +6,7 @@
 
 #include "hack.h"
 #include "eshk.h"
+#include "lev.h"
 #ifndef NO_SIGNAL
 #include <signal.h>
 #endif
@@ -188,18 +189,18 @@ register struct monst *mtmp;
 	You("die...");
 	mark_synch();	/* flush buffered screen output */
 	buf[0] = '\0';
-	killer_format = KILLED_BY_AN;
+	killer.format = KILLED_BY_AN;
 	/* "killed by the high priest of Crom" is okay, "killed by the high
 	   priest" alone isn't */
 	if ((mtmp->data->geno & G_UNIQ) != 0 && !(mtmp->data == &mons[PM_HIGH_PRIEST] && !mtmp->ispriest)) {
 	    if (!type_is_pname(mtmp->data))
 		Strcat(buf, "the ");
-	    killer_format = KILLED_BY;
+	    killer.format = KILLED_BY;
 	}
 	/* _the_ <invisible> <distorted> ghost of Dudley */
 	if (mtmp->data == &mons[PM_GHOST] && mtmp->mnamelth) {
 		Strcat(buf, "the ");
-		killer_format = KILLED_BY;
+		killer.format = KILLED_BY;
 	}
 	if (mtmp->minvis)
 		Strcat(buf, "invisible ");
@@ -212,12 +213,11 @@ register struct monst *mtmp;
 	} else if(mtmp->isshk) {
 		Sprintf(eos(buf), "%s %s, the shopkeeper",
 			(mtmp->female ? "Ms." : "Mr."), shkname(mtmp));
-		killer_format = KILLED_BY;
+		killer.format = KILLED_BY;
 	} else if (mtmp->ispriest || mtmp->isminion) {
 		/* m_monnam() suppresses "the" prefix plus "invisible", and
 		   it overrides the effect of Hallucination on priestname() */
-		killer = m_monnam(mtmp);
-		Strcat(buf, killer);
+		Strcat(buf, m_monnam(mtmp));
 	} else {
 		Strcat(buf, mtmp->data->mname);
 		if (mtmp->mnamelth)
@@ -225,7 +225,7 @@ register struct monst *mtmp;
 	}
 
 	if (multi) Strcat(buf, ", while helpless");
-	killer = buf;
+	Strcpy(killer.name, buf);
 	if (mtmp->data->mlet == S_WRAITH)
 		u.ugrave_arise = PM_WRAITH;
 	else if (mtmp->data->mlet == S_MUMMY && urace.mummynum != NON_PM)
@@ -534,16 +534,16 @@ done(how)
 int how;
 {
 	boolean taken;
-	char kilbuf[BUFSZ], pbuf[BUFSZ];
+	char pbuf[BUFSZ];
 	winid endwin = WIN_ERR;
 	boolean bones_ok, have_windows = iflags.window_inited;
 	struct obj *corpse = (struct obj *)0;
 	long umoney;
 
 	if (how == TRICKED) {
-	    if (killer) {
-		paniclog("trickery", killer);
-		killer = 0;
+	    if (killer.name[0]) {
+		paniclog("trickery", killer.name);
+		killer.name[0] = 0;
 	    }
 #ifdef WIZARD
 	    if (wizard) {
@@ -553,18 +553,15 @@ int how;
 #endif
 	}
 
-	/* kilbuf: used to copy killer in case it comes from something like
-	 *	xname(), which would otherwise get overwritten when we call
-	 *	xname() when listing possessions
-	 * pbuf: holds Sprintf'd output for raw_print and putstr
+	/* pbuf: holds Sprintf'd output for raw_print and putstr
 	 */
-	if (how == ASCENDED || (!killer && how == GENOCIDED))
-		killer_format = NO_KILLER_PREFIX;
+	if (how == ASCENDED || (!killer.name[0] && how == GENOCIDED))
+		killer.format = NO_KILLER_PREFIX;
 	/* Avoid killed by "a" burning or "a" starvation */
-	if (!killer && (how == STARVING || how == BURNING))
-		killer_format = KILLED_BY;
-	Strcpy(kilbuf, (!killer || how >= PANICKED ? deaths[how] : killer));
-	killer = kilbuf;
+	if (!killer.name[0] && (how == STARVING || how == BURNING))
+		killer.format = KILLED_BY;
+	if (!killer.name[0] || how >= PANICKED)
+	    Strcpy(killer.name, deaths[how]);
 
 	if (how < PANICKED) u.umortality++;
 	if (Lifesaved && (how <= GENOCIDED)) {
@@ -583,8 +580,8 @@ int how;
 		if (how == GENOCIDED)
 			pline("Unfortunately you are still genocided...");
 		else {
-			killer = 0;
-			killer_format = 0;
+			killer.name[0] = 0;
+			killer.format = 0;
 			return;
 		}
 	}
@@ -598,8 +595,8 @@ int how;
 			(how == CHOKING) ? "choke" : "die");
 		if(u.uhpmax <= 0) u.uhpmax = u.ulevel * 8;	/* arbitrary */
 		savelife(how);
-		killer = 0;
-		killer_format = 0;
+		killer.name[0] = 0;
+		killer.format = 0;
 		return;
 	}
 
@@ -659,24 +656,24 @@ die:
 		corpse = mk_named_object(CORPSE, &mons[mnum],
 				       u.ux, u.uy, plname);
 		Sprintf(pbuf, "%s, %s%s", plname,
-			killer_format == NO_KILLER_PREFIX ? "" :
+			killer.format == NO_KILLER_PREFIX ? "" :
 			killed_by_prefix[how],
-			killer_format == KILLED_BY_AN ? an(killer) : killer);
+			killer.format == KILLED_BY_AN ? an(killer.name) :
+			killer.name);
 		make_grave(u.ux, u.uy, pbuf);
 	    }
 	}
 
 	if (how == QUIT) {
-		killer_format = NO_KILLER_PREFIX;
-		if (u.uhp < 1) {
-			how = DIED;
-			u.umortality++;	/* skipped above when how==QUIT */
-			/* note that killer is pointing at kilbuf */
-			Strcpy(kilbuf, "quit while already on Charon's boat");
-		}
+	    killer.format = NO_KILLER_PREFIX;
+	    if (u.uhp < 1) {
+		how = DIED;
+		u.umortality++;	/* skipped above when how==QUIT */
+		Strcpy(killer.name, "quit while already on Charon's boat");
+	    }
 	}
 	if (how == ESCAPED || how == PANICKED)
-		killer_format = NO_KILLER_PREFIX;
+		killer.format = NO_KILLER_PREFIX;
 
 	if (how != PANICKED) {
 	    /* these affect score and/or bones, but avoid them during panic */
@@ -755,15 +752,12 @@ die:
 	} else
 	    done_stopprint = 1; /* just avoid any more output */
 
-/* changing kilbuf really changes killer. we do it this way because
-   killer is declared a (const char *)
-*/
-	if (u.uhave.amulet) Strcat(kilbuf, " (with the Amulet)");
+	if (u.uhave.amulet) Strcat(killer.name, " (with the Amulet)");
 	else if (how == ESCAPED) {
 	    if (Is_astralevel(&u.uz))	/* offered Amulet to wrong deity */
-		Strcat(kilbuf, " (in celestial disgrace)");
+		Strcat(killer.name, " (in celestial disgrace)");
 	    else if (carrying(FAKE_AMULET_OF_YENDOR))
-		Strcat(kilbuf, " (with a fake Amulet)");
+		Strcat(killer.name, " (with a fake Amulet)");
 		/* don't bother counting to see whether it should be plural */
 	}
 
@@ -1096,6 +1090,96 @@ boolean ask;
 
 	    display_nhwindow(klwin, TRUE);
 	    destroy_nhwindow(klwin);
+	}
+    }
+}
+
+/* set a delayed killer, ensure non-delayed killer is cleared out */
+void
+delayed_killer(id, format, killername)
+    int		id;
+    int		format;
+    const char	*killername;
+{
+    struct kinfo *k = find_delayed_killer(id);
+
+    if (k == (struct kinfo*) 0) {
+	/* no match, add a new delayed killer to the list */
+	k = (struct kinfo*) alloc(sizeof(struct kinfo));
+	k->id = id;
+	k->next = killer.next;
+	killer.next = k;
+    }
+
+    k->format = format;
+    Strcpy(k->name, killername ? killername : "");
+    killer.name[0] = 0;
+}
+
+struct kinfo*
+find_delayed_killer(id)
+    int id;
+{
+    struct kinfo* k;
+
+    for (k = killer.next; k != (struct kinfo*) 0; k = k->next) {
+	if (k->id == id) break;
+    }
+
+    return k;
+}
+
+void
+dealloc_killer(kptr)
+    struct kinfo *kptr;
+{
+    struct kinfo *prev = &killer, *k;
+
+    if (kptr == (struct kinfo *)0) return;
+    for (k = killer.next; k != (struct kinfo*) 0; k = k->next) {
+	if (k == kptr) break;
+	prev = k;
+    }
+
+    if (k == (struct kinfo*) 0) {
+	impossible("dealloc_killer not on list");
+    } else {
+	prev->next = k->next;
+	free((genericptr_t) k);
+    }
+}
+
+void
+save_killers(fd, mode)
+    int fd;
+    int mode;
+{
+    struct kinfo *kptr;
+
+    if (perform_bwrite(mode)) {
+	for (kptr = &killer; kptr != (struct kinfo*)0; kptr = kptr->next) {
+	    bwrite(fd, (genericptr_t)kptr, sizeof(struct kinfo));
+	}
+    }
+    if (release_data(mode)) {
+	while (killer.next) {
+	    kptr = killer.next->next;
+	    free((genericptr_t)killer.next);
+	    killer.next = kptr;
+	}
+    }
+}
+
+void
+restore_killers(fd)
+    int fd;
+{
+    struct kinfo *kptr;
+
+    for (kptr = &killer; kptr != (struct kinfo*)0; kptr = kptr->next) {
+	mread(fd, (genericptr_t)kptr, sizeof(struct kinfo));
+	if (kptr->next) {
+	    kptr->next = (struct kinfo*) alloc(sizeof(struct kinfo));
 	}
     }
 }

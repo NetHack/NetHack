@@ -45,15 +45,12 @@ struct q_score	quest_status = DUMMY;
 
 NEARDATA int smeq[MAXNROFROOMS+1] = DUMMY;
 NEARDATA int doorindex = 0;
-
 NEARDATA char *save_cm = 0;
-NEARDATA int killer_format = 0;
-const char *killer = 0;
-const char *delayed_killer = 0;
+
+NEARDATA struct kinfo killer = DUMMY;
 #ifdef GOLDOBJ
 NEARDATA long done_money = 0;
 #endif
-char killer_buf[BUFSZ] = DUMMY;
 const char *nomovemsg = 0;
 const char nul[40] = DUMMY;			/* contains zeros */
 NEARDATA char plname[PL_NSIZ] = DUMMY;		/* player name */

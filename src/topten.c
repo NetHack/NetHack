@@ -315,20 +315,20 @@ int how;
 	(void) strncpy(t0->name, plname, NAMSZ);
 	t0->name[NAMSZ] = '\0';
 	t0->death[0] = '\0';
-	switch (killer_format) {
+	switch (killer.format) {
 		default: impossible("bad killer format?");
 		case KILLED_BY_AN:
 			Strcat(t0->death, killed_by_prefix[how]);
-			(void) strncat(t0->death, an(killer),
+			(void) strncat(t0->death, an(killer.name),
 						DTHSZ-strlen(t0->death));
 			break;
 		case KILLED_BY:
 			Strcat(t0->death, killed_by_prefix[how]);
-			(void) strncat(t0->death, killer,
+			(void) strncat(t0->death, killer.name,
 						DTHSZ-strlen(t0->death));
 			break;
 		case NO_KILLER_PREFIX:
-			(void) strncat(t0->death, killer, DTHSZ);
+			(void) strncat(t0->death, killer.name, DTHSZ);
 			break;
 	}
 	t0->birthdate = yyyymmdd(u.ubirthday);

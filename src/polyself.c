@@ -67,11 +67,16 @@ const char *fmt, *arg;
 			(urace.femalenum != NON_PM &&
 			(mvitals[urace.femalenum].mvflags & G_GENOD))) {
 	    /* intervening activity might have clobbered genocide info */
-	    killer = delayed_killer;
-	    if (!killer || !strstri(killer, "genocid")) {
-		killer_format = KILLED_BY;
-		killer = "self-genocide";
+	    struct kinfo *kptr = find_delayed_killer(POLYMORPH);
+
+	    if (kptr != (struct kinfo*) 0 && kptr->name[0]) {
+		killer.format = kptr->format;
+		Strcpy(killer.name, kptr->name);
+	    } else {
+		killer.format = KILLED_BY;
+		Strcpy(killer.name, "self-genocide");
 	    }
+	    dealloc_killer(kptr);
 	    done(GENOCIDED);
 	}
 
@@ -188,7 +193,7 @@ newman()
 	u.uhunger = rn1(500,500);
 	if (Sick) make_sick(0L, (char *) 0, FALSE, SICK_ALL);
 	Stoned = 0;
-	delayed_killer = 0;
+	dealloc_killer(find_delayed_killer(STONED));
 	if (u.uhp <= 0 || u.uhpmax <= 0) {
 		if (Polymorph_control) {
 		    if (u.uhp <= 0) u.uhp = 1;
@@ -196,8 +201,8 @@ newman()
 		} else {
 dead: /* we come directly here if their experience level went to 0 or less */
 		    Your("new form doesn't seem healthy enough to survive.");
-		    killer_format = KILLED_BY_AN;
-		    killer="unsuccessful polymorph";
+		    killer.format = KILLED_BY_AN;
+		    Strcpy(killer.name, "unsuccessful polymorph");
 		    done(DIED);
 		    newuhs(FALSE);
 		    return; /* lifesaved */
@@ -209,7 +214,7 @@ dead: /* we come directly here if their experience level went to 0 or less */
 		(urace.individual.m) ? urace.individual.m : urace.noun);
 	if (Slimed) {
 		Your("body transforms, but there is still slime on you.");
-		Slimed = 10L;
+		make_slimed(10L, (const char*) 0);
 	}
 	context.botl = 1;
 	see_monsters();
@@ -385,7 +390,7 @@ int	mntmp;
 		You("turn to stone!");
 		mntmp = PM_STONE_GOLEM;
 		Stoned = 0;
-		delayed_killer = 0;
+		dealloc_killer(find_delayed_killer(STONED));
 	}
 
 	u.mtimedone = rn1(500, 500);
@@ -399,7 +404,7 @@ int	mntmp;
 
 	if (Stone_resistance && Stoned) { /* parnes@eniac.seas.upenn.edu */
 		Stoned = 0;
-		delayed_killer = 0;
+		dealloc_killer(find_delayed_killer(STONED));
 		You("no longer seem to be petrifying.");
 	}
 	if (Sick_resistance && Sick) {
@@ -408,13 +413,10 @@ int	mntmp;
 	}
 	if (Slimed) {
 	    if (flaming(youmonst.data)) {
-		pline_The("slime burns away!");
-		Slimed = 0L;
-		context.botl = 1;
+		make_slimed(0L, "The slime burns away!");
 	    } else if (mntmp == PM_GREEN_SLIME) {
 		/* do it silently */
-		Slimed = 0L;
-		context.botl = 1;
+		make_slimed(0L, (char*) 0);
 	    }
 	}
 	if (nohands(youmonst.data)) Glib = 0;
@@ -715,8 +717,8 @@ rehumanize()
 {
 	/* You can't revert back while unchanging */
 	if (Unchanging && (u.mh < 1)) {
-		killer_format = NO_KILLER_PREFIX;
-		killer = "killed while stuck in creature form";
+		killer.format = NO_KILLER_PREFIX;
+		Strcpy(killer.name, "killed while stuck in creature form");
 		done(DIED);
 	}
 
@@ -725,11 +727,8 @@ rehumanize()
 	polyman("return to %s form!", urace.adj);
 
 	if (u.uhp < 1) {
-	    char kbuf[256];
-
-	    Sprintf(kbuf, "reverting to unhealthy %s form", urace.adj);
-	    killer_format = KILLED_BY;
-	    killer = kbuf;
+	    Sprintf(killer.name, "reverting to unhealthy %s form", urace.adj);
+	    killer.format = KILLED_BY;
 	    done(DIED);
 	}
 	if (!uarmg) selftouch("No longer petrify-resistant, you");
@@ -1045,8 +1044,9 @@ dogaze()
 			    l_monnam(mtmp));
 			/* as if gazing at a sleeping anything is fruitful... */
 			You("turn to stone...");
-			killer_format = KILLED_BY;
-			killer = "deliberately meeting Medusa's gaze";
+			killer.format = KILLED_BY;
+			Strcpy(killer.name,
+			       "deliberately meeting Medusa's gaze");
 			done(STONING);
 		    }
 		}

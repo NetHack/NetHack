@@ -1200,7 +1200,7 @@ mac_destroy_nhwindow (winid win) {
 	}
 	if (win == WIN_INVEN || win == WIN_MESSAGE) {
 		if (iflags.window_inited) {
-			if (flags.tombstone && killer) {
+			if (flags.tombstone && killer.name[0]) {
 				/* Prepare for the coming of the tombstone window. */
 				win_fonts [NHW_TEXT] = kFontIDMonaco;
 			}

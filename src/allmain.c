@@ -360,8 +360,8 @@ moveloop()
 	    else if (!u.uinvulnerable) {
 		u.utrap -= 1<<8;
 		if(u.utrap < 1<<8) {
-		    killer_format = KILLED_BY;
-		    killer = "molten lava";
+		    killer.format = KILLED_BY;
+		    Strcpy(killer.name, "molten lava");
 		    You("sink below the surface and die.");
 		    done(DISSOLVED);
 		} else if(didmove && !u.umoved) {

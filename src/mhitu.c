@@ -1058,8 +1058,8 @@ dopois:
 				pline("Unfortunately your brain is still gone.");
 			    else
 				Your("last thought fades away.");
-			    killer = "brainlessness";
-			    killer_format = KILLED_BY;
+			    Strcpy(killer.name, "brainlessness");
+			    killer.format = KILLED_BY;
 			    done(DIED);
 			    lifesaved++;
 			}
@@ -1150,18 +1150,16 @@ dopois:
 			    if (!Stoned && !Stone_resistance
 				    && !(poly_when_stoned(youmonst.data) &&
 					polymon(PM_STONE_GOLEM))) {
-				Stoned = 5;
-				delayed_killer = mtmp->data->mname;
-				if (mtmp->data->geno & G_UNIQ) {
-				    if (!type_is_pname(mtmp->data)) {
-					static char buf[BUFSZ];
+				int kformat = KILLED_BY_AN;
+				const char *kname = mtmp->data->mname;
 
-					/* "the" buffer may be reallocated */
-					Strcpy(buf, the(delayed_killer));
-					delayed_killer = buf;
-				    }
-				    killer_format = KILLED_BY;
-				} else killer_format = KILLED_BY_AN;
+				Stoned = 5;
+				if (mtmp->data->geno & G_UNIQ) {
+				    if (!type_is_pname(mtmp->data))
+					kname = the(kname);
+				    kformat = KILLED_BY;
+				}
+				delayed_killer(STONED, kformat, kname);
 				return(1);
 				/* You("turn to stone..."); */
 				/* done_in_by(mtmp); */
@@ -1195,11 +1193,10 @@ dopois:
 				!Is_waterlevel(&u.uz);
 
 			    pline("%s drowns you...", Monnam(mtmp));
-			    killer_format = KILLED_BY_AN;
-			    Sprintf(buf, "%s by %s",
+			    killer.format = KILLED_BY_AN;
+			    Sprintf(killer.name, "%s by %s",
 				    moat ? "moat" : "pool of water",
 				    an(mtmp->data->mname));
-			    killer = buf;
 			    done(DROWNING);
 			} else if(mattk->aatyp == AT_HUGS)
 			    You("are being crushed.");
@@ -1450,8 +1447,8 @@ dopois:
 		switch (rn2(20)) {
 		case 19: case 18: case 17:
 		    if (!Antimagic) {
-			killer_format = KILLED_BY_AN;
-			killer = "touch of death";
+			killer.format = KILLED_BY_AN;
+			Strcpy(killer.name, "touch of death");
 			done(DIED);
 			dmg = 0;
 			break;
@@ -1491,10 +1488,8 @@ dopois:
 		    dmg = 0;
 		} else if (!Slimed) {
 		    You("don't feel very well.");
-		    Slimed = 10L;
-		    context.botl = 1;
-		    killer_format = KILLED_BY_AN;
-		    delayed_killer = mtmp->data->mname;
+		    make_slimed(10L, (char*) 0);
+		    delayed_killer(SLIMED, KILLED_BY_AN, mtmp->data->mname);
 		} else
 		    pline("Yuck!");
 		break;
@@ -1912,8 +1907,8 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    if(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
 			break;
 		    You("turn to stone...");
-		    killer_format = KILLED_BY;
-		    killer = mtmp->data->mname;
+		    killer.format = KILLED_BY;
+		    Strcpy(killer.name, mtmp->data->mname);
 		    done(STONING);
 		}
 		break;

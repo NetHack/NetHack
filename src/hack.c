@@ -2099,8 +2099,9 @@ boolean k_format;
 		u.uhpmax = u.uhp;	/* perhaps n was negative */
 	context.botl = 1;
 	if(u.uhp < 1) {
-		killer_format = k_format;
-		killer = knam;		/* the thing that killed you */
+		killer.format = k_format;
+		if (killer.name != knam) /* the thing that killed you */
+		    Strcpy(killer.name, knam ? knam : "");
 		You("die...");
 		done(DIED);
 	} else if (n > 0 && u.uhp*10 < u.uhpmax) {

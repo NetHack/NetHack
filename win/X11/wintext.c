@@ -290,7 +290,7 @@ create_text_window(wp)
 		XtParseTranslationTable(text_translations));	num_args++;
 
     wp->w = XtCreateManagedWidget(
-		killer && WIN_MAP == WIN_ERR ?
+		killer.name[0] && WIN_MAP == WIN_ERR ?
 				  "tombstone" : "text_text", /* name */
 		asciiTextWidgetClass,
 		form,			/* parent widget */
@@ -474,18 +474,18 @@ calculate_rip_text(int how)
 		done_money);
 #endif
 	/* Put together death description */
-	switch (killer_format) {
+	switch (killer.format) {
 		default: impossible("bad killer format?");
 		case KILLED_BY_AN:
 			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, an(killer));
+			Strcat(buf, an(killer.name));
 			break;
 		case KILLED_BY:
 			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, killer);
+			Strcat(buf, killer.name);
 			break;
 		case NO_KILLER_PREFIX:
-			Strcpy(buf, killer);
+			Strcpy(buf, killer.name);
 			break;
 	}
 

@@ -252,7 +252,7 @@ dosave0()
 		    HUP pline("%s", whynot);
 		    (void) close(fd);
 		    (void) delete_savefile();
-		    HUP killer = whynot;
+		    HUP Strcpy(killer.name, whynot);
 		    HUP done(TRICKED);
 		    return(0);
 		}
@@ -297,6 +297,7 @@ register int fd, mode;
 	}
 #endif
 	bwrite(fd, (genericptr_t) &u, sizeof(struct you));
+	save_killers(fd, mode);
 
 	/* must come before migrating_objs and migrating_mons are freed */
 	save_timers(fd, mode, RANGE_GLOBAL);
@@ -371,7 +372,7 @@ savestateinlock()
 		if (fd < 0) {
 		    pline("%s", whynot);
 		    pline("Probably someone removed it.");
-		    killer = whynot;
+		    Strcpy(killer.name, whynot);
 		    done(TRICKED);
 		    return;
 		}
@@ -382,7 +383,7 @@ savestateinlock()
 			    "Level #0 pid (%d) doesn't match ours (%d)!",
 			    hpid, hackpid);
 		    pline("%s", whynot);
-		    killer = whynot;
+		    Strcpy(killer.name, whynot);
 		    done(TRICKED);
 		}
 		(void) close(fd);
@@ -390,7 +391,7 @@ savestateinlock()
 		fd = create_levelfile(0, whynot);
 		if (fd < 0) {
 		    pline("%s", whynot);
-		    killer = whynot;
+		    Strcpy(killer.name, whynot);
 		    done(TRICKED);
 		    return;
 		}
@@ -1007,6 +1008,7 @@ freedynamicdata()
 # define freetrapchn(X)	(savetrapchn(0, X, FREE_SAVE), X = 0)
 # define freefruitchn()	 savefruitchn(0, FREE_SAVE)
 # define freenames()	 savenames(0, FREE_SAVE)
+# define free_killers()	 save_killers(0, FREE_SAVE)
 # define free_oracles()	save_oracles(0, FREE_SAVE)
 # define free_waterlevel() save_waterlevel(0, FREE_SAVE)
 # define free_worm()	 save_worm(0, FREE_SAVE)
@@ -1032,6 +1034,7 @@ freedynamicdata()
 	freedamage();
 
 	/* game-state data */
+	free_killers();
 	free_timers(RANGE_GLOBAL);
 	free_light_sources(RANGE_GLOBAL);
 	freeobjchn(invent);

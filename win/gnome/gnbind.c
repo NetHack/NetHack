@@ -1170,18 +1170,18 @@ void gnome_outrip(winid wid, int how)
     Strcat(ripString, buf);
 
     /* Put together death description */
-    switch (killer_format) {
+    switch (killer.format) {
 	    default: impossible("bad killer format?");
 	    case KILLED_BY_AN:
 		    Strcpy(buf, killed_by_prefix[how]);
-		    Strcat(buf, an(killer));
+		    Strcat(buf, an(killer.name));
 		    break;
 	    case KILLED_BY:
 		    Strcpy(buf, killed_by_prefix[how]);
-		    Strcat(buf, killer);
+		    Strcat(buf, killer.name);
 		    break;
 	    case NO_KILLER_PREFIX:
-		    Strcpy(buf, killer);
+		    Strcpy(buf, killer.name);
 		    break;
     }
     /* Put death type on stone */

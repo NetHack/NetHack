@@ -1814,7 +1814,7 @@ $(O)drawing.o:   $(SRC)\drawing.c  $(HACK_H) $(TERMCAP_H)
 	@echo $(BCOPTS1) >> $(VROOMMCFG)
 	@echo $(BCOPTS2) >> $(VROOMMCFG)
 	$(CC) $(CFLAGSN) $(COBJNAM)$@ $(SRC)\drawing.c
-$(O)end.o:       $(SRC)\end.c      $(HACK_H) $(ESHK_H) $(DLB_H)
+$(O)end.o:       $(SRC)\end.c      $(HACK_H) $(ESHK_H) $(LEV_H) $(DLB_H)
 	@type schema$(SCHEMA).bc | find "$(@B)_o" > $(VROOMMCFG)
 	@echo $(BCOPTS1) >> $(VROOMMCFG)
 	@echo $(BCOPTS2) >> $(VROOMMCFG)

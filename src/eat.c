@@ -208,7 +208,7 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 		nomovemsg = 0;
 		vomit();
 	} else {
-		killer_format = KILLED_BY_AN;
+		killer.format = KILLED_BY_AN;
 		/*
 		 * Note all "killer"s below read "Choked on %s" on the
 		 * high score list & tombstone.  So plan accordingly.
@@ -216,19 +216,19 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 		if(food) {
 			You("choke over your %s.", foodword(food));
 			if (food->oclass == COIN_CLASS) {
-				killer = "a very rich meal";
+				Strcpy(killer.name, "a very rich meal");
 			} else {
-				killer = food_xname(food, FALSE);
+				Strcpy(killer.name, food_xname(food, FALSE));
 				if (food->otyp == CORPSE &&
 				    (mons[food->corpsenm].geno & G_UNIQ)) {
 				    if (!type_is_pname(&mons[food->corpsenm]))
-					killer = the(killer);
-				    killer_format = KILLED_BY;
+					Strcpy(killer.name, the(killer.name));
+				    killer.format = KILLED_BY;
 				}
 			}
 		} else {
 			You("choke over it.");
-			killer = "quick snack";
+			Strcpy(killer.name, "quick snack");
 		}
 		You("die...");
 		done(CHOKING);
@@ -425,9 +425,8 @@ register int pm;
 	if (touch_petrifies(&mons[pm]) || pm == PM_MEDUSA) {
 	    if (!Stone_resistance &&
 		!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
-		Sprintf(killer_buf, "tasting %s meat", mons[pm].mname);
-		killer_format = KILLED_BY;
-		killer = killer_buf;
+		Sprintf(killer.name, "tasting %s meat", mons[pm].mname);
+		killer.format = KILLED_BY;
 		You("turn to stone.");
 		done(STONING);
 		if (context.victual.piece)
@@ -454,12 +453,11 @@ register int pm;
 	    case PM_DEATH:
 	    case PM_PESTILENCE:
 	    case PM_FAMINE:
-		{ char buf[BUFSZ];
+		{
 		    pline("Eating that is instantly fatal.");
-		    Sprintf(buf, "unwisely ate the body of %s",
+		    Sprintf(killer.name, "unwisely ate the body of %s",
 			    mons[pm].mname);
-		    killer = buf;
-		    killer_format = NO_KILLER_PREFIX;
+		    killer.format = NO_KILLER_PREFIX;
 		    done(DIED);
 		    /* It so happens that since we know these monsters */
 		    /* cannot appear in tins, context.victual.piece will always */
@@ -474,8 +472,8 @@ register int pm;
 		if (!Slimed && !Unchanging && !flaming(youmonst.data) &&
 			youmonst.data != &mons[PM_GREEN_SLIME]) {
 		    You("don't feel very well.");
-		    Slimed = 10L;
-		    context.botl = 1;
+		    make_slimed(10L, (char*) 0);
+		    delayed_killer(SLIMED, KILLED_BY_AN, nul);
 		}
 		/* Fall through */
 	    default:
@@ -489,7 +487,7 @@ void
 fix_petrification()
 {
 	Stoned = 0;
-	delayed_killer = 0;
+	dealloc_killer(find_delayed_killer(STONED));
 	if (Hallucination)
 	    pline("What a pity - you just ruined a future piece of %sart!",
 		  ACURR(A_CHA) > 15 ? "fine " : "");
@@ -1668,8 +1666,8 @@ register struct obj *otmp;
 			if(!rn2(17)) u.uhpmax++;
 			u.uhp = u.uhpmax;
 		    } else if (u.uhp <= 0) {
-			killer_format = KILLED_BY_AN;
-			killer = "rotten lump of royal jelly";
+			killer.format = KILLED_BY_AN;
+			Strcpy(killer.name, "rotten lump of royal jelly");
 			done(POISONING);
 		    }
 		}
@@ -1679,10 +1677,12 @@ register struct obj *otmp;
 		if (touch_petrifies(&mons[otmp->corpsenm])) {
 		    if (!Stone_resistance &&
 			!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
-			if (!Stoned) Stoned = 5;
-			killer_format = KILLED_BY_AN;
-			Sprintf(killer_buf, "%s egg", mons[otmp->corpsenm].mname);
-			delayed_killer = killer_buf;
+			if (!Stoned) {
+			    Stoned = 5;
+			    Sprintf(killer.name,
+				    "%s egg", mons[otmp->corpsenm].mname);
+			    delayed_killer(STONED, KILLED_BY_AN, killer.name);
+			}
 		    }
 		}
 		break;
@@ -2294,8 +2294,8 @@ boolean incr;
 			context.botl = 1;
 			bot();
 			You("die from starvation.");
-			killer_format = KILLED_BY;
-			killer = "starvation";
+			killer.format = KILLED_BY;
+			Strcpy(killer.name, "starvation");
 			done(STARVING);
 			/* if we return, we lifesaved, and that calls newuhs */
 			return;
@@ -2346,8 +2346,8 @@ boolean incr;
 		bot();
 		if ((Upolyd ? u.mh : u.uhp) < 1) {
 			You("die from hunger and exhaustion.");
-			killer_format = KILLED_BY;
-			killer = "exhaustion";
+			killer.format = KILLED_BY;
+			Strcpy(killer.name, "exhaustion");
 			done(STARVING);
 			return;
 		}

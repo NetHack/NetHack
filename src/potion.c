@@ -133,14 +133,24 @@ int type;
 
 	if (Sick) {
 	    exercise(A_CON, FALSE);
-	    if (cause) {
-		(void) strncpy(u.usick_cause, cause, sizeof(u.usick_cause));
-		u.usick_cause[sizeof(u.usick_cause)-1] = 0;
-		}
-	    else
-		u.usick_cause[0] = 0;
+	    delayed_killer(SICK, KILLED_BY_AN, cause);
 	} else
-	    u.usick_cause[0] = 0;
+	    dealloc_killer(find_delayed_killer(SICK));
+}
+
+void
+make_slimed(xtime, msg)
+long xtime;
+const char *msg;
+{
+	long old = Slimed;
+
+	if ((!xtime && old) || (xtime && !old)) {
+	    if (msg) pline("%s", msg);
+	    context.botl = 1;
+	}
+	set_itimeout(&Slimed, xtime);
+	if (!Slimed) dealloc_killer(find_delayed_killer(SLIMED));
 }
 
 void

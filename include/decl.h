@@ -170,16 +170,20 @@ E const char disclosure_options[];
 E NEARDATA int smeq[];
 E NEARDATA int doorindex;
 E NEARDATA char *save_cm;
+
+E NEARDATA struct kinfo {
+    struct kinfo *next;			/* chain of delayed killers */
+    int		id;			/* uprop keys to ID a delayed killer */
+    int		format;			/* one of the killer formats */
 #define KILLED_BY_AN	 0
 #define KILLED_BY	 1
 #define NO_KILLER_PREFIX 2
-E NEARDATA int killer_format;
-E const char *killer;
-E const char *delayed_killer;
+    char	name[BUFSZ];		/* actual killer name */
+} killer;
+
 #ifdef GOLDOBJ
 E long done_money;
 #endif
-E char killer_buf[BUFSZ];
 E const char *configfile;
 E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];

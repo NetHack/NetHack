@@ -1593,8 +1593,8 @@ do_class_genocide()
 		    }
 		}
 		if (gameover || u.uhp == -1) {
-		    killer_format = KILLED_BY_AN;
-		    killer = "scroll of genocide";
+		    killer.format = KILLED_BY_AN;
+		    Strcpy(killer.name, "scroll of genocide");
 		    if (gameover) done(GENOCIDED);
 		}
 		return;
@@ -1709,25 +1709,24 @@ int how;
 
 		u.uhp = -1;
 		if (how & PLAYER) {
-		    killer_format = KILLED_BY;
-		    killer = "genocidal confusion";
+		    killer.format = KILLED_BY;
+		    Strcpy(killer.name, "genocidal confusion");
 		} else if (how & ONTHRONE) {
 		    /* player selected while on a throne */
-		    killer_format = KILLED_BY_AN;
-		    killer = "imperious order";
+		    killer.format = KILLED_BY_AN;
+		    Strcpy(killer.name, "imperious order");
 		} else { /* selected player deliberately, not confused */
-		    killer_format = KILLED_BY_AN;
-		    killer = "scroll of genocide";
+		    killer.format = KILLED_BY_AN;
+		    Strcpy(killer.name, "scroll of genocide");
 		}
 
 	/* Polymorphed characters will die as soon as they're rehumanized. */
 	/* KMH -- Unchanging prevents rehumanization */
 		if (Upolyd && ptr != youmonst.data) {
-			delayed_killer = killer;
-			killer = 0;
-			You_feel("dead inside.");
+		    delayed_killer(POLYMORPH, killer.format, killer.name);
+		    You_feel("dead inside.");
 		} else
-			done(GENOCIDED);
+		    done(GENOCIDED);
 	    } else if (ptr == youmonst.data) {
 		rehumanize();
 	    }

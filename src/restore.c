@@ -403,6 +403,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	}
 
 	/* this stuff comes after potential aborted restore attempts */
+	restore_killers(fd);
 	restore_timers(fd, RANGE_GLOBAL, FALSE, 0L);
 	restore_light_sources(fd);
 	invent = restobjchn(fd, FALSE, FALSE);
@@ -694,7 +695,7 @@ char *reason;
 	pline("Strange, this map is not as I remember it.");
 	pline("Somebody is trying some trickery here...");
 	pline("This game is void.");
-	killer = reason;
+	Strcpy(killer.name, reason ? reason : "");
 	done(TRICKED);
 }
 

@@ -1166,7 +1166,7 @@ $(O)dothrow.o: dothrow.c $(HACK_H)
 $(O)drawing.o: drawing.c $(HACK_H) $(INCL)/tcap.h
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
-$(O)end.o: end.c $(HACK_H) $(INCL)/eshk.h $(INCL)/dlb.h
+$(O)end.o: end.c $(HACK_H) $(INCL)/eshk.h $(INCL)/lev.h $(INCL)/dlb.h
 $(O)engrave.o: engrave.c $(HACK_H) $(INCL)/lev.h
 $(O)exper.o: exper.c $(HACK_H)
 $(O)explode.o: explode.c $(HACK_H)

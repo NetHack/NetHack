@@ -555,6 +555,11 @@ E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(terminate, (int));
 E int NDECL(num_genocides);
+E void FDECL(delayed_killer, (int, int, const char*));
+E struct kinfo *FDECL(find_delayed_killer, (int));
+E void FDECL(dealloc_killer, (struct kinfo*));
+E void FDECL(save_killers, (int,int));
+E void FDECL(restore_killers, (int));
 
 /* ### engrave.c ### */
 
@@ -1546,6 +1551,7 @@ E void FDECL(make_confused, (long,BOOLEAN_P));
 E void FDECL(make_stunned, (long,BOOLEAN_P));
 E void FDECL(make_blinded, (long,BOOLEAN_P));
 E void FDECL(make_sick, (long, const char *, BOOLEAN_P,int));
+E void FDECL(make_slimed, (long,const char*));
 E void FDECL(make_vomiting, (long,BOOLEAN_P));
 E void FDECL(make_hallucinated, (long,BOOLEAN_P,long));
 E int NDECL(dodrink);
