@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2002/02/05	*/
+/*	SCCS Id: @(#)hack.c	3.4	2002/03/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1166,6 +1166,7 @@ domove()
 	    if (mtmp->mtrapped) {
 		if (!rn2(mtmp->mtame)) {
 		    mtmp->mtame = mtmp->mpeaceful = mtmp->msleeping = 0;
+		    if (mtmp->mleashed) m_unleash(mtmp, TRUE);
 		    growl(mtmp);
 		} else {
 		    yelp(mtmp);

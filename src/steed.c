@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.4	2001/04/12	*/
+/*	SCCS Id: @(#)steed.c	3.4	2002/03/09	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -272,8 +272,11 @@ mount_steed(mtmp, force)
 	    return (FALSE);
 	}
 	if (!force && !Role_if(PM_KNIGHT) && !(--mtmp->mtame)) {
+	    /* no longer tame */
 	    newsym(mtmp->mx, mtmp->my);
-	    pline("%s resists!", Monnam(mtmp));
+	    pline("%s resists%s!", Monnam(mtmp),
+		  mtmp->mleashed ? " and its leash comes off" : "");
+	    if (mtmp->mleashed) m_unleash(mtmp, FALSE);
 	    return (FALSE);
 	}
 	if (!force && Underwater && !is_swimmer(ptr)) {
@@ -385,6 +388,7 @@ kick_steed()
 
 	/* Make the steed less tame and check if it resists */
 	if (u.usteed->mtame) u.usteed->mtame--;
+	if (!u.usteed->mtame && u.usteed->mleashed) m_unleash(u.usteed, TRUE);
 	if (!u.usteed->mtame || (u.ulevel+u.usteed->mtame < rnd(MAXULEV/2+5))) {
 	    newsym(u.usteed->mx, u.usteed->my);
 	    dismount_steed(DISMOUNT_THROWN);

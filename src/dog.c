@@ -91,6 +91,7 @@ boolean quietly;
 		    if (!quietly)
 		       You("get a bad feeling about this.");
 		    mtmp->mpeaceful = 0;
+		    set_malign(mtmp);
 		}
 	    }
 	    /* if figurine has been named, give same name to the monster */
@@ -413,6 +414,13 @@ long nmv;		/* number of moves */
 		mtmp->mtame = mtmp->mpeaceful = 0;
 	}
 
+	if (!mtmp->mtame && mtmp->mleashed) {
+	    /* leashed monsters should always be with hero, consequently
+	       never losing any time to be accounted for later */
+	    impossible("catching up for leashed monster?");
+	    m_unleash(mtmp, FALSE);
+	}
+
 	/* recover lost hit points */
 	if (!regenerates(mtmp->data)) imv /= 20;
 	if (mtmp->mhp + imv >= mtmp->mhpmax)
@@ -463,11 +471,10 @@ boolean pets_only;	/* true for ascension or final escape */
 			    pline("%s is still trapped.", Monnam(mtmp));
 			stay_behind = TRUE;
 		}
-		if (stay_behind
 #ifdef STEED
-				&& mtmp != u.usteed
+		if (mtmp == u.usteed) stay_behind = FALSE;
 #endif
-				) {
+		if (stay_behind) {
 			if (mtmp->mleashed) {
 				pline("%s leash suddenly comes loose.",
 					humanoid(mtmp->data)
@@ -550,14 +557,13 @@ migrate_to_level(mtmp, tolev, xyloc, cc)
 	    obj->no_charge = 0;
 	}
 
+	if (mtmp->mleashed) {
+		mtmp->mtame--;
+		m_unleash(mtmp, TRUE);
+	}
 	relmon(mtmp);
 	mtmp->nmon = migrating_mons;
 	migrating_mons = mtmp;
-	if (mtmp->mleashed)  {
-		m_unleash(mtmp, FALSE);
-		mtmp->mtame--;
-		pline_The("leash comes off!");
-	}
 	newsym(mtmp->mx,mtmp->my);
 
 	new_lev.dnum = ledger_to_dnum((xchar)tolev);
@@ -809,7 +815,12 @@ boolean quietly;
     		mtmp->mpeaceful = mtmp->mtame = 0;
     	}
     }
-    if (!mtmp->mtame) newsym(mtmp->mx, mtmp->my);
+    if (!mtmp->mtame) {
+	newsym(mtmp->mx, mtmp->my);
+	/* a life-saved monster might be leashed;
+	   don't leave it that way if it's no longer tame */
+	if (mtmp->mleashed) m_unleash(mtmp, TRUE);
+    }
 
     /* if its still a pet, start a clean pet-slate now */
     if (has_edog && mtmp->mtame) {
@@ -831,10 +842,8 @@ struct monst *mtmp;
 	if (mtmp->mtame && !mtmp->isminion)
 	    EDOG(mtmp)->abuse++;
 
-	if (!mtmp->mtame && mtmp->mleashed) {
-	    pline("%s breaks loose of %s leash!", Monnam(mtmp), mhis(mtmp));
-	    m_unleash(mtmp, FALSE);
-	}
+	if (!mtmp->mtame && mtmp->mleashed)
+	    m_unleash(mtmp, TRUE);
 
 	/* don't make a sound if pet is in the middle of leaving the level */
 	/* newsym isn't necessary in this case either */

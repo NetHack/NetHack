@@ -332,7 +332,8 @@ keep monster from forgetting its weapon is cursed every other round
 multiple shot throwing stops immediately whenever you hurtle backwards
 don't panic if being billed for a burning or other timed object
 food that makes a monster peaceful should not re-anger it at the same time
-abusing a leashed pet can result in a leashed peaceful monster
+abusing a leashed pet could result in a leashed peaceful monster
+couldn't unleash steed while mounted
 trying and failing to wield an item could leave current weapon flagged as both
 	"weapon in hand" and "alternate weapon" when `pushweapon' option is set
 handle OBJ_CONTAINED case for corpse revival so that trolls can revive 
