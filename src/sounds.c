@@ -435,6 +435,12 @@ register struct monst *mtmp;
     if (!flags.soundok) return(0);
     if (is_silent(ptr)) return(0);
 
+    /* Make sure its your role's quest quardian; adjust if not */
+    if (ptr->msound == MS_GUARDIAN && ptr != &mons[urole.guardnum]) {
+    	int mndx = monsndx(ptr);
+    	ptr = &mons[genus(mndx)];
+    }
+
     /* be sure to do this before talking; the monster might teleport away, in
      * which case we want to check its pre-teleport position
      */
@@ -578,7 +584,7 @@ register struct monst *mtmp;
 	    pline_msg = "squeaks.";
 	    break;
 	case MS_SQAWK:
-	    if (mtmp->data == &mons[PM_RAVEN] && !mtmp->mpeaceful)
+	    if (ptr == &mons[PM_RAVEN] && !mtmp->mpeaceful)
 	    	verbl_msg = "Nevermore!";
 	    else
 	    	pline_msg = "squawks.";
