@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.4	2002/09/25	*/
+/*	SCCS Id: @(#)eat.c	3.4	2003/02/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -770,6 +770,7 @@ cpostfx(pm)		/* called after completely consuming a corpse */
 register int pm;
 {
 	register int tmp = 0;
+	boolean catch_lycanthropy = FALSE;
 
 	/* in case `afternmv' didn't get called for previously mimicking
 	   gold, clean up now to avoid `eatmbuf' memory leak */
@@ -795,12 +796,15 @@ register int pm;
 		pluslvl(FALSE);
 		break;
 	    case PM_HUMAN_WERERAT:
+		catch_lycanthropy = TRUE;
 		u.ulycn = PM_WERERAT;
 		break;
 	    case PM_HUMAN_WEREJACKAL:
+		catch_lycanthropy = TRUE;
 		u.ulycn = PM_WEREJACKAL;
 		break;
 	    case PM_HUMAN_WEREWOLF:
+		catch_lycanthropy = TRUE;
 		u.ulycn = PM_WEREWOLF;
 		break;
 	    case PM_NURSE:
@@ -952,6 +956,14 @@ register int pm;
 	    }
 	    break;
 	}
+
+	if (catch_lycanthropy && defends(AD_WERE, uwep)) {
+	    if (!touch_artifact(uwep, &youmonst)) {
+		dropx(uwep);
+		uwepgone();
+	    }
+	}
+
 	return;
 }
 

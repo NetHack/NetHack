@@ -579,8 +579,9 @@ struct monst *mtmp;
 	} else if (weap->spfx & SPFX_DFLAG1) {
 	    return ((ptr->mflags1 & weap->mtype) != 0L);
 	} else if (weap->spfx & SPFX_DFLAG2) {
-	    return ((ptr->mflags2 & weap->mtype) ||
-		(yours && !Upolyd && (urace.selfmask & weap->mtype)));
+	    return ((ptr->mflags2 & weap->mtype) || (yours &&
+			((!Upolyd && (urace.selfmask & weap->mtype)) ||
+			 ((weap->mtype & M2_WERE) && u.ulycn >= LOW_PM))));
 	} else if (weap->spfx & SPFX_DALIGN) {
 	    return yours ? (u.ualign.type != weap->alignment) :
 			   (ptr->maligntyp == A_NONE ||

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artilist.h 3.4	2001/11/17	*/
+/*	SCCS Id: @(#)artilist.h 3.4	2003/02/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -107,7 +107,7 @@ A("Demonbane",			LONG_SWORD,
 
 A("Werebane",			SILVER_SABER,
 	(SPFX_RESTR|SPFX_DFLAG2), 0, M2_WERE,
-	PHYS(5,0),	NO_DFNS,	NO_CARY,	0, A_NONE, NON_PM, NON_PM, 1500L ),
+	PHYS(5,0),	DFNS(AD_WERE),	NO_CARY,	0, A_NONE, NON_PM, NON_PM, 1500L ),
 
 A("Grayswandir",		SILVER_SABER,
 	(SPFX_RESTR|SPFX_HALRES), 0, 0,
