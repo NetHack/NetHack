@@ -680,7 +680,7 @@ int thrown;
 	    } else {
 		if (!shade_aware(obj)) {
 		    tmp = 0;
-		    Strcpy(unconventional, xname(obj));
+		    Strcpy(unconventional, cxname(obj));
 		} else {
 		    switch(obj->otyp) {
 		    case BOULDER:		/* 1d20 */
