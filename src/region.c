@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)region.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)region.c	3.4	2004/11/30	*/
 /* Copyright (c) 1996 by Jean-Christophe Collet	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -907,10 +907,13 @@ genericptr_t p2;
     if (p2 == NULL) {		/* This means *YOU* Bozo! */
 	if (nonliving(youmonst.data) || Breathless)
 	    return FALSE;
-	if (!Blind)
+	if (!Blind) {
+	    Your("%s sting.", makeplural(body_part(EYE)));
 	    make_blinded(1L, FALSE);
+	}
 	if (!Poison_resistance) {
-	    pline("%s is burning your %s!", Something, makeplural(body_part(LUNG)));
+	    pline("%s is burning your %s!",
+		  Something, makeplural(body_part(LUNG)));
 	    You("cough and spit blood!");
 	    losehp(Maybe_Half_Phys(rnd(dam) + 5), "gas cloud", KILLED_BY_AN);
 	    return FALSE;
