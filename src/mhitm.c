@@ -225,7 +225,7 @@ mattackm(magr, mdef)
 	if(canseemon(mdef) && !sensemon(mdef)) {
 	    if (u.usleep) You("dream of %s.",
 				(mdef->data->geno & G_UNIQ) ?
-				mon_nam(mdef) : makeplural(mon_nam(mdef)));
+				a_monnam(mdef) : makeplural(m_monnam(mdef)));
 	    else pline("Suddenly, you notice %s.", a_monnam(mdef));
 	}
     }
