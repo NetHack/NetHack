@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)rnd.c	3.4	2003/12/13	*/
+/*	SCCS Id: @(#)rnd.c	3.4	2004/08/27	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -40,7 +40,7 @@ int
 rnl(x)		/* 0 <= rnl(x) < x; sometimes subtracting Luck */
 register int x;	/* good luck approaches 0, bad luck approaches (x-1) */
 {
-	register int i;
+	register int i, adjustment;
 
 #ifdef DEBUG
 	if (x <= 0) {
@@ -48,14 +48,32 @@ register int x;	/* good luck approaches 0, bad luck approaches (x-1) */
 		return(0);
 	}
 #endif
-	i = RND(x);
 
-	if (Luck && rn2(50 - Luck)) {
-	    i -= (x <= 15 && Luck >= -5 ? Luck/3 : Luck);
+	adjustment = Luck;
+	if (x <= 15) {
+	    /* for small ranges, use Luck/3 (rounded away from 0);
+	       also guard against architecture-specific differences
+	       of integer division involving negative values */
+	    adjustment = (abs(adjustment) + 1) / 3 * sgn(adjustment);
+	    /*
+	     *	 11..13 ->  4
+	     *	  8..10 ->  3
+	     *	  5.. 7 ->  2
+	     *	  2.. 4 ->  1
+	     *	 -1,0,1 ->  0 (no adjustment)
+	     *	 -4..-2 -> -1
+	     *	 -7..-5 -> -2
+	     *	-10..-8 -> -3
+	     *	-13..-11-> -4
+	     */
+	}
+
+	i = RND(x);
+	if (adjustment && rn2(37 + abs(adjustment))) {
+	    i -= adjustment;
 	    if (i < 0) i = 0;
 	    else if (i >= x) i = x-1;
 	}
-
 	return i;
 }
 
