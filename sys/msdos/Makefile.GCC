@@ -1,5 +1,5 @@
 #	SCCS Id: @(#)Makefile.GCC	      3.5     $Date$
-#	Copyright (c) NetHack PC Development Team 1996-2003.
+#	Copyright (c) NetHack PC Development Team 1996-2005.
 #	PC NetHack 3.5 Makefile for djgpp V2
 #
 #	Gnu gcc compiler for msdos (djgpp)
@@ -77,13 +77,20 @@ endif
 #
 YACC   = bison -y
 LEX    = flex
-YTABC  = y_tab.c
-YTABH  = y_tab.h
-#If your tool produces y.tab.c and y.tab.h DOS might require
-#the following instead.
-#YTABC  = ytab~1.c
-#YTABH  = ytab~1.h
-LEXYYC = lexyy.c
+#
+# If your flex and bison port mess with the output names directly
+# you must set the file names to the appropriate output file names
+# here
+#YTABC  = y_tab.c
+#YTABH  = y_tab.h
+#LEXYYC = lexyy.c
+#
+# If your flex and bison are able to produce files named
+# y.tab.c, y.tab.h or lex.yy.c you might have to set these
+# to the short file name equivalent (DIR /X to reveal them):
+YTABC  = ytab~1.c
+YTABH  = ytab~1.h
+LEXYYC = lexyy~1.c
 
 #
 # Uncomment the line below if you want to store all the level files,
@@ -104,6 +111,20 @@ LS = ls -1		# ls.exe from djgpp distribution
 # (Note: binary will require ANSI.SYS driver or equivalent loaded)
 # SUPPRESS_GRAPHICS = Y
 SUPPRESS_GRAPHICS = 
+
+# ZLIB Support
+# To support zlib compression in bones and save files, you must
+# define ZLIB_COMP in include/config.h.
+# You must also have a zlib library to link NetHack with, and
+# for the djgpp build, you need one compatible with djgpp.
+# At the time that this was written (post-NetHack 3.4.3) the 
+# following URL was a valid place to get a pre-built djgpp library
+# to add to your djgpp tools directory tree.
+# http://www.delorie.com/pub/djgpp/current/v2tk/zlib114b.zip
+#
+# If you defined ZLIB_COMP in include/config.h to build in support
+# for ZLIB compression, you need to uncomment the line below.
+#ZLIB= -lz
 
 #===============================================
 #======= End of Modification Section ===========
@@ -447,7 +468,7 @@ endif
 #==========================================
 
 $(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
-	$(LINK) $(LFLAGS) -o$(GAME).exe @$(O)$(GAME).lnk $(LIBRARIES)
+	$(LINK) $(LFLAGS) -o$(GAME).exe @$(O)$(GAME).lnk $(LIBRARIES) $(ZLIB)
 	@$(subst /,\,stubedit $(GAME).exe minstack=2048K)
 	@$(subst /,\,copy $(GAME).exe $(GAMEFILE))
 	@$(subst /,\,del $(GAME).exe)

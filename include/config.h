@@ -216,7 +216,7 @@
  *	files at the cost of additional code and time.
  */
 
-/* # define INTERNAL_COMP	*/	/* Forces both ZEROCOMP and RLECOMP */
+/* # define INTERNAL_COMP	*/	/* defines both ZEROCOMP and RLECOMP */
 /* # define ZEROCOMP		*/	/* Support ZEROCOMP compression */
 /* # define RLECOMP		*/	/* Support RLECOMP compression  */
 
