@@ -1887,11 +1887,6 @@ struct obj *otmp;
 		goto see_streaks;	/* okay even if not touchstone */
 		/*NOTREACHED*/
 		break;
-	    case GOLD:
-		color = "golden";
-		goto see_streaks;
-		/*NOTREACHED*/
-		break;
 	    }
 	    return;
 	}
@@ -1906,6 +1901,11 @@ struct obj *otmp;
 	if (otmp->otyp != TOUCHSTONE) {
 	    pline(ambiguous_scratch);
 	    return;
+	}
+
+	if (material == GOLD) {
+	    color = "golden";
+	    goto see_streaks;
 	}
 
 	switch (obj->oclass) {
