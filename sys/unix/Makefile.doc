@@ -19,7 +19,10 @@ COLCMD = col -bx
 PSCMD = groff
 
 # Use the "cat" GUIDECMD if nroff and/or tbl and/or col are not installed
+# Not appropriate for creating Guidebook.txt.
 # GUIDECMD = cat Guidebook.txt
+# The following works better with groff-1.18, eg on Linux
+# GUIDECMD = tbl tmac.n Guidebook.mn | nroff -c -Tascii | $(COLCMD)
 GUIDECMD = tbl tmac.n Guidebook.mn | nroff | $(COLCMD)
 
 # the basic guidebook
@@ -68,7 +71,7 @@ distrib: $(DISTRIB)
 	@echo "Plain text documentation is up to date."
 
 Guidebook.txt	: Guidebook.mn tmac.n
-	tbl tmac.n Guidebook.mn | nroff | $(COLCMD) > Guidebook.txt
+	$(GUIDECMD) > Guidebook.txt
 nethack.txt	: nethack.6
 	nroff -man nethack.6 | $(COLCMD) > nethack.txt
 lev_comp.txt	: lev_comp.6
