@@ -1,0 +1,107 @@
+Copyright (c) Alex Kompel, 2002
+NetHack may be freely redistributed.  See license for details.
+========================================================================
+                 Instructions for compiling and installing
+             NetHack 3.4 on a Windows CE or PocketPC system
+========================================================================
+		      Last revision: $DATE$
+
+Credit for the porting of NetHack to Windows CE goes to Alex Kompel who 
+initially developed and contributed the port.
+
+In order to build NetHack for Windows CE, you need *both* of the following:
+
+  o A copy of Microsoft Visual C V6.0 SP3 or later.  Things may work with 
+    an earlier version of the compiler, but the current code has not been
+    tested with an earlier version.
+  o Embedded Visual C++ 3.0 or later
+
+
+FIRST STEP:
+
+The first step in building NetHack for Windows CE is to execute
+sys/wince/cesetup.bat.
+
+From the command prompt:
+	cd sys\wince
+	cesetup
+
+From a Windows explorer window:
+	double-click on cesetup.bat
+
+A "wince" directory will be created off the top of the NetHack source
+tree, and a Microsoft embedded C workspace file will be placed in the
+top of the NetHack source tree.  The "wince" directory will also have
+the subdirectories wince\ceinc and wince\ceince\sys.
+
+------------
+| BUILDING |
+------------
+
+Boostrapping the build process on Windows NT/2000/XP
+
+1. With the Visual C++ 6.0 tools in your path,
+   Run "nmake /f bootstrp.mak" from the wince folder.
+
+Compiling
+
+2. Start the Embedded Visual C IDE. In the Embeddd Visual C IDE 
+       Menus, choose:
+           File | Open Workspace
+
+3.  Set up for the build.
+
+        o In the Visual C "Open Workspace" dialog box, navigate to the top
+            of  your NetHack source directory tree.
+ 
+            In there, highlight "wince.vcw" and click on Open.
+            Once the workspace has been opened, you should see the following
+            list in the Visual C selection window:
+              + winhack files
+              + recover files
+
+        o On the Embedded Visual C menus, choose:
+              Project | Set Active Project | winhack
+
+        o On the Visual C menus again, choose either:
+              Build | Set Active Configuration | Release (for your handheld platform)
+            or
+              Build | Set Active Configuration | Debug (for your handheld platform)
+
+Building
+    
+4.  Start your build.
+ 
+        o On the Embedded Visual C menus once again, choose:
+              Build | Build winhack
+          This starts the build.  It is likely that the IDE message window 
+          where you are doing the compiling will be occupied for a while.
+    Notes: 
+
+        o You may get a bunch of warnings regarding missing include files in the 
+          beginning of the build process - ignore them. For some reason the tool 
+          that produces these messages ignores preprocessor directives. The actual 
+          build will go just fine.
+        o Sometimes the compiler chokes on do_wear.c  Ignore that - let the build 
+          finish. Then run it again - it will compile just fine. (Seems to be some 
+          sort of bug in EVC++) 
+
+Transfer
+
+5.  Transfer the files and executables to your handheld by extracting the
+    files into some folder on the CE device - that should do it. 
+
+
+PROBLEMS
+
+    If you encounter a bug and wish to report it, please send e-mail to:
+        nethack-bugs@nethack.org
+
+    If you have any comments or suggestions, feel free to drop us a line c/o:
+        DevTeam@nethack.org
+
+    You may wish to vist the NetHack Development Team's website occasionally
+    to check for updates or known bugs.  The website can be found at:
+             http://www.nethack.org/
+
+    Happy NetHacking!

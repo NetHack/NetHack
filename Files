@@ -43,8 +43,8 @@ pcconf.h        permonst.h      prop.h          qtext.h         quest.h
 rect.h          region.h        rm.h            skills.h        sp_lev.h
 spell.h         system.h        tcap.h          timeout.h       tosconf.h
 tradstdc.h      trampoli.h      trap.h          unixconf.h      vault.h
-vision.h        vmsconf.h       winami.h        winprocs.h      wintype.h
-you.h           youprop.h
+vision.h        vmsconf.h       wceconf.h       winami.h        winprocs.h
+wintype.h       you.h           youprop.h
 (file for tty versions)
 wintty.h
 (files for X versions)
@@ -172,6 +172,19 @@ Install.vms     Makefile.dat    Makefile.doc    Makefile.src    Makefile.top
 Makefile.utl    install.com     lev_lex.h       nethack.com     oldcrtl.c
 spec_lev.com    vmsbuild.com    vmsfiles.c      vmsmail.c       vmsmain.c
 vmsmisc.c       vmstty.c        vmsunix.c
+
+sys/wince:
+(files for Windows CE and PocketPC)
+assert.h        bootstrp.mak    celib.c         cesetup.bat     errno.h         
+fcntl.h         Install.ce      keypad.uu       mhaskyn.c       mhaskyn.h
+mhcmd.c         mhcmd.h         mhcolor.c       mhcolor.h       mhdlg.c
+mhdlg.h         mhfont.c        mhfont.h        mhinput.c       mhinput.h
+mhmain.c        mhmain.h        mhmap.c         mhmap.h         mhmenu.c
+mhmenu.h        mhmsg.h         mhmsgwnd.c      mhmsgwnd.h      mhrip.c
+mhrip.h         mhstatus.c      mhstatus.h      mhtext.c        mhtext.h
+mswproc.c       newres.h        recover.vcp     resource.h      stat.h
+winMS.h         wince.vcp       wince.vcw       winhack.c       winhack.h
+winhack.rc      winmain.c
 
 sys/winnt:
 (files for Windows 9x, NT and Windows2000 version)
