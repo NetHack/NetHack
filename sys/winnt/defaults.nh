@@ -31,10 +31,18 @@ OPTIONS=IBMGraphics
 # General options.  You might also set "silent" so as not to attract
 # the boss's attention.
 #
-OPTIONS=time,noshowexp,number_pad,lit_corridor,rest_on_space
+OPTIONS=time,noshowexp,number_pad,lit_corridor
 #
 # If you want to get rid of "use #quit to quit..." use:
-#OPTIONS=suppress_alert:3.3.1
+OPTIONS=suppress_alert:3.3.1
+#
+# Note: the rest_on_space in the next line may not be
+#       appropriate for a beginning NetHack player, since
+#       it could result in use of a turn unintentionally.
+#       If you're new to NetHack, comment it out. It is
+#       being left in to keep the sample config file the 
+#       same as it was in past releases.
+OPTIONS=rest_on_space
 #
 # Set some options to control graphical window-port (these will
 # be safely and silently ignored by the tty port)
@@ -55,7 +63,7 @@ OPTIONS=font_menu:Arial,font_size_menu:9
 OPTIONS=font_text:Courier New,font_size_text:9
 
 # Status window settings
-OPTIONS=font_status:Courier New,font_size_status:10
+OPTIONS=font_status:Courier New,font_size_status:9
 
 # Other
 OPTIONS=hilite_pet,!toptenwin
