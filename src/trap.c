@@ -2301,6 +2301,15 @@ long hmask, emask;     /* might cancel timeout */
 	}
 	/* check for falling into pool - added by GAN 10/20/86 */
 	if(!Flying) {
+		if (!u.uswallow && u.ustuck) {
+			if (sticks(youmonst.data))
+				You("aren't able to maintain your hold on %s.",
+					mon_nam(u.ustuck));
+			else
+				pline("Startled, %s can no longer hold you!",
+					mon_nam(u.ustuck));
+			u.ustuck = 0;
+		}
 		/* kludge alert:
 		 * drown() and lava_effects() print various messages almost
 		 * every time they're called which conflict with the "fall
