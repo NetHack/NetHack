@@ -30,7 +30,6 @@ STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
 STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
 STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
 STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
-STATIC_OVL int FDECL(de_pointer_type, (int));
 # ifdef STATUS_HILITES
 STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *));
 STATIC_DCL char *FDECL(clridx_to_s, (char *, int));
@@ -486,7 +485,7 @@ struct istat_s *bl1, *bl2;
 	if ((!bl1->a.a_void || !bl2->a.a_void) &&
 	    (anytype == ANY_IPTR || anytype == ANY_UPTR ||
 	     anytype == ANY_LPTR || anytype == ANY_ULPTR)) {
-		panic("compare_blstat: invalid pointer %ls, %ld",
+		panic("compare_blstat: invalid pointer %ld, %ld",
 			(long)bl1->a.a_void, (long)bl2->a.a_void);
 	}
 
@@ -1140,18 +1139,6 @@ int idx;
 			Strcpy(buf, c_obj_colors[idx]);
 	}
 	return buf;
-}
-
-STATIC_OVL int
-de_pointer_type(anytype)
-int anytype;
-{
-	int dt = anytype;
-	if (anytype == ANY_IPTR)	dt = ANY_INT;
-	else if (anytype == ANY_LPTR)	dt = ANY_LONG;
-	else if (anytype == ANY_UPTR)	dt = ANY_UINT;
-	else if (anytype == ANY_ULPTR)	dt = ANY_ULONG;
-	return dt;
 }
 
 boolean

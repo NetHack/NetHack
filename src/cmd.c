@@ -756,7 +756,6 @@ STATIC_PTR int
 wiz_smell()
 {
 	char	out_str[BUFSZ];
-	const char *firstmatch = 0;
 	struct permonst *pm = 0;
 	int     ans = 0;
 	int     mndx;		/* monster index */
