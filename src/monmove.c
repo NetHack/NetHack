@@ -214,7 +214,7 @@ boolean fleemsg;
 		if (fleetime == 1) fleetime++;
 		mtmp->mfleetim = min(fleetime, 127);
 	    }
-	    if (!mtmp->mflee && fleemsg && canseemon(mtmp))
+	    if (!mtmp->mflee && fleemsg && canseemon(mtmp) && !mtmp->mfrozen)
 		pline("%s turns to flee!", (Monnam(mtmp)));
 	    mtmp->mflee = 1;
 	}
