@@ -968,6 +968,7 @@ STATIC_OVL int
 throwspell()
 {
 	coord cc;
+	struct monst *mtmp;
 
 	if (u.uinwater) {
 	    pline("You're joking! In this weather?"); return 0;
@@ -990,14 +991,16 @@ throwspell()
 	    u.dx = 0;
 	    u.dy = 0;
 	    return 1;
-	} else if (!cansee(cc.x, cc.y) || IS_STWALL(levl[cc.x][cc.y].typ)) {
+	} else if ((!cansee(cc.x, cc.y) &&
+		    (!(mtmp = m_at(cc.x, cc.y)) || !canspotmon(mtmp))) ||
+		   IS_STWALL(levl[cc.x][cc.y].typ)) {
 	    Your("mind fails to lock onto that location!");
 	    return 0;
-	} else {
-	    u.dx=cc.x;
-	    u.dy=cc.y;
-	    return 1;
 	}
+
+	u.dx = cc.x;
+	u.dy = cc.y;
+	return 1;
 }
 
 void

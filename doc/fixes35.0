@@ -7,6 +7,8 @@ typos fixed in data.base
 bad capitalization of msg when charging for something that catches light
 missing opthelp for use_inverse
 Never say "It moves only reluctantly"
+expert fireball/cone of cold could not target a monster seen only with
+	infravision or ESP
 
 
 Platform- and/or Interface-Specific Fixes
