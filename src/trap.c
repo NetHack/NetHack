@@ -3397,7 +3397,7 @@ boolean force;
 				&& rn2(MAXULEV + 1 - u.ulevel) < 10)))
 		       || (!force && confused && !rn2(3))) {
 			You("find a trap on %s!", the(xname(otmp)));
-			exercise(A_WIS, TRUE);
+			if (!confused) exercise(A_WIS, TRUE);
 
 			switch (ynq("Disarm it?")) {
 			    case 'q': return(1);
