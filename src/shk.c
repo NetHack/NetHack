@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)shk.c	3.4	2003/05/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1754,6 +1754,8 @@ finish_paybill()
 #if 0		/* don't bother */
 	if (ox == 0 && oy == 0) impossible("finish_paybill: no location");
 #endif
+	/* normally done by savebones(), but that's too late in this case */
+	unleash_all();
 	/* transfer all of the character's inventory to the shop floor */
 	while ((otmp = invent) != 0) {
 	    otmp->owornmask = 0L;	/* perhaps we should call setnotworn? */
