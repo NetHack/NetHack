@@ -1483,19 +1483,17 @@ xchar x, y;		/* object location (ox, oy may not be right) */
 /*
  * Unconditionally break an object. Assumes all resistance checks
  * and break messages have been delivered prior to getting here.
- * This routine assumes the cause is the hero if heros_fault is TRUE.
- *
  */
 STATIC_OVL void
-breakobj(obj, x, y, heros_fault, from_invent)
+breakobj(obj, x, y, hero_caused, from_invent)
 struct obj *obj;
 xchar x, y;		/* object location (ox, oy may not be right) */
-boolean heros_fault;
+boolean hero_caused;	/* is this the hero's fault? */
 boolean from_invent;
 {
 	switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
 		case MIRROR:
-			if (heros_fault)
+			if (hero_caused)
 			    change_luck(-2);
 			break;
 		case POT_WATER:		/* really, all potions */
@@ -1522,11 +1520,11 @@ boolean from_invent;
 			break;
 		case EGG:
 			/* breaking your own eggs is bad luck */
-			if (heros_fault && obj->spe && obj->corpsenm >= LOW_PM)
+			if (hero_caused && obj->spe && obj->corpsenm >= LOW_PM)
 			    change_luck((schar) -min(obj->quan, 5L));
 			break;
 	}
-	if (heros_fault) {
+	if (hero_caused) {
 	    if (from_invent) {
 		if (*u.ushops)
 			check_shop_obj(obj, x, y, TRUE);
