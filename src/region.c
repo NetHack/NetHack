@@ -71,7 +71,7 @@ int x, y;
 {
     int i;
 
-    if (reg == NULL || !inside_rect(&(reg->bounding_box), x, y))
+    if (reg == (NhRegion *)0 || !inside_rect(&(reg->bounding_box), x, y))
 	return FALSE;
     for (i = 0; i < reg->nrects; i++)
 	if (inside_rect(&(reg->rects[i]), x, y))
@@ -101,7 +101,8 @@ int nrect;
 	reg->bounding_box.hy = 0;
     }
     reg->nrects = nrect;
-    reg->rects = nrect > 0 ? (NhRect *)alloc((sizeof (NhRect)) * nrect) : NULL;
+    reg->rects = nrect > 0 ?
+		(NhRect *)alloc((sizeof (NhRect)) * nrect) : (NhRect *)0;
     for (i = 0; i < nrect; i++) {
 	if (rects[i].lx < reg->bounding_box.lx)
 	    reg->bounding_box.lx = rects[i].lx;
@@ -117,8 +118,8 @@ int nrect;
     reg->attach_2_u = FALSE;
     reg->attach_2_m = 0;
     /* reg->attach_2_o = NULL; */
-    reg->enter_msg = NULL;
-    reg->leave_msg = NULL;
+    reg->enter_msg = (const char *)0;
+    reg->leave_msg = (const char *)0;
     reg->expire_f = NO_CALLBACK;
     reg->enter_f = NO_CALLBACK;
     reg->can_enter_f = NO_CALLBACK;
@@ -129,8 +130,8 @@ int nrect;
     clear_heros_fault(reg);
     reg->n_monst = 0;
     reg->max_monst = 0;
-    reg->monsters = NULL;
-    reg->arg = NULL;
+    reg->monsters = (unsigned int *)0;
+    reg->arg = (genericptr_t)0;
     return reg;
 }
 
@@ -250,12 +251,12 @@ NhRegion *reg;
     ret_reg->player_flags = reg->player_flags;	/* set/clear_hero_inside,&c*/
     ret_reg->n_monst = reg->n_monst;
     if (reg->n_monst > 0) {
-	ret_reg->monsters = (unsigned *)
+	ret_reg->monsters = (unsigned int *)
 				alloc((sizeof (unsigned)) * reg->n_monst);
 	(void) memcpy((genericptr_t) ret_reg->monsters, (genericptr_t) reg->monsters,
 		      sizeof (unsigned) * reg->n_monst);
     } else
-	ret_reg->monsters = NULL;
+	ret_reg->monsters = (unsigned int *)0;
     return ret_reg;
 }
 
@@ -361,7 +362,7 @@ clear_regions()
     if (max_regions > 0)
 	free((genericptr_t) regions);
     max_regions = 0;
-    regions = NULL;
+    regions = (NhRegion **)0;
 }
 
 /*
@@ -444,7 +445,7 @@ xchar
 	if (hero_inside(regions[i]) &&
 		!regions[i]->attach_2_u && !inside_region(regions[i], x, y)) {
 	    clear_hero_inside(regions[i]);
-	    if (regions[i]->leave_msg != NULL)
+	    if (regions[i]->leave_msg != (const char *)0)
 		pline(regions[i]->leave_msg);
 	    if ((f_indx = regions[i]->leave_f) != NO_CALLBACK)
 		(void) (*callbacks[f_indx])(regions[i], (genericptr_t) 0);
@@ -455,7 +456,7 @@ xchar
 	if (!hero_inside(regions[i]) &&
 		!regions[i]->attach_2_u && inside_region(regions[i], x, y)) {
 	    set_hero_inside(regions[i]);
-	    if (regions[i]->enter_msg != NULL)
+	    if (regions[i]->enter_msg != (const char *)0)
 		pline(regions[i]->enter_msg);
 	    if ((f_indx = regions[i]->enter_f) != NO_CALLBACK)
 		(void) (*callbacks[f_indx])(regions[i], (genericptr_t) 0);
@@ -631,11 +632,13 @@ int mode;
 	bwrite(fd, (genericptr_t) &regions[i]->attach_2_u, sizeof (boolean));
 	n = 0;
 	bwrite(fd, (genericptr_t) &regions[i]->attach_2_m, sizeof (unsigned));
-	n = regions[i]->enter_msg != NULL ? strlen(regions[i]->enter_msg) : 0;
+	n = regions[i]->enter_msg != (const char *)0 ?
+			strlen(regions[i]->enter_msg) : 0;
 	bwrite(fd, (genericptr_t) &n, sizeof n);
 	if (n > 0)
 	    bwrite(fd, (genericptr_t) regions[i]->enter_msg, n);
-	n = regions[i]->leave_msg != NULL ? strlen(regions[i]->leave_msg) : 0;
+	n = regions[i]->leave_msg != (const char *)0 ?
+			strlen(regions[i]->leave_msg) : 0;
 	bwrite(fd, (genericptr_t) &n, sizeof n);
 	if (n > 0)
 	    bwrite(fd, (genericptr_t) regions[i]->leave_msg, n);
@@ -699,7 +702,7 @@ boolean ghostly; /* If a bones file restore */
 	    msg_buf[n] = '\0';
 	    regions[i]->enter_msg = (const char *) msg_buf;
 	} else
-	    regions[i]->enter_msg = NULL;
+	    regions[i]->enter_msg = (const char *)0;
 
 	mread(fd, (genericptr_t) &n, sizeof n);
 	if (n > 0) {
@@ -708,7 +711,7 @@ boolean ghostly; /* If a bones file restore */
 	    msg_buf[n] = '\0';
 	    regions[i]->leave_msg = (const char *) msg_buf;
 	} else
-	    regions[i]->leave_msg = NULL;
+	    regions[i]->leave_msg = (const char *)0;
 
 	mread(fd, (genericptr_t) &regions[i]->ttl, sizeof (short));
 	/* check for expired region */
@@ -731,7 +734,7 @@ boolean ghostly; /* If a bones file restore */
 	    regions[i]->monsters =
 		(unsigned *) alloc(sizeof (unsigned) * regions[i]->n_monst);
 	else
-	    regions[i]->monsters = NULL;
+	    regions[i]->monsters = (unsigned int *)0;
 	regions[i]->max_monst = regions[i]->n_monst;
 	for (j = 0; j < regions[i]->n_monst; j++)
 	    mread(fd, (genericptr_t) &regions[i]->monsters[j],
@@ -813,7 +816,7 @@ genericptr_t p2;
 {
     struct monst *mtmp;
 
-    if (p2 == NULL) {		/* That means the player */
+    if (p2 == (genericptr_t)0) {		/* That means the player */
 	if (!Blind)
 		You("bump into %s. Ouch!",
 		    Hallucination ? "an invisible tree" :
@@ -904,7 +907,7 @@ genericptr_t p2;
 
     reg = (NhRegion *) p1;
     dam = (int) reg->arg;
-    if (p2 == NULL) {		/* This means *YOU* Bozo! */
+    if (p2 == (genericptr_t)0) {		/* This means *YOU* Bozo! */
 	if (nonliving(youmonst.data) || Breathless)
 	    return FALSE;
 	if (!Blind) {

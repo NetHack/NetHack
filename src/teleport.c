@@ -23,7 +23,7 @@ int x,y;
 struct monst *mtmp;
 unsigned gpflags;
 {
-	struct permonst *mdat = NULL;
+	struct permonst *mdat = (struct permonst *)0;
 	boolean ignorewater = ((gpflags & MM_IGNOREWATER) != 0);
 
 	if (!isok(x, y)) return FALSE;
