@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)end.c	3.4	2003/03/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -264,7 +264,9 @@ panic VA_DECL(const char *, str)
 	    iflags.window_inited = 0; /* they're gone; force raw_print()ing */
 	}
 
-	raw_print(!program_state.something_worth_saving ?
+	raw_print(program_state.gameover ?
+		  "Postgame wrapup disrupted." :
+		  !program_state.something_worth_saving ?
 		  "Program initialization has failed." :
 		  "Suddenly, the dungeon collapses.");
 #if defined(WIZARD) && !defined(MICRO)
@@ -919,8 +921,10 @@ boolean identified, all_containers;
 	char buf[BUFSZ];
 
 	for (box = list; box; box = box->nobj) {
-	    if (Is_container(box) && box->otyp != BAG_OF_TRICKS) {
-		if (box->cobj) {
+	    if (Is_container(box) || box->otyp == STATUE) {
+		if (box->otyp == BAG_OF_TRICKS) {
+		    continue;	/* wrong type of container */
+		} else if (box->cobj) {
 		    winid tmpwin = create_nhwindow(NHW_MENU);
 		    Sprintf(buf, "Contents of %s:", the(xname(box)));
 		    putstr(tmpwin, 0, buf);
