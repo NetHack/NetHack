@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.49 $ $Date: 2002/08/07 03:26:50 $
+% $Revision: 1.50 $ $Date: 2002/08/12 01:39:55 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2008,6 +2008,8 @@ is taken as defining the corresponding {\it dungeon},
 {\it boulder\/} option in a different syntax,
 a sequence of decimal numbers giving the character position
 in the current font to be used in displaying each entry.
+A zero in any entry in such a sequence leaves the display of that
+entry unchanged; this feature is not available using the option syntax.
 Such a sequence can be continued to multiple lines by putting a
 `{\tt \verb+\+}' at the end of each line to be continued.
 Any line starting with `{\tt \#}' is treated as a comment.

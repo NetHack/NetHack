@@ -831,7 +831,7 @@ register uchar *graph_chars;
 {
 	int i;
 	for (i = 0; i < WARNCOUNT; i++)
-	    warnsyms[i] = graph_chars[i];
+	    if (graph_chars[i]) warnsyms[i] = graph_chars[i];
 }
 
 STATIC_OVL int

@@ -1602,6 +1602,8 @@ or
 option in a different syntax,
 a sequence of decimal numbers giving the character position
 in the current font to be used in displaying each entry.
+A zero in any entry in such a sequence leaves the display of that
+entry unchanged; this feature is not available using the option syntax.
 Such a sequence can be continued to multiple lines by putting a `\e'
 at the end of each line to be continued.
 Any line starting with `#' is treated as a comment.

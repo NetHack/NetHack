@@ -127,7 +127,7 @@ STATIC_DCL void FDECL(docompress_file, (const char *,BOOLEAN_P));
 #endif
 STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
-STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,int,const char *));
+STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
 int FDECL(parse_config_line, (FILE *,char *,char *,char *));
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
@@ -1430,27 +1430,33 @@ const char *filename;
 /*
  * Retrieve a list of integers from a file into a uchar array.
  *
- * NOTE:  This routine is unable to read a value of 0.
+ * NOTE: zeros are inserted unless modlist is TRUE, in which case the list
+ *  location is unchanged.  Callers must handle zeros if modlist is FALSE.
  */
 STATIC_OVL int
-get_uchars(fp, buf, bufp, list, size, name)
+get_uchars(fp, buf, bufp, list, modlist, size, name)
     FILE *fp;		/* input file pointer */
     char *buf;		/* read buffer, must be of size BUFSZ */
     char *bufp;		/* current pointer */
     uchar *list;	/* return list */
+    boolean modlist;	/* TRUE: list is being modified in place */
     int  size;		/* return list size */
     const char *name;		/* name of option for error message */
 {
     unsigned int num = 0;
     int count = 0;
+    boolean havenum = FALSE;
 
     while (1) {
 	switch(*bufp) {
 	    case ' ':  case '\0':
 	    case '\t': case '\n':
-		if (num) {
-		    list[count++] =  num;
+		if (havenum) {
+		    /* if modifying in place, don't insert zeros */
+		    if (num || !modlist) list[count] = num;
+		    count++;
 		    num = 0;
+		    havenum = FALSE;
 		}
 		if (count == size || !*bufp) return count;
 		bufp++;
@@ -1459,6 +1465,7 @@ get_uchars(fp, buf, bufp, list, size, name)
 	    case '0': case '1': case '2': case '3':
 	    case '4': case '5': case '6': case '7':
 	    case '8': case '9':
+		havenum = TRUE;
 		num = num*10 + (*bufp-'0');
 		bufp++;
 		break;
@@ -1620,30 +1627,35 @@ char		*tmp_levels;
 	    (void) strncpy(catname, bufp, PL_PSIZ-1);
 
 	} else if (match_varname(buf, "BOULDER", 3)) {
-	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, 1, "BOULDER");
+	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
+			      1, "BOULDER");
 	} else if (match_varname(buf, "GRAPHICS", 4)) {
-	    len = get_uchars(fp, buf, bufp, translate, MAXPCHARS, "GRAPHICS");
+	    len = get_uchars(fp, buf, bufp, translate, FALSE,
+			     MAXPCHARS, "GRAPHICS");
 	    assign_graphics(translate, len, MAXPCHARS, 0);
 	} else if (match_varname(buf, "DUNGEON", 4)) {
-	    len = get_uchars(fp, buf, bufp, translate, MAXDCHARS, "DUNGEON");
+	    len = get_uchars(fp, buf, bufp, translate, FALSE,
+			     MAXDCHARS, "DUNGEON");
 	    assign_graphics(translate, len, MAXDCHARS, 0);
 	} else if (match_varname(buf, "TRAPS", 4)) {
-	    len = get_uchars(fp, buf, bufp, translate, MAXTCHARS, "TRAPS");
+	    len = get_uchars(fp, buf, bufp, translate, FALSE,
+			     MAXTCHARS, "TRAPS");
 	    assign_graphics(translate, len, MAXTCHARS, MAXDCHARS);
 	} else if (match_varname(buf, "EFFECTS", 4)) {
-	    len = get_uchars(fp, buf, bufp, translate, MAXECHARS, "EFFECTS");
+	    len = get_uchars(fp, buf, bufp, translate, FALSE,
+			     MAXECHARS, "EFFECTS");
 	    assign_graphics(translate, len, MAXECHARS, MAXDCHARS+MAXTCHARS);
 
 	} else if (match_varname(buf, "OBJECTS", 3)) {
 	    /* oc_syms[0] is the RANDOM object, unused */
-	    (void) get_uchars(fp, buf, bufp, &(oc_syms[1]),
+	    (void) get_uchars(fp, buf, bufp, &(oc_syms[1]), TRUE,
 					MAXOCLASSES-1, "OBJECTS");
 	} else if (match_varname(buf, "MONSTERS", 3)) {
 	    /* monsyms[0] is unused */
-	    (void) get_uchars(fp, buf, bufp, &(monsyms[1]),
+	    (void) get_uchars(fp, buf, bufp, &(monsyms[1]), TRUE,
 					MAXMCLASSES-1, "MONSTERS");
 	} else if (match_varname(buf, "WARNINGS", 5)) {
-	    (void) get_uchars(fp, buf, bufp, translate,
+	    (void) get_uchars(fp, buf, bufp, translate, FALSE,
 					WARNCOUNT, "WARNINGS");
 	    assign_warnings(translate);
 #ifdef WIZARD
