@@ -4,7 +4,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 17, 2002
+.ds f2 "March 18, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2345,10 +2345,10 @@ The 3.3 development team, consisting of \fBMichael Allison\fP, \fBKen Arromdee\f
 December 1999 and 3.3.1 in August of 2000.
 .pg
 Version 3.3 offered many firsts. It was the first version to separate race 
-and profession. The Elf class was removed in preference to an Elf Race, 
-and the races of Dwarves, Gnomes, and Orcs made their first appearance in 
-the game alongside the familiar Human race.  Monk and Ranger roles joined 
-Archeologists, Barbarians, Cavemen, Healers, Knights, Priests, Rogues, 
+and profession. The Elf class was removed in preference to an elf race, 
+and the races of dwarves, gnomes, and orcs made their first appearance in 
+the game alongside the familiar human race.  Monk and Ranger roles joined 
+Archeologists, Barbarians, Cavemen, Healers, Knights, Priests, Rogues, Samurai, 
 Tourists, Valkyries and of course, Wizards.  It was also the first version
 to allow you to ride a steed, and was the first version to have a publicly 
 available web-site listing all the bugs that had been discovered.  Despite 
@@ -2362,7 +2362,7 @@ The 3.4 development team initially consisted of
 \fBJanet Walz\fP, and \fBPaul Winner\fP, with \fB Warwick Allison\fP joining 
 just before the release of NetHack 3.4.0 in March 2002.
 .pg
-As with version 3.2, various people contributed to the game as a whole as
+As with version 3.3, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
 .pg
 \fBPat Rankin\fP maintained 3.4 for VMS.
