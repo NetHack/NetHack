@@ -306,7 +306,7 @@ boolean forcecontrol;
 	/* The below polyok() fails either if everything is genocided, or if
 	 * we deliberately chose something illegal to force newman().
 	 */
-	if (!polyok(&mons[mntmp]) || !rn2(5))
+	if (!polyok(&mons[mntmp]) || !rn2(5) || your_race(&mons[mntmp]))
 		newman();
 	else if(!polymon(mntmp)) return;
 
