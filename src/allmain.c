@@ -60,9 +60,6 @@ moveloop()
     youmonst.movement = NORMAL_SPEED;	/* give the hero some movement points */
 
     for(;;) {
-#ifdef CLIPPING
-	cliparound(u.ux, u.uy);
-#endif
 	get_nh_event();
 #ifdef POSITIONBAR
 	do_positionbar();
@@ -379,6 +376,11 @@ moveloop()
 #ifdef WIZARD
 	if (iflags.sanity_check)
 	    sanity_check();
+#endif
+
+#ifdef CLIPPING
+	/* just before rhack */
+	cliparound(u.ux, u.uy);
 #endif
 
 	u.umoved = FALSE;
