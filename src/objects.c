@@ -418,7 +418,7 @@ CLOAK("robe", (char *)0,
 CLOAK("alchemy smock", "apron",
 		0, 1,	POISON_RES, 9, 0, 10, 50,  9, 1, CLOTH, CLR_WHITE),
 CLOAK("leather cloak", (char *)0,
-		1, 0,	0,	    8, 0, 15, 40,  9, 1, CLOTH, CLR_BROWN),
+		1, 0,	0,	    8, 0, 15, 40,  9, 1, LEATHER, CLR_BROWN),
 /* With shuffled appearances... */
 CLOAK("cloak of protection", "tattered cape",
 		0, 1,	PROTECTION, 9, 0, 10, 50,  7, 3, CLOTH, HI_CLOTH),
