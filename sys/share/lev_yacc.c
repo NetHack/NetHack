@@ -1138,6 +1138,9 @@ case 11:
 			    yyerror("Invalid background type.");
 			init_lev.smoothed = yyvsp[-6].i;
 			init_lev.joined = yyvsp[-4].i;
+			if (init_lev.joined &&
+			    init_lev.fg != CORR && init_lev.fg != ROOM)
+			    yyerror("Invalid foreground type for joined map.");
 			init_lev.lit = yyvsp[-2].i;
 			init_lev.walled = yyvsp[0].i;
 			yyval.i = 1;
