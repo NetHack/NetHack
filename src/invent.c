@@ -1763,20 +1763,22 @@ count_buc(list, type)
     while (list) {
 	switch(type) {
 	    case BUC_BLESSED:
-		if (list->oclass != GOLD_CLASS && list->bknown && list->blessed)
+		if (list->oclass != GOLD_CLASS &&
+		    (list->bknown || Role_if(PM_PRIEST)) && list->blessed)
 		    count++;
 		break;
 	    case BUC_CURSED:
-		if (list->oclass != GOLD_CLASS && list->bknown && list->cursed)
+		if (list->oclass != GOLD_CLASS &&
+		    (list->bknown || Role_if(PM_PRIEST)) && list->cursed)
 		    count++;
 		break;
 	    case BUC_UNCURSED:
 		if (list->oclass != GOLD_CLASS &&
-			list->bknown && !list->blessed && !list->cursed)
+		    (list->bknown || Role_if(PM_PRIEST)) && !list->blessed && !list->cursed)
 		    count++;
 		break;
 	    case BUC_UNKNOWN:
-		if (list->oclass != GOLD_CLASS && !list->bknown)
+		if (list->oclass != GOLD_CLASS && !(list->bknown || Role_if(PM_PRIEST)))
 		    count++;
 		break;
 	    default:

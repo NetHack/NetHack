@@ -316,16 +316,19 @@ struct obj *obj;
 	(index(valid_menu_classes, obj->oclass) != (char *)0))
 	return TRUE;
     else if (((index(valid_menu_classes,'U') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && obj->bknown && !obj->blessed && !obj->cursed)))
+	(obj->oclass != GOLD_CLASS && (obj->bknown || Role_if(PM_PRIEST)) &&
+	!obj->blessed && !obj->cursed)))
 	return TRUE;
     else if (((index(valid_menu_classes,'B') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && obj->bknown && obj->blessed)))
+	(obj->oclass != GOLD_CLASS &&
+	(obj->bknown || Role_if(PM_PRIEST)) && obj->blessed)))
 	return TRUE;
     else if (((index(valid_menu_classes,'C') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && obj->bknown && obj->cursed)))
+	(obj->oclass != GOLD_CLASS &&
+	(obj->bknown || Role_if(PM_PRIEST)) && obj->cursed)))
 	return TRUE;
     else if (((index(valid_menu_classes,'X') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && !obj->bknown)))
+	(obj->oclass != GOLD_CLASS && !(obj->bknown || Role_if(PM_PRIEST)))))
 	return TRUE;
     else
 	return FALSE;
