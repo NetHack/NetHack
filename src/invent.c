@@ -855,7 +855,7 @@ register const char *let,*word;
 			!strcmp(word, "untrap with")) &&
 		     /* Picks, axes, pole-weapons, bullwhips */
 		    ((otmp->oclass == WEAPON_CLASS && !is_pick(otmp) &&
-		      !is_pole(otmp) && otyp != BULLWHIP)
+		      !is_axe(otmp) && !is_pole(otmp) && otyp != BULLWHIP)
 		|| (otmp->oclass == POTION_CLASS &&
 		     /* only applicable potion is oil, and it will only
 			be offered as a choice when already discovered */

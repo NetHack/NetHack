@@ -2827,7 +2827,7 @@ doapply()
 		if (is_pole(obj)) {
 			res = use_pole(obj);
 			break;
-		} else if (is_pick(obj) /* || is_axe(obj) */) {
+		} else if (is_pick(obj) || is_axe(obj)) {
 			res = use_pick_axe(obj);
 			break;
 		}

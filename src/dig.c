@@ -13,10 +13,18 @@ static NEARDATA boolean did_dig_msg;
 STATIC_DCL boolean NDECL(rm_waslit);
 STATIC_DCL void FDECL(mkcavepos, (XCHAR_P,XCHAR_P,int,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void FDECL(mkcavearea, (BOOLEAN_P));
-STATIC_DCL int FDECL(dig_typ, (XCHAR_P,XCHAR_P));
+STATIC_DCL int FDECL(dig_typ, (struct obj *,XCHAR_P,XCHAR_P));
 STATIC_DCL int NDECL(dig);
 STATIC_DCL schar FDECL(fillholetyp, (int, int));
 STATIC_DCL void NDECL(dig_up_grave);
+
+/* Indicies returned by dig_typ() */
+#define DIGTYP_UNDIGGABLE 0
+#define DIGTYP_ROCK       1
+#define DIGTYP_STATUE     2
+#define DIGTYP_BOULDER    3
+#define DIGTYP_DOOR       4
+#define DIGTYP_TREE       5
 
 
 STATIC_OVL boolean
@@ -122,16 +130,20 @@ register boolean rockit;
 }
 
 /* When digging into location <x,y>, what are you actually digging into? */
-/* result: 1=>statue, 2=>boulder, 3=>door, 0=>other; used as array index */
-/* KMH -- Added 4=>tree */
 STATIC_OVL int
-dig_typ(x, y)
+dig_typ(otmp, x, y)
+struct obj *otmp;
 xchar x, y;
 {
-	return (sobj_at(STATUE, x, y) ? 1 :
-		sobj_at(BOULDER, x, y) ? 2 :
-		closed_door(x, y) ? 3 :
-		IS_TREE(levl[x][y].typ) ? 4: 0);
+	boolean ispick = is_pick(otmp);
+
+	return (ispick && sobj_at(STATUE, x, y) ? DIGTYP_STATUE :
+		ispick && sobj_at(BOULDER, x, y) ? DIGTYP_BOULDER :
+		closed_door(x, y) ? DIGTYP_DOOR :
+		IS_TREE(levl[x][y].typ) ? (ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE) :
+		ispick && IS_ROCK(levl[x][y].typ) &&
+			(!level.flags.arboreal || IS_WALL(levl[x][y].typ)) ?
+			DIGTYP_ROCK : DIGTYP_UNDIGGABLE);
 }
 
 boolean
@@ -153,11 +165,12 @@ dig_check(madeby, verbose, x, y)
 	int		x, y;
 {
 	struct trap *ttmp = t_at(x, y);
+	const char *verb = (madeby == BY_YOU && uwep && is_axe(uwep)) ? "chop" : "dig in";
 
 	if (On_stairs(x, y)) {
 	    if (x == xdnladder || x == xupladder) {
 		if(verbose) pline_The("ladder resists your effort.");
-	    } else if(verbose) pline_The("stairs are too hard to dig in.");
+	    } else if(verbose) pline_The("stairs are too hard to %s.", verb);
 	    return(FALSE);
 	} else if (IS_THRONE(levl[x][y].typ) && madeby != BY_OBJECT) {
 	    if(verbose) pline_The("throne is too hard to break apart.");
@@ -167,7 +180,7 @@ dig_check(madeby, verbose, x, y)
 	    if(verbose) pline_The("altar is too hard to break apart.");
 	    return(FALSE);
 	} else if (Is_airlevel(&u.uz)) {
-	    if(verbose) You("cannot dig in thin air.");
+	    if(verbose) You("cannot %s thin air.", verb);
 	    return(FALSE);
 	} else if (Is_waterlevel(&u.uz)) {
 	    if(verbose) pline_The("water splashes and subsides.");
@@ -176,11 +189,11 @@ dig_check(madeby, verbose, x, y)
 		      (levl[x][y].wall_info & W_NONDIGGABLE) != 0)
 		|| (ttmp &&
 		      (ttmp->ttyp == MAGIC_PORTAL || !Can_dig_down(&u.uz)))) {
-	    if(verbose) pline_The("%s here is too hard to dig in.",
-				  surface(x,y));
+	    if(verbose) pline_The("%s here is too hard to %s.",
+				  surface(x,y), verb);
 	    return(FALSE);
 	} else if (sobj_at(BOULDER, x, y)) {
-	    if(verbose) There("isn't enough room to dig here.");
+	    if(verbose) There("isn't enough room to %s here.", verb);
 	    return(FALSE);
 	} else if (madeby == BY_OBJECT &&
 		    /* the block against existing traps is mainly to
@@ -197,11 +210,13 @@ dig()
 {
 	register struct rm *lev;
 	register xchar dpx = digging.pos.x, dpy = digging.pos.y;
+	register boolean ispick = uwep && is_pick(uwep);
+	const char *verb = (!uwep || is_pick(uwep)) ? "dig into" : "chop";
 
 	lev = &levl[dpx][dpy];
 	/* perhaps a nymph stole your pick-axe while you were busy digging */
 	/* or perhaps you teleported away */
-	if (u.uswallow || !uwep || !is_pick(uwep) ||
+	if (u.uswallow || !uwep || (!ispick && !is_axe(uwep)) ||
 	    !on_level(&digging.level, &u.uz) ||
 	    ((digging.down ? (dpx != u.ux || dpy != u.uy)
 			   : (distu(dpx,dpy) > 2))))
@@ -210,12 +225,14 @@ dig()
 	if (digging.down) {
 	    if(!dig_check(BY_YOU, TRUE, u.ux, u.uy)) return(0);
 	} else { /* !digging.down */
-	    if (IS_ROCK(lev->typ) && !may_dig(dpx,dpy) && !dig_typ(dpx, dpy)) {
-		pline("This wall is too hard to dig into.");
+	    if (IS_TREE(lev->typ) && !may_dig(dpx,dpy) &&
+			dig_typ(uwep, dpx, dpy) == DIGTYP_TREE) {
+		pline("This tree seems to be petrified.");
 		return(0);
 	    }
-	    if (IS_TREE(lev->typ) && !may_dig(dpx,dpy) && dig_typ(dpx, dpy) == 4) {
-		pline("This tree seems to be petrified.");
+	    if (IS_ROCK(lev->typ) && !may_dig(dpx,dpy) &&
+			dig_typ(uwep, dpx, dpy) == DIGTYP_ROCK) {
+		pline("This wall is too hard to %s.", verb);
 		return(0);
 	    }
 	}
@@ -319,6 +336,7 @@ dig()
 			if (IS_TREE(lev->typ)) {
 			    digtxt = "You cut down the tree.";
 			    lev->typ = ROOM;
+			    if (!rn2(5)) (void) rnd_treefruit_at(dpx, dpy);
 			} else {
 			    digtxt = "You succeed in cutting away some rock.";
 			    lev->typ = CORR;
@@ -389,15 +407,15 @@ cleanup:
 		digging.level.dlevel = -1;
 		return(0);
 	} else {		/* not enough effort has been spent yet */
-		static const char *d_target[5] = {
-					"rock", "statue", "boulder", "door", "tree"
+		static const char *d_target[6] = {
+					"", "rock", "statue", "boulder", "door", "tree"
 		};
-		int dig_target = dig_typ(dpx, dpy);
+		int dig_target = dig_typ(uwep, dpx, dpy);
 
 		if (IS_WALL(lev->typ) || dig_target == 3) {
 		    if(*in_rooms(dpx, dpy, SHOPBASE)) {
-			pline("This %s seems too hard to dig into.",
-			      IS_DOOR(lev->typ) ? "door" : "wall");
+			pline("This %s seems too hard to %s.",
+			      IS_DOOR(lev->typ) ? "door" : "wall", verb);
 			return(0);
 		    }
 		} else if (!IS_ROCK(lev->typ) && !dig_target)
@@ -777,23 +795,29 @@ int
 use_pick_axe(obj)
 struct obj *obj;
 {
+	boolean ispick;
 	char dirsyms[12];
 	char qbuf[QBUFSZ];
 	register char *dsp = dirsyms;
 	register int rx, ry;
 	int res = 0;
-	register const char *sdp;
+	register const char *sdp, *verb;
+
 	if(iflags.num_pad) sdp = ndir; else sdp = sdir;	/* DICE workaround */
 
+	/* Check tool */
 	if (obj != uwep) {
 	    if (!wield_tool(obj)) return(0);
 	    else res = 1;
 	}
+	ispick = is_pick(obj);
+	verb = ispick ? "dig" : "chop";
+
 	if (u.utrap && u.utraptype == TT_WEB) {
-	    pline("%s you can't dig while entangled in a web.",
+	    pline("%s you can't %s while entangled in a web.",
 		  /* res==0 => no prior message;
 		     res==1 => just got "You now wield a pick-axe." message */
-		  !res ? "Unfortunately," : "But");
+		  !res ? "Unfortunately," : "But", verb);
 	    return res;
 	}
 
@@ -801,13 +825,14 @@ struct obj *obj;
 		(void) movecmd(*sdp);	/* sets u.dx and u.dy and u.dz */
 		rx = u.ux + u.dx;
 		ry = u.uy + u.dy;
-		if(u.dz > 0 || (u.dz == 0 && isok(rx, ry) &&
-		    (IS_ROCK(levl[rx][ry].typ) || dig_typ(rx, ry))))
+		/* Include down even with axe, so we have at least one direction */
+		if (u.dz > 0 ||
+				(u.dz == 0 && isok(rx, ry) && dig_typ(obj, rx, ry)))
 			*dsp++ = *sdp;
 		sdp++;
 	}
 	*dsp = 0;
-	Sprintf(qbuf, "In what direction do you want to dig? [%s]", dirsyms);
+	Sprintf(qbuf, "In what direction do you want to %s? [%s]", verb, dirsyms);
 	if(!getdir(qbuf))
 		return(res);
 
@@ -825,11 +850,14 @@ struct obj *obj;
 	register int rx, ry;
 	register struct rm *lev;
 	int dig_target;
+	boolean ispick = is_pick(obj);
+	const char *verb = ispick ? "dig" : "chop";
+	const char *verbing = ispick ? "digging" : "chopping";
 
 	if (u.uswallow && attack(u.ustuck)) {
 		;  /* return(1) */
 	} else if (Underwater) {
-		pline("Turbulence torpedoes your digging attempts.");
+		pline("Turbulence torpedoes your %s attempts.", verbing);
 	} else if(u.dz < 0) {
 		if(Levitation)
 			You("don't have enough leverage.");
@@ -858,8 +886,8 @@ struct obj *obj;
 		lev = &levl[rx][ry];
 		if(MON_AT(rx, ry) && attack(m_at(rx, ry)))
 			return(1);
-		dig_target = dig_typ(rx, ry);
-		if (!IS_ROCK(lev->typ) && !dig_target) {
+		dig_target = dig_typ(obj, rx, ry);
+		if (dig_target == DIGTYP_UNDIGGABLE) {
 			/* ACCESSIBLE or POOL */
 			struct trap *trap = t_at(rx, ry);
 
@@ -877,11 +905,16 @@ struct obj *obj;
 			} else if (lev->typ == IRONBARS) {
 			    pline("Clang!");
 			    wake_nearby();
-			} else
+			} else if (IS_TREE(lev->typ))
+			    You("need an axe to cut down a tree.");
+			else if (IS_ROCK(lev->typ))
+			    You("need a pick to dig rock.");
+			else
 			    You("swing your %s through thin air.",
 				aobjnam(obj, (char *)0));
 		} else {
-			static const char *d_action[5] = {
+			static const char *d_action[6] = {
+						"swinging",
 						"digging",
 						"chipping the statue",
 						"hitting the boulder",
@@ -914,7 +947,7 @@ struct obj *obj;
 					d_action[dig_target]);
 			    digging.chew = FALSE;
 			}
-			set_occupation(dig, "digging", 0);
+			set_occupation(dig, verbing, 0);
 		}
 	} else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) {
 		/* it must be air -- water checked above */
@@ -925,6 +958,10 @@ struct obj *obj;
 		/* Monsters which swim also happen not to be able to dig */
 		You("cannot stay under%s long enough.",
 				is_pool(u.ux, u.uy) ? "water" : " the lava");
+	} else if (!ispick) {
+		Your("%s merely scratches the %s.",
+				aobjnam(obj, (char *)0), surface(u.ux,u.uy));
+		u_wipe_engr(3);
 	} else {
 		if (digging.pos.x != u.ux || digging.pos.y != u.uy ||
 			!on_level(&digging.level, &u.uz) || !digging.down) {
@@ -935,12 +972,12 @@ struct obj *obj;
 		    digging.pos.y = u.uy;
 		    assign_level(&digging.level, &u.uz);
 		    digging.effort = 0;
-		    You("start digging downward.");
+		    You("start %s downward.", verbing);
 		    if (*u.ushops) shopdig(0);
 		} else
-		    You("continue digging downward.");
+		    You("continue %s downward.", verbing);
 		did_dig_msg = FALSE;
-		set_occupation(dig, "digging", 0);
+		set_occupation(dig, verbing, 0);
 	}
 	return(1);
 }
@@ -1009,9 +1046,6 @@ register struct monst *mtmp;
 	here = &levl[mtmp->mx][mtmp->my];
 	if (here->typ == SDOOR)
 	    cvt_sdoor_to_door(here);	/* ->typ = DOOR */
-	if (IS_TREE(here->typ))
-		/* KMH -- Trees shouldn't create piles */
-		pile = 0;
 
 	/* Eats away door if present & closed or locked */
 	if (closed_door(mtmp->mx, mtmp->my)) {
@@ -1031,11 +1065,10 @@ register struct monst *mtmp;
 	    }
 	    newsym(mtmp->mx, mtmp->my);
 	    return FALSE;
-	} else
-	if (!IS_ROCK(here->typ)) /* no dig */
+	} else if (!IS_ROCK(here->typ) && !IS_TREE(here->typ)) /* no dig */
 	    return FALSE;
 
-	/* Only rock and walls fall through to this point. */
+	/* Only rock, trees, and walls fall through to this point. */
 	if ((here->wall_info & W_NONDIGGABLE) != 0) {
 	    impossible("mdig_tunnel:  %s at (%d,%d) is undiggable",
 		       (IS_WALL(here->typ) ? "wall" : "stone"),
@@ -1057,13 +1090,16 @@ register struct monst *mtmp;
 		here->typ = DOOR;
 		here->doormask = D_NODOOR;
 	    }
-	} else
-	    /* KMH -- Added support for trees */
-	    here->typ = level.flags.arboreal ? ROOM : CORR;
-
-	if (pile && pile < 5)   /* leave behind some rocks? */
-	    (void) mksobj_at((pile == 1) ? BOULDER : ROCK,
+	} else if (IS_TREE(here->typ)) {
+	    here->typ = ROOM;
+	    if (pile && pile < 5)
+		(void) rnd_treefruit_at(mtmp->mx, mtmp->my);
+	} else {
+	    here->typ = CORR;
+	    if (pile && pile < 5)
+		(void) mksobj_at((pile == 1) ? BOULDER : ROCK,
 			     mtmp->mx, mtmp->my, TRUE, FALSE);
+	}
 	newsym(mtmp->mx, mtmp->my);
 	if (!sobj_at(BOULDER, mtmp->mx, mtmp->my))
 	    unblock_point(mtmp->mx, mtmp->my);	/* vision */
