@@ -1538,7 +1538,7 @@ struct obj *obj;
 xchar x, y;		/* object location (ox, oy may not be right) */
 boolean from_invent;	/* thrown or dropped by player; maybe on shop bill */
 {
-	boolean in_view = !Blind;
+	boolean in_view = Blind ? FALSE : (from_invent || cansee(x, y));
 	if (!breaktest(obj)) return 0;
 	breakmsg(obj, in_view);
 	breakobj(obj, x, y, TRUE, from_invent);
