@@ -281,6 +281,8 @@ learn()
 	char splname[BUFSZ];
 	boolean costly = TRUE;
 
+	/* JDS: lenses give 50% faster reading; 33% smaller read time */
+	if (ublindf && ublindf->otyp == LENSES && rn2(2)) delay++;
 	if (delay) {	/* not if (delay++), so at end delay == 0 */
 		delay++;
 		return(1); /* still busy */
@@ -386,7 +388,8 @@ register struct obj *spellbook;
 			} else {
 			    /* uncursed - chance to fail */
 			    int read_ability = ACURR(A_INT) + 4 + u.ulevel/2
-					       - 2*objects[booktype].oc_level;
+					       - 2*objects[booktype].oc_level
+					       + (ublindf && ublindf->otyp == LENSES) ? 2 : 0;
 			    /* only wizards know if a spell is too difficult */
 			    if (Role_if(PM_WIZARD) && read_ability < 20) {
 				char qbuf[QBUFSZ];
