@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2003/01/02	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2003/01/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -580,11 +580,14 @@ int thrown;
 			tmp = rnd(2);
 		    if (!thrown && obj == uwep && obj->otyp == BOOMERANG &&
 			    rnl(4) == 4-1) {
-			pline("As you hit %s, %s %s breaks into splinters.",
-			    mon_nam(mon), shk_your(yourbuf, obj), xname(obj));
-			uwepgone();		/* set unweapon */
+			boolean more_than_1 = (obj->quan > 1L);
+
+			pline("As you hit %s, %s%s %s breaks into splinters.",
+			      mon_nam(mon), more_than_1 ? "one of " : "",
+			      shk_your(yourbuf, obj), xname(obj));
+			if (!more_than_1) uwepgone();	/* set unweapon */
 			useup(obj);
-			obj = (struct obj *) 0;
+			if (!more_than_1) obj = (struct obj *) 0;
 			hittxt = TRUE;
 			if (mdat != &mons[PM_SHADE])
 			    tmp++;
