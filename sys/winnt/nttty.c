@@ -128,6 +128,7 @@ int *wid, *hgt;
 	if (twid > 80) twid = 80;
 	*wid = twid;
 	*hgt = origcsbi.srWindow.Bottom - origcsbi.srWindow.Top;
+	set_option_mod_status("mouse_support", SET_IN_GAME);
 }
 
 void
@@ -225,16 +226,18 @@ nttty_open()
 			0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,0);
 #endif       
 	GetConsoleMode(hConIn,&cmode);
-#ifndef NO_MOUSE_ALLOWED
-	mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT |
-	       ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT;   
-#else
+#ifdef NO_MOUSE_ALLOWED
 	mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT |
 	       ENABLE_MOUSE_INPUT | ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT;   
+#else
+	mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT |
+	       ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT;   
 #endif
 	/* Turn OFF the settings specified in the mask */
 	cmode &= ~mask;
+#ifndef NO_MOUSE_ALLOWED
 	cmode |= ENABLE_MOUSE_INPUT;
+#endif
 	SetConsoleMode(hConIn,cmode);
 	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE)) {
 		/* Unable to set control handler */
@@ -484,7 +487,7 @@ nttty_kbhit()
 			retval = 1;
 		}
 
-		else /* Discard it, its an insignificant event */
+		else /* Discard it, it's an insignificant event */
 			ReadConsoleInput(hConIn,&ir,1,&count);
 		} else  /* There are no events in console event queue */ {
 		done = 1;	  /* Stop looking               */
@@ -862,4 +865,29 @@ standoutend()
 	colorchange = TRUE;
 }
 
+#ifndef NO_MOUSE_ALLOWED
+void
+toggle_mouse_support()
+{
+        DWORD cmode;
+	GetConsoleMode(hConIn,&cmode);
+	if (iflags.wc_mouse_support)
+		cmode |= ENABLE_MOUSE_INPUT;
+	else
+		cmode &= ~ENABLE_MOUSE_INPUT;
+	SetConsoleMode(hConIn,cmode);
+}
+#endif
+
+/* handle tty options updates here */
+void nttty_preference_update(pref)
+const char *pref;
+{
+	if( stricmp( pref, "mouse_support")==0) {
+#ifndef NO_MOUSE_ALLOWED
+		toggle_mouse_support();
+#endif
+	}
+	return;
+}
 #endif /* WIN32CON */

@@ -1738,11 +1738,14 @@ register char *cmd;
 		    multi = 0;
 		    return;
 	 case CMD_TRAVEL:
-		    flags.travel = 1;
-		    flags.run = 8;
-		    flags.nopick = 1;
-		    do_rush = TRUE;
-		    break;
+		    if (iflags.travelcmd) {
+			    flags.travel = 1;
+			    flags.run = 8;
+			    flags.nopick = 1;
+			    do_rush = TRUE;
+			    break;
+		    }
+		    /*FALLTHRU*/
 	 default:   if (movecmd(*cmd)) {	/* ordinary movement */
 			do_walk = TRUE;
 		    } else if (movecmd(iflags.num_pad ?
@@ -1936,62 +1939,81 @@ click_to_cmd(x, y, mod)
     x -= u.ux;
     y -= u.uy;
 
-    if ( abs(x) <= 1 && abs(y) <= 1 ) {
-	x = sgn(x), y = sgn(y);
+    if (iflags.travelcmd) {
+        if (abs(x) <= 1 && abs(y) <= 1 ) {
+            x = sgn(x), y = sgn(y);
+        } else {
+            u.tx = u.ux+x;
+            u.ty = u.uy+y;
+            cmd[0] = CMD_TRAVEL;
+            return cmd;
+        }
+
+        if(x == 0 && y == 0) {
+            /* here */
+            if(IS_FOUNTAIN(levl[u.ux][u.uy].typ) || IS_SINK(levl[u.ux][u.uy].typ)) {
+                cmd[0]=mod == CLICK_1 ? 'q' : M('d');
+                return cmd;
+            } else if(IS_THRONE(levl[u.ux][u.uy].typ)) {
+                cmd[0]=M('s');
+                return cmd;
+            } else if((u.ux == xupstair && u.uy == yupstair)
+                      || (u.ux == sstairs.sx && u.uy == sstairs.sy && sstairs.up)
+                      || (u.ux == xupladder && u.uy == yupladder)) {
+                return "<";
+            } else if((u.ux == xdnstair && u.uy == ydnstair)
+                      || (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)
+                      || (u.ux == xdnladder && u.uy == ydnladder)) {
+                return ">";
+            } else if(OBJ_AT(u.ux, u.uy)) {
+                cmd[0] = Is_container(level.objects[u.ux][u.uy]) ? M('l') : ',';
+                return cmd;
+            } else {
+                return "."; /* just rest */
+            }
+        }
+
+        /* directional commands */
+
+        dir = xytod(x, y);
+
+        if (!m_at(u.ux+x, u.uy+y) && !test_move(u.ux, u.uy, x, y, 1)) {
+            cmd[1] = (iflags.num_pad ? ndir[dir] : sdir[dir]);
+            cmd[2] = 0;
+            if (IS_DOOR(levl[u.ux+x][u.uy+y].typ)) {
+                /* slight assistance to the player: choose kick/open for them */
+                if (levl[u.ux+x][u.uy+y].doormask & D_LOCKED) {
+                    cmd[0] = C('d');
+                    return cmd;
+                }
+                if (levl[u.ux+x][u.uy+y].doormask & D_CLOSED) {
+                    cmd[0] = 'o';
+                    return cmd;
+                }
+            }
+            if (levl[u.ux+x][u.uy+y].typ <= SCORR) {
+                cmd[0] = 's';
+                cmd[1] = 0;
+                return cmd;
+            }
+        }
     } else {
-	u.tx = u.ux+x;
-	u.ty = u.uy+y;
-	cmd[0] = CMD_TRAVEL;
-	return cmd;
-    }
+        /* convert without using floating point, allowing sloppy clicking */
+        if(x > 2*abs(y))
+            x = 1, y = 0;
+        else if(y > 2*abs(x))
+            x = 0, y = 1;
+        else if(x < -2*abs(y))
+            x = -1, y = 0;
+        else if(y < -2*abs(x))
+            x = 0, y = -1;
+        else
+            x = sgn(x), y = sgn(y);
 
-    if(x == 0 && y == 0) {
-	/* here */
-	if(IS_FOUNTAIN(levl[u.ux][u.uy].typ) || IS_SINK(levl[u.ux][u.uy].typ)) {
-	    cmd[0]=mod == CLICK_1 ? 'q' : M('d');
-	    return cmd;
-	} else if(IS_THRONE(levl[u.ux][u.uy].typ)) {
-	    cmd[0]=M('s');
-	    return cmd;
-	} else if((u.ux == xupstair && u.uy == yupstair)
-		  || (u.ux == sstairs.sx && u.uy == sstairs.sy && sstairs.up)
-		  || (u.ux == xupladder && u.uy == yupladder)) {
-	    return "<";
-	} else if((u.ux == xdnstair && u.uy == ydnstair)
-		  || (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)
-		  || (u.ux == xdnladder && u.uy == ydnladder)) {
-	    return ">";
-	} else if(OBJ_AT(u.ux, u.uy)) {
-	    cmd[0] = Is_container(level.objects[u.ux][u.uy]) ? M('l') : ',';
-	    return cmd;
-	} else {
-	    return "."; /* just rest */
-	}
-    }
+        if(x == 0 && y == 0)	/* map click on player to "rest" command */
+            return ".";
 
-    /* directional commands */
-
-    dir = xytod(x, y);
-
-    if (!m_at(u.ux+x, u.uy+y) && !test_move(u.ux, u.uy, x, y, 1)) {
-	cmd[1] = (iflags.num_pad ? ndir[dir] : sdir[dir]);
-	cmd[2] = 0;
-	if (IS_DOOR(levl[u.ux+x][u.uy+y].typ)) {
-	    /* slight assistance to the player: choose kick/open for them */
-	    if (levl[u.ux+x][u.uy+y].doormask & D_LOCKED) {
-		cmd[0] = C('d');
-		return cmd;
-	    }
-	    if (levl[u.ux+x][u.uy+y].doormask & D_CLOSED) {
-		cmd[0] = 'o';
-		return cmd;
-	    }
-	}
-	if (levl[u.ux+x][u.uy+y].typ <= SCORR) {
-	    cmd[0] = 's';
-	    cmd[1] = 0;
-	    return cmd;
-	}
+        dir = xytod(x, y);
     }
 
     /* move, attack, etc. */
@@ -2142,6 +2164,8 @@ dotravel()
 	/* Keyboard travel command */
 	static char cmd[2];
 	coord cc;
+
+	if (!iflags.travelcmd) return 0;
 	cmd[1]=0;
 	cc.x = u.ux;
 	cc.y = u.uy;

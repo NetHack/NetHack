@@ -499,6 +499,7 @@ to support:
   |                    |                    | wc_backgrnd_status |char *  |
   |                    |                    | wc_foregrnd_text   |char *  |
   |                    |                    | wc_backgrnd_text   |char *  |
+  |  mouse             | WC_MOUSE_SUPPORT   | wc_mouse_support   |boolean |
   +--------------------+--------------------+--------------------+--------+
 
 align_message	-- where to place message window (top, bottom, left, right)
@@ -541,6 +542,7 @@ windowcolors
 		-- port should use these colors for window foreground/background
 		   colors.  Syntax:
 		     menu fore/back message fore/back status fore/back text fore/back
+mouse_support	-- port should enable mouse support if possible
 
 Whenever one of these settings is adjusted, the port is notified of a change
 to the setting by calling the port's preference_update() routine. The port
@@ -578,10 +580,11 @@ To add a new wincap option, please follow all these steps:
 	2. Add the description to the paragraph below the chart.
 	3. Add the WC_ to the bit list in include/winprocs.h (if there is room).
 	4. Add the wc_ field(s) to the iflags structure in flag.h.
-	5. Add an appropriate parser to parseoptions() in options.c.
-	6. Add code to display current value to get_compopt_value() in options.c.
-	7. Document the option in Guidebook.mn and Guidebook.tex.
-	8. Add the bit name to the OR'd values in your window port's winprocs struct
+	5. Add the name and value to wc_options[] in options.c
+	6. Add an appropriate parser to parseoptions() in options.c.
+	7. Add code to display current value to get_compopt_value() in options.c.
+	8. Document the option in Guidebook.mn and Guidebook.tex.
+	9. Add the bit name to the OR'd values in your window port's winprocs struct
 	   wincap mask if your port supports the option.
 
 V.  New or respecified common, high level routines

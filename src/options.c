@@ -128,6 +128,7 @@ static struct Bool_Opt
 #else
 	{"msg_window", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},
 #else
@@ -183,6 +184,7 @@ static struct Bool_Opt
 #endif
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&flags.toptenwin, FALSE, SET_IN_GAME},
+	{"travel", &iflags.travelcmd, TRUE, SET_IN_GAME},
 	{"use_inverse",   &iflags.wc_inverse, FALSE, SET_IN_GAME},		/*WC*/
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
 	{(char *)0, (boolean *)0, FALSE, 0}
@@ -2990,6 +2992,7 @@ struct wc_Opt wc_options[] = {
 	{"hilite_pet", WC_HILITE_PET},
 	{"large_font", WC_LARGE_FONT},	/* now obsolete */
 	{"popup_dialog", WC_POPUP_DIALOG},
+	{"player_selection", WC_PLAYER_SELECTION},
 	{"preload_tiles", WC_PRELOAD_TILES},
 	{"tiled_map", WC_TILED_MAP},
 	{"tile_file", WC_TILE_FILE},
@@ -3013,7 +3016,10 @@ struct wc_Opt wc_options[] = {
 	{"font_text", WC_FONT_TEXT},
 	{"map_mode", WC_MAP_MODE},
 	{"scroll_margin", WC_SCROLL_MARGIN},
+	{"splash_screen", WC_SPLASH_SCREEN},
 	{"vary_msgcount",WC_VARY_MSGCOUNT},
+	{"windowcolors", WC_WINDOWCOLORS},
+	{"mouse_support", WC_MOUSE_SUPPORT},
 	{(char *)0, 0L}
 };
 

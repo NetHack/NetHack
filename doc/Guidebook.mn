@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 20, 2002
+.ds f2 "April 3, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2036,6 +2036,8 @@ pit, spiked pit, hole, trap door, teleportation trap, level teleporter,
 magic portal, web, statue trap, magic trap, anti-magic field, polymorph trap.
 
 Cannot be set with the `O' command.
+.lp travel
+Allow the travel command (default on).
 .lp verbose
 Provide more commentary during the game (default on).
 .lp videocolors
@@ -2113,6 +2115,8 @@ with tiles, generally displays a heart symbol near pets.
 NetHack should use a large font.
 .lp map_mode	
 NetHack should display the map in the manner specified.
+.lp mouse_support
+Allow use of the mouse for input and travel.
 .lp player_selection
 NetHack should pop up dialog boxes, or use prompts for character selection.
 .lp popup_dialog	

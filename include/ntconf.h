@@ -121,6 +121,10 @@ extern char hackdir[];
 #define getuid() 1
 #define getlogin() ((char *)0)
 extern void NDECL(win32_abort);
+#ifdef WIN32CON
+extern void FDECL(nttty_preference_update, (const char *));
+extern void NDECL(toggle_mouse_support);
+#endif
 
 #include <fcntl.h>
 #ifndef __BORLANDC__

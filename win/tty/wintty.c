@@ -46,6 +46,9 @@ struct window_procs tty_procs = {
 #ifdef MSDOS
     WC_TILED_MAP|WC_ASCII_MAP|
 #endif
+#if defined(WIN32CON)
+    WC_MOUSE_SUPPORT|
+#endif
     WC_COLOR|WC_HILITE_PET|WC_INVERSE|WC_EIGHT_BIT_IN,
     tty_init_nhwindows,
     tty_player_selection,
@@ -100,7 +103,11 @@ struct window_procs tty_procs = {
     tty_start_screen,
     tty_end_screen,
     genl_outrip,
+#if defined(WIN32CON)
+    nttty_preference_update,
+#else
     genl_preference_update,
+#endif
 };
 
 static int maxwin = 0;			/* number of windows in use */

@@ -245,6 +245,10 @@ char *argv[];
 	process_options(argc, argv);
 #endif
 
+#ifdef WIN32CON
+	toggle_mouse_support();	/* must come after process_options */
+#endif
+
 #ifdef MFLOPPY
 	set_lock_and_bones();
 # ifndef AMIGA
