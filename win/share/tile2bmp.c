@@ -48,6 +48,25 @@ extern char *FDECL(tilename, (int, int));
 #define PACK
 #endif 
 
+static short leshort(short x)
+{
+#ifdef __ppc__
+    return ((x&0xff)<<8)|((x>>8)&0xff);
+#else
+    return x;
+#endif
+}
+
+
+static long lelong(long x)
+{
+#ifdef __ppc__
+    return ((x&0xff)<<24)|((x&0xff00)<<8)|((x>>8)&0xff00)|((x>>24)&0xff);
+#else
+    return x;
+#endif
+}
+
 #ifdef __GNUC__
 typedef struct tagBMIH {
         unsigned long   biSize;
@@ -231,12 +250,12 @@ static void
 build_bmfh(pbmfh)
 BITMAPFILEHEADER *pbmfh;
 {
-	pbmfh->bfType = (UINT)0x4D42;
-	pbmfh->bfSize = (DWORD)BMPFILESIZE;
+	pbmfh->bfType = leshort(0x4D42);
+	pbmfh->bfSize = lelong(BMPFILESIZE);
 	pbmfh->bfReserved1 = (UINT)0;
 	pbmfh->bfReserved2 = (UINT)0;
-	pbmfh->bfOffBits = sizeof(bmp.bmfh) + sizeof(bmp.bmih) +
-			   (RGBQUAD_COUNT * sizeof(RGBQUAD));
+	pbmfh->bfOffBits = lelong(sizeof(bmp.bmfh) + sizeof(bmp.bmih) +
+			   (RGBQUAD_COUNT * sizeof(RGBQUAD)));
 }
 
 static void
@@ -244,20 +263,22 @@ build_bmih(pbmih)
 BITMAPINFOHEADER *pbmih;
 {
 	WORD cClrBits;
-	pbmih->biSize = (DWORD) sizeof(bmp.bmih);
+	int w,h;
+	pbmih->biSize = lelong(sizeof(bmp.bmih));
 #if BITCOUNT==4
-	pbmih->biWidth = (LONG) MAX_X * 2;
+	pbmih->biWidth = lelong(w = MAX_X * 2);
 #else
-	pbmih->biWidth = (LONG) MAX_X;
+	pbmih->biWidth = lelong(w = MAX_X);
 #endif
-	pbmih->biHeight = (LONG) MAX_Y;
-	pbmih->biPlanes = (WORD) 1;
+	pbmih->biHeight = lelong(h = MAX_Y);
+	pbmih->biPlanes = leshort(1);
 #if BITCOUNT==4
-	pbmih->biBitCount = (WORD) 4;
+	pbmih->biBitCount = leshort(4);
+	cClrBits = 4;
 #else
-	pbmih->biBitCount = (WORD) 8;
+	pbmih->biBitCount = leshort(8);
+	cClrBits = 8;
 #endif
-	cClrBits = (WORD)(pbmih->biPlanes * pbmih->biBitCount); 
 	if (cClrBits == 1) 
 	        cClrBits = 1; 
 	else if (cClrBits <= 4) 
@@ -269,21 +290,20 @@ BITMAPINFOHEADER *pbmih;
 	else if (cClrBits <= 24) 
 		cClrBits = 24; 
 	else cClrBits = 32; 
-	pbmih->biCompression = (DWORD) BI_RGB;
-	pbmih->biXPelsPerMeter = (LONG)0;
-	pbmih->biYPelsPerMeter = (LONG)0;
+	pbmih->biCompression = lelong(BI_RGB);
+	pbmih->biXPelsPerMeter = lelong(0);
+	pbmih->biYPelsPerMeter = lelong(0);
 #if (TILE_X==32)
 	if (cClrBits < 24) 
-        	pbmih->biClrUsed = (1<<cClrBits);
+        	pbmih->biClrUsed = lelong(1<<cClrBits);
 #else
-	pbmih->biClrUsed = (DWORD)RGBQUAD_COUNT; 
+	pbmih->biClrUsed = lelong(RGBQUAD_COUNT); 
 #endif
 
 #if (TILE_X==16)
-	pbmih->biSizeImage = 0;
+	pbmih->biSizeImage = lelong(0);
 #else
-	pbmih->biSizeImage = ((pbmih->biWidth * cClrBits +31) & ~31) /8
-                              * pbmih->biHeight;
+	pbmih->biSizeImage = lelong(((w * cClrBits +31) & ~31) /8 * h);
 #endif
  	pbmih->biClrImportant = (DWORD)0;
 }
