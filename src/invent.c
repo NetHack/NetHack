@@ -17,10 +17,7 @@ STATIC_DCL boolean FDECL(only_here, (struct obj *));
 #endif /* OVL1 */
 STATIC_DCL void FDECL(compactify,(char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
-STATIC_PTR int FDECL(ckblessed,(struct obj *));
-STATIC_PTR int FDECL(ckuncursed,(struct obj *));
-STATIC_PTR int FDECL(ckcursed,(struct obj *));
-STATIC_PTR int FDECL(ckunbknown,(struct obj *));
+STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
 static char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
 #ifdef OVLB
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
@@ -1039,38 +1036,18 @@ register const char *let,*word;
 #ifdef OVLB
 
 STATIC_PTR int
+ckvalidcat(otmp)
+register struct obj *otmp;
+{
+	/* use allow_category() from pickup.c */
+	return((int)allow_category(otmp));
+}
+
+STATIC_PTR int
 ckunpaid(otmp)
 register struct obj *otmp;
 {
 	return((int)(otmp->unpaid));
-}
-
-STATIC_PTR int
-ckblessed(otmp)
-register struct obj *otmp;
-{
-	return((int)(otmp->bknown && otmp->blessed));
-}
-
-STATIC_PTR int
-ckuncursed(otmp)
-register struct obj *otmp;
-{
-	return((int)(otmp->bknown && !otmp->blessed && !otmp->cursed));
-}
-
-STATIC_PTR int
-ckcursed(otmp)
-register struct obj *otmp;
-{
-	return((int)(otmp->bknown && otmp->cursed));
-}
-
-STATIC_PTR int
-ckunbknown(otmp)
-register struct obj *otmp;
-{
-	return((int)(!otmp->bknown));
 }
 
 boolean
@@ -1224,16 +1201,16 @@ unsigned *resultflags;
 		ckfn = ckunpaid;
 	    } else if (sym == 'B') {
 	    	add_valid_menu_class('B');
-	    	ckfn = ckblessed;
+	    	ckfn = ckvalidcat;
 	    } else if (sym == 'U') {
 	    	add_valid_menu_class('U');
-	    	ckfn = ckuncursed;
+	    	ckfn = ckvalidcat;
 	    } else if (sym == 'C') {
 	    	add_valid_menu_class('C');
-	    	ckfn = ckcursed;
+		ckfn = ckvalidcat;
 	    } else if (sym == 'X') {
 	    	add_valid_menu_class('X');
-	    	ckfn = ckunbknown;
+		ckfn = ckvalidcat;
 	    } else if (sym == 'm') {
 		m_seen = TRUE;
 	    } else if (oc_of_sym == MAXOCLASSES) {
