@@ -1684,8 +1684,9 @@ bhitpile(obj,fhito,tx,ty)
 	   because that last call might end up operating on our `next_obj'
 	   (below), rather than on the current object, if it happens to
 	   encounter a statue which mustn't become animated. */
-	if (t && t->ttyp == STATUE_TRAP)
-	    (void) activate_statue_trap(t, tx, ty, TRUE);
+	if (t && t->ttyp == STATUE_TRAP &&
+	    activate_statue_trap(t, tx, ty, TRUE))
+	    makeknown(obj->otyp);
     }
 
     poly_zapped = -1;
