@@ -124,6 +124,7 @@ struct obj *cont;
 {
 	struct obj *otmp;
 
+	uswapwep = 0; /* ensure curse() won't cause swapwep to drop twice */
 	while ((otmp = invent) != 0) {
 		obj_extract_self(otmp);
 		obj_no_longer_held(otmp);
