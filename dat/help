@@ -58,12 +58,15 @@ h-.-l   4-.-6           YUHJKLBN: go in specified direction until you
 b j n   1 2 3           g<dir>:   run in direction <dir> until something
       numberpad                     interesting is seen
                         G<dir>,   same, except a branching corridor isn't
- <  up                  ^<dir>:     considered interesting
+ <  up                  ^<dir>:     considered interesting (the ^ in this
+                                    case means the Control key, not a caret)
  >  down                m<dir>:   move without picking up objects
                         F<dir>:   fight even if you don't sense a monster
                 If the number_pad option is set, the number keys move instead.
                 Depending on the platform, Shift number (on the numberpad),
                 Meta number, or Alt number will invoke the YUHJKLBN commands.
+                Control <dir> may or may not work when number_pad is enabled,
+                depending on the platform's capabilities.
 
 Commands:
         NetHack knows the following commands:
