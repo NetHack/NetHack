@@ -176,7 +176,8 @@ struct instance_flags {
 	int      purge_monsters;	/* # of dead monsters still on fmon list */
 	int *opt_booldup;	/* for duplication of boolean opts in config file */
 	int *opt_compdup;	/* for duplication of compound opts in config file */
-	uchar bouldersym;		/* symbol for boulder display */
+	uchar	bouldersym;	/* symbol for boulder display */
+	coord	travelcc;	/* coordinates for travel_cache */
 #ifdef WIZARD
 	boolean  sanity_check;	/* run sanity checks */
 	boolean  mon_polycontrol;	/* debug: control monster polymorphs */

@@ -2413,15 +2413,20 @@ dotravel()
 
 	if (!flags.travelcmd) return 0;
 	cmd[1]=0;
-	cc.x = u.ux;
-	cc.y = u.uy;
+	cc.x = iflags.travelcc.x;
+	cc.y = iflags.travelcc.y;
+	if (cc.x == -1 && cc.y == -1) {
+	    /* No cached destination, start attempt from current position */
+	    cc.x = u.ux;
+	    cc.y = u.uy;
+	}
 	pline("Where do you want to travel to?");
 	if (getpos(&cc, TRUE, "the desired destination") < 0) {
 		/* user pressed ESC */
 		return 0;
 	}
-	u.tx = cc.x;
-	u.ty = cc.y;
+	iflags.travelcc.x = u.tx = cc.x;
+	iflags.travelcc.y = u.ty = cc.y;
 	cmd[0] = CMD_TRAVEL;
 	readchar_queue = cmd;
 	return 0;

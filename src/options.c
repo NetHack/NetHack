@@ -516,6 +516,7 @@ initoptions()
 	for (i = 0; i < WARNCOUNT; i++)
 		warnsyms[i] = def_warnsyms[i].sym;
 	iflags.bouldersym = 0;
+	iflags.travelcc.x = iflags.travelcc.y = -1;
 	flags.warnlevel = 1;
 	flags.warntype = 0L;
 

@@ -768,6 +768,7 @@ boolean guess;
 				    nomul(0);
 				    /* reset run so domove run checks work */
 				    flags.run = 8;
+				    iflags.travelcc.x = iflags.travelcc.y = -1;
 				}
 				return TRUE;
 			    }
