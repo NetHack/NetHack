@@ -26,7 +26,7 @@ VMS = [.sys.vms]
 GAMEDIR =			# defaults to [.play]
 GAMEOWNER =			# defaults to installer's UIC
 # these are the distributed values in [.include]vmsconf.h
-#GAMEDIR = DISK$USERS:[GAMES.NETHACK.3-4-2.PLAY]
+#GAMEDIR = DISK$USERS:[GAMES.NETHACK.3_5_X.PLAY]
 #GAMEOWNER = NHWIZARD
 
 # just about everything, except installation
