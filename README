@@ -4,12 +4,11 @@ NetHack 3.4.0 is an enhancement to the dungeon exploration game NetHack.
 It is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.3.
 
-This version is primarily a bug fix release, but there are many
-changes and surprises beyond what you see listed here.
-Here is a brief overview of new additions and changes in the game.
-To give more would be cheating, wouldn't it?
+There are a great number of bug fixes in this release, as well as 
+many changes and surprises beyond what you see listed below.
+Here is a brief overview of some new additions and changes in the game.
 
-o Many, many bug fixes and tweaks
+o Many, many bug fixes and tweaks to the core code and to several ports
 o Enhanced config file processing and player selection prompts for some ports
 o Stamina affects ability to throw heavy things
 o Objects merge in containers
@@ -18,12 +17,14 @@ o Several small refinements to race/role separation
 o Config file BOULDER option to specify the symbol for displaying boulders
 o New travel command which is particularly helpful for mouse navigation on
   handheld computers
+o more feedback about skill advancement from #enhance command
+o End-of-game disclose options can be individually tuned to your liking
 o Mac: command-key shortcuts in the player selection dialog
 o Amiga: screenmode requester
 o Win32: new graphical port contributed by Alex Kompel
 
-We've also included variations of the following patches
-contributed by members of the NetHack community at large:
+We've also included variations of enhancements contributed by members 
+of the NetHack community at large. Among them:
 
 o Scott Bigham's new T-shirt messages and his option to turn off 
   resistance display effects
@@ -33,9 +34,12 @@ o Dylan O'Donnell's patch for optionally starting with no pet
 o Tom Friedetzky's blessed/uncursed/cursed selection patch for menustyle:full
 o Jason Short's additonal lens uses
 o Kelly Bailey's Gnomish Mines changes
+o Ken Arnold's patch to display prices in your inventory
 
 Carried forward
-o The Gnome toolkit interface is still considered an experimental option
+o The Gnome toolkit interface is still considered an experimental option. 
+  We have not enhanced the port ourselves, and so far we have not received
+  any contributions doing so from the NetHack community.
 
 
                         - - - - - - - - - - -
