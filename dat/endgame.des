@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)endgame.des	3.3	96/11/09
+#	SCCS Id: @(#)endgame.des	3.3	2002/01/19
 #	Copyright (c) 1989 by Jean-Christophe Collet
 #	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
 #                      and Timo Hakulinen
@@ -158,8 +158,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAACCCCCCAAACCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAACCAAAAAACCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ENDMAP
-TELEPORT_REGION:(09,16,09,16),(0,0,0,0)
-PORTAL:(30,0,75,19),(00,00,09,16),"fire"
+# Use up and down regions to partition the level into three parts;
+# teleportation can't cross from one part into another.
+# The up region is where you'll arrive after activating the portal from
+# the preceding level; the exit portal is placed inside the down region.
+TELEPORT_REGION:levregion(01,00,24,20),levregion(25,00,79,20),up
+TELEPORT_REGION:levregion(56,00,79,20),levregion(01,00,55,20),down
+PORTAL:levregion(57,01,78,19),(0,0,0,0),"fire"
 REGION:(00,00,75,19),lit,"ordinary"
 MONSTER:'E',"air elemental",random,hostile
 MONSTER:'E',"air elemental",random,hostile
