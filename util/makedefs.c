@@ -75,33 +75,33 @@ static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.3\t1999/08/16";
 # define DGN_TEMPLATE		"NH:dat/%s"  /* where dungeon.pdf file goes */
 # define DATA_TEMPLATE		"NH:slib/%s"
 # define DATA_IN_TEMPLATE	"NH:dat/%s"
-#else
+#else /* not AMIGA */
 # ifdef MAC
 #   define INCLUDE_TEMPLATE	":include:%s"
 #   define SOURCE_TEMPLATE	":src:%s"
 #   define DGN_TEMPLATE		":dat:%s"  /* where dungeon.pdf file goes */
+#  if __SC__ || __MRC__
+#   define DATA_TEMPLATE	":Dungeon:%s"
+#  else
 #   define DATA_TEMPLATE	":lib:%s"
+#  endif /* __SC__ || __MRC__ */
 #   define DATA_IN_TEMPLATE	":dat:%s"
-# else /* MAC */
+# else /* neither AMIGA nor MAC */
 #  ifdef OS2
 #   define INCLUDE_TEMPLATE	"..\\include\\%s"
 #   define SOURCE_TEMPLATE	"..\\src\\%s"
 #   define DGN_TEMPLATE		"..\\dat\\%s"  /* where dungeon.pdf file goes */
-#  if __SC__ || __MRC__
-#   define DATA_TEMPLATE	":Dungeon:%s"
-#  else
 #   define DATA_TEMPLATE	"..\\dat\\%s"
-#  endif /* __SC__ || __MRC__ */
 #   define DATA_IN_TEMPLATE	"..\\dat\\%s"
-#  else /* OS2 */
+#  else /* not AMIGA, MAC, or OS2 */
 #   define INCLUDE_TEMPLATE	"../include/%s"
 #   define SOURCE_TEMPLATE	"../src/%s"
 #   define DGN_TEMPLATE		"../dat/%s"  /* where dungeon.pdf file goes */
 #   define DATA_TEMPLATE	"../dat/%s"
 #   define DATA_IN_TEMPLATE	"../dat/%s"
-#  endif /* OS2 */
-# endif /* MAC */
-#endif	/* AMIGA */
+#  endif /* else !OS2 */
+# endif /* else !MAC */
+#endif	/* else !AMIGA */
 
 static const char
     *Dont_Edit_Code =
