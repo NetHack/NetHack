@@ -456,6 +456,7 @@ boolean wr;
 	    fqn_prefix[SAVEPREFIX] = fqn_prefix[SCOREPREFIX];
 	    fqn_prefix[BONESPREFIX] = fqn_prefix[SCOREPREFIX];
 	    fqn_prefix[LOCKPREFIX] = fqn_prefix[SCOREPREFIX];
+	    fqn_prefix[TROUBLEPREFIX] = fqn_prefix[SCOREPREFIX];
 # endif
 	    check_recordfile(dir);
 	}
