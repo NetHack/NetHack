@@ -1759,8 +1759,9 @@ xkilled(mtmp, dest)
 		redisp = TRUE;
 	}
 #endif
-	if(!accessible(x, y) && !is_pool(x, y)) {
-	    /* might be mimic in wall or corpse in lava */
+	if((!accessible(x, y) && !is_pool(x, y)) ||
+	   (x == u.ux && y == u.uy)) {
+	    /* might be mimic in wall or corpse in lava or on player's spot */
 	    redisp = TRUE;
 	    if(wasinside) spoteffects(TRUE);
 	} else if(x != u.ux || y != u.uy) {

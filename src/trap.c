@@ -2154,6 +2154,11 @@ long hmask, emask;     /* might cancel timeout */
 	HLevitation &= ~hmask;
 	ELevitation &= ~emask;
 	if(Levitation) return(0); /* maybe another ring/potion/boots */
+	if(u.uswallow) {
+	    You("float down, but you are still %s.",
+		is_animal(u.ustuck->data) ? "swallowed" : "engulfed");
+	    return(1);
+	}
 
 	if (Punished && !carried(uball) &&
 	    (is_pool(uball->ox, uball->oy) ||
