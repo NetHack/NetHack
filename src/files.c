@@ -1642,6 +1642,7 @@ fopen_wizkit_file()
 		Sprintf(tmp_wizkit, "%s/%s", envp, wizkit);
 	if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *)0)
 		return(fp);
+	else 	Strcpy(tmp_wizkit, wizkit);
 	else if (errno != ENOENT) {
 		/* e.g., problems when setuid NetHack can't search home
 		 * directory restricted to user */
