@@ -30,7 +30,9 @@ STATIC_DCL boolean FDECL(restgamestate, (int, unsigned int *, unsigned int *));
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
 STATIC_DCL int FDECL(restlevelfile, (int,XCHAR_P));
 STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
+#ifndef GOLDOBJ
 STATIC_DCL struct obj *FDECL(gold_in, (struct obj *));
+#endif
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
