@@ -374,7 +374,8 @@ boolean with_you;
 		    if (xlocale && ylocale)
 			    place_object(obj, xlocale, ylocale);
 		    else if (rloco(obj)) {
-			get_obj_location(obj, &xlocale, &ylocale, 0);
+			if (!get_obj_location(obj, &xlocale, &ylocale, 0))
+			    impossible("Can't find relocated object.");
 		    }
 		}
 		corpse = mkcorpstat(CORPSE, (struct monst *)0, mtmp->data,

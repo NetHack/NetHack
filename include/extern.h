@@ -1543,7 +1543,9 @@ E int FDECL(loot_mon, (struct monst *,int *,boolean *));
 E int NDECL(dotip);
 E const char *FDECL(safe_qbuf, (const char *,unsigned,
 				const char *,const char *,const char *));
+#ifdef AUTOPICKUP_EXCEPTIONS
 E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
+#endif /* AUTOPICKUP_EXCEPTIONS */
 
 /* ### pline.c ### */
 

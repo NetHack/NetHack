@@ -329,7 +329,8 @@ boolean forcecontrol;
 	}
 	if (is_pool(u.ux,u.uy) && was_floating && !(Levitation || Flying) &&
 		!breathless(youmonst.data) && !amphibious(youmonst.data) &&
-		!Swimming) drown();
+		!Swimming)
+	    (void) drown();
 }
 
 /* (try to) make a mntmp monster out of the player */

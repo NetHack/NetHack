@@ -894,7 +894,7 @@ register int pm;
 		if (dmgtype(ptr, AD_STUN) || dmgtype(ptr, AD_HALU) ||
 		    pm == PM_VIOLET_FUNGUS) {
 			pline ("Oh wow!  Great stuff!");
-			make_hallucinated(HHallucination + 200,FALSE,0L);
+			(void) make_hallucinated(HHallucination + 200,FALSE,0L);
 		}
 		if(is_giant(ptr)) gainstr((struct obj *)0, 0);
 
