@@ -117,7 +117,8 @@ Paul Winner and Yitzhak Sapir provided encouragement.
 Dean Luick, Mark Modrall, and Kevin Hugo maintained and enhanced the
 Macintosh port of 3.3.
 
-Michael Allison maintained 3.3 for the Microsoft Windows NT platform.
+Michael Allison maintained and enhanced the console port of 3.3 for 
+the Microsoft Windows NT/2000 platform. 
 
 Ron Van Iwaarden maintained 3.3 for OS/2.
 
@@ -127,6 +128,8 @@ Amiga port of 3.3 after Janne Salmijarvi resurrected it for 3.3.1.
 Christian `Marvin' Bressler maintained 3.3 for the Atari after he
 resurrected it for 3.3.1.
 
+Alex Kompel contributed a new graphical port of 3.3 for Microsoft Windows.
+
 
 			   - - - - - - - - - -
 
@@ -135,7 +138,8 @@ particularly intriguing modification to help out with the game.  The Gods of
 the Dungeon sometimes make note of the names of the worst of these miscreants
 in this, the list of Dungeoneers:
 
-    Adam Aronow               Irina Rempt-Drijfhout     Mike Engber 
+    Adam Aronow               Helge Hafting             Michael Sokolov
+    Alex Kompel               Irina Rempt-Drijfhout     Mike Engber 
     Andreas Dorn              Izchak Miller             Mike Gallop
     Andy Church               J. Ali Harlow             Mike Passaretti
     Andy Swanson              Janet Walz                Mike Stephenson
@@ -168,4 +172,3 @@ in this, the list of Dungeoneers:
     Greg Olson                Michael Allison           Tom West
     Gregg Wonderly            Michael Feir              Warren Cheung
     Hao-yang Wang             Michael Hamel             Warwick Allison
-    Helge Hafting             Michael Sokolov           Yitzhak Sapir

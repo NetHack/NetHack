@@ -48,7 +48,7 @@ clean:
 
 ..\util\dgn_lex.c: ..\util\dgn_comp.l
 !IF "$(LEX)"==""
-	   @echo Using pre-built lev_lex.c
+	   @echo Using pre-built dgn_lex.c
 	   @copy ..\sys\share\dgn_lex.c $@
 !ELSE
 	   chdir ..\util

@@ -4,7 +4,7 @@
 .ds vr "NetHack 3.3
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "January 1, 2002
+.ds f2 "January 14, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2240,7 +2240,8 @@ and \fBYitzhak Sapir\fP provided encouragement.
 \fBDean Luick\fP, \fBMark Modrall\fP, and \fBKevin Hugo\fP maintained and enhanced the
 Macintosh port of 3.3.
 .pg
-\fBMichael Allison\fP maintained and enhanced 3.3 for the Microsoft Windows NT platform.
+\fBMichael Allison\fP maintained and enhanced the console port of 3.3 for 
+the Microsoft Windows NT/2000 platform. 
 .pg
 \fBRon Van Iwaarden\fP maintained 3.3 for OS/2.
 .pg
@@ -2249,6 +2250,8 @@ enhanced the Amiga port of 3.3 after \fBJanne Salmijarvi\fP resurrected it for 3
 .pg
 \fBChristian ``Marvin'' Bressler\fP maintained 3.3 for the Atari after he 
 resurrected it for 3.3.1.
+.pg
+\fBAlex Kompel\fP contributed a new graphical port of 3.3 for Microsoft Windows.
 .pg
 			   - - - - - - - - - -
 .pg
@@ -2262,7 +2265,8 @@ in this, the list of Dungeoneers:
 center;
 c c c.
 .\"TABLE_START
-Adam Aronow	Irina Rempt-Drijfhout	Mike Engber 
+Adam Aronow	Helge Hafting	Michael Sokolov
+Alex Kompel	Irina Rempt-Drijfhout	Mike Engber 
 Andreas Dorn	Izchak Miller	Mike Gallop
 Andy Church	J. Ali Harlow	Mike Passaretti
 Andy Swanson	Janet Walz	Mike Stephenson
@@ -2295,7 +2299,6 @@ Greg Laskin	Merlyn LeRoy	Tom Almy
 Greg Olson	Michael Allison	Tom West
 Gregg Wonderly	Michael Feir	Warren Cheung
 Hao-yang Wang	Michael Hamel	Warwick Allison
-Helge Hafting	Michael Sokolov	Yitzhak Sapir
 .\"TABLE_END  Do not delete this line.
 .TE
 .ed
