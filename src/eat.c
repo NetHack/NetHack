@@ -1129,8 +1129,8 @@ start_tin(otmp)		/* called when starting to open a tin */
 		default:
 			goto no_opener;
 		}
-		pline("Using your %s you try to open the tin.",
-			aobjnam(uwep, (char *)0));
+		pline("Using %s you try to open the tin.",
+			yobjnam(uwep, (char *)0));
 	} else {
 no_opener:
 		pline("It is not so easy to open this tin.");

@@ -629,12 +629,12 @@ break_armor()
     if (has_horns(youmonst.data)) {
 	if ((otmp = uarmh) != 0) {
 	    if (is_flimsy(otmp) && !donning(otmp)) {
-		char hornbuf[BUFSZ], yourbuf[BUFSZ];
+		char hornbuf[BUFSZ];
 
 		/* Future possiblities: This could damage/destroy helmet */
 		Sprintf(hornbuf, "horn%s", plur(num_horns(youmonst.data)));
-		Your("%s %s through %s %s.", hornbuf, vtense(hornbuf, "pierce"),
-		     shk_your(yourbuf, otmp), xname(otmp));
+		Your("%s %s through %s.",
+		     hornbuf, vtense(hornbuf, "pierce"), yname(otmp));
 	    } else {
 		if (donning(otmp)) cancel_don();
 		Your("helmet falls to the %s!", surface(u.ux, u.uy));

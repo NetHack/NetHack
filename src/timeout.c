@@ -777,7 +777,7 @@ long timeout;
 	/* only interested in INVENT, FLOOR, and MINVENT */
 	if (get_obj_location(obj, &x, &y, 0)) {
 	    canseeit = !Blind && cansee(x, y);
-	    /* set up `whose[]' to be "Your" or "Fred's" or "The goblin's" */
+	    /* set `whose[]' to be "Your " or "Fred's " or "The goblin's " */
 	    (void) Shk_Your(whose, obj);
 	} else {
 	    canseeit = FALSE;
@@ -792,7 +792,7 @@ long timeout;
 			switch (obj->where) {
 			    case OBJ_INVENT:
 			    case OBJ_MINVENT:
-				pline("%s potion of oil has burnt away.",
+				pline("%spotion of oil has burnt away.",
 				    whose);
 				break;
 			    case OBJ_FLOOR:
@@ -830,8 +830,8 @@ long timeout;
 				switch (obj->where) {
 				    case OBJ_INVENT:
 				    case OBJ_MINVENT:
-					pline("%s %s seems about to go out.",
-					    whose, xname(obj));
+					pline("%s seems about to go out.",
+					      Yname2(obj));
 					break;
 				    case OBJ_FLOOR:
 					You("see %s about to go out.",
@@ -849,11 +849,10 @@ long timeout;
 				case OBJ_INVENT:
 				case OBJ_MINVENT:
 				    if (obj->otyp == BRASS_LANTERN)
-					pline("%s lantern has run out of power.",
+					pline("%slantern has run out of power.",
 					    whose);
 				    else
-					pline("%s %s has gone out.",
-					    whose, xname(obj));
+					pline("%s has gone out.", Yname2(obj));
 				    break;
 				case OBJ_FLOOR:
 				    if (obj->otyp == BRASS_LANTERN)
@@ -890,7 +889,7 @@ long timeout;
 			    switch (obj->where) {
 				case OBJ_INVENT:
 				case OBJ_MINVENT:
-				    pline("%s %scandle%s getting short.",
+				    pline("%s%scandle%s getting short.",
 					whose,
 					menorah ? "candelabrum's " : "",
 					many ? "s are" : " is");
@@ -910,7 +909,7 @@ long timeout;
 				case OBJ_INVENT:
 				case OBJ_MINVENT:
 				    pline(
-					"%s %scandle%s flame%s flicker%s low!",
+					"%s%scandle%s flame%s flicker%s low!",
 					    whose,
 					    menorah ? "candelabrum's " : "",
 					    many ? "s'" : "'s",
@@ -934,9 +933,8 @@ long timeout;
 				switch (obj->where) {
 				    case OBJ_INVENT:
 				    case OBJ_MINVENT:
-					pline("%s candelabrum's flame%s.",
-					    whose,
-					    many ? "s die" : " dies");
+					pline("%scandelabrum's flame%s.",
+					    whose, many ? "s die" : " dies");
 					break;
 				    case OBJ_FLOOR:
 					You("see a candelabrum's flame%s die.",
@@ -947,9 +945,8 @@ long timeout;
 				switch (obj->where) {
 				    case OBJ_INVENT:
 				    case OBJ_MINVENT:
-					pline("%s %s %s consumed!",
-					    whose,
-					    xname(obj),
+					pline("%s %s consumed!",
+					    Yname2(obj),
 					    many ? "are" : "is");
 					break;
 				    case OBJ_FLOOR:

@@ -530,7 +530,7 @@ peffects(otmp)
 	case SPE_INVISIBILITY:
 		/* spell cannot penetrate mummy wrapping */
 		if (BInvis && uarmc->otyp == MUMMY_WRAPPING) {
-			You_feel("rather itchy under your %s.", xname(uarmc));
+			You_feel("rather itchy under %s.", yname(uarmc));
 			break;
 		}
 		/* FALLTHRU */
@@ -1423,22 +1423,20 @@ get_wet(obj)
 register struct obj *obj;
 /* returns TRUE if something happened (potion should be used up) */
 {
-	char Your_buf[BUFSZ];
-
 	if (snuff_lit(obj)) return(TRUE);
 
 	if (obj->greased) {
 		grease_protect(obj,(char *)0,&youmonst);
 		return(FALSE);
 	}
-	(void) Shk_Your(Your_buf, obj);
+
 	/* (Rusting shop goods ought to be charged for.) */
 	switch (obj->oclass) {
 	    case WEAPON_CLASS:
 		if (!obj->oerodeproof && is_rustprone(obj) &&
 		    (obj->oeroded < MAX_ERODE) && !rn2(2)) {
-			pline("%s %s some%s.",
-			      Your_buf, aobjnam(obj, "rust"),
+			pline("%s some%s.",
+			      Yobjnam2(obj, "rust"),
 			      obj->oeroded ? " more" : "what");
 			obj->oeroded++;
 			update_inventory();
@@ -1455,7 +1453,7 @@ register struct obj *obj;
 			update_inventory();
 			return (TRUE);
 		}
-		pline("%s %s%s.", Your_buf, aobjnam(obj,"dilute"),
+		pline("%s%s.", Yobjnam2(obj,"dilute"),
 		      obj->odiluted ? " further" : "");
 		if(obj->unpaid && costly_spot(u.ux, u.uy)) {
 		    You("dilute it, you pay for it.");
@@ -1515,7 +1513,7 @@ register struct obj *obj;
 			return TRUE;
 		}
 	}
-	pline("%s %s wet.", Your_buf, aobjnam(obj,"get"));
+	pline("%s wet.", Yobjnam2(obj, "get"));
 	return FALSE;
 }
 
@@ -1528,7 +1526,7 @@ dodip()
 	uchar here;
 	char allowall[2];
 	short mixture;
-	char qbuf[QBUFSZ], Your_buf[BUFSZ];
+	char qbuf[QBUFSZ];
 
 	allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 	if(!(obj = getobj(allowall, "dip")))
@@ -1569,13 +1567,11 @@ dodip()
 	potion->in_use = TRUE;		/* assume it will be used up */
 	if(potion->otyp == POT_WATER) {
 		boolean useeit = !Blind;
-		if (useeit) (void) Shk_Your(Your_buf, obj);
 		if (potion->blessed) {
 			if (obj->cursed) {
 				if (useeit)
-				    pline("%s %s %s.",
-					  Your_buf,
-					  aobjnam(obj, "softly glow"),
+				    pline("%s %s.",
+					  Yobjnam2(obj, "softly glow"),
 					  hcolor(NH_AMBER));
 				uncurse(obj);
 				obj->bknown=1;
@@ -1588,9 +1584,8 @@ dodip()
 			} else if(!obj->blessed) {
 				if (useeit) {
 				    tmp = hcolor(NH_LIGHT_BLUE);
-				    pline("%s %s with a%s %s aura.",
-					  Your_buf,
-					  aobjnam(obj, "softly glow"),
+				    pline("%s with a%s %s aura.",
+					  Yobjnam2(obj, "softly glow"),
 					  index(vowels, *tmp) ? "n" : "", tmp);
 				}
 				bless(obj);
@@ -1600,9 +1595,8 @@ dodip()
 		} else if (potion->cursed) {
 			if (obj->blessed) {
 				if (useeit)
-				    pline("%s %s %s.",
-					  Your_buf,
-					  aobjnam(obj, "glow"),
+				    pline("%s %s.",
+					  Yobjnam2(obj, "glow"),
 					  hcolor((const char *)"brown"));
 				unbless(obj);
 				obj->bknown=1;
@@ -1610,9 +1604,8 @@ dodip()
 			} else if(!obj->cursed) {
 				if (useeit) {
 				    tmp = hcolor(NH_BLACK);
-				    pline("%s %s with a%s %s aura.",
-					  Your_buf,
-					  aobjnam(obj, "glow"),
+				    pline("%s with a%s %s aura.",
+					  Yobjnam2(obj, "glow"),
 					  index(vowels, *tmp) ? "n" : "", tmp);
 				}
 				curse(obj);
@@ -1982,7 +1975,7 @@ struct monst *mon,	/* monster being split */
 
 	reason[0] = '\0';
 	if (mtmp) Sprintf(reason, " from %s heat",
-			  (mtmp == &youmonst) ? (const char *)"your" :
+			  (mtmp == &youmonst) ? the_your[1] :
 			      (const char *)s_suffix(mon_nam(mtmp)));
 
 	if (mon == &youmonst) {

@@ -202,11 +202,8 @@ struct monst *victim;
 	    else if (vismon)
 		pline("%s's %s %s %s", Monnam(victim),
 		    ostr, vtense(ostr, "are"), txt);
-	} else {
-	    if (victim == &youmonst)
-		Your("%s %s",aobjnam(otmp,"are"), txt);
-	    else if (vismon)
-		pline("%s's %s %s", Monnam(victim), aobjnam(otmp,"are"), txt);
+	} else if ((victim == &youmonst) || vismon) {
+	    pline("%s %s", Yobjnam2(otmp, "are"), txt);
 	}
 	if (!rn2(2)) {
 	    otmp->greased = 0;
@@ -697,7 +694,7 @@ unsigned trflags;
 			    pline("Fortunately, you are wearing a hard helmet.");
 			    dmg = 2;
 			} else if (flags.verbose) {
-			    Your("%s does not protect you.", xname(uarmh));
+			    pline("%s does not protect you.", Yname2(uarmh));
 			}
 		    }
 
@@ -3895,7 +3892,7 @@ lava_effects()
 	    if(is_organic(obj) && !obj->oerodeproof) {
 		if(obj->owornmask) {
 		    if (usurvive)
-			Your("%s into flame!", aobjnam(obj, "burst"));
+			pline("%s into flame!", Yobjnam2(obj, "burst"));
 
 		    if(obj == uarm) (void) Armor_gone();
 		    else if(obj == uarmc) (void) Cloak_off();
@@ -3945,7 +3942,7 @@ burn_stuff:
     if(uarmf && !uarmf->oerodeproof && is_organic(uarmf)) {
 	/* save uarmf value because Boots_off() sets uarmf to null */
 	obj = uarmf;
-	Your("%s bursts into flame!", xname(obj));
+	pline("%s into flame!", Yobjnam2(obj, "burst"));
 	(void) Boots_off();
 	useup(obj);
     }

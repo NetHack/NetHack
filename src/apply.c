@@ -982,7 +982,7 @@ register struct obj *otmp;
 
 	    (void) get_obj_location(otmp, &x, &y, 0);
 	    if (otmp->where == OBJ_MINVENT ? cansee(x,y) : !Blind)
-		pline("%s %scandle%s flame%s extinguished.",
+		pline("%s%scandle%s flame%s extinguished.",
 		      Shk_Your(buf, otmp),
 		      (candle ? "" : "candelabrum's "),
 		      (many ? "s'" : "'s"), (many ? "s are" : " is"));
@@ -1066,7 +1066,7 @@ struct obj *obj;
 	if(obj->lamplit) {
 		if(obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
 				obj->otyp == BRASS_LANTERN)
-		    pline("%s lamp is now off.", Shk_Your(buf, obj));
+		    pline("%slamp is now off.", Shk_Your(buf, obj));
 		else
 		    You("snuff out %s.", yname(obj));
 		end_burn(obj, TRUE);
@@ -1087,7 +1087,7 @@ struct obj *obj;
 		if(obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
 				obj->otyp == BRASS_LANTERN) {
 		    check_unpaid(obj);
-		    pline("%s lamp is now on.", Shk_Your(buf, obj));
+		    pline("%slamp is now on.", Shk_Your(buf, obj));
 		} else {	/* candle(s) */
 		    pline("%s flame%s %s%s",
 			s_suffix(Yname2(obj)),
@@ -1131,7 +1131,7 @@ light_cocktail(obj)
 	    return;
 	}
 
-	You("light %s potion.%s", shk_your(buf, obj),
+	You("light %spotion.%s", shk_your(buf, obj),
 	    Blind ? "" : "  It gives off a dim light.");
 	if (obj->unpaid && costly_spot(u.ux, u.uy)) {
 	    /* Normally, we shouldn't both partially and fully charge
@@ -1752,7 +1752,7 @@ struct obj **optr;
 
 static NEARDATA const char lubricables[] = { ALL_CLASSES, ALLOW_NONE, 0 };
 static NEARDATA const char need_to_remove_outer_armor[] =
-			"need to remove your %s to grease your %s.";
+			"need to remove %s to grease %s.";
 
 STATIC_OVL void
 use_grease(obj)
@@ -1780,16 +1780,17 @@ struct obj *obj;
 		otmp = getobj(lubricables, "grease");
 		if (!otmp) return;
 		if ((otmp->owornmask & WORN_ARMOR) && uarmc) {
-			Strcpy(buf, xname(uarmc));
-			You(need_to_remove_outer_armor, buf, xname(otmp));
+			Strcpy(buf, yname(uarmc));
+			You(need_to_remove_outer_armor, buf, yname(otmp));
 			return;
 		}
 #ifdef TOURIST
 		if ((otmp->owornmask & WORN_SHIRT) && (uarmc || uarm)) {
-			Strcpy(buf, uarmc ? xname(uarmc) : "");
-			if (uarmc && uarm) Strcat(buf, " and ");
-			Strcat(buf, uarm ? xname(uarm) : "");
-			You(need_to_remove_outer_armor, buf, xname(otmp));
+			Strcpy(buf, uarmc ? yname(uarmc) : "");
+			if (uarmc && uarm)
+			    Strcat(strcat(buf, " and "), xname(uarm));
+			else Strcat(buf, uarm ? yname(uarm) : "");
+			You(need_to_remove_outer_armor, buf, yname(otmp));
 			return;
 		}
 #endif
@@ -2011,7 +2012,7 @@ struct obj *otmp;
 	ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
 	if (otmp == trapinfo.tobj &&
 		u.ux == trapinfo.tx && u.uy == trapinfo.ty) {
-	    You("resume setting %s %s.",
+	    You("resume setting %s%s.",
 		shk_your(buf, otmp),
 		defsyms[trap_to_defsym(what_trap(ttyp))].explanation);
 	    set_occupation(set_trap, occutext, 0);
@@ -2059,7 +2060,7 @@ struct obj *otmp;
 	    }
 	}
 #endif
-	You("begin setting %s %s.",
+	You("begin setting %s%s.",
 	    shk_your(buf, otmp),
 	    defsyms[trap_to_defsym(what_trap(ttyp))].explanation);
 	set_occupation(set_trap, occutext, 0);
@@ -2260,8 +2261,7 @@ struct obj *obj;
 	    } else
 		mon_hand = 0;	/* lint suppression */
 
-	    You("wrap your bullwhip around %s %s.",
-		s_suffix(mon_nam(mtmp)), onambuf);
+	    You("wrap your bullwhip around %s.", yname(otmp));
 	    if (gotit && otmp->cursed) {
 		pline("%s welded to %s %s%c",
 		      (otmp->quan == 1L) ? "It is" : "They are",
@@ -2278,8 +2278,8 @@ struct obj *obj;
 		switch (rn2(proficient + 1)) {
 		case 2:
 		    /* to floor near you */
-		    You("yank %s %s to the %s!", s_suffix(mon_nam(mtmp)),
-			onambuf, surface(u.ux, u.uy));
+		    You("yank %s to the %s!",
+			yname(otmp), surface(u.ux, u.uy));
 		    place_object(otmp, u.ux, u.uy);
 		    stackobj(otmp);
 		    break;
@@ -2305,7 +2305,7 @@ struct obj *obj;
 		    }
 #endif /* 0 */
 		    /* right into your inventory */
-		    You("snatch %s %s!", s_suffix(mon_nam(mtmp)), onambuf);
+		    You("snatch %s!", yname(otmp));
 		    if (otmp->otyp == CORPSE &&
 			    touch_petrifies(&mons[otmp->corpsenm]) &&
 			    !uarmg && !Stone_resistance &&
@@ -2868,10 +2868,8 @@ doapply()
 		    /* sometimes the blessing will be worn off */
 		    if (!rn2(49)) {
 			if (!Blind) {
-			    char buf[BUFSZ];
-
-			    pline("%s %s %s.", Shk_Your(buf, obj),
-				  aobjnam(obj, "glow"), hcolor("brown"));
+			    pline("%s %s.",
+				  Yobjnam2(obj, "glow"), hcolor("brown"));
 			    obj->bknown = 1;
 			}
 			unbless(obj);

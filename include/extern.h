@@ -1367,6 +1367,8 @@ E char *FDECL(An, (const char *));
 E char *FDECL(The, (const char *));
 E char *FDECL(the, (const char *));
 E char *FDECL(aobjnam, (struct obj *,const char *));
+E char *FDECL(yobjnam, (struct obj *,const char *));
+E char *FDECL(Yobjnam2, (struct obj *,const char *));
 E char *FDECL(Tobjnam, (struct obj *,const char *));
 E char *FDECL(otense, (struct obj *,const char *));
 E char *FDECL(vtense, (const char *,const char *));

@@ -630,9 +630,7 @@ register struct monst *mon;
 			} else {
 			    pline("%s tries to wield %s.", Monnam(mon),
 				doname(obj));
-			    pline("%s %s %s!",
-				  s_suffix(Monnam(mon)),
-				  xname(mw_tmp), welded_buf);
+			    pline("%s %s!", yname(mw_tmp), welded_buf);
 			}
 			mw_tmp->bknown = 1;
 		    }

@@ -1424,8 +1424,8 @@ struct monst *mtmp;
 				pline("Fortunately, you are wearing a hard helmet.");
 				if (dmg > 2) dmg = 2;
 			    } else if (flags.verbose) {
-				Your("%s does not protect you.",
-						xname(uarmh));
+				pline("%s does not protect you.",
+						Yname2(uarmh));
 			    }
 			}
 		    } else

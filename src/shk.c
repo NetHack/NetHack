@@ -3964,14 +3964,15 @@ register xchar x, y;
 	return(FALSE);
 }
 
+/* "your " or "Foobar's " (note the trailing space) */
 char *
 shk_your(buf, obj)
 char *buf;
 struct obj *obj;
 {
 	if (!shk_owns(buf, obj) && !mon_owns(buf, obj))
-	    Strcpy(buf, carried(obj) ? "your" : "the");
-	return buf;
+	    Strcpy(buf, the_your[carried(obj) ? 1 : 0]);
+	return strcat(buf, " ");
 }
 
 char *
@@ -3996,7 +3997,7 @@ struct obj *obj;
 	    (obj->unpaid ||
 	     (obj->where==OBJ_FLOOR && !obj->no_charge && costly_spot(x,y)))) {
 	    shkp = shop_keeper(inside_shop(x, y));
-	    return strcpy(buf, shkp ? s_suffix(shkname(shkp)) : "the");
+	    return strcpy(buf, shkp ? s_suffix(shkname(shkp)) : the_your[0]);
 	}
 	return (char *)0;
 }
@@ -4007,7 +4008,7 @@ char *buf;
 struct obj *obj;
 {
 	if (obj->where == OBJ_MINVENT)
-	    return strcpy(buf, s_suffix(mon_nam(obj->ocarry)));
+	    return strcpy(buf, s_suffix(y_monnam(obj->ocarry)));
 	return (char *)0;
 }
 

@@ -1220,8 +1220,8 @@ register struct obj *obj;
 		    if (obj->greased && !rn2(2)) obj->greased = 0;
 		} else {
 		    if (cansee(mdef->mx, mdef->my)) {
-			pline("%s %s%s!", s_suffix(Monnam(magr)),
-			    aobjnam(obj, (is_acid ? "corrode" : "rust")),
+			pline("%s%s!",
+			    Yobjnam2(obj, (is_acid ? "corrode" : "rust")),
 			    (is_acid ? obj->oeroded2 : obj->oeroded)
 				? " further" : "");
 		    }

@@ -271,8 +271,8 @@ register int trouble;
 	int i;
 	struct obj *otmp = 0;
 	const char *what = (const char *)0;
-	static NEARDATA const char leftglow[] = "left ring softly glows",
-				   rightglow[] = "right ring softly glows";
+	static NEARDATA const char leftglow[] = "Your left ring softly glows",
+				   rightglow[] = "Your right ring softly glows";
 
 	switch (trouble) {
 	    case TROUBLE_STONED:
@@ -400,9 +400,9 @@ decurse:
 		    }
 		    uncurse(otmp);
 		    if (!Blind) {
-			Your("%s %s.", what ? what :
-				(const char *)aobjnam(otmp, "softly glow"),
-			     hcolor(NH_AMBER));
+			pline("%s %s.", what ? what :
+				(const char *)Yobjnam2(otmp, "softly glow"),
+			      hcolor(NH_AMBER));
 			otmp->bknown = TRUE;
 		    }
 		    update_inventory();
@@ -450,9 +450,7 @@ decurse:
 		    otmp = which_armor(u.usteed, W_SADDLE);
 		    uncurse(otmp);
 		    if (!Blind) {
-			pline("%s %s %s.",
-			      s_suffix(upstart(y_monnam(u.usteed))),
-			      aobjnam(otmp, "softly glow"),
+			pline("%s %s.", Yobjnam2(otmp, "softly glow"),
 			      hcolor(NH_AMBER));
 			otmp->bknown = TRUE;
 		    }
@@ -870,20 +868,20 @@ pleased(g_align)
 		    uncurse(uwep);
 		    uwep->bknown = TRUE;
 		    if (!Blind)
-			Your("%s %s%s.", aobjnam(uwep, "softly glow"),
-			     hcolor(NH_AMBER), repair_buf);
-		    else You_feel("the power of %s over your %s.",
-			u_gname(), xname(uwep));
+			pline("%s %s%s.", Yobjnam2(uwep, "softly glow"),
+			      hcolor(NH_AMBER), repair_buf);
+		    else You_feel("the power of %s over %s.",
+				  u_gname(), yname(uwep));
 		    *repair_buf = '\0';
 		} else if (!uwep->blessed) {
 		    bless(uwep);
 		    uwep->bknown = TRUE;
 		    if (!Blind)
-			Your("%s with %s aura%s.",
-			     aobjnam(uwep, "softly glow"),
-			     an(hcolor(NH_LIGHT_BLUE)), repair_buf);
-		    else You_feel("the blessing of %s over your %s.",
-			u_gname(), xname(uwep));
+			pline("%s with %s aura%s.",
+			      Yobjnam2(uwep, "softly glow"),
+			      an(hcolor(NH_LIGHT_BLUE)), repair_buf);
+		    else You_feel("the blessing of %s over %s.",
+				  u_gname(), yname(uwep));
 		    *repair_buf = '\0';
 		}
 
@@ -894,8 +892,8 @@ pleased(g_align)
 		    /* only give this message if we didn't just bless
 		       or uncurse (which has already given a message) */
 		    if (*repair_buf)
-			Your("%s as good as new!",
-			     aobjnam(uwep, Blind ? "feel" : "look"));
+			pline("%s as good as new!",
+			      Yobjnam2(uwep, Blind ? "feel" : "look"));
 		}
 		update_inventory();
 	    }
@@ -951,8 +949,8 @@ pleased(g_align)
 		if (otmp->cursed) {
 		    uncurse(otmp);
 		    if (!Blind) {
-			Your("%s %s.", aobjnam(otmp, "softly glow"),
-			     hcolor(NH_AMBER));
+			pline("%s %s.", Yobjnam2(otmp, "softly glow"),
+			      hcolor(NH_AMBER));
 			otmp->bknown = TRUE;
 			++any;
 		    }

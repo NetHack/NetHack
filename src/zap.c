@@ -1959,7 +1959,7 @@ boolean ordinary;
 
 		    if (BInvis && uarmc->otyp == MUMMY_WRAPPING) {
 			/* A mummy wrapping absorbs it and protects you */
-		        You_feel("rather itchy under your %s.", xname(uarmc));
+		        You_feel("rather itchy under %s.", yname(uarmc));
 		        break;
 		    }
 		    if (ordinary || !rn2(10)) {	/* permanent */
@@ -3980,8 +3980,7 @@ int osym, dmgtyp;
 		    if(!rn2(3)) cnt++;
 
 		if(!cnt) continue;
-		if (vis) pline("%s %s %s!",
-			s_suffix(Monnam(mtmp)), xname(obj),
+		if (vis) pline("%s %s!", yname(obj),
 			(cnt > 1L) ? destroy_strings[dindx*3 + 1]
 				  : destroy_strings[dindx*3]);
 		for(i = 0; i < cnt; i++) m_useup(mtmp, obj);

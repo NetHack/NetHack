@@ -1499,7 +1499,7 @@ dopois:
 		    struct obj *obj = some_armor(&youmonst);
 
 		    if (drain_item(obj)) {
-			Your("%s less effective.", aobjnam(obj, "seem"));
+			pline("%s less effective.", Yobjnam2(obj, "seem"));
 		    }
 		}
 		break;
@@ -2040,9 +2040,8 @@ register struct obj *obj;
 		    if (obj->greased && !rn2(2)) obj->greased = 0;
 		} else {
 		    if (vis)
-			pline("%s %s%s!",
-			        s_suffix(Monnam(mon)),
-				aobjnam(obj, (is_acid ? "corrode" : "rust")),
+			pline("%s%s!",
+				Yobjnam2(obj, (is_acid ? "corrode" : "rust")),
 			        (is_acid ? obj->oeroded2 : obj->oeroded)
 				    ? " further" : "");
 		    if (is_acid) obj->oeroded2++;
@@ -2138,8 +2137,8 @@ register struct monst *mon;
 			xname(ring), simple_typename(ring->otyp), "ring"));
 		    makeknown(RIN_ADORNMENT);
 		    if (yn(qbuf) == 'n') continue;
-		} else pline("%s decides she'd like your %s, and takes it.",
-			Blind ? "She" : Monnam(mon), xname(ring));
+		} else pline("%s decides she'd like %s, and takes it.",
+			Blind ? "She" : Monnam(mon), yname(ring));
 		makeknown(RIN_ADORNMENT);
 		if (ring==uleft || ring==uright) Ring_gone(ring);
 		if (ring==uwep) setuwep((struct obj *)0);
@@ -2148,8 +2147,6 @@ register struct monst *mon;
 		freeinv(ring);
 		(void) mpickobj(mon,ring);
 	    } else {
-		char buf[BUFSZ];
-
 		if (uleft && uright && uleft->otyp == RIN_ADORNMENT
 				&& uright->otyp==RIN_ADORNMENT)
 			break;
@@ -2162,8 +2159,8 @@ register struct monst *mon;
 		    makeknown(RIN_ADORNMENT);
 		    if (yn(qbuf) == 'n') continue;
 		} else {
-		    pline("%s decides you'd look prettier wearing your %s,",
-			Blind ? "He" : Monnam(mon), xname(ring));
+		    pline("%s decides you'd look prettier wearing %s,",
+			Blind ? "He" : Monnam(mon), yname(ring));
 		    pline("and puts it on your finger.");
 		}
 		makeknown(RIN_ADORNMENT);
@@ -2176,15 +2173,13 @@ register struct monst *mon;
 			Blind ? "He" : Monnam(mon), the(xname(ring)), body_part(HAND));
 		    setworn(ring, LEFT_RING);
 		} else if (uright && uright->otyp != RIN_ADORNMENT) {
-		    Strcpy(buf, xname(uright));
-		    pline("%s replaces your %s with your %s.",
-			Blind ? "He" : Monnam(mon), buf, xname(ring));
+		    pline("%s replaces %s with %s.",
+			Blind ? "He" : Monnam(mon), yname(uright), yname(ring));
 		    Ring_gone(uright);
 		    setworn(ring, RIGHT_RING);
 		} else if (uleft && uleft->otyp != RIN_ADORNMENT) {
-		    Strcpy(buf, xname(uleft));
-		    pline("%s replaces your %s with your %s.",
-			Blind ? "He" : Monnam(mon), buf, xname(ring));
+		    pline("%s replaces %s with %s.",
+			Blind ? "He" : Monnam(mon), yname(uleft), yname(ring));
 		    Ring_gone(uleft);
 		    setworn(ring, LEFT_RING);
 		} else impossible("ring replacement");

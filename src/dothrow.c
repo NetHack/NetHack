@@ -796,7 +796,7 @@ boolean hitsroof;
 		    pline("Fortunately, you are wearing a hard helmet.");
 	    } else if (flags.verbose &&
 		    !(obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])))
-		Your("%s does not protect you.", xname(uarmh));
+		pline("%s does not protect you.", Yname2(uarmh));
 	} else if (obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])) {
 	    if (!Stone_resistance &&
 		    !(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {

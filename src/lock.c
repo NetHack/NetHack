@@ -276,8 +276,7 @@ pick_lock(pick) /* pick a lock with a given object */
 		      Levitation ? "here" : "there");
 		return 0;
 	    } else if (is_lava(u.ux, u.uy)) {
-		pline("Doing that would probably melt your %s.",
-		      xname(pick));
+		pline("Doing that would probably melt %s.", yname(pick));
 		return 0;
 	    } else if (is_pool(u.ux, u.uy) && !Underwater) {
 		pline_The("water has no lock.");
@@ -314,7 +313,8 @@ pick_lock(pick) /* pick a lock with a given object */
 #ifdef TOURIST
 		    else if (picktyp == CREDIT_CARD && !otmp->olocked) {
 			/* credit cards are only good for unlocking */
-			You_cant("do that with %s.", doname(pick));
+			You_cant("do that with %s.",
+				 an(simple_typename(picktyp)));
 			return 0;
 		    }
 #endif
@@ -473,9 +473,9 @@ doforce()		/* try to force a chest with your weapon */
 		if(c == 'n') continue;
 
 		if(picktyp)
-		    You("force your %s into a crack and pry.", xname(uwep));
+		    You("force %s into a crack and pry.", yname(uwep));
 		else
-		    You("start bashing it with your %s.", xname(uwep));
+		    You("start bashing it with %s.", yname(uwep));
 		xlock.box = otmp;
 		xlock.chance = objects[uwep->otyp].oc_wldam * 2;
 		xlock.picktyp = picktyp;

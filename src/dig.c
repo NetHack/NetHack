@@ -240,20 +240,18 @@ dig()
 	    switch(rn2(3)) {
 	    case 0:
 		if(!welded(uwep)) {
-		    You("fumble and drop your %s.", xname(uwep));
+		    You("fumble and drop %s.", yname(uwep));
 		    dropx(uwep);
 		} else {
 #ifdef STEED
 		    if (u.usteed)
-			Your("%s %s and %s %s!",
-			     xname(uwep),
-			     otense(uwep, "bounce"), otense(uwep, "hit"),
-			     mon_nam(u.usteed));
+			pline("%s and %s %s!",
+			      Yobjnam2(uwep, "bounce"), otense(uwep, "hit"),
+			      mon_nam(u.usteed));
 		    else
 #endif
-			pline("Ouch!  Your %s %s and %s you!",
-			      xname(uwep),
-			      otense(uwep, "bounce"), otense(uwep, "hit"));
+			pline("Ouch!  %s and %s you!",
+			      Yobjnam2(uwep, "bounce"), otense(uwep, "hit"));
 		    set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
 		}
 		break;
@@ -913,8 +911,8 @@ struct obj *obj;
 				seetrap(trap);
 				There("is a spider web there!");
 			    }
-			    Your("%s entangled in the web.",
-				aobjnam(obj, "become"));
+			    pline("%s entangled in the web.",
+				  Yobjnam2(obj, "become"));
 			    /* you ought to be able to let go; tough luck */
 			    /* (maybe `move_into_trap()' would be better) */
 			    nomul(-d(2,2));
@@ -935,8 +933,8 @@ struct obj *obj;
 			    if (vibrate) losehp(2, "axing a hard object", KILLED_BY);
 			}
 			else
-			    You("swing your %s through thin air.",
-				aobjnam(obj, (char *)0));
+			    You("swing %s through thin air.",
+				yobjnam(obj, (char *)0));
 		} else {
 			static const char * const d_action[6] = {
 						"swinging",
@@ -977,7 +975,7 @@ struct obj *obj;
 		}
 	} else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) {
 		/* it must be air -- water checked above */
-		You("swing your %s through thin air.", aobjnam(obj, (char *)0));
+		You("swing %s through thin air.", yobjnam(obj, (char *)0));
 	} else if (!can_reach_floor()) {
 		You_cant("reach the %s.", surface(u.ux,u.uy));
 	} else if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) {
@@ -985,8 +983,8 @@ struct obj *obj;
 		You("cannot stay under%s long enough.",
 				is_pool(u.ux, u.uy) ? "water" : " the lava");
 	} else if (!ispick) {
-		Your("%s merely scratches the %s.",
-				aobjnam(obj, (char *)0), surface(u.ux,u.uy));
+		pline("%s merely scratches the %s.",
+				Yobjnam2(obj, (char *)0), surface(u.ux,u.uy));
 		u_wipe_engr(3);
 	} else {
 		if (digging.pos.x != u.ux || digging.pos.y != u.uy ||

@@ -423,11 +423,8 @@ const char *verb;	/* "rub",&c */
 		   strstri(what, "s of ") != 0);
 
     if (obj->owornmask & (W_ARMOR|W_RING|W_AMUL|W_TOOL)) {
-	char yourbuf[BUFSZ];
-
-	You_cant("%s %s %s while wearing %s.",
-		 verb, shk_your(yourbuf, obj), what,
-		 more_than_1 ? "them" : "it");
+	You_cant("%s %s while wearing %s.",
+		 verb, yname(obj), more_than_1 ? "them" : "it");
 	return FALSE;
     }
     if (welded(uwep)) {
@@ -498,8 +495,8 @@ can_twoweapon()
 	} else if (uarms)
 		You_cant("use two weapons while wearing a shield.");
 	else if (uswapwep->oartifact)
-		pline("%s %s being held second to another weapon!",
-			Yname2(uswapwep), otense(uswapwep, "resist"));
+		pline("%s being held second to another weapon!",
+			Yobjnam2(uswapwep, "resist"));
 	else if (!uarmg && !Stone_resistance && (uswapwep->otyp == CORPSE &&
 		    touch_petrifies(&mons[uswapwep->corpsenm]))) {
 		char kbuf[BUFSZ];
@@ -525,7 +522,7 @@ drop_uswapwep()
 
 	/* Avoid trashing makeplural's static buffer */
 	Strcpy(str, makeplural(body_part(HAND)));
-	Your("%s from your %s!",  aobjnam(obj, "slip"), str);
+	pline("%s from your %s!",  Yobjnam2(obj, "slip"), str);
 	dropx(obj);
 }
 
@@ -631,13 +628,8 @@ boolean fade_scrolls;
 					)
 	    {
 		if (!Blind) {
-		    if (victim == &youmonst)
-			Your("%s.", aobjnam(target, "fade"));
-		    else if (vismon)
-			pline("%s's %s.", Monnam(victim),
-			      aobjnam(target, "fade"));
-		    else if (visobj)
-			pline_The("%s.", aobjnam(target, "fade"));
+		    if ((victim == &youmonst) || vismon || visobj)
+			pline("%s.", Yobjnam2(target, "fade"));
 		}
 		target->otyp = SCR_BLANK_PAPER;
 		target->spe = 0;
@@ -645,27 +637,14 @@ boolean fade_scrolls;
 	} else if (target->oerodeproof ||
 		(acid_dmg ? !is_corrodeable(target) : !is_rustprone(target))) {
 	    if (flags.verbose || !(target->oerodeproof && target->rknown)) {
-		if (victim == &youmonst)
-		    Your("%s not affected.", aobjnam(target, "are"));
-		else if (vismon)
-		    pline("%s's %s not affected.", Monnam(victim),
-			aobjnam(target, "are"));
+		if ((victim == &youmonst) || vismon)
+		    pline("%s not affected.", Yobjnam2(target, "are"));
 		/* no message if not carried */
 	    }
 	    if (target->oerodeproof) target->rknown = TRUE;
 	} else if (erosion < MAX_ERODE) {
-	    if (victim == &youmonst)
-		Your("%s%s!", aobjnam(target, acid_dmg ? "corrode" : "rust"),
-		    erosion+1 == MAX_ERODE ? " completely" :
-		    erosion ? " further" : "");
-	    else if (vismon)
-		pline("%s's %s%s!", Monnam(victim),
-		    aobjnam(target, acid_dmg ? "corrode" : "rust"),
-		    erosion+1 == MAX_ERODE ? " completely" :
-		    erosion ? " further" : "");
-	    else if (visobj)
-		pline_The("%s%s!",
-		    aobjnam(target, acid_dmg ? "corrode" : "rust"),
+	    if ((victim == &youmonst) || vismon || visobj)
+		pline("%s%s!", Yobjnam2(target, acid_dmg ? "corrode" : "rust"),
 		    erosion+1 == MAX_ERODE ? " completely" :
 		    erosion ? " further" : "");
 	    if (acid_dmg)
@@ -675,16 +654,12 @@ boolean fade_scrolls;
 	} else {
 	    if (flags.verbose) {
 		if (victim == &youmonst)
-		    Your("%s completely %s.",
-			aobjnam(target, Blind ? "feel" : "look"),
+		    pline("%s completely %s.",
+			Yobjnam2(target, Blind ? "feel" : "look"),
 			acid_dmg ? "corroded" : "rusty");
-		else if (vismon)
-		    pline("%s's %s completely %s.", Monnam(victim),
-			aobjnam(target, "look"),
-			acid_dmg ? "corroded" : "rusty");
-		else if (visobj)
-		    pline_The("%s completely %s.",
-			aobjnam(target, "look"),
+		else if (vismon || visobj)
+		    pline("%s completely %s.",
+			Yobjnam2(target, "look"),
 			acid_dmg ? "corroded" : "rusty");
 	    }
 	}
@@ -730,27 +705,27 @@ register int amount;
 
 	if (amount < 0 && uwep->oartifact && restrict_name(uwep, ONAME(uwep))) {
 	    if (!Blind)
-		Your("%s %s.", aobjnam(uwep, "faintly glow"), color);
+		pline("%s %s.", Yobjnam2(uwep, "faintly glow"), color);
 	    return(1);
 	}
 	/* there is a (soft) upper and lower limit to uwep->spe */
 	if(((uwep->spe > 5 && amount >= 0) || (uwep->spe < -5 && amount < 0))
 								&& rn2(3)) {
 	    if (!Blind)
-	    Your("%s %s for a while and then %s.",
-		 aobjnam(uwep, "violently glow"), color,
+	    pline("%s %s for a while and then %s.",
+		 Yobjnam2(uwep, "violently glow"), color,
 		 otense(uwep, "evaporate"));
 	    else
-		Your("%s.", aobjnam(uwep, "evaporate"));
+		pline("%s.", Yobjnam2(uwep, "evaporate"));
 
 	    useupall(uwep);	/* let all of them disappear */
 	    return(1);
 	}
 	if (!Blind) {
 	    xtime = (amount*amount == 1) ? "moment" : "while";
-	    Your("%s %s for a %s.",
-		 aobjnam(uwep, amount == 0 ? "violently glow" : "glow"),
-		 color, xtime);
+	    pline("%s %s for a %s.",
+		  Yobjnam2(uwep, amount == 0 ? "violently glow" : "glow"),
+		  color, xtime);
 	    if (otyp != STRANGE_OBJECT && uwep->known &&
 		    (amount > 0 || (amount < 0 && otmp->bknown)))
 		makeknown(otyp);
@@ -773,8 +748,7 @@ register int amount;
 	/* elven weapons vibrate warningly when enchanted beyond a limit */
 	if ((uwep->spe > 5)
 		&& (is_elven_weapon(uwep) || uwep->oartifact || !rn2(7)))
-	    Your("%s unexpectedly.",
-		aobjnam(uwep, "suddenly vibrate"));
+	    pline("%s unexpectedly.", Yobjnam2(uwep, "suddenly vibrate"));
 
 	return(1);
 }
@@ -797,8 +771,8 @@ register struct obj *obj;
 	long savewornmask;
 
 	savewornmask = obj->owornmask;
-	Your("%s %s welded to your %s!",
-		xname(obj), otense(obj, "are"),
+	pline("%s welded to your %s!",
+		Yobjnam2(obj, "are"),
 		bimanual(obj) ? (const char *)makeplural(body_part(HAND))
 				: body_part(HAND));
 	obj->owornmask = savewornmask;

@@ -252,8 +252,8 @@ register struct obj *obj;
 	obj->in_use = TRUE;	/* block free identification via interrupt */
 	switch(obj->otyp) {	/* effects that can be noticed without eyes */
 	    case RIN_SEARCHING:
-		You("thought your %s got lost in the sink, but there it is!",
-			xname(obj));
+		You("thought %s got lost in the sink, but there it is!",
+			yname(obj));
 		goto giveback;
 	    case RIN_SLOW_DIGESTION:
 		pline_The("ring is regurgitated!");
@@ -1506,10 +1506,8 @@ struct obj *corpse;
 	   case OBJ_CONTAINED:
 	   	if (container_where == OBJ_MINVENT && cansee(mtmp->mx, mtmp->my) &&
 		    mcarry && canseemon(mcarry) && container) {
-		        char sackname[BUFSZ];
-		        Sprintf(sackname, "%s %s", s_suffix(mon_nam(mcarry)),
-				xname(container)); 
-	   		pline("%s writhes out of %s!", Amonnam(mtmp), sackname);
+	   		pline("%s writhes out of %s!",
+			      Amonnam(mtmp), yname(container));
 	   	} else if (container_where == OBJ_INVENT && container) {
 		        char sackname[BUFSZ];
 		        Strcpy(sackname, an(xname(container)));

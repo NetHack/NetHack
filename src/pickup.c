@@ -2500,7 +2500,7 @@ struct obj *box;	/* or bag */
 	observe_quantum_cat(box);
 	if (!Has_contents(box))	/* evidently a live cat came out */
 	    /* container type of "large box" is inferred */
-	    pline("%s box is now empty.", Shk_Your(yourbuf, box));
+	    pline("%sbox is now empty.", Shk_Your(yourbuf, box));
 	else			/* holds cat corpse or other random stuff */
 	    empty_it = TRUE;
     } else if (!Has_contents(box)) {

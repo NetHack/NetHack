@@ -1011,6 +1011,39 @@ register const char *verb;
 	return(bp);
 }
 
+/* combine yname and aobjnam eg "your count cxname(otmp)" */
+char *
+yobjnam(obj,verb)
+struct obj *obj;
+const char *verb;
+{
+	char *s = aobjnam(obj, verb);
+
+	/* leave off "your" for most of your artifacts, but prepend
+	 * "your" for unique objects and "foo of bar" quest artifacts */
+	if (!carried(obj) || !obj_is_pname(obj) ||
+	    obj->oartifact >= ART_ORB_OF_DETECTION) {
+	    char *outbuf = shk_your(nextobuf(), obj);
+	    int space_left = BUFSZ - 1 - strlen(outbuf);
+
+	    s = strncat(outbuf, s, space_left);
+	}
+
+	return s;
+}
+
+/* combine Yname2 and aobjnam eg "Your count cxname(otmp)" */
+char *
+Yobjnam2(obj,verb)
+struct obj *obj;
+const char *verb;
+{
+	register char *s = yobjnam(obj,verb);
+
+	*s = highc(*s);
+	return(s);
+}
+
 /* like aobjnam, but prepend "The", not count, and use xname */
 char *
 Tobjnam(otmp, verb)
@@ -1166,16 +1199,24 @@ register struct obj *obj;
 	return(s);
 }
 
-/* returns "your xname(obj)" or "Foobar's xname(obj)" or "the xname(obj)" */
+/* returns "[your ]xname(obj)" or "Foobar's xname(obj)" or "the xname(obj)" */
 char *
 yname(obj)
 struct obj *obj;
 {
-	char *outbuf = nextobuf();
-	char *s = shk_your(outbuf, obj);	/* assert( s == outbuf ); */
-	int space_left = BUFSZ - strlen(s) - sizeof " ";
+	char *s = cxname(obj);
 
-	return strncat(strcat(s, " "), cxname(obj), space_left);
+	/* leave off "your" for most of your artifacts, but prepend
+	 * "your" for unique objects and "foo of bar" quest artifacts */
+	if (!carried(obj) || !obj_is_pname(obj) ||
+	    obj->oartifact >= ART_ORB_OF_DETECTION) {
+	    char *outbuf = shk_your(nextobuf(), obj);
+	    int space_left = BUFSZ - 1 - strlen(outbuf);
+
+	    s = strncat(outbuf, s, space_left);
+	}
+
+	return s;
 }
 
 /* capitalized variant of yname() */
@@ -1199,9 +1240,9 @@ struct obj *obj;
 {
 	char *outbuf = nextobuf();
 	char *s = shk_your(outbuf, obj);	/* assert( s == outbuf ); */
-	int space_left = BUFSZ - strlen(s) - sizeof " ";
+	int space_left = BUFSZ - 1 - strlen(s);
 
-	return strncat(strcat(s, " "), simple_typename(obj->otyp), space_left);
+	return strncat(s, simple_typename(obj->otyp), space_left);
 }
 
 /* capitalized variant of ysimple_name() */

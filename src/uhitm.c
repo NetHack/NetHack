@@ -379,8 +379,8 @@ register struct monst *mtmp;
 	    unweapon = FALSE;
 	    if(flags.verbose) {
 		if(uwep)
-		    You("begin bashing monsters with your %s.",
-			aobjnam(uwep, (char *)0));
+		    You("begin bashing monsters with %s.",
+			yobjnam(uwep, (char *)0));
 		else if (!cantwield(youmonst.data))
 		    You("begin %sing monsters with your %s %s.",
 			Role_if(PM_MONK) ? "strik" : "bash",
@@ -607,9 +607,9 @@ int thrown;
 			    rnl(4) == 4-1) {
 			boolean more_than_1 = (obj->quan > 1L);
 
-			pline("As you hit %s, %s%s %s breaks into splinters.",
+			pline("As you hit %s, %s%s breaks into splinters.",
 			      mon_nam(mon), more_than_1 ? "one of " : "",
-			      shk_your(yourbuf, obj), xname(obj));
+			      yname(obj));
 			if (!more_than_1) uwepgone();	/* set unweapon */
 			useup(obj);
 			if (!more_than_1) obj = (struct obj *) 0;
@@ -647,9 +647,8 @@ int thrown;
 			setmnotwielded(mon,monwep);
 			MON_NOWEP(mon);
 			mon->weapon_check = NEED_WEAPON;
-			pline("%s %s %s from the force of your blow!",
-			      s_suffix(Monnam(mon)), xname(monwep),
-			      otense(monwep, "shatter"));
+			pline("%s from the force of your blow!",
+			      Yobjnam2(monwep, "shatter"));
 			m_useup(mon, monwep);
 			/* If someone just shattered MY weapon, I'd flee! */
 			if (rn2(4)) {
@@ -718,7 +717,7 @@ int thrown;
 			break;
 		    case MIRROR:
 			if (breaktest(obj)) {
-			    You("break %s mirror.  That's bad luck!",
+			    You("break %smirror.  That's bad luck!",
 				shk_your(yourbuf, obj));
 			    change_luck(-2);
 			    useup(obj);
@@ -731,7 +730,7 @@ int thrown;
 			break;
 #ifdef TOURIST
 		    case EXPENSIVE_CAMERA:
-			You("succeed in destroying %s camera.  Congratulations!",
+			You("succeed in destroying %scamera.  Congratulations!",
 			        shk_your(yourbuf, obj));
 			useup(obj);
 			return(TRUE);
@@ -927,8 +926,7 @@ int thrown;
 	    }
 	    if (obj && !rn2(nopoison)) {
 		obj->opoisoned = FALSE;
-		Your("%s %s no longer poisoned.", xname(obj),
-		     otense(obj, "are"));
+		pline("%s no longer poisoned.", Yobjnam2(obj, "are"));
 	    }
 	    if (resists_poison(mon))
 		needpoismsg = TRUE;
@@ -959,7 +957,7 @@ int thrown;
 	    You("joust %s%s",
 			 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
 	    if (jousting < 0) {
-		Your("%s shatters on impact!", xname(obj));
+		pline("%s shatters on impact!", Yname2(obj));
 		/* (must be either primary or secondary weapon to get here) */
 		u.twoweap = FALSE;	/* untwoweapon() is too verbose here */
 		if (obj == uwep) uwepgone();		/* set unweapon */
@@ -2392,7 +2390,7 @@ struct attack *mattk;		/* null means we find one internally */
 	    if (!mon->mcan) {
 		if (drain_item(obj) && carried(obj) &&
 		    (obj->known || obj->oclass == ARMOR_CLASS)) {
-		    Your("%s less effective.", aobjnam(obj, "seem"));
+		    pline("%s less effective.", Yobjnam2(obj, "seem"));
 	    	}
 	    	break;
 	    }

@@ -149,35 +149,36 @@ doread()
 	}
 	return(1);
 }
+
 STATIC_OVL void
 stripspe(obj)
 register struct obj *obj;
 {
 	if (obj->blessed) pline(nothing_happens);
 	else {
-		if (obj->spe > 0) {
-		    obj->spe = 0;
-		    if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
-			obj->age = 0;
-		    Your("%s %s briefly.",xname(obj), otense(obj, "vibrate"));
-		} else pline(nothing_happens);
+	    if (obj->spe > 0) {
+		obj->spe = 0;
+		if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
+		    obj->age = 0;
+		pline("%s briefly.", Yobjnam2(obj, "vibrate"));
+	    } else pline(nothing_happens);
 	}
 }
+
 STATIC_OVL void
 p_glow1(otmp)
 register struct obj	*otmp;
 {
-	Your("%s %s briefly.", xname(otmp),
-	     otense(otmp, Blind ? "vibrate" : "glow"));
+	pline("%s briefly.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
 }
+
 STATIC_OVL void
 p_glow2(otmp,color)
 register struct obj	*otmp;
 register const char *color;
 {
-	Your("%s %s%s%s for a moment.",
-		xname(otmp),
-		otense(otmp, Blind ? "vibrate" : "glow"),
+	pline("%s%s%s for a moment.",
+		Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
 		Blind ? "" : " ",
 		Blind ? nul : hcolor(color));
 }
@@ -270,8 +271,8 @@ int curse_bless;
 
 	    /* destruction depends on current state, not adjustment */
 	    if (obj->spe > rn2(7) || obj->spe <= -5) {
-		Your("%s %s momentarily, then %s!",
-		     xname(obj), otense(obj,"pulsate"), otense(obj,"explode"));
+		pline("%s momentarily, then %s!",
+		      Yobjnam2(obj, "pulsate"), otense(obj,"explode"));
 		if (is_on) Ring_gone(obj);
 		s = rnd(3 * abs(obj->spe));	/* amount of damage */
 		useup(obj);
@@ -279,8 +280,8 @@ int curse_bless;
 	    } else {
 		long mask = is_on ? (obj == uleft ? LEFT_RING :
 				     RIGHT_RING) : 0L;
-		Your("%s spins %sclockwise for a moment.",
-		     xname(obj), s < 0 ? "counter" : "");
+		pline("%s spins %sclockwise for a moment.",
+		      Yname2(obj), s < 0 ? "counter" : "");
 		/* cause attributes and/or properties to be updated */
 		if (is_on) Ring_off(obj);
 		obj->spe += s;	/* update the ring while it's off */
@@ -679,12 +680,12 @@ register struct obj	*sobj;
 			otmp->oerodeproof = !(sobj->cursed);
 			if(Blind) {
 			    otmp->rknown = FALSE;
-			    Your("%s %s warm for a moment.",
-				xname(otmp), otense(otmp, "feel"));
+			    pline("%s warm for a moment.",
+				  Yobjnam2(otmp, "feel"));
 			} else {
 			    otmp->rknown = TRUE;
-			    Your("%s %s covered by a %s %s %s!",
-				xname(otmp), otense(otmp, "are"),
+			    pline("%s covered by a %s %s %s!",
+				Yobjnam2(otmp, "are"),
 				sobj->cursed ? "mottled" : "shimmering",
 				 hcolor(sobj->cursed ? NH_BLACK : NH_GOLDEN),
 				sobj->cursed ? "glow" :
@@ -693,9 +694,8 @@ register struct obj	*sobj;
 			if (otmp->oerodeproof &&
 			    (otmp->oeroded || otmp->oeroded2)) {
 			    otmp->oeroded = otmp->oeroded2 = 0;
-			    Your("%s %s as good as new!",
-				 xname(otmp),
-				 otense(otmp, Blind ? "feel" : "look"));
+			    pline("%s as good as new!",
+				  Yobjnam2(otmp, Blind ? "feel" : "look"));
 			}
 			break;
 		}
@@ -716,8 +716,8 @@ register struct obj	*sobj;
 		/* KMH -- catch underflow */
 		s = sobj->cursed ? -otmp->spe : otmp->spe;
 		if (s > (special_armor ? 5 : 3) && rn2(s)) {
-		Your("%s violently %s%s%s for a while, then %s.",
-		     xname(otmp),
+		pline("%s violently %s%s%s for a while, then %s.",
+		     Yname2(otmp),
 		     otense(otmp, Blind ? "vibrate" : "glow"),
 		     (!Blind && !same_color) ? " " : nul,
 		     (Blind || same_color) ? nul :
@@ -738,7 +738,7 @@ register struct obj	*sobj;
 		if (s >= 0 && otmp->otyp >= GRAY_DRAGON_SCALES &&
 					otmp->otyp <= YELLOW_DRAGON_SCALES) {
 			/* dragon scales get turned into dragon scale mail */
-			Your("%s merges and hardens!", xname(otmp));
+			pline("%s merges and hardens!", Yname2(otmp));
 			setworn((struct obj *)0, W_ARM);
 			/* assumes same order */
 			otmp->otyp = GRAY_DRAGON_SCALE_MAIL +
@@ -752,8 +752,8 @@ register struct obj	*sobj;
 			setworn(otmp, W_ARM);
 			break;
 		}
-		Your("%s %s%s%s%s for a %s.",
-			xname(otmp),
+		pline("%s %s%s%s%s for a %s.",
+			Yname2(otmp),
 		        s == 0 ? "violently " : nul,
 			otense(otmp, Blind ? "vibrate" : "glow"),
 			(!Blind && !same_color) ? " " : nul,
@@ -770,8 +770,8 @@ register struct obj	*sobj;
 
 		if ((otmp->spe > (special_armor ? 5 : 3)) &&
 		    (special_armor || !rn2(7)))
-			Your("%s suddenly %s %s.",
-				xname(otmp), otense(otmp, "vibrate"),
+			pline("%s %s.",
+				Yobjnam2(otmp, "suddenly vibrate"),
 				Blind ? "again" : "unexpectedly");
 		break;
 	    }
@@ -798,7 +798,7 @@ register struct obj	*sobj;
 		    } else
 			known = TRUE;
 		} else {	/* armor and scroll both cursed */
-		    Your("%s %s.", xname(otmp), otense(otmp, "vibrate"));
+		    pline("%s.", Yobjnam2(otmp, "vibrate"));
 		    if (otmp->spe >= -6) otmp->spe--;
 		    make_stunned(HStun + rn1(10, 10), TRUE);
 		}
@@ -967,16 +967,16 @@ register struct obj	*sobj;
 			    Your("weapon feels warm for a moment.");
 			} else {
 			    uwep->rknown = TRUE;
-			    Your("%s covered by a %s %s %s!",
-				aobjnam(uwep, "are"),
+			    pline("%s covered by a %s %s %s!",
+				Yobjnam2(uwep, "are"),
 				sobj->cursed ? "mottled" : "shimmering",
 				hcolor(sobj->cursed ? NH_PURPLE : NH_GOLDEN),
 				sobj->cursed ? "glow" : "shield");
 			}
 			if (uwep->oerodeproof && (uwep->oeroded || uwep->oeroded2)) {
 			    uwep->oeroded = uwep->oeroded2 = 0;
-			    Your("%s as good as new!",
-				 aobjnam(uwep, Blind ? "feel" : "look"));
+			    pline("%s as good as new!",
+				  Yobjnam2(uwep, Blind ? "feel" : "look"));
 			}
 		} else return !chwepon(sobj,
 				       sobj->cursed ? -1 :
@@ -1256,8 +1256,8 @@ register struct obj	*sobj;
 				pline("Fortunately, you are wearing a hard helmet.");
 				if (dmg > 2) dmg = 2;
 			    } else if (flags.verbose) {
-				Your("%s does not protect you.",
-						xname(uarmh));
+				pline("%s does not protect you.",
+						Yname2(uarmh));
 			    }
 			}
 		    } else
@@ -1311,7 +1311,7 @@ wand_explode(obj)
 register struct obj *obj;
 {
     obj->in_use = TRUE;	/* in case losehp() is fatal */
-    Your("%s vibrates violently, and explodes!",xname(obj));
+    pline("%s vibrates violently, and explodes!", Yname2(obj));
     nhbell();
     losehp(rnd(2*(u.uhpmax+1)/3), "exploding wand", KILLED_BY_AN);
     useup(obj);
