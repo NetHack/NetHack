@@ -33,62 +33,6 @@ static struct stat hbuf;
 static int NDECL(eraseoldlocks);
 #endif
 
-void
-gethdate(name)
-char *name;
-{
-# ifdef WANT_GETHDATE
-#if 0
-/* old version - for people short of space */
-
-register char *np;
-      if(stat(name, &hbuf))
-	      error("Cannot get status of %s.",
-		      (np = rindex(name, '/')) ? np+1 : name);
-#endif
-/* version using PATH from: seismo!gregc@ucsf-cgl.ARPA (Greg Couch) */
-
-/*
- * The problem with   #include  <sys/param.h> is that this include file
- * does not exist on all systems, and moreover, that it sometimes includes
- * <sys/types.h> again, so that the compiler sees these typedefs twice.
- */
-#define	 MAXPATHLEN      1024
-
-    register char *np, *path;
-    char filename[MAXPATHLEN+1], *getenv();
-    int pathlen;
-
-    if (index(name, '/') != (char *)0 || (path = getenv("PATH")) == (char *)0)
-	path = "";
-
-    for (;;) {
-	if ((np = index(path, ':')) == (char *)0)
-	    np = path + strlen(path);       /* point to end str */
-	pathlen = np - path;
-	if (pathlen > MAXPATHLEN)
-	    pathlen = MAXPATHLEN;
-	if (pathlen <= 1) {		     /* %% */
-	    (void) strncpy(filename, name, MAXPATHLEN);
-	} else {
-	    (void) strncpy(filename, path, pathlen);
-	    filename[pathlen] = '/';
-	    (void) strncpy(filename + pathlen + 1, name,
-				(MAXPATHLEN - 1) - pathlen);
-	}
-	filename[MAXPATHLEN] = '\0';
-	if (stat(filename, &hbuf) == 0)
-	    return;
-	if (*np == '\0')
-	path = "";
-	path = np + 1;
-    }
-    if (strlen(name) > BUFSZ/2)
-	name = name + strlen(name) - BUFSZ/2;
-    error("Cannot get status of %s.", (np = rindex(name, '/')) ? np+1 : name);
-# endif /* WANT_GETHDATE */
-}
-
 #if 0
 int
 uptodate(fd)

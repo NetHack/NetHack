@@ -18,7 +18,7 @@
 
 #ifdef GETRES_SUPPORT
 
-#if defined(LINUX)
+# if defined(LINUX)
 
 static _syscall3(int, getresuid, unsigned short *, ruid, \
   unsigned short *, euid, unsigned short *, suid)
@@ -55,9 +55,10 @@ gid_t *rgid, *egid, *sgid;
     return retval;
 }
 
-#elif defined(BSD) || defined(SVR4)
+# else
+#  if defined(BSD) || defined(SVR4)
 
-#ifdef SYS_getresuid
+#   ifdef SYS_getresuid
 
 static int
 real_getresuid(ruid, euid, suid)
@@ -66,7 +67,7 @@ uid_t *ruid, *euid, *suid;
     return syscall(SYS_getresuid, ruid, euid, suid);
 }
 
-#else	/* SYS_getresuid */
+#   else	/* SYS_getresuid */
 
 static int
 real_getresuid(ruid, euid, suid)
@@ -88,9 +89,9 @@ uid_t *ruid, *euid, *suid;
     return retval;
 }
 
-#endif	/* SYS_getresuid */
+#   endif	/* SYS_getresuid */
 
-#ifdef SYS_getresgid
+#   ifdef SYS_getresgid
 
 static int
 real_getresgid(rgid, egid, sgid)
@@ -99,7 +100,7 @@ gid_t *rgid, *egid, *sgid;
     return syscall(SYS_getresgid, rgid, egid, sgid);
 }
 
-#else	/* SYS_getresgid */
+#   else	/* SYS_getresgid */
 
 static int
 real_getresgid(rgid, egid, sgid)
@@ -121,8 +122,9 @@ gid_t *rgid, *egid, *sgid;
     return retval;
 }
 
-#endif	/* SYS_getresgid */
-#endif	/* LINUX || BSD || SVR4 */
+#   endif	/* SYS_getresgid */
+#  endif	/* BSD || SVR4 */
+# endif		/* LINUX */
 
 static unsigned int hiding_privileges = 0;
 
@@ -199,11 +201,13 @@ nh_getegid()
 
 #else	/* GETRES_SUPPORT */
 
+# ifdef GNOME_GRAPHICS 
 int
 hide_privileges(flag)
 boolean flag;
 {
     return 0;
 }
+# endif
 
 #endif	/* GETRES_SUPPORT */

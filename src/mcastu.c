@@ -507,7 +507,7 @@ int spellnum;
 	destroy_item(SCROLL_CLASS, AD_FIRE);
 	destroy_item(POTION_CLASS, AD_FIRE);
 	destroy_item(SPBOOK_CLASS, AD_FIRE);
-	burn_floor_paper(u.ux, u.uy, TRUE, FALSE);
+	(void) burn_floor_paper(u.ux, u.uy, TRUE, FALSE);
 	break;
     case CLC_LIGHTNING:
     {

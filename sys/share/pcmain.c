@@ -231,8 +231,7 @@ char *argv[];
 	u.ux = 0;	/* prevent flush_screen() */
 
 	/* chdir shouldn't be called before this point to keep the
-	 * code parallel to other ports which call gethdate just
-	 * before here.
+	 * code parallel to other ports.
 	 */
 #ifdef CHDIR
 	chdirx(hackdir,1);

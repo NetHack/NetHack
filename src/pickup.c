@@ -2133,9 +2133,7 @@ boolean put_in;
     menu_item *pick_list;
     int mflags, res;
     long count;
-    boolean all_blessed, all_cursed, all_uncursed, all_buc_unknown;
 
-    all_blessed = all_cursed = all_uncursed = all_buc_unknown = FALSE;
     if (retry) {
 	all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {

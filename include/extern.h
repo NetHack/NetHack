@@ -1406,7 +1406,6 @@ E void FDECL(msleep, (unsigned));
 /* ### pcunix.c ### */
 
 #if defined(MICRO)
-E void FDECL(gethdate, (char *));
 E void FDECL(regularize, (char *));
 #endif /* MICRO */
 #if defined(PC_LOCKING)
@@ -2012,7 +2011,6 @@ E void VDECL(error, (const char *,...)) PRINTF_F(1,2);
 /* ### unixunix.c ### */
 
 #ifdef UNIX
-E void FDECL(gethdate, (const char *));
 E void NDECL(getlock);
 E void FDECL(regularize, (char *));
 # ifdef SHELL
@@ -2026,7 +2024,9 @@ E int FDECL(child, (int));
 /* ### unixres.c ### */
 
 #ifdef UNIX
+# ifdef GNOME_GRAPHICS 
 E int FDECL(hide_privileges, (BOOLEAN_P));
+# endif
 #endif /* UNIX */
 
 /* ### vault.c ### */

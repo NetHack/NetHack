@@ -469,7 +469,7 @@ register struct obj *obj;
 			char buf[BUFSZ];
 
 			/* doname can call s_suffix, reusing its buffer */
-			strcpy(buf, s_suffix(mon_nam(u.ustuck)));
+			Strcpy(buf, s_suffix(mon_nam(u.ustuck)));
 			You("drop %s into %s %s.", doname(obj), buf,
 				mbodypart(u.ustuck, STOMACH));
 		}

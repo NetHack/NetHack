@@ -960,11 +960,11 @@ dogaze()
 			    dmg = 0;
 			}
 			if((int) u.ulevel > rn2(20))
-			    destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
+			    (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
 			if((int) u.ulevel > rn2(20))
-			    destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
+			    (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
 			if((int) u.ulevel > rn2(25))
-			    destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
+			    (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
 			if (dmg && !DEADMONSTER(mtmp)) mtmp->mhp -= dmg;
 			if (mtmp->mhp <= 0) killed(mtmp);
 		    }

@@ -1860,6 +1860,7 @@ struct obj *otmp;
 	    case WAX:
 		color = "waxy";
 		goto see_streaks;	/* okay even if not touchstone */
+		/*NOTREACHED*/
 		break;
 	    case CLOTH:
 		pline_The("stone looks a little more polished now.");
@@ -1867,6 +1868,7 @@ struct obj *otmp;
 	    case WOOD:
 		color = "wooden";
 		goto see_streaks;	/* okay even if not touchstone */
+		/*NOTREACHED*/
 		break;
 	    }
 	    return;

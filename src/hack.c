@@ -550,7 +550,7 @@ boolean test_only;
 		   uwep && is_pick(uwep)) {
 	/* MRKR: Automatic digging when wielding the appropriate tool */
 	    if (!test_only)
-		use_pick_axe2(uwep);
+		(void) use_pick_axe2(uwep);
 	    return FALSE;
 	} else {
 	    if ( !test_only ) {
@@ -668,9 +668,9 @@ static void findtravelpath()
 	xchar travelstepy[2][COLNO*ROWNO];
 	int n=1;
 	int set=0;
-	int d=1;
+	int dia=1;
 
-	memset(travel,0,sizeof(travel));
+	(void) memset(travel,0,sizeof(travel));
 
 	travelstepx[0][0] = u.tx;
 	travelstepy[0][0] = u.ty;
@@ -699,7 +699,7 @@ static void findtravelpath()
 			    if ( !travel[nx][ny] ) {
 				travelstepx[1-set][nn]=nx;
 				travelstepy[1-set][nn]=ny;
-				travel[nx][ny]=d;
+				travel[nx][ny]=dia;
 				nn++;
 			    }
 			}
@@ -708,7 +708,7 @@ static void findtravelpath()
 	    }
 	    n = nn;
 	    set = 1-set;
-	    d++;
+	    dia++;
 	}
 
 	/* give up */

@@ -248,7 +248,8 @@ register int nux,nuy;
 
 		/* this should only drag the chain (and never give a near-
 		   capacity message) since we already checked ball distance */
-		drag_ball(u.ux, u.uy, &bc_control, &ballx, &bally, &chainx, &chainy, &cause_delay);
+		(void) drag_ball(u.ux, u.uy, &bc_control, &ballx, &bally,
+					&chainx, &chainy, &cause_delay);
 		move_bc(0, bc_control, ballx, bally, chainx, chainy);
 	    } else
 		 placebc();

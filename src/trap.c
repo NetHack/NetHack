@@ -2316,6 +2316,7 @@ xchar x, y;
 	    switch (obj->otyp) {
 	    case ICE_BOX:
 		continue;		/* Immune */
+		/*NOTREACHED*/
 		break;
 	    case CHEST:
 		chance = 40;

@@ -2373,7 +2373,6 @@ boolean setinitial,setfromfile;
 	retval = TRUE;
     } else if (!strcmp("disclose", optname)) {
 	int pick_cnt, pick_idx, opt_idx;
-	winid tmpwin;
 	menu_item *disclosure_category_pick = (menu_item *)0;
 	/*
 	 * The order of disclose_names[]

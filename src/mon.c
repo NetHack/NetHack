@@ -383,7 +383,8 @@ register struct monst *mtmp;
 		    pline("%s burns slightly.", Monnam(mtmp));
 	    }
 	    if (mtmp->mhp > 0) {
-		fire_damage(mtmp->minvent, FALSE, FALSE, mtmp->mx, mtmp->my);
+		(void) fire_damage(mtmp->minvent, FALSE, FALSE,
+						mtmp->mx, mtmp->my);
 		rloc(mtmp);
 		return 0;
 	    }
@@ -1395,16 +1396,16 @@ register struct monst *mtmp;
 
 /* TRUE if corpse might be dropped, magr may die if mon was swallowed */
 boolean
-corpse_chance(mon, magr, swallowed)
+corpse_chance(mon, magr, was_swallowed)
 struct monst *mon;
 struct monst *magr;			/* killer, if swallowed */
-boolean swallowed;			/* digestion */
+boolean was_swallowed;			/* digestion */
 {
 	struct permonst *mdat = mon->data;
 	int i, tmp;
 
 	if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
-	    if (cansee(mon->mx, mon->my) && !swallowed)
+	    if (cansee(mon->mx, mon->my) && !was_swallowed)
 		pline("%s body crumbles into dust.", s_suffix(Monnam(mon)));
 	    return FALSE;
 	}
@@ -1419,7 +1420,7 @@ boolean swallowed;			/* digestion */
 	    	    tmp = d((int)mdat->mlevel+1, (int)mdat->mattk[i].damd);
 	    	else tmp = 0;
 		if (Half_physical_damage) tmp = (tmp+1) / 2;
-		if (swallowed && magr) {
+		if (was_swallowed && magr) {
 		    if (magr == &youmonst) {
 			There("is an explosion in your %s!",
 			      body_part(STOMACH));
