@@ -283,10 +283,13 @@ moveloop()
 
 		    /* when immobile, count is in turns */
 		    if(multi < 0) {
-			if (++multi == 0)	/* finished yet? */
+			if (++multi == 0) {	/* finished yet? */
 			    unmul((char *)0);
+			    /* if unmul caused a level change, take it now */
+			    if (u.utotype) deferred_goto();
+			}
 		    }
-		}			
+		}
 	    } while (youmonst.movement<NORMAL_SPEED); /* hero can't move loop */
 
 	    /******************************************/
