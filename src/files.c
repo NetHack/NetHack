@@ -716,7 +716,7 @@ d_level *lev;
 #endif
 #ifdef WIZARD
 	if (wizard && ret != 0)
-		pline("couldn't rename %s to %s", tempname, fq_bones);
+		pline("couldn't rename %s to %s.", tempname, fq_bones);
 #endif
 }
 

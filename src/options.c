@@ -1031,7 +1031,7 @@ boolean tinitial, tfrom_file;
 			    preferred_pet = 'n';
 			    break;
 			default:
-			    pline("Unrecognized pet type '%s'", op);
+			    pline("Unrecognized pet type '%s'.", op);
 			    break;
 		    }
 		} else if (negated) preferred_pet = 'n';
@@ -2188,7 +2188,7 @@ add_menu_cmd_alias(from_ch, to_ch)
     char from_ch, to_ch;
 {
     if (n_menu_mapped >= MAX_MENU_MAPPED_CMDS)
-	pline("out of menu map space");
+	pline("out of menu map space.");
     else {
 	mapped_menu_cmds[n_menu_mapped] = from_ch;
 	mapped_menu_op[n_menu_mapped] = to_ch;

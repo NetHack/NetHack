@@ -1035,7 +1035,7 @@ int lev;
 	}
 # ifdef WIZARD
 	if (wizard) {
-		pline("Swapping in `%s'", from);
+		pline("Swapping in `%s'.", from);
 		wait_synch();
 	}
 # endif
