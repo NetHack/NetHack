@@ -219,7 +219,7 @@ getlock()
 # if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 		chdirx(orgdir, 0);
 # endif
-		error("%s", "");
+		error("%s", "Cannot start a new game.");
 	}
 
 gotlock:
