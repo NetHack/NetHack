@@ -58,7 +58,6 @@
  *  X11 player selection fixes, one of which could be fatal
  *  Eliminated a gold-in-shop-container cheat
  *  Include bones file version compatibility info in options file
- *  Synchronize save files and compression algorithms among various Mac ports
  */
 
 /*  Patch 2, August 30, 2003
