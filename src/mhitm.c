@@ -765,10 +765,12 @@ mdamagem(magr, mdef, mattk)
 							0 : MM_AGR_DIED));
 		}
 		hurtmarmor(mdef, AD_RUST);
+		mdef->mstrategy &= ~STRAT_WAITFORU;
 		tmp = 0;
 		break;
 	    case AD_CORR:
 		hurtmarmor(mdef, AD_CORR);
+		mdef->mstrategy &= ~STRAT_WAITFORU;
 		tmp = 0;
 		break;
 	    case AD_DCAY:
@@ -783,6 +785,7 @@ mdamagem(magr, mdef, mattk)
 							0 : MM_AGR_DIED));
 		}
 		hurtmarmor(mdef, AD_DCAY);
+		mdef->mstrategy &= ~STRAT_WAITFORU;
 		tmp = 0;
 		break;
 	    case AD_STON:
@@ -811,6 +814,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		    /* save the name before monster teleports, otherwise
 		       we'll get "it" in the suddenly disappears message */
 		    if (vis) Strcpy(mdef_Monnam, Monnam(mdef));
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		    rloc(mdef);
 		    if (vis && !canspotmon(mdef)
 #ifdef STEED
@@ -827,6 +831,7 @@ label2:			if (mdef->mhp > 0) return 0;
 			Strcpy(buf, Monnam(mdef));
 			pline("%s is put to sleep by %s.", buf, mon_nam(magr));
 		    }
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		    slept_monst(mdef);
 		}
 		break;
@@ -838,6 +843,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		    }
 		    mdef->mcanmove = 0;
 		    mdef->mfrozen = rnd(10);
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		}
 		break;
 	    case AD_SLOW:
@@ -845,6 +851,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		    unsigned int oldspeed = mdef->mspeed;
 
 		    mon_adjust_speed(mdef, -1, (struct obj *)0);
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		    if (mdef->mspeed != oldspeed && vis)
 			pline("%s slows down.", Monnam(mdef));
 		}
@@ -857,6 +864,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		if (!magr->mcan && !mdef->mconf && !magr->mspec_used) {
 		    if (vis) pline("%s looks confused.", Monnam(mdef));
 		    mdef->mconf = 1;
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		}
 		break;
 	    case AD_BLND:
@@ -869,6 +877,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		    if ((rnd_tmp += mdef->mblinded) > 127) rnd_tmp = 127;
 		    mdef->mblinded = rnd_tmp;
 		    mdef->mcansee = 0;
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		}
 		tmp = 0;
 		break;
@@ -877,6 +886,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		    if (vis) pline("%s looks %sconfused.",
 				    Monnam(mdef), mdef->mconf ? "more " : "");
 		    mdef->mconf = 1;
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		}
 		tmp = 0;
 		break;
@@ -884,6 +894,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		if (!night() && (pa == &mons[PM_GREMLIN])) break;
 		if (!magr->mcan && !rn2(10)) {
 		    mdef->mcan = 1;	/* cancelled regardless of lifesave */
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		    if (is_were(pd) && pd->mlet != S_HUMAN)
 			were_change(mdef);
 		    if (pd == &mons[PM_CLAY_GOLEM]) {
@@ -926,6 +937,7 @@ label2:			if (mdef->mhp > 0) return 0;
 		    add_to_minv(magr, gold);
                 }
 #endif
+		mdef->mstrategy &= ~STRAT_WAITFORU;
 		if (vis) {
 		    Strcpy(buf, Monnam(magr));
 		    pline("%s steals some gold from %s.", buf, mon_nam(mdef));
@@ -991,6 +1003,7 @@ label2:			if (mdef->mhp > 0) return 0;
 				    onambuf, mdefnambuf);
 			}
 			possibly_unwield(mdef);
+			mdef->mstrategy &= ~STRAT_WAITFORU;
 			mselftouch(mdef, (const char *)0, FALSE);
 			if (mdef->mhp <= 0)
 				return (MM_DEF_DIED | (grow_up(magr,mdef) ?
@@ -1061,6 +1074,7 @@ label2:			if (mdef->mhp > 0) return 0;
 	    			mdef->data != &mons[PM_GREEN_SLIME]) {
 	    	    if (vis) pline("%s turns into slime.", Monnam(mdef));
 	    	    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE);
+		    mdef->mstrategy &= ~STRAT_WAITFORU;
 	    	    tmp = 0;
 	    	}
 	    	break;
