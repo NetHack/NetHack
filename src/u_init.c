@@ -583,7 +583,7 @@ u_init()
 			aligns[flags.initalign].value;
 	u.ulycn = NON_PM;
 
-#ifdef BSD
+#if defined(BSD) && !defined(POSIX_TYPES)
 	(void) time((long *)&u.ubirthday);
 #else
 	(void) time(&u.ubirthday);

@@ -19,7 +19,7 @@
  */
 
 /* define exactly one of the following four choices */
-/* #define BSD 1 */	/* define for 4.n BSD  */
+/* #define BSD 1 */	/* define for 4.n/Free/Open/Net BSD  */
 			/* also for relatives like SunOS 4.x, DG/UX, and */
 			/* older versions of Linux */
 /* #define ULTRIX */	/* define for Ultrix v3.0 or higher (but not lower) */
@@ -171,11 +171,15 @@
 #  ifdef AMS
 #define AMS_MAILBOX	"/Mailbox"
 #  else
+#   if defined(__FreeBSD__) || defined(__OpenBSD__)
+#define DEF_MAILREADER	"/usr/bin/mail"
+#   else
 #define DEF_MAILREADER	"/usr/ucb/Mail"
+#   endif
 #  endif
 #else
 # if (defined(SYSV) || defined(DGUX) || defined(HPUX)) && !defined(LINUX)
-#  if defined(M_XENIX) || defined(__FreeBSD__)
+#  if defined(M_XENIX)
 #define DEF_MAILREADER	"/usr/bin/mail"
 #  else
 #   ifdef __sgi

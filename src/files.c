@@ -930,6 +930,7 @@ restore_saved_game()
 	return fd;
 }
 
+#if defined(UNIX) && defined(QT_GRAPHICS)
 /*ARGSUSED*/
 static char*
 plname_from_file(filename)
@@ -982,6 +983,7 @@ const char* filename;
     }
 #endif
 }
+#endif /* defined(UNIX) && defined(QT_GRAPHICS) */
 
 char**
 get_saved_games()

@@ -35,7 +35,7 @@ int fd;
 #ifndef INSURANCE
 	if(buf.st_size != sizeof(int)) return(0);	/* not an xlock file */
 #endif
-#ifdef BSD
+#if defined(BSD) && !defined(POSIX_TYPES)
 	(void) time((long *)(&date));
 #else
 	(void) time(&date);
