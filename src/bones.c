@@ -194,6 +194,7 @@ struct obj *corpse;
 	struct permonst *mptr;
 	struct fruit *f;
 	char c, *bonesid;
+	char whynot[BUFSZ];
 
 	/* caller has already checked `can_make_bones()' */
 
@@ -308,12 +309,16 @@ struct obj *corpse;
 	    levl[x][y].glyph = cmap_to_glyph(S_stone);
 	}
 
-	fd = create_bonesfile(&u.uz, &bonesid);
+	fd = create_bonesfile(&u.uz, &bonesid, whynot);
 	if(fd < 0) {
 #ifdef WIZARD
 		if(wizard)
-			pline("Cannot create bones file - create failed");
+			pline("%s", whynot);
 #endif
+		/* bones file creation problems are silent to the player.
+		 * Keep it that way, but place a clue into the paniclog.
+		 */
+		paniclog("savebones", whynot);
 		return;
 	}
 	c = (char) (strlen(bonesid) + 1);

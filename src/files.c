@@ -633,13 +633,15 @@ set_bonestemp_name()
 }
 
 int
-create_bonesfile(lev, bonesid)
+create_bonesfile(lev, bonesid, errbuf)
 d_level *lev;
 char **bonesid;
+char errbuf[];
 {
 	const char *file;
 	int fd;
 
+	if (errbuf) *errbuf = '\0';
 	*bonesid = set_bonesfile_name(bones, lev);
 	file = set_bonestemp_name();
 	file = fqname(file, BONESPREFIX, 0);
@@ -655,6 +657,12 @@ char **bonesid;
 # else
 	fd = creat(file, FCMASK);
 # endif
+#endif
+	if (fd < 0 && errbuf) /* failure explanation */
+	    Sprintf(errbuf,
+		    "Cannot create bones \"%s\", id %s (errno %d).",
+		    lock, *bonesid, errno);
+
 # if defined(VMS) && !defined(SECURE)
 	/*
 	   Re-protect bones file with world:read+write+execute+delete access.
@@ -666,7 +674,6 @@ char **bonesid;
 	 */
 	(void) chmod(file, FCMASK | 007);  /* allow other users full access */
 # endif /* VMS && !SECURE */
-#endif /* MICRO || WIN32*/
 
 	return fd;
 }
