@@ -58,7 +58,7 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 
 /* A variable set in use_container(), to be used by the callback routines  */
 /* in_container() and out_container() from askchain() and use_container(). */
-/* Also used by doapply(apply.c).					   */
+/* Also used by menu_loot().  And by doapply(apply.c).			   */
 struct obj *current_container;
 #define Icebox (current_container->otyp == ICE_BOX)
 
