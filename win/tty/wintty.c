@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wintty.c	3.4	2002/02/05	*/
+/*	SCCS Id: @(#)wintty.c	3.4	2002/08/04	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -678,6 +678,9 @@ tty_askname()
 	while((c = tty_nhgetch()) != '\n') {
 		if(c == EOF) error("End of input\n");
 		if (c == '\033') { ct = 0; break; }  /* continue outer loop */
+#if defined(WIN32CON)
+		if (c == '\003') bail("^C abort.\n");
+#endif
 		/* some people get confused when their erase char is not ^H */
 		if (c == '\b' || c == '\177') {
 			if(ct) {
