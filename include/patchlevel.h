@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2002/12/29	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2003/02/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -40,11 +40,12 @@
 /*****************************************************************************/
 /* Version 3.4.x */
 
-/*  Patch 1, ?????, 2003
+/*  Patch 1, February 22, 2003
  *  Fix a few fatal errors including one for reentering shops, one
- *     involving land mines and boulders/statues, and one for delayed
- *     polymorph
- *  Dozens of general bug fixes
+ *     involving land mines and boulders/statues, one for delayed
+ *     polymorph, and one from a chest trap exploding ball and chain
+ *  Fix a buffer overflow that could lead to security problems
+ *  Hundreds of general bug fixes
  *  Several message and other glitches corrected
  *  Travel command adjustments and ability to disable travel command
  *  message recall window extensions (by Christian Cooper)
