@@ -54,6 +54,7 @@ grammar fixes for applying stethoscope to corpses and statues
 player polymorphed as a ceiling hider cannot reach the floor, but
 	automatically unhide on #sit
 trappers do not hide on the ceiling
+non-magical whistles do not work underwater
 
 
 Platform- and/or Interface-Specific Fixes

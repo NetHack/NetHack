@@ -389,8 +389,12 @@ STATIC_OVL void
 use_whistle(obj)
 struct obj *obj;
 {
-	You(whistle_str, obj->cursed ? "shrill" : "high");
-	wake_nearby();
+	if(Underwater) {
+	    You("blow bubbles through %s.", yname(obj));
+	} else {
+	    You(whistle_str, obj->cursed ? "shrill" : "high");
+	    wake_nearby();
+	}
 }
 
 STATIC_OVL void
@@ -399,12 +403,15 @@ struct obj *obj;
 {
 	register struct monst *mtmp, *nextmon;
 
+	/* it's magic!  it works underwater too (at a higher pitch) */
 	if(obj->cursed && !rn2(2)) {
-		You("produce a high-pitched humming noise.");
+		You("produce a %shigh-pitched humming noise.",
+		    Underwater ? "very " : "");
 		wake_nearby();
 	} else {
 		int pet_cnt = 0;
-		You(whistle_str, Hallucination ? "normal" : "strange");
+		You(whistle_str, Hallucination ? "normal" :
+		    Underwater ? "strange, high-pitched" : "strange");
 		for(mtmp = fmon; mtmp; mtmp = nextmon) {
 		    nextmon = mtmp->nmon; /* trap might kill mon */
 		    if (DEADMONSTER(mtmp)) continue;
