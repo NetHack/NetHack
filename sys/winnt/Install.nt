@@ -1,10 +1,10 @@
          Copyright (c) NetHack Development Team 1990-2002
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
-                    Instructions for compiling and installing
-                 NetHack 3.4 on a Windows NT, 2000, or XP system
+                 Instructions for compiling and installing
+             NetHack 3.4 on a Windows 9x, Me, NT, 2000, or XP system
          ==============================================================
-		      Last revision: March 24, 2002
+		      Last revision: March 29, 2002
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -13,14 +13,9 @@ Credit for the Win32 Graphical version of NetHack (aka
 "NetHack for Windows" or Nethackw) goes to Alex Kompel who initially 
 developed and contributed the port.
 
-The PC Windows porting team consisting of Michael Allison, Dave Cohrs, 
-Alex Kompel, Yitzhak Sapir, and Janet Walz integrated the tty version 
-and the graphical version into the NetHack 3.4.1 sources.  Just as
-the release of NetHack 3.4.1 was being prepared, Dion Nicolaas submitted 
-an entire win32 port of his own to the NetHack Development Team. Dion was
-subsequently invited to join the PC Windows porting team where he could 
-continue to contribute to the win32 port, and that invitation was accepted.
-
+The PC Windows porting team consisting of Michael Allison, David Cohrs, 
+Alex Kompel, Dion Nicolaas, Yitzhak Sapir, and Janet Walz maintained the 
+tty and graphical win32 versions of NetHack 3.4.1.
 
 You can build either the TTY version of NetHack or the Windows Graphical 
 version.  In either case you can use one of the following build
@@ -466,7 +461,7 @@ Running NetHack
     "c:\nethack\binary\nethackw.exe" (specifying whatever drive 
     and directory your NetHack executable resides in) each time.
 
-    b) Running from a Windows shortcut (win95 or NT4.x)
+    b) Running from a Windows shortcut
 
     If you will be running it by launching it from program manager
     or from a shortcut, just use the following information when 

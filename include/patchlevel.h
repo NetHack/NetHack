@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2002/03/28	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2002/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,16 +42,9 @@
 
 /*  Patch 1, March 31, 2002
  *  Fix a fatal error involving land mines and boulders/statues
- *  Several message glitches corrected
- *  Restore bumping into closed doors while impaired
- *  Fix iron ball cases that could put the chain in solid rock
- *  A few glitches around gas spore explosions are corrected
- *  Sunsword should extinguish if monster wielding it dies
- *  Wizard will harass post-invocation even if you haven't kill him yet
- *  non-square tile support for X11 and Gnome
- *  win32: ensure error messages are delivered during game startup
- *  win32: some cosmetic corrections and one crash fix from window sizing
- *  win32: filter any punctuation characters from "Who are you" response
+ *  Several message and other glitches corrected 
+ *  win32: some interface improvements
+ *  unix: improved tile support
  */
 
 /*
