@@ -717,6 +717,10 @@ mon_tele:
 			pline("%s %s into a %s!", Monnam(mtmp),
 			makeplural(locomotion(mtmp->data, "jump")),
 			t->ttyp == TRAPDOOR ? "trap door" : "hole");
+			if (levl[trapx][trapy].typ == SCORR) {
+			    levl[trapx][trapy].typ = CORR;
+			    unblock_point(trapx, trapy);
+			}
 			seetrap(t_at(trapx,trapy));
 		}
 
@@ -803,6 +807,10 @@ mon_tele:
 		if (vis) {
 			pline("%s %s onto a teleport trap!", Monnam(mtmp),
 				makeplural(locomotion(mtmp->data, "jump")));
+			if (levl[trapx][trapy].typ == SCORR) {
+			    levl[trapx][trapy].typ = CORR;
+			    unblock_point(trapx, trapy);
+			}
 			seetrap(t_at(trapx,trapy));
 		}
 		/*  don't use rloc_to() because worm tails must "move" */
