@@ -417,7 +417,7 @@ fixup_special()
 	croom = &rooms[0]; /* only one room on the medusa level */
 	for (tryct = rnd(4); tryct; tryct--) {
 	    x = somex(croom); y = somey(croom);
-	    if (goodpos(x, y, (struct monst *)0)) {
+	    if (goodpos(x, y, (struct monst *)0, 0)) {
 		otmp = mk_tt_object(STATUE, x, y);
 		while (otmp && (poly_when_stoned(&mons[otmp->corpsenm]) ||
 				pm_resistance(&mons[otmp->corpsenm],MR_STONE))) {

@@ -613,7 +613,7 @@ place_worm_tail_randomly(worm, x, y)
 
 	do {
 	    random_dir(ox, oy, &nx, &ny);
-	} while (!goodpos(nx, ny, worm) && (tryct++ < 50));
+	} while (!goodpos(nx, ny, worm, 0) && (tryct++ < 50));
 
 	if (tryct < 50)  {
 	    place_worm_seg(worm, nx, ny);

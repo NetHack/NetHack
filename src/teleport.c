@@ -18,11 +18,13 @@ STATIC_DCL void FDECL(mvault_tele, (struct monst *));
  * call it to generate new monster positions with fake monster structures.
  */
 boolean
-goodpos(x, y, mtmp)
+goodpos(x, y, mtmp, gpflags)
 int x,y;
 struct monst *mtmp;
+unsigned gpflags;
 {
 	struct permonst *mdat = NULL;
+	boolean ignorewater = ((gpflags & MM_IGNOREWATER) != 0);
 
 	if (!isok(x, y)) return FALSE;
 
@@ -56,13 +58,13 @@ struct monst *mtmp;
 		return FALSE;
 
 	    mdat = mtmp->data;
-	    if (is_pool(x,y)) {
+	    if (is_pool(x,y) && !ignorewater) {
 		if (mtmp == &youmonst)
 			return !!(HLevitation || Flying || Wwalking ||
 					Swimming || Amphibious);
 		else	return (is_flyer(mdat) || is_swimmer(mdat) ||
 							is_clinger(mdat));
-	    } else if (mdat->mlet == S_EEL && rn2(13)) {
+	    } else if (mdat->mlet == S_EEL && rn2(13) && !ignorewater) {
 		return FALSE;
 	    } else if (is_lava(x,y)) {
 		if (mtmp == &youmonst)
@@ -72,7 +74,10 @@ struct monst *mtmp;
 	    }
 	    if (passes_walls(mdat) && may_passwall(x,y)) return TRUE;
 	}
-	if (!ACCESSIBLE(levl[x][y].typ)) return FALSE;
+	if (!ACCESSIBLE(levl[x][y].typ)) {
+		if (!(is_pool(x,y) && ignorewater)) return FALSE;
+	}
+
 	if (closed_door(x, y) && (!mdat || !amorphous(mdat)))
 		return FALSE;
 	if (sobj_at(BOULDER, x, y) && (!mdat || !throws_rocks(mdat)))
@@ -93,6 +98,16 @@ enexto(cc, xx, yy, mdat)
 coord *cc;
 register xchar xx, yy;
 struct permonst *mdat;
+{
+	return enexto_core(cc, xx, yy, mdat, 0);
+}
+
+boolean
+enexto_core(cc, xx, yy, mdat, entflags)
+coord *cc;
+register xchar xx, yy;
+struct permonst *mdat;
+unsigned entflags;
 {
 #define MAX_GOOD 15
     coord good[MAX_GOOD], *good_ptr;
@@ -121,28 +136,28 @@ struct permonst *mdat;
 	ymax = min(ROWNO-1, yy+range);
 
 	for (x = xmin; x <= xmax; x++)
-	    if (goodpos(x, ymin, &fakemon)) {
+	    if (goodpos(x, ymin, &fakemon, entflags)) {
 		good_ptr->x = x;
 		good_ptr->y = ymin ;
 		/* beware of accessing beyond segment boundaries.. */
 		if (good_ptr++ == &good[MAX_GOOD-1]) goto full;
 	    }
 	for (x = xmin; x <= xmax; x++)
-	    if (goodpos(x, ymax, &fakemon)) {
+	    if (goodpos(x, ymax, &fakemon, entflags)) {
 		good_ptr->x = x;
 		good_ptr->y = ymax ;
 		/* beware of accessing beyond segment boundaries.. */
 		if (good_ptr++ == &good[MAX_GOOD-1]) goto full;
 	    }
 	for (y = ymin+1; y < ymax; y++)
-	    if (goodpos(xmin, y, &fakemon)) {
+	    if (goodpos(xmin, y, &fakemon, entflags)) {
 		good_ptr->x = xmin;
 		good_ptr-> y = y ;
 		/* beware of accessing beyond segment boundaries.. */
 		if (good_ptr++ == &good[MAX_GOOD-1]) goto full;
 	    }
 	for (y = ymin+1; y < ymax; y++)
-	    if (goodpos(xmax, y, &fakemon)) {
+	    if (goodpos(xmax, y, &fakemon, entflags)) {
 		good_ptr->x = xmax;
 		good_ptr->y = y ;
 		/* beware of accessing beyond segment boundaries.. */
@@ -205,7 +220,7 @@ register int x, y;
 boolean trapok;
 {
 	if (!trapok && t_at(x, y)) return FALSE;
-	if (!goodpos(x, y, &youmonst)) return FALSE;
+	if (!goodpos(x, y, &youmonst, 0)) return FALSE;
 	if (!tele_jump_ok(u.ux, u.uy, x, y)) return FALSE;
 	if (!in_out_region(x, y)) return FALSE;
 	return TRUE;
@@ -826,7 +841,7 @@ struct monst *mtmp;
 {
 	register int xx, yy;
 
-	if (!goodpos(x, y, mtmp)) return FALSE;
+	if (!goodpos(x, y, mtmp, 0)) return FALSE;
 	/*
 	 * Check for restricted areas present in some special levels.
 	 *
@@ -938,7 +953,7 @@ struct monst *mtmp;	/* mx==0 implies migrating monster arrival */
 	    /* if the wiz teleports away to heal, try the up staircase,
 	       to block the player's escaping before he's healed
 	       (deliberately use `goodpos' rather than `rloc_pos_ok' here) */
-	    if (goodpos(x, y, mtmp))
+	    if (goodpos(x, y, mtmp, 0))
 		goto found_xy;
 	}
 
@@ -947,14 +962,14 @@ struct monst *mtmp;	/* mx==0 implies migrating monster arrival */
 	    x = rn1(COLNO-3,2);
 	    y = rn2(ROWNO);
 	    if ((trycount < 500) ? rloc_pos_ok(x, y, mtmp)
-				 : goodpos(x, y, mtmp))
+				 : goodpos(x, y, mtmp, 0))
 		goto found_xy;
 	} while (++trycount < 1000);
 
 	/* last ditch attempt to find a good place */
 	for (x = 2; x < COLNO - 1; x++)
 	    for (y = 0; y < ROWNO; y++)
-		if (goodpos(x, y, mtmp))
+		if (goodpos(x, y, mtmp, 0))
 		    goto found_xy;
 
 	/* level either full of monsters or somehow faulty */
@@ -973,7 +988,7 @@ struct monst *mtmp;
 	coord c;
 
 	if (croom && somexy(croom, &c) &&
-				goodpos(c.x, c.y, mtmp)) {
+				goodpos(c.x, c.y, mtmp, 0)) {
 		rloc_to(mtmp, c.x, c.y);
 		return;
 	}
@@ -1114,7 +1129,7 @@ register struct obj *obj;
 	    tx = rn1(COLNO-3,2);
 	    ty = rn2(ROWNO);
 	    if (!--try_limit) break;
-	} while (!goodpos(tx, ty, (struct monst *)0) ||
+	} while (!goodpos(tx, ty, (struct monst *)0, 0) ||
 		/* bug: this lacks provision for handling the Wizard's tower */
 		 (restricted_fall &&
 		  (!within_bounded_area(tx, ty, dndest.lx, dndest.ly,

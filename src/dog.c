@@ -81,7 +81,7 @@ boolean quietly;
 		}
 	    }
 
-	    mtmp = makemon(pm, x, y, MM_EDOG);
+	    mtmp = makemon(pm, x, y, MM_EDOG|MM_IGNOREWATER);
 	    if (otmp && !mtmp) { /* monster was genocided or square occupied */
 	 	if (!quietly)
 		   pline_The("figurine writhes and then shatters into pieces!");
@@ -90,6 +90,9 @@ boolean quietly;
 	} while (!mtmp && --trycnt > 0);
 
 	if (!mtmp) return (struct monst *)0;
+
+	if (is_pool(mtmp->mx, mtmp->my) && minliquid(mtmp))
+		return (struct monst *)0;
 
 	initedog(mtmp);
 	mtmp->msleeping = 0;

@@ -2737,7 +2737,7 @@ drown()
 	for (i = 0; i < 100; i++) {
 		x = rn1(3,u.ux - 1);
 		y = rn1(3,u.uy - 1);
-		if (goodpos(x, y, &youmonst)) {
+		if (goodpos(x, y, &youmonst, 0)) {
 			crawl_ok = TRUE;
 			goto crawl;
 		}
@@ -2745,7 +2745,7 @@ drown()
 	/* one more scan */
 	for (x = u.ux - 1; x <= u.ux + 1; x++)
 		for (y = u.uy - 1; y <= u.uy + 1; y++)
-			if (goodpos(x, y, &youmonst)) {
+			if (goodpos(x, y, &youmonst, 0)) {
 				crawl_ok = TRUE;
 				goto crawl;
 			}

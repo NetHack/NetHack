@@ -760,16 +760,16 @@ newdogpos:
 		ny = sgn(omy - u.uy);
 		cc.x = u.ux + nx;
 		cc.y = u.uy + ny;
-		if (goodpos(cc.x, cc.y, mtmp)) goto dognext;
+		if (goodpos(cc.x, cc.y, mtmp, 0)) goto dognext;
 
 		i  = xytod(nx, ny);
 		for (j = (i + 7)%8; j < (i + 1)%8; j++) {
 			dtoxy(&cc, j);
-			if (goodpos(cc.x, cc.y, mtmp)) goto dognext;
+			if (goodpos(cc.x, cc.y, mtmp, 0)) goto dognext;
 		}
 		for (j = (i + 6)%8; j < (i + 2)%8; j++) {
 			dtoxy(&cc, j);
-			if (goodpos(cc.x, cc.y, mtmp)) goto dognext;
+			if (goodpos(cc.x, cc.y, mtmp, 0)) goto dognext;
 		}
 		cc.x = mtmp->mx;
 		cc.y = mtmp->my;

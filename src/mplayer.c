@@ -305,7 +305,7 @@ boolean special;
 		do {
 		    x = rn1(COLNO-4, 2);
 		    y = rnd(ROWNO-2);
-		} while(!goodpos(x, y, &fakemon) && tryct++ <= 50);
+		} while(!goodpos(x, y, &fakemon, 0) && tryct++ <= 50);
 
 		/* if pos not found in 50 tries, don't bother to continue */
 		if(tryct > 50) return;

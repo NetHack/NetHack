@@ -47,7 +47,7 @@ const char *msg;
     /* this location might not be safe, if not, move revived monster */
     if (revived) {
 	mtmp = m_at(x,y);
-	if (mtmp && !goodpos(x, y, mtmp) &&
+	if (mtmp && !goodpos(x, y, mtmp, 0) &&
 	    enexto(&cc, x, y, mtmp->data)) {
 	    rloc_to(mtmp, cc.x, cc.y);
 	}

@@ -766,6 +766,7 @@ register int	mmflags;
 	boolean byyou = (x == u.ux && y == u.uy);
 	boolean allow_minvent = ((mmflags & NO_MINVENT) == 0);
 	boolean countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0);
+	unsigned gpflags = (mmflags & MM_IGNOREWATER) ? MM_IGNOREWATER : 0;
 	uchar lim;
 
 	/* if caller wants random location, do it here */
@@ -777,12 +778,12 @@ register int	mmflags;
 		do {
 			x = rn1(COLNO-3,2);
 			y = rn2(ROWNO);
-		} while(!goodpos(x, y, ptr ? &fakemon : (struct monst *)0) ||
+		} while(!goodpos(x, y, ptr ? &fakemon : (struct monst *)0, gpflags) ||
 			(!in_mklev && tryct++ < 50 && cansee(x, y)));
 	} else if (byyou && !in_mklev) {
 		coord bypos;
 
-		if(enexto(&bypos, u.ux, u.uy, ptr)) {
+		if(enexto_core(&bypos, u.ux, u.uy, ptr, gpflags)) {
 			x = bypos.x;
 			y = bypos.y;
 		} else
@@ -819,7 +820,7 @@ register int	mmflags;
 			    return((struct monst *) 0);	/* no more monsters! */
 			}
 			fakemon.data = ptr;	/* set up for goodpos */
-		} while(!goodpos(x, y, &fakemon) && tryct++ < 50);
+		} while(!goodpos(x, y, &fakemon, gpflags) && tryct++ < 50);
 		mndx = monsndx(ptr);
 	}
 	/* if it's unique, don't ever make it again */
