@@ -2008,7 +2008,7 @@ struct monst *mon,	/* monster being split */
 		You("multiply%s!", reason);
 	    }
 	} else {
-	    mtmp2 = clone_mon(mon);
+	    mtmp2 = clone_mon(mon, 0, 0);
 	    if (mtmp2) {
 		mtmp2->mhpmax = mon->mhpmax / 2;
 		mon->mhpmax -= mtmp2->mhpmax;

@@ -655,9 +655,11 @@ register struct	monst	*mtmp;
 #endif
 }
 
+/* Note: for long worms, always call cutworm (cutworm calls clone_mon) */
 struct monst *
-clone_mon(mon)
+clone_mon(mon, x, y)
 struct monst *mon;
+xchar x, y;	/* clone's preferred location or 0 (near mon) */
 {
 	coord mm;
 	struct monst *m2;
@@ -666,10 +668,21 @@ struct monst *mon;
 	if (mon->mhp <= 1 || (mvitals[monsndx(mon->data)].mvflags & G_EXTINCT))
 	    return (struct monst *)0;
 
-	mm.x = mon->mx;
-	mm.y = mon->my;
-	if (!enexto(&mm, mm.x, mm.y, mon->data) || MON_AT(mm.x, mm.y))
-	    return (struct monst *)0;
+	if (x == 0) {
+	    mm.x = mon->mx;
+	    mm.y = mon->my;
+	    if (!enexto(&mm, mm.x, mm.y, mon->data) || MON_AT(mm.x, mm.y))
+		return (struct monst *)0;
+	} else if (!isok(x, y)) {
+	    return (struct monst *)0;	/* paranoia */
+	} else {
+	    mm.x = x;
+	    mm.y = y;
+	    if (MON_AT(mm.x, mm.y)) {
+		if (!enexto(&mm, mm.x, mm.y, mon->data) || MON_AT(mm.x, mm.y))
+		    return (struct monst *)0;
+	    }
+	}
 	m2 = newmonst(0);
 	*m2 = *mon;			/* copy condition of old monster */
 	m2->nmon = fmon;
@@ -708,9 +721,20 @@ struct monst *mon;
 	if (m2->mnamelth) {
 	    m2->mnamelth = 0; /* or it won't get allocated */
 	    m2 = christen_monst(m2, NAME(mon));
+	} else if (mon->isshk) {
+	    m2 = christen_monst(m2, shkname(mon));
 	}
+
+	/* not all clones caused by player are tame or peaceful */
+	if (!context.mon_moving) {
+	    if (mon->mtame)
+		m2->mtame = rn2(max(2 + u.uluck, 2)) ? mon->mtame : 0;
+	    else if (mon->mpeaceful)
+		m2->mpeaceful = rn2(max(2 + u.uluck, 2)) ? 1 : 0;
+	}
+
 	newsym(m2->mx,m2->my);	/* display the new monster */
-	if (mon->mtame) {
+	if (m2->mtame) {
 	    struct monst *m3;
 
 	    if (mon->isminion) {
@@ -733,6 +757,8 @@ struct monst *mon;
 		}
 	    }
 	}
+	set_malign(m2);
+
 	return m2;
 }
 

@@ -280,7 +280,7 @@ mattackm(magr, mdef)
 		       && otmp && objects[otmp->otyp].oc_material == IRON
 		       && mdef->mhp > 1 && !mdef->mcan)
 		    {
-			if (clone_mon(mdef)) {
+			if (clone_mon(mdef, 0, 0)) {
 			    if (vis) {
 				char buf[BUFSZ];
 

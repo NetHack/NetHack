@@ -341,7 +341,7 @@ cutworm(worm, x, y, weap)
     while ( (curr->wx != x) || (curr->wy != y) ) {
 	curr = curr->nseg;
 	if (!curr) {
-	    impossible("cut_worm:  no segment at (%d,%d)", (int) x, (int) y);
+	    impossible("cutworm: no segment at (%d,%d)", (int) x, (int) y);
 	    return;
 	}
     }
@@ -368,26 +368,18 @@ cutworm(worm, x, y, weap)
 
     /* Sometimes the tail end dies. */
     if (rn2(3) || !(new_wnum = get_wormno())) {
-	You("cut part of the tail off of %s.", mon_nam(worm));
+	if (context.mon_moving)
+	    pline("Part of the tail of %s is cut off.", mon_nam(worm));
+	else
+	    You("cut part of the tail off of %s.", mon_nam(worm));
 	toss_wsegs(new_tail, TRUE);
 	if (worm->mhp > 1) worm->mhp /= 2;
 	return;
     }
 
-    /* Create the second worm. */
-    new_worm  = newmonst(0);
-    *new_worm = *worm;			/* make a copy of the old worm */
-    new_worm->m_id = context.ident++;	/* make sure it has a unique id */
+    remove_monster(x, y);		/* clone_mon puts new head here */
+    new_worm = clone_mon(worm, x, y);
     new_worm->wormno = new_wnum;	/* affix new worm number */
-
-    if (worm->mtame)
-	new_worm->mtame = (rn2(max(2 + u.uluck, 2)) ? worm->mtame : 0);
-    else
-	if (worm->mpeaceful)
-	    new_worm->mpeaceful = (rn2(max(2 + u.uluck, 2)) ? 1 : 0);
-    set_malign(new_worm);
-
-    new_worm->mxlth = new_worm->mnamelth = 0;
 
     /* Devalue the monster level of both halves of the worm. */
     worm->m_lev = ((unsigned)worm->m_lev <= 3) ?
@@ -403,14 +395,6 @@ cutworm(worm, x, y, weap)
 	if (worm->mhpmax < worm->mhp) worm->mhp = worm->mhpmax;
     }
 
-    /* Add new monster to mon chain. */
-    new_worm->nmon = fmon;
-    fmon = new_worm;
-
-    /* Initialize the new worm. */
-    place_monster(new_worm, x, y);	/* put worm in level.monsters[][] */
-    newsym(x, y);			/* make sure new worm shows up */
-
     wtails[new_wnum] = new_tail;	/* We've got all the info right now */
     wheads[new_wnum] = curr;		/* so we can do this faster than    */
     wgrowtime[new_wnum] = 0L;		/* trying to call initworm().       */
@@ -418,14 +402,10 @@ cutworm(worm, x, y, weap)
     /* Place the new monster at all the segment locations. */
     place_wsegs(new_worm);
 
-#if 0	/* long worms don't glow in the dark... */
-    if (emits_light(worm->data))
-	new_light_source(new_worm->mx, new_worm->my,
-			 emits_light(worm->data),
-			 LS_MONSTER, (genericptr_t)new_worm);
-#endif
-
-    You("cut %s in half.", mon_nam(worm));
+    if (context.mon_moving)
+	pline("%s is cut in half.", Monnam(worm));
+    else
+	You("cut %s in half.", mon_nam(worm));
 }
 
 

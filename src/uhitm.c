@@ -1007,7 +1007,7 @@ int thrown;
 		   && objects[obj->otyp].oc_material == IRON
 		   && mon->mhp > 1 && !thrown && !mon->mcan
 		   /* && !destroyed  -- guaranteed by mhp > 1 */ ) {
-		if (clone_mon(mon)) {
+		if (clone_mon(mon, 0, 0)) {
 			pline("%s divides as you hit it!", Monnam(mon));
 			hittxt = TRUE;
 		}
