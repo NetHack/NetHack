@@ -40,7 +40,7 @@ struct window_procs mswin_procs = {
 	WC_INVERSE|WC_SCROLL_MARGIN|WC_MAP_MODE|
 	WC_FONT_MESSAGE|WC_FONT_STATUS|WC_FONT_MENU|WC_FONT_TEXT|
 	WC_FONTSIZ_MESSAGE|WC_FONTSIZ_STATUS|WC_FONTSIZ_MENU|WC_FONTSIZ_TEXT|
-	WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE,
+	WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE|WC_VARY_MSGCOUNT,
     mswin_init_nhwindows,
     mswin_player_selection,
     mswin_askname,
@@ -143,6 +143,8 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	if( iflags.wc_tile_width==0 ) iflags.wc_tile_width = TILE_X;
 	if( iflags.wc_tile_height==0 ) iflags.wc_tile_height = TILE_Y;
 
+	if( iflags.wc_vary_msgcount==0 ) iflags.wc_vary_msgcount = 4;
+
 	/* force tabs in menus */
 	iflags.menu_tab_sep = 1;
 
@@ -168,7 +170,8 @@ void mswin_init_nhwindows(int* argc, char** argv)
 		WC_FONTSIZ_MESSAGE | 
 		WC_FONTSIZ_STATUS | 
 		WC_FONTSIZ_MENU | 
-		WC_FONTSIZ_TEXT,
+		WC_FONTSIZ_TEXT |
+		WC_VARY_MSGCOUNT,
 		SET_IN_GAME 
 	);
 
@@ -1178,6 +1181,12 @@ void mswin_preference_update(const char *pref)
 
 	if( stricmp( pref, "align_message")==0 ||
 		stricmp( pref, "align_status")==0 ) {
+		mswin_layout_main_window(NULL);
+		return;
+	}
+
+	if( stricmp( pref, "vary_msgcount")==0 ) {
+		InvalidateRect(mswin_hwnd_from_winid(WIN_MESSAGE), NULL, TRUE);
 		mswin_layout_main_window(NULL);
 		return;
 	}

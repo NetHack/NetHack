@@ -15,7 +15,7 @@
 #define MAX_LOADSTRING 100
 
 typedef struct mswin_nethack_main_window {
-	int dummy;
+	int mapAcsiiModeSave;
 } NHMainWindow, *PNHMainWindow;
 
 static TCHAR szMainWindowClass[] = TEXT("MSNHMainWndClass");
@@ -125,11 +125,18 @@ numpad[KEY_LAST][3] = {
 	{'.', ':', ':'} /* Del */
 };
 
+static const unsigned char alt_commands[] = "acdeijlnNopqrstuvw?2";
+/* original: "acdefijlmnNopqrstuvw?2"; */ 
 
 #define STATEON(x) ((GetKeyState(x) & 0xFFFE) != 0)
 #define KEYTABLE(x) ((iflags.num_pad ? numpad : keypad)[x] \
 [(STATEON(VK_SHIFT) ? 1 : STATEON(VK_CONTROL) ? 2 : 0)])
+
+/* map mode macros */
+#define IS_MAP_FIT_TO_SCREEN(mode) ((mode)==MAP_MODE_ASCII_FIT_TO_SCREEN || \
+							  (mode)==MAP_MODE_TILES_FIT_TO_SCREEN )
   
+#define IS_MAP_ASCII(mode) ((mode)!=MAP_MODE_TILES && (mode)!=MAP_MODE_TILES_FIT_TO_SCREEN)
     
 /*
 //  FUNCTION: WndProc(HWND, unsigned, WORD, LONG)
@@ -147,6 +154,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			data = (PNHMainWindow)malloc(sizeof(NHMainWindow));
 			if( !data ) panic("out of memory");
 			ZeroMemory(data, sizeof(NHMainWindow));
+			data->mapAcsiiModeSave = MAP_MODE_ASCII12x16;
 			SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 
 			GetNHApp()->hMainWnd = hWnd;
@@ -158,11 +166,13 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
         case WM_KEYDOWN: 
 		{
+			data = (PNHMainWindow)GetWindowLong(hWnd, GWL_USERDATA);
+
 			/* translate arrow keys into nethack commands */
             switch (wParam) 
             { 
 			case VK_LEFT:
-				if( GetKeyState(VK_CONTROL)&0x80 ) {
+				if( STATEON(VK_CONTROL) ) {
 					/* scroll map window one line left */
 					SendMessage(
 						mswin_hwnd_from_winid(WIN_MAP),
@@ -176,7 +186,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 
 			case VK_RIGHT:
-				if( GetKeyState(VK_CONTROL)&0x80 ) {
+				if( STATEON(VK_CONTROL) ) {
 					/* scroll map window one line right */
 					SendMessage(
 						mswin_hwnd_from_winid(WIN_MAP),
@@ -190,7 +200,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 
 			case VK_UP:
-				if( GetKeyState(VK_CONTROL)&0x80 ) {
+				if( STATEON(VK_CONTROL) ) {
 					/* scroll map window one line up */
 					SendMessage(
 						mswin_hwnd_from_winid(WIN_MAP),
@@ -204,7 +214,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 
 			case VK_DOWN:
-				if( GetKeyState(VK_CONTROL)&0x80 ) {
+				if( STATEON(VK_CONTROL) ) {
 					/* scroll map window one line down */
 					SendMessage(
 						mswin_hwnd_from_winid(WIN_MAP),
@@ -218,7 +228,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 
 			case VK_HOME:
-				if( GetKeyState(VK_CONTROL)&0x80 ) {
+				if( STATEON(VK_CONTROL) ) {
 					/* scroll map window to upper left corner */
 					SendMessage(
 						mswin_hwnd_from_winid(WIN_MAP),
@@ -239,7 +249,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 
 			case VK_END:
-				if( GetKeyState(VK_CONTROL)&0x80 ) {
+				if( STATEON(VK_CONTROL) ) {
 					/* scroll map window to lower right corner */
 					SendMessage(
 						mswin_hwnd_from_winid(WIN_MAP),
@@ -260,7 +270,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 
 			case VK_PRIOR:
-				if( GetKeyState(VK_CONTROL)&0x80 ) {
+				if( STATEON(VK_CONTROL) ) {
 					/* scroll map window one page up */
 					SendMessage(
 						mswin_hwnd_from_winid(WIN_MAP),
@@ -274,7 +284,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 
 			case VK_NEXT:
-				if( GetKeyState(VK_CONTROL)&0x80 ) {
+				if( STATEON(VK_CONTROL) ) {
 					/* scroll map window one page down */
 					SendMessage(
 						mswin_hwnd_from_winid(WIN_MAP),
@@ -305,12 +315,36 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				NHEVENT_KBD(KEYTABLE(KEY_PLUS));
 			return 0;
 
-			case VK_F3:
-				mswin_select_map_mode(MAP_MODE_TILES);
+			case VK_F4:
+				if( IS_MAP_FIT_TO_SCREEN(iflags.wc_map_mode) ) {
+					mswin_select_map_mode(
+						IS_MAP_ASCII(iflags.wc_map_mode)? 
+							data->mapAcsiiModeSave :
+							MAP_MODE_TILES
+					);
+				} else {
+					mswin_select_map_mode(
+						IS_MAP_ASCII(iflags.wc_map_mode)?
+							MAP_MODE_ASCII_FIT_TO_SCREEN :
+							MAP_MODE_TILES_FIT_TO_SCREEN
+					);
+				}
 			return 0;
 
-			case VK_F4:
-				mswin_select_map_mode(MAP_MODE_ASCII_FIT_TO_SCREEN);
+			case VK_F5:
+				if( IS_MAP_ASCII(iflags.wc_map_mode) ) {
+					if( IS_MAP_FIT_TO_SCREEN(iflags.wc_map_mode) ) {
+						mswin_select_map_mode(MAP_MODE_TILES_FIT_TO_SCREEN);
+					} else {
+						mswin_select_map_mode(MAP_MODE_TILES);
+					}
+				} else {
+					if( IS_MAP_FIT_TO_SCREEN(iflags.wc_map_mode) ) {
+						mswin_select_map_mode(MAP_MODE_ASCII_FIT_TO_SCREEN);
+					} else {
+						mswin_select_map_mode(data->mapAcsiiModeSave);
+					}
+				}
 			return 0;
 
 			default: {
@@ -330,6 +364,25 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			}
 
 			} /* end switch */
+		} break;
+
+        case WM_SYSKEYDOWN:
+		{
+			/* see if this is something we need */
+			WORD c;
+			BYTE kbd_state[256];
+
+			c = 0;
+			ZeroMemory(kbd_state, sizeof(kbd_state));
+			GetKeyboardState(kbd_state);
+
+			if( ToAscii( wParam, (lParam>>16)&0xFF, kbd_state, &c, 0) &&
+				index(alt_commands, c&0xFF) ) {
+				NHEVENT_KBD( M(c&0xFF) );
+				return 0;
+			} else {
+				return DefWindowProc(hWnd, message, wParam, lParam);
+			}
 		} break;
 
 		case WM_COMMAND:
@@ -573,7 +626,9 @@ void mswin_layout_main_window(HWND changed_child)
 LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
+	PNHMainWindow  data;
 
+	data = (PNHMainWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	wmId    = LOWORD(wParam); 
 	wmEvent = HIWORD(wParam); 
 
@@ -602,8 +657,23 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case IDM_MAP_ASCII12X16:
 		case IDM_MAP_ASCII16X12:
 		case IDM_MAP_ASCII10X18:
-		case IDM_MAP_FIT_TO_SCREEN:
 			mswin_select_map_mode(menuid2mapmode(wmId));
+			break;
+
+		case IDM_MAP_FIT_TO_SCREEN:
+			if( IS_MAP_FIT_TO_SCREEN(iflags.wc_map_mode) ) {
+				mswin_select_map_mode(
+					IS_MAP_ASCII(iflags.wc_map_mode)? 
+						data->mapAcsiiModeSave :
+						MAP_MODE_TILES
+				);
+			} else {
+				mswin_select_map_mode(
+					IS_MAP_ASCII(iflags.wc_map_mode)?
+						MAP_MODE_ASCII_FIT_TO_SCREEN :
+						MAP_MODE_TILES_FIT_TO_SCREEN
+				);
+			}
 			break;
 
 		case IDM_HELP_LONG:	
@@ -704,17 +774,42 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void mswin_select_map_mode(int mode)
 {
-	CheckMenuRadioItem(
-		GetMenu(GetNHApp()->hMainWnd), 
-		IDM_MAP_TILES, 
-		IDM_MAP_FIT_TO_SCREEN, 
-		mapmode2menuid(mode), 
-		MF_BYCOMMAND);
-	
+	PNHMainWindow  data;
+	data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
+
 	/* override for Rogue level */
 #ifdef REINCARNATION
-    if( Is_rogue_level(&u.uz) ) return;
+    if( Is_rogue_level(&u.uz) && !IS_MAP_ASCII(mode) ) return;
 #endif
+
+	/* set map mode menu mark */
+	if( IS_MAP_ASCII(mode) ) {
+		CheckMenuRadioItem(
+			GetMenu(GetNHApp()->hMainWnd), 
+			IDM_MAP_TILES, 
+			IDM_MAP_ASCII10X18, 
+			mapmode2menuid( IS_MAP_FIT_TO_SCREEN(mode)? data->mapAcsiiModeSave : mode ), 
+			MF_BYCOMMAND);
+	} else {
+		CheckMenuRadioItem(
+			GetMenu(GetNHApp()->hMainWnd), 
+			IDM_MAP_TILES, 
+			IDM_MAP_ASCII10X18, 
+			mapmode2menuid( MAP_MODE_TILES ), 
+			MF_BYCOMMAND);
+	}
+
+	/* set fit-to-screen mode mark */
+	CheckMenuItem(
+		GetMenu(GetNHApp()->hMainWnd),
+		IDM_MAP_FIT_TO_SCREEN,
+		MF_BYCOMMAND | 
+		(IS_MAP_FIT_TO_SCREEN(mode)? MF_CHECKED : MF_UNCHECKED)
+	);
+
+	if( IS_MAP_ASCII(iflags.wc_map_mode) && !IS_MAP_FIT_TO_SCREEN(iflags.wc_map_mode)) {
+		data->mapAcsiiModeSave = iflags.wc_map_mode;
+	}
 
 	iflags.wc_map_mode = mode;
 	mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), mode);

@@ -20,6 +20,7 @@ typedef struct mswin_nethack_map_window {
 
 	int	 mapMode;				/* current map mode */
 	boolean bAsciiMode;			/* switch ASCII/tiled mode */
+	boolean bFitToScreenMode;	/* switch Fit map to screen mode on/off */
 	int  xPos, yPos;			/* scroll position */
 	int  xPageSize, yPageSize;	/* scroll page size */
 	int  xCur, yCur;			/* position of the cursor */
@@ -91,8 +92,8 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	
 	/* set new screen tile size */
 	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	data->xScrTile = ((data->mapMode==MAP_MODE_ASCII_FIT_TO_SCREEN)? wnd_size.cx : lpsz->cx) / COLNO;
-	data->yScrTile = ((data->mapMode==MAP_MODE_ASCII_FIT_TO_SCREEN)? wnd_size.cy : lpsz->cy) / ROWNO;
+	data->xScrTile = (data->bFitToScreenMode? wnd_size.cx : lpsz->cx) / COLNO;
+	data->yScrTile = (data->bFitToScreenMode? wnd_size.cy : lpsz->cy) / ROWNO;
 
 	/* set map origin point */
 	data->map_orig.x = max(0, client_rt.left + (wnd_size.cx - data->xScrTile*COLNO)/2 );
@@ -102,7 +103,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	data->map_orig.y -= data->map_orig.y % data->yScrTile;
 
 	/* adjust horizontal scroll bar */
-	if( data->mapMode==MAP_MODE_ASCII_FIT_TO_SCREEN )
+	if( data->bFitToScreenMode )
 		data->xPageSize = COLNO+1;  /* disable scroll bar */
 	else
 		data->xPageSize = wnd_size.cx/data->xScrTile;
@@ -124,7 +125,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
     SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
 
 	/* adjust vertical scroll bar */
-	if( data->mapMode==MAP_MODE_ASCII_FIT_TO_SCREEN )
+	if( data->bFitToScreenMode )
 		data->yPageSize = ROWNO+1;   /* disable scroll bar */
 	else
 		data->yPageSize = wnd_size.cy/data->yScrTile;
@@ -186,54 +187,63 @@ int mswin_map_mode(HWND hWnd, int mode)
 
 	case MAP_MODE_ASCII4x6:
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = 4*COLNO;
 		mapSize.cy = 6*ROWNO;
 	break;
 
 	case MAP_MODE_ASCII6x8:
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = 6*COLNO;
 		mapSize.cy = 8*ROWNO;
 	break;
 
 	case MAP_MODE_ASCII8x8:
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = 8*COLNO;
 		mapSize.cy = 8*ROWNO;
 	break;
 
 	case MAP_MODE_ASCII16x8:
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = 16*COLNO;
 		mapSize.cy = 8*ROWNO;
 	break;
 
 	case MAP_MODE_ASCII7x12:
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = 7*COLNO;
 		mapSize.cy = 12*ROWNO;
 	break;
 
 	case MAP_MODE_ASCII8x12:
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = 8*COLNO;
 		mapSize.cy = 12*ROWNO;
 	break;
 
 	case MAP_MODE_ASCII16x12:
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = 16*COLNO;
 		mapSize.cy = 12*ROWNO;
 	break;
 
 	case MAP_MODE_ASCII12x16:
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = 12*COLNO;
 		mapSize.cy = 16*ROWNO;
 	break;
 
 	case MAP_MODE_ASCII10x18:
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = 10*COLNO;
 		mapSize.cy = 18*ROWNO;
 	break;
@@ -245,11 +255,23 @@ int mswin_map_mode(HWND hWnd, int mode)
 		mapSize.cy = client_rt.bottom - client_rt.top;
 
 		data->bAsciiMode = TRUE;
+		data->bFitToScreenMode = TRUE;
+	} break;
+
+	case MAP_MODE_TILES_FIT_TO_SCREEN: {
+		RECT client_rt;
+		GetClientRect(hWnd, &client_rt);
+		mapSize.cx = client_rt.right - client_rt.left;
+		mapSize.cy = client_rt.bottom - client_rt.top;
+
+		data->bAsciiMode = FALSE;
+		data->bFitToScreenMode = TRUE;
 	} break;
 
 	case MAP_MODE_TILES:
 	default:
 		data->bAsciiMode = FALSE;
+		data->bFitToScreenMode = FALSE;
 		mapSize.cx = GetNHApp()->mapTile_X*COLNO;
 		mapSize.cy = GetNHApp()->mapTile_Y*ROWNO;
 	break;
@@ -320,7 +342,7 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     { 
 		SIZE size;
 
-		if( data->mapMode == MAP_MODE_ASCII_FIT_TO_SCREEN ) {
+		if( data->bFitToScreenMode ) {
 			size.cx = LOWORD(lParam);
 			size.cy = HIWORD(lParam);
 		} else {

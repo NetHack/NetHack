@@ -180,6 +180,7 @@ extern NEARDATA struct window_procs windowprocs;
 #define MAP_MODE_ASCII12x16	8
 #define MAP_MODE_ASCII10x18	9
 #define MAP_MODE_ASCII_FIT_TO_SCREEN 10
+#define MAP_MODE_TILES_FIT_TO_SCREEN 11
 
 #if 0
 #define WC_SND_SOUND	 0x01L		/* 01 Port has some sound capabilities       */

@@ -61,7 +61,8 @@ BEGIN
         MENUITEM "&7 - ASCII (16x12)",          IDM_MAP_ASCII16X12
         MENUITEM "&8 - ASCII (12x16)",          IDM_MAP_ASCII12X16
         MENUITEM "&9 - ASCII  (10x18)",         IDM_MAP_ASCII10X18
-        MENUITEM "&Fit To Screen (ASCII only)", IDM_MAP_FIT_TO_SCREEN
+        MENUITEM SEPARATOR
+        MENUITEM "&Fit To Screen ",             IDM_MAP_FIT_TO_SCREEN
     END
     POPUP "&Help"
     BEGIN

@@ -8,7 +8,7 @@
 
 #define MSG_WRAP_TEXT 
 
-#define MSG_VISIBLE_LINES     4
+#define MSG_VISIBLE_LINES     max(iflags.wc_vary_msgcount, 2)
 #define MAX_MSG_LINES		  32
 #define MSG_LINES			  (int)min(iflags.msg_history, MAX_MSG_LINES)
 #define MAXWINDOWTEXT		  200
