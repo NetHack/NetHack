@@ -7,7 +7,7 @@
 .ds f2 "January 1, 2002
 .mt
 A Guide to the Mazes of Menace
-(Guidebook for NetHack 3.3)
+(Guidebook for NetHack)
 .au
 Eric S. Raymond
 (Extensively edited and expanded for 3.3)
@@ -2221,10 +2221,12 @@ and with the help of \fBKevin Hugo\fP, added more features.
 Kevin later joined the
 DevTeam and incorporated the best of these ideas in NetHack 3.3.
 .pg
-The 3.3 development team consisted of \fBMichael Allison\fP, \fBKen Arromdee\fP,
+The 3.3 development team initially consisted of \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSteve Creps\fP, \fBKevin Darcy\fP, \fBTimo Hakulinen\fP,
 \fBKevin Hugo\fP, \fBSteve Linhart\fP, \fBDean Luick\fP, \fBPat Rankin\fP, \fBEric Smith\fP, \fBMike
-Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
+Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.  \fB Warwick Allison\fP joined 
+just before the release of Nethack 3.3.2.
+
 .pg
 As with version 3.2, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
