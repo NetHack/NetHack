@@ -19,24 +19,28 @@ OPTIONS=IBMGraphics
 # Map window settings
 # possible map_mode options include: tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|
 #                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
-#                                    ascii10x18|ascii_fit_to_screen
+#                                    ascii10x18|fit_to_screen
 OPTIONS=map_mode:tiles,scroll_margin:5
 
 #
 # Message window settings
-OPTIONS=align_message:top
+OPTIONS=font_message:Arial,font_size_message:9,align_message:top
 
 #
 # Menu settings
 OPTIONS=font_menu:Arial,font_size_menu:9
 
 #
+# Text settings
+OPTIONS=font_text:Courier New,font_size_text:9
+
+#
 # Status window settings
-OPTIONS=font_size_status:10
+OPTIONS=font_status:Courier New,font_size_status:10
 
 #
 # Other
-OPTIONS=font_size_text:9,font_size_message:9,hilite_pet
+OPTIONS=hilite_pet
 
 # Top Ten Window.  Highly Recommended.
 OPTIONS=toptenwin

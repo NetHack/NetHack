@@ -82,6 +82,7 @@ which may need a slightly more explanatory note:
                    Default: [FALSE] 
 
     msg_window     When ^P is pressed, it shows menu in a full window.
+                   Available only in the non-graphical (tty) version.
                    Default: [FALSE] 
 
 
@@ -90,10 +91,15 @@ which may need a slightly more explanatory note:
 
 "NetHack for Windows - Graphical Interface" recognizes the following 
 additional options, which the non-graphical (tty) version will
-silently ignore:
+silently ignore.  These are options that specify attributes of various
+windows.  These include the menu windows (such as the inventory list),
+the text windows (such as "It is written in the book of ..."
+screens), the message window (where events of the game are
+displayed), the status window (where your character name
+and attributes are displayed), and the map window (where the dungeon
+is drawn).
 
 Window Alignment options:
-
 
     align_message  Specifies at which side of the NetHack screen the 
                    message window is aligned. This option can be used 
@@ -106,28 +112,6 @@ Window Alignment options:
                    to align the window to "top" or "bottom". "left" 
                    or "right" are possible, but not properly supported 
                    in the Microsoft Windows port. Default: [BOTTOM] 
-
-Other Window options:
-
-These are options that specify attributes of various windows. 
-These include the menu windows (such as the inventory list), 
-the text windows (such as "It is written in the book of ..." 
-screens), the message window (where events of the game are 
-displayed), and the status window (where your character name 
-and attributes are displayed). 
-
-    font_menu      Specifies the name of the menu font. 
-    font_message   Specifies the name of the message font. 
-    font_status    Specifies the name of the status font. 
-    font_text      Specifies the name of the text font. 
-
-    font_size_menu Specifies the size of the menu font. 
-    font_size_message 
-                   Specifies the size of the message font.
-    font_size_status 
-                   Specifies the size of the status font.
-    font_size_text 
-                   Specifies the size of the text font. 
 
 Map Window options:
 
@@ -150,8 +134,8 @@ Map Window options:
                    be organized as 40 rectangular tiles wide. It is 
                    beyond the scope of this document to describe the 
                    exact contents of each tile in the .bmp which may 
-                   even be dependent on the options that your version 
-                   of NetHack was built with. 
+                   even be dependent on the options with which your
+                   version of NetHack was built.
 
                    If you are interested in creating a tile file of 
                    your own, create a regular build of NetHack using 
@@ -176,17 +160,19 @@ Map Window options:
                    format:
                        window-type foreground/background
                    Notes:
-                      - the slash is required.
-                      - window-type is either "message" or "status"  
+                      - Both foreground and background colors are
+                        required, and a slash must separate them.
+                      - "window-type" is either "message" or "status"
                         (Short forms are: "msg" or "sts").
-                      - Foreground and background may be specified as
+                      - "foreground" and "background" may be specified as
                         a color name (such as "blue"), or by a six
                         digit hexadecimal RGB color value (such as
                         "#8F8F8F")
                       - The following color names are available:
                         black, red, green, brown, blue, magenta,
-                        cyan, gray (or grey), orange,
-                        yellow, purple, silver, maroon, fuchsia, 
+                        cyan, gray (or grey), orange, brightgreen,
+                        yellow, brightblue, brightmagenta, brightcyan,
+                        white, trueblack, purple, silver, maroon, fuchsia,
                         lime, olive, navy, teal, aqua. In addition, you 
                         can use the following names to refer to default 
                         Windows settings: activeborder, activecaption, 
@@ -197,6 +183,21 @@ Map Window options:
 
                         Example:
                         OPTIONS=windowcolors:sts #00FF80/blue msg menutext/menu
+
+Other Window options:
+
+    font_menu      Specifies the name of the menu font.
+    font_message   Specifies the name of the message font.
+    font_status    Specifies the name of the status font.
+    font_text      Specifies the name of the text font.
+
+    font_size_menu Specifies the size of the menu font.
+    font_size_message
+                   Specifies the size of the message font.
+    font_size_status
+                   Specifies the size of the status font.
+    font_size_text
+                   Specifies the size of the text font.
 
 Miscellaneous options: 
 
