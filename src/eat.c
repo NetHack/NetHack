@@ -1676,6 +1676,7 @@ struct obj *otmp;
 		    stoneorslime = (!Unchanging &&
 			youmonst.data != &mons[PM_FIRE_VORTEX] &&
 			youmonst.data != &mons[PM_FIRE_ELEMENTAL] &&
+			youmonst.data != &mons[PM_SALAMANDER] &&
 			youmonst.data != &mons[PM_GREEN_SLIME]);
 
 		if (cadaver && mnum != PM_LIZARD && mnum != PM_LICHEN) {
