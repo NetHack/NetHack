@@ -3674,8 +3674,11 @@ boolean *shopdamage;
 	}
 	else if(abstype == ZT_COLD && is_ice(x,y)) {
 		/* Already ice here, so just firm it up. */
-		spot_stop_timers(x, y, MELT_ICE_AWAY); /* stop existing timer */
-		start_melt_ice_timeout(x,y);	       /* start new timer */
+		/* Now ensure that only ice that is already timed is affected */
+		if (spot_time_left(x,y,MELT_ICE_AWAY)) { 
+		    spot_stop_timers(x, y, MELT_ICE_AWAY); /* stop existing timer */
+		    start_melt_ice_timeout(x,y);	   /* start new timer */
+		}
 	}
 	if(closed_door(x, y)) {
 		int new_doormask = -1;
