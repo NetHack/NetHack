@@ -9,3 +9,14 @@ Debug-Mode Quick Reference:
 ^V  ==  do trans-level teleport.
 ^W  ==  make wish.
 ^X  ==  show attributes including intrinsic attributes.
+
+#levelchange == change experience level
+#light sources == show mobile light sources
+#monpoly_control == control monster polymorphs
+#poly == polymorph self
+#seenv == show seen vectors
+#stats == show memory statistics
+#timeout == look at timeout queue
+#vision == show vision array
+#wmode == show wall modes
+
