@@ -21,6 +21,7 @@ extern void tty_raw_print_bold(const char *);
 /* Interface definition, for windows.c */
 struct window_procs Gnome_procs = {
     "Gnome",
+    WC_COLOR|WC_HILITE_PET|WC_INVERSE,
     gnome_init_nhwindows,
     gnome_player_selection,
     gnome_askname,
@@ -69,6 +70,7 @@ struct window_procs Gnome_procs = {
     gnome_start_screen,
     gnome_end_screen,
     gnome_outrip,
+    genl_preference_update,
 };
 
 /*  

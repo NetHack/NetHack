@@ -45,6 +45,10 @@ extern char mapped_menu_cmds[]; /* from options.c */
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
     "tty",
+#ifdef MSDOS
+    WC_TILED_MAP|WC_TILES_16x16|WC_TILES_8x16|WC_ASCII_MAP
+#endif
+    WC_COLOR|WC_HILITE_PET|WC_INVERSE,
     tty_init_nhwindows,
     tty_player_selection,
     tty_askname,
@@ -97,7 +101,8 @@ struct window_procs tty_procs = {
     /* other defs that really should go away (they're tty specific) */
     tty_start_screen,
     tty_end_screen,
-    genl_outrip
+    genl_outrip,
+    genl_preference_update,
 };
 
 static int maxwin = 0;			/* number of windows in use */

@@ -33,6 +33,8 @@ static void mswin_main_loop();
 /* Interface definition, for windows.c */
 struct window_procs mswin_procs = {
     "MSWIN",
+    WC_COLOR|WC_HILITE_PET|WC_ALIGN_MESSAGE|WC_ALIGN_STATUS|
+	WC_INVERSE|WC_SCROLL_MARGIN|WC_MAP_MODE,
     mswin_init_nhwindows,
     mswin_player_selection,
     mswin_askname,
@@ -81,6 +83,7 @@ struct window_procs mswin_procs = {
     mswin_start_screen,
     mswin_end_screen,
     mswin_outrip,
+    genl_preference_update,
 };
 
 

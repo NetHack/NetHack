@@ -29,6 +29,7 @@ long amii_scrnmode;
 struct window_procs amii_procs =
 {
     "amii",
+    WC_COLOR|WC_HILITE_PET|WC_INVERSE,
     amii_init_nhwindows,
     amii_player_selection,
     amii_askname,
@@ -76,7 +77,8 @@ struct window_procs amii_procs =
     /* other defs that really should go away (they're tty specific) */
     amii_delay_output,
     amii_delay_output,
-    amii_outrip
+    amii_outrip,
+    genl_preference_update
 };
 
 /* The view window layout uses the same function names so we can use
@@ -85,6 +87,7 @@ struct window_procs amii_procs =
 struct window_procs amiv_procs =
 {
     "amitile",
+    WC_COLOR|WC_HILITE_PET|WC_INVERSE,
     amii_init_nhwindows,
     amii_player_selection,
     amii_askname,
@@ -132,7 +135,8 @@ struct window_procs amiv_procs =
     /* other defs that really should go away (they're tty specific) */
     amii_delay_output,
     amii_delay_output,
-    amii_outrip
+    amii_outrip,
+    genl_preference_update
 };
 
 unsigned short amii_initmap[ AMII_MAXCOLORS ];

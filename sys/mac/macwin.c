@@ -2488,6 +2488,7 @@ try_key_queue (char *bufp) {
 /* Interface definition, for windows.c */
 struct window_procs mac_procs = {
 	"mac",
+	WC_ASCII_MAP|WC_COLOR|WC_LARGE_FONT,
 	mac_init_nhwindows,
 	mac_unimplemented,	/* see macmenu.c:mac_askname() for player selection */
 	mac_askname,
@@ -2538,6 +2539,7 @@ struct window_procs mac_procs = {
 	0, //    mac_start_screen,
 	0, //    mac_end_screen,
 	genl_outrip,
+	genl_preference_update,
 };
 
 /*macwin.c*/

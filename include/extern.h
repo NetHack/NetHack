@@ -2196,6 +2196,7 @@ E void FDECL(setmnotwielded, (struct monst *,struct obj *));
 
 E void FDECL(choose_windows, (const char *));
 E char FDECL(genl_message_menu, (CHAR_P,int,const char *));
+E void FDECL(genl_preference_update, (const char *));
 
 /* ### wizard.c ### */
 

@@ -92,6 +92,7 @@ int updated_inventory;
 /* Interface definition, for windows.c */
 struct window_procs X11_procs = {
     "X11",
+    WC_COLOR|WC_HILITE_PET,
     X11_init_nhwindows,
     X11_player_selection,
     X11_askname,
@@ -144,6 +145,7 @@ struct window_procs X11_procs = {
 #else
     genl_outrip,
 #endif
+    genl_preference_update,
 };
 
 /*

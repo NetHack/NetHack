@@ -133,4 +133,16 @@ const char *mesg;
     return 0;
 }
 
+void
+genl_preference_update(pref)
+const char *pref;
+{
+	extern struct wc_Opt wc_options[];	/* in options.c */
+	/* window ports are expected to provide
+	   their own preference update routine
+	   for the preference capabilities that
+	   they support.
+	   Just return in this genl one. */
+	return;
+}
 /*windows.c*/

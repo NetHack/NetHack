@@ -5059,6 +5059,7 @@ extern "C" struct window_procs Qt_procs;
 
 struct window_procs Qt_procs = {
     "Qt",
+    WC_COLOR|WC_HILITE_PET,
     NetHackQtBind::qt_init_nhwindows,
     NetHackQtBind::qt_player_selection,
     NetHackQtBind::qt_askname,
@@ -5112,6 +5113,7 @@ struct window_procs Qt_procs = {
 #else
     genl_outrip,
 #endif
+    genl_preference_update,
 };
 
 extern "C" void play_usersound(const char* filename, int volume)

@@ -1635,9 +1635,6 @@ Check free disk space before writing files to disk (default on).
 You may have to turn this off if you have more than 2 GB free space
 on the partition used for your save and level files.
 Only applies when MFLOPPY was defined during compilation.
-.lp "color   "
-Use color for different monsters, objects, and dungeon features
-(default on for microcomputers).
 .lp "confirm "
 Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).
@@ -1748,11 +1745,6 @@ Note that in the next release, new symbols may be added,
 or the present ones rearranged.
 
 Cannot be set with the `O' command.
-.lp eight_bit_tty
-Pass eight-bit character values (for example, specified with the
-.op traps
-option) straight through to your terminal (default off).  Only applies
-to the tty port.
 .lp extmenu
 Changes the extended commands interface to pop-up a menu of available commands.  
 It is keystroke compatible with the traditional interface except that it does
@@ -1783,11 +1775,6 @@ with the `/' command, ask if you want to see it (default on). Turning help
 off makes just looking at things faster, since you aren't interrupted with the
 ``More info?'' prompt, but it also means that you might miss some
 interesting and/or important information.
-.lp hilite_pet
-Visually distinguish pets from similar animals (default off).
-The behavior of this option depends on the type of windowing you use.
-In text windowing, text highlighting or inverse video is often used;
-with tiles, generally displays a heart symbol near pets.
 .lp horsename
 Name your starting horse (ex. ``horsename:Trigger'').
 Cannot be set with the `O' command.
@@ -1954,11 +1941,6 @@ Specify the object types to be picked up when
 is on.  Default is all types.
 .lp prayconfirm
 Prompt for confirmation before praying (default on).
-.lp preload_tiles
-For the protected mode MSDOS version, control whether tiles
-get pre-loaded into RAM at the start of the game.  Doing so
-enhances performance of the tile graphics, but uses more memory. (default on).
-Cannot be set with the `O' command.
 .lp pushweapon
 Using the `w' (wield) command when already wielding
 something pushes the old item into your secondary weapon slot (default off).
@@ -2053,6 +2035,88 @@ Cannot be set with the `O' command.
 Select which windowing system to use, such as ``tty'' or ``X11''
 (default depends on version).
 Cannot be set with the `O' command.
+.hn 2
+Window Port Customization options
+.pg
+Here are explanations of the various options that are
+used to customize and change the characteristics of the
+windowtype that you have chosen.
+Character strings that are too long may be truncated.
+Not all window ports will adjust for all settings listed
+here.  You can safely add any of these options to your config
+file, and if the window port is capable of adjusting to
+suit your preferences, it will attempt to do so. If it
+can't it will silently ignore it.  You can find out if an
+option is supported by the window port that you are currently
+using by checking to see if it shows up in the Options list.
+Some options are dynamic and can be specified during the game
+with the `O' command.
+.lp align_message
+Where to align or place the message window (top, bottom, left, or right)
+.lp align_status
+Where to align or place the status window (top, bottom, left, or right).
+.lp ascii_map
+NetHack should display an ascii character map if it can.
+.lp color		
+NetHack should display color if it can for different monsters, 
+objects, and dungeon features
+.lp eight_bit_tty	
+NetHack should pass eight-bit character values (for example, specified with the
+.op traps
+option) straight through to your terminal (default off).
+.lp font_map	
+NetHack should use a font by the chosen name for the map window.
+.lp font_menu	
+NetHack should use a font by the chosen name for menu windows.
+.lp font_message	
+NetHack should use a font by the chosen name for the message window.
+.lp font_status	
+NetHack should use a font by the chosen name for the status window.
+.lp font_text	
+NetHack should use a font by the chosen name for text windows.
+.lp font_size_map	
+NetHack should use this size font for the map window.
+.lp font_size_menu	
+NetHack should use this size font for menu windows.
+.lp font_size_message 
+NetHack should use this size font for the message window.
+.lp font_size_status
+NetHack should use this size font for the status window.
+.lp font_size_text	
+NetHack should use this size font for text windows.
+.lp hilite_pet
+Visually distinguish pets from similar animals (default off).
+The behavior of this option depends on the type of windowing you use.
+In text windowing, text highlighting or inverse video is often used;
+with tiles, generally displays a heart symbol near pets.
+.lp large_font	
+NetHack should use a large font.
+.lp map_mode	
+NetHack should display the map in the manner specified.
+.lp popup_dialog	
+NetHack should pop up dialog boxes for input.
+.lp preload_tiles
+NetHack should preload tiles into memory.
+For example, in the protected mode MSDOS version, control whether tiles
+get pre-loaded into RAM at the start of the game.  Doing so
+enhances performance of the tile graphics, but uses more memory. (default on).
+Cannot be set with the `O' command.
+.lp scroll_margin	
+NetHack should scroll the display when the hero or cursor
+is this number of cells away from the edge of the window.
+.lp tiled_map	
+NetHack should display a tiled map if it can.
+.lp tiles_16x16	
+NetHack should display 16x16 tiles if it can.
+.lp tiles_32x32	
+NetHack should display 32x32 tiles if it can.
+.lp tiles_8x16	
+NetHack should display 8x16 tiles if it can.
+.lp use_inverse	
+NetHack should display inverse when the game specifies it.
+.lp vary_msgcount	
+NetHack should display this number of messages at a time in
+the message window.
 .hn 2
 Configuring NetHack for Play by the Blind
 .pg

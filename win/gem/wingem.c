@@ -27,6 +27,7 @@ extern void mar_display_nhwindow(winid);	/* from wingem1.c */
 /* Interface definition, for windows.c */
 struct window_procs Gem_procs = {
     "Gem",
+    WC_COLOR|WC_HILITE_PET|WC_INVERSE,
     Gem_init_nhwindows,
     Gem_player_selection,
     Gem_askname,
@@ -79,7 +80,8 @@ struct window_procs Gem_procs = {
     /* other defs that really should go away (they're tty specific) */
     Gem_start_screen,
     Gem_end_screen,
-    genl_outrip
+    genl_outrip,
+    genl_preference_update
 };
 
 #ifdef MAC

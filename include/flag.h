@@ -158,10 +158,6 @@ struct instance_flags {
 	boolean  cbreak;	/* in cbreak mode, rogue format */
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  echo;		/* 1 to echo characters */
-#ifdef TTY_GRAPHICS
-	boolean  eight_bit_tty;	/* pass eight-bit characters through to tty */
-	boolean  extmenu;	/* extended commands use menu interface */
-#endif
 	boolean  IBMgraphics;	/* use IBM extended character set */
 	unsigned msg_history;	/* hint: # of top lines to save */
 	boolean  num_pad;	/* use numbers for movement commands */
@@ -170,26 +166,14 @@ struct instance_flags {
 	int      purge_monsters;	/* # of dead monsters still on fmon list */
 	int *opt_booldup;	/* for duplication of boolean opts in config file */
 	int *opt_compdup;	/* for duplication of compound opts in config file */
-
+	uchar bouldersym;		/* symbol for boulder display */
 #ifdef WIZARD
 	boolean  sanity_check;	/* run sanity checks */
 	boolean  mon_polycontrol;	/* debug: control monster polymorphs */
 #endif
-#ifdef TEXTCOLOR
-	boolean  use_color;	/* use color graphics */
-#endif
-	boolean  hilite_pet;	/* hilight pets on supported environments */
-	boolean  use_inverse;	/* inverse attribute is available on display */
-#ifdef MAC_GRAPHICS_ENV
-	boolean  large_font;	/* draw in larger fonts (say, 12pt instead
-				   of 9pt) */
-	boolean  MACgraphics;	/* use Macintosh extended character set, as
-				   as defined in the special font HackFont */
-	unsigned  use_stone;		/* use the stone ppats */
-#endif
-#ifdef MAC
-	boolean  popup_dialog;	/* put queries in pop up dialogs instead of
-				   in the message window */
+#ifdef TTY_GRAPHICS
+	boolean prevmsg_window;	/* show more old messages at a time */
+	boolean  extmenu;	/* extended commands use menu interface */
 #endif
 #ifdef MFLOPPY
 	boolean  checkspace;	/* check disk space before writing files */
@@ -200,33 +184,82 @@ struct instance_flags {
 	boolean  BIOS;		/* use IBM or ST BIOS calls when appropriate */
 	boolean  rawio;		/* whether can use rawio (IOCTL call) */
 #endif
-#ifdef MSDOS
-	boolean hasvga;		/* has a vga adapter */
-	boolean usevga;		/* use the vga adapter */
-	boolean has8514;
-	boolean use8514;
-	boolean hasvesa;
-	boolean usevesa;
-	boolean grmode;		/* currently in graphics mode */
+#ifdef MAC_GRAPHICS_ENV
+	boolean  MACgraphics;	/* use Macintosh extended character set, as
+				   as defined in the special font HackFont */
+	unsigned  use_stone;		/* use the stone ppats */
 #endif
 #if defined(MSDOS) || defined(WIN32)
 	boolean hassound;	/* has a sound card */
 	boolean usesound;	/* use the sound card */
 	boolean usepcspeaker;	/* use the pc speaker */
-	boolean preload_tiles;	/* preload the tiles into RAM */
 	boolean tile_view;
 	boolean over_view;
 	boolean traditional_view;
+#endif
+#ifdef MSDOS
+	boolean hasvga;		/* has a vga adapter */
+	boolean usevga;		/* use the vga adapter */
+	boolean grmode;		/* currently in graphics mode */
 #endif
 #ifdef LAN_FEATURES
 	boolean lan_mail;	/* mail is initialized */
 	boolean lan_mail_fetched; /* mail is awaiting display */
 #endif
-	uchar bouldersym;	/* alternative boulder symbol */
-#ifdef TTY_GRAPHICS
-	boolean prevmsg_window;	/* show more old messages at a time */
-#endif
+/*
+ * Window capability support.
+ */
+	boolean wc_color;		/* use color graphics */
+	boolean wc_hilite_pet;		/* hilight pets */
+	boolean wc_ascii_map;		/* show map using traditional ascii */
+	boolean wc_tiled_map;		/* show map using tiles */
+	boolean wc_preload_tiles;	/* preload tiles into memory */
+	boolean wc_tiles_8x16;		/* use 8x16  tiles */
+	boolean wc_tiles_16x16;		/* use 16x16 tiles */
+	boolean wc_tiles_32x32;		/* use 32x32 tiles */
+	boolean wc_inverse;		/* use inverse video for some things   */
+	int	wc_align_status;	/*  status win at top|bot|right|left    */
+	int	wc_align_message;	/* message win at top|bot|right|left   */
+	int     wc_vary_msgcount;	/* show more old messages at a time    */
+	char    *wc_font_map;		/* points to font name for the map win */
+	char    *wc_font_message;	/* points to font name for message win */
+	char    *wc_font_status;	/* points to font name for status win  */
+	char    *wc_font_menu;		/* points to font name for menu win    */
+	char    *wc_font_text;		/* points to font name for text win    */
+	int     wc_fontsiz_map;		/* font size for the map win           */
+	int     wc_fontsiz_message;	/* font size for the message window    */
+	int     wc_fontsiz_status;	/* font size for the status window     */
+	int     wc_fontsiz_menu;	/* font size for the menu window       */
+	int     wc_fontsiz_text;	/* font size for text windows          */
+	int	wc_scroll_margin;	/* scroll map when this far from
+						the edge */
+	int	wc_map_mode;		/* specify map viewing options, mostly
+						for backward compatibility */
+	boolean	wc_popup_dialog;	/* put queries in pop up dialogs instead of
+				   		in the message window */
+	boolean wc_large_font;		/* draw in larger fonts (say, 12pt instead
+				   		of 9pt) */
+	boolean wc_eight_bit_input;	/* allow eight bit input               */
 };
+
+/*
+ * Old deprecated names
+ */
+#ifdef TTY_GRAPHICS
+#define eight_bit_tty wc_eight_bit_input
+#endif
+#ifdef TEXTCOLOR
+#define use_color wc_color
+#endif
+#define hilite_pet wc_hilite_pet
+#define use_inverse wc_inverse
+#ifdef MAC_GRAPHICS_ENV
+#define large_font wc_large_font
+#endif
+#ifdef MAC
+#define popup_dialog wc_popup_dialog
+#endif
+#define preload_tiles wc_preload_tiles
 
 extern NEARDATA struct flag flags;
 extern NEARDATA struct instance_flags iflags;

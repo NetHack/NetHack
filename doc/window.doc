@@ -5,17 +5,18 @@ NetHack.  The support is through a standard interface, separating the
 main NetHack code from window-system specific code.  The implementation
 supports multiple window systems in the same binary.  Even if you only
 wish to support one window-port on your port, you will need to follow
-the instructions in Section VIII to get a compilable binary.
+the instructions in Section IX to get a compilable binary.
 
 Contents:
 	I.    Window Types and Terminology
 	II.   Interface Specification
 	III.  Global variables
-	IV.   New or respecified common, high level routines
-	V.    Helper routines
-	VI.   Game startup
-	VII.  Conventions
-	VIII. Implementation and Multi-window support
+	IV.   WINCAP preferences support
+	V.    New or respecified common, high level routines
+	VI.   Helper routines
+	VII.  Game startup
+	VIII. Conventions
+	IX.   Implementation and Multi-window support
 
 I.  Window Types and Terminology
 
@@ -351,6 +352,15 @@ outrip(winid, int)
 		-- The tombstone code.  If you want the traditional code use
 		   genl_outrip for the value and check the #if in rip.c.
 
+preference_update(preference)
+		-- The player has just changed one of the wincap preference
+		   settings, and the NetHack core is notifying your window
+		   port of that change.  If your window-port is capable of
+		   dynamically adjusting to the change then it should do so.
+		   Your window-port will only be notified of a particular
+		   change if it indicated that it wants to be by setting the 
+		   corresponding bit in the wincap mask.
+
 III.  Global variables
 
 The following global variables are defined in decl.c and must be used by
@@ -370,7 +380,101 @@ window-port should also declare this variable in one of your sys/*.c files.
 short ospeed;		Set and declared in sys/unix/unixtty.c (don't
 			know about other sys files).
 
-IV.  New or respecified common, high level routines
+IV. WINCAP preferences support
+
+Starting with NetHack 3.3.2, the window interface was enhanced to provide
+a common way of setting window port user preferences from the config file, 
+and from the command line for some settings.
+
+The wincap preference settings all have their underlying values stored
+in iflags fields.  The names of the wincap related fields are all pre-
+fixed with wc_ to make it easy to identify them.  Your window port can
+access the fields directly.
+
+Your window port identifies what options it will react to and support
+by setting bits in the window_procs wincap mask. See section IX for
+details of where the wincap mask resides. Any preference settings 
+marked as being supported by having its bit set in the wincap mask 
+will be available for the user of your window port to set via the 'O' 
+command, while those not marked as supported will not appear in the 
+menus of the 'O' command.
+
+Setting of any wincap option is handled by the NetHack core option
+code, you do not have to provide a parser in your window port.
+
+Here are the wincap preference settings that your port can choose
+to support:
+
+  +-------------------+--------------------+-------------------+--------+
+  |                   |                    | iflags field      | data   |
+  | player option     | bit in wincap mask |   for value       | type   |
+  |-------------------+--------------------+-------------------+--------+
+  |  align_message    | WC_ALIGN_MESSAGE   | wc_align_message  |int     |
+  |  align_status     | WC_ALIGN_STATUS    | wc_align_status   |int     |
+  |  ascii_map        | WC_ASCII_MAP       | wc_ascii_map      |boolean |
+  |  color            | WC_COLOR           | wc_color          |boolean |
+  |  eight_bit_tty    | WC_EIGHT_BIT_IN    | wc_eight_bit_input|boolean |
+  |  font_map         | WC_FONT_MAP        | wc_font_map       |char *  |
+  |  font_menu        | WC_FONT_MENU       | wc_font_menu      |char *  |
+  |  font_message     | WC_FONT_MESSAGE    | wc_font_message   |char *  |
+  |  font_size_map    | WC_FONTSIZ_MAP     | wc_fontsiz_map    |int     |
+  |  font_size_menu   | WC_FONTSIZ_MENU    | wc_fontsiz_menu   |int     |
+  |  font_size_message| WC_FONTSIZ_MESSAGE | wc_fontsiz_message|int     |
+  |  font_size_status | WC_FONTSIZ_STATUS  | wc_fontsiz_status |int     |
+  |  font_size_text   | WC_FONTSIZ_TEXT    | wc_fontsiz_text   |int     |
+  |  font_status      | WC_FONT_STATUS     | wc_font_status    |char *  |
+  |  font_text        | WC_FONT_TEXT       | wc_font_text      |char *  |
+  |  hilite_pet       | WC_HILITE_PET      | wc_hilite_pet     |boolean |
+  |  large_font       | WC_LARGE_FONT      | wc_large_font     |boolean |
+  |  map_mode         | WC_MAP_MODE        | wc_map_mode       |int     |
+  |  popup_dialog     | WC_POPUP_DIALOG    | wc_popup_dialog   |boolean |
+  |  preload_tiles    | WC_PRELOAD_TILES   | wc_preload_tiles  |boolean |
+  |  scroll_margin    | WC_SCROLL_MARGIN   | wc_scroll_margin  |int     |
+  |  tiled_map        | WC_TILED_MAP       | wc_tiled_map      |boolean |
+  |  tiles_16x16      | WC_TILES_16x16     | wc_tiles_16x16    |boolean |
+  |  tiles_32x32      | WC_TILES_32x32     | wc_tiles_32x32    |boolean |
+  |  tiles_8x16       | WC_TILES_8x16      | wc_tiles_8x16     |boolean |
+  |  use_inverse      | WC_INVERSE         | wc_inverse        |boolean |
+  |  vary_msgcount    | WC_VARY_MSGCOUNT   | wc_vary_msgcount  |int     |
+  +-------------------+--------------------+-------------------+--------+
+
+align_message	-- where to place message window (top, bottom, left, right)
+align_status	-- where to place status window (top, bottom, left, right).
+ascii_map	-- port should display an ascii map if it can.
+color		-- port should display color if it can.
+eight_bit_tty	-- port should allow eight bit input.
+font_map	-- port should use a font by this name for map window.
+font_menu	-- port should use a font by this name for menu windows.
+font_message	-- port should use a font by this name for message window.
+font_size_map	-- port should use this size font for the map window.
+font_size_menu	-- port should use this size font for menu windows.
+font_size_message 
+		-- port should use this size font for the message window.
+font_size_status-- port should use this size font for the status window.
+font_size_text	-- port should use this size font for text windows.
+font_status	-- port should use a font by this name for status window.
+font_text	-- port should use a font by this name for text windows.
+hilite_pet	-- port should mark pets in some special way on the map.
+large_font	-- port should use a large font.
+map_mode	-- port should display the map in the manner specified.
+popup_dialog	-- port should pop up dialog boxes for input.
+preload_tiles	-- port should preload tiles into memory.
+scroll_margin	-- port should scroll the display when the hero or cursor
+		   is this number of cells away from the edge of the window.
+tiled_map	-- port should display a tiled map if it can.
+tiles_16x16	-- port should display 16x16 tiles if it can.
+tiles_32x32	-- port should display 32x32 tiles if it can.
+tiles_8x16	-- port should display 8x16 tiles if it can.
+use_inverse	-- port should display inverse when NetHack asks for it.
+vary_msgcount	-- port should display this number of messages at a time in
+		   the message window.
+
+Whenever one of these settings is adjusted (and if supported by the port
+by marking it so in the wincap mask), the port is notified of a change
+to a setting by calling the port's preference_update() routine. The port
+can choose to adjust for the change or ignore it.
+
+V.  New or respecified common, high level routines
 
 These are not part of the interface, but mentioned here for your information.
 
@@ -392,7 +496,7 @@ pline(str, ...)
 		   by Norep() and pline().  If the window system is not active
 		   (!iflags.window_inited) pline() uses raw_print().
 
-V.  Helper Routines
+VI.  Helper Routines
 
 These are not part of the interface. They may be called by your
 window port routines to perform the desired task, instead of duplicating
@@ -405,7 +509,7 @@ mapglyph(int glyph, int *ochar, int *ocolor, unsigned *special, int x, int y)
 		   Usually called from the window port's print_glyph() 
 		   routine.
 
-VI.  Game startup
+VII.  Game startup
 
 The following is the general order in which calls from main() should be made,
 as they relate to the window system.  The actual code may differ, but the
@@ -438,7 +542,7 @@ Process_options() is currently still unique to each port.  There may be need
 in the future to make it possible to replace this on a per window-port basis.
 
 
-VII.  Conventions
+VIII.  Conventions
 
 init_nhwindows() is expected to display a gee-whiz banner window, including
 the Copyright message.  It is recommended that the COPYRIGHT_BANNER_A,
@@ -463,7 +567,7 @@ in win/X11.  The files in these directories contain _only_ window port code,
 and may be replaced completely by other window ports.
 
 
-VIII.  Implementation and Multi-window support
+IX.  Implementation and Multi-window support
 
 NetHack 3.2 and higher support multiple window systems in the same binary.
 When writing a new window-port, you need to follow the following guidelines:
@@ -494,7 +598,9 @@ When writing a new window-port, you need to follow the following guidelines:
 3) Declare a structure, "struct window_procs prefix_procs", (with your
    prefix instead of "prefix") and fill in names of all of your
    interface functions.  The first entry in this structure is the name
-   of your window-port, which should be the prefix.  The other entries
+   of your window-port, which should be the prefix.  The second entry
+   is the wincap mask that identifies what window port preference
+   settings your port will react to and support.  The other entries
    are the function addresses.
 
    Assuming that you followed the convention in (2), you can safely copy
@@ -541,7 +647,7 @@ When writing a new window-port, you need to follow the following guidelines:
 
 9) Look at your port's portmain.c (the file containing main()) and make
    sure that all of the calls match the the requirements laid out in
-   Section VI.
+   Section VII.
 
 Now, proceed with compilation and installation as usual.  Don't forget
 to edit Makefile.src (or its equivalent) and config.h to set the
