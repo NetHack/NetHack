@@ -41,7 +41,7 @@ stoned_dialogue()
 
 /* He is getting sicker and sicker prior to vomiting */
 static NEARDATA const char * const vomiting_texts[] = {
-	"are feeling mildly nauseous.",		/* 14 */
+	"are feeling mildly nauseated.",	/* 14 */
 	"feel slightly confused.",		/* 11 */
 	"can't seem to think straight.",	/* 8 */
 	"feel incredibly sick.",		/* 5 */

@@ -152,7 +152,7 @@ boolean talk;
 	long old = Vomiting;
 
 	if(!xtime && old)
-	    if(talk) You_feel("much less nauseous now.");
+	    if(talk) You_feel("much less nauseated now.");
 
 	set_itimeout(&Vomiting, xtime);
 }
