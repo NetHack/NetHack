@@ -823,13 +823,6 @@ The code contains several sections which were necessary when removing a
 fire resistance item (weapon, armor, ring) was instant death in Hell.  These
 could use removal.
 
-Soldiers have no logical reason to possess elven cloaks.  Either create a new,
-nonspecial, cloak for this purpose, or change the leather jacket to a cloak
-and use it.
-
-Likewise, leather gloves make little sense as healer items.  Add "surgical
-gloves" with no base AC protection.
-
 Effects for the blessed scrolls/potions with effects that are absent:
 -- destroy armor: (see controversial item section)
 

@@ -204,6 +204,7 @@ Cloak_on()
 	case DWARVISH_CLOAK:
 	case CLOAK_OF_MAGIC_RESISTANCE:
 	case ROBE:
+	case LEATHER_CLOAK:
 		break;
 	case MUMMY_WRAPPING:
 		/* Note: it's already being worn, so we have to cheat here. */
@@ -254,6 +255,7 @@ Cloak_off()
 	case CLOAK_OF_DISPLACEMENT:
 	case OILSKIN_CLOAK:
 	case ROBE:
+	case LEATHER_CLOAK:
 		break;
 	case MUMMY_WRAPPING:
 		if (Invis && !Blind) {
