@@ -266,6 +266,10 @@ SOURCE=..\src\makemon.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\mapglyph.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\mcastu.c
 # End Source File
 # Begin Source File
