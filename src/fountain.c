@@ -391,13 +391,12 @@ register struct obj *obj;
 		if(in_town(u.ux, u.uy))
 		    (void) angry_guards(FALSE);
 		return;
-	} else if (get_wet(obj) && !rn2(2))
+	} else if (get_wet(obj)) {
+	    if (obj->otyp == POT_ACID) { /* Acid and water don't mix */
+		useup(obj);
 		return;
-
-	/* Acid and water don't mix */
-	if (obj->otyp == POT_ACID) {
-	    useup(obj);
-	    return;
+	    } else if (!rn2(2))		/* no further effect */
+		return;
 	}
 
 	switch (rnd(30)) {
