@@ -357,6 +357,7 @@ gotobj:
 		    } else {
 			int curssv = otmp->cursed;
 			int slowly;
+			boolean seen = canspotmon(mtmp);
 
 			otmp->cursed = 0;
 			/* can't charm you without first waking you */
@@ -364,13 +365,13 @@ gotobj:
 			slowly = (armordelay >= 1 || multi < 0);
 			if(flags.female)
 			    pline("%s charms you.  You gladly %s your %s.",
-				  Blind ? "She" : Monnam(mtmp),
+				  !seen ? "She" : Monnam(mtmp),
 				  curssv ? "let her take" :
 				  slowly ? "start removing" : "hand over",
 				  equipname(otmp));
 			else
 			    pline("%s seduces you and %s off your %s.",
-				  Blind ? "It" : Adjmonnam(mtmp, "beautiful"),
+				  !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
 				  curssv ? "helps you to take" :
 				  slowly ? "you start taking" : "you take",
 				  equipname(otmp));
