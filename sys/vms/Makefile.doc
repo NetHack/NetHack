@@ -1,0 +1,68 @@
+#	NetHack Makefile (VMS) - for the [Unix] documentation.
+#	SCCS Id: @(#)Makefile.doc	3.3	1993/01/06
+
+#  Copy this file to [.doc]Makefile. and edit it if needed.
+
+GUIDEBOOK = Guidebook.		# regular ASCII file
+#GUIDEBOOK = Guidebook.ps	# PostScript file
+#GUIDEBOOK = Guidebook.dvi	# TeX device-independent file
+
+ALLDOCS = $(GUIDEBOOK)
+#ALLDOCS = $(GUIDEBOOK) manpages
+
+NOOP = !
+
+Guidebook :	$(GUIDEBOOK)
+	$(NOOP)
+
+# the basic guidebook
+#Guidebook. :	Guidebook.mn
+#	#tbl tmac.n Guidebook.mn | nroff | col > Guidebook
+#	write sys$output "Guidebook.mn cannot be processed under VMS."
+Guidebook. :	Guidebook.txt		# distributed version of plain text
+	copy Guidebook.txt Guidebook.
+
+# Fancier output for those with ditroff, psdit and a PostScript printer.
+#Guidebook.ps : Guidebook.mn
+#	#tbl tmac.n Guidebook.mn | ditroff | psdit > Guidebook.ps
+#	write sys$output "Guidebook.mn cannot be processed under VMS."
+Guidebook.ps :	Guidebook.dvi		# generated with LaTeX
+	dvi2ps Guidebook
+
+# Guidebook.tex is the same as Guidebook.mn but formatted with LaTeX.
+# - The invocation command for LaTeX may vary in different installations.
+# - To print Guidebook.dvi you need to use a suitable dvi-driver.
+Guidebook.dvi :  Guidebook.tex
+	latex Guidebook.tex
+
+all : $(ALLDOCS)
+	$(NOOP)
+
+GAME	= nethack
+MANDIR	= HACKDIR:
+MANEXT	= man
+#MANDIR = /usr/man/man6
+#MANEXT = 6
+
+# manual non-installation; raw man pages may be better than nothing
+GAMEMANCREATE = copy nethack.6
+LEVMANCREATE = copy lev_comp.6
+DGNMANCREATE = copy dgn_comp.6
+RCVRMANCREATE = copy recover.6
+# GAMEMANCREATE = nroff -man nethack.6 >
+# LEVMANCREATE = nroff -man lev_comp.6 >
+# DGNMANCREATE = nroff -man dgn_comp.6 >
+# RCVRMANCREATE = nroff -man recover.6 >
+
+manpages :
+	- $(GAMEMANCREATE) $(MANDIR)$(GAME).$(MANEXT)
+	- $(LEVMANCREATE) $(MANDIR)lev_comp.$(MANEXT)
+	- $(DGNMANCREATE) $(MANDIR)dgn_comp.$(MANEXT)
+	- $(RCVRMANCREATE) $(MANDIR)recover.$(MANEXT)
+
+spotless :
+	- if f$search("Guidebook.")   .nes."" then  delete Guidebook.;*
+	- if f$search("Guidebook.ps") .nes."" then  delete Guidebook.ps;*
+	- if f$search("Guidebook.dvi").nes."" then  delete Guidebook.dvi;*
+	- if f$search("Guidebook.aux").nes."" then  delete Guidebook.aux;*
+	- if f$search("Guidebook.log").nes."" then  delete Guidebook.log;*
