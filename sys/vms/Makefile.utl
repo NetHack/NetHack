@@ -1,0 +1,367 @@
+#	NetHack Makefile (VMS) - for utility programs.
+#	SCCS Id: @(#)Makefile.utl	3.3	2000/08/05
+
+#  Copy this file to [.util]Makefile. and then edit it as needed.
+#  Settings for CC and CFLAGS ought to match the ones used in [.src]Makefile.
+
+MAKE	= $(MMS)
+CD	= set default
+ECHO	= write sys$output
+MOVE	= rename/New		# within save device only
+MUNG	= search/Exact/Match=NOR	# to strip bogus #module directives
+NOOP	= continue
+RM	= delete/noConfirm
+RUN	= mcr			# simplest way to pass command line args
+TOUCH	= append/New _NLA0:	# only one file per $(TOUCH)
+# source tree, relative to 'src' and 'util'
+DAT = [-.dat]
+INC = [-.include]
+SYSSHR = [-.sys.share]
+SRC = [-.src]
+UTL = [-.util]
+VMS = [-.sys.vms]
+WINSHR = [-.win.share]
+WINX11 = [-.win.X11]
+# targets, with enough punctuation to keep MCR and DELETE happy
+MAKEDEFS= $(UTL)makedefs.exe;
+LEVCOMP = $(UTL)lev_comp.exe;
+DGNCOMP = $(UTL)dgn_comp.exe;
+DLB	= $(UTL)dlb.exe;
+RECOVER = $(UTL)recover.exe;
+
+# if you are using gcc as your compiler,
+#	uncomment the CC definition below if it's not in your environment
+# CC = gcc
+
+CFLAGS	= /Include=$(INC)/noList	# VAXC or GNUC
+#CFLAGS	= /Prefix=All/Incl=$(INC)/noList	# DECC in native mode
+LFLAGS	= /noMap
+LIBS	= $(SRC)crtl.opt/Options		# run-time library(s) needed
+LINK	= link
+
+# If you don't have yacc, byacc, or bison or just don't want to run any of
+#	them, then make target "no_yacc" before trying to build lev_comp
+#	or dgn_comp.  You won't be able to modify *_comp.y though.
+# If you don't have lex or flex, then make target "no_lex" and leave
+#	*_comp.l alone.  $(VMS)lev_lex.h will be used to work-around some
+#	suspect code included in the distributed copies of *_lex.c.
+# If you do either of the above, the corresponding value of YACC and/or LEX
+#	below won't matter.
+#
+# Note:  VMS POSIX V1.1 lex and yacc generate code which contains an
+#	invalid #module directive; it order to prevent warnings for CC or
+#	choking by GCC, the SEARCH command is used in an attempt to strip
+#	then out.  Otherwise MMS would quit when making the affected targets.
+#	Each "munged" copy should be identical to its original if no #module
+#	directives are present.
+#
+# yacc/lex programs to use to generate *_comp.c, *_comp.h, and *_lex.c.
+# choose xxxOUT that matches xxx tool's output
+YACC	= bison /Define
+LEX	= flex
+#YACC	= yacc -d
+#LEX	= lex
+#YACC	= posix/Run posix$bin:yacc. "-d
+#LEX	= posix/Run posix$bin:lex. "
+# blank means foo.y -> foo_tab.c & foo_tab.h
+YACCOUT =		# bison
+#YACCOUT = ytab		# VMS POSIX
+#YACCOUT = y_tab	# DEC/Shell
+LEXOUT	= lexyy		# flex
+#LEXOUT  = lex_yy	# VMS POSIX
+
+
+# Nothing below this line should have to be changed.
+
+# linker options file
+LIBOPT	= $(SRC)crtl.opt;
+
+# timestamps for primary header files, matching src/Makefile
+CONFIG_H = $(SRC)config.h-t
+HACK_H   = $(SRC)hack.h-t
+
+# utility .c files
+MAKESRC    = makedefs.c
+SPLEVSRC   = lev_yacc.c lev_lex.c lev_main.c
+DGNCOMPSRC = dgn_yacc.c dgn_lex.c dgn_main.c
+RECOVSRC   = recover.c
+DLBSRC	   = dlb_main.c
+UTILSRCS   = $(MAKESRC) $(SPLEVSRC) $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC) panic.c
+
+# object files that provide access to NetHack's names
+NAMEOBJ1 = $(SRC)monst.obj,$(SRC)objects.obj
+NAMEOBJ2 = $(SRC)drawing.obj,$(SRC)decl.obj
+NAMEOBJS = $(NAMEOBJ1),$(NAMEOBJ2)
+
+# object files for makedefs
+MAKEOBJS = makedefs.obj,$(NAMEOBJ1)
+VMSMAKEOBJS = $(SRC)vmsmisc.obj
+
+# object files for special levels compiler
+SPLEVOBJS = lev_main.obj,lev_yacc.obj,lev_lex.obj,panic.obj,\
+	    $(SRC)alloc.obj,$(NAMEOBJS)
+VMSSPLEVOBJS = $(SRC)vmsmisc.obj,$(SRC)vmsfiles.obj
+
+# object files for dungeon compiler
+DGNCOMPOBJS = dgn_main.obj,dgn_yacc.obj,dgn_lex.obj,panic.obj,$(SRC)alloc.obj
+VMSDGNCOBJS = $(SRC)vmsmisc.obj
+
+# object files for recovery utility
+RECOVOBJS = recover.obj
+VMSRECOBJS = $(SRC)vmsmisc.obj,$(SRC)vmsfiles.obj
+
+# object files for dlb utility
+DLBOBJS = dlb_main.obj,panic.obj,$(SRC)alloc.obj,$(SRC)dlb.obj
+VMSDLBOBJS = $(SRC)vmsmisc.obj,$(SRC)vmsfiles.obj
+
+
+#	fake target
+default :
+      @ $(ECHO) "Oops!  No target(s) specified...."
+
+all	: $(MAKEDEFS) $(LEVCOMP) $(DGNCOMP) $(RECOVER) $(DLB)
+      @ $(ECHO) "util is up to date."
+
+#	special targets for folks without yacc/bison and or lex/flex
+no_yacc :
+	copy $(SYSSHR)%%%_yacc.c $(UTL)
+	copy $(SYSSHR)%%%_comp.h $(INC)
+      @ $(ECHO) "distributed yacc output (*_yacc.c) copied into place"
+no_lex :
+	copy $(SYSSHR)%%%_lex.c $(UTL)
+	copy $(VMS)lev_lex.h $(UTL)
+      @ $(ECHO) "distributed lex output (*_lex.c) copied into place"
+
+#	alternate target names for possible interactive use
+makedefs : $(MAKEDEFS)
+      @ $(ECHO) "makedefs is up to date."
+lev_comp : $(LEVCOMP)
+      @ $(ECHO) "lev_comp is up to date."
+dgn_comp : $(DGNCOMP)
+      @ $(ECHO) "dgn_comp is up to date."
+recover  : $(RECOVER)
+      @ $(ECHO) "recover is up to date."
+dlb	 : $(DLB)
+      @ $(ECHO) "recover is up to date."
+
+$(LIBOPT) : $(SRC)Makefile.;		# linker options file
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) $(LIBOPT)
+      @ $(CD) $(UTL)
+
+#	dependencies for makedefs
+#
+$(MAKEDEFS) :	$(MAKEOBJS) $(VMSMAKEOBJS) $(LIBOPT)
+	$(LINK) $(LFLAGS) $(MAKEOBJS),$(VMSMAKEOBJS),$(LIBS)
+
+makedefs.obj :	makedefs.c \
+		$(CONFIG_H) $(INC)permonst.h $(INC)objclass.h \
+		$(INC)monsym.h $(INC)artilist.h $(INC)dungeon.h \
+		$(INC)obj.h $(INC)monst.h $(INC)you.h $(INC)flag.h \
+		$(INC)dlb.h $(INC)patchlevel.h $(INC)qtext.h
+
+$(INC)onames.h	: $(MAKEDEFS)
+	$(RUN) $(MAKEDEFS) -o
+$(INC)pm.h	: $(MAKEDEFS)
+	$(RUN) $(MAKEDEFS) -p
+$(SRC)monstr.c	: $(MAKEDEFS)
+	$(RUN) $(MAKEDEFS) -m
+# both vis_tab.h and vis_tab.c are made at the same time by makedefs -z
+$(INC)vis_tab.h : $(SRC)vis_tab.c
+	$(TOUCH) $(INC)vis_tab.h
+$(SRC)vis_tab.c : $(MAKEDEFS)
+	$(RUN) $(MAKEDEFS) -z
+
+# the src Makefile is responsible for knowing when to call this, since
+# it knows all about the main src and include files
+$(INC)date.h :	$(MAKEDEFS)
+	$(RUN) $(MAKEDEFS) -v
+
+
+#	dependencies for lev_comp
+#
+$(LEVCOMP) : $(SPLEVOBJS) $(VMSSPLEVOBJS)	# $(LIBOPT)
+	$(LINK)/Exe=$(LEVCOMP) $(LFLAGS) $(SPLEVOBJS),$(VMSSPLEVOBJS),$(LIBS)
+
+lev_yacc.obj : $(HACK_H) $(INC)sp_lev.h lev_yacc.c
+	$(CC) $(CFLAGS) lev_yacc.c
+lev_lex.obj  : $(HACK_H) $(INC)lev_comp.h $(INC)sp_lev.h lev_lex.c
+	@ if f$search("lev_lex.h").nes."" then	$(MOVE) lev_lex.h stdio.h
+	$(CC) $(CFLAGS) lev_lex.c
+	@ if f$search("stdio.h").nes."" then  $(MOVE) stdio.h lev_lex.h
+lev_main.obj : $(HACK_H) $(INC)sp_lev.h $(INC)tcap.h $(INC)date.h lev_main.c
+	$(CC) $(CFLAGS) lev_main.c
+panic.obj    : $(CONFIG_H)
+	$(CC) $(CFLAGS) panic.c
+
+$(INC)lev_comp.h : lev_yacc.c
+	$(TOUCH) $(INC)lev_comp.h
+
+lev_yacc.c : lev_comp.y
+	$(YACC) lev_comp.y
+	$(MUNG) 'f$parse("$(YACCOUT)","lev_comp_tab.c")' "#module" /Outp=lev_yacc.c
+	@ if f$search("''f$parse("$(YACCOUT)","lev_comp_tab.c")'").nes."" then \
+		$(RM) 'f$parse("$(YACCOUT)","lev_comp_tab.c")'
+	$(MOVE) 'f$parse("$(YACCOUT)","lev_comp_tab.h")' $(INC)lev_comp.h
+
+lev_lex.c : lev_comp.l
+	$(LEX) lev_comp.l
+	$(MUNG) 'f$parse("$(LEXOUT)","lev_comp_lex.c")' "#module" /Outp=lev_lex.c
+	@ if f$search("''f$parse("$(LEXOUT)","lev_comp_lex.c")'").nes."" then \
+		$(RM) 'f$parse("$(LEXOUT)","lev_comp_lex.c")'
+
+
+#	dependencies for dgn_comp
+#
+$(DGNCOMP) : $(DGNCOMPOBJS) $(VMSDGNCOBJS)	# $(LIBOPT)
+	$(LINK)/Exe=$(DGNCOMP) $(LFLAGS) $(DGNCOMPOBJS),$(VMSDGNCOBJS),$(LIBS)
+
+dgn_yacc.obj : $(CONFIG_H) $(INC)dgn_file.h $(INC)date.h dgn_yacc.c
+	$(CC) $(CFLAGS) dgn_yacc.c
+dgn_lex.obj  : $(CONFIG_H) $(INC)dgn_comp.h $(INC)dgn_file.h dgn_lex.c
+	@ if f$search("lev_lex.h").nes."" then	$(MOVE) lev_lex.h stdio.h
+	$(CC) $(CFLAGS) dgn_lex.c
+	@ if f$search("stdio.h").nes."" then  $(MOVE) stdio.h lev_lex.h
+dgn_main.obj : $(CONFIG_H) dgn_main.c
+	$(CC) $(CFLAGS) dgn_main.c
+
+$(INC)dgn_comp.h : dgn_yacc.c
+	$(TOUCH) $(INC)dgn_comp.h
+
+dgn_yacc.c : dgn_comp.y
+	$(YACC) dgn_comp.y
+	$(MUNG) 'f$parse("$(YACCOUT)","dgn_comp_tab.c")' "#module" /Outp=dgn_yacc.c
+	@ if f$search("''f$parse("$(YACCOUT)","dgn_comp_tab.c")'").nes."" then \
+		$(RM) 'f$parse("$(YACCOUT)","dgn_comp_tab.c")'
+	$(MOVE) 'f$parse("$(YACCOUT)","dgn_comp_tab.h")' $(INC)dgn_comp.h
+
+dgn_lex.c : dgn_comp.l
+	$(LEX) dgn_comp.l
+	$(MUNG) 'f$parse("$(LEXOUT)","dgn_comp_lex.c")' "#module" /Outp=dgn_lex.c
+	@ if f$search("''f$parse("$(LEXOUT)","dgn_comp_lex.c")'").nes."" then \
+		$(RM) 'f$parse("$(LEXOUT)","dgn_comp_lex.c")'
+
+
+#	dependencies for recover
+#
+$(RECOVER) : $(RECOVOBJS) $(VMSRECOBJS)		# $(LIBOPT)
+	$(LINK) $(LFLAGS) $(RECOVOBJS),$(VMSRECOBJS),$(LIBS)
+
+recover.obj : $(CONFIG_H) recover.c
+
+#	dependencies for dlb
+#
+$(DLB) : $(DLBOBJS) $(VMSDLBOBJS)		# $(LIBOPT)
+	$(LINK)/Exe=$(DLB) $(LFLAGS) $(DLBOBJS),$(VMSDLBOBJS),$(LIBS)
+
+dlb_main.obj : $(CONFIG_H) $(INC)dlb.h dlb_main.c
+
+#	dependencies and build rules for tile utilities
+#
+TILEMAP    = $(UTL)tilemap.exe;
+GIF2TXT    = $(UTL)gif2txt.exe;
+TXT2PPM    = $(UTL)txt2ppm.exe;
+TILE2X11   = $(UTL)tile2x11.exe;
+TILEUTILS  = $(TILEMAP),$(GIF2TXT),$(TXT2PPM),$(TILE2X11)
+TEXTIO	   = $(UTL)tiletxt.obj,tiletext.obj,$(NAMEOBJS),$(SRC)vmsmisc.obj
+GIFREADERS = gifread.obj,panic.obj,$(SRC)alloc.obj
+PPMWRITERS = ppmwrite.obj,panic.obj,$(SRC)alloc.obj
+
+tileutils : $(TILEUTILS)
+	@ $(NOOP)
+
+$(GIF2TXT) : $(GIFREADERS) $(TEXTIO)
+	$(LINK)/Exe=$(GIF2TXT) $(LFLAGS) $(GIFREADERS),$(TEXTIO),$(LIBS)
+$(TXT2PPM) : $(PPMWRITERS) $(TEXTIO)
+	$(LINK)/Exe=$(TXT2PPM) $(LFLAGS) $(PPMWRITERS),$(TEXTIO),$(LIBS)
+$(TILE2X11) : tile2x11.obj $(TEXTIO)
+	$(LINK) $(LFLAGS) tile2x11.obj,$(TEXTIO),$(LIBS)
+$(TILEMAP) : tilemap.obj $(SRC)vmsmisc.obj
+	$(LINK) $(LFLAGS) tilemap.obj,$(SRC)vmsmisc.obj,$(LIBS)
+
+$(SRC)tile.c : $(TILEMAP)
+	$(RUN) $(TILEMAP)
+$(INC)tile.h : $(WINSHR)tile.h
+	copy $(WINSHR)tile.h $(INC)tile.h
+
+# Force an explicit directory prefix on tiletxt.obj so that we don't get
+# unwanted "sticky defaults" when $(TEXTIO) is used in a comma-separated
+# list on the link command line.
+#
+$(UTL)tiletxt.obj : $(HACK_H) $(WINSHR)tilemap.c
+	$(CC) $(CFLAGS) /Def=("TILETEXT")/Obj=$@ $(WINSHR)tilemap.c
+tilemap.obj  : $(HACK_H) $(WINSHR)tilemap.c
+tiletext.obj : $(CONFIG_H) $(INC)tile.h $(WINSHR)tiletext.c
+gifread.obj  : $(CONFIG_H) $(INC)tile.h $(WINSHR)gifread.c
+ppmwrite.obj : $(CONFIG_H) $(INC)tile.h $(WINSHR)ppmwrite.c
+tile2x11.obj : $(HACK_H) $(INC)tile.h $(INC)tile2x11.h $(WINX11)tile2x11.c
+
+
+# make sure object files from src are available when needed
+#
+$(SRC)alloc.obj : $(SRC)alloc.c $(CONFIG_H)
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) alloc.obj
+      @ $(CD) $(UTL)
+
+$(SRC)monst.obj : $(SRC)monst.c $(CONFIG_H)
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) monst.obj
+      @ $(CD) $(UTL)
+
+$(SRC)objects.obj : $(SRC)objects.c $(CONFIG_H)
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) objects.obj
+      @ $(CD) $(UTL)
+
+$(SRC)decl.obj : $(SRC)decl.c $(HACK_H)
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) decl.obj
+      @ $(CD) $(UTL)
+
+$(SRC)drawing.obj : $(SRC)drawing.c $(HACK_H)
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) drawing.obj
+      @ $(CD) $(UTL)
+
+$(SRC)dlb.obj : $(SRC)dlb.c $(HACK_H) $(INC)dlb.h
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) dlb.obj
+      @ $(CD) $(UTL)
+
+# make sure hack.h dependencies get transitive information
+$(HACK_H) : $(CONFIG_H)
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) $(HACK_H)
+      @ $(CD) $(UTL)
+$(CONFIG_H) : $(INC)config.h
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) $(CONFIG_H)
+      @ $(CD) $(UTL)
+
+# VMS specific dependencies
+$(SRC)vmsmisc.obj :	$(VMS)vmsmisc.c
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) vmsmisc.obj
+      @ $(CD) $(UTL)
+
+$(SRC)vmsfiles.obj :	$(VMS)vmsfiles.c $(CONFIG_H)
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) vmsfiles.obj
+      @ $(CD) $(UTL)
+
+
+clean :
+      - if f$search("*.*;-1").nes."" then  purge
+      - if f$search("*.obj") .nes."" then  $(RM) *.obj;
+
+spotless :	clean
+      - if f$search("%%%_lex.c") .nes."" then  $(RM) %%%_lex.c;
+      - if f$search("%%%_yacc.c").nes."" then  $(RM) %%%_yacc.c;
+      - if f$search("$(INC)%%%_comp.h").nes."" then  $(RM) $(INC)%%%_comp.h;*
+      - if f$search("$(INC)tile.h").nes."" then  $(RM) $(INC)tile.h;*
+      - if f$search("lev_lex.h") .nes."" then  $(RM) lev_lex.h;
+      - if f$search("*tab.c")	 .nes."" then  $(RM) *tab.c;
+      - if f$search("*.exe").nes."" then \
+ $(RM) $(MAKEDEFS),$(LEVCOMP),$(DGNCOMP),$(RECOVER),$(DLB)
+      - if f$search("*.exe").nes."" then  $(RM) $(TILEUTILS)
