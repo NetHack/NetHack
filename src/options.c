@@ -2372,7 +2372,6 @@ char *buf;
 	else if (!strcmp(optname, "catname")) 
 		Sprintf(buf, "%s", catname[0] ? catname : none );
 	else if (!strcmp(optname, "disclose")) {
-		boolean all = TRUE, dnone = TRUE;
 		for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
 			char topt[2];
 			topt[1] = '\0';
