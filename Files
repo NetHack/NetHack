@@ -156,8 +156,8 @@ wdnflute.uu     wdnharp.uu
 sys/unix:
 (files for UNIX versions)
 Install.unx     Makefile.dat    Makefile.doc    Makefile.src    Makefile.top
-Makefile.utl    depend.awk      nethack.sh      setup.sh        unixmain.c
-unixunix.c      unixres.c
+Makefile.utl    README.linux    depend.awk      nethack.sh      setup.sh
+unixmain.c      unixunix.c      unixres.c
 (files for replacement cpp, apparently only needed by some UNIX systems)
 cpp1.shr        cpp2.shr        cpp3.shr
 (file for sound driver for 386 UNIX)
