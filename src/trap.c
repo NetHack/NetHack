@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/02/10	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/04/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1208,6 +1208,7 @@ struct trap *trap;
 	/* caller may subsequently fill pit, e.g. with a boulder */
 	trap->ttyp = PIT;		/* explosion creates a pit */
 	trap->madeby_u = FALSE;		/* resulting pit isn't yours */
+	seetrap(trap);			/* and it isn't concealed */
 }
 
 #endif /* OVLB */
