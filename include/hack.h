@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2001/04/12	*/
+/*	SCCS Id: @(#)hack.h	3.5	2005/03/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -267,12 +267,12 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define NOSE 17
 #define STOMACH 18
 
-/* indexes for some special tin types */
-#define ROTTEN_TIN 4
-#define HOMEMADE_TIN 5
-#define FRENCH_FRIED_TIN 11
+/* indices for some special tin types */
+#define ROTTEN_TIN    0
+#define HOMEMADE_TIN  1
 #define SPINACH_TIN (-1)
-#define RANDOM_TIN (-2)
+#define RANDOM_TIN  (-2)
+#define HEALTHY_TIN (-3)
 
 /* Flags to control menus */
 #define MENUTYPELEN sizeof("traditional ")

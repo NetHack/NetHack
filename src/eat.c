@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2005/01/29	*/
+/*	SCCS Id: @(#)eat.c	3.5	2005/03/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -116,23 +116,29 @@ init_uhunger()
 	u.uhs = NOT_HUNGRY;
 }
 
-static const struct { const char *txt; int nut; } tintxts[] = {
-	{"deep fried",	 60},
-	{"pickled",	 40},
-	{"soup made from", 20},
-	{"pureed",	500},
-	{"rotten",	-50},	/* ROTTEN_TIN = 4 */
-	{"homemade",	 50},	/* HOMEMADE_TIN = 5 */
-	{"stir fried",   80},
-	{"candied",      100},
-	{"boiled",       50},
-	{"dried",        55},
-	{"szechuan",     70},
-	{"french fried", 40},	/* FRENCH_FRIED_TIN = 11 */
-	{"sauteed",      95},
-	{"broiled",      80},
-	{"smoked",       50},
-	{"", 0}
+/* tin types */
+static const struct {
+    const char *txt;			/* description */
+    int nut;				/* nutrition */
+    Bitfield(fodder,1);			/* stocked by health food shops */
+    Bitfield(greasy,1);			/* causes slippery fingers */
+} tintxts[] = {
+    {"rotten",	       -50, 0, 0},	/* ROTTEN_TIN = 0 */
+    {"homemade",	50, 1, 0},	/* HOMEMADE_TIN = 1 */
+    {"soup made from",	20, 1, 0},
+    {"french fried",	40, 0, 1},
+    {"pickled",		40, 1, 0},
+    {"boiled",		50, 1, 0},
+    {"smoked",		50, 1, 0},
+    {"dried",		55, 1, 0},
+    {"deep fried",	60, 0, 1},
+    {"szechuan",	70, 1, 0},
+    {"broiled",		80, 0, 0},
+    {"stir fried",	80, 0, 1},
+    {"sauteed",		95, 0, 0},
+    {"candied",	       100, 1, 0},
+    {"pureed",	       500, 1, 0},
+    {"", 0, 0, 0}
 };
 #define TTSZ	SIZE(tintxts)
 
@@ -1010,6 +1016,7 @@ char *s;
 int *tinvariety;
 {
 	int k, l;
+
 	if (s && tinvariety) {
 	    *tinvariety = -1;
 	    for (k = 0; k < TTSZ-1; ++k) {
@@ -1030,9 +1037,19 @@ struct obj *obj;
 int forcetype;
 {
 	register int r;
-	if (forcetype == SPINACH_TIN) {
-		obj->spe = 1;
+
+	if (forcetype == SPINACH_TIN ||
+		(forcetype == HEALTHY_TIN &&
+		    (obj->corpsenm == NON_PM || /* empty or already spinach */
+		     !vegetarian(&mons[obj->corpsenm])))) { /* replace meat */
+		obj->corpsenm = NON_PM;	/* not based on any monster */
+		obj->spe = 1;		/* spinach */
 		return;
+	} else if (forcetype == HEALTHY_TIN) {
+		r = tin_variety(obj);
+		if (r < 0 || r >= TTSZ) r = ROTTEN_TIN;	/* shouldn't happen */
+		while ((r == ROTTEN_TIN && !obj->cursed) || !tintxts[r].fodder)
+		    r = rn2(TTSZ-1);
 	} else if (forcetype >= 0 && forcetype < TTSZ-1) {
 		r = forcetype;
 	} else {	/* RANDOM_TIN */
@@ -1050,7 +1067,9 @@ struct obj *obj;
 {
 	register int r;
 
-	if (obj->spe != 1 && obj->cursed) {
+	if (obj->spe == 1) {
+		r = SPINACH_TIN;
+	} else if (obj->cursed) {
 		r = ROTTEN_TIN;			/* always rotten if cursed */
 	} else if (obj->spe < 0) {
 		r = -(obj->spe);
@@ -1150,11 +1169,11 @@ opentin()		/* called during each move whilst opening a tin */
 	    if(tintxts[r].nut < 0) make_vomiting((long)rn1(15,10), FALSE);
 	    else lesshungry(tintxts[r].nut);
 
-	    if(r == 0 || r == FRENCH_FRIED_TIN) {
-	        /* Assume !Glib, because you can't open tins when Glib. */
+	    if (tintxts[r].greasy) {
+		/* Assume !Glib, because you can't open tins when Glib. */
 		incr_itimeout(&Glib, rnd(15));
-		pline("Eating deep fried food made your %s very slippery.",
-		      makeplural(body_part(FINGER)));
+		pline("Eating %s food made your %s very slippery.",
+		      tintxts[r].txt, makeplural(body_part(FINGER)));
 	    }
 	} else {
 	    if (context.tin.tin->cursed)
