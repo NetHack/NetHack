@@ -770,6 +770,18 @@ dodown()
 		if (float_down(I_SPECIAL|TIMEOUT, W_ARTI))
 		    return (1);   /* came down, so moved */
 	    }
+	    if (Blind) {
+		/* Avoid alerting player to an unknown stair or ladder.
+		 * Changes the message for a covered, known staircase
+		 * too; staircase knowledge is not stored anywhere.
+		 */
+		if (stairs_down)
+		    stairs_down =
+			(glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnstair);
+		else if (ladder_down)
+		    ladder_down =
+			(glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnladder);
+	    }
 	    floating_above(stairs_down ? "stairs" : ladder_down ?
 			   "ladder" : surface(u.ux, u.uy));
 	    return (0);   /* didn't move */
