@@ -243,3 +243,26 @@ Notes:
     on your console speaker in certain appropriate game situations.  The only
     modification to the main-line code needed to enable use of the driver
     is defining UNIX386MUSIC or VPIX_MUSIC in unixconf.h.
+
+15. If you are trying to cross-compile for another system, there is some
+    support in the src and util Makefiles, but there are still other
+    complications.  It may well be best to make another copy of util,
+    util2, to compile target copies of makedefs, lev_comp, and recover
+    (duplicating the cross-compilation settings from the src Makefile)
+    without disturbing the main build.
+
+    You can use the host makedefs for everything but "makedefs -v", which
+    creates include/date.h, which provides various sanity-checking values
+    for making sure files read by NetHack at run-time are compatible.
+    These values depend on the endianness of your processor, its type
+    sizes, and its compiler's idea of struct packing.  Your host and target
+    computers may disagree on these things, so you'll need to build a target
+    version of makedefs, run "makedefs -v" on your target, and bring the
+    resulting date.h back for the builds on the host.  (Making sure the host
+    makedefs doesn't decide it needs to overwrite it for you. :-)
+
+    You also need a target version of lev_comp, and to provide it with all
+    the dat/*.des files, and copy all the resulting *.lev files back for
+    packaging on the host.
+
+    For recover, you just want the target binary to install on the target.
