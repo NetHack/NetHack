@@ -1,0 +1,31 @@
+            Amiga-specific help file for NetHack 3.3
+
+The Amiga port of NetHack supports a number of additional commands
+and facilities specific to the Amiga.  Listed below are the things
+which are either specific to the Amiga port or might not appear
+in other ports.
+
+While playing NetHack you can press:
+
+        ALT-HELP                Color requestor.
+        CTL-HELP                Scale display (amitile only).
+        SHIFT-HELP              Overview window (amitile only).
+
+Amiga-specific run-time options:
+        altmeta                 use the alt keys as meta keys
+        flush                   throw away keyboard type-ahead
+
+Command line options recognized are
+
+        -n                      No News at game startup.
+        -X                      Play in discovery mode.
+        -D                      Play in debug mode.
+        -L                      Interlaced screen.
+        -l                      Never Interlaced screen.
+        -u                      Play as player given as
+                                an argument.
+        -r                      Pick a race given as an
+                                argument.
+        -p                      Pick a profession given
+                                as an argument
+        -?                      Gives command line usage.
