@@ -465,8 +465,8 @@ struct monst *shkp;
 	eshkp = ESHK(shkp);
 	total = (addupbill(shkp) + eshkp->debit);
 	if (eshkp->credit >= total) {
-	    Your("credit of %ld zorkmid%s is used to cover your shopping bill.",
-		 eshkp->credit, plur(eshkp->credit));
+	    Your("credit of %ld %s is used to cover your shopping bill.",
+		 eshkp->credit, currency(eshkp->credit));
 	    total = 0L;		/* credit gets cleared by setpaid() */
 	} else {
 	    You("escaped the shop without paying!");
@@ -477,8 +477,8 @@ struct monst *shkp;
 
 	/* by this point, we know an actual robbery has taken place */
 	eshkp->robbed += total;
-	You("stole %ld zorkmid%s worth of merchandise.",
-	    total, plur(total));
+	You("stole %ld %s worth of merchandise.",
+	    total, currency(total));
 	if (!Role_if(PM_ROGUE))	/* stealing is unlawful */
 	    adjalign(-sgn(u.ualign.type));
 
@@ -674,14 +674,14 @@ shopper_financial_report()
 		if ((shkp != this_shkp) ^ pass) continue;
 		eshkp = ESHK(shkp);
 		if ((amt = eshkp->credit) != 0)
-		    You("have %ld zorkmid%s credit at %s %s.",
-			amt, plur(amt), s_suffix(shkname(shkp)),
+		    You("have %ld %s credit at %s %s.",
+			amt, currency(amt), s_suffix(shkname(shkp)),
 			shtypes[eshkp->shoptype - SHOPBASE].name);
 		else if (shkp == this_shkp)
 		    You("have no credit in here.");
 		if ((amt = shop_debt(eshkp)) != 0)
-		    You("owe %s %ld zorkmid%s.",
-			shkname(shkp), amt, plur(amt));
+		    You("owe %s %ld %s.",
+			shkname(shkp), amt, currency(amt));
 		else if (shkp == this_shkp)
 		    You("don't owe any money here.");
 	    }
@@ -1297,8 +1297,8 @@ proceed:
 #ifdef GOLDOBJ
                 umoney = money_cnt(invent);
 #endif
-		Sprintf(sbuf, "You owe %s %ld zorkmid%s ",
-					   shkname(shkp), dtmp, plur(dtmp));
+		Sprintf(sbuf, "You owe %s %ld %s ",
+					   shkname(shkp), dtmp, currency(dtmp));
 		if(loan) {
 		    if(loan == dtmp)
 			Strcat(sbuf, "you picked up in the store.");
@@ -1493,8 +1493,8 @@ boolean itemize;
 
 	if (itemize) {
 	    char qbuf[BUFSZ];
-	    Sprintf(qbuf,"%s for %ld zorkmid%s.  Pay?", quan == 1L ?
-		    Doname2(obj) : doname(obj), ltmp, plur(ltmp));
+	    Sprintf(qbuf,"%s for %ld %s.  Pay?", quan == 1L ?
+		    Doname2(obj) : doname(obj), ltmp, currency(ltmp));
 	    if (yn(qbuf) == 'n') {
 		buy = PAY_SKIP;		/* don't want to buy */
 	    } else if (quan < bp->bquan && !consumed) { /* partly used goods */
@@ -1673,9 +1673,9 @@ boolean croaked;
                         money2mon(shkp, loss);
 #endif
 			flags.botl = 1;
-			pline("%s %s the %ld zorkmid%s %sowed %s.",
+			pline("%s %s the %ld %s %sowed %s.",
 			      Monnam(shkp), takes,
-			      loss, plur(loss),
+			      loss, currency(loss),
 			      strncmp(eshkp->customer, plname, PL_NSIZ) ?
 					"" : "you ",
 			      shkp->female ? "her" : "him");
@@ -2230,12 +2230,12 @@ speak:
 			(quan > 1L) ? "per" : "for this", xname(obj));
 		obj->quan = quan;
 	    } else
-		pline("%s will cost you %ld zorkmid%s%s.",
-			The(xname(obj)), ltmp, plur(ltmp),
+		pline("%s will cost you %ld %s%s.",
+			The(xname(obj)), ltmp, currency(ltmp),
 			(obj->quan > 1L) ? " each" : "");
 	} else if(!silent) {
-	    if(ltmp) pline_The("list price of %s is %ld zorkmid%s%s.",
-				   the(xname(obj)), ltmp, plur(ltmp),
+	    if(ltmp) pline_The("list price of %s is %ld %s%s.",
+				   the(xname(obj)), ltmp, currency(ltmp),
 				   (obj->quan > 1L) ? " each" : "");
 	    else pline("%s does not notice.", Monnam(shkp));
 	}
@@ -2423,8 +2423,8 @@ register boolean peaceful, silent;
 		char *still = "";
 		if (credit_use) {
 		    if (ESHK(shkp)->credit) {
-			You("have %ld zorkmids credit remaining.",
-				 ESHK(shkp)->credit);
+			You("have %ld %s credit remaining.",
+				 ESHK(shkp)->credit, currency(ESHK(shkp)->credit));
 			return value;
 		    } else if (!value) {
 			You("have no credit remaining.");
@@ -2433,10 +2433,10 @@ register boolean peaceful, silent;
 		    still = "still ";
 		}
 		if(obj->oclass == GOLD_CLASS)
-		    You("%sowe %s %ld zorkmids!", still, mon_nam(shkp), value);
-		else You("%sowe %s %ld zorkmids for %s!", still,
+		    You("%sowe %s %ld %s!", still, mon_nam(shkp), value, currency(value));
+		else You("%sowe %s %ld %s for %s!", still,
 			mon_nam(shkp),
-			value,
+			value, currency(value),
 			obj->quan > 1L ? "them" : "it");
 	    }
 	} else {
@@ -2588,8 +2588,8 @@ xchar x, y;
 			eshkp->loan = 0L;
 			Your("debt is paid off.");
 		    }
-		    pline("%ld zorkmid%s added to your credit.",
-				delta, delta > 1L ? "s are" : " is");
+		    pline("%ld %s %s added to your credit.",
+				delta, currency(delta), delta > 1L ? "are" : "is");
 		}
 		if(offer) goto move_on;
 		else {
@@ -2631,8 +2631,8 @@ move_on:
 		} else if (sell_response != 'n') {
 		    pline("%s cannot pay you at present.", Monnam(shkp));
 		    Sprintf(qbuf,
-			    "Will you accept %ld zorkmid%s in credit for %s?",
-			    tmpcr, plur(tmpcr), doname(obj));
+			    "Will you accept %ld %s in credit for %s?",
+			    tmpcr, currency(tmpcr), doname(obj));
 		    /* won't accept 'a' response here */
 		    /* KLY - 3/2000 yes, we will, it's a damn nuisance
                        to have to constantly hit 'y' to sell for credit */
@@ -3497,8 +3497,8 @@ getcad:
 	}
 
 	if (Invis) Your("invisibility does not fool %s!", shkname(shkp));
-	Sprintf(qbuf,"\"Cad!  You did %ld zorkmids worth of damage!\"  Pay? ",
-		 cost_of_damage);
+	Sprintf(qbuf,"\"Cad!  You did %ld %s worth of damage!\"  Pay? ",
+		 cost_of_damage, currency(cost_of_damage));
 	if(yn(qbuf) != 'n') {
 		cost_of_damage = check_credit(cost_of_damage, shkp);
 #ifndef GOLDOBJ
@@ -3584,7 +3584,7 @@ register struct obj *first_obj;
 	if (!cost) {
 	    Strcpy(price, "no charge");
 	} else {
-	    Sprintf(price, "%ld zorkmid%s%s", cost, plur(cost),
+	    Sprintf(price, "%ld %s%s", cost, currency(cost),
 		    otmp->quan > 1L ? " each" : "");
 	}
 	Sprintf(buf, "%s, %s", doname(otmp), price);
@@ -3600,8 +3600,8 @@ register struct obj *first_obj;
 	    cost = get_cost(first_obj, (struct monst *)0);
 	    if (Has_contents(first_obj))
 		cost += contained_cost(first_obj, shkp, 0L, FALSE);
-	    pline("%s, price %ld zorkmid%s%s%s", doname(first_obj),
-		cost, plur(cost), first_obj->quan > 1L ? " each" : "",
+	    pline("%s, price %ld %s%s%s", doname(first_obj),
+		cost, currency(cost), first_obj->quan > 1L ? " each" : "",
 		shk_embellish(first_obj, cost));
 	}
     }
@@ -3692,15 +3692,15 @@ struct monst *shkp;
 		}
 	} else if (eshk->billct) {
 		register long total = addupbill(shkp) + eshk->debit;
-		pline("%s says that your bill comes to %ld zorkmid%s.",
-		      shkname(shkp), total, plur(total));
+		pline("%s says that your bill comes to %ld %s.",
+		      shkname(shkp), total, currency(total));
 	} else if (eshk->debit)
-		pline("%s reminds you that you owe %s %ld zorkmid%s.",
+		pline("%s reminds you that you owe %s %ld %s.",
 		      shkname(shkp), mhim(shkp),
-		      eshk->debit, plur(eshk->debit));
+		      eshk->debit, currency(eshk->debit));
 	else if (eshk->credit)
-		pline("%s encourages you to use your %ld zorkmid%s of credit.",
-		      shkname(shkp), eshk->credit, plur(eshk->credit));
+		pline("%s encourages you to use your %ld %s of credit.",
+		      shkname(shkp), eshk->credit, currency(eshk->credit));
 	else if (eshk->robbed)
 		pline("%s complains about a recent robbery.", shkname(shkp));
 #ifndef GOLDOBJ
@@ -3823,19 +3823,19 @@ boolean altusage;
 
 	arg1 = arg2 = "";
 	if (otmp->oclass == SPBOOK_CLASS) {
-	    fmt = "%sYou owe%s %ld zorkmids.";
+	    fmt = "%sYou owe%s %ld %s.";
 	    arg1 = rn2(2) ? "This is no free library, cad!  " : "";
 	    arg2 = ESHK(shkp)->debit > 0L ? " an additional" : "";
 	} else if (otmp->otyp == POT_OIL) {
-	    fmt = "%s%sThat will cost you %ld zorkmids (Yendorian Fuel Tax).";
+	    fmt = "%s%sThat will cost you %ld %s (Yendorian Fuel Tax).";
 	} else {
-	    fmt = "%s%sUsage fee, %ld zorkmids.";
+	    fmt = "%s%sUsage fee, %ld %s.";
 	    if (!rn2(3)) arg1 = "Hey!  ";
 	    if (!rn2(3)) arg2 = "Ahem.  ";
 	}
 
 	if (shkp->mcanmove || !shkp->msleeping)
-	    verbalize(fmt, arg1, arg2, tmp);
+	    verbalize(fmt, arg1, arg2, tmp, currency(tmp));
 	ESHK(shkp)->debit += tmp;
 	exercise(A_WIS, TRUE);		/* you just got info */
 }
@@ -3864,8 +3864,8 @@ register long amount;
 	eshkp = ESHK(shkp);
 	if(eshkp->credit >= amount) {
 	    if(eshkp->credit > amount)
-		Your("credit is reduced by %ld zorkmid%s.",
-					amount, plur(amount));
+		Your("credit is reduced by %ld %s.",
+					amount, currency(amount));
 	    else Your("credit is erased.");
 	    eshkp->credit -= amount;
 	} else {
@@ -3873,10 +3873,10 @@ register long amount;
 	    if(eshkp->credit)
 		Your("credit is erased.");
 	    if(eshkp->debit)
-		Your("debt increases by %ld zorkmid%s.",
-					delta, plur(delta));
-	    else You("owe %s %ld zorkmid%s.",
-				shkname(shkp), delta, plur(delta));
+		Your("debt increases by %ld %s.",
+					delta, currency(delta));
+	    else You("owe %s %ld %s.",
+				shkname(shkp), delta, currency(delta));
 	    eshkp->debit += delta;
 	    eshkp->loan += delta;
 	    eshkp->credit = 0L;

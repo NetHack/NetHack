@@ -2215,8 +2215,8 @@ register struct monst *mon;
 		if (cost > u.ugold) cost = u.ugold;
 		if (!cost) verbalize("It's on the house!");
 		else {
-		    pline("%s takes %ld zorkmid%s for services rendered!",
-			    Monnam(mon), cost, plur(cost));
+		    pline("%s takes %ld %s for services rendered!",
+			    Monnam(mon), cost, currency(cost));
 		    u.ugold -= cost;
 		    mon->mgold += cost;
 		    flags.botl = 1;
@@ -2236,8 +2236,8 @@ register struct monst *mon;
 		if (cost > umoney) cost = umoney;
 		if (!cost) verbalize("It's on the house!");
 		else { 
-		    pline("%s takes %ld zorkmid%s for services rendered!",
-			    Monnam(mon), cost, plur(cost));
+		    pline("%s takes %ld %s for services rendered!",
+			    Monnam(mon), cost, currency(cost));
                     money2mon(mon, cost);
 		    flags.botl = 1;
 		}

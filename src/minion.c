@@ -140,8 +140,8 @@ register struct monst *mtmp;
 	if (!demand)		/* you have no gold */
 	    return mtmp->mpeaceful = 0;
 	else {
-	    pline("%s demands %ld zorkmid%s for safe passage.",
-		  Amonnam(mtmp), demand, plur(demand));
+	    pline("%s demands %ld %s for safe passage.",
+		  Amonnam(mtmp), demand, currency(demand));
 
 	    if ((offer = bribe(mtmp)) >= demand) {
 		pline("%s vanishes, laughing about cowardly mortals.",
@@ -185,8 +185,8 @@ struct monst *mtmp;
 	} else if (offer >= u.ugold) {
 		You("give %s all your gold.", mon_nam(mtmp));
 		offer = u.ugold;
-	} else You("give %s %ld zorkmid%s.", mon_nam(mtmp), offer,
-		   plur(offer));
+	} else You("give %s %ld %s.", mon_nam(mtmp), offer,
+		   currency(offer));
 
 	u.ugold -= offer;
 	mtmp->mgold += offer;
@@ -194,8 +194,8 @@ struct monst *mtmp;
 	} else if (offer >= umoney) {
 		You("give %s all your gold.", mon_nam(mtmp));
 		offer = umoney;
-	} else You("give %s %ld zorkmid%s.", mon_nam(mtmp), offer,
-		   plur(offer));
+	} else You("give %s %ld %s.", mon_nam(mtmp), offer,
+		   currency(offer));
 
         money2mon(mtmp, offer);
 #endif

@@ -763,13 +763,13 @@ paygd()
 #endif
 
 	if (u.uinvault) {
-	    Your("%ld zorkmid%s goes into the Magic Memory Vault.",
+	    Your("%ld %s goes into the Magic Memory Vault.",
 #ifndef GOLDOBJ
 		u.ugold,
-		plur(u.ugold));
+		currency(u.ugold));
 #else
 		umoney,
-		plur(umoney));
+		currency(umoney));
 #endif
 	    gx = u.ux;
 	    gy = u.uy;

@@ -312,8 +312,8 @@ register struct monst *oracl;
 	}
 
 	Sprintf(qbuf,
-		"\"Wilt thou settle for a minor consultation?\" (%d zorkmids)",
-		minor_cost);
+		"\"Wilt thou settle for a minor consultation?\" (%d %s)",
+		minor_cost, currency(minor_cost));
 	switch (ynq(qbuf)) {
 	    default:
 	    case 'q':
@@ -337,8 +337,8 @@ register struct monst *oracl;
 #endif
 		    (oracle_cnt == 1 || oracle_flg < 0)) return 0;
 		Sprintf(qbuf,
-			"\"Then dost thou desire a major one?\" (%d zorkmids)",
-			major_cost);
+			"\"Then dost thou desire a major one?\" (%d %s)",
+			major_cost, currency(major_cost));
 		if (yn(qbuf) != 'y') return 0;
 #ifndef GOLDOBJ
 		u_pay = (u.ugold < (long)major_cost ? (int)u.ugold

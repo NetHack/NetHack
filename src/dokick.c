@@ -285,9 +285,9 @@ register struct obj *gold;
 #else
 				    ESHK(mtmp)->credit += value;
 #endif
-				    You("have %ld zorkmid%s in credit.",
+				    You("have %ld %s in credit.",
 					ESHK(mtmp)->credit,
-					plur(ESHK(mtmp)->credit));
+					currency(ESHK(mtmp)->credit));
 				} else verbalize("Thanks, scum!");
 			}
 		} else if (mtmp->ispriest) {
@@ -449,11 +449,11 @@ xchar x, y;
 		}
 		if(costly && loss) {
 		    if(!insider) {
-			You("caused %ld zorkmids worth of damage!", loss);
+			You("caused %ld %s worth of damage!", loss, currency(loss));
 			make_angry_shk(shkp, x, y);
 		    } else {
-			You("owe %s %ld zorkmids for objects destroyed.",
-			    mon_nam(shkp), loss);
+			You("owe %s %ld %s for objects destroyed.",
+			    mon_nam(shkp), loss, currency(loss));
 		    }
 		}
 
@@ -1179,7 +1179,7 @@ xchar x, y, dlev;
 
 	if(costly && shkp && price) {
 		if(ESHK(shkp)->robbed > robbed) {
-		    You("removed %ld zorkmids worth of goods!", price);
+		    You("removed %ld %s worth of goods!", price, currency(price));
 		    if(cansee(shkp->mx, shkp->my)) {
 			if(ESHK(shkp)->customer[0] == 0)
 			    (void) strncpy(ESHK(shkp)->customer,
@@ -1192,10 +1192,12 @@ xchar x, y, dlev;
 		    (void) angry_guards(FALSE);
 		    return;
 		}
-		if(ESHK(shkp)->debit > debit)
-		    You("owe %s %ld zorkmids for goods lost.",
+		if(ESHK(shkp)->debit > debit) {
+		    long amt = (ESHK(shkp)->debit - debit);
+		    You("owe %s %ld %s for goods lost.",
 			Monnam(shkp),
-			(ESHK(shkp)->debit - debit));
+			amt, currency(amt));
+		}
 	}
 
 }

@@ -573,6 +573,14 @@ register int type;
 	return((struct obj *) 0);
 }
 
+const char *
+currency(amount)
+long amount;
+{
+	if (amount == 1) return "zorkmid";
+	else return "zorkmids";
+}
+
 boolean
 have_lizard()
 {
@@ -1442,9 +1450,9 @@ long quan;		/* if non-0, print this quantity, not obj->quan */
      */
     if (cost != 0 || let == '*') {
 	/* if dot is true, we're doing Iu, otherwise Ix */
-	Sprintf(li, "%c - %-45s %6ld zorkmid%s",
+	Sprintf(li, "%c - %-45s %6ld %s",
 		(dot && use_invlet ? obj->invlet : let),
-		(txt ? txt : doname(obj)), cost, plur(cost));
+		(txt ? txt : doname(obj)), cost, currency(cost));
 #ifndef GOLDOBJ
     } else if (obj && obj->oclass == GOLD_CLASS) {
 	Sprintf(li, "%ld gold piece%s%s", obj->quan, plur(obj->quan),
@@ -2193,7 +2201,7 @@ doprgold()
 	if(!umoney)
 	    Your("wallet is empty.");
 	else
-	    Your("wallet contains %ld zorkmid%s.", umoney, plur(umoney));
+	    Your("wallet contains %ld %s.", umoney, currency(umoney));
 #endif
 	shopper_financial_report();
 	return 0;

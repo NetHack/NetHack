@@ -3298,11 +3298,11 @@ boolean disarm;
 			  exercise(A_STR, FALSE);
 			  if(costly && loss) {
 			      if(insider)
-			      You("owe %ld zorkmids for objects destroyed.",
-							loss);
+			      You("owe %ld %s for objects destroyed.",
+							loss, currency(loss));
 			      else {
-				  You("caused %ld zorkmids worth of damage!",
-							loss);
+				  You("caused %ld %s worth of damage!",
+							loss, currency(loss));
 				  make_angry_shk(shkp, ox, oy);
 			      }
 			  }

@@ -463,10 +463,10 @@ winid endwin;
 	    otmp->known = otmp->bknown = otmp->dknown =
 		otmp->rknown = 1;
 	    /* assumes artifacts don't have quan>1 */
-	    Sprintf(pbuf, "%s (worth %ld zorkmids and %ld points)",
+	    Sprintf(pbuf, "%s (worth %ld %s and %ld points)",
 		otmp->oartifact ? artifact_name(xname(otmp), &dummy) :
 			OBJ_NAME(objects[otmp->otyp]),
-		100L * (long)objects[otmp->otyp].oc_cost,
+		100L * (long)objects[otmp->otyp].oc_cost, currency(2L), 
 		250L * (long)objects[otmp->otyp].oc_cost);
 	    putstr(endwin, 0, pbuf);
 	}
@@ -561,7 +561,7 @@ die:
 	 * smiling... :-)  -3.
 	 */
 	if (moves <= 1 && how < PANICKED)	/* You die... --More-- */
-	    pline("Do not pass go.  Do not collect 200 zorkmids.");
+	    pline("Do not pass go.  Do not collect 200 %s.", currency(200L));
 
 	if (have_windows) wait_synch();	/* flush screen output */
 #ifndef NO_SIGNAL
@@ -769,9 +769,9 @@ die:
 			otmp->dknown = 1;	/* seen it (blindness fix) */
 			otmp->onamelth = 0;
 			otmp->quan = count;
-			Sprintf(pbuf, "%8ld %s (worth %ld zorkmids),",
+			Sprintf(pbuf, "%8ld %s (worth %ld %s),",
 				count, xname(otmp),
-				count * (long)objects[typ].oc_cost);
+				count * (long)objects[typ].oc_cost, currency(2L));
 			obfree(otmp, (struct obj *)0);
 		    } else {
 			Sprintf(pbuf,
