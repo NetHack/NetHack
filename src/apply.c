@@ -1800,6 +1800,7 @@ struct obj *otmp;
 	const char *color = 0;
 	static const char *ambiguous = "You make scratch marks on the stone.";
 	const char *scritch = "\"scritch, scritch\"";
+	unsigned material;
 
 	allowall[0] = ALL_CLASSES;
 	allowall[1] = '\0';
@@ -1810,6 +1811,7 @@ struct obj *otmp;
 	    You_cant("rub %s on itself.", the(xname(obj)));
 	    return;
 	}
+	material = objects[obj->otyp].oc_material;
 
 	if (otmp->cursed && obj->oclass == GEM_CLASS && rnd(5) == 1) {
 	    pline(
@@ -1832,6 +1834,30 @@ struct obj *otmp;
 	    return;
 	}
 
+	if (material == LIQUID || material == WAX ||
+		material == CLOTH || material == WOOD) {
+	    switch(material) {
+		    case LIQUID:
+			if (!obj->known)
+			    You("must think this is a wetstone, do you?");
+			else
+			    pline("%s is a little wetter now.", The(xname(otmp)));
+			break;
+		    case WAX:
+		    	color = "waxy";
+		    	goto see_streaks;	/* okay even if not touchstone */
+		    	break;
+		    case CLOTH:
+		    	pline_The("stone looks a little more polished now.");
+		    	break;
+		    case WOOD:
+		    	color = "wooden";
+		    	goto see_streaks;	/* okay even if not touchstone */
+		    	break;
+	    }
+	    return;
+	}
+	   
 	if (otmp->otyp != TOUCHSTONE) {
 	    pline(ambiguous);
 	    return;
@@ -1867,6 +1893,7 @@ struct obj *otmp;
 	    pline(scritch);
 	    return;
 	}
+see_streaks:
 	pline("You see %s streaks on the stone.", color);
 	return;
 }
