@@ -12,7 +12,7 @@ static NEARDATA const char steeds[] = {
 	S_QUADRUPED, S_UNICORN, S_ANGEL, S_CENTAUR, S_DRAGON, S_JABBERWOCK, '\0'
 };
 
-STATIC_DCL boolean FDECL(landing_spot, (coord *, int));
+STATIC_DCL boolean FDECL(landing_spot, (coord *, int, int));
 
 /* caller has decided that hero can't reach something while mounted */
 void
@@ -415,30 +415,38 @@ kick_steed()
  * Adapted from mail daemon code.
  */
 STATIC_OVL boolean
-landing_spot(spot, forceit)
+landing_spot(spot, reason, forceit)
 coord *spot;	/* landing position (we fill it in) */
+int reason;
 int forceit;
 {
-    int x, y, distance, min_distance = -1;
+    int i = 0, x, y, distance, min_distance = -1;
     boolean found = FALSE;
-    
-    for (x = u.ux-1; x <= u.ux+1; x++)
-  	for (y = u.uy-1; y <= u.uy+1; y++) {
-	    if (!isok(x, y) || (x == u.ux && y == u.uy)) continue;
+    struct trap *t;
 
-	    if (ACCESSIBLE(levl[x][y].typ) &&
-			!MON_AT(x,y) && !closed_door(x,y)) {
-		distance = distu(x,y);
-		if (min_distance < 0 || distance < min_distance ||
-			(distance == min_distance && rn2(2))) {
-		    spot->x = x;
-		    spot->y = y;
-		    min_distance = distance;
-		    found = TRUE;
+    /* avoid known traps (i == 0), but allow them as a backup */
+    if (reason != DISMOUNT_BYCHOICE || Stunned || Confusion || Fumbling) i = 1;
+    for (; !found && i < 2; ++i) {
+	for (x = u.ux-1; x <= u.ux+1; x++)
+	    for (y = u.uy-1; y <= u.uy+1; y++) {
+		if (!isok(x, y) || (x == u.ux && y == u.uy)) continue;
+
+		if (ACCESSIBLE(levl[x][y].typ) &&
+			    !MON_AT(x,y) && !closed_door(x,y)) {
+		    distance = distu(x,y);
+		    if (min_distance < 0 || distance < min_distance ||
+			    (distance == min_distance && rn2(2))) {
+			if (i > 0 || (t = t_at(x, y)) == 0 || !t->tseen) {
+			    spot->x = x;
+			    spot->y = y;
+			    min_distance = distance;
+			    found = TRUE;
+			}
+		    }
 		}
 	    }
-	}
-    
+    }
+
     /* If we didn't find a good spot and forceit is on, try enexto(). */
     if (forceit && min_distance < 0 &&
 		!enexto(spot, u.ux, u.uy, youmonst.data))
@@ -458,7 +466,7 @@ dismount_steed(reason)
 	const char *verb = "fall";
 	boolean repair_leg_damage = TRUE;
 	unsigned save_utrap = u.utrap;
-	boolean have_spot = landing_spot(&cc,0);
+	boolean have_spot = landing_spot(&cc,reason,0);
 	
 	mtmp = u.usteed;		/* make a copy of steed pointer */
 	/* Sanity check */
@@ -472,14 +480,14 @@ dismount_steed(reason)
 		verb = "are thrown";
 	    case DISMOUNT_FELL:
 		You("%s off of %s!", verb, mon_nam(mtmp));
-		if (!have_spot) have_spot = landing_spot(&cc,1);
+		if (!have_spot) have_spot = landing_spot(&cc,reason,1);
 		losehp(rn1(10,10), "riding accident", KILLED_BY_AN);
 		set_wounded_legs(BOTH_SIDES, (int)HWounded_legs + rn1(5,5));
 		repair_leg_damage = FALSE;
 		break;
 	    case DISMOUNT_POLY:
 		You("can no longer ride %s.", mon_nam(u.usteed));
-		if (!have_spot) have_spot = landing_spot(&cc,1);
+		if (!have_spot) have_spot = landing_spot(&cc,reason,1);
 		break;
 	    case DISMOUNT_ENGULFED:
 		/* caller displays message */
