@@ -1256,8 +1256,10 @@ const char *oldstr;
 		goto bottom;
 	}
 
-	/* fungus/fungi, homunculus/homunculi, but wumpuses */
-	if (!strcmp(spot-1, "us") && (len < 6 || strcmp(spot-5, "wumpus"))) {
+	/* fungus/fungi, homunculus/homunculi, but lotuses, wumpuses */
+	if (!strcmp(spot-1, "us") &&
+	    (len < 5 || (strcmp(spot-4, "lotus") &&
+			 (len < 6 || strcmp(spot-5, "wumpus"))))) {
 		*(spot--) = (char)0;
 		*spot = 'i';
 		goto bottom;
