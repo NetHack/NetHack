@@ -61,6 +61,9 @@ int ttycolors[CLR_MAX];
 static void NDECL(init_ttycolor);
 # endif
 
+#define MAX_OVERRIDES	256
+unsigned char key_overrides[MAX_OVERRIDES];
+
 #define DEFTEXTCOLOR  ttycolors[7]
 #ifdef TEXTCOLOR
 #define DEFGLYPHBGRND (0)
@@ -331,9 +334,9 @@ INPUT_RECORD *ir;
 boolean *valid;
 int portdebug;
 {
-	int metaflags = 0, k;
+	int metaflags = 0, k = 0;
 	int keycode, vk;
-	unsigned char ch, pre_ch;
+	unsigned char ch, pre_ch, mk = 0;
 	unsigned short int scan;
 	unsigned long shiftstate;
 	int altseq = 0;
@@ -406,13 +409,20 @@ int portdebug;
 				*valid = FALSE;
 		    }
 	}
+	/* check for override */
+	if (ch && ch < MAX_OVERRIDES && key_overrides[ch]) {
+		mk = ch;
+		ch = key_overrides[ch];
+		*valid = TRUE;
+	}
+
 	if (ch == '\r') ch = '\n';
 #ifdef PORT_DEBUG
 	if (portdebug) {
 		char buf[BUFSZ];
 		Sprintf(buf,
-	"PORTDEBUG: ch=%u, scan=%u, vk=%d, pre=%d, shiftstate=0x%X (ESC to end)\n",
-			ch, scan, vk, pre_ch, shiftstate);
+	"PORTDEBUG: ch=%u, sc=%u, vk=%d, pre=%d, sh=0x%X, ta=%d, mk=%d (ESC to end)\n",
+			ch, scan, vk, pre_ch, shiftstate, k, mk);
 		xputs(buf);
 	}
 #endif
@@ -936,4 +946,35 @@ win32con_debug_keystrokes()
 	(void)doredraw();
 }
 #endif
+
+void
+map_subkeyvalue(op)
+register char *op;
+{
+	char digits[] = "0123456789";
+	int length, i, idx, val;
+	char *kp;
+
+	idx = -1;
+	val = -1;
+	kp = index(op, '/');
+	if (kp) {
+		*kp = '\0';
+		kp++;
+		length = strlen(kp);
+		if (length < 1 || length > 3) return;
+		for (i = 0; i < length; i++)
+			if (!index(digits, kp[i])) return;
+		val = atoi(kp);
+		length = strlen(op);
+		if (length < 1 || length > 3) return;
+		for (i = 0; i < length; i++)
+			if (!index(digits, op[i])) return;
+		idx = atoi(op);
+	}
+	if (idx >= MAX_OVERRIDES || idx < 0 || val >= MAX_OVERRIDES || val < 1)
+		return;
+	key_overrides[idx] = val;
+}
+
 #endif /* WIN32CON */

@@ -132,6 +132,7 @@ extern void NDECL(win32_abort);
 #ifdef WIN32CON
 extern void FDECL(nttty_preference_update, (const char *));
 extern void NDECL(toggle_mouse_support);
+extern void FDECL(map_subkeyvalue, (char *));
 #endif
 
 #include <fcntl.h>

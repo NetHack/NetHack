@@ -106,6 +106,15 @@ OPTIONS=hilite_pet,!toptenwin
 # The location that a record of game aborts and self-diagnosed game problems
 # is kept (default=HACKDIR, writeable)
 #TROUBLEDIR=c:\nethack\trouble
+
+# Finnish keyboards might need these modifications uncommented. 
+# For  \, @, $, [, |
+#OPTIONS=subkeyvalue:171/92
+#OPTIONS=subkeyvalue:178/64
+#OPTIONS=subkeyvalue:180/36
+#OPTIONS=subkeyvalue:184/91
+#OPTIONS=subkeyvalue:188/124
+
 #
 # *** CHARACTER GRAPHICS ***
 #
@@ -164,5 +173,4 @@ OPTIONS=hilite_pet,!toptenwin
 #          048 035 064 042                         \
 #          047 045 092 058 058 092 045 047         \
 #          047 045 092 058 032 058 092 045 047
-
 

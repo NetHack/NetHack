@@ -317,6 +317,9 @@ static struct Comp_Opt
 	{ "videoshades", "gray shades to map to black/gray/white",
 						32, DISP_IN_GAME },
 #endif
+#ifdef WIN32CON
+	{"subkeyvalue", "override keystroke value", 7, SET_IN_FILE},
+#endif
 	{ "windowcolors",  "the foreground/background colors of windows",	/*WC*/
 						80, DISP_IN_GAME },
 	{ "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
@@ -981,6 +984,7 @@ boolean tinitial, tfrom_file;
 	if (match_optname(opts, "colour", 5, FALSE))
 		Strcpy(opts, "color");	/* fortunately this isn't longer */
 
+	if (!match_optname(opts, "subkeyvalue", 11, TRUE)) /* allow multiple */
 	duplicate_opt_detection(opts, 1);	/* 1 means compound opts */
 
 	/* special boolean options */
@@ -1889,6 +1893,17 @@ goodfruit:
 		} else if (negated) bad_negation(fullname, TRUE);
 		return;
 	}
+	fullname = "subkeyvalue";
+	if (match_optname(opts, fullname, 5, TRUE)) {
+		if (negated) bad_negation(fullname, FALSE);
+		else {
+#if defined(WIN32CON)
+			op = string_for_opt(opts, 0);
+			map_subkeyvalue(op);
+#endif
+		}
+		return;
+	}
 	/* WINCAP
 	 * tile_width:nn */
 	fullname = "tile_width";
@@ -1930,7 +1945,6 @@ goodfruit:
 		} else if (negated) bad_negation(fullname, TRUE);
 		return;
 	}
-
 	fullname = "windowtype";
 	if (match_optname(opts, fullname, 3, TRUE)) {
 	    if (negated) {
