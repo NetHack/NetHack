@@ -1,0 +1,83 @@
+.TH DLB 6 "28 Oct 1993"
+.UC 4
+.SH NAME
+dlb \- NetHack data librarian
+.SH SYNOPSIS
+.B dlb
+{
+.B xct
+}
+[
+.B vfIC
+]
+arguments...
+[
+.B files...
+]
+.SH DESCRIPTION
+.PP
+.I Dlb
+is a file archiving tool in the spirit (and tradition) of tar for
+NetHack version 3.1 and higher.  It is used to maintain the
+archive files from which NetHack reads special level files and other
+read-only information.  Note that like tar the command and option
+specifiers are specified as a continuous string and are followed
+by any arguments required in the same order as the option specifiers.
+.PP
+This facility is optional and may be excluded during NetHack
+configuration.
+.SH COMMANDS
+The
+.B x
+command causes
+.I dlb
+to extract the contents of the archive into the current directory.
+.PP
+The
+.B c
+command causes
+.I dlb
+to create a new archive from files in the current directory.
+.PP
+The
+.B t
+command lists the files in the archive.
+.SH OPTIONS AND ARGUMENTS
+.DT
+.ta \w'f archive\ \ \ 'u
+v	verbose output
+.br
+.sp 1
+f archive	specify the archive.  Default if f not specified is
+LIBFILE (usually the nhdat file in the playground).
+.br
+.sp 1
+I lfile	specify the file containing the list of files to
+put in to or extract from the archive if no files are listed
+on the command line.  Default for archive creation if no files
+are listed is LIBLISTFILE.
+.br
+.sp 1
+C dir	change directory.  Changes directory before trying to
+read any files (including the archive and the lfile).
+.br
+.SH EXAMPLES
+Create the default archive from the default file list:
+.br
+	dlb c
+.sp 1
+List the contents of the archive 'foo':
+.br
+	dlb tf foo
+.SH AUTHOR
+.PP
+Kenneth Lorber
+.SH "SEE ALSO"
+.PP
+nethack(6), tar(1)
+.SH BUGS
+.PP
+Not a good tar emulation; - does not mean stdin or stdout.
+Should include an optional compression facility.
+Not all read-only files for NetHack can be read out of an archive;
+examining the source is the only way to know which files can be. 
