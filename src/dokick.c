@@ -1280,6 +1280,29 @@ boolean shop_floor_obj;
 	if (otmp == uquiver) setuqwep((struct obj *)0);
 	if (otmp == uswapwep) setuswapwep((struct obj *)0);
 
+	/* some things break rather than ship */
+	if (breaktest(otmp)) {
+	    char *result;
+	    if (objects[otmp->otyp].oc_material == GLASS
+#ifdef TOURIST
+		|| otmp->otyp == EXPENSIVE_CAMERA
+#endif
+		) {
+		if (otmp->otyp == MIRROR)
+		    change_luck(-2);
+		result = "crash";
+	    } else {
+		/* penalty for breaking eggs laid by you */
+		if (otmp->otyp == EGG && otmp->spe && otmp->corpsenm >= LOW_PM)
+		    change_luck((schar) -min(otmp->quan, 5L));
+		result = "splatt";
+	    }
+	    You_hear("a muffled %s.",result);
+	    obj_extract_self(otmp);
+	    obfree(otmp, (struct obj *) 0);
+	    return TRUE;
+	}
+
 	add_to_migration(otmp);
 	otmp->ox = cc.x;
 	otmp->oy = cc.y;
