@@ -329,6 +329,7 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(VVOBJ)
 # Header file macros
 #==========================================
 
+PATCHLEV_H = $(INCL)/patchlev.h
 DGN_FILE_H = $(INCL)/align.h	$(INCL)/dgn_file.h
 DUNGEON_H  = $(INCL)/align.h	$(INCL)/dungeon.h
 EMIN_H	   = $(DUNGEON_H)	$(INCL)/emin.h
@@ -391,7 +392,7 @@ endif
 
 all :   install
 
-install: $(GAMEFILE) $(O)install.tag
+install: $(GAMEFILE) $(O)install.tag 
 	@echo Done.
 
 default: $(GAMEFILE)
@@ -401,7 +402,7 @@ util: $(O)utility.tag
 $(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h	       \
 	$(INCL)/pm.h	  monstr.c   vis_tab.c	\
 	$(U)lev_comp.exe $(U)dgn_comp.exe $(U)recover.exe $(TILEUTIL)
-	echo utilities made > $@
+	$(subst /,\,echo utilities made > $@)
 
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
@@ -437,39 +438,39 @@ endif
 #  The main target.
 
 
-$(GAMEFILE): $(O)obj.tag $(O)lfnfixup.tag $(O)utility.tag $(O)$(GAME).lnk
+$(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(O)utility.tag $(O)$(GAME).lnk
 	$(LINK) $(LFLAGS) -o$(GAME).exe @$(O)$(GAME).lnk $(LIBRARIES)
-	stubedit $(GAME).exe minstack=2048K
+	$(subst /,\,stubedit $(GAME).exe minstack=2048K)
 	$(subst /,\,copy $(GAME).exe $(GAMEFILE))
 	$(subst /,\,del $(GAME).exe)
 
 $(O)$(GAME).lnk: $(ALLOBJ)
-	 echo $(VOBJ01) > $@
-	 echo $(VOBJ02) >> $@
-	 echo $(VOBJ03) >> $@
-	 echo $(VOBJ04) >> $@
-	 echo $(VOBJ05) >> $@
-	 echo $(VOBJ06) >> $@
-	 echo $(VOBJ07) >> $@
-	 echo $(VOBJ08) >> $@
-	 echo $(VOBJ09) >> $@
-	 echo $(VOBJ10) >> $@
-	 echo $(VOBJ11) >> $@
-	 echo $(VOBJ12) >> $@
-	 echo $(VOBJ13) >> $@
-	 echo $(VOBJ14) >> $@
-	 echo $(VOBJ15) >> $@
-	 echo $(VOBJ16) >> $@
-	 echo $(VOBJ17) >> $@
-	 echo $(VOBJ18) >> $@
-	 echo $(VOBJ19) >> $@
-	 echo $(VOBJ20) >> $@
-	 echo $(VOBJ21) >> $@
-	 echo $(VOBJ22) >> $@
-	 echo $(VOBJ23) >> $@
-	 echo $(SOBJ)   >> $@
-	 echo $(TILOBJ) >> $@
-	 echo $(VVOBJ)  >> $@
+	 echo $(VOBJ01) > $(subst /,\,$@)
+	 echo $(VOBJ02) >> $(subst /,\,$@)
+	 echo $(VOBJ03) >> $(subst /,\,$@)
+	 echo $(VOBJ04) >> $(subst /,\,$@)
+	 echo $(VOBJ05) >> $(subst /,\,$@)
+	 echo $(VOBJ06) >> $(subst /,\,$@)
+	 echo $(VOBJ07) >> $(subst /,\,$@)
+	 echo $(VOBJ08) >> $(subst /,\,$@)
+	 echo $(VOBJ09) >> $(subst /,\,$@)
+	 echo $(VOBJ10) >> $(subst /,\,$@)
+	 echo $(VOBJ11) >> $(subst /,\,$@)
+	 echo $(VOBJ12) >> $(subst /,\,$@)
+	 echo $(VOBJ13) >> $(subst /,\,$@)
+	 echo $(VOBJ14) >> $(subst /,\,$@)
+	 echo $(VOBJ15) >> $(subst /,\,$@)
+	 echo $(VOBJ16) >> $(subst /,\,$@)
+	 echo $(VOBJ17) >> $(subst /,\,$@)
+	 echo $(VOBJ18) >> $(subst /,\,$@)
+	 echo $(VOBJ19) >> $(subst /,\,$@)
+	 echo $(VOBJ20) >> $(subst /,\,$@)
+	 echo $(VOBJ21) >> $(subst /,\,$@)
+	 echo $(VOBJ22) >> $(subst /,\,$@)
+	 echo $(VOBJ23) >> $(subst /,\,$@)
+	 echo $(SOBJ)   >> $(subst /,\,$@)
+	 echo $(TILOBJ) >> $(subst /,\,$@)
+	 echo $(VVOBJ)  >> $(subst /,\,$@)
 
 #
 #  Housekeeping.
@@ -479,7 +480,7 @@ clean:
 	$(subst /,\,copy $(SSHR)/dgn_lex.c $@)
 	$(subst /,\,del $(O)*.o)
 	$(subst /,\,del *.map)
-	$(subst /,\,del $(DAT)/dlb_main.exe)
+	$(subst /,\,del $(U)/dlb_main.exe)
 
 spotless: clean
 	$(subst /,\,if exist $(O)utility.tag del $(O)utility.tag)
@@ -506,7 +507,7 @@ spotless: clean
 	$(subst /,\,if exist $(SRC)/makedefs.c del $(SRC)/makedefs.c)
 	$(subst /,\,if exist $(SRC)/recover.c  del $(SRC)/recover.c)
 	$(subst /,\,if exist $(SRC)/lev_main.c del $(SRC)/lev_main.c)
-	$(subst /,\,if exist $(SRC)/dlb_main.c del $(SRC)/dlb_main.c)
+	$(subst /,\,if exist $(U)/dlb_main.c del $(U)/dlb_main.c)
 	$(subst /,\,if exist $(SRC)/dgn_main.c del $(SRC)/dgn_main.c)
 	$(subst /,\,if exist $(SRC)/wintty.c   del $(SRC)/wintty.c)
 	$(subst /,\,if exist $(SRC)/topl.c del $(SRC)/topl.c)
@@ -554,7 +555,7 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
 	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/msdoshlp.txt del $(DAT)/msdoshlp.txt)
-	$(subst /,\,if exist $(DAT)/dlb_main.exe del $(DAT)/dlb_main.exe)
+	$(subst /,\,if exist $(U)/dlb_main.exe del $(U)/dlb_main.exe)
 	$(subst /,\,if exist $(U)/lev_comp.exe del $(U)/lev_comp.exe)
 	$(subst /,\,if exist $(U)/dgn_comp.exe del $(U)/dgn_comp.exe)
 	$(subst /,\,if exist $(O)sp_lev.tag del $(O)sp_lev.tag)
@@ -583,9 +584,8 @@ $(O)obj.tag:
 # Work around some djgpp long file name woes
 #===========================================
 
-$(O)lfnfixup.tag:
-	@$(subst /,\,if exist $(INCL)/patchl~1.h copy $(INCL)/patchl~1.h $(INCL)/patchlev.h)
-	@$(subst /,\,echo directory created > $@)
+$(PATCHLEV_H):
+	@$(subst /,\,if not exist $@ copy $(INCL)/patchlevel.h $(INCL)/patchlev.h)
 
 #==========================================
 #=========== SECONDARY TARGETS ============
@@ -598,22 +598,22 @@ $(O)lfnfixup.tag:
 
 
 $(INCL)/date.h : $(U)makedefs.exe
-	-makedefs -v
+	-$(subst /,\,$(U)makedefs -v)
 
 $(INCL)/onames.h: $(U)makedefs.exe
-	-makedefs -o
+	-$(subst /,\,$(U)makedefs -o)
 
 $(INCL)/pm.h: $(U)makedefs.exe
-	-makedefs -p
+	-$(subst /,\,$(U)makedefs -p)
 
 monstr.c: $(U)makedefs.exe
-	-makedefs -m
+	-$(subst /,\,$(U)makedefs -m)
 
 $(INCL)/vis_tab.h: $(U)makedefs.exe
-	-makedefs -z
+	-$(subst /,\,$(U)makedefs -z)
 
 vis_tab.c: $(U)makedefs.exe
-	-makedefs -z
+	-$(subst /,\,$(U)makedefs -z)
 
 #
 #  Makedefs Stuff
@@ -650,9 +650,9 @@ $(O)lev_$(LEX).o:  $(HACK_H)   $(SP_LEV_H)	  $(INCL)/lev_comp.h \
 
 $(O)lev_main.o:  $(HACK_H) $(INCL)/sp_lev.h $(INCL)/date.h $(U)lev_main.c
 
-$(INCL)/lev_comp.h: lev_yacc.c
-
 ifeq  "$(DO_YACC)" "YACC_ACT"
+
+$(INCL)/lev_comp.h: lev_yacc.c
 
 $(U)lev_yacc.c $(INCL)/lev_comp.h : $(U)lev_comp.y
 	$(subst /,\,chdir $(U)) & \
@@ -665,14 +665,16 @@ $(U)lev_yacc.c $(INCL)/lev_comp.h : $(U)lev_comp.y
 else
 
 $(U)lev_yacc.c: $(SSHR)/lev_yacc.c
+	@echo ---
 	@echo For now, we will copy the prebuilt
 	@echo lev_comp.c from $(SSHR) into $(U) and use that.
 	$(subst /,\,copy $(SSHR)/lev_yacc.c $(U)lev_yacc.c)
 	$(subst /,\,echo.>>$(U)lev_yacc.c)
 
 $(INCL)/lev_comp.h : $(SSHR)/lev_comp.h
+	@echo ---
 	@echo For now, we will copy the prebuilt lev_comp.h
-	@echo from $(SSHR) into $(U) and use that.
+	@echo from $(SSHR) into $(INCL) and use that.
 	$(subst /,\,copy $(SSHR)/lev_comp.h $(INCL)/lev_comp.h)
 	$(subst /,\,echo.>>$(INCL)/lev_comp.h)
 
@@ -686,7 +688,6 @@ ifeq  "$(DO_LEX)" "LEX_ACT"
 	$(subst /,\,@del $(LEXYYC)) & \
 	$(subst /,\,chdir $(SRC))
 else
-	@echo $(U)lev_comp.l has changed. To update $@ run $(LEX).
 	@echo ---
 	@echo For now, we will copy the prebuilt lev_lex.c
 	@echo from $(SSHR) into $(U) and use it.
@@ -713,12 +714,15 @@ $(U)dgn_yacc.c $(INCL)/dgn_comp.h : $(U)dgn_comp.y
 	$(subst /,\,chdir $(SRC))
 else
 $(U)dgn_yacc.c: $(SSHR)/dgn_yacc.c
+	@echo ---
 	@echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
 	@echo dgn_comp.h from $(SSHR) into $(U) and use that.
 	$(subst /,\,copy $(SSHR)/dgn_yacc.c $(U)dgn_yacc.c)
 	$(subst /,\,echo.>>$(U)dgn_yacc.c)
 
 $(INCL)/dgn_comp.h: $(SSHR)/dgn_comp.h
+	@echo For now, we will copy the prebuilt dgn_comp.h
+	@echo from $(SSHR) into $(INCL) and use that.
 	$(subst /,\,copy $(SSHR)/dgn_comp.h $(INCL)/dgn_comp.h)
 	$(subst /,\,echo.>>$(INCL)/dgn_comp.h)
 
@@ -763,7 +767,7 @@ else
 #  Tile Mapping
 #
 
-tile.c: $(U)tilemap.exe
+$(SRC)/tile.c: $(U)tilemap.exe
 	@$(subst /,\,$(U)tilemap.exe)
 	@echo A new $@ has been created
 
@@ -782,11 +786,11 @@ $(O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H) $(TILE_H)
 
 $(O)NetHack1.tib: $(TILEFILES) $(U)tile2bin.exe
 	@echo Creating binary tile files (this may take some time)
-	@tile2bin
+	@$(subst /,\,$(U)tile2bin.exe)
 
 $(O)NetHacko.tib: $(O)thintile.tag $(TILEFILES2) $(U)til2bin2.exe
 	@echo Creating overview binary tile files (this may take some time)
-	@til2bin2
+	@$(subst /,\,$(U)til2bin2.exe)
 
 $(U)tile2bin.exe: $(O)tile2bin.o $(TEXTIO)
 	$(LINK) $(LFLAGS) -o$@ $(O)tile2bin.o $(TEXTIO)
@@ -843,7 +847,7 @@ $(O)gifread2.o: $(CONFIG_H) $(WSHR)/tile.h $(WSHR)/gifread.c
 	$(CC) $(cflags) -DTILE_X=8 -o$@ $(WSHR)/gifread.c
 
 ppmwrite.c: $(WSHR)/ppmwrite.c
-	copy $(WSHR)/ppmwrite.c .
+	$(subst /,\,copy $(WSHR)/ppmwrite.c .)
 
 $(O)ppmwrite.o: $(CONFIG_H)	$(WSHR)/tile.h
 
@@ -893,19 +897,19 @@ DATABASE = $(DAT)/data.bas
 
 
 $(O)dat.tag: $(DAT)/nhdat
-	@echo dat done >$@
+	@$(subst /,\,echo dat done >$@)
 
 $(DAT)/data: $(O)utility.tag	$(DATABASE)
-	makedefs -d
+	$(subst /,\,$(U)makedefs.exe -d)
 
 $(DAT)/rumors:	     $(O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
-	makedefs -r
+	$(subst /,\,$(U)makedefs.exe -r)
 
 $(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
-	makedefs -q
+	$(subst /,\,$(U)makedefs.exe -q)
 
 $(DAT)/oracles:	     $(O)utility.tag    $(DAT)/oracles.txt
-	makedefs -h
+	$(subst /,\,$(U)makedefs.exe -h)
 
 $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des \
@@ -953,7 +957,7 @@ $(DAT)/dungeon:	  $(O)utility.tag  $(DAT)/dungeon.def
 #
 #note that dir below assumes bin/dir.exe from djgpp distribution
 #
-$(DAT)/nhdat:	$(DAT)/dlb_main.exe $(DAT)/data $(DAT)/rumors $(DAT)/dungeon \
+$(DAT)/nhdat:	$(U)/dlb_main.exe $(DAT)/data $(DAT)/rumors $(DAT)/dungeon \
 	    $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag
 	@$(subst /,\,echo dat done >$(O)dat.tag)
 	@$(subst /,\,cd $(DAT))
@@ -973,19 +977,16 @@ $(DAT)/nhdat:	$(DAT)/dlb_main.exe $(DAT)/data $(DAT)/rumors $(DAT)/dungeon \
 	@$(subst /,\,echo license >>dlb.lst)
 	@$(subst /,\,echo msdoshlp.txt >>dlb.lst)
 	@$(subst /,\,$(LS) *.lev >>dlb.lst)
-	dlb_main cvIf dlb.lst nhdat
+	$(subst /,\,$(U)dlb_main cvIf dlb.lst nhdat)
 	@$(subst /,\,cd $(SRC))
 
-$(DAT)/dlb_main.exe: $(DLBOBJS)
+$(U)/dlb_main.exe: $(DLBOBJS)
 	$(LINK) $(LFLAGS) -o$@ $(DLBOBJS)
 
 $(O)dlb_main.o: $(U)dlb_main.c $(INCL)/config.h $(DLB_H)
 	$(CC) $(cflags) -o$@ $(U)dlb_main.c
 
 # Game Dependencies
-# Some files require movement as Gnu make doesn't like unix style '/'
-# directory specs and djgcc doesn't like dos style directory specs.
-# So we get to copy stuff where we might need it.   Fun eh?
 
 # sys/share
 $(O)main.o:	 $(HACK_H) $(DLB_H) $(SSHR)/pcmain.c
@@ -1034,6 +1035,9 @@ $(O)stubvid.o : $(HACK_H) $(MSYS)/pcvideo.h $(MSYS)/video.c
 # with -o$@ , 
 # Also an explicit build instruction for dlb.o
 # because it requires a .h file in ../sys/msdos.
+# Also the PATCHLEV_H macro is substitued for
+# $(INCL)/patchlevel.h to work around a long filename
+# issue.
 # Other than that, these dependencies are untouched.
 # That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
@@ -1068,7 +1072,7 @@ $(O)termcap.o: ../win/tty/termcap.c $(HACK_H) $(INCL)/tcap.h
 $(O)topl.o: ../win/tty/topl.c $(HACK_H) $(INCL)/tcap.h
 	$(CC) $(cflags) -o$@ ../win/tty/topl.c
 $(O)wintty.o: ../win/tty/wintty.c $(HACK_H) $(INCL)/dlb.h \
-	     $(INCL)/patchlevel.h $(INCL)/tcap.h
+	     $(PATCHLEV_H) $(INCL)/tcap.h
 	$(CC) $(cflags) -o$@ ../win/tty/wintty.c
 $(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
 	     $(CONFIG_H)
@@ -1076,7 +1080,7 @@ $(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
 $(O)dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
 	$(CC) $(cflags) -o$@ ../win/X11/dialogs.c
 $(O)winX.o: ../win/X11/winX.c $(HACK_H) $(INCL)/winX.h $(INCL)/dlb.h \
-	     $(INCL)/patchlevel.h ../win/X11/nh72icon \
+	     $(PATCHLEV_H) ../win/X11/nh72icon \
 	     ../win/X11/nh56icon ../win/X11/nh32icon
 	$(CC) $(cflags) -o$@ ../win/X11/winX.c
 $(O)winmap.o: ../win/X11/winmap.c $(INCL)/xwindow.h $(HACK_H) $(INCL)/dlb.h \
@@ -1135,16 +1139,16 @@ $(O)gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h ../win/gnome/gnmain.h 
 $(O)gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
 	$(CC) $(cflags) $(GNOMEINC) -c ../win/gnome/gnyesno.c
 $(O)wingem.o: ../win/gem/wingem.c $(HACK_H) $(INCL)/func_tab.h $(INCL)/dlb.h \
-	     $(INCL)/patchlevel.h $(INCL)/wingem.h
+	     $(PATCHLEV_H) $(INCL)/wingem.h
 	$(CC) $(cflags) -o$@ ../win/gem/wingem.c
 $(O)wingem1.o: ../win/gem/wingem1.c $(INCL)/gem_rsc.h $(INCL)/load_img.h \
 	     $(INCL)/wintype.h $(INCL)/wingem.h
 	$(CC) $(cflags) -o$@ ../win/gem/wingem1.c
 $(O)load_img.o: ../win/gem/load_img.c $(INCL)/load_img.h
 	$(CC) $(cflags) -o$@ ../win/gem/load_img.c
-$(O)tile.o: tile.c $(HACK_H)
+$(O)tile.o: $(SRC)/tile.c $(HACK_H)
 $(O)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) $(INCL)/func_tab.h \
-	     $(INCL)/dlb.h $(INCL)/patchlevel.h $(INCL)/qt_win.h \
+	     $(INCL)/dlb.h $(PATCHLEV_H) $(INCL)/qt_win.h \
 	     $(INCL)/qt_clust.h $(INCL)/qt_kde0.h \
 	     $(INCL)/qt_xpms.h qt_win.moc qt_kde0.moc
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_win.cpp
@@ -1249,13 +1253,13 @@ $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
 $(O)timeout.o: timeout.c $(HACK_H) $(INCL)/lev.h
-$(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h $(INCL)/patchlevel.h
+$(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h $(PATCHLEV_H)
 $(O)track.o: track.c $(HACK_H)
 $(O)trap.o: trap.c $(HACK_H)
 $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H) $(INCL)/vault.h
-$(O)version.o: version.c $(HACK_H) $(INCL)/date.h $(INCL)/patchlevel.h
+$(O)version.o: version.c $(HACK_H) $(INCL)/date.h $(PATCHLEV_H)
 $(O)vision.o: vision.c $(HACK_H) $(INCL)/vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
