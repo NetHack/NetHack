@@ -539,8 +539,6 @@ clear_bypasses()
 		    xchar ox, oy;
 
 		    (void) get_obj_location(otmp, &ox, &oy, 0);
-		    obj_extract_self(otmp);
-		    place_object(otmp, ox, oy);
 		    stack_object(otmp);
 		    newsym(ox, oy);
 		}
