@@ -2224,7 +2224,7 @@ Cannot be set with the `O' command.
 (default on, PC NetHack only).
 Cannot be set with the `O' command.
 .lp subkeyval
-(Win32 tty NetHackonly).
+(Win32 tty NetHack only).
 May be used to alter the value of keystrokes that the operating system
 returns to NetHack to help compensate for international keyboard issues.
 OPTIONS=subkeyvalue:171/92

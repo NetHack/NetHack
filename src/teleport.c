@@ -592,7 +592,13 @@ level_tele()
 
 	    Strcpy(qbuf, "To what level do you want to teleport?");
 	    do {
-		if (++trycnt == 2) Strcat(qbuf, " [type a number]");
+		if (++trycnt == 2) {
+#ifdef WIZARD
+			if (wizard) Strcat(qbuf, " [type a number or ? for a menu]");
+			else
+#endif
+			Strcat(qbuf, " [type a number]");
+		}
 		getlin(qbuf, buf);
 		if (!strcmp(buf,"\033")) {	/* cancelled */
 		    if (Confusion && rnl(5)) {
