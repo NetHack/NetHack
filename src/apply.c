@@ -1808,14 +1808,15 @@ use_stone(otmp)
 struct obj *otmp;
 {
 	struct obj *obj;
-	char allowall[2];
+	char allowall[3];
 	const char *color = 0;
 	static const char *ambiguous = "You make scratch marks on the stone.";
 	const char *scritch = "\"scritch, scritch\"";
 	unsigned material;
 
-	allowall[0] = ALL_CLASSES;
-	allowall[1] = '\0';
+	allowall[0] = GOLD_CLASS;
+	allowall[1] = ALL_CLASSES;
+	allowall[2] = '\0';
 	if (!(obj = getobj(allowall, "rub on the stone")))
 	    return;
 

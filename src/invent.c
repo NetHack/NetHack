@@ -733,7 +733,6 @@ register const char *let,*word;
 	boolean usegold = FALSE;	/* can't use gold because its illegal */
 	boolean allowall = FALSE;
 	boolean allownone = FALSE;
-	boolean touchstone = FALSE;
 	xchar foox = 0;
 	long cnt;
 	boolean prezero = FALSE;
@@ -746,15 +745,6 @@ register const char *let,*word;
 #else
 	if(*let == GOLD_CLASS) let++, usegold = TRUE;
 #endif
-	/* Ugly check for touchstone */
-	if (!strncmp(word, "rub on", 6)) {
-	    touchstone = TRUE;		/* avoid silly "stone gold" */
-#ifndef GOLDOBJ
-	    if(u.ugold) allowgold = usegold = TRUE;
-#else
-	    usegold = TRUE;
-#endif
-	}
 
 	/* Equivalent of an "ugly check" for gold */
 	if (usegold && !strcmp(word, "eat") && !metallivorous(youmonst.data))
@@ -939,10 +929,7 @@ register const char *let,*word;
 		}
 		if(ilet == def_oc_syms[GOLD_CLASS]) {
 			if (!usegold) {
-			    if (touchstone)
-				You("cannot rub gold on the stone.");
-			    else
-				You("cannot %s gold.", word);
+			    You("cannot %s gold.", word);
 			    return(struct obj *)0;
 #ifndef GOLDOBJ
 			} else if (!allowgold) {
