@@ -11,6 +11,8 @@ STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *,int,int));
 STATIC_DCL void FDECL(nameshk, (struct monst *,const char * const *));
 STATIC_DCL int  FDECL(shkinit, (const struct shclass *,struct mkroom *));
 
+#define VEGETARIAN_CLASS	(MAXOCLASSES+1)
+
 static const char * const shkliquors[] = {
     /* Ukraine */
     "Njezjin", "Tsjernigof", "Ossipewsk", "Gorlowka",
@@ -161,6 +163,21 @@ static const char * const shkgeneral[] = {
     0
 };
 
+static const char * const shkhealthfoods[] = {
+    /* Tibet */
+    "Ga'er", "Zhangmu", "Rikaze", "Jiangji",
+    "Changdu", "Linzhi", "Shigatse", "Gyantse",
+    "Ganden", "Tsurphu", "Lhasa", "Tsedong",
+    "Drepung",
+    /* Hippie names */
+    "Azura", "Blaze", "Breanna", "Breezy",
+    "Dharma", "Feather", "Jasmine", "Luna",
+    "Melody", "Moonjava", "Petal", "Rhiannon",
+    "Starla", "Tranquilla", "Windsong", "Zennia",
+    "Zoe", "Zora",
+    0
+};
+
 /*
  * To add new shop types, all that is necessary is to edit the shtypes[] array.
  * See mkroom.h for the structure definition.  Typically, you'll have to lower
@@ -178,7 +195,7 @@ static const char * const shkgeneral[] = {
  */
 
 const struct shclass shtypes[] = {
-	{"general store", RANDOM_CLASS, 44, D_SHOP,
+	{"general store", RANDOM_CLASS, 42, D_SHOP,
 	    {{100, RANDOM_CLASS}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
 	    shkgeneral},
 	{"used armor dealership", ARMOR_CLASS, 14, D_SHOP,
@@ -214,6 +231,10 @@ const struct shclass shtypes[] = {
 	{"rare books", SPBOOK_CLASS, 3, D_SHOP,
 	    {{90, SPBOOK_CLASS}, {10, SCROLL_CLASS}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
 	    shkbooks},
+	{"health food store", FOOD_CLASS, 2, D_SHOP,
+	    {{70, VEGETARIAN_CLASS}, {20, -POT_FRUIT_JUICE}, {4, -POT_HEALING},
+	     {3, -POT_FULL_HEALING}, {2, -SCR_FOOD_DETECTION}, {1, -LUMP_OF_ROYAL_JELLY}},
+	    shkhealthfoods},
 	/* Shops below this point are "unique".  That is they must all have a
 	 * probability of zero.  They are only created via the special level
 	 * loader.
@@ -246,6 +267,34 @@ init_shop_selection()
 }
 #endif /*0*/
 
+STATIC_OVL int
+shkveg()
+{
+	int i, j, maxprob, prob;
+	char oclass = FOOD_CLASS;
+	int ok[NUM_OBJECTS];
+
+	j = maxprob = 0;
+	for (i = bases[(int)oclass]; i < NUM_OBJECTS; ++i) {
+		if (objects[i].oc_material == VEGGY) {
+			ok[j++] = i;
+			maxprob += objects[i].oc_prob;
+		}
+	}
+	prob = rnd(maxprob);
+
+	j = 0;
+	i = ok[0];
+	while((prob -= objects[i].oc_prob) > 0) {
+		j++;
+		i = ok[j];
+	}
+
+	if(objects[i].oc_class != oclass || !OBJ_NAME(objects[i]))
+		panic("shkveg probtype error, oclass=%d i=%d", (int) oclass, i);
+	return i;
+}
+
 STATIC_OVL void
 mkshobj_at(shp, sx, sy)
 /* make an object of the appropriate type for a shop square */
@@ -266,7 +315,9 @@ int sx, sy;
 	    }
 	} else {
 	    atype = get_shop_item(shp - shtypes);
-	    if (atype < 0)
+	    if (atype == VEGETARIAN_CLASS)
+		(void) mksobj_at(shkveg(), sx, sy, TRUE, TRUE);
+	    else if (atype < 0)
 		(void) mksobj_at(-atype, sx, sy, TRUE, TRUE);
 	    else
 		(void) mkobj_at(atype, sx, sy, TRUE);
@@ -284,6 +335,12 @@ const char * const *nlp;
 	struct monst *mtmp;
 	int name_wanted;
 	s_level *sptr;
+
+	if (nlp == shkfoods && In_mines(&u.uz) && Role_if(PM_MONK)
+		&& (sptr = Is_special(&u.uz)) != 0 && sptr->flags.town) {
+	    /* special-case override for minetown food store for monks */
+	    nlp = shkhealthfoods;
+	}
 
 	if (nlp == shklight && In_mines(&u.uz)
 		&& (sptr = Is_special(&u.uz)) != 0 && sptr->flags.town) {
