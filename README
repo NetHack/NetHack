@@ -59,30 +59,25 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     h.  A 'sys/share/sounds' subsubdirectory, which contains sound files
         shared by some OSs.
     i.  A 'sys/amiga' subdirectory, which contains files specific to AmigaDOS.
-    j.  A 'sys/amiga/splitter' subsubdirectory, which contains files
-        for the Amiga splitter program.
+    j.  A 'sys/amiga/ship' subsubdirectory
     k.  A 'sys/atari' subdirectory, which contains files specific to TOS.
     l.  A 'sys/be' subdirectory, which contains files specific to Be OS.
     m.  A 'sys/mac' subdirectory, which contains files specific to MacOS.
-    n.  A 'sys/mac/old' subdirectory which contains files used by
-        compilers that haven't been tested/used in a while.
-    o.  A 'sys/msdos' subdirectory, which contains files specific to MS-DOS.
-    p.  A 'sys/msdos/old' subsubdirectory, which contains files for old
-        MS-DOS compilers (no longer officially supported).
-    q.  A 'sys/os2' subdirectory, which contains files specific to OS/2.
-    r.  A 'sys/unix' subdirectory, which contains files specific to UNIX.
-    s.  A 'sys/vms' subdirectory, which contains files specific to VMS.
-    t.  A 'sys/winnt' subdirectory, which contains files specific to Windows NT.
-    u.  A 'win' directory, which contains subdirectories for files that
+    n.  A 'sys/msdos' subdirectory, which contains files specific to MS-DOS.
+    o.  A 'sys/os2' subdirectory, which contains files specific to OS/2.
+    p.  A 'sys/unix' subdirectory, which contains files specific to UNIX.
+    q.  A 'sys/vms' subdirectory, which contains files specific to VMS.
+    r.  A 'sys/winnt' subdirectory, which contains files specific to Windows NT.
+    s.  A 'win' directory, which contains subdirectories for files that
         are windowing-system specific (but not operating-system specific).
-    v.  A 'win/share' subdirectory, which contains files shared by some
+    t.  A 'win/share' subdirectory, which contains files shared by some
         windowing systems.
-    w.  A 'win/Qt' subdirectory, which contains files specific to Qt.
-    x.  A 'win/X11' subdirectory, which contains files specific to X11.
-    y.  A 'win/gem' subdirectory, which contains files specific to GEM.
-    z.  A 'win/gnome' subdirectory, which contains files specific to GNOME.
-    A.  A 'win/tty' subdirectory, which contains files specific to ttys.
-    B.  A 'win/win32' subdirectory, which contains files specific to the
+    u.  A 'win/Qt' subdirectory, which contains files specific to Qt.
+    v.  A 'win/X11' subdirectory, which contains files specific to X11.
+    w.  A 'win/gem' subdirectory, which contains files specific to GEM.
+    x.  A 'win/gnome' subdirectory, which contains files specific to GNOME.
+    y.  A 'win/tty' subdirectory, which contains files specific to ttys.
+    z.  A 'win/win32' subdirectory, which contains files specific to the
         Windows NT Win32 API.
 
     The names of these directories should not be changed unless you are
