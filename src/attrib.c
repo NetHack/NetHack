@@ -522,6 +522,7 @@ redist_attr()
 	(void)encumber_msg();
 }
 
+STATIC_OVL
 void
 postadjabil(ability)
 long *ability;

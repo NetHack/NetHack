@@ -185,7 +185,7 @@ int bufsz;
 {
 	char *sp, *op;
 	int cnt = 0;
-	char hexdigits[] = "0123456789ABCDEF";
+	static char hexdigits[] = "0123456789ABCDEF";
 
 	sp = s;
 	op = callerbuf;
@@ -230,7 +230,7 @@ int bufsz;
 {
 	char *sp, *op;
 	int k,calc,cnt = 0;
-	char hexdigits[] = "0123456789ABCDEF";
+	static char hexdigits[] = "0123456789ABCDEF";
 
 	sp = s;
 	op = callerbuf;

@@ -2058,7 +2058,7 @@ const char *msg;
 {
 	char ctrl;
 	winid win;
-	const char wiz_only_list[] = "EFGIOVW";
+	static const char wiz_only_list[] = "EFGIOVW";
 	char buf[BUFSZ], buf2[BUFSZ], *expl;
 
 	win = create_nhwindow(NHW_TEXT);
