@@ -2577,10 +2577,9 @@ boolean setinitial,setfromfile;
 	Sprintf(abuf, "Select %s window placement relative to the map:",
 		msg ? "message" : "status");
 	end_menu(tmpwin, abuf);
-	if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
-		int reslt = window_pick->item.a_int;
-		if (msg) iflags.wc_align_message = reslt;
-		else iflags.wc_align_status = reslt;
+	if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {		
+		if (msg) iflags.wc_align_message = window_pick->item.a_int;
+		else iflags.wc_align_status = window_pick->item.a_int;
 		free((genericptr_t)window_pick);
 	}
 	destroy_nhwindow(tmpwin);
