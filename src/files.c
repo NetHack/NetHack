@@ -2275,12 +2275,16 @@ const char *reason;	/* explanation */
 	FILE *lfile;
 	char buf[BUFSZ];
 
-	lfile = fopen_datafile(PANICLOG, "a", TROUBLEPREFIX);
-	if (lfile) {
-	    (void) fprintf(lfile, "%s %08ld: %s %s\n",
-			   version_string(buf), yyyymmdd((time_t)0L),
-			   type, reason);
-	    (void) fclose(lfile);
+	if (!program_state.in_paniclog) {
+		program_state.in_paniclog = 1;
+		lfile = fopen_datafile(PANICLOG, "a", TROUBLEPREFIX);
+		if (lfile) {
+		    (void) fprintf(lfile, "%s %08ld: %s %s\n",
+				   version_string(buf), yyyymmdd((time_t)0L),
+				   type, reason);
+		    (void) fclose(lfile);
+		}
+		program_state.in_paniclog = 0;
 	}
 #endif /* PANICLOG */
 	return;
