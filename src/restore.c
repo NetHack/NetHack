@@ -251,13 +251,7 @@ boolean ghostly;
 {
 	register struct monst *mtmp, *mtmp2 = 0;
 	register struct monst *first = (struct monst *)0;
-	int xl;
-	struct permonst *monbegin;
-	boolean moved;
-
-	/* get the original base address */
-	mread(fd, (genericptr_t)&monbegin, sizeof(monbegin));
-	moved = (monbegin != mons);
+	int xl, offset;
 
 	while(1) {
 		mread(fd, (genericptr_t) &xl, sizeof(xl));
@@ -271,10 +265,8 @@ boolean ghostly;
 			add_id_mapping(mtmp->m_id, nid);
 			mtmp->m_id = nid;
 		}
-		if (moved && mtmp->data) {
-			int offset = mtmp->data - monbegin;	/*(ptrdiff_t)*/
-			mtmp->data = mons + offset;  /* new permonst location */
-		}
+		offset = mtmp->mnum;
+		mtmp->data = &mons[offset];
 		if(mtmp->minvent) {
 			struct obj *obj;
 			mtmp->minvent = restobjchn(fd, ghostly, FALSE);

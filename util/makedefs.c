@@ -407,16 +407,9 @@ do_rumors()
 }
 
 /*
- * 3.4.1: way back in 3.2.1 `flags.nap' became unconditional but
- * TIMED_DELAY was erroneously left in VERSION_FEATURES and has
- * been there up through 3.4.0.  Simply removing it now would
- * break save file compatibility with 3.4.0 files, so we will
- * explicitly mask it out during version checks.
- * This should go away in the next version update.
+ * Use this to explicitly mask out features during version checks.
  */
-#define IGNORED_FEATURES	( 0L \
-				| (1L << 23)	/* TIMED_DELAY */ \
-				)
+#define IGNORED_FEATURES	( 0L )
 
 static void
 make_version()

@@ -1,14 +1,14 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2003/02/19	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2003/03/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* NetHack 3.4.1 */
+/* NetHack 3.5.0 */
 #define VERSION_MAJOR	3
-#define VERSION_MINOR	4
+#define VERSION_MINOR	5
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL	1
+#define PATCHLEVEL	0
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -24,7 +24,7 @@
 #define COPYRIGHT_BANNER_C \
 "         See license for details."
 
-#if 1
+#if 0
 /*
  * If two successive patchlevels have compatible data files (fat chance),
  * defining this with the value of the older one will allow its bones and
@@ -34,11 +34,25 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x03040000L
+#define VERSION_COMPATIBILITY 0x03040100L
 #endif
 
 /*****************************************************************************/
+/* Version 3.5.x */
+
+/*
+ *  NetHack 3.5.0, March NN, NNNN
+ *
+ */
+
+/* Version 3.5 */
+
+/*****************************************************************************/
 /* Version 3.4.x */
+
+/*  Patch 2, March 17, 2003
+ *  Fix a few fatal errors
+ */
 
 /*  Patch 1, February 22, 2003
  *  Fix a few fatal errors including one for reentering shops, one

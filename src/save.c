@@ -274,7 +274,6 @@ savegamestate(fd, mode)
 register int fd, mode;
 {
 	int uid;
-
 #ifdef MFLOPPY
 	count_only = (mode & COUNT_SAVE);
 #endif
@@ -875,14 +874,11 @@ register struct monst *mtmp;
 	register struct monst *mtmp2;
 	unsigned int xl;
 	int minusone = -1;
-	struct permonst *monbegin = &mons[0];
-
-	if (perform_bwrite(mode))
-	    bwrite(fd, (genericptr_t) &monbegin, sizeof(monbegin));
 
 	while (mtmp) {
 	    mtmp2 = mtmp->nmon;
 	    if (perform_bwrite(mode)) {
+		mtmp->mnum = monsndx(mtmp->data);
 		xl = mtmp->mxlth + mtmp->mnamelth;
 		bwrite(fd, (genericptr_t) &xl, sizeof(int));
 		bwrite(fd, (genericptr_t) mtmp, xl + sizeof(struct monst));

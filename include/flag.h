@@ -146,6 +146,11 @@ struct flag {
 	int	 initalign;	/* starting alignment (index into aligns[])  */
 	int	 randomall;	/* randomly assign everything not specified */
 	int	 pantheon;	/* deity selection for priest character */
+	/* Items which were in iflags in 3.4.x to preserve savefile compatibility */
+	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */
+	boolean  showrace;	/* show hero glyph by race rather than by role */
+	boolean  travelcmd;	/* allow travel command */
+	int	 runmode;	/* update screen display during run moves */
 };
 
 /*
@@ -257,11 +262,6 @@ struct instance_flags {
 
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
-	/* Items which belong in flags, but are here to allow save compatibility */
-	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */
-	boolean  showrace;	/* show hero glyph by race rather than by role */
-	boolean  travelcmd;	/* allow travel command */
-	int	 runmode;	/* update screen display during run moves */
 };
 
 /*

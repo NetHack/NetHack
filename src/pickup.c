@@ -2259,7 +2259,7 @@ boolean outokay, inokay;
     menu_item *pick_list;
     char buf[BUFSZ];
     int n;
-    const char *menuselector = iflags.lootabc ? "abc" : "oib";
+    const char *menuselector = flags.lootabc ? "abc" : "oib";
 
     any.a_void = 0;
     win = create_nhwindow(NHW_MENU);
