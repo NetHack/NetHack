@@ -613,6 +613,21 @@ break_armor()
 	}
 #endif
     }
+    if (has_horns(youmonst.data)) {
+    	if ((otmp = uarmh) != 0) {
+		if (is_flimsy(otmp) && !donning(otmp)) {
+			char yourbuf[BUFSZ];
+			/* Future possiblities: This could damage/destroy helmet*/
+			Your("horns pierce through %s %s.", shk_your(yourbuf, otmp),
+				xname(otmp));
+		} else {
+	    		if (donning(otmp)) cancel_don();
+			Your("helmet falls to the %s!", surface(u.ux, u.uy));
+			(void) Helmet_off();
+			dropx(otmp);
+		}
+	}
+    }
     if (nohands(youmonst.data) || verysmall(youmonst.data)) {
 	if ((otmp = uarmg) != 0) {
 	    if (donning(otmp)) cancel_don();
