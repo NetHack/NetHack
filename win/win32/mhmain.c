@@ -2,6 +2,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
+#include <commdlg.h>
 #include "patchlevel.h"
 #include "resource.h"
 #include "mhmsg.h"
@@ -28,6 +29,8 @@ static void		register_main_window_class(void);
 static int		menuid2mapmode(int menuid);
 static int		mapmode2menuid(int map_mode);
 static void		nhlock_windows( BOOL lock );
+static char*	nh_compose_ascii_screenshot(); 
+		// returns strdup() created pointer - callee assumes the ownership
 
 HWND mswin_init_main_window () {
 	static int run_once = 0;
@@ -802,6 +805,93 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 
+		case IDM_SETTING_SCREEN_TO_CLIPBOARD:
+		{
+			char* p;
+			size_t len;
+			HANDLE hglbCopy;
+			TCHAR* p_copy;
+
+			p = nh_compose_ascii_screenshot();
+			if( !p ) return 0;
+			len = strlen(p);
+			
+			if( !OpenClipboard(hWnd) ) {
+				NHMessageBox(hWnd, TEXT("Cannot open clipboard"), MB_OK | MB_ICONERROR);
+				return 0;
+			}
+			
+			EmptyClipboard();
+
+			hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * sizeof(TCHAR)); 
+			if (hglbCopy == NULL) { 
+				CloseClipboard(); 
+				return FALSE; 
+			} 
+
+			p_copy = (TCHAR*)GlobalLock(hglbCopy); 
+			NH_A2W( p, p_copy, len ); 
+			p_copy[len] = (TCHAR) 0;    // null character 
+			GlobalUnlock(hglbCopy); 
+
+			SetClipboardData(CF_TEXT, hglbCopy);
+			
+			CloseClipboard();
+			
+			free(p);
+		} break;
+		
+		case IDM_SETTING_SCREEN_TO_FILE: {
+			OPENFILENAME ofn;
+			char filename[1024];
+			FILE* pFile;
+			char* text;
+			
+			ZeroMemory(filename, sizeof(filename));
+			ZeroMemory(&ofn, sizeof(ofn));
+			ofn.lStructSize = sizeof (OPENFILENAME);
+			ofn.hwndOwner = hWnd;
+			ofn.hInstance = GetNHApp()->hApp;
+			ofn.lpstrFilter = 
+				"Text Files (*.txt)\x0*.txt\x0"
+				"All Files (*.*)\x0*.*\x0"
+				"\x0\x0";
+			ofn.lpstrCustomFilter = NULL;
+			ofn.nMaxCustFilter = 0;
+			ofn.nFilterIndex = 1;
+			ofn.lpstrFile = filename;
+			ofn.nMaxFile = sizeof(filename);
+			ofn.lpstrFileTitle = NULL;
+			ofn.nMaxFileTitle = 0;
+			ofn.lpstrInitialDir = hackdir;
+			ofn.lpstrTitle = NULL;
+			ofn.Flags = OFN_LONGNAMES | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
+			ofn.nFileOffset = 0;
+			ofn.nFileExtension = 0;
+			ofn.lpstrDefExt = "txt";
+			ofn.lCustData = 0;
+			ofn.lpfnHook = 0;
+			ofn.lpTemplateName = 0;
+
+			if( !GetSaveFileName( &ofn ) ) return FALSE;
+
+			text = nh_compose_ascii_screenshot();
+			if( !text ) return FALSE;
+
+			pFile = fopen(filename, "wb");
+			if( !pFile ) {
+				char buf[4096];
+				sprintf(buf, "Cannot open %s for writing!", filename);
+				NHMessageBox(hWnd, buf, MB_OK | MB_ICONERROR);
+				free(text);
+				return FALSE;
+			}
+
+			fwrite(text, strlen(text), 1, pFile);
+			fclose(pFile);
+			free(text);
+		} break;
+
         case IDM_NHMODE:
         {
             GetNHApp()->regNetHackMode = GetNHApp()->regNetHackMode ? 0 : 1;
@@ -1065,4 +1155,36 @@ void nhlock_windows( BOOL lock )
 		MF_BYCOMMAND | 
 		(lock? MF_CHECKED : MF_UNCHECKED)
 	);
+}
+
+// returns strdup() created pointer - callee assumes the ownership
+#define TEXT_BUFFER_SIZE 4096
+char*
+nh_compose_ascii_screenshot()
+{
+	char* retval;
+	PMSNHMsgGetText text;
+
+	retval = (char*)malloc(3*TEXT_BUFFER_SIZE);
+
+	text = (PMSNHMsgGetText)malloc(sizeof(MSNHMsgGetText) + TEXT_BUFFER_SIZE);
+	text->max_size = TEXT_BUFFER_SIZE-1;	/* make sure we always have 0 at the end of the buffer */
+
+	ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+	SendMessage( mswin_hwnd_from_winid(WIN_MESSAGE), 
+		         WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_GETTEXT, (LPARAM)text );
+	strcpy(retval, text->buffer);
+
+	ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+	SendMessage( mswin_hwnd_from_winid(WIN_MAP), 
+		         WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_GETTEXT, (LPARAM)text );
+	strcat(retval, text->buffer);
+
+	ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+	SendMessage( mswin_hwnd_from_winid(WIN_STATUS), 
+	         WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_GETTEXT, (LPARAM)text );
+	strcat(retval, text->buffer);
+
+	free( text );
+	return retval;
 }

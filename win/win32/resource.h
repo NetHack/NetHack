@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by winhack.rc
 //
 #define IDC_MYICON                      2
@@ -139,6 +139,8 @@
 #define IDM_CLEARSETTINGS               32795
 #define IDM_SETTING_AUTOLAYOUT          32796
 #define IDM_SETTING_LOCKWINDOWS         32797
+#define IDM_SETTING_SCREEN_TO_CLIPBOARD 32798
+#define IDM_SETTING_SCREEN_TO_FILE      32799
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -146,7 +148,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
-#define _APS_NEXT_COMMAND_VALUE         32798
+#define _APS_NEXT_COMMAND_VALUE         32800
 #define _APS_NEXT_CONTROL_VALUE         1332
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

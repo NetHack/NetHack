@@ -110,6 +110,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	_nethack_app.bAutoLayout = TRUE;
 	_nethack_app.bWindowsLocked = TRUE;
 
+	_nethack_app.bNoSounds = FALSE;
+
     // init controls
     if (FAILED(GetComCtlVersion(&major, &minor)))
     {

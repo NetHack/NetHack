@@ -121,8 +121,8 @@ struct window_procs mswin_procs = {
     mswin_end_screen,
     mswin_outrip,
     mswin_preference_update,
-    genl_getmsghistory,
-    genl_putmsghistory,
+    mswin_getmsghistory,
+    mswin_putmsghistory,
 };
 
 
@@ -1929,6 +1929,45 @@ void mswin_preference_update(const char *pref)
 
 }
 
+#define TEXT_BUFFER_SIZE 4096
+char *mswin_getmsghistory(BOOLEAN_P init)
+{
+	static PMSNHMsgGetText text = 0;
+	static char* next_message = 0;
+
+	if( init ) {
+		text = (PMSNHMsgGetText)malloc(sizeof(MSNHMsgGetText) + TEXT_BUFFER_SIZE);
+		text->max_size = TEXT_BUFFER_SIZE-1;	/* make sure we always have 0 at the end of the buffer */
+
+		ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+		SendMessage( mswin_hwnd_from_winid(WIN_MESSAGE), 
+					WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_GETTEXT, (LPARAM)text );
+	
+		next_message = text->buffer;
+	}
+
+	if( !(next_message && next_message[0]) ) {
+		free(text);
+		next_message = 0;
+		return (char*)0;
+	} else {
+		char* retval = next_message;
+		char* p;
+		next_message = p = strchr(next_message, '\n');
+		if( next_message ) next_message++;
+		if( p )	while( p>=retval && isspace(*p) ) *p-- = (char)0; /* delete trailing whitespace */
+		return retval;
+	}
+}
+
+void mswin_putmsghistory(const char * msg)
+{
+	BOOL save_sound_opt = GetNHApp()->bNoSounds;
+	GetNHApp()->bNoSounds = TRUE;	/* disable sounds while restoring message history */
+	mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, msg, 0);
+	clear_nhwindow(WIN_MESSAGE); /* it is in fact end-of-turn indication so each message will print on the new line */
+	GetNHApp()->bNoSounds = save_sound_opt; /* restore sounds option */
+}
 
 void mswin_main_loop()
 {

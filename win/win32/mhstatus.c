@@ -99,20 +99,29 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	{
 	case WM_MSNH_COMMAND: {
 		switch( wParam ) {
+		
 		case MSNH_MSG_PUTSTR: {
 			PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
 			strncpy(data->window_text[data->index], msg_data->text, 
 				    MAXWINDOWTEXT);
 			data->index = (data->index+1) % NHSW_LINES;
 			InvalidateRect(hWnd, NULL, TRUE);
-			break;
-		}
-		case MSNH_MSG_CLEAR_WINDOW:
+		} break;
+		
+		case MSNH_MSG_CLEAR_WINDOW: {
 			data->index = 0;
 			ZeroMemory(data->window_text, sizeof(data->window_text));
 			InvalidateRect(hWnd, NULL, TRUE);
-			break;
-		}
+		} break;
+
+		case MSNH_MSG_GETTEXT: {
+			PMSNHMsgGetText msg_data = (PMSNHMsgGetText)lParam;
+			strncpy(msg_data->buffer, data->window_text[0], msg_data->max_size);
+			strncat(msg_data->buffer, "\r\n", msg_data->max_size - strlen(msg_data->buffer) );
+			strncat(msg_data->buffer, data->window_text[1], msg_data->max_size - strlen(msg_data->buffer) );
+		} break;
+		
+		} /* end switch( wParam ) { */
 	} break;
 
 	case WM_PAINT: {

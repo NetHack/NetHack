@@ -520,7 +520,35 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 		ReleaseDC(hWnd, hdc);
 	} break;
-	}
+
+	case MSNH_MSG_GETTEXT: {
+		PMSNHMsgGetText msg_data = (PMSNHMsgGetText)lParam;
+		size_t index;
+		int col, row;
+		int   color;
+		unsigned special;
+		int mgch;
+
+		index = 0;
+		for( row=0; row<ROWNO; row++ ) {
+			for( col=0; col<COLNO; col++ ) {
+				if( index>=msg_data->max_size ) break;
+				if( data->map[col][row] == -1 ) {
+					mgch = ' ';
+				} else {
+					mapglyph(data->map[col][row], &mgch, &color,
+							 &special, col, row);
+				}
+				msg_data->buffer[index] = mgch;
+				index++;
+			}
+			if( index>=msg_data->max_size-1 ) break;
+			msg_data->buffer[index++] = '\r';
+			msg_data->buffer[index++] = '\n';
+		}
+	} break;
+
+	} /* end switch(wParam) */
 }
 
 /* on WM_CREATE */

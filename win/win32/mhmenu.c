@@ -309,7 +309,10 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		GetWindowRect(hWnd, &rt);
 		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
 		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
-		mswin_update_window_placement(NHW_MENU, &rt);
+		if( flags.perm_invent && mswin_winid_from_handle(hWnd)==WIN_INVEN )
+			mswin_update_window_placement(NHW_INVEN, &rt);
+		else
+			mswin_update_window_placement(NHW_MENU, &rt);
 	} return FALSE;
 	
 	case WM_CLOSE:

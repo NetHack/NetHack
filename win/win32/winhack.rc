@@ -63,6 +63,9 @@ BEGIN
         MENUITEM "&9 - ASCII  (10x18)",         IDM_MAP_ASCII10X18
         MENUITEM SEPARATOR
         MENUITEM "&Fit To Screen ",             IDM_MAP_FIT_TO_SCREEN
+        MENUITEM SEPARATOR
+        MENUITEM "&Copy To Clipboard (ASCII)",  IDM_SETTING_SCREEN_TO_CLIPBOARD
+        MENUITEM "&Save to File (ASCII)",       IDM_SETTING_SCREEN_TO_FILE
     END
     POPUP "Windows &Settings"
     BEGIN

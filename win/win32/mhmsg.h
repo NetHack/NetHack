@@ -18,6 +18,7 @@
 #define MSNH_MSG_ENDMENU		108
 #define MSNH_MSG_DIED			109
 #define MSNH_MSG_CARET			110
+#define MSNH_MSG_GETTEXT		111
 
 typedef struct mswin_nhmsg_add_wnd {
   winid		  wid;
@@ -58,6 +59,11 @@ typedef struct mswin_nhmsg_cursor {
 typedef struct mswin_nhmsg_end_menu {
 	const char* text;
 } MSNHMsgEndMenu, *PMSNHMsgEndMenu;
+
+typedef struct mswin_nhmsg_get_text {
+	size_t	max_size;
+	char	buffer[];
+} MSNHMsgGetText, *PMSNHMsgGetText;
 
 #endif
 

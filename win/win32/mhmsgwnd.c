@@ -9,7 +9,7 @@
 #define MSG_WRAP_TEXT 
 
 #define MSG_VISIBLE_LINES     max(iflags.wc_vary_msgcount, 2)
-#define MAX_MSG_LINES		  32
+#define MAX_MSG_LINES		  128
 #define MSG_LINES			  (int)min(iflags.msg_history, MAX_MSG_LINES)
 #define MAXWINDOWTEXT		  TBUFSZ
 
@@ -218,6 +218,15 @@ LRESULT CALLBACK NHMessageWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
     } 
     break; 
 
+	case WM_MOVE: {
+		RECT rt;
+		GetWindowRect(hWnd, &rt);
+		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
+		mswin_update_window_placement(NHW_MESSAGE, &rt);
+	}
+	break;
+
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
    }
@@ -319,7 +328,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		InvalidateRect(hWnd, NULL, TRUE);
 
 #ifdef USER_SOUNDS
-		play_sound_for_message(msg_data->text);
+		if( !GetNHApp()->bNoSounds ) play_sound_for_message(msg_data->text);
 #endif
 	}
 	break;
@@ -344,8 +353,25 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	    }
         break;
 
+	case MSNH_MSG_GETTEXT: {
+		PMSNHMsgGetText msg_data = (PMSNHMsgGetText)lParam;
+		int i;
+		size_t buflen;
 
-	}
+		buflen = 0;
+		for(i=0; i<MSG_LINES; i++ )
+			if( *data->window_text[i].text ) {
+				strncpy(&msg_data->buffer[buflen], data->window_text[i].text, msg_data->max_size - buflen );
+				buflen += strlen(data->window_text[i].text);
+				if( buflen >= msg_data->max_size ) break;
+
+				strncpy(&msg_data->buffer[buflen], "\r\n", msg_data->max_size - buflen );
+				buflen += 2;
+				if( buflen > msg_data->max_size ) break;
+			}
+	} break;
+
+	} /* switch( wParam ) */
 }
 
 void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
