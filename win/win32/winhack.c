@@ -17,6 +17,7 @@
 #endif
 
 extern void FDECL(nethack_exit,(int));
+static TCHAR* _get_cmd_arg(TCHAR* pCmdLine);
 
 // Global Variables:
 NHWinApp _nethack_app;
@@ -43,7 +44,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	int argc;
 	char* argv[MAX_CMDLINE_PARAM];
 	size_t len;
-	TCHAR *p, *p2;
+	TCHAR *p;
 	TCHAR wbuf[BUFSZ];
 	char buf[BUFSZ];
 
@@ -78,22 +79,16 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	}
 
 	/* get command line parameters */	
-	argc = 0;
-	p = GetCommandLine();
-	if (p && *p == _T('"')) {
-		p2 = _tcschr(p + 1, _T('"'));
-		p = p2 + 2;
-		argc = 1;
-	}
-	p = _tcstok(p, TEXT(" "));
-	for( ; p && argc<MAX_CMDLINE_PARAM; argc++ ) {
+	p = _get_cmd_arg(GetCommandLine());
+	p = _get_cmd_arg(NULL); /* skip first paramter - command name */
+	for( argc = 1; p && argc<MAX_CMDLINE_PARAM; argc++ ) {
 		len = _tcslen(p);
 		if( len>0 ) {
 			argv[argc] = _strdup( NH_W2A(p, buf, BUFSZ) );
 		} else {
 			argv[argc] = "";
 		}
-		p = _tcstok(NULL, TEXT(" "));
+		p = _get_cmd_arg(NULL);
 	}
 	GetModuleFileName(NULL, wbuf, BUFSZ);
 	argv[0] = _strdup(NH_W2A(wbuf, buf, BUFSZ));
@@ -137,5 +132,43 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 PNHWinApp GetNHApp()
 {
 	return &_nethack_app;
+}
+
+TCHAR* _get_cmd_arg(TCHAR* pCmdLine)
+{
+        static TCHAR* pArgs = NULL;
+        TCHAR  *pRetArg;
+        BOOL   bQuoted;
+
+        if( !pCmdLine && !pArgs ) return NULL;
+        if( !pArgs ) pArgs = pCmdLine;
+
+        /* skip whitespace */
+        for(pRetArg = pArgs; *pRetArg && _istspace(*pRetArg); pRetArg = CharNext(pRetArg));
+		if( !*pRetArg ) {
+			pArgs = NULL;
+			return NULL;
+		}
+
+        /* check for quote */
+        if( *pRetArg==TEXT('"') ) {
+                bQuoted = TRUE;
+                pRetArg = CharNext(pRetArg);
+				pArgs = _tcschr(pRetArg, TEXT('"'));
+	    } else {
+			/* skip to whitespace */
+			for(pArgs = pRetArg; *pArgs && !_istspace(*pArgs); pArgs = CharNext(pArgs));
+		}
+		
+		if( pArgs && *pArgs ) {
+			TCHAR* p;
+			p = pArgs;
+			pArgs = CharNext(pArgs);
+			*p = (TCHAR)0;
+		} else {
+			pArgs = NULL;
+		}
+
+		return pRetArg;
 }
 
