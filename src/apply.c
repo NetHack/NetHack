@@ -1028,7 +1028,7 @@ struct obj **optr;
 	} else {
 		if ((long)otmp->spe + obj->quan > 7L) {
 		    obj = splitobj(obj, 7L - (long)otmp->spe);
-		    /* avoid a gramatical error if obj->quan gets
+		    /* avoid a grammatical error if obj->quan gets
 		       reduced to 1 candle from more than one */
 		    s = (obj->quan != 1) ? "candles" : "candle";
 		} else *optr = 0;
