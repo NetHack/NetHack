@@ -61,6 +61,7 @@ sync default documentation of "null" option with the code
 tripping over a cockatrice corpse didn't petrify, even when not wearing boots
 do not call swamps on the Juiblex level "moat" when freezing
 keep score from wrapping around and becoming negative by capping it
+kicked objects do not slide when on the air or water levels
 
 
 Platform- and/or Interface-Specific Fixes

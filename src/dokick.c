@@ -454,6 +454,9 @@ xchar x, y;
 	if (is_pool(x, y)) {
 	    /* you're in the water too; significantly reduce range */
 	    range = range / 3 + 1;	/* {1,2}=>1, {3,4,5}=>2, {6,7,8}=>3 */
+	} else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) {
+	    /* you're in air, since is_pool did not match */
+	    range + rnd(3);
 	} else {
 	    if (is_ice(x, y)) range += rnd(3),  slide = TRUE;
 	    if (kickobj->greased) range += rnd(3),  slide = TRUE;
