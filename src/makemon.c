@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)makemon.c	3.4	2003/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1717,6 +1717,30 @@ assign_sym:
 	}
 	mtmp->m_ap_type = ap_type;
 	mtmp->mappearance = appear;
+}
+
+/* release a monster from a bag of tricks */
+void
+bagotricks(bag)
+struct obj *bag;
+{
+    if (!bag || bag->otyp != BAG_OF_TRICKS) {
+	impossible("bad bag o' tricks");
+    } else if (bag->spe < 1) {
+	pline(nothing_happens);
+    } else {
+	boolean gotone = FALSE;
+	int cnt = 1;
+
+	check_unpaid(bag);
+	bag->spe--;
+	if (!rn2(23)) cnt += rn1(7, 1);
+	while (cnt-- > 0) {
+	    if (makemon((struct permonst *)0, u.ux, u.uy, NO_MM_FLAGS))
+		gotone = TRUE;
+	}
+	if (gotone) makeknown(BAG_OF_TRICKS);
+    }
 }
 
 #endif /* OVLB */

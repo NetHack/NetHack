@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2003/03/23	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2003/04/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,6 +31,7 @@ STATIC_DCL boolean FDECL(mbag_explodes, (struct obj *,int));
 STATIC_PTR int FDECL(in_container,(struct obj *));
 STATIC_PTR int FDECL(ck_bag,(struct obj *));
 STATIC_PTR int FDECL(out_container,(struct obj *));
+STATIC_DCL long FDECL(mbag_item_gone, (int,struct obj *));
 STATIC_DCL int FDECL(menu_loot, (int, struct obj *, BOOLEAN_P));
 STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
@@ -1903,6 +1904,29 @@ register struct obj *obj;
 	return 1;
 }
 
+/* an object inside a cursed bag of holding is being destroyed */
+STATIC_OVL long
+mbag_item_gone(held, item)
+int held;
+struct obj *item;
+{
+    struct monst *shkp;
+    long loss = 0L;
+
+    if (item->dknown)
+	pline("%s %s vanished!", Doname2(item), otense(item, "have"));
+    else
+	You("%s %s disappear!", Blind ? "notice" : "see", doname(item));
+
+    if (*u.ushops && (shkp = shop_keeper(*u.ushops)) != 0) {
+	if (held ? (boolean) item->unpaid : costly_spot(u.ux, u.uy))
+	    loss = stolen_value(item, u.ux, u.uy,
+				(boolean)shkp->mpeaceful, TRUE);
+    }
+    obfree(item, (struct obj *) 0);
+    return loss;
+}
+
 #undef Icebox
 
 int
@@ -1919,7 +1943,7 @@ register int held;
 	char select[MAXOCLASSES+1];
 	char qbuf[BUFSZ], emptymsg[BUFSZ], pbuf[QBUFSZ];
 	long loss = 0L;
-	int cnt = 0, used = 0, lcnt = 0,
+	int cnt = 0, used = 0,
 	    menu_on_request;
 
 	emptymsg[0] = '\0';
@@ -1985,39 +2009,20 @@ register int held;
 	for (curr = obj->cobj; curr; curr = otmp) {
 	    otmp = curr->nobj;
 	    if (Is_mbag(obj) && obj->cursed && !rn2(13)) {
-		if (curr->dknown)
-		    pline("%s to have vanished!", The(aobjnam(curr,"seem")));
-		else
-		    You("%s %s disappear.", Blind ? "notice" : "see",
-							doname(curr));
 		obj_extract_self(curr);
-		if (*u.ushops && (shkp = shop_keeper(*u.ushops)) != 0) {
-		    if(held) {
-			if(curr->unpaid)
-			    loss += stolen_value(curr, u.ux, u.uy,
-					     (boolean)shkp->mpeaceful, TRUE);
-			lcnt++;
-		    } else if(costly_spot(u.ux, u.uy)) {
-			loss += stolen_value(curr, u.ux, u.uy,
-					     (boolean)shkp->mpeaceful, TRUE);
-			lcnt++;
-		    }
-		}
-		/* obfree() will free all contained objects */
-		obfree(curr, (struct obj *) 0);
+		loss += mbag_item_gone(held, curr);
 		used = 1;
 	    } else {
 		cnt++;
 	    }
 	}
 
-	if (lcnt && loss)
-	    You("owe %ld %s for lost item%s.",
-		loss, currency(loss), lcnt > 1 ? "s" : "");
-
+	if (loss)
+	    You("owe %ld %s for lost merchandise.", loss, currency(loss));
 	obj->owt = weight(obj);
 
-	if (!cnt) Sprintf(emptymsg, "%s %s empty.", Yname2(obj), otense(obj, "are"));
+	if (!cnt)
+	    Sprintf(emptymsg, "%s is empty.", Yname2(obj));
 	if (cnt || flags.menu_style == MENU_FULL) {
 	    Sprintf(qbuf, "Do you want to take %s out of %s?",
 		    something, yname(obj));

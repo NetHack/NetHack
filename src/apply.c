@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2003/02/13	*/
+/*	SCCS Id: @(#)apply.c	3.4	2003/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2780,18 +2780,7 @@ doapply()
 		res = use_container(obj, 1);
 		break;
 	case BAG_OF_TRICKS:
-		if(obj->spe > 0) {
-			register int cnt = 1;
-
-			check_unpaid(obj);
-			obj->spe--;
-			if(!rn2(23)) cnt += rn2(7) + 1;
-			while(cnt--)
-			   (void) makemon((struct permonst *) 0,
-						u.ux, u.uy, NO_MM_FLAGS);
-			makeknown(BAG_OF_TRICKS);
-		} else
-			pline(nothing_happens);
+		bagotricks(obj);
 		break;
 	case CAN_OF_GREASE:
 		use_grease(obj);
