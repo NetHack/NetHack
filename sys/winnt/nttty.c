@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)nttty.c	3.4	2000/08/02
+/*	SCCS Id: @(#)nttty.c	3.4	2002/03/23   */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -754,51 +754,59 @@ has_color(int color)
 }
 
 void
-term_end_attr(int attr)
-{
-    switch(attr){
-
-        case ATR_ULINE:
-        case ATR_BOLD:
-        case ATR_BLINK:
-		standoutend();
-                break;
-        case ATR_INVERSE:
-		if (currentcolor == 0)
-			currentcolor = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED;
-		currentbackground = 0; 
-		colorchange = TRUE;
-		break;
-        default:
-		standoutend();
-		if (currentcolor == 0)
-			currentcolor = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED;
-		currentbackground = 0;
-		currenthilite = 0;
-                break;
-    }                
-}
-
-void
 term_start_attr(int attr)
 {
     switch(attr){
-
+        case ATR_INVERSE:
+		if (iflags.wc_inverse) {
+		   /* Suggestion by Lee Berger */
+		   if ((currentcolor & (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED)) ==
+			(FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED))
+			currentcolor = 0;
+		   currentbackground = (BACKGROUND_RED|BACKGROUND_BLUE|BACKGROUND_GREEN);
+		   colorchange = TRUE;
+		   break;
+		} /* else */
+		/*FALLTHRU*/
         case ATR_ULINE:
         case ATR_BOLD:
         case ATR_BLINK:
 		standoutbeg();
                 break;
+        default:
+#ifdef DEBUG
+		impossible("term_start_attr: strange attribute %d", attr);
+#endif
+		standoutend();
+		if (currentcolor == 0)
+			currentcolor = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED;
+		currentbackground = 0;
+                break;
+    }
+}
+
+void
+term_end_attr(int attr)
+{
+    switch(attr){
+
         case ATR_INVERSE:
-		/* Suggestion by Lee Berger */
-		if ((currentcolor & (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED)) ==
-			(FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED))
-			currentcolor = 0;
-		currentbackground = (BACKGROUND_RED|BACKGROUND_BLUE|BACKGROUND_GREEN);
-		colorchange = TRUE;
-		break;
+        	if (iflags.wc_inverse) {
+		   if (currentcolor == 0)
+			currentcolor = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED;
+		   currentbackground = 0; 
+		   colorchange = TRUE;
+		   break;
+		} /* else */
+		/*FALLTHRU*/
+        case ATR_ULINE:
+        case ATR_BOLD:
+        case ATR_BLINK:
         default:
 		standoutend();
+		if (currentcolor == 0)
+			currentcolor = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED;
+		currentbackground = 0;
                 break;
     }                
 }
