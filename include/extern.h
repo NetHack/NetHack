@@ -645,7 +645,6 @@ E char *FDECL(fname_encode, (const char *, CHAR_P, char *, char *, int));
 E char *FDECL(fname_decode, (CHAR_P, char *, char *, int));
 E const char *FDECL(fqname, (const char *, int, int));
 E FILE *FDECL(fopen_datafile, (const char *,const char *,int));
-E boolean FDECL(uptodate, (int,const char *));
 E void FDECL(store_version, (int));
 #ifdef MFLOPPY
 E void NDECL(set_lock_and_bones);
@@ -2196,6 +2195,7 @@ E unsigned long NDECL(get_current_feature_ver);
 #ifdef RUNTIME_PORT_ID
 E void FDECL(append_port_id, (char *));
 #endif
+E boolean FDECL(uptodate, (int,const char *));
 
 /* ### video.c ### */
 
