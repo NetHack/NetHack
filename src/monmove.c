@@ -217,7 +217,9 @@ boolean fleemsg;
 		if (fleetime == 1) fleetime++;
 		mtmp->mfleetim = min(fleetime, 127);
 	    }
-	    if (!mtmp->mflee && fleemsg && canseemon(mtmp) && !mtmp->mfrozen)
+	    if (!mtmp->mflee && fleemsg && canseemon(mtmp) && !mtmp->mfrozen &&
+		mtmp->m_ap_type != M_AP_FURNITURE &&
+		mtmp->m_ap_type != M_AP_OBJECT)
 		pline("%s turns to flee!", (Monnam(mtmp)));
 	    mtmp->mflee = 1;
 	}
