@@ -26,8 +26,8 @@ typedef struct mswin_nethack_map_window {
 	int  xCur, yCur;			/* position of the cursor */
 	int  xScrTile, yScrTile;	/* size of display tile */
 	POINT map_orig;				/* map origin point */
-
 	HFONT hMapFont;				/* font for ASCII mode */
+	int  xLastMouseClick, yLastMouseClick;     /* last mouse click */
 } NHMapWindow, *PNHMapWindow;
 
 static TCHAR szNHMapWindowClass[] = TEXT("MSNethackMapWndClass");
@@ -324,6 +324,7 @@ void register_map_window_class()
 LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMapWindow data;
+	int x, y;
 	
 	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch (message) 
@@ -369,20 +370,24 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     } 
     break; 
 
-	case WM_LBUTTONDOWN:
-		NHEVENT_MS( 
-			CLICK_1,
-			max(0, min(COLNO, data->xPos + (LOWORD(lParam)-data->map_orig.x)/data->xScrTile)),
-			max(0, min(ROWNO, data->yPos + (HIWORD(lParam)-data->map_orig.y)/data->yScrTile))
-		);
+	case WM_LBUTTONDOWN: 
+		x = max(0, min(COLNO, data->xPos + (LOWORD(lParam)-data->map_orig.x)/data->xScrTile));
+		y = max(0, min(ROWNO, data->yPos + (HIWORD(lParam)-data->map_orig.y)/data->yScrTile));
+
+		NHEVENT_MS( CLICK_1, x, y);
+
+		data->xLastMouseClick = x;
+		data->yLastMouseClick = y;
 	return 0;
 
-	case WM_LBUTTONDBLCLK :
-		NHEVENT_MS( 
-			CLICK_2,
-			max(0, min(COLNO, data->xPos + (LOWORD(lParam)-data->map_orig.x)/data->xScrTile)),
-			max(0, min(ROWNO, data->yPos + (HIWORD(lParam)-data->map_orig.y)/data->yScrTile))
-		);
+	case WM_LBUTTONDBLCLK:
+		x = max(0, min(COLNO, data->xPos + (LOWORD(lParam)-data->map_orig.x)/data->xScrTile));
+		y = max(0, min(ROWNO, data->yPos + (HIWORD(lParam)-data->map_orig.y)/data->yScrTile));
+
+		/* if map has scrolled since the last mouse click - ignore double-click message */
+		if( data->xLastMouseClick == x && data->yLastMouseClick == y ) {
+			NHEVENT_MS( CLICK_1, x, y);
+		}
 	return 0;
 
 	case WM_DESTROY:
@@ -521,6 +526,8 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	data->xScrTile = GetNHApp()->mapTile_X;
 	data->yScrTile = GetNHApp()->mapTile_Y;
+
+	data->xLastMouseClick = data->yLastMouseClick = -1;
 
 	SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 }
