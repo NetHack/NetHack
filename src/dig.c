@@ -504,6 +504,13 @@ int ttyp;
 	    breaksink(x, y);
 	    return;
 #endif
+	} else if (lev->typ == DRAWBRIDGE_DOWN ||
+		   (is_drawbridge_wall(x, y) >= 0)) {
+	    int bx = x, by = y;
+	    /* if under the portcullis, the bridge is adjacent */
+	    (void) find_drawbridge(&bx, &by);
+	    destroy_drawbridge(bx, by);
+	    return;
 	}
 
 	if (ttyp != PIT && !Can_dig_down(&u.uz)) {
