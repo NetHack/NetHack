@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2002/11/07	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2002/11/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,6 +8,10 @@ STATIC_DCL boolean FDECL(known_hitum, (struct monst *,int *,struct attack *));
 STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
 STATIC_DCL boolean FDECL(hitum, (struct monst *,int,struct attack *));
 STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *,struct obj *,int));
+#ifdef STEED
+STATIC_DCL int FDECL(joust, (struct monst *,struct obj *));
+#endif
+STATIC_DCL void NDECL(demonpet);
 STATIC_DCL boolean FDECL(m_slips_free, (struct monst *mtmp,struct attack *mattk));
 STATIC_DCL int FDECL(explum, (struct monst *,struct attack *));
 STATIC_DCL void FDECL(start_engulf, (struct monst *));
@@ -419,17 +423,20 @@ struct attack *uattk;
 	if(!*mhit) {
 	    missum(mon, uattk);
 	} else {
-	    int oldhp = mon->mhp;
+	    int oldhp = mon->mhp,
+		x = u.ux + u.dx, y = u.uy + u.dy;
 
-		/* KMH, conduct */
-		if (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
-		    u.uconduct.weaphit++;
+	    /* KMH, conduct */
+	    if (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+		u.uconduct.weaphit++;
 
-	    /* we hit the monster; be careful: it might die! */
-	    notonhead = (mon->mx != u.ux+u.dx || mon->my != u.uy+u.dy);
+	    /* we hit the monster; be careful: it might die or
+	       be knocked into a different location */
+	    notonhead = (mon->mx != x || mon->my != y);
 	    malive = hmon(mon, uwep, 0);
-	    /*	This assumes that Stormbringer was uwep not uswapwep */ 
-	    if (malive && u.twoweap && !override_confirmation)
+	    /* this assumes that Stormbringer was uwep not uswapwep */ 
+	    if (malive && u.twoweap && !override_confirmation &&
+		    m_at(x, y) == mon)
 		malive = hmon(mon, uswapwep, 0);
 	    if (malive) {
 		/* monster still alive */
@@ -453,7 +460,7 @@ struct attack *uattk;
 			--u.uconduct.weaphit;
 		}
 		if (mon->wormno && *mhit)
-			cutworm(mon, u.ux+u.dx, u.uy+u.dy, uwep);
+		    cutworm(mon, x, y, uwep);
 	    }
 	}
 	return(malive);
@@ -512,10 +519,11 @@ int thrown;
 	boolean get_dmg_bonus = TRUE;
 	boolean ispoisoned = FALSE, needpoismsg = FALSE, poiskilled = FALSE;
 	boolean silvermsg = FALSE;
-#ifdef STEED
-	boolean jousting = FALSE;
-#endif
 	boolean valid_weapon_attack = FALSE;
+	boolean unarmed = !uwep && !uarm && !uarms;
+#ifdef STEED
+	int jousting = 0;
+#endif
 	int wtype;
 	struct obj *monwep;
 	char yourbuf[BUFSZ];
@@ -620,9 +628,12 @@ int thrown;
 				&& hates_silver(mdat))
 			silvermsg = TRUE;
 #ifdef STEED
-		    if (u.usteed && !thrown &&
-				weapon_type(obj) == P_LANCE && mon != u.ustuck)
-			jousting = TRUE;
+		    if (u.usteed && !thrown && tmp > 0 &&
+			    weapon_type(obj) == P_LANCE && mon != u.ustuck) {
+			jousting = joust(mon, obj);
+			/* exercise skill even for minimal damage hits */
+			if (jousting) valid_weapon_attack = TRUE;
+		    }
 #endif
 		    if(!thrown && obj == uwep && obj->otyp == BOOMERANG &&
 		       !rnl(3)) {
@@ -679,6 +690,8 @@ int thrown;
 			    change_luck(-2);
 			    useup(obj);
 			    obj = (struct obj *) 0;
+			    unarmed = FALSE;	/* avoid obj==0 confusion */
+			    get_dmg_bonus = FALSE;
 			    hittxt = TRUE;
 			}
 			tmp = 1;
@@ -908,8 +921,15 @@ int thrown;
 
 #ifdef STEED
 	if (jousting) {
+	    tmp += d(2, (obj == uwep) ? 10 : 2);	/* [was in dmgval()] */
 	    You("joust %s%s",
 			 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
+	    if (jousting < 0) {
+		Your("%s shatters on impact!", doname(obj));
+		/* minor side-effect: broken lance won't split puddings */
+		useup(obj);
+		obj = 0;
+	    }
 	    /* avoid migrating a dead monster */
 	    if (mon->mhp > tmp) {
 		mhurtle(mon, u.dx, u.dy, 1);
@@ -920,7 +940,7 @@ int thrown;
 #endif
 
 	/* VERY small chance of stunning opponent if unarmed. */
-	if (tmp > 1 && !thrown && !obj && !uwep && !uarm && !uarms && !Upolyd) {
+	if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {
 	    if (rnd(100) < P_SKILL(P_BARE_HANDED_COMBAT) &&
 			!bigmonst(mdat) && !thick_skinned(mdat)) {
 		if (canspotmon(mon))
@@ -1051,7 +1071,32 @@ struct attack *mattk;
 	return FALSE;
 }
 
-STATIC_DCL void NDECL(demonpet);
+/* used when hitting a monster with a lance while mounted */
+STATIC_OVL int	/* 1: joust hit; 0: ordinary hit; -1: joust but break lance */
+joust(mon, obj)
+struct monst *mon;	/* target */
+struct obj *obj;	/* weapon */
+{
+    int skill_rating, joust_dieroll;
+
+    if (Fumbling || Stunned) return 0;
+
+    /* if using two weapons, use worse of lance and two-weapon skills */
+    skill_rating = P_SKILL(weapon_type(obj));	/* lance skill */
+    if (u.twoweap && P_SKILL(P_TWO_WEAPON_COMBAT) < skill_rating)
+	skill_rating = P_SKILL(P_TWO_WEAPON_COMBAT);
+    if (skill_rating == P_ISRESTRICTED) skill_rating = P_UNSKILLED; /* 0=>1 */
+
+    /* odds to joust are expert:80%, skilled:60%, basic:40%, unskilled:20% */
+    if ((joust_dieroll = rn2(5)) < skill_rating) {
+	if (joust_dieroll == 0 && rnl(50) == (50-1) &&
+		!unsolid(mon->data) && !obj_resists(obj, 0, 100))
+	    return -1;	/* hit that breaks lance */
+	return 1;	/* successful joust */
+    }
+    return 0;	/* no joust bonus; revert to ordinary attack */
+}
+
 /*
  * Send in a demon pet for the hero.  Exercise wisdom.
  *

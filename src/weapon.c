@@ -286,13 +286,6 @@ struct monst *mon;
 		otmp->oclass == BALL_CLASS || otmp->oclass == CHAIN_CLASS) {
 	    int bonus = 0;
 
-#ifdef STEED
-		/* KMH -- Lances are especially made for riding */
-		if (otmp == uwep && u.usteed &&
-				objects[otmp->otyp].oc_skill == P_LANCE)
-			bonus += d(2,10);
-#endif
-
 	    if (otmp->blessed && (is_undead(ptr) || is_demon(ptr)))
 		bonus += rnd(4);
 	    if (is_axe(otmp) && is_wooden(ptr))
