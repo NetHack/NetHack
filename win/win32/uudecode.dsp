@@ -66,6 +66,8 @@ echo decoding mnunsel (mnunsel.uu to mnunsel.bmp)	\
 ..\..\util\uudecode.exe mnunsel.uu	\
 echo decoding petmark (petmark.uu to petmark.bmp)	\
 ..\..\util\uudecode.exe petmark.uu	\
+echo decoding splash (splash.uu to splash.bmp)	\
+..\..\util\uudecode.exe splash.uu	\
 echo decoding tombstone (rip.uu to rip.bmp)	\
 ..\..\util\uudecode.exe rip.uu	\
 chdir ..\..\binary
@@ -110,6 +112,8 @@ echo decoding mnunsel (mnunsel.uu to mnunsel.bmp)	\
 ..\..\util\uudecode.exe mnunsel.uu	\
 echo decoding petmark (petmark.uu to petmark.bmp)	\
 ..\..\util\uudecode.exe petmark.uu	\
+echo decoding splash (splash.uu to splash.bmp)	\
+..\..\util\uudecode.exe splash.uu	\
 echo decoding tombstone (rip.uu to rip.bmp)	\
 ..\..\util\uudecode.exe rip.uu	\
 chdir ..\..\binary
