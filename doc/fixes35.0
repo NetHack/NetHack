@@ -88,6 +88,7 @@ win32gui: made auto-arrange windows on/off option (it was reset automatically
 	which was unintuitive and in some cases annoying
 win32gui: fix a possible crash with AltGr-4 WM_KEYDOWN handling
 win32gui: use whatever alternate tile set is loaded in the menus
+win32tty: prevent early error messages from flashing by too fast and not seen
 platforms that support hangup: SAFERHANGUP to avoid losing objects in transit
 	between lists when hangup occurs, and also avoid cheats due to
 	well-timed hangups to stop a long melee
@@ -120,6 +121,8 @@ shapeshifted vampire will transform back to vampire form after you defeat it and
 container lknown flag for locked/unlocked/broken awareness
 container cknown flag for container content awareness
 plname is stored in the save file on all platforms now
+introduce support for negation of role, race, align, gender values to eliminate
+	them from random selection and the pick list of startup choices
 
 
 Platform- and/or Interface-Specific New Features
