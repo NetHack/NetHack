@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "September 3, 2002
+.ds f2 "December 17, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1891,7 +1891,7 @@ gremlin, humanoid, imp or minor demon,
 jelly, kobold, leprechaun,
 mimic, nymph, orc,
 piercer, quadruped, rodent,
-spider, trapper or lurker above, horse or unicorn,
+arachnid or centipede, trapper or lurker above, horse or unicorn,
 vortex, worm, xan or other mythical/fantastic insect,
 light, zruty,
 angelic being, bat or bird, centaur,
