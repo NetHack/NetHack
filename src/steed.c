@@ -230,8 +230,9 @@ mount_steed(mtmp, force)
 	}
 
 	/* Can the player reach and see the monster? */
-	if (u.uswallow || u.ustuck || u.utrap || Punished) {
-	    if (Punished)
+	if (u.uswallow || u.ustuck || u.utrap || Punished ||
+	    !test_move(u.ux, u.uy, mtmp->mx-u.ux, mtmp->my-u.uy, TEST_MOVE)) {
+	    if (Punished || !(u.uswallow || u.ustuck || u.utrap))
 		You("are unable to swing your %s over.", body_part(LEG)); 
 	    else
 		You("are stuck here for now.");
