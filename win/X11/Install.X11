@@ -110,11 +110,12 @@ find the include and library files for X11.
 
 
 Finally, you should also install the NetHack.ad file as NetHack in the
-normal X11 applications defaults directory.  Alternatively, each person
-may append the contents of this file to their .Xdefaults file.  A second
-alternative is copy NetHack.ad to NetHack in GAMEDIR (from the top Makefile)
-and add a line to nethack.sh specifying this additional applications
-defaults directory:
+normal X11 applications defaults directory.  Alternatively, each person may
+append the contents of this file to their .Xdefaults or .Xresources file,
+depending on how your system is configured and the version of X11 you are
+using.  A second alternative is copy NetHack.ad to NetHack in GAMEDIR
+(from the top Makefile) and add a line to nethack.sh specifying this
+additional applications defaults directory:
 	XAPPLRESDIR=$HACKDIR; export XAPPLRESDIR
 
 
