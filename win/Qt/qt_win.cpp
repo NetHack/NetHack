@@ -2,10 +2,6 @@
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 
-#define VERSION_QT_MAJOR 2
-#define VERSION_QT_MINOR 0
-#define VERSION_QT_PATCH 0
-
 // Qt Binding for NetHack 3.3
 //
 // Copyright (C) 1996-2001 by Warwick W. Allison (warwick@troll.no)
@@ -147,7 +143,7 @@ aboutMsg()
 #else
     "using the Qt GUI toolkit.\n"
 #endif
-    "This is version %d.%d.%d.%d.%d.%d\n\n"
+    "This is version %d.%d.%d\n\n"
     "Homepage:\n     http://trolls.troll.no/warwick/nethack/\n\n"
 #ifdef KDE
 	  "KDE:\n     http://www.kde.org\n"
@@ -155,10 +151,7 @@ aboutMsg()
 	  "Qt:\n     http://www.troll.no",
 	VERSION_MAJOR,
 	VERSION_MINOR,
-	PATCHLEVEL,
-	VERSION_QT_MAJOR,
-	VERSION_QT_MINOR,
-	VERSION_QT_PATCH);
+	PATCHLEVEL);
     return msg;
 }
 
@@ -3349,8 +3342,8 @@ void NetHackQtTextWindow::Search()
 	int current=lines->currentItem();
 	for (int i=1; i<lines->count(); i++) {
 	    int lnum=(i+current)%lines->count();
-	    const char* str=lines->text(lnum);
-	    if (strstr(str,line)) {
+	    QString str=lines->text(lnum);
+	    if (str.contains(line)) {
 		lines->setCurrentItem(lnum);
 		lines->centerCurrentItem();
 		return;
@@ -3508,70 +3501,70 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     } item[] = {
 	{ game,		0, 0, 3},
 	{ game,		"Version\tv",           "v", 3},
-	{ game,		"Compilation\tAlt-V",     "\366", 3},
-	{ game,		"History\tShift-V",           "V", 3},
-	{ game,		"Redraw\tCtrl-R",          "\022", 0}, // useless
-	{ game,		"Options\tShift-O",           "O", 3},
-	{ game,		"Explore mode\tShift-X",      "X", 3},
+	{ game,		"Compilation\tAlt+V",     "\366", 3},
+	{ game,		"History\tShift+V",           "V", 3},
+	{ game,		"Redraw\tCtrl+R",          "\022", 0}, // useless
+	{ game,		"Options\tShift+O",           "O", 3},
+	{ game,		"Explore mode\tShift+X",      "X", 3},
 	{ game,		0, 0, 3},
-	{ game,		"Save\tShift-S",              "Sy", 3},
-	{ game,		"Quit\tAlt-Q",                "\361", 3},
+	{ game,		"Save\tShift+S",              "Sy", 3},
+	{ game,		"Quit\tAlt+Q",                "\361", 3},
 
-	{ apparel,	"Apparel off\tShift-A",       "A", 2},
-	{ apparel,	"Remove many\tShift-A",       "A", 1},
+	{ apparel,	"Apparel off\tShift+A",       "A", 2},
+	{ apparel,	"Remove many\tShift+A",       "A", 1},
 	{ apparel,	0, 0, 3},
 	{ apparel,	"Wield weapon\tw",      "w", 3},
 	{ apparel,	"Exchange weapons\tx",      "x", 3},
 	{ apparel,	"Two weapon combat\t#two",      "#tw", 3},
 	{ apparel,	"Load quiver\tQ",       "Q", 3},
 	{ apparel,	0, 0, 3},
-	{ apparel,	"Wear armour\tShift-W",       "W", 3},
-	{ apparel,	"Take off armour\tShift-T",   "T", 3},
+	{ apparel,	"Wear armour\tShift+W",       "W", 3},
+	{ apparel,	"Take off armour\tShift+T",   "T", 3},
 	{ apparel,	0, 0, 3},
-	{ apparel,	"Put on non-armour\tShift-P", "P", 3},
-	{ apparel,	"Remove non-armour\tShift-R", "R", 3},
+	{ apparel,	"Put on non-armour\tShift+P", "P", 3},
+	{ apparel,	"Remove non-armour\tShift+R", "R", 3},
 
-	{ act1,	"Again\tCtrl-A",           "\001", 2},
+	{ act1,	"Again\tCtrl+A",           "\001", 2},
 	{ act1,	0, 0, 3},
 	{ act1,	"Apply\ta?",            "a?", 3},
-	{ act1,	"Chat\tAlt-C",            "\343", 3},
+	{ act1,	"Chat\tAlt+C",            "\343", 3},
 	{ act1,	"Close door\tc",        "c", 3},
 	{ act1,	"Down\t>",              ">", 3},
-	{ act1,	"Drop many\tShift-D",         "D", 2},
+	{ act1,	"Drop many\tShift+D",         "D", 2},
 	{ act1,	"Drop\td?",             "d?", 2},
 	{ act1,	"Eat\te?",              "e?", 2},
-	{ act1,	"Engrave\tShift-E",           "E", 3},
+	{ act1,	"Engrave\tShift+E",           "E", 3},
 	{ act1,	"Fight\tF",             "F", 3},
 	{ act1,	"Fire from quiver\tf",  "f", 2},
-	{ act1,	"Force\tAlt-F",           "\346", 3},
+	{ act1,	"Force\tAlt+F",           "\346", 3},
 	{ act1,	"Get\t,",               ",", 2},
-	{ act1,	"Jump\tAlt-J",            "\352", 3},
-	{ act2,	"Kick\tCtrl-D",              "\004", 2},
-	{ act2,	"Loot\tAlt-L",            "\354", 3},
+	{ act1,	"Jump\tAlt+J",            "\352", 3},
+	{ act2,	"Kick\tCtrl+D",              "\004", 2},
+	{ act2,	"Loot\tAlt+L",            "\354", 3},
 	{ act2,	"Open door\to",         "o", 3},
 	{ act2,	"Pay\tp",               "p", 3},
 	{ act2,	"Rest\t.",              ".", 2},
 	{ act2,	"Ride\t#ri",            "#ri", 3},
 	{ act2,	"Search\ts",            "s", 3},
-	{ act2,	"Sit\tAlt-S",             "\363", 3},
+	{ act2,	"Sit\tAlt+S",             "\363", 3},
 	{ act2,	"Throw\tt",             "t", 2},
 	{ act2,	"Up\t<",                "<", 3},
-	{ act2,	"Wipe face\tAlt-W",       "\367", 3},
+	{ act2,	"Wipe face\tAlt+W",       "\367", 3},
 
 	{ magic,	"Quaff potion\tq",      "q?", 3},
 	{ magic,	"Read scroll/book\tr?", "r?", 3},
 	{ magic,	"Zap wand\tz?",         "z?", 3},
-	{ magic,	"Zap spell\tShift-Z",        "Z", 3},
-	{ magic,	"Dip\tAlt-D",             "\344", 3},
-	{ magic,	"Rub\tAlt-R",             "\362", 3},
-	{ magic,	"Invoke\tAlt-I",          "\351", 3},
+	{ magic,	"Zap spell\tShift+Z",        "Z", 3},
+	{ magic,	"Dip\tAlt+D",             "\344", 3},
+	{ magic,	"Rub\tAlt+R",             "\362", 3},
+	{ magic,	"Invoke\tAlt+I",          "\351", 3},
 	{ magic,	0, 0, 3},
-	{ magic,	"Offer\tAlt-O",           "\357", 3},
-	{ magic,	"Pray\tAlt-P",            "\360", 3},
+	{ magic,	"Offer\tAlt+O",           "\357", 3},
+	{ magic,	"Pray\tAlt+P",            "\360", 3},
 	{ magic,	0, 0, 3},
-	{ magic,	"Teleport\tCtrl-T",        "\024", 3},
-	{ magic,	"Monster action\tAlt-M",  "\355", 3},
-	{ magic,	"Turn undead\tAlt-T",     "\364", 3},
+	{ magic,	"Teleport\tCtrl+T",        "\024", 3},
+	{ magic,	"Monster action\tAlt+M",  "\355", 3},
+	{ magic,	"Turn undead\tAlt+T",     "\364", 3},
 
 	{ help,		"Help\t?",              "?", 3},
 	{ help,		0, 0, 3},
@@ -3587,13 +3580,13 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	{ info,		"Conduct\t#co",         "#co", 3},
 	{ info,		"Discoveries\t\\",      "\\", 3},
 	{ info,		"List/reorder spells\t+",     "+", 3},
-	{ info,		"Adjust letters\tAlt-A",  "\341", 2},
+	{ info,		"Adjust letters\tAlt+A",  "\341", 2},
 	{ info,		0, 0, 3},
-	{ info,		"Name object\tAlt-N",    "\356y?", 3},
-	{ info,		"Name object type\tAlt-N",    "\356n?", 3},
-	{ info,		"Name creature\tShift-C",      "C", 3},
+	{ info,		"Name object\tAlt+N",    "\356y?", 3},
+	{ info,		"Name object type\tAlt+N",    "\356n?", 3},
+	{ info,		"Name creature\tShift+C",      "C", 3},
 	{ info,		0, 0, 3},
-	{ info,		"Qualifications\tAlt-E",  "\345", 3},
+	{ info,		"Qualifications\tAlt+E",  "\345", 3},
 
 	{ 0, 0, 0, 0 }
     };
