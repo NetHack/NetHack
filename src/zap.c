@@ -3546,8 +3546,10 @@ register int dx,dy;
 		} else {
 		    zhitu(type, nd, fltxt, sx, sy);
 		}
-	    } else {
+	    } else if (!Blind) {
 		pline("%s whizzes by you!", The(fltxt));
+	    } else {
+		Your("%s tingles.", body_part(ARM));
 	    }
 	    if (abstype == ZT_LIGHTNING) (void) flashburn((long)d(nd,50));
 	    stop_occupation();
