@@ -1826,7 +1826,7 @@ register struct monst *mtmp;
 register struct attack  *mattk;
 boolean ufound;
 {
-    boolean physical_damage = TRUE;
+    boolean physical_damage = TRUE, kill_agr = TRUE;
 
     if (mtmp->mcan) return(0);
 
@@ -1890,6 +1890,9 @@ common:
 		    boolean chg;
 		    if (!Hallucination)
 			You("are caught in a blast of kaleidoscopic light!");
+		    /* avoid hallucinating the black light as it dies */
+		    mondead(mtmp);	/* remove it from map now */
+		    kill_agr = FALSE;	/* already killed (maybe lifesaved) */
 		    chg = make_hallucinated(HHallucination + (long)tmp,FALSE,0L);
 		    You("%s.", chg ? "are freaked out" : "seem unaffected");
 		}
@@ -1903,10 +1906,9 @@ common:
 	    ugolemeffects((int)mattk->adtyp, tmp);
 	}
     }
-    mondead(mtmp);
+    if (kill_agr) mondead(mtmp);
     wake_nearto(mtmp->mx, mtmp->my, 7*7);
-    if (mtmp->mhp > 0) return(0);
-    return(2);	/* it dies */
+    return (mtmp->mhp > 0) ? 0 : 2;
 }
 
 int
