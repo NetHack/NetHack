@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wintty.c	3.5	2002/09/27	*/
+/*	SCCS Id: @(#)wintty.c	3.5	2005/01/09	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -693,7 +693,6 @@ tty_askname()
 	menu_item *chosen_game = (menu_item *)0;
 
     	ch = -1;
-	saved = get_saved_games();
 	tty_clear_nhwindow(BASE_WINDOW);
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
