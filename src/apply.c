@@ -350,7 +350,7 @@ use_stethoscope(obj)
 		mstatusline(mtmp);
 		if (mtmp->mundetected) {
 			mtmp->mundetected = 0;
-			if (cansee(rx,ry)) newsym(mtmp->my,mtmp->my);
+			if (cansee(rx,ry)) newsym(mtmp->mx,mtmp->my);
 		}
 		if (!canspotmon(mtmp))
 			map_invisible(rx,ry);

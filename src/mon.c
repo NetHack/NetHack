@@ -871,7 +871,7 @@ mpickstuff(mtmp, str)
 #endif
 		if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
 			pline("%s picks up %s.", Monnam(mtmp),
-			      (distu(mtmp->my, mtmp->my) <= 5) ?
+			      (distu(mtmp->mx, mtmp->my) <= 5) ?
 				doname(otmp) : distant_name(otmp, doname));
 		obj_extract_self(otmp);
 		/* unblock point after extract, before pickup */
