@@ -575,9 +575,8 @@ int thrown;
 			  ((wtype = uwep_skill_type()) != P_NONE &&
 			    P_SKILL(wtype) >= P_SKILLED) &&
 			  ((monwep = MON_WEP(mon)) != 0 &&
-			    weapon_type(monwep) != P_WHIP &&
-			    monwep->otyp != SLING &&
-			    !obj_resists(monwep,
+			   objects[monwep->otyp].oc_material >= WOOD &&
+			   !obj_resists(monwep,
 				 50 + 15 * greatest_erosion(obj), 100))) {
 			/*
 			 * 2.5% chance of shattering defender's weapon when
