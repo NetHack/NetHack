@@ -186,7 +186,11 @@ static struct Bool_Opt
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&flags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &flags.travelcmd, TRUE, SET_IN_GAME},
+#ifdef WIN32CON
+	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
+#else
 	{"use_inverse",   &iflags.wc_inverse, FALSE, SET_IN_GAME},		/*WC*/
+#endif
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
 	{(char *)0, (boolean *)0, FALSE, 0}
 };
