@@ -59,7 +59,14 @@ LINK32=link.exe
 OutDir=.\Release
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
-PostBuild_Cmds=copy $(OutDir)\nethackw.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
+PostBuild_Cmds=copy $(OutDir)\nethackw.exe ..\binary	\
+copy ..\dat\nhdat ..\binary	\
+copy ..\dat\license ..\binary	\
+if exist tiles.bmp copy tiles.bmp ..\binary	\
+if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	\
+if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	\
+if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	\
+copy ..\sys\winnt\defaults.nh ..\binary\defaults.nh
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "nethackw - Win32 Debug"
@@ -92,7 +99,15 @@ LINK32=link.exe
 OutDir=.\Debug
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
-PostBuild_Cmds=if NOT exist ..\binary\*.* mkdir ..\binary	copy $(OutDir)\nethackw.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
+PostBuild_Cmds=if NOT exist ..\binary\*.* mkdir ..\binary	\
+copy $(OutDir)\nethackw.exe ..\binary	\
+copy ..\dat\nhdat ..\binary	\
+copy ..\dat\license ..\binary	\
+if exist tiles.bmp copy tiles.bmp ..\binary	\
+if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	\
+if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	\
+if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	\
+copy ..\sys\winnt\defaults.nh ..\binary\defaults.nh
 # End Special Build Tool
 
 !ENDIF 
