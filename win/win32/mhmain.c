@@ -496,8 +496,21 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			}
 			else
 			{
+				/* prompt user for action */
 			    switch (NHMessageBox(hWnd, TEXT("Save?"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
-			    case IDYES: NHEVENT_KBD('y'); dosave(); break;
+				case IDYES: 
+#ifdef SAFERHANGUP
+					/* destroy popup window - it has its own loop and we need to 
+					return control to NetHack core at this point */
+					if( IsWindow( GetNHApp()->hPopupWnd ) )
+						SendMessage( GetNHApp()->hPopupWnd, WM_COMMAND, IDCANCEL, 0);
+
+					/* tell NetHack core that "hangup" is requested */
+					hangup(1);
+#else
+					NHEVENT_KBD('y'); dosave(); 
+#endif
+					break;
 			    case IDNO: NHEVENT_KBD('q'); done(QUIT); break;
 			    case IDCANCEL: break;
 			    }
