@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2002/05/15	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2002/08/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1871,15 +1871,14 @@ register struct obj *obj;
 	}
 	/* simulated point of time */
 
-	if (is_pick(obj) && !obj->unpaid && *u.ushops && shop_keeper(*u.ushops))
-		verbalize("You sneaky cad! Get out of here with that pick!");
 	if(!obj->unpaid && !carried(current_container) &&
 	     costly_spot(current_container->ox, current_container->oy)) {
-
 		obj->ox = current_container->ox;
 		obj->oy = current_container->oy;
 		addtobill(obj, FALSE, FALSE, FALSE);
 	}
+	if (is_pick(obj) && !obj->unpaid && *u.ushops && shop_keeper(*u.ushops))
+		verbalize("You sneaky cad! Get out of here with that pick!");
 
 	otmp = addinv(obj);
 	loadlev = near_capacity();
