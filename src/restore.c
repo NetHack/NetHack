@@ -974,6 +974,7 @@ boolean ghostly;
 	    struct monst *mtmp = (struct monst *)otmp->oextra;
 
 	    mtmp->m_id = 0;
+	    mtmp->mpeaceful = mtmp->mtame = 0;	/* pet's owner died! */
 	}
 	if (ghostly && otmp->oattached == OATTACHED_M_ID) {
 	    (void) memcpy((genericptr_t)&oldid, (genericptr_t)otmp->oextra,
