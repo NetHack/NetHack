@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.4	2002/11/20	*/
+/*	SCCS Id: @(#)end.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,8 +37,7 @@ static void FDECL(done_hangup, (int));
 STATIC_DCL void FDECL(disclose,(int,BOOLEAN_P));
 STATIC_DCL void FDECL(get_valuables, (struct obj *));
 STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *,int));
-STATIC_DCL void FDECL(add_artifact_score, (struct obj *));
-STATIC_DCL void FDECL(display_artifact_score, (struct obj *,winid));
+STATIC_DCL void FDECL(artifact_score, (struct obj *,BOOLEAN_P,winid));
 STATIC_DCL void FDECL(savelife, (int));
 STATIC_DCL void FDECL(list_vanquished, (int, BOOLEAN_P));
 STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P));
@@ -490,52 +489,41 @@ int size;		/* max value is less than 20 */
     return;
 }
 
+/* called twice; first to calculate total, then to list relevant items */
 STATIC_OVL void
-add_artifact_score(list)
+artifact_score(list, counting, endwin)
 struct obj *list;
-{
-    struct obj *otmp;
-
-    for (otmp = list; otmp; otmp = otmp->nobj)
-	if (otmp->oartifact ||
-			otmp->otyp == BELL_OF_OPENING ||
-			otmp->otyp == SPE_BOOK_OF_THE_DEAD ||
-			otmp->otyp == CANDELABRUM_OF_INVOCATION) {
-	    u.urexp += (arti_cost(otmp) * 5 / 2);
-	if (Has_contents(otmp))
-	    add_artifact_score(otmp->cobj);
-    }
-}
-
-STATIC_OVL void
-display_artifact_score(list,endwin)
-struct obj *list;
+boolean counting;	/* true => add up points; false => display them */
 winid endwin;
 {
     char pbuf[BUFSZ];
     struct obj *otmp;
+    long value, points;
+    short dummy;	/* object type returned by artifact_name() */
 
     for (otmp = list; otmp; otmp = otmp->nobj) {
 	if (otmp->oartifact ||
 			otmp->otyp == BELL_OF_OPENING ||
 			otmp->otyp == SPE_BOOK_OF_THE_DEAD ||
 			otmp->otyp == CANDELABRUM_OF_INVOCATION) {
-	    short dummy;
-
-	    makeknown(otmp->otyp);
-	    otmp->known = otmp->bknown = otmp->dknown =
-		otmp->rknown = 1;
-	    /* assumes artifacts don't have quan>1 */
-	    Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
-		the_unique_obj(otmp) ? "The " : "",
-		otmp->oartifact ? artifact_name(xname(otmp), &dummy) :
-			OBJ_NAME(objects[otmp->otyp]),
-		arti_cost(otmp), currency(2L), 
-		arti_cost(otmp) * 5 / 2);
-	    putstr(endwin, 0, pbuf);
+	    value = arti_cost(otmp);	/* zorkmid value */
+	    points = value * 5 / 2;	/* score value */
+	    if (counting) {
+		u.rexp += points;
+	    } else {
+		makeknown(otmp->otyp);
+		otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
+		/* assumes artifacts don't have quan > 1 */
+		Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
+			the_unique_obj(otmp) ? "The " : "",
+			otmp->oartifact ? artifact_name(xname(otmp), &dummy) :
+				OBJ_NAME(objects[otmp->otyp]),
+			value, currency(value), points);
+		putstr(endwin, 0, pbuf);
+	    }
 	}
 	if (Has_contents(otmp))
-	    display_artifact_score(otmp->cobj,endwin);
+	    artifact_score(otmp->cobj, counting, endwin);
     }
 }
 
@@ -807,7 +795,8 @@ die:
 			u.urexp += val->list[i].count
 				  * (long)objects[val->list[i].typ].oc_cost;
 
-	    add_artifact_score(invent);
+	    /* count the points for artifacts */
+	    artifact_score(invent, TRUE, endwin);
 
 	    keepdogs(TRUE);
 	    viz_array[0][0] |= IN_SIGHT; /* need visibility for naming */
@@ -835,7 +824,7 @@ die:
 	    }
 
 	    if (!done_stopprint)
-		display_artifact_score(invent,endwin);
+		artifact_score(invent, FALSE, endwin);	/* list artifacts */
 
 	    /* list valuables here */
 	    for (val = valuables; val->list; val++) {
