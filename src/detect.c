@@ -208,7 +208,7 @@ register struct obj *sobj;
 	if (sobj) {
 		if (youmonst.data == &mons[PM_GOLD_GOLEM])
 			You_feel("like a million %s!", currency(2L));
-		else if (sobj && hidden_gold() ||
+		else if (hidden_gold() ||
 #ifndef GOLDOBJ
 				u.ugold)
 #else
