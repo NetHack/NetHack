@@ -292,7 +292,7 @@ d_level *lev;
 	if (!oneshot) {
 	    return FALSE;		/* caller should try again */
 	} else {
-	    /* Must make due with the only location possible;
+	    /* Must make do with the only location possible;
 	       avoid failure due to a misplaced trap.
 	       It might still fail if there's a dungeon feature here. */
 	    struct trap *t = t_at(x,y);
