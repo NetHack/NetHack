@@ -347,6 +347,10 @@ int expltype;
 			    killer_format = NO_KILLER_PREFIX;
 			    Sprintf(killer_buf, "caught %sself in %s own %s",
 				    uhim(), uhis(), str);
+			} else if (!strncmpi(str,"tower of flame", 8) ||
+				   !strncmpi(str,"fireball", 8)) {
+			    killer_format = KILLED_BY_AN;
+			    Strcpy(killer_buf, str);
 			} else {
 			    killer_format = KILLED_BY;
 			    Strcpy(killer_buf, str);
