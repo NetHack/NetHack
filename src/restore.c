@@ -355,6 +355,8 @@ restgamestate(fd, stuckid, steedid)
 register int fd;
 unsigned int *stuckid, *steedid;	/* STEED */
 {
+	/* discover is actually flags.explore */
+	boolean remember_discover = discover;
 	struct obj *otmp;
 	int uid;
 
@@ -371,6 +373,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 
 	mread(fd, (genericptr_t) &flags, sizeof(struct flag));
 	flags.bypasses = 0;	/* never use the saved value of bypasses */
+	if (remember_discover) discover = remember_discover;
 
 	role_init();	/* Reset the initial role, race, gender, and alignment */
 #ifdef AMII_GRAPHICS
