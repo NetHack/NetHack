@@ -19,6 +19,8 @@
 #include "mhaskyn.h"
 #include "mhdlg.h"
 #include "mhrip.h"
+#include "mhmain.h"
+#include "mhfont.h"
 
 #define LLEN 128
 
@@ -29,6 +31,7 @@ void logDebug(const char *fmt, ...) { }
 #endif
 
 static void mswin_main_loop(void);
+static BOOL initMapTiles(void);
 
 /* Interface definition, for windows.c */
 struct window_procs mswin_procs = {
@@ -86,7 +89,7 @@ struct window_procs mswin_procs = {
     mswin_start_screen,
     mswin_end_screen,
     mswin_outrip,
-    genl_preference_update,
+    mswin_preference_update,
 };
 
 
@@ -116,6 +119,58 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	}
 #endif
     mswin_nh_input_init();
+
+	/* check default values */
+	if( iflags.wc_fontsiz_status<NHFONT_SIZE_MIN || 
+		iflags.wc_fontsiz_status>NHFONT_SIZE_MAX )
+		iflags.wc_fontsiz_status = NHFONT_DEFAULT_SIZE;
+
+	if( iflags.wc_fontsiz_message<NHFONT_SIZE_MIN || 
+		iflags.wc_fontsiz_message>NHFONT_SIZE_MAX )
+		iflags.wc_fontsiz_message = NHFONT_DEFAULT_SIZE;
+
+	if( iflags.wc_fontsiz_text<NHFONT_SIZE_MIN || 
+		iflags.wc_fontsiz_text>NHFONT_SIZE_MAX )
+		iflags.wc_fontsiz_text = NHFONT_DEFAULT_SIZE;
+
+	if( iflags.wc_fontsiz_menu<NHFONT_SIZE_MIN || 
+		iflags.wc_fontsiz_menu>NHFONT_SIZE_MAX )
+		iflags.wc_fontsiz_menu = NHFONT_DEFAULT_SIZE;
+
+	if( iflags.wc_align_message==0 ) iflags.wc_align_message = ALIGN_TOP;
+	if( iflags.wc_align_status==0 ) iflags.wc_align_status = ALIGN_BOTTOM;
+	if( iflags.wc_scroll_margin==0 ) iflags.wc_scroll_margin = DEF_CLIPAROUND_MARGIN;
+	if( iflags.wc_tile_width==0 ) iflags.wc_tile_width = TILE_X;
+	if( iflags.wc_tile_height==0 ) iflags.wc_tile_height = TILE_Y;
+
+	/* force tabs in menus */
+	iflags.menu_tab_sep = 1;
+
+	/* initialize map tiles bitmap */
+	initMapTiles();
+
+	/* set tile-related options to readonly */
+	set_wc_option_mod_status(
+	   WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE,
+	   DISP_IN_GAME);
+
+	/* set font-related options to change in the game */
+	set_wc_option_mod_status(
+		WC_HILITE_PET |
+		WC_ALIGN_MESSAGE | 
+		WC_ALIGN_STATUS |
+		WC_SCROLL_MARGIN | 
+		WC_MAP_MODE |
+		WC_FONT_MESSAGE |
+		WC_FONT_STATUS |
+		WC_FONT_MENU |
+		WC_FONT_TEXT |
+		WC_FONTSIZ_MESSAGE | 
+		WC_FONTSIZ_STATUS | 
+		WC_FONTSIZ_MENU | 
+		WC_FONTSIZ_TEXT,
+		SET_IN_GAME 
+	);
 
 	iflags.window_inited = TRUE;
 }
@@ -1022,6 +1077,112 @@ void mswin_outrip(winid wid, int how)
 	genl_outrip(wid, how);
 }
 
+/* handle options updates here */
+void mswin_preference_update(const char *pref)
+{
+	HDC hdc;
+
+	if( stricmp( pref, "font_menu")==0 ||
+		stricmp( pref, "font_size_menu")==0 ) {
+		if( iflags.wc_fontsiz_menu<NHFONT_SIZE_MIN || 
+			iflags.wc_fontsiz_menu>NHFONT_SIZE_MAX )
+			iflags.wc_fontsiz_menu = NHFONT_DEFAULT_SIZE;
+
+		hdc = GetDC(GetNHApp()->hMainWnd);
+		mswin_get_font(NHW_MENU, ATR_NONE, hdc, TRUE);
+		mswin_get_font(NHW_MENU, ATR_BOLD, hdc, TRUE);
+		mswin_get_font(NHW_MENU, ATR_DIM, hdc, TRUE);
+		mswin_get_font(NHW_MENU, ATR_ULINE, hdc, TRUE);
+		mswin_get_font(NHW_MENU, ATR_BLINK, hdc, TRUE);
+		mswin_get_font(NHW_MENU, ATR_INVERSE, hdc, TRUE);
+		ReleaseDC(GetNHApp()->hMainWnd, hdc);
+
+		mswin_layout_main_window(NULL);
+		return;
+	}
+
+	if( stricmp( pref, "font_status")==0 ||
+		stricmp( pref, "font_size_status")==0 ) {
+
+		if( iflags.wc_fontsiz_status<NHFONT_SIZE_MIN || 
+			iflags.wc_fontsiz_status>NHFONT_SIZE_MAX )
+			iflags.wc_fontsiz_status = NHFONT_DEFAULT_SIZE;
+
+		hdc = GetDC(GetNHApp()->hMainWnd);
+		mswin_get_font(NHW_STATUS, ATR_NONE, hdc, TRUE);
+		mswin_get_font(NHW_STATUS, ATR_BOLD, hdc, TRUE);
+		mswin_get_font(NHW_STATUS, ATR_DIM, hdc, TRUE);
+		mswin_get_font(NHW_STATUS, ATR_ULINE, hdc, TRUE);
+		mswin_get_font(NHW_STATUS, ATR_BLINK, hdc, TRUE);
+		mswin_get_font(NHW_STATUS, ATR_INVERSE, hdc, TRUE);
+		ReleaseDC(GetNHApp()->hMainWnd, hdc);
+
+		mswin_layout_main_window(NULL);
+		return;
+	}
+
+	if( stricmp( pref, "font_message")==0 ||
+		stricmp( pref, "font_size_message")==0 ) {
+
+		if( iflags.wc_fontsiz_message<NHFONT_SIZE_MIN || 
+			iflags.wc_fontsiz_message>NHFONT_SIZE_MAX )
+			iflags.wc_fontsiz_message = NHFONT_DEFAULT_SIZE;
+
+		hdc = GetDC(GetNHApp()->hMainWnd);
+		mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, TRUE);
+		mswin_get_font(NHW_MESSAGE, ATR_BOLD, hdc, TRUE);
+		mswin_get_font(NHW_MESSAGE, ATR_DIM, hdc, TRUE);
+		mswin_get_font(NHW_MESSAGE, ATR_ULINE, hdc, TRUE);
+		mswin_get_font(NHW_MESSAGE, ATR_BLINK, hdc, TRUE);
+		mswin_get_font(NHW_MESSAGE, ATR_INVERSE, hdc, TRUE);
+		ReleaseDC(GetNHApp()->hMainWnd, hdc);
+
+		mswin_layout_main_window(NULL);
+		return;
+	}
+
+	if( stricmp( pref, "font_text")==0 ||
+		stricmp( pref, "font_size_text")==0 ) {
+
+		if( iflags.wc_fontsiz_text<NHFONT_SIZE_MIN || 
+			iflags.wc_fontsiz_text>NHFONT_SIZE_MAX )
+			iflags.wc_fontsiz_text = NHFONT_DEFAULT_SIZE;
+
+		hdc = GetDC(GetNHApp()->hMainWnd);
+		mswin_get_font(NHW_TEXT, ATR_NONE, hdc, TRUE);
+		mswin_get_font(NHW_TEXT, ATR_BOLD, hdc, TRUE);
+		mswin_get_font(NHW_TEXT, ATR_DIM, hdc, TRUE);
+		mswin_get_font(NHW_TEXT, ATR_ULINE, hdc, TRUE);
+		mswin_get_font(NHW_TEXT, ATR_BLINK, hdc, TRUE);
+		mswin_get_font(NHW_TEXT, ATR_INVERSE, hdc, TRUE);
+		ReleaseDC(GetNHApp()->hMainWnd, hdc);
+
+		mswin_layout_main_window(NULL);
+		return;
+	}
+
+	if( stricmp( pref, "scroll_margin")==0 ) {
+		mswin_cliparound(u.ux, u.uy);
+		return;
+	}
+
+	if( stricmp( pref, "map_mode")==0 ) {
+		mswin_select_map_mode( iflags.wc_map_mode );
+		return;
+	}
+
+	if( stricmp( pref, "hilite_pet")==0 ) {
+		InvalidateRect(mswin_hwnd_from_winid(WIN_MAP), NULL, TRUE);
+		return;
+	}
+
+	if( stricmp( pref, "align_message")==0 ||
+		stricmp( pref, "align_status")==0 ) {
+		mswin_layout_main_window(NULL);
+		return;
+	}
+}
+
 
 void mswin_main_loop()
 {
@@ -1043,6 +1204,70 @@ void bail(const char *mesg)
     mswin_exit_nhwindows(mesg);
     terminate(EXIT_SUCCESS);
     /*NOTREACHED*/
+}
+
+BOOL initMapTiles(void)
+{
+	HBITMAP hBmp;
+	BITMAP  bm;
+	TCHAR   wbuf[MAX_PATH];
+	int     tl_num;
+	SIZE    map_size;
+	extern int total_tiles_used;
+
+	/* no file - no tile */
+	if( !(iflags.wc_tile_file && *iflags.wc_tile_file) ) 
+		return TRUE;
+
+	/* load bitmap */
+	hBmp = LoadImage(
+				GetNHApp()->hApp, 
+				NH_A2W(iflags.wc_tile_file, wbuf, MAX_PATH),
+				IMAGE_BITMAP,
+				0,
+				0,
+				LR_LOADFROMFILE | LR_DEFAULTSIZE 
+			);
+	if( hBmp==NULL ) {
+		raw_print("Cannot load tiles from the file. Reverting back to default.");
+		return FALSE;
+	}
+
+	/* calculate tile dimensions */
+	GetObject(hBmp, sizeof(BITMAP), (LPVOID)&bm);
+	if( bm.bmWidth%iflags.wc_tile_width ||
+		bm.bmHeight%iflags.wc_tile_height ) {
+		DeleteObject(hBmp);
+		raw_print("Tiles bitmap does not match tile_width and tile_height options. Reverting back to default.");
+		return FALSE;
+	}
+
+	tl_num = (bm.bmWidth/iflags.wc_tile_width)*
+		     (bm.bmHeight/iflags.wc_tile_height);
+	if( tl_num<total_tiles_used ) {
+		DeleteObject(hBmp);
+		raw_print("Number of tiles in the bitmap is less than required by the game. Reverting back to default.");
+		return FALSE;
+	}
+
+	/* set the tile information */
+	if( GetNHApp()->bmpMapTiles!=GetNHApp()->bmpTiles ) {
+		DeleteObject(GetNHApp()->bmpMapTiles);
+	}
+
+	GetNHApp()->bmpMapTiles = hBmp;
+	GetNHApp()->mapTile_X = iflags.wc_tile_width;
+	GetNHApp()->mapTile_Y = iflags.wc_tile_height;
+	GetNHApp()->mapTilesPerLine = bm.bmWidth / iflags.wc_tile_width;
+
+	map_size.cx = GetNHApp()->mapTile_X * COLNO;
+	map_size.cy = GetNHApp()->mapTile_Y * ROWNO;
+	mswin_map_stretch(
+		mswin_hwnd_from_winid(WIN_MAP),
+		&map_size,
+		TRUE 
+	);
+	return TRUE;
 }
 
 #ifdef _DEBUG

@@ -2362,7 +2362,7 @@ doset()
 			parseoptions(buf, setinitial, fromfile);
 		    }
 		    if (wc_supported(compopt[opt_indx].name))
-			preference_update(boolopt[opt_indx].name);
+			preference_update(compopt[opt_indx].name);
 		}
 	    }
 	    free((genericptr_t)pick_list);

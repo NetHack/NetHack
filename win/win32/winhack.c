@@ -31,7 +31,6 @@ BOOL				InitInstance(HINSTANCE, int);
 
 extern void FDECL(pcmain, (int,char **));
 static void __cdecl mswin_moveloop(void *);
-static BOOL initMapTiles(void);
 
 #define MAX_CMDLINE_PARAM 255
 
@@ -101,9 +100,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
 	pcmain(argc,argv);
 
-	/* initialize map tiles bitmap */
-	initMapTiles();
-
 	moveloop();
 
 	return 0;
@@ -143,66 +139,3 @@ PNHWinApp GetNHApp()
 	return &_nethack_app;
 }
 
-BOOL initMapTiles(void)
-{
-	HBITMAP hBmp;
-	BITMAP  bm;
-	TCHAR   wbuf[MAX_PATH];
-	int     tl_num;
-	SIZE    map_size;
-	extern int total_tiles_used;
-
-	/* no file - no tile */
-	if( !(iflags.wc_tile_file && *iflags.wc_tile_file) ) 
-		return TRUE;
-
-	/* load bitmap */
-	hBmp = LoadImage(
-				GetNHApp()->hApp, 
-				NH_A2W(iflags.wc_tile_file, wbuf, MAX_PATH),
-				IMAGE_BITMAP,
-				0,
-				0,
-				LR_LOADFROMFILE | LR_DEFAULTSIZE 
-			);
-	if( hBmp==NULL ) {
-		raw_print("Cannot load tiles from the file. Reverting back to default.");
-		return FALSE;
-	}
-
-	/* calculate tile dimensions */
-	GetObject(hBmp, sizeof(BITMAP), (LPVOID)&bm);
-	if( bm.bmWidth%iflags.wc_tile_width ||
-		bm.bmHeight%iflags.wc_tile_height ) {
-		DeleteObject(hBmp);
-		raw_print("Tiles bitmap does not match tile_width and tile_height options. Reverting back to default.");
-		return FALSE;
-	}
-
-	tl_num = (bm.bmWidth/iflags.wc_tile_width)*
-		     (bm.bmHeight/iflags.wc_tile_height);
-	if( tl_num<total_tiles_used ) {
-		DeleteObject(hBmp);
-		raw_print("Number of tiles in the bitmap is less than required by the game. Reverting back to default.");
-		return FALSE;
-	}
-
-	/* set the tile information */
-	if( GetNHApp()->bmpMapTiles!=GetNHApp()->bmpTiles ) {
-		DeleteObject(GetNHApp()->bmpMapTiles);
-	}
-
-	GetNHApp()->bmpMapTiles = hBmp;
-	GetNHApp()->mapTile_X = iflags.wc_tile_width;
-	GetNHApp()->mapTile_Y = iflags.wc_tile_height;
-	GetNHApp()->mapTilesPerLine = bm.bmWidth / iflags.wc_tile_width;
-
-	map_size.cx = GetNHApp()->mapTile_X * COLNO;
-	map_size.cy = GetNHApp()->mapTile_Y * ROWNO;
-	mswin_map_stretch(
-		mswin_hwnd_from_winid(WIN_MAP),
-		&map_size,
-		TRUE 
-	);
-	return TRUE;
-}

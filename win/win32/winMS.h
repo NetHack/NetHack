@@ -112,6 +112,7 @@ char *mswin_get_color_string(void);
 void mswin_start_screen(void);
 void mswin_end_screen(void);
 void mswin_outrip(winid wid, int how);
+void mswin_preference_update(const char *pref);
 
 /* helper function */
 HWND mswin_hwnd_from_winid(winid wid);

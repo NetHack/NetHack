@@ -26,7 +26,6 @@ LRESULT CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 static LRESULT  onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void		onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void		register_main_window_class(void);
-static void		select_map_mode(int map_mode);
 static int		menuid2mapmode(int menuid);
 static int		mapmode2menuid(int map_mode);
 
@@ -290,7 +289,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		HWND child;
 
 		if( GetNHApp()->windowlist[msg_param->wid].type == NHW_MAP )
-			select_map_mode(iflags.wc_map_mode);
+			mswin_select_map_mode(iflags.wc_map_mode);
 		
 		child = GetNHApp()->windowlist[msg_param->wid].win;
 		if( child ) mswin_layout_main_window(child);
@@ -502,7 +501,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case IDM_MAP_ASCII16X12:
 		case IDM_MAP_ASCII10X18:
 		case IDM_MAP_FIT_TO_SCREEN:
-			select_map_mode(menuid2mapmode(wmId));
+			mswin_select_map_mode(menuid2mapmode(wmId));
 			break;
 
 		case IDM_HELP_LONG:	
@@ -601,7 +600,7 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return FALSE;
 }
 
-void select_map_mode(int mode)
+void mswin_select_map_mode(int mode)
 {
 	CheckMenuRadioItem(
 		GetMenu(GetNHApp()->hMainWnd), 
