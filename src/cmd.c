@@ -1048,6 +1048,7 @@ minimal_enlightenment()
 	anything any;
 	char buf[BUFSZ], buf2[BUFSZ];
 	static char fmtstr[] = "%-15s: %-12s";
+	char deity_fmtstr[] = "%-17s%s";
 
 	any.a_void = 0;
 	buf[0] = buf2[0] = '\0';
@@ -1099,7 +1100,7 @@ minimal_enlightenment()
 	/* Deity list */
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_BOLD, "Deities", FALSE);
-	Sprintf(buf2, "%-17s%s", align_gname(A_CHAOTIC),
+	Sprintf(buf2, deity_fmtstr, align_gname(A_CHAOTIC),
 	    (u.ualignbase[A_ORIGINAL] == u.ualign.type
 		&& u.ualign.type == A_CHAOTIC) ? " (s,c)" :
 	    (u.ualignbase[A_ORIGINAL] == A_CHAOTIC)       ? " (s)" :
@@ -1107,7 +1108,7 @@ minimal_enlightenment()
     	Sprintf(buf, fmtstr, "chaotic deity", buf2);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-	Sprintf(buf2, "%-17s%s", align_gname(A_NEUTRAL),
+	Sprintf(buf2, deity_fmtstr, align_gname(A_NEUTRAL),
 	    (u.ualignbase[A_ORIGINAL] == u.ualign.type
 		&& u.ualign.type == A_NEUTRAL) ? " (s,c)" :
 	    (u.ualignbase[A_ORIGINAL] == A_NEUTRAL)       ? " (s)" :
@@ -1115,7 +1116,7 @@ minimal_enlightenment()
     	Sprintf(buf, fmtstr, "neutral deity", buf2);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-	Sprintf(buf2, "%-17s%s", align_gname(A_LAWFUL),
+	Sprintf(buf2, deity_fmtstr, align_gname(A_LAWFUL),
 	    (u.ualignbase[A_ORIGINAL] == u.ualign.type && u.ualign.type == A_LAWFUL)  ? " (s,c)" :
 	    (u.ualignbase[A_ORIGINAL] == A_LAWFUL)        ? " (s)" :
 	    (u.ualign.type   == A_LAWFUL)        ? " (c)" : "");

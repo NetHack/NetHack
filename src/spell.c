@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.4	2002/01/19	*/
+/*	SCCS Id: @(#)spell.c	3.4	2002/02/12	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -998,10 +998,14 @@ int *spell_no;
 	 * To do it right would require that we implement columns
 	 * in the window-ports (say via a tab character).
 	 */
-	Sprintf(buf, "%-20s     Level  %-12s Fail", "    Name", "Category");
+	if (!iflags.menu_tab_sep)
+		Sprintf(buf, "%-20s     Level  %-12s Fail", "    Name", "Category");
+	else
+		Sprintf(buf, "%-20s\tLevel\tCategory\tFail", "Name");
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 	for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
-	        Sprintf(buf, "%-20s  %2d%s   %-12s %3d%%",
+		Sprintf(buf, iflags.menu_tab_sep ?
+			"%s\t%2d%s\t%s\t%3d%%" : "%-20s  %2d%s   %-12s %3d%%",
 			spellname(i), spellev(i),
 			spellknow(i) ? " " : "*",
 			spelltypemnemonic(spell_skilltype(spellid(i))),

@@ -2196,7 +2196,7 @@ map_menu_cmd(ch)
 #endif
 
 static char fmtstr_doset_add_menu[] = "%s%-15s [%s]   "; 
-static char fmtstr_doset_add_menu_tab[] = "%s\t%s\t[%s]   "; 
+static char fmtstr_doset_add_menu_tab[] = "%s\t[%s]";
 
 STATIC_OVL void
 doset_add_menu(win, option, indexoffset)
@@ -2229,8 +2229,10 @@ doset_add_menu(win, option, indexoffset)
 	}
     }
     /* "    " replaces "a - " -- assumes menus follow that style */
-    Sprintf(buf, iflags.menu_tab_sep ? fmtstr_doset_add_menu_tab : fmtstr_doset_add_menu,
-		any.a_int ? "" : iflags.menu_tab_sep ? "" : "    ", option, value);
+    if (!iflags.menu_tab_sep)
+	Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ", option, value);
+    else
+	Sprintf(buf, fmtstr_doset_add_menu_tab, option, value);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 }
 
@@ -2274,8 +2276,7 @@ doset()
 			    pass == 0 ? "    " : "",
 			    boolopt[i].name, *bool_p ? "true" : "false");
  		    else
-			Sprintf(buf, "%s\t%s\t[%s]",
-			    pass == 0 ? "    " : "",
+			Sprintf(buf, "%s\t[%s]",
 			    boolopt[i].name, *bool_p ? "true" : "false");
 		    add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
 			     ATR_NONE, buf, MENU_UNSELECTED);
