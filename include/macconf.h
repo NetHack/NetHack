@@ -79,10 +79,12 @@ extern void error(const char *,...);
 # define read macread
 # define write macwrite
 # define lseek macseek
+#ifdef __MWERKS__
 # define unlink _unlink
 #endif
+#endif
 
-#define YY_NEVER_INTERACTIVE
+#define YY_NEVER_INTERACTIVE 1
 
 # define TEXT_TYPE 'TEXT'
 # define LEVL_TYPE 'LEVL'
