@@ -106,9 +106,10 @@ void gnome_init_nhwindows(int* argc, char** argv)
 #   error HACKDIR is not defined!
 #endif
   
-    /* Force wizard mode on for debugging */
-    //wizard = TRUE;
-    
+    // gnome/gtk is not reentrant
+    set_option_mod_status("ignintr", DISP_IN_GAME);
+    flags.ignintr = TRUE;
+
     iflags.window_inited = TRUE;
 
     /* gnome-specific window creation */
