@@ -3500,6 +3500,7 @@ boolean *shopdamage;
 		/* a burning web is too flimsy to notice if you can't see it */
 		if (cansee(x,y)) Norep("A web bursts into flames!");
 		(void) delfloortrap(t);
+		if (cansee(x,y)) newsym(x,y);
 	    }
 	    if(is_ice(x, y)) {
 		melt_ice(x, y);
