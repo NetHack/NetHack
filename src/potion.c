@@ -1428,6 +1428,7 @@ register struct obj *obj;
 		/* KMH -- Water into acid causes an explosion */
 		if (obj->otyp == POT_ACID) {
 			pline("It boils vigorously!");
+			You("are caught in the explosion!");
 			losehp(rnd(10), "elementary chemistry", KILLED_BY);
 			makeknown(obj->otyp);
 			update_inventory();
