@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)attrib.c	3.4	2000/05/17	*/
+/*	SCCS Id: @(#)attrib.c	3.4	2002/07/17	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -318,9 +318,15 @@ exerper()
 		pline("exerper: Hunger checks");
 #endif
 		switch (hs) {
-		    case SATIATED:	exercise(A_DEX, FALSE); break;
+		    case SATIATED:	exercise(A_DEX, FALSE);
+					if (Role_if(PM_MONK))
+					    exercise(A_WIS, FALSE);
+					break;
 		    case NOT_HUNGRY:	exercise(A_CON, TRUE); break;
-		    case WEAK:		exercise(A_STR, FALSE); break;
+		    case WEAK:		exercise(A_STR, FALSE);
+					if (Role_if(PM_MONK))	/* fasting */
+					    exercise(A_WIS, TRUE);
+					break;
 		    case FAINTING:
 		    case FAINTED:	exercise(A_CON, FALSE); break;
 		}
