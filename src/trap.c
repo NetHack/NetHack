@@ -404,6 +404,7 @@ int *fail_reason;
 	struct monst *mon = 0;
 	struct obj *item;
 	coord cc;
+	boolean historic = (Role_if(PM_ARCHEOLOGIST) && !flags.mon_moving && statue->spe);
 
 	if (statue->oxlth && statue->oattached == OATTACHED_MONST) {
 	    cc.x = x,  cc.y = y;
@@ -443,10 +444,14 @@ int *fail_reason;
 	/* mimic statue becomes seen mimic; other hiders won't be hidden */
 	if (mon->m_ap_type) seemimic(mon);
 	else mon->mundetected = FALSE;
-	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL)
+	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
 	    pline_The("statue %s!",
 		canspotmon(mon) ? "comes to life" : "disappears");
-	else if (cause == ANIMATE_SHATTER)
+		if (historic) {
+		    You_feel("guilty that the historic statue is now gone.");
+		    adjalign(-1);
+		}
+	} else if (cause == ANIMATE_SHATTER)
 	    pline("Instead of shattering, the statue suddenly %s!",
 		canspotmon(mon) ? "comes to life" : "disappears");
 	else /* cause == ANIMATE_NORMAL */
