@@ -1119,7 +1119,6 @@ boolean uncomp;
 # endif
 	args[++i] = (char *)0;
 
-	f = fork();
 # ifdef TTY_GRAPHICS
 	/* If we don't do this and we are right after a y/n question *and*
 	 * there is an error message from the compression, the 'y' or 'n' can
@@ -1128,6 +1127,7 @@ boolean uncomp;
 	if (istty)
 	    mark_synch();
 # endif
+	f = fork();
 	if (f == 0) {	/* child */
 # ifdef TTY_GRAPHICS
 		/* any error messages from the compression must come out after

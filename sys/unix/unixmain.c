@@ -262,7 +262,7 @@ char *argv[];
 		 */
 		boolean remember_wiz_mode = wizard;
 #endif
-		const char *fq_save = fqname(SAVEF, SAVEPREFIX, 0);
+		const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
 
 		(void) chmod(fq_save,0);	/* disallow parallel restores */
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
