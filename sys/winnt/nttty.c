@@ -656,7 +656,7 @@ term_start_color(int color)
 {
 #ifdef TEXTCOLOR
         if (color >= 0 && color < CLR_MAX) {
-	    foreground = (background != 0 && (color == CLR_GRAY | color == CLR_WHITE)) ?
+	    foreground = (background != 0 && (color == CLR_GRAY || color == CLR_WHITE)) ?
 			ttycolors[0] : ttycolors[color];
 	}
 #else
