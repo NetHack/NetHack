@@ -77,7 +77,7 @@ DESCRIPTION
        left out.
 
        -p profession can be used to determine the character  profession,
-       also know as the role.  You can specify either the male or female
+       also known as the role. You can specify either the male or female
        name for the character role, or the first three characters of the
        role  as  an  abbreviation.  -p @ has been retained to explicitly
        request that a random role be chosen.  It may need to  be  quoted
