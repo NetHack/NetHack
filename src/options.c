@@ -476,7 +476,9 @@ initoptions()
 	flags.end_top = 3;
 	flags.end_around = 2;
 	iflags.msg_history = 20;
+#ifdef TTY_GRAPHICS
 	iflags.prevmsg_window = 's';
+#endif
 
 	/* Use negative indices to indicate not yet selected */
 	flags.initrole = -1;
@@ -2474,7 +2476,9 @@ boolean setinitial,setfromfile;
 	    }
 	}
 	retval = TRUE;
-    } else if (!strcmp("msg_window", optname)) {
+    } 
+#ifdef TTY_GRAPHICS
+	else if (!strcmp("msg_window", optname)) {
 	/* by Christian W. Cooper */
 	menu_item *window_pick = (menu_item *)0;
 	tmpwin = create_nhwindow(NHW_MENU);
@@ -2499,6 +2503,7 @@ boolean setinitial,setfromfile;
 	destroy_nhwindow(tmpwin);
         retval = TRUE;
     }
+#endif
     return retval;
 }
 
@@ -2635,10 +2640,12 @@ char *buf;
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "msghistory"))
 		Sprintf(buf, "%u", iflags.msg_history);
+#ifdef TTY_GRAPHICS
 	else if (!strcmp(optname, "msg_window"))
 		Sprintf(buf, "%s", (iflags.prevmsg_window=='s') ? "single" :
 					(iflags.prevmsg_window=='c') ? "combination" :
 					(iflags.prevmsg_window=='f') ? "full" : "reversed");
+#endif
 	else if (!strcmp(optname, "name"))
 		Sprintf(buf, "%s", plname);
 	else if (!strcmp(optname, "objects"))
