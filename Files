@@ -85,7 +85,7 @@ zap.c
 
 sys/amiga:
 (files for Amiga versions)
-Build.ami       Install.ami     Makefile.ami    Makefile.agc    NetHack.cnf
+Build.ami       Install.ami     Makefile.agc    Makefile.ami    NetHack.cnf
 amidos.c        amidos.p        amifont.uu      amifont8.uu     amigst.c
 amii.hlp        amimenu.c       amirip.c        amisnd.c        amistack.c
 amitty.c        amiwind.c       amiwind.p       clipwin.c       colorwin.c
@@ -113,11 +113,11 @@ mgetline.c      mmodal.c        mrecover.c      mrecover.hqx    mttymain.c
 
 sys/msdos:
 (files for MSDOS version)
-Install.dos     Makefile.BC     Makefile.GCC    Makefile.MSC    Makefile.SC
-NHAccess.nh     moveinit.pat    msdos.c         msdoshlp.txt    ovlinit.c
-pckeys.c        pctiles.c       pctiles.h       pcvideo.h       portio.h
-schema1.BC      schema2.BC      schema3.MSC     setup.bat       sound.c
-tile2bin.c      video.c         vidtxt.c        vidvga.c
+Install.dos     Makefile.BC     Makefile.GCC    Makefile.MSC    NHAccess.nh
+moveinit.pat    msdos.c         msdoshlp.txt    ovlinit.c       pckeys.c
+pctiles.c       pctiles.h       pcvideo.h       portio.h        schema1.BC
+schema2.BC      schema3.MSC     setup.bat       sound.c         tile2bin.c
+video.c         vidtxt.c        vidvga.c
 (files for running MSDOS binary under Windows)
 nhico.uu        nhpif.uu
 
@@ -160,7 +160,7 @@ sys/unix:
 (files for UNIX versions)
 Install.unx     Makefile.dat    Makefile.doc    Makefile.src    Makefile.top
 Makefile.utl    README.linux    depend.awk      nethack.sh      setup.sh
-unixmain.c      unixunix.c      unixres.c
+unixmain.c      unixres.c       unixunix.c
 (files for replacement cpp, apparently only needed by some UNIX systems)
 cpp1.shr        cpp2.shr        cpp3.shr
 (file for sound driver for 386 UNIX)
@@ -175,8 +175,8 @@ vmsmisc.c       vmstty.c        vmsunix.c
 
 sys/wince:
 (files for Windows CE and PocketPC)
-assert.h        bootstrp.mak    celib.c         cesetup.bat     cesound.c
-defaults.nh     errno.h         fcntl.h         hpc.vcp         Install.ce
+Install.ce      assert.h        bootstrp.mak    celib.c         cesetup.bat
+cesound.c       defaults.nh     errno.h         fcntl.h         hpc.vcp
 keypad.uu       mhaskyn.c       mhaskyn.h       mhcmd.c         mhcmd.h
 mhcolor.c       mhcolor.h       mhdlg.c         mhdlg.h         mhfont.c
 mhfont.h        mhinput.c       mhinput.h       mhmain.c        mhmain.h
@@ -189,8 +189,8 @@ winmain.c
 
 sys/winnt:
 (files for Windows 9x, NT and Windows2000 version)
-console.rc      defaults.nh     Install.nt      Makefile.bcc    Makefile.gcc
-Makefile.msc    mapimail.c      nethack.def     nhico.uu        nhsetup.bat
+Install.nt      Makefile.bcc    Makefile.gcc    Makefile.msc    console.rc
+defaults.nh     mapimail.c      nethack.def     nhico.uu        nhsetup.bat
 ntsound.c       nttty.c         porthelp        win32api.h      winnt.c
 
 util:
@@ -202,10 +202,9 @@ dgn_comp.l      dgn_comp.y      lev_comp.l      lev_comp.y
 
 win/Qt:
 (files for the Qt widget library - X11, Windows, Mac OS X, or Qtopia)
-Install.Qt      knethack.lnk    knh-mini.xpm     knh.xpm        nhsplash.xpm   
-qt_clust.cpp    qt_win.cpp      qttableview.cpp  tileedit.cpp   tileedit.h       
-qpe-nethack.control             Info.pli    nhicns.uu
-
+Info.pli        Install.Qt      knethack.lnk    knh-mini.xpm    knh.xpm
+nhicns.uu       nhsplash.xpm    qt_clust.cpp    qt_win.cpp      qttableview.cpp
+tileedit.cpp    tileedit.h      qpe-nethack.control
 
 win/X11:
 (files for X versions)
@@ -223,12 +222,13 @@ wingem1.c       xpm2img.c
 
 win/gnome:
 (files for GNOME versions)
-README          gnaskstr.c      gnaskstr.h      gnbind.c        gnbind.h
-gnglyph.c       gnglyph.h       gnmain.c        gnmain.h        gnmap.c
-gnmap.h         gnmenu.c        gnmenu.h        gnmesg.c        gnmesg.h
-gnomeprv.h      gnopts.c        gnopts.h        gnplayer.c      gnplayer.h
-gnsignal.c      gnsignal.h      gnstatus.c      gnstatus.h      gntext.c
-gntext.h        gnyesno.c       gnyesno.h       gn_xpms.h       mapbg.xpm
+README          gn_xpms.h       gnaskstr.c      gnaskstr.h      gnbind.c
+gnbind.h        gnglyph.c       gnglyph.h       gnmain.c        gnmain.h
+gnmap.c         gnmap.h         gnmenu.c        gnmenu.h        gnmesg.c
+gnmesg.h        gnomeprv.h      gnopts.c        gnopts.h        gnplayer.c
+gnplayer.h      gnsignal.c      gnsignal.h      gnstatus.c      gnstatus.h
+gntext.c        gntext.h        gnworn.c        gnworn.h        gnyesno.c
+gnyesno.h       mapbg.xpm
 
 win/share:
 (files for versions using optional tiles)
@@ -251,8 +251,8 @@ mhrip.c         mhrip.h         mhsplash.h      mhsplash.c      mhstatus.c
 mhstatus.h      mhtext.c        mhtext.h        mnsel.uu        mnselcnt.uu
 mnunsel.uu      mswproc.c       nethack.dsw     nethackw.dsp    petmark.uu
 recover.dsp     resource.h      rip.uu          splash.uu       tile2bmp.dsp
-tilemap.dsp     tiles.dsp       tiles.mak       uudecode.dsp    winhack.c
-winhack.rc      winMS.h
+tilemap.dsp     tiles.dsp       tiles.mak       uudecode.dsp    winMS.h
+winhack.c       winhack.rc
 
 
 
