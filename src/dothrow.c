@@ -471,6 +471,17 @@ hurtle_step(arg, x, y)
 	    losehp(rnd(2+*range), "touching the edge of the universe", KILLED_BY);
 	    return FALSE;
 	}
+	if ((u.ux - x) && (u.uy - y) &&
+		bad_rock(youmonst.data,u.ux,y) && bad_rock(youmonst.data,x,u.uy)) {
+	    boolean too_much = (invent && (inv_weight() + weight_cap() > 600));
+	    /* Move at a diagonal. */
+	    if (bigmonst(youmonst.data) || too_much) {
+		You("%sget forcefully wedged into a crevice.",
+			too_much ? "and all your belongings " : "");
+		losehp(rnd(2+*range), "wedging into a narrow crevice", KILLED_BY);
+		return FALSE;
+	    }
+	}
     }
 
     if ((mon = m_at(x, y)) != 0) {
