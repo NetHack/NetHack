@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)Valkyrie.des	3.4	1997/01/31
+#	SCCS Id: @(#)Valkyrie.des	3.4	2002/05/02
 #	Copyright (c) 1989 by Jean-Christophe Collet
 #	Copyright (c) 1991-2 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
@@ -40,6 +40,7 @@ REGION:(27,08,42,12),lit,"ordinary"
 BRANCH:(66,17,66,17),(0,0,0,0)
 # Stairs
 STAIR:(18,01),down
+FOUNTAIN:(53,02)
 # Doors
 DOOR:locked,(26,10)
 DOOR:locked,(43,10)

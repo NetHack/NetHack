@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)mines.des	3.4	2002/01/01
+#	SCCS Id: @(#)mines.des	3.4	2002/05/02
 #	Copyright (c) 1989-95 by Jean-Christophe Collet
 #	Copyright (c) 1991-95 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
@@ -423,8 +423,12 @@ MAP
 |...|  ----       ------|....|     -----       -----.....----........|..|.|
 -----                   ------                     -------  ---------------
 ENDMAP
+
 STAIR:(01,01),up
 STAIR:(46,03),down
+FOUNTAIN:(50,09)
+FOUNTAIN:(10,15)
+FOUNTAIN:(66,18)
 
 REGION:(00,00,74,20),unlit,"ordinary"
 REGION:(09,13,11,17),lit,"ordinary"
@@ -519,9 +523,11 @@ MAP
 ...--..-....T.....--------....|......|-.
 .......--.....................----------
 ENDMAP
+
 REGION:(00,00,38,15),lit,"ordinary"
 STAIR:levregion(01,03,20,19),(0,0,39,15),up
 STAIR:levregion(21,03,75,19),(0,0,39,15),down
+FOUNTAIN:(22,07)
 REGION:(13,5,14,6),unlit,"ordinary"
 REGION:(9,7,11,9),lit,"candle shop"
 REGION:(16,4,18,6),lit,"tool shop"
@@ -704,6 +710,7 @@ MAP
 | |....S..          |...............-..|         ..S...........|          |
 --------            --------------------           ------------------------
 ENDMAP
+
 # Dungeon Description
 RANDOM_PLACES:(08,16),(13,07),(21,08),(41,14),(50,04),(50,16),(66,01)
 REGION:(26,01,32,01),unlit,"ordinary",filled,true
@@ -814,7 +821,9 @@ MAP
 |.................|                    |.....................|........    |
 ---------------------------------------------------------------------------
 ENDMAP
+
 # Dungeon Description
+FOUNTAIN:(14,13)
 REGION:(23,03,48,06),lit,"ordinary"
 REGION:(21,06,22,06),lit,"ordinary"
 REGION:(14,04,14,04),unlit,"ordinary"
@@ -933,9 +942,11 @@ MAP
 -.S..|--------.---.---       -...---------------...{.---------   ---------  
 --|. - - - - - - - -- - - - -- . - - - --- - - - . . - - - - -- - - - - - - 
 ENDMAP
+
 RANDOM_PLACES:(1,15),(68,6),(1,13)
 NON_DIGGABLE:(67,3,73,7)
 NON_DIGGABLE:(0,12,2,16)
+FOUNTAIN:(12,08)
 REGION:(0,0,75,16),unlit,"ordinary"
 REGION:(38,6,46,10),lit,"ordinary"
 DOOR:closed,(37,8)
