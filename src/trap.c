@@ -772,17 +772,17 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		    break;
 		}
 		if (!In_sokoban(&u.uz)) {
-		   char verbbuf[BUFSZ];
+		    char verbbuf[BUFSZ];
 #ifdef STEED
-		   if (u.usteed)
+		    if (u.usteed)
 		   	Sprintf(verbbuf,"lead %s",
 				x_monnam(u.usteed,
 					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
 				 	 "poor", SUPPRESS_SADDLE, FALSE));
-		   else
+		    else
 #endif
 		    Strcpy(verbbuf,"fall");
-		   You("%s into %s pit!", verbbuf, a_your[trap->madeby_u]);
+		    You("%s into %s pit!", verbbuf, a_your[trap->madeby_u]);
 		}
 		/* wumpus reference */
 		if (Role_if(PM_RANGER) && !trap->madeby_u && !trap->once &&
@@ -875,27 +875,54 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		    break;
 		}
 		if (webmsgok) {
-		   char verbbuf[BUFSZ];
-		   verbbuf[0] = '\0';
+		    char verbbuf[BUFSZ];
+		    verbbuf[0] = '\0';
 #ifdef STEED
-		   if (u.usteed)
+		    if (u.usteed)
 		   	Sprintf(verbbuf,"lead %s",
 				x_monnam(u.usteed,
 					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
 				 	 "poor", SUPPRESS_SADDLE, FALSE));
-		   else
+		    else
 #endif
 			
 		    Sprintf(verbbuf, "%s", Levitation ? (const char *)"float" :
 		      		locomotion(youmonst.data, "stumble"));
-		   You("%s into %s spider web!", verbbuf, a_your[trap->madeby_u]);
+		    You("%s into %s spider web!",
+			verbbuf, a_your[trap->madeby_u]);
 		}
 		u.utraptype = TT_WEB;
 
-		/* Time stuck in the web depends on your strength. */
+		/* Time stuck in the web depends on your/steed strength. */
 		{
 		    register int str = ACURR(A_STR);
 
+#ifdef STEED
+		    /* If mounted, the steed gets trapped.  Use mintrap
+		     * to do all the work.  If mtrapped is set as a result,
+		     * unset it and set utrap instead.  In the case of a
+		     * strongmonst and mintrap said it's trapped, use a
+		     * short but non-zero trap time.  Otherwise, monsters
+		     * have no specific strength, so use player strength.
+		     * This gets skipped for webmsgok, which implies that
+		     * the steed isn't a factor.
+		     */
+		    if (u.usteed && webmsgok) {
+			/* mtmp location might not be up to date */
+			u.usteed->mx = u.ux;
+			u.usteed->my = u.uy;
+
+			/* mintrap currently does not return 2(died) for webs */
+			if (mintrap(u.usteed)) {
+			    u.usteed->mtrapped = 0;
+			    if (strongmonst(u.usteed->data)) str = 17;
+			} else {
+			    break;
+			}
+
+			webmsgok = FALSE; /* mintrap printed the messages */
+		    }
+#endif
 		    if (str <= 3) u.utrap = rn1(6,6);
 		    else if (str < 6) u.utrap = rn1(6,4);
 		    else if (str < 9) u.utrap = rn1(4,4);
@@ -906,7 +933,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		    else {
 			u.utrap = 0;
 			if (webmsgok)
-				You("tear through %s web!", a_your[trap->madeby_u]);
+			    You("tear through %s web!", a_your[trap->madeby_u]);
 			deltrap(trap);
 			newsym(u.ux,u.uy);	/* get rid of trap symbol */
 		    }
@@ -1537,6 +1564,10 @@ register struct monst *mtmp;
 				   In_sokoban(&u.uz) && !trap->madeby_u);
 	    const char *fallverb;
 
+#ifdef STEED
+	    /* true when called from dotrap, inescapable is not an option */
+	    if (mtmp == u.usteed) inescapable = TRUE;
+#endif
 	    if (!inescapable &&
 		    ((mtmp->mtrapseen & (1 << (tt-1))) != 0 ||
 			(tt == HOLE && !mindless(mtmp->data)))) {
@@ -1553,6 +1584,10 @@ register struct monst *mtmp;
 	    /* bug?  `in_sight' ought to be split to distinguish between
 	       trap_in_sight and can_see_victim to handle invisible monsters */
 	    in_sight = canseemon(mtmp);
+#ifdef STEED
+	    /* assume hero can tell what's going on for the steed */
+	    if (mtmp == u.usteed) in_sight = TRUE;
+#endif
 	    switch (tt) {
 		case ARROW_TRAP:
 			otmp = mksobj(ARROW, TRUE, FALSE);
@@ -2915,6 +2950,12 @@ boolean force_failure;
 				if (ttmp2) {
 				    pline_The("webbing sticks to you. You're caught too!");
 				    dotrap(ttmp2, NOWEBMSG);
+#ifdef STEED
+				    if (u.usteed && u.utrap) {
+					/* you, not steed, are trapped */
+					dismount_steed(DISMOUNT_FELL);
+				    }
+#endif
 				}
 			    } else
 				pline("%s remains entangled.", Monnam(mtmp));
