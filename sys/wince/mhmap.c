@@ -901,3 +901,4 @@ void nhapply_image_transparent(
 		cTransparent 
 	);
 }
+

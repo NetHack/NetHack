@@ -270,3 +270,4 @@ void FormatStatusString(char* text, int format)
 	if(cap > UNENCUMBERED)
 		Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
 }
+
