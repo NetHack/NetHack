@@ -1478,9 +1478,27 @@ do_class_genocide()
 		    }
 		}
 		/*
-		 * TODO[?]: If user's input doesn't match any class
-		 *	    description, check individual species names.
+		 * If user's input doesn't match any class
+		 * description, check individual species names.
 		 */
+		if (class == 0) {
+		    for (i = LOW_PM; i < NUMMONS; i++) {
+			if (strstri(mons[i].mname, buf) != 0) {
+			    class = mons[i].mlet;
+			    break;
+			}
+		    }
+
+		    if (class != 0) {
+		        for (i = LOW_PM; i < NUMMONS; i++) {
+		            if (mons[i].mlet == class) {
+				if (!(mons[i].geno & G_GENO)) immunecnt++;
+				else if(mvitals[i].mvflags & G_GENOD) gonecnt++;
+				else goodcnt++;
+		            }
+			}
+		    }
+		}
 		if (!goodcnt && class != mons[urole.malenum].mlet &&
 				class != mons[urace.malenum].mlet) {
 			if (gonecnt)
