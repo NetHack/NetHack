@@ -524,7 +524,7 @@ void onPaint(HWND hWnd)
 			/* draw the map */
 			for(i=paint_rt.left; i<paint_rt.right; i++) 
 			for(j=paint_rt.top; j<paint_rt.bottom; j++) 
-			if(data->map[i][j]>0) {
+			if(data->map[i][j]>=0) {
 				uchar ch;
 				TCHAR wch;
 				RECT  glyph_rect;
@@ -558,7 +558,7 @@ void onPaint(HWND hWnd)
 			/* draw the map */
 			for(i=paint_rt.left; i<paint_rt.right; i++) 
 			for(j=paint_rt.top; j<paint_rt.bottom; j++) 
-				if(data->map[i][j]>0) {
+				if(data->map[i][j]>=0) {
 					short ntile;
 					int t_x, t_y;
 					RECT glyph_rect;
