@@ -2383,6 +2383,8 @@ doset()
 							setinitial, fromfile)) {
 			Sprintf(buf, "Set %s to what?", compopt[opt_indx].name);
 			getlin(buf, buf2);
+			if (buf2[0] == '\033')
+			    continue;
 			Sprintf(buf, "%s:%s", compopt[opt_indx].name, buf2);
 			/* pass the buck */
 			parseoptions(buf, setinitial, fromfile);
