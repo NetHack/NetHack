@@ -543,7 +543,7 @@ $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/system.h ../include/unixconf.h ../include/os2conf.h \
 		../include/micro.h ../include/pcconf.h ../include/tosconf.h \
 		../include/amiconf.h ../include/macconf.h ../include/beconf.h \
-		../include/ntconf.h ../include/nhlan.h
+		../include/wceconf.h ../include/ntconf.h ../include/nhlan.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
@@ -666,11 +666,11 @@ wingem.o: ../win/gem/wingem.c $(HACK_H) ../include/func_tab.h ../include/dlb.h \
 		../include/patchlevel.h ../include/wingem.h
 	$(CC) $(CFLAGS) -c ../win/gem/wingem.c
 wingem1.o: ../win/gem/wingem1.c ../include/gem_rsc.h ../include/load_img.h \
-		../include/wintype.h ../include/wingem.h
+		../include/gr_rect.h ../include/wintype.h ../include/wingem.h
 	$(CC) $(CFLAGS) -c ../win/gem/wingem1.c
 load_img.o: ../win/gem/load_img.c ../include/load_img.h
 	$(CC) $(CFLAGS) -c ../win/gem/load_img.c
-gr_rect.o: ../win/gem/gr_rect.c
+gr_rect.o: ../win/gem/gr_rect.c ../include/gr_rect.h
 	$(CC) $(CFLAGS) -c ../win/gem/gr_rect.c
 tile.o: tile.c $(HACK_H)
 qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
@@ -736,7 +736,8 @@ mkobj.o: mkobj.c $(HACK_H)
 mkroom.o: mkroom.c $(HACK_H)
 mon.o: mon.c $(HACK_H) ../include/mfndpos.h ../include/edog.h
 mondata.o: mondata.c $(HACK_H) ../include/eshk.h ../include/epri.h
-monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h ../include/artifact.h
+monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h ../include/artifact.h \
+		../include/epri.h
 monst.o: monst.c $(CONFIG_H) ../include/permonst.h ../include/align.h \
 		../include/monattk.h ../include/monflag.h ../include/monsym.h \
 		../include/dungeon.h ../include/eshk.h ../include/vault.h \
@@ -792,7 +793,7 @@ weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
 windows.o: windows.c $(HACK_H) ../include/wingem.h ../include/winGnome.h
-wizard.o: wizard.c $(HACK_H) ../include/qtext.h
+wizard.o: wizard.c $(HACK_H) ../include/qtext.h ../include/epri.h
 worm.o: worm.c $(HACK_H) ../include/lev.h
 worn.o: worn.c $(HACK_H)
 write.o: write.c $(HACK_H)
