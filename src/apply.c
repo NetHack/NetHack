@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2003/03/29	*/
+/*	SCCS Id: @(#)apply.c	3.4	2003/05/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -65,8 +65,8 @@ use_camera(obj)
 		pline(nothing_happens);
 		return (1);
 	}
-	check_unpaid(obj);
-	obj->spe--;
+	consume_obj_charge(obj, TRUE);
+
 	if (obj->cursed && !rn2(2)) {
 		(void) zapyourself(obj, TRUE);
 	} else if (u.uswallow) {
@@ -782,8 +782,7 @@ struct obj **optr;
 
 	} else {
 	    /* charged Bell of Opening */
-	    check_unpaid(obj);
-	    obj->spe--;
+	    consume_obj_charge(obj, TRUE);
 
 	    if (u.uswallow) {
 		if (!obj->cursed)
@@ -1410,8 +1409,8 @@ register struct obj *obj;
 		pline("That's too insubstantial to tin.");
 		return;
 	}
-	check_unpaid(obj);
-	obj->spe--;
+	consume_obj_charge(obj, TRUE);
+
 	if ((can = mksobj(TIN, FALSE, FALSE)) != 0) {
 	    static const char you_buy_it[] = "You tin it, you bought it!";
 
@@ -1766,8 +1765,8 @@ struct obj *obj;
 
 	if (obj->spe > 0) {
 		if ((obj->cursed || Fumbling) && !rn2(2)) {
-			check_unpaid(obj);
-			obj->spe--;
+			consume_obj_charge(obj, TRUE);
+
 			pline("%s from your %s.", Tobjnam(obj, "slip"),
 			      makeplural(body_part(FINGER)));
 			dropx(obj);
@@ -1789,8 +1788,8 @@ struct obj *obj;
 			return;
 		}
 #endif
-		check_unpaid(obj);
-		obj->spe--;
+		consume_obj_charge(obj, TRUE);
+
 		if (otmp != &zeroobj) {
 			You("cover %s with a thick layer of grease.",
 			    yname(otmp));
@@ -2915,8 +2914,7 @@ doapply()
 		    struct obj *otmp;
 		    const char *what;
 
-		    check_unpaid(obj);
-		    obj->spe--;
+		    consume_obj_charge(obj, TRUE);
 		    if (!rn2(13)) {
 			otmp = mkobj(POTION_CLASS, FALSE);
 			if (objects[otmp->otyp].oc_magic) do {

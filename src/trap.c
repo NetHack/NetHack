@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/05/09	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/05/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3150,9 +3150,7 @@ struct trap *ttmp;
 
 	/* successfully used oil or grease to fix squeaky board */
 	if (obj->otyp == CAN_OF_GREASE) {
-	    check_unpaid(obj);
-	    obj->spe--;
-	    update_inventory();
+	    consume_obj_charge(obj, TRUE);
 	} else {
 	    useup(obj);	/* oil */
 	    makeknown(POT_OIL);

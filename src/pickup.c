@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2003/05/08	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2003/05/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2417,8 +2417,7 @@ dotip()
 	      surface(u.ux, u.uy), buf);
 	/* shop usage message comes after the spill message */
 	if (cobj->otyp == CAN_OF_GREASE && cobj->spe > 0) {
-	    check_unpaid(cobj);
-	    cobj->spe--;		/* doesn't affect cobj->owt */
+	    consume_obj_charge(cobj, TRUE);
 	}
 	/* something [useless] happened */
 	return 1;
@@ -2477,6 +2476,7 @@ struct obj *box;	/* or bag */
 	}
 	if (loss)
 	    You("owe %ld %s for lost merchandise.", loss, currency(loss));
+	if (held) (void)encumber_msg();
     }
 }
 

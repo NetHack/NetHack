@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)music.c	3.4	2003/03/10	*/
+/*	SCCS Id: @(#)music.c	3.4	2003/05/25	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -384,8 +384,8 @@ struct obj *instr;
 	switch (instr->otyp) {
 	case MAGIC_FLUTE:		/* Make monster fall asleep */
 	    if (do_spec && instr->spe > 0) {
-		check_unpaid(instr);
-		instr->spe--;
+		consume_obj_charge(instr, TRUE);
+
 		You("produce soft music.");
 		put_monsters_to_sleep(u.ulevel * 5);
 		exercise(A_DEX, TRUE);
@@ -400,8 +400,8 @@ struct obj *instr;
 	case FROST_HORN:		/* Idem wand of cold */
 	case FIRE_HORN:			/* Idem wand of fire */
 	    if (do_spec && instr->spe > 0) {
-		check_unpaid(instr);
-		instr->spe--;
+		consume_obj_charge(instr, TRUE);
+
 		if (!getdir((char *)0)) {
 		    pline("%s.", Tobjnam(instr, "vibrate"));
 		    break;
@@ -430,8 +430,8 @@ struct obj *instr;
 	    break;
 	case MAGIC_HARP:		/* Charm monsters */
 	    if (do_spec && instr->spe > 0) {
-		check_unpaid(instr);
-		instr->spe--;
+		consume_obj_charge(instr, TRUE);
+
 		pline("%s very attractive music.", Tobjnam(instr, "produce"));
 		charm_monsters((u.ulevel - 1) / 3 + 1);
 		exercise(A_DEX, TRUE);
@@ -446,8 +446,8 @@ struct obj *instr;
 	    break;
 	case DRUM_OF_EARTHQUAKE:	/* create several pits */
 	    if (do_spec && instr->spe > 0) {
-		check_unpaid(instr);
-		instr->spe--;
+		consume_obj_charge(instr, TRUE);
+
 		You("produce a heavy, thunderous rolling!");
 		pline_The("entire dungeon is shaking around you!");
 		do_earthquake((u.ulevel - 1) / 3 + 1);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2003/04/02	*/
+/*	SCCS Id: @(#)invent.c	3.4	2003/05/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -462,6 +462,17 @@ register struct obj *obj;
 	} else {
 		useupall(obj);
 	}
+}
+
+/* use one charge from an item and possibly incur shop debt for it */
+void
+consume_obj_charge(obj, maybe_unpaid)
+struct obj *obj;
+boolean maybe_unpaid;	/* false if caller handles shop billing */
+{
+	if (maybe_unpaid) check_unpaid(obj);
+	obj->spe -= 1;
+	if (obj->known) update_inventory();
 }
 
 #endif /* OVLB */

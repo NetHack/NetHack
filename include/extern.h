@@ -765,6 +765,7 @@ E struct obj *FDECL(hold_another_object,
 			(struct obj *,const char *,const char *,const char *));
 E void FDECL(useupall, (struct obj *));
 E void FDECL(useup, (struct obj *));
+E void FDECL(consume_obj_charge, (struct obj *,BOOLEAN_P));
 E void FDECL(freeinv_core, (struct obj *));
 E void FDECL(freeinv, (struct obj *));
 E void FDECL(delallobj, (int,int));

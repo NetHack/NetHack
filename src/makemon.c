@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.4	2003/03/29	*/
+/*	SCCS Id: @(#)makemon.c	3.4	2003/05/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1732,8 +1732,8 @@ struct obj *bag;
 	boolean gotone = FALSE;
 	int cnt = 1;
 
-	check_unpaid(bag);
-	bag->spe--;
+	consume_obj_charge(bag, TRUE);
+
 	if (!rn2(23)) cnt += rn1(7, 1);
 	while (cnt-- > 0) {
 	    if (makemon((struct permonst *)0, u.ux, u.uy, NO_MM_FLAGS))
