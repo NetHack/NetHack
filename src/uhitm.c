@@ -1616,10 +1616,16 @@ register struct attack *mattk;
 			    You("hurriedly regurgitate the sizzling in your %s.",
 				body_part(STOMACH));
 			} else {
-			    u.uhunger += mdef->data->cnutrit;
+			    tmp = 1 + (mdef->data->cwt >> 8);
+			    if (corpse_chance(mdef, &youmonst, TRUE) &&
+				!(mvitals[monsndx(mdef->data)].mvflags &
+				  G_NOCORPSE)) {
+				/* nutrition only if there can be a corpse */
+				u.uhunger += (mdef->data->cnutrit+1) / 2;
+			    } else tmp = 0;
 			    Sprintf(msgbuf, "You totally digest %s.",
 					    mon_nam(mdef));
-			    if ((tmp = 3 + (mdef->data->cwt >> 6)) != 0) {
+			    if (tmp != 0) {
 				/* setting afternmv = end_engulf is tempting,
 				 * but will cause problems if the player is
 				 * attacked (which uses his real location) or

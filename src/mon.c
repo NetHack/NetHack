@@ -12,7 +12,6 @@
 #include "edog.h"
 #include <ctype.h>
 
-STATIC_DCL boolean FDECL(corpse_chance,(struct monst *));
 STATIC_DCL boolean FDECL(restrap,(struct monst *));
 STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));
 #ifdef OVL2
@@ -1381,19 +1380,20 @@ register struct monst *mtmp;
 	m_detach(mtmp, mptr);
 }
 
-STATIC_OVL boolean
-corpse_chance(mon)
+/* TRUE if corpse might be dropped, magr may die if mon was swallowed */
+boolean
+corpse_chance(mon, magr, swallowed)
 struct monst *mon;
+struct monst *magr;			/* killer, if swallowed */
+boolean swallowed;			/* digestion */
 {
 	struct permonst *mdat = mon->data;
 	int i, tmp;
 
-
 	if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
-		if (cansee(mon->mx, mon->my))
-			pline("%s body crumbles into dust.",
-				s_suffix(Monnam(mon)));
-		return FALSE;
+	    if (cansee(mon->mx, mon->my) && !swallowed)
+		pline("%s body crumbles into dust.", s_suffix(Monnam(mon)));
+	    return FALSE;
 	}
 
 	/* Gas spores always explode upon death */
@@ -1405,6 +1405,28 @@ struct monst *mon;
 	    	else if(mdat->mattk[i].damd)
 	    	    tmp = d((int)mdat->mlevel+1, (int)mdat->mattk[i].damd);
 	    	else tmp = 0;
+		if (swallowed && magr) {
+		    if (magr == &youmonst) {
+			There("is an explosion in your %s!",
+			      body_part(STOMACH));
+			Sprintf(killer_buf, "%s explosion",
+				s_suffix(mdat->mname));
+			losehp(tmp, killer_buf, KILLED_BY_AN);
+		    } else {
+			if (flags.soundok) You_hear("an explosion.");
+			magr->mhp -= tmp;
+			if (magr->mhp < 1) mondied(magr);
+			if (magr->mhp < 1) { /* maybe lifesaved */
+			    if (canspotmon(magr))
+				pline("%s rips open!", Monnam(magr));
+			} else if (canseemon(magr))
+			    pline("%s seems to have indigestion.",
+				  Monnam(magr));
+		    }
+
+		    return FALSE;
+		}
+
 	    	Sprintf(killer_buf, "%s explosion", s_suffix(mdat->mname));
 	    	killer = killer_buf;
 	    	killer_format = KILLED_BY_AN;
@@ -1440,7 +1462,7 @@ register struct monst *mdef;
 	mondead(mdef);
 	if (mdef->mhp > 0) return;	/* lifesaved */
 
-	if (corpse_chance(mdef))
+	if (corpse_chance(mdef, (struct monst *)0, FALSE))
 		(void) make_corpse(mdef);
 }
 
@@ -1708,7 +1730,7 @@ xkilled(mtmp, dest)
 		 * different from whether or not the corpse is "special";
 		 * if we want both, we have to specify it explicitly.
 		 */
-		if (corpse_chance(mtmp))
+		if (corpse_chance(mtmp, (struct monst *)0, FALSE))
 			(void) make_corpse(mtmp);
 	}
 	if(redisp) newsym(x,y);

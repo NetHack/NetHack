@@ -557,6 +557,7 @@ mdamagem(magr, mdef, mattk)
 	int protector =
 	    mattk->aatyp == AT_TENT ? 0 :
 	    mattk->aatyp == AT_KICK ? W_ARMF : W_ARMG;
+	int num;
 
 	if (touch_petrifies(pd) && !resists_ston(magr) &&
 	   (mattk->aatyp != AT_WEAP || !otmp) &&
@@ -595,6 +596,31 @@ mdamagem(magr, mdef, mattk)
 		tmp = mdef->mhp;
 		/* Use up amulet of life saving */
 		if (!!(obj = mlifesaver(mdef))) m_useup(mdef, obj);
+
+		/* Is a corpse for nutrition possible?  It may kill magr */
+		if (!corpse_chance(mdef, magr, TRUE) || magr->mhp < 1)
+		    break;
+
+		/* Pets get nutrition from swallowing monster whole.
+		 * No nutrition from G_NOCORPSE monster, eg, undead.
+		 * DGST monsters don't die from undead corpses
+		 */
+		num = monsndx(mdef->data);
+		if (magr->mtame && !magr->isminion &&
+		    !(mvitals[num].mvflags & G_NOCORPSE)) {
+		    struct obj *virtualcorpse = mksobj(CORPSE, FALSE, FALSE);
+		    int nutrit;
+
+		    virtualcorpse->corpsenm = num;
+		    virtualcorpse->owt = weight(virtualcorpse);
+		    nutrit = dog_nutrition(magr, virtualcorpse);
+		    dealloc_obj(virtualcorpse);
+
+		    /* only 50% nutrition, 25% of normal eating time */
+		    if (magr->meating > 1) magr->meating = (magr->meating+3)/4;
+		    if (nutrit > 1) nutrit /= 2;
+		    EDOG(magr)->hungrytime += nutrit;
+		}
 		break;
 	    case AD_STUN:
 		if (magr->mcan) break;
