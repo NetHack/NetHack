@@ -91,7 +91,7 @@ int spellval;
     case 17:
     case 16:
     case 15:
-	return MGC_SUMMON_MONS;	/* also aggravates */
+	return MGC_SUMMON_MONS;
     case 14:
     case 13:
 	return MGC_AGGRAVATION;
@@ -355,7 +355,7 @@ int spellnum;
 	} else
 	    impossible("bad wizard cloning?");
 	break;
-    case MGC_SUMMON_MONS:		/* also aggravates */
+    case MGC_SUMMON_MONS:
     {
 	int count;
 
