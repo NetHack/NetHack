@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.4	2002/01/17	*/
+/*	SCCS Id: @(#)pager.c	3.4	2002/07/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -545,11 +545,14 @@ do_look(quick)
 		}
 	    }
 	}
-	/* handle '@' as a special case; firstmatch is guaranteed
-	   to already be set in that case */
-	if (!from_screen ? (sym == def_monsyms[S_HUMAN]) :
-		(cc.x == u.ux && cc.y == u.uy && sym == monsyms[S_HUMAN]))
-	     found += append_str(out_str, "you");	/* tack on "or you" */
+	/* handle '@' as a special case if it refers to you and you're
+	   playing a character which isn't normally displayed by that
+	   symbol; firstmatch is assumed to already be set for '@' */
+	if ((from_screen ?
+		(sym == monsyms[S_HUMAN] && cc.x == u.ux && cc.y == u.uy) :
+		(sym == def_monsyms[S_HUMAN] && !iflags.showrace)) &&
+	    !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
+	    found += append_str(out_str, "you");	/* tack on "or you" */
 
 	/*
 	 * Special case: if identifying from the screen, and we're swallowed,
