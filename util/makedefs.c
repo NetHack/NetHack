@@ -729,6 +729,13 @@ static const char *build_opts[] = {
 #ifdef TOURIST
 		"tourists",
 #endif
+#ifdef USER_SOUNDS
+# ifdef USER_SOUNDS_REGEX
+		"user sounds via regular expressions",
+# else
+		"user sounds via pmatch",
+# endif
+#endif
 #ifdef PREFIXES_IN_USE
 		"variable playground",
 #endif

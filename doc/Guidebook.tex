@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.51 $ $Date: 2002/08/22 04:18:41 $
+% $Revision: 1.52 $ $Date: 2002/08/23 01:03:41 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.4)}
-\date{July 27, 2002}
+\date{September 3, 2002}
 
 \maketitle
 
@@ -2738,6 +2738,68 @@ If the game display is difficult to read, try adjusting these scales;
 if this does not correct the problem, try {\tt !color}.
 Cannot be set with the `{\tt O}' command.
 \elist
+
+%.lp
+%.hn 2
+\subsection*{Configuring User Sounds}
+
+%.pg
+Some platforms allow you to define sound files to be played when a message 
+that matches a user-defined pattern is delivered to the message window.
+At this time the Qt port and the win32tty and win32gui ports support the
+use of user sounds.
+
+%.pg
+The following config file options are relevant to mapping user sounds
+to messages:
+
+\blist{}
+%.lp
+\item[\ib{soundir}]
+The directory that houses the sound files to be played.
+%.lp
+\item[\ib{sound}]
+An entry that maps a sound file to a user-specified message pattern.
+Each SOUND entry is broken down into the following parts:
+
+%.sd
+%.si
+{\tt MESG      } --- message window mapping (the only one supported in 3.4).\\
+{\tt pattern   } --- the pattern to match.\\
+{\tt sound file} --- the sound file to play.\\
+{\tt volume    } --- the volume to be set while playing the sound file.
+%.ei
+%.ed
+\elist
+
+%.pg
+The exact format for the pattern depends on whether the platform is
+built to use {\it regular expressions \/} or NetHack's own internal pattern 
+matching facility. The {\it regular expressions \/} matching can be much more 
+sophisticated than the internal NetHack pattern matching, but requires 
+3rd party libraries on some platforms.  There are plenty of references 
+available elsewhere for explaining {\it regular expressions \/}. You can verify 
+which pattern matching is used by your port with the 
+\#version command.  
+
+%.pg
+NetHack's internal pattern matching routine uses the following
+special characters in its pattern matching:
+
+\begin{verbatim}
+    *--- matches 0 or more characters.
+    ?--- matches any single character.
+\end{verbatim}
+
+%.pg
+Here's an example of a sound mapping using NetHack's internal
+pattern matching facility:
+\begin{verbatim}
+    SOUND=MESG "*chime of a cash register*" "gong.wav" 50
+\end{verbatim}
+specifies that any message with "chime of a cash register" contained
+in it will trigger the playing of "gong.wav".  You can have multiple
+SOUND entries in your config file.
 
 %.lp
 %.hn 2

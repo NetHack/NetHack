@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "August 22, 2002
+.ds f2 "September 3, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2217,6 +2217,56 @@ Set the intensity level of the three gray scales available
 If the game display is difficult to read, try adjusting these scales;
 if this does not correct the problem, try !color.
 Cannot be set with the `O' command.
+.hn 2
+Configuring User Sounds
+.pg
+Some platforms allow you to define sound files to be played when a message 
+that matches a user-defined pattern is delivered to the message window.
+At this time the Qt port and the win32tty and win32gui ports support the
+use of user sounds.
+.pg
+The following config file options are relevant to mapping user sounds
+to messages:
+.lp soundir
+The directory that houses the sound files to be played.
+.lp sound
+An entry that maps a sound file to a user-specified message pattern.
+Each SOUND entry is broken down into the following parts:
+.sd
+.si
+MESG       - message window mapping (the only one supported in 3.4).
+pattern    - the pattern to match.
+sound file - the sound file to play.
+volume     - the volume to be set while playing the sound file.
+.ei
+.ed
+.pg
+The exact format for the pattern depends on whether the platform is
+built to use ``regular expressions'' or NetHack's own internal pattern 
+matching facility. The ``regular expressions'' matching can be much more 
+sophisticated than the internal NetHack pattern matching, but requires 
+3rd party libraries on some platforms.  There are plenty of references 
+available elsewhere for explaining ``regular expressions''. You can verify 
+which pattern matching is used by your port with the #version command.  
+.pg
+NetHack's internal pattern matching routine uses the following
+special characters in its pattern matching:
+.sd
+.si
+  *--- matches 0 or more characters.
+  ?--- matches any single character.
+.ei
+.ed
+.pg
+Here's an example of a sound mapping using NetHack's internal
+pattern matching facility:
+.sd
+    SOUND=MESG "*chime of a cash register*" "gong.wav" 50
+.ed
+specifies that any message with "chime of a cash register" contained
+in it will trigger the playing of "gong.wav".  You can have multiple
+SOUND entries in your config file.
+.pg
 .hn 2
 Configuring NetHack for Play by the Blind
 .pg
