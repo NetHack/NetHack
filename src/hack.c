@@ -545,6 +545,14 @@ boolean test_only;
 	} else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
 	    /* Eat the rock. */
 	    if (!test_only && still_chewing(x,y)) return FALSE;
+	} else if (flags.autodig && !flags.run && !flags.nopick && (uwep->otyp == PICK_AXE || uwep->otyp == DWARVISH_MATTOCK)) {
+	/* MRKR: Automatic digging when wielding the appropriate tool */
+	    if (!test_only) {
+		use_pick_axe2(uwep);
+		flags.move = 0;
+		nomul(0);
+		return FALSE;
+	    }
 	} else {
 	    if ( !test_only ) {
 		if (Is_stronghold(&u.uz) && is_db_wall(x,y))

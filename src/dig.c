@@ -773,9 +773,8 @@ struct obj *obj;
 	char dirsyms[12];
 	char qbuf[QBUFSZ];
 	register char *dsp = dirsyms;
-	register struct rm *lev;
 	register int rx, ry;
-	int dig_target, res = 0;
+	int res = 0;
 	register const char *sdp;
 	if(iflags.num_pad) sdp = ndir; else sdp = sdir;	/* DICE workaround */
 
@@ -804,6 +803,22 @@ struct obj *obj;
 	Sprintf(qbuf, "In what direction do you want to dig? [%s]", dirsyms);
 	if(!getdir(qbuf))
 		return(res);
+
+	return(use_pick_axe2(obj));
+}
+
+/* MRKR: use_pick_axe() is split in two to allow autodig to bypass */
+/*       the "In what direction do you want to dig?" query.        */
+/*       use_pick_axe2() uses the existing u.dx, u.dy and u.dz    */
+
+int
+use_pick_axe2(obj) 
+struct obj *obj;
+{
+	register int rx, ry;
+	register struct rm *lev;
+	int dig_target;
+
 	if (u.uswallow && attack(u.ustuck)) {
 		;  /* return(1) */
 	} else if (Underwater) {

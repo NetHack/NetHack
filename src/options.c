@@ -39,6 +39,7 @@ static struct Bool_Opt
 #else
 	{"asksavedisk", (boolean *)0, FALSE},
 #endif
+	{"autodig", &flags.autodig, FALSE},
 	{"autopickup", &flags.pickup, TRUE},
 	{"autoquiver", &flags.autoquiver, FALSE},
 #if defined(MICRO) && !defined(AMIGA)

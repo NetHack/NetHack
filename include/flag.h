@@ -22,6 +22,7 @@ struct flag {
 #ifdef	MFLOPPY
 	boolean  asksavedisk;
 #endif
+	boolean  autodig;       /* MRKR: Automatically dig */
 	boolean  autoquiver;	/* Automatically fill quiver */
 	boolean  beginner;
 #ifdef MAIL
