@@ -1566,7 +1566,6 @@ dodip()
 		    }
 		    return 1;
 		}
-		break;
 	}
 
 	if(!(potion = getobj(beverages, "dip into")))
