@@ -140,7 +140,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define MM_NONAME	  0x20  /* monster is not christened */
 #define MM_NOCOUNTBIRTH	  0x40  /* don't increment born counter (for revival) */
 #define MM_IGNOREWATER	  0x80	/* ignore water when positioning */
-#define MM_ADJACENTOK	  0x100 /* its acceptable to use adjacent coordinates */
+#define MM_ADJACENTOK	  0x100 /* it is acceptable to use adjacent coordinates */
 
 /* flags for special ggetobj status returns */
 #define ALL_FINISHED	  0x01  /* called routine already finished the job */
