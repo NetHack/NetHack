@@ -195,6 +195,7 @@ struct obj *obj;	/* quest artifact; possibly null if carrying Amulet */
 	    /* behave as if leader imparts sufficient info about the
 	       quest artifact */
 	    fully_identify_obj(obj);
+	    update_inventory();
 	}
 }
 

@@ -734,6 +734,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 			    (void) rust_dmg(uarmu, "shirt", 1, TRUE, &youmonst);
 #endif
 		}
+		update_inventory();
 		break;
 
 	    case FIRE_TRAP:

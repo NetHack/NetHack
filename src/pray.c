@@ -338,6 +338,7 @@ decurse:
 				 what ? what :
 				 (const char *)aobjnam(otmp, "softly glow"),
 				 hcolor(amber));
+		    update_inventory();
 		    break;
 	    case TROUBLE_POISONED:
 		    if (Hallucination)
@@ -854,6 +855,7 @@ pleased(g_align)
 	    break;
 	case 4: {
 	    register struct obj *otmp;
+	    int any = 0;
 
 	    if (Blind)
 		You_feel("the power of %s.", u_gname());
@@ -866,9 +868,11 @@ pleased(g_align)
 			Your("%s %s.", aobjnam(otmp, "softly glow"),
 			     hcolor(amber));
 			otmp->bknown = TRUE;
+			++any;
 		    }
 		}
 	    }
+	    if (any) update_inventory();
 	    break;
 	}
 	case 5: {
