@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vault.c	3.4	2002/11/06	*/
+/*	SCCS Id: @(#)vault.c	3.4	2003/01/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -454,6 +454,8 @@ register struct monst *grd;
         long umoney = money_cnt(invent);
 	register boolean u_carry_gold = ((umoney + hidden_gold()) > 0L);
 #endif
+	boolean see_guard;
+
 	if(!on_level(&(egrd->gdlevel), &u.uz)) return(-1);
 	nx = ny = m = n = 0;
 	if(!u_in_vault && !grd_in_vault)
@@ -710,6 +712,7 @@ newpos:
 cleanup:
 		x = grd->mx; y = grd->my;
 
+		see_guard = canspotmon(grd);
 		wallify_vault(grd);
 		remove_monster(grd->mx, grd->my);
 		newsym(grd->mx,grd->my);
@@ -719,7 +722,7 @@ cleanup:
 		restfakecorr(grd);
 		if(!semi_dead && (in_fcorridor(grd, u.ux, u.uy) ||
 				     cansee(x, y))) {
-		    if (!disappear_msg_seen && canspotmon(grd))
+		    if (!disappear_msg_seen && see_guard)
 			pline("Suddenly, the %s disappears.", g_monnam(grd));
 		    return(1);
 		}
