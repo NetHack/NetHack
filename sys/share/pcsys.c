@@ -408,7 +408,7 @@ void
 msmsg VA_DECL(const char *, fmt)
 	VA_START(fmt);
 	VA_INIT(fmt, const char *);
-# if defined(MSDOS)
+# if defined(MSDOS) && defined(NO_TERMS)
 	if (iflags.grmode)
 		gr_finish();
 # endif
