@@ -1,5 +1,5 @@
-#	SCCS Id: @(#)Makefile.os2	3.4	1996/10/29
-#	OS/2 NetHack 3.4 Makefile for OS/2 versions 1.x and 2.x
+#	SCCS Id: @(#)Makefile.os2	3.4.1	1996/10/29
+#	OS/2 NetHack 3.4.1 Makefile for OS/2 versions 1.x and 2.x
 #	Copyright (C) 1990, 1991, 1992, 1993, 1996 Timo Hakulinen
 #
 #	Several compilers exist for OS/2 but, currently only GCC emx is tested
@@ -95,25 +95,25 @@ LINK    = gcc
 #CMD	=		# Command processor name if required
 #AB	= $*.c		# Base name of the target in target action
 #CB	= $*.c		#               - " -               dependent
-#B	= (		# Command line begin in shell one-liners
-#E	= )		#   - " -      end   - " -
-#S	= ;		# Command separator  - " -
+#BEG	= (		# Command line begin in shell one-liners
+#END	= )		#   - " -      end   - " -
+#SEP	= ;		# Command separator  - " -
 #P	= %		# Literal percent sign
 #MAKEB	= nmake
 #CMD	=
 #AB	= $(@B).c
 #CB	= $$(@B).c
-#B	= (
-#E	= )
-#S	= &
+#BEG	= (
+#END	= )
+#SEP	= &
 #P	= %%
 MAKEB	= dmake
 CMD	= cmd /C
 AB	= $(@:B).c
 CB	= $$(@:B).c
-B	= $(CMD) "
-E	= "
-S	= &
+BEG	= $(CMD) "
+END	= "
+SEP	= &
 P	= %
 
 #
@@ -168,7 +168,7 @@ LEXYYC	= lexyy.c
 #	Source tree base directory.
 #
 
-NHSRC	= \nethack
+NHSRC	= \nethack-3.4.0
 
 #
 #	Source directories.  Makedefs hardcodes these, don't change them.
@@ -197,7 +197,7 @@ WINSHARE= $(NHSRC)\win\share	# Shared system files
 
 OBJ	= \tmp\obj		# Object files
 TEMP	= \tmp\bin		# Temporary files during make process
-GAMEDIR = \games\nh34		# Game directory
+GAMEDIR = \games\nh34x11		# Game directory
 PLIBP	= c:\emx\lib		# Protected mode C libraries
 RLIBP	= c:\emx\lib		# Possible real mode C libraries
 
@@ -217,7 +217,8 @@ GAMEDES = "NetHack 3.4"
 #
 
 CFLAGS	= -c $(GCCO) $(WARN) -I$(INCL) $(CDFLAGS) $(STDC) $(WINX11CFLAGS)
-O	= -s -O -o
+#OPT	= -s -O -o
+OPT	=
 
 #
 #	Compiler warning levels.  These are really for development, so
@@ -258,10 +259,11 @@ CL	=
 #	Prepare for a debugger.
 #
 
-CDFLAGS =
+#LFLAGS = /noig /stack:40000    # GCC OMF
+CDFLAGS = -O -s
 LDFLAGS =
-CDFLAGS = -g		# GDB (GCC a.out)
-LDFLAGS = -g		# - " -
+#CDFLAGS = -g		# GDB (GCC a.out)
+#LDFLAGS = -g		# - " -
 
 #
 #	How to produce the most ANSI-like environment.
@@ -300,12 +302,12 @@ PLIBS	= -lgcc -lc -lgcc -los2 $(X11LIBS)	# GCC a.out
 #RLIBS	= $(RLIBP)\llibcer
 RLIBS	= $(PLIBS)
 
-SRCCC	= $(CC) $(CFLAGS) $(O) $@ $(AB)
-UTILCC	= $(B) cd $(UTIL) $(S) $(CC) $(CFLAGS) $(O) $@ $(AB) $(E)
-SYSCC	= $(B) cd $(SYS) $(S) $(CC) $(CFLAGS) $(O) $@ $(AB) $(E)
-SSYSCC	= $(B) cd $(SSYS) $(S) $(CC) $(CFLAGS) $(O) $@ $(AB) $(E)
-PSYSCC	= $(B) cd $(SSYS) $(S) $(CC) $(CFLAGS) $(O) $@ pc$(AB) $(E)
-WINCC	= $(B) cd $(WIN) $(S) $(CC) $(CFLAGS) $(O) $@ $(AB) $(E)
+SRCCC	= $(CC) $(CFLAGS) $(OPT) $@ $(AB)
+UTILCC	= $(BEG) cd $(UTIL) $(SEP) $(CC) $(CFLAGS) $(OPT) $@ $(AB) $(END)
+SYSCC	= $(BEG) cd $(SYS) $(SEP) $(CC) $(CFLAGS) $(OPT) $@ $(AB) $(END)
+SSYSCC	= $(BEG) cd $(SSYS) $(SEP) $(CC) $(CFLAGS) $(OPT) $@ $(AB) $(END)
+PSYSCC	= $(BEG) cd $(SSYS) $(SEP) $(CC) $(CFLAGS) $(OPT) $@ pc$(AB) $(END)
+WINCC	= $(BEG) cd $(WIN) $(SEP) $(CC) $(CFLAGS) $(OPT) $@ $(AB) $(END)
 
 #
 #	Default linker skeletons.  The upper six lines for everything
@@ -524,7 +526,8 @@ SPEC_LEVS = \
  asmodeus.lev baalz.lev    bigrm-1.lev \
  bigrm-2.lev  bigrm-3.lev  bigrm-4.lev castle.lev   fakewiz1.lev fakewiz2.lev \
  juiblex.lev  knox.lev     medusa-1.lev medusa-2.lev minend-1.lev minend-2.lev \
- minefill.lev minetn-1.lev minetn-2.lev oracle.lev   orcus.lev    sanctum.lev \
+ minend-3.lev minefill.lev minetn-1.lev minetn-2.lev minetn-3.lev minetn-4.lev \
+ minetn-5.lev minetn-6.lev minetn-7.lev oracle.lev   orcus.lev    sanctum.lev \
  tower1.lev   tower2.lev   tower3.lev valley.lev   wizard1.lev  wizard2.lev \
  wizard3.lev  astral.lev   air.lev earth.lev    fire.lev     water.lev \
  soko1-1.lev  soko1-2.lev  soko2-1.lev  soko2-2.lev  \
@@ -1059,7 +1062,7 @@ realtouch :
 	$(TOUCH) $(TT)
 
 faketouch :
-	$(B) $(CAT) $(TT) > $(TEMP)\foo.bar $(S) $(CP) $(TEMP)\foo.bar $(TT) $(S) $(RM) $(TEMP)\foo.bar $(E)
+	$(BEG) $(CAT) $(TT) > $(TEMP)\foo.bar $(SEP) $(CP) $(TEMP)\foo.bar $(TT) $(SEP) $(RM) $(TEMP)\foo.bar $(END)
 
 #
 #	Targets for the recovery utility.
@@ -1755,7 +1758,7 @@ x11tiles: $(TEMP)\tile2x11.exe $(WINSHARE)\monsters.txt \
 				$(WINSHARE)\other.txt
 	$(TEMP)\tile2x11.exe $(WINSHARE)\monsters.txt $(WINSHARE)\objects.txt \
 				$(WINSHARE)\other.txt
-	cp x11tiles $(GAMEDIR)\x11tiles
+	$(CP) x11tiles $(GAMEDIR)\x11tiles
 
 TEXT_IO = $(OBJ)\tiletext.o \
 	  $(OBJ)\tiletxt.o \
@@ -1773,10 +1776,10 @@ $(TEMP)\tile2x11.exe: $(OBJ)\tile2x11.o $(TEXT_IO)
 	$(CC) $(LFLAGS) -o $(TEMP)\tile2x11.exe $(OBJ)\tile2x11.o $(TEXT_IO) $(LIBS)
 
 pet_mark.xbm: $(WINX11)\pet_mark.xbm
-	cp $(WINX11)\pet_mark.xbm $(GAMEDIR)\pet_mark.xbm
+	$(CP) $(WINX11)\pet_mark.xbm $(GAMEDIR)\pet_mark.xbm
 
 rip.xpm: $(WINX11)\rip.xpm
-	cp $(WINX11)\rip.xpm $(GAMEDIR)\rip.xpm
+	$(CP) $(WINX11)\rip.xpm $(GAMEDIR)\rip.xpm
 
 $(OBJ)\tile2x11.o : $(WINX11)\tile2x11.c $(INCL)\tile2x11.h
 	$(CC) $(CFLAGS) -o$(OBJ)\tile2x11.o -c $(WINX11)\tile2x11.c \
