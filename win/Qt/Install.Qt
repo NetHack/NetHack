@@ -21,10 +21,6 @@ To use this code:
         interfaces (in which case be sure you have the right curses
         libraries etc. required for that interface).
 
-	If you are using Qt 2.1 or earlier, you will need to undefine
-	USER_SOUNDS as these versions of Qt do no include the necessary
-	library support.
-
    3. ../../src/Makefile
 
 	ensure your QTDIR environment variable was set correctly when
