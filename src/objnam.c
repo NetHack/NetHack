@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2003/02/08	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2003/03/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1049,7 +1049,7 @@ register const char *subj;
 register const char *verb;
 {
 	char *buf = nextobuf();
-	int len;
+	int len, ltmp;
 	const char *sp, *spot;
 	const char * const *spec;
 
@@ -1064,6 +1064,8 @@ register const char *verb;
 	 * present tense form so we don't duplicate this code elsewhere.
 	 */
 	if (subj) {
+	    if (!strncmpi(subj, "a ", 2) || !strncmpi(subj, "an ", 3))
+		goto sing;
 	    spot = (const char *)0;
 	    for (sp = subj; (sp = index(sp, ' ')) != 0; ++sp) {
 		if (!strncmp(sp, " of ", 4) ||
@@ -1090,15 +1092,23 @@ register const char *verb;
 		((spot - subj) >= 2 && !strncmp(spot-1, "ae", 2))) {
 		/* check for special cases to avoid false matches */
 		len = (int)(spot - subj) + 1;
-		for (spec = special_subjs; *spec; spec++)
-		    if (!strncmpi(*spec, subj, len)) goto sing;
+		for (spec = special_subjs; *spec; spec++) {
+		    ltmp = strlen(*spec);
+		    if (len == ltmp && !strncmpi(*spec, subj, len)) goto sing;
+		    /* also check for <prefix><space><special_subj>
+		       to catch things like "the invisible erinys" */
+		    if (len > ltmp && *(spot - ltmp) == ' ' &&
+			    strncmpi(*spec, spot - ltmp + 1, ltmp)) goto sing;
+		}
 
 		return strcpy(buf, verb);
 	    }
 	    /*
+	     * 3rd person plural doesn't end in telltale 's';
 	     * 2nd person singular behaves as if plural.
 	     */
-	    if (!strcmpi(subj, "you")) return strcpy(buf, verb);
+	    if (!strcmpi(subj, "they") || !strcmpi(subj, "you"))
+		return strcpy(buf, verb);
 	}
 
  sing:
