@@ -198,7 +198,6 @@ return &szFullPath[0];
 
 /* fatal error */
 /*VARARGS1*/
-
 void
 error VA_DECL(const char *,s)
 	VA_START(s);
@@ -218,7 +217,6 @@ error VA_DECL(const char *,s)
 	VA_END();
 	exit(EXIT_FAILURE);
 }
-
 void Delay(int ms)
 {
 	(void)Sleep(ms);
@@ -231,9 +229,10 @@ extern void NDECL(backsp);
 void win32_abort()
 {
 #ifdef WIZARD
-	int c, ci, ct;
    	if (wizard) {
 # ifdef WIN32CON
+	    int c, ci, ct;
+
    	    if (!iflags.window_inited)
 		c = 'n';
 		ct = 0;
@@ -254,8 +253,8 @@ void win32_abort()
 		}
 		if (c == 'y')
 			DebugBreak();
-	}
 # endif
+	}
 #endif
 	abort();
 }
