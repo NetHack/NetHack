@@ -716,14 +716,33 @@ int how;			/* type of query */
 	char invlet;
 	int ccount;
 	boolean do_unpaid = FALSE;
+	boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
+	    do_buc_unknown = FALSE;
+	int num_buc_types = 0;
 
 	*pick_list = (menu_item *) 0;
 	if (!olist) return 0;
 	if ((qflags & UNPAID_TYPES) && count_unpaid(olist)) do_unpaid = TRUE;
+	if ((qflags & BUC_BLESSED) && count_buc(olist, BUC_BLESSED)) {
+	    do_blessed = TRUE;
+	    num_buc_types++;
+	}
+	if ((qflags & BUC_CURSED) && count_buc(olist, BUC_CURSED)) {
+	    do_cursed = TRUE;
+	    num_buc_types++;
+	}
+	if ((qflags & BUC_UNCURSED) && count_buc(olist, BUC_UNCURSED)) {
+	    do_uncursed = TRUE;
+	    num_buc_types++;
+	}
+	if ((qflags & BUC_UNKNOWN) && count_buc(olist, BUC_UNKNOWN)) {
+	    do_buc_unknown = TRUE;
+	    num_buc_types++;
+	}
 
 	ccount = count_categories(olist, qflags);
 	/* no point in actually showing a menu for a single category */
-	if (ccount == 1 && !do_unpaid && !(qflags & BILLED_TYPES)) {
+	if (ccount == 1 && !do_unpaid && num_buc_types <= 1 && !(qflags & BILLED_TYPES)) {
 	    for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
 		if ((qflags & WORN_TYPES) &&
 		    !(curr->owornmask & (W_ARMOR|W_RING|W_AMUL|W_TOOL|W_WEP|W_SWAPWEP|W_QUIVER)))
@@ -804,6 +823,35 @@ int how;			/* type of query */
 			(qflags & WORN_TYPES) ?
 			"Auto-select every item being worn" :
 			"Auto-select every item", MENU_UNSELECTED);
+	}
+	/* items with b/u/c/unknown if there are any */
+	if (do_blessed) {
+		invlet = 'B';
+		any.a_void = 0;
+		any.a_int = 'B';
+		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+			"Auto-select blessed items", MENU_UNSELECTED);
+	}
+	if (do_cursed) {
+		invlet = 'C';
+		any.a_void = 0;
+		any.a_int = 'C';
+		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+			"Auto-select cursed items", MENU_UNSELECTED);
+	}
+	if (do_uncursed) {
+		invlet = 'U';
+		any.a_void = 0;
+		any.a_int = 'U';
+		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+			"Auto-select known uncursed items", MENU_UNSELECTED);
+	}
+	if (do_buc_unknown) {
+		invlet = 'X';
+		any.a_void = 0;
+		any.a_int = 'X';
+		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+			"Auto-select un-b/u/c known items", MENU_UNSELECTED);
 	}
 	end_menu(win, qstr);
 	n = select_menu(win, how, pick_list);

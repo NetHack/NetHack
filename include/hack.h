@@ -158,6 +158,10 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define ALL_TYPES    0x10
 #define BILLED_TYPES 0x20
 #define CHOOSE_ALL   0x40
+#define BUC_BLESSED  0x80
+#define BUC_CURSED   0x100
+#define BUC_UNCURSED 0x200
+#define BUC_UNKNOWN  0x400
 #define ALL_TYPES_SELECTED -2
 
 /* Flags to control find_mid() */

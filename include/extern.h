@@ -780,6 +780,7 @@ E void NDECL(free_invbuf);
 E void NDECL(reassign);
 E int NDECL(doorganize);
 E int FDECL(count_unpaid, (struct obj *));
+E int FDECL(count_buc, (struct obj *,int));
 E void FDECL(carry_obj_effects, (struct obj *));
 
 /* ### ioctl.c ### */

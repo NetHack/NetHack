@@ -1631,6 +1631,45 @@ count_unpaid(list)
     return count;
 }
 
+/*
+ * Returns the number of items with b/u/c/unknown within the given list.  
+ * This does NOT include contained objects.
+ */
+int
+count_buc(list, type)
+    struct obj *list;
+    int type;
+{
+    int count = 0;
+
+    while (list) {
+	switch(type) {
+	    case BUC_BLESSED:
+		if (list->oclass != GOLD_CLASS && list->bknown && list->blessed)
+		    count++;
+		break;
+	    case BUC_CURSED:
+		if (list->oclass != GOLD_CLASS && list->bknown && list->cursed)
+		    count++;
+		break;
+	    case BUC_UNCURSED:
+		if (list->oclass != GOLD_CLASS &&
+			list->bknown && !list->blessed && !list->cursed)
+		    count++;
+		break;
+	    case BUC_UNKNOWN:
+		if (list->oclass != GOLD_CLASS && !list->bknown)
+		    count++;
+		break;
+	    default:
+		impossible("need count of curse status %d?", type);
+		return 0;
+	}
+	list = list->nobj;
+    }
+    return count;
+}
+
 STATIC_OVL void
 dounpaid()
 {
