@@ -818,6 +818,10 @@ leave_topl_mode(char *answer) {
 	if (!in_topl_mode())
 		return;
 
+	/* Cap length of reply */
+	if (ans_len >= BUFSZ)
+		ans_len = BUFSZ-1;
+
 	/* remove unprintables from the answer */
 	for (ap = *(*top_line)->hText + topl_query_len, bp = answer; ans_len > 0; ans_len--, ap++) {
 		if (*ap >= ' ' && *ap < 128) {
