@@ -26,6 +26,8 @@
 #define PN_ESCAPE_SPELL			(-13)
 #define PN_MATTER_SPELL			(-14)
 
+STATIC_DCL void FDECL(give_may_advance_msg, (int));
+
 #ifndef OVLB
 
 STATIC_DCL NEARDATA const short skill_names_indices[];
@@ -94,7 +96,6 @@ int skill;
 
 STATIC_DCL boolean FDECL(can_advance, (int, BOOLEAN_P));
 STATIC_DCL int FDECL(slots_required, (int));
-STATIC_DCL void FDECL(give_may_advance_msg, (int));
 
 #ifdef OVL1
 
