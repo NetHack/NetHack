@@ -475,7 +475,7 @@ tile_width	-- port should display tiles with this width or round to closest
 		   if it can.
 tile_height	-- port should display tiles with this height or round to closest
 		   if it can.
-tile_file	-- open this alterntive tile file. The file name is likely to be
+tile_file	-- open this alternative tile file. The file name is likely to be
 		   window-port or platform specific.
 use_inverse	-- port should display inverse when NetHack asks for it.
 vary_msgcount	-- port should display this number of messages at a time in

@@ -4,7 +4,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "February 3, 2002
+.ds f2 "February 4, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2106,15 +2106,15 @@ NetHack should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
 .lp tiled_map	
 NetHack should display a tiled map if it can.
-.lp tiles_16x16	
-NetHack should display 16x16 tiles if it can.
-.lp tiles_32x32	
-NetHack should display 32x32 tiles if it can.
-.lp tiles_8x16	
-NetHack should display 8x16 tiles if it can.
-.lp use_inverse	
+.lp tile_file
+Specify the name of an alternative tile file to override the default.
+.lp tile_height
+Specify the preferred height of each tile in a tile capable port.
+.lp tile_width
+Specify the preferred width of each tile in a tile capable port
+.lp use_inverse
 NetHack should display inverse when the game specifies it.
-.lp vary_msgcount	
+.lp vary_msgcount
 NetHack should display this number of messages at a time in
 the message window.
 .hn 2
