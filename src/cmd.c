@@ -1944,9 +1944,9 @@ char *msg;
 	    if ((expl = dowhatdoes_core(ctrl, buf2))
 		&& (!index(wiz_only_list, sym)
 #ifdef WIZARD
-		    || wizard)
+		    || wizard
 #endif
-		              ) {
+	                     )) {
 		Sprintf(buf, "Are you trying to use ^%c%s?", sym,
 			index(wiz_only_list, sym) ? "" :
 			" as specified in the Guidebook");
