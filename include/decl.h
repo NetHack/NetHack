@@ -153,10 +153,6 @@ E NEARDATA struct sinfo {
 #if defined(VMS) || defined(WIN32)
 	int exiting;		/* an exit handler is executing */
 #endif
-	int in_impossible;
-#ifdef PANICLOG
-	int in_paniclog;
-#endif
 } program_state;
 
 E boolean restoring;
