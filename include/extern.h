@@ -423,6 +423,7 @@ E void FDECL(wantdoor, (int,int,genericptr_t));
 /* ### dokick.c ### */
 
 E boolean FDECL(ghitm, (struct monst *,struct obj *));
+E void FDECL(container_impact_dmg, (struct obj *));
 E int NDECL(dokick);
 E boolean FDECL(ship_object, (struct obj *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void NDECL(obj_delivery);
