@@ -692,7 +692,12 @@ void CalculateCellSize(HWND hWnd, LPSIZE pSize)
 	
 	hdc = GetDC(hWnd);
 	pSize->cx = (clrt.right - clrt.left)/NH_CMDPAD_COLS;
-	pSize->cy = max(pSize->cx, 10*GetDeviceCaps(hdc, LOGPIXELSY)/72);
+	pSize->cy = min(
+					max( pSize->cx, 
+					     10*GetDeviceCaps(hdc, LOGPIXELSY)/72 // minimum cell size - 10 points
+						),
+					20*GetDeviceCaps(hdc, LOGPIXELSY)/72 // maximum cell size - 20 points
+				);
 	ReleaseDC(hWnd, hdc);
 }
 

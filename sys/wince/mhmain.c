@@ -32,6 +32,7 @@ static void		register_main_window_class();
 static void		select_map_mode(int map_mode);
 static int		menuid2mapmode(int menuid);
 static int		mapmode2menuid(int map_mode);
+static HMENU	_get_main_menu();
 
 HWND mswin_init_main_window () {
 	static int run_once = 0;
@@ -731,6 +732,17 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 
+		case IDM_VIEW_KEYPAD:
+			GetNHApp()->bCmdPad = !GetNHApp()->bCmdPad;
+			CheckMenuItem(
+				_get_main_menu(),
+				IDM_VIEW_KEYPAD,
+				MF_BYCOMMAND | 
+				(GetNHApp()->bCmdPad? MF_CHECKED : MF_UNCHECKED)
+			);
+			mswin_layout_main_window(data->hCmdWnd);
+			break;
+
 		case IDM_HELP_LONG:	
 			display_file(HELP, TRUE);  
 			break;
@@ -834,25 +846,14 @@ void mswin_select_map_mode(int mode)
 	HMENU hmenuMap;
 	PNHMainWindow  data;
 	winid map_id;
-#ifndef WIN_CE_2xx
-	TBBUTTONINFO tbbi;
-#endif
 
 	map_id = WIN_MAP;
 	data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
+	hmenuMap = _get_main_menu();
 
 	/* override for Rogue level */
 #ifdef REINCARNATION
     if( Is_rogue_level(&u.uz) && !IS_MAP_ASCII(mode) ) return;
-#endif
-
-#ifndef WIN_CE_2xx
-	tbbi.cbSize = sizeof(tbbi);
-	tbbi.dwMask = TBIF_LPARAM;
-	SendMessage( GetNHApp()->hMenuBar, TB_GETBUTTONINFO, ID_MAP, (LPARAM)&tbbi);
-    hmenuMap = (HMENU)tbbi.lParam;
-#else
-	hmenuMap = CommandBar_GetMenu(GetNHApp()->hMenuBar, 0);
 #endif
 
 	/* set map mode menu mark */
@@ -929,4 +930,22 @@ int	mapmode2menuid(int map_mode)
 	for( p = _menu2mapmode; p->mapMode!=-1; p++ ) 
 		if(p->mapMode==map_mode ) return p->menuID;
 	return -1;
+}
+
+HMENU _get_main_menu()
+{
+	HMENU hmenuMap;
+#ifndef WIN_CE_2xx
+	TBBUTTONINFO tbbi;
+#endif
+
+#ifndef WIN_CE_2xx
+	tbbi.cbSize = sizeof(tbbi);
+	tbbi.dwMask = TBIF_LPARAM;
+	SendMessage( GetNHApp()->hMenuBar, TB_GETBUTTONINFO, ID_MAP, (LPARAM)&tbbi);
+    hmenuMap = (HMENU)tbbi.lParam;
+#else
+	hmenuMap = CommandBar_GetMenu(GetNHApp()->hMenuBar, 0);
+#endif
+	return hmenuMap;
 }

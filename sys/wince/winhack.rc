@@ -32,7 +32,7 @@ IDI_WINHACK             ICON    DISCARDABLE     "NETHACK.ICO"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Menubar
+// Menu
 //
 
 IDC_WINHACK MENU DISCARDABLE 
@@ -57,6 +57,10 @@ BEGIN
         MENUITEM "&9 - ASCII  (10x18)",         IDM_MAP_ASCII10X18
         MENUITEM SEPARATOR
         MENUITEM "&Fit To Screen",              IDM_MAP_FIT_TO_SCREEN
+    END
+    POPUP "View"
+    BEGIN
+        MENUITEM "&Keypad",                     IDM_VIEW_KEYPAD
     END
     POPUP "Help"
     BEGIN
@@ -257,15 +261,11 @@ END
 // Data
 //
 
-IDC_WINHACK SHMENUBAR DISCARDABLE 
+IDC_WINHACK RCDATA DISCARDABLE 
 BEGIN
-    IDC_WINHACK, 3,
-    I_IMAGENONE, ID_FILE, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_FILE, 0, 0,
-    I_IMAGENONE, ID_MAP, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_MAP, 0, 1,
-    I_IMAGENONE, ID_HELP, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_HELP, 0, 2,
+    0x006d, 0x0003, 0xfffe, 0x8018, 0x0004, 0x0018, 0x8019, 0x0000, 0x0000, 
+    0xfffe, 0x801d, 0x0004, 0x0018, 0x801f, 0x0000, 0x0001, 0xfffe, 0x801a, 
+    0x0004, 0x0018, 0x801b, 0x0000, 0x0002
 END
 
 
@@ -331,6 +331,11 @@ BEGIN
     IDS_CAP_FILE            "File"
     IDS_CAP_HELP            "Help"
     IDS_CAP_MAP             "Map"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDM_VIEW_KEYPAD         "Show/Hide keypad."
 END
 
 #endif    // English (U.S.) resources

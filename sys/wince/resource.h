@@ -137,13 +137,14 @@
 #define ID_MAP                          32797
 #define IDS_CAP_AMP                     32798
 #define IDS_CAP_MAP                     32799
+#define IDM_VIEW_KEYPAD                 32800
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
-#define _APS_NEXT_COMMAND_VALUE         32800
+#define _APS_NEXT_COMMAND_VALUE         32801
 #define _APS_NEXT_CONTROL_VALUE         1333
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
