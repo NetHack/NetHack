@@ -482,7 +482,8 @@ hitum(mon, uattk)
 struct monst *mon;
 struct attack *uattk;
 {
-	boolean malive;
+	boolean malive, wep_was_destroyed = FALSE;
+	struct obj *wepbefore = uwep;
 	int armorpenalty, attknum = 0,
 	    x = u.ux + u.dx, y = u.uy + u.dy,
 	    tmp = find_roll_to_hit(mon, uattk->aatyp, uwep,
@@ -502,8 +503,8 @@ struct attack *uattk;
 	    malive = known_hitum(mon, uswapwep, &mhit,
 			   tmp, armorpenalty, uattk);
 	}
-
-	(void) passive(mon, mhit, malive, AT_WEAP);
+	if (wepbefore && !uwep) wep_was_destroyed = TRUE;
+	(void) passive(mon, mhit, malive, AT_WEAP, wep_was_destroyed);
 	return(malive);
 }
 
@@ -2153,10 +2154,10 @@ use_weapon:
 		rehumanize();
 	    }
 	    if (sum[i] == 2)
-		return((boolean)passive(mon, 1, 0, mattk->aatyp));
+		return((boolean)passive(mon, 1, 0, mattk->aatyp, FALSE));
 							/* defender dead */
 	    else {
-		(void) passive(mon, sum[i], 1, mattk->aatyp);
+		(void) passive(mon, sum[i], 1, mattk->aatyp, FALSE);
 		nsum |= sum[i];
 	    }
 	    if (!Upolyd)
@@ -2170,11 +2171,12 @@ use_weapon:
 /*	Special (passive) attacks on you by monsters done here.		*/
 
 int
-passive(mon, mhit, malive, aatyp)
+passive(mon, mhit, malive, aatyp, wep_was_destroyed)
 register struct monst *mon;
 register boolean mhit;
 register int malive;
 uchar aatyp;
+boolean wep_was_destroyed;
 {
 	register struct permonst *ptr = mon->data;
 	register int i, tmp;
@@ -2224,7 +2226,7 @@ uchar aatyp;
 		if (aatyp == AT_MAGC) protector = W_ARMG;
 
 		if (protector == 0L ||		/* no protection */
-			(protector == W_ARMG && !uarmg && !uwep) ||
+			(protector == W_ARMG && !uarmg && !uwep && !wep_was_destroyed) ||
 			(protector == W_ARMF && !uarmf) ||
 			(protector == W_ARMH && !uarmh) ||
 			(protector == (W_ARMC|W_ARMG) && (!uarmc || !uarmg))) {

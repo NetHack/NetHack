@@ -2108,7 +2108,7 @@ E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *,struct obj *,int));
 E int FDECL(damageum, (struct monst *,struct attack *));
 E void FDECL(missum, (struct monst *,struct attack *,BOOLEAN_P));
-E int FDECL(passive, (struct monst *,BOOLEAN_P,int,UCHAR_P));
+E int FDECL(passive, (struct monst *,BOOLEAN_P,int,UCHAR_P,BOOLEAN_P));
 E void FDECL(passive_obj, (struct monst *,struct obj *,struct attack *));
 E void FDECL(stumble_onto_mimic, (struct monst *));
 E int FDECL(flash_hits_mon, (struct monst *,struct obj *));

@@ -106,7 +106,7 @@ register boolean clumsy;
 		}
 	}
 
-	(void) passive(mon, TRUE, mon->mhp > 0, AT_KICK);
+	(void) passive(mon, TRUE, mon->mhp > 0, AT_KICK, FALSE);
 	if (mon->mhp <= 0 && !trapkilled) killed(mon);
 
 	/* may bring up a dialog, so put this after all messages */
@@ -157,12 +157,12 @@ register xchar x, y;
 		} else if (tmp > (kickdieroll = rnd(20))) {
 		    You("kick %s.", mon_nam(mon));
 		    sum = damageum(mon, uattk);
-		    (void)passive(mon, (boolean)(sum > 0), (sum != 2), AT_KICK);
+		    (void)passive(mon, (boolean)(sum > 0), (sum != 2), AT_KICK, FALSE);
 		    if (sum == 2)
 			break;		/* Defender died */
 		} else {
 		    missum(mon, uattk, (tmp + armorpenalty > kickdieroll));
-		    (void)passive(mon, 0, 1, AT_KICK);
+		    (void)passive(mon, 0, 1, AT_KICK,FALSE);
 		}
 	    }
 	    return;
@@ -172,7 +172,7 @@ register xchar x, y;
 	   !is_flyer(mon->data)) {
 		pline("Floating in the air, you miss wildly!");
 		exercise(A_DEX, FALSE);
-		(void) passive(mon, FALSE, 1, AT_KICK);
+		(void) passive(mon, FALSE, 1, AT_KICK, FALSE);
 		return;
 	}
 
@@ -183,7 +183,7 @@ register xchar x, y;
 		if(!rn2((i < j/10) ? 2 : (i < j/5) ? 3 : 4)) {
 			if(martial() && !rn2(2)) goto doit;
 			Your("clumsy kick does no damage.");
-			(void) passive(mon, FALSE, 1, AT_KICK);
+			(void) passive(mon, FALSE, 1, AT_KICK, FALSE);
 			return;
 		}
 		if(i < j/10) clumsy = TRUE;
@@ -204,7 +204,7 @@ doit:
 		if(!nohands(mon->data) && !rn2(martial() ? 5 : 3)) {
 		    pline("%s blocks your %skick.", Monnam(mon),
 				clumsy ? "clumsy " : "");
-		    (void) passive(mon, FALSE, 1, AT_KICK);
+		    (void) passive(mon, FALSE, 1, AT_KICK, FALSE);
 		    return;
 		} else {
 		    mnexto(mon);
@@ -221,7 +221,7 @@ doit:
 					"slides" : "jumps"),
 				clumsy ? "easily" : "nimbly",
 				clumsy ? "clumsy " : "");
-			(void) passive(mon, FALSE, 1, AT_KICK);
+			(void) passive(mon, FALSE, 1, AT_KICK, FALSE);
 			return;
 		    }
 		}
