@@ -79,6 +79,10 @@ YACC   = bison -y
 LEX    = flex
 YTABC  = y_tab.c
 YTABH  = y_tab.h
+#If your tool produces y.tab.c and y.tab.h DOS might require
+#the following instead.
+#YTABC  = ytab~1.c
+#YTABH  = ytab~1.h
 LEXYYC = lexyy.c
 
 #
@@ -616,12 +620,12 @@ ifeq  "$(DO_YACC)" "YACC_ACT"
 $(INCL)/lev_comp.h: $(U)lev_yacc.c
 
 $(U)lev_yacc.c $(INCL)/lev_comp.h : $(U)lev_comp.y
-       @$(subst /,\,chdir $(UTIL))
-       @$(subst /,\,$(YACC) -d lev_comp.y)
-       @$(subst /,\,copy $(YTABC) lev_yacc.c)
-       @$(subst /,\,copy $(YTABH) $(INCL)/lev_comp.h)
-       @$(subst /,\,@del $(YTABC))
-       @$(subst /,\,@del $(YTABH))
+	@$(subst /,\,chdir $(UTIL))
+	@$(subst /,\,$(YACC) -d lev_comp.y)
+	@$(subst /,\,copy $(YTABC) lev_yacc.c)
+	@$(subst /,\,copy $(YTABH) $(INCL)/lev_comp.h)
+	@$(subst /,\,@del $(YTABC))
+	@$(subst /,\,@del $(YTABH))
 	@$(subst /,\,chdir $(SRC))
 else
 
@@ -643,11 +647,11 @@ endif
 
 $(U)lev_$(LEX).c: $(U)lev_comp.l
 ifeq  "$(DO_LEX)" "LEX_ACT"
-       @$(subst /,\,chdir $(UTIL))
-       @$(subst /,\,$(LEX) $(FLEXSKEL) lev_comp.l)
-       @$(subst /,\,if exist $@ del $@)
-       @$(subst /,\,copy $(LEXYYC) $@)
-       @$(subst /,\,del $(LEXYYC))
+	@$(subst /,\,chdir $(UTIL))
+	@$(subst /,\,$(LEX) $(FLEXSKEL) lev_comp.l)
+	@$(subst /,\,if exist $@ del $@)
+	@$(subst /,\,copy $(LEXYYC) $@)
+	@$(subst /,\,del $(LEXYYC))
 	@$(subst /,\,chdir $(SRC))
 else
 	@echo ---
@@ -666,12 +670,12 @@ $(U)dgn_comp.exe:  $(DGNCOMPOBJS)
 
 ifeq  "$(DO_YACC)" "YACC_ACT"
 $(U)dgn_yacc.c $(INCL)/dgn_comp.h : $(U)dgn_comp.y
-       @$(subst /,\,chdir $(UTIL))
-       @$(subst /,\,$(YACC) -d dgn_comp.y)
-       @$(subst /,\,copy $(YTABC) dgn_yacc.c)
-       @$(subst /,\,copy $(YTABH) $(INCL)/dgn_comp.h)
-       @$(subst /,\,@del $(YTABC))
-       @$(subst /,\,@del $(YTABH))
+	@$(subst /,\,chdir $(UTIL))
+	@$(subst /,\,$(YACC) -d dgn_comp.y)
+	@$(subst /,\,copy $(YTABC) dgn_yacc.c)
+	@$(subst /,\,copy $(YTABH) $(INCL)/dgn_comp.h)
+	@$(subst /,\,@del $(YTABC))
+	@$(subst /,\,@del $(YTABH))
 	@$(subst /,\,chdir $(SRC))
 else
 $(U)dgn_yacc.c: $(SSHR)/dgn_yacc.c
@@ -693,11 +697,11 @@ endif
 ifeq  "$(DO_LEX)" "LEX_ACT"
 
 $(U)dgn_$(LEX).c: $(U)dgn_comp.l $(INCL)/dgn_comp.h
-       @$(subst /,\,chdir $(UTIL))
-       @$(subst /,\,$(LEX) $(FLEXSKEL) dgn_comp.l)
-       @$(subst /,\,if exist $@ del $@)
-       @$(subst /,\,copy $(LEXYYC) $@)
-       @$(subst /,\,del $(LEXYYC))
+	@$(subst /,\,chdir $(UTIL))
+	@$(subst /,\,$(LEX) $(FLEXSKEL) dgn_comp.l)
+	@$(subst /,\,if exist $@ del $@)
+	@$(subst /,\,copy $(LEXYYC) $@)
+	@$(subst /,\,del $(LEXYYC))
 	@$(subst /,\,chdir $(SRC))
 else
 
