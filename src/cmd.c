@@ -150,6 +150,8 @@ static const char* readchar_queue="";
 
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P, char *));
+STATIC_DCL void FDECL(help_out, (winid, char *, BOOLEAN_P));
+
 
 #ifdef OVL1
 
@@ -2023,6 +2025,22 @@ const char *s;
 	return 1;
 }
 
+STATIC_OVL void
+help_out(win, str, use_menu)
+winid win;
+char *str;
+boolean use_menu;
+{
+	if (use_menu) {
+		anything any;
+		any.a_void = 0;
+		add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, str, MENU_UNSELECTED);
+	} else {
+		putstr(win, 0, str);
+	}
+	return;
+}
+
 STATIC_OVL boolean
 help_dir(sym, msg)
 char sym;
@@ -2031,14 +2049,24 @@ char *msg;
 	char ctrl;
 	winid win;
 	char *wiz_only_list = "EFGIOVW";
+	menu_item *selected;
 	char buf[BUFSZ], buf2[BUFSZ], *expl;
+	boolean use_menu = FALSE;
 
-	win = create_nhwindow(NHW_TEXT);
-	if (!win) return FALSE;
-	if (msg) {
+	/* use menu window rather than text to display the help */
+	if (!strncmpi(windowprocs.name, "x11", 3))
+		use_menu = TRUE;
+
+	if (!use_menu && msg) {
+		win = create_nhwindow(NHW_TEXT);
+		if (!win) return FALSE;
 		Sprintf(buf, "cmdassist: %s", msg);
-		putstr(win, 0, buf);
-		putstr(win, 0, "");
+		help_out(win, buf, use_menu);
+		help_out(win, "", use_menu);
+	} else {
+		win = create_nhwindow(NHW_MENU);
+		if (!win) return FALSE;
+		start_menu(win);
 	}
 	if (letter(sym)) { 
 	    sym = highc(sym);
@@ -2052,39 +2080,46 @@ char *msg;
 		Sprintf(buf, "Are you trying to use ^%c%s?", sym,
 			index(wiz_only_list, sym) ? "" :
 			" as specified in the Guidebook");
-		putstr(win, 0, buf);
-		putstr(win, 0, "");
-		putstr(win, 0, expl);
-		putstr(win, 0, "");
-		putstr(win, 0, "To use that command, you press");
+		help_out(win, buf, use_menu);
+		help_out(win, "", use_menu);
+		help_out(win, expl, use_menu);
+		help_out(win, "", use_menu);
+		help_out(win, "To use that command, you press", use_menu);
 		Sprintf(buf,
 			"the <Ctrl> key, and the <%c> key at the same time.", sym);
-		putstr(win, 0, buf);
-		putstr(win, 0, "");
+		help_out(win, buf, use_menu);
+		help_out(win, "", use_menu);
 	    }
 	}
 	if (iflags.num_pad) {
-		putstr(win, 0, "Valid direction keys (with number_pad on) are:");
-		putstr(win, 0, "          7  8  9");
-		putstr(win, 0, "           \\ | / ");
-		putstr(win, 0, "          4- . -6");
-		putstr(win, 0, "           / | \\ ");
-		putstr(win, 0, "          1  2  3");
+		help_out(win, "Valid direction keys (with number_pad on) are:", use_menu);
+		help_out(win, "          7  8  9", use_menu);
+		help_out(win, "           \\ | / ", use_menu);
+		help_out(win, "          4- . -6", use_menu);
+		help_out(win, "           / | \\ ", use_menu);
+		help_out(win, "          1  2  3", use_menu);
 	} else {
-		putstr(win, 0, "Valid direction keys are:");
-		putstr(win, 0, "          y  k  u");
-		putstr(win, 0, "           \\ | / ");
-		putstr(win, 0, "          h- . -l");
-		putstr(win, 0, "           / | \\ ");
-		putstr(win, 0, "          b  j  n");
+		help_out(win, "Valid direction keys are:", use_menu);
+		help_out(win, "          y  k  u", use_menu);
+		help_out(win, "           \\ | / ", use_menu);
+		help_out(win, "          h- . -l", use_menu);
+		help_out(win, "           / | \\ ", use_menu);
+		help_out(win, "          b  j  n", use_menu);
 	};
-	putstr(win, 0, "");
-	putstr(win, 0, "          <  up");
-	putstr(win, 0, "          >  down");
-	putstr(win, 0, "          .  direct at yourself");
-	putstr(win, 0, "");
-	putstr(win, 0, "(Suppress this message with !cmdassist in config file.)");
-	display_nhwindow(win, FALSE);
+	help_out(win, "", use_menu);
+	help_out(win, "          <  up", use_menu);
+	help_out(win, "          >  down", use_menu);
+	help_out(win, "          .  direct at yourself", use_menu);
+	help_out(win, "", use_menu);
+	help_out(win, "(Suppress this message with !cmdassist in config file.)", use_menu);
+	if (use_menu) {
+		if (msg) Sprintf(buf, "cmdassist: %s", msg);
+		else buf[0] = '\0';
+		end_menu(win, buf);
+		(void) select_menu(win, PICK_NONE, &selected);
+	} else {
+		display_nhwindow(win, FALSE);
+	}
 	destroy_nhwindow(win);
 	return TRUE;
 }
