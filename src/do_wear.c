@@ -1553,6 +1553,7 @@ glibr()
 	register struct obj *otmp;
 	int xfl = 0;
 	boolean leftfall, rightfall;
+	const char *otherwep = 0;
 
 	leftfall = (uleft && !uleft->cursed &&
 		    (!uwep || !welded(uwep) || !bimanual(uwep)));
@@ -1577,9 +1578,10 @@ glibr()
 
 	otmp = uswapwep;
 	if (u.twoweap && otmp) {
+		otherwep = is_sword(otmp) ? c_sword :
+		    makesingular(oclass_names[(int)otmp->oclass]);
 		Your("%s %sslips from your %s.",
-			is_sword(otmp) ? c_sword :
-				makesingular(oclass_names[(int)otmp->oclass]),
+			otherwep,
 			xfl ? "also " : "",
 			makeplural(body_part(HAND)));
 		setuswapwep((struct obj *)0);
@@ -1589,10 +1591,16 @@ glibr()
 	}
 	otmp = uwep;
 	if (otmp && !welded(otmp)) {
+		const char *thiswep;
+
+		/* nice wording if both weapons are the same type */
+		thiswep = is_sword(otmp) ? c_sword :
+		    makesingular(oclass_names[(int)otmp->oclass]);
+		if (otherwep && strcmp(thiswep, otherwep)) otherwep = 0;
+
 		/* changed so cursed weapons don't fall, GAN 10/30/86 */
-		Your("%s %sslips from your %s.",
-			is_sword(otmp) ? c_sword :
-				makesingular(oclass_names[(int)otmp->oclass]),
+		Your("%s%s %sslips from your %s.",
+			otherwep ? "other " : "", thiswep,
 			xfl ? "also " : "",
 			makeplural(body_part(HAND)));
 		setuwep((struct obj *)0);
