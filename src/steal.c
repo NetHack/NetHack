@@ -433,8 +433,7 @@ register struct obj *otmp;
 	attacktype(mtmp->data, AT_ENGL)) {
 	/* this is probably a burning object that you dropped or threw */
 	if (u.uswallow && mtmp == u.ustuck && !Blind)
-	pline("%s go%s out.", The(xname(otmp)),
-	          otmp->quan == 1L ? "es" : "");
+	    pline("%s out.", Tobjnam(otmp, "go"));
 	snuff_otmp = TRUE;
     }
     /* Must do carrying effects on object prior to add_to_minv() */

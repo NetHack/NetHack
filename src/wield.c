@@ -101,7 +101,7 @@ register struct obj *obj;
 	setworn(obj, W_WEP);
 	if (uwep == obj && artifact_light(olduwep) && olduwep->lamplit) {
 	    end_burn(olduwep, FALSE);
-	    if (!Blind) pline("%s stops glowing.", The(xname(olduwep)));
+	    if (!Blind) pline("%s glowing.", Tobjnam(olduwep, "stop"));
 	}
 	/* Note: Explicitly wielding a pick-axe will not give a "bashing"
 	 * message.  Wielding one via 'a'pplying it will.
@@ -184,7 +184,7 @@ struct obj *wep;
 	    if (artifact_light(wep) && !wep->lamplit) {
 		begin_burn(wep, FALSE);
 		if (!Blind)
-		    pline("%s begins to glow brilliantly!", The(xname(wep)));
+		    pline("%s to glow brilliantly!", Tobjnam(wep, "begin"));
 	    }
 
 #if 0
@@ -369,7 +369,7 @@ dowieldquiver()
 	} else if (newquiver == uwep) {
 		/* Prevent accidentally readying the main weapon */
 		pline("%s already being used as a weapon!",
-		      (uwep->quan == 1L) ? "That is" : "They are");
+		      !is_plural(uwep) ? "That is" : "They are");
 		return(0);
 	} else if (newquiver->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
 #ifdef STEED
@@ -415,15 +415,15 @@ can_twoweapon()
 	else if (NOT_WEAPON(uwep) || NOT_WEAPON(uswapwep)) {
 		otmp = NOT_WEAPON(uwep) ? uwep : uswapwep;
 		pline("%s %s.", Yname2(otmp),
-		    (otmp->quan) > 1L ? "aren't weapons" : "isn't a weapon");
+		    is_plural(otmp) ? "aren't weapons" : "isn't a weapon");
 	} else if (bimanual(uwep) || bimanual(uswapwep)) {
 		otmp = bimanual(uwep) ? uwep : uswapwep;
 		pline("%s isn't one-handed.", Yname2(otmp));
 	} else if (uarms)
 		You_cant("use two weapons while wearing a shield.");
 	else if (uswapwep->oartifact)
-		pline("%s resists being held second to another weapon!",
-			Yname2(uswapwep));
+		pline("%s %s being held second to another weapon!",
+			Yname2(uswapwep), otense(uswapwep, "resist"));
 	else if (!uarmg && !Stone_resistance && (uswapwep->otyp == CORPSE &&
 		    touch_petrifies(&mons[uswapwep->corpsenm]))) {
 		char kbuf[BUFSZ];
@@ -481,7 +481,7 @@ uwepgone()
 	if (uwep) {
 		if (artifact_light(uwep) && uwep->lamplit) {
 		    end_burn(uwep, FALSE);
-		    if (!Blind) pline("%s stops glowing.", The(xname(uwep)));
+		    if (!Blind) pline("%s glowing.", Tobjnam(uwep, "stop"));
 		}
 		setworn((struct obj *)0, W_WEP);
 		unweapon = TRUE;
@@ -540,7 +540,7 @@ boolean fade_scrolls;
 	erosion = acid_dmg ? target->oeroded2 : target->oeroded;
 
 	if (target->greased) {
-	    grease_protect(target,(char *)0,FALSE,victim);
+	    grease_protect(target,(char *)0,victim);
 	} else if (target->oclass == SCROLL_CLASS) {
 	    if(fade_scrolls && target->otyp != SCR_BLANK_PAPER
 #ifdef MAIL
@@ -650,9 +650,9 @@ register int amount;
 	if(((uwep->spe > 5 && amount >= 0) || (uwep->spe < -5 && amount < 0))
 								&& rn2(3)) {
 	    if (!Blind)
-	    Your("%s %s for a while and then evaporate%s.",
+	    Your("%s %s for a while and then %s.",
 		 aobjnam(uwep, "violently glow"), color,
-		 uwep->quan == 1L ? "s" : "");
+		 otense(uwep, "evaporate"));
 	    else
 		Your("%s.", aobjnam(uwep, "evaporate"));
 
@@ -709,7 +709,7 @@ register struct obj *obj;
 
 	savewornmask = obj->owornmask;
 	Your("%s %s welded to your %s!",
-		xname(obj), (obj->quan == 1L) ? "is" : "are",
+		xname(obj), otense(obj, "are"),
 		bimanual(obj) ? (const char *)makeplural(body_part(HAND))
 				: body_part(HAND));
 	obj->owornmask = savewornmask;

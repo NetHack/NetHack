@@ -322,7 +322,7 @@ register struct monst *mtmp;
     else
 	growl_verb = growl_sound(mtmp);
     if (growl_verb) {
-	pline("%s %s!", Monnam(mtmp), makeplural(growl_verb));
+	pline("%s %s!", Monnam(mtmp), vtense((char *)0, growl_verb));
 	if(flags.run) nomul(0);
 	wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 18);
     }
@@ -363,7 +363,7 @@ register struct monst *mtmp;
 	    break;
     }
     if (yelp_verb) {
-	pline("%s %ss!", Monnam(mtmp), yelp_verb);
+	pline("%s %s!", Monnam(mtmp), vtense((char *)0, yelp_verb));
 	if(flags.run) nomul(0);
 	wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 12);
     }
@@ -395,7 +395,7 @@ register struct monst *mtmp;
 	    break;
     }
     if (whimper_verb) {
-	pline("%s %ss.", Monnam(mtmp), whimper_verb);
+	pline("%s %s.", Monnam(mtmp), vtense((char *)0, whimper_verb));
 	if(flags.run) nomul(0);
 	wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 6);
     }

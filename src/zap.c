@@ -1446,7 +1446,7 @@ struct obj *obj, *otmp;
 			return 0;
 		else {
 #ifdef DEBUG
-			pline("%s pulsates for a moment.", The(xname(obj)));
+			pline("%s for a moment.", Tobjnam(obj, "pulsate"));
 #endif
 			obj->bypass = 0;
 		}
@@ -1499,7 +1499,7 @@ struct obj *obj, *otmp;
 		obj->dknown = 1;
 		if (Has_contents(obj)) {
 		    if (!obj->cobj)
-			pline("%s is empty.", The(xname(obj)));
+			pline("%s empty.", Tobjnam(obj, "are"));
 		    else {
 			struct obj *o;
 			/* view contents (not recursively) */
@@ -1815,7 +1815,7 @@ dozap()
 		current_wand = 0;
 	}
 	if (obj && obj->spe < 0) {
-	    pline("%s turns to dust.", The(xname(obj)));
+	    pline("%s to dust.", Tobjnam(obj, "turn"));
 	    useup(obj);
 	}
 	update_inventory();	/* maybe used a charge */
@@ -2515,12 +2515,10 @@ register const char *str;
 register struct monst *mtmp;
 register const char *force;		/* usually either "." or "!" */
 {
-	int pl = strcmp(str, makesingular(str));
-
 	if((!cansee(bhitpos.x,bhitpos.y) && !canspotmon(mtmp))
 	   || !flags.verbose)
-	    pline("%s %s it.", The(str), pl ? "hit" : "hits");
-	else pline("%s %s %s%s", The(str), pl ? "hit" : "hits",
+	    pline("%s %s it.", The(str), vtense(str, "hit"));
+	else pline("%s %s %s%s", The(str), vtense(str, "hit"),
 		   mon_nam(mtmp), force);
 }
 
@@ -2529,9 +2527,7 @@ miss(str,mtmp)
 register const char *str;
 register struct monst *mtmp;
 {
-	int pl = strcmp(str, makesingular(str));
-
-	pline("%s %s %s.", The(str), pl ? "miss" : "misses",
+	pline("%s %s %s.", The(str), vtense(str, "miss"),
 	      ((cansee(bhitpos.x,bhitpos.y) || canspotmon(mtmp))
 	       && flags.verbose) ?
 	      mon_nam(mtmp) : "it");

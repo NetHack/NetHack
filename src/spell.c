@@ -132,7 +132,7 @@ cursed_book(lev)
 			Your("gloves seem unaffected.");
 		    } else if (uarmg->oeroded2 < MAX_ERODE) {
 			if (uarmg->greased) {
-			    grease_protect(uarmg, "gloves", TRUE, &youmonst);
+			    grease_protect(uarmg, "gloves", &youmonst);
 			} else {
 			    Your("gloves corrode%s!",
 				 uarmg->oeroded2+1 == MAX_ERODE ?

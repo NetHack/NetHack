@@ -588,9 +588,9 @@ int thrown;
 			setmnotwielded(mon,monwep);
 			MON_NOWEP(mon);
 			mon->weapon_check = NEED_WEAPON;
-			pline("%s %s shatter%s from the force of your blow!",
+			pline("%s %s %s from the force of your blow!",
 			      s_suffix(Monnam(mon)), xname(monwep),
-			      (monwep->quan) == 1L ? "s" : "");
+			      otense(monwep, "shatter"));
 			m_useup(mon, monwep);
 			/* If someone just shattered MY weapon, I'd flee! */
 			if (rn2(4)) {
@@ -868,8 +868,8 @@ int thrown;
 	    }
 	    if (obj && !rn2(nopoison)) {
 		obj->opoisoned = FALSE;
-		Your("%s%s no longer poisoned.", xname(obj),
-		     (obj->quan == 1L) ? " is" : "s are");	/**FIXME**/
+		Your("%s %s no longer poisoned.", xname(obj),
+		     otense(obj, "are"));
 	    }
 	    if (resists_poison(mon))
 		needpoismsg = TRUE;

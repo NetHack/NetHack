@@ -173,7 +173,7 @@ register struct obj *obj;
 		    obj->spe = 0;
 		    if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
 			obj->age = 0;
-		    Your("%s vibrates briefly.",xname(obj));
+		    Your("%s %s briefly.",xname(obj), otense(obj, "vibrate"));
 		} else pline(nothing_happens);
 	}
 }
@@ -183,7 +183,7 @@ p_glow1(otmp)
 register struct obj	*otmp;
 {
 	Your("%s %s briefly.", xname(otmp),
-		Blind ? "vibrates" : "glows");
+	     otense(otmp, Blind ? "vibrate" : "glow"));
 }
 
 static void
@@ -191,10 +191,11 @@ p_glow2(otmp,color)
 register struct obj	*otmp;
 register const char *color;
 {
-	Your("%s %s%s for a moment.",
+	Your("%s %s%s%s for a moment.",
 		xname(otmp),
-		Blind ? "vibrates" : "glows ",
-		Blind ? (const char *)"" : hcolor(color));
+		otense(otmp, Blind ? "vibrate" : "glow"),
+		Blind ? "" : " ",
+		Blind ? nul : hcolor(color));
 }
 
 /* Is the object chargeable?  For purposes of inventory display; it is */
@@ -285,8 +286,8 @@ int curse_bless;
 
 	    /* destruction depends on current state, not adjustment */
 	    if (obj->spe > rn2(7) || obj->spe <= -5) {
-		Your("%s pulsates momentarily, then explodes!",
-		     xname(obj));
+		Your("%s %s momentarily, then %s!",
+		     xname(obj), otense(obj,"pulsate"), otense(obj,"explode"));
 		if (is_on) Ring_gone(obj);
 		s = rnd(3 * abs(obj->spe));	/* amount of damage */
 		useup(obj);
@@ -365,7 +366,7 @@ int curse_bless;
 		    stripspe(obj);
 		    if (obj->lamplit) {
 			if (!Blind)
-			    pline("%s goes out!", The(xname(obj)));
+			    pline("%s out!", Tobjnam(obj, "go"));
 			end_burn(obj, TRUE);
 		    }
 		} else if (is_blessed) {
@@ -694,26 +695,28 @@ register struct obj	*sobj;
 			otmp->oerodeproof = !(sobj->cursed);
 			if(Blind) {
 			    otmp->rknown = FALSE;
-			    Your("%s feels warm for a moment.",
-				xname(otmp));
+			    Your("%s %s warm for a moment.",
+				xname(otmp), otense(otmp, "feel"));
 			} else {
 			    otmp->rknown = TRUE;
-			    Your("%s is covered by a %s %s %s!",
-				xname(otmp),
+			    Your("%s %s covered by a %s %s %s!",
+				xname(otmp), otense(otmp, "are"),
 				sobj->cursed ? "mottled" : "shimmering",
 				hcolor(sobj->cursed ? Black : golden),
 				sobj->cursed ? "glow" :
 				  (is_shield(otmp) ? "layer" : "shield"));
 			}
-			if (otmp->oerodeproof && (otmp->oeroded || otmp->oeroded2)) {
+			if (otmp->oerodeproof &&
+			    (otmp->oeroded || otmp->oeroded2)) {
 			    otmp->oeroded = otmp->oeroded2 = 0;
 			    Your("%s %s as good as new!",
-				 xname(otmp), Blind ? "feels" : "looks");
+				 xname(otmp),
+				 otense(otmp, Blind ? "feel" : "look"));
 			}
 			break;
 		}
 		special_armor = is_elven_armor(otmp) ||
-				(Role_if(PM_WIZARD) && otmp->otyp == CORNUTHAUM);
+			(Role_if(PM_WIZARD) && otmp->otyp == CORNUTHAUM);
 		if (sobj->cursed)
 		    same_color =
 			(otmp->otyp == BLACK_DRAGON_SCALE_MAIL ||
@@ -728,11 +731,13 @@ register struct obj	*sobj;
 		/* KMH -- catch underflow */
 		s = sobj->cursed ? -otmp->spe : otmp->spe;
 		if (s > (special_armor ? 5 : 3) && rn2(s)) {
-		Your("%s violently %s%s%s for a while, then evaporates.",
-			    xname(otmp),
-			    Blind ? "vibrates" : "glows",
-			    (!Blind && !same_color) ? " " : nul,
-			    (Blind || same_color) ? nul : hcolor(sobj->cursed ? Black : silver));
+		Your("%s violently %s%s%s for a while, then %s.",
+		     xname(otmp),
+		     otense(otmp, Blind ? "vibrate" : "glow"),
+		     (!Blind && !same_color) ? " " : nul,
+		     (Blind || same_color) ? nul :
+			hcolor(sobj->cursed ? Black : silver),
+		     otense(otmp, "evaporate"));
 			if(is_cloak(otmp)) (void) Cloak_off();
 			if(is_boots(otmp)) (void) Boots_off();
 			if(is_helmet(otmp)) (void) Helmet_off();
@@ -765,7 +770,7 @@ register struct obj	*sobj;
 		Your("%s %s%s%s%s for a %s.",
 			xname(otmp),
 		        s == 0 ? "violently " : nul,
-			Blind ? "vibrates" : "glows",
+			otense(otmp, Blind ? "vibrate" : "glow"),
 			(!Blind && !same_color) ? " " : nul,
 			(Blind || same_color) ? nul : hcolor(sobj->cursed ? Black : silver),
 			  (s*s>1) ? "while" : "moment");
@@ -780,8 +785,8 @@ register struct obj	*sobj;
 
 		if ((otmp->spe > (special_armor ? 5 : 3)) &&
 		    (special_armor || !rn2(7)))
-			Your("%s suddenly vibrates %s.",
-				xname(otmp),
+			Your("%s suddenly %s %s.",
+				xname(otmp), otense(otmp, "vibrate"),
 				Blind ? "again" : "unexpectedly");
 		break;
 	    }
@@ -808,7 +813,7 @@ register struct obj	*sobj;
 		    } else
 			known = TRUE;
 		} else {	/* armor and scroll both cursed */
-		    Your("%s vibrates.", xname(otmp));
+		    Your("%s %s.", xname(otmp), otense(otmp, "vibrate"));
 		    if (otmp->spe >= -6) otmp->spe--;
 		    make_stunned(HStun + rn1(10, 10), TRUE);
 		}

@@ -64,11 +64,11 @@ amulet()
 		if(ttmp->ttyp == MAGIC_PORTAL) {
 		    int du = distu(ttmp->tx, ttmp->ty);
 		    if (du <= 9)
-			pline("%s feels hot!", The(xname(amu)));
+			pline("%s hot!", Tobjnam(amu, "feel"));
 		    else if (du <= 64)
-			pline("%s feels very warm.", The(xname(amu)));
+			pline("%s very warm.", Tobjnam(amu, "feel"));
 		    else if (du <= 144)
-			pline("%s feels warm.", The(xname(amu)));
+			pline("%s warm.", Tobjnam(amu, "feel"));
 		    /* else, the amulet feels normal */
 		    break;
 		}

@@ -120,7 +120,6 @@ struct monst *victim;
 	static NEARDATA const char *action[] = { "smoulder", "rust", "rot", "corrode" };
 	static NEARDATA const char *msg[] =  { "burnt", "rusted", "rotten", "corroded" };
 	boolean vulnerable = FALSE;
-	boolean plural;
 	boolean grprot = FALSE;
 	boolean is_primary = TRUE;
 	boolean vismon = (victim != &youmonst) && canseemon(victim);
@@ -146,40 +145,37 @@ struct monst *victim;
 	if (!print && (!vulnerable || otmp->oerodeproof || erosion == MAX_ERODE))
 		return FALSE;
 
-	plural = (is_gloves(otmp) || is_boots(otmp)) &&
-		!strstri(ostr, "pair of ");	/* "pair of *s" is singular */
-
 	if (!vulnerable) {
 	    if (flags.verbose) {
 		if (victim == &youmonst)
-		    Your("%s %s not affected.", ostr, plural ? "are" : "is");
+		    Your("%s %s not affected.", ostr, vtense(ostr, "are"));
 		else if (vismon)
 		    pline("%s's %s %s not affected.", Monnam(victim), ostr,
-			plural ? "are" : "is");
+			  vtense(ostr, "are"));
 	    }
 	} else if (erosion < MAX_ERODE) {
 	    if (grprot && otmp->greased) {
-		grease_protect(otmp,ostr,plural,victim);
+		grease_protect(otmp,ostr,victim);
 	    } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
 		if (flags.verbose) {
 		    if (victim == &youmonst)
 			pline("Somehow, your %s %s not affected.",
-				ostr, plural ? "are" : "is");
+			      ostr, vtense(ostr, "are"));
 		    else if (vismon)
 			pline("Somehow, %s's %s %s not affected.",
-				mon_nam(victim), ostr, plural ? "are" : "is");
+			      mon_nam(victim), ostr, vtense(ostr, "are"));
 		}
 	    } else {
 		if (victim == &youmonst)
-		    Your("%s %s%s%s!", ostr, action[type],
-			plural ? "" : "s",
-			erosion+1 == MAX_ERODE ? " completely" :
-			erosion ? " further" : "");
+		    Your("%s %s%s!", ostr,
+			 vtense(ostr, action[type]),
+			 erosion+1 == MAX_ERODE ? " completely" :
+			    erosion ? " further" : "");
 		else if (vismon)
-		    pline("%s's %s %s%s%s!", Monnam(victim), ostr, action[type],
-			plural ? "" : "s",
+		    pline("%s's %s %s%s!", Monnam(victim), ostr,
+			vtense(ostr, action[type]),
 			erosion+1 == MAX_ERODE ? " completely" :
-			erosion ? " further" : "");
+			  erosion ? " further" : "");
 		if (is_primary)
 		    otmp->oeroded++;
 		else
@@ -189,23 +185,22 @@ struct monst *victim;
 	} else {
 	    if (flags.verbose) {
 		if (victim == &youmonst)
-		    Your("%s %s%s completely %s.", ostr,
-			Blind ? "feel" : "look",
-			plural ? "" : "s", msg[type]);
+		    Your("%s %s completely %s.", ostr,
+			 vtense(ostr, Blind ? "feel" : "look"),
+			 msg[type]);
 		else if (vismon)
-		    pline("%s's %s look%s completely %s.",
-			Monnam(victim), ostr,
-			plural ? "" : "s", msg[type]);
+		    pline("%s's %s %s completely %s.",
+			  Monnam(victim), ostr,
+			  vtense(ostr, "look"), msg[type]);
 	    }
 	}
 	return(TRUE);
 }
 
 void
-grease_protect(otmp,ostr,plu,victim)
+grease_protect(otmp,ostr,victim)
 register struct obj *otmp;
 register const char *ostr;
-register boolean plu;
 struct monst *victim;
 {
 	static const char txt[] = "protected by the layer of grease!";
@@ -213,10 +208,10 @@ struct monst *victim;
 
 	if (ostr) {
 	    if (victim == &youmonst)
-		Your("%s %s %s",ostr,plu ? "are" : "is", txt);
+		Your("%s %s %s", ostr, vtense(ostr, "are"), txt);
 	    else if (vismon)
 		pline("%s's %s %s %s", Monnam(victim),
-		    ostr, plu ? "are" : "is", txt);
+		    ostr, vtense(ostr, "are"), txt);
 	} else {
 	    if (victim == &youmonst)
 		Your("%s %s",aobjnam(otmp,"are"), txt);
@@ -2375,7 +2370,7 @@ xchar x, y;
 	} else if (is_flammable(obj) && obj->oeroded < MAX_ERODE &&
 		   !(obj->oerodeproof || (obj->blessed && !rnl(4)))) {
 	    if (in_sight) {
-		pline("%s burn%s%s.", Yname2(obj), obj->quan > 1 ? "": "s",
+		pline("%s %s%s.", Yname2(obj), otense(obj, "burn"),
 		      obj->oeroded+1 == MAX_ERODE ? " completely" :
 		      obj->oeroded ? " further" : "");
 	    }
@@ -3292,7 +3287,7 @@ boolean disarm;
 			  insider = (*u.ushops && inside_shop(u.ux, u.uy) &&
 				    *in_rooms(ox, oy, SHOPBASE) == *u.ushops);
 
-			  pline("%s explodes!", The(xname(obj)));
+			  pline("%s!", Tobjnam(obj, "explode"));
 			  Sprintf(buf, "exploding %s", xname(obj));
 
 			  if(costly)

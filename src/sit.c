@@ -335,7 +335,7 @@ rndcurse()			/* curse a few inventory items at random! */
 
 		if(otmp->oartifact && spec_ability(otmp, SPFX_INTEL) &&
 		   rn2(10) < 8) {
-		    pline("%s resists!", The(xname(otmp)));
+		    pline("%s!", Tobjnam(otmp, "resist"));
 		    continue;
 		}
 

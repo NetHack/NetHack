@@ -622,7 +622,7 @@ register struct monst *mon;
 
 			if (bimanual(mw_tmp)) mon_hand = makeplural(mon_hand);
 			Sprintf(welded_buf, "%s welded to %s %s",
-				(mw_tmp->quan == 1L) ? "is" : "are",
+				otense(mw_tmp, "are"),
 				mhis(mon), mon_hand);
 
 			if (obj->otyp == PICK_AXE) {
@@ -651,8 +651,7 @@ register struct monst *mon;
 		    if (obj->cursed && obj->otyp != CORPSE) {
 			pline("%s %s to %s %s!",
 			    The(xname(obj)),
-			    (obj->quan == 1L) ? "welds itself"
-				: "weld themselves",
+			    is_plural(obj) ? "welds itself" : "weld themselves",
 			    s_suffix(mon_nam(mon)), mbodypart(mon,HAND));
 			obj->bknown = 1;
 		    }
@@ -660,8 +659,8 @@ register struct monst *mon;
 		if (artifact_light(obj) && !obj->lamplit) {
 		    begin_burn(obj, FALSE);
 		    if (canseemon(mon))
-			pline("%s glows brilliantly in %s %s!",
-			    The(xname(obj)), 
+			pline("%s brilliantly in %s %s!",
+			    Tobjnam(obj, "glow"), 
 			    s_suffix(mon_nam(mon)), mbodypart(mon,HAND));
 		}
 		obj->owornmask = W_WEP;
@@ -1215,8 +1214,9 @@ register struct obj *obj;
     if (artifact_light(obj) && obj->lamplit) {
 	end_burn(obj, FALSE);
 	if (canseemon(mon))
-	    pline("%s in %s %s stops glowing.", The(xname(obj)),
-		s_suffix(mon_nam(mon)), mbodypart(mon,HAND));
+	    pline("%s in %s %s %s glowing.", The(xname(obj)),
+		  s_suffix(mon_nam(mon)), mbodypart(mon,HAND),
+		  otense(obj, "stop"));
     }
     obj->owornmask &= ~W_WEP;
 }
