@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.4	2002/01/02	*/
+/*	SCCS Id: @(#)eat.c	3.4	2002/03/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -316,8 +316,7 @@ register struct obj *otmp;
 	if (!otmp->oeaten) {
 	    if(((!carried(otmp) && costly_spot(otmp->ox, otmp->oy) &&
 		 !otmp->no_charge)
-		 || otmp->unpaid) &&
-		 (otmp->otyp == CORPSE || objects[otmp->otyp].oc_delay > 1)) {
+		 || otmp->unpaid)) {
 		/* create a dummy duplicate to put on bill */
 		verbalize("You bit it, you bought it!");
 		bill_dummy_object(otmp);
