@@ -15,6 +15,13 @@
  */
 
 struct flag {
+#ifdef SAVEFILE_340_CONVERT
+	int	 version;	/* flag structure version */
+	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */
+	boolean  showrace;	/* show hero glyph by race rather than by role */
+	boolean  travelcmd;	/* allow travel command */
+	int	 runmode;	/* update screen display during run moves */
+#endif
 #ifdef AMIFLUSH
 	boolean  altmeta;	/* use ALT keys as META */
 	boolean  amiflush;	/* kill typeahead */
@@ -254,11 +261,13 @@ struct instance_flags {
 	boolean wc_eight_bit_input;	/* allow eight bit input               */
 	boolean wc_mouse_support;	/* allow mouse support */
 
+#ifndef SAVEFILE_340_CONVERT
 	/* Items which belong in flags, but are here to allow save compatibility */
 	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */
 	boolean  showrace;	/* show hero glyph by race rather than by role */
 	boolean  travelcmd;	/* allow travel command */
 	int	 runmode;	/* update screen display during run moves */
+#endif
 };
 
 /*
@@ -288,5 +297,112 @@ extern NEARDATA struct instance_flags iflags;
 #define RUN_LEAP	1	/* update display every 7 steps */
 #define RUN_STEP	2	/* update display every single step */
 #define RUN_CRAWL	3	/* walk w/ extra delay after each update */
+
+#ifndef SAVEFILE_340_CONVERT
+# define Xflags iflags
+#else
+# define Xflags flags
+/* This is identical to 3.4.0 flag structure */
+struct flag340 {
+#ifdef AMIFLUSH
+	boolean  altmeta;	/* use ALT keys as META */
+	boolean  amiflush;	/* kill typeahead */
+#endif
+#ifdef	MFLOPPY
+	boolean  asksavedisk;
+#endif
+	boolean  autodig;       /* MRKR: Automatically dig */
+	boolean  autoquiver;	/* Automatically fill quiver */
+	boolean  beginner;
+#ifdef MAIL
+	boolean  biff;		/* enable checking for mail */
+#endif
+	boolean  botl;		/* partially redo status line */
+	boolean  botlx;		/* print an entirely new bottom line */
+	boolean  confirm;	/* confirm before hitting tame monsters */
+	boolean  debug;		/* in debugging mode */
+	boolean  end_own;	/* list all own scores */
+	boolean  explore;	/* in exploration mode */
+#ifdef OPT_DISPMAP
+	boolean  fast_map;	/* use optimized, less flexible map display */
+#endif
+#define discover flags.explore
+	boolean  female;
+	boolean  forcefight;
+	boolean  friday13;	/* it's Friday the 13th */
+	boolean  help;		/* look in data file for info about stuff */
+	boolean  ignintr;	/* ignore interrupts */
+#ifdef INSURANCE
+	boolean  ins_chkpt;	/* checkpoint as appropriate */
+#endif
+	boolean  invlet_constant; /* let objects keep their inventory symbol */
+	boolean  legacy;	/* print game entry "story" */
+	boolean  lit_corridor;	/* show a dark corr as lit if it is in sight */
+	boolean  made_amulet;
+	boolean  mon_moving;	/* monsters' turn to move */
+	boolean  move;
+	boolean  mv;
+	boolean  bypasses;	/* bypass flag is set on at least one fobj */
+	boolean  nap;		/* `timed_delay' option for display effects */
+	boolean  nopick;	/* do not pickup objects (as when running) */
+	boolean  null;		/* OK to send nulls to the terminal */
+#ifdef MAC
+	boolean  page_wait;	/* put up a --More-- after a page of messages */
+#endif
+	boolean  perm_invent;	/* keep full inventories up until dismissed */
+	boolean  pickup;	/* whether you pickup or move and look */
+
+	boolean  pushweapon;	/* When wielding, push old weapon into second slot */
+	boolean  rest_on_space; /* space means rest */
+	boolean  safe_dog;	/* give complete protection to the dog */
+#ifdef EXP_ON_BOTL
+	boolean  showexp;	/* show experience points */
+#endif
+#ifdef SCORE_ON_BOTL
+	boolean  showscore;	/* show score */
+#endif
+	boolean  silent;	/* whether the bell rings or not */
+	boolean  sortpack;	/* sorted inventory */
+	boolean  soundok;	/* ok to tell about sounds heard */
+	boolean  sparkle;	/* show "resisting" special FX (Scott Bigham) */
+	boolean  standout;	/* use standout for --More-- */
+	boolean  time;		/* display elapsed 'time' */
+	boolean  tombstone;	/* print tombstone */
+	boolean  toptenwin;	/* ending list in window instead of stdout */
+	boolean  verbose;	/* max battle info */
+	boolean  prayconfirm;	/* confirm before praying */
+	int	 end_top, end_around;	/* describe desired score list */
+	unsigned ident;		/* social security number for each monster */
+	unsigned moonphase;
+	unsigned long suppress_alert;
+
+
+	unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
+	boolean  travel;	/* find way automatically to u.tx,u.ty */
+	unsigned run;		/* 0: h (etc), 1: H (etc), 2: fh (etc) */
+				/* 3: FH, 4: ff+, 5: ff-, 6: FF+, 7: FF- */
+				/* 8: travel */
+	unsigned long warntype; /* warn_of_mon monster type M2 */
+	int	 warnlevel;
+	int	 djinni_count, ghost_count;	/* potion effect tuning */
+	int	 pickup_burden;		/* maximum burden before prompt */
+	char	 inv_order[MAXOCLASSES];
+	char	 pickup_types[MAXOCLASSES];
+	char	 end_disclose[NUM_DISCLOSURE_OPTIONS + 1];  /* disclose various info
+								upon exit */
+	char	 menu_style;	/* User interface style setting */
+#ifdef AMII_GRAPHICS
+	int numcols;
+	unsigned short amii_dripens[ 20 ]; /* DrawInfo Pens currently there are 13 in v39 */
+	AMII_COLOR_TYPE amii_curmap[ AMII_MAXCOLORS ]; /* colormap */
+#endif
+	int	 initrole;	/* starting role      (index into roles[])   */
+	int	 initrace;	/* starting race      (index into races[])   */
+	int	 initgend;	/* starting gender    (index into genders[]) */
+	int	 initalign;	/* starting alignment (index into aligns[])  */
+	int	 randomall;	/* randomly assign everything not specified */
+	int	 pantheon;	/* deity selection for priest character */
+};
+#endif /*SAVEFILE_340_CONVERT */
 
 #endif /* FLAG_H */

@@ -30,6 +30,12 @@ STATIC_DCL boolean FDECL(restgamestate, (int, unsigned int *, unsigned int *));
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
 STATIC_DCL int FDECL(restlevelfile, (int,XCHAR_P));
 STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
+#ifdef SAVEFILE_340_CONVERT
+STATIC_DCL void FDECL(mread_set_checkpoint, (int));
+STATIC_DCL void FDECL(mread_seek_to_checkpoint, (int));
+STATIC_DCL void FDECL(mread_clear_checkpoint, (int));
+STATIC_DCL void FDECL(convertflags, (genericptr_t, struct flag *));
+#endif
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -371,7 +377,22 @@ unsigned int *stuckid, *steedid;	/* STEED */
 		return FALSE;
 	}
 
+#ifndef SAVEFILE_340_CONVERT
+	mread(fd, (genericptr_t) &flags, sizeof(struct flag));	
+#else
+	mread_set_checkpoint(fd);
 	mread(fd, (genericptr_t) &flags, sizeof(struct flag));
+	if (flags.version != 341) {
+		struct flag340 oldflags;
+		/* We need to try again and convert it */
+		mread_seek_to_checkpoint(fd);
+		mread(fd, (genericptr_t) &oldflags, sizeof(struct flag340));
+		convertflags((genericptr_t)&oldflags, &flags);
+		pline("Converted older savefile flags to new format.");
+	}
+	mread_clear_checkpoint(fd);
+#endif
+		
 	flags.bypasses = 0;	/* never use the saved value of bypasses */
 	if (remember_discover) discover = remember_discover;
 
@@ -1077,4 +1098,183 @@ register unsigned int len;
 }
 #endif /* ZEROCOMP */
 
+#ifdef SAVEFILE_340_CONVERT
+struct mread_checkpoint_data {
+	int mreadfd;
+	long mreadloc;	/* from tell() */
+# ifdef ZEROCOMP
+	unsigned char inbuf[ZEROCOMP_BUFSIZ];
+	unsigned short inbufp;
+	unsigned short inbufsz;
+	short inrunlength;
+# endif
+};
+static NEARDATA struct mread_checkpoint_data mrcheckpoint;
+
+static void
+mread_set_checkpoint(fd)
+int fd;
+{
+    mrcheckpoint.mreadfd = fd;
+    mrcheckpoint.mreadloc = tell(fd);
+# ifdef ZEROCOMP
+    memcpy(mrcheckpoint.inbuf, inbuf, ZEROCOMP_BUFSIZ);
+    mrcheckpoint.inbufp = inbufp;
+    mrcheckpoint.inbufsz = inbufsz;
+    mrcheckpoint.inrunlength = inrunlength;
+# endif
+};
+
+static void
+mread_seek_to_checkpoint(fd)
+{
+    long floc;
+    if (mrcheckpoint.mreadfd != fd)
+	panic("mread_seek_to_checkpoint: bad mrcheckpoint.mreadfd %d", fd);
+    floc = lseek(fd, mrcheckpoint.mreadloc, SEEK_SET);
+#ifdef ZEROCOMP
+    memcpy(inbuf, mrcheckpoint.inbuf, ZEROCOMP_BUFSIZ);
+    inbufp = mrcheckpoint.inbufp;
+    inbufsz = mrcheckpoint.inbufsz;
+    inrunlength = mrcheckpoint.inrunlength;
+#endif
+}
+
+static void
+mread_clear_checkpoint(fd)
+int fd;
+{
+    if (mrcheckpoint.mreadfd != fd)
+		panic("mread_clear_checkpoint: bad mrcheckpoint.mreadfd %d", fd);
+    mrcheckpoint.mreadfd = 0;
+    mrcheckpoint.mreadloc = 0L;
+# ifdef ZEROCOMP
+    /* memset((genericptr_t)mrcheckpoint.inbuf, 0, ZEROCOMP_BUFSIZ); */
+    mrcheckpoint.inbufsz = 0;
+    mrcheckpoint.inbufp = 0;
+    mrcheckpoint.inrunlength = -1;
+# endif
+}
+
+void
+convertflags(oldflagptr, newflags)
+genericptr_t oldflagptr;
+struct flag *newflags;
+{
+	int k;
+	struct flag340 *oldflags = (struct flag340 *)oldflagptr;
+
+	/* set default values for these; they didn't exist in savefile*/
+	newflags->version = 341;
+	newflags->lootabc = FALSE;
+	newflags->showrace = FALSE;
+	newflags->travelcmd = TRUE;
+	newflags->runmode = RUN_LEAP;
+
+	/* convert these */
+#ifdef AMIFLUSH
+	newflags->altmeta = oldflags->altmeta;
+	newflags->amiflush = oldflags->amiflush;	
+#endif
+#ifdef	MFLOPPY
+	newflags->asksavedisk = oldflags->asksavedisk;
+#endif
+	newflags->autodig = oldflags->autodig;
+	newflags->autoquiver = oldflags->autoquiver;
+	newflags->beginner = oldflags->beginner;
+#ifdef MAIL
+	newflags->biff = oldflags->biff;
+#endif
+	newflags->botl = oldflags->botl;
+	newflags->botlx = oldflags->botlx;
+	newflags->confirm = oldflags->confirm;
+	newflags->debug = oldflags->debug;
+	newflags->end_own = oldflags->end_own;
+	newflags->explore = oldflags->explore;
+#ifdef OPT_DISPMAP
+	newflags->fast_map = oldflags->fast_map;
+#endif
+#define discover flags.explore
+	newflags->female = oldflags->female;
+	newflags->forcefight = oldflags->forcefight;
+	newflags->friday13 = oldflags->friday13;
+	newflags->help = oldflags->help;
+	newflags->ignintr = oldflags->ignintr;
+#ifdef INSURANCE
+	newflags->ins_chkpt = oldflags->ins_chkpt;
+#endif
+	newflags->invlet_constant = oldflags->invlet_constant;
+	newflags->invlet_constant = oldflags->invlet_constant;
+	newflags->legacy = oldflags->legacy;
+	newflags->lit_corridor = oldflags->lit_corridor;
+	newflags->made_amulet = oldflags->made_amulet;
+	newflags->mon_moving = oldflags->mon_moving;
+	newflags->move = oldflags->move;
+	newflags->mv = oldflags->mv;
+	newflags->bypasses = oldflags->bypasses;
+	newflags->nap = oldflags->nap;
+	newflags->nopick = oldflags->nopick;
+	newflags->null = oldflags->null;
+#ifdef MAC
+	newflags->page_wait = oldflags->page_wait;
+#endif
+	newflags->perm_invent = oldflags->perm_invent;
+	newflags->pickup = oldflags->pickup;
+	newflags->pushweapon = oldflags->pushweapon;
+	newflags->rest_on_space = oldflags->rest_on_space;
+	newflags->safe_dog = oldflags->safe_dog;
+#ifdef EXP_ON_BOTL
+	newflags->showexp = oldflags->showexp;
+#endif
+#ifdef SCORE_ON_BOTL
+	newflags->showscore = oldflags->showscore;
+#endif
+	newflags->silent = oldflags->silent;
+	newflags->sortpack = oldflags->sortpack;
+	newflags->soundok = oldflags->soundok;
+	newflags->sparkle = oldflags->sparkle;
+	newflags->standout = oldflags->standout;
+	newflags->time = oldflags->time;
+	newflags->tombstone = oldflags->tombstone;
+	newflags->toptenwin = oldflags->toptenwin;
+	newflags->verbose = oldflags->verbose;
+	newflags->prayconfirm = oldflags->prayconfirm;
+	newflags->end_top = oldflags->end_top;
+	newflags->end_around = oldflags->end_around;
+	newflags->ident = oldflags->ident;
+	newflags->moonphase = oldflags->moonphase;
+	newflags->suppress_alert = oldflags->suppress_alert;
+	newflags->no_of_wizards = oldflags->no_of_wizards;
+	newflags->travel = oldflags->travel;
+	newflags->run = oldflags->run;
+	newflags->warntype = oldflags->warntype;
+	newflags->warnlevel = oldflags->warnlevel;
+	newflags->djinni_count = oldflags->djinni_count;
+	newflags->ghost_count = oldflags->ghost_count;
+	newflags->pickup_burden = oldflags->pickup_burden;
+	for (k = 0; k < MAXOCLASSES; ++k) {
+		newflags->inv_order[k] = oldflags->inv_order[k];
+		newflags->pickup_types[k] = oldflags->pickup_types[k];
+	}
+	for (k = 0; k < NUM_DISCLOSURE_OPTIONS + 1; ++k) {
+		newflags->end_disclose[k] = oldflags->end_disclose[k];
+	}
+	newflags->menu_style = oldflags->menu_style;
+#ifdef AMII_GRAPHICS
+	newflags->numcols = oldflags->numcols;
+	for (k = 0; k < 20; ++k) {
+		newflags->amii_dripens[k] = oldflags->amii_dripens[k];
+	}
+	for (k = 0; k < AMII_MAXCOLORS; ++k) {
+		newflags->amii_curmap[k] = oldflags->amii_curmap[k];
+	}
+#endif
+	newflags->initrole = oldflags->initrole;
+	newflags->initrace = oldflags->initrace;
+	newflags->initgend = oldflags->initgend;
+	newflags->initalign = oldflags->initalign;
+	newflags->randomall = oldflags->randomall;
+	newflags->pantheon = oldflags->pantheon;
+}
+#endif
 /*restore.c*/

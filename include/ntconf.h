@@ -19,6 +19,8 @@
 #define PC_LOCKING		/* Prevent overwrites of aborted or in-progress games */
 				/* without first receiving confirmation. */
 
+#define SAVEFILE_340_CONVERT	/* allow moving of some iflags fields to flags
+					without destroying savefile compatibility */
 
 /*
  * -----------------------------------------------------------------

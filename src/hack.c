@@ -1368,13 +1368,13 @@ domove()
 	    nomovemsg = "";
 	}
 
-	if (flags.run && iflags.runmode != RUN_TPORT) {
+	if (flags.run && Xflags.runmode != RUN_TPORT) {
 	    /* display every step or every 7th step depending upon mode */
-	    if (iflags.runmode != RUN_LEAP || !(moves % 7L)) {
+	    if (Xflags.runmode != RUN_LEAP || !(moves % 7L)) {
 		if (flags.time) flags.botl = 1;
 		curs_on_u();
 		delay_output();
-		if (iflags.runmode == RUN_CRAWL) {
+		if (Xflags.runmode == RUN_CRAWL) {
 		    delay_output();
 		    delay_output();
 		    delay_output();

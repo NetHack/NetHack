@@ -1753,7 +1753,7 @@ register char *cmd;
 		    multi = 0;
 		    return;
 	 case CMD_TRAVEL:
-		    if (iflags.travelcmd) {
+		    if (Xflags.travelcmd) {
 			    flags.travel = 1;
 			    flags.run = 8;
 			    flags.nopick = 1;
@@ -1954,7 +1954,7 @@ click_to_cmd(x, y, mod)
     x -= u.ux;
     y -= u.uy;
 
-    if (iflags.travelcmd) {
+    if (Xflags.travelcmd) {
         if (abs(x) <= 1 && abs(y) <= 1 ) {
             x = sgn(x), y = sgn(y);
         } else {
@@ -2180,7 +2180,7 @@ dotravel()
 	static char cmd[2];
 	coord cc;
 
-	if (!iflags.travelcmd) return 0;
+	if (!Xflags.travelcmd) return 0;
 	cmd[1]=0;
 	cc.x = u.ux;
 	cc.y = u.uy;
