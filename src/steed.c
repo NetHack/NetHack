@@ -300,8 +300,13 @@ mount_steed(mtmp, force)
 	    return (FALSE);
 	}
 	if (!force && (Confusion || Fumbling || Glib || Wounded_legs ||
-			otmp->cursed || (u.ulevel+mtmp->mtame < rnd(MAXULEV/2+5)))) {
+		otmp->cursed || (u.ulevel+mtmp->mtame < rnd(MAXULEV/2+5)))) {
+	    if (Levitation) {
+		pline("%s slips away from you.", Monnam(mtmp));
+		return FALSE;
+	    }
 	    You("slip while trying to get on %s.", mon_nam(mtmp));
+
 	    /* Unfortunately we don't have a version of the monster-naming
 	     * function that works well with "a" and "the" but ignores
 	     * hallucination.  Fortunately, we know the monster must be saddled
