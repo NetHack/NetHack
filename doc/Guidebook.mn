@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 20, 2002
+.ds f2 "June 1, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1628,11 +1628,6 @@ into account the blessed/cursed status, enchantment, damage, or
 quality of the weapon; you are free to manually fill your quiver with
 the `Q' command instead.  If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  (default false)
-.lp "BIOS    "
-Use BIOS calls to update the screen
-display quickly and to read the keyboard (allowing the use of arrow
-keys to move) on machines with an IBM PC compatible BIOS ROM (default off,
-OS/2, PC, and ST NetHack only).
 .lp boulder
 Set the character used to display boulders (default is rock class symbol).
 .lp catname
@@ -1977,11 +1972,6 @@ something pushes the old item into your secondary weapon slot (default off).
 .lp race
 Selects your race (for example, ``race:human'').  Default is random.
 Cannot be set with the `O' command.
-.lp "rawio   "
-Force raw (non-cbreak) mode for faster output and more
-bulletproof input (MS-DOS sometimes treats `^P' as a printer toggle
-without it) (default off).  Note:  DEC Rainbows hang if this is turned on.
-Cannot be set with the `O' command.
 .lp rest_on_space
 Make the space bar a synonym for the `.' (rest) command (default off).
 .lp "role    "
@@ -2054,19 +2044,6 @@ Cannot be set with the `O' command.
 Allow the travel command (default on).
 .lp verbose
 Provide more commentary during the game (default on).
-.lp videocolors
-Set the color palette for PC systems using NO_TERMS
-(default 4-2-6-1-5-3-15-12-10-14-9-13-11).
-The order of colors is red, green, brown, blue, magenta, cyan,
-bright.white, bright.red, bright.green, yellow, bright.blue,
-bright.magenta, and bright.cyan.
-Cannot be set with the `O' command.
-.lp videoshades
-Set the intensity level of the three gray scales available
-(default dark normal light, PC NetHack only).
-If the game display is difficult to read, try adjusting these scales;
-if this does not correct the problem, try !color.
-Cannot be set with the `O' command.
 .lp windowtype
 Select which windowing system to use, such as ``tty'' or ``X11''
 (default depends on version).
@@ -2162,6 +2139,52 @@ the message window.
 .lp windowcolors
 NetHack should display windows with the specified foreground/background
 colors if it can.
+.hn 2
+Platform-specific Customization options
+.pg
+Here are explanations of options that are used by specific platforms or ports 
+to customize and change the port behaviour.
+.lp altmeta
+(default on, AMIGA NetHack only).
+.lp "BIOS    "
+Use BIOS calls to update the screen
+display quickly and to read the keyboard (allowing the use of arrow
+keys to move) on machines with an IBM PC compatible BIOS ROM (default off,
+OS/2, PC, and ST NetHack only).
+.lp flush
+(default off, AMIGA NetHack only).
+.lp "MACgraphics"
+(default on, Mac NetHack only).
+.lp page_wait
+(default on, Mac NetHack only).
+.lp "rawio   "
+Force raw (non-cbreak) mode for faster output and more
+bulletproof input (MS-DOS sometimes treats `^P' as a printer toggle
+without it) (default off, OS/2, PC, and ST NetHack only).
+Note:  DEC Rainbows hang if this is turned on.
+Cannot be set with the `O' command.
+.lp soundcard
+(default on, PC NetHack only).
+Cannot be set with the `O' command.
+.lp video
+Set the video mode used (PC NetHack only).
+Values are `autodetect', `default', or `vga'.
+Setting `vga' (or `autodetect' with vga hardware present) will cause
+the game to display tiles. 
+Cannot be set with the `O' command.
+.lp videocolors
+Set the color palette for PC systems using NO_TERMS
+(default 4-2-6-1-5-3-15-12-10-14-9-13-11, (PC NetHack only).
+The order of colors is red, green, brown, blue, magenta, cyan,
+bright.white, bright.red, bright.green, yellow, bright.blue,
+bright.magenta, and bright.cyan.
+Cannot be set with the `O' command.
+.lp videoshades
+Set the intensity level of the three gray scales available
+(default dark normal light, PC NetHack only).
+If the game display is difficult to read, try adjusting these scales;
+if this does not correct the problem, try !color.
+Cannot be set with the `O' command.
 .hn 2
 Configuring NetHack for Play by the Blind
 .pg
