@@ -318,31 +318,31 @@ struct istat_s {
 
 /* If entries are added to this, botl.h will require updating too */
 struct istat_s blstats[2][MAXBLSTATS] = {
-	{
-	{ 0L, P_STR, (genericptr_t)0, (char *)0, 80, 0},	/*  0 BL_TITLE */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  1 BL_STR */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  2 BL_DX */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  3 BL_CO */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  4 BL_IN */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  5 BL_WI */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  6 BL_CH */
-	{ 0L, P_STR, (genericptr_t)0, (char *)0, 40,  0},	/*  7 BL_ALIGN */
-	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 20, 0},	/*  8 BL_SCORE */
-	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 20, 0},	/*  9 BL_CAP */
-	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 10,  0},	/* 10 BL_GOLD */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
-	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 10,  0},	/* 13 BL_XP */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/* 14 BL_AC */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/* 15 BL_HD */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 20, 0},	/* 16 BL_TIME */
-	{ 0L, P_UINT,(genericptr_t)0, (char *)0, 40, 0},	/* 17 BL_HUNGER */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,BL_HPMAX},	/* 18 BL_HP */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10, 0},	/* 19 BL_HPMAX */
-	{ 0L, P_STR, (genericptr_t)0, (char *)0, 80, 0},	/* 20 BL_LEVELDESC */
-	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 20, 0},	/* 21 BL_EXP */
-	{ 0L, P_MASK,(genericptr_t)0, (char *)0, 0, 0},		/* 22 BL_CONDITION */
-	}
+    {
+    { 0L, P_STR, {(genericptr_t)0}, (char *)0, 80, 0 },	/*  0 BL_TITLE */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  1 BL_STR */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  2 BL_DX */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  3 BL_CO */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  4 BL_IN */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  5 BL_WI */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  6 BL_CH */
+    { 0L, P_STR, {(genericptr_t)0}, (char *)0, 40,  0},	/*  7 BL_ALIGN */
+    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 20, 0},	/*  8 BL_SCORE */
+    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 20, 0},	/*  9 BL_CAP */
+    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 10,  0},	/* 10 BL_GOLD */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
+    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 10,  0},	/* 13 BL_XP */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/* 14 BL_AC */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/* 15 BL_HD */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 20, 0},	/* 16 BL_TIME */
+    { 0L, P_UINT,{(genericptr_t)0}, (char *)0, 40, 0},	/* 17 BL_HUNGER */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,BL_HPMAX},	/* 18 BL_HP */
+    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10, 0},	/* 19 BL_HPMAX */
+    { 0L, P_STR, {(genericptr_t)0}, (char *)0, 80, 0},	/* 20 BL_LEVELDESC */
+    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 20, 0},	/* 21 BL_EXP */
+    { 0L, P_MASK,{(genericptr_t)0}, (char *)0, 0, 0}	/* 22 BL_CONDITION */
+    }
 };
 
 static boolean blinit = FALSE, update_all = FALSE;
@@ -442,7 +442,6 @@ bot()
 {
 	char buf[BUFSZ];
 	register char *nb;
-	static boolean init = FALSE;
 	static int idx = 0, idx_p, idxmax;
 	boolean updated = FALSE;
 	unsigned ptype;
@@ -779,7 +778,6 @@ int idx, chg, percent;
 genericptr_t ptr;
 {
 	char newbot1[MAXCO], newbot2[MAXCO];
-	static int init = FALSE;
 	long cond;
 	register int i;
 	char *text = (char *)ptr;
