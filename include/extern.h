@@ -1481,7 +1481,7 @@ E int NDECL(doloot);
 E int FDECL(use_container, (struct obj *,int));
 E int FDECL(loot_mon, (struct monst *,int *,boolean *));
 E int NDECL(dotip);
-E char *FDECL(safe_qbuf, (char *,unsigned,char *,char *,const char *));
+E char *FDECL(safe_qbuf, (char *,unsigned,char *,char *,char *));
 
 /* ### pline.c ### */
 

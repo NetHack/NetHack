@@ -540,7 +540,7 @@ menu_pickup:
 		    char qbuf[BUFSZ];
 		    Sprintf(qbuf, "Pick up %s?",
 			safe_qbuf("", sizeof("Pick up ?"), doname(obj),
-					an(simple_typename(obj->otyp)), something));
+					an(simple_typename(obj->otyp)), "something"));
 		    switch ((obj->quan < 2L) ? ynaq(qbuf) : ynNaq(qbuf)) {
 		    case 'q': goto end_query;	/* out 2 levels */
 		    case 'n': continue;
@@ -1132,7 +1132,7 @@ boolean telekinesis;
 			moderateloadmsg);
 		Sprintf(eos(qbuf), " %s. Continue?",
 			safe_qbuf(qbuf, sizeof(" . Continue?"),
-				doname(obj), an(simple_typename(obj->otyp)), something));
+				doname(obj), an(simple_typename(obj->otyp)), "something"));
 		obj->quan = savequan;
 		switch (ynq(qbuf)) {
 		case 'q':  result = -1; break;
@@ -1156,8 +1156,7 @@ boolean telekinesis;
  */
 char *
 safe_qbuf(qbuf, padlength, planA, planB, last_resort)
-char *qbuf, *planA, *planB;
-const char *last_resort;
+char *qbuf, *planA, *planB, *last_resort;
 unsigned padlength;
 {
 	unsigned textleft = QBUFSZ - (strlen(qbuf) + padlength);
