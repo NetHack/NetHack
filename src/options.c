@@ -140,7 +140,7 @@ static struct Bool_Opt
 	{"prayconfirm", &flags.prayconfirm, TRUE, SET_IN_GAME},
 	{"preload_tiles", &iflags.wc_preload_tiles, TRUE, DISP_IN_GAME},	/*WC*/
 	{"pushweapon", &flags.pushweapon, FALSE, SET_IN_GAME},
-#if defined(MICRO) && !defined(AMIGA)
+#if defined(MICRO) && !defined(AMIGA) && !defined(MSWIN_GRAPHICS)
 	{"rawio", &iflags.rawio, FALSE, DISP_IN_GAME},
 #else
 	{"rawio", (boolean *)0, FALSE, SET_IN_FILE},
@@ -3166,36 +3166,37 @@ char *op;
 
 		wn = tfg = tbg = (char *)0;
 
-		/* until first non-space in case there's leading spaces*/
+		/* until first non-space in case there's leading spaces - before colorname*/
 		while(*newop && isspace(*newop)) newop++;
 		if (*newop) wn = newop;
 		else return 0;
 
-		/* until first space */
+		/* until first space - colorname*/
 		while(*newop && !isspace(*newop)) newop++;
 		if (*newop) *newop = '\0';
+		else return 0;
 		newop++;
 
-		/* until first non-space */
+		/* until first non-space - before foreground*/
 		while(*newop && isspace(*newop)) newop++;
 		if (*newop) tfg = newop;
 		else return 0;
 
-		/* until slash */
+		/* until slash - foreground */
 		while(*newop && *newop != '/') newop++;
 		if (*newop) *newop = '\0';
 		else return 0;
 		newop++;
 
-		/* until first non-space (in case there's leading space after slash) */
+		/* until first non-space (in case there's leading space after slash) - before background */
 		while(*newop && isspace(*newop)) newop++;
 		if (*newop) tbg = newop;
 		else return 0;
 
-		/* until first space */
+		/* until first space - background */
 		while(*newop && !isspace(*newop)) newop++;
-		if (*newop) *newop = '\0';
-		newop++;
+		if (*newop) *newop++ = '\0';
+
 		for (j = 0; j < 4; ++j) {
 			if (!strcmpi(wn, wnames[j]) ||
 			    !strcmpi(wn, shortnames[j])) {

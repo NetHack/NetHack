@@ -794,15 +794,12 @@ boolean is_rlevel;
 	/* Use a loop: char != uchar on some machines. */
 	for (i = 0; i < MAXMCLASSES; i++)
 	    monsyms[i] = def_monsyms[i];
-# ifdef ASCIIGRAPH
+# if defined(ASCIIGRAPH) && !defined(MSWIN_GRAPHICS)
 	if (iflags.IBMgraphics
 #  if defined(USE_TILES) && defined(MSDOS)
 		&& !iflags.grmode
 #  endif
-#  if defined(MSWIN_GRAPHICS)
-		&& 0
-#  endif
-				)
+		)
 	    monsyms[S_HUMAN] = 0x01; /* smiley face */
 # endif
 	for (i = 0; i < MAXPCHARS; i++)

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)ntconf.h	3.4	1996/10/14	*/
+/*	SCCS Id: @(#)ntconf.h	3.4	2002/03/10	*/
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,15 +8,12 @@
 /* #define SHELL	/* nt use of pcsys routines caused a hang */
 
 #define RANDOM		/* have Berkeley random(3) */
-
 #define TEXTCOLOR	/* Color text */
 
-#define PATHLEN		64	/* maximum pathlength */
-#define FILENAME	80	/* maximum filename length (conservative) */
 #define EXEPATH			/* Allow .exe location to be used as HACKDIR */
 #define TRADITIONAL_GLYPHMAP	/* Store glyph mappings at level change time */
 #ifdef WIN32CON
-#define LAN_FEATURES		/* Include code for lan-aware features. */
+#define LAN_FEATURES		/* Include code for lan-aware features. Untested in 3.4.0*/
 #endif
 
 #define PC_LOCKING		/* Prevent overwrites of aborted or in-progress games */
@@ -62,6 +59,19 @@
 #undef randomize
 #undef random
 #endif
+
+#define PATHLEN		BUFSZ /* maximum pathlength */
+#define FILENAME	BUFSZ /* maximum filename length (conservative) */
+
+#if defined(_MAX_PATH) && defined(_MAX_FNAME)
+# if (_MAX_PATH < BUFSZ) && (_MAX_FNAME < BUFSZ)
+#undef PATHLEN
+#undef FILENAME
+#define PATHLEN		_MAX_PATH
+#define FILENAME	_MAX_FNAME
+# endif
+#endif
+
 
 #define NO_SIGNAL
 #define index	strchr
