@@ -59,6 +59,10 @@ extern void FDECL(nethack_exit,(int));
 #define nethack_exit exit
 #endif
 
+#if defined(MSWIN_GRAPHICS)
+extern void NDECL(mswin_destroy_reg);
+#endif
+
 #ifdef EXEPATH
 STATIC_DCL char *FDECL(exepath,(char *));
 #endif
@@ -236,7 +240,13 @@ char *argv[];
 #endif /*MSWIN_GRAPHICS*/
 			nethack_exit(EXIT_SUCCESS);
 		}
-		
+
+#ifdef MSWIN_GRAPHICS
+		if (!strncmpi(argv[1], "-clearreg", 6)) {	/* clear registry */
+			mswin_destroy_reg();
+			nethack_exit(EXIT_SUCCESS);
+		}
+#endif
 		/* Don't initialize the window system just to print usage */
 		if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
 			nhusage();
