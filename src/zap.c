@@ -3518,6 +3518,8 @@ const char *msg;
 		spoteffects(TRUE);	/* possibly drown, notice objects */
 }
 
+#define MIN_ICE_TIME 50
+#define MAX_ICE_TIME 2000
 /*
  * Start a melt_ice timer.
  */
@@ -3525,13 +3527,16 @@ void
 start_melt_ice_timeout(x,y)
 xchar x,y;
 {
-	long when, where;
+	int when;
+	long where;
 	short action = MELT_ICE_AWAY;
-	for (when = 50L; when < 2000L; when++)
-		if (!rn2(3)) break;
+	for (when = MIN_ICE_TIME; when < (MAX_ICE_TIME + MIN_ICE_TIME); when++)
+		if (!rn2((MAX_ICE_TIME - when) + MIN_ICE_TIME)) break;
 	where = (((long)x << 16) | ((long)y));
-	(void) start_timer(when, TIMER_LEVEL, action, (genericptr_t)where);
+	(void) start_timer((long)when, TIMER_LEVEL, action, (genericptr_t)where);
 }
+#undef MIN_ICE_TIME
+#undef MAX_ICE_TIME
 
 /*
  * Called when ice has melted completely away.
