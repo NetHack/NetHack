@@ -68,6 +68,7 @@ provide core support for saving of messsage history in save file
 the following actions can now be continued after save/restore: digging, 
 	eating, studying, removing armor
 hero-created and monster-created ice will eventually melt away
+extend Warning to include ice danger
 
 
 Platform- and/or Interface-Specific New Features

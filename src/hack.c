@@ -1485,6 +1485,19 @@ stillinwater:;
 		if (trap && !pit)
 			dotrap(trap, 0);	/* fall into arrow trap, etc. */
 	}
+	/* Warning alerts you to ice danger */
+	if (Warning && is_ice(u.ux,u.uy)) {
+		static const char * const icewarnings[] = {
+			"The ice seems very soft and slushy.",
+			"You feel the ice shift beneath you!",
+			"The ice, is gonna BREAK!",	/* The Dead Zone */
+		};
+		long time_left = spot_time_left(u.ux, u.uy, MELT_ICE_AWAY);
+		if (time_left && time_left < 15L)
+			pline("%s",
+			    (time_left < 5L)  ? icewarnings[2] :
+			    (time_left < 10L) ? icewarnings[1] : icewarnings[0]);				    
+	}
 	if((mtmp = m_at(u.ux, u.uy)) && !u.uswallow) {
 		mtmp->mundetected = mtmp->msleeping = 0;
 		switch(mtmp->data->mlet) {
