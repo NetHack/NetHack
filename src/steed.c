@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.4	2002/05/05	*/
+/*	SCCS Id: @(#)steed.c	3.4	2002/05/31	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -188,11 +188,9 @@ mount_steed(mtmp, force)
 	char buf[BUFSZ];
 	struct permonst *ptr;
 
-
 	/* Sanity checks */
 	if (u.usteed) {
-	    if (!force)
-		You("are already riding %s.", mon_nam(u.usteed));
+	    You("are already riding %s.", mon_nam(u.usteed));
 	    return (FALSE);
 	}
 
@@ -223,8 +221,7 @@ mount_steed(mtmp, force)
 
 	if (Upolyd && (!humanoid(youmonst.data) || verysmall(youmonst.data) ||
 			bigmonst(youmonst.data))) {
-	    if (!force)
-		You("won't fit on a saddle.");
+	    You("won't fit on a saddle.");
 	    return (FALSE);
 	}
 	if(!force && (near_capacity() > SLT_ENCUMBER)) {
@@ -234,20 +231,17 @@ mount_steed(mtmp, force)
 
 	/* Can the player reach and see the monster? */
 	if (u.uswallow || u.ustuck || u.utrap || Punished) {
-	    if (!force) {
-		if (Punished)
-		    You("are unable to swing your %s over.", body_part(LEG)); 
-		else
-		    You("are stuck here for now.");
-	    }
+	    if (Punished)
+		You("are unable to swing your %s over.", body_part(LEG)); 
+	    else
+		You("are stuck here for now.");
 	    return (FALSE);
 	}
 	if (!mtmp || (!force && ((Blind && !Blind_telepat) ||
 		mtmp->mundetected ||
 		mtmp->m_ap_type == M_AP_FURNITURE ||
 		mtmp->m_ap_type == M_AP_OBJECT))) {
-	    if (!force)
-		pline("I see nobody there.");
+	    pline("I see nobody there.");
 	    return (FALSE);
 	}
 
@@ -266,8 +260,7 @@ mount_steed(mtmp, force)
 	    instapetrify(kbuf);
 	}
 	if (!mtmp->mtame || mtmp->isminion) {
-	    if (!force)
-		pline("I think %s would mind.", mon_nam(mtmp));
+	    pline("I think %s would mind.", mon_nam(mtmp));
 	    return (FALSE);
 	}
 	if (mtmp->mtrapped) {
@@ -292,8 +285,7 @@ mount_steed(mtmp, force)
 	    return (FALSE);
 	}
 	if (!can_saddle(mtmp) || !can_ride(mtmp)) {
-	    if (!force)
-		You_cant("ride such a creature.");
+	    You_cant("ride such a creature.");
 	    return (0);
 	}
 
