@@ -57,7 +57,7 @@ static const char * const shkwands[] = {
     /* Wales */
     "Yr Wyddgrug", "Trallwng", "Mallwyd", "Pontarfynach",
     "Rhaeader", "Llandrindod", "Llanfair-ym-muallt",
-    "Y-Fenni", "Measteg", "Rhydaman", "Beddgelert",
+    "Y-Fenni", "Maesteg", "Rhydaman", "Beddgelert",
     "Curig", "Llanrwst", "Llanerchymedd", "Caergybi",
     /* Scotland */
     "Nairn", "Turriff", "Inverurie", "Braemar", "Lochnagar",
