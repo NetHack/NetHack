@@ -145,7 +145,7 @@ E NEARDATA struct sinfo {
 	int gameover;		/* self explanatory? */
 	int stopprint;		/* inhibit further end of game disclosure */
 #if defined(UNIX) || defined(VMS) || defined (__EMX__) || defined(WIN32)
-	int done_hup;		/* SIGHUP or moral equivalent received
+	volatile int done_hup;	/* SIGHUP or moral equivalent received
 				 * -- no more screen output */
 #endif
 	int something_worth_saving;	/* in case of panic */
