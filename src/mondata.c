@@ -705,6 +705,9 @@ struct attack *mattk;
 {
     return (mptr == &mons[PM_WATER_ELEMENTAL]) ? "boiling" :
 	   (mptr == &mons[PM_FLAMING_SPHERE]) ? "already on fire" :
+	   (mptr == &mons[PM_STONE_GOLEM] || mptr == &mons[PM_CLAY_GOLEM] ||
+	    mptr == &mons[PM_GOLD_GOLEM]) ? "heating up" :
+	   (mptr == &mons[PM_GLASS_GOLEM]) ? "getting soft" :
 	   (mattk->aatyp == AT_HUGS) ? "being roasted" : "on fire";
 }
 
