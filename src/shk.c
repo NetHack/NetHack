@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2003/12/04	*/
+/*	SCCS Id: @(#)shk.c	3.4	2004/06/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2915,14 +2915,15 @@ long cost;
 STATIC_OVL
 void
 remove_damage(shkp, croaked)
-register struct monst *shkp;
-register boolean croaked;
+struct monst *shkp;
+boolean croaked;
 {
-	register struct damage *tmp_dam, *tmp2_dam;
-	register boolean did_repair = FALSE, saw_door = FALSE;
-	register boolean saw_floor = FALSE, stop_picking = FALSE;
-	register boolean saw_untrap = FALSE;
-	uchar saw_walls = 0;
+	struct damage *tmp_dam, *tmp2_dam;
+	boolean did_repair = FALSE, saw_door = FALSE,
+		saw_floor = FALSE, stop_picking = FALSE,
+		doorway_trap = FALSE;
+	int saw_walls = 0, saw_untrap = 0;
+	char trapmsg[BUFSZ];
 
 	tmp_dam = level.damagelist;
 	tmp2_dam = 0;
@@ -2930,10 +2931,13 @@ register boolean croaked;
 	    register xchar x = tmp_dam->place.x, y = tmp_dam->place.y;
 	    char shops[5];
 	    int disposition;
+	    unsigned old_doormask = 0;
 
 	    disposition = 0;
 	    Strcpy(shops, in_rooms(x, y, SHOPBASE));
 	    if (index(shops, ESHK(shkp)->shoproom)) {
+		if (IS_DOOR(levl[x][y].typ)) old_doormask = levl[x][y].doormask;
+
 		if (croaked)
 		    disposition = (shops[1])? 0 : 1;
 		else if (stop_picking)
@@ -2957,14 +2961,18 @@ register boolean croaked;
 	    if (disposition > 1) {
 		did_repair = TRUE;
 		if (cansee(x, y)) {
-		    if (IS_WALL(levl[x][y].typ))
+		    if (IS_WALL(levl[x][y].typ)) {
 			saw_walls++;
-		    else if (IS_DOOR(levl[x][y].typ))
+		    } else if (IS_DOOR(levl[x][y].typ) &&
+			    /* an existing door here implies trap removal */
+			    !(old_doormask & (D_ISOPEN|D_CLOSED))) {
 			saw_door = TRUE;
-		    else if (disposition == 3)		/* untrapped */
-			saw_untrap = TRUE;
-		    else
+		    } else if (disposition == 3) {	/* untrapped */
+			saw_untrap++;
+			if (IS_DOOR(levl[x][y].typ)) doorway_trap = TRUE;
+		    } else {
 			saw_floor = TRUE;
+		    }
 		}
 	    }
 
@@ -2979,22 +2987,41 @@ register boolean croaked;
 	}
 	if (!did_repair)
 	    return;
+
+	if (saw_untrap) {
+	    Sprintf(trapmsg, "%s trap%s",
+		    (saw_untrap > 3) ? "several" :
+			(saw_untrap > 1) ? "some" : "a",
+		    plur(saw_untrap));
+	    Sprintf(eos(trapmsg), " %s", vtense(trapmsg, "are"));
+	    Sprintf(eos(trapmsg), " removed from the %s",
+		    (doorway_trap && saw_untrap == 1) ? "doorway" : "floor");
+	} else
+	   trapmsg[0] = '\0';	/* not just lint suppression... */
+
 	if (saw_walls) {
-	    pline("Suddenly, %s section%s of wall close%s up!",
+	    char wallbuf[BUFSZ];
+
+	    Sprintf(wallbuf, "section%s", plur(saw_walls));
+	    pline("Suddenly, %s %s of wall %s up!",
 		  (saw_walls == 1) ? "a" : (saw_walls <= 3) ?
 						  "some" : "several",
-		  (saw_walls == 1) ? "" : "s", (saw_walls == 1) ? "s" : "");
+		  wallbuf, vtense(wallbuf, "close"));
+
 	    if (saw_door)
 		pline_The("shop door reappears!");
 	    if (saw_floor)
 		pline_The("floor is repaired!");
+	    if (saw_untrap)
+		pline("%s!", upstart(trapmsg));
 	} else {
-	    if (saw_door)
-		pline("Suddenly, the shop door reappears!");
-	    else if (saw_floor)
-		pline("Suddenly, the floor damage is gone!");
-	    else if (saw_untrap)
-	        pline("Suddenly, the trap is removed from the floor!");
+	    if (saw_door || saw_floor || saw_untrap)
+		pline("Suddenly, %s%s%s%s%s!",
+		      saw_door ? "the shop door reappears" : "",
+		      (saw_door && saw_floor) ? " and " : "",
+		      saw_floor ? "the floor damage is gone" : "",
+		      ((saw_door || saw_floor) && *trapmsg) ? " and " : "",
+		      trapmsg);
 	    else if (inside_shop(u.ux, u.uy) == ESHK(shkp)->shoproom)
 		You_feel("more claustrophobic than before.");
 	    else if (!Deaf && !rn2(10))
@@ -3048,8 +3075,9 @@ boolean catchup;	/* restoring a level */
 		(void) mpickobj(shkp, otmp);
 	    }
 	    deltrap(ttmp);
-	    if(IS_DOOR(tmp_dam->typ)) {
-		levl[x][y].doormask = D_CLOSED; /* arbitrary */
+	    if (IS_DOOR(tmp_dam->typ) &&
+		    !(levl[x][y].doormask & D_ISOPEN)) {
+		levl[x][y].doormask = D_CLOSED;
 		block_point(x, y);
 	    } else if (IS_WALL(tmp_dam->typ)) {
 		levl[x][y].typ = tmp_dam->typ;

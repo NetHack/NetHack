@@ -71,6 +71,7 @@ mimic that ends up on the rogue level should not mimic a closed door
 polymorphed or shapechanged monster sometimes got erroneous hit points
 mimic should not mimic a boulder while on a pit or hole location
 reviving invisible troll could appear visible until it moves
+adjust some of the shop repair messages
 
 
 Platform- and/or Interface-Specific Fixes
