@@ -79,7 +79,9 @@ struct window_procs amii_procs =
     amii_delay_output,
     amii_delay_output,
     amii_outrip,
-    genl_preference_update
+    genl_preference_update,
+    genl_getmsghistory,
+    genl_putmsghistory
 };
 
 /* The view window layout uses the same function names so we can use
@@ -138,7 +140,9 @@ struct window_procs amiv_procs =
     amii_delay_output,
     amii_delay_output,
     amii_outrip,
-    genl_preference_update
+    genl_preference_update,
+    genl_getmsghistory,
+    genl_putmsghistory
 };
 
 unsigned short amii_initmap[ AMII_MAXCOLORS ];

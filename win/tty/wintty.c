@@ -109,6 +109,8 @@ struct window_procs tty_procs = {
 #else
     genl_preference_update,
 #endif
+    tty_getmsghistory,
+    tty_putmsghistory,
 };
 
 static int maxwin = 0;			/* number of windows in use */

@@ -121,6 +121,8 @@ struct window_procs mswin_procs = {
     mswin_end_screen,
     mswin_outrip,
     mswin_preference_update,
+    genl_getmsghistory,
+    genl_putmsghistory,
 };
 
 

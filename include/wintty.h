@@ -222,6 +222,10 @@ E void NDECL(tty_end_screen);
 
 E void FDECL(genl_outrip, (winid,int));
 
+E char *FDECL(tty_getmsghistory, (BOOLEAN_P));
+E void FDECL(tty_putmsghistory, (const char *));
+
+
 #ifdef NO_TERMS
 # ifdef MAC
 #  ifdef putchar

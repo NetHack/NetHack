@@ -143,4 +143,47 @@ const char *pref;
 	   they support.
 	   Just return in this genl one. */
 }
+
+char *
+genl_getmsghistory(init)
+boolean init;
+{
+	/* window ports can provide
+	   their own getmsghistory() routine to
+	   preserve message history between games.
+	   The routine is called repeatedly from
+	   the core save routine, and the window
+	   port is expected to successively return
+	   each message that it wants saved, starting
+	   with the oldest message first, finishing
+	   with the most recent.
+	   Return null pointer when finished.
+	 */
+	 return (char *)0;
+}
+
+/*ARGSUSED*/
+void
+genl_putmsghistory(msg)
+const char *msg;
+{
+	/* window ports can provide
+	   their own putmsghistory() routine to
+	   load message history from a saved game.
+	   The routine is called repeatedly from
+	   the core restore routine, starting with
+	   the oldest saved message first, and
+	   finishing with the latest.
+	   The window port routine is expected to
+	   load the message recall buffers in such
+	   a way that the ordering is preserved.
+	   The window port routine should make no
+	   assumptions about how many messages are
+	   forthcoming, nor should it assume that
+	   another message will follow this one,
+	   so it should keep all pointers/indexes
+	   intact at the end of each call.
+	 */
+}
+
 /*windows.c*/

@@ -73,6 +73,8 @@ struct window_procs Gnome_procs = {
     gnome_end_screen,
     gnome_outrip,
     genl_preference_update,
+    genl_getmsghistory,
+    genl_putmsghistory,
 };
 
 /*  

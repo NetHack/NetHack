@@ -157,6 +157,8 @@ struct window_procs X11_procs = {
     genl_outrip,
 #endif
     X11_preference_update,
+    genl_getmsghistory,
+    genl_putmsghistory,
 };
 
 /*

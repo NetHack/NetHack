@@ -65,6 +65,8 @@ struct window_procs {
 
     void FDECL((*win_outrip), (winid,int));
     void FDECL((*win_preference_update), (const char *));
+    char * FDECL((*win_getmsghistory), (BOOLEAN_P));
+    void FDECL((*win_putmsghistory), (const char *));
 };
 
 extern NEARDATA struct window_procs windowprocs;
@@ -134,6 +136,8 @@ extern NEARDATA struct window_procs windowprocs;
 
 #define outrip (*windowprocs.win_outrip)
 #define preference_update (*windowprocs.win_preference_update)
+#define getmsghistory (*windowprocs.win_getmsghistory)
+#define putmsghistory (*windowprocs.win_putmsghistory)
 
 /*
  * WINCAP

@@ -97,7 +97,9 @@ struct window_procs Gem_procs = {
     Gem_start_screen,
     Gem_end_screen,
     Gem_outrip,
-    Gem_preference_update
+    Gem_preference_update,
+    genl_getmsghistory,
+    genl_putmsghistory
 };
 
 #ifdef MAC

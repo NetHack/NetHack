@@ -2288,6 +2288,8 @@ E void FDECL(setmnotwielded, (struct monst *,struct obj *));
 E void FDECL(choose_windows, (const char *));
 E char FDECL(genl_message_menu, (CHAR_P,int,const char *));
 E void FDECL(genl_preference_update, (const char *));
+E char *FDECL(genl_getmsghistory, (BOOLEAN_P));
+E void FDECL(genl_putmsghistory, (const char *));
 
 /* ### wizard.c ### */
 

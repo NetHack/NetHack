@@ -378,6 +378,35 @@ preference_update(preference)
 		   change if it indicated that it wants to be by setting the 
 		   corresponding bit in the wincap mask.
 
+getmsghistory(init) 
+		-- This is used to preserve message history between games by
+		   obtaining the messages from the window port so that the core
+		   can put them into the savefile.
+		   The routine is called repeatedly from the core save routine,
+		   and the window port routine is expected to successively return
+		   each message that it wants the game to store in the savefile, 
+		   starting with the oldest message first, finishing
+		   with the most recent.
+		   If init is TRUE, start over again from most recent message.
+
+putmsghistory(msg)
+		-- The is the counterpart to getmsghistory() for restores
+		   used to reload the port's message recall buffer.
+		   The routine is called repeatedly from the core restore 
+		   routine, starting with the oldest message first, and
+		   finishing with the most recent one that it read from the savefile.
+		   The window port routine is expected to load the message 
+		   recall buffers in such a way that the ordering remains correct.
+		   The window port routine should make no assumptions about how 
+		   many messages are forthcoming, nor should it assume that
+		   another message will follow this one, so it must be careful
+		   to keep all pointers/indexes intact at the end of each call.
+		   If the window port receives more messages that can fit in
+		   its buffers, it is expected to scroll away the oldest from
+		   its buffers, much like it would with new messages being
+		   produced.
+
+
 III.  Global variables
 
 The following global variables are defined in decl.c and must be used by

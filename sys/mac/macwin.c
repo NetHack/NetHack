@@ -2645,6 +2645,8 @@ struct window_procs mac_procs = {
 	0, //    mac_end_screen,
 	genl_outrip,
 	genl_preference_update,
+	genl_getmsghistory,
+	genl_putmsghistory,
 };
 
 /*macwin.c*/

@@ -452,6 +452,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 
 	restnames(fd);
 	restore_waterlevel(fd);
+	restore_msghistory(fd);
 	/* must come after all mons & objs are restored */
 	relink_timers(FALSE);
 	relink_light_sources(FALSE);
@@ -910,6 +911,26 @@ boolean ghostly;
 	    clear_id_mapping();
 }
 
+restore_msghistory(fd)
+register int fd;
+{
+	int msgsize, k, msgcount = 0;
+	char msg[BUFSZ];
+
+	while(1) {
+		mread(fd, (genericptr_t) &msgsize, sizeof(msgsize));
+		if(msgsize == -1) break;
+		if (msgsize > (BUFSZ - 1))
+			panic("restore_msghistory: msg too big (%d)", msgsize);
+		mread(fd, (genericptr_t)msg, msgsize);
+		msg[msgsize] = '\0';
+		putmsghistory(msg);
+		++msgcount;
+	}
+#ifdef DEBUG_MSGCOUNT
+	pline("Read %d messages from savefile.", msgcount);
+#endif
+}
 
 /* Clear all structures for object and monster ID mapping. */
 STATIC_OVL void

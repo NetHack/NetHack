@@ -5285,6 +5285,8 @@ struct window_procs Qt_procs = {
     genl_outrip,
 #endif
     genl_preference_update,
+    genl_getmsghistory,
+    genl_putmsghistory,
 };
 
 extern "C" void play_usersound(const char* filename, int volume)

@@ -339,6 +339,7 @@ register int fd, mode;
 	savefruitchn(fd, mode);
 	savenames(fd, mode);
 	save_waterlevel(fd, mode);
+	save_msghistory(fd, mode);
 	bflush(fd);
 }
 
@@ -984,6 +985,36 @@ register int fd, mode;
 	    ffruit = 0;
 }
 
+save_msghistory(fd, mode)
+register int fd, mode;
+{
+	char *msg, buf[BUFSZ];
+	int msgcount = 0, msglen = 0;
+	int minusone = -1;
+	boolean init = TRUE;
+
+	/* Ask window port for each message in sequence */
+	while ((msg = getmsghistory(init)) != 0) {
+		init = FALSE;
+		msglen = strlen(msg);
+		if (msglen < (BUFSZ-1))
+			Strcpy(buf, msg);
+		else {
+			/* impossible */
+			(void)strncpy(buf, msg, (BUFSZ - 1));
+			buf[BUFSZ-1] = '\0';
+			msglen = strlen(buf);
+		}
+		bwrite(fd, (genericptr_t)&msglen, sizeof(msglen));
+		bwrite(fd, (genericptr_t)msg, msglen);
+		++msgcount;
+	}
+	bwrite(fd, (genericptr_t) &minusone, sizeof(int));
+#ifdef DEBUG_MSGCOUNT
+	pline("Stored %d messages into savefile.", msgcount);
+#endif
+}
+	
 /* also called by prscore(); this probably belongs in dungeon.c... */
 void
 free_dungeons()

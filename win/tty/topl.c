@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)topl.c	3.4	1996/10/24	*/
+/*	SCCS Id: @(#)topl.c	3.4	2003/10/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -442,6 +442,73 @@ char def;
 	    tty_clear_nhwindow(WIN_MESSAGE);
 
 	return q;
+}
+
+/*
+ * This is called by the core save routines.
+ * Each time we are called, we return one string from the
+ * message history starting with the oldest message first. each time
+ * we are called. Each time after that, we return a more recent message,
+ * until there are no more messages to return. Then we return a final
+ * null string.
+ */
+char *
+tty_getmsghistory(init)
+boolean init;
+{
+	static int idx = 0, state = 0;
+	static boolean doneinit = FALSE;
+	register struct WinDesc *cw = wins[WIN_MESSAGE];
+	char *retstr = (char *)0;
+
+	/*
+	 * state 0 = normal return with string from msg history.
+	 * state 1 = finished with recall data, return toplines.
+	 * state 2 = completely finished, return null string.
+	 */
+	if (init) {
+		doneinit = TRUE;
+		state = 0;
+		idx = cw->maxrow;
+	}
+	if (doneinit && state < 2) {
+		if (state == 1) {
+			++state;
+			return toplines;
+		}
+		do {
+			if(cw->data[idx] && strcmp(cw->data[idx], "") )
+				retstr = cw->data[idx];
+			idx = (idx + 1) % cw->rows;
+		} while (idx != cw->maxrow && !retstr);
+		if (idx == cw->maxrow) ++state;
+	}
+	return retstr;
+}
+
+/*
+ * This is called by the core savefile restore routines.
+ * Each time we are called, we stuff the string into our message
+ * history recall buffer. The core will send the oldest message
+ * first (actually it sends them in the order they exist in the
+ * save file, but that is supposed to be the oldest first).
+ */
+void
+tty_putmsghistory(msg)
+const char *msg;
+{
+	register struct WinDesc *cw = wins[WIN_MESSAGE];
+	int idx = cw->maxrow;
+	unsigned len = strlen(msg) + 1;
+
+	if (len > (unsigned)cw->datlen[idx]) {
+		if (cw->data[idx]) free(cw->data[idx]);
+		len += (8 - (len & 7));		/* pad up to next multiple of 8 */
+		cw->data[idx] = (char *)alloc(len);
+		cw->datlen[idx] = (short)len;
+        }
+	Strcpy(cw->data[idx], msg);
+	cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
 }
 #endif /* TTY_GRAPHICS */
 
