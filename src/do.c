@@ -195,6 +195,19 @@ const char *verb;
 		    newsym(x, y);
 		}
 		water_damage(obj, FALSE, FALSE);
+	} else if (u.ux == x && u.uy == y &&
+		(!u.utrap || u.utrap && u.utraptype != TT_PIT) &&
+		(t = t_at(x,y)) != 0 && t->tseen &&
+			(t->ttyp==PIT || t->ttyp==SPIKED_PIT)) {
+		static const char * const the_your[2] = { "the", "your" };
+		/* you escaped a pit and are standing on the precipice */
+		if (Blind && flags.soundok)
+			You_hear("%s %s downwards.",
+				The(xname(obj)), otense(obj, "tumble"));
+		else
+			pline("%s %s into %s pit.",
+				The(xname(obj)), otense(obj, "tumble"),
+				the_your[t->madeby_u]);
 	}
 	return FALSE;
 }

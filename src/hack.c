@@ -1421,7 +1421,6 @@ void
 spoteffects(pick)
 boolean pick;
 {
-	register struct trap *trap;
 	register struct monst *mtmp;
 
 	if(u.uinwater) {
@@ -1479,11 +1478,16 @@ stillinwater:;
 	if(IS_SINK(levl[u.ux][u.uy].typ) && Levitation)
 		dosinkfall();
 #endif
-	if (pick && !in_steed_dismounting)
-		(void) pickup(1);
-	/* if dismounting, we'll check again later */
-	if ((trap = t_at(u.ux,u.uy)) != 0 && !in_steed_dismounting)
-		dotrap(trap, 0);	/* fall into pit, arrow trap, etc. */
+	if (!in_steed_dismounting) { /* if dismounting, we'll check again later */
+		struct trap *trap = t_at(u.ux, u.uy);
+		boolean pit;
+		pit = (trap && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT));
+		if (trap && pit)
+			dotrap(trap, 0);	/* fall into pit */
+		if (pick) (void) pickup(1);
+		if (trap && !pit)
+			dotrap(trap, 0);	/* fall into arrow trap, etc. */
+	}
 	if((mtmp = m_at(u.ux, u.uy)) && !u.uswallow) {
 		mtmp->mundetected = mtmp->msleeping = 0;
 		switch(mtmp->data->mlet) {
@@ -1792,7 +1796,8 @@ int
 dopickup()
 {
 	int count;
-	/* awful kludge to work around parse()'s pre-decrement */
+	struct trap *traphere = t_at(u.ux, u.uy);
+ 	/* awful kludge to work around parse()'s pre-decrement */
 	count = (multi || (save_cm && *save_cm == ',')) ? multi + 1 : 0;
 	multi = 0;	/* always reset */
 	/* uswallow case added by GAN 01/29/87 */
@@ -1845,6 +1850,20 @@ dopickup()
 		You("cannot reach the %s.", surface(u.ux,u.uy));
 		return(0);
 	}
+
+ 	if (traphere && traphere->tseen) {
+		/* Allow pickup from holes and trap doors that you escaped from
+		 * because that stuff is teetering on the edge just like you, but
+		 * not pits, because there is an elevation discrepancy with stuff
+		 * in pits.
+		 */
+		if ((traphere->ttyp == PIT || traphere->ttyp == SPIKED_PIT) &&
+		     (!u.utrap || (u.utrap && u.utraptype != TT_PIT))) {
+			You("cannot reach the bottom of the pit.");
+			return(0);
+		}
+	}
+
 	return (pickup(-count));
 }
 
