@@ -851,7 +851,6 @@ struct obj *obj;
 	register struct rm *lev;
 	int dig_target;
 	boolean ispick = is_pick(obj);
-	const char *verb = ispick ? "dig" : "chop";
 	const char *verbing = ispick ? "digging" : "chopping";
 
 	if (u.uswallow && attack(u.ustuck)) {
@@ -1516,7 +1515,7 @@ struct obj *otmp;
 #endif
 
 #ifdef DEBUG
-void
+int
 wiz_debug_cmd() /* in this case, bury everything at your loc and around */
 {
 	int x, y;
@@ -1524,6 +1523,7 @@ wiz_debug_cmd() /* in this case, bury everything at your loc and around */
 	for (x = u.ux - 1; x <= u.ux + 1; x++)
 	    for (y = u.uy - 1; y <= u.uy + 1; y++)
 		if (isok(x,y)) bury_objs(x,y);
+	return 0;
 }
 
 #endif /* DEBUG */

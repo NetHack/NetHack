@@ -22,7 +22,7 @@
  * module you are trying to debug) or things are going to get rather
  * hard to link :-)
  */
-extern void NDECL(wiz_debug_cmd);
+extern int NDECL(wiz_debug_cmd);
 #endif
 
 #ifdef DUMB	/* stuff commented out in extern.h, but needed here */
