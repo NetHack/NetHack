@@ -680,8 +680,13 @@ peffects(otmp)
 		    if (Role_if(PM_HEALER))
 			pline("Fortunately, you have been immunized.");
 		    else {
+		    	char contaminant[BUFSZ];
 			int typ = rn2(A_MAX);
 
+			Sprintf(contaminant, "%s%s",
+				(Poison_resistance) ? "mildly " : "",
+				(otmp->fromsink) ? "contaminated tap water" :
+						   "contaminated potion");
 			if (!Fixed_abil) {
 			    poisontell(typ, FALSE);
 			    (void) adjattrib(typ,
@@ -691,10 +696,14 @@ peffects(otmp)
 			if(!Poison_resistance) {
 			    if (otmp->fromsink)
 				losehp(rnd(10)+5*!!(otmp->cursed),
-				       "contaminated tap water", KILLED_BY);
+				       contaminant, KILLED_BY);
 			    else
 				losehp(rnd(10)+5*!!(otmp->cursed),
-				       "contaminated potion", KILLED_BY_AN);
+				       contaminant, KILLED_BY_AN);
+			} else {
+			    /* rnd loss is so that unblessed poorer than blessed */
+			    losehp(1 + rn2(2), contaminant,
+				   (otmp->fromsink) ? KILLED_BY : KILLED_BY_AN);
 			}
 			exercise(A_CON, FALSE);
 		    }
