@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2004/08/02	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2004/11/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2809,6 +2809,26 @@ struct obj *cloak;
 	}
     }
     return "cloak";
+}
+
+/* helm vs hat for messages */
+const char *
+helm_simple_name(helmet)
+struct obj *helmet;
+{
+    /*
+     *	There is some wiggle room here; the result has been chosen
+     *	for consistency with the "protected by hard helmet" messages
+     *	given for various bonks on the head:  headgear that provides
+     *	such protection is a "helm", that which doesn't is a "hat".
+     *
+     *	    elven leather helm / leather hat	-> hat
+     *	    dwarvish iron helm / hard hat	-> helm
+     *	The rest are completely straightforward:
+     *	    fedora, cornuthaum, dunce cap	-> hat
+     *	    all other types of helmets		-> helm
+     */
+    return (helmet && !is_metallic(helmet)) ? "hat" : "helm";
 }
 
 const char *

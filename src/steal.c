@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.4	2003/12/04	*/
+/*	SCCS Id: @(#)steal.c	3.4	2004/11/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,7 +21,8 @@ register struct obj *otmp;
 		(otmp == uarms) ? "shield" :
 		(otmp == uarmg) ? "gloves" :
 		(otmp == uarmc) ? cloak_simple_name(otmp) :
-		(otmp == uarmh) ? "helmet" : "armor");
+		(otmp == uarmh) ? helm_simple_name(otmp) :
+		    "armor");
 }
 
 #ifndef GOLDOBJ

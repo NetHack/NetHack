@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2004/09/10	*/
+/*	SCCS Id: @(#)trap.c	3.4	2004/11/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -55,7 +55,8 @@ struct monst *victim;
 	    item = (victim == &youmonst) ? uarmh : which_armor(victim, W_ARMH);
 	    if (item) {
 		mat_idx = objects[item->otyp].oc_material;
-	    	Sprintf(buf,"%s helmet", materialnm[mat_idx] );
+		Sprintf(buf,"%s %s",
+			materialnm[mat_idx], helm_simple_name(item));
 	    }
 	    if (!burn_dmg(item, item ? buf : "helmet")) continue;
 	    break;
@@ -850,7 +851,8 @@ unsigned trflags;
 		    case 0:
 			pline("%s you on the %s!", A_gush_of_water_hits,
 				    body_part(HEAD));
-			(void) rust_dmg(uarmh, "helmet", 1, TRUE, &youmonst);
+			(void) rust_dmg(uarmh, helm_simple_name(uarmh),
+					1, TRUE, &youmonst);
 			break;
 		    case 1:
 			pline("%s your left %s!", A_gush_of_water_hits,
@@ -1903,7 +1905,8 @@ register struct monst *mtmp;
 				pline("%s %s on the %s!", A_gush_of_water_hits,
 				    mon_nam(mtmp), mbodypart(mtmp, HEAD));
 			    target = which_armor(mtmp, W_ARMH);
-			    (void) rust_dmg(target, "helmet", 1, TRUE, mtmp);
+			    (void) rust_dmg(target, helm_simple_name(target),
+					    1, TRUE, mtmp);
 			    break;
 			case 1:
 			    if (in_sight)

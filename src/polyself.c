@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)polyself.c	3.4	2004/11/11	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -651,7 +651,8 @@ break_armor()
 		     hornbuf, vtense(hornbuf, "pierce"), yname(otmp));
 	    } else {
 		if (donning(otmp)) cancel_don();
-		Your("helmet falls to the %s!", surface(u.ux, u.uy));
+		Your("%s falls to the %s!",
+		     helm_simple_name(otmp), surface(u.ux, u.uy));
 		(void) Helmet_off();
 		dropx(otmp);
 	    }
@@ -673,7 +674,8 @@ break_armor()
 	}
 	if ((otmp = uarmh) != 0) {
 	    if (donning(otmp)) cancel_don();
-	    Your("helmet falls to the %s!", surface(u.ux, u.uy));
+	    Your("%s falls to the %s!",
+		 helm_simple_name(otmp), surface(u.ux, u.uy));
 	    (void) Helmet_off();
 	    dropx(otmp);
 	}

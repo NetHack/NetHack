@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2004/11/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1545,6 +1545,9 @@ register struct attack *mattk;
 		}
 		break;
 	    case AD_DRIN:
+	      {
+		struct obj *helmet;
+
 		if (notonhead || !has_head(mdef->data)) {
 		    pline("%s doesn't seem harmed.", Monnam(mdef));
 		    tmp = 0;
@@ -1558,9 +1561,10 @@ register struct attack *mattk;
 		}
 		if (m_slips_free(mdef, mattk)) break;
 
-		if ((mdef->misc_worn_check & W_ARMH) && rn2(8)) {
-		    pline("%s helmet blocks your attack to %s head.",
-			  s_suffix(Monnam(mdef)), mhis(mdef));
+		if ((helmet = which_armor(mdef, W_ARMH)) != 0 && rn2(8)) {
+		    pline("%s %s blocks your attack to %s head.",
+			  s_suffix(Monnam(mdef)),
+			  helm_simple_name(helmet), mhis(mdef));
 		    break;
 		}
 
@@ -1588,6 +1592,7 @@ register struct attack *mattk;
 		}
 		exercise(A_WIS, TRUE);
 		break;
+	      }
 	    case AD_STCK:
 		if (!negated && !sticks(mdef->data))
 		    u.ustuck = mdef; /* it's now stuck to you */

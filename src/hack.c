@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2004/08/16	*/
+/*	SCCS Id: @(#)hack.c	3.4	2004/11/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1626,7 +1626,8 @@ stillinwater:;
 			if(mtmp->mtame) /* jumps to greet you, not attack */
 			    ;
 			else if(uarmh && is_metallic(uarmh))
-			    pline("Its blow glances off your helmet.");
+			    pline("Its blow glances off your %s.",
+				  helm_simple_name(uarmh));
 			else if (u.uac + 3 <= rnd(20))
 			    You("are almost hit by %s!",
 				x_monnam(mtmp, ARTICLE_A, "falling", 0, TRUE));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2004/10/29	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2004/11/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1180,7 +1180,10 @@ register struct obj *otmp;
 	if(delay) {
 		nomul(delay);
 		if (is_helmet(otmp)) {
-			nomovemsg = "You finish taking off your helmet.";
+			/* ick... */
+			nomovemsg = !strcmp(helm_simple_name(otmp), "hat") ?
+					"You finish taking off your hat." :
+					"You finish taking off your helmet.";
 			afternmv = Helmet_off;
 		     }
 		else if (is_gloves(otmp)) {
@@ -1282,13 +1285,14 @@ boolean noisy;
 
     if (is_helmet(otmp)) {
 	if (uarmh) {
-	    if (noisy) already_wearing(an(c_helmet));
+	    if (noisy) already_wearing(an(helm_simple_name(uarmh)));
 	    err++;
 	} else if (Upolyd && has_horns(youmonst.data) && !is_flimsy(otmp)) {
 	    /* (flimsy exception matches polyself handling) */
 	    if (noisy)
 		pline_The("%s won't fit over your horn%s.",
-			  c_helmet, plur(num_horns(youmonst.data)));
+			  helm_simple_name(otmp),
+			  plur(num_horns(youmonst.data)));
 	    err++;
 	} else
 	    *mask = W_ARMH;
@@ -2146,7 +2150,8 @@ register struct obj *atmp;
 #endif
 	} else if (DESTROY_ARM(uarmh)) {
 		if (donning(otmp)) cancel_don();
-		Your("helmet turns to dust and is blown away!");
+		Your("%s turns to dust and is blown away!",
+		     helm_simple_name(uarmh));
 		(void) Helmet_off();
 		useup(otmp);
 	} else if (DESTROY_ARM(uarmg)) {

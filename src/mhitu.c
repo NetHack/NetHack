@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2004/10/27	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2004/11/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -371,8 +371,8 @@ mattacku(mtmp)
 
 		    obj = which_armor(mtmp, WORN_HELMET);
 		    if (obj && is_metallic(obj)) {
-			Your("blow glances off %s helmet.",
-			               s_suffix(mon_nam(mtmp)));
+			Your("blow glances off %s %s.",
+			     s_suffix(mon_nam(mtmp)), helm_simple_name(obj));
 		    } else {
 			if (3 + find_mac(mtmp) <= rnd(20)) {
 			    pline("%s is hit by a falling piercer (you)!",
@@ -1053,7 +1053,8 @@ dopois:
 
 		if (uarmh && rn2(8)) {
 		    /* not body_part(HEAD) */
-		    Your("helmet blocks the attack to your head.");
+		    Your("%s blocks the attack to your head.",
+			 helm_simple_name(uarmh));
 		    break;
 		}
 		if (Half_physical_damage) dmg = (dmg+1) / 2;
@@ -2260,7 +2261,7 @@ register struct monst *mon;
 	if(!uwep || !welded(uwep))
 		mayberem(uarmg, "gloves");
 	mayberem(uarms, "shield");
-	mayberem(uarmh, "helmet");
+	mayberem(uarmh, helm_simple_name(uarmh));
 #ifdef TOURIST
 	if(!uarmc && !uarm)
 		mayberem(uarmu, "shirt");
