@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2002/05/30	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2002/08/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1043,10 +1043,11 @@ register const char *verb;
 	    if (!spot) spot = subj + len - 1;
 
 	    /*
-	     * plural: anything that ends in 's', but not '*us'.
+	     * plural: anything that ends in 's', but not '*us' or '*ss'.
 	     * Guess at a few other special cases that makeplural creates.
 	     */
-	    if ((*spot == 's' && spot != subj && *(spot-1) != 'u') ||
+	    if ((*spot == 's' && spot != subj &&
+			(*(spot-1) != 'u' && *(spot-1) != 's')) ||
 		((spot - subj) >= 4 && !strncmp(spot-3, "eeth", 4)) ||
 		((spot - subj) >= 3 && !strncmp(spot-3, "feet", 4)) ||
 		((spot - subj) >= 2 && !strncmp(spot-1, "ia", 2)) ||
