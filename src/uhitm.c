@@ -576,6 +576,7 @@ int thrown;
 			    P_SKILL(wtype) >= P_SKILLED) &&
 			  ((monwep = MON_WEP(mon)) != 0 &&
 			    weapon_type(monwep) != P_WHIP &&
+			    monwep->otyp != SLING &&
 			    !obj_resists(monwep,
 				 50 + 15 * greatest_erosion(obj), 100))) {
 			/*
