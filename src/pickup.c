@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2002/08/21	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1614,7 +1614,7 @@ boolean *prev_loot;
 		if ((unwornmask = otmp->owornmask) != 0L) {
 		    mtmp->misc_worn_check &= ~unwornmask;
 		    otmp->owornmask = 0L;
-		    update_mon_intrinsics(mtmp, otmp, FALSE);
+		    update_mon_intrinsics(mtmp, otmp, FALSE, FALSE);
 		}
 		otmp = hold_another_object(otmp, "You drop %s!", doname(otmp),
 					(const char *)0);

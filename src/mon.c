@@ -1559,13 +1559,8 @@ register struct monst *mdef;
 		/* some objects may end up outside the statue */
 		while ((obj = mdef->minvent) != 0) {
 		    obj_extract_self(obj);
-		    if (obj->owornmask) {
-			/* don't want map updates if invisibility
-			   toggles or messages if speed changes */
-			in_mklev = TRUE;
-			update_mon_intrinsics(mdef, obj, FALSE);
-			in_mklev = FALSE;
-		    }
+		    if (obj->owornmask)
+			update_mon_intrinsics(mdef, obj, FALSE, TRUE);
 		    obj_no_longer_held(obj);
 		    if (obj->owornmask & W_WEP)
 			setmnotwielded(mdef,obj);

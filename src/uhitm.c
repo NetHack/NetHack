@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2002/08/21	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1134,7 +1134,7 @@ struct attack *mattk;
 		    MON_NOWEP(mdef);
 		}
 		otmp->owornmask = 0L;
-		update_mon_intrinsics(mdef, otmp, FALSE);
+		update_mon_intrinsics(mdef, otmp, FALSE, FALSE);
 
 		if (otmp == stealoid)	/* special message for final item */
 		    pline("%s finishes taking off %s suit.",

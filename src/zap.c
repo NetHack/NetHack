@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2002/07/23	*/
+/*	SCCS Id: @(#)zap.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -244,8 +244,8 @@ struct obj *otmp;
 #ifdef STEED
 		} else if (!!(obj = which_armor(mtmp, W_SADDLE))) {
 			mtmp->misc_worn_check &= ~obj->owornmask;
+			update_mon_intrinsics(mtmp, obj, FALSE, FALSE);
 			obj->owornmask = 0L;
-			update_mon_intrinsics(mtmp, obj, FALSE);
 			obj_extract_self(obj);
 			place_object(obj, mtmp->mx, mtmp->my);
 			/* call stackobj() if we ever drop anything that can merge */

@@ -554,13 +554,8 @@ boolean is_pet;		/* If true, pet should keep wielded/worn items */
 			    costly_spot(mtmp->mx, mtmp->my))
 				otmp->no_charge = 1;
 #endif
-			if (otmp->owornmask) {
-			    /* don't want map updates if invisibility
-			       toggles or messages if speed changes */
-			    in_mklev = TRUE;
-			    update_mon_intrinsics(mtmp, otmp, FALSE);
-			    in_mklev = FALSE;
-			}
+			if (otmp->owornmask)
+			    update_mon_intrinsics(mtmp, otmp, FALSE, TRUE);
 		     /* obj_no_longer_held(otmp); -- done by place_object */
 			if (otmp->owornmask & W_WEP)
 			    setmnotwielded(mtmp, otmp);

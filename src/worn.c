@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.4	2002/08/30	*/
+/*	SCCS Id: @(#)worn.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -208,10 +208,10 @@ struct obj *obj;	/* item to make known if effect can be seen */
 
 /* armor put on or taken off; might be magical variety */
 void
-update_mon_intrinsics(mon, obj, on)
+update_mon_intrinsics(mon, obj, on, silently)
 struct monst *mon;
 struct obj *obj;
-boolean on;
+boolean on, silently;
 {
     int unseen;
     uchar mask;
@@ -227,8 +227,13 @@ boolean on;
 	    mon->minvis = !mon->invis_blkd;
 	    break;
 	 case FAST:
+	  {
+	    boolean save_in_mklev = in_mklev;
+	    if (silently) in_mklev = TRUE;
 	    mon_adjust_speed(mon, 0, obj);
+	    in_mklev = save_in_mklev;
 	    break;
+	  }
 	/* properties handled elsewhere */
 	 case ANTIMAGIC:
 	 case REFLECTING:
@@ -262,8 +267,13 @@ boolean on;
 	    mon->minvis = mon->perminvis;
 	    break;
 	 case FAST:
+	  {
+	    boolean save_in_mklev = in_mklev;
+	    if (silently) in_mklev = TRUE;
 	    mon_adjust_speed(mon, 0, obj);
+	    in_mklev = save_in_mklev;
 	    break;
+	  }
 	 case FIRE_RES:
 	 case COLD_RES:
 	 case SLEEP_RES:
@@ -310,7 +320,7 @@ boolean on;
 #endif
 
     /* if couldn't see it but now can, or vice versa, update display */
-    if (unseen ^ !canseemon(mon))
+    if (!silently && (unseen ^ !canseemon(mon)))
 	newsym(mon->mx, mon->my);
 }
 
@@ -474,10 +484,10 @@ outer_break:
 	    if (mon->mfrozen) mon->mcanmove = 0;
 	}
 	if (old)
-	    update_mon_intrinsics(mon, old, FALSE);
+	    update_mon_intrinsics(mon, old, FALSE, creation);
 	mon->misc_worn_check |= flag;
 	best->owornmask |= flag;
-	update_mon_intrinsics(mon, best, TRUE);
+	update_mon_intrinsics(mon, best, TRUE, creation);
 }
 
 struct obj *
@@ -499,8 +509,9 @@ struct monst *mon;
 struct obj *obj;
 {
 	mon->misc_worn_check &= ~obj->owornmask;
+	if (obj->owornmask)
+	    update_mon_intrinsics(mon, obj, FALSE, FALSE);
 	obj->owornmask = 0L;
-	update_mon_intrinsics(mon, obj, FALSE);
 
 	obj_extract_self(obj);
 	place_object(obj, mon->mx, mon->my);

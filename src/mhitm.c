@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.4	2002/02/17	*/
+/*	SCCS Id: @(#)mhitm.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -991,7 +991,7 @@ label2:			if (mdef->mhp > 0) return 0;
 				if (otmp->owornmask & W_WEP)
 				    setmnotwielded(mdef,otmp);
 				otmp->owornmask = 0L;
-				update_mon_intrinsics(mdef, otmp, FALSE);
+				update_mon_intrinsics(mdef, otmp, FALSE, FALSE);
 			}
 			/* add_to_minv() might free otmp [if it merges] */
 			if (vis)

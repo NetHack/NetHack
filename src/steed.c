@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.4	2002/05/31	*/
+/*	SCCS Id: @(#)steed.c	3.4	2002/09/08	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -139,7 +139,7 @@ use_saddle(otmp)
 	    mtmp->misc_worn_check |= W_SADDLE;
 	    otmp->owornmask = W_SADDLE;
 	    otmp->leashmon = mtmp->m_id;
-	    update_mon_intrinsics(mtmp, otmp, TRUE);
+	    update_mon_intrinsics(mtmp, otmp, TRUE, FALSE);
 	} else
 	    pline("%s resists!", Monnam(mtmp));
 	return 1;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.4	2002/03/09	*/
+/*	SCCS Id: @(#)dog.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -152,7 +152,7 @@ makedog()
 	    otmp->dknown = otmp->bknown = otmp->rknown = 1;
 	    otmp->owornmask = W_SADDLE;
 	    otmp->leashmon = mtmp->m_id;
-	    update_mon_intrinsics(mtmp, otmp, TRUE);
+	    update_mon_intrinsics(mtmp, otmp, TRUE, TRUE);
 	}
 #endif
 
