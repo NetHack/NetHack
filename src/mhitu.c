@@ -988,12 +988,9 @@ hitmu(mtmp, mattk)
 dopois:
 		hitmsg(mtmp, mattk);
 		if (uncancelled && !rn2(8)) {
-			Sprintf(buf, "%s %s",
-				!canspotmon(mtmp) ? "Its" :
-				Hallucination ? s_suffix(rndmonnam()) :
-				                s_suffix(mdat->mname),
-				mpoisons_subj(mtmp, mattk));
-			poisoned(buf, ptmp, mdat->mname, 30);
+		    Sprintf(buf, "%s %s",
+			    s_suffix(Monnam(mtmp)), mpoisons_subj(mtmp, mattk));
+		    poisoned(buf, ptmp, mdat->mname, 30);
 		}
 		break;
 	    case AD_DRIN:
