@@ -645,7 +645,7 @@ static const char *build_opts[] = {
 		"Keystone Kops",
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
-		"exlusive lock on level 0 file",
+		"exclusive lock on level 0 file",
 #endif
 #ifdef LOGFILE
 		"log file",
