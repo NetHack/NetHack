@@ -53,6 +53,12 @@ mapbg.xpm: ../win/gnome/mapbg.xpm
 nhsplash.xpm: ../win/Qt/nhsplash.xpm
 	cp ../win/Qt/nhsplash.xpm nhsplash.xpm
 
+nethack.icns: ../win/Qt/nhicns.uu
+	$(UUDECODE) ../win/Qt/nhicns.uu
+
+Info.plist: ../win/Qt/Info.pli
+	cp ../win/Qt/Info.pli Info.plist
+
 ../util/tile2img.ttp:
 	(cd ../util ; make tile2img.ttp)
 
