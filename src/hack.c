@@ -553,9 +553,6 @@ int mode;
     register struct rm *tmpr = &levl[x][y];
     register struct rm *ust;
 
-    /* no diagonal movement for grid bugs */
-    if (dx && dy && u.umonnum == PM_GRID_BUG) return FALSE;
-
     /*
      *  Check for physical obstacles.  First, the place we are going.
      */
@@ -743,8 +740,10 @@ boolean guess;
 		int x = travelstepx[set][i];
 		int y = travelstepy[set][i];
 		static int ordered[] = { 0, 2, 4, 6, 1, 3, 5, 7 };
+		/* no diagonal movement for grid bugs */
+		int dirmax = u.umonnum == PM_GRID_BUG ? 4 : 8;
 
-		for (dir = 0; dir < 8; dir++) {
+		for (dir = 0; dir < dirmax; ++dir) {
 		    int nx = x+xdir[ordered[dir]];
 		    int ny = y+ydir[ordered[dir]];
 
