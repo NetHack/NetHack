@@ -37,12 +37,12 @@ STATIC_DCL void FDECL(accessory_has_effect, (struct obj *));
 STATIC_DCL void FDECL(fpostfx, (struct obj *));
 STATIC_DCL int NDECL(bite);
 STATIC_DCL int FDECL(edibility_prompts, (struct obj *));
-
 STATIC_DCL int FDECL(rottenfood, (struct obj *));
 STATIC_DCL void NDECL(eatspecial);
 STATIC_DCL void FDECL(eataccessory, (struct obj *));
 STATIC_DCL const char *FDECL(foodword, (struct obj *));
 STATIC_DCL int FDECL(tin_variety, (struct obj *));
+STATIC_DCL boolean FDECL(maybe_cannibal, (int,BOOLEAN_P));
 
 char msgbuf[BUFSZ];
 
@@ -411,18 +411,29 @@ boolean message;
 	context.victual.fullwarn = context.victual.eating = context.victual.doreset = FALSE;
 }
 
+STATIC_OVL boolean
+maybe_cannibal(pm, allowmsg)
+int pm;
+boolean allowmsg;
+{
+	if (!CANNIBAL_ALLOWED() && your_race(&mons[pm])) {
+		if (allowmsg) {
+			if (Upolyd)
+				You("have a bad feeling deep inside.");
+			You("cannibal!  You will regret this!");
+		}
+		HAggravate_monster |= FROMOUTSIDE;
+		change_luck(-rn1(4,2));		/* -5..-2 */
+		return TRUE;
+	}
+	return FALSE;
+}
+
 STATIC_OVL void
 cprefx(pm)
 register int pm;
 {
-	if (!CANNIBAL_ALLOWED() && your_race(&mons[pm])) {
-		if (Upolyd)
-			You("have a bad feeling deep inside.");
-		You("cannibal!  You will regret this!");
-		HAggravate_monster |= FROMOUTSIDE;
-		change_luck(-rn1(4,2));		/* -5..-2 */
-	}
-
+	(void) maybe_cannibal(pm,TRUE);
 	if (touch_petrifies(&mons[pm]) || pm == PM_MEDUSA) {
 	    if (!Stone_resistance &&
 		!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
@@ -1288,9 +1299,11 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	}
 
 	if (mnum != PM_ACID_BLOB && !stoneable && rotted > 5L) {
-		pline("Ulch - that %s was tainted!",
+		boolean cannibal = maybe_cannibal(mnum, FALSE);
+		pline("Ulch - that %s was tainted%s!",
 		      mons[mnum].mlet == S_FUNGUS ? "fungoid vegetation" :
-		      !vegetarian(&mons[mnum]) ? "meat" : "protoplasm");
+		      !vegetarian(&mons[mnum]) ? "meat" : "protoplasm",
+		      cannibal ? " cannibal" : "");
 		if (Sick_resistance) {
 			pline("It doesn't seem at all sickening, though...");
 		} else {
