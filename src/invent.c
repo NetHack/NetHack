@@ -1136,6 +1136,7 @@ unsigned *resultflags;
 	int FDECL((*ckfn),(OBJ_P)) = (int FDECL((*),(OBJ_P))) 0;
 	boolean FDECL((*filter),(OBJ_P)) = (boolean FDECL((*),(OBJ_P))) 0;
 	boolean takeoff, ident, allflag, m_seen;
+	int itemcount;
 #ifndef GOLDOBJ
 	int oletct, iletct, allowgold, unpaid, oc_of_sym;
 #else
@@ -1172,7 +1173,7 @@ unsigned *resultflags;
 #ifndef GOLDOBJ
 					(allowgold != 0),
 #endif
-					filter);
+					filter, &itemcount);
 	unpaid = count_unpaid(invent);
 
 	if (ident && !iletct) {
@@ -1928,7 +1929,7 @@ dotypeinv()
 	char c = '\0';
 	int n, i = 0;
 	char *extra_types, types[BUFSZ];
-	int class_count, oclass, unpaid_count;
+	int class_count, oclass, unpaid_count, itemcount;
 	boolean billx = *u.ushops && doinvbill(0);
 	menu_item *pick_list;
 	boolean traditional = TRUE;
@@ -1963,7 +1964,7 @@ dotypeinv()
 #ifndef GOLDOBJ
 					      (u.ugold != 0),
 #endif
-					      (boolean FDECL((*),(OBJ_P))) 0);
+					      (boolean FDECL((*),(OBJ_P))) 0, &itemcount);
 	    if (unpaid_count) {
 		Strcat(types, "u");
 		class_count++;

@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 17, 2002
+.ds f2 "January 11, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -630,7 +630,7 @@ Look at what is here.
 .lp ;
 Show what type of thing a visible symbol corresponds to.
 .lp ,
-Pick up some things.
+Pick up some things. May be preceded by `m' to force a selection menu.
 .lp @
 Toggle the
 .op autopickup

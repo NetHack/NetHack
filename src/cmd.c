@@ -1753,6 +1753,7 @@ register char *cmd;
 	boolean do_walk, do_rush, prefix_seen, bad_command,
 		firsttime = (cmd == 0);
 
+	iflags.menu_requested = FALSE;
 	if (firsttime) {
 		flags.nopick = 0;
 		cmd = parse();
@@ -1850,6 +1851,14 @@ register char *cmd;
 		    }
 		    break;
 	}
+
+	/* some special prefix handling */
+	/* overload 'm' prefix for ',' to mean "request a menu" */
+	if (prefix_seen && cmd[1] == ',') {
+		iflags.menu_requested = TRUE;
+		++cmd;
+	}
+
 	if (do_walk) {
 	    if (multi) flags.mv = TRUE;
 	    domove();

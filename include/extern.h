@@ -1444,10 +1444,10 @@ E void NDECL(getlock);
 
 #ifdef GOLDOBJ
 E int FDECL(collect_obj_classes,
-	(char *,struct obj *,BOOLEAN_P,boolean FDECL((*),(OBJ_P))));
+	(char *,struct obj *,BOOLEAN_P,boolean FDECL((*),(OBJ_P)), int *));
 #else
 E int FDECL(collect_obj_classes,
-	(char *,struct obj *,BOOLEAN_P,BOOLEAN_P,boolean FDECL((*),(OBJ_P))));
+	(char *,struct obj *,BOOLEAN_P,BOOLEAN_P,boolean FDECL((*),(OBJ_P)), int *));
 #endif
 E void FDECL(add_valid_menu_class, (int));
 E boolean FDECL(allow_all, (struct obj *));

@@ -87,23 +87,26 @@ boolean here;		/* flag for type of obj list linkage */
 
 #ifndef GOLDOBJ
 int
-collect_obj_classes(ilets, otmp, here, incl_gold, filter)
+collect_obj_classes(ilets, otmp, here, incl_gold, filter, itemcount)
 char ilets[];
 register struct obj *otmp;
 boolean here, incl_gold;
 boolean FDECL((*filter),(OBJ_P));
+int *itemcount;
 #else
 int
-collect_obj_classes(ilets, otmp, here, filter)
+collect_obj_classes(ilets, otmp, here, filter, itemcount)
 char ilets[];
 register struct obj *otmp;
 boolean here;
 boolean FDECL((*filter),(OBJ_P));
+int *itemcount;
 #endif
 {
 	register int iletct = 0;
 	register char c;
 
+	*itemcount = 0;
 #ifndef GOLDOBJ
 	if (incl_gold)
 	    ilets[iletct++] = def_oc_syms[COIN_CLASS];
@@ -113,6 +116,7 @@ boolean FDECL((*filter),(OBJ_P));
 	    c = def_oc_syms[(int)otmp->oclass];
 	    if (!index(ilets, c) && (!filter || (*filter)(otmp)))
 		ilets[iletct++] = c,  ilets[iletct] = '\0';
+	    *itemcount += 1;
 	    otmp = here ? otmp->nexthere : otmp->nobj;
 	}
 
@@ -158,6 +162,7 @@ int *menu_on_demand;
 	boolean not_everything;
 	char qbuf[QBUFSZ];
 	boolean m_seen;
+	int itemcount;
 
 	oclasses[oclassct = 0] = '\0';
 	*one_at_a_time = *everything = m_seen = FALSE;
@@ -165,12 +170,17 @@ int *menu_on_demand;
 #ifndef GOLDOBJ
 				     incl_gold,
 #endif
-				     (boolean FDECL((*),(OBJ_P))) 0);
+				     (boolean FDECL((*),(OBJ_P))) 0, &itemcount);
 	if (iletct == 0) {
 		return FALSE;
 	} else if (iletct == 1) {
 		oclasses[0] = def_char_to_objclass(ilets[0]);
 		oclasses[1] = '\0';
+		if (itemcount && menu_on_demand) {
+			ilets[iletct++] = 'm';
+			*menu_on_demand = 0;
+			ilets[iletct] = '\0';
+		}
 	} else  {	/* more than one choice available */
 		const char *where = 0;
 		register char sym, oc_of_sym, *p;
@@ -438,9 +448,9 @@ int what;		/* should be a long */
 	    goto menu_pickup;
 	}
 
-	if (flags.menu_style != MENU_TRADITIONAL) {
-	    /* use menus exclusively */
+	if (flags.menu_style != MENU_TRADITIONAL || iflags.menu_requested) {
 
+	    /* use menus exclusively */
 	    if (count) {	/* looking for N of something */
 		char buf[QBUFSZ];
 		Sprintf(buf, "Pick %d of what?", count);
@@ -1906,7 +1916,7 @@ register int held;
 	struct monst *shkp;
 	boolean one_by_one, allflag, loot_out = FALSE, loot_in = FALSE;
 	char select[MAXOCLASSES+1];
-	char qbuf[BUFSZ], emptymsg[BUFSZ];
+	char qbuf[BUFSZ], emptymsg[BUFSZ], pbuf[QBUFSZ];
 	long loss = 0L;
 	int cnt = 0, used = 0, lcnt = 0,
 	    menu_on_request;
@@ -2040,7 +2050,9 @@ register int held;
 ask_again2:
 		menu_on_request = 0;
 		add_valid_menu_class(0);	/* reset */
-		switch (yn_function(qbuf, ":ynq", 'n')) {
+		Strcpy(pbuf, ":ynq");
+		if (cnt) Strcat(pbuf, "m");
+		switch (yn_function(qbuf, pbuf, 'n')) {
 		case ':':
 		    container_contents(current_container, FALSE, FALSE);
 		    goto ask_again2;
@@ -2065,6 +2077,10 @@ ask_again2:
 		    /*FALLTHRU*/
 		case 'n':
 		    break;
+		case 'm':
+		    menu_on_request = -2; /* triggers ALL_CLASSES */
+		    used |= menu_loot(menu_on_request, current_container, FALSE) > 0;
+		    break;
 		case 'q':
 		default:
 		    return used;
@@ -2084,8 +2100,25 @@ ask_again2:
 	    return used;
 	}
 	if (flags.menu_style != MENU_FULL) {
-	    loot_in = (yn_function("Do you wish to put something in?",
-				   ynqchars, 'n') == 'y');
+	    Sprintf(qbuf, "Do you wish to put %s in?", something);
+	    Strcpy(pbuf, ynqchars);
+	    if (flags.menu_style == MENU_TRADITIONAL && invent && inv_cnt() > 0)
+		Strcat(pbuf, "m");
+	    switch (yn_function(qbuf, pbuf, 'n')) {
+		case 'y':
+		    loot_in = TRUE;
+		    break;
+		case 'n':
+		    break;
+		case 'm':
+		    add_valid_menu_class(0);	  /* reset */
+		    menu_on_request = -2; /* triggers ALL_CLASSES */
+		    used |= menu_loot(menu_on_request, current_container, TRUE) > 0;
+		    break;
+		case 'q':
+		default:
+		    return used;
+	    }
 	}
 	/*
 	 * Gone: being nice about only selecting food if we know we are
