@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.4	2002/03/09	*/
+/*	SCCS Id: @(#)steed.c	3.4	2002/05/05	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -192,7 +192,7 @@ mount_steed(mtmp, force)
 	/* Sanity checks */
 	if (u.usteed) {
 	    if (!force)
-	    	You("are already riding %s.", mon_nam(u.usteed));
+		You("are already riding %s.", mon_nam(u.usteed));
 	    return (FALSE);
 	}
 
@@ -220,11 +220,11 @@ mount_steed(mtmp, force)
 #endif
 	    return (FALSE);
 	}
-	
+
 	if (Upolyd && (!humanoid(youmonst.data) || verysmall(youmonst.data) ||
 			bigmonst(youmonst.data))) {
 	    if (!force)
-	    	You("won't fit on a saddle.");
+		You("won't fit on a saddle.");
 	    return (FALSE);
 	}
 	if(!force && (near_capacity() > SLT_ENCUMBER)) {
@@ -233,22 +233,21 @@ mount_steed(mtmp, force)
 	}
 
 	/* Can the player reach and see the monster? */
-    if (u.uswallow || u.ustuck || u.utrap || Punished) {
-        if (!force) {
+	if (u.uswallow || u.ustuck || u.utrap || Punished) {
+	    if (!force) {
 		if (Punished)
-			You("are unable to swing your %s over.",
-				body_part(LEG)); 
+		    You("are unable to swing your %s over.", body_part(LEG)); 
 		else
-        		You("are stuck here for now.");
+		    You("are stuck here for now.");
+	    }
+	    return (FALSE);
 	}
-        return (FALSE);
-    }
 	if (!mtmp || (!force && ((Blind && !Blind_telepat) ||
 		mtmp->mundetected ||
 		mtmp->m_ap_type == M_AP_FURNITURE ||
 		mtmp->m_ap_type == M_AP_OBJECT))) {
 	    if (!force)
-	    	pline("I see nobody there.");
+		pline("I see nobody there.");
 	    return (FALSE);
 	}
 
@@ -263,14 +262,23 @@ mount_steed(mtmp, force)
 	    char kbuf[BUFSZ];
 
 	    You("touch %s.", mon_nam(mtmp));
- 	    Sprintf(kbuf, "attempting to ride %s", an(mtmp->data->mname));
+	    Sprintf(kbuf, "attempting to ride %s", an(mtmp->data->mname));
 	    instapetrify(kbuf);
 	}
 	if (!mtmp->mtame || mtmp->isminion) {
 	    if (!force)
-	    	pline("I think %s would mind.", mon_nam(mtmp));
+		pline("I think %s would mind.", mon_nam(mtmp));
 	    return (FALSE);
 	}
+	if (mtmp->mtrapped) {
+	    struct trap *t = t_at(mtmp->mx, mtmp->my);
+
+	    You_cant("mount %s while %s's trapped in %s.",
+		     mon_nam(mtmp), mhe(mtmp),
+		     an(defsyms[trap_to_defsym(t->ttyp)].explanation));
+	    return (FALSE);
+	}
+
 	if (!force && !Role_if(PM_KNIGHT) && !(--mtmp->mtame)) {
 	    /* no longer tame */
 	    newsym(mtmp->mx, mtmp->my);
@@ -285,7 +293,7 @@ mount_steed(mtmp, force)
 	}
 	if (!can_saddle(mtmp) || !can_ride(mtmp)) {
 	    if (!force)
-	    	You_cant("ride such a creature.");
+		You_cant("ride such a creature.");
 	    return (0);
 	}
 
