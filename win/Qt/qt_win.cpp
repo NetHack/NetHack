@@ -1656,8 +1656,6 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	painter.setClipRect( event->rect() ); // (normally we don't clip)
 	painter.fillRect( event->rect(), black );
 
-	int offset;
-
 	if ( !rogue_font ) {
 	    // Find font...
 	    int pts = 5;
@@ -1845,10 +1843,10 @@ public:
     int uncleared;
 
     NetHackQtScrollText(int maxlength) :
+	uncleared(0),
 	maxitems(maxlength),
 	first(0),
 	count(0),
-	uncleared(0),
 	item_cycle(maxlength)
     {
 	setNumCols(1);
@@ -2046,21 +2044,21 @@ void NetHackQtMessageWindow::PutStr(int attr, const char* text)
 
 NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget* parent, const char* l) :
     QWidget(parent),
+    low_is_good(FALSE),
+    prev_value(-123),
     turn_count(-1),
     label(new QLabel(l,this)),
-    icon(0),
-    low_is_good(FALSE),
-    prev_value(-123)
+    icon(0)
 {
     initHighlight();
 }
 NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget* parent, const char* l, const QPixmap& i) :
     QWidget(parent),
     low_is_good(FALSE),
+    prev_value(-123),
     turn_count(-1),
     label(new QLabel(l,this)),
-    icon(new QLabel(this)),
-    prev_value(-123)
+    icon(new QLabel(this))
 {
     setIcon(i);
     initHighlight();
@@ -2202,14 +2200,14 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     //  Alignment needs -2 init value, because -1 is an alignment.
     //  Armor Class is an schar, so 256 is out of range.
     //  Blank value is 0 and should never change.
+    name(this,"(name)"),
+    dlevel(this,"(dlevel)"),
     str(this,"STR"),
     dex(this,"DEX"),
     con(this,"CON"),
     intel(this,"INT"),
     wis(this,"WIS"),
     cha(this,"CHA"),
-    name(this,"(name)"),
-    dlevel(this,"(dlevel)"),
     gold(this,"Gold"),
     hp(this,"Hit Points"),
     power(this,"Power"),
@@ -2356,7 +2354,6 @@ void NetHackQtStatusWindow::resizeEvent(QResizeEvent*)
 
     int h=height();
     int x=0,y=0;
-    double space=1.0;
 
     int iw; // Width of an item across line
     int lh; // Height of a line of values
@@ -2700,16 +2697,14 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(NetHackQtKeyBuffer& ks) :
     QTableView(),
     keysource(ks),
     dialog(new NetHackQtMenuDialog()),
-    pressed(-1),
-    prompt(0)
+    prompt(0),
+    pressed(-1)
 {
     setNumCols(4);
     setCellHeight(QMAX(qt_settings->glyphs().height()+1,fontMetrics().height()));
     setBackgroundColor(lightGray);
     setFrameStyle(Panel|Sunken);
     setLineWidth(2);
-
-    int x=0;
 
     ok=new QPushButton("Ok",dialog);
     connect(ok,SIGNAL(clicked()),dialog,SLOT(accept()));
@@ -2808,7 +2803,7 @@ void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P* identifier,
 	}
     }
 
-    if (item.size()<itemcount+1) {
+    if ((int)item.size() < itemcount+1) {
 	item.resize(itemcount*4+10);
     }
     item[itemcount].glyph=glyph;
@@ -3110,7 +3105,7 @@ void NetHackQtMenuWindow::mousePressEvent(QMouseEvent* event)
 	    if (item[row].count>0)
 		Sprintf(buf,"%d", item[row].count);
 	    else
-		Sprintf(buf,"");
+		Strcpy(buf, "");
 
 	    requestor.SetDefault(buf);
 	    if (requestor.Get(buf)) {
@@ -3436,7 +3431,7 @@ void NetHackQtTextWindow::Search()
     requestor.SetDefault(line);
     if (requestor.Get(line)) {
 	int current=lines->currentItem();
-	for (int i=1; i<lines->count(); i++) {
+	for (uint i=1; i<lines->count(); i++) {
 	    int lnum=(i+current)%lines->count();
 	    QString str=lines->text(lnum);
 	    if (str.contains(line)) {
@@ -4096,8 +4091,8 @@ void NetHackQtMainWindow::ShowIfReady()
 
 NetHackQtYnDialog::NetHackQtYnDialog(NetHackQtKeyBuffer& keysrc,const char* q,const char* ch,char df) :
     QDialog(qApp->mainWidget(),0,FALSE),
-    keysource(keysrc),
-    question(q), choices(ch), def(df)
+    question(q), choices(ch), def(df),
+    keysource(keysrc)
 {
     setCaption("NetHack: Question");
 }
@@ -4184,7 +4179,6 @@ char NetHackQtYnDialog::Exec()
 	const int margin=8;
 	const int gutter=8;
 	const int extra=fontMetrics().height(); // Extra for group
-	int row=0;
 	int x=margin, y=extra+margin;
 	int butsize=fontMetrics().height()*2+5;
 
@@ -4222,7 +4216,7 @@ char NetHackQtYnDialog::Exec()
 	show();
 	char choice=0;
 	char ch_esc=0;
-	for (int i=0; i<ch.length(); i++) {
+	for (uint i=0; i<ch.length(); i++) {
 	    if (ch[i].latin1()=='q') ch_esc='q';
 	    else if (!ch_esc && ch[i].latin1()=='n') ch_esc='n';
 	}
@@ -4231,7 +4225,7 @@ char NetHackQtYnDialog::Exec()
 	    if (!keysource.Empty()) {
 		char k=keysource.GetAscii();
 		char ch_esc=0;
-		for (int i=0; i<ch.length(); i++)
+		for (uint i=0; i<ch.length(); i++)
 		    if (ch[i].latin1()==k)
 			choice=k;
 		if (!choice) {
@@ -4318,7 +4312,7 @@ NetHackQtGlyphs::NetHackQtGlyphs()
     } else {
 	tiles_per_row = 40;
     }
-    int rows = ((total_tiles_used+tiles_per_row-1) / tiles_per_row);
+
     if ( iflags.wc_tile_width )
 	tilefile_tile_W = iflags.wc_tile_width;
     else
@@ -4391,8 +4385,8 @@ void NetHackQtGlyphs::setSize(int w, int h)
 
 
 NetHackQtMenuOrTextWindow::NetHackQtMenuOrTextWindow(NetHackQtKeyBuffer& ks) :
-    keysource(ks),
-    actual(0)
+    actual(0),
+    keysource(ks)
 {
 }
 
@@ -4684,11 +4678,11 @@ static QArray<NetHackQtWindow*> id_to_window;
 winid NetHackQtBind::qt_create_nhwindow(int type)
 {
     winid id;
-    for (id = 0; id < id_to_window.size(); id++) {
+    for (id = 0; id < (winid) id_to_window.size(); id++) {
 	if ( !id_to_window[id] )
 	    break;
     }
-    if ( id == id_to_window.size() )
+    if ( id == (winid) id_to_window.size() )
 	id_to_window.resize(id+1);
 
     NetHackQtWindow* window=0;
