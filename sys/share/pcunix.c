@@ -127,11 +127,16 @@ getlock()
 # if defined(WIN32)
 #  if defined(HOLD_LOCKFILE_OPEN)
  		if(errno == EACCES) {
-	  		msmsg("\nThere are files from a game in progress under your name.");
-			msmsg(
-		"\nThe files are locked or inaccessible. Is the other game still running?");
-			unlock_file(HLOCK);
-			error("Cannot open %s", fq_lock);
+#define OOPS_BUFSZ 512
+ 		    char oops[OOPS_BUFSZ];
+ 		    Strcpy(oops,
+			     "\nThere are files from a game in progress under your name.");
+		    Strcat(oops, "\nThe files are locked or inaccessible.");
+		    Strcat(oops, " Is the other game still running?\n");
+		    if (strlen(fq_lock) < ((OOPS_BUFSZ - 1) - strlen(oops)))
+			    Sprintf(eos(oops), "Cannot open %s", fq_lock);
+		    unlock_file(HLOCK);
+		    error(oops);
  		} else
 #  endif
 		error("Bad directory or name: %s\n%s\n",
