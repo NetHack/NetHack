@@ -306,8 +306,12 @@ mattackm(magr, mdef)
 		break;
 
 	    case AT_EXPL:
-		strike = 1;	/* automatic hit */
 		res[i] = explmm(magr, mdef, mattk);
+		if (res[i] == MM_MISS) { /* cancelled--no attack */
+		    strike = 0;
+		    attk = 0;
+		} else
+		    strike = 1;	/* automatic hit */
 		break;
 
 	    case AT_ENGL:
@@ -536,6 +540,9 @@ explmm(magr, mdef, mattk)
 	register struct	attack *mattk;
 {
 	int result;
+
+	if (magr->mcan)
+	    return MM_MISS;
 
 	if(cansee(magr->mx, magr->my))
 		pline("%s explodes!", Monnam(magr));
