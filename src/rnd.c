@@ -1,7 +1,11 @@
-/*	SCCS Id: @(#)rnd.c	3.4	1996/02/07	*/
+/*	SCCS Id: @(#)rnd.c	3.4	2003/12/13	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+
+#if defined(BETA) && !defined(DEBUG) && !defined(NODEBUG)
+#define DEBUG
+#endif
 
 /* "Rand()"s definition is determined by [OS]conf.h */
 #if defined(LINT) && defined(UNIX)	/* rand() is long... */
