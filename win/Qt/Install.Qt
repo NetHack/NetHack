@@ -53,10 +53,40 @@ To use this code:
 
 If you are using KDE, you may want to also try the KDE version. It just
 uses the KDE menubar and follows other KDE conventions - there is no
-extra functionality. To do so, first ensure that you have KDE 2.x
-libraries on your system (in 1999 KDE 1.x was the norm); then, add
-$(KDECXXFLAGS) to the CXXFLAGS definition, $(KDELFLAGS) to the LFLAGS
-definition and $(WINKDELIB) to WINLIB.  Some additional files here -
-knh-mini.xpm, knh.xpm, and knethack.lnk are useful if you want to
-install "knethack" in the KDE games directory.  
+extra functionality. To do so:
+
+   1. Ensure that you have KDE 2.x libraries on your system
+        (in 1999 KDE 1.x was the norm)
+
+   2. ../../src/Makefile
+
+      Add $(KDECXXFLAGS) to the CXXFLAGS definition, $(KDELFLAGS) to
+      the LFLAGS definition and $(WINKDELIB) to WINLIB.
+
+   3. Some additional files here - knh-mini.xpm, knh.xpm, and
+      knethack.lnk are useful if you want to install "knethack" in
+      the KDE games directory.  
+
+
+If you are using Qtopia, you can compile NetHack for that environment
+with the following additional steps:
+
+   1. First be sure that you can build a simple Qtopia application,
+      such as the examples that ship with Qtopia. Do not attempt
+      something as challenging to compile as NetHack before you can
+      already build a Qtopia application for your target device.
+
+   2. If you are cross-compiling (eg. targetting an ARM-based handheld),
+      be sure to follow the steps for cross-compiling in the Makefile.src
+      and Makefile.utl files.
+
+   3. To CXXFLAGS in Makefile.src, add:
+      -DQWS -I$(QPEDIR)/include -fno-rtti -fno-exceptions
+
+   4. Rather than -lqt in WINQTLIB, have:
+      -L$(QPEDIR)/lib -lqpe -lqte
+
+   5. After building, use the "mkipks" program that ships with Qtopia
+      to package the result into an ipk file.
+
 
