@@ -3377,6 +3377,7 @@ register int fall;
 		if ((obj->owornmask & ~(W_SWAPWEP|W_QUIVER)) != 0 ||
 			(obj == uswapwep && u.twoweap) ||
 			(obj->otyp == LEASH && obj->leashmon)) continue;
+		if (obj == current_wand) continue;
 		setnotworn(obj);
 		freeinv(obj);
 		subfrombill(obj, shkp);
