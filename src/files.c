@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.4	2003/11/14	*/
+/*	SCCS Id: @(#)files.c	3.4	2004/11/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2149,6 +2149,7 @@ read_wizkit()
 
 	if (!wizard || !(fp = fopen_wizkit_file())) return;
 
+	program_state.wizkit_wishing = 1;
 	while (fgets(buf, (int)(sizeof buf), fp)) {
 	    ep = index(buf, '\n');
 	    if (skip) {	/* in case previous line was too long */
@@ -2158,7 +2159,7 @@ read_wizkit()
 		else *ep = '\0';		/* remove newline */
 
 		if (buf[0]) {
-			otmp = readobjnam(buf, (struct obj *)0, FALSE);
+			otmp = readobjnam(buf, (struct obj *)0);
 			if (otmp) {
 			    if (otmp != &zeroobj)
 				otmp = addinv(otmp);
@@ -2170,6 +2171,7 @@ read_wizkit()
 		}
 	    }
 	}
+	program_state.wizkit_wishing = 0;
 	if (bad_items)
 	    wait_synch();
 	(void) fclose(fp);

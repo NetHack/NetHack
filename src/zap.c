@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2004/09/10	*/
+/*	SCCS Id: @(#)zap.c	3.4	2004/11/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4232,12 +4232,12 @@ retry:
 	 *  has been denied.  Wishing for "nothing" requires a separate
 	 *  value to remain distinct.
 	 */
-	otmp = readobjnam(buf, &nothing, TRUE);
+	otmp = readobjnam(buf, &nothing);
 	if (!otmp) {
 	    pline("Nothing fitting that description exists in the game.");
 	    if (++tries < 5) goto retry;
 	    pline(thats_enough_tries);
-	    otmp = readobjnam((char *)0, (struct obj *)0, TRUE);
+	    otmp = readobjnam((char *)0, (struct obj *)0);
 	    if (!otmp) return;	/* for safety; should never happen */
 	} else if (otmp == &nothing) {
 	    /* explicitly wished for "nothing", presumeably attempting

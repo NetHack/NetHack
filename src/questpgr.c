@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)questpgr.c	3.4	2000/05/05	*/
+/*	SCCS Id: @(#)questpgr.c	3.4	2004/11/22	*/
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,6 +24,7 @@ STATIC_DCL void FDECL(convert_arg, (CHAR_P));
 STATIC_DCL void NDECL(convert_line);
 STATIC_DCL void FDECL(deliver_by_pline, (struct qtmsg *));
 STATIC_DCL void FDECL(deliver_by_window, (struct qtmsg *,int));
+STATIC_DCL boolean FDECL(skip_pager, (BOOLEAN_P));
 
 static char	in_line[80], cvt_buf[64], out_line[128];
 static struct	qtlists	qt_list;
@@ -386,11 +387,31 @@ int how;
 	destroy_nhwindow(datawin);
 }
 
+boolean
+skip_pager(common)
+boolean common;
+{
+#ifdef WIZARD
+	/* WIZKIT: suppress plot feedback if starting with quest artifact */
+	if (program_state.wizkit_wishing) return TRUE;
+#endif
+	if (!(common ? qt_list.common : qt_list.chrole)) {
+	    panic("%s: no %s quest text data available",
+		  common ? "com_pager" : "qt_pager",
+		  common ? "common" : "role-specific");
+	    /*NOTREACHED*/
+	    return TRUE;
+	}
+	return FALSE;
+}
+
 void
 com_pager(msgnum)
 int	msgnum;
 {
 	struct qtmsg *qt_msg;
+
+	if (skip_pager(TRUE)) return;
 
 	if (!(qt_msg = msg_in(qt_list.common, msgnum))) {
 		impossible("com_pager: message %d not found.", msgnum);
@@ -409,6 +430,8 @@ qt_pager(msgnum)
 int	msgnum;
 {
 	struct qtmsg *qt_msg;
+
+	if (skip_pager(FALSE)) return;
 
 	if (!(qt_msg = msg_in(qt_list.chrole, msgnum))) {
 		impossible("qt_pager: message %d not found.", msgnum);

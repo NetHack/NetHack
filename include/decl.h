@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)decl.h	3.4	2001/12/10	*/
+/*	SCCS Id: @(#)decl.h	3.4	2004/11/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -157,6 +157,9 @@ E NEARDATA struct sinfo {
 	int in_impossible;
 #ifdef PANICLOG
 	int in_paniclog;
+#endif
+#ifdef WIZARD
+	int wizkit_wishing;
 #endif
 } program_state;
 

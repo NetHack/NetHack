@@ -1523,6 +1523,7 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
 	{ "candle",	TOOL_CLASS,   TALLOW_CANDLE,  WAX_CANDLE },
 	{ "horn",	TOOL_CLASS,   TOOLED_HORN,    HORN_OF_PLENTY },
 	{ "shield",	ARMOR_CLASS,  SMALL_SHIELD,   SHIELD_OF_REFLECTION },
+	{ "hat",	ARMOR_CLASS,  FEDORA,	      DUNCE_CAP },
 	{ "helm",	ARMOR_CLASS,  ELVEN_LEATHER_HELM, HELM_OF_TELEPATHY },
 	{ "gloves",	ARMOR_CLASS,  LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY },
 	{ "gauntlets",	ARMOR_CLASS,  LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY },
@@ -1749,6 +1750,7 @@ struct alt_spellings {
 	{ "lantern", BRASS_LANTERN },
 	{ "mattock", DWARVISH_MATTOCK },
 	{ "amulet of poison resistance", AMULET_VERSUS_POISON },
+	{ "potion of sleep", POT_SLEEPING },
 	{ "stone", ROCK },
 #ifdef TOURIST
 	{ "camera", EXPENSIVE_CAMERA },
@@ -1758,6 +1760,9 @@ struct alt_spellings {
 	{ "can opener", TIN_OPENER },
 	{ "kelp", KELP_FROND },
 	{ "eucalyptus", EUCALYPTUS_LEAF },
+	{ "hook", GRAPPLING_HOOK },
+	{ "grappling iron", GRAPPLING_HOOK },
+	{ "grapnel", GRAPPLING_HOOK },
 	{ "grapple", GRAPPLING_HOOK },
 	{ (const char *)0, 0 },
 };
@@ -1768,13 +1773,11 @@ struct alt_spellings {
  * if asking explicitly for "nothing" (or "nil") return no_wish;
  * if not an object return &zeroobj; if an error (no matching object),
  * return null.
- * If from_user is false, we're reading from the wizkit, nothing was typed in.
  */
 struct obj *
-readobjnam(bp, no_wish, from_user)
+readobjnam(bp, no_wish)
 register char *bp;
 struct obj *no_wish;
-boolean from_user;
 {
 	register char *p;
 	register int i;
@@ -2126,8 +2129,7 @@ boolean from_user;
 						) cnt=5000;
 		if (cnt < 1) cnt=1;
 #ifndef GOLDOBJ
-		if (from_user)
-		    pline("%d gold piece%s.", cnt, plur(cnt));
+		pline("%d gold piece%s.", cnt, plur(cnt));
 		u.ugold += cnt;
 		context.botl=1;
 		return (&zeroobj);
@@ -2331,11 +2333,12 @@ srch:
 	    }
 	}
 #ifdef WIZARD
-	/* Let wizards wish for traps --KAA */
-	/* must come after objects check so wizards can still wish for
-	 * trap objects like beartraps
+	/* Let wizards wish for traps and furniture.
+	 * Must come after objects check so wizards can still wish for
+	 * trap objects like beartraps.
+	 * Disallow such topology tweaks for WIZKIT startup wishes.
 	 */
-	if (wizard && from_user) {
+	if (wizard && !program_state.wizkit_wishing) {
 		int trap;
 
 		for (trap = NO_TRAP+1; trap < TRAPNUM; trap++) {
@@ -2351,7 +2354,8 @@ srch:
 				return(&zeroobj);
 			}
 		}
-		/* or some other dungeon features -dlc */
+
+		/* furniture and terrain */
 		p = eos(bp);
 		if(!BSTRCMP(bp, p-8, "fountain")) {
 			levl[u.ux][u.uy].typ = FOUNTAIN;
@@ -2515,11 +2519,13 @@ typfnd:
 	if (oclass == VENOM_CLASS) otmp->spe = 1;
 #endif
 
-	if (spesgn == 0) spe = otmp->spe;
+	if (spesgn == 0) {
+		spe = otmp->spe;
 #ifdef WIZARD
-	else if (wizard) /* no alteration to spe */ ;
+	} else if (wizard) {
+		;	/* no alteration to spe */
 #endif
-	else if (oclass == ARMOR_CLASS || oclass == WEAPON_CLASS ||
+	} else if (oclass == ARMOR_CLASS || oclass == WEAPON_CLASS ||
 		 is_weptool(otmp) ||
 			(oclass==RING_CLASS && objects[typ].oc_charged)) {
 		if(spe > rnd(5) && spe > otmp->spe) spe = 0;

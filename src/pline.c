@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pline.c	3.4	2003/11/06	*/
+/*	SCCS Id: @(#)pline.c	3.4	2004/11/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,6 +49,10 @@ pline VA_DECL(const char *, line)
 /* Do NOT use VA_START and VA_END in here... see above */
 
 	if (!line || !*line) return;
+#ifdef WIZARD
+	if (program_state.wizkit_wishing) return;
+#endif
+
 	if (index(line, '%')) {
 	    Vsprintf(pbuf,line,VA_ARGS);
 	    line = pbuf;
