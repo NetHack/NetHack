@@ -704,10 +704,6 @@ struct monst *mon;
 	 * polymorphed away from their original forms, the clone doesn't have
 	 * room for the extra information.  we also don't want two shopkeepers
 	 * around for the same shop.
-	 * similarly, clones of named monsters don't have room for the name,
-	 * so we just make the clone unnamed instead of bothering to create
-	 * a clone with room and copying over the name from the right place
-	 * (which changes if the original was a shopkeeper or guard).
 	 */
 	if (mon->isshk) m2->isshk = FALSE;
 	if (mon->isgd) m2->isgd = FALSE;
