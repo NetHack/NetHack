@@ -882,84 +882,107 @@ COLORREF nhcolor_to_RGB(int c)
 
 /* apply bitmap pointed by sourceDc transparently over 
    bitmap pointed by hDC */
+
+typedef BOOL (WINAPI* LPTRANSPARENTBLT)(HDC, int, int, int, int, HDC, int, int, int, int, UINT); 
 void nhapply_image_transparent( 
 	HDC hDC, int x, int y, int width, int height,
 	HDC sourceDC, int s_x, int s_y, int s_width, int s_height,
 	COLORREF cTransparent
 )
 {
-	HDC        hdcMem, hdcBack, hdcObject, hdcSave;
-	COLORREF   cColor;
-	HBITMAP    bmAndBack, bmAndObject, bmAndMem, bmSave;
-	HBITMAP    bmBackOld, bmObjectOld, bmMemOld, bmSaveOld;
+	static BOOL MSIInit = FALSE;
+	static HMODULE hMSIModule = NULL; 
+	static LPTRANSPARENTBLT pTransparentBlt = NULL; 
 
-	/* Create some DCs to hold temporary data. */
-	hdcBack   = CreateCompatibleDC(hDC);
-	hdcObject = CreateCompatibleDC(hDC);
-	hdcMem    = CreateCompatibleDC(hDC);
-	hdcSave   = CreateCompatibleDC(hDC);
+	if( !MSIInit ) {
+		MSIInit = TRUE;
+		hMSIModule = LoadLibrary(_T("Msimg32.dll")); 
+		if (hMSIModule) { 
+			pTransparentBlt = (LPTRANSPARENTBLT) GetProcAddress(hMSIModule, "TransparentBlt"); 
+		} 
+	}
 
-	/* this is bitmap for our pet image */
-	bmSave = CreateCompatibleBitmap(hDC, s_width, s_height);
+	if ( pTransparentBlt )
+	{
+		(*pTransparentBlt)(
+			hDC, x, y, width, height,
+			sourceDC, s_x, s_y, s_width, s_height,
+			cTransparent
+		);
+	} else {
+		HDC        hdcMem, hdcBack, hdcObject, hdcSave;
+		COLORREF   cColor;
+		HBITMAP    bmAndBack, bmAndObject, bmAndMem, bmSave;
+		HBITMAP    bmBackOld, bmObjectOld, bmMemOld, bmSaveOld;
 
-	/* Monochrome DC */
-	bmAndBack   = CreateBitmap(s_width, s_height, 1, 1, NULL);
-	bmAndObject = CreateBitmap(s_width, s_height, 1, 1, NULL);
+		/* Create some DCs to hold temporary data. */
+		hdcBack   = CreateCompatibleDC(hDC);
+		hdcObject = CreateCompatibleDC(hDC);
+		hdcMem    = CreateCompatibleDC(hDC);
+		hdcSave   = CreateCompatibleDC(hDC);
 
-	/* resulting bitmap */
-	bmAndMem    = CreateCompatibleBitmap(hDC, s_width, s_height);
+		/* this is bitmap for our pet image */
+		bmSave = CreateCompatibleBitmap(hDC, width, height);
 
-	/* Each DC must select a bitmap object to store pixel data. */
-	bmBackOld   = SelectObject(hdcBack, bmAndBack);
-	bmObjectOld = SelectObject(hdcObject, bmAndObject);
-	bmMemOld    = SelectObject(hdcMem, bmAndMem);
-	bmSaveOld   = SelectObject(hdcSave, bmSave);
+		/* Monochrome DC */
+		bmAndBack   = CreateBitmap(width, height, 1, 1, NULL);
+		bmAndObject = CreateBitmap(width, height, 1, 1, NULL);
 
-	/* copy source image because it is going to be overwritten */
-	BitBlt(hdcSave, 0, 0, s_width, s_height, sourceDC, s_x, s_y, SRCCOPY);
+		/* resulting bitmap */
+		bmAndMem    = CreateCompatibleBitmap(hDC, width, height);
 
-	/* Set the background color of the source DC to the color.
-	   contained in the parts of the bitmap that should be transparent */
-	cColor = SetBkColor(hdcSave, cTransparent);
+		/* Each DC must select a bitmap object to store pixel data. */
+		bmBackOld   = SelectObject(hdcBack, bmAndBack);
+		bmObjectOld = SelectObject(hdcObject, bmAndObject);
+		bmMemOld    = SelectObject(hdcMem, bmAndMem);
+		bmSaveOld   = SelectObject(hdcSave, bmSave);
 
-	/* Create the object mask for the bitmap by performing a BitBlt
-	   from the source bitmap to a monochrome bitmap. */
-	BitBlt(hdcObject, 0, 0, s_width, s_height, hdcSave, 0, 0, SRCCOPY);
+		/* copy source image because it is going to be overwritten */
+		StretchBlt(hdcSave, 0, 0, width, height, sourceDC, s_x, s_y, s_width, s_height, SRCCOPY);
 
-	/* Set the background color of the source DC back to the original
-	   color. */
-	SetBkColor(hdcSave, cColor);
+		/* Set the background color of the source DC to the color.
+		   contained in the parts of the bitmap that should be transparent */
+		cColor = SetBkColor(hdcSave, cTransparent);
 
-	/* Create the inverse of the object mask. */
-	BitBlt(hdcBack, 0, 0, s_width, s_height, hdcObject, 0, 0, NOTSRCCOPY);
+		/* Create the object mask for the bitmap by performing a BitBlt
+		   from the source bitmap to a monochrome bitmap. */
+		BitBlt(hdcObject, 0, 0, width, height, hdcSave, 0, 0, SRCCOPY);
 
-	/* Copy background to the resulting image  */
-	StretchBlt(hdcMem, 0, 0, s_width, s_height, hDC, x, y, width, height, SRCCOPY);
+		/* Set the background color of the source DC back to the original
+		   color. */
+		SetBkColor(hdcSave, cColor);
 
-	/* Mask out the places where the source image will be placed. */
-	BitBlt(hdcMem, 0, 0, s_width, s_height, hdcObject, 0, 0, SRCAND);
+		/* Create the inverse of the object mask. */
+		BitBlt(hdcBack, 0, 0, width, height, hdcObject, 0, 0, NOTSRCCOPY);
 
-	/* Mask out the transparent colored pixels on the source image. */
-	BitBlt(hdcSave, 0, 0, s_width, s_height, hdcBack, 0, 0, SRCAND);
+		/* Copy background to the resulting image  */
+		BitBlt(hdcMem, 0, 0, width, height, hDC, x, y, SRCCOPY);
 
-	/* XOR the source image with the beckground. */
-	BitBlt(hdcMem, 0, 0, s_width, s_height, hdcSave, 0, 0, SRCPAINT);
+		/* Mask out the places where the source image will be placed. */
+		BitBlt(hdcMem, 0, 0, width, height, hdcObject, 0, 0, SRCAND);
 
-	/* blt resulting image to the screen */
-	StretchBlt( 
-		hDC, 
-		x, y, width, height, hdcMem,
-		0, 0, s_width, s_height, SRCCOPY 
-	);
+		/* Mask out the transparent colored pixels on the source image. */
+		BitBlt(hdcSave, 0, 0, width, height, hdcBack, 0, 0, SRCAND);
 
-	/* cleanup */
-	DeleteObject(SelectObject(hdcBack, bmBackOld));
-	DeleteObject(SelectObject(hdcObject, bmObjectOld));
-	DeleteObject(SelectObject(hdcMem, bmMemOld));
-	DeleteObject(SelectObject(hdcSave, bmSaveOld));
+		/* XOR the source image with the beckground. */
+		BitBlt(hdcMem, 0, 0, width, height, hdcSave, 0, 0, SRCPAINT);
 
-	DeleteDC(hdcMem);
-	DeleteDC(hdcBack);
-	DeleteDC(hdcObject);
-	DeleteDC(hdcSave);
+		/* blt resulting image to the screen */
+		BitBlt( 
+			hDC, 
+			x, y, width, height, hdcMem,
+			0, 0, SRCCOPY 
+		);
+
+		/* cleanup */
+		DeleteObject(SelectObject(hdcBack, bmBackOld));
+		DeleteObject(SelectObject(hdcObject, bmObjectOld));
+		DeleteObject(SelectObject(hdcMem, bmMemOld));
+		DeleteObject(SelectObject(hdcSave, bmSaveOld));
+
+		DeleteDC(hdcMem);
+		DeleteDC(hdcBack);
+		DeleteDC(hdcObject);
+		DeleteDC(hdcSave);
+	}
 }
