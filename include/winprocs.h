@@ -162,7 +162,9 @@ extern NEARDATA struct window_procs windowprocs;
 #define WC_EIGHT_BIT_IN	 0x2000000L	/* 26 8-bit character input                  */
 #define WC_PERM_INVENT	 0x4000000L	/* 27 8-bit character input                  */
 #define WC_MAP_MODE	 0x8000000L	/* 28 map_mode option                        */
-					/* 4 free bits */
+#define WC_WINDOWCOLORS  0x10000000L	/* 29 background color for message window    */
+					/* 3 free bits */
+
 #define ALIGN_LEFT	1
 #define ALIGN_RIGHT	2
 #define ALIGN_TOP	3

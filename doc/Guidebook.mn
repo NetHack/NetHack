@@ -2117,6 +2117,9 @@ NetHack should display inverse when the game specifies it.
 .lp vary_msgcount
 NetHack should display this number of messages at a time in
 the message window.
+.lp windowcolors
+NetHack should display windows with the specified foreground/background
+colors if it can.
 .hn 2
 Configuring NetHack for Play by the Blind
 .pg

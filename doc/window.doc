@@ -456,38 +456,46 @@ iflags.wc_* fields are:
 Here are the wincap preference settings that your port can choose
 to support:
 
-  +-------------------+--------------------+-------------------+--------+
-  |                   |                    | iflags field      | data   |
-  | player option     | bit in wincap mask |   for value       | type   |
-  |-------------------+--------------------+-------------------+--------+
-  |  align_message    | WC_ALIGN_MESSAGE   | wc_align_message  |int     |
-  |  align_status     | WC_ALIGN_STATUS    | wc_align_status   |int     |
-  |  ascii_map        | WC_ASCII_MAP       | wc_ascii_map      |boolean |
-  |  color            | WC_COLOR           | wc_color          |boolean |
-  |  eight_bit_tty    | WC_EIGHT_BIT_IN    | wc_eight_bit_input|boolean |
-  |  font_map         | WC_FONT_MAP        | wc_font_map       |char *  |
-  |  font_menu        | WC_FONT_MENU       | wc_font_menu      |char *  |
-  |  font_message     | WC_FONT_MESSAGE    | wc_font_message   |char *  |
-  |  font_status      | WC_FONT_STATUS     | wc_font_status    |char *  |
-  |  font_text        | WC_FONT_TEXT       | wc_font_text      |char *  |
-  |  font_size_map    | WC_FONTSIZ_MAP     | wc_fontsiz_map    |int     |
-  |  font_size_menu   | WC_FONTSIZ_MENU    | wc_fontsiz_menu   |int     |
-  |  font_size_message| WC_FONTSIZ_MESSAGE | wc_fontsiz_message|int     |
-  |  font_size_status | WC_FONTSIZ_STATUS  | wc_fontsiz_status |int     |
-  |  font_size_text   | WC_FONTSIZ_TEXT    | wc_fontsiz_text   |int     |
-  |  hilite_pet       | WC_HILITE_PET      | wc_hilite_pet     |boolean |
-  |  large_font       | WC_LARGE_FONT      | wc_large_font     |boolean |
-  |  map_mode         | WC_MAP_MODE        | wc_map_mode       |int     |
-  |  popup_dialog     | WC_POPUP_DIALOG    | wc_popup_dialog   |boolean |
-  |  preload_tiles    | WC_PRELOAD_TILES   | wc_preload_tiles  |boolean |
-  |  scroll_margin    | WC_SCROLL_MARGIN   | wc_scroll_margin  |int     |
-  |  tiled_map        | WC_TILED_MAP       | wc_tiled_map      |boolean |
-  |  tile_width       | WC_TILE_WIDTH      | wc_tile_width     |int     |
-  |  tile_height      | WC_TILE_HEIGHT     | wc_tile_height    |int     |
-  |  tile_file        | WC_TILE_FILE       | wc_tile_file      |char *  |
-  |  use_inverse      | WC_INVERSE         | wc_inverse        |boolean |
-  |  vary_msgcount    | WC_VARY_MSGCOUNT   | wc_vary_msgcount  |int     |
-  +-------------------+--------------------+-------------------+--------+
+  +--------------------+--------------------+--------------------+--------+
+  |                    |                    | iflags field       | data   |
+  | player option      | bit in wincap mask |   for value        | type   |
+  |--------------------+--------------------+--------------------+--------+
+  |  align_message     | WC_ALIGN_MESSAGE   | wc_align_message   |int     |
+  |  align_status      | WC_ALIGN_STATUS    | wc_align_status    |int     |
+  |  ascii_map         | WC_ASCII_MAP       | wc_ascii_map       |boolean |
+  |  color             | WC_COLOR           | wc_color           |boolean |
+  |  eight_bit_tty     | WC_EIGHT_BIT_IN    | wc_eight_bit_input |boolean |
+  |  font_map          | WC_FONT_MAP        | wc_font_map        |char *  |
+  |  font_menu         | WC_FONT_MENU       | wc_font_menu       |char *  |
+  |  font_message      | WC_FONT_MESSAGE    | wc_font_message    |char *  |
+  |  font_status       | WC_FONT_STATUS     | wc_font_status     |char *  |
+  |  font_text         | WC_FONT_TEXT       | wc_font_text       |char *  |
+  |  font_size_map     | WC_FONTSIZ_MAP     | wc_fontsiz_map     |int     |
+  |  font_size_menu    | WC_FONTSIZ_MENU    | wc_fontsiz_menu    |int     |
+  |  font_size_message | WC_FONTSIZ_MESSAGE | wc_fontsiz_message |int     |
+  |  font_size_status  | WC_FONTSIZ_STATUS  | wc_fontsiz_status  |int     |
+  |  font_size_text    | WC_FONTSIZ_TEXT    | wc_fontsiz_text    |int     |
+  |  hilite_pet        | WC_HILITE_PET      | wc_hilite_pet      |boolean |
+  |  large_font        | WC_LARGE_FONT      | wc_large_font      |boolean |
+  |  map_mode          | WC_MAP_MODE        | wc_map_mode        |int     |
+  |  popup_dialog      | WC_POPUP_DIALOG    | wc_popup_dialog    |boolean |
+  |  preload_tiles     | WC_PRELOAD_TILES   | wc_preload_tiles   |boolean |
+  |  scroll_margin     | WC_SCROLL_MARGIN   | wc_scroll_margin   |int     |
+  |  tiled_map         | WC_TILED_MAP       | wc_tiled_map       |boolean |
+  |  tile_width        | WC_TILE_WIDTH      | wc_tile_width      |int     |
+  |  tile_height       | WC_TILE_HEIGHT     | wc_tile_height     |int     |
+  |  tile_file         | WC_TILE_FILE       | wc_tile_file       |char *  |
+  |  use_inverse       | WC_INVERSE         | wc_inverse         |boolean |
+  |  vary_msgcount     | WC_VARY_MSGCOUNT   | wc_vary_msgcount   |int     |
+  |  windowcolors      | WC_WINDOWCOLORS    | wc_foregrnd_menu   |char *  |
+  |                    |                    | wc_backgrnd_menu   |char *  |
+  |                    |                    | wc_foregrnd_message|char *  |
+  |                    |                    | wc_backgrnd_message|char *  |
+  |                    |                    | wc_foregrnd_status |char *  |
+  |                    |                    | wc_backgrnd_status |char *  |
+  |                    |                    | wc_foregrnd_text   |char *  |
+  |                    |                    | wc_backgrnd_text   |char *  |
+  +--------------------+--------------------+--------------------+--------+
 
 align_message	-- where to place message window (top, bottom, left, right)
 align_status	-- where to place status window (top, bottom, left, right).
@@ -522,6 +530,10 @@ tile_file	-- open this alternative tile file. The file name is likely to be
 use_inverse	-- port should display inverse when NetHack asks for it.
 vary_msgcount	-- port should display this number of messages at a time in
 		   the message window.
+windowcolors
+		-- port should use these colors for window foreground/background
+		   colors.  Syntax:
+		     menu fore/back message fore/back status fore/back text fore/back
 
 Whenever one of these settings is adjusted, the port is notified of a change
 to the setting by calling the port's preference_update() routine. The port
@@ -543,6 +555,19 @@ set_wc_option_mod_status(optmask, status)
 		   or SET_IN_GAME (SET_IN_FILE implies that the option
 		   is completely hidden during the game).
 
+
+Adding a new wincap option:
+
+To add a new wincap option, please follow all these steps:
+	1. Add the option to the wincap preference settings table above.
+	2. Add the description to the paragraph below the chart.
+	3. Add the WC_ to the bit list in include/winprocs.h (if there is room).
+	4. Add the wc_ field(s) to the iflags structure in flag.h.
+	5. Add an appropriate parser to parseoptions() in options.c.
+	6. Add code to display current value to get_compopt_value() in options.c.
+	7. Document the option in Guidebook.mn and Guidebook.tex.
+	8. Add the bit name to the OR'd values in your window port's winprocs struct
+	   wincap mask if your port supports the option.
 
 V.  New or respecified common, high level routines
 

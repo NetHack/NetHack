@@ -302,6 +302,8 @@ static struct Comp_Opt
 	{ "videoshades", "gray shades to map to black/gray/white",
 						32, DISP_IN_GAME },
 #endif
+	{ "windowcolors",  "the foreground/background colors of windows",	/*WC*/
+						80, DISP_IN_GAME },
 	{ "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
 	{ (char *)0, (char *)0, 0, 0 }
 };
@@ -404,6 +406,7 @@ STATIC_DCL void FDECL(warning_opts, (char *,const char *));
 STATIC_DCL void FDECL(duplicate_opt_detection, (const char *, int));
 
 STATIC_OVL void FDECL(wc_set_font_name, (int, char *));
+STATIC_OVL int FDECL(wc_set_window_colors, (char *));
 STATIC_OVL boolean FDECL(is_wc_option, (const char *));
 STATIC_OVL boolean FDECL(wc_supported, (const char *));
 
@@ -1858,6 +1861,19 @@ goodfruit:
 	    return;
 	}
 
+	/* WINCAP
+	 * setting window colors
+         * syntax: windowcolors=menu foregrnd/backgrnd text foregrnd/backgrnd
+         */
+	fullname = "windowcolors";
+	if (match_optname(opts, fullname, 7, TRUE)) {
+		if ((op = string_for_opt(opts, FALSE)) != 0) {
+			if (!wc_set_window_colors(op))
+				badoption(opts);
+		} else if (negated) bad_negation(fullname, TRUE);
+		return;
+	}
+
 	/* menustyle:traditional or combo or full or partial */
 	if (match_optname(opts, "menustyle", 4, TRUE)) {
 		int tmp;
@@ -2437,7 +2453,8 @@ char *buf;
 	char ocl[MAXOCLASSES+1];
 	static const char none[] = "(none)", randomrole[] = "random",
 		     to_be_done[] = "(to be done)",
-		     defopt[] = "default";
+		     defopt[] = "default",
+		     defbrief[] = "def";
 	int i;
 
 	buf[0] = '\0';
@@ -2638,6 +2655,16 @@ char *buf;
 #endif /* VIDEOSHADES */
 	else if (!strcmp(optname, "windowtype"))
 		Sprintf(buf, "%s", windowprocs.name);
+	else if (!strcmp(optname, "windowcolors"))
+		Sprintf(buf, "%s/%s %s/%s %s/%s %s/%s",
+			iflags.wc_foregrnd_menu    ? iflags.wc_foregrnd_menu : defbrief,
+			iflags.wc_backgrnd_menu    ? iflags.wc_backgrnd_menu : defbrief,
+			iflags.wc_foregrnd_message ? iflags.wc_foregrnd_message : defbrief,
+			iflags.wc_backgrnd_message ? iflags.wc_backgrnd_message : defbrief,
+			iflags.wc_foregrnd_status  ? iflags.wc_foregrnd_status : defbrief,
+			iflags.wc_backgrnd_status  ? iflags.wc_backgrnd_status : defbrief,
+			iflags.wc_foregrnd_text    ? iflags.wc_foregrnd_text : defbrief,
+			iflags.wc_backgrnd_text    ? iflags.wc_backgrnd_text : defbrief);
 #ifdef PREFIXES_IN_USE
 	else {
 	    for (i = 0; i < PREFIX_COUNT; ++i)
@@ -3106,6 +3133,88 @@ char *fontname;
 		Strcpy(*fn, fontname);
 	}
 	return;
+}
+
+STATIC_OVL int
+wc_set_window_colors(op)
+char *op;
+{
+	/* syntax:
+	 *  menu white/black message green/yellow status white/blue text white/black
+	 */
+
+	int j;
+	char buf[BUFSZ];
+	char *wn, *tfg, *tbg, *newop;
+	char *wnames[] = {"menu", "message", "status", "text"};
+	char *shortnames[] = {"mnu", "msg", "sts", "txt"};
+	char **fgp[] = {
+		&iflags.wc_foregrnd_menu,
+		&iflags.wc_foregrnd_message,
+		&iflags.wc_foregrnd_status,
+		&iflags.wc_foregrnd_text
+	};
+	char **bgp[] = {
+		&iflags.wc_backgrnd_menu,
+		&iflags.wc_backgrnd_message,
+		&iflags.wc_backgrnd_status,
+		&iflags.wc_backgrnd_text
+	};
+
+	Strcpy(buf, op);
+	newop = mungspaces(buf);
+	while (newop && *newop) {
+
+		wn = tfg = tbg = (char *)0;
+
+		/* until first non-space in case there's leading spaces*/
+		while(*newop && isspace(*newop)) newop++;
+		if (*newop) wn = newop;
+		else return 0;
+
+		/* until first space */
+		while(*newop && !isspace(*newop)) newop++;
+		if (*newop) *newop = '\0';
+		newop++;
+
+		/* until first non-space */
+		while(*newop && isspace(*newop)) newop++;
+		if (*newop) tfg = newop;
+		else return 0;
+
+		/* until slash */
+		while(*newop && *newop != '/') newop++;
+		if (*newop) *newop = '\0';
+		else return 0;
+		newop++;
+
+		/* until first non-space (in case there's leading space after slash) */
+		while(*newop && isspace(*newop)) newop++;
+		if (*newop) tbg = newop;
+		else return 0;
+
+		/* until first space */
+		while(*newop && !isspace(*newop)) newop++;
+		if (*newop) *newop = '\0';
+		newop++;
+		for (j = 0; j < 4; ++j) {
+			if (!strcmpi(wn, wnames[j]) ||
+			    !strcmpi(wn, shortnames[j])) {
+				if (tfg && !strstri(tfg, " ")) {
+					if (*fgp[j]) free(*fgp[j]);
+					*fgp[j] = (char *)alloc(strlen(tfg) + 1);
+					Strcpy(*fgp[j], tfg);
+				}
+				if (tbg && !strstri(tbg, " ")) {
+					if (*bgp[j]) free(*bgp[j]);
+					*bgp[j] = (char *)alloc(strlen(tbg) + 1);
+					Strcpy(*bgp[j], tbg);
+				}
+ 				break;
+			}
+		}
+	}
+	return 1;
 }
 
 #endif	/* OPTION_LISTS_ONLY */

@@ -223,6 +223,14 @@ struct instance_flags {
 	int	wc_align_status;	/*  status win at top|bot|right|left   */
 	int	wc_align_message;	/* message win at top|bot|right|left   */
 	int     wc_vary_msgcount;	/* show more old messages at a time    */
+	char    *wc_foregrnd_menu;	/* points to foregrnd color name for menu win   */
+	char    *wc_backgrnd_menu;	/* points to backgrnd color name for menu win   */
+	char    *wc_foregrnd_message;	/* points to foregrnd color name for msg win    */
+	char    *wc_backgrnd_message;	/* points to backgrnd color name for msg win    */
+	char    *wc_foregrnd_status;	/* points to foregrnd color name for status win */
+	char    *wc_backgrnd_status;	/* points to backgrnd color name for status win */
+	char    *wc_foregrnd_text;	/* points to foregrnd color name for text win   */
+	char    *wc_backgrnd_text;	/* points to backgrnd color name for text win   */
 	char    *wc_font_map;		/* points to font name for the map win */
 	char    *wc_font_message;	/* points to font name for message win */
 	char    *wc_font_status;	/* points to font name for status win  */
