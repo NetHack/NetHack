@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.4	2002/02/23	*/
+/*	SCCS Id: @(#)files.c	3.4	2002/07/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -167,6 +167,8 @@ char *reasonbuf;
 	failbuf[0] = '\0';
 	if (reasonbuf) reasonbuf[0] = '\0';
 	for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
+		/* don't test writing to configdir or datadir; they're readonly */
+		if (prefcnt == CONFIGPREFIX || prefcnt == DATAPREFIX) continue;
 		filename = fqname("validate", prefcnt, 3);
 		if ((fp = fopen(filename, "w"))) {
 			fclose(fp);
