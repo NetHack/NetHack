@@ -1474,7 +1474,7 @@ const char *oldstr;
 		goto bottom;
 	}
 	if (len >= 5 && (!strcmp(spot-4, "matzo")
-					|| !strcmp(spot-5, "matza"))) {
+					|| !strcmp(spot-4, "matza"))) {
 		Strcpy(spot, "ot");
 		goto bottom;
 	}
