@@ -7,7 +7,7 @@
  * and some useful functions needed by yacc
  */
 #define SPEC_LEV	/* for MPW */
-/* although, why don't we move those special defined here.. and in dgn_main? */
+/* although, why don't we move those special defines here.. and in dgn_main? */
 
 #include "hack.h"
 #include "date.h"
