@@ -7,11 +7,11 @@
 #include "mhfont.h"
 
 #define NHSW_LINES    2
-#define MAXWINDOWTEXT 80
+#define MAXWINDOWTEXT BUFSZ
 
 typedef struct mswin_nethack_status_window {
 	int   index;
-	char  window_text[NHSW_LINES][MAXWINDOWTEXT];
+	char  window_text[NHSW_LINES][MAXWINDOWTEXT+1];
 } NHStatusWindow, *PNHStatusWindow;
 
 static TCHAR szStatusWindowClass[] = TEXT("MSNHStatusWndClass");
