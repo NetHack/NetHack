@@ -883,6 +883,7 @@ hitmu(mtmp, mattk)
 			     hitmsg(mtmp, mattk);
 			if (!dmg) break;
 			if (u.mh > 1 && u.mh > ((u.uac>0) ? dmg : dmg+u.uac) &&
+				   objects[otmp->otyp].oc_material == IRON &&
 					(u.umonnum==PM_BLACK_PUDDING
 					|| u.umonnum==PM_BROWN_PUDDING)) {
 			    /* This redundancy necessary because you have to

@@ -274,9 +274,22 @@ mattackm(magr, mdef)
 		/* KMH -- don't accumulate to-hit bonuses */
 		if (otmp)
 		    tmp -= hitval(otmp, mdef);
-		if (strike)
+		if (strike) {
 		    res[i] = hitmm(magr, mdef, mattk);
-		else
+		    if((mdef->data == &mons[PM_BLACK_PUDDING] || mdef->data == &mons[PM_BROWN_PUDDING])
+		       && otmp && objects[otmp->otyp].oc_material == IRON
+		       && mdef->mhp > 1 && !mdef->mcan)
+		    {
+			if (clone_mon(mdef)) {
+			    if (vis) {
+				char buf[BUFSZ];
+
+				Strcpy(buf, Monnam(mdef));
+				pline("%s divides as %s hits it!", buf, mon_nam(magr));
+			    }
+			}
+		    }
+		} else
 		    missmm(magr, mdef, mattk);
 		break;
 

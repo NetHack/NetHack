@@ -435,6 +435,8 @@ strengthen Death; weaken Famine, Pestilence, and Demogorgon
 pet purple worms get nutrition from engulfing attack
 throwing an artifact upwards will trigger artifact hit effects when it falls
 being hit by Fire Brand when not resistant stops the turning-into-slime process
+monsters hitting other monsters can split puddings with weapons
+be consistent with checking for iron weapons when splitting puddings
 
 
 Platform- and/or Interface-Specific Fixes
