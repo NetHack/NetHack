@@ -382,30 +382,31 @@ register struct obj *spellbook;
 
 		/* Books are often wiser than their readers (Rus.) */
 		spellbook->in_use = TRUE;
-		if (!spellbook->blessed && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
-			if (spellbook->cursed) {
-			    too_hard = TRUE;
-			} else {
-			    /* uncursed - chance to fail */
-			    int read_ability = ACURR(A_INT) + 4 + u.ulevel/2
-					       - 2*objects[booktype].oc_level
-					       + (ublindf && ublindf->otyp == LENSES) ? 2 : 0;
-			    /* only wizards know if a spell is too difficult */
-			    if (Role_if(PM_WIZARD) && read_ability < 20) {
-				char qbuf[QBUFSZ];
-				Sprintf(qbuf,
+		if (!spellbook->blessed &&
+		    spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
+		    if (spellbook->cursed) {
+			too_hard = TRUE;
+		    } else {
+			/* uncursed - chance to fail */
+			int read_ability = ACURR(A_INT) + 4 + u.ulevel/2
+			    - 2*objects[booktype].oc_level
+			    + ((ublindf && ublindf->otyp == LENSES) ? 2 : 0);
+			/* only wizards know if a spell is too difficult */
+			if (Role_if(PM_WIZARD) && read_ability < 20) {
+			    char qbuf[QBUFSZ];
+			    Sprintf(qbuf,
 		      "This spellbook is %sdifficult to comprehend. Continue?",
-					(read_ability < 12 ? "very " : ""));
-				if (yn(qbuf) != 'y') {
-				    spellbook->in_use = FALSE;
-				    return(1);
-				}
-			    }
-			    /* its up to random luck now */
-			    if (rnd(20) > read_ability) {
-				too_hard = TRUE;
+				    (read_ability < 12 ? "very " : ""));
+			    if (yn(qbuf) != 'y') {
+				spellbook->in_use = FALSE;
+				return(1);
 			    }
 			}
+			/* its up to random luck now */
+			if (rnd(20) > read_ability) {
+			    too_hard = TRUE;
+			}
+		    }
 		}
 
 		if (too_hard) {
