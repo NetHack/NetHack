@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2001/03/14	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2002/03/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1275,10 +1275,7 @@ pick_obj(otmp)
 struct obj *otmp;
 {
 	obj_extract_self(otmp);
-	if (otmp->no_charge) {
-	    /* this attribute only applies to objects outside invent */
-	    otmp->no_charge = 0;
-	} else if (otmp != uball && costly_spot(otmp->ox, otmp->oy)) {
+	if (otmp != uball && costly_spot(otmp->ox, otmp->oy)) {
 	    char saveushops[5], fakeshop[2];
 
 	    /* addtobill cares about your location rather than the object's;
@@ -1295,6 +1292,8 @@ struct obj *otmp;
 	    if (!index(u.ushops, *fakeshop))
 		remote_burglary(otmp->ox, otmp->oy);
 	}
+	if (otmp->no_charge)	/* only applies to objects outside invent */
+	    otmp->no_charge = 0;
 	if (Invisible) newsym(otmp->ox, otmp->oy);
 	return addinv(otmp);	/* might merge it with other objects */
 }
