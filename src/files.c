@@ -1372,12 +1372,16 @@ int retryct;
 #define OPENFAILURE(fd) (fd < 0)
     lockptr = -1;
 # endif
-    while (retryct-- && OPENFAILURE(lockptr)) {
-# ifdef AMIGA
-	(void)DeleteFile(lockname); /* in case dead process was here first */
-	lockptr = Open(lockname,MODE_NEWFILE);
+    while (--retryct && OPENFAILURE(lockptr)) {
+# if defined(WIN32) && !defined(WIN_CE)
+	lockptr = sopen(lockname, O_RDWR|O_CREAT, SH_DENYRW, S_IWRITE);
 # else
+	(void)DeleteFile(lockname); /* in case dead process was here first */
+#  ifdef AMIGA
+	lockptr = Open(lockname,MODE_NEWFILE);
+#  else
 	lockptr = open(lockname, O_RDWR|O_CREAT|O_EXCL, S_IWRITE);
+#  endif
 # endif
 	if (OPENFAILURE(lockptr)) {
 	    raw_printf("Waiting for access to %s.  (%d retries left).",
