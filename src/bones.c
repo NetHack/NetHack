@@ -106,6 +106,7 @@ boolean restore;
 				otmp->quan = (long)otmp->spe;
 			    otmp->spe = 0;
 			    otmp->owt = weight(otmp);
+			    curse(otmp);
 			} else if (otmp->otyp == BELL_OF_OPENING) {
 			    otmp->otyp = BELL;
 			    curse(otmp);
