@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)explode.c	3.4	2000/07/07	*/
+/*	SCCS Id: @(#)explode.c	3.4	2002/11/10	*/
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -188,7 +188,7 @@ int expltype;
 		}
 		curs_on_u();	/* will flush screen and output */
 
-		if (any_shield) {	/* simulate a shield effect */
+		if (any_shield && flags.sparkle) { /* simulate shield effect */
 		    for (k = 0; k < SHIELD_COUNT; k++) {
 			for (i=0; i<3; i++) for (j=0; j<3; j++) {
 			    if (explmask[i][j] == 1)
