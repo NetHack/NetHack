@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.3	2001/11/29	*/
+/*	SCCS Id: @(#)pray.c	3.3	2002/01/15	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -833,10 +833,18 @@ pleased(g_align)
 	    /* Otherwise, falls into next case */
 	case 2:
 	    if (!Blind)
-		You("are surrounded by %s glow.",
-		    an(hcolor(golden)));
-	    if (Upolyd) u.mh = u.mhmax += 5;
-	    u.uhp = u.uhpmax += 5;
+		You("are surrounded by %s glow.", an(hcolor(golden)));
+	    /* if any levels have been lost (and not yet regained),
+	       treat this effect like blessed full healing */
+	    if (u.ulevel < u.ulevelmax) {
+		u.ulevelmax -= 1;	/* see potion.c */
+		pluslvl(FALSE);
+	    } else {
+		u.uhpmax += 5;
+		if (Upolyd) u.mhmax += 5;
+	    }
+	    u.uhp = u.uhpmax;
+	    if (Upolyd) u.mh = u.mhmax;
 	    ABASE(A_STR) = AMAX(A_STR);
 	    if (u.uhunger < 900) init_uhunger();
 	    if (u.uluck < 0) u.uluck = 0;

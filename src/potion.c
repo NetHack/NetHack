@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.3	2001/12/07	*/
+/*	SCCS Id: @(#)potion.c	3.3	2002/01/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -784,8 +784,12 @@ peffects(otmp)
 		You_feel("completely healed.");
 		healup(400, 4+4*bcsign(otmp), !otmp->cursed, TRUE);
 		/* Restore one lost level if blessed */
-		if (otmp->blessed && (u.ulevel < u.ulevelmax))
-			pluslvl(FALSE);
+		if (otmp->blessed && u.ulevel < u.ulevelmax) {
+		    /* when multiple levels have been lost, drinking
+		       multiple potions will only get half of them back */
+		    u.ulevelmax -= 1;
+		    pluslvl(FALSE);
+		}
 		make_hallucinated(0L,TRUE,0L);
 		exercise(A_STR, TRUE);
 		exercise(A_CON, TRUE);

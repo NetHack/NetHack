@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.3	2001/03/22	*/
+/*	SCCS Id: @(#)polyself.c	3.3	2002/01/15	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -130,27 +130,34 @@ change_sex()
 STATIC_OVL void
 newman()
 {
-	int tmp, tmp2;
+	int tmp, oldlvl;
 
 	tmp = u.uhpmax;
-	tmp2 = u.ulevel;
+	oldlvl = u.ulevel;
 	u.ulevel = u.ulevel + rn1(5, -2);
 	if (u.ulevel > 127 || u.ulevel < 1) { /* level went below 0? */
-	    u.ulevel = tmp2; /* restore old level in case they lifesave */
+	    u.ulevel = oldlvl; /* restore old level in case they lifesave */
 	    goto dead;
 	}
 	if (u.ulevel > MAXULEV) u.ulevel = MAXULEV;
+	/* If your level goes down, your peak level goes down by
+	   the same amount so that you can't simply use blessed
+	   full healing to undo the decrease.  But if your level
+	   goes up, your peak level does *not* undergo the same
+	   adjustment; you might end up losing out on the chance
+	   to regain some levels previously lost to other causes. */
+	if (u.ulevel < oldlvl) u.ulevelmax -= (oldlvl - u.ulevel);
 	if (u.ulevelmax < u.ulevel) u.ulevelmax = u.ulevel;
 
 	if (!rn2(10)) change_sex();
 
-	adjabil(tmp2, (int)u.ulevel);
+	adjabil(oldlvl, (int)u.ulevel);
 	reset_rndmonst(NON_PM);	/* new monster generation criteria */
 
 	/* random experience points for the new experience level */
 	u.uexp = rndexp();
 
-	/* u.uhpmax * u.ulevel / tmp2: proportionate hit points to new level
+	/* u.uhpmax * u.ulevel / oldlvl: proportionate hit points to new level
 	 * -10 and +10: don't apply proportionate HP to 10 of a starting
 	 *   character's hit points (since a starting character's hit points
 	 *   are not on the same scale with hit points obtained through level
@@ -158,7 +165,7 @@ newman()
 	 * 9 - rn2(19): random change of -9 to +9 hit points
 	 */
 #ifndef LINT
-	u.uhpmax = ((u.uhpmax - 10) * (long)u.ulevel / tmp2 + 10) +
+	u.uhpmax = ((u.uhpmax - 10) * (long)u.ulevel / oldlvl + 10) +
 		(9 - rn2(19));
 #endif
 
@@ -170,7 +177,7 @@ newman()
 
 	tmp = u.uenmax;
 #ifndef LINT
-	u.uenmax = u.uenmax * (long)u.ulevel / tmp2 + 9 - rn2(19);
+	u.uenmax = u.uenmax * (long)u.ulevel / oldlvl + 9 - rn2(19);
 #endif
 	if (u.uenmax < 0) u.uenmax = 0;
 #ifndef LINT
