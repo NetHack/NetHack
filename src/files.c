@@ -1671,6 +1671,8 @@ read_wizkit()
 	FILE *fp;
 	char *ep, buf[BUFSZ];
 	struct obj *otmp;
+	boolean bad_items = FALSE;
+
 	if (!wizard || !(fp = fopen_wizkit_file())) return;
 
 	while (fgets(buf, 4*BUFSZ, fp)) {
@@ -1682,10 +1684,12 @@ read_wizkit()
 				otmp = addinv(otmp);
 			} else {
 			    raw_printf("Bad wizkit item: \"%.50s\"", buf);
-			    wait_synch();
+			    bad_items = TRUE;
 			}
 		}
 	}
+	if (bad_items)
+	    wait_synch();
 	(void) fclose(fp);
 	return;
 }
