@@ -165,6 +165,9 @@ can_make_bones()
 	    return FALSE;
 	if (no_bones_level(&u.uz))
 	    return FALSE;		/* no bones for specific levels */
+	if (u.uswallow) {
+	    return FALSE;		/* no bones when swallowed */
+	}
 	if (!Is_branchlev(&u.uz)) {
 	    /* no bones on non-branches with portals */
 	    for(ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
