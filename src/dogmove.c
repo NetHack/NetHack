@@ -16,8 +16,8 @@ STATIC_DCL int FDECL(dog_invent,(struct monst *,struct edog *,int));
 STATIC_DCL int FDECL(dog_goal,(struct monst *,struct edog *,int,int,int));
 
 STATIC_DCL struct obj *FDECL(DROPPABLES, (struct monst *));
-STATIC_DCL boolean can_reach_food(struct monst *,XCHAR_P,XCHAR_P,XCHAR_P,
-    XCHAR_P);
+STATIC_DCL boolean FDECL(can_reach_food,(struct monst *,XCHAR_P,XCHAR_P,XCHAR_P,
+    XCHAR_P));
 
 STATIC_OVL struct obj *
 DROPPABLES(mon)
