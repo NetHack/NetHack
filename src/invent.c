@@ -708,13 +708,9 @@ register const char *let,*word;
 	register char *bp = buf;
 	xchar allowcnt = 0;	/* 0, 1 or 2 */
 #ifndef GOLDOBJ
-	boolean allowgold = FALSE, usegold = FALSE;
-		/* Two possibilities: they can't use gold because it's illegal,
-		 * or they can't use gold because they don't have any.
-		 */
-#else
-	boolean usegold = FALSE;
+	boolean allowgold = FALSE;	/* can't use gold because they don't have any */
 #endif
+	boolean usegold = FALSE;	/* can't use gold because its illegal */
 	boolean allowall = FALSE;
 	boolean allownone = FALSE;
 	xchar foox = 0;
@@ -730,8 +726,14 @@ register const char *let,*word;
 	if(*let == GOLD_CLASS) let++, usegold = TRUE;
 #endif
 	/* Ugly check for touchstone */
-	if (!strncmp(word, "rub on", 6) && u.ugold)
+	if (!strncmp(word, "rub on", 6)
+#ifndef GOLDOBJ
+		&& u.ugold)
 		allowgold = usegold = TRUE;
+#else
+		)
+		usegold = TRUE;		
+#endif
 
 	/* Equivalent of an "ugly check" for gold */
 	if (usegold && !strcmp(word, "eat") && !metallivorous(youmonst.data))
