@@ -110,8 +110,19 @@ extern "C" {
 #include <unistd.h>
 #endif
 
+// Some distributors released Qt 2.1.0beta4
+#if QT_VERSION < 220
+# define nh_WX11BypassWM 0x01000000
+#else
+# define nh_WX11BypassWM WX11BypassWM
+#endif
+
 #ifdef USER_SOUNDS
-#include <qsound.h>
+# if QT_VERSION < 220
+#  undef USER_SOUNDS
+# else
+#  include <qsound.h>
+# endif
 #endif
 
 
@@ -4308,7 +4319,7 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
     QPixmap pm("nhsplash.xpm");
     if ( !pm.isNull() ) {
 	QVBox *vb = new QVBox(0,0,
-	    WStyle_Customize | WStyle_NoBorder | WX11BypassWM | WStyle_StaysOnTop );
+	    WStyle_Customize | WStyle_NoBorder | nh_WX11BypassWM | WStyle_StaysOnTop );
 	splash = vb;
 	QLabel *lsplash = new QLabel(vb);
 	lsplash->setAlignment(AlignCenter);
