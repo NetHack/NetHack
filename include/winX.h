@@ -56,6 +56,8 @@ struct tile_map_info_t {
     unsigned short glyphs[ROWNO][COLNO];	/* Saved glyph numbers. */
     GC	white_gc;
     GC	black_gc;
+    unsigned long image_width;			/* dimensions of tile image */
+    unsigned long image_height;
 };
 
 struct map_info_t {

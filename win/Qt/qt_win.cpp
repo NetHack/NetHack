@@ -56,6 +56,7 @@ extern "C" {
 #include "func_tab.h"
 #include "dlb.h"
 #include "patchlevel.h"
+#include "tile2x11.h"
 #undef Warning
 #undef red
 #undef green
@@ -4178,10 +4179,10 @@ NetHackQtGlyphs::NetHackQtGlyphs()
 	    tiles_per_row = 40;
 	}
     } else {
-        tiles_per_row = 1;
-        if (img.height()%total_tiles_used) {
-            impossible("Tile file \"%s\" has %d lines, not multiple of glyph count (%d)",
-               tile_file, img.height(), total_tiles_used);
+        tiles_per_row = TILES_PER_ROW;
+        if (img.width()%tiles_per_row) {
+            impossible("Tile file \"%s\" has %d columns, not multiple of row count (%d)",
+               tile_file, img.height(), tiles_per_row);
         }
     }
     int rows = ((total_tiles_used+tiles_per_row-1) / tiles_per_row);
