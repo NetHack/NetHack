@@ -173,7 +173,9 @@ getlock()
 		    if (ct > 0) {
 # if defined(WIN32CON)
 			backsp();       /* \b is visible on NT */
-# else
+			(void) putchar(' ');
+			backsp();
+ # else
 			msmsg("\b \b");
 # endif
 			ct = 0;
