@@ -606,6 +606,11 @@ level_tele()
 		    pline("Oops...");
 		    goto random_levtport;
 		}
+#ifdef WIZARD
+		if (wizard && !strcmp(buf,"?")) {
+		    newlev = print_dungeon(TRUE);
+		} else
+#endif
 		if ((newlev = lev_by_name(buf)) == 0) newlev = atoi(buf);
 	    } while (!newlev && !digit(buf[0]) &&
 		     (buf[0] != '-' || !digit(buf[1])) &&

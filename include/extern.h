@@ -505,7 +505,7 @@ E boolean FDECL(Invocation_lev, (d_level *));
 E xchar NDECL(level_difficulty);
 E schar FDECL(lev_by_name, (const char *));
 #ifdef WIZARD
-E void NDECL(print_dungeon);
+E schar FDECL(print_dungeon, (BOOLEAN_P));
 #endif
 
 /* ### eat.c ### */

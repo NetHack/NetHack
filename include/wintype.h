@@ -13,6 +13,7 @@ typedef union any {
     struct obj *a_obj;
     int  a_int;
     char a_char;
+    schar a_schar;
     /* add types as needed */
 } anything;
 #define ANY_P union any /* avoid typedef in prototypes */

@@ -44,7 +44,7 @@ STATIC_DCL xchar FDECL(pick_level, (boolean *, int));
 STATIC_DCL boolean FDECL(place_level, (int, struct proto_dungeon *));
 #ifdef WIZARD
 STATIC_DCL const char *FDECL(br_string, (int));
-STATIC_DCL void FDECL(print_branch, (winid, int, int, int));
+STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P, char *));
 #endif
 
 #ifdef DEBUG
@@ -1519,7 +1519,6 @@ const char *nam;
     return lev;
 }
 
-
 #ifdef WIZARD
 
 /* Convert a branch type to a string usable by print_dungeon(). */
@@ -1538,14 +1537,17 @@ br_string(type)
 
 /* Print all child branches between the lower and upper bounds. */
 STATIC_OVL void
-print_branch(win, dnum, lower_bound, upper_bound)
+print_branch(win, dnum, lower_bound, upper_bound, bymenu, menuletter)
     winid win;
     int   dnum;
     int   lower_bound;
     int   upper_bound;
+    boolean bymenu;
+    char *menuletter;
 {
     branch *br;
     char buf[BUFSZ];
+    anything any;
 
     /* This assumes that end1 is the "parent". */
     for (br = branches; br; br = br->next) {
@@ -1555,14 +1557,25 @@ print_branch(win, dnum, lower_bound, upper_bound)
 		    br_string(br->type),
 		    dungeons[br->end2.dnum].dname,
 		    depth(&br->end1));
-	    putstr(win, 0, buf);
+	    if (bymenu) {
+	    	schar lev = depth(&br->end1);
+		any.a_void = 0;
+		if (lev >= 0) any.a_schar = lev + 1;
+		else any.a_schar = lev;
+		add_menu(win, NO_GLYPH, &any, *menuletter,
+				0, ATR_NONE, buf, MENU_UNSELECTED);
+		if (*menuletter == 'z') *menuletter = 'A';
+		else *menuletter += 1;
+	    } else
+		putstr(win, 0, buf);
 	}
     }
 }
 
 /* Print available dungeon information. */
-void
-print_dungeon()
+schar
+print_dungeon(bymenu)
+boolean bymenu;
 {
     int     i, last_level, nlev;
     char    buf[BUFSZ];
@@ -1570,7 +1583,14 @@ print_dungeon()
     s_level *slev;
     dungeon *dptr;
     branch  *br;
+
+    anything any;
+    char mlet;
     winid   win = create_nhwindow(NHW_MENU);
+    if (bymenu) {
+	start_menu(win);
+	mlet = 'a';
+    }
 
     for (i = 0, dptr = dungeons; i < n_dgns; i++, dptr++) {
 	nlev = dptr->num_dunlevs;
@@ -1588,7 +1608,11 @@ print_dungeon()
 		Sprintf(eos(buf), ", entrance on %d",
 			dptr->depth_start + dptr->entry_lev - 1);
 	}
-	putstr(win, 0, buf);
+	if (bymenu) {
+	    any.a_void = 0;
+	    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_BOLD, buf, MENU_UNSELECTED);
+	} else
+	    putstr(win, 0, buf);
 
 	/*
 	 * Circle through the special levels to find levels that are in
@@ -1598,31 +1622,70 @@ print_dungeon()
 	    if (slev->dlevel.dnum != i) continue;
 
 	    /* print any branches before this level */
-	    print_branch(win, i, last_level, slev->dlevel.dlevel);
+	    print_branch(win, i, last_level, slev->dlevel.dlevel, bymenu, &mlet);
 
 	    Sprintf(buf, "   %s: %d", slev->proto, depth(&slev->dlevel));
 	    if (Is_stronghold(&slev->dlevel))
 		Sprintf(eos(buf), " (tune %s)", tune);
-	    putstr(win, 0, buf);
+	    if (bymenu) {
+	    	schar lev = depth(&slev->dlevel);
+		any.a_void = 0;
+		if (lev >= 0) any.a_schar = lev + 1;
+		else any.a_schar = lev;
+		add_menu(win, NO_GLYPH, &any, mlet, 0, ATR_NONE, buf, MENU_UNSELECTED);
+		if (mlet == 'z') mlet = 'A';
+		else mlet++;
+	    } else
+		putstr(win, 0, buf);
 
 	    last_level = slev->dlevel.dlevel;
 	}
 	/* print branches after the last special level */
-	print_branch(win, i, last_level, MAXLEVEL);
+	print_branch(win, i, last_level, MAXLEVEL, bymenu, &mlet);
     }
 
     /* Print out floating branches (if any). */
     for (first = TRUE, br = branches; br; br = br->next) {
 	if (br->end1.dnum == n_dgns) {
 	    if (first) {
-		putstr(win, 0, "");
-		putstr(win, 0, "Floating branches");
+	    	if (bymenu) {
+		    any.a_void = 0;
+		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_BOLD,
+				"Floating branches", MENU_UNSELECTED);
+	    	} else {
+		    putstr(win, 0, "");
+		    putstr(win, 0, "Floating branches");
+		}
 		first = FALSE;
 	    }
 	    Sprintf(buf, "   %s to %s",
 			br_string(br->type), dungeons[br->end2.dnum].dname);
-	    putstr(win, 0, buf);
+	    if (bymenu) {
+	    	schar lev = lev_by_name(dungeons[br->end2.dnum].dname);
+		any.a_void = 0;
+		if (lev >= 0) any.a_schar = lev + 1;
+		else any.a_schar = lev;
+		add_menu(win, NO_GLYPH, &any, mlet, 0, ATR_NONE, buf, MENU_UNSELECTED);
+		if (mlet == 'z') mlet = 'A';
+		else mlet++;
+	    } else
+		putstr(win, 0, buf);
 	}
+    }
+    if (bymenu) {
+    	int n;
+	menu_item *selected;
+	schar lev = 0;
+
+	end_menu(win, "Level teleport to where:");
+	n = select_menu(win, PICK_ONE, &selected);
+	destroy_nhwindow(win);
+	if (n > 0) {
+		lev = selected[0].item.a_schar;
+		if (lev > 0) lev--;
+		free((genericptr_t)selected);
+	}
+	return lev;
     }
 
     /* I hate searching for the invocation pos while debugging. -dean */
@@ -1654,6 +1717,7 @@ print_dungeon()
 
     display_nhwindow(win, TRUE);
     destroy_nhwindow(win);
+    return 0;
 }
 #endif /* WIZARD */
 
