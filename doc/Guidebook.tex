@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.47 $ $Date: 2002/08/04 16:48:05 $
+% $Revision: 1.48 $ $Date: 2002/08/05 00:20:08 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -807,8 +807,8 @@ Wield weapon.\\
 Wear armor.
 %.lp
 \item[\tb{x}]
-Exchange your wielded weapon with the item in your secondary
-weapon slot.  The latter is used as your second weapon in
+Exchange your wielded weapon with the item in your alternate
+weapon slot.  The latter is used as your secondary weapon when engaging in
 two-weapon combat.  Note that if one of these slots is empty,
 the exchange still takes place.
 %.lp
@@ -1383,9 +1383,9 @@ Many weapons can be wielded in one hand; some require both hands.
 When wielding a two-handed weapon, you can not wear a shield, and
 vice versa.  When wielding a one-handed weapon, you can have another
 weapon ready to use by setting things up with the `{\tt x}' command, which
-exchanges your primary (the one being wielded) and secondary weapons.
+exchanges your primary (the one being wielded) and alternate weapons.
 And if you have proficiency in the ``two weapon combat'' skill, you
-may wield both primary and secondary weapons simultaneously; use the
+may wield both weapons simultaneously as primary and secondary; use the
 `{\tt \#twoweapon}' extended command to engage or disengage that.  Only
 some types of characters (barbarians, for instance) have the necessary
 skill available.  Even with that skill, using two weapons at once incurs
@@ -2424,7 +2424,7 @@ Prompt for confirmation before praying (default on).
 %.lp
 \item[\ib{pushweapon}]
 Using the `w' (wield) command when already wielding
-something pushes the old item into your secondary weapon slot (default off).
+something pushes the old item into your alternate weapon slot (default off).
 %.Ip
 \item[\ib{race}]
 Selects your race (for example, ``{\tt race:human}'').  Default is random.
