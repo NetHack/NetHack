@@ -2019,7 +2019,7 @@ boolean from_user;
 		as++;
 	}
 	/* can't use spellings list for this one due to shuffling */
-	if (!strcmpi(bp, "grey spellbook"))
+	if (!strncmpi(bp, "grey spell", 10))
 		*(bp + 2) = 'a';
     }
 
