@@ -339,6 +339,8 @@ mount_steed(mtmp, force)
 	    	pline("%s magically floats up!", Monnam(mtmp));
 	    You("mount %s.", mon_nam(mtmp));
 	}
+	/* setuwep handles polearms differently when you're mounted */
+	if (uwep && is_pole(uwep)) unweapon = FALSE;
 	u.usteed = mtmp;
 	remove_monster(mtmp->mx, mtmp->my);
 	teleds(mtmp->mx, mtmp->my, TRUE);
@@ -598,14 +600,17 @@ dismount_steed(reason)
 	}
 
 	/* Return the player to the floor */
-    if (reason != DISMOUNT_ENGULFED) {
-	in_steed_dismounting = TRUE;
-	(void) float_down(0L, W_SADDLE);
-	in_steed_dismounting = FALSE;
-	flags.botl = 1;
-	(void)encumber_msg();
-	vision_full_recalc = 1;
-    } else flags.botl = 1;
+	if (reason != DISMOUNT_ENGULFED) {
+	    in_steed_dismounting = TRUE;
+	    (void) float_down(0L, W_SADDLE);
+	    in_steed_dismounting = FALSE;
+	    flags.botl = 1;
+	    (void)encumber_msg();
+	    vision_full_recalc = 1;
+	} else
+	    flags.botl = 1;
+	/* polearms behave differently when not mounted */
+	if (uwep && is_pole(uwep)) unweapon = TRUE;
 	return;
 }
 
