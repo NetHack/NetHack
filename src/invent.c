@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2002/04/07	*/
+/*	SCCS Id: @(#)invent.c	3.4	2002/09/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1677,6 +1677,7 @@ long* out_cnt;
 		    ret = message_menu(lets[0],
 			  want_reply ? PICK_ONE : PICK_NONE,
 			  xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
+		    if (out_cnt) *out_cnt = -1L;	/* select all */
 		    break;
 		}
 	    }
