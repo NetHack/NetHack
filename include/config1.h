@@ -130,6 +130,11 @@
 #endif
 
 
+#if defined(__linux__) && defined(__GNUC__) && !defined(_GNU_SOURCE)
+/* ensure _GNU_SOURCE is defined before including any system headers */
+# define _GNU_SOURCE
+#endif
+
 #ifdef VMS	/* really old compilers need special handling, detected here */
 # undef UNIX
 # ifdef __DECC
