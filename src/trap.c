@@ -494,6 +494,8 @@ int *fail_reason;
 	} else { /* cause == ANIMATE_NORMAL */
 	    You("find %s posing as a statue.",
 		canspotmon(mon) ? a_monnam(mon) : something);
+	    if (!canspotmon(mon) && Blind)
+		map_invisible(x,y);
 	    stop_occupation();
 	}
 
