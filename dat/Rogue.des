@@ -1,0 +1,475 @@
+#	SCCS Id: @(#)Rogue.des	3.3	2001/09/01
+#	Copyright (c) 1992 by Dean Luick
+# NetHack may be freely redistributed.  See license for details.
+#
+#	The "start" level for the quest.
+#
+#	Here you meet your (besieged) class leader, Master of Thieves
+#	and receive your quest assignment.
+#
+MAZE: "Rog-strt",' '
+FLAGS: noteleport, hardfloor, nommap
+GEOMETRY:center,center
+MAP
+#         1         2         3         4         5         6         7
+#123456789012345678901234567890123456789012345678901234567890123456789012345
+---------------------------------.------------------------------------------
+|.....|.||..........|....|......|.|.........|.......+............---.......|
+|.....|..+..........+....---....S.|...-S-----.-----.|............+.+.......|
+|.....+.||........---......|....|.|...|.....|.|...|.---.....------.--------|
+|-----|.-------|..|........------.-----.....|.--..|...-------..............|
+|.....|........------+------..........+.....|..--S---.........------.-----..
+|.....|.------...............-----.}}.--------.|....-------.---....|.+...--|
+|..-+--.|....|-----.--------.|...|.....+.....|.|....|.....+.+......|.--....|
+|..|....|....|....+.|......|.|...-----.|.....|.--...|.....|.|......|..|....|
+|..|.----------...|.+....-----...|...|.----..|..|.---....--.---S-----.|----|
+|..|.|........|...------.|.S.....|...|....-----.+.|......|..|.......|.|....|
+|---.-------..|...|....|.|.|.....|...----.|...|.|---.....|.|-.......|.---..|
+...........|..|...|....---.----S----..|...|...+.|..-------.---+-....|...--+|
+|---------.---------...|......|....S..|.---...|.|..|...........----.---....|
+|........|.........|...+.------....|---.---...|.--+-.----.----....|.+...--+|
+|........|.---+---.|----.--........|......-----......|..|..|.--+-.|.-S-.|..|
+|........|.|.....|........----------.----.......---.--..|-.|....|.-----.|..|
+|----....+.|.....----+---............|..|--------.+.|...SS.|....|.......|..|
+|...--+-----.....|......|.------------............---...||.------+--+----..|
+|..........S.....|......|.|..........S............|.....||...|.....|....|..|
+-------------------------.--------------------------------------------------
+ENDMAP
+# Dungeon Description
+#REGION:(00,00,75,20),lit,"ordinary"
+# The down stairs is at one of the 4 "exits".  The others are mimics,
+# mimicing stairwells.
+RANDOM_PLACES: (33,0), (0,12), (25,20), (75,05)
+STAIR:place[0],down
+MONSTER:'m',"giant mimic", place[1], m_feature "staircase down"
+MONSTER:'m',"large mimic", place[2], m_feature "staircase down"
+MONSTER:'m',"small mimic", place[3], m_feature "staircase down"
+# Portal arrival point
+BRANCH:(19,09,19,09),(0,0,0,0)
+# Doors (secret)
+#DOOR:locked|closed|open,(xx,yy)
+DOOR: locked, (32, 2)
+DOOR: locked, (63, 9)
+DOOR: locked, (27,10)
+DOOR: locked, (31,12)
+DOOR: locked, (35,13)
+DOOR: locked, (69,15)
+DOOR: locked, (56,17)
+DOOR: locked, (57,17)
+DOOR: locked, (11,19)
+DOOR: locked, (37,19)
+# Doors (regular)
+DOOR: closed, (52, 1)
+DOOR: closed, ( 9, 2)
+DOOR: closed, (20, 2)
+DOOR: closed, (65, 2)
+DOOR: closed, (67, 2)
+DOOR: closed, ( 6, 3)
+DOOR: closed, (21, 5)
+DOOR: closed, (38, 5)
+DOOR: closed, (69, 6)
+DOOR: closed, ( 4, 7)
+DOOR: closed, (39, 7)
+DOOR: closed, (58, 7)
+DOOR: closed, (60, 7)
+DOOR: closed, (18, 8)
+DOOR: closed, (20, 9)
+DOOR: closed, (48,10)
+DOOR: closed, (46,12)
+DOOR: closed, (62,12)
+DOOR: closed, (74,12)
+DOOR: closed, (23,14)
+DOOR: closed, (23,14)
+DOOR: closed, (50,14)
+DOOR: closed, (68,14)
+DOOR: closed, (74,14)
+DOOR: closed, (14,15)
+DOOR: closed, (63,15)
+DOOR: closed, ( 9,17)
+DOOR: closed, (21,17)
+DOOR: closed, (50,17)
+DOOR: closed, ( 6,18)
+DOOR: closed, (65,18)
+DOOR: closed, (68,18)
+# Master of Thieves
+MONSTER:'@',"Master of Thieves",(36,11)
+# The treasure of Master of Thieves
+OBJECT:'(',"chest",(36,11)
+# thug guards, room #1
+MONSTER:'@',"thug",(28,10)
+MONSTER:'@',"thug",(29,11)
+MONSTER:'@',"thug",(30,09)
+MONSTER:'@',"thug",(31,07)
+# thug guards, room #2
+MONSTER:'@',"thug",(31,13)
+MONSTER:'@',"thug",(33,14)
+MONSTER:'@',"thug",(30,15)
+#thug guards, room #3
+MONSTER:'@',"thug",(35,09)
+MONSTER:'@',"thug",(36,13)
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,20)
+# Random traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+#
+# Monsters to get in the way.
+#
+# West exit
+MONSTER: 'l',"leprechaun",(01,12),hostile
+MONSTER: 'n',"water nymph",(02,12),hostile
+# North exit
+MONSTER: 'n',"water nymph",(33,01),hostile
+MONSTER: 'l',"leprechaun",(33,02),hostile
+# East exit
+MONSTER: 'n',"water nymph",(74,05),hostile
+MONSTER: 'l',"leprechaun",(74,04),hostile
+# South exit
+MONSTER: 'l',"leprechaun",(25,19),hostile
+MONSTER: 'n',"water nymph",(25,18),hostile
+# Wandering the streets.  What I'd really like for this is a random
+# location, but make sure we're on a given type, e.g. street (if they
+# existed, of course).
+MONSTER: 'n',"water nymph",(07,05),hostile
+MONSTER: 'l',"leprechaun",(28,06),hostile
+MONSTER: 'n',"water nymph",(38,07),hostile
+MONSTER: 'l',"leprechaun",(45,01),hostile
+MONSTER: 'n',"water nymph",(59,07),hostile
+MONSTER: 'l',"leprechaun",(62,14),hostile
+MONSTER: 'n',"water nymph",(71,14),hostile
+MONSTER: 'l',"leprechaun",(39,13),hostile
+MONSTER: 'n',"water nymph",(18,14),hostile
+MONSTER: ':',"chameleon",(19,08),hostile
+MONSTER: ':',"chameleon",(22,08),hostile
+MONSTER: ':',"chameleon",(16,08),hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+
+#
+#	The "locate" level for the quest.
+#
+#	Here you have to find the entrance to the Assassins' Guild to go
+#	further towards your assigned quest.
+#
+
+MAZE: "Rog-loca",' '
+GEOMETRY:center,center
+MAP
+#         1         2         3         4         5         6         7
+#123456789012345678901234567890123456789012345678901234567890123456789012345
+             ----------------------------------------------------   --------
+           ---.................................................-    --.....|
+         ---...--------........-------.......................---     ---...|
+       ---.....-      ---......-     ---..................----         --.--
+     ---.....----       --------       --..................--         --..|
+   ---...-----                       ----.----.....----.....---      --..||
+----..----                       -----..---  |...---  |.......---   --...|
+|...---                       ----....---    |.---    |.........-- --...||
+|...-                      ----.....---     ----      |..........---....|
+|...----                ----......---       |         |...|.......-....||
+|......-----          ---.........-         |     -----...|............|
+|..........-----   ----...........---       -------......||...........||
+|..............-----................---     |............|||..........|
+|------...............................---   |...........|| |.........||
+|.....|..............------.............-----..........||  ||........|
+|.....|.............--    ---.........................||    |.......||
+|.....|.............-       ---.....................--|     ||......|
+|-S----------.......----      --.................----        |.....||
+|...........|..........--------..............-----           ||....|
+|...........|............................-----                |....|
+------------------------------------------                    ------
+ENDMAP
+# Dungeon Description
+REGION:(00,00,75,20),lit,"ordinary"
+# Doors
+#DOOR:locked|closed|open,(xx,yy)
+# Stairs
+STAIR:random,up
+STAIR:random,down
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,20)
+# Objects
+OBJECT:'?',"teleportation",(11,18),cursed,0
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+# Random traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+# Random monsters.
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',random,random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',random,random,hostile
+MONSTER:'N',random,random,hostile
+MONSTER:'N',random,random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+
+#
+#	The "goal" level for the quest.  Teleportation and digging are
+#	disallowed.
+#
+#	You have to reach The Master Assassin via some means other than
+#	simple searching or digging since there is no path between your
+#	arrival point and his location.
+#
+MAZE: "Rog-goal", ' '
+FLAGS: noteleport
+GEOMETRY:center,center
+MAP
+#         1         2         3         4         5         6         7
+#123456789012345678901234567890123456789012345678901234567890123456789012345
+-----      -------.......................................|-----------------|
+|...|  -----.....|.......................................|.................|
+|...----...|.....|.......................................|....---------....|
+|.---......---..--.................................------------.......|....|
+|...............|..................................|..|...|...----........-|
+|.....-----....--.................................|-..--..-|.....----S----|
+|--S---...|....|.................................|-........-|....|........|
+|.........---------.............................|-....}}....-|...|...|....|
+|....|.....S......|............................|-.....}}.....-|..--.------|
+|-----.....--.....|...........................|-...}}}}}}}}...-|....|.....--
+|...........--....------S-----...............|-....}}}}}}}}....-|..........|
+|............--........|...| |..............--.....}}.}}........----------S-
+|.............|........|...| |..............|......}}}}}}}}......|...|.....|
+|S-.---.---.---.---.---|...| ------------...--........}}.}}.....--..---....|
+|.---.---.---.---.-S-..----- |....|.....|....|-....}}}}}}}}....---..S.|--..|
+|...|.......|..........|...---....---...S.....|-...}}}}}}}}...-|.S..|...|..|
+|...|..|....|..........|............|..--..----|-.....}}.....-|..----...-S--
+|...|---....----.......|----- ......|...---|    |-....}}....-|...|..--.--..|
+-----.....---.....--.---....--...--------..|     |-........-|....|.........|
+    |.............|..........|.............S...   |S-------|.....|..-----..|
+    ----------------------------------------  ......       ----------   ----
+ENDMAP
+# Dungeon Description
+REGION:(00,00,75,20),lit,"ordinary"
+# Stairs
+STAIR:levregion(01,00,15,20),(01,18,04,20),up
+# Doors
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,20)
+# One trap to keep the gnomes at bay.
+TRAP:"spiked pit",(37,07)
+# Objects
+OBJECT:'(',"skeleton key",(38,10),blessed,0,"The Master Key of Thievery"
+OBJECT:'%',"tin",(26,12),"chameleon",0
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+# Random traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+# Random monsters.
+MONSTER:'@',"Master Assassin",(38,10),hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',"leprechaun",random,hostile
+MONSTER:'l',random,random,hostile
+MONSTER:'l',random,random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',"guardian naga",random,hostile
+MONSTER:'N',random,random,hostile
+MONSTER:'N',random,random,hostile
+MONSTER:'N',random,random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER: ':',"chameleon",random,hostile
+MONSTER:';',"shark",(51,14),hostile
+MONSTER:';',"shark",(53,09),hostile
+MONSTER:';',"shark",(55,15),hostile
+MONSTER:';',"shark",(58,10),hostile
+
+#
+#	The "fill" level for the quest.
+#
+#	This level is used to fill out any levels not occupied by specific
+#	levels as defined above.
+#
+LEVEL: "Rog-fila"
+#
+ROOM: "ordinary" , random, random, random, random
+STAIR: random, up
+OBJECT: random,random,random
+MONSTER: 'l', "leprechaun", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+OBJECT: random, random, random
+OBJECT: random,random,random
+MONSTER: 'l', "leprechaun", random, hostile
+MONSTER: 'N', "guardian naga", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+OBJECT: random, random, random
+TRAP: random, random
+TRAP: random, random
+OBJECT: random,random,random
+MONSTER: 'n', "water nymph", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+STAIR: random, down
+OBJECT: random, random, random
+TRAP: random, random
+TRAP: random, random
+MONSTER: 'l', random, random, hostile
+MONSTER: 'N', "guardian naga", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+TRAP: random, random
+TRAP: random, random
+MONSTER: 'l', "leprechaun", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+OBJECT: random, random, random
+TRAP: random, random
+TRAP: random, random
+MONSTER: 'l', "leprechaun", random, hostile
+MONSTER: 'n', "water nymph", random, hostile
+
+RANDOM_CORRIDORS
+
+#
+# currently a & b are the same.
+#
+LEVEL: "Rog-filb"
+#
+ROOM: "ordinary" , random, random, random, random
+STAIR: random, up
+OBJECT: random,random,random
+MONSTER: 'l', "leprechaun", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+OBJECT: random, random, random
+OBJECT: random,random,random
+MONSTER: 'l', "leprechaun", random, hostile
+MONSTER: 'N', "guardian naga", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+OBJECT: random, random, random
+TRAP: random, random
+TRAP: random, random
+OBJECT: random,random,random
+MONSTER: 'n', "water nymph", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+STAIR: random, down
+OBJECT: random, random, random
+TRAP: random, random
+TRAP: random, random
+MONSTER: 'l', random, random, hostile
+MONSTER: 'N', "guardian naga", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+TRAP: random, random
+TRAP: random, random
+MONSTER: 'l', "leprechaun", random, hostile
+
+ROOM: "ordinary" , random, random, random, random
+OBJECT: random, random, random
+TRAP: random, random
+TRAP: random, random
+MONSTER: 'l', "leprechaun", random, hostile
+MONSTER: 'n', "water nymph", random, hostile
+
+RANDOM_CORRIDORS
