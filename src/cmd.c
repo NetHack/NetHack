@@ -1134,9 +1134,16 @@ minimal_enlightenment()
 	anything any;
 	int genidx, n;
 	char buf[BUFSZ], buf2[BUFSZ];
-	static const char fmtstr[] = "%-15s: %-12s";
-	static const char deity_fmtstr[] = "%-17s%s";
+	static const char untabbed_fmtstr[] = "%-15s: %-12s";
+	static const char untabbed_deity_fmtstr[] = "%-17s%s";
+	static const char tabbed_fmtstr[] = "%s:\t%-12s";
+	static const char tabbed_deity_fmtstr[] = "%s\t%s";
+	static const char *fmtstr;
+	static const char *deity_fmtstr;
 
+	fmtstr = iflags.menu_tab_sep ? tabbed_fmtstr : untabbed_fmtstr;
+	deity_fmtstr = iflags.menu_tab_sep ?
+			tabbed_deity_fmtstr : untabbed_deity_fmtstr; 
 	any.a_void = 0;
 	buf[0] = buf2[0] = '\0';
 	tmpwin = create_nhwindow(NHW_MENU);
