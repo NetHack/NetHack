@@ -999,24 +999,21 @@ void mswin_display_file(const char *filename,BOOLEAN_P must_exist)
 			MessageBox(GetNHApp()->hMainWnd, message, TEXT("ERROR"), MB_OK | MB_ICONERROR );
 		} 
 	} else {
-		HWND hwnd;
+		winid text;
 		char line[LLEN];
 
-		hwnd = mswin_init_text_window();
+		text = mswin_create_nhwindow(NHW_TEXT);
 
 		while (dlb_fgets(line, LLEN, f)) {
-			 MSNHMsgPutstr data;
 			 size_t len;
-
 			 len = strlen(line);
 			 if( line[len-1]=='\n' ) line[len-1]='\x0';
-			 data.attr = 0;
-			 data.text = line;
-			 SendMessage( hwnd, WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_PUTSTR, (LPARAM)&data );
+				mswin_putstr(text, ATR_NONE, line);
 		}
 		(void) dlb_fclose(f);
 
-		mswin_display_text_window(hwnd);
+		mswin_display_nhwindow(text, 1);
+		mswin_destroy_nhwindow(text);
 	}
 }
 
@@ -1954,6 +1951,84 @@ BOOL initMapTiles(void)
 		TRUE 
 	);
 	return TRUE;
+}
+
+void mswin_popup_display(HWND hWnd, int* done_indicator)
+{
+	MSG msg;
+	HWND hChild;
+	HMENU hMenu;
+	int mi_count;
+	int i;
+
+	/* activate the menu window */
+	GetNHApp()->hPopupWnd = hWnd;
+
+	mswin_layout_main_window(hWnd);
+
+	/* disable game windows */
+	for( hChild=GetWindow(GetNHApp()->hMainWnd, GW_CHILD);
+		 hChild;
+		 hChild = GetWindow(hChild, GW_HWNDNEXT) ) {
+		if( hChild!= hWnd) EnableWindow(hChild, FALSE);
+	}
+
+	/* disable menu */
+	hMenu = GetMenu( GetNHApp()->hMainWnd );
+	mi_count = GetMenuItemCount( hMenu );
+	for( i=0; i<mi_count; i++ ) {
+		EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_GRAYED);
+	}
+	DrawMenuBar( GetNHApp()->hMainWnd );
+
+	/* bring menu window on top */
+	SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+
+	/* go into message loop */
+	while( IsWindow(hWnd) && 
+		   (done_indicator==NULL || !*done_indicator) &&
+		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
+		if( !IsDialogMessage(hWnd, &msg) ) {
+			if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+	}
+}
+
+void mswin_popup_destroy(HWND hWnd)
+{
+	HWND hChild;
+	HMENU hMenu;
+	int mi_count;
+	int i;
+
+	/* enable game windows */
+	for( hChild=GetWindow(GetNHApp()->hMainWnd, GW_CHILD);
+		 hChild;
+		 hChild = GetWindow(hChild, GW_HWNDNEXT) ) {
+		if( hChild!= hWnd) {
+			EnableWindow(hChild, TRUE);
+		}
+	}
+
+	/* enable menu */
+	hMenu = GetMenu( GetNHApp()->hMainWnd );
+	mi_count = GetMenuItemCount( hMenu );
+	for( i=0; i<mi_count; i++ ) {
+		EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_ENABLED);
+	}
+	DrawMenuBar( GetNHApp()->hMainWnd );
+
+	SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW);
+	GetNHApp()->hPopupWnd = NULL;
+	mswin_window_mark_dead( mswin_winid_from_handle(hWnd) );
+	DestroyWindow(hWnd);
+
+	mswin_layout_main_window(hWnd);
+
+	SetFocus(GetNHApp()->hMainWnd );
 }
 
 #ifdef _DEBUG

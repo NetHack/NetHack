@@ -651,6 +651,7 @@ void mswin_layout_main_window(HWND changed_child)
 						   TRUE );
 				break;
 
+			case NHW_TEXT: // same as the map window
 			case NHW_MAP:
 				MoveWindow(GetNHApp()->windowlist[i].win, 
 					       map_org.x, 
@@ -675,7 +676,6 @@ void mswin_layout_main_window(HWND changed_child)
 
 				pt.x = map_org.x + max(0, (int)(map_size.cx-menu_size.cx));
 				pt.y = map_org.y;
-				ClientToScreen(GetNHApp()->hMainWnd, &pt);
 				MoveWindow(GetNHApp()->windowlist[i].win, 
 						   pt.x, 
 						   pt.y,

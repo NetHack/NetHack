@@ -144,6 +144,9 @@ void nhapply_image_transparent(
 	COLORREF cTransparent
 );
 
+void mswin_popup_display(HWND popup, int* done_indicator);
+void mswin_popup_destroy(HWND popup);
+
 void mswin_read_reg(void);
 void mswin_destroy_reg(void);
 void mswin_write_reg(void);

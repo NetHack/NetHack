@@ -103,7 +103,6 @@ HWND mswin_init_menu_window (int type) {
 /*-----------------------------------------------------------------------------*/
 int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 {
-	MSG msg;
 	PNHMenuWindow data;
 	int ret_val;
     MENU_ITEM_P *selected = NULL;
@@ -157,28 +156,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 		reset_menu_count(NULL, data);
 	}
 
-	/* activate the menu window */
-	GetNHApp()->hPopupWnd = hWnd;
-
-	mswin_layout_main_window(hWnd);
-
-	/* disable game windows */
-	EnableWindow(mswin_hwnd_from_winid(WIN_MAP), FALSE);
-	EnableWindow(mswin_hwnd_from_winid(WIN_MESSAGE), FALSE);
-	EnableWindow(mswin_hwnd_from_winid(WIN_STATUS), FALSE);
-
-	/* bring menu window on top */
-	SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-
-	/* go into message loop */
-	while( IsWindow(hWnd) && 
-		   !data->done &&
-		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
-		if( !IsDialogMessage(hWnd, &msg) ) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
+	mswin_popup_display(hWnd, &data->done);
 
 	/* get the result */
 	if( data->result != -1 ) {
@@ -215,19 +193,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 		}
 	}
 
-	/* restore window state */
-	EnableWindow(mswin_hwnd_from_winid(WIN_MAP), TRUE);
-	EnableWindow(mswin_hwnd_from_winid(WIN_MESSAGE), TRUE);
-	EnableWindow(mswin_hwnd_from_winid(WIN_STATUS), TRUE);
-
-	SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW);
-	GetNHApp()->hPopupWnd = NULL;
-	mswin_window_mark_dead( mswin_winid_from_handle(hWnd) );
-	DestroyWindow(hWnd);
-
-	mswin_layout_main_window(hWnd);
-
-	SetFocus(GetNHApp()->hMainWnd );
+	mswin_popup_destroy(hWnd);
 
 	return ret_val;
 }
