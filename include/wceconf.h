@@ -43,6 +43,8 @@
 
 #define USER_SOUNDS
 
+#define AUTOPICKUP_EXCEPTIONS
+
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.
@@ -346,6 +348,13 @@ extern long   __cdecl ftell(FILE * f);
 /* ARM - the processor; avoids conflict with ARM in hack.h */
 # ifdef ARM
 # undef ARM
+# endif
+
+/* leave - Windows CE defines leave as part of exception handling (__leave)
+   It confilicts with existing sources and since we don't use exceptions it is safe 
+   to undefine it */
+# ifdef leave
+# undef leave
 # endif
 
 #endif /* WCECONF_H */
