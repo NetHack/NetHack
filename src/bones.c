@@ -379,6 +379,7 @@ struct obj *corpse;
 	     * information itself.
 	     */
 	    store_version(fd);
+	    store_savefileinfo(fd);
 	    bwrite(fd, (genericptr_t) &c, sizeof c);
 	    bwrite(fd, (genericptr_t) bonesid, (unsigned) c);	/* DD.nnn */
 	    savefruitchn(fd, COUNT_SAVE);
@@ -397,6 +398,7 @@ struct obj *corpse;
 #endif /* MFLOPPY */
 
 	store_version(fd);
+	store_savefileinfo(fd);
 	bwrite(fd, (genericptr_t) &c, sizeof c);
 	bwrite(fd, (genericptr_t) bonesid, (unsigned) c);	/* DD.nnn */
 	savefruitchn(fd, WRITE_SAVE | FREE_SAVE);
