@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.4	2002/11/06	*/
+/*	SCCS Id: @(#)read.c	3.4	2003/01/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1800,40 +1800,46 @@ boolean
 create_particular()
 {
 	char buf[BUFSZ], monclass = MAXMCLASSES;
-	int which = PM_PLAYERMON, tries = 0, i;
-	struct permonst *whichpm = 0;
+	int which, tries, i;
+	struct permonst *whichpm;
 	struct monst *mtmp;
 	boolean madeany = FALSE;
-	boolean maketame = FALSE;
+	boolean maketame, makepeaceful, makehostile;
 
+	tries = 0;
 	do {
+	    which = urole.malenum;	/* an arbitrary index into mons[] */
+	    maketame = makepeaceful = makehostile = FALSE;
 	    getlin("Create what kind of monster? [type the name or symbol]",
 		   buf);
 	    if (buf[0] == '\033') return FALSE;
 	    (void)mungspaces(buf);
 	    if (strlen(buf) == 1) {
 		monclass = def_char_to_monclass(buf[0]);
-		if (monclass == MAXMCLASSES)
-		    pline("I've never heard of such monsters.");
-		else break;
+		if (monclass != MAXMCLASSES) break;	/* got one */
 	    } else {
+		i = 0;		/* offset into buf[] */
 		if (!strncmpi(buf, "tame ", 5)) {
-		    which = name_to_mon(buf+5);
+		    i = 5;
 		    maketame = TRUE;
-		} else {
-		    which = name_to_mon(buf);
-		    maketame = FALSE;
+		} else if (!strncmpi(buf, "peaceful ", 9)) {
+		    i = 9;
+		    makepeaceful = TRUE;
+		} else if (!strncmpi(buf, "hostile ", 8)) {
+		    i = 8;
+		    makehostile = TRUE;
 		}
-		if (which < LOW_PM) pline("I've never heard of such monsters.");
-		else {
-		    whichpm = &mons[which];
-		    break;
-		}
+		which = name_to_mon(&buf[i]);
+		if (which >= LOW_PM) break;		/* got one */
 	    }
+	    pline("I've never heard of such monsters.");
 	} while (++tries < 5);
-	if (tries == 5) pline(thats_enough_tries);
-	else {
+
+	if (tries == 5) {
+	    pline(thats_enough_tries);
+	} else {
 	    (void) cant_create(&which, FALSE);
+	    whichpm = &mons[which];
 	    for (i = 0; i <= multi; i++) {
 		if (monclass != MAXMCLASSES)
 		    whichpm = mkclass(monclass, 0);
@@ -1843,8 +1849,14 @@ create_particular()
 			initedog(mtmp);
 			set_malign(mtmp);
 		    }
-		} else
+		} else {
 		    mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);
+		    if ((makepeaceful || makehostile) && mtmp) {
+			mtmp->mtame = 0;	/* sanity precaution */
+			mtmp->mpeaceful = makepeaceful ? 1 : 0;
+			set_malign(mtmp);
+		    }
+		}
 		if (mtmp) madeany = TRUE;
 	    }
 	}
