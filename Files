@@ -82,7 +82,7 @@ zap.c
 
 sys/amiga:
 (files for Amiga versions)
-Build.ami       Install.ami     Makefile.ami    Makefile.amigcc NetHack.cnf
+Build.ami       Install.ami     Makefile.ami    Makefile.agc    NetHack.cnf
 amidos.c        amidos.p        amifont.uu      amifont8.uu     amigst.c
 amii.hlp        amimenu.c       amirip.c        amisnd.c        amistack.c
 amitty.c        amiwind.c       amiwind.p       ask.uu          clipwin.c
@@ -90,7 +90,7 @@ clipwin.uu      colors.uu       colorwin.c      cvtsnd.c        grave16.xpm
 ifchange        mkdmake         scroll.uu       string.uu       txt2iff.c
 winami.c        winami.p        winchar.c       windefs.h       winext.h
 winfuncs.c      winkey.c        winmenu.c       winproto.h      winreq.c
-winstr.c        xpm2iff.c
+winstr.c        xpm2iff.c       amibug
 
 sys/atari:
 (files for Atari version)
