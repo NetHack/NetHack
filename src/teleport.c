@@ -1147,14 +1147,17 @@ boolean give_feedback;
 	    if (give_feedback)
 		pline("%s resists your magic!", Monnam(mtmp));
 	    return FALSE;
-	} else {
-	    if (is_rider(mtmp->data) && rn2(13) &&
-		    enexto(&cc, u.ux, u.uy, mtmp->data))
-		rloc_to(mtmp, cc.x, cc.y);
-	    else
-		rloc(mtmp);
-	    return TRUE;
-	}
+	} else if (level.flags.noteleport && u.uswallow && mtmp == u.ustuck) {
+	    if (give_feedback)
+		You("are no longer inside %s!", mon_nam(mtmp));
+	    unstuck(mtmp);
+	    rloc(mtmp);
+	} else if (is_rider(mtmp->data) && rn2(13) &&
+		   enexto(&cc, u.ux, u.uy, mtmp->data))
+	    rloc_to(mtmp, cc.x, cc.y);
+	else
+	    rloc(mtmp);
+	return TRUE;
 }
 
 /*teleport.c*/
