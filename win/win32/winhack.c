@@ -50,6 +50,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	TCHAR wbuf[BUFSZ];
 	char buf[BUFSZ];
 
+
+	/* ensure that we don't access violate on a panic() */
+	windowprocs.win_raw_print = mswin_raw_print;
+	windowprocs.win_raw_print_bold = mswin_raw_print_bold;
+
 	/* init applicatio structure */
 	_nethack_app.hApp = hInstance;
 	_nethack_app.hAccelTable = LoadAccelerators(hInstance, (LPCTSTR)IDC_NETHACKW);
