@@ -758,7 +758,7 @@ cl_eos()
 static void
 init_ttycolor()
 {
-	ttycolors[CLR_BLACK] = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED;
+	ttycolors[CLR_BLACK] = FOREGROUND_INTENSITY;  /* fix by Quietust */
 	ttycolors[CLR_RED] = FOREGROUND_RED;
 	ttycolors[CLR_GREEN] = FOREGROUND_GREEN;
 	ttycolors[CLR_BROWN] = FOREGROUND_GREEN|FOREGROUND_RED;
