@@ -39,7 +39,7 @@ int
 dosit()
 {
 	static const char sit_message[] = "sit on the %s.";
-	register struct trap *trap;
+	register struct trap *trap = t_at(u.ux,u.uy);
 	register int typ = levl[u.ux][u.uy].typ;
 
 
@@ -63,7 +63,11 @@ dosit()
 	    goto in_water;
 	}
 
-	if(OBJ_AT(u.ux, u.uy)) {
+	if (OBJ_AT(u.ux, u.uy) && 
+	   /* ensure we're not standing on the precipice */
+	   !((!u.utrap || u.utraptype != TT_PIT) &&
+	     (trap && trap->tseen &&
+	     (trap->ttyp==PIT || trap->ttyp==SPIKED_PIT)))) {
 	    register struct obj *obj;
 
 	    obj = level.objects[u.ux][u.uy];
@@ -71,7 +75,7 @@ dosit()
 	    if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
 		pline("It's not very comfortable...");
 
-	} else if ((trap = t_at(u.ux, u.uy)) != 0 ||
+	} else if (trap != 0 ||
 		   (u.utrap && (u.utraptype >= TT_LAVA))) {
 
 	    if (u.utrap) {
@@ -80,7 +84,7 @@ dosit()
 		    You_cant("sit down with your %s in the bear trap.", body_part(FOOT));
 		    u.utrap++;
 	        } else if(u.utraptype == TT_PIT) {
-		    if(trap->ttyp == SPIKED_PIT) {
+		    if(trap && trap->ttyp == SPIKED_PIT) {
 			You("sit down on a spike.  Ouch!");
 			losehp(Half_physical_damage ? rn2(2) : 1,
 				"sitting on an iron spike", KILLED_BY);
