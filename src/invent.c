@@ -20,7 +20,6 @@ STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
 STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
 static char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
-STATIC_DCL void FDECL(silly_thing, (const char *,const char *,struct obj *));
 #ifdef OVLB
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
@@ -1059,7 +1058,7 @@ register const char *let,*word;
 	   && !(usegold && otmp->oclass == COIN_CLASS)
 #endif
 	   ) {
-		silly_thing(let, word, otmp);
+		silly_thing(word, otmp);
 		return((struct obj *)0);
 	}
 	if(allowcnt == 2) {	/* cnt given */
@@ -1078,9 +1077,9 @@ register const char *let,*word;
 	return(otmp);
 }
 
-STATIC_OVL void
-silly_thing(let, word, otmp)
-const char *let, *word;
+void
+silly_thing(word, otmp)
+const char *word;
 struct obj *otmp;
 {
 	int otyp = otmp->otyp;

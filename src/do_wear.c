@@ -1296,7 +1296,7 @@ boolean noisy;
 	/* getobj can't do this after setting its allow_all flag; that
 	   happens if you have armor for slots that are covered up or
 	   extra armor for slots that are filled */
-	if (noisy) pline(silly_thing_to, "wear");
+	if (noisy) silly_thing("wear", otmp);
 	err++;
     }
 /* Unnecessary since now only weapons and special items like pick-axes get
