@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsconf.h	3.4	2001/12/07	*/
+/*	SCCS Id: @(#)vmsconf.h	3.4	2003/05/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,7 +16,7 @@
  *   extra room for patching longer values into an existing executable.
  */
 #define Local_WIZARD	"NHWIZARD\0\0\0\0"
-#define Local_HACKDIR	"DISK$USERS:[GAMES.NETHACK.3-3-0.PLAY]\0\0\0\0\0\0\0\0"
+#define Local_HACKDIR	"DISK$USERS:[GAMES.NETHACK.3-4-2.PLAY]\0\0\0\0\0\0\0\0"
 
 /*
  * This section cleans up the stuff done in config.h so that it

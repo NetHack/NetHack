@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - top level for making & installing everything.
-#	SCCS Id: @(#)Makefile.top	3.4	1996/03/02
+#	SCCS Id: @(#)Makefile.top	3.4	2003/05/19
 
 #  Copy this file to <top>Makefile.; edit the appropriate values for
 #  GAMEDIR ("playground" location) and GAMEOWNER (UIC or identifier
@@ -26,7 +26,7 @@ VMS = [.sys.vms]
 GAMEDIR =			# defaults to [.play]
 GAMEOWNER =			# defaults to installer's UIC
 # these are the distributed values in [.include]vmsconf.h
-#GAMEDIR = DISK$USERS:[GAMES.NETHACK.3-3-0.PLAY]
+#GAMEDIR = DISK$USERS:[GAMES.NETHACK.3-4-2.PLAY]
 #GAMEOWNER = NHWIZARD
 
 # just about everything, except installation
