@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "January 9, 2005
+.ds f2 "January 15, 2005
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1693,6 +1693,8 @@ Note that this has nothing to do with your computer's audio capabilities.
 Your starting alignment (align:lawful, align:neutral,
 or align:chaotic).  You may specify just the first letter.
 The default is to randomly pick an appropriate alignment.
+If you prefix a `!' or ``no'' to the value, you can 
+exclude that alignment from being picked randomly.
 Cannot be set with the `O' command.
 .lp autodig
 Automatically dig if you are wielding a digging tool and moving into a place
@@ -1867,6 +1869,8 @@ You may specify just the first letter.  Although you can
 still denote your gender using the ``male'' and ``female''
 options, the ``gender'' option will take precedence.
 The default is to randomly pick an appropriate gender.
+If you prefix a `!' or ``no'' to the value, you can 
+exclude that gender from being picked randomly.
 Cannot be set with the `O' command.
 .lp "help    "
 If more information is available for an object looked at
@@ -2070,6 +2074,8 @@ Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
 .lp "race    "
 Selects your race (for example, ``race:human'').  Default is random.
+If you prefix a `!' or ``no'' to the value, you can 
+exclude that race from being picked randomly.
 Cannot be set with the `O' command.
 .lp rest_on_space
 Make the space bar a synonym for the `.' (rest) command (default off).
@@ -2078,7 +2084,8 @@ Pick your type of character (ex. ``role:Samurai'');
 synonym for ``character''.  See ``name'' for an alternate method
 of specifying your role.  Normally only the first letter of the
 value is examined; `r' is an exception with ``Rogue'', ``Ranger'',
-and ``random'' values.
+and ``random'' values. If you prefix a `!' or ``no'' to the value, you can 
+exclude that role from being picked randomly.
 .lp runmode
 Controls the amount of screen updating for the map window when engaged
 in multi-turn movement (running via shift+direction or control+direction

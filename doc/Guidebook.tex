@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.88 $ $Date: 2005/01/02 17:10:47 $
+% $Revision: 1.89 $ $Date: 2005/01/09 21:40:02 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.5)}
-\date{January 9, 2005}
+\date{January 15, 2005}
 
 \maketitle
 
@@ -2124,6 +2124,8 @@ Note that this has nothing to do with your computer's audio capabilities.
 Your starting alignment ({\tt align:lawful}, {\tt align:neutral},
 or {\tt align:chaotic}).  You may specify just the first letter.
 The default is to randomly pick an appropriate alignment.
+If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
+exclude that alignment from being picked randomly.
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{autodig}]
@@ -2311,6 +2313,8 @@ You may specify just the first letter.  Although you can
 still denote your gender using the ``{\tt male}'' and ``{\tt female}''
 options, the ``{\tt gender}'' option will take precedence.
 The default is to randomly pick an appropriate gender.
+If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
+exclude that gender from being picked randomly. 
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{help}]
@@ -2535,6 +2539,8 @@ something pushes the old item into your alternate weapon slot (default off).
 %.Ip
 \item[\ib{race}]
 Selects your race (for example, ``{\tt race:human}'').  Default is random.
+If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
+exclude that race from being picked randomly. 
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{rest\_on\_space}]
@@ -2545,7 +2551,8 @@ Pick your type of character (ex.\ ``{\tt role:Samurai}'');
 synonym for ``{\it character\/}''.  See ``{\it name\/}'' for an alternate method
 of specifying your role.  Normally only the first letter of the
 value is examined; `r' is an exception with ``{\tt Rogue}'', {\tt Ranger}'',
-and ``{\tt random}'' values.
+and ``{\tt random}'' values. If you prefix `{\tt !}' or ``{\tt no}'' to the 
+value, you can exclude that role from being picked randomly.
 %.lp
 \item[\ib{runmode}]
 Controls the amount of screen updating for the map window when engaged
