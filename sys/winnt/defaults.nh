@@ -51,10 +51,8 @@ OPTIONS=suppress_alert:3.3.1
 # Note: the rest_on_space in the next line may not be
 #       appropriate for a beginning NetHack player, since
 #       it could result in use of a turn unintentionally.
-#       If you're new to NetHack, comment it out. It is
-#       being left in to keep the sample config file the 
-#       same as it was in past releases.
-OPTIONS=rest_on_space
+#       If you're new to NetHack, leave it commented it out.
+#OPTIONS=rest_on_space
 #
 # Set some options to control graphical window-port (these will
 # be safely and silently ignored by the tty port)
