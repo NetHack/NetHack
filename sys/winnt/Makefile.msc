@@ -1112,12 +1112,12 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 #
 # The rest are stolen from sys/unix/Makefile.src, 
 # with the following changes:
-#    slashes changed to back-slashes 
-#    -c (which is included in CFLAGS) substituted with -Fo$@
-#    s/..\include/$(INCL)
-#    targets prefixed with $(O)
-# but otherwise untouched. That
-# means that there is some irrelevant stuff
+#   * ../include changed to $(INCL)
+#   * slashes changed to back-slashes 
+#   * -c (which is included in CFLAGS) substituted with -Fo$@
+#   * targets prefixed with $(O)
+# but otherwise untouched.
+# That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
 #
 $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
