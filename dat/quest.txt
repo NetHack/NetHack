@@ -868,7 +868,7 @@ microscopic organisms, and not ill humors?"
 "I see that you bring %o, now you can cure this plague!"
 %E
 %Cc Hea 00015
-"Feebly, %l raises his head to look at you.
+Feebly, %l raises his head to look at you.
 
 "It is good to see you again, %p.  I see the concern in your
 eyes, but do not worry for me.  I am not ready for Hades yet.  We have
