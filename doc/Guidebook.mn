@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "June 1, 2002
+.ds f2 "July 1, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1892,7 +1892,7 @@ mummy, naga, ogre,
 pudding or ooze, quantum mechanic, rust monster,
 snake, troll, umber hulk,
 vampire, wraith, xorn,
-yeti or ape or other large beast, zombie,
+yeti or ape or some large beast, zombie,
 human, ghost, golem,
 demon, sea monster, lizard,
 long worm tail, and mimic.
