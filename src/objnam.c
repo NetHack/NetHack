@@ -47,7 +47,6 @@ STATIC_OVL struct Jitem Japanese_items[] = {
 	{ HELMET, "kabuto" },
 	{ LEATHER_GLOVES, "yugake" },
 	{ FOOD_RATION, "gunyoki" },
-	{ KELP_FROND, "nori" },
 	{ POT_BOOZE, "sake" },
 	{0, "" }
 };
@@ -1209,8 +1208,7 @@ const char *oldstr;
 	    (len >= 3 && !strcmp(spot-2, " ya")) ||
 	    (len >= 4 &&
 	     (!strcmp(spot-3, "fish") || !strcmp(spot-3, "tuna") ||
-	      !strcmp(spot-3, "deer") || !strcmp(spot-3, "yaki") ||
-	      !strcmp(spot-3, "nori"))) ||
+	      !strcmp(spot-3, "deer") || !strcmp(spot-3, "yaki"))) ||
 	    (len >= 5 && (!strcmp(spot-4, "sheep") ||
 			!strcmp(spot-4, "ninja") ||
 			!strcmp(spot-4, "ronin") ||
