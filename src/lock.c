@@ -872,12 +872,12 @@ STATIC_OVL void
 chest_shatter_msg(otmp)
 struct obj *otmp;
 {
-	const char *disposition, *article = (otmp->quan > 1L) ? "A" : "The";
+	const char *disposition;
 	const char *thing;
 	long save_Blinded;
 
 	if (otmp->oclass == POTION_CLASS) {
-		You("%s a %s shatter!", Blind ? "hear" : "see", bottlename());
+		You("%s %s shatter!", Blind ? "hear" : "see", an(bottlename()));
 		if (!breathless(youmonst.data) || haseyes(youmonst.data))
 			potionbreathe(otmp);
 		return;
@@ -904,7 +904,7 @@ struct obj *otmp;
 	default:	disposition = "is destroyed";
 		break;
 	}
-	pline("%s %s %s!", article, thing, disposition);
+	pline("%s %s!", An(thing), disposition);
 }
 
 #endif /* OVLB */
