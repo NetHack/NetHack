@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)options.c	3.4	2003/04/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -291,11 +291,11 @@ static struct Comp_Opt
 						PL_CSIZ, DISP_IN_GAME },
 	{ "role",     "your starting role (e.g., Barbarian, Valkyrie)",
 						PL_CSIZ, DISP_IN_GAME },
-	{ "runmode", "display updating frequency when `running' or `travelling'",
+	{ "runmode", "display frequency when `running' or `travelling'",
 						sizeof "teleport", SET_IN_GAME },
 	{ "scores",   "the parts of the score list you wish to see",
 						32, SET_IN_GAME },
-	{ "scroll_amount", "scroll the map this amount when scroll_margin is reached",
+	{ "scroll_amount", "amount to scroll map when scroll_margin is reached",
 						20, DISP_IN_GAME }, /*WC*/
 	{ "scroll_margin", "scroll map when this far from the edge", 20, DISP_IN_GAME }, /*WC*/
 #ifdef MSDOS
