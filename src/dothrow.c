@@ -756,7 +756,7 @@ boolean hitsroof;
     if (obj->oclass == POTION_CLASS) {
 	potionhit(&youmonst, obj, TRUE);
     } else if (breaktest(obj)) {
-	int otyp = obj->otyp, ocorpsenm = obj->corpsenm;
+	int otyp = obj->otyp;
 	int blindinc;
 
 	/* need to check for blindness result prior to destroying obj */
