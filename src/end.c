@@ -298,6 +298,9 @@ panic VA_DECL(const char *, str)
 	    raw_print(buf);
 	    paniclog("panic", buf);
 	}
+#ifdef WIN32
+	interject(INTERJECT_PANIC);
+#endif
 #if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32))
 	if (wizard)
 	    NH_abort();	/* generate core dump */

@@ -112,6 +112,7 @@ int ttycolors[CLR_MAX];
 # ifdef TEXTCOLOR
 static void NDECL(init_ttycolor);
 # endif
+static void NDECL(really_move_cursor);
 
 #define MAX_OVERRIDES	256
 unsigned char key_overrides[MAX_OVERRIDES];
@@ -124,7 +125,7 @@ static WORD background = 0;
 static WORD foreground = (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED);
 static WORD attr = (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED);
 static DWORD ccount, acount;
-static COORD cursor;
+static COORD cursor = {0,0};
 
 /*
  * Called after returning from ! or ^Z
@@ -151,7 +152,7 @@ void
 settty(s)
 const char *s;
 {
-	nocmov(ttyDisplay->curx, ttyDisplay->cury);
+	cmov(ttyDisplay->curx, ttyDisplay->cury);
 	end_screen();
 	if(s) raw_print(s);
 }
@@ -292,6 +293,8 @@ nttty_open()
 		cmode = 0; 	/* just to have a statement to break on for debugger */
 	}
 	get_scr_size();
+	cursor.X = cursor.Y = 0;
+	really_move_cursor();
 }
 
 int process_keystroke(ir, valid, numberpad, portdebug)
@@ -319,8 +322,8 @@ get_scr_size()
 {
 	GetConsoleScreenBufferInfo(hConOut, &csbi);
   
-	LI = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	CO = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	LI = csbi.srWindow.Bottom - (csbi.srWindow.Top + 1);
+	CO = csbi.srWindow.Right - (csbi.srWindow.Left + 1);
 
 	if ( (LI < 25) || (CO < 80) ) {
 		COORD newcoord;
@@ -341,7 +344,7 @@ tgetch()
 	int mod;
 	coord cc;
 	DWORD count;
-	if (iflags.window_inited) nocmov(ttyDisplay->curx, ttyDisplay->cury);
+	really_move_cursor();
 	return (program_state.done_hup) ?
 		'\033' :
 		pCheckInput(hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
@@ -354,7 +357,7 @@ int *x, *y, *mod;
 	int ch;
 	coord cc;
 	DWORD count;
-	nocmov(ttyDisplay->curx, ttyDisplay->cury);
+	really_move_cursor();
 	ch = (program_state.done_hup) ?
 		'\033' :
 		pCheckInput(hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
@@ -365,15 +368,20 @@ int *x, *y, *mod;
 	return ch;
 }
 
+static void
+really_move_cursor()
+{
+	SetConsoleCursorPosition(hConOut, cursor);
+}
+
 void
 cmov(x, y)
 register int x, y;
 {
-	ttyDisplay->curx = x;
-	ttyDisplay->cury = y;
 	cursor.X = x;
 	cursor.Y = y;
-	SetConsoleCursorPosition(hConOut, cursor);
+	ttyDisplay->curx = x;
+	ttyDisplay->cury = y;
 }
 
 void
@@ -382,34 +390,37 @@ int x,y;
 {
 	cursor.Y = y;
 	cursor.X = x;
-	SetConsoleCursorPosition(hConOut, cursor);
+	ttyDisplay->curx = x;
+	ttyDisplay->cury = y;
 }
 
 void
 xputc(ch)
 char ch;
 {
-	cursor.X = ttyDisplay->curx;
-	cursor.Y = ttyDisplay->cury;
 	switch(ch) {
 	    case '\n':
+	    		cursor.Y++;
+	    		/* fall through */
 	    case '\r':
-		    cmov(cursor.X, cursor.Y);
-		    return;
+	    		cursor.X = 0;
+			cmov(cursor.X, cursor.Y);
+			return;		
 	}
 	WriteConsoleOutputAttribute(hConOut,&attr,1,cursor,&acount);
 	WriteConsoleOutputCharacter(hConOut,&ch,1,cursor,&ccount);
+	cursor.X++;
+	cmov(cursor.X, cursor.Y);
 }
 
 void
 xputs(s)
 const char *s;
 {
-	int slen = strlen(s);
-	cursor.X = ttyDisplay->curx;
-	cursor.Y = ttyDisplay->cury;
-	FillConsoleOutputAttribute(hConOut,attr,slen,cursor,&acount);
-	WriteConsoleOutputCharacter(hConOut,s,slen,cursor,&ccount);
+	int k, slen = strlen(s);
+	if (s)
+	    for (k=0; k < slen && s[k]; ++k)
+		xputc(s[k]);
 }
 
 
@@ -422,16 +433,9 @@ g_putch(in_ch)
 int in_ch;
 {
 	char ch = (char)in_ch;
+
 	cursor.X = ttyDisplay->curx;
 	cursor.Y = ttyDisplay->cury;
-#if 0
-	switch(ch) {
-	    case '\n':
-	    case '\r':
-		    cmov(cursor.X, cursor.Y);
-		    return;
-	}
-#endif
 	WriteConsoleOutputAttribute(hConOut,&attr,1,cursor,&acount);
 	WriteConsoleOutputCharacter(hConOut,&ch,1,cursor,&ccount);
 }
@@ -440,8 +444,6 @@ void
 cl_end()
 {
 	int cx;
-	cursor.X = ttyDisplay->curx;
-	cursor.Y = ttyDisplay->cury;
 	cx = CO - cursor.X;
 	FillConsoleOutputAttribute(hConOut, DEFTEXTCOLOR, cx, cursor, &acount);
 	FillConsoleOutputCharacter(hConOut,' ', cx, cursor,&ccount);
@@ -482,11 +484,9 @@ home()
 void
 backsp()
 {
- 	GetConsoleScreenBufferInfo(hConOut,&csbi);
- 	if (csbi.dwCursorPosition.X > 0)
- 		ntcoord.X = csbi.dwCursorPosition.X-1;
- 	ntcoord.Y = csbi.dwCursorPosition.Y;
- 	SetConsoleCursorPosition(hConOut,ntcoord);
+	cursor.X--;
+	xputc(' ');
+	cursor.X--;
 }
 
 void
@@ -877,59 +877,18 @@ load_keyboard_handler()
 	}
 }
 
-static COORD msmsgcursor = {0,4};	/* avoid copyright notice */
-
-void
-nttty_close()
-{
-	msmsgcursor.X = 0;
-	msmsgcursor.Y = 0;
-#if 0
-	if (GetConsoleScreenBufferInfo(hConOut,&csbi)) {
-	    DWORD ccnt;
-	    FillConsoleOutputAttribute(hConOut,
-	    		FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-	    		csbi.dwSize.X * csbi.dwSize.Y,
-	    		msmsgcursor, &ccnt);
-	    FillConsoleOutputCharacter(hConOut,' ',
-			csbi.dwSize.X * csbi.dwSize.Y,
-			msmsgcursor, &ccnt);
-	}
-#endif
-}
-
 /* this is used when window system isn't initialized yet */
 void
 msmsg VA_DECL(const char *, fmt)
-	char buf[BUFSZ];
-	int slen, k, ac, cc;
+	char buf[ROWNO * COLNO];	/* worst case scenario */
 
 	VA_START(fmt);
 	VA_INIT(fmt, const char *);
 	Vsprintf(buf, fmt, VA_ARGS);
 	VA_END();
 
-	slen = strlen(buf);
-	SetConsoleCursorPosition(hConOut, msmsgcursor);
-	for (k = 0; k < slen; ++k) {
-		switch(buf[k]) {
-			case '\n':
-				msmsgcursor.Y = msmsgcursor.Y++ % 24;
-				msmsgcursor.X = 0;
-				break;
-			case '\r':
-				msmsgcursor.Y = 0;
-				msmsgcursor.X = 0;
-				break;
-			default:
-				FillConsoleOutputAttribute(hConOut,attr,1,
-							msmsgcursor,&ac);
-				WriteConsoleOutputCharacter(hConOut,&buf[k],1,
-							msmsgcursor,&cc);
-				msmsgcursor.X++;
-		}
-		SetConsoleCursorPosition(hConOut, msmsgcursor);
-	}
+	xputs(buf);
+	really_move_cursor();
 	return;
 }
 

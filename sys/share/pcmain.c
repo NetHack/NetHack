@@ -379,6 +379,9 @@ char *argv[];
 	dlb_init();
 
 	display_gamewindows();
+#ifdef WIN32
+	getreturn_enabled = TRUE;
+#endif
 
 	if ((fd = restore_saved_game()) >= 0) {
 #ifdef WIZARD
@@ -436,9 +439,6 @@ not_recovered:
 #endif
 #ifdef OS2
 	gettty(); /* somehow ctrl-P gets turned back on during startup ... */
-#endif
-#ifdef WIN32
-	getreturn_enabled = TRUE;
 #endif
 	return;
 }

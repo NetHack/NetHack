@@ -259,6 +259,62 @@ void win32_abort()
 #endif
 	abort();
 }
+
+static char interjection_buf[INTERJECTION_TYPES][1024];
+static int interjection[INTERJECTION_TYPES];
+
+void
+interject_assistance(num, interjection_type, ptr1, ptr2)
+int num;
+int interjection_type;
+genericptr_t ptr1;
+genericptr_t ptr2;
+{
+	switch(num) {
+	    case 1: {
+		char *panicmsg = (char *)ptr1;
+		char *datadir =  (char *)ptr2;
+		char *tempdir = nh_getenv("TEMP");
+		interjection_type = INTERJECT_PANIC;
+		interjection[INTERJECT_PANIC] = 1;
+		/*
+		 * ptr1 = the panic message about to be delivered.
+		 * ptr2 = the directory prefix of the dungeon file
+		 *        that failed to open.
+		 * Check to see if datadir matches tempdir or a
+		 * common windows temp location. If it does, inform
+		 * the user that they are probably trying to run the
+		 * game from within their unzip utility, so the required
+		 * files really don't exist at the location. Instruct
+		 * them to unpack them first.
+		 */
+		if (panicmsg && datadir) {
+		    if (!strncmpi(datadir, "C:\\WINDOWS\\TEMP", 15) ||
+			    strstri(datadir, "TEMP")   ||
+			    (tempdir && strstri(datadir, tempdir))) {
+			(void)strncpy(interjection_buf[INTERJECT_PANIC],
+			"\nThe nature of the error seems to indicate that you may\n"
+			"be attempting to execute the game by double-clicking on \n"
+			"it from within the download distribution zip file.\n\n"
+			"You have to unzip the contents of the zip file into a\n"
+			"folder on your system, and then run \"NetHack.exe\" or \n"
+			"\"NetHackW.exe\" from there.\n\n"
+			"If that is not the situation, you are encouraged to\n"
+			"report the error as shown above.\n\n", 1023);
+		    }
+		}
+	    }
+	    break;
+	}
+}
+
+void
+interject(interjection_type)
+int interjection_type;
+{
+	if (interjection_type >= 0 && interjection_type < INTERJECTION_TYPES)
+		msmsg(interjection_buf[interjection_type]);
+}
 #endif /* WIN32 */
 
 /*winnt.c*/

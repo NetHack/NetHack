@@ -660,6 +660,10 @@ init_dungeons()		/* initialize the "dungeon" structs */
 # endif
 	    Strcat(tbuf, "\" file!");
 #endif
+#ifdef WIN32
+	    interject_assistance(1, INTERJECT_PANIC, (genericptr_t)tbuf,
+				 (genericptr_t)fqn_prefix[DATAPREFIX]);
+#endif
 	    panic(tbuf);
 	}
 
