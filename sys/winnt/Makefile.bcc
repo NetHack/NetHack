@@ -534,6 +534,7 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 ! IF ("$(USE_DLB)"=="Y")
 	copy nhdat                $(GAMEDIR)
 	copy $(DAT)\license       $(GAMEDIR)
+	copy $(DAT)\opthelp       $(GAMEDIR)
 ! ELSE
 	copy $(DAT)\*.            $(GAMEDIR)
 	copy $(DAT)\*.dat         $(GAMEDIR)

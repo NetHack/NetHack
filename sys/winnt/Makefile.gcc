@@ -498,6 +498,7 @@ $(O)install.tag:  $(DAT)/data    $(DAT)/rumors    $(DAT)/dungeon \
 ifeq  "$(USE_DLB)" "Y"
 	$(subst /,\,copy nhdat                $(GAMEDIR))
 	$(subst /,\,copy $(DAT)/license       $(GAMEDIR))
+	$(subst /,\,copy $(DAT)/opthelp       $(GAMEDIR))
 else
 	$(subst /,\,copy $(DAT)/*.            $(GAMEDIR))
 	$(subst /,\,copy $(DAT)/*.dat         $(GAMEDIR))
