@@ -49,10 +49,7 @@ register xchar omx,omy,gx,gy;
 	else allowflags = ALLOW_SSM | ALLOW_SANCT;
 	if (passes_walls(mtmp->data)) allowflags |= (ALLOW_ROCK|ALLOW_WALL);
 	if (throws_rocks(mtmp->data)) allowflags |= ALLOW_ROCK;
-	if (tunnels(mtmp->data) &&
-		    (!needspick(mtmp->data) || m_carrying(mtmp, PICK_AXE) ||
-		     m_carrying(mtmp, DWARVISH_MATTOCK)))
-		allowflags |= ALLOW_DIG;
+	if (tunnels(mtmp->data)) allowflags |= ALLOW_DIG;
 	if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
 		allowflags |= OPENDOOR;
 		if (m_carrying(mtmp, SKELETON_KEY)) allowflags |= BUSTDOOR;

@@ -599,7 +599,23 @@ register struct monst *mon;
 		case NEED_PICK_AXE:
 			obj = m_carrying(mon, PICK_AXE);
 			/* KMH -- allow other picks */
-			if (!obj) obj = m_carrying(mon, DWARVISH_MATTOCK);
+			if (!obj && !which_armor(mon, W_ARMS))
+			    obj = m_carrying(mon, DWARVISH_MATTOCK);
+			break;
+		case NEED_AXE:
+			/* currently, only 2 types of axe */
+			obj = m_carrying(mon, BATTLE_AXE);
+			if (!obj || which_armor(mon, W_ARMS))
+			    obj = m_carrying(mon, AXE);
+			break;
+		case NEED_PICK_OR_AXE:
+			/* prefer pick for fewer switches on most levels */
+			obj = m_carrying(mon, DWARVISH_MATTOCK);
+			if (!obj) obj = m_carrying(mon, BATTLE_AXE);
+			if (!obj || which_armor(mon, W_ARMS)) {
+			    obj = m_carrying(mon, PICK_AXE);
+			    if (!obj) obj = m_carrying(mon, AXE);
+			}
 			break;
 		default: impossible("weapon_check %d for %s?",
 				mon->weapon_check, mon_nam(mon));

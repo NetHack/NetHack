@@ -624,12 +624,10 @@ register int after;
 	/* Not necessary if m_move called from this file, but necessary in
 	 * other calls of m_move (ex. leprechauns dodging)
 	 */
-	can_tunnel = tunnels(ptr) &&
 #ifdef REINCARNATION
-		!Is_rogue_level(&u.uz) &&
+	if (!Is_rogue_level(&u.uz))
 #endif
-		(!needspick(ptr) || m_carrying(mtmp, PICK_AXE) ||
-		(m_carrying(mtmp, DWARVISH_MATTOCK) && !which_armor(mtmp, W_ARMS)));
+	    can_tunnel = tunnels(ptr);
 	can_open = !(nohands(ptr) || verysmall(ptr));
 	can_unlock = ((can_open && m_carrying(mtmp, SKELETON_KEY)) ||
 		      mtmp->iswiz || is_rider(ptr));
@@ -874,13 +872,10 @@ not_special:
 	}
       }
 
-	/* don't tunnel if needspick and wielding a non-pick that is known
-	 * cursed or hostile and close enough to prefer a weapon */
+	/* don't tunnel if hostile and close enough to prefer a weapon */
 	if (can_tunnel && needspick(ptr) &&
-	    (mw_tmp = MON_WEP(mtmp)) != 0 && !is_pick(mw_tmp) &&
-	    ((mw_tmp->cursed && mtmp->weapon_check == NO_WEAPON_WANTED) ||
-	     ((!mtmp->mpeaceful || Conflict) &&
-	      dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 8)))
+	    ((!mtmp->mpeaceful || Conflict) &&
+	     dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 8))
 	    can_tunnel = FALSE;
 
 	nix = omx;
@@ -955,11 +950,20 @@ not_special:
 	    if (mmoved==1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
 		return(3);
 
-	    if(IS_ROCK(levl[nix][niy].typ) && may_dig(nix,niy) &&
-		    mmoved==1 && can_tunnel && needspick(ptr) &&
-		    (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp))) {
-		mtmp->weapon_check = NEED_PICK_AXE;
-		if (mon_wield_item(mtmp))
+	    if (((IS_ROCK(levl[nix][niy].typ) && may_dig(nix,niy)) ||
+		 closed_door(nix, niy)) &&
+		mmoved==1 && can_tunnel && needspick(ptr)) {
+		if (closed_door(nix, niy)) {
+		    if (!(mw_tmp = MON_WEP(mtmp)) ||
+			!is_pick(mw_tmp) || !is_axe(mw_tmp))
+			mtmp->weapon_check = NEED_PICK_OR_AXE;
+		} else if (IS_TREE(levl[nix][niy].typ)) {
+		    if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp))
+			mtmp->weapon_check = NEED_AXE;
+		} else if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)) {
+		    mtmp->weapon_check = NEED_PICK_AXE;
+		}
+		if (mtmp->weapon_check >= NEED_PICK_AXE && mon_wield_item(mtmp))
 		    return(3);
 	    }
 	    /* If ALLOW_U is set, either it's trying to attack you, or it

@@ -565,10 +565,7 @@ register int after;	/* this is extra fast monster movement */
 		if (m_carrying(mtmp, SKELETON_KEY)) allowflags |= BUSTDOOR;
 	}
 	if (is_giant(mtmp->data)) allowflags |= BUSTDOOR;
-	if (tunnels(mtmp->data) && (!needspick(mtmp->data) ||
-					m_carrying(mtmp, PICK_AXE) ||
-					m_carrying(mtmp, DWARVISH_MATTOCK)))
-		allowflags |= ALLOW_DIG;
+	if (tunnels(mtmp->data)) allowflags |= ALLOW_DIG;
 	cnt = mfndpos(mtmp, poss, info, allowflags);
 
 	/* Normally dogs don't step on cursed items, but if they have no
@@ -714,12 +711,22 @@ newdogpos:
 		}
 		if (!m_in_out_region(mtmp, nix, niy))
 		    return 1;
-		if(IS_ROCK(levl[nix][niy].typ) && may_dig(nix,niy) &&
+		if (((IS_ROCK(levl[nix][niy].typ) && may_dig(nix,niy)) ||
+		     closed_door(nix, niy)) &&
 		    mtmp->weapon_check != NO_WEAPON_WANTED &&
-		    tunnels(mtmp->data) && needspick(mtmp->data) &&
-			(!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp))) {
-		    mtmp->weapon_check = NEED_PICK_AXE;
-		    if (mon_wield_item(mtmp))
+		    tunnels(mtmp->data) && needspick(mtmp->data)) {
+		    if (closed_door(nix, niy)) {
+			if (!(mw_tmp = MON_WEP(mtmp)) ||
+			    !is_pick(mw_tmp) || !is_axe(mw_tmp))
+			    mtmp->weapon_check = NEED_PICK_OR_AXE;
+		    } else if (IS_TREE(levl[nix][niy].typ)) {
+			if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp))
+			    mtmp->weapon_check = NEED_AXE;
+		    } else if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)) {
+			mtmp->weapon_check = NEED_PICK_AXE;
+		    }
+		    if (mtmp->weapon_check >= NEED_PICK_AXE &&
+			mon_wield_item(mtmp))
 			return 0;
 		}
 		/* insert a worm_move() if worms ever begin to eat things */

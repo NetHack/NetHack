@@ -952,6 +952,7 @@ mfndpos(mon, poss, info, flag)
 	register uchar ntyp;
 	uchar nowtyp;
 	boolean wantpool,poolok,lavaok,nodiag;
+	boolean rockok = FALSE, treeok = FALSE, thrudoor;
 	int maxx, maxy;
 
 	x = mon->mx;
@@ -963,6 +964,27 @@ mfndpos(mon, poss, info, flag)
 	poolok = is_flyer(mdat) || is_clinger(mdat) ||
 		 (is_swimmer(mdat) && !wantpool);
 	lavaok = is_flyer(mdat) || is_clinger(mdat) || likes_lava(mdat);
+	thrudoor = (flag & (ALLOW_WALL|BUSTDOOR));
+	if (flag & ALLOW_DIG) {
+	    struct obj *mw_tmp;
+
+	    /* need to be specific about what can currently be dug */
+	    if (!needspick(mdat)) {
+		rockok = treeok = TRUE;
+	    } else if ((mw_tmp = MON_WEP(mon)) && mw_tmp->cursed &&
+		       mon->weapon_check == NO_WEAPON_WANTED) {
+		rockok = is_pick(mw_tmp);
+		treeok = is_axe(mw_tmp);
+	    } else {
+		rockok = (m_carrying(mon, PICK_AXE) ||
+			  (m_carrying(mon, DWARVISH_MATTOCK) &&
+			   !which_armor(mon, W_ARMS)));
+		treeok = (m_carrying(mon, AXE) ||
+			  (m_carrying(mon, BATTLE_AXE) &&
+			   !which_armor(mon, W_ARMS)));
+	    }
+	    thrudoor |= rockok || treeok;
+	}
 
 nexttry:	/* eels prefer the water, but if there is no water nearby,
 		   they will crawl over land */
@@ -979,13 +1001,13 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 	    if(nx == x && ny == y) continue;
 	    if(IS_ROCK(ntyp = levl[nx][ny].typ) &&
 	       !((flag & ALLOW_WALL) && may_passwall(nx,ny)) &&
-	       !((flag & ALLOW_DIG) && may_dig(nx,ny))) continue;
+	       !((IS_TREE(ntyp) ? treeok : rockok) && may_dig(nx,ny))) continue;
 	    /* KMH -- Added iron bars */
 	    if (ntyp == IRONBARS && !(flag & ALLOW_BARS)) continue;
 	    if(IS_DOOR(ntyp) && !amorphous(mdat) &&
 	       ((levl[nx][ny].doormask & D_CLOSED && !(flag & OPENDOOR)) ||
-		(levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))
-	       ) && !(flag & (ALLOW_WALL|ALLOW_DIG|BUSTDOOR))) continue;
+		(levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))) &&
+	       !thrudoor) continue;
 	    if(nx != x && ny != y && (nodiag ||
 #ifdef REINCARNATION
 	       ((IS_DOOR(nowtyp) &&
