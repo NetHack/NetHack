@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)beconf.h	3.3	98/07/08	*/
+/*	SCCS Id: @(#)beconf.h	3.4	1998/07/08	*/
 /* Copyright (c) Dean Luick 1996.	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mcastu.c	3.3	2002/01/10	*/
+/*	SCCS Id: @(#)mcastu.c	3.4	2002/01/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -442,7 +442,7 @@ int spellnum;
 	}
 	/* else FALLTHRU */
     case MGC_PSI_BOLT:
-	/* prior to 3.3.2 Antimagic was setting the damage to 1--this
+	/* prior to 3.4.0 Antimagic was setting the damage to 1--this
 	   made the spell virtually harmless to players with magic res. */
 	if (Antimagic) {
 	    shieldeff(u.ux, u.uy);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)macconf.h	3.3	99/10/25	*/
+/*	SCCS Id: @(#)macconf.h	3.4	1999/10/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wintype.h	3.3	96/02/18	*/
+/*	SCCS Id: @(#)wintype.h	3.4	1996/02/18	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

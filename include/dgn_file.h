@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dgn_file.h 3.3	93/01/17	*/
+/*	SCCS Id: @(#)dgn_file.h 3.4	1993/01/17	*/
 /* Copyright (c) 1989 by M. Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

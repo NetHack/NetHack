@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkmap.c	3.3	96/05/23	*/
+/*	SCCS Id: @(#)mkmap.c	3.4	1996/05/23	*/
 /* Copyright (c) J. C. Collet, M. Stephenson and D. Cohrs, 1992   */
 /* NetHack may be freely redistributed.  See license for details. */
 

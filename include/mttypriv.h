@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mttypriv.h 3.3	93/03/01	*/
+/*	SCCS Id: @(#)mttypriv.h 3.4	1993/03/01	*/
 /* Copyright (c) Jon W{tte 1993.					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 

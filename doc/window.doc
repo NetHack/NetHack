@@ -391,7 +391,7 @@ struct wc_Opt wc_options[];
 
 IV. WINCAP preferences support
 
-Starting with NetHack 3.3.2, the window interface was enhanced to provide
+Starting with NetHack 3.4.0, the window interface was enhanced to provide
 a common way of setting window port user preferences from the config file, 
 and from the command line for some settings.
 

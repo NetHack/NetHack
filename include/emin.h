@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)emin.h	3.3	97/05/01	*/
+/*	SCCS Id: @(#)emin.h	3.4	1997/05/01	*/
 /* Copyright (c) David Cohrs, 1990.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

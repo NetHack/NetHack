@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.3	2001/03/14	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2001/03/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1608,7 +1608,7 @@ boolean *prev_loot;
 	}
     }
 #endif	/* STEED */
-    /* 3.3.2 introduced the ability to pick things up from within swallower's stomach */
+    /* 3.4.0 introduced the ability to pick things up from within swallower's stomach */
     if (u.uswallow) {
 	int count = passed_info ? *passed_info : 0;
 	timepassed = pickup(count);

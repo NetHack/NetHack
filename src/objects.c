@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objects.c	3.3	2000/02/18	*/
+/*	SCCS Id: @(#)objects.c	3.4	2000/02/18	*/
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,7 +1,7 @@
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
-.ds vr "NetHack 3.3
+.ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
 .ds f2 "February 3, 2002
@@ -10,7 +10,7 @@ A Guide to the Mazes of Menace
 (Guidebook for NetHack)
 .au
 Eric S. Raymond
-(Extensively edited and expanded for 3.3)
+(Extensively edited and expanded for 3.4)
 .hn 1
 Introduction
 
@@ -2322,36 +2322,37 @@ and with the help of \fBKevin Hugo\fP, added more features.
 Kevin later joined the
 DevTeam and incorporated the best of these ideas in NetHack 3.3.
 .pg
-The 3.3 development team initially consisted of \fBMichael Allison\fP, \fBKen Arromdee\fP,
+The 3.4 development team initially consisted of \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSteve Creps\fP, \fBKevin Darcy\fP, 
 \fBTimo Hakulinen\fP, \fBKevin Hugo\fP, \fBSteve Linhart\fP, \fBKen Lorber\fP,
 \fBDean Luick\fP, \fBPat Rankin\fP, \fBEric Smith\fP, \fBMike Stephenson\fP, 
 \fBJanet Walz\fP, and \fBPaul Winner\fP.  \fB Warwick Allison\fP joined 
-just before the release of NetHack 3.3.2.
+just before the release of NetHack 3.4.0.
 .pg
 As with version 3.2, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
 .pg
-\fBPat Rankin\fP maintained 3.3 for VMS.
+\fBPat Rankin\fP maintained 3.4 for VMS.
 .pg
-\fBMichael Allison\fP maintained NetHack 3.3 for the MS-DOS platform.  \fBPaul Winner\fP
+\fBMichael Allison\fP maintained NetHack 3.4 for the MS-DOS platform.  \fBPaul Winner\fP
 and \fBYitzhak Sapir\fP provided encouragement.
 .pg
 \fBDean Luick\fP, \fBMark Modrall\fP, and \fBKevin Hugo\fP maintained and enhanced the
-Macintosh port of 3.3.
+Macintosh port of 3.4.
 .pg
-\fBMichael Allison\fP maintained and enhanced the console port of 3.3 for 
+\fBMichael Allison\fP maintained and enhanced the console port of 3.4 for 
 the Microsoft Windows NT/2000 platform. 
 .pg
-\fBRon Van Iwaarden\fP maintained 3.3 for OS/2.
+\fBRon Van Iwaarden\fP maintained 3.4 for OS/2.
 .pg
 \fBJanne Salmijarvi\fP and \fBTeemu Suikki\fP maintained and 
-enhanced the Amiga port of 3.3 after \fBJanne Salmijarvi\fP resurrected it for 3.3.1.
+enhanced the Amiga port of 3.4 after \fBJanne Salmijarvi\fP resurrected 
+it for 3.3.1.
 .pg
-\fBChristian ``Marvin'' Bressler\fP maintained 3.3 for the Atari after he 
+\fBChristian ``Marvin'' Bressler\fP maintained 3.4 for the Atari after he 
 resurrected it for 3.3.1.
 .pg
-\fBAlex Kompel\fP contributed a new graphical port of 3.3 for Microsoft Windows.
+\fBAlex Kompel\fP contributed a new graphical port of 3.4 for Microsoft Windows.
 .pg
 There is a NetHack web site maintained by \fBKen Lorber\fP at http://www.nethack.org/.
 .pg

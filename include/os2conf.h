@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)os2conf.h	3.3	96/10/29	*/
+/*	SCCS Id: @(#)os2conf.h	3.4	1996/10/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Timo Hakulinen, 1990, 1991, 1992, 1993, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */

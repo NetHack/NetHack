@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)light.c	3.3	97/04/10	*/
+/*	SCCS Id: @(#)light.c	3.4	1997/04/10	*/
 /* Copyright (c) Dean Luick, 1994					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)quest.h	3.3	92/11/15	*/
+/*	SCCS Id: @(#)quest.h	3.4	1992/11/15	*/
 /* Copyright (c) Mike Stephenson 1991.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

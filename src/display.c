@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)display.c	3.3	2000/07/27	*/
+/*	SCCS Id: @(#)display.c	3.4	2000/07/27	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */

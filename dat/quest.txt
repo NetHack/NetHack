@@ -1,8 +1,8 @@
-#	SCCS Id: @(#)quest.txt	3.3	2002/01/30
+#	SCCS Id: @(#)quest.txt	3.4	2002/01/30
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
-#	The quest text file for NetHack 3.3
+#	The quest text file for NetHack 3.4
 #
 #	These are the "standard" message numbers from qtext.h.  All class
 #	dialogue must have at least these entries.

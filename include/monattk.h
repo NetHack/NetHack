@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monattk.h	3.3	95/01/28	*/
+/*	SCCS Id: @(#)monattk.h	3.4	1995/01/28	*/
 /* NetHack may be freely redistributed.  See license for details. */
 /* Copyright 1988, M. Stephenson */
 

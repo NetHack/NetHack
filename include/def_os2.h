@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)def_os2.h	3.3	93/01/19	*/
+/*	SCCS Id: @(#)def_os2.h	3.4	1993/01/19	*/
 /* Copyright (c) Timo Hakulinen, 1990, 1991, 1992, 1993.	  */
 /* NetHack may be freely redistributed.  See license for details. */
 

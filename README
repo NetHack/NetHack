@@ -1,8 +1,8 @@
-                NetHack 3.3.2 -- General information
+                NetHack 3.4.0 -- General information
 
-NetHack 3.3.2 is an enhancement to the dungeon exploration game NetHack.
+NetHack 3.4.0 is an enhancement to the dungeon exploration game NetHack.
 It is a distant descendent of Rogue and Hack, and a direct descendent of
-NetHack 3.2 and 3.3.1.
+NetHack 3.3.
 
 This version is primarily a bug fix release, but there are many
 changes and surprises beyond what you see listed here.
@@ -98,7 +98,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     to compile and run on your particular system.  It is worth mentioning
     that the default configuration is SysV/Sun/Solaris2.x (simply because
     the code was housed on such a system).  It is also worth mentioning
-    here that NetHack 3.3 is a huge program.  If you intend to run it on a
+    here that NetHack 3.4 is a huge program.  If you intend to run it on a
     small machine, you'll have to make hard choices among the options
     available in config.h.
 
@@ -108,7 +108,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     for particular windowing environments.  Reading them, and the man pages,
     should answer most of your questions.
 
-    At the time of this release, NetHack 3.3 is known to run/compile on:
+    At the time of this release, NetHack 3.4 is known to run/compile on:
 
         Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
         Atari ST/TT/Falcon running TOS (or MultiTOS) with GCC
@@ -125,7 +125,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
 
     Previous versions of NetHack were tested on the following systems,
-    and we expect that NetHack 3.3 will work on them as well:
+    and we expect that NetHack 3.4 will work on them as well:
 
         AT&T 3B1 running System V (3.51)
         AT&T 3B2/600 & 3B2/622 running System V R3.2.1
@@ -160,19 +160,19 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     lack of people with machines and time.
 
     With the demise of Windows NT on the DEC Alpha, no attempt has been
-    made to build NetHack 3.3.2 on that platform.
+    made to build NetHack 3.4.0 on that platform.
 
-    No attempt has been made to build or run NetHack 3.3.2 on Windows Me
+    No attempt has been made to build or run NetHack 3.4.0 on Windows Me
     or Windows XP at this point.  It may work, but then again it may not.
     
     A build for Intel 80286 machines and DOS "real mode" overlaid versions 
-    has been produced for 3.3.2, with a marginal attempt at tuning it for 
-    suitable performance.  If someone has access to real-mode compiler and 
-    lots of spare time on their hands, you may be able to enhance the 
-    performance even further.  We don't know how well it runs on a real
-    80286 since we no longer have access to one.  We have had some reports
-    of it running out of memory quite abruptly on levels with many monsters,
-    rendering the game in progress useless. Use it at your own risk.
+    has been not been produced for 3.4.0.  Nobody on the porting team has
+    the time or the software to attempt the necessary tuning that will allow 
+    it achieve the balance of having just the right amount of available 
+    memory, and still have acceptable performance.  The sources necessary 
+    to do so are still included in the source distribution, so if someone 
+    has access to a real-mode compiler and lots of spare time on their hands, 
+    you may be able to get things working. Of course you do so at your own risk.
 
                         - - - - - - - - - - -
 
@@ -207,13 +207,13 @@ something to get NetHack to run on your system, it's likely that others have
 done it by making slightly different modifications.  By routing your patches
 through the development team, we should be able to avoid making everyone else
 choose among variant patches claiming to do the same thing, to keep most of
-the copies of 3.3 synchronized by means of official patches, and to maintain
+the copies of 3.4 synchronized by means of official patches, and to maintain
 the painfully-created file organization.  (This process has been working since
 the time when everyone just posted their own patches to 2.3.  At that time,
 there were no archived bug-fixes to give to people who got 2.3 after its initial
 release, so the same bugs kept being discovered by new batches of people.)
 We have been successful in preventing this from happening since the 3.0
-release.  Please cooperate to keep this from happening to 3.3.
+release.  Please cooperate to keep this from happening to 3.4.
 
 It is inevitable that we will reject some proposed additions of new features
 either because they do not fit our conception of the game, or because they
@@ -222,7 +222,7 @@ you are free, of course, to post the patches to the net yourself and let the
 marketplace decide their worth.
 
 All of this amounts to the following:  If you decide to apply a free-lanced
-patch to your 3.3 code, you are on your own.  In our own patches, we will
+patch to your 3.4 code, you are on your own.  In our own patches, we will
 assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --

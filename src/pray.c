@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.3	2002/01/15	*/
+/*	SCCS Id: @(#)pray.c	3.4	2002/01/15	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 

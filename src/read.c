@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.3	2001/12/03	*/
+/*	SCCS Id: @(#)read.c	3.4	2001/12/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

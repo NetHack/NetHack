@@ -1,19 +1,19 @@
-/*	SCCS Id: @(#)patchlevel.h	3.3	2002/01/01	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2002/02/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* NetHack 3.3.2 */
+/* NetHack 3.4.0 */
 #define VERSION_MAJOR	3
-#define VERSION_MINOR	3
+#define VERSION_MINOR	4
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL	2
+#define PATCHLEVEL	0
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL	3
+#define EDITLEVEL	0
 
 #define COPYRIGHT_BANNER_A \
 "NetHack, Copyright 1985-2002"
@@ -38,9 +38,11 @@
 #endif
 
 /*****************************************************************************/
-/* Version 3.3.2 */
+/* Version 3.4.0 */
 
-/*  Patch 2, January??, 2002
+/*
+ *  NetHack 3.4.0, February ??, 2002
+ *
  *  Many, many bug general fixes including some for sliming, zapping, conduct,
  *	and several more for riding
  *  Eliminated a few potentially fatal bugs including one for stone-to-flesh,
@@ -59,6 +61,11 @@
  *  Amiga: screenmode requester, and several amiga specific bug fixes
  *  Win32 graphical port contributed by Alex Kompel included in source tree
  */
+
+/* Version 3.4 */
+
+/*****************************************************************************/
+/* Version 3.3.x */
 
 /*  Patch 1, August 9, 2000
  *  Many, many general fixes, including a number for riding, twoweapon,
@@ -95,10 +102,11 @@
  *  updated COPYRIGHT_BANNER_A to reflect year of release.
  *  Dozens of other bug fixes, and minor improvements.
  */
+
 /* Version 3.3 */
 
 /*****************************************************************************/
-/* Version 3.2.3 */
+/* Version 3.2.x */
 
 /*  Patch 3, December 10, 1999
  *  Released simultaneously with 3.3.0 for the benefit of

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)rect.c	3.3	90/02/22	*/
+/*	SCCS Id: @(#)rect.c	3.4	1990/02/22	*/
 /* Copyright (c) 1990 by Jean-Christophe Collet	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
