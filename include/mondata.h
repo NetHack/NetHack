@@ -94,6 +94,7 @@
 #define strongmonst(ptr)	(((ptr)->mflags2 & M2_STRONG) != 0L)
 #define can_breathe(ptr)	attacktype(ptr, AT_BREA)
 #define cantwield(ptr)		(nohands(ptr) || verysmall(ptr))
+#define could_twoweap(ptr)	((ptr)->mattk[1].aatyp == AT_WEAP)
 #define cantweararm(ptr)	(breakarm(ptr) || sliparm(ptr))
 #define throws_rocks(ptr)	(((ptr)->mflags2 & M2_ROCKTHROW) != 0L)
 #define type_is_pname(ptr)	(((ptr)->mflags2 & M2_PNAME) != 0L)

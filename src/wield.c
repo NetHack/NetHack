@@ -407,8 +407,8 @@ can_twoweapon()
 	struct obj *otmp;
 
 #define NOT_WEAPON(obj) (!is_weptool(obj) && obj->oclass != WEAPON_CLASS)
-	if (Upolyd)
-		You("can only use two weapons in your normal form.");
+	if (!could_twoweap(youmonst.data))
+		You_cant("use two weapons in your current form.");
 	else if (!uwep || !uswapwep)
 		Your("%s%s%s empty.", uwep ? "left " : uswapwep ? "right " : "",
 			body_part(HAND), (!uwep && !uswapwep) ? "s are" : " is");
