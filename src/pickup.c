@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2002/03/30	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2002/04/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -312,23 +312,21 @@ boolean
 allow_category(obj)
 struct obj *obj;
 {
+    if (Role_if(PM_PRIEST)) obj->bknown = TRUE;
     if (((index(valid_menu_classes,'u') != (char *)0) && obj->unpaid) ||
 	(index(valid_menu_classes, obj->oclass) != (char *)0))
 	return TRUE;
     else if (((index(valid_menu_classes,'U') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && (obj->bknown || Role_if(PM_PRIEST)) &&
-	!obj->blessed && !obj->cursed)))
+	(obj->oclass != GOLD_CLASS && obj->bknown && !obj->blessed && !obj->cursed)))
 	return TRUE;
     else if (((index(valid_menu_classes,'B') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS &&
-	(obj->bknown || Role_if(PM_PRIEST)) && obj->blessed)))
+	(obj->oclass != GOLD_CLASS && obj->bknown && obj->blessed)))
 	return TRUE;
     else if (((index(valid_menu_classes,'C') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS &&
-	(obj->bknown || Role_if(PM_PRIEST)) && obj->cursed)))
+	(obj->oclass != GOLD_CLASS && obj->bknown && obj->cursed)))
 	return TRUE;
     else if (((index(valid_menu_classes,'X') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && !(obj->bknown || Role_if(PM_PRIEST)))))
+	(obj->oclass != GOLD_CLASS && !obj->bknown)))
 	return TRUE;
     else
 	return FALSE;

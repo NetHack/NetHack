@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2002/02/23	*/
+/*	SCCS Id: @(#)invent.c	3.4	2002/04/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1761,24 +1761,23 @@ count_buc(list, type)
     int count = 0;
 
     while (list) {
+	if (Role_if(PM_PRIEST)) list->bknown = TRUE;
 	switch(type) {
 	    case BUC_BLESSED:
-		if (list->oclass != GOLD_CLASS &&
-		    (list->bknown || Role_if(PM_PRIEST)) && list->blessed)
+		if (list->oclass != GOLD_CLASS && list->bknown && list->blessed)
 		    count++;
 		break;
 	    case BUC_CURSED:
-		if (list->oclass != GOLD_CLASS &&
-		    (list->bknown || Role_if(PM_PRIEST)) && list->cursed)
+		if (list->oclass != GOLD_CLASS && list->bknown && list->cursed)
 		    count++;
 		break;
 	    case BUC_UNCURSED:
 		if (list->oclass != GOLD_CLASS &&
-		    (list->bknown || Role_if(PM_PRIEST)) && !list->blessed && !list->cursed)
+			list->bknown && !list->blessed && !list->cursed)
 		    count++;
 		break;
 	    case BUC_UNKNOWN:
-		if (list->oclass != GOLD_CLASS && !(list->bknown || Role_if(PM_PRIEST)))
+		if (list->oclass != GOLD_CLASS && !list->bknown)
 		    count++;
 		break;
 	    default:
