@@ -1357,10 +1357,11 @@ int retryct;
 #if defined(AMIGA) || defined(WIN32) || defined(MSDOS)
 # ifdef AMIGA
 #define OPENFAILURE(fd) (!fd)
+    lockptr = 0;
 # else
 #define OPENFAILURE(fd) (fd < 0)
+    lockptr = -1;
 # endif
-    lockptr = 0;
     while (retryct-- && OPENFAILURE(lockptr)) {
 # ifdef AMIGA
 	(void)DeleteFile(lockname); /* in case dead process was here first */
