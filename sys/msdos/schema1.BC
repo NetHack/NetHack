@@ -1,0 +1,252 @@
+/* SCCS Id: @(#)schema1.BC	3.3	 99/10/28 */
+/* Copyright (c) Yitzhak Sapir, 1999 */
+/*  */
+/*  NetHack Overlay Schema */
+/*  Minimal extended memory available, lots of 640K base RAM free */
+/*  Overlay buffer size will be (20 + 20 + 19) = 59K (sum of 3 largest overlays). */
+/*  Requires about 490K (for exe load plus overlay buffer), but */
+/*  an additional 70K free (minimum) will be needed for malloc calls, */
+/*  bringing the total requirement to about 560K. */
+/*  Optimized for minimal overlay turns. */
+/*  */
+
+
+-zCallmain_0 -zAOVLY -zCOVL1
+-zCallmain_1 -zAOVLY -zCOVL2
+-zCallmain_b -zAOVLY -zCOVL3
+-zCalloc_o
+-zCapply_0 -zAOVLY -zCOVL4
+-zCapply_1 -zAOVLY -zCOVL5
+-zCapply_b -zAOVLY -zCOVL6
+-zCartifact_0 -zAOVLY -zCOVL7
+-zCartifact_1 -zAOVLY -zCOVL8
+-zCartifact_b -zAOVLY -zCOVL9
+-zCattrib_0
+-zCattrib_1 -zAOVLY -zCOVL10
+-zCattrib_2 -zAOVLY -zCOVL11
+-zCattrib_b -zAOVLY -zCOVL12
+-zCball_o -zAOVLY -zCOVL13
+-zCbones_o -zAOVLY -zCOVL14
+-zCbotl_0
+-zCbotl_1 -zAOVLY -zCOVL15
+-zCbotl_b -zAOVLY -zCOVL16
+-zCcmd_0
+-zCcmd_1 -zAOVLY -zCOVL17
+-zCcmd_b -zAOVLY -zCOVL18
+-zCdbridge_0
+-zCdbridge_1 -zAOVLY -zCOVL19
+-zCdbridge_b -zAOVLY -zCOVL20
+-zCdecl_o -zAOVLY -zCOVL21
+-zCdetect_o
+-zCdig_o -zAOVLY -zCOVL22
+-zCdisplay_o
+-zCdlb_o -zAOVLY -zCOVL23
+-zCdo_0 -zAOVLY -zCOVL24
+-zCdo_1 -zAOVLY -zCOVL25
+-zCdo_2 -zAOVLY -zCOVL26
+-zCdo_3 -zAOVLY -zCOVL27
+-zCdo_b -zAOVLY -zCOVL28
+-zCdo_name_0 -zAOVLY -zCOVL29
+-zCdo_name_2 -zAOVLY -zCOVL30
+-zCdo_name_b -zAOVLY -zCOVL31
+-zCdo_wear_0 -zAOVLY -zCOVL32
+-zCdo_wear_1 -zAOVLY -zCOVL33
+-zCdo_wear_2 -zAOVLY -zCOVL34
+-zCdo_wear_b -zAOVLY -zCOVL35
+-zCdog_1 -zAOVLY -zCOVL36
+-zCdog_2 -zAOVLY -zCOVL37
+-zCdog_b -zAOVLY -zCOVL38
+-zCdogmove_0 -zAOVLY -zCOVL39
+-zCdogmove_b
+-zCdokick_o -zAOVLY -zCOVL40
+-zCdothrow_o -zAOVLY -zCOVL41
+-zCdrawing_o -zAOVLY -zCOVL42
+-zCdungeon_0
+-zCdungeon_1 -zAOVLY -zCOVL43
+-zCeat_0 -zAOVLY -zCOVL44
+-zCeat_1 -zAOVLY -zCOVL45
+-zCeat_b -zAOVLY -zCOVL46
+-zCend_o -zAOVLY -zCOVL47
+-zCengrave_0
+-zCengrave_1 -zAOVLY -zCOVL48
+-zCengrave_2 -zAOVLY -zCOVL49
+-zCengrave_b -zAOVLY -zCOVL50
+-zCexper_o -zAOVLY -zCOVL51
+-zCexplode_0 -zAOVLY -zCOVL52
+-zCexplode_1 -zAOVLY -zCOVL53
+-zCextralev_o -zAOVLY -zCOVL54
+-zCfiles_o -zAOVLY -zCOVL55
+-zCfountain_o -zAOVLY -zCOVL56
+-zCgetline_1 -zAOVLY -zCOVL57
+-zCgetline_2 -zAOVLY -zCOVL58
+-zChack_1
+-zChack_2 -zAOVLY -zCOVL59
+-zChack_3
+-zChack_b -zAOVLY -zCOVL60
+-zChacklib_0
+-zChacklib_1
+-zChacklib_2
+-zChacklib_b -zAOVLY -zCOVL61
+-zCinvent_0
+-zCinvent_1 -zAOVLY -zCOVL62
+-zCinvent_2 -zAOVLY -zCOVL63
+-zCinvent_3 -zAOVLY -zCOVL64
+-zCinvent_b -zAOVLY -zCOVL65
+-zClight_3 -zAOVLY -zCOVL66
+-zClock_0 -zAOVLY -zCOVL67
+-zClock_b -zAOVLY -zCOVL68
+-zCmail_0 -zAOVLY -zCOVL68
+-zCmail_b -zAOVLY -zCOVL69
+-zCmakemon_0 -zAOVLY -zCOVL70
+-zCmakemon_1 -zAOVLY -zCOVL71
+-zCmakemon_2 -zAOVLY -zCOVL72
+-zCmakemon_b -zAOVLY -zCOVL73
+-zCmcastu_0 -zAOVLY -zCOVL74
+-zCmcastu_b -zAOVLY -zCOVL75
+-zCmhitm_0 -zAOVLY -zCOVL76
+-zCmhitm_b -zAOVLY -zCOVL77
+-zCmhitu_0 -zAOVLY -zCOVL78
+-zCmhitu_1 -zAOVLY -zCOVL79
+-zCmhitu_b -zAOVLY -zCOVL80
+-zCminion_o -zAOVLY -zCOVL81
+-zCmklev_o -zAOVLY -zCOVL82
+-zCmkmap_o -zAOVLY -zCOVL83
+-zCmkmaze_o -zAOVLY -zCOVL84
+-zCmkobj_0 -zAOVLY -zCOVL85
+-zCmkobj_1 -zAOVLY -zCOVL86
+-zCmkobj_b -zAOVLY -zCOVL87
+-zCmkroom_0 -zAOVLY -zCOVL88
+-zCmkroom_b -zAOVLY -zCOVL89
+-zCmon_0
+-zCmon_1 -zAOVLY -zCOVL90
+-zCmon_2 -zAOVLY -zCOVL91
+-zCmon_b -zAOVLY -zCOVL92
+-zCmondata_0
+-zCmondata_1 -zAOVLY -zCOVL93
+-zCmondata_2 -zAOVLY -zCOVL94
+-zCmondata_b -zAOVLY -zCOVL95
+-zCmonmove_0
+-zCmonmove_1
+-zCmonmove_2
+-zCmonmove_b -zAOVLY -zCOVL96
+-zCmonst_o -zAOVLY -zCOVL97
+-zCmonstr_o -zAOVLY -zCOVL98
+-zCmplayer_o -zAOVLY -zCOVL99
+-zCmsdos_0
+-zCmsdos_b -zAOVLY -zCOVL100
+-zCmthrowu_0 -zAOVLY -zCOVL101
+-zCmthrowu_1 -zAOVLY -zCOVL102
+-zCmthrowu_b -zAOVLY -zCOVL103
+-zCmuse_o -zAOVLY -zCOVL104
+-zCmusic_o -zAOVLY -zCOVL105
+-zCo_init_o -zAOVLY -zCOVL106
+-zCobjects_o -zAOVLY -zCOVL107
+-zCobjnam_0 -zAOVLY -zCOVL108
+-zCobjnam_1 -zAOVLY -zCOVL109
+-zCobjnam_b -zAOVLY -zCOVL110
+-zCoptions_o -zAOVLY -zCOVL111
+-zCovlinit_o
+-zCpager_o -zAOVLY -zCOVL112
+-zCpckeys_o
+-zCpcmain_0
+-zCpcmain_1 -zAOVLY -zCOVL113
+-zCpcmain_b -zAOVLY -zCOVL114
+-zCpctiles_0
+-zCpctiles_b
+-zCpcunix_b -zAOVLY -zCOVL115
+-zCpickup_o -zAOVLY -zCOVL116
+-zCpline_b -zAOVLY -zCOVL117
+-zCpolyself_0 -zAOVLY -zCOVL118
+-zCpolyself_1 -zAOVLY -zCOVL119
+-zCpolyself_b -zAOVLY -zCOVL120
+-zCpotion_b -zAOVLY -zCOVL121
+-zCpray_o -zAOVLY -zCOVL122
+-zCpriest_0 -zAOVLY -zCOVL123
+-zCpriest_b -zAOVLY -zCOVL124
+-zCquest_o -zAOVLY -zCOVL125
+-zCquestpgr_o -zAOVLY -zCOVL126
+-zCrandom_o
+-zCread_b -zAOVLY -zCOVL127
+-zCrect_o -zAOVLY -zCOVL128
+-zCregion_o -zAOVLY -zCOVL129
+-zCrestore_o -zAOVLY -zCOVL130
+-zCrip_o -zAOVLY -zCOVL131
+-zCrnd_0
+-zCrnd_1 -zAOVLY -zCOVL132
+-zCrnd_b -zAOVLY -zCOVL133
+-zCrole_o -zAOVLY -zCOVL113
+-zCrumors_o -zAOVLY -zCOVL134
+-zCsave_o -zAOVLY -zCOVL135
+-zCshk_0 -zAOVLY -zCOVL136
+-zCshk_1 -zAOVLY -zCOVL137
+-zCshk_2 -zAOVLY -zCOVL138
+-zCshk_3 -zAOVLY -zCOVL139
+-zCshk_b -zAOVLY -zCOVL140
+-zCshknam_0 -zAOVLY -zCOVL141
+-zCshknam_b -zAOVLY -zCOVL142
+-zCsit_o -zAOVLY -zCOVL143
+-zCsound_o
+-zCsounds_0 -zAOVLY -zCOVL144
+-zCsounds_b -zAOVLY -zCOVL145
+-zCsp_lev_o -zAOVLY -zCOVL146
+-zCspell_o -zAOVLY -zCOVL147
+-zCsteal_0 -zAOVLY -zCOVL148
+-zCsteal_1 -zAOVLY -zCOVL149
+-zCsteal_b -zAOVLY -zCOVL150
+-zCsteed_o -zAOVLY -zCOVL188
+-zCsys_o -zAOVLY -zCOVL151
+-zCteleport_o -zAOVLY -zCOVL152
+-zCtermcap_0 -zAOVLY -zCOVL153
+-zCtermcap_1 -zAOVLY -zCOVL154
+-zCtermcap_b -zAOVLY -zCOVL155
+-zCtile_o
+-zCtimeout_0 -zAOVLY -zCOVL156
+-zCtimeout_1 -zAOVLY -zCOVL157
+-zCtimeout_b -zAOVLY -zCOVL158
+-zCtopl_1 -zAOVLY -zCOVL159
+-zCtopl_2 -zAOVLY -zCOVL160
+-zCtopl_b -zAOVLY -zCOVL161
+-zCtopten_o -zAOVLY -zCOVL162
+-zCtrack_0 -zAOVLY -zCOVL163
+-zCtrack_1 -zAOVLY -zCOVL164
+-zCtrack_b -zAOVLY -zCOVL165
+-zCtrap_0
+-zCtrap_1 -zAOVLY -zCOVL166
+-zCtrap_2 -zAOVLY -zCOVL167
+-zCtrap_3 -zAOVLY -zCOVL168
+-zCtrap_b -zAOVLY -zCOVL169
+-zCtty_o -zAOVLY -zCOVL170
+-zCu_init_o -zAOVLY -zCOVL171
+-zCuhitm_o -zAOVLY -zCOVL172
+-zCvault_0 -zAOVLY -zCOVL173
+-zCvault_b -zAOVLY -zCOVL174
+-zCversion_o -zAOVLY -zCOVL175
+-zCvideo_0
+-zCvideo_1
+-zCvideo_b
+-zCvidtxt_0
+-zCvidtxt_b
+-zCvidvga_0
+-zCvidvga_1
+-zCvidvga_2 -zAOVLY -zCOVL176
+-zCvidvga_b
+-zCvis_tab_o -zAOVLY -zCOVL177
+-zCvision_o
+-zCweapon_0 -zAOVLY -zCOVL178
+-zCweapon_1 -zAOVLY -zCOVL179
+-zCweapon_b -zAOVLY -zCOVL180
+-zCwere_0 -zAOVLY -zCOVL181
+-zCwere_b -zAOVLY -zCOVL182
+-zCwield_o -zAOVLY -zCOVL183
+-zCwindows_o -zAOVLY -zCOVL184
+-zCwintty_o
+-zCwizard_0 -zAOVLY -zCOVL185
+-zCwizard_b -zAOVLY -zCOVL186
+-zCworm_o -zAOVLY -zCOVL187
+-zCworn_o -zAOVLY -zCOVL188
+-zCwrite_o -zAOVLY -zCOVL189
+-zCzap_0 -zAOVLY -zCOVL190
+-zCzap_1 -zAOVLY -zCOVL191
+-zCzap_2 -zAOVLY -zCOVL192
+-zCzap_3 -zAOVLY -zCOVL193
+-zCzap_b -zAOVLY -zCOVL194
