@@ -16,6 +16,8 @@ STATIC_DCL int FDECL(dog_invent,(struct monst *,struct edog *,int));
 STATIC_DCL int FDECL(dog_goal,(struct monst *,struct edog *,int,int,int));
 
 STATIC_DCL struct obj *FDECL(DROPPABLES, (struct monst *));
+STATIC_DCL boolean can_reach_food(struct monst *,XCHAR_P,XCHAR_P,XCHAR_P,
+    XCHAR_P);
 
 STATIC_OVL struct obj *
 DROPPABLES(mon)
@@ -381,7 +383,8 @@ int after, udist, whappr;
 			continue;
 		    if (cursed_object_at(nx, ny))
 			continue;
-		    if (otyp < MANFOOD) {
+		    if (otyp < MANFOOD &&
+			    can_reach_food(mtmp, mtmp->mx, mtmp->my, nx, ny)) {
 			if (otyp < gtyp || DDIST(nx,ny) < DDIST(gx,gy)) {
 			    gx = nx;
 			    gy = ny;
@@ -776,6 +779,50 @@ dognext:
 		set_apparxy(mtmp);
 	}
 	return(1);
+}
+
+/* Hack to prevent a dog from being endlessly stuck near a piece of food that
+ * it can't reach, such as caught in a teleport scroll niche.  It recursively
+ * checks to see if the squares inbetween are good.  The checking could be a
+ * little smarter; a full check would probably be useful in m_move() too.
+ * Since the maximum food distance is 5, this should never be more than 5 calls
+ * deep.
+ */
+STATIC_OVL  boolean
+can_reach_food(mon, mx, my, fx, fy)
+struct monst *mon;
+xchar mx, my, fx, fy;
+{
+    int i, j;
+    int dist;
+
+    if (mx == fx && my == fy) return TRUE;
+    if (!isok(mx, my)) return FALSE; /* should not happen */
+    
+    dist = dist2(mx, my, fx, fy);
+    for(i=mx-1; i<=mx+1; i++) {
+	for(j=my-1; j<=my+1; j++) {
+	    if (!isok(i, j))
+		continue;
+	    if (dist2(i, j, fx, fy) >= dist)
+		continue;
+	    if (IS_ROCK(levl[i][j].typ) && !passes_walls(mon->data) &&
+				    (!may_dig(i,j) || !tunnels(mon->data)))
+		continue;
+	    if (IS_DOOR(levl[i][j].typ) &&
+				(levl[i][j].doormask & (D_CLOSED | D_LOCKED)))
+		continue;
+	    if (is_pool(i, j) && !is_swimmer(mon->data))
+		continue;
+	    if (is_lava(i, j) && !likes_lava(mon->data))
+		continue;
+	    if (sobj_at(BOULDER,i,j) && !throws_rocks(mon->data))
+		continue;
+	    if (can_reach_food(mon, i, j, fx, fy))
+		return TRUE;
+	}
+    }
+    return FALSE;
 }
 
 #endif /* OVL0 */

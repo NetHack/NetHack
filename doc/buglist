@@ -133,10 +133,6 @@ Reported but unconfirmed bugs:
    catching a signal.
 -- Reported problem with loss of hit points for no apparent reason until
    player was left with 1 out of 1 hit points.
--- Walking around in the Gnomish Town, when I suddenly noticed my cat
-   wasn't following me around anymore. It appeared to be hanging around
-   somewhere near an outer wall of a food shop, on the other side of which
-   was lying a tripe ration and would not move. [Boudewijn Waijers]
 -- Monsters were displayed as 'I' (unseen monster) but were referred to by
    name.  [Irina]
 -- A wand of secret door detection self-identified while engraving even
