@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)weapon.c	3.4	2004/10/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -100,6 +100,47 @@ STATIC_DCL void FDECL(skill_advance, (int));
 static NEARDATA const char kebabable[] = {
 	S_XORN, S_DRAGON, S_JABBERWOCK, S_NAGA, S_GIANT, '\0'
 };
+
+/* weapon's skill category name for use as generalized description of weapon */
+const char *weapon_descr(obj)
+struct obj *obj;
+{
+    int skill = weapon_type(obj);
+    const char *descr = P_NAME(skill);
+
+    /* assorted special cases */
+    switch (skill) {
+    case P_NONE:
+	/* not a weapon: use item class name; override "food" for corpses */
+	descr = (obj->otyp == CORPSE) ? "corpse" :
+		oclass_names[(int)obj->oclass];
+	break;
+    case P_SLING:
+	if (is_ammo(obj))
+	    descr = (obj->otyp == ROCK || is_graystone(obj)) ? "stone" :
+		    /* avoid "rock"; what about known glass? */
+		    (obj->oclass == GEM_CLASS) ? "gem" :
+		    /* in case somebody adds odd sling ammo */
+		    oclass_names[(int)obj->oclass];
+	break;
+    case P_BOW:
+	if (is_ammo(obj)) descr = "arrow";
+	break;
+    case P_CROSSBOW:
+	if (is_ammo(obj)) descr = "bolt";
+	break;
+    case P_FLAIL:
+	if (obj->otyp == GRAPPLING_HOOK) descr = "hook";
+	break;
+    case P_PICK_AXE:
+	/* even if "dwarvish mattock" hasn't been discovered yet */
+	if (obj->otyp == DWARVISH_MATTOCK) descr = "mattock";
+	break;
+    default:
+	break;
+    }
+    return makesingular(descr);
+}
 
 /*
  *	hitval returns an integer representing the "to hit" bonuses

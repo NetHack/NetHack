@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2004/06/30	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2004/10/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1616,8 +1616,8 @@ glibr()
 {
 	register struct obj *otmp;
 	int xfl = 0;
-	boolean leftfall, rightfall;
-	const char *otherwep = 0;
+	boolean leftfall, rightfall, wastwoweap = FALSE;
+	const char *otherwep = 0, *thiswep, *which, *hand;
 
 	leftfall = (uleft && !uleft->cursed &&
 		    (!uwep || !welded(uwep) || !bimanual(uwep)));
@@ -1643,31 +1643,53 @@ glibr()
 
 	otmp = uswapwep;
 	if (u.twoweap && otmp) {
-		otherwep = is_sword(otmp) ? c_sword :
-		    makesingular(oclass_names[(int)otmp->oclass]);
-		Your("%s %sslips from your %s.",
-			otherwep,
-			xfl ? "also " : "",
-			makeplural(body_part(HAND)));
-		setuswapwep((struct obj *)0);
+		/* secondary weapon doesn't need nearly as much handling as
+		   primary; when in two-weapon mode, we know it's one-handed
+		   with something else in the other hand and also that it's
+		   a weapon or weptool rather than something unusual, plus
+		   we don't need to compare its type with the primary */
+		otherwep = is_sword(otmp) ? c_sword : weapon_descr(otmp);
+		if (otmp->quan > 1L) otherwep = makeplural(otherwep);
+		hand = body_part(HAND);
+		which = "left ";
+		Your("%s %s%s from your %s%s.",
+		     otherwep, xfl ? "also " : "",
+		     otense(otmp, "slip"), which, hand);
 		xfl++;
+		wastwoweap = TRUE;
+		setuswapwep((struct obj *)0);	/* clears u.twoweap */
 		if (otmp->otyp != LOADSTONE || !otmp->cursed)
 			dropx(otmp);
 	}
 	otmp = uwep;
 	if (otmp && !welded(otmp)) {
-		const char *thiswep;
+		long savequan = otmp->quan;
 
 		/* nice wording if both weapons are the same type */
-		thiswep = is_sword(otmp) ? c_sword :
-		    makesingular(oclass_names[(int)otmp->oclass]);
-		if (otherwep && strcmp(thiswep, otherwep)) otherwep = 0;
-
-		/* changed so cursed weapons don't fall, GAN 10/30/86 */
-		Your("%s%s %sslips from your %s.",
-			otherwep ? "other " : "", thiswep,
-			xfl ? "also " : "",
-			makeplural(body_part(HAND)));
+		thiswep = is_sword(otmp) ? c_sword : weapon_descr(otmp);
+		if (otherwep && strcmp(thiswep, makesingular(otherwep)))
+		    otherwep = 0;
+		if (otmp->quan > 1L) {
+		    /* most class names for unconventional wielded items
+		       are ok, but if wielding multiple apples or rations
+		       we don't want "your foods slip", so force non-corpse
+		       food to be singular; skipping makeplural() isn't
+		       enough--we need to fool otense() too */
+		    if (!strcmp(thiswep, "food")) otmp->quan = 1L;
+		    else thiswep = makeplural(thiswep);
+		}
+		hand = body_part(HAND);
+		which = "";
+		if (bimanual(otmp))
+		    hand = makeplural(hand);
+		else if (wastwoweap)
+		    which = "right ";	/* preceding msg was about left */
+		pline("%s %s%s %s%s from your %s%s.",
+		      !strncmp(thiswep, "corpse", 6) ? "The" : "Your",
+		      otherwep ? "other " : "", thiswep, xfl ? "also " : "",
+		      otense(otmp, "slip"), which, hand);
+	     /* xfl++; */
+		otmp->quan = savequan;
 		setuwep((struct obj *)0);
 		if (otmp->otyp != LOADSTONE || !otmp->cursed)
 			dropx(otmp);

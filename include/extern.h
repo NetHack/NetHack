@@ -2303,6 +2303,7 @@ E int NDECL(dosuspend);
 
 /* ### weapon.c ### */
 
+E const char *FDECL(weapon_descr, (struct obj *));
 E int FDECL(hitval, (struct obj *,struct monst *));
 E int FDECL(dmgval, (struct obj *,struct monst *));
 E struct obj *FDECL(select_rwep, (struct monst *));
