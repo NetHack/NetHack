@@ -66,7 +66,8 @@ register struct monst *mtmp;
 #else /* !GOLDOBJ */
 
 long		/* actually returns something that fits in an int */
-somegold(long umoney)
+somegold(umoney)
+long umoney;
 {
 #ifdef LINT	/* long conv. ok */
 	return(0L);
