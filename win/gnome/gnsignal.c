@@ -248,193 +248,194 @@ ghack_handle_button_press(GtkWidget *widget, GdkEventButton *event,
 void 
 ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
-  int key=0;
-  int ctl=GDK_CONTROL_MASK;
-  int alt=GDK_MOD1_MASK;
+    static int was_pound = 0;
+    int key = 0;
+    int ctl = GDK_CONTROL_MASK;
+    int alt = GDK_MOD1_MASK;
 
-/* Turn this on to debug key events */
+    /* Turn this on to debug key events */
 #if 0
-  g_message("I got a \"%s\" key (%d) %s%s", 
-	    gdk_keyval_name (event->keyval), event->keyval, 
-	    (event->state&ctl)? "+CONTROL":"", (event->state&alt)? "+ALT":"");
+    g_message("I got a \"%s\" key (%d) %s%s", 
+	      gdk_keyval_name (event->keyval), event->keyval, 
+	      (event->state&ctl)? "+CONTROL":"", (event->state&alt)? "+ALT":"");
 #endif
 
-  switch (event->keyval) {
-  /* special keys to do stuff with */
+    switch (event->keyval) {
+	/* special keys to do stuff with */
 
-  /* Set up the direction keys */
+	/* Set up the direction keys */
 
-  /* First handle the arrow keys -- these always mean move */
-  case GDK_Right:
-  case GDK_rightarrow:
-      if (iflags.num_pad) key='6'; else  key='l'; break;
-  case GDK_Left:
-  case GDK_leftarrow:
-      if (iflags.num_pad) key='4'; else  key='h'; break;
-  case GDK_Up:
-  case GDK_uparrow:
-      if (iflags.num_pad) key='8'; else  key='k'; break;
-  case GDK_Down:
-  case GDK_downarrow:
-      if (iflags.num_pad) key='2'; else  key='j'; break;
-  case GDK_Home:
-      if (iflags.num_pad) key='7'; else  key='y'; break;
-  case GDK_End:
-      if (iflags.num_pad) key='1'; else  key='b'; break;
-  case GDK_Page_Down:
-      if (iflags.num_pad) key='3'; else  key='n'; break;
-  case GDK_Page_Up:
-      if (iflags.num_pad) key='9'; else  key='u'; break;
-  case ' ':		 key='.'; break;
+	/* First handle the arrow keys -- these always mean move */
+    case GDK_Right:
+    case GDK_rightarrow:
+	if (iflags.num_pad) key='6'; else  key='l'; break;
+    case GDK_Left:
+    case GDK_leftarrow:
+	if (iflags.num_pad) key='4'; else  key='h'; break;
+    case GDK_Up:
+    case GDK_uparrow:
+	if (iflags.num_pad) key='8'; else  key='k'; break;
+    case GDK_Down:
+    case GDK_downarrow:
+	if (iflags.num_pad) key='2'; else  key='j'; break;
+    case GDK_Home:
+	if (iflags.num_pad) key='7'; else  key='y'; break;
+    case GDK_End:
+	if (iflags.num_pad) key='1'; else  key='b'; break;
+    case GDK_Page_Down:
+	if (iflags.num_pad) key='3'; else  key='n'; break;
+    case GDK_Page_Up:
+	if (iflags.num_pad) key='9'; else  key='u'; break;
+    case ' ':		 key='.'; break;
 
-  /* Now, handle the numberpad (move or numbers) */
-  case GDK_KP_Right:
-  case GDK_KP_6:
-      if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	  key = GDK_KP_6;
-      else
-	  key='6'; 
-      break;
+	/* Now, handle the numberpad (move or numbers) */
+    case GDK_KP_Right:
+    case GDK_KP_6:
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
+	    key = GDK_KP_6;
+	else
+	    key='6'; 
+	break;
 
-  case GDK_KP_Left:
-  case GDK_KP_4:
-      if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	  key = GDK_KP_4;
-      else
-	  key='4'; 
-      break;
+    case GDK_KP_Left:
+    case GDK_KP_4:
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
+	    key = GDK_KP_4;
+	else
+	    key='4'; 
+	break;
 
-  case GDK_KP_Up:
-  case GDK_KP_8:
-      if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	  key = GDK_KP_8;
-      else
-	  key='8'; 
-      break;
+    case GDK_KP_Up:
+    case GDK_KP_8:
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
+	    key = GDK_KP_8;
+	else
+	    key='8'; 
+	break;
 
-  case GDK_KP_Down:
-  case GDK_KP_2:
-      if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	  key = GDK_KP_2;
-      else
-	  key='2'; 
-      break;
+    case GDK_KP_Down:
+    case GDK_KP_2:
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
+	    key = GDK_KP_2;
+	else
+	    key='2'; 
+	break;
 
-  /* Move Top-Left */
-  case GDK_KP_Home:
-  case GDK_KP_7:
-      if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	  key = GDK_KP_7;
-      else
-	  key='7'; 
-      break;
+	/* Move Top-Left */
+    case GDK_KP_Home:
+    case GDK_KP_7:
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
+	    key = GDK_KP_7;
+	else
+	    key='7'; 
+	break;
 
-  case GDK_KP_Page_Up:
-  case GDK_KP_9:
-      if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	  key = GDK_KP_9;
-      else
-	  key='9'; 
-      break;
+    case GDK_KP_Page_Up:
+    case GDK_KP_9:
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
+	    key = GDK_KP_9;
+	else
+	    key='9'; 
+	break;
 
-  case GDK_KP_End:
-  case GDK_KP_1:
-      if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	  key = GDK_KP_1;
-      else
-	  key='1'; 
-      break;
+    case GDK_KP_End:
+    case GDK_KP_1:
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
+	    key = GDK_KP_1;
+	else
+	    key='1'; 
+	break;
 
-  case GDK_KP_Page_Down:
-  case GDK_KP_3:
-      if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	  key = GDK_KP_3;
-      else
-	  key='3'; 
-      break;
+    case GDK_KP_Page_Down:
+    case GDK_KP_3:
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
+	    key = GDK_KP_3;
+	else
+	    key='3'; 
+	break;
   
   
-  case GDK_KP_5:
-      if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	  key = GDK_KP_5;
-      else
-	  key='5'; 
-      break;
+    case GDK_KP_5:
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
+	    key = GDK_KP_5;
+	else
+	    key='5'; 
+	break;
 
-  case GDK_KP_Delete:
-  case GDK_KP_Decimal:
-	  key='.'; 
-      break;
+    case GDK_KP_Delete:
+    case GDK_KP_Decimal:
+	key='.'; 
+	break;
 
-  /* We don't bother using the "#" key for extended commands.  Instead, 
-   * we will just use the ALT key.*/
-  case GDK_numbersign:
-      break;
+	/* can't just ignore "#", it's a core feature */
+    case GDK_numbersign:
+	was_pound = 1;
+	return;
 
-  /* We will probably want to do something with these later... */
-  case GDK_KP_Begin:
-  case GDK_KP_F1:
-  case GDK_F1:
-  case GDK_KP_F2:
-  case GDK_F2:
-  case GDK_KP_F3:
-  case GDK_F3:
-  case GDK_KP_F4:
-  case GDK_F4:
-  case GDK_F5:
-  case GDK_F6:
-  case GDK_F7:
-  case GDK_F8:
-  case GDK_F9:
-  case GDK_F10:
-  case GDK_F11:
-  case GDK_F12:
-    break;
-  /* various keys to ignore */
-  case GDK_KP_Insert:
-  case GDK_Insert:
-  case GDK_Delete:
-  case GDK_Print:
-  case GDK_BackSpace:
-  case GDK_Pause:
-  case GDK_Scroll_Lock:
-  case GDK_Shift_Lock:
-  case GDK_Num_Lock:
-  case GDK_Caps_Lock:
-  case GDK_Control_L:
-  case GDK_Control_R:
-  case GDK_Shift_L:
-  case GDK_Shift_R:
-  case GDK_Alt_L:
-  case GDK_Alt_R:
-  case GDK_Meta_L:
-  case GDK_Meta_R:
-  case GDK_Mode_switch:
-  case GDK_Multi_key:
-    return;
+	/* We will probably want to do something with these later... */
+    case GDK_KP_Begin:
+    case GDK_KP_F1:
+    case GDK_F1:
+    case GDK_KP_F2:
+    case GDK_F2:
+    case GDK_KP_F3:
+    case GDK_F3:
+    case GDK_KP_F4:
+    case GDK_F4:
+    case GDK_F5:
+    case GDK_F6:
+    case GDK_F7:
+    case GDK_F8:
+    case GDK_F9:
+    case GDK_F10:
+    case GDK_F11:
+    case GDK_F12:
+	break;
+	/* various keys to ignore */
+    case GDK_KP_Insert:
+    case GDK_Insert:
+    case GDK_Delete:
+    case GDK_Print:
+    case GDK_BackSpace:
+    case GDK_Pause:
+    case GDK_Scroll_Lock:
+    case GDK_Shift_Lock:
+    case GDK_Num_Lock:
+    case GDK_Caps_Lock:
+    case GDK_Control_L:
+    case GDK_Control_R:
+    case GDK_Shift_L:
+    case GDK_Shift_R:
+    case GDK_Alt_L:
+    case GDK_Alt_R:
+    case GDK_Meta_L:
+    case GDK_Meta_R:
+    case GDK_Mode_switch:
+    case GDK_Multi_key:
+	return;
 
-  default:
-    key = event->keyval;
-  }
+    default:
+	key = event->keyval;
+    }
 
-  if (event->state & alt) {
+    if ((event->state & alt) || was_pound) {
 	key=M(event->keyval);
-  }
-  else if (event->state & ctl) {
+    } else if (event->state & ctl) {
 	key=C(event->keyval);
-  }
+    }
+    if (was_pound) {
+	was_pound = 0;
+    }
  
-  /* Ok, here is where we do clever stuff to overide the default
-   * game behavior */
-  if (g_askingQuestion==0) {
+    /* Ok, here is where we do clever stuff to overide the default
+     * game behavior */
+    if (g_askingQuestion == 0) {
 
-      if (key == 'S' || key == M('S') || key == C('S')) {
-	  ghack_save_game_cb( NULL, NULL);
-	  return;
-      }
-  }
+	if (key == 'S' || key == M('S') || key == C('S')) {
+	    ghack_save_game_cb( NULL, NULL);
+	    return;
+	}
+    }
     g_keyBuffer = g_list_prepend (g_keyBuffer, GINT_TO_POINTER( key));
     g_numKeys++;
 }
-
-

@@ -138,7 +138,8 @@ ghack_about_cb(GtkWidget *widget, gpointer data)
       _("\nSend comments and bug reports to: nethack-bugs@nethack.org\n"
       "This game is free software. See License for details."));
     about = gnome_about_new(_("Nethack"), 
-	    buf1, "(C) 1985-2000 Mike Stephenson", (const char **)authors, buf,
+	    buf1, "Copyright (C) 1985-2002 Mike Stephenson",
+	    (const char **)authors, buf,
 	    NULL);
 
     gtk_signal_connect (GTK_OBJECT (about), "destroy",
@@ -720,6 +721,7 @@ void ghack_init_main_window( int argc, char** argv)
     if (uid != euid)
       setuid(uid);
     hide_privileges(TRUE);
+    /* XXX gnome_init must print nethack options for --help, but does not */
     gnome_init ("nethack", VERSION_STRING, argc, argv);
     hide_privileges(FALSE);
     parse_args (argc, argv);
@@ -821,4 +823,3 @@ ghack_get_main_window()
 {
       return( GTK_WIDGET(mainWindow) );
 }
-

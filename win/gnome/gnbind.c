@@ -112,49 +112,50 @@ void gnome_init_nhwindows(int* argc, char** argv)
    offers a Quit option, it is its responsibility to clean up and terminate
    the process. You need to fill in pl_character[0].
 */
-void gnome_player_selection()
+void
+gnome_player_selection()
 {
-  int num_roles, availcount, i, nRole;
-  const char** choices;
+    int num_roles, availcount, i, nRole;
+    const char** choices;
+    int* rolemap;
 
-  /* select a role */
-  for (num_roles = 0; roles[num_roles].name.m; ++num_roles) continue;
-  choices = (const char **)alloc(sizeof(char *) * (num_roles+1));
-  for (;;) {
-    availcount = 0;
-    for (i = 0; i < num_roles; i++) {
-      choices[i] = 0;
-      if (ok_role(i, flags.initrace,
-		  flags.initgend, flags.initalign)) {
-	choices[i] = roles[i].name.m;
-	if (flags.initgend >= 0 && flags.female && roles[i].name.f)
-	  choices[i] = roles[i].name.f;
-	++availcount;
-      }
+    /* select a role */
+    for (num_roles = 0; roles[num_roles].name.m; ++num_roles) continue;
+    choices = (const char **)alloc(sizeof(char *) * (num_roles+1));
+    rolemap = (int*)alloc(sizeof(int) * (num_roles + 1));
+    for (;;) {
+	availcount = 0;
+	for (i = 0; i < num_roles; i++) {
+	    if (ok_role(i, flags.initrace, flags.initgend, flags.initalign)) {
+		choices[availcount] = roles[i].name.m;
+		if (flags.initgend >= 0 && flags.female && roles[i].name.f)
+		    choices[availcount] = roles[i].name.f;
+		rolemap[availcount] = i;
+		++availcount;
+	    }
+	}
+	if (availcount > 0) break;
+	else if (flags.initalign >= 0) flags.initalign = -1;    /* reset */
+	else if (flags.initgend >= 0) flags.initgend = -1;
+	else if (flags.initrace >= 0) flags.initrace = -1;
+	else panic("no available ROLE+race+gender+alignment combinations");
     }
-    if (availcount > 0) break;
-    else if (flags.initalign >= 0) flags.initalign = -1;    /* reset */
-    else if (flags.initgend >= 0) flags.initgend = -1;
-    else if (flags.initrace >= 0) flags.initrace = -1;
-    else panic("no available ROLE+race+gender+alignment combinations");
-  }
-  choices[num_roles] = (const char *) 0;
-  nRole=ghack_player_sel_dialog(choices);
+    choices[availcount] = (const char *) 0;
+    nRole = ghack_player_sel_dialog(choices);
   
-  /* Quit */
-  if ( nRole == -1 )
-    {
-      clearlocks();
-      gnome_exit_nhwindows(0);
-    }
-  /* Random role */
-  if ( nRole == -2)
-    {
-      nRole = rn2(num_roles);
-      pline("This game you will be %s", an(choices[nRole]));
+    if (nRole == -1) {			/* Quit */
+	clearlocks();
+	gnome_exit_nhwindows(0);
+    } else if (nRole == -2) {		/* Random role */
+	nRole = rolemap[rn2(availcount)];
+	pline("This game you will be %s", an(choices[nRole]));
+    } else {
+	nRole = rolemap[nRole];
     }
   
-  flags.initrole = nRole;
+    flags.initrole = nRole;
+    free(choices);
+    free(rolemap);
 }
 
 
@@ -1008,6 +1009,3 @@ void gnome_outrip(winid wid, int how)
 
     ghack_text_window_rip_string( ripString);
 }
-
-
-

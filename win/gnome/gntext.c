@@ -40,6 +40,7 @@ void ghack_text_window_clear(GtkWidget *widget, gpointer data)
 
 void ghack_text_window_destroy()
 {
+    TW_window = NULL;
 }
 
 void ghack_text_window_display(GtkWidget *widget, boolean block,
@@ -50,6 +51,8 @@ void ghack_text_window_display(GtkWidget *widget, boolean block,
 	gtk_window_set_title(GTK_WINDOW( TW_window), "Rest In Peace");
     }
    
+    gtk_signal_connect (GTK_OBJECT (TW_window), "destroy",
+	(GtkSignalFunc) ghack_text_window_destroy, NULL);
     if (block)
 	gnome_dialog_run(GNOME_DIALOG(TW_window));
     else
