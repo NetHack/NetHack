@@ -921,7 +921,8 @@ int x,y;
 			killer.format = KILLED_BY_AN;
 			Strcpy(killer.name, "collapsing drawbridge");
 			e_died(etmp1, e_inview? 3 : 2, CRUSHING); /*no corpse*/
-			if(lev1->typ == MOAT) do_entity(etmp1);
+			if(levl[etmp1->ex][etmp1->ey].typ == MOAT)
+			    do_entity(etmp1);
 		}
 	}
 }
