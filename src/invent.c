@@ -1428,9 +1428,13 @@ long quan;		/* if non-0, print this quantity, not obj->quan */
     static char li[BUFSZ];
 #endif
     boolean use_invlet = flags.invlet_constant && let != CONTAINED_SYM;
-    long savequan = obj->quan;
+    long savequan = 0;
 
-    if (quan) obj->quan = quan;
+    if (quan && obj) {
+	savequan = obj->quan;
+	obj->quan = quan;
+    }
+
     /*
      * If let is:
      *	*  Then obj == null and we are printing a total amount.
@@ -1442,7 +1446,7 @@ long quan;		/* if non-0, print this quantity, not obj->quan */
 		(dot && use_invlet ? obj->invlet : let),
 		(txt ? txt : doname(obj)), cost, plur(cost));
 #ifndef GOLDOBJ
-    } else if (obj->oclass == GOLD_CLASS) {
+    } else if (obj && obj->oclass == GOLD_CLASS) {
 	Sprintf(li, "%ld gold piece%s%s", obj->quan, plur(obj->quan),
 		(dot ? "." : ""));
 #endif
@@ -1452,7 +1456,7 @@ long quan;		/* if non-0, print this quantity, not obj->quan */
 		(use_invlet ? obj->invlet : let),
 		(txt ? txt : doname(obj)), (dot ? "." : ""));
     }
-    if (quan) obj->quan = savequan;
+    if (savequan) obj->quan = savequan;
 
     return li;
 }
