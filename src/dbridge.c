@@ -531,7 +531,7 @@ struct entity *etmp;
 			pline_The("%s passes through %s!",
 			      at_portcullis ? "portcullis" : "drawbridge",
 			      e_nam(etmp));
-		spoteffects(FALSE);
+		if (is_u(etmp)) spoteffects(FALSE);
 		return;
 	}
 	if (e_missed(etmp, FALSE)) {
