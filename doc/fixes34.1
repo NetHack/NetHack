@@ -306,6 +306,8 @@ all objects carried by a monster who's hit by a polymorph zap are protected
 sparkle option for display effects was ignored on explosions
 level teleport while on a sleeping steed caused panic and possible crash
 breaking wand of digging causing a shopkeeper to fall left unpaid items unpaid
+use get_adjacent_loc() rather than getdir() directly for some things where
+	you want to ensure valid adjacent coordinates are returned
 
 
 Platform- and/or Interface-Specific Fixes

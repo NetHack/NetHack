@@ -400,7 +400,7 @@ STATIC_OVL void
 use_leash(obj)
 struct obj *obj;
 {
-	register int x, y;
+	coord cc;
 	register struct monst *mtmp;
 	int spotmon;
 
@@ -409,12 +409,9 @@ struct obj *obj;
 		return;
 	}
 
-	if(!getdir((char *)0)) return;
+	if(!get_adjacent_loc((char *)0, (char *)0, u.ux, u.uy, &cc)) return;
 
-	x = u.ux + u.dx;
-	y = u.uy + u.dy;
-
-	if((x == u.ux) && (y == u.uy)) {
+	if((cc.x == u.ux) && (cc.y == u.uy)) {
 #ifdef STEED
 		if (u.usteed && u.dz > 0) {
 		    mtmp = u.usteed;
@@ -426,7 +423,7 @@ struct obj *obj;
 		return;
 	}
 
-	if(!(mtmp = m_at(x, y))) {
+	if(!(mtmp = m_at(cc.x, cc.y))) {
 		There("is no creature there.");
 		return;
 	}

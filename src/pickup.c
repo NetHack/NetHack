@@ -1402,12 +1402,12 @@ int x, y;
 }
 
 int
-doloot()	/* loot a container on the floor. */
+doloot()	/* loot a container on the floor or loot saddle from mon. */
 {
     register struct obj *cobj, *nobj;
     register int c = -1;
     int timepassed = 0;
-    int x,y;
+    coord cc;
     boolean underfoot = TRUE;
     const char *dont_find_anything = "don't find anything";
     struct monst *mtmp;
@@ -1423,15 +1423,15 @@ doloot()	/* loot a container on the floor. */
 	You("have no hands!");	/* not `body_part(HAND)' */
 	return 0;
     }
-    x = u.ux; y = u.uy;
+    cc.x = u.ux; cc.y = u.uy;
 
 lootcont:
 
-    if (container_at(x, y, FALSE)) {
+    if (container_at(cc.x, cc.y, FALSE)) {
 	boolean any = FALSE;
 
-	if (!able_to_loot(x, y)) return 0;
-	for (cobj = level.objects[x][y]; cobj; cobj = nobj) {
+	if (!able_to_loot(cc.x, cc.y)) return 0;
+	for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
 	    nobj = cobj->nexthere;
 
 	    if (Is_container(cobj)) {
@@ -1520,32 +1520,28 @@ gotit:
 		pline("Ok, now there is loot here.");
 	    }
 	}
-    } else if (IS_GRAVE(levl[x][y].typ)) {
+    } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
 	You("need to dig up the grave to effectively loot it...");
     }
     /*
      * 3.3.1 introduced directional looting for some things.
      */
     if (c != 'y' && mon_beside(u.ux, u.uy)) {
-	if (!getdir("Loot in what direction?")) {
-	    pline(Never_mind);
-	    return(0);
-	}
-	x = u.ux + u.dx;
-	y = u.uy + u.dy;
-	if (x == u.ux && y == u.uy) {
+	if (!get_adjacent_loc("Loot in what direction?", "Invalid loot location",
+			u.ux, u.uy, &cc)) return 0;
+	if (cc.x == u.ux && cc.y == u.uy) {
 	    underfoot = TRUE;
-	    if (container_at(x, y, FALSE))
+	    if (container_at(cc.x, cc.y, FALSE))
 		goto lootcont;
 	} else
 	    underfoot = FALSE;
 	if (u.dz < 0) {
 	    You("%s to loot on the %s.", dont_find_anything,
-		ceiling(x, y));
+		ceiling(cc.x, cc.y));
 	    timepassed = 1;
 	    return timepassed;
 	}
-	mtmp = m_at(x, y);
+	mtmp = m_at(cc.x, cc.y);
 	if (mtmp) timepassed = loot_mon(mtmp, &prev_inquiry, &prev_loot);
 
 	/* Preserve pre-3.3.1 behaviour for containers.
@@ -1553,7 +1549,7 @@ gotit:
 	 * from one square away to change that in the future.
 	 */
 	if (!underfoot) {
-	    if (container_at(x, y, FALSE)) {
+	    if (container_at(cc.x, cc.y, FALSE)) {
 		if (mtmp) {
 		    You_cant("loot anything %sthere with %s in the way.",
 			    prev_inquiry ? "else " : "", mon_nam(mtmp));

@@ -1958,6 +1958,38 @@ char sym;
 	return !u.dz;
 }
 
+/*
+ * uses getdir() but unlike getdir() it specifically
+ * produces coordinates using the direction from getdir()
+ * and verifies that those coordinates are ok.
+ *
+ * If the call to getdir() returns 0, Never_mind is displayed.
+ * If the resulting coordinates are not okay, emsg is displayed.
+ *
+ * Returns non-zero if coordinates in cc are valid.
+ */
+int get_adjacent_loc(prompt,emsg,x,y,cc)
+const char *prompt, *emsg;
+xchar x,y;
+coord *cc;
+{
+	xchar new_x, new_y;
+	if (!getdir(prompt)) {
+		pline(Never_mind);
+		return 0;
+	}
+	new_x = x + u.dx;
+	new_y = y + u.dy;
+	if (cc && isok(new_x,new_y)) {
+		cc->x = new_x;
+		cc->y = new_y;
+	} else {
+		if (emsg) pline(emsg);
+		return 0;
+	}
+	return 1;
+}
+
 int
 getdir(s)
 const char *s;
