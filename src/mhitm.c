@@ -1095,6 +1095,23 @@ label2:			if (mdef->mhp > 0) return 0;
 	    }
 	    monkilled(mdef, "", (int)mattk->adtyp);
 	    if (mdef->mhp > 0) return 0; /* mdef lifesaved */
+
+	    if (mattk->adtyp == AD_DGST) {
+		/* various checks similar to dog_eat and meatobj.
+		 * after monkilled() to provide better message ordering */
+		if (mdef->cham != CHAM_ORDINARY) {
+		    (void) newcham(magr, (struct permonst *)0, FALSE, TRUE);
+		} else if (mdef->data == &mons[PM_GREEN_SLIME]) {
+		    (void) newcham(magr, &mons[PM_GREEN_SLIME], FALSE, TRUE);
+		} else if (mdef->data == &mons[PM_WRAITH]) {
+		    (void) grow_up(magr, (struct monst *)0);
+		    /* don't grow up twice */
+		    return (MM_DEF_DIED | (magr->mhp > 0 ? 0 : MM_AGR_DIED));
+		} else if (mdef->data == &mons[PM_NURSE]) {
+		    magr->mhp = magr->mhpmax;
+		}
+	    }
+
 	    return (MM_DEF_DIED | (grow_up(magr,mdef) ? 0 : MM_AGR_DIED));
 	}
 	return(MM_HIT);

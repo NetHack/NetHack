@@ -517,15 +517,39 @@ register struct obj *obj;
 	if (!u.uswallow && flooreffects(obj,u.ux,u.uy,"drop")) return;
 	/* uswallow check done by GAN 01/29/87 */
 	if(u.uswallow) {
-	    boolean could_petrify;
+	    boolean could_petrify = FALSE;
+	    boolean could_poly = FALSE;
+	    boolean could_slime = FALSE;
+	    boolean could_grow = FALSE;
+	    boolean could_heal = FALSE;
+
 	    if (obj != uball) {		/* mon doesn't pick up ball */
-		could_petrify = obj->otyp == CORPSE &&
-		    touch_petrifies(&mons[obj->corpsenm]);
+		if (obj->otyp == CORPSE) {
+		    could_petrify = touch_petrifies(&mons[obj->corpsenm]);
+		    could_poly = polyfodder(obj);
+		    could_slime = (obj->corpsenm == PM_GREEN_SLIME);
+		    could_grow = (obj->corpsenm == PM_WRAITH);
+		    could_heal = (obj->corpsenm == PM_NURSE);
+		}
 		(void) mpickobj(u.ustuck,obj);
-		if (could_petrify && is_animal(u.ustuck->data)) {
-		    minstapetrify(u.ustuck, TRUE);
-		    /* Don't leave a cockatrice corpse available in a statue */
-		    if (!u.uswallow) delobj(obj);
+		if (is_animal(u.ustuck->data)) {
+		    if (could_poly || could_slime) {
+			(void) newcham(u.ustuck,
+				       could_poly ? (struct permonst *)0 :
+				       &mons[PM_GREEN_SLIME],
+				       FALSE, could_slime);
+			delobj(obj);	/* corpse is digested */
+		    } else if (could_petrify) {
+			minstapetrify(u.ustuck, TRUE);
+			/* Don't leave a cockatrice corpse in a statue */
+			if (!u.uswallow) delobj(obj);
+		    } else if (could_grow) {
+			(void) grow_up(u.ustuck, (struct monst *)0);
+			delobj(obj);	/* corpse is digested */
+		    } else if (could_heal) {
+			u.ustuck->mhp = u.ustuck->mhpmax;
+			delobj(obj);	/* corpse is digested */
+		    }
 		}
 	    }
 	} else  {
