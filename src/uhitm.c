@@ -1115,13 +1115,10 @@ struct attack *mattk;
 		    pline("%s finishes taking off %s suit.",
 			  Monnam(mdef), mhis(mdef));
 	    }
-	    if (!touch_artifact(otmp, &youmonst)) {
-		dropy(otmp);
-		continue;
-	    }
 	    /* give the object to the character */
 	    otmp = hold_another_object(otmp, "You steal %s.",
 				       doname(otmp), "You steal: ");
+	    if (otmp->where != OBJ_INVENT) continue;
 	    if (otmp->otyp == CORPSE &&
 		    touch_petrifies(&mons[otmp->corpsenm]) && !uarmg) {
 		char kbuf[BUFSZ];

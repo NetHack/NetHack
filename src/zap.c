@@ -4055,24 +4055,8 @@ retry:
 	u.uconduct.wishes++;
 
 	if (otmp != &zeroobj) {
-	    /* place_object looses these */
-	    boolean crysknife = (otmp->otyp == CRYSKNIFE);
-	    int oerode = otmp->oerodeproof;
-
-	    /* in case touching this object turns out to be fatal */
-	    place_object(otmp, u.ux, u.uy);
-
-	    if (otmp->oartifact && !touch_artifact(otmp,&youmonst)) {
-		obj_extract_self(otmp);	/* remove it from the floor */
-		dropy(otmp);		/* now put it back again :-) */
-	    } else {
-		obj_extract_self(otmp);
-		if (crysknife) {
-		    otmp->otyp = CRYSKNIFE;
-		    otmp->oerodeproof = oerode;
-		}
-		/* The(aobjnam()) is safe since otmp is unidentified -dlc */
-		(void) hold_another_object(otmp, u.uswallow ?
+	    /* The(aobjnam()) is safe since otmp is unidentified -dlc */
+	    (void) hold_another_object(otmp, u.uswallow ?
 				       "Oops!  %s out of your reach!" :
 				       (Is_airlevel(&u.uz) ||
 					Is_waterlevel(&u.uz) ||
@@ -4084,7 +4068,6 @@ retry:
 					     Is_airlevel(&u.uz) || u.uinwater ?
 						   "slip" : "drop")),
 				       (const char *)0);
-	    }
 	    u.ublesscnt += rn1(100,50);  /* the gods take notice */
 	}
 }

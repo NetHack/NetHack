@@ -365,10 +365,12 @@ struct obj *obj;
 #endif /* OVL1 */
 #ifdef OVLB
 
-/* Add an item to the inventory unless we're fumbling, and give a message.
+/* Add an item to the inventory unless we're fumbling or it refuses to be
+ * held (via touch_artifact), and give a message.
  * If there aren't any free inventory slots, we'll drop it instead.
  * If both success and failure messages are NULL, then we're just doing the
- * fumbling/slot-limit checking for a silent grab.
+ * fumbling/slot-limit checking for a silent grab.  In any case,
+ * touch_artifact will print its own messages if they are warranted.
  */
 struct obj *
 hold_another_object(obj, drop_fmt, drop_arg, hold_msg)
@@ -378,12 +380,32 @@ const char *drop_fmt, *drop_arg, *hold_msg;
 	char buf[BUFSZ];
 
 	if (!Blind) obj->dknown = 1;	/* maximize mergibility */
+	if (obj->oartifact) {
+	    /* place_object may change these */
+	    boolean crysknife = (obj->otyp == CRYSKNIFE);
+	    int oerode = obj->oerodeproof;
+
+	    /* in case touching this object turns out to be fatal */
+	    place_object(obj, u.ux, u.uy);
+
+	    if (!touch_artifact(obj, &youmonst)) {
+		obj_extract_self(obj);	/* remove it from the floor */
+		dropy(obj);		/* now put it back again :-) */
+		return obj;
+	    }
+	    obj_extract_self(obj);
+	    if (crysknife) {
+		obj->otyp = CRYSKNIFE;
+		obj->oerodeproof = oerode;
+	    }
+	}
 	if (Fumbling) {
 		if (drop_fmt) pline(drop_fmt, drop_arg);
 		dropy(obj);
 	} else {
 		long oquan = obj->quan;
 		int prev_encumbr = near_capacity();	/* before addinv() */
+
 		/* encumbrance only matters if it would now become worse
 		   than max( current_value, stressed ) */
 		if (prev_encumbr < MOD_ENCUMBER) prev_encumbr = MOD_ENCUMBER;
