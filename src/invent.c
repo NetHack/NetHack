@@ -17,6 +17,7 @@ STATIC_DCL boolean FDECL(only_here, (struct obj *));
 #endif /* OVL1 */
 STATIC_DCL void FDECL(compactify,(char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
+static char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
 #ifdef OVLB
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
@@ -934,6 +935,26 @@ register const char *let,*word;
 			return(mkgoldobj(cnt));
 #endif
 		}
+		if(ilet == '?' || ilet == '*') {
+		    char *allowed_choices = (ilet == '?') ? lets : (char *)0;
+		    long ctmp = 0;
+
+		    if (ilet == '?' && !*lets && *altlets)
+			allowed_choices = altlets;
+		    ilet = display_pickinv(allowed_choices, TRUE,
+					   allowcnt ? &ctmp : (long *)0);
+		    if(!ilet) continue;
+		    if (ctmp) {
+			cnt = ctmp;
+			allowcnt = 2;
+		    }
+		    if(ilet == '\033') {
+			if(flags.verbose)
+			    pline(Never_mind);
+			return((struct obj *)0);
+		    }
+		    /* they typed a letter (not a space) at the prompt */
+		}
 		if(allowcnt == 2 && !strcmp(word,"throw")) {
 		    /* permit counts for throwing gold, but don't accept
 		     * counts for other things since the throw code will
@@ -951,20 +972,6 @@ register const char *let,*word;
 #ifdef GOLDOBJ
 		flags.botl = 1; /* May have changed the amount of money */
 #endif
-		if(ilet == '?' || ilet == '*') {
-		    char *allowed_choices = (ilet == '?') ? lets : (char *)0;
-
-		    if (ilet == '?' && !*lets && *altlets)
-			allowed_choices = altlets;
-		    ilet = display_inventory(allowed_choices, TRUE);
-		    if(!ilet) continue;
-		    if(ilet == '\033') {
-			if(flags.verbose)
-			    pline(Never_mind);
-			return((struct obj *)0);
-		    }
-		    /* they typed a letter (not a space) at the prompt */
-		}
 #ifdef REDO
 		savech(ilet);
 #endif
@@ -1520,16 +1527,15 @@ find_unpaid(list, last_found)
 }
 
 /*
- * If lets == NULL or "", list all objects in the inventory.  Otherwise,
- * list all objects with object classes that match the order in lets.
- *
- * Returns the letter identifier of a selected item, or 0 if nothing
- * was selected.
+ * Internal function used by display_inventory and getobj that can display
+ * inventory and return a count as well as a letter. If out_cnt is not null,
+ * any count returned from the menu selection is placed here.
  */
-char
-display_inventory(lets, want_reply)
+static char
+display_pickinv(lets, want_reply, out_cnt)
 register const char *lets;
 boolean want_reply;
+long* out_cnt;
 {
 	struct obj *otmp;
 	char ilet, ret;
@@ -1623,11 +1629,27 @@ nextclass:
 	n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);
 	if (n > 0) {
 	    ret = selected[0].item.a_char;
+	    if (out_cnt) *out_cnt = selected[0].count;
 	    free((genericptr_t)selected);
 	} else
 	    ret = !n ? '\0' : '\033';	/* cancelled */
 
 	return ret;
+}
+
+/*
+ * If lets == NULL or "", list all objects in the inventory.  Otherwise,
+ * list all objects with object classes that match the order in lets.
+ *
+ * Returns the letter identifier of a selected item, or 0 if nothing
+ * was selected.
+ */
+char
+display_inventory(lets, want_reply)
+register const char *lets;
+boolean want_reply;
+{
+	return display_pickinv(lets, want_reply, (long *)0);
 }
 
 /*
