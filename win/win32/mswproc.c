@@ -1429,7 +1429,7 @@ char mswin_yn_function(const char *question, const char *choices,
     /* Only here if main window is not present */
     while (result<0) {
         ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
-	ch=mswin_nhgetch();
+	ch=lowc(mswin_nhgetch());
         HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
 	if (ch=='\033') {
 	    result=yn_esc_map;

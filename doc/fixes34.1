@@ -195,6 +195,7 @@ win32: strip illegal file name characters from plname and replace with '_'
 win32gui: make error() work; it was essentially non-operative in 3.4.0
 win32gui: fix alignment of columns in menu windows
 win32gui: Window menu File|Save worked during #quit disclosure processing
+win32gui: make mswin_yn_function() case insensitive like the tty version
 win32tty: honour the use_inverse option and default to ATR_BOLD if disabled
 win32tty: respond only to mouse clicks not mouse movement
 win32tty: allow ^C to abort the game at the "Who are you?" prompt
@@ -220,7 +221,7 @@ lootabc option
 runmode option
 showrace option
 travel option
-cmdassist option to provide additional feedback for some commands
+cmdassist option to provide additional error feedback for some commands
 mouse_support wincap option
 debug mode: #panic routine to test panic() and panic save file generation
 a new PANICLOG optional file to log the reason for panic and impossible messages
