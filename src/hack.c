@@ -1279,6 +1279,13 @@ domove()
 		    sobj_at(BOULDER, trap->tx, trap->ty)) {
 		/* can't swap places with pet pinned in a pit by a boulder */
 		u.ux = u.ux0,  u.uy = u.uy0;	/* didn't move after all */
+	    } else if (u.ux0 != x && u.uy0 != y &&
+		       bad_rock(mtmp->data, x, u.uy0) &&
+		       bad_rock(mtmp->data, u.ux0, y) &&
+		       (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
+		/* can't swap places when pet won't fit thru the opening */
+		u.ux = u.ux0,  u.uy = u.uy0;	/* didn't move after all */
+		You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
 	    } else {
 		char pnambuf[BUFSZ];
 
