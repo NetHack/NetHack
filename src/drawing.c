@@ -181,7 +181,7 @@ const char *monexplain[MAXMCLASSES] = {
     "pudding or ooze",		"quantum mechanic",	"rust monster or disenchanter",
     "snake",			"troll",		"umber hulk",
     "vampire",			"wraith",		"xorn",
-    "yeti, ape or other large beast", "zombie",
+    "yeti, ape or some large beast", "zombie",
 
     "human or elf",		"ghost",		"golem",
     "major demon",		"sea monster",		"lizard",
