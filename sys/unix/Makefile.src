@@ -152,7 +152,7 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 # CFLAGS = -g -I../include
 
 CFLAGS = -O -I../include
-LFLAGS =
+LFLAGS = 
 
 # The Qt and Be window systems are written in C++, while the rest of
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
@@ -402,7 +402,7 @@ Sys3B2:	$(HOBJ) Makefile
 
 Sysatt:	$(HOBJ) Makefile
 	@echo "Loading ..."
-	@$(LINK) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
+	@$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
 	@touch Sysatt
 
 Systos:	$(HOBJ) Makefile
