@@ -201,6 +201,7 @@ struct obj *corpse;
 
 	/* caller has already checked `can_make_bones()' */
 
+	clear_bypasses();
 	fd = open_bonesfile(&u.uz, &bonesid);
 	if (fd >= 0) {
 		(void) close(fd);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.4	2002/04/06	*/
+/*	SCCS Id: @(#)mon.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2459,11 +2459,11 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	    mtmp->mnamelth = save_mnamelth;
 	}
 
+	possibly_unwield(mtmp, polyspot);	/* might lose use of weapon */
 	mon_break_armor(mtmp, polyspot);
 	if (!(mtmp->misc_worn_check & W_ARMG))
 	    mselftouch(mtmp, "No longer petrify-resistant, ",
 			!flags.mon_moving);
-	possibly_unwield(mtmp);
 	m_dowear(mtmp, FALSE);
 
 	/* This ought to re-test can_carry() on each item in the inventory

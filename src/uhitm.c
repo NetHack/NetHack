@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2002/10/17	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1154,7 +1154,7 @@ struct attack *mattk;
 	    }
 	    /* more take-away handling, after theft message */
 	    if (unwornmask & W_WEP) {		/* stole wielded weapon */
-		possibly_unwield(mdef);
+		possibly_unwield(mdef, FALSE);
 	    } else if (unwornmask & W_ARMG) {	/* stole worn gloves */
 		mselftouch(mdef, (const char *)0, TRUE);
 		if (mdef->mhp <= 0)	/* it's now a statue */

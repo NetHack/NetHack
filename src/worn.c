@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)worn.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -519,34 +519,48 @@ struct obj *obj;
 	newsym(mon->mx, mon->my);
 }
 
+/* all objects with their bypass bit set should now be reset to normal */
 void
 clear_bypasses()
 {
 	struct obj *otmp, *nobj;
+	struct monst *mtmp;
 
 	for (otmp = fobj; otmp; otmp = nobj) {
 	    nobj = otmp->nobj;
 	    if (otmp->bypass) {
 		otmp->bypass = 0;
+		/* bypass will have inhibited any stacking, but since it's
+		   used for polymorph handling, the objects here probably
+		   have been transformed and won't be stacked in the usual
+		   manner afterwards; so don't bother with this */
 #if 0
-		/*  setting otmp->bypass changes mergability.
-		 *  If monster can ever drop anything that
-                 *  can and should merge, this code block
-		 *  should be enabled.
-		 */
-		{
+		if (otmp->where == OBJ_FLOOR) {
 		    struct obj *obj;
 		    xchar ox, oy;
+
 		    (void) get_obj_location(otmp, &ox, &oy, 0);
 		    obj_extract_self(otmp);
-		    obj = merge_choice(fobj, otmp);
-		    /* If it can't merge, then place it */
-		    if (!obj || (obj && !merged(&obj, &otmp)))
+		    obj = merge_choice(level.objects[ox][oy], otmp);
+		    /* if it doesn't merge then place it back */
+		    if (!obj || !merged(&obj, &otmp))
 		        place_object(otmp, ox, oy);
 		    newsym(ox, oy);
 		}
-#endif
+#endif	/*0*/
 	    }
+	}
+	/* invent and mydogs chains shouldn't matter here */
+	for (otmp = migrating_objs; otmp; otmp = otmp->nobj)
+	    otmp->bypass = 0;
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+		otmp->bypass = 0;
+	}
+	for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+	    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+		otmp->bypass = 0;
 	}
 	flags.bypasses = FALSE;
 }
@@ -647,11 +661,11 @@ boolean polyspot;
 #endif
 	}
 	if (nohands(mdat) || verysmall(mdat)) {
+	    /* [caller needs to handle weapon checks] */
 	    if ((otmp = which_armor(mon, W_ARMG)) != 0) {
 		if (vis)
 		    pline("%s drops %s gloves%s!", Monnam(mon), ppronoun,
 					MON_WEP(mon) ? " and weapon" : "");
-		possibly_unwield(mon);
 		if (polyspot) bypass_obj(otmp);
 		m_lose_armor(mon, otmp);
 	    }

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.4	2002/10/17	*/
+/*	SCCS Id: @(#)mhitm.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -242,7 +242,7 @@ mattackm(magr, mdef)
 		    magr->weapon_check = NEED_HTH_WEAPON;
 		    if (mon_wield_item(magr) != 0) return 0;
 		}
-		possibly_unwield(magr);
+		possibly_unwield(magr, FALSE);
 		otmp = MON_WEP(magr);
 
 		if (otmp) {
@@ -1011,7 +1011,7 @@ label2:			if (mdef->mhp > 0) return 0;
 				pline("%s steals %s from %s!", buf,
 				    onambuf, mdefnambuf);
 			}
-			possibly_unwield(mdef);
+			possibly_unwield(mdef, FALSE);
 			mdef->mstrategy &= ~STRAT_WAITFORU;
 			mselftouch(mdef, (const char *)0, FALSE);
 			if (mdef->mhp <= 0)

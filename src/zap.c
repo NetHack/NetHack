@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)zap.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -109,9 +109,7 @@ struct obj *otmp;
 	boolean dbldam = Role_if(PM_KNIGHT) && u.uhave.questart;
 	int dmg, otyp = otmp->otyp;
 	const char *zap_type_text = "spell";
-#ifdef STEED
 	struct obj *obj;
-#endif
 	boolean disguised_mimic = (mtmp->data->mlet == S_MIMIC &&
 				   mtmp->m_ap_type != M_AP_NOTHING);
 
@@ -189,6 +187,9 @@ struct obj *otmp;
 			    pline("%s shudders!", Monnam(mtmp));
 			    makeknown(otyp);
 			}
+			/* dropped inventory shouldn't be hit by this zap */
+			for (obj = mtmp->minvent; obj; obj = obj->nobj)
+			    bypass_obj(obj);
 			/* flags.bypasses = TRUE; ## for make_corpse() */
 			/* no corpse after system shock */
 			xkilled(mtmp, 3);

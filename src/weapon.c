@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.4	2002/03/22	*/
+/*	SCCS Id: @(#)weapon.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -527,18 +527,18 @@ register struct monst *mtmp;
 }
 
 /* Called after polymorphing a monster, robbing it, etc....  Monsters
- * otherwise never unwield stuff on their own.  Shouldn't print messages.
+ * otherwise never unwield stuff on their own.  Might print message.
  */
 void
-possibly_unwield(mon)
-register struct monst *mon;
+possibly_unwield(mon, polyspot)
+struct monst *mon;
+boolean polyspot;
 {
-	register struct obj *obj;
-	struct obj *mw_tmp;
+	struct obj *obj, *mw_tmp;
 
 	if (!(mw_tmp = MON_WEP(mon)))
 		return;
-	for(obj=mon->minvent; obj; obj=obj->nobj)
+	for (obj = mon->minvent; obj; obj = obj->nobj)
 		if (obj == mw_tmp) break;
 	if (!obj) { /* The weapon was stolen or destroyed */
 		MON_NOWEP(mon);
@@ -550,13 +550,16 @@ register struct monst *mon;
 		MON_NOWEP(mon);
 		mon->weapon_check = NO_WEAPON_WANTED;
 		obj_extract_self(obj);
-		/* flooreffects unnecessary, can't wield boulders */
-		place_object(obj, mon->mx, mon->my);
-		stackobj(obj);
 		if (cansee(mon->mx, mon->my)) {
-			pline("%s drops %s.", Monnam(mon),
-				distant_name(obj, doname));
-			newsym(mon->mx, mon->my);
+		    pline("%s drops %s.", Monnam(mon),
+			  distant_name(obj, doname));
+		    newsym(mon->mx, mon->my);
+		}
+		/* might be dropping object into water or lava */
+		if (!flooreffects(obj, mon->mx, mon->my, "drop")) {
+		    if (polyspot) bypass_obj(obj);
+		    place_object(obj, mon->mx, mon->my);
+		    stackobj(obj);
 		}
 		return;
 	}
@@ -575,6 +578,7 @@ register struct monst *mon;
 	 */
 	if (!(mw_tmp->cursed && mon->weapon_check == NO_WEAPON_WANTED))
 	    mon->weapon_check = NEED_WEAPON;
+	return;
 }
 
 /* Let a monster try to wield a weapon, based on mon->weapon_check.

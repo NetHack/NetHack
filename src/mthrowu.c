@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)mthrowu.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -489,7 +489,7 @@ struct obj *obj;
 		obj->owt = weight(obj);
 	} else {
 		obj_extract_self(obj);
-		possibly_unwield(mon);
+		possibly_unwield(mon, FALSE);
 		if (obj->owornmask) {
 		    mon->misc_worn_check &= ~obj->owornmask;
 		    update_mon_intrinsics(mon, obj, FALSE, FALSE);

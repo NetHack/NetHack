@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2002/09/25	*/
+/*	SCCS Id: @(#)apply.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2248,7 +2248,7 @@ struct obj *obj;
 	    }
 	    if (gotit) {
 		obj_extract_self(otmp);
-		possibly_unwield(mtmp);
+		possibly_unwield(mtmp, FALSE);
 		setmnotwielded(mtmp,otmp);
 
 		switch (rn2(proficient + 1)) {

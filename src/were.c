@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)were.c	3.4	1997/05/25	*/
+/*	SCCS Id: @(#)were.c	3.4	2002/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -83,7 +83,7 @@ register struct monst *mon;
 	mon->mhp += (mon->mhpmax - mon->mhp) / 4;
 	newsym(mon->mx,mon->my);
 	mon_break_armor(mon, FALSE);
-	possibly_unwield(mon);
+	possibly_unwield(mon, FALSE);
 }
 
 boolean
