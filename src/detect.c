@@ -1112,10 +1112,24 @@ struct trap *trap;
 
     if (levl[trap->tx][trap->ty].glyph != trap_to_glyph(trap)) {
     	/* There's too much clutter to see your find otherwise */
-	tmp_at(DISP_ALWAYS, trap_to_glyph(trap));
-	tmp_at(trap->tx, trap->ty);
-	display_nhwindow(WIN_MAP, TRUE);	/* wait */
-	tmp_at(DISP_END,0);
+	if (!strncmpi(windowprocs.name, "tty", 3)) {
+		tmp_at(DISP_ALWAYS, trap_to_glyph(trap));
+		tmp_at(trap->tx, trap->ty);
+		display_nhwindow(WIN_MAP, TRUE);	/* wait */
+		tmp_at(DISP_END,0);
+	}
+#if 0
+	/* This could flash the trap in a future post-3.4.0 release? (untested) */
+	else {
+		int i, tglyph = levl[trap->tx][trap->ty].glyph;
+		for (i = 0; i < 4; i++) {
+			tmp_at(DISP_FLASH, trap_to_glyph(trap));
+			tmp_at(trap->tx, trap->ty);
+			delay_output();
+			tmp_at(DISP_END, 0);
+		}
+	}
+#endif
     }
 }
 
