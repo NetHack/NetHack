@@ -170,30 +170,39 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 	int spellnum = 0;
 
 	/* Three cases:
-	 * -- monster is attacking you.  Cast spell normally.
-	 * -- monster thinks it's attacking you.  Cast spell, but spells that
-	 *    are not undirected fail with cursetxt() and loss of mspec_used.
-	 * -- monster isn't trying to attack.  Cast spell; spells that are
-	 *    are not undirected don't go off, but they don't fail--they're
-	 *    just not cast.
+	 * -- monster is attacking you.  Search for a useful spell.
+	 * -- monster thinks it's attacking you.  Search for a useful spell,
+	 *    without checking for undirected.  If the spell found is directed,
+	 *    it fails with cursetxt() and loss of mspec_used.
+	 * -- monster isn't trying to attack.  Select a spell once.  Don't keep
+	 *    searching; if that spell is not useful (or if it's directed),
+	 *    return and do something else. 
 	 * Since most spells are directed, this means that a monster that isn't
 	 * attacking casts spells only a small portion of the time that an
 	 * attacking monster does.
 	 */
 	if (mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) {
-	    spellnum = rn2(ml);
-	    if (mattk->adtyp == AD_SPEL)
-		spellnum = choose_magic_spell(spellnum);
-	    else
-		spellnum = choose_clerical_spell(spellnum);
-	    /* not trying to attack?  don't allow directed spells */
-	    if (!thinks_it_foundyou &&
-		    (!is_undirected_spell(mattk->adtyp, spellnum) ||
-		    spell_would_be_useless(mtmp, mattk->adtyp, spellnum))) {
-		if (foundyou)
-		    impossible("spellcasting monster found you and doesn't know it?");
-		return 0;
-	    }
+	    int cnt = 40;
+
+	    do {
+		spellnum = rn2(ml);
+		if (mattk->adtyp == AD_SPEL)
+		    spellnum = choose_magic_spell(spellnum);
+		else
+		    spellnum = choose_clerical_spell(spellnum);
+		/* not trying to attack?  don't allow directed spells */
+		if (!thinks_it_foundyou) {
+		    if (!is_undirected_spell(mattk->adtyp, spellnum) ||
+			spell_would_be_useless(mtmp, mattk->adtyp, spellnum)) {
+			if (foundyou)
+			    impossible("spellcasting monster found you and doesn't know it?");
+			return 0;
+		    }
+		    break;
+		}
+	    } while(--cnt > 0 &&
+		    spell_would_be_useless(mtmp, mattk->adtyp, spellnum));
+	    if (cnt == 0) return 0;
 	}
 
 	/* monster unable to cast spells? */
@@ -302,7 +311,8 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 /*
    If dmg is zero, then the monster is not casting at you.
    If the monster is intentionally not casting at you, we have previously
-   called spell_would_be_useless() and the fallthroughs shouldn't happen.
+   called spell_would_be_useless() and spellnum should always be a valid
+   undirected spell.
    If you modify either of these, be sure to change is_undirected_spell()
    and spell_would_be_useless().
  */
@@ -342,9 +352,9 @@ int spellnum;
 	    pline("Double Trouble...");
 	    clonewiz();
 	    dmg = 0;
-	    break;
-	}
-	/* else FALLTHRU */
+	} else
+	    impossible("bad wizard cloning?");
+	break;
     case MGC_SUMMON_MONS:		/* also aggravates */
     {
 	int count;
@@ -409,9 +419,9 @@ int spellnum;
 		      !See_invisible ? "disappears" : "becomes transparent");
 	    mon_set_minvis(mtmp);
 	    dmg = 0;
-	    break;
-	}
-	/* else FALLTHRU */
+	} else
+	    impossible("no reason for monster to cast disappear spell?");
+	break;
     case MGC_STUN_YOU:
 	if (Antimagic || Free_action) {
 	    shieldeff(u.ux, u.uy);
@@ -438,9 +448,8 @@ int spellnum;
 	    if ((mtmp->mhp += d(3,6)) > mtmp->mhpmax)
 		mtmp->mhp = mtmp->mhpmax;
 	    dmg = 0;
-	    break;
 	}
-	/* else FALLTHRU */
+	break;
     case MGC_PSI_BOLT:
 	/* prior to 3.4.0 Antimagic was setting the damage to 1--this
 	   made the spell virtually harmless to players with magic res. */
@@ -580,9 +589,9 @@ int spellnum;
 	    make_blinded(Half_spell_damage ? 100L : 200L, FALSE);
 	    if (!Blind) Your(vision_clears);
 	    dmg = 0;
-	    break;
-	}
-	/* else FALLTHRU */
+	} else
+	    impossible("no reason for monster to cast blindness spell?");
+	break;
     case CLC_PARALYZE:
 	if (Antimagic || Free_action) {
 	    shieldeff(u.ux, u.uy);
@@ -623,9 +632,8 @@ int spellnum;
 	    if ((mtmp->mhp += d(3,6)) > mtmp->mhpmax)
 		mtmp->mhp = mtmp->mhpmax;
 	    dmg = 0;
-	    break;
 	}
-	/* else FALLTHRU */
+	break;
     case CLC_OPEN_WOUNDS:
 	if (Antimagic) {
 	    shieldeff(u.ux, u.uy);
@@ -679,9 +687,7 @@ int spellnum;
     return FALSE;
 }
 
-/* Some undirected spells are useless under some circumstances. */
-/* This isn't called when the monster is deliberately casting at you; we
-   handle that using fallthroughs. */
+/* Some spells are useless under some circumstances. */
 STATIC_DCL
 boolean
 spell_would_be_useless(mtmp, adtyp, spellnum)
@@ -721,6 +727,9 @@ int adtyp;
 	if (!couldsee && (spellnum == MGC_SUMMON_MONS ||
 		(!mtmp->iswiz && spellnum == MGC_CLONE_WIZ)))
 	    return TRUE;
+	if ((!mtmp->iswiz || flags.no_of_wizards > 1)
+						&& spellnum == MGC_CLONE_WIZ)
+	    return TRUE;
     } else if (adtyp == AD_CLRC) {
 	/* summon insects/sticks to snakes won't be cast by peaceful monsters */
 	if (mtmp->mpeaceful && spellnum == CLC_INSECTS)
@@ -730,6 +739,9 @@ int adtyp;
 	    return TRUE;
 	/* don't summon insects if it doesn't think you're around */
 	if (!couldsee && spellnum == CLC_INSECTS)
+	    return TRUE;
+	/* blindness spell on blinded player */
+	if (Blinded && spellnum == CLC_BLIND_YOU)
 	    return TRUE;
     }
     return FALSE;
