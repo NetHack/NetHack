@@ -936,7 +936,7 @@ msmsg VA_DECL(const char *, fmt)
 	Vsprintf(buf, fmt, VA_ARGS);
 	VA_END();
 	xputs(buf);
-	curs(BASE_WINDOW, cursor.X+1, cursor.Y);
+	if (ttyDisplay) curs(BASE_WINDOW, cursor.X+1, cursor.Y);
 	return;
 }
 
