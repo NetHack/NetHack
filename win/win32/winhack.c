@@ -42,10 +42,10 @@ typedef HRESULT (CALLBACK* DLLGETVERSIONPROC)(DLLVERSIONINFO *);
 /* Minimal common control library version
 Version     _WIN_32IE   Platform/IE
 =======     =========   ===========
-4.00        0x0200      Microsoft® Windows® 95/Windows NT® 4.0
-4.70        0x0300      Microsoft® Internet Explorer 3.x
-4.71        0x0400      Microsoft® Internet Explorer 4.0
-4.72        0x0401      Microsoft® Internet Explorer 4.01
+4.00        0x0200      Microsoft(r) Windows 95/Windows NT 4.0
+4.70        0x0300      Microsoft(r) Internet Explorer 3.x
+4.71        0x0400      Microsoft(r) Internet Explorer 4.0
+4.72        0x0401      Microsoft(r) Internet Explorer 4.01
 ...and probably going on infinitely...
 */
 #define MIN_COMCTLMAJOR 4
