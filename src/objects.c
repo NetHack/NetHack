@@ -921,6 +921,10 @@ GEM("worthless piece of black glass",  "black",  76, 1, 0, 6, 5, GLASS, CLR_BLAC
 GEM("worthless piece of green glass", "green",   77, 1, 0, 6, 5, GLASS, CLR_GREEN),
 GEM("worthless piece of violet glass", "violet", 77, 1, 0, 6, 5, GLASS, CLR_MAGENTA),
 
+/* Placement note: there is a wishable subrange for
+ * "gray stones" in the o_ranges[] array in objnam.c
+ * that is currently everything between luckstones and flint (inclusive).
+ */
 ROCK("luckstone", "gray",	0, 10,  10, 60, 3, 3, 1, 10, 7, MINERAL, CLR_GRAY),
 ROCK("loadstone", "gray",	0, 10, 500,  1, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY),
 ROCK("touchstone", "gray",	0,  8,  10, 45, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY),

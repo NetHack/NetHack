@@ -1570,6 +1570,7 @@ struct obj *obj;
 		case POT_WATER:		/* really, all potions */
 		case EGG:
 		case CREAM_PIE:
+		case MELON:
 		case ACID_VENOM:
 		case BLINDING_VENOM:
 			return 1;
@@ -1607,6 +1608,7 @@ boolean in_view;
 				(obj->quan==1) ? "s" : "", to_pieces);
 			break;
 		case EGG:
+		case MELON:
 			pline("Splat!");
 			break;
 		case CREAM_PIE:
