@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2002/09/21	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2003/02/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1029,6 +1029,19 @@ register const char *verb;
 	return buf;
 }
 
+/* various singular words that vtense would otherwise categorize as plural */
+static const char * const special_subjs[] = {
+	"erinys",
+	"manes",		/* this one is ambiguous */
+	"Cyclops",
+	"Hippocrates",
+	"Pelias",
+	"aklys",
+	"amnesia",
+	"paralysis",
+	0
+};
+
 /* return form of the verb (input plural) for present tense 3rd person subj */
 char *
 vtense(subj, verb)
@@ -1037,8 +1050,8 @@ register const char *verb;
 {
 	char *buf = nextobuf();
 	int len;
-	const char *spot;
-	const char *sp;
+	const char *sp, *spot;
+	const char * const *spec;
 
 	/*
 	 * verb is given in plural (without trailing s).  Return as input
@@ -1054,6 +1067,7 @@ register const char *verb;
 	    spot = (const char *)0;
 	    for (sp = subj; (sp = index(sp, ' ')) != 0; ++sp) {
 		if (!strncmp(sp, " of ", 4) ||
+		    !strncmp(sp, " from ", 6) ||
 		    !strncmp(sp, " called ", 8) ||
 		    !strncmp(sp, " named ", 7) ||
 		    !strncmp(sp, " labeled ", 9)) {
@@ -1061,7 +1075,7 @@ register const char *verb;
 		    break;
 		}
 	    }
-	    len = strlen(subj);
+	    len = (int) strlen(subj);
 	    if (!spot) spot = subj + len - 1;
 
 	    /*
@@ -1074,11 +1088,20 @@ register const char *verb;
 		((spot - subj) >= 3 && !strncmp(spot-3, "feet", 4)) ||
 		((spot - subj) >= 2 && !strncmp(spot-1, "ia", 2)) ||
 		((spot - subj) >= 2 && !strncmp(spot-1, "ae", 2))) {
-		Strcpy(buf, verb);
-		return buf;
+		/* check for special cases to avoid false matches */
+		len = (int)(spot - subj) + 1;
+		for (spec = special_subjs; *spec; spec++)
+		    if (!strncmpi(*spec, subj, len)) goto sing;
+
+		return strcpy(buf, verb);
 	    }
+	    /*
+	     * 2nd person singular behaves as if plural.
+	     */
+	    if (!strcmpi(subj, "you")) return strcpy(buf, verb);
 	}
 
+ sing:
 	len = strlen(verb);
 	spot = verb + len - 1;
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)zap.c	3.4	2003/02/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -202,7 +202,7 @@ struct obj *otmp;
 		break;
 	case WAN_CANCELLATION:
 	case SPE_CANCELLATION:
-		cancel_monst(mtmp, otmp, TRUE, TRUE, FALSE);
+		(void) cancel_monst(mtmp, otmp, TRUE, TRUE, FALSE);
 		break;
 	case WAN_TELEPORTATION:
 	case SPE_TELEPORT_AWAY:
@@ -1956,7 +1956,7 @@ boolean ordinary;
 
 		case WAN_CANCELLATION:
 		case SPE_CANCELLATION:
-		    cancel_monst(&youmonst, obj, TRUE, FALSE, TRUE);
+		    (void) cancel_monst(&youmonst, obj, TRUE, FALSE, TRUE);
 		    break;
 
 		case SPE_DRAIN_LIFE:
@@ -2203,7 +2203,7 @@ struct obj *obj;	/* wand or spell */
  * effect is too strong.  currently non-hero monsters do not zap
  * themselves with cancellation.
  */
-void
+boolean
 cancel_monst(mdef, obj, youattack, allow_cancel_kill, self_cancel)
 register struct monst	*mdef;
 register struct obj	*obj;
@@ -2216,7 +2216,7 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 
 	if (youdefend ? (!youattack && Antimagic)
 		      : resist(mdef, obj->oclass, 0, NOTELL))
-		return;		/* resisted cancellation */
+		return FALSE;	/* resisted cancellation */
 
 	if (self_cancel) {	/* 1st cancel inventory */
 	    struct obj *otmp;
@@ -2259,6 +2259,7 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 		}
 	    }
 	}
+	return TRUE;
 }
 
 /* you've zapped an immediate type wand up or down */
@@ -4010,11 +4011,12 @@ int damage, tell;
 	/* attack level */
 	switch (oclass) {
 	    case WAND_CLASS:	alev = 12;	 break;
-	    case TOOL_CLASS:	alev = 10;	 break;
+	    case TOOL_CLASS:	alev = 10;	 break;	/* instrument */
+	    case WEAPON_CLASS:	alev = 10;	 break;	/* artifact */
 	    case SCROLL_CLASS:	alev =  9;	 break;
 	    case POTION_CLASS:	alev =  6;	 break;
 	    case RING_CLASS:	alev =  5;	 break;
-	    default:		alev = u.ulevel; break;		/* spell */
+	    default:		alev = u.ulevel; break;	/* spell */
 	}
 	/* defense level */
 	dlev = (int)mtmp->m_lev;
