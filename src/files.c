@@ -153,6 +153,42 @@ int whichprefix, buffnum;
 #endif
 }
 
+/* reasonbuf must be at least BUFSZ, supplied by caller */
+int
+validate_prefix_locations(reasonbuf)
+char *reasonbuf;
+{
+#if defined(NOCWD_ASSUMPTIONS)
+	FILE *fp;
+	const char *filename;
+	int prefcnt, failcount = 0;
+	char failbuf[BUFSZ];
+	
+	failbuf[0] = '\0';
+	if (reasonbuf) reasonbuf[0] = '\0';
+	for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
+		filename = fqname("validate", prefcnt, 3);
+		if ((fp = fopen(filename, "w"))) {
+			fclose(fp);
+			(void) unlink(filename);
+		} else {
+			if (failcount) {
+				Strcat(failbuf,", ");
+				if (reasonbuf) Strcat(reasonbuf,", ");
+			}
+			/* the paniclog entry gets the value of errno */
+			Sprintf(eos(failbuf), "%s:%d", fqn_prefix_names[prefcnt], errno);
+			if (reasonbuf) Strcat(reasonbuf, fqn_prefix_names[prefcnt]);
+			failcount++;
+		}	
+	}
+	if (failcount) {
+		paniclog("Invalid locations", failbuf);
+		return 0;
+	}
+#endif
+	return 1;
+}
 
 /* fopen a file, with OS-dependent bells and whistles */
 /* NOTE: a simpler version of this routine also exists in util/dlb_main.c */
@@ -1289,7 +1325,7 @@ char		*tmp_levels;
 	} else if (match_varname(buf, "LEVELDIR", 4) ||
 		   match_varname(buf, "LEVELS", 4)) {
 		adjust_prefix(bufp, LEVELPREFIX);
-	} else if (match_varname(buf, "SAVE", 4)) {
+	} else if (match_varname(buf, "SAVEDIR", 4)) {
 		adjust_prefix(bufp, SAVEPREFIX);
 	} else if (match_varname(buf, "BONESDIR", 5)) {
 		adjust_prefix(bufp, BONESPREFIX);

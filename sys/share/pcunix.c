@@ -186,7 +186,7 @@ gotlock:
 		chdirx(orgdir, 0);
 #if defined(WIN32)
 		error("cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n", 
-				fq_lock, strerror(ern), "Are you sure that the directory",
+				fq_lock, strerror(ern), " Are you sure that the directory",
 				fqn_prefix[LEVELPREFIX]);
 #else
 		error("cannot creat file (%s.)", fq_lock);

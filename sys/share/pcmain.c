@@ -105,6 +105,9 @@ char *argv[];
 
 	register int fd;
 	register char *dir;
+#ifdef NOCWD_ASSUMPTIONS
+	char failbuf[BUFSZ];
+#endif
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
 	startup();
@@ -170,6 +173,14 @@ char *argv[];
 	ami_wininit_data();
 #endif
 	initoptions();
+
+#ifdef NOCWD_ASSUMPTIONS
+	if (!validate_prefix_locations(failbuf)) {
+		raw_printf("Some invalid directory locations were specified:\n\t%s\n",
+				failbuf);
+		 nethack_exit(EXIT_FAILURE);
+	}
+#endif
 
 #if defined(TOS) && defined(TEXTCOLOR)
 	if (iflags.BIOS && iflags.use_color)

@@ -639,6 +639,7 @@ E void FDECL(check_recordfile, (const char *));
 E void NDECL(read_wizkit);
 #endif
 E void FDECL(paniclog, (const char *, const char *));
+E int FDECL(validate_prefix_locations, (char *));
 
 /* ### fountain.c ### */
 
