@@ -1156,7 +1156,10 @@ struct WinDesc *cw;
 
 	for (i = 0; i < SIZE(gcnt); i++) gcnt[i] = 0;
 	for (n = 0, curr = cw->mlist; curr; curr = curr->next)
-	    if (curr->gselector) ++n,  ++gcnt[GSELIDX(curr->gselector)];
+	    if (curr->gselector && curr->gselector != curr->selector) {
+		++n;
+		++gcnt[GSELIDX(curr->gselector)];
+	    }
 
 	if (n > 0)	/* at least one group accelerator found */
 	    for (rp = gacc, curr = cw->mlist; curr; curr = curr->next)

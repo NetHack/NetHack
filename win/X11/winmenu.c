@@ -713,7 +713,10 @@ X11_select_menu(window, how, menu_list)
 
 	for (i = 0; i < SIZE(gcnt); i++) gcnt[i] = 0;
 	for (n = 0, curr = menu_info->new_menu.base; curr; curr = curr->next)
-	    if (curr->gselector) ++n,  ++gcnt[GSELIDX(curr->gselector)];
+	    if (curr->gselector && curr->gselector != curr->selector) {
+		++n;
+		++gcnt[GSELIDX(curr->gselector)];
+	    }
 
 	if (n > 0)	/* at least one group accelerator found */
 	    for (ap = gacc, curr = menu_info->new_menu.base;
