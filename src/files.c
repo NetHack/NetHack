@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.4	2002/08/18	*/
+/*	SCCS Id: @(#)files.c	3.4	2003/02/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2067,22 +2067,30 @@ read_wizkit()
 	FILE *fp;
 	char *ep, buf[BUFSZ];
 	struct obj *otmp;
-	boolean bad_items = FALSE;
+	boolean bad_items = FALSE, skip = FALSE;
 
 	if (!wizard || !(fp = fopen_wizkit_file())) return;
 
-	while (fgets(buf, BUFSZ, fp)) {
-		if ((ep = index(buf, '\n'))) *ep = '\0';
-		if (ep && buf[0]) {
+	while (fgets(buf, (int)(sizeof buf), fp)) {
+	    ep = index(buf, '\n');
+	    if (skip) {	/* in case previous line was too long */
+		if (ep) skip = FALSE; /* found newline; next line is normal */
+	    } else {
+		if (!ep) skip = TRUE; /* newline missing; discard next fgets */
+		else *ep = '\0';		/* remove newline */
+
+		if (buf[0]) {
 			otmp = readobjnam(buf, (struct obj *)0, FALSE);
 			if (otmp) {
 			    if (otmp != &zeroobj)
 				otmp = addinv(otmp);
 			} else {
-			    raw_printf("Bad wizkit item: \"%.50s\"", buf);
+			    /* .60 limits output line width to 79 chars */
+			    raw_printf("Bad wizkit item: \"%.60s\"", buf);
 			    bad_items = TRUE;
 			}
 		}
+	    }
 	}
 	if (bad_items)
 	    wait_synch();
