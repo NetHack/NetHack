@@ -104,7 +104,8 @@ register struct obj *obj;
 	/* above also prevents the Amulet from being eaten, so we must never
 	   allow fake amulets to be eaten either [which is already the case] */
 
-	if (metallivorous(youmonst.data) && is_metallic(obj))
+	if (metallivorous(youmonst.data) && is_metallic(obj) &&
+	    (youmonst.data != &mons[PM_RUST_MONSTER] || is_rustprone(obj)))
 		return TRUE;
 	if (u.umonnum == PM_GELATINOUS_CUBE && is_organic(obj) &&
 		/* [g.cubes can eat containers and retain all contents
@@ -1533,6 +1534,11 @@ eatspecial() /* called after eating non-food */
 	victual.piece = (struct obj *)0;
 	victual.eating = 0;
 	if (otmp->oclass == GOLD_CLASS) {
+#ifdef GOLDOBJ
+		if (carried(otmp))
+		    useupall(otmp);
+		else
+#endif
 		dealloc_obj(otmp);
 		return;
 	}
@@ -2336,7 +2342,8 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 		}
 	    }
 
-	    if ((gold = g_at(u.ux, u.uy)) != 0) {
+	    if (youmonst.data != &mons[PM_RUST_MONSTER] &&
+		(gold = g_at(u.ux, u.uy)) != 0) {
 		if (gold->quan == 1L)
 		    Sprintf(qbuf, "There is 1 gold piece here; eat it?");
 		else

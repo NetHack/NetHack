@@ -763,8 +763,16 @@ register const char *let,*word;
 
 	ilet = 'a';
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
-	    if (!flags.invlet_constant) otmp->invlet = ilet;	/* reassign() */
-	    if (!*let || index(let, otmp->oclass)) {
+	    if (!flags.invlet_constant)
+#ifndef GOLDOBJ
+		if (otmp->invlet != GOLD_SYM) /* don't reassign this */
+#endif
+		otmp->invlet = ilet;	/* reassign() */
+	    if (!*let || index(let, otmp->oclass)
+#ifdef GOLDOBJ
+		|| (usegold && otmp->invlet == GOLD_SYM)
+#endif
+		) {
 		register int otyp = otmp->otyp;
 		bp[foo++] = otmp->invlet;
 
@@ -995,7 +1003,11 @@ register const char *let,*word;
 		}
 		break;
 	}
-	if(!allowall && let && !index(let,otmp->oclass)) {
+	if(!allowall && let && !index(let,otmp->oclass)
+#ifdef GOLDOBJ
+	   && !(usegold && otmp->oclass == GOLD_CLASS)
+#endif
+	   ) {
 		pline(silly_thing_to, word);
 		return((struct obj *)0);
 	}
