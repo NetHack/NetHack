@@ -381,6 +381,9 @@ unsigned int *stuckid, *steedid;	/* STEED */
 		return FALSE;
 	}
 	mread(fd, (genericptr_t) &context, sizeof(struct context_info));
+	if (context.warntype.speciesidx)
+		context.warntype.species = &mons[context.warntype.speciesidx];
+
 	mread(fd, (genericptr_t) &flags, sizeof(struct flag));
 	if (remember_discover) discover = remember_discover;
 #ifdef SYSFLAGS

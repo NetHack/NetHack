@@ -18,6 +18,7 @@ STATIC_DCL void FDECL(drop_weapon,(int));
 STATIC_DCL void NDECL(uunstick);
 STATIC_DCL int FDECL(armor_to_dragon,(int));
 STATIC_DCL void NDECL(newman);
+STATIC_DCL boolean FDECL(polysense,(struct permonst *));
 
 /* update the youmonst.data structure pointer */
 void
@@ -205,6 +206,7 @@ dead: /* we come directly here if their experience level went to 0 or less */
 		    Strcpy(killer.name, "unsuccessful polymorph");
 		    done(DIED);
 		    newuhs(FALSE);
+		    (void) polysense(youmonst.data);
 		    return; /* lifesaved */
 		}
 	}
@@ -216,6 +218,7 @@ dead: /* we come directly here if their experience level went to 0 or less */
 		Your("body transforms, but there is still slime on you.");
 		make_slimed(10L, (const char*) 0);
 	}
+	(void) polysense(youmonst.data);
 	context.botl = 1;
 	see_monsters();
 	(void) encumber_msg();
@@ -559,6 +562,8 @@ int	mntmp;
 	    You("orient yourself on the web.");
 	    u.utrap = 0;
 	}
+	(void) polysense(youmonst.data);
+
 	context.botl = 1;
 	vision_full_recalc = 1;
 	see_monsters();
@@ -1329,4 +1334,37 @@ int atyp;
 	}
 }
 
+/*
+ * Some species have awareness of other species
+ */
+static boolean
+polysense(mptr)
+struct permonst *mptr;
+{
+	short warnidx = 0;
+	context.warntype.speciesidx = 0;
+	context.warntype.species = 0;
+	context.warntype.polyd = 0;
+
+	switch (monsndx(mptr)) {
+	    case PM_PURPLE_WORM:
+	    	warnidx = PM_SHRIEKER;
+	    	break;
+	    case PM_VAMPIRE:
+	    case PM_VAMPIRE_LORD:
+	    	context.warntype.polyd = M2_HUMAN | M2_ELF;
+	    	HWarn_of_mon |= FROMRACE;
+	    	return TRUE;
+	}
+	if (warnidx) {
+		context.warntype.speciesidx = warnidx;
+		context.warntype.species = &mons[warnidx];
+		HWarn_of_mon |= FROMRACE;
+		return TRUE;
+	}
+	context.warntype.speciesidx = 0;
+	context.warntype.species = 0;
+	HWarn_of_mon &= ~FROMRACE;
+	return FALSE;
+}
 /*polyself.c*/

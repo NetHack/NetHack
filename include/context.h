@@ -65,8 +65,14 @@ struct victual_info {
 	Bitfield(doreset,1);	/* stop eating at end of turn */
 };
 
+struct warntype_info {
+	unsigned long obj;	/* object warn_of_mon monster type M2 */
+	unsigned long polyd;	/* warn_of_mon monster type M2 due to poly */
+	struct permonst *species;	/* particular species due to poly */
+	short speciesidx;	/* index of above in mons[] (for save/restore) */
+};
+
 struct context_info {
-	unsigned long warntype; /* warn_of_mon monster type M2 */
 	unsigned ident;		/* social security number for each monster */
 	unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
 	unsigned run;		/* 0: h (etc), 1: H (etc), 2: fh (etc) */
@@ -94,6 +100,7 @@ struct context_info {
 	struct tin_info tin;
 	struct book_info spbook;
 	struct takeoff_info takeoff;
+	struct warntype_info warntype;
 };
 
 extern NEARDATA struct context_info context;
