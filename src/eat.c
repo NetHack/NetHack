@@ -1543,10 +1543,11 @@ struct obj *otmp;
 		context.botl = 1;
 		break;
 	    case AMULET_OF_UNCHANGING:
-		/* remove intrinsic polymorph only */
-		if (HPolymorph & INTRINSIC) {
-		    HPolymorph &= ~INTRINSIC;
+		/* un-change: it's a pun */
+		if (!Unchanging && Upolyd) {
 		    accessory_has_effect(otmp);
+		    makeknown(typ);
+		    rehumanize();
 		}
 		break;
 	    case AMULET_OF_STRANGULATION: /* bad idea! */
