@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)quest.txt	3.3	2000/01/31
+#	SCCS Id: @(#)quest.txt	3.3	2002/01/30
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -2322,9 +2322,9 @@ show you what to do with it.  Once that's done, we will be invincible!"
 Even before your senses adjust, you recognize the kami of
 %H.
 
-But why is the standard of your teki, %n, flying
-above the town?  Why are ninja wandering freely, where are the
-samurai of your daimyo, %l?
+You %x the standard of your teki, %n, flying above
+the town.  How could such a thing have happened?  Why are ninja
+wandering freely; where are the samurai of your daimyo, %l?
 
 You quickly say a prayer to Izanagi and Izanami and walk towards
 town.
