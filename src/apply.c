@@ -1761,6 +1761,7 @@ reset_trapset()
 	trapinfo.tobj = 0;
 }
 
+/* touchstones - by Ken Arnold */
 STATIC_OVL void
 use_stone(otmp)
 struct obj *otmp;
