@@ -75,9 +75,7 @@ shuffle(o_low, o_high, domaterial)
 {
 	int i, j, num_to_shuffle;
 	short sw;
-#ifdef TEXTCOLOR
 	int color;
-#endif /* TEXTCOLOR */
 
 	for (num_to_shuffle = 0, j=o_low; j <= o_high; j++)
 		if (!objects[j].oc_name_known) num_to_shuffle++;
@@ -94,11 +92,10 @@ shuffle(o_low, o_high, domaterial)
 		sw = objects[j].oc_tough;
 		objects[j].oc_tough = objects[i].oc_tough;
 		objects[i].oc_tough = sw;
-#ifdef TEXTCOLOR
 		color = objects[j].oc_color;
 		objects[j].oc_color = objects[i].oc_color;
 		objects[i].oc_color = color;
-#endif /* TEXTCOLOR */
+
 		/* shuffle material */
 		if (domaterial) {
 			sw = objects[j].oc_material;

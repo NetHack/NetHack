@@ -608,6 +608,7 @@ u_init()
 		else if(!rn2(4)) ini_inv(Lamp);
 		else if(!rn2(10)) ini_inv(Magicmarker);
 		knows_object(SACK);
+		knows_object(TOUCHSTONE);
 		skill_init(Skill_A);
 		break;
 	case PM_BARBARIAN:

@@ -91,9 +91,8 @@ struct objclass {
 	uchar	oc_oprop;		/* property (invis, &c.) conveyed */
 	char	oc_class;		/* object class */
 	schar	oc_delay;		/* delay when using such an object */
-#ifdef TEXTCOLOR
-	uchar	oc_color;		/* display color of the object */
-#endif /* TEXTCOLOR */
+	uchar	oc_color;		/* color of the object */
+
 	short	oc_prob;		/* probability, used in mkobj() */
 	unsigned short	oc_weight;	/* encumbrance (1 cn = 0.1 lb.) */
 	short	oc_cost;		/* base cost in shops */

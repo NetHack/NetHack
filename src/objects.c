@@ -13,12 +13,8 @@ struct monst { struct monst *dummy; };	/* lint: struct obj's union */
 
 #else	/* !OBJECTS_PASS_2_ */
 /* second pass */
-# ifdef TEXTCOLOR
 #include "color.h"
 #  define COLOR_FIELD(X) X,
-# else
-#  define COLOR_FIELD(X) /*empty*/
-# endif
 #endif	/* !OBJECTS_PASS_2_ */
 
 
