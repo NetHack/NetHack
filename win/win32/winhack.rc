@@ -274,7 +274,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_APP_TITLE           "winhack"
+    IDS_APP_TITLE           "NetHack for Windows - Graphical Port"
     IDC_WINHACK             "WINHACK"
 END
 
