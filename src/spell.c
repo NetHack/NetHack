@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.4	2002/03/27	*/
+/*	SCCS Id: @(#)spell.c	3.4	2002/07/12	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -891,8 +891,7 @@ boolean atme;
 	}
 
 	/* gain skill for successful cast */
-	if (role_skill != P_ISRESTRICTED && role_skill < P_EXPERT)
-	    use_skill(skill, spellev(spell));
+	use_skill(skill, spellev(spell));
 
 	obfree(pseudo, (struct obj *)0);	/* now, get rid of it */
 	return(1);
