@@ -916,7 +916,10 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	else if (Amphibious) you_can("breathe water");
 	if (Passes_walls) you_can("walk through walls");
 #ifdef STEED
-	if (u.usteed) {
+	/* If you die while dismounting, u.usteed is still set.  Since several
+	 * places in the done() sequence depend on u.usteed, just detect this
+	 * special case. */
+	if (u.usteed && (final < 2 || strcmp(killer, "riding accident"))) {
 	    Sprintf(buf, "riding %s", y_monnam(u.usteed));
 	    you_are(buf);
 	}
