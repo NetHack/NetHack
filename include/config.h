@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)config.h	3.4	2000/07/20	*/
+/*	SCCS Id: @(#)config.h	3.4	2002/03/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -313,8 +313,6 @@ typedef unsigned char	uchar;
  * complexity of the game but also to the size of the load module.
  */
 
-/*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
-
 /* dungeon features */
 #define SINKS		/* Kitchen sinks - Janet Walz */
 /* dungeon levels */
@@ -339,6 +337,18 @@ typedef unsigned char	uchar;
 
 #define EXP_ON_BOTL	/* Show experience on bottom line */
 /* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
+
+/*
+ * Section 5:  EXPERIMENTAL STUFF
+ *
+ * Conditional compilation of new or experimental options are controlled here.
+ * Enable any of these at your own risk -- there are almost certainly
+ * bugs left here.
+ */
+
+/*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
+
+/* End of Section 5 */
 
 #include "global.h"	/* Define everything else according to choices above */
 
