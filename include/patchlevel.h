@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2003/03/04	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2003/03/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -50,12 +50,12 @@
 /*****************************************************************************/
 /* Version 3.4.x */
 
-/*  Patch 2, March 17, 2003
+/*  Patch 2, April 15, 2003
  *  Fix a fatal bug that caused a crash when applying figurine, candle, or
  *     bell that gets used up
  *  Fix a fatal bug that triggered a panic when your secondary weapon was
  *     cursed during bones file creation
- *  Several other general bug fixes
+ *  A few dozen general bug fixes
  *  Fixed some Gnome compilation problems on Redhat 7.2 and 8.0
  *  Fixed a problem in the util Makefile
  *  win32 tty adjustments and support for loading alternative key handlers
