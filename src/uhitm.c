@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2002/12/09	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2002/12/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -925,7 +925,10 @@ int thrown;
 	    You("joust %s%s",
 			 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
 	    if (jousting < 0) {
-		Your("%s shatters on impact!", doname(obj));
+		Your("%s shatters on impact!", xname(obj));
+		/* (must be either primary or secondary weapon to get here) */
+		u.twoweap = FALSE;	/* untwoweapon() is too verbose here */
+		if (obj == uwep) uwepgone();		/* set unweapon */
 		/* minor side-effect: broken lance won't split puddings */
 		useup(obj);
 		obj = 0;
@@ -1080,6 +1083,8 @@ struct obj *obj;	/* weapon */
     int skill_rating, joust_dieroll;
 
     if (Fumbling || Stunned) return 0;
+    /* sanity check; lance must be wielded in order to joust */
+    if (obj != uwep && (obj != uswapwep || !u.twoweap)) return 0;
 
     /* if using two weapons, use worse of lance and two-weapon skills */
     skill_rating = P_SKILL(weapon_type(obj));	/* lance skill */
