@@ -764,7 +764,7 @@ register const char *let,*word;
 	ilet = 'a';
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
 	    if (!flags.invlet_constant)
-#ifndef GOLDOBJ
+#ifdef GOLDOBJ
 		if (otmp->invlet != GOLD_SYM) /* don't reassign this */
 #endif
 		otmp->invlet = ilet;	/* reassign() */
