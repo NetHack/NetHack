@@ -7,8 +7,8 @@ NetHack 3.3.
 NetHack 3.4.1 is a bugfix release for 3.4.0.
  *  Fix a few fatal errors including one for reentering shops, one
        involving land mines and boulders/statues, one for delayed
-       polymorph
- *  Dozens of general bug fixes
+       polymorph, and one for chest traps blowing up a ball and chain
+ *  Hundreds of general bug fixes
  *  Several message and other glitches corrected
  *  Travel command adjustments and ability to disable travel command
  *  message recall window extensions (by Christian Cooper)
