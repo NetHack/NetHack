@@ -1112,8 +1112,10 @@ freedynamicdata()
 #ifdef AUTOPICKUP_EXCEPTIONS
 	free_autopickup_exceptions();
 #endif
-
 #endif	/* FREE_ALL_MEMORY */
+#ifdef STATUS_VIA_WINDOWPORT
+	status_finish();
+#endif
 	return;
 }
 

@@ -5,6 +5,8 @@
 #ifndef WINPROCS_H
 #define WINPROCS_H
 
+#include "botl.h"
+
 struct window_procs {
     const char *name;
     unsigned long wincap;	/* window port capability options supported */
@@ -67,6 +69,12 @@ struct window_procs {
     void FDECL((*win_preference_update), (const char *));
     char * FDECL((*win_getmsghistory), (BOOLEAN_P));
     void FDECL((*win_putmsghistory), (const char *));
+#ifdef STATUS_VIA_WINDOWPORT
+    void NDECL((*win_status_init));
+    void NDECL((*win_status_finish));
+    void FDECL((*win_status_enablefield), (int,const char *,const char *,BOOLEAN_P));
+    void FDECL((*win_status_update), (int,genericptr_t,int,int));
+#endif
 };
 
 extern NEARDATA struct window_procs windowprocs;
@@ -138,6 +146,13 @@ extern NEARDATA struct window_procs windowprocs;
 #define preference_update (*windowprocs.win_preference_update)
 #define getmsghistory (*windowprocs.win_getmsghistory)
 #define putmsghistory (*windowprocs.win_putmsghistory)
+#ifdef STATUS_VIA_WINDOWPORT
+/* there is a status_initialize() in botl.c,
+ * which calls win_status_init() directly; same with status_finish.
+ */
+#define status_enablefield (*windowprocs.win_status_enablefield)
+#define status_update (*windowprocs.win_status_update)
+#endif
 
 /*
  * WINCAP

@@ -768,10 +768,17 @@ die:
 	    wait_synch();
 	    display_nhwindow(WIN_MESSAGE, TRUE);
 	    destroy_nhwindow(WIN_MAP);
+#ifdef STATUS_VIA_WINDOWPORT
+	    status_finish();
+#else
 	    destroy_nhwindow(WIN_STATUS);
+#endif
 	    destroy_nhwindow(WIN_MESSAGE);
+#ifdef STATUS_VIA_WINDOWPORT
+	    WIN_MESSAGE = WIN_MAP = WIN_ERR;
+#else
 	    WIN_MESSAGE = WIN_STATUS = WIN_MAP = WIN_ERR;
-
+#endif
 	    if(!done_stopprint || flags.tombstone)
 		endwin = create_nhwindow(NHW_TEXT);
 

@@ -26,6 +26,12 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 #define PREFER_TILED FALSE
 #endif
 
+#define MESSAGE_OPTION	1
+#define STATUS_OPTION	2
+#define MAP_OPTION	3
+#define MENU_OPTION	4
+#define TEXT_OPTION	5
+
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
  *  options help (option_help()), the long options help (dat/opthelp),
@@ -1188,55 +1194,55 @@ boolean tinitial, tfrom_file;
 	fullname = "font";
 	if (!strncmpi(opts, fullname, 4))
 	{
-		int wintype = -1;
+		int opttype = -1;
 		char *fontopts = opts + 4;
 
 		if (!strncmpi(fontopts, "map", 3) ||
 		    !strncmpi(fontopts, "_map", 4))
-			wintype = NHW_MAP;
+			opttype = MAP_OPTION;
 		else if (!strncmpi(fontopts, "message", 7) ||
 			 !strncmpi(fontopts, "_message", 8))
-			wintype = NHW_MESSAGE;
+			opttype = MESSAGE_OPTION;
 		else if (!strncmpi(fontopts, "text", 4) ||
 			 !strncmpi(fontopts, "_text", 5))
-			wintype = NHW_TEXT;			
+			opttype = TEXT_OPTION;			
 		else if (!strncmpi(fontopts, "menu", 4) ||
 			 !strncmpi(fontopts, "_menu", 5))
-			wintype = NHW_MENU;
+			opttype = MENU_OPTION;
 		else if (!strncmpi(fontopts, "status", 6) ||
 			 !strncmpi(fontopts, "_status", 7))
-			wintype = NHW_STATUS;
+			opttype = STATUS_OPTION;
 		else if (!strncmpi(fontopts, "_size", 5)) {
 			if (!strncmpi(fontopts, "_size_map", 8))
-				wintype = NHW_MAP;
+				opttype = MAP_OPTION;
 			else if (!strncmpi(fontopts, "_size_message", 12))
-				wintype = NHW_MESSAGE;
+				opttype = MESSAGE_OPTION;
 			else if (!strncmpi(fontopts, "_size_text", 9))
-				wintype = NHW_TEXT;
+				opttype = TEXT_OPTION;
 			else if (!strncmpi(fontopts, "_size_menu", 9))
-				wintype = NHW_MENU;
+				opttype = MENU_OPTION;
 			else if (!strncmpi(fontopts, "_size_status", 11))
-				wintype = NHW_STATUS;
+				opttype = STATUS_OPTION;
 			else {
 				badoption(opts);
 				return;
 			}
-			if (wintype > 0 && !negated &&
+			if (opttype > 0 && !negated &&
 			    (op = string_for_opt(opts, FALSE)) != 0) {
-			    switch(wintype)  {
-			    	case NHW_MAP:
+			    switch(opttype)  {
+			    	case MAP_OPTION:
 					iflags.wc_fontsiz_map = atoi(op);
 					break;
-			    	case NHW_MESSAGE:
+			    	case MESSAGE_OPTION:
 					iflags.wc_fontsiz_message = atoi(op);
 					break;
-			    	case NHW_TEXT:
+			    	case TEXT_OPTION:
 					iflags.wc_fontsiz_text = atoi(op);
 					break;
-			    	case NHW_MENU:
+			    	case MENU_OPTION:
 					iflags.wc_fontsiz_menu = atoi(op);
 					break;
-			    	case NHW_STATUS:
+			    	case STATUS_OPTION:
 					iflags.wc_fontsiz_status = atoi(op);
 					break;
 			    }
@@ -1245,11 +1251,11 @@ boolean tinitial, tfrom_file;
 		} else {
 			badoption(opts);
 		}
-		if (wintype > 0 &&
+		if (opttype > 0 &&
 		    (op = string_for_opt(opts, FALSE)) != 0) {
-			wc_set_font_name(wintype, op);
+			wc_set_font_name(opttype, op);
 #ifdef MAC
-			set_font_name (wintype, op);
+			set_font_name (opttype, op);
 #endif
 			return;
 		} else if (negated) bad_negation(fullname, TRUE);
@@ -2204,9 +2210,12 @@ goodfruit:
 #ifdef SCORE_ON_BOTL
 			 || (boolopt[i].addr) == &flags.showscore
 #endif
-			    )
+			    ) {
+#ifdef STATUS_VIA_WINDOWPORT
+			    status_initialize(TRUE);   /* TRUE = reassess only */
+#endif
 			    context.botl = TRUE;
-
+			}
 			else if ((boolopt[i].addr) == &flags.invlet_constant) {
 			    if (flags.invlet_constant) reassign();
 			}
@@ -3745,26 +3754,26 @@ const char *optnam;
 
 
 STATIC_OVL void
-wc_set_font_name(wtype, fontname)
-int wtype;
+wc_set_font_name(opttype, fontname)
+int opttype;
 char *fontname;
 {
 	char **fn = (char **)0;
 	if (!fontname) return;
-	switch(wtype) {
-	    case NHW_MAP:
+	switch(opttype) {
+	    case MAP_OPTION:
 	    		fn = &iflags.wc_font_map;
 			break;
-	    case NHW_MESSAGE:
+	    case MESSAGE_OPTION:
 	    		fn = &iflags.wc_font_message;
 			break;
-	    case NHW_TEXT:
+	    case TEXT_OPTION:
 	    		fn = &iflags.wc_font_text;
 			break;
-	    case NHW_MENU:
+	    case MENU_OPTION:
 	    		fn = &iflags.wc_font_menu;
 			break;
-	    case NHW_STATUS:
+	    case STATUS_OPTION:
 	    		fn = &iflags.wc_font_status;
 			break;
 	    default:

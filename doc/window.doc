@@ -20,15 +20,18 @@ Contents:
 
 I.  Window Types and Terminology
 
-There are 5 basic window types, used to call create_nhwindow():
+There are 4 basic window types, used to call create_nhwindow():
 
 	NHW_MESSAGE	(top line)
-	NHW_STATUS	(bottom lines)
 	NHW_MAP		(main dungeon)
 	NHW_MENU	(inventory or other "corner" windows)
 	NHW_TEXT	(help/text, full screen paged window)
 
 The tty window-port also uses NHW_BASE (the base display) internally.
+
+(The genl_status_* routines use NHW_STATUS for backward compatibility
+ when displaying status information on the bottom lines.  New code
+ should not use NHW_STATUS. NHW_STATUS will be phased out over time.)
 
 NHW_MENU windows can be used for either menu or text display.  Their
 basic feature is that for the tty-port, if the window is small enough,
@@ -53,11 +56,15 @@ integer, but doesn't necessarily have to be done that way.  There are
 a few fixed window names that are known throughout the code:
 
 	WIN_MESSAGE	(top line)
-	WIN_STATUS	(bottom lines)
 	WIN_MAP		(main dungeon)
 	WIN_INVEN	(inventory)
 
 Other windows are created and destroyed as needed.
+
+(The genl_status_* routines use WIN_STATUS for backward compatibility
+ when displaying status information on the bottom lines.  New code
+ should not use WIN_STATUS, or assume its presence. NHW_STATUS will 
+ be phased out over time.)
 
 "Port" in this document refers to a CPU/OS/hardware platform (UNIX, MSDOS
 TOS, etc.)  "window-port" refers to the windowing platform.  This is
@@ -85,12 +92,12 @@ curs(window, x, y)
 		   displayable cursor to (x,y).  For backward compatibility,
 		   1 <= x < cols, 0 <= y < rows, where cols and rows are
 		   the size of window.
-		-- For variable sized windows, like the status window, the
+		-- For variable sized windows, like the old status window, the
 		   behavior when curs() is called outside the window's limits
 		   is unspecified. The mac port wraps to 0, with the status
 		   window being 2 lines high and 80 columns wide.
-		-- Still used by curs_on_u(), status updates, screen locating
-		   (identify, teleport).
+		-- Still used by curs_on_u(), obsolete status updates, 
+		   screen locating (identify, teleport).
 		-- NHW_MESSAGE, NHW_MENU and NHW_TEXT windows do not
 		   currently support curs in the tty window-port.
 putstr(window, attr, str)
@@ -331,7 +338,51 @@ char message_menu(char let, int how, const char *mesg)
 		   windows typically won't need this functionality, so can
 		   substitute genl_message_menu (windows.c) instead.
 
-D.  Misc. Routines
+D.  Status Display Routines
+
+status_init()   -- core calls this to notify the window port that a status
+		   display is required. The window port should perform 
+		   the necessary initialization in here, allocate memory, etc.
+status_enablefield(int fldindex, char fldname, char fieldfmt, boolean enable)   
+                -- notifies the window port which fields it is authorized to
+		   display.
+		-- This may be called at any time, and is used
+		   to disable as well as enable fields, depending on the 
+		   value of the final argument (TRUE = enable).
+		-- fldindex could be one of the following from botl.h:
+		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
+		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
+		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+		   BL_LEVELDESC, BL_EXP, BL_CONDITION
+		-- There are MAXBLSTATS status fields (from botl.h)
+status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
+		-- update the value of a status field
+		-- the fldindex identifies which field is changing and
+		   is an integer index value from botl.h
+		-- fldindex could be any one of the following from botl.h:
+		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
+		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
+		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+		   BL_LEVELDESC, BL_EXP, BL_CONDITION, 
+		-- fldindex could also be BL_FLUSH (-1), which is not really
+		   a field index, but is a special trigger to tell the 
+		   windowport that it should redisplay all its status fields,
+		   even if no changes have been presented to it.
+		-- ptr is usually a "char *", unless fldindex is BL_CONDITION.
+		   If fldindex is BL_CONDITION, then ptr is a long value with
+		   any or none of the following bits set (from botl.h):
+			BL_MASK_BLIND		0x00000001L
+			BL_MASK_CONF		0x00000002L
+			BL_MASK_FOODPOIS	0x00000004L
+			BL_MASK_ILL		0x00000008L
+			BL_MASK_HALLU		0x00000010L
+			BL_MASK_STUNNED		0x00000020L
+			BL_MASK_SLIMED		0x00000040L
+status_finish() -- called when it is time for the window port to tear down
+		   the status display and free allocated memory, etc.
+
+
+E.  Misc. Routines
 
 make_sound(???) -- To be determined later.  THIS IS CURRENTLY UN-IMPLEMENTED.
 nhbell()	-- Beep at user.  [This will exist at least until sounds are
@@ -414,8 +465,11 @@ the window interface to the rest of NetHack.
 
 char toplines[BUFSZ]	Contains the last message printed to the WIN_MESSAGE
 			window, used by Norep().
-winid WIN_MESSAGE, WIN_MAP, WIN_STATUS, WIN_INVEN
-			The four standard windows.
+winid WIN_MESSAGE, WIN_MAP, WIN_INVEN
+			The three standard windows.
+			There is also a window called WIN_STATUS that is used
+			only for backward compatibility in the genl_status_*
+			set of generic status display functions.
 char *AE, *AS;		Checked in options.c to see if we should switch
 			to DEC_GRAPHICS.  It is #ifdefed VMS and UNIX.
 int LI, CO;		Set in sys/unix/ioctl.c.
@@ -560,7 +614,7 @@ to support:
   +--------------------+--------------------+--------------------+--------+
 
 align_message	-- where to place message window (top, bottom, left, right)
-align_status	-- where to place status window (top, bottom, left, right).
+align_status	-- where to place status display (top, bottom, left, right).
 ascii_map	-- port should display an ascii map if it can.
 color		-- port should display color if it can.
 eight_bit_tty	-- port should allow eight bit input.
@@ -571,9 +625,9 @@ font_size_map	-- port should use this size font for the map window.
 font_size_menu	-- port should use this size font for menu windows.
 font_size_message 
 		-- port should use this size font for the message window.
-font_size_status-- port should use this size font for the status window.
+font_size_status-- port should use this size font for the status display.
 font_size_text	-- port should use this size font for text windows.
-font_status	-- port should use a font by this name for status window.
+font_status	-- port should use a font by this name for status display.
 font_text	-- port should use a font by this name for text windows.
 fullscreen      -- port should try to use the whole screen.
 hilite_pet	-- port should mark pets in some special way on the map.
@@ -718,9 +772,9 @@ to initialize the function pointer table to _something_ so that calls to
 raw_print() will not fail.  Choose_windows() should be called almost
 immediately upon entering main().  Look at unixmain.c for an example.
 
-Display_gamewindows() is a common routine that displays the three standard
-game windows (WIN_MESSAGE, WIN_MAP, and WIN_STATUS).  It is normally called
-just before the "Hello, welcome" message.
+Display_gamewindows() is a common routine that displays the two standard
+game windows (WIN_MESSAGE, WIN_MAP), and the status display.  It is normally 
+called just before the "Hello, welcome" message.
 
 Process_options() is currently still unique to each port.  There may be need
 in the future to make it possible to replace this on a per window-port basis.

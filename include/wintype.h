@@ -14,6 +14,10 @@ typedef union any {
     int  a_int;
     char a_char;
     schar a_schar;
+    unsigned int a_uint;
+    int *a_iptr;
+    long *a_lptr;
+    unsigned *a_uptr;
     /* add types as needed */
 } anything;
 #define ANY_P union any /* avoid typedef in prototypes */
@@ -66,6 +70,5 @@ typedef struct mi {
 #define MENU_UNSELECT_PAGE	'\\'
 #define MENU_INVERT_PAGE	'~'
 #define MENU_SEARCH		':'
-
 
 #endif /* WINTYPE_H */

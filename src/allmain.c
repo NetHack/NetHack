@@ -447,7 +447,11 @@ void
 display_gamewindows()
 {
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
+#ifdef STATUS_VIA_WINDOWPORT
+    status_initialize(FALSE);
+#else
     WIN_STATUS = create_nhwindow(NHW_STATUS);
+#endif
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
 
@@ -466,7 +470,9 @@ display_gamewindows()
      * The mac port is not DEPENDENT on the order of these
      * displays, but it looks a lot better this way...
      */
+#ifndef STATUS_VIA_WINDOWPORT
     display_nhwindow(WIN_STATUS, FALSE);
+#endif
     display_nhwindow(WIN_MESSAGE, FALSE);
     clear_glyph_buffer();
     display_nhwindow(WIN_MAP, FALSE);

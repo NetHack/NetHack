@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)config.h	3.4	2003/02/19	*/
+/*	SCCS Id: @(#)config.h	3.4	2003/11/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -353,7 +353,8 @@ typedef unsigned char	uchar;
  */
 
 /*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
-#define AUTOPICKUP_EXCEPTIONS  /* exceptions to autopickup - M. Allison */
+#define AUTOPICKUP_EXCEPTIONS	/* exceptions to autopickup */
+#define STATUS_VIA_WINDOWPORT	/* re-work of the status line updating process */
 
 /* End of Section 5 */
 

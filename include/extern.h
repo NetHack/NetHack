@@ -131,6 +131,14 @@ E long NDECL(botl_score);
 E int FDECL(describe_level, (char *));
 E const char *FDECL(rank_of, (int,SHORT_P,BOOLEAN_P));
 E void NDECL(bot);
+#ifdef STATUS_VIA_WINDOWPORT
+E void FDECL(status_initialize, (BOOLEAN_P));
+E void NDECL(status_finish);
+E void NDECL(genl_status_init);
+E void NDECL(genl_status_finish);
+E void FDECL(genl_status_update, (int, genericptr_t, int, int));
+E void FDECL(genl_status_enablefield, (int, const char *, const char *,BOOLEAN_P));
+#endif
 
 /* ### cmd.c ### */
 
