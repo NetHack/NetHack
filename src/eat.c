@@ -1656,7 +1656,7 @@ struct obj *otmp;
 	char buf[BUFSZ], foodname[BUFSZ];
 	char *eat_it_anyway = "Eat it anyway?";
 	boolean cadaver = (otmp->otyp == CORPSE);
-	boolean stoneable = FALSE;
+	boolean stoneorslime = FALSE;
 	int material = objects[otmp->otyp].oc_material;
 	long rotted = 0L;
 	int mnum;
@@ -1666,12 +1666,19 @@ struct obj *otmp;
 #endif
 
 	Strcpy(foodname, The(xname(otmp)));
-	if (cadaver || otmp->otyp == EGG) {
+	if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN) {
 		mnum = otmp->corpsenm;
 		/* These checks must match those in eatcorpse() */
-	  	stoneable = (touch_petrifies(&mons[mnum]) &&
+	  	stoneorslime = (touch_petrifies(&mons[mnum]) &&
 			    !Stone_resistance && !poly_when_stoned(youmonst.data));
-		if (mnum != PM_LIZARD && mnum != PM_LICHEN) {
+
+		if (mnum == PM_GREEN_SLIME)
+		    stoneorslime = (!Unchanging &&
+			youmonst.data != &mons[PM_FIRE_VORTEX] &&
+			youmonst.data != &mons[PM_FIRE_ELEMENTAL] &&
+			youmonst.data != &mons[PM_GREEN_SLIME]);
+
+		if (cadaver && mnum != PM_LIZARD && mnum != PM_LICHEN) {
 			long age = peek_at_iced_corpse_age(otmp);
 			/* worst case rather than random
 			   in this calculation to force prompt */
@@ -1693,7 +1700,7 @@ struct obj *otmp;
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
-	if (stoneable) {
+	if (stoneorslime) {
 		Sprintf(buf, "%s smells like it could be something very dangerous! %s",
 		     foodname, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
