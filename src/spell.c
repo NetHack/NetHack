@@ -22,6 +22,7 @@ static NEARDATA struct obj *book;	/* last/current book being xscribed */
 
 STATIC_DCL int FDECL(spell_let_to_idx, (CHAR_P));
 STATIC_DCL boolean FDECL(cursed_book, (struct obj *bp));
+STATIC_DCL boolean FDECL(confused_book, (struct obj *));
 STATIC_DCL void FDECL(deadbook, (struct obj *));
 STATIC_PTR int NDECL(learn);
 STATIC_DCL boolean FDECL(getspell, (int *));
@@ -172,6 +173,31 @@ cursed_book(bp)
 	return FALSE;
 }
 
+/* study while confused: returns TRUE if the book is destroyed */
+STATIC_OVL boolean
+confused_book(spellbook)
+struct obj *spellbook;
+{
+	boolean gone = FALSE;
+
+	if (!rn2(3) && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
+	    spellbook->in_use = TRUE;	/* in case called from learn */
+	    pline(
+	"Being confused you have difficulties in controlling your actions.");
+	    display_nhwindow(WIN_MESSAGE, FALSE);
+	    You("accidentally tear the spellbook to pieces.");
+	    if (!objects[spellbook->otyp].oc_name_known &&
+		!objects[spellbook->otyp].oc_uname)
+		docall(spellbook);
+	    useup(spellbook);
+	    gone = TRUE;
+	} else {
+	    You("find yourself reading the %s line over and over again.",
+		spellbook == book ? "next" : "first");
+	}
+	return gone;
+}
+
 /* special effects for The Book of the Dead */
 STATIC_OVL void
 deadbook(book2)
@@ -295,9 +321,16 @@ learn()
 
 	/* JDS: lenses give 50% faster reading; 33% smaller read time */
 	if (delay && ublindf && ublindf->otyp == LENSES && rn2(2)) delay++;
+	if (Confusion) {		/* became confused while learning */
+	    (void) confused_book(book);
+	    book = 0;			/* no longer studying */
+	    nomul(delay);		/* remaining delay is uninterrupted */
+	    delay = 0;
+	    return(0);
+	}
 	if (delay) {	/* not if (delay++), so at end delay == 0 */
-		delay++;
-		return(1); /* still busy */
+	    delay++;
+	    return(1); /* still busy */
 	}
 	exercise(A_WIS, TRUE);		/* you're studying. */
 	booktype = book->otyp;
@@ -441,24 +474,12 @@ register struct obj *spellbook;
 			spellbook->in_use = FALSE;
 		    return(1);
 		} else if (confused) {
-			if (!rn2(3) &&
-				spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
-			    pline(
-	  "Being confused you have difficulties in controlling your actions.");
-			    display_nhwindow(WIN_MESSAGE, FALSE);
-			    You("accidentally tear the spellbook to pieces.");
-			    if (!objects[spellbook->otyp].oc_name_known &&
-				   !objects[spellbook->otyp].oc_uname)
-				docall(spellbook);
-			    useup(spellbook);
-			} else {
-			    You(
-		  "find yourself reading the first line over and over again.");
-			    spellbook->in_use = FALSE;
-			}
-			nomul(delay);
-			delay = 0;
-			return(1);
+		    if (!confused_book(spellbook)) {
+			spellbook->in_use = FALSE;
+		    }
+		    nomul(delay);
+		    delay = 0;
+		    return(1);
 		}
 		spellbook->in_use = FALSE;
 
