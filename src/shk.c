@@ -999,6 +999,7 @@ register struct monst *shkp;
 	if(!shkp->isshk) return;
 
 	rile_shk(shkp);
+	(void) strncpy(ESHK(shkp)->customer, plname, PL_NSIZ);
 	ESHK(shkp)->following = 1;
 }
 
@@ -2469,8 +2470,6 @@ register boolean peaceful, silent;
 
 	    if(!silent) {
 		if(cansee(shkp->mx, shkp->my)) {
-		    if(ESHK(shkp)->customer[0] == 0)
-			(void) strncpy(ESHK(shkp)->customer,plname,PL_NSIZ);
 		    Norep("%s booms: \"%s, you are a thief!\"",
 				Monnam(shkp), plname);
 		} else  Norep("You hear a scream, \"Thief!\"");
