@@ -66,7 +66,7 @@ echo Generating rumors	echo ..\util\makedefs.exe -r	..\util\makedefs.exe -r	\
 echo Generating quests	echo ..\util\makedefs.exe -q	..\util\makedefs.exe -q	\
 echo Generating oracles	echo ..\util\makedefs.exe -h	..\util\makedefs.exe -h	\
 echo Generating dungeon.pdf	echo ..\util\makedefs.exe -e	..\util\makedefs.exe -e	\
-echo popd	popd	\
+echo chdir ..\build	chdir ..\build	\
 copy ..\win\share\tilemap.c ..\win\share\tiletxt.c
 # End Special Build Tool
 
@@ -108,7 +108,7 @@ echo Generating rumors	echo ..\util\makedefs.exe -r	..\util\makedefs.exe -r	\
 echo Generating quests	echo ..\util\makedefs.exe -q	..\util\makedefs.exe -q	\
 echo Generating oracles	echo ..\util\makedefs.exe -h	..\util\makedefs.exe -h	\
 echo Generating dungeon.pdf	echo ..\util\makedefs.exe -e	..\util\makedefs.exe -e	\
-echo popd	popd	\
+echo chdir ..\build	chdir ..\build	\
 copy ..\win\share\tilemap.c ..\win\share\tiletxt.c
 # End Special Build Tool
 
