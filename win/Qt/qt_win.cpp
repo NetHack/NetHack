@@ -591,8 +591,8 @@ static const char * cast_c_xpm[] = {
 "   .    XX  "};
 
 NetHackQtSettings::NetHackQtSettings(int w, int h) :
-    tilewidth(TILEWMIN,32,1,this),
-    tileheight(TILEHMIN,32,1,this),
+    tilewidth(TILEWMIN,64,1,this),
+    tileheight(TILEHMIN,64,1,this),
     widthlbl(&tilewidth,"&Width:",this),
     heightlbl(&tileheight,"&Height:",this),
     fontsize(this),
