@@ -1664,7 +1664,6 @@ STATIC_PTR int
 in_container(obj)
 register struct obj *obj;
 {
-	boolean is_gold = (obj->oclass == GOLD_CLASS);
 	boolean floor_container = !carried(current_container);
 	char buf[BUFSZ];
 
@@ -1792,13 +1791,17 @@ register struct obj *obj;
 	}
 
 	if (current_container) {
-	    (void) add_to_container(current_container, obj);
-	    current_container->owt = weight(current_container);
-
 	    Strcpy(buf, the(xname(current_container)));
 	    You("put %s into %s.", doname(obj), buf);
+
+	    (void) add_to_container(current_container, obj);
+	    current_container->owt = weight(current_container);
 	}
-	if (is_gold) bot(); /* update gold piece count immediately */
+	/* gold needs this, and freeinv() many lines above may cause
+	 * the encumbrance to disappear from the status, so just always
+	 * update status immediately.
+	 */
+	bot();
 
 	return(current_container ? 1 : -1);
 }
