@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2002/03/09	*/
+/*	SCCS Id: @(#)apply.c	3.4	2002/04/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -971,8 +971,8 @@ register struct obj *obj;
 			      (obj->quan > 1L) ? "them" : "it",
 			      (obj->quan > 1L) ? "them" : "it");
 		if (obj->quan < 7L && otmp->spe == 7)
-		    pline("%s now has seven%s %s attached.",
-			  The(xname(otmp)), otmp->lamplit ? " lit" : "", s);
+		    pline("%s now has seven%s candles attached.",
+			  The(xname(otmp)), otmp->lamplit ? " lit" : "");
 		/* candelabrum's light range might increase */
 		if (otmp->lamplit) obj_merge_light_sources(otmp, otmp);
 		/* candles are no longer a separate light source */
