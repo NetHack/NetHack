@@ -730,7 +730,7 @@ boolean uncomp;
 	 * end up being displayed after the error message.
 	 */
 	if (istty)
-	    wait_synch();
+	    mark_synch();
 # endif
 	if (f == 0) {	/* child */
 # ifdef TTY_GRAPHICS
