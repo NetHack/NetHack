@@ -14,6 +14,11 @@
 #if !defined(MAC) && !defined(O_WRONLY) && !defined(AZTEC_C)
 #include <fcntl.h>
 #endif
+
+#if defined(NOCWD_ASSUMPTIONS)
+#include <errno.h>
+#endif
+
 #if defined(UNIX) || defined(VMS)
 #include <errno.h>
 # ifndef SKIP_ERRNO
