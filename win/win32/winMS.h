@@ -54,6 +54,8 @@ typedef struct mswin_nhwindow_app {
 
 	int			winStatusAlign;		/* alignment of the status window */
 	int			winMessageAlign;	/* alignment of the status window */
+
+	char*		saved_text;
 } NHWinApp, *PNHWinApp;
 extern PNHWinApp GetNHApp();
 

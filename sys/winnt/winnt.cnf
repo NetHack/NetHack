@@ -28,7 +28,7 @@ OPTIONS=IBMGraphics
 # General options.  You might also set "silent" so as not to attract
 # the boss's attention.
 #
-OPTIONS=time,noshowexp,number_pad,lit_corridor,rest_on_space
+OPTIONS=time,noshowexp,number_pad,lit_corridor,rest_on_space,toptenwin
 #
 # If you want to get rid of "use #quit to quit..." use:
 #OPTIONS=suppress_alert:3.3.1

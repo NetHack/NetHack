@@ -62,6 +62,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	_nethack_app.winStatusAlign = NHWND_ALIGN_BOTTOM;
 	_nethack_app.winMessageAlign = NHWND_ALIGN_TOP;
 	_nethack_app.mapCliparoundMargin = DEF_CLIPAROUND_MARGIN;
+	_nethack_app.saved_text = strdup(TEXT(""));
 
 	// init controls
 	ZeroMemory(&InitCtrls, sizeof(InitCtrls));
@@ -74,10 +75,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	{
 		return FALSE;
 	}
-
-#ifdef _DEBUG
-	wizard = TRUE;
-#endif
 
 	/* get command line parameters */	
 	p = _tcstok(GetCommandLine(), TEXT(" "));

@@ -141,14 +141,10 @@ void mswin_askname(void)
 {
 	logDebug("mswin_askname()\n");
 
-#ifdef _DEBUG
-	strcpy(plname, "wizard");
-#else
-	if( mswin_getlin_window("who are you?", plname, PL_NSIZ)==IDCANCEL ) {
+	if( mswin_getlin_window("Who are you?", plname, PL_NSIZ)==IDCANCEL ) {
 		bail("bye-bye");
 		/* not reached */
 	}
-#endif
 }
 
 
@@ -167,8 +163,6 @@ void mswin_get_nh_event(void)
 void mswin_exit_nhwindows(const char *str)
 {
 	logDebug("mswin_exit_nhwindows(%s)\n", str);
-
-	terminate(EXIT_SUCCESS);
 }
 
 /* Prepare the window to be suspended. */
@@ -446,6 +440,13 @@ void mswin_putstr(winid wid, int attr, const char *text)
 				 GetNHApp()->windowlist[wid].win, 
 				 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_PUTSTR, (LPARAM)&data );
 		}
+	}
+	else
+	{
+		// build text to display later in message box
+		GetNHApp()->saved_text = realloc(GetNHApp()->saved_text, strlen(text) +
+			strlen(GetNHApp()->saved_text) + 1);
+		strcat(GetNHApp()->saved_text, text);
 	}
 }
 
@@ -853,6 +854,22 @@ char mswin_yn_function(const char *question, const char *choices,
     char message[BUFSZ];
 
 	logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
+
+    if (WIN_MESSAGE == WIN_ERR && choices == ynchars) {
+        char *text = realloc(strdup(GetNHApp()->saved_text), strlen(question)
+			+ strlen(GetNHApp()->saved_text) + 1);
+        DWORD box_result;
+        strcat(text, question);
+        box_result = MessageBox(NULL,
+             NH_W2A(text, message, sizeof(message)),
+             TEXT("NetHack for Windows"),
+             MB_YESNOCANCEL |
+             ((def == 'y') ? MB_DEFBUTTON1 :
+              (def == 'n') ? MB_DEFBUTTON2 : MB_DEFBUTTON3));
+        free(text);
+		GetNHApp()->saved_text = strdup(TEXT(""));
+        return box_result == IDYES ? 'y' : box_result == IDNO ? 'n' : '\033';
+    }
 
     if (choices) {
 	char *cb, choicebuf[QBUFSZ];
