@@ -220,29 +220,34 @@ dig()
 	    }
 	}
 	if(Fumbling && !rn2(3)) {
-		switch(rn2(3)) {
-		case 0:  if(!welded(uwep)) {
-			     You("fumble and drop your %s.", xname(uwep));
-			     dropx(uwep);
-			 } else {
+	    switch(rn2(3)) {
+	    case 0:
+		if(!welded(uwep)) {
+		    You("fumble and drop your %s.", xname(uwep));
+		    dropx(uwep);
+		} else {
 #ifdef STEED
-			     if (u.usteed)
-				Your("%s bounces and hits %s!",
-					xname(uwep), mon_nam(u.usteed));
-			     else
+		    if (u.usteed)
+			Your("%s %s and %s %s!",
+			     xname(uwep),
+			     otense(uwep, "bounce"), otense(uwep, "hit"),
+			     mon_nam(u.usteed));
+		    else
 #endif
-				pline("Ouch!  Your %s bounces and hits you!",
-					xname(uwep));
-			     set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
-			 }
-			 break;
-		case 1:  pline("Bang!  You hit with the broad side of %s!",
-			       the(xname(uwep)));
-			 break;
-		default: Your("swing misses its mark.");
-			 break;
+			pline("Ouch!  Your %s %s and %s you!",
+			      xname(uwep),
+			      otense(uwep, "bounce"), otense(uwep, "hit"));
+		    set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
 		}
-		return(0);
+		break;
+	    case 1:
+		pline("Bang!  You hit with the broad side of %s!",
+		      the(xname(uwep)));
+		break;
+	    default: Your("swing misses its mark.");
+		break;
+	    }
+	    return(0);
 	}
 
 	digging.effort += 10 + rn2(5) + abon() +
@@ -863,8 +868,8 @@ struct obj *obj;
 				seetrap(trap);
 				There("is a spider web there!");
 			    }
-			    Your("%s becomes entangled in the web.",
-				aobjnam(obj, (char *)0));
+			    Your("%s entangled in the web.",
+				aobjnam(obj, "become"));
 			    /* you ought to be able to let go; tough luck */
 			    /* (maybe `move_into_trap()' would be better) */
 			    nomul(-d(2,2));
@@ -1343,10 +1348,12 @@ long timeout;	/* unused */
 	    x = obj->ox;
 	    y = obj->oy;
 	} else if (in_invent) {
-	    if (flags.verbose)
-		Your("%s%s rot%s away%c",
-		     obj == uwep ? "wielded " : "", corpse_xname(obj, FALSE),
-		     obj->quan == 1L ? "s" : "", obj == uwep ? '!' : '.');
+	    if (flags.verbose) {
+		char *cname = corpse_xname(obj, FALSE);
+		Your("%s%s %s away%c",
+		     obj == uwep ? "wielded " : nul, cname,
+		     vtense(cname, "rot"), obj == uwep ? '!' : '.');
+	    }
 	    if (obj == uwep) {
 		uwepgone();	/* now bare handed */
 		stop_occupation();

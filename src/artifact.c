@@ -513,7 +513,7 @@ touch_artifact(obj,mon)
 
     /* can pick it up unless you're totally non-synch'd with the artifact */
     if (badclass && badalign && self_willed) {
-	if (yours) pline("%s evades your grasp!", The(xname(obj)));
+	if (yours) pline("%s your grasp!", Tobjnam(obj, "evade"));
 	return 0;
     }
 
@@ -750,7 +750,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	if (attacks(AD_ELEC, otmp)) {
 	    if (realizes_damage) {
 		if(youattack && otmp != uwep)
-		    pline("%s hits %s!", The(xname(otmp)), hittee);
+		    pline("%s %s!", Tobjnam(otmp, "hit"), hittee);
 		pline("Lightning strikes %s!", hittee);
 		if (!rn2(5)) (void) destroy_mitem(mdef, RING_CLASS, AD_ELEC);
 		if (!rn2(5)) (void) destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
@@ -760,7 +760,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	if (attacks(AD_MAGM, otmp)) {
 		if (realizes_damage) {
 			if(youattack && otmp != uwep)
-			    pline("%s hits %s!", The(xname(otmp)), hittee);
+			    pline("%s %s!", Tobjnam(otmp, "hit"), hittee);
 			pline("A hail of magic missiles strikes %s!", hittee);
 			return TRUE;
 		}
@@ -1327,7 +1327,7 @@ void arti_speak(obj)
 	line = getrumor(bcsign(obj), buf, TRUE);
 	if (!*line)
 		line = "NetHack rumors file closed for renovation.";
-	pline("%s whispers:", The(xname(obj)));
+	pline("%s:", Tobjnam(obj, "whisper"));
 	verbalize("%s", line);
 	return;
 }

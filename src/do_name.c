@@ -296,7 +296,7 @@ register struct obj *obj;
 	short objtyp;
 
 	Sprintf(qbuf, "What do you want to name %s %s?",
-		(obj->quan > 1L) ? "these" : "this", xname(obj));
+		is_plural(obj) ? "these" : "this", xname(obj));
 	getlin(qbuf, buf);
 	if(!*buf || *buf == '\033')	return;
 	/* strip leading and trailing spaces; unnames item if all spaces */

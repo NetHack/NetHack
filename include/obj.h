@@ -222,6 +222,10 @@ struct obj {
 				 (obj)->otyp == FLINT     || \
 				 (obj)->otyp == TOUCHSTONE)
 
+/* helpers, simple enough to be macros */
+#define is_plural(o)	((o)->quan > 1 || \
+			 (o)->oartifact == ART_EYES_OF_THE_OVERWORLD)
+
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO	0x1
 #define BURIED_TOO	0x2

@@ -166,7 +166,8 @@ const char *verb;
 		if (((mtmp = m_at(x, y)) && mtmp->mtrapped) ||
 			(u.utrap && u.ux == x && u.uy == y)) {
 		    if (*verb)
-			pline_The("boulder %ss into the pit%s.", verb,
+			pline_The("boulder %s into the pit%s.",
+				vtense((const char *)0, verb),
 				(mtmp) ? "" : " with you");
 		    if (mtmp) {
 			if (!passes_walls(mtmp->data) &&
@@ -228,14 +229,13 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 	u.uconduct.gnostic++;
 
 	if (obj->blessed || obj->cursed) {
-		There("is %s flash as %s hit%s the altar.",
+		There("is %s flash as %s %s the altar.",
 			an(hcolor(obj->blessed ? amber : Black)),
-			doname(obj),
-			(obj->quan == 1L) ? "s" : "");
+			doname(obj), otense(obj, "hit"));
 		if (!Hallucination) obj->bknown = 1;
 	} else {
-		pline("%s land%s on the altar.", Doname2(obj),
-			(obj->quan == 1L) ? "s" : "");
+		pline("%s %s on the altar.", Doname2(obj),
+			otense(obj, "land"));
 		obj->bknown = 1;
 	}
 }
@@ -314,8 +314,8 @@ giveback:
 		    if (otmp != uball && otmp != uchain &&
 			    !obj_resists(otmp, 1, 99)) {
 			if (!Blind) {
-			    pline("Suddenly, %s vanishes from the sink!",
-							doname(otmp));
+			    pline("Suddenly, %s %s from the sink!",
+				  doname(otmp), otense(otmp, "vanish"));
 			    ideed = TRUE;
 			}
 			delobj(otmp);

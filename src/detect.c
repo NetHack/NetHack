@@ -751,33 +751,32 @@ struct obj *obj;
 {
     char ch;
     int oops;
-    const char *bname = xname(obj);
 
     if (Blind) {
-	pline("Too bad you can't see %s", the(bname));
+	pline("Too bad you can't see %s", the(xname(obj)));
 	return;
     }
     oops = (rnd(20) > ACURR(A_INT) || obj->cursed);
     if (oops && (obj->spe > 0)) {
 	switch (rnd(obj->oartifact ? 4 : 5)) {
-	case 1 : pline("%s is too much to comprehend!", The(bname));
+	case 1 : pline("%s too much to comprehend!", Tobjnam(obj, "are"));
 	    break;
-	case 2 : pline("%s confuses you!", The(bname));
+	case 2 : pline("%s you!", Tobjnam(obj, "confuse"));
 	    make_confused(HConfusion + rnd(100),FALSE);
 	    break;
 	case 3 : if (!resists_blnd(&youmonst)) {
-		pline("%s damages your vision!", The(bname));
+		pline("%s your vision!", Tobjnam(obj, "damage"));
 		make_blinded(Blinded + rnd(100),FALSE);
 		if (!Blind) Your(vision_clears);
 	    } else {
-		pline("%s assaults your vision.", The(bname));
+		pline("%s your vision.", Tobjnam(obj, "assault"));
 		You("are unaffected!");
 	    }
 	    break;
-	case 4 : pline("%s zaps your mind!", The(bname));
+	case 4 : pline("%s your mind!", Tobjnam(obj, "zap"));
 	    make_hallucinated(HHallucination + rnd(100),FALSE,0L);
 	    break;
-	case 5 : pline("%s explodes!", The(bname));
+	case 5 : pline("%s!", Tobjnam(obj, "explode"));
 	    useup(obj);
 	    losehp(rnd(30), "exploding crystal ball", KILLED_BY_AN);
 	    break;
@@ -820,7 +819,7 @@ struct obj *obj;
 	if (flags.verbose) pline(Never_mind);
 	return;
     }
-    You("peer into %s...", the(bname));
+    You("peer into %s...", the(xname(obj)));
     nomul(-rnd(10));
     nomovemsg = "";
     if (obj->spe <= 0)

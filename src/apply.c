@@ -773,7 +773,7 @@ register struct obj *obj;
 					u.ux, u.uy, NO_MINVENT)) != 0) {
 		You("summon %s!", a_monnam(mtmp));
 		if (!obj_resists(obj, 93, 100)) {
-		    pline("%s has shattered!", The(xname(obj)));
+		    pline("%s shattered!", Tobjnam(obj, "have"));
 		    useup(obj);
 		} else switch (rn2(3)) {
 			default:
@@ -809,8 +809,8 @@ register struct obj *obj;
 		wakem = TRUE;
 
 	    } else  if (invoking) {
-		pline("%s issues an unsettling shrill sound...",
-		      The(xname(obj)));
+		pline("%s an unsettling shrill sound...",
+		      Tobjnam(obj, "issue"));
 #ifdef	AMIGA
 		amii_speaker( obj, "aefeaefeaefeaefeaefe", AMII_LOUDER_VOLUME );
 #endif
@@ -858,50 +858,47 @@ STATIC_OVL void
 use_candelabrum(obj)
 register struct obj *obj;
 {
+	char *s = obj->spe != 1 ? "candles" : "candle";
+
 	if(Underwater) {
 		You("cannot make fire under water.");
 		return;
 	}
 	if(obj->lamplit) {
-		You("snuff the candle%s.", obj->spe > 1 ? "s" : "");
+		You("snuff the %s.", s);
 		end_burn(obj, TRUE);
 		return;
 	}
 	if(obj->spe <= 0) {
-		pline("This %s has no candles.", xname(obj));
+		pline("This %s has no %s.", xname(obj), s);
 		return;
 	}
 	if(u.uswallow || obj->cursed) {
 		if (!Blind)
-		    pline_The("candle%s flicker%s for a moment, then die%s.",
-			obj->spe > 1 ? "s" : "",
-			obj->spe > 1 ? "" : "s",
-			obj->spe > 1 ? "" : "s");
+		    pline_The("%s %s for a moment, then %s.",
+			      s, vtense(s, "flicker"), vtense(s, "die"));
 		return;
 	}
 	if(obj->spe < 7) {
-		There("%s only %d candle%s in %s.",
-		       obj->spe == 1 ? "is" : "are",
-		       obj->spe,
-		       obj->spe > 1 ? "s" : "",
-		       the(xname(obj)));
+		There("%s only %d %s in %s.",
+		      vtense(s, "are"), obj->spe, s, the(xname(obj)));
 		if (!Blind)
-		    pline("%s lit.  %s shines dimly.",
-		       obj->spe == 1 ? "It is" : "They are", The(xname(obj)));
+		    pline("%s lit.  %s dimly.",
+			  obj->spe == 1 ? "It is" : "They are",
+			  Tobjnam(obj, "shine"));
 	} else {
-		pline("%s's candles burn%s", The(xname(obj)),
+		pline("%s's %s burn%s", The(xname(obj)), s,
 			(Blind ? "." : " brightly!"));
 	}
 	if (!invocation_pos(u.ux, u.uy)) {
-		pline_The("candle%s being rapidly consumed!",
-			(obj->spe > 1 ? "s are" : " is"));
+		pline_The("%s %s being rapidly consumed!", s, vtense(s, "are"));
 		obj->age /= 2;
 	} else {
 		if(obj->spe == 7) {
 		    if (Blind)
-		      pline("%s radiates a strange warmth!", The(xname(obj)));
+		      pline("%s a strange warmth!", Tobjnam(obj, "radiate"));
 		    else
-		      pline("%s glows with a strange light!", The(xname(obj)));
+		      pline("%s with a strange light!", Tobjnam(obj, "glow"));
 		}
 		obj->known = 1;
 	}
@@ -913,6 +910,7 @@ use_candle(obj)
 register struct obj *obj;
 {
 	register struct obj *otmp;
+	char *s = obj->quan != 1 ? "candles" : "candle";
 	char qbuf[QBUFSZ];
 
 	if(u.uswallow) {
@@ -940,16 +938,14 @@ register struct obj *obj;
 	} else {
 		if ((long)otmp->spe + obj->quan > 7L)
 		    obj = splitobj(obj, 7L - (long)otmp->spe);
-		You("attach %ld%s candle%s to %s.",
+		You("attach %ld%s %s to %s.",
 		    obj->quan, !otmp->spe ? "" : " more",
-		    plur(obj->quan), the(xname(otmp)));
+		    s, the(xname(otmp)));
 		if (!otmp->spe || otmp->age > obj->age)
 		    otmp->age = obj->age;
 		otmp->spe += (int)obj->quan;
 		if (otmp->lamplit && !obj->lamplit)
-		    pline_The("new candle%s magically ignite%s!",
-			      plur(obj->quan),
-			      (obj->quan > 1L) ? "" : "s");
+		    pline_The("new %s magically %s!", s, vtense(s, "ignite"));
 		else if (!otmp->lamplit && obj->lamplit)
 		    pline("%s out.", (obj->quan > 1L) ? "They go" : "It goes");
 		if (obj->unpaid)
@@ -958,8 +954,8 @@ register struct obj *obj;
 			      (obj->quan > 1L) ? "them" : "it",
 			      (obj->quan > 1L) ? "them" : "it");
 		if (obj->quan < 7L && otmp->spe == 7)
-		    pline("%s now has seven%s candles attached.",
-			  The(xname(otmp)), otmp->lamplit ? " lit" : "");
+		    pline("%s now has seven%s %s attached.",
+			  The(xname(otmp)), otmp->lamplit ? " lit" : "", s);
 		/* candelabrum's light range might increase */
 		if (otmp->lamplit) obj_merge_light_sources(otmp, otmp);
 		/* candles are no longer a separate light source */
@@ -1007,7 +1003,7 @@ struct obj *obj;
 		    obj->otyp == BRASS_LANTERN || obj->otyp == POT_OIL) {
 		(void) get_obj_location(obj, &x, &y, 0);
 		if (obj->where == OBJ_MINVENT ? cansee(x,y) : !Blind)
-		    pline("%s goes out!", Yname2(obj));
+		    pline("%s %s out!", Yname2(obj), otense(obj, "go"));
 		end_burn(obj, TRUE);
 		return TRUE;
 	    }
@@ -1035,7 +1031,7 @@ struct obj *obj;
 	    if (!get_obj_location(obj, &x, &y, 0))
 		return FALSE;
 	    if (obj->where == OBJ_MINVENT ? cansee(x,y) : !Blind)
-		pline("%s catches light!", Yname2(obj));
+		pline("%s %s light!", Yname2(obj), otense(obj, "catch"));
 	    begin_burn(obj, TRUE);
 	    return TRUE;
 	}
@@ -1070,20 +1066,17 @@ struct obj *obj;
 		return;
 	}
 	if (obj->cursed && !rn2(2)) {
-		pline("%s flicker%s for a moment, then die%s.",
-		       The(xname(obj)),
-		       obj->quan > 1L ? "" : "s",
-		       obj->quan > 1L ? "" : "s");
+		pline("%s for a moment, then %s.",
+		      Tobjnam(obj, "flicker"), otense(obj, "die"));
 	} else {
 		if(obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
 				obj->otyp == BRASS_LANTERN) {
 		    check_unpaid(obj);
 		    pline("%s lamp is now on.", Shk_Your(buf, obj));
 		} else {	/* candle(s) */
-		    pline("%s flame%s burn%s%s",
+		    pline("%s flame%s %s%s",
 			s_suffix(Yname2(obj)),
-			plur(obj->quan),
-			obj->quan > 1L ? "" : "s",
+			plur(obj->quan), otense(obj, "burn"),
 			Blind ? "." : " brightly!");
 		    if (obj->unpaid && costly_spot(u.ux, u.uy) &&
 			  obj->age == 20L * (long)objects[obj->otyp].oc_cost) {
@@ -1725,7 +1718,7 @@ struct obj *obj;
 
 	if (Glib) {
 	    dropx(obj);
-	    pline("%s slips from your %s.", The(xname(obj)),
+	    pline("%s from your %s.", Tobjnam(obj, "slip"),
 		  makeplural(body_part(FINGER)));
 	    return;
 	}
@@ -1735,7 +1728,7 @@ struct obj *obj;
 			check_unpaid(obj);
 			obj->spe--;
 			dropx(obj);
-			pline("%s slips from your %s.", The(xname(obj)),
+			pline("%s from your %s.", Tobjnam(obj, "slip"),
 			      makeplural(body_part(FINGER)));
 			return;
 		}
@@ -1772,8 +1765,10 @@ struct obj *obj;
 			    makeplural(body_part(FINGER)));
 		}
 	} else {
-		pline("%s %s empty.", The(xname(obj)),
-			obj->known ? "is" : "seems to be");
+	    if (obj->known)
+		pline("%s empty.", Tobjnam(obj, "are"));
+	    else
+		pline("%s to be empty.", Tobjnam(obj, "seem"));
 	}
 	update_inventory();
 }
@@ -1837,27 +1832,27 @@ struct obj *otmp;
 	if (material == LIQUID || material == WAX ||
 		material == CLOTH || material == WOOD) {
 	    switch(material) {
-		    case LIQUID:
-			if (!obj->known)
-			    You("must think this is a wetstone, do you?");
-			else
-			    pline("%s is a little wetter now.", The(xname(otmp)));
-			break;
-		    case WAX:
-		    	color = "waxy";
-		    	goto see_streaks;	/* okay even if not touchstone */
-		    	break;
-		    case CLOTH:
-		    	pline_The("stone looks a little more polished now.");
-		    	break;
-		    case WOOD:
-		    	color = "wooden";
-		    	goto see_streaks;	/* okay even if not touchstone */
-		    	break;
+	    case LIQUID:
+		if (!obj->known)
+		    You("must think this is a wetstone, do you?");
+		else
+		    pline("%s a little wetter now.", Tobjnam(otmp, "are"));
+		break;
+	    case WAX:
+		color = "waxy";
+		goto see_streaks;	/* okay even if not touchstone */
+		break;
+	    case CLOTH:
+		pline_The("stone looks a little more polished now.");
+		break;
+	    case WOOD:
+		color = "wooden";
+		goto see_streaks;	/* okay even if not touchstone */
+		break;
 	    }
 	    return;
 	}
-	   
+
 	if (otmp->otyp != TOUCHSTONE) {
 	    pline(ambiguous);
 	    return;
