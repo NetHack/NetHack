@@ -1,4 +1,4 @@
-#       $Id$
+#       SCCS Id: @(#)Makefile.msc       3.4     $Date$
 #       Copyright (c) NetHack PC Development Team 1993-2002
 #
 #       NetHack 3.4.x Makefile for MS Visual C++ V6.x and above and MS NMAKE

@@ -1,4 +1,4 @@
-#   $Id$
+#   SCCS Id: @(#)Makefile.gcc       3.4     $Date$
 #   Copyright (c) NetHack PC Development Team 1993-2002
 #
 #   NetHack 3.4.x Makefile for MinGW

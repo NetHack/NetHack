@@ -1,4 +1,4 @@
-/*      $Id$       */
+/*      SCCS Id: @(#)mapimail.c 3.4     $Date$        */
 /* Copyright (c) Michael Allison, 1997                  */
 /* NetHack may be freely redistributed.  See license for details. */
 
