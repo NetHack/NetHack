@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)teleport.c	3.4	2002/05/31	*/
+/*	SCCS Id: @(#)teleport.c	3.4	2002/11/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -648,6 +648,14 @@ level_tele()
 	killer = 0;		/* still alive, so far... */
 
 	if (newlev < 0) {
+		if (*u.ushops0) {
+		    /* take unpaid inventory items off of shop bills */
+		    in_mklev = TRUE;	/* suppress map update */
+		    u_left_shop(u.ushops0, TRUE);
+		    /* you're now effectively out of the shop */
+		    *u.ushops0 = *u.ushops = '\0';
+		    in_mklev = FALSE;
+		}
 		if (newlev <= -10) {
 			You("arrive in heaven.");
 			verbalize("Thou art early, but we'll admit thee.");
@@ -670,8 +678,8 @@ level_tele()
 		    pline("Unfortunately, you don't know how to fly.");
 		    You("plummet a few thousand feet to your death.");
 		    Sprintf(buf,
-				"teleported out of the dungeon and fell to %s death",
-				uhis());
+			  "teleported out of the dungeon and fell to %s death",
+			    uhis());
 		    killer = buf;
 		    killer_format = NO_KILLER_PREFIX;
 		}

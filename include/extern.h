@@ -1762,7 +1762,7 @@ E void FDECL(make_happy_shk, (struct monst *,BOOLEAN_P));
 E void FDECL(hot_pursuit, (struct monst *));
 E void FDECL(make_angry_shk, (struct monst *,XCHAR_P,XCHAR_P));
 E int NDECL(dopay);
-E boolean FDECL(paybill, (BOOLEAN_P));
+E boolean FDECL(paybill, (int));
 E void NDECL(finish_paybill);
 E struct obj *FDECL(find_oid, (unsigned));
 E long FDECL(contained_cost, (struct obj *,struct monst *,long,BOOLEAN_P, BOOLEAN_P));

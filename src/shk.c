@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2002/09/28	*/
+/*	SCCS Id: @(#)shk.c	3.4	2002/11/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -51,7 +51,7 @@ STATIC_DCL long FDECL(getprice, (struct obj *,BOOLEAN_P));
 STATIC_DCL void FDECL(shk_names_obj,
 		 (struct monst *,struct obj *,const char *,long,const char *));
 STATIC_DCL struct obj *FDECL(bp_to_obj, (struct bill_x *));
-STATIC_DCL boolean FDECL(inherits, (struct monst *, int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(inherits, (struct monst *,int,int));
 STATIC_DCL void FDECL(set_repo_loc, (struct eshk *));
 STATIC_DCL boolean NDECL(angry_shk_exists);
 STATIC_DCL void FDECL(rile_shk, (struct monst *));
@@ -1572,6 +1572,9 @@ boolean croaked;
 	register boolean taken = FALSE;
 	register int numsk = 0;
 
+	/* if we escaped from the dungeon, shopkeepers can't reach us */
+	if (croaked < 0) return FALSE;
+
 	/* this is where inventory will end up if any shk takes it */
 	repo_location.x = repo_location.y = 0;
 
@@ -1602,7 +1605,7 @@ STATIC_OVL boolean
 inherits(shkp, numsk, croaked)
 struct monst *shkp;
 int numsk;
-boolean croaked;
+int croaked;
 {
 	long loss = 0L;
 #ifdef GOLDOBJ

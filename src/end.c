@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.4	2002/10/04	*/
+/*	SCCS Id: @(#)end.c	3.4	2002/11/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -690,7 +690,7 @@ die:
 
 	if (how != PANICKED) {
 	    /* these affect score and/or bones, but avoid them during panic */
-	    taken = paybill(how != QUIT);
+	    taken = paybill((how == ESCAPED) ? -1 : (how != QUIT));
 	    paygd();
 	    clearpriests();
 	} else	taken = FALSE;	/* lint; assert( !bones_ok ); */
