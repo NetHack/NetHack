@@ -800,7 +800,13 @@ void LayoutCmdWindow(HWND hWnd)
 	lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 	lgfnt.lfClipPrecision	=	CLIP_CHARACTER_PRECIS; // clipping precision
 	lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
-	lgfnt.lfPitchAndFamily	=	VARIABLE_PITCH;		 // pitch and family
+	if( iflags.wc_font_message &&
+		*iflags.wc_font_message ) {
+		lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
+		NH_A2W( iflags.wc_font_message, lgfnt.lfFaceName, LF_FACESIZE);
+	} else {
+		lgfnt.lfPitchAndFamily	= VARIABLE_PITCH;		 // pitch and family
+	}
 	data->font[NH_CMDPAD_FONT_NORMAL] = CreateFontIndirect(&lgfnt);
 
 	InvalidateRect(hWnd, NULL, TRUE);
