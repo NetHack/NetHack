@@ -412,6 +412,9 @@ int *fail_reason;
 	struct obj *item;
 	coord cc;
 	boolean historic = (Role_if(PM_ARCHEOLOGIST) && !flags.mon_moving && (statue->spe & STATUE_HISTORIC));
+	char statuename[BUFSZ];
+
+	Strcpy(statuename,the(xname(statue)));
 
 	if (statue->oxlth && statue->oattached == OATTACHED_MONST) {
 	    cc.x = x,  cc.y = y;
@@ -434,7 +437,8 @@ int *fail_reason;
 	        if (fail_reason) *fail_reason = AS_MON_IS_UNIQUE;
 	        return (struct monst *)0;
 	    }
-	    mon = makemon(mptr, x, y, NO_MINVENT);
+	    mon = makemon(mptr, x, y, (cause == ANIMATE_SPELL) ?
+			(NO_MINVENT | MM_ADJACENTOK) : NO_MINVENT);
 	}
 
 	if (!mon) {
@@ -463,12 +467,16 @@ int *fail_reason;
 	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
 	    const char *comes_to_life = nonliving(mon->data) ?
 					"moves" : "comes to life"; 
-	    pline_The("statue %s!",
-		canspotmon(mon) ? comes_to_life : "disappears");
-		if (historic) {
+	    if (cause == ANIMATE_SPELL)
+	    	pline("%s %s!", upstart(statuename),
+	    		canspotmon(mon) ? comes_to_life : "disappears");
+	    else
+		pline_The("statue %s!",
+			canspotmon(mon) ? comes_to_life : "disappears");
+	    if (historic) {
 		    You_feel("guilty that the historic statue is now gone.");
 		    adjalign(-1);
-		}
+	    }
 	} else if (cause == ANIMATE_SHATTER)
 	    pline("Instead of shattering, the statue suddenly %s!",
 		canspotmon(mon) ? "comes to life" : "disappears");
