@@ -267,6 +267,11 @@ ENDMAP
 # Dungeon Description
 RANDOM_PLACES:(02,11),(42,09)
 REGION:(00,00,44,19),unlit,"ordinary"
+# Doors
+DOOR:closed,(19,10)
+DOOR:closed,(22,08)
+DOOR:closed,(22,12)
+DOOR:closed,(25,10)
 # Stairs
 STAIR:place[0],up
 # Non diggable walls
@@ -387,6 +392,11 @@ MAP
 -------------                                  -------------
 ENDMAP
 REGION:(00,00,59,15),unlit,"ordinary"
+# Doors
+DOOR:closed,(16,07)
+DOOR:closed,(16,08)
+DOOR:closed,(43,07)
+DOOR:closed,(43,08)
 #
 STAIR: random, up
 STAIR: random, down
