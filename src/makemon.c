@@ -713,11 +713,14 @@ struct monst *mon;
 	if (mon->isgd) m2->isgd = FALSE;
 	if (mon->ispriest) m2->ispriest = FALSE;
 	m2->mxlth = 0;
-	m2->mnamelth = 0;
 	place_monster(m2, m2->mx, m2->my);
 	if (emits_light(m2->data))
 	    new_light_source(m2->mx, m2->my, emits_light(m2->data),
 			     LS_MONSTER, (genericptr_t)m2);
+	if (m2->mnamelth) {
+	    m2->mnamelth = 0; /* or it won't get allocated */
+	    m2 = christen_monst(m2, NAME(mon));
+	}
 	newsym(m2->mx,m2->my);	/* display the new monster */
 	if (mon->mtame) {
 	    struct monst *m3;
@@ -727,8 +730,10 @@ struct monst *mon;
 	     * must be made non-tame to get initialized properly.
 	     */
 	    m2->mtame = 0;
-	    if ((m3 = tamedog(m2, (struct obj *)0)) != 0)
+	    if ((m3 = tamedog(m2, (struct obj *)0)) != 0) {
 		m2 = m3;
+		*(EDOG(m2)) = *(EDOG(mon));
+	    }
 	}
 	return m2;
 }

@@ -5,6 +5,9 @@
 #define NEED_VARARGS /* Uses ... */	/* comment line for pre-compiled headers */
 #include "hack.h"
 #include "epri.h"
+#ifdef WIZARD
+#include "edog.h"
+#endif
 
 #ifdef OVLB
 
@@ -282,7 +285,10 @@ register struct monst *mtmp;
 	info[0] = 0;
 	if (mtmp->mtame) {	  Strcat(info, ", tame");
 #ifdef WIZARD
-	    if (wizard)		  Sprintf(eos(info), " (%d)", mtmp->mtame);
+	    if (wizard) {
+		Sprintf(eos(info), " (%d; hungry %ld; apport %d)",
+		    mtmp->mtame, EDOG(mtmp)->hungrytime, EDOG(mtmp)->apport);
+	    }
 #endif
 	}
 	else if (mtmp->mpeaceful) Strcat(info, ", peaceful");
