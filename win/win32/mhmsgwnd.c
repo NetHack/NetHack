@@ -201,10 +201,15 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		SCROLLINFO si;
 		char* p;
 
-		if( msg_data->append ) {
+		if( msg_data->append == 1) {
 			strncat(data->window_text[MSG_LINES-1].text, msg_data->text, 
 				    MAXWINDOWTEXT - strlen(data->window_text[MSG_LINES-1].text));
-		} else {
+		} else if( msg_data->append < 0) {
+            /* remove that many chars */
+            int len = strlen(data->window_text[MSG_LINES-1].text);
+            int newend = max(len + msg_data->append, 0);
+            data->window_text[MSG_LINES-1].text[newend] = '\0';
+        } else {
 			/* check if the string is empty */
 			for(p = data->window_text[MSG_LINES-1].text; *p && isspace(*p); p++);
 
@@ -241,11 +246,21 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		/* append an empty line to the message window (send message to itself) */
 		data.attr = ATR_NONE;
 		data.text = " ";
+		data.append = 0;
 		onMSNHCommand(hWnd, (WPARAM)MSNH_MSG_PUTSTR, (LPARAM)&data);
 
 		InvalidateRect(hWnd, NULL, TRUE);
 		break;
 	}
+    case MSNH_MSG_CARET:
+        /* Create or destroy a caret */
+        if (*(int *)lParam)
+            CreateCaret(hWnd, NULL, 0, data->yChar);
+        else
+            DestroyCaret();
+        break;
+
+
 	}
 }
 
@@ -446,12 +461,49 @@ void onPaint(HWND hWnd)
 				oldFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, data->window_text[i].attr, hdc, FALSE));
 
 #ifdef MSG_WRAP_TEXT				
+                
 				DrawText(hdc, wbuf, wlen, &draw_rt, DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
 				draw_rt.top = y - (draw_rt.bottom - draw_rt.top);
 				draw_rt.bottom = y;
 				DrawText(hdc, wbuf, wlen, &draw_rt, DT_NOPREFIX | DT_WORDBREAK);
+                
+                /* Find out the cursor (caret) position */
+                if (i == LastLine) {
+                    int nnum, numfit;
+                    SIZE size;
+                    TCHAR *nbuf;
+                    int nlen;
+
+                    nbuf = wbuf;
+                    nlen = wlen;
+                    while (nlen) {
+                        /* Get the number of characters that fit on the line */
+                        GetTextExtentExPoint(hdc, nbuf, nlen, draw_rt.right - draw_rt.left, &numfit, NULL, &size);
+                        /* Search back to a space */
+                        nnum = numfit;
+                        if (numfit < nlen) {
+                            while (nnum > 0 && nbuf[nnum] != ' ')
+                                nnum--;
+                            /* If no space found, break wherever */
+                            if (nnum == 0)
+                                nnum = numfit;
+                        }
+                        nbuf += nnum;
+                        nlen -= nnum;
+                        if (*nbuf == ' ') {
+                            nbuf++;
+                            nlen--;
+                        }
+                    }
+                    /* The last size is the size of the last line. Set the caret there.
+                       This will fail automatically if we don't own the caret (i.e.,
+                       when not in a question.)
+                     */
+                    SetCaretPos(draw_rt.left + size.cx, draw_rt.bottom - data->yChar);
+                }
 #else
 				DrawText(hdc, wbuf, wlen, &draw_rt, DT_NOPREFIX );
+                SetCaretPos(draw_rt.left + size.cx, draw_rt.bottom - data->yChar);
 #endif
 				SelectObject(hdc, oldFont);
 

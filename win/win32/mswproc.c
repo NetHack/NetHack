@@ -8,6 +8,7 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include "func_tab.h"   /* for extended commands */
 #include "winMS.h"
 #include "mhmap.h"
 #include "mhstatus.h"
@@ -68,7 +69,7 @@ struct window_procs mswin_procs = {
 	WC_FONT_MESSAGE|WC_FONT_STATUS|WC_FONT_MENU|WC_FONT_TEXT|
 	WC_FONTSIZ_MESSAGE|WC_FONTSIZ_STATUS|WC_FONTSIZ_MENU|WC_FONTSIZ_TEXT|
 	WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE|WC_VARY_MSGCOUNT|
-	WC_WINDOWCOLORS|WC_PLAYER_SELECTION|WC_SPLASH_SCREEN,
+	WC_WINDOWCOLORS|WC_PLAYER_SELECTION|WC_SPLASH_SCREEN|WC_POPUP_DIALOG,
     mswin_init_nhwindows,
     mswin_player_selection,
     mswin_askname,
@@ -153,7 +154,16 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	WIN_MAP = WIN_ERR;
 
     /* Read Windows settings from the reqistry */
+    /* First set safe defaults */
+    GetNHApp()->regMainMinX = CW_USEDEFAULT;
     mswin_read_reg();
+    /* Create the main window */
+    GetNHApp()->hMainWnd = mswin_init_main_window();
+    if (!GetNHApp()->hMainWnd)
+    {
+        panic("Cannot create main window");
+    }
+
     /* Set menu check mark for interface mode */
     mswin_menu_check_intf_mode();
 
@@ -653,7 +663,15 @@ void mswin_askname(void)
 */
 void mswin_get_nh_event(void)
 {
+	MSG msg;
+
 	logDebug("mswin_get_nh_event()\n");
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)!=0 ) {
+		if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	} 
 	return;
 }
 
@@ -931,7 +949,7 @@ void mswin_putstr(winid wid, int attr, const char *text)
 	mswin_putstr_ex(wid, attr, text, 0);
 }
 
-void mswin_putstr_ex(winid wid, int attr, const char *text, boolean app)
+void mswin_putstr_ex(winid wid, int attr, const char *text, int app)
 {
 	if( (wid >= 0) && 
         (wid < MAXWINDOWS) )
@@ -953,6 +971,8 @@ void mswin_putstr_ex(winid wid, int attr, const char *text, boolean app)
 				 GetNHApp()->windowlist[wid].win, 
 				 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_PUTSTR, (LPARAM)&data );
 		}
+        /* yield a bit so it gets done immediately */
+        mswin_get_nh_event();
 	}
 	else
 	{
@@ -1161,6 +1181,8 @@ int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 void mswin_update_inventory()
 {
 	logDebug("mswin_update_inventory()\n");
+    if (program_state.something_worth_saving) 
+        display_inventory(NULL, FALSE);
 }
 
 /*
@@ -1368,6 +1390,7 @@ char mswin_yn_function(const char *question, const char *choices,
     char yn_esc_map='\033';
     char message[BUFSZ];
 	char res_ch[2];
+    int createcaret;
 
 	logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
 
@@ -1404,11 +1427,17 @@ char mswin_yn_function(const char *question, const char *choices,
 	Strcat(message, " ");
     }
 
+    createcaret = 1;
+    SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
+        WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+
     mswin_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
     /* Only here if main window is not present */
     while (result<0) {
+        ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
 	ch=mswin_nhgetch();
+        HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
 	if (ch=='\033') {
 	    result=yn_esc_map;
 	} else if (choices && !index(choices,ch)) {
@@ -1424,6 +1453,9 @@ char mswin_yn_function(const char *question, const char *choices,
 	}
     }
 
+    createcaret = 0;
+    SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
+        WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
 	/* display selection in the message window */
 	if( isprint(ch) ) {
 		res_ch[0] = ch;
@@ -1446,10 +1478,66 @@ getlin(const char *ques, char *input)
 */
 void mswin_getlin(const char *question, char *input)
 {
+
 	logDebug("mswin_getlin(%s, %p)\n", question, input);
-	if( mswin_getlin_window(question, input, BUFSZ)==IDCANCEL ) {
-		strcpy(input, "\033");
-	}
+
+    if (!iflags.wc_popup_dialog)
+    {
+        char c;
+        int len;
+        int done;
+        int createcaret;
+
+        createcaret = 1;
+        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
+            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+
+        mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, question, 0);
+        mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, " ", 1);
+        input[0] = '\0';
+        len = 0;
+        ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
+        done = FALSE;
+        while (!done)
+        {
+            c = mswin_nhgetch();
+            switch (c)
+            {
+                case VK_ESCAPE:
+                    strcpy(input, "\033");
+                    done = TRUE;
+                    break;
+                case '\n':
+                case '\r':
+                case -115:
+                    done = TRUE;
+                    break;
+                default:
+                    if (input[0])
+                        mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, input, -len);
+                    if (c == VK_BACK) {
+                        if (len > 0) len--;
+                        input[len] = '\0';
+                    } else {
+
+                        input[len++] = c;
+                        input[len] = '\0';
+                    }
+                    mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, input, 1);
+                    break;
+            }
+        }
+        HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
+        createcaret = 0;
+        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
+            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+    }
+    else
+    {
+	    if( mswin_getlin_window(question, input, BUFSZ)==IDCANCEL ) {
+		    strcpy(input, "\033");
+	    }
+    }
 }
 
 /*
@@ -1463,10 +1551,86 @@ int mswin_get_ext_cmd()
 	int ret;
 	logDebug("mswin_get_ext_cmd()\n");
 
-	if(mswin_ext_cmd_window (&ret) == IDCANCEL)
-		return -1;
-	else 
-		return ret;
+    if (!iflags.wc_popup_dialog)
+    {
+        char c;
+        char cmd[BUFSZ];
+        int i, len;
+        int createcaret;
+
+        createcaret = 1;
+        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
+            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+
+        cmd[0] = '\0';
+        i = -2;
+        mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, "#", 0);
+        len = 0;
+        ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
+        while (i == -2)
+        {
+            int oindex, com_index;
+            c = mswin_nhgetch();
+            switch (c)
+            {
+                case VK_ESCAPE:
+                    i = -1;
+                    break;
+                case '\n':
+                case '\r':
+                case -115:
+                    for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
+                        if (!strcmpi(cmd, extcmdlist[i].ef_txt)) break;
+
+                    if (extcmdlist[i].ef_txt == (char *)0) {
+                        pline("%s: unknown extended command.", cmd);
+                        i = -1;
+                    }
+                    break;
+                default:
+                    if (cmd[0])
+                        mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, cmd, -(int)strlen(cmd));
+                    if (c == VK_BACK)
+                    {
+                        if (len > 0) len--;
+                        cmd[len] = '\0';
+                    }
+                    else
+                    {
+
+                        cmd[len++] = c;
+                        cmd[len] = '\0';
+                        /* Find a command with this prefix in extcmdlist */
+	                    com_index = -1;
+	                    for (oindex = 0; extcmdlist[oindex].ef_txt != (char *)0; oindex++) {
+		                    if (!strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
+			                    if (com_index == -1)	/* no matches yet */
+			                        com_index = oindex;
+                                else
+                                    com_index = -2;     /* two matches, don't complete */
+		                    }
+	                    }
+	                    if (com_index >= 0) {
+		                    Strcpy(cmd, extcmdlist[com_index].ef_txt);
+	                    }
+                    }
+                    mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, cmd, 1);
+                    break;
+            }
+        }
+        HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
+        createcaret = 0;
+        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
+            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+	    return i;
+    }
+    else
+    {
+    	if(mswin_ext_cmd_window (&ret) == IDCANCEL)
+	    	return -1;
+	    else 
+		    return ret;
+    }
 }
 
 
@@ -1702,9 +1866,9 @@ void mswin_main_loop()
 
 	while( !mswin_have_input() &&
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
-		if (GetNHApp()->regNetHackMode ||
-			!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg))
-		{
+ 		if (GetNHApp()->regNetHackMode ||
+ 			!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg))
+ 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -1806,10 +1970,19 @@ logDebug(const char *fmt, ...)
 
 
 /* Reading and writing settings from the registry. */
-#define CATEGORYKEY "Software"
-#define COMPANYKEY  "NetHack"
-#define PRODUCTKEY  "NetHack 3.4.0"
-#define SETTINGSKEY     "Settings"
+#define CATEGORYKEY         "Software"
+#define COMPANYKEY          "NetHack"
+#define PRODUCTKEY          "NetHack 3.4.0"
+#define SETTINGSKEY         "Settings"
+#define MAINSHOWSTATEKEY    "MainShowState"
+#define MAINMINXKEY         "MainMinX"
+#define MAINMINYKEY         "MainMinY"
+#define MAINMAXXKEY         "MainMaxX"
+#define MAINMAXYKEY         "MainMaxY"
+#define MAINLEFTKEY         "MainLeft"
+#define MAINRIGHTKEY        "MainRight"
+#define MAINTOPKEY          "MainTop"
+#define MAINBOTTOMKEY       "MainBottom"
 
 /* #define all the subkeys here */
 #define INTFKEY "Interface"
@@ -1833,10 +2006,19 @@ mswin_read_reg()
             != ERROR_SUCCESS)
         return;
 
-    /* Read the keys here. */
     size = sizeof(DWORD);
-    RegQueryValueEx(key, INTFKEY, 0, NULL, 
-        (unsigned char *)(&(GetNHApp()->regNetHackMode)), &size);
+    /* Read the keys here. */
+    RegQueryValueEx(key, INTFKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regNetHackMode)), &size);
+    /* Main window placement */
+    RegQueryValueEx(key, MAINSHOWSTATEKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainShowState)), &size);
+    RegQueryValueEx(key, MAINMINXKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainMinX)), &size);
+    RegQueryValueEx(key, MAINMINYKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainMinY)), &size);
+    RegQueryValueEx(key, MAINMAXXKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainMaxX)), &size);
+    RegQueryValueEx(key, MAINMAXYKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainMaxY)), &size);
+    RegQueryValueEx(key, MAINLEFTKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainLeft)), &size);
+    RegQueryValueEx(key, MAINRIGHTKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainRight)), &size);
+    RegQueryValueEx(key, MAINTOPKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainTop)), &size);
+    RegQueryValueEx(key, MAINBOTTOMKEY, 0, NULL, (unsigned char *)(&(GetNHApp()->regMainBottom)), &size);
     
     RegCloseKey(key);
 }
@@ -1862,6 +2044,16 @@ mswin_write_reg()
 
         /* Write the keys here */
         RegSetValueEx(key, INTFKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regNetHackMode)), sizeof(DWORD));
+        /* Main window placement */
+        RegSetValueEx(key, MAINSHOWSTATEKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainShowState)), sizeof(DWORD));
+        RegSetValueEx(key, MAINMINXKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainMinX)), sizeof(DWORD));
+        RegSetValueEx(key, MAINMINYKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainMinY)), sizeof(DWORD));
+        RegSetValueEx(key, MAINMAXXKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainMaxX)), sizeof(DWORD));
+        RegSetValueEx(key, MAINMAXYKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainMaxY)), sizeof(DWORD));
+        RegSetValueEx(key, MAINLEFTKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainLeft)), sizeof(DWORD));
+        RegSetValueEx(key, MAINRIGHTKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainRight)), sizeof(DWORD));
+        RegSetValueEx(key, MAINTOPKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainTop)), sizeof(DWORD));
+        RegSetValueEx(key, MAINBOTTOMKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regMainBottom)), sizeof(DWORD));
 
         RegCloseKey(key);
     }
@@ -1952,24 +2144,24 @@ typedef struct ctbv
 static color_table_brush_value color_table_brush[] = {
 	{ "activeborder", 	COLOR_ACTIVEBORDER	},
 	{ "activecaption",	COLOR_ACTIVECAPTION	},
-	{ "appworkspace",	COLOR_APPWORKSPACE	},
-	{ "background",		COLOR_BACKGROUND	},
+	{ "appworkspace",		COLOR_APPWORKSPACE	},
+	{ "background",		COLOR_BACKGROUND		},
 	{ "btnface",		COLOR_BTNFACE		},
 	{ "btnshadow",		COLOR_BTNSHADOW		},
 	{ "btntext", 		COLOR_BTNTEXT		},
-	{ "captiontext",	COLOR_CAPTIONTEXT	},
+	{ "captiontext",		COLOR_CAPTIONTEXT		},
 	{ "graytext",		COLOR_GRAYTEXT		},
 	{ "greytext",		COLOR_GRAYTEXT 		},
-	{ "highlight",		COLOR_HIGHLIGHT 	},
+	{ "highlight",		COLOR_HIGHLIGHT 		},
 	{ "highlighttext",	COLOR_HIGHLIGHTTEXT	},
 	{ "inactiveborder", 	COLOR_INACTIVEBORDER 	},
 	{ "inactivecaption",	COLOR_INACTIVECAPTION 	},
-	{ "menu",		COLOR_MENU 		},
+	{ "menu",			COLOR_MENU 			},
 	{ "menutext",		COLOR_MENUTEXT 		},
-	{ "scrollbar",		COLOR_SCROLLBAR 	},
-	{ "window",		COLOR_WINDOW 		},
-	{ "windowframe", 	COLOR_WINDOWFRAME 	},
-	{ "windowtext",		COLOR_WINDOWTEXT 	},
+	{ "scrollbar",		COLOR_SCROLLBAR 		},
+	{ "window",			COLOR_WINDOW 		},
+	{ "windowframe", 		COLOR_WINDOWFRAME 	},
+	{ "windowtext",		COLOR_WINDOWTEXT 		},
 	{ "", 			-1				},
 };
 

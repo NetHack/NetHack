@@ -30,6 +30,7 @@ static int		mapmode2menuid(int map_mode);
 HWND mswin_init_main_window () {
 	static int run_once = 0;
 	HWND ret;
+    WINDOWPLACEMENT wp;
 
 	/* register window class */
 	if( !run_once ) {
@@ -54,6 +55,28 @@ HWND mswin_init_main_window () {
 		);
 
 	if( !ret ) panic("Cannot create main window");
+
+    
+    if (GetNHApp()->regMainMinX != CW_USEDEFAULT)
+    {
+        wp.length = sizeof(wp);
+        wp.showCmd = GetNHApp()->regMainShowState;
+
+        wp.ptMinPosition.x = GetNHApp()->regMainMinX;
+        wp.ptMinPosition.y = GetNHApp()->regMainMinY;
+
+        wp.ptMaxPosition.x = GetNHApp()->regMainMaxX;
+        wp.ptMaxPosition.y = GetNHApp()->regMainMaxY;
+
+        wp.rcNormalPosition.left = GetNHApp()->regMainLeft;
+        wp.rcNormalPosition.top = GetNHApp()->regMainTop;
+        wp.rcNormalPosition.right = GetNHApp()->regMainRight;
+        wp.rcNormalPosition.bottom = GetNHApp()->regMainBottom;
+        SetWindowPlacement(ret, &wp);
+    }
+    else
+        ShowWindow(ret, SW_SHOWDEFAULT);
+    UpdateWindow(ret);
 
 	return ret;
 }
@@ -406,9 +429,28 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		case WM_MOVE:
 		case WM_SIZE:
-			mswin_layout_main_window(NULL);
-			break;
+        {
+            WINDOWPLACEMENT wp;
 
+			mswin_layout_main_window(NULL);
+            
+            wp.length = sizeof(wp);
+            if (GetWindowPlacement(hWnd, &wp)) {
+                GetNHApp()->regMainShowState = wp.showCmd;
+
+                GetNHApp()->regMainMinX = wp.ptMinPosition.x;
+                GetNHApp()->regMainMinY = wp.ptMinPosition.y;
+
+                GetNHApp()->regMainMaxX = wp.ptMaxPosition.x;
+                GetNHApp()->regMainMaxY = wp.ptMaxPosition.y;
+
+                GetNHApp()->regMainLeft = wp.rcNormalPosition.left;
+                GetNHApp()->regMainTop = wp.rcNormalPosition.top;
+                GetNHApp()->regMainRight = wp.rcNormalPosition.right;
+                GetNHApp()->regMainBottom = wp.rcNormalPosition.bottom;
+            }
+			break;
+        }
 		case WM_SETFOCUS:
 			/* if there is a menu window out there -
 			   transfer input focus to it */

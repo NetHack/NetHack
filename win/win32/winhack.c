@@ -67,8 +67,6 @@ NHWinApp _nethack_app;
 #endif
 
 // Foward declarations of functions included in this code module:
-BOOL				InitInstance(HINSTANCE, int);
-
 extern void FDECL(pcmain, (int,char **));
 static void __cdecl mswin_moveloop(void *);
 
@@ -140,12 +138,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	InitCtrls.dwICC = ICC_LISTVIEW_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 	
-	// Perform application initialization:
-	if (!InitInstance (hInstance, nCmdShow)) 
-	{
-		return FALSE;
-	}
-
 	/* get command line parameters */	
 	p = _get_cmd_arg(GetCommandLine());
 	p = _get_cmd_arg(NULL); /* skip first paramter - command name */
@@ -168,33 +160,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	return 0;
 }
 
-
-//
-//   FUNCTION: InitInstance(HANDLE, int)
-//
-//   PURPOSE: Creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we create and display the main program window.
-//
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
-   HWND hWnd;
-
-   hWnd = mswin_init_main_window();
-   if (!hWnd)
-   {
-      return FALSE;
-   }
-
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-   _nethack_app.hMainWnd = hWnd;
-
-   return TRUE;
-}
 
 PNHWinApp GetNHApp()
 {
