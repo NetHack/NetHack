@@ -1426,6 +1426,7 @@ bhito(obj, otmp)
 struct obj *obj, *otmp;
 {
 	int res = 1;	/* affected object by default */
+	xchar refresh_x, refresh_y;
 
 	if (obj->bypass) {
 		/* The bypass bit is currently only used as follows:
@@ -1581,6 +1582,7 @@ struct obj *obj, *otmp;
 		res = 0;
 		break;
 	case SPE_STONE_TO_FLESH:
+		refresh_x = obj->ox; refresh_y = obj->oy;
 		if (objects[obj->otyp].oc_material != MINERAL &&
 			objects[obj->otyp].oc_material != GEMSTONE) {
 		    res = 0;
@@ -1598,6 +1600,7 @@ struct obj *obj, *otmp;
 			    xchar oox, ooy;
 
 			    (void) get_obj_location(obj, &oox, &ooy, 0);
+			    refresh_x = oox; refresh_y = ooy;
 			    if (!animate_statue(obj, oox, ooy,
 						ANIMATE_SPELL, (int *)0)) {
 				struct obj *item;
@@ -1612,7 +1615,7 @@ makecorpse:			if (mons[obj->corpsenm].geno &
 				 */
 				while ((item = obj->cobj) != 0) {
 				    obj_extract_self(item);
-				    place_object(item, obj->ox, obj->oy);
+				    place_object(item, oox, ooy);
 				}
 				obj = poly_obj(obj, CORPSE);
 				break;
@@ -1632,6 +1635,7 @@ makecorpse:			if (mons[obj->corpsenm].geno &
 			    break;
 			}
 			(void) get_obj_location(obj, &oox, &ooy, 0);
+			refresh_x = oox; refresh_y = ooy;
 			mon = makemon(&mons[obj->corpsenm],
 				      oox, ooy, NO_MM_FLAGS);
 			if (mon) {
@@ -1662,7 +1666,7 @@ smell:
 			res = 0;
 			break;
 		}
-		newsym(obj->ox,obj->oy);
+		newsym(refresh_x, refresh_y);
 		break;
 	default:
 		impossible("What an interesting effect (%d)", otmp->otyp);
