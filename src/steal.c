@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.4	2002/03/29	*/
+/*	SCCS Id: @(#)steal.c	3.4	2002/09/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -554,6 +554,14 @@ boolean is_pet;		/* If true, pet should keep wielded/worn items */
 			    costly_spot(mtmp->mx, mtmp->my))
 				otmp->no_charge = 1;
 #endif
+			if (otmp->owornmask) {
+			    /* don't want map updates if invisibility
+			       toggles or messages if speed changes */
+			    in_mklev = TRUE;
+			    update_mon_intrinsics(mtmp, otmp, FALSE);
+			    in_mklev = FALSE;
+			}
+		     /* obj_no_longer_held(otmp); -- done by place_object */
 			if (otmp->owornmask & W_WEP)
 			    setmnotwielded(mtmp, otmp);
 			otmp->owornmask = 0L;

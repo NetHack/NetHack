@@ -1540,7 +1540,7 @@ void
 monstone(mdef)
 register struct monst *mdef;
 {
-	struct obj *otmp, *obj;
+	struct obj *otmp, *obj, *oldminvent;
 	xchar x = mdef->mx, y = mdef->my;
 	boolean wasinside = FALSE;
 
@@ -1555,12 +1555,17 @@ register struct monst *mdef;
 
 	if ((int)mdef->data->msize > MZ_TINY ||
 		    !rn2(2 + ((int) (mdef->data->geno & G_FREQ) > 2))) {
-		otmp = mkcorpstat(STATUE, KEEPTRAITS(mdef) ? mdef : 0,
-				  mdef->data, x, y, FALSE);
-		if (mdef->mnamelth) otmp = oname(otmp, NAME(mdef));
+		oldminvent = 0;
 		/* some objects may end up outside the statue */
 		while ((obj = mdef->minvent) != 0) {
 		    obj_extract_self(obj);
+		    if (obj->owornmask) {
+			/* don't want map updates if invisibility
+			   toggles or messages if speed changes */
+			in_mklev = TRUE;
+			update_mon_intrinsics(mdef, obj, FALSE);
+			in_mklev = FALSE;
+		    }
 		    obj_no_longer_held(obj);
 		    if (obj->owornmask & W_WEP)
 			setmnotwielded(mdef,obj);
@@ -1574,8 +1579,19 @@ register struct monst *mdef;
 			place_object(obj, x, y);
 		    } else {
 			if (obj->lamplit) end_burn(obj, TRUE);
-			(void) add_to_container(otmp, obj);
+			obj->nobj = oldminvent;
+			oldminvent = obj;
 		    }
+		}
+		/* defer statue creation until after inventory removal
+		   so that saved monster traits won't retain any stale
+		   item-conferred attributes */
+		otmp = mkcorpstat(STATUE, KEEPTRAITS(mdef) ? mdef : 0,
+				  mdef->data, x, y, FALSE);
+		if (mdef->mnamelth) otmp = oname(otmp, NAME(mdef));
+		while ((obj = oldminvent) != 0) {
+		    oldminvent = obj->nobj;
+		    (void) add_to_container(otmp, obj);
 		}
 #ifndef GOLDOBJ
 		if (mdef->mgold) {
