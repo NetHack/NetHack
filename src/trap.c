@@ -417,13 +417,17 @@ int *fail_reason;
 	    if (mon && mon->mtame && !mon->isminion)
 		wary_dog(mon, TRUE);
 	} else {
+	    /* statue of Stone golem hit with Stone-to-flesh becomes flesh golem */
+	    if (statue->corpsenm == PM_STONE_GOLEM && cause == ANIMATE_SPELL)
+	    	mptr = &mons[PM_FLESH_GOLEM];
+	    else
+		mptr = &mons[statue->corpsenm];
 	    /*
 	     * Guard against someone wishing for a statue of a unique monster
 	     * (which is allowed in normal play) and then tossing it onto the
 	     * [detected or guessed] location of a statue trap.  Normally the
 	     * uppermost statue is the one which would be activated.
 	     */
-	    mptr = &mons[statue->corpsenm];
 	    if (mptr->geno & G_UNIQ) {
 	        if (fail_reason) *fail_reason = AS_MON_IS_UNIQUE;
 	        return (struct monst *)0;
