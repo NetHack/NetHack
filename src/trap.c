@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/11/26	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/12/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -578,6 +578,9 @@ unsigned trflags;
 	boolean webmsgok = (!(trflags & NOWEBMSG));
 	boolean forcebungle = (trflags & FORCEBUNGLE);
 	boolean plunged = (trflags & TOOKPLUNGE);
+#ifdef STEED
+	int steed_article = ARTICLE_THE;
+#endif
 
 	nomul(0);
 
@@ -617,7 +620,13 @@ unsigned trflags;
 	}
 
 #ifdef STEED
-	if (u.usteed) u.usteed->mtrapseen |= (1 << (ttype-1));
+	if (u.usteed) {
+	    u.usteed->mtrapseen |= (1 << (ttype - 1));
+	    /* suppress article in various steed messages when using its
+	       name (which won't occur when hallucinating) */
+	    if (u.usteed->mnamelth && !Hallucination)
+		steed_article = ARTICLE_NONE;
+	}
 #endif
 
 	switch(ttype) {
@@ -866,16 +875,14 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		    char verbbuf[BUFSZ];
 #ifdef STEED
 		    if (u.usteed) {
-		    	if ((trflags & RECURSIVETRAP) != 0)
+			if ((trflags & RECURSIVETRAP) != 0)
 			    Sprintf(verbbuf, "and %s fall",
-				x_monnam(u.usteed,
-				    u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				    (char *)0, SUPPRESS_SADDLE, FALSE));
+				  x_monnam(u.usteed, steed_article,
+					   (char *)0, SUPPRESS_SADDLE, FALSE));
 			else
-			    Sprintf(verbbuf,"lead %s",
-				x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 "poor", SUPPRESS_SADDLE, FALSE));
+			    Sprintf(verbbuf, "lead %s",
+				  x_monnam(u.usteed, steed_article,
+					   "poor", SUPPRESS_SADDLE, FALSE));
 		    } else
 #endif
 		    Strcpy(verbbuf, plunged ? "plunge" : "fall");
@@ -894,9 +901,8 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 #ifdef STEED
 		    if (u.usteed) {
 			pline("%s lands %s!",
-				upstart(x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-					 "poor", SUPPRESS_SADDLE, FALSE)),
+			      upstart(x_monnam(u.usteed, steed_article,
+					       "poor", SUPPRESS_SADDLE, FALSE)),
 			      predicament);
 		    } else
 #endif
@@ -980,18 +986,17 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		}
 		if (webmsgok) {
 		    char verbbuf[BUFSZ];
-		    verbbuf[0] = '\0';
+
 #ifdef STEED
 		    if (u.usteed)
-		   	Sprintf(verbbuf,"lead %s",
-				x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 "poor", SUPPRESS_SADDLE, FALSE));
+			Sprintf(verbbuf, "lead %s",
+				x_monnam(u.usteed, steed_article,
+					 "poor", SUPPRESS_SADDLE, FALSE));
 		    else
 #endif
 			
 		    Sprintf(verbbuf, "%s", Levitation ? (const char *)"float" :
-		      		locomotion(youmonst.data, "stumble"));
+				locomotion(youmonst.data, "stumble"));
 		    You("%s into %s spider web!",
 			verbbuf, a_your[trap->madeby_u]);
 		}
@@ -1077,9 +1082,8 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 #ifdef STEED
 		if (u.usteed)
 			Sprintf(verbbuf, "lead %s",
-				x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE));
+				x_monnam(u.usteed, steed_article,
+					 (char *)0, SUPPRESS_SADDLE, FALSE));
 		else
 #endif
 		 Sprintf(verbbuf,"%s",
@@ -1185,89 +1189,77 @@ steedintrap(trap, otmp)
 struct trap *trap;
 struct obj *otmp;
 {
-	struct monst *mtmp = u.usteed;
-	struct permonst *mptr;
+	struct monst *steed = u.usteed;
 	int tt;
-	boolean in_sight;
-	boolean trapkilled = FALSE;
-	boolean steedhit = FALSE;
+	boolean in_sight, trapkilled, steedhit;
 
-	if (!u.usteed || !trap) return 0;
-	mptr = mtmp->data;
+	if (!steed || !trap) return 0;
 	tt = trap->ttyp;
-	mtmp->mx = u.ux;
-	mtmp->my = u.uy;
-
+	steed->mx = u.ux;
+	steed->my = u.uy;
 	in_sight = !Blind;
+	trapkilled = steedhit = FALSE;
+
 	switch (tt) {
-		case ARROW_TRAP:
-			if(!otmp) {
-				impossible("steed hit by non-existant arrow?");
-				return 0;
-			}
-			if (thitm(8, mtmp, otmp, 0, FALSE)) trapkilled = TRUE;
-			steedhit = TRUE;
-			break;
-		case DART_TRAP:
-			if(!otmp) {
-				impossible("steed hit by non-existant dart?");
-				return 0;
-			}
-			if (thitm(7, mtmp, otmp, 0, FALSE)) trapkilled = TRUE;
-			steedhit = TRUE;
-			break;
-		case SLP_GAS_TRAP:
-		    if (!resists_sleep(mtmp) && !breathless(mptr) &&
-				!mtmp->msleeping && mtmp->mcanmove) {
-			    mtmp->mcanmove = 0;
-			    mtmp->mfrozen = rnd(25);
-			    if (in_sight) {
-				pline("%s suddenly falls asleep!",
-				      Monnam(mtmp));
-			    }
-			}
-			steedhit = TRUE;
-			break;
-		case LANDMINE:
-			if (thitm(0, mtmp, (struct obj *)0, rnd(16), FALSE))
-			    trapkilled = TRUE;
-			steedhit = TRUE;
-			break;
-		case PIT:
-		case SPIKED_PIT:
-			if (mtmp->mhp <= 0 ||
-				thitm(0, mtmp, (struct obj *)0,
-				      rnd((tt == PIT) ? 6 : 10), FALSE))
-			    trapkilled = TRUE;
-			steedhit = TRUE;
-			break;
-		case POLY_TRAP: 
-		    if (!resists_magm(mtmp)) {
-			if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-			(void) newcham(mtmp, (struct permonst *)0,
-				       FALSE, FALSE);
-			if (!can_saddle(mtmp) || !can_ride(mtmp)) {
-				dismount_steed(DISMOUNT_POLY);
-			} else {
-				You("have to adjust yourself in the saddle on %s.",
-					x_monnam(mtmp,
-					 mtmp->mnamelth ? ARTICLE_NONE : ARTICLE_A,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE));
-			}
-				
-		    }
-		    steedhit = TRUE;
-		    break;
-		default:
-			return 0;
+	case ARROW_TRAP:
+	    if (!otmp) {
+		impossible("steed hit by non-existant arrow?");
+		return 0;
 	    }
+	    trapkilled = thitm(8, steed, otmp, 0, FALSE);
+	    steedhit = TRUE;
+	    break;
+	case DART_TRAP:
+	    if (!otmp) {
+		impossible("steed hit by non-existant dart?");
+		return 0;
+	    }
+	    trapkilled = thitm(7, steed, otmp, 0, FALSE);
+	    steedhit = TRUE;
+	    break;
+	case SLP_GAS_TRAP:
+	    if (!resists_sleep(steed) && !breathless(steed->data) &&
+		    !steed->msleeping && steed->mcanmove) {
+		steed->mcanmove = 0;
+		steed->mfrozen = rnd(25);
+		if (in_sight)
+		    pline("%s suddenly falls asleep!", Monnam(steed));
+	    }
+	    steedhit = TRUE;
+	    break;
+	case LANDMINE:
+	    trapkilled = thitm(0, steed, (struct obj *)0, rnd(16), FALSE);
+	    steedhit = TRUE;
+	    break;
+	case PIT:
+	case SPIKED_PIT:
+	    trapkilled = (steed->mhp <= 0 ||
+			  thitm(0, steed, (struct obj *)0,
+				rnd((tt == PIT) ? 6 : 10), FALSE));
+	    steedhit = TRUE;
+	    break;
+	case POLY_TRAP: 
+	    if (!resists_magm(steed) &&
+		    !resist(steed, WAND_CLASS, 0, NOTELL)) {
+		(void) newcham(steed, (struct permonst *)0, FALSE, FALSE);
+		if (!can_saddle(steed) || !can_ride(steed))
+		    dismount_steed(DISMOUNT_POLY);
+		else
+		    You("have to adjust yourself in the saddle on %s.",
+			x_monnam(steed, ARTICLE_A,
+				 (char *)0, SUPPRESS_SADDLE, FALSE));
+	    }
+	    steedhit = TRUE;
+	    break;
+	default:
+	    break;
 	}
-	if(trapkilled) {
-		dismount_steed(DISMOUNT_POLY);
-		return 2;
+
+	if (trapkilled) {
+	    dismount_steed(DISMOUNT_POLY);
+	    return 2;
 	}
-	else if(steedhit) return 1;
-	else return 0;
+	return steedhit ? 1 : 0;
 }
 #endif /*STEED*/
 
