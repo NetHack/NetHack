@@ -457,7 +457,7 @@ boolean allow_drag;
 			    /* Avoid pathological case *if* not teleporting:
 			     *    0			     0
 			     *   _X  move east       ----->  X_
-			     *    @			     @
+			     *    @			      @
 			     */
 			    if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 4 &&
 				  dist2(x, y, tempx, tempy) == 2)
