@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)region.h	3.4	1996/06/17	*/
+/*	SCCS Id: @(#)region.h	3.4	2002/10/15	*/
 /* Copyright (c) 1996 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,6 +8,27 @@
 /* generic callback function */
 
 typedef boolean FDECL((*callback_proc), (genericptr_t, genericptr_t));
+
+/*
+ * Overload the old player_inside field with two values, coded in such
+ * a way as to retain compatibility with 3.4.0 save and bones files;
+ * this relies on the fact that nethack's `boolean' is really stored
+ * in a `char' (or bigger type) rather than in a single bit.
+ *
+ * 3.4.1 save and bones files will be correct.
+ * 3.4.0 save files restored under 3.4.1 will be correct.
+ * 3.4.0 bones files used with 3.4.1 will continue to have the minor
+ *	 3.4.0 bug of falsely claiming that the current game's hero is
+ *	 responsible for the dead former hero's stinking clouds.
+ */
+#define REG_HERO_INSIDE	1
+#define REG_NOT_HEROS	2
+#define hero_inside(r)	((unsigned)(r)->player_flags & REG_HERO_INSIDE)
+#define heros_fault(r)	(!((unsigned)(r)->player_flags & REG_NOT_HEROS))
+#define set_hero_inside(r)	((r)->player_flags |= REG_HERO_INSIDE)
+#define clear_hero_inside(r)	((r)->player_flags &= ~REG_HERO_INSIDE)
+#define set_heros_fault(r)	((r)->player_flags &= ~REG_NOT_HEROS)
+#define clear_heros_fault(r)	((r)->player_flags |= REG_NOT_HEROS)
 
 typedef struct {
   NhRect bounding_box;		/* Bounding box of the region */
@@ -28,7 +49,7 @@ typedef struct {
   short leave_f;		/* Function to call when the player leaves */
   short inside_f;		/* Function to call every turn if player's
 				   inside */
-  boolean player_inside;	/* Is the player inside this region */
+  boolean player_flags;	/* (see above) */
   unsigned int* monsters;	/* Monsters currently inside this region */
   short n_monst;		/* Number of monsters inside this region */
   short max_monst;		/* Maximum number of monsters that can be
