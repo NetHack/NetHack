@@ -875,9 +875,13 @@ not_special:
 	}
       }
 
+	/* don't tunnel if needspick and wielding a non-pick that is known
+	 * cursed or hostile and close enough to prefer a weapon */
 	if (can_tunnel && needspick(ptr) &&
-		(mw_tmp = MON_WEP(mtmp)) != 0 && !is_pick(mw_tmp) &&
-		mw_tmp->cursed && mtmp->weapon_check == NO_WEAPON_WANTED)
+	    (mw_tmp = MON_WEP(mtmp)) != 0 && !is_pick(mw_tmp) &&
+	    ((mw_tmp->cursed && mtmp->weapon_check == NO_WEAPON_WANTED) ||
+	     ((!mtmp->mpeaceful || Conflict) &&
+	      dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 8)))
 	    can_tunnel = FALSE;
 
 	nix = omx;
