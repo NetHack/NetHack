@@ -1499,7 +1499,8 @@ do_class_genocide()
 			    return;
 			} else
 #endif
-	pline("That symbol does not represent any monster.");
+			    pline("That %s does not represent any monster.",
+				  strlen(buf) == 1 ? "symbol" : "response");
 			continue;
 		}
 
