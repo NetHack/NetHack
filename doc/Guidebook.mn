@@ -4,7 +4,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 10, 2002
+.ds f2 "March 12, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2093,6 +2093,8 @@ with tiles, generally displays a heart symbol near pets.
 NetHack should use a large font.
 .lp map_mode	
 NetHack should display the map in the manner specified.
+.lp player_selection
+NetHack should pop up dialog boxes, or use prompts for character selection.
 .lp popup_dialog	
 NetHack should pop up dialog boxes for input.
 .lp preload_tiles
@@ -2104,6 +2106,8 @@ Cannot be set with the `O' command.
 .lp scroll_margin	
 NetHack should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
+.lp splash_screen
+NetHack should display an opening splash screen when it starts up (default yes).
 .lp tiled_map	
 NetHack should display a tiled map if it can.
 .lp tile_file

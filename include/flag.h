@@ -245,6 +245,8 @@ struct instance_flags {
 						the edge */
 	int	wc_map_mode;		/* specify map viewing options, mostly
 						for backward compatibility */
+	int	wc_player_selection;	/* method of choosing character */
+	boolean	wc_splash_screen;	/* display an opening splash screen or not */
 	boolean	wc_popup_dialog;	/* put queries in pop up dialogs instead of
 				   		in the message window */
 	boolean wc_large_font;		/* draw in larger fonts (say, 12pt instead

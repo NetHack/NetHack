@@ -13,38 +13,6 @@
 # for tty window-port.
 OPTIONS=IBMGraphics
 
-# Set some options to control graphical window-port (these will
-# be safely and silently ignored by the tty port)
-#
-# Map window settings
-# possible map_mode options include: tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|
-#                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
-#                                    ascii10x18|fit_to_screen
-OPTIONS=map_mode:tiles,scroll_margin:5
-
-#
-# Message window settings
-OPTIONS=font_message:Arial,font_size_message:9,align_message:top
-
-#
-# Menu settings
-OPTIONS=font_menu:Arial,font_size_menu:9
-
-#
-# Text settings
-OPTIONS=font_text:Courier New,font_size_text:9
-
-#
-# Status window settings
-OPTIONS=font_status:Courier New,font_size_status:10
-
-#
-# Other
-OPTIONS=hilite_pet
-
-# Top Ten Window.  Highly Recommended.
-OPTIONS=toptenwin
-
 # *** Personal Preferences ***
 # Some options to set personal preferences.  Uncomment and change these to
 # suit your personal preference.  If several people are to use the same
@@ -68,12 +36,40 @@ OPTIONS=time,noshowexp,number_pad,lit_corridor,rest_on_space
 # If you want to get rid of "use #quit to quit..." use:
 #OPTIONS=suppress_alert:3.3.1
 #
+# Set some options to control graphical window-port (these will
+# be safely and silently ignored by the tty port)
+#
+# Map window settings
+# possible map_mode options include: tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|
+#                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
+#                                    ascii10x18|fit_to_screen
+OPTIONS=map_mode:tiles,scroll_margin:5
+
+# Message window settings
+OPTIONS=font_message:Arial,font_size_message:9,align_message:top
+
+# Menu settings
+OPTIONS=font_menu:Arial,font_size_menu:9
+
+# Text settings
+OPTIONS=font_text:Courier New,font_size_text:9
+
+# Status window settings
+OPTIONS=font_status:Courier New,font_size_status:10
+
+# Other
+OPTIONS=hilite_pet
+#OPTIONS=!splash_screen,player_selection:prompts
+
+# Top Ten Window.  Highly Recommended.
+#OPTIONS=toptenwin
 
 #
 #HACKDIR=c:\games\nethack
 # 
-# Note: Under MSDOS ports HACKDIR defaults to the location 
-#       of the NetHack.exe file. Setting HACKDIR above will override that.
+# Note: On Windows HACKDIR defaults to the location 
+#       of the NetHack.exe or NetHackw.exe file. 
+#       Setting HACKDIR above will override that.
 #
 #   LEVELS and SAVE default to HACKDIR
 #

@@ -167,6 +167,7 @@ static struct Bool_Opt
 	{"sound", &flags.soundok, TRUE, SET_IN_GAME},
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
 	{"standout", &flags.standout, FALSE, SET_IN_GAME},
+	{"splash_screen",     &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/
 	{"tiled_map",     &iflags.wc_tiled_map, FALSE, DISP_IN_GAME},	/*WC*/
 	{"time", &flags.time, FALSE, SET_IN_GAME},
 #ifdef TIMED_DELAY
@@ -272,6 +273,8 @@ static struct Comp_Opt
 						20, SET_IN_GAME },
 	{ "pickup_types", "types of objects to pick up automatically",
 						MAXOCLASSES, SET_IN_GAME },
+	{ "player_selection", "choose character via dialog or prompts",
+						12, DISP_IN_GAME },
 	{ "race",     "your starting race (e.g., Human, Elf)",
 						PL_CSIZ, DISP_IN_GAME },
 	{ "role",     "your starting role (e.g., Barbarian, Valkyrie)",
@@ -1570,6 +1573,21 @@ goodfruit:
 		}
 		return;
 	}
+	/* WINCAP
+	 * player_selection: dialog | prompts */
+	fullname = "player_selection";
+	if (match_optname(opts, fullname, sizeof("player_selection")-1, TRUE)) {
+		op = string_for_opt(opts, negated);
+		if (op && !negated) {
+		    if (!strncmpi (op, "dialog", sizeof("dialog")-1))
+			iflags.wc_player_selection = VIA_DIALOG;
+		    else if (!strncmpi (op, "prompt", sizeof("prompt")-1))
+			iflags.wc_player_selection = VIA_PROMPTS;
+		    else
+		    	badoption(opts);
+		} else if (negated) bad_negation(fullname, TRUE);
+		return;
+	}
 
 	/* things to disclose at end of game */
 	if (match_optname(opts, "disclose", 7, TRUE)) {
@@ -2606,6 +2624,8 @@ char *buf;
 		if (iflags.wc_scroll_margin) Sprintf(buf, "%d",iflags.wc_scroll_margin);
 		else Strcpy(buf, defopt);
 	}
+	else if (!strcmp(optname, "player_selection"))
+		Sprintf(buf, "%s", iflags.wc_player_selection ? "prompts" : "dialog");
 #ifdef MSDOS
 	else if (!strcmp(optname, "soundcard"))
 		Sprintf(buf, "%s", to_be_done);

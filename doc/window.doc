@@ -478,9 +478,11 @@ to support:
   |  hilite_pet        | WC_HILITE_PET      | wc_hilite_pet      |boolean |
   |  large_font        | WC_LARGE_FONT      | wc_large_font      |boolean |
   |  map_mode          | WC_MAP_MODE        | wc_map_mode        |int     |
+  |  player_selection  | WC_PLAYER_SELECTION| wc_player_selection|int     |
   |  popup_dialog      | WC_POPUP_DIALOG    | wc_popup_dialog    |boolean |
   |  preload_tiles     | WC_PRELOAD_TILES   | wc_preload_tiles   |boolean |
   |  scroll_margin     | WC_SCROLL_MARGIN   | wc_scroll_margin   |int     |
+  |  splash_screen     | WC_SPLASH_SCREEN   | wc_splash_screen   |boolean |
   |  tiled_map         | WC_TILED_MAP       | wc_tiled_map       |boolean |
   |  tile_width        | WC_TILE_WIDTH      | wc_tile_width      |int     |
   |  tile_height       | WC_TILE_HEIGHT     | wc_tile_height     |int     |
@@ -516,10 +518,13 @@ font_text	-- port should use a font by this name for text windows.
 hilite_pet	-- port should mark pets in some special way on the map.
 large_font	-- port should use a large font.
 map_mode	-- port should display the map in the manner specified.
+player_selection
+		-- dialog or prompts for choosing character.
 popup_dialog	-- port should pop up dialog boxes for input.
 preload_tiles	-- port should preload tiles into memory.
 scroll_margin	-- port should scroll the display when the hero or cursor
 		   is this number of cells away from the edge of the window.
+splash_screen   -- port should/should not display an opening splashscreen.
 tiled_map	-- port should display a tiled map if it can.
 tile_width	-- port should display tiles with this width or round to closest
 		   if it can.

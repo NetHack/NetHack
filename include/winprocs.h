@@ -157,18 +157,24 @@ extern NEARDATA struct window_procs windowprocs;
 #define WC_FONTSIZ_MENU	 0x100000L	/* 21 supports specification of mnu win font */
 #define WC_FONTSIZ_TEXT	 0x200000L	/* 22 supports specification of txt win font */
 #define WC_SCROLL_MARGIN 0x400000L	/* 23 supports setting scroll margin for map */
-#define WC_POPUP_DIALOG	 0x800000L	/* 24 supports queries in pop dialogs        */
-#define WC_LARGE_FONT	 0x1000000L	/* 25 Port supports large font               */
-#define WC_EIGHT_BIT_IN	 0x2000000L	/* 26 8-bit character input                  */
-#define WC_PERM_INVENT	 0x4000000L	/* 27 8-bit character input                  */
-#define WC_MAP_MODE	 0x8000000L	/* 28 map_mode option                        */
-#define WC_WINDOWCOLORS  0x10000000L	/* 29 background color for message window    */
-					/* 3 free bits */
+#define WC_SPLASH_SCREEN 0x800000L	/* 24 supports setting scroll margin for map */
+#define WC_POPUP_DIALOG	 0x1000000L	/* 25 supports queries in pop dialogs        */
+#define WC_LARGE_FONT	 0x2000000L	/* 26 Port supports large font               */
+#define WC_EIGHT_BIT_IN	 0x4000000L	/* 27 8-bit character input                  */
+#define WC_PERM_INVENT	 0x8000000L	/* 28 8-bit character input                  */
+#define WC_MAP_MODE	 0x10000000L	/* 29 map_mode option                        */
+#define WC_WINDOWCOLORS  0x20000000L	/* 30 background color for message window    */
+#define WC_PLAYER_SELECTION  0x40000000L /* 31 background color for message window    */
+					/* 1 free bit */
 
 #define ALIGN_LEFT	1
 #define ALIGN_RIGHT	2
 #define ALIGN_TOP	3
 #define ALIGN_BOTTOM	4
+
+/* player_selection */
+#define VIA_DIALOG	0
+#define VIA_PROMPTS	1
 
 /* map_mode settings - deprecated */
 #define MAP_MODE_TILES		0
