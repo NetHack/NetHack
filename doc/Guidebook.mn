@@ -2162,9 +2162,9 @@ make the game accessible are:
 Disable IBMgraphics by commenting out this option.
 .lp menustyle:traditional
 This will assist in the interface to speech synthesizers.
-.lp \!number_pad
+.lp number_pad
 A lot of speech access programs use the number-pad to review the screen.
-If this is the case, turn off the number_pad option and use the traditional
+If this is the case, disable the number_pad option and use the traditional
 Rogue-like commands.
 .lp "Character graphics"
 Comment out all character graphics sets found near the bottom of the
