@@ -9,7 +9,6 @@
  */
 
 #ifdef WIN32CON
-#define LOW_LEVEL_OUTPUT
 #define NEED_VARARGS /* Uses ... */
 #include "hack.h"
 #include "wintty.h"
@@ -392,7 +391,7 @@ char ch;
 	switch(ch) {
 	    case '\n':
 	    case '\r':
-		    cmov(ttyDisplay->curx, ttyDisplay->cury);
+! 		    cmov(cursor.X, cursor.Y);
 		    return;
 	}
 	WriteConsoleOutputAttribute(hConOut,&attr,1,cursor,&acount);
