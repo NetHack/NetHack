@@ -201,34 +201,50 @@ boolean trapok;
 }
 
 void
-teleds(nux, nuy)
+teleds(nux, nuy, allow_drag)
 register int nux,nuy;
+boolean allow_drag;
 {
-	boolean dont_teleport_ball = FALSE;
+	boolean ball_still_in_range = FALSE;
 
+	/* If they have to move the ball, then drag if allow_drag is true;
+	 * otherwise they are teleporting, so unplacebc().  
+	 * If they don't have to move the ball, then always "drag" whether or
+	 * not allow_drag is true, because we are calling that function, not
+	 * to drag, but to move the chain.  *However* there are some dumb
+	 * special cases:
+	 *    0				 0
+	 *   _X  move east       ----->  X_
+	 *    @				  @
+	 * These are permissible if teleporting, but not if dragging.  As a
+	 * result, drag_ball() needs to know about allow_drag and might end
+	 * up dragging the ball anyway.  Also, drag_ball() might find that
+	 * dragging the ball is completely impossible (ball in range but there's
+	 * rock in the way), in which case it teleports the ball on its own.
+	 */
 	if (Punished) {
-	    /* If they're teleporting to a position where the ball doesn't need
-	     * to be moved, don't place the ball.  Especially useful when this
-	     * function is being called for crawling out of water instead of
-	     * real teleportation.
-	     */
 	    if (!carried(uball) && distmin(nux, nuy, uball->ox, uball->oy) <= 2)
-		dont_teleport_ball = TRUE;
-	    else
-		unplacebc();
+		ball_still_in_range = TRUE; /* don't have to move the ball */
+	    else {
+		/* have to move the ball */
+		if (!allow_drag || distmin(u.ux, u.uy, nux, nuy) > 1) {
+		    /* we should not have dist > 1 and allow_drag at the same
+		     * time, but just in case, we must then revert to teleport.
+		     */
+		    allow_drag = FALSE;
+		    unplacebc();
+		}
+	    }
 	}
 	u.utrap = 0;
 	u.ustuck = 0;
 	u.ux0 = u.ux;
 	u.uy0 = u.uy;
-	u.ux = nux;
-	u.uy = nuy;
-	fill_pit(u.ux0, u.uy0); /* do this now so that cansee() is correct */
 
 	if (hides_under(youmonst.data))
 		u.uundetected = OBJ_AT(nux, nuy);
 	else if (youmonst.data->mlet == S_EEL)
-		u.uundetected = is_pool(u.ux, u.uy);
+		u.uundetected = is_pool(nux, nuy);
 	else {
 		u.uundetected = 0;
 		/* mimics stop being unnoticed */
@@ -241,25 +257,24 @@ register int nux,nuy;
 		docrt();
 	}
 	if (Punished) {
-	    if (dont_teleport_ball) {
+	    if (ball_still_in_range || allow_drag) {
 		int bc_control;
 		xchar ballx, bally, chainx, chainy;
 		boolean cause_delay;
 
-		/* We really should only be dragging the chain here, since we
-		 * checked the ball distance.  However, some pathological
-		 * cases will drag the ball anyway.  drag_ball() tries to
-		 * handle those by ignoring near_capacity() and teleporting the
-		 * ball and chain along with you.  Bug: if you only teleported
-		 * one square, drag_ball() has no way to distinguish between
-		 * teleporting and moving, and treats it like a move.  (Note
-		 * that teleds() doesn't imply teleporting.)
-		 */
-		if (drag_ball(u.ux, u.uy, &bc_control, &ballx, &bally,
-					&chainx, &chainy, &cause_delay))
+		if (drag_ball(nux, nuy, &bc_control, &ballx, &bally,
+				    &chainx, &chainy, &cause_delay, allow_drag))
 		    move_bc(0, bc_control, ballx, bally, chainx, chainy);
-	    } else
-		 placebc();
+	    }
+	}
+	/* must set u.ux, u.uy after drag_ball(), which may need to know
+	   the old position if allow_drag is true... */
+	u.ux = nux;
+	u.uy = nuy;
+	fill_pit(u.ux0, u.uy0);
+	if (Punished) {
+	    if (!ball_still_in_range && !allow_drag)
+		placebc();
 	}
 	initrack(); /* teleports mess up tracking monsters without this */
 	update_player_regions();
@@ -286,7 +301,8 @@ register int nux,nuy;
 }
 
 boolean
-safe_teleds()
+safe_teleds(allow_drag)
+boolean allow_drag;
 {
 	register int nux, nuy, tcnt = 0;
 
@@ -296,7 +312,7 @@ safe_teleds()
 	} while (!teleok(nux, nuy, (boolean)(tcnt > 200)) && ++tcnt <= 400);
 
 	if (tcnt <= 400) {
-		teleds(nux, nuy);
+		teleds(nux, nuy, allow_drag);
 		return TRUE;
 	} else
 		return FALSE;
@@ -309,7 +325,7 @@ vault_tele()
 	coord c;
 
 	if (croom && somexy(croom, &c) && teleok(c.x,c.y,FALSE)) {
-		teleds(c.x,c.y);
+		teleds(c.x,c.y,FALSE);
 		return;
 	}
 	tele();
@@ -394,14 +410,14 @@ tele()
 		    /* possible extensions: introduce a small error if
 		       magic power is low; allow transfer to solid rock */
 		    if (teleok(cc.x, cc.y, FALSE)) {
-			teleds(cc.x, cc.y);
+			teleds(cc.x, cc.y, FALSE);
 			return;
 		    }
 		    pline("Sorry...");
 		}
 	}
 
-	(void) safe_teleds();
+	(void) safe_teleds(FALSE);
 }
 
 int

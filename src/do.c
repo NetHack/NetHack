@@ -953,7 +953,7 @@ boolean at_stairs, falling, portal;
 
 		    pline("A mysterious force momentarily surrounds you...");
 		    if (on_level(newlevel, &u.uz)) {
-			(void) safe_teleds();
+			(void) safe_teleds(FALSE);
 			(void) next_to_u();
 			return;
 		    } else

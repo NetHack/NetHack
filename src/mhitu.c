@@ -363,7 +363,7 @@ mattacku(mtmp)
 			newsym(mtmp->mx,mtmp->my);
 			place_monster(mtmp, u.ux, u.uy);
 			if(mtmp->wormno) worm_move(mtmp);
-			teleds(cc.x, cc.y);
+			teleds(cc.x, cc.y, TRUE);
 			set_apparxy(mtmp);
 			newsym(u.ux,u.uy);
 		    } else {

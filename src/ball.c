@@ -347,15 +347,26 @@ xchar ballx, bally, chainx, chainy;	/* only matter !before */
  *
  *  Should not be called while swallowed.  Should be called before movement,
  *  because we might want to move the ball or chain to the hero's old position.
+ *
+ * It is called if we are moving.  It is also called if we are teleporting
+ * *if* the ball doesn't move and we thus must drag the chain.  It is not
+ * called for ordinary teleportation.
+ *
+ * allow_drag is only used in the ugly special case where teleporting must
+ * drag the chain, while an identical-looking movement must drag both the ball
+ * and chain.
  */
 boolean
-drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, cause_delay)
+drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, cause_delay,
+    allow_drag)
 xchar x, y;
 int *bc_control;
 xchar *ballx, *bally, *chainx, *chainy;
 boolean *cause_delay;
+boolean allow_drag;
 {
 	struct trap *t = (struct trap *)0;
+	boolean already_in_rock;
 
 	*ballx  = uball->ox;
 	*bally  = uball->oy;
@@ -375,7 +386,7 @@ boolean *cause_delay;
 	    *bc_control = BC_CHAIN;
 	    move_bc(1, *bc_control, *ballx, *bally, *chainx, *chainy);
 	    if (carried(uball)) {
-		/* move chain only if necessary; assume they didn't teleport */
+		/* move chain only if necessary */
 		if (distmin(x, y, uchain->ox, uchain->oy) > 1) {
 		    *chainx = u.ux;
 		    *chainy = u.uy;
@@ -388,17 +399,26 @@ boolean *cause_delay;
 (IS_ROCK(levl[x][y].typ) || (IS_DOOR(levl[x][y].typ) && \
       (levl[x][y].doormask & (D_CLOSED|D_LOCKED))))
 /* Don't ever move the chain into solid rock.  If we have to, then instead
- * undo the move_bc() and jump to the drag ball code.
+ * undo the move_bc() and jump to the drag ball code.  Note that this also
+ * means the "cannot carry and drag" message will not appear, since unless we
+ * moved at least two squares there is no possibility of the chain position
+ * being in solid rock.
  */
 #define SKIP_TO_DRAG { *chainx = oldchainx; *chainy = oldchainy; \
     move_bc(0, *bc_control, *ballx, *bally, *chainx, *chainy); \
     goto drag; } 
+	    if (IS_CHAIN_ROCK(u.ux, u.uy) || IS_CHAIN_ROCK(*chainx, *chainy)
+			|| IS_CHAIN_ROCK(uball->ox, uball->oy))
+		already_in_rock = TRUE;
+	    else
+		already_in_rock = FALSE;
+
 	    switch(dist2(x, y, uball->ox, uball->oy)) {
 		/* two spaces diagonal from ball, move chain inbetween */
 		case 8:
 		    *chainx = (uball->ox + x)/2;
 		    *chainy = (uball->oy + y)/2;
-		    if (IS_CHAIN_ROCK(*chainx, *chainy))
+		    if (IS_CHAIN_ROCK(*chainx, *chainy) && !already_in_rock)
 			SKIP_TO_DRAG;
 		    break;
 
@@ -423,37 +443,44 @@ boolean *cause_delay;
 			tempy2 = uball->oy;
 		    }
 		    if (IS_CHAIN_ROCK(tempx, tempy) &&
-				!IS_CHAIN_ROCK(tempx2, tempy2)) {
-			/* Avoid pathological case:
-			 *   0				0_
-			 *   _X  move northeast  ----->  X@
-			 *    @
-			 */
-			if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 5 &&
-			      dist2(x, y, tempx, tempy) == 1)
-			    SKIP_TO_DRAG;
-			/* Avoid pathological case:
-			 *    0				 0
-			 *   _X  move east       ----->  X_
-			 *    @				  @
-			 */
-			if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 4 &&
-			      dist2(x, y, tempx, tempy) == 2)
-			    SKIP_TO_DRAG;
+				!IS_CHAIN_ROCK(tempx2, tempy2) &&
+				!already_in_rock) {
+			if (allow_drag) {
+			    /* Avoid pathological case *if* not teleporting:
+			     *   0			    0_
+			     *   _X  move northeast  ----->  X@
+			     *    @
+			     */
+			    if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 5 &&
+				  dist2(x, y, tempx, tempy) == 1)
+				SKIP_TO_DRAG;
+			    /* Avoid pathological case *if* not teleporting:
+			     *    0			     0
+			     *   _X  move east       ----->  X_
+			     *    @			     @
+			     */
+			    if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 4 &&
+				  dist2(x, y, tempx, tempy) == 2)
+				SKIP_TO_DRAG;
+			}
 			*chainx = tempx2;
 			*chainy = tempy2;
 		    } else if (!IS_CHAIN_ROCK(tempx, tempy) &&
-				IS_CHAIN_ROCK(tempx2, tempy2)) {
-			if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 5 &&
-				dist2(x, y, tempx2, tempy2) == 1)
-			    SKIP_TO_DRAG;
-			if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 4 &&
-			      dist2(x, y, tempx2, tempy2) == 2)
-			    SKIP_TO_DRAG;
+				IS_CHAIN_ROCK(tempx2, tempy2) &&
+				!already_in_rock) {
+			if (allow_drag) {
+			    if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 5 &&
+				    dist2(x, y, tempx2, tempy2) == 1)
+				SKIP_TO_DRAG;
+			    if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 4 &&
+				  dist2(x, y, tempx2, tempy2) == 2)
+				SKIP_TO_DRAG;
+			}
 			*chainx = tempx;
 			*chainy = tempy;
 		    } else if (IS_CHAIN_ROCK(tempx, tempy) &&
-				IS_CHAIN_ROCK(tempx2, tempy2)) {
+				IS_CHAIN_ROCK(tempx2, tempy2) &&
+				!already_in_rock) {
 			SKIP_TO_DRAG;
 		    } else if (dist2(tempx, tempy, uchain->ox, uchain->oy) <
 			 dist2(tempx2, tempy2, uchain->ox, uchain->oy) ||
@@ -475,7 +502,7 @@ boolean *cause_delay;
 			break;
 		    *chainx = (x + uball->ox)/2;
 		    *chainy = (y + uball->oy)/2;
-		    if (IS_CHAIN_ROCK(*chainx, *chainy))
+		    if (IS_CHAIN_ROCK(*chainx, *chainy) && !already_in_rock)
 			SKIP_TO_DRAG;
 		    break;
 		
@@ -494,7 +521,7 @@ boolean *cause_delay;
 			    *chainx = uball->ox;
 			else
 			    *chainy = uball->oy;
-			if (IS_CHAIN_ROCK(*chainx, *chainy))
+			if (IS_CHAIN_ROCK(*chainx, *chainy) && !already_in_rock)
 			    SKIP_TO_DRAG;
 			break;
 		    }

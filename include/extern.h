@@ -109,7 +109,7 @@ E void NDECL(unplacebc);
 E void FDECL(set_bc, (int));
 E void FDECL(move_bc, (int,int,XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P));
 E boolean FDECL(drag_ball, (XCHAR_P,XCHAR_P,
-		    int *,xchar *,xchar *,xchar *,xchar *, boolean *));
+		int *,xchar *,xchar *,xchar *,xchar *, boolean *,BOOLEAN_P));
 E void FDECL(drop_ball, (XCHAR_P,XCHAR_P));
 E void NDECL(drag_down);
 
@@ -1870,8 +1870,8 @@ E void FDECL(place_monster, (struct monst *,int,int));
 
 E boolean FDECL(goodpos, (int,int,struct monst *));
 E boolean FDECL(enexto, (coord *,XCHAR_P,XCHAR_P,struct permonst *));
-E void FDECL(teleds, (int,int));
-E boolean NDECL(safe_teleds);
+E void FDECL(teleds, (int,int,BOOLEAN_P));
+E boolean FDECL(safe_teleds, (BOOLEAN_P));
 E boolean FDECL(teleport_pet, (struct monst *,BOOLEAN_P));
 E void NDECL(tele);
 E int NDECL(dotele);

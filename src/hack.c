@@ -1126,7 +1126,7 @@ domove()
 	/* Move ball and chain.  */
 	if (Punished)
 	    if (!drag_ball(x,y, &bc_control, &ballx, &bally, &chainx, &chainy,
-			&cause_delay))
+			&cause_delay, TRUE))
 		return;
 
 	/* Check regions entering/leaving */

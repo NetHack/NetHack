@@ -2642,7 +2642,7 @@ crawl:;
 			You("dump some of your gear to lose weight...");
 		if (succ) {
 			pline("Pheew!  That was close.");
-			teleds(x,y);
+			teleds(x,y,TRUE);
 			return(TRUE);
 		}
 		/* still too much weight */
@@ -2655,7 +2655,7 @@ crawl:;
 	    "pool of water" : "moat";
 	done(DROWNING);
 	/* oops, we're still alive.  better get out of the water. */
-	while (!safe_teleds()) {
+	while (!safe_teleds(TRUE)) {
 		pline("You're still drowning.");
 		done(DROWNING);
 	}
@@ -2758,7 +2758,8 @@ struct trap *ttmp;
 	boolean unused;
 
 	/* we know there's no monster in the way, and we're not trapped */
-	if (!Punished || drag_ball(x, y, &bc, &bx, &by, &cx, &cy, &unused)) {
+	if (!Punished || drag_ball(x, y, &bc, &bx, &by, &cx, &cy, &unused,
+		TRUE)) {
 	    u.ux0 = u.ux,  u.uy0 = u.uy;
 	    u.ux = x,  u.uy = y;
 	    u.umoved = TRUE;
@@ -3618,7 +3619,7 @@ lava_effects()
 	killer = lava_killer;
 	You("burn to a crisp...");
 	done(BURNING);
-	while (!safe_teleds()) {
+	while (!safe_teleds(TRUE)) {
 		pline("You're still burning.");
 		done(BURNING);
 	}

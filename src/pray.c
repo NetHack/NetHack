@@ -219,7 +219,7 @@ register int trouble;
 		    /* teleport should always succeed, but if not,
 		     * just untrap them.
 		     */
-		    if(!safe_teleds())
+		    if(!safe_teleds(FALSE))
 			u.utrap = 0;
 		    break;
 	    case TROUBLE_STARVING:
@@ -256,7 +256,7 @@ register int trouble;
 	    case TROUBLE_STUCK_IN_WALL:
 		    Your("surroundings change.");
 		    /* no control, but works on no-teleport levels */
-		    (void) safe_teleds();
+		    (void) safe_teleds(FALSE);
 		    break;
 	    case TROUBLE_CURSED_LEVITATION:
 		    if (uarmf && uarmf->otyp==LEVITATION_BOOTS

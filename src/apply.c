@@ -1361,7 +1361,7 @@ int magic; /* 0=Physical, otherwise skill level */
 	    if (In_sokoban(&u.uz))
 		change_luck(-1);
 
-	    teleds(cc.x, cc.y);
+	    teleds(cc.x, cc.y, TRUE);
 	    nomul(-1);
 	    nomovemsg = "";
 	    morehungry(rnd(25));
@@ -2180,7 +2180,7 @@ struct obj *obj;
 	    if (proficient && rn2(proficient + 2)) {
 		if (!mtmp || enexto(&cc, rx, ry, youmonst.data)) {
 		    You("yank yourself out of the pit!");
-		    teleds(cc.x, cc.y);
+		    teleds(cc.x, cc.y, TRUE);
 		    u.utrap = 0;
 		    vision_full_recalc = 1;
 		}

@@ -332,7 +332,7 @@ mount_steed(mtmp, force)
 	}
 	u.usteed = mtmp;
 	remove_monster(mtmp->mx, mtmp->my);
-	teleds(mtmp->mx, mtmp->my);
+	teleds(mtmp->mx, mtmp->my, TRUE);
 	return (TRUE);
 }
 
@@ -568,7 +568,7 @@ dismount_steed(reason)
 		     * teleds() clears u.utrap
 		     */
 		    in_steed_dismounting = TRUE;
-		    teleds(cc.x, cc.y);
+		    teleds(cc.x, cc.y, TRUE);
 		    in_steed_dismounting = FALSE;
 
 		    /* Put your steed in your trap */
