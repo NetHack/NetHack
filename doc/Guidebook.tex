@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.71 $ $Date: 2003/09/28 03:42:24 $
+% $Revision: 1.72 $ $Date: 2003/10/05 19:56:08 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.4)}
-\date{October 5, 2003}
+\date{November 15, 2003}
 
 \maketitle
 
@@ -2002,6 +2002,7 @@ and the {\it fruit\/} is set to ``papaya'', you would enter the command
 \subsection*{Using a configuration file}
 
 %.pg
+Any line in the configuration file starting with `{\tt \#}' is treated as a comment.
 Any line in the configuration file starting with ``{\tt OPTIONS=}'' may be
 filled out with options in the same syntax as in NETHACKOPTIONS.
 Any line starting with ``{\tt DUNGEON=}'', ``{\tt EFFECTS=}'',
@@ -2016,7 +2017,12 @@ A zero in any entry in such a sequence leaves the display of that
 entry unchanged; this feature is not available using the option syntax.
 Such a sequence can be continued to multiple lines by putting a
 `{\tt \verb+\+}' at the end of each line to be continued.
-Any line starting with `{\tt \#}' is treated as a comment.
+
+%.pg
+If your copy of the game included the compile time AUTOPICKUP\_EXCEPTIONS 
+option, then any line starting with ``{\tt AUTOPICKUP\_EXCEPTION=}'' 
+is taken as defining an exception to the ``{\tt pickup\_types}'' option.
+There is a section of this Guidebook that discusses that.
 
 %.pg
 The default name of the configuration file varies on different
@@ -2049,7 +2055,8 @@ that can be dug (default false).
 %.lp
 \item[\ib{autopickup}]
 Automatically pick up things onto which you move (default on).
-%.Ip
+See ``{\it pickup\_types\/}'' to refine the behaviour.
+%.lp
 \item[\ib{autoquiver}]
 This option controls what happens when you attempt the `f' (fire)
 command with an empty quiver.  When true, the computer will fill
@@ -2436,8 +2443,11 @@ or overLoaded), you will be asked if you want to continue.
 (Default `S').
 %.lp
 \item[\ib{pickup\_types}]
-Specify the object types to be picked up when {\it autopickup\/}
-is on.  Default is all types.
+Specify the object types to be picked up when ``{\it autopickup\/}'' 
+is on.  Default is all types. If your copy of the game has the
+experimental compile time option AUTOPICKUP\_EXCEPTIONS included,
+you may be able to use ``{\it autopickup\_exception\/}'' configuration
+file lines to further refine ``{\it autopickup\/}'' behaviour.
 %.lp
 \item[\ib{prayconfirm}]
 Prompt for confirmation before praying (default on).
@@ -2781,6 +2791,53 @@ If the game display is difficult to read, try adjusting these scales;
 if this does not correct the problem, try {\tt !color}.
 Cannot be set with the `{\tt O}' command.
 \elist
+
+%.lp
+%.hn 2
+\subsection*{Configuring autopickup exceptions}
+
+%.pg
+There is an experimental compile time option called AUTOPICKUP_EXCEPTIONS.  
+If your copy of the game was build with that option defined, you can 
+further refine the behaviour of the ``{\tt autopickup}'' option beyond 
+what is available through the ``{\tt pickup\_types}'' option.
+
+%.pg
+By placing ``{\tt autopickup\_exception}'' lines in your configuration
+file, you can define patterns to be checked when the game is about to
+autopickup something.
+
+\blist{}
+%.lp
+\item[\ib{autopickup\_exception}]
+Sets an exception to the `{\it pickup\_types}' option.
+The {\it autopickup\_exception\/} option should be followed by a string of 1--80
+characters to be used as a pattern to match against the singular form
+of the description of an object at your location.
+
+Some characters are treated specially if they occur as the first 
+character in the string pattern, specifically:
+
+%.sd
+%.si
+{\tt <} --- always pickup an object that matches the pattern that follows.\\
+{\tt >} --- never pickup an object that matches the pattern that follows.
+%.ei
+%.ed
+
+Can be set with the `{\tt O}' command, but the setting is not preserved
+across saves and restores.
+\elist
+
+%.pg
+Here's a couple of examples of autopickup\_exceptions:
+\begin{verbatim}
+    autopickup_exception="<*arrow"
+    autopickup_exception=">*corpse"
+\end{verbatim}
+
+The first example above will result in autopickup of any type of arrow.
+The second example results in the exclusion of any corpse from autopickup.
 
 %.lp
 %.hn 2

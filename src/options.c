@@ -2815,6 +2815,7 @@ boolean setinitial,setfromfile;
 		ape = ape->next;
 		numapes++;
 	}
+ape_again:
 	if (numapes > 0) {
 		tmpwin = create_nhwindow(NHW_MENU);
 		start_menu(tmpwin);
@@ -2825,8 +2826,8 @@ boolean setinitial,setfromfile;
 			add_menu(tmpwin, NO_GLYPH, &any, *action_titles[i],
 			      0, ATR_NONE, action_titles[i+1], MENU_UNSELECTED);
         	}
-		end_menu(tmpwin, "Adjust autopickup exception list how?");
-		if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list)) > 0) {
+		end_menu(tmpwin, "Do what with autopickup exception list?");
+		if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
 			for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
 				opt_idx = pick_list[pick_idx].item.a_int - 1;
 			}
@@ -2834,11 +2835,12 @@ boolean setinitial,setfromfile;
 			pick_list = (menu_item *)0;
 		}
 		destroy_nhwindow(tmpwin);
+		if (pick_cnt < 1) return FALSE;
 	} /* else just ask for new pickup exception string */
 
 	if (opt_idx == 0) {
 		getlin("What new autopickup exception pattern?", &apebuf[1]);
-		if (apebuf[0] == '\033') retval = FALSE;
+		if (apebuf[1] == '\033') retval = FALSE;
 		apebuf[0] = '"';
 		Strcat(apebuf,"\"");
 		add_autopickup_exception(apebuf);
@@ -2854,6 +2856,7 @@ boolean setinitial,setfromfile;
 		}
 		display_nhwindow(tmpwin, FALSE);
 		destroy_nhwindow(tmpwin);
+		goto ape_again;
 	} else {
 		ape = iflags.autopickup_exceptions;
 		ilet = 'a';

@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "October 5, 2003
+.ds f2 "November 15, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1590,6 +1590,7 @@ in \fIsh\fP or \fIksh\fP.
 .hn 2
 Using a configuration file
 .pg
+Any line in the configuration file starting with `#' is treated as a comment.
 Any line in the configuration file starting with ``OPTIONS='' may be
 filled out with options in the same syntax as in NETHACKOPTIONS.
 Any line starting with ``DUNGEON='', ``EFFECTS='', ``MONSTERS='',
@@ -1609,7 +1610,13 @@ A zero in any entry in such a sequence leaves the display of that
 entry unchanged; this feature is not available using the option syntax.
 Such a sequence can be continued to multiple lines by putting a `\e'
 at the end of each line to be continued.
-Any line starting with `#' is treated as a comment.
+.pg
+If your copy of the game included the compile time AUTOPICKUP_EXCEPTIONS
+option, then any line starting with ``AUTOPICKUP_EXCEPTION='' is taken
+as defining an exception to the 
+.op pickup_types
+option. 
+There is a section of this Guidebook that discusses that.
 .pg
 The default name of the configuration file varies on different
 operating systems, but NETHACKOPTIONS can also be set to
@@ -1632,7 +1639,10 @@ Cannot be set with the `O' command.
 Automatically dig if you are wielding a digging tool and moving into a place
 that can be dug (default false).
 .lp "autopickup  "
-Automatically pick up things onto which you move (default on).
+Automatically pick up things onto which you move (default on). 
+See
+.op pickup_types
+to refine the behaviour.
 .lp "autoquiver  "
 This option controls what happens when you attempt the `f' (fire)
 command with an empty quiver.  When true, the computer will fill
@@ -1988,7 +1998,12 @@ or overLoaded), you will be asked if you want to continue.
 .lp pickup_types
 Specify the object types to be picked up when
 .op autopickup
-is on.  Default is all types.
+is on.  Default is all types. If your copy of the game has the experimental
+compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use 
+.op autopickup_exception
+configuration file lines to further refine
+.op autopickup
+behaviour.
 .lp prayconfirm
 Prompt for confirmation before praying (default on).
 .lp pushweapon
@@ -2252,6 +2267,53 @@ Set the intensity level of the three gray scales available
 If the game display is difficult to read, try adjusting these scales;
 if this does not correct the problem, try !color.
 Cannot be set with the `O' command.
+.hn 2
+Configuring autopickup exceptions
+.pg
+There is an experimental compile time option called AUTOPICKUP_EXCEPTIONS.  
+If your copy of the game was build with that option defined, you can 
+further refine the behaviour of the
+.op autopickup
+option beyond what is available through the 
+.op pickup_types
+option. 
+.pg
+By placing 
+.op autopickup_exception
+lines in your configuration
+file, you can define patterns to be checked when the game is about to
+autopickup something.
+.lp autopickup_exception
+Sets an exception to the 
+.op pickup_types
+option.
+The
+.op "autopickup_exception  "
+option should be followed by a string of 1-80 characters to be used as a 
+pattern to match against the singular form of the description of an 
+object at your location.
+.pg
+Some characters are treated specially if they occur as the first 
+character in the string pattern, specifically:
+.sd
+.si
+< - always pickup an object that matches the pattern that follows.
+> - never pickup an object that matches the pattern that follows.
+.ei
+.ed
+.pg
+Can be set with the `O' command, but the setting is not preserved
+across saves and restores.
+.pg
+Here's a couple of examples of autopickup_exceptions:
+.sd
+.si
+autopickup_exception="<*arrow"
+autopickup_exception=">*corpse"
+.ei
+.ed
+The first example above will result in autopickup of any type of arrow.
+The second example results in the exclusion of any corpse from autopickup.
 .hn 2
 Configuring User Sounds
 .pg
