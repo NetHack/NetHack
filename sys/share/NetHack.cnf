@@ -1,0 +1,143 @@
+#	NetHack Copyright (c) NetHack PC Development Team 1993, 1996, 1999
+#	NetHack may be freely redistributed.  See license for details.
+#
+# A '#' at the beginning of a line means the rest of the line is a comment.
+#
+# Some options MUST be set in this file, other options can be toggled while
+# playing.  For a list of options available see the <opthelp.> file.  If
+# the game plays slowly you might notice some improvement by setting
+# !time and !showexp, which will reduce screen I/O somewhat.
+#
+# To change the configuration, comment out the unwanted lines, and
+# uncomment the configuration you want.
+#
+# Note: For blind players, please use the file NHAccess.nh as a template.
+#
+
+# *** OPTIONS ***
+#
+# The three options on this line should be used for most setups.  
+# If your machine isn't very IBM-compatible, and NetHack doesn't work, 
+# try commenting out this line.
+OPTIONS=rawio,BIOS,IBMgraphics
+
+# To use VGA graphical tiles on an MS-DOS PC with VGA or better,uncomment 
+# this:
+#OPTIONS=video:autodetect
+
+# Some versions of NetHack use the pc speaker to play the notes given when
+# playing music instruments in NetHack.  To use this feature, if available,
+# uncomment the following line:
+#OPTIONS=soundcard:autodetect
+
+# If your machine is NEC PC-9800, use:
+#OPTIONS=rawio,BIOS,video:default
+# If you use an Atari and want tty use:
+#OPTIONS=windowtype:tty,rawio,BIOS
+
+
+# Some options to set personal preferences.  Uncomment and change these to
+# suit your personal preference.  If several people are to use the same
+# configuration, options like these should not be set.
+#
+#OPTIONS=name:Janet,role:Valkyrie,race:Human,gender:female,align:lawful
+#OPTIONS=dogname:Fido,catname:Morris,fruit:guava
+#OPTIONS=horsename:Silver
+#OPTIONS=autopickup,pickup_types:$"=/!?+
+#OPTIONS=packorder:")[%?+/=!(*0_`
+#OPTIONS=scores:10 top/2 around/own
+#OPTIONS=nolegacy,noverbose
+#OPTIONS=menustyle:traditional
+
+# If you wish to change the symbol used to display boulders use:
+OPTIONS=boulder:0
+#
+# General options.  You might also set "silent" so as not to attract
+# the boss's attention.
+#
+OPTIONS=time,noshowexp,number_pad,lit_corridor,rest_on_space
+#
+# If you want to get rid of "use #quit to quit..." use:
+#OPTIONS=suppress_alert:3.3.1
+#
+#
+#HACKDIR=c:\games\nethack
+# 
+# Note: Under MSDOS ports HACKDIR defaults to the location 
+#       of the NetHack.exe file. Setting HACKDIR above will override that.
+#
+#   LEVELS and SAVE default to HACKDIR
+#
+#LEVELS=c:\games\nethack\bones
+#SAVE=c:\games\nethack\bones
+
+# *** CHARACTER GRAPHICS ***
+#
+# See the on-line help or the Guidebook for which symbols are in which
+# positions.
+#
+# If you merely set the IBMgraphics option as above, NetHack will use IBM
+# extended ASCII for dungeon characters.  If you don't like the selections,
+# you can make up your own via these graphics options, but you should still
+# set IBMgraphics if you are using IBM graphics characters to get the correct
+# processing.
+#
+# ================================================
+# The defaults using the IBM graphics character set:
+#DUNGEON = 032 179 196 218 191 192 217 197 193 194 \
+#          180 195 250 254 254 043 043 240 241 250 \
+#          176 177 243 242 060 062 095 124 092 035 \
+#          244 247 250 247 250 250 035 035 032 035 \
+#          247
+#
+# ================================================
+# Some alternatives:
+#DUNGEON=  032 186 205 201 187 200 188 206 202 203 \
+#	   185 204 249 239 239 254 254 240 241 249 \
+#	   177 177 060 062 060 062 095 124 092 035 \
+#	   244 247 249 247 042 042 179 196 046 035 \
+#	   247
+#
+#TRAPS=    094 094 094 094 094 094 094 094 094 094 \
+#	   094 094 094 094 094 034 094 094 094 094 \
+#	   094 094
+
+# ================================================
+# Here is a recommendation sent in by Michael Feir
+# for use by blind NetHack players.
+#
+#DUNGEON=  032 124 045 124 124 124 124 045 045 045 \
+#          124 124 046 045 124 043 043 046 035 035 \
+#          060 062 060 062 095 092 035 126 126 126 \
+#          126 042 042 035 035 032 035 126
+#
+#TRAPS=    094 094 094 094 094 094 094 094 094 094 \
+#          094 094 094 094 094 094 094 094 094 094 \
+#          094 094
+#
+#EFFECTS=  124 095 092 047 042 033 041 040         \
+#          048 035 064 042                         \
+#          047 045 092 058 058 092 045 047         \
+#          047 045 092 058 032 058 092 045 047
+
+# ================================================
+# Example using the DEC Rainbow/ANSI line-drawing character set:
+#
+# If you have compiled with TERMLIB, merely set the DECgraphics option as
+# above.  NetHack will then switch into the VTxxx line-drawing character set
+# (aka ANSI ruling character set '0') for dungeon characters.  If you don't
+# like the selections, you can make up your own via the graphics options,
+# adding 128 to the value of any line-drawing character you want to use.
+# (But you should still set DECgraphics to get the correct processing.)
+
+# =================================================
+# *** VIDEOCOLORS AND VIDEOSHADES ***
+#
+# While playing on NEC PC-9800, default game display may be difficult to
+# read.  Try following setting.
+#
+#OPTIONS=videocolors:4-2-6-1-5-3-4-2-6-1-5-3,videoshades:normal-normal-normal
+#
+# DEC Rainbows will hang if rawio is set, so they should instead use:
+#OPTIONS=BIOS,DECgraphics
+
