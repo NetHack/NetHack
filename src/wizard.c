@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wizard.c	3.4	2002/04/09	*/
+/*	SCCS Id: @(#)wizard.c	3.4	2003/02/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -325,7 +325,7 @@ tactics(mtmp)
 		/* fall through :-) */
 
 	    case STRAT_NONE:	/* harrass */
-	        if(!rn2(5)) mnexto(mtmp);
+		if (!rn2(!mtmp->mflee ? 5 : 33)) mnexto(mtmp);
 		return(0);
 
 	    default:		/* kill, maim, pillage! */
