@@ -1056,7 +1056,15 @@ struct obj *obj;
 		return FALSE;
 	    if (obj->where == OBJ_MINVENT ? cansee(x,y) : !Blind)
 		pline("%s %s light!", Yname2(obj), otense(obj, "catch"));
-	    begin_burn(obj, TRUE);
+	    if (obj->otyp == POT_OIL) makeknown(obj->otyp);
+	    if (obj->unpaid && costly_spot(u.ux, u.uy) && (obj->where == OBJ_INVENT)) {
+	        /* if it catches while you have it, then it's your tough luck */
+		check_unpaid(obj);
+	        verbalize("That's in addition to the cost of %s %s, of course.",
+				Yname2(obj), obj->quan == 1 ? "itself" : "themselves");
+		bill_dummy_object(obj);
+	    }
+	    begin_burn(obj, FALSE);
 	    return TRUE;
 	}
 	return FALSE;

@@ -914,7 +914,7 @@ struct obj *obj;
 			    boolean vibrate = !rn2(3);
 			    pline("Sparks fly as you whack the %s%s!",
 				sobj_at(STATUE, rx, ry) ? "statue" : "boulder",
-				vibrate ? " and the handle vibrates violently" : "");
+				vibrate ? " and the axe-handle vibrates violently" : "");
 			    if (vibrate) losehp(2, "axing a hard object", KILLED_BY);
 			    if ((otmp = carrying(POT_OIL))) catch_lit(otmp);
 			}
