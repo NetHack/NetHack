@@ -448,6 +448,8 @@ hurtle_step(arg, x, y)
 	return FALSE;
     } else if (!in_out_region(x, y)) {
 	return FALSE;
+    } else if (*range == 0) {
+	return FALSE;			/* previous step wants to stop now */
     }
 
     if (!Passes_walls || !(may_pass = may_passwall(x, y))) {
@@ -533,7 +535,8 @@ hurtle_step(arg, x, y)
 		   In_sokoban(&u.uz)) {
 		/* Air currents overcome the recoil */
     		dotrap(ttmp,0);
-		return FALSE;
+		*range = 0;
+		return TRUE;
     	} else {
 		if (ttmp->tseen)
 		    You("pass right over %s %s.",
