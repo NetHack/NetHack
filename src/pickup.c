@@ -842,28 +842,28 @@ int how;			/* type of query */
 		any.a_void = 0;
 		any.a_int = 'B';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-			"items known to be Blessed", MENU_UNSELECTED);
+			"Items known to be Blessed", MENU_UNSELECTED);
 	}
 	if (do_cursed) {
 		invlet = 'C';
 		any.a_void = 0;
 		any.a_int = 'C';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-			"items known to be Cursed", MENU_UNSELECTED);
+			"Items known to be Cursed", MENU_UNSELECTED);
 	}
 	if (do_uncursed) {
 		invlet = 'U';
 		any.a_void = 0;
 		any.a_int = 'U';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-			"items known to be Uncursed", MENU_UNSELECTED);
+			"Items known to be Uncursed", MENU_UNSELECTED);
 	}
 	if (do_buc_unknown) {
 		invlet = 'X';
 		any.a_void = 0;
 		any.a_int = 'X';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-			"items of unknown B/C/U status",
+			"Items of unknown B/C/U status",
 			MENU_UNSELECTED);
 	}
 	end_menu(win, qstr);
