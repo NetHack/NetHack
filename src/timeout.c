@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.5	2003/11/18	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2005/01/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,10 +30,24 @@ stoned_dialogue()
 
 	if (i > 0L && i <= SIZE(stoned_texts))
 		pline(stoned_texts[SIZE(stoned_texts) - i]);
-	if (i == 5L)
+	switch ((int) i) {
+	case 5:		/* slowing down */
 		HFast = 0L;
-	if (i == 3L)
-		nomul(-3);
+		if (multi > 0) nomul(0);
+		break;
+	case 4:		/* limbs stiffening */
+		/* just one move left to save oneself so quit fiddling around;
+		   don't stop attempt to eat tin--might be lizard or acidic */
+		if (!Popeye(STONED)) stop_occupation();
+		if (multi > 0) nomul(0);
+		break;
+	case 3:		/* limbs turned to stone */
+		stop_occupation();
+		nomul(-3);	/* can't move anymore */
+		break;
+	default:
+		break;
+	}
 	exercise(A_DEX, FALSE);
 }
 
@@ -59,12 +73,16 @@ vomiting_dialogue()
 	case 0:
 		vomit();
 		morehungry(20);
+		stop_occupation();
+		if (multi > 0) nomul(0);
 		break;
 	case 2:
 		make_stunned(HStun + d(2,4), FALSE);
+		if (!Popeye(VOMITING)) stop_occupation();
 		/* fall through */
 	case 3:
 		make_confused(HConfusion + d(2,4), FALSE);
+		if (multi > 0) nomul(0);
 		break;
 	}
 	exercise(A_CON, FALSE);
@@ -134,7 +152,7 @@ slime_dialogue()
 	}
 	if (i == 3L) {	/* limbs becoming oozy */
 	    HFast = 0L;	/* lose intrinsic speed */
-	    stop_occupation();
+	    if (!Popeye(SLIMED)) stop_occupation();
 	    if (multi > 0) nomul(0);
 	}
 	exercise(A_DEX, FALSE);

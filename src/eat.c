@@ -2652,4 +2652,42 @@ boolean stopping;
 	return FALSE;
 }
 
+/* Tin of <something> to the rescue?  Decide whether current occupation
+   is an attempt to eat a tin of something capable of saving hero's life.
+   We don't care about consumption of non-tinned food here because special
+   effects there take place on first bite rather than at end of occupation.
+   [Popeye the Sailor gets out of trouble by eating tins of spinach. :-] */
+boolean
+Popeye(threat)
+int threat;
+{
+    struct obj *otin; 
+    int mndx;
+
+    if (occupation != opentin) return FALSE;
+    otin = context.tin.tin;
+    /* make sure hero still has access to tin */
+    if (!carried(otin) && !obj_here(otin, u.ux, u.uy)) return FALSE;
+    /* unknown tin is assumed to be helpful */
+    if (!otin->known) return TRUE;
+    /* known tin is helpful if it will stop life-threatening problem */
+    mndx = otin->corpsenm;
+    switch (threat) {
+    /* note: not used; hunger code bypasses stop_occupation() when eating */
+    case HUNGER:
+	return (mndx != NON_PM || otin->spe == 1);
+    /* flesh from lizards and acidic critters stops petrification */
+    case STONED:
+	return (mndx >= LOW_PM && (mndx == PM_LIZARD || acidic(&mons[mndx])));
+    /* no tins can cure these (yet?) */
+    case SLIMED:
+    case SICK:
+    case VOMITING:
+	break;
+    default:
+	break;
+    }
+    return FALSE;
+}
+
 /*eat.c*/
