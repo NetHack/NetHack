@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bones.c	3.4	2002/08/23	*/
+/*	SCCS Id: @(#)bones.c	3.4	2003/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -433,8 +433,13 @@ getbones()
 			 * set to the magic DEFUNCT_MONSTER cookie value.
 			 */
 			for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-			    if (mtmp->mhpmax == DEFUNCT_MONSTER) mongone(mtmp);
-			    else
+			    if (mtmp->mhpmax == DEFUNCT_MONSTER) {
+#if defined(DEBUG) && defined(WIZARD)
+				pline("Removing defunct monster %s from bones.",
+					mtmp->data->mname);
+#endif
+				mongone(mtmp);
+			    } else
 				/* to correctly reset named artifacts on the level */
 				resetobjs(mtmp->minvent,TRUE);
 			}

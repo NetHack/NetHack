@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.4	2003/05/25	*/
+/*	SCCS Id: @(#)makemon.c	3.4	2003/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -748,30 +748,32 @@ struct monst *mon;
  *         TRUE  propagation successful
  */
 boolean
-propagate(mndx, tally)
+propagate(mndx, tally, ghostly)
 int mndx;
 boolean tally;
+boolean ghostly;
 {
+	boolean result;
 	uchar lim = mbirth_limit(mndx);
-	boolean not_gone_yet = (!(mons[mndx].geno & G_NOGEN) &&
-				!(mvitals[mndx].mvflags & G_EXTINCT));
-	if ((int) mvitals[mndx].born < lim && not_gone_yet) {
-		if (tally) mvitals[mndx].born++;
-		/* if it's unique, or we've reached the limit
-		 * don't ever make it again.
-		 */
-		if ((mvitals[mndx].born >= lim) || (mons[mndx].geno & G_UNIQ)) {
-#if defined(WIZARD) && defined(DEBUG)
-			if (wizard)
-				pline("Automatically extinguished %s.",
+	boolean gone = (mvitals[mndx].mvflags & G_GONE); /* genocided or extinct */
+
+	result = (((int) mvitals[mndx].born < lim) && !gone) ? TRUE : FALSE;
+
+	/* if it's unique, don't ever make it again */
+	if (mons[mndx].geno & G_UNIQ) mvitals[mndx].mvflags |= G_EXTINCT;
+
+	if (mvitals[mndx].born < 255 && tally && (!ghostly || (ghostly && result)))
+		 mvitals[mndx].born++;
+	if ((int) mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN) &&
+		!(mvitals[mndx].mvflags & G_EXTINCT)) {
+#if defined(DEBUG) && defined(WIZARD)
+		if (wizard) pline("Automatically extinguished %s.",
 					makeplural(mons[mndx].mname));
 #endif
-			mvitals[mndx].mvflags |= G_EXTINCT;
-			reset_rndmonst(mndx);
-		}
-		return TRUE;
+		mvitals[mndx].mvflags |= G_EXTINCT;
+		reset_rndmonst(mndx);
 	}
-	return FALSE;
+	return result;
 }
 
 /*
@@ -858,7 +860,7 @@ register int	mmflags;
 		} while(!goodpos(x, y, &fakemon, gpflags) && tryct++ < 50);
 		mndx = monsndx(ptr);
 	}
-	propagate(mndx, countbirth);
+	(void) propagate(mndx, countbirth, FALSE);
 	xlth = ptr->pxlth;
 	if (mmflags & MM_EDOG) xlth += sizeof(struct edog);
 	else if (mmflags & MM_EMIN) xlth += sizeof(struct emin);
