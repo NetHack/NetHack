@@ -1387,7 +1387,7 @@ obj_delivery()
 	    if (nx > 0) {
 		place_object(otmp, nx, ny);
 		stackobj(otmp);
-		scatter(nx, ny, rnd(2), 0, otmp);
+		(void)scatter(nx, ny, rnd(2), 0, otmp);
 	    } else {		/* random location */
 		/* set dummy coordinates because there's no
 		   current position for rloco() to update */

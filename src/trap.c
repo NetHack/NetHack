@@ -1135,7 +1135,7 @@ void
 blow_up_landmine(trap)
 struct trap *trap;
 {
-	scatter(trap->tx, trap->ty, 4,
+	(void)scatter(trap->tx, trap->ty, 4,
 		MAY_DESTROY | MAY_HIT | MAY_FRACTURE | VIS_EFFECTS,
 		(struct obj *)0);
 	del_engr_at(trap->tx, trap->ty);
@@ -1283,7 +1283,7 @@ int style;
 				place_object(singleobj, bhitpos.x, bhitpos.y);
 				singleobj->otrapped = 0;
 				fracture_rock(singleobj);
-				scatter(bhitpos.x,bhitpos.y, 4,
+				(void)scatter(bhitpos.x,bhitpos.y, 4,
 					MAY_DESTROY|MAY_HIT|MAY_FRACTURE|VIS_EFFECTS,
 					(struct obj *)0);
 				if (cansee(bhitpos.x,bhitpos.y))
