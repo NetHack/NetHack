@@ -1,0 +1,124 @@
+	Instructions for compiling and installing NetHack 3.3
+		          on a TOS system
+	=====================================================
+	          (or, How to make ST NetHack 3.3)
+		     Last revision: 2 February 2000
+
+1.  Make sure all the NetHack files are in the appropriate directory structure.
+    You should have a main directory with subdirectories dat, doc, include,
+    src, util, sys\atari, sys\share, sys\unix, and at least one of win\tty
+    and win\gem.  You may have other subdirectories under sys and win, but
+    they needn't concern you.  If you do not follow this structure, the
+    Makefiles will not function properly.  The .c files for the main program
+    belong in src, those for utility programs in util, and Atari-specific
+    ones in sys\atari.  All the .h files belong in include, the documentation
+    in doc, and assorted data files in dat.  You may also use random.c from
+    sys\share.  The Makefiles belong in sys\unix.  (A more detailed
+    explanation of the directory structure may be found in Files, which
+    should be in the top directory.)
+ 
+
+2.  If you don't already have a good command line interpreter, get one.
+    Doing all of the following from the desktop or a GEM shell will
+    probably be a *big* pain.  If you can get a Bourne shell compatible
+    one, and put it in \bin\sh, then you'll save yourself some trouble
+    with the Makefiles.  There are several good shells on various
+    FTP sites (including atari.archive.umich.edu).
+
+    Run the "setup.g" shell script in sys\atari.  This will setup all the
+    makefiles and other files in the appropriate directories.  It assumes
+    that your compiler prefers \ to / as a directory separator.  If not,
+    simply copy the makefiles instead of running sed on them.
+
+3.  Now go to the include subdirectory to edit a couple of the header files
+    there.
+
+    First edit config.h according to the comments to match your system and
+    desired set of features.  In particular:
+       make sure that UNIX is *not* defined, and TOS is (if you're using
+          the MiNT library, and/or the -mint option to gcc, this will
+	  be done automatically)
+       make sure that HACKDIR is defined properly (or not at all)
+       make sure that COMPRESS is not defined
+
+    Also edit tosconf.h; this shouldn't need much changing. If you are not
+    going to include random.c you will need to comment out RANDOM. Gcc users
+    don't need RANDOM, since the gcc and MiNT libraries have a Berkeley
+    derived srandom() function already. If you have no termcap support and
+    don't want to use the supplied termcap.uu, comment out TERMLIB. Gcc has
+    a termcap library, so TERMLIB should always be "on" with gcc (and you
+    don't need to worry about termcap.uu at all).
+
+4.  If you want to change the high score list behavior, examine the top of
+    topten.c, in the src directory.  You may want to change the definitions of
+    PERSMAX, POINTSMIN, and ENTRYMAX.  I set POINTSMIN to 51 and ENTRYMAX to
+    50 to keep the size of the score list down.
+
+5.  Go to the src directory and edit your Makefile.  You'll want the Systos
+    target configuration; the comments explain most of what needs to be done,
+    at least for the gcc.
+
+    Next, go to the top, util, dat, and doc directories, and edit the Makefiles
+    there, as necessary.  You'll need nroff and/or TeX to do the files in doc;
+    if you don't have one/both of these, you can skip it (docs?? we don't need
+    no steenking docs :-)).
+
+    If you elected to use Fred Fish's termcap library (bundled in as
+    termcap.arc), you will have to generate termcap.a from those sources.
+
+    If you are recompiling after patching your sources, or if you got your
+    files from somewhere other than the official distribution, "touch
+    makedefs.c" to ensure that certain files (onames.h and pm.h) are remade,
+    lest potentially troublesome timestamps fool "make."
+
+8.  Now, enter "make all", and take a long siesta; your computer will be
+    occupied for a long time.  If all goes well, you will get an executable.
+    If you tried to compile in too many features, you will probably get a
+    dysfunctional executable, and will have to start over.
+
+	Hint 1:  If you're short on memory, you might enter "make -n all
+	>make.bat," and then run script.bat with some sort of batch
+        program or with the gulam command "script make.bat."
+
+	Hint 2: You'll save yourself a lot of grief if you use the GNU
+	version of the "make" program. Some of the smaller makes aren't
+	completely compatible. GNU software for the Atari is widely
+	available; for example, by anonymous FTP from atari.archive.umich.edu.
+
+9.  Make sure the support files -- data, rumors, cmdhelp, opthelp, help, hh,
+    history, license, and oracles, or simply nhdat if DLB was defined --
+    were copied to the game directory.  If not, move them there from the
+    dat directory yourself.  rumors can be created manually by entering
+    "makedefs -r;" data by entering "makedefs -d."
+
+    Also, make sure that the various level files (*.lev, from the dat
+    subdirectory) were copied over correctly. If you're not sure what files
+    should have been made, double check with Makefile.dat.
+
+10. Go to the src\atari directory.  Copy atari.cnf to your game directory
+    as NetHack.cnf. Edit it to reflect your particular setup and personal
+    preferences, following the comments.
+
+    If you compiled in the TERMLIB feature, also move the "termcap" file to
+    your game directory.  (Note:  gcc's termcap routines have built-in
+    defaults, so the termcap file is not necessary with that compiler.)
+
+    If you're running NetHack from the MultiTOS desktop, and you want a
+    more useful set of drop down menus than the plain system "File/Edit"
+    ones, copy nethack.mnu to your games directory. This file contains a
+    menu definition that puts a lot of the common commands into the menu.
+
+11. Play NetHack.  If it works, you're done!
+
+
+Notes
+-----
+
+1)  Save files and bones files from previous versions will not work with
+    NetHack 3.3.  Don't bother trying to keep them.  
+
+2)  To install an update of NetHack after changing something, enter "make"
+    from the src directory.  If you add, delete, or reorder monsters or
+    objects, or you change the format of saved level files, delete any save
+    and bones files.  (Trying to use such files sometimes produces amusing
+    confusions on the game's part, but more often produces crashes.)
