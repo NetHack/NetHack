@@ -100,7 +100,7 @@ moveloop()
 
 		    /* calculate how much time passed. */
 #ifdef STEED
-		    if (u.usteed && flags.mv) {
+		    if (u.usteed && u.umoved) {
 			/* your speed doesn't augment steed's speed */
 			moveamt = mcalcmove(u.usteed);
 		    } else
