@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.4	2003/01/29	*/
+/*	SCCS Id: @(#)dig.c	3.4	2003/03/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1185,7 +1185,7 @@ zap_dig()
 			(void)xname(otmp);	/* set dknown, maybe bknown */
 			stackobj(otmp);
 		    }
-		    if (Invisible) newsym(u.ux, u.uy);
+		    newsym(u.ux, u.uy);
 		} else {
 		    watch_dig((struct monst *)0, u.ux, u.uy, TRUE);
 		    (void) dighole(FALSE);

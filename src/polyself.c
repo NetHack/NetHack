@@ -849,11 +849,11 @@ dospinweb()
 		case SPIKED_PIT: You("spin a web, covering up the pit.");
 			deltrap(ttmp);
 			bury_objs(u.ux, u.uy);
-			if (Invisible) newsym(u.ux, u.uy);
+			newsym(u.ux, u.uy);
 			return(1);
 		case SQKY_BOARD: pline_The("squeaky board is muffled.");
 			deltrap(ttmp);
-			if (Invisible) newsym(u.ux, u.uy);
+			newsym(u.ux, u.uy);
 			return(1);
 		case TELEP_TRAP:
 		case LEVEL_TELEP:
@@ -867,12 +867,12 @@ dospinweb()
 			You("web over the %s.",
 			    (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole");
 			deltrap(ttmp);
-			if (Invisible) newsym(u.ux, u.uy);
+			newsym(u.ux, u.uy);
 			return 1;
 		case ROLLING_BOULDER_TRAP:
 			You("spin a web, jamming the trigger.");
 			deltrap(ttmp);
-			if (Invisible) newsym(u.ux, u.uy);
+			newsym(u.ux, u.uy);
 			return(1);
 		case ARROW_TRAP:
 		case DART_TRAP:
@@ -897,7 +897,7 @@ dospinweb()
 		ttmp->tseen = 1;
 		ttmp->madeby_u = 1;
 	}
-	if (Invisible) newsym(u.ux, u.uy);
+	newsym(u.ux, u.uy);
 	return(1);
 }
 

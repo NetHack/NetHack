@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.4	2003/03/10	*/
+/*	SCCS Id: @(#)pray.c	3.4	2003/03/23	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1195,7 +1195,7 @@ dosacrifice()
 			  an(hcolor(NH_BLACK)));
 		    levl[u.ux][u.uy].typ = ROOM;
 		    levl[u.ux][u.uy].altarmask = 0;
-		    if(Invisible) newsym(u.ux, u.uy);
+		    newsym(u.ux, u.uy);
 		    angry_priest();
 		    demonless_msg = "cloud dissipates";
 		} else {

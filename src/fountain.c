@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)fountain.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)fountain.c	3.4	2003/03/23	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -386,7 +386,7 @@ register struct obj *obj;
 		update_inventory();
 		levl[u.ux][u.uy].typ = ROOM;
 		levl[u.ux][u.uy].looted = 0;
-		if(Invisible) newsym(u.ux, u.uy);
+		newsym(u.ux, u.uy);
 		level.flags.nfountains--;
 		if(in_town(u.ux, u.uy))
 		    (void) angry_guards(FALSE);
