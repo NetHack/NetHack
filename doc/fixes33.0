@@ -1,0 +1,372 @@
+General Fixes and Modified Features
+-----------------------------------
+objects falling down a level don't cause everything at destination to scatter
+randomize visible trap glyphs during hallucination
+don't match statue entry when looking up statue trap [after trap detection]
+do match statue entry when looking up "statue of a <foo>" when foo happens
+	to precede statue in the database; likewise for figurines
+initialize random number generator before processing user configuration file
+	(random role selection always selected tourist)
+support "character:X" and "role:X" in NETHACKOPTIONS as well as in config file
+allow colon as an alternative to equals sign for `OPTIONS:whatever' and
+	equals sign as an alternative to colon for `pickup_types=?!="$'
+make rndexp (blessed gain level) be safe for 16 bit integer configurations
+don't add player's weapon proficiency bonus for weapon attacks by monsters
+create quest artifact crystal balls with 5 charges instead of 0
+store ghost names in the same manner as other monster names (fix pet bug)
+boost kobold shaman level to 2 (was 1, too low to ever cast a spell)
+boost ogre king level to 9 (was 7, same as ogre lord)
+throwing quest artifact to quest leader won't cause anger; also, artifact
+	will be caught and thrown back instead of being explicitly ignored
+boost level of fake players in endgame to match their rank titles
+don't lose odd hit points (integer division truncation) when splitting HP
+	for cloned monsters
+update status line when cloning yourself halves your hit points
+suppress clone's initial inventory for poly'd player just as for monsters
+update the documention describing the O command
+polyself: immediately update vision when reverting to human from eyeless form
+use right pronoun when a mind flayer's attack is blocked by a monster's helmet
+tins of lizard meat are never rotten, just like the corresponding corpses
+tattered capes should not match ape entry in database
+booze should not match ooze entry in database
+lowered drawbridge should not match werecritter entry
+lengthen option file line length to 4*BUFSZ
+make zaps of death at polymorphed players work properly
+change way invisibility works, add remembered invis monsters and 'F' command
+don't list pick-axe and unicorn horn as likely candidates for charging
+give more accurate message when nymph steals multi-turn armor from female char
+fix splitting merged group of wielded weapons for menu mode version of #loot
+if a buried container rots away, bury rather than destroy any contents
+the 'W'ear command now only shows armor you can actually wear at this instant,
+	instead of all armor you're not currently wearing
+wishing for a genocided monster egg gets a dead egg, not a generic egg
+"Unfortunately it is still genocided" printed only if monster is in range
+	(particularly important for lifesaved monster genocided off-level).
+message for monster growing into genocided monster only printed if in range
+include number of attached candles when formatting candelabrum's name
+support attaching already lit candles to candelabrum
+range of candlelight varies with number of candles
+dropping ring of hunger onto sink won't falsely claim that undestroyed objects
+	like the Amulet have vanished
+winged gargoyle can't wear body armor
+self probing and stethoscope display speed with same detail as enlightenment
+throwing attacks can trigger reprisals similar to hand-to-hand and zap attacks
+'A' now works in dropping like when picking up
+make setting bear traps and land mines be a multi-turn occupation
+make lava be properly lit on special levels
+add orig.female flag to handle E quest monster situation
+clean up inconsistent quest text
+in initial legacy message, use "goddess" when appropriate
+allow FIRSTNEMESIS message to actually be printed
+taking a peaceful monster's weapon with applied bullwhip will anger victim
+applying an unpaid magic lamp will charge a low lighting fee instead of the
+	djinni release fee
+teleporting a Rider will usually bring it near you instead of sending it away
+Riders can open locked doors without a key, just like the Wizard
+Riders, angels, and elves won't avoid stepping on Elbereth/scare monster when
+	deciding where to walk
+Riders and angels will ignore the sanctuary effect of temples
+mind flayers cannot suck out brains by hitting long worm tails
+don't ignore object age when #offering a partially eaten corpse
+inability to pick up is not as general as nolimbs (blobs may pick up with
+	pseudopods and purple worms by swallowing)
+wishing for a magic lamp produces an oil lamp, not a no-charges, possibly lit,
+	magic lamp
+blobs may not ooze under doors if their inventory can't be squeezed through
+peaceful/tame monsters will not use bullwhips on the player
+ghosts were not inheriting player gender in bones files
+cannot wish for tins of untinnable (due to insubstantiality) monsters
+flying monsters cannot fall down stairs
+prevent divine retribution from destroying a wand which is being broken
+fix resuming to read a spellbook which has become blank since the prior read
+	attempt got interrupted
+make recharging cancelled wands behave like recharging other cancelled objects
+prevent "late" pline calls from triggering a crash when the RIP window was
+	displayed at end of game (observed when bones file rename failure
+	under Win95 was reported to wizard mode users)
+cannot shatter soft weapons (whips, rubber hoses)
+being punished on the Plane of Water doesn't trigger a panic when air bubbles
+	try to move the ball&chain or you around
+seen-invisible monsters are consistently visible but transparent, rather
+	than looking like normal monsters
+kicked object message for hitting another object no longer claims it "stops"
+kicked object hits objects (plural) if quan>1 but there is nothing else there
+kicking an object which is embedded in a closed door behaves like one in rock
+can't kick object out of a known pit, but could when pit hadn't been seen yet
+pets, shopkeepers, unique monsters, trolls, and Riders retain
+	their characteristics when killed and brought back to life
+being polymorphed into a black light makes you hallucination resistant
+don't attempt to perform panic save if the game is already over
+don't leave old game's timers, light sources, and shop data in place if
+	aborted restore attempt reverts to starting new game [eventual panic]
+Magicbane carried by mplayers has a lower enchantment than other artifacts
+if pets take longer to untame than to starve, make them go wild anyway
+split up erosion to allow both rust and acid (or fire and rot)
+rust/fire/corrosion/rot now work in all cases (monster/monster, monster/you)
+upon arrival to quest, mark return portal as seen
+can't be blinded by light while asleep
+can't put boulders or big statues into containers
+engulfers which engulf a pile engulf 'several objects'
+polyself: use right set of hit points for hunger and strength loss
+polyself: likewise when checking for troubles during prayer
+polyself: stop mimicking gold immediately if shape change occurs
+polyself: change monster type when sex change occurs for succubus or incubus
+Y2K fix: use 4 digit year values for the dates in the score file
+when changing levels, update the screen to show the new level sooner
+when changing levels, a monster might displace you from the stairs upon arrival
+petrify polymorphed player who has protected hands but is using a non-hand
+	attack on a cockatrice
+fix bug where barehanded AT_WEAP by polymorphed player on cockatrice worked
+prevent multiple purchases of clairvoyance at temple from overflowing the
+	intrinsic's timed subfield and becoming permanent
+when cursed, greased or oilskin cloak might fail to protect against grabbing
+when any corpse wielded by a monster rots away, unwield it to avoid "bad
+	monster weapon restore"
+hallucination affects priest and minion names
+don't try to make the word "aklys" singular
+bullwhip can't yank welded weapon from target
+eroded T-shirts now display the eroded shirt text consistently
+fix "killed by kicking something weird" when kicking a fountain
+disallow fruit names whose prefixes are valid for food (uncursed, numbers, etc.)
+properly handle wishing for fruits which start with other prefixes
+avoid rn2(0) divide by 0 for empty inventory when trying to crawl out of water
+don't let randomly placed monsters on special levels prevent explicitly
+	placed monsters who target that location from being created (a web
+	trap's spider resulted in no quest nemesis)
+don't let randomly placed stairs on special levels be covered by explicitly
+	placed features such as fountains
+substitute random monsters when special level monsters have been genocided
+fix intrinsic blockage by worn items so that wielding a mummy wrapping or
+	cornuthaum won't have the same special effect as wearing one
+magic markers created via polymorphing tools are flagged as being recharged
+unseen rust monster eating messages, and make tame rust monsters consistent
+	with wild ones with regard to rustproofed items
+pager: guard against '%' in output from being treated as a printf formatting
+	directive (using '/' or ';' to look at food yields "% blah blah")
+getpos: support shifted movement letters in number_pad as per help text
+getpos: properly truncate diagonal movements at map edge
+using #name to call an object type something could be used to distinguish
+	fake amulet of yendor (appeared in discoveries list) from real (didn't)
+upon quest completion, leader now IDs quest artifact and also tells player
+	that Bell of Opening is necessary if character doesn't already have it
+remove unwanted quote marks from quest message R 70
+make polymorphed objects be likely to retain magic state: non-magic items
+	usually yield other non-magic items, magic items yield magic ones
+make artifact mirrors unlikely to break when used to hit monsters
+make sure that nemeses don't leave corpses if the message says there's no body
+fix wizard-mode problem with generating Master of Thieves (was singularizing it)
+allow weapon-using monsters who ignore gems to throw darts
+make flint stones be the preferred ammo for sling wielding monsters
+gaining/losing telepathy via polymorph (i.e. mind flayer) redisplays monsters
+prayer result of ``escape from solid rock'' isn't inhibited by teleport
+	restrictions (attempting to fix all troubles got stuck in a loop)
+fix surviving level teleport to a negative destination from somewhere other
+	than the main dungeon (was corrupting the level maps)
+surviving level teleport to a negative destination ("you float down to earth")
+	escapes the dungeon instead of arriving on level 1
+dying due to level teleport directly to heaven won't leave bones
+kicking shades with blessed boots, punching with blessed gloves or when wearing
+	silver rings, does the appropriate damage to them
+add artifacts to ending score and display
+prevent used objects like scrolls and potions which immediately cause the
+	character's death from remaining in final inventory (disclosure+bones)
+blessed genocide of '@' will list the player's role during genocide disclosure
+moved skill definitions to their own file (skills.h) and embedded them in
+	the object table.
+increased the maximum number of branches supported by dgn_comp.
+increased the number of characters permitted in a role name.
+the number of bits available for properties are expanded.
+water demons should not chat about being freed.
+since hallucinating players see monsters constantly change anyway, don't print
+	message when werecritter changes
+artifacts which do fire/cold/electric damage to their targets can destroy
+	carried objects which are susceptible to that type of damage
+some artifacts are now unaligned in order to be more accessible to all types
+	of characters
+wizard mode ^F command reveals floor traps along with the map
+pager: '/' was not finding data.base entries for shopkeepers, mimics, or
+	race/role spit when picking from the screen
+small monsters like hobbits and gnome zombies couldn't wear cloaks/wraps
+make sure non-erodable objects aren't eroded or erodeproof (could happen by
+	wishing or object polymorph)
+consistently let iron non-weapons rust, etc.
+handle more spelling variations ("boots of speed",&c) when granting wishes
+fix 3.2.0 change which flags the castle and priest quest levels as graveyards
+when stepping on a spot where "there are several objects here" (so many
+	objects that they aren't automatically shown to the user), report any
+	dungeon feature such as stairs just like when there are fewer objects
+report "file empty?" rather than "version mismatch" when that's the reason
+	why a data file fails its validation check
+to-hit bonuses don't accumulate for monsters with multiple weapon
+	attacks
+skill definitions moved to skills.h
+skills are stored in the objects[] table.
+intrinsics and extrinsics are now >32 bit
+number of roles no longer limited to 26 letters
+renamed typename() to obj_typename()
+add "You hear a nearby zap" when monster is close
+fixed a bug that would print of "a Book of the Dead" instead of "The"
+fixed a bug so there is no delay when a rolling boulder trap is
+	triggered completely out of sight
+fixed emergency_disrobe() so it will drop gold
+fixed a missing case that occurs (rarely) when praying during a
+	full moon and your god is very pleased
+ask for confirmation before praying;  no more accidental Alt-P
+more guilt messages when you do something which lowers alignment
+mplayers get more suitable equipment for their role
+allow spaces before <option-name>= in the options file
+dragon scales/scale mail of all colors now work when worn by monsters (in
+	3.2.x, only gray conferred any special benefit)
+when shopkeeper takes cash from dead player's corpse, clear `been robbed'
+	status if there's enough gold to cover the amount so that next
+	player who loads level as bones data won't start out owing money
+merged scrolls of scare monster crumble to dust together, matching the
+	existing feedback (was destroying one and leaving the rest)
+properly disallow wishing for venom and allow wishing for iron balls by class
+drum of earthquake can't destroy the high altars
+potion of oil can't be ignited while underwater
+zapping a wand of digging upwards while underwater won't dislodge a rock
+	from the ceiling
+add "born" field so monster extinction limits the number created, not killed
+allow "okonomiyaki", etc. to pluralize properly (Ranma 1/2 is popular)
+fix off-by-one bug that disabled the check to see if you tried to name your
+	fruit after a previously existing corpse or egg
+avoid a "glorkum" message if an object conveying a warning is stolen before 
+	the warning message is delivered
+flags.made_amulet flag was never being set
+make sure proper message is given when tinning cockatrice while a flesh golem
+fix punctuation on cancelled cobra's dry rattle message
+leash cannot choke monsters that do not breathe
+rothes are now brown, harder to confuse with much more powerful grey quadrupeds
+defer level change for every schedule_goto() call, not just while monsters
+	are moving (player's move could cause an engulfer to expel character
+	onto a level changing trap, then attempt to access stale monster and
+	possibly trigger relmon panic or crash)
+fix obscure worm bug which did not consider the tail tip to be visible.  Bug
+    produced "You miss it" on 3.2 and a blatantly obvious 'I' in prerelease 3.3.
+water prayer: treat already blessed potions as `other' rather than as `water'
+water prayer: potions being blessed glow light blue rather than amber;
+	hallucination affects the color seen when changed potions glow
+fix Death/Sandman #9 joke (should be 8) and make sure the message can be seen
+zapping Death with wand of death multiple times could cause hit points to wrap
+when pet attacks monster that attacks back, be sure it's in range (could be a
+	worm attacked on the tail)
+
+
+Platform- and/or Interface-Specific Fixes
+-----------------------------------------
+micro: -uwizard-{class} counts as -uwizard when allowing debug mode
+micro (assorted): readmail()--don't show fake mail text when blind; also,
+	update the "report bugs to" message to specify devteam@nethack.org
+msdos: fix overlay separations in weapon.c
+msdos: fix problem breaking compile without REINCARNATION
+msdos: fix dependency in djgpp Makefile (wintty.c -> hack.h)
+tty: try to use terminfo sgr0 (aka termcap me) attribute to turn off all
+	text attributes, instead of just using "rmso" (aka "se") attribute.
+tty: change name of nethack's termcap.h to be tcap.h
+tty: ^P at a long prompt printed an extra newline (and then wrapped oddly)
+tty: get repeat to work properly on extended commands
+tty/ASCIIGRAPH: rogue level uses PC Rogue colors and symbols
+nt: in TTY port, non-English keyboard layouts that depended on AltGr-+ sequence
+	were getting "Unknown command 'M-\'" for '\','@','$','{','[',']','}'.
+tty and X11: avoid crashing trying to display long (>128 char) menu items
+X11: avoid setuid install problems by changing uid to real uid while
+	opening the X11 connection.
+unix: compress/uncompress detects failure of the compressor, such as for
+	filesystem full or missing compressor, and no longer deletes the
+	valid file.  In the uncompress case, such as uncompressing the save
+	file, a message is generated as well.
+dlb: handle situation where lseek(,,SEEK_END) doesn't yield the size of the
+	contents of a file (specifically, VMS "variable length" record format)
+vms: install.com couldn't handle the `copy readonly files' step when DLB
+	wasn't enabled
+mac: added unix tty-ish menu flexability
+mac: stoped using OLDROUTINENAMES
+mac: added dlb support
+mac: Increased the maximum number of menu items, so the inventory
+	won't get cut off at the bottom.
+mac: Changed the behavior of Cmd-Q so it uses the new #quit command.
+mac: Will only dispatch events if the window system is initialized.
+	This fixes a bug that would crash the system if the user had an
+	invalid option in the NetHack Defaults file.
+mac: Added an appropriate message when eating an apple.
+mac: Change the askname dialog for the new role patch.
+mac: Add a gray background to all dialogs.
+mac: Replace some improper calls to InitCursor().
+mac: Remove a whole bunch of unused code.
+mac: Added Balloon Help messages.
+mac: Pop-up menus display the 3-letter file code instead of a single
+	letter.
+mac: Pop-up menus and text item have a 3-dimensional look.
+
+
+General New Features
+--------------------
+incorporate the "wizard patch"
+`#quit' command added
+`*' command added; displays inventory of all equipment currently in use
+add Stone To Flesh spell
+wands eventually explode if rechaged too many times
+show IDed Amulet of Yendor + invocation tools in own section of discoveries
+	list; likewise for IDed artifacts
+add infravision
+add Eyes of the Overworld
+add lenses
+split players race from role in life
+cursed figurines cam spontaneously transform when carried
+`in_use' struct obj field is unconditional rather than just #if !NO_SIGNAL
+add the secondary weapon slot, e(x)change command, #twoweapon
+	command, and "pushweapon" option.
+add the quiver slot, (Q)uiver command, (f)ire command, and
+	"autoquiver" option (defaults to false).
+add the "pickup_burden" option which controls when the user
+	is asked for confirmation when picking up an item.
+pole-weapons can be applied at a distance, and similarly used by monsters.
+'/' command's pick-a-location input (getpos) supports shortcuts to bypass the
+	"more info?" prompt; ':' for '.'+'y', ',' for '.'+'n', ';' for ','+ESC
+monsters can throw cockatrice eggs at players
+prayer trouble "stuck in wall" takes boulders into consideration
+crysknives can be "fixed"
+vampires now #chat back
+new monsters: chickatrice,pyrolisk,fox,coyote,winter wolf cub,dingo, 
+	gas spore,flaming sphere,shocking sphere,lynx,panther,raven, 
+	glass piercer,mastodon,woodchuck,centipede,master mind flayer, 
+	pony,horse,warhorse,silver dragon,lichen,storm giant,arch-lich,
+	dwarf mummy,green slime,disenchanter,monkey,dwarf zombie,ghoul, 
+	paper golem, gold golem,glass golem,prisoner,jellyfish,piranha,
+	shark
+new objects: amulet of unchanging,silver dagger,silver spear, 
+	silver dragon scales/mail,robe,alchemy smock,kicking boots, 
+	kelp frond,eucalyptus leaf,scroll of earth,spell of drain life,
+	potion of acid,potion of full healing,potion of polymorph,
+	potion of sleeping,ring of free action,ring of gain constitution,
+	ring of increase accuracy,ring of slow digestion,grappling hook,
+	ring of sustain ability,wand of enlightenment,saddle,various gems
+add Monk role
+the old Elf role is replaced by the Ranger
+add Human, Elf, Dwarf, Gnome, and Orc races
+add multishot ammunition
+add graves, iron bars, trees, and arboreal levels
+dwarvish mattocks can be used to dig
+add leprechaun, cockatrice, and anthole special rooms
+add the Sokoban dungeon
+implement talking artifacts
+members of the clergy (aligned/high/player priests and monks) are 
+	generated with a robe instead of chain mail.
+new tin of meat types
+tinning kits and cameras have charges
+blessed magic mapping detects secret doors
+starting spells are known at start of game
+pre-discoveries are listed with an *
+voluntary challenges with #conduct
+add a funny message when eating tridents and flint stones
+allow debug-mode level teleport to the sanctum
+some #monster commands now consume energy
+trees can be kicked as a possible source of fruit
+Wile E. Coyote references when using '/' on a coyote
+
+Platform- and/or Interface-Specific New Features
+------------------------------------------------
+WinNT: implement mail support
+WinNT: console mouse support added to TTY port
+
