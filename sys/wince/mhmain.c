@@ -32,7 +32,7 @@ static void		register_main_window_class();
 static void		select_map_mode(int map_mode);
 static int		menuid2mapmode(int menuid);
 static int		mapmode2menuid(int map_mode);
-static HMENU	_get_main_menu();
+static HMENU	_get_main_menu(UINT menu_id);
 
 HWND mswin_init_main_window () {
 	static int run_once = 0;
@@ -184,6 +184,12 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				GetNHApp()->hMenuBar, GetNHApp()->hApp,
 				IDC_WINHACK, 0 );
 #endif
+			CheckMenuItem(
+				_get_main_menu(ID_VIEW),
+				IDM_VIEW_KEYPAD,
+				MF_BYCOMMAND | 
+				(GetNHApp()->bCmdPad? MF_CHECKED : MF_UNCHECKED)
+			);
 
 			/* create command pad (keyboard emulator) */
 			data->hCmdWnd = mswin_init_command_window();
@@ -735,7 +741,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case IDM_VIEW_KEYPAD:
 			GetNHApp()->bCmdPad = !GetNHApp()->bCmdPad;
 			CheckMenuItem(
-				_get_main_menu(),
+				_get_main_menu(ID_VIEW),
 				IDM_VIEW_KEYPAD,
 				MF_BYCOMMAND | 
 				(GetNHApp()->bCmdPad? MF_CHECKED : MF_UNCHECKED)
@@ -849,7 +855,7 @@ void mswin_select_map_mode(int mode)
 
 	map_id = WIN_MAP;
 	data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
-	hmenuMap = _get_main_menu();
+	hmenuMap = _get_main_menu(ID_MAP);
 
 	/* override for Rogue level */
 #ifdef REINCARNATION
@@ -932,7 +938,7 @@ int	mapmode2menuid(int map_mode)
 	return -1;
 }
 
-HMENU _get_main_menu()
+HMENU _get_main_menu(UINT menu_id)
 {
 	HMENU hmenuMap;
 #ifndef WIN_CE_2xx
@@ -942,7 +948,7 @@ HMENU _get_main_menu()
 #ifndef WIN_CE_2xx
 	tbbi.cbSize = sizeof(tbbi);
 	tbbi.dwMask = TBIF_LPARAM;
-	SendMessage( GetNHApp()->hMenuBar, TB_GETBUTTONINFO, ID_MAP, (LPARAM)&tbbi);
+	SendMessage( GetNHApp()->hMenuBar, TB_GETBUTTONINFO, menu_id, (LPARAM)&tbbi);
     hmenuMap = (HMENU)tbbi.lParam;
 #else
 	hmenuMap = CommandBar_GetMenu(GetNHApp()->hMenuBar, 0);
