@@ -209,6 +209,8 @@ use_stethoscope(obj)
 	struct monst *mtmp;
 	struct rm *lev;
 	int rx, ry, res;
+	boolean interference = (u.uswallow && is_whirly(u.ustuck->data) &&
+				!rn2(Role_if(PM_HEALER) ? 10 : 3));
 
 	if (nohands(youmonst.data)) {	/* should also check for no ears and/or deaf */
 		You("have no hands!");	/* not `body_part(HAND)' */
@@ -224,14 +226,23 @@ use_stethoscope(obj)
 	last_used_move = moves;
 	last_used_movement = youmonst.movement;
 
+#ifdef STEED
+	if (u.usteed && u.dz > 0) {
+		if (interference) {
+			pline("%s interferes.", Monnam(u.ustuck));
+			mstatusline(u.ustuck);
+		} else
+			mstatusline(u.usteed);
+		return res;
+	} else
+#endif
 	if (u.uswallow && (u.dx || u.dy || u.dz)) {
 		mstatusline(u.ustuck);
 		return res;
-#ifdef STEED
-	} else if (u.usteed && u.dz > 0) {
-		mstatusline(u.usteed);
+	} else if (u.uswallow && interference) {
+		pline("%s interferes.", Monnam(u.ustuck));
+		mstatusline(u.ustuck);
 		return res;
-#endif
 	} else if (u.dz) {
 		if (Underwater)
 		    You_hear("faint splashing.");
