@@ -222,7 +222,7 @@ register int humidity;
 		return TRUE;
 	}
 	if (humidity & WET) {
-	    if (is_pool(x,y) || is_lava(x,y))
+	    if (is_pool(x,y) || ((humidity & DRY) && is_lava(x,y)))
 		return TRUE;
 	}
 	return FALSE;
