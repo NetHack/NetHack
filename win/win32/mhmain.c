@@ -320,6 +320,10 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				NHEVENT_KBD(KEYTABLE(KEY_PLUS));
 			return 0;
 
+			case VK_CLEAR: /* This is the '5' key */
+				NHEVENT_KBD(KEYTABLE(KEY_GOINTERESTING));
+			return 0;
+
 			case VK_F4:
 				if( IS_MAP_FIT_TO_SCREEN(iflags.wc_map_mode) ) {
 					mswin_select_map_mode(
