@@ -75,7 +75,7 @@ struct objclass {
 #define is_corrodeable(otmp)	(objects[otmp->otyp].oc_material == COPPER || objects[otmp->otyp].oc_material == IRON)
 
 #define is_damageable(otmp) (is_rustprone(otmp) || is_flammable(otmp) || \
-				is_rottable || is_corrodeable(otmp))
+				is_rottable(otmp) || is_corrodeable(otmp))
 
 	schar	oc_subtyp;
 #define oc_skill	oc_subtyp   /* Skills of weapons, spellbooks, tools, gems */
