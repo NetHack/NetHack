@@ -287,12 +287,13 @@ char *argv[];
 	/* Obtain the name of the logged on user and incorporate
 	 * it into the name. */
 	Sprintf(lock, "%s-%s",get_username(0),plname);
+	regularize(lock);
 # else
 	Strcpy(lock,plname);
 	regularize(lock);
 # endif
 	getlock();
-#else   /* PC_LOCKING */
+#else   /* What follows is !PC_LOCKING */
 # ifdef AMIGA /* We'll put the bones & levels in the user specified directory -jhsa */
 	Strcat(lock,plname);
 	Strcat(lock,".99");

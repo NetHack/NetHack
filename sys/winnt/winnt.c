@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)winnt.c	 3.4	 1997/04/12		  */
+/*	SCCS Id: @(#)winnt.c	 3.4	 2002/03/23		  */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -151,10 +151,7 @@ def_kbhit()
 }
 
 /* 
- * Windows NT version >= 3.5x and above supports long file names,
- * even on FAT volumes (VFAT), so no need for nt_regularize.
- * Windows NT 3.1 could not do long file names except on NTFS,
- * so nt_regularize was required.
+ * Strip out troublesome file system characters.
  */
 
 void
