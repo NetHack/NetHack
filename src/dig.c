@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.5	2003/03/23	*/
+/*	SCCS Id: @(#)dig.c	3.5	2005/03/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -270,9 +270,10 @@ dig()
 	if (Race_if(PM_DWARF))
 	    context.digging.effort *= 2;
 	if (context.digging.down) {
-		register struct trap *ttmp;
+		struct trap *ttmp = t_at(dpx, dpy);
 
-		if (context.digging.effort > 250) {
+		if (context.digging.effort > 250 ||
+			(ttmp && ttmp->ttyp == HOLE)) {
 		    (void) dighole(FALSE);
 		    (void) memset((genericptr_t)&context.digging, 0,
 					sizeof (struct dig_info));
@@ -280,9 +281,8 @@ dig()
 		}
 
 		if (context.digging.effort <= 50 ||
-		    ((ttmp = t_at(dpx,dpy)) != 0 &&
-			(ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT ||
-			 ttmp->ttyp == TRAPDOOR || ttmp->ttyp == HOLE)))
+			(ttmp && (ttmp->ttyp == TRAPDOOR ||
+			    ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT)))
 		    return(1);
 
 		if (IS_ALTAR(lev->typ)) {
