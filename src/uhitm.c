@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2002/02/17	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2002/08/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -932,7 +932,10 @@ int thrown;
 	}
 
 	mon->mhp -= tmp;
-	if(mon->mhp < 1)
+	/* adjustments might have made tmp become less than what
+	   a level draining artifact has already done to max HP */
+	if (mon->mhp > mon->mhpmax) mon->mhp = mon->mhpmax;
+	if (mon->mhp < 1)
 		destroyed = TRUE;
 	if (mon->mtame && (!mon->mflee || mon->mfleetim) && tmp > 0) {
 		abuse_dog(mon);
