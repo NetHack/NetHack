@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.4	2002/10/10	*/
+/*	SCCS Id: @(#)steed.c	3.4	2003/01/10	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -319,15 +319,11 @@ mount_steed(mtmp, force)
 	    }
 	    You("slip while trying to get on %s.", mon_nam(mtmp));
 
-	    /* Unfortunately we don't have a version of the monster-naming
-	     * function that works well with "a" and "the" but ignores
-	     * hallucination.  Fortunately, we know the monster must be saddled
-	     * at this point, and that it can't have type_is_pname(), so we
-	     * don't need to worry about the special cases such a function
-	     * would have to consider.
-	     */
-	    Sprintf(buf, "slipped while mounting a saddled %s",
-		    m_monnam(mtmp));
+	    Sprintf(buf, "slipped while mounting %s",
+		    /* "a saddled mumak" or "a saddled pony called Dobbin" */
+		    x_monnam(mtmp, ARTICLE_A, (char *)0,
+			SUPPRESS_IT|SUPPRESS_INVISIBLE|SUPPRESS_HALLUCINATION,
+			     TRUE));
 	    losehp(rn1(5,10), buf, NO_KILLER_PREFIX);
 	    return (FALSE);
 	}
