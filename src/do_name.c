@@ -989,7 +989,6 @@ const char *colorpref;
 }
 
 /* Aliases for road-runner nemesis
- * See also http://www.geocities.com/EnchantedForest/1141/latin.html
  */
 static const char * const coynames[] = {
 	"Carnivorous Vulgaris","Road-Runnerus Digestus",
