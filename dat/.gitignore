@@ -2,6 +2,7 @@ options
 oracles
 data
 rip.xpm
+pet_mark.xbm
 quest.dat
 rumors
 x11tiles
@@ -12,3 +13,4 @@ dungeon.pdf
 dungeon
 nethack.png
 nhsplash.xpm
+nhdat
