@@ -461,6 +461,7 @@ struct monst *shkp;
 	long total;
 
 	eshkp = ESHK(shkp);
+	rouse_shk(shkp, TRUE);
 	total = (addupbill(shkp) + eshkp->debit);
 	if (eshkp->credit >= total) {
 	    Your("credit of %ld %s is used to cover your shopping bill.",
