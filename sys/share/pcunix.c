@@ -124,7 +124,7 @@ getlock()
 # if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 		chdirx(orgdir, 0);
 # endif
-# if defined(WIN32)
+# if defined(WIN32) || defined(HOLD_LOCKFILE_OPEN)
 #  if defined(HOLD_LOCKFILE_OPEN)
  		if(errno == EACCES) {
 #define OOPS_BUFSZ 512
@@ -135,6 +135,7 @@ getlock()
 		    Strcat(oops, " Is the other game still running?\n");
 		    if (strlen(fq_lock) < ((OOPS_BUFSZ -16) - strlen(oops)))
 			    Sprintf(eos(oops), "Cannot open %s", fq_lock);
+		    Strcat(oops, "\n");
 		    unlock_file(HLOCK);
 		    error(oops);
  		} else

@@ -99,10 +99,6 @@
 			/* amiconf.h).	In the future this will be the */
 			/* hook for mail reader implementation.        */
 
-/*# define PC_LOCKING */	/* Allow confirmation before overwriting game  */
-			/* that is in progress or aborted when another */
-			/* game is started with the same player name.  */
-
 /* The following is needed for prototypes of certain functions */
 
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__SC__)
@@ -160,12 +156,16 @@
 #include "system.h"
 #endif
 
-#ifdef __GO32__
+#ifdef __DJGPP__
 #include <unistd.h> /* close(), etc. */
-/* setmode is in io.h but lock() in io.h interferes with lock[] in decl.h */
-extern int FDECL(setmode, (int,int));
+/* lock() in io.h interferes with lock[] in decl.h */
+#define lock djlock
+#include <io.h>
+#undef lock
 #include <pc.h> /* kbhit() */
 #define PC_LOCKING
+#define HOLD_LOCKFILE_OPEN
+#define SELF_RECOVER		/* NetHack itself can recover games */
 #endif
 
 # ifdef MSDOS

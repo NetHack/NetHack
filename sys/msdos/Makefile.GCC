@@ -380,6 +380,11 @@ DJ1 = $(dir $(DJGPP))
 CWSDPMI = $(subst /,\,$(DJ1))bin\CWSDPMI.*
 endif
 
+ifdef BUILDRECOVER
+RECOVEREXE = $(U)RECOVER.EXE
+RECOVEROBJ = $(O)RECOVER.O
+endif
+
 #==========================================
 #  Primary Targets.
 #==========================================
@@ -397,7 +402,7 @@ util: $(O)utility.tag
 
 $(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h	       \
 	$(INCL)/pm.h	  monstr.c   vis_tab.c	\
-	$(U)lev_comp.exe $(U)dgn_comp.exe $(U)recover.exe $(TILEUTIL)
+	$(U)lev_comp.exe $(U)dgn_comp.exe $(RECOVEREXE) $(TILEUTIL)
 	$(subst /,\,echo utilities made > $@)
 
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
@@ -420,9 +425,13 @@ endif
 	@$(subst /,\,if exist $(DAT)/*.tib copy $(DAT)/*.tib $(GAMEDIR))
 	@$(subst /,\,copy $(SSHR)/NetHack.cnf  $(GAMEDIR)/defaults.nh)
 	@$(subst /,\,copy $(MSYS)/NHAccess.nh  $(GAMEDIR))
-	@$(subst /,\,copy $(U)recover.exe      $(GAMEDIR))
+ifdef BUILDRECOVER
+	@$(subst /,\,copy $(RECOVEREXE)      $(GAMEDIR))
+endif
 	@$(subst /,\,copy $(DOC)/guidebo*.txt  $(GAMEDIR))
+ifdef BUILDRECOVER
 	@$(subst /,\,if exist $(DOC)/recover.txt copy $(DOC)/recover.txt $(GAMEDIR))
+endif
 	@$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR))
 ifdef CWSDPMI
 	@$(subst /,\,if exist $(CWSDPMI) copy $(CWSDPMI) $(GAMEDIR))
@@ -435,7 +444,7 @@ endif
 #  The main target.
 #==========================================
 
-$(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(O)utility.tag $(O)$(GAME).lnk
+$(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
 	$(LINK) $(LFLAGS) -o$(GAME).exe @$(O)$(GAME).lnk $(LIBRARIES)
 	@$(subst /,\,stubedit $(GAME).exe minstack=2048K)
 	@$(subst /,\,copy $(GAME).exe $(GAMEFILE))
@@ -495,7 +504,9 @@ spotless: clean
 	$(subst /,\,if exist $(U)makedefs.exe del $(U)makedefs.exe)
 	$(subst /,\,if exist $(U)lev_comp.exe del $(U)lev_comp.exe)
 	$(subst /,\,if exist $(U)dgn_comp.exe del $(U)dgn_comp.exe)
-	$(subst /,\,if exist $(U)recover.exe del $(U)recover.exe)
+ifdef BUILDRECOVER
+	$(subst /,\,if exist $(RECOVEREXE) del $(RECOVEREXE))
+endif
 	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
 	$(subst /,\,if exist $(U)tile2bin.exe del $(U)tile2bin.exe)
 	$(subst /,\,if exist $(U)til2bin2.exe del $(U)til2bin2.exe)
@@ -705,11 +716,13 @@ endif
 #  Recover Utility
 #==========================================
 
+ifdef BUILDRECOVER
 $(U)recover.exe:   $(RECOVOBJS)
 	$(LINK) $(LFLAGS) -o$@ $(O)recover.o
 
 $(O)recover.o:   $(CONFIG_H) $(U)recover.c
 	$(CC) $(cflags) -o$@ $(U)recover.c
+endif
 
 #==========================================
 #  Header file moves required for tile support
