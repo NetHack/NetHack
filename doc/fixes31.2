@@ -1,0 +1,92 @@
+revived barbarians didn't gain levels from potions
+pets wouldn't keep their armor or weapons (blessed figurine of Archon)
+avoid "rot" v. "burn" damage for organics
+identify +/- known rings/armor as "uncursed"
+loop through identification as long as additional "charges" are available
+successive disease attacks made you less sick, also make nurses cure sickness
+NO_MAILREADER non-mail daemon message fix
+make fortune cookies, pancakes yellow and lightning white
+cavemen were red while cavewomen and all other characters were "domestic"
+monsters might not change color when growing up
+redisplay cancelled objects in case their color changed (potions, spellbooks)
+ask if you want to play heard passtune
+add: make ^T intrinsic teleports use magical energy
+don't encase the Amulet (or invocation tools) inside cockatrice induced statues
+fix eating taking 1 turn less than number necessary, cheating you of nutrition
+fix inventory to avoid % in user-supplied names [pline(xprname())]
+fix crash when #force destroys unpaid chest in shop
+fix crash when movement reaches edge of screen on rogue level
+fix crash when two items in a row vanish from magic bag
+set bknown when Priests see item, fixing missing checks elsewhere
+set alignment of priest's quest artifact to match priest's starting alignment
+if the Mitre of Holiness gets stolen by the Wizard, reset int & wis stats
+always unlock quest stairs whenever leader acknowledges quest completion
+make mysterious force which locks quest stairs block objects as well as player
+duplicate shopkeeper names were possible on town level
+trying to rename shopkeepers left dangling pointers
+credit balance can prevent Kop summoning when player leaves shop suddenly
+suppress several shopkeeper messages (and buy|sell) is shk is asleep|paralyzed
+using charged objects ((engrave) wands, horns of plenty, etc.) in shops was free
+don't double bill for food eaten off shop floor (multi-turn to eat only)
+fix to prevent unpaid objects differing only in price from merging (only in
+	inventory; they're not "unpaid" any more when dropped, so might merge)
+missing #ifdef SOUNDS in vault.c
+inconsistent MFLOPPY/MICRO use of dotcnt for saving
+add: wands of striking break potions
+add: directional healing spells
+add: pickup_types option, pickup -> autopickup
+disclosure option takes optional string value; killed counts and genocide list
+give better message when trying to set options which are compiled out
+add: hungry pets make begging noises
+centaurs and mariliths could wear inappropriate armor
+remove Medusa's tail and give her wings
+separate creatures that don't breathe from creatures that can breathe water
+you can't choke if you don't breathe
+Fort Knox eels were placed outside moat
+jellies for Juiblex, not Jabberwocks
+don't heal while praying, so that gods are more likely to heal you
+fix fireballs burning fire resistant players
+floating eyes could paralyze monsters indefinitely
+fix monster sleep/wakeup induced my musical instruments
+players hit by wands of sleep get chance to wake up when attacked by monster
+iron balls keep their "very heavy" weight
+fix vorpal blade/long worm misses
+allow monsters to kill players with vorpal blade and tsurugi
+fix objects falling through trapdoors; "shipping destination"'s overloaded use
+	of obj coordinates could cause bogus screen update attempt (y >= ROWNO)
+prevent bad argument to rnl() from prayer_done() when praying in gehennom
+display message when boulder is pushed into pit
+avoid monsters deciding displaced or invisible characters were off the screen
+kicking embedded objects loose would break fobj chain (-> freeobj() panic)
+when using the cursor to look at remote objects, if the target object is
+	embedded in something, mention that fact
+dropping gold inside a monster -> freeobj() panic
+gold picked up by pets wasn't in mgold and thus didn't show up on probing
+fix "stop *opening* the lock" even when you were locking it
+succubus stealing ring of adornment caused crash if she already had one
+monsters created by monster reading create monster didn't appear for scroll ID
+monsters explicitly casting spells of sleep or cold had messages reversed
+elf character could get impossible("snow boots not found?") stepping onto ice
+accept gray/grey except for spellbooks
+keep monsters from teleporting on no-teleport levels
+don't allow digging of trapdoors on the three wizard levels
+don't allow digging down (including drum of earthquake) to destroy portals
+fix digging down from within walls and solid rock; monsters could enter
+	the resulting trapdoor/pit, but players couldn't
+fix digging down while flying; don't fall through
+destroy any engraving if a hole is dug down thru it, or ice it's in gets melted
+change many hardcoded "floor"s and a few "ground"s to use actual surface type
+fix blessed unicorn horn's restore ability feature (strength gain when weak)
+underwater: prevent turbulence from placing character inside solid wall
+underwater: suppress "you inhale water" message when removing amulet of
+	magical breathing if you're polymorphed into a swimmer or nonbreather
+when using the 'A' command to take off armor from underneath other armor,
+	account for time needed to take off and put back on outer garment(s)
+don't create doors over pits and trap doors when using a wand of locking
+fix mapping when you drop objects while following the guard out of a vault
+
+X11: some status didn't show up after restore
+UNIX: fix potential security hole accessing file through NETHACKOPTIONS setuid
+VMS: disable installed privileges when assigning i/o channel to terminal,
+	opening termcap, or accessing user-specified config file
+Amiga: invalid showscore and numberpad options inserted by frontend
