@@ -206,17 +206,21 @@ register struct obj *sobj;
 	/* no gold found on floor or monster's inventory.
 	   adjust message if you have gold in your inventory */
 	if (sobj) {
-		if (youmonst.data == &mons[PM_GOLD_GOLEM])
-			You_feel("like a million %s!", currency(2L));
-		else if (hidden_gold() ||
+		char buf[BUFSZ];
+		if (youmonst.data == &mons[PM_GOLD_GOLEM]) {
+			Sprintf(buf, "You feel like a million %s!",
+				currency(2L));
+		} else if (sobj && hidden_gold() ||
 #ifndef GOLDOBJ
 				u.ugold)
 #else
 			        money_cnt(invent))
 #endif
-			You("worry about your future financial situation.");
+			Strcpy(buf,
+				"You feel worried about your future financial situation.");
 		else
-			strange_feeling(sobj, "You feel materially poor.");
+			Strcpy(buf, "You feel materially poor.");
+		strange_feeling(sobj, buf);
         }
 	return(1);
     }
