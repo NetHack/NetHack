@@ -3588,7 +3588,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	{ game,		"Options\tShift+O",           "O", 3},
 	{ game,		"Explore mode\tShift+X",      "X", 3},
 	{ game,		0, 0, 3},
-	{ game,		"Save\tShift+S",              "Sy", 3},
+	{ game,		"Save\tSy",              "Sy", 3},
 	{ game,		"Quit\tAlt+Q",                "\361", 3},
 
 	{ apparel,	"Apparel off\tShift+A",       "A", 2},
