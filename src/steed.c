@@ -18,7 +18,7 @@ STATIC_DCL boolean FDECL(landing_spot, (coord *, int));
 void
 rider_cant_reach()
 {
-     You("aren't skilled enough to reach from %s.", y_monnam());
+     You("aren't skilled enough to reach from %s.", y_monnam(u.usteed));
 }
 
 /*** Putting the saddle on ***/
