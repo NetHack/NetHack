@@ -443,9 +443,11 @@ int *fail_reason;
 	if (mon->m_ap_type) seemimic(mon);
 	else mon->mundetected = FALSE;
 	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL)
-	    pline_The("statue comes to life!");
+	    pline_The("statue %s!",
+		canspotmon(mon) ? "comes to life" : "disappears");
 	else if (cause == ANIMATE_SHATTER)
-	    pline("Instead of shattering, the statue suddenly comes alive!");
+	    pline("Instead of shattering, the statue suddenly %s!",
+		canspotmon(mon) ? "comes to life" : "disappears");
 	else /* cause == ANIMATE_NORMAL */
 	    You("find %s posing as a statue.",
 		canspotmon(mon) ? a_monnam(mon) : something);
