@@ -319,26 +319,9 @@ static const struct pad {
 			{'i', 'I', C('i')},		/* Ins */
 			{'.', ':', ':'}			/* Del */
 };
-/*
- * Unlike Ctrl-letter, the Alt-letter keystrokes have no specific ASCII
- * meaning unless assigned one by a keyboard conversion table
- * To interpret Alt-letters, we use a
- * scan code table to translate the scan code into a letter, then set the
- * "meta" bit for it.  -3.
- */
-#define SCANLO		0x02
 
-static const char scanmap[] = { 	/* ... */
-	'1','2','3','4','5','6','7','8','9','0',0,0,0,0,
-	'q','w','e','r','t','y','u','i','o','p','[',']', '\n',
-	0, 'a','s','d','f','g','h','j','k','l',';','\'', '`',
-	0, '\\', 'z','x','c','v','b','n','m',',','.','?'	/* ... */
-};
-
-static const char *extendedlist = "acdefijlmnopqrstuvw?2";
-
-#define inmap(x)	(SCANLO <= (x) && (x) < SCANLO + SIZE(scanmap))
-
+#define inmap(x,vk)	(((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
+ 
 int FDECL(process_keystroke, (INPUT_RECORD *ir, boolean *valid));
 
 int process_keystroke(ir, valid)
@@ -346,19 +329,33 @@ INPUT_RECORD *ir;
 boolean *valid;
 {
 	int metaflags = 0;
+	int keycode, vk;
 	unsigned char ch;
 	unsigned short int scan;
 	unsigned long shiftstate;
-	int altseq;
+	int altseq = 0;
 	const struct pad *kpad;
 
+#if 0
+	/* sanity check, but caller should have checked already */
+	if (ir->EventType != KEY_EVENT) {
+		if (valid) *valid = 0;
+		return 0;
+	}
+#endif
 	shiftstate = 0L;
 	ch    = ir->Event.KeyEvent.uChar.AsciiChar;
 	scan  = ir->Event.KeyEvent.wVirtualScanCode;
+	vk    = ir->Event.KeyEvent.wVirtualKeyCode;
+	keycode = MapVirtualKey(vk, 2);
 	shiftstate = ir->Event.KeyEvent.dwControlKeyState;
-	altseq=(shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED) && (ch || inmap(scan)));
-	if (ch || (iskeypad(scan)) || altseq)
-			*valid = 1;
+
+	if (shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)) {
+		if (ch || inmap(keycode,vk)) altseq = 1;
+		else altseq = -1;	/* invalid altseq */
+	}
+	if (ch || (iskeypad(scan)) || (altseq > 0))
+		*valid = TRUE;
 	/* if (!valid) return 0; */
     	/*
 	 * shiftstate can be checked to see if various special
@@ -386,11 +383,9 @@ boolean *valid;
                 ch = kpad[scan - KEYPADLO].normal;
             }
         }
-        else if (altseq) { /* ALT sequence */
-            altseq = 0;
-            if (!ch && inmap(scan)) ch = scanmap[scan - SCANLO];
-            if (index(extendedlist, tolower(ch)) != 0) ch = M(tolower(ch));
-                else if (scan == (SCANLO + SIZE(scanmap)) - 1) ch = M('?');
+        else if (altseq > 0) { /* ALT sequence */
+		if (vk == 0xBF) ch = M('?');
+		else ch = M(tolower(keycode));
         }
         return (ch == '\r') ? '\n' : ch;
 }
@@ -416,10 +411,7 @@ ntposkey(x, y, mod)
 int *x, *y, *mod;
 {
 	DWORD count;
-	unsigned short int scan;
-	unsigned char ch;
-	unsigned long shiftstate;
-	int altseq;
+	int keystroke = 0;
 	int done = 0;
 	boolean valid = 0;
 	while (!done)
@@ -427,36 +419,39 @@ int *x, *y, *mod;
 	    count = 0;
 	    ReadConsoleInput(hConIn,&ir,1,&count);
 	    if (count > 0) {
-		ch    = ir.Event.KeyEvent.uChar.AsciiChar;
-		scan  = ir.Event.KeyEvent.wVirtualScanCode;
-		shiftstate = ir.Event.KeyEvent.dwControlKeyState;
-		altseq=(shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED) && (ch || inmap(scan)));
-		if (((ir.EventType == KEY_EVENT) && ir.Event.KeyEvent.bKeyDown) &&
-		     (ch || (iskeypad(scan)) || altseq)) {
-		     	*mod = 0;
-			return process_keystroke(&ir, &valid);
-		} else if (
-		  (ir.EventType == MOUSE_EVENT &&
-		   (ir.Event.MouseEvent.dwEventFlags == 0) &&
-		   (ir.Event.MouseEvent.dwButtonState & MOUSEMASK))) {
-		  	*x = ir.Event.MouseEvent.dwMousePosition.X + 1;
-		  	*y = ir.Event.MouseEvent.dwMousePosition.Y - 1;
+		if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
+			keystroke = process_keystroke(&ir, &valid);
+			if (valid) return keystroke;
+		} else if (ir.EventType == MOUSE_EVENT) {
+			if ((ir.Event.MouseEvent.dwEventFlags == 0) &&
+		   	    (ir.Event.MouseEvent.dwButtonState & MOUSEMASK)) {
+			  	*x = ir.Event.MouseEvent.dwMousePosition.X + 1;
+			  	*y = ir.Event.MouseEvent.dwMousePosition.Y - 1;
 
-		  	if (ir.Event.MouseEvent.dwButtonState & LEFTBUTTON)
+			  	if (ir.Event.MouseEvent.dwButtonState & LEFTBUTTON)
 		  	       		*mod = CLICK_1;
-		  	else if (ir.Event.MouseEvent.dwButtonState & RIGHTBUTTON)
+			  	else if (ir.Event.MouseEvent.dwButtonState & RIGHTBUTTON)
 					*mod = CLICK_2;
 #if 0	/* middle button */			       
-			else if (ir.Event.MouseEvent.dwButtonState & MIDBUTTON)
+				else if (ir.Event.MouseEvent.dwButtonState & MIDBUTTON)
 			      		*mod = CLICK_3;
 #endif 
 			       return 0;
-		  
-		}
-	    }
+			}
+	        }
+#if 0
+		/* We ignore these types of console events */
+	        else if (ir.EventType == FOCUS_EVENT) {
+	        }
+	        else if (ir.EventType == MENU_EVENT) {
+	        }
+#endif
+		} else 
+			done = 1;
 	}
-	/* Not Reached */
-	return '\032';
+	/* NOTREACHED */
+	*mod = 0;
+	return 0;
 }
 
 int
@@ -468,7 +463,7 @@ nttty_kbhit()
 	unsigned short int scan;
 	unsigned char ch;
 	unsigned long shiftstate;
-	int altseq;
+	int altseq = 0, keycode, vk;
 	done = 0;
 	retval = 0;
 	while (!done)
@@ -476,17 +471,22 @@ nttty_kbhit()
 	    count = 0;
 	    PeekConsoleInput(hConIn,&ir,1,&count);
 	    if (count > 0) {
-		ch    = ir.Event.KeyEvent.uChar.AsciiChar;
-		scan  = ir.Event.KeyEvent.wVirtualScanCode;
-		shiftstate = ir.Event.KeyEvent.dwControlKeyState;
-		altseq=(shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED) && (ch || inmap(scan)));
-		if (((ir.EventType == KEY_EVENT) && ir.Event.KeyEvent.bKeyDown) &&
-		     (ch || (iskeypad(scan)) || altseq)) {
-			done = 1;	    /* Stop looking         */
-			retval = 1;         /* Found what we sought */
+		if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
+			ch    = ir.Event.KeyEvent.uChar.AsciiChar;
+			scan  = ir.Event.KeyEvent.wVirtualScanCode;
+			shiftstate = ir.Event.KeyEvent.dwControlKeyState;
+			vk = ir.Event.KeyEvent.wVirtualKeyCode;
+			keycode = MapVirtualKey(vk, 2);
+			if (shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)) {
+				if  (ch || inmap(keycode,vk)) altseq = 1;
+				else altseq = -1;	/* invalid altseq */
+			}
+			if (ch || iskeypad(scan) || altseq) {
+				done = 1;	    /* Stop looking         */
+				retval = 1;         /* Found what we sought */
+			}
 		}
-		
-		 else if ((ir.EventType == MOUSE_EVENT &&
+		else if ((ir.EventType == MOUSE_EVENT &&
 		  (ir.Event.MouseEvent.dwButtonState & MOUSEMASK))) {
 			done = 1;
 			retval = 1;
