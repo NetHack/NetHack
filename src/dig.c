@@ -993,7 +993,7 @@ struct obj *obj;
 }
 
 /*
- * Town Watchmen frown on damage to the town walls or fountains.
+ * Town Watchmen frown on damage to the town walls, trees or fountains.
  * It's OK to dig holes in the ground, however.
  * If mtmp is assumed to be a watchman, a watchman is found if mtmp == 0
  * zap == TRUE if wand/spell of digging, FALSE otherwise (chewing)
@@ -1008,7 +1008,7 @@ watch_dig(mtmp, x, y, zap)
 
 	if (in_town(x, y) &&
 	    (closed_door(x, y) || lev->typ == SDOOR ||
-	     IS_WALL(lev->typ) || IS_FOUNTAIN(lev->typ))) {
+	     IS_WALL(lev->typ) || IS_FOUNTAIN(lev->typ) || IS_TREE(lev->typ))) {
 	    if (!mtmp) {
 		for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 		    if (DEADMONSTER(mtmp)) continue;
@@ -1028,7 +1028,9 @@ watch_dig(mtmp, x, y, zap)
 		    char *str;
 		    if (IS_DOOR(lev->typ))
 			str = "door";
-		    else if (IS_WALL(lev->typ))
+		    else if (IS_TREE(lev->typ))
+			str = "tree";
+		    else if (IS_ROCK(lev->typ))
 			str = "wall";
 		    else
 			str = "fountain";
