@@ -39,7 +39,7 @@ static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void nhcoord2display(PNHMapWindow data, int x, int y, LPRECT lpOut);
-#if (VERSION_MAJOR < 3) && (VERSION_MINOR < 3) && (PATCHLEVEL < 2)
+#if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
 static void nhglyph2charcolor(short glyph, uchar* ch, int* color);
 #endif
 static COLORREF nhcolor_to_RGB(int c);
@@ -531,7 +531,7 @@ void onPaint(HWND hWnd)
 				int   color;
 				unsigned special, mgch;
 
-#if (VERSION_MAJOR < 3) && (VERSION_MINOR < 3) && (PATCHLEVEL < 2)
+#if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
 				nhglyph2charcolor(data->map[i][j], &ch, &color);
 #else
 				/* rely on NetHack core helper routine */
@@ -755,7 +755,7 @@ void nhcoord2display(PNHMapWindow data, int x, int y, LPRECT lpOut)
 	lpOut->bottom = lpOut->top + data->yScrTile;
 }
 
-#if (VERSION_MAJOR < 3) && (VERSION_MINOR < 3) && (PATCHLEVEL < 2)
+#if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
 /* map glyph to character/color combination */
 void nhglyph2charcolor(short g, uchar* ch, int* color)
 {
