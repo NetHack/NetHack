@@ -1904,7 +1904,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				!see_it && distu(mtmp->mx, mtmp->my) <= 3*3)
 			    You("smell smoke.");
 			if (is_ice(mtmp->mx,mtmp->my))
-			    melt_ice(mtmp->mx,mtmp->my);
+			    melt_ice(mtmp->mx,mtmp->my, (char *)0);
 			if (see_it) seetrap(trap);
 			break;
 
@@ -2440,7 +2440,7 @@ struct obj *box;	/* null for floor trap */
 	if (!box && burn_floor_paper(u.ux, u.uy, see_it, TRUE) && !see_it)
 	    You("smell paper burning.");
 	if (is_ice(u.ux, u.uy))
-	    melt_ice(u.ux, u.uy);
+	    melt_ice(u.ux, u.uy, (char *)0);
 }
 
 STATIC_OVL void

@@ -1982,6 +1982,7 @@ E void NDECL(run_timers);
 E void FDECL(obj_move_timers, (struct obj *, struct obj *));
 E void FDECL(obj_split_timers, (struct obj *, struct obj *));
 E void FDECL(obj_stop_timers, (struct obj *));
+E void FDECL(spot_stop_timers, (XCHAR_P,XCHAR_P,SHORT_P));
 E boolean FDECL(obj_is_local, (struct obj *));
 E void FDECL(save_timers, (int,int,int));
 E void FDECL(restore_timers, (int,int,BOOLEAN_P,long));
@@ -2379,7 +2380,9 @@ E struct monst *FDECL(bhit, (int,int,int,int,int (*)(MONST_P,OBJ_P),
 E struct monst *FDECL(boomhit, (int,int));
 E int FDECL(burn_floor_paper, (int,int,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(buzz, (int,int,XCHAR_P,XCHAR_P,int,int));
-E void FDECL(melt_ice, (XCHAR_P,XCHAR_P));
+E void FDECL(melt_ice, (XCHAR_P,XCHAR_P,const char *));
+E void FDECL(start_melt_ice_timeout, (XCHAR_P,XCHAR_P));
+E void FDECL(melt_ice_away, (genericptr_t, long));
 E int FDECL(zap_over_floor, (XCHAR_P,XCHAR_P,int,boolean *));
 E void FDECL(fracture_rock, (struct obj *));
 E boolean FDECL(break_statue, (struct obj *));

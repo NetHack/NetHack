@@ -3479,12 +3479,14 @@ register int dx,dy;
 }
 
 void
-melt_ice(x, y)
+melt_ice(x, y, msg)
 xchar x, y;
+const char *msg;
 {
 	struct rm *lev = &levl[x][y];
 	struct obj *otmp;
 
+	if (!msg) msg = "The ice crackles and melts.";
 	if (lev->typ == DRAWBRIDGE_UP)
 	    lev->drawbridgemask &= ~DB_ICE;	/* revert to DB_MOAT */
 	else {	/* lev->typ == ICE */
@@ -3496,11 +3498,12 @@ xchar x, y;
 #endif
 	    lev->icedpool = 0;
 	}
+	spot_stop_timers(x, y, MELT_ICE_AWAY);	/* no more ice to melt away */
 	obj_ice_effects(x, y, FALSE);
 	unearth_objs(x, y);
 	if (Underwater) vision_recalc(1);
 	newsym(x,y);
-	if (cansee(x,y)) Norep("The ice crackles and melts.");
+	if (cansee(x,y)) Norep(msg);
 	if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
 	    if (cansee(x,y)) pline("%s settles...", An(xname(otmp)));
 	    do {
@@ -3513,6 +3516,38 @@ xchar x, y;
 	}
 	if (x == u.ux && y == u.uy)
 		spoteffects(TRUE);	/* possibly drown, notice objects */
+}
+
+/*
+ * Start a melt_ice timer.
+ */
+void
+start_melt_ice_timeout(x,y)
+xchar x,y;
+{
+	long when, where;
+	short action = MELT_ICE_AWAY;
+	for (when = 50L; when < 2000L; when++)
+		if (!rn2(3)) break;
+	where = (((long)x << 16) | ((long)y));
+	(void) start_timer(when, TIMER_LEVEL, action, (genericptr_t)where);
+}
+
+/*
+ * Called when ice has melted completely away.
+ */
+void
+melt_ice_away(arg, timeout)
+genericptr_t arg;
+long timeout;	/* unused */
+{
+	xchar x,y;
+	long where = (long)arg;
+
+	y = (xchar)(where & 0xFFFF);
+	x = (xchar)((where >> 16) & 0xFFFF);
+	/* melt_ice does newsym when appropriate */
+	melt_ice(x,y,"Some ice melts away.");
 }
 
 /* Burn floor scrolls, evaporate pools, etc...  in a single square.  Used
@@ -3541,7 +3576,7 @@ boolean *shopdamage;
 		if (cansee(x,y)) newsym(x,y);
 	    }
 	    if(is_ice(x, y)) {
-		melt_ice(x, y);
+		melt_ice(x, y, (char *)0);
 	    } else if(is_pool(x,y)) {
 		const char *msgtxt = "You hear hissing gas.";
 		if(lev->typ != POOL) {	/* MOAT or DRAWBRIDGE_UP */
@@ -3627,6 +3662,7 @@ boolean *shopdamage;
 			}
 		    }
 		}
+		start_melt_ice_timeout(x,y);
 		obj_ice_effects(x,y,TRUE);
 	}
 	if(closed_door(x, y)) {

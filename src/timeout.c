@@ -1309,7 +1309,8 @@ static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
     TTAB(revive_mon,	(timeout_proc)0,	"revive_mon"),
     TTAB(burn_object,	cleanup_burn,		"burn_object"),
     TTAB(hatch_egg,	(timeout_proc)0,	"hatch_egg"),
-    TTAB(fig_transform,	(timeout_proc)0,	"fig_transform")
+    TTAB(fig_transform,	(timeout_proc)0,	"fig_transform"),
+    TTAB(melt_ice_away,	(timeout_proc)0,	"melt_ice_away")
 };
 #undef TTAB
 
@@ -1552,6 +1553,36 @@ obj_stop_timers(obj)
 	}
     }
     obj->timed = 0;
+}
+
+/*
+ * Stop all timers of index func_index at this spot.
+ * 
+ */
+void
+spot_stop_timers(x,y,func_index)
+xchar x,y;
+short func_index;
+{
+    timer_element *curr, *prev, *next_timer=0;
+    long where = (((long)x << 16) | ((long)y));
+
+    for (prev = 0, curr = timer_base; curr; curr = next_timer) {
+	next_timer = curr->next;
+	if (curr->kind == TIMER_LEVEL &&
+	    curr->func_index == func_index && curr->arg == (genericptr_t)where) {
+	    if (prev)
+		prev->next = curr->next;
+	    else
+		timer_base = curr->next;
+	    if (timeout_funcs[curr->func_index].cleanup)
+		(*timeout_funcs[curr->func_index].cleanup)(curr->arg,
+			curr->timeout);
+	    free((genericptr_t) curr);
+	} else {
+	    prev = curr;
+	}
+    }
 }
 
 
