@@ -200,7 +200,8 @@ E NEARDATA struct dig_info {		/* apply.c, hack.c */
 	int	effort;
 	d_level level;
 	coord	pos;
-	boolean down, chew, warned;
+	long lastdigtime;
+	boolean down, chew, warned, quiet;
 } digging;
 
 E NEARDATA long moves, monstermoves;

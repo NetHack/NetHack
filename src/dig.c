@@ -353,7 +353,7 @@ dig()
 		    feel_location(dpx, dpy);
 		else
 		    newsym(dpx, dpy);
-		if(digtxt) pline(digtxt);	/* after newsym */
+		if(digtxt && !digging.quiet) pline(digtxt); /* after newsym */
 		if(dmgtxt)
 		    pay_for_damage(dmgtxt);
 
@@ -378,6 +378,8 @@ dig()
 			newsym(dpx, dpy);
 		}
 cleanup:
+		digging.lastdigtime = moves;
+		digging.quiet = FALSE;
 		digging.level.dnum = 0;
 		digging.level.dlevel = -1;
 		return(0);
@@ -878,21 +880,32 @@ struct obj *obj;
 						"chopping at the door",
 						"cutting the tree"
 			};
+			did_dig_msg = FALSE;
+			digging.quiet = FALSE;
 			if (digging.pos.x != rx || digging.pos.y != ry ||
 			    !on_level(&digging.level, &u.uz) || digging.down) {
+			    if (flags.autodig && !dig_target && !digging.down &&
+				digging.pos.x == u.ux &&
+				digging.pos.y == u.uy &&
+				(moves <= digging.lastdigtime+2 &&
+				 moves >= digging.lastdigtime)) {
+				/* avoid messages if repeated autodigging */
+				did_dig_msg = TRUE;
+				digging.quiet = TRUE;
+			    }
 			    digging.down = digging.chew = FALSE;
 			    digging.warned = FALSE;
 			    digging.pos.x = rx;
 			    digging.pos.y = ry;
 			    assign_level(&digging.level, &u.uz);
 			    digging.effort = 0;
-			    You("start %s.", d_action[dig_target]);
+			    if (!digging.quiet)
+				You("start %s.", d_action[dig_target]);
 			} else {
 			    You("%s %s.", digging.chew ? "begin" : "continue",
 					d_action[dig_target]);
 			    digging.chew = FALSE;
 			}
-			did_dig_msg = FALSE;
 			set_occupation(dig, "digging", 0);
 		}
 	} else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) {
