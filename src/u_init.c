@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)u_init.c	3.4	2000/06/11	*/
+/*	SCCS Id: @(#)u_init.c	3.4	2002/03/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -988,15 +988,19 @@ register struct trobj *trop;
 			if (objects[otyp].oc_uses_known) obj->known = 1;
 			obj->cursed = 0;
 			if (obj->opoisoned && u.ualign.type != A_CHAOTIC)
-			obj->opoisoned = 0;
-			if(obj->oclass == WEAPON_CLASS || obj->oclass == TOOL_CLASS) {
-			obj->quan = (long) trop->trquan;
-			trop->trquan = 1;
+			    obj->opoisoned = 0;
+			if (obj->oclass == WEAPON_CLASS ||
+				obj->oclass == TOOL_CLASS) {
+			    obj->quan = (long) trop->trquan;
+			    trop->trquan = 1;
+			} else if (obj->oclass == GEM_CLASS &&
+				is_graystone(obj) && obj->otyp != FLINT) {
+			    obj->quan = 1L;
 			}
-			if(trop->trspe != UNDEF_SPE)
-			obj->spe = trop->trspe;
-			if(trop->trbless != UNDEF_BLESS)
-			obj->blessed = trop->trbless;
+			if (trop->trspe != UNDEF_SPE)
+			    obj->spe = trop->trspe;
+			if (trop->trbless != UNDEF_BLESS)
+			    obj->blessed = trop->trbless;
 #ifdef GOLDOBJ
 		}
 #endif
