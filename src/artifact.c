@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.4	2002/02/21	*/
+/*	SCCS Id: @(#)artifact.c 3.4	2002/03/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -725,7 +725,9 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	    return FALSE;
 	}
 
-	realizes_damage = (youdefend || vis);
+	realizes_damage = (youdefend || vis || 
+			   /* feel the effect even if not seen */
+			   (youattack && mdef == u.ustuck));
 
 	/* the four basic attacks: fire, cold, shock and missiles */
 	if (attacks(AD_FIRE, otmp)) {
@@ -751,8 +753,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	}
 	if (attacks(AD_ELEC, otmp)) {
 	    if (realizes_damage) {
-		if (youattack ? otmp != uwep : !spec_dbon_applies)
-		    pline("%s %s%c", Tobjnam(otmp, "hit"),
+		pline_The("massive hammer hits %s%c",
 			  hittee, !spec_dbon_applies ? '.' : '!');
 		if (spec_dbon_applies)
 		    pline("Lightning strikes %s!", hittee);
@@ -763,8 +764,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	}
 	if (attacks(AD_MAGM, otmp)) {
 	    if (realizes_damage) {
-		if (youattack ? otmp != uwep : !spec_dbon_applies)
-		    pline("%s %s%c", Tobjnam(otmp, "hit"),
+		pline_The("imaginary widget hits %s%c",
 			  hittee, !spec_dbon_applies ? '.' : '!');
 		if (spec_dbon_applies)
 		    pline("A hail of magic missiles strikes %s!", hittee);
