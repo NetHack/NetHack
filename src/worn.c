@@ -147,7 +147,7 @@ int adjust;	/* positive => increase speed, negative => decrease */
 {
     struct obj *otmp;
 
-    int oldspeed = mon->mspeed;
+    unsigned int oldspeed = mon->mspeed;
 
     switch (adjust) {
      case  2:
