@@ -1,19 +1,158 @@
-/*	SCCS Id: @(#)nhdefkey.c	3.4	$Date$   */
+/*	SCCS Id: @(#)nhraykey.c	3.4	$Date$   */
 /* Copyright (c) NetHack PC Development Team 2003                      */
 /* NetHack may be freely redistributed.  See license for details.      */
 
 /*
- * This is the default NetHack keystroke processing.
- * It can be built as a run-time loadable dll (nhdefkey.dll).
- * Alternative keystroke handlers can be built using the
- * entry points in this file as a template.
- *
- * Use the defaults.nh "altkeyhandler" option to set a
- * different dll name (without the ".DLL" extension) to
- * get different processing. Ensure that the dll referenced
- * in defaults.nh exists in the same directory as NetHack in
- * order for it to load successfully.
- *
+ * Keystroke handling contributed by Ray Chason.
+ *  
+ * The problem
+ * ===========
+ * 
+ * The console-mode Nethack wants both keyboard and mouse input.  The
+ * problem is that the Windows API provides no easy way to get mouse input
+ * and also keyboard input properly translated according to the user's
+ * chosen keyboard layout.
+ * 
+ * The ReadConsoleInput function returns a stream of keyboard and mouse
+ * events.  Nethack is interested in those events that represent a key
+ * pressed, or a click on a mouse button.  The keyboard events from
+ * ReadConsoleInput are not translated according to the keyboard layout,
+ * and do not take into account the shift, control, or alt keys.
+ * 
+ * The PeekConsoleInput function works similarly to ReadConsoleInput,
+ * except that it does not remove an event from the queue and it returns
+ * instead of blocking when the queue is empty.
+ * 
+ * A program can also use ReadConsole to get a properly translated stream
+ * of characters.  Unfortunately, ReadConsole does not return mouse events,
+ * does not distinguish the keypad from the main keyboard, does not return
+ * keys shifted with Alt, and does not even return the ESC key when
+ * pressed.  
+ * 
+ * We want both the functionality of ReadConsole and the functionality of
+ * ReadConsoleInput.  But Microsoft didn't seem to think of that.
+ * 
+ * 
+ * The solution, in the original code
+ * ==================================
+ * 
+ * The original 3.4.1 distribution tries to get proper keyboard translation
+ * by passing keyboard events to the ToAscii function.  This works, to some
+ * extent -- it takes the shift key into account, and it processes dead
+ * keys properly.  But it doesn't take non-US keyboards into account.  It
+ * appears that ToAscii is meant for windowed applications, and does not
+ * have enough information to do its job properly in a console application.
+ * 
+ * 
+ * The Finnish keyboard patch
+ * ==========================
+ * 
+ * This patch adds the "subkeyvalue" option to the defaults.nh file.  The
+ * user can then add OPTIONS=sukeyvalue:171/92, for instance, to replace
+ * the 171 character with 92, which is \.  This works, once properly
+ * configured, but places too much burden on the user.  It also bars the
+ * use of the substituted characters in naming objects or monsters.
+ * 
+ * 
+ * The solution presented here
+ * ===========================
+ * 
+ * The best way I could find to combine the functionality of ReadConsole
+ * with that of ReadConsoleInput is simple in concept.  First, call
+ * PeekConsoleInput to get the first event.  If it represents a key press,
+ * call ReadConsole to retrieve the key.  Otherwise, pop it off the queue
+ * with ReadConsoleInput and, if it's a mouse click, return it as such.
+ * 
+ * But the Devil, as they say, is in the details.  The problem is in
+ * recognizing an event that ReadConsole will return as a key.  We don't
+ * want to call ReadConsole unless we know that it will immediately return:
+ * if it blocks, the mouse and the Alt sequences will cease to function
+ * until it returns.
+ * 
+ * Separating process_keystroke into two functions, one for commands and a
+ * new one, process_keystroke2, for answering prompts, makes the job a lot
+ * easier.  process_keystroke2 doesn't have to worry about mouse events or
+ * Alt sequences, and so the consequences are minor if ReadConsole blocks. 
+ * process_keystroke, OTOH, never needs to return a non-ASCII character
+ * that was read from ReadConsole; it returns bytes with the high bit set
+ * only in response to an Alt sequence.
+ * 
+ * So in process_keystroke, before calling ReadConsole, a bogus key event
+ * is pushed on the queue.  This event causes ReadConsole to return, even
+ * if there was no other character available.  Because the bogus key has
+ * the eighth bit set, it is filtered out.  This is not done in
+ * process_keystroke2, because that would render dead keys unusable.
+ * 
+ * A separate process_keystroke2 can also process the numeric keypad in a
+ * way that makes sense for prompts:  just return the corresponding symbol,
+ * and pay no mind to number_pad or the num lock key.
+ * 
+ * The recognition of Alt sequences is modified, to support the use of
+ * characters generated with the AltGr key.  A keystroke is an Alt sequence
+ * if an Alt key is seen that can't be an AltGr (since an AltGr sequence
+ * could be a character, and in some layouts it could even be an ASCII
+ * character).  This recognition is different on NT-based and 95-based
+ * Windows:
+ * 
+ *    * On NT-based Windows, AltGr signals as right Alt and left Ctrl
+ *      together.  So an Alt sequence is recognized if either Alt key is
+ *      pressed and if right Alt and left Ctrl are not both present.  This
+ *      is true even if the keyboard in use does not have an AltGr key, and
+ *      uses right Alt for AltGr.
+ * 
+ *    * On 95-based Windows, with a keyboard that lacks the AltGr key, the
+ *      right Alt key is used instead.  But it still signals as right Alt,
+ *      without left Ctrl.  There is no way for the application to know
+ *      whether right Alt is Alt or AltGr, and so it is always assumed
+ *      to be AltGr.  This means that Alt sequences must be formed with
+ *      left Alt.
+ * 
+ * So the patch processes keystrokes as follows:
+ * 
+ *     * If the scan and virtual key codes are both 0, it's the bogus key,
+ *       and we ignore it.
+ * 
+ *     * Keys on the numeric keypad are processed for commands as in the
+ *       unpatched Nethack, and for prompts by returning the ASCII
+ *       character, even if the num lock is off.
+ *        
+ *     * Alt sequences are processed for commands as in the unpatched
+ *       Nethack, and ignored for prompts.
+ *        
+ *     * Control codes are returned as received, because ReadConsole will
+ *       not return the ESC key.
+ *        
+ *     * Other key-down events are passed to ReadConsole.  The use of
+ *       ReadConsole is different for commands than for prompts:
+ * 
+ *       o For commands, the bogus key is pushed onto the queue before
+ *         ReadConsole is called.  On return, non-ASCII characters are
+ *         filtered, so they are not mistaken for Alt sequences; this also
+ *         filters the bogus key.
+ * 
+ *       o For prompts, the bogus key is not used, because that would
+ *         interfere with dead keys.  Eight bit characters may be returned,
+ *         and are coded in the configured code page.
+ * 
+ * 
+ * Possible improvements
+ * =====================
+ * 
+ * Some possible improvements remain:
+ * 
+ *     * Integrate the existing Finnish keyboard patch, for use with non-
+ *       QWERTY layouts such as the German QWERTZ keyboard or Dvorak.
+ *        
+ *     * Fix the keyboard glitches in the graphical version.  Namely, dead
+ *       keys don't work, and input comes in as ISO-8859-1 but is displayed
+ *       as code page 437 if IBMgraphics is set on startup.
+ * 
+ *     * Transform incoming text to ISO-8859-1, for full compatibility with
+ *       the graphical version.
+ * 
+ *     * After pushing the bogus key and calling ReadConsole, check to see
+ *       if we got the bogus key; if so, and an Alt is pressed, process the
+ *       event as an Alt sequence.
  */
 
 static char where_to_get_source[] = "http://www.nethack.org/";
