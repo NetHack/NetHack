@@ -788,14 +788,6 @@ char **argv;
 	if (!argv[1][2]){	/* plain "-s" */
 		argc--;
 		argv++;
-#if 0 /* uses obsolete pl_classes[] */
-	} else if (!argv[1][3] && index(pl_classes, argv[1][2])) {
-		/* may get this case instead of next accidentally,
-		 * but neither is listed in the documentation, so
-		 * anything useful that happens is a bonus anyway */
-		argv[1]++;
-		argv[1][0] = '-';
-#endif
 	} else	argv[1] += 2;
 
 	if (argc > 1 && !strcmp(argv[1], "-v")) {
@@ -857,6 +849,12 @@ char **argv;
 	    else {
 		if (playerct > 1) Strcat(pbuf, "any of ");
 		for (i = 0; i < playerct; i++) {
+		    /* stop printing players if there are too many to fit */
+		    if (strlen(pbuf) + strlen(players[i]) + 2 >= BUFSZ) {
+			if (strlen(pbuf) < BUFSZ-4) Strcat(pbuf, "...");
+			else Strcpy(pbuf+strlen(pbuf)-4, "...");
+			break;
+		    }
 		    Strcat(pbuf, players[i]);
 		    if (i < playerct-1) {
 			if (players[i][0] == '-' &&
