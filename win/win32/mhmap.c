@@ -7,9 +7,7 @@
 #include "mhmsg.h"
 #include "mhinput.h"
 
-#if (VERSION_MAJOR < 3) && (VERSION_MINOR < 3) && (PATCHLEVEL < 2)
 #include "patchlevel.h"
-#endif
 
 #define NHMAP_FONT_NAME TEXT("Terminal")
 #define MAXWINDOWTEXT 255
