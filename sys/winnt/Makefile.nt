@@ -156,8 +156,11 @@ TILERES   = $(O)console.res
 TILEINCL  =
 !ENDIF
 
-TILEUTIL  = $(UTIL)\tile2bmp.exe
-TILEBMP   = $(SRC)\tiles.bmp
+TILEUTIL16  = $(UTIL)\tile2bmp.exe
+TILEBMP16   = $(SRC)\tiles.bmp
+
+TILEUTIL32  = $(UTIL)\til2bm32.exe
+TILEBMP32   = $(SRC)\tiles32.bmp
 
 #SOUND = $(OBJ)\ntsound.o
 
@@ -327,7 +330,11 @@ TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
 		 $(O)decl.o	$(O)monst.o	$(O)objects.o
 
+TEXT_IO32      = $(O)tilete32.o $(O)tiletx32.o $(O)drawing.o \
+		 $(O)decl.o	$(O)monst.o	$(O)objects.o
+
 GIFREADERS     = $(O)gifread.o	$(O)alloc.o $(O)panic.o
+GIFREADERS32   = $(O)gifrd32.o $(O)alloc.o $(O)panic.o
 
 PPMWRITERS     = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
 
@@ -516,11 +523,11 @@ $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
              @echo utilities made >$@
 	     @echo utilities made.
 
-tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
+tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
 !IF "$(GRAPHICAL)"=="Y"
-$(TILERES): $(TILEBMP) $(WIN32)\winhack.rc
+$(TILERES): $(TILEBMP16) $(WIN32)\winhack.rc
 	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
 !ELSE
 $(TILERES): $(NTSYS)\console.rc
@@ -832,17 +839,26 @@ $(U)tilemap.exe: $(O)tilemap.o
 $(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(CC) $(CFLAGSU) -Fo$@ $(WSHR)\tilemap.c
 
+$(O)tiletx32.o: $(WSHR)\tilemap.c $(HACK_H)
+	@$(CC) $(CFLAGS) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
+
 $(O)tiletxt.o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(CC) $(CFLAGS) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
 
 $(O)gifread.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
 	@$(CC) $(CFLAGS) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
 
+$(O)gifrd32.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
+	@$(CC) $(CFLAGS) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
+
 $(O)ppmwrite.o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
 	@$(CC) $(CFLAGS) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
 
 $(O)tiletext.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 	@$(CC) $(CFLAGS) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
+
+$(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
+	@$(CC) $(CFLAGS) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
 
 #==========================================
 # Optional Tile Utilities
@@ -857,6 +873,15 @@ $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
 		)
 <<
 
+$(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
+    @echo Linking $@...
+	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+		$(GIFREADERS32:^	=^
+		)
+		$(TEXT_IO32:^	=^
+		)
+<<
+
 $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
     @echo Linking $@...
 	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
@@ -867,11 +892,16 @@ $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
 <<
 
 !IF "$(GRAPHICAL)"=="Y"
-$(TILEBMP): $(TILEUTIL) $(TILEFILES)
-	@echo Creating binary tile files (this may take some time)
-	@$(U)tile2bmp $(TILEBMP)
+$(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
+	@echo Creating 16x16 binary tile files (this may take some time)
+	@$(U)tile2bmp $(TILEBMP16)
+#$(TILEBMP32): $(TILEUTIL32) $(TILEFILES32)
+#	@echo Creating 32x32 binary tile files (this may take some time)
+#	@$(U)til2bm32 $(TILEBMP32)
+
 !ELSE
-$(TILEBMP):
+$(TILEBMP16):
+$(TILEBMP32):
 !ENDIF
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
@@ -882,8 +912,19 @@ $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 		)
 <<
 
+$(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
+    @echo Linking $@...
+	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+		$(O)til2bm32.o
+		$(TEXT_IO32:^  =^
+		)
+<<
+
 $(O)tile2bmp.o: $(WIN32)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
 	@$(CC) $(CFLAGS) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WIN32)\tile2bmp.c
+
+$(O)til2bm32.o: $(WIN32)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
+	@$(CC) $(CFLAGS) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WIN32)\tile2bmp.c
 
 #==========================================
 # Housekeeping
@@ -950,7 +991,8 @@ clean:
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
 ! IF ("$(TILEDEF)"!="")
-	if exist $(TILEBMP)        del $(TILEBMP)
+	if exist $(TILEBMP16)        del $(TILEBMP16)
+	if exist $(TILEBMP32)        del $(TILEBMP32)
 ! ENDIF
 
 #===================================================================

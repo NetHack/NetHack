@@ -23,7 +23,9 @@ extern int colorsinmainmap;
 #ifndef TILE_X
 #define TILE_X 16
 #endif
+#ifndef TILE_Y
 #define TILE_Y 16
+#endif
 
 #define Fprintf (void) fprintf
 

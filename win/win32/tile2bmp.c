@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)tile2bmp.c	3.4	1999/08/29	*/
+/*	SCCS Id: @(#)tile2bmp.c	3.4	2002/02/24	*/
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -18,7 +18,11 @@
 #endif
 
 /* #define COLORS_IN_USE MAXCOLORMAPSIZE       /* 256 colors */
+#if (TILE_X==32)
+#define COLORS_IN_USE 256
+#else
 #define COLORS_IN_USE 16                       /* 16 colors */
+#endif
 
 #define BITCOUNT 8
 
@@ -26,10 +30,16 @@ extern char *FDECL(tilename, (int, int));
 
 #if BITCOUNT==4
 #define MAX_X 320		/* 2 per byte, 4 bits per pixel */
-#else
-#define MAX_X 640		/* 1 per byte, 8 bits per pixel */
-#endif	
 #define MAX_Y 480
+#else
+# if (TILE_X==32)
+#define MAX_X (32 * 40)
+#define MAX_Y 960
+# else
+#define MAX_X 640		/* 1 per byte, 8 bits per pixel */
+#define MAX_Y 480
+# endif
+#endif	
 
 /* GCC fix by Paolo Bonzini 1999/03/28 */
 #ifdef __GNUC__
@@ -85,13 +95,18 @@ struct tagBMP{
 #define RGBQUAD_COUNT 16
     RGBQUAD          bmaColors[RGBQUAD_COUNT];
 #else
+#if (TILE_X==32)
+#define RGBQUAD_COUNT 256
+#else
 #define RGBQUAD_COUNT 16
+#endif
     RGBQUAD          bmaColors[RGBQUAD_COUNT];
 #endif
-#if COLORS_IN_USE==16
+#if (COLORS_IN_USE==16)
     uchar            packtile[MAX_Y][MAX_X];
 #else
-    uchar            packtile[TILE_Y][TILE_X];
+    uchar            packtile[MAX_Y][MAX_X];
+/*    uchar            packtile[TILE_Y][TILE_X]; */
 #endif
 } PACK bmp;
 #pragma pack()
@@ -106,9 +121,17 @@ static void FDECL(build_bmfh,(BITMAPFILEHEADER *));
 static void FDECL(build_bmih,(BITMAPINFOHEADER *));
 static void FDECL(build_bmptile,(pixel (*)[TILE_X]));
 
-char *tilefiles[] = {	"../win/share/monsters.txt",
-			"../win/share/objects.txt",
-			"../win/share/other.txt"};
+char *tilefiles[] = {
+#if (TILE_X == 32)
+		"../win/share/mon32.txt",
+		"../win/share/obj32.txt",
+		"../win/share/oth32.txt"
+#else
+		"../win/share/monsters.txt",
+		"../win/share/objects.txt",
+		"../win/share/other.txt"
+#endif
+};
 
 int num_colors = 0;
 int tilecount;
@@ -125,10 +148,10 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	int i;
+	int i, j;
 
 	if (argc != 2) {
-		Fprintf(stderr, "usage: tile2bmp outfile.bmp\n");
+		Fprintf(stderr, "usage: %s outfile.bmp\n", argv[0]);
 		exit(EXIT_FAILURE);
 	} else
 		strcpy(bmpname, argv[1]);
@@ -151,7 +174,7 @@ char *argv[];
 	    printf("Error creating tile file %s, aborting.\n",bmpname);
 	    exit(1);
 	}
-	while (filenum < 3) {
+	while (filenum < (sizeof(tilefiles) / sizeof(char *))) {
 		if (!fopen_text_file(tilefiles[filenum], RDTMODE)) {
 			Fprintf(stderr,
 				"usage: tile2bmp (from the util directory)\n");
@@ -165,8 +188,9 @@ char *argv[];
 		if (!initflag) {
 		    build_bmfh(&bmp.bmfh);
 		    build_bmih(&bmp.bmih);
-		    memset(&bmp.packtile,0,
-				(MAX_X * MAX_Y * sizeof(uchar)));
+		    for (i = 0; i < MAX_Y; ++i)
+		    	for (j = 0; j < MAX_X; ++j)
+		    		bmp.packtile[i][j] = (uchar)0;
 		    for (i = 0; i < num_colors; i++) {
 			    bmp.bmaColors[i].rgbRed = ColorMap[CM_RED][i];
 			    bmp.bmaColors[i].rgbGreen = ColorMap[CM_GREEN][i];
@@ -219,6 +243,7 @@ static void
 build_bmih(pbmih)
 BITMAPINFOHEADER *pbmih;
 {
+	WORD cClrBits;
 	pbmih->biSize = (DWORD) sizeof(bmp.bmih);
 #if BITCOUNT==4
 	pbmih->biWidth = (LONG) MAX_X * 2;
@@ -232,12 +257,35 @@ BITMAPINFOHEADER *pbmih;
 #else
 	pbmih->biBitCount = (WORD) 8;
 #endif
+	cClrBits = (WORD)(pbmih->biPlanes * pbmih->biBitCount); 
+	if (cClrBits == 1) 
+	        cClrBits = 1; 
+	else if (cClrBits <= 4) 
+		cClrBits = 4; 
+	else if (cClrBits <= 8) 
+		cClrBits = 8; 
+	else if (cClrBits <= 16) 
+		cClrBits = 16; 
+	else if (cClrBits <= 24) 
+		cClrBits = 24; 
+	else cClrBits = 32; 
 	pbmih->biCompression = (DWORD) BI_RGB;
-	pbmih->biSizeImage = (DWORD)0;
 	pbmih->biXPelsPerMeter = (LONG)0;
 	pbmih->biYPelsPerMeter = (LONG)0;
-	pbmih->biClrUsed = (DWORD)RGBQUAD_COUNT;
-	pbmih->biClrImportant = (DWORD)0;
+#if (TILE_X==32)
+	if (cClrBits < 24) 
+        	pbmih->biClrUsed = (1<<cClrBits);
+#else
+	pbmih->biClrUsed = (DWORD)RGBQUAD_COUNT; 
+#endif
+
+#if (TILE_X==16)
+	pbmih->biSizeImage = 0;
+#else
+	pbmih->biSizeImage = ((pbmih->biWidth * cClrBits +31) & ~31) /8
+                              * pbmih->biHeight;
+#endif
+ 	pbmih->biClrImportant = (DWORD)0;
 }
 
 static void
