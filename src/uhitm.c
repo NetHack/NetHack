@@ -1428,7 +1428,8 @@ register struct attack *mattk;
 		if (tmp <= 0) tmp = 1;
 		if (!negated && tmp < mdef->mhp) {
 		    char nambuf[BUFSZ];
-		    boolean u_saw_mon = canseemon(mdef);
+		    boolean u_saw_mon = canseemon(mdef) ||
+					(u.uswallow && u.ustuck == mdef);
 		    /* record the name before losing sight of monster */
 		    Strcpy(nambuf, Monnam(mdef));
 		    if (u_teleport_mon(mdef, FALSE) &&
