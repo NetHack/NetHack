@@ -1427,6 +1427,7 @@ char mswin_yn_function(const char *question, const char *choices,
     SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
         WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
 
+    mswin_clear_nhwindow(WIN_MESSAGE);
     mswin_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
     /* Only here if main window is not present */
@@ -1490,6 +1491,7 @@ void mswin_getlin(const char *question, char *input)
         SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
             WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
 
+ mswin_clear_nhwindow(WIN_MESSAGE);
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, question, 0);
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, " ", 1);
         input[0] = '\0';
@@ -1562,6 +1564,7 @@ int mswin_get_ext_cmd()
 
         cmd[0] = '\0';
         i = -2;
+ mswin_clear_nhwindow(WIN_MESSAGE);
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, "#", 0);
         len = 0;
         ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));

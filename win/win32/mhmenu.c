@@ -821,11 +821,12 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	x = lpdis->rcItem.left + 1;
 
-	/* print check mark */
+    /* print check mark and letter */
 	if( NHMENU_IS_SELECTABLE(*item) ) {
+ char buf[2];
+ if (data->how != PICK_NONE) {
 		HGDIOBJ saveBrush;
 		HBRUSH	hbrCheckMark;
-		char buf[2];
 
 		switch(item->count) {
 		case -1: hbrCheckMark = CreatePatternBrush(data->bmpChecked); break;
@@ -840,8 +841,8 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		SelectObject(lpdis->hDC, saveBrush);
 		DeleteObject(hbrCheckMark);
 
+ }
 		x += TILE_X + 5;
-
 		if(item->accelerator!=0) {
 			buf[0] = item->accelerator;
 			buf[1] = '\x0';
