@@ -38,7 +38,6 @@ extern struct window_procs win32_procs;
 extern struct window_procs Gnome_procs;
 #endif
 #ifdef MSWIN_GRAPHICS
-#include "winMS.h"
 extern struct window_procs mswin_procs;
 #endif
 
