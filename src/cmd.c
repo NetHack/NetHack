@@ -937,7 +937,16 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	if (u.umconf) you_are("going to confuse monsters");
 
 	/*** Appearance and behavior ***/
-	if (Adornment) you_are("adorned");
+	if (Adornment) {
+	    int adorn = 0;
+
+	    if(uleft && uleft->otyp == RIN_ADORNMENT) adorn += uleft->spe;
+	    if(uright && uright->otyp == RIN_ADORNMENT) adorn += uright->spe;
+	    if (adorn < 0)
+		you_are("poorly adorned");
+	    else
+		you_are("adorned");
+	}
 	if (Invisible) you_are("invisible");
 	else if (Invis) you_are("invisible to others");
 	/* ordinarily "visible" is redundant; this is a special case for
