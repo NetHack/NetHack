@@ -1601,8 +1601,8 @@ fopen_wizkit_file()
 	FILE *fp;
 #if defined(VMS) || defined(UNIX)
 	char	tmp_wizkit[BUFSZ];
-	char *envp;
 #endif
+	char *envp;
 
 	envp = nh_getenv("WIZKIT");
 	if (envp && *envp) (void) strncpy(wizkit, envp, WIZKIT_MAX - 1);
