@@ -95,7 +95,7 @@ silently ignore:
 
 Window Alignment options:
 
-                   |
+
     align_message  Specifies at which side of the NetHack screen the 
                    message window is aligned. This option can be used 
                    to align the window to "top" or "bottom". "left" 
@@ -139,8 +139,7 @@ Map Window options:
                    ascii8x12, ascii16x12, ascii12x16, ascii10x18
                    (which use that size font to display things on 
                    the map), or fit_to_screen (which forces things
-                   to fit on a single screen display whether tiled
-                   or ascii). Default: [tiles]
+                   to fit on a single screen). Default: [tiles]
 
     scroll_margin  Specifies the margin of scrolling the map. 
                    Recommended to be set to 1 or greater. If set to 
@@ -162,15 +161,34 @@ Map Window options:
                    only be specified in the defaults.nh config file. 
                    Default: [default] 
 
-   tile_height     Used with tile_file to specify the width of each 
+    tile_height    Used with tile_file to specify the width of each 
                    tile in pixels. This option may only be specified
                    in the defaults.nh config file. 
                    Default: [16] 
 
-   tile_width      Used with tile_file to specify the height of each 
+    tile_width     Used with tile_file to specify the height of each 
                    tile in pixels. This option may only be specified
                    in the defaults.nh config file. 
                    Default: [16]
+
+   windowcolors    Specifies the colors for various windows
+                   This is a single option that has the following
+                   format:
+                      window-type foreground/background
+                   Notes:
+                      - The slash is required.
+                      - window-type is one of: 
+                        "menu, "message", "status", or "text"  
+                        (Short forms are: "mnu", "msg", "sts", or "txt").
+                      - Foreground and background may be specified as
+                        a color name (for example "blue") or as a
+                        six digit hexadecimal RGB color-number (for
+                        example "#8F8F8F").
+
+                   Examples include:
+                      OPTIONS=windowcolors:menu white/black
+                      OPTIONS=msg green/yellow
+                      OPTIONS=windowcolors:sts white/blue txt white/blue
 
 Miscellaneous options: 
 
@@ -212,11 +230,12 @@ the map_mode option.
 
 Window Settings - Changes your logged-on user's settings for 
 NetHack. In 3.4.0, only one setting is available: NetHack 
-mode (or not). NetHack mode allows you to use ALT-f, ALT-m, and ALT-s 
-for game key commands [see list above]. You can use F10 to 
-access the menu bar while in NetHack mode. You can also 
-clear your logged-on user's settings for NetHack. Settings 
-in this window are saved in your logged-on user's registry. 
+mode, which can be checked or unchecked. NetHack mode allows 
+you to use ALT-f, ALT-m, and ALT-s for game key commands 
+[see list above]. You can use F10 to access the menu bar while 
+in NetHack mode. You can also clear your logged-on user's 
+settings for NetHack. Settings in this window are saved in 
+your logged-on user's registry. 
 
 Help - Provides help about various portions of NetHack.
 
