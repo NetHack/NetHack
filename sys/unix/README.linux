@@ -1,4 +1,4 @@
-NetHack 3.4.2 Linux Elf
+NetHack 3.4.3 Linux Elf
 
 This README provides the instructions for using the official Linux binary,
 system platform requirements, as well as steps used to create that binary.
@@ -20,11 +20,11 @@ preserving permissions to put the NetHack files in /usr/games/nethack and
 home directory you might perform these steps.
     % su
     # cd /
-    # gunzip -c ~yourlogin/nh342lin.tgz | tar xpvf -
+    # gunzip -c ~yourlogin/nh343lin.tgz | tar xpvf -
 
 (If you have old record and logfile entries from a previous NetHack version,
 you might want to save copies before they get overwritten by the new empty
-files; old saved games and bones files from 3.4.x will work with 3.4.2).
+files; old saved games and bones files from 3.4.x will work with 3.4.3).
 
 In addition to data files for running the game, you will find other useful
 things in /usr/games/lib/nethackdir (such as a copy of this README :-).
