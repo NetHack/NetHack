@@ -384,6 +384,7 @@ const char *drop_fmt, *drop_arg, *hold_msg;
 	    /* place_object may change these */
 	    boolean crysknife = (obj->otyp == CRYSKNIFE);
 	    int oerode = obj->oerodeproof;
+	    boolean wasUpolyd = Upolyd;
 
 	    /* in case touching this object turns out to be fatal */
 	    place_object(obj, u.ux, u.uy);
@@ -391,6 +392,12 @@ const char *drop_fmt, *drop_arg, *hold_msg;
 	    if (!touch_artifact(obj, &youmonst)) {
 		obj_extract_self(obj);	/* remove it from the floor */
 		dropy(obj);		/* now put it back again :-) */
+		return obj;
+	    } else if (wasUpolyd && !Upolyd) {
+		/* loose your grip if you revert your form */
+		if (drop_fmt) pline(drop_fmt, drop_arg);
+		obj_extract_self(obj);
+		dropy(obj);
 		return obj;
 	    }
 	    obj_extract_self(obj);

@@ -1102,12 +1102,15 @@ struct attack *mattk;
 	}
 
 	while ((otmp = mdef->minvent) != 0) {
+	    if (!Upolyd) break;		/* no longer have ability to steal */
 	    /* take the object away from the monster */
 	    obj_extract_self(otmp);
 	    if ((unwornmask = otmp->owornmask) != 0L) {
 		mdef->misc_worn_check &= ~unwornmask;
-		if (otmp->owornmask & W_WEP)
+		if (otmp->owornmask & W_WEP) {
 		    setmnotwielded(mdef,otmp);
+		    MON_NOWEP(mdef);
+		}
 		otmp->owornmask = 0L;
 		update_mon_intrinsics(mdef, otmp, FALSE);
 
@@ -1116,7 +1119,7 @@ struct attack *mattk;
 			  Monnam(mdef), mhis(mdef));
 	    }
 	    /* give the object to the character */
-	    otmp = hold_another_object(otmp, "You steal %s.",
+	    otmp = hold_another_object(otmp, "You snatched but dropped %s.",
 				       doname(otmp), "You steal: ");
 	    if (otmp->where != OBJ_INVENT) continue;
 	    if (otmp->otyp == CORPSE &&
