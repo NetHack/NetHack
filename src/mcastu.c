@@ -600,7 +600,7 @@ int spellnum;
 	    shieldeff(u.ux, u.uy);
 	    You_feel("momentarily dizzy.");
 	} else {
-	    boolean oldprop = Confusion;
+	    boolean oldprop = !!Confusion;
 
 	    dmg = (int)mtmp->m_lev;
 	    if (Half_spell_damage) dmg = (dmg + 1) / 2;
