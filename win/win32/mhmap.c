@@ -6,6 +6,7 @@
 #include "mhmap.h"
 #include "mhmsg.h"
 #include "mhinput.h"
+#include "mhfont.h"
 
 #include "patchlevel.h"
 
@@ -159,7 +160,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	lgfnt.lfItalic			=	FALSE;				 // italic attribute option
 	lgfnt.lfUnderline		=	FALSE;				 // underline attribute option
 	lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-	lgfnt.lfCharSet			=	iflags.IBMgraphics? OEM_CHARSET : ANSI_CHARSET;     // character set identifier
+	lgfnt.lfCharSet			=	mswin_charset();     // character set identifier
 	lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 	lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 	lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
