@@ -253,8 +253,8 @@ mhmap.c         mhmap.h         mhmenu.c        mhmenu.h        mhmsg.h
 mhmsgwnd.c      mhmsgwnd.h      mhrip.c         mhrip.h         mhstatus.c
 mhstatus.h      mhtext.c        mhtext.h        mnsel.uu        mnunsel.uu
 mswproc.c       nethack.dsw     recover.dsp     resource.h      tile2bmp.c
-tile2bmp.dsp    tilemap.dsp     winhack.c       winhack.dsp     winhack.h
-winhack.rc      winMS.h         winnt.dsw
+tile2bmp.dsp    tilemap.dsp     tiles.dsp       tiles.mak       winhack.c
+winhack.dsp     winhack.h       winhack.rc      winMS.h         winnt.dsw
 
 
 
