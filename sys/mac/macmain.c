@@ -135,7 +135,7 @@ main (void)
 
 	if (discover)
 		You("are in non-scoring discovery mode.");
-	flags.move = 0;
+	context.move = 0;
 
 	UndimMenuBar (); /* Yes, this is the place for it (!) */
 	

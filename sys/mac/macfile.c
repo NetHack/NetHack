@@ -219,7 +219,7 @@ macopen (const char *name, int flags, long fileType)
 			TEXT_CREATOR, fileType) && (flags & O_EXCL)) {
 			return -1;
 		}
-
+#if 0	/* Fails during makedefs */
 		if (fileType == SAVE_TYPE) {
 			short resRef;
 			HCreateResFile(theDirs.dataRefNum, theDirs.dataDirID, s);
@@ -246,6 +246,7 @@ macopen (const char *name, int flags, long fileType)
 				CloseResFile(resRef);
 			}
 		}
+#endif
 
 	}
 	/*

@@ -456,14 +456,12 @@ display_gamewindows()
     WIN_INVEN = create_nhwindow(NHW_MENU);
 
 #ifdef MAC
-    /*
-     * This _is_ the right place for this - maybe we will
+    /* This _is_ the right place for this - maybe we will
      * have to split display_gamewindows into create_gamewindows
      * and show_gamewindows to get rid of this ifdef...
      */
-	if ( ! strcmp ( windowprocs . name , "mac" ) ) {
-	    SanePositions ( ) ;
-	}
+	if (!strcmp(windowprocs. name, "mac"))
+	    SanePositions();
 #endif
 
     /*
