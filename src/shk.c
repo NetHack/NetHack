@@ -2005,6 +2005,31 @@ register struct monst *shkp;
 	return tmp;
 }
 
+/* called when an item's value has been enhanced; if it happens to be
+   on any shop bill, update that bill to reflect the new higher price
+   [if the new price drops for some reason, keep the old one in place] */
+void
+alter_cost(obj, amt)
+struct obj *obj;
+long amt;	/* if 0, use regular shop pricing, otherwise force amount;
+		   if negative, use abs(amt) even if it's less than old cost */
+{
+    struct bill_x *bp = 0;
+    struct monst *shkp;
+    long new_price;
+
+    for (shkp = next_shkp(fmon, TRUE); shkp; shkp = next_shkp(shkp, TRUE))
+	if ((bp = onbill(obj, shkp, TRUE)) != 0) {
+	    new_price = !amt ? get_cost(obj, shkp) : (amt < 0L) ? -amt : amt;
+	    if (new_price > bp->price || amt < 0L) {
+		bp->price = new_price;
+		update_inventory();
+	    }
+	    break;	/* done */
+	}
+    return;
+}
+
 /* called from doinv(invent.c) for inventory of unpaid objects */
 long
 unpaid_cost(unp_obj)

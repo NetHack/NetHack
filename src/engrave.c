@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)engrave.c	3.5	2004/01/03	*/
+/*	SCCS Id: @(#)engrave.c	3.5	2005/03/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1031,13 +1031,7 @@ doengrave()
 			 *	 "ere", then "th".
 			 */
 		    pline("%s dull.", Yobjnam2(otmp, "get"));
-		    if (otmp->unpaid) {
-			struct monst *shkp = shop_keeper(*u.ushops);
-			if (shkp) {
-			    You("damage it, you pay for it!");
-			    bill_dummy_object(otmp);
-			}
-		    }
+		    costly_alteration(otmp, COST_DEGRD);
 		    if (len > maxelen) {
 			multi = -maxelen;
 			otmp->spe = -3;

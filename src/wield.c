@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.5	2003/01/29	*/
+/*	SCCS Id: @(#)wield.c	3.5	2005/03/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -694,21 +694,24 @@ register int amount;
 
 	if (otmp && otmp->oclass == SCROLL_CLASS) otyp = otmp->otyp;
 
-	if(uwep->otyp == WORM_TOOTH && amount >= 0) {
+	if (uwep->otyp == WORM_TOOTH && amount >= 0) {
+		/* order: message, transformation, shop handling */
+		Your("%s is much sharper now.", simple_typename(WORM_TOOTH));
 		uwep->otyp = CRYSKNIFE;
 		uwep->oerodeproof = 0;
-		Your("weapon seems sharper now.");
-		uwep->cursed = 0;
+		if (uwep->cursed) uncurse(uwep);
+		/* update shop bill to reflect new higher value */
+		if (uwep->unpaid) alter_cost(uwep, 0L);
 		if (otyp != STRANGE_OBJECT) makeknown(otyp);
-		return(1);
-	}
-
-	if(uwep->otyp == CRYSKNIFE && amount < 0) {
+		return 1;
+	} else if (uwep->otyp == CRYSKNIFE && amount < 0) {
+		/* order matters: message, shop handling, transformation */
+		Your("%s is much duller now.", simple_typename(CRYSKNIFE));
+		costly_alteration(uwep, COST_DEGRD);	/* DECHNT? other? */
 		uwep->otyp = WORM_TOOTH;
 		uwep->oerodeproof = 0;
-		Your("weapon seems duller now.");
 		if (otyp != STRANGE_OBJECT && otmp->bknown) makeknown(otyp);
-		return(1);
+		return 1;
 	}
 
 	if (amount < 0 && uwep->oartifact && restrict_name(uwep, ONAME(uwep))) {
@@ -738,8 +741,13 @@ register int amount;
 		    (amount > 0 || (amount < 0 && otmp->bknown)))
 		makeknown(otyp);
 	}
+	if (amount < 0) costly_alteration(uwep, COST_DECHNT);
 	uwep->spe += amount;
-	if(amount > 0) uwep->cursed = 0;
+	if (amount > 0) {
+	    if (uwep->cursed) uncurse(uwep);
+	    /* update shop bill to reflect new higher price */
+	    if (uwep->unpaid) alter_cost(uwep, 0L);
+	}
 
 	/*
 	 * Enchantment, which normally improves a weapon, has an

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2004/05/07	*/
+/*	SCCS Id: @(#)read.c	3.5	2005/03/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -150,14 +150,15 @@ STATIC_OVL void
 stripspe(obj)
 register struct obj *obj;
 {
-	if (obj->blessed) pline(nothing_happens);
-	else {
-	    if (obj->spe > 0) {
-		obj->spe = 0;
-		if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
-		    obj->age = 0;
-		pline("%s briefly.", Yobjnam2(obj, "vibrate"));
-	    } else pline(nothing_happens);
+	if (obj->blessed || obj->spe <= 0) {
+	    pline(nothing_happens);
+	} else {
+	    /* order matters: message, shop handling, actual transformation */
+	    pline("%s briefly.", Yobjnam2(obj, "vibrate"));
+	    costly_alteration(obj, COST_UNCHRG);
+	    obj->spe = 0;
+	    if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
+		obj->age = 0;
 	}
 }
 
@@ -257,6 +258,10 @@ int curse_bless;
 		}
 		if (obj->spe >= lim) p_glow2(obj, NH_BLUE);
 		else p_glow1(obj);
+#if 0			/*[shop price doesn't vary by charge count]*/
+		/* update shop bill to reflect new higher price */
+		if (obj->unpaid) alter_cost(obj, 0L);
+#endif
 	    }
 
 	} else if (obj->oclass == RING_CLASS &&
@@ -278,12 +283,15 @@ int curse_bless;
 				     RIGHT_RING) : 0L;
 		pline("%s spins %sclockwise for a moment.",
 		      Yname2(obj), s < 0 ? "counter" : "");
+		if (s < 0) costly_alteration(obj, COST_DECHNT);
 		/* cause attributes and/or properties to be updated */
 		if (is_on) Ring_off(obj);
 		obj->spe += s;	/* update the ring while it's off */
 		if (is_on) setworn(obj, mask), Ring_on(obj);
 		/* oartifact: if a touch-sensitive artifact ring is
 		   ever created the above will need to be revised  */
+		/* update shop bill to reflect new higher price */
+		if (s > 0 && obj->unpaid) alter_cost(obj, 0L);
 	    }
 
 	} else if (obj->oclass == TOOL_CLASS) {
@@ -637,11 +645,12 @@ struct obj *sobj;
 
 int
 seffects(sobj)
-register struct obj	*sobj;
+struct obj *sobj;
 {
-	register int cval;
-	register boolean confused = (Confusion != 0);
-	register struct obj *otmp;
+	int cval;
+	boolean confused = (Confusion != 0),
+		old_erodeproof, new_erodeproof;
+	struct obj *otmp;
 
 	if (objects[sobj->otyp].oc_magic)
 		exercise(A_WIS, TRUE);		/* just for trying */
@@ -650,7 +659,8 @@ register struct obj	*sobj;
 	case SCR_MAIL:
 		known = TRUE;
 		if (sobj->spe)
-		    pline("This seems to be junk mail addressed to the finder of the Eye of Larn.");
+		    pline(
+     "This seems to be junk mail addressed to the finder of the Eye of Larn.");
 		/* note to the puzzled: the game Larn actually sends you junk
 		 * mail if you win!
 		 */
@@ -673,7 +683,9 @@ register struct obj	*sobj;
 			return(1);
 		}
 		if(confused) {
-			otmp->oerodeproof = !(sobj->cursed);
+			old_erodeproof = (otmp->oerodeproof != 0);
+			new_erodeproof = !sobj->cursed;
+			otmp->oerodeproof = 0;	/* for messages */
 			if(Blind) {
 			    otmp->rknown = FALSE;
 			    pline("%s warm for a moment.",
@@ -683,16 +695,22 @@ register struct obj	*sobj;
 			    pline("%s covered by a %s %s %s!",
 				Yobjnam2(otmp, "are"),
 				sobj->cursed ? "mottled" : "shimmering",
-				 hcolor(sobj->cursed ? NH_BLACK : NH_GOLDEN),
+				hcolor(sobj->cursed ? NH_BLACK : NH_GOLDEN),
 				sobj->cursed ? "glow" :
 				  (is_shield(otmp) ? "layer" : "shield"));
 			}
-			if (otmp->oerodeproof &&
+			if (new_erodeproof &&
 			    (otmp->oeroded || otmp->oeroded2)) {
 			    otmp->oeroded = otmp->oeroded2 = 0;
 			    pline("%s as good as new!",
 				  Yobjnam2(otmp, Blind ? "feel" : "look"));
 			}
+			if (old_erodeproof && !new_erodeproof) {
+			    /* restore old_erodeproof before shop charges */
+			    otmp->oerodeproof = 1;
+			    costly_alteration(otmp, COST_DEGRD);
+			}
+			otmp->oerodeproof = new_erodeproof ? 1 : 0;
 			break;
 		}
 		/* elven armor vibrates warningly when enchanted beyond a limit */
@@ -739,29 +757,35 @@ register struct obj	*sobj;
 			/* assumes same order */
 			otmp->otyp = GRAY_DRAGON_SCALE_MAIL +
 						otmp->otyp - GRAY_DRAGON_SCALES;
-			otmp->cursed = 0;
 			if (sobj->blessed) {
-				otmp->spe++;
-				otmp->blessed = 1;
-			}
+			    otmp->spe++;
+			    if (!otmp->blessed) bless(otmp);
+			} else if (otmp->cursed)
+			    uncurse(otmp);
 			otmp->known = 1;
 			setworn(otmp, W_ARM);
+			if (otmp->unpaid) alter_cost(otmp, 0L); /* shop bill */
 			break;
 		}
 		pline("%s %s%s%s%s for a %s.",
-			Yname2(otmp),
-		        s == 0 ? "violently " : nul,
-			otense(otmp, Blind ? "vibrate" : "glow"),
-			(!Blind && !same_color) ? " " : nul,
-			(Blind || same_color) ? nul : hcolor(sobj->cursed ? NH_BLACK : NH_SILVER),
-			  (s*s>1) ? "while" : "moment");
-		otmp->cursed = sobj->cursed;
-		if (!otmp->blessed || sobj->cursed)
-			otmp->blessed = sobj->blessed;
+		      Yname2(otmp),
+		      s == 0 ? "violently " : nul,
+		      otense(otmp, Blind ? "vibrate" : "glow"),
+		      (!Blind && !same_color) ? " " : nul,
+		      (Blind || same_color) ? nul :
+			  hcolor(sobj->cursed ? NH_BLACK : NH_SILVER),
+		      (s * s > 1) ? "while" : "moment");
+		/* [this cost handling will need updating if shop pricing is
+		   ever changed to care about curse/bless status of armor] */
+		if (s < 0) costly_alteration(otmp, COST_DECHNT);
+		if (sobj->cursed && !otmp->cursed) curse(otmp);
+		else if (sobj->blessed && !otmp->blessed) bless(otmp);
 		if (s) {
 			otmp->spe += s;
 			adj_abon(otmp, s);
 			known = otmp->known;
+			/* update shop bill to reflect new higher price */
+			if (s > 0 && otmp->unpaid) alter_cost(otmp, 0L);
 		}
 
 		if ((otmp->spe > (special_armor ? 5 : 3)) &&
@@ -781,8 +805,16 @@ register struct obj	*sobj;
 				exercise(A_CON, FALSE);
 				return(1);
 			}
-			otmp->oerodeproof = sobj->cursed;
+			old_erodeproof = (otmp->oerodeproof != 0);
+			new_erodeproof = (sobj->cursed != 0);
+			otmp->oerodeproof = 0;	/* for messages */
 			p_glow2(otmp, NH_PURPLE);
+			if (old_erodeproof && !new_erodeproof) {
+			    /* restore old_erodeproof before shop charges */
+			    otmp->oerodeproof = 1;
+			    costly_alteration(otmp, COST_DEGRD);
+			}
+			otmp->oerodeproof = new_erodeproof ? 1 : 0;
 			break;
 		}
 		if(!sobj->cursed || !otmp || !otmp->cursed) {
@@ -850,7 +882,8 @@ register struct obj	*sobj;
 		break;
 	case SCR_SCARE_MONSTER:
 	case SPE_CAUSE_FEAR:
-	    {	register int ct = 0;
+	    {
+		register int ct = 0;
 		register struct monst *mtmp;
 
 		for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -884,17 +917,16 @@ register struct obj	*sobj;
 	    break;
 	case SCR_REMOVE_CURSE:
 	case SPE_REMOVE_CURSE:
-	    {	register struct obj *obj;
-		if(confused)
-		    if (Hallucination)
-			You_feel("the power of the Force against you!");
-		    else
-			You_feel("like you need some help.");
-		else
-		    if (Hallucination)
-			You_feel("in touch with the Universal Oneness.");
-		    else
-			You_feel("like someone is helping you.");
+	    {
+		register struct obj *obj;
+
+		You_feel(!Hallucination ?
+			    (!confused ?
+				"like someone is helping you." :
+				"like you need some help.") :
+			    (!confused ?
+				"in touch with the Universal Oneness." :
+				"the power of the Force against you!"));
 
 		if (sobj->cursed) {
 		    pline_The("scroll disintegrates.");
@@ -932,8 +964,39 @@ register struct obj	*sobj;
 			if (sobj->blessed || wornmask ||
 			     obj->otyp == LOADSTONE ||
 			     (obj->otyp == LEASH && obj->leashmon)) {
+			    unsigned save_bknown, save_cursed, save_blessed;
+			    boolean was_cursed = !!obj->cursed,
+			            was_blessed = !!obj->blessed,
+			            was_normal = !(was_cursed || was_blessed);
+
 			    if(confused) blessorcurse(obj, 2);
 			    else uncurse(obj);
+			    /* water price varies by curse/bless status */
+			    if (obj->unpaid && obj->otyp == POT_WATER) {
+				if ((was_cursed && !obj->cursed) ||
+					(was_blessed && !obj->blessed)) {
+				    /* make `Ix' more specific for this item */
+				    save_bknown = obj->bknown;
+				    obj->bknown = 1;
+				    /* temporarily restore curse/bless to
+				       obtain the right shop price (if potion
+				       went from cursed directly to blessed
+				       or vice versa its price didn't change
+				       but hero will have to buy it anyway) */
+				    save_cursed = obj->cursed;
+				    obj->cursed = was_cursed ? 1 : 0;
+				    save_blessed = obj->blessed;
+				    obj->blessed = was_blessed ? 1 : 0;
+				    costly_alteration(obj, was_cursed ?
+				                    COST_UNHOLY : COST_UNBLSS);
+				    obj->bknown = save_bknown;
+				    obj->cursed = save_cursed;
+				    obj->blessed = save_blessed;
+				} else if (was_normal &&
+					(obj->blessed || obj->cursed)) {
+				    alter_cost(obj, 0L);
+				}
+			    } /* unpaid water */
 			}
 		    }
 		}
@@ -957,10 +1020,11 @@ register struct obj	*sobj;
 	     */
 	    break;
 	case SCR_ENCHANT_WEAPON:
-		if(uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))
-			&& confused) {
-		/* oclass check added 10/25/86 GAN */
-			uwep->oerodeproof = !(sobj->cursed);
+		if (confused && uwep &&
+		    (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))) {
+			old_erodeproof = (uwep->oerodeproof != 0);
+			new_erodeproof = !sobj->cursed;
+			uwep->oerodeproof = 0;	/* for messages */
 			if (Blind) {
 			    uwep->rknown = FALSE;
 			    Your("weapon feels warm for a moment.");
@@ -977,12 +1041,19 @@ register struct obj	*sobj;
 			    pline("%s as good as new!",
 				  Yobjnam2(uwep, Blind ? "feel" : "look"));
 			}
-		} else return !chwepon(sobj,
-				       sobj->cursed ? -1 :
-				       !uwep ? 1 :
-				       uwep->spe >= 9 ? (rn2(uwep->spe) == 0) :
-				       sobj->blessed ? rnd(3-uwep->spe/3) : 1);
-		break;
+			if (old_erodeproof && !new_erodeproof) {
+			    /* restore old_erodeproof before shop charges */
+			    uwep->oerodeproof = 1;
+			    costly_alteration(uwep, COST_DEGRD);
+			}
+			uwep->oerodeproof = new_erodeproof ? 1 : 0;
+			break;
+		}
+		return !chwepon(sobj,
+				sobj->cursed ? -1 :
+				!uwep ? 1 :
+				uwep->spe >= 9 ? (rn2(uwep->spe) == 0) :
+				sobj->blessed ? rnd(3 - uwep->spe / 3) : 1);
 	case SCR_TAMING:
 	case SPE_CHARM_MONSTER:
 		if (u.uswallow) {
@@ -1280,8 +1351,9 @@ register struct obj	*sobj;
 		}
 		punish(sobj);
 		break;
-	case SCR_STINKING_CLOUD: {
-	        coord cc;
+	case SCR_STINKING_CLOUD:
+	    {
+		coord cc;
 
 		You("have found a scroll of stinking cloud!");
 		known = TRUE;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)potion.c	3.5	2005/03/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1571,20 +1571,14 @@ register struct obj *obj;
 		}
 		pline("%s%s.", Yobjnam2(obj,"dilute"),
 		      obj->odiluted ? " further" : "");
-		if(obj->unpaid && costly_spot(u.ux, u.uy)) {
-		    You("dilute it, you pay for it.");
-		    bill_dummy_object(obj);
-		}
+		costly_alteration(obj, COST_DILUTE);
 		if (obj->odiluted) {
 			obj->odiluted = 0;
-#ifdef UNIXPC
 			obj->blessed = FALSE;
 			obj->cursed = FALSE;
-#else
-			obj->blessed = obj->cursed = FALSE;
-#endif
 			obj->otyp = POT_WATER;
-		} else obj->odiluted++;
+		} else
+			obj->odiluted++;
 		update_inventory();
 		return TRUE;
 	    case SCROLL_CLASS:
@@ -1593,15 +1587,10 @@ register struct obj *obj;
 		    && obj->otyp != SCR_MAIL
 #endif
 		    ) {
-			if (!Blind) {
-				boolean oq1 = obj->quan == 1L;
-				pline_The("scroll%s %s.",
-					  oq1 ? "" : "s", otense(obj, "fade"));
-			}
-			if(obj->unpaid && costly_spot(u.ux, u.uy)) {
-			    You("erase it, you pay for it.");
-			    bill_dummy_object(obj);
-			}
+			if (!Blind)
+			    pline_The("scroll%s %s.",
+				      plur(obj->quan), otense(obj, "fade"));
+			costly_alteration(obj, COST_ERASE);
 			obj->otyp = SCR_BLANK_PAPER;
 			obj->spe = 0;
 			update_inventory();
@@ -1611,18 +1600,15 @@ register struct obj *obj;
 		if (obj->otyp != SPE_BLANK_PAPER) {
 
 			if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-	pline("%s suddenly heats up; steam rises and it remains dry.",
-				The(xname(obj)));
+			    pline(
+		       "%s suddenly heats up; steam rises and it remains dry.",
+				  The(xname(obj)));
 			} else {
-			    if (!Blind) {
-				    boolean oq1 = obj->quan == 1L;
-				    pline_The("spellbook%s %s.",
-					oq1 ? "" : "s", otense(obj, "fade"));
-			    }
-			    if(obj->unpaid && costly_spot(u.ux, u.uy)) {
-			        You("erase it, you pay for it.");
-			        bill_dummy_object(obj);
-			    }
+			    if (!Blind)
+				pline_The("spellbook%s %s.",
+					  plur(obj->quan),
+					  otense(obj, "fade"));
+			    costly_alteration(obj, COST_ERASE);
 			    obj->otyp = SPE_BLANK_PAPER;
 			    update_inventory();
 			}
@@ -1698,14 +1684,17 @@ dodip()
 	potion->in_use = TRUE;		/* assume it will be used up */
 	if(potion->otyp == POT_WATER) {
 		boolean useeit = !Blind || (obj == ublindf && Blindfolded_only);
+
 		if (potion->blessed) {
 			if (obj->cursed) {
 				if (useeit)
 				    pline("%s %s.",
 					  Yobjnam2(obj, "softly glow"),
 					  hcolor(NH_AMBER));
+				obj->bknown = 1;
+				if (obj->otyp == POT_WATER && obj->unpaid)
+				    costly_alteration(obj, COST_UNHOLY);
 				uncurse(obj);
-				obj->bknown=1;
 	poof:
 				if(!(objects[potion->otyp].oc_name_known) &&
 				   !(objects[potion->otyp].oc_uname))
@@ -1719,8 +1708,10 @@ dodip()
 					  Yobjnam2(obj, "softly glow"),
 					  index(vowels, *tmp) ? "n" : "", tmp);
 				}
+				obj->bknown = 1;
 				bless(obj);
-				obj->bknown=1;
+				if (obj->otyp == POT_WATER && obj->unpaid)
+				    alter_cost(obj, 0L);
 				goto poof;
 			}
 		} else if (potion->cursed) {
@@ -1729,8 +1720,10 @@ dodip()
 				    pline("%s %s.",
 					  Yobjnam2(obj, "glow"),
 					  hcolor((const char *)"brown"));
+				obj->bknown = 1;
+				if (obj->otyp == POT_WATER && obj->unpaid)
+				    costly_alteration(obj, COST_UNBLSS);
 				unbless(obj);
-				obj->bknown=1;
 				goto poof;
 			} else if(!obj->cursed) {
 				if (useeit) {
@@ -1739,8 +1732,10 @@ dodip()
 					  Yobjnam2(obj, "glow"),
 					  index(vowels, *tmp) ? "n" : "", tmp);
 				}
+				obj->bknown = 1;
 				curse(obj);
-				obj->bknown=1;
+				if (obj->otyp == POT_WATER && obj->unpaid)
+				    alter_cost(obj, 0L);
 				goto poof;
 			}
 		} else
@@ -1902,8 +1897,8 @@ dodip()
 		    /* catch_lit does all the work if true */
 		} else if (obj->oerodeproof || obj_resists(obj, 5, 95) ||
 			   !is_flammable(obj) || obj->oclass == FOOD_CLASS) {
-		    pline("%s %s to burn for a moment.",
-			  Yname2(obj), otense(obj, "seem"));
+		    pline("%s %s to burn for a moment but %s unharmed.",
+			  Yname2(obj), otense(obj, "seem"), otense(obj, "are"));
 		} else {
 		    if ((omat == PLASTIC || omat == PAPER) && !obj->oartifact)
 			obj->oeroded = MAX_ERODE;
@@ -1911,18 +1906,13 @@ dodip()
 			    obj->oeroded == MAX_ERODE ? "destroys" : "damages",
 			    yname(obj),
 			    obj->oeroded == MAX_ERODE ? '!' : '.');
+		    costly_alteration(obj, COST_BURN);
 		    if (obj->oeroded == MAX_ERODE) {
 			if (obj->owornmask) remove_worn_item(obj, TRUE);
 			obj_extract_self(obj);
 			obfree(obj, (struct obj *)0);
 			obj = (struct obj *) 0;
 		    } else {
-			/* we know it's carried */
-			if (obj->unpaid) {
-			    /* create a dummy duplicate to put on bill */
-			    verbalize("You burnt it, you bought it!");
-			    bill_dummy_object(obj);
-			}
 			obj->oeroded++;
 		    }
 		}
@@ -2009,11 +1999,8 @@ dodip()
 		if (potion->quan > 1L) {
 		    singlepotion = splitobj(potion, 1L);
 		} else singlepotion = potion;
-		
-		if(singlepotion->unpaid && costly_spot(u.ux, u.uy)) {
-		    You("use it, you pay for it.");
-		    bill_dummy_object(singlepotion);
-		}
+
+		costly_alteration(singlepotion, COST_NUTRLZ);
 		singlepotion->otyp = mixture;
 		singlepotion->blessed = 0;
 		if (mixture == POT_WATER)

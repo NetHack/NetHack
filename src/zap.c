@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2005/03/18	*/
+/*	SCCS Id: @(#)zap.c	3.5	2005/03/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -19,7 +19,6 @@ extern boolean notonhead;	/* for long worms */
 /* kludge to use mondied instead of killed */
 extern boolean m_using;
 
-STATIC_DCL void FDECL(costly_cancel, (struct obj *));
 STATIC_DCL void FDECL(polyuse, (struct obj*, int, int));
 STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
 STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
@@ -802,48 +801,15 @@ struct monst *mon;
 	return res;
 }
 
-static const char charged_objs[] = { WAND_CLASS, WEAPON_CLASS, ARMOR_CLASS, 0 };
-
-STATIC_OVL void
-costly_cancel(obj)
-register struct obj *obj;
-{
-	char objroom;
-	struct monst *shkp = (struct monst *)0;
-
-	if (obj->no_charge) return;
-
-	switch (obj->where) {
-	case OBJ_INVENT:
-		if (obj->unpaid) {
-		    shkp = shop_keeper(*u.ushops);
-		    if (!shkp) return;
-		    Norep("You cancel an unpaid object, you pay for it!");
-		    bill_dummy_object(obj);
-		}
-		break;
-	case OBJ_FLOOR:
-		objroom = *in_rooms(obj->ox, obj->oy, SHOPBASE);
-		shkp = shop_keeper(objroom);
-		if (!shkp || !inhishop(shkp)) return;
-		if (costly_spot(u.ux, u.uy) && objroom == *u.ushops) {
-		    Norep("You cancel it, you pay for it!");
-		    bill_dummy_object(obj);
-		} else
-		    (void) stolen_value(obj, obj->ox, obj->oy, FALSE, FALSE);
-		break;
-	}
-}
-
 /* cancel obj, possibly carried by you or a monster */
 void
 cancel_item(obj)
 register struct obj *obj;
 {
-	boolean	u_ring = (obj == uleft) || (obj == uright);
-	register boolean holy = (obj->otyp == POT_WATER && obj->blessed);
+	boolean u_ring = (obj == uleft || obj == uright);
+	int otyp = obj->otyp;
 
-	switch(obj->otyp) {
+	switch (otyp) {
 		case RIN_GAIN_STRENGTH:
 			if ((obj->owornmask & W_RING) && u_ring) {
 				ABON(A_STR) -= obj->spe;
@@ -885,51 +851,50 @@ register struct obj *obj;
 			break;
 		/* case RIN_PROTECTION:  not needed */
 	}
-	if (objects[obj->otyp].oc_magic
-	    || (obj->spe && (obj->oclass == ARMOR_CLASS ||
-			     obj->oclass == WEAPON_CLASS || is_weptool(obj)))
-	    || obj->otyp == POT_ACID || obj->otyp == POT_SICKNESS) {
+	if (objects[otyp].oc_magic ||
+		(obj->spe && (obj->oclass == ARMOR_CLASS ||
+			obj->oclass == WEAPON_CLASS || is_weptool(obj))) ||
+		otyp == POT_ACID || otyp == POT_SICKNESS ||
+		(otyp == WATER && (obj->blessed || obj->cursed))) {
 	    if (obj->spe != ((obj->oclass == WAND_CLASS) ? -1 : 0) &&
-	       obj->otyp != WAN_CANCELLATION &&
-		 /* can't cancel cancellation */
-		 obj->otyp != MAGIC_LAMP &&
-		 obj->otyp != CANDELABRUM_OF_INVOCATION) {
-		costly_cancel(obj);
+		    otyp != WAN_CANCELLATION && /* can't cancel cancellation */
+		    otyp != MAGIC_LAMP && /* cancelling doesn't remove djini */
+		    otyp != CANDELABRUM_OF_INVOCATION) {
+		costly_alteration(obj, COST_CANCEL);
 		obj->spe = (obj->oclass == WAND_CLASS) ? -1 : 0;
 	    }
 	    switch (obj->oclass) {
 	      case SCROLL_CLASS:
-		costly_cancel(obj);
+		costly_alteration(obj, COST_CANCEL);
 		obj->otyp = SCR_BLANK_PAPER;
 		obj->spe = 0;
 		break;
 	      case SPBOOK_CLASS:
-		if (obj->otyp != SPE_CANCELLATION &&
-			obj->otyp != SPE_BOOK_OF_THE_DEAD) {
-		    costly_cancel(obj);
+		if (otyp != SPE_CANCELLATION && otyp != SPE_BOOK_OF_THE_DEAD) {
+		    costly_alteration(obj, COST_CANCEL);
 		    obj->otyp = SPE_BLANK_PAPER;
 		}
 		break;
 	      case POTION_CLASS:
-		costly_cancel(obj);
-		if (obj->otyp == POT_SICKNESS ||
-		    obj->otyp == POT_SEE_INVISIBLE) {
-	    /* sickness is "biologically contaminated" fruit juice; cancel it
-	     * and it just becomes fruit juice... whereas see invisible
-	     * tastes like "enchanted" fruit juice, it similarly cancels.
-	     */
+		costly_alteration(obj, (otyp == WATER && obj->cursed) ?
+					COST_UNHOLY : COST_CANCEL);
+		if (otyp == POT_SICKNESS || otyp == POT_SEE_INVISIBLE) {
+		    /* sickness is "biologically contaminated" fruit juice;
+		       cancel it and it just becomes fruit juice...
+		       whereas see invisible tastes like "enchanted" fruit
+		       juice, it similarly cancels */
 		    obj->otyp = POT_FRUIT_JUICE;
 		} else {
-	            obj->otyp = POT_WATER;
+		    obj->otyp = POT_WATER;
 		    obj->odiluted = 0; /* same as any other water */
 		}
 		break;
 	    }
 	}
-	if (holy) costly_cancel(obj);
 	unbless(obj);
 	uncurse(obj);
 #ifdef INVISIBLE_OBJECTS
+	/*[this will be insufficient if it ever reduces obj's shop value]*/
 	if (obj->oinvis) obj->oinvis = 0;
 #endif
 	return;
@@ -954,7 +919,7 @@ register struct obj *obj;
 	    return (FALSE);
 
 	/* Charge for the cost of the object */
-	costly_cancel(obj);	/* The term "cancel" is okay for now */
+	costly_alteration(obj, COST_DRAIN);
 
 	/* Drain the object and any implied effects */
 	obj->spe--;
@@ -1212,6 +1177,11 @@ struct obj *obj;
 	/* zap the object */
 	delobj(obj);
 }
+
+/* classes of items whose current charge count carries over across polymorph */
+static const char charged_objs[] = {
+			WAND_CLASS, WEAPON_CLASS, ARMOR_CLASS, '\0'
+};
 
 /*
  * Polymorph the object to the given object ID.  If the ID is STRANGE_OBJECT

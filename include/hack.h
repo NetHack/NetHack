@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2005/03/07	*/
+/*	SCCS Id: @(#)hack.h	3.5	2005/03/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -58,6 +58,23 @@
 #define SELL_NORMAL	(0)
 #define SELL_DELIBERATE	(1)
 #define SELL_DONTSELL	(2)
+
+/* alteration types--keep in synch with costly_alteration(mkobj.c) */
+#define COST_CANCEL  0	/* standard cancellation */
+#define COST_DRAIN   1	/* drain life upon an object */
+#define COST_UNCHRG  2	/* cursed charging */
+#define COST_UNBLSS  3	/* unbless (devalues holy water) */
+#define COST_UNHOLY  4	/* uncurse (devalues unholy water) */
+#define COST_DECHNT  5	/* disenchant weapons or armor */
+#define COST_DEGRD   6	/* removal of rustproofing, dulling via engraving */
+#define COST_DILUTE  7	/* potion dilution */
+#define COST_ERASE   8	/* scroll or spellbook blanking */
+#define COST_BURN    9	/* dipped into flaming oil */
+#define COST_NUTRLZ 10	/* neutralized via unicorn horn */
+#define COST_DSTROY 11	/* wand breaking (bill first, useup later) */
+#define COST_SPLAT  12	/* cream pie to own face (ditto) */
+#define COST_BITE   13	/* start eating food */
+#define COST_OPEN   14	/* open tin */
 
 /*
  * This is the way the game ends.  If these are rearranged, the arrays

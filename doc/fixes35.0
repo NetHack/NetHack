@@ -80,6 +80,9 @@ allow use of the < command to try to exit a pit
 clean up messages when you stop levitation while riding a flying steed
 account for all attacks when determining max_passive_dmg
 dipping in acid can erode the dipped object
+various actions--such as enchanting--performed on an unpaid shop object
+	either force the hero to buy the item (when its value is lowered) or
+	increase the current bill (when its value is raised)
 
 
 Platform- and/or Interface-Specific Fixes

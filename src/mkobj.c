@@ -315,6 +315,11 @@ struct obj *otmp;
  * an object which is different from what it started out as; the "I x"
  * command needs to display the original object.
  *
+ * [BUG:  The cost might end up being different if item originally had a
+ * surcharge but doesn't get one now or vice versa.  Having the dummy keep
+ * the same o_id value as the original would avoid this; is that viable?
+ * (Mustn't give the original itself a new o_id, so can't just swap them.)]
+ *
  * The caller is responsible for checking otmp->unpaid and
  * costly_spot(u.ux, u.uy).  This function will make otmp no charge.
  *
@@ -347,6 +352,74 @@ register struct obj *otmp;
 			   otmp->where == OBJ_CONTAINED) ? 1 : 0;
 	otmp->unpaid = 0;
 	return;
+}
+
+/* alteration types; must match COST_xxx macros in hack.h */
+static const char * const alteration_verbs[] = {
+			"cancel", "drain", "uncharge", "unbless", "uncurse",
+			"disenchant", "degrade", "dilute", "erase", "burn",
+			"neutralize", "destroy", "splatter", "bite", "open",
+};
+
+/* possibly bill for an object which the player has just modified */
+void
+costly_alteration(obj, alter_type)
+struct obj *obj;
+int alter_type;
+{
+    xchar ox, oy;
+    char objroom;
+    const char *those, *them, *what;
+    struct monst *shkp = 0;
+
+    if (alter_type < 0 || alter_type >= SIZE(alteration_verbs)) {
+	impossible("invalid alteration type (%d)", alter_type);
+	alter_type = 0;
+    }
+
+    ox = oy = 0;	/* lint suppression */
+    objroom = '\0';	/* ditto */
+    if (carried(obj) || obj->where == OBJ_FREE) {
+	/* OBJ_FREE catches obj_no_longer_held()'s transformation
+	   of crysknife back into worm tooth; the object has been
+	   removed from inventory but not necessarily placed at
+	   its new location yet--the unpaid flag will still be set
+	   if this item is owned by a shop */
+	if (!obj->unpaid) return;
+    } else {
+	/* this get_obj_location shouldn't fail, but if it does,
+	   use hero's location */
+	if (!get_obj_location(obj, &ox, &oy, CONTAINED_TOO))
+	    ox = u.ux, oy = u.uy;
+	objroom = *in_rooms(ox, oy, SHOPBASE);
+	/* if no shop cares about it, we're done */
+	if (!billable(&shkp, obj, objroom, FALSE)) return;
+    }
+
+    if (obj->quan == 1L)
+	those = "that", them = "it";
+    else
+	those = "those", them = "them";
+
+    switch (obj->where) {
+    case OBJ_FREE:	/* obj_no_longer_held() */
+    case OBJ_INVENT:
+	what = simple_typename(obj->otyp);
+	if (obj->quan != 1L) what = makeplural(what);
+	verbalize("You %s %s %s, you pay for %s!",
+		  alteration_verbs[alter_type], those, what, them);
+	bill_dummy_object(obj);
+	break;
+    case OBJ_FLOOR:
+	if (costly_spot(u.ux, u.uy) && objroom == *u.ushops) {
+	    verbalize("You %s %s, you pay for %s!",
+		      alteration_verbs[alter_type], those, them);
+	    bill_dummy_object(obj);
+	} else {
+	    (void) stolen_value(obj, ox, oy, FALSE, FALSE);
+	}
+	break;
+    }
 }
 
 static const char dknowns[] = {

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2004/09/10	*/
+/*	SCCS Id: @(#)do.c	3.5	2005/03/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -589,16 +589,20 @@ struct obj *obj;
 {
 	if (!obj) {
 	    return;
-	} else if ((Is_container(obj) || obj->otyp == STATUE) && obj->cobj) {
+	} else if (Has_contents(obj)) {
 	    struct obj *contents;
-	    for(contents=obj->cobj; contents; contents=contents->nobj)
+
+	    for (contents = obj->cobj; contents; contents = contents->nobj)
 		obj_no_longer_held(contents);
 	}
-	switch(obj->otyp) {
+	switch (obj->otyp) {
 	case CRYSKNIFE:
 	    /* KMH -- Fixed crysknives have only 10% chance of reverting */
 	    /* only changes when not held by player or monster */
 	    if (!obj->oerodeproof || !rn2(10)) {
+		/* if monsters aren't moving, assume player is responsible */
+		if (!context.mon_moving && !program_state.gameover)
+		    costly_alteration(obj, COST_DEGRD);
 		obj->otyp = WORM_TOOTH;
 		obj->oerodeproof = 0;
 	    }

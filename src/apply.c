@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2005/01/05	*/
+/*	SCCS Id: @(#)apply.c	3.5	2005/03/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1132,7 +1132,7 @@ struct obj *obj;
 	    if (obj->where == OBJ_MINVENT ? cansee(x,y) : !Blind)
 		pline("%s %s light!", Yname2(obj), otense(obj, "catch"));
 	    if (obj->otyp == POT_OIL) makeknown(obj->otyp);
-	    if (obj->unpaid && costly_spot(u.ux, u.uy) && (obj->where == OBJ_INVENT)) {
+	    if (carried(obj) && obj->unpaid && costly_spot(u.ux, u.uy)) {
 	        /* if it catches while you have it, then it's your tough luck */
 		check_unpaid(obj);
 	        verbalize("That's in addition to the cost of %s %s, of course.",
@@ -1187,7 +1187,8 @@ struct obj *obj;
 			Blind ? "." : " brightly!");
 		    if (obj->unpaid && costly_spot(u.ux, u.uy) &&
 			  obj->age == 20L * (long)objects[obj->otyp].oc_cost) {
-			const char *ithem = obj->quan > 1L ? "them" : "it";
+			const char *ithem = (obj->quan > 1L) ? "them" : "it";
+
 			verbalize("You burn %s, you bought %s!", ithem, ithem);
 			bill_dummy_object(obj);
 		    }
@@ -2582,10 +2583,8 @@ struct obj *obj;
 			You_cant("see through all the sticky goop on your %s.",
 				body_part(FACE));
 	}
-	if (obj->unpaid) {
-		verbalize("You used it, you bought it!");
-		bill_dummy_object(obj);
-	}
+	/* useup() is appropriate, but we want costly_alteration()'s message */
+	costly_alteration(obj, COST_SPLAT);
 	obj_extract_self(obj);
 	delobj(obj);
 	return(0);
@@ -2753,7 +2752,7 @@ do_break_wand(obj)
      */
     if (obj->unpaid) {
 	check_unpaid(obj);		/* Extra charge for use */
-	bill_dummy_object(obj);
+	costly_alteration(obj, COST_DSTROY);
     }
 
     current_wand = obj;		/* destroy_item might reset this */
