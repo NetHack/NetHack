@@ -440,6 +440,11 @@ struct obj *obj;			/* only scatter this obj        */
 		    pline("%s breaks apart.",The(xname(otmp)));
 		    fracture_rock(otmp);
 		    place_object(otmp, sx, sy);	/* put fragments on floor */
+		    if ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
+			/* another boulder here, restack it to the top */
+			obj_extract_self(otmp);
+			place_object(otmp, sx, sy);
+		    }
 		} else {
 		    struct trap *trap;
 

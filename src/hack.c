@@ -137,11 +137,9 @@ moverock()
 				ttmp->madeby_u ? "your" : "a");
 			obj_extract_self(otmp);
 			place_object(otmp, rx, ry);
-			deltrap(ttmp);
-			del_engr_at(rx,ry);
-			scatter(rx,ry, 4,
-				MAY_DESTROY|MAY_HIT|MAY_FRACTURE|VIS_EFFECTS,
-				(struct obj *)0);
+			blow_up_landmine(ttmp);
+			/* if the boulder remains, it should fill the pit */
+			fill_pit(u.ux, u.uy);
 			if (cansee(rx,ry)) newsym(rx,ry);
 			continue;
 		    }

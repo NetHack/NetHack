@@ -24,7 +24,6 @@ STATIC_DCL boolean FDECL(thitm, (int, struct monst *, struct obj *, int));
 STATIC_DCL int FDECL(mkroll_launch,
 			(struct trap *,XCHAR_P,XCHAR_P,SHORT_P,long));
 STATIC_DCL boolean FDECL(isclearpath,(coord *, int, SCHAR_P, SCHAR_P));
-STATIC_DCL void FDECL(blow_up_landmine, (struct trap *));
 #ifdef STEED
 STATIC_OVL int FDECL(steedintrap, (struct trap *, struct obj *));
 #endif
@@ -1002,6 +1001,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		losehp(rnd(16), "land mine", KILLED_BY_AN);
 		/* fall recursively into the pit... */
 		if ((trap = t_at(u.ux, u.uy)) != 0) dotrap(trap, 0);
+		fill_pit(u.ux, u.uy);
 		break;
 
 	    case ROLLING_BOULDER_TRAP:
@@ -1118,7 +1118,7 @@ struct obj *otmp;
 #endif /*STEED*/
 
 /* some actions common to both player and monsters for triggered landmine */
-STATIC_OVL void
+void
 blow_up_landmine(trap)
 struct trap *trap;
 {
@@ -1129,8 +1129,8 @@ struct trap *trap;
 	wake_nearto(trap->tx, trap->ty, 400);
 	if (IS_DOOR(levl[trap->tx][trap->ty].typ))
 	    levl[trap->tx][trap->ty].doormask = D_BROKEN;
-	/* TODO: destroy drawbridge if present;
-		 sometimes delete trap instead of always leaving a pit */
+	/* TODO: destroy drawbridge if present */
+	/* caller may subsequently fill pit, e.g. with a boulder */
 	trap->ttyp = PIT;		/* explosion creates a pit */
 	trap->madeby_u = FALSE;		/* resulting pit isn't yours */
 }
@@ -1852,6 +1852,9 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				/* monsters recursively fall into new pit */
 				if (mintrap(mtmp) == 2) trapkilled=TRUE;
 			}
+			/* a boulder may fill the new pit, crushing monster */
+			fill_pit(trap->tx, trap->ty);
+			if (mtmp->mhp <= 0) trapkilled = TRUE;
 			if (unconscious()) {
 				multi = -1;
 				nomovemsg="The explosion awakens you!";
@@ -3488,9 +3491,8 @@ int d_override;
 	 * obj->spe into account.
 	 */
 	if(!strike) {
-		if (cansee(mon->mx, mon->my))
-			pline("%s is almost hit by %s!", Monnam(mon),
-								doname(obj));
+		if (obj && cansee(mon->mx, mon->my))
+		    pline("%s is almost hit by %s!", Monnam(mon), doname(obj));
 	} else {
 		int dam = 1;
 

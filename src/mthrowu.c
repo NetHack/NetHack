@@ -223,7 +223,8 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 		    pline("%s is %s!", Monnam(mtmp),
 			(nonliving(mtmp->data) || !vis)
 			? "destroyed" : "killed");
-		mondied(mtmp);
+		if (!flags.mon_moving) xkilled(mtmp,0);
+		else mondied(mtmp);
 	    }
 
 	    if (can_blnd((struct monst*)0, mtmp,
