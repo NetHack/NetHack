@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)minion.c	3.4	2002/01/23	*/
+/*	SCCS Id: @(#)minion.c	3.4	2002/12/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -142,7 +142,7 @@ int
 demon_talk(mtmp)		/* returns 1 if it won't attack. */
 register struct monst *mtmp;
 {
-	long	demand, offer;
+	long cash, demand, offer;
 
 	if (uwep && uwep->oartifact == ART_EXCALIBUR) {
 	    pline("%s looks very angry.", Amonnam(mtmp));
@@ -164,14 +164,23 @@ register struct monst *mtmp;
 	    return(1);
 	}
 #ifndef GOLDOBJ
-	demand = (u.ugold * (rnd(80) + 20 * Athome)) /
+	cash = u.ugold;
 #else
-	demand = (money_cnt(invent) * (rnd(80) + 20 * Athome)) /
+	cash = money_cnt(invent);
 #endif
+	demand = (cash * (rnd(80) + 20 * Athome)) /
 	    (100 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
-	if (!demand)		/* you have no gold */
-	    return mtmp->mpeaceful = 0;
-	else {
+
+	if (!demand) {		/* you have no gold */
+	    mtmp->mpeaceful = 0;
+	    return 0;
+	} else {
+	    /* make sure that the demand is unmeetable if the monster
+	       has the Amulet, preventing it from being satisified and
+	       removed from the game (along with said Amulet...) */
+	    if (mon_has_amulet(mtmp))
+		demand = cash + (long)rn1(1000,40);
+
 	    pline("%s demands %ld %s for safe passage.",
 		  Amonnam(mtmp), demand, currency(demand));
 
@@ -184,7 +193,8 @@ register struct monst *mtmp;
 			  Amonnam(mtmp));
 		} else {
 		    pline("%s gets angry...", Amonnam(mtmp));
-		    return mtmp->mpeaceful = 0;
+		    mtmp->mpeaceful = 0;
+		    return 0;
 		}
 	    }
 	}
