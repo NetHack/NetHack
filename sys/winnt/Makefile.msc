@@ -477,14 +477,16 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 ! ENDIF
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
-	if exist $(DOC)\recover.txt copy $(DOC)\recover.txt $(GAMEDIR)\recover.txt
 	@if exist $(SRC)\$(GAME).PDB copy $(SRC)\$(GAME).pdb $(GAMEDIR)\$(GAME).pdb
 	@if exist $(GAMEDIR)\$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)\$(GAME).pdb to conserve space
 	-copy $(NTSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
-	copy $(U)recover.exe  $(GAMEDIR)
 	echo install done > $@
 
 #	copy $(NTSYS)\winnt.hlp    $(GAMEDIR)
+
+recover: $(U)recover.exe
+	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
+	if exist $(DOC)\recover.txt copy $(DOC)\recover.txt $(GAMEDIR)\recover.txt
 
 $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(DAT)\endgame.des $(DAT)\gehennom.des $(DAT)\knox.des   \
@@ -525,7 +527,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
 		$(SRC)\monstr.c		$(SRC)\vis_tab.c  \
 		$(U)lev_comp.exe	$(INCL)\vis_tab.h \
-		$(U)dgn_comp.exe $(U)recover.exe
+		$(U)dgn_comp.exe
              @echo utilities made >$@
 	     @echo utilities made.
 
@@ -884,10 +886,10 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 #==========================================
 
 $(U)recover.exe: $(RECOVOBJS)
-	@$(link) $(LFLAGSU) -out:$@ $(RECOVOBJS)
+	$(link) $(LFLAGSU) -out:$@ $(RECOVOBJS)
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)\win32api.h
-	@$(CC) $(CFLAGSU) -Fo$@ $(U)recover.c
+	$(CC) $(CFLAGSU) -Fo$@ $(U)recover.c
 
 #==========================================
 #  Tile Mapping
