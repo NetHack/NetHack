@@ -92,8 +92,10 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	
 	/* set new screen tile size */
 	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	data->xScrTile = (data->bFitToScreenMode? wnd_size.cx : lpsz->cx) / COLNO;
-	data->yScrTile = (data->bFitToScreenMode? wnd_size.cy : lpsz->cy) / ROWNO;
+	data->xScrTile = 
+		max(1, (data->bFitToScreenMode? wnd_size.cx : lpsz->cx) / COLNO);
+	data->yScrTile = 
+		max(1, (data->bFitToScreenMode? wnd_size.cy : lpsz->cy) / ROWNO);
 
 	/* set map origin point */
 	data->map_orig.x = max(0, client_rt.left + (wnd_size.cx - data->xScrTile*COLNO)/2 );
