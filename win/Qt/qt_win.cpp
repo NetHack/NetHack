@@ -986,10 +986,6 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     connect(name, SIGNAL(textChanged(const QString&)),
 	    this, SLOT(selectName(const QString&)) );
     name->setFocus();
-    role = new NhPSListView(this);
-    race = new NhPSListView(this);
-    role->addColumn("Role");
-    race->addColumn("Race");
     QButtonGroup* genderbox = new QButtonGroup("Sex",this);
     QButtonGroup* alignbox = new QButtonGroup("Alignment",this);
     QVBoxLayout* vbgb = new QVBoxLayout(genderbox,3,1);
@@ -1002,12 +998,19 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 
     l->addMultiCellWidget( namebox, 0,0,0,2 );
 #ifdef QT_CHOOSE_RACE_FIRST
+    race = new NhPSListView(this);
+    role = new NhPSListView(this);
     l->addMultiCellWidget( race, 1,5,0,0 );
     l->addMultiCellWidget( role, 1,5,1,1 );
 #else
+    role = new NhPSListView(this);
+    race = new NhPSListView(this);
     l->addMultiCellWidget( role, 1,5,0,0 );
     l->addMultiCellWidget( race, 1,5,1,1 );
 #endif
+    role->addColumn("Role");
+    race->addColumn("Race");
+
     l->addWidget( genderbox, 1, 2 );
     l->addWidget( alignbox, 2, 2 );
     l->addWidget( logo, 3, 2, AlignCenter );
@@ -1132,7 +1135,7 @@ void NetHackQtPlayerSelector::selectRole()
     int ro = role->selectedItemNumber();
     if (ra == -1 || ro == -1) return;
 
-#ifndef QT_CHOOSE_RACE_FIRST
+#ifdef QT_CHOOSE_RACE_FIRST
     selectRace();
 #else
     QListViewItem* i=role->currentItem();
@@ -1168,7 +1171,7 @@ void NetHackQtPlayerSelector::selectRace()
     int ro = role->selectedItemNumber();
     if (ra == -1 || ro == -1) return;
 
-#ifdef QT_CHOOSE_RACE_FIRST
+#ifndef QT_CHOOSE_RACE_FIRST
     selectRole();
 #else
     QListViewItem* i=race->currentItem();
