@@ -3446,7 +3446,13 @@ public:
                  const QString& grouptext,
                  QObject * receiver, const char* slot,
                  QToolBar * parent) :
-	QToolButton(pm, textLabel, grouptext, receiver, slot, parent)
+	QToolButton(pm, textLabel,
+#if QT_VERSION < 210
+		QString::null,
+#else
+		grouptext,
+#endif
+		    receiver, slot, parent)
     {
     }
 
@@ -3462,10 +3468,12 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     message(0), map(0), status(0), invusage(0),
     keysink(ks)
 {
-    setToolBarsMovable(FALSE);
     QToolBar* toolbar = new QToolBar(this);
+#if QT_VERSION >= 210
+    setToolBarsMovable(FALSE);
     toolbar->setHorizontalStretchable(TRUE);
     toolbar->setVerticalStretchable(TRUE);
+#endif
     addToolBar(toolbar);
     menubar = menuBar();
 
