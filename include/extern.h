@@ -245,6 +245,8 @@ E void FDECL(rot_corpse, (genericptr_t, long));
 E struct obj *FDECL(buried_ball, (coord *));
 E void NDECL(buried_ball_to_punishment);
 E void NDECL(buried_ball_to_freedom);
+E schar FDECL(fillholetyp, (int, int));
+E void FDECL(liquid_flow, (XCHAR_P,XCHAR_P,SCHAR_P,struct trap *, const char *));
 #if 0
 E void FDECL(bury_monst, (struct monst *));
 E void NDECL(bury_you);

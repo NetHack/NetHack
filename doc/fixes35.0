@@ -38,6 +38,7 @@ don't place randomly-placed aquatic monsters in lava on special levels
 hiding monsters don't hide under cockatrice/chickatrice corpses
 "sound" option renamed to "acoustics"
 deafness now a full-fledged attribute
+water should flow into pits from broken wand of digging
 
 
 Platform- and/or Interface-Specific Fixes

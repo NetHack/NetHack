@@ -2608,6 +2608,7 @@ do_break_wand(obj)
     int dmg, damage;
     boolean affects_objects;
     boolean shop_damage = FALSE;
+    boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
 
@@ -2697,14 +2698,23 @@ do_break_wand(obj)
 	if (!isok(x,y)) continue;
 
 	if (obj->otyp == WAN_DIGGING) {
+	    schar typ;
 	    if(dig_check(BY_OBJECT, FALSE, x, y)) {
 		if (IS_WALL(levl[x][y].typ) || IS_DOOR(levl[x][y].typ)) {
 		    /* normally, pits and holes don't anger guards, but they
 		     * do if it's a wall or door that's being dug */
 		    watch_dig((struct monst *)0, x, y, TRUE);
 		    if (*in_rooms(x,y,SHOPBASE)) shop_damage = TRUE;
-		}		    
-		digactualhole(x, y, BY_OBJECT,
+		}
+		typ = fillholetyp(x,y); 
+		if (typ != ROOM) {
+			levl[x][y].typ = typ;
+			liquid_flow(x, y, typ, t_at(x,y),
+				fillmsg ? (char *)0 :
+				"Some holes are quickly filled with %s!");
+			fillmsg = TRUE;
+		} else
+			digactualhole(x, y, BY_OBJECT,
 			      (rn2(obj->spe) < 3 || !Can_dig_down(&u.uz)) ?
 			       PIT : HOLE);
 	    }

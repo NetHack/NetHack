@@ -13,7 +13,6 @@ STATIC_DCL void FDECL(mkcavepos, (XCHAR_P,XCHAR_P,int,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void FDECL(mkcavearea, (BOOLEAN_P));
 STATIC_DCL int FDECL(dig_typ, (struct obj *,XCHAR_P,XCHAR_P));
 STATIC_DCL int NDECL(dig);
-STATIC_DCL schar FDECL(fillholetyp, (int, int));
 STATIC_DCL void NDECL(dig_up_grave);
 
 /* Indices returned by dig_typ() */
@@ -438,7 +437,6 @@ holetime()
 }
 
 /* Return typ of liquid to fill a hole with, or ROOM, if no liquid nearby */
-STATIC_OVL
 schar
 fillholetyp(x,y)
 int x, y;
@@ -644,6 +642,32 @@ int ttyp;
 	}
 }
 
+/*
+ * Called from dighole(), but also from do_break_wand()
+ * in apply.c.
+ */
+void
+liquid_flow(x, y, typ, ttmp, fillmsg)
+xchar x,y;
+schar typ;
+struct trap *ttmp;
+const char *fillmsg;
+{
+	boolean u_spot = (x == u.ux && y == u.uy);
+
+	if (ttmp) (void) delfloortrap(ttmp);
+	/* if any objects were frozen here, they're released now */
+	unearth_objs(x, y);
+
+	if (fillmsg) pline(fillmsg, typ == LAVAPOOL ? "lava" : "water");
+	if (u_spot && !(Levitation || Flying)) {
+	    if (typ == LAVAPOOL)
+		(void) lava_effects();
+	    else if (!Wwalking)
+		(void) drown();
+	}
+}
+
 /* return TRUE if digging succeeded, FALSE otherwise */
 boolean
 dighole(pit_only)
@@ -718,20 +742,8 @@ boolean pit_only;
 
 		lev->drawbridgemask &= ~DB_UNDER;
 		lev->drawbridgemask |= (typ == LAVAPOOL) ? DB_LAVA : DB_MOAT;
-
- liquid_flow:
-		if (ttmp) (void) delfloortrap(ttmp);
-		/* if any objects were frozen here, they're released now */
-		unearth_objs(u.ux, u.uy);
-
-		pline("As you dig, the hole fills with %s!",
-		      typ == LAVAPOOL ? "lava" : "water");
-		if (!Levitation && !Flying) {
-		    if (typ == LAVAPOOL)
-			(void) lava_effects();
-		    else if (!Wwalking)
-			(void) drown();
-		}
+		liquid_flow(u.ux, u.uy, typ, ttmp,
+				"As you dig, the hole fills with %s!");
 		return TRUE;
 
 	/* the following two are here for the wand of digging */
@@ -746,7 +758,9 @@ boolean pit_only;
 
 		if (typ != ROOM) {
 			lev->typ = typ;
-			goto liquid_flow;
+			liquid_flow(u.ux, u.uy, typ, ttmp,
+				"As you dig, the hole fills with %s!");
+			return TRUE;
 		}
 
 		/* finally we get to make a hole */
