@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.4	2003/04/02	*/
+/*	SCCS Id: @(#)cmd.c	3.4	2004/01/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2084,30 +2084,35 @@ const char *s;
 {
 	char dirsym;
 
+ retry:
 #ifdef REDO
-	if(in_doagain || *readchar_queue)
+	if (in_doagain || *readchar_queue)
 	    dirsym = readchar();
 	else
 #endif
-	    dirsym = yn_function ((s && *s != '^') ? s : "In what direction?",
+	    dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
 					(char *)0, '\0');
 #ifdef REDO
 	savech(dirsym);
 #endif
-	if(dirsym == '.' || dirsym == 's')
-		u.dx = u.dy = u.dz = 0;
-	else if(!movecmd(dirsym) && !u.dz) {
-		boolean did_help = FALSE;
-		if(!index(quitchars, dirsym)) {
-		    if (iflags.cmdassist) {
-			did_help = help_dir((s && *s == '^') ? dirsym : 0,
+	if (dirsym == '.' || dirsym == 's') {
+	    u.dx = u.dy = u.dz = 0;
+	} else if (!movecmd(dirsym) && !u.dz) {
+	    boolean did_help = FALSE, help_requested;
+
+	    if (!index(quitchars, dirsym)) {
+		help_requested = (dirsym == '?');
+		if (help_requested || iflags.cmdassist) {
+		    did_help = help_dir((s && *s == '^') ? dirsym : 0,
+					help_requested ? (const char *)0 :
 					    "Invalid direction key!");
-		    }
-		    if (!did_help) pline("What a strange direction!");
+		    if (help_requested) goto retry;
 		}
-		return 0;
+		if (!did_help) pline("What a strange direction!");
+	    }
+	    return 0;
 	}
-	if(!u.dz && (Stunned || (Confusion && !rn2(5)))) confdir();
+	if (!u.dz && (Stunned || (Confusion && !rn2(5)))) confdir();
 	return 1;
 }
 
