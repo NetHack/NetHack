@@ -630,6 +630,9 @@ level_tele()
 		killer.format = NO_KILLER_PREFIX;
 		Strcpy(killer.name, "committed suicide");
 		done(DIED);
+		pline("An energized cloud of dust begins to coalesce.");
+		Your("body rematerializes%s.", invent ?
+			", and you gather up all your possessions" : "");			
 		return;
 	    }
 
