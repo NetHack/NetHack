@@ -1845,7 +1845,7 @@ Menu character accelerator to deselect all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
 Default '-'.
 .lp menu_deselect_page
-Menu character accelerator deselect all items on this page of a menu.
+Menu character accelerator to deselect all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default '\e'.
 .lp menu_first_page
