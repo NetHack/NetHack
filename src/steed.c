@@ -79,7 +79,7 @@ use_saddle(otmp)
 	    return 1;
 	}
 	ptr = mtmp->data;
-	if (touch_petrifies(ptr) && !Stone_resistance) {
+	if (touch_petrifies(ptr) && !uarmg && !Stone_resistance) {
 	    char kbuf[BUFSZ];
 
 	    You("touch %s.", mon_nam(mtmp));
