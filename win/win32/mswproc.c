@@ -1353,6 +1353,7 @@ doprev_message()
 int mswin_doprev_message()
 {
     logDebug("mswin_doprev_message()\n");
+	SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_VSCROLL, MAKEWPARAM(SB_LINEUP, 0), (LPARAM)NULL); 
     return 0;
 }
 
