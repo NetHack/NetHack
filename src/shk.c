@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.3	2001/12/06	*/
+/*	SCCS Id: @(#)shk.c	3.3	2002/01/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -770,9 +770,9 @@ register struct obj *obj, *merge;
 	register struct bill_x *bpm;
 	register struct monst *shkp;
 
-
 	if (obj->otyp == LEASH && obj->leashmon) o_unleash(obj);
 	if (obj->oclass == FOOD_CLASS) food_disappears(obj);
+	if (obj->oclass == SPBOOK_CLASS) book_disappears(obj);
 	if (Has_contents(obj)) delete_contents(obj);
 
 	shkp = 0;

@@ -1808,6 +1808,7 @@ E boolean FDECL(load_special, (const char *));
 E int NDECL(learn);
 #endif
 E int FDECL(study_book, (struct obj *));
+E void FDECL(book_disappears, (struct obj *));
 E void FDECL(book_substitution, (struct obj *,struct obj *));
 E void NDECL(age_spells);
 E int NDECL(docast);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.3	2001/12/03	*/
+/*	SCCS Id: @(#)spell.c	3.3	2002/01/19	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -451,6 +451,15 @@ register struct obj *spellbook;
 	book = spellbook;
 	set_occupation(learn, "studying", 0);
 	return(1);
+}
+
+/* a spellbook has been destroyed or the character has changed levels;
+   the stored address for the current book is no longer valid */
+void
+book_disappears(obj)
+struct obj *obj;
+{
+	if (obj == book) book = (struct obj *)0;
 }
 
 /* renaming an object usually results in it having a different address;
@@ -1175,6 +1184,5 @@ struct obj *obj;
 	impossible("Too many spells memorized!");
 	return;
 }
-
 
 /*spell.c*/

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)save.c	3.3	2000/07/27	*/
+/*	SCCS Id: @(#)save.c	3.3	2002/01/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -840,7 +840,8 @@ register struct obj *otmp;
 	    if (Has_contents(otmp))
 		saveobjchn(fd,otmp->cobj,mode);
 	    if (release_data(mode)) {
-		if(otmp->oclass == FOOD_CLASS) food_disappears(otmp);
+		if (otmp->oclass == FOOD_CLASS) food_disappears(otmp);
+		if (otmp->oclass == SPBOOK_CLASS) book_disappears(otmp);
 		otmp->where = OBJ_FREE;	/* set to free so dealloc will work */
 		otmp->timed = 0;	/* not timed any more */
 		otmp->lamplit = 0;	/* caller handled lights */
