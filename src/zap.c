@@ -2739,7 +2739,7 @@ struct obj *obj;			/* object tossed/used */
 			if (!Blind) pline("%s %s%s.", Yname2(obj),
 					  otense(obj, "skip"),
 					  skipcount ? " again" : "");
-			else if (!Deaf) You_hear("%s skip.", Yname2(obj));
+			else if (!Deaf) You_hear("%s skip.", yname(obj));
 			skipcount++;
 		} else if (skiprange_start > skiprange_end + 1) {
 			--skiprange_start;
