@@ -405,6 +405,8 @@ win32tty: respond only to mouse clicks not mouse movement
 win32tty: allow ^C to abort the game at the "Who are you?" prompt
 win32tty: fix truncated score list
 win32tty: prevent ALT+CTRL from sending NUL to core with the meta bit set
+win32tty: international keyboard handling improved by letting ToAscii()
+	generate input char based on VK and state of shift and caps lock
 Gnome: add support for non-square tiles
 Gnome: destroy main game windows correctly
 Gnome: Dylan Alex Simon's port of KDE-style worn window
