@@ -2122,11 +2122,11 @@ register struct monst *mon;
 
 	/* by this point you have discovered mon's identity, blind or not... */
 	pline("Time stands still while you and %s lie in each other's arms...",
-		mon_nam(mon));
+		noit_mon_nam(mon));
 	if (rn2(35) > ACURR(A_CHA) + ACURR(A_INT)) {
 		/* Don't bother with mspec_used here... it didn't get tired! */
 		pline("%s seems to have enjoyed it more than you...",
-			Monnam(mon));
+			noit_Monnam(mon));
 		switch (rn2(5)) {
 			case 0: You_feel("drained of energy.");
 				u.uen = 0;
@@ -2164,42 +2164,44 @@ register struct monst *mon;
 		}
 	} else {
 		mon->mspec_used = rnd(100); /* monster is worn out */
-		You("seem to have enjoyed it more than %s...", mon_nam(mon));
+		You("seem to have enjoyed it more than %s...",
+		    noit_mon_nam(mon));
 		switch (rn2(5)) {
-			case 0: You_feel("raised to your full potential.");
-				exercise(A_CON, TRUE);
-				u.uen = (u.uenmax += rnd(5));
-				break;
-			case 1: You_feel("good enough to do it again.");
-				(void) adjattrib(A_CON, 1, TRUE);
-				exercise(A_CON, TRUE);
-				flags.botl = 1;
-				break;
-			case 2: You("will always remember %s...", mon_nam(mon));
-				(void) adjattrib(A_WIS, 1, TRUE);
-				exercise(A_WIS, TRUE);
-				flags.botl = 1;
-				break;
-			case 3: pline("That was a very educational experience.");
-				pluslvl(FALSE);
-				exercise(A_WIS, TRUE);
-				break;
-			case 4: You_feel("restored to health!");
-				u.uhp = u.uhpmax;
-				if (Upolyd) u.mh = u.mhmax;
-				exercise(A_STR, TRUE);
-				flags.botl = 1;
-				break;
+		case 0: You_feel("raised to your full potential.");
+			exercise(A_CON, TRUE);
+			u.uen = (u.uenmax += rnd(5));
+			break;
+		case 1: You_feel("good enough to do it again.");
+			(void) adjattrib(A_CON, 1, TRUE);
+			exercise(A_CON, TRUE);
+			flags.botl = 1;
+			break;
+		case 2: You("will always remember %s...", noit_mon_nam(mon));
+			(void) adjattrib(A_WIS, 1, TRUE);
+			exercise(A_WIS, TRUE);
+			flags.botl = 1;
+			break;
+		case 3: pline("That was a very educational experience.");
+			pluslvl(FALSE);
+			exercise(A_WIS, TRUE);
+			break;
+		case 4: You_feel("restored to health!");
+			u.uhp = u.uhpmax;
+			if (Upolyd) u.mh = u.mhmax;
+			exercise(A_STR, TRUE);
+			flags.botl = 1;
+			break;
 		}
 	}
 
 	if (mon->mtame) /* don't charge */ ;
 	else if (rn2(20) < ACURR(A_CHA)) {
 		pline("%s demands that you pay %s, but you refuse...",
-			Monnam(mon), mhim(mon));
+			noit_Monnam(mon),
+			Blind ? (fem ? "her" : "him") : mhim(mon));
 	} else if (u.umonnum == PM_LEPRECHAUN)
 		pline("%s tries to take your money, but fails...",
-				Monnam(mon));
+				noit_Monnam(mon));
 	else {
 #ifndef GOLDOBJ
 		long cost;
@@ -2216,7 +2218,7 @@ register struct monst *mon;
 		if (!cost) verbalize("It's on the house!");
 		else {
 		    pline("%s takes %ld %s for services rendered!",
-			    Monnam(mon), cost, currency(cost));
+			    noit_Monnam(mon), cost, currency(cost));
 		    u.ugold -= cost;
 		    mon->mgold += cost;
 		    flags.botl = 1;
@@ -2237,7 +2239,7 @@ register struct monst *mon;
 		if (!cost) verbalize("It's on the house!");
 		else { 
 		    pline("%s takes %ld %s for services rendered!",
-			    Monnam(mon), cost, currency(cost));
+			    noit_Monnam(mon), cost, currency(cost));
                     money2mon(mon, cost);
 		    flags.botl = 1;
 		}
