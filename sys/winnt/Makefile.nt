@@ -29,6 +29,11 @@ TARGETOS=BOTH
 APPVER=4.0
 !include <win32.mak>
 
+# Graphical interface
+# Set to Y for a graphical version
+
+GRAPHICAL = Y
+
 #
 #  Set the gamedir according to your preference.  
 #  If not present prior to compilation it gets created.
@@ -131,18 +136,32 @@ PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 #                                              #
 ################################################
 
-# These must be left commented for 3.3.x
-#TILEGAME  = $(OBJ)\tile.o
-#TILEDEF   = -DTILES
-#TILEHDR   =
+!IF "$(GRAPHICAL)" == "Y"
+TILEGAME  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
+	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
+	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o \
+	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
+TILEDEF   = -DTILES -DMSWIN_GRAPHICS
+TILERES	  = $(O)winhack.res
+TILEINCL  = -I$(WIN32)
+TILEHDR   = $(WIN32)\mhaskyn.h $(WIN32)\mhdlg.h $(WIN32)\mhfont.h \
+	$(WIN32)\mhinput.h $(WIN32)\mhmain.h $(WIN32)\mhmap.h $(WIN32)\mhmenu.h \
+	$(WIN32)\mhmsg.h $(WIN32)\mhmsgwnd.h $(WIN32)\mhrip.h $(WIN32)\mhstatus.h \
+	$(WIN32)\mhtext.h $(WIN32)\resource.h $(WIN32)\winMS.h
+!ELSE
+TILEGAME  = $(O)nttty.o    
+TILEDEF   = -DWIN32CON
+TILEHDR   =
+TILERES   =
+TILEINCL  =
+!ENDIF
+
+TILEUTIL  = $(UTIL)\tile2bmp.exe
+TILEBMP   = $(SRC)\tiles.bmp
+
 #SOUND = $(OBJ)\ntsound.o
 
 #SOUND =
-#TILEUTIL  =
-#TILEBMP   =
-#TILEGAME  =
-#TILEDEF   =   
-#TILEHDR   =
 
 # To store all the level files,
 # help files, etc. in a single library file.
@@ -156,19 +175,12 @@ DLBFLG = -DDLB
 DLBFLG =
 ! ENDIF
 
-# You can actually build a set of tiles 
-# with this makefile even though they 
-# are not used. Use 'nmake o\nhtiles.bmp'
-#
-TILEUTIL  = $(UTIL)\tile2bmp.exe
-TILEBMP   = $(OBJ)\nhtiles.bmp
-
 #==========================================
 # Setting up the compiler and linker
 # macros. All builds include the base ones.
 #==========================================
 
-CFLAGSBASE  = -c $(cflags) $(cvarsmt) -I$(INCL) -nologo $(cdebug)
+CFLAGSBASE  = -c $(cflags) $(cvarsmt) -I$(INCL) -nologo $(cdebug) $(TILEINCL)
 LFLAGSBASEC = $(linkdebug) $(conflags) $(conlibsmt)
 LFLAGSBASEG = $(linkdebug) $(guiflags) $(guilibsmt) comctl32.lib
 
@@ -176,7 +188,7 @@ LFLAGSBASEG = $(linkdebug) $(guiflags) $(guilibsmt) comctl32.lib
 # Util builds
 #==========================================
 
-CFLAGSU = $(CFLAGSBASE) /DWIN32CON
+CFLAGSU = $(CFLAGSBASE)
 LFLAGSU	= $(LFLAGSBASEC)
 
 #==========================================
@@ -184,10 +196,10 @@ LFLAGSU	= $(LFLAGSBASEC)
 #==========================================
 
 LFLAGSBASE = $(linkdebug) $(conflags) $(conlibsmt)
-CFLAGS	 = $(CFLAGSBASE) /DWIN32CON $(TILEDEF) $(DLBFLG)
+CFLAGS	 = $(CFLAGSBASE) $(TILEDEF) $(DLBFLG)
 NHLFLAGS1 = /NODEFAULTLIB /INCREMENTAL:NO /PDB:"$(GAME).PDB" /RELEASE /NOLOGO
 NHLFLAGS2 = /MAP:"$(GAME).MAP" /MACHINE:$(CPU) -IGNORE:505 
-LFLAGS	= $(LFLAGSBASEC) $(NHLFLAGS1) $(NHLFLAGS2)
+LFLAGS	= $(LFLAGSBASEG) $(NHLFLAGS1) $(NHLFLAGS2)
 
 GAMEFILE = $(GAMEDIR)\$(GAME).exe # whole thing
 
@@ -257,6 +269,14 @@ DLB =
 {$(TTY)}.c{$(OBJ)}.o:
 	@$(CC) $(CFLAGS)  -Fo$@  $<
 
+
+#==========================================
+# Rules for files in win\win32
+#==========================================
+
+{$(WIN32)}.c{$(OBJ)}.o:
+	@$(cc) $(CFLAGS)  -o$@  $<
+
 #==========================================
 #================ MACROS ==================
 #==========================================
@@ -295,6 +315,8 @@ DGNCOMPOBJS    = $(O)dgn_yacc.o	$(O)dgn_$(LEX).o $(O)dgn_main.o \
 
 RECOVOBJS      = $(O)recover.o
 
+TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
+
 #
 # These are not invoked during a normal game build in 3.3.0
 #
@@ -304,8 +326,6 @@ TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
 GIFREADERS     = $(O)gifread.o	$(O)alloc.o $(O)panic.o
 
 PPMWRITERS     = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
-
-TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 
 #
 #  Object files for the game itself.
@@ -343,7 +363,7 @@ DLBOBJ = $(O)dlb.o
 
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
-SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)nttty.o    $(O)pcunix.o  \
+SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
 	   $(SOUND) 	$(O)mapimail.o $(O)nhlan.o
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
@@ -528,18 +548,24 @@ tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 #  DO NOT INDENT THE << below!
 #
 
-$(GAMEFILE) : $(ALLOBJ)
+$(GAMEFILE) : $(ALLOBJ) $(TILERES)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
 	@$(link) $(LFLAGS) -out:$@ @<<$(GAME).lnk
 		$(ALLOBJ:^	=^
-		) 
+		) $(TILERES)
 <<
 	@if exist $(O)install.tag del $(O)install.tag
 	@if exist $(GAMEDIR)\$(GAME).bak del $(GAMEDIR)\$(GAME).bak
 
 $(GAME)_.ico : $(NTSYS)\$(GAME).ico
 	@copy $(NTSYS)\$(GAME).ico $@
+
+!IF "$(GRAPHICAL)"=="Y"
+$(TILERES): $(TILEBMP) $(WIN32)\winhack.rc
+	@$(rc) /l 0x409 /d "_DEBUG" /fo$@ /i$(WIN32) $(WIN32)\winhack.rc
+!ENDIF
+
 #
 #  Secondary Targets.
 #
@@ -1034,7 +1060,7 @@ $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
 	$(CC) $(CFLAGS) -Fo$@ ..\win\X11\wintext.c
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
 	$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winval.c
-$(O)tile.o: tile.c $(HACK_H)
+$(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnmain.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnaskstr.c
