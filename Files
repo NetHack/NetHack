@@ -92,19 +92,6 @@ winami.c        winami.p        winchar.c       windefs.h       winext.h
 winfuncs.c      winkey.c        winmenu.c       winproto.h      winreq.c
 winstr.c        xpm2iff.c
 
-sys/amiga/old:
-(old and obsolete files)
-amilib.c        amiwbench.c     char.c          charwin.uu      dflicon.uu
-dispmap.s       hackwb.hlp      HackWB.uu       NewGame.uu      NHinfo.uu
-randwin.c       randwin.uu      wb.c            wbcli.c         wbdata.c
-wbdefs.h        wbgads.c        wbprotos.h      wbstruct.h      wbwin.c
-wbwin.uu
-
-sys/amiga/old/splitter:
-(more files for Amiga versions)
-amiout.h        arg.c           arg.h           loader.c        multi.c
-multi.h         split.doc       split.h         splitter.c
-
 sys/atari:
 (files for Atari version)
 Install.tos     atarifnt.uue    nethack.mnu     setup.g         tos.c
@@ -122,12 +109,6 @@ macerrs.c       macfile.c       machelp.hqx     macmain.c       macmenu.c
 macsnd.c        mactopl.c       mactty.c        macunix.c       macwin.c
 mgetline.c      mmodal.c        mrecover.c      mrecover.hqx    mttymain.c
 
-sys/mac/old:
-(files for old Think and MPW C compilers)
-DCproj.hqx      Install.mpw     Install.thk     LCproj.hqx      MDproj.hqx
-NHmake.hqx      NHproj.hqx      NetHack.r       macsegs         mhdump.c
-mpwhack.h       mstring.c
-
 sys/msdos:
 (files for MSDOS version)
 Install.dos     Makefile.BC     Makefile.GCC    Makefile.MSC    Makefile.SC
@@ -137,12 +118,6 @@ schema1.BC      schema2.BC      schema3.MSC     setup.bat       sound.c
 tile2bin.c      video.c         vidtxt.c        vidvga.c
 (files for running MSDOS binary under Windows)
 nhico.uu        nhpif.uu
-
-sys/msdos/old:
-(files for old MSC compiler)
-MakeMSC.src     MakeMSC.utl     Makefile.dat    README.old      exesmurf.c
-exesmurf.doc    maintovl.doc    ovlmgr.asm      ovlmgr.doc      ovlmgr.uu
-schema.old      trampoli.c
 
 sys/os2:
 (files for OS/2 version)
