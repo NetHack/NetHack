@@ -55,6 +55,7 @@ grammar fixes for applying stethoscope to corpses and statues
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+unix: new -wwindowtype option
 win32gui: better handling of "more" prompt for messages that would have scrolled
 	off the window
 win32gui: set correct checkmark on "Lock Windows" menu item on startup

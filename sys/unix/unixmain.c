@@ -150,14 +150,7 @@ char *argv[];
 	check_linux_console();
 #endif
 	initoptions();
-	init_nhwindows(&argc,argv);
 	exact_username = whoami();
-#ifdef _M_UNIX
-	init_sco_cons();
-#endif
-#ifdef __linux__
-	init_linux_cons();
-#endif
 
 	/*
 	 * It seems you really want to play.
@@ -188,6 +181,13 @@ char *argv[];
 #endif
 
 	process_options(argc, argv);	/* command line options */
+	init_nhwindows(&argc, argv);	/* now we can set up window system */
+#ifdef _M_UNIX
+	init_sco_cons();
+#endif
+#ifdef __linux__
+	init_linux_cons();
+#endif
 
 #ifdef DEF_PAGER
 	if(!(catmore = nh_getenv("HACKPAGER")) && !(catmore = nh_getenv("PAGER")))
@@ -315,7 +315,6 @@ char *argv[];
 {
 	int i;
 
-
 	/*
 	 * Process options.
 	 */
@@ -403,6 +402,9 @@ char *argv[];
 			    if ((i = str2race(argv[0])) >= 0)
 			    	flags.initrace = i;
 			}
+			break;
+		case 'w': /* windowtype */
+			choose_windows(&argv[0][2]);
 			break;
 		case '@':
 			flags.randomall = 1;
