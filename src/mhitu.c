@@ -1940,8 +1940,8 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    int stun = d(2,6);
 
 		    mtmp->mspec_used = mtmp->mspec_used + (stun + rn2(6));
-		    make_stunned(HStun + stun, TRUE);
 		    pline("%s stares piercingly at you!", Monnam(mtmp));
+		    make_stunned(HStun + stun, TRUE);
 		    stop_occupation();
 		}
 		break;
