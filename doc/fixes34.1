@@ -365,6 +365,8 @@ no longer need to manually examine inventory after regaining sight in order
 when adding an object to inventory, it is possible for it to becomed both
 	wielded and quivered if it merges with weapon and autoquiver is enabled
 include rocks as likely candidates for quivering if alternate weapon is a sling
+Asmodeus fails an is_armed() check, so code in m_initweap() to give him wands 
+	of fire and cold never got called; move the code to m_initinv()
 
 
 Platform- and/or Interface-Specific Fixes

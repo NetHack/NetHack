@@ -407,13 +407,6 @@ register struct monst *mtmp;
 		    case PM_HORNED_DEVIL:
 			(void)mongets(mtmp, rn2(4) ? TRIDENT : BULLWHIP);
 			break;
-		    case PM_ICE_DEVIL:
-			if (!rn2(4)) (void)mongets(mtmp, SPEAR);
-			break;
-		    case PM_ASMODEUS:
-			(void)mongets(mtmp, WAN_COLD);
-			(void)mongets(mtmp, WAN_FIRE);
-			break;
 		    case PM_DISPATER:
 			(void)mongets(mtmp, WAN_STRIKING);
 			break;
@@ -641,6 +634,16 @@ register struct	monst	*mtmp;
 #else
 		mkmonmoney(mtmp, (long) d(level_difficulty(), 30));
 #endif
+		break;
+	    case S_DEMON:
+	    	/* moved here from m_initweap() because these don't
+		   have AT_WEAP so m_initweap() is not called for them */
+		if (ptr == &mons[PM_ICE_DEVIL] && !rn2(4)) {
+			(void)mongets(mtmp, SPEAR);
+		} else if (ptr == &mons[PM_ASMODEUS]) {
+			(void)mongets(mtmp, WAN_COLD);
+			(void)mongets(mtmp, WAN_FIRE);
+		}
 		break;
 	    default:
 		break;
