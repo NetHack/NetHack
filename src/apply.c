@@ -278,6 +278,7 @@ use_stethoscope(obj)
 	case SCORR:
 		You_hear(hollow_str, "passage");
 		lev->typ = CORR;
+		unblock_point(rx,ry);
 		if (Blind) feel_location(rx,ry);
 		else newsym(rx,ry);
 		return res;

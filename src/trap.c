@@ -1314,6 +1314,7 @@ int style;
 			if (cansee(bhitpos.x, bhitpos.y))
 				pline_The("boulder crashes through a door.");
 			levl[bhitpos.x][bhitpos.y].doormask = D_BROKEN;
+			if (dist) unblock_point(bhitpos.x, bhitpos.y);
 		}
 	}
 	tmp_at(DISP_END, 0);

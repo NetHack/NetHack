@@ -338,6 +338,7 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 		    if (*in_rooms(x, y, SHOPBASE))
 			add_damage(x, y, 0L);
 		    levl[x][y].doormask = D_NODOOR;
+		    unblock_point(x,y);
 		    newsym(x,y);
 		    break;
 	    }

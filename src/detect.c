@@ -1046,10 +1046,12 @@ genericptr_t num;
 		    levl[zx][zy].doormask = D_NODOOR;
 		} else
 		    levl[zx][zy].doormask = D_ISOPEN;
+		unblock_point(zx, zy);
 		newsym(zx, zy);
 		(*(int*)num)++;
 	} else if(levl[zx][zy].typ == SCORR) {
 		levl[zx][zy].typ = CORR;
+		unblock_point(zx, zy);
 		newsym(zx, zy);
 		(*(int*)num)++;
 	} else if ((ttmp = t_at(zx, zy)) != 0) {
