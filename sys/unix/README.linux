@@ -20,11 +20,13 @@ preserving permissions to put the NetHack files in /usr/games/nethack and
 home directory you might perform these steps.
     % su
     # cd /
-    # gunzip -c ~yourlogin/nh343lin.tgz | tar xpvf -
+    # tar xpvzf ~yourlogin/nethack-343-linux-X11.tgz
 
-(If you have old record and logfile entries from a previous NetHack version,
+If you have old record and logfile entries from a previous NetHack version,
 you might want to save copies before they get overwritten by the new empty
-files; old saved games and bones files from 3.4.x will work with 3.4.3).
+files; old saved games and bones files from 3.4.x will work with 3.4.3.
+If you are installing from the RPM, there is no need to save the old record
+and logfile; they are automatically preserved.
 
 In addition to data files for running the game, you will find other useful
 things in /usr/games/lib/nethackdir (such as a copy of this README :-).
@@ -71,6 +73,7 @@ System:  gcc-3.2, XFree86-libs-4.2.1, ncurses-5.2, glibc-2.3.2 (GLIBC_2.3)
               seems to reside on newer Linux's.
               define COMPRESS_EXTENSION as ".gz"
               define DLB
+	      define AUTOPICKUP_EXCEPTIONS
 
     unixconf.h: define LINUX
                 define TIMED_DELAY
