@@ -1813,7 +1813,7 @@ struct obj *otmp;
 	}
 	material = objects[obj->otyp].oc_material;
 
-	if (otmp->cursed && obj->oclass == GEM_CLASS && rnd(5) == 1) {
+	if (otmp->cursed && obj->oclass == GEM_CLASS && !rn2(5)) {
 	    pline(
 		(Blind ? "You feel something shatter" :
 		 (Hallucination ? "Oh, wow, look at the pretty shards." :
