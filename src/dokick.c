@@ -879,7 +879,7 @@ dokick()
 		    exercise(A_DEX, TRUE);
 		    return(1);
 		}
-		if(IS_GRAVE(maploc->typ))
+		if(IS_GRAVE(maploc->typ) || maploc->typ == IRONBARS)
 		    goto ouch;
 		if(IS_TREE(maploc->typ)) {
 		    struct obj *treefruit;
