@@ -233,6 +233,10 @@ moveloop()
 			    }
 #endif
 			}
+			/* delayed change may not be valid anymore */
+			if ((change == 1 && !Polymorph) ||
+			    (change == 2 && u.ulycn == NON_PM))
+			    change = 0;
 			if(Polymorph && !rn2(100))
 			    change = 1;
 			else if (u.ulycn >= LOW_PM && !rn2(80 - (20 * night())))
