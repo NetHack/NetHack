@@ -47,9 +47,10 @@
  *  Dozens of general bug fixes
  *  Several message and other glitches corrected
  *  Travel command adjustments and ability to disable travel command
+ *  message recall window extensions (by Christian Cooper)
  *  win32: some interface improvements
  *  unix: improved tile support
- *  message recall window extensions (by Christian Cooper)
+ *  gnome: some fixes, and some enhancements by Dylan Alex Simon
  */
 
 /*

@@ -5,10 +5,16 @@ It is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.3.
 
 NetHack 3.4.1 is a bugfix release for 3.4.0.
- *  Fix a fatal error involving land mines and boulders/statues
- *  Several message and other glitches corrected 
+ *  Fix a few fatal errors including one for reentering shops, one
+       involving land mines and boulders/statues, and one for delayed
+       polymorph
+ *  Dozens of general bug fixes
+ *  Several message and other glitches corrected
+ *  Travel command adjustments and ability to disable travel command
+ *  message recall window extensions (by Christian Cooper)
  *  win32: some interface improvements
  *  unix: improved tile support
+ *  gnome: some fixes, and some enhancements by Dylan Alex Simon
 
 A fuller list of changes for this release can be found in the file 
 doc/fixes34.1 in the source distribution.  The text in there was written 
