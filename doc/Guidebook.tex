@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.75 $ $Date: 2003/11/15 23:26:18 $
+% $Revision: 1.76 $ $Date: 2003/11/16 04:20:28 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -702,6 +702,10 @@ Kick something (usually a door).
 \item[\tb{e}]
 Eat food.
 %.lp
+% Make sure Elbereth is not hyphenated below, the exact spelling matters.
+% (Only specified here to parallel Guidebook.mn; use of \tt font implicity
+% prevents automatic hyphenation in TeX and LaTeX.)
+\hyphenation{Elbereth}		%override the deduced syllable breaks
 \item[\tb{E}]
 Engrave a message on the floor.
 Engraving the word ``{\tt Elbereth}'' will cause most monsters to not attack
