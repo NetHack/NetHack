@@ -266,6 +266,11 @@ boolean allow_drag;
 
 	if (u.uswallow) {
 		u.uswldtim = u.uswallow = 0;
+		if (Punished && !ball_active) {
+		    /* ensure ball placement, like unstuck */
+		    ball_active = TRUE;
+		    allow_drag = FALSE;
+		}
 		docrt();
 	}
 	if (ball_active) {
