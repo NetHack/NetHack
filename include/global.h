@@ -333,7 +333,7 @@ struct version_info {
 
 #define MAXULEV		30	/* max character experience level */
 
-#define MAXMONNO	120	/* geno monst after this number killed */
+#define MAXMONNO	120	/* extinct monst after this number created */
 #define MHPMAX		500	/* maximum monster hp */
 
 #endif /* GLOBAL_H */
