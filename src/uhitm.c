@@ -19,6 +19,7 @@ STATIC_DCL void NDECL(end_engulf);
 STATIC_DCL int FDECL(gulpum, (struct monst *,struct attack *));
 STATIC_DCL boolean FDECL(hmonas, (struct monst *,int));
 STATIC_DCL void FDECL(nohandglow, (struct monst *));
+STATIC_DCL boolean FDECL(shade_aware, (struct obj *));
 
 extern boolean notonhead;	/* for long worms */
 /* The below might become a parameter instead if we use it a lot */
@@ -527,8 +528,9 @@ int thrown;
 	int wtype;
 	struct obj *monwep;
 	char yourbuf[BUFSZ];
-	char *unconventional = (char *)0;	/* substituted for word "attack" in msg */
+	char unconventional[BUFSZ];	/* substituted for word "attack" in msg */
 
+	unconventional[0] = '\0';
 	wakeup(mon);
 	if(!obj) {	/* attack with bare hands */
 	    if (mdat == &mons[PM_SHADE])
@@ -674,14 +676,15 @@ int thrown;
 		mdat = mon->data;
 		tmp = (mdat == &mons[PM_SHADE]) ? 0 : 1;
 	    } else {
-		boolean shade_aware = FALSE;
-
-		switch(obj->otyp) {
+		if (!shade_aware(obj)) {
+		    tmp = 0;
+		    Strcpy(unconventional, xname(obj));
+		} else {
+		    switch(obj->otyp) {
 		    case BOULDER:		/* 1d20 */
 		    case HEAVY_IRON_BALL:	/* 1d25 */
 		    case IRON_CHAIN:		/* 1d4+1 */
 			tmp = dmgval(obj, mon);
-			shade_aware = TRUE;	/* dmgval handles it */
 			break;
 		    case MIRROR:
 			if (breaktest(obj)) {
@@ -698,12 +701,10 @@ int thrown;
 			break;
 #ifdef TOURIST
 		    case EXPENSIVE_CAMERA:
-			if (mdat != &mons[PM_SHADE]) {
-			    You("succeed in destroying %s camera.  Congratulations!",
+			You("succeed in destroying %s camera.  Congratulations!",
 			        shk_your(yourbuf, obj));
-			    useup(obj);
-			    return(TRUE);
-			} else unconventional = "camera";
+			useup(obj);
+			return(TRUE);
 			break;
 #endif
 		    case CORPSE:		/* fixed by polder@cs.vu.nl */
@@ -851,11 +852,8 @@ int thrown;
 			if(tmp < 1) tmp = 1;
 			else tmp = rnd(tmp);
 			if(tmp > 6) tmp = 6;
+		    }
 		}
-
-		if (!shade_aware && mdat == &mons[PM_SHADE] && obj &&
-				objects[obj->otyp].oc_material != SILVER)
-		    tmp = 0;
 	    }
 	}
 
@@ -910,7 +908,7 @@ int thrown;
 	    if (mdat == &mons[PM_SHADE]) {
 		if (!hittxt) {
 		    Your("%s passes harmlessly through %s.",
-		    	unconventional ? unconventional : "attack",
+		    	unconventional[0] ? unconventional : "attack",
 			mon_nam(mon));
 		    hittxt = TRUE;
 		}
@@ -1028,6 +1026,27 @@ int thrown;
 	}
 
 	return((boolean)(destroyed ? FALSE : TRUE));
+}
+
+STATIC_OVL boolean
+shade_aware(obj)
+struct obj *obj;
+{
+	if (!obj) return FALSE;
+	/*
+	 * The things in this list either
+	 * 1) affect shades.
+	 *  OR
+	 * 2) are dealt with properly by other routines
+	 *    when it comes to shades.
+	 */
+	if (obj->otyp == BOULDER || obj->otyp == HEAVY_IRON_BALL
+	    || obj->otyp == IRON_CHAIN		/* dmgval handles those first three */
+	    || obj->otyp == MIRROR		/* silver in the reflective surface */
+	    || obj->otyp == CLOVE_OF_GARLIC	/* causes shades to flee */
+	    || objects[obj->otyp].oc_material == SILVER)
+		return TRUE;
+	return FALSE;
 }
 
 /* check whether slippery clothing protects from hug or wrap attack */
