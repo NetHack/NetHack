@@ -441,11 +441,15 @@ toofar:
 
 	    /* The scared check is necessary.  Otherwise a monster that is
 	     * one square near the player but fleeing into a wall would keep	
-	     * switching between pick-axe and weapon.
+	     * switching between pick-axe and weapon.  If monster is stuck
+	     * in a trap, prefer ranged weapon (wielding is done in thrwmu).
+	     * This may cost the monster an attack, but keeps the monster
+	     * from switching back and forth if carrying both.
 	     */
 	    mw_tmp = MON_WEP(mtmp);
 	    if (!(scared && mw_tmp && is_pick(mw_tmp)) &&
-		    mtmp->weapon_check == NEED_WEAPON) {
+		mtmp->weapon_check == NEED_WEAPON &&
+		!(mtmp->mtrapped && !nearby && select_rwep(mtmp))) {
 		mtmp->weapon_check = NEED_HTH_WEAPON;
 		if (mon_wield_item(mtmp) != 0) return(0);
 	    }
