@@ -727,11 +727,24 @@ winid tmpwin;		/* supplied by dodiscover() */
 	 * dependence on spe.  Against low mr victims, it typically
 	 * does "double athame" damage, 2d4.  Occasionally, it will
 	 * cast unbalancing magic which effectively averages out to
-	 * 4d4 damage (2.5d4 against high mr victims), for spe = 0.
+	 * 4d4 damage (3d4 against high mr victims), for spe = 0.
+	 *
+	 * Prior to 3.4.1, the cancel (aka purge) effect always
+	 * included the scare effect too; now it's one or the other.
+	 * Likewise, the stun effect won't be combined with either
+	 * of those two; it will be chosen separately or possibly
+	 * used as a fallback when scare or cancel fails.
+	 *
+	 * [Historical note: a change to artifact_hit() for 3.4.0
+	 * unintentionally made all of Magicbane's special effects
+	 * be blocked if the defender successfully saved against a
+	 * stun attack.  As of 3.4.1, those effects can occur but
+	 * will be slightly less likely than they were in 3.3.x.]
 	 */
 #define MB_MAX_DIEROLL		8	/* rolls above this aren't magical */
-static const char * const mb_verb[4] = {
-	"probe", "stun", "scare", "cancel"
+static const char * const mb_verb[2][4] = {
+	{ "probe", "stun", "scare", "cancel" },
+	{ "prod", "amaze", "tickle", "purge" },
 };
 #define MB_INDEX_PROBE		0
 #define MB_INDEX_STUN		1
@@ -749,6 +762,7 @@ boolean vis;			/* whether the action can be seen */
 char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 {
     struct permonst *old_uasmon;
+    const char *verb;
     boolean youattack = (magr == &youmonst),
 	    youdefend = (mdef == &youmonst),
 	    resisted = FALSE, do_stun, do_confuse, result;
@@ -758,35 +772,44 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
     /* the most severe effects are less likely at higher enchantment */
     if (mb->spe >= 3)
 	scare_dieroll /= (1 << (mb->spe / 3));
+    /* if target successfully resisted the artifact damage bonus,
+       reduce overall likelihood of the assorted special effects */
+    if (!spec_dbon_applies) dieroll += 1;
 
     /* might stun even when attempting a more severe effect, but
        in that case it will only happen if the other effect fails;
-       extra damage will apply regardless */
-    do_stun = (mb->spe <= rn2(10));
+       extra damage will apply regardless; 3.4.1: sometimes might
+       just probe even when it hasn't been enchanted */
+    do_stun = (max(mb->spe,0) < rn2(spec_dbon_applies ? 11 : 7));
 
-    /* the special effects also boost physical damage (base 2d4 assumed);
-       increments are generally cumulative, but since the stun effect is
-       based on a different criterium its damage might not be included */
+    /* the special effects also boost physical damage; increments are
+       generally cumulative, but since the stun effect is based on a
+       different criterium its damage might not be included; the base
+       damage is either 1d4 (athame) or 2d4 (athame+spec_dbon) depending
+       on target's resistance check against AD_STUN (handled by caller)
+       [note that a successful save against AD_STUN doesn't actually
+       prevent the target from ending up stunned] */
     attack_indx = MB_INDEX_PROBE;
-    *dmgptr += rnd(4);			/* 3d4 */
+    *dmgptr += rnd(4);			/* (2..3)d4 */
     if (do_stun) {
 	attack_indx = MB_INDEX_STUN;
-	*dmgptr += rnd(4);		/* 4d4 */
+	*dmgptr += rnd(4);		/* (3..4)d4 */
     }
     if (dieroll <= scare_dieroll) {
 	attack_indx = MB_INDEX_SCARE;
-	*dmgptr += rnd(4);		/* 5d4; actually (4 or 5)d4 */
+	*dmgptr += rnd(4);		/* (3..5)d4 */
     }
     if (dieroll <= (scare_dieroll / 2)) {
 	attack_indx = MB_INDEX_CANCEL;
-	*dmgptr += rnd(4);		/* 6d4; actually (5 or 6)d4 */
+	*dmgptr += rnd(4);		/* (4..6)d4 */
     }
 
     /* give the hit message prior to inflicting the effects */
+    verb = mb_verb[!!Hallucination][attack_indx];
     if (youattack || youdefend || vis) {
 	result = TRUE;
 	pline_The("magic-absorbing blade %s %s!",
-		  vtense((const char *)0, mb_verb[attack_indx]), hittee);
+		  vtense((const char *)0, verb), hittee);
 	/* assume probing has some sort of noticeable feedback
 	   even if it is being done by one monster to another */
 	if (attack_indx == MB_INDEX_PROBE && !canspotmon(mdef))
@@ -849,10 +872,8 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 	break;
 
     case MB_INDEX_PROBE:
-	/* note: can't get probe result unless mb->spe >= 1, but
-	   guard against passing bad argument to rn2() anyway */
-	if (youattack && (mb->spe < 1 || !rn2(4 * mb->spe))) {
-	    pline_The("probe is insightful.");
+	if (youattack && (mb->spe == 0 || !rn2(3 * abs(mb->spe)))) {
+	    pline_The("%s is insightful.", verb);
 	    /* pre-damage status */
 	    probe_monster(mdef);
 	}
