@@ -303,6 +303,8 @@ ghost_from_bottle()
 	nomovemsg = "You regain your composure.";
 }
 
+/* "Quaffing is like drinking, except you spill more."  -- Terry Pratchett
+ */
 int
 dodrink() {
 	register struct obj *otmp;
