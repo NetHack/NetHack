@@ -353,6 +353,11 @@ pick_lock(pick) /* pick a lock with a given object */
 	} else {			/* pick the lock in a door */
 	    struct monst *mtmp;
 
+	    if (u.utrap && u.utraptype == TT_PIT) {
+		You_cant("reach over the edge of the pit.");
+		return(0);
+	    }
+
 	    door = &levl[cc.x][cc.y];
 	    if ((mtmp = m_at(cc.x, cc.y)) && canseemon(mtmp)
 			&& mtmp->m_ap_type != M_AP_FURNITURE
