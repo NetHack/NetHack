@@ -486,6 +486,9 @@ init_level(dgn, proto_index, pd)
 	new_level->flags.maze_like = !!(tlevel->flags & MAZELIKE);
 	new_level->flags.rogue_like = !!(tlevel->flags & ROGUELIKE);
 	new_level->flags.align = ((tlevel->flags & D_ALIGN_MASK) >> 4);
+	if (!new_level->flags.align) 
+	    new_level->flags.align =
+		((pd->tmpdungeon[dgn].flags & D_ALIGN_MASK) >> 4);
 
 	new_level->rndlevs = tlevel->rndlevs;
 	new_level->next    = (s_level *) 0;
