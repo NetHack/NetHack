@@ -1035,9 +1035,9 @@ get_saved_games()
 	Sprintf(SAVEF, "%s*.NetHack-saved-game", encodedfnamebuf);
 	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
 
+	n = 0;
 	foundfile = foundfile_buffer();
 	if (findfirst((char *)fq_save)) {
-	    n = 0;
 	    do {
 		++n;
 	    } while (findnext());
