@@ -1500,8 +1500,10 @@ void
 spoteffects(pick)
 boolean pick;
 {
+	static struct trap *spottrap = (struct trap *)0;
+	static unsigned spottraptyp = NO_TRAP;
 	register struct monst *mtmp;
-
+	
 	if(u.uinwater) {
 		int was_underwater;
 
@@ -1560,12 +1562,33 @@ stillinwater:;
 	if (!in_steed_dismounting) { /* if dismounting, we'll check again later */
 		struct trap *trap = t_at(u.ux, u.uy);
 		boolean pit;
+
+	       /*
+		* If not a pit, pickup before triggering trap.
+		* If pit, trigger trap before pickup.
+		*/
 		pit = (trap && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT));
-		if (trap && pit)
-			dotrap(trap, 0);	/* fall into pit */
-		if (pick) (void) pickup(1);
-		if (trap && !pit)
-			dotrap(trap, 0);	/* fall into arrow trap, etc. */
+		if (pick && !pit) (void) pickup(1);
+
+		if (trap) {
+
+		       /*
+			* dotrap on a fire trap calls melt_ice() which triggers
+			* spoteffects() (again) which can trigger the same fire
+			* trap (again). Use static spottrap to prevent that.
+			* We track spottraptyp because some traps morph
+			* (landmine to pit) and any new trap type
+			* should get triggered.
+			*/
+			if (!spottrap || spottraptyp != trap->ttyp) {
+				spottrap = trap;
+				spottraptyp = trap->ttyp;
+				dotrap(trap, 0);    /* fall into arrow trap, etc. */
+				spottrap = (struct trap *)0;
+				spottraptyp = NO_TRAP;
+			}
+		}
+		if (pick && pit) (void) pickup(1);
 	}
 	/* Warning alerts you to ice danger */
 	if (Warning && is_ice(u.ux,u.uy)) {
