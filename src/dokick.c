@@ -811,7 +811,9 @@ dokick()
 			(void) mkgold((long) rn1(201, 300), x, y);
 			i = Luck + 1;
 			if(i > 6) i = 6;
-			while(i--) (void) mkobj_at(GEM_CLASS, x, y, TRUE);
+			while(i--)
+			    (void) mksobj_at(rnd_class(DILITHIUM_CRYSTAL,
+					LUCKSTONE-1), x, y, FALSE, TRUE);
 			if (Blind)
 			    You("kick %s loose!", something);
 			else {
