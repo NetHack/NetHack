@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.4	2002/08/03	*/
+/*	SCCS Id: @(#)wield.c	3.4	2003/01/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -395,6 +395,74 @@ dowieldquiver()
 	setuqwep(newquiver);
 	/* Take no time since this is a convenience slot */
 	return (0);
+}
+
+/* used for #rub and for applying pick-axe, whip, grappling hook, or polearm */
+/* (moved from apply.c) */
+boolean
+wield_tool(obj, verb)
+struct obj *obj;
+const char *verb;	/* "rub",&c */
+{
+    const char *what;
+    boolean more_than_1;
+
+    if (obj == uwep) return TRUE;   /* nothing to do if already wielding it */
+
+    if (!verb) verb = "wield";
+    what = xname(obj);
+    more_than_1 = (obj->quan > 1L ||
+		   strstri(what, "pair of ") != 0 ||
+		   strstri(what, "s of ") != 0);
+
+    if (obj->owornmask & (W_ARMOR|W_RING|W_AMUL|W_TOOL)) {
+	char yourbuf[BUFSZ];
+
+	You_cant("%s %s %s while wearing %s.",
+		 verb, shk_your(yourbuf, obj), what,
+		 more_than_1 ? "them" : "it");
+	return FALSE;
+    }
+    if (welded(uwep)) {
+	if (flags.verbose) {
+	    const char *hand = body_part(HAND);
+
+	    if (bimanual(uwep)) hand = makeplural(hand);
+	    if (strstri(what, "pair of ") != 0) more_than_1 = FALSE;
+	    pline(
+	     "Since your weapon is welded to your %s, you cannot %s %s %s.",
+		  hand, verb, more_than_1 ? "those" : "that", xname(obj));
+	} else {
+	    You_cant("do that.");
+	}
+	return FALSE;
+    }
+    if (cantwield(youmonst.data)) {
+	You_cant("hold %s strongly enough.", more_than_1 ? "them" : "it");
+	return FALSE;
+    }
+    /* check shield */
+    if (uarms && bimanual(obj)) {
+	You("cannot %s a two-handed %s while wearing a shield.",
+	    verb, (obj->oclass == WEAPON_CLASS) ? "weapon" : "tool");
+	return FALSE;
+    }
+    if (uquiver == obj) setuqwep((struct obj *)0);
+    if (uswapwep == obj) {
+	(void) doswapweapon();
+	/* doswapweapon might fail */
+	if (uswapwep == obj) return FALSE;
+    } else {
+	You("now wield %s.", doname(obj));
+	setuwep(obj);
+    }
+    if (uwep != obj) return FALSE;	/* rewielded old object after dying */
+    /* applying weapon or tool that gets wielded ends two-weapon combat */
+    if (u.twoweap)
+	untwoweapon();
+    if (obj->oclass != WEAPON_CLASS)
+	unweapon = TRUE;
+    return TRUE;
 }
 
 int

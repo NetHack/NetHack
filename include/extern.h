@@ -39,7 +39,6 @@ E void NDECL(unleash_all);
 E boolean NDECL(next_to_u);
 E struct obj *FDECL(get_mleash, (struct monst *));
 E void FDECL(check_leash, (XCHAR_P,XCHAR_P));
-E boolean FDECL(wield_tool, (struct obj *));
 E boolean FDECL(um_dist, (XCHAR_P,XCHAR_P,XCHAR_P));
 E boolean FDECL(snuff_candle, (struct obj *));
 E boolean FDECL(snuff_lit, (struct obj *));
@@ -2226,18 +2225,19 @@ E void FDECL(setuswapwep, (struct obj *));
 E int NDECL(dowield);
 E int NDECL(doswapweapon);
 E int NDECL(dowieldquiver);
-E int NDECL(dotwoweapon);
+E boolean FDECL(wield_tool, (struct obj *,const char *));
 E int NDECL(can_twoweapon);
-E void NDECL(untwoweapon);
+E void NDECL(drop_uswapwep);
+E int NDECL(dotwoweapon);
 E void NDECL(uwepgone);
 E void NDECL(uswapwepgone);
 E void NDECL(uqwepgone);
+E void NDECL(untwoweapon);
 E void FDECL(erode_obj, (struct obj *,BOOLEAN_P,BOOLEAN_P));
 E int FDECL(chwepon, (struct obj *,int));
 E int FDECL(welded, (struct obj *));
 E void FDECL(weldmsg, (struct obj *));
 E void FDECL(setmnotwielded, (struct monst *,struct obj *));
-E void NDECL(drop_uswapwep);
 
 /* ### windows.c ### */
 

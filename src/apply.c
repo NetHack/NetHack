@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)apply.c	3.4	2003/01/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -569,48 +569,6 @@ register xchar x, y;
 
 #endif /* OVL0 */
 #ifdef OVLB
-
-boolean
-wield_tool(obj)
-struct obj *obj;
-{
-	if(welded(uwep)) {
-		/* Andreas Bormann - ihnp4!decvax!mcvax!unido!ab */
-		if(flags.verbose) {
-			pline("Since your weapon is welded to your %s,",
-				bimanual(uwep) ?
-				(const char *)makeplural(body_part(HAND))
-				: body_part(HAND));
-			pline("you cannot wield that %s.", xname(obj));
-		}
-		return(FALSE);
-	}
-	if (cantwield(youmonst.data)) {
-		You_cant("hold it strongly enough.");
-		return(FALSE);
-	}
-	/* Check shield */
-	if (uarms && bimanual(obj)) {
-		You("cannot wield a two-handed tool while wearing a shield.");
-		return(FALSE);
-	}
-	if(uquiver == obj) setuqwep((struct obj *)0);
-	if(uswapwep == obj) {
-	    (void) doswapweapon();
-	    /* If doswapweapon failed... */
-	    if(uswapwep == obj) return (FALSE);
-	} else {
-	    You("now wield %s.", doname(obj));
-	    setuwep(obj);
-	}
-	if (uwep != obj) return(FALSE); /* rewielded old object after dying */
-	/* applying weapon or tool that gets wielded ends two-weapon combat */
-	if (u.twoweap)
-		untwoweapon();
-	if (obj->oclass != WEAPON_CLASS)
-		unweapon = TRUE;
-	return(TRUE);
-}
 
 #define WEAK	3	/* from eat.c */
 
@@ -1188,7 +1146,7 @@ dorub()
 	    }
 	}
 
-	if(!obj || (obj != uwep && !wield_tool(obj))) return 0;
+	if (!obj || !wield_tool(obj, "rub")) return 0;
 
 	/* now uwep is obj */
 	if (uwep->otyp == MAGIC_LAMP) {
@@ -2090,10 +2048,8 @@ struct obj *obj;
     const char *msg_snap = "Snap!";
 
     if (obj != uwep) {
-	if (!wield_tool(obj)) return 0;
+	if (!wield_tool(obj, "lash")) return 0;
 	else res = 1;
-	/* prevent bashing msg */
-	unweapon = FALSE;
     }
     if (!getdir((char *)0)) return res;
 
@@ -2351,7 +2307,7 @@ use_pole (obj)
 	    return (0);
 	}
 	if (obj != uwep) {
-	    if (!wield_tool(obj)) return(0);
+	    if (!wield_tool(obj, "swing")) return(0);
 	    else res = 1;
 	}
      /* assert(obj == uwep); */
@@ -2452,7 +2408,7 @@ use_grapple (obj)
 	    return (0);
 	}
 	if (obj != uwep) {
-	    if (!wield_tool(obj)) return(0);
+	    if (!wield_tool(obj, "cast")) return(0);
 	    else res = 1;
 	}
      /* assert(obj == uwep); */

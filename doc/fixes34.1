@@ -367,6 +367,7 @@ when adding an object to inventory, it is possible for it to becomed both
 include rocks as likely candidates for quivering if alternate weapon is a sling
 Asmodeus fails an is_armed() check, so code in m_initweap() to give him wands 
 	of fire and cold never got called; move the code to m_initinv()
+#rub would wield the target tool even when already being worn as eyewear
 
 
 Platform- and/or Interface-Specific Fixes

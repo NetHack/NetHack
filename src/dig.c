@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)dig.c	3.4	2003/01/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -820,7 +820,7 @@ struct obj *obj;
 
 	/* Check tool */
 	if (obj != uwep) {
-	    if (!wield_tool(obj)) return(0);
+	    if (!wield_tool(obj, "swing")) return 0;
 	    else res = 1;
 	}
 	ispick = is_pick(obj);
