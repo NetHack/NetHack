@@ -1437,6 +1437,10 @@ boolean looting;	/* loot vs tip */
 	} else if (nolimbs(youmonst.data)) {
 		pline("Without limbs, you cannot %s anything.", verb);
 		return FALSE;
+	} else if (!freehand()) {
+		pline("Without a free %s, you cannot loot anything.",
+			body_part(HAND));
+		return FALSE;
 	}
 	return TRUE;
 }
