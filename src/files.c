@@ -817,7 +817,7 @@ compress(filename)
 const char *filename;
 {
 #ifndef COMPRESS
-#if defined(applec) || defined(__MWERKS__)
+#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(filename)
 #endif
 #else
@@ -832,7 +832,7 @@ uncompress(filename)
 const char *filename;
 {
 #ifndef COMPRESS
-#if defined(applec) || defined(__MWERKS__)
+#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(filename)
 #endif
 #else
@@ -858,7 +858,7 @@ make_lockname(filename, lockname)
 const char *filename;
 char *lockname;
 {
-#if defined(applec) || defined(__MWERKS__)
+#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(filename,lockname)
 	return (char*)0;
 #else
@@ -895,7 +895,7 @@ const char *filename;
 int whichprefix;
 int retryct;
 {
-#if defined(applec) || defined(__MWERKS__)
+#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(filename, retryct)
 #endif
 	char locknambuf[BUFSZ];
@@ -1004,7 +1004,7 @@ int retryct;
 void
 unlock_file(filename)
 const char *filename;
-#if defined(applec)
+#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(filename)
 #endif
 {
@@ -1248,7 +1248,7 @@ char		*buf;
 char		*tmp_ramdisk;
 char		*tmp_levels;
 {
-#if defined(applec) || defined(__MWERKS__)
+#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(tmp_ramdisk,tmp_levels)
 #endif
 	char		*bufp, *altp;
@@ -1690,7 +1690,7 @@ void
 check_recordfile(dir)
 const char *dir;
 {
-#if defined(applec) || defined(__MWERKS__)
+#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(dir)
 #endif
 	const char *fq_record;
