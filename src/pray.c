@@ -1387,7 +1387,8 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 	    /* you were already in pretty good standing */
 	    /* The player can gain an artifact */
 	    /* The chance goes down as the number of artifacts goes up */
-	    if (u.ulevel > 2 && !rn2(10 + (2 * u.ugifts * nartifacts))) {
+	    if (u.ulevel > 2 && u.uluck >= 0 &&
+		!rn2(10 + (2 * u.ugifts * nartifacts))) {
 		otmp = mk_artifact((struct obj *)0, a_align(u.ux,u.uy));
 		if (otmp) {
 		    if (otmp->spe < 0) otmp->spe = 0;
@@ -1406,6 +1407,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		}
 	    }
 	    change_luck((value * LUCKMAX) / (MAXVALUE * 2));
+	    if ((int)u.uluck < 0) u.uluck = 0;
 	    if (u.uluck != saved_luck) {
 		if (Blind)
 		    You("think %s brushed your %s.",something, body_part(FOOT));
