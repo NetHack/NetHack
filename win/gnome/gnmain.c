@@ -33,6 +33,7 @@ void ghack_quit_game(GtkWidget *widget, int button)
     if (button == 0) {
 	gnome_exit_nhwindows(0);
 	gtk_object_unref(GTK_OBJECT(session_id));
+	clearlocks();
 	gtk_exit(0);
     }
 }
@@ -65,6 +66,7 @@ void ghack_save_game(GtkWidget *widget, int button)
 	    /* make sure they see the Saving message */
 	    display_nhwindow(WIN_MESSAGE, TRUE);
 	    gnome_exit_nhwindows("Be seeing you...");
+	    clearlocks();
 	    gtk_exit(0);
 	} else (void)doredraw();
     }

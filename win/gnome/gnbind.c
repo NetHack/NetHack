@@ -350,10 +350,10 @@ void gnome_askname()
 	    "GnomeHack", plname);
 
     /* Quit if they want to quit... */
-    if (ret==-1)
-      {
+    if (ret==-1) {
+	clearlocks();
 	gtk_exit(0);
-      }
+    }
 }
 
 
