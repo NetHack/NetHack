@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.4	2003/02/08	*/
+/*	SCCS Id: @(#)artifact.c 3.4	2003/08/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1199,7 +1199,8 @@ arti_invoke(obj)
 	/* It's a special power, not "just" a property */
 	if(obj->age > monstermoves) {
 	    /* the artifact is tired :-) */
-	    You_feel("that %s is ignoring you.", the(xname(obj)));
+	    You_feel("that %s %s ignoring you.",
+		     the(xname(obj)), otense(obj, "are"));
 	    /* and just got more so; patience is essential... */
 	    obj->age += (long) d(3,10);
 	    return 1;
@@ -1357,7 +1358,8 @@ arti_invoke(obj)
 	if(on && obj->age > monstermoves) {
 	    /* the artifact is tired :-) */
 	    u.uprops[oart->inv_prop].extrinsic ^= W_ARTI;
-	    You_feel("that %s is ignoring you.", the(xname(obj)));
+	    You_feel("that %s %s ignoring you.",
+		     the(xname(obj)), otense(obj, "are"));
 	    /* can't just keep repeatedly trying */
 	    obj->age += (long) d(3,10);
 	    return 1;
