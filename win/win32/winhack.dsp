@@ -61,7 +61,7 @@ LINK32=link.exe
 OutDir=.\Release
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
-PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy $(NTSYS)\winnt.cnf ..\binary\defaults.nh
+PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "winhack - Win32 Debug"
@@ -129,7 +129,7 @@ LINK32=link.exe
 OutDir=.\Unicode_Release
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
-PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy $(NTSYS)\winnt.cnf ..\binary\defaults.nh
+PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "winhack - Win32 Unicode Debug"
@@ -164,7 +164,7 @@ LINK32=link.exe
 OutDir=.\Unicode_Debug
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
-PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy $(NTSYS)\winnt.cnf ..\binary\defaults.nh
+PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
 # End Special Build Tool
 
 !ENDIF 
