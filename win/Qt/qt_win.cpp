@@ -122,8 +122,8 @@ extern "C" void play_sound_for_message(const char* str);
 // Warwick prefers it this way...
 #define QT_CHOOSE_RACE_FIRST
 
-static const char nh_attribution[] = "<big>Qt NetHack</big>"
-	"<br><small>by Warwick Allison<br>and the NetHack DevTeam</small>";
+static const char nh_attribution[] = "<center><big>NetHack</big>"
+	"<br><small>by the NetHack DevTeam</small></center>";
 
 static QString
 aboutMsg()
@@ -4307,20 +4307,21 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
 {
     QPixmap pm("nhsplash.xpm");
     if ( !pm.isNull() ) {
-	QVBox *vb = new QVBox(0,0,pm.mask() ? Qt::WStyle_Customize|Qt::WStyle_NoBorder : 0);
+	QVBox *vb = new QVBox(0,0,
+	    WStyle_Customize | WStyle_NoBorder | WX11BypassWM | WStyle_StaysOnTop );
 	splash = vb;
 	QLabel *lsplash = new QLabel(vb);
 	lsplash->setAlignment(AlignCenter);
 	lsplash->setPixmap(pm);
 	QLabel* capt = new QLabel("Loading...",vb);
 	capt->setAlignment(AlignCenter);
-
 	if ( pm.mask() ) {
 	    lsplash->setFixedSize(pm.size());
 	    lsplash->setMask(*pm.mask());
-	    splash->move((QApplication::desktop()->width()-pm.width())/2,
-			  (QApplication::desktop()->height()-pm.height())/2);
 	}
+	splash->move((QApplication::desktop()->width()-pm.width())/2,
+		      (QApplication::desktop()->height()-pm.height())/2);
+	//splash->setGeometry(0,0,100,100);
 	if ( qt_compact_mode ) {
 	    splash->showMaximized();
 	} else {
@@ -4329,10 +4330,13 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
 	    splash->adjustSize();
 	    splash->show();
 	}
-	flushX();
-	syncX();
-	processEvents();
-	flushX();
+
+	// force content refresh outside event loop
+	splash->repaint(FALSE);
+	lsplash->repaint(FALSE);
+	capt->repaint(FALSE);
+	qApp->flushX();
+
     } else {
 	splash = 0;
     }
@@ -4397,7 +4401,7 @@ NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
     QLabel* logo = new QLabel(this); vbl->addWidget(logo);
     logo->setAlignment(AlignCenter);
     logo->setPixmap(QPixmap("nhsplash.xpm"));
-    QLabel* attr = new QLabel("by Warwick Allison and the NetHack DevTeam",this);
+    QLabel* attr = new QLabel("by the NetHack DevTeam",this);
     attr->setAlignment(AlignCenter);
     vbl->addWidget(attr);
     vbl->addStretch(2);
@@ -4480,6 +4484,7 @@ void NetHackQtBind::qt_askname()
     char** saved = get_saved_names();
     int ch = -1;
     if ( saved && *saved ) {
+	if ( splash ) splash->hide();
 	NetHackQtSavedGameSelector sgsel((const char**)saved);
 	ch = sgsel.choose();
 	if ( ch >= 0 )
@@ -4489,6 +4494,7 @@ void NetHackQtBind::qt_askname()
 
     switch (ch) {
       case -1:
+	if ( splash ) splash->hide();
 	if (NetHackQtPlayerSelector(keybuffer).Choose())
 	    return;
       case -2:
