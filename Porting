@@ -152,7 +152,7 @@ to.  This file contains the mainline module, which reads options from the
 command line (or wherever) and processes them.  It also contains various
 functions associated with game startup.
 
-     3.5	tty.c
+     3.4	tty.c
 
 	You may need to create a new "tty.c" module.  If you do, call it
 [OS]tty.c where the [OS] is replaced with the name of the OS you are porting
