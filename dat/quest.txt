@@ -1128,7 +1128,7 @@ near %i?"
 "Hast thou indeed recovered %o?"
 %E
 %Cc Kni 00015
-"Ah, %p.  We see thou hast received our summons.
+"Ah, %p.  We see thou hast received Our summons.
 We are in dire need of thy prowess.  But first, We must needs
 decide if thou art ready for this great undertaking."
 %E
@@ -1142,7 +1142,7 @@ decide if thou art ready for this great undertaking."
 "Thou disgracest this noble court with thine impure presence.  We have been
 lenient with thee, but no more.  Thy name shall be spoken no more.  We
 hereby strip thee of thy title, thy lands, and thy standing as %ca.
-Begone from our sight!"
+Begone from Our sight!"
 %E
 %Cc Kni 00019
 "Verily, %p, thou hast done well.  That thou hast survived thus
@@ -1155,7 +1155,7 @@ Our presence when thou hast attained the noble title of %R."
 %E
 %Cc Kni 00020
 "Thou dishonourest us, %p!  Thou hast strayed from the path of
-chivalry! Go from our presence and do penance.  Only when thou art again
+chivalry! Go from Our presence and do penance.  Only when thou art again
 pure mayst thou return hence."
 %E
 %Cc Kni 00021
@@ -1164,8 +1164,8 @@ been.  Hear now Our words:
 
 "As thou noticed as thou approached %H, a great battle hath
 been fought recently in these fields.  Know thou that Merlin himself
-came to aid us here as we battled the foul %n.  In the midst of that
-battle, %n struck Merlin a great blow, felling him.  Then, as our
+came to aid us here as We battled the foul %n.  In the midst of that
+battle, %n struck Merlin a great blow, felling him.  Then, as Our
 forces were pressed back, %n stole %o.
 
 "We eventually turned the tide, but lost many %cP in doing so.
@@ -1184,7 +1184,7 @@ We restore Merlin to health."
 "Remember, %p, follow always the path of %d."
 %E
 %Cp Kni 00026
-"Though %n is verily a mighty foe, we have confidence in thy victory."
+"Though %n is verily a mighty foe, We have confidence in thy victory."
 %E
 %Cp Kni 00027
 "Beware, for %n hath surrounded himself with hordes of foul creatures."
@@ -1300,7 +1300,7 @@ As you approach %l, he beams at you and says:
 
     He hath instructed us that thou art now to be the guardian of
     %o.  He feeleth that thou mayst have need of
-    its powers in thine adventures.  It is our wish that thou keepest
+    its powers in thine adventures.  It is Our wish that thou keepest
     %o with thee as thou searchest for the fabled
     Amulet of Yendor.
 %E
@@ -1315,7 +1315,7 @@ return through the magic portal that brought thee here."
 "Well met, %p.  How goeth thy search for the Amulet of Yendor?"
 %E
 %Cc Kni 00091
-"Thou hast succeeded, we see, %p!  Now thou art commanded to take
+"Thou hast succeeded, We see, %p!  Now thou art commanded to take
 the Amulet to be sacrificed to %d in the plane of the astral.
 
 "Merlin hath counseled us that thou must travel always upwards through
