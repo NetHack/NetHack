@@ -37,7 +37,7 @@ void get_colors(int handle, short *palette, int col){
 			if(i<16)
 				idx=vdi2dev4[i];
 			else
-				idx=i;
+				idx= i==255 ? 1 : i;
 		}
 		vq_color(handle, i, 0, (int *)palette + idx * 3);
 	}
@@ -49,7 +49,7 @@ void img_set_colors(int handle, short *palette, int col){
 	/* set color palette */
 	end=min(1<<col,1<<planes);
 	for(i=0; i<end; i++){
-	switch(col){
+	switch(planes){	/* MAR -- war col 10.01.2001 */
 	 	case 1:
     		idx=i;break;
 		case 2:
@@ -60,7 +60,7 @@ void img_set_colors(int handle, short *palette, int col){
 			if(i<16)
 				idx=vdi2dev4[i];
 			else
-				idx=i;
+				idx= i==255 ? 1 : i;
     }
     vs_color(handle, i, (int *)palette + idx * 3);
   }
@@ -239,7 +239,6 @@ int depack_img(char *name, IMG_header *pic){
 				/* ensure that lines aren't repeated past the end of the img */
 				if(line + scan_repeat > pic->img_h)
 					scan_repeat = pic->img_h - line;
-		
 				/* copy line to image buffer */
 				if(scan_repeat>1){
 					/* calculate address of a current line in a current bitplane */

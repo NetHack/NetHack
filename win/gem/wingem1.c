@@ -5,6 +5,7 @@
 #define __TCC_COMPAT__
 
 #include	<stdio.h>
+#include	<stdlib.h>
 #include <time.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -13,6 +14,7 @@
 
 #include "gem_rsc.h"
 #include "load_img.h"
+#include "gr_rect.h"
 
 #define genericptr_t void *
 #include "wintype.h"
@@ -46,6 +48,7 @@ extern winid WIN_MESSAGE, WIN_MAP, WIN_STATUS, WIN_INVEN;
 #define MAXWIN 20
 #define ROWNO 21
 #define COLNO 80
+#define MSGLEN 100
 
 #define MAP_GADGETS NAME|MOVER|CLOSER|FULLER|LFARROW|RTARROW|UPARROW|DNARROW|VSLIDE|HSLIDE|SIZER|SMALLER
 #define DIALOG_MODE AUTO_DIAL|MODAL|NO_ICONIFY
@@ -116,11 +119,19 @@ extern int mar_iflags_numpad(void);			/* from wingem.c */
 extern void Gem_raw_print(const char *);	/* from wingem.c */
 extern int mar_hp_query(void);				/* from wingem.c */
 extern int mar_get_msg_history(void);		/* from wingem.c */
+extern int mar_get_msg_visible(void);		/* from wingem.c */
+extern void mar_get_font(int,char **,int *);/* from wingem.c */
 extern int vdi2dev4[];							/* from load_img.c */
 
+void recalc_msg_win(GRECT*);
+void recalc_status_win(GRECT*);
+void calc_std_winplace(int, GRECT *);
+int (*v_mtext)(int,int,int,char*);
 static int no_glyph;	/* the int indicating there is no glyph */
 IMG_header tile_image, titel_image, rip_image;
-MFDB Tile_bilder, Map_bild, Titel_bild, Rip_bild, Black_bild, Pet_Mark;
+MFDB Tile_bilder, Map_bild, Titel_bild, Rip_bild, Black_bild, Pet_Mark, FontCol_Bild;
+static int Tile_width=16, Tile_heigth=16, Tiles_per_line=20;
+char *Tilefile=NULL;
 /* pet_mark Design by Warwick Allison warwick@troll.no */
 static int pet_mark_data[]={0x0000,0x3600,0x7F00,0x7F00,0x3E00,0x1C00,0x0800};
 static short	*normal_palette=NULL;
@@ -131,19 +142,28 @@ static struct gw{
 	GRECT gw_place;
 } Gem_nhwindow[MAXWIN];
 
-int Fcw, Fch;
+typedef struct {
+	int id;
+	int size;
+	int cw, ch;
+	int prop;
+} NHGEM_FONT;
 
 /*struct gemmapdata {*/
-	GRECT dirty_map_area={COLNO,ROWNO,0,0};
+	GRECT dirty_map_area={COLNO-1,ROWNO,0,0};
 	int map_cursx=0, map_cursy=0, curs_col=WHITE;
-	int draw_cursor=TRUE, map_cell_width=16;
+	int draw_cursor=TRUE, scroll_margin=-1;
+	NHGEM_FONT map_font;
 	SCROLL 	scroll_map;
 	char **map_glyphs=NULL;
+	dirty_rect *dr_map;
 /*};*/
 
 /*struct gemstatusdata{*/
 	char **status_line;
-	int Anz_status_lines, status_w, StFch, StFcw;
+	int Anz_status_lines, status_w, status_align=FALSE;
+	NHGEM_FONT status_font;
+	dirty_rect *dr_stat;
 /*};*/
 
 /*struct gemmessagedata{*/
@@ -152,19 +172,25 @@ int Fcw, Fch;
 	int messages_pro_zug=0;
 	char **message_line;
 	int *message_age;
-	int msg_pos=0, msg_max=0, msg_anz=0, msg_width=0;
+	int msg_pos=0, msg_max=0, msg_anz=0, msg_width=0, msg_vis=3, msg_align=TRUE;
+	NHGEM_FONT msg_font;
+	dirty_rect *dr_msg;
 /*};*/
 
 /*struct geminvdata {*/
 	SCROLL scroll_menu;
 	Gem_menu_item *invent_list;
 	int Anz_inv_lines=0, Inv_breite=16;
+	NHGEM_FONT menu_font;
 	int Inv_how;
 /*};*/
 
 /*struct gemtextdata{*/
 	char **text_lines;
 	int Anz_text_lines=0, text_width;
+	NHGEM_FONT text_font;
+	int use_rip=FALSE;
+	extern char** rip_line;
 /*};*/
 
 static OBJECT *zz_oblist[NHICON+1];
@@ -266,7 +292,7 @@ void move_win(WIN *z_win){
 void message_handler(int x, int y){
 	switch(objc_find(zz_oblist[MSGWIN],ROOT,MAX_DEPTH,x,y)){
 	case UPMSG:
-		if(msg_pos>2){
+		if(msg_pos>msg_vis-1){
 			msg_pos--;
 			Gem_nhwindow[WIN_MESSAGE].gw_dirty=TRUE;
 			mar_display_nhwindow(WIN_MESSAGE);
@@ -310,8 +336,191 @@ int ng;
 	no_glyph=ng;
 }
 
+void
+mar_set_tilefile(name)
+char* name;
+{
+	Tilefile=name;
+}
+void
+mar_set_tilex(value)
+int value;
+{
+	Min(&value,32);
+	Max(&value,1);
+	Tile_width=value;
+}
+void
+mar_set_tiley(value)
+int value;
+{
+	Min(&value,32);
+	Max(&value,1);
+	Tile_heigth=value;
+}
 /****************************** userdef_draw *************************************/
 
+void rearrange_windows(void);
+void mar_set_status_align(int sa){
+	if(status_align!=sa){
+		status_align=sa;
+		rearrange_windows();
+	}
+}
+void mar_set_msg_align(int ma){
+	if(msg_align!=ma){
+		msg_align=ma;
+		rearrange_windows();
+	}
+}
+void mar_set_msg_visible(int mv){
+	if(mv!=msg_vis){
+		Max(&mv,1);
+		Min(&mv,min(msg_anz,20));
+		Min(&mv,desk.g_h/msg_font.ch/2);
+		msg_vis=mv;
+		rearrange_windows();
+	}
+}
+/* size<0 cellheight; size>0 points */
+void mar_set_fontbyid(int type, int id, int size){
+	int chardim[4];
+	if(id<=0)
+		id=ibm_font_id;
+	if((size>-3 && size<3) || size<-20 || size>20)
+		size=-ibm_font;
+	/* MAR -- 17.Mar 2002 For now allow FNT_PROP only with NHW_TEXT */
+	if(type!=NHW_TEXT && (FontInfo(id)->type & (FNT_PROP|FNT_ASCII)))
+		id=ibm_font_id;
+	switch(type){
+	case NHW_MESSAGE:
+		if(msg_font.size==-size && msg_font.id==id)
+			break;
+		msg_font.size=-size;
+		msg_font.id=id;
+		msg_font.prop=FontInfo(id)->type & (FNT_PROP|FNT_ASCII);
+		v_set_text(msg_font.id,msg_font.size,BLACK,0,0,chardim);
+		msg_font.ch=chardim[3] ? chardim[3] : 1;
+		msg_font.cw=chardim[2] ? chardim[2] : 1;
+		msg_width=min(max_w/msg_font.cw-3,MSGLEN);
+		rearrange_windows();
+		break;
+	case NHW_MAP:
+		if(map_font.size!=-size || map_font.id!=id){
+			MFDB mtmp;
+			map_font.size=-size;
+			map_font.id=id;
+			map_font.prop=FontInfo(id)->type & (FNT_PROP|FNT_ASCII);
+			v_set_text(map_font.id,map_font.size,BLACK,0,0,chardim);
+			map_font.ch=chardim[3] ? chardim[3] : 1;
+			map_font.cw=chardim[2] ? chardim[2] : 1;
+			mfdb(&mtmp,NULL,(COLNO-1)*map_font.cw, ROWNO*map_font.ch, 0, planes);
+			if(mfdb_size(&mtmp)>mfdb_size(&FontCol_Bild) && mfdb_size(&mtmp)>mfdb_size(&Map_bild)){
+				FontCol_Bild.fd_addr=Map_bild.fd_addr=(int *)realloc(Map_bild.fd_addr,mfdb_size(&mtmp));
+				if(!Map_bild.fd_addr)	/* FIXME -- Not really neccessary since the former space is still valid */
+					panic("Not enough Space for the map.");
+			}
+			mfdb(&FontCol_Bild,FontCol_Bild.fd_addr,(COLNO-1)*map_font.cw, ROWNO*map_font.ch, 0, planes);
+			rearrange_windows();
+		}
+		break;
+	case NHW_STATUS:
+		if(status_font.size==-size && status_font.id==id)
+			break;
+		status_font.size=-size;
+		status_font.id=id;
+		status_font.prop=FontInfo(id)->type & (FNT_PROP|FNT_ASCII);
+		v_set_text(status_font.id,status_font.size,BLACK,0,0,chardim);
+		status_font.ch=chardim[3] ? chardim[3] : 1;
+		status_font.cw=chardim[2] ? chardim[2] : 1;
+		rearrange_windows();
+		break;
+	case NHW_MENU:
+		if(menu_font.size==-size && menu_font.id==id)
+			break;
+		menu_font.size=-size;
+		menu_font.id=id;
+		menu_font.prop=FontInfo(id)->type & (FNT_PROP|FNT_ASCII);
+		v_set_text(menu_font.id,menu_font.size,BLACK,0,0,chardim);
+		menu_font.ch=chardim[3] ? chardim[3] : 1;
+		menu_font.cw=chardim[2] ? chardim[2] : 1;
+		break;
+	case NHW_TEXT:
+		if(text_font.size==-size && text_font.id==id)
+			break;
+		text_font.size=-size;
+		text_font.id=id;
+		text_font.prop=FontInfo(id)->type & (FNT_PROP|FNT_ASCII);
+		v_set_text(text_font.id,text_font.size,BLACK,0,0,chardim);
+		text_font.ch=chardim[3] ? chardim[3] : 1;
+		text_font.cw=chardim[2] ? chardim[2] : 1;
+		break;
+	default:
+		break;
+	}
+}
+void mar_set_font(int type, const char *font_name, int size){
+	int id=0;
+	/* MAR -- 17.Mar 2002 usual Gem behavior, use the Font-ID */
+	if(font_name && *font_name){
+		id=atoi(font_name);
+		if(id<=0){
+			int i, tid;
+			char name[32];
+			for(i=fonts_loaded;--i>=0;){
+				tid=vqt_name(x_handle,i,name);
+				if(!stricmp(name,font_name)){
+					id=tid;
+					break;
+				}
+			}
+		}
+	}
+	mar_set_fontbyid(type,id,size);
+}
+void rearrange_windows(void){
+	GRECT area;
+	int todo=TRUE;
+	if(WIN_MAP != WIN_ERR && Gem_nhwindow[WIN_MAP].gw_window){
+		scroll_map.px_hline=mar_set_tile_mode(FAIL)?Tile_width:map_font.cw;
+		scroll_map.px_vline=mar_set_tile_mode(FAIL)?Tile_heigth:map_font.ch;
+		if(todo){
+			calc_std_winplace(FAIL,&area);
+			todo=FALSE;
+		}
+		calc_std_winplace(NHW_MAP,&area);
+		Gem_nhwindow[WIN_MAP].gw_window->max.g_w=area.g_w;
+		Gem_nhwindow[WIN_MAP].gw_window->max.g_h=area.g_h;
+		Gem_nhwindow[WIN_MAP].gw_window->max.g_w=area.g_w;
+		window_reinit(Gem_nhwindow[WIN_MAP].gw_window,md,md,NULL,FALSE,FALSE);
+		{
+			int buf[8];
+			buf[3]=K_CTRL;
+			buf[4]=C('L');
+			AvSendMsg(ap_id,AV_SENDKEY,buf);
+		}
+	}
+	if(WIN_MESSAGE != WIN_ERR && Gem_nhwindow[WIN_MESSAGE].gw_window){
+		if(todo){
+			calc_std_winplace(FAIL,&area);
+			todo=FALSE;
+		}
+		calc_std_winplace(NHW_MESSAGE,&area);
+		Gem_nhwindow[WIN_MESSAGE].gw_window->min_h=area.g_h;
+		window_size(Gem_nhwindow[WIN_MESSAGE].gw_window,&area);
+		redraw_window(Gem_nhwindow[WIN_MESSAGE].gw_window,NULL);
+	}
+	if(WIN_STATUS != WIN_ERR && Gem_nhwindow[WIN_STATUS].gw_window){
+		if(todo){
+			calc_std_winplace(FAIL,&area);
+			todo=FALSE;
+		}
+		calc_std_winplace(NHW_STATUS,&area);
+		Gem_nhwindow[WIN_STATUS].gw_window->min_h=area.g_h;
+		window_size(Gem_nhwindow[WIN_STATUS].gw_window,&area);
+		redraw_window(Gem_nhwindow[WIN_STATUS].gw_window,NULL);
+	}
+}
 void my_color_area(GRECT *area, int col){
 	int pxy[4];
 
@@ -328,41 +537,42 @@ int mar_set_tile_mode(int);
 
 static void win_draw_map(int first, WIN *win, GRECT *area){
 	int pla[8], w=area->g_w-1, h=area->g_h-1;
-	int i, x, y, mode, mch;
+	int i, x, y;
 	GRECT back=*area;
 
 	first=first;
-	v_set_mode(MD_REPLACE);
-	mode=S_ONLY;
 
 	if(!mar_set_tile_mode(FAIL)){
-		v_set_text(ibm_font_id,ibm_font,WHITE,0,0,NULL);
+		int start=(area->g_x-win->work.g_x)/map_font.cw+scroll_map.hpos;
+		int stop=(area->g_x+area->g_w+map_font.cw-1-win->work.g_x)/map_font.cw+scroll_map.hpos;
+		int starty=(area->g_y-win->work.g_y)/map_font.ch+scroll_map.vpos;
+		int stopy=min((area->g_y+area->g_h+map_font.ch-1-win->work.g_y)/map_font.ch+scroll_map.vpos,ROWNO);
+		char tmp;
+		v_set_text(map_font.id,map_font.size,WHITE,0,0,NULL);
 		v_set_mode(MD_TRANS);
-		mode=S_OR_D;
-		mch=Fch-1;
 
-		x=win->work.g_x-scroll_map.px_hpos;
-		y=win->work.g_y-scroll_map.px_vpos;
-		pla[2]=pla[0]=area->g_x-x;
-		pla[3]=pla[1]=0;
+		x=win->work.g_x-scroll_map.px_hpos+start*map_font.cw;
+		y=win->work.g_y-scroll_map.px_vpos+starty*map_font.ch;
+		pla[2]=pla[0]=scroll_map.px_hpos+area->g_x-win->work.g_x;
+		pla[3]=pla[1]=starty*map_font.ch;
 		pla[2]+=w;
-		pla[3]+=mch;
+		pla[3]+=map_font.ch-1;
 		pla[6]=pla[4]=area->g_x;	/* x_wert to */
 		pla[7]=pla[5]=y;	/* y_wert to */
 		pla[6]+=w;
-		pla[7]+=mch;
-		Vsync();
-		back.g_h=Fch;
-		for(i=0;i<ROWNO;i++,y+=Fch,pla[1]+=Fch,pla[3]+=Fch,pla[5]+=Fch,pla[7]+=Fch){
+		pla[7]+=map_font.ch-1;
+		back.g_h=map_font.ch;
+		for(i=starty;i<stopy;i++,y+=map_font.ch,pla[1]+=map_font.ch,pla[3]+=map_font.ch,pla[5]+=map_font.ch,pla[7]+=map_font.ch){
 			back.g_y=y;
 			my_color_area(&back,BLACK);
-			v_gtext(x_handle,x,y,map_glyphs[i]);
-			vro_cpyfm(x_handle, mode, pla, &Map_bild, screen);
+			tmp=map_glyphs[i][stop];
+			map_glyphs[i][stop]=0;
+			(*v_mtext)(x_handle,x,y,&map_glyphs[i][start]);
+			map_glyphs[i][stop]=tmp;
+			vro_cpyfm(x_handle, S_OR_D, pla, &FontCol_Bild, screen);
 		}
 	}else{
 		v_set_mode(MD_REPLACE);
-		mch=15;
-	
 		pla[2]=pla[0]=scroll_map.px_hpos+area->g_x-win->work.g_x;
 		pla[3]=pla[1]=scroll_map.px_vpos+area->g_y-win->work.g_y;
 		pla[2]+=w;
@@ -371,15 +581,15 @@ static void win_draw_map(int first, WIN *win, GRECT *area){
 		pla[7]=pla[5]=area->g_y;	/* y_wert to */
 		pla[6]+=w;
 		pla[7]+=h;
-		vro_cpyfm(x_handle, mode, pla, &Map_bild, screen);
+		vro_cpyfm(x_handle, S_ONLY, pla, &Map_bild, screen);
 	}
 
 	if(draw_cursor){
 		v_set_line(curs_col,1,1,0,0);
 		pla[0]=pla[2]=win->work.g_x+scroll_map.px_hline*(map_cursx-scroll_map.hpos);
 		pla[1]=pla[3]=win->work.g_y+scroll_map.px_vline*(map_cursy-scroll_map.vpos);
-		pla[2]+=map_cell_width-1;
-		pla[3]+=mch;
+		pla[2]+=scroll_map.px_hline-1;
+		pla[3]+=scroll_map.px_vline-1;
 		v_rect(pla[0],pla[1],pla[2],pla[3]);
 	}
 }
@@ -408,33 +618,78 @@ static int draw_lines(PARMBLK *pb){
 
 	if(rc_intersect((GRECT *)&pb->pb_xc,&area)){
 		char **ptr;
-		int x=pb->pb_x,y=pb->pb_y,start_line=(area.g_y-y), chardim[4];
+		int x=pb->pb_x,y=pb->pb_y,start_line=(area.g_y-y);
 
-		v_set_mode(MD_REPLACE);
+		v_set_mode((text_font.cw&7)==0 && text_font.prop==0 ? MD_REPLACE : MD_TRANS);
 
 /* void v_set_text(int font,int height,int color,int effect,int rotate,int out[4])	*/
-		v_set_text(ibm_font_id,ibm_font,BLACK,0,0,chardim);
-
-		Fch= chardim[3] ? chardim[3] : 1;
-		start_line /= Fch;
-		y+=start_line*Fch;
-		x-=scroll_menu.px_hpos;
+		v_set_text(text_font.id,text_font.size,BLACK,0,0,NULL);
+		start_line /= text_font.ch;
+		y+=start_line*text_font.ch;
+		x-=(int)scroll_menu.px_hpos;
 		ptr=&text_lines[start_line+=scroll_menu.vpos];
-		start_line = min((area.g_y-y+area.g_h+Fch-1)/Fch,Anz_text_lines-start_line);
-		area.g_h=Fch;
+		start_line = min((area.g_y-y+area.g_h+text_font.ch-1)/text_font.ch,Anz_text_lines-start_line);
+		area.g_h=text_font.ch;
 		Vsync();
-		x=(x+7) & ~7;
-		for(;--start_line>=0;y+=Fch){
+/*		x=(x+7) & ~7;*/
+		for(;--start_line>=0;y+=text_font.ch){
 			area.g_y=y;
 			my_clear_area(&area);
 			if(**ptr-1){
 				v_set_text(FAIL,0,BLUE,0x01,0,NULL);
-				v_gtext(x_handle,x,y,(*ptr++)+1);
+				(*v_mtext)(x_handle,x,y,(*ptr++)+1);
 				v_set_text(FAIL,0,BLACK,0x00,0,NULL);
 			}else
-				v_gtext(x_handle,x,y,(*ptr++)+1);
-
+				(*v_mtext)(x_handle,x,y,(*ptr++)+1);
 		}
+	}
+	return(0);
+}
+
+static int draw_rip(PARMBLK *pb){
+	GRECT area=*(GRECT *) &pb->pb_x;
+	if(rc_intersect((GRECT *)&pb->pb_xc,&area)){
+		char **ptr;
+		int x=pb->pb_x,y=pb->pb_y,start_line=(area.g_y-y), chardim[4], pla[8],i;
+		v_set_mode(MD_REPLACE);
+/* void v_set_text(int font,int height,int color,int effect,int rotate,int out[4])	*/
+		v_set_text(text_font.id,text_font.size,BLACK,0,0,chardim);
+		start_line /= text_font.ch;
+		y+=start_line*text_font.ch;
+		x-=scroll_menu.px_hpos;
+		ptr=&text_lines[start_line+=scroll_menu.vpos];
+		start_line = min((area.g_y-y+area.g_h+text_font.ch-1)/text_font.ch,Anz_text_lines-start_line);
+		area.g_h=text_font.ch;
+		Vsync();
+		x=(x+7) & ~7;
+		for(;--start_line>=0;y+=text_font.ch){
+			area.g_y=y;
+			my_clear_area(&area);
+			if(**ptr-1){
+				v_set_text(FAIL,0,BLUE,0x01,0,NULL);
+				(*v_mtext)(x_handle,x,y,(*ptr++)+1);
+				v_set_text(FAIL,0,BLACK,0x00,0,NULL);
+			}else
+				(*v_mtext)(x_handle,x,y,(*ptr++)+1);
+		}
+		pla[0]=pla[1]=0;
+		pla[2]=min(pb->pb_w-1,Rip_bild.fd_w-1);
+		pla[3]=min(pb->pb_h-1,Rip_bild.fd_h-1);
+		pla[6]=pla[4]=pb->pb_x+(pb->pb_w-Rip_bild.fd_w)/2;	/* x_wert to */
+		pla[7]=pla[5]=pb->pb_y;	/* y_wert to */
+		pla[6]+=pla[2];
+		pla[7]+=pla[3];
+		vro_cpyfm(x_handle, S_ONLY, pla, &Rip_bild, screen);
+		v_set_mode(MD_TRANS);
+		vst_alignment(x_handle,1,5,&i,&i);
+		pla[5]+=64;
+		for(i=0;i<7;i++,pla[5]+=chardim[3]){
+			v_set_text(text_font.id,(i==0 || i==6) ? text_font.size : 12,WHITE,1,0,chardim);
+			(*v_mtext)(x_handle,pla[4]+157,pla[5],rip_line[i]);
+			v_set_text(text_font.id,(i==0 || i==6) ? text_font.size : 12,BLACK,0,0,chardim);
+			(*v_mtext)(x_handle,pla[4]+157,pla[5],rip_line[i]);
+		}
+		vst_alignment(x_handle,0,5,&i,&i);
 	}
 	return(0);
 }
@@ -443,24 +698,32 @@ static int draw_msgline(PARMBLK *pb){
 	GRECT area=*(GRECT *) &pb->pb_x;
 
 	if(rc_intersect((GRECT *)&pb->pb_xc,&area)){
-		int x=pb->pb_x, y=pb->pb_y+2*Fch, foo, i;
-		char **ptr=&message_line[msg_pos];
+		int x=pb->pb_x, y=pb->pb_y+(msg_vis-1)*msg_font.ch, foo, i;
+		char **ptr=&message_line[msg_pos], tmp;
+		int startx, stopx, starty, stopy;
 
 		x=(x+7) & ~7;	/* Byte alignment speeds output up */
 
 		v_set_mode(MD_REPLACE);
 
 /* void v_set_text(int font,int height,int color,int effect,int rotate,int out[4])	*/
-		v_set_text(ibm_font_id,ibm_font,FAIL, FAIL,0,NULL);
+		v_set_text(msg_font.id,msg_font.size,FAIL, FAIL,0,NULL);
 		vst_alignment(x_handle,0,5,&foo,&foo);
-		foo=min(msg_pos,3);
-		Vsync();
-		for(i=0;i<foo;i++,y-=Fch,ptr--){
+		stopy=min(msg_pos,msg_vis);
+/*		Vsync();*/
+		startx=(area.g_x-x)/msg_font.cw-1;	/* MAR 06.02.2001 -- because italic covers the next char */
+		Max(&startx,0);
+		stopx=(area.g_x+area.g_w+msg_font.cw-x-1)/msg_font.cw;
+		x+=startx*msg_font.cw;
+		for(i=0;i<stopy;i++,y-=msg_font.ch,ptr--){
 			if(message_age[msg_pos-i])
 				v_set_text(FAIL,0,BLACK,0,0,NULL);
 			else
 				v_set_text(FAIL,0,LBLACK,4,0,NULL);
-			v_gtext(x_handle,x,y,*ptr);
+			tmp=(*ptr)[stopx];
+			(*ptr)[stopx]=0;
+			(*v_mtext)(x_handle,x,y,&(*ptr)[startx]);
+			(*ptr)[stopx]=tmp;
 		}
 	}
 	return(0);
@@ -469,26 +732,34 @@ static int draw_msgline(PARMBLK *pb){
 static int draw_status(PARMBLK *pb){
 	GRECT area=*(GRECT *) &pb->pb_x;
 
-	area.g_x+=2*StFcw-2;
-	area.g_w-=2*StFcw-2;
+	area.g_x+=2*status_font.cw-2;
+	area.g_w-=2*status_font.cw-2;
 	if(rc_intersect((GRECT *)&pb->pb_xc,&area)){
-		int x=pb->pb_x, y=pb->pb_y;
+		int x=pb->pb_x, y=pb->pb_y, startx, stopx, starty, stopy, i;
+		char tmp;
 
 /* void v_set_text(int font,int height,int color,int effect,int rotate,int out[4])	*/
 		v_set_mode(MD_REPLACE);
-		if(max_w/Fcw>=COLNO-1)
-			v_set_text(ibm_font_id,ibm_font,BLACK,0,0,NULL);
-		else
-			v_set_text(small_font_id,small_font,BLACK,0,0,NULL);
-		x = (x+2*StFcw+6) & ~7;
+		v_set_text(status_font.id,status_font.size,BLACK,0,0,NULL);
+		x = (x+2*status_font.cw+6) & ~7;
 
-		Vsync();
-		area.g_h=StFch;
+		startx=(area.g_x-x)/status_font.cw;
+		starty=(area.g_y-y)/status_font.ch;
+		stopx=(area.g_x+area.g_w+status_font.ch-1-x)/status_font.cw;
+		stopy=(area.g_y+area.g_h+status_font.ch-1-y)/status_font.ch;
+		Max(&startx,0);	/* MAR -- Hmm, area.g_x could end up 1 below x */
+		Max(&stopx,0);
+		x+=startx*status_font.cw;
+		y+=starty*status_font.ch;
+/*		Vsync();*/
+		area.g_h=status_font.ch;
+		for(i=starty;i<min(2,stopy);i++,area.g_y+=status_font.ch,y+=status_font.ch){
 		my_clear_area(&area);
-		v_gtext(x_handle,x,y,      status_line[0]);
-		area.g_y+=StFch;
-		my_clear_area(&area);
-		v_gtext(x_handle,x,y+StFch,status_line[1]);
+			tmp=status_line[i][stopx];
+			status_line[i][stopx]=0;
+			(*v_mtext)(x_handle,x,y,&status_line[i][startx]);
+			status_line[i][stopx]=tmp;
+		}
 	}
 	return(0);
 }
@@ -501,21 +772,21 @@ static int draw_inventory(PARMBLK *pb){
 		Gem_menu_item *it;
 
 		v_set_mode(MD_REPLACE);
-		v_set_text(ibm_font_id,ibm_font,BLACK,0,0,NULL);
+		v_set_text(menu_font.id,menu_font.size,BLACK,0,0,NULL);
 
-		start_line /= Fch;
-		y+=start_line*Fch;
+		start_line /= menu_font.ch;
+		y+=start_line*menu_font.ch;
 		x-=scroll_menu.px_hpos;
 		start_line+=scroll_menu.vpos;
 
 		for(it=invent_list,i=start_line; --i>=0 && it; it=it->Gmi_next);
 
-		i = min((area.g_y-y+area.g_h+Fch-1)/Fch,Anz_inv_lines-start_line);
+		i = min((area.g_y-y+area.g_h+menu_font.ch-1)/menu_font.ch,Anz_inv_lines-start_line);
 
 		Vsync();
-		area.g_h=Fch;
+		area.g_h=menu_font.ch;
 
-		for(;(--i>=0) && it;it=it->Gmi_next,y+=Fch){
+		for(;(--i>=0) && it;it=it->Gmi_next,y+=menu_font.ch){
 			if(it->Gmi_attr)
 				v_set_text(FAIL,FALSE,BLUE,1,FAIL,NULL);	/* Bold */
 			else
@@ -524,22 +795,22 @@ static int draw_inventory(PARMBLK *pb){
 			area.g_y=y;
 			my_clear_area(&area);
 			if((gl=it->Gmi_glyph) != no_glyph){
-				int pla[8], h=min(Fch,16)-1;
+				int pla[8], h=min(menu_font.ch,Tile_heigth)-1;
 
-				pla[0]=pla[2]=(gl%20)*16;	/* x_wert from */
-				pla[1]=pla[3]=(gl/20)*16;	/* y_wert from */
+				pla[0]=pla[2]=(gl%Tiles_per_line)*Tile_width;	/* x_wert from */
+				pla[1]=pla[3]=(gl/Tiles_per_line)*Tile_heigth;	/* y_wert from */
 				pla[4]=pla[6]=x;				/* x_wert to */
 				pla[5]=pla[7]=y;				/* y_wert to */
-				pla[2]+=15;
+				pla[2]+=Tile_width-1;
 				pla[3]+=h;
-				pla[6]+=15;
+				pla[6]+=Tile_heigth-1;
 				pla[7]+=h;
 
 				vro_cpyfm(x_handle,S_ONLY,pla,&Tile_bilder,screen);
 			}
 			if(it->Gmi_identifier)
 				it->Gmi_str[2]=it->Gmi_selected ? (it->Gmi_count == -1L ? '+' : '#') : '-';
-			v_gtext(x_handle,(x+23) & ~7,y,it->Gmi_str);
+			(*v_mtext)(x_handle,(x+23) & ~7,y,it->Gmi_str);
 		}
 	}
 	return(0);
@@ -550,23 +821,22 @@ static int draw_prompt(PARMBLK *pb){
 
 	if(rc_intersect((GRECT *)&pb->pb_xc,&area)){
 		char **ptr=(char **)pb->pb_parm;
-		int x=pb->pb_x, y=pb->pb_y;
+		int x=pb->pb_x, y=pb->pb_y, chardim[4];
 
 /* void v_set_text(int font,int height,int color,int effect,int rotate,int out[4])	*/
 		v_set_mode(MD_TRANS);
-		v_set_text(ibm_font_id,ibm_font,WHITE,0,0,NULL);
+		v_set_text(ibm_font_id,ibm_font,WHITE,0,0,chardim);
 		Vsync();
 		if(planes<4){
 			int pxy[4];
-		
 			v_set_fill(BLACK,2,4,0);
 			rc_grect_to_array(&area,pxy);
 			v_bar(x_handle,pxy);
 		}else
 			my_color_area(&area,LWHITE);
-		v_gtext(x_handle,x,y,*(ptr++));
+		(*v_mtext)(x_handle,x,y,*(ptr++));
 		if(*ptr)
-			v_gtext(x_handle,x,y+Fch,*ptr);
+			(*v_mtext)(x_handle,x,y+chardim[3],*ptr);
 	}
 	return(0);
 }
@@ -636,7 +906,6 @@ mar_set_dir_keys()
 	if(mi_numpad!=mar_iflags_numpad()){
 		OBJECT *z_ob=zz_oblist[DIRECTION];
 		int i;
-	
 		mi_numpad=mar_iflags_numpad();
 		ob_set_hotkey(z_ob,DIRDOWN,'>');
 		ob_set_hotkey(z_ob,DIRUP,'<');
@@ -649,7 +918,8 @@ mar_set_dir_keys()
 int
 mar_gem_init()
 {
-	int i, bild_fehler=FALSE, chardim[4];
+	int i, bild_fehler=FALSE, fsize;
+	char *fname;
 	static MITEM wish_workaround= {FAIL,key(0,'J'),K_CTRL,W_CYCLE,FAIL};
 	OBJECT *z_ob;
 
@@ -667,6 +937,8 @@ mar_gem_init()
 	}
 	MouseBee();
 
+	/* MAR -- 17.Mar 2002 NVDI 3.0 or better uses v_ftext */
+	v_mtext= speedo==3 ? &v_ftext : &v_gtext;
 	for(i=0;i<NHICON;i++)
 		mar_get_rsc_tree(i, &zz_oblist[i]);
 
@@ -674,31 +946,39 @@ mar_gem_init()
 	ob_hide(z_ob,OKABOUT,TRUE);
 	ob_draw_dialog(z_ob,0,0,0,0);
 
-	v_set_text(ibm_font_id,ibm_font,BLACK,0,0,chardim);
-	Fch=chardim[3] ? chardim[3] : 1;
-	Fcw=chardim[2] ? chardim[2] : 1;
+	mar_get_font(NHW_MESSAGE,&fname,&fsize);
+	mar_set_font(NHW_MESSAGE,fname,fsize);
+	mar_get_font(NHW_MAP,&fname,&fsize);
+	mar_set_font(NHW_MAP,fname,fsize);
+	mar_get_font(NHW_STATUS,&fname,&fsize);
+	mar_set_font(NHW_STATUS,fname,fsize);
+	mar_get_font(NHW_MENU,&fname,&fsize);
+	mar_set_font(NHW_MENU,fname,fsize);
+	mar_get_font(NHW_TEXT,&fname,&fsize);
+	mar_set_font(NHW_TEXT,fname,fsize);
 	msg_anz=mar_get_msg_history();
-	msg_width=min(max_w/Fcw-3,100);
-	if(max_w/Fcw>=COLNO-1){
-		status_w=msg_width;
-		StFch=Fch;
-		StFcw=Fcw;
-	}else{
-		v_set_text(small_font_id,small_font,BLACK,0,0,chardim);
-		StFch=chardim[3] ? chardim[3] : 1;
-		StFcw=chardim[2] ? chardim[2] : 1;
-		status_w=min(max_w/StFcw-3,100);
-	}
+	mar_set_msg_visible(mar_get_msg_visible());
+	msg_width=min(max_w/msg_font.cw-3,MSGLEN);
 
+	if(max_w/status_font.cw<COLNO-1)
+		mar_set_fontbyid(NHW_STATUS,small_font_id,-small_font);
+	status_w=min(max_w/status_font.cw-3,MSGLEN);
 	if(planes>0 && planes<9)
 		normal_palette=(short *)m_alloc(3*colors*sizeof(short));
 		get_colors(x_handle,normal_palette, colors);
 	if(planes<4){
-		bild_fehler=depack_img("NH2.IMG",&tile_image);
+		bild_fehler=depack_img(Tilefile?Tilefile:"NH2.IMG",&tile_image);
 	}else{
-		bild_fehler=depack_img("NH16.IMG",&tile_image);
+		bild_fehler=depack_img(Tilefile?Tilefile:"NH16.IMG",&tile_image);
 		if(!bild_fehler)
-			img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+			if(tile_image.planes>1)
+				img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+#if 0
+			else{
+				int mypalette[]={};
+				img_set_colors(x_handle, mypalette, 4);
+			}
+#endif
 	}
 
 	if(bild_fehler ){
@@ -712,13 +992,15 @@ mar_gem_init()
 	mfdb(&Tile_bilder, (int *)tile_image.addr, tile_image.img_w, tile_image.img_h, 1, tile_image.planes);
 	transform_img(&Tile_bilder);
 
-	mfdb(&Map_bild,NULL,COLNO*16, ROWNO*16, 0, planes);
-	Map_bild.fd_addr=(int *)m_alloc(mfdb_size(&Map_bild));
+	mfdb(&Map_bild,NULL,(COLNO-1)*Tile_width, ROWNO*Tile_heigth, 0, planes);
+	mfdb(&FontCol_Bild,NULL,(COLNO-1)*map_font.cw, ROWNO*map_font.ch, 0, planes);
+	Map_bild.fd_addr=(int *)m_alloc(mfdb_size(&Map_bild)>mfdb_size(&FontCol_Bild)?mfdb_size(&Map_bild):mfdb_size(&FontCol_Bild));
+	FontCol_Bild.fd_addr=Map_bild.fd_addr;
 
 	mfdb(&Pet_Mark,pet_mark_data,8, 7, 1, 1);
 	vr_trnfm(x_handle,&Pet_Mark,&Pet_Mark);
 
-	mfdb(&Black_bild,NULL,8, 16, 1, 1);
+	mfdb(&Black_bild,NULL,16, 32, 1, 1);	/* MAR -- 17.Mar 2002 that should cover the biggest map-font */
 	Black_bild.fd_addr=(int *)m_alloc(mfdb_size(&Black_bild));
 	memset(Black_bild.fd_addr,255,mfdb_size(&Black_bild));
 	vr_trnfm(x_handle,&Black_bild,&Black_bild);
@@ -732,20 +1014,20 @@ mar_gem_init()
 	memset(&scroll_menu,0,sizeof(scroll_menu));
 	scroll_menu.scroll=AUTO_SCROLL;
 	scroll_menu.obj=LINESLIST;
-	scroll_menu.px_hline=Fcw;
-	scroll_menu.px_vline=Fch;
+	scroll_menu.px_hline=menu_font.cw;
+	scroll_menu.px_vline=menu_font.ch;
 	scroll_menu.hscroll=
 	scroll_menu.vscroll=1;
-	scroll_menu.tbar_d=2*Fch-2;
+	scroll_menu.tbar_d=2*gr_ch-2;
 
 	mar_set_dir_keys();
 
 	memset(&scroll_map,0,sizeof(scroll_map));
 	scroll_map.scroll=AUTO_SCROLL;
 	scroll_map.obj=ROOT;
-	scroll_map.px_hline=16;	/* width of Cell 8 char or 16 tile */
-	scroll_map.px_vline=16;	/* height of Cell always 16 */
-	scroll_map.hsize=COLNO;
+	scroll_map.px_hline=mar_set_tile_mode(FAIL)?Tile_width:map_font.cw;
+	scroll_map.px_vline=mar_set_tile_mode(FAIL)?Tile_heigth:map_font.ch;
+	scroll_map.hsize=COLNO-1;
 	scroll_map.vsize=ROWNO;
 	scroll_map.hpage=8;
 	scroll_map.vpage=8;
@@ -790,7 +1072,7 @@ mar_exit_nhwindows()
 			mar_destroy_nhwindow(i);
 
 	if(normal_palette){
-		img_set_colors(x_handle,normal_palette,planes);
+		img_set_colors(x_handle,normal_palette,tile_image.planes);
 		null_free(normal_palette);
 	}
 	test_free(tile_image.palette);
@@ -821,9 +1103,11 @@ int x, y;
 		Gem_nhwindow[WIN_MAP].gw_dirty=TRUE;
 }
 
+void mar_cliparound(void);
 void mar_map_curs_weiter(void)
 {
 	mar_curs(map_cursx+1,map_cursy);
+	mar_cliparound();
 }
 
 /************************* about *******************************/
@@ -951,7 +1235,7 @@ mar_more()
 		dial_colors(7,RED,BLACK,RED,RED,BLACK,BLACK,BLACK,BLACK,WHITE,WHITE,WHITE,WHITE,TRUE,TRUE);
 		if(WIN_MESSAGE!=WIN_ERR && (p_w=Gem_nhwindow[WIN_MESSAGE].gw_window)){
 			z_ob->ob_x=p_w->work.g_x;
-			z_ob->ob_y=p_w->curr.g_y+p_w->curr.g_h+Fch;
+			z_ob->ob_y=p_w->curr.g_y+p_w->curr.g_h+gr_ch;
 		}
 		xdialog(z_ob,NULL, NULL, NULL, DIA_LASTPOS, FALSE, DIALOG_MODE);
 		Event_Timer(0,0,TRUE);
@@ -1018,7 +1302,10 @@ mar_set_accelerators()
 	Gem_menu_item *curr;
 
 	for(curr=invent_list;curr;curr=curr->Gmi_next){
-		Max(&Inv_breite,Fcw*(strlen(curr->Gmi_str)+1)+16);
+		int extent[8];
+		v_set_text(menu_font.id,menu_font.size,BLACK,0,0,NULL);
+		vqt_extent(x_handle,curr->Gmi_str,extent);
+		Max(&Inv_breite,extent[4]+Tile_width+menu_font.cw);
 		if(ch && curr->Gmi_accelerator==0 && curr->Gmi_identifier){
 			curr->Gmi_accelerator=ch;
 			curr->Gmi_str[0]=ch;
@@ -1039,6 +1326,9 @@ mar_hol_inv()
 
 void mar_raw_print(const char *);
 
+void mar_set_text_to_rip(winid w){
+	use_rip=TRUE;
+}
 void
 mar_putstr_text(winid window, int attr, const char *str)
 {
@@ -1057,6 +1347,7 @@ mar_putstr_text(winid window, int attr, const char *str)
 	}
 	if(!text_lines){
 		mar_raw_print("No room for Text");
+		return;
 	}
 
 	if(str)
@@ -1077,24 +1368,25 @@ int Anzahl, Breite;
 	OBJECT *z_ob=zz_oblist[LINES];
 	int retval=WIN_DIAL|MODAL|NO_ICONIFY;
 
-	scroll_menu.vpage= (desk.g_h-3*Fch)/Fch;
+	scroll_menu.hsize=0;
+	scroll_menu.vpage= (desk.g_h-3*gr_ch)/scroll_menu.px_vline;
 	if(Anzahl>scroll_menu.vpage){
 		retval |= WD_VSLIDER;
-		if(Breite>max_w-3*Fcw){
+		if(Breite>max_w-3*scroll_menu.px_hline){
 			retval|=WD_HSLIDER;
-			scroll_menu.hpage=(max_w-3*Fcw)/Fcw;
+			scroll_menu.hpage=(max_w-3*scroll_menu.px_hline)/scroll_menu.px_hline;
 			scroll_menu.hpos=0;
-			scroll_menu.hsize=Breite/Fcw;
-			scroll_menu.vpage=(desk.g_h-4*Fch-1)/Fch;
+			scroll_menu.hsize=Breite/scroll_menu.px_hline;
+			scroll_menu.vpage=(desk.g_h-4*gr_ch-1)/scroll_menu.px_vline;
 		}
 		Anzahl=scroll_menu.vpage;
 	}else{
-		if(Breite>max_w-Fcw){
+		if(Breite>max_w-scroll_menu.px_hline){
 			retval|=WD_HSLIDER;
-			scroll_menu.hpage=(max_w-Fcw)/Fcw;
+			scroll_menu.hpage=(max_w-scroll_menu.px_hline)/scroll_menu.px_hline;
 			scroll_menu.hpos=0;
-			scroll_menu.hsize=Breite/Fcw;
-			scroll_menu.vpage= (desk.g_h-4*Fch-1)/Fch;
+			scroll_menu.hsize=Breite/scroll_menu.px_hline;
+			scroll_menu.vpage= (desk.g_h-4*gr_ch-1)/scroll_menu.px_vline;
 			if(Anzahl>scroll_menu.vpage){
 				retval |= WD_VSLIDER;
 				Anzahl=scroll_menu.vpage;
@@ -1107,14 +1399,14 @@ int Anzahl, Breite;
 	if((scroll_menu.vmax=scroll_menu.vsize-scroll_menu.vpage)<0)
 		scroll_menu.vmax=0;
 
-	/* left/right/up 2 pixel border down 2Fch toolbar */
+	/* left/right/up 2 pixel border down 2gr_ch toolbar */
 	z_ob[ROOT].ob_width=z_ob[LINESLIST].ob_width=Breite;
 	z_ob[ROOT].ob_height=
 	z_ob[QLINE].ob_y=
-	z_ob[LINESLIST].ob_height=Fch*Anzahl;
-	z_ob[QLINE].ob_y+=Fch/2;
+	z_ob[LINESLIST].ob_height=scroll_menu.px_vline*Anzahl;
+	z_ob[QLINE].ob_y+=gr_ch/2;
 	z_ob[ROOT].ob_width+=4;
-	z_ob[ROOT].ob_height+=2*Fch+2;
+	z_ob[ROOT].ob_height+=2*gr_ch+2;
 
 	return(retval);
 }
@@ -1125,9 +1417,6 @@ void
 mar_status_dirty()
 {
 	int ccol;
-
-	if(WIN_STATUS != WIN_ERR)
-		Gem_nhwindow[WIN_STATUS].gw_dirty=TRUE;
 
 	ccol=mar_hp_query();
 
@@ -1185,7 +1474,7 @@ const char *str;
 		rest=strcpy(buf,toplines+pos);
 	}else{
 		message_age[msg_max]=TRUE;
-		strcpy(message_line[msg_max],toplines);
+		strncpy(message_line[msg_max],toplines,msg_width);
 		rest=0;
 	}
 
@@ -1206,8 +1495,29 @@ mar_add_status_str(str,line)
 const char *str;
 int line;
 {
-	strncpy(status_line[line],str,status_w-1);
-	status_line[line][status_w-1]='\0';
+	int i,last_diff=-1;
+	GRECT area={0,line*status_font.ch,status_font.cw,status_font.ch};
+	for(i=0;(i<status_w-2) && str[i];i++)
+		if(str[i]!=status_line[line][i]){
+			if(last_diff==-1) area.g_x=i*status_font.cw;
+			else area.g_w+=status_font.cw;
+			last_diff=i;
+			status_line[line][i]=str[i];
+		}else if(last_diff>=0){
+			add_dirty_rect(dr_stat,&area);
+			last_diff=-1;
+			area.g_w=status_font.cw;
+		}
+		for(;i<status_w-1;i++){
+			if(status_line[line][i]){
+				if(last_diff==-1) area.g_x=i*status_font.cw;
+				else area.g_w+=status_font.cw;
+				last_diff=i;
+			}
+			status_line[line][i]=0;
+		}
+	if(last_diff>=0)
+		add_dirty_rect(dr_stat,&area);
 }
 
 /************************* mar_set_menu_title *******************************/
@@ -1318,7 +1628,7 @@ int scroll_top_dialog(char ch){
 	return(FALSE);
 }
 
-#define Text_Init K_Init
+#define Text_Init KM_Init
 
 int
 Text_Handler(xev)
@@ -1326,6 +1636,15 @@ XEVENT *xev;
 {
 	int ev=xev->ev_mwich;
 
+	if(ev&MU_MESAG){
+		int *buf=xev->ev_mmgpbuf, y_wo, i;
+		if(*buf==FONT_CHANGED){
+			if(buf[3]>=0){
+				mar_set_fontbyid(NHW_TEXT,buf[4],buf[5]);
+				FontAck(buf[1],1);
+			}
+		}
+	}
 	if(ev&MU_KEYBD){
 		char ch=(char)(xev->ev_mkreturn&0x00FF);
 
@@ -1347,6 +1666,7 @@ XEVENT *xev;
 
 #define Inv_Init KM_Init
 
+static long count=0;
 int
 Inv_Handler(xev)
 XEVENT *xev;
@@ -1354,17 +1674,22 @@ XEVENT *xev;
 	int ev=xev->ev_mwich;
 	Gem_menu_item *it;
 	GRECT area;
-	static long count=0;
 	OBJECT *z_ob=zz_oblist[LINES];
 
 	ob_pos(z_ob,LINESLIST,&area);
 	if(ev&MU_MESAG){
 		int *buf=xev->ev_mmgpbuf, y_wo, i;
 
+		if(*buf==FONT_CHANGED){
+			if(buf[3]>=0){
+				mar_set_fontbyid(NHW_MENU,buf[4],buf[5]);
+				FontAck(buf[1],1);
+			}
+		}else
 		if(*buf==OBJC_CHANGED && buf[3]==LINESLIST){
 			ob_undostate(z_ob,LINESLIST,SELECTED);
 			mouse(NULL,&y_wo);
-			y_wo=(y_wo-area.g_y)/Fch+scroll_menu.vpos;
+			y_wo=(y_wo-area.g_y)/menu_font.ch+scroll_menu.vpos;
 			for(it=invent_list,i=0;i<y_wo && it;it=it->Gmi_next,i++);
 			if(it->Gmi_identifier){
 				it->Gmi_selected=!it->Gmi_selected;
@@ -1374,10 +1699,10 @@ XEVENT *xev;
 					/*my_close_dialog(Inv_dialog,TRUE);*/
 					send_return();
 				}else{
-					area.g_x=(area.g_x+23+2*Fcw) & ~7;
-					area.g_w=Fcw;
-					area.g_h=Fch;
-					area.g_y+=(y_wo-scroll_menu.vpos)*Fch;
+					area.g_x=(area.g_x+23+2*menu_font.cw) & ~7;
+					area.g_w=menu_font.cw;
+					area.g_h=menu_font.ch;
+					area.g_y+=(y_wo-scroll_menu.vpos)*menu_font.ch;
 					ob_draw_chg(Inv_dialog,LINESLIST,&area,FAIL);
 				}	/* how != PICK_ANY */
 			}	/* identifier */
@@ -1445,7 +1770,6 @@ XEVENT *xev;
 			case MENU_SEARCH:
 				if(Inv_how!=PICK_NONE){
 					char buf[BUFSZ];
-	
 					Gem_getlin("Search for:",buf);
 					if(!*buf || buf[0]=='\033')
 						break;
@@ -1480,8 +1804,8 @@ XEVENT *xev;
 				break;
 			}	/* end switch(ch) */
 			if(Inv_how==PICK_ANY){
-				area.g_x=(area.g_x+23+2*Fcw) & ~7;
-				area.g_w=Fcw;
+				area.g_x=(area.g_x+23+2*menu_font.cw) & ~7;
+				area.g_w=menu_font.cw;
 				ob_draw_chg(Inv_dialog,LINESLIST,&area,FAIL);
 			}
 		}	/* !scroll_Inv_dialog */
@@ -1522,6 +1846,11 @@ GRECT *area;
 
 /************************* mar_display_nhwindow *******************************/
 
+void redraw_winwork(WIN *w,GRECT *area){
+	area->g_x+=w->work.g_x;
+	area->g_y+=w->work.g_y;
+	redraw_window(w,area);
+}
 void mar_menu_set_slider(WIN *p_win){
 	if(p_win){
 		SCROLL *sc=p_win->scroll;
@@ -1550,45 +1879,73 @@ void mar_menu_set_slider(WIN *p_win){
 	}
 }
 
+void recalc_msg_win(GRECT *area){
+	OBJECT *z_ob;
+	z_ob=zz_oblist[MSGWIN];
+	z_ob[MSGLINES].ob_spec.userblk=&ub_msg;
+	z_ob[MSGLINES].ob_width=
+	z_ob[ROOT].ob_width=		(msg_width+3)*msg_font.cw;
+	z_ob[MSGLINES].ob_width-=z_ob[UPMSG].ob_width;
+	z_ob[ROOT].ob_height=
+	z_ob[GRABMSGWIN].ob_height=
+	z_ob[MSGLINES].ob_height=msg_vis*msg_font.ch;
+	z_ob[DNMSG].ob_y=z_ob[GRABMSGWIN].ob_height-z_ob[DNMSG].ob_height;
+	window_border(0,0,0,z_ob->ob_width,z_ob->ob_height, area);
+}
+void recalc_status_win(GRECT *area){
+	OBJECT *z_ob;
+	z_ob=zz_oblist[STATUSLINE];
+	z_ob[ROOT].ob_type=G_USERDEF;
+	z_ob[ROOT].ob_spec.userblk=&ub_status;
+	z_ob[ROOT].ob_width=(status_w+2)*status_font.cw;
+	z_ob[ROOT].ob_height=
+	z_ob[GRABSTATUS].ob_height=2*status_font.ch;
+	z_ob[GRABSTATUS].ob_width=2*status_font.cw-2;
+	window_border(0,0,0,z_ob->ob_width,z_ob->ob_height,area);
+}
 void calc_std_winplace(int which, GRECT *place){
 	static int todo=TRUE;
 	static GRECT me, ma, st;
 
-	if(todo){
+	if(todo || which<0){
 		OBJECT *z_ob;
 		int map_h_off, foo;
 
 		/* First the messagewin */
-		z_ob=zz_oblist[MSGWIN];
-		z_ob[MSGLINES].ob_spec.userblk=&ub_msg;
-		z_ob[MSGLINES].ob_width=
-		z_ob[ROOT].ob_width=		(msg_width+3)*Fcw;
-		z_ob[MSGLINES].ob_width-=z_ob[UPMSG].ob_width;
-		window_border(0,0,0,z_ob->ob_width,z_ob->ob_height, &me);
+		recalc_msg_win(&me);
 
 		/* Now the map */
-		wind_calc(WC_BORDER,MAP_GADGETS,0,0,16*COLNO,16*ROWNO,&foo,&foo,&foo,&map_h_off);
-		map_h_off-=16*ROWNO;
-		window_border(MAP_GADGETS,0,0,16*COLNO,16*ROWNO, &ma);
-		ma.g_y=desk.g_y+me.g_h;
+		wind_calc(WC_BORDER,MAP_GADGETS,0,0,scroll_map.px_hline*(COLNO-1),scroll_map.px_vline*ROWNO,&foo,&foo,&foo,&map_h_off);
+		map_h_off-=scroll_map.px_vline*ROWNO;
+		window_border(MAP_GADGETS,0,0,scroll_map.px_hline*(COLNO-1),scroll_map.px_vline*ROWNO, &ma);
 
 		/* Next the statuswin */
-		z_ob=zz_oblist[STATUSLINE];
-		z_ob[ROOT].ob_type=G_USERDEF;
-		z_ob[ROOT].ob_spec.userblk=&ub_status;
-		z_ob[ROOT].ob_width=(status_w+2)*StFcw;
-		z_ob[ROOT].ob_height=
-		z_ob[GRABSTATUS].ob_height=2*StFch;
-		z_ob[GRABSTATUS].ob_width=2*StFcw-2;
-		window_border(0,0,0,z_ob->ob_width,z_ob->ob_height,&st);
+		recalc_status_win(&st);
 
 		/* And last but not least a final test */
-		ma.g_h=map_h_off+16*ROWNO;
+		ma.g_h=map_h_off+scroll_map.px_vline*ROWNO;
 		while(me.g_h+ma.g_h+st.g_h>=desk.g_h)
-			ma.g_h-=16;
-		st.g_y=desk.g_y+me.g_h+ma.g_h;
+			ma.g_h-=scroll_map.px_vline;
+		/* stack the windows */
+		ma.g_y=me.g_y=st.g_y=desk.g_y;
+		if(status_align){
+			ma.g_y+=st.g_h;
+			if(msg_align){
+				st.g_y+=me.g_h;
+				ma.g_y+=me.g_h;
+			}else{
+				me.g_y+=st.g_h+ma.g_h;
+			}
+		}else{
+			if(msg_align){
+				ma.g_y+=me.g_h;
+			}else{
+				me.g_y+=ma.g_h;
+			}
+			st.g_y+=me.g_h+ma.g_h;
+		}
 
-		todo=FALSE;
+		if(which) todo=FALSE;
 	}
 	switch(which){
 	case NHW_MESSAGE:
@@ -1626,14 +1983,28 @@ winid wind;
 		z_ob=zz_oblist[LINES];
 		scroll_menu.vsize=Anz_text_lines;
 		scroll_menu.vpos=0;
+		if(use_rip){
+			if(!depack_img(planes<4 ? "RIP2.IMG" : "RIP.IMG", &rip_image)){
+				mfdb(&Rip_bild, (int *)rip_image.addr, rip_image.img_w, rip_image.img_h, 1, rip_image.planes);
+				transform_img(&Rip_bild);
+			}
+			ub_lines.ub_code=draw_rip;
+		}else
+			ub_lines.ub_code=draw_lines;
 		z_ob[LINESLIST].ob_spec.userblk=&ub_lines;
 		breite=16;
-		for(i=0;i<Anz_text_lines;i++)
-			Max(&breite,Fcw*strlen(text_lines[i]));
+		v_set_text(text_font.id,text_font.size,BLACK,0,0,NULL);
+		for(i=0;i<Anz_text_lines;i++){
+			int eout[8];
+			vqt_extent(x_handle,text_lines[i],eout);
+			Max(&breite,eout[4]);
+		}
+		scroll_menu.px_vline=text_font.ch;
+		scroll_menu.px_hline=text_font.cw;
 		mar_di_mode=mar_set_inv_win(Anz_text_lines, breite);
 		tmp_button=ob_get_text(z_ob,QLINE,0);
 		ob_set_text(z_ob,QLINE,strOk);
-		ob_undoflag(z_ob,LINESLIST,SELECTABLE);
+		ob_undoflag(z_ob,LINESLIST,TOUCHEXIT);
 		Event_Handler(Text_Init,Text_Handler);
 		if((dlg_info=open_dialog(z_ob,strText, NULL, NULL, mar_ob_mapcenter(z_ob), FALSE, mar_di_mode, FAIL, NULL, NULL))!=NULL){
 			WIN *ptr_win=dlg_info->di_win;
@@ -1658,11 +2029,13 @@ winid wind;
 		scroll_menu.vpos=0;
 		z_ob[LINESLIST].ob_spec.userblk=&ub_inventory;
 		if((Menu_title)&&(wind!=WIN_INVEN))	/* because I sets no Menu_title */
-			Max(&Inv_breite,Fcw*strlen(Menu_title)+16);
-		mar_di_mode=mar_set_inv_win(Anz_inv_lines, Inv_breite);
+			Max(&Inv_breite,gr_cw*strlen(Menu_title)+16);
+		scroll_menu.px_vline=menu_font.ch;
+		scroll_menu.px_hline=menu_font.cw;
+		mar_di_mode=mar_set_inv_win(Anz_inv_lines, Inv_breite, NHW_MENU);
 		tmp_button=ob_get_text(z_ob,QLINE,0);
 		ob_set_text(z_ob,QLINE,Inv_how!=PICK_NONE ? strCancel : strOk );
-		ob_doflag(z_ob,LINESLIST,SELECTABLE);
+		ob_doflag(z_ob,LINESLIST,TOUCHEXIT);
 		Event_Handler(Inv_Init, Inv_Handler);
 		if((Inv_dialog=open_dialog(z_ob,(wind==WIN_INVEN) ? "Inventory" : (Menu_title ? Menu_title : "Staun"), NULL, NULL, mar_ob_mapcenter(z_ob), FALSE, mar_di_mode, FAIL, NULL, NULL))!=NULL){
 			WIN *ptr_win=Inv_dialog->di_win;
@@ -1670,7 +2043,43 @@ winid wind;
 			ptr_win->scroll=&scroll_menu;
 			mar_menu_set_slider(ptr_win);
 			WindowItems(ptr_win,SCROLL_KEYS,scroll_keys);
-			if((d_exit=X_Form_Do(NULL))!=W_ABANDON){
+			do{
+				int y_wo,x_wo,ru_w=1,ru_h=1;
+				GRECT oarea;
+				Gem_menu_item *it;
+				d_exit=X_Form_Do(NULL);
+				if((d_exit&NO_CLICK)==LINESLIST){
+					ob_pos(z_ob,LINESLIST,&oarea);
+					if(mouse(&x_wo,&y_wo) && Inv_how==PICK_ANY){
+						graf_rt_rubberbox(FALSE,x_wo,y_wo,FAIL,FAIL,&oarea,&ru_w,&ru_h,NULL);
+						invert_all_on_page((int)((y_wo-oarea.g_y)/menu_font.ch+scroll_menu.vpos),(ru_h+menu_font.ch-1)/menu_font.ch,0);
+					}else{
+						for(it=invent_list,i=0;i<((y_wo-oarea.g_y)/menu_font.ch+scroll_menu.vpos) && it;it=it->Gmi_next,i++);
+						if(it && it->Gmi_identifier){
+							it->Gmi_selected=!it->Gmi_selected;
+							it->Gmi_count= count==0L ? -1L : count;
+							count = 0L;
+							if(Inv_how!=PICK_ANY)
+								break;
+						}	/* identifier */
+					}
+					oarea.g_x=(oarea.g_x+23+2*menu_font.cw) & ~7;
+					oarea.g_y=y_wo-(y_wo-oarea.g_y)%menu_font.ch;
+					oarea.g_w=menu_font.cw;
+					oarea.g_h=((ru_h+menu_font.ch-1)/menu_font.ch)*menu_font.ch;
+					ob_draw_chg(Inv_dialog,LINESLIST,&oarea,FAIL);
+				}
+				if(Inv_how==PICK_ANY){
+					ob_set_text(Inv_dialog->di_tree,QLINE,strCancel);
+					for(it=invent_list;it;it=it->Gmi_next)
+						if(it->Gmi_identifier && it->Gmi_selected){
+							ob_set_text(Inv_dialog->di_tree,QLINE,strOk);
+							break;
+						}
+					ob_draw_chg(Inv_dialog,QLINE,NULL,FAIL);
+				}
+			}while((d_exit&NO_CLICK)==LINESLIST);
+			if(d_exit!=W_ABANDON){
 				my_close_dialog(Inv_dialog,FALSE);
 				if(d_exit!=W_CLOSED)
 					ob_undostate(z_ob,d_exit&NO_CLICK,SELECTED);
@@ -1682,7 +2091,7 @@ winid wind;
 	case NHW_MAP:
 		if(p_Gw->gw_window==NULL){
 			calc_std_winplace(NHW_MAP,&p_Gw->gw_place);
-			window_border(MAP_GADGETS,0,0,16*COLNO,16*ROWNO, &g_mapmax);
+			window_border(MAP_GADGETS,0,0,Tile_width*(COLNO-1),Tile_heigth*ROWNO, &g_mapmax);
 			p_Gw->gw_window=open_window(md, md, NULL, zz_oblist[NHICON], MAP_GADGETS, TRUE, 128, 128, &g_mapmax, &p_Gw->gw_place, &scroll_map, win_draw_map, NULL, XM_TOP|XM_BOTTOM|XM_SIZE);
 			WindowItems(p_Gw->gw_window,SCROLL_KEYS-1,scroll_keys);	/* ClrHome centers on u */
 			mar_clear_map();
@@ -1695,7 +2104,7 @@ winid wind;
 
 			redraw_window(p_Gw->gw_window,&area);
 
-			dirty_map_area.g_x=COLNO;
+			dirty_map_area.g_x=COLNO-1;
 			dirty_map_area.g_y=ROWNO;
 			dirty_map_area.g_w=
 			dirty_map_area.g_h=0;
@@ -1709,19 +2118,21 @@ winid wind;
 			p_Gw->gw_window=open_window(NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, &p_Gw->gw_place, NULL, mar_draw_window, z_ob, XM_TOP|XM_BOTTOM|XM_SIZE);
 			magx=tmp_magx;
 			window_size(p_Gw->gw_window,&p_Gw->gw_window->curr);
+			p_Gw->gw_dirty=TRUE;
 		}
 
 		if(p_Gw->gw_dirty){
+			ob_pos(zz_oblist[MSGWIN],MSGLINES,&area);
 			while(messages_pro_zug>3){
 				messages_pro_zug-=3;
 				msg_pos+=3;
-				redraw_window(p_Gw->gw_window,NULL);
+				redraw_window(p_Gw->gw_window,&area);
 				mar_more();
 			}
 			msg_pos+=messages_pro_zug;
 			messages_pro_zug=0;
 			if(msg_pos>msg_max) msg_pos=msg_max;
-			redraw_window(p_Gw->gw_window,NULL);
+			redraw_window(p_Gw->gw_window,&area);
 			mar_message_pause=FALSE;
 		}
 		break;
@@ -1732,11 +2143,17 @@ winid wind;
 			magx=0;	/* MAR -- Fake E_GEM to remove Backdropper */
 			p_Gw->gw_window=open_window(NULL, NULL, NULL, NULL, 0, FALSE, 0, 0, NULL, &p_Gw->gw_place, NULL, mar_draw_window, z_ob, XM_TOP|XM_BOTTOM|XM_SIZE);
 			magx=tmp_magx;
-			/* Because 2*StFch is smaller then e_gem expects the minimum win_height */
+			/* Because 2*status_font.ch is smaller then e_gem expects the minimum win_height */
 			p_Gw->gw_window->min_h=z_ob[ROOT].ob_height;
 			window_size(p_Gw->gw_window,&p_Gw->gw_place);
+			p_Gw->gw_dirty=TRUE;
 		}
-		/* Fall thru */
+		while(get_dirty_rect(dr_stat,&area)){
+			area.g_x=(area.g_x+p_Gw->gw_window->work.g_x+2*status_font.cw+6)&~7;
+			area.g_y+=p_Gw->gw_window->work.g_y;
+			redraw_window(p_Gw->gw_window,&area);
+		}
+		break;
 	default:
 		if(p_Gw->gw_dirty)
 			redraw_window(p_Gw->gw_window,NULL);
@@ -1769,23 +2186,29 @@ int type;
 		message_age=(int *)m_alloc(msg_anz*sizeof(int));
 		for(i=0;i<msg_anz;i++){
 			message_age[i]=FALSE;
-			message_line[i]=(char *)m_alloc((msg_width+1)*sizeof(char));
+			message_line[i]=(char *)m_alloc((MSGLEN+1)*sizeof(char));
 			*message_line[i]=0;
 		}
+		dr_msg=new_dirty_rect(10);
+		if (!dr_msg) panic("Memory allocation failure (dr_msg)");
 		break;
 	case NHW_STATUS:
 		status_line=(char **)m_alloc(2*sizeof(char *));
 		for(i=0;i<2;i++){
 			status_line[i]=(char *)m_alloc(status_w*sizeof(char));
-			*status_line[i]=0;
+			memset(status_line[i],0,status_w);
 		}
+		dr_stat=new_dirty_rect(10);
+		if (!dr_stat) panic("Memory allocation failure (dr_stat)");
 		break;
 	case NHW_MAP:
 		map_glyphs=(char **)m_alloc((long)ROWNO*sizeof(char *));
 		for(i=0;i<ROWNO;i++){
-			map_glyphs[i]=(char *)m_alloc((long)(COLNO+1)*sizeof(char));
-			*map_glyphs[i]=map_glyphs[i][COLNO]=0;
+			map_glyphs[i]=(char *)m_alloc((long)COLNO*sizeof(char));
+			*map_glyphs[i]=map_glyphs[i][COLNO-1]=0;
 		}
+		dr_map=new_dirty_rect(10);
+		if (!dr_map) panic("Memory allocation failure (dr_map)");
 
 		mar_clear_map();
 		break;
@@ -1814,12 +2237,15 @@ winid win;
 void
 mar_clear_map()
 {
-	static int pla[8]={0,0,16*COLNO-1,16*ROWNO-1,0,0,16*COLNO-1,16*ROWNO-1};
+	int pla[8];
 	int x,y;
 
-	for(y=0;y<ROWNO;y++) for(x=0;x<COLNO;x++)
+	pla[0]=pla[1]=pla[4]=pla[5]=0;
+	pla[2]=pla[6]=scroll_map.px_hline*(COLNO-1)-1;
+	pla[3]=pla[7]=scroll_map.px_vline*ROWNO-1;
+	for(y=0;y<ROWNO;y++) for(x=0;x<COLNO-1;x++)
 		map_glyphs[y][x]=' ';
-	vro_cpyfm(x_handle, ALL_BLACK,pla,&Tile_bilder,&Map_bild);
+	vro_cpyfm(x_handle, ALL_BLACK,pla,&Tile_bilder,&Map_bild);	/* MAR -- 17.Mar 2002 Hmm, what if FontCol_Bild is bigger? */
 	if(WIN_MAP != WIN_ERR && Gem_nhwindow[WIN_MAP].gw_window)
 		redraw_window(Gem_nhwindow[WIN_MAP].gw_window,NULL);
 }
@@ -1838,6 +2264,7 @@ winid window;
 			free(text_lines[i]);
 		null_free(text_lines);
 		Anz_text_lines=0;
+		use_rip=FALSE;
 		break;
 	case NHW_MENU:
 		Gem_start_menu(window);	/* delete invent_list */
@@ -1879,24 +2306,27 @@ winid window;
 
 /************************* nh_poskey *******************************/
 
+void mar_set_margin(int m){
+	Max(&m,0);
+	Min(&m,min(ROWNO,COLNO));	/* MAR 16.Mar 2002 -- the larger the less sense */
+	scroll_margin=m;
+}
 void
 mar_cliparound()
 {
 	if(WIN_MAP!=WIN_ERR && Gem_nhwindow[WIN_MAP].gw_window){
-		int	breite=max(scroll_map.hpage/4,1), adjust_needed,
-				hoehe=max(scroll_map.vpage/4,1);
-	
+		int	breite=scroll_margin>0 ? scroll_margin : max(scroll_map.hpage/4,1),
+				hoehe=scroll_margin>0 ? scroll_margin : max(scroll_map.vpage/4,1),
+				adjust_needed;
 		adjust_needed=FALSE;
 		if ((map_cursx < scroll_map.hpos + breite) || (map_cursx >= scroll_map.hpos + scroll_map.hpage - breite)){
-			scroll_map.hpos=map_cursx - 2*breite;
+			scroll_map.hpos=map_cursx - scroll_map.hpage/2;
 			adjust_needed=TRUE;
 		}
-	
 		if ((map_cursy < scroll_map.vpos + hoehe) || (map_cursy >= scroll_map.vpos + scroll_map.vpage - hoehe)){
-			scroll_map.vpos=map_cursy - 2*hoehe;
+			scroll_map.vpos=map_cursy - scroll_map.vpage/2;
 			adjust_needed=TRUE;
 		}
-	
 		if(adjust_needed)
 			scroll_window(Gem_nhwindow[WIN_MAP].gw_window,WIN_SCROLL,NULL);
 	}
@@ -1962,9 +2392,14 @@ mar_nh_poskey(x, y, mod)
 			kpad = mar_iflags_numpad()==1 ? numpad : keypad;
 			if (shift & K_SHIFT)
 				ch = kpad[scan - KEYPADLO].shift;
-			else if (shift & K_CTRL)
+			else if (shift & K_CTRL){
+				if(scan>=0x67 && scan<=0x6f && scan!=0x6b){
+					send_key(kpad[scan - KEYPADLO].normal);
+					ch = 'g';
+				}else{
 				ch = kpad[scan - KEYPADLO].cntrl;
-			else
+				}
+			}else
 				ch = kpad[scan - KEYPADLO].normal;
 		}
 		if(scan==SCANHOME)
@@ -1978,6 +2413,10 @@ mar_nh_poskey(x, y, mod)
 			draw_cursor=!draw_cursor;
 			mar_curs(map_cursx,map_cursy);
 			mar_display_nhwindow(WIN_MAP);
+		}else if(scan == SCANF4){	/* Font-Selector */
+			if(!CallFontSelector(0,FAIL,FAIL,FAIL,FAIL)){
+				xalert(1,1,X_ICN_ALERT,NULL,SYS_MODAL,BUTTONS_RIGHT,TRUE,"Hello","Fontselector not available!",NULL);
+			}
 		}else if(!ch && shift&K_CTRL && scan==-57){
 			/* MAR -- nothing ignore Ctrl-Alt-Clr/Home == MagiC's restore screen */
 		}else{
@@ -1994,7 +2433,7 @@ mar_nh_poskey(x, y, mod)
 		WIN *akt_win=window_find(ex,ey);
 
 		if(WIN_MAP != WIN_ERR && akt_win==Gem_nhwindow[WIN_MAP].gw_window){
-			*x=max(min((ex-akt_win->work.g_x)/scroll_map.px_hline+scroll_map.hpos,COLNO),0)+1;
+			*x=max(min((ex-akt_win->work.g_x)/scroll_map.px_hline+scroll_map.hpos,COLNO-1),0)+1;
 			*y=max(min((ey-akt_win->work.g_y)/scroll_map.px_vline+scroll_map.vpos,ROWNO),0);
 			*mod=xev.ev_mmobutton;
 			retval=0;
@@ -2037,8 +2476,8 @@ mar_nh_poskey(x, y, mod)
 					break;
 				case '3':
 					draw_cursor=!draw_cursor;
-					if(WIN_MAP != WIN_ERR && Gem_nhwindow[WIN_MAP].gw_window)
-						redraw_window(Gem_nhwindow[WIN_MAP].gw_window,NULL);
+					mar_curs(map_cursx,map_cursy);
+					mar_display_nhwindow(WIN_MAP);
 					break;
 				default:
 				}
@@ -2050,6 +2489,24 @@ mar_nh_poskey(x, y, mod)
 			break;	/* MN_SELECTED */
 		case WM_CLOSED:
 			WindowHandler(W_ICONIFYALL,NULL,NULL);
+			break;
+		case AP_TERM:
+			retval='S';
+			break;
+		case FONT_CHANGED:
+			if(buf[3]>=0){
+				if(buf[3]==Gem_nhwindow[WIN_MESSAGE].gw_window->handle){
+					mar_set_fontbyid(NHW_MESSAGE,buf[4],buf[5]);
+					mar_display_nhwindow(WIN_MESSAGE);
+				}else if(buf[3]==Gem_nhwindow[WIN_MAP].gw_window->handle){
+					mar_set_fontbyid(NHW_MAP,buf[4],buf[5]);
+					mar_display_nhwindow(WIN_MAP);
+				}else if(buf[3]==Gem_nhwindow[WIN_STATUS].gw_window->handle){
+					mar_set_fontbyid(NHW_STATUS,buf[4],buf[5]);
+					mar_display_nhwindow(WIN_STATUS);
+				}
+				FontAck(buf[1],1);
+			}
 			break;
 		default:
 			break;
@@ -2079,10 +2536,12 @@ Gem_delay_output()
 int
 Gem_doprev_message()
 {
-	if(msg_pos>2)	msg_pos--;
+	if(msg_pos>2){
+		msg_pos--;
 	if(WIN_MESSAGE != WIN_ERR)
 		Gem_nhwindow[WIN_MESSAGE].gw_dirty=TRUE;
 	mar_display_nhwindow(WIN_MESSAGE);
+	}
 	return(0);
 }
 
@@ -2096,21 +2555,23 @@ int tiles;
 {
 	static int tile_mode=TRUE;
 	static GRECT prev;
-	WIN *z_w=Gem_nhwindow[WIN_MAP].gw_window;
+	WIN *z_w=WIN_MAP!=WIN_ERR ? Gem_nhwindow[WIN_MAP].gw_window : NULL;
 
-	if(tiles<0) return(tile_mode);
+	if(tiles<0)
+		return(tile_mode);
+	else if(!z_w)
+		tile_mode=tiles;
+	else if(tile_mode==tiles || (mar_set_rogue(FAIL) && tiles))
+			return(FAIL);
 	else{
 		GRECT tmp;
 
-		if(tile_mode==tiles || (mar_set_rogue(FAIL) && tiles) || !z_w)
-			return(FAIL);
-
 		tile_mode=tiles;
-		map_cell_width= tiles ? 16 : Fcw;
-		scroll_map.px_hline=map_cell_width;
-		scroll_map.px_vline=tiles ? 16 : Fch;
-		window_border(MAP_GADGETS,0,0,map_cell_width*COLNO,16*ROWNO, &tmp);
+		scroll_map.px_hline= tiles ? Tile_width : map_font.cw;
+		scroll_map.px_vline= tiles ? Tile_heigth : map_font.ch;
+		window_border(MAP_GADGETS,0,0,scroll_map.px_hline*(COLNO-1),scroll_map.px_vline*ROWNO, &tmp);
 		z_w->max.g_w=tmp.g_w;
+		z_w->max.g_h=tmp.g_h;
 		if(tiles)
 			z_w->curr=prev;
 		else
@@ -2160,33 +2621,26 @@ mar_print_glyph(window, x, y, gl)
 winid window;
 int x, y, gl;
 {
+	if(window != WIN_ERR && window==WIN_MAP){
 	static int pla[8];
 
-	if(window != WIN_ERR && window==WIN_MAP){
-		Min(&dirty_map_area.g_x,x);
-		Min(&dirty_map_area.g_y,y);
-		Max(&dirty_map_area.g_w,x);
-		Max(&dirty_map_area.g_h,y);
-		Gem_nhwindow[window].gw_dirty=TRUE;
-		if(mar_set_tile_mode(FAIL)){
-			pla[2]=pla[0]=(gl%20)*16;
-			pla[3]=pla[1]=(gl/20)*16;
-			pla[2]+=15;
-			pla[3]+=15;
-			pla[6]=pla[4]=16*x;	/* x_wert to */
-			pla[7]=pla[5]=16*y;	/* y_wert to */
-			pla[6]+=15;
-			pla[7]+=15;
+			pla[2]=pla[0]=(gl%Tiles_per_line)*Tile_width;
+			pla[3]=pla[1]=(gl/Tiles_per_line)*Tile_heigth;
+			pla[2]+=Tile_width-1;
+			pla[3]+=Tile_heigth-1;
+			pla[6]=pla[4]=Tile_width*x;	/* x_wert to */
+			pla[7]=pla[5]=Tile_heigth*y;	/* y_wert to */
+			pla[6]+=Tile_width-1;
+			pla[7]+=Tile_heigth-1;
 
 			vro_cpyfm(x_handle, gl!=-1 ? S_ONLY : ALL_BLACK, pla, &Tile_bilder, &Map_bild);
 		}
 	}
-}
 
 void
 mar_print_char(window, x, y, ch, col)
 winid window;
-int x, y; 
+int x, y;
 char ch;
 int col;
 {
@@ -2198,15 +2652,15 @@ int col;
 
 		pla[0]=
 		pla[1]=0;
-		pla[2]=Fcw-1;
-		pla[3]=Fch-1;
-		pla[6]=pla[4]=Fcw*x;
-		pla[7]=pla[5]=Fch*y;
-		pla[6]+=Fcw-1;
-		pla[7]+=Fch-1;
+		pla[2]=map_font.cw-1;
+		pla[3]=map_font.ch-1;
+		pla[6]=pla[4]=map_font.cw*x;
+		pla[7]=pla[5]=map_font.ch*y;
+		pla[6]+=map_font.cw-1;
+		pla[7]+=map_font.ch-1;
 		colindex[0]=gem_color[col];
 		colindex[1]=WHITE;
-		vrt_cpyfm(x_handle,MD_REPLACE,pla,&Black_bild,&Map_bild,colindex);
+		vrt_cpyfm(x_handle,MD_REPLACE,pla,&Black_bild,&FontCol_Bild,colindex);
 	}
 }
 
@@ -2226,9 +2680,9 @@ char *input;
 
 	z_ob[LGPROMPT].ob_type=G_USERDEF;
 	z_ob[LGPROMPT].ob_spec.userblk=&ub_prompt;
-	z_ob[LGPROMPT].ob_height=2*Fch;
+	z_ob[LGPROMPT].ob_height=2*gr_ch;
 
-	length=z_ob[LGPROMPT].ob_width/Fcw;
+	length=z_ob[LGPROMPT].ob_width/gr_cw;
 	if(strlen(ques)>length){
 		tmp=ques+length;
 		while(*tmp!=' ' && tmp>=ques){
@@ -2401,9 +2855,9 @@ char def;
 	if(strstr(query,"irect"))
 		return(mar_ask_direction());
 
-	len=min(strlen(query),(max_w-8*Fcw)/Fcw);
-	z_ob[ROOT].ob_width=(len+8)*Fcw;
-	z_ob[YNPROMPT].ob_width=Fcw*len+8;
+	len=min(strlen(query),(max_w-8*gr_cw)/gr_cw);
+	z_ob[ROOT].ob_width=(len+8)*gr_cw;
+	z_ob[YNPROMPT].ob_width=gr_cw*len+8;
 	tmp=ob_get_text(z_ob,YNPROMPT,0);
 	ob_set_text(z_ob,YNPROMPT,mar_copy_of(query));
 
@@ -2437,11 +2891,11 @@ char def;
 		}
 
 		z_ob[SOMECHARS].ob_width=z_ob[YN1+i].ob_x+8;
-		z_ob[SOMECHARS].ob_height=z_ob[YN1+i].ob_y+Fch+Fch/2;
-		Max((int *)&z_ob[ROOT].ob_width,z_ob[SOMECHARS].ob_width+4*Fcw);
-		z_ob[ROOT].ob_height=z_ob[SOMECHARS].ob_height+4*Fch;
+		z_ob[SOMECHARS].ob_height=z_ob[YN1+i].ob_y+gr_ch+gr_ch/2;
+		Max((int *)&z_ob[ROOT].ob_width,z_ob[SOMECHARS].ob_width+4*gr_cw);
+		z_ob[ROOT].ob_height=z_ob[SOMECHARS].ob_height+4*gr_ch;
 		if(strchr(resp,'#'))
-			z_ob[ROOT].ob_height=z_ob[YNOK].ob_y+2*Fch;
+			z_ob[ROOT].ob_height=z_ob[YNOK].ob_y+2*gr_ch;
 
 		for(i+=YN1;i<(YNN+1);i+=2){
 			ob_hide(z_ob,i,TRUE);
@@ -2452,11 +2906,11 @@ char def;
 		ob_hide(z_ob,ANYCHAR,FALSE);
 		ob_hide(z_ob,YNOK,TRUE);
 		ob_hide(z_ob,COUNT,TRUE);
-		z_ob[ANYCHAR].ob_height=2*Fch;
+		z_ob[ANYCHAR].ob_height=2*gr_ch;
 		z_ob[CHOSENCH].ob_y=
-		z_ob[CHOSENCH+1].ob_y=Fch/2;
-		z_ob[ROOT].ob_width=max(z_ob[YNPROMPT].ob_width+z_ob[YNPROMPT].ob_x,z_ob[ANYCHAR].ob_width+z_ob[ANYCHAR].ob_x)+2*Fcw;
-		z_ob[ROOT].ob_height=z_ob[ANYCHAR].ob_height+z_ob[ANYCHAR].ob_y+Fch/2;
+		z_ob[CHOSENCH+1].ob_y=gr_ch/2;
+		z_ob[ROOT].ob_width=max(z_ob[YNPROMPT].ob_width+z_ob[YNPROMPT].ob_x,z_ob[ANYCHAR].ob_width+z_ob[ANYCHAR].ob_x)+2*gr_cw;
+		z_ob[ROOT].ob_height=z_ob[ANYCHAR].ob_height+z_ob[ANYCHAR].ob_y+gr_ch/2;
 		*ob_get_text(z_ob,CHOSENCH,0)='?';
 		Event_Handler(any_init,any_handler);
 	}
