@@ -2401,6 +2401,7 @@ dotravel()
 #ifdef PORT_DEBUG
 # ifdef WIN32CON
 extern void NDECL(win32con_debug_keystrokes);
+extern void NDECL(win32con_author_info);
 # endif
 
 int
@@ -2417,6 +2418,7 @@ wiz_port_debug()
 	} menu_selections[] = {
 #ifdef WIN32CON
 		{"test win32 keystrokes", win32con_debug_keystrokes},
+		{"show keystroke handler information", win32con_handler_info},
 #endif
 		{(char *)0, (void NDECL((*)))0}		/* array terminator */
 	};

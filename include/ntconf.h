@@ -133,6 +133,7 @@ extern void NDECL(win32_abort);
 extern void FDECL(nttty_preference_update, (const char *));
 extern void NDECL(toggle_mouse_support);
 extern void FDECL(map_subkeyvalue, (char *));
+extern void NDECL(load_keyboard_handler);
 #endif
 
 #include <fcntl.h>
@@ -184,5 +185,11 @@ int  _RTLENTRY _EXPFUNC read  (int __handle, void _FAR *__buf, unsigned __len);
 #endif
 
 extern int FDECL(set_win32_option, (const char *, const char *));
+#ifdef WIN32CON
+#define LEFTBUTTON  FROM_LEFT_1ST_BUTTON_PRESSED
+#define RIGHTBUTTON RIGHTMOST_BUTTON_PRESSED
+#define MIDBUTTON   FROM_LEFT_2ND_BUTTON_PRESSED
+#define MOUSEMASK (LEFTBUTTON | RIGHTBUTTON | MIDBUTTON)
+#endif /* WIN32CON */
 
 #endif /* NTCONF_H */

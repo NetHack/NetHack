@@ -262,6 +262,10 @@ struct instance_flags {
 
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
+#ifdef WIN32CON
+#define MAX_ALTKEYHANDLER 25
+	char	 altkeyhandler[MAX_ALTKEYHANDLER];
+#endif
 };
 
 /*

@@ -15,7 +15,6 @@
 #include <sys\types.h>
 #include <sys\stat.h>
 #include "win32api.h"
-#include <wincon.h>
 
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
@@ -53,6 +52,39 @@ INPUT_RECORD ir;
 int GUILaunched;
 static BOOL FDECL(CtrlHandler, (DWORD));
 
+/* dynamic keystroke handling .DLL support */
+typedef int (__stdcall * PROCESS_KEYSTROKE)(
+    INPUT_RECORD *,
+    boolean *,
+    BOOLEAN_P,
+    int
+);
+
+typedef int (__stdcall * NHKBHIT)(
+    HANDLE,
+    INPUT_RECORD *
+);
+
+typedef int (__stdcall * SOURCEWHERE)(
+    char **
+);
+
+typedef int (__stdcall * SOURCEAUTHOR)(
+    char **
+);
+
+typedef int (__stdcall * KEYHANDLERNAME)(
+    char **,
+    int
+);
+
+HANDLE hLibrary;
+PROCESS_KEYSTROKE pProcessKeystroke;
+NHKBHIT pNHkbhit;
+SOURCEWHERE pSourceWhere;
+SOURCEAUTHOR pSourceAuthor;
+KEYHANDLERNAME pKeyHandlerName;
+
 #ifndef CLR_MAX
 #define CLR_MAX 16
 #endif
@@ -79,11 +111,6 @@ static char noninvertedcurrentcolor = FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND
 static char currenthilite = 0;
 static char currentbackground = 0;
 static boolean colorchange = TRUE;
-
-#define LEFTBUTTON  FROM_LEFT_1ST_BUTTON_PRESSED
-#define RIGHTBUTTON RIGHTMOST_BUTTON_PRESSED
-#define MIDBUTTON   FROM_LEFT_2ND_BUTTON_PRESSED
-#define MOUSEMASK (LEFTBUTTON | RIGHTBUTTON | MIDBUTTON)
 
 /*
  * Called after returning from ! or ^Z
@@ -199,11 +226,11 @@ nttty_open()
         HANDLE hStdOut;
         DWORD cmode;
         long mask;
-        
+
+	load_keyboard_handler();
 	/* Initialize the function pointer that points to
          * the kbhit() equivalent, in this TTY case nttty_kbhit()
          */
-
 	nt_kbhit = nttty_kbhit;
 
         /* The following 6 lines of code were suggested by 
@@ -252,6 +279,26 @@ nttty_open()
 	get_scr_size();
 }
 
+int process_keystroke(ir, valid, numberpad, portdebug)
+INPUT_RECORD *ir;
+boolean *valid;
+boolean numberpad;
+int portdebug;
+{
+	int ch = pProcessKeystroke(ir, valid, numberpad, portdebug);
+	/* check for override */
+	if (ch && ch < MAX_OVERRIDES && key_overrides[ch])
+		ch = key_overrides[ch];
+	return ch;
+}
+
+int
+nttty_kbhit()
+{
+	return pNHkbhit(hConIn, &ir);
+}
+
+
 void
 get_scr_size()
 {
@@ -273,162 +320,6 @@ get_scr_size()
 	}
 }
 
-
-/*
- *  Keyboard translation tables.
- *  (Adopted from the MSDOS port)
- */
-
-#define KEYPADLO	0x47
-#define KEYPADHI	0x53
-
-#define PADKEYS 	(KEYPADHI - KEYPADLO + 1)
-#define iskeypad(x)	(KEYPADLO <= (x) && (x) <= KEYPADHI)
-
-/*
- * Keypad keys are translated to the normal values below.
- * Shifted keypad keys are translated to the
- *    shift values below.
- */
-
-static const struct pad {
-	uchar normal, shift, cntrl;
-} keypad[PADKEYS] = {
-			{'y', 'Y', C('y')},		/* 7 */
-			{'k', 'K', C('k')},		/* 8 */
-			{'u', 'U', C('u')},		/* 9 */
-			{'m', C('p'), C('p')},		/* - */
-			{'h', 'H', C('h')},		/* 4 */
-			{'g', 'G', 'g'},		/* 5 */
-			{'l', 'L', C('l')},		/* 6 */
-			{'+', 'P', C('p')},		/* + */
-			{'b', 'B', C('b')},		/* 1 */
-			{'j', 'J', C('j')},		/* 2 */
-			{'n', 'N', C('n')},		/* 3 */
-			{'i', 'I', C('i')},		/* Ins */
-			{'.', ':', ':'}			/* Del */
-}, numpad[PADKEYS] = {
-			{'7', M('7'), '7'},		/* 7 */
-			{'8', M('8'), '8'},		/* 8 */
-			{'9', M('9'), '9'},		/* 9 */
-			{'m', C('p'), C('p')},		/* - */
-			{'4', M('4'), '4'},		/* 4 */
-			{'g', 'G', 'g'},		/* 5 */
-			{'6', M('6'), '6'},		/* 6 */
-			{'+', 'P', C('p')},		/* + */
-			{'1', M('1'), '1'},		/* 1 */
-			{'2', M('2'), '2'},		/* 2 */
-			{'3', M('3'), '3'},		/* 3 */
-			{'i', 'I', C('i')},		/* Ins */
-			{'.', ':', ':'}			/* Del */
-};
-
-#define inmap(x,vk)	(((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
-
-static BYTE KeyState[256];
- 
-int FDECL(process_keystroke, (INPUT_RECORD *ir, boolean *valid, int portdebug));
-
-int process_keystroke(ir, valid, portdebug)
-INPUT_RECORD *ir;
-boolean *valid;
-int portdebug;
-{
-	int metaflags = 0, k = 0;
-	int keycode, vk;
-	unsigned char ch, pre_ch, mk = 0;
-	unsigned short int scan;
-	unsigned long shiftstate;
-	int altseq = 0;
-	const struct pad *kpad;
-
-	shiftstate = 0L;
-	ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
-	scan  = ir->Event.KeyEvent.wVirtualScanCode;
-	vk    = ir->Event.KeyEvent.wVirtualKeyCode;
-	keycode = MapVirtualKey(vk, 2);
-	shiftstate = ir->Event.KeyEvent.dwControlKeyState;
-	KeyState[VK_SHIFT]   = (shiftstate & SHIFT_PRESSED) ? 0x81 : 0;
-	KeyState[VK_CONTROL] = (shiftstate & (LEFT_CTRL_PRESSED|RIGHT_CTRL_PRESSED)) ?
-				0x81 : 0;
-	KeyState[VK_CAPITAL] = (shiftstate & CAPSLOCK_ON) ? 0x81 : 0;
-
-	if (shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)) {
-		if (ch || inmap(keycode,vk)) altseq = 1;
-		else altseq = -1;	/* invalid altseq */
-	}
-	if (ch || (iskeypad(scan)) || (altseq > 0))
-		*valid = TRUE;
-	/* if (!valid) return 0; */
-    	/*
-	 * shiftstate can be checked to see if various special
-         * keys were pressed at the same time as the key.
-         * Currently we are using the ALT & SHIFT & CONTROLS.
-         *
-         *           RIGHT_ALT_PRESSED, LEFT_ALT_PRESSED,
-         *           RIGHT_CTRL_PRESSED, LEFT_CTRL_PRESSED,
-         *           SHIFT_PRESSED,NUMLOCK_ON, SCROLLLOCK_ON,
-         *           CAPSLOCK_ON, ENHANCED_KEY
-         *
-         * are all valid bit masks to use on shiftstate.
-         * eg. (shiftstate & LEFT_CTRL_PRESSED) is true if the
-         *      left control key was pressed with the keystroke.
-         */
-        if (iskeypad(scan)) {
-            kpad = iflags.num_pad ? numpad : keypad;
-            if (shiftstate & SHIFT_PRESSED) {
-                ch = kpad[scan - KEYPADLO].shift;
-            }
-            else if (shiftstate & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) {
-                ch = kpad[scan - KEYPADLO].cntrl;
-            }
-            else {
-                ch = kpad[scan - KEYPADLO].normal;
-            }
-        }
-        else if (altseq > 0) { /* ALT sequence */
-		if (vk == 0xBF) ch = M('?');
-		else ch = M(tolower(keycode));
-        }
-	/* Attempt to work better with international keyboards. */
-	else {
-		WORD chr[2];
-		k = ToAscii(vk, scan, KeyState, chr, 0);
-		if (k <= 2)
-		    switch(k) {
-			case 2:  /* two characters */
-				ch = (unsigned char)chr[1];
-				*valid = TRUE;
-				break;
-			case 1:  /* one character */
-				ch = (unsigned char)chr[0];
-				*valid = TRUE;
-				break;
-			case 0:  /* no translation */
-			default: /* negative */
-				*valid = FALSE;
-		    }
-	}
-	/* check for override */
-	if (ch && ch < MAX_OVERRIDES && key_overrides[ch]) {
-		mk = ch;
-		ch = key_overrides[ch];
-		*valid = TRUE;
-	}
-
-	if (ch == '\r') ch = '\n';
-#ifdef PORT_DEBUG
-	if (portdebug) {
-		char buf[BUFSZ];
-		Sprintf(buf,
-	"PORTDEBUG: ch=%u, sc=%u, vk=%d, pre=%d, sh=0x%X, ta=%d, mk=%d (ESC to end)\n",
-			ch, scan, vk, pre_ch, shiftstate, k, mk);
-		xputs(buf);
-	}
-#endif
-	return ch;
-}
-
 int
 tgetch()
 {
@@ -439,7 +330,7 @@ tgetch()
 	while (!valid) {
 	   ReadConsoleInput(hConIn,&ir,1,&count);
 	   if ((ir.EventType == KEY_EVENT) && ir.Event.KeyEvent.bKeyDown)
-		ch = process_keystroke(&ir, &valid, 0);
+		ch = process_keystroke(&ir, &valid, iflags.num_pad, 0);
 	}
 	return ch;
 }
@@ -458,7 +349,7 @@ int *x, *y, *mod;
 	    ReadConsoleInput(hConIn,&ir,1,&count);
 	    if (count > 0) {
 		if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
-			keystroke = process_keystroke(&ir, &valid, 0);
+			keystroke = process_keystroke(&ir, &valid, iflags.num_pad, 0);
 			if (valid) return keystroke;
 		} else if (ir.EventType == MOUSE_EVENT) {
 			if ((ir.Event.MouseEvent.dwEventFlags == 0) &&
@@ -490,54 +381,6 @@ int *x, *y, *mod;
 	/* NOTREACHED */
 	*mod = 0;
 	return 0;
-}
-
-int
-nttty_kbhit()
-{
-	int done = 0;	/* true =  "stop searching"        */
-	int retval;	/* true =  "we had a match"        */
-	DWORD count;
-	unsigned short int scan;
-	unsigned char ch;
-	unsigned long shiftstate;
-	int altseq = 0, keycode, vk;
-	done = 0;
-	retval = 0;
-	while (!done)
-	{
-	    count = 0;
-	    PeekConsoleInput(hConIn,&ir,1,&count);
-	    if (count > 0) {
-		if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
-			ch    = ir.Event.KeyEvent.uChar.AsciiChar;
-			scan  = ir.Event.KeyEvent.wVirtualScanCode;
-			shiftstate = ir.Event.KeyEvent.dwControlKeyState;
-			vk = ir.Event.KeyEvent.wVirtualKeyCode;
-			keycode = MapVirtualKey(vk, 2);
-			if (shiftstate & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)) {
-				if  (ch || inmap(keycode,vk)) altseq = 1;
-				else altseq = -1;	/* invalid altseq */
-			}
-			if (ch || iskeypad(scan) || altseq) {
-				done = 1;	    /* Stop looking         */
-				retval = 1;         /* Found what we sought */
-			}
-		}
-		else if ((ir.EventType == MOUSE_EVENT &&
-		  (ir.Event.MouseEvent.dwButtonState & MOUSEMASK))) {
-			done = 1;
-			retval = 1;
-		}
-
-		else /* Discard it, it's an insignificant event */
-			ReadConsoleInput(hConIn,&ir,1,&count);
-		} else  /* There are no events in console event queue */ {
-		done = 1;	  /* Stop looking               */
-		retval = 0;
-	    }
-	}
-	return retval;
 }
 
 void
@@ -945,6 +788,34 @@ win32con_debug_keystrokes()
 	}
 	(void)doredraw();
 }
+void
+win32con_handler_info()
+{
+	char *buf;
+	int ci;
+	if (!pSourceAuthor && !pSourceWhere)
+	    pline("Keyboard handler source info and author unavailable.");
+	else {
+		if (pKeyHandlerName && pKeyHandlerName(&buf, 1)) {
+			xputs("\n");
+			xputs("Keystroke handler loaded: \n    ");
+			xputs(buf);
+		}
+		if (pSourceAuthor && pSourceAuthor(&buf)) {
+			xputs("\n");
+			xputs("Keystroke handler Author: \n    ");
+			xputs(buf);
+		}
+		if (pSourceWhere && pSourceWhere(&buf)) {
+			xputs("\n");
+			xputs("Keystroke handler source code available at:\n    ");
+			xputs(buf);
+		}
+		xputs("\nPress any key to resume.");
+		ci=nhgetch();
+		(void)doredraw();
+	}
+}
 #endif
 
 void
@@ -975,6 +846,66 @@ register char *op;
 	if (idx >= MAX_OVERRIDES || idx < 0 || val >= MAX_OVERRIDES || val < 1)
 		return;
 	key_overrides[idx] = val;
+}
+
+void
+load_keyboard_handler()
+{
+	char suffx[] = ".dll";	
+#define MAX_DLLNAME 25
+	char kh[MAX_ALTKEYHANDLER];
+	if (iflags.altkeyhandler[0]) {
+		if (hLibrary) {	/* already one loaded apparently */
+			FreeLibrary(hLibrary);
+			hLibrary = (HANDLE)0;
+		}
+		(void) strncpy(kh, iflags.altkeyhandler,
+				(MAX_ALTKEYHANDLER - sizeof suffx) - 1);
+		kh[(MAX_ALTKEYHANDLER - sizeof suffx) - 1] = '\0';
+		Strcat(kh, suffx);
+		hLibrary = LoadLibrary(kh);
+		if (hLibrary) {
+		   pProcessKeystroke =
+		   (PROCESS_KEYSTROKE) GetProcAddress (hLibrary, TEXT ("ProcessKeystroke"));
+		   pNHkbhit =
+		   (NHKBHIT) GetProcAddress (hLibrary, TEXT ("NHkbhit"));
+		   pSourceWhere =
+		   (SOURCEWHERE) GetProcAddress (hLibrary, TEXT ("SourceWhere"));
+		   pSourceAuthor =
+		   (SOURCEAUTHOR) GetProcAddress (hLibrary, TEXT ("SourceAuthor"));
+		   pKeyHandlerName =
+		   (KEYHANDLERNAME) GetProcAddress (hLibrary, TEXT ("KeyHandlerName"));
+		}
+	}
+	if (!pProcessKeystroke || !pNHkbhit) {
+		if (hLibrary) {
+			FreeLibrary(hLibrary);
+			hLibrary = (HANDLE)0;
+		}
+		hLibrary = LoadLibrary("nhdefkey.dll");
+		if (hLibrary) {
+		   pProcessKeystroke =
+		   (PROCESS_KEYSTROKE) GetProcAddress (hLibrary, TEXT ("ProcessKeystroke"));
+		   pNHkbhit =
+		   (NHKBHIT) GetProcAddress (hLibrary, TEXT ("NHkbhit"));
+		   pSourceWhere =
+		   (SOURCEWHERE) GetProcAddress (hLibrary, TEXT ("SourceWhere"));
+		   pSourceAuthor =
+		   (SOURCEAUTHOR) GetProcAddress (hLibrary, TEXT ("SourceAuthor"));
+		   pKeyHandlerName =
+		   (KEYHANDLERNAME) GetProcAddress (hLibrary, TEXT ("KeyHandlerName"));
+		}
+	}
+	if (!pProcessKeystroke || !pNHkbhit) {
+		if (!hLibrary)
+			raw_printf("\nNetHack was unable to load keystroke handler.\n");
+		else {
+			FreeLibrary(hLibrary);
+			hLibrary = (HANDLE)0;
+			raw_printf("\nNetHack keystroke handler is invalid.\n");
+		}
+		exit(EXIT_FAILURE);
+	}
 }
 
 #endif /* WIN32CON */

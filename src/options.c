@@ -208,6 +208,7 @@ static struct Comp_Opt
 						8, DISP_IN_GAME },
 	{ "align_message", "message window alignment", 20, DISP_IN_GAME }, 	/*WC*/
 	{ "align_status", "status window alignment", 20, DISP_IN_GAME }, 	/*WC*/
+	{ "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
 	{ "boulder",  "the symbol to use for displaying boulders",
 						1, SET_IN_GAME },
 	{ "catname",  "the name of your (first) cat (e.g., catname:Tabby)",
@@ -1467,6 +1468,19 @@ goodfruit:
 				badoption(opts);
 			else
 				flags.female = flags.initgend;
+		}
+		return;
+	}
+
+	/* altkeyhandler:string */
+	fullname = "altkeyhandler";
+	if (match_optname(opts, fullname, 4, TRUE)) {
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_opt(opts, negated))) {
+#ifdef WIN32CON
+		    (void)strncpy(iflags.altkeyhandler, op, MAX_ALTKEYHANDLER - 5);
+		    load_keyboard_handler();
+#endif
 		}
 		return;
 	}
