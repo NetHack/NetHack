@@ -1000,7 +1000,7 @@ register struct monst *shkp;
 	ESHK(shkp)->following = 1;
 }
 
-/* used when the shkp is teleported out of his shop,
+/* used when the shkp is teleported or falls (ox == 0) out of his shop,
  * or when the player is not on a costly_spot and he
  * damages something inside the shop.  these conditions
  * must be checked by the calling function.
@@ -1027,7 +1027,7 @@ register xchar ox,oy;
 	   which makes this message look pretty silly, so temporarily restore
 	   her original location during the call to Monnam. */
 	sx = shkp->mx,  sy = shkp->my;
-	if (cansee(ox, oy) && !cansee(sx, sy))
+	if (isok(ox, oy) && cansee(ox, oy) && !cansee(sx, sy))
 		shkp->mx = ox,  shkp->my = oy;
 	pline("%s %s!", Monnam(shkp),
 	      !ANGRY(shkp) ? "gets angry" : "is furious");
