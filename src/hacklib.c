@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hacklib.c	3.4	2002/12/13	*/
+/*	SCCS Id: @(#)hacklib.c	3.4	2004/04/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -24,6 +24,7 @@ NetHack, except that rounddiv may call panic().
 	boolean		onlyspace	(const char *)
 	char *		tabexpand	(char *)
 	char *		visctrl		(char)
+	char *		strsubst	(char *, const char *, const char *)
 	const char *	ordin		(int)
 	char *		sitoa		(int)
 	int		sgn		(int)
@@ -222,6 +223,27 @@ visctrl(c)		/* make a displayable string from a character */
     }
     return ccc;
 }
+
+/* substitute a word or phrase in a string (in place) */
+/* caller is responsible for ensuring that bp points to big enough buffer */
+char *
+strsubst(bp, orig, replacement)
+    char *bp;
+    const char *orig, *replacement;
+{
+    char *found, buf[BUFSZ];
+
+    if (bp) {
+	found = strstr(bp, orig);
+	if (found) {
+		Strcpy(buf, found + strlen(orig));
+		Strcpy(found, replacement);
+		Strcat(bp, buf);
+	}
+    }
+    return bp;
+}
+
 
 const char *
 ordin(n)		/* return the ordinal suffix of a number */

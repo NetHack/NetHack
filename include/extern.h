@@ -757,6 +757,7 @@ E char *FDECL(xcrypt, (const char *,char *));
 E boolean FDECL(onlyspace, (const char *));
 E char *FDECL(tabexpand, (char *));
 E char *FDECL(visctrl, (CHAR_P));
+E char *FDECL(strsubst, (char *,const char *,const char *));
 E const char *FDECL(ordin, (int));
 E char *FDECL(sitoa, (int));
 E int FDECL(sgn, (int));

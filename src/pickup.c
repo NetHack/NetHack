@@ -1175,6 +1175,7 @@ boolean telekinesis;
 			(next_encumbr > HVY_ENCUMBER) ? overloadmsg :
 			(next_encumbr > MOD_ENCUMBER) ? nearloadmsg :
 			moderateloadmsg);
+		if (container) (void) strsubst(qbuf,"lifting","removing");
 		Sprintf(eos(qbuf), " %s. Continue?",
 			safe_qbuf(qbuf, sizeof(" . Continue?"),
 				doname(obj), an(simple_typename(obj->otyp)), "something"));
