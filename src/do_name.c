@@ -155,7 +155,7 @@ const char *goal;
 			    }	/* column */
 			}	/* row */
 		    }		/* pass */
-		    pline("Can't find dungeon feature '%c'", c);
+		    pline("Can't find dungeon feature '%c'.", c);
 		    msg_given = TRUE;
 		    goto nxtc;
 		} else {

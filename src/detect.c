@@ -770,7 +770,7 @@ struct obj *obj;
     int oops;
 
     if (Blind) {
-	pline("Too bad you can't see %s", the(xname(obj)));
+	pline("Too bad you can't see %s.", the(xname(obj)));
 	return;
     }
     oops = (rnd(20) > ACURR(A_INT) || obj->cursed);

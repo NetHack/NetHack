@@ -1817,7 +1817,7 @@ struct obj *otmp;
 	if (otmp->cursed &&
 	    obj->oclass == GEM_CLASS && !is_greystone(obj) && !rn2(5)) {
 	    pline(
-		(Blind ? "You feel something shatter" :
+		(Blind ? "You feel something shatter." :
 		 (Hallucination ? "Oh, wow, look at the pretty shards." :
 		 "A sharp crack shatters %s %s.")),
 		(obj->quan == 1 ? "the" : "a"),
