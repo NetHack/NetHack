@@ -1796,7 +1796,7 @@ still denote your gender using the ``male'' and ``female''
 options, the ``gender'' option will take precedence.
 The default is to randomly pick an appropriate gender.
 Cannot be set with the `O' command.
-.lp help
+.lp "help    "
 If more information is available for an object looked at
 with the `/' command, ask if you want to see it (default on). Turning help
 off makes just looking at things faster, since you aren't interrupted with the
@@ -1987,7 +1987,7 @@ Prompt for confirmation before praying (default on).
 .lp pushweapon
 Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
-.lp race
+.lp "race    "
 Selects your race (for example, ``race:human'').  Default is random.
 Cannot be set with the `O' command.
 .lp rest_on_space
