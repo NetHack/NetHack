@@ -942,7 +942,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	boolean youattack = (magr == &youmonst);
 	boolean youdefend = (mdef == &youmonst);
 	boolean vis = (!youattack && magr && cansee(magr->mx, magr->my))
-		|| (!youdefend && cansee(mdef->mx, mdef->my));
+	    || (!youdefend && cansee(mdef->mx, mdef->my))
+	    || (youattack && u.uswallow && mdef == u.ustuck && !Blind);
 	boolean realizes_damage;
 	const char *wepdesc;
 	static const char you[] = "you";
