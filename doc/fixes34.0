@@ -448,6 +448,7 @@ fixed a few places where unblock_point wasn't called but should have been
 cloned monsters should have the same name and tameness as the original
 you should stop eating (etc.) if a monster attacks you and misses
 half physical damage should apply to gas spores
+iron bars should affect wall corner wallification
 
 
 Platform- and/or Interface-Specific Fixes

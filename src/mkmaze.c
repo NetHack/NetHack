@@ -29,9 +29,12 @@ STATIC_OVL boolean
 iswall(x,y)
 int x,y;
 {
-	if (!isok(x,y)) return FALSE;
-	return (IS_WALL(levl[x][y].typ) || IS_DOOR(levl[x][y].typ)
-		|| levl[x][y].typ == SDOOR);
+    register int type;
+
+    if (!isok(x,y)) return FALSE;
+    type = levl[x][y].typ;
+    return (IS_WALL(type) || IS_DOOR(type) ||
+	    type == SDOOR || type == IRONBARS);
 }
 
 STATIC_OVL boolean
@@ -44,7 +47,8 @@ iswall_or_stone(x,y)
     if (!isok(x,y)) return TRUE;
 
     type = levl[x][y].typ;
-    return (type == STONE || IS_WALL(type) || IS_DOOR(type) || type == SDOOR);
+    return (type == STONE || IS_WALL(type) || IS_DOOR(type) ||
+	    type == SDOOR || type == IRONBARS);
 }
 
 /* return TRUE if out of bounds, wall or rock */
