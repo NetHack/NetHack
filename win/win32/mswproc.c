@@ -201,6 +201,7 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	 */
 	flags.toptenwin = 1;
 	set_option_mod_status("toptenwin", SET_IN_FILE);
+	set_option_mod_status("perm_invent", SET_IN_FILE);
 
 	/* initialize map tiles bitmap */
 	initMapTiles();

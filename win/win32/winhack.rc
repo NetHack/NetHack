@@ -45,7 +45,7 @@ IDC_NETHACKW MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&Save",                       IDM_SAVE
+        MENUITEM "&Save and Exit",              IDM_SAVE
         MENUITEM SEPARATOR
         MENUITEM "&Quit",                       IDM_EXIT
     END
