@@ -167,8 +167,8 @@ char *reasonbuf;
 	FILE *fp;
 	const char *filename;
 	int prefcnt, failcount = 0;
-	char panicbuf1[BUFSZ], panicbuf2[BUFSZ];
-	
+	char panicbuf1[BUFSZ], panicbuf2[BUFSZ], *details;
+
 	if (reasonbuf) reasonbuf[0] = '\0';
 	for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
 		/* don't test writing to configdir or datadir; they're readonly */
@@ -184,8 +184,12 @@ char *reasonbuf;
 			}
 			/* the paniclog entry gets the value of errno as well */
 			Sprintf(panicbuf1,"Invalid %s", fqn_prefix_names[prefcnt]);
+#if defined (NHSTDC) && !defined(NOTSTDC)
+			if (!(details = strerror(errno)))
+#endif
+			details = "";
 			Sprintf(panicbuf2,"\"%s\", (%d) %s",
-				fqn_prefix[prefcnt], errno, strerror(errno));
+				fqn_prefix[prefcnt], errno, details);
 			paniclog(panicbuf1, panicbuf2);
 			failcount++;
 		}	
