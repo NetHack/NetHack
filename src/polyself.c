@@ -1109,6 +1109,10 @@ int part;
 		"rear claw", "foreclaw", "clawed", "head", "rear limb",
 		"light headed", "neck", "spine", "rear claw tip",
 		"fur", "blood", "lung", "nose", "stomach" },
+	*bird_parts[] = { "wing", "eye", "face", "wing", "wing tip",
+		"foot", "wing", "winged", "head", "leg",
+		"light headed", "neck", "spine", "toe",
+		"feathers", "blood", "lung", "bill", "stomach" },
 	*horse_parts[] = { "foreleg", "eye", "face", "forehoof", "hoof tip",
 		"rear hoof", "foreclaw", "hooved", "head", "rear leg",
 		"light headed", "neck", "backbone", "rear hoof tip",
@@ -1169,6 +1173,8 @@ int part;
 		(part == ARM || part == FINGER || part == FINGERTIP ||
 		    part == HAND || part == HANDED))
 	    return humanoid_parts[part];
+	if (mptr == &mons[PM_RAVEN])
+	    return bird_parts[part];
 	if (mptr->mlet == S_CENTAUR || mptr->mlet == S_UNICORN ||
 		(mptr == &mons[PM_ROTHE] && part != HAIR))
 	    return horse_parts[part];
