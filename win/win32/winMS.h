@@ -217,5 +217,12 @@ extern COLORREF message_fg_color;
 	#define NH_A2W(a, w, cb)     (strncpy((w), (a), (cb)))
 #endif
 
-#endif /* WINmswin_H */
+/* map mode macros */
+#define IS_MAP_FIT_TO_SCREEN(mode) ((mode)==MAP_MODE_ASCII_FIT_TO_SCREEN || \
+							  (mode)==MAP_MODE_TILES_FIT_TO_SCREEN )
+  
+#define IS_MAP_ASCII(mode) ((mode)!=MAP_MODE_TILES && (mode)!=MAP_MODE_TILES_FIT_TO_SCREEN)
+
+
+#endif /* WINMS_H */
 

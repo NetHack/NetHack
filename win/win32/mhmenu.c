@@ -72,6 +72,7 @@ static WNDPROC editControlWndProc = NULL;
 
 #define NHMENU_IS_SELECTABLE(item) ((item).identifier.a_obj!=NULL)
 #define NHMENU_IS_SELECTED(item) ((item).count!=0)
+#define NHMENU_HAS_GLYPH(item) 	((item).glyph!=NO_GLYPH) 
 
 BOOL	CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	NHMenuListWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -869,6 +870,7 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	HDC hdc;
 	PNHMenuWindow data;
 	RECT list_rect;
+	int i;
 
     lpmis = (LPMEASUREITEMSTRUCT) lParam; 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
@@ -878,8 +880,17 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_INVERSE, hdc, FALSE));
 	GetTextMetrics(hdc, &tm);
 
-    /* Set the height of the list box items. */
-    lpmis->itemHeight = max(tm.tmHeight, TILE_Y)+2;
+    /* Set the height of the list box items to max height of the individual items */
+	for( i=0; i<data->menu.size;  i++) {
+		if( NHMENU_HAS_GLYPH(data->menu.items[i]) && !IS_MAP_ASCII(iflags.wc_map_mode) ) {
+			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, GetNHApp()->mapTile_Y) );
+		} else {
+			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, TILE_Y) );
+		}
+	}
+	lpmis->itemHeight += 2;
+
+	/* set width to the window width */
 	lpmis->itemWidth = list_rect.right - list_rect.left;
 
 	SelectObject(hdc, saveFont);
@@ -903,6 +914,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	COLORREF OldBg, OldFg, NewBg;
 	char *p, *p1;
 	int column;
+	int spacing = 0;
 
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
@@ -921,31 +933,35 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		menu_fg_brush ? menu_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_MENU)); 
 
     GetTextMetrics(lpdis->hDC, &tm);
+	spacing = tm.tmAveCharWidth;
 
+	/* set initial offset */
 	x = lpdis->rcItem.left + 1;
 
     /* print check mark and letter */
 	if( NHMENU_IS_SELECTABLE(*item) ) {
- char buf[2];
- if (data->how != PICK_NONE) {
-		HGDIOBJ saveBrush;
-		HBRUSH	hbrCheckMark;
+		char buf[2];
+		if (data->how != PICK_NONE) {
+			HGDIOBJ saveBrush;
+			HBRUSH	hbrCheckMark;
 
-		switch(item->count) {
-		case -1: hbrCheckMark = CreatePatternBrush(data->bmpChecked); break;
-		case 0: hbrCheckMark = CreatePatternBrush(data->bmpNotChecked); break;
-		default: hbrCheckMark = CreatePatternBrush(data->bmpCheckedCount); break;
+			switch(item->count) {
+			case -1: hbrCheckMark = CreatePatternBrush(data->bmpChecked); break;
+			case 0: hbrCheckMark = CreatePatternBrush(data->bmpNotChecked); break;
+			default: hbrCheckMark = CreatePatternBrush(data->bmpCheckedCount); break;
+			}
+
+			y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
+			SetBrushOrgEx(lpdis->hDC, x, y, NULL);
+			saveBrush = SelectObject(lpdis->hDC, hbrCheckMark);
+			PatBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, PATCOPY);
+			SelectObject(lpdis->hDC, saveBrush);
+			DeleteObject(hbrCheckMark);
+
 		}
 
-		y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
-		SetBrushOrgEx(lpdis->hDC, x, y, NULL);
-		saveBrush = SelectObject(lpdis->hDC, hbrCheckMark);
-		PatBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, PATCOPY);
-		SelectObject(lpdis->hDC, saveBrush);
-		DeleteObject(hbrCheckMark);
+		x += TILE_X + spacing;
 
- }
-		x += TILE_X + 5;
 		if(item->accelerator!=0) {
 			buf[0] = item->accelerator;
 			buf[1] = '\x0';
@@ -953,32 +969,67 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
 			DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 		}
-		x += tm.tmAveCharWidth + tm.tmOverhang + 5;
+		x += tm.tmAveCharWidth + tm.tmOverhang + spacing;
 	} else {
-		x += TILE_X + tm.tmAveCharWidth + tm.tmOverhang + 10;
+		x += TILE_X + tm.tmAveCharWidth + tm.tmOverhang + 2*spacing;
 	}
 
 	/* print glyph if present */
-	if( item->glyph != NO_GLYPH ) {
-		HGDIOBJ saveBmp;
+	if( NHMENU_HAS_GLYPH(*item) ) {
+		if( !IS_MAP_ASCII(iflags.wc_map_mode) ) {
+			HGDIOBJ saveBmp;
 
-		saveBmp = SelectObject(tileDC, GetNHApp()->bmpTiles);				
-		ntile = glyph2tile[ item->glyph ];
-		t_x = (ntile % TILES_PER_LINE)*TILE_X;
-		t_y = (ntile / TILES_PER_LINE)*TILE_Y;
+			saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);				
+			ntile = glyph2tile[ item->glyph ];
+			t_x = (ntile % GetNHApp()->mapTilesPerLine)*GetNHApp()->mapTile_X;
+			t_y = (ntile / GetNHApp()->mapTilesPerLine)*GetNHApp()->mapTile_Y;
 
-		y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
+			y = (lpdis->rcItem.bottom + lpdis->rcItem.top - GetNHApp()->mapTile_Y) / 2; 
 
-		nhapply_image_transparent(
-			lpdis->hDC, x, y, TILE_X, TILE_Y, 
-			tileDC, t_x, t_y, TILE_X, TILE_Y, TILE_BK_COLOR );
-		SelectObject(tileDC, saveBmp);
+			if( GetNHApp()->bmpMapTiles == GetNHApp()->bmpTiles ) {
+				/* using original nethack tiles - apply image transparently */
+				nhapply_image_transparent(
+					lpdis->hDC, x, y, TILE_X, TILE_Y, 
+					tileDC, t_x, t_y, TILE_X, TILE_Y, TILE_BK_COLOR );
+			} else {
+				/* using custom tiles - simple blt */
+				BitBlt(
+					lpdis->hDC, x, y, GetNHApp()->mapTile_X, GetNHApp()->mapTile_Y, 
+					tileDC, t_x, t_y,  SRCCOPY );
+			}
+			SelectObject(tileDC, saveBmp);
+			x += GetNHApp()->mapTile_X;
+		} else {
+			const char *sel_ind;
+			switch(item->count) {
+			case -1: sel_ind = "+"; break;
+			case 0: sel_ind = "-"; break;
+			default: sel_ind = "#"; break;
+			}
+
+			SetRect( 
+				&drawRect, 
+				x, 
+				lpdis->rcItem.top, 
+				min(x + tm.tmAveCharWidth, lpdis->rcItem.right), 
+				lpdis->rcItem.bottom 
+			);
+			DrawText(lpdis->hDC,
+				NH_A2W(sel_ind, wbuf, BUFSZ),
+				1,
+				&drawRect,
+				DT_CENTER| DT_VCENTER | DT_SINGLELINE
+			);
+			x += tm.tmAveCharWidth;
+		}
+	} else {
+		/* no glyph - need to adjust so help window won't look to cramped */
+		x += TILE_X;
 	}
 
-	x += TILE_X + 5;
+	x += spacing;
 
 	/* draw item text */
-
 	p1 = item->str;
 	p = strchr(item->str, '\t');
 	column = 0;
@@ -1446,27 +1497,23 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 {
 	BOOL bUpdateFocusItem;
 
+	/* we will redraw focused item whenever horizontal scrolling occurs
+	   since "Count: XXX" indicator is garbled by scrolling */
 	bUpdateFocusItem = FALSE;
 
 	switch(message) {
-
-	/* filter keyboard input for the control */
 	case WM_KEYDOWN:
-	case WM_KEYUP: {
-		MSG msg;
-		BOOL processed;
-
-		processed = FALSE;
-		if( PeekMessage(&msg, hWnd, WM_CHAR, WM_CHAR, PM_REMOVE) ) {
-			if( onListChar(GetParent(hWnd), hWnd, (char)msg.wParam)==-2 ) {
-				processed = TRUE;
-			}
-		}
-		if( processed ) return 0;
-
 		if( wParam==VK_LEFT || wParam==VK_RIGHT )
 			bUpdateFocusItem = TRUE;
-	} break;
+	break;
+	
+	case WM_CHAR: /* filter keyboard input for the control */
+		if( wParam>0 && wParam<256 && onListChar(GetParent(hWnd), hWnd, (char)wParam)==-2 ) {
+			return 0;
+		} else {
+			return 1;
+		}
+	break;
 
 	case WM_SIZE:
 	case WM_HSCROLL:
@@ -1480,6 +1527,7 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	return FALSE;
 	}
 
+	/* update focused item */
 	if(	bUpdateFocusItem ) {
 		int i;
 		RECT rt;
@@ -1492,6 +1540,7 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 		}
 	}
 
+	/* call ListView control window proc */
 	if( wndProcListViewOrig ) 
 		return CallWindowProc(wndProcListViewOrig, hWnd, message, wParam, lParam);
 	else 

@@ -86,6 +86,8 @@ win32gui: fixed copy/paste error in read registry settings function
 win32gui: improved calculation of the size of the menu window
 win32gui: made auto-arrange windows on/off option (it was reset automatically
 	which was unintuitive and in some cases annoying
+win32gui: fix a possible crash with AltGr-4 WM_KEYDOWN handling
+win32gui: use whatever alternate tile set is loaded in the menus
 platforms that support hangup: SAFERHANGUP to avoid losing objects in transit
 	between lists when hangup occurs, and also avoid cheats due to
 	well-timed hangups to stop a long melee

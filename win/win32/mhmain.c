@@ -158,12 +158,6 @@ numpad[KEY_LAST][3] = {
 #define KEYTABLE_SHIFT(x) ((iflags.num_pad ? numpad : keypad)[x][1])
 #define KEYTABLE(x) (STATEON(VK_SHIFT) ? KEYTABLE_SHIFT(x) : KEYTABLE_REGULAR(x))
 
-/* map mode macros */
-#define IS_MAP_FIT_TO_SCREEN(mode) ((mode)==MAP_MODE_ASCII_FIT_TO_SCREEN || \
-							  (mode)==MAP_MODE_TILES_FIT_TO_SCREEN )
-  
-#define IS_MAP_ASCII(mode) ((mode)!=MAP_MODE_TILES && (mode)!=MAP_MODE_TILES_FIT_TO_SCREEN)
-
 static const char *extendedlist = "acdefijlmnopqrstuvw?2";
 
 #define SCANLO		0x02
