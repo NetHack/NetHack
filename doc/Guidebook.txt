@@ -126,7 +126,7 @@
           as well as tracking and stealthy movement.
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -192,7 +192,7 @@
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -390,7 +390,7 @@
                played.
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -522,7 +522,7 @@
           ed.  Typing a `*' lists your entire inventory, so you can see the
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -672,10 +672,15 @@
                ject a.
 
           D    Drop several things.  In answer to the question ``What kinds
-               of  things do you want to drop? [!%= aium]'' you should type
-               zero or more object symbols possibly followed by `a'  and/or
-               `i' and/or `u' and/or `m'.
+               of  things  do you want to drop? [!%= BUCXaium]'' you should
+               type zero or more object symbols possibly  followed  by  `a'
+               and/or  `i' and/or `u' and/or `m'.  In addition, one or more
+               of the blessed/uncursed/cursed groups may be typed.
 
+                    DB  - drop all objects known to be blessed.
+                    DU  - drop all objects known to be uncursed.
+                    DC  - drop all objects known to be cursed.
+                    DX  - drop all objects of unknown B/U/C status.
                     Da  - drop all objects, without asking for confirmation.
                     Di  - examine your inventory before dropping anything.
                     Du  - drop only unpaid objects (when in a shop).
@@ -686,16 +691,16 @@
 
           e    Eat food.
 
-          E    Engrave  a  message  on the floor.  Engraving the word ``El-
+          E    Engrave a message on the floor.  Engraving  the  word  ``El-
                bereth'' will cause most monsters to not attack you hand-to-
                hand (but if you attack, you will rub it out); this is often
-               useful to give yourself a breather.  (This  feature  may  be
-               compiled  out  of  the  game, so your version might not have
+               useful  to  give  yourself a breather.  (This feature may be
+               compiled out of the game, so your  version  might  not  have
                it.)
 
                     E- - write in the dust with your fingers.
 
-          f    Fire one of the objects placed in your quiver.  You may  se-
+          f    Fire  one of the objects placed in your quiver.  You may se-
                lect ammunition with a previous `Q' command, or let the com-
                puter pick something appropriate if autoquiver is true.
 
@@ -710,17 +715,12 @@
 
           o    Open a door.
 
-          O    Set options.  A menu showing the current option values  will
-               be  displayed.  You can change most values simply by select-
-               ing the menu entry for the given option (ie, by  typing  its
-               letter  or  clicking  upon it, depending on your user inter-
-               face).  For the  non-boolean  choices,  a  further  menu  or
-               prompt will appear once you've closed this menu.  The avail-
-               able options are listed later in  this  Guidebook.   Options
-               are  usually  set  before  the game rather than with the `O'
+          O    Set  options.  A menu showing the current option values will
+               be displayed.  You can change most values simply by  select-
+               ing  the  menu entry for the given option (ie, by typing its
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -730,6 +730,11 @@
 
 
 
+               letter or clicking upon it, depending on  your  user  inter-
+               face).   For  the  non-boolean  choices,  a  further menu or
+               prompt will appear once you've closed this menu.  The avail-
+               able  options  are  listed later in this Guidebook.  Options
+               are usually set before the game rather  than  with  the  `O'
                command; see the section on options below.
 
           p    Pay your shopping bill.
@@ -741,9 +746,9 @@
 
           q    Quaff (drink) a potion.
 
-          Q    Select  an  object for your quiver.  You can then throw this
-               using the `f' command.  (In versions prior to 3.3  this  was
-               the  command  to  quit the game, which has now been moved to
+          Q    Select an object for your quiver.  You can then  throw  this
+               using  the  `f' command.  (In versions prior to 3.3 this was
+               the command to quit the game, which has now  been  moved  to
                `#quit'.)
 
           r    Read a scroll or spellbook.
@@ -752,10 +757,10 @@
 
           ^R   Redraw the screen.
 
-          s    Search for secret doors and traps around  you.   It  usually
+          s    Search  for  secret  doors and traps around you.  It usually
                takes several tries to find something.
 
-          S    Save  (and suspend) the game.  The game will be restored au-
+          S    Save (and suspend) the game.  The game will be restored  au-
                tomatically the next time you play.
 
           t    Throw an object or shoot a projectile.
@@ -774,19 +779,14 @@
 
           W    Wear armor.
 
-          x    Exchange your wielded weapon with the item in your secondary
-               weapon  slot.   The  latter is used as your second weapon in
-               two-weapon combat.  Note that if one of these slots is  emp-
-               ty, the exchange still takes place.
-
-          X    Enter explore (discovery) mode, explained in its own section
-               later.
-
-          ^X   Display your name, role, race, gender, and alignment as well
-               as the various deities in your game.
+          x    Exchange your wielded weapon with the item in your alternate
+               weapon slot.  The latter is used as  your  secondary  weapon
+               when  engaging  in  two-weapon  combat.  Note that if one of
+               these slots is empty, the exchange still takes place.
 
 
-          NetHack 3.4                                         July 23, 2002
+
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -796,9 +796,15 @@
 
 
 
-          z    Zap  a wand.  To aim at yourself, use `.' for the direction.
+          X    Enter explore (discovery) mode, explained in its own section
+               later.
 
-          Z    Zap (cast) a spell.  To cast at yourself, use  `.'  for  the
+          ^X   Display your name, role, race, gender, and alignment as well
+               as the various deities in your game.
+
+          z    Zap a wand.  To aim at yourself, use `.' for the  direction.
+
+          Z    Zap  (cast)  a  spell.  To cast at yourself, use `.' for the
                direction.
 
           ^Z   Suspend the game (UNIX(R) versions with job control only).
@@ -823,16 +829,16 @@
 
           (    Tell what tools you are using.
 
-          *    Tell  what  equipment  you are using; combines the preceding
+          *    Tell what equipment you are using;  combines  the  preceding
                five type-specific commands into one.
 
           $    Count your gold pieces.
 
-          +    List the spells you know.  Using this command, you can  also
-               rearrange  the  order in which your spells are listed.  They
-               are shown via a menu, and if you  select  a  spell  in  that
+          +    List  the spells you know.  Using this command, you can also
+               rearrange the order in which your spells are  listed.   They
+               are  shown  via  a  menu,  and if you select a spell in that
                menu, you'll be re-prompted for another spell to swap places
-               with it, and then  have  opportunity  to  make  further  ex-
+               with  it,  and  then  have  opportunity  to make further ex-
                changes.
 
           \    Show what types of objects have been discovered.
@@ -840,19 +846,13 @@
           !    Escape to a shell.
 
           #    Perform an extended command.  As you can see, the authors of
-               NetHack used up all the letters, so this is a way to  intro-
-               duce  the less frequently used commands.  What extended com-
-               mands are available depends on what features  the  game  was
-               compiled with.
-
-          #adjust
-               Adjust inventory letters (most useful when the fixinv option
+               NetHack  used  up  all  the  letters,  so  this  is a way to
 
           __________
           (R)UNIX is a registered trademark of AT&T.
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -862,13 +862,19 @@
 
 
 
+               introduce the less frequently used commands.  What  extended
+               commands are available depends on what features the game was
+               compiled with.
+
+          #adjust
+               Adjust inventory letters (most useful when the fixinv option
                is ``on'').
 
           #chat
                Talk to someone.
 
           #conduct
-               List which challenges you have adhered to.  See the  section
+               List  which challenges you have adhered to.  See the section
                below entitled ``Conduct'' for details.
 
           #dip Dip an object into something.
@@ -886,11 +892,11 @@
                Jump to another location.
 
           #loot
-               Loot  a  box  or bag on the floor beneath you, or the saddle
+               Loot a box or bag on the floor beneath you,  or  the  saddle
                from a horse standing next to you.
 
           #monster
-               Use a monster's special ability (when polymorphed into  mon-
+               Use  a monster's special ability (when polymorphed into mon-
                ster form).
 
           #name
@@ -910,15 +916,9 @@
 
           #rub Rub a lamp or a stone.
 
-          #sit Sit down.
-
-          #turn
-               Turn undead.
 
 
-
-
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -928,9 +928,14 @@
 
 
 
+          #sit Sit down.
+
+          #turn
+               Turn undead.
+
           #twoweapon
-               Toggle  two-weapon combat on or off.  Note that you must use
-               suitable weapons for this type of combat, or it will be  au-
+               Toggle two-weapon combat on or off.  Note that you must  use
+               suitable  weapons for this type of combat, or it will be au-
                tomatically turned off.
 
           #untrap
@@ -945,9 +950,9 @@
           #?   Help menu:  get the list of available extended commands.
 
                If your keyboard has a meta key (which, when pressed in com-
-          bination with another key, modifies  it  by  setting  the  `meta'
-          [8th,  or  `high'] bit), you can invoke many extended commands by
-          meta-ing the first letter of the command.  In NT,  OS/2,  and  PC
+          bination  with  another  key,  modifies  it by setting the `meta'
+          [8th, or `high'] bit), you can invoke many extended  commands  by
+          meta-ing  the  first  letter of the command.  In NT, OS/2, and PC
           NetHack, the `Alt' key can be used in this fashion.
 
           M-?  #? (not supported by all platforms)
@@ -976,15 +981,10 @@
 
           M-o  #offer
 
-          M-p  #pray
-
-          M-q  #quit
-
-          M-r  #rub
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -993,6 +993,12 @@
           NetHack Guidebook                                              16
 
 
+
+          M-p  #pray
+
+          M-q  #quit
+
+          M-r  #rub
 
           M-s  #sit
 
@@ -1004,32 +1010,32 @@
 
           M-w  #wipe
 
-               If  the number_pad option is on, some additional letter com-
+               If the number_pad option is on, some additional letter  com-
           mands are available:
 
-          h    Help menu:  display one of  several  help  texts  available,
+          h    Help  menu:   display  one  of several help texts available,
                like ``?''.
 
           j    Jump to another location.  Same as ``#jump'' or ``M-j''.
 
           k    Kick something (usually a door).  Same as `^D'.
 
-          l    Loot  a  box  or bag on the floor beneath you, or the saddle
-               from a horse standing next to you.   Same  as  ``#loot''  or
+          l    Loot a box or bag on the floor beneath you,  or  the  saddle
+               from  a  horse  standing  next to you.  Same as ``#loot'' or
                ``M-l''.
 
-          N    Name  an  item or type of object.  Same as ``#name'' or ``M-
+          N    Name an item or type of object.  Same as ``#name''  or  ``M-
                n''.
 
-          u    Untrap a trap, door, or chest.  Same as ``#untrap'' or  ``M-
+          u    Untrap  a trap, door, or chest.  Same as ``#untrap'' or ``M-
                u''.
 
 
           5.  Rooms and corridors
 
-               Rooms  and  corridors in the dungeon are either lit or dark.
-          Any lit areas within your line of sight will be  displayed;  dark
-          areas  are  only  displayed  if they are within one space of you.
+               Rooms and corridors in the dungeon are either lit  or  dark.
+          Any  lit  areas within your line of sight will be displayed; dark
+          areas are only displayed if they are within  one  space  of  you.
           Walls and corridors remain on the map as you explore them.
 
                Secret corridors are hidden.  You can find them with the `s'
@@ -1038,19 +1044,13 @@
           5.1.  Doorways
 
                Doorways connect rooms and corridors.  Some doorways have no
-          doors; you can walk right through.  Others have  doors  in  them,
+          doors;  you  can  walk right through.  Others have doors in them,
           which may be open, closed, or locked.  To open a closed door, use
-          the `o' (open) command; to close it again, use  the  `c'  (close)
+          the  `o'  (open)  command; to close it again, use the `c' (close)
           command.
 
-               You  can  get  through a locked door by using a tool to pick
-          the lock with the `a' (apply) command, or by kicking it open with
-          the `^D' (kick) command.
 
-
-
-
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1060,63 +1060,63 @@
 
 
 
-               Open  doors  cannot be entered diagonally; you must approach
-          them straight on, horizontally or vertically.   Doorways  without
+               You can get through a locked door by using a  tool  to  pick
+          the lock with the `a' (apply) command, or by kicking it open with
+          the `^D' (kick) command.
+
+               Open doors cannot be entered diagonally; you  must  approach
+          them  straight  on, horizontally or vertically.  Doorways without
           doors are not restricted in this fashion.
 
-               Doors  can  be  useful for shutting out monsters.  Most mon-
+               Doors can be useful for shutting out  monsters.   Most  mon-
           sters cannot open doors, although a few don't need to (ex. ghosts
           can walk through doors).
 
-               Secret  doors  are  hidden.   You can find them with the `s'
-          (search) command.  Once found they are in all ways equivalent  to
+               Secret doors are hidden.  You can find  them  with  the  `s'
+          (search)  command.  Once found they are in all ways equivalent to
           normal doors.
 
           5.2.  Traps (`^')
 
-               There  are  traps throughout the dungeon to snare the unwary
-          delver.  For example, you may suddenly fall into  a  pit  and  be
+               There are traps throughout the dungeon to snare  the  unwary
+          delver.   For  example,  you  may suddenly fall into a pit and be
           stuck for a few turns trying to climb out.  Traps don't appear on
           your map until you see one triggered by moving onto it, see some-
           thing fall into it, or you discover it with the `s' (search) com-
-          mand.  Monsters can fall prey to traps, too, which can be a  very
+          mand.   Monsters can fall prey to traps, too, which can be a very
           useful defensive strategy.
 
                There is a special pre-mapped branch of the dungeon based on
-          the classic computer game ``Sokoban.''  The goal is to  push  the
-          boulders  into  the pits or holes.  With careful foresight, it is
-          possible to complete all of the levels according  to  the  tradi-
-          tional  rules  of Sokoban.  Some allowances are permitted in case
+          the  classic  computer game ``Sokoban.''  The goal is to push the
+          boulders into the pits or holes.  With careful foresight,  it  is
+          possible  to  complete  all of the levels according to the tradi-
+          tional rules of Sokoban.  Some allowances are permitted  in  case
           the player gets stuck; however, they will lower your luck.
 
           5.3.  Stairs (`<', `>')
 
-               In general, each level in the dungeon will have a  staircase
+               In  general, each level in the dungeon will have a staircase
           going up (`<') to the previous level and another going down (`>')
-          to the next level.  There are some exceptions  though.   For  in-
-          stance,  fairly  early  in the dungeon you will find a level with
+          to  the  next  level.  There are some exceptions though.  For in-
+          stance, fairly early in the dungeon you will find  a  level  with
           two down staircases, one continuing into the dungeon and the oth-
-          er  branching  into  an  area  known as the Gnomish Mines.  Those
-          mines eventually hit a dead end, so after exploring them (if  you
-          choose  to  do so), you'll need to climb back up to the main dun-
+          er branching into an area known  as  the  Gnomish  Mines.   Those
+          mines  eventually hit a dead end, so after exploring them (if you
+          choose to do so), you'll need to climb back up to the  main  dun-
           geon.
 
-               When you traverse a set of stairs, or trigger a  trap  which
-          sends  you to another level, the level you're leaving will be de-
-          activated and stored in a file on disk.  If you're  moving  to  a
+               When  you  traverse a set of stairs, or trigger a trap which
+          sends you to another level, the level you're leaving will be  de-
+          activated  and  stored  in a file on disk.  If you're moving to a
           previously visited level, it will be loaded from its file on disk
-          and reactivated.  If you're moving to a level which has  not  yet
-          been  visited,  it  will be created (from scratch for most random
-          levels, from a template for some ``special''  levels,  or  loaded
-          from  the  remains  of  an  earlier game for a ``bones'' level as
-          briefly described below).  Monsters are only active on  the  cur-
-          rent  level;  those  on  other levels are essentially placed into
-          stasis.
+          and  reactivated.   If you're moving to a level which has not yet
+          been visited, it will be created (from scratch  for  most  random
+          levels,  from  a  template for some ``special'' levels, or loaded
+          from the remains of an earlier game  for  a  ``bones''  level  as
+          briefly  described  below).   Monsters  are  only  active  on the
 
 
-
-
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1126,63 +1126,63 @@
 
 
 
-               Ordinarily when you climb a set of stairs, you  will  arrive
-          on  the  corresponding  staircase  at your destination.  However,
-          pets (see below) and some other monsters  will  follow  along  if
+          current level; those on other levels are essentially placed  into
+          stasis.
+
+               Ordinarily  when  you climb a set of stairs, you will arrive
+          on the corresponding staircase  at  your  destination.   However,
+          pets  (see  below)  and  some other monsters will follow along if
           they're close enough when you travel up or down stairs, and occa-
-          sionally one of these creatures  will  displace  you  during  the
+          sionally  one  of  these  creatures  will displace you during the
           climb.  When that occurs, the pet or other monster will arrive on
           the staircase and you will end up nearby.
 
           5.4.  Ladders (`<', `>')
 
-               Ladders serve the same purpose as staircases,  and  the  two
-          types  of  inter-level  connections  are nearly indistinguishable
+               Ladders  serve  the  same purpose as staircases, and the two
+          types of inter-level  connections  are  nearly  indistinguishable
           during game play.
 
 
           6.  Monsters
 
-               Monsters you cannot see are not  displayed  on  the  screen.
-          Beware!   You  may  suddenly come upon one in a dark place.  Some
-          magic items can help you  locate  them  before  they  locate  you
+               Monsters  you  cannot  see  are not displayed on the screen.
+          Beware!  You may suddenly come upon one in a  dark  place.   Some
+          magic  items  can  help  you  locate  them before they locate you
           (which some monsters can do very well).
 
-               The  commands  `/' and `;' may be used to obtain information
-          about those monsters who are displayed on the screen.   The  com-
-          mand  `C'  allows you to assign a name to a monster, which may be
-          useful to help distinguish one from another  when  multiple  mon-
-          sters  are  present.  Assigning a name which is just a space will
+               The commands `/' and `;' may be used to  obtain  information
+          about  those  monsters who are displayed on the screen.  The com-
+          mand `C' allows you to assign a name to a monster, which  may  be
+          useful  to  help  distinguish one from another when multiple mon-
+          sters are present.  Assigning a name which is just a  space  will
           remove any prior name.
 
-               The extended command ``#chat'' can be used to interact  with
-          an  adjacent monster.  There is no actual dialog (in other words,
-          you don't get to choose what you'll say), but chatting with  some
+               The  extended command ``#chat'' can be used to interact with
+          an adjacent monster.  There is no actual dialog (in other  words,
+          you  don't get to choose what you'll say), but chatting with some
           monsters such as a shopkeeper or the Oracle of Delphi can produce
           useful results.
 
           6.1.  Fighting
 
-               If you see a monster and you wish to fight it, just  attempt
-          to  walk  into  it.   Many  monsters you find will mind their own
+               If  you see a monster and you wish to fight it, just attempt
+          to walk into it.  Many monsters you  find  will  mind  their  own
           business unless you attack them.  Some of them are very dangerous
           when angered.  Remember:  discretion is the better part of valor.
 
-               If you can't see a monster (if it is invisible,  or  if  you
-          are  blinded), the symbol `I' will be shown when you learn of its
-          presence.  If you attempt to walk into it, you will try to  fight
-          it  just  like a monster that you can see; of course, if the mon-
+               If  you  can't  see a monster (if it is invisible, or if you
+          are blinded), the symbol `I' will be shown when you learn of  its
+          presence.   If you attempt to walk into it, you will try to fight
+          it just like a monster that you can see; of course, if  the  mon-
           ster has moved, you will attack empty air.  If you guess that the
-          monster  has  moved  and you don't wish to fight, you can use the
-          `m' command to move without fighting; likewise, if you don't  re-
+          monster has moved and you don't wish to fight, you  can  use  the
+          `m'  command to move without fighting; likewise, if you don't re-
           member a monster but want to try fighting anyway, you can use the
           `F' command.
 
 
-
-
-
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1194,50 +1194,50 @@
 
           6.2.  Your pet
 
-               You start the game with a little dog (`d'),  cat  (`f'),  or
-          pony  (`u'),  which follows you about the dungeon and fights mon-
-          sters with you.  Like you, your pet needs food  to  survive.   It
+               You  start  the  game with a little dog (`d'), cat (`f'), or
+          pony (`u'), which follows you about the dungeon and  fights  mon-
+          sters  with  you.   Like you, your pet needs food to survive.  It
           usually feeds itself on fresh carrion and other meats.  If you're
-          worried about it or want to train it, you can feed  it,  too,  by
-          throwing  it food.  A properly trained pet can be very useful un-
+          worried  about  it  or want to train it, you can feed it, too, by
+          throwing it food.  A properly trained pet can be very useful  un-
           der certain circumstances.
 
-               Your pet also gains experience from  killing  monsters,  and
-          can  grow  over  time,  gaining hit points and doing more damage.
-          Initially, your pet may even be better  at  killing  things  than
+               Your  pet  also  gains experience from killing monsters, and
+          can grow over time, gaining hit points  and  doing  more  damage.
+          Initially,  your  pet  may  even be better at killing things than
           you, which makes pets useful for low-level characters.
 
-               Your  pet  will  follow  you up and down staircases if it is
-          next to you when you move.  Otherwise your pet will  be  stranded
-          and  may  become wild.  Similarly, when you trigger certain types
-          of traps which alter your location (for  instance,  a  trap  door
-          which  drops you to a lower dungeon level), any adjacent pet will
+               Your pet will follow you up and down  staircases  if  it  is
+          next  to  you when you move.  Otherwise your pet will be stranded
+          and may become wild.  Similarly, when you trigger  certain  types
+          of  traps  which  alter  your location (for instance, a trap door
+          which drops you to a lower dungeon level), any adjacent pet  will
           accompany you and any non-adjacent pet will be left behind.  Your
-          pet  may trigger such traps itself; you will not be carried along
+          pet may trigger such traps itself; you will not be carried  along
           with it even if adjacent at the time.
 
           6.3.  Steeds
 
-               Some types of creatures in the dungeon can actually be  rid-
+               Some  types of creatures in the dungeon can actually be rid-
           den if you have the right equipment and skill.  Convincing a wild
-          beast to let you saddle it up is  difficult  to  say  the  least.
-          Many  a dungeoneer has had to resort to magic and wizardry in or-
+          beast  to  let  you  saddle  it up is difficult to say the least.
+          Many a dungeoneer has had to resort to magic and wizardry in  or-
           der to forge the alliance.  Once you do have the beast under your
-          control  however,  you  can easily climb in and out of the saddle
+          control however, you can easily climb in and out  of  the  saddle
           with the `#ride' command.  Lead the beast around the dungeon when
           riding, in the same manner as you would move yourself.  It is the
           beast that you will see displayed on the map.
 
-               Riding skill is managed by the `#enhance' command.  See  the
+               Riding  skill is managed by the `#enhance' command.  See the
           section on Weapon proficiency for more information about that.
 
           6.4.  Bones levels
 
-               You  may encounter the shades and corpses of other adventur-
+               You may encounter the shades and corpses of other  adventur-
           ers (or even former incarnations of yourself!) and their personal
-          effects.   Ghosts  are  hard  to  kill,  but easy to avoid, since
-          they're slow and do little damage.  You can plunder the  deceased
-          adventurer's  possessions; however, they are likely to be cursed.
+          effects.  Ghosts are hard to  kill,  but  easy  to  avoid,  since
+          they're  slow and do little damage.  You can plunder the deceased
+          adventurer's possessions; however, they are likely to be  cursed.
           Beware of whatever killed the former player; it is probably still
           lurking around, gloating over its last victory.
 
@@ -1248,7 +1248,7 @@
           to pick it up.  In NetHack, this is accomplished automatically by
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1258,63 +1258,63 @@
 
 
 
-          walking  over  the object (unless you turn off the autopickup op-
-          tion (see below), or move with the `m' prefix  (see  above)),  or
+          walking over the object (unless you turn off the  autopickup  op-
+          tion  (see  below),  or move with the `m' prefix (see above)), or
           manually by using the `,' command.
 
-               If  you're carrying too many items, NetHack will tell you so
-          and you won't be able to pick up anything  more.   Otherwise,  it
-          will  add  the  object(s) to your pack and tell you what you just
+               If you're carrying too many items, NetHack will tell you  so
+          and  you  won't  be able to pick up anything more.  Otherwise, it
+          will add the object(s) to your pack and tell you  what  you  just
           picked up.
 
-               As you add items to your inventory, you also add the  weight
-          of  that  object to your load.  The amount that you can carry de-
-          pends on your strength and your constitution.  The  stronger  you
+               As  you add items to your inventory, you also add the weight
+          of that object to your load.  The amount that you can  carry  de-
+          pends  on  your strength and your constitution.  The stronger you
           are, the less the additional load will affect you.  There comes a
-          point, though, when the weight of all of that stuff you are  car-
-          rying  around  with  you  through  the dungeon will encumber you.
-          Your reactions will get slower and you'll burn  calories  faster,
-          requiring  food  more  frequently  to  cope with it.  Eventually,
-          you'll be so overloaded that you'll either have to  discard  some
+          point,  though, when the weight of all of that stuff you are car-
+          rying around with you through  the  dungeon  will  encumber  you.
+          Your  reactions  will get slower and you'll burn calories faster,
+          requiring food more frequently  to  cope  with  it.   Eventually,
+          you'll  be  so overloaded that you'll either have to discard some
           of what you're carrying or collapse under its weight.
 
-               NetHack  will  tell  you how badly you have loaded yourself.
-          The symbols `Burdened', `Stressed', `Strained',  `Overtaxed'  and
+               NetHack will tell you how badly you  have  loaded  yourself.
+          The  symbols  `Burdened', `Stressed', `Strained', `Overtaxed' and
           `Overloaded' are displayed on the bottom line display to indicate
           your condition.
 
                When you pick up an object, it is assigned an inventory let-
-          ter.   Many commands that operate on objects must ask you to find
-          out which object you want to  use.   When  NetHack  asks  you  to
+          ter.  Many commands that operate on objects must ask you to  find
+          out  which  object  you  want  to  use.  When NetHack asks you to
           choose a particular object you are carrying, you are usually pre-
-          sented with a list of inventory letters to choose from (see  Com-
+          sented  with a list of inventory letters to choose from (see Com-
           mands, above).
 
-               Some  objects,  such  as weapons, are easily differentiated.
-          Others, like scrolls and potions, are  given  descriptions  which
-          vary  according to type.  During a game, any two objects with the
-          same description are the same type.   However,  the  descriptions
+               Some objects, such as weapons,  are  easily  differentiated.
+          Others,  like  scrolls  and potions, are given descriptions which
+          vary according to type.  During a game, any two objects with  the
+          same  description  are  the same type.  However, the descriptions
           will vary from game to game.
 
                When you use one of these objects, if its effect is obvious,
-          NetHack will remember what it is for you.  If  its  effect  isn't
-          extremely  obvious,  you will be asked what you want to call this
-          type of object so you will recognize it later.  You can also  use
-          the  ``#name''  command for the same purpose at any time, to name
-          all objects of a particular type or just  an  individual  object.
+          NetHack  will  remember  what it is for you.  If its effect isn't
+          extremely obvious, you will be asked what you want to  call  this
+          type  of object so you will recognize it later.  You can also use
+          the ``#name'' command for the same purpose at any time,  to  name
+          all  objects  of  a particular type or just an individual object.
           When you use ``#name'' on an object which has already been named,
-          specifying a space as the value will remove the  prior  name  in-
+          specifying  a  space  as the value will remove the prior name in-
           stead of assigning a new one.
 
           7.1.  Curses and Blessings
 
-               Any  object  that you find may be cursed, even if the object
+               Any object that you find may be cursed, even if  the  object
           is otherwise helpful.  The most common effect of a curse is being
-          stuck  with (and to) the item.  Cursed weapons weld themselves to
-          your hand when wielded, so you cannot unwield them.   Any  cursed
+          stuck with (and to) the item.  Cursed weapons weld themselves  to
+          your  hand  when wielded, so you cannot unwield them.  Any cursed
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1324,63 +1324,63 @@
 
 
 
-          item  you  wear is not removable by ordinary means.  In addition,
-          cursed arms and armor usually, but not always, bear negative  en-
+          item you wear is not removable by ordinary means.   In  addition,
+          cursed  arms and armor usually, but not always, bear negative en-
           chantments that make them less effective in combat.  Other cursed
           objects may act poorly or detrimentally in other ways.
 
-               Objects can also be blessed.   Blessed  items  usually  work
-          better  or more beneficially than normal uncursed items.  For ex-
+               Objects  can  also  be  blessed.  Blessed items usually work
+          better or more beneficially than normal uncursed items.  For  ex-
           ample, a blessed weapon will do more damage against demons.
 
                There are magical means of bestowing or removing curses upon
-          objects,  so  even  if you are stuck with one, you can still have
-          the curse lifted and the item removed.  Priests  and  Priestesses
-          have  an  innate  sensitivity  to this property in any object, so
-          they can more easily avoid cursed objects  than  other  character
+          objects, so even if you are stuck with one, you  can  still  have
+          the  curse  lifted and the item removed.  Priests and Priestesses
+          have an innate sensitivity to this property  in  any  object,  so
+          they  can  more  easily avoid cursed objects than other character
           roles.
 
-               An  item with unknown status will be reported in your inven-
+               An item with unknown status will be reported in your  inven-
           tory with no prefix.  An item which you know the state of will be
-          distinguished  in  your  inventory  by  the  presence of the word
+          distinguished in your inventory  by  the  presence  of  the  word
           ``cursed'', ``uncursed'' or ``blessed'' in the description of the
           item.
 
           7.2.  Weapons (`)')
 
-               Given  a  chance,  most monsters in the Mazes of Menace will
-          gratuitously try to kill you.  You need weapons for  self-defense
-          (killing  them  first).   Without  a  weapon, you do only 1-2 hit
-          points of damage (plus bonuses, if any).  Monk characters are  an
+               Given a chance, most monsters in the Mazes  of  Menace  will
+          gratuitously  try to kill you.  You need weapons for self-defense
+          (killing them first).  Without a weapon,  you  do  only  1-2  hit
+          points  of damage (plus bonuses, if any).  Monk characters are an
           exception; they normally do much more damage with bare hands than
           they do with weapons.
 
                There are wielded weapons, like maces and swords, and thrown
-          weapons,  like arrows and spears.  To hit monsters with a weapon,
-          you must wield it and attack them, or throw it at them.  You  can
-          simply  elect  to  throw  a spear.  To shoot an arrow, you should
-          first wield a bow, then throw the arrow.  Crossbows shoot  cross-
+          weapons, like arrows and spears.  To hit monsters with a  weapon,
+          you  must wield it and attack them, or throw it at them.  You can
+          simply elect to throw a spear.  To shoot  an  arrow,  you  should
+          first  wield a bow, then throw the arrow.  Crossbows shoot cross-
           bow bolts.  Slings hurl rocks and (other) stones (like gems).
 
                Enchanted weapons have a ``plus'' (or ``to hit enhancement''
-          which can be either positive  or  negative)  that  adds  to  your
-          chance  to  hit and the damage you do to a monster.  The only way
+          which  can  be  either  positive  or  negative) that adds to your
+          chance to hit and the damage you do to a monster.  The  only  way
           to determine a weapon's enchantment is to have it magically iden-
-          tified  somehow.  Most weapons are subject to some type of damage
+          tified somehow.  Most weapons are subject to some type of  damage
           like rust.  Such ``erosion'' damage can be repaired.
 
-               The chance that an attack will successfully hit  a  monster,
-          and  the  amount  of damage such a hit will do, depends upon many
-          factors.  Among them are: type of weapon, quality of weapon  (en-
+               The  chance  that an attack will successfully hit a monster,
+          and the amount of damage such a hit will do,  depends  upon  many
+          factors.   Among them are: type of weapon, quality of weapon (en-
           chantment and/or erosion), experience level, strength, dexterity,
-          encumbrance, and proficiency (see below).   The  monster's  armor
-          class  - a general defense rating, not necessarily due to wearing
-          of armor - is a factor too; also, some monsters are  particularly
+          encumbrance,  and  proficiency  (see below).  The monster's armor
+          class - a general defense rating, not necessarily due to  wearing
+          of  armor - is a factor too; also, some monsters are particularly
           vulnerable to certain types of weapons.
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1390,63 +1390,63 @@
 
 
 
-               Many  weapons  can be wielded in one hand; some require both
-          hands.  When wielding a two-handed weapon, you  can  not  wear  a
-          shield,  and  vice versa.  When wielding a one-handed weapon, you
-          can have another weapon ready to use by setting  things  up  with
-          the  `x'  command,  which  exchanges  your primary (the one being
-          wielded) and secondary weapons.  And if you have  proficiency  in
-          the  ``two  weapon combat'' skill, you may wield both primary and
-          secondary weapons simultaneously; use the  `#twoweapon'  extended
-          command  to engage or disengage that.  Only some types of charac-
-          ters (barbarians, for instance) have the necessary  skill  avail-
-          able.   Even  with that skill, using two weapons at once incurs a
-          penalty in the chance to hit your target compared to  using  just
-          one weapon at a time.
+               Many weapons can be wielded in one hand; some  require  both
+          hands.   When  wielding  a  two-handed weapon, you can not wear a
+          shield, and vice versa.  When wielding a one-handed  weapon,  you
+          can  have  another  weapon ready to use by setting things up with
+          the `x' command, which exchanges  your  primary  (the  one  being
+          wielded)  and  alternate weapons.  And if you have proficiency in
+          the ``two weapon combat'' skill, you may wield both  weapons  si-
+          multaneously  as  primary and secondary; use the `#twoweapon' ex-
+          tended command to engage or disengage that.  Only some  types  of
+          characters  (barbarians,  for  instance) have the necessary skill
+          available.  Even with that skill, using two weapons at  once  in-
+          curs a penalty in the chance to hit your target compared to using
+          just one weapon at a time.
 
-               There  might be times when you'd rather not wield any weapon
-          at all.  To accomplish that, wield `-', or else use the `A'  com-
-          mand  which  allows you to unwield the current weapon in addition
+               There might be times when you'd rather not wield any  weapon
+          at  all.  To accomplish that, wield `-', or else use the `A' com-
+          mand which allows you to unwield the current weapon  in  addition
           to taking off other worn items.
 
-               Those of you in the audience who are AD&D players, be  aware
+               Those  of you in the audience who are AD&D players, be aware
           that each weapon which existed in AD&D does roughly the same dam-
-          age to monsters in NetHack.  Some of  the  more  obscure  weapons
+          age  to  monsters  in  NetHack.  Some of the more obscure weapons
           (such as the aklys, lucern hammer, and bec-de-corbin) are defined
           in an appendix to Unearthed Arcana, an AD&D supplement.
 
-               The commands to use weapons are `w'  (wield),  `t'  (throw),
-          `f'  (fire,  an  alternative  way of throwing), `Q' (quiver), `x'
+               The  commands  to  use weapons are `w' (wield), `t' (throw),
+          `f' (fire, an alternative way of  throwing),  `Q'  (quiver),  `x'
           (exchange), `#twoweapon', and `#enhance' (see below).
 
           7.2.1.  Throwing and shooting
 
-               You can throw just about anything via the `t'  command.   It
-          will  prompt  for the item to throw; picking `?' will list things
-          in your inventory which are considered likely to  be  thrown,  or
+               You  can  throw just about anything via the `t' command.  It
+          will prompt for the item to throw; picking `?' will  list  things
+          in  your  inventory  which are considered likely to be thrown, or
           picking `*' will list your entire inventory.  After you've chosen
-          what to throw, you will be prompted for a direction  rather  than
-          for  a specific target.  The distance something can be thrown de-
+          what  to  throw, you will be prompted for a direction rather than
+          for a specific target.  The distance something can be thrown  de-
           pends mainly on the type of object and your strength.  Arrows can
-          be  thrown  by  hand,  but can be thrown much farther and will be
+          be thrown by hand, but can be thrown much  farther  and  will  be
           more likely to hit when thrown while you are wielding a bow.
 
-               You can simplify the throwing operation  by  using  the  `Q'
-          command  to select your preferred ``missile'', then using the `f'
-          command to throw it.  You'll  be  prompted  for  a  direction  as
-          above,  but  you  don't  have to specify which item to throw each
+               You  can  simplify  the  throwing operation by using the `Q'
+          command to select your preferred ``missile'', then using the  `f'
+          command  to  throw  it.   You'll  be  prompted for a direction as
+          above, but you don't have to specify which  item  to  throw  each
           time you use `f'.  There is also an option, autoquiver, which has
-          NetHack  choose  another  item  to automatically fill your quiver
+          NetHack choose another item to  automatically  fill  your  quiver
           when the inventory slot used for `Q' runs out.
 
-               Some characters have the ability to fire a volley of  multi-
-          ple  items  in a single turn.  Knowing how to load several rounds
+               Some  characters have the ability to fire a volley of multi-
+          ple items in a single turn.  Knowing how to load  several  rounds
           of ammunition at once -- or hold several missiles in your hand --
-          and  still  hit  a target is not an easy task.  Rangers are among
-          those who are adept at this task, as are those with a high  level
+          and still hit a target is not an easy task.   Rangers  are  among
+          those  who are adept at this task, as are those with a high level
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1456,15 +1456,15 @@
 
 
 
-          of  proficiency  in  the  relevant  weapon skill (in bow skill if
-          you're wielding one to shoot arrows, in crossbow skill if  you're
+          of proficiency in the relevant weapon  skill  (in  bow  skill  if
+          you're  wielding one to shoot arrows, in crossbow skill if you're
           wielding one to shoot bolts, or in sling skill if you're wielding
           one to shoot stones).  The number of items that the character has
-          a  chance  to  fire varies from turn to turn.  You can explicitly
-          limit the number of shots by using a numeric  prefix  before  the
-          `t'  or  `f'  command.   For example, ``2f'' (or ``n2f'' if using
+          a chance to fire varies from turn to turn.   You  can  explicitly
+          limit  the  number  of shots by using a numeric prefix before the
+          `t' or `f' command.  For example, ``2f''  (or  ``n2f''  if  using
           number_pad mode) would ensure that at most 2 arrows are shot even
-          if  you  could have fired 3.  If you specify a larger number than
+          if you could have fired 3.  If you specify a larger  number  than
           would have been shot (``4f'' in this example), you'll just end up
           shooting the same number (3, here) as if no limit had been speci-
           fied.  Once the volley is in motion, all of the items will travel
@@ -1474,45 +1474,45 @@
           7.2.2.  Weapon proficiency
 
                You will have varying degrees of skill in the weapons avail-
-          able.   Weapon proficiency, or weapon skills, affect how well you
-          can use particular types of weapons, and you'll be  able  to  im-
-          prove  your  skills  as you progress through a game, depending on
+          able.  Weapon proficiency, or weapon skills, affect how well  you
+          can  use  particular  types of weapons, and you'll be able to im-
+          prove your skills as you progress through a  game,  depending  on
           your role, your experience level, and use of the weapons.
 
-               For the purposes of proficiency, weapons have  been  divided
-          up   into  various  groups  such  as  daggers,  broadswords,  and
-          polearms.  Each role has a limit on what level of  proficiency  a
-          character  can achieve for each group.  For instance, wizards can
-          become highly skilled in daggers or staves but not in  swords  or
+               For  the  purposes of proficiency, weapons have been divided
+          up  into  various  groups  such  as  daggers,  broadswords,   and
+          polearms.   Each  role has a limit on what level of proficiency a
+          character can achieve for each group.  For instance, wizards  can
+          become  highly  skilled in daggers or staves but not in swords or
           bows.
 
-               The  `#enhance'  extended  command is used to review current
-          weapons proficiency (also spell proficiency) and to choose  which
+               The `#enhance' extended command is used  to  review  current
+          weapons  proficiency (also spell proficiency) and to choose which
           skill(s) to improve when you've used one or more skills enough to
           become eligible to do so.  The skill rankings are ``none'' (some-
-          times  also  referred  to as ``restricted'', because you won't be
-          able to  advance),  ``unskilled'',  ``basic'',  ``skilled'',  and
+          times also referred to as ``restricted'', because  you  won't  be
+          able  to  advance),  ``unskilled'',  ``basic'',  ``skilled'', and
           ``expert''.  Restricted skills simply will not appear in the list
-          shown by `#enhance'.  (Divine  intervention  might  unrestrict  a
+          shown  by  `#enhance'.   (Divine  intervention might unrestrict a
           particular skill, in which case it will start at unskilled and be
-          limited to basic.)  Some characters can enhance their  barehanded
-          combat  or  martial  arts  skill  beyond  expert to ``master'' or
+          limited  to basic.)  Some characters can enhance their barehanded
+          combat or martial arts  skill  beyond  expert  to  ``master''  or
           ``grand master''.
 
                Use of a weapon in which you're restricted or unskilled will
           incur a modest penalty in the chance to hit a monster and also in
-          the amount of damage done when you do hit; at basic level,  there
-          is  no  penalty  or bonus; at skilled level, you receive a modest
-          bonus in the chance to hit and amount of damage done;  at  expert
-          level,  the  bonus  is  higher.  A successful hit has a chance to
-          boost your training towards the next skill level  (unless  you've
-          already  reached  the  limit for this skill).  Once such training
-          reaches the threshold for that next level, you'll  be  told  that
-          you  feel  more  confident in your skills.  At that point you can
-          use `#enhance' to increase one or more skills.  Such  skills  are
+          the  amount of damage done when you do hit; at basic level, there
+          is no penalty or bonus; at skilled level, you  receive  a  modest
+          bonus  in  the chance to hit and amount of damage done; at expert
+          level, the bonus is higher.  A successful hit  has  a  chance  to
+          boost  your  training towards the next skill level (unless you've
+          already reached the limit for this skill).   Once  such  training
+          reaches  the  threshold  for that next level, you'll be told that
+          you feel more confident in your skills.  At that  point  you  can
+          use  `#enhance'  to increase one or more skills.  Such skills are
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1522,18 +1522,18 @@
 
 
 
-          not  increased automatically because there is a limit to your to-
-          tal overall skills, so you need to actively choose  which  skills
+          not increased automatically because there is a limit to your  to-
+          tal  overall  skills, so you need to actively choose which skills
           to enhance and which to ignore.
 
           7.3.  Armor (`[')
 
                Lots of unfriendly things lurk about; you need armor to pro-
           tect yourself from their blows.  Some types of armor offer better
-          protection  than  others.   Your armor class is a measure of this
+          protection than others.  Your armor class is a  measure  of  this
           protection.  Armor class (AC) is measured as in AD&D, with 10 be-
-          ing  the equivalent of no armor, and lower numbers meaning better
-          armor.  Each suit of armor which exists in AD&D  gives  the  same
+          ing the equivalent of no armor, and lower numbers meaning  better
+          armor.   Each  suit  of armor which exists in AD&D gives the same
           protection in NetHack.  Here is an (incomplete) list of the armor
           classes provided by various suits of armor:
 
@@ -1556,29 +1556,29 @@
                              no armor                 10
 
                You can also wear other pieces of armor (ex. helmets, boots,
-          shields,  cloaks) to lower your armor class even further, but you
-          can only wear one item of each category (one suit of  armor,  one
+          shields, cloaks) to lower your armor class even further, but  you
+          can  only  wear one item of each category (one suit of armor, one
           cloak, one helmet, one shield, and so on) at a time.
 
-               If  a piece of armor is enchanted, its armor protection will
-          be better (or worse) than normal, and  its  ``plus''  (or  minus)
-          will  subtract  from  your  armor class.  For example, a +1 chain
-          mail would give you better protection  than  normal  chain  mail,
+               If a piece of armor is enchanted, its armor protection  will
+          be  better  (or  worse)  than normal, and its ``plus'' (or minus)
+          will subtract from your armor class.  For  example,  a  +1  chain
+          mail  would  give  you  better protection than normal chain mail,
           lowering your armor class one unit further to 4.  When you put on
-          a piece of armor, you immediately find out the  armor  class  and
+          a  piece  of  armor, you immediately find out the armor class and
           any ``plusses'' it provides.  Cursed pieces of armor usually have
           negative enchantments (minuses) in addition to being unremovable.
 
-               Many  types of armor are subject to some kind of damage like
-          rust.  Such damage can be repaired.  Some types of armor may  in-
+               Many types of armor are subject to some kind of damage  like
+          rust.   Such damage can be repaired.  Some types of armor may in-
           hibit spell casting.
 
                The commands to use armor are `W' (wear) and `T' (take off).
-          The `A' command can also be used to take off  armor  as  well  as
+          The  `A'  command  can  also be used to take off armor as well as
           other worn items.
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1590,52 +1590,52 @@
 
           7.4.  Food (`%')
 
-               Food  is  necessary  to survive.  If you go too long without
-          eating you will faint, and eventually die  of  starvation.   Some
-          types  of  food  will  spoil, and become unhealthy to eat, if not
+               Food is necessary to survive.  If you go  too  long  without
+          eating  you  will  faint, and eventually die of starvation.  Some
+          types of food will spoil, and become unhealthy  to  eat,  if  not
           protected.  Food stored in ice boxes or tins (``cans'') will usu-
-          ally  stay  fresh, but ice boxes are heavy, and tins take a while
+          ally stay fresh, but ice boxes are heavy, and tins take  a  while
           to open.
 
                When you kill monsters, they usually leave corpses which are
           also ``food.''  Many, but not all, of these are edible; some also
-          give you special powers when you eat them.  A good rule of  thumb
+          give  you special powers when you eat them.  A good rule of thumb
           is ``you are what you eat.''
 
                Some character roles and some monsters are vegetarian.  Veg-
-          etarian monsters will typically never eat animal  corpses,  while
-          vegetarian  players can, but with some rather unpleasant side-ef-
+          etarian  monsters  will typically never eat animal corpses, while
+          vegetarian players can, but with some rather unpleasant  side-ef-
           fects.
 
-               You can name one food item after something you like  to  eat
+               You  can  name one food item after something you like to eat
           with the fruit option.
 
                The command to eat food is `e'.
 
           7.5.  Scrolls (`?')
 
-               Scrolls  are labeled with various titles, probably chosen by
-          ancient wizards for their amusement value (ex.  ``READ  ME,''  or
+               Scrolls are labeled with various titles, probably chosen  by
+          ancient  wizards  for  their amusement value (ex. ``READ ME,'' or
           ``THANX MAUD'' backwards).  Scrolls disappear after you read them
           (except for blank ones, without magic spells on them).
 
-               One of the most useful of these is the scroll  of  identify,
+               One  of  the most useful of these is the scroll of identify,
           which can be used to determine what another object is, whether it
-          is cursed or blessed, and how many uses it has  left.   Some  ob-
-          jects  of  subtle  enchantment  are difficult to identify without
+          is  cursed  or  blessed, and how many uses it has left.  Some ob-
+          jects of subtle enchantment are  difficult  to  identify  without
           these.
 
                A mail daemon may run up and deliver mail to you as a scroll
-          of  mail  (on  versions compiled with this feature).  To use this
-          feature on versions where NetHack mail delivery is  triggered  by
-          electronic  mail  appearing  in your system mailbox, you must let
-          NetHack know where to look for new mail by setting  the  ``MAIL''
-          environment  variable  to the file name of your mailbox.  You may
-          also want to set the ``MAILREADER'' environment variable  to  the
-          file  name  of  your  favorite reader, so NetHack can shell to it
-          when you read the scroll.  On versions of NetHack where  mail  is
-          randomly  generated internal to the game, these environment vari-
-          ables are ignored.  You can disable the mail  daemon  by  turning
+          of mail (on versions compiled with this feature).   To  use  this
+          feature  on  versions where NetHack mail delivery is triggered by
+          electronic mail appearing in your system mailbox,  you  must  let
+          NetHack  know  where to look for new mail by setting the ``MAIL''
+          environment variable to the file name of your mailbox.   You  may
+          also  want  to set the ``MAILREADER'' environment variable to the
+          file name of your favorite reader, so NetHack  can  shell  to  it
+          when  you  read the scroll.  On versions of NetHack where mail is
+          randomly generated internal to the game, these environment  vari-
+          ables  are  ignored.   You can disable the mail daemon by turning
           off the mail option.
 
                The command to read a scroll is `r'.
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1656,61 +1656,61 @@
 
           7.6.  Potions (`!')
 
-               Potions  are distinguished by the color of the liquid inside
+               Potions are distinguished by the color of the liquid  inside
           the flask.  They disappear after you quaff them.
 
-               Clear potions are potions of  water.   Sometimes  these  are
+               Clear  potions  are  potions  of water.  Sometimes these are
           blessed or cursed, resulting in holy or unholy water.  Holy water
-          is the bane of the undead, so potions  of  holy  water  are  good
-          things  to throw (`t') at them.  It is also sometimes very useful
+          is  the  bane  of  the  undead, so potions of holy water are good
+          things to throw (`t') at them.  It is also sometimes very  useful
           to dip (``#dip'') an object into a potion.
 
                The command to drink a potion is `q' (quaff).
 
           7.7.  Wands (`/')
 
-               Magic wands usually have  multiple  magical  charges.   Some
-          wands  are directional--you must give a direction in which to zap
-          them.  You can also zap them at yourself (just give a `.' or  `s'
+               Magic  wands  usually  have  multiple magical charges.  Some
+          wands are directional--you must give a direction in which to  zap
+          them.   You can also zap them at yourself (just give a `.' or `s'
           for the direction). Be warned, however, for this is often unwise.
-          Other wands are nondirectional--they don't require  a  direction.
-          The  number  of  charges in a wand is random and decreases by one
+          Other  wands  are nondirectional--they don't require a direction.
+          The number of charges in a wand is random and  decreases  by  one
           whenever you use it.
 
-               When the number of charges left in a wand becomes zero,  at-
-          tempts  to use the wand will usually result in nothing happening.
+               When  the number of charges left in a wand becomes zero, at-
+          tempts to use the wand will usually result in nothing  happening.
           Occasionally, however, it may be possible to squeeze the last few
-          mana  points  from  an otherwise spent wand, destroying it in the
-          process.  A wand may be recharged by using  suitable  magic,  but
-          doing  so runs the risk of causing it to explode.  The chance for
-          such an explosion starts out very small and increases  each  time
+          mana points from an otherwise spent wand, destroying  it  in  the
+          process.   A  wand  may be recharged by using suitable magic, but
+          doing so runs the risk of causing it to explode.  The chance  for
+          such  an  explosion starts out very small and increases each time
           the wand is recharged.
 
                In a truly desperate situation, when your back is up against
-          the wall, you might decide to go for broke and break  your  wand.
-          This  is  not  for the faint of heart.  Doing so will almost cer-
+          the  wall,  you might decide to go for broke and break your wand.
+          This is not for the faint of heart.  Doing so  will  almost  cer-
           tainly cause a catastrophic release of magical energies.
 
-               When you have fully identified a particular wand,  inventory
-          display  will  include additional information in parentheses: the
-          number of times it has been recharged followed  by  a  colon  and
+               When  you have fully identified a particular wand, inventory
+          display will include additional information in  parentheses:  the
+          number  of  times  it  has been recharged followed by a colon and
           then by its current number of charges.  A current charge count of
           -1 is a special case indicating that the wand has been cancelled.
 
-               The  command  to use a wand is `z' (zap).  To break one, use
+               The command to use a wand is `z' (zap).  To break  one,  use
           the `a' (apply) command.
 
           7.8.  Rings (`=')
 
-               Rings are very useful items, since they are relatively  per-
-          manent  magic,  unlike  the  usually fleeting effects of potions,
+               Rings  are very useful items, since they are relatively per-
+          manent magic, unlike the usually  fleeting  effects  of  potions,
           scrolls, and wands.
 
-               Putting on a ring activates its magic.  You  can  wear  only
+               Putting  on  a  ring activates its magic.  You can wear only
           two rings, one on each ring finger.
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1720,7 +1720,7 @@
 
 
 
-               Most  rings  also cause you to grow hungry more rapidly, the
+               Most rings also cause you to grow hungry more  rapidly,  the
           rate varying with the type of ring.
 
                The commands to use rings are `P' (put on) and `R' (remove).
@@ -1728,55 +1728,55 @@
           7.9.  Spellbooks (`+')
 
                Spellbooks are tomes of mighty magic.  When studied with the
-          `r' (read) command, they transfer to the reader the knowledge  of
-          a  spell  (and  therefore eventually become unreadable) -- unless
-          the attempt backfires.  Reading a cursed spellbook  or  one  with
+          `r'  (read) command, they transfer to the reader the knowledge of
+          a spell (and therefore eventually become  unreadable)  --  unless
+          the  attempt  backfires.   Reading a cursed spellbook or one with
           mystic runes beyond your ken can be harmful to your health!
 
-               A  spell (even when learned) can also backfire when you cast
-          it.  If you attempt to cast a spell well  above  your  experience
-          level,  or  if  you  have little skill with the appropriate spell
-          type, or cast it at a time when your luck  is  particularly  bad,
-          you  can  end up wasting both the energy and the time required in
+               A spell (even when learned) can also backfire when you  cast
+          it.   If  you  attempt to cast a spell well above your experience
+          level, or if you have little skill  with  the  appropriate  spell
+          type,  or  cast  it at a time when your luck is particularly bad,
+          you can end up wasting both the energy and the time  required  in
           casting.
 
-               Casting a spell calls forth  magical  energies  and  focuses
-          them  with  your naked mind.  Some of the magical energy released
-          comes from within you, and casting several spells in  a  row  may
-          tire  you.  Casting of spells also requires practice.  With prac-
-          tice, your skill in each category of spell casting will  improve.
-          Over  time,  however, your memory of each spell will dim, and you
+               Casting  a  spell  calls  forth magical energies and focuses
+          them with your naked mind.  Some of the magical  energy  released
+          comes  from  within  you, and casting several spells in a row may
+          tire you.  Casting of spells also requires practice.  With  prac-
+          tice,  your skill in each category of spell casting will improve.
+          Over time, however, your memory of each spell will dim,  and  you
           will need to relearn it.
 
-               Some spells are directional--you must give  a  direction  in
-          which  to  cast  them.   You can also cast them at yourself (just
-          give a `.' or `s' for the direction).  Be  warned,  however,  for
-          this  is  often  unwise.   Other  spells are nondirectional--they
+               Some  spells  are  directional--you must give a direction in
+          which to cast them.  You can also cast  them  at  yourself  (just
+          give  a  `.'  or  `s' for the direction). Be warned, however, for
+          this is often  unwise.   Other  spells  are  nondirectional--they
           don't require a direction.
 
                Just as weapons are divided into groups in which a character
-          can  become proficient (to varying degrees), spells are similarly
+          can become proficient (to varying degrees), spells are  similarly
           grouped.  Successfully casting a spell exercises the skill group;
           sufficient skill may increase the potency of the spell and reduce
-          the risk of spell failure.  Skill slots are shared  with  weapons
+          the  risk  of spell failure.  Skill slots are shared with weapons
           skills.  (See also the section on ``Weapon proficiency''.)
 
                Casting a spell also requires flexible movement, and wearing
           various types of armor may interfere with that.
 
-               The command to read a spellbook is the same as for  scrolls,
-          `r'  (read).   The  `+'  command lists your current spells, their
+               The  command to read a spellbook is the same as for scrolls,
+          `r' (read).  The `+' command lists  your  current  spells,  their
           levels, categories, and chances for failure.  The `Z' (cast) com-
           mand casts a spell.
 
           7.10.  Tools (`(')
 
                Tools are miscellaneous objects with various purposes.  Some
-          tools have a limited number of uses, akin to wand  charges.   For
-          example,   lamps  burn  out  after  a  while.   Other  tools  are
+          tools  have  a limited number of uses, akin to wand charges.  For
+          example,  lamps  burn  out  after  a  while.   Other  tools   are
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1792,14 +1792,14 @@
 
           7.10.1.  Containers
 
-               You may encounter bags, boxes, and chests in  your  travels.
-          A  tool  of  this  sort can be opened with the ``#loot'' extended
-          command when you are standing on top of it (that is, on the  same
-          floor  spot), or with the `a' (apply) command when you are carry-
-          ing it.  However, chests are often locked, and are  in  any  case
-          unwieldy  objects.   You must set one down before unlocking it by
+               You  may  encounter bags, boxes, and chests in your travels.
+          A tool of this sort can be opened  with  the  ``#loot''  extended
+          command  when you are standing on top of it (that is, on the same
+          floor spot), or with the `a' (apply) command when you are  carry-
+          ing  it.   However,  chests are often locked, and are in any case
+          unwieldy objects.  You must set one down before unlocking  it  by
           using a key or lock-picking tool with the `a' (apply) command, by
-          kicking  it  with the `^D' command, or by using a weapon to force
+          kicking it with the `^D' command, or by using a weapon  to  force
           the lock with the ``#force'' extended command.
 
                Some chests are trapped, causing nasty things to happen when
@@ -1808,41 +1808,41 @@
 
           7.11.  Amulets (`"')
 
-               Amulets are very similar to rings, and often more  powerful.
+               Amulets  are very similar to rings, and often more powerful.
           Like rings, amulets have various magical properties, some benefi-
           cial, some harmful, which are activated by putting them on.
 
                Only one amulet may be worn at a time, around your neck.
 
-               The commands to use amulets are the same as for  rings,  `P'
+               The  commands  to use amulets are the same as for rings, `P'
           (put on) and `R' (remove).
 
           7.12.  Gems (`*')
 
-               Some  gems  are valuable, and can be sold for a lot of gold.
-          They are also a far more efficient way of carrying  your  riches.
+               Some gems are valuable, and can be sold for a lot  of  gold.
+          They  are  also a far more efficient way of carrying your riches.
           Valuable gems increase your score if you bring them with you when
           you exit.
 
                Other small rocks are also categorized as gems, but they are
-          much  less  valuable.  All rocks, however, can be used as projec-
-          tile weapons (if you have a sling).  In  the  most  desperate  of
+          much less valuable.  All rocks, however, can be used  as  projec-
+          tile  weapons  (if  you  have a sling).  In the most desperate of
           cases, you can still throw them by hand.
 
           7.13.  Large rocks (``')
 
-               Statues  and  boulders  are not particularly useful, and are
-          generally heavy.  It is rumored that some statues  are  not  what
+               Statues and boulders are not particularly  useful,  and  are
+          generally  heavy.   It  is rumored that some statues are not what
           they seem.
 
-               Very  large humanoids (giants and their ilk) have been known
+               Very large humanoids (giants and their ilk) have been  known
           to use boulders as weapons.
 
 
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1854,61 +1854,61 @@
 
           7.14.  Gold (`$')
 
-               Gold adds to your score, and you can  buy  things  in  shops
-          with  it.  There are a number of monsters in the dungeon that may
+               Gold  adds  to  your  score, and you can buy things in shops
+          with it.  There are a number of monsters in the dungeon that  may
           be influenced by the amount of gold you are carrying (shopkeepers
           aside).
 
 
           8.  Conduct
 
-               As  if  winning  NetHack  were not difficult enough, certain
-          players seek to challenge themselves by imposing restrictions  on
-          the  way  they play the game.  The game automatically tracks some
-          of these challenges, which can be checked at any  time  with  the
-          #conduct  command or at the end of the game.  When you perform an
-          action which breaks a challenge, it will  no  longer  be  listed.
+               As if winning NetHack were  not  difficult  enough,  certain
+          players  seek to challenge themselves by imposing restrictions on
+          the way they play the game.  The game automatically  tracks  some
+          of  these  challenges,  which can be checked at any time with the
+          #conduct command or at the end of the game.  When you perform  an
+          action  which  breaks  a  challenge, it will no longer be listed.
           This gives players extra ``bragging rights'' for winning the game
-          with these challenges.  Note that it is perfectly  acceptable  to
-          win  the game without resorting to these restrictions and that it
-          is unusual for players to adhere to  challenges  the  first  time
+          with  these  challenges.  Note that it is perfectly acceptable to
+          win the game without resorting to these restrictions and that  it
+          is  unusual  for  players  to adhere to challenges the first time
           they win the game.
 
-               Several  of  the  challenges are related to eating behavior.
-          The most difficult of these is the foodless challenge.   Although
+               Several of the challenges are related  to  eating  behavior.
+          The  most difficult of these is the foodless challenge.  Although
           creatures can survive long periods of time without food, there is
-          a physiological need for water; thus there is no  restriction  on
-          drinking  beverages,  even  if they provide some minor food bene-
-          fits.  Calling upon your god for help with  starvation  does  not
+          a  physiological  need for water; thus there is no restriction on
+          drinking beverages, even if they provide some  minor  food  bene-
+          fits.   Calling  upon  your god for help with starvation does not
           violate any food challenges either.
 
-               A  strict  vegan  diet  is one which avoids any food derived
+               A strict vegan diet is one which  avoids  any  food  derived
           from animals.  The primary source of nutrition is fruits and veg-
           etables.  The corpses and tins of blobs (`b'), jellies (`j'), and
-          fungi (`F') are also considered to be vegetable matter.   Certain
-          human  food  is  prepared without animal products; namely, lembas
-          wafers, cram rations, food rations (gunyoki), K-rations,  and  C-
-          rations.   Metal  or another normally indigestible material eaten
+          fungi  (`F') are also considered to be vegetable matter.  Certain
+          human food is prepared without animal  products;  namely,  lembas
+          wafers,  cram  rations, food rations (gunyoki), K-rations, and C-
+          rations.  Metal or another normally indigestible  material  eaten
           while polymorphed into a creature that can digest it is also con-
-          sidered  vegan  food.   Note however that eating such items still
+          sidered vegan food.  Note however that eating  such  items  still
           counts against foodless conduct.
 
-               Vegetarians do not eat animals; however, they are  less  se-
-          lective  about eating animal byproducts than vegans.  In addition
+               Vegetarians  do  not eat animals; however, they are less se-
+          lective about eating animal byproducts than vegans.  In  addition
           to the vegan items listed above, they may eat any kind of pudding
           (`P') other than the black puddings, eggs and food made from eggs
-          (fortune cookies and pancakes), food made with milk  (cream  pies
+          (fortune  cookies  and pancakes), food made with milk (cream pies
           and candy bars), and lumps of royal jelly.  Monks are expected to
           observe a vegetarian diet.
 
-               Eating any kind of meat violates the vegetarian, vegan,  and
-          foodless  conducts.   This includes tripe rations, the corpses or
-          tins of any monsters not mentioned above, and the  various  other
-          chunks  of meat found in the dungeon.  Swallowing and digesting a
+               Eating  any kind of meat violates the vegetarian, vegan, and
+          foodless conducts.  This includes tripe rations, the  corpses  or
+          tins  of  any monsters not mentioned above, and the various other
+          chunks of meat found in the dungeon.  Swallowing and digesting  a
           monster while polymorphed is treated as if you ate the creature's
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1918,63 +1918,63 @@
 
 
 
-          corpse.   Eating  leather, dragon hide, or bone items while poly-
-          morphed into a creature that can digest  it,  or  eating  monster
+          corpse.  Eating leather, dragon hide, or bone items  while  poly-
+          morphed  into  a  creature  that can digest it, or eating monster
           brains while polymorphed into a mind flayer, is considered eating
           an animal, although wax is only an animal byproduct.
 
-               Regardless of conduct, there will be some  items  which  are
-          indigestible,  and  others  which  are hazardous to eat.  Using a
+               Regardless  of  conduct,  there will be some items which are
+          indigestible, and others which are hazardous  to  eat.   Using  a
           swallow-and-digest attack against a monster is equivalent to eat-
           ing the monster's corpse.  Please note that the term ``vegan'' is
-          used here only in the context of diet.  You  are  still  free  to
-          choose  not  to  use  or  wear  items  derived from animals (e.g.
-          leather, dragon hide, bone, horns, coral), but the game will  not
+          used  here  only  in  the context of diet.  You are still free to
+          choose not to use  or  wear  items  derived  from  animals  (e.g.
+          leather,  dragon hide, bone, horns, coral), but the game will not
           keep track of this for you.  Also note that ``milky'' potions may
           be a translucent white, but they do not contain milk, so they are
-          compatible  with  a  vegan  diet.   Slime molds or player-defined
-          ``fruits'', although they could be anything from ``cherries''  to
+          compatible with a vegan  diet.   Slime  molds  or  player-defined
+          ``fruits'',  although they could be anything from ``cherries'' to
           ``pork chops'', are also assumed to be vegan.
 
                An atheist is one who rejects religion.  This means that you
-          cannot #pray, #offer sacrifices to  any  god,  #turn  undead,  or
-          #chat  with  a  priest.  Particularly selective readers may argue
-          that playing Monk or Priest characters should violate  this  con-
-          duct;  that  is a choice left to the player.  Offering the Amulet
-          of Yendor to your god is necessary to win the  game  and  is  not
+          cannot  #pray,  #offer  sacrifices  to  any god, #turn undead, or
+          #chat with a priest.  Particularly selective  readers  may  argue
+          that  playing  Monk or Priest characters should violate this con-
+          duct; that is a choice left to the player.  Offering  the  Amulet
+          of  Yendor  to  your  god is necessary to win the game and is not
           counted against this conduct.  You are also not penalized for be-
-          ing spoken to by an angry god, priest(ess),  or  other  religious
+          ing  spoken  to  by an angry god, priest(ess), or other religious
           figure; a true atheist would hear the words but attach no special
           meaning to them.
 
-               Most players fight with a wielded weapon (or  tool  intended
+               Most  players  fight with a wielded weapon (or tool intended
           to be wielded as a weapon).  Another challenge is to win the game
-          without using such a wielded weapon.  You are still permitted  to
-          throw,  fire,  and kick weapons; use a wand, spell, or other type
+          without  using such a wielded weapon.  You are still permitted to
+          throw, fire, and kick weapons; use a wand, spell, or  other  type
           of item; or fight with your hands and feet.
 
-               In NetHack, a pacifist refuses to cause  the  death  of  any
-          other  monster  (i.e. if you would get experience for the death).
-          This is a particularly difficult challenge, although it is  still
+               In  NetHack,  a  pacifist  refuses to cause the death of any
+          other monster (i.e. if you would get experience for  the  death).
+          This  is a particularly difficult challenge, although it is still
           possible to gain experience by other means.
 
                An illiterate character cannot read or write.  This includes
-          reading a scroll, spellbook, fortune cookie message, or  t-shirt;
+          reading  a scroll, spellbook, fortune cookie message, or t-shirt;
           writing a scroll; or making an engraving of anything other than a
           single ``x'' (the traditional signature of an illiterate person).
           Reading an engraving, or any item that is absolutely necessary to
-          win the game, is not counted against this conduct.  The  identity
-          of  scrolls  and  spellbooks  (and  knowledge  of spells) in your
-          starting inventory is assumed to be learned  from  your  teachers
+          win  the game, is not counted against this conduct.  The identity
+          of scrolls and spellbooks  (and  knowledge  of  spells)  in  your
+          starting  inventory  is  assumed to be learned from your teachers
           prior to the start of the game and isn't counted.
 
-               There  are several other challenges tracked by the game.  It
+               There are several other challenges tracked by the game.   It
           is possible to eliminate one or more species of monsters by geno-
-          cide;  playing  without  this  feature is considered a challenge.
+          cide; playing without this feature  is  considered  a  challenge.
           When you game offers you an opportunity to genocide monsters, you
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -1984,54 +1984,54 @@
 
 
 
-          may  respond  with  the  monster type ``none'' if you want to de-
-          cline.  You can change the form of an item into another  item  of
-          the  same type (``polypiling'') or the form of your own body into
-          another creature (``polyself'') by  wand,  spell,  or  potion  of
+          may respond with the monster type ``none'' if  you  want  to  de-
+          cline.   You  can change the form of an item into another item of
+          the same type (``polypiling'') or the form of your own body  into
+          another  creature  (``polyself'')  by  wand,  spell, or potion of
           polymorph; avoiding these effects are each considered challenges.
-          Polymorphing monsters, including pets, does not break  either  of
-          these  challenges.   Finally, you may sometimes receive wishes; a
-          game without an attempt to wish for any items is a challenge,  as
-          is  a  game without wishing for an artifact (even if the artifact
+          Polymorphing  monsters,  including pets, does not break either of
+          these challenges.  Finally, you may sometimes receive  wishes;  a
+          game  without an attempt to wish for any items is a challenge, as
+          is a game without wishing for an artifact (even if  the  artifact
           immediately disappears).  When the game offers you an opportunity
-          to  make  a  wish  for an item, you may choose ``nothing'' if you
+          to make a wish for an item, you may  choose  ``nothing''  if  you
           want to decline.
 
 
           9.  Options
 
-               Due to variations in personal tastes and conceptions of  how
+               Due  to variations in personal tastes and conceptions of how
           NetHack should do things, there are options you can set to change
           how NetHack behaves.
 
           9.1.  Setting the options
 
-               Options may be set in a number of ways.   Within  the  game,
+               Options  may  be  set in a number of ways.  Within the game,
           the `O' command allows you to view all options and change most of
-          them.  You can also set options automatically by placing them  in
-          the  NETHACKOPTIONS  environment  variable  or in a configuration
+          them.   You can also set options automatically by placing them in
+          the NETHACKOPTIONS environment variable  or  in  a  configuration
           file.  Some versions of NetHack also have front-end programs that
           allow you to set options before starting the game.
 
           9.2.  Using the NETHACKOPTIONS environment variable
 
-               The  NETHACKOPTIONS  variable  is  a comma-separated list of
-          initial values for the various options.  Some can only be  turned
-          on  or  off.   You turn one of these on by adding the name of the
+               The NETHACKOPTIONS variable is  a  comma-separated  list  of
+          initial  values for the various options.  Some can only be turned
+          on or off.  You turn one of these on by adding the  name  of  the
           option to the list, and turn it off by typing a `!' or ``no'' be-
-          fore  the  name.  Others take a character string as a value.  You
-          can set string options by typing the  option  name,  a  colon  or
+          fore the name.  Others take a character string as a  value.   You
+          can  set  string  options  by  typing the option name, a colon or
           equals sign, and then the value of the string.  The value is ter-
           minated by the next comma or the end of string.
 
                For example, to set up an environment variable so that ``au-
-          toquiver''  is  on,  ``autopickup''  is  off,  the name is set to
-          ``Blue Meanie'', and the fruit is set to  ``papaya'',  you  would
+          toquiver'' is on, ``autopickup'' is  off,  the  name  is  set  to
+          ``Blue  Meanie'',  and  the fruit is set to ``papaya'', you would
           enter the command
 
                % setenv NETHACKOPTIONS "autoquiver,\!autopickup,name:Blue Meanie,fruit:papaya"
 
-          in  csh  (note the need to escape the ! since it's special to the
+          in csh (note the need to escape the ! since it's special  to  the
           shell), or
 
                $ NETHACKOPTIONS="autoquiver,!autopickup,name:Blue Meanie,fruit:papaya"
@@ -2040,7 +2040,7 @@
           in sh or ksh.
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -2052,61 +2052,61 @@
 
           9.3.  Using a configuration file
 
-               Any line in  the  configuration  file  starting  with  ``OP-
-          TIONS=''  may be filled out with options in the same syntax as in
+               Any  line  in  the  configuration  file  starting with ``OP-
+          TIONS='' may be filled out with options in the same syntax as  in
           NETHACKOPTIONS.   Any  line  starting  with  ``DUNGEON='',  ``EF-
-          FECTS='',  ``MONSTERS='',  ``OBJECTS='',  ``TRAPS='',  or ``BOUL-
-          DER='' is taken as defining the corresponding  dungeon,  effects,
-          monsters,  objects traps or boulder option in a different syntax,
-          a sequence of decimal numbers giving the  character  position  in
+          FECTS='', ``MONSTERS='',  ``OBJECTS='',  ``TRAPS='',  or  ``BOUL-
+          DER=''  is  taken as defining the corresponding dungeon, effects,
+          monsters, objects traps or boulder option in a different  syntax,
+          a  sequence  of  decimal numbers giving the character position in
           the current font to be used in displaying each entry.  Such a se-
           quence can be continued to multiple lines by putting a `\' at the
-          end  of each line to be continued.  Any line starting with `#' is
+          end of each line to be continued.  Any line starting with `#'  is
           treated as a comment.
 
                The default name of the configuration file varies on differ-
-          ent  operating systems, but NETHACKOPTIONS can also be set to the
-          full name of a file you want to  use  (possibly  preceded  by  an
+          ent operating systems, but NETHACKOPTIONS can also be set to  the
+          full  name  of  a  file  you want to use (possibly preceded by an
           `@').
 
           9.4.  Customization options
 
                Here are explanations of what the various options do.  Char-
-          acter strings that are too long may be truncated.   Some  of  the
+          acter  strings  that  are too long may be truncated.  Some of the
           options listed may be inactive in your dungeon.
 
           align
-               Your  starting  alignment  (align:lawful,  align:neutral, or
+               Your starting  alignment  (align:lawful,  align:neutral,  or
                align:chaotic).  You may specify just the first letter.  The
-               default  is to randomly pick an appropriate alignment.  Can-
+               default is to randomly pick an appropriate alignment.   Can-
                not be set with the `O' command.
 
           autodig
-               Automatically dig if you are wielding  a  digging  tool  and
+               Automatically  dig  if  you  are wielding a digging tool and
                moving into a place that can be dug (default false).
 
           autopickup
-               Automatically  pick  up  things onto which you move (default
+               Automatically pick up things onto which  you  move  (default
                on).
 
           autoquiver
-               This option controls what happens when you attempt  the  `f'
+               This  option  controls what happens when you attempt the `f'
                (fire) command with an empty quiver.  When true, the comput-
-               er will fill your quiver with some  suitable  weapon.   Note
-               that  it  will not take into account the blessed/cursed sta-
-               tus, enchantment, damage, or quality of the weapon; you  are
-               free  to  manually fill your quiver with the `Q' command in-
-               stead.  If no weapon is found or the option  is  false,  the
+               er  will  fill  your quiver with some suitable weapon.  Note
+               that it will not take into account the  blessed/cursed  sta-
+               tus,  enchantment, damage, or quality of the weapon; you are
+               free to manually fill your quiver with the `Q'  command  in-
+               stead.   If  no  weapon is found or the option is false, the
                `t' (throw) command is executed instead.  (default false)
 
           boulder
-               Set  the character used to display boulders (default is rock
+               Set the character used to display boulders (default is  rock
                class symbol).
 
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -2117,12 +2117,12 @@
 
 
           catname
-               Name your starting cat (ex. ``catname:Morris'').  Cannot  be
+               Name  your starting cat (ex. ``catname:Morris'').  Cannot be
                set with the `O' command.
 
           character
-               Pick  your  type of character (ex. ``character:Monk''); syn-
-               onym for ``role''.  See ``name'' for an alternate method  of
+               Pick your type of character (ex.  ``character:Monk'');  syn-
+               onym  for ``role''.  See ``name'' for an alternate method of
                specifying your role.  Normally only the first letter of the
                value is examined; the string ``random'' is an exception.
 
@@ -2131,28 +2131,33 @@
                ery after program crash (default on).
 
           checkspace
-               Check  free disk space before writing files to disk (default
-               on).  You may have to turn this off if you have more than  2
-               GB  free space on the partition used for your save and level
-               files.  Only applies when MFLOPPY was defined during  compi-
+               Check free disk space before writing files to disk  (default
+               on).   You may have to turn this off if you have more than 2
+               GB free space on the partition used for your save and  level
+               files.   Only applies when MFLOPPY was defined during compi-
                lation.
 
+          cmdassist
+               Have the game provide some additional command assistance for
+               new players if it detects some anticipated mistakes (default
+               on).
+
           confirm
-               Have  user  confirm  attacks on pets, shopkeepers, and other
+               Have user confirm attacks on pets,  shopkeepers,  and  other
                peaceable creatures (default on).
 
           DECgraphics
-               Use a predefined selection of characters from  the  DEC  VT-
-               xxx/DEC  Rainbow/ANSI  line-drawing character set to display
+               Use  a  predefined  selection of characters from the DEC VT-
+               xxx/DEC Rainbow/ANSI line-drawing character set  to  display
                the dungeon/effects/traps instead of having to define a full
-               graphics  set yourself (default off).  This option also sets
-               up proper handling of graphics characters  for  such  termi-
-               nals,  so you should specify it when appropriate even if you
+               graphics set yourself (default off).  This option also  sets
+               up  proper  handling  of graphics characters for such termi-
+               nals, so you should specify it when appropriate even if  you
                override the selections with your own graphics strings.
 
           disclose
                Controls options for disclosing various information when the
-               game  ends  (defaults to all possibilities being disclosed).
+               game ends (defaults to all possibilities  being  disclosed).
                The possibilities are:
 
                     i - disclose your inventory.
@@ -2161,18 +2166,13 @@
                     g - list monster species that have been genocided.
                     c - display your conduct.
 
-               Each disclosure possibility can optionally be preceded by  a
-               prefix  which  let  you  refine how it behaves. Here are the
+               Each  disclosure possibility can optionally be preceded by a
+               prefix which let you refine how it  behaves.  Here  are  the
                valid prefixes:
 
-                    y - prompt you and default to yes on the prompt.
-                    n - prompt you and default to no on the prompt.
-                    + - disclose it without prompting.
-                    - - do not disclose it and do not prompt.
 
 
-
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -2182,63 +2182,63 @@
 
 
 
+                    y - prompt you and default to yes on the prompt.
+                    n - prompt you and default to no on the prompt.
+                    + - disclose it without prompting.
+                    - - do not disclose it and do not prompt.
+
                (ex. ``disclose:yi na +v -g -c'') The example sets inventory
-               to  prompt  and default to yes, attributes to prompt and de-
+               to prompt and default to yes, attributes to prompt  and  de-
                fault to no, vanquished to disclose without prompting, geno-
                cided to not disclose and not to prompt, conduct to not dis-
-               close and not to prompt.  Note that the vanquished  monsters
+               close  and not to prompt.  Note that the vanquished monsters
                list includes all monsters killed by traps and each other as
                well as by you.
 
           dogname
-               Name your starting dog (ex.  ``dogname:Fang'').   Cannot  be
+               Name  your  starting  dog (ex. ``dogname:Fang'').  Cannot be
                set with the `O' command.
 
           dungeon
                Set the graphics symbols for displaying the dungeon (default
                `` |--------||.-|++##.##<><>_|\\#{}.}..## #}'').   The  dun-
-               geon  option  should be followed by a string of 1-41 charac-
-               ters to be used instead of the default  map-drawing  charac-
-               ters.   The  dungeon map will use the characters you specify
-               instead of the default symbols, and default symbols for  any
-               you  do  not  specify.  Remember that you may need to escape
-               some of these characters on a command line if they are  spe-
+               geon option should be followed by a string of  1-41  charac-
+               ters  to  be used instead of the default map-drawing charac-
+               ters.  The dungeon map will use the characters  you  specify
+               instead  of the default symbols, and default symbols for any
+               you do not specify.  Remember that you may  need  to  escape
+               some  of these characters on a command line if they are spe-
                cial to your shell.
 
-               Note  that  NetHack  escape-processes  this option string in
-               conventional C fashion.  This means that `\' is a prefix  to
-               take  the  following character literally.  Thus `\' needs to
-               be represented  as  `\\'.   The  special  escape  form  `\m'
+               Note that NetHack escape-processes  this  option  string  in
+               conventional  C fashion.  This means that `\' is a prefix to
+               take the following character literally.  Thus `\'  needs  to
+               be  represented  as  `\\'.   The  special  escape  form `\m'
                switches on the meta bit in the following character, and the
                `^' prefix causes the following character to be treated as a
                control character.
 
-               The  order  of  the  symbols is:  solid rock, vertical wall,
+               The order of the symbols is:   solid  rock,  vertical  wall,
                horizontal wall, upper left corner, upper right corner, low-
-               er  left  corner,  lower  right corner, cross wall, upward T
+               er left corner, lower right corner,  cross  wall,  upward  T
                wall, downward T wall, leftward T wall, rightward T wall, no
-               door,  vertical  open  door,  horizontal open door, vertical
-               closed door, horizontal closed door, iron bars, tree,  floor
-               of  a  room,  dark corridor, lit corridor, stairs up, stairs
-               down, ladder up, ladder down, altar, grave, throne,  kitchen
-               sink,  fountain,  pool  or moat, ice, lava, vertical lowered
-               drawbridge, horizontal lowered drawbridge,  vertical  raised
-               drawbridge,  horizontal raised drawbridge, air, cloud, under
+               door, vertical open door,  horizontal  open  door,  vertical
+               closed  door, horizontal closed door, iron bars, tree, floor
+               of a room, dark corridor, lit corridor,  stairs  up,  stairs
+               down,  ladder up, ladder down, altar, grave, throne, kitchen
+               sink, fountain, pool or moat, ice,  lava,  vertical  lowered
+               drawbridge,  horizontal  lowered drawbridge, vertical raised
+               drawbridge, horizontal raised drawbridge, air, cloud,  under
                water.
 
-               You might want to use `+' for the corners and T walls for  a
-               more  aesthetic,  boxier display.  Note that in the next re-
-               lease, new symbols may be added, or the present  ones  rear-
+               You  might want to use `+' for the corners and T walls for a
+               more aesthetic, boxier display.  Note that in the  next  re-
+               lease,  new  symbols may be added, or the present ones rear-
                ranged.
 
-               Cannot be set with the `O' command.
-
-          effects
-               Set the graphics symbols for displaying special effects (de-
-               fault ``|-\\/*!)(0#@*/-\\||\\-//-\\| |\\-/'').  The  effects
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -2248,63 +2248,63 @@
 
 
 
-               option  should be followed by a string of 1-29 characters to
-               be used instead of the default  special-effects  characters.
-               This  string is subjected to the same processing as the dun-
+               Cannot be set with the `O' command.
+
+          effects
+               Set the graphics symbols for displaying special effects (de-
+               fault  ``|-\\/*!)(0#@*/-\\||\\-//-\\| |\\-/'').  The effects
+               option should be followed by a string of 1-29 characters  to
+               be  used  instead of the default special-effects characters.
+               This string is subjected to the same processing as the  dun-
                geon option.
 
-               The order of the  symbols  is:   vertical  beam,  horizontal
-               beam,  left  slant,  right slant, digging beam, camera flash
-               beam, left boomerang, right boomerang,  four  glyphs  giving
-               the  sequence  for magic resistance displays, the eight sur-
-               rounding glyphs for swallowed display, nine glyphs  for  ex-
+               The  order  of  the  symbols  is:  vertical beam, horizontal
+               beam, left slant, right slant, digging  beam,  camera  flash
+               beam,  left  boomerang,  right boomerang, four glyphs giving
+               the sequence for magic resistance displays, the  eight  sur-
+               rounding  glyphs  for swallowed display, nine glyphs for ex-
                plosions.  An explosion consists of three rows (top, middle,
-               and bottom) of three characters.  The explosion is  centered
+               and  bottom) of three characters.  The explosion is centered
                in the center of this 3 by 3 array.
 
-               Note  that in the next release, new symbols may be added, or
+               Note that in the next release, new symbols may be added,  or
                the present ones rearranged.
 
                Cannot be set with the `O' command.
 
           extmenu
-               Changes the extended commands interface to pop-up a menu  of
-               available  commands.   It  is  keystroke compatible with the
-               traditional interface except that it does not  require  that
-               you  hit  Enter. It is implemented only by the tty port (de-
-               fault off), when the game has been compiled to  support  tty
+               Changes  the extended commands interface to pop-up a menu of
+               available commands.  It is  keystroke  compatible  with  the
+               traditional  interface  except that it does not require that
+               you hit Enter. It is implemented only by the tty  port  (de-
+               fault  off),  when the game has been compiled to support tty
                graphics.
 
           female
-               An  obsolete  synonym  for ``gender:female''.  Cannot be set
+               An obsolete synonym for ``gender:female''.   Cannot  be  set
                with the `O' command.
 
           fixinv
-               An object's inventory letter sticks to it when it's  dropped
+               An  object's inventory letter sticks to it when it's dropped
                (default on).  If this is off, dropping an object shifts all
                the remaining inventory letters.
 
           fruit
-               Name  a  fruit  after  something  you  enjoy   eating   (ex.
+               Name   a   fruit  after  something  you  enjoy  eating  (ex.
                ``fruit:mango'') (default ``slime mold'').  Basically a nos-
-               talgic whimsy that NetHack uses  from  time  to  time.   You
-               should  set  this to something you find more appetizing than
+               talgic  whimsy  that  NetHack  uses  from time to time.  You
+               should set this to something you find more  appetizing  than
                slime mold.  Apples, oranges, pears, bananas, and melons al-
                ready exist in NetHack, so don't use those.
 
           gender
-               Your  starting  gender  (gender:male or gender:female).  You
-               may specify just the first letter.  Although you  can  still
-               denote  your  gender  using  the ``male'' and ``female'' op-
-               tions, the ``gender'' option will take precedence.  The  de-
-               fault  is to randomly pick an appropriate gender.  Cannot be
-               set with the `O' command.
-
-          help If more information is available for  an  object  looked  at
-               with  the  `/'  command,  ask if you want to see it (default
+               Your starting gender (gender:male  or  gender:female).   You
+               may  specify  just the first letter.  Although you can still
+               denote your gender using the  ``male''  and  ``female''  op-
+               tions,  the  ``gender''  option  will  take precedence.  The
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -2314,29 +2314,34 @@
 
 
 
-               on). Turning help off makes just looking at  things  faster,
+               default is to randomly pick an appropriate  gender.   Cannot
+               be set with the `O' command.
+
+          help If  more  information  is  available for an object looked at
+               with the `/' command, ask if you want  to  see  it  (default
+               on).  Turning  help off makes just looking at things faster,
                since you aren't interrupted with the ``More info?'' prompt,
-               but it also means  that  you  might  miss  some  interesting
+               but  it  also  means  that  you  might miss some interesting
                and/or important information.
 
           horsename
-               Name  your starting horse (ex. ``horsename:Trigger'').  Can-
+               Name your starting horse (ex. ``horsename:Trigger'').   Can-
                not be set with the `O' command.
 
           IBMgraphics
-               Use a predefined selection of IBM extended ASCII  characters
-               to  display  the  dungeon/effects/traps instead of having to
+               Use  a predefined selection of IBM extended ASCII characters
+               to display the dungeon/effects/traps instead  of  having  to
                define a full graphics set yourself (default off).  This op-
                tion also sets up proper handling of graphics characters for
-               such terminals, so you should specify  it  when  appropriate
-               even  if  you override the selections with your own graphics
+               such  terminals,  so  you should specify it when appropriate
+               even if you override the selections with your  own  graphics
                strings.
 
           ignintr
                Ignore interrupt signals, including breaks (default off).
 
           legacy
-               Display an introductory message when starting the game  (de-
+               Display  an introductory message when starting the game (de-
                fault on).
 
           lit_corridor
@@ -2344,8 +2349,8 @@
                held by your character as lit (default off).
 
           lootabc
-               Use the old `a', `b', and `c' keyboard shortcuts when  loot-
-               ing,  rather  than  the mnemonics `o', `i', and `b' (default
+               Use  the old `a', `b', and `c' keyboard shortcuts when loot-
+               ing, rather than the mnemonics `o', `i',  and  `b'  (default
                off).
 
           mail
@@ -2356,21 +2361,16 @@
                the `O' command.
 
           menustyle
-               Controls  the interface used when you need to choose various
-               objects (in response to the  Drop  command,  for  instance).
+               Controls the interface used when you need to choose  various
+               objects  (in  response  to  the Drop command, for instance).
                The value specified should be the first letter of one of the
                following:   traditional,  combination,  partial,  or  full.
-               Traditional  was  the  only  interface available for earlier
-               versions; it consists of a prompt for object  class  charac-
-               ters,  followed  by an object-by-object prompt for all items
-               matching the selected object class(es).  Combination  starts
-               with  a  prompt  for  object class(es) of interest, but then
-               displays a menu of matching objects  rather  than  prompting
-               one-by-one.   Partial  skips  the object class filtering and
-               immediately displays a menu of all objects.  Full displays a
+               Traditional was the only  interface  available  for  earlier
+               versions;  it  consists of a prompt for object class charac-
+               ters, followed by an object-by-object prompt for  all  items
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -2380,63 +2380,63 @@
 
 
 
-               menu  of  object classes rather than a character prompt, and
+               matching  the selected object class(es).  Combination starts
+               with a prompt for object class(es)  of  interest,  but  then
+               displays  a  menu  of matching objects rather than prompting
+               one-by-one.  Partial skips the object  class  filtering  and
+               immediately displays a menu of all objects.  Full displays a
+               menu of object classes rather than a character  prompt,  and
                then a menu of matching objects for selection.
 
           menu_deselect_all
-               Menu character accelerator to deselect all items in a  menu.
-               Implemented  by  the Amiga, Gem, X11 and tty ports.  Default
+               Menu  character accelerator to deselect all items in a menu.
+               Implemented by the Amiga, Gem, X11 and tty  ports.   Default
                '-'.
 
           menu_deselect_page
-               Menu character accelerator deselect all items on  this  page
-               of  a  menu.   Implemented  by the Amiga, Gem and tty ports.
+               Menu  character  accelerator deselect all items on this page
+               of a menu.  Implemented by the Amiga,  Gem  and  tty  ports.
                Default '\'.
 
           menu_first_page
-               Menu character accelerator to jump to the first  page  in  a
+               Menu  character  accelerator  to jump to the first page in a
                menu.  Implemented by the Amiga, Gem and tty ports.  Default
                '^'.
 
           menu_invert_all
-               Menu character accelerator to invert all items  in  a  menu.
-               Implemented  by  the Amiga, Gem, X11 and tty ports.  Default
+               Menu  character  accelerator  to invert all items in a menu.
+               Implemented by the Amiga, Gem, X11 and tty  ports.   Default
                '@'.
 
           menu_invert_page
-               Menu character accelerator to invert all items on this  page
-               of  a  menu.   Implemented  by the Amiga, Gem and tty ports.
+               Menu  character accelerator to invert all items on this page
+               of a menu.  Implemented by the Amiga,  Gem  and  tty  ports.
                Default '~'.
 
           menu_last_page
-               Menu character accelerator to jump to the  last  page  in  a
+               Menu  character  accelerator  to  jump to the last page in a
                menu.  Implemented by the Amiga, Gem and tty ports.  Default
                '|'.
 
           menu_next_page
-               Menu character accelerator to goto the next menu page.   Im-
+               Menu  character accelerator to goto the next menu page.  Im-
                plemented by the Amiga, Gem and tty ports.  Default '>'.
 
           menu_previous_page
-               Menu  character  accelerator to goto the previous menu page.
+               Menu character accelerator to goto the previous  menu  page.
                Implemented by the Amiga, Gem and tty ports.  Default '<'.
 
           menu_search
-               Menu character accelerator to search for a menu  item.   Im-
+               Menu  character  accelerator to search for a menu item.  Im-
                plemented by the Amiga, Gem and X11 ports.  Default ':'.
 
           menu_select_all
-               Menu  character  accelerator  to select all items in a menu.
-               Implemented by the Amiga, Gem, X11 and tty  ports.   Default
+               Menu character accelerator to select all items  in  a  menu.
+               Implemented  by  the Amiga, Gem, X11 and tty ports.  Default
                '.'.
 
-          menu_select_page
-               Menu  character accelerator to select all items on this page
-               of a menu.  Implemented by the Amiga,  Gem  and  tty  ports.
-               Default ','.
 
-
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -2446,23 +2446,28 @@
 
 
 
+          menu_select_page
+               Menu character accelerator to select all items on this  page
+               of  a  menu.   Implemented  by the Amiga, Gem and tty ports.
+               Default ','.
+
           monsters
-               Set  the characters used to display monster classes (default
+               Set the characters used to display monster classes  (default
                ``abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTU-
                VWXYZ@ '&;:~]'').  This string is subjected to the same pro-
-               cessing as the dungeon option.  The order of the symbols  is
-               ant  or other insect, blob, cockatrice, dog or other canine,
-               eye or sphere, feline, gremlin, humanoid, imp or  minor  de-
-               mon,  jelly, kobold, leprechaun, mimic, nymph, orc, piercer,
+               cessing  as the dungeon option.  The order of the symbols is
+               ant or other insect, blob, cockatrice, dog or other  canine,
+               eye  or  sphere, feline, gremlin, humanoid, imp or minor de-
+               mon, jelly, kobold, leprechaun, mimic, nymph, orc,  piercer,
                quadruped, rodent, spider, trapper or lurker above, horse or
-               unicorn,  vortex,  worm, xan or other mythical/fantastic in-
-               sect, light, zruty, angelic being,  bat  or  bird,  centaur,
-               dragon,  elemental,  fungus  or mold, gnome, giant humanoid,
-               invisible monster, jabberwock, Keystone  Kop,  lich,  mummy,
+               unicorn, vortex, worm, xan or other  mythical/fantastic  in-
+               sect,  light,  zruty,  angelic  being, bat or bird, centaur,
+               dragon, elemental, fungus or mold,  gnome,  giant  humanoid,
+               invisible  monster,  jabberwock,  Keystone Kop, lich, mummy,
                naga, ogre, pudding or ooze, quantum mechanic, rust monster,
                snake, troll, umber hulk, vampire, wraith, xorn, yeti or ape
                or some large beast, zombie, human, ghost, golem, demon, sea
-               monster, lizard, long worm tail, and mimic.  Cannot  be  set
+               monster,  lizard,  long worm tail, and mimic.  Cannot be set
                with the `O' command.
 
           msghistory
@@ -2470,8 +2475,8 @@
                (default 20).  Cannot be set with the `O' command.
 
           msg_window
-               Allows you to change the  way  recalled  messages  are  dis-
-               played.   (It  is  currently implemented for tty only.)  The
+               Allows  you  to  change  the  way recalled messages are dis-
+               played.  (It is currently implemented for  tty  only.)   The
                possible values are:
 
                     s - single message (the default prior to 3.4.0).
@@ -2479,30 +2484,25 @@
                     f - full window, oldest message first.
                     r - full window, newest message first.
 
-               For backward compatibility, no value needs to  be  specified
-               (which  defaults to `full'), or it can be negated (which de-
+               For  backward  compatibility, no value needs to be specified
+               (which defaults to `full'), or it can be negated (which  de-
                faults to `single').
 
           name
                Set your character's name (defaults to your user name).  You
-               can  also  set your character's role by appending a dash and
-               one or more letters of the role (that is, by  suffixing  one
+               can also set your character's role by appending a  dash  and
+               one  or  more letters of the role (that is, by suffixing one
                of -A -B -C -H -K -M -P -Ra -Ro -S -T -V -W).  If -@ is used
-               for the role, then a random one will be  automatically  cho-
+               for  the  role, then a random one will be automatically cho-
                sen.  Cannot be set with the `O' command.
 
           news
-               Read  the NetHack news file, if present (default on).  Since
-               the news is shown at the beginning of the game,  there's  no
+               Read the NetHack news file, if present (default on).   Since
+               the  news  is shown at the beginning of the game, there's no
                point in setting this with the `O' command.
 
-          null
-               Send padding nulls to the terminal (default off).
 
-
-
-
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -2512,63 +2512,63 @@
 
 
 
+          null
+               Send padding nulls to the terminal (default off).
+
           number_pad
-               Use  the  number keys to move instead of [yuhjklbn] (default
+               Use the number keys to move instead of  [yuhjklbn]  (default
                off).
 
           objects
-               Set the characters used to display object  classes  (default
-               ``])[="(%!?+/$*`0_.'').   This  string  is  subjected to the
-               same processing as the dungeon option.   The  order  of  the
-               symbols  is  illegal-object  (should never be seen), weapon,
-               armor, ring, amulet, tool, food, potion, scroll,  spellbook,
-               wand,  gold,  gem  or  rock,  boulder  or statue, iron ball,
+               Set  the  characters used to display object classes (default
+               ``])[="(%!?+/$*`0_.'').  This string  is  subjected  to  the
+               same  processing  as  the  dungeon option.  The order of the
+               symbols is illegal-object (should never  be  seen),  weapon,
+               armor,  ring, amulet, tool, food, potion, scroll, spellbook,
+               wand, gold, gem or  rock,  boulder  or  statue,  iron  ball,
                chain, and venom.  Cannot be set with the `O' command.
 
           packorder
-               Specify  the  order  to  list  object  types   in   (default
-               ``")[%?+!=/(*`0_'').   The  value of this option should be a
-               string containing the symbols for the various object  types.
+               Specify   the   order  to  list  object  types  in  (default
+               ``")[%?+!=/(*`0_'').  The value of this option should  be  a
+               string  containing the symbols for the various object types.
                Any omitted types are filled in at the end from the previous
                order.
 
           perm_invent
-               If true, always display your current inventory in a  window.
-               This  only  makes sense for windowing system interfaces that
+               If  true, always display your current inventory in a window.
+               This only makes sense for windowing system  interfaces  that
                implement this feature.
 
           pettype
-               Specify the type of your initial pet, if you are  playing  a
-               character  class that uses multiple types of pets; or choose
+               Specify  the  type of your initial pet, if you are playing a
+               character class that uses multiple types of pets; or  choose
                to have no initial pet at all.  Possible values are ``cat'',
                ``dog'' and ``none''.  Cannot be set with the `O' command.
 
           pickup_burden
-               When  you pick up an item that would exceed this encumbrance
-               level (Unburdened, Burdened, streSsed, straiNed,  overTaxed,
-               or  overLoaded),  you will be asked if you want to continue.
+               When you pick up an item that would exceed this  encumbrance
+               level  (Unburdened, Burdened, streSsed, straiNed, overTaxed,
+               or overLoaded), you will be asked if you want  to  continue.
                (Default `S').
 
           pickup_types
-               Specify the object types to be picked up when autopickup  is
+               Specify  the object types to be picked up when autopickup is
                on.  Default is all types.
 
           prayconfirm
                Prompt for confirmation before praying (default on).
 
           pushweapon
-               Using  the  `w'  (wield) command when already wielding some-
-               thing pushes the old item into your  secondary  weapon  slot
+               Using the `w' (wield) command when  already  wielding  some-
+               thing  pushes  the  old item into your alternate weapon slot
                (default off).
 
           race Selects your race (for example, ``race:human'').  Default is
                random.  Cannot be set with the `O' command.
 
-          rest_on_space
-               Make the space bar a synonym  for  the  `.'  (rest)  command
 
-
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -2578,14 +2578,33 @@
 
 
 
-               (default off).
+          rest_on_space
+               Make the space bar a synonym for the `.' (rest) command (de-
+               fault off).
 
           role
-               Pick  your type of character (ex. ``role:Samurai''); synonym
-               for ``character''.  See ``name'' for an alternate method  of
+               Pick your type of character (ex. ``role:Samurai'');  synonym
+               for  ``character''.  See ``name'' for an alternate method of
                specifying your role.  Normally only the first letter of the
-               value is examined;  `r'  is  an  exception  with  ``Rogue'',
+               value  is  examined;  `r'  is  an  exception with ``Rogue'',
                ``Ranger'', and ``random'' values.
+
+          runmode
+               Controls the amount of screen updating for  the  map  window
+               when  engaged  in multi-turn movement (running via shift+di-
+               rection or control+direction and so forth, or via the travel
+               command or mouse click).  The possible values are:
+
+                    teleport - update the map after movement has finished;
+                    run - update the map after every seven or so steps;
+                    walk - update the map after each step;
+                    crawl - like walk, but pause briefly after each step.
+
+               This  option only affects the game's screen display, not the
+               actual results of moving.  The default  is  `run';  versions
+               prior to 3.4.1 used `teleport' only.  Whether or not the ef-
+               fect is noticeable will depend upon the window port used  or
+               on the type of terminal.
 
           safe_pet
                Prevent  you  from  (knowingly) attacking your pets (default
@@ -2614,6 +2633,17 @@
           silent
                Suppress terminal beeps (default on).
 
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              41
+
+
+
           sortpack
                Sort the pack contents by  type  when  displaying  inventory
                (default on).
@@ -2632,18 +2662,6 @@
 
           time
                Show the elapsed game time in turns on bottom line  (default
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              41
-
-
-
                off).
 
           timed_delay
@@ -2680,8 +2698,22 @@
 
                Cannot be set with the `O' command.
 
+
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              42
+
+
+
           travel
-               Allow the travel command (default on).
+               Allow  the travel command (default on).  Turning this option
+               off will prevent the game from attempting  unintended  moves
+               if you make inadvertent mouse clicks on the map window.
 
           verbose
                Provide more commentary during the game (default on).
@@ -2698,18 +2730,6 @@
           that you have chosen.  Character strings that are too long may be
           truncated.  Not all window ports will  adjust  for  all  settings
           listed  here.   You  can  safely add any of these options to your
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              42
-
-
-
           config file, and if the window port is capable  of  adjusting  to
           suit  your  preferences, it will attempt to do so. If it can't it
           will silently ignore it.  You can find out if an option  is  sup-
@@ -2743,8 +2763,20 @@
                window.
 
           font_menu
-               NetHack should use a font by the chosen name for  menu  win-
-               dows.
+               NetHack should use a  font  by  the  chosen  name  for  menu
+
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              43
+
+
+
+               windows.
 
           font_message
                NetHack should use a font by the chosen name for the message
@@ -2763,18 +2795,6 @@
 
           font_size_menu
                NetHack should use this size font for menu windows.
-
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              43
-
-
 
           font_size_message
                NetHack should use this size font for the message window.
@@ -2810,6 +2830,18 @@
 
           preload_tiles
                NetHack  should  preload tiles into memory.  For example, in
+
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              44
+
+
+
                the protected mode MSDOS version, control whether tiles  get
                pre-loaded  into RAM at the start of the game.  Doing so en-
                hances performance of the tile graphics, but uses more memo-
@@ -2829,18 +2861,6 @@
           tile_file
                Specify the name of an alternative tile file to override the
                default.
-
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              44
-
-
 
           tile_height
                Specify the preferred height of each tile in a tile  capable
@@ -2875,6 +2895,19 @@
                on machines with an IBM PC compatible BIOS ROM (default off,
                OS/2, PC, and ST NetHack only).
 
+
+
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              45
+
+
+
           flush
                (default off, AMIGA NetHack only).
 
@@ -2894,19 +2927,6 @@
           soundcard
                (default on, PC NetHack only).  Cannot be set with  the  `O'
                command.
-
-
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              45
-
-
 
           video
                Set  the video mode used (PC NetHack only).  Values are `au-
@@ -2942,6 +2962,18 @@
           examine  this  Guidebook  before playing so you have an idea what
           the screen layout is like. You'll also need to be able to  locate
           the  PC  cursor.  It  is  always where your character is located.
+
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              46
+
+
+
           Merely searching for an @-sign will not always find your  charac-
           ter since there are other humanoids represented by the same sign.
           Your screen-reader should also have a function  which  gives  you
@@ -2962,17 +2994,6 @@
 
           IBMgraphics
                Disable IBMgraphics by commenting out this option.
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              46
-
-
 
           menustyle:traditional
                This will assist in the interface to speech synthesizers.
@@ -3007,6 +3028,18 @@
           Menace, the guild will only hear about 90% of your gold when your
           corpse is discovered (adventurers  have  been  known  to  collect
           finder's  fees).   So, consider whether you want to take one last
+
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              47
+
+
+
           hit at that monster and possibly live,  or  quit  and  stop  with
           whatever  you  have.  If you quit, you keep all your gold, but if
           you swing and live, you might find more.
@@ -3028,16 +3061,6 @@
           start the game with the -X switch.  The other is to issue the `X'
           command while already playing the game.  The  other  benefits  of
           explore mode are left for the trepid reader to discover.
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              47
-
 
 
           12.  Credits
@@ -3071,6 +3094,18 @@
                Mike Stephenson merged these various versions back together,
           incorporating  many  of  the added features, and produced NetHack
           1.4.  He then coordinated a cast of thousands  in  enhancing  and
+
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              48
+
+
+
           debugging  NetHack 1.4 and released NetHack versions 2.2 and 2.3.
 
                Later, Mike coordinated a major rewrite of the game, heading
@@ -3094,18 +3129,6 @@
           and Janet Walz, the development team which now included  Ken  Ar-
           romdee,  David  Cohrs,  Jean-Christophe Collet, Kevin Darcy, Matt
           Day, Timo Hakulinen, Steve Linhart, Dean Luick, Pat Rankin,  Eric
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              48
-
-
-
           Raymond,  and  Eric  Smith  undertook  a radical revision of 3.0.
           They re-structured the game's design, and re-wrote major parts of
           the  code.   They added multiple dungeons, a new display, special
@@ -3136,6 +3159,19 @@
           for the Atari; he later contributed the tiles to the DevTeam  and
           tile support was then added to other platforms.
 
+
+
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              49
+
+
+
                The  3.2 development team, comprised of Michael Allison, Ken
           Arromdee, David Cohrs, Jessie Collet, Steve Creps,  Kevin  Darcy,
           Timo  Hakulinen,  Steve  Linhart,  Dean  Luick,  Pat Rankin, Eric
@@ -3160,18 +3196,6 @@
           wrote NetHack Plus.  Tom Proudfoot later merged NetHack Plus  and
           his own NetHack-- to produce SLASH.  Larry Stewart-Zerba and War-
           wick Allison improved the spell casting system  with  the  Wizard
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              49
-
-
-
           Patch.   Warwick Allison also ported NetHack to use the Qt inter-
           face.
 
@@ -3202,6 +3226,18 @@
           version to have a publicly available  web-site  listing  all  the
           bugs  that  had been discovered.  Despite that constantly growing
           bug list, 3.3 proved stable enough to last for more than  a  year
+
+
+          NetHack 3.4                                         July 27, 2002
+
+
+
+
+
+          NetHack Guidebook                                              50
+
+
+
           and a half.
 
                The  3.4 development team initially consisted of Michael Al-
@@ -3225,20 +3261,8 @@
                Michael  Allison,  David  Cohrs, Alex Kompel, Dion Nicolaas,
           and Yitzhak Sapir maintained and enhanced 3.4 for  the  Microsoft
           Windows platform.  Alex Kompel contributed a new graphical inter-
-          face for the  Windows  port.   Alex  Kompel  also  contributed  a
-
-
-          NetHack 3.4                                         July 23, 2002
-
-
-
-
-
-          NetHack Guidebook                                              50
-
-
-
-          Windows CE port for 3.4.1.
+          face for the Windows port.  Alex Kompel also contributed  a  Win-
+          dows CE port for 3.4.1.
 
                Ron Van Iwaarden maintained 3.4 for OS/2.
 
@@ -3270,31 +3294,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
@@ -3360,7 +3360,7 @@
 
 
 
-          NetHack 3.4                                         July 23, 2002
+          NetHack 3.4                                         July 27, 2002
 
 
 
