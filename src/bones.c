@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bones.c	3.4	2001/04/12	*/
+/*	SCCS Id: @(#)bones.c	3.4	2002/08/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -397,15 +397,18 @@ getbones()
 #endif
 		mread(fd, (genericptr_t) &c, sizeof c);	/* length incl. '\0' */
 		mread(fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
-		if (strcmp(bonesid, oldbonesid)) {
+		if (strcmp(bonesid, oldbonesid) != 0) {
+			char errbuf[BUFSZ];
+
+			Sprintf(errbuf, "This is bones level '%s', not '%s'!",
+				oldbonesid, bonesid);
 #ifdef WIZARD
 			if (wizard) {
-				pline("This is bones level '%s', not '%s'!",
-					oldbonesid, bonesid);
+				pline("%s", errbuf);
 				ok = FALSE;	/* won't die of trickery */
 			}
 #endif
-			trickery();
+			trickery(errbuf);
 		} else {
 			register struct monst *mtmp;
 			int mndx;
