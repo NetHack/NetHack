@@ -133,6 +133,10 @@ extern "C" {
 extern "C" void play_sound_for_message(const char* str);
 #endif
 
+#ifdef SAFERHANGUP
+#include <qtimer.h>
+#endif
+
 // Warwick prefers it this way...
 #define QT_CHOOSE_RACE_FIRST
 
@@ -1478,7 +1482,17 @@ NetHackQtMapWindow::NetHackQtMapWindow(NetHackQtClickBuffer& click_sink) :
 
     updateTiles();
     //setFocusPolicy(StrongFocus);
+#ifdef SAFERHANGUP
+    QTimer* deadman = new QTimer(this);
+    connect(deadman, SIGNAL(timeout()), SLOT(timeout()));
+    deadman->start(2000);		// deadman timer every 2 seconds
+#endif
 }
+
+#ifdef SAFERHANGUP
+// The "deadman" timer is received by this slot
+void NetHackQtMapWindow::timeout() {}
+#endif
 
 void NetHackQtMapWindow::moveMessages(int x, int y)
 {
@@ -4883,10 +4897,17 @@ int NetHackQtBind::qt_nhgetch()
 
     // Process events until a key arrives.
     //
-    while (keybuffer.Empty()) {
+    while (keybuffer.Empty()
+#ifdef SAFERHANGUP
+	   && !program_state.done_hup
+#endif
+	   ) {
 	qApp->enter_loop();
     }
 
+#ifdef SAFERHANGUP
+    if (program_state.done_hup && keybuffer.Empty()) return '\033';
+#endif
     return keybuffer.GetAscii();
 }
 
@@ -4897,9 +4918,16 @@ int NetHackQtBind::qt_nh_poskey(int *x, int *y, int *mod)
 
     // Process events until a key or map-click arrives.
     //
-    while (keybuffer.Empty() && clickbuffer.Empty()) {
+    while (keybuffer.Empty() && clickbuffer.Empty()
+#ifdef SAFERHANGUP
+	   && !program_state.done_hup
+#endif
+	   ) {
 	qApp->enter_loop();
     }
+#ifdef SAFERHANGUP
+    if (program_state.done_hup && keybuffer.Empty()) return '\033';
+#endif
     if (!keybuffer.Empty()) {
 	return keybuffer.GetAscii();
     } else {
@@ -5143,6 +5171,13 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 	return TRUE;
 
     bool result=QApplication::notify(receiver,event);
+#ifdef SAFERHANGUP
+    if (program_state.done_hup) {
+	keybuffer.Put('\033');
+	qApp->exit_loop();
+	return TRUE;
+    }
+#endif
     if (event->type()==QEvent::KeyPress) {
 	QKeyEvent* key_event=(QKeyEvent*)event;
 

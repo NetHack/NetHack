@@ -309,6 +309,9 @@ signals:
 private slots:
 	void updateTiles();
 	void moveMessages(int x, int y);
+#ifdef SAFERHANGUP
+	void timeout();
+#endif
 
 protected:
 	virtual void paintEvent(QPaintEvent*);
