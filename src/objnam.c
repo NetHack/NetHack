@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2002/01/04	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2002/02/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1055,7 +1055,7 @@ register const char *verb;
 	} else if (*spot == 'y' && (!index(vowels, *(spot-1)))) {
 	    /* like "y" case in makeplural */
 	    Strcpy(buf, verb);
-	    Strcat(buf + len - 1, "ies");
+	    Strcpy(buf + len - 1, "ies");
 	} else {
 	    Strcpy(buf, verb);
 	    Strcat(buf, "s");
