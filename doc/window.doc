@@ -157,6 +157,10 @@ char yn_function(const char *ques, const char *choices, char default)
 		   Place this value in the global "yn_number" and return '#'.
 		-- This uses the top line in the tty window-port, other
 		   ports might use a popup.
+		-- If choices is NULL, all possible inputs are accepted and
+		   returned, preserving case (upper or lower.) This means that
+		   if the calling function needs an exact match, it must handle
+		   user input correctness itself.
 getlin(const char *ques, char *input)
 		-- Prints ques as a prompt and reads a single line of text,
 		   up to a newline.  The string entered is returned without the

@@ -1431,9 +1431,8 @@ char mswin_yn_function(const char *question, const char *choices,
     while (result<0) {
         ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
 	ch=mswin_nhgetch();
-	if (choices == ynchars || choices == ynqchars ||
-		choices == ynaqchars || choices == ynNaqchars)
-	    ch = lowc(ch);
+	if (choices)
+		ch = lowc(ch);
         HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
 	if (ch=='\033') {
 	    result=yn_esc_map;
