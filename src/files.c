@@ -1605,7 +1605,7 @@ fopen_wizkit_file()
 #endif
 
 	envp = nh_getenv("WIZKIT");
-	if (envp && *envp) Strcpy(wizkit, envp);
+	if (envp && *envp) (void) strncpy(wizkit, envp, WIZKIT_MAX - 1);
 	if (!wizkit[0]) return (FILE *)0;
 
 #ifdef UNIX
