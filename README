@@ -120,7 +120,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         IBM PS/2 and AT compatibles running OS/2 - 2.0 and up with GCC emx
         Intel 80386 or greater (or clone) boxes running MS-DOS with DPMI.
         Intel 80386 or greater (or clone) boxes running Linux, BSDI, or
-		Windows 95/98/NT/2000/XP
+		Windows 95/98/NT/2000
 	Intel Pentium or better (or clone) running BeOS 4.5
         Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
 
@@ -162,8 +162,8 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     With the demise of Windows NT on the DEC Alpha, no attempt has been
     made to build NetHack 3.3.2 on that platform.
 
-    No attempt has been made to build or run NetHack 3.3.2 on Windows
-    Millenium.  It may work, but then again it may not.
+    No attempt has been made to build or run NetHack 3.3.2 on Windows Me
+    or Windows XP at this point.  It may work, but then again it may not.
     
     A build for Intel 80286 machines and DOS "real mode" overlaid versions 
     has been produced for 3.3.2, with a marginal attempt at tuning it for 
