@@ -1796,10 +1796,17 @@ boolean revival;
 }
 
 #ifdef WIZARD
+/*
+ * Make a new monster with the type controlled by the user.
+ *
+ * Note:  when creating a monster by class letter, specifying the
+ * "strange object" (']') symbol produces a random monster rather
+ * than a mimic; this behavior quirk is useful so don't "fix" it...
+ */
 boolean
 create_particular()
 {
-	char buf[BUFSZ], monclass = MAXMCLASSES;
+	char buf[BUFSZ], *bufp, monclass = MAXMCLASSES;
 	int which, tries, i;
 	struct permonst *whichpm;
 	struct monst *mtmp;
@@ -1812,26 +1819,28 @@ create_particular()
 	    maketame = makepeaceful = makehostile = FALSE;
 	    getlin("Create what kind of monster? [type the name or symbol]",
 		   buf);
-	    if (buf[0] == '\033') return FALSE;
-	    (void)mungspaces(buf);
-	    if (strlen(buf) == 1) {
-		monclass = def_char_to_monclass(buf[0]);
+	    bufp = mungspaces(buf);
+	    if (*bufp == '\033') return FALSE;
+	    /* allow the initial disposition to be specified */
+	    if (!strncmpi(bufp, "tame ", 5)) {
+		bufp += 5;
+		maketame = TRUE;
+	    } else if (!strncmpi(bufp, "peaceful ", 9)) {
+		bufp += 9;
+		makepeaceful = TRUE;
+	    } else if (!strncmpi(bufp, "hostile ", 8)) {
+		bufp += 8;
+		makehostile = TRUE;
+	    }
+	    /* decide whether a valid monster was chosen */
+	    if (strlen(bufp) == 1) {
+		monclass = def_char_to_monclass(*bufp);
 		if (monclass != MAXMCLASSES) break;	/* got one */
 	    } else {
-		i = 0;		/* offset into buf[] */
-		if (!strncmpi(buf, "tame ", 5)) {
-		    i = 5;
-		    maketame = TRUE;
-		} else if (!strncmpi(buf, "peaceful ", 9)) {
-		    i = 9;
-		    makepeaceful = TRUE;
-		} else if (!strncmpi(buf, "hostile ", 8)) {
-		    i = 8;
-		    makehostile = TRUE;
-		}
-		which = name_to_mon(&buf[i]);
+		which = name_to_mon(bufp);
 		if (which >= LOW_PM) break;		/* got one */
 	    }
+	    /* no good; try again... */
 	    pline("I've never heard of such monsters.");
 	} while (++tries < 5);
 
