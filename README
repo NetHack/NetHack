@@ -200,7 +200,7 @@ o We don't give hints for playing the game.
 o Don't bother to ask when the next version will be out.  You will not get
   a reply.
 Alternatively, you may fill out the bug report form on our web
-page at http://www.nethack.org.
+page at http://www.nethack.org/.
 
 Patches especially should be directed to this address.  If you've changed
 something to get NetHack to run on your system, it's likely that others have

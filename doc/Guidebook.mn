@@ -4,7 +4,7 @@
 .ds vr "NetHack 3.3
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "January 26, 2002
+.ds f2 "February 3, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2353,7 +2353,7 @@ resurrected it for 3.3.1.
 .pg
 \fBAlex Kompel\fP contributed a new graphical port of 3.3 for Microsoft Windows.
 .pg
-There is a NetHack web site maintained by \fBKen Lorber\fP at http://www.nethack.org.
+There is a NetHack web site maintained by \fBKen Lorber\fP at http://www.nethack.org/.
 .pg
 			   - - - - - - - - - -
 .pg
