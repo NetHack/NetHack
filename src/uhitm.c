@@ -2236,6 +2236,9 @@ uchar aatyp;
 		if (aatyp == AT_KICK) {
 		    obj = uarmf;
 		    if (!obj) break;
+		} else if (aatyp == AT_BITE || aatyp == AT_BUTT ||
+			   (aatyp >= AT_STNG && aatyp < AT_WEAP)) {
+		    break;		/* no object involved */
 		}
 		passive_obj(mon, obj, &(ptr->mattk[i]));
 	    }
