@@ -50,6 +50,7 @@ healers notice when a wand of undead turning revives a monster so the
 update display if bestowed a spellbook while unable to see invisible self
 use small pool of static buffers for mon_nam() and Monnam()
 Acknowledge Schroedinger's cat at end of game
+grammar fixes for applying stethoscope to corpses and statues
 
 
 Platform- and/or Interface-Specific Fixes
