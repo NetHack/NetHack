@@ -59,7 +59,6 @@ getlin_hook_proc hook;
 		Sprintf(toplines, "%s ", query);
 		Strcat(toplines, obufp);
 		if((c = Getchar()) == EOF) {
-			*bufp = 0;
 			break;
 		}
 		if(c == '\033') {
@@ -101,34 +100,46 @@ getlin_hook_proc hook;
 		}
 		if(c == erase_char || c == '\b') {
 			if(bufp != obufp) {
+				char *i;
+
 				bufp--;
-				putsyms("\b \b");/* putsym converts \b */
+				putsyms("\b");
+				for (i = bufp; *i; ++i) putsyms(" ");
+				for (; i > bufp; --i) putsyms("\b");
+				*bufp = 0;
 			} else	tty_nhbell();
 #if defined(apollo)
 		} else if(c == '\n' || c == '\r') {
 #else
 		} else if(c == '\n') {
 #endif
-			*bufp = 0;
 			break;
 		} else if(' ' <= (unsigned char) c && c != '\177' &&
 			    (bufp-obufp < BUFSZ-1 && bufp-obufp < COLNO)) {
 				/* avoid isprint() - some people don't have it
 				   ' ' is not always a printing char */
+			char *i = eos(bufp);
+
 			*bufp = c;
 			bufp[1] = 0;
 			putsyms(bufp);
 			bufp++;
 			if (hook && (*hook)(obufp)) {
 			    putsyms(bufp);
-			    bufp = eos(bufp);
+			    /* pointer and cursor left where they were */
+			    for (i = bufp; *i; ++i) putsyms("\b");
+			} else if (i > bufp) {
+			    char *s = i;
+
+			    /* erase rest of prior guess */
+			    for (; i > bufp; --i) putsyms(" ");
+			    for (; s > bufp; --s) putsyms("\b");
 			}
 		} else if(c == kill_char || c == '\177') { /* Robert Viduya */
 				/* this test last - @ might be the kill_char */
-			while(bufp != obufp) {
-				bufp--;
-				putsyms("\b \b");
-			}
+			for (; *bufp; ++bufp) putsyms(" ");
+			for (; bufp != obufp; --bufp) putsyms("\b \b");
+			*bufp = 0;
 		} else
 			tty_nhbell();
 	}
