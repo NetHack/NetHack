@@ -115,7 +115,9 @@ but that's really hard.
 STATIC_OVL int
 in_trouble()
 {
+#ifdef STEED
 	register struct obj *otmp;
+#endif
 	int i, j, count=0;
 
 /* Borrowed from eat.c */
