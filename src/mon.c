@@ -380,7 +380,9 @@ register struct monst *mtmp;
 	if (!is_clinger(mtmp->data) && !likes_lava(mtmp->data)) {
 	    if (!resists_fire(mtmp)) {
 		if (cansee(mtmp->mx,mtmp->my))
-		    pline("%s burns to a crisp.", Monnam(mtmp));
+		    pline("%s %s.", Monnam(mtmp),
+			  mtmp->data == &mons[PM_WATER_ELEMENTAL] ?
+			  "boils aways" : "burns to a crisp");
 		mondead(mtmp);
 	    }
 	    else {
@@ -472,6 +474,13 @@ mcalcdistress()
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 	if (DEADMONSTER(mtmp)) continue;
+
+	/* must check non-moving monsters once/turn in case
+	 * they managed to end up in liquid */
+	if (mtmp->data->mmove == 0) {
+	    if (vision_full_recalc) vision_recalc(0);
+	    if (minliquid(mtmp)) continue;
+	}
 
 	/* regenerate hit points */
 	mon_regen(mtmp, FALSE);
