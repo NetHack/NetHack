@@ -1559,8 +1559,27 @@ struct obj *obj, *otmp;
 	case SPE_TURN_UNDEAD:
 		if (obj->otyp == EGG)
 			revive_egg(obj);
-		else
+		else {
+			int corpsenm = (obj->otyp == CORPSE) ?
+					corpse_revive_type(obj) : 0;
 			res = !!revive(obj);
+			if (res && corpsenm && Role_if(PM_HEALER)) {
+			    boolean u_noticed = FALSE;
+			    if (Hallucination) {
+				You_hear("the sound of a defibrillator.");
+				u_noticed = TRUE;
+			    } else if (!Blind) {
+			    	You("observe %s %s change dramatically.",
+			    		s_suffix(an(mons[corpsenm].mname)),
+					nonliving(&mons[corpsenm]) ?
+					"motility" : "health");
+			    }
+			    if (u_noticed) {
+				    makeknown(otmp->otyp);
+				    exercise(A_WIS, TRUE);
+			    }
+			}
+		}
 		break;
 	case WAN_OPENING:
 	case SPE_KNOCK:

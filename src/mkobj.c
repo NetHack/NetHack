@@ -927,6 +927,30 @@ boolean init;
 }
 
 /*
+ * Return the type of monster that this corpse will
+ * revive as, even if it has a monster structure
+ * attached to it. In that case, you can't just
+ * use obj->corpsenm, because the stored monster
+ * type can, and often is, different.
+ * The return value is an index into mons[].
+ */
+int
+corpse_revive_type(obj)
+struct obj *obj;
+{
+	int revivetype;
+	struct monst *mtmp;
+	if (obj->oxlth && obj->oattached == OATTACHED_MONST &&
+		((mtmp = get_mtraits(obj, FALSE)) != (struct monst *)0)) {
+	    /* mtmp is a temporary pointer to a monster's stored
+		attributes, not a real monster */
+	    revivetype = mtmp->mnum;
+	} else
+	    revivetype = obj->corpsenm;
+	return revivetype;
+}
+
+/*
  * Attach a monster id to an object, to provide
  * a lasting association between the two.
  */
