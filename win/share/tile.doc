@@ -1,0 +1,140 @@
+Window ports can optionally make use of the tiles (pictures for NetHack
+symbols) found in this directory.  They are distributed in a text format
+with routines to help in converting them to a system's preferred format
+and using them there.  The original tiles were provided by Warwick Allison.
+
+The tile distribution format for monsters.txt, objects.txt, and other.txt
+starts with a palette header like:
+
+A = (0, 0, 0)
+...
+P = (254, 254, 254)
+
+and then each tile has an entry like:
+
+# tile 292 (comment identifying tile)
+{
+  AAAAGHPAAAAACDAA
+  AAAFGDEMLOCNAAAA
+...
+}
+
+Each port can convert these .txt files to whatever format it wants the
+game executable to use, probably providing only one merged output file.
+See the tilemap.c discussion at the bottom for more hints on adding tiles.
+
+
+Shared code provided for conversion utilities:
+
+tile.h contains shared declarations.
+
+tiletext.c defines the external variables from tile.h and supplies
+the external routines for reading and writing the defined text format.
+
+Each conversion utility is expected to use tiletext.c and provide code of
+its own for reading and/or writing another format.  The important global
+variables implement a colormap shared between tiletext.c and the other
+half of utilities.  As an example of conversion utilities, we provide
+txt2ppm (tiletext.c + ppmwrite.c) and gif2txt (tiletext.c + gifread.c).
+(Sorry, we're not paying Unisys patent royalties for the right to provide
+you with a gifwrite.c, which would necessarily use the LZW compression
+algorithm they claim.)
+
+The text I/O routines are:
+
+boolean fopen_text_file(const char *filename, const char *type);
+	select file for subsequent tile I/O
+	"type" a la fopen
+	returns FALSE if file not opened, otherwise reads/writes header
+	(including colormap) and sets up to decode/encode tiles
+int fclose_text_file();
+	close file
+boolean read_text_tile(pixel[TILE_Y][TILE_X]);
+	returns FALSE if no next tile in current file
+	otherwise TRUE and insert the tile in the provided array
+boolean write_text_tile(pixel[TILE_Y][TILE_X]);
+	writes tile
+
+There are two additional shared routines provided for writers:
+
+void init_colormap();
+	initialize the output colormap from the input one
+	must be called before opening output file as colormap is part of header
+void merge_colormap();
+	merge the current input colormap into the output one
+
+Due to the amount of state being kept, only one text or gif file can be
+open at a time.  If you are combining multiple files into one other-format
+file with a single common colormap, you may need to open each source file
+and merge their colormaps into a common colormap before processing any tiles.
+
+Although there are expected to be only 16 colors in the distribution tiles,
+conversion programs should be prepared to accept up to MAXCOLORMAPSIZE
+colors and map them to a smaller number if their port requires it.
+
+
+Expected sequence for editing tiles:
+	edit foo.txt
+
+	-or-
+
+	run txt2ppm foo.txt foo.ppm
+	convert ppm to gif, either via ppmtogif from pbmplus/netpbm or
+		stripping the first 15 bytes of foo.ppm (containing the
+		size of the image) and feeding the rest to any raw-24bit-
+		image-reading program
+	edit tiles with gif-editing program
+	run gif2txt foo.gif foo.txt
+
+
+When converted to ppm, monsters.ppm, objects.ppm, and other.ppm are:
+	each a single ppm format (rgb triples with header)
+	20 tiles across, however many down (need "blank" tile to fill in
+		extras on last row -- currently alternating pixels in
+		first and second colors)
+	allows looking at tiles en masse for comparison or whatever
+
+The gif reading routines accept further variations so long as the gif is
+n*TILE_X pixels across.
+
+The gif I/O routines are:
+
+boolean fopen_gif_file(const char *filename, const char *type);
+	select file for subsequent tile I/O
+	"type" a la fopen
+	returns FALSE if file not opened, otherwise reads gif header
+	(including colormap) and sets up to decode tiles
+int fclose_gif_file();
+	tear down decode mechanism
+	close file
+boolean read_gif_tile(pixel[TILE_Y][TILE_X]);
+	returns FALSE if no next tile in current file (including when any
+	remaining tiles are "blank"),
+	otherwise TRUE and insert the tile in the provided array
+
+
+Array provided by shared code for NetHack use, by compiling and running
+tilemap.c to form tile.c:
+
+short glyph2tile[MAXGLYPH];
+	maps glyph number to tile number for display purposes, assuming
+	(non-blank) tiles are numbered sequentially through
+	monsters/objects/other
+
+tilemap.c (shudder) accounts for things disappearing due to compilation
+options -- there should be a tile for everything appearing under any
+supported option, but under some options some tiles won't be referenced.
+Therefore, tilemap.c has the knowledge to provide the comments for gif2txt
+and is compiled with GIF2TXT to link in there, along with the various
+strings for things that are compiled in (monst.o etc.).
+
+If you add monsters/objects/other things to NetHack and need to add tiles
+to go with them, just add an entry in the right place in the appropriate
+.txt file, and one to tilemap.c if the new item is conditionally compiled.
+While the "comment identifying tile" in the .txt file must be correct,
+the number of the tile need not be, and can just be a duplicate of the
+tile on either side (or any other integer, for that matter).  In an
+official release, the tiles in a .txt file will be numbered consecutively
+so that you may cross-reference with a graphics format, but the conversion
+code does not care about the numbering.  (In fact, running txt2ppm, ppmtogif,
+and gif2txt gives you a consecutively numbered version of the .txt file.)
