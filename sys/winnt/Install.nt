@@ -4,7 +4,7 @@
                     Instructions for compiling and installing
                  NetHack 3.3 on a Windows NT, 2000, or XP system
          ==============================================================
-		      Last revision: January 12, 2002
+		      Last revision: January 13, 2002
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -14,19 +14,20 @@ Alex Kompel.
 
 You can build either the TTY version of NetHack or the Windows Graphical 
 version.  In either case you will need:
-  o A copy of Microsoft Visual C V6.0 or later.  Things may work with 
+  o A copy of Microsoft Visual C V6.0 or later.  Things may work with an
     earlier version of the compiler, but the current code has not been
     tested with an earlier compiler.
 
   o A version of a UUDECODE utility in your path.  The Makefiles and
     the VC Project files assume that a utility called uudecode.exe is
-    in your path.
+    in your path.  A version of uudecode.exe is required to be in
+    your path when you start the build process because 3 binary files 
+    are distributed in uuencoded format and are required.
 
 FIRST STEP:
 
 The first step in building either version of NetHack is to execute
-sys/winnt/Install.nt.  Specify either TTY, or GUI.  (You can 
-substitute WINHACK for GUI if you wish).
+sys/winnt/nhsetup.bat.  Specify either TTY, or WIN.
 
 For the tty version using the NT Console I/O subsystem:
 	cd sys\winnt
@@ -34,13 +35,28 @@ For the tty version using the NT Console I/O subsystem:
 
 For the graphical version (WinHack)
 	cd sys\winnt
-	nhsetup WINHACK
+	nhsetup WIN
 
-Files appropriate for the selected build will be moved to the
-appropriate place.
+The winhacknt subdirectory will be created off the top of the NetHack
+source tree, and files appropriate for the selected build will be moved to the
+appropriate place.  
+
+If you received some warning messages about not having
+a uudecode utility, you must find a way to uudecode the following files 
+elsewhere and move the decoded version to its target directory:
+
+        win\win32\mnsel.uu    ---> winhacknt\mnsel.bmp
+        win\win32\mnunsel.uu  ---> winhacknt\mnunsel.bmp
+        sys\winnt\nhico.uu    ---> winhacknt\nethack.ico
+
+    (NOTE: The winhacknt directory is not part of the distribution.
+           It was created when you executed nhsetup.bat as part of 
+           the FIRST STEP just above this.)
+
 
 If you wish to build the TTY version, proceed now to "BUILDING TTY VERSION."
 If you wish to build the graphical version, proceed now to "BUILDING GRAPHICAL VERSION."
+
 
 ------------------------
 | BUILDING TTY VERSION |
@@ -71,9 +87,12 @@ I.  Dispelling the Myths:
     required should you desire to make any changes to the level and dungeon 
     compilers.
 
-    To use the distributed NetHack icon, a version of uudecode is required.
+    To use the distributed NetHack icon, a version of uudecode is required
+    to decode sys\winnt\nhico.uu.
 
-II. To compile your copy of NetHack on a 32 bit Windows machine (NT or 95):
+II. To compile your copy of NetHack on a 32 bit Windows machine (NT or 2000):
+    (Note: build has not been tested on Windows XP.  That isn't to say that
+           it doesn't work, it just hasn't been tried by us.)
 
 Setting Up
 
@@ -88,10 +107,7 @@ Setting Up
     dat, doc, include, src, sys\share, sys\winnt, util and win\tty.
     Other subdirectories may also be included in your distribution, but
     they are not necessary for building the TTY version for the Win32 
-    console subsystem.  You can delete them to save space.  Your distribution 
-    may contain a directory win\win32.  This window port variant was a
-    recent addition and was not ready for the 3.3.0 or 3.3.1  releases.
-    You may ignore it or contribute to it.
+    console subsystem.  You can delete them to save space.
 
     Required Directories for a Win32 Console NetHack:
 
@@ -121,8 +137,9 @@ Setting Up
     The necessary Makefile movements will be accomplished for you. It
     will also verify that your directories are set up properly.  It
     will also attempt to uudecode the NetHack icon contained in the
-    file sys/winnt/nhico.uu.  You must uudecode this file manually 
-    if the batch file fails to do so.
+    file sys\winnt\nhico.uu.  You must uudecode this file manually 
+    if the batch file fails to do so, or if you have no uudecode
+    utility in your path.
 
 4.  Now go to the include subdirectory to check a couple of the header
     files there.  Things *should* work as they are, but since you have
@@ -130,10 +147,7 @@ Setting Up
     it doesn't hurt to check out the following:
 
     First check config.h according to the comments to match your system and
-    desired set of features.  Mostly you need to check the WIZARD option,
-    make sure the HACKDIR is set properly.
-
-    Also check COMPRESS.
+    desired set of features.  Mostly you need to check the WIZARD option.
 
     You may include all or as few of the special game features as you wish.
 
@@ -145,11 +159,13 @@ Setting Up
 
     The directory you specify *MUST* exist for all remaining steps to be 
     successful. Be sure the directory you want the game installed 
-    actually exists.  If it doesn't, create it now.
+    actually exists.  If it doesn't, create it now. Do it before you forget:
+		mkdir \games\nethackntty
 
-    If you elected not to use the high-quality BSD random number routines by
-    commenting out RANDOM in ntconf.h, comment out (or set equal
-    to nothing) the RANDOM macro in your Makefile.
+    Optional:
+      If you elected not to use the high-quality BSD random number routines by
+      commenting out RANDOM in ntconf.h, comment out (or set equal
+      to nothing) the RANDOM macro in your Makefile.
 
     If you are recompiling after patching your sources, or if you got your
     files from somewhere other than the official distribution, "touch
@@ -159,7 +175,7 @@ Setting Up
 Compiling
 
 6.  Now that everything is set up, and with your current directory set
-    to src, run "nmake install".
+    to src (as instructed at the start of step 5), run "nmake install".
 
     If you get any errors along the way  then something has not been set 
     up correctly. The time it takes to compile depends on your particular 
@@ -168,29 +184,29 @@ Compiling
     the longer the lunch you may take.
     
     In any case, it is likely that the command prompt window where you are 
-    doing the compiling will be occupied for a quite a while.  If all 
-    goes well, you will get an NetHack executable.
+    doing the compiling will be occupied for a while.  If all goes well, 
+    you will get an NetHack executable.
 
 Running NetHack
 
-7.  Make sure all of the support files -- Guidebook.txt, license, logfile,
-    Defaults.nh, NetHack.exe, nhdat, record, and recover.exe 
-    -- were copied to the game directory.  If not, move them there yourself.  
-    Defaults.nh is actually distributed in the sources as sys/winnt/winnt.cnf, 
+7.  Make sure all of the support files -- Guidebook.txt, license,
+    Defaults.nh, NetHack.exe, nhdat, and recover.exe -- were copied to the 
+    game directory.  If not, move them there yourself.  Defaults.nh is 
+    actually distributed in the sources as sys/winnt/winnt.cnf, 
     but the Makefile should take care of moving it and renaming it correctly.
 
     Edit Defaults.nh to reflect your particular setup and personal 
     preferences, by following the comments.  As with all releases since
     3.2.1, HACKDIR defaults to the same directory as that where the NetHack.exe 
     executable resides.  You only need to set HACKDIR in Defaults.nh if, 
-    for some reason, you wish to override that.
+    for some reason, you wish to override that (be careful).
   
 8a. Running from the command prompt:
 
     If you add the directory containing the NetHack executable
     to your PATH, you can just type "nethack" or "nethack -umike"
     to start it up.  Alternatively, you can explicitly invoke it with 
-    a command such as "c:\games\nethack\nethack" (specifying whatever 
+    a command such as "c:\games\nethackntty\nethack" (specifying whatever 
     drive and directory your NetHack executable resides in) each time.
 
 
@@ -201,7 +217,7 @@ Running NetHack
     setting up the icon or shortcut.
 
          Description      :  NetHack 3.3.1 
-         Command Line     :  C:\GAMES\NETHACK\NETHACK.EXE
+         Command Line     :  C:\GAMES\NETHACKNTTY\NETHACK.EXE
 
    (changing the directory to the appropriate one of course)
 
@@ -233,33 +249,22 @@ This version of NetHack is a Win32 native port built on the Windows API.
 I.  Dispelling the Myths:
 
     Compiling WIN32 is straightforward, as long as you have Visual C
-    correctly installed.  It is also assumed that you changed your 
-    directory to sys\winnt and executed:
-	nhsetup winhack
+    correctly installed.  
+
+    It is also assumed that you changed your directory to sys\winnt 
+    and executed:
+	nhsetup win
     as described at the top of this document.
 
 II. To compile your copy of NetHack on a Windows NT/2000/XP machine:
 
 Setting Up
 
-1.  A version of uudecode.exe is required to be in
-    your path when you attempt the build.  If you don't have a version
-    of uudecode on your system, then you must find a way to uudecode
-    the following files elsewhere and move the decoded version to its
-    target directory:
-
-        win\win32\mnsel.uu    ---> winhacknt\mnsel.bmp
-        win\win32\mnunsel.uu  ---> winhacknt\mnunsel.bmp
-        sys\winnt\nhico.uu    ---> winhacknt\nethack.ico
-
-    (The winhacknt directory should have been created when you
-     issued the "nhsetup winhack" command earlier.)
-
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
     dat, doc, include, src, sys\share, sys\winnt, util, win\win32, 
     and at this point, you should also have winhacknt (created by
-    nhsetup.bat in sys\winnt.)
+    nhsetup.bat executed from sys\winnt.)
 
     Other subdirectories may also be included in your distribution, but
     they are not necessary for building the graphical version of NetHack
@@ -279,7 +284,9 @@ Setting Up
  
     Those last two (winhacknt and binary) are created during the
     build.  They are not disributed as part of the source distribution.
-    nhsetup.bat moves many files into the "winhacknt" directory.
+    nhsetup.bat moves many files into the "winhacknt" directory, and
+    "binary" will house everything you need to place the game after
+    building.
 
     Check the file "Files" in your top level directory for an exact
     listing of what file is in which directory.  In order for the
@@ -317,10 +324,10 @@ Setting Up
     This starts the build.  If all goes well, you will have a playable
     game of netack in the "binary" directory.
  
-    In any case, it is likely that the command prompt window where you are
- 
-    doing the compiling will be occupied for a quite a while.  If all 
-    goes well, you will get an NetHack executable.
+    In any case, it is likely that the IDE message window where you are 
+    doing the compiling will be occupied for a while.  If all goes well, 
+    you will get an NetHack executable called winhack.exe in the "binary"
+    directory, along with all the support files that it needs.
 
 Running NetHack
 
@@ -359,7 +366,7 @@ Running NetHack
          Description      :  NetHack 3.3.2 
          Command Line     :  C:\GAMES\NETHACK\WINHACK.EXE
 
-   (changing the directory to the appropriate one of course)
+   (changing the directory in the Command Line to the appropriate one of course)
 
 9. Play NetHack.  If it works, you're done!
 
@@ -371,3 +378,9 @@ PROBLEMS
 
     If you have any comments or suggestions, feel free to drop us a line c/o:
         DevTeam@nethack.org
+
+    You may wish to vist the NetHack Development Team's website occasionally
+    to check for updates or known bugs.  The website can be found at:
+             http://www.nethack.org
+
+    Happy NetHacking!

@@ -1,4 +1,4 @@
-@REM  SCCS Id: @(#)nhsetup.bat      2002/01/12
+@REM  SCCS Id: @(#)nhsetup.bat      2002/01/13
 @REM  Copyright (c) NetHack PC Development Team 1993, 1996, 2002
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.nt for details
@@ -17,12 +17,12 @@ if not exist ..\..\util\makedefs.c goto err_dir
 if not exist ..\..\sys\winnt\winnt.c goto err_dir
 echo Directories look ok.
 
-if "%1"=="tty"      goto do_tty
-if "%1"=="WINHACK" goto do_winhack
-if "%1"=="tty"      goto do_tty
-if "%1"=="winhack" goto do_winhack
-if "%1"=="gui" goto do_winhack
-if "%1"=="GUI" goto do_winhack
+if "%1"=="tty"  goto do_tty
+if "%1"=="TTY"  goto do_tty
+if "%1"=="win"  goto do_win
+if "%1"=="WIN"  goto do_win
+if "%1"=="gui"  goto do_win
+if "%1"=="GUI"  goto do_win
 goto err_set
 
 :do_tty
@@ -43,9 +43,9 @@ echo Proceed with the next step documented in Install.nt
 echo.
 goto done
 
-:do_winhack
-set opt=Graphical NetHack for Windows (winhack)
-if not exist ..\..\win\win32\winnt.dsw goto err_winhack
+:do_win
+set opt=Graphical NetHack for Windows
+if not exist ..\..\win\win32\winnt.dsw goto err_win
 echo "Copying Visual C project files to ..\..\winhacknt directory"
 if NOT exist ..\..\winhacknt\*.* mkdir ..\..\winhacknt
 REM copy ..\..\win\win32\winnt.dsw ..\.. >nul
@@ -133,7 +133,7 @@ if NOT exist ..\..\winhacknt\nethack.ico set err_nouu=Y
 
 goto done
 
-:err_winhack
+:err_win
 echo Some of the files needed to build graphical NetHack
 echo for Windows are not in the expected places.
 echo Check "Install.nt" for a list of the steps required 
