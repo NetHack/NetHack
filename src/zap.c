@@ -1419,6 +1419,9 @@ no_unwear:
 	if (obj_location == OBJ_FLOOR && obj->otyp == BOULDER &&
 		otmp->otyp != BOULDER)
 	    unblock_point(obj->ox, obj->oy);
+	else if (obj_location == OBJ_FLOOR && obj->otyp != BOULDER &&
+		otmp->otyp == BOULDER)
+	    block_point(obj->ox, obj->oy);
 
 	/* ** we are now done adjusting the object ** */
 
