@@ -380,7 +380,10 @@ insert_branch(new_branch, extract_first)
     new_branch->next = (branch *) 0;
 
 /* Convert the branch into a unique number so we can sort them. */
-#define branch_val(bp) ((((long)(bp)->end1.dnum * (MAXLEVEL+1) + (long)(bp)->end1.dlevel) * (MAXDUNGEON+1) * (MAXLEVEL+1)) + ((long)(bp)->end2.dnum * (MAXLEVEL+1) + (long)(bp)->end2.dlevel))
+#define branch_val(bp) \
+	((((long)(bp)->end1.dnum * (MAXLEVEL+1) + \
+	  (long)(bp)->end1.dlevel) * (MAXDUNGEON+1) * (MAXLEVEL+1)) + \
+	 ((long)(bp)->end2.dnum * (MAXLEVEL+1) + (long)(bp)->end2.dlevel))
 
     /*
      * Insert the new branch into the correct place in the branch list.
@@ -664,7 +667,7 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	/* we'd better clear the screen now, since when error messages come from
 	 * check_version() they will be printed using pline(), which doesn't
 	 * mix with the raw messages that might be already on the screen
-         */
+	 */
 	if (iflags.window_inited) clear_nhwindow(WIN_MAP);
 	if (!check_version(&vers_info, DUNGEON_FILE, TRUE))
 	    panic("Dungeon description not valid.");
