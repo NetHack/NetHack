@@ -1,0 +1,196 @@
+
+This document describes the installation of NetHack with an X11 interface.
+
+There are no explicit UNIX dependencies in this code, but we have only
+tested it under UNIX, using X11R4, X11R5, or X11R6.  We have two reports
+that the code also works under DesqView/X on MS-DOS with djgpp, but you
+will have to add dependencies for the X code to that makefile before you
+can use it.  Other X11R4+ platforms may work as well, with some tweaking
+likely.  Follow WIN* in sys/unix/Makefile.src for compilation hints.
+
+(If you try to compile it with X11R3 or earlier, you will get many errors,
+starting with complaints about XtPointer not being declared.  If you get
+around the compilation problems, you will still need a recent library of
+Athena Widgets to link against.  Once compiled, you can probably run it
+under an R3 X server, though.)
+
+The reason this uses the Athena widget set is that the Athena widgets come
+free from MIT (like X11).  Unfortunately, the companies that resell X11
+(value subtracted er, added software; yea, yea, that's the ticket) usually
+discourage its use by either omitting the set or putting it on the
+"unsupported" portion of their tape.  If you do not have the Athena
+widgets, you may obtain them via anonymous ftp from ftp.x.org.
+
+
+To use this code, define X11_GRAPHICS in include/config.h.  (You can comment
+out TTY_GRAPHICS or change DEFAULT_WINDOW_SYS if you want to, but there's
+little reason to do so.  The X11 version almost requires a config file
+for full effect, so you can just as well set windowtype there; also, you
+or someone else might just possibly be stuck in a situation where you can't
+use the X version -- over a non-blindingly-fast modem, say.)  You may also
+want to define USE_XPM or GRAPHIC_TOMBSTONE as discussed below.
+
+In src/Makefile, add $(WINX11SRC), $(WINX11OBJ), and $(WINX11LIB) to
+WINSRC, WINOBJ, and WINLIB respectively, and compile.  This will give you
+an executable supporting both X11 and tty windowing.
+
+
+If you want to use the optional tiles (multicolored pictures instead of a
+replacement font), you will need to have the win/share files and change
+the VARDATND setting in the top Makefile to contain the tile files before
+you do your 'make all'.
+
+When using tiles, you have the option of defining USE_XPM in config.h.
+This causes NetHack to use the XPM file format for the "x11tiles" file
+rather than a custom format.  Since the XPM format can be processed by
+existing tools such as PBMPlus and XV, you can modify the tiles to suit
+your environment.  For example, you may magnify them for display on
+high-resolution screens using the following command:
+    xpmtoppm x11tiles | pnmscale -xscale 1 -yscale 1.6875 |
+        pnmdepth 255 | ppmquant 100 | ppmtoxpm >x11tiles_big.xpm
+To use XPM, you must have the free XPM libraries installed in your system.
+Official xpm releases can be found by ftp on:
+    ftp.x.org       (198.4.202.8)  contrib/libraries     (Boston, USA)
+    avahi.inria.fr  (138.96.12.1)  pub/xpm     (Sophia Antipolis, France)
+If you do choose to define USE_XPM, be sure to add "-lXpm" to WINX11LIB
+in src/Makefile.
+
+If you define USE_XPM in config.h, you may also define GRAPHIC_TOMBSTONE
+which causes the closing tombstone to be displayed from the image file
+specified by the "tombstone" X resource (rip.xpm by default).  In this
+case, make sure the top Makefile VARDATND also contains rip.xpm.
+
+
+Whether or not you install tile support, you can provide support for
+special graphics symbols via alternate fonts.  (The fonts and tiles
+cannot be used at the same time, but the same executable handles both.)
+The two included X11 fonts use the general NetHack map area remapping
+to represent object/dungeon/trap/effect characters (see win/X11/nethack.rc
+and the Guidebook) as monocolored symbols and monsters as monocolored
+letters.  For instance, a ruby potion will show up as a potion symbol in
+red.  It's easier to see the difference between fonts and tiles than to
+describe it. :-)  Unless you are the only one using your executable and
+you already know which you prefer, we suggest installing the optional files
+for both possibilities and letting each person decide for themselves.
+
+To use the included fonts, you will need to install one or both of them
+and then use the symbol mappings found in nethack.rc.  The fonts are found
+in nh10.bdf and ibm.bdf.  You first need to convert the bdf files to whatever
+form your X11 server recognizes (usually using a command called bdftosnf
+for R4 servers or bdftopcf for R5 servers).  Then run mkfontdir on the
+directory containing your font files (you might want to copy them to GAMEDIR,
+from the top Makefile, after you've done "make install").  If these commands
+aren't familiar, talk to your local X11 guru and read the man pages.
+Finally, add that directory to your font search path (e.g. xset fp+ GAMEDIR,
+setting GAMEDIR to the value of GAMEDIR in the top Makefile).  Alternatively,
+you (assuming you are a system administrator) can install the fonts in your
+standard X11 font directory.  If you do not install the fonts in the standard
+X11 font directory, all persons playing nethack must add that "xset fp+"
+command to their .xinitrc file, or whatever file they execute when starting
+X11.  Adding the "xset" command to the nethack.sh is also an alternative,
+though it may clutter your X11 font search path after playing several games,
+so this method is not recommended.  See the note below for the alternative
+installation procedure for Sun's OpenWindows.
+
+
+If your X11 include files and libraries are not installed in a standard
+place (i.e. /usr/include/X11 and /usr/lib respectively) you will need to
+prepend an appropriate -I<idirectory> parameter to CFLAGS and a
+-L<ldirectory> parameter to LFLAGS, setting <?directory> to the place to
+find the include and library files for X11.
+
+
+Finally, you should also install the NetHack.ad file as NetHack in the
+normal X11 applications defaults directory.  Alternatively, each person
+may append the contents of this file to their .Xdefaults file.  A second
+alternative is copy NetHack.ad to NetHack in GAMEDIR (from the top Makefile)
+and add a line to nethack.sh specifying this additional applications
+defaults directory:
+	XAPPLRESDIR=$HACKDIR; export XAPPLRESDIR
+
+
+Three icon suggestions to the window manager are supported:  nh72, nh56,
+and nh32.  Data for them comes from the source files nh72icon, nh56icon,
+and nh32icon; they are compiled into the program via #includes in winX.c.
+Selection between them is controlled by the "icon" resource in NetHack.ad;
+the default is nh72.
+
+
+Sorry, an Imakefile is not included.  Unlike many X11 programs, X11
+support is only a small, optional, part of nethack, and the Makefile is
+needed for systems that don't use X11.
+
+
+Notes for Sun's OpenWindows:
+    1.	For OpenWindows 3.0 (NOT 2.x), define OPENWINBUG in include/unixconf.h.
+	The library bug from SunOS 4.1.x is fixed in Solaris 2.x (or when
+	proper Sun patches have been applied to 4.1.x), so it is also
+	unnecessary there.  (Defining it when unnecessary causes the same
+	problem being avoided when it is necessary. :-)
+
+    2.  In addition to the changes suggested by the comments in src/Makefile,
+
+	-- for OpenWindows 2.x and 3.0 (NOT 3.1) (i.e., versions for SunOS 4.x),
+	   add -I/usr/openwin/include to CFLAGS, -L/usr/openwin/lib to LFLAGS,
+	   and -lm to WINX11LIB in src/Makefile.
+
+	-- for OpenWindows 3.1 (i.e., versions for Solaris 2.x), add
+	   -I/usr/openwin/include to CFLAGS, -L/usr/openwin/lib -L/usr/ccs/lib
+	   -R/usr/openwin/lib to LFLAGS, and -lsocket -lnsl -lm
+	   to WINX11LIB in src/Makefile.
+
+	(Naturally, if your OpenWindows is installed elsewhere, adapt the
+	openwin paths.)  This will allow you to create a game executable.
+
+    3.	Run the fonts through convertfont and run bldfamily on the directory.
+	Now you must let your X server know where to find the fonts.  For a
+	personal installation, the simplest thing is to include the directory
+	of the fonts in the environment variable FONTPATH, as set in your
+	.profile or .login before starting the server.  For a multi-user
+	installation, you have the various "xset fp+" options outlined
+	above for standard X.
+
+    4.  Something must still be done with the NetHack.ad file -- all three
+	of the possibilities mentioned for standard X11 should work.
+
+
+Notes for AIX 3.2:
+    1.  AIX 3.2 includes the Athena Widget Toolkit library (and other things)
+	under the /usr/lpp/X11/Xamples tree, so you will have to add
+	-L/usr/lpp/X11/Xamples/lib to LFLAGS.  If you can't find libXaw.a on
+	your first build, go into /usr/lib/X11/Xamples, read the README file,
+	and build the library.
+
+Notes for XFree86 - (on linux and BSD386 platforms)
+
+    1.  Edit src/Makefile for linux/BSD386. Even though you use the 
+	Open Look Window manager, do not define OPENWINBUG.  Use the 
+	standard X11 object and library options.
+
+    2.  Follow the standard installation directions defined above.
+
+
+File				Description
+---------	---------------------------------------------------------------
+nethack.rc	- A sample configuration file for fonts nh10 and ibm.
+nh10.bdf	- A modified version of the 10x20 standard font.
+ibm.bdf		- A modified version of one of the ibm (8x14) nethack font.
+		  Must be used in conjunction with NetHack.ad or nethack.rc.
+nh32icon	- A 32x32 icon bitmap for use with window managers.
+nh56icon	- A 56x56 icon bitmap for use with window managers.
+nh72icon	- A 72x72 icon bitmap for use with window managers.
+nh_icon.xpm	- A color icon for use with window managers.
+NetHack.ad	- A sample .Xdefaults for a color screen.
+../../include/Window.h
+../../include/WindowP.h
+Window.c	- A bare-bones widget that has 16 colors and a drawing canvas.
+../../include/winX.h
+		- Defines for the X window-port.
+win*.c		- Code for the X window-port
+dialogs.c	- A better dialog widget.  Original code (modified slightly
+		  by Dean Luick) distributed under the X copyright by Tim
+		  Theisen.  This is from his Ghostview program (which is under
+		  the GNU public license, v2 or higher).
+pet_mark.xbm	- A pet indicator bitmap for tiles.
+rip.xpm		- A graphical tombstone.
+tile2x11.c	- Converts win/share tiles for X11 use.
