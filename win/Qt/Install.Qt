@@ -2,12 +2,12 @@ Installing NetHack with a Qt or KDE interface
 ---------------------------------------------
 
 This document describes the installation of NetHack with a Qt interface
-on X11.  The Qt interface is an alternative to the Athena-widgets interface
-found in ../X11.  You can download Qt for UNIX from http://www.troll.no.
-You need Qt 2.0 or later to use this code.
+on UNIX/X11 or Mac OS X. This code should also work with Qt/Windows, but
+support for that is not currently official.
 
-There are no explicit UNIX dependencies in this code, but we only regularly
-test it under UNIX.  If you have Qt for Windows, that should also work.
+You can download Qt for UNIX and Qt for Windows from http://www.trolltech.com.
+Qt for Mac OS X is currently only available commercially.  You need Qt 2.0 or
+later to use this code.
 
 To use this code:
 

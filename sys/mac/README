@@ -2,6 +2,9 @@ Jan 2002
 
 The MPW compilers are now supported again.
 
+Note that the graphical MacOSX variant uses the Qt windowport and the UNIX
+build system.
+
 
 26 Nov, 1999
 
