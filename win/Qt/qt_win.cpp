@@ -3942,11 +3942,10 @@ void NetHackQtMainWindow::ShowIfReady()
 	    stack->addWidget(message->Widget(), 1);
 	    stack->addWidget(status->Widget(), 2);
 	    raiseMap();
-	    showMaximized();
 	} else {
 	    layout();
-	    show();
 	}
+	showMaximized();
     } else if (isVisible()) {
 	hide();
     }
