@@ -311,7 +311,8 @@ ghost_from_bottle()
 /* "Quaffing is like drinking, except you spill more."  -- Terry Pratchett
  */
 int
-dodrink() {
+dodrink()
+{
 	register struct obj *otmp;
 	const char *potion_descr;
 
@@ -375,6 +376,7 @@ register struct obj *otmp;
 {
 	int retval;
 
+	otmp->in_use = TRUE;
 	nothing = unkn = 0;
 	if((retval = peffects(otmp)) >= 0) return(retval);
 
@@ -1547,6 +1549,7 @@ dodip()
 		pline("That is a potion bottle, not a Klein bottle!");
 		return 0;
 	}
+	potion->in_use = TRUE;		/* assume it will be used up */
 	if(potion->otyp == POT_WATER) {
 		boolean useeit = !Blind;
 		if (useeit) (void) Shk_Your(Your_buf, obj);
@@ -1632,11 +1635,13 @@ dodip()
 			makeknown(POT_POLYMORPH);
 			useup(potion);
 			prinv((char *)0, obj, 0L);
+			return 1;
 		} else {
 			pline("Nothing seems to happen.");
-			useup(potion);
+			goto poof;
 		}
 	    }
+	    potion->in_use = FALSE;	/* didn't go poof */
 	    return(1);
 	} else if(obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
 		/* Mixing potions is dangerous... */
@@ -1821,6 +1826,7 @@ dodip()
 	    }
 	    if (obj->age > 1000L) {
 		pline("%s %s full.", Yname2(obj), otense(obj, "are"));
+		potion->in_use = FALSE;	/* didn't go poof */
 	    } else {
 		You("fill %s with oil.", yname(obj));
 		check_unpaid(potion);	/* Yendorian Fuel Tax */
@@ -1835,6 +1841,7 @@ dodip()
 	    return 1;
 	}
 
+	potion->in_use = FALSE;		/* didn't go poof */
 	if ((obj->otyp == UNICORN_HORN || obj->otyp == AMETHYST) &&
 	    (mixture = mixtype(obj, potion)) != 0) {
 		boolean more_than_one = potion->quan > 1;
