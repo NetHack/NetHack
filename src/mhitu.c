@@ -1236,11 +1236,6 @@ do_stone:
 			if (!is_animal(mtmp->data) && !tele_restrict(mtmp))
 			    rloc(mtmp);
 			if (is_animal(mtmp->data) && *buf) {
-			    /* set mavenge bit for animals so knights won't
-			       suffer an alignment penalty during retaliation;
-			       note that only happens when the thief succeeds
-			       in getting something (*buf != 0) */
-			    mtmp->mavenge = 1;
 			    if (canseemon(mtmp))
 				pline("%s tries to %s away with %s.",
 				      Monnam(mtmp),

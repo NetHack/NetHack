@@ -51,6 +51,7 @@ register struct monst *mtmp;
 		    Monnam(mtmp), makeplural(body_part(FOOT)));
 	    if(!u.ugold || !rn2(5)) {
 		if (!tele_restrict(mtmp)) rloc(mtmp);
+		/* do not set mtmp->mavenge here; gold on the floor is fair game */
 		monflee(mtmp, 0, FALSE, FALSE);
 	    }
 	} else if(u.ugold) {
@@ -58,6 +59,7 @@ register struct monst *mtmp;
 	    Your("purse feels lighter.");
 	    mtmp->mgold += tmp;
 	if (!tele_restrict(mtmp)) rloc(mtmp);
+	    mtmp->mavenge = 1;
 	    monflee(mtmp, 0, FALSE, FALSE);
 	    flags.botl = 1;
 	}
@@ -157,6 +159,8 @@ stealarm()
 			freeinv(otmp);
 			pline("%s steals %s!", Monnam(mtmp), doname(otmp));
 			(void) mpickobj(mtmp,otmp);	/* may free otmp */
+			/* Implies seduction, "you gladly hand over ..."
+			   so we don't set mavenge bit here. */
 			monflee(mtmp, 0, FALSE, FALSE);
 			if (!tele_restrict(mtmp)) rloc(mtmp);
 		        break;
@@ -398,6 +402,10 @@ gotobj:
 
 	/* do this before removing it from inventory */
 	if (objnambuf) Strcpy(objnambuf, yname(otmp));
+	/* set mavenge bit so knights won't suffer an
+	 * alignment penalty during retaliation;
+	 */
+	mtmp->mavenge = 1;
 
 	freeinv(otmp);
 	pline("%s stole %s.", named ? "She" : Monnam(mtmp), doname(otmp));
