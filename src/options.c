@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.4	2003/04/30	*/
+/*	SCCS Id: @(#)options.c	3.4	2003/05/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1681,29 +1681,28 @@ goodfruit:
 		 * string as a prefix to get the desired behaviour.
 		 *
 		 * For backward compatibility, no prefix is required,
-		 * and the presence of a i,a,g,v, or c without a
-		 * prefix sets the corresponding value to DISCLOSE_YES_WITHOUT_PROMPT;
+		 * and the presence of a i,a,g,v, or c without a prefix
+		 * sets the corresponding value to DISCLOSE_YES_WITHOUT_PROMPT.
 		 */
 		boolean badopt = FALSE;
 		int idx, prefix_val;
-		if (!(op = string_for_opt(opts, TRUE))) {
-			/* for backwards compatibility, "disclose" without a
-			 * value means all (was inventory and attributes,
-			 * the only things available then), but negated
-			 * it means "none"
-			 * (note "none" contains none of "iavkgc")
-			 */
-			for (num = 0; num < NUM_DISCLOSURE_OPTIONS; num++) {
-				if (negated)
-				    flags.end_disclose[num] = DISCLOSE_NO_WITHOUT_PROMPT;
-			 	else flags.end_disclose[num] = DISCLOSE_PROMPT_DEFAULT_YES;
-			}
-			return;
-		}
-		if (negated) {
+
+		op = string_for_opt(opts, TRUE);
+		if (op && negated) {
 			bad_negation("disclose", TRUE);
 			return;
 		}
+		/* "disclose" without a value means "all with prompting"
+		   and negated means "none without prompting" */
+		if (!op || !strcmpi(op, "all") || !strcmpi(op, "none")) {
+			if (op && !strcmpi(op, "none")) negated = TRUE;
+			for (num = 0; num < NUM_DISCLOSURE_OPTIONS; num++)
+			    flags.end_disclose[num] = negated ?
+						DISCLOSE_NO_WITHOUT_PROMPT :
+						DISCLOSE_PROMPT_DEFAULT_YES;
+			return;
+		}
+
 		num = 0;
 		prefix_val = -1;
 		while (*op && num < sizeof flags.end_disclose - 1) {
