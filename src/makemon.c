@@ -924,8 +924,7 @@ register int	mmflags;
 			if(in_mklev)
 			    if(x && y)
 				(void) mkobj_at(0, x, y, TRUE);
-			if(hides_under(ptr) && OBJ_AT(x, y))
-			    mtmp->mundetected = TRUE;
+			(void) hideunder(mtmp);
 			break;
 		case S_LIGHT:
 		case S_ELEMENTAL:
@@ -935,8 +934,7 @@ register int	mmflags;
 			}
 			break;
 		case S_EEL:
-			if (is_pool(x, y))
-			    mtmp->mundetected = TRUE;
+			(void) hideunder(mtmp);
 			break;
 		case S_LEPRECHAUN:
 			mtmp->msleeping = 1;

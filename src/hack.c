@@ -1339,12 +1339,9 @@ domove()
 		    nomul(0);
 	}
 
-	if (hides_under(youmonst.data))
-	    u.uundetected = OBJ_AT(u.ux, u.uy);
-	else if (youmonst.data->mlet == S_EEL)
-	    u.uundetected = is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz);
-	else if (u.dx || u.dy)
-	    u.uundetected = 0;
+	if (hides_under(youmonst.data) || (youmonst.data->mlet == S_EEL) ||
+	    u.dx || u.dy)
+	    (void) hideunder(&youmonst);
 
 	/*
 	 * Mimics (or whatever) become noticeable if they move and are

@@ -1181,9 +1181,7 @@ postmov:
 		   usually set mundetected unless monster can't move.  */
 		if (mtmp->mundetected ||
 			(mtmp->mcanmove && !mtmp->msleeping && rn2(5)))
-		    mtmp->mundetected = (ptr->mlet != S_EEL) ?
-			OBJ_AT(mtmp->mx, mtmp->my) :
-			(is_pool(mtmp->mx, mtmp->my) && !Is_waterlevel(&u.uz));
+		    (void) hideunder(mtmp);
 		newsym(mtmp->mx, mtmp->my);
 	    }
 	    if (mtmp->isshk) {

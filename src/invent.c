@@ -2506,7 +2506,7 @@ long numused;
 	}
 	delobj(otmp);
 	if (at_u && u.uundetected && hides_under(youmonst.data))
-	    u.uundetected = OBJ_AT(u.ux, u.uy);
+	    (void) hideunder(&youmonst);
 }
 
 /*

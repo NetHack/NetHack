@@ -1148,6 +1148,7 @@ E void FDECL(seemimic, (struct monst *));
 E void NDECL(rescham);
 E void NDECL(restartcham);
 E void FDECL(restore_cham, (struct monst *));
+E boolean FDECL(hideunder, (struct monst*));
 E void FDECL(mon_animal_list, (BOOLEAN_P));
 E int FDECL(newcham, (struct monst *,struct permonst *,BOOLEAN_P,BOOLEAN_P));
 E int FDECL(can_be_hatched, (int));

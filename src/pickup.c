@@ -585,13 +585,13 @@ end_query:
 	}
 
 	if (!u.uswallow) {
-		if (!OBJ_AT(u.ux,u.uy)) u.uundetected = 0;
+	    if (hides_under(youmonst.data)) (void) hideunder(&youmonst);
 
-		/* position may need updating (invisible hero) */
-		if (n_picked) newsym(u.ux,u.uy);
+	    /* position may need updating (invisible hero) */
+	    if (n_picked) newsym(u.ux,u.uy);
 
-		/* see whether there's anything else here, after auto-pickup is done */
-		if (autopickup) check_here(n_picked > 0);
+	    /* check if there's anything else here after auto-pickup is done */
+	    if (autopickup) check_here(n_picked > 0);
 	}
 	return (n_tried > 0);
 }

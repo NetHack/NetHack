@@ -2248,6 +2248,32 @@ register struct monst *mtmp;
 	return(FALSE);
 }
 
+/* monster/hero tries to hide under something at the current location */
+boolean
+hideunder(mtmp)
+struct monst *mtmp;
+{
+	boolean undetected = FALSE;
+	xchar x = (mtmp == &youmonst) ? u.ux : mtmp->mx;
+	xchar y = (mtmp == &youmonst) ? u.uy : mtmp->my;
+
+	if (mtmp->data->mlet == S_EEL) {
+	    undetected = (is_pool(x, y) && !Is_waterlevel(&u.uz));
+	} else if (hides_under(mtmp->data) && OBJ_AT(x, y)) {
+	    struct obj *otmp = level.objects[x][y];
+
+	    /* most monsters won't hide under cockatrice corpse */
+	    if (otmp->nexthere || otmp->otyp != CORPSE ||
+		(mtmp == &youmonst ? Stone_resistance : resists_ston(mtmp)) ||
+		!touch_petrifies(&mons[otmp->corpsenm]))
+		undetected = TRUE;
+	}
+
+	if (mtmp == &youmonst) u.uundetected = undetected;
+	else mtmp->mundetected = undetected;
+	return undetected;
+}
+
 short *animal_list = 0;		/* list of PM values for animal monsters */
 int animal_list_count;
 
@@ -2444,9 +2470,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	if (!mtmp->perminvis || pm_invisible(olddata))
 	    mtmp->perminvis = pm_invisible(mdat);
 	mtmp->minvis = mtmp->invis_blkd ? 0 : mtmp->perminvis;
-	if (!(hides_under(mdat) && OBJ_AT(mtmp->mx, mtmp->my)) &&
-			!(mdat->mlet == S_EEL && is_pool(mtmp->mx, mtmp->my)))
-		mtmp->mundetected = 0;
+	if (mtmp->mundetected) (void) hideunder(mtmp);
 	if (u.ustuck == mtmp) {
 		if(u.uswallow) {
 			if(!attacktype(mdat,AT_ENGL)) {

@@ -458,12 +458,7 @@ int	mntmp;
 		skinback(FALSE);
 	break_armor();
 	drop_weapon(1);
-	if (hides_under(youmonst.data))
-		u.uundetected = OBJ_AT(u.ux, u.uy);
-	else if (youmonst.data->mlet == S_EEL)
-		u.uundetected = is_pool(u.ux, u.uy);
-	else
-		u.uundetected = 0;
+	(void) hideunder(&youmonst);
 
 	if (u.utraptype == TT_PIT) {
 	    if (could_pass_walls && !Passes_walls) {

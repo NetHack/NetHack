@@ -274,15 +274,9 @@ boolean allow_drag;
 	u.ux0 = u.ux;
 	u.uy0 = u.uy;
 
-	if (hides_under(youmonst.data))
-		u.uundetected = OBJ_AT(nux, nuy);
-	else if (youmonst.data->mlet == S_EEL)
-		u.uundetected = is_pool(nux, nuy);
-	else {
-		u.uundetected = 0;
-		/* mimics stop being unnoticed */
-		if (youmonst.data->mlet == S_MIMIC)
-		    youmonst.m_ap_type = M_AP_NOTHING;
+	if (!hideunder(&youmonst) && youmonst.data->mlet == S_MIMIC) {
+	    /* mimics stop being unnoticed */
+	    youmonst.m_ap_type = M_AP_NOTHING;
 	}
 
 	if (u.uswallow) {
