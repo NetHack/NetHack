@@ -498,7 +498,7 @@ newgame()
 				 * creating odd monsters for any tins and eggs
 				 * in hero's initial inventory */
 	init_artifacts();	/* before u_init() in case $WIZKIT specifies
-				 * any aritfacts */
+				 * any artifacts */
 	u_init();
 
 #ifndef NO_SIGNAL
