@@ -747,7 +747,7 @@ pleased(g_align)
 	} else {
 	    int action = rn1(on_altar() ? 3 + on_shrine() : 2, Luck+1);
 
-	    if (!on_altar()) action = max(action,2);
+	    if (!on_altar()) action = min(action, 2);
 	    if (u.ualign.record < STRIDENT)
 		action = (u.ualign.record > 0 || !rnl(2)) ? 1 : 0;
 
