@@ -57,6 +57,7 @@ extern "C" {
 #include "dlb.h"
 #include "patchlevel.h"
 #include "tile2x11.h"
+#undef Invisible
 #undef Warning
 #undef red
 #undef green
@@ -72,9 +73,6 @@ extern "C" {
 #undef yn
 
 }
-#ifdef yn
-#undef yn
-#endif
 
 #include "qt_win.h"
 #include <qregexp.h>
@@ -980,7 +978,7 @@ public:
 };
 
 NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
-    QDialog(0,"plsel",TRUE),
+    QDialog(qApp->mainWidget(),"plsel",TRUE),
     keysource(ks),
     fully_specified_role(TRUE)
 {
@@ -1333,7 +1331,7 @@ bool NetHackQtPlayerSelector::Choose()
 
 
 NetHackQtStringRequestor::NetHackQtStringRequestor(NetHackQtKeyBuffer& ks, const char* p, const char* cancelstr) :
-    QDialog(0,"string",FALSE),
+    QDialog(qApp->mainWidget(),"string",FALSE),
     prompt(p,this,"prompt"),
     input(this,"input"),
     keysource(ks)
@@ -2645,7 +2643,7 @@ void NetHackQtStatusWindow::checkTurnEvents()
 
 
 NetHackQtMenuDialog::NetHackQtMenuDialog() :
-    QDialog(0,0,FALSE)
+    QDialog(qApp->mainWidget(),0,FALSE)
 {
 }
 
@@ -3222,7 +3220,7 @@ void NetHackQtRIP::paintEvent(QPaintEvent* event)
 }
 
 NetHackQtTextWindow::NetHackQtTextWindow(NetHackQtKeyBuffer& ks) :
-    QDialog(0,0,FALSE),
+    QDialog(qApp->mainWidget(),0,FALSE),
     keysource(ks),
     use_rip(FALSE),
     str_fixed(FALSE),
@@ -3608,32 +3606,33 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	{ apparel,	"Put on non-armour\tShift+P", "P", 3},
 	{ apparel,	"Remove non-armour\tShift+R", "R", 3},
 
-	{ act1,	"Again\tCtrl+A",           "\001", 2},
+	{ act1,	"Again\tCtrl+A",        "\001", 2},
 	{ act1,	0, 0, 3},
 	{ act1,	"Apply\ta?",            "a?", 3},
-	{ act1,	"Chat\tAlt+C",            "\343", 3},
+	{ act1,	"Chat\tAlt+C",          "\343", 3},
 	{ act1,	"Close door\tc",        "c", 3},
 	{ act1,	"Down\t>",              ">", 3},
-	{ act1,	"Drop many\tShift+D",         "D", 2},
+	{ act1,	"Drop many\tShift+D",   "D", 2},
 	{ act1,	"Drop\td?",             "d?", 2},
 	{ act1,	"Eat\te?",              "e?", 2},
-	{ act1,	"Engrave\tShift+E",           "E", 3},
-	{ act1,	"Fight\tShift+F",             "F", 3},
+	{ act1,	"Engrave\tShift+E",     "E", 3},
+	{ act1,	"Fight\tShift+F",       "F", 3},
 	{ act1,	"Fire from quiver\tf",  "f", 2},
-	{ act1,	"Force\tAlt+F",           "\346", 3},
+	{ act1,	"Force\tAlt+F",         "\346", 3},
 	{ act1,	"Get\t,",               ",", 2},
-	{ act1,	"Jump\tAlt+J",            "\352", 3},
-	{ act2,	"Kick\tCtrl+D",              "\004", 2},
-	{ act2,	"Loot\tAlt+L",            "\354", 3},
+	{ act1,	"Jump\tAlt+J",          "\352", 3},
+	{ act2,	"Kick\tCtrl+D",         "\004", 2},
+	{ act2,	"Loot\tAlt+L",          "\354", 3},
 	{ act2,	"Open door\to",         "o", 3},
 	{ act2,	"Pay\tp",               "p", 3},
 	{ act2,	"Rest\t.",              ".", 2},
 	{ act2,	"Ride\t#ri",            "#ri", 3},
 	{ act2,	"Search\ts",            "s", 3},
-	{ act2,	"Sit\tAlt+S",             "\363", 3},
+	{ act2,	"Sit\tAlt+S",           "\363", 3},
 	{ act2,	"Throw\tt",             "t", 2},
+	{ act2,	"Untrap\t#u",           "#u", 3},
 	{ act2,	"Up\t<",                "<", 3},
-	{ act2,	"Wipe face\tAlt+W",       "\367", 3},
+	{ act2,	"Wipe face\tAlt+W",     "\367", 3},
 
 	{ magic,	"Quaff potion\tq?",      "q?", 3},
 	{ magic,	"Read scroll/book\tr?", "r?", 3},
@@ -4082,7 +4081,7 @@ void NetHackQtMainWindow::ShowIfReady()
 
 
 NetHackQtYnDialog::NetHackQtYnDialog(NetHackQtKeyBuffer& keysrc,const char* q,const char* ch,char df) :
-    QDialog(0,0,FALSE),
+    QDialog(qApp->mainWidget(),0,FALSE),
     keysource(keysrc),
     question(q), choices(ch), def(df)
 {
@@ -4553,7 +4552,7 @@ void NetHackQtBind::qt_player_selection()
 }
 
 NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
-    QDialog(0,"sgsel",TRUE)
+    QDialog(qApp->mainWidget(),"sgsel",TRUE)
 {
     QVBoxLayout *vbl = new QVBoxLayout(this,6);
     QHBox* hb;
@@ -5005,7 +5004,7 @@ void NetHackQtBind::qt_getlin(const char *prompt, char *line)
 }
 
 NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(NetHackQtKeyBuffer& ks) :
-    QDialog(0, "ext-cmd", FALSE),
+    QDialog(qApp->mainWidget(), "ext-cmd", FALSE),
     keysource(ks)
 {
     int marg=4;
@@ -5159,8 +5158,12 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 		}
 	    }
 	    char ch=key_event->ascii();
+	    if ( !ch && (key_event->state() & Qt::ControlButton) ) {
+		// On Mac, it aint-ncessarily-control
+		if ( k>=Qt::Key_A && k<=Qt::Key_Z )
+		    ch = k - Qt::Key_A + 1;
+	    }
 	    if (!macro && ch) {
-		int k = key_event->key();
 		bool alt = (key_event->state()&AltButton) ||
 		   (k >= Key_0 && k <= Key_9 && (key_event->state()&ControlButton));
 		keybuffer.Put(key_event->key(),ch + (alt ? 128 : 0),
