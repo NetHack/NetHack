@@ -413,6 +413,8 @@ do_rumors()
  */
 #define IGNORED_FEATURES	( 0L \
 				| (1L << 12)	/* GOLDOBJ */ \
+				| (1L << 20)	/* EXP_ON_BOTL */ \
+				| (1L << 21)	/* SCORE_ON_BOTL */ \
 				)
 
 static void
