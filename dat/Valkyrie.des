@@ -1,0 +1,331 @@
+#	SCCS Id: @(#)Valkyrie.des	3.3	97/01/31
+#	Copyright (c) 1989 by Jean-Christophe Collet
+#	Copyright (c) 1991-2 by M. Stephenson
+# NetHack may be freely redistributed.  See license for details.
+#
+#	The "start" level for the quest.
+#
+#	Here you meet your (besieged) class leader, the Norn,
+#	and receive your quest assignment.
+#
+MAZE: "Val-strt",' '
+FLAGS: noteleport,hardfloor
+GEOMETRY:center,center
+MAP
+IIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+IIIIPPPPPIIIIIIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII...IIIIIIIIIIIIIIIIIIIII
+IIIIPLLPPIIIIIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII..{..IIIIIIIIIIIIIIIIIIII
+IIIIPLPPIIIIIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.....IIIIIIPPPIIIIIIIIII
+IIIPPPPPIIIIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.IIIIIPPLPIIIIIIIIII
+IIIIPIIIIIIII..IIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.IIIIIPLPPIIIIIIIIII
+IIIIIIIIIIII..IIIIIPLPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII..IIIIIPPPIIIIIIIIIII
+IIIIIIII.....IIIIIIPPPIIII|----------------|IIIIIPPPIII.IIIIIIIIIIIIIIIIIIII
+IIIIIII..III...IIIIIIIIIII|................|IIIIIPLPII..IIIIIIIIIIIIIIIIIIII
+IIIIII..IIIIII......IIIII.|................|.IIIIPPPII.IIIIIIIIIIIIIIIIIIIII
+IIIII..IIIIIIIIIIII.......+................+...IIIIIII.IIIIIIIIIIIIIIIIIIIII
+IIII..IIIIIIIII.....IIIII.|................|.I...IIIII.IIIIIIIIIIIIIIIIIIIII
+III..IIIIIIIII..IIIIIIIIII|................|IIII.......IIIIIIIIIIIIIIIIIIIII
+IIII..IIIIIII..IIIIIIIIIII|----------------|IIIIIIIIII...IIIIIIIIIIIIIIIIIII
+IIIIII..IIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIPPPPIIII...IIIIIIIIIIIIIIIII
+IIIIIII......IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIPLLPPIIIII...IIIIIIIIIIIIIII
+IIIIPPPIP...IIIIIIIIIIIPIIIIIIIIIIIIIIIIIIIIIIIIPPPPIIIIIIII...I......IIIIII
+IIIPPLPPIIIIIIIIIIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.........IIIII
+IIIIPPPIIIIIIIIIIIIIIPPLPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.......IIIIII
+IIIIIIIIIIIIIIIIIIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ENDMAP
+# Dungeon Description
+REGION:(00,00,75,19),lit,"ordinary"
+REGION:(27,08,42,12),lit,"ordinary"
+# Portal arrival point
+BRANCH:(66,17,66,17),(0,0,0,0)
+# Stairs
+STAIR:(18,01),down
+# Doors
+DOOR:locked,(26,10)
+DOOR:locked,(43,10)
+# Norn
+MONSTER:'@',"Norn",(35,10)
+# The treasure of the Norn
+OBJECT:'(',"chest",(36,10)
+# valkyrie guards for the audience chamber
+MONSTER:'@',"warrior",(27,08)
+MONSTER:'@',"warrior",(27,09)
+MONSTER:'@',"warrior",(27,11)
+MONSTER:'@',"warrior",(27,12)
+MONSTER:'@',"warrior",(42,08)
+MONSTER:'@',"warrior",(42,09)
+MONSTER:'@',"warrior",(42,11)
+MONSTER:'@',"warrior",(42,12)
+# Non diggable walls
+NON_DIGGABLE:(26,07,43,13)
+# Random traps
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+# Monsters on siege duty.
+MONSTER: 'a',"fire ant",(04,12)
+MONSTER: 'a',"fire ant",(08,08)
+MONSTER: 'a',"fire ant",(14,04)
+MONSTER: 'a',"fire ant",(17,11)
+MONSTER: 'a',"fire ant",(24,10)
+MONSTER: 'a',"fire ant",(45,10)
+MONSTER: 'a',"fire ant",(54,02)
+MONSTER: 'a',"fire ant",(55,07)
+MONSTER: 'a',"fire ant",(58,14)
+MONSTER: 'a',"fire ant",(63,17)
+MONSTER: 'H',"fire giant",(18,01),hostile
+MONSTER: 'H',"fire giant",(10,16),hostile
+
+#
+#	The "locate" level for the quest.
+#
+#	Here you have to find the cave of Surtur to go
+#	further towards your assigned quest.
+#
+
+MAZE: "Val-loca",' '
+FLAGS: hardfloor
+INIT_MAP: '.' , 'I' , true , true , lit , false
+GEOMETRY:center,center
+MAP
+PPPP....                      ....PPPPP.
+PLP...                          .PPLLLPP
+PPP    .......................    PPPLLP
+..   ............................   PPPP
+.  ...............................  ....
+  .................................   ..
+....................................   .
+  ...................................   
+.  ..................................  .
+..   ..............................   PP
+.PPP  ..........................     PLP
+.PLLP                             ..PLLP
+.PPPP..                         ....PPPP
+ENDMAP
+# Dungeon Description
+REGION:(00,00,39,12),lit,"ordinary"
+# Stairs
+STAIR:(48,14),up
+STAIR:(20,06),down
+# Non diggable walls
+NON_DIGGABLE:(00,00,39,12)
+# Objects
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+# Random traps
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:random,random
+TRAP:random,random
+# Random monsters.
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',random,random
+MONSTER:'H',random,random,hostile
+MONSTER:'H',"fire giant",random,hostile
+MONSTER:'H',"fire giant",random,hostile
+MONSTER:'H',"fire giant",random,hostile
+MONSTER:'H',"fire giant",random,hostile
+MONSTER:'H',"fire giant",random,hostile
+MONSTER:'H',"fire giant",random,hostile
+MONSTER:'H',"fire giant",random,hostile
+MONSTER:'H',random,random,hostile
+
+#
+#	The "goal" level for the quest.
+#
+#	Here you meet Lord Surtur your nemesis monster.  You have to
+#	defeat Lord Surtur in combat to gain the artifact you have
+#	been assigned to retrieve.
+#
+
+MAZE: "Val-goal", 'L'
+INIT_MAP: '.' , 'L' , true , true , lit , false
+GEOMETRY:center,center
+MAP
+.L............................LLLLL
+LLL.........LLLLL.LLLLL.........LLL
+.LLL......LLLLLLLLLLLLLLL.......LL.
+.LLL.....LLL|---------|LLL.....L...
+..LL....LL|--.........--|LL.....LLL
+.......LL|-...LLLLLLL...-|LL.....L.
+.......LL|...LL.....LL...|LL.......
+......LL|-..LL.......LL..-|LL......
+......LL|.................|LL......
+......LL|-..LL.......LL..-|LL......
+.......LL|...LL.....LL...|LL.......
+.......LL|-...LLLLLLL...-|LL.......
+..L.....LL|--.........--|LL.....LL.
+..LL.....LLL|---------|LLL....LLLL.
+..LLL.....LLLLLLLLLLLLLLL...LLLLL..
+.LLLL.......LLLLL.LLLLL.....LLLL...
+..LL...............................
+ENDMAP
+# Dungeon Description
+REGION:(00,00,34,16),lit,"ordinary"
+# Stairs
+# Note:  The up stairs are *intentionally* off of the map.
+STAIR:(45,10),up
+# Non diggable walls
+NON_DIGGABLE:(00,00,34,16)
+# Drawbridges
+DRAWBRIDGE:(17,02),south,open
+DRAWBRIDGE:(17,14),north,open
+# Objects
+OBJECT:'(',"crystal ball",(17,08),blessed,5,"The Orb of Fate"
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+# Traps
+TRAP:"board",(13,08)
+TRAP:"board",(21,08)
+# Random traps
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"board",random
+TRAP:random,random
+TRAP:random,random
+# Random monsters.
+MONSTER:'H',"Lord Surtur",(17,08)
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',"fire ant",random
+MONSTER:'a',random,random
+MONSTER:'a',random,random
+MONSTER:'H',"fire giant",(10,06),hostile
+MONSTER:'H',"fire giant",(10,07),hostile
+MONSTER:'H',"fire giant",(10,08),hostile
+MONSTER:'H',"fire giant",(10,09),hostile
+MONSTER:'H',"fire giant",(10,10),hostile
+MONSTER:'H',"fire giant",(24,06),hostile
+MONSTER:'H',"fire giant",(24,07),hostile
+MONSTER:'H',"fire giant",(24,08),hostile
+MONSTER:'H',"fire giant",(24,09),hostile
+MONSTER:'H',"fire giant",(24,10),hostile
+MONSTER:'H',"fire giant",random,hostile
+MONSTER:'H',"fire giant",random,hostile
+MONSTER:'H',random,random,hostile
+
+#
+#	The "fill" levels for the quest.
+#
+#	These levels are used to fill out any levels not occupied by specific
+#	levels as defined above. "filla" is the upper filler, between the
+#	start and locate levels, and "fillb" the lower between the locate
+#	and goal levels.
+#
+
+MAZE: "Val-fila" , 'I'
+INIT_MAP: '.' , 'I' , true , true , lit, false
+NOMAP
+#
+STAIR: random, up
+STAIR: random, down
+#
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+#
+MONSTER: 'a', "fire ant", random
+MONSTER: 'a', "fire ant", random
+MONSTER: 'a', "fire ant", random
+MONSTER: 'a', "fire ant", random
+MONSTER: 'a', "fire ant", random
+MONSTER: 'a', random, random
+MONSTER: 'H', "fire giant", random, hostile
+#
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+
+MAZE: "Val-filb" , 'L'
+INIT_MAP: '.' , 'L' , true , true , lit, false
+NOMAP
+#
+STAIR: random, up
+STAIR: random, down
+#
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+OBJECT: random, random, random
+#
+MONSTER: 'a', "fire ant", random
+MONSTER: 'a', "fire ant", random
+MONSTER: 'a', "fire ant", random
+MONSTER: 'a', random, random
+MONSTER: 'H', "fire giant", random, hostile
+MONSTER: 'H', "fire giant", random, hostile
+MONSTER: 'H', "fire giant", random, hostile
+#
+TRAP: "fire", random
+TRAP: "fire", random
+TRAP: "fire", random
+TRAP: "fire", random
+TRAP: "fire", random
+TRAP: random, random
+TRAP: random, random
