@@ -203,6 +203,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 /* Macros for launching objects */
 #define ROLL		0x01	/* the object is rolling */
 #define FLING		0x02	/* the object is flying thru the air */
+#define LAUNCH_UNSEEN	0x40	/* hero neither caused nor saw it */
 #define LAUNCH_KNOWN	0x80	/* the hero caused this by explicit action */
 
 /* Macros for explosion types */

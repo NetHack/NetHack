@@ -1274,11 +1274,19 @@ int style;
 	dx = sgn(x2 - x1);
 	dy = sgn(y2 - y1);
 	switch (style) {
+	    case ROLL|LAUNCH_UNSEEN:
+			if (otyp == BOULDER) {
+			    You_hear(Hallucination ?
+				     "someone bowling." :
+				     "rumbling in the distance.");
+			}
+			goto roll;
 	    case ROLL|LAUNCH_KNOWN:
 			/* use otrapped as a flag to ohitmon */
 			singleobj->otrapped = 1;
 			style &= ~LAUNCH_KNOWN;
 			/* fall through */
+	    roll:
 	    case ROLL:
 			delaycnt = 2;
 			/* fall through */
@@ -2035,24 +2043,23 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 
 		case ROLLING_BOULDER_TRAP:
 		    if (!is_flyer(mptr)) {
+			int style = ROLL | (in_sight ? 0 : LAUNCH_UNSEEN);
+
 		        newsym(mtmp->mx,mtmp->my);
 			if (in_sight)
-			  pline("Click! %s triggers %s.", Monnam(mtmp),
+			    pline("Click! %s triggers %s.", Monnam(mtmp),
 				  trap->tseen ?
 				  "a rolling boulder trap" :
 				  something);
 			if (launch_obj(BOULDER, trap->launch.x, trap->launch.y,
-				       trap->launch2.x, trap->launch2.y, ROLL)) {
-			  if (in_sight) trap->tseen = TRUE;
-			  else You_hear(Hallucination ?
-					"someone bowling." :
-					"rumbling in the distance.");
-			  if (mtmp->mhp <= 0) trapkilled = TRUE;
+				trap->launch2.x, trap->launch2.y, style)) {
+			    if (in_sight) trap->tseen = TRUE;
+			    if (mtmp->mhp <= 0) trapkilled = TRUE;
 			} else {
-			  deltrap(trap);
-			  newsym(mtmp->mx,mtmp->my);
+			    deltrap(trap);
+			    newsym(mtmp->mx,mtmp->my);
 			}
-		      }
+		    }
 		    break;
 
 		default:
