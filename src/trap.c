@@ -569,6 +569,13 @@ unsigned trflags;
 
 	switch(ttype) {
 	    case ARROW_TRAP:
+		if (trap->once && trap->tseen && !rn2(15)) {
+		    You_hear("a loud click!");
+		    deltrap(trap);
+		    newsym(u.ux,u.uy);
+		    break;
+		}
+		trap->once = 1;
 		seetrap(trap);
 		pline("An arrow shoots out at you!");
 		otmp = mksobj(ARROW, TRUE, FALSE);
@@ -589,6 +596,13 @@ unsigned trflags;
 		}
 		break;
 	    case DART_TRAP:
+		if (trap->once && trap->tseen && !rn2(15)) {
+		    You_hear("a soft click.");
+		    deltrap(trap);
+		    newsym(u.ux,u.uy);
+		    break;
+		}
+		trap->once = 1;
 		seetrap(trap);
 		pline("A little dart shoots out at you!");
 		otmp = mksobj(DART, TRUE, FALSE);
@@ -611,17 +625,24 @@ unsigned trflags;
 		}
 		break;
 	    case ROCKTRAP:
-		{
+		if (trap->once && trap->tseen && !rn2(15)) {
+		    pline("A trap door in %s opens, but nothing falls out!",
+			  the(ceiling(u.ux,u.uy)));
+		    deltrap(trap);
+		    newsym(u.ux,u.uy);
+		} else {
 		    int dmg = d(2,6); /* should be std ROCK dmg? */
 
+		    trap->once = 1;
 		    seetrap(trap);
 		    otmp = mksobj_at(ROCK, u.ux, u.uy, TRUE, FALSE);
 		    otmp->quan = 1L;
 		    otmp->owt = weight(otmp);
 
-    pline("A trap door in the %s opens and a rock falls on your %s!",
-			    ceiling(u.ux,u.uy),
-			    body_part(HEAD));
+		    pline("A trap door in %s opens and %s falls on your %s!",
+			  the(ceiling(u.ux,u.uy)),
+			  an(xname(otmp)),
+			  body_part(HEAD));
 
 		    if (uarmh) {
 			if(is_metallic(uarmh)) {
@@ -1598,15 +1619,23 @@ register struct monst *mtmp;
 	       unreasonable; everybody has their own style. */
 	    if (trap->madeby_u && rnl(5)) setmangry(mtmp);
 
-	    /* bug?  `in_sight' ought to be split to distinguish between
-	       trap_in_sight and can_see_victim to handle invisible monsters */
 	    in_sight = canseemon(mtmp);
+	    see_it = cansee(mtmp->mx, mtmp->my);
 #ifdef STEED
 	    /* assume hero can tell what's going on for the steed */
 	    if (mtmp == u.usteed) in_sight = TRUE;
 #endif
 	    switch (tt) {
 		case ARROW_TRAP:
+			if (trap->once && trap->tseen && !rn2(15)) {
+			    if (in_sight && see_it)
+				pline("%s triggers a trap but nothing happens.",
+				      Monnam(mtmp));
+			    deltrap(trap);
+			    newsym(mtmp->mx, mtmp->my);
+			    break;
+			}
+			trap->once = 1;
 			otmp = mksobj(ARROW, TRUE, FALSE);
 			otmp->quan = 1L;
 			otmp->owt = weight(otmp);
@@ -1615,6 +1644,15 @@ register struct monst *mtmp;
 			if (thitm(8, mtmp, otmp, 0, FALSE)) trapkilled = TRUE;
 			break;
 		case DART_TRAP:
+			if (trap->once && trap->tseen && !rn2(15)) {
+			    if (in_sight && see_it)
+				pline("%s triggers a trap but nothing happens.",
+				      Monnam(mtmp));
+			    deltrap(trap);
+			    newsym(mtmp->mx, mtmp->my);
+			    break;
+			}
+			trap->once = 1;
 			otmp = mksobj(DART, TRUE, FALSE);
 			otmp->quan = 1L;
 			otmp->owt = weight(otmp);
@@ -1623,6 +1661,15 @@ register struct monst *mtmp;
 			if (thitm(7, mtmp, otmp, 0, FALSE)) trapkilled = TRUE;
 			break;
 		case ROCKTRAP:
+			if (trap->once && trap->tseen && !rn2(15)) {
+			    if (in_sight && see_it)
+				pline("A trap door above %s opens, but nothing falls out!",
+				      mon_nam(mtmp));
+			    deltrap(trap);
+			    newsym(mtmp->mx, mtmp->my);
+			    break;
+			}
+			trap->once = 1;
 			otmp = mksobj(ROCK, TRUE, FALSE);
 			otmp->quan = 1L;
 			otmp->owt = weight(otmp);
@@ -1745,7 +1792,6 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 		    }
 		case FIRE_TRAP:
  mfiretrap:
-			see_it = cansee(mtmp->mx, mtmp->my);
 			if (in_sight)
 			    pline("A %s erupts from the %s under %s!",
 				  tower_of_flame,

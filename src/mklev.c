@@ -485,7 +485,7 @@ int trap_type;
 			trap_type = ROCKTRAP;
 		    ttmp = maketrap(xx, yy+dy, trap_type);
 		    if (ttmp) {
-			ttmp->once = 1;
+			if (trap_type != ROCKTRAP) ttmp->once = 1;
 			if (trap_engravings[trap_type]) {
 			    make_engr_at(xx, yy-dy,
 				     trap_engravings[trap_type], 0L, DUST);
