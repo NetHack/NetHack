@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.4	2003/12/04	*/
+/*	SCCS Id: @(#)mon.c	3.4	2004/05/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2372,7 +2372,7 @@ struct permonst *mdat;
 boolean polyspot;	/* change is the result of wand or spell of polymorph */
 boolean msg;		/* "The oldmon turns into a newmon!" */
 {
-	int mhp, hpn, hpd;
+	int hpn, hpd;
 	int mndx, tryct;
 	struct permonst *olddata = mtmp->data;
 	char oldname[BUFSZ], newname[BUFSZ];
@@ -2432,31 +2432,23 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 		place_monster(mtmp, mtmp->mx, mtmp->my);
 	}
 
+	/* (this code used to try to adjust the monster's health based on
+	   a normal one of its type but there are too many special cases
+	   which need to handled in order to do that correctly, so just
+	   give the new form the same proportion of HP as its old one had) */
 	hpn = mtmp->mhp;
-	hpd = (mtmp->m_lev < 50) ? ((int)mtmp->m_lev)*8 : mdat->mlevel;
-	if(!hpd) hpd = 4;
-
-	mtmp->m_lev = adj_lev(mdat);		/* new monster level */
-
-	mhp = (mtmp->m_lev < 50) ? ((int)mtmp->m_lev)*8 : mdat->mlevel;
-	if(!mhp) mhp = 4;
-
+	hpd = mtmp->mhpmax;
+	/* set level and hit points */
+	newmonhp(mtmp, monsndx(mdat));
 	/* new hp: same fraction of max as before */
 #ifndef LINT
-	mtmp->mhp = (int)(((long)hpn*(long)mhp)/(long)hpd);
+	mtmp->mhp = (int)(((long)hpn * (long)mtmp->mhp) / (long)hpd);
 #endif
-	if(mtmp->mhp < 0) mtmp->mhp = hpn;	/* overflow */
-/* Unlikely but not impossible; a 1HD creature with 1HP that changes into a
-   0HD creature will require this statement */
+	/* sanity check (potentional overflow) */
+	if (mtmp->mhp < 0 || mtmp->mhp > mtmp->mhpmax) mtmp->mhp = mtmp->mhpmax;
+	/* unlikely but not impossible; a 1HD creature with 1HP that changes
+	   into a 0HD creature will require this statement */
 	if (!mtmp->mhp) mtmp->mhp = 1;
-
-/* and the same for maximum hit points */
-	hpn = mtmp->mhpmax;
-#ifndef LINT
-	mtmp->mhpmax = (int)(((long)hpn*(long)mhp)/(long)hpd);
-#endif
-	if(mtmp->mhpmax < 0) mtmp->mhpmax = hpn;	/* overflow */
-	if (!mtmp->mhpmax) mtmp->mhpmax = 1;
 
 	/* take on the new form... */
 	set_mon_data(mtmp, mdat, 0);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.4	2003/11/30	*/
+/*	SCCS Id: @(#)makemon.c	3.4	2004/05/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -802,6 +802,41 @@ boolean ghostly;
 	return result;
 }
 
+/* set up a new monster's initial level and hit points;
+   used by newcham() as well as by makemon() */
+void
+newmonhp(mon, mndx)
+struct monst *mon;
+int mndx;
+{
+    struct permonst *ptr = &mons[mndx];
+
+    mon->m_lev = adj_lev(ptr);
+    if (is_golem(ptr)) {
+	mon->mhpmax = mon->mhp = golemhp(mndx);
+    } else if (is_rider(ptr)) {
+	/* we want low HP, but a high mlevel so they can attack well */
+	mon->mhpmax = mon->mhp = d(10,8);
+    } else if (ptr->mlevel > 49) {
+	/* "special" fixed hp monster
+	 * the hit points are encoded in the mlevel in a somewhat strange
+	 * way to fit in the 50..127 positive range of a signed character
+	 * above the 1..49 that indicate "normal" monster levels */
+	mon->mhpmax = mon->mhp = 2 * (ptr->mlevel - 6);
+	mon->m_lev = mon->mhp / 4;	/* approximation */
+    } else if (ptr->mlet == S_DRAGON && mndx >= PM_GRAY_DRAGON) {
+	/* adult dragons */
+	mon->mhpmax = mon->mhp = (int) (In_endgame(&u.uz) ?
+		(8 * mon->m_lev) : (4 * mon->m_lev + d((int)mon->m_lev, 4)));
+    } else if (!mon->m_lev) {
+	mon->mhpmax = mon->mhp = rnd(4);
+    } else {
+	mon->mhpmax = mon->mhp = d((int)mon->m_lev, 8);
+	if (is_home_elemental(ptr))
+	    mon->mhpmax = (mon->mhp *= 3);
+    }
+}
+
 /*
  * called with [x,y] = coordinates;
  *	[0,0] means anyplace
@@ -904,30 +939,8 @@ register int	mmflags;
 	mtmp->mxlth = xlth;
 	mtmp->mnum = mndx;
 
-	mtmp->m_lev = adj_lev(ptr);
-	if (is_golem(ptr)) {
-	    mtmp->mhpmax = mtmp->mhp = golemhp(mndx);
-	} else if (is_rider(ptr)) {
-	    /* We want low HP, but a high mlevel so they can attack well */
-	    mtmp->mhpmax = mtmp->mhp = d(10,8);
-	} else if (ptr->mlevel > 49) {
-	    /* "special" fixed hp monster
-	     * the hit points are encoded in the mlevel in a somewhat strange
-	     * way to fit in the 50..127 positive range of a signed character
-	     * above the 1..49 that indicate "normal" monster levels */
-	    mtmp->mhpmax = mtmp->mhp = 2*(ptr->mlevel - 6);
-	    mtmp->m_lev = mtmp->mhp / 4;	/* approximation */
-	} else if (ptr->mlet == S_DRAGON && mndx >= PM_GRAY_DRAGON) {
-	    /* adult dragons */
-	    mtmp->mhpmax = mtmp->mhp = (int) (In_endgame(&u.uz) ?
-		(8 * mtmp->m_lev) : (4 * mtmp->m_lev + d((int)mtmp->m_lev, 4)));
-	} else if (!mtmp->m_lev) {
-	    mtmp->mhpmax = mtmp->mhp = rnd(4);
-	} else {
-	    mtmp->mhpmax = mtmp->mhp = d((int)mtmp->m_lev, 8);
-	    if (is_home_elemental(ptr))
-		mtmp->mhpmax = (mtmp->mhp *= 3);
-	}
+	/* set up level and hit points */
+	newmonhp(mtmp, mndx);
 
 	if (is_female(ptr)) mtmp->female = TRUE;
 	else if (is_male(ptr)) mtmp->female = FALSE;
