@@ -46,6 +46,20 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Quit",                       IDM_EXIT
     END
+    POPUP "&Map"
+    BEGIN
+        MENUITEM "&0 - Use Tiles",              IDM_MAP_TILES
+        MENUITEM "&1 - ASCII (4x6)",            IDM_MAP_ASCII4X6
+        MENUITEM "&2 - ASCII (6x8)",            IDM_MAP_ASCII6X8
+        MENUITEM "&3 - ASCII (8x8)",            IDM_MAP_ASCII8X8
+        MENUITEM "&4 - ASCII (16x8)",           IDM_MAP_ASCII16X8
+        MENUITEM "&5 - ASCII (7x12)",           IDM_MAP_ASCII7X12
+        MENUITEM "&6 - ASCII  (8x12)",          IDM_MAP_ASCII8X12
+        MENUITEM "&7 - ASCII (16x12)",          IDM_MAP_ASCII16X12
+        MENUITEM "&8 - ASCII (12x16)",          IDM_MAP_ASCII12X16
+        MENUITEM "&9 - ASCII  (10x18)",         IDM_MAP_ASCII10X18
+        MENUITEM "&Fit To Screen (ASCII only)", IDM_MAP_FIT_TO_SCREEN
+    END
     POPUP "&Help"
     BEGIN
         MENUITEM "&About ...",                  IDM_ABOUT

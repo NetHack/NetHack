@@ -3,21 +3,28 @@
 
 #include "winMS.h"
 #include "resource.h"
-#include "mhstatus.h"
+#include "mhmap.h"
 #include "mhmsg.h"
 #include "mhinput.h"
 #include "mhfont.h"
 
 #define MAXWINDOWTEXT 255
+
 extern short glyph2tile[];
 
 /* map window data */
 typedef struct mswin_nethack_map_window {
 	int map[COLNO][ROWNO];		/* glyph map */
 
-	int xPos, yPos;
-	int xPageSize, yPageSize;
-	int xCur, yCur;
+	int	 mapMode;				/* current map mode */
+	boolean bAsciiMode;			/* switch ASCII/tiled mode */
+	int  xPos, yPos;			/* scroll position */
+	int  xPageSize, yPageSize;	/* scroll page size */
+	int  xCur, yCur;			/* position of the cursor */
+	int  xScrTile, yScrTile;	/* size of display tile */
+	POINT map_orig;				/* map origin point */
+
+	HFONT hMapFont;				/* font for ASCII mode */
 } NHMapWindow, *PNHMapWindow;
 
 static TCHAR szNHMapWindowClass[] = TEXT("MSNethackMapWndClass");
@@ -28,9 +35,9 @@ static void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
-#ifdef TEXTCOLOR
+static void nhcoord2display(PNHMapWindow data, int x, int y, LPRECT lpOut);
+static void nhglyph2charcolor(short glyph, uchar* ch, int* color);
 static COLORREF nhcolor_to_RGB(int c);
-#endif
 
 HWND mswin_init_map_window () {
 	static int run_once = 0;
@@ -59,6 +66,196 @@ HWND mswin_init_map_window () {
 	return ret;
 }
 
+void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
+{
+	PNHMapWindow data;
+	RECT         client_rt;
+	SCROLLINFO   si;
+	SIZE		 wnd_size;		         
+	LOGFONT		 lgfnt;
+
+	/* check arguments */
+	if( !IsWindow(hWnd) ||
+		!lpsz ||
+		lpsz->cx<=0 ||
+		lpsz->cy<=0 ) return;
+
+	/* calculate window size */
+	GetClientRect(hWnd, &client_rt);
+	wnd_size.cx = client_rt.right - client_rt.left;
+	wnd_size.cy = client_rt.bottom - client_rt.top;
+	
+	/* set new screen tile size */
+	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data->xScrTile = ((data->mapMode==NHMAP_VIEW_FIT_TO_SCREEN)? wnd_size.cx : lpsz->cx) / COLNO;
+	data->yScrTile = ((data->mapMode==NHMAP_VIEW_FIT_TO_SCREEN)? wnd_size.cy : lpsz->cy) / ROWNO;
+
+	/* set map origin point */
+	data->map_orig.x = max(0, client_rt.left + (wnd_size.cx - data->xScrTile*COLNO)/2 );
+	data->map_orig.y = max(0, client_rt.top + (wnd_size.cy - data->yScrTile*ROWNO)/2 );
+
+	data->map_orig.x -= data->map_orig.x % data->xScrTile;
+	data->map_orig.y -= data->map_orig.y % data->yScrTile;
+
+	/* adjust horizontal scroll bar */
+	if( data->mapMode==NHMAP_VIEW_FIT_TO_SCREEN )
+		data->xPageSize = COLNO+1;  /* disable scroll bar */
+	else
+		data->xPageSize = wnd_size.cx/data->xScrTile;
+	if( wnd_size.cx/data->xScrTile >= COLNO ) {
+		data->xPos = 0;
+		GetNHApp()->bNoHScroll = TRUE;
+	} else {
+		GetNHApp()->bNoHScroll = FALSE;
+		data->xPos = max(0, min(COLNO, u.ux - data->xPageSize/2));
+	}
+
+    si.cbSize = sizeof(si); 
+    si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
+    si.nMin   = 0; 
+    si.nMax   = COLNO; 
+    si.nPage  = data->xPageSize; 
+    si.nPos   = data->xPos; 
+    SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
+
+	/* adjust vertical scroll bar */
+	if( data->mapMode==NHMAP_VIEW_FIT_TO_SCREEN )
+		data->yPageSize = ROWNO+1;   /* disable scroll bar */
+	else
+		data->yPageSize = wnd_size.cy/data->yScrTile;
+
+	if( wnd_size.cy/data->yScrTile >= ROWNO ) {
+		data->yPos = 0;
+		GetNHApp()->bNoVScroll = TRUE;
+	} else {
+		GetNHApp()->bNoVScroll = FALSE;
+		data->yPos = max(0, min(ROWNO, u.uy - data->yPageSize/2));
+	}
+
+    si.cbSize = sizeof(si); 
+    si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
+    si.nMin   = 0; 
+    si.nMax   = ROWNO; 
+    si.nPage  = data->yPageSize; 
+    si.nPos   = data->yPos; 
+    SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+
+	/* create font */
+	if( data->hMapFont ) DeleteObject(data->hMapFont);
+	ZeroMemory(&lgfnt, sizeof(lgfnt));
+	lgfnt.lfHeight			=	-data->yScrTile;	 // height of font
+	lgfnt.lfWidth			=	-data->xScrTile;	 // average character width
+	lgfnt.lfEscapement		=	0;					 // angle of escapement
+	lgfnt.lfOrientation		=	0;					 // base-line orientation angle
+	lgfnt.lfWeight			=	FW_NORMAL;			 // font weight
+	lgfnt.lfItalic			=	FALSE;				 // italic attribute option
+	lgfnt.lfUnderline		=	FALSE;				 // underline attribute option
+	lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
+	lgfnt.lfCharSet			=	OEM_CHARSET;         // character set identifier
+	lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
+	lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
+	lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
+	lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
+	_tcscpy(lgfnt.lfFaceName, TEXT("Terminal"));
+	data->hMapFont = CreateFontIndirect(&lgfnt);
+
+	mswin_cliparound(data->xCur, data->yCur);
+
+	if(redraw) InvalidateRect(hWnd, NULL, TRUE);
+}
+
+/* set map mode */
+int mswin_map_mode(HWND hWnd, int mode)
+{
+	PNHMapWindow data;
+	int oldMode;
+	SIZE mapSize;
+
+	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	if( mode == data->mapMode ) return mode;
+	
+	oldMode = data->mapMode;
+	data->mapMode = mode;
+
+	switch( data->mapMode ) {
+
+	case NHMAP_VIEW_ASCII4x6:
+		data->bAsciiMode = TRUE;
+		mapSize.cx = 4*COLNO;
+		mapSize.cy = 6*ROWNO;
+	break;
+
+	case NHMAP_VIEW_ASCII6x8:
+		data->bAsciiMode = TRUE;
+		mapSize.cx = 6*COLNO;
+		mapSize.cy = 8*ROWNO;
+	break;
+
+	case NHMAP_VIEW_ASCII8x8:
+		data->bAsciiMode = TRUE;
+		mapSize.cx = 8*COLNO;
+		mapSize.cy = 8*ROWNO;
+	break;
+
+	case NHMAP_VIEW_ASCII16x8:
+		data->bAsciiMode = TRUE;
+		mapSize.cx = 16*COLNO;
+		mapSize.cy = 8*ROWNO;
+	break;
+
+	case NHMAP_VIEW_ASCII7x12:
+		data->bAsciiMode = TRUE;
+		mapSize.cx = 7*COLNO;
+		mapSize.cy = 12*ROWNO;
+	break;
+
+	case NHMAP_VIEW_ASCII8x12:
+		data->bAsciiMode = TRUE;
+		mapSize.cx = 8*COLNO;
+		mapSize.cy = 12*ROWNO;
+	break;
+
+	case NHMAP_VIEW_ASCII16x12:
+		data->bAsciiMode = TRUE;
+		mapSize.cx = 16*COLNO;
+		mapSize.cy = 12*ROWNO;
+	break;
+
+	case NHMAP_VIEW_ASCII12x16:
+		data->bAsciiMode = TRUE;
+		mapSize.cx = 12*COLNO;
+		mapSize.cy = 16*ROWNO;
+	break;
+
+	case NHMAP_VIEW_ASCII10x18:
+		data->bAsciiMode = TRUE;
+		mapSize.cx = 10*COLNO;
+		mapSize.cy = 18*ROWNO;
+	break;
+
+	case NHMAP_VIEW_FIT_TO_SCREEN: {
+		RECT client_rt;
+		GetClientRect(hWnd, &client_rt);
+		mapSize.cx = client_rt.right - client_rt.left;
+		mapSize.cy = client_rt.bottom - client_rt.top;
+
+		data->bAsciiMode = TRUE;
+	} break;
+
+	case NHMAP_VIEW_TILES:
+	default:
+		data->bAsciiMode = FALSE;
+		mapSize.cx = TILE_X*COLNO;
+		mapSize.cy = TILE_Y*ROWNO;
+	break;
+	}
+
+	mswin_map_stretch(hWnd, &mapSize, TRUE);
+
+	return oldMode;
+}
+
+/* register window class for map window */
 void register_map_window_class()
 {
 	WNDCLASS wcex;
@@ -81,7 +278,7 @@ void register_map_window_class()
 	}
 }
     
-    
+/* map window procedure */    
 LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMapWindow data;
@@ -116,60 +313,29 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
     case WM_SIZE: 
     { 
-		SCROLLINFO si;
-        int xNewSize; 
-        int yNewSize; 
- 
-        xNewSize = LOWORD(lParam); 
-        yNewSize = HIWORD(lParam); 
+		SIZE size;
 
-		/* adjust horizontal scroll bar */
-		if( xNewSize/TILE_X >= COLNO ) {
-			data->xPos = 0;
-			GetNHApp()->bNoHScroll = TRUE;
+		if( data->mapMode == NHMAP_VIEW_FIT_TO_SCREEN ) {
+			size.cx = LOWORD(lParam);
+			size.cy = HIWORD(lParam);
 		} else {
-			GetNHApp()->bNoHScroll = FALSE;
-			data->xPos = max(0, min(COLNO, u.ux - xNewSize/TILE_X/2));
+			/* mapping factor is unchaged we just need to adjust scroll bars */
+			size.cx = data->xScrTile*COLNO; 
+			size.cy = data->yScrTile*ROWNO;
 		}
-
-        si.cbSize = sizeof(si); 
-        si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
-        si.nMin   = 0; 
-        si.nMax   = COLNO; 
-        si.nPage  = xNewSize/TILE_X; 
-        si.nPos   = data->xPos; 
-        SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
- 
-		/* adjust vertical scroll bar */
-		if( yNewSize/TILE_Y >= ROWNO ) {
-			data->yPos = 0;
-			GetNHApp()->bNoVScroll = TRUE;
-		} else {
-			GetNHApp()->bNoVScroll = FALSE;
-			data->yPos = max(0, min(ROWNO, u.uy - yNewSize/TILE_Y/2));
-		}
-
-        si.cbSize = sizeof(si); 
-        si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
-        si.nMin   = 0; 
-        si.nMax   = ROWNO; 
-        si.nPage  = yNewSize/TILE_Y; 
-        si.nPos   = data->yPos; 
-        SetScrollInfo(hWnd, SB_VERT, &si, TRUE); 
-
-		/* erase window */
-		InvalidateRect(hWnd, NULL, TRUE);
+		mswin_map_stretch(hWnd, &size, TRUE);
     } 
     break; 
 
 	case WM_LBUTTONDOWN:
 		NHEVENT_MS( 
-			min(COLNO, data->xPos + LOWORD(lParam)/TILE_X),
-			min(ROWNO, data->yPos + HIWORD(lParam)/TILE_Y) 
+			max(0, min(COLNO, data->xPos + (LOWORD(lParam)-data->map_orig.x)/data->xScrTile)),
+			max(0, min(ROWNO, data->yPos + (HIWORD(lParam)-data->map_orig.y)/data->yScrTile))
 		);
 	break;
 
 	case WM_DESTROY:
+		if( data->hMapFont ) DeleteObject(data->hMapFont);
 		free(data);
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
 		break;
@@ -180,6 +346,7 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
    return 0;
 }
 
+/* on WM_COMMAND */
 void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHMapWindow data;
@@ -193,11 +360,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		data->map[msg_data->x][msg_data->y] = msg_data->glyph;
 
 		/* invalidate the update area */
-		rt.left = msg_data->x*TILE_X - TILE_X*data->xPos;
-		rt.top = msg_data->y*TILE_Y - TILE_Y*data->yPos;
-		rt.right = rt.left + TILE_X;
-		rt.bottom = rt.top + TILE_Y;
-
+		nhcoord2display(data, msg_data->x, msg_data->y, &rt);
 		InvalidateRect(hWnd, &rt, TRUE);
 	} 
 	break;
@@ -205,30 +368,17 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case MSNH_MSG_CLIPAROUND: 
 	{
 		PMSNHMsgClipAround msg_data = (PMSNHMsgClipAround)lParam;
-		SCROLLINFO si; 
-		int xPage, yPage;
 		int x, y;
- 
-		/* get page size */
+
+		/* get page size and center horizontally on x-position*/
 		if( !GetNHApp()->bNoHScroll ) {
-			si.cbSize = sizeof(si);
-			si.fMask = SIF_PAGE;
-			GetScrollInfo(hWnd, SB_HORZ, &si);
-			xPage = si.nPage;
-
-			x = max(0, min(COLNO, msg_data->x - xPage/2));
-
+			x = max(0, min(COLNO, msg_data->x - data->xPageSize/2));
 			SendMessage( hWnd, WM_HSCROLL, (WPARAM)MAKELONG(SB_THUMBTRACK, x), (LPARAM)NULL	);
 		}
 
+		/* get page size and center vertically on y-position*/
 		if( !GetNHApp()->bNoVScroll ) {
-			si.cbSize = sizeof(si);
-			si.fMask = SIF_PAGE;
-			GetScrollInfo(hWnd, SB_VERT, &si);
-			yPage = si.nPage;
-
-			y = max(0, min(ROWNO, msg_data->y - yPage/2));
-
+			y = max(0, min(ROWNO, msg_data->y - data->yPageSize/2));
 			SendMessage( hWnd, WM_VSCROLL, (WPARAM)MAKELONG(SB_THUMBTRACK, y), (LPARAM)NULL );
 		}
 	} 
@@ -252,25 +402,30 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 		/* move focus rectangle at the cursor postion */
 		hdc = GetDC(hWnd);
-		rt.left = (data->xCur - data->xPos)*TILE_X;
-		rt.top = (data->yCur - data->yPos)*TILE_Y;
-		rt.right = rt.left + TILE_X;
-		rt.bottom = rt.top + TILE_Y;
-		DrawFocusRect(hdc, &rt);
+
+		nhcoord2display(data, data->xCur, data->yCur, &rt);
+		if( data->bAsciiMode ) {
+			PatBlt(hdc, rt.left, rt.top, rt.right-rt.left, rt.bottom-rt.top, DSTINVERT);	
+		} else {
+			DrawFocusRect(hdc, &rt);
+		}
 		
 		data->xCur = msg_data->x;
 		data->yCur = msg_data->y;
-		rt.left = (data->xCur - data->xPos)*TILE_X;
-		rt.top = (data->yCur - data->yPos)*TILE_Y;
-		rt.right = rt.left + TILE_X;
-		rt.bottom = rt.top + TILE_Y;
-		DrawFocusRect(hdc, &rt);
+
+		nhcoord2display(data, data->xCur, data->yCur, &rt);
+		if( data->bAsciiMode ) {
+			PatBlt(hdc, rt.left, rt.top, rt.right-rt.left, rt.bottom-rt.top, DSTINVERT);	
+		} else {
+			DrawFocusRect(hdc, &rt);
+		}
 
 		ReleaseDC(hWnd, hdc);
 	} break;
 	}
 }
 
+/* on WM_CREATE */
 void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHMapWindow data;
@@ -285,9 +440,16 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		for(j=0; j<ROWNO; j++) {
 		data->map[i][j] = -1;
 	}
+
+	data->bAsciiMode = FALSE;
+
+	data->xScrTile = TILE_X;
+	data->yScrTile = TILE_Y;
+
 	SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 }
 
+/* on WM_PAINT */
 void onPaint(HWND hWnd) 
 {
 	PNHMapWindow data;
@@ -306,18 +468,20 @@ void onPaint(HWND hWnd)
 	/* calculate paint rectangle */
 	if( !IsRectEmpty(&ps.rcPaint) ) {
 		/* calculate paint rectangle */
-		paint_rt.top = data->yPos + ps.rcPaint.top/TILE_X;
-		paint_rt.left = data->xPos + ps.rcPaint.left/TILE_Y;
-		paint_rt.bottom = min(data->yPos+ps.rcPaint.bottom/TILE_Y+1, ROWNO);
-		paint_rt.right = min(data->xPos+ps.rcPaint.right/TILE_X+1, COLNO);
+		paint_rt.left = max(data->xPos + (ps.rcPaint.left - data->map_orig.x)/data->xScrTile, 0);
+		paint_rt.top = max(data->yPos + (ps.rcPaint.top - data->map_orig.y)/data->yScrTile, 0);
+		paint_rt.right = min(data->xPos + (ps.rcPaint.right - data->map_orig.x)/data->xScrTile+1, COLNO);
+		paint_rt.bottom = min(data->yPos + (ps.rcPaint.bottom - data->map_orig.y)/data->yScrTile+1, ROWNO);
 
+		if( data->bAsciiMode
 #ifdef REINCARNATION
-		if (Is_rogue_level(&u.uz)) {
+		    || Is_rogue_level(&u.uz) 
 			/* You enter a VERY primitive world! */
+#endif
+			) {
 			HGDIOBJ oldFont;
-			int offset;
 
-			oldFont = SelectObject(hDC, mswin_create_font(NHW_MAP, ATR_NONE, hDC));
+			oldFont = SelectObject(hDC, data->hMapFont);
 			SetBkMode(hDC, TRANSPARENT);
 
 			/* draw the map */
@@ -327,74 +491,14 @@ void onPaint(HWND hWnd)
 				uchar ch;
 				TCHAR wch;
 				RECT  glyph_rect;
-				unsigned short g=data->map[i][j];
+				int   color;
 				
-				/* (from wintty, naturally)
-				 *
-				 *  Map the glyph back to a character.
-				 *
-				 *  Warning:  For speed, this makes an assumption on the order of
-				 *		  offsets.  The order is set in display.h.
-				 */
-
-#ifdef TEXTCOLOR
-				int	    color;
-
-#define zap_color(n)  color = iflags.use_color ? zapcolors[n] : NO_COLOR
-#define cmap_color(n) color = iflags.use_color ? defsyms[n].color : NO_COLOR
-#define obj_color(n)  color = iflags.use_color ? objects[n].oc_color : NO_COLOR
-#define mon_color(n)  color = iflags.use_color ? mons[n].mcolor : NO_COLOR
-#define pet_color(n)  color = iflags.use_color ? mons[n].mcolor : NO_COLOR
-#define warn_color(n) color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
-
-# else /* no text color */
-
-#define zap_color(n)
-#define cmap_color(n)
-#define obj_color(n)
-#define mon_color(n)
-#define pet_color(c)
-#define warn_color(c)
-				SetTextColor( hDC, nhcolor_to_RGB(CLR_WHITE) );
-#endif
-
-				if ((offset = (g - GLYPH_WARNING_OFF)) >= 0) { 	  /* a warning flash */
-					ch = warnsyms[offset];
-					warn_color(offset);
-				} else if ((offset = (g - GLYPH_SWALLOW_OFF)) >= 0) {	/* swallow */
-					/* see swallow_to_glyph() in display.c */
-					ch = (uchar) showsyms[S_sw_tl + (offset & 0x7)];
-					mon_color(offset >> 3);
-				} else if ((offset = (g - GLYPH_ZAP_OFF)) >= 0) {	/* zap beam */
-					/* see zapdir_to_glyph() in display.c */
-					ch = showsyms[S_vbeam + (offset & 0x3)];
-					zap_color((offset >> 2));
-				} else if ((offset = (g - GLYPH_CMAP_OFF)) >= 0) {	/* cmap */
-					ch = showsyms[offset];
-					cmap_color(offset);
-				} else if ((offset = (g - GLYPH_OBJ_OFF)) >= 0) {	/* object */
-					ch = oc_syms[(int)objects[offset].oc_class];
-					obj_color(offset);
-				} else if ((offset = (g - GLYPH_BODY_OFF)) >= 0) {	/* a corpse */
-					ch = oc_syms[(int)objects[CORPSE].oc_class];
-					mon_color(offset);
-				} else if ((offset = (g - GLYPH_PET_OFF)) >= 0) {	/* a pet */
-					ch = monsyms[(int)mons[offset].mlet];
-					pet_color(offset);
-				} else {							/* a monster */
-					ch = monsyms[(int)mons[g].mlet];
-					mon_color(g);
-				}	
-				// end of wintty code
-
-#ifdef TEXTCOLOR
+				nhglyph2charcolor(data->map[i][j], &ch, &color);
+				
 				if( color == NO_COLOR ) continue;
 				else SetTextColor( hDC,  nhcolor_to_RGB(color) );
-#endif
-				glyph_rect.left = (i-data->xPos)*TILE_X;
-				glyph_rect.top  = (j-data->yPos)*TILE_Y;
-				glyph_rect.right = glyph_rect.left + TILE_X;
-				glyph_rect.bottom = glyph_rect.top + TILE_Y;
+
+				nhcoord2display(data, i, j, &glyph_rect);
 				DrawText(hDC, 
 						 NH_A2W(&ch, &wch, 1),
 						 1,
@@ -402,10 +506,8 @@ void onPaint(HWND hWnd)
 						 DT_CENTER | DT_VCENTER | DT_NOPREFIX
 						 );
 			}
-			mswin_destroy_font( SelectObject(hDC, oldFont) );
-		} else
-#endif
-		{
+			SelectObject(hDC, oldFont);
+		} else {
 			/* prepare tiles DC for mapping */
 			tileDC = CreateCompatibleDC(hDC);
 			saveBmp = SelectObject(tileDC, GetNHApp()->bmpTiles);
@@ -416,52 +518,67 @@ void onPaint(HWND hWnd)
 				if(data->map[i][j]>0) {
 					short ntile;
 					int t_x, t_y;
+					RECT glyph_rect;
 
 					ntile = glyph2tile[ data->map[i][j] ];
 					t_x = (ntile % TILES_PER_LINE)*TILE_X;
 					t_y = (ntile / TILES_PER_LINE)*TILE_Y;
+					
+					nhcoord2display(data, i, j, &glyph_rect);
 
-					BitBlt(hDC, (i-data->xPos)*TILE_X, (j-data->yPos)*TILE_Y, TILE_X, TILE_Y, tileDC, t_x, t_y, SRCCOPY );
+					StretchBlt( 
+						hDC, 
+						glyph_rect.left,
+						glyph_rect.top, 
+						data->xScrTile,
+						data->yScrTile,
+						tileDC,
+						t_x,
+						t_y,
+						TILE_X, 
+						TILE_Y, 
+						SRCCOPY 
+					);
 				}
 			SelectObject(tileDC, saveBmp);
 			DeleteDC(tileDC);
 		}
 
 		/* draw focus rect */
-		paint_rt.left = (data->xCur - data->xPos)*TILE_X;
-		paint_rt.top = (data->yCur - data->yPos)*TILE_Y;
-		paint_rt.right = paint_rt.left + TILE_X;
-		paint_rt.bottom = paint_rt.top + TILE_Y;
-		DrawFocusRect(hDC, &paint_rt);
+		nhcoord2display(data, data->xCur, data->yCur, &paint_rt);
+		if( data->bAsciiMode ) {
+			PatBlt( hDC, 
+				    paint_rt.left, paint_rt.top, 
+				    paint_rt.right-paint_rt.left, paint_rt.bottom-paint_rt.top, 
+				    DSTINVERT );	
+		} else {
+			DrawFocusRect(hDC, &paint_rt);
+		}
 	}
 	EndPaint(hWnd, &ps);
 }
 
+/* on WM_VSCROLL */
 void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHMapWindow data;
-	SCROLLINFO si; 
+	SCROLLINFO si;
 	int yNewPos;
 	int yDelta;
  
 	/* get window data */
 	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	
-	/* get page size */
-	si.cbSize = sizeof(si);
-	si.fMask = SIF_PAGE;
-	GetScrollInfo(hWnd, SB_VERT, &si);
 
     switch(LOWORD (wParam)) 
     { 
         /* User clicked shaft left of the scroll box. */
         case SB_PAGEUP: 
-             yNewPos = data->yPos-si.nPage; 
+             yNewPos = data->yPos-data->yPageSize; 
              break; 
 
         /* User clicked shaft right of the scroll box. */
         case SB_PAGEDOWN: 
-             yNewPos = data->yPos+si.nPage; 
+             yNewPos = data->yPos+data->yPageSize; 
              break; 
 
         /* User clicked the left arrow. */
@@ -484,13 +601,13 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
     } 
 
 	yNewPos = max(0, yNewPos);
-	yNewPos = min(ROWNO, yNewPos);
+	yNewPos = min(ROWNO-data->yPageSize+1, yNewPos);
 	if( yNewPos == data->yPos ) return;
 	
 	yDelta = yNewPos - data->yPos;
 	data->yPos = yNewPos;
 
-    ScrollWindowEx (hWnd, 0, -TILE_Y * yDelta, 
+    ScrollWindowEx (hWnd, 0, -data->yScrTile * yDelta, 
             (CONST RECT *) NULL, (CONST RECT *) NULL, 
             (HRGN) NULL, (LPRECT) NULL, SW_INVALIDATE | SW_ERASE); 
 
@@ -500,31 +617,27 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
     SetScrollInfo(hWnd, SB_VERT, &si, TRUE); 
 }
 
+/* on WM_HSCROLL */
 void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHMapWindow data;
-	SCROLLINFO si; 
+	SCROLLINFO si;
 	int xNewPos;
 	int xDelta;
  
 	/* get window data */
 	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	
-	/* get page size */
-	si.cbSize = sizeof(si);
-	si.fMask = SIF_PAGE;
-	GetScrollInfo(hWnd, SB_HORZ, &si);
-
     switch(LOWORD (wParam)) 
     { 
         /* User clicked shaft left of the scroll box. */
         case SB_PAGEUP: 
-             xNewPos = data->xPos-si.nPage; 
+             xNewPos = data->xPos-data->xPageSize; 
              break; 
 
         /* User clicked shaft right of the scroll box. */
         case SB_PAGEDOWN: 
-             xNewPos = data->xPos+si.nPage; 
+             xNewPos = data->xPos+data->xPageSize; 
              break; 
 
         /* User clicked the left arrow. */
@@ -547,13 +660,13 @@ void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
     } 
 
 	xNewPos = max(0, xNewPos);
-	xNewPos = min(COLNO, xNewPos);
+	xNewPos = min(COLNO-data->xPageSize+1, xNewPos);
 	if( xNewPos == data->xPos ) return;
 	
 	xDelta = xNewPos - data->xPos;
 	data->xPos = xNewPos;
 
-    ScrollWindowEx (hWnd, -TILE_X * xDelta, 0, 
+    ScrollWindowEx (hWnd, -data->xScrTile * xDelta, 0, 
             (CONST RECT *) NULL, (CONST RECT *) NULL, 
             (HRGN) NULL, (LPRECT) NULL, SW_INVALIDATE | SW_ERASE); 
 
@@ -564,8 +677,70 @@ void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
     SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
 }
 
+/* map nethack map coordinates to the screen location */
+void nhcoord2display(PNHMapWindow data, int x, int y, LPRECT lpOut)
+{
+	lpOut->left = (x - data->xPos)*data->xScrTile + data->map_orig.x;
+	lpOut->top  = (y - data->yPos)*data->yScrTile + data->map_orig.y;
+	lpOut->right = lpOut->left + data->xScrTile;
+	lpOut->bottom = lpOut->top + data->yScrTile;
+}
+
+/* map glyph to character/color combination */
+void nhglyph2charcolor(short g, uchar* ch, int* color)
+{
+	int offset;
 #ifdef TEXTCOLOR
-static
+
+#define zap_color(n)  *color = iflags.use_color ? zapcolors[n] : NO_COLOR
+#define cmap_color(n) *color = iflags.use_color ? defsyms[n].color : NO_COLOR
+#define obj_color(n)  *color = iflags.use_color ? objects[n].oc_color : NO_COLOR
+#define mon_color(n)  *color = iflags.use_color ? mons[n].mcolor : NO_COLOR
+#define pet_color(n)  *color = iflags.use_color ? mons[n].mcolor : NO_COLOR
+#define warn_color(n) *color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
+
+# else /* no text color */
+
+#define zap_color(n)
+#define cmap_color(n)
+#define obj_color(n)
+#define mon_color(n)
+#define pet_color(c)
+#define warn_color(c)
+	*color = CLR_WHITE;
+#endif
+
+	if ((offset = (g - GLYPH_WARNING_OFF)) >= 0) { 	  /* a warning flash */
+		*ch = warnsyms[offset];
+		warn_color(offset);
+	} else if ((offset = (g - GLYPH_SWALLOW_OFF)) >= 0) {	/* swallow */
+		/* see swallow_to_glyph() in display.c */
+		*ch = (uchar) showsyms[S_sw_tl + (offset & 0x7)];
+		mon_color(offset >> 3);
+	} else if ((offset = (g - GLYPH_ZAP_OFF)) >= 0) {	/* zap beam */
+		/* see zapdir_to_glyph() in display.c */
+		*ch = showsyms[S_vbeam + (offset & 0x3)];
+		zap_color((offset >> 2));
+	} else if ((offset = (g - GLYPH_CMAP_OFF)) >= 0) {	/* cmap */
+		*ch = showsyms[offset];
+		cmap_color(offset);
+	} else if ((offset = (g - GLYPH_OBJ_OFF)) >= 0) {	/* object */
+		*ch = oc_syms[(int)objects[offset].oc_class];
+		obj_color(offset);
+	} else if ((offset = (g - GLYPH_BODY_OFF)) >= 0) {	/* a corpse */
+		*ch = oc_syms[(int)objects[CORPSE].oc_class];
+		mon_color(offset);
+	} else if ((offset = (g - GLYPH_PET_OFF)) >= 0) {	/* a pet */
+		*ch = monsyms[(int)mons[offset].mlet];
+		pet_color(offset);
+	} else {							/* a monster */
+		*ch = monsyms[(int)mons[g].mlet];
+		mon_color(g);
+	}	
+	// end of wintty code
+}
+
+/* map nethack color to RGB */
 COLORREF nhcolor_to_RGB(int c)
 {
 	switch(c) {
@@ -588,4 +763,3 @@ COLORREF nhcolor_to_RGB(int c)
 	default:				return RGB(  0,   0,   0);	/* black */
 	}
 }
-#endif

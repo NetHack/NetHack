@@ -113,6 +113,17 @@
 #define IDM_HELP_OPTIONS_LONG           32778
 #define IDM_HELP_EXTCMD                 32779
 #define IDM_HELP_LICENSE                32780
+#define IDM_MAP_TILES                   32781
+#define IDM_MAP_ASCII4X6                32782
+#define IDM_MAP_ASCII6X8                32783
+#define IDM_MAP_ASCII8X8                32784
+#define IDM_MAP_ASCII16X8               32785
+#define IDM_MAP_ASCII7X12               32786
+#define IDM_MAP_ASCII8X12               32787
+#define IDM_MAP_ASCII16X12              32788
+#define IDM_MAP_ASCII12X16              32789
+#define IDM_MAP_ASCII10X18              32790
+#define IDM_MAP_FIT_TO_SCREEN           32791
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -120,7 +131,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        143
-#define _APS_NEXT_COMMAND_VALUE         32781
+#define _APS_NEXT_COMMAND_VALUE         32793
 #define _APS_NEXT_CONTROL_VALUE         1329
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

@@ -43,6 +43,9 @@ typedef struct mswin_nhwindow_app {
 
 	boolean		bNoHScroll;	/* disable cliparound for horizontal grid (map) */
 	boolean		bNoVScroll; /* disable cliparound for vertical grid (map) */
+
+	int			mapDisplayMode;		/* regular map display mode */
+	int			mapDisplayModeSave;	/* saved map display mode */
 } NHWinApp, *PNHWinApp;
 extern PNHWinApp GetNHApp();
 

@@ -8,6 +8,7 @@
 #include "dlb.h"
 #include "resource.h"
 #include "mhmain.h"
+#include "mhmap.h"
 
 #ifdef OVL0
 #define SHARED_DCL
@@ -52,6 +53,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	if( _nethack_app.bmpTiles==NULL ) panic("cannot load tiles bitmap");
 	_nethack_app.bNoHScroll = FALSE;
 	_nethack_app.bNoVScroll = FALSE;
+	_nethack_app.mapDisplayMode = NHMAP_VIEW_TILES;
 
 	// init controls
 	LoadLibrary( TEXT("RICHED32.DLL") );

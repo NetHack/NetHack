@@ -271,6 +271,13 @@ void mswin_clear_nhwindow(winid wid)
 			 GetNHApp()->windowlist[wid].win, 
 			 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CLEAR_WINDOW, (LPARAM)NULL );
     }
+
+#ifdef REINCARNATION
+    if( Is_rogue_level(&u.uz) ) 
+		mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
+	else 
+		mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), GetNHApp()->mapDisplayMode);
+#endif
 }
 
 /* -- Display the window on the screen.  If there is data

@@ -10,6 +10,7 @@
 #include "mhmenu.h"
 #include "mhstatus.h"
 #include "mhmsgwnd.h"
+#include "mhmap.h"
 
 #define MAX_LOADSTRING 100
 
@@ -25,6 +26,9 @@ LRESULT CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 static LRESULT  onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void		onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void		register_main_window_class();
+static void		select_map_mode(int map_mode);
+static int		menuid2mapmode(int menuid);
+static int		mapmode2menuid(int map_mode);
 
 HWND mswin_init_main_window () {
 	static int run_once = 0;
@@ -202,7 +206,12 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	/* new window was just added */
 	case MSNH_MSG_ADDWND: {
 		PMSNHMsgAddWnd msg_param = (PMSNHMsgAddWnd)lParam;
-		HWND child = GetNHApp()->windowlist[msg_param->wid].win;
+		HWND child;
+
+		if( GetNHApp()->windowlist[msg_param->wid].type == NHW_MAP )
+			select_map_mode(GetNHApp()->mapDisplayMode);
+		
+		child = GetNHApp()->windowlist[msg_param->wid].win;
 		if( child ) mswin_layout_main_window(child);
 	} break;
 
@@ -323,7 +332,21 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case IDM_SAVE:
 		   dosave();
 		   break;
-		
+
+		case IDM_MAP_TILES:
+		case IDM_MAP_ASCII4X6:
+		case IDM_MAP_ASCII6X8:
+		case IDM_MAP_ASCII8X8:
+		case IDM_MAP_ASCII16X8:
+		case IDM_MAP_ASCII7X12:
+		case IDM_MAP_ASCII8X12:
+		case IDM_MAP_ASCII12X16:
+		case IDM_MAP_ASCII16X12:
+		case IDM_MAP_ASCII10X18:
+		case IDM_MAP_FIT_TO_SCREEN:
+			select_map_mode(menuid2mapmode(wmId));
+			break;
+
 		case IDM_HELP_LONG:	
 			display_file(HELP, TRUE);  
 			break;
@@ -420,3 +443,55 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return FALSE;
 }
 
+void select_map_mode(int mode)
+{
+	CheckMenuRadioItem(
+		GetMenu(GetNHApp()->hMainWnd), 
+		IDM_MAP_TILES, 
+		IDM_MAP_FIT_TO_SCREEN, 
+		mapmode2menuid(mode), 
+		MF_BYCOMMAND);
+	
+	/* override for Rogue level */
+#ifdef REINCARNATION
+    if( Is_rogue_level(&u.uz) ) return;
+#endif
+
+	GetNHApp()->mapDisplayMode = mode;
+	mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), mode);
+}
+
+static struct t_menu2mapmode {
+	int menuID;
+	int mapMode;
+} _menu2mapmode[] = 
+{
+	{ IDM_MAP_TILES, NHMAP_VIEW_TILES },
+	{ IDM_MAP_ASCII4X6, NHMAP_VIEW_ASCII4x6 },
+	{ IDM_MAP_ASCII6X8, NHMAP_VIEW_ASCII6x8 },
+	{ IDM_MAP_ASCII8X8, NHMAP_VIEW_ASCII8x8 },
+	{ IDM_MAP_ASCII16X8, NHMAP_VIEW_ASCII16x8 },
+	{ IDM_MAP_ASCII7X12, NHMAP_VIEW_ASCII7x12 },
+	{ IDM_MAP_ASCII8X12, NHMAP_VIEW_ASCII8x12 },
+	{ IDM_MAP_ASCII12X16, NHMAP_VIEW_ASCII12x16 },
+	{ IDM_MAP_ASCII16X12, NHMAP_VIEW_ASCII16x12 },
+	{ IDM_MAP_ASCII10X18, NHMAP_VIEW_ASCII10x18 },
+	{ IDM_MAP_FIT_TO_SCREEN, NHMAP_VIEW_FIT_TO_SCREEN },
+	{ -1, -1 }
+};
+
+int	menuid2mapmode(int menuid)
+{
+	struct t_menu2mapmode* p;
+	for( p = _menu2mapmode; p->mapMode!=-1; p++ ) 
+		if(p->menuID==menuid ) return p->mapMode;
+	return -1;
+}
+
+int	mapmode2menuid(int map_mode)
+{
+	struct t_menu2mapmode* p;
+	for( p = _menu2mapmode; p->mapMode!=-1; p++ ) 
+		if(p->mapMode==map_mode ) return p->menuID;
+	return -1;
+}
