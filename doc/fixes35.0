@@ -65,6 +65,8 @@ kicked objects do not slide when on the air or water levels
 when a giant carrying a boulder dies in a pit, ensure that the corpse is
 	buried under the filled pit
 when blind and levitating > shouldn't say "stairs" if player has not seen them
+a slow-moving monster hidden under a rotting corpse was not immediately
+	displayed when the corpse rotted away
 
 
 Platform- and/or Interface-Specific Fixes

@@ -1556,8 +1556,16 @@ long timeout;	/* unused */
 	    }
 	}
 	rot_organic(arg, timeout);
-	if (on_floor) newsym(x, y);
-	else if (in_invent) update_inventory();
+	if (on_floor) {
+	    struct monst *mtmp = m_at(x, y);
+
+	    /* a hiding monster may be exposed */
+	    if (mtmp && !OBJ_AT(x, y) &&
+		mtmp->mundetected && hides_under(mtmp->data)) {
+		mtmp->mundetected = 0;
+	    }
+	    newsym(x, y);
+	} else if (in_invent) update_inventory();
 }
 
 #if 0
