@@ -1,0 +1,16 @@
+; makescript
+; build filldir and dozoo from the file shiplist
+if exists filldir
+	copy filldir filldir.old clone
+endif
+if exists dozoo
+	copy dozoo dozoo.old clone
+endif
+if not exists shiplist
+	echo "No shiplist file."
+	fail 20
+endif
+gawk  -f mkfd.awk shiplist
+protect filldir s add
+gawk  -f mkdz.awk shiplist
+protect dozoo s add
