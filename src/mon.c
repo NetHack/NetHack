@@ -774,21 +774,21 @@ mpickgold(mtmp)
 	register struct monst *mtmp;
 {
     register struct obj *gold;
+    int mat_idx;
 
     if ((gold = g_at(mtmp->mx, mtmp->my)) != 0) {
+	mat_idx = objects[gold->otyp].oc_material;
 #ifndef GOLDOBJ
 	mtmp->mgold += gold->quan;
 	delobj(gold);
-	if (cansee(mtmp->mx, mtmp->my) ) {
-	    if (flags.verbose && !mtmp->isgd)
-		pline("%s picks up some gold.", Monnam(mtmp));
 #else
         obj_extract_self(gold);
         add_to_minv(mtmp, gold);
+#endif
 	if (cansee(mtmp->mx, mtmp->my) ) {
 	    if (flags.verbose && !mtmp->isgd)
-		pline("%s picks up some money.", Monnam(mtmp));
-#endif
+		pline("%s picks up some %s.", Monnam(mtmp),
+			mat_idx == GOLD ? "gold" : "money");
 	    newsym(mtmp->mx, mtmp->my);
 	}
     }
