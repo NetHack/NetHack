@@ -469,6 +469,7 @@ boolean init;
 	register struct WinDesc *cw = wins[WIN_MESSAGE];
 	char *retstr = (char *)0;
 
+	if (!cw) return (char *)0;	/* bail */
 	/*
 	 * state 0 = normal return with string from msg history.
 	 * state 1 = finished with recall data, return toplines.
