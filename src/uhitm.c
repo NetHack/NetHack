@@ -519,6 +519,7 @@ int thrown;
 	int wtype;
 	struct obj *monwep;
 	char yourbuf[BUFSZ];
+	char *unconventional = (char *)0;	/* substituted for word "attack" in msg */
 
 	wakeup(mon);
 	if(!obj) {	/* attack with bare hands */
@@ -684,10 +685,13 @@ int thrown;
 			break;
 #ifdef TOURIST
 		    case EXPENSIVE_CAMERA:
-			You("succeed in destroying %s camera.  Congratulations!",
-			    shk_your(yourbuf, obj));
-			useup(obj);
-			return(TRUE);
+			if (mdat != &mons[PM_SHADE]) {
+			    You("succeed in destroying %s camera.  Congratulations!",
+			        shk_your(yourbuf, obj));
+			    useup(obj);
+			    return(TRUE);
+			} else unconventional = "camera";
+			break;
 #endif
 		    case CORPSE:		/* fixed by polder@cs.vu.nl */
 			if (touch_petrifies(&mons[obj->corpsenm])) {
@@ -892,7 +896,8 @@ int thrown;
 	    tmp = 0;
 	    if (mdat == &mons[PM_SHADE]) {
 		if (!hittxt) {
-		    Your("attack passes harmlessly through %s.",
+		    Your("%s passes harmlessly through %s.",
+		    	unconventional ? unconventional : "attack",
 			mon_nam(mon));
 		    hittxt = TRUE;
 		}
