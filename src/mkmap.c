@@ -388,18 +388,6 @@ remove_rooms(lx, ly, hx, hy)
 	    /* TODO: ensure remaining parts of room are still joined */
 
 	    if (!croom->irregular) impossible("regular room in joined map");
-
-	    /* if a "donut" or even disconnected room, leave bounds alone */
-	    if ((croom->lx < lx && croom->hx >= hx) ||
-		(croom->ly < ly && croom->hy >= hy)) {
-		continue;
-	    }
-
-	    /* truncate the side(s) that are covered by the region */
-	    if (croom->lx < lx && croom->hx < hx) croom->hx = lx - 1;
-	    if (croom->lx >= lx && croom->hx >= hx) croom->lx = hx;
-	    if (croom->ly < ly && croom->hy < hy) croom->hy = ly - 1;
-	    if (croom->ly >= ly && croom->hy >= hy) croom->ly = hy;
 	} else {
 	    /* total overlap, remove the room */
 	    remove_room((unsigned)i);
