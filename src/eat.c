@@ -351,6 +351,8 @@ do_reset_eat()
 	if (context.victual.piece) {
 		context.victual.o_id = 0;
 		context.victual.piece = touchfood(context.victual.piece);
+		if (context.victual.piece)
+			context.victual.o_id = context.victual.piece->o_id;
 		recalc_wt();
 	}
 	context.victual.fullwarn = context.victual.eating = context.victual.doreset = FALSE;
@@ -1147,7 +1149,8 @@ no_opener:
 	context.tin.reqtime = tmp;
 	context.tin.usedtime = 0;
 	context.tin.tin = otmp;
-	if (otmp) context.tin.o_id = otmp->o_id;
+	if (context.tin.tin)
+		context.tin.o_id = context.tin.tin->o_id;
 	set_occupation(opentin, "opening the tin", 0);
 	return;
 }
@@ -1955,6 +1958,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	 * they shouldn't be able to choke now.
 	 */
 	    if (u.uhs != SATIATED) context.victual.canchoke = FALSE;
+	    context.victual.o_id = 0;
 	    context.victual.piece = touchfood(otmp);
 	    if (context.victual.piece)
 	    	context.victual.o_id = context.victual.piece->o_id;
@@ -1974,6 +1978,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	/* KMH, conduct */
 	u.uconduct.food++;
 
+	context.victual.o_id = 0;
 	context.victual.piece = otmp = touchfood(otmp);
 	if (context.victual.piece)
 		context.victual.o_id = context.victual.piece->o_id;

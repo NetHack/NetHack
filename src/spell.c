@@ -4,9 +4,6 @@
 
 #include "hack.h"
 
-static NEARDATA schar delay;		/* moves left for this spell */
-static NEARDATA struct obj *book;	/* last/current book being xscribed */
-
 /* spellmenu arguments; 0 thru n-1 used as spl_book[] index when swapping */
 #define SPELLMENU_CAST (-2)
 #define SPELLMENU_VIEW (-1)
@@ -194,7 +191,7 @@ struct obj *spellbook;
 	    gone = TRUE;
 	} else {
 	    You("find yourself reading the %s line over and over again.",
-		spellbook == book ? "next" : "first");
+		spellbook == context.spbook.book ? "next" : "first");
 	}
 	return gone;
 }
@@ -321,22 +318,23 @@ learn()
 	boolean costly = TRUE;
 
 	/* JDS: lenses give 50% faster reading; 33% smaller read time */
-	if (delay && ublindf && ublindf->otyp == LENSES && rn2(2)) delay++;
+	if (context.spbook.delay && ublindf && ublindf->otyp == LENSES && rn2(2)) context.spbook.delay++;
 	if (Confusion) {		/* became confused while learning */
-	    (void) confused_book(book);
-	    book = 0;			/* no longer studying */
-	    nomul(delay);		/* remaining delay is uninterrupted */
-	    delay = 0;
+	    (void) confused_book(context.spbook.book);
+	    context.spbook.book = 0;			/* no longer studying */
+	    context.spbook.o_id = 0;
+	    nomul(context.spbook.delay);		/* remaining delay is uninterrupted */
+	    context.spbook.delay = 0;
 	    return(0);
 	}
-	if (delay) {	/* not if (delay++), so at end delay == 0 */
-	    delay++;
+	if (context.spbook.delay) {	/* not if (context.spbook.delay++), so at end delay == 0 */
+	    context.spbook.delay++;
 	    return(1); /* still busy */
 	}
 	exercise(A_WIS, TRUE);		/* you're studying. */
-	booktype = book->otyp;
+	booktype = context.spbook.book->otyp;
 	if(booktype == SPE_BOOK_OF_THE_DEAD) {
-	    deadbook(book);
+	    deadbook(context.spbook.book);
 	    return(0);
 	}
 
@@ -345,13 +343,13 @@ learn()
 		OBJ_NAME(objects[booktype]));
 	for (i = 0; i < MAXSPELL; i++)  {
 		if (spellid(i) == booktype)  {
-			if (book->spestudied > MAX_SPELL_STUDY) {
+			if (context.spbook.book->spestudied > MAX_SPELL_STUDY) {
 			    pline("This spellbook is too faint to be read any more.");
-			    book->otyp = booktype = SPE_BLANK_PAPER;
+			    context.spbook.book->otyp = booktype = SPE_BLANK_PAPER;
 			} else if (spellknow(i) <= 1000) {
 			    Your("knowledge of %s is keener.", splname);
 			    incrnknow(i);
-			    book->spestudied++;
+			    context.spbook.book->spestudied++;
 			    exercise(A_WIS,TRUE);       /* extra study */
 			} else { /* 1000 < spellknow(i) <= MAX_SPELL_STUDY */
 			    You("know %s quite well already.", splname);
@@ -365,7 +363,7 @@ learn()
 			spl_book[i].sp_id = booktype;
 			spl_book[i].sp_lev = objects[booktype].oc_level;
 			incrnknow(i);
-			book->spestudied++;
+			context.spbook.book->spestudied++;
 			You(i > 0 ? "add %s to your repertoire." : "learn %s.",
 			    splname);
 			makeknown((int)booktype);
@@ -374,15 +372,17 @@ learn()
 	}
 	if (i == MAXSPELL) impossible("Too many spells memorized!");
 
-	if (book->cursed) {	/* maybe a demon cursed it */
-	    if (cursed_book(book)) {
-		useup(book);
-		book = 0;
+	if (context.spbook.book->cursed) {	/* maybe a demon cursed it */
+	    if (cursed_book(context.spbook.book)) {
+		useup(context.spbook.book);
+		context.spbook.book = 0;
+		context.spbook.o_id = 0;
 		return 0;
 	    }
 	}
-	if (costly) check_unpaid(book);
-	book = 0;
+	if (costly) check_unpaid(context.spbook.book);
+	context.spbook.book = 0;
+	context.spbook.o_id = 0;
 	return(0);
 }
 
@@ -394,9 +394,9 @@ register struct obj *spellbook;
 	register boolean confused = (Confusion != 0);
 	boolean too_hard = FALSE;
 
-	if (delay && !confused && spellbook == book &&
+	if (context.spbook.delay && !confused && spellbook == context.spbook.book &&
 		    /* handle the sequence: start reading, get interrupted,
-		       have book become erased somehow, resume reading it */
+		       have context.spbook.book become erased somehow, resume reading it */
 		    booktype != SPE_BLANK_PAPER) {
 		You("continue your efforts to memorize the spell.");
 	} else {
@@ -409,20 +409,20 @@ register struct obj *spellbook;
 		switch (objects[booktype].oc_level) {
 		 case 1:
 		 case 2:
-			delay = -objects[booktype].oc_delay;
+			context.spbook.delay = -objects[booktype].oc_delay;
 			break;
 		 case 3:
 		 case 4:
-			delay = -(objects[booktype].oc_level - 1) *
+			context.spbook.delay = -(objects[booktype].oc_level - 1) *
 				objects[booktype].oc_delay;
 			break;
 		 case 5:
 		 case 6:
-			delay = -objects[booktype].oc_level *
+			context.spbook.delay = -objects[booktype].oc_level *
 				objects[booktype].oc_delay;
 			break;
 		 case 7:
-			delay = -8 * objects[booktype].oc_delay;
+			context.spbook.delay = -8 * objects[booktype].oc_delay;
 			break;
 		 default:
 			impossible("Unknown spellbook level %d, book %d;",
@@ -463,8 +463,8 @@ register struct obj *spellbook;
 		if (too_hard) {
 		    boolean gone = cursed_book(spellbook);
 
-		    nomul(delay);			/* study time */
-		    delay = 0;
+		    nomul(context.spbook.delay);			/* study time */
+		    context.spbook.delay = 0;
 		    if(gone || !rn2(3)) {
 			if (!gone) pline_The("spellbook crumbles to dust!");
 			if (!objects[spellbook->otyp].oc_name_known &&
@@ -478,8 +478,8 @@ register struct obj *spellbook;
 		    if (!confused_book(spellbook)) {
 			spellbook->in_use = FALSE;
 		    }
-		    nomul(delay);
-		    delay = 0;
+		    nomul(context.spbook.delay);
+		    context.spbook.delay = 0;
 		    return(1);
 		}
 		spellbook->in_use = FALSE;
@@ -489,7 +489,9 @@ register struct obj *spellbook;
 		    "memorize");
 	}
 
-	book = spellbook;
+	context.spbook.book = spellbook;
+	if (context.spbook.book)
+		context.spbook.o_id = context.spbook.book->o_id;
 	set_occupation(learn, "studying", 0);
 	return(1);
 }
@@ -500,7 +502,10 @@ void
 book_disappears(obj)
 struct obj *obj;
 {
-	if (obj == book) book = (struct obj *)0;
+	if (obj == context.spbook.book) {
+		context.spbook.book = (struct obj *)0;
+		context.spbook.o_id = 0;
+	}
 }
 
 /* renaming an object usually results in it having a different address;
@@ -510,7 +515,11 @@ void
 book_substitution(old_obj, new_obj)
 struct obj *old_obj, *new_obj;
 {
-	if (old_obj == book) book = new_obj;
+	if (old_obj == context.spbook.book) {
+		context.spbook.book = new_obj;
+		if (context.spbook.book)
+			context.spbook.o_id = context.spbook.book->o_id;
+	}
 }
 
 /* called from moveloop() */
@@ -1005,7 +1014,8 @@ losespells()
 	boolean confused = (Confusion != 0);
 	int  n, nzap, i;
 
-	book = 0;
+	context.spbook.book = 0;
+	context.spbook.o_id = 0;
 	for (n = 0; n < MAXSPELL && spellid(n) != NO_SPELL; n++)
 		continue;
 	if (n) {

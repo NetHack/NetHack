@@ -877,17 +877,34 @@ register struct obj *otmp;
 		saveobjchn(fd,otmp->cobj,mode);
 	    if (release_data(mode)) {
 /*		if (otmp->oclass == FOOD_CLASS) food_disappears(otmp); */
+		/*
+		 * If these are on the floor, the discarding could
+		 * be because of a game save, or we could just be changing levels.
+		 * Always invalidate the pointer, but ensure that we have
+		 * the o_id in order to restore the pointer on reload.
+		 */
 		if (otmp == context.victual.piece) {
 			/* Store the o_id of the victual if mismatched */
 			if (context.victual.o_id != otmp->o_id)
 			    context.victual.o_id = otmp->o_id;
+			/* invalidate the pointer; on reload it will get restored */
+			context.victual.piece = (struct obj *)0;
 		}
 		if (otmp == context.tin.tin) {
 			/* Store the o_id of your tin */
 			if (context.tin.o_id != otmp->o_id)
 			    context.tin.o_id = otmp->o_id;
+			/* invalidate the pointer; on reload it will get restored */
+			context.tin.tin = (struct obj *)0;
 		}
-		if (otmp->oclass == SPBOOK_CLASS) book_disappears(otmp);
+/*		if (otmp->oclass == SPBOOK_CLASS) book_disappears(otmp); */
+		if (otmp == context.spbook.book) {
+			/* Store the o_id of your spellbook */
+			if (context.spbook.o_id != otmp->o_id)
+			    context.spbook.o_id = otmp->o_id;
+			/* invalidate the pointer; on reload it will get restored */
+			context.spbook.book = (struct obj *)0;
+		}
 		otmp->where = OBJ_FREE;	/* set to free so dealloc will work */
 		otmp->timed = 0;	/* not timed any more */
 		otmp->lamplit = 0;	/* caller handled lights */

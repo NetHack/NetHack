@@ -9,6 +9,8 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#define CONTEXTVERBSZ 30
+
 /*
  * The context structure houses things that the game tracks
  * or adjusts during the game, to preserve game state or context.
@@ -29,6 +31,20 @@ struct tin_info {
 	struct	obj *tin;
 	unsigned o_id;		/* o_id of tin in save file */
 	int	usedtime, reqtime;
+};
+
+struct book_info {
+	struct obj *book;	/* last/current book being xscribed */
+	unsigned o_id;		/* o_id of book in save file */
+	schar delay;		/* moves left for this spell */
+};
+
+struct takeoff_info {
+	long mask;
+	long what;
+	int delay;
+	boolean cancelled_don;
+	char disrobing[CONTEXTVERBSZ+1];
 };
 
 struct victual_info {
@@ -73,6 +89,8 @@ struct context_info {
 	struct dig_info digging;
 	struct victual_info victual;
 	struct tin_info tin;
+	struct book_info spbook;
+	struct takeoff_info takeoff;
 };
 
 extern NEARDATA struct context_info context;
