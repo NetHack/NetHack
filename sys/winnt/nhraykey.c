@@ -156,7 +156,7 @@
  */
 
 static char where_to_get_source[] = "http://www.nethack.org/";
-static char author[] = "The NetHack Development Team";
+static char author[] = "Ray Chason";
 
 #include "hack.h"
 #include "wintty.h"
