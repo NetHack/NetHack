@@ -70,8 +70,7 @@ OPTIONS=hilite_pet,!toptenwin
 # background, btnface, btnshadow, btntext, captiontext, graytext, highlight,
 # highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
 # window, windowframe, windowtext.
-
-OPTIONS=windowcolors:status windowtext/window message windowtext/window
+#OPTIONS=windowcolors:status windowtext/window message windowtext/window
 
 #
 #HACKDIR=c:\games\nethack
