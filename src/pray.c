@@ -813,6 +813,9 @@ pleased(g_align)
 	    }
 	}
 
+    /* note: can't get pat_on_head unless all troubles have just been
+       fixed or there were no troubles to begin with; hallucination
+       won't be in effect so special handling for it is superfluous */
     if(pat_on_head)
 	switch(rn2((Luck + 6)>>1)) {
 	case 0:	break;
@@ -862,8 +865,8 @@ pleased(g_align)
 	    break;
 	case 3:
 	    /* takes 2 hints to get the music to enter the stronghold */
-	    if (flags.soundok && !u.uevent.uopened_dbridge) {
-		if(u.uevent.uheard_tune < 1) {
+	    if (!u.uevent.uopened_dbridge) {
+		if (u.uevent.uheard_tune < 1) {
 		    godvoice(g_align,(char *)0);
 		    verbalize("Hark, %s!",
 			  youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
@@ -872,7 +875,7 @@ pleased(g_align)
 		    u.uevent.uheard_tune++;
 		    break;
 		} else if (u.uevent.uheard_tune < 2) {
-		    You_hear(Hallucination ? "a funeral march..." : "a divine music...");
+		    You_hear("a divine music...");
 		    pline("It sounds like:  \"%s\".", tune);
 		    u.uevent.uheard_tune++;
 		    break;
