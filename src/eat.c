@@ -848,7 +848,7 @@ register int pm;
 #endif
 		    nomul(-tmp);
 		    Sprintf(buf, Hallucination ?
-			"You suddenly dread being peeled and mimick %s again!" :
+			"You suddenly dread being peeled and mimic %s again!" :
 			"You now prefer mimicking %s again.",
 			an(Upolyd ? youmonst.data->mname : urace.noun));
 		    eatmbuf = strcpy((char *) alloc(strlen(buf) + 1), buf);
