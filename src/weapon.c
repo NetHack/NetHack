@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)weapon.c	3.4	2002/03/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -871,7 +871,7 @@ enhance_weapon_skill()
 	    /* start with a legend if any entries will be annotated
 	       with "*" or "#" below */
 	    if (eventually_advance > 0 || maxxed_cnt > 0) {
-		any.a_int = 0;
+		any.a_void = 0;
 		if (eventually_advance > 0) {
 		    Sprintf(buf,
 			    "(Skill%s flagged by \"*\" may be enhanced %s.)",

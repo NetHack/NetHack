@@ -438,8 +438,9 @@ struct obj *obj;			/* only scatter this obj        */
 			&& rn2(10)) {
 		if (otmp->otyp == BOULDER) {
 		    pline("%s apart.", Tobjnam(otmp, "break"));
-		    fracture_rock(otmp);
-		    place_object(otmp, sx, sy);	/* put fragments on floor */
+		    fracture_rock(otmp); /* the will place fragments on floor */
+		    obj_extract_self(otmp);
+		    place_object(otmp, sx, sy);
 		    if ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
 			/* another boulder here, restack it to the top */
 			obj_extract_self(otmp);
