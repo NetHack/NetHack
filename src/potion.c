@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)potion.c	3.4	2004/06/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2081,10 +2081,12 @@ register struct obj *obj;
 		set_malign(mtmp);
 		break;
 	case 3 : verbalize("It is about time!");
-		pline("%s vanishes.", Monnam(mtmp));
+		if (canspotmon(mtmp)) pline("%s vanishes.", Monnam(mtmp));
 		mongone(mtmp);
 		break;
 	default: verbalize("You disturbed me, fool!");
+		mtmp->mpeaceful = FALSE;
+		set_malign(mtmp);
 		break;
 	}
 }
