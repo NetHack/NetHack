@@ -17,6 +17,10 @@ STATIC_DCL boolean FDECL(only_here, (struct obj *));
 #endif /* OVL1 */
 STATIC_DCL void FDECL(compactify,(char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
+STATIC_PTR int FDECL(ckblessed,(struct obj *));
+STATIC_PTR int FDECL(ckuncursed,(struct obj *));
+STATIC_PTR int FDECL(ckcursed,(struct obj *));
+STATIC_PTR int FDECL(ckunbknown,(struct obj *));
 static char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
 #ifdef OVLB
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
@@ -1041,6 +1045,34 @@ register struct obj *otmp;
 	return((int)(otmp->unpaid));
 }
 
+STATIC_PTR int
+ckblessed(otmp)
+register struct obj *otmp;
+{
+	return((int)(otmp->blessed));
+}
+
+STATIC_PTR int
+ckuncursed(otmp)
+register struct obj *otmp;
+{
+	return((int)(!otmp->blessed && !otmp->cursed));
+}
+
+STATIC_PTR int
+ckcursed(otmp)
+register struct obj *otmp;
+{
+	return((int)(otmp->cursed));
+}
+
+STATIC_PTR int
+ckunbknown(otmp)
+register struct obj *otmp;
+{
+	return((int)(!otmp->bknown));
+}
+
 boolean
 wearing_armor()
 {
@@ -1121,6 +1153,10 @@ unsigned *resultflags;
 	} else if (!takeoff && (unpaid || invent)) {
 	    ilets[iletct++] = ' ';
 	    if (unpaid) ilets[iletct++] = 'u';
+	    if (count_buc(invent, BUC_BLESSED))  ilets[iletct++] = 'B';
+	    if (count_buc(invent, BUC_UNCURSED)) ilets[iletct++] = 'U';
+	    if (count_buc(invent, BUC_CURSED))   ilets[iletct++] = 'C';
+	    if (count_buc(invent, BUC_UNKNOWN))  ilets[iletct++] = 'X';
 	    if (invent) ilets[iletct++] = 'a';
 	} else if (takeoff && invent) {
 	    ilets[iletct++] = ' ';
@@ -1183,9 +1219,21 @@ unsigned *resultflags;
 		allflag = TRUE;
 	    } else if (sym == 'A') {
 		/* same as the default */ ;
-	    } else if (sym == 'u' || sym == 'U') {
+	    } else if (sym == 'u') {
 		add_valid_menu_class('u');
 		ckfn = ckunpaid;
+	    } else if (sym == 'B') {
+	    	add_valid_menu_class('B');
+	    	ckfn = ckblessed;
+	    } else if (sym == 'U') {
+	    	add_valid_menu_class('U');
+	    	ckfn = ckuncursed;
+	    } else if (sym == 'C') {
+	    	add_valid_menu_class('C');
+	    	ckfn = ckcursed;
+	    } else if (sym == 'X') {
+	    	add_valid_menu_class('X');
+	    	ckfn = ckunbknown;
 	    } else if (sym == 'm') {
 		m_seen = TRUE;
 	    } else if (oc_of_sym == MAXOCLASSES) {
