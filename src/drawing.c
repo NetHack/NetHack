@@ -169,7 +169,7 @@ const char * const monexplain[MAXMCLASSES] = {
     "jelly",			"kobold",		"leprechaun",
     "mimic",			"nymph",		"orc",
     "piercer",			"quadruped",		"rodent",
-    "spider",			"trapper or lurker above", "unicorn or horse",
+    "arachnid or centipede",	"trapper or lurker above", "unicorn or horse",
     "vortex",		"worm", "xan or other mythical/fantastic insect",
     "light",			"zruty",
 
