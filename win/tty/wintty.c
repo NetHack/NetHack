@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wintty.c	3.4	2002/08/04	*/
+/*	SCCS Id: @(#)wintty.c	3.4	2002/09/27	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2447,11 +2447,13 @@ tty_print_glyph(window, x, y, glyph)
 
     if (reverse_on) {
     	term_end_attr(ATR_INVERSE);
+#ifdef TEXTCOLOR
 	/* turn off color as well, ATR_INVERSE may have done this already */
 	if(ttyDisplay->color != NO_COLOR) {
 	    term_end_color();
 	    ttyDisplay->color = NO_COLOR;
 	}
+#endif
     }
 
     wins[window]->curx++;	/* one character over */
