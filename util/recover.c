@@ -418,8 +418,10 @@ int pid;
     if (Process32First(hProcessSnap, &pe32)) { 
         do {
             if (pe32.th32ProcessID == (unsigned)pid && pe32.szExeFile &&
-            	(!strcmpi(pe32.szExeFile, "nethack.exe") ||
-            	 !strcmpi(pe32.szExeFile, "nethackw.exe")))
+	       ((strlen(pe32.szExeFile) >= 12 &&
+		 !strcmpi(&pe32.szExeFile[strlen(pe32.szExeFile) - 12], "nethackw.exe")) ||
+		(strlen(pe32.szExeFile) >= 11 &&
+        	 !strcmpi(&pe32.szExeFile[strlen(pe32.szExeFile) - 11], "nethack.exe"))))
 	    bRet = TRUE;
         }
         while (Process32Next(hProcessSnap, &pe32)); 
