@@ -739,7 +739,7 @@ doidtrap()
 	register struct trap *trap;
 	int x, y, tt;
 
-	if (!getdir((char *)0)) return 0;
+	if (!getdir("^")) return 0;
 	x = u.ux + u.dx;
 	y = u.uy + u.dy;
 	for (trap = ftrap; trap; trap = trap->ntrap)
@@ -765,12 +765,14 @@ doidtrap()
 	return 0;
 }
 
-int
-dowhatdoes()
+char *
+dowhatdoes_core(q, cbuf)
+char q;
+char *cbuf;
 {
 	dlb *fp;
-	char bufr[BUFSZ+6];
-	register char *buf = &bufr[6], *ep, q, ctrl, meta;
+	char bufr[BUFSZ];
+	register char *buf = &bufr[6], *ep, ctrl, meta;
 
 	fp = dlb_fopen(CMDHELPFILE, "r");
 	if (!fp) {
@@ -778,16 +780,9 @@ dowhatdoes()
 		return 0;
 	}
 
-#if defined(UNIX) || defined(VMS)
-	introff();
-#endif
-	q = yn_function("What command?", (char *)0, '\0');
-#if defined(UNIX) || defined(VMS)
-	intron();
-#endif
-	ctrl = ((q <= '\033') ? (q - 1 + 'A') : 0);
+  	ctrl = ((q <= '\033') ? (q - 1 + 'A') : 0);
 	meta = ((0x80 & q) ? (0x7f & q) : 0);
-	while(dlb_fgets(buf,BUFSZ,fp))
+	while(dlb_fgets(buf,BUFSZ-6,fp)) {
 	    if ((ctrl && *buf=='^' && *(buf+1)==ctrl) ||
 		(meta && *buf=='M' && *(buf+1)=='-' && *(buf+2)==meta) ||
 		*buf==q) {
@@ -806,12 +801,33 @@ dowhatdoes()
 			buf[0] = q;
 			(void) strncpy(buf+1, "       ", 7);
 		}
-		pline("%s", buf);
 		(void) dlb_fclose(fp);
-		return 0;
+		Strcpy(cbuf, buf);
+		return cbuf;
 	    }
-	pline("I've never heard of such commands.");
+	}
 	(void) dlb_fclose(fp);
+	return (char *)0;
+}
+
+int
+dowhatdoes()
+{
+	char bufr[BUFSZ];
+	char q, *reslt;
+
+#if defined(UNIX) || defined(VMS)
+	introff();
+#endif
+	q = yn_function("What command?", (char *)0, '\0');
+#if defined(UNIX) || defined(VMS)
+	intron();
+#endif
+	reslt = dowhatdoes_core(q, bufr);
+	if (reslt)
+		pline("%s", reslt);
+	else
+		pline("I've never heard of such commands.");
 	return 0;
 }
 

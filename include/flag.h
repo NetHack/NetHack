@@ -254,6 +254,7 @@ struct instance_flags {
 	boolean wc_eight_bit_input;	/* allow eight bit input               */
 	boolean wc_mouse_support;	/* allow mouse support */
 
+	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	/* Items which belong in flags, but are here to allow save compatibility */
 	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */
 	boolean  showrace;	/* show hero glyph by race rather than by role */

@@ -1646,6 +1646,9 @@ Check free disk space before writing files to disk (default on).
 You may have to turn this off if you have more than 2 GB free space
 on the partition used for your save and level files.
 Only applies when MFLOPPY was defined during compilation.
+.lp cmdassist
+Have the game provide some additional command assistance for 
+new players if it detects some anticipated mistakes (default on).
 .lp "confirm "
 Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).

@@ -1369,6 +1369,7 @@ E int NDECL(dowhatis);
 E int NDECL(doquickwhatis);
 E int NDECL(doidtrap);
 E int NDECL(dowhatdoes);
+E char *FDECL(dowhatdoes_core,(CHAR_P, char *));
 E int NDECL(dohelp);
 E int NDECL(dohistory);
 

@@ -148,6 +148,7 @@ static void NDECL(end_of_input);
 static const char* readchar_queue="";
 
 STATIC_DCL char *NDECL(parse);
+STATIC_DCL boolean FDECL(help_control, (CHAR_P, char *));
 
 #ifdef OVL1
 
@@ -1899,7 +1900,7 @@ const char *s;
 	    dirsym = readchar();
 	else
 #endif
-	    dirsym = yn_function (s ? s : "In what direction?",
+	    dirsym = yn_function ((s && *s != '^') ? s : "In what direction?",
 					(char *)0, '\0');
 #ifdef REDO
 	savech(dirsym);
@@ -1907,12 +1908,53 @@ const char *s;
 	if(dirsym == '.' || dirsym == 's')
 		u.dx = u.dy = u.dz = 0;
 	else if(!movecmd(dirsym) && !u.dz) {
-		if(!index(quitchars, dirsym))
-			pline("What a strange direction!");
+		boolean did_control = FALSE;
+		if(!index(quitchars, dirsym)) {
+		    if (s && *s == '^' && iflags.cmdassist)
+			did_control = help_control(dirsym, "Invalid direction key!");
+		    if (!did_control) pline("What a strange direction!");
+		}
 		return 0;
 	}
 	if(!u.dz && (Stunned || (Confusion && !rn2(5)))) confdir();
 	return 1;
+}
+
+STATIC_OVL boolean
+help_control(sym, msg)
+char sym;
+char *msg;
+{
+	char ctrl;
+	winid win;
+	char buf[BUFSZ], buf2[BUFSZ], *expl;
+	if (letter(sym)) { 
+	    sym = highc(sym);
+	    ctrl = (sym - 'A') + 1;
+	    if ((expl = dowhatdoes_core(ctrl, buf2))) {
+		win = create_nhwindow(NHW_TEXT);
+		putstr(win, 0, "cmdassist");
+		if (msg) putstr(win, 0, msg);
+		putstr(win, 0, "");
+		Sprintf(buf,
+			"Are you trying to use ^%c as specified in the Guidebook?",
+		    	sym);
+		putstr(win, 0, buf);
+		putstr(win, 0, "");
+		putstr(win, 0, expl);
+		putstr(win, 0, "");
+		putstr(win, 0, "To use that command, you press");
+		Sprintf(buf,
+			"the <Ctrl> key, and the <%c> key at the same time.", sym);
+		putstr(win, 0, buf);
+		putstr(win, 0, "");
+		putstr(win, 0, "(Suppress this message with !cmdassist in config file.)");
+		display_nhwindow(win, FALSE);
+		destroy_nhwindow(win);
+		return TRUE;
+	    }
+	}
+	return FALSE;
 }
 
 #endif /* OVL1 */
