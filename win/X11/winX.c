@@ -1187,6 +1187,7 @@ X11_hangup(w, event, params, num_params)
     Cardinal *num_params;
 {
     hangup(1);		/* 1 is commonly SIGHUP, but ignored anyway */
+    exit_x_event = TRUE;
 }
 
 /* askname ----------------------------------------------------------------- */
