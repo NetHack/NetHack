@@ -272,9 +272,11 @@ void
 map_invisible(x, y)
 register xchar x, y;
 {
-    if (level.flags.hero_memory)
-	levl[x][y].glyph = GLYPH_INVISIBLE;
-    show_glyph(x, y, GLYPH_INVISIBLE);
+    if (x != u.ux || y != u.uy) { /* don't display I at hero's location */
+	if (level.flags.hero_memory)
+	    levl[x][y].glyph = GLYPH_INVISIBLE;
+	show_glyph(x, y, GLYPH_INVISIBLE);
+    }
 }
 
 /*
