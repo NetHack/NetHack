@@ -1,0 +1,482 @@
+               Instructions for Installing NetHack 3.3.1
+                           on a VMS system
+               =========================================
+
+0.  Please read this entire file before trying to build or install
+    NetHack, then read it again!
+
+1.  Building NetHack requires a C compiler (either VAX C, DEC C, or GNU C)
+    and VMS version V4.6 or later (but see note #9).  This release has been
+    tested on VAX/VMS V5.5-2 and V6.2, and Alpha/VMS V6.2 and V7.1.  The
+    build procedure (vmsbuild.com) should not need to be modified; it accepts
+    an option for selecting the compiler, and it can detect different
+    versions which might require specific command qualifiers.  Versions
+    of VAXC earlier than V2.3 will produce many warning messages (about
+    200 per source file; over to 25,000 total!), but NetHack has been
+    verified to compile, link, and execute correctly when built with VAXC
+    V2.2 using vmsbuild.com.  There is also a set of Makefiles suitable
+    for use with MMS; they may or may not work with other make utilities.
+
+2.  Make sure all the NetHack files are in the appropriate directory
+    structure.  You should set up a directory--referred to as "top" below
+    and in some of the assorted files, but which may be a subdirectory--
+    that has these subdirectories
+        [.dat]          -- data files
+        [.doc]          -- documentation files
+        [.include]      -- C header files
+        [.src]          -- primary source files
+        [.sys]          -- parent for [.sys.*]
+        [.sys   .share] -- files shared by several ports, including VMS
+        [.sys   .vms]   -- VMS-specific source and support files
+        [.util]         -- sources for essential utility programs
+        [.win]          -- parent for [.win.*]
+        [.win   .tty]   -- "window" routines for ordinary terminals
+                           (including terminal windows on workstations)
+    The following subdirectories may be present, but are not useful for
+    building NetHack on VMS and are not required:
+        [.sys   .amiga] -- AmigaDOS
+        [.sys   .amiga   .splitter]
+        [.sys   .atari] -- Atari TOS
+        [.sys   .be]    -- BeBox BeOS
+        [.sys   .mac]   -- Macintosh
+        [.sys   .mac     .old]
+        [.sys   .msdos] -- MSDOS for IBM PCs and compatibles
+        [.sys   .msdos   .old]
+        [.sys   .os2]   -- OS/2
+        [.sys   .share   .sounds] -- AIFF format audio files
+        [.sys   .unix]  -- guess :-)
+        [.sys   .winnt] -- Windows NT
+        [.win   .gem]   -- window routines for Atari/GEM
+        [.win   .gnome] -- window routines for Unix/GNOME
+        [.win   .Qt]    -- window routines for Qt
+        [.win   .share] -- "tile" graphic support
+        [.win   .win32] -- Windows NT
+        [.win   .X11]   -- window routines for X-Windows; requires X11R4
+                           or later and MIT's Athena Widget set
+    You must arrange things in this structure or the supplied procedures
+    and instructions in this file will not work properly.  Several DCL
+    command files are present in the [.sys.vms] subdirectory and won't
+    work as intended if they're moved elsewhere.  The file called Files
+    in the top directory contains lists of everything that should be in
+    each subdirectory, including things that are constructed as NetHack
+    is being built.  (If you obtain the NetHack distribution via the
+    "shar" packaging used for Usenet newsgroup comp.sources.games and its
+    archives, you may have to reconstruct several files that get split
+    for posting.)
+
+3.  Prior to beginning compilation, go to the [.include] subdirectory and
+    edit vmsconf.h according to its comments.  You should set Local_WIZARD
+    and Local_HACKDIR to appropriate values, and you might want to define
+    TEXTCOLOR if you have any color VAXstations or color terminals which
+    handle ANSI-format escape sequences to set foreground and background
+    color for text characters.  (VT241/VT340 color graphics won't work.)
+    Other things which may be of interest are SECURE if you intend to
+    set up NetHack as an installed image which is granted privileges, and
+    SHELL which should be disabled if you intend to allow captive accounts
+    to run NetHack.  You may also want to edit file config.h, but that's
+    only necessary if you want or need to disable some of the game options.
+    The distributed copy of config.h will work successfully on VMS;
+    vmsconf.h has conditional code to deal with the UNIX-specific items.
+
+4.  If you have the programming utilities lex or flex and yacc or bison,
+    you may edit the procedure [.sys.vms]spec_lev.com and execute it to
+    process several source files for NetHack's special level and dungeon
+    compilers.  If you don't modify spec_lev.com, it will copy some
+    pre-processed versions of the appropriate files (dgn_lex.c, lev_lex.c,
+    dgn_yacc.c, lev_yacc.c, dgn_comp.h, and lev_comp.h) from [.sys.share]
+    into [.util]*.c and [.include]*.h.
+       $ @[.SYS.VMS]SPEC_LEV            ![OPTIONAL]
+    If you perform this step, do it prior to executing vmsbuild.com; if
+    you don't perform this step, vmsbuild.com will do so for you.
+
+5.  To build NETHACK.EXE and its auxiliary programs, execute the
+    following DCL command:
+       $ @[.SYS.VMS]VMSBUILD          !defaults to CC, either VAXC or DECC
+    or $ @[.SYS.VMS]VMSBUILD "GNUC"   !force "GCC"
+    It can take quite a bit of time for a full build to complete.
+    vmsbuild.com will display some feedback as it executes; generally
+    this will be the name of each source file that's about to be compiled
+    or the name of the executable that has just been linked.
+
+6.  If you have already started (or finished) a build and decide to start
+    over with a different compiler, you should DELETE [.SRC]CRTL.OPT;*
+    first.
+
+7.  After compilation, it's time to perform installation.  Go back to
+    the top directory.  Either edit [.sys.vms]install.com to indicate
+    where you want everything to be installed, or specify the location
+    and "playground" owner on the command line.  Then execute either
+       $ @[.SYS.VMS]INSTALL
+    or $ @[.SYS.VMS]INSTALL location owner
+    where location is a device:[directory] specification and owner is
+    either a rights identifier or UIC.  If install.com is not modified
+    and if values aren't supplied on the command line, the default values
+    used are the translation of logical name HACKDIR, if any, or else
+    [.PLAY] (relative to the current directory), and the UIC for the
+    current process.  install.com will use the auxiliary programs
+    constructed by vmsbuild.com to process quite a few data files in the
+    [.dat] subdirectory.  Then it will create the playground directory,
+    if necessary, plus the associated [.save] subdirectory.  Next it will
+    copy the data files into the playground; this step can take a while.
+    Finally it will copy nethack.exe and a few additional support files.
+
+    After it completes, the files [.src]nethack.olb, [.src]nethack.exe,
+    [.util]*.obj, [.util]*_comp.exe, and [.util]makedefs.exe can be
+    deleted in order to save disk space if desired.  The other program,
+    [.util]recover.exe, should not be deleted unless you make a copy of
+    it somewhere--perhaps in the playground directory--first.  It can be
+    used to resurrect some games disrupted by system or program crash.
+
+8.  The file nethack.com which is copied to the playground directory can
+    be used to invoke NetHack, or nethack.exe can be run directly.  Most
+    of the command-line options specified in the Unix man-page (file
+    [.doc]nethack.txt) are also applicable to VMS.  Some comments at the
+    beginning of nethack.com illustrate several of the options.  New
+    players should read the file "Guidebook.txt" which will be copied
+    into the playground directory as "Guidebook.doc".
+
+
+Notes:
+
+1.  Save files and bones files from earlier versions will not work with
+    3.3.1.  The scoreboard file (RECORD) from 3.3.0 will work; one from
+    version 3.2.x is slightly different format but should be compatible.
+
+2.  To specify user-preference options in your environment, define the
+    logical name NETHACKOPTIONS to have the value of a quoted string
+    containing a comma separated list of option values.  The option names
+    are case-insensitive.
+       $ define nethackoptions "noAutoPickup,Dog:Rover,Cat:Felix,DECgraphics"
+    One value you'll probably want to specify is "noLegacy" to turn off
+    the initial introductory passage.  The "checkpoint" option controls
+    whether or not enough data is saved to disk so that the set of level
+    files left behind after a crash contains sufficient information for
+    recover.exe to be able to construct a save file after the fact.  The
+    tradeoff for enabling checkpoint is that using it makes level changes
+    do more I/O and take longer.  The "menustyle" option controls some
+    aspects of the user interface, and can be set to "menustyle:traditional"
+    to make 3.3.1 or 3.2.x behave more like 3.1.3.
+
+    If logical name or DCL symbol NETHACKOPTIONS is not defined, NetHack
+    will try HACKOPTIONS instead.  Regardless of whether or not either
+    is defined, it will also try to find a configuration file containing
+    additional option settings.  If the value of the translation of
+    NETHACKOPTIONS--or HACKOPTIONS--begins with an "@" character then the
+    rest of the translation is assumed to be the name of the configuration
+    file.  Otherwise, the following are tried:  file specified by logical
+    name NETHACKINI, file SYS$LOGIN:NETHACK.INI, and file HOME:NETHACK.CNF
+    (note that the C run-time library sets up the value of HOME to match
+    sys$login).  Syntax for the configuration file is similar to
+    NETHACKOPTIONS, but multiple lines can be used, each must start with
+    OPTIONS=, and comments can be included by placing '#' in the first
+    column.  Several options which take more complex values (graphics
+    representation) can also be present; see the "Guidebook" for details.
+    (Guidebook.txt can be found in the [.doc] subdirectory; a copy gets
+    placed in the playground directory by install.com.  Also, an example
+    configuration file can be found in [.win.X11]nethack.rc.)
+
+3.  Instead of using vmsbuild.com to compile and link everything, you can
+    use the set of Makefiles found in the vms subdirectory, provided you
+    have an appropriate and compatible make utility.  They've been tested
+    using MMK, a freeware clone of Digital's MMS.  There are five of them,
+    and the suffix or filetype on their names indicates where they should
+    be placed.
+       $ copy [.sys.vms]Makefile.top []Makefile.
+       $ copy [.sys.vms]Makefile.src [.src]Makefile.
+       $ copy [.sys.vms]Makefile.utl [.util]Makefile.
+       $ copy [.sys.vms]Makefile.dat [.dat]Makefile.
+       $ copy [.sys.vms]Makefile.doc [.doc]Makefile.
+    After doing that, edit [.src]Makefile and [.util]Makefile to specify
+    pertinent compiler options in CFLAGS, linker options in LFLAGS, and
+    libraries in LIBS and/or MORELIBS if the default values aren't right.
+    Be sure to make compatible compilation and linking settings in both
+    files.  While in there, edit [.util]Makefile to specify the appropriate
+    values for lex and yacc, _or_ move to that directory and use MMS or
+    make to build targets no_lex and no_yacc which will copy several
+    pre-processed files from [.sys.share] into [.util].  Finally, edit
+    Makefile in the top directory to specify values for GAMEDIR and
+    GAMEOWNER.  This top Makefile invokes [.sys.vms]install.com to do
+    much of the actual installation work, so if you want to make any
+    customizations or file protection changes, edit install.com to suit.
+    Also set MAKE in all of the Makefiles to the appropriate command if
+    not using MMS or MMK.
+
+    Once the Makefiles are tailored for your site, give the command
+       $ mms all,install
+    or $ make all install
+    To compile and install everything.  The object files compiled via
+    the Makefiles are left as individual .OBJ files rather than placed
+    into an object library (in contrast to step #7 above and note #10
+    below).  These Makefiles are provided on an as-is basis; vmsbuild.com
+    is the preferred way to compile because it's guaranteed to compile
+    and link everything.
+
+4.  termcap is an ASCII data file containing descriptions of terminal
+    capabilities and the escape sequences that software must use to take
+    advantage of them.  If you do not already have a termcap file in use
+    on your system there is a small one in file [.SYS.SHARE]TERMCAP.  It
+    contains definitions for common Digital terminals, also suitable for
+    most clones and emulators.  This file is copied into the playground
+    by install.com, and NetHack will use it if it can't find any other
+    one.  NetHack uses the following sequence to attempt to locate the
+    termcap file:  translation of the logical name TERMCAP (used as-is),
+    file NETHACKDIR:TERMCAP, similar file HACKDIR:TERMCAP, GNU-Emacs file
+    EMACS_LIBRARY:[ETC]TERMCAP.DAT, file []TERMCAP, and lastly file
+    $TERMCAP (which most likely would be a logical name).  If NetHack
+    can't find the termcap file, or if the above search sequence finds a
+    different one than you'd prefer, then use the DCL ASSIGN or DEFINE
+    command to define a value for logical name TERMCAP.
+
+    NetHack also tries fairly hard to figure out what kind of terminal
+    you're using.  It checks for logical names (or symbols) NETHACK_TERM,
+    HACK_TERM, EMACS_TERM, and lastly TERM.  The last is set up by the
+    C run-time library and you cannot use a logical name or symbol for
+    it.  If all those fail, or if whichever one succeeds has a value of
+    "undefined" or "unknown" (which can happen under VMS V5.4-* and
+    V5.5-* for VT420 terminals), NetHack will query the VMS TERMTABLE
+    database used by the SMG library routines.  Whatever value NetHack
+    eventually comes up with needs to be the name of an entry in the
+    termcap file, otherwise a message about "Unknown terminal type" will
+    be printed and NetHack will exit.
+
+5.  NetHack contains code which attempts to make it secure in case it's
+    installed with privileges (to allow the playground to be protected
+    against world write access).  This has only undergone limited testing,
+    so install NetHack with privileges at your own risk.  If you discover
+    any potential security holes, please let us know so that we can take
+    steps to correct the problem(s).  NetHack always includes filename
+    punctuation when accessing files, so that it should never be affected
+    by inadvertent or malicious logical name definitions, and it always
+    deactivates installed privileges prior to spawning a subprocess.
+
+    Note to end users:  "installing with privileges" is an option for
+    system managers who set up system-wide access to the game.  Since
+    CMKRNL privilege and modification of the system boot routines are
+    both required, it is not an option for ordinary users.  There are
+    no explicit instructions on how to do such an installation, because
+    only system managers who are already familiar with the process and
+    its potential security ramifications should even consider it.
+
+    The default setup by install.com assumes no privileges and uses
+    world-writable files to allow arbitrary users to play.  This is
+    NOT secure and not advisable in any environment where there are
+    untrustworthy users, but works fine for many sites.  If you allow
+    users to run NetHack from captive accounts (VMS 5.1-* or earlier)
+    or from restricted accounts (5.2 and later), you should either make
+    sure that they do not have TMPMBX privilege or else disable NetHack's
+    ability to spawn an interactive subprocess.  To disable subprocesses,
+    disable the "!" (shell escape) command by commenting out the definition
+    of SHELL in vmsconf.h prior to building the program.  This necessity
+    may be removed in some future release, where NetHack will check for
+    captive accounts instead of spawning unconditionally.  Note that
+    disabling the SHELL command also prevents spawning MAIL when scrolls
+    of new mail are received.
+
+    In order for installed privileges to be used at all, the value of
+    HACKDIR (via Local_HACKDIR in vmsconf.h) compiled into the program
+    must correspond to the actual playground directory.  If logical name
+    HACKDIR (or NETHACKDIR) is used to override that value, installed
+    privileges will be deactivated unless its value corresponds to the
+    same device and directory as the internal value.  If that internal
+    value contains a logical name, only an executive-mode translation
+    will be honored; if there is no such translation, installed privs
+    will be deactivated.
+
+    To be able to install nethack.exe with privileges (SYSPRV or GRPPRV,
+    perhaps EXQUOTA, depending on site usage and needs), you'll need to
+    link it with debugging and tracebacks both disabled.  You can do this
+    by specifying an argument to vmsbuild.com when performing step #6
+    above; pass it "/noTrace/noDebug" as the 4th parameter.
+       $ @[.SYS.VMS]VMSBUILD "" "" "" "/noTrace/noDebug"
+    /Trace/noDebug is the linker's normal default.  If you've already
+    built NetHack, you can relink with tracebacks disabled by doing
+       $ @[.SYS.VMS]VMSBUILD "LINK" "" "" "/noTrace/noDebug"
+
+6.  If you can't or won't install nethack.exe with privileges and if you
+    don't have access to a privileged account yourself, then if you intend
+    to allow other users to access your copy of NetHack you should probably
+    place an ACL on the playground directory and its save subdirectory.
+    The access control list should contain a default protection ACE which
+    grants delete+control access to the playground owner (ie, your own
+    account if there's no special games account involved).  install.com
+    does not attempt to do this automatically at the present time.  After
+    executing install.com to create the playground directory, perform a
+    pair of commands similar to the following
+       $ SET ACL/ACL=(IDENT=your_id, OPTIONS=DEFAULT, ACCESS=R+W+E+D+C) -
+       $_ device:[playground's.parent.directory]playground.DIR
+       $ SET ACL/ACL=(IDENT=your_id, OPTIONS=DEFAULT, ACCESS=R+W+E+D+C) -
+       $_ device:[playground.directory]SAVE.DIR
+    The two commands use the same options, but SET ACL won't accept a
+    list of files to modify.  (For recent versions of VMS, SET ACL was
+    made obsolete in favor of SET FILE/ACL, which in turn has been made
+    obsolete in favor of SET SECURITY/CLASS=FILE/ACL; however, the older
+    forms will still work.)  'your_id' should be the rights identifier
+    which corresponds to the account which should retain access to those
+    files; 'device:[playground's.parent.directory]' is the name of the
+    parent directory for the playground (ie, if your playground directory
+    is disk$foo:[me.games.nethack.play], then you want to specify
+    disk$foo:[me.games.nethack]play.dir on the SET ACL command), and
+    'device:[playground.directory]' is the playground itself.  Those ACLs
+    establish a default protection scheme such that every newly created
+    file in those directories will have an ACL attached to it, and the
+    attached ACL will grant 'your_id' full access to the corresponding
+    file.  That should allow you to clear away level files from aborted
+    games, and to delete old save files if necessary.  It will not enable
+    you to run recover.exe on behalf of other users, because you won't be
+    able to create files owned by them unless you have elevated privileges.
+
+7.  Many NetHack commands can be aborted by sending it the <escape>
+    character when it wants input.  This is displayed as ESC inside the
+    game.  Digital VK201 keyboards (used by VT2xx and VT3xx and older
+    VAXstations) and VK401 keyboards (used by VT4xx, newer VAXstations,
+    and DEC's X Terminals) do not have an <escape> key.  They may
+    transmit <escape> for the <F11> key if the terminal or emulator
+    window is set to operate in VT100 mode, or there may be a setup-type
+    option for making the <` | ~> key behave as <escape>.  If your
+    terminal does not have that, or if it's set to a mode where that
+    won't work, then just use <ctrl/[> instead.  (Press the "[" key while
+    holding down the "Ctrl" key, then release both; <escape> and <ctrl/[>
+    have the same ASCII code and are indistinguishable once they reach
+    the computer; note that VAXstations and X Terminals _can_ tell the
+    difference, but that won't matter for NetHack.)
+
+    VMS NetHack is configured to use the SYS$QIOW system service for
+    reading characters from the keyboard.  This allows ^C and ^Y (as well
+    as ^X and ^O for wizard mode debugging) to be used as commands without
+    being intercepted or interpreted by the terminal driver.  The code
+    which parses arrow and function keys is not perfect, and it's possible
+    to get strange results if you hold such keys down to just type too
+    quickly, particularly on slow multiplexor lines.  Those keys are
+    never needed in actual play, and most function keys are just treated
+    as <escape> for use in aborting partial commands.
+
+    VMS NetHack also still has code to use SMG$READ_KEYSTROKE instead.
+    That can be activated by modifying vmsconf.h and recompiling, but
+    it should never be necessary.  If you use it, you'll need to press
+    either <esc> or <ctrl/[> twice to abort partial commands, or else
+    press an arbitrary function key, such as <PF4>, once.
+
+    If SUSPEND is defined in vmsconf.h, <ctrl/Z> is used for that command.
+    Since Unix-style job control is not available, it's used for connecting
+    to the parent process if NetHack is running in a subprocess.  When not
+    in a subprocess, it doesn't do anything except give a message to the
+    effect that it's not doing anything....  The suspend command does not
+    save the current game; if you use ^Z to attach to your parent process,
+    be sure to remember to eventually reattach to the NetHack subprocess;
+    otherwise the game in progress won't get saved when you logout.
+
+8.  NetHack optionally maintains a logfile which receives one line appended
+    to it whenever a game ends.  This can be disabled entirely by adding
+    an "#undef LOGFILE" directive to vmsconf.h prior to building the
+    program, or it can be disabled later by removing the file(s) LOGFILE.;*
+    from the playground directory.  If not disabled prior to compilation,
+    the logfile can be reinitialized by simply creating an empty file
+    named LOGFILE in the playground, but make sure that users are able
+    to write into it, or new entries will not be appended.
+
+9.  Some attempt at support for VMS versions earlier than V4.6 has been
+    included, but no such obsolete system was available for testing it.
+    vmsbuild.com detects the need for the extra support routines and
+    arranges automatically for them to be compiled.  The reason that
+    special support is needed is that the C Run-Time Library (VAXCRTL)
+    underwent a major revision for VMS V4.6 and several routines which
+    NetHack utilizes were not available prior to that upgrade.
+
+10. vmsbuild.com collects almost all of the object files (xxx.OBJ) into
+    an object library (NETHACK.OLB) as it compiles the source files.
+    This should prevent the quota-exceeded problems from the linker
+    that some sites have reported for prior versions.  Note that if you
+    compile any source files manually, you'll need to replace those
+    modules in the object library prior to linking the program:
+       $ cc/include=[-.include] [-.sys.vms]vmstty   !for example
+       $ libr/obj []nethack vmstty                  !replace VMSTTY
+       $ @[-.sys.vms]vmsbuild LINK                  !re-link NETHACK.EXE
+    If you forget to replace the library entry, your newly compiled code
+    will not be included in the new executable image.
+
+11. To access "wizard mode"--intended for debugging purposes, not to
+    spoil the game with unlimited wishes--you must be running from the
+    username compiled into the game via Local_WIZARD in vmsconf.h, and
+    you must specify "-D" on the command line when invoking NetHack.
+    Note that it must be uppercase, and it must be in quotes to prevent
+    the C run-time library's program startup code from converting it into
+    lowercase.
+       $ @hackdir:nethack "-D"
+    Any character name you specify will be ignored in favor of "wizard".
+
+12. At program startup time, NetHack uses the empty file PERM to prevent
+    two different processes from using the same character name (under the
+    same UIC ownership) at the same time.  It does this by temporarily
+    giving that file a second directory entry named PERM.LOCK, then
+    removing the alternate entry once started.  If the PERM file is
+    missing or inaccessible, NetHack will give a message and then quit.
+    Several possible messages and their usual causes are:
+       Can't find file perm;1 to lock!
+    PERM.;1 is missing from the playground directory.  Fix:  reinstall
+    the playground directory using install.com, or use CREATE or an editor
+    to make an empty file named PERM.  Version number must be 1.
+       Can't lock perm;1 due to directory protection.
+    The playground directory is not allowing write access.  Fix:  players
+    need to be able to write files for dungeon levels and "bones" into
+    the playground directory.  Set the protection or ACL on the xxx.DIR;1
+    file in the playground's parent directory to allow write access.
+       Can't unlink perm.lock;1.
+    The empty file PERM.;1 is protected against delete access; only matters
+    under some versions of VMS.  Fix:  set the protection or ACL on PERM.;1
+    to allow delete access to players.  Under VMS V5.5-2, delete access is
+    not necessary.  PERM does not have to remain writable.
+       Waiting for access to perm;1.  (# retries left).
+    If some other process is also starting up NetHack at about the same
+    time, you may have to wait a short period.  NetHack will retry once
+    per second, counting down to 0.  If 0 is reached, the message
+       Perhaps there is an old perm.lock;1 around?
+    will be displayed and then NetHack will give up.  Fix:  to forcibly
+    remove a stale PERM.LOCK entry, issue the following command
+       $ SET FILE/REMOVE PERM.LOCK;1
+    from the playground directory.  The file PERM should remain intact.
+    Do not use that command for real files, only alternate directory
+    entries.  If output from a DIRECTORY command on the playground reports
+       PERM.LOCK;1          no such file
+    then someone has deleted PERM.;1 while the synonym entry was still
+    in place, and PERM.LOCK was left as a dangling name which no longer
+    points at any file.  The SET FILE/REMOVE command above will fix the
+    dangling name; a new PERM.;1 will need to be created as mentioned above.
+
+    In similar fashion, synchronized access to the scoreboard file RECORD
+    is accomplished using temporary entry RECORD.LOCK and LOGFILE using
+    entry LOGFILE.LOCK.
+
+13. Unless you have both Motif and the Athena Widget set from MIT, you
+    will not be able to use the X11 interface on VMS.  Even if you do
+    have both those things, such a configuration has not been tested and
+    there are no provisions for it in vmsbuild.com.  Makefile.src does
+    have the extra source files listed, but not the necessary libraries.
+
+    The X11 port will not compile and link with DECwindows, but it will
+    be able to display on a VMS DECwindows X server provided that it and
+    its Unix X client have a compatible transport between them (either
+    TCP/IP added to VMS or DECnet added to Unix) and session security
+    is set up appropriately.  You'll need to add the contents of file
+    [.win.X11]NetHack.ad into your DECW$USER_DEFAULTS:DECW$XDEFAULTS.DAT,
+    and modify some of the lines.  The DECwindows window manager does not
+    support having input focus automatically follow the pointer, so you
+    should uncomment the "NetHack*autofocus" resource line.  (For Motif
+    this may not be necessary, depending on customization options.)
+    Uncommenting the "NetHack*slow" line is highly recommended.  You'll
+    also need to set "NetHack*fonts: fixed" (rather than "variable"), and
+    either set the map font to "fixed" too or install the "nh10" font
+    that comes in file [.win.X11]nh10.bdf.  If NetHack warns that the map
+    font is variable, then something isn't set up properly.
+
+    After creating or modifying decw$xdefaults.dat, you must restart the
+    window manager in order for any changes to take effect; it's easiest
+    to just make the session manager quit and then log in again.
+
+14. There is no support for VMS POSIX in this release of NetHack.
+
+15. If necessary, send problem reports via e-mail to
+       <devteam@nethack.org>
+    Always include version information for NetHack, the operating system,
+    and the C compiler used.
+
+ 3-AUG-2000
