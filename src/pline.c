@@ -286,8 +286,11 @@ register struct monst *mtmp;
 	if (mtmp->mtame) {	  Strcat(info, ", tame");
 #ifdef WIZARD
 	    if (wizard) {
-		Sprintf(eos(info), " (%d; hungry %ld; apport %d)",
-		    mtmp->mtame, EDOG(mtmp)->hungrytime, EDOG(mtmp)->apport);
+		Sprintf(eos(info), " (%d", mtmp->mtame);
+		if (!mtmp->isminion)
+		    Sprintf(eos(info), "; hungry %ld; apport %d",
+			EDOG(mtmp)->hungrytime, EDOG(mtmp)->apport);
+		Strcat(info, ")");
 	    }
 #endif
 	}
