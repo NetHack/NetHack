@@ -72,12 +72,22 @@ getlin_hook_proc hook;
 		    *bufp = 0;
 		}
 		if(c == '\020') { /* ctrl-P */
-		    if(!doprev)
-			(void) tty_doprev_message(); /* need two initially */
-		    (void) tty_doprev_message();
-		    doprev = 1;
-		    continue;
-		} else if(doprev) {
+		    if (iflags.prevmsg_window) {
+			(void) tty_doprev_message();
+			tty_clear_nhwindow(WIN_MESSAGE);
+			cw->maxcol = cw->maxrow;
+			addtopl(query);
+			addtopl(" ");
+			*bufp = 0;
+			addtopl(obufp);
+		    } else {
+			if (!doprev)
+			    (void) tty_doprev_message();/* need two initially */
+			(void) tty_doprev_message();
+			doprev = 1;
+			continue;
+		    }
+		} else if (doprev && !iflags.prevmsg_window) {
 		    tty_clear_nhwindow(WIN_MESSAGE);
 		    cw->maxcol = cw->maxrow;
 		    doprev = 0;

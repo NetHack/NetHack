@@ -111,10 +111,7 @@ int how;
 #ifndef GOLDOBJ
 	Sprintf(buf, "%ld Au", u.ugold);
 #else
-	/* FIXME: this neglects gold in containers (which will be gone by
-	   now if bones have been saved).  For the !GOLDOBJ configuration,
-	   any such gold gets added into u.ugold by done(). */
-	Sprintf(buf, "%ld Au", money_cnt(invent));
+	Sprintf(buf, "%ld Au", done_money);
 #endif
 	buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
 	center(GOLD_LINE, buf);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.3	2001/09/06	*/
+/*	SCCS Id: @(#)extern.h	3.3	2002/01/04	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -521,6 +521,8 @@ E int FDECL(eaten_stat, (int,struct obj *));
 E void FDECL(food_disappears, (struct obj *));
 E void FDECL(food_substitution, (struct obj *,struct obj *));
 E void NDECL(fix_petrification);
+E void FDECL(consume_oeaten, (struct obj *,int));
+E boolean FDECL(maybe_finished_meal, (BOOLEAN_P));
 
 /* ### end.c ### */
 
@@ -751,7 +753,7 @@ E void FDECL(identify_pack, (int));
 E int FDECL(askchain, (struct obj **,const char *,int,int (*)(OBJ_P),
 			int (*)(OBJ_P),int,const char *));
 E void FDECL(prinv, (const char *,struct obj *,long));
-E char *FDECL(xprname, (struct obj *,const char *,CHAR_P,BOOLEAN_P,long));
+E char *FDECL(xprname, (struct obj *,const char *,CHAR_P,BOOLEAN_P,long,long));
 E int NDECL(ddoinv);
 E char FDECL(display_inventory, (const char *,BOOLEAN_P));
 E int FDECL(display_binventory, (int,int,BOOLEAN_P));

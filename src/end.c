@@ -662,7 +662,7 @@ die:
 #ifndef GOLDOBJ
 	u.ugold = umoney;
 #else
-	/* FIXME */
+	done_money = umoney;
 #endif
 
 	/* clean up unneeded windows */

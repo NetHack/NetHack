@@ -71,6 +71,9 @@ timed_delay    on unix and VMS, use a timer instead of sending
                display effect.  on MSDOS without the termcap
                lib, whether or not to pause for visual effect.    [TRUE]
 
+Boolean option if TTY_GRAPHICS was set at compile time:
+msg_window show previous messages in a screen-size window         [FALSE]
+
 Boolean option if USE_TILES was set at compile time (MSDOS protected mode only):
 preload_tiles  control whether tiles get pre-loaded into RAM at the
                start of the game.  Doing so enhances performance

@@ -1081,11 +1081,10 @@ long count;
 boolean telekinesis;	/* not picking it up directly by hand */
 {
 	int res, nearload;
-#ifdef GOLDOBJ
-	long umoney = money_cnt(invent);
-#endif
+#ifndef GOLDOBJ
 	const char *where = (obj->ox == u.ux && obj->oy == u.uy) ?
 			    "here" : "there";
+#endif
 
 	if (obj->quan < count) {
 	    impossible("pickup_object: count %ld > quan %ld?",
@@ -1191,13 +1190,14 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	if (obj->oclass == GOLD_CLASS) flags.botl = 1;
 #endif
 	if (obj->quan != count && obj->otyp != LOADSTONE)
-	    (void) splitobj(obj, count);
+	    obj = splitobj(obj, count);
 
 	obj = pick_obj(obj);
 
 	if (uwep && uwep == obj) mrg_to_wielded = TRUE;
 	nearload = near_capacity();
-	prinv(nearload == SLT_ENCUMBER ? moderateloadmsg : (char *) 0, obj, count);
+	prinv(nearload == SLT_ENCUMBER ? moderateloadmsg : (char *) 0,
+	      obj, count);
 	mrg_to_wielded = FALSE;
 	return 1;
 }
@@ -1406,12 +1406,15 @@ lootcont:
 	    struct obj *goldob = mkgoldobj(contribution);
 #else
 	struct obj *goldob;
-        /* Find a money object to mess with */
-        for (goldob = invent; goldob; goldob = goldob->nobj) ;
+	/* Find a money object to mess with */
+	for (goldob = invent; goldob; goldob = goldob->nobj) {
+	    if (goldob->oclass == GOLD_CLASS) break;
+	}
 	if (goldob){
 	    long contribution = rnd((int)min(LARGEST_INT, goldob->quan));
-	    if (contribution < goldob->quan) (void)splitobj(goldob, contribution);
-            freeinv(goldob);
+	    if (contribution < goldob->quan)
+		goldob = splitobj(goldob, contribution);
+	    freeinv(goldob);
 #endif
 	    if (IS_THRONE(levl[u.ux][u.uy].typ)){
 		struct obj *coffers;
@@ -1515,11 +1518,12 @@ struct monst *mtmp;
 int *passed_info;
 boolean *prev_loot;
 {
-    struct obj *otmp;
     int c = -1;
     int timepassed = 0;
-    char qbuf[QBUFSZ];
 #ifdef STEED
+    struct obj *otmp;
+    char qbuf[QBUFSZ];
+
     /* 3.3.1 introduced the ability to remove saddle from a steed             */
     /* 	*passed_info is set to TRUE if a loot query was given.               */
     /*	*prev_loot is set to TRUE if something was actually acquired in here. */
@@ -1789,7 +1793,7 @@ register struct obj *obj;
 	    return res;
 
 	if (obj->quan != count && obj->otyp != LOADSTONE)
-	    (void) splitobj(obj, count);
+	    obj = splitobj(obj, count);
 
 	/* Remove the object from the list. */
 	obj_extract_self(obj);
@@ -1822,7 +1826,9 @@ register struct obj *obj;
 	      otmp, count);
 
 	if (is_gold) {
+#ifndef GOLDOBJ
 		dealloc_obj(obj);
+#endif
 		bot();	/* update character's gold piece count immediately */
 	}
 	return 1;
@@ -2109,11 +2115,8 @@ boolean put_in;
 		    otmp = pick_list[i].item.a_obj;
 		    count = pick_list[i].count;
 		    if (count > 0 && count < otmp->quan) {
-			otmp2 = splitobj(otmp, count);
+			otmp = splitobj(otmp, count);
 			/* special split case also handled by askchain() */
-			if (otmp == uwep) setuwep(otmp2);
-			if (otmp == uquiver) setuqwep(otmp2);
-			if (otmp == uswapwep) setuswapwep(otmp2);
 		    }
 		    res = put_in ? in_container(otmp) : out_container(otmp);
 		    if (res < 0)

@@ -146,11 +146,16 @@ int mechanism;
 	boolean reading = (mechanism == BY_COOKIE ||
 			   mechanism == BY_PAPER);
 
-	if (reading && Blind) {
+	if (reading) {
+	    /* deal with various things that prevent reading */
+	    if (is_fainted() && mechanism == BY_COOKIE)
+	    	return;
+	    else if (Blind) {
 		if (mechanism == BY_COOKIE)
 			pline(fortune_msg);
 		pline("What a pity that you cannot read it!");
-		return;
+	    	return;
+	    }
 	}
 	line = getrumor(truth, buf, reading ? FALSE : TRUE);
 	if (!*line)

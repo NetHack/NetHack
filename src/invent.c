@@ -51,8 +51,10 @@ register struct obj *otmp;
 
 #ifdef GOLDOBJ
         /* There is only one of these in inventory... */        
-        if (otmp->oclass == GOLD_CLASS) otmp->invlet = GOLD_SYM;
-        return;
+        if (otmp->oclass == GOLD_CLASS) {
+	    otmp->invlet = GOLD_SYM;
+	    return;
+	}
 #endif
 
 	for(i = 0; i < 52; i++) inuse[i] = FALSE;
@@ -395,10 +397,7 @@ const char *drop_fmt, *drop_arg, *hold_msg;
 			if (drop_fmt) pline(drop_fmt, drop_arg);
 			/* undo any merge which took place */
 			if (obj->quan > oquan) {
-			    struct obj *otmp = splitobj(obj, oquan);
-			    /* might have merged with weapon */
-			    if (obj->owornmask)
-				setworn(otmp, obj->owornmask);
+			    obj = splitobj(obj, oquan);
 			}
 			dropx(obj);
 		} else {
@@ -914,23 +913,26 @@ register const char *let,*word;
 	pline_The("LRS would be very interested to know you have that much.");
 				return(struct obj *)0;
 			}
-#ifndef GOLDOBJ
 
+#ifndef GOLDOBJ
 			if(!(allowcnt == 2 && cnt < u.ugold))
 				cnt = u.ugold;
 			return(mkgoldobj(cnt));
 #endif
 		}
 		if(allowcnt == 2 && !strcmp(word,"throw")) {
-			/* permit counts for throwing gold, but don't accept
-			 * counts for other things since the throw code will
-			 * split off a single item anyway */
+		    /* permit counts for throwing gold, but don't accept
+		     * counts for other things since the throw code will
+		     * split off a single item anyway */
+#ifdef GOLDOBJ
+		    if (ilet != def_oc_syms[GOLD_CLASS])
+#endif
 			allowcnt = 1;
-			if(cnt == 0 && prezero) return((struct obj *)0);
-			if(cnt > 1) {
-			    You("can only throw one item at a time.");
-			    continue;
-			}
+		    if(cnt == 0 && prezero) return((struct obj *)0);
+		    if(cnt > 1) {
+			You("can only throw one item at a time.");
+			continue;
+		    }
 		}
 #ifdef GOLDOBJ
 		flags.botl = 1; /* May have changed the amount of money */
@@ -975,20 +977,17 @@ register const char *let,*word;
 		return((struct obj *)0);
 	}
 	if(allowcnt == 2) {	/* cnt given */
-		if(cnt == 0) return (struct obj *)0;
-		if(cnt != otmp->quan) {
-			register struct obj *obj = splitobj(otmp, cnt);
+	    if(cnt == 0) return (struct obj *)0;
+	    if(cnt != otmp->quan) {
+		otmp = splitobj(otmp, cnt);
 		/* Very ugly kludge necessary to prevent someone from trying
 		 * to drop one of several loadstones and having the loadstone
 		 * now be separate.
 		 */
-			if (!strcmp(word, "drop") &&
-			    obj->otyp == LOADSTONE && obj->cursed)
-				otmp->corpsenm = obj->invlet;
-			if(otmp == uwep) setuwep(obj);
-			else if (otmp == uquiver) setuqwep(obj);
-			if (otmp == uswapwep) setuswapwep(obj);
-		}
+		if (!strcmp(word, "drop") &&
+		    otmp->otyp == LOADSTONE && otmp->cursed)
+		    otmp->corpsenm = otmp->invlet;
+	    }
 	}
 	return(otmp);
 }
@@ -1230,7 +1229,7 @@ nextclass:
 		if (ckfn && !(*ckfn)(otmp)) continue;
 		if (!allflag) {
 			Strcpy(qbuf, !ininv ? doname(otmp) :
-				xprname(otmp, (char *)0, ilet, !nodot, 0L));
+				xprname(otmp, (char *)0, ilet, !nodot, 0L, 0L));
 			Strcat(qbuf, "?");
 			sym = (takeoff || ident || otmp->quan < 2L) ?
 				nyaq(qbuf) : nyNaq(qbuf);
@@ -1250,13 +1249,7 @@ nextclass:
 			sym = 'y';
 			if (yn_number < otmp->quan && !welded(otmp) &&
 			    (!otmp->cursed || otmp->otyp != LOADSTONE)) {
-			    struct obj *otmpx = splitobj(otmp, yn_number);
-			    if (!otmpx || otmpx->nobj != otmp2)
-				impossible("bad object split in askchain");
-			    /* assume other worn items aren't mergable */
-			    if (otmp == uwep) setuwep(otmpx);
-				if (otmp == uquiver) setuqwep(otmpx);
-				if (otmp == uswapwep) setuswapwep(otmpx);
+			    otmp = splitobj(otmp, yn_number);
 			}
 		    }
 		}
@@ -1411,32 +1404,33 @@ const char *prefix;
 register struct obj *obj;
 long quan;
 {
-	long savequan = obj->quan;
-	if (quan) obj->quan = quan;
 	if (!prefix) prefix = "";
 	pline("%s%s%s",
 	      prefix, *prefix ? " " : "",
-	      xprname(obj, (char *)0, obj_to_let(obj), TRUE, 0L));
-	if (quan) obj->quan = savequan;
+	      xprname(obj, (char *)0, obj_to_let(obj), TRUE, 0L, quan));
 }
 
 #endif /* OVL2 */
 #ifdef OVL1
 
 char *
-xprname(obj, txt, let, dot, cost)
+xprname(obj, txt, let, dot, cost, quan)
 struct obj *obj;
 const char *txt;	/* text to print instead of obj */
 char let;		/* inventory letter */
 boolean dot;		/* append period; (dot && cost => Iu) */
 long cost;		/* cost (for inventory of unpaid or expended items) */
+long quan;		/* if non-0, print this quantity, not obj->quan */
 {
 #ifdef LINT	/* handle static char li[BUFSZ]; */
-	char li[BUFSZ];
+    char li[BUFSZ];
 #else
-	static char li[BUFSZ];
+    static char li[BUFSZ];
 #endif
-	boolean use_invlet = flags.invlet_constant && let != CONTAINED_SYM;
+    boolean use_invlet = flags.invlet_constant && let != CONTAINED_SYM;
+    long savequan = obj->quan;
+
+    if (quan) obj->quan = quan;
     /*
      * If let is:
      *	*  Then obj == null and we are printing a total amount.
@@ -1458,6 +1452,8 @@ long cost;		/* cost (for inventory of unpaid or expended items) */
 		(use_invlet ? obj->invlet : let),
 		(txt ? txt : doname(obj)), (dot ? "." : ""));
     }
+    if (quan) obj->quan = savequan;
+
     return li;
 }
 
@@ -1566,8 +1562,8 @@ boolean want_reply;
 	    for (otmp = invent; otmp; otmp = otmp->nobj) {
 		if (otmp->invlet == lets[0]) {
 		    ret = message_menu(lets[0],
-				  want_reply ? PICK_ONE : PICK_NONE,
-				  xprname(otmp, (char *)0, lets[0], TRUE, 0L));
+			  want_reply ? PICK_ONE : PICK_NONE,
+			  xprname(otmp, (char *)0, lets[0], TRUE, 0L, 0L));
 		    break;
 		}
 	    }
@@ -1658,7 +1654,7 @@ dounpaid()
 
 	pline("%s", xprname(otmp, distant_name(otmp, doname),
 			    marker ? otmp->invlet : CONTAINED_SYM,
-			    TRUE, unpaid_cost(otmp)));
+			    TRUE, unpaid_cost(otmp), 0L));
 	return;
     }
 
@@ -1683,7 +1679,7 @@ dounpaid()
 		    save_unpaid = otmp->unpaid;
 		    otmp->unpaid = 0;
 		    putstr(win, 0, xprname(otmp, distant_name(otmp, doname),
-					   ilet, TRUE, cost));
+					   ilet, TRUE, cost, 0L));
 		    otmp->unpaid = save_unpaid;
 		    num_so_far++;
 		}
@@ -1709,7 +1705,7 @@ dounpaid()
 		    marker->unpaid = 0;    /* suppress "(unpaid)" suffix */
 		    putstr(win, 0,
 			   xprname(marker, distant_name(marker, doname),
-				   CONTAINED_SYM, TRUE, cost));
+				   CONTAINED_SYM, TRUE, cost, 0L));
 		    marker->unpaid = save_unpaid;
 		}
 	    }
@@ -1717,7 +1713,7 @@ dounpaid()
     }
 
     putstr(win, 0, "");
-    putstr(win, 0, xprname((struct obj *)0, "Total:", '*', FALSE, totcost));
+    putstr(win, 0, xprname((struct obj *)0, "Total:", '*', FALSE, totcost, 0L));
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
 }
@@ -2291,7 +2287,7 @@ long numused;
 	/* burn_floor_paper() keeps an object pointer that it tries to
 	 * useupf() multiple times, so obj must survive if plural */
 	if (obj->quan > numused)
-		otmp = splitobj(obj, obj->quan - numused);
+		otmp = splitobj(obj, numused);
 	else
 		otmp = obj;
 	if(costly_spot(otmp->ox, otmp->oy)) {

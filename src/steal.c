@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.3	2001/10/15	*/
+/*	SCCS Id: @(#)steal.c	3.3	2002/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -123,7 +123,7 @@ register struct monst *mtmp;
             const int gold_price = objects[GOLD_PIECE].oc_cost;
 	    tmp = (somegold(money_cnt(invent)) + gold_price - 1) / gold_price;
 	    tmp = min(tmp, ygold->quan);
-            if (tmp < ygold->quan) splitobj(ygold, tmp);
+            if (tmp < ygold->quan) ygold = splitobj(ygold, tmp);
             freeinv(ygold);
             add_to_minv(mtmp, ygold);
 	    Your("purse feels lighter.");
@@ -228,6 +228,11 @@ char *objnambuf;
 	if (objnambuf) *objnambuf = '\0';
 	/* the following is true if successful on first of two attacks. */
 	if(!monnear(mtmp, u.ux, u.uy)) return(0);
+
+	/* food being eaten might already be used up but will not have
+	   been removed from inventory yet; we don't want to steal that,
+	   so this will cause it to be removed now */
+	if (occupation) (void) maybe_finished_meal(FALSE);
 
 	if (!invent || (inv_cnt() == 1 && uskin)) {
 nothing_to_steal:

@@ -977,7 +977,7 @@ void gnome_outrip(winid wid, int how)
 #ifndef GOLDOBJ
 		u.ugold);
 #else
-		money_cnt(invent));
+		done_money);
 #endif
     Strcat(ripString, buf);
 

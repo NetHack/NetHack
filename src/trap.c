@@ -1160,7 +1160,7 @@ int style;
 	    singleobj = otmp;
 	    otmp = (struct obj *) 0;
 	} else {
-	    singleobj = splitobj(otmp, otmp->quan - 1L);
+	    singleobj = splitobj(otmp, 1L);
 	    obj_extract_self(singleobj);
 	}
 	newsym(x1,y1);

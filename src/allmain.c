@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)allmain.c	3.3	2000/05/05	*/
+/*	SCCS Id: @(#)allmain.c	3.3	2002/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -415,7 +415,8 @@ void
 stop_occupation()
 {
 	if(occupation) {
-		You("stop %s.", occtxt);
+		if (!maybe_finished_meal(TRUE))
+		    You("stop %s.", occtxt);
 		occupation = 0;
 		flags.botl = 1; /* in case u.uhs changed */
 /* fainting stops your occupation, there's no reason to sync.

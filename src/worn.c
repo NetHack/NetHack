@@ -6,6 +6,7 @@
 
 STATIC_DCL void FDECL(m_lose_armor, (struct monst *,struct obj *));
 STATIC_DCL void FDECL(m_dowear_type, (struct monst *,long,BOOLEAN_P));
+STATIC_DCL int FDECL(extra_pref, (struct monst *, struct obj *));
 
 const struct worn {
 	long w_mask;
@@ -114,16 +115,16 @@ register struct obj *obj;
 	if (!obj) return;
 	if (obj == uwep || obj == uswapwep) u.twoweap = 0;
 	for(wp = worn; wp->w_mask; wp++)
-		if(obj == *(wp->w_obj)) {
-			*(wp->w_obj) = 0;
-			p = objects[obj->otyp].oc_oprop;
-			u.uprops[p].extrinsic = u.uprops[p].extrinsic & ~wp->w_mask;
-			obj->owornmask &= ~wp->w_mask;
-			if (obj->oartifact)
-			    set_artifact_intrinsic(obj, 0, wp->w_mask);
-			if ((p = w_blocks(obj,wp->w_mask)) != 0)
-			    u.uprops[p].blocked &= ~wp->w_mask;
-		}
+	    if(obj == *(wp->w_obj)) {
+		*(wp->w_obj) = 0;
+		p = objects[obj->otyp].oc_oprop;
+		u.uprops[p].extrinsic = u.uprops[p].extrinsic & ~wp->w_mask;
+		obj->owornmask &= ~wp->w_mask;
+		if (obj->oartifact)
+		    set_artifact_intrinsic(obj, 0, wp->w_mask);
+		if ((p = w_blocks(obj,wp->w_mask)) != 0)
+		    u.uprops[p].blocked &= ~wp->w_mask;
+	    }
 	update_inventory();
 }
 
@@ -404,7 +405,8 @@ boolean creation;
 	     * it would forget spe and once again think the object is better
 	     * than what it already has.
 	     */
-	    if (best && (ARM_BONUS(best) >= ARM_BONUS(obj))) continue;
+	    if (best && (ARM_BONUS(best) + extra_pref(mon,best) >= ARM_BONUS(obj) + extra_pref(mon,obj)))
+		continue;
 	    best = obj;
 	}
 outer_break:
@@ -667,4 +669,16 @@ boolean polyspot;
 	return;
 }
 
+/* bias a monster's preferences towards armor that has special benefits. */
+/* currently only does speed boots, but might be expanded if monsters get to
+   use more armor abilities */
+static int
+extra_pref(struct monst *mon, struct obj *obj)
+{
+    if (obj) {
+	if (obj->otyp == SPEED_BOOTS && mon->permspeed != MFAST)
+	    return 20;
+    }
+    return 0;
+}
 /*worn.c*/

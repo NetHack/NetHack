@@ -52,7 +52,12 @@ int shotlimit;
 
 	if(obj->oclass == GOLD_CLASS) return(throw_gold(obj));
 #else
-	if (!getdir((char *)0)) return(0);
+	if (!getdir((char *)0)) {
+	    /* obj might need to be merged back into the singular gold object */
+	    freeinv(obj);
+	    addinv(obj);
+	    return(0);
+	}
 
         /*
 	  Throwing money is usually for getting rid of it when
@@ -157,8 +162,7 @@ int shotlimit;
 	    twoweap = u.twoweap;
 	    /* split this object off from its slot if necessary */
 	    if (obj->quan > 1L) {
-		otmp = splitobj(obj, obj->quan - 1L);
-		otmp->owornmask = 0L;
+		otmp = splitobj(obj, 1L);
 	    } else {
 		otmp = obj;
 		if (otmp->owornmask && otmp != uball)
@@ -846,7 +850,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		if (is_ammo(obj)) {
 		    if (ammo_and_launcher(obj, uwep))
 			range++;
-		    else
+		    else if (obj->oclass != GEM_CLASS)
 			range /= 2;
 		}
 
@@ -1482,9 +1486,10 @@ breaktest(obj)
 struct obj *obj;
 {
 	if (obj_resists(obj, 1, 99)) return 0;
+	if (objects[obj->otyp].oc_material == GLASS && !obj->oartifact &&
+		obj->oclass != GEM_CLASS)
+	    return 1;
 	switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
-		case MIRROR:
-		case CRYSTAL_BALL:
 #ifdef TOURIST
 		case EXPENSIVE_CAMERA:
 #endif
@@ -1508,6 +1513,11 @@ boolean in_view;
 
 	to_pieces = "";
 	switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
+		default: /* glass or crystal wand */
+		    if (obj->oclass != WAND_CLASS)
+			impossible("breaking odd object?");
+		case CRYSTAL_PLATE_MAIL:
+		case LENSES:
 		case MIRROR:
 		case CRYSTAL_BALL:
 #ifdef TOURIST

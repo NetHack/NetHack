@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.3	2001/11/28	*/
+/*	SCCS Id: @(#)eat.c	3.3	2002/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -40,7 +40,7 @@ STATIC_DCL int FDECL(edibility_prompts, (struct obj *));
 STATIC_DCL int FDECL(rottenfood, (struct obj *));
 STATIC_DCL void NDECL(eatspecial);
 STATIC_DCL void FDECL(eataccessory, (struct obj *));
-STATIC_DCL const char * FDECL(foodword, (struct obj *));
+STATIC_DCL const char *FDECL(foodword, (struct obj *));
 
 char msgbuf[BUFSZ];
 
@@ -303,9 +303,9 @@ register struct obj *otmp;
 {
 	if (otmp->quan > 1L) {
 	    if(!carried(otmp))
-		(void) splitobj(otmp, 1L);
+		(void) splitobj(otmp, otmp->quan - 1L);
 	    else
-		otmp = splitobj(otmp, otmp->quan - 1L);
+		otmp = splitobj(otmp, 1L);
 #ifdef DEBUG
 	    debugpline("split object,");
 #endif
@@ -1097,11 +1097,7 @@ no_opener:
 			pline_The("tin slips from your %s.",
 			      makeplural(body_part(FINGER)));
 			if(otmp->quan > 1L) {
-				register struct obj *obj;
-				obj = splitobj(otmp, 1L);
-				if (otmp == uwep) setuwep(obj);
-				if (otmp == uswapwep) setuswapwep(obj);
-				if (otmp == uquiver) setuqwep(obj);
+			    otmp = splitobj(otmp, 1L);
 			}
 			if (carried(otmp)) dropx(otmp);
 			else stackobj(otmp);
@@ -1233,7 +1229,7 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 		(void)touchfood(otmp);
 		retcode = 1;
 	    } else
-		otmp->oeaten >>= 2;
+		consume_oeaten(otmp, 2);	/* oeaten >>= 2 */
 	} else {
 	    pline("%s%s %s!",
 		  !uniq ? "This " : !type_is_pname(&mons[mnum]) ? "The " : "",
@@ -1800,10 +1796,10 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    u.umonnum == PM_RUST_MONSTER && otmp->oerodeproof) {
 	    	otmp->rknown = TRUE;
 		if (otmp->quan > 1L) {
-			if(!carried(otmp))
-				(void) splitobj(otmp, 1L);
-			else
-				otmp = splitobj(otmp, otmp->quan - 1L);
+		    if(!carried(otmp))
+			(void) splitobj(otmp, otmp->quan - 1L);
+		    else
+			otmp = splitobj(otmp, 1L);
 		}
 		pline("Ulch - That %s was rustproofed!", xname(otmp));
 		/* The regurgitated object's rustproofing is gone now */
@@ -1926,7 +1922,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		    otmp->orotten = TRUE;
 		    dont_start = TRUE;
 		}
-		otmp->oeaten >>= 1;
+		consume_oeaten(otmp, 1);	/* oeaten >>= 1 */
 	    } else fprefx(otmp);
 	}
 
@@ -1979,10 +1975,10 @@ bite()
 	force_save_hs = TRUE;
 	if(victual.nmod < 0) {
 		lesshungry(-victual.nmod);
-		victual.piece->oeaten -= -victual.nmod;
+		consume_oeaten(victual.piece, victual.nmod); /* -= -nmod */
 	} else if(victual.nmod > 0 && (victual.usedtime % victual.nmod)) {
 		lesshungry(1);
-		victual.piece->oeaten--;
+		consume_oeaten(victual.piece, -1);		  /* -= 1 */
 	}
 	force_save_hs = FALSE;
 	recalc_wt();
@@ -2279,7 +2275,7 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 	/* if we can't touch floor objects then use invent food only */
 	if (!can_reach_floor() ||
 #ifdef STEED
-		u.usteed ||		/* can't eat off floor while riding */
+		(feeding && u.usteed) || /* can't eat off floor while riding */
 #endif
 		((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) &&
 		    (Wwalking || is_clinger(youmonst.data) ||
@@ -2382,6 +2378,74 @@ register struct obj *obj;
 	return (base < 1) ? 1 : base;
 }
 
+/* reduce obj's oeaten field, making sure it never hits or passes 0 */
+void
+consume_oeaten(obj, amt)
+struct obj *obj;
+int amt;
+{
+    /*
+     * This is a hack to try to squelch several long standing mystery
+     * food bugs.  A better solution would be to rewrite the entire
+     * victual handling mechanism from scratch using a less complex
+     * model.  Alternatively, this routine could call done_eating()
+     * or food_disappears() but its callers would need revisions to
+     * cope with victual.piece unexpectedly going away.
+     *
+     * Multi-turn eating operates by setting the food's oeaten field
+     * to its full nutritional value and then running a counter which
+     * independently keeps track of whether there is any food left.
+     * The oeaten field can reach exactly zero on the last turn, and
+     * the object isn't removed from inventory until the next turn
+     * when the "you finish eating" message gets delivered, so the
+     * food would be restored to the status of untouched during that
+     * interval.  This resulted in unexpected encumbrance messages
+     * at the end of a meal (if near enough to a threshold) and would
+     * yield full food if there was an interruption on the critical
+     * turn.  Also, there have been reports over the years of food
+     * becoming massively heavy or producing unlimited satiation;
+     * this would occur if reducing oeaten via subtraction attempted
+     * to drop it below 0 since its unsigned type would produce a
+     * huge positive value instead.  So far, no one has figured out
+     * _why_ that inappropriate subtraction might sometimes happen.
+     */
+
+    if (amt > 0) {
+	/* bit shift to divide the remaining amount of food */
+	obj->oeaten >>= amt;
+    } else {
+	/* simple decrement; value is negative so we actually add it */
+	if ((int) obj->oeaten > -amt)
+	    obj->oeaten += amt;
+	else
+	    obj->oeaten = 0;
+    }
+
+    if (obj->oeaten == 0) {
+	if (obj == victual.piece)	/* always true unless wishing... */
+	    victual.reqtime = victual.usedtime;	/* no bites left */
+	obj->oeaten = 1;	/* smallest possible positive value */
+    }
+}
+
 #endif /* OVLB */
+#ifdef OVL1
+
+/* called when eatfood occupation has been interrupted,
+   or in the case of theft, is about to be interrupted */
+boolean
+maybe_finished_meal(stopping)
+boolean stopping;
+{
+	/* in case consume_oeaten() has decided that the food is all gone */
+	if (occupation == eatfood && victual.usedtime >= victual.reqtime) {
+	    if (stopping) occupation = 0;	/* for do_reset_eat */
+	    (void) eatfood(); /* calls done_eating() to use up victual.piece */
+	    return TRUE;
+	}
+	return FALSE;
+}
+
+#endif /* OVL1 */
 
 /*eat.c*/

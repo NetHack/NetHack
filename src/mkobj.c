@@ -217,10 +217,10 @@ rndmonnum()	/* select a random, common monster type */
 }
 
 /*
- * Split obj so that it gets size num. The remainder is put in the object
- * structure delivered by this call.  The object is positioned just
- * following the original in the nobj chain (and nexthere chain when on
- * the floor).
+ * Split obj so that it gets size gets reduced by num. The quantity num is
+ * put in the object structure delivered by this call.  The returned object
+ * has its wornmask cleared and is positioned just following the original
+ * in the nobj chain (and nexthere chain when on the floor).
  */
 struct obj *
 splitobj(obj, num)
@@ -229,7 +229,7 @@ long num;
 {
 	struct obj *otmp;
 
-	if (obj->cobj || num <= 0L || obj->quan < num)
+	if (obj->cobj || num <= 0L || obj->quan <= num)
 	    panic("splitobj");	/* can't split containers */
 	otmp = newobj(obj->oxlth + obj->onamelth);
 	*otmp = *obj;		/* copies whole structure */
@@ -237,9 +237,10 @@ long num;
 	if (!otmp->o_id) otmp->o_id = flags.ident++;	/* ident overflowed */
 	otmp->timed = 0;	/* not timed, yet */
 	otmp->lamplit = 0;	/* ditto */
-	obj->quan = num;
+	otmp->owornmask = 0L;	/* new object isn't worn */
+	obj->quan -= num;
 	obj->owt = weight(obj);
-	otmp->quan -= num;
+	otmp->quan = num;
 	otmp->owt = weight(otmp);	/* -= obj->owt ? */
 	obj->nobj = otmp;
 	/* Only set nexthere when on the floor, nexthere is also used */

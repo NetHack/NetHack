@@ -634,7 +634,7 @@ int thrown;
 		}
 	    } else if(obj->oclass == POTION_CLASS) {
 		if (obj->quan > 1L)
-		    setworn(splitobj(obj, 1L), W_WEP);
+		    obj = splitobj(obj, 1L);
 		else
 		    setuwep((struct obj *)0);
 		freeinv(obj);

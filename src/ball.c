@@ -345,7 +345,8 @@ xchar ballx, bally, chainx, chainy;	/* only matter !before */
 
 /* return TRUE if ball could be dragged
  *
- *  Should not be called while swallowed.
+ *  Should not be called while swallowed.  Should be called before movement,
+ *  because we might want to move the ball or chain to the hero's old position.
  */
 boolean
 drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, cause_delay)
@@ -368,27 +369,108 @@ boolean *cause_delay;
 	    return TRUE;
 	}
 
-	if (carried(uball) || dist2(x, y, uball->ox, uball->oy) < 3 ||
-		(uball->ox == uchain->ox && uball->oy == uchain->oy)) {
-	    /*
-	     * Case where the ball doesn't move but the chain can't just move
-	     * to the player's position:
-	     *   @                                             _
-	     *    _    moving southwest becomes  @_  and not  @
-	     *   0                                0            0
-	     */
+	/* only need to move the chain? */
+	if (carried(uball) || distmin(x, y, uball->ox, uball->oy) <= 2) {
 	    *bc_control = BC_CHAIN;
 	    move_bc(1, *bc_control, *ballx, *bally, *chainx, *chainy);
-	    if (dist2(x, y, uball->ox, uball->oy) == 2 &&
-		    dist2(x, y, uchain->ox, uchain->oy) == 4) {
-		if (uchain->oy == y)
-		    *chainx = uball->ox;
-		else
-		    *chainy = uball->oy;
-	    } else {
-		*chainx = u.ux;
-		*chainy = u.uy;
+	    if (carried(uball)) {
+		/* move chain only if necessary; assume they didn't teleport */
+		if (distmin(x, y, uchain->ox, uchain->oy) > 1) {
+		    *chainx = u.ux;
+		    *chainy = u.uy;
+		}
+		return TRUE;
 	    }
+#define CHAIN_IN_MIDDLE(chx, chy) \
+(distmin(x, y, chx, chy) <= 1 && distmin(chx, chy, uball->ox, uball->oy) <= 1)
+	    switch(dist2(x, y, uball->ox, uball->oy)) {
+		/* two spaces diagonal from ball, move chain inbetween */
+		case 8:
+		    *chainx = (uball->ox + x)/2;
+		    *chainy = (uball->oy + y)/2;
+		    break;
+
+		/* player is distance 2/1 from ball; move chain to one of the
+		 * two spaces between
+		 *   @
+		 *   __
+		 *    0
+		 */
+		case 5: {
+		    xchar tempx, tempy, tempx2, tempy2;
+
+		    /* find position closest to current position of chain */
+		    /* no effect if current position is already OK */
+		    if (abs(x - uball->ox) == 1) {
+			tempx = x;
+			tempx2 = uball->ox;
+			tempy = tempy2 = (uball->oy + y)/2;
+		    } else {
+			tempx = tempx2 = (uball->ox + x)/2;
+			tempy = y;
+			tempy2 = uball->oy;
+		    }
+		    if (dist2(tempx, tempy, uchain->ox, uchain->oy) <
+			 dist2(tempx2, tempy2, uchain->ox, uchain->oy) ||
+		       ((dist2(tempx, tempy, uchain->ox, uchain->oy) ==
+			 dist2(tempx2, tempy2, uchain->ox, uchain->oy)) && rn2(2))) {
+			*chainx = tempx;
+			*chainy = tempy;
+		    } else {
+			*chainx = tempx2;
+			*chainy = tempy2;
+		    }
+		    break;
+		}
+
+		/* ball is two spaces horizontal or vertical from player; move*/
+		/* chain inbetween *unless* current chain position is OK */
+		case 4:
+		    if (CHAIN_IN_MIDDLE(uchain->ox, uchain->oy))
+			break;
+		    *chainx = (x + uchain->ox)/2;
+		    *chainy = (y + uchain->oy)/2;
+		    break;
+		
+		/* ball is one space diagonal from player.  Check for the
+		 * following special case:
+		 *   @
+		 *    _    moving southwest becomes  @_
+		 *   0                                0
+		 * (This will also catch teleporting that happens to resemble
+		 * this case, but oh well.)  Otherwise fall through.
+		 */
+		case 2:
+		    if (dist2(x, y, uball->ox, uball->oy) == 2 &&
+			    dist2(x, y, uchain->ox, uchain->oy) == 4) {
+			if (uchain->oy == y)
+			    *chainx = uball->ox;
+			else
+			    *chainy = uball->oy;
+			break;
+		    }
+		    /* fall through */
+		case 1:
+		case 0:
+		    /* do nothing if possible */
+		    if (CHAIN_IN_MIDDLE(uchain->ox, uchain->oy))
+			break;
+		    /* otherwise try to drag chain to player's old position */
+		    if (CHAIN_IN_MIDDLE(u.ux, u.uy)) {
+			*chainx = u.ux;
+			*chainy = u.uy;
+			break;
+		    }
+		    /* otherwise use player's new position (they must have
+		       teleported, for this to happen) */
+		    *chainx = x;
+		    *chainy = y;
+		    break;
+		
+		default: impossible("bad chain movement");
+		    break;
+	    }
+#undef CHAIN_IN_MIDDLE
 	    return TRUE;
 	}
 

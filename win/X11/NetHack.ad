@@ -59,10 +59,10 @@ NetHack*message*translations:	<KeyPress>: input()
 ! It is not guaranteed that the window manager will honor the icon selection.
 !NetHack*icon: nh56
 !
-! If True, a popup for single character prompts such as y/n questions is _not_
-! used.
-!NetHack*slow: True
-!
+! If True, the default, a popup for single character prompts such as y/n
+! questions is _not_ used.
+NetHack*slow: True
+
 ! The number of lines the message window will show without scrolling.
 !NetHack*message_lines: 12
 !

@@ -140,6 +140,7 @@ struct obj *otmp;
 	case SPE_SLOW_MONSTER:
 		if (!resist(mtmp, otmp->oclass, 0, NOTELL)) {
 			mon_adjust_speed(mtmp, -1);
+			m_dowear(mtmp, FALSE); /* might want speed boots */
 			if (u.uswallow && (mtmp == u.ustuck) &&
 			    is_whirly(mtmp->data)) {
 				You("disrupt %s!", mon_nam(mtmp));
@@ -149,8 +150,10 @@ struct obj *otmp;
 		}
 		break;
 	case WAN_SPEED_MONSTER:
-		if (!resist(mtmp, otmp->oclass, 0, NOTELL))
+		if (!resist(mtmp, otmp->oclass, 0, NOTELL)) {
 			mon_adjust_speed(mtmp, 1);
+			m_dowear(mtmp, FALSE); /* might want speed boots */
+		}
 		break;
 	case WAN_UNDEAD_TURNING:
 	case SPE_TURN_UNDEAD:
@@ -450,7 +453,7 @@ coord *cc;
 		if (mtmp2->mhpmax <= 0 && !is_rider(mtmp2->data))
 			return (struct monst *)0;
 		mtmp = makemon(mtmp2->data,
-				cc->x, cc->y, NO_MINVENT|MM_NOWAIT);
+				cc->x, cc->y, NO_MINVENT|MM_NOWAIT|MM_NOCOUNTBIRTH);
 		if (!mtmp) return mtmp;
 
 		/* heal the monster */
@@ -610,7 +613,7 @@ register struct obj *obj;
 				wary_dog(mtmp, TRUE);
 		    } else
  		            mtmp = makemon(&mons[montype], x, y,
-				       NO_MINVENT|MM_NOWAIT);
+				       NO_MINVENT|MM_NOWAIT|MM_NOCOUNTBIRTH);
 		    if (mtmp) {
 			if (obj->oxlth && (obj->oattached == OATTACHED_M_ID)) {
 			    unsigned m_id;
@@ -666,7 +669,7 @@ register struct obj *obj;
 				x = obj->ox,  y = obj->oy;
 				/* not useupf(), which charges */
 				if (obj->quan > 1L)
-				    (void) splitobj(obj, 1L);
+				    obj = splitobj(obj, 1L);
 				delobj(obj);
 				newsym(x, y);
 				break;
@@ -1134,9 +1137,9 @@ struct obj *obj;
 	/* if quan > 1 then some will survive intact */
 	if (obj->quan > 1L) {
 	    if (obj->quan > LARGEST_INT)
-		(void) splitobj(obj, (long)rnd(30000));
+		obj = splitobj(obj, (long)rnd(30000));
 	    else
-		(void) splitobj(obj, (long)rnd((int)obj->quan - 1));
+		obj = splitobj(obj, (long)rnd((int)obj->quan - 1));
 	}
 
 	/* appropriately add damage to bill */
@@ -2504,10 +2507,13 @@ register const char *str;
 register struct monst *mtmp;
 register const char *force;		/* usually either "." or "!" */
 {
+	int pl = strcmp(str, makesingular(str));
+
 	if((!cansee(bhitpos.x,bhitpos.y) && !canspotmon(mtmp))
 	   || !flags.verbose)
-	    pline("%s hits it.", The(str));
-	else pline("%s hits %s%s", The(str), mon_nam(mtmp), force);
+	    pline("%s %s it.", The(str), pl ? "hit" : "hits");
+	else pline("%s %s %s%s", The(str), pl ? "hit" : "hits",
+		   mon_nam(mtmp), force);
 }
 
 void
@@ -2515,7 +2521,9 @@ miss(str,mtmp)
 register const char *str;
 register struct monst *mtmp;
 {
-	pline("%s misses %s.", The(str),
+	int pl = strcmp(str, makesingular(str));
+
+	pline("%s %s %s.", The(str), pl ? "miss" : "misses",
 	      ((cansee(bhitpos.x,bhitpos.y) || canspotmon(mtmp))
 	       && flags.verbose) ?
 	      mon_nam(mtmp) : "it");

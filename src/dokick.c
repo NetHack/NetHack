@@ -431,6 +431,11 @@ xchar x, y;
 				result = "cracking";
 			}
 			if (result) {
+				if (otmp->otyp == MIRROR)
+				    change_luck(-2);
+				/* eggs laid by you */
+				if (otmp->otyp == EGG && otmp->spe && otmp->corpsenm >= LOW_PM)
+				    change_luck(-5);
 				You_hear("a muffled %s.",result);
 				if(costly) loss += stolen_value(otmp, x, y,
 					    (boolean)shkp->mpeaceful, TRUE);
@@ -512,7 +517,7 @@ xchar x, y;
 	    return(!rn2(3) || martial());
 	}
 
-	if (kickobj->quan > 1L && !isgold) (void) splitobj(kickobj, 1L);
+	if (kickobj->quan > 1L && !isgold) kickobj = splitobj(kickobj, 1L);
 
 	if (slide && !Blind)
 	    pline("Whee!  %s slide%s across the %s.", Doname2(kickobj),
@@ -1266,6 +1271,10 @@ boolean shop_floor_obj;
 	    if(otmp->oclass != GOLD_CLASS)
 		otmp->no_charge = 0;
 	}
+
+	if (otmp == uwep) setuwep((struct obj *)0);
+	if (otmp == uquiver) setuqwep((struct obj *)0);
+	if (otmp == uswapwep) setuswapwep((struct obj *)0);
 
 	add_to_migration(otmp);
 	otmp->ox = cc.x;

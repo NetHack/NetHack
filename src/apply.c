@@ -936,7 +936,7 @@ register struct obj *obj;
 		return;
 	} else {
 		if ((long)otmp->spe + obj->quan > 7L)
-		    (void)splitobj(obj, 7L - (long)otmp->spe);
+		    obj = splitobj(obj, 7L - (long)otmp->spe);
 		You("attach %ld%s candle%s to %s.",
 		    obj->quan, !otmp->spe ? "" : " more",
 		    plur(obj->quan), the(xname(otmp)));
@@ -1107,7 +1107,7 @@ light_cocktail(obj)
 	makeknown(obj->otyp);
 
 	if (obj->quan > 1L) {
-	    (void) splitobj(obj, 1L);
+	    obj = splitobj(obj, 1L);
 	    begin_burn(obj, FALSE);	/* burn before free to get position */
 	    obj_extract_self(obj);	/* free from inv */
 

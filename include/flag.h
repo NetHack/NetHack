@@ -216,6 +216,9 @@ struct instance_flags {
 	boolean lan_mail_fetched; /* mail is awaiting display */
 #endif
 	uchar bouldersym;	/* alternative boulder symbol */
+#ifdef TTY_GRAPHICS
+	boolean prevmsg_window;	/* show more old messages at a time */
+#endif
 };
 
 extern NEARDATA struct flag flags;

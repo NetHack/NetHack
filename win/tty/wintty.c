@@ -1732,7 +1732,9 @@ tty_putstr(window, attr, str)
 	return;
     }
 
-    if(str == (const char*)0 || (cw->flags & WIN_CANCELLED))
+    if(str == (const char*)0 ||
+	( (cw->flags & WIN_CANCELLED) && 
+	  (cw->type != NHW_MESSAGE || !iflags.prevmsg_window) ))
 	return;
     if(cw->type != NHW_MESSAGE)
 	str = compress_str(str);
@@ -2215,7 +2217,8 @@ tty_wait_synch()
 	    /* this can only happen if we were reading and got interrupted */
 	    ttyDisplay->toplin = 3;
 	    /* do this twice; 1st time gets the Quit? message again */
-	    (void) tty_doprev_message();
+	    if (!iflags.prevmsg_window)
+		(void) tty_doprev_message();
 	    (void) tty_doprev_message();
 	    ttyDisplay->intr++;
 	    (void) fflush(stdout);

@@ -138,6 +138,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define MM_EMIN		  0x08	/* add emin structure */
 #define MM_ANGRY	  0x10  /* monster is created angry */
 #define MM_NONAME	  0x20  /* monster is not christened */
+#define MM_NOCOUNTBIRTH	  0x40  /* don't increment born counter (for revival) */
 
 /* flags for special ggetobj status returns */
 #define ALL_FINISHED	  0x01  /* called routine already finished the job */

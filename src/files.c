@@ -730,7 +730,7 @@ boolean uncomp;
 	 * end up being displayed after the error message.
 	 */
 	if (istty)
-	    fflush(stdout);
+	    wait_synch();
 # endif
 	if (f == 0) {	/* child */
 # ifdef TTY_GRAPHICS
@@ -740,7 +740,7 @@ boolean uncomp;
 		 * invisible if there are no error messages.
 		 */
 		if (istty)
-		    raw_printf("");
+		    raw_print("");
 # endif
 		/* run compressor without privileges, in case other programs
 		 * have surprises along the line of gzip once taking filenames

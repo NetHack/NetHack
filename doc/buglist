@@ -51,24 +51,12 @@ Drain life requires you to reach floor to wipe an engraving.
 
 Orc monsters should be given poison res? [psmith@spod-central.org]
 
-Ninja monsters should get multishot bonuses with yumi-ya? 
-[psmith@spod-central.org]
-
 Chromatic Dragon should have reflection? [psmith@spod-central.org]
 
 stone-to-flesh monsters' inventory? [psmith@spod-central.org]
 
 Releasing your pet from a bear trap by displacing is silly.
 [eino.keskitalo@purkki.mbnet.fi]
-
-When punished, being teleported always places the iron ball underneath you
-even when you land at a spot that's within range of the current ball&chain
-position.  Since the teleport mechanism is used for crawling out of water,
-this can produce an even stranger effect:  if you're carrying the attached
-ball when you step into water and it happens to be chosen as an item to
-drop in order to lighten your load, it will end up crawling out of the
-water with you.  (Ie, it will end up underneath you on land rather than in
-the adjacent water where it was actually dropped.)
 
 Monster spellcasting is in serious need of overhaul.
 Clerical spell `case 1' has ``if (...) {} /* else fall into default */''
@@ -96,18 +84,6 @@ inefficient when multiple objects are migrating. It might be better to place
 all of the migrating objects that are being scattered onto a special obj 
 chain which scatter() could easily be changed to accomodate.
 
-Occasionally an eating attempt which gets interrupted will produce a
-food object that is not flagged as partially eaten, even though it did
-get split out of a merged group.  (Observed in both 3.1.3 and 3.2.2), 
-for ordinary food rations carried in the player's inventory.)
-
-Occasionally player will get messages about become encumbered while eating,
-when they didn't begin eating encumbered, but they return to proper encum-
-berance when finished eating.  There is also a problem with partly eaten
-food rations carrying the wrong nutritional value (player can start out weak,
-get interrupted, finish the partly eaten ration, and end up satiated) which is
-likely the same bug.
-
 For "traditional" menu style, pickup and #loot/apply can't accept an 'm'
 response to bring up a menu upon request when all items involved are of
 the same class, because the prompt where that response is allowed only
@@ -128,9 +104,7 @@ The resistance delays are very slow on some machines and fine on others, with
 no apparent pattern.  There is a proposal to do timing in a different manner.
 
 Monsters do not get affected by special properties of many types of armor,
-like levitation boots.  They do get affected by speed boots, but do not
-consider such items to be any better than other shoes which grant 1 point
-of AC when deciding whether to wear them.
+like levitation boots.
 
 Corpses buried under ice ought to be handled as if they were inside an
 ice box.

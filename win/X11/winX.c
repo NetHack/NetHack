@@ -902,7 +902,7 @@ static XtActionsRec actions[] = {
 
 static XtResource resources[] = {
     { "slow", "Slow", XtRBoolean, sizeof(Boolean),
-      XtOffset(AppResources *,slow), XtRString, "False" },
+      XtOffset(AppResources *,slow), XtRString, "True" },
     { "autofocus", "AutoFocus", XtRBoolean, sizeof(Boolean),
       XtOffset(AppResources *,autofocus), XtRString, "False" },
     { "message_line", "Message_line", XtRBoolean, sizeof(Boolean),

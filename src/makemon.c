@@ -751,6 +751,7 @@ register int	mmflags;
 	boolean anymon = (!ptr);
 	boolean byyou = (x == u.ux && y == u.uy);
 	boolean allow_minvent = ((mmflags & NO_MINVENT) == 0);
+	boolean countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0);
 	uchar lim;
 
 	/* if caller wants random location, do it here */
@@ -818,10 +819,10 @@ register int	mmflags;
 	 * the caller manually decrement mvitals if the monster is created
 	 * under circumstances where one would not logically expect the
 	 * creation to reduce the supply of wild monsters.  Monster cloning
-	 * might be one such case, but we go against logic there in order to
+ 	 * might be one such case, but we go against logic there in order to
 	 * reduce the possibility of abuse.
 	 */
-	if (mvitals[mndx].born < 255) mvitals[mndx].born++;
+	if (mvitals[mndx].born < 255 && countbirth) mvitals[mndx].born++;
 	lim = mbirth_limit(mndx);
 	if ((int) mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN) &&
 		!(mvitals[mndx].mvflags & G_EXTINCT)) {

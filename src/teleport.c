@@ -204,7 +204,19 @@ void
 teleds(nux, nuy)
 register int nux,nuy;
 {
-	if (Punished) unplacebc();
+	boolean dont_teleport_ball = FALSE;
+
+	if (Punished) {
+	    /* If they're teleporting to a position where the ball doesn't need
+	     * to be moved, don't place the ball.  Especially useful when this
+	     * function is being called for crawling out of water instead of
+	     * real teleportation.
+	     */
+	    if (!carried(uball) && distmin(nux, nuy, uball->ox, uball->oy) <= 2)
+		dont_teleport_ball = TRUE;
+	    else
+		unplacebc();
+	}
 	u.utrap = 0;
 	u.ustuck = 0;
 	u.ux0 = u.ux;
@@ -228,7 +240,19 @@ register int nux,nuy;
 		u.uswldtim = u.uswallow = 0;
 		docrt();
 	}
-	if (Punished) placebc();
+	if (Punished) {
+	    if (dont_teleport_ball) {
+		int bc_control;
+		xchar ballx, bally, chainx, chainy;
+		boolean cause_delay;
+
+		/* this should only drag the chain (and never give a near-
+		   capacity message) since we already checked ball distance */
+		drag_ball(u.ux, u.uy, &bc_control, &ballx, &bally, &chainx, &chainy, &cause_delay);
+		move_bc(0, bc_control, ballx, bally, chainx, chainy);
+	    } else
+		 placebc();
+	}
 	initrack(); /* teleports mess up tracking monsters without this */
 	update_player_regions();
 #ifdef STEED

@@ -471,7 +471,7 @@ calculate_rip_text(int how)
 #ifndef GOLDOBJ
 		u.ugold);
 #else
-		money_cnt(invent));
+		done_money);
 #endif
 	/* Put together death description */
 	switch (killer_format) {

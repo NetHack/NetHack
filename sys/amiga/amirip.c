@@ -199,7 +199,7 @@ int how;
 #ifndef GOLDOBJ
 		u.ugold);
 #else
-		money_cnt(invent));
+		done_money);
 #endif
     buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
     tomb_text(buf);

@@ -349,6 +349,25 @@ make blindness with just 1 turn remaining be a candicate for repair by
 healing potions/spells shouldn't fix being creamed
 make pie throwing and venom spitting by the player be consistent with the
 	effects of those attacks by monsters
+offering & tinning corpses on altars should work even while riding
+It was possible to faint after eating a fortune cookie and still read
+	the fortune's text despite being unconscious
+when filling a pit containing a vortex, a surviving vortex gets untrapped
+teleporting no longer moves the iron ball to under you if that's not necessary;
+	prevents odd ball movement when crawling out of water
+monsters now prefer to wear speed boots over other boots
+prevent crash when loading a special level specifying a mimic using m_object
+prevent crashes caused by dropping or shipping quivered or secondary weapons
+don't trigger spurious encumbrance messages on last turn of a multi-turn meal
+prevent food being restored to untouched status if interrupted while eating
+troll revival shouldn't increment the troll creation counter
+breaking mirrors and your eggs should be bad luck when kicking chests as well
+	as throwing
+vampires should be G_NOCORPSE so you can't wish for them
+glass objects should break when thrown, just like when kicked in chests
+rocks/gems shouldn't be hard to throw by hand because they are ammo
+avoid all cases where splitting an object would result in two objects being
+	quivered, wielded or otherwise having its owornflag set
 
 
 Platform- and/or Interface-Specific Fixes
@@ -378,6 +397,7 @@ X11: allow extra space added to map widget to be removed if widget shrinks
 Gnome: workaround for GTK+ attempts to disallow setgid executables
 X11: general solution to the problem that the meaning of font height varies
 	among different implementations of X11
+X11: make "slow" mode the default since it seems to be very prevalent
 
 
 General New Features
@@ -433,6 +453,8 @@ blessed gold detection now detects anything made of gold, not just
 new T-shirt messages from Scott Bigham
 option to get rid of resistance 'sparkle' (shieldeffect) (Scott Bigham)
 glowing Sunsword (inspired by Slashem)
+msg_window option for ^P in TTY mode (Jay Tilton)
+ninjas should get multishot bonus with yumi and ya (Dylan O'Donnell)
 
 
 Platform- and/or Interface-Specific New Features

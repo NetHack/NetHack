@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.3	2001/10/29	*/
+/*	SCCS Id: @(#)objnam.c	3.3	2002/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2430,17 +2430,16 @@ typfnd:
 		  makeplural(body_part(HAND)));
 	}
 
-	otmp->owt = weight(otmp);
-	if (very && otmp->otyp == HEAVY_IRON_BALL) otmp->owt += 160;
 	if (halfeaten && otmp->oclass == FOOD_CLASS) {
 		if (otmp->otyp == CORPSE)
 			otmp->oeaten = mons[otmp->corpsenm].cnutrit;
 		else otmp->oeaten = objects[otmp->otyp].oc_nutrition;
-		otmp->owt /= 2;
-		otmp->oeaten /= 2;
-		if (!otmp->owt) otmp->owt = 1;
-		if (!otmp->oeaten) otmp->oeaten = 1;
+		/* (do this adjustment before setting up object's weight) */
+		consume_oeaten(otmp, 1);
 	}
+	otmp->owt = weight(otmp);
+	if (very && otmp->otyp == HEAVY_IRON_BALL) otmp->owt += 160;
+
 	return(otmp);
 }
 

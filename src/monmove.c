@@ -297,7 +297,7 @@ register struct monst *mtmp;
 	register int tmp=0;
 	int inrange, nearby, scared;
 #ifdef GOLDOBJ
-        struct obj *ygold, *lepgold;
+        struct obj *ygold = 0, *lepgold = 0;
 #endif
 
 /*	Pre-movement adjustments	*/
@@ -474,8 +474,8 @@ toofar:
 	   (mdat->mlet == S_LEPRECHAUN && !u.ugold && (mtmp->mgold || rn2(2))) ||
 #else
         if (mdat->mlet == S_LEPRECHAUN) {
-	        ygold = findgold(invent);
-                lepgold = findgold(mtmp->minvent);
+	    ygold = findgold(invent);
+	    lepgold = findgold(mtmp->minvent);
 	}
 
 	if(!nearby || mtmp->mflee || scared ||

@@ -103,7 +103,7 @@ long amount;
 		return 0;
 	}
         
-        if (ygold->quan > amount) splitobj(ygold, amount);
+        if (ygold->quan > amount) ygold = splitobj(ygold, amount);
         freeinv(ygold);
 	add_to_minv(mon, ygold);
         flags.botl = 1;
@@ -131,7 +131,7 @@ long amount;
                 return;
         }
    
-        if (mongold->quan > amount) splitobj(mongold, amount);
+        if (mongold->quan > amount) mongold = splitobj(mongold, amount);
         obj_extract_self(mongold);
 
         if (!merge_choice(invent, mongold) && inv_cnt() >= 52) {
@@ -2748,11 +2748,9 @@ int mode;		/* 0: deliver count 1: paged */
 		uquan = (bp->useup ? bp->bquan : bp->bquan - oquan);
 		thisused = bp->price * uquan;
 		totused += thisused;
-		obj->quan = uquan;		/* cheat doname */
 		obj->unpaid = 0;		/* ditto */
 		/* Why 'x'?  To match `I x', more or less. */
-		buf_p = xprname(obj, (char *)0, 'x', FALSE, thisused);
-		obj->quan = oquan;		/* restore value */
+		buf_p = xprname(obj, (char *)0, 'x', FALSE, thisused, uquan);
 #ifdef __SASC
 				/* SAS/C 6.2 can't cope for some reason */
 		sasc_bug(obj,save_unpaid);
@@ -2768,10 +2766,10 @@ int mode;		/* 0: deliver count 1: paged */
 	    totused += eshkp->debit;
 	    buf_p = xprname((struct obj *)0,
 			    "usage charges and/or other fees",
-			    GOLD_SYM, FALSE, eshkp->debit);
+			    GOLD_SYM, FALSE, eshkp->debit, 0L);
 	    putstr(datawin, 0, buf_p);
 	}
-	buf_p = xprname((struct obj *)0, "Total:", '*', FALSE, totused);
+	buf_p = xprname((struct obj *)0, "Total:", '*', FALSE, totused, 0L);
 	putstr(datawin, 0, "");
 	putstr(datawin, 0, buf_p);
 	display_nhwindow(datawin, FALSE);

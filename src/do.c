@@ -171,9 +171,10 @@ const char *verb;
 		    if (mtmp) {
 			if (!passes_walls(mtmp->data) &&
 				!throws_rocks(mtmp->data)) {
-			    if (hmon(mtmp, obj, TRUE))
+			    if (hmon(mtmp, obj, TRUE) && !is_whirly(mtmp->data))
 				return FALSE;	/* still alive */
-			} else mtmp->mtrapped = 0;
+			}
+			mtmp->mtrapped = 0;
 		    } else {
 			if (!Passes_walls && !throws_rocks(youmonst.data)) {
 			    losehp(rnd(15), "squished under a boulder",
@@ -523,31 +524,35 @@ void
 dropy(obj)
 register struct obj *obj;
 {
+	if (obj == uwep) setuwep((struct obj *)0);
+	if (obj == uquiver) setuqwep((struct obj *)0);
+	if (obj == uswapwep) setuswapwep((struct obj *)0);
+
 	if (!u.uswallow && flooreffects(obj,u.ux,u.uy,"drop")) return;
 	/* uswallow check done by GAN 01/29/87 */
 	obj_no_longer_held(obj);
 	if(u.uswallow) {
-		boolean could_petrify;
-		if (obj != uball) {		/* mon doesn't pick up ball */
-		    could_petrify = obj->otyp == CORPSE &&
-				    touch_petrifies(&mons[obj->corpsenm]);
-		    (void) mpickobj(u.ustuck,obj);
-		    if (could_petrify && is_animal(u.ustuck->data)) {
-			minstapetrify(u.ustuck, TRUE);
-			/* Don't leave a cockatrice corpse available in a statue */
-			if (!u.uswallow) delobj(obj);
-		    }
+	    boolean could_petrify;
+	    if (obj != uball) {		/* mon doesn't pick up ball */
+		could_petrify = obj->otyp == CORPSE &&
+		    touch_petrifies(&mons[obj->corpsenm]);
+		(void) mpickobj(u.ustuck,obj);
+		if (could_petrify && is_animal(u.ustuck->data)) {
+		    minstapetrify(u.ustuck, TRUE);
+		    /* Don't leave a cockatrice corpse available in a statue */
+		    if (!u.uswallow) delobj(obj);
 		}
+	    }
 	} else  {
-		place_object(obj, u.ux, u.uy);
-		if (obj == uball)
-		    drop_ball(u.ux,u.uy);
-		else
-		    sellobj(obj, u.ux, u.uy);
-		stackobj(obj);
-		if(Blind && Levitation)
-		    map_object(obj, 0);
-		newsym(u.ux,u.uy);	/* remap location under self */
+	    place_object(obj, u.ux, u.uy);
+	    if (obj == uball)
+		drop_ball(u.ux,u.uy);
+	    else
+		sellobj(obj, u.ux, u.uy);
+	    stackobj(obj);
+	    if(Blind && Levitation)
+		map_object(obj, 0);
+	    newsym(u.ux,u.uy);	/* remap location under self */
 	}
 }
 
@@ -597,7 +602,10 @@ int retry;
 {
     int n, i, n_dropped = 0;
     long cnt;
-    struct obj *otmp, *otmp2, *u_gold = 0;
+    struct obj *otmp, *otmp2;
+#ifndef GOLDOBJ
+    struct obj *u_gold = 0;
+#endif
     menu_item *pick_list;
     boolean all_categories = TRUE;
     boolean drop_everything = FALSE;
@@ -657,11 +665,7 @@ int retry;
 		cnt = pick_list[i].count;
 		if (cnt < otmp->quan && !welded(otmp) &&
 			(!otmp->cursed || otmp->otyp != LOADSTONE)) {
-		    otmp2 = splitobj(otmp, cnt);
-		    /* assume other worn items aren't mergable */
-		    if (otmp == uwep) setuwep(otmp2);
-			if (otmp == uquiver) setuqwep(otmp2);
-			if (otmp == uswapwep) setuswapwep(otmp2);
+		    otmp = splitobj(otmp, cnt);
 		}
 		n_dropped += drop(otmp);
 	    }

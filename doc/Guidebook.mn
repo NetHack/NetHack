@@ -1863,6 +1863,9 @@ Cannot be set with the `O' command.
 .lp msghistory
 The number of top line messages to save (and recall with ^P) (default 20).
 Cannot be set with the `O' command.
+.lp msg_window
+Use a screen-size window to show the previous messages with ^P instead of 
+showing them one at a time.  (Currently implemented for tty only.)
 .lp "name    "
 Set your character's name (defaults to your user name).  You can also
 set your character's role by appending a dash and one or more letters of

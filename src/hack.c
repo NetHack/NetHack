@@ -160,7 +160,11 @@ moverock()
 		    continue;
 		case HOLE:
 		case TRAPDOOR:
-		    pline("%s %s and plugs a %s in the %s!",
+		    if (Blind)
+			pline("Kerplunk!  You no longer feel %s.",
+				the(xname(otmp)));
+		    else 
+			pline("%s %s and plugs a %s in the %s!",
 			  The(xname(otmp)),
 			  (ttmp->ttyp == TRAPDOOR) ? "triggers" : "falls into",
 			  (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole",

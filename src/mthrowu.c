@@ -282,7 +282,7 @@ m_throw(mon, x, y, dx, dy, range, obj)
 	    singleobj = obj;
 	    obj = (struct obj *) 0;
 	} else {
-	    singleobj = splitobj(obj, obj->quan - 1L);
+	    singleobj = splitobj(obj, 1L);
 	    obj_extract_self(singleobj);
 	}
 
@@ -557,6 +557,7 @@ struct monst *mtmp;
 	    case PM_ROGUE:
 		    if (skill == P_DAGGER) multishot++;
 		    break;
+	    case PM_NINJA:
 	    case PM_SAMURAI:
 		    if (otmp->otyp == YA && mwep &&
 			mwep->otyp == YUMI) multishot++;

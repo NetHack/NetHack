@@ -416,20 +416,18 @@ struct obj *obj;			/* only scatter this obj        */
 		qtmp = otmp->quan - 1;
 		if (qtmp > LARGEST_INT) qtmp = LARGEST_INT;
 		qtmp = (long)rnd((int)qtmp);
-		(void) splitobj(otmp, qtmp);
-		if (qtmp < otmp->quan)
-			split_up = TRUE;
+		otmp = splitobj(otmp, qtmp);
+		if (rn2(qtmp))
+		    split_up = TRUE;
 		else
-			split_up = FALSE;
-	    }
+		    split_up = FALSE;
+	    } else
+		split_up = FALSE;
 	    if (individual_object) {
-		if (split_up) {
-			if (otmp->where == OBJ_FLOOR)
-				obj = otmp->nexthere;
-			else
-				obj = otmp->nobj;
+ 		if (split_up) {
+		    obj = otmp;
 		} else
-			obj = (struct obj *)0;
+		    obj = (struct obj *)0;
 	    }
 	    obj_extract_self(otmp);
 	    used_up = FALSE;

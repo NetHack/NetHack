@@ -850,8 +850,8 @@ struct mkroom	*croom;
 
 		    case M_AP_OBJECT:
 			for (i = 0; i < NUM_OBJECTS; i++)
-			    if (!strcmp(OBJ_NAME(objects[i]),
-					m->appear_as.str))
+			    if (OBJ_NAME(objects[i]) &&
+				!strcmp(OBJ_NAME(objects[i]),m->appear_as.str))
 				break;
 			if (i == NUM_OBJECTS) {
 			    impossible(

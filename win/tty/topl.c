@@ -26,19 +26,37 @@ tty_doprev_message()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
-    ttyDisplay->dismiss_more = C('p');	/* <ctrl/P> allowed at --More-- */
-    do {
-	morc = 0;
-	if (cw->maxcol == cw->maxrow)
-	    redotoplin(toplines);
-	else if (cw->data[cw->maxcol])
-	    redotoplin(cw->data[cw->maxcol]);
-	cw->maxcol--;
-	if (cw->maxcol < 0) cw->maxcol = cw->rows-1;
-	if (!cw->data[cw->maxcol])
-	    cw->maxcol = cw->maxrow;
-    } while (morc == C('p'));
-    ttyDisplay->dismiss_more = 0;
+    winid prevmsg_win;
+    int i;
+
+    if (iflags.prevmsg_window) {
+	prevmsg_win = create_nhwindow(NHW_MENU);
+	putstr(prevmsg_win, 0, "Message History");
+	putstr(prevmsg_win, 0, "");
+	i = cw->maxcol;
+	do {
+	    if(cw->data[i] && strcmp(cw->data[i], "") )
+		putstr(prevmsg_win, 0, cw->data[i]);
+	    i = (i + 1) % cw->rows;
+	} while (i != cw->maxcol);
+	putstr(prevmsg_win, 0, toplines);
+	display_nhwindow(prevmsg_win, TRUE);
+	destroy_nhwindow(prevmsg_win);
+    } else {
+	ttyDisplay->dismiss_more = C('p');  /* <ctrl/P> allowed at --More-- */
+	do {
+	    morc = 0;
+	    if (cw->maxcol == cw->maxrow)
+		redotoplin(toplines);
+	    else if (cw->data[cw->maxcol])
+		redotoplin(cw->data[cw->maxcol]);
+	    cw->maxcol--;
+	    if (cw->maxcol < 0) cw->maxcol = cw->rows-1;
+	    if (!cw->data[cw->maxcol])
+		cw->maxcol = cw->maxrow;
+	} while (morc == C('p'));
+	ttyDisplay->dismiss_more = 0;
+    }
     return 0;
 }
 
@@ -147,7 +165,9 @@ update_topl(bp)
 	/* If there is room on the line, print message on same line */
 	/* But messages like "You die..." deserve their own line */
 	n0 = strlen(bp);
-	if(ttyDisplay->toplin == 1 && cw->cury == 0 &&
+	if( (ttyDisplay->toplin == 1 || 
+		(cw->flags & WIN_STOP && iflags.prevmsg_window)) &&
+	    cw->cury == 0 &&
 	    n0 + (int)strlen(toplines) + 3 < CO-8 &&  /* room for --More-- */
 	    (notdied = strncmp(bp, "You die", 7))) {
 		Strcat(toplines, "  ");
@@ -156,7 +176,7 @@ update_topl(bp)
 		if(!(cw->flags & WIN_STOP))
 		    addtopl(bp);
 		return;
-	} else if(!(cw->flags & WIN_STOP)) {
+	} else if (!(cw->flags & WIN_STOP && !iflags.prevmsg_window)) {
 	    if(ttyDisplay->toplin == 1) more();
 	    else if(cw->cury) {	/* for when flags.toplin == 2 && cury > 1 */
 		docorner(1, cw->cury+1); /* reset cury = 0 if redraw screen */
@@ -279,9 +299,16 @@ char def;
 	do {	/* loop until we get valid input */
 	    q = lowc(readchar());
 	    if (q == '\020') { /* ctrl-P */
-		if(!doprev) (void) tty_doprev_message(); /* need two initially */
-		(void) tty_doprev_message();
-		doprev = 1;
+		if (iflags.prevmsg_window) {
+		    (void) tty_doprev_message();
+		    tty_clear_nhwindow(WIN_MESSAGE);
+		    cw->maxcol = cw->maxrow;
+		    addtopl(prompt);
+		} else {
+		    if(!doprev) (void) tty_doprev_message(); /* need two initially */
+		    (void) tty_doprev_message();
+		    doprev = 1;
+		}
 		q = '\0';	/* force another loop iteration */
 		continue;
 	    } else if (doprev) {

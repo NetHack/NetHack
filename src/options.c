@@ -115,6 +115,11 @@ static struct Bool_Opt
 #else
 	{"mail", (boolean *)0, TRUE},
 #endif
+#ifdef TTY_GRAPHICS
+	{"msg_window", &iflags.prevmsg_window, FALSE},
+#else
+	{"msg_window", (boolean *)0, FALSE},
+#endif
 #ifdef NEWS
 	{"news", &iflags.news, TRUE},
 #else
