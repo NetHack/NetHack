@@ -11,6 +11,7 @@
 #define IDS_HELLO                       106
 #define IDI_NETHACKW                    107
 #define IDC_NETHACKW                    109
+#define IDS_APP_TITLE_SHORT             110
 #define IDR_MAINFRAME                   128
 #define IDB_TILES                       129
 #define IDD_TEXT                        130

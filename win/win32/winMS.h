@@ -164,6 +164,8 @@ void mswin_write_reg(void);
 void mswin_get_window_placement(int type, LPRECT rt);
 void mswin_update_window_placement(int type, LPRECT rt);
 
+int NHMessageBox(HWND hWnd, LPCTSTR text, UINT type);
+
 extern HBRUSH menu_bg_brush;
 extern HBRUSH menu_fg_brush;
 extern HBRUSH text_bg_brush;
