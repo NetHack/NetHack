@@ -21,6 +21,14 @@ typedef boolean FDECL((*callback_proc), (genericptr_t, genericptr_t));
 #define set_heros_fault(r)	((r)->player_flags &= ~REG_NOT_HEROS)
 #define clear_heros_fault(r)	((r)->player_flags |= REG_NOT_HEROS)
 
+/*
+ * Note: if you change the size/type of any of the fields below,
+ *       or add any/remove any fields, you must update the
+ *       bwrite() calls in save_regions(), and the
+ *       mread() calls in rest_regions() in src/region.c
+ *       to reflect the changes.
+ */
+
 typedef struct {
   NhRect bounding_box;		/* Bounding box of the region */
   NhRect *rects;		/* Rectangles composing the region */

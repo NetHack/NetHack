@@ -646,7 +646,7 @@ int mode;
 	bwrite(fd, (genericptr_t) &regions[i]->can_leave_f, sizeof (short));
 	bwrite(fd, (genericptr_t) &regions[i]->leave_f, sizeof (short));
 	bwrite(fd, (genericptr_t) &regions[i]->inside_f, sizeof (short));
-	bwrite(fd, (genericptr_t) &regions[i]->player_flags, sizeof (boolean));
+	bwrite(fd, (genericptr_t) &regions[i]->player_flags, sizeof (unsigned int));
 	bwrite(fd, (genericptr_t) &regions[i]->n_monst, sizeof (short));
 	for (j = 0; j < regions[i]->n_monst; j++)
 	    bwrite(fd, (genericptr_t) &regions[i]->monsters[j],
@@ -721,7 +721,7 @@ boolean ghostly; /* If a bones file restore */
 	mread(fd, (genericptr_t) &regions[i]->can_leave_f, sizeof (short));
 	mread(fd, (genericptr_t) &regions[i]->leave_f, sizeof (short));
 	mread(fd, (genericptr_t) &regions[i]->inside_f, sizeof (short));
-	mread(fd, (genericptr_t) &regions[i]->player_flags, sizeof (boolean));
+	mread(fd, (genericptr_t) &regions[i]->player_flags, sizeof (unsigned int));
 	if (ghostly) {	/* settings pertained to old player */
 	    clear_hero_inside(regions[i]);
 	    clear_heros_fault(regions[i]);
