@@ -23,8 +23,6 @@ STATIC_DCL void FDECL(drop_to, (coord *,SCHAR_P));
 
 static NEARDATA struct obj *kickobj;
 
-#define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
-
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 
 STATIC_OVL void
