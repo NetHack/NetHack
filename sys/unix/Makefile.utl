@@ -364,17 +364,17 @@ tile2beos.o: ../win/BeOS/tile2beos.cpp $(HACK_H) ../include/tile.h
 # make sure object files from src are available when needed
 #
 $(OBJDIR)/alloc.o: ../src/alloc.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c ../src/alloc.c
+	$(CC) $(CFLAGS) -c ../src/alloc.c -o $@
 $(OBJDIR)/drawing.o: ../src/drawing.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c ../src/drawing.c
+	$(CC) $(CFLAGS) -c ../src/drawing.c -o $@
 $(OBJDIR)/decl.o: ../src/decl.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c ../src/decl.c
+	$(CC) $(CFLAGS) -c ../src/decl.c -o $@
 $(OBJDIR)/monst.o: ../src/monst.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c ../src/monst.c
+	$(CC) $(CFLAGS) -c ../src/monst.c -o $@
 $(OBJDIR)/objects.o: ../src/objects.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c ../src/objects.c
+	$(CC) $(CFLAGS) -c ../src/objects.c -o $@
 $(OBJDIR)/dlb.o: ../src/dlb.c $(HACK_H) ../include/dlb.h
-	$(CC) $(CFLAGS) -c ../src/dlb.c
+	$(CC) $(CFLAGS) -c ../src/dlb.c -o $@
 
 # make sure hack.h dependencies get transitive information
 $(HACK_H): $(CONFIG_H)
