@@ -892,16 +892,21 @@ dokick()
 		    if (rn2(15) && !(maploc->looted & TREE_LOOTED) &&
 			  (treefruit = rnd_treefruit_at(x, y))) {
 			long nfruit = 8L-rnl(7), nfall;
+			short frtype = treefruit->otyp;
 			treefruit->quan = nfruit;
 			if (is_plural(treefruit))
 			    pline("Some %s fall from the tree!", xname(treefruit));
 			else
 			    pline("%s falls from the tree!", An(xname(treefruit)));
 			nfall = scatter(x,y,2,MAY_HIT,treefruit);
-			if ( nfall != nfruit ) {
-			    /* scatter left some in the tree */
+			if (nfall != nfruit) {
+			    /* scatter left some in the tree, but treefruit
+			     * may not refer to the correct object */
+			    treefruit = mksobj(frtype, TRUE, FALSE);
+			    treefruit->quan = nfruit-nfall;
 			    pline("%ld %s got caught in the branches.",
 				nfruit-nfall, xname(treefruit));
+			    dealloc_obj(treefruit);
 			}
 			exercise(A_DEX, TRUE);
 			exercise(A_WIS, TRUE);	/* discovered a new food source! */
