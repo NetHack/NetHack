@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.4	2002/03/22	*/
+/*	SCCS Id: @(#)eat.c	3.4	2002/05/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1673,24 +1673,24 @@ struct obj *otmp;
 	   ability to detect food that is unfit for consumption
 	   or dangerous and avoid it. */
 
-	char buf[BUFSZ], foodsmell[BUFSZ];
-	char *eat_it_anyway = "Eat it anyway?";
-	boolean cadaver = (otmp->otyp == CORPSE);
-	boolean stoneorslime = FALSE;
-	int material = objects[otmp->otyp].oc_material;
+	char buf[BUFSZ], foodsmell[BUFSZ],
+	     it_or_they[QBUFSZ], eat_it_anyway[QBUFSZ];
+	boolean cadaver = (otmp->otyp == CORPSE),
+		stoneorslime = FALSE;
+	int material = objects[otmp->otyp].oc_material,
+	    mnum = otmp->corpsenm;
 	long rotted = 0L;
-	int mnum;
-
-#ifdef GCC_WARN
-	mnum = 0;
-#endif
 
 	Strcpy(foodsmell, Tobjnam(otmp, "smell"));
+	Strcpy(it_or_they, (otmp->quan == 1L) ? "it" : "they");
+	Sprintf(eat_it_anyway, "Eat %s anyway?",
+		(otmp->quan == 1L) ? "it" : "one");
+
 	if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN) {
-		mnum = otmp->corpsenm;
 		/* These checks must match those in eatcorpse() */
-	  	stoneorslime = (touch_petrifies(&mons[mnum]) &&
-			    !Stone_resistance && !poly_when_stoned(youmonst.data));
+		stoneorslime = (touch_petrifies(&mons[mnum]) &&
+				!Stone_resistance &&
+				!poly_when_stoned(youmonst.data));
 
 		if (mnum == PM_GREEN_SLIME)
 		    stoneorslime = (!Unchanging &&
@@ -1716,28 +1716,28 @@ struct obj *otmp;
 
 	if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && !Sick_resistance) {
 		/* Tainted meat */
-		Sprintf(buf, "%s like it could be tainted! %s",
-		     foodsmell, eat_it_anyway);
+		Sprintf(buf, "%s like %s could be tainted! %s",
+			foodsmell, it_or_they, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (stoneorslime) {
-		Sprintf(buf, "%s like it could be something very dangerous! %s",
-		     foodsmell, eat_it_anyway);
+		Sprintf(buf, "%s like %s could be something very dangerous! %s",
+			foodsmell, it_or_they, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (otmp->orotten || (cadaver && rotted > 3L)) {
 		/* Rotten */
-		Sprintf(buf, "%s like it could be rotten! %s",
-			foodsmell, eat_it_anyway);
+		Sprintf(buf, "%s like %s could be rotten! %s",
+			foodsmell, it_or_they, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (cadaver && poisonous(&mons[mnum]) && !Poison_resistance) {
 		/* poisonous */
-		Sprintf(buf, "%s like it might be poisonous! %s",
-			foodsmell, eat_it_anyway);
+		Sprintf(buf, "%s like %s might be poisonous! %s",
+			foodsmell, it_or_they, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
@@ -1754,8 +1754,8 @@ struct obj *otmp;
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
-	if (Upolyd &&
-	    (u.umonnum == PM_RUST_MONSTER && is_metallic(otmp) && otmp->oerodeproof)) {
+	if (Upolyd && u.umonnum == PM_RUST_MONSTER &&
+	    is_metallic(otmp) && otmp->oerodeproof) {
 		Sprintf(buf, "%s disgusting to you right now. %s",
 			foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
@@ -1776,7 +1776,8 @@ struct obj *otmp;
 		else return 2;
 	}
 	if (!u.uconduct.unvegetarian &&
-	    ((material == LEATHER || material == BONE || material == DRAGON_HIDE) ||
+	    ((material == LEATHER || material == BONE ||
+	      material == DRAGON_HIDE) ||
 	     (cadaver && !vegetarian(&mons[mnum])))) {
 		Sprintf(buf, "%s unfamiliar to you. %s",
 			foodsmell, eat_it_anyway);
@@ -1786,8 +1787,8 @@ struct obj *otmp;
 
 	if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && Sick_resistance) {
 		/* Tainted meat with Sick_resistance */
-		Sprintf(buf, "%s like it could be tainted! %s",
-		     foodsmell, eat_it_anyway);
+		Sprintf(buf, "%s like %s could be tainted! %s",
+			foodsmell, it_or_they, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
