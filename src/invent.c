@@ -729,6 +729,10 @@ register const char *let,*word;
 #else
 	if(*let == GOLD_CLASS) let++, usegold = TRUE;
 #endif
+	/* Ugly check for touchstone */
+	if (!strncmp(word, "rub on", 6) && u.ugold)
+		allowgold = usegold = TRUE;
+
 	/* Equivalent of an "ugly check" for gold */
 	if (usegold && !strcmp(word, "eat") && !metallivorous(youmonst.data))
 #ifndef GOLDOBJ

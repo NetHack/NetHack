@@ -1838,8 +1838,15 @@ struct obj *otmp;
 	}
 
 	switch (obj->oclass) {
-	  case GOLD:
+	  case GOLD_CLASS:
 	    color = "golden";
+#ifndef GOLDOBJ
+	    /* goldobj back to u.ugold */
+	    u.ugold = obj->quan;
+	    obj->quan = 0L;
+	    dealloc_obj(obj);
+	    obj = (struct obj *)0;
+#endif
 	    break;
 	  case GEM_CLASS:
 	    if (otmp->blessed) {
