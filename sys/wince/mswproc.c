@@ -1418,6 +1418,12 @@ char mswin_yn_function(const char *question, const char *choices,
 		mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, res_ch, 1);
 	}
 
+	/* prevent "--more--" prompt from appearing when several 
+	   questions being asked in the same loop (like selling 
+	   something in the shop)
+	   It does not really clears the window - mhmsgwnd.c */
+	mswin_clear_nhwindow(WIN_MESSAGE);
+
 #if defined(WIN_CE_SMARTPHONE)
 	NHSPhoneSetKeypadDefault();
 #endif
