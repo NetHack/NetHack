@@ -92,7 +92,7 @@ Compound options which can be set during the game are:
 
 boulder       override the default boulder symbol with another default: [`]
 disclose      the types of information you want offered at the end of the
-              game  [all]
+              game  [ni na nv ng nc]
 fruit         the name of a fruit you enjoy eating  [slime mold]
               (basically a whimsy which NetHack uses from time to time).
 menustyle     user interface for selection of multiple objects:
