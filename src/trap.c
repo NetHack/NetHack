@@ -2708,9 +2708,11 @@ crawl:;
 		pline("You're still drowning.");
 		done(DROWNING);
 	}
-	u.uinwater = 0;
-	You("find yourself back %s.", Is_waterlevel(&u.uz) ?
+	if (u.uinwater) {
+	    u.uinwater = 0;
+	    You("find yourself back %s.", Is_waterlevel(&u.uz) ?
 		"in an air bubble" : "on land");
+	}
 	return(TRUE);
 }
 
@@ -2816,7 +2818,7 @@ struct trap *ttmp;
 	    vision_recalc(1);
 	    check_leash(u.ux0, u.uy0);
 	    if (Punished) move_bc(0, bc, bx, by, cx, cy);
-	    spoteffects(TRUE);	/* dotrap() */
+	    spoteffects(FALSE);	/* dotrap() */
 	    exercise(A_WIS, FALSE);
 	}
 }
