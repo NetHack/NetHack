@@ -1,0 +1,288 @@
+.TH NETHACK 6 "17 November 1999"
+.UC 4
+.SH NAME
+nethack \- Exploring The Mazes of Menace
+.SH SYNOPSIS
+.B nethack
+[
+.B \-d
+.I directory
+]
+[
+.B \-n
+]
+[
+.B \-p
+.I profession (role)
+]
+[
+.B \-r
+.I race
+]
+[
+.B \-[DX]
+]
+[
+.B \-u
+.I playername
+]
+[
+.B \-dec
+]
+[
+.B \-ibm
+]
+.br
+.B nethack
+[
+.B \-d
+.I directory
+]
+.B \-s
+[
+.B \-v
+]
+[
+.B \-p
+.I profession (role)
+]
+[
+.B \-r
+.I race
+]
+[
+.I playernames
+]
+.SH DESCRIPTION
+.PP
+.I NetHack
+is a display oriented Dungeons & Dragons(tm) - like game.
+The standard tty display and command structure resemble rogue.
+.PP
+Other, more graphical display options exist if you are using either a PC,
+or an X11 interface.
+.PP
+To get started you really only need to know two commands.  The command
+.B ?
+will give you a list of the available commands (as well as other information)
+and the command
+.B /
+will identify the things you see on the screen.
+.PP
+To win the game (as opposed to merely playing to beat other people's high
+scores) you must locate the Amulet of Yendor which is somewhere below
+the 20th level of the dungeon and get it out.
+Nobody has achieved this yet; anybody who does will probably go down
+in history as a hero among heros.
+.PP
+When the game ends, whether by your dying, quitting, or escaping
+from the caves,
+.I NetHack
+will give you (a fragment of) the list of top scorers.
+The scoring is based on many aspects of your behavior, but a rough estimate
+is obtained by taking the amount of gold you've found in the cave plus four
+times your (real) experience.
+Precious stones may be worth a lot of gold when brought to the exit.
+There is a 10% penalty for getting yourself killed.
+.PP
+The environment variable NETHACKOPTIONS can be used to initialize many
+run-time options.
+The ? command provides a description of these options and syntax.
+(The
+.B \-dec
+and
+.B \-ibm
+command line options are equivalent to the
+.B decgraphics
+and
+.B ibmgraphics
+run-time options described there,
+and are provided purely for convenience on systems
+supporting multiple types of terminals.)
+.PP
+Because the option list can be very long (particularly when specifying
+graphics characters), options may also be included in a configuration
+file.
+The default is located in your home directory and
+named .nethackrc on Unix systems.  On other systems, the default may be
+different, usually NetHack.cnf.  On DOS the name is defaults.nh, while
+on the Macintosh or BeOS, it is NetHack Defaults.
+The configuration file's location may be specified by setting NETHACKOPTIONS
+to a string consisting of an @ character followed by the filename.
+.PP
+The
+.B \-u
+.I playername
+option supplies the answer to the question "Who are you?".
+It overrides any name from the options or configuration file, USER, LOGNAME,
+or getlogin(), which will otherwise be tried in order.
+If none of these provides a useful name, the player will be asked for one.
+Player names (in conjunction with uids) are used to identify save files,
+so you can have several saved games under different names.
+Conversely, you must use the appropriate player name to restore a saved game.
+.PP
+A
+.I playername
+suffix or a separate option,
+.B \-p
+.I profession
+can be used to determine the character role.  You can specify either the
+male or female name for the character role, or the first three characters
+of the role as an abbreviation.
+.B "\-p \@"
+has been retained to explicitly request that a random role be chosen.
+It may need to be quoted with a backslash (\\@) if @
+is the "kill" character (see "stty") for the terminal, in order
+to prevent the current input line from being cleared.
+.PP
+Likewise,
+.B \-r
+.I race
+can be used to explicitly request that a race be chosen.
+.PP
+.PP
+Leaving out either of these will result in you being prompted during
+the game startup for the information.
+.PP
+The
+.B \-s
+option alone will print out the list of your scores on the current version.
+An immediately following
+.B \-v
+reports on all versions present in the score file.
+The
+.B \-s
+may also be followed by arguments
+.B \-p
+and
+.B \-r
+to print the scores of particular roles and races only.
+It may also be followed by one or more player names to print the scores of the
+players mentioned, by 'all' to print out all scores, or by a number to print
+that many top scores.
+.PP
+The
+.B \-n
+option suppresses printing of any news from the game administrator.
+.PP
+The
+.B \-D
+or
+.B \-X
+option will start the game in a special non-scoring discovery mode.
+.B \-D
+will, if the player is the game administrator, start in debugging (wizard)
+mode instead.
+.PP
+The
+.B \-d
+option, which must be the first argument if it appears,
+supplies a directory which is to serve as the playground.
+It overrides the value from NETHACKDIR, HACKDIR,
+or the directory specified by the game administrator during compilation
+(usually /usr/games/lib/nethackdir).
+This option is usually only useful to the game administrator.
+The playground must contain several auxiliary files such as help files,
+the list of top scorers, and a subdirectory
+.I save
+where games are saved.
+.SH AUTHORS
+.PP
+Jay Fenlason (+ Kenny Woodland, Mike Thome and Jon Payne) wrote the
+original hack, very much like rogue (but full of bugs).
+.PP
+Andries Brouwer continuously deformed their sources into an entirely
+different game.
+.PP
+Mike Stephenson has continued the perversion of sources, adding various
+warped character classes and sadistic traps with the help of many strange
+people who reside in that place between the worlds, the Usenet Zone.
+A number of these miscreants are immortalized in the historical
+roll of dishonor and various other places.
+.PP
+The resulting mess is now called NetHack, to denote its
+development by the Usenet.  Andries Brouwer has made this request for the
+distinction, as he may eventually release a new version of his own.
+.SH FILES
+.PP
+All files are in the playground, normally /usr/games/lib/nethackdir.
+If DLB was defined during the compile, the data files and special levels
+will be inside a larger file, normally nhdat, instead of being separate
+files.
+.br
+.DT
+.ta \w'cmdhelp, opthelp, wizhelp\ \ \ 'u
+nethack		The program itself.
+.br
+data, oracles, rumors	Data files used by NetHack.
+.br
+options, quest.dat	More data files.
+.br
+help, hh	Help data files.
+.br
+cmdhelp, opthelp, wizhelp	More help data files.
+.br
+*.lev	Predefined special levels.
+.br
+dungeon	Control file for special levels.
+.br
+history	A short history of NetHack.
+.br
+license	Rules governing redistribution.
+.br
+record	The list of top scorers.
+.br
+logfile	An extended list of games
+.br
+	played.
+.br
+xlock.nnn	Description of a dungeon level.
+.br
+perm	Lock file for xlock.dd.
+.br
+bonesDD.nn	Descriptions of the ghost and
+.br
+	belongings of a deceased
+.br
+	adventurer.
+.br
+save	A subdirectory containing the
+.br
+	saved games.
+.SH ENVIRONMENT
+.DT
+.ta \w'HACKPAGER or PAGER\ \ \ 'u
+USER or LOGNAME	Your login name.
+.br
+HOME		Your home directory.
+.br
+SHELL		Your shell.
+.br
+TERM		The type of your terminal.
+.br
+HACKPAGER or PAGER	Replacement for default pager.
+.br
+MAIL	Mailbox file.
+.br
+MAILREADER	Replacement for default reader
+.br
+	(probably /bin/mail or /usr/ucb/mail).
+.br
+NETHACKDIR	Playground.
+.br
+NETHACKOPTIONS	String predefining several NetHack
+.br
+	options.
+.br
+
+In addition, SHOPTYPE is used in debugging (wizard) mode.
+.SH "SEE ALSO"
+.PP
+dgn_comp(6), lev_comp(6), recover(6)
+.SH BUGS
+.PP
+Probably infinite.
+
+
+.PP
+Dungeons & Dragons is a Trademark of TSR Inc.
