@@ -1055,6 +1055,8 @@ boolean at_stairs, falling, portal;
 					(int) new_ledger, depth(&u.uz), errno);
 			pline("Probably someone removed it.");
 			done(TRICKED);
+			/* we'll reach here if running in wizard mode */
+			error("Cannot continue this game.");
 		}
 		minit();	/* ZEROCOMP */
 		getlev(fd, hackpid, new_ledger, FALSE);

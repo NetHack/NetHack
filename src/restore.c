@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.4	1999/11/20	*/
+/*	SCCS Id: @(#)restore.c	3.4	2002/08/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1026,6 +1026,7 @@ genericptr_t buf;
 register unsigned len;
 {
     /*register int readlen = 0;*/
+    if (fd < 0) error("Restore error; mread attempting to read file %d.", fd);
     mreadfd = fd;
     while (len--) {
 	if (inrunlength > 0) {

@@ -220,6 +220,8 @@ If there were a hole outside a shop, you could kick stuff out of the door
 curing hallucination while wielding Grayswandir should print a message
 removing unowned pick-axe from container in shop gave inappropriate message
 don't let monster end up with more current HP than max HP after life drain
+make sure that missing file trickery in wizard mode which is discovered during
+	level change doesn't try to keep going after discarding current level
 
 
 Platform- and/or Interface-Specific Fixes
@@ -262,6 +264,7 @@ Gnome/Linux: more portable getres*id workaround
 msdos: compiling without NO_TERMS resulted in a link-time error
 msdos: reworked Makefile.GCC to get rid of need to duplicate source files
 msdos,win32: stop doing chdir when NOCWD_ASSUMPTIONS is defined
+vms: prevent error() from indirectly triggering hangup save during forced exit
 
 
 General New Features
