@@ -84,8 +84,8 @@ use_saddle(otmp)
 
 	    You("touch %s.", mon_nam(mtmp));
  	    if (!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
-			Sprintf(kbuf, "attempting to saddle %s", a_monnam(mtmp));
-			instapetrify(kbuf);
+		Sprintf(kbuf, "attempting to saddle %s", an(mtmp->data->mname));
+		instapetrify(kbuf);
  	    }
 	}
 	if (ptr == &mons[PM_INCUBUS] || ptr == &mons[PM_SUCCUBUS]) {

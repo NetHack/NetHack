@@ -1208,7 +1208,7 @@ dopois:
 			    killer_format = KILLED_BY_AN;
 			    Sprintf(buf, "%s by %s",
 				    moat ? "moat" : "pool of water",
-				    a_monnam(mtmp));
+				    an(mtmp->data->mname));
 			    killer = buf;
 			    done(DROWNING);
 			} else if(mattk->aatyp == AT_HUGS)
