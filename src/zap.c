@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2004/08/02	*/
+/*	SCCS Id: @(#)zap.c	3.4	2004/09/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -563,168 +563,194 @@ int *container_nesting;
  * successful.  Note: this does NOT use up the corpse if it fails.
  */
 struct monst *
-revive(obj)
-register struct obj *obj;
+revive(corpse, by_hero)
+struct obj *corpse;
+boolean by_hero;
 {
-	register struct monst *mtmp = (struct monst *)0;
-	struct permonst *mptr;
-	struct obj *container = (struct obj *)0;
-	int container_nesting = 0;
-	schar savetame = 0;
-	boolean recorporealization = FALSE;
-	boolean in_container = FALSE;
+    struct monst *mtmp = 0;
+    struct permonst *mptr;
+    struct obj *container;
+    coord xy;
+    xchar x, y;
+    int montype, container_nesting = 0;
 
-	if(obj->otyp == CORPSE) {
-		int montype = obj->corpsenm;
-		xchar x, y;
+    if (corpse->otyp != CORPSE) {
+	impossible("Attempting to revive %s?", xname(corpse));
+	return (struct monst *)0;
+    }
 
-		if (obj->where == OBJ_CONTAINED) {
-			/* deal with corpses in [possibly nested] containers */
-			struct monst *carrier;
-			int holder = 0;
+    x = y = 0;
+    if (corpse->where != OBJ_CONTAINED) {
+	/* only for invent, minvent, or floor */
+	container = 0;
+	(void) get_obj_location(corpse, &x, &y, 0);
+    } else {
+	/* deal with corpses in [possibly nested] containers */
+	struct monst *carrier;
+	int holder = OBJ_FREE;
 
-			container = obj->ocontainer;
-			carrier = get_container_location(container, &holder,
-							&container_nesting);
-			switch(holder) {
-			    case OBJ_MINVENT:
-				x = carrier->mx; y = carrier->my;
-				in_container = TRUE;
-				break;
-			    case OBJ_INVENT:
-				x = u.ux; y = u.uy;
-				in_container = TRUE;
-				break;
-			    case OBJ_FLOOR:
-				if (!get_obj_location(obj, &x, &y, CONTAINED_TOO))
-					return (struct monst *) 0;
-				in_container = TRUE;
-				break;
-			    default:
-			    	return (struct monst *)0;
-			}
-		} else {
-			/* only for invent, minvent, or floor */
-			if (!get_obj_location(obj, &x, &y, 0))
-			    return (struct monst *) 0;
-		}
-		if (in_container) {
-			/* Rules for revival from containers:
-			   - the container cannot be locked
-			   - the container cannot be heavily nested (>2 is arbitrary)
-			   - the container cannot be a statue or bag of holding
-			     (except in very rare cases for the latter)
-			*/
-			if (!x || !y || container->olocked || container_nesting > 2 ||
-			    container->otyp == STATUE ||
-			    (container->otyp == BAG_OF_HOLDING && rn2(40)))
-				return (struct monst *)0;
-		}
-
-		if (MON_AT(x,y)) {
-		    coord new_xy;
-
-		    if (enexto(&new_xy, x, y, &mons[montype]))
-			x = new_xy.x,  y = new_xy.y;
-		}
-
-		mptr = &mons[montype];
-		if (cant_revive(&montype, TRUE, obj)) {
-		    /* make a zombie or doppelganger instead */
-		    mtmp = makemon(&mons[montype], x, y,
-				   NO_MINVENT | MM_NOWAIT);
-		    if (mtmp) {
-			if (mtmp->cham == PM_DOPPELGANGER) {
-			    /* change shape to match the corpse */
-			    (void) newcham(mtmp, mptr, FALSE, FALSE);
-			} else if (mtmp->data->mlet == S_ZOMBIE) {
-			    mtmp->mhp = mtmp->mhpmax = 100;
-			    mon_adjust_speed(mtmp, 2, (struct obj *)0); /* MFAST */
-			}
-		    }
-		} else {
-		    if (obj->oxlth && (obj->oattached == OATTACHED_MONST)) {
-			coord xy;
-
-			xy.x = x; xy.y = y;
-			mtmp = montraits(obj, &xy);
-			if (mtmp && mtmp->mtame && !mtmp->isminion)
-			    wary_dog(mtmp, TRUE);
-		    } else
-			mtmp = makemon(&mons[montype], x, y,
-				       NO_MINVENT|MM_NOWAIT|MM_NOCOUNTBIRTH);
-		    if (mtmp) {
-			if (obj->oxlth && (obj->oattached == OATTACHED_M_ID)) {
-			    unsigned m_id;
-			    struct monst *ghost;
-			    (void) memcpy((genericptr_t)&m_id,
-				    (genericptr_t)obj->oextra, sizeof(m_id));
-			    ghost = find_mid(m_id, FM_FMON);
-		    	    if (ghost && ghost->data == &mons[PM_GHOST]) {
-		    		    int x2, y2;
-		    		    x2 = ghost->mx; y2 = ghost->my;
-		    		    if (ghost->mtame)
-		    		    	savetame = ghost->mtame;
-		    		    if (canseemon(ghost))
-		    		  	pline("%s is suddenly drawn into its former body!",
-						Monnam(ghost));
-				    mondead(ghost);
-				    recorporealization = TRUE;
-				    newsym(x2, y2);
-			    }
-			    /* don't mess with obj->oxlth here */
-			    obj->oattached = OATTACHED_NOTHING;
-			}
-			/* Monster retains its name */
-			if (obj->onamelth)
-			    mtmp = christen_monst(mtmp, ONAME(obj));
-		    }
-		}
-		if (mtmp) {
-			if (obj->oeaten)
-				mtmp->mhp = eaten_stat(mtmp->mhp, obj);
-			/* track that this monster was revived at least once */
-			mtmp->mrevived = 1;
-
-			if (recorporealization) {
-				/* If mtmp is revivification of former tame ghost*/
-				if (savetame) {
-				    struct monst *mtmp2 = tamedog(mtmp, (struct obj *)0);
-				    if (mtmp2) {
-					mtmp2->mtame = savetame;
-					mtmp = mtmp2;
-				    }
-				}
-				/* was ghost, now alive, it's all very confusing */
-				mtmp->mconf = 1;
-			}
-
-			switch (obj->where) {
-			    case OBJ_INVENT:
-				useup(obj);
-				break;
-			    case OBJ_FLOOR:
-				/* in case MON_AT+enexto for invisible mon */
-				x = obj->ox,  y = obj->oy;
-				/* not useupf(), which charges */
-				if (obj->quan > 1L)
-				    obj = splitobj(obj, 1L);
-				delobj(obj);
-				newsym(x, y);
-				break;
-			    case OBJ_MINVENT:
-				m_useup(obj->ocarry, obj);
-				break;
-			    case OBJ_CONTAINED:
-				obj_extract_self(obj);
-				obfree(obj, (struct obj *) 0);
-				break;
-			    default:
-				panic("revive");
-			}
-		}
+	container = corpse->ocontainer;
+	carrier = get_container_location(container, &holder,
+					 &container_nesting);
+	switch (holder) {
+	case OBJ_MINVENT:
+	    x = carrier->mx,  y = carrier->my;
+	    break;
+	case OBJ_INVENT:
+	    x = u.ux,  y = u.uy;
+	    break;
+	case OBJ_FLOOR:
+	    (void) get_obj_location(corpse, &x, &y, CONTAINED_TOO);
+	    break;
+	default:
+	    break;		/* x,y are 0 */
 	}
-	return mtmp;
+    }
+    if (!x || !y ||
+	    /* Rules for revival from containers:
+	       - the container cannot be locked
+	       - the container cannot be heavily nested (>2 is arbitrary)
+	       - the container cannot be a statue or bag of holding
+	       (except in very rare cases for the latter)
+	    */
+	    (container &&
+		(container->olocked || container_nesting > 2 ||
+		 container->otyp == STATUE ||
+		 (container->otyp == BAG_OF_HOLDING && rn2(40)))))
+	return (struct monst *)0;
+
+    /* record the object's location now that we're sure where it is */
+    corpse->ox = x,  corpse->oy = y;
+
+    /* prepare for the monster */
+    montype = corpse->corpsenm;
+    mptr = &mons[montype];
+    /* [should probably handle recorporealization first; if corpse and
+       ghost are at same location, revived creature shouldn't be bumped
+       to an adjacent spot by ghost which joins with it] */
+    if (MON_AT(x,y)) {
+	if (enexto(&xy, x, y, mptr))
+	    x = xy.x,  y = xy.y;
+    }
+
+    if (cant_revive(&montype, TRUE, corpse)) {
+	/* make a zombie or doppelganger instead */
+	/* note: montype has changed; mptr keeps old value for newcham() */
+	mtmp = makemon(&mons[montype], x, y, NO_MINVENT|MM_NOWAIT);
+	if (mtmp) {
+	    corpse->oattached = OATTACHED_NOTHING;  /* skip ghost handling */
+	    if (mtmp->cham == PM_DOPPELGANGER) {
+		/* change shape to match the corpse */
+		(void) newcham(mtmp, mptr, FALSE, FALSE);
+	    } else if (mtmp->data->mlet == S_ZOMBIE) {
+		mtmp->mhp = mtmp->mhpmax = 100;
+		mon_adjust_speed(mtmp, 2, (struct obj *)0); /* MFAST */
+	    }
+	}
+    } else if (corpse->oxlth && corpse->oattached == OATTACHED_MONST) {
+	/* use saved traits */
+	xy.x = x,  xy.y = y;
+	mtmp = montraits(corpse, &xy);
+	if (mtmp && mtmp->mtame && !mtmp->isminion)
+	    wary_dog(mtmp, TRUE);
+    } else {
+	/* make a new monster */
+	mtmp = makemon(mptr, x, y, NO_MINVENT|MM_NOWAIT|MM_NOCOUNTBIRTH);
+    }
+    if (!mtmp) return (struct monst *)0;
+
+    /* if this is caused by the hero there might be a shop charge */
+    if (by_hero) {
+	struct monst *shkp = 0;
+
+	x = corpse->ox,  y = corpse->oy;
+	if (costly_spot(x, y))
+	    shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
+
+	if (cansee(x, y))
+	    pline_The("%s glows iridescently.", cxname(corpse));
+	else if (shkp)
+	    /* need some prior description of the corpse since
+	       stolen_value() will refer to the object as "it" */
+	    pline("A corpse is resuscitated.");
+
+	if (shkp)
+	    (void) stolen_value(corpse, x, y, (boolean)shkp->mpeaceful, FALSE);
+
+	/* [we don't give any comparable message about the corpse for
+	   the !by_hero case because caller might have already done so] */
+    }
+
+    /* handle recorporealization of an active ghost */
+    if (corpse->oxlth && corpse->oattached == OATTACHED_M_ID) {
+	unsigned m_id;
+	struct monst *ghost, *mtmp2;
+	struct obj *otmp;
+
+	(void) memcpy((genericptr_t)&m_id,
+		      (genericptr_t)corpse->oextra, sizeof m_id);
+	ghost = find_mid(m_id, FM_FMON);
+	if (ghost && ghost->data == &mons[PM_GHOST]) {
+	    if (canseemon(ghost))
+		pline("%s is suddenly drawn into its former body!",
+		      Monnam(ghost));
+	    /* transfer the ghost's inventory along with it */
+	    while ((otmp = ghost->minvent) != 0) {
+		obj_extract_self(otmp);
+		add_to_minv(mtmp, otmp);
+	    }
+	    /* tame the revived monster if its ghost was tame */
+	    if (ghost->mtame && !mtmp->mtame) {
+		mtmp2 = tamedog(mtmp, (struct obj *)0);
+		if (mtmp2) {
+		    /* ghost's edog data is ignored */
+		    mtmp2->mtame = ghost->mtame;
+		    mtmp = mtmp2;
+		}
+	    }
+	    /* was ghost, now alive, it's all very confusing */
+	    mtmp->mconf = 1;
+	    /* separate ghost monster no longer exists */
+	    mongone(ghost);
+	}
+	corpse->oattached = OATTACHED_NOTHING;
+    }
+
+    /* monster retains its name */
+    if (corpse->onamelth)
+	mtmp = christen_monst(mtmp, ONAME(corpse));
+    /* partially eaten corpse yields wounded monster */
+    if (corpse->oeaten)
+	mtmp->mhp = eaten_stat(mtmp->mhp, corpse);
+    /* track that this monster was revived at least once */
+    mtmp->mrevived = 1;
+
+    /* finally, get rid of the corpse--it's gone now */
+    switch (corpse->where) {
+    case OBJ_INVENT:
+	useup(corpse);
+	break;
+    case OBJ_FLOOR:
+	/* in case MON_AT+enexto for invisible mon */
+	x = corpse->ox,  y = corpse->oy;
+	/* not useupf(), which charges */
+	if (corpse->quan > 1L)
+	    corpse = splitobj(corpse, 1L);
+	delobj(corpse);
+	newsym(x, y);
+	break;
+    case OBJ_MINVENT:
+	m_useup(corpse->ocarry, corpse);
+	break;
+    case OBJ_CONTAINED:
+	obj_extract_self(corpse);
+	obfree(corpse, (struct obj *)0);
+	break;
+    default:
+	panic("revive");
+    }
+
+    return mtmp;
 }
 
 STATIC_OVL void
@@ -762,7 +788,7 @@ struct monst *mon;
 	    if (youseeit) Strcpy(corpse, corpse_xname(otmp, TRUE));
 
 	    /* for a merged group, only one is revived; should this be fixed? */
-	    if ((mtmp2 = revive(otmp)) != 0) {
+	    if ((mtmp2 = revive(otmp, !context.mon_moving)) != 0) {
 		++res;
 		if (youseeit) {
 		    if (!once++) Strcpy(owner,
@@ -1577,29 +1603,30 @@ struct obj *obj, *otmp;
 		break;
 	case WAN_UNDEAD_TURNING:
 	case SPE_TURN_UNDEAD:
-		if (obj->otyp == EGG)
-			revive_egg(obj);
-		else {
-			int corpsenm = (obj->otyp == CORPSE) ?
-					corpse_revive_type(obj) : 0;
-			res = !!revive(obj);
-			if (res && corpsenm && Role_if(PM_HEALER)) {
-			    boolean u_noticed = FALSE;
-			    if (Hallucination && !Deaf) {
-				You_hear("the sound of a defibrillator.");
-				u_noticed = TRUE;
-			    } else if (!Blind) {
-			    	You("observe %s %s change dramatically.",
-			    		s_suffix(an(mons[corpsenm].mname)),
-					nonliving(&mons[corpsenm]) ?
+		if (obj->otyp == EGG) {
+		    revive_egg(obj);
+		} else if (obj->otyp == CORPSE) {
+		    int corpsenm = corpse_revive_type(obj);
+
+		    res = !!revive(obj, TRUE);
+		    if (res && Role_if(PM_HEALER)) {
+			boolean u_noticed = FALSE;
+
+			if (Hallucination && !Deaf) {
+			    You_hear("the sound of a defibrillator.");
+			    u_noticed = TRUE;
+			} else if (!Blind) {
+			    You("observe %s %s change dramatically.",
+				s_suffix(an(mons[corpsenm].mname)),
+				nonliving(&mons[corpsenm]) ?
 					"motility" : "health");
-				u_noticed = TRUE;
-			    }
-			    if (u_noticed) {
-				    makeknown(otmp->otyp);
-				    exercise(A_WIS, TRUE);
-			    }
+			    u_noticed = TRUE;
 			}
+			if (u_noticed) {
+			    makeknown(otmp->otyp);
+			    exercise(A_WIS, TRUE);
+			}
+		    }
 		}
 		break;
 	case WAN_OPENING:

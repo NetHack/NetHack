@@ -2422,7 +2422,7 @@ E boolean FDECL(get_obj_location, (struct obj *,xchar *,xchar *,int));
 E boolean FDECL(get_mon_location, (struct monst *,xchar *,xchar *,int));
 E struct monst *FDECL(get_container_location, (struct obj *obj, int *, int *));
 E struct monst *FDECL(montraits, (struct obj *,coord *));
-E struct monst *FDECL(revive, (struct obj *));
+E struct monst *FDECL(revive, (struct obj *,BOOLEAN_P));
 E int FDECL(unturn_dead, (struct monst *));
 E void FDECL(cancel_item, (struct obj *));
 E boolean FDECL(drain_item, (struct obj *));

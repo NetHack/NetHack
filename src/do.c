@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.4	2003/12/17	*/
+/*	SCCS Id: @(#)do.c	3.4	2004/09/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1511,7 +1511,7 @@ struct obj *corpse;
 	/* container_where is the outermost container's location even if nested */
 	if (container_where == OBJ_MINVENT && mtmp2) mcarry = mtmp2;
     }
-    mtmp = revive(corpse);	/* corpse is gone if successful */
+    mtmp = revive(corpse, FALSE);	/* corpse is gone if successful */
 
     if (mtmp) {
 	chewed = (mtmp->mhp < mtmp->mhpmax);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkroom.c	3.4	2001/09/06	*/
+/*	SCCS Id: @(#)mkroom.c	3.4	2004/06/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -403,7 +403,7 @@ int mm_flags;
 	    if (enexto(&cc, mm->x, mm->y, mdat) &&
 		    (!revive_corpses ||
 		     !(otmp = sobj_at(CORPSE, cc.x, cc.y)) ||
-		     !revive(otmp)))
+		     !revive(otmp, FALSE)))
 		(void) makemon(mdat, cc.x, cc.y, mm_flags);
 	}
 	level.flags.graveyard = TRUE;	/* reduced chance for undead corpse */

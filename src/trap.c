@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2004/08/23	*/
+/*	SCCS Id: @(#)trap.c	3.4	2004/09/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -382,6 +382,18 @@ boolean td;	/* td == TRUE : trap door or hole */
  *
  * Perhaps x, y is not needed if we can use get_obj_location() to find
  * the statue's location... ???
+ *
+ * Sequencing matters:
+ *	create monster; if it fails, give up with statue intact;
+ *	give "statue comes to life" message;
+ *	if statue belongs to shop, have shk give "you owe" message;
+ *	transfer statue contents to monster (after stolen_value());
+ *	delete statue.
+ *	[This ordering means that if the statue ends up wearing a cloak of
+ *	 invisibility or a mummy wrapping, the visibility checks might be
+ *	 wrong, but to avoid that we'd have to clone the statue contents
+ *	 first in order to give them to the monster before checking their
+ *	 shop status--it's not worth the hassle.]
  */
 struct monst *
 animate_statue(statue, x, y, cause, fail_reason)
@@ -392,15 +404,16 @@ int *fail_reason;
 {
 	int mnum = statue->corpsenm;
 	struct permonst *mptr = &mons[mnum];
-	struct monst *mon = 0;
+	struct monst *mon = 0, *shkp;
 	struct obj *item;
 	coord cc;
-	boolean historic = (Role_if(PM_ARCHEOLOGIST) && !context.mon_moving &&
-			    (statue->spe & STATUE_HISTORIC)),
+	boolean historic = (Role_if(PM_ARCHEOLOGIST) &&
+				(statue->spe & STATUE_HISTORIC) != 0),
 		use_saved_traits;
-	char statuename[BUFSZ];
-
-	Strcpy(statuename,the(xname(statue)));
+	const char *comes_to_life;
+	char statuename[BUFSZ], tmpbuf[BUFSZ];
+	static const char historic_statue_is_gone[] =
+				"that the historic statue is now gone";
 
 	if (cant_revive(&mnum, TRUE, statue)) {
 	    /* mnum has changed; we won't be animating this statue as itself */
@@ -449,10 +462,7 @@ int *fail_reason;
 	    return (struct monst *)0;
 	}
 
-	/* in case statue is wielded and hero zaps stone-to-flesh at self */
-	if (statue->owornmask) remove_worn_item(statue, TRUE);
-
-	/* allow statues to be of a specific gender */
+	/* a non-montraits() statue might specify gender */
 	if (statue->spe & STATUE_MALE)
 	    mon->female = FALSE;
 	else if (statue->spe & STATUE_FEMALE)
@@ -460,40 +470,65 @@ int *fail_reason;
 	/* if statue has been named, give same name to the monster */
 	if (statue->onamelth)
 	    mon = christen_monst(mon, ONAME(statue));
+	/* mimic statue becomes seen mimic; other hiders won't be hidden */
+	if (mon->m_ap_type) seemimic(mon);
+	else mon->mundetected = FALSE;
+
+	comes_to_life = !canspotmon(mon) ? "disappears" :
+			(nonliving(mon->data) || is_vampshifter(mon)) ?
+				"moves" : "comes to life";
+	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
+	    /* "the|your|Manlobbi's statue [of a wombat]" */
+	    Sprintf(statuename, "%s%s", shk_your(tmpbuf, statue),
+		    (cause == ANIMATE_SPELL) ? xname(statue) : "statue");
+	    pline("%s %s!", upstart(statuename), comes_to_life);
+	} else if (cause == ANIMATE_SHATTER) {
+	    if (cansee(x, y))
+		Sprintf(statuename, "%s%s", shk_your(tmpbuf, statue),
+			  xname(statue));
+	    else
+		Strcpy(statuename, "a statue");
+	    pline("Instead of shattering, %s suddenly %s!",
+		  statuename, comes_to_life);
+	} else { /* cause == ANIMATE_NORMAL */
+	    You("find %s posing as a statue.",
+		canspotmon(mon) ? a_monnam(mon) : something);
+	    stop_occupation();
+	}
+
+	/* if this isn't caused by a monster using a wand of striking,
+	   there might be consequences for the hero */
+	if (!context.mon_moving) {
+	    /* if statue is owned by a shop, hero will have to pay for it;
+	       stolen_value gives a message (about debt or use of credit)
+	       which refers to "it" so needs to follow a message describing
+	       the object ("the statue comes to life" one above) */
+	    if (cause != ANIMATE_NORMAL && costly_spot(x, y) &&
+		    (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0)
+		(void) stolen_value(statue, x, y,
+				    (boolean)shkp->mpeaceful, FALSE);
+
+	    if (historic) {
+		You_feel("guilty %s.", historic_statue_is_gone);
+		adjalign(-1);
+	    }
+	} else {   
+	    if (historic && cansee(x, y))
+		You_feel("regret %s.", historic_statue_is_gone);
+		/* no alignment penalty */
+	}
+
 	/* transfer any statue contents to monster's inventory */
 	while ((item = statue->cobj) != 0) {
 	    obj_extract_self(item);
 	    (void) add_to_minv(mon, item);
 	}
 	m_dowear(mon, TRUE);
+	/* in case statue is wielded and hero zaps stone-to-flesh at self */
+	if (statue->owornmask) remove_worn_item(statue, TRUE);
+	/* statue no longer exists */
 	delobj(statue);
 
-	/* mimic statue becomes seen mimic; other hiders won't be hidden */
-	if (mon->m_ap_type) seemimic(mon);
-	else mon->mundetected = FALSE;
-
-	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
-	    const char *comes_to_life = (nonliving(mon->data) ||
-					 is_vampshifter(mon)) ?
-					"moves" : "comes to life"; 
-	    if (cause == ANIMATE_SPELL)
-	    	pline("%s %s!", upstart(statuename),
-	    		canspotmon(mon) ? comes_to_life : "disappears");
-	    else
-		pline_The("statue %s!",
-			canspotmon(mon) ? comes_to_life : "disappears");
-	    if (historic) {
-		    You_feel("guilty that the historic statue is now gone.");
-		    adjalign(-1);
-	    }
-	} else if (cause == ANIMATE_SHATTER)
-	    pline("Instead of shattering, the statue suddenly %s!",
-		canspotmon(mon) ? "comes to life" : "disappears");
-	else { /* cause == ANIMATE_NORMAL */
-	    You("find %s posing as a statue.",
-		canspotmon(mon) ? a_monnam(mon) : something);
-	    stop_occupation();
-	}
 	/* avoid hiding under nothing */
 	if (x == u.ux && y == u.uy &&
 		Upolyd && hides_under(youmonst.data) && !OBJ_AT(x, y))
