@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.4	2003/03/14	*/
+/*	SCCS Id: @(#)dokick.c	3.4	2003/12/04	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -238,13 +238,18 @@ ghitm(mtmp, gold)
 register struct monst *mtmp;
 register struct obj *gold;
 {
+	boolean msg_given = FALSE;
+
 	if(!likes_gold(mtmp->data) && !mtmp->isshk && !mtmp->ispriest
 			&& !is_mercenary(mtmp->data)) {
 		wakeup(mtmp);
 	} else if (!mtmp->mcanmove) {
 		/* too light to do real damage */
-		if (canseemon(mtmp))
-		    pline_The("gold hits %s.", mon_nam(mtmp));
+		if (canseemon(mtmp)) {
+		    pline_The("%s harmlessly %s %s.", xname(gold),
+			      otense(gold, "hit"), mon_nam(mtmp));
+		    msg_given = TRUE;
+		}
 	} else {
 #ifdef GOLDOBJ
                 long value = gold->quan * objects[gold->otyp].oc_cost;
@@ -318,16 +323,18 @@ register struct obj *gold;
 		     if (mtmp->mpeaceful)
 			    verbalize("That should do.  Now beat it!");
 		     else verbalize("That's not enough, coward!");
-		 }
+		}
 
 #ifndef GOLDOBJ
 		dealloc_obj(gold);
 #else
-                add_to_minv(mtmp, gold);
+		add_to_minv(mtmp, gold);
 #endif
-		return(1);
+		return TRUE;
 	}
-	return(0);
+
+	if (!msg_given) miss(xname(gold), mtmp);
+	return FALSE;
 }
 
 /* container is kicked, dropped, thrown or otherwise impacted by player.
