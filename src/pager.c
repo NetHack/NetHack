@@ -531,7 +531,8 @@ do_look(quick)
 
 	/* Check for monsters */
 	for (i = 0; i < MAXMCLASSES; i++) {
-	    if (sym == (from_screen ? monsyms[i] : def_monsyms[i])) {
+	    if (sym == (from_screen ? monsyms[i] : def_monsyms[i]) &&
+		monexplain[i]) {
 		need_to_look = TRUE;
 		if (!found) {
 		    Sprintf(out_str, "%c       %s", sym, an(monexplain[i]));
