@@ -1308,8 +1308,12 @@ start_eating(otmp)		/* called as you start to eat */
 }
 
 
+/*
+ * called on "first bite" of (non-corpse) food.
+ * used for non-rotten non-tin non-corpse food
+ */
 STATIC_OVL void
-fprefx(otmp)		/* called on "first bite" of (non-corpse) food */
+fprefx(otmp)
 struct obj *otmp;
 {
 	switch(otmp->otyp) {
@@ -1387,33 +1391,6 @@ struct obj *otmp;
 		      ? "bland." :
 		      Hallucination ? "gnarly!" : "delicious!");
 		break;
-	}
-
-	/* KMH, conduct */
-	switch (objects[otmp->otyp].oc_material) {
-	  case WAX: /* let's assume bees' wax */
-	    u.uconduct.unvegan++;
-	    break;
-
-	  case FLESH:
-	    if (otmp->otyp == EGG) {
-		u.uconduct.unvegan++;
-		break;
-	    }
-	  case LEATHER:
-	  case BONE:
-	  case DRAGON_HIDE:
-	    u.uconduct.unvegan++;
-	    violated_vegetarian();
-	    break;
-
-	  default:
-	    if (otmp->otyp == PANCAKE ||
-			otmp->otyp == FORTUNE_COOKIE || /* eggs */
-		otmp->otyp == CREAM_PIE || otmp->otyp == CANDY_BAR || /* milk */
-			otmp->otyp == LUMP_OF_ROYAL_JELLY)
-		u.uconduct.unvegan++;
-	    break;
 	}
 }
 
@@ -1887,11 +1864,12 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    victual.eating = TRUE; /* needed for lesshungry() */
 
 	    material = objects[otmp->otyp].oc_material;
-	    if (material == LEATHER || material == BONE || material == DRAGON_HIDE) {
-	 		u.uconduct.unvegan++;
-	    		violated_vegetarian();
+	    if (material == LEATHER ||
+		material == BONE || material == DRAGON_HIDE) {
+		u.uconduct.unvegan++;
+		violated_vegetarian();
 	    } else if (material == WAX)
-			u.uconduct.unvegan++;
+		u.uconduct.unvegan++;
 	    u.uconduct.food++;
 	    
 	    if (otmp->cursed)
@@ -1956,6 +1934,25 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    /* if not used up, eatcorpse sets up reqtime and may modify
 	     * oeaten */
 	} else {
+	    /* No checks for WAX, LEATHER, BONE, DRAGON_HIDE.  These are
+	     * all handled in the != FOOD_CLASS case, above */
+	    switch (objects[otmp->otyp].oc_material) {
+	    case FLESH:
+		if (otmp->otyp == EGG) {
+		    u.uconduct.unvegan++;
+		}
+		break;
+
+	    default:
+		if (otmp->otyp == PANCAKE ||
+		    otmp->otyp == FORTUNE_COOKIE || /* eggs */
+		    otmp->otyp == CREAM_PIE ||
+		    otmp->otyp == CANDY_BAR || /* milk */
+		    otmp->otyp == LUMP_OF_ROYAL_JELLY)
+		    u.uconduct.unvegan++;
+		break;
+	    }
+
 	    victual.reqtime = objects[otmp->otyp].oc_delay;
 	    if (otmp->otyp != FORTUNE_COOKIE &&
 		(otmp->cursed ||
