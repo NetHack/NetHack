@@ -137,23 +137,25 @@ PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 ################################################
 
 !IF "$(GRAPHICAL)" == "Y"
-WINPORT  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
+WINPORT	= $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
-WINPFLAG   = -DTILES -DMSWIN_GRAPHICS
-NHRES   = $(O)winhack.res
-WINPINC  = -I$(WIN32)
-WINPHDR   = $(WIN32)\mhaskyn.h $(WIN32)\mhdlg.h $(WIN32)\mhfont.h \
+WINPHDR	= $(WIN32)\mhaskyn.h $(WIN32)\mhdlg.h $(WIN32)\mhfont.h \
 	$(WIN32)\mhinput.h $(WIN32)\mhmain.h $(WIN32)\mhmap.h $(WIN32)\mhmenu.h \
 	$(WIN32)\mhmsg.h $(WIN32)\mhmsgwnd.h $(WIN32)\mhrip.h $(WIN32)\mhstatus.h \
 	$(WIN32)\mhtext.h $(WIN32)\resource.h $(WIN32)\winMS.h
+WINDLLS =
+WINPFLAG= -DTILES -DMSWIN_GRAPHICS
+NHRES	= $(O)winhack.res
+WINPINC	= -I$(WIN32)
 !ELSE
-WINPORT  = $(O)nttty.o    
-WINPFLAG   = -DWIN32CON
-WINPHDR   =
-NHRES   = $(O)console.res
-WINPINC  =
+WINPORT	= $(O)nttty.o    
+WINPHDR	=
+WINDLLS	= $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll $(GAMEDIR)\nhraykey.dll
+WINPFLAG= -DWIN32CON
+NHRES	= $(O)console.res
+WINPINC	=
 !ENDIF
 
 TILEUTIL16  = $(UTIL)\tile2bmp.exe
@@ -572,12 +574,7 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 #  DO NOT INDENT THE << below!
 #
 
-!IF "$(GRAPHICAL)"=="Y"
-$(GAMEFILE) : $(ALLOBJ) $(NHRES)
-!ELSE
-$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag \
-		$(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll $(GAMEDIR)\nhraykey.dll
-!ENDIF
+$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag $(WINDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
 	$(link) $(LFLAGS) user32.lib winmm.lib -out:$@ @<<$(GAME).lnk
