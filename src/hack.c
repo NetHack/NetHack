@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2002/03/09	*/
+/*	SCCS Id: @(#)hack.c	3.4	2002/03/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -578,19 +578,17 @@ boolean test_only;
 		    else if (x == ux || y == uy) {
 			if (Blind || Stunned || ACURR(A_DEX) < 10 || Fumbling) {
 #ifdef STEED
-			    if (u.usteed)
+			    if (u.usteed) {
 				You_cant("lead %s through that closed door.",
 				      x_monnam(u.usteed,
 					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE));
-		 	    else {
-#else
+					 (char *)0, SUPPRESS_SADDLE, FALSE));
+			    } else
+#endif
+			    {
 			        pline("Ouch!  You bump into a door.");
 			        exercise(A_DEX, FALSE);
-#endif
-#ifdef STEED
 			    }
-#endif
 			} else pline("That door is closed.");
 		    }
 		}
