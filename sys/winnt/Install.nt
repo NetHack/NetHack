@@ -34,8 +34,9 @@ environments:
 		
 	OR
 
-  o A copy of Borland C 5.5.1 command line tools.  Borland has released its
-    command line tools to the public domain at 
+  o A copy of Borland C 5.5.1 command line tools.  Borland has made a
+    version of its command line tools available for download after
+    registration at:
     http://www.borland.com/bcppbuilder/freecompiler/.
 
 
