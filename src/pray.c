@@ -745,7 +745,7 @@ pleased(g_align)
 	    /* if hero was in trouble, but got better, no special favor */
 	    if (p_trouble == 0) pat_on_head = 1;
 	} else {
-	    int action = rn1(on_altar() ? 3 + on_shrine() : 2, Luck+1);
+	    int action = rn1(Luck + (on_altar() ? 3 + on_shrine() : 2), 1);
 
 	    if (!on_altar()) action = min(action, 2);
 	    if (u.ualign.record < STRIDENT)
