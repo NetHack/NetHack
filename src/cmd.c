@@ -971,7 +971,19 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	    you_have(enlght_combatinc("damage", u.udaminc, final, buf));
 	if (Slow_digestion) you_have("slower digestion");
 	if (Regeneration) enl_msg("You regenerate", "", "d", "");
-	if (u.uspellprot || Protection) you_are("protected");
+	if (u.uspellprot || Protection) {
+	    int prot = 0;
+
+	    if(uleft && uleft->otyp == RIN_PROTECTION) prot += uleft->spe;
+	    if(uright && uright->otyp == RIN_PROTECTION) prot += uright->spe;
+	    if (HProtection & INTRINSIC) prot += u.ublessed;
+	    prot += u.uspellprot;
+
+	    if (prot < 0)
+		you_are("ineffectively protected");
+	    else
+		you_are("protected");
+	}
 	if (Protection_from_shape_changers)
 		you_are("protected from shape changers");
 	if (Polymorph) you_are("polymorphing");
@@ -1474,8 +1486,8 @@ struct ext_func_tab extcmdlist[] = {
 #if defined(WIZARD)
 static const struct ext_func_tab debug_extcmdlist[] = {
 	{"levelchange", "change experience level", wiz_level_change, TRUE},
-	{"light sources", "show mobile light sources", wiz_light_sources, TRUE},
-	{"monpoly_control", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
+	{"lightsources", "show mobile light sources", wiz_light_sources, TRUE},
+	{"monpolycontrol", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
 	{"panic", "test panic routine (fatal to game)", wiz_panic, TRUE},
 	{"poly", "polymorph self", wiz_polyself, TRUE},
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
