@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2002/04/07	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2002/05/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1671,6 +1671,7 @@ in_container(obj)
 register struct obj *obj;
 {
 	boolean floor_container = !carried(current_container);
+	boolean was_unpaid = FALSE;
 	char buf[BUFSZ];
 
 	if (!current_container) {
@@ -1755,9 +1756,16 @@ register struct obj *obj;
 		(void) snuff_lit(obj);
 
 	if (floor_container && costly_spot(u.ux, u.uy)) {
+	    if (current_container->no_charge && !obj->unpaid) {
+		/* don't sell when putting the item into your own container */
+		obj->no_charge = 1;
+	    } else {
+		/* sellobj() will take an unpaid item off the shop bill */
+		was_unpaid = obj->unpaid ? TRUE : FALSE;
 		sellobj_state(SELL_DELIBERATE);
 		sellobj(obj, u.ux, u.uy);
 		sellobj_state(SELL_NORMAL);
+	    }
 	}
 	if (Icebox && obj->otyp != OIL_LAMP && obj->otyp != BRASS_LANTERN
 			&& !Is_candle(obj)) {
@@ -1768,21 +1776,11 @@ register struct obj *obj;
 			(void) stop_timer(REVIVE_MON, (genericptr_t)obj);
 			/* mark a non-reviving corpse as such */
 			if (rot_alarm) obj->norevive = 1;
-  		}
-	}
-
-	else if (Is_mbag(current_container) && mbag_explodes(obj, 0)) {
-		You("are blasted by a magical explosion!");
-
-		/* the !floor_container case is taken care of */
-		if(*u.ushops && costly_spot(u.ux, u.uy) && floor_container) {
-		    register struct monst *shkp;
-
-		    if ((shkp = shop_keeper(*u.ushops)) != 0)
-			(void)stolen_value(current_container, u.ux, u.uy,
-					   (boolean)shkp->mpeaceful, FALSE);
 		}
+	} else if (Is_mbag(current_container) && mbag_explodes(obj, 0)) {
+		You("are blasted by a magical explosion!");
 		/* did not actually insert obj yet */
+		if (was_unpaid) addtobill(obj, FALSE, FALSE, TRUE);
 		obfree(obj, (struct obj *)0);
 		delete_contents(current_container);
 		if (!floor_container)
