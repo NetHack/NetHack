@@ -18,6 +18,7 @@ static const char *developers[] = {
 	/* devteam */
 	"Dave", "Dean", "Eric", "Izchak", "Janet", "Jessie",
 	"Ken", "Kevin", "Michael", "Mike", "Pat", "Paul", "Steve", "Timo",
+	"Warwick",
 	/* PC team */
 	"Bill", "Eric", "Keizo", "Ken", "Kevin", "Michael", "Mike", "Paul",
 	"Stephen", "Steve", "Timo", "Yitzhak",
