@@ -244,7 +244,7 @@ fnd:
 	if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
 	    if (youmonst.m_ap_type == M_AP_OBJECT &&
 			youmonst.mappearance != GOLD_PIECE)
-	    	verbalize("Hey! who left that %s in here?", mimic_obj_name(&youmonst));
+	    	verbalize("Hey! Who left that %s in here?", mimic_obj_name(&youmonst));
 	    /* You're mimicking some object or you're hidden. */
 	    pline("Puzzled, %s turns around and leaves.", mhe(guard));
 	    mongone(guard);
