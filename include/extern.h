@@ -1405,6 +1405,7 @@ E int NDECL(dowhatdoes);
 E char *FDECL(dowhatdoes_core,(CHAR_P, char *));
 E int NDECL(dohelp);
 E int NDECL(dohistory);
+E int FDECL(do_look, (int, coord *));
 
 /* ### pcmain.c ### */
 

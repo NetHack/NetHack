@@ -262,6 +262,7 @@ struct instance_flags {
 	boolean wc_mouse_support;	/* allow mouse support */
 
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
+	boolean	 clicklook;	/* allow right-clicking for look */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
 #ifdef WIN32CON
 #define MAX_ALTKEYHANDLER 25

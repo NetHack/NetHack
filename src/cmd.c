@@ -14,7 +14,8 @@
 #define NR_OF_EOFS	20
 #endif
 
-#define CMD_TRAVEL (char)0x90
+#define CMD_TRAVEL	(char)0x90
+#define CMD_CLICKLOOK	(char)0x8F
 
 #ifdef DEBUG
 /*
@@ -151,6 +152,7 @@ static void NDECL(end_of_input);
 #endif /* OVLB */
 
 static const char* readchar_queue="";
+static coord clicklook_cc;
 
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P,const char *));
@@ -1853,6 +1855,12 @@ register char *cmd;
 		    flags.move = FALSE;
 		    multi = 0;
 		    return;
+	 case CMD_CLICKLOOK:
+		    if (iflags.clicklook) {
+		    	flags.move = FALSE;
+			do_look(2, &clicklook_cc);
+		    }
+		    return;
 	 case CMD_TRAVEL:
 		    if (flags.travelcmd) {
 			    flags.travel = 1;
@@ -2166,6 +2174,13 @@ click_to_cmd(x, y, mod)
     int dir;
     static char cmd[4];
     cmd[1]=0;
+
+    if (iflags.clicklook && mod == CLICK_2) {
+	clicklook_cc.x = x;
+	clicklook_cc.y = y;
+	cmd[0] = CMD_CLICKLOOK;
+	return cmd;
+    }
 
     x -= u.ux;
     y -= u.uy;

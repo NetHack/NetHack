@@ -41,6 +41,8 @@ General New Features
 --------------------
 burying a punishment ball no longer ends your punishment
 #tip command--pay a modest gratuity
+add clicklook option to allow looking at things on the display by clicking 
+	right mouse button when floating mouse pointer over them
 
 
 Platform- and/or Interface-Specific New Features

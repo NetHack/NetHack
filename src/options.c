@@ -68,6 +68,7 @@ static struct Bool_Opt
 #else
 	{"checkspace", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"clicklook", &iflags.clicklook, FALSE, SET_IN_GAME},
 	{"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
 # if defined(MICRO) || defined(WIN32)
 	{"color",         &iflags.wc_color,TRUE, SET_IN_GAME},		/*WC*/
