@@ -6,18 +6,6 @@
 
 #include "hack.h"
 
-
-#if 0
-int
-uptodate(int fd)
-#if defined(applec) || defined(__MWERKS__)
-# pragma unused(fd)
-#endif
-	return(1);
-}
-#endif
-
-
 void
 regularize(char *s)
 {
@@ -29,12 +17,11 @@ regularize(char *s)
 	}
 }
 
-
 void
 getlock(void)
 {
 	int fd;
-	int pid = getpid(); /* Process Serial Number ? */
+	int pid = getpid(); /* Process ID */
 	
 	set_levelfile_name (lock, 0);
 
