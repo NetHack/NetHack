@@ -706,7 +706,7 @@ unsigned trflags;
 		    stackobj(otmp);
 		    newsym(u.ux,u.uy);	/* map the rock */
 
-		    losehp(dmg, "falling rock", KILLED_BY_AN);
+		    losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
 		    exercise(A_STR, FALSE);
 		}
 		break;
@@ -906,12 +906,14 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		if (!steedintrap(trap, (struct obj *)0)) {
 #endif
 		if (ttype == SPIKED_PIT) {
-		    losehp(rnd(10),"fell into a pit of iron spikes",
+		    losehp(Maybe_Half_Phys(rnd(10)),
+			"fell into a pit of iron spikes",
 			NO_KILLER_PREFIX);
 		    if (!rn2(6))
 			poisoned("spikes", A_STR, "fall onto poison spikes", 8);
 		} else
-		    losehp(rnd(6),"fell into a pit", NO_KILLER_PREFIX);
+		    losehp(Maybe_Half_Phys(rnd(6)),"fell into a pit",
+			NO_KILLER_PREFIX);
 		if (Punished && !carried(uball)) {
 		    unplacebc();
 		    ballfall();
@@ -1140,7 +1142,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 			(void)keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
 #endif
 		newsym(u.ux,u.uy);		/* update trap symbol */
-		losehp(rnd(16), "land mine", KILLED_BY_AN);
+		losehp(Maybe_Half_Phys(rnd(16)), "land mine", KILLED_BY_AN);
 		/* fall recursively into the pit... */
 		if ((trap = t_at(u.ux, u.uy)) != 0) dotrap(trap, RECURSIVETRAP);
 		fill_pit(u.ux, u.uy);
@@ -2412,7 +2414,7 @@ struct obj *box;	/* null for floor trap */
 	    pline("A cascade of steamy bubbles erupts from %s!",
 		    the(box ? xname(box) : surface(u.ux,u.uy)));
 	    if (Fire_resistance) You("are uninjured.");
-	    else losehp(rnd(3), "boiling water", KILLED_BY);
+	    else losehp(Maybe_Half_Phys(rnd(3)), "boiling water", KILLED_BY);
 	    return;
 	}
 	pline("A %s %s from %s!", tower_of_flame,
@@ -3813,7 +3815,7 @@ register int bodypart;
 
 	pline("KABOOM!!  %s was booby-trapped!", The(item));
 	wake_nearby();
-	losehp(dmg, "explosion", KILLED_BY_AN);
+	losehp(Maybe_Half_Phys(dmg), "explosion", KILLED_BY_AN);
 	exercise(A_STR, FALSE);
 	if (bodypart) exercise(A_CON, FALSE);
 	make_stunned(HStun + dmg, TRUE);
@@ -3897,7 +3899,7 @@ lava_effects()
 	    dmg = d(6,6);
 	    pline_The("lava here burns you!");
 	    if(dmg < u.uhp) {
-		losehp(dmg, lava_killer, KILLED_BY);
+		losehp(Maybe_Half_Phys(dmg), lava_killer, KILLED_BY);
 		goto burn_stuff;
 	    }
 	} else
@@ -3954,7 +3956,7 @@ lava_effects()
 	u.utraptype = TT_LAVA;
 	You("sink into the lava, but it only burns slightly!");
 	if (u.uhp > 1)
-	    losehp(1, lava_killer, KILLED_BY);
+	    losehp(Half_physical_damage ? rn2(2) : 1, lava_killer, KILLED_BY);
     }
     /* just want to burn boots, not all armor; destroy_item doesn't work on
        armor anyway */

@@ -2183,7 +2183,7 @@ struct obj *obj;
 	if (dam <= 0) dam = 1;
 	You("hit your %s with your bullwhip.", body_part(FOOT));
 	Sprintf(buf, "killed %sself with %s bullwhip", uhim(), uhis());
-	losehp(dam, buf, NO_KILLER_PREFIX);
+	losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
 	context.botl = 1;
 	return 1;
 
@@ -2585,7 +2585,7 @@ use_grapple (obj)
 	default:	/* Yourself (oops!) */
 	    if (P_SKILL(typ) <= P_BASIC) {
 		You("hook yourself!");
-		losehp(rn1(10,10), "a grappling hook", KILLED_BY);
+		losehp(Maybe_Half_Phys(rn1(10,10)), "a grappling hook", KILLED_BY);
 		return (1);
 	    }
 	    break;

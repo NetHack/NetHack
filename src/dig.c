@@ -902,7 +902,7 @@ struct obj *obj;
 		You("hit yourself with %s.", yname(uwep));
 		Sprintf(buf, "%s own %s", uhis(),
 				OBJ_NAME(objects[obj->otyp]));
-		losehp(dam, buf, KILLED_BY);
+		losehp(Maybe_Half_Phys(dam), buf, KILLED_BY);
 		context.botl=1;
 		return(1);
 	} else if(u.dz == 0) {
@@ -1182,13 +1182,15 @@ zap_dig()
 	if (u.dz) {
 	    if (!Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz) && !Underwater) {
 		if (u.dz < 0 || On_stairs(u.ux, u.uy)) {
+		    int dmg;
 		    if (On_stairs(u.ux, u.uy))
 			pline_The("beam bounces off the %s and hits the %s.",
 			      (u.ux == xdnladder || u.ux == xupladder) ?
 			      "ladder" : "stairs", ceiling(u.ux, u.uy));
 		    You("loosen a rock from the %s.", ceiling(u.ux, u.uy));
 		    pline("It falls on your %s!", body_part(HEAD));
-		    losehp(rnd((uarmh && is_metallic(uarmh)) ? 2 : 6),
+		    dmg = rnd((uarmh && is_metallic(uarmh)) ? 2 : 6);
+		    losehp(Maybe_Half_Phys(dmg),
 			   "falling rock", KILLED_BY_AN);
 		    otmp = mksobj_at(ROCK, u.ux, u.uy, FALSE, FALSE);
 		    if (otmp) {

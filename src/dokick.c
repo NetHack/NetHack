@@ -614,6 +614,7 @@ dokick()
 {
 	int x, y;
 	int avrg_attrib;
+	int dmg = 0;
 	register struct monst *mtmp;
 	boolean no_kick = FALSE;
 	char buf[BUFSZ];
@@ -1000,7 +1001,8 @@ ouch:
 			maploc = &levl[x][y];
 		    }
 		    if(!rn2(3)) set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
-		    losehp(rnd(ACURR(A_CON) > 15 ? 3 : 5), kickstr(buf),
+		    dmg = rnd(ACURR(A_CON) > 15 ? 3 : 5);
+		    losehp(Maybe_Half_Phys(dmg), kickstr(buf),
 			KILLED_BY);
 		    if(Is_airlevel(&u.uz) || Levitation)
 			hurtle(-u.dx, -u.dy, rn1(2,4), TRUE); /* assume it's heavy */

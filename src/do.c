@@ -154,7 +154,8 @@ const char *verb;
 			mtmp->mtrapped = 0;
 		    } else {
 			if (!Passes_walls && !throws_rocks(youmonst.data)) {
-			    losehp(rnd(15), "squished under a boulder",
+			    losehp(Maybe_Half_Phys(rnd(15)),
+				   "squished under a boulder",
 				   NO_KILLER_PREFIX);
 			    return FALSE;	/* player remains trapped */
 			} else u.utrap = 0;
