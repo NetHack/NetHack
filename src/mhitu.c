@@ -1583,8 +1583,8 @@ dopois:
 		    *hpmax_p -= permdmg;
 		else if (*hpmax_p > lowerlimit)
 		    *hpmax_p = lowerlimit;
-		else	/* unlikely... */
-		    ;	/* already at or below minimum threshold; do nothing */
+		/* else unlikely...
+		 * already at or below minimum threshold; do nothing */
 		context.botl = 1;
 	    }
 
