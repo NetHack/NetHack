@@ -47,6 +47,8 @@ typedef long off_t;
 #else
 # define DLBFILE	"nhdat"			/* main library */
 # define DLBFILE2	"nhsdat"		/* sound library */
+#endif
+
 #define FILENAME_CMP	stricmp			/* case insensitive */
 
 #ifndef __SASC_60
