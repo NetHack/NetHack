@@ -162,6 +162,9 @@ E const char ynqchars[];
 E const char ynaqchars[];
 E const char ynNaqchars[];
 E NEARDATA long yn_number;
+
+E const char disclosure_options[];
+
 E NEARDATA int smeq[];
 E NEARDATA int doorindex;
 E NEARDATA char *save_cm;

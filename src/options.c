@@ -214,7 +214,7 @@ static struct Comp_Opt
 	{ "catname",  "the name of your (first) cat (e.g., catname:Tabby)",
 						PL_PSIZ, DISP_IN_GAME },
 	{ "disclose", "the kinds of information to disclose at end of game",
-						sizeof(flags.end_disclose),
+						sizeof(flags.end_disclose) * 2,
 						SET_IN_GAME },
 	{ "dogname",  "the name of your (first) dog (e.g., dogname:Fang)",
 						PL_PSIZ, DISP_IN_GAME },
@@ -499,6 +499,8 @@ initoptions()
 	flags.pickup_types[0] = '\0';
 	flags.pickup_burden = MOD_ENCUMBER;
 
+	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
+		flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
 	switch_graphics(ASCII_GRAPHICS);	/* set default characters */
 #if defined(UNIX) && defined(TTY_GRAPHICS)
 	/*
@@ -1554,7 +1556,28 @@ goodfruit:
 
 	/* things to disclose at end of game */
 	if (match_optname(opts, "disclose", 4, TRUE)) {
-		flags.end_disclose[0] = '\0';	/* all */
+		/*
+		 * The order that the end_disclore options are stored:
+		 * inventory, attribs, vanquished, genocided, conduct
+		 * There is an array in flags:
+		 *	end_disclose[NUM_DISCLOSURE_OPT];
+		 * with option settings for the each of the following:
+		 * iagvc [see disclosure_options in decl.c]:
+		 * Legal setting values in that array are:
+		 *	DISCLOSE_PROMPT_DEFAULT_YES  ask with default answer yes
+		 *	DISCLOSE_PROMPT_DEFAULT_NO   ask with default answer no
+		 *	DISCLOSE_YES_WITHOUT_PROMPT  always disclose and don't ask
+		 *	DISCLOSE_NO_WITHOUT_PROMPT   never disclose and don't ask
+		 *
+		 * Those setting values can be used in the option
+		 * string as a prefix to get the desired behaviour.
+		 *
+		 * For backward compatibility, no prefix is required,
+		 * and the presence of a i,a,g,v, or c without a
+		 * prefix sets the corresponding value to DISCLOSE_YES_WITHOUT_PROMPT;
+		 */
+		boolean badopt = FALSE;
+		int idx, prefix_val;
 		if (!(op = string_for_opt(opts, TRUE))) {
 			/* for backwards compatibility, "disclose" without a
 			 * value means all (was inventory and attributes,
@@ -1562,7 +1585,11 @@ goodfruit:
 			 * it means "none"
 			 * (note "none" contains none of "iavkgc")
 			 */
-			if (negated) Strcpy(flags.end_disclose, "none");
+			for (num = 0; num < NUM_DISCLOSURE_OPTIONS; num++) {
+				if (negated)
+				    flags.end_disclose[num] = DISCLOSE_NO_WITHOUT_PROMPT;
+			 	else flags.end_disclose[num] = DISCLOSE_PROMPT_DEFAULT_YES;
+			}
 			return;
 		}
 		if (negated) {
@@ -1570,16 +1597,37 @@ goodfruit:
 			return;
 		}
 		num = 0;
+		prefix_val = -1;
 		while (*op && num < sizeof flags.end_disclose - 1) {
-			register char c;
+			register char c, *dop;
+			char valid_settings[] = {
+				DISCLOSE_PROMPT_DEFAULT_YES,
+				DISCLOSE_PROMPT_DEFAULT_NO,
+				DISCLOSE_YES_WITHOUT_PROMPT,
+				DISCLOSE_NO_WITHOUT_PROMPT
+			};
 			c = lowc(*op);
 			if (c == 'k') c = 'v';	/* killed -> vanquished */
-			if (!index(flags.end_disclose, c)) {
-				flags.end_disclose[num++] = c;
-				flags.end_disclose[num] = '\0';	/* for index */
-			}
+			dop = index(disclosure_options, c);
+			if (dop) {
+				idx = dop - disclosure_options;
+				if (idx < 0 || idx > NUM_DISCLOSURE_OPTIONS - 1) {
+				    impossible("bad disclosure index %d %c",
+							idx, c);
+				    continue;
+				}
+				if (prefix_val != -1) {
+				    flags.end_disclose[idx] = prefix_val;
+				    prefix_val = -1;
+				} else
+				    flags.end_disclose[idx] = DISCLOSE_YES_WITHOUT_PROMPT;
+			} else if (index(valid_settings, c)) {
+				prefix_val = c;
+			} else
+				badopt = TRUE;				
 			op++;
 		}
+		if (badopt) badoption(opts);
 		return;
 	}
 
@@ -2188,7 +2236,7 @@ boolean setinitial,setfromfile;
     char buf[BUFSZ];
     boolean retval = FALSE;
     
-    /* Special handling of menustyle, pickup_burden, and pickup_types. */
+    /* Special handling of menustyle, pickup_burden, and pickup_types, disclose options. */
     if (!strcmp("menustyle", optname)) {
 	const char *style_name;
 	menu_item *style_pick = (menu_item *)0;
@@ -2231,6 +2279,71 @@ boolean setinitial,setfromfile;
 	/* parseoptions will prompt for the list of types */
 	parseoptions(strcpy(buf, "pickup_types"), setinitial, setfromfile);
 	retval = TRUE;
+    } else if (!strcmp("disclose", optname)) {
+	int pick_cnt, pick_idx, opt_idx;
+	winid tmpwin;
+	menu_item *disclosure_category_pick = (menu_item *)0;
+	/*
+	 * The order of disclose_names[]
+         * must correspond to disclosure_options in decl.h
+         */
+	const char *disclosure_names[] = {
+		"inventory", "attributes", "vanquished", "genocides", "conduct"
+	};
+	int disc_cat[NUM_DISCLOSURE_OPTIONS];
+	const char *disclosure_name;
+
+        tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
+		disclosure_name = disclosure_names[i];
+		any.a_int = i + 1;
+		add_menu(tmpwin, NO_GLYPH, &any, disclosure_options[i], 0,
+			 ATR_NONE, disclosure_name, MENU_UNSELECTED);
+		disc_cat[i] = 0;
+        }
+	end_menu(tmpwin, "Change which disclosure options categories:");
+	if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &disclosure_category_pick)) > 0) {
+	    for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+		opt_idx = disclosure_category_pick[pick_idx].item.a_int - 1;
+		disc_cat[opt_idx] = 1;
+	    }
+	    free((genericptr_t)disclosure_category_pick);
+	    disclosure_category_pick = (menu_item *)0;
+	}
+	destroy_nhwindow(tmpwin);
+
+	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
+	    if (disc_cat[i]) {
+	    	char dbuf[BUFSZ];
+		menu_item *disclosure_option_pick = (menu_item *)0;
+		Sprintf(dbuf, "Disclosure options for %s:", disclosure_names[i]);
+	        tmpwin = create_nhwindow(NHW_MENU);
+		start_menu(tmpwin);
+		any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
+		add_menu(tmpwin, NO_GLYPH, &any, 'a', 0,
+			ATR_NONE,"Never disclose and don't prompt", MENU_UNSELECTED);
+		any.a_void = 0;
+		any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
+		add_menu(tmpwin, NO_GLYPH, &any, 'b', 0,
+			ATR_NONE,"Always disclose and don't prompt", MENU_UNSELECTED);
+		any.a_void = 0;
+		any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
+		add_menu(tmpwin, NO_GLYPH, &any, 'c', 0,
+			ATR_NONE,"Prompt and default answer to \"No\"", MENU_UNSELECTED);
+		any.a_void = 0;
+		any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
+		add_menu(tmpwin, NO_GLYPH, &any, 'd', 0,
+			ATR_NONE,"Prompt and default answer to \"Yes\"", MENU_UNSELECTED);
+		end_menu(tmpwin, dbuf);
+		if (select_menu(tmpwin, PICK_ONE, &disclosure_option_pick) > 0) {
+			flags.end_disclose[i] = disclosure_option_pick->item.a_char;
+			free((genericptr_t)disclosure_option_pick);
+		}
+		destroy_nhwindow(tmpwin);
+	    }
+	}
+	retval = TRUE;
     }
     return retval;
 }
@@ -2248,9 +2361,7 @@ char *buf;
 	char ocl[MAXOCLASSES+1];
 	static const char none[] = "(none)", randomrole[] = "random",
 		     to_be_done[] = "(to be done)";
-#ifdef PREFIXES_IN_USE
 	int i;
-#endif
 
 	buf[0] = '\0';
 	if (!strcmp(optname,"align"))
@@ -2260,9 +2371,17 @@ char *buf;
 			iflags.bouldersym : oc_syms[(int)objects[BOULDER].oc_class]);
 	else if (!strcmp(optname, "catname")) 
 		Sprintf(buf, "%s", catname[0] ? catname : none );
-	else if (!strcmp(optname, "disclose")) 
-		Sprintf(buf, "%s",
-			flags.end_disclose[0] ? flags.end_disclose : "all" );
+	else if (!strcmp(optname, "disclose")) {
+		boolean all = TRUE, dnone = TRUE;
+		for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
+			char topt[2];
+			topt[1] = '\0';
+			topt[0] = flags.end_disclose[i];
+			Strcat(buf, topt);
+			topt[0] = disclosure_options[i];
+			Strcat(buf, topt);
+		}
+	}
 	else if (!strcmp(optname, "dogname")) 
 		Sprintf(buf, "%s", dogname[0] ? dogname : none );
 	else if (!strcmp(optname, "dungeon"))

@@ -73,6 +73,8 @@ const char ynaqchars[] = "ynaq";
 const char ynNaqchars[] = "yn#aq";
 NEARDATA long yn_number = 0L;
 
+const char disclosure_options[] = "iavgc";
+
 #ifdef MICRO
 char hackdir[PATHLEN];		/* where rumors, help, record are */
 char levels[PATHLEN];		/* where levels are */

@@ -4,7 +4,7 @@
 .ds vr "NetHack 3.3
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "January 22, 2002
+.ds f2 "January 26, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1646,13 +1646,41 @@ This option also sets up proper handling of graphics
 characters for such terminals, so you should specify it when appropriate
 even if you override the selections with your own graphics strings.
 .lp disclose
-Offer to disclose various information when the game ends (default all).
-The possibilities are identifying your inventory ('i'),
-disclosing your attributes ('a'), summarizing monsters that have been
-vanquished ('v'), listing monster species that have been genocided ('g'),
-and displaying your conduct ('c').
+Controls options for disclosing various information when the game ends (defaults
+to all possibilities being disclosed).
+The possibilities are:
+.sd
+.si
+i - disclose your inventory.
+a - disclose your attributes.
+v - summarizing monsters that have been vanquished.
+g - listing monster species that have been genocided.
+c - displaying your conduct.
+.ei
+.ed
+Each disclosure possibility can optionally be preceded by a prefix which
+let you refine how it behaves. Here are some of the prefixes:
+.sd
+.si
+y - prompt you and default to yes on the prompt.
+n - prompt you and default to no on the prompt.
++ - disclose it without prompting.
+- - do not disclose it and do not prompt.
+.ei
+.ed
 Note that the vanquished monsters list includes all monsters killed by
-traps and each other as well as by you.
+traps and each other as well as by you.(ex. ``disclose:yina+v-g-c'')
+The example sets 
+.op inventory
+to prompt and default to yes,
+.op attributes
+to prompt and default to no,
+.op vanquished
+to disclose without prompting,
+.op genocided
+to not disclose and not to prompt,
+.op conduct
+to not disclose and not to prompt.
 .lp dogname
 Name your starting dog (ex. ``dogname:Fang'').
 Cannot be set with the `O' command.

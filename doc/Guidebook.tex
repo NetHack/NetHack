@@ -39,7 +39,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.3)}
-\date{January 22, 2002}
+\date{January 26, 2002}
 
 \maketitle
 
@@ -2067,13 +2067,39 @@ characters for such terminals, so you should specify it when appropriate
 even if you override the selections with your own graphics strings.
 %.lp
 \item[\ib{disclose}]
-Offer to disclose various information when the game ends (default all).
-The possibilities are identifying your inventory (`{\tt i}'),
-disclosing your attributes (`{\tt a}'), summarizing monsters that have been
-vanquished (`{\tt v}'), listing monster species that have been
-genocided (`{\tt g}'), and displaying your conduct (`{\tt c}').
+Controls options for disclosing various information when the game ends (defaults
+to all possibilities being disclosed).
+The possibilities are:
+
+%.sd
+%.si
+{\tt i} --- disclose your inventory.\\
+{\tt a} --- disclose your attributes.\\
+{\tt v} --- summarizing monsters that have been vanquished.\\
+{\tt g} --- listing monster species that have been genocided.\\
+{\tt c} --- displaying your conduct.
+%.ei
+%.ed
+
+Each disclosure possibility can optionally be preceded by a prefix which
+let you refine how it behaves. Here are some of the prefixes:
+
+%.sd
+%.si
+{\tt y} --- prompt you and default to yes on the prompt.\\
+{\tt n} --- prompt you and default to no on the prompt.\\
+{\tt +} --- disclose it without prompting.\\
+{\tt -} --- do not disclose it and do not prompt.
+%.ei
+%.ed
+
 Note that the vanquished monsters list includes all monsters killed by
-traps and each other as well as by you.
+traps and each other as well as by you. (ex.\ ``{\tt disclose:yina+v-g-c}'')
+The example sets {\it inventory\/} to {\it prompt\/} and default to {\it yes\/}, 
+{\it attributes\/} to {\it prompt\/} and default to {\it no\/}, 
+{\it vanquished\/} to {\it disclose without prompting\/}, 
+{\it genocided\/} to {\it not disclose\/} and not to {\it prompt\/}, and 
+{\it conduct\/} to {\it not disclose\/} and not to {\it prompt\/}.
 %.lp
 \item[\ib{dogname}]
 Name your starting dog (ex.\ ``{\tt dogname:Fang}'').

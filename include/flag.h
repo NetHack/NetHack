@@ -100,7 +100,13 @@ struct flag {
 	int	 pickup_burden;		/* maximum burden before prompt */
 	char	 inv_order[MAXOCLASSES];
 	char	 pickup_types[MAXOCLASSES];
-	char	 end_disclose[6];	/* disclose various info upon exit */
+#define NUM_DISCLOSURE_OPTIONS		5
+#define DISCLOSE_PROMPT_DEFAULT_YES	'y'
+#define DISCLOSE_PROMPT_DEFAULT_NO	'n'
+#define DISCLOSE_YES_WITHOUT_PROMPT	'+'
+#define DISCLOSE_NO_WITHOUT_PROMPT	'-'
+	char	 end_disclose[NUM_DISCLOSURE_OPTIONS + 1];  /* disclose various info
+								upon exit */
 	char	 menu_style;	/* User interface style setting */
 #ifdef AMII_GRAPHICS
 	int numcols;
