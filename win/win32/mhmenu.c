@@ -900,7 +900,9 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	/* draw focused item */
-	if( item->has_focus ) {
+	if( item->has_focus 
+        || (NHMENU_IS_SELECTABLE(*item) && 
+			data->menu.items[lpdis->itemID].count!=-1)) {
 		RECT client_rt;
 
 		GetClientRect(lpdis->hwndItem, &client_rt);
@@ -932,8 +934,12 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			DrawText(lpdis->hDC, wbuf, _tcslen(wbuf), &drawRect, 
 					 DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX );
 		}
-
+    }
+    if (item->has_focus) {
 		/* draw focus rect */
+		RECT client_rt;
+
+		GetClientRect(lpdis->hwndItem, &client_rt);
 		SetRect( &drawRect, client_rt.left, lpdis->rcItem.top, client_rt.right, lpdis->rcItem.bottom );
 		DrawFocusRect(lpdis->hDC, &drawRect);
 	}
