@@ -99,7 +99,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     if (FAILED(GetComCtlVersion(&major, &minor)))
     {
         char buf[TBUFSZ];
-        Sprintf(buf, "Cannot load common control library.\n%s\%s"
+        Sprintf(buf, "Cannot load common control library.\n%s\n%s"
               "For further information, refer to the installation notes at",
 		INSTALL_NOTES);
         panic(buf);
