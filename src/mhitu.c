@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2003/01/02	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2003/09/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1861,33 +1861,33 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 	switch(mattk->adtyp) {
 	    case AD_STON:
 		if (mtmp->mcan || !mtmp->mcansee) {
-		    if (mtmp->data == &mons[PM_MEDUSA] && canseemon(mtmp)) {
-			if (mtmp->mcan) {
-			    pline("%s doesn't look all that ugly.",
-				  Monnam(mtmp));
-			    break;
-			}
-		    }
-		    if (canseemon(mtmp))
-			pline("%s gazes ineffectually.", Monnam(mtmp));
+		    if (!canseemon(mtmp)) break;	/* silently */
+		    pline("%s %s.", Monnam(mtmp),
+			  (mtmp->data == &mons[PM_MEDUSA] && mtmp->mcan) ?
+				"doesn't look all that ugly" :
+				"gazes ineffectually");
 		    break;
 		}
-		if (Reflecting && canspotmon(mtmp) &&
-		    mtmp->data == &mons[PM_MEDUSA]) {
-		    if(!Blind) {
-		    	(void) ureflects("%s gaze is reflected by your %s.",
-		    			s_suffix(Monnam(mtmp)));
-		    	if (mon_reflects(mtmp,
-		    			"The gaze is reflected away by %s %s!"))
-		    	    break;
-			if (!m_canseeu(mtmp)) { /* probably you're invisible */
-			    pline("%s doesn't seem to notice that %s gaze was reflected.",
-				Monnam(mtmp),
-				mhis(mtmp));
-			    break;
-			}
-			pline("%s is turned to stone!", Monnam(mtmp));
+		if (Reflecting && couldsee(mtmp->mx, mtmp->my) &&
+			mtmp->data == &mons[PM_MEDUSA]) {
+		    /* hero has line of sight to Medusa and she's not blind */
+		    boolean useeit = canseemon(mtmp);
+
+		    if (useeit)
+			(void) ureflects("%s gaze is reflected by your %s.",
+					 s_suffix(Monnam(mtmp)));
+		    if (mon_reflects(mtmp, !useeit ? (char *)0 :
+				     "The gaze is reflected away by %s %s!"))
+			break;
+		    if (!m_canseeu(mtmp)) { /* probably you're invisible */
+			if (useeit)
+			    pline(
+		      "%s doesn't seem to notice that %s gaze was reflected.",
+				  Monnam(mtmp), mhis(mtmp));
+			break;
 		    }
+		    if (useeit)
+			pline("%s is turned to stone!", Monnam(mtmp));
 		    stoned = TRUE;
 		    killed(mtmp);
 
