@@ -310,7 +310,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_APP_TITLE           "NetHack for Windows - Graphical Port"
+    IDS_APP_TITLE           "NetHack for Windows - Graphical Interface"
     IDC_NETHACKW            "NETHACKW"
 END
 

@@ -1,0 +1,221 @@
+        Microsoft Windows specific help file for NetHack 3.4.0
+        Copyright (c) NetHack PC Development Team 1993-2002.
+        NetHack may be freely distributed.  See license for details.
+                   (Last Revision: March 10, 2002)
+
+This file details specifics for NetHack built for Windows 95, 98, NT, 
+Me, 2000, and XP. Users of really early 16-bit Windows versions should 
+use the MSDOS NetHack. 
+
+Please note that "NetHack for Windows - Graphical Interface" requires 
+an installation of Internet Explorer 4 or an installation of 
+version 4.71 of the common controls. See the following internet page: 
+    http://www.nethack.org/v340/ports/download-win.html#cc
+for more information. If the game runs for you, you are not affected.
+
+New players should be sure to read GuideBook.txt which contains 
+essential information about playing NetHack. It can be found in the
+same directory as your NetHack executable.
+
+The Windows port of NetHack supports some additional or enhanced 
+commands as well as some defaults.nh file options specific to 
+configuration choices used during the building of NetHack for 
+Windows. Listed below are those commands and defaults.nh file 
+options. 
+
+Some options are applicable only to the graphical port. 
+These are discussed separately in their own section. 
+
+Contents
+1. Boolean options
+2. Graphical Port Complex options
+3. Graphical Port Additional/Enhanced Commands
+4. Available ALT Key Combinations
+5. Graphical Port Menus
+
+1. Boolean Options
+------------------
+
+Listed here are any options not discussed in the main help, options 
+which may be slightly different from the main help file, and options 
+which may need a slightly more explanatory note: 
+
+    color          Use color when displaying non-tiled maps. Tiled 
+                   maps (available in the graphical port) are always 
+                   rendered in color. Default: [TRUE]
+
+    IBMgraphics    Use IBM extended characters for the dungeon 
+                   Default: [TRUE] 
+ 
+    use_inverse    Use inverse color for detection (similar to hilite_pet). 
+                   Default: [FALSE] 
+
+    msg_window     When ^P is pressed, it shows menu in a full window.
+                   Default: [FALSE] 
+
+
+2. Graphical Port Complex Options
+---------------------------------
+
+"NetHack for Windows - Graphical Interface" recognizes the following 
+additional options, which the non-graphical (tty) version will
+silently ignore:
+
+Window Alignment options:
+
+                   |
+    align_message  Specifies at which side of the NetHack screen the 
+                   message window is aligned. This option can be used 
+                   to align the window to "top" or "bottom". "left" 
+                   or "right" are possible, but not properly supported 
+                   in the Microsoft Windows port. Default: [TOP] 
+
+    align_status   Specifies at which side of the NetHack screen the 
+                   status window is aligned. This option can be used 
+                   to align the window to "top" or "bottom". "left" 
+                   or "right" are possible, but not properly supported 
+                   in the Microsoft Windows port. Default: [BOTTOM] 
+
+Other Window options:
+
+These are options that specify attributes of various windows. 
+These include the menu windows (such as the inventory list), 
+the text windows (such as "It is written in the book of ..." 
+screens), the message window (where events of the game are 
+displayed), and the status window (where your character name 
+and attributes are displayed). 
+
+    font_menu      Specifies the name of the menu font. 
+    font_message   Specifies the name of the message font. 
+    font_status    Specifies the name of the status font. 
+    font_text      Specifies the name of the text font. 
+
+    font_size_menu Specifies the size of the menu font. 
+    font_size_message 
+                   Specifies the size of the message font.
+    font_size_status 
+                   Specifies the size of the status font.
+    font_size_text 
+                   Specifies the size of the text font. 
+
+Map Window options:
+
+    map_mode       Specifies which map mode to use. 
+                   The following map modes are available: 
+                   tiles (uses tiles to display things on the map), 
+                   ascii4x6ascii6x8, ascii8x8, ascii16x8, ascii7x12
+                   ascii8x12, ascii16x12, ascii12x16, ascii10x18
+                   (which use that size font to display things on 
+                   the map), or fit_to_screen (which forces things
+                   to fit on a single screen display whether tiled
+                   or ascii). Default: [tiles]
+
+    scroll_margin  Specifies the margin of scrolling the map. 
+                   Recommended to be set to 1 or greater. If set to 
+                   80, this will keep your character centered on the map. 
+                   Default: [5] 
+
+    tile_file      An alternative file containing bitmap to use for 
+                   tiles. This file should be a .bmp file and should 
+                   be organized as 40 rectangular tiles wide. It is 
+                   beyond the scope of this document to describe the 
+                   exact contents of each tile in the .bmp which may 
+                   even be dependent on the options that your version 
+                   of NetHack was built with. 
+
+                   If you are interested in creating a tile file of 
+                   your own, create a regular build of NetHack using 
+                   the graphical version and examine the file tiles.bmp 
+                   in the src or build directory. This option may 
+                   only be specified in the defaults.nh config file. 
+                   Default: [default] 
+
+   tile_height     Used with tile_file to specify the width of each 
+                   tile in pixels. This option may only be specified
+                   in the defaults.nh config file. 
+                   Default: [16] 
+
+   tile_width      Used with tile_file to specify the height of each 
+                   tile in pixels. This option may only be specified
+                   in the defaults.nh config file. 
+                   Default: [16]
+
+Miscellaneous options: 
+
+    vary_msgcount  Number of lines to display in message window. 
+
+
+3. Graphical Port Additional/Enhanced Commands
+----------------------------------------------
+
+The following function keys are active in
+the "NetHack for Windows - Graphical Interface": 
+
+    F4             Toggle level overview mode on/off 
+                   This key will toggle the map between a view that 
+                   is mapped to fit exactly to the window, and the 
+                   view that shows the various symbols in their 
+                   normal size. This is useful for getting an idea 
+                   of where you are in a level. 
+
+    F5             Toggle tiled display on/off. 
+                   This key switches between the tiled and the 
+                   traditional ASCII display. This is equivalent to 
+                   using the "map_mode" option. 
+
+    F10            Activate menu bar. 
+                   This key will activate the menu bar, allowing you 
+                   to select between the menus: File, Map, 
+                   Window Settings, and Help. 
+
+4. Available ALT Key Combinations
+---------------------------------
+
+While playing NetHack under Windows you can press the ALT key in 
+combination with another key to execute an extended command as an 
+alternative method to pressing a # key sequence. (The non-graphical
+(tty) version is always running in NetHack mode, but 
+"NetHack for Windows - Graphical Interface" can be toggled): 
+
+    Alt-a    adjust         - adjust inventory letters.
+    Alt-c    chat           - talk to someone or something.
+    Alt-d    dip            - dip an object into something.
+    Alt-e    enhance        - enhance your skill with a weapon.
+    Alt-f    force          - force a lock. [works in NetHack mode only]
+    Alt-i    invoke         - invoke an object's powers.
+    Alt-j    jump           - jump to a location.
+    Alt-l    loot           - loot a box on the floor.
+    Alt-m    monster        - use a monster's special ability. 
+                              [works in NetHack mode only]
+    Alt-n    name           - name an item or type of object.
+    Alt-o    offer          - offer a sacrifice to the gods.
+    Alt-p    pray           - pray to the gods for help.
+    Alt-q    quit           - quit the game. (Same as #quit)
+    Alt-r    rub            - rub a lamp.
+    Alt-s    sit            - sit down. [works in NetHack mode only]
+    Alt-t    turn           - turn undead.
+    Alt-u    untrap         - untrap something.
+    Alt-v    version        - list compile time options for this version of
+                              NetHack.
+    Alt-w    wipe           - wipe off your face.
+
+5. Graphical Port Menus
+-----------------------
+
+File
+  Save - Allows you to save and exit the game
+  Quit - Allows you to quit the game
+
+Map - Provides for selection of map mode. Equivalent to using 
+the map_mode option. 
+
+Window Settings - Changes your logged-on user's settings for 
+NetHack. In 3.4.0, only one setting is available: NetHack 
+mode (or not). NetHack mode allows you to use ALT-f, ALT-m, and ALT-s 
+for game key commands [see list above]. You can use F10 to 
+access the menu bar while in NetHack mode. You can also 
+clear your logged-on user's settings for NetHack. Settings 
+in this window are saved in your logged-on user's registry. 
+
+Help - Provides help about various portions of NetHack.
+

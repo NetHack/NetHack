@@ -174,7 +174,7 @@ sys/winnt:
 (files for Windows 9x, NT and Windows2000 version)
 console.rc      defaults.nh     Install.nt      Makefile.bcc    Makefile.gcc
 Makefile.msc    mapimail.c      nethack.def     nhico.uu        nhsetup.bat
-ntsound.c       nttty.c         win32api.h      winnt.c
+ntsound.c       nttty.c         porthelp        win32api.h      winnt.c
 
 util:
 (files for all versions)
