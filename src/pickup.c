@@ -1302,8 +1302,8 @@ boolean telekinesis;	/* not picking it up directly by hand */
 }
 
 /*
- * Do the actual work of picking otmp from the floor and putting
- * it in the hero's inventory.  Take care of billing.  Return a
+ * Do the actual work of picking otmp from the floor or monster's interior
+ * and putting it in the hero's inventory.  Take care of billing.  Return a
  * pointer to the object where otmp ends up.  This may be different
  * from otmp because of merging.
  *
@@ -1314,7 +1314,7 @@ pick_obj(otmp)
 struct obj *otmp;
 {
 	obj_extract_self(otmp);
-	if (otmp != uball && costly_spot(otmp->ox, otmp->oy)) {
+	if (!u.uswallow && otmp != uball && costly_spot(otmp->ox, otmp->oy)) {
 	    char saveushops[5], fakeshop[2];
 
 	    /* addtobill cares about your location rather than the object's;
