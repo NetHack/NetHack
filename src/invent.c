@@ -1367,7 +1367,7 @@ register int FDECL((*fn),(OBJ_P)), FDECL((*ckfn),(OBJ_P));
 	register char sym, ilet;
 	register int cnt = 0, dud = 0, tmp;
 	boolean takeoff, nodot, ident, ininv;
-	char qbuf[QBUFSZ];
+	char qbuf[BUFSZ];
 
 	takeoff = taking_off(word);
 	ident = !strcmp(word, "identify");
@@ -1390,10 +1390,17 @@ nextclass:
 		if (ident && !not_fully_identified(otmp)) continue;
 		if (ckfn && !(*ckfn)(otmp)) continue;
 		if (!allflag) {
-			Strcpy(qbuf, !ininv ? doname(otmp) :
-				xprname(otmp, (char *)0, ilet, !nodot, 0L, 0L));
-			Strcat(qbuf, "?");
-			sym = (takeoff || ident || otmp->quan < 2L) ?
+		    Strcpy(qbuf, !ininv ? doname(otmp) :
+			   xprname(otmp, (char *)0, ilet, !nodot, 0L, 0L));
+		    /* this code seemed too complex to use safe_qbuf */
+		    if (strlen(qbuf) > QBUFSZ - 20) {
+			Strcpy(qbuf,
+			       !ininv ? an(simple_typename(otmp->otyp)) :
+			       xprname(otmp, simple_typename(otmp->otyp),
+				       ilet, !nodot, 0L, 0L));
+		    }
+		    Strcat(qbuf, "?");
+		    sym = (takeoff || ident || otmp->quan < 2L) ?
 				nyaq(qbuf) : nyNaq(qbuf);
 		}
 		else	sym = 'y';
@@ -2999,17 +3006,19 @@ display_cinventory(obj)
 register struct obj *obj;
 {
 	struct obj *ret;
-	char tmp[QBUFSZ];
+	char qbuf[QBUFSZ];
 	int n;
 	menu_item *selected = 0;
 
-	Sprintf(tmp,"Contents of %s:", doname(obj));
+	Sprintf(qbuf,"Contents of %s:",
+		safe_qbuf("", sizeof("Contents of :"),
+			  doname(obj), simple_typename(obj->otyp), ""));
 
 	if (obj->cobj) {
-	    n = query_objlist(tmp, obj->cobj, INVORDER_SORT, &selected,
+	    n = query_objlist(qbuf, obj->cobj, INVORDER_SORT, &selected,
 			    PICK_NONE, allow_all);
 	} else {
-	    invdisp_nothing(tmp, "(empty)");
+	    invdisp_nothing(qbuf, "(empty)");
 	    n = 0;
 	}
 	if (n > 0) {

@@ -2552,19 +2552,21 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 
 	/* Is there some food (probably a heavy corpse) here on the ground? */
 	for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
-		if(corpsecheck ?
+	    if (corpsecheck ?
 		(otmp->otyp==CORPSE && (corpsecheck == 1 || tinnable(otmp))) :
 		    feeding ? (otmp->oclass != COIN_CLASS && is_edible(otmp)) :
 						otmp->oclass==FOOD_CLASS) {
-			Sprintf(qbuf, "There %s %s here; %s %s?",
-				otense(otmp, "are"),
-				doname(otmp), verb,
-				(otmp->quan == 1L) ? "it" : "one");
-			if((c = yn_function(qbuf,ynqchars,'n')) == 'y')
-				return(otmp);
-			else if(c == 'q')
-				return((struct obj *) 0);
-		}
+		Sprintf(qbuf, "There %s ", otense(otmp, "are"));
+		Sprintf(eos(qbuf), "%s here; %s %s?",
+			safe_qbuf(qbuf, sizeof(" here;  ...?") + strlen(verb),
+				  doname(otmp), simple_typename(otmp->otyp),
+				  "something"),
+			verb, (otmp->quan == 1L) ? "it" : "one");
+		if ((c = yn_function(qbuf,ynqchars,'n')) == 'y')
+		    return(otmp);
+		else if (c == 'q')
+		    return((struct obj *) 0);
+	    }
 	}
 
  skipfloor:

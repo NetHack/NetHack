@@ -308,8 +308,11 @@ register struct obj *obj;
 	const char *aname;
 	short objtyp;
 
-	Sprintf(qbuf, "What do you want to name %s %s?",
-		is_plural(obj) ? "these" : "this", xname(obj));
+	Sprintf(qbuf, "What do you want to name %s ",
+		is_plural(obj) ? "these" : "this");
+	Sprintf(eos(qbuf), "%s?",
+		safe_qbuf(qbuf, sizeof("?"),
+			  xname(obj), simple_typename(obj->otyp), ""));
 	getlin(qbuf, buf);
 	if(!*buf || *buf == '\033')	return;
 	/* strip leading and trailing spaces; unnames item if all spaces */
