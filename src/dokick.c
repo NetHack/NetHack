@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.4	2000/04/21	*/
+/*	SCCS Id: @(#)dokick.c	3.4	2002/07/25	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,6 +34,7 @@ register boolean clumsy;
 	register int dmg = ( ACURRSTR + ACURR(A_DEX) + ACURR(A_CON) )/ 15;
 	int kick_skill = P_NONE;
 	int blessed_foot_damage = 0;
+	boolean trapkilled = FALSE;
 
 	if (uarmf && uarmf->otyp == KICKING_BOOTS)
 	    dmg += 5;
@@ -100,13 +101,13 @@ register boolean clumsy;
 			    place_monster(mon, mdx, mdy);
 			    newsym(mon->mx, mon->my);
 			    set_apparxy(mon);
-			    (void) mintrap(mon);
+			    if (mintrap(mon) == 2) trapkilled = TRUE;
 			}
 		}
 	}
 
 	(void) passive(mon, TRUE, mon->mhp > 0, AT_KICK);
-	if (mon->mhp <= 0) killed(mon);
+	if (mon->mhp <= 0 && !trapkilled) killed(mon);
 
 	/* may bring up a dialog, so put this after all messages */
 	if (kick_skill != P_NONE)	/* exercise proficiency */
