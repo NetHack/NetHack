@@ -238,7 +238,7 @@ int lev;
 	set_levelfile_name(lock, lev);
 	fq_lock = fqname(lock, LEVELPREFIX, 0);
 
-#if defined(MICRO)
+#if defined(MICRO) || defined(WIN32)
 	/* Use O_TRUNC to force the file to be shortened if it already
 	 * exists and is currently longer.
 	 */
@@ -249,7 +249,7 @@ int lev;
 # else
 	fd = creat(fq_lock, FCMASK);
 # endif
-#endif /* MICRO */
+#endif /* MICRO || WIN32 */
 
 	if (fd >= 0)
 	    level_info[lev].flags |= LFILE_EXISTS;
@@ -377,7 +377,7 @@ char **bonesid;
 	file = set_bonestemp_name();
 	file = fqname(file, BONESPREFIX, 0);
 
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 	/* Use O_TRUNC to force the file to be shortened if it already
 	 * exists and is currently longer.
 	 */
@@ -399,7 +399,7 @@ char **bonesid;
 	 */
 	(void) chmod(file, FCMASK | 007);  /* allow other users full access */
 # endif /* VMS && !SECURE */
-#endif /* MICRO */
+#endif /* MICRO || WIN32*/
 
 	return fd;
 }
@@ -499,7 +499,7 @@ set_savefile_name()
 	regularize(SAVEF+7);
 	Strcat(SAVEF, ";1");
 #else
-# if defined(MICRO) && !defined(WIN32)
+# if defined(MICRO)
 	Strcpy(SAVEF, SAVEP);
 #  ifdef AMIGA
 	strncat(SAVEF, bbs_id, PATHLEN);
@@ -566,7 +566,7 @@ create_savefile()
 	int fd;
 
 	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 	fd = open(fq_save, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
 #else
 # ifdef MAC
@@ -1112,7 +1112,7 @@ const char *filename;
 		}
 	}
 
-#if defined(MICRO) || defined(MAC) || defined(__BEOS__)
+#if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
 	if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r"))
 								!= (FILE *)0)
 		return(fp);
@@ -1538,7 +1538,7 @@ const char *filename;
 #define tmp_levels	(char *)0
 #define tmp_ramdisk	(char *)0
 
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 #undef tmp_levels
 	char	tmp_levels[PATHLEN];
 # ifdef MFLOPPY
@@ -1553,7 +1553,7 @@ const char *filename;
 
 	if (!(fp = fopen_config_file(filename))) return;
 
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 # ifdef MFLOPPY
 #  ifndef AMIGA
 	tmp_ramdisk[0] = 0;
@@ -1735,7 +1735,7 @@ const char *dir;
 	    wait_synch();
 	}
 #endif  /* !UNIX && !VMS */
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 	char tmp[PATHLEN];
 
 # ifdef OS2_CODEVIEW   /* explicit path on opening for OS/2 */
@@ -1768,7 +1768,7 @@ const char *dir;
 		(void) close(fd);
 	} else		/* open succeeded */
 	    (void) close(fd);
-#else /* MICRO */
+#else /* MICRO || WIN32*/
 
 # ifdef MAC
 	/* Create the "record" file, if necessary */
@@ -1777,7 +1777,7 @@ const char *dir;
 	if (fd != -1) macclose (fd);
 # endif /* MAC */
 
-#endif /* MICRO */
+#endif /* MICRO || WIN32*/
 }
 
 /* ----------  END SCOREBOARD CREATION ----------- */

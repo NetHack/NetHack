@@ -77,10 +77,12 @@ NEARDATA long yn_number = 0L;
 
 const char disclosure_options[] = "iavgc";
 
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 char hackdir[PATHLEN];		/* where rumors, help, record are */
+# ifdef MICRO
 char levels[PATHLEN];		/* where levels are */
-#endif /* MICRO */
+# endif
+#endif /* MICRO || WIN32 */
 
 
 #ifdef MFLOPPY

@@ -19,7 +19,7 @@ STATIC_DCL void NDECL(do_positionbar);
 void
 moveloop()
 {
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
     char ch;
     int abort_lev;
 #endif
@@ -315,7 +315,7 @@ moveloop()
 	flags.move = 1;
 
 	if(multi >= 0 && occupation) {
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 	    abort_lev = 0;
 	    if (kbhit()) {
 		if ((ch = Getchar()) == ABORT)
@@ -331,14 +331,14 @@ moveloop()
 #endif
 		occupation = 0;
 	    if(
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 		   abort_lev ||
 #endif
 		   monster_nearby()) {
 		stop_occupation();
 		reset_eat();
 	    }
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 	    if (!(++occtime % 7))
 		display_nhwindow(WIN_MAP, FALSE);
 #endif

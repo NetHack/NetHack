@@ -48,7 +48,7 @@ int fd;
 	return(0);
     }
 # else
-#  if defined(MICRO) && !defined(NO_FSTAT)
+#  if (defined(MICRO) || defined(WIN32)) && !defined(NO_FSTAT)
     if(fstat(fd, &buf)) {
 	if(moves > 1) pline("Cannot get status of saved level? ");
 	else pline("Cannot get status of saved game");

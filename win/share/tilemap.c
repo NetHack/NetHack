@@ -13,7 +13,7 @@ const char * FDECL(tilename, (int, int));
 void NDECL(init_tilemap);
 void FDECL(process_substitutions, (FILE *));
 
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 #undef exit
 #if !defined(MSDOS) && !defined(WIN32)
 extern void FDECL(exit, (int));

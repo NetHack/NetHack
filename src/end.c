@@ -240,6 +240,10 @@ register struct monst *mtmp;
 	return;
 }
 
+#if defined(WIN32)
+#define NOTIFY_NETHACK_BUGS
+#endif
+
 /*VARARGS1*/
 void
 panic VA_DECL(const char *, str)
@@ -260,15 +264,25 @@ panic VA_DECL(const char *, str)
 		  "Program initialization has failed." :
 		  "Suddenly, the dungeon collapses.");
 #if defined(WIZARD) && !defined(MICRO)
+# if defined(NOTIFY_NETHACK_BUGS)
+	if (!wizard)
+	    raw_printf("Report error to \"%s\".\n%s.\n",
+			"nethack-bugs@nethack.org",
+			!program_state.something_worth_saving ? "" :
+			"An error save file will be created.\n");
+	else if (program_state.something_worth_saving)
+	    raw_print("\nAn error save file will be created.\n");
+# else
 	if (!wizard)
 	    raw_printf("Report error to \"%s\"%s.",
-# ifdef WIZARD_NAME	/*(KR1ED)*/
+#  ifdef WIZARD_NAME	/*(KR1ED)*/
 			WIZARD_NAME,
-# else
+#  else
 			WIZARD,
-# endif
+#  endif
 			!program_state.something_worth_saving ? "" :
 			" and it may be possible to rebuild.");
+# endif
 	if (program_state.something_worth_saving) {
 	    set_error_savefile();
 	    (void) dosave0();

@@ -6,7 +6,7 @@
 #include "lev.h"
 #include "tcap.h" /* for TERMLIB and ASCIIGRAPH */
 
-#ifdef MICRO
+#if defined(MICRO)
 extern int dotcnt;	/* shared with save */
 extern int dotrow;	/* shared with save */
 #endif

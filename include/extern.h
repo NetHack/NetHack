@@ -1176,7 +1176,7 @@ E struct monst *FDECL(mk_mplayer, (struct permonst *,XCHAR_P,
 E void FDECL(create_mplayers, (int,BOOLEAN_P));
 E void FDECL(mplayer_talk, (struct monst *));
 
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 
 /* ### msdos.c,os2.c,tos.c,winnt.c ### */
 
@@ -1226,7 +1226,7 @@ E int NDECL((*nt_kbhit));
 E void FDECL(Delay, (int));
 # endif /* WIN32 */
 
-#endif /* MICRO */
+#endif /* MICRO || WIN32 */
 
 /* ### mthrowu.c ### */
 
@@ -1366,15 +1366,15 @@ E int NDECL(dohistory);
 
 /* ### pcmain.c ### */
 
-#if defined(MICRO)
+#if defined(MICRO) || defined(WIN32)
 # ifdef CHDIR
 E void FDECL(chdirx, (char *,BOOLEAN_P));
 # endif /* CHDIR */
-#endif /* MICRO */
+#endif /* MICRO || WIN32 */
 
 /* ### pcsys.c ### */
 
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 E void NDECL(flushout);
 E int NDECL(dosh);
 # ifdef MFLOPPY
@@ -1390,11 +1390,11 @@ E void FDECL(getreturn, (const char *));
 E void VDECL(msmsg, (const char *,...));
 # endif
 E FILE *FDECL(fopenp, (const char *,const char *));
-#endif /* MICRO */
+#endif /* MICRO || WIN32 */
 
 /* ### pctty.c ### */
 
-#if defined(MICRO)
+#if defined(MICRO) || defined(WIN32)
 E void NDECL(gettty);
 E void FDECL(settty, (const char *));
 E void NDECL(setftty);
@@ -1402,7 +1402,7 @@ E void VDECL(error, (const char *,...));
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 E void FDECL(msleep, (unsigned));
 #endif
-#endif /* MICRO */
+#endif /* MICRO || WIN32 */
 
 /* ### pcunix.c ### */
 

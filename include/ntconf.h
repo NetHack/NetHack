@@ -18,9 +18,7 @@
 
 #define PC_LOCKING		/* Prevent overwrites of aborted or in-progress games */
 				/* without first receiving confirmation. */
-#define NOCWD_ASSUMPTIONS	/* Allow paths to be specified for HACKDIR,
-				   LEVELDIR, SAVEDIR, BONESDIR, DATADIR,
-				   SCOREDIR, LOCKDIR, and CONFIGDIR */
+
 
 /*
  * -----------------------------------------------------------------
@@ -29,7 +27,15 @@
  */
 /* #define SHORT_FILENAMES	/* All NT filesystems support long names now */
 
-#define MICRO		/* always define this! */
+#ifdef MICRO
+#undef MICRO			/* never define this! */
+#endif
+
+#define NOCWD_ASSUMPTIONS	/* Always define this. There are assumptions that
+                                   it is defined for WIN32.
+				   Allow paths to be specified for HACKDIR,
+				   LEVELDIR, SAVEDIR, BONESDIR, DATADIR,
+				   SCOREDIR, LOCKDIR, and CONFIGDIR */
 #define NO_TERMS
 #define ASCIIGRAPH
 
@@ -104,11 +110,22 @@
 #define FILENAME_CMP  stricmp		      /* case insensitive */
 #endif
 
-#ifdef MICRO
-# ifndef MICRO_H
-#include "micro.h"	/* contains necessary externs for [os_name].c */
-# endif
+#if 0
+#ifndef C
+#define C(c)	(0x1f & (c))
 #endif
+#ifndef M
+#define M(c)	(0x80 | (c))
+#endif
+extern char levels[], bones[], permbones[],
+#endif /* 0 */
+
+/* this was part of the MICRO stuff in the past */
+extern const char *alllevels, *allbones;
+extern char hackdir[];
+#define ABORT C('a')
+#define getuid() 1
+#define getlogin() ((char *)0)
 
 #include <fcntl.h>
 #ifndef __BORLANDC__

@@ -47,7 +47,7 @@
 # define O_BINARY 0
 #endif
 
-#ifdef MICRO
+#if defined(MICRO) || defined(WIN32)
 # define OMASK FCMASK
 #else
 # define OMASK 0644
