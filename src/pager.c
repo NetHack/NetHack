@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.4	2002/07/25	*/
+/*	SCCS Id: @(#)pager.c	3.4	2002/10/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -65,7 +65,7 @@ lookat(x, y, buf, monbuf)
 
     buf[0] = monbuf[0] = 0;
     glyph = glyph_at(x,y);
-    if (u.ux == x && u.uy == y && canseeself()) {
+    if (u.ux == x && u.uy == y && senseself()) {
 	char race[QBUFSZ];
 
 	/* if not polymorphed, show both the role and the race */
@@ -89,6 +89,27 @@ lookat(x, y, buf, monbuf)
 	    Strcat(buf, steedbuf);
 	}
 #endif
+	/* When you see yourself normally, no explanation is appended
+	   (even if you could also see yourself via other means).
+	   Sensing self while blind or swallowed is treated as if it
+	   were by normal vision (cf canseeself()). */
+	if ((Invisible || u.uundetected) && !Blind && !u.uswallow) {
+	    unsigned how = 0;
+
+	    if (Infravision)	 how |= 1;
+	    if (Unblind_telepat) how |= 2;
+	    if (Detect_monsters) how |= 4;
+
+	    if (how)
+		Sprintf(eos(buf), " [seen: %s%s%s%s%s]",
+			(how & 1) ? "infravision" : "",
+			/* add comma if telep and infrav */
+			((how & 3) > 2) ? ", " : "",
+			(how & 2) ? "telepathy" : "",
+			/* add comma if detect and (infrav or telep or both) */
+			((how & 7) > 4) ? ", " : "",
+			(how & 4) ? "monster detection" : "");
+	}
     } else if (u.uswallow) {
 	/* all locations when swallowed other than the hero are the monster */
 	Sprintf(buf, "interior of %s",

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)display.c	3.4	2000/07/27	*/
+/*	SCCS Id: @(#)display.c	3.4	2002/10/03	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -667,7 +667,7 @@ newsym(x,y)
 	    return;
 	}
 	if (x == u.ux && y == u.uy) {
-	    if (canseeself()) {
+	    if (senseself()) {
 		_map_location(x,y,0);	/* map *under* self */
 		display_self();
 	    } else
@@ -709,7 +709,7 @@ newsym(x,y)
 	if (x == u.ux && y == u.uy) {
 	    feel_location(u.ux, u.uy);		/* forces an update */
 
-	    if (canseeself()) display_self();
+	    if (senseself()) display_self();
 	}
 	else if ((mon = m_at(x,y))
 		&& ((see_it = (tp_sensemon(mon) || MATCH_WARN_OF_MON(mon)
@@ -1060,11 +1060,17 @@ void
 see_monsters()
 {
     register struct monst *mon;
+
     for (mon = fmon; mon; mon = mon->nmon) {
 	if (DEADMONSTER(mon)) continue;
 	newsym(mon->mx,mon->my);
 	if (mon->wormno) see_wsegs(mon);
     }
+#ifdef STEED
+    /* when mounted, hero's location gets caught by monster loop */
+    if (!u.usteed)
+#endif
+    newsym(u.ux, u.uy);
 }
 
 /*
@@ -1076,16 +1082,19 @@ void
 set_mimic_blocking()
 {
     register struct monst *mon;
-    for (mon = fmon; mon; mon = mon->nmon)
-	if(!DEADMONSTER(mon) && mon->minvis &&
+
+    for (mon = fmon; mon; mon = mon->nmon) {
+	if (DEADMONSTER(mon)) continue;
+	if (mon->minvis &&
 	   ((mon->m_ap_type == M_AP_FURNITURE &&
-	      (mon->mappearance == S_vcdoor || mon->mappearance == S_hcdoor))||
+	     (mon->mappearance == S_vcdoor || mon->mappearance == S_hcdoor)) ||
 	    (mon->m_ap_type == M_AP_OBJECT && mon->mappearance == BOULDER))) {
 	    if(See_invisible)
 		block_point(mon->mx, mon->my);
 	    else
 		unblock_point(mon->mx, mon->my);
 	}
+    }
 }
 
 /*

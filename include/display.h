@@ -125,6 +125,7 @@
 
 /*
  * canseeself()
+ * senseself()
  *
  * This returns true if the hero can see her/himself.
  *
@@ -132,7 +133,8 @@
  * invisible.  If not, then we don't need the check.
  */
 #define canseeself()	(Blind || u.uswallow || (!Invisible && !u.uundetected))
-
+#define senseself()	(canseeself() || Infravision || Unblind_telepat || \
+			 Detect_monsters)
 
 /*
  * random_monster()
@@ -192,28 +194,22 @@
  * _if_ the hero can be seen have already been done.
  */
 #ifdef STEED
-#define display_self()							\
-    show_glyph(u.ux, u.uy,						\
-	(u.usteed && mon_visible(u.usteed)) ?			\
-				ridden_mon_to_glyph(u.usteed) :		\
-	youmonst.m_ap_type == M_AP_NOTHING ?				\
-				hero_glyph :					\
-	youmonst.m_ap_type == M_AP_FURNITURE ?				\
-				cmap_to_glyph(youmonst.mappearance) :	\
-	youmonst.m_ap_type == M_AP_OBJECT ?				\
-				objnum_to_glyph(youmonst.mappearance) : \
-	/* else M_AP_MONSTER */ monnum_to_glyph(youmonst.mappearance))
+#define maybe_display_usteed	(u.usteed && mon_visible(u.usteed)) ? \
+					ridden_mon_to_glyph(u.usteed) :
 #else
+#define maybe_display_usteed	/* empty */
+#endif
+
 #define display_self()							\
     show_glyph(u.ux, u.uy,						\
+	maybe_display_usteed			/* else */		\
 	youmonst.m_ap_type == M_AP_NOTHING ?				\
-				hero_glyph :					\
+				hero_glyph :				\
 	youmonst.m_ap_type == M_AP_FURNITURE ?				\
 				cmap_to_glyph(youmonst.mappearance) :	\
 	youmonst.m_ap_type == M_AP_OBJECT ?				\
 				objnum_to_glyph(youmonst.mappearance) : \
 	/* else M_AP_MONSTER */ monnum_to_glyph(youmonst.mappearance))
-#endif
 
 /*
  * A glyph is an abstraction that represents a _unique_ monster, object,
