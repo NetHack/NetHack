@@ -860,6 +860,23 @@ struct mkroom	*croom;
 			} else {
 			    mtmp->m_ap_type = M_AP_OBJECT;
 			    mtmp->mappearance = i;
+			    /* try to avoid placing mimic boulder on a trap */
+			    if (i == BOULDER && m->x < 0 && t_at(x, y)) {
+				int k;
+
+				for (k = 0; k < 10 && t_at(x, y); ++k) {
+				    x = m->x;
+				    y = m->y;
+				    if (croom)
+					get_room_loc(&x, &y, croom);
+				    else {
+					get_location(&x, &y, DRY);
+				    }
+				    if (MON_AT(x,y) && enexto(&cc, x, y, pm))
+					x = cc.x,  y = cc.y;
+				}
+				place_monster(mtmp, x, y);
+			    }
 			}
 			break;
 
