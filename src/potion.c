@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2002/07/11	*/
+/*	SCCS Id: @(#)potion.c	3.4	2002/08/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -543,10 +543,11 @@ peffects(otmp)
 		if (otmp->cursed)
 		    pline("Yecch!  This tastes %s.",
 			  Hallucination ? "overripe" : "rotten");
-		else pline(Hallucination ?
-		"This tastes like 10%% real %s%s juice all-natural beverage." :
-				"This tastes like %s%s juice.",
-			  otmp->odiluted ? "reconstituted " : "", pl_fruit);
+		else
+		    pline(Hallucination ?
+		      "This tastes like 10%% real %s%s all-natural beverage." :
+				"This tastes like %s%s.",
+			 otmp->odiluted ? "reconstituted " : "", fruitjuice());
 		if (otmp->otyp == POT_FRUIT_JUICE) {
 		    u.uhunger += (otmp->odiluted ? 5 : 10) * (2 + bcsign(otmp));
 		    newuhs(FALSE);
@@ -636,8 +637,8 @@ peffects(otmp)
 	case POT_SICKNESS:
 		pline("Yecch!  This stuff tastes like poison.");
 		if (otmp->blessed) {
-		    pline("(But in fact it was mildly stale %s juice.)",
-			  pl_fruit);
+		    pline("(But in fact it was mildly stale %s.)",
+			  fruitjuice());
 		    if (!Role_if(PM_HEALER)) {
 			if (otmp->corpsenm)
 			    losehp(1,
@@ -649,8 +650,8 @@ peffects(otmp)
 		} else {
 		    if(Poison_resistance)
 			pline(
-		    "(But in fact it was biologically contaminated %s juice.)",
-			      pl_fruit);
+			  "(But in fact it was biologically contaminated %s.)",
+			      fruitjuice());
 		    if (Role_if(PM_HEALER))
 			pline("Fortunately, you have been immunized.");
 		    else {

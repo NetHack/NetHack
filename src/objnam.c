@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2002/08/06	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2002/08/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -207,6 +207,23 @@ char *FDECL((*func), (OBJ_P));
 	str = (*func)(obj);
 	Blinded = save_Blinded;
 	return str;
+}
+
+/* convert player specified fruit name into corresponding fruit juice name
+   ("slice of pizza" -> "pizza juice" rather than "slice of pizza juice") */
+char *
+fruitjuice()
+{
+    char *buf = nextobuf();
+    const char *juice = strstri(pl_fruit, " of ");
+
+    if (juice)
+	juice += 4;		/* skip past " of " */
+    else
+	juice = pl_fruit;	/* use it as is */
+
+    Sprintf(buf, "%s juice", juice);
+    return buf;
 }
 
 #endif /* OVLB */
