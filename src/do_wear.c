@@ -635,10 +635,9 @@ register struct obj *obj;
     long oldprop = u.uprops[objects[obj->otyp].oc_oprop].extrinsic;
     int old_attrib;
 
-
-	if (obj == uwep) setuwep((struct obj *) 0);
-	if (obj == uswapwep) setuswapwep((struct obj *) 0);
-	if (obj == uquiver) setuqwep((struct obj *) 0);
+    if (obj == uwep) setuwep((struct obj *) 0);
+    if (obj == uswapwep) setuswapwep((struct obj *) 0);
+    if (obj == uquiver) setuqwep((struct obj *) 0);
 
     /* only mask out W_RING when we don't have both
        left and right rings of the same type */
@@ -1417,6 +1416,10 @@ doputon()
 	}
 	if(otmp == uwep)
 		setuwep((struct obj *)0);
+	if(otmp == uswapwep)
+		setuswapwep((struct obj *) 0);
+	if(otmp == uquiver)
+		setuqwep((struct obj *) 0);
 	if(otmp->oclass == RING_CLASS || otmp->otyp == MEAT_RING) {
 		if(nolimbs(youmonst.data)) {
 			You("cannot make the ring stick to your body.");

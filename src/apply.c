@@ -2015,7 +2015,6 @@ struct obj *obj;
     } else if ((Fumbling || Glib) && !rn2(5)) {
 	pline_The("bullwhip slips out of your %s.", body_part(HAND));
 	dropx(obj);
-	setuwep((struct obj *)0);
 
     } else if (u.utrap && u.utraptype == TT_PIT) {
 	/*

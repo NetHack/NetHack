@@ -84,11 +84,6 @@ STATIC_DCL int FDECL(ready_weapon, (struct obj *));
  * 5.  Emptying the slot, by passing a null object.  NEVER pass
  *     zeroobj!
  *
- * Note: setuwep() with a null obj, and uwepgone(), are NOT the same!
- * Sometimes unwielding a weapon can kill you, and lifesaving will then
- * put it back into your hand.  If lifesaving is permitted to do this,
- * use setwuep((struct obj *)0); otherwise use uwepgone().
- *
  * If the item is being moved from another slot, it is the caller's
  * responsibility to handle that.  It's also the caller's responsibility
  * to print the appropriate messages.
@@ -443,7 +438,6 @@ can_twoweapon()
 		Your("%s from your %s!",  aobjnam(obj, "slip"), str);
 		if (!Glib)
 			obj->bknown = TRUE;
-		setuswapwep((struct obj *) 0);
 		dropx(obj);
 	} else
 		return (TRUE);

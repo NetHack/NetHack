@@ -456,7 +456,6 @@ register struct obj *obj;
 			return(0);
 		}
 		setuwep((struct obj *)0);
-		if(uwep) return 0; /* lifesaved and rewielded */
 	}
 	if(obj == uquiver) {
 		setuqwep((struct obj *)0);

@@ -224,7 +224,6 @@ dig()
 		case 0:  if(!welded(uwep)) {
 			     You("fumble and drop your %s.", xname(uwep));
 			     dropx(uwep);
-			     setuwep((struct obj *)0);
 			 } else {
 #ifdef STEED
 			     if (u.usteed)

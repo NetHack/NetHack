@@ -641,9 +641,7 @@ litter()
 	while (otmp) {
 		nextobj = otmp->nobj;
 		if ((otmp != uball) && (rnd(capacity) <= (int)otmp->owt)) {
-			if (otmp == uwep)
-				setuwep((struct obj *)0);
-			if ((otmp != uwep) && (canletgo(otmp, ""))) {
+			if (canletgo(otmp, "")) {
 				Your("%s you down the stairs.",
 				     aobjnam(otmp, "follow"));
 				dropx(otmp);
