@@ -98,6 +98,7 @@ const struct innate {
 
 static long next_check = 600L;	/* arbitrary first setting */
 STATIC_DCL void NDECL(exerper);
+STATIC_DCL void FDECL(postadjabil, (long *));
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -522,6 +523,15 @@ redist_attr()
 }
 
 void
+postadjabil(ability)
+long *ability;
+{
+	if (!ability) return;
+	if (ability == &(HWarning) || ability == &(HSee_invisible))
+		see_monsters();
+}
+
+void
 adjabil(oldlevel,newlevel)
 int oldlevel, newlevel;
 {
@@ -558,6 +568,7 @@ int oldlevel, newlevel;
 	}
 
 	while (abil || rabil) {
+	    long prevabil;
 	    /* Have we finished with the intrinsics list? */
 	    if (!abil || !abil->ability) {
 	    	/* Try the race intrinsics */
@@ -566,7 +577,7 @@ int oldlevel, newlevel;
 	    	rabil = 0;
 	    	mask = FROMRACE;
 	    }
-
+		prevabil = *(abil->ability);
 		if(oldlevel < abil->ulevel && newlevel >= abil->ulevel) {
 			/* Abilities gained at level 1 can never be lost
 			 * via level loss, only via means that remove _any_
@@ -591,6 +602,8 @@ int oldlevel, newlevel;
 				You_feel("less %s!", abil->gainstr);
 			}
 		}
+	    if (prevabil != *(abil->ability))	/* it changed */
+		postadjabil(abil->ability);
 	    abil++;
 	}
 
