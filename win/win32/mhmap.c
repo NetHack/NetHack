@@ -555,12 +555,13 @@ void onPaint(HWND hWnd)
 				unsigned special;
 				int mgch;
 				HBRUSH back_brush;
+				COLORREF OldFg;
 
 				nhcoord2display(data, i, j, &glyph_rect);
 
 #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
 				nhglyph2charcolor(data->map[i][j], &ch, &color);
-				SetTextColor (hDC, nhcolor_to_RGB(color) );
+				OldFg = SetTextColor (hDC, nhcolor_to_RGB(color) );
 #else
 				/* rely on NetHack core helper routine */
 				mapglyph(data->map[i][j], &mgch, &color,
@@ -568,13 +569,20 @@ void onPaint(HWND hWnd)
 				ch = (char)mgch;
 				if (((special & MG_PET) && iflags.hilite_pet) ||
 				    ((special & MG_DETECT) && iflags.use_inverse)) {
-					back_brush = CreateSolidBrush(RGB(192, 192, 192));
+					back_brush = CreateSolidBrush(nhcolor_to_RGB(CLR_GRAY));
 					FillRect (hDC, &glyph_rect, back_brush);
 					DeleteObject (back_brush);
-					SetTextColor( hDC,  RGB(0, 0, 0) );
-				} else
-				{
-					SetTextColor (hDC, nhcolor_to_RGB(color) );
+					switch (color)
+					{
+					case CLR_GRAY:
+					case CLR_WHITE:
+						OldFg = SetTextColor( hDC,  nhcolor_to_RGB(CLR_BLACK));
+						break;
+					default:
+						OldFg = SetTextColor (hDC, nhcolor_to_RGB(color) );
+					}
+				} else {
+					OldFg = SetTextColor (hDC, nhcolor_to_RGB(color) );
 				}
 #endif
 
@@ -584,6 +592,7 @@ void onPaint(HWND hWnd)
 						 &glyph_rect,
 						 DT_CENTER | DT_VCENTER | DT_NOPREFIX
 						 );
+				SetTextColor (hDC, OldFg);
 			}
 			SelectObject(hDC, oldFont);
 		} else {
