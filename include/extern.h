@@ -1353,6 +1353,7 @@ E char *FDECL(nh_getenv, (const char *));
 E void FDECL(set_duplicate_opt_detection, (int));
 E void FDECL(set_wc_option_mod_status, (unsigned long, int));
 E void FDECL(set_option_mod_status, (char *, int));
+E boolean FDECL(feature_toggle, (int));
 
 /* ### pager.c ### */
 

@@ -370,6 +370,28 @@ E char *fqn_prefix[PREFIX_COUNT];
 E char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
+/*
+ * Feature toggles
+ *
+ * The following provide a way to offer two different
+ * behaviours for a game interface feature, and allow
+ * the player to toggle the alternate behaviour on.
+ * The feature_name fields stored in the feature_toggles[]
+ * array can be specified in an OPTIONS=feature_toggle:value1 value2
+ * statement in the config file.
+ */
+
+E unsigned long toggled_features;
+
+E struct features_that_toggle {
+	char *feature_name;
+	unsigned long feature_bit;
+} feature_toggles[];
+
+#define TOGGLE_INVALID			0
+#define TOGGLE_LOOT_MENU_SELECTORS	1	/* index in feature_toogle_list[] */
+#define LAST_FEATURE_TOGGLE		1
+
 #undef E
 
 #endif /* DECL_H */

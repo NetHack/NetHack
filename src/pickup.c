@@ -2197,18 +2197,21 @@ struct obj *obj;
     menu_item *pick_list;
     char buf[BUFSZ];
     int n;
+    char oldmenu[3] = {'a', 'b', 'c'}, newmenu[3] = {'o', 'i', 'b'};
+    char *menuselector = newmenu;
 
+    if (feature_toggle(TOGGLE_LOOT_MENU_SELECTORS)) menuselector = oldmenu;
     any.a_void = 0;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     any.a_int = 1;
     Sprintf(buf,"Take %s out of %s", something, the(xname(obj)));
-    add_menu(win, NO_GLYPH, &any, 'o', 0, ATR_NONE, buf, MENU_UNSELECTED);
+    add_menu(win, NO_GLYPH, &any, *menuselector++, 0, ATR_NONE, buf, MENU_UNSELECTED);
     any.a_int = 2;
     Sprintf(buf,"Put %s into %s", something, the(xname(obj)));
-    add_menu(win, NO_GLYPH, &any, 'i', 0, ATR_NONE, buf, MENU_UNSELECTED);
+    add_menu(win, NO_GLYPH, &any, *menuselector++, 0, ATR_NONE, buf, MENU_UNSELECTED);
     any.a_int = 3;
-    add_menu(win, NO_GLYPH, &any, 'b', 0, ATR_NONE,
+    add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE,
 		"Both of the above", MENU_UNSELECTED);
     end_menu(win, prompt);
     n = select_menu(win, PICK_ONE, &pick_list);

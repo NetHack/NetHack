@@ -219,6 +219,7 @@ static struct Comp_Opt
 						MAXDCHARS+1, SET_IN_FILE },
 	{ "effects",  "the symbols to use in drawing special effects",
 						MAXECHARS+1, SET_IN_FILE },
+	{ "feature_toggle",   "alternate feature behaviour", 79, SET_IN_FILE },
 	{ "font_map", "the font to use in the map window", 40, DISP_IN_GAME },	/*WC*/
 	{ "font_menu", "the font to use in menus", 40, DISP_IN_GAME },		/*WC*/
 	{ "font_message", "the font to use in the message window",
@@ -1038,6 +1039,43 @@ boolean tinitial, tfrom_file;
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(dogname, op, PL_PSIZ);
+		return;
+	}
+
+	fullname = "feature_toggle";
+	if (match_optname(opts, fullname, 11, TRUE)) {
+		char buf[BUFSZ];
+		char *feature;
+		boolean matched = FALSE;
+		if (!(op = string_for_opt(opts, FALSE)))
+			return;
+		if (!negated) {
+		    boolean has_badfield = FALSE;
+		    char badfields[BUFSZ];
+		    buf[BUFSZ-1] = '\0';
+
+		    Strcpy(badfields, "feature_toggle:");
+		    (void)strncpy(buf, op, BUFSZ - 1);
+		    (void)mungspaces(buf);
+		    feature = strtok(buf, " \n");
+		    while(feature && *feature && *feature != ' ') {
+		    	matched = FALSE;
+			for (num = 1; num <= LAST_FEATURE_TOGGLE; num++) {
+			    if (!strcmpi(feature, feature_toggles[num].feature_name)) {
+				toggled_features |= feature_toggles[num].feature_bit;
+				matched = TRUE;
+			    }
+			}
+			if (!matched) {
+				if (has_badfield) Strcat(badfields, " ");
+				Strcat(badfields, feature);
+				has_badfield = TRUE;
+			}
+			feature = strtok((char *)0, " \n");
+		    }
+		    if (has_badfield) badoption(badfields);
+		} else
+			bad_negation(fullname, FALSE);
 		return;
 	}
 
@@ -3249,6 +3287,16 @@ char *op;
 	return 1;
 }
 
+boolean
+feature_toggle(ftidx)
+int ftidx;
+{
+	if (ftidx > 0 && ftidx <= LAST_FEATURE_TOGGLE) {
+		if (toggled_features & feature_toggles[ftidx].feature_bit)
+			return TRUE;
+	}
+	return FALSE;
+}
 #endif	/* OPTION_LISTS_ONLY */
 
 /*options.c*/
