@@ -148,6 +148,10 @@ extern char *sounddir;
 extern int n_dgns;		/* from dungeon.c */
 
 #if defined(UNIX) && defined(QT_GRAPHICS)
+#define SELECTSAVED
+#endif
+
+#ifdef SELECTSAVED
 STATIC_DCL int FDECL(strcmp_wrap, (const void *, const void *));
 #endif
 STATIC_DCL char *FDECL(set_bonesfile_name, (char *,d_level*));
@@ -543,13 +547,17 @@ clearlocks()
 #endif
 }
 
-#if defined(UNIX) && defined(QT_GRAPHICS)
+#if defined(SELECTSAVED)
 STATIC_OVL int
 strcmp_wrap(p, q)
 const void *p;
 const void *q;
 {
+#if defined(UNIX) && defined(QT_GRAPHICS)
 	return strncasecmp(*(char **) p, *(char **) q, 16);
+# else
+	return strncmpi(*(char **) p, *(char **) q, 16);
+# endif
 }
 #endif
 
@@ -954,25 +962,24 @@ restore_saved_game()
 	return fd;
 }
 
-#if defined(UNIX) && defined(QT_GRAPHICS)
+#if defined(SELECTSAVED)
 /*ARGSUSED*/
 static char*
 plname_from_file(filename)
 const char* filename;
 {
-#ifdef STORE_PLNAME_IN_FILE
     int fd;
     char* result = 0;
 
     Strcpy(SAVEF,filename);
-#ifdef COMPRESS_EXTENSION
+#  ifdef COMPRESS_EXTENSION
     SAVEF[strlen(SAVEF)-strlen(COMPRESS_EXTENSION)] = '\0';
-#endif
+#  endif
     uncompress(SAVEF);
     if ((fd = open_savefile()) >= 0) {
 	if (uptodate(fd, filename)) {
 	    char tplname[PL_NSIZ];
-	    mread(fd, (genericptr_t) tplname, PL_NSIZ);
+	    get_plname_from_file(fd, tplname);
 	    result = strdup(tplname);
 	}
 	(void) close(fd);
@@ -980,19 +987,20 @@ const char* filename;
     compress(SAVEF);
 
     return result;
-#else
-# if defined(UNIX) && defined(QT_GRAPHICS)
+# if 0
+/* --------- obsolete - used to be ifndef STORE_PLNAME_IN_FILE ----*/
+#  if defined(UNIX) && defined(QT_GRAPHICS)
     /* Name not stored in save file, so we have to extract it from
        the filename, which loses information
        (eg. "/", "_", and "." characters are lost. */
     int k;
     int uid;
     char name[64]; /* more than PL_NSIZ */
-#ifdef COMPRESS_EXTENSION
+#   ifdef COMPRESS_EXTENSION
 #define EXTSTR COMPRESS_EXTENSION
-#else
+#   else
 #define EXTSTR ""
-#endif
+#   endif
     if ( sscanf( filename, "%*[^/]/%d%63[^.]" EXTSTR, &uid, name ) == 2 ) {
 #undef EXTSTR
     /* "_" most likely means " ", which certainly looks nicer */
@@ -1001,18 +1009,52 @@ const char* filename;
 		name[k]=' ';
 	return strdup(name);
     } else
-# endif
+#  endif /* UNIX && QT_GRAPHICS */
     {
 	return 0;
     }
-#endif
+/* --------- end of obsolete code ----*/
+# endif /* 0 - WAS STORE_PLNAME_IN_FILE*/
 }
-#endif /* defined(UNIX) && defined(QT_GRAPHICS) */
+#endif /* defined(SELECTSAVED) */
 
 char**
 get_saved_games()
 {
-#if defined(UNIX) && defined(QT_GRAPHICS)
+#if defined(SELECTSAVED)
+	int n, j;
+	char **result;
+# ifdef WIN32CON
+	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
+	char *foundfile;
+	const char *fq_save;
+
+	Sprintf(fnamebuf, "%s-", get_username(0));
+	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
+				'%', fnamebuf, encodedfnamebuf, BUFSZ);
+	Sprintf(SAVEF, "%s*.NetHack-saved-game", encodedfnamebuf);
+	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
+
+	foundfile = foundfile_buffer();
+	if (findfirst((char *)fq_save)) {
+	    n = 0;
+	    do {
+		++n;
+	    } while (findnext());
+	}
+	if (n > 0) {
+	    result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
+	    if (findfirst((char *)fq_save)) {
+	    j = n = 0;
+	    do {
+		char *r;
+		r = plname_from_file(foundfile);
+		if (r)
+		    result[j++] = r;
+		++n;
+	    } while (findnext());
+# endif
+# if defined(UNIX) && defined(QT_GRAPHICS)
 	/* posixly correct version */
     int myuid=getuid();
     DIR *dir;
@@ -1045,6 +1087,7 @@ get_saved_games()
 		    }
 		}
 		closedir(dir);
+# endif
 		qsort(result, j, sizeof(char *), strcmp_wrap);
 		result[j++] = 0;
 		return result;

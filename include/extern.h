@@ -1748,6 +1748,7 @@ E void FDECL(inven_inuse, (BOOLEAN_P));
 E int FDECL(dorecover, (int));
 E void FDECL(trickery, (char *));
 E void FDECL(getlev, (int,int,XCHAR_P,BOOLEAN_P));
+E void FDECL(get_plname_from_file, (int, char *));
 E void NDECL(minit);
 E boolean FDECL(lookup_id_mapping, (unsigned, unsigned *));
 #ifdef ZEROCOMP
@@ -1834,6 +1835,7 @@ E void FDECL(bflush, (int));
 E void FDECL(bwrite, (int,genericptr_t,unsigned int));
 E void FDECL(bclose, (int));
 E void FDECL(savefruitchn, (int,int));
+E void FDECL(store_plname_in_file, (int));
 E void NDECL(free_dungeons);
 E void NDECL(freedynamicdata);
 

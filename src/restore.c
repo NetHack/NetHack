@@ -573,11 +573,8 @@ register int fd;
 	int rtmp;
 	struct obj *otmp;
 
-#ifdef STORE_PLNAME_IN_FILE
-	mread(fd, (genericptr_t) plname, PL_NSIZ);
-#endif
-
 	restoring = TRUE;
+	get_plname_from_file(fd, plname);
 	getlev(fd, 0, (xchar)0, FALSE);
 	if (!restgamestate(fd, &stuckid, &steedid)) {
 		display_nhwindow(WIN_MESSAGE, TRUE);
@@ -656,9 +653,8 @@ register int fd;
 	(void) lseek(fd, (off_t)0, 0);
 #endif
 	(void) uptodate(fd, (char *)0);		/* skip version info */
-#ifdef STORE_PLNAME_IN_FILE
-	mread(fd, (genericptr_t) plname, PL_NSIZ);
-#endif
+	get_plname_from_file(fd, plname);
+
 	getlev(fd, 0, (xchar)0, FALSE);
 	(void) close(fd);
 
@@ -929,6 +925,17 @@ boolean ghostly;
 
 	if (ghostly)
 	    clear_id_mapping();
+}
+
+void
+get_plname_from_file(fd, plbuf)
+int fd;
+char *plbuf;
+{
+	int rlen, pltmpsiz = 0;
+	rlen = read(fd, (genericptr_t) &pltmpsiz, sizeof(pltmpsiz));
+	rlen = read(fd, (genericptr_t) plbuf, pltmpsiz);
+	return;
 }
 
 STATIC_OVL void

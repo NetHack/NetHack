@@ -171,6 +171,7 @@ static struct Bool_Opt
 #else
 	{"sanity_check", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"selectsaved", &iflags.wc2_selectsaved, TRUE, DISP_IN_GAME},		/*WC*/
 #ifdef EXP_ON_BOTL
 	{"showexp", &flags.showexp, FALSE, SET_IN_GAME},
 #else

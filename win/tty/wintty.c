@@ -53,6 +53,9 @@ struct window_procs tty_procs = {
     WC_MOUSE_SUPPORT|
 #endif
     WC_COLOR|WC_HILITE_PET|WC_INVERSE|WC_EIGHT_BIT_IN,
+#if defined(SELECTSAVED) && defined(WIN32CON)
+    WC2_SELECTSAVED|
+#endif
     0L,
     tty_init_nhwindows,
     tty_player_selection,
@@ -676,6 +679,62 @@ tty_askname()
 {
     static char who_are_you[] = "Who are you? ";
     register int c, ct, tryct = 0;
+#ifdef SELECTSAVED
+# if defined(WIN32CON)
+    int ch = -2;
+    char** saved = (char **)0;
+
+    if (iflags.wc2_selectsaved)
+	saved = get_saved_games();
+    if (saved && *saved) {
+	int k, clet = 'a';
+	winid tmpwin;
+	anything any;
+	menu_item *chosen_game = (menu_item *)0;
+
+    	ch = -1;
+	saved = get_saved_games();
+	tty_clear_nhwindow(BASE_WINDOW);
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	any.a_int = 0;	/* no selection */
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		 ATR_NONE, COPYRIGHT_BANNER_A, MENU_UNSELECTED);
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		 ATR_NONE, COPYRIGHT_BANNER_B, MENU_UNSELECTED);
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		 ATR_NONE, COPYRIGHT_BANNER_C, MENU_UNSELECTED);
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		 ATR_NONE, "", MENU_UNSELECTED);
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		 ATR_NONE, "Select one of your saved games", MENU_UNSELECTED);
+	for (k = 0; saved[k]; ++k) {
+		if (clet == 'z' + 1) clet = 'A';
+		if (clet == 'Z') break;
+		any.a_int = k + 1;
+		add_menu(tmpwin, NO_GLYPH, &any, clet++, 0,
+			 ATR_NONE, saved[k], MENU_UNSELECTED);
+        }
+	any.a_int = -2;
+	add_menu(tmpwin, NO_GLYPH, &any, clet, 0,
+		 ATR_NONE, "Start a new character", MENU_UNSELECTED);
+	/* no prompt on end_menu, as we've done our own at the top */
+	end_menu(tmpwin, (char *)0);
+	if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {
+		ch = chosen_game->item.a_int;
+		if (ch > 0)  {
+			ch--;
+			strcpy(plname,saved[ch]);
+		}
+		free((genericptr_t)chosen_game);
+        }
+	destroy_nhwindow(tmpwin);
+    }
+    free_saved_games(saved);
+    if (ch >= 0) return;
+    if (ch == -1) bail("Until next time then...");
+# endif /* WIN32CON */
+#endif /* SELECTSAVED */
 
     tty_putstr(BASE_WINDOW, 0, "");
     do {
@@ -1555,8 +1614,10 @@ tty_display_nhwindow(window, blocking)
 	    } else
 		clear_screen();
 	    ttyDisplay->toplin = 0;
-	} else
-	    tty_clear_nhwindow(WIN_MESSAGE);
+	} else {
+		if (WIN_MESSAGE != WIN_ERR)
+			tty_clear_nhwindow(WIN_MESSAGE);
+	}
 
 	if (cw->data || !cw->maxrow)
 	    process_text_window(window, cw);

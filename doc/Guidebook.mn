@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "October 29, 2004
+.ds f2 "January 9, 2005
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2244,6 +2244,9 @@ when the hero reaches the scroll_margin.
 .lp scroll_margin
 NetHack should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
+.lp selectsaved
+NetHack should display a menu of existing saved games for the player to
+choose from at game startup, if it can. Not all ports support this option.
 .lp softkeyboard
 Display an onscreen keyboard.  Handhelds are most likely to support this option.
 .lp splash_screen

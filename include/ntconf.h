@@ -24,6 +24,11 @@
 #define SELF_RECOVER		/* Allow the game itself to recover from an aborted game */
 
 #define USER_SOUNDS
+
+#ifdef WIN32CON
+#define SELECTSAVED		/* Provide menu of saved games to choose from at start */
+#endif
+
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.

@@ -117,6 +117,7 @@ shapeshifted vampire will transform back to vampire form after you defeat it and
 	continue to fight in its native form
 container lknown flag for locked/unlocked/broken awareness
 container cknown flag for container content awareness
+plname is stored in the save file on all platforms now
 
 
 Platform- and/or Interface-Specific New Features
@@ -126,6 +127,8 @@ win32gui: menu option to add/remove windows captions
 win32gui: support for saving/restoring message history
 win32gui: added menu options "Copy ASCII Screenshot To Clipboard" and "Save 
 	ASCII Screenshot To File"
+win32tty: support for 'selectsaved' option for menu of existing save files
+	to choose from at game startup
 tty: add window port routines for saving/restoring message history
 
 

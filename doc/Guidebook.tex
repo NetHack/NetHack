@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.87 $ $Date: 2004/11/06 02:42:03 $
+% $Revision: 1.88 $ $Date: 2005/01/02 17:10:47 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.5)}
-\date{October 29, 2004}
+\date{January 9, 2005}
 
 \maketitle
 
@@ -2758,6 +2758,10 @@ when the hero reaches the scroll\_margin.
 \item[\ib{scroll\_margin}]
 NetHack should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
+%.lp
+\item[\ib{selectsaved}]
+NetHack should display a menu of existing saved games for the player to
+choose from at game startup, if it can. Not all ports support this option.
 %.lp
 \item[\ib{softkeyboard}]
 Display an onscreen keyboard.  Handhelds are most likely to support this option.

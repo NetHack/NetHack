@@ -653,6 +653,7 @@ to support:
   |  fullscreen        | WC2_FULLSCREEN     | wc2_fullscreen     |boolean |
   |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
   |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
+  |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
   +--------------------+--------------------+--------------------+--------+
 
 align_message	-- where to place message window (top, bottom, left, right)
@@ -678,6 +679,7 @@ player_selection
 		-- dialog or prompts for choosing character.
 popup_dialog	-- port should pop up dialog boxes for input.
 preload_tiles	-- port should preload tiles into memory.
+saveselection   -- if port can display a menu of the user's saved games do so.
 scroll_amount   -- scroll this amount when scroll_margin is reached.
 scroll_margin	-- port should scroll the display when the hero or cursor
 		   is this number of cells away from the edge of the window.
