@@ -1408,6 +1408,7 @@ register struct obj *obj;
 		pline("That's too insubstantial to tin.");
 		return;
 	}
+	check_unpaid(obj);
 	obj->spe--;
 	if ((can = mksobj(TIN, FALSE, FALSE)) != 0) {
 	    static const char you_buy_it[] = "You tin it, you bought it!";
