@@ -587,7 +587,7 @@ vision_recalc(control)
 
 		    next_rmin[row] = min(next_rmin[row], col);
 		    next_rmax[row] = max(next_rmax[row], col);
-		    next_array[row][col] = IN_SIGHT;
+		    next_array[row][col] = IN_SIGHT | COULD_SEE;
 		}
 	}
 
@@ -601,7 +601,7 @@ vision_recalc(control)
 		next_row = next_array[row];
 
 		for(col=next_rmin[row]; col <= next_rmax[row]; col++)
-		    next_row[col] = IN_SIGHT;
+		    next_row[col] = IN_SIGHT | COULD_SEE;
 	    }
 	} else
 	    view_from(u.uy, u.ux, next_array, next_rmin, next_rmax,
