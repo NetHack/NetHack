@@ -2,7 +2,7 @@
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
                     Instructions for compiling and installing
-                 NetHack 3.3 on a Windows NT, 2000, or XP system
+                 NetHack 3.4 on a Windows NT, 2000, or XP system
          ==============================================================
 		      Last revision: January 22, 2002
 
@@ -216,7 +216,7 @@ Running NetHack
     or from a shortcut, just use the following information when 
     setting up the icon or shortcut.
 
-         Description      :  NetHack 3.3.1 
+         Description      :  NetHack 3.4.0 
          Command Line     :  C:\GAMES\NETHACKNTTY\NETHACK.EXE
 
    (changing the directory to the appropriate one of course)
@@ -374,7 +374,7 @@ Running NetHack
     or from a shortcut, just use the following information when 
     setting up the icon or shortcut.
 
-         Description      :  NetHack 3.3.2 
+         Description      :  NetHack 3.4.0 
          Command Line     :  C:\GAMES\NETHACK\NETHACKW.EXE
 
    (changing the directory in the Command Line to the appropriate one of course)

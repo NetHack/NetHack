@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for the [Unix] documentation.
-#	SCCS Id: @(#)Makefile.doc	3.3	1993/01/06
+#	SCCS Id: @(#)Makefile.doc	3.4	1993/01/06
 
 #  Copy this file to [.doc]Makefile. and edit it if needed.
 

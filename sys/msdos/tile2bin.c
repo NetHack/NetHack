@@ -1,4 +1,4 @@
-/*   SCCS Id: @(#)tile2bin.c   3.3     95/01/26                     */
+/*   SCCS Id: @(#)tile2bin.c   3.4     1995/01/26                     */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 1995     */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -169,7 +169,7 @@ char *argv[];
 #  endif
 	
 	strncpy(tibheader.ident,
-		"NetHack 3.3 MSDOS Port binary tile file", 80);
+		"NetHack 3.4 MSDOS Port binary tile file", 80);
 	strncpy(tibheader.timestamp, asctime(newtime), 24);
 	tibheader.timestamp[25] = '\0';
 	tibheader.tilecount = tilecount;

@@ -1,7 +1,7 @@
-#   SCCS Id: @(#)Makefile.bcc       3.3     2002/01/23
+#   SCCS Id: @(#)Makefile.bcc       3.4     2002/01/23
 #   Copyright (c) NetHack PC Development Team 1993-2002
 #
-#   NetHack 3.3.x Makefile for Borland C++ V5.5 and above and Borland's MAKE
+#   NetHack 3.4.x Makefile for Borland C++ V5.5 and above and Borland's MAKE
 #  
 #   Win32 Compilers Tested:
 #                              - Borland C++ 5.5.1 for Win32
@@ -204,7 +204,7 @@ TILEINCL  =
 TILEUTIL  = $(UTIL)\tile2bmp.exe
 TILEBMP   = $(SRC)\tiles.bmp
 
-# These should be left commented in 3.3.x
+# These should be left commented in 3.4.x
 #
 
 #SOUND = $(OBJ)\ntsound.o
@@ -367,7 +367,7 @@ RECOVOBJS      = $(O)recover.o
 TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 
 #
-# These are not invoked during a normal game build in 3.3.2
+# These are not invoked during a normal game build in 3.4.0
 #
 TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
 		 $(O)decl.o	$(O)monst.o	$(O)objects.o

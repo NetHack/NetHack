@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)tile2bmp.c	3.3	1999/08/29	*/
+/*	SCCS Id: @(#)tile2bmp.c	3.4	1999/08/29	*/
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 

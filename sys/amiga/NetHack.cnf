@@ -20,7 +20,7 @@ PATH=NetHack:
 
 # My own setup
 #OPTIONS=nolegacy,fruit:lemon,time,autopickup,checkpoint,showexp,showscore,standout,nonews
-#OPTIONS=nomail,flush,eight_bit_tty,scores:10t/2a,pickup_types:$,suppress_alert:3.3.0
+#OPTIONS=nomail,flush,eight_bit_tty,scores:10t/2a,pickup_types:$,suppress_alert:3.3.1
 
 # The windowtype option must be set before any options regarding colors and palette
 # are set otherwise previously set values will be overridden by the defaults

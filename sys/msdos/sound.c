@@ -1,4 +1,4 @@
-/*   SCCS Id: @(#)sound.c   3.3     96/02/19                        */
+/*   SCCS Id: @(#)sound.c   3.4     1996/02/19                        */
 /*   Copyright (c) NetHack PC Development Team 1993,1995            */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

@@ -1,8 +1,8 @@
-//	SCCS Id: @(#)qt_win.cpp	3.3	1999/11/19
+//	SCCS Id: @(#)qt_win.cpp	3.4	1999/11/19
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 
-// Qt Binding for NetHack 3.3
+// Qt Binding for NetHack 3.4
 //
 // Copyright (C) 1996-2001 by Warwick W. Allison (warwick@troll.no)
 // 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)nhlan.c	3.3	99/11/21	*/
+/*	SCCS Id: @(#)nhlan.c	3.4	1999/11/21	*/
 /* Copyright (c) Michael Allison, 1997                  */
 /* NetHack may be freely redistributed.  See license for details. */
 

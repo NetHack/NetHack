@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)def2mak.c	3.3	95/03/19	*/
+/*	SCCS Id: @(#)def2mak.c	3.4	1995/03/19	*/
 /* Copyright (c) NetHack PC Development Team, 1994. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -340,7 +340,7 @@ char *argv[];
 		break;
 	    if (!strnicmp(buffer, "?SCCS?", 6)) {
 		time (&timer);
-	      printf ("%s#\tSCCS Id: @(#)Makefile.%s\t3.3\t%02d/%02d/%02d\n",
+	      printf ("%s#\tSCCS Id: @(#)Makefile.%s\t3.4\t%02d/%02d/%02d\n",
                     SavedNewLine,
 		    MSC ? "MSC" : BC ? "BC" : "???",
 		    localtime(&timer)->tm_year,

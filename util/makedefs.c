@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makedefs.c	3.3	1999/08/16	*/
+/*	SCCS Id: @(#)makedefs.c	3.4	1999/08/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -49,7 +49,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.3\t1999/08/16";
+static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.4\t2002/02/03";
 #endif
 
 	/* names of files to be generated */
@@ -543,7 +543,7 @@ do_date()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.3\t1996/05/17 */\n\n");
+	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.4\t2002/02/03 */\n\n");
 	Fprintf(ofp,Dont_Edit_Code);
 
 #ifdef KR1ED
@@ -1342,7 +1342,7 @@ do_permonst()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)pm.h\t3.3\t1994/09/10 */\n\n");
+	Fprintf(ofp,"/*\tSCCS Id: @(#)pm.h\t3.4\t2002/02/03 */\n\n");
 	Fprintf(ofp,Dont_Edit_Code);
 	Fprintf(ofp,"#ifndef PM_H\n#define PM_H\n");
 
@@ -1655,7 +1655,7 @@ do_objs()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)onames.h\t3.3\t1994/09/10 */\n\n");
+	Fprintf(ofp,"/*\tSCCS Id: @(#)onames.h\t3.4\t2002/02/03 */\n\n");
 	Fprintf(ofp,Dont_Edit_Code);
 	Fprintf(ofp,"#ifndef ONAMES_H\n#define ONAMES_H\n\n");
 

@@ -1,4 +1,4 @@
-/*   SCCS Id: @(#)video.c   3.3     2001/04/07			    */
+/*   SCCS Id: @(#)video.c   3.4     2001/04/07			    */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 2001	    */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*								    */

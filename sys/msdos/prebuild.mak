@@ -1,4 +1,4 @@
-#       SCCS Id: @(#)prebuild.mak       3.3     97/09/28
+#       SCCS Id: @(#)prebuild.mak       3.4     1997/09/28
 #
 # Makefile for building the genschem utility, the .def files and
 # the Makefiles for distribution.

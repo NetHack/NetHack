@@ -35,7 +35,7 @@ FNR == 1	{ output_dep()			#finish previous file
 		}
 /^\#[ \t]*include[ \t]+\"/  {			#find `#include "X"'
 		  incl = $2;
-		  #[3.3.1: gnomehack headers currently aren't in include]
+		  #[3.4.0: gnomehack headers currently aren't in include]
 		  if (incl ~ /\.h$/) {
 		    if (incl ~ /^gn/)	# gnomehack special case
 		      incl = "../win/gnome/" incl

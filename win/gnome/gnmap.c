@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)gnmap.c	3.3	2000/07/16	*/
+/*	SCCS Id: @(#)gnmap.c	3.4	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* Copyright (C) 1998 by Anthony Taylor <tonyt@ptialaska.net> */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.src	3.3	2001/12/09
+#	SCCS Id: @(#)Makefile.src	3.4	2001/12/09
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used

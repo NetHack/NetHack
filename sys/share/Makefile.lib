@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)Makefile.lib	3.3	90/22/02
+#	SCCS Id: @(#)Makefile.lib	3.4	1990/22/02
 #	Nethack makefile for Fred fish termlib -- Norman Meluch
 #
 CC	= cl /c

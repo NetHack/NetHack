@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsmail.c	3.3	1995/06/01	*/
+/*	SCCS Id: @(#)vmsmail.c	3.4	1995/06/01	*/
 /* Copyright (c) Robert Patrick Rankin, 1991.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 

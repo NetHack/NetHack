@@ -1,13 +1,13 @@
 
-                   Using and Installing Amiga NetHack 3.3
+                   Using and Installing Amiga NetHack 3.4
       (or Everything You Never Wanted to Know Before NetHacking)
         (or Not Everything That Happens Always Comes Knocking)
 
-	     Last Revision: 28 March 2000 for NetHack 3.3.1
+	     Last Revision: 28 March 2000 for NetHack 3.4.0
 
 
-0. Pre-intro for NetHack 3.3.1:
-   Amiga-specific changes for 3.3.1:
+0. Pre-intro for NetHack 3.4.0:
+   Amiga-specific changes for 3.4.0:
      Most (around 99%) known bugs fixed (volunteers welcome).
      HackWB and HackCli are no longer supported.  Use the main binary.
 
@@ -24,9 +24,9 @@ I.A. Overview
     light those mundane tasks which must be dealt with before beginning
     your journey; for those of you who are faced with the task of
     installing the pre-fabricated version of our town, section III
-    (Installing Amiga NetHack 3.3) will guide you through the task at
+    (Installing Amiga NetHack 3.4) will guide you through the task at
     hand.  If you are ready to visit, the local visitors guide is in
-    section II (Using Amiga NetHack 3.3); please also see the general
+    section II (Using Amiga NetHack 3.4); please also see the general
     guide packaged separately (the file "GuideBook").
     
     To all our visitors, a hearty Welcome! - and please be careful.
@@ -56,7 +56,7 @@ I.C. Credits
     are responsible for the 3.2 port.  Janne Salmijärvi resurrected the
     amigaport for 3.3.
 
-II. Using Amiga NetHack 3.3
+II. Using Amiga NetHack 3.4
     Run NetHack from the shell or from some tool that allows that,
     ie. ToolManager.  See the NetHack.txt file for command line options
     and other usage.
@@ -71,10 +71,10 @@ II.A. Sources of Information
     menu or by pressing Help key.
 
 II.B. The Amiga NetHack WorkBench Front End
-    3.3.1 no longer supports HackWB.
+    3.4.0 no longer supports HackWB.
 
 II.C. The Amiga NetHack CLI Front End
-    3.3.1 no longer supports CLI Front End either.
+    3.4.0 no longer supports CLI Front End either.
 
     Instead, use the main binary.  See NetHack.txt file for the standard Unix
     flags for NetHack.  In addition to those flags, Amiga NetHack accepts
@@ -103,7 +103,7 @@ II.D. Amiga-Specific Information for NetHack
     is to drop all selected items (as before).
 
 
-III. Installing Amiga NetHack 3.3
+III. Installing Amiga NetHack 3.4
 
 III.A. General Installation
     Installation should be easy - basically it consists of putting files
@@ -114,12 +114,12 @@ III.A. General Installation
 
     IF YOU ALREADY HAVE A PREVIOUS VERSION INSTALLED YOU MUST DELETE THE
     OLD SAVE AND BONES FILES - THEY WILL NOT WORK!  This includes save
-    and bones files from all previous versions of NetHack (yes, even 3.3.0).
+    and bones files from all previous versions of NetHack (yes, even 3.3.1).
     If you have a game in progress and want to finish it, use your
     current version and then update.
 
 Will NetHack fit on your machine?
-    NetHack 3.3 is large.  NetHack 3.3 is very large.  You will need:
+    NetHack 3.4 is large.  NetHack 3.4 is very large.  You will need:
     > Any standard series Amiga: 500, 600, 1000, 1200, 2000, 2500, 3000, 4000.
     > WorkBench 2.04 or later.
     > At least 3 meg of RAM.  NetHack will NOT run in 1 meg (probably even 2).

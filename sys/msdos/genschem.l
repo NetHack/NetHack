@@ -276,8 +276,8 @@ char *argv[];
             return 1;
 	};
 
-	Header = BC ? "/* SCCS Id: @(#)%s\t3.3\t %02d/%02d/%02d */\n" :
-	    "; SCCS Id: @(#)%s\t3.3\t %02d/%02d/%02d\n";
+	Header = BC ? "/* SCCS Id: @(#)%s\t3.4\t %02d/%02d/%02d */\n" :
+	    "; SCCS Id: @(#)%s\t3.4\t %02d/%02d/%02d\n";
 	Header2 = BC ? "/* Copyright (c) Yitzhak Sapir, %d */\n" :
 	    "; Copyright (c) NetHack PC Development Team, %d\n";
 	Header3 = BC ? "\n\n" : ";\n\nSEGMENTS\n\n";

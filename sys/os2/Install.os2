@@ -1,4 +1,4 @@
-             Instructions for compiling and installing NetHack 3.3
+             Instructions for compiling and installing NetHack 3.4
                                on an OS/2 system
              =====================================================
                                 Timo Hakulinen
@@ -51,7 +51,7 @@
 
     Note that code compiled for OS/2 versions 1.0-1.3 runs unmodified in OS/2
     versions 2.0 and up.  In principle it should be possible to cross compile
-    NetHack 3.3 for OS/2 in DOS using NDMAKE and MSC, but this is not
+    NetHack 3.4 for OS/2 in DOS using NDMAKE and MSC, but this is not
     recommended (see note 3).
 
     If you're using some other compiler than one listed above, you will have
@@ -171,7 +171,7 @@
     soko4-2.lev    tower1.lev     tower2.lev     tower3.lev     valley.lev
     water.lev      wizard1.lev    wizard2.lev    wizard3.lev    wizhelp
 
-    Yes.  It's 112 files for a full featured NetHack 3.3.  If any of the files
+    Yes.  It's 112 files for a full featured NetHack 3.4.  If any of the files
     are missing, try to rerun make.  If that doesn't help, you'll have to try
     to decipher the makefile to find out how to manually create the missing
     files.  These kinds of troubles shouldn't happen except for two reasons:
@@ -181,7 +181,7 @@
 
     If you have old record, logfile, or news files in the game directory, they
     are not overwritten.  Of course, old records from NetHack 3.1 and 3.2 are
-    not worth keeping with 3.3, since these games are really quite different.
+    not worth keeping with 3.4, since these games are really quite different.
 
     Edit file nethack.cnf in the game directory to reflect your particular
     setup and personal preferences, following the comments there.  More info
@@ -199,7 +199,7 @@
     The following is a sample program description for OS/2 1.3 desktop, but
     it's similar for OS/2 2.0:
 
-    Program title:          NetHack 3.3
+    Program title:          NetHack 3.4
     Path and file name:     c:\games\nh33\nethack.cmd
     Parameters:
     Working directory:      c:\games\nh33
@@ -226,7 +226,7 @@ Notes
 -----
 
 1)  Save-files and bones-files from previous versions will not work with
-    NetHack 3.3.  Don't bother trying to keep them.
+    NetHack 3.4.  Don't bother trying to keep them.
 
 2)  To install an update of NetHack after changing something, enter "make"
     from the src directory.  If you add, delete, or reorder monsters or

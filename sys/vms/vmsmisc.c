@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsmisc.c	3.3	1996/03/02	*/
+/*	SCCS Id: @(#)vmsmisc.c	3.4	1996/03/02	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include <ssdef.h>

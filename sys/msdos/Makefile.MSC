@@ -1,6 +1,6 @@
-#	SCCS Id: @(#)Makefile.MSC	      3.3     2000/08/20
+#	SCCS Id: @(#)Makefile.MSC	      3.4     2000/08/20
 #	Copyright (c) NetHack PC Development Team 1997, 2000.
-#	PC NetHack 3.3 Makefile for MSC
+#	PC NetHack 3.4 Makefile for MSC
 #
 #	For questions or comments: nethack-bugs@nethack.org
 #
@@ -64,7 +64,7 @@ LEXYYC = lexyy.c
 #
 # Uncomment this line if you want to include support for ALT-numeric
 # sequences, such as ALT-2 for toggling #twoweapon mode.  
-# Note that this code did not get a thorough testing prior to 3.3.1
+# Note that this code did not get a thorough testing prior to 3.4.0
 #NEWALT=/DNEW_ALT
 
 #############################################################################

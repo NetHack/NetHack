@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sounds.c	3.3	2001/02/14	*/
+/*	SCCS Id: @(#)sounds.c	3.4	2001/02/14	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 

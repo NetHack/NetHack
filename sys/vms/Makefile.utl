@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for utility programs.
-#	SCCS Id: @(#)Makefile.utl	3.3	2000/08/05
+#	SCCS Id: @(#)Makefile.utl	3.4	2000/08/05
 
 #  Copy this file to [.util]Makefile. and then edit it as needed.
 #  Settings for CC and CFLAGS ought to match the ones used in [.src]Makefile.

@@ -1,6 +1,6 @@
-#	SCCS Id: @(#)Makefile.GCC	      3.3     1999/11/06
+#	SCCS Id: @(#)Makefile.GCC	      3.4     1999/11/06
 #	Copyright (c) NetHack PC Development Team 1996.
-#	PC NetHack 3.3 Makefile for djgpp V2
+#	PC NetHack 3.4 Makefile for djgpp V2
 #
 #	Gnu gcc compiler for msdos (djgpp)
 #	Requires Gnu Make utility (V3.73 or greater) supplied with djgpp V2

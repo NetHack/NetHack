@@ -1,13 +1,13 @@
-# SCCS Id: @(#)template.mak	3.3	96/10/25
+# SCCS Id: @(#)template.mak	3.4	1996/10/25
 # Copyright (c) NetHack PC Development Team 1996
 #
 ?BEGIN?
 ?SCCS?
 ?MSC?
-# PC NetHack 3.3 Makefile for Microsoft(tm) "C" >= 7.0 and MSVC >= 1.0
+# PC NetHack 3.4 Makefile for Microsoft(tm) "C" >= 7.0 and MSVC >= 1.0
 ?ENDMSC?
 ?BC?
-# PC NetHack 3.3 Makefile for Borland C++ 3.1.
+# PC NetHack 3.4 Makefile for Borland C++ 3.1.
 ?ENDBC?
 #
 # Nota Bene:	Before you get to here you should have already read

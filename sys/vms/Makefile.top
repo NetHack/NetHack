@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - top level for making & installing everything.
-#	SCCS Id: @(#)Makefile.top	3.3	96/03/02
+#	SCCS Id: @(#)Makefile.top	3.4	1996/03/02
 
 #  Copy this file to <top>Makefile.; edit the appropriate values for
 #  GAMEDIR ("playground" location) and GAMEOWNER (UIC or identifier

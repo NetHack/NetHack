@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lev_lex.h	3.3	1999/08/08	*/
+/*	SCCS Id: @(#)lev_lex.h	3.4	1999/08/08	*/
 /* "vms/lev_lex.h" copied into "util/stdio.h" for use in *_lex.c only!
  * This is an awful kludge to allow util/*_lex.c made by SunOS's `lex'
  * to be compiled as is.  (It isn't needed with `flex' or VMS POSIX

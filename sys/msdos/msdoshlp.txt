@@ -1,4 +1,4 @@
-            MSDOS specific help file for NetHack 3.3.0
+            MSDOS specific help file for NetHack 3.4.0
 		  (Last Revision: December 4, 1999)
 
 Copyright (c) NetHack PC Development Team 1993-1999.

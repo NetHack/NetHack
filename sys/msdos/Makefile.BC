@@ -1,9 +1,9 @@
-#	SCCS Id: @(#)Makefile.BC	3.3	1999/11/06
+#	SCCS Id: @(#)Makefile.BC	3.4	1999/11/06
 # Copyright (c) Yitzhak Sapir, 1999.
 # NetHack may be freely distributed.  See license for details.
 #
 
-# PC NetHack 3.3 Makefile for Borland C++ 3.1 and 4.5.
+# PC NetHack 3.4 Makefile for Borland C++ 3.1 and 4.5.
 #
 # Nota Bene:	Before you get to here you should have already read
 # 		the Install.dos file located in the sys/msdos directory.

@@ -1,7 +1,7 @@
-	Instructions for compiling and installing NetHack 3.3
+	Instructions for compiling and installing NetHack 3.4
 		          on a TOS system
 	=====================================================
-	          (or, How to make ST NetHack 3.3)
+	          (or, How to make ST NetHack 3.4)
 		     Last revision: 2 February 2000
 
 1.  Make sure all the NetHack files are in the appropriate directory structure.
@@ -115,7 +115,7 @@ Notes
 -----
 
 1)  Save files and bones files from previous versions will not work with
-    NetHack 3.3.  Don't bother trying to keep them.  
+    NetHack 3.4.  Don't bother trying to keep them.  
 
 2)  To install an update of NetHack after changing something, enter "make"
     from the src directory.  If you add, delete, or reorder monsters or

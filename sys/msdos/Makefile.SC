@@ -1,10 +1,10 @@
-#	SCCS Id :  @(#)Makefile.SC	      3.3     96/10/14
+#	SCCS Id :  @(#)Makefile.SC	      3.4     1996/10/14
 #	Copyright (c) NetHack Development Team 1996.
 #
 #	Symantec C compiler V7.2
 #	Written for Symantec SMAKE utility
 #
-#	NOTE: This Makefile has not been tested for NetHack 3.3.0
+#	NOTE: This Makefile has not been tested for NetHack 3.4.0
 #
 #	For questions or comments :  nethack-bugs@linc.cis.upenn.edu
 #

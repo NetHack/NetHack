@@ -1,4 +1,4 @@
-               Instructions for Installing NetHack 3.3.1
+               Instructions for Installing NetHack 3.4.0
                            on a VMS system
                =========================================
 
@@ -139,7 +139,7 @@
 Notes:
 
 1.  Save files and bones files from earlier versions will not work with
-    3.3.1.  The scoreboard file (RECORD) from 3.3.0 will work; one from
+    3.4.0.  The scoreboard file (RECORD) from 3.3.1 will work; one from
     version 3.2.x is slightly different format but should be compatible.
 
 2.  To specify user-preference options in your environment, define the
@@ -155,7 +155,7 @@ Notes:
     tradeoff for enabling checkpoint is that using it makes level changes
     do more I/O and take longer.  The "menustyle" option controls some
     aspects of the user interface, and can be set to "menustyle:traditional"
-    to make 3.3.1 or 3.2.x behave more like 3.1.3.
+    to make 3.4.0, 3.3.x, or 3.2.x behave more like 3.1.3.
 
     If logical name or DCL symbol NETHACKOPTIONS is not defined, NetHack
     will try HACKOPTIONS instead.  Regardless of whether or not either

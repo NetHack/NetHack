@@ -1,7 +1,7 @@
-#       SCCS Id: @(#)Makefile.nt       3.3     2002/01/22
+#       SCCS Id: @(#)Makefile.nt       3.4     2002/01/22
 #       Copyright (c) NetHack PC Development Team 1993-2001
 #
-#       NetHack 3.3.x Makefile for MS Visual C++ V6.x and above and MS NMAKE
+#       NetHack 3.4.x Makefile for MS Visual C++ V6.x and above and MS NMAKE
 #  
 #       Win32 Compilers Tested:
 #                              - Microsoft 32 bit Visual C++ V4.x
@@ -322,7 +322,7 @@ RECOVOBJS      = $(O)recover.o
 TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 
 #
-# These are not invoked during a normal game build in 3.3.0
+# These are not invoked during a normal game build in 3.4.0
 #
 TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
 		 $(O)decl.o	$(O)monst.o	$(O)objects.o

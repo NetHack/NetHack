@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)macmenu.c	3.3	99/11/24	*/
+/*	SCCS Id: @(#)macmenu.c	3.4	1999/11/24	*/
 /*      Copyright (c) Macintosh NetHack Port Team, 1993.          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1091,7 +1091,7 @@ aboutNetHack() {
 	if (theMenubar >= mbarRegular) {
 		(void) doversion();				/* is this necessary? */
 	} else {
-		unsigned char aboutStr[32] = "\pNetHack 3.3.";
+		unsigned char aboutStr[32] = "\pNetHack 3.4.";
 
 		if (PATCHLEVEL > 10) {
 			aboutStr[++aboutStr[0]] = '0'+PATCHLEVEL/10;
