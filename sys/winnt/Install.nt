@@ -42,22 +42,21 @@ environments:
 FIRST STEP:
 
 The first step in building either version of NetHack is to execute
-sys/winnt/nhsetup.bat.  Specify either TTY, or WIN.
+sys/winnt/nhsetup.bat.  
 
-For the tty version using the NT Console I/O subsystem:
+From the command prompt:
 	cd sys\winnt
-	nhsetup TTY
+	nhsetup
 
-For the graphical version (NetHackW)
-	cd sys\winnt
-	nhsetup WIN
+From a Windows explorer window:
+	double-click on nhsetup.bat
 
 A "binary" directory will be created off the top of the NetHack source
-tree to house the completed build for TTY and WIN.
+tree to house the completed build.
 
-If you specified "WIN", the build subdirectory will also be created off the 
-top of the NetHack source tree, and many files appropriate for that build 
-will be moved there.
+A build subdirectory will also be created off the top of the NetHack 
+source tree, and many files appropriate for a graphical build will be 
+moved there.
 
 If you wish to build the TTY version, proceed now to "BUILDING TTY VERSION."
 If you wish to build the graphical version, proceed now to "BUILDING GRAPHICAL VERSION."
@@ -268,7 +267,7 @@ I.  Dispelling the Myths:
 
     It is also assumed that you already changed your directory to 
     sys\winnt and executed:
-	nhsetup win
+	nhsetup
     as described at the top of this document. If you didn't, you must
     go back and do so before proceeding.
 
