@@ -258,7 +258,7 @@ register struct monst *mtmp;
 		break;
 
 	    case S_ANGEL:
-		{
+		if (humanoid(ptr)) {
 		    int spe2;
 
 		    /* create minion stuff; can't use mongets */

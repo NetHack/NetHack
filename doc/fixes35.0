@@ -11,6 +11,7 @@ expert fireball/cone of cold could not target a monster seen only with
 	infravision or ESP
 display "lotus juice", not "lotu juice" for the fruit juice name
 statue of any golem hit with stone-to-flesh spell animates as flesh golem
+only humanoid angelic minions should get/use sword and armor
 
 
 Platform- and/or Interface-Specific Fixes
