@@ -19,40 +19,35 @@
 #ifdef GETRES_SUPPORT
 
 # if defined(LINUX)
+#ifdef __GNUC__
+#define _GNU_SOURCE
+#endif
 
-static _syscall3(int, getresuid, unsigned short *, ruid, \
-  unsigned short *, euid, unsigned short *, suid)
-static _syscall3(int, getresgid, unsigned short *, rgid, \
-  unsigned short *, egid, unsigned short *, sgid)
+/* requires dynamic linking with libc */
+#include <dlfcn.h>
 
 static int
 real_getresuid(ruid, euid, suid)
 uid_t *ruid, *euid, *suid;
 {
-    int retval;
-    unsigned short r, e, s;
-    retval = getresuid(&r, &e, &s);
-    if (!retval) {
-	*ruid = r;
-	*euid = e;
-	*suid = s;
-    }
-    return retval;
+    int (*f)(uid_t *, uid_t *, uid_t *); /* getresuid signature */
+
+    f = dlsym(RTLD_NEXT, "getresuid");
+    if (!f) return -1;
+
+    return f(ruid, euid, suid);
 }
 
 static int
 real_getresgid(rgid, egid, sgid)
 gid_t *rgid, *egid, *sgid;
 {
-    int retval;
-    unsigned short r, e, s;
-    retval = getresgid(&r, &e, &s);
-    if (!retval) {
-	*rgid = r;
-	*egid = e;
-	*sgid = s;
-    }
-    return retval;
+    int (*f)(gid_t *, gid_t *, gid_t *); /* getresgid signature */
+
+    f = dlsym(RTLD_NEXT, "getresgid");
+    if (!f) return -1;
+
+    return f(rgid, egid, sgid);
 }
 
 # else
