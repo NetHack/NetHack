@@ -812,12 +812,18 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		if (!In_sokoban(&u.uz)) {
 		    char verbbuf[BUFSZ];
 #ifdef STEED
-		    if (u.usteed)
-		   	Sprintf(verbbuf,"lead %s",
+		    if (u.usteed) {
+		    	if ((trflags & RECURSIVETRAP) != 0)
+			    Sprintf(verbbuf, "and %s fall",
+				x_monnam(u.usteed,
+				    u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
+				    (char *)0, SUPPRESS_SADDLE, FALSE));
+			else
+			    Sprintf(verbbuf,"lead %s",
 				x_monnam(u.usteed,
 					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
 				 	 "poor", SUPPRESS_SADDLE, FALSE));
-		    else
+		    } else
 #endif
 		    Strcpy(verbbuf,"fall");
 		    You("%s into %s pit!", verbbuf, a_your[trap->madeby_u]);
@@ -1076,7 +1082,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		newsym(u.ux,u.uy);		/* update trap symbol */
 		losehp(rnd(16), "land mine", KILLED_BY_AN);
 		/* fall recursively into the pit... */
-		if ((trap = t_at(u.ux, u.uy)) != 0) dotrap(trap, 0);
+		if ((trap = t_at(u.ux, u.uy)) != 0) dotrap(trap, RECURSIVETRAP);
 		fill_pit(u.ux, u.uy);
 		break;
 

@@ -180,6 +180,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 /* Flags to control dotrap() in trap.c */
 #define NOWEBMSG	0x01	/* suppress stumble into web message */
 #define FORCEBUNGLE	0x02	/* adjustments appropriate for bungling */
+#define RECURSIVETRAP	0x04	/* trap changed into another type this same turn */
 
 /* Flags to control test_move in hack.c */
 #define DO_MOVE		0	/* really doing the move */
