@@ -105,6 +105,9 @@ char *argv[];
 
 	register int fd;
 	register char *dir;
+#if defined(WIN32)
+	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
+#endif
 #ifdef NOCWD_ASSUMPTIONS
 	char failbuf[BUFSZ];
 #endif
@@ -306,8 +309,11 @@ char *argv[];
 # if defined(WIN32)
 	/* Obtain the name of the logged on user and incorporate
 	 * it into the name. */
-	Sprintf(lock, "%s-%s",get_username(0),plname);
-	regularize(lock);
+	Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
+	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
+				'%', fnamebuf, encodedfnamebuf, BUFSZ);
+	Sprintf(lock, "%s",encodedfnamebuf);
+	/* regularize(lock); */ /* we encode now, rather than substitute */
 # else
 	Strcpy(lock,plname);
 	regularize(lock);

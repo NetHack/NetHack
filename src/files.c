@@ -68,7 +68,7 @@ char lock[PL_NSIZ+25];		/* long enough for username+-+name+.99 */
 #define SAVESIZE	(PL_NSIZ + 22)	/* [.save]<uid>player.e;1 */
 # else
 #  if defined(WIN32)
-#define SAVESIZE	(PL_NSIZ + 40)	/* username-player.NetHack-saved-game */
+#define SAVESIZE	(PL_NSIZ + 60)	/* username-player.NetHack-saved-game */
 #  else
 #define SAVESIZE	FILENAME	/* from macconf.h or pcconf.h */
 #  endif
@@ -126,6 +126,114 @@ int FDECL(parse_config_line, (FILE *,char *,char *,char *));
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
+
+
+/*
+ * fname_encode()
+ *
+ *   Args:
+ *	legal		zero-terminated list of acceptable file name characters
+ *	quotechar	lead-in character used to quote illegal characters as hex digits
+ *	s		string to encode
+ *	callerbuf	buffer to house result
+ *	bufsz		size of callerbuf
+ *
+ *   Notes:
+ *	The hex digits 0-9 and A-F are always part of the legal set due to
+ *	their use in the encoding scheme, even if not explicitly included in 'legal'.
+ *
+ *   Sample:
+ *	The following call:
+ *	    (void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+ *				'%', "This is a % test!", buf, 512);
+ *	results in this encoding:
+ *	    "This%20is%20a%20%25%20test%21"
+ */
+char *
+fname_encode(legal, quotechar, s, callerbuf, bufsz)
+const char *legal;
+char quotechar;
+char *s, *callerbuf;
+int bufsz;
+{
+	char *sp, *op;
+	int cnt = 0;
+	char hexdigits[] = "0123456789ABCDEF";
+
+	sp = s;
+	op = callerbuf;
+	*op = '\0';
+	
+	while (*sp) {
+		/* Do we have room for one more character or encoding? */
+		if ((bufsz - cnt) <= 4) return callerbuf;
+
+		if (*sp == quotechar) {
+			(void)sprintf(op, "%c%02X", quotechar, *sp);
+			 op += 3;
+			 cnt += 3;
+		} else if ((index(legal, *sp) != 0) || (index(hexdigits, *sp) != 0)) {
+			*op++ = *sp;
+			*op = '\0';
+			cnt++;
+		} else {
+			(void)sprintf(op,"%c%02X", quotechar, *sp);
+			op += 3;
+			cnt += 3;
+		}
+		sp++;
+	}
+	return callerbuf;
+}
+
+/*
+ * fname_decode()
+ *
+ *   Args:
+ *	quotechar	lead-in character used to quote illegal characters as hex digits
+ *	s		string to decode
+ *	callerbuf	buffer to house result
+ *	bufsz		size of callerbuf
+ */
+char *
+fname_decode(quotechar, s, callerbuf, bufsz)
+char quotechar;
+char *s, *callerbuf;
+int bufsz;
+{
+	char *sp, *op;
+	int k,calc,cnt = 0;
+	char hexdigits[] = "0123456789ABCDEF";
+	int  hexvalues[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+
+	sp = s;
+	op = callerbuf;
+	*op = '\0';
+	calc = 0;
+
+	while (*sp) {
+		/* Do we have room for one more character? */
+		if ((bufsz - cnt) <= 2) return callerbuf;
+		if (*sp == quotechar) {
+			sp++;
+			for (k=0; k < 15; ++k) if (*sp == hexdigits[k]) break;
+			if (k >= 15) return callerbuf;	/* impossible, so bail */
+			calc = hexvalues[k] << 4; 
+			sp++;
+			for (k=0; k < 15; ++k) if (*sp == hexdigits[k]) break;
+			if (k >= 15) return callerbuf;	/* impossible, so bail */
+			calc += hexvalues[k]; 
+			sp++;
+			*op++ = calc;
+			*op = '\0';
+		} else {
+			*op++ = *sp++;
+			*op = '\0';
+		}
+		cnt++;
+	}
+	return callerbuf;
+}
 
 #ifndef PREFIXES_IN_USE
 /*ARGSUSED*/
@@ -540,6 +648,9 @@ compress_bonesfile()
 void
 set_savefile_name()
 {
+#if defined(WIN32)
+	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
+#endif
 #ifdef VMS
 	Sprintf(SAVEF, "[.save]%d%s", getuid(), plname);
 	regularize(SAVEF+7);
@@ -563,7 +674,12 @@ set_savefile_name()
 	Strcat(SAVEF, ".sav");
 # else
 #  if defined(WIN32)
-	Sprintf(SAVEF,"%s-%s.NetHack-saved-game",get_username(0), plname);
+	/* Obtain the name of the logged on user and incorporate
+	 * it into the name. */
+	Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
+	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
+				'%', fnamebuf, encodedfnamebuf, BUFSZ);
+	Sprintf(SAVEF, "%s.NetHack-saved-game", encodedfnamebuf);
 #  else
 	Sprintf(SAVEF, "save/%d%s", (int)getuid(), plname);
 	regularize(SAVEF+5);	/* avoid . or / in name */
