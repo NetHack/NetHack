@@ -3154,7 +3154,7 @@ boolean u_caused;
 {
 	struct obj *obj, *obj2;
 	long i, scrquan, delquan;
-	const char *what;
+	char buf1[BUFSZ], buf2[BUFSZ];
 	int cnt = 0;
 
 	for (obj = level.objects[x][y]; obj; obj = obj2) {
@@ -3169,8 +3169,15 @@ boolean u_caused;
 		    if (!rn2(3)) delquan++;
 		if (delquan) {
 		    /* save name before potential delobj() */
-		    what = !give_feedback ? 0 : (x == u.ux && y == u.uy) ?
-				xname(obj) : distant_name(obj, xname);
+		    if (give_feedback) {
+			obj->quan = 1;
+			Strcpy(buf1, (x == u.ux && y == u.uy) ?
+				xname(obj) : distant_name(obj, xname));
+			obj->quan = 2;
+		    	Strcpy(buf2, (x == u.ux && y == u.uy) ?
+				xname(obj) : distant_name(obj, xname));
+			obj->quan = scrquan;
+		    }
 		    /* useupf(), which charges, only if hero caused damage */
 		    if (u_caused) useupf(obj, delquan);
 		    else if (delquan < scrquan) obj->quan -= delquan;
@@ -3178,9 +3185,9 @@ boolean u_caused;
 		    cnt += delquan;
 		    if (give_feedback) {
 			if (delquan > 1)
-			    pline("%ld %s burn.", delquan, what);
+			    pline("%ld %s burn.", delquan, buf2);
 			else
-			    pline("%s burns.", An(what));
+			    pline("%s burns.", An(buf1));
 		    }
 		}
 	    }
