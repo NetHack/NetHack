@@ -472,7 +472,8 @@ int *fail_reason;
 	else mon->mundetected = FALSE;
 
 	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
-	    const char *comes_to_life = nonliving(mon->data) ?
+	    const char *comes_to_life = (nonliving(mon->data) ||
+					 is_vampshifter(mon)) ?
 					"moves" : "comes to life"; 
 	    if (cause == ANIMATE_SPELL)
 	    	pline("%s %s!", upstart(statuename),

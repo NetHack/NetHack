@@ -233,11 +233,12 @@ int psflags;
 	int mntmp = NON_PM;
 	int tries=0;
 	boolean forcecontrol = (psflags == 1);
+	boolean monsterpoly = (psflags == 2);
 	boolean draconian = (uarm &&
 				uarm->otyp >= GRAY_DRAGON_SCALE_MAIL &&
 				uarm->otyp <= YELLOW_DRAGON_SCALES);
 	boolean iswere = (u.ulycn >= LOW_PM || is_were(youmonst.data));
-	boolean isvamp = (youmonst.data->mlet == S_VAMPIRE || u.umonnum == PM_VAMPIRE_BAT);
+	boolean isvamp = (youmonst.data->mlet == S_VAMPIRE);
 	boolean was_floating = (Levitation || Flying);
 
         if(!Polymorph_control && !forcecontrol && !draconian && !iswere && !isvamp) {
@@ -250,7 +251,7 @@ int psflags;
 	}
 	old_light = Upolyd ? emits_light(youmonst.data) : 0;
 
-	if (Polymorph_control || forcecontrol) {
+	if ((Polymorph_control || forcecontrol) && !monsterpoly) {
 		do {
 			getlin("Become what kind of monster? [type the name]",
 				buf);
@@ -288,10 +289,21 @@ int psflags;
 			else
 				mntmp = u.ulycn;
 		} else {
-			if (youmonst.data->mlet == S_VAMPIRE)
-				mntmp = PM_VAMPIRE_BAT;
-			else
-				mntmp = PM_VAMPIRE;
+			if (youmonst.data->mlet == S_VAMPIRE) {
+				mntmp = (youmonst.data != &mons[PM_VAMPIRE] &&
+					 !rn2(10)) ? PM_WOLF :
+					!rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
+				if (Polymorph_control) {
+					char buf[BUFSZ];
+					Sprintf(buf, "Become %s?",
+						an(mons[mntmp].mname));
+					if (yn(buf) != 'y') return;
+				}
+				if (Unchanging) {
+					pline("You fail to transform!");
+					return;
+				}
+			}
 		}
 		/* if polymon fails, "you feel" message has been given
 		   so don't follow up with another polymon or newman */
@@ -1074,6 +1086,21 @@ dohide()
 	} else
 		u.uundetected = 1;
 	newsym(u.ux,u.uy);
+	return(1);
+}
+
+int
+dopoly()
+{
+	boolean isvampire = youmonst.data->mlet == S_VAMPIRE;
+	struct permonst *savedat = youmonst.data;
+	if (isvampire) {
+		polyself(2);
+		if (savedat != youmonst.data) {
+			You("transform into %s.", an(youmonst.data->mname));
+			newsym(u.ux,u.uy);
+		}
+	}
 	return(1);
 }
 

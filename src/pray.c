@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.4	2003/10/26	*/
+/*	SCCS Id: @(#)pray.c	3.4	2004/06/12	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1697,6 +1697,7 @@ doturn()
 		distu(mtmp->mx,mtmp->my) > range) continue;
 
 	    if (!mtmp->mpeaceful && (is_undead(mtmp->data) ||
+	    	   is_vampshifter(mtmp) ||
 		   (is_demon(mtmp->data) && (u.ulevel > (MAXULEV/2))))) {
 
 		    mtmp->msleeping = 0;

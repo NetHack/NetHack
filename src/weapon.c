@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.4	2002/11/07	*/
+/*	SCCS Id: @(#)weapon.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -124,7 +124,7 @@ struct monst *mon;
 
 	/* Blessed weapons used against undead or demons */
 	if (Is_weapon && otmp->blessed &&
-	   (is_demon(ptr) || is_undead(ptr))) tmp += 2;
+	   (is_demon(ptr) || is_undead(ptr) || is_vampshifter(mon))) tmp += 2;
 
 	if (is_spear(otmp) &&
 	   index(kebabable, ptr->mlet)) tmp += 2;
@@ -270,11 +270,12 @@ struct monst *mon;
 		otmp->oclass == BALL_CLASS || otmp->oclass == CHAIN_CLASS) {
 	    int bonus = 0;
 
-	    if (otmp->blessed && (is_undead(ptr) || is_demon(ptr)))
+	    if (otmp->blessed &&
+		(is_undead(ptr) || is_demon(ptr) || is_vampshifter(mon)))
 		bonus += rnd(4);
 	    if (is_axe(otmp) && is_wooden(ptr))
 		bonus += rnd(4);
-	    if (objects[otyp].oc_material == SILVER && hates_silver(ptr))
+	    if (objects[otyp].oc_material == SILVER && mon_hates_silver(mon))
 		bonus += rnd(20);
 
 	    /* if the weapon is going to get a double damage bonus, adjust
@@ -370,7 +371,7 @@ register struct monst *mtmp;
 		if (((strongmonst(mtmp->data) && (mtmp->misc_worn_check & W_ARMS) == 0)
 			|| !objects[pwep[i]].oc_bimanual) &&
 		    (objects[pwep[i]].oc_material != SILVER
-			|| !hates_silver(mtmp->data))) {
+			|| !mon_hates_silver(mtmp))) {
 		    if ((otmp = oselect(mtmp, pwep[i])) != 0) {
 			propellor = otmp; /* force the monster to wield it */
 			return otmp;
@@ -492,7 +493,7 @@ register struct monst *mtmp;
 	    if (((strong && !wearing_shield)
 			|| !objects[hwep[i]].oc_bimanual) &&
 		    (objects[hwep[i]].oc_material != SILVER
-			|| !hates_silver(mtmp->data)))
+			|| !mon_hates_silver(mtmp)))
 		Oselect(hwep[i]);
 	}
 

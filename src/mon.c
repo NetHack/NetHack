@@ -18,7 +18,6 @@ STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));
 STATIC_DCL long FDECL(mm_displacement, (struct monst *,struct monst *));
 #endif
 STATIC_DCL int NDECL(pick_animal);
-STATIC_DCL int FDECL(select_newcham_form, (struct monst *));
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 
 #ifdef REINCARNATION
@@ -530,8 +529,12 @@ mcalcdistress()
 	mon_regen(mtmp, FALSE);
 
 	/* possibly polymorph shapechangers and lycanthropes */
-	if (mtmp->cham && !rn2(6))
-	    (void) newcham(mtmp, (struct permonst *)0, FALSE, FALSE);
+	if (mtmp->cham != CHAM_ORDINARY) {
+	    if (is_vampshifter(mtmp) || mtmp->data->mlet == S_VAMPIRE)
+		decide_to_shapeshift(mtmp,0);
+	    else if (!rn2(6))
+		(void) newcham(mtmp, (struct permonst *)0, FALSE, FALSE);
+	}
 	were_change(mtmp);
 
 	/* gradually time out temporary problems */
@@ -917,7 +920,6 @@ max_mon_load(mtmp)
 register struct monst *mtmp;
 {
 	register long maxload;
-
 	/* Base monster carrying capacity is equal to human maximum
 	 * carrying capacity, or half human maximum if not strong.
 	 * (for a polymorphed player, the value used would be the
@@ -956,7 +958,7 @@ struct obj *otmp;
 	    return FALSE;
 	if (otyp == CORPSE && is_rider(&mons[otmp->corpsenm]))
 	    return FALSE;
-	if (objects[otyp].oc_material == SILVER && hates_silver(mdat) &&
+	if (objects[otyp].oc_material == SILVER && mon_hates_silver(mtmp) &&
 		(otyp != BELL_OF_OPENING || !is_covetous(mdat)))
 	    return FALSE;
 
@@ -1049,7 +1051,8 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 	       !((IS_TREE(ntyp) ? treeok : rockok) && may_dig(nx,ny))) continue;
 	    /* KMH -- Added iron bars */
 	    if (ntyp == IRONBARS && !(flag & ALLOW_BARS)) continue;
-	    if(IS_DOOR(ntyp) && !amorphous(mdat) &&
+	    if(IS_DOOR(ntyp) && 
+		!(amorphous(mdat) || (!amorphous(mdat) && can_fog(mon))) &&
 	       ((levl[nx][ny].doormask & D_CLOSED && !(flag & OPENDOOR)) ||
 		(levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))) &&
 	       !thrudoor) continue;
@@ -1373,7 +1376,7 @@ struct obj *
 mlifesaver(mon)
 struct monst *mon;
 {
-	if (!nonliving(mon->data)) {
+	if (!nonliving(mon->data) || is_vampshifter(mon)) {
 	    struct obj *otmp = which_armor(mon, W_AMUL);
 
 	    if (otmp && otmp->otyp == AMULET_OF_LIFE_SAVING)
@@ -1440,6 +1443,52 @@ register struct monst *mtmp;
 	}
 	lifesaved_monster(mtmp);
 	if (mtmp->mhp > 0) return;
+
+	if (is_vampshifter(mtmp)) {
+		int mndx = mtmp->cham;
+		int x = mtmp->mx, y = mtmp->my;
+		/* this only happens if shapeshifted */
+		if (mndx != CHAM_ORDINARY && mndx != monsndx(mtmp->data)) {
+			char buf[BUFSZ];
+			boolean in_door = amorphous(mtmp->data) &&
+					 closed_door(mtmp->mx,mtmp->my);
+			Sprintf(buf,
+				"The %s%s suddenly %s and rises as %%s!",
+				(nonliving(mtmp->data) ||
+				 noncorporeal(mtmp->data) ||
+				 amorphous(mtmp->data)) ? "" : "seemingly dead ",
+	    			x_monnam(mtmp, ARTICLE_NONE, (char *)0, 
+		    		    SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION |
+				    SUPPRESS_INVISIBLE | SUPPRESS_IT, FALSE),
+				(nonliving(mtmp->data) ||
+				 noncorporeal(mtmp->data) ||
+				 amorphous(mtmp->data)) ?
+				"reconstitutes" : "transforms");
+			mtmp->mcanmove = 1;
+			mtmp->mfrozen = 0;
+			if (mtmp->mhpmax <= 0) mtmp->mhpmax = 10;
+			mtmp->mhp = mtmp->mhpmax;
+			/* this can happen if previously a fog cloud */
+			if (u.uswallow && (mtmp == u.ustuck))
+				expels(mtmp, mtmp->data, FALSE);
+			if (in_door) {
+				coord new_xy;
+				if (enexto(&new_xy,
+					    mtmp->mx, mtmp->my, &mons[mndx])) {
+					rloc_to(mtmp, new_xy.x, new_xy.y);
+				}
+			}
+			newcham(mtmp, &mons[mndx], FALSE, FALSE);
+			if (mtmp->data == &mons[mndx])
+				mtmp->cham = CHAM_ORDINARY;
+			else
+				mtmp->cham = mndx;
+			if ((!Blind && canseemon(mtmp)) || sensemon(mtmp))
+				pline(buf, a_monnam(mtmp));
+			newsym(x,y);
+			return;
+		}
+	}
 
 #ifdef STEED
 	/* Player is thrown from his steed when it dies */
@@ -2304,6 +2353,31 @@ pick_animal()
 	if (!animal_list) mon_animal_list(TRUE);
 
 	return animal_list[rn2(animal_list_count)];
+}
+
+void
+decide_to_shapeshift(mon, shiftflags)
+struct monst *mon;
+int shiftflags;
+{
+	boolean msg = FALSE;
+
+	if ((shiftflags & SHIFT_MSG) ||
+	    ((shiftflags & SHIFT_SEENMSG) && sensemon(mon))) msg = TRUE;
+
+	if (is_vampshifter(mon)) {
+	    /* The vampire has to be in good health (mhp) to maintain
+	     * its shifted form.
+             *
+	     * If we're shifted and getting low on hp, maybe shift back.
+	     * If we're not already shifted and in good health, maybe shift.
+	     */
+		if ((mon->mhp <= mon->mhpmax / 6) && rn2(4))
+			(void) newcham(mon, &mons[mon->cham], FALSE, msg);
+	} else if (mon->data->mlet == S_VAMPIRE && mon->cham == CHAM_ORDINARY
+		   && !rn2(6) && (mon->mhp > mon->mhpmax - ((mon->mhpmax / 10) + 1))) {
+			(void) newcham(mon, (struct permonst *)0, FALSE, msg);
+	}
 }
 
 int

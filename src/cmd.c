@@ -464,7 +464,8 @@ domonability()
 	    if(u.uburied)
 		pline("Unfortunately sound does not carry well through rock.");
 	    else aggravate();
-	} else if (Upolyd)
+	} else if (youmonst.data->mlet == S_VAMPIRE) return dopoly();
+	else if (Upolyd)
 		pline("Any special ability you may have is purely reflexive.");
 	else You("don't have a special ability in your normal form!");
 	return 0;

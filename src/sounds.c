@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sounds.c	3.4	2002/05/06	*/
+/*	SCCS Id: @(#)sounds.c	3.4	2004/06/12	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -157,7 +157,7 @@ dosounds()
     if (level.flags.has_morgue && !rn2(200)) {
 	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 	    if (DEADMONSTER(mtmp)) continue;
-	    if (is_undead(mtmp->data) &&
+	    if ((is_undead(mtmp->data) || is_vampshifter(mtmp)) &&
 		mon_in_room(mtmp, MORGUE)) {
 		switch (rn2(2)+hallu) {
 		    case 0:

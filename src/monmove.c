@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monmove.c	3.4	2002/04/06	*/
+/*	SCCS Id: @(#)monmove.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,9 @@ STATIC_DCL int FDECL(disturb,(struct monst *));
 STATIC_DCL void FDECL(distfleeck,(struct monst *,int *,int *,int *));
 STATIC_DCL int FDECL(m_arrival, (struct monst *));
 STATIC_DCL void FDECL(watch_on_duty,(struct monst *));
+STATIC_DCL boolean FDECL(stuff_prevents_passage, (struct monst *));
+STATIC_OVL int FDECL(vamp_shift, (struct monst *,struct permonst *));
+
 
 boolean /* TRUE : mtmp died */
 mb_trapped(mtmp)
@@ -936,6 +939,7 @@ not_special:
 	if (can_tunnel) flag |= ALLOW_DIG;
 	if (is_human(ptr) || ptr == &mons[PM_MINOTAUR]) flag |= ALLOW_SSM;
 	if (is_undead(ptr) && ptr->mlet != S_GHOST) flag |= NOGARLIC;
+	if (is_vampshifter(mtmp)) flag |= NOGARLIC;
 	if (throws_rocks(ptr)) flag |= ALLOW_ROCK;
 	if (can_open) flag |= OPENDOOR;
 	if (can_unlock) flag |= UNLOCKDOOR;
@@ -1118,7 +1122,9 @@ postmov:
 		    struct rm *here = &levl[mtmp->mx][mtmp->my];
 		    boolean btrapped = (here->doormask & D_TRAPPED);
 
-		    if(here->doormask & (D_LOCKED|D_CLOSED) && amorphous(ptr)) {
+		    if(here->doormask & (D_LOCKED|D_CLOSED) &&
+			(amorphous(ptr) || (!amorphous(ptr) && can_fog(mtmp) &&
+			   vamp_shift(mtmp, &mons[PM_FOG_CLOUD])))) {
 			if (flags.verbose && canseemon(mtmp))
 			    pline("%s %s under the door.", Monnam(mtmp),
 				  (ptr == &mons[PM_FOG_CLOUD] ||
@@ -1346,7 +1352,8 @@ register struct monst *mtmp;
 		  || ((mx != u.ux || my != u.uy) &&
 		      !passes_walls(mtmp->data) &&
 		      (!ACCESSIBLE(levl[mx][my].typ) ||
-		       (closed_door(mx, my) && !can_ooze(mtmp))))
+		       (closed_door(mx, my) &&
+			!(can_ooze(mtmp) || can_fog(mtmp)))))
 		  || !couldsee(mx, my));
 	} else {
 found_you:
@@ -1392,21 +1399,24 @@ xchar x,y;
 }
 #endif /* BARGETHROUGH */
 
-boolean
-can_ooze(mtmp)
+/*
+ * Inventory prevents passage under door.
+ * Used by can_ooze() and can_fog().
+ */
+STATIC_OVL boolean
+stuff_prevents_passage(mtmp)
 struct monst *mtmp;
 {
 	struct obj *chain, *obj;
 
-	if (!amorphous(mtmp->data)) return FALSE;
 	if (mtmp == &youmonst) {
 #ifndef GOLDOBJ
-		if (u.ugold > 100L) return FALSE;
+		if (u.ugold > 100L) return TRUE;
 #endif
 		chain = invent;
 	} else {
 #ifndef GOLDOBJ
-		if (mtmp->mgold > 100L) return FALSE;
+		if (mtmp->mgold > 100L) return TRUE;
 #endif
 		chain = mtmp->minvent;
 	}
@@ -1414,7 +1424,7 @@ struct monst *mtmp;
 		int typ = obj->otyp;
 
 #ifdef GOLDOBJ
-                if (typ == COIN_CLASS && obj->quan > 100L) return FALSE;
+                if (typ == COIN_CLASS && obj->quan > 100L) return TRUE;
 #endif
 		if (obj->oclass != GEM_CLASS &&
 		    !(typ >= ARROW && typ <= BOOMERANG) &&
@@ -1441,11 +1451,47 @@ struct monst *mtmp;
 		    typ != TIN_WHISTLE && typ != MAGIC_WHISTLE &&
 		    typ != MAGIC_MARKER && typ != TIN_OPENER &&
 		    typ != SKELETON_KEY && typ != LOCK_PICK
-		) return FALSE;
-		if (Is_container(obj) && obj->cobj) return FALSE;
-		    
+		) return TRUE;
+		if (Is_container(obj) && obj->cobj) return TRUE;		    
 	}
+	return FALSE;
+}
+
+boolean
+can_ooze(mtmp)
+struct monst *mtmp;
+{
+	if (!amorphous(mtmp->data) ||
+		stuff_prevents_passage(mtmp))
+		return FALSE;
 	return TRUE;
 }
 
+/* monster can change form into a fog if necessary */
+boolean
+can_fog(mtmp)
+struct monst *mtmp;
+{
+	if ((is_vampshifter(mtmp) || mtmp->data->mlet == S_VAMPIRE) &&
+		!Protection_from_shape_changers && !stuff_prevents_passage(mtmp))
+		return TRUE;
+	return FALSE;
+}
+
+STATIC_OVL int
+vamp_shift(mon,ptr)
+struct monst *mon;
+struct permonst *ptr;
+{
+	int reslt = 0;
+	if (mon->cham != CHAM_ORDINARY) {
+		if (ptr == &mons[mon->cham])
+			mon->cham = CHAM_ORDINARY;
+		reslt = newcham(mon, ptr, FALSE, FALSE);
+	} else if (mon->cham == CHAM_ORDINARY && ptr != mon->data) {
+		mon->cham = monsndx(mon->data);
+		reslt = newcham(mon, ptr, FALSE, FALSE);
+	}
+	return reslt;
+}
 /*monmove.c*/

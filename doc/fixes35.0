@@ -109,6 +109,10 @@ health-food store that stocks monk-appropriate foods in mine town when monk
 give more information about your attributes in debug mode
 polywarn to give intrinsic monster detection of limited species while polymorphed
 rocks can skip on the water sometimes allowing them to pass over water creatures
+vampires can now shapeshift into bats and fog clouds; the latter can be done at 
+	will to slip through locked doors
+shapeshifted vampire will transform back to vampire form after you defeat it and
+	continue to fight in its native form
 
 
 Platform- and/or Interface-Specific New Features

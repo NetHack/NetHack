@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2003/03/14	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -570,7 +570,8 @@ int thrown;
 		tmp = rnd(2);
 	    valid_weapon_attack = (tmp > 1);
 	    /* blessed gloves give bonuses when fighting 'bare-handed' */
-	    if (uarmg && uarmg->blessed && (is_undead(mdat) || is_demon(mdat)))
+	    if (uarmg && uarmg->blessed &&
+		    (is_undead(mdat) || is_demon(mdat) || is_vampshifter(mon)))
 		tmp += rnd(4);
 	    /* So do silver rings.  Note: rings are worn under gloves, so you
 	     * don't get both bonuses.
@@ -580,7 +581,7 @@ int thrown;
 		    barehand_silver_rings++;
 		if (uright && objects[uright->otyp].oc_material == SILVER)
 		    barehand_silver_rings++;
-		if (barehand_silver_rings && hates_silver(mdat)) {
+		if (barehand_silver_rings && mon_hates_silver(mon)) {
 		    tmp += rnd(20);
 		    silvermsg = TRUE;
 		}
@@ -609,7 +610,7 @@ int thrown;
 		    else
 			tmp = rnd(2);
 		    if (objects[obj->otyp].oc_material == SILVER
-				&& hates_silver(mdat)) {
+				&& mon_hates_silver(mon)) {
 			silvermsg = TRUE; silverobj = TRUE;
 			/* if it will already inflict dmg, make it worse */
 			tmp += rnd((tmp) ? 20 : 10);
@@ -676,7 +677,7 @@ int thrown;
 			hittxt = TRUE;
 		    }
 		    if (objects[obj->otyp].oc_material == SILVER
-				&& hates_silver(mdat)) {
+				&& mon_hates_silver(mon)) {
 			silvermsg = TRUE; silverobj = TRUE;
 		    }
 #ifdef STEED
@@ -833,7 +834,7 @@ int thrown;
 #undef useup_eggs
 		      }
 		    case CLOVE_OF_GARLIC:	/* no effect against demons */
-			if (is_undead(mdat)) {
+			if (is_undead(mdat) || is_vampshifter(mon)) {
 			    monflee(mon, d(2, 4), FALSE, TRUE);
 			}
 			tmp = 1;
@@ -905,7 +906,7 @@ int thrown;
 			 * so we need another silver check.
 			 */
 			if (objects[obj->otyp].oc_material == SILVER
-						&& hates_silver(mdat)) {
+						&& mon_hates_silver(mon)) {
 				tmp += rnd(20);
 				silvermsg = TRUE; silverobj = TRUE;
 			}
@@ -1067,7 +1068,7 @@ int thrown;
 		    fmt = "%s is seared!";
 		}
 		/* note: s_suffix returns a modifiable buffer */
-		if (!noncorporeal(mdat))
+		if (!noncorporeal(mdat) && !amorphous(mdat))
 		    whom = strcat(s_suffix(whom), " flesh");
 		pline(fmt, whom);
 	}

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.4	2003/12/04	*/
+/*	SCCS Id: @(#)dokick.c	3.4	2004/06/12	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,8 +49,8 @@ register boolean clumsy;
 	if (mon->data == &mons[PM_SHADE])
 	    dmg = 0;
 
-	if ((is_undead(mon->data) || is_demon(mon->data)) && uarmf &&
-		uarmf->blessed)
+	if ((is_undead(mon->data) || is_demon(mon->data) || is_vampshifter(mon))
+		 && uarmf && uarmf->blessed)
 	    blessed_foot_damage = 1;
 
 	if (mon->data == &mons[PM_SHADE] && !blessed_foot_damage) {

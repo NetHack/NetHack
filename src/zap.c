@@ -153,7 +153,7 @@ struct obj *otmp;
 	case SPE_TURN_UNDEAD:
 		wake = FALSE;
 		if (unturn_dead(mtmp)) wake = TRUE;
-		if (is_undead(mtmp->data)) {
+		if (is_undead(mtmp->data) || is_vampshifter(mtmp)) {
 			reveal_invis = TRUE;
 			wake = TRUE;
 			dmg = rnd(8);
@@ -3034,7 +3034,8 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 			break;
 		    }
 		    if (nonliving(mon->data) || is_demon(mon->data) ||
-			    resists_magm(mon)) {	/* similar to player */
+			    is_vampshifter(mon) || resists_magm(mon)) {
+			/* similar to player */
 			sho_shieldeff = TRUE;
 			break;
 		    }

@@ -1848,7 +1848,7 @@ skipmsg:
 		    if (!where_to) {
 			pline_The("whip slips free.");  /* not `The_whip' */
 			return 1;
-		    } else if (where_to == 3 && hates_silver(mtmp->data) &&
+		    } else if (where_to == 3 && mon_hates_silver(mtmp) &&
 			    objects[obj->otyp].oc_material == SILVER) {
 			/* this monster won't want to catch a silver
 			   weapon; drop it at hero's feet instead */
@@ -1929,7 +1929,8 @@ struct monst *mtmp;
 	if (difficulty < 6 && !rn2(30))
 	    return rn2(6) ? POT_POLYMORPH : WAN_POLYMORPH;
 
-	if (!rn2(40) && !nonliving(pm)) return AMULET_OF_LIFE_SAVING;
+	if (!rn2(40) && !nonliving(pm) && !is_vampshifter(mtmp))
+	    return AMULET_OF_LIFE_SAVING;
 
 	switch (rn2(3)) {
 		case 0:
@@ -1997,7 +1998,7 @@ struct obj *obj;
 	    break;
 	case AMULET_CLASS:
 	    if (typ == AMULET_OF_LIFE_SAVING)
-		return (boolean)(!nonliving(mon->data));
+		return (boolean)(!(nonliving(mon->data) || is_vampshifter(mon)));
 	    if (typ == AMULET_OF_REFLECTION)
 		return TRUE;
 	    break;

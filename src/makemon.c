@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.4	2004/05/21	*/
+/*	SCCS Id: @(#)makemon.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1001,18 +1001,28 @@ register int	mmflags;
 				 LS_MONSTER, (genericptr_t)mtmp);
 	mitem = 0;	/* extra inventory item for this monster */
 
+	if (mndx == PM_VLAD_THE_IMPALER)
+		mitem = CANDELABRUM_OF_INVOCATION;
 	mtmp->cham = CHAM_ORDINARY;	/* default is "not a shapechanger" */
 	if ((mcham = pm_to_cham(mndx)) != CHAM_ORDINARY) {
 		/* this is a shapechanger after all */
 		if (Protection_from_shape_changers) {
 			;	/* stuck in its natural form (CHAM_ORDINARY) */
 		} else {
-			/* new shapechanger starts out with random form
+			/* General shapechangers start out with random form
 			   (this explicitly picks something from the normal
 			   selection for current difficulty level rather
-			   than from among shapechanger's preferred forms) */
+			   than from among shapechanger's preferred forms).
+			   Vampires are the exception. */
+			struct permonst *tmpcham = rndmonst();
 			mtmp->cham = mcham;
-			(void) newcham(mtmp, rndmonst(), FALSE, FALSE);
+			if (is_vampshifter(mtmp)){
+			    int chamidx = select_newcham_form(mtmp);
+			    if (chamidx != NON_PM)
+				tmpcham = &mons[chamidx];
+			}
+			if (mtmp->cham != PM_VLAD_THE_IMPALER)
+			    (void) newcham(mtmp,tmpcham,FALSE, FALSE);
 		}
 	} else if (mndx == PM_WIZARD_OF_YENDOR) {
 		mtmp->iswiz = TRUE;
@@ -1021,8 +1031,6 @@ register int	mmflags;
 			mitem = SPE_DIG;
 	} else if (mndx == PM_GHOST && !(mmflags & MM_NONAME)) {
 		mtmp = christen_monst(mtmp, rndghostname());
-	} else if (mndx == PM_VLAD_THE_IMPALER) {
-		mitem = CANDELABRUM_OF_INVOCATION;
 	} else if (mndx == PM_CROESUS) {
 		mitem = TWO_HANDED_SWORD;
 	} else if (ptr->msound == MS_NEMESIS) {

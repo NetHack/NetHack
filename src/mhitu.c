@@ -890,7 +890,7 @@ hitmu(mtmp, mattk)
 
 /*	First determine the base damage done */
 	dmg = d((int)mattk->damn, (int)mattk->damd);
-	if(is_undead(mdat) && midnight())
+	if((is_undead(mdat) || is_vampshifter(mtmp)) && midnight())
 		dmg += d((int)mattk->damn, (int)mattk->damd); /* extra damage */
 
 /*	Next a cancellation factor	*/
@@ -1550,7 +1550,8 @@ dopois:
 	    if (Half_physical_damage
 					/* Mitre of Holiness */
 		|| (Role_if(PM_PRIEST) && uarmh && is_quest_artifact(uarmh) &&
-		    (is_undead(mtmp->data) || is_demon(mtmp->data))))
+		    (is_undead(mtmp->data) ||
+			is_demon(mtmp->data) || is_vampshifter(mtmp))))
 		dmg = (dmg+1) / 2;
 
 	    if (permdmg) {	/* Death's life force drain */

@@ -1211,7 +1211,7 @@ boolean your_fault;
 		break;
 	case POT_WATER:
 		if (is_undead(mon->data) || is_demon(mon->data) ||
-			is_were(mon->data)) {
+			is_were(mon->data) || is_vampshifter(mon)) {
 		    if (obj->blessed) {
 			pline("%s %s in pain!", Monnam(mon),
 			      is_silent(mon->data) ? "writhes" : "shrieks");

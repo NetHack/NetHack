@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.4	2003/01/17	*/
+/*	SCCS Id: @(#)spell.c	3.4	2004/06/12	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -284,7 +284,8 @@ raise_dead:
 	    mtmp2 = mtmp->nmon;		/* tamedog() changes chain */
 	    if (DEADMONSTER(mtmp)) continue;
 
-	    if (is_undead(mtmp->data) && cansee(mtmp->mx, mtmp->my)) {
+	    if ((is_undead(mtmp->data) || is_vampshifter(mtmp)) &&
+			cansee(mtmp->mx, mtmp->my)) {
 		mtmp->mpeaceful = TRUE;
 		if(sgn(mtmp->data->maligntyp) == sgn(u.ualign.type)
 		   && distu(mtmp->mx, mtmp->my) < 4)

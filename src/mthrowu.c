@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.4	2003/11/26	*/
+/*	SCCS Id: @(#)mthrowu.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -182,7 +182,7 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 		}
 	    }
 	    if (objects[otmp->otyp].oc_material == SILVER &&
-		    hates_silver(mtmp->data)) {
+		    mon_hates_silver(mtmp)) {
 		if (vis) pline_The("silver sears %s flesh!",
 				s_suffix(mon_nam(mtmp)));
 		else if (verbose) pline("Its flesh is seared!");
@@ -201,7 +201,8 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 	    if (mtmp->mhp < 1) {
 		if (vis || verbose)
 		    pline("%s is %s!", Monnam(mtmp),
-			(nonliving(mtmp->data) || !canspotmon(mtmp))
+			(nonliving(mtmp->data) ||
+				is_vampshifter(mtmp) || !canspotmon(mtmp))
 			? "destroyed" : "killed");
 		/* don't blame hero for unknown rolling boulder trap */
 		if (!context.mon_moving &&

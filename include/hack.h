@@ -153,6 +153,10 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define CORPSTAT_INIT	  0x01	/* pass init flag to mkcorpstat */
 #define CORPSTAT_BURIED	  0x02	/* bury the corpse or statue */
 
+/* flags for decide_to_shift() */
+#define SHIFT_SEENMSG	  0x01	/* put out a message if in sight */
+#define SHIFT_MSG	  0x02  /* always put out a message */
+ 
 /* special mhpmax value when loading bones monster to flag as extinct or genocided */
 #define DEFUNCT_MONSTER	(-100)
 

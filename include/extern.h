@@ -1196,6 +1196,7 @@ E void NDECL(kill_genocided_monsters);
 E void FDECL(golemeffects, (struct monst *,int,int));
 E boolean FDECL(angry_guards, (BOOLEAN_P));
 E void NDECL(pacify_guards);
+E void FDECL(decide_to_shapeshift, (struct monst *,int));
 
 /* ### mondata.c ### */
 
@@ -1209,6 +1210,7 @@ E boolean FDECL(resists_blnd, (struct monst *));
 E boolean FDECL(can_blnd, (struct monst *,struct monst *,UCHAR_P,struct obj *));
 E boolean FDECL(ranged_attk, (struct permonst *));
 E boolean FDECL(hates_silver, (struct permonst *));
+E boolean FDECL(mon_hates_silver, (struct monst *));
 E boolean FDECL(passes_bars, (struct permonst *));
 E boolean FDECL(can_blow, (struct monst *));
 E boolean FDECL(can_track, (struct permonst *));
@@ -1247,6 +1249,7 @@ E boolean FDECL(closed_door, (int,int));
 E boolean FDECL(accessible, (int,int));
 E void FDECL(set_apparxy, (struct monst *));
 E boolean FDECL(can_ooze, (struct monst *));
+E boolean FDECL(can_fog, (struct monst *));
 #ifdef BARGETHROUGH
 E boolean FDECL(should_displace, (struct monst *,coord *,long *,int,
 					XCHAR_P,XCHAR_P));
@@ -1591,6 +1594,7 @@ E int NDECL(dospinweb);
 E int NDECL(dosummon);
 E int NDECL(dogaze);
 E int NDECL(dohide);
+E int NDECL(dopoly);
 E int NDECL(domindblast);
 E void FDECL(skinback, (BOOLEAN_P));
 E const char *FDECL(mbodypart, (struct monst *,int));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)dog.c	3.4	2004/06/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -689,7 +689,7 @@ register struct obj *obj;
 			return (herbi ? CADAVER : MANFOOD);
 		    else return (carni ? CADAVER : MANFOOD);
 		case CLOVE_OF_GARLIC:
-		    return (is_undead(mon->data) ? TABU :
+		    return ((is_undead(mon->data) || is_vampshifter(mon)) ? TABU :
 			    ((herbi || starving) ? ACCFOOD : MANFOOD));
 		case TIN:
 		    return (metallivorous(mon->data) ? ACCFOOD : MANFOOD);
@@ -709,7 +709,7 @@ register struct obj *obj;
 	    if (obj->otyp == AMULET_OF_STRANGULATION ||
 			obj->otyp == RIN_SLOW_DIGESTION)
 		return TABU;
-	    if (hates_silver(mon->data) &&
+	    if (mon_hates_silver(mon) &&
 		objects[obj->otyp].oc_material == SILVER)
 		return(TABU);
 	    if (mon->data == &mons[PM_GELATINOUS_CUBE] && is_organic(obj))

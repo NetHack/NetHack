@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)explode.c	3.4	2003/10/21	*/
+/*	SCCS Id: @(#)explode.c	3.4	2004/06/12	*/
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -157,7 +157,7 @@ int expltype;
 				break;
 			case AD_DISN:
 				explmask[i][j] |= (olet == WAND_CLASS) ?
-					(nonliving(mtmp->data) || is_demon(mtmp->data)) :
+	(nonliving(mtmp->data) || is_demon(mtmp->data) || is_vampshifter(mtmp)) :
 					resists_disint(mtmp);
 				break;
 			case AD_ELEC:

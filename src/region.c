@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)region.c	3.4	2002/10/15	*/
+/*	SCCS Id: @(#)region.c	3.4	2004/06/12	*/
 /* Copyright (c) 1996 by Jean-Christophe Collet	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -922,7 +922,8 @@ genericptr_t p2;
 	mtmp = (struct monst *) p2;
 
 	/* Non living and non breathing monsters are not concerned */
-	if (!nonliving(mtmp->data) && !breathless(mtmp->data)) {
+	if (!(nonliving(mtmp->data) || is_vampshifter(mtmp))
+			 && !breathless(mtmp->data)) {
 	    if (cansee(mtmp->mx, mtmp->my))
 		pline("%s coughs!", Monnam(mtmp));
 	    if (heros_fault(reg)) setmangry(mtmp);

@@ -763,7 +763,7 @@ struct obj *obj;
 	    if (vis)
 		pline("%s can't see anything right now.", Monnam(mtmp));
 	/* some monsters do special things */
-	} else if (mlet == S_VAMPIRE || mlet == S_GHOST) {
+	} else if (mlet == S_VAMPIRE || mlet == S_GHOST || is_vampshifter(mtmp)) {
 	    if (vis)
 		pline ("%s doesn't have a reflection.", Monnam(mtmp));
 	} else if(!mtmp->mcan && !mtmp->minvis &&
