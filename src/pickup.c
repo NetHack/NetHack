@@ -32,6 +32,7 @@ STATIC_PTR int FDECL(in_container,(struct obj *));
 STATIC_PTR int FDECL(ck_bag,(struct obj *));
 STATIC_PTR int FDECL(out_container,(struct obj *));
 STATIC_DCL long FDECL(mbag_item_gone, (int,struct obj *));
+STATIC_DCL void FDECL(observe_quantum_cat, (struct obj *));
 STATIC_DCL int FDECL(menu_loot, (int, struct obj *, BOOLEAN_P));
 STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
@@ -1981,6 +1982,47 @@ struct obj *item;
     return loss;
 }
 
+STATIC_OVL void
+observe_quantum_cat(box)
+struct obj *box;
+{
+    static NEARDATA const char sc[] = "Schroedinger's Cat";
+    struct obj *deadcat;
+    struct monst *livecat;
+    xchar ox, oy;
+
+    box->spe = 0;		/* box->owt will be updated below */
+    if (get_obj_location(box, &ox, &oy, 0))
+	box->ox = ox, box->oy = oy;	/* in case it's being carried */
+
+    /* this isn't really right, since any form of observation
+       (telepathic or monster/object/food detection) ought to
+       force the determination of alive vs dead state; but basing
+       it just on opening the box is much simpler to cope with */
+    livecat = rn2(2) ? makemon(&mons[PM_HOUSECAT],
+			       box->ox, box->oy, NO_MINVENT) : 0;
+    if (livecat) {
+	livecat->mpeaceful = 1;
+	set_malign(livecat);
+	if (!canspotmon(livecat))
+	    You("think %s brushed your %s.", something, body_part(FOOT));
+	else
+	    pline("%s inside the box is still alive!", Monnam(livecat));
+	(void) christen_monst(livecat, sc);
+    } else {
+	deadcat = mk_named_object(CORPSE, &mons[PM_HOUSECAT],
+				  box->ox, box->oy, sc);
+	if (deadcat) {
+	    obj_extract_self(deadcat);
+	    (void) add_to_container(box, deadcat);
+	}
+	pline_The("%s inside the box is dead!",
+	    Hallucination ? rndmonnam() : "housecat");
+    }
+    box->owt = weight(box);
+    return;
+}
+
 #undef Icebox
 
 int
@@ -1992,7 +2034,8 @@ register int held;
 #ifndef GOLDOBJ
 	struct obj *u_gold = (struct obj *)0;
 #endif
-	boolean one_by_one, allflag, loot_out = FALSE, loot_in = FALSE;
+	boolean one_by_one, allflag, quantum_cat = FALSE,
+		loot_out = FALSE, loot_in = FALSE;
 	char select[MAXOCLASSES+1];
 	char qbuf[BUFSZ], emptymsg[BUFSZ], pbuf[QBUFSZ];
 	long loss = 0L;
@@ -2024,38 +2067,9 @@ register int held;
 	current_container = obj;	/* for use by in/out_container */
 
 	if (obj->spe == 1) {
-	    static NEARDATA const char sc[] = "Schroedinger's Cat";
-	    struct obj *ocat;
-	    struct monst *cat;
-
-	    obj->spe = 0;		/* obj->owt will be updated below */
-	    /* this isn't really right, since any form of observation
-	       (telepathic or monster/object/food detection) ought to
-	       force the determination of alive vs dead state; but basing
-	       it just on opening the box is much simpler to cope with */
-	    cat = rn2(2) ? makemon(&mons[PM_HOUSECAT],
-				   obj->ox, obj->oy, NO_MINVENT) : 0;
-	    if (cat) {
-		cat->mpeaceful = 1;
-		set_malign(cat);
-		if (Blind)
-		    You("think %s brushed your %s.", something,
-			body_part(FOOT));
-		else
-		    pline("%s inside the box is still alive!", Monnam(cat));
-		(void) christen_monst(cat, sc);
-	    } else {
-		ocat = mk_named_object(CORPSE, &mons[PM_HOUSECAT],
-				       obj->ox, obj->oy, sc);
-		if (ocat) {
-		    obj_extract_self(ocat);
-		    (void) add_to_container(obj, ocat);
-		    /* weight handled below */
-		}
-		pline_The("%s inside the box is dead!",
-		    Hallucination ? rndmonnam() : "housecat");
-	    }
+	    observe_quantum_cat(obj);
 	    used = 1;
+	    quantum_cat = TRUE;	/* for adjusting "it's empty" message */
 	}
 	/* Count the number of contained objects. Sometimes toss objects if */
 	/* a cursed magic bag.						    */
@@ -2070,12 +2084,14 @@ register int held;
 	    }
 	}
 
-	if (loss)
+	if (loss)	/* magic bag lost some shop goods */
 	    You("owe %ld %s for lost merchandise.", loss, currency(loss));
-	obj->owt = weight(obj);
+	obj->owt = weight(obj);	/* in case any items were lost */
 
 	if (!cnt)
-	    Sprintf(emptymsg, "%s is empty.", Yname2(obj));
+	    Sprintf(emptymsg, "%s is %sempty.", Yname2(obj),
+		    quantum_cat ? "now " : "");
+
 	if (cnt || flags.menu_style == MENU_FULL) {
 	    Strcpy(qbuf, "Do you want to take something out of ");
 	    Sprintf(eos(qbuf), "%s?",
