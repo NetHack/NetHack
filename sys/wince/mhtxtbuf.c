@@ -235,3 +235,4 @@ void mswin_render_text(PNHTextBuffer pb, HWND edit_control)
 	}
 }
 /*----------------------------------------------------------------*/
+
