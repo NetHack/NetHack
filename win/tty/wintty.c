@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wintty.c	3.4	2002/02/05	*/
+/*	SCCS Id: @(#)wintty.c	3.4	2000/06/27	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -46,7 +46,7 @@ extern char mapped_menu_cmds[]; /* from options.c */
 struct window_procs tty_procs = {
     "tty",
 #ifdef MSDOS
-    WC_TILED_MAP|WC_TILES_16x16|WC_TILES_8x16|WC_ASCII_MAP|
+    WC_TILED_MAP|WC_ASCII_MAP|
 #endif
     WC_COLOR|WC_HILITE_PET|WC_INVERSE|WC_EIGHT_BIT_IN,
     tty_init_nhwindows,
