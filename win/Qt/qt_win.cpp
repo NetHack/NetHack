@@ -1091,6 +1091,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     int g = flags.initgend;
     if (g == -1) {
 	g = rn2(ROLE_GENDERS);
+	fully_specified_role = FALSE;
     }
     while (!validgend(ro,ra,g)) {
 	g = rn2(ROLE_GENDERS);
@@ -1101,6 +1102,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     int a = flags.initalign;
     if (a == -1) {
 	a = rn2(ROLE_ALIGNS);
+	fully_specified_role = FALSE;
     }
     while (!validalign(ro,ra,a)) {
 	a = rn2(ROLE_ALIGNS);
