@@ -11,7 +11,7 @@ A Guide to the Mazes of Menace
 (Guidebook for NetHack)
 .au
 Eric S. Raymond
-(Extensively edited and expanded for 3.4)
+(Extensively edited and expanded for 3.5)
 .hn 1
 Introduction
 
@@ -2401,7 +2401,7 @@ An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
 .sd
 .si
-MESG       - message window mapping (the only one supported in 3.4).
+MESG       - message window mapping (the only one supported in 3.5).
 pattern    - the pattern to match.
 sound file - the sound file to play.
 volume     - the volume to be set while playing the sound file.
@@ -2660,7 +2660,7 @@ available web-site listing all the bugs that had been discovered.  Despite
 that constantly growing bug list, 3.3 proved stable enough to last for
 more than a year and a half.
 .pg
-The 3.4 development team initially consisted of
+The 3.5 development team initially consisted of
 \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBKevin Hugo\fP, \fBKen Lorber\fP,
 \fBDean Luick\fP, \fBPat Rankin\fP, \fBMike Stephenson\fP, 
@@ -2670,26 +2670,26 @@ just before the release of NetHack 3.4.0 in March 2002.
 As with version 3.3, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
 .pg
-\fBPat Rankin\fP maintained 3.4 for VMS.
+\fBPat Rankin\fP maintained 3.5 for VMS.
 .pg
-\fBMichael Allison\fP maintained NetHack 3.4 for the MS-DOS platform.  \fBPaul Winner\fP
+\fBMichael Allison\fP maintained NetHack 3.5 for the MS-DOS platform.  \fBPaul Winner\fP
 and \fBYitzhak Sapir\fP provided encouragement.
 .pg
 \fBDean Luick\fP, \fBMark Modrall\fP, and \fBKevin Hugo\fP maintained and enhanced the
 Macintosh port of 3.4.
 .pg
 \fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBAlex Kompel\fP, \fBDion Nicolaas\fP, and 
-\fBYitzhak Sapir\fP maintained and enhanced 3.4 for the Microsoft Windows platform.
+\fBYitzhak Sapir\fP maintained and enhanced 3.5 for the Microsoft Windows platform.
 \fBAlex Kompel\fP contributed a new graphical interface for the Windows port. 
 \fBAlex Kompel\fP also contributed a Windows CE port for 3.4.1.
 .pg
-\fBRon Van Iwaarden\fP maintained 3.4 for OS/2.
+\fBRon Van Iwaarden\fP maintained 3.5 for OS/2.
 .pg
 \fBJanne Salmijarvi\fP and \fBTeemu Suikki\fP maintained and 
-enhanced the Amiga port of 3.4 after \fBJanne Salmijarvi\fP resurrected 
+enhanced the Amiga port of 3.5 after \fBJanne Salmijarvi\fP resurrected 
 it for 3.3.1.
 .pg
-\fBChristian ``Marvin'' Bressler\fP maintained 3.4 for the Atari after he 
+\fBChristian ``Marvin'' Bressler\fP maintained 3.5 for the Atari after he 
 resurrected it for 3.3.1.
 .pg
 There is a NetHack web site maintained by \fBKen Lorber\fP at http://www.nethack.org/.
