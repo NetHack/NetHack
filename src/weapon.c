@@ -650,8 +650,8 @@ register struct monst *mon;
 		    pline("%s wields %s!", Monnam(mon), doname(obj));
 		    if (obj->cursed && obj->otyp != CORPSE) {
 			pline("%s %s to %s %s!",
-			    The(xname(obj)),
-			    is_plural(obj) ? "welds itself" : "weld themselves",
+			    Tobjnam(obj, "weld"),
+			    is_plural(obj) ? "themselves" : "itself",
 			    s_suffix(mon_nam(mon)), mbodypart(mon,HAND));
 			obj->bknown = 1;
 		    }
