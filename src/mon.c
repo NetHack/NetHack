@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.4	2002/03/09	*/
+/*	SCCS Id: @(#)mon.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -963,8 +963,7 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 	       !((flag & ALLOW_WALL) && may_passwall(nx,ny)) &&
 	       !((flag & ALLOW_DIG) && may_dig(nx,ny))) continue;
 	    /* KMH -- Added iron bars */
-	    if (ntyp == IRONBARS &&
-	    	!((flag & ALLOW_WALL) && may_passwall(nx,ny))) continue;
+	    if (ntyp == IRONBARS && !(flag & ALLOW_BARS)) continue;
 	    if(IS_DOOR(ntyp) && !amorphous(mdat) &&
 	       ((levl[nx][ny].doormask & D_CLOSED && !(flag & OPENDOOR)) ||
 		(levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monmove.c	3.4	2000/08/16	*/
+/*	SCCS Id: @(#)monmove.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -890,6 +890,7 @@ not_special:
 	/* unicorn may not be able to avoid hero on a noteleport level */
 	if (is_unicorn(ptr) && !level.flags.noteleport) flag |= NOTONL;
 	if (passes_walls(ptr)) flag |= (ALLOW_WALL | ALLOW_ROCK);
+	if (passes_bars(ptr)) flag |= ALLOW_BARS;
 	if (can_tunnel) flag |= ALLOW_DIG;
 	if (is_human(ptr) || ptr == &mons[PM_MINOTAUR]) flag |= ALLOW_SSM;
 	if (is_undead(ptr) && ptr->mlet != S_GHOST) flag |= NOGARLIC;
@@ -1048,10 +1049,10 @@ postmov:
 
 		    if(here->doormask & (D_LOCKED|D_CLOSED) && amorphous(ptr)) {
 			if (flags.verbose && canseemon(mtmp))
-			    pline("%s %ss under the door.", Monnam(mtmp),
+			    pline("%s %s under the door.", Monnam(mtmp),
 				  (ptr == &mons[PM_FOG_CLOUD] ||
 				   ptr == &mons[PM_YELLOW_LIGHT])
-				  ? "flow" : "ooze");
+				  ? "flows" : "oozes");
 		    } else if(here->doormask & D_LOCKED && can_unlock) {
 			if(btrapped) {
 			    here->doormask = D_NODOOR;
@@ -1110,6 +1111,12 @@ postmov:
 			if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
 			    add_damage(mtmp->mx, mtmp->my, 0L);
 		    }
+		} else if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
+			if (flags.verbose && canseemon(mtmp))
+			    Norep("%s %s %s the iron bars.", Monnam(mtmp),
+				  /* pluralization fakes verb conjugation */
+				  makeplural(locomotion(ptr, "pass")),
+				  passes_walls(ptr) ? "through" : "between");
 		}
 
 		/* possibly dig */

@@ -1128,6 +1128,7 @@ E boolean FDECL(resists_blnd, (struct monst *));
 E boolean FDECL(can_blnd, (struct monst *,struct monst *,UCHAR_P,struct obj *));
 E boolean FDECL(ranged_attk, (struct permonst *));
 E boolean FDECL(hates_silver, (struct permonst *));
+E boolean FDECL(passes_bars, (struct permonst *));
 E boolean FDECL(can_track, (struct permonst *));
 E boolean FDECL(breakarm, (struct permonst *));
 E boolean FDECL(sliparm, (struct permonst *));
@@ -1240,6 +1241,7 @@ E boolean FDECL(lined_up, (struct monst *));
 E struct obj *FDECL(m_carrying, (struct monst *,int));
 E void FDECL(m_useup, (struct monst *,struct obj *));
 E void FDECL(m_throw, (struct monst *,int,int,int,int,int,struct obj *));
+E boolean FDECL(hits_bars, (struct obj **,int,int,int,int));
 
 /* ### muse.c ### */
 

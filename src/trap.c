@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	20021/03/29	*/
+/*	SCCS Id: @(#)trap.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1330,6 +1330,16 @@ int style;
 			levl[bhitpos.x][bhitpos.y].doormask = D_BROKEN;
 			if (dist) unblock_point(bhitpos.x, bhitpos.y);
 		}
+
+		/* if about to hit iron bars, do so now */
+		if (dist > 0 && isok(bhitpos.x + dx,bhitpos.y + dy) &&
+			levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS) {
+		    x2 = bhitpos.x,  y2 = bhitpos.y;	/* object stops here */
+		    if (hits_bars(&singleobj, x2, y2, !rn2(20), 0)) {
+			if (!singleobj) used_up = TRUE;
+			break;
+		    }
+		}
 	}
 	tmp_at(DISP_END, 0);
 	if (!used_up) {
@@ -1340,6 +1350,7 @@ int style;
 	} else
 		return 2;
 }
+
 #endif /* OVL3 */
 #ifdef OVLB
 

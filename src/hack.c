@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2002/03/24	*/
+/*	SCCS Id: @(#)hack.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -89,6 +89,7 @@ moverock()
 	    goto cannot_push;
 	}
 	if (isok(rx,ry) && !IS_ROCK(levl[rx][ry].typ) &&
+	    levl[rx][ry].typ != IRONBARS &&
 	    (!IS_DOOR(levl[rx][ry].typ) || !(u.dx && u.dy) || (
 #ifdef REINCARNATION
 		!Is_rogue_level(&u.uz) &&
@@ -543,6 +544,9 @@ boolean test_only;
 	if (Blind && !test_only) feel_location(x,y);
 	if (Passes_walls && may_passwall(x,y)) {
 	    ;	/* do nothing */
+	} else if (tmpr->typ == IRONBARS) {
+	    if (!(Passes_walls || passes_bars(youmonst.data)))
+		return FALSE;
 	} else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
 	    /* Eat the rock. */
 	    if (!test_only && still_chewing(x,y)) return FALSE;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.4	2001/09/06	*/
+/*	SCCS Id: @(#)dig.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -874,6 +874,9 @@ struct obj *obj;
 			    /* (maybe `move_into_trap()' would be better) */
 			    nomul(-d(2,2));
 			    nomovemsg = "You pull free.";
+			} else if (lev->typ == IRONBARS) {
+			    pline("Clang!");
+			    wake_nearby();
 			} else
 			    You("swing your %s through thin air.",
 				aobjnam(obj, (char *)0));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2002/03/29	*/
+/*	SCCS Id: @(#)zap.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -28,7 +28,6 @@ STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
 STATIC_DCL int FDECL(zhitm, (struct monst *,int,int,struct obj **));
 STATIC_DCL void FDECL(zhitu, (int,int,const char *,XCHAR_P,XCHAR_P));
 STATIC_DCL void FDECL(revive_egg, (struct obj *));
-STATIC_DCL boolean FDECL(hits_bars, (struct obj *));
 #ifdef STEED
 STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
 #endif
@@ -2550,25 +2549,6 @@ register struct monst *mtmp;
 #endif /*OVL0*/
 #ifdef OVL1
 
-/* return TRUE if obj_type can't pass through iron bars */
-static boolean
-hits_bars(obj)
-struct obj *obj;
-{
-    int obj_type = obj->otyp;
-    /*
-    There should be a _lot_ of things here..., but iron ball
-    started this change and boulders, chests, and boxes were added later...
-    Corpses and statues that are at least medium size are also screened.
-    */
-    if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL || obj_type == LARGE_BOX ||
-	obj_type == CHEST   || obj_type == ICE_BOX ||
-	((obj_type == CORPSE || obj_type == STATUE)
-	  && mons[obj->corpsenm].msize >= MZ_MEDIUM))
-	return TRUE;
-    return FALSE;
-}
-
 /*
  *  Called for the following distance effects:
  *	when a weapon is thrown (weapon == THROWN_WEAPON)
@@ -2595,9 +2575,9 @@ int FDECL((*fhitm), (MONST_P, OBJ_P)),	/* fns called when mon/obj hit */
     FDECL((*fhito), (OBJ_P, OBJ_P));
 struct obj *obj;			/* object tossed/used */
 {
-	register struct monst *mtmp;
-	register uchar typ;
-	register boolean shopdoor = FALSE;
+	struct monst *mtmp;
+	uchar typ;
+	boolean shopdoor = FALSE;
 
 	if (weapon == KICKED_WEAPON) {
 	    /* object starts one square in front of player */
@@ -2636,8 +2616,10 @@ struct obj *obj;			/* object tossed/used */
 	    typ = levl[bhitpos.x][bhitpos.y].typ;
 
 	    /* iron bars will block anything big enough */
-	    if ((weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
-	    		 && typ == IRONBARS && hits_bars(obj)) {
+	    if ((weapon == THROWN_WEAPON || weapon == KICKED_WEAPON) &&
+		    typ == IRONBARS &&
+		    hits_bars(&obj, x - ddx, y - ddy, !rn2(20), 1)) {
+		/* caveat: obj might now be null... */
 		bhitpos.x -= ddx;
 		bhitpos.y -= ddy;
 		break;
@@ -2714,13 +2696,11 @@ struct obj *obj;			/* object tossed/used */
 		if(bhitpile(obj,fhito,bhitpos.x,bhitpos.y))
 		    range--;
 	    } else {
-boolean costly = shop_keeper(*in_rooms(bhitpos.x, bhitpos.y, SHOPBASE)) &&
-				costly_spot(bhitpos.x, bhitpos.y);
-
 		if(weapon == KICKED_WEAPON &&
 		      ((obj->oclass == GOLD_CLASS &&
 			 OBJ_AT(bhitpos.x, bhitpos.y)) ||
-		    ship_object(obj, bhitpos.x, bhitpos.y, costly))) {
+			    ship_object(obj, bhitpos.x, bhitpos.y,
+					costly_spot(bhitpos.x, bhitpos.y)))) {
 			tmp_at(DISP_END, 0);
 			return (struct monst *)0;
 		}

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.4	2002/03/24	*/
+/*	SCCS Id: @(#)mondata.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -245,6 +245,16 @@ register struct permonst *ptr;
 	return((boolean)(is_were(ptr) || ptr->mlet==S_VAMPIRE || is_demon(ptr) ||
 		ptr == &mons[PM_SHADE] ||
 		(ptr->mlet==S_IMP && ptr != &mons[PM_TENGU])));
+}
+
+/* true iff the type of monster pass through iron bars */
+boolean
+passes_bars(mptr)
+struct permonst *mptr;
+{
+    return (boolean) (passes_walls(mptr) || amorphous(mptr) ||
+		      is_whirly(mptr) || verysmall(mptr) ||
+		      (slithy(mptr) && !bigmonst(mptr)));
 }
 
 #endif /* OVL0 */

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.4	2002/03/09	*/
+/*	SCCS Id: @(#)dogmove.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -543,7 +543,8 @@ register int after;	/* this is extra fast monster movement */
 	if (appr == -2) return(0);
 
 	allowflags = ALLOW_M | ALLOW_TRAPS | ALLOW_SSM | ALLOW_SANCT;
-	if (passes_walls(mtmp->data)) allowflags |= (ALLOW_ROCK|ALLOW_WALL);
+	if (passes_walls(mtmp->data)) allowflags |= (ALLOW_ROCK | ALLOW_WALL);
+	if (passes_bars(mtmp->data)) allowflags |= ALLOW_BARS;
 	if (throws_rocks(mtmp->data)) allowflags |= ALLOW_ROCK;
 	if (Conflict && !resist(mtmp, RING_CLASS, 0, 0)) {
 	    allowflags |= ALLOW_U;

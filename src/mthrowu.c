@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.4	2001/12/10	*/
+/*	SCCS Id: @(#)mthrowu.c	3.4	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -312,6 +312,16 @@ m_throw(mon, x, y, dx, dy, range, obj)
 	    }
 	}
 
+	/* also need to pre-check for bars regardless of direction,
+	   but we know that isok() has already been verified;
+	   the random chance for small objects hitting bars is
+	   skipped when reaching them at point blank range */
+	if ((levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS &&
+		hits_bars(&singleobj, bhitpos.x, bhitpos.y, 0, 0))) {
+	    (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
+	    return;
+	}
+
 	/* Note: drop_throw may destroy singleobj.  Since obj must be destroyed
 	 * early to avoid the dagger bug, anyone who modifies this code should
 	 * be careful not to use either one after it's been freed.
@@ -437,12 +447,16 @@ m_throw(mon, x, y, dx, dy, range, obj)
 			|| !isok(bhitpos.x+dx,bhitpos.y+dy)
 			/* missile hits the wall */
 			|| IS_ROCK(levl[bhitpos.x+dx][bhitpos.y+dy].typ)
+			/* missile might hit iron bars */
+			|| (levl[bhitpos.x+dx][bhitpos.y+dy].typ == IRONBARS &&
+			hits_bars(&singleobj, bhitpos.x, bhitpos.y, !rn2(2), 0))
 #ifdef SINKS
 			/* Thrown objects "sink" */
 			|| IS_SINK(levl[bhitpos.x][bhitpos.y].typ)
 #endif
 								) {
-		    (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
+		    if (singleobj) /* hits_bars might have destroyed it */
+			(void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
 		    break;
 		}
 		tmp_at(bhitpos.x, bhitpos.y);
@@ -745,6 +759,80 @@ int type;
 		if(otmp->otyp == type)
 			return(otmp);
 	return((struct obj *) 0);
+}
+
+/* TRUE iff thrown/kicked/rolled object doesn't pass through iron bars */
+boolean
+hits_bars(obj_p, x, y, always_hit, whodidit)
+struct obj **obj_p;	/* *obj_p will be set to NULL if object breaks */
+int x, y;
+int always_hit;	/* caller can force a hit for items which would fit through */
+int whodidit;	/* 1==hero, 0=other, -1==just check whether it'll pass thru */
+{
+    struct obj *otmp = *obj_p;
+    int obj_type = otmp->otyp;
+    boolean hits = always_hit;
+
+    if (!hits)
+	switch (otmp->oclass) {
+	case WEAPON_CLASS:
+	    {
+		int oskill = objects[obj_type].oc_skill;
+
+		hits = (oskill != -P_BOW  && oskill != -P_CROSSBOW &&
+			oskill != -P_DART && oskill != -P_SHURIKEN &&
+			oskill != P_SPEAR && oskill != P_JAVELIN &&
+			oskill != P_KNIFE);	/* but not dagger */
+		break;
+	    }
+	case ARMOR_CLASS:
+		hits = (objects[obj_type].oc_armcat != ARM_GLOVES);
+		break;
+	case TOOL_CLASS:
+		hits = (obj_type != SKELETON_KEY &&
+			obj_type != LOCK_PICK &&
+#ifdef TOURIST
+			obj_type != CREDIT_CARD &&
+#endif
+			obj_type != TALLOW_CANDLE &&
+			obj_type != WAX_CANDLE &&
+			obj_type != LENSES &&
+			obj_type != TIN_WHISTLE &&
+			obj_type != MAGIC_WHISTLE);
+		break;
+	case ROCK_CLASS:	/* includes boulder */
+		if (obj_type != STATUE ||
+			mons[otmp->corpsenm].msize > MZ_TINY) hits = TRUE;
+		break;
+	case FOOD_CLASS:
+		if (obj_type == CORPSE &&
+			mons[otmp->corpsenm].msize > MZ_TINY) hits = TRUE;
+		break;
+	case SPBOOK_CLASS:
+	case WAND_CLASS:
+	case BALL_CLASS:
+	case CHAIN_CLASS:
+		hits = TRUE;
+		break;
+	default:
+		break;
+	}
+
+    if (hits && whodidit != -1) {
+	if (whodidit ? hero_breaks(otmp, x, y, FALSE) : breaks(otmp, x, y))
+	    *obj_p = otmp = 0;		/* object is now gone */
+	    /* breakage makes its own noises */
+	else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
+	    pline("Whang!");
+	else if (otmp->oclass == GOLD_CLASS ||
+		objects[obj_type].oc_material == GOLD ||
+		objects[obj_type].oc_material == SILVER)
+	    pline("Clink!");
+	else
+	    pline("Clonk!");
+    }
+
+    return hits;
 }
 
 #endif /* OVL0 */
