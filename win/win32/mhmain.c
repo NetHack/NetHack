@@ -386,8 +386,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		    NHEVENT_KBD(M(tolower(c)));
 		} else if (scancode == (SCANLO + SIZE(scanmap)) - 1) {
 		    NHEVENT_KBD(M('?'));
-		} else
-		    return DefWindowProc(hWnd, message, wParam, lParam);
+		}
 		return 0;
             }
             return DefWindowProc(hWnd, message, wParam, lParam);
