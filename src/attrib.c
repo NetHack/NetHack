@@ -677,6 +677,8 @@ from_what(propidx)
 int propidx;
 {
 	struct obj *obj = (struct obj *)0;
+	int innate = is_innate(propidx);
+
 	static char buf[BUFSZ];
 
 	buf[0] = '\0';
@@ -685,9 +687,9 @@ int propidx;
 	 */
 #ifdef WIZARD
 	if (wizard) {
-	    if (is_innate(propidx) == 2)
+	    if (innate == 2)
 		Strcpy(buf, " because of your experience");
-	    else if (is_innate(propidx) == 1)
+	    else if (innate == 1)
 		Strcpy(buf, " innately");
 	    else if (wizard && (obj = what_gives(&u.uprops[propidx].extrinsic)))
 		Sprintf(buf, " because of %s",

@@ -1509,7 +1509,10 @@ long *abil;
 	long wornbits;
 	long wornmask = (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF |
 			 W_WEP | W_QUIVER | W_SWAPWEP | W_ART | W_ARTI | W_AMUL |
-			 W_RINGL | W_RINGR | W_TOOL | W_SADDLE | W_BALL | W_CHAIN
+			 W_RINGL | W_RINGR | W_TOOL | W_BALL | W_CHAIN
+#ifdef STEED
+			 | W_SADDLE
+#endif
 #ifdef TOURIST
 			 | W_ARMU
 #endif
@@ -1531,7 +1534,7 @@ long *abil;
 				return obj;
 		}
 	    } else {
-		if (wornbits == (wornmask & obj->owornmask))
+		if (wornbits && wornbits == (wornmask & obj->owornmask))
 				return obj;
 	    }
 	}
