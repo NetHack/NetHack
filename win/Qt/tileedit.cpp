@@ -183,7 +183,6 @@ void TrivialTileEditor::setColor( QRgb rgb )
 	    penpixel<img.numColors()-1 && (img.color(penpixel)&0xffffff)!=(pen.rgb()&0xffffff);
 	    penpixel++)
 	continue;
-qDebug("penpixel=%d, pen=%x",penpixel,pen.rgb());
 }
 
 void TrivialTileEditor::setImage( const QImage& i )
