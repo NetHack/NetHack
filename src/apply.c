@@ -21,13 +21,13 @@ STATIC_DCL void FDECL(use_whistle, (struct obj *));
 STATIC_DCL void FDECL(use_magic_whistle, (struct obj *));
 STATIC_DCL void FDECL(use_leash, (struct obj *));
 STATIC_DCL int FDECL(use_mirror, (struct obj *));
-STATIC_DCL void FDECL(use_bell, (struct obj *));
+STATIC_DCL void FDECL(use_bell, (struct obj **));
 STATIC_DCL void FDECL(use_candelabrum, (struct obj *));
-STATIC_DCL void FDECL(use_candle, (struct obj *));
+STATIC_DCL void FDECL(use_candle, (struct obj **));
 STATIC_DCL void FDECL(use_lamp, (struct obj *));
 STATIC_DCL void FDECL(light_cocktail, (struct obj *));
 STATIC_DCL void FDECL(use_tinning_kit, (struct obj *));
-STATIC_DCL void FDECL(use_figurine, (struct obj *));
+STATIC_DCL void FDECL(use_figurine, (struct obj **));
 STATIC_DCL void FDECL(use_grease, (struct obj *));
 STATIC_DCL void FDECL(use_trap, (struct obj *));
 STATIC_DCL void FDECL(use_stone, (struct obj *));
@@ -725,9 +725,10 @@ struct obj *obj;
 }
 
 STATIC_OVL void
-use_bell(obj)
-register struct obj *obj;
+use_bell(optr)
+struct obj **optr;
 {
+	register struct obj *obj = *optr;
 	struct monst *mtmp;
 	boolean wakem = FALSE, learno = FALSE,
 		ordinary = (obj->otyp != BELL_OF_OPENING || !obj->spe),
@@ -762,6 +763,7 @@ register struct obj *obj;
 		if (!obj_resists(obj, 93, 100)) {
 		    pline("%s shattered!", Tobjnam(obj, "have"));
 		    useup(obj);
+		    *optr = 0;
 		} else switch (rn2(3)) {
 			default:
 				break;
@@ -893,9 +895,10 @@ register struct obj *obj;
 }
 
 STATIC_OVL void
-use_candle(obj)
-register struct obj *obj;
+use_candle(optr)
+struct obj **optr;
 {
+	register struct obj *obj = *optr;
 	register struct obj *otmp;
 	const char *s = (obj->quan != 1) ? "candles" : "candle";
 	char qbuf[QBUFSZ];
@@ -925,6 +928,7 @@ register struct obj *obj;
 	} else {
 		if ((long)otmp->spe + obj->quan > 7L)
 		    obj = splitobj(obj, 7L - (long)otmp->spe);
+		else *optr = 0;
 		You("attach %ld%s %s to %s.",
 		    obj->quan, !otmp->spe ? "" : " more",
 		    s, the(xname(otmp)));
@@ -1696,9 +1700,10 @@ boolean quietly;
 }
 
 STATIC_OVL void
-use_figurine(obj)
-register struct obj *obj;
+use_figurine(optr)
+struct obj **optr;
 {
+	register struct obj *obj = *optr;
 	xchar x, y;
 	coord cc;
 
@@ -1726,6 +1731,7 @@ register struct obj *obj;
 	(void) make_familiar(obj, cc.x, cc.y, FALSE);
 	(void) stop_timer(FIG_TRANSFORM, (genericptr_t)obj);
 	useup(obj);
+	*optr = 0;
 }
 
 static NEARDATA const char lubricables[] = { ALL_CLASSES, ALLOW_NONE, 0 };
@@ -2712,7 +2718,7 @@ char class;
 int
 doapply()
 {
-	register struct obj *obj;
+	struct obj *obj;
 	register int res = 1;
 	char class_list[MAXOCLASSES+2];
 
@@ -2838,14 +2844,14 @@ doapply()
 		break;
 	case BELL:
 	case BELL_OF_OPENING:
-		use_bell(obj);
+		use_bell(&obj);
 		break;
 	case CANDELABRUM_OF_INVOCATION:
 		use_candelabrum(obj);
 		break;
 	case WAX_CANDLE:
 	case TALLOW_CANDLE:
-		use_candle(obj);
+		use_candle(&obj);
 		break;
 	case OIL_LAMP:
 	case MAGIC_LAMP:
@@ -2882,7 +2888,7 @@ doapply()
 		goto xit;
 
 	case FIGURINE:
-		use_figurine(obj);
+		use_figurine(&obj);
 		break;
 	case UNICORN_HORN:
 		use_unicorn_horn(obj);
@@ -2960,7 +2966,7 @@ doapply()
 		nomul(0);
 		return 0;
 	}
-	if (res && obj->oartifact) arti_speak(obj);
+	if (res && obj && obj->oartifact) arti_speak(obj);
 	nomul(0);
 	return res;
 }
