@@ -1116,7 +1116,7 @@ register int aflag;
 	    int fund = (uwep && uwep->oartifact &&
 		    spec_ability(uwep, SPFX_SEARCH)) ?
 		    uwep->spe : 0;
-	    if (ublindf && ublindf->otyp == LENSES)
+	    if (ublindf && ublindf->otyp == LENSES && !Blind)
 		    fund += 2; /* JDS: lenses help searching */
 	    if (fund > 5) fund = 5;
 	    for(x = u.ux-1; x < u.ux+2; x++)
