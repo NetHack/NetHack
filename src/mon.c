@@ -382,7 +382,7 @@ register struct monst *mtmp;
 		if (cansee(mtmp->mx,mtmp->my))
 		    pline("%s %s.", Monnam(mtmp),
 			  mtmp->data == &mons[PM_WATER_ELEMENTAL] ?
-			  "boils aways" : "burns to a crisp");
+			  "boils away" : "burns to a crisp");
 		mondead(mtmp);
 	    }
 	    else {
