@@ -309,7 +309,9 @@ gotobj:
  cant_take:
 		pline("%s tries to %s your %s but gives up.",
 		      Monnam(mtmp), how[rn2(SIZE(how))],
-		 (otmp->owornmask & W_ARMOR) ? equipname(otmp) : xname(otmp));
+		      (otmp->owornmask & W_ARMOR) ? equipname(otmp) :
+		       (otmp->otyp == CORPSE) ? corpse_xname(otmp, FALSE) :
+		       xname(otmp));
 		/* the fewer items you have, the less likely the thief
 		   is going to stick around to try again (0) instead of
 		   running away (1) */

@@ -1084,7 +1084,10 @@ struct obj *obj;
 	char *s = shk_your(outbuf, obj);	/* assert( s == outbuf ); */
 	int space_left = BUFSZ - strlen(s) - sizeof " ";
 
-	return strncat(strcat(s, " "), xname(obj), space_left);
+	/* "your corpse" is silly, use corpse_xname for this case */
+	return strncat(strcat(s, " "),
+		       (obj->otyp == CORPSE) ?
+		       corpse_xname(obj, FALSE) : xname(obj), space_left);
 }
 
 /* capitalized variant of yname() */
