@@ -117,6 +117,7 @@ picklock()	/* try to open/close a lock */
 	    else xlock.door->doormask = D_LOCKED;
 	} else {
 	    xlock.box->olocked = !xlock.box->olocked;
+	    xlock.box->lknown = 1;
 	    if(xlock.box->otrapped)	
 		(void) chest_trap(xlock.box, FINGER, FALSE);
 	}
@@ -163,6 +164,7 @@ forcelock()	/* try to force a locked chest */
 	You("succeed in forcing the lock.");
 	xlock.box->olocked = 0;
 	xlock.box->obroken = 1;
+	xlock.box->lknown = 1;
 	if(!xlock.picktyp && !rn2(3)) {
 	    struct monst *shkp;
 	    boolean costly;
@@ -301,6 +303,7 @@ pick_lock(pick) /* pick a lock with a given object */
 		    	    safe_qbuf("", sizeof("There is  here, unlock its lock?"),
 			    	doname(otmp), an(simple_typename(otmp->otyp)), "a box"),
 			    verb, it ? "it" : "its lock");
+		    otmp->lknown = 1;
 
 		    c = ynq(qbuf);
 		    if(c == 'q') return(0);
@@ -461,12 +464,14 @@ doforce()		/* try to force a chest with your weapon */
 		if (otmp->obroken || !otmp->olocked) {
 		    There("is %s here, but its lock is already %s.",
 			  doname(otmp), otmp->obroken ? "broken" : "unlocked");
+		    otmp->lknown = 1;
 		    continue;
 		}
 		Sprintf(qbuf,"There is %s here, force its lock?",
 			safe_qbuf("", sizeof("There is  here, force its lock?"),
 				doname(otmp), an(simple_typename(otmp->otyp)),
 				"a box"));
+		otmp->lknown = 1;
 
 		c = ynq(qbuf);
 		if(c == 'q') return(0);
@@ -702,6 +707,7 @@ register struct obj *obj, *otmp;	/* obj *is* a box */
 		pline("Klunk!");
 		obj->olocked = 1;
 		obj->obroken = 0;
+		if (Role_if(PM_WIZARD)) obj->lknown = 1;
 		res = 1;
 	    } /* else already closed and locked */
 	    break;
@@ -711,6 +717,7 @@ register struct obj *obj, *otmp;	/* obj *is* a box */
 		pline("Klick!");
 		obj->olocked = 0;
 		res = 1;
+		if (Role_if(PM_WIZARD)) obj->lknown = 1;
 	    } else			/* silently fix if broken */
 		obj->obroken = 0;
 	    break;

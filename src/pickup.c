@@ -1544,8 +1544,11 @@ lootcont:
 
 		if (cobj->olocked) {
 		    pline("Hmmm, it seems to be locked.");
+		    cobj->lknown = 1;
 		    continue;
 		}
+		cobj->lknown = 1;
+
 		if (cobj->otyp == BAG_OF_TRICKS) {
 		    int tmp;
 		    You("carefully open the bag...");
@@ -2091,9 +2094,11 @@ register int held;
 	if (obj->olocked) {
 	    pline("%s to be locked.", Tobjnam(obj, "seem"));
 	    if (held) You("must put it down to unlock.");
+	    obj->lknown = 1;
 	    return 0;
 	} else if (obj->otrapped) {
 	    if (held) You("open %s...", the(xname(obj)));
+	    obj->lknown = 1;
 	    (void) chest_trap(obj, HAND, FALSE);
 	    /* even if the trap fails, you've used up this turn */
 	    if (multi >= 0) {	/* in case we didn't become paralyzed */
@@ -2102,6 +2107,7 @@ register int held;
 	    }
 	    return 1;
 	}
+	obj->lknown = 1;
 	current_container = obj;	/* for use by in/out_container */
 
 	if (obj->spe == 1) {
@@ -2147,6 +2153,7 @@ register int held;
 		    if (!outokay && !inokay) {
 			pline("%s", emptymsg);
 			You("don't have anything to put in.");
+			if (used) obj->cknown = 1;
 			return used;
 		    }
 		    menuprompt[0] = '\0';
@@ -2201,6 +2208,7 @@ ask_again2:
 		    break;
 		case 'q':
 		default:
+		    if (used) obj->cknown = 1;
 		    return used;
 		}
 	    }
@@ -2215,6 +2223,7 @@ ask_again2:
 #endif
 	    /* nothing to put in, but some feedback is necessary */
 	    You("don't have anything to put in.");
+	    if (used) obj->cknown = 1;
 	    return used;
 	}
 	if (flags.menu_style != MENU_FULL) {
@@ -2235,6 +2244,7 @@ ask_again2:
 		    break;
 		case 'q':
 		default:
+		    if (used) obj->cknown = 1;
 		    return used;
 	    }
 	}
@@ -2330,6 +2340,7 @@ boolean put_in;
     }
 
     if (loot_everything) {
+	container->cknown = 1;
 	for (otmp = container->cobj; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
 	    res = out_container(otmp);
@@ -2338,6 +2349,7 @@ boolean put_in;
     } else {
 	mflags = INVORDER_SORT;
 	if (put_in && flags.invlet_constant) mflags |= USE_INVLET;
+	if (takeout) container->cknown = 1;
 	Sprintf(buf,"%s what?", put_in ? putin : takeout);
 	n = query_objlist(buf, put_in ? invent : container->cobj,
 			  mflags, &pick_list, PICK_ANY,
@@ -2446,7 +2458,7 @@ dotip()
 		c = ynq(buf);
 		if (c == 'q') return 0;
 		if (c == 'n') continue;
-
+		
 		tipcontainer(cobj);
 		return 1;
 	    }	/* next cobj */
@@ -2511,6 +2523,7 @@ struct obj *box;	/* or bag */
 {
     boolean empty_it = FALSE;
 
+    box->lknown = 1;
     if (box->olocked) {
 	pline("It's locked.");
     } else if (box->otrapped) {
@@ -2524,16 +2537,19 @@ struct obj *box;	/* or bag */
     } else if (box->otyp == BAG_OF_TRICKS && box->spe > 0) {
 	/* apply (not loot) this bag; uses up one charge */
 	bagotricks(box);
+	box->cknown = 1;
     } else if (box->spe) {
 	char yourbuf[BUFSZ];
 
 	observe_quantum_cat(box);
+	box->cknown = 1;
 	if (!Has_contents(box))	/* evidently a live cat came out */
 	    /* container type of "large box" is inferred */
 	    pline("%sbox is now empty.", Shk_Your(yourbuf, box));
 	else			/* holds cat corpse or other random stuff */
 	    empty_it = TRUE;
     } else if (!Has_contents(box)) {
+	box->cknown = 1;
 	pline("It's empty.");
     } else {
 	empty_it = TRUE;
@@ -2548,6 +2564,7 @@ struct obj *box;	/* or bag */
 	int held = carried(box);
 	long loss = 0L;
 
+	box->cknown = 1;
 	pline("%s out%c",
 	      box->cobj->nobj ? "Objects spill" : "An object spills",
 	      !(highdrop || altarizing) ? ':' : '.');  

@@ -516,12 +516,14 @@ xchar x, y;
 			You("break open the lock!");
 			kickobj->olocked = 0;
 			kickobj->obroken = 1;
+			kickobj->lknown = 1;
 			if (otrp) (void) chest_trap(kickobj, LEG, FALSE);
 			return(1);
 		    }
 		} else {
 		    if (!rn2(3) || (martial() && !rn2(2))) {
 			pline_The("lid slams open, then falls shut.");
+			kickobj->lknown = 1;
 			if (otrp) (void) chest_trap(kickobj, LEG, FALSE);
 			return(1);
 		    }

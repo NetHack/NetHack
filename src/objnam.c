@@ -569,6 +569,11 @@ register struct obj *obj;
 	if (obj->oinvis) Strcat(prefix,"invisible ");
 #endif
 
+	/* "empty" goes at the beginning, but item count goes at the end */
+	if (obj->cknown &&
+	    (Is_container(obj) || obj->otyp == STATUE) && !Has_contents(obj))
+		Strcat(prefix, "empty ");
+
 	if (obj->bknown &&
 	    obj->oclass != COIN_CLASS &&
 	    (obj->otyp != POT_WATER || !objects[POT_WATER].oc_name_known
@@ -602,7 +607,27 @@ register struct obj *obj;
 		Strcat(prefix, "uncursed ");
 	}
 
+	if (obj->lknown && Is_box(obj)) {
+	    if (obj->obroken)
+	        Strcat(prefix, "unlockable ");
+	    else if (obj->olocked)
+		Strcat(prefix, "locked ");
+	    else
+		Strcat(prefix, "unlocked ");
+	}
+
 	if (obj->greased) Strcat(prefix, "greased ");
+
+	if (obj->cknown && Has_contents(obj)) {
+	    struct obj *curr;
+	    long itemcount = 0L;
+
+	    /* Count the number of contained objects */
+	    for (curr = obj->cobj; curr; curr = curr->nobj)
+		itemcount += curr->quan;
+	    Sprintf(eos(bp), " containing %ld item%s",
+	    		itemcount, plur(itemcount));
+	}
 
 	switch(obj->oclass) {
 	case AMULET_CLASS:

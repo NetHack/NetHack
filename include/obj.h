@@ -92,7 +92,9 @@ struct obj {
 
 	Bitfield(in_use,1);	/* for magic items before useup items */
 	Bitfield(bypass,1);	/* mark this as an object to be skipped by bhito() */
-	/* 6 free bits */
+	Bitfield(cknown,1);	/* contents of container assumed to be known */
+	Bitfield(lknown,1);	/* locked/unlocked status is known */
+	/* 4 free bits */
 
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */

@@ -115,6 +115,8 @@ vampires can now shapeshift into bats and fog clouds; the latter can be done at
 	will to slip through locked doors
 shapeshifted vampire will transform back to vampire form after you defeat it and
 	continue to fight in its native form
+container lknown flag for locked/unlocked/broken awareness
+container cknown flag for container content awareness
 
 
 Platform- and/or Interface-Specific New Features

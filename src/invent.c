@@ -1917,15 +1917,27 @@ dounpaid()
 	 */
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
 	    if (Has_contents(otmp)) {
+	    	long contcost = 0L;
 		marker = (struct obj *) 0;	/* haven't found any */
 		while (find_unpaid(otmp->cobj, &marker)) {
 		    totcost += cost = unpaid_cost(marker);
-		    save_unpaid = marker->unpaid;
-		    marker->unpaid = 0;    /* suppress "(unpaid)" suffix */
-		    putstr(win, 0,
+		    contcost += cost;
+		    if (otmp->cknown) {
+			save_unpaid = marker->unpaid;
+			marker->unpaid = 0;    /* suppress "(unpaid)" suffix */
+			putstr(win, 0,
 			   xprname(marker, distant_name(marker, doname),
 				   CONTAINED_SYM, TRUE, cost, 0L));
-		    marker->unpaid = save_unpaid;
+			marker->unpaid = save_unpaid;
+		    }
+		}
+		if (!otmp->cknown) {
+			char contbuf[BUFSZ];
+			/* Shopkeeper knows what to charge for contents */
+			Sprintf(contbuf, "%s contents", s_suffix(xname(otmp)));
+			putstr(win, 0,
+				xprname((struct obj *)0, contbuf,
+				CONTAINED_SYM, TRUE, contcost, 0L));
 		}
 	    }
 	}
@@ -2937,6 +2949,7 @@ register struct obj *obj;
 	    free((genericptr_t)selected);
 	} else
 	    ret = (struct obj *) 0;
+	obj->cknown = 1;
 	return ret;
 }
 

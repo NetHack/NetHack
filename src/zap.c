@@ -1561,6 +1561,7 @@ struct obj *obj, *otmp;
 			    o->dknown = 1;	/* "seen", even if blind */
 			(void) display_cinventory(obj);
 		    }
+		    obj->cknown = 1;
 		    res = 1;
 		}
 		if (res) makeknown(WAN_PROBING);
