@@ -2401,7 +2401,7 @@ dotravel()
 #ifdef PORT_DEBUG
 # ifdef WIN32CON
 extern void NDECL(win32con_debug_keystrokes);
-extern void NDECL(win32con_author_info);
+extern void NDECL(win32con_handler_info);
 # endif
 
 int
