@@ -1565,7 +1565,7 @@ struct obj *obj, *otmp;
 			res = !!revive(obj);
 			if (res && corpsenm && Role_if(PM_HEALER)) {
 			    boolean u_noticed = FALSE;
-			    if (Hallucination) {
+			    if (Hallucination && !Deaf) {
 				You_hear("the sound of a defibrillator.");
 				u_noticed = TRUE;
 			    } else if (!Blind) {
