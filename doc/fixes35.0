@@ -54,3 +54,7 @@ Platform- and/or Interface-Specific New Features
 win32gui: support perm_invent
 win32gui: menu option to add/remove windows captions
 
+
+Code Cleanup and Reorganization
+-------------------------------
+removed OVLx section dividers previously  used for TRAMPOLINE overlay system
