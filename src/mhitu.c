@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2002/03/29	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2002/10/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2390,15 +2390,16 @@ register struct attack *mattk;
 		goto assess_dmg;
 	    case AD_STON: /* cockatrice */
 	    {
-		int protector =
-		    mattk->aatyp == AT_TENT ? 0 :
-		    mattk->aatyp == AT_KICK ? W_ARMF : W_ARMG;
-		if (!resists_ston(mtmp) &&
-		    (mattk->aatyp != AT_WEAP || !MON_WEP(mtmp)) &&
-		    mattk->aatyp != AT_GAZE && mattk->aatyp != AT_EXPL &&
-		    mattk->aatyp != AT_MAGC &&
-		    !(mtmp->misc_worn_check & protector)) {
-		    if(poly_when_stoned(mtmp->data)) {
+		long protector = attk_protection(mattk->aatyp),
+		     wornitems = mtmp->misc_worn_check;
+
+		/* wielded weapon gives same protection as gloves here */
+		if (MON_WEP(mtmp) != 0) wornitems |= W_ARMG;
+
+		if (!resists_ston(mtmp) && (protector == 0L ||
+			(protector != ~0L &&
+			    (wornitems & protector) != protector))) {
+		    if (poly_when_stoned(mtmp->data)) {
 			mon_to_stone(mtmp);
 			return (1);
 		    }

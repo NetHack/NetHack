@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2002/10/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2020,21 +2020,26 @@ uchar aatyp;
 	    exercise(A_STR, FALSE);
 	    break;
 	  case AD_STON:
-	    if(mhit) {
-	      /* mhit does not mean you physically hit; it just means the
-	         attack was successful */
-	      if ((aatyp == AT_KICK && !uarmf) ||
-		    ((aatyp == AT_WEAP || aatyp == AT_CLAW || aatyp == AT_MAGC
-				|| aatyp == AT_TUCH) && !uwep && !uarmg) ||
-		    aatyp == AT_BITE || aatyp == AT_STNG || aatyp == AT_BUTT ||
-		    aatyp == AT_TENT || aatyp == AT_HUGS || aatyp == AT_ENGL) {
-		if (!Stone_resistance &&
-		    !(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
+	    if (mhit) {		/* successful attack */
+		long protector = attk_protection(aatyp);
+
+		/* hero using monsters' AT_MAGC attack is hitting hand to
+		   hand rather than casting a spell */
+		if (aatyp == AT_MAGC) protector = W_ARMG;
+
+		if (protector == 0L ||		/* no protection */
+			(protector == W_ARMG && !uarmg && !uwep) ||
+			(protector == W_ARMF && !uarmf) ||
+			(protector == W_ARMH && !uarmh) ||
+			(protector == (W_ARMC|W_ARMG) && (!uarmc || !uarmg))) {
+		    if (!Stone_resistance &&
+			    !(poly_when_stoned(youmonst.data) &&
+				polymon(PM_STONE_GOLEM))) {
 			You("turn to stone...");
 			done_in_by(mon);
 			return 2;
+		    }
 		}
-	      }
 	    }
 	    break;
 	  case AD_RUST:

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)mhitm.c	3.4	2002/10/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -563,19 +563,20 @@ mdamagem(magr, mdef, mattk)
 	register struct monst	*magr, *mdef;
 	register struct attack	*mattk;
 {
-	struct	permonst *pa = magr->data, *pd = mdef->data;
-	int	tmp = d((int)mattk->damn,(int)mattk->damd);
 	struct obj *obj;
 	char buf[BUFSZ];
-	int protector =
-	    mattk->aatyp == AT_TENT ? 0 :
-	    mattk->aatyp == AT_KICK ? W_ARMF : W_ARMG;
-	int num;
+	struct permonst *pa = magr->data, *pd = mdef->data;
+	int num, tmp = d((int)mattk->damn, (int)mattk->damd);
 
-	if (touch_petrifies(pd) && !resists_ston(magr) &&
-	   (mattk->aatyp != AT_WEAP || !otmp) &&
-	   (mattk->aatyp != AT_GAZE && mattk->aatyp != AT_EXPL) &&
-	   !(magr->misc_worn_check & protector)) {
+	if (touch_petrifies(pd) && !resists_ston(magr)) {
+	    long protector = attk_protection(mattk->aatyp),
+		 wornitems = magr->misc_worn_check;
+
+	    /* wielded weapon gives same protection as gloves here */
+	    if (otmp != 0) wornitems |= W_ARMG;
+
+	    if (protector == 0L ||
+		  (protector != ~0L && (wornitems & protector) != protector)) {
 		if (poly_when_stoned(pa)) {
 		    mon_to_stone(magr);
 		    return MM_HIT; /* no damage during the polymorph */
@@ -586,6 +587,7 @@ mdamagem(magr, mdef, mattk)
 		else if (magr->mtame && !vis)
 		    You(brief_feeling, "peculiarly sad");
 		return MM_AGR_DIED;
+	    }
 	}
 
 	switch(mattk->adtyp) {
@@ -1364,6 +1366,49 @@ int mdead;
 		return (mdead | mhit | MM_AGR_DIED);
 	}
 	return (mdead | mhit);
+}
+
+/* "aggressive defense"; what type of armor prevents specified attack
+   from touching its target? */
+long
+attk_protection(aatyp)
+int aatyp;
+{
+    long w_mask = 0L;
+
+    switch (aatyp) {
+    case AT_NONE:
+    case AT_SPIT:
+    case AT_EXPL:
+    case AT_BOOM:
+    case AT_GAZE:
+    case AT_BREA:
+    case AT_MAGC:
+	w_mask = ~0L;		/* special case; no defense needed */
+	break;
+    case AT_CLAW:
+    case AT_TUCH:
+    case AT_WEAP:
+	w_mask = W_ARMG;	/* caller needs to check for weapon */
+	break;
+    case AT_KICK:
+	w_mask = W_ARMF;
+	break;
+    case AT_BUTT:
+	w_mask = W_ARMH;
+	break;
+    case AT_HUGS:
+	w_mask = (W_ARMC|W_ARMG); /* attacker needs both to be protected */
+	break;
+    case AT_BITE:
+    case AT_STNG:
+    case AT_ENGL:
+    case AT_TENT:
+    default:
+	w_mask = 0L;		/* no defense available */
+	break;
+    }
+    return w_mask;
 }
 
 #endif /* OVLB */
