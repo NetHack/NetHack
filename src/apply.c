@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)apply.c	3.4	2002/03/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -406,6 +406,13 @@ struct obj *obj;
 	y = u.uy + u.dy;
 
 	if((x == u.ux) && (y == u.uy)) {
+#ifdef STEED
+		if (u.usteed && u.dz > 0) {
+		    mtmp = u.usteed;
+		    spotmon = 1;
+		    goto got_target;
+		}
+#endif
 		pline("Leash yourself?  Very funny...");
 		return;
 	}
@@ -416,6 +423,9 @@ struct obj *obj;
 	}
 
 	spotmon = canspotmon(mtmp);
+#ifdef STEED
+ got_target:
+#endif
 
 	if(!mtmp->mtame) {
 	    if(!spotmon)
