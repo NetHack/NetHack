@@ -327,7 +327,7 @@ X11_player_selection()
 	} else if (ps_selected == PS_RANDOM) {
 	    flags.initrole = ROLE_RANDOM;
 	} else if (ps_selected < 0 || ps_selected >= num_roles) {
-	    panic("player_selection: bad role select value %d\n", ps_selected);
+	    panic("player_selection: bad role select value %d", ps_selected);
 	} else {
 	    flags.initrole = ps_selected;
 	}
@@ -392,7 +392,7 @@ X11_player_selection()
 	    } else if (ps_selected == PS_RANDOM) {
 		flags.initrace = ROLE_RANDOM;
 	    } else if (ps_selected < 0 || ps_selected >= num_races) {
-		panic("player_selection: bad race select value %d\n", ps_selected);
+		panic("player_selection: bad race select value %d", ps_selected);
 	    } else {
 		flags.initrace = ps_selected;
 	    }
@@ -457,7 +457,7 @@ X11_player_selection()
 	    } else if (ps_selected == PS_RANDOM) {
 		flags.initgend = ROLE_RANDOM;
 	    } else if (ps_selected < 0 || ps_selected >= num_gends) {
-		panic("player_selection: bad gender select value %d\n", ps_selected);
+		panic("player_selection: bad gender select value %d", ps_selected);
 	    } else {
 		flags.initgend = ps_selected;
 	    }
@@ -521,7 +521,7 @@ X11_player_selection()
 	    } else if (ps_selected == PS_RANDOM) {
 		flags.initalign = ROLE_RANDOM;
 	    } else if (ps_selected < 0 || ps_selected >= num_algns) {
-		panic("player_selection: bad alignment select value %d\n", ps_selected);
+		panic("player_selection: bad alignment select value %d", ps_selected);
 	    } else {
 		flags.initalign = ps_selected;
 	    }

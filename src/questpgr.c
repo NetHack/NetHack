@@ -60,7 +60,7 @@ dlb	*stream;
 
 	if ((cnt = dlb_fread(ptr, size, nitems, stream)) != nitems) {
 
-	    panic("PREMATURE EOF ON QUEST TEXT FILE!\nExpected %d bytes - got %d\n",
+	    panic("PREMATURE EOF ON QUEST TEXT FILE! Expected %d bytes, got %d",
 		    (size * nitems), (size * cnt));
 	}
 }
@@ -96,7 +96,7 @@ load_qtlist()
 
 	msg_file = dlb_fopen(QTEXT_FILE, RDBMODE);
 	if (!msg_file)
-	    panic("\rCANNOT OPEN QUEST TEXT FILE %s.", QTEXT_FILE);
+	    panic("CANNOT OPEN QUEST TEXT FILE %s.", QTEXT_FILE);
 
 	/*
 	 * Read in the number of classes, then the ID's & offsets for

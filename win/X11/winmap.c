@@ -1654,7 +1654,7 @@ x_event(exit_condition)
 		}
 		break;
 	    default:
-		panic("x_event: unknown exit condition %d\n", exit_condition);
+		panic("x_event: unknown exit condition %d", exit_condition);
 		break;
 	}
     } while (keep_going);
