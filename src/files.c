@@ -34,7 +34,7 @@ extern int errno;
 #endif
 
 #ifdef PREFIXES_IN_USE
-#define FQN_NUMBUF 3
+#define FQN_NUMBUF 4
 static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #endif
 
@@ -157,14 +157,13 @@ int whichprefix, buffnum;
 /* fopen a file, with OS-dependent bells and whistles */
 /* NOTE: a simpler version of this routine also exists in util/dlb_main.c */
 FILE *
-fopen_datafile(filename, mode, use_scoreprefix)
+fopen_datafile(filename, mode, prefix)
 const char *filename, *mode;
-boolean use_scoreprefix;
+int prefix;
 {
 	FILE *fp;
 
-	filename = fqname(filename,
-				use_scoreprefix ? SCOREPREFIX : DATAPREFIX, 0);
+	filename = fqname(filename, prefix, prefix == TROUBLEPREFIX ? 3 : 0);
 #ifdef VMS	/* essential to have punctuation, to avoid logical names */
     {
 	char tmp[BUFSIZ];
@@ -1302,6 +1301,8 @@ char		*tmp_levels;
 		adjust_prefix(bufp, LOCKPREFIX);
 	} else if (match_varname(buf, "CONFIGDIR", 4)) {
 		adjust_prefix(bufp, CONFIGPREFIX);
+	} else if (match_varname(buf, "TROUBLEDIR", 4)) {
+		adjust_prefix(bufp, TROUBLEPREFIX);
 #else /*NOCWD_ASSUMPTIONS*/
 # ifdef MICRO
 	} else if (match_varname(buf, "HACKDIR", 4)) {
@@ -1793,7 +1794,7 @@ const char* s;
 #ifdef PANICLOG
 	FILE *lfile;
 
-	lfile = fopen_datafile(PANICLOG, "a", TRUE);
+	lfile = fopen_datafile(PANICLOG, "a", TROUBLEPREFIX);
 	if (lfile) {
 	    (void) fprintf(lfile, "%08ld: %s %s\n",
 			   yyyymmdd((time_t)0L), why, s);

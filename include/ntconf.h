@@ -35,7 +35,7 @@
                                    it is defined for WIN32.
 				   Allow paths to be specified for HACKDIR,
 				   LEVELDIR, SAVEDIR, BONESDIR, DATADIR,
-				   SCOREDIR, LOCKDIR, and CONFIGDIR */
+				   SCOREDIR, LOCKDIR, CONFIGDIR, and TROUBLEDIR */
 #define NO_TERMS
 #define ASCIIGRAPH
 

@@ -596,7 +596,7 @@ E void NDECL(makerogueghost);
 /* ### files.c ### */
 
 E const char *FDECL(fqname, (const char *, int, int));
-E FILE *FDECL(fopen_datafile, (const char *,const char *,BOOLEAN_P));
+E FILE *FDECL(fopen_datafile, (const char *,const char *,int));
 E boolean FDECL(uptodate, (int,const char *));
 E void FDECL(store_version, (int));
 #ifdef MFLOPPY

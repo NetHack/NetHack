@@ -38,7 +38,7 @@ typedef long off_t;
 
 #define NOCWD_ASSUMPTIONS	/* Allow paths to be specified for HACKDIR,
 				   LEVELDIR, SAVEDIR, BONESDIR, DATADIR,
-				   SCOREDIR, LOCKDIR, and CONFIGDIR. */
+				   SCOREDIR, LOCKDIR, CONFIGDIR, and TROUBLEDIR */
 
 /* data librarian defs */
 #ifndef NOCWD_ASSUMPTIONS

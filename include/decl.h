@@ -348,11 +348,12 @@ E const char *monexplain[], *invisexplain, *objexplain[], *oclass_names[];
 #define LEVELPREFIX	1
 #define SAVEPREFIX	2
 #define BONESPREFIX	3
-#define DATAPREFIX	4
+#define DATAPREFIX	4	/* this one must match hardcoded value in dlb.c */
 #define SCOREPREFIX	5
 #define LOCKPREFIX	6
 #define CONFIGPREFIX	7
-#define PREFIX_COUNT	8
+#define TROUBLEPREFIX	8
+#define PREFIX_COUNT	9
 /* used in files.c; xxconf.h can override if needed */
 # ifndef FQN_MAX_FILENAME
 #define FQN_MAX_FILENAME 512
