@@ -498,7 +498,7 @@ cl_end()
 
 
 void
-clear_screen()
+raw_clear_screen()
 {
 	if (GetConsoleScreenBufferInfo(hConOut,&csbi)) {
 	    DWORD ccnt;
@@ -514,6 +514,12 @@ clear_screen()
 			csbi.dwSize.X * csbi.dwSize.Y,
 			newcoord, &ccnt);
 	}
+}
+
+void
+clear_screen()
+{
+	raw_clear_screen();
 	home();
 }
 

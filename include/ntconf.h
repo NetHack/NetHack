@@ -151,6 +151,7 @@ extern void FDECL(nttty_preference_update, (const char *));
 extern void NDECL(toggle_mouse_support);
 extern void FDECL(map_subkeyvalue, (char *));
 extern void NDECL(load_keyboard_handler);
+extern void NDECL(raw_clear_screen);
 #endif
 
 #include <fcntl.h>

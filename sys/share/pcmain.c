@@ -105,6 +105,7 @@ char *argv[];
 	register char *dir;
 #if defined(WIN32)
 	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
+	boolean save_getreturn_status;
 #endif
 #ifdef NOCWD_ASSUMPTIONS
 	char failbuf[BUFSZ];
@@ -172,6 +173,11 @@ char *argv[];
 		chdirx(HACKDIR, 1);
 # endif
 	ami_wininit_data();
+#endif
+#ifdef WIN32CON
+	save_getreturn_status = getreturn_enabled;
+	raw_clear_screen();
+	getreturn_enabled = TRUE;
 #endif
 	initoptions();
 
@@ -243,6 +249,9 @@ char *argv[];
 	    }
 	}
 
+#ifdef WIN32
+	getreturn_enabled = save_getreturn_status;
+#endif
 	/*
 	 * It seems you really want to play.
 	 */
