@@ -417,6 +417,8 @@ dragons have scales, not fur
 if player teleports a monster while swallowed on a noteleport level, the
 	player should not teleport along with the monster
 prefixes that can appear in any order when wishing should include +/- and empty
+word-order in wishes, allow "blessed +2 fireproof", not just 
+	"blessed fireproof +2"
 
 
 Platform- and/or Interface-Specific Fixes
@@ -507,6 +509,7 @@ glowing Sunsword (inspired by Slashem)
 msg_window option for ^P in TTY mode (Jay Tilton)
 ninjas should get multishot bonus with yumi and ya (Dylan O'Donnell)
 put prisoners in the Dark One's dungeon (Dylan O'Donnell)
+touchstones; Archeologists start with one
 add leather cloak so soldiers don't have elven cloaks
 add Tom Friedetzky's BUC-patch
 add wizard #poly and #levelchange (originally levelgain; Dylan O'Donnell),
@@ -520,6 +523,11 @@ allow disclose options to be more finally tuned, including being able
 debug mode SPLEVTYPE environment variable to choose specific levels from
 	when there are random selections
 artifacts have individual prices
+new window-port preference options added, and some existing options
+	moved into the window-port preferences section
+made each of the end disclosure options customizable to "prompt;default no",
+	"prompt;default yes", "do it;without prompt", and 
+	"hide;without prompt"
 
 
 Platform- and/or Interface-Specific New Features
@@ -527,4 +535,5 @@ Platform- and/or Interface-Specific New Features
 mac: command-key shortcuts in the player selection dialog
 amiga: screenmode requester
 amiga: 16 color font mode
+win32: new graphical port contribution by Alex Kompel
 
