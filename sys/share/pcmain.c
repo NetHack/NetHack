@@ -217,12 +217,17 @@ char *argv[];
 		 * may do a prscore().
 		 */
 		if (!strncmp(argv[1], "-s", 2)) {
-#ifdef CHDIR
+#if !defined(MSWIN_GRAPHICS)
+# ifdef CHDIR
 			chdirx(hackdir,0);
-#endif
+# endif
 			prscore(argc, argv);
+#else
+			raw_printf("-s is not supported for the Graphical Interface\n");
+#endif /*MSWIN_GRAPHICS*/
 			nethack_exit(EXIT_SUCCESS);
 		}
+		
 		/* Don't initialize the window system just to print usage */
 		if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
 			nhusage();
@@ -555,39 +560,44 @@ char *argv[];
 STATIC_OVL void 
 nhusage()
 {
-	char buf1[BUFSZ];
+	char buf1[BUFSZ], buf2[BUFSZ], *bufptr;
+
+	buf1[0] = '\0';
+	bufptr = buf1;
+
+#define ADD_USAGE(s)	if (strlen(buf1) < ((BUFSZ - strlen(s)) + 1)) Strcat(bufptr, s);
 
 	/* -role still works for those cases which aren't already taken, but
 	 * is deprecated and will not be listed here.
 	 */
-	(void) Sprintf(buf1,
-"\nUsage: %s [-d dir] -s [-r race] [-p profession] [maxrank] [name]...\n       or",
+	(void) Sprintf(buf2,
+"\nUsage:\n%s [-d dir] -s [-r race] [-p profession] [maxrank] [name]...\n       or",
 		hname);
-	if (!iflags.window_inited)
-		raw_printf(buf1);
-	else
-		(void)	printf(buf1);
-	(void) Sprintf(buf1,
-	 "\n       %s [-d dir] [-u name] [-r race] [-p profession] [-[DX]]",
+	ADD_USAGE(buf2);
+
+	(void) Sprintf(buf2,
+	 "\n%s [-d dir] [-u name] [-r race] [-p profession] [-[DX]]",
 		hname);
+	ADD_USAGE(buf2);
 #ifdef NEWS
-	Strcat(buf1," [-n]");
+	ADD_USAGE(" [-n]");
 #endif
 #ifndef AMIGA
-	Strcat(buf1," [-I] [-i] [-d]");
+	ADD_USAGE(" [-I] [-i] [-d]");
 #endif
 #ifdef MFLOPPY
 # ifndef AMIGA
-	Strcat(buf1," [-R]");
+	ADD_USAGE(" [-R]");
 # endif
 #endif
 #ifdef AMIGA
-	Strcat(buf1," [-[lL]]");
+	ADD_USAGE(" [-[lL]]");
 #endif
 	if (!iflags.window_inited)
 		raw_printf("%s\n",buf1);
 	else
 		(void) printf("%s\n",buf1);
+#undef ADD_USAGE
 }
 
 #ifdef CHDIR
