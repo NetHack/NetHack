@@ -302,7 +302,7 @@ shopkeeper will not try to buy food you are eating when inventory is full
 don't duplicate any gold inside containers when saving bones data
 can't tell between acid and holy/unholy water that burns like acid
 tame stuck monsters should release you after regaining their senses
-engraving Elbereth should exercise wisdom, not everything but wisdom
+engraving Elbereth exercises wisdom, engraving anything else does not
 artifact bows get any special attack bonus added to missile to-hit roll
 monsters with gaze attacks should not try to blind the hero with potions
 players polymorphed into umber hulks should not try to eat boulders in Sokoban
@@ -396,10 +396,12 @@ gaining a level while polymorphed increases current monst hit points as well
 	as latent human (or whatever) hit points
 pets should not try to go after food that they can't reach
 monsters shouldn't use wands of digging in Sokoban
-objects dropped in or travelling across java pools can take damage
+objects dropped in or travelling across lava pools can take damage
 monsters that enter lava can take damage
 eating an unpaid tin should calculate cost before not after eating
 spells shouldn't do negative damage
+when reading spellbooks, don't "continue studying" wrong book if original one
+	gets destroyed after previous reading attempt has been interrupted
 
 
 Platform- and/or Interface-Specific Fixes
@@ -495,8 +497,6 @@ add wizard #poly and #levelchange (originally levelgain; Dylan O'Donnell),
 add Jason Short's additional lenses use patch
 add new Gnomish Mines levels from Kelly Bailey's patch
 jousting by players wielding a lance while riding
-when reading spellbooks, don't "continue studying" wrong book if original one
-	gets destroyed after previous reading attempt has been interrupted
 can start game without a pet via pettype:none (Dylan O'Donnell)
 
 
