@@ -559,11 +559,11 @@ check_cursor_visibility(wp)
 
 /* All values are relative to currently visible area */
 
-#define V_BORDER 0.3	/* if this far from vert edge, shift */
-#define H_BORDER 0.3	/* if this from from horiz edge, shift */
+#define V_BORDER 0.25	/* if this far from vert edge, shift */
+#define H_BORDER 0.25	/* if this from from horiz edge, shift */
 
-#define H_DELTA 0.4	/* distance of horiz shift */
-#define V_DELTA 0.4	/* distance of vert shift */
+#define H_DELTA 0.25	/* distance of horiz shift */
+#define V_DELTA 0.25	/* distance of vert shift */
 
     if (horiz_sb) {
 	XtSetArg(arg[0], XtNshown,	&shown);
