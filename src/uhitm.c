@@ -554,8 +554,11 @@ int thrown;
 	struct obj *monwep;
 	char yourbuf[BUFSZ];
 	char unconventional[BUFSZ];	/* substituted for word "attack" in msg */
+	char saved_oname[BUFSZ];
 
 	unconventional[0] = '\0';
+	saved_oname[0] = '\0';
+
 	wakeup(mon);
 	if(!obj) {	/* attack with bare hands */
 	    if (mdat == &mons[PM_SHADE])
@@ -582,6 +585,7 @@ int thrown;
 		}
 	    }
 	} else {
+	    Strcpy(saved_oname, cxname(obj));
 	    if(obj->oclass == WEAPON_CLASS || is_weptool(obj) ||
 	       obj->oclass == GEM_CLASS) {
 
@@ -1043,11 +1047,11 @@ int thrown;
 			fmt = "Your silver ring sears %s!";
 		    else if (barehand_silver_rings == 2)
 			fmt = "Your silver rings sear %s!";
-		    else if (silverobj) {
+		    else if (silverobj && saved_oname[0]) {
 		    	Sprintf(silverobjbuf, "Your %s%s %s %%s!",
-		    		strstri(xname(obj), "silver") ?
+		    		strstri(saved_oname, "silver") ?
 					"" : "silver ",
-				xname(obj), otense(obj, "sear"));
+				saved_oname, vtense(saved_oname, "sear"));
 		    	fmt = silverobjbuf;
 		    } else
 			fmt = "The silver sears %s!";
