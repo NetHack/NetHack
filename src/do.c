@@ -612,10 +612,6 @@ int retry;
     menu_item *pick_list;
     boolean all_categories = TRUE;
     boolean drop_everything = FALSE;
-    boolean drop_blessed = FALSE;
-    boolean drop_cursed = FALSE;
-    boolean drop_uncursed = FALSE;
-    boolean drop_buc_unknown = FALSE;
 
 #ifndef GOLDOBJ
     if (u.ugold) {
