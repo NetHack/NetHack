@@ -3186,7 +3186,6 @@ const char *mapping;
 {
 	struct autopickup_exception *ape, **apehead;
 	char text[256], *text2;
-	static int allocsize = 0;
 	int textsize = 0;
 	boolean grab = FALSE;
 

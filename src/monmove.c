@@ -1370,7 +1370,6 @@ undesirable_disp(mtmp, x, y)
 struct monst *mtmp;
 xchar x,y;
 {
-	struct permonst *mdat = mtmp->data;
 	boolean is_pet = (mtmp && mtmp->mtame && !mtmp->isminion);
 	struct trap *trap = t_at(x,y);
 
