@@ -372,10 +372,11 @@ E char *fqn_prefix_names[PREFIX_COUNT];
 #ifdef AUTOPICKUP_EXCEPTIONS
 struct autopickup_exception {
 	char *pattern;
+	boolean grab;
 	struct autopickup_exception *next;
 };
-
 #endif /* AUTOPICKUP_EXCEPTIONS */
+
 #undef E
 
 #endif /* DECL_H */

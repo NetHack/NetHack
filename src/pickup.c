@@ -598,8 +598,9 @@ end_query:
 
 #ifdef AUTOPICKUP_EXCEPTIONS
 boolean
-is_autopickup_exception(obj)
+is_autopickup_exception(obj, grab)
 struct obj *obj;
+boolean grab;	 /* forced pickup, rather than forced leave behind? */
 {
 	/*
 	 *  Does the text description of this match an exception?
@@ -607,7 +608,8 @@ struct obj *obj;
 	char *objdesc = makesingular(xname(obj));
 	struct autopickup_exception *ape = iflags.autopickup_exceptions;
 	while (ape) {
-		if (pmatch(ape->pattern, objdesc)) return TRUE;
+		if (pmatch(ape->pattern, objdesc) &&
+		    ((grab && ape->grab) || (!grab && !ape->grab))) return TRUE;
 		ape = ape->next;
 	}
 	return FALSE;
@@ -635,21 +637,26 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 	/* first count the number of eligible items */
 	for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
 
-	    if ((!*otypes || index(otypes, curr->oclass))
-#ifdef AUTOPICKUP_EXCEPTIONS
-	    	 && !is_autopickup_exception(curr)
+
+#ifndef AUTOPICKUP_EXCEPTIONS
+	    if (!*otypes || index(otypes, curr->oclass))
+#else
+	    if ((!*otypes || index(otypes, curr->oclass) ||
+		 is_autopickup_exception(curr, TRUE)) &&
+	    	 !is_autopickup_exception(curr, FALSE))
 #endif
-						       );
 		n++;
 
 	if (n) {
 	    *pick_list = pi = (menu_item *) alloc(sizeof(menu_item) * n);
 	    for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
-		if ((!*otypes || index(otypes, curr->oclass))
-#ifdef AUTOPICKUP_EXCEPTIONS
-		    && !is_autopickup_exception(curr)
+#ifndef AUTOPICKUP_EXCEPTIONS
+		if (!*otypes || index(otypes, curr->oclass)) {
+#else
+	    if ((!*otypes || index(otypes, curr->oclass) ||
+		 is_autopickup_exception(curr, TRUE)) &&
+	    	 !is_autopickup_exception(curr, FALSE)) {
 #endif
-							     ) {
 		    pi[n].item.a_obj = curr;
 		    pi[n].count = curr->quan;
 		    n++;

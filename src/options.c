@@ -2846,8 +2846,10 @@ boolean setinitial,setfromfile;
 		tmpwin = create_nhwindow(NHW_TEXT);
 		ape = iflags.autopickup_exceptions;
 		for (i = 0; i < numapes && ape; i++) {
-			Sprintf(apebuf, "\"%s\"", ape->pattern);
-			putstr(tmpwin, 0, ape->pattern);
+			Sprintf(apebuf, "\"%s\" (%s)",
+				ape->pattern,
+				ape->grab ? "always pickup" : "never pickup");
+			putstr(tmpwin, 0, apebuf);
 			ape = ape->next;
 		}
 		display_nhwindow(tmpwin, FALSE);
@@ -3172,18 +3174,28 @@ add_autopickup_exception_mapping(mapping)
 const char *mapping;
 {
 	struct autopickup_exception *newape, *ape;
-	char text[256];
+	char text[256], *text2;
 	static int allocsize = 0;
 	int textsize = 0;
+	boolean grab = FALSE;
 
 	if (sscanf(mapping, "\"%255[^\"]\"", text) == 1) {
-		textsize = strlen(text);
+		text2 = &text[0];
+		if (*text2 == '<') {		/* force autopickup */
+			grab = TRUE;
+			++text2;
+		} else if (*text2 == '>') {	/* default - Do not pickup */
+			grab = FALSE;
+			++text2;
+		}
+		textsize = strlen(text2);
 		if (!iflags.autopickup_exceptions) {
 		    iflags.autopickup_exceptions = (struct autopickup_exception *)
 					alloc(sizeof(struct autopickup_exception));
 		    iflags.autopickup_exceptions->pattern = (char *)
 					alloc(textsize+1);
-		    Strcpy(iflags.autopickup_exceptions->pattern, text);
+		    Strcpy(iflags.autopickup_exceptions->pattern, text2);
+		    iflags.autopickup_exceptions->grab = grab;
 		    iflags.autopickup_exceptions->next =
 					(struct autopickup_exception *)0;
 		} else {
@@ -3191,7 +3203,8 @@ const char *mapping;
 		    newape = (struct autopickup_exception *)alloc(
 					sizeof(struct autopickup_exception));
 		    newape->pattern = (char *)alloc(textsize+1);
-		    Strcpy(newape->pattern, text);
+		    Strcpy(newape->pattern, text2);
+		    newape->grab = grab;
 		    newape->next = iflags.autopickup_exceptions;
 		    iflags.autopickup_exceptions = newape;
 		}
