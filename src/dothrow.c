@@ -827,13 +827,13 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 	if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
 	    boolean slipok = TRUE;
 	    if (ammo_and_launcher(obj, uwep))
-		pline("%s misfires!", The(xname(obj)));
+		pline("%s!", Tobjnam(obj, "misfire"));
 	    else {
 		/* only slip if it's greased or meant to be thrown */
 		if (obj->greased || throwing_weapon(obj))
 		    /* BUG: this message is grammatically incorrect if obj has
 		       a plural name; greased gloves or boots for instance. */
-		    pline("%s slips as you throw it!", The(xname(obj)));
+		    pline("%s as you throw it!", Tobjnam(obj, "slip"));
 		else slipok = FALSE;
 	    }
 	    if (slipok) {
@@ -864,8 +864,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 	} else if(u.dz) {
 	    if (u.dz < 0 && Role_if(PM_VALKYRIE) &&
 		    obj->oartifact == ART_MJOLLNIR && !impaired) {
-		pline("%s hits the %s and returns to your hand!",
-		      The(xname(obj)), ceiling(u.ux,u.uy));
+		pline("%s the %s and returns to your hand!",
+		      Tobjnam(obj, "hit"), ceiling(u.ux,u.uy));
 		obj = addinv(obj);
 		(void) encumber_msg();
 		setuwep(obj);
@@ -975,7 +975,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		    sho_obj_return_to_u(obj);	    /* display its flight */
 
 		    if (!impaired && rn2(100)) {
-			pline("%s returns to your hand!", The(xname(obj)));
+			pline("%s to your hand!", Tobjnam(obj, "return"));
 			obj = addinv(obj);
 			(void) encumber_msg();
 			setuwep(obj);
@@ -985,11 +985,11 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		    } else {
 			int dmg = rnd(4);
 			if (Blind)
-			    pline("%s hits your %s!",
-				  The(xname(obj)), body_part(ARM));
+			    pline("%s your %s!",
+				  Tobjnam(obj, "hit"), body_part(ARM));
 			else
-			    pline("%s flies back toward you, hitting your %s!",
-				  The(xname(obj)), body_part(ARM));
+			    pline("%s back toward you, hitting your %s!",
+				  Tobjnam(obj, "fly"), body_part(ARM));
 			(void) artifact_hit((struct monst *) 0, &youmonst,
 					    obj, &dmg, 0);
 			losehp(dmg, xname(obj), KILLED_BY);
@@ -1319,8 +1319,8 @@ register struct obj   *obj;
 			}
 	    	}
 	    }
-	    pline("%s vanishes into %s %s.",
-		The(xname(obj)), s_suffix(mon_nam(mon)),
+	    pline("%s into %s %s.",
+		Tobjnam(obj, "vanish"), s_suffix(mon_nam(mon)),
 		is_animal(u.ustuck->data) ? "entrails" : "currents");
 	} else {
 	    tmiss(obj, mon);

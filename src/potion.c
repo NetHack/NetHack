@@ -973,7 +973,7 @@ boolean your_fault;
 
 	/* oil doesn't instantly evaporate */
 	if (obj->otyp != POT_OIL && cansee(mon->mx,mon->my))
-		pline("%s evaporates.", The(xname(obj)));
+		pline("%s.", Tobjnam(obj, "evaporate"));
 
     if (isyou) {
 	switch (obj->otyp) {
@@ -1407,7 +1407,7 @@ register struct obj *obj;
 	if (snuff_lit(obj)) return(TRUE);
 
 	if (obj->greased) {
-		grease_protect(obj,(char *)0,FALSE,&youmonst);
+		grease_protect(obj,(char *)0,&youmonst);
 		return(FALSE);
 	}
 	(void) Shk_Your(Your_buf, obj);
@@ -1459,9 +1459,8 @@ register struct obj *obj;
 		    ) {
 			if (!Blind) {
 				boolean oq1 = obj->quan == 1L;
-				pline_The("scroll%s fade%s.",
-					oq1 ? "" : "s",
-					oq1 ? "s" : "");
+				pline_The("scroll%s %s.",
+					  oq1 ? "" : "s", otense(obj, "fade"));
 			}
 			if(obj->unpaid && costly_spot(u.ux, u.uy)) {
 			    You("erase it, you pay for it.");
@@ -1482,7 +1481,7 @@ register struct obj *obj;
 			    if (!Blind) {
 				    boolean oq1 = obj->quan == 1L;
 				    pline_The("spellbook%s fade%s.",
-					oq1 ? "" : "s", oq1 ? "s" : "");
+					oq1 ? "" : "s", otense(obj, "fade"));
 			    }
 			    if(obj->unpaid && costly_spot(u.ux, u.uy)) {
 			        You("erase it, you pay for it.");
@@ -1736,9 +1735,8 @@ dodip()
 		if (obj->oerodeproof || obj_resists(obj, 5, 95) ||
 			/* `METAL' should not be confused with is_metallic() */
 			omat == METAL || omat == MITHRIL || omat == BONE) {
-		    pline("%s seem%s to burn for a moment.",
-			  Yname2(obj),
-			  (obj->quan > 1L) ? "" : "s");
+		    pline("%s %s to burn for a moment.",
+			  Yname2(obj), otense(obj, "seem"));
 		} else {
 		    if (omat == PLASTIC) obj->oeroded = MAX_ERODE;
 		    pline_The("burning oil %s %s.",
@@ -1763,15 +1761,13 @@ dodip()
 	     * material, but dipping in oil shouldn't repair them.
 	     */
 	    } else if ((!is_rustprone(obj) && !is_corrodeable(obj)) ||
-				is_ammo(obj) || (!obj->oeroded && !obj->oeroded2)) {
+			is_ammo(obj) || (!obj->oeroded && !obj->oeroded2)) {
 		/* uses up potion, doesn't set obj->greased */
-		pline("%s gleam%s with an oily sheen.",
-		      Yname2(obj),
-		      (obj->quan > 1L) ? "" : "s");
+		pline("%s %s with an oily sheen.",
+		      Yname2(obj), otense(obj, "gleam"));
 	    } else {
 		pline("%s %s less %s.",
-		      Yname2(obj),
-		      (obj->quan > 1L) ? "are" : "is",
+		      Yname2(obj), otense(obj, "are"),
 		      (obj->oeroded && obj->oeroded2) ? "corroded and rusty" :
 			obj->oeroded ? "rusty" : "corroded");
 		if (obj->oeroded > 0) obj->oeroded--;
@@ -1800,7 +1796,7 @@ dodip()
 		obj->age = 0;
 	    }
 	    if (obj->age > 1000L) {
-		pline("%s is full.", Yname2(obj));
+		pline("%s %s full.", Yname2(obj), otense(obj, "are"));
 	    } else {
 		You("fill %s with oil.", yname(obj));
 		check_unpaid(potion);	/* Yendorian Fuel Tax */

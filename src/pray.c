@@ -336,7 +336,7 @@ decurse:
 		    if (!Blind)
 			    Your("%s %s.",
 				 what ? what :
-				 (const char *)aobjnam (otmp, "softly glow"),
+				 (const char *)aobjnam(otmp, "softly glow"),
 				 hcolor(amber));
 		    break;
 	    case TROUBLE_POISONED:
@@ -546,11 +546,11 @@ at_your_feet(str)
 	if (Blind) str = Something;
 	if (u.uswallow) {
 	    /* barrier between you and the floor */
-	    pline("%s drops into %s %s.", str,
+	    pline("%s %s into %s %s.", str, vtense(str, "drop"),
 		  s_suffix(mon_nam(u.ustuck)), mbodypart(u.ustuck, STOMACH));
 	} else {
 	    pline("%s %s %s your %s!", str,
-		  Blind ? "lands" : "appears",
+		  Blind ? "lands" : vtense(str, "appear"),
 		  Levitation ? "beneath" : "at",
 		  makeplural(body_part(FOOT)));
 	}
@@ -777,7 +777,7 @@ pleased(g_align)
 		*repair_buf = '\0';
 		if (uwep->oeroded || uwep->oeroded2)
 		    Sprintf(repair_buf, " and %s now as good as new",
-			    uwep->quan == 1L ? "is" : "are");
+			    otense(uwep, "are"));
 
 		if (uwep->cursed) {
 		    uncurse(uwep);

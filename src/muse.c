@@ -1803,7 +1803,7 @@ skipmsg:
 			  The_whip, the_weapon);
 		    if (welded(obj)) {
 			pline("%s welded to your %s%c",
-			      (obj->quan == 1L) ? "It is" : "They are",
+			      is_plural(obj) ? "It is" : "They are",
 			      hand, !obj->bknown ? '!' : '.');
 			/* obj->bknown = 1; */ /* welded() takes care of this */
 			where_to = 0;

@@ -133,8 +133,8 @@ moverock()
 		switch(ttmp->ttyp) {
 		case LANDMINE:
 		    if (rn2(10)) {
-			pline("KAABLAMM!!!  %s triggers %s land mine.",
-				The(xname(otmp)),
+			pline("KAABLAMM!!!  %s %s land mine.",
+				Tobjnam(otmp, "trigger"),
 				ttmp->madeby_u ? "your" : "a");
 			obj_extract_self(otmp);
 			place_object(otmp, rx, ry);
@@ -162,10 +162,12 @@ moverock()
 		    if (Blind)
 			pline("Kerplunk!  You no longer feel %s.",
 				the(xname(otmp)));
-		    else 
-			pline("%s %s and plugs a %s in the %s!",
-			  The(xname(otmp)),
-			  (ttmp->ttyp == TRAPDOOR) ? "triggers" : "falls into",
+		    else
+			pline("%s%s and %s a %s in the %s!",
+			  Tobjnam(otmp,
+			   (ttmp->ttyp == TRAPDOOR) ? "trigger" : "fall"),
+			  (ttmp->ttyp == TRAPDOOR) ? nul : " into",
+			  otense(otmp, "plug"),
 			  (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole",
 			  surface(rx, ry));
 		    deltrap(ttmp);
@@ -2078,7 +2080,7 @@ struct obj *otmp;
         while(otmp) {
 	        /* Must change when silver & copper is implemented: */
  	        if (otmp->oclass == GOLD_CLASS) return otmp->quan;
-  	        otmp = otmp->nobj;       
+  	        otmp = otmp->nobj;
 	}
 	return 0;
 }

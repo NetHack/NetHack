@@ -898,7 +898,7 @@ boolean identified, all_containers;
 		    if (all_containers)
 			container_contents(box->cobj, identified, TRUE);
 		} else {
-		    pline("%s is empty.", The(xname(box)));
+		    pline("%s empty.", Tobjnam(box, "are"));
 		    display_nhwindow(WIN_MESSAGE, FALSE);
 		}
 	    }

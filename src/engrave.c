@@ -785,15 +785,16 @@ doengrave()
 				if (!Blind)
 				    You("wipe out the message here.");
 				else
-				    Your("%s gets %s.", xname(otmp),
-					  is_ice(u.ux,u.uy) ?
-					  "frosty" : "dusty");
+				    Your("%s %s %s.", xname(otmp),
+					 otense(otmp, "get"),
+					 is_ice(u.ux,u.uy) ?
+					 "frosty" : "dusty");
 				dengr = TRUE;
 			    } else
 				Your("%s can't wipe out this engraving.",
 				     xname(otmp));
 			else
-			    Your("%s gets %s.", xname(otmp),
+			    Your("%s %s %s.", xname(otmp), otense(otmp, "get"),
 				  is_ice(u.ux,u.uy) ? "frosty" : "dusty");
 			break;
 		    default:
@@ -968,7 +969,8 @@ doengrave()
 	if (len == 0 || index(ebuf, '\033')) {
 	    if (zapwand) {
 		if (!Blind)
-		    pline("%s glows, then fades.", The(xname(otmp)));
+		    pline("%s, then %s.",
+			  Tobjnam(otmp, "glow"), otense(otmp, "fade"));
 		return(1);
 	    } else {
 		pline(Never_mind);

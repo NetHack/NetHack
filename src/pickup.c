@@ -1047,7 +1047,7 @@ int *wt_before, *wt_after;
 	suffx  = "";
     }
     There("%s %s %s, but %s%s%s%s.",
-	  (obj->quan == 1L) ? "is" : "are", obj_nambuf, where,
+	  otense(obj, "are"), obj_nambuf, where,
 	  prefx1, prefx2, verb, suffx);
 
  /* *wt_after = iw; */
@@ -1161,7 +1161,7 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    if (gold_capacity <= 0L) {
 		pline(
 	       "There %s %ld gold piece%s %s, but you cannot carry any more.",
-		      (obj->quan == 1L) ? "is" : "are",
+		      otense(obj, "are"),
 		      obj->quan, plur(obj->quan), where);
 		return 0;
 	    } else if (gold_capacity < count) {
@@ -1200,9 +1200,8 @@ boolean telekinesis;	/* not picking it up directly by hand */
 		else {
 			char kbuf[BUFSZ];
 
-			pline("Touching %s corpse is a fatal mistake.",
-					an(mons[obj->corpsenm].mname));
-			Sprintf(kbuf, "%s corpse", an(mons[obj->corpsenm].mname));
+			Strcpy(kbuf, an(corpse_xname(obj, TRUE)));
+			pline("Touching %s is a fatal mistake.", kbuf);
 			instapetrify(kbuf);
 		    return -1;
 		}
@@ -1217,8 +1216,8 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    if (obj->blessed) obj->blessed = 0;
 	    else if (!obj->spe && !obj->cursed) obj->spe = 1;
 	    else {
-		pline_The("scroll%s turn%s to dust as you %s %s up.",
-			plur(obj->quan), (obj->quan == 1L) ? "s" : "",
+		pline_The("scroll%s %s to dust as you %s %s up.",
+			plur(obj->quan), otense(obj, "turn"),
 			telekinesis ? "raise" : "pick",
 			(obj->quan == 1L) ? "it" : "them");
 		if (!(objects[SCR_SCARE_MONSTER].oc_name_known) &&
@@ -1685,7 +1684,7 @@ register struct obj *obj;
 	    pline("%s cannot be confined in such trappings.", The(xname(obj)));
 	    return 0;
 	} else if (obj->otyp == LEASH && obj->leashmon != 0) {
-		pline("%s is attached to your pet.", The(xname(obj)));
+		pline("%s attached to your pet.", Tobjnam(obj, "are"));
 		return 0;
 	} else if (obj == uwep) {
 		if (welded(obj)) {
@@ -1710,9 +1709,8 @@ register struct obj *obj;
 		else {
 		    char kbuf[BUFSZ];
 
-		    pline("Touching %s corpse is a fatal mistake.",
-			  an(mons[obj->corpsenm].mname));
-		    Sprintf(kbuf, "%s corpse", an(mons[obj->corpsenm].mname));
+		    Strcpy(kbuf, an(corpse_xname(obj, TRUE)));
+		    pline("Touching %s is a fatal mistake.", kbuf);
 		    instapetrify(kbuf);
 		    return -1;
 		}
@@ -1827,9 +1825,8 @@ register struct obj *obj;
 		else {
 		    char kbuf[BUFSZ];
 
-		    pline("Touching %s corpse is a fatal mistake.",
-			  an(mons[obj->corpsenm].mname));
-		    Sprintf(kbuf, "%s corpse", an(mons[obj->corpsenm].mname));
+		    Strcpy(kbuf, an(corpse_xname(obj, TRUE)));
+		    pline("Touching %s is a fatal mistake.", kbuf);
 		    instapetrify(kbuf);
 		    return -1;
 		}
@@ -1902,7 +1899,7 @@ register int held;
 	    menu_on_request;
 
 	if (obj->olocked) {
-	    pline("%s seems to be locked.", The(xname(obj)));
+	    pline("%s to be locked.", Tobjnam(obj, "seem"));
 	    if (held) You("must put it down to unlock.");
 	    return 0;
 	} else if (obj->otrapped) {
@@ -1989,7 +1986,7 @@ register int held;
 	obj->owt = weight(obj);
 
 	if (!cnt) {
-	    pline("%s is empty.", Yname2(obj));
+	    pline("%s %s empty.", Yname2(obj), otense(obj, "are"));
 	} else {
 	    Sprintf(qbuf, "Do you want to take %s out of %s?",
 		    something, yname(obj));

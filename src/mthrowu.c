@@ -294,8 +294,8 @@ m_throw(mon, x, y, dx, dy, range, obj)
 		if(is_ammo(singleobj))
 		    pline("%s misfires!", Monnam(mon));
 		else
-		    pline("%s slips as %s throws it!",
-			  The(xname(singleobj)), mon_nam(mon));
+		    pline("%s as %s throws it!",
+			  Tobjnam(singleobj, "slip"), mon_nam(mon));
 	    }
 	    dx = rn2(3)-1;
 	    dy = rn2(3)-1;

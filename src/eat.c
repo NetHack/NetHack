@@ -1654,7 +1654,7 @@ struct obj *otmp;
 	   ability to detect food that is unfit for consumption
 	   or dangerous and avoid it. */
 
-	char buf[BUFSZ], foodname[BUFSZ];
+	char buf[BUFSZ], foodsmell[BUFSZ];
 	char *eat_it_anyway = "Eat it anyway?";
 	boolean cadaver = (otmp->otyp == CORPSE);
 	boolean stoneorslime = FALSE;
@@ -1666,7 +1666,7 @@ struct obj *otmp;
 	mnum = 0;
 #endif
 
-	Strcpy(foodname, The(xname(otmp)));
+	Strcpy(foodsmell, Tobjnam(otmp, "smell"));
 	if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN) {
 		mnum = otmp->corpsenm;
 		/* These checks must match those in eatcorpse() */
@@ -1697,48 +1697,48 @@ struct obj *otmp;
 
 	if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && !Sick_resistance) {
 		/* Tainted meat */
-		Sprintf(buf, "%s smells like it could be tainted! %s",
-		     foodname, eat_it_anyway);
+		Sprintf(buf, "%s like it could be tainted! %s",
+		     foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (stoneorslime) {
-		Sprintf(buf, "%s smells like it could be something very dangerous! %s",
-		     foodname, eat_it_anyway);
+		Sprintf(buf, "%s like it could be something very dangerous! %s",
+		     foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (otmp->orotten || (cadaver && rotted > 3L)) {
 		/* Rotten */
-		Sprintf(buf, "%s smells like it could be rotten! %s",
-			foodname, eat_it_anyway);
+		Sprintf(buf, "%s like it could be rotten! %s",
+			foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (cadaver && poisonous(&mons[mnum]) && !Poison_resistance) {
 		/* poisonous */
-		Sprintf(buf, "%s smells like it might be poisonous! %s",
-			foodname, eat_it_anyway);
+		Sprintf(buf, "%s like it might be poisonous! %s",
+			foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (cadaver && !vegetarian(&mons[mnum]) &&
 	    !u.uconduct.unvegetarian && Role_if(PM_MONK)) {
-		Sprintf(buf, "%s smells unhealthy. %s",
-			foodname, eat_it_anyway);
+		Sprintf(buf, "%s unhealthy. %s",
+			foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (cadaver && acidic(&mons[mnum]) && !Acid_resistance) {
-		Sprintf(buf, "%s smells rather acidic. %s",
-			foodname, eat_it_anyway);
+		Sprintf(buf, "%s rather acidic. %s",
+			foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (Upolyd &&
 	    (u.umonnum == PM_RUST_MONSTER && is_metallic(otmp) && otmp->oerodeproof)) {
-		Sprintf(buf, "%s smells disgusting to you right now. %s",
-			foodname, eat_it_anyway);
+		Sprintf(buf, "%s disgusting to you right now. %s",
+			foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
@@ -1751,24 +1751,24 @@ struct obj *otmp;
 	    ((material == LEATHER || material == BONE ||
 	      material == DRAGON_HIDE || material == WAX) ||
 	     (cadaver && !vegan(&mons[mnum])))) {
-		Sprintf(buf, "%s smells foul and unfamiliar to you. %s",
-			foodname, eat_it_anyway);
+		Sprintf(buf, "%s foul and unfamiliar to you. %s",
+			foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 	if (!u.uconduct.unvegetarian &&
 	    ((material == LEATHER || material == BONE || material == DRAGON_HIDE) ||
 	     (cadaver && !vegetarian(&mons[mnum])))) {
-		Sprintf(buf, "%s smells unfamiliar to you. %s",
-			foodname, eat_it_anyway);
+		Sprintf(buf, "%s unfamiliar to you. %s",
+			foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
 
 	if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && Sick_resistance) {
 		/* Tainted meat with Sick_resistance */
-		Sprintf(buf, "%s smells like it could be tainted! %s",
-		     foodname, eat_it_anyway);
+		Sprintf(buf, "%s like it could be tainted! %s",
+		     foodsmell, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
 	}
@@ -2254,10 +2254,11 @@ boolean incr;
 				  "You still have the munchies." :
       "The munchies are interfering with your motor capabilities.");
 			else if (incr &&
-				(Role_if(PM_WIZARD) || Race_if(PM_ELF) || Role_if(PM_VALKYRIE)))
+				(Role_if(PM_WIZARD) || Race_if(PM_ELF) ||
+				 Role_if(PM_VALKYRIE)))
 			    pline("%s needs food, badly!",
-			    		(Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE)) ?
-			    		urole.name.m : "Elf");
+				  (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE)) ?
+				  urole.name.m : "Elf");
 			else
 			    You((!incr) ? "feel weak now." :
 				  (u.uhunger < 45) ? "feel weak." :
@@ -2348,7 +2349,7 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 		    feeding ? (otmp->oclass != GOLD_CLASS && is_edible(otmp)) :
 						otmp->oclass==FOOD_CLASS) {
 			Sprintf(qbuf, "There %s %s here; %s %s?",
-				(otmp->quan == 1L) ? "is" : "are",
+				otense(otmp, "are"),
 				doname(otmp), verb,
 				(otmp->quan == 1L) ? "it" : "one");
 			if((c = yn_function(qbuf,ynqchars,'n')) == 'y')

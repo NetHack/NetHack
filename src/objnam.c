@@ -7,6 +7,7 @@
 /* "an uncursed greased partly eaten guardian naga hatchling [corpse]" */
 #define PREFIX	80	/* (56) */
 #define SCHAR_LIM 127
+#define NUMOBUF 12
 
 STATIC_DCL char *FDECL(strprepend,(char *,const char *));
 #ifdef OVL0
@@ -15,6 +16,7 @@ static boolean FDECL(the_unique_obj, (struct obj *obj));
 #ifdef OVLB
 static boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
 #endif
+static char *NDECL(nextobuf);
 static void FDECL(add_erosion_words, (struct obj *, char *));
 
 struct Jitem {
@@ -78,21 +80,27 @@ register const char *pref;
 #endif /* OVL1 */
 #ifdef OVLB
 
+/* manage a pool of BUFSZ buffers, so callers don't have to */
+static char *
+nextobuf()
+{
+	static char NEARDATA bufs[NUMOBUF][BUFSZ];
+	static int bufidx = 0;
+
+	bufidx = (bufidx + 1) % NUMOBUF;
+	return bufs[bufidx];
+}
+
 char *
 obj_typename(otyp)
 register int otyp;
 {
-#ifdef LINT	/* static char buf[BUFSZ]; */
-	char buf[BUFSZ];
-#else
-	static char NEARDATA buf[BUFSZ];
-#endif
+	char *buf = nextobuf();
 	register struct objclass *ocl = &objects[otyp];
 	register const char *actualn = OBJ_NAME(*ocl);
 	register const char *dn = OBJ_DESCR(*ocl);
 	register const char *un = ocl->oc_uname;
 	register int nn = ocl->oc_name_known;
-
 
 	if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp))
 		actualn = Japanese_item_name(otyp);
@@ -212,12 +220,7 @@ char *
 xname(obj)
 register struct obj *obj;
 {
-#ifdef LINT	/* lint may handle static decl poorly -- static char bufr[]; */
-	char bufr[BUFSZ];
-#else
-	static char bufr[BUFSZ];
-#endif
-	register char *buf = &(bufr[PREFIX]);	/* leave room for "17 -3 " */
+	register char *buf;
 	register int typ = obj->otyp;
 	register struct objclass *ocl = &objects[typ];
 	register int nn = ocl->oc_name_known;
@@ -225,6 +228,7 @@ register struct obj *obj;
 	register const char *dn = OBJ_DESCR(*ocl);
 	register const char *un = ocl->oc_uname;
 
+	buf = nextobuf() + PREFIX;	/* leave room for "17 -3 " */
 	if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
 		actualn = Japanese_item_name(typ);
 
@@ -797,17 +801,13 @@ register struct obj *otmp;
 			 is_flammable(otmp));
 }
 
-/* The result is actually modifiable, but caller shouldn't rely on that
- * due to the small buffer size.
- */
-const char *
+char *
 corpse_xname(otmp, ignore_oquan)
 struct obj *otmp;
 boolean ignore_oquan;	/* to force singular */
 {
-	static char NEARDATA nambuf[40];
+	char *nambuf = nextobuf();
 
-     /* assert( strlen(mons[otmp->corpsenm].mname) <= 32 ); */
 	Sprintf(nambuf, "%s corpse", mons[otmp->corpsenm].mname);
 
 	if (ignore_oquan || otmp->quan < 2)
@@ -842,7 +842,7 @@ char *
 an(str)
 register const char *str;
 {
-	static char NEARDATA buf[BUFSZ];
+	char *buf = nextobuf();
 
 	buf[0] = '\0';
 
@@ -881,7 +881,7 @@ char *
 the(str)
 const char *str;
 {
-	static char NEARDATA buf[BUFSZ];
+	char *buf = nextobuf();
 	boolean insert_the = FALSE;
 
 	if (!strncmpi(str, "the ", 4)) {
@@ -933,6 +933,7 @@ const char *str;
     return tmp;
 }
 
+/* returns "count xname(otmp)" or just xname(otmp) if count == 1 */
 char *
 aobjnam(otmp,verb)
 register struct obj *otmp;
@@ -947,18 +948,120 @@ register const char *verb;
 	}
 
 	if(verb) {
-		/* verb is given in plural (without trailing s) */
-		Strcat(bp, " ");
-		if(otmp->quan != 1L)
-			Strcat(bp, verb);
-		else if(!strcmp(verb, "are"))
-			Strcat(bp, "is");
-		else {
-			Strcat(bp, verb);
-			Strcat(bp, "s");
-		}
+	    Strcat(bp, " ");
+	    Strcat(bp, otense(otmp, verb));
 	}
 	return(bp);
+}
+
+/* like aobjnam, but prepend "The", not count */
+char *
+Tobjnam(otmp, verb)
+register struct obj *otmp;
+register const char *verb;
+{
+	char *bp = The(xname(otmp));
+
+	if(verb) {
+	    Strcat(bp, " ");
+	    Strcat(bp, otense(otmp, verb));
+	}
+	return(bp);
+}
+
+/* return form of the verb (input plural) if xname(otmp) were the subject */
+char *
+otense(otmp, verb)
+register struct obj *otmp;
+register const char *verb;
+{
+	char *buf;
+
+	/*
+	 * verb is given in plural (without trailing s).  Return as input
+	 * if the result of xname(otmp) would be plural.  Don't bother
+	 * recomputing xname(otmp) at this time.
+	 */
+	if (!is_plural(otmp))
+	    return vtense((char *)0, verb);
+
+	buf = nextobuf();
+	Strcpy(buf, verb);
+	return buf;
+}
+
+/* return form of the verb (input plural) for present tense 3rd person subj */
+char *
+vtense(subj, verb)
+register const char *subj;
+register const char *verb;
+{
+	char *buf = nextobuf();
+	int len;
+	const char *spot;
+	const char *sp;
+
+	/*
+	 * verb is given in plural (without trailing s).  Return as input
+	 * if subj appears to be plural.  Add special cases as necessary.
+	 * Many hard cases can already be handled by using otense() instead.
+	 * If this gets much bigger, consider decomposing makeplural.
+	 * Note: monster names are not expected here (except before corpse).
+	 *
+	 * special case: allow null sobj to get the singular 3rd person
+	 * present tense form so we don't duplicate this code elsewhere.
+	 */
+	if (subj) {
+	    spot = (const char *)0;
+	    for (sp = subj; (sp = index(sp, ' ')) != 0; ++sp) {
+		if (!strncmp(sp, " of ", 4) ||
+		    !strncmp(sp, " called ", 8) ||
+		    !strncmp(sp, " named ", 7) ||
+		    !strncmp(sp, " labeled ", 9)) {
+		    if (sp != subj) spot = sp - 1;
+		    break;
+		}
+	    }
+	    len = strlen(subj);
+	    if (!spot) spot = subj + len - 1;
+
+	    /*
+	     * plural: anything that ends in 's', but not '*us'.
+	     * Guess at a few other special cases that makeplural creates.
+	     */
+	    if ((*spot == 's' && spot != subj && *(spot-1) != 'u') ||
+		((spot - subj) >= 4 && strncmp(spot-3, "eeth", 4)) ||
+		((spot - subj) >= 3 && strncmp(spot-3, "feet", 4)) ||
+		((spot - subj) >= 2 && strncmp(spot-1, "ia", 2)) ||
+		((spot - subj) >= 2 && strncmp(spot-1, "ae", 2))) {
+		Strcpy(buf, verb);
+		return buf;
+	    }
+	}
+
+	len = strlen(verb);
+	spot = verb + len - 1;
+
+	if (!strcmp(verb, "are"))
+	    Strcpy(buf, "is");
+	else if (!strcmp(verb, "have"))
+	    Strcpy(buf, "has");
+	else if (index("zxs", *spot) ||
+		 (len >= 2 && *spot=='h' && index("cs", *(spot-1))) ||
+		 (len == 2 && *spot == 'o')) {
+	    /* Ends in z, x, s, ch, sh; add an "es" */
+	    Strcpy(buf, verb);
+	    Strcat(buf, "es");
+	} else if (*spot == 'y' && (!index(vowels, *(spot-1)))) {
+	    /* like "y" case in makeplural */
+	    Strcpy(buf, verb);
+	    Strcat(buf + len - 1, "ies");
+	} else {
+	    Strcpy(buf, verb);
+	    Strcat(buf, "s");
+	}
+
+	return buf;
 }
 
 /* capitalized variant of doname() */
@@ -977,9 +1080,9 @@ char *
 yname(obj)
 struct obj *obj;
 {
-	static char outbuf[BUFSZ];
+	char *outbuf = nextobuf();
 	char *s = shk_your(outbuf, obj);	/* assert( s == outbuf ); */
-	int space_left = sizeof outbuf - strlen(s) - sizeof " ";
+	int space_left = BUFSZ - strlen(s) - sizeof " ";
 
 	return strncat(strcat(s, " "), xname(obj), space_left);
 }
@@ -1027,7 +1130,7 @@ const char *oldstr;
 {
 	/* Note: cannot use strcmpi here -- it'd give MATZot, CAVEMeN,... */
 	register char *spot;
-	static char NEARDATA str[BUFSZ];
+	char *str = nextobuf();
 	const char *excess = (char *)0;
 	int len;
 
@@ -1040,14 +1143,11 @@ const char *oldstr;
 	Strcpy(str, oldstr);
 
 	/*
-	Skip changing "pair of" to "pairs of".  According to Webster, usual
-	English usage is use pairs for humans, e.g. 3 pairs of dancers,
-	and pair for objects and non-humans, e.g. 3 pair of boots.  We don't
-	refer to pairs of humans in this game so just skip to the bottom.
-
-	Actually, none of the "pair" objects -- gloves, boots, and lenses --
-	currently merge, so this isn't used.
-	*/
+	 * Skip changing "pair of" to "pairs of".  According to Webster, usual
+	 * English usage is use pairs for humans, e.g. 3 pairs of dancers,
+	 * and pair for objects and non-humans, e.g. 3 pair of boots.  We don't
+	 * refer to pairs of humans in this game so just skip to the bottom.
+	 */
 	if (!strncmp(str, "pair of ", 8))
 		goto bottom;
 
@@ -1291,13 +1391,12 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
  * of readobjnam, and is also used in pager.c to singularize the string
  * for which help is sought.
  */
-
 char *
 makesingular(oldstr)
 const char *oldstr;
 {
 	register char *p, *bp;
-	static char NEARDATA str[BUFSZ];
+	char *str = nextobuf();
 
 	if (!oldstr || !*oldstr) {
 		impossible("singular of null?");

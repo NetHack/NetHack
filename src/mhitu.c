@@ -343,7 +343,7 @@ mattacku(mtmp)
 			newsym(u.ux,u.uy);
 		    } else {
 			pline("%s is killed by a falling %s (you)!",
-						Monnam(mtmp), youmonst.data->mname);
+					Monnam(mtmp), youmonst.data->mname);
 			killed(mtmp);
 			newsym(u.ux,u.uy);
 			if (mtmp->mhp > 0) return 0;
@@ -1526,10 +1526,9 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 
 		i = number_leashed();
 		if (i > 0) {
-			pline_The("leash%s snap%s loose.",
-					(i > 1) ? "es" : "",
-					(i > 1) ? "" : "s");
-			unleash_all();
+		    char *s = (i > 1) ? "leashes" : "leash";
+		    pline_The("%s %s loose.", s, vtense(s, "snap"));
+		    unleash_all();
 		}
 
 		if (touch_petrifies(youmonst.data) && !resists_ston(mtmp)) {

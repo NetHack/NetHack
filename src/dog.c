@@ -721,7 +721,7 @@ register struct obj *obj;
 			  Monnam(mtmp), the(xname(obj)),
 			  !big_corpse ? "." : ", or vice versa!");
 		} else if (cansee(mtmp->mx,mtmp->my))
-		    pline("%s stops.", The(xname(obj)));
+		    pline("%s.", Tobjnam(obj, "stop"));
 		/* dog_eat expects a floor object */
 		place_object(obj, mtmp->mx, mtmp->my);
 		(void) dog_eat(mtmp, obj, mtmp->mx, mtmp->my, FALSE);

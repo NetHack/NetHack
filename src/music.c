@@ -392,8 +392,7 @@ struct obj *instr;
 	    } /* else FALLTHRU */
 	case WOODEN_FLUTE:		/* May charm snakes */
 	    do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
-	    pline("%s %s.", The(xname(instr)),
-		  do_spec ? "trills" : "toots");
+	    pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
 	    if (do_spec) charm_snakes(u.ulevel * 3);
 	    exercise(A_DEX, TRUE);
 	    break;
@@ -403,7 +402,7 @@ struct obj *instr;
 		check_unpaid(instr);
 		instr->spe--;
 		if (!getdir((char *)0)) {
-		    pline("%s vibrates.", The(xname(instr)));
+		    pline("%s.", Tobjnam(instr, "vibrate"));
 		    break;
 		} else if (!u.dx && !u.dy && !u.dz) {
 		    if ((damage = zapyourself(instr, TRUE)) != 0) {
@@ -432,8 +431,7 @@ struct obj *instr;
 	    if (do_spec && instr->spe > 0) {
 		check_unpaid(instr);
 		instr->spe--;
-		pline("%s produces very attractive music.",
-		      The(xname(instr)));
+		pline("%s very attractive music.", Tobjnam(instr, "produce"));
 		charm_monsters((u.ulevel - 1) / 3 + 1);
 		exercise(A_DEX, TRUE);
 		break;

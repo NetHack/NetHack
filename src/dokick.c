@@ -370,16 +370,16 @@ xchar x, y;
 
 	if(kickobj->otyp == CORPSE && touch_petrifies(&mons[kickobj->corpsenm])
 			&& !Stone_resistance && !uarmf) {
-		char kbuf[BUFSZ];
+	    char kbuf[BUFSZ];
 
-		You("kick the %s corpse with your bare %s.",
-				mons[kickobj->corpsenm].mname, makeplural(body_part(FOOT)));
+	    You("kick the %s with your bare %s.",
+		corpse_xname(kickobj, TRUE), makeplural(body_part(FOOT)));
 	    if (!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
 		You("turn to stone...");
 		killer_format = KILLED_BY;
 		/* KMH -- otmp should be kickobj */
-		Sprintf(kbuf, "kicking a %s corpse without boots",
-			mons[kickobj->corpsenm].mname);
+		Sprintf(kbuf, "kicking %s without boots",
+			an(corpse_xname(kickobj, TRUE)));
 		killer = kbuf;
 		done(STONING);
 	    }
@@ -451,7 +451,8 @@ xchar x, y;
 		}
 		if(costly && loss) {
 		    if(!insider) {
-			You("caused %ld %s worth of damage!", loss, currency(loss));
+			You("caused %ld %s worth of damage!",
+			    loss, currency(loss));
 			make_angry_shk(shkp, x, y);
 		    } else {
 			You("owe %s %ld %s for objects destroyed.",
@@ -486,15 +487,15 @@ xchar x, y;
 				 || IS_ROCK(levl[u.ux][u.uy].typ)
 				 || closed_door(u.ux, u.uy)) {
 			if (Blind) pline("It doesn't come loose.");
-			else pline("%s do%sn't come loose.",
+			else pline("%s %sn't come loose.",
 				The(distant_name(kickobj, xname)),
-				(kickobj->quan == 1L) ? "es" : "");
+				otense(kickobj, "do"));
 			return(!rn2(3) || martial());
 		}
 		if (Blind) pline("It comes loose.");
-		else pline("%s come%s loose.",
+		else pline("%s %s loose.",
 			   The(distant_name(kickobj, xname)),
-			   (kickobj->quan == 1L) ? "s" : "");
+			   otense(kickobj, "come"));
 		obj_extract_self(kickobj);
 		newsym(x, y);
 		if (costly && (!costly_spot(u.ux, u.uy)
@@ -522,9 +523,8 @@ xchar x, y;
 	if (kickobj->quan > 1L && !isgold) kickobj = splitobj(kickobj, 1L);
 
 	if (slide && !Blind)
-	    pline("Whee!  %s slide%s across the %s.", Doname2(kickobj),
-		kickobj->quan > 1L ? "" : "s",
-		surface(x,y));
+	    pline("Whee!  %s %s across the %s.", Doname2(kickobj),
+		  otense(kickobj, "slide"), surface(x,y));
 
 	obj_extract_self(kickobj);
 	(void) snuff_candle(kickobj);
@@ -861,10 +861,10 @@ dokick()
 		    if (!rn2(2) && !(maploc->looted & TREE_LOOTED) &&
 			  (treefruit = rnd_treefruit_at(x, y))) {
 			treefruit->quan = (long)(8 - rnl(8));
-			if (treefruit->quan > 1L)
-				pline("Some %s fall from the tree!", xname(treefruit));
+			if (is_plural(treefruit))
+			    pline("Some %s fall from the tree!", xname(treefruit));
 			else
-				pline("%s falls from the tree!", An(xname(treefruit)));
+			    pline("%s falls from the tree!", An(xname(treefruit)));
 			scatter(x,y,2,MAY_HIT,treefruit);
 			exercise(A_DEX, TRUE);
 			exercise(A_WIS, TRUE);	/* discovered a new food source! */
@@ -1385,19 +1385,18 @@ long num;
 		 xname(otmp));
 
 	if(num) { /* means: other objects are impacted */
-	    Sprintf(eos(obuf), " hit%s %s object%s",
-		      otmp->quan == 1L ? "s" : "",
-		      num == 1L ? "another" : "other",
-		      num > 1L ? "s" : "");
+	    Sprintf(eos(obuf), " %s %s object%s",
+		    otense(otmp, "hit"),
+		    num == 1L ? "another" : "other",
+		    num > 1L ? "s" : "");
 	    if(nodrop)
 		Sprintf(eos(obuf), ".");
 	    else
-		Sprintf(eos(obuf), " and fall%s %s.",
-			otmp->quan == 1L ? "s" : "", gate_str);
+		Sprintf(eos(obuf), " and %s %s.",
+			otense(otmp, "fall"), gate_str);
 	    pline("%s", obuf);
 	} else if(!nodrop)
-	    pline("%s fall%s %s.", obuf,
-		  otmp->quan == 1L ? "s" : "", gate_str);
+	    pline("%s %s %s.", obuf, otense(otmp, "fall"), gate_str);
 }
 
 /* migration destination for objects which fall down to next level */

@@ -284,9 +284,9 @@ int expltype;
 			int mdam = dam;
 
 			if (resist(mtmp, olet, 0, FALSE)) {
-				if (cansee(i+x-1,j+y-1))
-				    pline("%s resists the %s!", Monnam(mtmp), str);
-				mdam = dam/2;
+			    if (cansee(i+x-1,j+y-1))
+				pline("%s resists the %s!", Monnam(mtmp), str);
+			    mdam = dam/2;
 			}
 			if (mtmp == u.ustuck)
 				mdam *= 2;
@@ -437,7 +437,7 @@ struct obj *obj;			/* only scatter this obj        */
 			&& ((otmp->otyp == BOULDER) || (otmp->otyp == STATUE))
 			&& rn2(10)) {
 		if (otmp->otyp == BOULDER) {
-		    pline("%s breaks apart.",The(xname(otmp)));
+		    pline("%s apart.", Tobjnam(otmp, "break"));
 		    fracture_rock(otmp);
 		    place_object(otmp, sx, sy);	/* put fragments on floor */
 		    if ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -450,7 +450,7 @@ struct obj *obj;			/* only scatter this obj        */
 
 		    if ((trap = t_at(sx,sy)) && trap->ttyp == STATUE_TRAP)
 			    deltrap(trap);
-		    pline("%s crumbles.",The(xname(otmp)));
+		    pline("%s.", Tobjnam(otmp, "crumble"));
 		    (void) break_statue(otmp);
 		    place_object(otmp, sx, sy);	/* put fragments on floor */
 		}

@@ -226,7 +226,7 @@ Cloak_on()
 		}
 		break;
 	case OILSKIN_CLOAK:
-		pline("%s fits very tightly.",The(xname(uarmc)));
+		pline("%s very tightly.", Tobjnam(uarmc, "fit"));
 		break;
 	/* Alchemy smock gives poison _and_ acid resistance */
 	case ALCHEMY_SMOCK:
@@ -317,9 +317,11 @@ Helmet_on()
 		/*FALLTHRU*/
 	case DUNCE_CAP:
 		if (!uarmh->cursed) {
-		    pline("%s %s%s for a moment.", The(xname(uarmh)),
-			  Blind ? "vibrates" : "glows ",
-			  Blind ? (const char *)"" : hcolor(Black));
+		    if (Blind)
+			pline("%s for a moment.", Tobjnam(uarmh, "vibrate"));
+		    else
+			pline("%s %s for a moment.",
+			      Tobjnam(uarmh, "glow"), hcolor(Black));
 		    curse(uarmh);
 		}
 		flags.botl = 1;		/* reveal new alignment or INT & WIS */
@@ -435,9 +437,9 @@ Gloves_off()
 		touch_petrifies(&mons[uwep->corpsenm])) {
 	char kbuf[BUFSZ];
 
-	You("wield the %s corpse in your bare %s.",
-	    mons[uwep->corpsenm].mname, makeplural(body_part(HAND)));
-	Sprintf(kbuf, "%s corpse", an(mons[uwep->corpsenm].mname));
+	You("wield the %s in your bare %s.",
+	    corpse_xname(uwep, TRUE), makeplural(body_part(HAND)));
+	Strcpy(kbuf, an(corpse_xname(uwep, TRUE)));
 	instapetrify(kbuf);
 	uwepgone();  /* life-saved still doesn't allow touching cockatrice */
     }
@@ -447,10 +449,10 @@ Gloves_off()
 	touch_petrifies(&mons[uswapwep->corpsenm])) {
 	char kbuf[BUFSZ];
 
-	You("wield the %s corpse in your bare %s.",
-	    mons[uswapwep->corpsenm].mname, body_part(HAND));
+	You("wield the %s in your bare %s.",
+	    corpse_xname(uswapwep, TRUE), body_part(HAND));
 
-	Sprintf(kbuf, "%s corpse", an(mons[uswapwep->corpsenm].mname));
+	Strcpy(kbuf, an(corpse_xname(uswapwep, TRUE)));
 	instapetrify(kbuf);
 	uswapwepgone();	/* lifesaved still doesn't allow touching cockatrice */
     }
