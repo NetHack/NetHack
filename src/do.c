@@ -83,9 +83,6 @@ boolean pushing;
 	    if (!fills_up || !pushing) {	/* splashing occurs */
 		if (!u.uinwater) {
 		    if (pushing ? !Blind : cansee(rx,ry)) {
-			boolean moat = (ltyp != WATER) &&
-			    !Is_medusa_level(&u.uz) && !Is_waterlevel(&u.uz);
-
 			There("is a large splash as %s %s the %s.",
 			      the(xname(otmp)), fills_up? "fills":"falls into",
 			      what);
@@ -195,7 +192,7 @@ const char *verb;
 		}
 		water_damage(obj, FALSE, FALSE);
 	} else if (u.ux == x && u.uy == y &&
-		(!u.utrap || u.utrap && u.utraptype != TT_PIT) &&
+		(!u.utrap || (u.utrap && u.utraptype != TT_PIT)) &&
 		(t = t_at(x,y)) != 0 && t->tseen &&
 			(t->ttyp==PIT || t->ttyp==SPIKED_PIT)) {
 		static const char * const the_your[2] = { "the", "your" };
