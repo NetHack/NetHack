@@ -37,6 +37,6 @@ int FDECL(chdir, (char *));
 #ifndef	strcmpi
 int FDECL(strcmpi, (char * , char *));
 #endif
-#if !defined(memcmp) && !defined(AZTEC_C) && !defined(_DCC)
+#if !defined(memcmp) && !defined(AZTEC_C) && !defined(_DCC) && !defined(__GNUC__)
 int FDECL(memcmp, (unsigned char * , unsigned char * , int ));
 #endif

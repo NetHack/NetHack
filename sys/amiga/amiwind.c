@@ -21,11 +21,7 @@ static void ProcessMessage( register struct IntuiMessage *message );
 
 #define BufferQueueChar(ch) (KbdBuffer[KbdBuffered++] = (ch))
 
-#ifdef __GNUC__ /* Conflicting includefiles ... */
-struct Device *ConsoleDevice;
-#else
 struct Library *ConsoleDevice;
-#endif
 
 #include "NH:sys/amiga/amimenu.c"
 
