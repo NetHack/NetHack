@@ -1802,6 +1802,20 @@ goodfruit:
 		return;
 	}
 #endif /* MSWIN_GRAPHICS */
+#ifdef WIN32CON
+	/* ignore the graphical win32 graphical options silently,
+	 * so defaults.nh can be easily used by both tty and win32
+	 */
+	if (match_optname(opts, "win32_map_mode",
+				sizeof("win32_map_mode")-1, TRUE) ||
+	    match_optname(opts, "win32_align_status",
+				sizeof("win32_align_status")-1, TRUE) ||
+	    match_optname(opts, "win32_align_message",
+	    			sizeof("win32_align_message")-1, TRUE) ||
+	    match_optname(opts, "win32_map_cliparound_margin",
+				sizeof("win32_map_cliparound_margin")-1, TRUE))
+	    return;
+#endif
 
 	fullname = "windowtype";
 	if (match_optname(opts, fullname, 3, TRUE)) {
