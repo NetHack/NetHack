@@ -225,17 +225,20 @@ short hor, vert;
 		}
 	}
 
-	mustwork (create_tty (&_mt_window, WIN_BASE_KIND + NHW_MAP, _mt_in_color));
+	if (create_tty (&_mt_window, WIN_BASE_KIND + NHW_MAP, _mt_in_color) != noErr)
+		error("_mt_init_stuff: Couldn't create tty.");
 	((WindowPeek) _mt_window)->windowKind = (WIN_BASE_KIND + NHW_MAP);
 	SelectWindow (_mt_window);
 	SetPort (_mt_window);
 	SetOrigin (-1, -1);
 	
 	font_size = (iflags.large_font && !small_screen) ? 12 : 9;
-	mustwork (init_tty_number (_mt_window, win_fonts [NHW_MAP], font_size, CO, LI));
+	if (init_tty_number (_mt_window, win_fonts [NHW_MAP], font_size, CO, LI) != noErr)
+		error("_mt_init_stuff: Couldn't init tty.");
 
-	mustwork (get_tty_metrics (_mt_window, &num_cols, &num_rows, &win_width ,
-		&win_height, &font_num, &font_size, &char_width, &row_height));
+	if (get_tty_metrics (_mt_window, &num_cols, &num_rows, &win_width ,
+		&win_height, &font_num, &font_size, &char_width, &row_height))
+		error("_mt_init_stuff: Couldn't get tty metrics.");
 
 	SizeWindow (_mt_window, win_width + 2, win_height + 2, 1);
 	if (RetrievePosition (kMapWindow, &vert, &hor)) {
@@ -245,17 +248,17 @@ short hor, vert;
 	ShowWindow (_mt_window);
 
 	/* Start in raw, always flushing mode */
-	mustwork (get_tty_attrib (_mt_window, TTY_ATTRIB_FLAGS, &flag));
+	get_tty_attrib(_mt_window, TTY_ATTRIB_FLAGS, &flag);
 	flag |= TA_ALWAYS_REFRESH | TA_WRAP_AROUND;
-	mustwork (set_tty_attrib (_mt_window, TTY_ATTRIB_FLAGS, flag));
+	set_tty_attrib(_mt_window, TTY_ATTRIB_FLAGS, flag);
 
-	mustwork (get_tty_attrib (_mt_window, TTY_ATTRIB_CURSOR, &flag));
+	get_tty_attrib(_mt_window, TTY_ATTRIB_CURSOR, &flag);
 	flag |= (TA_BLINKING_CURSOR | TA_NL_ADD_CR);
-	mustwork (set_tty_attrib (_mt_window, TTY_ATTRIB_CURSOR, flag));
+	set_tty_attrib(_mt_window, TTY_ATTRIB_CURSOR, flag);
 
-	mustwork (set_tty_attrib (_mt_window, TTY_ATTRIB_FOREGROUND, _mt_colors [NO_COLOR] [0]));
-	mustwork (set_tty_attrib (_mt_window, TTY_ATTRIB_BACKGROUND, _mt_colors [NO_COLOR] [1]));
-	clear_tty (_mt_window);//
+	set_tty_attrib(_mt_window, TTY_ATTRIB_FOREGROUND, _mt_colors[NO_COLOR][0]);
+	set_tty_attrib(_mt_window, TTY_ATTRIB_BACKGROUND, _mt_colors[NO_COLOR][1]);
+	clear_tty (_mt_window);
 
 	InitMenuRes ();
 }
@@ -481,15 +484,15 @@ term_start_color (int color) {
 
 
 void
-setftty (void) {
-long flag;
+setftty (void)
+{
+	long flag;
 
-	mustwork (get_tty_attrib (_mt_window, TTY_ATTRIB_FLAGS, &flag));
-/* Buffered output in the game */
+	/* Buffered output for the game */
+	get_tty_attrib (_mt_window, TTY_ATTRIB_FLAGS, &flag);
 	flag &= ~ TA_ALWAYS_REFRESH;
 	flag |= TA_INHIBIT_VERT_SCROLL; /* don't scroll */
-	mustwork (set_tty_attrib (_mt_window, TTY_ATTRIB_FLAGS, flag));
-
+	set_tty_attrib (_mt_window, TTY_ATTRIB_FLAGS, flag);
 	iflags.cbreak = 1;
 }
 
@@ -508,16 +511,17 @@ gettty (void) {
 
 
 void
-settty (const char *str) {
-long flag;
+settty (const char *str)
+{
+	long flag;
 
 	update_tty (_mt_window);
 
-	mustwork (get_tty_attrib (_mt_window, TTY_ATTRIB_FLAGS, &flag));
-/* Buffered output in the game, raw in "raw" mode */
+	/* Buffered output for the game, raw in "raw" mode */
+	get_tty_attrib(_mt_window, TTY_ATTRIB_FLAGS, &flag);
 	flag &= ~ TA_INHIBIT_VERT_SCROLL; /* scroll */
 	flag |= TA_ALWAYS_REFRESH;
-	mustwork (set_tty_attrib (_mt_window, TTY_ATTRIB_FLAGS, flag));
+	set_tty_attrib(_mt_window, TTY_ATTRIB_FLAGS, flag);
 
 	tty_raw_print ("\n");
 	if (str) {

@@ -8,6 +8,7 @@
 #include "mactty.h"
 #endif
 #include "macpopup.h"
+#include <ControlDefinitions.h>
 
 /* Flash a dialog button when its accelerator key is pressed */
 void
@@ -18,7 +19,7 @@ FlashButton (WindowPtr wind, short item) {
 	unsigned long ticks;
 
 	/* Apple recommends 8 ticks */
-	GetDItem(wind, item, &type, &handle, &rect);
+	GetDialogItem(wind, item, &type, &handle, &rect);
 	HiliteControl((ControlHandle)handle, kControlButtonPart);
 	Delay(8, &ticks);
 	HiliteControl((ControlHandle)handle, 0);
@@ -48,7 +49,7 @@ FrameItem (DialogPtr dlog, short item) {
 	Handle h;
 	Rect r;
 
-	GetDItem (dlog, item, &k, &h, &r);
+	GetDialogItem (dlog, item, &k, &h, &r);
 	PenSize (3, 3);
 	FrameRoundRect (&r, frame_corner, frame_corner);
 	PenNormal ();
@@ -64,11 +65,11 @@ SetFrameItem (DialogPtr dlog, short frame, short item) {
 	if (!FrameItemUPP)	/* initialize handler routine */
 		FrameItemUPP = NewUserItemProc(FrameItem);
 		
-	GetDItem (dlog, item, &kind, &h, &r);
+	GetDialogItem (dlog, item, &kind, &h, &r);
 	InsetRect (&r, -4, -4);
 	r2 = r;
-	GetDItem (dlog, frame, &kind, &h, &r);
-	SetDItem (dlog, frame, kind, (Handle) FrameItemUPP, &r2);
+	GetDialogItem (dlog, frame, &kind, &h, &r);
+	SetDialogItem (dlog, frame, kind, (Handle) FrameItemUPP, &r2);
 	frame_corner = 16;
 }
 
@@ -235,20 +236,20 @@ SetEnterItem (DialogPtr dp, const short newEnterItem) {
 	Rect r, r2;
 
 	if (gEnterItem != newEnterItem) {
-		GetDItem (dp, gEnterItem, &kind, &item, &r2);
+		GetDialogItem (dp, gEnterItem, &kind, &item, &r2);
 		InsetRect (&r2, - 4, - 4);
 		EraseRect (&r2);
 		InvalRect (&r2);
 
 		gEnterItem = newEnterItem;
 
-		GetDItem (dp, newEnterItem, &kind, &item, &r2);
+		GetDialogItem (dp, newEnterItem, &kind, &item, &r2);
 		frame_corner = kind == ctrlItem + btnCtrl ? 16 : 0;
 		InsetRect (&r2, - 4, - 4);
 		InvalRect (&r2);
 		r = r2;
-		GetDItem (dp, yn_user_item [dlogID - YN_DLOG], &kind, &item, &r2);
-		SetDItem (dp, yn_user_item [dlogID - YN_DLOG], kind, item, &r);
+		GetDialogItem (dp, yn_user_item [dlogID - YN_DLOG], &kind, &item, &r2);
+		SetDialogItem (dp, yn_user_item [dlogID - YN_DLOG], kind, item, &r);
 	}
 }
 
@@ -266,8 +267,8 @@ set_yn_number(DialogPtr dp) {
 		Handle h;
 		Rect r;
 		Str255 s;
-		GetDItem(dp, gEnterItem, &k, &h, &r);
-		GetIText(h, s);
+		GetDialogItem(dp, gEnterItem, &k, &h, &r);
+		GetDialogItemText(h, s);
 		if (s[0])
 			StringToNum(s, &yn_number);
 	}
@@ -399,30 +400,30 @@ OneCharDLOGFilter (DialogPtr dp, EventRecord *ev, short *item) {
 	com [1] = ch;
 
 	if (ch == 27) {
-		GetDItem (dp, 4, &k, &h, &r);
-		SetIText (h, com);
+		GetDialogItem (dp, 4, &k, &h, &r);
+		SetDialogItemText (h, com);
 		*item = 2;
 		FlashButton (dp, 2);
 		return 1;
 	}
 	if (! gRespStr || strchr (gRespStr, ch)) {
-		GetDItem (dp, 4, &k, &h, &r);
-		SetIText (h, com);
+		GetDialogItem (dp, 4, &k, &h, &r);
+		SetDialogItemText (h, com);
 		*item = 1;
 		FlashButton (dp, 1);
 		return 1;
 	}
 	if (ch == 10 || ch == 13 || ch == 3 || ch == 32) {
 		com [1] = gDef;
-		GetDItem (dp, 4, &k, &h, &r);
-		SetIText (h, com);
+		GetDialogItem (dp, 4, &k, &h, &r);
+		SetDialogItemText (h, com);
 		*item = 1;
 		FlashButton (dp, 1);
 		return 1;
 	}
 	if (ch > 32 && ch < 127) {
-		GetDItem (dp, 4, &k, &h, &r);
-		SetIText (h, com);
+		GetDialogItem (dp, 4, &k, &h, &r);
+		SetDialogItemText (h, com);
 		*item = 1;
 		FlashButton (dp, 1);
 		return 1;
@@ -442,7 +443,7 @@ char def;
 	short k, item;
 	Handle h;
 	Rect r;
-	unsigned char com [32] = {1, 27}; // margin for getitext
+	unsigned char com [32] = {1, 27}; // margin for GetDialogItemText
 	Str255 pQuery;
 
 	char c = queued_resp ((char *) resp);
@@ -468,9 +469,9 @@ char def;
 	}
 	pQuery[0] = strlen (&pQuery[1]);
 	ParamText ((char *) pQuery, (uchar *) 0, (uchar *) 0, (uchar *) 0);
-	GetDItem (dp, 4, &k, &h, &r);
-	SetIText (h, com);
-	SelIText (dp, 4, 0, 0x7fff);
+	GetDialogItem (dp, 4, &k, &h, &r);
+	SetDialogItemText (h, com);
+	SelectDialogItemText (dp, 4, 0, 0x7fff);
 	InitCursor ();
 	SetFrameItem (dp, 6, 1);
 	gRespStr = resp;
@@ -479,7 +480,7 @@ char def;
 		mv_modal_dialog (OneCharDLOGFilter, &item);
 
 	} while (item != 1 && item != 2);
-	GetIText (h, com);
+	GetDialogItemText (h, com);
 
 	mv_close_dialog (dp);
 	if (item == 2 || ! com [0]) {
@@ -584,7 +585,7 @@ ExtendedCommandDialogFilter (DialogPtr dp, EventRecord *ev, short *item) {
 	for (ix = 3; ix; ix ++) {
 		h = (Handle) 0;
 		k = 0;
-		GetDItem (dp, ix, &k, &h, &r);
+		GetDialogItem (dp, ix, &k, &h, &r);
 		if (! k || ! h) {
 			return 0;
 		}
@@ -639,8 +640,8 @@ popup_getlin (const char *query, char *bufp) {
 		** Get the text from the text edit item.
 		*/
 		
-		GetDItem(promptDialog, 4, &type, (Handle *) &ctrl, &box);
-		GetIText((Handle) ctrl, pasStr);
+		GetDialogItem(promptDialog, 4, &type, (Handle *) &ctrl, &box);
+		GetDialogItemText((Handle) ctrl, pasStr);
 		
 		/*
 		** Convert it to a 'C' string and copy it into the return value.

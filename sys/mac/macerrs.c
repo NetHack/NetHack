@@ -2,7 +2,8 @@
 /* Copyright (c) Michael Hamel, 1991 */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifdef applec	/* This needs to be resident always */
+#if defined(macintosh) && defined(__SC__) && !defined(__FAR_CODE__)
+/* this needs to be resident always */
 #pragma segment Main
 #endif
 
@@ -11,6 +12,25 @@
 #include <Dialogs.h>
 #include <TextUtils.h>
 #include <Resources.h>
+
+
+void error(const char *format,...)
+{
+	Str255 buf;
+	va_list ap;
+
+	va_start(ap, format);
+	vsprintf((char *)buf, format, ap);
+	va_end(ap);
+
+	C2P((char *)buf, buf);
+	ParamText(buf, (StringPtr)"", (StringPtr)"", (StringPtr)"");
+	Alert(128, (ModalFilterUPP) NULL);
+	ExitToShell();
+}
+
+
+#if 0	/* Remainder of file is obsolete and will be removed */
 
 #define stackDepth  1
 #define errAlertID 129
@@ -32,7 +52,6 @@ void showerror(char * errdesc, const char * errcomment)
 	ParamText(paserr,pascomment,gActivities[gTopactivity],(StringPtr)"");
 	itemHit = Alert(errAlertID, (ModalFilterUPP)nil);
 }
-
 
 Boolean itworked(short errcode)
 /* Return TRUE if it worked, do an error message and return false if it didn't. Error
@@ -111,13 +130,13 @@ error VA_DECL(const char *, line)
 	showerror("of an internal error",line);
 }
 
+
 void attemptingto(char * activity)
 /* Say what we are trying to do for subsequent error-handling: will appear as x in an
    alert in the form "Could not x because y" */
 {	C2P(activity,gActivities[gTopactivity]);
 }
 
-#if 0 /* Apparently unused */
 void comment(char *s, long n)
 {
 	Str255 paserr;
@@ -145,4 +164,5 @@ void popattempt(void)
 	if (gTopactivity > 1) --gTopactivity;
 	else error("activity stack underflow");
 }
-#endif /* Apparently unused */
+
+#endif /* Obsolete */

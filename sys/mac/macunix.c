@@ -6,10 +6,6 @@
 
 #include "hack.h"
 
-#ifndef __MWERKS__
-#include <fcntl.h>
-#endif
-
 
 #if 0
 int

@@ -12,27 +12,23 @@
 #include <OSUtils.h>
 #include <files.h>
 #include <Types.h>
-#ifdef MAC_MPW32
-#include <String.h>
-#include <Strings.h>
-#endif
 #include <Dialogs.h>
 #include <Packages.h>
 #include <ToolUtils.h>
 #include <Resources.h>
-#ifdef applec
-#include <SysEqu.h>
-#endif
 #include <Errors.h>
 
 #ifndef O_RDONLY
 #include <fcntl.h>
 #endif
 
-static void
-finder_file_request(void);
+static void finder_file_request(void);
+int main(void);
 
-int NDECL(main);
+#if __SC__ || __MRC__
+QDGlobals qd;
+#endif
+
 
 int
 main (void)

@@ -55,9 +55,8 @@ mac_speaker (struct obj *instr, char *melody) {
 	/*
 	 * Set up the synth
 	 */
-	if (itworked (SndNewChannel (&theChannel, sampledSynth, initMono +
-		initNoInterp, (void *) 0))) {
-
+	if (SndNewChannel(&theChannel, sampledSynth, initMono +
+		initNoInterp, (void *) 0) == noErr) {
 		char midi_note [] = {57, 59, 60, 62, 64, 65, 67};
 
 		short err;
@@ -89,8 +88,6 @@ mac_speaker (struct obj *instr, char *melody) {
 		}
 		SndDisposeChannel (theChannel, false);	/* Sync wait for completion */
 		ReleaseResource (theSound);
-
-		mustwork (err);
 	}
 }
 
