@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2003/12/02	*/
+/*	SCCS Id: @(#)invent.c	3.4	2004/11/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2587,6 +2587,7 @@ boolean unpaid;
 	return invbuf;
 }
 
+/* release the static buffer used by let_to_name() */
 void
 free_invbuf()
 {
@@ -2594,6 +2595,7 @@ free_invbuf()
 	invbufsiz = 0;
 }
 
+/* give consecutive letters to every item in inventory (for !fixinv mode) */
 void
 reassign()
 {
@@ -2605,6 +2607,16 @@ reassign()
 	lastinvnr = i;
 }
 
+/* #adjust command
+ *
+ *	User specifies a 'from' slot for inventory stack to move,
+ *	then a 'to' slot for its destination.  Open slots and those
+ *	filled by compatible stacks are listed as likely candidates
+ *	but user can pick any inventory letter (including 'from').
+ *	All compatible items found are gathered into the 'from'
+ *	stack as it is moved.  If the 'to' slot isn't empty and
+ *	doesn't merge, then its stack is swapped to the 'from' slot.
+ */
 int
 doorganize()	/* inventory organizer by Del Lamb */
 {
@@ -2616,15 +2628,24 @@ doorganize()	/* inventory organizer by Del Lamb */
 	char allowall[2];
 	const char *adj_type;
 
+	if (!invent) {
+	    /* (we don't need any !GOLDOBJ check for "except gold" here) */
+	    You("aren't carrying anything to adjust.");
+	    return 0;
+	}
+
 	if (!flags.invlet_constant) reassign();
-	/* get a pointer to the object the user wants to organize */
+	/* get object the user wants to organize (the 'from' slot) */
 	allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 	if (!(obj = getobj(allowall,"adjust"))) return(0);
 
-	/* initialize the list with all upper and lower case letters */
-	for (let = 'a', ix = 0;  let <= 'z';) alphabet[ix++] = let++;
-	for (let = 'A', ix = 26; let <= 'Z';) alphabet[ix++] = let++;
-	alphabet[52] = 0;
+	/* initialize the list with all lower and upper case letters */
+	for (ix = 0, let = 'a';  let <= 'z'; ) alphabet[ix++] = let++;
+	for (let = 'A'; let <= 'Z'; ) alphabet[ix++] = let++;
+	alphabet[ix] = '\0';
+	/* for floating inv letters, truncate list after the first open slot */
+	if (!flags.invlet_constant && (ix = inv_cnt()) < 52)
+	    alphabet[ix + 1] = '\0';
 
 	/* blank out all the letters currently in use in the inventory */
 	/* except those that will be merged with the selected object   */
@@ -2636,24 +2657,22 @@ doorganize()	/* inventory organizer by Del Lamb */
 		}
 
 	/* compact the list by removing all the blanks */
-	for (ix = cur = 0; ix <= 52; ix++)
+	for (ix = cur = 0; alphabet[ix]; ix++)
 		if (alphabet[ix] != ' ') buf[cur++] = alphabet[ix];
-
+	buf[cur] = '\0';
 	/* and by dashing runs of letters */
 	if(cur > 5) compactify(buf);
 
-	/* get new letter to use as inventory letter */
+	/* get 'to' slot to use as destination */
+	Sprintf(qbuf, "Adjust letter to what [%s]?", buf);
 	for (;;) {
-		Sprintf(qbuf, "Adjust letter to what [%s]?",buf);
-		let = yn_function(qbuf, (char *)0, '\0');
-		if(index(quitchars,let)) {
-			pline(Never_mind);
-			return(0);
-		}
-		if (let == '@' || !letter(let))
-			pline("Select an inventory slot letter.");
-		else
-			break;
+	    let = yn_function(qbuf, (char *)0, '\0');
+	    if (index(quitchars, let)) {
+		pline(Never_mind);
+		return 0;
+	    }
+	    if (letter(let) && let != '@') break;	/* got one */
+	    pline("Select an inventory slot letter.");	/* else try again */
 	}
 
 	/* change the inventory and print the resulting item */
@@ -2679,9 +2698,9 @@ doorganize()	/* inventory organizer by Del Lamb */
 			otmp = otmp->nobj;
 		}
 
-	/* inline addinv (assuming flags.invlet_constant and !merged) */
+	/* inline addinv; insert loose object at beginning of inventory */
 	obj->invlet = let;
-	obj->nobj = invent; /* insert at beginning */
+	obj->nobj = invent;
 	obj->where = OBJ_INVENT;
 	invent = obj;
 	reorder_invent();
