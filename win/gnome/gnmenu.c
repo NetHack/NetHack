@@ -658,7 +658,7 @@ ghack_ext_key_hit(GtkWidget *menuWin, GdkEventKey *event, gpointer data)
     if (info->curItem >= 0) {
 	for (i = info->curItem + 1; i < info->numRows; ++i) {
 	    if (!strncmp(extcmdlist[info->curItem].ef_txt,
-			 extcmdlist[i].ef_txt, info->charIdx-1)) {
+			 extcmdlist[i].ef_txt, info->charIdx)) {
 		if (extcmdlist[i].ef_txt[info->charIdx] == c) {
 		    ++info->charIdx;
 		    info->curItem = i;
