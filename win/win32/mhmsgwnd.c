@@ -20,21 +20,14 @@
 
 struct window_line {
 	int  attr;
-	char text[MAXWINDOWTEXT];
+	char text[MAXWINDOWTEXT+1];
 };
 
 typedef struct mswin_nethack_message_window {
 	size_t max_text;
 	struct window_line window_text[MAX_MSG_LINES];
-#ifdef MSG_WRAP_TEXT
-    int  window_text_lines[MAX_MSG_LINES]; /* How much space this text line takes */
-#endif
     int  lines_last_turn; /* lines added during the last turn */
-    int  cleared;     /* clear was called */
-    int  last_line;   /* last line in the message history */
-    struct window_line new_line;
     int  lines_not_seen;  /* lines not yet seen by user after last turn or --More-- */
-    int  in_more;   /* We are in a --More-- prompt */
     int  nevermore;   /* We want no more --More-- prompts */
 
 	int  xChar;       /* horizontal scrolling unit */
@@ -58,6 +51,11 @@ static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static COLORREF setMsgTextColor(HDC hdc, int gray);
 static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
+static BOOL can_append_text(HWND hWnd, int attr, const char* text ); 
+			/* check if text can be appended to the last line without wrapping */
+
+static BOOL more_prompt_check(HWND hWnd);
+			/* check if "--more--" promt needs to be displayed */
 
 #ifdef USER_SOUNDS
 extern void play_sound_for_message(const char* str);
@@ -215,22 +213,41 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	{
 		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
 		SCROLLINFO si;
+		char* p;
+		BOOL check_more = FALSE;
 
 		if( msg_data->append == 1) {
 		    /* Forcibly append to line, even if we pass the edge */
-		    strncat(data->window_text[data->last_line].text, msg_data->text, 
-			    MAXWINDOWTEXT - strlen(data->window_text[data->last_line].text));
+		    strncat(data->window_text[MSG_LINES-1].text, msg_data->text, 
+			    MAXWINDOWTEXT - strlen(data->window_text[MSG_LINES-1].text));
 		} else if( msg_data->append < 0) {
             /* remove that many chars */
-		    int len = strlen(data->window_text[data->last_line].text);
+		    int len = strlen(data->window_text[MSG_LINES-1].text);
             int newend = max(len + msg_data->append, 0);
-		    data->window_text[data->last_line].text[newend] = '\0';
+		    data->window_text[MSG_LINES-1].text[newend] = '\0';
         } else {
-		    /* Try to append but move the whole message to the next line if 
-		       it doesn't fit */
-		    /* just schedule for displaying */
-		    data->new_line.attr = msg_data->attr;
-		    strncpy(data->new_line.text, msg_data->text, MAXWINDOWTEXT);
+			if( can_append_text(hWnd, msg_data->attr, msg_data->text ) ) {
+				strncat(data->window_text[MSG_LINES-1].text, "  ", MAXWINDOWTEXT-strlen(data->window_text[MSG_LINES-1].text));
+				strncat(data->window_text[MSG_LINES-1].text, msg_data->text, MAXWINDOWTEXT-strlen(data->window_text[MSG_LINES-1].text));
+			} else {
+				/* check if the string is empty */
+				for(p = data->window_text[MSG_LINES-1].text; *p && isspace(*p); p++);
+
+				if( *p ) {
+					/* last string is not empty - scroll up */
+					memmove(&data->window_text[0],
+							&data->window_text[1],
+							(MSG_LINES-1)*sizeof(data->window_text[0]));
+				}
+
+				/* append new text to the end of the array */
+				data->window_text[MSG_LINES-1].attr = msg_data->attr;
+				strncpy(data->window_text[MSG_LINES-1].text, msg_data->text, MAXWINDOWTEXT);
+
+				data->lines_not_seen++;
+				data->lines_last_turn++;
+				check_more = TRUE;
+			}
 		}
 		
 		/* reset V-scroll position to display new text */
@@ -241,6 +258,43 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         si.fMask  = SIF_POS; 
         si.nPos   = data->yPos; 
         SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+
+		/* check for "--more--" */
+		if( check_more && !data->nevermore && more_prompt_check(hWnd) ) {
+			int okkey = 0;
+			int chop;
+			// @@@ Ok respnses
+
+			/* append more prompt and inticate the update */
+			strncat(data->window_text[MSG_LINES-1].text, MORE, MAXWINDOWTEXT - strlen(data->window_text[MSG_LINES-1].text));
+			InvalidateRect(hWnd, NULL, TRUE);
+
+			/* get the input */
+			while (!okkey) {
+			char c = mswin_nhgetch();
+
+			switch (c)
+			{
+				/* space or enter */
+				case ' ':
+				case '\015':
+				okkey = 1;
+				break;
+				/* ESC */
+				case '\033':
+				data->nevermore = 1;
+				okkey = 1;
+				break;
+				default:
+				break;
+				}
+			}
+
+			/* erase the "--more--" prompt */
+			chop = strlen(data->window_text[MSG_LINES-1].text) - strlen(MORE);
+			data->window_text[MSG_LINES-1].text[chop] = '\0';
+			data->lines_not_seen = 0;
+		}
 
 		/* update window content */
 		InvalidateRect(hWnd, NULL, TRUE);
@@ -253,9 +307,8 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	case MSNH_MSG_CLEAR_WINDOW:
 	{
-		data->cleared = 1;
+		data->lines_last_turn = 0;
 		data->lines_not_seen = 0;
-		/* do --More-- again if needed */
 		data->nevermore = 0;
 		break;
 	}
@@ -480,7 +533,6 @@ void onPaint(HWND hWnd)
 		LastLine = min (MSG_LINES-1, data->yPos - (client_rt.bottom - ps.rcPaint.bottom)/data->yChar); 
 		y = min( ps.rcPaint.bottom, client_rt.bottom ); 
  		for (i=LastLine; i>=FirstLine; i--) { 
-				int lineidx = (data->last_line + 1 + i) % MSG_LINES;
 				x = data->xChar * (2 - data->xPos); 
 
 				draw_rt.left = x;
@@ -488,120 +540,21 @@ void onPaint(HWND hWnd)
 				draw_rt.top = y - data->yChar;
 				draw_rt.bottom = y;
 
-	    oldFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, data->window_text[lineidx].attr, hdc, FALSE));
+	    oldFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, data->window_text[i].attr, hdc, FALSE));
 
-	    /* find out if we can concatenate the scheduled message without wrapping,
-	       but only if no clear_nhwindow was done just before putstr'ing this one. 
-	       */
-	    if (i == MSG_LINES-1 
-		    && strlen(data->new_line.text) > 0) {
-		/* concatenate to the previous line if that is not empty, and
-		   if it has the same attribute, and no clear was done.
-		   */
-		if (strlen(data->window_text[lineidx].text) > 0
-			&& (data->window_text[lineidx].attr 
-			    == data->new_line.attr)
-			&& !data->cleared) {
-		    RECT tmpdraw_rt = draw_rt;
-		    /* assume this will never work when textsize is near MAXWINDOWTEXT */
-		    char tmptext[MAXWINDOWTEXT];
-		    TCHAR tmpwbuf[MAXWINDOWTEXT+2];
-
-		    strcpy(tmptext, data->window_text[lineidx].text);
-		    strncat(tmptext, "  ", 
-			    MAXWINDOWTEXT - strlen(tmptext));
-		    strncat(tmptext, data->new_line.text, 
-			    MAXWINDOWTEXT - strlen(tmptext));
-		    /* Always keep room for a --More-- */
-		    strncat(tmptext, MORE, 
-			    MAXWINDOWTEXT - strlen(tmptext));
-		    NH_A2W(tmptext, tmpwbuf, sizeof(tmpwbuf));
-		    /* Find out how large the bounding rectangle of the text is */                
-		    DrawText(hdc, tmpwbuf, _tcslen(tmpwbuf), &tmpdraw_rt, DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
-		    if ((tmpdraw_rt.bottom - tmpdraw_rt.top) == (draw_rt.bottom - draw_rt.top)  /* fits pixelwise */
-			    && (strlen(data->window_text[lineidx].text) 
-				+ strlen(data->new_line.text) < MAXWINDOWTEXT)) /* fits charwise */
-		    {
-			/* strip off --More-- of this combined line and make it so */
-			tmptext[strlen(tmptext) - strlen(MORE)] = '\0';
-			strcpy(data->window_text[lineidx].text, tmptext);
-			data->new_line.text[0] = '\0';
-			i++; /* Start from the last line again */
-			continue;
-		    }
-		}
-		if (strlen(data->new_line.text) > 0) {
-		    /* if we get here, the new line was not concatenated. Add it on a new line,
-		       but first check whether we should --More--. */
-		    RECT tmpdraw_rt = draw_rt;
-		    TCHAR tmpwbuf[MAXWINDOWTEXT+2];
-		    HGDIOBJ oldFont;
-		    int new_screen_lines;
-		    int screen_lines_not_seen = 0;
-		    /* Count how many screen lines we haven't seen yet. */
-#ifdef MSG_WRAP_TEXT				
-		    {
-			int n;
-			for (n = data->lines_not_seen - 1; n >= 0; n--) {
-			    screen_lines_not_seen += 
-				data->window_text_lines[(data->last_line - n + MSG_LINES) % MSG_LINES];
-			}
-		    }
-#else
-		    screen_lines_not_seen = data->lines_not_seen;
-#endif
-		    /* Now find out how many screen lines we would like to add */
-		    NH_A2W(data->new_line.text, tmpwbuf, sizeof(tmpwbuf));
-		    /* Find out how large the bounding rectangle of the text is */                
-		    oldFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, data->window_text[lineidx].attr, hdc, FALSE));
-		    DrawText(hdc, tmpwbuf, _tcslen(tmpwbuf), &tmpdraw_rt, DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
-		    SelectObject(hdc, oldFont);
-		    new_screen_lines = (tmpdraw_rt.bottom - tmpdraw_rt.top) / data->yChar;
-		    /* If this together is more than fits on the window, we must 
-		       --More--, unless:
-		       - We are in --More-- already (the user is scrolling the window)
-		       - The user pressed ESC
-		       */
-		    if (screen_lines_not_seen + new_screen_lines > MSG_VISIBLE_LINES
-			    && !data->in_more && !data->nevermore) {
-			data->in_more = 1;
-			/* Show --More-- on last line */
-			strcat(data->window_text[data->last_line].text, MORE);
-			/* Go on drawing, but remember we must do a more afterwards */
-			do_more = 1;
-		    } else if (!data->in_more) {
-			data->last_line++;
-			data->last_line %= MSG_LINES; 
-			data->window_text[data->last_line].attr = data->new_line.attr;
-			strncpy(data->window_text[data->last_line].text, data->new_line.text, MAXWINDOWTEXT);
-			data->new_line.text[0] = '\0';
-			if (data->cleared) {
-			    /* now we are drawing a new line, the old lines can be redrawn in grey.*/
-			    data->lines_last_turn = 0;
-			    data->cleared = 0;
-			}
-			data->lines_last_turn++;
-			data->lines_not_seen++;
-			/* and start over */
-			i++; /* Start from the last line again */
-			continue;
-		    }
-		}
-	    }
 	    /* convert to UNICODE */
-	    NH_A2W(data->window_text[lineidx].text, wbuf, sizeof(wbuf));
+	    NH_A2W(data->window_text[i].text, wbuf, sizeof(wbuf));
 	    wlen = _tcslen(wbuf);
 	    setMsgTextColor(hdc, i < (MSG_LINES - data->lines_last_turn));
 #ifdef MSG_WRAP_TEXT				
 	    /* Find out how large the bounding rectangle of the text is */                
 				DrawText(hdc, wbuf, wlen, &draw_rt, DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
-	    /* move that rectangle up, so that the bottom remains at the same height */
+		/* move that rectangle up, so that the bottom remains at the same height */
 				draw_rt.top = y - (draw_rt.bottom - draw_rt.top);
 				draw_rt.bottom = y;
-	    /* Remember the height of this line for subsequent --More--'s */
-	    data->window_text_lines[lineidx] = (draw_rt.bottom - draw_rt.top) / data->yChar;
-	    /* Now really draw it */
-				DrawText(hdc, wbuf, wlen, &draw_rt, DT_NOPREFIX | DT_WORDBREAK);
+
+			/* Now really draw it */
+			DrawText(hdc, wbuf, wlen, &draw_rt, DT_NOPREFIX | DT_WORDBREAK);
                 
                 /* Find out the cursor (caret) position */
 	    if (i == MSG_LINES-1) {
@@ -644,39 +597,6 @@ void onPaint(HWND hWnd)
 				SelectObject(hdc, oldFont);
 				y -= draw_rt.bottom - draw_rt.top;
 			}
-	if (do_more) {
-	    int okkey = 0;
-	    int chop;
-	    // @@@ Ok respnses
-
-	    while (!okkey) {
-		char c = mswin_nhgetch();
-
-		switch (c)
-		{
-		    /* space or enter */
-		    case ' ':
-		    case '\015':
-			okkey = 1;
-			break;
-			/* ESC */
-		    case '\033':
-			data->nevermore = 1;
-			okkey = 1;
-			break;
-		    default:
-			break;
-			}
-		}
-	    chop = strlen(data->window_text[data->last_line].text) 
-		- strlen(MORE);
-	    data->window_text[data->last_line].text[chop] = '\0';
-	    data->in_more = 0;
-	    data->lines_not_seen = 0;
-	    /* We did the --More--, reset the lines_not_seen; now draw that
-	       new line. This is the easiest method */
-	    InvalidateRect(hWnd, NULL, TRUE);
-	}
 	}
 	SetTextColor (hdc, OldFg);
 	SetBkColor (hdc, OldBg);
@@ -737,3 +657,94 @@ void mswin_message_window_size (HWND hWnd, LPSIZE sz)
 	sz->cy = sz->cy - (client_rt.bottom - client_rt.top) +
 			 data->yChar * MSG_VISIBLE_LINES;
 }
+
+/* check if text can be appended to the last line without wrapping */
+BOOL can_append_text(HWND hWnd, int attr, const char* text )
+{
+	PNHMessageWindow data;
+	char tmptext[MAXWINDOWTEXT+1];
+	HDC hdc;
+	HGDIOBJ saveFont;
+	RECT draw_rt;
+	BOOL retval = FALSE;
+
+	data = (PNHMessageWindow)GetWindowLong(hWnd, GWL_USERDATA);
+
+	/* cannot append if lines_not_seen is 0 (beginning of the new turn */
+	if( data->lines_not_seen==0 ) return FALSE;
+
+	/* cannot append text with different attrbutes */
+	if( data->window_text[MSG_LINES-1].attr != attr ) return FALSE;
+
+	/* check if the maximum string langth will be exceeded */
+	if( strlen(data->window_text[MSG_LINES-1].text)+
+		2 + /* space characters */
+		strlen(text) +
+		strlen(MORE) >= MAXWINDOWTEXT ) return FALSE;
+
+	/* check if the text is goinf to fin into a single line */
+	strcpy(tmptext, data->window_text[MSG_LINES-1].text );
+	strcat(tmptext, "  " );
+	strcat(tmptext, text );
+	strcat(tmptext, MORE );
+
+    hdc = GetDC(hWnd); 
+    saveFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, data->window_text[MSG_LINES-1].attr, hdc, FALSE));
+	GetClientRect(hWnd, &draw_rt);
+	draw_rt.bottom = draw_rt.top; /* we only need width for the DrawText */
+	DrawText(hdc, tmptext, strlen(tmptext), &draw_rt, DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
+
+	/* we will check against 1.5 of the font size in order to determine
+	   if the text is single-line or not - just to be on the safe size */
+	retval = (draw_rt.bottom-draw_rt.top)<(data->yChar+data->yChar/2);
+			
+	/* free device context */
+	SelectObject(hdc, saveFont);
+	ReleaseDC (hWnd, hdc); 
+	return retval;
+}
+
+/* check if "--more--" promt needs to be displayed 
+   basically, check if the lines not seen are going to find in the message window 
+*/
+BOOL more_prompt_check(HWND hWnd)
+{
+	PNHMessageWindow data;
+	HDC hdc;
+	HGDIOBJ saveFont;
+	RECT client_rt, draw_rt;
+	BOOL retval = FALSE;
+	int visible_lines = 0;
+	int i;
+	int remaining_height;
+
+	data = (PNHMessageWindow)GetWindowLong(hWnd, GWL_USERDATA);
+
+	if( data->lines_not_seen==0 ) return FALSE;  /* don't bother checking - nothig to "more" */
+	if( data->lines_not_seen>=MSG_LINES ) return TRUE; /* history size exceeded - always more */
+
+	GetClientRect(hWnd, &client_rt);
+	remaining_height = client_rt.bottom - client_rt.top;
+
+    hdc = GetDC(hWnd); 
+    saveFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, FALSE));
+	for( i=0; i<data->lines_not_seen; i++ ) {
+		/* we only need width for the DrawText */
+		SetRect(&draw_rt, client_rt.left, client_rt.top, client_rt.right, client_rt.top);
+		SelectObject(hdc, mswin_get_font(NHW_MESSAGE, data->window_text[MSG_LINES-i-1].attr, hdc, FALSE));
+		remaining_height -= 
+					DrawText( hdc, 
+							  data->window_text[MSG_LINES-i-1].text, 
+							  strlen(data->window_text[MSG_LINES-i-1].text), 
+							  &draw_rt, 
+							  DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT
+							);
+		if( remaining_height<0 ) break;
+	}
+	
+	/* free device context */
+	SelectObject(hdc, saveFont);
+	ReleaseDC (hWnd, hdc); 
+	return (remaining_height<0); /* TRUE if lines_not_seen take more that window height */ 
+}
+
