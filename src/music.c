@@ -355,7 +355,6 @@ do_improvisation(instr)
 struct obj *instr;
 {
 	int damage, do_spec = !Confusion;
-	boolean physical_damage = FALSE;
 #if defined(MAC) || defined(AMIGA) || defined(VPIX_MUSIC) || defined (PCMUSIC)
 	struct obj itmp;
 
@@ -400,8 +399,6 @@ struct obj *instr;
 	    exercise(A_DEX, TRUE);
 	    break;
 	case FIRE_HORN:			/* Idem wand of fire */
-	    physical_damage = TRUE;
-	    /* fall through */
 	case FROST_HORN:		/* Idem wand of cold */
 	    if (do_spec && instr->spe > 0) {
 		consume_obj_charge(instr, TRUE);
@@ -413,8 +410,8 @@ struct obj *instr;
 		    if ((damage = zapyourself(instr, TRUE)) != 0) {
 			char buf[BUFSZ];
 			Sprintf(buf, "using a magical horn on %sself", uhim());
-			if (physical_damage) damage = Maybe_Half_Phys(damage);
-			losehp(damage, buf, KILLED_BY);
+			losehp(damage, buf, KILLED_BY); /* frost damage */
+							/* fire damage */
 		    }
 		} else {
 		    buzz((instr->otyp == FROST_HORN) ? AD_COLD-1 : AD_FIRE-1,

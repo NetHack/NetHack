@@ -71,8 +71,8 @@ int expltype;
 		case 1: str =   olet == BURNING_OIL ?	"burning oil" :
 				olet == SCROLL_CLASS ?	"tower of flame" :
 							"fireball";
+			/* fire damage, not physical damage */
 			adtyp = AD_FIRE;
-			physical_dmg = TRUE;
 			break;
 		case 2: str = "ball of cold";
 			adtyp = AD_COLD;

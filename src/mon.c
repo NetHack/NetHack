@@ -2012,7 +2012,7 @@ int  typ, fatal;
 		    pline("You%s!", poiseff[typ]);
 	} else {
 		i = thrown_weapon ? rnd(6) : rn1(10,6);
-		losehp(Maybe_Half_Phys(i), pname, kprefix);
+		losehp(i, pname, kprefix); /* poison damage */
 	}
 	if(u.uhp < 1) {
 		killer.format = kprefix;

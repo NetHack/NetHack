@@ -1783,6 +1783,8 @@ register struct monst *mtmp;
 register struct attack  *mattk;
 boolean ufound;
 {
+    boolean physical_damage = TRUE;
+
     if (mtmp->mcan) return(0);
 
     if (!ufound)
@@ -1798,12 +1800,15 @@ boolean ufound;
 
 	switch (mattk->adtyp) {
 	    case AD_COLD:
+	        physical_damage = FALSE;
 		not_affected |= Cold_resistance;
 		goto common;
 	    case AD_FIRE:
+	        physical_damage = FALSE;
 		not_affected |= Fire_resistance;
 		goto common;
 	    case AD_ELEC:
+	        physical_damage = FALSE;
 		not_affected |= Shock_resistance;
 common:
 
@@ -1815,7 +1820,7 @@ common:
 		        if (flags.verbose) You("get blasted!");
 		    }
 		    if (mattk->adtyp == AD_FIRE) burn_away_slime();
-		    if (Half_physical_damage) tmp = (tmp+1) / 2;
+		    if (physical_damage) tmp = Maybe_Half_Phys(tmp);
 		    mdamageu(mtmp, tmp);
 		}
 		break;

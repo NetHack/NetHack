@@ -1143,8 +1143,7 @@ register struct obj	*sobj;
 		    } else {
 			pline_The("scroll catches fire and you burn your %s.",
 				makeplural(body_part(HAND)));
-			losehp(Half_physical_damage ? rn2(2) : 1,
-				"scroll of fire", KILLED_BY_AN);
+			losehp(1, "scroll of fire", KILLED_BY_AN);
 		    }
 		    return(1);
 		}

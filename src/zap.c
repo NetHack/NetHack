@@ -3862,7 +3862,6 @@ register int osym, dmgtyp;
 		    break;
 		case AD_FIRE:
 		    xresist = (Fire_resistance && obj->oclass != POTION_CLASS);
-		    physical_damage = TRUE;
 
 		    if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
 			skip++;

@@ -1260,7 +1260,7 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	} else if (acidic(&mons[mnum]) && !Acid_resistance) {
 		tp++;
 		You("have a very bad case of stomach acid."); /* not body_part() */
-		losehp(Maybe_Half_Phys(rnd(15)), "acidic corpse", KILLED_BY_AN);
+		losehp(rnd(15), "acidic corpse", KILLED_BY_AN); /* acid damage */
 	} else if (poisonous(&mons[mnum]) && rn2(5)) {
 		tp++;
 		pline("Ecch - that must have been poisonous!");

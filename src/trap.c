@@ -2413,7 +2413,7 @@ struct obj *box;	/* null for floor trap */
 	    pline("A cascade of steamy bubbles erupts from %s!",
 		    the(box ? xname(box) : surface(u.ux,u.uy)));
 	    if (Fire_resistance) You("are uninjured.");
-	    else losehp(Maybe_Half_Phys(rnd(3)), "boiling water", KILLED_BY);
+	    else losehp(rnd(3), "boiling water", KILLED_BY);
 	    return;
 	}
 	pline("A %s %s from %s!", tower_of_flame,
@@ -2442,7 +2442,7 @@ struct obj *box;	/* null for floor trap */
 	if (!num)
 	    You("are uninjured.");
 	else
-	    losehp(Maybe_Half_Phys(num), tower_of_flame, KILLED_BY_AN);
+	    losehp(num, tower_of_flame, KILLED_BY_AN);	/* fire damage */
 	burn_away_slime();
 
 	if (burnarmor(&youmonst) || rn2(3)) {
@@ -3898,7 +3898,7 @@ lava_effects()
 	    dmg = d(6,6);
 	    pline_The("lava here burns you!");
 	    if(dmg < u.uhp) {
-		losehp(Maybe_Half_Phys(dmg), lava_killer, KILLED_BY);
+		losehp(dmg, lava_killer, KILLED_BY);	/* lava damage */
 		goto burn_stuff;
 	    }
 	} else
@@ -3955,7 +3955,7 @@ lava_effects()
 	u.utraptype = TT_LAVA;
 	You("sink into the lava, but it only burns slightly!");
 	if (u.uhp > 1)
-	    losehp(Half_physical_damage ? rn2(2) : 1, lava_killer, KILLED_BY);
+	    losehp(1, lava_killer, KILLED_BY);	/* lava damage */
     }
     /* just want to burn boots, not all armor; destroy_item doesn't work on
        armor anyway */

@@ -879,7 +879,8 @@ peffects(otmp)
 				good_for_you = TRUE;
 			    } else {
 				You("burn your %s.", body_part(FACE));
-				losehp(Maybe_Half_Phys(d(Fire_resistance ? 1 : 3, 4)),
+				/* fire damage */
+				losehp(d(Fire_resistance ? 1 : 3, 4),
 				       "burning potion of oil", KILLED_BY_AN);
 			    }
 			} else if(otmp->cursed)
@@ -1683,7 +1684,7 @@ dodip()
 				potionbreathe(obj);
 			useup(obj);
 			useup(potion);
-			losehp(Maybe_Half_Phys(rnd(10)), "alchemic blast",
+			losehp(rnd(10), "alchemic blast",  /* not physical damage */
 					KILLED_BY_AN);
 			return(1);
 		}

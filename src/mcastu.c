@@ -484,7 +484,9 @@ int spellnum;
 
     switch (spellnum) {
     case CLC_GEYSER:
-	/* this is physical damage, not magical damage */
+	/* this is physical damage (force not heat),
+	 * not magical damage or fire damage
+	 */
 	pline("A sudden geyser slams into you from nowhere!");
 	dmg = d(8, 6);
 	if (Half_physical_damage) dmg = (dmg + 1) / 2;

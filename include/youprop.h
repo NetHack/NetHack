@@ -290,6 +290,20 @@
 #define EHalf_spell_damage	u.uprops[HALF_SPDAM].extrinsic
 #define Half_spell_damage	(HHalf_spell_damage || EHalf_spell_damage)
 
+/*
+ * Physical damage
+ *
+ * Damage is NOT physical damage if (in order of priority):
+ * 1. it already qualifies for some other special category
+ *    for which a special resistance already exists in the game 
+ *    including: cold, fire, shock, acid, and magic.
+ *    Note that fire is extended to include all non-acid forms of
+ *    burning, even boiling water since that is already dealt with
+ *    by fire resistance, and in most or all cases is caused by fire. 
+ * 2. it doesn't leave a mark. Marks include destruction of, or 
+ *    damage to, an internal organ (including the brain), 
+ *    lacerations, bruises, crushed body parts, bleeding.
+ */
 #define HHalf_physical_damage	u.uprops[HALF_PHDAM].intrinsic
 #define EHalf_physical_damage	u.uprops[HALF_PHDAM].extrinsic
 #define Half_physical_damage	(HHalf_physical_damage || EHalf_physical_damage)

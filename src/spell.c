@@ -837,8 +837,6 @@ boolean atme;
 	 * additional cost to the spellcaster.
 	 */
 	case SPE_FIREBALL:
-	    physical_damage = TRUE;
-	    /* fall through */
 	case SPE_CONE_OF_COLD:
 	    if (role_skill >= P_SKILLED) {
 	        if (throwspell()) {
@@ -849,8 +847,6 @@ boolean atme;
 			    if ((damage = zapyourself(pseudo, TRUE)) != 0) {
 				char buf[BUFSZ];
 				Sprintf(buf, "zapped %sself with a spell", uhim());
-				if (physical_damage)
-					damage = Maybe_Half_Phys(damage);
 				losehp(damage, buf, NO_KILLER_PREFIX);
 			    }
 			} else {
