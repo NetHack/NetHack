@@ -1,0 +1,38 @@
+Hi,
+
+This is nethack3.3.1 for Atari Gem and tty
+Windowing System.
+
+It is by far not complete or perfect.
+(My english too :-))
+
+You need at least 2Meg free RAM,  16 colors and
+3 Meg free Disk space.
+In fact it works also with monochrome, but you
+have to create a nh2.img (and title2.img) on your own.
+
+Atari windowport changes from 3.3.0:
+added a ASCII-Mode in GEM   -> F2
+the cursor is switchable    -> F3
+added inventory/menu search -> :
+removed the redraw problem
+removed almost all flicker (except with NOVA-Card :-()
+placed the GEM-dialogues more pleasent
+tty corner windows (i.e. inv) display now correct in a vt52-win
+greyed out old messages
+placed the GEM-windows more convient
+...
+
+Feel free to contact me about Issues and Errors.
+e-mail: gaston@cs.tu-berlin.de
+
+You use this program at your own risk, I can't 
+guarantee it will work or do you no harm.
+
+Look at the nethack licence too.
+
+As you may have noticed the look and feel is from
+Warwick Allisons nethack3.1.3d Gem Version
+and I have used E_Gem2.2.0 from Christian Grunenberg.
+
+Marvin
