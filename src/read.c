@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.4	2002/03/22	*/
+/*	SCCS Id: @(#)read.c	3.4	2002/10/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1405,7 +1405,7 @@ do_it:
 static void
 do_class_genocide()
 {
-	register int i, j, immunecnt, gonecnt, goodcnt, class;
+	int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
 	char buf[BUFSZ];
 	boolean gameover = FALSE;	/* true iff killed self */
 
@@ -1496,19 +1496,26 @@ do_class_genocide()
 			    update_inventory();		/* eggs & tins */
 			    pline("Wiped out all %s.", nam);
 			    if (Upolyd && i == u.umonnum) {
-				if (Unchanging) done(GENOCIDED);
-				rehumanize();
+				u.mh = -1;
+				if (Unchanging) {
+				    if (!feel_dead++) You("die.");
+				    /* finish genociding this class of
+				       monsters before ultimately dying */
+				    gameover = TRUE;
+				} else
+				    rehumanize();
 			    }
-			    /* Self-genocide if it matches either your race or role */
-			    /* Assumption: male and female forms share the same letter */
+			    /* Self-genocide if it matches either your race
+			       or role.  Assumption:  male and female forms
+			       share same monster class. */
 			    if (i == urole.malenum || i == urace.malenum) {
 				u.uhp = -1;
-				killer_format = KILLED_BY_AN;
-				killer = "scroll of genocide";
-				if (Upolyd)
-				    You_feel("dead inside.");
-				else
+				if (Upolyd) {
+				    if (!feel_dead++) You_feel("dead inside.");
+				} else {
+				    if (!feel_dead++) You("die.");
 				    gameover = TRUE;
+				}
 			    }
 			} else if (mvitals[i].mvflags & G_GENOD) {
 			    if (!gameover)
@@ -1539,7 +1546,11 @@ do_class_genocide()
 			}
 		    }
 		}
-		if (gameover) done(GENOCIDED);
+		if (gameover || u.uhp == -1) {
+		    killer_format = KILLED_BY_AN;
+		    killer = "scroll of genocide";
+		    if (gameover) done(GENOCIDED);
+		}
 		return;
 	}
 }
