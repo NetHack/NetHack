@@ -665,7 +665,7 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	 * check_version() they will be printed using pline(), which doesn't
 	 * mix with the raw messages that might be already on the screen
          */
-	clear_nhwindow(WIN_MAP);
+	if (iflags.window_inited) clear_nhwindow(WIN_MAP);
 	if (!check_version(&vers_info, DUNGEON_FILE, TRUE))
 	    panic("Dungeon description not valid.");
 
