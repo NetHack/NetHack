@@ -5,6 +5,7 @@
 #include "hack.h"
 #include "mfndpos.h"
 #include "artifact.h"
+#include "epri.h"
 
 extern boolean notonhead;
 
@@ -130,9 +131,9 @@ int x, y;
 struct monst *mtmp;
 {
 	if (mtmp->isshk || mtmp->isgd || mtmp->iswiz || !mtmp->mcansee ||
-			mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN ||
-			is_lminion(mtmp->data) || is_rider(mtmp->data) ||
-			mtmp->data == &mons[PM_MINOTAUR])
+	    mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN ||
+	    is_lminion(mtmp) || mtmp->data == &mons[PM_ANGEL] ||
+	    is_rider(mtmp->data) || mtmp->data == &mons[PM_MINOTAUR])
 		return(FALSE);
 
 	return (boolean)(sobj_at(SCR_SCARE_MONSTER, x, y)

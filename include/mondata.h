@@ -19,6 +19,11 @@
 #define resists_acid(mon)	(((mon)->mintrinsics & MR_ACID) != 0)
 #define resists_ston(mon)	(((mon)->mintrinsics & MR_STONE) != 0)
 
+#define is_lminion(mon)		(is_minion((mon)->data) && \
+				 (mon)->data->maligntyp >= A_COALIGNED && \
+				 ((mon)->data != &mons[PM_ANGEL] || \
+				  EPRI(mon)->shralign > 0))
+
 #define is_flyer(ptr)		(((ptr)->mflags1 & M1_FLY) != 0L)
 #define is_floater(ptr)		((ptr)->mlet == S_EYE)
 #define is_clinger(ptr)		(((ptr)->mflags1 & M1_CLING) != 0L)
@@ -106,8 +111,6 @@
 #define is_dlord(ptr)		(is_demon(ptr) && is_lord(ptr))
 #define is_dprince(ptr)		(is_demon(ptr) && is_prince(ptr))
 #define is_minion(ptr)		((ptr)->mflags2 & M2_MINION)
-#define is_lminion(ptr)		(is_minion(ptr) && \
-				 (ptr)->maligntyp >= A_COALIGNED)
 #define likes_gold(ptr)		(((ptr)->mflags2 & M2_GREEDY) != 0L)
 #define likes_gems(ptr)		(((ptr)->mflags2 & M2_JEWELS) != 0L)
 #define likes_objs(ptr)		(((ptr)->mflags2 & M2_COLLECT) != 0L || \

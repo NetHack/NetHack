@@ -9,6 +9,7 @@
 
 #include "hack.h"
 #include "qtext.h"
+#include "epri.h"
 
 extern const int monstr[];
 
@@ -428,7 +429,7 @@ nasty(mcast)
     int count=0;
 
     if(!rn2(10) && Inhell) {
-	msummon(&mons[PM_WIZARD_OF_YENDOR]);
+	msummon((struct monst *) 0);	/* summons like WoY */
 	count++;
     } else {
 	tmp = (u.ulevel > 3) ? u.ulevel/3 : 1; /* just in case -- rph */
@@ -621,7 +622,7 @@ register struct monst	*mtmp;
 		    verbalize("%s %s!",
 			  random_malediction[rn2(SIZE(random_malediction))],
 			  random_insult[rn2(SIZE(random_insult))]);
-	} else if(is_lminion(mtmp->data)) {
+	} else if(is_lminion(mtmp)) {
 		com_pager(rn2(QTN_ANGELIC - 1 + (Hallucination ? 1 : 0)) +
 			      QT_ANGELIC);
 	} else {

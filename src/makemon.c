@@ -1439,7 +1439,7 @@ register int otyp;
 	    if (mtmp->data->mlet == S_DEMON) {
 		/* demons never get blessed objects */
 		if (otmp->blessed) curse(otmp);
-	    } else if(is_lminion(mtmp->data)) {
+	    } else if(is_lminion(mtmp)) {
 		/* lawful minions don't get cursed, bad, or rusting objects */
 		otmp->cursed = FALSE;
 		if(otmp->spe < 0) otmp->spe = 0;
