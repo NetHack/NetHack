@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2004/06/28	*/
+/*	SCCS Id: @(#)potion.c	3.4	2004/09/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1896,10 +1896,12 @@ dodip()
 		} else {
 		    if ((omat == PLASTIC || omat == PAPER) && !obj->oartifact)
 			obj->oeroded = MAX_ERODE;
-		    pline_The("burning oil %s %s.",
+		    pline_The("burning oil %s %s%c",
 			    obj->oeroded == MAX_ERODE ? "destroys" : "damages",
-			    yname(obj));
+			    yname(obj),
+			    obj->oeroded == MAX_ERODE ? '!' : '.');
 		    if (obj->oeroded == MAX_ERODE) {
+			if (obj->owornmask) remove_worn_item(obj, TRUE);
 			obj_extract_self(obj);
 			obfree(obj, (struct obj *)0);
 			obj = (struct obj *) 0;
