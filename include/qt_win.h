@@ -151,6 +151,12 @@ private:
 };
 
 
+class NetHackQtSavedGameSelector : public QDialog {
+public:
+	NetHackQtSavedGameSelector(const char** saved);
+
+	int choose();
+};
 
 class NetHackQtPlayerSelector : private QDialog {
 	Q_OBJECT
@@ -763,6 +769,7 @@ private:
 	static NetHackQtKeyBuffer keybuffer;
 	static NetHackQtClickBuffer clickbuffer;
 
+	static QWidget* splash;
 	static NetHackQtMainWindow* main;
 
 public:

@@ -36,8 +36,10 @@ To use this code:
 
    4. ../../Makefile (the top-level makefile)
 
-        change the VARDATND setting to contain the files "x11tiles"
-        and "rip.xpm".
+        change the VARDATND setting to contain the files "x11tiles",
+        "rip.xpm", and "nhsplash.xpm":
+
+            VARDATND = x11tiles rip.xpm nhsplash.xpm
 
    5. Follow all the instructions in ../../sys/unix/Install.unx for
       the remainder of the installation process.

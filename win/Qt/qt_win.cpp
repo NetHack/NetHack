@@ -73,6 +73,7 @@ extern "C" {
 
 #include "qt_win.h"
 #include <qpainter.h>
+#include <qdir.h>
 #include <qbitmap.h>
 #include <qkeycode.h>
 #include <qmenubar.h>
@@ -84,6 +85,8 @@ extern "C" {
 #include <qtoolbutton.h>
 #include <qcombobox.h>
 #include <qvbox.h>
+#include <qdragobject.h>
+#include <qtextbrowser.h>
 #include <qhbox.h>
 #include <qsignalmapper.h>
 //#include <qgrid.h>
@@ -94,6 +97,7 @@ extern "C" {
 #include "qt_clust.h"
 #include "qt_xpms.h"
 
+#include <dirent.h>
 #include <malloc.h>
 
 #ifdef _WS_X11_
@@ -102,22 +106,30 @@ extern "C" {
 #endif
 
 #ifdef USER_SOUNDS
+#include <qsound.h>
+#endif
+
+
+#ifdef USER_SOUNDS
 extern "C" void play_sound_for_message(const char* str);
 #endif
 
 // Warwick prefers it this way...
 #define QT_CHOOSE_RACE_FIRST
 
+static const char nh_attribution[] = "<big>Qt NetHack</big>"
+	"<br><small>by Warwick Allison<br>and the NetHack DevTeam</small>";
+
 static QString
 aboutMsg()
 {
     QString msg;
     msg.sprintf(
-    "Qt NetHack is a version of NetHack built using\n"
+    "Qt NetHack is a version of NetHack built\n"
 #ifdef KDE
-    "KDE and the Qt GUI toolkit for the user interface.\n"
+    "using KDE and the Qt GUI toolkit.\n"
 #else
-    "the Qt GUI toolkit for the user interface.\n"
+    "using the Qt GUI toolkit.\n"
 #endif
     "This is version %d.%d.%d.%d.%d.%d\n\n"
     "Homepage:\n     http://trolls.troll.no/warwick/nethack/\n\n"
@@ -971,8 +983,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     QVBoxLayout* vbab = new QVBoxLayout(alignbox,3,1);
     vbab->setAutoAdd(TRUE);
     vbab->addSpacing(fontMetrics().height());
-    QLabel* logo = new QLabel("<big>Qt NetHack</big>"
-	"<br><small>by Warwick Allison<br>and the NetHack DevTeam</small>", this);
+    QLabel* logo = new QLabel(nh_attribution, this);
 
     l->addMultiCellWidget( namebox, 0,0,0,2 );
 #ifdef QT_CHOOSE_RACE_FIRST
@@ -1608,6 +1619,8 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		}
 	    }
 	}
+
+	painter.setFont(font());
     } else
 #endif
     {
@@ -1657,6 +1670,9 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
     }
 
     if (area.intersects(messages_rect)) {
+	painter.setPen(black);
+	painter.drawText(viewport.contentsX()+1,viewport.contentsY()+1,
+	    viewport.width(),0, WordBreak|AlignTop|AlignLeft|DontClip, messages);
 	painter.setPen(white);
 	painter.drawText(viewport.contentsX(),viewport.contentsY(),
 	    viewport.width(),0, WordBreak|AlignTop|AlignLeft|DontClip, messages);
@@ -2012,7 +2028,7 @@ void NetHackQtLabelledIcon::setFont(const QFont& f)
 }
 void NetHackQtLabelledIcon::show()
 {
-    if (!isVisible()) highlight(hl_bad);
+    if (isHidden()) highlight(hl_bad);
     QWidget::show();
 }
 void NetHackQtLabelledIcon::highlightWhenChanging()
@@ -2207,6 +2223,8 @@ void NetHackQtStatusWindow::doUpdate()
     stunned.setFont(normal);
     hallu.setFont(normal);
     encumber.setFont(normal);
+
+    updateStats();
 }
 
 QWidget* NetHackQtStatusWindow::Widget() { return this; }
@@ -2359,7 +2377,7 @@ void NetHackQtStatusWindow::fadeHighlighting()
  */
 void NetHackQtStatusWindow::updateStats()
 {
-    //if (!isVisible()) return;
+    if (!parentWidget()) return;
 
     char buf[BUFSZ];
 
@@ -3421,9 +3439,6 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     message(0), map(0), status(0), invusage(0),
     keysink(ks)
 {
-    if ( !qt_compact_mode )
-	invusage = new NetHackQtInvUsageWindow(this);
-
     setToolBarsMovable(FALSE);
     QToolBar* toolbar = new QToolBar(this);
     toolbar->setHorizontalStretchable(TRUE);
@@ -3464,14 +3479,15 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	{ game,		"Version\tv",           "v", 3},
 	{ game,		"Compilation\tAlt-V",     "\366", 3},
 	{ game,		"History\tShift-V",           "V", 3},
-	{ game,		"Redraw\tCtrl-R",          "\022", 3},
+	{ game,		"Redraw\tCtrl-R",          "\022", 0}, // useless
 	{ game,		"Options\tShift-O",           "O", 3},
 	{ game,		"Explore mode\tShift-X",      "X", 3},
 	{ game,		0, 0, 3},
 	{ game,		"Save\tShift-S",              "Sy", 3},
 	{ game,		"Quit\tAlt-Q",                "\361", 3},
 
-	{ apparel,	"Apparel off\tShift-A",       "A", 3},
+	{ apparel,	"Apparel off\tShift-A",       "A", 2},
+	{ apparel,	"Remove many\tShift-A",       "A", 1},
 	{ apparel,	0, 0, 3},
 	{ apparel,	"Wield weapon\tw",      "w", 3},
 	{ apparel,	"Exchange weapons\tx",      "x", 3},
@@ -3491,14 +3507,14 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	{ act1,	"Close door\tc",        "c", 3},
 	{ act1,	"Down\t>",              ">", 3},
 	{ act1,	"Drop many\tShift-D",         "D", 2},
-	{ act1,	"Drop\td?",             "d?", 3},
+	{ act1,	"Drop\td?",             "d?", 2},
 	{ act1,	"Eat\te?",              "e?", 2},
 	{ act1,	"Engrave\tShift-E",           "E", 3},
 	{ act1,	"Fight\tF",             "F", 3},
-	{ act1,	"Fire from quiver\tf",  "f", 3},
+	{ act1,	"Fire from quiver\tf",  "f", 2},
 	{ act1,	"Force\tAlt-F",           "\346", 3},
-	{ act2,	"Get\t,",               ",", 2},
-	{ act2,	"Jump\tAlt-J",            "\352", 3},
+	{ act1,	"Get\t,",               ",", 2},
+	{ act1,	"Jump\tAlt-J",            "\352", 3},
 	{ act2,	"Kick\tCtrl-D",              "\004", 2},
 	{ act2,	"Loot\tAlt-L",            "\354", 3},
 	{ act2,	"Open door\to",         "o", 3},
@@ -3507,7 +3523,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	{ act2,	"Ride\t#ri",            "#ri", 3},
 	{ act2,	"Search\ts",            "s", 3},
 	{ act2,	"Sit\tAlt-S",             "\363", 3},
-	{ act2,	"Throw\tt",             "t", 3},
+	{ act2,	"Throw\tt",             "t", 2},
 	{ act2,	"Up\t<",                "<", 3},
 	{ act2,	"Wipe face\tAlt-W",       "\367", 3},
 
@@ -3560,17 +3576,16 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 
     game->insertItem("Qt settings...",1000);
     help->insertItem("About Qt NetHack...",2000);
+    help->insertItem("NetHack Guidebook...",3000);
+    help->insertSeparator();
 
     count=0;
     for (i=0; item[i].menu; i++) {
-	if ( item[i].flags & ((1<<qt_compact_mode)&3) ) {
+	if ( item[i].flags & (qt_compact_mode ? 1 : 2) ) {
 	    if (item[i].name) {
 		QString name = item[i].name;
-		if ( qt_compact_mode ) { // accelerators aren't
+		if ( qt_compact_mode ) // accelerators aren't
 		    name.replace(QRegExp("\t.*"),"");
-		    if ( item[i].action[0] == '/' )
-			continue; // useless command on handhelds
-		}
 		item[i].menu->insertItem(name,count);
 		macro[count++]=item[i].action;
 	    } else {
@@ -3583,45 +3598,50 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     menubar->insertItem("Gear",apparel);
 
     if ( qt_compact_mode ) {
-	menubar->insertItem("A-F",act1);
-	menubar->insertItem("G-Z",act2);
+	menubar->insertItem("A-J",act1);
+	menubar->insertItem("K-Z",act2);
 	menubar->insertItem("Magic",magic);
-
-	QSignalMapper* sm = new QSignalMapper(this);
-	connect(sm, SIGNAL(mapped(const QString&)), this, SLOT(doKeys(const QString&)));
 	menubar->insertItem(QPixmap(info_xpm),info);
 	menubar->insertItem(QPixmap(map_xpm), this, SLOT(raiseMap()));
 	menubar->insertItem(QPixmap(msg_xpm), this, SLOT(raiseMessages()));
 	menubar->insertItem(QPixmap(stat_xpm), this, SLOT(raiseStatus()));
-	QToolButton* tb;
-	tb = new SmallToolButton( QPixmap(again_xpm),"Again","Action", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "\001" );
-	tb = new SmallToolButton( QPixmap(get_xpm),"Get","Action", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "," );
-	tb = new SmallToolButton( QPixmap(kick_xpm),"Kick","Action", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "\004" );
-	tb = new SmallToolButton( QPixmap(throw_xpm),"Throw","Action", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "t" );
-	tb = new SmallToolButton( QPixmap(fire_xpm),"Fire","Action", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "f" );
-	tb = new SmallToolButton( QPixmap(drop_xpm),"Drop","Action", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "D" );
-	tb = new SmallToolButton( QPixmap(eat_xpm),"Eat","Action", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "e" );
-	tb = new SmallToolButton( QPixmap(rest_xpm),"Rest","Action", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "." );
-	tb = new SmallToolButton( QPixmap(cast_a_xpm),"Cast A","Magic", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "Za" );
-	tb = new SmallToolButton( QPixmap(cast_b_xpm),"Cast B","Magic", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "Zb" );
-	tb = new SmallToolButton( QPixmap(cast_c_xpm),"Cast C","Magic", sm, SLOT(map()), toolbar );
-	sm->setMapping(tb, "Zc" );
     } else {
 	menubar->insertItem("Action",act1);
 	menubar->insertItem("Magic",magic);
 	menubar->insertItem("Info",info);
 	menubar->insertSeparator();
 	menubar->insertItem("Help",help);
+    }
+
+    QSignalMapper* sm = new QSignalMapper(this);
+    connect(sm, SIGNAL(mapped(const QString&)), this, SLOT(doKeys(const QString&)));
+    QToolButton* tb;
+    tb = new SmallToolButton( QPixmap(again_xpm),"Again","Action", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "\001" );
+    tb = new SmallToolButton( QPixmap(get_xpm),"Get","Action", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "," );
+    tb = new SmallToolButton( QPixmap(kick_xpm),"Kick","Action", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "\004" );
+    tb = new SmallToolButton( QPixmap(throw_xpm),"Throw","Action", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "t" );
+    tb = new SmallToolButton( QPixmap(fire_xpm),"Fire","Action", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "f" );
+    tb = new SmallToolButton( QPixmap(drop_xpm),"Drop","Action", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "D" );
+    tb = new SmallToolButton( QPixmap(eat_xpm),"Eat","Action", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "e" );
+    tb = new SmallToolButton( QPixmap(rest_xpm),"Rest","Action", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "." );
+    tb = new SmallToolButton( QPixmap(cast_a_xpm),"Cast A","Magic", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "Za" );
+    tb = new SmallToolButton( QPixmap(cast_b_xpm),"Cast B","Magic", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "Zb" );
+    tb = new SmallToolButton( QPixmap(cast_c_xpm),"Cast C","Magic", sm, SLOT(map()), toolbar );
+    sm->setMapping(tb, "Zc" );
+    if ( !qt_compact_mode ) {
+	QWidget* filler = new QWidget(toolbar);
+	filler->setBackgroundMode(PaletteButton);
+	toolbar->setStretchableWidget(filler);
     }
 
     connect(menubar,SIGNAL(activated(int)),this,SLOT(doMenuItem(int)));
@@ -3664,6 +3684,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	setCentralWidget(stack);
     } else {
 	setCentralWidget(new QWidget(this));
+	invusage = new NetHackQtInvUsageWindow(centralWidget());
     }
 }
 
@@ -3682,6 +3703,34 @@ void NetHackQtMainWindow::raiseStatus()
     stack->raiseWidget(2);
 }
 
+class NetHackMimeSourceFactory : public QMimeSourceFactory {
+public:
+    const QMimeSource* data(const QString& abs_name) const
+    {
+	const QMimeSource* r = 0;
+	if ( (NetHackMimeSourceFactory*)this == QMimeSourceFactory::defaultFactory() )
+	    r = QMimeSourceFactory::data(abs_name);
+	else
+	    r = QMimeSourceFactory::defaultFactory()->data(abs_name);
+	if ( !r ) {
+	    int sl = abs_name.length();
+	    do {
+		sl = abs_name.findRev('/',sl-1);
+		QString name = sl>=0 ? abs_name.mid(sl+1) : abs_name;
+		int dot = name.findRev('.');
+		if ( dot >= 0 )
+		    name = name.left(dot);
+		if ( name == "map" )
+		    r = new QImageDrag(QImage(map_xpm));
+		else if ( name == "msg" )
+		    r = new QImageDrag(QImage(msg_xpm));
+		else if ( name == "stat" )
+		    r = new QImageDrag(QImage(stat_xpm));
+	    } while (!r && sl>0);
+	}
+	return r;
+    }
+};
 
 void NetHackQtMainWindow::doMenuItem(int id)
 {
@@ -3690,9 +3739,21 @@ void NetHackQtMainWindow::doMenuItem(int id)
 	centerOnMain(qt_settings);
 	qt_settings->show();
 	break;
-      case 2000: {
-	    QMessageBox::about(this,  "About Qt NetHack", aboutMsg());
-	} break;
+      case 2000:
+	QMessageBox::about(this,  "About Qt NetHack", aboutMsg());
+	break;
+      case 3000: {
+	    QDialog dlg(this,0,TRUE);
+	    (new QVBoxLayout(&dlg))->setAutoAdd(TRUE);
+	    QTextBrowser browser(&dlg);
+	    NetHackMimeSourceFactory ms;
+	    browser.setMimeSourceFactory(&ms);
+	    browser.setSource(QDir::currentDirPath()+"/Guidebook-qpe.html");
+	    if ( qt_compact_mode )
+		dlg.showMaximized();
+	    dlg.exec();
+	}
+	break;
       default:
 	if ( id >= 0 )
 	    doKeys(macro[id]);
@@ -3759,17 +3820,17 @@ void NetHackQtMainWindow::layout()
 	QSize maxs=map->Widget()->maximumSize();
 	int maph=QMIN(height()*2/3,maxs.height());
 
-	int y=menubar->height();
-	int h=height()-y;
+	QWidget* c = centralWidget();
+	int h=c->height();
 	int toph=h-maph;
 	int iuw=3*qt_settings->glyphs().width();
-	int topw=(width()-iuw)/2;
+	int topw=(c->width()-iuw)/2;
 
-	message->Widget()->setGeometry(0,y,topw,toph);
-	invusage->setGeometry(topw,y,iuw,toph);
-	status->Widget()->setGeometry(topw+iuw,y,topw,toph);
-	map->Widget()->setGeometry(QMAX(0,(width()-maxs.width())/2),
-				   y+toph,width(),maph);
+	message->Widget()->setGeometry(0,0,topw,toph);
+	invusage->setGeometry(topw,0,iuw,toph);
+	status->Widget()->setGeometry(topw+iuw,0,topw,toph);
+	map->Widget()->setGeometry(QMAX(0,(c->width()-maxs.width())/2),
+				   toph,c->width(),maph);
     }
 }
 
@@ -3825,20 +3886,17 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent* e)
     if ( program_state.something_worth_saving ) {
 	switch ( QMessageBox::information( this, "NetHack",
 	    "This will end your NetHack session",
-	    "&Save", "&Quit", "&Cancel", 0, 2 ) )
+	    "&Save", "&Cancel", 0, 1 ) )
 	{
 	    case 0:
 		// See dosave() function
 		if (dosave0()) {
 		    u.uhp = -1;
+		    NetHackQtBind::qt_exit_nhwindows(0);
 		    terminate(EXIT_SUCCESS);
 		}
 		break;
 	    case 1:
-		u.uhp = -1;
-		terminate(EXIT_SUCCESS);
-		break;
-	    case 2:
 		break; // ignore the event
 	}
     } else {
@@ -4039,8 +4097,9 @@ char NetHackQtYnDialog::Exec()
 	cancel.move(width()/2-cancel.width()/2,label.geometry().bottom()+8);
 	connect(&cancel,SIGNAL(clicked()),this,SLOT(reject()));
 	centerOnMain(this);
+	setResult(-1);
 	show();
-	while (!result() && keysource.Empty()) {
+	while (result()<0 && keysource.Empty()) {
 	    qApp->enter_loop();
 	}
 	hide();
@@ -4232,8 +4291,43 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
     QApplication(argc,argv)
 #endif
 {
+    QPixmap pm("nhsplash.xpm");
+    if ( !pm.isNull() ) {
+	QVBox *vb = new QVBox(0,0,pm.mask() ? Qt::WStyle_Customize|Qt::WStyle_NoBorder : 0);
+	splash = vb;
+	QLabel *lsplash = new QLabel(vb);
+	lsplash->setAlignment(AlignCenter);
+	lsplash->setPixmap(pm);
+	QLabel* capt = new QLabel("Loading...",vb);
+	capt->setAlignment(AlignCenter);
+
+	if ( pm.mask() ) {
+	    lsplash->setFixedSize(pm.size());
+	    lsplash->setMask(*pm.mask());
+	    splash->move((QApplication::desktop()->width()-pm.width())/2,
+			  (QApplication::desktop()->height()-pm.height())/2);
+	}
+	if ( qt_compact_mode ) {
+	    splash->showMaximized();
+	} else {
+	    vb->setFrameStyle(QFrame::WinPanel|QFrame::Raised);
+	    vb->setMargin(10);
+	    splash->adjustSize();
+	    splash->show();
+	}
+	flushX();
+	syncX();
+	processEvents();
+	flushX();
+    } else {
+	splash = 0;
+    }
     main = new NetHackQtMainWindow(keybuffer);
+#if defined(QWS) // not quite the right condition
+    showMainWidget(main);
+#else
     setMainWidget(main);
+#endif
     qt_settings=new NetHackQtSettings(main->width(),main->height());
 }
 
@@ -4280,21 +4374,117 @@ void NetHackQtBind::qt_player_selection()
 	qt_askname();
 }
 
+NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
+    QDialog(0,"sgsel",TRUE)
+{
+    QVBoxLayout *vbl = new QVBoxLayout(this,6);
+    QHBox* hb;
+
+    QLabel* logo = new QLabel(this); vbl->addWidget(logo);
+    logo->setAlignment(AlignCenter);
+    logo->setPixmap(QPixmap("nethack.png"));
+    QLabel* attr = new QLabel("by Warwick Allison and the NetHack DevTeam",this);
+    attr->setAlignment(AlignCenter);
+    vbl->addWidget(attr);
+    vbl->addStretch(2);
+    /*
+    QLabel* logo = new QLabel(hb);
+    hb = new QHBox(this);
+    vbl->addWidget(hb, AlignCenter);
+    logo->setPixmap(QPixmap(nh_icon));
+    logo->setAlignment(AlignRight|AlignVCenter);
+    new QLabel(nh_attribution,hb);
+    */
+
+    hb = new QHBox(this);
+    vbl->addWidget(hb, AlignCenter);
+    QPushButton* q = new QPushButton("Quit",hb);
+    connect(q, SIGNAL(clicked()), this, SLOT(reject()));
+    QPushButton* c = new QPushButton("New Game",hb);
+    connect(c, SIGNAL(clicked()), this, SLOT(accept()));
+
+    QButtonGroup* bg = new QButtonGroup(3, Horizontal, "Saved Characters",this);
+    vbl->addWidget(bg);
+    connect(bg, SIGNAL(clicked(int)), this, SLOT(done(int)));
+    for (int i=0; saved[i]; i++) {
+	QPushButton* b = new QPushButton(saved[i],bg);
+	bg->insert(b, i+2);
+    }
+}
+
+int NetHackQtSavedGameSelector::choose()
+{
+    if ( qt_compact_mode )
+	showMaximized();
+    return exec()-2;
+}
+
+static char** get_saved_names()
+{
+    int myuid=getuid();
+    struct dirent **namelist;
+    int n = scandir("save", &namelist, 0, alphasort);;
+    if ( n > 0 ) {
+	int i,j=0;
+	char** result = (char**)malloc((n+1)*sizeof(char*)); /* at most */
+	for (i=0; i<n; i++) {
+	    int uid;
+	    char name[NAME_MAX];
+	    if ( sscanf( namelist[i]->d_name, "%d%s", &uid, name ) == 2 ) {
+		if ( uid == myuid ) {
+		    char* end = strstr(name,".gz");
+		    if ( !end ) end = strstr(name,".Z");
+		    if ( end ) *end = 0;
+		    result[j++] = strdup(name);
+		}
+	    }
+	}
+	result[j++] = 0;
+	return result;
+    } else {
+	return 0;
+    }
+}
+
+static void free_saved_names(char** saved)
+{
+    if ( saved ) {
+	int i=0;
+	while (saved[i]) free(saved[i++]);
+	free(saved);
+    }
+}
+
 void NetHackQtBind::qt_askname()
 {
     have_asked = TRUE;
 
     // We do it all here, and nothing in askname
 
-    NetHackQtPlayerSelector selector(keybuffer);
-
-    if (selector.Choose()) {
-	// ...
-    } else {
-	clearlocks();
-	qt_exit_nhwindows(0);
-	terminate(0);
+    char** saved = get_saved_names();
+    int ch = -1;
+    if ( saved && *saved ) {
+	NetHackQtSavedGameSelector sgsel((const char**)saved);
+	ch = sgsel.choose();
+	if ( ch >= 0 )
+	    strcpy(plname,saved[ch]);
     }
+    free_saved_names(saved);
+
+    switch (ch) {
+      case -1:
+	if (NetHackQtPlayerSelector(keybuffer).Choose())
+	    return;
+      case -2:
+	break;
+      default:
+	return;
+    }
+
+    // Quit
+    clearlocks();
+    qt_exit_nhwindows(0);
+    terminate(0);
 }
 
 void NetHackQtBind::qt_get_nh_event()
@@ -4303,6 +4493,8 @@ void NetHackQtBind::qt_get_nh_event()
 
 void NetHackQtBind::qt_exit_nhwindows(const char *)
 {
+    delete instance;
+    delete qApp;
 }
 
 void NetHackQtBind::qt_suspend_nhwindows(const char *)
@@ -4344,6 +4536,11 @@ winid NetHackQtBind::qt_create_nhwindow(int type)
 	window=new NetHackQtMenuOrTextWindow(keybuffer);
     break; case NHW_TEXT:
 	window=new NetHackQtTextWindow(keybuffer);
+    }
+
+    if ( splash && !main->isHidden() ) {
+	delete splash;
+	splash = 0;
     }
 
     id_to_window[id] = window;
@@ -4803,6 +5000,7 @@ NetHackQtBind* NetHackQtBind::instance=0;
 NetHackQtKeyBuffer NetHackQtBind::keybuffer;
 NetHackQtClickBuffer NetHackQtBind::clickbuffer;
 NetHackQtMainWindow* NetHackQtBind::main=0;
+QWidget* NetHackQtBind::splash=0;
 
 
 extern "C" struct window_procs Qt_procs;
@@ -4867,8 +5065,9 @@ struct window_procs Qt_procs = {
 extern "C" void play_usersound(const char* filename, int volume)
 {
 #ifdef USER_SOUNDS
-    // Qt 2.2 has sound
-    //QSound::play(filename,volume);
+#ifndef QT_NO_SOUND
+    QSound::play(filename);
+#endif
 #endif
 }
 
