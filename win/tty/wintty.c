@@ -2218,7 +2218,7 @@ tty_wait_synch()
 	if(ttyDisplay->inmore) {
 	    addtopl("--More--");
 	    (void) fflush(stdout);
-	} else if(ttyDisplay->inread) {
+	} else if(ttyDisplay->inread > program_state.gameover) {
 	    /* this can only happen if we were reading and got interrupted */
 	    ttyDisplay->toplin = 3;
 	    /* do this twice; 1st time gets the Quit? message again */

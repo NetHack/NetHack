@@ -300,12 +300,16 @@ char def;
 	    q = lowc(readchar());
 	    if (q == '\020') { /* ctrl-P */
 		if (iflags.prevmsg_window) {
+		    int sav = ttyDisplay->inread;
+		    ttyDisplay->inread = 0;
 		    (void) tty_doprev_message();
+		    ttyDisplay->inread = sav;
 		    tty_clear_nhwindow(WIN_MESSAGE);
 		    cw->maxcol = cw->maxrow;
 		    addtopl(prompt);
 		} else {
-		    if(!doprev) (void) tty_doprev_message(); /* need two initially */
+		    if(!doprev)
+			(void) tty_doprev_message(); /* need two initially */
 		    (void) tty_doprev_message();
 		    doprev = 1;
 		}
