@@ -202,6 +202,8 @@ const char *verb;
 		bury_objs(x, y);
 		newsym(x,y);
 		return TRUE;
+	} else if (is_lava(x, y)) {
+		return fire_damage(obj, FALSE, FALSE, x, y);
 	} else if (is_pool(x, y)) {
 		water_damage(obj, FALSE, FALSE);
 	}

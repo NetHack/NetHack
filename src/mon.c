@@ -308,19 +308,21 @@ warn_effects()
 }
 #endif /* 0 */
 
-/* check mtmp and water for compatibility, 0 (survived), 1 (drowned) */
+/* check mtmp and water/lava for compatibility, 0 (survived), 1 (died) */
 int
-minwater(mtmp)
+minliquid(mtmp)
 register struct monst *mtmp;
 {
-    boolean inpool, infountain;
+    boolean inpool, inlava, infountain;
 
     inpool = is_pool(mtmp->mx,mtmp->my) &&
+	     !is_flyer(mtmp->data) && !is_floater(mtmp->data);
+    inlava = is_lava(mtmp->mx,mtmp->my) &&
 	     !is_flyer(mtmp->data) && !is_floater(mtmp->data);
     infountain = IS_FOUNTAIN(levl[mtmp->mx][mtmp->my].typ);
 
 #ifdef STEED
-	/* Flying and levitation keeps our steed out of the water */
+	/* Flying and levitation keeps our steed out of the liquid */
 	/* (but not water-walking or swimming) */
 	if (mtmp == u.usteed && (Flying || Levitation))
 		return (0);
@@ -349,7 +351,35 @@ register struct monst *mtmp;
 	return (0);
     }
 
-    if (inpool) {
+    if (inlava) {
+	/*
+	 * Lava effects much as water effects. Lava likers are able to
+	 * protect their stuff. Fire resistant monsters can only protect
+	 * themselves  --ALI
+	 */
+	if (!is_clinger(mtmp->data) && !likes_lava(mtmp->data)) {
+	    if (!resists_fire(mtmp)) {
+		if (cansee(mtmp->mx,mtmp->my))
+		    pline("%s burns to a crisp.", Monnam(mtmp));
+		mondead(mtmp);
+	    }
+	    else {
+		if (--mtmp->mhp < 1) {
+		    if (cansee(mtmp->mx,mtmp->my))
+			pline("%s surrenders to the fire.", Monnam(mtmp));
+		    mondead(mtmp);
+		}
+		else if (cansee(mtmp->mx,mtmp->my))
+		    pline("%s burns slightly.", Monnam(mtmp));
+	    }
+	    if (mtmp->mhp > 0) {
+		fire_damage(mtmp->minvent, FALSE, FALSE, mtmp->mx, mtmp->my);
+		rloc(mtmp);
+		return 0;
+	    }
+	    return (1);
+	}
+    } else if (inpool) {
 	/* Most monsters drown in pools.  flooreffects() will take care of
 	 * water damage to dead monsters' inventory, but survivors need to
 	 * be handled here.  Swimmers are able to protect their stuff...
@@ -480,7 +510,7 @@ movemon()
 
 	if (vision_full_recalc) vision_recalc(0);	/* vision! */
 
-	if (minwater(mtmp)) continue;
+	if (minliquid(mtmp)) continue;
 
 	if (is_hider(mtmp->data)) {
 	    /* unwatched mimics and piercers may hide again  [MRS] */

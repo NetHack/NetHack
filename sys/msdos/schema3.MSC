@@ -421,7 +421,7 @@ functions:382 _write_timer _yyyymmdd _zap_steed
 functions:383 _getprice _getreturn _getrumor _gettrack
 functions:384 _ini_inv _knows_object _knows_class _restricted_spell_discipline _ready_weapon
 functions:385 _doname _Doname2
-functions:386 _minwater 
+functions:386 _minliquid 
 functions:387 _missmm 
 functions:388 _missmu 
 functions:389 _missum 

@@ -1016,6 +1016,32 @@ struct obj *obj;
 	return FALSE;
 }
 
+/* Called when potentially lightable object is affected by fire_damage().
+   Return TRUE if object was lit and FALSE otherwise --ALI */
+boolean
+catch_lit(obj)
+struct obj *obj;
+{
+	xchar x, y;
+
+	if (!obj->lamplit && (obj->otyp == CANDELABRUM_OF_INVOCATION ||
+		obj->otyp == WAX_CANDLE || obj->otyp == TALLOW_CANDLE ||
+		obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
+		obj->otyp == BRASS_LANTERN || obj->otyp == POT_OIL)) {
+	    if (obj->otyp == MAGIC_LAMP && obj->spe == 0)
+		return FALSE;
+	    else if (obj->otyp != MAGIC_LAMP && obj->age == 0)
+		return FALSE;
+	    if (!get_obj_location(obj, &x, &y, 0))
+		return FALSE;
+	    if (obj->where == OBJ_MINVENT ? cansee(x,y) : !Blind)
+		pline("%s catches light!", Yname2(obj));
+	    begin_burn(obj, TRUE);
+	    return TRUE;
+	}
+	return FALSE;
+}
+
 STATIC_OVL void
 use_lamp(obj)
 struct obj *obj;

@@ -126,7 +126,7 @@ genericptr_t poolcnt;
 	water_damage(level.objects[x][y], FALSE, TRUE);
 
 	if ((mtmp = m_at(x, y)) != 0)
-		(void) minwater(mtmp);
+		(void) minliquid(mtmp);
 	else
 		newsym(x,y);
 }

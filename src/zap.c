@@ -2744,7 +2744,8 @@ boolean costly = shop_keeper(*in_rooms(bhitpos.x, bhitpos.y, SHOPBASE)) &&
 		delay_output();
 		/* kicked objects fall in pools */
 		if((weapon == KICKED_WEAPON) &&
-		   is_pool(bhitpos.x, bhitpos.y))
+		   (is_pool(bhitpos.x, bhitpos.y) ||
+		   is_lava(bhitpos.x, bhitpos.y)))
 		    break;
 #ifdef SINKS
 		if(IS_SINK(typ) && weapon != FLASHED_LIGHT)

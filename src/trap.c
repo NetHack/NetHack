@@ -4,6 +4,8 @@
 
 #include "hack.h"
 
+extern const char *destroy_strings[];
+
 STATIC_DCL void FDECL(dofiretrap, (struct obj *));
 STATIC_DCL void NDECL(domagictrap);
 STATIC_DCL boolean FDECL(emergency_disrobe,(boolean *));
@@ -2282,6 +2284,105 @@ domagictrap()
 		   }
 	     default: break;
 	  }
+}
+
+/*
+ * Scrolls, spellbooks, potions, and flammable items
+ * may get affected by the fire.
+ *
+ * Return number of objects destroyed. --ALI
+ */
+int
+fire_damage(chain, force, here, x, y)
+struct obj *chain;
+boolean force, here;
+xchar x, y;
+{
+    int chance;
+    struct obj *obj, *otmp, *nobj, *ncobj;
+    int retval = 0;
+    int in_sight = !Blind && couldsee(x, y);	/* Don't care if it's lit */
+    int dindx;
+
+    for (obj = chain; obj; obj = nobj) {
+	nobj = here ? obj->nexthere : obj->nobj;
+
+	/* object might light in a controlled manner */
+	if (catch_lit(obj))
+	    continue;
+
+	if (Is_container(obj)) {
+	    switch (obj->otyp) {
+	    case ICE_BOX:
+		continue;		/* Immune */
+		break;
+	    case CHEST:
+		chance = 40;
+		break;
+	    case LARGE_BOX:
+		chance = 30;
+		break;
+	    default:
+		chance = 20;
+		break;
+	    }
+	    if (!force && (Luck + 5) > rn2(chance))
+		continue;
+	    /* Container is burnt up - dump contents out */
+	    if (in_sight) pline("%s catches fire and burns.", Yname2(obj));
+	    if (Has_contents(obj)) {
+		if (in_sight) pline("Its contents fall out.");
+		for (otmp = obj->cobj; otmp; otmp = ncobj) {
+		    ncobj = otmp->nobj;
+		    obj_extract_self(otmp);
+		    if (!flooreffects(otmp, x, y, ""))
+			place_object(otmp, x, y);
+		}
+	    }
+	    delobj(obj);
+	    retval++;
+	} else if (!force && (Luck + 5) > rn2(20)) {
+	    /*  chance per item of sustaining damage:
+	     *	max luck (full moon):	 5%
+	     *	max luck (elsewhen):	10%
+	     *	avg luck (Luck==0):	75%
+	     *	awful luck (Luck<-4):  100%
+	     */
+	    continue;
+	} else if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS) {
+	    if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
+		continue;
+	    if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+		if (in_sight) pline("Smoke rises from %s.", the(xname(obj)));
+		continue;
+	    }
+	    dindx = (obj->oclass == SCROLL_CLASS) ? 2 : 3;
+	    if (in_sight)
+		pline("%s %s.", Yname2(obj), (obj->quan > 1) ?
+		      destroy_strings[dindx*3 + 1] : destroy_strings[dindx*3]);
+	    delobj(obj);
+	    retval++;
+	} else if (obj->oclass == POTION_CLASS) {
+	    dindx = 1;
+	    if (in_sight)
+		pline("%s %s.", Yname2(obj), (obj->quan > 1) ?
+		      destroy_strings[dindx*3 + 1] : destroy_strings[dindx*3]);
+	    delobj(obj);
+	    retval++;
+	} else if (is_flammable(obj) && obj->oeroded < MAX_ERODE &&
+		   !(obj->oerodeproof || (obj->blessed && !rnl(4)))) {
+	    if (in_sight) {
+		pline("%s burn%s%s.", Yname2(obj), obj->quan > 1 ? "": "s",
+		      obj->oeroded+1 == MAX_ERODE ? " completely" :
+		      obj->oeroded ? " further" : "");
+	    }
+	    obj->oeroded++;
+	}
+    }
+
+    if (retval && !in_sight)
+	You("smell smoke.");
+    return retval;
 }
 
 void

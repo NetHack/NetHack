@@ -1208,7 +1208,7 @@ domove()
 		place_monster(mtmp, u.ux0, u.uy0);
 
 		/* check for displacing it into pools and traps */
-		switch (minwater(mtmp) ? 2 : mintrap(mtmp)) {
+		switch (minliquid(mtmp) ? 2 : mintrap(mtmp)) {
 		case 0:
 		    You("%s %s.", mtmp->mtame ? "displaced" : "frightened",
 			pnambuf);
@@ -1230,7 +1230,7 @@ domove()
 		    }
 
 		    /* you killed your pet by direct action.
-		     * minwater and mintrap don't know to do this
+		     * minliquid and mintrap don't know to do this
 		     */
 		    u.uconduct.killer++;
 		    break;
