@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)mthrowu.c	3.4	2004/08/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -234,11 +234,11 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 
 void
 m_throw(mon, x, y, dx, dy, range, obj)
-	register struct monst *mon;
-	register int x,y,dx,dy,range;		/* direction and range */
-	register struct obj *obj;
+struct monst *mon;		/* launching monster */
+int x, y, dx, dy, range;	/* launch point, direction, and range */
+struct obj *obj;		/* missile (or stack providing it) */
 {
-	register struct monst *mtmp;
+	struct monst *mtmp;
 	struct obj *singleobj;
 	char sym = obj->oclass;
 	int hitu, blindinc = 0;
@@ -273,7 +273,8 @@ m_throw(mon, x, y, dx, dy, range, obj)
 
 	singleobj->owornmask = 0; /* threw one of multiple weapons in hand? */
 
-	if (singleobj->cursed && (dx || dy) && !rn2(7)) {
+	if ((singleobj->cursed || singleobj->greased) && (dx || dy) &&
+		!rn2(7)) {
 	    if(canseemon(mon) && flags.verbose) {
 		if(is_ammo(singleobj))
 		    pline("%s misfires!", Monnam(mon));
