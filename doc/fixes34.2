@@ -50,7 +50,8 @@ give more explicit feedback for exploding bag of holding
 help display for "list of game options" misformats runmode and scroll_amount
 pit created by land mine explosion doesn't start out concealed
 update map display sooner when pushed boulder triggers land mine explosion
-prevent fatal error from prompt string overflow in lift_object() 
+prevent several QBUFSZ sized buffers from overflowing and triggering fatal 
+	errors inside window port prompt routines
 make sure that leashed monsters are released prior to shopkeeper inheriting
 	dead character's inventory
 attaching long named candle to long named candelabrum caused buffer overflow
