@@ -253,8 +253,6 @@ objects that fall from monster's minvent as a result of monster polymorph
 quaffing a potion of gain ability while wearing ring of sustain ability
 	displayed no message and identified the potion
 monsters still with WAITFORU strategy should not follow up/downstairs
-travel command now respects different monster's abilities to move through
-	different mediums, such as xorn's ability to move through rock
 messages should reflect the fact that the Eyes of the Overworld mask the
 	effects of blindness
 Amulet of life saving should save you from sickness that will kick in this turn
@@ -433,6 +431,7 @@ if you float_down on a trap in which you're already trapped, don't retrap
 applying whip toward hidden mimic displays mimic name before "Wait!" message
 stealing a container didn't multiply cost of stolen contained objects by quan
 halve air elemental damage to compensate for side effect of speed system
+strengthen Death; weaken Famine, Pestilence, and Demogorgon
 pet purple worms get nutrition from engulfing attack
 
 
@@ -470,6 +469,7 @@ tty: pet was not always hilited
 
 General New Features
 --------------------
+added travel command via '_' or mouse click
 config file processing detects multiple use of the same OPTION and 
 	prints a warning when it does
 make the player selection prompt more explicit in the information
@@ -492,7 +492,7 @@ objects merge in containers
 wishing for "nothing" yields no object and preserves wishless conduct
 genociding "none" destroys no monsters and preserves genocideless conduct
 coyote id naming shows only the true latin name if coyote is cancelled
-xorns can "speak" and smell valuable metal
+xorns can "speak" and can smell valuable metal
 if you find a trap but there is too much clutter to see it, have the
 	game display it temporarily until a keypress
 rename the Wizard of Balance to Neferet the Green
