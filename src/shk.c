@@ -2225,7 +2225,6 @@ boolean ininv, dummy, silent;
 	} else /* i.e., !container */
 	    add_one_tobill(obj, dummy);
 
-speak:
 	if (shkp->mcanmove && !shkp->msleeping && !silent) {
 	    char buf[BUFSZ];
 
