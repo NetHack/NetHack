@@ -246,11 +246,18 @@ register int nux,nuy;
 		xchar ballx, bally, chainx, chainy;
 		boolean cause_delay;
 
-		/* this should only drag the chain (and never give a near-
-		   capacity message) since we already checked ball distance */
-		(void) drag_ball(u.ux, u.uy, &bc_control, &ballx, &bally,
-					&chainx, &chainy, &cause_delay);
-		move_bc(0, bc_control, ballx, bally, chainx, chainy);
+		/* We really should only be dragging the chain here, since we
+		 * checked the ball distance.  However, some pathological
+		 * cases will drag the ball anyway.  drag_ball() tries to
+		 * handle those by ignoring near_capacity() and teleporting the
+		 * ball and chain along with you.  Bug: if you only teleported
+		 * one square, drag_ball() has no way to distinguish between
+		 * teleporting and moving, and treats it like a move.  (Note
+		 * that teleds() doesn't imply teleporting.)
+		 */
+		if (drag_ball(u.ux, u.uy, &bc_control, &ballx, &bally,
+					&chainx, &chainy, &cause_delay))
+		    move_bc(0, bc_control, ballx, bally, chainx, chainy);
 	    } else
 		 placebc();
 	}
