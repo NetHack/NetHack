@@ -530,7 +530,11 @@ doengrave()
 		return(0);
 	}
 	if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
-	    if (!levl[u.ux][u.uy].disturbed) {
+	    if (otmp == &zeroobj) { /* using only finger */
+		You("would only make a small smudge on the %s.",
+			surface(u.ux, u.uy));
+		return(0);
+	    } else if (!levl[u.ux][u.uy].disturbed) {
 		You("disturb the undead!");
 		levl[u.ux][u.uy].disturbed = 1;
 		(void) makemon(&mons[PM_GHOUL], u.ux, u.uy, NO_MM_FLAGS);
