@@ -17,7 +17,7 @@ $	if p2.nes."" then  gameuic := 'p2'
 $
 $	! note: all filespecs contain some punctuation,
 $	!	to avoid inadvertent logical name interaction
-$	play_files = "PERM.,RECORD.,LOGFILE."
+$	play_files = "PERM.,RECORD.,LOGFILE.,PANICLOG."
 $	help_files = "HELP.,HH.,CMDHELP.,WIZHELP.,OPTHELP.,HISTORY.,LICENSE."
 $	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,QUEST.DAT"
 $	guidebook  = "[.doc]Guidebook.txt"
