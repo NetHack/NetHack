@@ -6,9 +6,10 @@
 #include "mhmsg.h"
 #include "mhfont.h"
 #include "mhcolor.h"
+#include "mhtxtbuf.h"
 
 typedef struct mswin_nethack_text_window {
-	TCHAR*  window_text;
+	PNHTextBuffer  window_text;
 	int done;
 } NHTextWindow, *PNHTextWindow;
 
@@ -35,6 +36,9 @@ HWND mswin_init_text_window () {
 	if( !data ) panic("out of memory");
 
 	ZeroMemory(data, sizeof(NHTextWindow));
+	data->window_text = mswin_init_text_buffer(
+			program_state.gameover? FALSE : GetNHApp()->bWrapText
+		);
 	SetWindowLong(ret, GWL_USERDATA, (LONG)data);
 	return ret;
 }
@@ -44,11 +48,11 @@ void mswin_display_text_window (HWND hWnd)
 	PNHTextWindow data;
 	
 	data = (PNHTextWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	if( data && data->window_text ) {
+	if( data ) {
 		HWND control;
 		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
 		SendMessage(control, EM_FMTLINES, 1, 0 );
-		SetWindowText(GetDlgItem(hWnd, IDC_TEXT_CONTROL), data->window_text);
+		mswin_render_text(data->window_text, GetDlgItem(hWnd, IDC_TEXT_CONTROL));
 
 		data->done = 0;
 		mswin_popup_display(hWnd, &data->done);
@@ -78,11 +82,21 @@ LRESULT CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 #if defined(WIN_CE_SMARTPHONE)
 		/* special initialization for SmartPhone dialogs */ 
-		NHSPhoneDialogSetup(hWnd, FALSE);
+		NHSPhoneDialogSetup(hWnd, FALSE, GetNHApp()->bFullScreen);
 #endif
 		/* subclass edit control */
 		editControlWndProc = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
 		SetWindowLong(control, GWL_WNDPROC, (LONG)NHTextControlWndProc);
+
+		if( !program_state.gameover && GetNHApp()->bWrapText ) {
+			DWORD styles;
+			styles = GetWindowLong(control, GWL_STYLE);
+			if( styles ) {
+				SetWindowLong(control, GWL_STYLE, styles & (~WS_HSCROLL));
+				SetWindowPos(control, NULL, 0, 0, 0, 0, 
+							  SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE );
+			}
+		}
 
 		SetFocus(control);
 	return FALSE;
@@ -119,7 +133,7 @@ LRESULT CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 	case WM_DESTROY:
 		if( data ) {
-			if( data->window_text ) free(data->window_text);
+			mswin_free_text_buffer(data->window_text);
 			free(data);
 			SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
 		}
@@ -137,21 +151,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	switch( wParam ) {
 	case MSNH_MSG_PUTSTR: {
 		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
-		TCHAR	wbuf[NHSTR_BUFSIZE];
-		size_t text_size;
-
-		if( !data->window_text ) {
-			text_size = strlen(msg_data->text) + 4;
-			data->window_text = (TCHAR*)malloc(text_size*sizeof(data->window_text[0]));
-			ZeroMemory(data->window_text, text_size*sizeof(data->window_text[0]));
-		} else {
-			text_size = _tcslen(data->window_text) + strlen(msg_data->text) + 4;
-			data->window_text = (TCHAR*)realloc(data->window_text, text_size*sizeof(data->window_text[0]));
-		}
-		if( !data->window_text ) break;
-		
-		_tcscat(data->window_text, NH_A2W(msg_data->text, wbuf, NHSTR_BUFSIZE)); 
-		_tcscat(data->window_text, TEXT("\r\n"));
+		mswin_add_text(data->window_text, msg_data->attr, msg_data->text);
 		break;
 	}
 	}

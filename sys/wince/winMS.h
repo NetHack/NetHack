@@ -33,6 +33,9 @@
 #include <sipapi.h>
 #endif
 
+/* Taskbar Menu height */
+#define MENU_HEIGHT 26
+
 /* Create an array to keep track of the various windows */
 
 #ifndef MAXWINDOWS
@@ -92,6 +95,12 @@ typedef struct mswin_nhwindow_app {
 
 	int			bCmdPad;	/* command pad - on-screen keyboard */ 
 	HWND		hCmdWnd;	/* handle of on-screen keyboard window */
+
+	/* options */
+	boolean		bWrapText;	/* format text to fit the window */
+	boolean		bFullScreen;/* run nethack in full-screen mode  */
+	boolean		bHideScrollBars; /* hide scroll bars */
+	boolean		bUseSIP; /* use SIP (built-in software keyboard) for menus (PocketPC only) */
 } NHWinApp, *PNHWinApp;
 extern PNHWinApp GetNHApp();
 
@@ -162,7 +171,12 @@ void mswin_popup_display(HWND popup, int* done_indicator);
 void mswin_popup_destroy(HWND popup);
 
 #if defined(WIN_CE_SMARTPHONE)
-void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit);
+void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit, BOOL is_fullscreen);
 #endif
 
+void mswin_read_reg(void);
+void mswin_destroy_reg(void);
+void mswin_write_reg(void);
+
+void mswin_set_fullscreen(BOOL is_fullscreen);
 #endif /* WINmswin_H */

@@ -185,8 +185,8 @@ NHCmdPadCell cells_layout_movement[NH_CMDPAD_CELLNUM] =
 	{ -1, "1", "1", 7, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "2", "2", 8, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "3", "3", 9, NH_CELL_REG, 1, (void*)-1 },
-	{ -1, ">", ">", 10, NH_CELL_REG, 1, (void*)-1 },
-	{ -1, "<", "<", 12, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "<", "<", 10, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, ">", ">", 12, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "X", "X", 13, NH_CELL_LAYOUT_MENU, 1, 0 }
 };
 

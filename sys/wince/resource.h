@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by winhack_sp.rc
+// Used by winhack.rc
 //
 #define IDC_MYICON                      2
 #define IDD_WINHACK_DIALOG              102
@@ -26,6 +26,7 @@
 #define IDB_PETMARK                     145
 #define IDB_MENU_SEL_COUNT              146
 #define IDB_KEYPAD                      147
+#define IDB_MENUBAR                     154
 #define IDC_TEXT_VIEW                   1001
 #define IDC_CMD_MOVE_NW                 1001
 #define IDC_CMD_MOVE_N                  1002
@@ -144,13 +145,14 @@
 #define IDS_CAP_ENTIREMAP               32826
 #define IDS_CAP_NORMALMAP               32827
 #define IDM_HELP_MENU                   32828
+#define IDM_VIEW_OPTIONS                32829
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        153
-#define _APS_NEXT_COMMAND_VALUE         32829
+#define _APS_NEXT_RESOURCE_VALUE        155
+#define _APS_NEXT_COMMAND_VALUE         32830
 #define _APS_NEXT_CONTROL_VALUE         1334
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

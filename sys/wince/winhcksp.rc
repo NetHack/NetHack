@@ -28,7 +28,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_WINHACK             ICON    DISCARDABLE     "NETHACK.ICO"
+IDI_WINHACK             ICON    DISCARDABLE     "..\\..\\wince\\NETHACK.ICO"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -40,6 +40,7 @@ BEGIN
     MENUITEM "Entire Map",                  IDM_MAP_FIT_TO_SCREEN
     POPUP "Menu"
     BEGIN
+        MENUITEM "Options",                     IDM_VIEW_OPTIONS
         MENUITEM "Keypad",                      IDM_VIEW_KEYPAD
         MENUITEM SEPARATOR
         MENUITEM "ASCII",                       IDM_MAP_ASCII8X8
@@ -184,12 +185,12 @@ END
 // Bitmap
 //
 
-IDB_TILES               BITMAP  DISCARDABLE     "tiles.bmp"
-IDB_MENU_SEL            BITMAP  DISCARDABLE     "mnsel.bmp"
-IDB_MENU_UNSEL          BITMAP  DISCARDABLE     "mnunsel.bmp"
-IDB_PETMARK             BITMAP  DISCARDABLE     "petmark.bmp"
-IDB_MENU_SEL_COUNT      BITMAP  DISCARDABLE     "mnselcnt.bmp"
-IDB_KEYPAD              BITMAP  DISCARDABLE     "keypad.bmp"
+IDB_TILES               BITMAP  DISCARDABLE     "..\\..\\wince\\tiles.bmp"
+IDB_MENU_SEL            BITMAP  DISCARDABLE     "..\\..\\wince\\mnsel.bmp"
+IDB_MENU_UNSEL          BITMAP  DISCARDABLE     "..\\..\\wince\\mnunsel.bmp"
+IDB_PETMARK             BITMAP  DISCARDABLE     "..\\..\\wince\\petmark.bmp"
+IDB_MENU_SEL_COUNT      BITMAP  DISCARDABLE     "..\\..\\wince\\mnselcnt.bmp"
+IDB_KEYPAD              BITMAP  DISCARDABLE     "..\\..\\wince\\keypad.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -231,7 +232,7 @@ END
 IDC_WINHACK SHMENUBAR DISCARDABLE 
 BEGIN
     IDC_WINHACK, 2,
-    I_IMAGENONE, IDM_MAP_FIT_TO_SCREEN, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, IDM_MAP_FIT_TO_SCREEN, 0, NOMENU,
+    I_IMAGENONE, IDM_MAP_FIT_TO_SCREEN, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, IDM_MAP_FIT_TO_SCREEN, 0, NOMENU, 
     I_IMAGENONE, ID_VIEW, TBSTATE_ENABLED, TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_VIEW, 0, 1,
 END
 

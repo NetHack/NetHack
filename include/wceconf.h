@@ -254,8 +254,8 @@ struct tm {
 #define _TM_DEFINED
 #endif
 
-struct tm * __cdecl localtime(const time_t *);
-time_t __cdecl time(time_t *);
+extern struct tm * __cdecl localtime(const time_t *);
+extern time_t __cdecl time(time_t *);
 
 /* __stdio.h__ */
 #ifndef BUFSIZ
@@ -267,16 +267,16 @@ time_t __cdecl time(time_t *);
 /* __io.h__ */
 typedef long off_t;
 
-int __cdecl close(int);
-int __cdecl creat(const char *, int);
-int __cdecl eof(int);
-long __cdecl lseek(int, long, int);
-int __cdecl open(const char *, int, ...);
-int __cdecl read(int, void *, unsigned int);
-int __cdecl unlink(const char *);
-int __cdecl write(int, const void *, unsigned int);
-int __cdecl rename(const char *, const char *);
-int __cdecl access(const char *, int);
+extern int __cdecl close(int);
+extern int __cdecl creat(const char *, int);
+extern int __cdecl eof(int);
+extern long __cdecl lseek(int, long, int);
+extern int __cdecl open(const char *, int, ...);
+extern int __cdecl read(int, void *, unsigned int);
+extern int __cdecl unlink(const char *);
+extern int __cdecl write(int, const void *, unsigned int);
+extern int __cdecl rename(const char *, const char *);
+extern int __cdecl access(const char *, int);
 
 #ifdef DeleteFile
 #undef DeleteFile
@@ -284,7 +284,7 @@ int __cdecl access(const char *, int);
 #define DeleteFile(a) unlink(a)
 
 int chdir( const char *dirname );
-char *getcwd( char *buffer, int maxlen );
+extern char *getcwd( char *buffer, int maxlen );
 
 /* __stdlib.h__ */
 #define abort()  (void)TerminateProcess(GetCurrentProcess(), 0)
@@ -301,14 +301,33 @@ char *getcwd( char *buffer, int maxlen );
 #if defined(WIN_CE_PS2xx) || defined(WIN32_PLATFORM_HPCPRO)
 #define ZeroMemory(p, s)         memset((p), 0, (s))
 
-int __cdecl isupper(int c);
-int __cdecl isdigit(int c);
-int __cdecl isspace(int c);
-int __cdecl isprint(int c);
+extern int __cdecl isupper(int c);
+extern int __cdecl isdigit(int c);
+extern int __cdecl isspace(int c);
+extern int __cdecl isprint(int c);
 
-char* __cdecl _strdup(const char* s);
-char* __cdecl strrchr( const char *string, int c );
-int   __cdecl _stricmp(const char* a, const char* b);
+extern char* __cdecl _strdup(const char* s);
+extern char* __cdecl strrchr( const char *string, int c );
+extern int   __cdecl _stricmp(const char* a, const char* b);
+
+extern FILE * __cdecl fopen(const char* filename, const char *mode);
+extern int    __cdecl fscanf(FILE *f , const char *format, ...);
+extern int __cdecl fprintf(FILE *f , const char *format, ...);
+extern int    __cdecl vfprintf(FILE* f, const char *format, va_list args);
+extern int __cdecl fgetc(FILE * f);
+extern char * __cdecl fgets(char *s, int size, FILE *f);
+extern int    __cdecl printf(const char *format, ...);
+extern int    __cdecl vprintf(const char *format, va_list args);
+extern int    __cdecl puts(const char * s);
+extern FILE*  __cdecl _getstdfilex(int desc);
+extern int __cdecl fclose(FILE * f);
+extern size_t __cdecl fread(void *p, size_t size, size_t count, FILE *f);
+extern size_t __cdecl fwrite(const void *p, size_t size, size_t count, FILE * f);
+extern int    __cdecl fflush(FILE *f);
+extern int    __cdecl feof(FILE *f);
+extern int    __cdecl fseek(FILE *f, long offset, int from);
+extern long   __cdecl ftell(FILE * f);
+
 #endif
 
 /* ARM - the processor; avoids conflict with ARM in hack.h */

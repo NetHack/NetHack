@@ -68,11 +68,23 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	_nethack_app.mapTilesPerLine = TILES_PER_LINE;
 	_nethack_app.bNoHScroll = FALSE;
 	_nethack_app.bNoVScroll = FALSE;
+
 #if  defined(WIN_CE_PS2xx) || defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
 	_nethack_app.bCmdPad = TRUE;
 #else
 	_nethack_app.bCmdPad = FALSE;
 #endif
+
+	_nethack_app.bWrapText = TRUE;
+	_nethack_app.bFullScreen = TRUE;
+
+#if defined(WIN_CE_SMARTPHONE)
+	_nethack_app.bHideScrollBars = TRUE;
+#else
+	_nethack_app.bHideScrollBars = FALSE;
+#endif
+
+	_nethack_app.bUseSIP = TRUE;
 
 	// check for running nethack programs
 	nethackWnd = FindWindow(szMainWindowClass, NULL);

@@ -174,8 +174,13 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			menubar.dwFlags = 0; 
 			menubar.nToolBarId = IDC_WINHACK; 
 			menubar.hInstRes = GetNHApp()->hApp; 
+#	if defined(WIN_CE_POCKETPC)
+			menubar.nBmpId = IDB_MENUBAR; 
+			menubar.cBmpImages = 2; 
+#	else
 			menubar.nBmpId = 0; 
 			menubar.cBmpImages = 0; 
+#	endif
 			if( !SHCreateMenuBar(&menubar) ) panic("cannot create menu");
 			GetNHApp()->hMenuBar = menubar.hwndMB;
 #else
@@ -435,10 +440,30 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		/*-----------------------------------------------------------------------*/
 
 		case WM_ACTIVATE:
+			if( LOWORD(wParam)!=WA_INACTIVE ) {
+#if defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
+				if( GetNHApp()->bFullScreen ) 
+					SHFullScreen(GetNHApp()->hMainWnd, SHFS_HIDETASKBAR | SHFS_HIDESTARTICON);
+				else
+					SHFullScreen(GetNHApp()->hMainWnd, SHFS_SHOWTASKBAR | SHFS_SHOWSTARTICON);
+#endif
+				mswin_layout_main_window(NULL);
+			}
+		break;
+
 		case WM_SETTINGCHANGE:
+#if defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
+			if( GetNHApp()->bFullScreen ) 
+				SHFullScreen(GetNHApp()->hMainWnd, SHFS_HIDETASKBAR | SHFS_HIDESTARTICON);
+			else
+				SHFullScreen(GetNHApp()->hMainWnd, SHFS_SHOWTASKBAR | SHFS_SHOWSTARTICON);
+#endif
+			mswin_layout_main_window(NULL);
+		break;
+
 		case WM_SIZE:
 			mswin_layout_main_window(NULL);
-			break;
+		break;
 
 		/*-----------------------------------------------------------------------*/
 
@@ -540,6 +565,7 @@ void mswin_layout_main_window(HWND changed_child)
 	ZeroMemory(&sip, sizeof(sip));
 	sip.cbSize = sizeof(sip);
 	SHSipInfo(SPI_GETSIPINFO, 0, &sip, 0);
+	if( GetNHApp()->bFullScreen ) sip.rcVisibleDesktop.top = 0;
 
 	/* adjust client rectangle size */
 	GetWindowRect(GetNHApp()->hMenuBar, &menu_bar);
@@ -558,6 +584,13 @@ void mswin_layout_main_window(HWND changed_child)
 #else
 #	if	!defined(WIN_CE_SMARTPHONE)
 	client_rt.top += CommandBar_Height(GetNHApp()->hMenuBar);
+#	else
+	/* Smartphone only */
+	if( GetNHApp()->bFullScreen ) {
+		RECT menu_bar;
+		GetWindowRect(GetNHApp()->hMenuBar, &menu_bar);
+		client_rt.bottom -= menu_bar.bottom-menu_bar.top;
+	}
 #	endif
 #endif
 
@@ -864,6 +897,10 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				(GetNHApp()->bCmdPad? MF_CHECKED : MF_UNCHECKED)
 			);
 			mswin_layout_main_window(GetNHApp()->hCmdWnd);
+			break;
+
+		case IDM_VIEW_OPTIONS:
+			doset();
 			break;
 
 		case IDM_HELP_LONG:	

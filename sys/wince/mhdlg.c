@@ -128,7 +128,7 @@ LRESULT CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 					TRUE );
 
 #if defined(WIN_CE_SMARTPHONE)
-		NHSPhoneDialogSetup(hWnd, TRUE);
+		NHSPhoneDialogSetup(hWnd, TRUE, FALSE);
 #endif
 
 		/* set focus to the edit control */
@@ -240,7 +240,7 @@ LRESULT CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		}
 
 #if defined(WIN_CE_SMARTPHONE)
-		NHSPhoneDialogSetup(hWnd, FALSE);
+		NHSPhoneDialogSetup(hWnd, FALSE, FALSE);
 
 		GetClientRect(hWnd, &dlg_rt);
 		MoveWindow(GetDlgItem(hWnd, IDC_EXTCMD_LIST),
@@ -362,7 +362,7 @@ BOOL CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		plselInitDialog(hWnd);
 
 #if defined(WIN_CE_SMARTPHONE)
-		NHSPhoneDialogSetup(hWnd, FALSE);
+		NHSPhoneDialogSetup(hWnd, FALSE, FALSE);
 #endif
 		/* set focus on the role checkbox (random) field */
 		SetFocus(GetDlgItem(hWnd, IDC_PLSEL_ROLE_RANDOM));
@@ -472,6 +472,22 @@ void plselInitDialog(HWND hWnd)
 	/* set player name */
 	SetDlgItemText(hWnd, IDC_PLSEL_NAME, NH_A2W(plname, wbuf, sizeof(wbuf)));
 
+	/* check flags for consistency */
+	if( flags.initrole>=0 ) {
+		if (flags.initrace>=0 && !validrace(flags.initrole, flags.initrace)) {
+			flags.initrace = ROLE_NONE;
+		}
+
+		if (flags.initgend>=0 && !validgend(flags.initrole, flags.initrace, flags.initgend)) {
+			flags.initgend = ROLE_NONE;
+		}
+
+		if (flags.initalign>=0 && !validalign(flags.initrole, flags.initrace, flags.initalign)) {
+			flags.initalign = ROLE_NONE;
+		}
+	}
+
+	/* populate select boxes */
 	plselAdjustLists(hWnd, -1);
 
 	/* intialize roles list */
@@ -537,16 +553,16 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 
 	/* get current selections */	
 	ind = SendMessage(control_role, CB_GETCURSEL, 0, 0);
-	initrole = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_role, CB_GETITEMDATA, ind, 0);
+	initrole = (ind==LB_ERR)? flags.initrole : SendMessage(control_role, CB_GETITEMDATA, ind, 0);
 
 	ind = SendMessage(control_race, CB_GETCURSEL, 0, 0);
-	initrace = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_race, CB_GETITEMDATA, ind, 0);
+	initrace = (ind==LB_ERR)? flags.initrace : SendMessage(control_race, CB_GETITEMDATA, ind, 0);
 
 	ind = SendMessage(control_gender, CB_GETCURSEL, 0, 0);
-	initgend = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_gender, CB_GETITEMDATA, ind, 0);
+	initgend = (ind==LB_ERR)? flags.initgend : SendMessage(control_gender, CB_GETITEMDATA, ind, 0);
 
 	ind = SendMessage(control_align, CB_GETCURSEL, 0, 0);
-	initalign = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_align, CB_GETITEMDATA, ind, 0);
+	initalign = (ind==LB_ERR)? flags.initalign : SendMessage(control_align, CB_GETITEMDATA, ind, 0);
 
 	/* intialize roles list */
 	if( changed_sel==-1 ) {
@@ -624,6 +640,7 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 				SendMessage(control_gender, CB_SETITEMDATA, (WPARAM)ind, (LPARAM)i ); 
 				if( i==initgend ) { 
 					SendMessage(control_gender, CB_SETCURSEL, (WPARAM)ind, (LPARAM)0 );
+					valid_opt = 1;
 				}
 			}
 

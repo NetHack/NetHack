@@ -45,7 +45,7 @@ struct window_procs mswin_procs = {
 	WC_FONTSIZ_MESSAGE|WC_FONTSIZ_STATUS|WC_FONTSIZ_MENU|WC_FONTSIZ_TEXT|
 	WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE|WC_VARY_MSGCOUNT|
 	WC_WINDOWCOLORS|WC_PLAYER_SELECTION,
-    0L,
+    WC2_FULLSCREEN|WC2_SOFTKEYBOARD|WC2_WRAPTEXT,
     mswin_init_nhwindows,
     mswin_player_selection,
     mswin_askname,
@@ -127,6 +127,9 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	/* intialize input subsystem */
     mswin_nh_input_init();
 
+	/* read registry settings */
+    mswin_read_reg();
+
 	/* set it to WIN_ERR so we can detect attempts to
 	   use this ID before it is inialized */
 	WIN_MAP = WIN_ERR;
@@ -196,12 +199,30 @@ void mswin_init_nhwindows(int* argc, char** argv)
 		SET_IN_GAME 
 	);
 
+	/* WC2 options */
+	set_wc2_option_mod_status(
+		WC2_FULLSCREEN|
+		WC2_SOFTKEYBOARD,
+		SET_IN_FILE
+	);
+	GetNHApp()->bFullScreen = iflags.wc2_fullscreen;
+	GetNHApp()->bUseSIP = iflags.wc2_softkeyboard;
+	
+	set_wc2_option_mod_status(
+		WC2_WRAPTEXT,
+		SET_IN_GAME
+	);
+	GetNHApp()->bWrapText = iflags.wc2_wraptext;
+
 	/* create the main nethack window */
 	hWnd = mswin_init_main_window();
 	if (!hWnd) panic( "Cannot create the main window." );
 	ShowWindow(hWnd, GetNHApp()->nCmdShow);
 	UpdateWindow(hWnd);
 	GetNHApp()->hMainWnd = hWnd;
+
+	/* set Full screen if requested */
+	mswin_set_fullscreen(GetNHApp()->bFullScreen);
 
 	/* let nethack code know that the window subsystem is ready */
 	iflags.window_inited = TRUE;
@@ -653,6 +674,9 @@ void mswin_get_nh_event(void)
 void mswin_exit_nhwindows(const char *str)
 {
 	logDebug("mswin_exit_nhwindows(%s)\n", str);
+
+    /* Write Window settings to the registry */
+    mswin_write_reg();
 
 	// Don't do any of this (?) - exit_nhwindows does not terminate 
 	// the application
@@ -1650,6 +1674,22 @@ void mswin_preference_update(const char *pref)
 		mswin_layout_main_window(NULL);
 		return;
 	}
+
+	if( _stricmp( pref, "fullscreen")==0 ) {
+		mswin_set_fullscreen(iflags.wc2_fullscreen);
+		return;
+	}
+
+	if( _stricmp( pref, "softkeyboard")==0 ) {
+		GetNHApp()->bUseSIP = iflags.wc2_softkeyboard;
+		return;
+	}
+
+	if( _stricmp( pref, "wraptext")==0 ) {
+		GetNHApp()->bWrapText = iflags.wc2_wraptext;
+		return;
+	}
+
 }
 
 void mswin_main_loop()
@@ -1800,8 +1840,41 @@ void mswin_popup_destroy(HWND hWnd)
 	SetFocus(GetNHApp()->hMainWnd );
 }
 
+void mswin_set_fullscreen(BOOL is_fullscreen)
+{
+#if defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
+	SetForegroundWindow(GetNHApp()->hMainWnd);
+	if(	is_fullscreen ) {
+		SHFullScreen(GetNHApp()->hMainWnd, SHFS_HIDETASKBAR | SHFS_HIDESTARTICON);
+		MoveWindow(
+			GetNHApp()->hMainWnd,
+			0,
+			0,
+			GetSystemMetrics(SM_CXSCREEN),
+			GetSystemMetrics(SM_CYSCREEN),
+			FALSE
+		);
+	} else {
+		RECT rc;
+		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
+		SHFullScreen(GetNHApp()->hMainWnd, SHFS_SHOWTASKBAR | SHFS_SHOWSTARTICON);
+		MoveWindow(
+			GetNHApp()->hMainWnd,
+			rc.left,
+			rc.top,
+			rc.right - rc.left,
+			rc.bottom - rc.top,
+			FALSE
+		);
+	}
+	GetNHApp()->bFullScreen = is_fullscreen;
+#else
+	GetNHApp()->bFullScreen = FALSE;
+#endif
+}
+
 #if defined(WIN_CE_SMARTPHONE)
-void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit)
+void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit, BOOL is_fullscreen)
 {
     SHMENUBARINFO mbi;
 	HWND hOK, hCancel;
@@ -1815,6 +1888,25 @@ void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit)
     mbi.hInstRes = GetNHApp()->hApp;
     if(!SHCreateMenuBar(&mbi)) {
 		error("cannot create dialog menu");
+	}
+
+	if(is_fullscreen) {
+		SHINITDLGINFO shidi;
+		RECT main_wnd_rect;
+		shidi.dwMask = SHIDIM_FLAGS;
+		shidi.dwFlags = SHIDIF_SIZEDLGFULLSCREEN;
+		shidi.hDlg = hDlg;
+		SHInitDialog(&shidi);
+
+		GetWindowRect(GetNHApp()->hMainWnd, &main_wnd_rect);
+		MoveWindow(
+			hDlg,
+			main_wnd_rect.left,
+			main_wnd_rect.top,
+			main_wnd_rect.right - main_wnd_rect.left,
+			main_wnd_rect.bottom - main_wnd_rect.top,
+			FALSE
+		);
 	}
 
 	/* hide OK and CANCEL buttons */
@@ -1840,6 +1932,17 @@ void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit)
 }
 #endif /* defined(WIN_CE_SMARTPHONE) */
 
+void mswin_read_reg(void)
+{
+}
+
+void mswin_destroy_reg(void)
+{
+}
+
+void mswin_write_reg(void)
+{
+}
 
 #ifdef _DEBUG
 #include <stdarg.h>

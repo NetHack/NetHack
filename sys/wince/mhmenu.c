@@ -9,6 +9,7 @@
 #include "mhinput.h"
 #include "mhfont.h"
 #include "mhcolor.h"
+#include "mhtxtbuf.h"
 
 #define MENU_MARGIN			0
 #define NHMENU_STR_SIZE     BUFSZ
@@ -45,7 +46,7 @@ typedef struct mswin_nethack_menu_window {
 		} menu;
 
 		struct menu_text {
-			TCHAR*			text;
+			PNHTextBuffer	text;
 		} text;
 	};
 	int result;
@@ -237,7 +238,12 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch (message) 
 	{
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
+		HWND text_control;
+		HDC hDC;
+
+		text_control = GetDlgItem(hWnd, IDC_MENU_TEXT);
+
 		data = (PNHMenuWindow)malloc(sizeof(NHMenuWindow));
 		ZeroMemory(data, sizeof(NHMenuWindow));
 		data->type = MENU_TYPE_TEXT;
@@ -250,14 +256,24 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 
 		/* subclass edit control */
-		editControlWndProc = (WNDPROC)GetWindowLong(GetDlgItem(hWnd, IDC_MENU_TEXT), GWL_WNDPROC);
-		SetWindowLong(GetDlgItem(hWnd, IDC_MENU_TEXT), GWL_WNDPROC, (LONG)NHMenuTextWndProc);
+		editControlWndProc = (WNDPROC)GetWindowLong(text_control, GWL_WNDPROC);
+		SetWindowLong(text_control, GWL_WNDPROC, (LONG)NHMenuTextWndProc);
+
+		/* set text window font */
+		hDC = GetDC(text_control);
+		SendMessage(
+			text_control, 
+			WM_SETFONT, 
+			(WPARAM)mswin_get_font(NHW_TEXT, ATR_NONE, hDC, FALSE),
+			(LPARAM)0
+		);
+		ReleaseDC(text_control, hDC);
 
 #if defined(WIN_CE_SMARTPHONE)
 		/* special initialization for SmartPhone dialogs */ 
-		NHSPhoneDialogSetup(hWnd, FALSE);
+		NHSPhoneDialogSetup(hWnd, FALSE, GetNHApp()->bFullScreen);
 #endif
-		break;
+	} break;
 
 	case WM_MSNH_COMMAND:
 		onMSNHCommand(hWnd, wParam, lParam);
@@ -424,7 +440,10 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			DeleteObject(data->bmpCheckedCount);
 			DeleteObject(data->bmpNotChecked);
 			if( data->type == MENU_TYPE_TEXT ) {
-				if( data->text.text ) free(data->text.text);
+				if( data->text.text ) {
+					mswin_free_text_buffer(data->text.text);
+					data->text.text = NULL;
+				}
 			}
 			free(data);
 			SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
@@ -447,12 +466,12 @@ void CheckInputDialog(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	
 	switch(message) {
 	case WM_SETFOCUS:
-		SHSipPreference(hWnd, SIP_UP);
+		if( GetNHApp()->bUseSIP ) SHSipPreference(hWnd, SIP_UP);
 	return;
 
 	case WM_DESTROY:
 	case WM_KILLFOCUS:
-		SHSipPreference(hWnd, SIP_DOWN);
+		if( GetNHApp()->bUseSIP ) SHSipPreference(hWnd, SIP_DOWN);
 	return;
 
 	case WM_NOTIFY:
@@ -460,10 +479,10 @@ void CheckInputDialog(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		LPNMHDR	lpnmhdr = (LPNMHDR)lParam;
 		switch(lpnmhdr->code) {
 		case NM_SETFOCUS:
-			SHSipPreference(hWnd, SIP_UP);
+			if( GetNHApp()->bUseSIP ) SHSipPreference(hWnd, SIP_UP);
 		break;
 		case NM_KILLFOCUS:
-			SHSipPreference(hWnd, SIP_DOWN);
+			if( GetNHApp()->bUseSIP ) SHSipPreference(hWnd, SIP_DOWN);
 		break;
 		}
 	} return;
@@ -471,10 +490,10 @@ void CheckInputDialog(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		switch(HIWORD(wParam)) {
 		case BN_SETFOCUS:
-			SHSipPreference(hWnd, SIP_UP);
+			if( GetNHApp()->bUseSIP ) SHSipPreference(hWnd, SIP_UP);
 		break;
 		case BN_KILLFOCUS:
-			SHSipPreference(hWnd, SIP_DOWN);
+			if( GetNHApp()->bUseSIP ) SHSipPreference(hWnd, SIP_DOWN);
 		break;
 		}
 	return;
@@ -493,28 +512,22 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	{
 		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
 		HWND   text_view;
-		TCHAR	wbuf[BUFSZ];
-		size_t text_size;
 
 		if( data->type!=MENU_TYPE_TEXT )
 			SetMenuType(hWnd, MENU_TYPE_TEXT);
 
 		if( !data->text.text ) {
-			text_size = strlen(msg_data->text) + 4;
-			data->text.text = (TCHAR*)malloc(text_size*sizeof(data->text.text[0]));
-			ZeroMemory(data->text.text, text_size*sizeof(data->text.text[0]));
-		} else {
-			text_size = _tcslen(data->text.text) + strlen(msg_data->text) + 4;
-			data->text.text = (TCHAR*)realloc(data->text.text, text_size*sizeof(data->text.text[0]));
+			data->text.text = mswin_init_text_buffer(
+						program_state.gameover? FALSE : GetNHApp()->bWrapText
+					);
+			if( !data->text.text ) break;
 		}
-		if( !data->text.text ) break;
 		
-		_tcscat(data->text.text, NH_A2W(msg_data->text, wbuf, BUFSZ)); 
-		_tcscat(data->text.text, TEXT("\r\n"));
+		mswin_add_text(data->text.text, msg_data->attr, msg_data->text); 
 		
 		text_view = GetDlgItem(hWnd, IDC_MENU_TEXT);
 		if( !text_view ) panic("cannot get text view window");
-		SetWindowText(text_view, data->text.text);
+		mswin_render_text(data->text.text, text_view);
 	} break;
 
 	case MSNH_MSG_STARTMENU:
@@ -661,6 +674,12 @@ void LayoutMenu(HWND hWnd)
 	sz_elem.cx = (clrt.right - clrt.left) - 2*MENU_MARGIN;
 	sz_elem.cy = min(pt_cancel.y, pt_ok.y) - MENU_MARGIN - pt_elem.y;
 	MoveWindow(GetMenuControl(hWnd), pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
+
+	/* reformat text for the text menu */
+	if(	data && 
+		data->type==MENU_TYPE_TEXT &&
+		data->text.text )
+		mswin_render_text(data->text.text, GetMenuControl(hWnd));
 }
 
 void SetMenuType(HWND hWnd, int type)
@@ -1136,10 +1155,12 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	case MENU_SEARCH:
 	    if( data->how==PICK_ANY || data->how==PICK_ONE ) {
 			char buf[BUFSZ];
+			int  selected_item;
 			
 			reset_menu_count(hwndList, data);
 			mswin_getlin("Search for:", buf);
 			if (!*buf || *buf == '\033') return -2;
+			selected_item = -1;
 			for(i=0; i<data->menu.size; i++ ) {
 				if( NHMENU_IS_SELECTABLE(data->menu.items[i])
 					&& strstr(data->menu.items[i].str, buf) ) {
@@ -1150,6 +1171,8 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 							i, 
 							NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
 						);
+						/* save the first item - we will move focus to it */
+						if( selected_item == -1 ) selected_item = i;
 					} else if( data->how == PICK_ONE ) {
 						SelectMenuItem(
 							hwndList, 
@@ -1157,12 +1180,16 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 							i, 
 							-1
 						);
-						ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
-						ListView_EnsureVisible(hwndList, i, FALSE);
+						selected_item = i;
 						break;
 					}
 				}
 			} 
+
+			if( selected_item>0 ) {
+				ListView_SetItemState(hwndList, selected_item, LVIS_FOCUSED, LVIS_FOCUSED);
+				ListView_EnsureVisible(hwndList, selected_item, FALSE);
+			}
 		} else {
 			mswin_nhbell();
 	    }
@@ -1353,14 +1380,8 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 			}
 			SelectObject(hdc, saveFont);
 		} else {
-			/* Calculate the width of the text box. */
-			RECT text_rt;
-			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
-			GetTextMetrics(hdc, &tm);
-			SetRect(&text_rt, 0, 0, sz->cx, sz->cy);
-			DrawText(hdc, data->text.text, _tcslen(data->text.text), &text_rt, DT_CALCRECT | DT_TOP | DT_LEFT | DT_NOPREFIX);
-			sz->cx = max(sz->cx, text_rt.right - text_rt.left + 5*tm.tmAveCharWidth + tm.tmOverhang);
-			SelectObject(hdc, saveFont);
+			/* do not change size for text output - the text will be formatted to
+			   fit any window */
 		}
 		sz->cx += extra_cx;
 

@@ -47,16 +47,19 @@ static COLORREF nhcolor_to_RGB(int c);
 HWND mswin_init_map_window () {
 	static int run_once = 0;
 	HWND ret;
+	DWORD styles;
 
 	if( !run_once ) {
 		register_map_window_class();
 		run_once = 1;
 	}
 	
+	styles = WS_CHILD | WS_CLIPSIBLINGS;
+	if( !GetNHApp()->bHideScrollBars ) styles |= WS_HSCROLL | WS_VSCROLL;
 	ret = CreateWindow(
 			szNHMapWindowClass,		/* registered class name */
 			NULL,					/* window name */
-			WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPSIBLINGS, /* window style */
+			styles, /* window style */
 			0,  /* horizontal position of window - set it later */
 			0,  /* vertical position of window - set it later */
 			0,  /* window width - set it later */
@@ -118,13 +121,15 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 		data->xPos = max(0, min(COLNO-data->xPageSize+1, u.ux - data->xPageSize/2));
 	}
 
-    si.cbSize = sizeof(si); 
-    si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
-    si.nMin   = 0; 
-    si.nMax   = COLNO; 
-    si.nPage  = data->xPageSize; 
-    si.nPos   = data->xPos; 
-    SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
+	if( !GetNHApp()->bHideScrollBars ) {
+		si.cbSize = sizeof(si); 
+		si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
+		si.nMin   = 0; 
+		si.nMax   = COLNO; 
+		si.nPage  = data->xPageSize; 
+		si.nPos   = data->xPos; 
+		SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
+	}
 
 	/* adjust vertical scroll bar */
 	if( data->bFitToScreenMode )
@@ -140,13 +145,15 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 		data->yPos = max(0, min(ROWNO-data->yPageSize+1, u.uy - data->yPageSize/2));
 	}
 
-    si.cbSize = sizeof(si); 
-    si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
-    si.nMin   = 0; 
-    si.nMax   = ROWNO; 
-    si.nPage  = data->yPageSize; 
-    si.nPos   = data->yPos; 
-    SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+	if( !GetNHApp()->bHideScrollBars ) {
+		si.cbSize = sizeof(si); 
+		si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
+		si.nMin   = 0; 
+		si.nMax   = ROWNO; 
+		si.nPage  = data->yPageSize; 
+		si.nPos   = data->yPos; 
+		SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+	}
 
 	/* create font */
 	if( data->hMapFont ) DeleteObject(data->hMapFont);
@@ -733,10 +740,12 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
             (CONST RECT *) NULL, (CONST RECT *) NULL, 
             (HRGN) NULL, (LPRECT) NULL, SW_INVALIDATE | SW_ERASE); 
 
-    si.cbSize = sizeof(si); 
-    si.fMask  = SIF_POS; 
-    si.nPos   = data->yPos; 
-    SetScrollInfo(hWnd, SB_VERT, &si, TRUE); 
+	if( !GetNHApp()->bHideScrollBars ) {
+		si.cbSize = sizeof(si); 
+		si.fMask  = SIF_POS; 
+		si.nPos   = data->yPos; 
+		SetScrollInfo(hWnd, SB_VERT, &si, TRUE); 
+	}
 }
 
 /* on WM_HSCROLL */
@@ -791,11 +800,12 @@ void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
             (CONST RECT *) NULL, (CONST RECT *) NULL, 
             (HRGN) NULL, (LPRECT) NULL, SW_INVALIDATE | SW_ERASE); 
 
-
-    si.cbSize = sizeof(si); 
-    si.fMask  = SIF_POS; 
-    si.nPos   = data->xPos; 
-    SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
+	if( !GetNHApp()->bHideScrollBars ) {
+		si.cbSize = sizeof(si); 
+		si.fMask  = SIF_POS; 
+		si.nPos   = data->xPos; 
+		SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
+	}
 }
 
 /* map nethack map coordinates to the screen location */

@@ -175,17 +175,24 @@ vmsmisc.c       vmstty.c        vmsunix.c
 
 sys/wince:
 (files for Windows CE and PocketPC)
-Install.ce      assert.h        bootstrp.mak    celib.c         cesetup.bat
-cesound.c       defaults.nh     errno.h         fcntl.h         hpc.vcp
-keypad.uu       mhaskyn.c       mhaskyn.h       mhcmd.c         mhcmd.h
-mhcolor.c       mhcolor.h       mhdlg.c         mhdlg.h         mhfont.c
-mhfont.h        mhinput.c       mhinput.h       mhmain.c        mhmain.h
-mhmap.c         mhmap.h         mhmenu.c        mhmenu.h        mhmsg.h
-mhmsgwnd.c      mhmsgwnd.h      mhrip.c         mhrip.h         mhstatus.c
-mhstatus.h      mhtext.c        mhtext.h        mswproc.c       newres.h
-palmpc.vcp      pocketpc.vcp    resource.h      smartphn.vcp    stat.h
-winMS.h         wince.vcw       winhack.c       winhack.rc      winhcksp.rc
-winmain.c
+Install.ce      bootstrp.mak    celib.c         cesetup.bat     cesound.c
+defaults.nh     hpc.vcp         menubar.uu      keypad.uu       mhaskyn.c
+mhaskyn.h       mhcmd.c         mhcmd.h         mhcolor.c       mhcolor.h
+mhdlg.c         mhdlg.h         mhfont.c        mhfont.h        mhinput.c
+mhinput.h       mhmain.c        mhmain.h        mhmap.c         mhmap.h
+mhmenu.c        mhmenu.h        mhmsg.h         mhmsgwnd.c      mhmsgwnd.h
+mhrip.c         mhrip.h         mhstatus.c      mhstatus.h      mhtext.c
+mhtext.h        mhtxtbuf.c      mhtxtbuf.h      mswproc.c       newres.h
+palmpc.vcp      pocketpc.vcp    resource.h      smartphn.vcp    winMS.h
+wince.vcw       winhack.c       winhack.rc      winhcksp.rc     winmain.c
+
+sys/wince/ceinc:
+(header files for Windows CE and PocketPC)
+assert.h        errno.h         fcntl.h
+
+sys/wince/ceinc/sys:
+(sys/stat.h for Windows CE and PocketPC)
+stat.h
 
 sys/winnt:
 (files for Windows 9x, NT and Windows2000 version)

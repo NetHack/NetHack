@@ -31,8 +31,7 @@ From a Windows explorer window:
 
 A "wince" directory will be created off the top of the NetHack source
 tree, and a Microsoft embedded C workspace file will be placed in the
-top of the NetHack source tree.  The "wince" directory will also have
-the subdirectories wince\ceinc and wince\ceinc\sys.
+top of the NetHack source tree. 
 
 ------------
 | BUILDING |

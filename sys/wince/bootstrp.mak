@@ -234,7 +234,7 @@ all :	$(INCL)\date.h	$(INCL)\onames.h $(INCL)\pm.h \
 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB) $(SRC)\tile.c \
 	$(SWINCE)\nethack.ico $(SWINCE)\tiles.bmp $(SWINCE)\mnsel.bmp \
 	$(SWINCE)\mnunsel.bmp $(SWINCE)\petmark.bmp $(SWINCE)\mnselcnt.bmp \
-	$(SWINCE)\keypad.bmp
+	$(SWINCE)\keypad.bmp $(SWINCE)\menubar.bmp
 	@echo Done!
 
 $(O)sp_lev.tag:  $(DAT)\bigroom.des  $(DAT)\castle.des \
@@ -370,6 +370,11 @@ $(SWINCE)\splash.bmp: $(U)uudecode.exe $(SWINCE)\splash.uu
 $(SWINCE)\keypad.bmp: $(U)uudecode.exe $(SWINCE)\keypad.uu
 	chdir $(SWINCE)
 	..\util\uudecode.exe keypad.uu
+	chdir $(WINCE)
+
+$(SWINCE)\menubar.bmp: $(U)uudecode.exe $(SWINCE)\menubar.uu
+	chdir $(SWINCE)
+	..\util\uudecode.exe menubar.uu
 	chdir $(WINCE)
 
 #==========================================
