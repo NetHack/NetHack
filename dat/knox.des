@@ -1,0 +1,104 @@
+#	SCCS Id: @(#)knox.des	3.3	94/08/20
+#	Copyright (c) 1989 by Jean-Christophe Collet
+#	Copyright (c) 1992 by Izchak Miller
+# NetHack may be freely redistributed.  See license for details.
+#
+MAZE:"knox",' '
+FLAGS: noteleport
+GEOMETRY:center,center
+MAP
+----------------------------------------------------------------------------
+| |........|...............................................................|
+| |........|.................................................------------..|
+| -------+--.................................................|..........|..|
+|       |........}}}}}}}....................}}}}}}}..........|..........|..|
+|       |........}-----}....................}-----}..........--+--+--...|..|
+|     ---........}|...|}}}}}}}}}}}}}}}}}}}}}}|...|}.................|...|..|
+|     |..........}---S------------------------S---}.................|...|..|
+|     |..........}}}|...............|..........|}}}.................+...|..|
+| -------..........}|...............S..........|}...................|...|..|
+| |.....|..........}|...............|......\...S}...................|...|..|
+| |.....+........}}}|...............|..........|}}}.................+...|..|
+| |.....|........}---S------------------------S---}.................|...|..|
+| |.....|........}|...|}}}}}}}}}}}}}}}}}}}}}}|...|}.................|...|..|
+| |..-S----......}-----}....................}-----}..........--+--+--...|..|
+| |..|....|......}}}}}}}....................}}}}}}}..........|..........|..|
+| |..|....|..................................................|..........|..|
+| -----------................................................------------..|
+|           |..............................................................|
+----------------------------------------------------------------------------
+ENDMAP
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,19)
+# Portal arrival point
+BRANCH:(08,16,08,16),(0,0,0,0)
+#   Throne room, with Croesus on the throne
+REGION:(37,08,46,11),lit,"throne"
+MONSTER:'@',"Croesus",(43,10),hostile
+#   The Vault
+#   Using unfilled morgue for
+#   identification in mkmaze.c
+REGION:(21,08,35,11),lit,"morgue",unfilled
+#   Corner towers
+REGION:(19,06,21,06),lit,"ordinary"
+REGION:(46,06,48,06),lit,"ordinary"
+REGION:(19,13,21,13),lit,"ordinary"
+REGION:(46,13,48,13),lit,"ordinary"
+#   A welcoming committee
+REGION:(03,10,07,13),lit,"zoo",filled,true
+#   arrival chamber; needs to be a real room to control migrating monsters,
+#   and `unfilled' is a kludge to force an ordinary room to remain a room
+REGION:(06,15,09,16),unlit,"ordinary",unfilled
+#   Barracks
+REGION:(62,03,71,04),lit,"barracks",filled,true
+# Doors
+DOOR:closed,(06,14)
+DOOR:closed,(09,03)
+DOOR:open,(63,05)
+DOOR:open,(66,05)
+DOOR:open,(68,08)
+DOOR:locked,(08,11)
+DOOR:open,(68,11)
+DOOR:closed,(63,14)
+DOOR:closed,(66,14)
+# Soldiers guarding the fort
+MONSTER:'@',"soldier",(12,14)
+MONSTER:'@',"soldier",(12,13)
+MONSTER:'@',"soldier",(11,10)
+MONSTER:'@',"soldier",(13,02)
+MONSTER:'@',"soldier",(14,03)
+MONSTER:'@',"soldier",(20,02)
+MONSTER:'@',"soldier",(30,02)
+MONSTER:'@',"soldier",(40,02)
+MONSTER:'@',"soldier",(30,16)
+MONSTER:'@',"soldier",(32,16)
+MONSTER:'@',"soldier",(40,16)
+MONSTER:'@',"soldier",(54,16)
+MONSTER:'@',"soldier",(54,14)
+MONSTER:'@',"soldier",(54,13)
+MONSTER:'@',"soldier",(57,10)
+MONSTER:'@',"soldier",(57,09)
+MONSTER:'@',"lieutenant",(15,08)
+# Four dragons guarding each side
+MONSTER:'D',random,(18,09)
+MONSTER:'D',random,(49,10)
+MONSTER:'D',random,(33,05)
+MONSTER:'D',random,(33,14)
+# Eels in the moat
+MONSTER:';',"giant eel",(17,08)
+MONSTER:';',"giant eel",(17,11)
+MONSTER:';',"giant eel",(48,08)
+MONSTER:';',"giant eel",(48,11)
+# The corner rooms treasures
+OBJECT:'*',"diamond",(19,06)
+OBJECT:'*',"diamond",(20,06)
+OBJECT:'*',"diamond",(21,06)
+OBJECT:'*',"emerald",(19,13)
+OBJECT:'*',"emerald",(20,13)
+OBJECT:'*',"emerald",(21,13)
+OBJECT:'*',"ruby",(46,06)
+OBJECT:'*',"ruby",(47,06)
+OBJECT:'*',"ruby",(48,06)
+OBJECT:'*',"amethyst",(46,13)
+OBJECT:'*',"amethyst",(47,13)
+OBJECT:'*',"amethyst",(48,13)
