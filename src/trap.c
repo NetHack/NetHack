@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2002/04/06	*/
+/*	SCCS Id: @(#)trap.c	3.4	2002/05/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1950,12 +1950,12 @@ struct monst *mon;
 boolean byplayer;
 {
 	if (resists_ston(mon)) return;
-	if (cansee(mon->mx, mon->my))
-		pline("%s turns to stone.", Monnam(mon));
 	if (poly_when_stoned(mon->data)) {
 		mon_to_stone(mon);
 		return;
 	}
+	if (cansee(mon->mx, mon->my))
+		pline("%s turns to stone.", Monnam(mon));
 	if (byplayer) {
 		stoned = TRUE;
 		xkilled(mon,0);
