@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2003/05/07	*/
+/*	SCCS Id: @(#)shk.c	3.4	2003/08/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,6 +56,7 @@ STATIC_DCL boolean FDECL(inherits, (struct monst *,int,int));
 STATIC_DCL void FDECL(set_repo_loc, (struct eshk *));
 STATIC_DCL boolean NDECL(angry_shk_exists);
 STATIC_DCL void FDECL(rile_shk, (struct monst *));
+STATIC_DCL void FDECL(rouse_shk, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(remove_damage, (struct monst *, BOOLEAN_P));
 STATIC_DCL void FDECL(sub_one_frombill, (struct obj *, struct monst *));
 STATIC_DCL void FDECL(add_one_tobill, (struct obj *, BOOLEAN_P));
@@ -950,6 +951,23 @@ register struct monst *shkp;
 	}
 }
 
+/* wakeup and/or unparalyze shopkeeper */
+STATIC_OVL void
+rouse_shk(shkp, verbosely)
+struct monst *shkp;
+boolean verbosely;
+{
+	if (!shkp->mcanmove) {
+	    /* greed induced recovery... */
+	    if (verbosely && canspotmon(shkp))
+		pline("%s %s.", Monnam(shkp),
+		      shkp->msleeping ? "wakes up" : "can move again");
+	    shkp->msleeping = 0;
+	    shkp->mfrozen = 0;
+	    shkp->mcanmove = 1;
+	}
+}
+
 void
 make_happy_shk(shkp, silentkops)
 register struct monst *shkp;
@@ -1170,15 +1188,18 @@ dopay()
 		return(0);
 	}
 proceed:
+	eshkp = ESHK(shkp);
+	ltmp = eshkp->robbed;
 
-	if (shkp->msleeping || !shkp->mcanmove) {
+	/* wake sleeping shk when someone who owes money offers payment */
+	if (ltmp || eshkp->billct || eshkp->debit) 
+	    rouse_shk(shkp, TRUE);
+
+	if (!shkp->mcanmove) {	    /* still asleep or paralyzed */
 		pline("%s %s.", Monnam(shkp),
 		      rn2(2) ? "seems to be napping" : "doesn't respond");
 		return 0;
 	}
-	eshkp = ESHK(shkp);
-
-	ltmp = eshkp->robbed;
 
 	if(shkp != resident && NOTANGRY(shkp)) {
 #ifdef GOLDOBJ
@@ -1623,14 +1644,15 @@ int croaked;
 
 	/* the simplifying principle is that first-come */
 	/* already took everything you had.		*/
-	if(numsk > 1) {
-	    if(cansee(shkp->mx, shkp->my) && croaked)
-		pline("%s %slooks at your corpse%s%s", Monnam(shkp),
-		     (shkp->msleeping || !shkp->mcanmove) ?
-				   "wakes up, " : "",
-		     !rn2(2) ? (shkp->female ? ", shakes her head," :
-				 ", shakes his head,") : "",
-		     !inhishop(shkp) ? " and disappears. " : " and sighs.");
+	if (numsk > 1) {
+	    if (cansee(shkp->mx, shkp->my && croaked))
+		pline("%s %slooks at your corpse%s and %s.",
+		      Monnam(shkp),
+		      !shkp->mcanmove ? "wakes up, " : "",
+		      !rn2(2) ? (shkp->female ? ", shakes her head," :
+			   ", shakes his head,") : "",
+		      !inhishop(shkp) ? "disappears" : "sighs");
+	    rouse_shk(shkp, FALSE);	/* wake shk for bones */    
 	    taken = (roomno == eshkp->shoproom);
 	    goto skip;
 	}
@@ -1662,7 +1684,7 @@ int croaked;
                 umoney = money_cnt(invent);
 #endif
 		takes[0] = '\0';
-		if (shkp->msleeping || !shkp->mcanmove)
+		if (!shkp->mcanmove)
 			Strcat(takes, "wakes up and ");
 		if (distu(shkp->mx, shkp->my) > 2)
 			Strcat(takes, "comes and ");
@@ -1707,7 +1729,7 @@ int croaked;
 		}
 skip:
 		/* in case we create bones */
-		shkp->msleeping = 0;
+		rouse_shk(shkp, FALSE);	/* wake up */
 		if (!inhishop(shkp))
 			home_shk(shkp, FALSE);
 	}
@@ -2565,23 +2587,7 @@ xchar x, y;
 	}
 
 	/* you dropped something of your own - probably want to sell it */
-	if (shkp->msleeping || !shkp->mcanmove) {
-		if (container)
-		    dropped_container(obj, shkp, TRUE);
-		if (!obj->unpaid)
-		    obj->no_charge = 1;
-		if (shkp->msleeping) {
-		    if(!rn2(3))
-			pline("%s snores indifferently.", Monnam(shkp));
-		} else {
-		    if(ANGRY(shkp) && !rn2(4))
-			pline("%s utters a curse.", Monnam(shkp));
-		    else pline("%s is indisposed.", Monnam(shkp));
-		}
-		subfrombill(obj, shkp);
-		return;
-	}
-
+	rouse_shk(shkp, TRUE);	/* wake up sleeping or paralyzed shk */
 	eshkp = ESHK(shkp);
 
 	if (ANGRY(shkp)) { /* they become shop-objects, no pay */
