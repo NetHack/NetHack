@@ -294,6 +294,7 @@ panic VA_DECL(const char *, str)
 	    char buf[BUFSZ];
 	    Vsprintf(buf,str,VA_ARGS);
 	    raw_print(buf);
+	    paniclog("panic", buf);
 	}
 #if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32))
 	if (wizard)

@@ -248,6 +248,11 @@ void
 impossible VA_DECL(const char *, s)
 	VA_START(s);
 	VA_INIT(s, const char *);
+	{
+	    char pbuf[BUFSZ];
+	    Vsprintf(pbuf,s,VA_ARGS);
+	    paniclog("impossible", s);
+	}
 	vpline(s,VA_ARGS);
 	pline("Program in disorder - perhaps you'd better #quit.");
 	VA_END();

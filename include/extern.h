@@ -638,6 +638,7 @@ E void FDECL(check_recordfile, (const char *));
 #if defined(WIZARD)
 E void NDECL(read_wizkit);
 #endif
+E void FDECL(paniclog, (const char *, const char *));
 
 /* ### fountain.c ### */
 

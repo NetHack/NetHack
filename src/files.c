@@ -1782,4 +1782,26 @@ const char *dir;
 
 /* ----------  END SCOREBOARD CREATION ----------- */
 
+/* ----------  BEGIN PANIC/IMPOSSIBLE LOG ----------- */
+
+/*ARGSUSED*/
+void
+paniclog(why, s)
+const char* why;
+const char* s;
+{
+#ifdef PANICLOG
+	FILE *lfile;
+
+	lfile = fopen_datafile(PANICLOG, "a", TRUE);
+	if (lfile) {
+	    (void) fprintf(lfile, "%08ld: %s %s\n",
+			   yyyymmdd((time_t)0L), why, s);
+	    (void) fclose(lfile);
+	}
+#endif /* PANICLOG */
+}
+
+/* ----------  END PANIC/IMPOSSIBLE LOG ----------- */
+
 /*files.c*/

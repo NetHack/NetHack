@@ -131,9 +131,10 @@
 
 /*
  * Section 2:	Some global parameters and filenames.
- *		Commenting out WIZARD, LOGFILE, or NEWS removes that feature
- *		from the game; otherwise set the appropriate wizard name.
- *		LOGFILE and NEWS refer to files in the playground.
+ *		Commenting out WIZARD, LOGFILE, NEWS or PANICLOG removes that
+ *		feature from the game; otherwise set the appropriate wizard
+ *		name.  LOGFILE, NEWS and PANICLOG refer to files in the
+ *		playground.
  */
 
 #ifndef WIZARD		/* allow for compile-time or Makefile changes */
@@ -147,6 +148,7 @@
 
 #define LOGFILE "logfile"	/* larger file for debugging purposes */
 #define NEWS "news"		/* the file containing the latest hack news */
+#define PANICLOG "paniclog"	/* log of panic and impossible events */
 
 /*
  *	If COMPRESS is defined, it should contain the full path name of your
