@@ -315,6 +315,18 @@ struct obj *obj;
     if (((index(valid_menu_classes,'u') != (char *)0) && obj->unpaid) ||
 	(index(valid_menu_classes, obj->oclass) != (char *)0))
 	return TRUE;
+    else if (((index(valid_menu_classes,'U') != (char *)0) &&
+	(obj->oclass != GOLD_CLASS && obj->bknown && !obj->blessed && !obj->cursed)))
+	return TRUE;
+    else if (((index(valid_menu_classes,'B') != (char *)0) &&
+	(obj->oclass != GOLD_CLASS && obj->bknown && obj->blessed)))
+	return TRUE;
+    else if (((index(valid_menu_classes,'C') != (char *)0) &&
+	(obj->oclass != GOLD_CLASS && obj->bknown && obj->cursed)))
+	return TRUE;
+    else if (((index(valid_menu_classes,'X') != (char *)0) &&
+	(obj->oclass != GOLD_CLASS && !obj->bknown)))
+	return TRUE;
     else
 	return FALSE;
 }
@@ -830,28 +842,29 @@ int how;			/* type of query */
 		any.a_void = 0;
 		any.a_int = 'B';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-			"Auto-select blessed items", MENU_UNSELECTED);
+			"items known to be Blessed", MENU_UNSELECTED);
 	}
 	if (do_cursed) {
 		invlet = 'C';
 		any.a_void = 0;
 		any.a_int = 'C';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-			"Auto-select cursed items", MENU_UNSELECTED);
+			"items known to be Cursed", MENU_UNSELECTED);
 	}
 	if (do_uncursed) {
 		invlet = 'U';
 		any.a_void = 0;
 		any.a_int = 'U';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-			"Auto-select known uncursed items", MENU_UNSELECTED);
+			"items known to be Uncursed", MENU_UNSELECTED);
 	}
 	if (do_buc_unknown) {
 		invlet = 'X';
 		any.a_void = 0;
 		any.a_int = 'X';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-			"Auto-select un-b/u/c known items", MENU_UNSELECTED);
+			"items of unknown B/C/U status",
+			MENU_UNSELECTED);
 	}
 	end_menu(win, qstr);
 	n = select_menu(win, how, pick_list);
@@ -2120,13 +2133,16 @@ boolean put_in;
     menu_item *pick_list;
     int mflags, res;
     long count;
+    boolean all_blessed, all_cursed, all_uncursed, all_buc_unknown;
 
+    all_blessed = all_cursed = all_uncursed = all_buc_unknown = FALSE;
     if (retry) {
 	all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
 	all_categories = FALSE;
 	Sprintf(buf,"%s what type of objects?", put_in ? putin : takeout);
-	mflags = put_in ? ALL_TYPES : ALL_TYPES|CHOOSE_ALL;
+	mflags = put_in ? ALL_TYPES | BUC_ALLBKNOWN | BUC_UNKNOWN :
+		          ALL_TYPES | CHOOSE_ALL | BUC_ALLBKNOWN | BUC_UNKNOWN;
 	n = query_category(buf, put_in ? invent : container->cobj,
 			   mflags, &pick_list, PICK_ANY);
 	if (!n) return 0;

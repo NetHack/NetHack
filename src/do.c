@@ -643,14 +643,6 @@ int retry;
 		all_categories = TRUE;
 	    else if (pick_list[i].item.a_int == 'A')
 		drop_everything = TRUE;
-	    else if (pick_list[i].item.a_int == 'B')
-		drop_blessed = TRUE;
-	    else if (pick_list[i].item.a_int == 'C')
-		drop_cursed = TRUE;
-	    else if (pick_list[i].item.a_int == 'U')
-		drop_uncursed = TRUE;
-	    else if (pick_list[i].item.a_int == 'X')
-		drop_buc_unknown = TRUE;
 	    else
 		add_valid_menu_class(pick_list[i].item.a_int);
 	}
@@ -671,35 +663,6 @@ int retry;
 	for(otmp = invent; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
 	    n_dropped += drop(otmp);
-	}
-    } else if (drop_blessed) {
-	for(otmp = invent; otmp; otmp = otmp2) {
-	    /* zw, gold is never blessed or cursed */
-	    otmp2 = otmp->nobj;
-	    if (otmp->oclass != GOLD_CLASS && otmp->bknown && otmp->blessed)
-		n_dropped += drop(otmp);
-	}
-    } else if (drop_cursed) {
-	for(otmp = invent; otmp; otmp = otmp2) {
-	    /* zw, gold is never blessed or cursed */
-	    otmp2 = otmp->nobj;
-	    if (otmp->oclass != GOLD_CLASS && otmp->bknown && otmp->cursed)
-		n_dropped += drop(otmp);
-	}
-    } else if (drop_uncursed) {
-	for(otmp = invent; otmp; otmp = otmp2) {
-	    /* zw, gold is never blessed or cursed */
-	    otmp2 = otmp->nobj;
-	    if (otmp->oclass != GOLD_CLASS &&
-		    otmp->bknown && !otmp->blessed && !otmp->cursed)
-		n_dropped += drop(otmp);
-	}
-    } else if (drop_buc_unknown) {
-	for(otmp = invent; otmp; otmp = otmp2) {
-	    /* zw, gold is never blessed or cursed */
-	    otmp2 = otmp->nobj;
-	    if (otmp->oclass != GOLD_CLASS && !otmp->bknown)
-		n_dropped += drop(otmp);
 	}
     } else {
 	/* should coordinate with perm invent, maybe not show worn items */
