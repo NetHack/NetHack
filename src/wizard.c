@@ -341,21 +341,25 @@ tactics(mtmp)
 		    return(0);
 		}
 		if(where == STRAT_GROUND) {
-		  if(!MON_AT(tx, ty) || (mtmp->mx == tx && mtmp->my == ty)) {
-		    /* teleport to it and pick it up */
-		    rloc_to(mtmp, tx, ty);	/* clean old pos */
+		    if(!MON_AT(tx, ty) || (mtmp->mx == tx && mtmp->my == ty)) {
+			/* teleport to it and pick it up */
+			rloc_to(mtmp, tx, ty);	/* clean old pos */
 
-		    if ((otmp = on_ground(which_arti(targ))) != 0) {
-			if (cansee(mtmp->mx, mtmp->my))
-			    pline("%s picks up %s.",
-				  Monnam(mtmp),
-				  (distu(mtmp->my, mtmp->my) <= 5) ?
-				    doname(otmp) : distant_name(otmp, doname));
-			obj_extract_self(otmp);
-			(void) mpickobj(mtmp, otmp);
-			return(1);
-		    } else return(0);
-		  }
+			if ((otmp = on_ground(which_arti(targ))) != 0) {
+			    if (cansee(mtmp->mx, mtmp->my))
+				pline("%s picks up %s.",
+				    Monnam(mtmp),
+				    (distu(mtmp->my, mtmp->my) <= 5) ?
+				     doname(otmp) : distant_name(otmp, doname));
+			    obj_extract_self(otmp);
+			    (void) mpickobj(mtmp, otmp);
+			    return(1);
+			} else return(0);
+		    } else {
+			/* a monster is standing on it - cause some trouble */
+			if (!rn2(5)) mnexto(mtmp);
+			return(0);
+		    }
 	        } else { /* a monster has it - 'port beside it. */
 		    (void) mnearto(mtmp, tx, ty, TRUE);
 		    return(0);
