@@ -126,7 +126,7 @@ unsigned *ospecial;
 #ifdef ROGUE_COLOR
 	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color) {
 	    switch(objects[offset].oc_class) {
-		case GOLD_CLASS: color = CLR_YELLOW; break;
+		case COIN_CLASS: color = CLR_YELLOW; break;
 		case FOOD_CLASS: color = CLR_RED; break;
 		default: color = CLR_BRIGHT_BLUE; break;
 	    }

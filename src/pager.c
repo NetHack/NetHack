@@ -212,7 +212,7 @@ lookat(x, y, buf, monbuf)
 	if (!otmp || otmp->otyp != glyph_to_obj(glyph)) {
 	    if (glyph_to_obj(glyph) != STRANGE_OBJECT) {
 		otmp = mksobj(glyph_to_obj(glyph), FALSE, FALSE);
-		if (otmp->oclass == GOLD_CLASS)
+		if (otmp->oclass == COIN_CLASS)
 		    otmp->quan = 2L; /* to force pluralization */
 		else if (otmp->otyp == SLIME_MOLD)
 		    otmp->spe = current_fruit;	/* give the fruit a type */

@@ -254,7 +254,7 @@ bot2()
 	if(hp < 0) hp = 0;
 	(void) describe_level(newbot2);
 	Sprintf(nb = eos(newbot2),
-		"%c:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d", oc_syms[GOLD_CLASS],
+		"%c:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d", oc_syms[COIN_CLASS],
 #ifndef GOLDOBJ
 		u.ugold,
 #else

@@ -1837,7 +1837,7 @@ struct obj *tstone;
     const char *streak_color;
     char stonebuf[QBUFSZ];
     static const char scritch[] = "\"scritch, scritch\"";
-    static char allowall[3] = { GOLD_CLASS, ALL_CLASSES, 0 };
+    static char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
 #ifndef GOLDOBJ
     struct obj goldobj;
 #endif
@@ -1846,7 +1846,7 @@ struct obj *tstone;
     if ((obj = getobj(allowall, stonebuf)) == 0)
 	return;
 #ifndef GOLDOBJ
-    if (obj->oclass == GOLD_CLASS) {
+    if (obj->oclass == COIN_CLASS) {
 	u.ugold += obj->quan;	/* keep botl up to date */
 	goldobj = *obj;
 	dealloc_obj(obj);

@@ -215,7 +215,7 @@ static struct trobj Wishing[] = {
 };
 #ifdef GOLDOBJ
 static struct trobj Money[] = {
-	{ GOLD_PIECE, 0 , GOLD_CLASS, 1, 0 },
+	{ GOLD_PIECE, 0 , COIN_CLASS, 1, 0 },
 	{ 0, 0, 0, 0, 0 }
 };
 #endif
@@ -980,7 +980,7 @@ register struct trobj *trop;
 		}
 
 #ifdef GOLDOBJ
-		if (trop->trclass == GOLD_CLASS) {
+		if (trop->trclass == COIN_CLASS) {
 			/* no "blessed" or "identified" money */
 			obj->quan = u.umoney0;
 		} else {

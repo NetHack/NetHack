@@ -46,7 +46,7 @@ const struct icp boxiprobs[] = {
 {18, POTION_CLASS},
 {18, SCROLL_CLASS},
 {12, SPBOOK_CLASS},
-{ 7, GOLD_CLASS},
+{ 7, COIN_CLASS},
 { 6, WAND_CLASS},
 { 5, RING_CLASS},
 { 1, AMULET_CLASS}
@@ -175,7 +175,7 @@ struct obj *box;
 		if (!(otmp = mkobj(iprobs->iclass, TRUE))) continue;
 
 		/* handle a couple of special cases */
-		if (otmp->oclass == GOLD_CLASS) {
+		if (otmp->oclass == COIN_CLASS) {
 		    /* 2.5 x level's usual amount; weight adjusted below */
 		    otmp->quan = (long)(rnd(level_difficulty()+2) * rnd(75));
 		    otmp->owt = weight(otmp);
@@ -609,7 +609,7 @@ boolean artif;
 						    mkobj(SPBOOK_CLASS,FALSE));
 		}
 		break;
-	case GOLD_CLASS:
+	case COIN_CLASS:
 		break;	/* do nothing */
 	default:
 		impossible("impossible mkobj %d, sym '%c'.", otmp->otyp,
@@ -830,7 +830,7 @@ register struct obj *obj;
 		return wt;
 	} else if (obj->oclass == FOOD_CLASS && obj->oeaten) {
 		return eaten_stat((int)obj->quan * wt, obj);
-	} else if (obj->oclass == GOLD_CLASS)
+	} else if (obj->oclass == COIN_CLASS)
 		return (int)((obj->quan + 50L) / 100L);
 	else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0)
 		return((int)(obj->owt));	/* kludge for "very" heavy iron ball */

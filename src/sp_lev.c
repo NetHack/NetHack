@@ -945,7 +945,7 @@ struct mkroom	*croom;
 		panic("create_object:  unexpected object class '%c'",c);
 
 	    /* KMH -- Create piles of gold properly */
-	    if (oclass == GOLD_CLASS)
+	    if (oclass == COIN_CLASS)
 		otmp = mkgold(0L, x, y);
 	    else
 		otmp = mkobj_at(oclass, x, y, !named);

@@ -431,7 +431,7 @@ register struct obj *otmp;
     int freed_otmp;
 
 #ifndef GOLDOBJ
-    if (otmp->oclass == GOLD_CLASS) {
+    if (otmp->oclass == COIN_CLASS) {
 	mtmp->mgold += otmp->quan;
 	obfree(otmp, (struct obj *)0);
 	freed_otmp = 1;

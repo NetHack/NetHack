@@ -2088,14 +2088,14 @@ inv_weight()
 	   of invent for easier manipulation by askchain & co, but it's also
 	   retained in u.ugold in order to keep the status line accurate; we
 	   mustn't add its weight in twice under that circumstance */
-	wt = (otmp && otmp->oclass == GOLD_CLASS) ? 0 :
+	wt = (otmp && otmp->oclass == COIN_CLASS) ? 0 :
 		(int)((u.ugold + 50L) / 100L);
 #endif
 	while (otmp) {
 #ifndef GOLDOBJ
 		if (otmp->otyp != BOULDER || !throws_rocks(youmonst.data))
 #else
-		if (otmp->oclass == GOLD_CLASS)
+		if (otmp->oclass == COIN_CLASS)
 			wt += (int)(((long)otmp->quan + 50L) / 100L);
 		else if (otmp->otyp != BOULDER || !throws_rocks(youmonst.data))
 #endif
@@ -2176,7 +2176,7 @@ struct obj *otmp;
 {
         while(otmp) {
 	        /* Must change when silver & copper is implemented: */
- 	        if (otmp->oclass == GOLD_CLASS) return otmp->quan;
+ 	        if (otmp->oclass == COIN_CLASS) return otmp->quan;
   	        otmp = otmp->nobj;
 	}
 	return 0;

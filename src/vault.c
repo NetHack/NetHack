@@ -802,7 +802,7 @@ paygd()
 #else
         for (coins = invent; coins; coins = nextcoins) {
             nextcoins = coins->nobj;
-	    if (objects[coins->otyp].oc_class == GOLD_CLASS) {
+	    if (objects[coins->otyp].oc_class == COIN_CLASS) {
 	        freeinv(coins);
                 place_object(coins, gx, gy);
 		stackobj(coins);

@@ -42,7 +42,7 @@ STATIC_DCL void NDECL(final_level);
 #ifdef OVLB
 
 static NEARDATA const char drop_types[] =
-	{ ALLOW_COUNT, GOLD_CLASS, ALL_CLASSES, 0 };
+	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
 
 /* 'd' command: drop one inventory item */
 int
@@ -224,7 +224,7 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 	/* KMH, conduct */
 	u.uconduct.gnostic++;
 
-	if ((obj->blessed || obj->cursed) && obj->oclass != GOLD_CLASS) {
+	if ((obj->blessed || obj->cursed) && obj->oclass != COIN_CLASS) {
 		There("is %s flash as %s %s the altar.",
 			an(hcolor(obj->blessed ? amber : Black)),
 			doname(obj), otense(obj, "hit"));
@@ -484,10 +484,10 @@ register struct obj *obj;
 	    if (!can_reach_floor()) {
 		if(flags.verbose) You("drop %s.", doname(obj));
 #ifndef GOLDOBJ
-		if (obj->oclass != GOLD_CLASS || obj == invent) freeinv(obj);
+		if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
 #else
 		/* Ensure update when we drop gold objects */
-		if (obj->oclass == GOLD_CLASS) flags.botl = 1;
+		if (obj->oclass == COIN_CLASS) flags.botl = 1;
 		freeinv(obj);
 #endif
 		hitfloor(obj);
@@ -509,10 +509,10 @@ dropx(obj)
 register struct obj *obj;
 {
 #ifndef GOLDOBJ
-	if (obj->oclass != GOLD_CLASS || obj == invent) freeinv(obj);
+	if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
 #else
         /* Ensure update when we drop gold objects */
-        if (obj->oclass == GOLD_CLASS) flags.botl = 1;
+        if (obj->oclass == COIN_CLASS) flags.botl = 1;
         freeinv(obj);
 #endif
 	if (!u.uswallow && ship_object(obj, u.ux, u.uy, FALSE)) return;
@@ -671,7 +671,7 @@ int retry;
 		if (cnt < otmp->quan && !welded(otmp) &&
 			(!otmp->cursed || otmp->otyp != LOADSTONE)) {
 #ifndef GOLDOBJ
-		    if (otmp->oclass == GOLD_CLASS)
+		    if (otmp->oclass == COIN_CLASS)
 			(void) splitobj(otmp, otmp->quan - cnt);
 		    else
 #endif
@@ -685,7 +685,7 @@ int retry;
 
  drop_done:
 #ifndef GOLDOBJ
-    if (u_gold && invent && invent->oclass == GOLD_CLASS) {
+    if (u_gold && invent && invent->oclass == COIN_CLASS) {
 	/* didn't drop [all of] it */
 	u_gold = invent;
 	invent = u_gold->nobj;

@@ -101,7 +101,7 @@ register int otyp;
 	if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp))
 		actualn = Japanese_item_name(otyp);
 	switch(ocl->oc_class) {
-	case GOLD_CLASS:
+	case COIN_CLASS:
 		Strcpy(buf, "coin");
 		break;
 	case POTION_CLASS:
@@ -342,7 +342,7 @@ register struct obj *obj;
 			Sprintf(eos(buf), " of %s meat", mons[obj->corpsenm].mname);
 		}
 		break;
-	    case GOLD_CLASS:
+	    case COIN_CLASS:
 	    case CHAIN_CLASS:
 		Strcpy(buf, actualn);
 		break;
@@ -572,7 +572,7 @@ register struct obj *obj;
 #endif
 
 	if (obj->bknown &&
-	    obj->oclass != GOLD_CLASS &&
+	    obj->oclass != COIN_CLASS &&
 	    (obj->otyp != POT_WATER || !objects[POT_WATER].oc_name_known
 		|| (!obj->cursed && !obj->blessed))) {
 	    /* allow 'blessed clear potion' if we don't know it's holy water;

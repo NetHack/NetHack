@@ -1896,7 +1896,7 @@ register boolean unpaid_only;
 
 	/* the price of contained objects */
 	for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-	    if (otmp->oclass == GOLD_CLASS) continue;
+	    if (otmp->oclass == COIN_CLASS) continue;
 	    /* the "top" container is evaluated by caller */
 	    if (usell) {
 		if (saleable(shkp, otmp) &&
@@ -1926,7 +1926,7 @@ register struct obj *obj;
 
 	/* accumulate contained gold */
 	for (otmp = obj->cobj; otmp; otmp = otmp->nobj)
-	    if (otmp->oclass == GOLD_CLASS)
+	    if (otmp->oclass == COIN_CLASS)
 		value += otmp->quan;
 	    else if (Has_contents(otmp))
 		value += contained_gold(otmp);
@@ -1944,7 +1944,7 @@ register boolean sale;
 
 	/* the "top" container is treated in the calling fn */
 	for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-	    if (otmp->oclass == GOLD_CLASS) continue;
+	    if (otmp->oclass == COIN_CLASS) continue;
 
 	    if (!otmp->unpaid && !(sale && saleable(shkp, otmp)))
 		otmp->no_charge = 1;
@@ -1962,7 +1962,7 @@ register struct obj *obj;
 
 	/* the "top" container is treated in the calling fn */
 	for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-	    if (otmp->oclass == GOLD_CLASS) continue;
+	    if (otmp->oclass == COIN_CLASS) continue;
 
 	    if (otmp->no_charge)
 		otmp->no_charge = 0;
@@ -2097,7 +2097,7 @@ register struct monst *shkp;
 	register struct obj *otmp;
 
 	for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-		if (otmp->oclass == GOLD_CLASS) continue;
+		if (otmp->oclass == COIN_CLASS) continue;
 
 		/* the "top" box is added in addtobill() */
 		if (!otmp->no_charge)
@@ -2170,7 +2170,7 @@ register boolean ininv, dummy, silent;
 		return;
 	}
 
-	if(obj->oclass == GOLD_CLASS) {
+	if(obj->oclass == COIN_CLASS) {
 		costly_gold(obj->ox, obj->oy, obj->quan);
 		return;
 	}
@@ -2344,7 +2344,7 @@ register struct monst *shkp;
 
 	if (Has_contents(obj))
 	    for(otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-		if(otmp->oclass == GOLD_CLASS) continue;
+		if(otmp->oclass == COIN_CLASS) continue;
 
 		if (Has_contents(otmp))
 		    subfrombill(otmp, shkp);
@@ -2376,7 +2376,7 @@ register boolean ininv;
 	/* the price of contained objects, if any */
 	for(otmp = obj->cobj; otmp; otmp = otmp->nobj) {
 
-	    if(otmp->oclass == GOLD_CLASS) continue;
+	    if(otmp->oclass == COIN_CLASS) continue;
 
 	    if (!Has_contents(otmp)) {
 		if(ininv) {
@@ -2410,7 +2410,7 @@ register boolean peaceful, silent;
 	if (!shkp || !inhishop(shkp))
 	    return (0L);
 
-	if(obj->oclass == GOLD_CLASS) {
+	if(obj->oclass == COIN_CLASS) {
 	    gvalue += obj->quan;
 	} else if (Has_contents(obj)) {
 	    register boolean ininv = !!count_unpaid(obj->cobj);
@@ -2443,7 +2443,7 @@ register boolean peaceful, silent;
 		    }
 		    still = "still ";
 		}
-		if(obj->oclass == GOLD_CLASS)
+		if(obj->oclass == COIN_CLASS)
 		    You("%sowe %s %ld %s!", still, mon_nam(shkp), value, currency(value));
 		else You("%sowe %s %ld %s for %s!", still,
 			mon_nam(shkp),
@@ -2498,7 +2498,7 @@ xchar x, y;
 	register struct eshk *eshkp;
 	long ltmp = 0L, cltmp = 0L, gltmp = 0L, offer;
 	boolean saleitem, cgold = FALSE, container = Has_contents(obj);
-	boolean isgold = (obj->oclass == GOLD_CLASS);
+	boolean isgold = (obj->oclass == COIN_CLASS);
 	boolean only_partially_your_contents = FALSE;
 
 	if(!(shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) ||
@@ -3592,7 +3592,7 @@ register xchar x, y;
 	return(struct obj *)0;
 
     for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
-	if (otmp->oclass != GOLD_CLASS)
+	if (otmp->oclass != COIN_CLASS)
 	    break;
     /* note: otmp might have ->no_charge set, but that's ok */
     return (otmp && costly_spot(x, y) && NOTANGRY(shkp)
@@ -3616,7 +3616,7 @@ register struct obj *first_obj;
     putstr(tmpwin, 0, "Fine goods for sale:");
     putstr(tmpwin, 0, "");
     for (otmp = first_obj; otmp; otmp = otmp->nexthere) {
-	if (otmp->oclass == GOLD_CLASS) continue;
+	if (otmp->oclass == COIN_CLASS) continue;
 	cost = (otmp->no_charge || otmp == uball || otmp == uchain) ? 0L :
 		get_cost(otmp, (struct monst *)0);
 	if (Has_contents(otmp))

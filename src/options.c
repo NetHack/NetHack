@@ -329,7 +329,7 @@ extern char ttycolors[CLR_MAX];	  /* in sys/msdos/video.c */
 #endif
 
 static char def_inv_order[MAXOCLASSES] = {
-	GOLD_CLASS, AMULET_CLASS, WEAPON_CLASS, ARMOR_CLASS, FOOD_CLASS,
+	COIN_CLASS, AMULET_CLASS, WEAPON_CLASS, ARMOR_CLASS, FOOD_CLASS,
 	SCROLL_CLASS, SPBOOK_CLASS, POTION_CLASS, RING_CLASS, WAND_CLASS,
 	TOOL_CLASS, GEM_CLASS, ROCK_CLASS, BALL_CLASS, CHAIN_CLASS, 0,
 };
@@ -745,7 +745,7 @@ char *op;
     num = 0;
 #ifndef GOLDOBJ
     if (!index(op, GOLD_SYM))
-	buf[num++] = GOLD_CLASS;
+	buf[num++] = COIN_CLASS;
 #else
     /*  !!!! probably unnecessary with gold as normal inventory */
 #endif

@@ -107,7 +107,7 @@ boolean quietly;
 	for (otmp = invent; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
 #ifndef GOLDOBJ
-	    if (otmp->oclass == GOLD_CLASS) {
+	    if (otmp->oclass == COIN_CLASS) {
 		/* in_use gold is created by some menu operations */
 		if (!otmp->in_use) {
 		    impossible("inven_inuse: !in_use gold in inventory");

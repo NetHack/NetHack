@@ -822,7 +822,7 @@ not_special:
 			 (mtoo->mappearance && !mtoo->iswiz) ||
 			 !mtoo->data->mmove)) continue;
 
-		    if(((likegold && otmp->oclass == GOLD_CLASS) ||
+		    if(((likegold && otmp->oclass == COIN_CLASS) ||
 		       (likeobjs && index(practical, otmp->oclass) &&
 			(otmp->otyp != CORPSE || (ptr->mlet == S_NYMPH
 			   && !is_rider(&mons[otmp->corpsenm])))) ||
@@ -1317,7 +1317,7 @@ struct monst *mtmp;
 		int typ = obj->otyp;
 
 #ifdef GOLDOBJ
-                if (typ == GOLD_CLASS && obj->quan > 100L) return FALSE;
+                if (typ == COIN_CLASS && obj->quan > 100L) return FALSE;
 #endif
 		if (obj->oclass != GEM_CLASS &&
 		    !(typ >= ARROW && typ <= BOOMERANG) &&

@@ -20,7 +20,7 @@ take_gold()
         struct obj *otmp;
 	int lost_money = 0;
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
-		if (otmp->oclass == GOLD_CLASS) {
+		if (otmp->oclass == COIN_CLASS) {
 			lost_money = 1;
 			delobj(otmp);
 		}

@@ -455,7 +455,7 @@ register struct obj *obj;
                             if (money > 10) {
 				/* Amount to loose.  Might get rounded up as fountains don't pay change... */
 			        money = somegold(money) / 10; 
-			        for (otmp = invent; otmp && money > 0; otmp = otmp->nobj) if (otmp->oclass == GOLD_CLASS) {
+			        for (otmp = invent; otmp && money > 0; otmp = otmp->nobj) if (otmp->oclass == COIN_CLASS) {
 				    int denomination = objects[otmp->otyp].oc_cost;
 				    long coin_loss = (money + denomination - 1) / denomination;
                                     coin_loss = min(coin_loss, otmp->quan);

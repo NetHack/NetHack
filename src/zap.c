@@ -2707,7 +2707,7 @@ struct obj *obj;			/* object tossed/used */
 		    range--;
 	    } else {
 		if(weapon == KICKED_WEAPON &&
-		      ((obj->oclass == GOLD_CLASS &&
+		      ((obj->oclass == COIN_CLASS &&
 			 OBJ_AT(bhitpos.x, bhitpos.y)) ||
 			    ship_object(obj, bhitpos.x, bhitpos.y,
 					costly_spot(bhitpos.x, bhitpos.y)))) {

@@ -875,7 +875,7 @@ WAND((char *)0,        "jeweled",   0, 150, 1, 0,         IRON,     HI_MINERAL),
 /* coins ... - so far, gold is all there is */
 #define COIN(name,prob,metal,worth) OBJECT( \
 		OBJ(name,(char *)0), BITS(0,1,0,0,0,0,0,0,0,0,0,P_NONE,metal), 0, \
-		GOLD_CLASS, prob, 0, 1, worth, 0, 0, 0, 0, 0, HI_GOLD )
+		COIN_CLASS, prob, 0, 1, worth, 0, 0, 0, 0, 0, HI_GOLD )
 	COIN("gold piece",      1000, GOLD,1),
 #undef COIN
 

@@ -100,7 +100,7 @@ struct obj *obj;
 		mtmp->meating = eaten_stat(mtmp->meating, obj);
 		nutrit = eaten_stat(nutrit, obj);
 	    }
-	} else if (obj->oclass == GOLD_CLASS) {
+	} else if (obj->oclass == COIN_CLASS) {
 	    mtmp->meating = (int)(obj->quan/2000) + 1;
 	    if (mtmp->meating < 0) mtmp->meating = 1;
 	    nutrit = (int)(obj->quan/20);

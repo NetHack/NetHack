@@ -106,7 +106,7 @@ boolean FDECL((*filter),(OBJ_P));
 
 #ifndef GOLDOBJ
 	if (incl_gold)
-	    ilets[iletct++] = def_oc_syms[GOLD_CLASS];
+	    ilets[iletct++] = def_oc_syms[COIN_CLASS];
 #endif
 	ilets[iletct] = '\0'; /* terminate ilets so that index() will work */
 	while (otmp) {
@@ -317,16 +317,16 @@ struct obj *obj;
 	(index(valid_menu_classes, obj->oclass) != (char *)0))
 	return TRUE;
     else if (((index(valid_menu_classes,'U') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && obj->bknown && !obj->blessed && !obj->cursed)))
+	(obj->oclass != COIN_CLASS && obj->bknown && !obj->blessed && !obj->cursed)))
 	return TRUE;
     else if (((index(valid_menu_classes,'B') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && obj->bknown && obj->blessed)))
+	(obj->oclass != COIN_CLASS && obj->bknown && obj->blessed)))
 	return TRUE;
     else if (((index(valid_menu_classes,'C') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && obj->bknown && obj->cursed)))
+	(obj->oclass != COIN_CLASS && obj->bknown && obj->cursed)))
 	return TRUE;
     else if (((index(valid_menu_classes,'X') != (char *)0) &&
-	(obj->oclass != GOLD_CLASS && !obj->bknown)))
+	(obj->oclass != COIN_CLASS && !obj->bknown)))
 	return TRUE;
     else
 	return FALSE;
@@ -914,7 +914,7 @@ boolean telekinesis;
 int *wt_before, *wt_after;
 {
     boolean adjust_wt = container && carried(container),
-	    is_gold = obj->oclass == GOLD_CLASS;
+	    is_gold = obj->oclass == COIN_CLASS;
     int wt, iw, ow, oow;
     long qq, savequan;
 #ifdef GOLDOBJ
@@ -1091,7 +1091,7 @@ boolean telekinesis;
     if (*cnt_p < 1L) {
 	result = -1;	/* nothing lifted */
 #ifndef GOLDOBJ
-    } else if (obj->oclass != GOLD_CLASS && inv_cnt() >= 52 &&
+    } else if (obj->oclass != COIN_CLASS && inv_cnt() >= 52 &&
 		!merge_choice(invent, obj)) {
 #else
     } else if (inv_cnt() >= 52 && !merge_choice(invent, obj)) {
@@ -1168,7 +1168,7 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	} else if (obj->oartifact && !touch_artifact(obj,&youmonst)) {
 	    return 0;
 #ifndef GOLDOBJ
-	} else if (obj->oclass == GOLD_CLASS) {
+	} else if (obj->oclass == COIN_CLASS) {
 	    /* Special consideration for gold pieces... */
 	    long iw = (long)max_capacity() - GOLD_WT(u.ugold);
 	    long gold_capacity = GOLD_CAPACITY(iw, u.ugold);
@@ -1249,7 +1249,7 @@ boolean telekinesis;	/* not picking it up directly by hand */
 
 #ifdef GOLDOBJ
         /* Whats left of the special case for gold :-) */
-	if (obj->oclass == GOLD_CLASS) flags.botl = 1;
+	if (obj->oclass == COIN_CLASS) flags.botl = 1;
 #endif
 	if (obj->quan != count && obj->otyp != LOADSTONE)
 	    obj = splitobj(obj, count);
@@ -1473,7 +1473,7 @@ lootcont:
 	struct obj *goldob;
 	/* Find a money object to mess with */
 	for (goldob = invent; goldob; goldob = goldob->nobj) {
-	    if (goldob->oclass == GOLD_CLASS) break;
+	    if (goldob->oclass == COIN_CLASS) break;
 	}
 	if (goldob){
 	    long contribution = rnd((int)min(LARGEST_INT, goldob->quan));
@@ -1823,7 +1823,7 @@ out_container(obj)
 register struct obj *obj;
 {
 	register struct obj *otmp;
-	boolean is_gold = (obj->oclass == GOLD_CLASS);
+	boolean is_gold = (obj->oclass == COIN_CLASS);
 	int res, loadlev;
 	long count;
 
@@ -2115,7 +2115,7 @@ ask_again2:
 	}
 
 #ifndef GOLDOBJ
-	if (u_gold && invent && invent->oclass == GOLD_CLASS) {
+	if (u_gold && invent && invent->oclass == COIN_CLASS) {
 	    /* didn't stash [all of] it */
 	    u_gold = invent;
 	    invent = u_gold->nobj;

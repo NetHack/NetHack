@@ -115,7 +115,7 @@ unsigned material;
 			/* didn't find it; perhaps a monster is carrying it */
 #ifndef GOLDOBJ
 			if ((mtmp = m_at(x,y)) != 0) {
-				if (oclass == GOLD_CLASS && mtmp->mgold)
+				if (oclass == COIN_CLASS && mtmp->mgold)
 					return FALSE;
 				else for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
 					if (o_in(otmp, oclass)) return FALSE;
@@ -169,7 +169,7 @@ register struct obj *sobj;
     struct obj *temp;
     boolean stale;
 
-    known = stale = clear_stale_map(GOLD_CLASS,
+    known = stale = clear_stale_map(COIN_CLASS,
 				(unsigned)(sobj->blessed ? GOLD : 0));
 
     /* look for gold carried by monsters (might be in a container) */
@@ -186,7 +186,7 @@ register struct obj *sobj;
 	    if (sobj->blessed && o_material(obj, GOLD)) {
 	    	known = TRUE;
 	    	goto outgoldmap;
-	    } else if (o_in(obj, GOLD_CLASS)) {
+	    } else if (o_in(obj, COIN_CLASS)) {
 		known = TRUE;
 		goto outgoldmap;	/* skip further searching */
 	    }
@@ -197,7 +197,7 @@ register struct obj *sobj;
 	if (sobj->blessed && o_material(obj, GOLD)) {
 	    known = TRUE;
 	    if (obj->ox != u.ux || obj->oy != u.uy) goto outgoldmap;
-	} else if (o_in(obj, GOLD_CLASS)) {
+	} else if (o_in(obj, COIN_CLASS)) {
 	    known = TRUE;
 	    if (obj->ox != u.ux || obj->oy != u.uy) goto outgoldmap;
 	}
@@ -242,7 +242,7 @@ outgoldmap:
 		temp->oy = obj->oy;
 	    }
 	    map_object(temp,1);
-	} else if ((temp = o_in(obj, GOLD_CLASS))) {
+	} else if ((temp = o_in(obj, COIN_CLASS))) {
 	    if (temp != obj) {
 		temp->ox = obj->ox;
 		temp->oy = obj->oy;
@@ -269,7 +269,7 @@ outgoldmap:
 		temp->oy = mtmp->my;
 		map_object(temp,1);
 		break;
-	    } else if ((temp = o_in(obj, GOLD_CLASS))) {
+	    } else if ((temp = o_in(obj, COIN_CLASS))) {
 		temp->ox = mtmp->mx;
 		temp->oy = mtmp->my;
 		map_object(temp,1);
@@ -448,9 +448,9 @@ int		class;		/* an object class, 0 for all */
 	if ((is_cursed && mtmp->m_ap_type == M_AP_OBJECT &&
 	    (!class || class == objects[mtmp->mappearance].oc_class)) ||
 #ifndef GOLDOBJ
-	    (mtmp->mgold && (!class || class == GOLD_CLASS))) {
+	    (mtmp->mgold && (!class || class == COIN_CLASS))) {
 #else
-	    (findgold(mtmp->minvent) && (!class || class == GOLD_CLASS))) {
+	    (findgold(mtmp->minvent) && (!class || class == COIN_CLASS))) {
 #endif
 	    ct++;
 	    break;
@@ -530,9 +530,9 @@ int		class;		/* an object class, 0 for all */
 	    temp.corpsenm = PM_TENGU;		/* if mimicing a corpse */
 	    map_object(&temp, 1);
 #ifndef GOLDOBJ
-	} else if (mtmp->mgold && (!class || class == GOLD_CLASS)) {
+	} else if (mtmp->mgold && (!class || class == COIN_CLASS)) {
 #else
-	} else if (findgold(mtmp->minvent) && (!class || class == GOLD_CLASS)) {
+	} else if (findgold(mtmp->minvent) && (!class || class == COIN_CLASS)) {
 #endif
 	    struct obj gold;
 

@@ -21,10 +21,10 @@ STATIC_DCL boolean FDECL(mhurtle_step, (genericptr_t,int,int));
 
 
 static NEARDATA const char toss_objs[] =
-	{ ALLOW_COUNT, GOLD_CLASS, ALL_CLASSES, WEAPON_CLASS, 0 };
+	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, WEAPON_CLASS, 0 };
 /* different default choices when wielding a sling (gold must be included) */
 static NEARDATA const char bullets[] =
-	{ ALLOW_COUNT, GOLD_CLASS, ALL_CLASSES, GEM_CLASS, 0 };
+	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, GEM_CLASS, 0 };
 
 extern boolean notonhead;	/* for long worms */
 
@@ -44,7 +44,7 @@ int shotlimit;
 	/* ask "in what direction?" */
 #ifndef GOLDOBJ
 	if (!getdir((char *)0)) {
-		if (obj->oclass == GOLD_CLASS) {
+		if (obj->oclass == COIN_CLASS) {
 		    u.ugold += obj->quan;
 		    flags.botl = 1;
 		    dealloc_obj(obj);
@@ -52,7 +52,7 @@ int shotlimit;
 		return(0);
 	}
 
-	if(obj->oclass == GOLD_CLASS) return(throw_gold(obj));
+	if(obj->oclass == COIN_CLASS) return(throw_gold(obj));
 #else
 	if (!getdir((char *)0)) {
 	    /* obj might need to be merged back into the singular gold object */
@@ -69,7 +69,7 @@ int shotlimit;
           If the money is in quiver, throw one coin at a time,
           possibly using a sling.
         */
-	if(obj->oclass == GOLD_CLASS && obj != uquiver) return(throw_gold(obj));
+	if(obj->oclass == COIN_CLASS && obj != uquiver) return(throw_gold(obj));
 #endif
 
 	if(!canletgo(obj,"throw"))

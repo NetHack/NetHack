@@ -55,7 +55,7 @@ register struct obj *otmp;
 
 #ifdef GOLDOBJ
         /* There is only one of these in inventory... */        
-        if (otmp->oclass == GOLD_CLASS) {
+        if (otmp->oclass == COIN_CLASS) {
 	    otmp->invlet = GOLD_SYM;
 	    return;
 	}
@@ -179,7 +179,7 @@ struct obj **potmp, **pobj;
 #ifdef GOLDOBJ
                 /* temporary special case for gold objects!!!! */
 #endif
-		if (otmp->oclass == GOLD_CLASS) otmp->owt = weight(otmp);
+		if (otmp->oclass == COIN_CLASS) otmp->owt = weight(otmp);
 		else otmp->owt += obj->owt;
 		if(!otmp->onamelth && obj->onamelth)
 			otmp = *potmp = oname(otmp, ONAME(obj));
@@ -245,7 +245,7 @@ void
 addinv_core1(obj)
 struct obj *obj;
 {
-	if (obj->oclass == GOLD_CLASS) {
+	if (obj->oclass == COIN_CLASS) {
 #ifndef GOLDOBJ
 		u.ugold += obj->quan;
 #else
@@ -312,7 +312,7 @@ struct obj *obj;
 	addinv_core1(obj);
 #ifndef GOLDOBJ
 	/* if handed gold, we're done */
-	if (obj->oclass == GOLD_CLASS)
+	if (obj->oclass == COIN_CLASS)
 	    return obj;
 #endif
 
@@ -484,7 +484,7 @@ void
 freeinv_core(obj)
 struct obj *obj;
 {
-	if (obj->oclass == GOLD_CLASS) {
+	if (obj->oclass == COIN_CLASS) {
 #ifndef GOLDOBJ
 		u.ugold -= obj->quan;
 		obj->in_use = FALSE;
@@ -663,7 +663,7 @@ register int x, y;
 {
 	register struct obj *obj = level.objects[x][y];
 	while(obj) {
-	    if (obj->oclass == GOLD_CLASS) return obj;
+	    if (obj->oclass == COIN_CLASS) return obj;
 	    obj = obj->nexthere;
 	}
 	return((struct obj *)0);
@@ -770,10 +770,10 @@ register const char *let,*word;
 
 	if(*let == ALLOW_COUNT) let++, allowcnt = 1;
 #ifndef GOLDOBJ
-	if(*let == GOLD_CLASS) let++,
+	if(*let == COIN_CLASS) let++,
 		usegold = TRUE, allowgold = (u.ugold ? TRUE : FALSE);
 #else
-	if(*let == GOLD_CLASS) let++, usegold = TRUE;
+	if(*let == COIN_CLASS) let++, usegold = TRUE;
 #endif
 
 	/* Equivalent of an "ugly check" for gold */
@@ -798,7 +798,7 @@ register const char *let,*word;
 
 	if(allownone) *bp++ = '-';
 #ifndef GOLDOBJ
-	if(allowgold) *bp++ = def_oc_syms[GOLD_CLASS];
+	if(allowgold) *bp++ = def_oc_syms[COIN_CLASS];
 #endif
 	if(bp > buf && bp[-1] == '-') *bp++ = ' ';
 	ap = altlets;
@@ -959,7 +959,7 @@ register const char *let,*word;
 		if(ilet == '-') {
 			return(allownone ? &zeroobj : (struct obj *) 0);
 		}
-		if(ilet == def_oc_syms[GOLD_CLASS]) {
+		if(ilet == def_oc_syms[COIN_CLASS]) {
 			if (!usegold) {
 			    You("cannot %s gold.", word);
 			    return(struct obj *)0;
@@ -1013,7 +1013,7 @@ register const char *let,*word;
 		     * counts for other things since the throw code will
 		     * split off a single item anyway */
 #ifdef GOLDOBJ
-		    if (ilet != def_oc_syms[GOLD_CLASS])
+		    if (ilet != def_oc_syms[COIN_CLASS])
 #endif
 			allowcnt = 1;
 		    if(cnt == 0 && prezero) return((struct obj *)0);
@@ -1048,7 +1048,7 @@ register const char *let,*word;
 	}
 	if(!allowall && let && !index(let,otmp->oclass)
 #ifdef GOLDOBJ
-	   && !(usegold && otmp->oclass == GOLD_CLASS)
+	   && !(usegold && otmp->oclass == COIN_CLASS)
 #endif
 	   ) {
 		pline(silly_thing_to, word);
@@ -1220,7 +1220,7 @@ unsigned *resultflags;
 		}
 	    }
 
-	    if (oc_of_sym == GOLD_CLASS && !combo) {
+	    if (oc_of_sym == COIN_CLASS && !combo) {
 #ifndef GOLDOBJ
 		if (allowgold == 1)
 		    (*fn)(mkgoldobj(u.ugold));
@@ -1320,7 +1320,7 @@ register int FDECL((*fn),(OBJ_P)), FDECL((*ckfn),(OBJ_P));
 	 */
 nextclass:
 	ilet = 'a'-1;
-	if (*objchn && (*objchn)->oclass == GOLD_CLASS)
+	if (*objchn && (*objchn)->oclass == COIN_CLASS)
 		ilet--;		/* extra iteration */
 	for (otmp = *objchn; otmp; otmp = otmp2) {
 		if(ilet == 'z') ilet = 'A'; else ilet++;
@@ -1493,7 +1493,7 @@ obj_to_let(obj)	/* should of course only be called for things in invent */
 register struct obj *obj;
 {
 #ifndef GOLDOBJ
-	if (obj->oclass == GOLD_CLASS)
+	if (obj->oclass == COIN_CLASS)
 		return GOLD_SYM;
 #endif
 	if (!flags.invlet_constant) {
@@ -1555,7 +1555,7 @@ long quan;		/* if non-0, print this quantity, not obj->quan */
 		(dot && use_invlet ? obj->invlet : let),
 		(txt ? txt : doname(obj)), cost, currency(cost));
 #ifndef GOLDOBJ
-    } else if (obj && obj->oclass == GOLD_CLASS) {
+    } else if (obj && obj->oclass == COIN_CLASS) {
 	Sprintf(li, "%ld gold piece%s%s", obj->quan, plur(obj->quan),
 		(dot ? "." : ""));
 #endif
@@ -1774,20 +1774,20 @@ count_buc(list, type)
 	if (Role_if(PM_PRIEST)) list->bknown = TRUE;
 	switch(type) {
 	    case BUC_BLESSED:
-		if (list->oclass != GOLD_CLASS && list->bknown && list->blessed)
+		if (list->oclass != COIN_CLASS && list->bknown && list->blessed)
 		    count++;
 		break;
 	    case BUC_CURSED:
-		if (list->oclass != GOLD_CLASS && list->bknown && list->cursed)
+		if (list->oclass != COIN_CLASS && list->bknown && list->cursed)
 		    count++;
 		break;
 	    case BUC_UNCURSED:
-		if (list->oclass != GOLD_CLASS &&
+		if (list->oclass != COIN_CLASS &&
 			list->bknown && !list->blessed && !list->cursed)
 		    count++;
 		break;
 	    case BUC_UNKNOWN:
-		if (list->oclass != GOLD_CLASS && !list->bknown)
+		if (list->oclass != COIN_CLASS && !list->bknown)
 		    count++;
 		break;
 	    default:
@@ -1995,7 +1995,7 @@ dotypeinv()
 	}
 	if (traditional) {
 	    oclass = def_char_to_objclass(c); /* change to object class */
-	    if (oclass == GOLD_CLASS) {
+	    if (oclass == COIN_CLASS) {
 		return doprgold();
 	    } else if (index(types, c) > index(types, '\033')) {
 		You("have no such objects.");
@@ -2232,7 +2232,7 @@ mergable(otmp, obj)	/* returns TRUE if obj  & otmp can be merged */
 	if (obj->otyp != otmp->otyp) return FALSE;
        
         /* Coins of the same kind will always merge. */
-        if (obj->oclass == GOLD_CLASS) return TRUE;
+        if (obj->oclass == COIN_CLASS) return TRUE;
 
         if (obj->unpaid != otmp->unpaid ||
 #endif
@@ -2722,7 +2722,7 @@ char *title;
 		 * gold in their inventory, so it won't merge.
 		 */
 		m_gold = zeroobj;
-		m_gold.otyp = GOLD_PIECE;  m_gold.oclass = GOLD_CLASS;
+		m_gold.otyp = GOLD_PIECE;  m_gold.oclass = COIN_CLASS;
 		m_gold.quan = mon->mgold;  m_gold.dknown = 1;
 		m_gold.where = OBJ_FREE;
 		/* we had better not merge and free this object... */

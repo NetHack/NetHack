@@ -70,7 +70,7 @@ STATIC_OVL NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
 
 /* Gold must come first for getobj(). */
 STATIC_OVL NEARDATA const char allobj[] = {
-	GOLD_CLASS, WEAPON_CLASS, ARMOR_CLASS, POTION_CLASS, SCROLL_CLASS,
+	COIN_CLASS, WEAPON_CLASS, ARMOR_CLASS, POTION_CLASS, SCROLL_CLASS,
 	WAND_CLASS, RING_CLASS, AMULET_CLASS, FOOD_CLASS, TOOL_CLASS,
 	GEM_CLASS, ROCK_CLASS, BALL_CLASS, CHAIN_CLASS, SPBOOK_CLASS, 0 };
 
@@ -253,7 +253,7 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 		 */
 		if(food) {
 			You("choke over your %s.", foodword(food));
-			if (food->oclass == GOLD_CLASS) {
+			if (food->oclass == COIN_CLASS) {
 				killer = "a very rich meal";
 			} else {
 				killer = food_xname(food, FALSE);
@@ -1515,7 +1515,7 @@ eatspecial() /* called after eating non-food */
 	lesshungry(victual.nmod);
 	victual.piece = (struct obj *)0;
 	victual.eating = 0;
-	if (otmp->oclass == GOLD_CLASS) {
+	if (otmp->oclass == COIN_CLASS) {
 #ifdef GOLDOBJ
 		if (carried(otmp))
 		    useupall(otmp);
@@ -1854,7 +1854,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    victual.canchoke = (u.uhs == SATIATED);
 		/* Note: gold weighs 1 pt. for each 1000 pieces (see */
 		/* pickup.c) so gold and non-gold is consistent. */
-	    if (otmp->oclass == GOLD_CLASS)
+	    if (otmp->oclass == COIN_CLASS)
 		basenutrit = ((otmp->quan > 200000L) ? 2000
 			: (int)(otmp->quan/100L));
 	    else if(otmp->oclass == BALL_CLASS || otmp->oclass == CHAIN_CLASS)
@@ -1885,7 +1885,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		    You("seem unaffected by the poison.");
 	    } else if (!otmp->cursed)
 		pline("This %s is delicious!",
-		      otmp->oclass == GOLD_CLASS ? foodword(otmp) :
+		      otmp->oclass == COIN_CLASS ? foodword(otmp) :
 		      singular(otmp, xname));
 
 	    eatspecial();
@@ -2366,7 +2366,7 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 	for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
 		if(corpsecheck ?
 		(otmp->otyp==CORPSE && (corpsecheck == 1 || tinnable(otmp))) :
-		    feeding ? (otmp->oclass != GOLD_CLASS && is_edible(otmp)) :
+		    feeding ? (otmp->oclass != COIN_CLASS && is_edible(otmp)) :
 						otmp->oclass==FOOD_CLASS) {
 			Sprintf(qbuf, "There %s %s here; %s %s?",
 				otense(otmp, "are"),

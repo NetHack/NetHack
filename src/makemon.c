@@ -1601,7 +1601,7 @@ struct monst *mtmp;
 
 static NEARDATA char syms[] = {
 	MAXOCLASSES, MAXOCLASSES+1, RING_CLASS, WAND_CLASS, WEAPON_CLASS,
-	FOOD_CLASS, GOLD_CLASS, SCROLL_CLASS, POTION_CLASS, ARMOR_CLASS,
+	FOOD_CLASS, COIN_CLASS, SCROLL_CLASS, POTION_CLASS, ARMOR_CLASS,
 	AMULET_CLASS, TOOL_CLASS, ROCK_CLASS, GEM_CLASS, SPBOOK_CLASS,
 	S_MIMIC_DEF, S_MIMIC_DEF, S_MIMIC_DEF,
 };
@@ -1696,7 +1696,7 @@ assign_sym:
 		if (s_sym >= MAXOCLASSES) {
 			ap_type = M_AP_FURNITURE;
 			appear = s_sym == MAXOCLASSES ? S_upstair : S_dnstair;
-		} else if (s_sym == GOLD_CLASS) {
+		} else if (s_sym == COIN_CLASS) {
 			ap_type = M_AP_OBJECT;
 			appear = GOLD_PIECE;
 		} else {

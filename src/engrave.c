@@ -546,7 +546,7 @@ doengrave()
 	    case AMULET_CLASS:
 	    case CHAIN_CLASS:
 	    case POTION_CLASS:
-	    case GOLD_CLASS:
+	    case COIN_CLASS:
 		break;
 
 	    case RING_CLASS:

@@ -826,7 +826,7 @@ int whodidit;	/* 1==hero, 0=other, -1==just check whether it'll pass thru */
 	    /* breakage makes its own noises */
 	else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
 	    pline("Whang!");
-	else if (otmp->oclass == GOLD_CLASS ||
+	else if (otmp->oclass == COIN_CLASS ||
 		objects[obj_type].oc_material == GOLD ||
 		objects[obj_type].oc_material == SILVER)
 	    pline("Clink!");

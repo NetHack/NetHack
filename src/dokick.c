@@ -507,7 +507,7 @@ xchar x, y;
 		return(1);
 	}
 
-	isgold = (kickobj->oclass == GOLD_CLASS);
+	isgold = (kickobj->oclass == COIN_CLASS);
 
 	/* too heavy to move.  range is calculated as potential distance from
 	 * player, so range == 2 means the object may move up to one square
@@ -1160,7 +1160,7 @@ xchar x, y, dlev;
 		    /* set obj->no_charge to 0 */
 		    if (Has_contents(obj))
 			picked_container(obj);	/* does the right thing */
-		    if (obj->oclass != GOLD_CLASS)
+		    if (obj->oclass != COIN_CLASS)
 			obj->no_charge = 0;
 		}
 
@@ -1281,7 +1281,7 @@ boolean shop_floor_obj;
 	    /* set otmp->no_charge to 0 */
 	    if(container)
 		picked_container(otmp); /* happens to do the right thing */
-	    if(otmp->oclass != GOLD_CLASS)
+	    if(otmp->oclass != COIN_CLASS)
 		otmp->no_charge = 0;
 	}
 

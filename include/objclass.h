@@ -133,7 +133,7 @@ extern NEARDATA struct objdescr obj_descr[];
 #define SCROLL_CLASS	 9
 #define SPBOOK_CLASS	10	/* actually SPELL-book */
 #define WAND_CLASS	11
-#define GOLD_CLASS	12
+#define COIN_CLASS	12
 #define GEM_CLASS	13
 #define ROCK_CLASS	14
 #define BALL_CLASS	15
