@@ -6,6 +6,7 @@
 #include "edog.h"
 #ifdef USER_SOUNDS
 # ifdef USER_SOUNDS_REGEX
+#include <sys/types.h>
 #include <regex.h>
 # endif
 #endif
