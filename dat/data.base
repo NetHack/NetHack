@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)data.base	3.4	2003/07/23
+#	SCCS Id: @(#)data.base	3.4	2004/06/04
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -38,6 +38,8 @@ aleax
 	Said to be a doppelganger sent to inflict divine punishment
 	for alignment violations.
 *altar
+offer*
+sacrific*
 	Altars are of three types:
 	1.  In Temples.  These are for Sacrifices [...].  The stone
 	top will have grooves for blood, and the whole will be covered
@@ -123,6 +125,13 @@ angel*
 	and shall cast them into the furnace of fire; there shall be
 	wailing and gnashing of teeth.
 		[ The Gospel According to Matthew, 13:37-42, 49-50 ]
+angry god*
+	Cold wind blows.
+	The gods look down in anger on this poor child.
+
+	Why so unforgiving?
+	And why so cold?
+		[ Robin Trower, "Bridge of Sighs" ]
 anhur
 	An Egyptian god of war and a great hunter, few gods can match
 	his fury.  Unlike many gods of war, he is a force for good.
@@ -3292,7 +3301,8 @@ raven
 	On the morrow *he* will leave me, as my hopes have flown before.'
 		Then the bird said, 'Nevermore.'
 				[ The Raven - Edgar Allan Poe ]
-*ring
+ring
+* ring
 ring of *
 	Three Rings for the Elven-kings under the sky,
 	Seven for the Dwarf-lords in their halls of stone,
