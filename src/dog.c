@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.5	2005/01/29	*/
+/*	SCCS Id: @(#)dog.c	3.5	2005/03/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -488,7 +488,18 @@ boolean pets_only;	/* true for ascension or final escape */
 	for (mtmp = fmon; mtmp; mtmp = mtmp2) {
 	    mtmp2 = mtmp->nmon;
 	    if (DEADMONSTER(mtmp)) continue;
-	    if (pets_only && !mtmp->mtame) continue;
+	    if (pets_only) {
+		if (!mtmp->mtame) continue;	/* reject non-pets */     
+		/* don't block pets from accompanying hero's dungeon
+		   escape or ascension simply due to mundane trifles;
+		   unlike level change for steed, don't bother trying
+		   to achieve a normal trap escape first */
+		mtmp->mtrapped = 0;
+		mtmp->meating = 0;
+		mtmp->msleeping = 0;
+		mtmp->mfrozen = 0;
+		mtmp->mcanmove = 1;
+	    }
 	    if (((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp)) ||
 #ifdef STEED
 			(mtmp == u.usteed) ||
