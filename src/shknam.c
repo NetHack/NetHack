@@ -16,6 +16,17 @@ STATIC_DCL int  FDECL(shkinit, (const struct shclass *,struct mkroom *));
 
 #define VEGETARIAN_CLASS	(MAXOCLASSES+1)
 
+/*
+ *  Name prefix codes:
+ *	dash          _  female, personal name
+ *	underscore    _  female, general name
+ *	plus          +  male, personal name
+ *	vertical bar  |  male, general name (implied for most of shktools)
+ *	equals        =  gender not specified, personal name
+ *
+ *  Personal names do not receive the honorific prefix "Mr." or "Ms.".
+ */
+
 static const char * const shkliquors[] = {
     /* Ukraine */
     "Njezjin", "Tsjernigof", "Ossipewsk", "Gorlowka",
@@ -173,11 +184,11 @@ static const char * const shkhealthfoods[] = {
     "Ganden", "Tsurphu", "Lhasa", "Tsedong",
     "Drepung",
     /* Hippie names */
-    "Azura", "Blaze", "Breanna", "Breezy",
-    "Dharma", "Feather", "Jasmine", "Luna",
-    "Melody", "Moonjava", "Petal", "Rhiannon",
-    "Starla", "Tranquilla", "Windsong", "Zennia",
-    "Zoe", "Zora",
+    "=Azura", "=Blaze", "=Breanna", "=Breezy",
+    "=Dharma", "=Feather", "=Jasmine", "=Luna",
+    "=Melody", "=Moonjava", "=Petal", "=Rhiannon",
+    "=Starla", "=Tranquilla", "=Windsong", "=Zennia",
+    "=Zoe", "=Zora",
     0
 };
 
@@ -227,10 +238,6 @@ const struct shclass shtypes[] = {
 	{"hardware store", TOOL_CLASS, 3, D_SHOP,
 	    {{100, TOOL_CLASS}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
 	    shktools},
-	/* Actually shktools is ignored; the code specifically chooses a
-	 * random implementor name (along with candle shops having
-	 * random shopkeepers)
-	 */
 	{"rare books", SPBOOK_CLASS, 3, D_SHOP,
 	    {{90, SPBOOK_CLASS}, {10, SCROLL_CLASS}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
 	    shkbooks},
@@ -395,7 +402,7 @@ const char * const *nlp;
 	if (nlp == shklight && In_mines(&u.uz)
 		&& (sptr = Is_special(&u.uz)) != 0 && sptr->flags.town) {
 	    /* special-case minetown lighting shk */
-	    shname = "Izchak";
+	    shname = "+Izchak";
 	    shk->female = FALSE;
 	} else {
 	    /* We want variation from game to game, without needing the save
@@ -414,8 +421,7 @@ const char * const *nlp;
 	    for (trycnt = 0; trycnt < 50; trycnt++) {
 		if (nlp == shktools) {
 		    shname = shktools[rn2(names_avail)];
-		    shk->female = (*shname == '_');
-		    if (shk->female) shname++;
+		    shk->female = 0;	/* reversed below for '_' prefix */
 		} else if (name_wanted < names_avail) {
 		    shname = nlp[name_wanted];
 		} else if ((i = rn2(names_avail)) != 0) {
@@ -426,8 +432,10 @@ const char * const *nlp;
 			continue;
 		    continue;		/* next `trycnt' iteration */
 		} else {
-		    shname = shk->female ? "Lucrezia" : "Dirk";
+		    shname = shk->female ? "-Lucrezia" : "+Dirk";
 		}
+		if (*shname == '_' || *shname == '-') shk->female = 1;
+		else if (*shname == '|' || *shname == '+') shk->female = 0;
 
 		/* is name already in use on this level? */
 		for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -637,6 +645,26 @@ int type;
 		continue;
 
 	return shp->iprobs[i].itype;
+}
+
+const char *
+shkname(mtmp)
+struct monst *mtmp;
+{
+    const char *shknm = ESHK(mtmp)->shknam;
+
+    /* strip prefix if present */
+    if (!letter(*shknm)) ++shknm;
+    return shknm;
+}
+
+boolean
+shkname_is_pname(mtmp)
+struct monst *mtmp;
+{
+    const char *shknm = ESHK(mtmp)->shknam;
+
+    return (*shknm == '-' || *shknm == '+' || *shknm == '=');
 }
 
 /*shknam.c*/

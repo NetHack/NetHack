@@ -1854,7 +1854,6 @@ E void FDECL(store_savefileinfo, (int));
 E long FDECL(money2mon, (struct monst *, long));
 E void FDECL(money2u, (struct monst *, long));
 #endif
-E char *FDECL(shkname, (struct monst *));
 E void FDECL(shkgone, (struct monst *));
 E void FDECL(set_residency, (struct monst *,BOOLEAN_P));
 E void FDECL(replshk, (struct monst *,struct monst *));
@@ -1914,6 +1913,8 @@ E char *FDECL(Shk_Your, (char *,struct obj *));
 E void FDECL(stock_room, (int,struct mkroom *));
 E boolean FDECL(saleable, (struct monst *,struct obj *));
 E int FDECL(get_shop_item, (int));
+E const char *FDECL(shkname, (struct monst *));
+E boolean FDECL(shkname_is_pname, (struct monst *));
 
 /* ### sit.c ### */
 

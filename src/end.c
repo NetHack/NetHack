@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)end.c	3.5	2005/03/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -218,8 +218,11 @@ register struct monst *mtmp;
 		Strcat(buf, "ghost");
 		if (mtmp->mnamelth) Sprintf(eos(buf), " of %s", NAME(mtmp));
 	} else if(mtmp->isshk) {
-		Sprintf(eos(buf), "%s %s, the shopkeeper",
-			(mtmp->female ? "Ms." : "Mr."), shkname(mtmp));
+		const char *shknm = shkname(mtmp),
+			   *honorific = shkname_is_pname(mtmp) ? "" :
+					    mtmp->female ? "Ms. " : "Mr. ";
+
+		Sprintf(eos(buf), "%s%s, the shopkeeper", honorific, shknm);
 		killer.format = KILLED_BY;
 	} else if (mtmp->ispriest || mtmp->isminion) {
 		/* m_monnam() suppresses "the" prefix plus "invisible", and

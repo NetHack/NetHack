@@ -170,13 +170,6 @@ register boolean withbill;
 	return(shkp);
 }
 
-char *
-shkname(mtmp)				/* called in do_name.c */
-register struct monst *mtmp;
-{
-	return(ESHK(mtmp)->shknam);
-}
-
 void
 shkgone(mtmp)				/* called in mon.c */
 struct monst *mtmp;
