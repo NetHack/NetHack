@@ -1040,6 +1040,9 @@ int n;
 		    if(nh_US) return nh_US;
 	    case ATR_BOLD:
 	    case ATR_BLINK:
+#if defined(TERMLIB) && defined(TEXTCOLOR)
+		    if (MD) return MD;
+#endif
 		    return nh_HI;
 	    case ATR_INVERSE:
 		    return MR;
