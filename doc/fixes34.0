@@ -425,12 +425,8 @@ grammar fixes such as "Eyes of the Overworld resists" and others
 score bonus was missing from scrolls of identify and fire 
 make wands of speed or slow monster known if their effect
 	on monsters is observed; likewise for speed boots
-avoid giving odd "the bat is moving faster" when seeing a bat created
-	in gehennom and inaccurate "the monster is moving slower" when
-	a monster puts on speed boots.
 gold detection "materially poor" message inappropriate if you have hidden_gold()
 cannot reflect back an invisible umber hulk or medusa's attack
-
 
 
 Platform- and/or Interface-Specific Fixes
