@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2002/09/30	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2002/11/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1652,6 +1652,7 @@ register struct obj *otmp;
 	if (!otmp) return 0;
 	*buf = '\0';			/* lint suppresion */
 
+	/* special ring checks */
 	if (otmp == uright || otmp == uleft) {
 	    if (nolimbs(youmonst.data)) {
 		pline_The("ring is stuck.");
@@ -1671,6 +1672,7 @@ register struct obj *otmp;
 		return 0;
 	    }
 	}
+	/* special glove checks */
 	if (otmp == uarmg) {
 	    if (welded(uwep)) {
 		You("are unable to take off your %s while wielding that %s.",
@@ -1683,6 +1685,7 @@ register struct obj *otmp;
 		return 0;
 	    }
 	}
+	/* special boot checks */
 	if (otmp == uarmf) {
 	    if (u.utrap && u.utraptype == TT_BEARTRAP) {
 		pline_The("bear trap prevents you from pulling your %s out.",
@@ -1694,6 +1697,7 @@ register struct obj *otmp;
 		return 0;
 	    }
 	}
+	/* special suit and shirt checks */
 	if (otmp == uarm
 #ifdef TOURIST
 			|| otmp == uarmu
@@ -1720,8 +1724,13 @@ register struct obj *otmp;
 		return 0;
 	    }
 	}
-	/* fundamental, but other impediments are checked first */
-	if (cursed(otmp)) return 0;
+	/* basic curse check */
+	if (otmp == uquiver || (otmp == uswapwep && !u.twoweap)) {
+	    ;	/* some items can be removed even when cursed */
+	} else {
+	    /* otherwise, this is fundamental */
+	    if (cursed(otmp)) return 0;
+	}
 
 	if(otmp == uarm) takeoff_mask |= WORN_ARMOR;
 	else if(otmp == uarmc) takeoff_mask |= WORN_CLOAK;
