@@ -1515,13 +1515,14 @@ register struct obj *obj;
 	    default:
 		if (!obj->oerodeproof && is_rustprone(obj) &&
 		    (obj->oeroded < MAX_ERODE) && !rn2(2)) {
-			pline("%s %s some%s.",
-			      Your_buf, aobjnam(obj, "rust"),
+			pline("%s some%s.",
+			      Yobjnam2(obj, "rust"),
 			      obj->oeroded ? " more" : "what");
 			obj->oeroded++;
 			update_inventory();
 			return TRUE;
-		} else break;
+		}
+		break;
 	}
 	pline("%s wet.", Yobjnam2(obj, "get"));
 	return FALSE;
