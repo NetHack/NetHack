@@ -1,5 +1,5 @@
 %{
-/*	SCCS Id: @(#)lev_lex.c	3.4	2000/12/22	*/
+/*	SCCS Id: @(#)lev_lex.c	3.4	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -88,11 +88,15 @@ static int map_cnt = 0;
 		  map_cnt = 0;
 		  return MAP_ID;
 		}
-<MAPC>[-|}{+ABCISHKPLWTF\\#. 0123456789]*\n	{
+<MAPC>[-|}{+ABCISHKPLWTF\\#. 0123456789]*\r?\n	{
+		  int len = yyleng;
+		  /* convert \r\n to \n */
+		  if (len >= 2 && yytext[len - 2] == '\r') len -= 1;
 		  line_number++;
-		  (void) strncpy(map + map_cnt, yytext, yyleng);
-		  map_cnt += yyleng;
-		  map[map_cnt] = 0;
+		  (void) strncpy(map + map_cnt, yytext, len);
+		  map_cnt += len;
+		  map[map_cnt - 1] = '\n';
+		  map[map_cnt] = '\0';
 		}
 ^#.*\n		{ line_number++; }
 :		{ colon_line_number = line_number; return ':'; }
@@ -103,7 +107,7 @@ LEVEL		return LEVEL_ID;
 INIT_MAP	return LEV_INIT_ID;
 FLAGS		return FLAGS_ID;
 GEOMETRY	return GEOMETRY_ID;
-^MAP\n		{ BEGIN(MAPC); line_number++; }
+^MAP\r?\n		{ BEGIN(MAPC); line_number++; }
 OBJECT		return OBJECT_ID;
 CONTAINER	return COBJECT_ID;
 MONSTER		return MONSTER_ID;
@@ -201,7 +205,7 @@ shortsighted	{ yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
 		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
 		  return STRING; }
-\n		{ line_number++; }
+\r?\n		{ line_number++; }
 [ \t]+		;
 '\\.'		{ yylval.i = yytext[2]; return CHAR; }
 '.'		{ yylval.i = yytext[1]; return CHAR; }

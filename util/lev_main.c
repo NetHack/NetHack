@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lev_main.c	3.4	2000/08/01	*/
+/*	SCCS Id: @(#)lev_main.c	3.4	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -52,8 +52,6 @@
 #else
 # define OMASK 0644
 #endif
-
-#define NEWLINE	'\n'	/* changes to 13 for MPW */
 
 #define ERR		(-1)
 
@@ -525,7 +523,7 @@ char *map;
 	/* Second, find the max width of the map */
 	s1 = map;
 	while (s1 && *s1) {
-		s2 = index(s1, NEWLINE);
+		s2 = index(s1, '\n');
 		if (s2) {
 			len = (int) (s2 - s1);
 			s1 = s2 + 1;
@@ -539,7 +537,7 @@ char *map;
 	/* Then parse it now */
 	while (map && *map) {
 		tmpmap[max_hig] = (char *) alloc(max_len);
-		s1 = index(map, NEWLINE);
+		s1 = index(map, '\n');
 		if (s1) {
 			len = (int) (s1 - map);
 			s1++;

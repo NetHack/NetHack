@@ -1,5 +1,5 @@
 %{
-/*	SCCS Id: @(#)dgn_lex.c	3.4	1996/03/02	*/
+/*	SCCS Id: @(#)dgn_lex.c	3.4	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson	     */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -111,7 +111,7 @@ RNDCHLEVEL	return(RNDCHLEVEL);
 		  Strcpy(yylval.str, yytext+1); /* Discard the first \" */
 		  return(STRING); }
 ^#.*\n		{ line_number++; }
-\n		{ line_number++; }
+\r?\n		{ line_number++; }
 [ \t]+		;	/* skip trailing tabs & spaces */
 .		{ return yytext[0]; }
 %%
