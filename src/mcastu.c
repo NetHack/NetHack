@@ -701,7 +701,7 @@ int adtyp;
      * This check isn't quite right because it always uses your real position.
      * We really want something like "if the monster could see mux, muy".
      */
-    boolean couldsee = couldsee(mtmp->mx, mtmp->my);
+    boolean mcouldseeu = couldsee(mtmp->mx, mtmp->my);
 
     if (adtyp == AD_SPEL) {
 	/* aggravate monsters, etc. won't be cast by peaceful monsters */
@@ -724,7 +724,7 @@ int adtyp;
 	if (mtmp->mhp == mtmp->mhpmax && spellnum == MGC_CURE_SELF)
 	    return TRUE;
 	/* don't summon monsters if it doesn't think you're around */
-	if (!couldsee && (spellnum == MGC_SUMMON_MONS ||
+	if (!mcouldseeu && (spellnum == MGC_SUMMON_MONS ||
 		(!mtmp->iswiz && spellnum == MGC_CLONE_WIZ)))
 	    return TRUE;
 	if ((!mtmp->iswiz || flags.no_of_wizards > 1)
@@ -738,7 +738,7 @@ int adtyp;
 	if (mtmp->mhp == mtmp->mhpmax && spellnum == CLC_CURE_SELF)
 	    return TRUE;
 	/* don't summon insects if it doesn't think you're around */
-	if (!couldsee && spellnum == CLC_INSECTS)
+	if (!mcouldseeu && spellnum == CLC_INSECTS)
 	    return TRUE;
 	/* blindness spell on blinded player */
 	if (Blinded && spellnum == CLC_BLIND_YOU)
