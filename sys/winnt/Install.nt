@@ -30,15 +30,15 @@ environments:
   o A copy of Borland C 5.5.1 command line tools.  Borland has made a
     version of its command line tools available for download after
     registration at:
-    http://www.borland.com/bcppbuilder/freecompiler/.
+        http://www.borland.com/bcppbuilder/freecompiler/
 
-        OR
+    OR
 
   o A copy of MinGW 2.0. MinGW is a collection of header files and import
     libraries with which native Windows32 programs can be made; the
     MinGW 2.0 distribution contains the GNU Compiler Collection.
     You can download MinGW at
-    http://www.mingw.org/
+        http://www.mingw.org/
     Earlier versions of MinGW will not allow you to build the Windows
     Graphical version.
     
@@ -51,7 +51,7 @@ Visual C's IDE (Integrated Development Environment.)
 FIRST STEP
 
 The first step in building either version of NetHack is to execute
-sys/winnt/nhsetup.bat.  
+sys\winnt\nhsetup.bat.  
 
 From the command prompt:
 	cd sys\winnt
@@ -87,7 +87,7 @@ executable for Graphical NetHack will be named NetHackW.exe. You can opt
 to build both; they will be able to use the same datafiles, save files
 and bones files.
 
-I.  Dispelling the Myths:
+I. Dispelling the Myths:
 
     Compiling NetHack for Win32 is not as easy as it sounds, nor as hard
     as it looks, however it will behoove you to read this entire section 
@@ -220,7 +220,7 @@ Compiling
         make /f Makefile.bcc install
 
     For GCC:
-        make -f Makefile.gcc install
+        mingw32-make -f Makefile.gcc install
 
     If you get any errors along the way then something has not been set
     up correctly. The time it takes to compile depends on your
@@ -245,7 +245,7 @@ Notes:
         make /f Makefile.bcc
 
     For GCC:
-        make -f Makefile.gcc
+        mingw32-make -f Makefile.gcc
 
     If you add, delete, or reorder monsters or objects, or you change
     the format of saved level files, delete any save and bones files.
@@ -272,7 +272,7 @@ BUILDING USING VISUAL C'S IDE
 Only the Win32 native port built on the Windows API, or Graphical
 NetHack, can be built using the Visual C IDE.
 
-I.  Dispelling the Myths:
+I. Dispelling the Myths:
 
     Compiling NetHack using the Visual C IDE is straightforward, as long
     as you have your compiler and tools correctly installed.  
@@ -343,34 +343,34 @@ Setting Up
     functionality and is the officially released build.
 
     Start the Visual C IDE. In the Visual C IDE menus, choose:
-           File | Open Workspace
+        File | Open Workspace
 
 4.  Set up for the build.
 
     In the Visual C "Open Workspace" dialog box, navigate to the top of
     your NetHack source directory.
- 
-            In there, highlight "nethack.dsw" and click on Open.
-            Once the workspace has been opened, you should see the following
-            list in the Visual C selection window:
-              + dgncomp files
-              + dgnstuff files
-              + dlb_main files
-              + levcomp files
-              + levstuff files
-              + makedefs files
-              + nethackw files
-              + recover files
-              + tile2bmp files
-              + tilemap files
-              + uudecode files
+
+    In there, highlight "nethack.dsw" and click on Open.
+    Once the workspace has been opened, you should see the following
+    list in the Visual C selection window:
+      + dgncomp files
+      + dgnstuff files
+      + dlb_main files
+      + levcomp files
+      + levstuff files
+      + makedefs files
+      + nethackw files
+      + recover files
+      + tile2bmp files
+      + tilemap files
+      + uudecode files
 
     On the Visual C menus, choose:
         Project | Set Active Project | NetHackW
 
     On the Visual C menus again, choose either:
         Build | Set Active Configuration | NetHackW - Win32 Release
-            or
+    or
         Build | Set Active Configuration | NetHackW - Win32 Debug
 
     The first will create the Release build of NetHackW which does not
@@ -378,7 +378,7 @@ Setting Up
     quicker.  The second will create the Debug build of NetHackW and
     will spend a lot of time writing debug information to the disk as
     the game is played. Unless you are debugging or enhancing NetHack
-            for Windows, choose the Release build.
+    for Windows, choose the Release build.
 
 Building
     
@@ -386,8 +386,8 @@ Building
 
     On the Visual C menus once again, choose:
         Build | Build NetHackW.exe
-          This starts the build.  It is likely that the IDE message window 
-          where you are doing the compiling will be occupied for a while.
+    This starts the build.  It is likely that the IDE message window 
+    where you are doing the compiling will be occupied for a while.
 
 6.  If all has gone well to this point, you should now have a NetHack
     executable called NetHackW.exe in the "binary" directory, along with

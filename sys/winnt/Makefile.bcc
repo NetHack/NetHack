@@ -13,22 +13,25 @@
 #   root, but this can be changed by modifying the bccroot and related
 #   variables.
 #
-#   This is used for building a TTY or graphical version of NetHack using
-#   WIN32 Console I/O and API routines only.
+#   This is used for building two versions of NetHack:
+#   A tty port utilizing the Win32 Console I/O subsystem, Console
+#       NetHack;
+#   A Win32 native port built on the Windows API, Graphical NetHack or
+#       NetHackW.
 #
 #   In addition to your C compiler,
 #
 #     if you want to change     you will need a
-#     files with suffix               workalike for
-#              .y                          yacc   (such as bison)
-#              .l                           lex    (such as flex)
+#     files with suffix         workalike for
+#              .y                   yacc   (such as bison)
+#              .l                   lex    (such as flex)
 #
 #
 #   If you have any questions read the sys/winnt/Install.nt file included 
 #   with the distribution.
 #
 #   --
-#       Yitzhak Sapir
+#   Yitzhak Sapir
 #==============================================================================
 # Do not delete the following 3 lines.
 #
@@ -167,19 +170,6 @@ RANDOM	= $(OBJ)\random.o
 #RANDOM	=
 
 #
-# - For debugging ability, comment out the upper two 
-#   macros and uncomment the lower two.
-#
-
-#
-#  Leave the next two lines uncommented _ONLY_ if you do NOT want any
-#  debug capability in the object files, or in the NetHack executable.
-#  Comment them if you want debug capability.
-
-#cdebug =
-#linkdebug =
-
-#
 # Compiler and Linker flags
 #
 
@@ -220,10 +210,7 @@ TILEBMP16   = $(SRC)\tiles.bmp
 TILEUTIL32  = $(UTIL)\til2bm32.exe
 TILEBMP32   = $(SRC)\tiles32.bmp
 
-# These should be left commented in 3.4.x
-#
-
-#SOUND = $(OBJ)\ntsound.o
+SOUND = $(OBJ)\ntsound.o
 #SOUND =
 
 # To store all the level files,
@@ -238,10 +225,6 @@ DLBFLG = -DDLB
 DLBFLG =
 ! ENDIF
 
-# You can actually build a set of tiles 
-# with this makefile even though they 
-# are not used. Use 'nmake o\nhtiles.bmp'
-#
 
 #==========================================
 # Setting up the compiler and linker

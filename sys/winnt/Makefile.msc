@@ -7,8 +7,11 @@
 #                              - Microsoft 32 bit Visual C++ V4.x
 #                              - Microsoft 32 bit Visual C++ V6.0 SP3, SP4
 #
-#	This is used for building a TTY version of NetHack using WIN32 Console
-#	I/O routines only.
+#   This is used for building two versions of NetHack:
+#   A tty port utilizing the Win32 Console I/O subsystem, Console
+#       NetHack;
+#   A Win32 native port built on the Windows API, Graphical NetHack or
+#       NetHackW.
 #
 #       In addition to your C compiler,
 #
@@ -34,14 +37,13 @@ APPVER=4.0
 
 #GRAPHICAL = Y
 
-#
 #  Set the gamedir according to your preference.  
 #  If not present prior to compilation it gets created.
 
 !IF "$(GRAPHICAL)" == "Y"
-GAME    = NetHack                 # Game Name
-!ELSE
 GAME    = NetHackW                # Game Name
+!ELSE
+GAME    = NetHack                 # Game Name
 !ENDIF
 
 GAMEDIR = ..\binary               # Game directory
@@ -112,11 +114,6 @@ LEXYYC  = lexyy.c
 
 RANDOM	= $(OBJ)\random.o
 #RANDOM	=
-
-#
-# - For debugging ability, comment out the upper two 
-#   macros and uncomment the lower two.
-#
 
 #
 #  Leave the next two lines uncommented _ONLY_ if you do NOT want any

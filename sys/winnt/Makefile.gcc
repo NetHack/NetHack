@@ -4,20 +4,24 @@
 #   NetHack 3.4.x Makefile for MinGW
 #
 #   Win32 Compilers Tested:
-#                              - gcc version 2.95.3-6
+#                  - MinGW 1.0 (gcc version 2.95.3-6) (Console NetHack only)
+#                  - MinGW 2.0 (gcc version 3.2)
 #
 #   If you don't have this compiler, you can get it at:
 #       http://www.mingw.org/
 #
-#   This is used for building a TTY version of NetHack using
-#   WIN32 Console I/O only.
+#   This is used for building two versions of NetHack:
+#   A tty port utilizing the Win32 Console I/O subsystem, Console
+#       NetHack;
+#   A Win32 native port built on the Windows API, Graphical NetHack or
+#       NetHackW.
 #
 #   In addition to your C compiler,
 #
 #     if you want to change     you will need a
-#     files with suffix               workalike for
-#              .y                          yacc   (such as bison)
-#              .l                          lex    (such as flex)
+#     files with suffix         workalike for
+#         .y                     yacc   (such as bison)
+#         .l                     lex    (such as flex)
 #
 #
 #   If you have any questions read the sys/winnt/Install.nt file included
@@ -27,11 +31,10 @@
 #   Dion Nicolaas
 #==============================================================================
 # Graphical interface
-# Don't uncomment this line for 3.4.1
 # Set to Y for a graphical version
 # Set to anything else (or undefine) for a tty version
 
-GRAPHICAL = N
+#GRAPHICAL = Y
 
 # Debug
 # Set to Y for Debug support (to produce debug information)
@@ -159,7 +162,6 @@ WINPORT  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
-# WIN32_IE=0x400 is currently unsupported by MinGW
 WINPFLAG   = -DTILES -DMSWIN_GRAPHICS -D_WIN32_IE=0x0400
 NHRES   = $(O)winres.o
 WINPINC = -I$(WIN32)
@@ -168,14 +170,14 @@ WINPHDR = $(WIN32)/mhaskyn.h $(WIN32)/mhdlg.h $(WIN32)/mhfont.h \
 	$(WIN32)/mhmenu.h $(WIN32)/mhmsg.h $(WIN32)/mhmsgwnd.h \
 	$(WIN32)/mhrip.h $(WIN32)/mhstatus.h \
 	$(WIN32)/mhtext.h $(WIN32)/resource.h $(WIN32)/winMS.h
-WINPLIBS =  -lcomctl32
+WINPLIBS =  -lcomctl32 -lwinmm
 else
 WINPORT = $(O)nttty.o
 WINPFLAG= -DWIN32CON
 WINPHDR =
 NHRES   = $(O)console.o
 WINPINC =
-WINPLIBS =
+WINPLIBS = -lwinmm
 endif
 
 TILEUTIL16  = $(UTIL)/tile2bmp.exe
@@ -184,10 +186,8 @@ TILEBMP16   = $(SRC)/tiles.bmp
 TILEUTIL32  = $(UTIL)/til2bm32.exe
 TILEBMP32   = $(SRC)/tiles32.bmp
 
-# These should be left commented in 3.4.x
-#
+SOUND = $(OBJ)/ntsound.o
 
-#SOUND = $(OBJ)/ntsound.o
 #SOUND =
 
 # To store all the level files,
