@@ -196,7 +196,7 @@ TILEGAME  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
 TILEDEF   = -DTILES -DMSWIN_GRAPHICS
-TILERES	  = $(O)winhack.res
+TILERES   = $(O)winhack.res
 TILEINCL  = -I$(WIN32)
 TILEHDR   = $(WIN32)\mhaskyn.h $(WIN32)\mhdlg.h $(WIN32)\mhfont.h \
 	$(WIN32)\mhinput.h $(WIN32)\mhmain.h $(WIN32)\mhmap.h $(WIN32)\mhmenu.h \
@@ -206,7 +206,7 @@ TILEHDR   = $(WIN32)\mhaskyn.h $(WIN32)\mhdlg.h $(WIN32)\mhfont.h \
 TILEGAME  = $(O)nttty.o    
 TILEDEF   = -DWIN32CON
 TILEHDR   =
-TILERES   =
+TILERES   = $(O)console.res
 TILEINCL  =
 !ENDIF
 
@@ -576,6 +576,9 @@ tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 !IF "$(GRAPHICAL)"=="Y"
 $(TILERES): $(TILEBMP) $(WIN32)\winhack.rc
 	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
+!ELSE
+$(TILERES): $(NTSYS)\console.rc
+	@$(rc) -r -fo$@ -i$(NTSYS) -dNDEBUG $(NTSYS)\console.rc
 !ENDIF
 
 #==========================================

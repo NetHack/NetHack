@@ -42,8 +42,8 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
+# ADD BASE CPP /nologo /W3 /GX /Og /Oy /Ob1 /Gs /Gf /Gy /Oi- /Ot  /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /W3 /GX /Og /Oy /Ob1 /Gs /Gf /Gy /Oi- /Ot  /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
