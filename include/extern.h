@@ -577,7 +577,7 @@ E void FDECL(more_experienced, (int,int));
 E void FDECL(losexp, (const char *));
 E void NDECL(newexplevel);
 E void FDECL(pluslvl, (BOOLEAN_P));
-E long NDECL(rndexp);
+E long FDECL(rndexp, (BOOLEAN_P));
 
 /* ### explode.c ### */
 

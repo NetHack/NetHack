@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2002/03/23	*/
+/*	SCCS Id: @(#)potion.c	3.4	2002/07/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -770,7 +770,7 @@ peffects(otmp)
 			/* blessed potions place you at a random spot in the
 			 * middle of the new level instead of the low point
 			 */
-			u.uexp = rndexp();
+			u.uexp = rndexp(TRUE);
 		break;
 	case POT_HEALING:
 		You_feel("better.");

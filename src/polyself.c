@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.4	2002/06/23	*/
+/*	SCCS Id: @(#)polyself.c	3.4	2002/07/11	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -159,7 +159,7 @@ newman()
 	reset_rndmonst(NON_PM);	/* new monster generation criteria */
 
 	/* random experience points for the new experience level */
-	u.uexp = rndexp();
+	u.uexp = rndexp(FALSE);
 
 	/* u.uhpmax * u.ulevel / oldlvl: proportionate hit points to new level
 	 * -10 and +10: don't apply proportionate HP to 10 of a starting

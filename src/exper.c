@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)exper.c	3.4	2002/06/23	*/
+/*	SCCS Id: @(#)exper.c	3.4	2002/07/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -216,17 +216,32 @@ boolean incr;	/* true iff via incremental experience growth */
 	flags.botl = 1;
 }
 
+/* compute a random amount of experience points suitable for the hero's
+   experience level:  base number of points needed to reach the current
+   level plus a random portion of what it takes to get to the next level */
 long
-rndexp()
+rndexp(gaining)
+boolean gaining;	/* gaining XP via potion vs setting XP for polyself */
 {
-	long minexp, maxexp, diff, factor;
+	long minexp, maxexp, diff, factor, result;
 
 	minexp = (u.ulevel == 1) ? 0L : newuexp(u.ulevel - 1);
 	maxexp = newuexp(u.ulevel);
 	diff = maxexp - minexp,  factor = 1L;
+	/* make sure that `diff' is an argument which rn2() can handle */
 	while (diff >= (long)LARGEST_INT)
 	    diff /= 2L,  factor *= 2L;
-	return minexp + factor * (long)rn2((int)diff);
+	result = minexp + factor * (long)rn2((int)diff);
+	/* 3.4.1:  if already at level 30, add to current experience
+	   points rather than to threshold needed to reach the current
+	   level; otherwise blessed potions of gain level can result
+	   in lowering the experience points instead of raising them */
+	if (u.ulevel == MAXULEV && gaining) {
+	    result += (u.uexp - minexp);
+	    /* avoid wrapping (over 400 blessed potions needed for that...) */
+	    if (result < u.uexp) result = u.uexp;
+	}
+	return result;
 }
 
 /*exper.c*/
