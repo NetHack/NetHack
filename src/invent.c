@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2004/11/03	*/
+/*	SCCS Id: @(#)invent.c	3.5	2005/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1422,7 +1422,11 @@ nextclass:
 		case 'y':
 			tmp = (*fn)(otmp);
 			if(tmp < 0) {
-			    if (otmp != otmpo) {
+			    if (container_gone(fn)) {
+				/* otmp caused magic bag to explode;
+				   both are now gone */
+				otmp = 0;		/* and return */
+			    } else if (otmp && otmp != otmpo) {
 				/* split occurred, merge again */
 				(void) merged(&otmpo, &otmp);
 			    }

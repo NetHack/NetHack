@@ -58,8 +58,8 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 
 /* A variable set in use_container(), to be used by the callback routines  */
 /* in_container() and out_container() from askchain() and use_container(). */
-/* Also used by menu_loot().  And by doapply(apply.c).			   */
-struct obj *current_container;
+/* Also used by menu_loot() and container_gone().			   */ 
+static NEARDATA struct obj *current_container;
 #define Icebox (current_container->otyp == ICE_BOX)
 
 static const char moderateloadmsg[] = "You have a little trouble lifting";
@@ -1508,7 +1508,7 @@ int x, y;
 int
 doloot()	/* loot a container on the floor or loot saddle from mon. */
 {
-    register struct obj *cobj, *nobj;
+    struct obj *cobj, *nobj;
     register int c = -1;
     int timepassed = 0;
     coord cc;
@@ -1567,8 +1567,9 @@ lootcont:
 		}
 
 		You("carefully open %s...", the(xname(cobj)));
-		timepassed |= use_container(cobj, 0);
-		if (multi < 0) return 1;		/* chest trap */
+		timepassed |= use_container(&cobj, 0);
+		/* might have triggered chest trap or magic bag explosion */
+		if (multi < 0 || !cobj) return 1;
 	    }
 	}
 	if (any) c = 'y';
@@ -2067,12 +2068,21 @@ struct obj *box;
 
 #undef Icebox
 
-int
-use_container(obj, held)
-register struct obj *obj;
-register int held;
+/* used by askchain() to check for magic bag explosion */
+boolean
+container_gone(fn)
+int FDECL((*fn), (OBJ_P));
 {
-	struct obj *curr, *otmp;
+    /* result is only meaningful while use_container() is executing */
+    return ((fn == in_container || fn == out_container) && !current_container);
+}
+
+int
+use_container(objp, held)
+struct obj **objp;
+int held;
+{
+	struct obj *curr, *otmp, *obj = *objp;
 #ifndef GOLDOBJ
 	struct obj *u_gold = (struct obj *)0;
 #endif
@@ -2109,7 +2119,9 @@ register int held;
 	    return 1;
 	}
 	obj->lknown = 1;
+
 	current_container = obj;	/* for use by in/out_container */
+	/* from here on out, all early returns go through containerdone */
 
 	if (obj->spe == 1) {
 	    observe_quantum_cat(obj);
@@ -2145,23 +2157,28 @@ register int held;
 		if (flags.menu_style == MENU_FULL) {
 		    int t;
 		    char menuprompt[BUFSZ];
-		    boolean outokay = (cnt != 0);
+		    boolean outokay = (cnt != 0),
+			    inokay = (invent != 0);
+
 #ifndef GOLDOBJ
-		    boolean inokay = (invent != 0) || (u.ugold != 0);
-#else
-		    boolean inokay = (invent != 0);
+		    if (u.ugold) inokay = TRUE;
 #endif
+		    if (!cnt) obj->cknown = 1;	/* will be giving emptymsg */
+
 		    if (!outokay && !inokay) {
 			pline("%s", emptymsg);
 			You("don't have anything to put in.");
-			if (used) obj->cknown = 1;
-			return used;
+			goto containerdone;
 		    }
 		    menuprompt[0] = '\0';
 		    if (!cnt) Sprintf(menuprompt, "%s ", emptymsg);
 		    Strcat(menuprompt, "Do what?");
-		    t = in_or_out_menu(menuprompt, current_container, outokay, inokay);
-		    if (t <= 0) return 0;
+		    t = in_or_out_menu(menuprompt, current_container,
+				       outokay, inokay);
+		    if (t <= 0) {
+			used = 0;
+			goto containerdone;
+		    }
 		    loot_out = (t & 0x01) != 0;
 		    loot_in  = (t & 0x02) != 0;
 		} else {	/* MENU_COMBINATION or MENU_PARTIAL */
@@ -2208,12 +2225,12 @@ ask_again2:
 		    break;
 		case 'q':
 		default:
-		    if (used) obj->cknown = 1;
-		    return used;
+		    goto containerdone;
 		}
 	    }
 	} else {
 	    pline("%s", emptymsg);		/* <whatever> is empty. */
+	    obj->cknown = 1;
 	}
 
 #ifndef GOLDOBJ
@@ -2223,8 +2240,7 @@ ask_again2:
 #endif
 	    /* nothing to put in, but some feedback is necessary */
 	    You("don't have anything to put in.");
-	    if (used) obj->cknown = 1;
-	    return used;
+	    goto containerdone;
 	}
 	if (flags.menu_style != MENU_FULL) {
 	    Sprintf(qbuf, "Do you wish to put %s in?", something);
@@ -2244,8 +2260,7 @@ ask_again2:
 		    break;
 		case 'q':
 		default:
-		    if (used) obj->cknown = 1;
-		    return used;
+		    goto containerdone;
 	    }
 	}
 	/*
@@ -2298,6 +2313,16 @@ ask_again2:
 	    dealloc_obj(u_gold);
 	}
 #endif
+
+ containerdone:
+	/* Not completely correct; if we put something in without knowing
+	   whatever was already inside, now we suddenly do.  That can't be
+	   helped unless we want to track things item by item and then deal
+	   with containers whose contents are "partly known". */
+	if (used) obj->cknown = 1;
+
+	*objp = current_container;	/* might have become null */
+	current_container = 0;		/* avoid hanging on to stale pointer */
 	return used;
 }
 

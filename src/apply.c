@@ -45,9 +45,6 @@ STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 void FDECL( amii_speaker, ( struct obj *, char *, int ) );
 #endif
 
-/* managed by use_container(pickup.c) */
-extern struct obj *current_container;
-
 static const char no_elbow_room[] = "don't have enough elbow-room to maneuver.";
 
 #ifdef TOURIST
@@ -2969,10 +2966,7 @@ doapply()
 	case SACK:
 	case BAG_OF_HOLDING:
 	case OILSKIN_SACK:
-		res = use_container(obj, 1);
-		/* magic bag might end up being destroyed;
-		   if so, current_container will be null */
-		obj = current_container;
+		res = use_container(&obj, 1);
 		break;
 	case BAG_OF_TRICKS:
 		bagotricks(obj);
