@@ -342,6 +342,7 @@ E char *FDECL(a_monnam, (struct monst *));
 E char *FDECL(distant_monnam, (struct monst *,int,char *));
 E const char *NDECL(rndmonnam);
 E const char *FDECL(hcolor, (const char *));
+E const char *NDECL(rndcolor);
 #ifdef REINCARNATION
 E const char *NDECL(roguename);
 #endif
