@@ -226,10 +226,10 @@ static struct Comp_Opt
 	{ "font_message", "the font to use in the message window",
 						40, DISP_IN_GAME },		/*WC*/
 	{ "font_size_map", "the size of the map font", 20, DISP_IN_GAME },	/*WC*/
-	{ "font_size_menu", "the size of the map font", 20, DISP_IN_GAME },	/*WC*/
-	{ "font_size_message", "the size of the map font", 20, DISP_IN_GAME },	/*WC*/
-	{ "font_size_status", "the size of the map font", 20, DISP_IN_GAME },	/*WC*/
-	{ "font_size_text", "the size of the map font", 20, DISP_IN_GAME },	/*WC*/
+	{ "font_size_menu", "the size of the menu font", 20, DISP_IN_GAME },	/*WC*/
+	{ "font_size_message", "the size of the message font", 20, DISP_IN_GAME },	/*WC*/
+	{ "font_size_status", "the size of the status font", 20, DISP_IN_GAME },	/*WC*/
+	{ "font_size_text", "the size of the text font", 20, DISP_IN_GAME },	/*WC*/
 	{ "font_status", "the font to use in status window", 40, DISP_IN_GAME }, /*WC*/
 	{ "font_text", "the font to use in text windows", 40, DISP_IN_GAME },	/*WC*/
 	{ "fruit",    "the name of a fruit you enjoy eating",
