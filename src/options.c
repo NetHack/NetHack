@@ -110,7 +110,7 @@ static struct Bool_Opt
 #else
 	{"ignintr", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-	{"large_font", &iflags.wc_large_font, FALSE, SET_IN_FILE},	/*WC*/
+	{"large_font", &iflags.obsolete, FALSE, SET_IN_FILE},	/* OBSOLETE */
 	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
 	{"lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME},
 	{"lootabc", &iflags.lootabc, FALSE, SET_IN_GAME},
@@ -294,6 +294,8 @@ static struct Comp_Opt
 						sizeof "teleport", SET_IN_GAME },
 	{ "scores",   "the parts of the score list you wish to see",
 						32, SET_IN_GAME },
+	{ "scroll_amount", "scroll the map this amount when scroll_margin is reached",
+						20, DISP_IN_GAME }, /*WC*/
 	{ "scroll_margin", "scroll map when this far from the edge", 20, DISP_IN_GAME }, /*WC*/
 #ifdef MSDOS
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
@@ -1867,6 +1869,16 @@ goodfruit:
 		return;
 	}
 	/* WINCAP
+	 * scroll_amount:nn */
+	fullname = "scroll_amount";
+	if (match_optname(opts, fullname, sizeof("scroll_amount")-1, TRUE)) {
+		op = string_for_opt(opts, negated);
+		if ((negated && !op) || (!negated && op)) {
+			iflags.wc_scroll_amount = negated ? 1 : atoi(op);
+		} else if (negated) bad_negation(fullname, TRUE);
+		return;
+	}
+	/* WINCAP
 	 * scroll_margin:nn */
 	fullname = "scroll_margin";
 	if (match_optname(opts, fullname, sizeof("scroll_margin")-1, TRUE)) {
@@ -2759,6 +2771,10 @@ char *buf;
 		Sprintf(buf, "%d top/%d around%s", flags.end_top,
 				flags.end_around, flags.end_own ? "/own" : "");
 	}
+	else if (!strcmp(optname, "scroll_amount")) {
+		if (iflags.wc_scroll_amount) Sprintf(buf, "%d",iflags.wc_scroll_amount);
+		else Strcpy(buf, defopt);
+	}
 	else if (!strcmp(optname, "scroll_margin")) {
 		if (iflags.wc_scroll_margin) Sprintf(buf, "%d",iflags.wc_scroll_margin);
 		else Strcpy(buf, defopt);
@@ -3145,7 +3161,6 @@ struct wc_Opt wc_options[] = {
 	{"color", WC_COLOR},
 	{"eight_bit_tty", WC_EIGHT_BIT_IN},
 	{"hilite_pet", WC_HILITE_PET},
-	{"large_font", WC_LARGE_FONT},	/* now obsolete */
 	{"popup_dialog", WC_POPUP_DIALOG},
 	{"player_selection", WC_PLAYER_SELECTION},
 	{"preload_tiles", WC_PRELOAD_TILES},
@@ -3170,6 +3185,7 @@ struct wc_Opt wc_options[] = {
 	{"font_status", WC_FONT_STATUS},
 	{"font_text", WC_FONT_TEXT},
 	{"map_mode", WC_MAP_MODE},
+	{"scroll_amount", WC_SCROLL_AMOUNT},
 	{"scroll_margin", WC_SCROLL_MARGIN},
 	{"splash_screen", WC_SPLASH_SCREEN},
 	{"vary_msgcount",WC_VARY_MSGCOUNT},

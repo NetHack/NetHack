@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.50 $ $Date: 2002/08/12 01:39:55 $
+% $Revision: 1.51 $ $Date: 2002/08/22 04:18:41 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2642,6 +2642,10 @@ For example, in the protected mode MSDOS version, control whether tiles
 get pre-loaded into RAM at the start of the game.  Doing so
 enhances performance of the tile graphics, but uses more memory. (default on).
 Cannot be set with the `{\tt O}' command.
+%.lp
+\item[\ib{scroll\_amount}]
+NetHack should scroll the display by this number of cells
+when the hero reaches the scroll\_margin.
 %.lp
 \item[\ib{scroll\_margin}]
 NetHack should scroll the display when the hero or cursor

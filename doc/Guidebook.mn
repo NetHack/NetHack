@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "July 27, 2002
+.ds f2 "August 22, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2147,7 +2147,10 @@ For example, in the protected mode MSDOS version, control whether tiles
 get pre-loaded into RAM at the start of the game.  Doing so
 enhances performance of the tile graphics, but uses more memory. (default on).
 Cannot be set with the `O' command.
-.lp scroll_margin	
+.lp scroll_amount
+NetHack should scroll the display by this number of cells
+when the hero reaches the scroll_margin.
+.lp scroll_margin
 NetHack should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
 .lp splash_screen

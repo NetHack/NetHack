@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)flag.h	3.4	2002/07/27	*/
+/*	SCCS Id: @(#)flag.h	3.4	2002/08/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -241,6 +241,7 @@ struct instance_flags {
 	int     wc_fontsiz_status;	/* font size for the status window     */
 	int     wc_fontsiz_menu;	/* font size for the menu window       */
 	int     wc_fontsiz_text;	/* font size for text windows          */
+	int	wc_scroll_amount;	/* scroll this amount at scroll_margin */
 	int	wc_scroll_margin;	/* scroll map when this far from
 						the edge */
 	int	wc_map_mode;		/* specify map viewing options, mostly
@@ -249,12 +250,11 @@ struct instance_flags {
 	boolean	wc_splash_screen;	/* display an opening splash screen or not */
 	boolean	wc_popup_dialog;	/* put queries in pop up dialogs instead of
 				   		in the message window */
-	boolean wc_large_font;		/* draw in larger fonts (say, 12pt instead
-				   		of 9pt) */
 	boolean wc_eight_bit_input;	/* allow eight bit input               */
 	boolean wc_mouse_support;	/* allow mouse support */
 
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
+	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
 	/* Items which belong in flags, but are here to allow save compatibility */
 	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */
 	boolean  showrace;	/* show hero glyph by race rather than by role */
@@ -274,7 +274,7 @@ struct instance_flags {
 #define hilite_pet wc_hilite_pet
 #define use_inverse wc_inverse
 #ifdef MAC_GRAPHICS_ENV
-#define large_font wc_large_font
+#define large_font obsolete
 #endif
 #ifdef MAC
 #define popup_dialog wc_popup_dialog

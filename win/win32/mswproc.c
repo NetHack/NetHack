@@ -65,7 +65,7 @@ COLORREF message_fg_color = RGB(0xFF, 0xFF, 0xFF);
 struct window_procs mswin_procs = {
     "MSWIN",
     WC_COLOR|WC_HILITE_PET|WC_ALIGN_MESSAGE|WC_ALIGN_STATUS|
-	WC_INVERSE|WC_SCROLL_MARGIN|WC_MAP_MODE|
+	WC_INVERSE|WC_SCROLL_AMOUNT|WC_SCROLL_MARGIN|WC_MAP_MODE|
 	WC_FONT_MESSAGE|WC_FONT_STATUS|WC_FONT_MENU|WC_FONT_TEXT|
 	WC_FONTSIZ_MESSAGE|WC_FONTSIZ_STATUS|WC_FONTSIZ_MENU|WC_FONTSIZ_TEXT|
 	WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE|WC_VARY_MSGCOUNT|
@@ -187,6 +187,7 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	if( iflags.wc_align_message==0 ) iflags.wc_align_message = ALIGN_TOP;
 	if( iflags.wc_align_status==0 ) iflags.wc_align_status = ALIGN_BOTTOM;
 	if( iflags.wc_scroll_margin==0 ) iflags.wc_scroll_margin = DEF_CLIPAROUND_MARGIN;
+	if( iflags.wc_scroll_amount==0 ) iflags.wc_scroll_amount = DEF_CLIPAROUND_AMOUNT;
 	if( iflags.wc_tile_width==0 ) iflags.wc_tile_width = TILE_X;
 	if( iflags.wc_tile_height==0 ) iflags.wc_tile_height = TILE_Y;
 
@@ -216,7 +217,8 @@ void mswin_init_nhwindows(int* argc, char** argv)
 		WC_HILITE_PET |
 		WC_ALIGN_MESSAGE | 
 		WC_ALIGN_STATUS |
-		WC_SCROLL_MARGIN | 
+		WC_SCROLL_AMOUNT |
+		WC_SCROLL_MARGIN |
 		WC_MAP_MODE |
 		WC_FONT_MESSAGE |
 		WC_FONT_STATUS |
@@ -1825,6 +1827,11 @@ void mswin_preference_update(const char *pref)
 		ReleaseDC(GetNHApp()->hMainWnd, hdc);
 
 		mswin_layout_main_window(NULL);
+		return;
+	}
+
+	if( stricmp( pref, "scroll_amount")==0 ) {
+		mswin_cliparound(u.ux, u.uy);
 		return;
 	}
 

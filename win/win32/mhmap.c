@@ -420,6 +420,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			( msg_data->y<(data->yPos+mcam) ||
 			  msg_data->y>(data->yPos+data->yPageSize-mcam) );
 		
+     mcam += iflags.wc_scroll_amount;
 		/* get page size and center horizontally on x-position */
 		if( scroll_x ) {
 			if( data->xPageSize<=2*mcam ) {
