@@ -411,6 +411,8 @@ struct mkroom	*sroom;
 #else
         mkmonmoney(shk, 1000L + 30L*(long)rnd(100));	/* initial capital */
 #endif
+	if (shp->shknms == shkrings)
+	    (void) mongets(shk, TOUCHSTONE);
 	nameshk(shk, shp->shknms);
 
 	return(sh);
