@@ -105,7 +105,9 @@ getlock()
 # if defined(MSDOS) && defined(NO_TERMS)
 	int grmode = iflags.grmode;
 # endif
-	
+#ifdef WIN32CON
+	if (iflags.rawio) set_output_mode(0);
+#endif
 	/* we ignore QUIT and INT at this point */
 	if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
 		wait_synch();
