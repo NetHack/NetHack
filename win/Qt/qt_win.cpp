@@ -69,6 +69,7 @@ extern "C" {
 #undef max
 #undef alloc
 #undef lock
+#undef yn
 
 }
 
@@ -2535,7 +2536,7 @@ void NetHackQtStatusWindow::updateStats()
     name.setLabel(buf,NetHackQtLabelledIcon::NoNum,u.ulevel);
 
     if (describe_level(buf)) {
-	dlevel.setLabel(buf,TRUE);
+	dlevel.setLabel(buf,(bool)TRUE);
     } else {
 	Sprintf(buf, "%s, level ", dungeons[u.uz.dnum].dname);
 	dlevel.setLabel(buf,(long)depth(&u.uz));
