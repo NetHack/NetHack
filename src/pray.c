@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.4	2002/10/06	*/
+/*	SCCS Id: @(#)pray.c	3.4	2003/03/10	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -70,33 +70,37 @@ static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
  * order to have the values be meaningful.
  */
 
-#define TROUBLE_STONED 12
-#define TROUBLE_SLIMED 11
-#define TROUBLE_STRANGLED 10
-#define TROUBLE_LAVA 9
-#define TROUBLE_SICK 8
-#define TROUBLE_STARVING 7
-#define TROUBLE_HIT 6
-#define TROUBLE_LYCANTHROPE 5
-#define TROUBLE_COLLAPSING 4
-#define TROUBLE_STUCK_IN_WALL 3
-#define TROUBLE_CURSED_LEVITATION 2
-#define TROUBLE_CURSED_BLINDFOLD 1
+#define TROUBLE_STONED			13
+#define TROUBLE_SLIMED			12
+#define TROUBLE_STRANGLED		11
+#define TROUBLE_LAVA			10
+#define TROUBLE_SICK			 9
+#define TROUBLE_STARVING		 8
+#define TROUBLE_HIT			 7
+#define TROUBLE_LYCANTHROPE		 6
+#define TROUBLE_COLLAPSING		 5
+#define TROUBLE_STUCK_IN_WALL		 4
+#define TROUBLE_CURSED_LEVITATION	 3
+#define TROUBLE_UNUSEABLE_HANDS		 2
+#define TROUBLE_CURSED_BLINDFOLD	 1
 
-#define TROUBLE_PUNISHED (-1)
-#define TROUBLE_FUMBLING (-2)
-#define TROUBLE_CURSED_ITEMS (-3)
-#define TROUBLE_SADDLE (-4)
-#define TROUBLE_BLIND (-5)
-#define TROUBLE_POISONED (-6)
-#define TROUBLE_WOUNDED_LEGS (-7)
-#define TROUBLE_HUNGRY (-8)
-#define TROUBLE_STUNNED (-9)
-#define TROUBLE_CONFUSED (-10)
-#define TROUBLE_HALLUCINATION (-11)
+#define TROUBLE_PUNISHED	       (-1)
+#define TROUBLE_FUMBLING	       (-2)
+#define TROUBLE_CURSED_ITEMS	       (-3)
+#define TROUBLE_SADDLE		       (-4)
+#define TROUBLE_BLIND		       (-5)
+#define TROUBLE_POISONED	       (-6)
+#define TROUBLE_WOUNDED_LEGS	       (-7)
+#define TROUBLE_HUNGRY		       (-8)
+#define TROUBLE_STUNNED		       (-9)
+#define TROUBLE_CONFUSED	      (-10)
+#define TROUBLE_HALLUCINATION	      (-11)
 
 /* We could force rehumanize of polyselfed people, but we can't tell
-   unintentional shape changes from the other kind. Oh well. */
+   unintentional shape changes from the other kind. Oh well.
+   3.4.2: make an exception if polymorphed into a form which lacks
+   hands; that's a case where the ramifications override this doubt.
+ */
 
 /* Return 0 if nothing particular seems wrong, positive numbers for
    serious trouble, and negative numbers for comparative annoyances. This
@@ -115,9 +119,7 @@ but that's really hard.
 STATIC_OVL int
 in_trouble()
 {
-#ifdef STEED
-	register struct obj *otmp;
-#endif
+	struct obj *otmp;
 	int i, j, count=0;
 
 /* Borrowed from eat.c */
@@ -158,6 +160,15 @@ in_trouble()
 		stuck_ring(uleft, RIN_LEVITATION) ||
 		stuck_ring(uright, RIN_LEVITATION))
 		return(TROUBLE_CURSED_LEVITATION);
+	if (nohands(youmonst.data) || !freehand()) {
+	    /* for bag/box access [cf use_container()]...
+	       make sure it's a case that we know how to handle;
+	       otherwise "fix all troubles" would get stuck in a loop */
+	    if (welded(uwep)) return TROUBLE_UNUSEABLE_HANDS;
+	    if (Upolyd && nohands(youmonst.data) && (!Unchanging ||
+		    ((otmp = unchanger()) != 0 && otmp->cursed)))
+		return TROUBLE_UNUSEABLE_HANDS;
+	}
 	if(Blindfolded && ublindf->cursed) return(TROUBLE_CURSED_BLINDFOLD);
 
 	/*
@@ -202,9 +213,8 @@ worst_cursed_item()
 	    if (Cursed_obj(otmp, LOADSTONE)) return otmp;
     }
     /* weapon takes precedence if it is interfering
-       with taking off a ring or shield */
-    if (welded(uwep) &&					/* weapon */
-	    (uright || (bimanual(uwep) && (uleft || uarms)))) {
+       with taking off a ring or putting on a shield */
+    if (welded(uwep) && (uright || bimanual(uwep))) {	/* weapon */
 	otmp = uwep;
     /* gloves come next, due to rings */
     } else if (uarmg && uarmg->cursed) {		/* gloves */
@@ -335,6 +345,23 @@ register int trouble;
 			if (otmp == uright) what = rightglow;
 		    }
 		    goto decurse;
+	    case TROUBLE_UNUSEABLE_HANDS:
+		    if (welded(uwep)) {
+			otmp = uwep;
+			goto decurse;
+		    }
+		    if (Upolyd && nohands(youmonst.data)) {
+			if (!Unchanging) {
+			    Your("shape becomes uncertain.");
+			    rehumanize();  /* "You return to {normal} form." */
+			} else if ((otmp = unchanger()) != 0 && otmp->cursed) {
+			    /* otmp is an amulet of unchanging */
+			    goto decurse;
+			}
+		    }
+		    if (nohands(youmonst.data) || !freehand())
+			impossible("fix_worst_trouble: couldn't cure hands.");
+		    break;
 	    case TROUBLE_CURSED_BLINDFOLD:
 		    otmp = ublindf;
 		    goto decurse;

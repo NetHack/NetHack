@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.4	2003/01/02	*/
+/*	SCCS Id: @(#)extern.h	3.4	2003/03/10	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -385,6 +385,7 @@ E void NDECL(glibr);
 E struct obj *FDECL(some_armor,(struct monst *));
 E void FDECL(erode_armor, (struct monst *,BOOLEAN_P));
 E struct obj *FDECL(stuck_ring, (struct obj *,int));
+E struct obj *NDECL(unchanger);
 E void NDECL(reset_remarm);
 E int NDECL(doddoremarm);
 E int FDECL(destroy_arm, (struct obj *));

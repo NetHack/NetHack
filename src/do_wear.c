@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2003/03/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1447,6 +1447,8 @@ doputon()
 	    You("cannot free your weapon hand to put on the ring.");
 			return(0);
 		}
+		if (otmp->oartifact && !touch_artifact(otmp, &youmonst))
+		    return 1; /* costs a turn even though it didn't get worn */
 		setworn(otmp, mask);
 		Ring_on(otmp);
 	} else if (otmp->oclass == AMULET_CLASS) {
@@ -1454,6 +1456,8 @@ doputon()
 			already_wearing("an amulet");
 			return(0);
 		}
+		if (otmp->oartifact && !touch_artifact(otmp, &youmonst))
+		    return 1;
 		setworn(otmp, W_AMUL);
 		if (otmp->otyp == AMULET_OF_CHANGE) {
 			Amulet_on();
@@ -1484,6 +1488,8 @@ doputon()
 			You_cant("wear that!");
 			return(0);
 		}
+		if (otmp->oartifact && !touch_artifact(otmp, &youmonst))
+		    return 1;
 		Blindf_on(otmp);
 		return(1);
 	}
@@ -1649,6 +1655,14 @@ int otyp;
     }
     /* either no ring or not right type or nothing prevents its removal */
     return (struct obj *)0;
+}
+
+/* also for praying; find worn item that confers "Unchanging" attribute */
+struct obj *
+unchanger()
+{
+    if (uamul && uamul->otyp == AMULET_OF_UNCHANGING) return uamul;
+    return 0;
 }
 
 STATIC_PTR
