@@ -568,7 +568,7 @@ void ghack_status_window_update_stats()
     if (lastAu < u.ugold && firstTime==FALSE) {
 #else
     umoney = money_cnt(invent);
-    sprintf(buf,"Au:%ld", umouney);
+    sprintf(buf,"Au:%ld", umoney);
     if (lastAu < umoney && firstTime==FALSE) {
 #endif
 	/* Ok, this changed so add it to the highlighing list */
