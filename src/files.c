@@ -204,7 +204,6 @@ int bufsz;
 	char *sp, *op;
 	int k,calc,cnt = 0;
 	char hexdigits[] = "0123456789ABCDEF";
-	int  hexvalues[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
 
 	sp = s;
 	op = callerbuf;
@@ -218,11 +217,11 @@ int bufsz;
 			sp++;
 			for (k=0; k < 15; ++k) if (*sp == hexdigits[k]) break;
 			if (k >= 15) return callerbuf;	/* impossible, so bail */
-			calc = hexvalues[k] << 4; 
+			calc = k << 4; 
 			sp++;
 			for (k=0; k < 15; ++k) if (*sp == hexdigits[k]) break;
 			if (k >= 15) return callerbuf;	/* impossible, so bail */
-			calc += hexvalues[k]; 
+			calc += k; 
 			sp++;
 			*op++ = calc;
 			*op = '\0';
