@@ -1702,7 +1702,9 @@ void mswin_main_loop()
 
 	while( !mswin_have_input() &&
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
-		if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
+		if (GetNHApp()->regNetHackMode ||
+			!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg))
+		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
