@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2005/02/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2167,6 +2167,7 @@ register struct monst *mon;
 {
 	register struct obj *ring, *nring;
 	boolean fem = (mon->data == &mons[PM_SUCCUBUS]); /* otherwise incubus */
+	int tried_gloves = 0;
 	char qbuf[QBUFSZ];
 
 	if (mon->mcan || mon->mspec_used) {
@@ -2184,11 +2185,18 @@ register struct monst *mon;
 
 	if (Blind) pline("It caresses you...");
 	else You_feel("very attracted to %s.", mon_nam(mon));
+	/* don't try to take off gloves if cursed weapon blocks them */
+	if (welded(uwep)) tried_gloves = 1;
 
 	for(ring = invent; ring; ring = nring) {
 	    nring = ring->nobj;
 	    if (ring->otyp != RIN_ADORNMENT) continue;
 	    if (fem) {
+		if (ring->owornmask && uarmg) {
+		    /* don't take off worn ring if gloves are in the way */
+		    if (!tried_gloves++) mayberem(uarmg, "gloves");
+		    if (uarmg) continue;    /* next ring might not be worn */
+		}
 		if (rn2(20) < ACURR(A_CHA)) {
 		    Sprintf(qbuf, "\"That %s looks pretty.  May I have it?\"",
 			safe_qbuf("",sizeof("\"That  looks pretty.  May I have it?\""),
@@ -2209,6 +2217,11 @@ register struct monst *mon;
 				&& uright->otyp==RIN_ADORNMENT)
 			break;
 		if (ring==uleft || ring==uright) continue;
+		if (uarmg) {
+		    /* don't put on ring if gloves are in the way */
+		    if (!tried_gloves++) mayberem(uarmg, "gloves");
+		    if (uarmg) break;	/* no point trying further rings */
+		}
 		if (rn2(20) < ACURR(A_CHA)) {
 		    Sprintf(qbuf,"\"That %s looks pretty.  Would you wear it for me?\"",
 			safe_qbuf("",
@@ -2260,7 +2273,7 @@ register struct monst *mon;
 	if(!uarmc)
 		mayberem(uarm, "suit");
 	mayberem(uarmf, "boots");
-	if(!uwep || !welded(uwep))
+	if (!tried_gloves)
 		mayberem(uarmg, "gloves");
 	mayberem(uarms, "shield");
 	mayberem(uarmh, helm_simple_name(uarmh));

@@ -259,7 +259,7 @@ nothing_to_steal:
 	}
 
 	monkey_business = is_animal(mtmp->data);
-	if (monkey_business) {
+	if (monkey_business || uarmg) {
 	    ;	/* skip ring special cases */
 	} else if (Adornment & LEFT_RING) {
 	    otmp = uleft;
@@ -293,15 +293,18 @@ nothing_to_steal:
 		impossible("Steal fails!");
 		return(0);
 	}
+	/* can't steal ring(s) while wearing gloves */
+	if ((otmp == uleft || otmp == uright) && uarmg) otmp = uarmg;
 	/* can't steal gloves while wielding - so steal the wielded item. */
-	if (otmp == uarmg && uwep)
-	    otmp = uwep;
+	if (otmp == uarmg && uwep) otmp = uwep;
 	/* can't steal armor while wearing cloak - so steal the cloak. */
 	else if(otmp == uarm && uarmc) otmp = uarmc;
 #ifdef TOURIST
+	/* can't steal shirt while wearing cloak or suit */
 	else if(otmp == uarmu && uarmc) otmp = uarmc;
 	else if(otmp == uarmu && uarm) otmp = uarm;
 #endif
+
 gotobj:
 	if(otmp->o_id == stealoid) return(0);
 
