@@ -226,7 +226,8 @@ int
 pick_lock(pick) /* pick a lock with a given object */
 	register struct	obj	*pick;
 {
-	int x, y, picktyp, c, ch;
+	int picktyp, c, ch;
+	coord cc;
 	struct rm	*door;
 	struct obj	*otmp;
 	char qbuf[QBUFSZ];
@@ -270,12 +271,10 @@ pick_lock(pick) /* pick a lock with a given object */
 		impossible("picking lock with object %d?", picktyp);
 		return(0);
 	}
-	if(!getdir((char *)0)) return(0);
-
 	ch = 0;		/* lint suppression */
-	x = u.ux + u.dx;
-	y = u.uy + u.dy;
-	if (x == u.ux && y == u.uy) {	/* pick lock on a container */
+
+	if(!get_adjacent_loc((char *)0, "Invalid location!", u.ux, u.uy, &cc)) return 0;
+	if (cc.x == u.ux && cc.y == u.uy) {	/* pick lock on a container */
 	    const char *verb;
 	    boolean it;
 	    int count;
@@ -295,7 +294,7 @@ pick_lock(pick) /* pick a lock with a given object */
 
 	    count = 0;
 	    c = 'n';			/* in case there are no boxes here */
-	    for(otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
+	    for(otmp = level.objects[cc.x][cc.y]; otmp; otmp = otmp->nexthere)
 		if (Is_box(otmp)) {
 		    ++count;
 		    if (!can_reach_floor()) {
@@ -354,8 +353,8 @@ pick_lock(pick) /* pick a lock with a given object */
 	} else {			/* pick the lock in a door */
 	    struct monst *mtmp;
 
-	    door = &levl[x][y];
-	    if ((mtmp = m_at(x, y)) && canseemon(mtmp)
+	    door = &levl[cc.x][cc.y];
+	    if ((mtmp = m_at(cc.x, cc.y)) && canseemon(mtmp)
 			&& mtmp->m_ap_type != M_AP_FURNITURE
 			&& mtmp->m_ap_type != M_AP_OBJECT) {
 #ifdef TOURIST
@@ -368,7 +367,7 @@ pick_lock(pick) /* pick a lock with a given object */
 		return(0);
 	    }
 	    if(!IS_DOOR(door->typ)) {
-		if (is_drawbridge_wall(x,y) >= 0)
+		if (is_drawbridge_wall(cc.x,cc.y) >= 0)
 		    You("%s no lock on the drawbridge.",
 				Blind ? "feel" : "see");
 		else
@@ -490,7 +489,7 @@ doforce()		/* try to force a chest with your weapon */
 int
 doopen()		/* try to open a door */
 {
-	register int x, y;
+	coord cc;
 	register struct rm *door;
 	struct monst *mtmp;
 
@@ -504,13 +503,11 @@ doopen()		/* try to open a door */
 	    return 0;
 	}
 
-	if(!getdir((char *)0)) return(0);
+	if(!get_adjacent_loc((char *)0, (char *)0, u.ux, u.uy, &cc)) return(0);
 
-	x = u.ux + u.dx;
-	y = u.uy + u.dy;
-	if((x == u.ux) && (y == u.uy)) return(0);
+	if((cc.x == u.ux) && (cc.y == u.uy)) return(0);
 
-	if ((mtmp = m_at(x,y))				&&
+	if ((mtmp = m_at(cc.x,cc.y))			&&
 		mtmp->m_ap_type == M_AP_FURNITURE	&&
 		(mtmp->mappearance == S_hcdoor ||
 			mtmp->mappearance == S_vcdoor)	&&
@@ -520,10 +517,10 @@ doopen()		/* try to open a door */
 	    return(1);
 	}
 
-	door = &levl[x][y];
+	door = &levl[cc.x][cc.y];
 
 	if(!IS_DOOR(door->typ)) {
-		if (is_db_wall(x,y)) {
+		if (is_db_wall(cc.x,cc.y)) {
 		    There("is no obvious way to open the drawbridge.");
 		    return(0);
 		}
@@ -542,7 +539,7 @@ doopen()		/* try to open a door */
 	    default:	   mesg = " is locked"; break;
 	    }
 	    pline("This door%s.", mesg);
-	    if (Blind) feel_location(x,y);
+	    if (Blind) feel_location(cc.x,cc.y);
 	    return(0);
 	}
 
@@ -557,14 +554,14 @@ doopen()		/* try to open a door */
 	    if(door->doormask & D_TRAPPED) {
 		b_trapped("door", FINGER);
 		door->doormask = D_NODOOR;
-		if (*in_rooms(x, y, SHOPBASE)) add_damage(x, y, 0L);
+		if (*in_rooms(cc.x, cc.y, SHOPBASE)) add_damage(cc.x, cc.y, 0L);
 	    } else
 		door->doormask = D_ISOPEN;
 	    if (Blind)
-		feel_location(x,y);	/* the hero knows she opened it  */
+		feel_location(cc.x,cc.y);	/* the hero knows she opened it  */
 	    else
-		newsym(x,y);
-	    unblock_point(x,y);		/* vision: new see through there */
+		newsym(cc.x,cc.y);
+	    unblock_point(cc.x,cc.y);		/* vision: new see through there */
 	} else {
 	    exercise(A_STR, TRUE);
 	    pline_The("door resists!");
