@@ -2441,7 +2441,13 @@ register boolean peaceful, silent;
 	if(peaceful) {
 	    boolean credit_use = !!ESHK(shkp)->credit;
 	    value = check_credit(value, shkp);
-	    ESHK(shkp)->debit += value;
+	    /* 'peaceful' affects general treatment, but doesn't affect
+	     * the fact that other code expects that all charges after the
+	     * shopkeeper is angry are included in robbed, not debit */
+	    if (ANGRY(shkp))
+		ESHK(shkp)->robbed += value;
+	    else 
+		ESHK(shkp)->debit += value;
 
 	    if(!silent) {
 		const char *still = "";
