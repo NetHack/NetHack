@@ -40,8 +40,8 @@ STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *,int));
 STATIC_DCL void FDECL(add_artifact_score, (struct obj *));
 STATIC_DCL void FDECL(display_artifact_score, (struct obj *,winid));
 STATIC_DCL void FDECL(savelife, (int));
-STATIC_DCL void FDECL(list_vanquished, (int));
-STATIC_DCL void FDECL(list_genocided, (int));
+STATIC_DCL void FDECL(list_vanquished, (int, BOOLEAN_P));
+STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int, int*));
 
 #if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
@@ -304,10 +304,10 @@ int *defquery;
 			return TRUE;
 		}
 		if (flags.end_disclose[idx] == DISCLOSE_YES_WITHOUT_PROMPT) {
-			*defquery = 'q';
+			*defquery = 'y';
 			return FALSE;
 		} else if (flags.end_disclose[idx] == DISCLOSE_NO_WITHOUT_PROMPT) {
-			*defquery = 'q';
+			*defquery = 'n';
 			return FALSE;
 		} else if (flags.end_disclose[idx] == DISCLOSE_PROMPT_DEFAULT_YES) {
 			*defquery = 'y';
@@ -327,18 +327,23 @@ disclose(how,taken)
 int how;
 boolean taken;
 {
-	char	c;
+	char	c = 0;
 	char	qbuf[QBUFSZ];
 	int defquery;
+	boolean ask;
 
-	if (invent && !done_stopprint) {
-	    if (should_query_disclose_option('i', &defquery)) {
-		if(taken)
-			Sprintf(qbuf,"Do you want to see what you had when you %s?",
-				(how == QUIT) ? "quit" : "died");
-		else
-			Strcpy(qbuf,"Do you want your possessions identified?");
-		if ((c = yn_function(qbuf, ynqchars, defquery)) == 'y') {
+	if (invent) {
+	    if(taken)
+		Sprintf(qbuf,"Do you want to see what you had when you %s?",
+			(how == QUIT) ? "quit" : "died");
+	    else
+		Strcpy(qbuf,"Do you want your possessions identified?");
+
+	    ask = should_query_disclose_option('i', &defquery);
+	    if (!done_stopprint) {
+		if (ask)
+		   c = yn_function(qbuf, ynqchars, defquery);
+		if ((!ask && defquery == 'y') || (ask && c == 'y')) {
 			/* New dump format by maartenj@cs.vu.nl */
 			struct obj *obj;
 			
@@ -349,26 +354,34 @@ boolean taken;
 			(void) display_inventory((char *)0, TRUE);
 			container_contents(invent, TRUE, TRUE);
 		}
-		if (c == 'q')  done_stopprint++;
+		if (ask && c == 'q')  done_stopprint++;
 	    }
 	}
 
-	if (!done_stopprint && should_query_disclose_option('a', &defquery)) {
-	    c = yn_function("Do you want to see your attributes?",ynqchars, defquery);
-	    if (c == 'y') enlightenment(how >= PANICKED ? 1 : 2); /* final */
-	    if (c == 'q') done_stopprint++;
+ 	ask = should_query_disclose_option('a', &defquery);
+	if (!done_stopprint) {
+	    if (ask)
+		c = yn_function("Do you want to see your attributes?",ynqchars, defquery);
+	    if ((!ask && defquery == 'y') || (ask && c == 'y'))
+		enlightenment(how >= PANICKED ? 1 : 2); /* final */
+	    if (ask && c == 'q') done_stopprint++;
 	}
 
-	if (!done_stopprint && should_query_disclose_option('v', &defquery))
-	    list_vanquished(defquery);
+	ask = should_query_disclose_option('v', &defquery);
+	if (!done_stopprint)
+	    list_vanquished(defquery, ask);
 
-	if (!done_stopprint && should_query_disclose_option('g', &defquery))
-	    list_genocided(defquery);
+	ask = should_query_disclose_option('g', &defquery);
+	if (!done_stopprint)
+	    list_genocided(defquery, ask);
 
-	if (!done_stopprint && should_query_disclose_option('c', &defquery)) {
-	    c = yn_function("Do you want to see your conduct?",ynqchars,defquery);
-	    if (c == 'y') show_conduct(how >= PANICKED ? 1 : 2);
-	    if (c == 'q') done_stopprint++;
+	ask = should_query_disclose_option('c', &defquery);
+	if (!done_stopprint) {
+	    if (ask)
+		c = yn_function("Do you want to see your conduct?",ynqchars,defquery);
+	    if ((!ask && defquery == 'y') || (ask && c == 'y'))
+		show_conduct(how >= PANICKED ? 1 : 2);
+	    if (ask && c == 'q') done_stopprint++;
 	}
 }
 
@@ -928,8 +941,9 @@ int status;
 }
 
 STATIC_OVL void
-list_vanquished(defquery)
+list_vanquished(defquery, ask)
 int defquery;
+boolean ask;
 {
     register int i, lev;
     int ntypes = 0, max_lev = 0, nkilled;
@@ -949,10 +963,11 @@ int defquery;
      * includes all dead monsters, not just those killed by the player
      */
     if (ntypes != 0) {
-	c = yn_function("Do you want an account of creatures vanquished?",
-			ynqchars, defquery);
-	if (c == 'q') done_stopprint++;
-	if (c == 'y') {
+    	if (ask)
+	    c = yn_function("Do you want an account of creatures vanquished?",
+				ynqchars, defquery);
+	if (ask && c == 'q') done_stopprint++;
+	if ((!ask && defquery == 'y') || (ask && c == 'y')) {
 	    klwin = create_nhwindow(NHW_MENU);
 	    putstr(klwin, 0, "Vanquished creatures:");
 	    putstr(klwin, 0, "");
@@ -1013,8 +1028,9 @@ num_genocides()
 }
 
 STATIC_OVL void
-list_genocided(defquery)
+list_genocided(defquery, ask)
 int defquery;
+boolean ask;
 {
     register int i;
     int ngenocided;
@@ -1026,10 +1042,11 @@ int defquery;
 
     /* genocided species list */
     if (ngenocided != 0) {
-	c = yn_function("Do you want a list of species genocided?",
-			ynqchars, defquery);
-	if (c == 'q') done_stopprint++;
-	if (c == 'y') {
+    	if (ask)
+	    c = yn_function("Do you want a list of species genocided?",
+				ynqchars, defquery);
+	if (ask && c == 'q') done_stopprint++;
+	if ((!ask && defquery == 'y') || (ask && c == 'y')) {
 	    klwin = create_nhwindow(NHW_MENU);
 	    putstr(klwin, 0, "Genocided species:");
 	    putstr(klwin, 0, "");
