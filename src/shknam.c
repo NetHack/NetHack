@@ -115,7 +115,7 @@ static const char *shktools[] = {
     "Erreip", "Nehpets", "Mron", "Snivek", "Lapu", "Kahztiy",
 #endif
 #ifdef WIN32
-    "Lechaim",
+    "Lechaim", "Lexa", "Niod",
 #endif
 #ifdef MAC
     "Nhoj-lee", "Evad\'kh", "Ettaw-noj", "Tsew-mot", "Ydna-s",
