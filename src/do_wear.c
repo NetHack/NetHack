@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2003/11/14	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2004/06/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -94,6 +94,8 @@ Boots_on()
 		break;
 	case WATER_WALKING_BOOTS:
 		if (u.uinwater) spoteffects(TRUE);
+		/* (we don't need a lava check here since boots can't be
+		   put on while feet are stuck) */
 		break;
 	case SPEED_BOOTS:
 		/* Speed boots are still better than intrinsic speed, */
@@ -146,10 +148,12 @@ Boots_off()
 		}
 		break;
 	case WATER_WALKING_BOOTS:
-		if (is_pool(u.ux,u.uy) && !Levitation && !Flying &&
-		    !is_clinger(youmonst.data) && !context.takeoff.cancelled_don) {
-			makeknown(otyp);
+		/* check for lava since fireproofed boots make it viable */
+		if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) &&
+		    !Levitation && !Flying && !is_clinger(youmonst.data) &&
+		    !context.takeoff.cancelled_don) {
 			/* make boots known in case you survive the drowning */
+			makeknown(otyp);
 			spoteffects(TRUE);
 		}
 		break;
@@ -1320,10 +1324,11 @@ boolean noisy;
 	    err++;
 	} else if (u.utrap && (u.utraptype == TT_BEARTRAP ||
 				u.utraptype == TT_INFLOOR ||
+				u.utraptype == TT_LAVA ||
 				u.utraptype == TT_BURIEDBALL)) {
 	    if (u.utraptype == TT_BEARTRAP) {
 		if (noisy) Your("%s is trapped!", body_part(FOOT));
-	    } else if (u.utraptype == TT_INFLOOR) {
+	    } else if (u.utraptype == TT_INFLOOR || u.utraptype == TT_LAVA) {
 		if (noisy) Your("%s are stuck in the %s!",
 				makeplural(body_part(FOOT)),
 				surface(u.ux, u.uy));
