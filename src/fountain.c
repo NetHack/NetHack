@@ -140,7 +140,7 @@ dofindgem() /* Find a gem in the sparkling waters. */
 	else You_feel("a gem here!");
 	(void) mksobj_at(rnd_class(DILITHIUM_CRYSTAL, LUCKSTONE-1),
 			 u.ux, u.uy, FALSE, FALSE);
-	levl[u.ux][u.uy].looted |= F_LOOTED;
+	SET_FOUNTAIN_LOOTED(u.ux,u.uy);
 	newsym(u.ux, u.uy);
 	exercise(A_WIS, TRUE);			/* a discovery! */
 }
@@ -151,12 +151,12 @@ xchar x, y;
 boolean isyou;
 {
 	if (IS_FOUNTAIN(levl[x][y].typ) &&
-	    (!rn2(3) || (levl[x][y].looted & F_WARNED))) {
+	    (!rn2(3) || FOUNTAIN_IS_WARNED(x,y))) {
 		s_level *slev = Is_special(&u.uz);
 		if(isyou && slev && slev->flags.town &&
-		   !(levl[x][y].looted & F_WARNED)) {
+		   !FOUNTAIN_IS_WARNED(x,y)) {
 			struct monst *mtmp;
-			levl[x][y].looted |= F_WARNED;
+			SET_FOUNTAIN_WARNED(x,y);
 			/* Warn about future fountain use. */
 			for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 			    if (DEADMONSTER(mtmp)) continue;
@@ -313,7 +313,7 @@ drinkfountain()
 
 		case 27: /* Find a gem in the sparkling waters. */
 
-			if (!levl[u.ux][u.uy].looted) {
+			if (!FOUNTAIN_IS_LOOTED(u.ux,u.uy)) {
 				dofindgem();
 				break;
 			}
@@ -426,7 +426,7 @@ register struct obj *obj;
 			dowatersnakes();
 			break;
 		case 24: /* Find a gem */
-			if (!levl[u.ux][u.uy].looted) {
+			if (!FOUNTAIN_IS_LOOTED(u.ux,u.uy)) {
 				dofindgem();
 				break;
 			}
@@ -446,7 +446,7 @@ register struct obj *obj;
 			if (u.ugold > 10) {
 			    u.ugold -= somegold() / 10;
 			    You("lost some of your gold in the fountain!");
-			    levl[u.ux][u.uy].looted &= ~F_LOOTED;
+			    CLEAR_FOUNTAIN_LOOTED(u.ux,u.uy);
 			    exercise(A_WIS, FALSE);
 			}
 #else
@@ -465,7 +465,7 @@ register struct obj *obj;
 				    if (!otmp->quan) delobj(otmp);
 				}
 			        You("lost some of your money in the fountain!");
-			        levl[u.ux][u.uy].looted &= ~F_LOOTED;
+				CLEAR_FOUNTAIN_LOOTED(u.ux,u.uy);
 			        exercise(A_WIS, FALSE);
                             }
 			}
@@ -477,8 +477,8 @@ register struct obj *obj;
 		 * surface.  After all, there will have been more people going
 		 * by.	Just like a shopping mall!  Chris Woodbury  */
 
-		    if (levl[u.ux][u.uy].looted) break;
-		    levl[u.ux][u.uy].looted |= F_LOOTED;
+		    if (FOUNTAIN_IS_LOOTED(u.ux,u.uy)) break;
+		    SET_FOUNTAIN_LOOTED(u.ux,u.uy);
 		    (void) mkgold((long)
 			(rnd((dunlevs_in_dungeon(&u.uz)-dunlev(&u.uz)+1)*2)+5),
 			u.ux, u.uy);

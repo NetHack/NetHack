@@ -267,6 +267,12 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
  */
 #define F_LOOTED	1
 #define F_WARNED	2
+#define FOUNTAIN_IS_WARNED(x,y)		(levl[x][y].looted & F_WARNED)
+#define FOUNTAIN_IS_LOOTED(x,y)		(levl[x][y].looted & F_LOOTED)
+#define SET_FOUNTAIN_WARNED(x,y)	levl[x][y].looted |= F_WARNED;
+#define SET_FOUNTAIN_LOOTED(x,y)	levl[x][y].looted |= F_LOOTED;
+#define CLEAR_FOUNTAIN_WARNED(x,y)	levl[x][y].looted &= ~F_WARNED;
+#define CLEAR_FOUNTAIN_LOOTED(x,y)	levl[x][y].looted &= ~F_LOOTED;
 
 /*
  * Doors are even worse :-) The special warning has a side effect

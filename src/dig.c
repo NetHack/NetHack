@@ -495,7 +495,7 @@ int ttyp;
 	   breaking bypasses that routine and calls us directly */
 	if (IS_FOUNTAIN(lev->typ)) {
 	    dogushforth(FALSE);
-	    lev->looted |= F_WARNED;		/* force dryup */
+	    SET_FOUNTAIN_WARNED(x,y);		/* force dryup */
 	    dryup(x, y, madeby_u);
 	    return;
 #ifdef SINKS
