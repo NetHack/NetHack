@@ -1783,6 +1783,7 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) &&
 		    !Stone_resistance) {
 		    You("meet %s gaze.", s_suffix(mon_nam(mtmp)));
+		    stop_occupation();
 		    if(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
 			break;
 		    You("turn to stone...");
@@ -1804,6 +1805,7 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    else
 			You("are getting more and more confused.");
 		    make_confused(HConfusion + conf, FALSE);
+		    stop_occupation();
 		}
 		break;
 	    case AD_STUN:
@@ -1815,15 +1817,18 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    mtmp->mspec_used = mtmp->mspec_used + (stun + rn2(6));
 		    make_stunned(HStun + stun, TRUE);
 		    pline("%s stares piercingly at you!", Monnam(mtmp));
+		    stop_occupation();
 		}
 		break;
 	    case AD_BLND:
 		if (!mtmp->mcan && canseemon(mtmp) && !resists_blnd(&youmonst)
 			&& distu(mtmp->mx,mtmp->my) <= BOLT_LIM*BOLT_LIM) {
 		    int blnd = d((int)mattk->damn, (int)mattk->damd);
+
 		    You("are blinded by %s radiance!",
 			              s_suffix(mon_nam(mtmp)));
 		    make_blinded((long)blnd,FALSE);
+		    stop_occupation();
 		    /* not blind at this point implies you're wearing
 		       the Eyes of the Overworld; make them block this
 		       particular stun attack too */
@@ -1836,7 +1841,9 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 			couldsee(mtmp->mx, mtmp->my) &&
 			mtmp->mcansee && !mtmp->mspec_used && rn2(5)) {
 		    int dmg = d(2,6);
+
 		    pline("%s attacks you with a fiery gaze!", Monnam(mtmp));
+		    stop_occupation();
 		    if (Fire_resistance) {
 			pline_The("fire doesn't feel hot!");
 			dmg = 0;
@@ -1856,6 +1863,7 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		if(!mtmp->mcan && canseemon(mtmp) &&
 		   couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee &&
 		   multi >= 0 && !rn2(5) && !Sleep_resistance) {
+
 		    fall_asleep(-rnd(10), TRUE);
 		    pline("%s gaze makes you very sleepy...",
 			  s_suffix(Monnam(mtmp)));
@@ -1865,7 +1873,9 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		if(!mtmp->mcan && canseemon(mtmp) && mtmp->mcansee &&
 		   (HFast & (INTRINSIC|TIMEOUT)) &&
 		   !defends(AD_SLOW, uwep) && !rn2(4))
+
 		    u_slow_down();
+		    stop_occupation();
 		break;
 #endif
 	    default: impossible("Gaze attack %d?", mattk->adtyp);
