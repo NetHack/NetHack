@@ -52,6 +52,10 @@ extern void FDECL(nethack_exit,(int));
 #define nethack_exit exit
 #endif
 
+#ifdef WIN32
+extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
+#endif
+
 #if defined(MSWIN_GRAPHICS)
 extern void NDECL(mswin_destroy_reg);
 #endif
@@ -433,7 +437,9 @@ not_recovered:
 #ifdef OS2
 	gettty(); /* somehow ctrl-P gets turned back on during startup ... */
 #endif
-
+#ifdef WIN32
+	getreturn_enabled = TRUE;
+#endif
 	return;
 }
 

@@ -389,7 +389,7 @@ char *name;
 }
 
 #ifdef WIN32
-boolean getreturn_disable;
+boolean getreturn_enabled;
 #endif
 
 void
@@ -397,7 +397,7 @@ getreturn(str)
 const char *str;
 {
 #ifdef WIN32
-	if (getreturn_disable) return;
+	if (!getreturn_enabled) return;
 #endif
 #ifdef TOS
 	msmsg("Hit <Return> %s.", str);

@@ -58,6 +58,8 @@ INPUT_RECORD ir;
 int GUILaunched;
 static BOOL FDECL(CtrlHandler, (DWORD));
 
+extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
+
 /* dynamic keystroke handling .DLL support */
 typedef int (__stdcall * PROCESS_KEYSTROKE)(
     HANDLE,
@@ -207,8 +209,6 @@ tty_end_screen()
 	FlushConsoleInputBuffer(hConIn);
 }
 
-extern boolean getreturn_disable;	/* from sys/share/pcsys.c */
-
 static BOOL CtrlHandler(ctrltype)
 DWORD ctrltype;
 {
@@ -219,7 +219,7 @@ DWORD ctrltype;
 		case CTRL_CLOSE_EVENT:
 		case CTRL_LOGOFF_EVENT:
 		case CTRL_SHUTDOWN_EVENT:
-			getreturn_disable = TRUE;
+			getreturn_enabled = FALSE;
 #ifndef NOSAVEONHANGUP
 			hangup(0);
 #endif
