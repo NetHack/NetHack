@@ -18,6 +18,7 @@ STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
 STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
 STATIC_DCL char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
+STATIC_DCL char FDECL(display_used_invlets, (CHAR_P));
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
 STATIC_DCL struct obj *FDECL(find_unpaid,(struct obj *,struct obj **));
@@ -1792,6 +1793,59 @@ boolean want_reply;
 }
 
 /*
+ * Show what is current using inventory letters. 
+ *
+ */
+STATIC_OVL char
+display_used_invlets(avoidlet)
+char avoidlet;
+{
+	struct obj *otmp;
+	char ilet, ret = 0;
+	char *invlet = flags.inv_order;
+	int n, classcount, done = 0;
+	winid win;
+	anything any;
+	menu_item *selected;
+
+	if (invent) {
+	    win = create_nhwindow(NHW_MENU);
+	    start_menu(win);
+	    while (!done) {
+		any.a_void = 0;		/* set all bits to zero */
+		classcount = 0;
+		for(otmp = invent; otmp; otmp = otmp->nobj) {
+		    ilet = otmp->invlet;
+		    if (ilet == avoidlet) continue;
+		    if (!flags.sortpack || otmp->oclass == *invlet) {
+			if (flags.sortpack && !classcount) {
+				any.a_void = 0;		/* zero */
+				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
+				classcount++;
+			}
+			any.a_char = ilet;
+			add_menu(win, obj_to_glyph(otmp),
+				&any, ilet, 0, ATR_NONE, doname(otmp),
+				MENU_UNSELECTED);
+		    }
+	        }
+		if (flags.sortpack && *++invlet) continue;
+		done = 1;
+	    }
+	    end_menu(win, "Inventory letters used:");
+
+	    n = select_menu(win, PICK_NONE, &selected);
+	    if (n > 0) {
+		ret = selected[0].item.a_char;
+		free((genericptr_t)selected);
+	    } else
+		ret = !n ? '\0' : '\033';	/* cancelled */
+	}
+	return ret;
+}
+
+/*
  * Returns the number of unpaid items within the given list.  This includes
  * contained objects.
  */
@@ -2700,9 +2754,19 @@ doorganize()	/* inventory organizer by Del Lamb */
 	if(cur > 5) compactify(buf);
 
 	/* get 'to' slot to use as destination */
-	Sprintf(qbuf, "Adjust letter to what [%s]?", buf);
+	Sprintf(qbuf, "Adjust letter to what [%s]%s?", buf,
+		invent ? " (? see used letters)" : "");
 	for (;;) {
 	    let = yn_function(qbuf, (char *)0, '\0');
+	    if(let == '?' || let == '*') {
+		char ilet = display_used_invlets(splitting ? obj->invlet : 0);
+		if(!ilet) continue;
+		if(ilet == '\033') {
+			pline(Never_mind);
+			return 0;
+		}
+		let = ilet;
+	    }
 	    if (index(quitchars, let) ||
 		    /* adjusting to same slot is meaningful since all
 		       compatible stacks get collected along the way,
