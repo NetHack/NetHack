@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shknam.c	3.4	2001/09/06	*/
+/*	SCCS Id: @(#)shknam.c	3.4	2003/01/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -271,7 +271,7 @@ int sx, sy;
 STATIC_OVL void
 nameshk(shk, nlp)
 struct monst *shk;
-const char * const nlp[];
+const char * const *nlp;
 {
 	int i, trycnt, names_avail;
 	const char *shname = 0;
