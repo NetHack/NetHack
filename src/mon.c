@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.4	2002/11/07	*/
+/*	SCCS Id: @(#)mon.c	3.4	2003/01/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2514,6 +2514,11 @@ int
 can_be_hatched(mnum)
 int mnum;
 {
+    /* ranger quest nemesis has the oviparous bit set, making it
+       be possible to wish for eggs of that unique monster; turn
+       such into ordinary eggs rather than forbidding them outright */
+    if (mnum == PM_SCORPIUS) mnum = PM_SCORPION;
+
     mnum = little_to_big(mnum);
     /*
      * Queen bees lay killer bee eggs (usually), but killer bees don't
