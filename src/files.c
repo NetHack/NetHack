@@ -550,7 +550,7 @@ int lev, oflag;
 			fd = lftrack.fd;
 			reslt = lseek(fd, 0L, SEEK_SET);
 			if (reslt == -1L)
-			    panic("open_levelfile_exclusively: lseek failed %d", reslt);
+			    panic("open_levelfile_exclusively: lseek failed %d", errno);
 			lftrack.nethack_thinks_it_is_open = TRUE;
 		} else {
 			really_close();
