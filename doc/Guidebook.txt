@@ -126,7 +126,7 @@
           as well as tracking and stealthy movement.
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -192,7 +192,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -390,7 +390,7 @@
                played.
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -522,7 +522,7 @@
           ed.  Typing a `*' lists your entire inventory, so you can see the
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -720,7 +720,7 @@
                ing the menu entry for the given option (ie, by  typing  its
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -745,7 +745,7 @@
                messages.  The behavior can be varied via the msg_window op-
                tion.
 
-          q    Quaff (drink) a potion.
+          q    Quaff (drink) something (potion, water, etc).
 
           Q    Select an object for your quiver.  You can then  throw  this
                using  the  `f' command.  (In versions prior to 3.3 this was
@@ -786,7 +786,7 @@
                these slots is empty, the exchange still takes place.
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -852,7 +852,7 @@
           (R)UNIX is a registered trademark of AT&T.
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -931,6 +931,8 @@
           #rub Rub a lamp or a stone.
 
           #sit Sit down.
+
+          #tip Tip over a container to pour out its contents.
 
           #turn
                Turn undead.
@@ -979,12 +981,10 @@
 
           M-m  #monster
 
-          M-n  #name
 
 
 
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -993,6 +993,8 @@
           NetHack Guidebook                                              16
 
 
+
+          M-n  #name
 
           M-o  #offer
 
@@ -1043,14 +1045,12 @@
                Secret corridors are hidden.  You can find them with the `s'
           (search) command.
 
-          5.1.  Doorways
-
-               Doorways connect rooms and corridors.  Some doorways have no
-          doors; you can walk right through.  Others have  doors  in  them,
-          which may be open, closed, or locked.  To open a closed door, use
 
 
-          NetHack 3.4                                     February 12, 2003
+
+
+
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1060,6 +1060,11 @@
 
 
 
+          5.1.  Doorways
+
+               Doorways connect rooms and corridors.  Some doorways have no
+          doors; you can walk right through.  Others have  doors  in  them,
+          which may be open, closed, or locked.  To open a closed door, use
           the `o' (open) command; to close it again, use  the  `c'  (close)
           command.
 
@@ -1108,15 +1113,10 @@
           choose  to  do so), you'll need to climb back up to the main dun-
           geon.
 
-               When you traverse a set of stairs, or trigger a  trap  which
-          sends  you to another level, the level you're leaving will be de-
-          activated and stored in a file on disk.  If you're  moving  to  a
-          previously visited level, it will be loaded from its file on disk
-          and reactivated.  If you're moving to a level which has  not  yet
-          been  visited,  it  will be created (from scratch for most random
 
 
-          NetHack 3.4                                     February 12, 2003
+
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1126,6 +1126,12 @@
 
 
 
+               When you traverse a set of stairs, or trigger a  trap  which
+          sends  you to another level, the level you're leaving will be de-
+          activated and stored in a file on disk.  If you're  moving  to  a
+          previously visited level, it will be loaded from its file on disk
+          and reactivated.  If you're moving to a level which has  not  yet
+          been  visited,  it  will be created (from scratch for most random
           levels, from a template for some ``special''  levels,  or  loaded
           from  the  remains  of  an  earlier game for a ``bones'' level as
           briefly described below).  Monsters are only active on  the  cur-
@@ -1174,15 +1180,9 @@
           business unless you attack them.  Some of them are very dangerous
           when angered.  Remember:  discretion is the better part of valor.
 
-               If you can't see a monster (if it is invisible,  or  if  you
-          are  blinded), the symbol `I' will be shown when you learn of its
-          presence.  If you attempt to walk into it, you will try to  fight
-          it  just  like a monster that you can see; of course, if the mon-
-          ster has moved, you will attack empty air.  If you guess that the
-          monster  has  moved  and you don't wish to fight, you can use the
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1192,6 +1192,12 @@
 
 
 
+               If you can't see a monster (if it is invisible,  or  if  you
+          are  blinded), the symbol `I' will be shown when you learn of its
+          presence.  If you attempt to walk into it, you will try to  fight
+          it  just  like a monster that you can see; of course, if the mon-
+          ster has moved, you will attack empty air.  If you guess that the
+          monster  has  moved  and you don't wish to fight, you can use the
           `m' command to move without fighting; likewise, if you don't  re-
           member a monster but want to try fighting anyway, you can use the
           `F' command.
@@ -1240,15 +1246,9 @@
                You  may encounter the shades and corpses of other adventur-
           ers (or even former incarnations of yourself!) and their personal
           effects.   Ghosts  are  hard  to  kill,  but easy to avoid, since
-          they're slow and do little damage.  You can plunder the  deceased
-          adventurer's  possessions; however, they are likely to be cursed.
-          Beware of whatever killed the former player; it is probably still
-          lurking around, gloating over its last victory.
 
 
-
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1256,6 +1256,12 @@
 
           NetHack Guidebook                                              20
 
+
+
+          they're slow and do little damage.  You can plunder the  deceased
+          adventurer's  possessions; however, they are likely to be cursed.
+          Beware of whatever killed the former player; it is probably still
+          lurking around, gloating over its last victory.
 
 
           7.  Objects
@@ -1306,15 +1312,9 @@
           type of object so you will recognize it later.  You can also  use
           the  ``#name''  command for the same purpose at any time, to name
           all objects of a particular type or just  an  individual  object.
-          When you use ``#name'' on an object which has already been named,
-          specifying a space as the value will remove the  prior  name  in-
-          stead of assigning a new one.
 
 
-
-
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1323,6 +1323,10 @@
           NetHack Guidebook                                              21
 
 
+
+          When you use ``#name'' on an object which has already been named,
+          specifying a space as the value will remove the  prior  name  in-
+          stead of assigning a new one.
 
           7.1.  Curses and Blessings
 
@@ -1375,12 +1379,8 @@
           tified  somehow.  Most weapons are subject to some type of damage
           like rust.  Such ``erosion'' damage can be repaired.
 
-               The chance that an attack will successfully hit  a  monster,
-          and  the  amount  of damage such a hit will do, depends upon many
-          factors.  Among them are:  type  of  weapon,  quality  of  weapon
 
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1390,11 +1390,14 @@
 
 
 
-          (enchantment and/or erosion), experience level, strength, dexter-
-          ity, encumbrance, and proficiency (see below).  The monster's ar-
-          mor  class  -  a  general  defense rating, not necessarily due to
-          wearing of armor - is a factor too; also, some monsters are  par-
-          ticularly vulnerable to certain types of weapons.
+               The chance that an attack will successfully hit  a  monster,
+          and  the  amount  of damage such a hit will do, depends upon many
+          factors.  Among them are: type of weapon, quality of weapon  (en-
+          chantment and/or erosion), experience level, strength, dexterity,
+          encumbrance, and proficiency (see below).   The  monster's  armor
+          class  - a general defense rating, not necessarily due to wearing
+          of armor - is a factor too; also, some monsters are  particularly
+          vulnerable to certain types of weapons.
 
                Many  weapons  can be wielded in one hand; some require both
           hands.  When wielding a two-handed weapon, you  can  not  wear  a
@@ -1441,12 +1444,9 @@
           command  to select your preferred ``missile'', then using the `f'
           command to throw it.  You'll  be  prompted  for  a  direction  as
           above,  but  you  don't  have to specify which item to throw each
-          time you use `f'.  There is also an option, autoquiver, which has
-          NetHack  choose  another  item  to automatically fill your quiver
-          when the inventory slot used for `Q' runs out.
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1455,6 +1455,10 @@
           NetHack Guidebook                                              23
 
 
+
+          time you use `f'.  There is also an option, autoquiver, which has
+          NetHack  choose  another  item  to automatically fill your quiver
+          when the inventory slot used for `Q' runs out.
 
                Some characters have the ability to fire a volley of  multi-
           ple  items  in a single turn.  Knowing how to load several rounds
@@ -1506,13 +1510,9 @@
 
                Use of a weapon in which you're restricted or unskilled will
           incur a modest penalty in the chance to hit a monster and also in
-          the amount of damage done when you do hit; at basic level,  there
-          is  no  penalty  or bonus; at skilled level, you receive a modest
-          bonus in the chance to hit and amount of damage done;  at  expert
-          level,  the  bonus  is  higher.  A successful hit has a chance to
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1522,6 +1522,10 @@
 
 
 
+          the amount of damage done when you do hit; at basic level,  there
+          is  no  penalty  or bonus; at skilled level, you receive a modest
+          bonus in the chance to hit and amount of damage done;  at  expert
+          level,  the  bonus  is  higher.  A successful hit has a chance to
           boost your training towards the next skill level  (unless  you've
           already  reached  the  limit for this skill).  Once such training
           reaches the threshold for that next level, you'll  be  told  that
@@ -1572,13 +1576,9 @@
           lowering your armor class one unit further to 4.  When you put on
           a piece of armor, you immediately find out the  armor  class  and
           any ``plusses'' it provides.  Cursed pieces of armor usually have
-          negative enchantments (minuses) in addition to being unremovable.
-
-               Many  types of armor are subject to some kind of damage like
-          rust.  Such damage can be repaired.   Some  types  of  armor  may
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1588,7 +1588,11 @@
 
 
 
-          inhibit spell casting.
+          negative enchantments (minuses) in addition to being unremovable.
+
+               Many  types of armor are subject to some kind of damage like
+          rust.  Such damage can be repaired.  Some types of armor may  in-
+          hibit spell casting.
 
                The commands to use armor are `W' (wear) and `T' (take off).
           The `A' command can also be used to take off  armor  as  well  as
@@ -1638,13 +1642,9 @@
           NetHack know where to look for new mail by setting  the  ``MAIL''
           environment  variable  to the file name of your mailbox.  You may
           also want to set the ``MAILREADER'' environment variable  to  the
-          file  name  of  your  favorite reader, so NetHack can shell to it
-          when you read the scroll.  On versions of NetHack where  mail  is
-          randomly  generated internal to the game, these environment vari-
-          ables are ignored.  You can disable the mail  daemon  by  turning
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1654,6 +1654,10 @@
 
 
 
+          file  name  of  your  favorite reader, so NetHack can shell to it
+          when you read the scroll.  On versions of NetHack where  mail  is
+          randomly  generated internal to the game, these environment vari-
+          ables are ignored.  You can disable the mail  daemon  by  turning
           off the mail option.
 
                The command to read a scroll is `r'.
@@ -1704,13 +1708,9 @@
                The  command  to use a wand is `z' (zap).  To break one, use
           the `a' (apply) command.
 
-          7.8.  Rings (`=')
-
-               Rings are very useful items, since they are relatively  per-
-          manent  magic,  unlike  the  usually fleeting effects of potions,
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1720,6 +1720,10 @@
 
 
 
+          7.8.  Rings (`=')
+
+               Rings are very useful items, since they are relatively  per-
+          manent  magic,  unlike  the  usually fleeting effects of potions,
           scrolls, and wands.
 
                Putting on a ring activates its magic.  You  can  wear  only
@@ -1769,14 +1773,10 @@
                Casting a spell also requires flexible movement, and wearing
           various types of armor may interfere with that.
 
-               The command to read a spellbook is the same as for  scrolls,
-          `r'  (read).   The  `+'  command lists your current spells, their
-          levels, categories, and chances for failure.  The `Z' (cast) com-
-          mand casts a spell.
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1785,6 +1785,11 @@
           NetHack Guidebook                                              28
 
 
+
+               The command to read a spellbook is the same as for  scrolls,
+          `r'  (read).   The  `+'  command lists your current spells, their
+          levels, categories, and chances for failure.  The `Z' (cast) com-
+          mand casts a spell.
 
           7.10.  Tools (`(')
 
@@ -1834,15 +1839,10 @@
           tile weapons (if you have a sling).  In  the  most  desperate  of
           cases, you can still throw them by hand.
 
-          7.13.  Large rocks (``')
-
-               Statues  and  boulders  are not particularly useful, and are
-          generally heavy.  It is rumored that some statues  are  not  what
-          they seem.
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1851,6 +1851,12 @@
           NetHack Guidebook                                              29
 
 
+
+          7.13.  Large rocks (``')
+
+               Statues  and  boulders  are not particularly useful, and are
+          generally heavy.  It is rumored that some statues  are  not  what
+          they seem.
 
                Very  large humanoids (giants and their ilk) have been known
           to use boulders as weapons.
@@ -1900,15 +1906,9 @@
           lective  about eating animal byproducts than vegans.  In addition
           to the vegan items listed above, they may eat any kind of pudding
           (`P') other than the black puddings, eggs and food made from eggs
-          (fortune cookies and pancakes), food made with milk  (cream  pies
-          and candy bars), and lumps of royal jelly.  Monks are expected to
-          observe a vegetarian diet.
-
-               Eating any kind of meat violates the vegetarian, vegan,  and
-          foodless  conducts.   This includes tripe rations, the corpses or
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1918,6 +1918,12 @@
 
 
 
+          (fortune cookies and pancakes), food made with milk  (cream  pies
+          and candy bars), and lumps of royal jelly.  Monks are expected to
+          observe a vegetarian diet.
+
+               Eating any kind of meat violates the vegetarian, vegan,  and
+          foodless  conducts.   This includes tripe rations, the corpses or
           tins of any monsters not mentioned above, and the  various  other
           chunks  of meat found in the dungeon.  Swallowing and digesting a
           monster while polymorphed is treated as if you ate the creature's
@@ -1966,15 +1972,9 @@
           writing a scroll; or making an engraving of anything other than a
           single ``x'' (the traditional signature of an illiterate person).
           Reading an engraving, or any item that is absolutely necessary to
-          win the game, is not counted against this conduct.  The  identity
-          of  scrolls  and  spellbooks  (and  knowledge  of spells) in your
-          starting inventory is assumed to be learned  from  your  teachers
-          prior to the start of the game and isn't counted.
 
 
-
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -1983,6 +1983,11 @@
           NetHack Guidebook                                              31
 
 
+
+          win the game, is not counted against this conduct.  The  identity
+          of  scrolls  and  spellbooks  (and  knowledge  of spells) in your
+          starting inventory is assumed to be learned  from  your  teachers
+          prior to the start of the game and isn't counted.
 
                There  are several other challenges tracked by the game.  It
           is possible to eliminate one or more species of monsters by geno-
@@ -2033,14 +2038,9 @@
           ``Blue Meanie'', and the fruit is set to  ``papaya'',  you  would
           enter the command
 
-               % setenv NETHACKOPTIONS "autoquiver,\!autopickup,name:Blue Meanie,fruit:papaya"
-
-          in  csh  (note the need to escape the ! since it's special to the
-          shell), or
 
 
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2049,6 +2049,11 @@
           NetHack Guidebook                                              32
 
 
+
+               % setenv NETHACKOPTIONS "autoquiver,\!autopickup,name:Blue Meanie,fruit:papaya"
+
+          in  csh  (note the need to escape the ! since it's special to the
+          shell), or
 
                $ NETHACKOPTIONS="autoquiver,!autopickup,name:Blue Meanie,fruit:papaya"
                $ export NETHACKOPTIONS
@@ -2098,15 +2103,10 @@
 
           autoquiver
                This option controls what happens when you attempt  the  `f'
-               (fire) command with an empty quiver.  When true, the comput-
-               er will fill your quiver with some  suitable  weapon.   Note
-               that  it  will not take into account the blessed/cursed sta-
-               tus, enchantment, damage, or quality of the weapon; you  are
-               free  to  manually fill your quiver with the `Q' command in-
-               stead.  If no weapon is found or the option  is  false,  the
+               (fire)  command  with  an  empty  quiver.   When  true,  the
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2116,6 +2116,11 @@
 
 
 
+               computer will fill your quiver with  some  suitable  weapon.
+               Note  that  it will not take into account the blessed/cursed
+               status, enchantment, damage, or quality of the  weapon;  you
+               are  free  to manually fill your quiver with the `Q' command
+               instead.  If no weapon is found or the option is false,  the
                `t' (throw) command is executed instead.  (default false)
 
           boulder
@@ -2167,12 +2172,7 @@
                The possibilities are:
 
 
-
-
-
-
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2238,7 +2238,7 @@
                down, ladder up, ladder down, altar, grave, throne,  kitchen
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2304,7 +2304,7 @@
                ``fruit:mango'')  (default  ``slime  mold'').   Basically  a
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2370,7 +2370,7 @@
                An obsolete synonym for ``gender:male''.  Cannot be set with
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2436,7 +2436,7 @@
                Menu  character  accelerator to goto the previous menu page.
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2529,8 +2529,9 @@
                Send padding nulls to the terminal (default off).
 
           number_pad
-               Use  the  number keys to move instead of [yuhjklbn] (default
-               off).
+               Use the number keys to move instead of [yuhjklbn] (default 0
+               or off).  (number_pad:2 invokes the old DOS behaviour  where
+               `5' means `g', meta-`5' means `G',  and meta-`0' means `I'.)
 
           objects
                Set the characters used to display object  classes  (default
@@ -2567,8 +2568,7 @@
 
 
 
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2634,7 +2634,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2700,7 +2700,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2766,7 +2766,7 @@
                Where  to  align  or  place the message window (top, bottom,
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2832,7 +2832,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2898,7 +2898,7 @@
 
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2928,12 +2928,18 @@
                Here are explanations of options that are used  by  specific
           platforms or ports to customize and change the port behaviour.
 
+          altkeyhandler
+               Select an alternate keystroke handler dll to load (Win32 tty
+               NetHack only).  The name of the handler is specified without
+               the .dll extension and without any path information.  Cannot
+               be set with the `O' command.
+
           altmeta
                (default on, AMIGA NetHack only).
 
           BIOS
-               Use  BIOS  calls to update the screen display quickly and to
-               read the keyboard (allowing the use of arrow keys  to  move)
+               Use BIOS calls to update the screen display quickly  and  to
+               read  the  keyboard (allowing the use of arrow keys to move)
                on machines with an IBM PC compatible BIOS ROM (default off,
                OS/2, PC, and ST NetHack only).
 
@@ -2947,24 +2953,18 @@
                (default on, Mac NetHack only).
 
           rawio
-               Force raw (non-cbreak) mode for faster output and more  bul-
-               letproof  input  (MS-DOS  sometimes treats `^P' as a printer
-               toggle without it) (default off, OS/2, PC,  and  ST  NetHack
+               Force  raw (non-cbreak) mode for faster output and more bul-
+               letproof input (MS-DOS sometimes treats `^P'  as  a  printer
+               toggle  without  it)  (default off, OS/2, PC, and ST NetHack
                only).  Note:  DEC Rainbows hang if this is turned on.  Can-
                not be set with the `O' command.
 
           soundcard
-               (default on, PC NetHack only).  Cannot be set with  the  `O'
+               (default  on,  PC NetHack only).  Cannot be set with the `O'
                command.
 
-          video
-               Set  the video mode used (PC NetHack only).  Values are `au-
-               todetect', `default', or `vga'.  Setting `vga' (or  `autode-
-               tect' with vga hardware present) will cause the game to dis-
-               play tiles.  Cannot be set with the `O' command.
 
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -2974,36 +2974,51 @@
 
 
 
+          subkeyval
+               (Win32 tty NetHackonly).  May be used to alter the value  of
+               keystrokes  that  the operating system returns to NetHack to
+               help compensate  for  international  keyboard  issues.   OP-
+               TIONS=subkeyvalue:171/92  will  return 92 to NetHack, if 171
+               was originally going to be returned.  You can  use  multiple
+               subkeyvalue statements in the config file if needed.  Cannot
+               be set with the `O' command.
+
+          video
+               Set the video mode used (PC NetHack only).  Values are  `au-
+               todetect',  `default', or `vga'.  Setting `vga' (or `autode-
+               tect' with vga hardware present) will cause the game to dis-
+               play tiles.  Cannot be set with the `O' command.
+
           videocolors
                Set the color palette for PC systems using NO_TERMS (default
                4-2-6-1-5-3-15-12-10-14-9-13-11, (PC NetHack only).  The or-
-               der of colors is red, green,  brown,  blue,  magenta,  cyan,
+               der  of  colors  is  red, green, brown, blue, magenta, cyan,
                bright.white, bright.red, bright.green, yellow, bright.blue,
                bright.magenta, and bright.cyan.  Cannot be set with the `O'
                command.
 
           videoshades
-               Set  the  intensity level of the three gray scales available
-               (default dark normal light, PC NetHack only).  If  the  game
+               Set the intensity level of the three gray  scales  available
+               (default  dark  normal light, PC NetHack only).  If the game
                display is difficult to read, try adjusting these scales; if
-               this does not correct the problem, try  !color.   Cannot  be
+               this  does  not  correct the problem, try !color.  Cannot be
                set with the `O' command.
 
           9.7.  Configuring User Sounds
 
-               Some  platforms allow you to define sound files to be played
-          when a message that matches a user-defined pattern  is  delivered
+               Some platforms allow you to define sound files to be  played
+          when  a  message that matches a user-defined pattern is delivered
           to the message window.  At this time the Qt port and the win32tty
           and win32gui ports support the use of user sounds.
 
-               The following config file entries are  relevant  to  mapping
+               The  following  config  file entries are relevant to mapping
           user sounds to messages:
 
           SOUNDDIR
                The directory that houses the sound files to be played.
 
           SOUND
-               An  entry that maps a sound file to a user-specified message
+               An entry that maps a sound file to a user-specified  message
                pattern.  Each SOUND entry is broken down into the following
                parts:
 
@@ -3012,25 +3027,10 @@
                     sound file - the sound file to play.
                     volume     - the volume to be set while playing the sound file.
 
-               The  exact  format  for  the  pattern depends on whether the
-          platform is built to use ``regular expressions'' or NetHack's own
-          internal  pattern  matching facility. The ``regular expressions''
-          matching can be much more sophisticated than the internal NetHack
-          pattern  matching, but requires 3rd party libraries on some plat-
-          forms.  There are plenty of references  available  elsewhere  for
-          explaining  ``regular expressions''. You can verify which pattern
-          matching is used by your port with the #version command.
-
-               NetHack's internal pattern matching routine uses the follow-
-          ing special characters in its pattern matching:
-
-                 *--- matches 0 or more characters.
-                 ?--- matches any single character.
 
 
 
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -3040,45 +3040,71 @@
 
 
 
-               Here's  an example of a sound mapping using NetHack's inter-
+               The exact format for the  pattern  depends  on  whether  the
+          platform is built to use ``regular expressions'' or NetHack's own
+          internal pattern matching facility. The  ``regular  expressions''
+          matching can be much more sophisticated than the internal NetHack
+          pattern matching, but requires 3rd party libraries on some  plat-
+          forms.   There  are  plenty of references available elsewhere for
+          explaining ``regular expressions''. You can verify which  pattern
+          matching is used by your port with the #version command.
+
+               NetHack's internal pattern matching routine uses the follow-
+          ing special characters in its pattern matching:
+
+                 *--- matches 0 or more characters.
+                 ?--- matches any single character.
+
+               Here's an example of a sound mapping using NetHack's  inter-
           nal pattern matching facility:
 
                    SOUND=MESG "*chime of a cash register*" "gong.wav" 50
 
-          specifies that any message with "chime of a cash  register"  con-
-          tained  in  it  will  trigger the playing of "gong.wav".  You can
+          specifies  that  any message with "chime of a cash register" con-
+          tained in it will trigger the playing  of  "gong.wav".   You  can
           have multiple SOUND entries in your config file.
 
           9.8.  Configuring NetHack for Play by the Blind
 
-               NetHack can be set up to use only standard ASCII  characters
-          for  making  maps of the dungeons. This makes the MS-DOS versions
-          of NetHack completely accessible to  the  blind  who  use  speech
-          and/or  Braille access technologies.  Players will require a good
-          working knowledge of their screen-reader's review  features,  and
-          will  have  to  know  how to navigate horizontally and vertically
-          character by character. They will also find the search  capabili-
-          ties  of their screen-readers to be quite valuable. Be certain to
-          examine this Guidebook before playing so you have  an  idea  what
-          the  screen layout is like. You'll also need to be able to locate
-          the PC cursor. It is always  where  your  character  is  located.
-          Merely  searching for an @-sign will not always find your charac-
+               NetHack  can be set up to use only standard ASCII characters
+          for making maps of the dungeons. This makes the  MS-DOS  versions
+          of  NetHack  completely  accessible  to  the blind who use speech
+          and/or Braille access technologies.  Players will require a  good
+          working  knowledge  of their screen-reader's review features, and
+          will have to know how to  navigate  horizontally  and  vertically
+          character  by character. They will also find the search capabili-
+          ties of their screen-readers to be quite valuable. Be certain  to
+          examine  this  Guidebook  before playing so you have an idea what
+          the screen layout is like. You'll also need to be able to  locate
+          the  PC  cursor.  It  is  always where your character is located.
+          Merely searching for an @-sign will not always find your  charac-
           ter since there are other humanoids represented by the same sign.
-          Your  screen-reader  should  also have a function which gives you
-          the row and column of your  review  cursor  and  the  PC  cursor.
-          These  co-ordinates  are  often useful in giving players a better
+          Your screen-reader should also have a function  which  gives  you
+          the  row  and  column  of  your  review cursor and the PC cursor.
+          These co-ordinates are often useful in giving  players  a  better
           sense of the overall location of items on the screen.
 
-               While it is not difficult for experienced users to edit  the
-          defaults.nh  file  to accomplish this, novices may find this task
-          somewhat daunting.  Included in  all  official  distributions  of
+               While  it is not difficult for experienced users to edit the
+          defaults.nh file to accomplish this, novices may find  this  task
+          somewhat  daunting.   Included  in  all official distributions of
           NetHack is a file called NHAccess.nh.  Replacing defaults.nh with
-          this file will cause the game to run in a  manner  accessible  to
-          the  blind.  After  you have gained some experience with the game
-          and with editing files, you may want to alter settings to  better
+          this  file  will  cause the game to run in a manner accessible to
+          the blind. After you have gained some experience  with  the  game
+          and  with editing files, you may want to alter settings to better
           suit your preferences. Instructions on how to do this are includ-
-          ed in the NHAccess.nh file itself. The most crucial  settings  to
+          ed  in  the NHAccess.nh file itself. The most crucial settings to
           make the game accessible are:
+
+
+          NetHack 3.4                                          June 5, 2003
+
+
+
+
+
+          NetHack Guidebook                                              48
+
+
 
           IBMgraphics
                Disable IBMgraphics by commenting out this option.
@@ -3092,77 +3118,51 @@
                tion and use the traditional Rogue-like commands.
 
           Character graphics
-               Comment  out all character graphics sets found near the bot-
-               tom  of  the  defaults.nh  file.   Most  of  these   replace
-
-
-          NetHack 3.4                                     February 12, 2003
-
-
-
-
-
-          NetHack Guidebook                                              48
-
-
-
-               NetHack's  default representation of the dungeon using stan-
-               dard ASCII characters with fancier characters from  extended
-               character  sets,  and  these  fancier  characters  can annoy
+               Comment out all character graphics sets found near the  bot-
+               tom   of  the  defaults.nh  file.   Most  of  these  replace
+               NetHack's default representation of the dungeon using  stan-
+               dard  ASCII characters with fancier characters from extended
+               character sets,  and  these  fancier  characters  can  annoy
                screen-readers.
 
           10.  Scoring
 
-               NetHack maintains a list of the top  scores  or  scorers  on
+               NetHack  maintains  a  list  of the top scores or scorers on
           your machine, depending on how it is set up.  In the latter case,
-          each account on the machine can post only one  non-winning  score
-          on  this  list.   If  you  score higher than someone else on this
-          list, or better your previous score, you will be inserted in  the
-          proper  place  under your current name.  How many scores are kept
+          each  account  on the machine can post only one non-winning score
+          on this list.  If you score higher  than  someone  else  on  this
+          list,  or better your previous score, you will be inserted in the
+          proper place under your current name.  How many scores  are  kept
           can also be set up when NetHack is compiled.
 
-               Your score is chiefly based upon  how  much  experience  you
+               Your  score  is  chiefly  based upon how much experience you
           gained, how much loot you accumulated, how deep you explored, and
           how the game ended.  If you quit the game, you escape with all of
-          your  gold  intact.   If, however, you get killed in the Mazes of
+          your gold intact.  If, however, you get killed in  the  Mazes  of
           Menace, the guild will only hear about 90% of your gold when your
-          corpse  is  discovered  (adventurers  have  been known to collect
-          finder's fees).  So, consider whether you want to take  one  last
-          hit  at  that  monster  and  possibly live, or quit and stop with
-          whatever you have.  If you quit, you keep all your gold,  but  if
+          corpse is discovered (adventurers  have  been  known  to  collect
+          finder's  fees).   So, consider whether you want to take one last
+          hit at that monster and possibly live,  or  quit  and  stop  with
+          whatever  you  have.  If you quit, you keep all your gold, but if
           you swing and live, you might find more.
 
-               If  you  just want to see what the current top players/games
+               If you just want to see what the current  top  players/games
           list is, you can type nethack -s all on most versions.
 
 
           11.  Explore mode
 
-               NetHack is an intricate and difficult game.   Novices  might
+               NetHack  is  an intricate and difficult game.  Novices might
           falter in fear, aware of their ignorance of the means to survive.
-          Well, fear not.  Your dungeon may come  equipped  with  an  ``ex-
-          plore''  or  ``discovery'' mode that enables you to keep old save
-          files and cheat death, at the paltry cost of not getting  on  the
+          Well,  fear  not.   Your  dungeon may come equipped with an ``ex-
+          plore'' or ``discovery'' mode that enables you to keep  old  save
+          files  and  cheat death, at the paltry cost of not getting on the
           high score list.
 
-               There  are  two  ways  of  enabling explore mode.  One is to
-          start the game with the -X switch.  The other is to issue the `X'
-          command  while  already  playing the game.  The other benefits of
-          explore mode are left for the trepid reader to discover.
-
-
-          12.  Credits
-
-               The original hack game was  modeled  on  the  Berkeley  UNIX
-          rogue  game.   Large  portions  of  this  paper  were shamelessly
-          cribbed from A Guide to the Dungeons of Doom, by Michael  C.  Toy
-          and  Kenneth  C.  R. C. Arnold.  Small portions were adapted from
-          Further Exploration of the Dungeons of Doom, by Ken Arromdee.
 
 
 
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -3172,63 +3172,63 @@
 
 
 
+               There are two ways of enabling  explore  mode.   One  is  to
+          start the game with the -X switch.  The other is to issue the `X'
+          command while already playing the game.  The  other  benefits  of
+          explore mode are left for the trepid reader to discover.
+
+
+          12.  Credits
+
+               The  original  hack  game  was  modeled on the Berkeley UNIX
+          rogue game.   Large  portions  of  this  paper  were  shamelessly
+          cribbed  from  A Guide to the Dungeons of Doom, by Michael C. Toy
+          and Kenneth C. R. C. Arnold.  Small portions  were  adapted  from
+          Further Exploration of the Dungeons of Doom, by Ken Arromdee.
+
                NetHack is the product of literally dozens of people's work.
-          Main  events  in the course of the game development are described
+          Main events in the course of the game development  are  described
           below:
 
 
-               Jay Fenlason wrote the original Hack, with help  from  Kenny
+               Jay  Fenlason  wrote the original Hack, with help from Kenny
           Woodland, Mike Thome and Jon Payne.
 
                Andries Brouwer did a major re-write, transforming Hack into
-          a very different game, and published (at  least)  three  versions
+          a  very  different  game, and published (at least) three versions
           (1.0.1, 1.0.2, and 1.0.3) for UNIX machines to the Usenet.
 
-               Don  G. Kneller ported Hack 1.0.3 to Microsoft C and MS-DOS,
-          producing PC HACK 1.01e, added support for DEC  Rainbow  graphics
-          in  version 1.03g, and went on to produce at least four more ver-
+               Don G. Kneller ported Hack 1.0.3 to Microsoft C and  MS-DOS,
+          producing  PC  HACK 1.01e, added support for DEC Rainbow graphics
+          in version 1.03g, and went on to produce at least four more  ver-
           sions (3.0, 3.2, 3.51, and 3.6).
 
-               R. Black ported PC HACK 3.51 to  Lattice  C  and  the  Atari
+               R.  Black  ported  PC  HACK  3.51 to Lattice C and the Atari
           520/1040ST, producing ST Hack 1.03.
 
                Mike Stephenson merged these various versions back together,
-          incorporating many of the added features,  and  produced  NetHack
-          1.4.   He  then  coordinated a cast of thousands in enhancing and
-          debugging NetHack 1.4 and released NetHack versions 2.2 and  2.3.
+          incorporating  many  of  the added features, and produced NetHack
+          1.4.  He then coordinated a cast of thousands  in  enhancing  and
+          debugging  NetHack 1.4 and released NetHack versions 2.2 and 2.3.
 
                Later, Mike coordinated a major rewrite of the game, heading
           a team which included Ken Arromdee, Jean-Christophe Collet, Steve
           Creps, Eric Hendrickson, Izchak Miller, John Rupley, Mike Threep-
           oint, and Janet Walz, to produce NetHack 3.0c.
 
-               NetHack 3.0 was ported to the Atari by  Eric  R.  Smith,  to
-          OS/2  by  Timo Hakulinen, and to VMS by David Gentzel.  The three
+               NetHack  3.0  was  ported  to the Atari by Eric R. Smith, to
+          OS/2 by Timo Hakulinen, and to VMS by David Gentzel.   The  three
           of them and Kevin Darcy later joined the main development team to
           produce subsequent revisions of 3.0.
 
-               Olaf  Seibert ported NetHack 2.3 and 3.0 to the Amiga.  Norm
-          Meluch, Stephen Spackman and Pierre  Martineau  designed  overlay
-          code  for  PC  NetHack 3.0.  Johnny Lee ported NetHack 3.0 to the
-          Macintosh.  Along with various other Dungeoneers, they  continued
-          to  enhance  the PC, Macintosh, and Amiga ports through the later
-          revisions of 3.0.
-
-               Headed by Mike Stephenson and coordinated by  Izchak  Miller
-          and  Janet  Walz, the development team which now included Ken Ar-
-          romdee, David Cohrs, Jean-Christophe Collet,  Kevin  Darcy,  Matt
-          Day,  Timo Hakulinen, Steve Linhart, Dean Luick, Pat Rankin, Eric
-          Raymond, and Eric Smith undertook  a  radical  revision  of  3.0.
-          They re-structured the game's design, and re-wrote major parts of
-          the code.  They added multiple dungeons, a new  display,  special
-          individual  character  quests,  a  new endgame and many other new
-          features, and produced NetHack 3.1.
-
-               Ken Lorber, Gregg Wonderly and Greg Olson,  with  help  from
-          Richard  Addison,  Mike  Passaretti,  and Olaf Seibert, developed
+               Olaf Seibert ported NetHack 2.3 and 3.0 to the Amiga.   Norm
+          Meluch,  Stephen  Spackman  and Pierre Martineau designed overlay
+          code for PC NetHack 3.0.  Johnny Lee ported NetHack  3.0  to  the
+          Macintosh.   Along with various other Dungeoneers, they continued
+          to enhance the PC, Macintosh, and Amiga ports through  the  later
 
 
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -3238,63 +3238,63 @@
 
 
 
+          revisions of 3.0.
+
+               Headed  by  Mike Stephenson and coordinated by Izchak Miller
+          and Janet Walz, the development team which now included  Ken  Ar-
+          romdee,  David  Cohrs,  Jean-Christophe Collet, Kevin Darcy, Matt
+          Day, Timo Hakulinen, Steve Linhart, Dean Luick, Pat Rankin,  Eric
+          Raymond,  and  Eric  Smith  undertook  a radical revision of 3.0.
+          They re-structured the game's design, and re-wrote major parts of
+          the  code.   They added multiple dungeons, a new display, special
+          individual character quests, a new endgame  and  many  other  new
+          features, and produced NetHack 3.1.
+
+               Ken  Lorber,  Gregg  Wonderly and Greg Olson, with help from
+          Richard Addison, Mike Passaretti,  and  Olaf  Seibert,  developed
           NetHack 3.1 for the Amiga.
 
-               Norm Meluch and Kevin Smolkowski, with help from Carl  Sche-
+               Norm  Meluch and Kevin Smolkowski, with help from Carl Sche-
           lin, Stephen Spackman, Steve VanDevender, and Paul Winner, ported
           NetHack 3.1 to the PC.
 
                Jon W{tte and Hao-yang Wang, with help from Ross Brown, Mike
-          Engber,  David  Hairston, Michael Hamel, Jonathan Handler, Johnny
-          Lee, Tim Lennan, Rob Menke, and Andy Swanson,  developed  NetHack
+          Engber, David Hairston, Michael Hamel, Jonathan  Handler,  Johnny
+          Lee,  Tim  Lennan, Rob Menke, and Andy Swanson, developed NetHack
           3.1 for the Macintosh, porting it for MPW.  Building on their de-
           velopment, Barton House added a Think C port.
 
                Timo Hakulinen ported NetHack 3.1 to OS/2.  Eric Smith port-
-          ed  NetHack  3.1 to the Atari.  Pat Rankin, with help from Joshua
-          Delahunty, was responsible for the VMS version  of  NetHack  3.1.
+          ed NetHack 3.1 to the Atari.  Pat Rankin, with help  from  Joshua
+          Delahunty,  was  responsible  for the VMS version of NetHack 3.1.
           Michael Allison ported NetHack 3.1 to Windows NT.
 
-               Dean  Luick,  with  help from David Cohrs, developed NetHack
-          3.1 for X11.  Warwick Allison wrote a tiled  version  of  NetHack
-          for  the Atari; he later contributed the tiles to the DevTeam and
+               Dean Luick, with help from David  Cohrs,  developed  NetHack
+          3.1  for  X11.   Warwick Allison wrote a tiled version of NetHack
+          for the Atari; he later contributed the tiles to the DevTeam  and
           tile support was then added to other platforms.
 
-               The 3.2 development team, comprised of Michael Allison,  Ken
-          Arromdee,  David  Cohrs, Jessie Collet, Steve Creps, Kevin Darcy,
-          Timo Hakulinen, Steve  Linhart,  Dean  Luick,  Pat  Rankin,  Eric
-          Smith,  Mike  Stephenson,  Janet  Walz, and Paul Winner, released
+               The  3.2 development team, comprised of Michael Allison, Ken
+          Arromdee, David Cohrs, Jessie Collet, Steve Creps,  Kevin  Darcy,
+          Timo  Hakulinen,  Steve  Linhart,  Dean  Luick,  Pat Rankin, Eric
+          Smith, Mike Stephenson, Janet Walz,  and  Paul  Winner,  released
           version 3.2 in April of 1996.
 
                Version 3.2 marked the tenth anniversary of the formation of
-          the  development team.  In a testament to their dedication to the
-          game, all thirteen members of the original development  team  re-
-          mained  on the team at the start of work on that release.  During
-          the interval between the release of 3.1.3 and  3.2,  one  of  the
-          founding  members of the development team, Dr. Izchak Miller, was
-          diagnosed with cancer and passed away.  That release of the  game
+          the development team.  In a testament to their dedication to  the
+          game,  all  thirteen members of the original development team re-
+          mained on the team at the start of work on that release.   During
+          the  interval  between  the  release of 3.1.3 and 3.2, one of the
+          founding members of the development team, Dr. Izchak Miller,  was
+          diagnosed  with cancer and passed away.  That release of the game
           was dedicated to him by the development and porting teams.
 
                During the lifespan of NetHack 3.1 and 3.2, several enthusi-
-          asts of the game added their own modifications to  the  game  and
+          asts  of  the  game added their own modifications to the game and
           made these ``variants'' publicly available:
 
-               Tom  Proudfoot  and  Yuval Oren created NetHack++, which was
-          quickly renamed NetHack--.  Working independently, Stephen  White
-          wrote  NetHack Plus.  Tom Proudfoot later merged NetHack Plus and
-          his own NetHack-- to produce SLASH.  Larry Stewart-Zerba and War-
-          wick  Allison  improved  the spell casting system with the Wizard
-          Patch.  Warwick Allison also ported NetHack to use the Qt  inter-
-          face.
 
-               Warren  Cheung  combined SLASH with the Wizard Patch to pro-
-          duce Slash'em, and with the help of Kevin Hugo, added  more  fea-
-          tures.   Kevin later joined the DevTeam and incorporated the best
-          of these ideas in NetHack 3.3.
-
-
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -3304,63 +3304,63 @@
 
 
 
+               Tom Proudfoot and Yuval Oren created  NetHack++,  which  was
+          quickly  renamed NetHack--.  Working independently, Stephen White
+          wrote NetHack Plus.  Tom Proudfoot later merged NetHack Plus  and
+          his own NetHack-- to produce SLASH.  Larry Stewart-Zerba and War-
+          wick Allison improved the spell casting system  with  the  Wizard
+          Patch.   Warwick Allison also ported NetHack to use the Qt inter-
+          face.
+
+               Warren Cheung combined SLASH with the Wizard Patch  to  pro-
+          duce  Slash'em,  and with the help of Kevin Hugo, added more fea-
+          tures.  Kevin later joined the DevTeam and incorporated the  best
+          of these ideas in NetHack 3.3.
+
                The final update to 3.2 was the bug fix release 3.2.3, which
-          was  released  simultaneously with 3.3.0 in December 1999 just in
+          was released simultaneously with 3.3.0 in December 1999  just  in
           time for the Year 2000.
 
                The 3.3 development team, consisting of Michael Allison, Ken
-          Arromdee,  David  Cohrs, Jessie Collet, Steve Creps, Kevin Darcy,
-          Timo Hakulinen, Kevin  Hugo,  Steve  Linhart,  Ken  Lorber,  Dean
-          Luick,  Pat  Rankin, Eric Smith, Mike Stephenson, Janet Walz, and
-          Paul Winner, released 3.3.0 in December 1999 and 3.3.1 in  August
+          Arromdee, David Cohrs, Jessie Collet, Steve Creps,  Kevin  Darcy,
+          Timo  Hakulinen,  Kevin  Hugo,  Steve  Linhart,  Ken Lorber, Dean
+          Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet  Walz,  and
+          Paul  Winner, released 3.3.0 in December 1999 and 3.3.1 in August
           of 2000.
 
                Version 3.3 offered many firsts. It was the first version to
-          separate race and profession. The Elf class was removed in  pref-
+          separate  race and profession. The Elf class was removed in pref-
           erence to an elf race, and the races of dwarves, gnomes, and orcs
-          made their first appearance in the game  alongside  the  familiar
-          human  race.  Monk and Ranger roles joined Archeologists, Barbar-
-          ians,  Cavemen,  Healers,  Knights,  Priests,  Rogues,   Samurai,
-          Tourists,  Valkyries  and  of  course,  Wizards.  It was also the
-          first version to allow you to ride a steed,  and  was  the  first
-          version  to  have  a  publicly available web-site listing all the
-          bugs that had been discovered.  Despite that  constantly  growing
-          bug  list,  3.3 proved stable enough to last for more than a year
+          made  their  first  appearance in the game alongside the familiar
+          human race.  Monk and Ranger roles joined Archeologists,  Barbar-
+          ians,   Cavemen,  Healers,  Knights,  Priests,  Rogues,  Samurai,
+          Tourists, Valkyries and of course,  Wizards.   It  was  also  the
+          first  version  to  allow  you to ride a steed, and was the first
+          version to have a publicly available  web-site  listing  all  the
+          bugs  that  had been discovered.  Despite that constantly growing
+          bug list, 3.3 proved stable enough to last for more than  a  year
           and a half.
 
-               The 3.4 development team initially consisted of Michael  Al-
-          lison,  Ken Arromdee, David Cohrs, Jessie Collet, Kevin Hugo, Ken
-          Lorber, Dean Luick, Pat Rankin, Mike Stephenson, Janet Walz,  and
-          Paul  Winner,  with   Warwick Allison joining just before the re-
+               The  3.4 development team initially consisted of Michael Al-
+          lison, Ken Arromdee, David Cohrs, Jessie Collet, Kevin Hugo,  Ken
+          Lorber,  Dean Luick, Pat Rankin, Mike Stephenson, Janet Walz, and
+          Paul Winner, with  Warwick Allison joining just  before  the  re-
           lease of NetHack 3.4.0 in March 2002.
 
-               As with version 3.3, various people contributed to the  game
+               As  with version 3.3, various people contributed to the game
           as a whole as well as supporting ports on the different platforms
           that NetHack runs on:
 
                Pat Rankin maintained 3.4 for VMS.
 
-               Michael Allison maintained NetHack 3.4 for the MS-DOS  plat-
+               Michael  Allison maintained NetHack 3.4 for the MS-DOS plat-
           form.  Paul Winner and Yitzhak Sapir provided encouragement.
 
-               Dean  Luick, Mark Modrall, and Kevin Hugo maintained and en-
+               Dean Luick, Mark Modrall, and Kevin Hugo maintained and  en-
           hanced the Macintosh port of 3.4.
 
-               Michael Allison, David Cohrs, Alex  Kompel,  Dion  Nicolaas,
-          and  Yitzhak  Sapir maintained and enhanced 3.4 for the Microsoft
-          Windows platform.  Alex Kompel contributed a new graphical inter-
-          face  for  the Windows port.  Alex Kompel also contributed a Win-
-          dows CE port for 3.4.1.
 
-               Ron Van Iwaarden maintained 3.4 for OS/2.
-
-               Janne Salmijarvi and Teemu Suikki  maintained  and  enhanced
-          the  Amiga  port of 3.4 after Janne Salmijarvi resurrected it for
-          3.3.1.
-
-
-
-          NetHack 3.4                                     February 12, 2003
+          NetHack 3.4                                          June 5, 2003
 
 
 
@@ -3370,63 +3370,129 @@
 
 
 
-               Christian ``Marvin'' Bressler maintained 3.4 for  the  Atari
+               Michael  Allison,  David  Cohrs, Alex Kompel, Dion Nicolaas,
+          and Yitzhak Sapir maintained and enhanced 3.4 for  the  Microsoft
+          Windows platform.  Alex Kompel contributed a new graphical inter-
+          face for the Windows port.  Alex Kompel also contributed  a  Win-
+          dows CE port for 3.4.1.
+
+               Ron Van Iwaarden maintained 3.4 for OS/2.
+
+               Janne  Salmijarvi  and  Teemu Suikki maintained and enhanced
+          the Amiga port of 3.4 after Janne Salmijarvi resurrected  it  for
+          3.3.1.
+
+               Christian  ``Marvin''  Bressler maintained 3.4 for the Atari
           after he resurrected it for 3.3.1.
 
-               There  is  a  NetHack  web  site maintained by Ken Lorber at
+               There is a NetHack web site  maintained  by  Ken  Lorber  at
           http://www.nethack.org/.
 
                        - - - - - - - - - -
 
-               From time to time, some depraved  individual  out  there  in
-          netland  sends a particularly intriguing modification to help out
-          with the game.  The Gods of the Dungeon sometimes  make  note  of
-          the  names  of the worst of these miscreants in this, the list of
+               From  time  to  time,  some depraved individual out there in
+          netland sends a particularly intriguing modification to help  out
+          with  the  game.   The Gods of the Dungeon sometimes make note of
+          the names of the worst of these miscreants in this, the  list  of
           Dungeoneers:
 
 
-                   Adam Aronow       Irina Rempt-Drijfhout       Mike Gallop
-                   Alex Kompel           Izchak Miller         Mike Passaretti
-                  Andreas Dorn           J. Ali Harlow         Mike Stephenson
-                   Andy Church             Janet Walz            Norm Meluch
-                  Andy Swanson          Janne Salmijarvi         Olaf Seibert
-                  Ari Huttunen       Jean-Christophe Collet     Pasi Kallinen
-                  Barton House           Jochen Erwied            Pat Rankin
-               Benson I. Margulies        John Kallen            Paul Winner
-                    Bill Dyer             John Rupley          Pierre Martineau
-                Boudewijn Waijers         John S. Bien            Ralf Brown
-                    Bruce Cox              Johnny Lee          Richard Addison
-                 Bruce Holloway            Jon W{tte            Richard Beigel
-                 Bruce Mewborne         Jonathan Handler      Richard P. Hughey
-                  Carl Schelin          Joshua Delahunty          Rob Menke
-                   Chris Russo           Keizo Yamamoto         Robin Johnson
-                   David Cohrs             Ken Arnold         Roderick Schertler
-                 David Damerell           Ken Arromdee          Roland McGrath
-                  David Gentzel            Ken Lorber          Ron Van Iwaarden
-                 David Hairston          Ken Washikita          Ronnen Miller
-                   Dean Luick             Kevin Darcy             Ross Brown
-                    Del Lamb               Kevin Hugo          Sascha Wostmann
-                  Deron Meranda           Kevin Sitze            Scott Bigham
-                  Dion Nicolaas         Kevin Smolkowski       Scott R. Turner
-                 Dylan O'Donnell          Kevin Sweet          Stephen Spackman
-                   Eric Backus            Lars Huttar           Stephen White
-                Eric Hendrickson          Malcolm Ryan           Steve Creps
-                  Eric R. Smith          Mark Gooderum          Steve Linhart
-                 Eric S. Raymond          Mark Modrall        Steve VanDevender
-                  Erik Andersen         Marvin Bressler          Teemu Suikki
-                Frederick Roeber          Matthew Day             Tim Lennan
-                   Gil Neiger             Merlyn LeRoy          Timo Hakulinen
-                   Greg Laskin          Michael Allison            Tom Almy
-                   Greg Olson             Michael Feir             Tom West
-                 Gregg Wonderly          Michael Hamel          Warren Cheung
-                  Hao-yang Wang         Michael Sokolov        Warwick Allison
-                  Helge Hafting           Mike Engber           Yitzhak Sapir
 
-          Brand and product names are trademarks or  registered  trademarks
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          NetHack 3.4                                          June 5, 2003
+
+
+
+
+
+          NetHack Guidebook                                              53
+
+
+
+                    Adam Aronow            Izchak Miller         Mike Stephenson
+                    Alex Kompel            J. Ali Harlow           Norm Meluch
+                   Andreas Dorn              Janet Walz            Olaf Seibert
+                    Andy Church           Janne Salmijarvi        Pasi Kallinen
+                   Andy Swanson        Jean-Christophe Collet       Pat Rankin
+                   Ari Huttunen            Jochen Erwied           Paul Winner
+                   Barton House             John Kallen          Pierre Martineau
+                Benson I. Margulies         John Rupley             Ralf Brown
+                     Bill Dyer              John S. Bien            Ray Chason
+                 Boudewijn Waijers           Johnny Lee          Richard Addison
+                     Bruce Cox               Jon W{tte            Richard Beigel
+                  Bruce Holloway          Jonathan Handler      Richard P. Hughey
+                  Bruce Mewborne          Joshua Delahunty          Rob Menke
+                   Carl Schelin            Keizo Yamamoto         Robin Johnson
+                    Chris Russo              Ken Arnold         Roderick Schertler
+                    David Cohrs             Ken Arromdee          Roland McGrath
+                  David Damerell             Ken Lorber          Ron Van Iwaarden
+                   David Gentzel           Ken Washikita          Ronnen Miller
+                  David Hairston            Kevin Darcy             Ross Brown
+                    Dean Luick               Kevin Hugo          Sascha Wostmann
+                     Del Lamb               Kevin Sitze            Scott Bigham
+                   Deron Meranda          Kevin Smolkowski       Scott R. Turner
+                   Dion Nicolaas            Kevin Sweet          Stephen Spackman
+                  Dylan O'Donnell           Lars Huttar           Stephen White
+                    Eric Backus             Malcolm Ryan           Steve Creps
+                 Eric Hendrickson          Mark Gooderum          Steve Linhart
+                   Eric R. Smith            Mark Modrall        Steve VanDevender
+                  Eric S. Raymond         Marvin Bressler          Teemu Suikki
+                   Erik Andersen            Matthew Day             Tim Lennan
+                 Frederick Roeber           Merlyn LeRoy          Timo Hakulinen
+                    Gil Neiger            Michael Allison            Tom Almy
+                    Greg Laskin             Michael Feir             Tom West
+                    Greg Olson             Michael Hamel          Warren Cheung
+                  Gregg Wonderly          Michael Sokolov        Warwick Allison
+                   Hao-yang Wang            Mike Engber           Yitzhak Sapir
+                   Helge Hafting            Mike Gallop
+               Irina Rempt-Drijfhout      Mike Passaretti
+
+          Brand  and  product names are trademarks or registered trademarks
           of their respective holders.
 
 
-          NetHack 3.4                                     February 12, 2003
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          NetHack 3.4                                          June 5, 2003
 
 
 
