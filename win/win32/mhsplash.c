@@ -31,12 +31,13 @@ extern HFONT extrainfo_splash_font;
 void mswin_display_splash_window (BOOL show_ver)
 {
 	MSG msg;
-	RECT rt;
+ int left, top;
 	RECT splashrt;
 	RECT clientrt;
 	RECT controlrt;
 	HWND hWnd;
  int buttop;
+ HDC hDC;
 
 	hWnd = CreateDialog(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_SPLASH),
 	    GetNHApp()->hMainWnd, NHSplashWndProc);
@@ -57,10 +58,12 @@ void mswin_display_splash_window (BOOL show_ver)
 	splashrt.right += SPLASH_WIDTH + SPLASH_OFFSET_X * 2 - clientrt.right;
 	splashrt.bottom += SPLASH_HEIGHT + controlrt.bottom + SPLASH_OFFSET_Y * 3 - clientrt.bottom;
 	/* Place the window centered */
-	GetWindowRect(GetNHApp()->hMainWnd, &rt);
-	rt.left += (rt.right - rt.left - splashrt.right) / 2;
-	rt.top += (rt.bottom - rt.top - splashrt.bottom) / 2;
-	MoveWindow(hWnd, rt.left, rt.top, splashrt.right, splashrt.bottom, TRUE);
+ /* On the screen, not on the parent window */
+ hDC = CreateDC("DISPLAY", NULL, NULL, NULL);
+ left = (GetDeviceCaps(hDC, HORZRES) - splashrt.right) / 2;
+ top = (GetDeviceCaps(hDC, VERTRES) - splashrt.bottom) / 2;
+ DeleteDC(hDC);                          
+ MoveWindow(hWnd, left, top, splashrt.right, splashrt.bottom, TRUE);
  /* Place the OK control */
 	GetClientRect (hWnd, &clientrt);
 	MoveWindow (GetDlgItem(hWnd, IDOK),
