@@ -76,38 +76,39 @@ static void FDECL(rob_shop, (struct monst *));
 
 #ifdef GOLDOBJ
 /*
-        Transfer money from inventory to monster when paying
-        shopkeepers, priests, oracle, succubus, & other demons.
-        Simple qith only gold coins.
-        This routine will handle money changing when multiple
-        coin types is implemented, only appropriate
-        monsters will pay change.  (Peaceful shopkeepers, priests
-        & the oracle try to maintain goodwill while selling
-        their wares or services.  Angry monsters and all demons
-        will keep anything they get their hands on.  
-        Returns the amount actually paid, so we can know
-        if the monster kept the change.
-*/
+    Transfer money from inventory to monster when paying
+    shopkeepers, priests, oracle, succubus, & other demons.
+    Simple qith only gold coins.
+    This routine will handle money changing when multiple
+    coin types is implemented, only appropriate
+    monsters will pay change.  (Peaceful shopkeepers, priests
+    & the oracle try to maintain goodwill while selling
+    their wares or services.  Angry monsters and all demons
+    will keep anything they get their hands on.
+    Returns the amount actually paid, so we can know
+    if the monster kept the change.
+ */
 long money2mon(mon, amount)
 struct monst *mon;
 long amount;
 {
-        struct obj *ygold = findgold(invent); 
+    struct obj *ygold = findgold(invent);
 
-        if (ygold && ygold == uquiver) uqwepgone();
+    if (amount <= 0) {
+	impossible("%s payment in money2mon!", amount ? "negative" : "zero");
+	return 0L;
+    }
+    if (!ygold || ygold->quan < amount) {
+	impossible("Paying without %s money?", ygold ? "enough" : "");
+	return 0L;
+    }
 
-        if (amount <= 0) impossible("%s payment in money2mon!",
-                                    amount ? "negative" : "zero");        
-        if (!ygold || ygold->quan < amount) {
-	        impossible("Paying without %s money?", ygold ? "enough" : "");
-		return 0;
-	}
-        
-        if (ygold->quan > amount) ygold = splitobj(ygold, amount);
-        freeinv(ygold);
-	add_to_minv(mon, ygold);
-        flags.botl = 1;
-        return amount;
+    if (ygold->quan > amount) ygold = splitobj(ygold, amount);
+    else if (ygold->owornmask) remove_worn_item(ygold);		/* quiver */
+    freeinv(ygold);
+    add_to_minv(mon, ygold);
+    flags.botl = 1;
+    return amount;
 }
 
 
@@ -115,32 +116,34 @@ long amount;
     Transfer money from monster to inventory.
     Used when the shopkeeper pay for items, and when
     the priest gives you money for an ale.
-*/
+ */
 void
 money2u(mon, amount)
 struct monst *mon;
 long amount;
 {
-        struct obj *mongold = findgold(mon->minvent);
+    struct obj *mongold = findgold(mon->minvent);
 
-        if (amount <= 0) impossible("%s payment in money2u!", 
-                                    amount ? "negative" : "zero");
-        if (!mongold || mongold->quan < amount) {
-                impossible("%s paying without %s money?", a_monnam(mon),
-                           mongold ? "enough" : "");
-                return;
-        }
-   
-        if (mongold->quan > amount) mongold = splitobj(mongold, amount);
-        obj_extract_self(mongold);
+    if (amount <= 0) {
+	impossible("%s payment in money2u!", amount ? "negative" : "zero");
+	return;
+    }
+    if (!mongold || mongold->quan < amount) {
+	impossible("%s paying without %s money?", a_monnam(mon),
+		   mongold ? "enough" : "");
+	return;
+    }
 
-        if (!merge_choice(invent, mongold) && inv_cnt() >= 52) {
-                You("have no room for the money!");
-                dropy(mongold);
-        } else {
-                addinv(mongold);  
-                flags.botl = 1;
-	}
+    if (mongold->quan > amount) mongold = splitobj(mongold, amount);
+    obj_extract_self(mongold);
+
+    if (!merge_choice(invent, mongold) && inv_cnt() >= 52) {
+	You("have no room for the money!");
+	dropy(mongold);
+    } else {
+	addinv(mongold);
+	flags.botl = 1;
+    }
 }
 
 #endif /* GOLDOBJ */

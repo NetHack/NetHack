@@ -186,19 +186,19 @@ struct monst *mtmp;
 	} else if (offer >= u.ugold) {
 		You("give %s all your gold.", mon_nam(mtmp));
 		offer = u.ugold;
-	} else You("give %s %ld %s.", mon_nam(mtmp), offer,
-		   currency(offer));
-
+	} else {
+		You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
+	}
 	u.ugold -= offer;
 	mtmp->mgold += offer;
 #else
 	} else if (offer >= umoney) {
 		You("give %s all your gold.", mon_nam(mtmp));
 		offer = umoney;
-	} else You("give %s %ld %s.", mon_nam(mtmp), offer,
-		   currency(offer));
-
-	money2mon(mtmp, offer);
+	} else {
+		You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
+	}
+	(void) money2mon(mtmp, offer);
 #endif
 	flags.botl = 1;
 	return(offer);
