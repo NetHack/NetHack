@@ -59,11 +59,14 @@ copy mhtext.c     ..\..\wince\mhtext.c
 copy mhtext.h     ..\..\wince\mhtext.h
 copy mswproc.c    ..\..\wince\mswproc.c
 copy newres.h     ..\..\wince\newres.h
-copy recover.vcp  ..\..\wince\recover.vcp
 copy resource.h   ..\..\wince\resource.h
-copy wince.vcp    ..\..\wince\wince.vcp
+copy hpc.vcp      ..\..\wince\wince_hpc.vcp
+copy palmpc.vcp   ..\..\wince\wince_palm_pc.vcp
+copy pocketpc.vcp ..\..\wince\wince_pocket_pc.vcp
+copy smartphn.vcp ..\..\wince\wince_smartphone.vcp
 copy winhack.c    ..\..\wince\winhack.c
 copy winhack.rc   ..\..\wince\winhack.rc
+copy winhcksp.rc  ..\..\wince\winhack_sp.rc
 copy winmain.c    ..\..\wince\winmain.c
 copy winMS.h      ..\..\wince\winMS.h
 echo.

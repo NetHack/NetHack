@@ -2,16 +2,13 @@
 
 #include "winMS.h"
 #include <assert.h>
-#include "resource.h"
 #include "mhmenu.h"
 #include "mhmain.h"
 #include "mhmsg.h"
+#include "mhcmd.h"
+#include "mhinput.h"
 #include "mhfont.h"
 #include "mhcolor.h"
-
-#ifndef WIN_CE_2xx
-#include <aygshell.h>
-#endif
 
 #define MENU_MARGIN			0
 #define NHMENU_STR_SIZE     BUFSZ
@@ -107,6 +104,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
     MENU_ITEM_P *selected = NULL;
 	int i;
 	char* ap;
+	char accell_str[256];
 
 	assert( _selected!=NULL );
 	*_selected = NULL;
@@ -118,21 +116,45 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 	SetMenuListType(hWnd, how);
 
 	/* Ok, now give items a unique accelerators */
+	ZeroMemory(accell_str, sizeof(accell_str));
+	ap = accell_str;
+
+#if defined(WIN_CE_SMARTPHONE)
+	if( data->menu.size>10 ) {
+		*ap++ = MENU_FIRST_PAGE;
+		*ap++ = MENU_LAST_PAGE;
+		*ap++ = MENU_NEXT_PAGE;
+		*ap++ = MENU_PREVIOUS_PAGE;
+		if( data->how == PICK_ANY ) {
+			*ap++ = MENU_SELECT_ALL;
+			*ap++ = MENU_UNSELECT_ALL;
+			*ap++ = MENU_INVERT_ALL;
+			*ap++ = MENU_SELECT_PAGE;
+			*ap++ = MENU_UNSELECT_PAGE;
+			*ap++ = MENU_INVERT_PAGE;
+		}
+		*ap++ = MENU_SEARCH;
+	}
+#endif
+
 	if( data->type == MENU_TYPE_MENU ) {
 		char next_char = 'a';
 
 		for( i=0; i<data->menu.size;  i++) {
 			if( data->menu.items[i].accelerator!=0 ) {
+				*ap++ = data->menu.items[i].accelerator;
 				next_char = (char)(data->menu.items[i].accelerator+1);
 			} else if( NHMENU_IS_SELECTABLE(data->menu.items[i]) ) {
 				if ( (next_char>='a' && next_char<='z') ||
 					 (next_char>='A' && next_char<='Z') )  {
 					 data->menu.items[i].accelerator = next_char;
+					 *ap++ = data->menu.items[i].accelerator;
 				} else {
 					if( next_char > 'z' ) next_char = 'A';
 					else if ( next_char > 'Z' ) break;
 
 					data->menu.items[i].accelerator = next_char;
+					*ap++ = data->menu.items[i].accelerator;
 				}
 
 				next_char ++;
@@ -154,6 +176,10 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 
 		reset_menu_count(NULL, data);
 	}
+
+#if defined(WIN_CE_SMARTPHONE)
+	if( data->type==MENU_TYPE_MENU ) NHSPhoneSetKeypadFromString( accell_str );
+#endif
 
 	mswin_popup_display(hWnd, &data->done);
 
@@ -194,6 +220,10 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 
 	mswin_popup_destroy(hWnd);
 
+#if defined(WIN_CE_SMARTPHONE)
+	if( data->type==MENU_TYPE_MENU ) NHSPhoneSetKeypadDefault();
+#endif
+
 	return ret_val;
 }
    
@@ -202,7 +232,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	PNHMenuWindow data;
 	
 	CheckInputDialog(hWnd, message, wParam, lParam);	
-	
+
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch (message) 
 	{
@@ -221,7 +251,12 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		/* subclass edit control */
 		editControlWndProc = (WNDPROC)GetWindowLong(GetDlgItem(hWnd, IDC_MENU_TEXT), GWL_WNDPROC);
 		SetWindowLong(GetDlgItem(hWnd, IDC_MENU_TEXT), GWL_WNDPROC, (LONG)NHMenuTextWndProc);
-	break;
+
+#if defined(WIN_CE_SMARTPHONE)
+		/* special initialization for SmartPhone dialogs */ 
+		NHSPhoneDialogSetup(hWnd, FALSE);
+#endif
+		break;
 
 	case WM_MSNH_COMMAND:
 		onMSNHCommand(hWnd, wParam, lParam);
@@ -288,6 +323,17 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 						data->result = 0;
 						return TRUE;
 					}
+				} else if( data->how==PICK_ANY ) {
+					if( lpnmlv->iItem>=0 &&
+						lpnmlv->iItem<data->menu.size &&
+						NHMENU_IS_SELECTABLE(data->menu.items[lpnmlv->iItem]) ) {
+						SelectMenuItem(
+							lpnmlv->hdr.hwndFrom, 
+							data, 
+							lpnmlv->iItem, 
+							NHMENU_IS_SELECTED(data->menu.items[lpnmlv->iItem])? 0 : -1
+						);
+					}
 				}
 			} break;
 
@@ -310,10 +356,9 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				if( lpnmlv->iItem==-1 ) return 0;
 				if( !(lpnmlv->uChanged & LVIF_STATE) ) return 0;
 
-				if( data->how==PICK_ONE || data->how==PICK_ANY ) {
-					data->menu.items[lpnmlv->iItem].has_focus = !!(lpnmlv->uNewState & LVIS_FOCUSED);
-					ListView_RedrawItems(lpnmlv->hdr.hwndFrom, lpnmlv->iItem, lpnmlv->iItem);
-				}
+				/* update item that has the focus */
+				data->menu.items[lpnmlv->iItem].has_focus = !!(lpnmlv->uNewState & LVIS_FOCUSED);
+				ListView_RedrawItems(lpnmlv->hdr.hwndFrom, lpnmlv->iItem, lpnmlv->iItem);
 
 				/* update count for single-selection menu (follow the listview selection) */
 				if( data->how==PICK_ONE ) {
@@ -328,10 +373,8 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				}
 
 				/* check item focus */
-				if( data->how==PICK_ONE || data->how==PICK_ANY ) {
-					data->menu.items[lpnmlv->iItem].has_focus = !!(lpnmlv->uNewState & LVIS_FOCUSED);
-					ListView_RedrawItems(lpnmlv->hdr.hwndFrom, lpnmlv->iItem, lpnmlv->iItem);
-				}
+				data->menu.items[lpnmlv->iItem].has_focus = !!(lpnmlv->uNewState & LVIS_FOCUSED);
+				ListView_RedrawItems(lpnmlv->hdr.hwndFrom, lpnmlv->iItem, lpnmlv->iItem);
 			} break;
 
 			case NM_KILLFOCUS:
@@ -346,6 +389,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_SETFOCUS:
 		if( hWnd!=GetNHApp()->hPopupWnd ) {
 			SetFocus(GetNHApp()->hPopupWnd );
+			return 0;
 		}
 	break;
 	
@@ -391,8 +435,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 void CheckInputDialog(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-/* NOP in Windows CE 211 */
-#ifndef WIN_CE_2xx
+#if defined(WIN_CE_POCKETPC)
 	PNHMenuWindow data;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
@@ -581,26 +624,37 @@ void LayoutMenu(HWND hWnd)
 	GetClientRect(hWnd, &clrt );
 	
 	/* set window placements */
-	GetWindowRect(menu_ok, &rt);
-	sz_ok.cx = (clrt.right - clrt.left)/2 - 2*MENU_MARGIN;
-	sz_ok.cy = rt.bottom-rt.top;
-	pt_ok.x = clrt.left + MENU_MARGIN;
-	pt_ok.y = clrt.bottom - MENU_MARGIN - sz_ok.cy;
-
-	GetWindowRect(menu_cancel, &rt);
-	sz_cancel.cx = (clrt.right - clrt.left)/2 - 2*MENU_MARGIN;
-	sz_cancel.cy = rt.bottom-rt.top;
-	pt_cancel.x = (clrt.left + clrt.right)/2 + MENU_MARGIN;
-	pt_cancel.y = clrt.bottom - MENU_MARGIN - sz_cancel.cy;
+	if( IsWindow(menu_ok) ) {
+		GetWindowRect(menu_ok, &rt);
+		sz_ok.cx = (clrt.right - clrt.left)/2 - 2*MENU_MARGIN;
+		sz_ok.cy = rt.bottom-rt.top;
+		pt_ok.x = clrt.left + MENU_MARGIN;
+		pt_ok.y = clrt.bottom - MENU_MARGIN - sz_ok.cy;
+		MoveWindow(menu_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE );
+	} else {
+		pt_ok.x = 0;
+		pt_ok.y = clrt.bottom;
+		sz_ok.cx = sz_ok.cy = 0;
+	}
+	
+	if( IsWindow(menu_cancel) ) {
+		GetWindowRect(menu_cancel, &rt);
+		sz_cancel.cx = (clrt.right - clrt.left)/2 - 2*MENU_MARGIN;
+		sz_cancel.cy = rt.bottom-rt.top;
+		pt_cancel.x = (clrt.left + clrt.right)/2 + MENU_MARGIN;
+		pt_cancel.y = clrt.bottom - MENU_MARGIN - sz_cancel.cy;
+		MoveWindow(menu_cancel, pt_cancel.x, pt_cancel.y, sz_cancel.cx, sz_cancel.cy, TRUE );
+	} else {
+		pt_cancel.x = 0;
+		pt_cancel.y = clrt.bottom;
+		sz_cancel.cx = sz_cancel.cy = 0;
+	}
 
 	pt_elem.x = clrt.left + MENU_MARGIN;
 	pt_elem.y = clrt.top + MENU_MARGIN;
 	sz_elem.cx = (clrt.right - clrt.left) - 2*MENU_MARGIN;
-	sz_elem.cy = min(pt_cancel.y, pt_ok.y) - 2*MENU_MARGIN;
-
+	sz_elem.cy = min(pt_cancel.y, pt_ok.y) - MENU_MARGIN - pt_elem.y;
 	MoveWindow(GetMenuControl(hWnd), pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
-	MoveWindow(menu_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE );
-	MoveWindow(menu_cancel, pt_cancel.x, pt_cancel.y, sz_cancel.cx, sz_cancel.cy, TRUE );
 }
 
 void SetMenuType(HWND hWnd, int type)
@@ -804,37 +858,39 @@ LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	x = lpdis->rcItem.left + 1;
 
-	/* print check mark */
-	if( NHMENU_IS_SELECTABLE(*item) ) {
-		HGDIOBJ saveBrush;
-		HBRUSH	hbrCheckMark;
-		char buf[2];
+	/* print check mark if it is a "selectable" menu */
+	if( data->how!=PICK_NONE ) {
+		if( NHMENU_IS_SELECTABLE(*item) ) {
+			HGDIOBJ saveBrush;
+			HBRUSH	hbrCheckMark;
+			char buf[2];
 
-		switch(item->count) {
-		case -1: hbrCheckMark = CreatePatternBrush(data->bmpChecked); break;
-		case 0: hbrCheckMark = CreatePatternBrush(data->bmpNotChecked); break;
-		default: hbrCheckMark = CreatePatternBrush(data->bmpCheckedCount); break;
+			switch(item->count) {
+			case -1: hbrCheckMark = CreatePatternBrush(data->bmpChecked); break;
+			case 0: hbrCheckMark = CreatePatternBrush(data->bmpNotChecked); break;
+			default: hbrCheckMark = CreatePatternBrush(data->bmpCheckedCount); break;
+			}
+
+			y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
+			SetBrushOrgEx(lpdis->hDC, x, y, NULL);
+			saveBrush = SelectObject(lpdis->hDC, hbrCheckMark);
+			PatBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, PATCOPY);
+			SelectObject(lpdis->hDC, saveBrush);
+			DeleteObject(hbrCheckMark);
+
+			x += TILE_X + 5;
+
+			if(item->accelerator!=0) {
+				buf[0] = item->accelerator;
+				buf[1] = '\x0';
+
+				SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
+				DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+			}
+			x += tm.tmAveCharWidth + tm.tmOverhang + 5;
+		} else {
+			x += TILE_X + tm.tmAveCharWidth + tm.tmOverhang + 10;
 		}
-
-		y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
-		SetBrushOrgEx(lpdis->hDC, x, y, NULL);
-		saveBrush = SelectObject(lpdis->hDC, hbrCheckMark);
-		PatBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, PATCOPY);
-		SelectObject(lpdis->hDC, saveBrush);
-		DeleteObject(hbrCheckMark);
-
-		x += TILE_X + 5;
-
-		if(item->accelerator!=0) {
-			buf[0] = item->accelerator;
-			buf[1] = '\x0';
-
-			SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
-			DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
-		}
-		x += tm.tmAveCharWidth + tm.tmOverhang + 5;
-	} else {
-		x += TILE_X + tm.tmAveCharWidth + tm.tmOverhang + 10;
 	}
 
 	/* print glyph if present */
@@ -1113,6 +1169,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 					NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
 				);
 			}
+			return -2;
 		}
 	break;
 
@@ -1327,32 +1384,65 @@ void reset_menu_count(HWND hwndList, PNHMenuWindow data)
 /* List window Proc */
 LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	BOOL bUpdateFocusItem;
-
-	bUpdateFocusItem = FALSE;
-
-	/* bring the system input pad up if required */
-	// CheckInputDialog(GetParent(hWnd), message, wParam);
+	BOOL bUpdateFocusItem = FALSE;
 
 	switch(message) {
 
 	/* filter keyboard input for the control */
+#if !defined(WIN_CE_SMARTPHONE)
 	case WM_KEYDOWN:
 	case WM_KEYUP: {
 		MSG msg;
-		BOOL processed;
 
-		processed = FALSE;
 		if( PeekMessage(&msg, hWnd, WM_CHAR, WM_CHAR, PM_REMOVE) ) {
 			if( onListChar(GetParent(hWnd), hWnd, (char)msg.wParam)==-2 ) {
-				processed = TRUE;
+				return 0;
 			}
 		}
-		if( processed ) return 0;
 
 		if( wParam==VK_LEFT || wParam==VK_RIGHT )
 			bUpdateFocusItem = TRUE;
 	} break;
+
+#else /* defined(WIN_CE_SMARTPHONE) */
+	case WM_KEYDOWN:
+		if( wParam==VK_TACTION ) {
+			if( onListChar(GetParent(hWnd), hWnd, ' ')==-2 ) {
+				return 0;
+			}
+		} else if( NHSPhoneTranslateKbdMessage(wParam, lParam, TRUE) ) {
+			PMSNHEvent	evt;
+			BOOL processed = FALSE;
+			if( mswin_have_input() ) {
+				evt = mswin_input_pop();
+				if( evt->type==NHEVENT_CHAR && 
+					onListChar(GetParent(hWnd), hWnd, evt->kbd.ch)==-2 ) {
+					processed = TRUE;
+				}
+
+				/* eat the rest of the events */
+				if( mswin_have_input() ) mswin_input_pop();
+			}
+			if( processed ) return 0;
+		}
+
+		if( wParam==VK_LEFT || wParam==VK_RIGHT )
+			bUpdateFocusItem = TRUE;
+	break;
+
+	case WM_KEYUP:
+		/* translate SmartPhone keyboard message */
+		if( NHSPhoneTranslateKbdMessage(wParam, lParam, FALSE) )
+			return 0;
+	break;
+
+	/* tell Windows not to process default button on VK_RETURN */
+	case WM_GETDLGCODE: 
+		return DLGC_DEFPUSHBUTTON | DLGC_WANTALLKEYS |
+			   (wndProcListViewOrig? 
+						CallWindowProc(wndProcListViewOrig, hWnd, message, wParam, lParam) 
+						: 0 );
+#endif
 
 	case WM_SIZE:
 	case WM_HSCROLL:
@@ -1383,14 +1473,35 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message) {
-
-	/* close on space */
-	case WM_KEYDOWN:
-		if( wParam==VK_SPACE ) {
+	case WM_KEYUP:
+		switch( wParam ) {
+		case VK_SPACE:
+		case VK_RETURN:
+			/* close on space */
 			PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
-		}
-	break;
+			return 0;
+		
+		case VK_UP:
+			/* scoll up */
+			PostMessage(hWnd, WM_VSCROLL, MAKEWPARAM(SB_LINEUP, 0), (LPARAM)NULL);
+			return 0;
 
+		case VK_DOWN:
+			/* scoll down */
+			PostMessage(hWnd, WM_VSCROLL, MAKEWPARAM(SB_LINEDOWN, 0), (LPARAM)NULL);
+			return 0;
+
+		case VK_LEFT:
+			/* scoll left */
+			PostMessage(hWnd, WM_HSCROLL, MAKEWPARAM(SB_LINELEFT, 0), (LPARAM)NULL);
+			return 0;
+
+		case VK_RIGHT:
+			/* scoll right */
+			PostMessage(hWnd, WM_HSCROLL, MAKEWPARAM(SB_LINERIGHT, 0), (LPARAM)NULL);
+			return 0;
+		}
+		break; /* case WM_KEYUP: */
 	}
 
 	if( editControlWndProc ) 

@@ -11,7 +11,7 @@
 	#endif
 	#include <commctrl.h>
 	#define  SHMENUBAR RCDATA
-	#if defined(WIN32_PLATFORM_PSPC) && (_WIN32_WCE >= 300)
+	#if (defined(WIN32_PLATFORM_PSPC) || defined(WIN32_PLATFORM_WFSP)) && (_WIN32_WCE >= 300)
 		#include <aygshell.h> 
 	#else
 		#define I_IMAGENONE		(-2)

@@ -11,6 +11,21 @@
 
 #include <windows.h>
 
+/* Detect the targe device */
+#if defined(WIN32_PLATFORM_PSPC) 
+#	if _WIN32_WCE >= 300
+#		define WIN_CE_POCKETPC
+#	else
+#		define WIN_CE_PS2xx
+#	endif
+#elif defined(WIN32_PLATFORM_HPCPRO)
+#	define WIN_CE_HPCPRO
+#elif defined(WIN32_PLATFORM_WFSP)
+#	define WIN_CE_SMARTPHONE
+#else
+#	error "Unsupported Windows CE platform"
+#endif
+
 /* #define SHELL	/* nt use of pcsys routines caused a hang */
 
 #define RANDOM		/* have Berkeley random(3) */
@@ -21,6 +36,8 @@
 
 #define PC_LOCKING		/* Prevent overwrites of aborted or in-progress games */
 				/* without first receiving confirmation. */
+
+#define SELF_RECOVER		/* Allow the game itself to recover from an aborted game */
 
 #define NOTSTDC		/* no strerror() */
 
@@ -144,11 +161,6 @@ extern void NDECL(toggle_mouse_support);
 #endif
 #endif
 
-/* Detect HPC - CE ver 2.11 */
-#if UNDER_CE<300
-#define WIN_CE_2xx
-#endif
-
 /* UNICODE stuff */
 #define NHSTR_BUFSIZE	255
 #ifdef UNICODE
@@ -249,7 +261,7 @@ char *getcwd( char *buffer, int maxlen );
 
 
 /* CE 2.xx is missing even more stuff */
-#ifdef WIN_CE_2xx
+#if defined(WIN_CE_PS2xx) || defined(WIN32_PLATFORM_HPCPRO)
 #define ZeroMemory(p, s)         memset((p), 0, (s))
 
 int __cdecl isupper(int c);

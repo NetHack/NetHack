@@ -9,5 +9,6 @@
 #include "winMS.h"
 
 HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace);
+UINT mswin_charset();
 
 #endif /* MSWINFont_h */

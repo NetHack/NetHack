@@ -2,7 +2,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
-#include "resource.h"
 #include "mhtext.h"
 #include "mhmsg.h"
 #include "mhfont.h"
@@ -10,9 +9,13 @@
 
 typedef struct mswin_nethack_text_window {
 	TCHAR*  window_text;
+	int done;
 } NHTextWindow, *PNHTextWindow;
 
+static WNDPROC editControlWndProc = NULL;
+
 LRESULT CALLBACK	TextWndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK	NHTextControlWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void LayoutText(HWND hwnd);
 
@@ -46,10 +49,11 @@ void mswin_display_text_window (HWND hWnd)
 		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
 		SendMessage(control, EM_FMTLINES, 1, 0 );
 		SetWindowText(GetDlgItem(hWnd, IDC_TEXT_CONTROL), data->window_text);
-	}
 
-	mswin_popup_display(hWnd, NULL);
-	mswin_popup_destroy(hWnd);
+		data->done = 0;
+		mswin_popup_display(hWnd, &data->done);
+		mswin_popup_destroy(hWnd);
+	}
 }
     
 LRESULT CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -72,6 +76,14 @@ LRESULT CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		SendMessage(control, WM_SETFONT, (WPARAM)mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE), 0);
 		ReleaseDC(control, hdc);
 
+#if defined(WIN_CE_SMARTPHONE)
+		/* special initialization for SmartPhone dialogs */ 
+		NHSPhoneDialogSetup(hWnd, FALSE);
+#endif
+		/* subclass edit control */
+		editControlWndProc = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
+		SetWindowLong(control, GWL_WNDPROC, (LONG)NHTextControlWndProc);
+
 		SetFocus(control);
 	return FALSE;
 
@@ -88,11 +100,7 @@ LRESULT CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
         { 
           case IDOK: 
 		  case IDCANCEL:
-			mswin_window_mark_dead(mswin_winid_from_handle(hWnd));
-			if( GetNHApp()->hMainWnd==hWnd ) 
-				GetNHApp()->hMainWnd=NULL;
-			DestroyWindow(hWnd);
-			SetFocus(GetNHApp()->hMainWnd);
+			data->done = 1;
 			return TRUE;
 		}
 	break;
@@ -164,17 +172,65 @@ void LayoutText(HWND hWnd)
 	GetClientRect(hWnd, &clrt );
 	
 	/* set window placements */
-	GetWindowRect(btn_ok, &rt);
-	sz_ok.cx = clrt.right - clrt.left;
-	sz_ok.cy = rt.bottom-rt.top;
-	pt_ok.x = clrt.left;
-	pt_ok.y = clrt.bottom - sz_ok.cy;
+	if( IsWindow(btn_ok) ) {
+		GetWindowRect(btn_ok, &rt);
+		sz_ok.cx = clrt.right - clrt.left;
+		sz_ok.cy = rt.bottom-rt.top;
+		pt_ok.x = clrt.left;
+		pt_ok.y = clrt.bottom - sz_ok.cy;
+		MoveWindow(btn_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE );
 
-	pt_elem.x = clrt.left;
-	pt_elem.y = clrt.top;
-	sz_elem.cx = clrt.right - clrt.left;
-	sz_elem.cy = pt_ok.y;
+		pt_elem.x = clrt.left;
+		pt_elem.y = clrt.top;
+		sz_elem.cx = clrt.right - clrt.left;
+		sz_elem.cy = pt_ok.y;
+		MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
+	} else {
+		pt_elem.x = clrt.left;
+		pt_elem.y = clrt.top;
+		sz_elem.cx = clrt.right - clrt.left;
+		sz_elem.cy = clrt.bottom - clrt.top;
+		MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
+	}
+}
 
-	MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
-	MoveWindow(btn_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE );
+/* Text control window proc - implements close on space and scrolling on arrows */
+LRESULT CALLBACK NHTextControlWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch(message) {
+	case WM_KEYUP:
+		switch( wParam ) {
+		case VK_SPACE:
+		case VK_RETURN:
+			/* close on space */
+			PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
+			return 0;
+		
+		case VK_UP:
+			/* scoll up */
+			PostMessage(hWnd, WM_VSCROLL, MAKEWPARAM(SB_LINEUP, 0), (LPARAM)NULL);
+			return 0;
+
+		case VK_DOWN:
+			/* scoll down */
+			PostMessage(hWnd, WM_VSCROLL, MAKEWPARAM(SB_LINEDOWN, 0), (LPARAM)NULL);
+			return 0;
+
+		case VK_LEFT:
+			/* scoll left */
+			PostMessage(hWnd, WM_HSCROLL, MAKEWPARAM(SB_LINELEFT, 0), (LPARAM)NULL);
+			return 0;
+
+		case VK_RIGHT:
+			/* scoll right */
+			PostMessage(hWnd, WM_HSCROLL, MAKEWPARAM(SB_LINERIGHT, 0), (LPARAM)NULL);
+			return 0;
+		}
+		break; /* case WM_KEYUP: */
+	}
+
+	if( editControlWndProc ) 
+		return CallWindowProc(editControlWndProc, hWnd, message, wParam, lParam);
+	else 
+		return 0;
 }

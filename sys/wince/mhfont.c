@@ -13,8 +13,10 @@ static struct font_table_entry {
 	HFONT   hFont;
 } font_table[MAXFONTS] ;
 static int font_table_size = 0;
+HFONT version_splash_font;
+HFONT extrainfo_splash_font;
 
-#define NHFONT_CODE(win, attr) ((((win)&0xFF)<<8)|((attr)&0xFF))
+#define NHFONT_CODE(win, attr) (((attr&0xFF)<<8)|(win_type&0xFF))
 
 static void __cdecl font_table_cleanup(void);
 
@@ -53,17 +55,16 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 		lgfnt.lfItalic			=	FALSE;		         // italic attribute option
 		lgfnt.lfUnderline		=	FALSE;			     // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
+		lgfnt.lfCharSet			=	mswin_charset();     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
 		if( iflags.wc_font_status &&
 			*iflags.wc_font_status ) {
 			lgfnt.lfPitchAndFamily = DEFAULT_PITCH;		 // pitch and family
-			lgfnt.lfCharSet		   = DEFAULT_CHARSET;    // character set identifier			
 			NH_A2W( iflags.wc_font_status, lgfnt.lfFaceName, LF_FACESIZE);
 		} else {
 			lgfnt.lfPitchAndFamily = FIXED_PITCH;		 // pitch and family
-			lgfnt.lfCharSet        = ANSI_CHARSET;       // character set identifier
 		}
 		break;
 
@@ -76,17 +77,16 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
 		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;				// strikeout attribute option
+		lgfnt.lfCharSet			=	mswin_charset();     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
 		if( iflags.wc_font_menu &&
 			*iflags.wc_font_menu ) {
-			lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;	 // pitch and family
-			lgfnt.lfCharSet		   = DEFAULT_CHARSET;    // character set identifier			
+			lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
 			NH_A2W( iflags.wc_font_menu, lgfnt.lfFaceName, LF_FACESIZE);
 		} else {
-			lgfnt.lfPitchAndFamily = VARIABLE_PITCH;		 // pitch and family
-			lgfnt.lfCharSet		   = ANSI_CHARSET;      // character set identifier
+			lgfnt.lfPitchAndFamily = FIXED_PITCH;		 // pitch and family
 		}
 		break;
 
@@ -100,17 +100,16 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
 		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
+		lgfnt.lfCharSet			=	mswin_charset();     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
 		if( iflags.wc_font_message &&
 			*iflags.wc_font_message ) {
-			lgfnt.lfPitchAndFamily = DEFAULT_PITCH;		 // pitch and family
-			lgfnt.lfCharSet		   = DEFAULT_CHARSET;      // character set identifier
+			lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
 			NH_A2W( iflags.wc_font_message, lgfnt.lfFaceName, LF_FACESIZE);
 		} else {
-			lgfnt.lfPitchAndFamily = VARIABLE_PITCH;		 // pitch and family
-			lgfnt.lfCharSet		   = ANSI_CHARSET;      // character set identifier
+			lgfnt.lfPitchAndFamily	= VARIABLE_PITCH;		 // pitch and family
 		}
 		break;
 
@@ -123,17 +122,16 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
 		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
+		lgfnt.lfCharSet			=	mswin_charset();     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
 		if( iflags.wc_font_text &&
 			*iflags.wc_font_text ) {
-			lgfnt.lfPitchAndFamily = DEFAULT_PITCH;		 // pitch and family
-			lgfnt.lfCharSet		   = DEFAULT_CHARSET;      // character set identifier
+			lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
 			NH_A2W( iflags.wc_font_text, lgfnt.lfFaceName, LF_FACESIZE);
 		} else {
-			lgfnt.lfPitchAndFamily = FIXED_PITCH;		 // pitch and family
-			lgfnt.lfCharSet		   = ANSI_CHARSET;      // character set identifier
+			lgfnt.lfPitchAndFamily	= FIXED_PITCH;		 // pitch and family
 		}
 		break;
 	}
@@ -151,6 +149,21 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 	font_table[font_index].code = NHFONT_CODE(win_type, attr);
 	font_table[font_index].hFont = fnt;
 	return fnt;
+}
+
+UINT mswin_charset()
+{
+	CHARSETINFO cis;
+	if( iflags.IBMgraphics )
+		if( TranslateCharsetInfo((DWORD*)GetOEMCP(), &cis, TCI_SRCCODEPAGE) ) 
+			return cis.ciCharset;
+		else
+			return OEM_CHARSET;
+	else 
+		if( TranslateCharsetInfo((DWORD*)GetACP(), &cis, TCI_SRCCODEPAGE) ) 
+			return cis.ciCharset;
+		else
+			return ANSI_CHARSET;
 }
 
 void __cdecl font_table_cleanup(void)

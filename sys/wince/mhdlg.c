@@ -6,16 +6,11 @@
 #include "winMS.h"
 #include "hack.h"
 #include "func_tab.h"
-#include "resource.h"
 #include "mhdlg.h"
+#include "mhmain.h"
 
-#ifndef WIN_CE_2xx
-#include <aygshell.h>
-#endif
-
-#ifdef WIN_CE
 #define CheckDlgButton(dlg, btn_id, st) SendDlgItemMessage((dlg), (btn_id), BM_SETCHECK, (WPARAM)(st), 0)
-#endif
+
 
 /*---------------------------------------------------------------*/
 /* data for getlin dialog */
@@ -61,10 +56,11 @@ LRESULT CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	RECT   main_rt, text_rt, dlg_rt, edit_rt;
 	SIZE   dlg_sz;
 	TCHAR  wbuf[BUFSZ];
-	HDC hdc;
+	HDC	   hdc;
 	HWND   control;
+	HWND   hwndMap;	
 
-#ifndef WIN_CE_2xx
+#if defined(WIN_CE_POCKETPC)
 	SHInputDialog(hWnd, message, wParam);
 #endif
 
@@ -84,11 +80,12 @@ LRESULT CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 
 		/* center dialog in the main window */
 		GetWindowRect(hWnd, &dlg_rt);
-		GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
+		hwndMap = mswin_hwnd_from_winid(WIN_MAP);
+		GetWindowRect( IsWindow(hwndMap)? hwndMap : GetNHApp()->hMainWnd, &main_rt);
 		dlg_sz.cx = max(dlg_rt.right-dlg_rt.left, 
 			            min( text_rt.right-text_rt.left+GetSystemMetrics(SM_CXICON),
 						     main_rt.right-main_rt.left ) );
-		dlg_sz.cy = dlg_rt.bottom - dlg_rt.top;
+		dlg_sz.cy = min(dlg_rt.bottom - dlg_rt.top, main_rt.bottom - main_rt.top);
 		dlg_rt.left = (main_rt.left+main_rt.right-dlg_sz.cx)/2;
 		dlg_rt.right = dlg_rt.left + dlg_sz.cx;
 		dlg_rt.top = (main_rt.top+main_rt.bottom-dlg_sz.cy)/2;
@@ -130,6 +127,10 @@ LRESULT CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 					text_rt.bottom - text_rt.top,
 					TRUE );
 
+#if defined(WIN_CE_SMARTPHONE)
+		NHSPhoneDialogSetup(hWnd, TRUE);
+#endif
+
 		/* set focus to the edit control */
 		SetFocus(GetDlgItem(hWnd, IDC_GETLIN_EDIT));
 
@@ -157,7 +158,15 @@ LRESULT CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			return TRUE;
 		}
 	} break;
-	
+
+#if defined(WIN_CE_SMARTPHONE)
+	case WM_HOTKEY:
+		if(VK_TBACK == HIWORD(lParam)) {
+			SHSendBackToFocusWindow(message, wParam, lParam);
+		}
+	break;
+#endif
+
 	} /* end switch (message) */
 	return FALSE;
 }
@@ -229,6 +238,16 @@ LRESULT CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		for(i=0; (ptr=extcmdlist[i].ef_txt); i++) {
 			SendDlgItemMessage(hWnd, IDC_EXTCMD_LIST, LB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(ptr, wbuf, sizeof(wbuf)) );
 		}
+
+#if defined(WIN_CE_SMARTPHONE)
+		NHSPhoneDialogSetup(hWnd, FALSE);
+
+		GetClientRect(hWnd, &dlg_rt);
+		MoveWindow(GetDlgItem(hWnd, IDC_EXTCMD_LIST),
+			       dlg_rt.left, dlg_rt.top, 
+				   dlg_rt.right-dlg_rt.left, dlg_rt.bottom-dlg_rt.top,
+				   TRUE);
+#endif
 
 		/* set focus to the list control */
 		SetFocus(GetDlgItem(hWnd, IDC_EXTCMD_LIST));
@@ -342,6 +361,9 @@ BOOL CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		/* init dialog */
 		plselInitDialog(hWnd);
 
+#if defined(WIN_CE_SMARTPHONE)
+		NHSPhoneDialogSetup(hWnd, FALSE);
+#endif
 		/* set focus on the role checkbox (random) field */
 		SetFocus(GetDlgItem(hWnd, IDC_PLSEL_ROLE_RANDOM));
 
@@ -731,3 +753,4 @@ int	plselFinalSelection(HWND hWnd, int* selection)
 
 	return TRUE;
 }
+

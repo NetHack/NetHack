@@ -22,7 +22,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
 	/* get command line parameters */	
 	p = _get_cmd_arg(
-#ifdef WIN_CE_2xx
+#if defined(WIN_CE_PS2xx) || defined(WIN32_PLATFORM_HPCPRO)
 		lpCmdLine
 #else
 		GetCommandLine()

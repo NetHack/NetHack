@@ -10,7 +10,28 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <tchar.h>
+#include <newres.h>
+#include "resource.h"
 #include "hack.h"
+
+#if defined(WIN_CE_POCKETPC)
+#include <aygshell.h> 
+#include <sipapi.h>
+#endif
+
+#if defined(WIN_CE_SMARTPHONE)
+#include <aygshell.h> 
+#include <sipapi.h>
+#include <shlobj.h>
+#include <prsht.h>
+#include <Tpcshell.h>
+#include <windowsm.h>
+#include <KEYBD.H>
+#endif
+
+#if defined(WIN_CE_PS2xx) || defined(WIN32_PLATFORM_HPCPRO)
+#include <sipapi.h>
+#endif
 
 /* Create an array to keep track of the various windows */
 
@@ -70,6 +91,7 @@ typedef struct mswin_nhwindow_app {
 	int			mapDisplayModeSave;	/* saved map display mode */
 
 	int			bCmdPad;	/* command pad - on-screen keyboard */ 
+	HWND		hCmdWnd;	/* handle of on-screen keyboard window */
 } NHWinApp, *PNHWinApp;
 extern PNHWinApp GetNHApp();
 
@@ -138,4 +160,9 @@ void nhapply_image_transparent(
 );
 void mswin_popup_display(HWND popup, int* done_indicator);
 void mswin_popup_destroy(HWND popup);
+
+#if defined(WIN_CE_SMARTPHONE)
+void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit);
+#endif
+
 #endif /* WINmswin_H */

@@ -15,6 +15,7 @@
 #include "mhmsgwnd.h"
 #include "mhmenu.h"
 #include "mhmsg.h"
+#include "mhcmd.h"
 #include "mhinput.h"
 #include "mhaskyn.h"
 #include "mhdlg.h"
@@ -24,7 +25,6 @@
 #include "mhcolor.h"
 
 #define LLEN 128
-#define NHMAP_FONT_NAME "Lucida Console"
 
 #ifdef _DEBUG
 extern void logDebug(const char *fmt, ...);
@@ -213,11 +213,16 @@ void mswin_init_nhwindows(int* argc, char** argv)
 */
 void mswin_player_selection(void)
 {
-	int nRole;
-
 	logDebug("mswin_player_selection()\n");
 
+#if defined(WIN_CE_SMARTPHONE)
+	/* SmartPhone does not supprt combo-boxes therefor we cannot
+	   use dialog for player selection */
+    prompt_for_player_selection();
+#else
 	if (iflags.wc_player_selection == VIA_DIALOG) {
+		int nRole;
+
 	    /* pick player type randomly (use pre-selected role/race/gender/alignment) */
 	    if( flags.randomall ) {
 		if (flags.initrole < 0) {
@@ -266,6 +271,7 @@ void mswin_player_selection(void)
 	} else { /* iflags.wc_player_selection == VIA_PROMPTS */
 	    prompt_for_player_selection();
 	}
+#endif /* defined(WIN_CE_SMARTPHONE) */
 }
 
 void prompt_for_player_selection(void)
@@ -297,7 +303,12 @@ void prompt_for_player_selection(void)
         box_result = MessageBox(NULL, 
 					NH_A2W(prompt, wbuf, BUFSZ), 
 					TEXT("NetHack for Windows"),
-					MB_YESNOCANCEL | MB_DEFBUTTON1 );
+#if defined(WIN_CE_SMARTPHONE)
+					MB_YESNO | MB_DEFBUTTON1 
+#else					
+					MB_YESNOCANCEL | MB_DEFBUTTON1 
+#endif
+					);
 
         pick4u = (box_result == IDYES) ? 'y' : (box_result == IDNO) ? 'n' : '\033';
 	    /* tty_putstr(BASE_WINDOW, 0, prompt); */
@@ -1336,20 +1347,48 @@ char mswin_yn_function(const char *question, const char *choices,
 	logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
 
     if (choices) {
-	char *cb, choicebuf[QBUFSZ];
-	Strcpy(choicebuf, choices);
-	if ((cb = index(choicebuf, '\033')) != 0) {
-	    /* anything beyond <esc> is hidden */
-	    *cb = '\0';
-	}
-	sprintf(message, "%s [%s] ", question, choicebuf);
-	if (def) sprintf(eos(message), "(%c) ", def);
-	/* escape maps to 'q' or 'n' or default, in that order */
-	yn_esc_map = (index(choices, 'q') ? 'q' :
-		 (index(choices, 'n') ? 'n' : def));
-    } else {
-	Strcpy(message, question);
+		char *cb, choicebuf[QBUFSZ];
+		Strcpy(choicebuf, choices);
+		if ((cb = index(choicebuf, '\033')) != 0) {
+			/* anything beyond <esc> is hidden */
+			*cb = '\0';
+		}
+		sprintf(message, "%s [%s] ", question, choicebuf);
+		if (def) sprintf(eos(message), "(%c) ", def);
+		/* escape maps to 'q' or 'n' or default, in that order */
+		yn_esc_map = (index(choices, 'q') ? 'q' :
+			 (index(choices, 'n') ? 'n' : def));
+	} else {
+		Strcpy(message, question);
     }
+
+#if defined(WIN_CE_SMARTPHONE)
+	{
+	char buf[BUFSZ];
+	ZeroMemory(buf, sizeof(buf));
+	if( choices ) {
+		if( !index(choices, '\033') ) buf[0]='\033'; /* make sure ESC is always available */
+		strncat( buf, choices, sizeof(buf)-2);
+		NHSPhoneSetKeypadFromString( buf );
+	} else {
+		/* sometimes choices are included in the message itself, e.g. "what? [abcd]" */
+		char *p1, *p2;
+		p1 = strchr(question, '[');
+		p2 = strrchr(question, ']');
+		if( p1 && p2 && p1<p2 ) {
+			buf[0]='\033'; /* make sure ESC is always available */
+			strncat(buf, p1+1, p2-p1-1);
+			NHSPhoneSetKeypadFromString( buf );
+		} else if( strstr(question, "direction") ) {
+			/* asking for direction here */
+			NHSPhoneSetKeypadDirection( );
+		} else {
+			/* anything goes */
+			NHSPhoneSetKeypadFromString( "\0330-9a-zA-Z" );
+		}
+	}
+	}
+#endif /* defined(WIN_CE_SMARTPHONE) */
 
     mswin_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
@@ -1378,6 +1417,9 @@ char mswin_yn_function(const char *question, const char *choices,
 		mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, res_ch, 1);
 	}
 
+#if defined(WIN_CE_SMARTPHONE)
+	NHSPhoneSetKeypadDefault();
+#endif
     return result;
 }
 
@@ -1695,14 +1737,20 @@ void mswin_popup_display(HWND hWnd, int* done_indicator)
 	for( hChild=GetWindow(GetNHApp()->hMainWnd, GW_CHILD);
 		 hChild;
 		 hChild = GetWindow(hChild, GW_HWNDNEXT) ) {
-		if( hChild!= hWnd) EnableWindow(hChild, FALSE);
+		if( hChild!=hWnd ) EnableWindow(hChild, FALSE);
 	}
+#if defined(WIN_CE_SMARTPHONE)
+	ShowWindow(GetNHApp()->hMenuBar, SW_HIDE);
+	ShowWindow(SHFindMenuBar(hWnd), SW_SHOW);
+#else
 	EnableWindow(GetNHApp()->hMenuBar, FALSE);
+#endif
 
 	/* bring menu window on top */
 	SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
 	/* go into message loop */
+	if( done_indicator ) *done_indicator = 0;
 	while( IsWindow(hWnd) && 
 		   (done_indicator==NULL || !*done_indicator) &&
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
@@ -1727,7 +1775,12 @@ void mswin_popup_destroy(HWND hWnd)
 			EnableWindow(hChild, TRUE);
 		}
 	}
+#if defined(WIN_CE_SMARTPHONE)
+	ShowWindow(SHFindMenuBar(hWnd), SW_HIDE);
+	ShowWindow(GetNHApp()->hMenuBar, SW_SHOW);
+#else
 	EnableWindow(GetNHApp()->hMenuBar, TRUE);
+#endif
 
 	SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW);
 	GetNHApp()->hPopupWnd = NULL;
@@ -1739,6 +1792,45 @@ void mswin_popup_destroy(HWND hWnd)
 	SetFocus(GetNHApp()->hMainWnd );
 }
 
+#if defined(WIN_CE_SMARTPHONE)
+void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit)
+{
+    SHMENUBARINFO mbi;
+	HWND hOK, hCancel;
+	RECT rtOK, rtDlg;
+
+	// Create our MenuBar
+    ZeroMemory(&mbi, sizeof(SHMENUBARINFO));
+    mbi.cbSize = sizeof(mbi);
+    mbi.hwndParent = hDlg;
+    mbi.nToolBarId = IDC_SPHONE_DIALOGBAR;
+    mbi.hInstRes = GetNHApp()->hApp;
+    if(!SHCreateMenuBar(&mbi)) {
+		error("cannot create dialog menu");
+	}
+
+	/* hide OK and CANCEL buttons */
+	hOK = GetDlgItem(hDlg, IDOK);
+	hCancel = GetDlgItem(hDlg, IDCANCEL);
+
+	if( IsWindow(hCancel) ) ShowWindow(hCancel, SW_HIDE);
+	if( IsWindow(hOK) ) {
+		GetWindowRect(hOK, &rtOK);
+		GetWindowRect(hDlg, &rtDlg);
+
+		rtDlg.bottom -= rtOK.bottom-rtOK.top;
+		ShowWindow(hOK, SW_HIDE);
+		SetWindowPos( hDlg, HWND_TOP, 
+			          0, 0, 
+					  rtDlg.right-rtDlg.left, rtDlg.bottom-rtDlg.top,
+					  SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOZORDER );
+	}
+
+	/* override "Back" button for edit box dialogs */
+	if( is_edit ) 
+		SendMessage(mbi.hwndMB, SHCMBM_OVERRIDEKEY, VK_TBACK, MAKELPARAM(SHMBOF_NODEFAULT | SHMBOF_NOTIFY, SHMBOF_NODEFAULT | SHMBOF_NOTIFY));
+}
+#endif /* defined(WIN_CE_SMARTPHONE) */
 
 
 #ifdef _DEBUG

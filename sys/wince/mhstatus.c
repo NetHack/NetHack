@@ -8,16 +8,18 @@
 #include "mhcolor.h"
 
 #define MAXWINDOWTEXT 255
-#define NHSW_LINES 4
 
+#define NHSTAT_LINES_2	2
+#define NHSTAT_LINES_4	4
 typedef struct mswin_nethack_status_window {
+	int		nhstat_format;
 	char	window_text[MAXWINDOWTEXT];
 } NHStatusWindow, *PNHStatusWindow;
 
 static TCHAR szStatusWindowClass[] = TEXT("MSNHStatusWndClass");
 LRESULT CALLBACK	StatusWndProc(HWND, UINT, WPARAM, LPARAM);
 static void register_status_window_class(void);
-static void FormatStatusString(char* text);
+static void FormatStatusString(char* text, int format);
 
 HWND mswin_init_status_window () {
 	static int run_once = 0;
@@ -49,6 +51,7 @@ HWND mswin_init_status_window () {
 	if( !data ) panic("out of memory");
 
 	ZeroMemory(data, sizeof(NHStatusWindow));
+	data->nhstat_format = NHSTAT_LINES_4;
 	SetWindowLong(ret, GWL_USERDATA, (LONG)data);
 	return ret;
 }
@@ -89,7 +92,7 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		case MSNH_MSG_PUTSTR:
 		case MSNH_MSG_CLEAR_WINDOW:
 			ZeroMemory(data->window_text, sizeof(data->window_text));
-			FormatStatusString(data->window_text);
+			FormatStatusString(data->window_text, data->nhstat_format);
 			break;
 
 		case MSNH_MSG_CURSOR: {
@@ -157,7 +160,12 @@ void mswin_status_window_size (HWND hWnd, LPSIZE sz)
 		saveFont = SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));
 		GetTextMetrics(hdc, &tm);
 
-		sz->cy = tm.tmHeight * NHSW_LINES;
+		/* see if the status window can fit 80 characters per line */
+		if( (80*tm.tmMaxCharWidth)>=sz->cx ) data->nhstat_format = NHSTAT_LINES_4;
+		else							 data->nhstat_format = NHSTAT_LINES_2;
+
+		/* set height of the status box */
+		sz->cy = tm.tmHeight * data->nhstat_format;
 
 		SelectObject(hdc, saveFont);
 		ReleaseDC(hWnd, hdc);
@@ -165,7 +173,7 @@ void mswin_status_window_size (HWND hWnd, LPSIZE sz)
 }
 extern const char *hu_stat[];	/* defined in eat.c */
 extern const char *enc_stat[]; /* define in botl.c */
-void FormatStatusString(char* text)
+void FormatStatusString(char* text, int format)
 {
 	register char *nb;
 	int hp, hpmax;
@@ -191,7 +199,7 @@ void FormatStatusString(char* text)
 	} else
 		Sprintf(nb = eos(nb), rank_of(u.ulevel, Role_switch, flags.female));
 
-	Sprintf(nb = eos(nb),"\r\n");
+	if( format==NHSTAT_LINES_4 ) Sprintf(nb = eos(nb),"\r\n");
 
 	if (ACURR(A_STR) > 18) {
 		if (ACURR(A_STR) > STR18(100))
@@ -211,7 +219,8 @@ void FormatStatusString(char* text)
 	if (flags.showscore)
 	    Sprintf(nb = eos(nb), " S:%ld", botl_score());
 #endif
-	strcat(text, "\r\n");
+	if( format==NHSTAT_LINES_4 ||
+		format==NHSTAT_LINES_2 ) strcat(text, "\r\n");
 
 	/* third line */
 	hp = Upolyd ? u.mh : u.uhp;
@@ -236,7 +245,7 @@ void FormatStatusString(char* text)
 #endif
 	else
 		Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
-	strcat(text, "\r\n");
+	if( format==NHSTAT_LINES_4 ) strcat(text, "\r\n");
 
 	/* forth line */
 	if(flags.time)

@@ -2,7 +2,7 @@ Copyright (c) Alex Kompel, 2002
 NetHack may be freely redistributed.  See license for details.
 ========================================================================
                  Instructions for compiling and installing
-             NetHack 3.4 on a Windows CE or PocketPC system
+             NetHack 3.4.1 on a Windows CE or PocketPC system
 ========================================================================
 		      Last revision: $Date$
 
@@ -57,11 +57,30 @@ Compiling
             In there, highlight "wince.vcw" and click on Open.
             Once the workspace has been opened, you should see the following
             list in the Visual C selection window:
-              + winhack files
-              + recover files
+              + nethack_hpc files
+              + nethack_palm_pc files
+              + nethack_pocket_pc files
+              + nethack_smartphone files
+              + recover_hpc files
+              + recover_palm_pc files
+              + recover_pocket_pc files
+              + recover_smartphone files
 
         o On the Embedded Visual C menus, choose:
-              Project | Set Active Project | winhack
+              Project | Set Active Platform | <platform>
+		where <platform> is:
+			Palm-size PC 2.11  - palm size PC running Windows CE version 2.11
+			Pocket PC          - palm-size PC running Windows CE 3.0 and higher (PocketPC)
+			H/PC Pro 2.11      - handheld computers running Windows CE 2.11 anf higher
+			Smartphone 2002	 - Microsoft SmartPhone device
+
+        o On the Embedded Visual C menus, choose:
+              Project | Set Active Project | <project>
+		where <project> is based on the platform you selected:
+			nethack_palm_pc    for Palm-size PC 2.11 platform
+			nethack_pocket_pc  for Pocket PC platform
+			nethack_hpc        for H/PC Pro 2.11 platform
+			nethack_smartphone for Smartphone 2002
 
         o On the Visual C menus again, choose either:
               Build | Set Active Configuration | Release (for your handheld platform)

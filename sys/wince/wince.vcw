@@ -3,7 +3,7 @@ Microsoft eMbedded Visual Tools Workspace File, Format Version 3.00
 
 ###############################################################################
 
-Project: "recover"=.\wince\recover.vcp - Package Owner=<4>
+Project: "nethack_hpc"=.\wince\wince_hpc.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -15,7 +15,31 @@ Package=<4>
 
 ###############################################################################
 
-Project: "winhack"=.\wince\wince.vcp - Package Owner=<4>
+Project: "nethack_palm_pc"=.\wince\wince_palm_pc.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "nethack_pocketp_pc"=.\wince\wince_pocket_pc.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "nethack_smartphone"=.\wince\wince_smartphone.vcp - Package Owner=<4>
 
 Package=<5>
 {{{

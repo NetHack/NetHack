@@ -5,7 +5,6 @@
 #include "winMS.h"
 #include "hack.h"
 #include "dlb.h"
-#include "resource.h"
 #include "mhmain.h"
 #include "mhmap.h"
 
@@ -28,7 +27,6 @@ BOOL				InitInstance(HINSTANCE, int);
 
 static void win_hack_init(int, char **);
 static void __cdecl mswin_moveloop(void *);
-static void	run_recover();
 static BOOL setMapTiles(const char* fname);
 
 extern void FDECL(pcmain, (int,char **));
@@ -70,7 +68,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	_nethack_app.mapTilesPerLine = TILES_PER_LINE;
 	_nethack_app.bNoHScroll = FALSE;
 	_nethack_app.bNoVScroll = FALSE;
-#ifndef WIN_CE_2xx
+#if  defined(WIN_CE_PS2xx) || defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
 	_nethack_app.bCmdPad = TRUE;
 #else
 	_nethack_app.bCmdPad = FALSE;
@@ -101,7 +99,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
 	/* get command line parameters */	
 	p = _get_cmd_arg(
-#ifdef WIN_CE_2xx
+#if defined(WIN_CE_PS2xx) || defined(WIN32_PLATFORM_HPCPRO)
 		lpCmdLine
 #else
 		GetCommandLine()
@@ -177,7 +175,7 @@ getlock()
 	int choice;
 
 	/* regularize(lock); */ /* already done in pcmain */
-	Sprintf(tbuf,fqname(lock, LEVELPREFIX, 0));
+	Sprintf(tbuf, "%s", fqname(lock, LEVELPREFIX, 0));
 	set_levelfile_name(lock, 0);
 	fq_lock = fqname(lock, LEVELPREFIX, 1);
 
@@ -199,28 +197,22 @@ getlock()
 	/* prompt user that the game alredy exist */
 	choice = MessageBox(
 		GetNHApp()->hMainWnd,
-		TEXT("There is already a game in progress under your name.\n")
-		TEXT("If this is unexpected, you may be able to use \n")
-		TEXT("\"recover\" to get it back.")
-		TEXT("\nDo you want to recover the old game?"),
+		TEXT("There are files from a game in progress under your name. Recover?"),
 		TEXT("Nethack"),
-		MB_YESNOCANCEL );
+		MB_YESNO | MB_DEFBUTTON1 
+		);
 	switch(choice) {
 	case IDYES:
-		run_recover();
-		break;
-
-	case IDNO: 
-		if(eraseoldlocks()) {
+		if(recover_savefile()) {
 			goto gotlock;
 		} else {
-			error("Couldn't destroy old game.");
+			error("Couldn't recover old game.");
 		}
 		break;
 
-	case IDCANCEL:
-		SetLastError(0);
-		error("%s", "Good-bye.");
+	case IDNO: 
+		unlock_file(HLOCK);
+		error("%s", "Cannot start a new game.");
 		break;
 	};
 
@@ -319,40 +311,6 @@ TCHAR* _get_cmd_arg(TCHAR* pCmdLine)
 	}
 
 	return pRetArg;
-}
-
-static void	run_recover()
-{
-	TCHAR wbuf[BUFSZ];
-	TCHAR cmd_name[BUFSZ];
-	char  cmd_line[BUFSZ];
-	DWORD ret;
-	PROCESS_INFORMATION pi;
-
-	_stprintf(cmd_name, TEXT("%s\\recover.exe"), NH_A2W(hackdir, wbuf, BUFSZ) );
-	sprintf(cmd_line, "-d \"%s\" \"%s-%s\"", 
-		hackdir,
-		get_username(0),
-		plname
-	);
-	ret = CreateProcess(
-		cmd_name,
-		NH_A2W(cmd_line, wbuf, BUFSZ),
-		NULL,
-		NULL,
-		0,
-		0,
-		NULL,
-		NULL,
-		NULL,
-		&pi );
-	if( ret==0 ) {
-		error( "cannot run recover.exe" );
-	}
-
-	WaitForSingleObject(pi.hProcess, INFINITE);
-	GetExitCodeProcess(pi.hProcess, &ret );
-	/* do something with exit status? */
 }
 
 /* 

@@ -37,44 +37,24 @@ IDI_WINHACK             ICON    DISCARDABLE     "NETHACK.ICO"
 
 IDC_WINHACK MENU DISCARDABLE 
 BEGIN
-    POPUP "File"
+    MENUITEM "Entire Map",                  IDM_MAP_FIT_TO_SCREEN
+    POPUP "Menu"
     BEGIN
-        MENUITEM "&Save",                       IDM_SAVE
+        MENUITEM "Keypad",                      IDM_VIEW_KEYPAD
         MENUITEM SEPARATOR
-        MENUITEM "&Quit",                       IDM_EXIT
-    END
-    POPUP "Map"
-    BEGIN
-        MENUITEM "&0 - Use Tiles",              IDM_MAP_TILES
-        MENUITEM "&1 - ASCII (4x6)",            IDM_MAP_ASCII4X6
-        MENUITEM "&2 - ASCII (6x8)",            IDM_MAP_ASCII6X8
-        MENUITEM "&3 - ASCII (8x8)",            IDM_MAP_ASCII8X8
-        MENUITEM "&4 - ASCII (16x8)",           IDM_MAP_ASCII16X8
-        MENUITEM "&5 - ASCII (7x12)",           IDM_MAP_ASCII7X12
-        MENUITEM "&6 - ASCII  (8x12)",          IDM_MAP_ASCII8X12
-        MENUITEM "&7 - ASCII (16x12)",          IDM_MAP_ASCII16X12
-        MENUITEM "&8 - ASCII (12x16)",          IDM_MAP_ASCII12X16
-        MENUITEM "&9 - ASCII  (10x18)",         IDM_MAP_ASCII10X18
+        MENUITEM "ASCII",                       IDM_MAP_ASCII8X8
+        MENUITEM "Use Tiles",                   IDM_MAP_TILES
         MENUITEM SEPARATOR
-        MENUITEM "&Fit To Screen",              IDM_MAP_FIT_TO_SCREEN
+        MENUITEM "Help",                        IDM_HELP_MENU
+        MENUITEM "Save",                        IDM_SAVE
+        MENUITEM "Quit",                        IDM_EXIT
     END
-    POPUP "View"
-    BEGIN
-        MENUITEM "&Keypad",                     IDM_VIEW_KEYPAD
-    END
-    POPUP "Help"
-    BEGIN
-        MENUITEM "&About ...",                  IDM_ABOUT
-        MENUITEM "&Long description of the game", IDM_HELP_LONG
-        MENUITEM "List of &commands",           IDM_HELP_COMMANDS
-        MENUITEM "&History of NetHack",         IDM_HELP_HISTORY
-        MENUITEM "&Info on a character",        IDM_HELP_INFO_CHAR
-        MENUITEM "Info on what a given &key does", IDM_HELP_INFO_KEY
-        MENUITEM "List of game &options",       IDM_HELP_OPTIONS
-        MENUITEM "&Longer list of game options", IDM_HELP_OPTIONS_LONG
-        MENUITEM "List of e&xtended commands",  IDM_HELP_EXTCMD
-        MENUITEM "The &NetHack license",        IDM_HELP_LICENSE
-    END
+END
+
+IDC_SPHONE_DIALOGBAR MENU DISCARDABLE 
+BEGIN
+    MENUITEM "Done",                        IDOK
+    MENUITEM "Cancel",                      IDCANCEL
 END
 
 
@@ -105,25 +85,38 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,45,75,30,11,WS_GROUP
 END
 
-IDD_MENU DIALOG DISCARDABLE  0, 0, 109, 153
-STYLE WS_CHILD | WS_CLIPSIBLINGS | WS_BORDER
+IDD_MENU DIALOG DISCARDABLE  0, 0, 109, 131
+STYLE DS_SETFOREGROUND | DS_CONTROL | WS_POPUP | WS_CLIPSIBLINGS | WS_BORDER
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,5,130,50,14,BS_NOTIFY
-    PUSHBUTTON      "Cancel",IDCANCEL,55,130,50,14,BS_NOTIFY
     CONTROL         "List1",IDC_MENU_LIST,"SysListView32",WS_BORDER | 
                     WS_TABSTOP,5,5,100,60
     EDITTEXT        IDC_MENU_TEXT,5,70,100,55,ES_MULTILINE | ES_READONLY | 
                     WS_VSCROLL | WS_HSCROLL
 END
 
-IDD_GETLIN DIALOG DISCARDABLE  0, 0, 115, 30
+IDD_NHTEXT DIALOG DISCARDABLE  0, 0, 83, 83
+STYLE WS_POPUP | WS_BORDER
+FONT 8, "System"
+BEGIN
+    EDITTEXT        IDC_TEXT_CONTROL,5,0,70,75,ES_MULTILINE | ES_READONLY | 
+                    WS_VSCROLL | WS_HSCROLL
+END
+
+IDD_EXTCMD DIALOG DISCARDABLE  0, 0, 88, 82
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Extended Commands"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         IDC_EXTCMD_LIST,7,5,75,69,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_GETLIN DIALOG DISCARDABLE  0, 0, 115, 16
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Question?"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,0,16,55,14
-    PUSHBUTTON      "Cancel",IDCANCEL,55,16,60,14
     EDITTEXT        IDC_GETLIN_EDIT,0,0,115,15,ES_AUTOHSCROLL
 END
 
@@ -157,26 +150,6 @@ BEGIN
     GROUPBOX        "Alignment",IDC_STATIC,0,85,105,25
     DEFPUSHBUTTON   "Play",IDOK,0,110,55,14
     PUSHBUTTON      "Quit",IDCANCEL,55,110,50,14
-END
-
-IDD_NHTEXT DIALOG DISCARDABLE  0, 0, 83, 97
-STYLE WS_CHILD | WS_BORDER
-FONT 8, "System"
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,15,80,50,14
-    EDITTEXT        IDC_TEXT_CONTROL,5,0,70,75,ES_MULTILINE | ES_READONLY | 
-                    WS_VSCROLL | WS_HSCROLL
-END
-
-IDD_EXTCMD DIALOG DISCARDABLE  0, 0, 109, 114
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Extended Commands"
-FONT 8, "MS Sans Serif"
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,75,5,30,14
-    PUSHBUTTON      "Cancel",IDCANCEL,75,20,30,14
-    LISTBOX         IDC_EXTCMD_LIST,5,5,65,105,LBS_NOINTEGRALHEIGHT | 
-                    WS_VSCROLL | WS_TABSTOP
 END
 
 
@@ -226,28 +199,26 @@ IDB_KEYPAD              BITMAP  DISCARDABLE     "keypad.bmp"
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
-    IDD_PLAYER_SELECTOR, DIALOG
-    BEGIN
-        RIGHTMARGIN, 98
-        BOTTOMMARGIN, 117
-    END
-
     IDD_NHTEXT, DIALOG
     BEGIN
         LEFTMARGIN, 5
         RIGHTMARGIN, 76
         TOPMARGIN, 7
-        BOTTOMMARGIN, 94
     END
 
     IDD_EXTCMD, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 102
+        RIGHTMARGIN, 82
         TOPMARGIN, 7
-        BOTTOMMARGIN, 107
+        BOTTOMMARGIN, 75
     END
 
+    IDD_PLAYER_SELECTOR, DIALOG
+    BEGIN
+        RIGHTMARGIN, 98
+        BOTTOMMARGIN, 117
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -259,16 +230,19 @@ END
 
 IDC_WINHACK SHMENUBAR DISCARDABLE 
 BEGIN
-    IDC_WINHACK, 4,
-    I_IMAGENONE, ID_FILE, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_FILE, 0, 0,
-    I_IMAGENONE, ID_MAP, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_MAP, 0, 1,
-    I_IMAGENONE, ID_VIEW, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_VIEW, 0, 2,
-    I_IMAGENONE, ID_HELP, TBSTATE_ENABLED, 
-    TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_HELP, 0, 3,
+    IDC_WINHACK, 2,
+    I_IMAGENONE, IDM_MAP_FIT_TO_SCREEN, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, IDM_MAP_FIT_TO_SCREEN, 0, NOMENU,
+    I_IMAGENONE, ID_VIEW, TBSTATE_ENABLED, TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_VIEW, 0, 1,
 END
+
+IDC_SPHONE_DIALOGBAR SHMENUBAR DISCARDABLE 
+BEGIN
+    IDC_SPHONE_DIALOGBAR, 2,
+    I_IMAGENONE, IDOK, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, IDOK, 0, NOMENU,
+    I_IMAGENONE, IDCANCEL, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, IDCANCEL, 0, 
+    NOMENU,
+END
+
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
@@ -293,7 +267,7 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Winhack is a GUI version of Nethack 3.4.0 by Alex Kompel\0"
+            VALUE "Comments", "Nethack 3.4.1 for Smartphone  (GUI by Alex Kompel)\0"
             VALUE "CompanyName", " \0"
             VALUE "FileDescription", "winhack\0"
             VALUE "FileVersion", "1, 0, 1, 0\0"
@@ -301,8 +275,8 @@ BEGIN
             VALUE "LegalCopyright", "Copyright © 2002\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "winhack.exe\0"
-            VALUE "PrivateBuild", "020617\0"
-            VALUE "ProductName", "WinHack\0"
+            VALUE "PrivateBuild", "021111\0"
+            VALUE "ProductName", "Nethack For Smartphone\0"
             VALUE "ProductVersion", "1, 0, 1, 0\0"
             VALUE "SpecialBuild", "\0"
         END
@@ -329,6 +303,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
+    IDM_MAP_FIT_TO_SCREEN   "Entire Map"
     IDS_CAP_FILE            "File"
     IDS_CAP_HELP            "Help"
     IDS_CAP_MAP             "Map"
@@ -337,13 +312,20 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDM_VIEW_KEYPAD         "Show/Hide keypad."
-    IDS_CAP_VIEW            "View"
+    IDS_CAP_VIEW            "Menu"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDOK                    "Done"
     IDCANCEL                "Cancel"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_CAP_ENTIREMAP       "Entire Map"
+    IDS_CAP_NORMALMAP       "Normal Map"
+    IDM_HELP_MENU           "Help Menu"
 END
 
 #endif    // English (U.S.) resources

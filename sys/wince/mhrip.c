@@ -2,7 +2,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
-#include "resource.h"
 #include "mhrip.h"
 #include "mhtext.h"
 

@@ -2,8 +2,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
-#include "newres.h"
-#include "resource.h"
 #include "mhmsg.h"
 #include "mhinput.h"
 #include "mhmain.h"
@@ -17,7 +15,6 @@
 #define MAX_LOADSTRING 100
 
 typedef struct mswin_nethack_main_window {
-	HWND			hCmdWnd;
 	int				mapAcsiiModeSave;
 } NHMainWindow, *PNHMainWindow;
 
@@ -37,6 +34,7 @@ static HMENU	_get_main_menu(UINT menu_id);
 HWND mswin_init_main_window () {
 	static int run_once = 0;
 	HWND ret;
+	RECT rc;
 
 	/* register window class */
 	if( !run_once ) {
@@ -46,14 +44,16 @@ HWND mswin_init_main_window () {
 	}
 	
 	/* create the main window */
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
+
 	ret = CreateWindow(
 			szMainWindowClass,		/* registered class name */
 			szTitle,				/* window name */
 			WS_CLIPCHILDREN,		/* window style */
-			CW_USEDEFAULT,			/* horizontal position of window */
-			CW_USEDEFAULT,			/* vertical position of window */
-			CW_USEDEFAULT,			/* window width */
-			CW_USEDEFAULT,			/* window height */
+			rc.left,			    /* horizontal position of window */
+			rc.top,			        /* vertical position of window */
+			rc.right - rc.left,		/* window width */
+			rc.bottom - rc.top,		/* window height */
 			NULL,					/* handle to parent or owner window */
 			NULL,					/* menu handle or child identifier */
 			GetNHApp()->hApp,		/* handle to application instance */
@@ -152,8 +152,9 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 	switch (message) 
 	{
+		/*-----------------------------------------------------------------------*/
 		case WM_CREATE: {
-#ifndef WIN_CE_2xx
+#if defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
 			SHMENUBARINFO menubar;
 #endif
 			/* set window data */
@@ -166,7 +167,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			GetNHApp()->hMainWnd = hWnd;
 
 			/* create menu bar */
-#ifndef WIN_CE_2xx
+#if defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
 			ZeroMemory(&menubar, sizeof(menubar));
 			menubar.cbSize = sizeof(menubar); 
 			menubar.hwndParent = hWnd; 
@@ -176,7 +177,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			menubar.nBmpId = 0; 
 			menubar.cBmpImages = 0; 
 			if( !SHCreateMenuBar(&menubar) ) panic("cannot create menu");
-			GetNHApp()->hMenuBar = menubar.hwndMB;			
+			GetNHApp()->hMenuBar = menubar.hwndMB;
 #else
 			GetNHApp()->hMenuBar = CommandBar_Create(GetNHApp()->hApp, hWnd, 1);
 			if( !GetNHApp()->hMenuBar ) panic("cannot create menu");
@@ -192,15 +193,18 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			);
 
 			/* create command pad (keyboard emulator) */
-			data->hCmdWnd = mswin_init_command_window();
+			GetNHApp()->hCmdWnd = mswin_init_command_window();
 		} break;
 
+		/*-----------------------------------------------------------------------*/
+		
 		case WM_MSNH_COMMAND:
 			onMSNHCommand(hWnd, wParam, lParam);
 		break;
 
+		/*-----------------------------------------------------------------------*/
+
         case WM_KEYDOWN: 
-		{
 			data = (PNHMainWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
 			/* translate arrow keys into nethack commands */
@@ -384,26 +388,59 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 					}
 				}
 			return 0;
-			}
-		} return 1;
 
+			case VK_RETURN:
+				NHEVENT_MS( CLICK_1, u.ux, u.uy);
+			return 0;
+			} 
+
+#if defined(WIN_CE_SMARTPHONE)
+			if( NHSPhoneTranslateKbdMessage(wParam, lParam, TRUE) ) return 0;
+#endif
+		return 1; /* end of WM_KEYDOWN */
+
+		/*-----------------------------------------------------------------------*/
+
+#if defined(WIN_CE_SMARTPHONE)
+		case WM_KEYUP:
+			if( NHSPhoneTranslateKbdMessage(wParam, lParam, FALSE) ) return 0;
+		return 1; /* end of WM_KEYUP */
+#endif
+		/*-----------------------------------------------------------------------*/
+
+#if !defined(WIN_CE_SMARTPHONE)
 		case WM_CHAR:
-			/* all characters go to nethack */
-			NHEVENT_KBD( (lParam & 1<<29)? M(tolower(wParam)) : wParam );
+			if( wParam=='\n' || wParam=='\r' || wParam==C('M') ) return 0; /* we already processed VK_RETURN */
+
+			/* all characters go to nethack except Ctrl-P that scrolls message window up */
+			if( wParam==C('P') || wParam==C('p') ) {
+				SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_VSCROLL, MAKEWPARAM(SB_LINEUP, 0), (LPARAM)NULL); 
+			} else {
+				NHEVENT_KBD( (lParam & 1<<29)? M(tolower(wParam)) : wParam );
+			}
 		return 0;
+#endif
+
+		/*-----------------------------------------------------------------------*/
 
 		case WM_COMMAND:
 			/* process commands - menu commands mostly */
-			if( onWMCommand(hWnd, wParam, lParam) )
+			if( IsWindow(GetNHApp()->hPopupWnd) ) {
+				return SendMessage(GetNHApp()->hPopupWnd, message, wParam, lParam);
+			} else if( onWMCommand(hWnd, wParam, lParam) )
 				return DefWindowProc(hWnd, message, wParam, lParam);
 			else
 				return 0;
+
+		/*-----------------------------------------------------------------------*/
 
 		case WM_ACTIVATE:
 		case WM_SETTINGCHANGE:
 		case WM_SIZE:
 			mswin_layout_main_window(NULL);
 			break;
+
+		/*-----------------------------------------------------------------------*/
 
 		case WM_SETFOCUS:
 			/* if there is a menu window out there -
@@ -413,11 +450,15 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			}
 			break;
 
+		/*-----------------------------------------------------------------------*/
+
 		case WM_CLOSE: 
 		{
 			/* exit gracefully */
 			dosave0();
 		} return 0;
+
+		/*-----------------------------------------------------------------------*/
 
 		case WM_DESTROY: {
 			/* apparently we never get here 
@@ -430,6 +471,8 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 			terminate(EXIT_SUCCESS);
 		} break;
+
+		/*-----------------------------------------------------------------------*/
 
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
@@ -484,14 +527,16 @@ void mswin_layout_main_window(HWND changed_child)
 	SIZE cmd_size;
 	HWND wnd_status, wnd_msg;
 	PNHMainWindow  data;
-#ifndef WIN_CE_2xx
+#if defined(WIN_CE_POCKETPC)
 	SIPINFO sip;
 	RECT menu_bar;
+	RECT visible_rt;
+	POINT pt;
 #endif
 
 	GetClientRect(GetNHApp()->hMainWnd, &client_rt);
 
-#ifndef WIN_CE_2xx
+#if defined(WIN_CE_POCKETPC)  
 	ZeroMemory(&sip, sizeof(sip));
 	sip.cbSize = sizeof(sip);
 	SHSipInfo(SPI_GETSIPINFO, 0, &sip, 0);
@@ -499,8 +544,21 @@ void mswin_layout_main_window(HWND changed_child)
 	/* adjust client rectangle size */
 	GetWindowRect(GetNHApp()->hMenuBar, &menu_bar);
 	client_rt.bottom -= menu_bar.bottom-menu_bar.top;
+
+	/* calcuate visible rect in client coordinates */
+	pt.x = sip.rcVisibleDesktop.left;
+	pt.y = sip.rcVisibleDesktop.top;
+	ScreenToClient(GetNHApp()->hMainWnd, &pt);
+	SetRect(&wnd_rect, 
+			pt.x, 
+			pt.y, 
+			pt.x+sip.rcVisibleDesktop.right-sip.rcVisibleDesktop.left,
+			pt.y+sip.rcVisibleDesktop.bottom-sip.rcVisibleDesktop.top );
+	IntersectRect(&visible_rt, &client_rt, &wnd_rect);
 #else
+#	if	!defined(WIN_CE_SMARTPHONE)
 	client_rt.top += CommandBar_Height(GetNHApp()->hMenuBar);
+#	endif
 #endif
 
 	/* get window data */
@@ -521,21 +579,30 @@ void mswin_layout_main_window(HWND changed_child)
 		msg_size.cx = msg_size.cy = 0;
 	}
 
-	if( GetNHApp()->bCmdPad && IsWindow(data->hCmdWnd) ) {
-		mswin_command_window_size(data->hCmdWnd, &cmd_size);
-	} else {
-		cmd_size.cx = cmd_size.cy = 0;
+	cmd_size.cx = cmd_size.cy = 0;
+	if( GetNHApp()->bCmdPad && IsWindow(GetNHApp()->hCmdWnd) ) {
+		mswin_command_window_size(GetNHApp()->hCmdWnd, &cmd_size);
 	}
 
 	/* set window positions */
 
-	/* keypad */
+	/* calculate the application windows size */
+#if defined(WIN_CE_POCKETPC)
+	SetRect(&wnd_rect, visible_rt.left, visible_rt.top, visible_rt.right, visible_rt.bottom);
+	if( sip.fdwFlags & SIPF_ON )
+		cmd_size.cx = cmd_size.cy = 0;  /* hide keypad window */
+#else
 	SetRect(&wnd_rect, client_rt.left, client_rt.top, client_rt.right, client_rt.bottom);
+#endif
+
+#if !defined(WIN_CE_SMARTPHONE)
+	/* other ports have it at the bottom of the screen */
 	cmd_size.cx = (wnd_rect.right-wnd_rect.left);
 	cmd_org.x = wnd_rect.left;
 	cmd_org.y = wnd_rect.bottom - cmd_size.cy;
 	wnd_rect.bottom -= cmd_size.cy;
-	
+#endif
+
 	/* status window */
 	switch(iflags.wc_align_status) {
 	case ALIGN_LEFT:
@@ -573,33 +640,71 @@ void mswin_layout_main_window(HWND changed_child)
 	/* message window */
 	switch(iflags.wc_align_message) {
 	case ALIGN_LEFT:
+#if defined(WIN_CE_SMARTPHONE)
+		/* smartphone has a keypad window on the right (bottom) side of the message window */
+		msg_size.cx = cmd_size.cx = max(msg_size.cx, cmd_size.cx);
+		msg_size.cy = (wnd_rect.bottom-wnd_rect.top) - cmd_size.cy;
+		msg_org.x = cmd_org.x = wnd_rect.left;
+		msg_org.y = wnd_rect.top;
+		cmd_org.y = msg_org.y + msg_size.cy;
+#else
 		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4;
 		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
 		msg_org.x = wnd_rect.left;
 		msg_org.y = wnd_rect.top;
+#endif
 		wnd_rect.left += msg_size.cx;
+
 		break;
 
 	case ALIGN_RIGHT:  
+#if defined(WIN_CE_SMARTPHONE)
+		/* smartphone has a keypad window on the right (bottom) side of the message window */
+		msg_size.cx = cmd_size.cx = max(msg_size.cx, cmd_size.cx);
+		msg_size.cy = (wnd_rect.bottom-wnd_rect.top) - cmd_size.cy;
+		msg_org.x = cmd_org.x = wnd_rect.right - msg_size.cx;
+		msg_org.y = wnd_rect.top;
+		cmd_org.y = msg_org.y + msg_size.cy;
+#else
 		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
 		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
 		msg_org.x = wnd_rect.right - msg_size.cx;
 		msg_org.y = wnd_rect.top;
+#endif
+	
 		wnd_rect.right -= msg_size.cx;
 		break;
 
 	case ALIGN_TOP:    
+#if defined(WIN_CE_SMARTPHONE)
+		/* smartphone has a keypad window on the right side of the message window */
+		msg_size.cy = cmd_size.cy = max(msg_size.cy, cmd_size.cy);
+		msg_size.cx = (wnd_rect.right - wnd_rect.left) - cmd_size.cx;
+		msg_org.x = wnd_rect.left;
+		cmd_org.x = msg_org.x + msg_size.cx;
+		msg_org.y = cmd_org.y = wnd_rect.bottom - msg_size.cy;
+#else
 		msg_size.cx = (wnd_rect.right-wnd_rect.left);
 		msg_org.x = wnd_rect.left;
 		msg_org.y = wnd_rect.top;
+#endif
 		wnd_rect.top += msg_size.cy;
 		break;
 
 	case ALIGN_BOTTOM:
 	default:
+#if defined(WIN_CE_SMARTPHONE)
+		/* smartphone has a keypad window on the right side of the message window */
+		msg_size.cy = cmd_size.cy = max(msg_size.cy, cmd_size.cy);
+		msg_size.cx = (wnd_rect.right - wnd_rect.left) - cmd_size.cx;
+		msg_org.x = wnd_rect.left;
+		cmd_org.x = msg_org.x + msg_size.cx;
+		msg_org.y = cmd_org.y = wnd_rect.bottom - msg_size.cy;
+#else
 		msg_size.cx = (wnd_rect.right-wnd_rect.left);
 		msg_org.x = wnd_rect.left;
 		msg_org.y = wnd_rect.bottom - msg_size.cy;
+#endif
 		wnd_rect.bottom -= msg_size.cy;
 		break;
 	}
@@ -647,7 +752,7 @@ void mswin_layout_main_window(HWND changed_child)
 
 				menu_org.x = client_rt.left;
 				menu_org.y = client_rt.top;
-#ifndef WIN_CE_2xx
+#if defined(WIN_CE_POCKETPC)
 				menu_size.cx = min(sip.rcVisibleDesktop.right-sip.rcVisibleDesktop.left,
 					               client_rt.right - client_rt.left);
 				menu_size.cy = min(sip.rcVisibleDesktop.bottom-sip.rcVisibleDesktop.top,
@@ -656,7 +761,17 @@ void mswin_layout_main_window(HWND changed_child)
 				menu_size.cx = client_rt.right - client_rt.left;
 				menu_size.cy = client_rt.bottom - client_rt.top;
 #endif
-				
+
+#if defined(WIN_CE_SMARTPHONE)
+				/* leave room for the command window */
+				if( GetNHApp()->windowlist[i].type == NHW_MENU ) {
+					menu_size.cy -= cmd_size.cy;
+				}
+
+				/* dialogs are popup windows unde SmartPhone so we need 
+				   to convert to screen coordinates */
+				ClientToScreen(GetNHApp()->hMainWnd, &menu_org);
+#endif
 				MoveWindow(GetNHApp()->windowlist[i].win, 
 					       menu_org.x, 
 						   menu_org.y,
@@ -670,17 +785,19 @@ void mswin_layout_main_window(HWND changed_child)
 		}
 	}
 
-	if( IsWindow(data->hCmdWnd) ) {
-		if( GetNHApp()->bCmdPad ) {
-			MoveWindow(data->hCmdWnd, 
+	if( IsWindow(GetNHApp()->hCmdWnd) ) {
+		/* show command window only if it exists and 
+		   the game is ready (plname is set) */
+		if( GetNHApp()->bCmdPad && cmd_size.cx>0 && cmd_size.cy>0 && *plname) {
+			MoveWindow(GetNHApp()->hCmdWnd, 
 				   cmd_org.x,
 				   cmd_org.y,
 				   cmd_size.cx, 
 				   cmd_size.cy, 
 				   TRUE );
-			ShowWindow(data->hCmdWnd, SW_SHOW);
+			ShowWindow(GetNHApp()->hCmdWnd, SW_SHOW);
 		} else {
-			ShowWindow(data->hCmdWnd, SW_HIDE);
+			ShowWindow(GetNHApp()->hCmdWnd, SW_HIDE);
 		}
 	}
 }
@@ -746,7 +863,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				MF_BYCOMMAND | 
 				(GetNHApp()->bCmdPad? MF_CHECKED : MF_UNCHECKED)
 			);
-			mswin_layout_main_window(data->hCmdWnd);
+			mswin_layout_main_window(GetNHApp()->hCmdWnd);
 			break;
 
 		case IDM_HELP_LONG:	
@@ -783,6 +900,10 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		
 		case IDM_HELP_LICENSE:
 			display_file(LICENSE, TRUE);  
+			break;
+
+		case IDM_HELP_MENU:	
+			dohelp();
 			break;
 
 		default:
@@ -855,7 +976,12 @@ void mswin_select_map_mode(int mode)
 
 	map_id = WIN_MAP;
 	data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
+#if defined(WIN_CE_SMARTPHONE)
+	/* Smartphone manu has only 2 items */
+	hmenuMap = _get_main_menu(ID_VIEW);
+#else
 	hmenuMap = _get_main_menu(ID_MAP);
+#endif
 
 	/* override for Rogue level */
 #ifdef REINCARNATION
@@ -879,6 +1005,34 @@ void mswin_select_map_mode(int mode)
 			MF_BYCOMMAND);
 	}
 
+#if defined(WIN_CE_SMARTPHONE)
+	/* update "Fit To Screen" item text */
+	{
+		TCHAR wbuf[BUFSZ];
+		TBBUTTONINFO tbbi;
+
+		ZeroMemory( wbuf, sizeof(wbuf) );
+		if( !LoadString( 
+			GetNHApp()->hApp, 
+			(IS_MAP_FIT_TO_SCREEN(mode)? IDS_CAP_NORMALMAP : IDS_CAP_ENTIREMAP),
+			wbuf,
+			BUFSZ) ) {
+			panic("cannot load main menu strings");
+		}
+
+		ZeroMemory( &tbbi, sizeof(tbbi) );
+		tbbi.cbSize = sizeof(tbbi);
+		tbbi.dwMask = TBIF_TEXT;
+		tbbi.pszText = wbuf;
+		if( !SendMessage( 
+				GetNHApp()->hMenuBar, 
+				TB_SETBUTTONINFO, 
+				IDM_MAP_FIT_TO_SCREEN, 
+				(LPARAM)&tbbi) ) {
+			error( "Cannot update IDM_MAP_FIT_TO_SCREEN menu item." );
+		}
+	}
+#else
 	/* set fit-to-screen mode mark */
 	CheckMenuItem(
 		hmenuMap,
@@ -886,6 +1040,7 @@ void mswin_select_map_mode(int mode)
 		MF_BYCOMMAND | 
 		(IS_MAP_FIT_TO_SCREEN(mode)? MF_CHECKED : MF_UNCHECKED)
 	);
+#endif
 
 	if( IS_MAP_ASCII(iflags.wc_map_mode) && !IS_MAP_FIT_TO_SCREEN(iflags.wc_map_mode)) {
 		data->mapAcsiiModeSave = iflags.wc_map_mode;
@@ -941,11 +1096,11 @@ int	mapmode2menuid(int map_mode)
 HMENU _get_main_menu(UINT menu_id)
 {
 	HMENU hmenuMap;
-#ifndef WIN_CE_2xx
+#if defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
 	TBBUTTONINFO tbbi;
 #endif
 
-#ifndef WIN_CE_2xx
+#if defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
 	tbbi.cbSize = sizeof(tbbi);
 	tbbi.dwMask = TBIF_LPARAM;
 	SendMessage( GetNHApp()->hMenuBar, TB_GETBUTTONINFO, menu_id, (LPARAM)&tbbi);

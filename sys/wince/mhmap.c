@@ -2,10 +2,10 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
-#include "resource.h"
 #include "mhmap.h"
 #include "mhmsg.h"
 #include "mhinput.h"
+#include "mhfont.h"
 
 #include "patchlevel.h"
 
@@ -159,12 +159,18 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	lgfnt.lfItalic			=	FALSE;				 // italic attribute option
 	lgfnt.lfUnderline		=	FALSE;				 // underline attribute option
 	lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-	lgfnt.lfCharSet			=	OEM_CHARSET;         // character set identifier
+	lgfnt.lfCharSet			=	mswin_charset();     // character set identifier
 	lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 	lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 	lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
-	lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
-	_tcscpy(lgfnt.lfFaceName, NHMAP_FONT_NAME);
+	if( iflags.wc_font_map &&
+		*iflags.wc_font_map ) {
+		lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
+		NH_A2W(iflags.wc_font_map, lgfnt.lfFaceName, LF_FACESIZE);
+	} else {
+		lgfnt.lfPitchAndFamily	= FIXED_PITCH;		 // pitch and family
+		_tcsncpy(lgfnt.lfFaceName, NHMAP_FONT_NAME, LF_FACESIZE);
+	}
 	data->hMapFont = CreateFontIndirect(&lgfnt);
 
 	mswin_cliparound(data->xCur, data->yCur);
@@ -420,6 +426,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			( msg_data->y<(data->yPos+mcam) ||
 			  msg_data->y>(data->yPos+data->yPageSize-mcam) );
 		
+		mcam += iflags.wc_scroll_amount - 1;
 		/* get page size and center horizontally on x-position */
 		if( scroll_x ) {
 			if( data->xPageSize<=2*mcam ) {
@@ -882,8 +889,6 @@ COLORREF nhcolor_to_RGB(int c)
 
 /* apply bitmap pointed by sourceDc transparently over 
    bitmap pointed by hDC */
-
-typedef BOOL (WINAPI* LPTRANSPARENTBLT)(HDC, int, int, int, int, HDC, int, int, int, int, UINT); 
 void nhapply_image_transparent( 
 	HDC hDC, int x, int y, int width, int height,
 	HDC sourceDC, int s_x, int s_y, int s_width, int s_height,
