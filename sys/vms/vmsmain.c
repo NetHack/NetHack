@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsmain.c	3.4	2001/07/27	*/
+/*	SCCS Id: @(#)vmsmain.c	3.4	2003/09/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* main.c - VMS NetHack */
@@ -210,14 +210,14 @@ char *argv[];
 			    (void) chmod(fq_save,FCMASK); /* back to readable */
 		}
 
-		flags.move = 0;
+		context.move = 0;
 	} else {
 not_recovered:
 		player_selection();
 		newgame();
 		wd_message();
 
-		flags.move = 0;
+		context.move = 0;
 		set_wear();
 		(void) pickup(1);
 	}
