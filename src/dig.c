@@ -18,7 +18,7 @@ STATIC_DCL int NDECL(dig);
 STATIC_DCL schar FDECL(fillholetyp, (int, int));
 STATIC_DCL void NDECL(dig_up_grave);
 
-/* Indicies returned by dig_typ() */
+/* Indices returned by dig_typ() */
 #define DIGTYP_UNDIGGABLE 0
 #define DIGTYP_ROCK       1
 #define DIGTYP_STATUE     2

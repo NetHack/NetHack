@@ -460,7 +460,7 @@ xchar x, y;
 	}
 }
 
-/* shop merchanize has been taken; pay for it with any credit available;  
+/* shop merchandize has been taken; pay for it with any credit available;  
    return false if the debt is fully covered by credit, true otherwise */
 static boolean
 rob_shop(shkp)
