@@ -1553,11 +1553,18 @@ const char *filename;
 	}
 # endif
 	if (errno != ENOENT) {
-		/* e.g., problems when setuid NetHack can't search home
-		 * directory restricted to user */
-		raw_printf("Couldn't open default config file %s (%d).",
-					tmp_config, errno);
-		wait_synch();
+	    char *details;
+
+	    /* e.g., problems when setuid NetHack can't search home
+	     * directory restricted to user */
+
+#if defined(POSIX_TYPES) || defined(BSD) || defined(SYSV)
+	    if ((details = strerror(errno)) == 0)
+#endif
+		details = "";
+	    raw_printf("Couldn't open default config file %s %s(%d).",
+		       tmp_config, details, errno);
+	    wait_synch();
 	}
 # endif
 #endif
