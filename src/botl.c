@@ -1412,8 +1412,8 @@ genericptr_t ptr;
 	    		if (cond & BL_MASK_FOODPOIS)
 					Strcat(vals[idx], " FoodPois");
 	    		if (cond & BL_MASK_ILL) Strcat(vals[idx], " Ill");
-	    		if (cond & BL_MASK_STUNNED) Strcat(vals[idx], " Hallu");
-	    		if (cond & BL_MASK_HALLU) Strcat(vals[idx], " Stun");
+	    		if (cond & BL_MASK_STUNNED) Strcat(vals[idx], " Stun");
+	    		if (cond & BL_MASK_HALLU) Strcat(vals[idx], " Hallu");
 	    		if (cond & BL_MASK_SLIMED) Strcat(vals[idx], " Slime");
 	    		break;
 		default:
