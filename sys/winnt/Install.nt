@@ -439,16 +439,12 @@ III. Play NetHack.  If it works, you're done!
 
 PROBLEMS
 
-    If you encounter a bug and wish to report it, please send e-mail to:
-        nethack-bugs@nethack.org
+    If you discover a bug and wish to report it, or if you have comments
+    or suggestions we recommend using our "Contact Us" web page at:
+        http://www.nethack.org/common/contact.html
 
-    If you have any comments or suggestions, feel free to drop us a line
-    c/o:
-        DevTeam@nethack.org
-
-    You may wish to vist the NetHack Development Team's website
-    occasionally to check for updates or known bugs.  The website can be
-    found at:
-             http://www.nethack.org/
+    If you don't have access to the web, or you want to send us a patch
+    to the NetHack source code feel free to drop us a line c/o:
+        DevTeam (at) nethack.org
 
     Happy NetHacking!

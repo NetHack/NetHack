@@ -251,10 +251,12 @@ Appendix C - Additional Notes
 
 Appendix D - Contacting the Development Team
 
-    If you discover a bug and wish to report it please send mail to:
-        nethack-bugs@nethack.org 
+    If you discover a bug and wish to report it, or if you have comments
+    or suggestions we recommend using
+    our "Contact Us" web page at:
+        http://www.nethack.org/common/contact.html
 
-    If you have comments or suggestions, feel free to drop us a line c/o
-        DevTeam@nethack.org
-
+    If you don't have access to the web, or you want to send us a patch
+    to the NetHack source code feel free to drop us a line c/o:
+        DevTeam (at) nethack.org
 
