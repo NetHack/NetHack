@@ -3708,12 +3708,14 @@ register struct obj *obj;		   /* no texts here! */
 	obj->onamelth = 0;		/* no names */
 	obj->oxlth = 0;			/* no extra data */
 	obj->oattached = OATTACHED_NOTHING;
-	obj_extract_self(obj);		/* move rocks back on top */
-	place_object(obj, obj->ox, obj->oy);
-	if(!does_block(obj->ox,obj->oy,&levl[obj->ox][obj->oy]))
-	    unblock_point(obj->ox,obj->oy);
-	if(cansee(obj->ox,obj->oy))
-	    newsym(obj->ox,obj->oy);
+	if (obj->where == OBJ_FLOOR) {
+		obj_extract_self(obj);		/* move rocks back on top */
+		place_object(obj, obj->ox, obj->oy);
+		if(!does_block(obj->ox,obj->oy,&levl[obj->ox][obj->oy]))
+	    		unblock_point(obj->ox,obj->oy);
+		if(cansee(obj->ox,obj->oy))
+		    newsym(obj->ox,obj->oy);
+	}
 }
 
 /* handle statue hit by striking/force bolt/pick-axe */
