@@ -29,6 +29,7 @@ class genocide recognizes species name as an example of the class to
 	genocide (Martin Snyder)
 internals: use Is_box rather than explicitly checking what it checks
 fix some unreachable messages (either make then reachable or remove them)
+can quiver coins when GOLDOBJ is defined
 
 
 Platform- and/or Interface-Specific Fixes
