@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2004/01/03	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2005/02/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -55,6 +55,12 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 #define GOLD_WT(n)		(((n) + 50L) / 100L)
 /* if you can figure this out, give yourself a hearty pat on the back... */
 #define GOLD_CAPACITY(w,n)	(((w) * -100L) - ((n) + 50L) - 1L)
+
+/* A variable set in use_container(), to be used by the callback routines  */
+/* in_container() and out_container() from askchain() and use_container(). */
+/* Also used by doapply(apply.c).					   */
+struct obj *current_container;
+#define Icebox (current_container->otyp == ICE_BOX)
 
 static const char moderateloadmsg[] = "You have a little trouble lifting";
 static const char nearloadmsg[] = "You have much trouble lifting";
@@ -1758,11 +1764,6 @@ mbag_explodes(obj, depthin)
     return FALSE;
 }
 
-/* A variable set in use_container(), to be used by the callback routines   */
-/* in_container(), and out_container() from askchain() and use_container(). */
-static NEARDATA struct obj *current_container;
-#define Icebox (current_container->otyp == ICE_BOX)
-
 /* Returns: -1 to stop, 1 item was inserted, 0 item was not inserted. */
 STATIC_PTR int
 in_container(obj)
@@ -1887,7 +1888,7 @@ register struct obj *obj;
 		if (!floor_container)
 			useup(current_container);
 		else if (obj_here(current_container, u.ux, u.uy))
-			useupf(current_container, obj->quan);
+			useupf(current_container, current_container->quan);
 		else
 			panic("in_container:  bag not found.");
 

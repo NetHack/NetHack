@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)apply.c	3.5	2005/01/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,6 +44,9 @@ STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 #ifdef	AMIGA
 void FDECL( amii_speaker, ( struct obj *, char *, int ) );
 #endif
+
+/* managed by use_container(pickup.c) */
+extern struct obj *current_container;
 
 static const char no_elbow_room[] = "don't have enough elbow-room to maneuver.";
 
@@ -2967,6 +2970,9 @@ doapply()
 	case BAG_OF_HOLDING:
 	case OILSKIN_SACK:
 		res = use_container(obj, 1);
+		/* magic bag might end up being destroyed;
+		   if so, current_container will be null */
+		obj = current_container;
 		break;
 	case BAG_OF_TRICKS:
 		bagotricks(obj);
