@@ -190,6 +190,7 @@ dust		{ yylval.i=DUST; return ENGRAVING_TYPE; }
 engrave		{ yylval.i=ENGRAVE; return ENGRAVING_TYPE; }
 burn		{ yylval.i=BURN; return ENGRAVING_TYPE; }
 mark		{ yylval.i=MARK; return ENGRAVING_TYPE; }
+blood		{ yylval.i=ENGR_BLOOD; return ENGRAVING_TYPE; }
 blessed		{ yylval.i=1; return CURSE_TYPE; }
 uncursed	{ yylval.i=2; return CURSE_TYPE; }
 cursed		{ yylval.i=3; return CURSE_TYPE; }

@@ -40,6 +40,7 @@ hiding monsters don't hide under cockatrice/chickatrice corpses
 deafness now a full-fledged attribute
 water should flow into pits from broken wand of digging
 objects that fall thru trapdoors, et al, can break on impact
+support engraving in blood in special level files
 
 
 Platform- and/or Interface-Specific Fixes
