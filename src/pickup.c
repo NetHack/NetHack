@@ -1122,12 +1122,18 @@ boolean telekinesis;
 	    } else {
 		char qbuf[BUFSZ];
 		long savequan = obj->quan;
+		unsigned textleft;
 
 		obj->quan = *cnt_p;
-		Sprintf(qbuf, "%s %s.  Continue?",
+		Strcpy(qbuf,
 			(next_encumbr > HVY_ENCUMBER) ? overloadmsg :
 			(next_encumbr > MOD_ENCUMBER) ? nearloadmsg :
-			moderateloadmsg, doname(obj));
+			moderateloadmsg);
+		textleft = QBUFSZ - (strlen(qbuf) + sizeof(" . Continue?"));
+		Sprintf(eos(qbuf), " %s. Continue?",
+			(strlen(doname(obj)) < textleft) ? doname(obj) :
+			(strlen(simple_typename(obj->otyp)) < textleft) ?
+			an(simple_typename(obj->otyp)) : something);
 		obj->quan = savequan;
 		switch (ynq(qbuf)) {
 		case 'q':  result = -1; break;
