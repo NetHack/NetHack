@@ -449,7 +449,7 @@ void plselInitDialog(HWND hWnd)
 	plselAdjustLists(hWnd, -1);
 
 	/* intialize roles list */
-	if( flags.initrole<0 ) {
+	if( flags.initrole<0 || !ok_role(flags.initrole, ROLE_NONE, ROLE_NONE, ROLE_NONE)) {
 		CheckDlgButton(hWnd, IDC_PLSEL_ROLE_RANDOM, BST_CHECKED);
 		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST), FALSE);
 	} else {
@@ -459,7 +459,7 @@ void plselInitDialog(HWND hWnd)
 	}
 
 	/* intialize races list */
-	if( flags.initrace<0 || !validrace(flags.initrole, flags.initrace) ) {
+	if( flags.initrace<0 || !ok_race(flags.initrole, flags.initrace, ROLE_NONE, ROLE_NONE) ) {
 		CheckDlgButton(hWnd, IDC_PLSEL_RACE_RANDOM, BST_CHECKED);
 		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST), FALSE);
 	} else {
@@ -469,7 +469,7 @@ void plselInitDialog(HWND hWnd)
 	}
 
 	/* intialize genders list */
-	if( flags.initgend<0 || !validgend(flags.initrole, flags.initrace, flags.initgend)) {
+	if( flags.initgend<0 || !ok_gend(flags.initrole, flags.initrace, flags.initgend, ROLE_NONE)) {
 		CheckDlgButton(hWnd, IDC_PLSEL_GENDER_RANDOM, BST_CHECKED);
 		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_GENDER_LIST), FALSE);
 	} else {
@@ -479,7 +479,7 @@ void plselInitDialog(HWND hWnd)
 	}
 
 	/* intialize alignments list */
-	if( flags.initalign<0 || !validalign(flags.initrole, flags.initrace, flags.initalign) ) {
+	if( flags.initalign<0 || !ok_align(flags.initrole, flags.initrace, flags.initgend, flags.initalign) ) {
 		CheckDlgButton(hWnd, IDC_PLSEL_ALIGN_RANDOM, BST_CHECKED);
 		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LIST), FALSE);
 	} else {
