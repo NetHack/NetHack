@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2002/04/20	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2002/07/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -40,7 +40,7 @@
 /*****************************************************************************/
 /* Version 3.4.x */
 
-/*  Patch 1, May 1, 2002
+/*  Patch 1, August 1, 2002
  *  Fix a few fatal errors including one for reentering shops, one
  *     involving land mines and boulders/statues, and one for delayed
  *     polymorph
@@ -51,6 +51,7 @@
  *  win32: some interface improvements
  *  unix: improved tile support
  *  gnome: some fixes, and some enhancements by Dylan Alex Simon
+ *  winCE: Windows CE port included (by Alex Kompel)
  */
 
 /*

@@ -15,6 +15,7 @@ NetHack 3.4.1 is a bugfix release for 3.4.0.
  *  win32: some interface improvements
  *  unix: improved tile support
  *  gnome: some fixes, and some enhancements by Dylan Alex Simon
+ *  Windows CE port included (by Alex Kompel)
 
 A fuller list of changes for this release can be found in the file 
 doc/fixes34.1 in the source distribution.  The text in there was written 
@@ -56,17 +57,18 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     o.  A 'sys/os2' subdirectory, which contains files specific to OS/2.
     p.  A 'sys/unix' subdirectory, which contains files specific to UNIX.
     q.  A 'sys/vms' subdirectory, which contains files specific to VMS.
-    r.  A 'sys/winnt' subdirectory, which contains files specific to Windows NT.
-    s.  A 'win' directory, which contains subdirectories for files that
+    r.  A 'sys/wince' subdirectory, which contains files specific to Windows CE.
+    s.  A 'sys/winnt' subdirectory, which contains files specific to Windows NT.
+    t.  A 'win' directory, which contains subdirectories for files that
         are windowing-system specific (but not operating-system specific).
-    t.  A 'win/share' subdirectory, which contains files shared by some
+    u.  A 'win/share' subdirectory, which contains files shared by some
         windowing systems.
-    u.  A 'win/Qt' subdirectory, which contains files specific to Qt.
-    v.  A 'win/X11' subdirectory, which contains files specific to X11.
-    w.  A 'win/gem' subdirectory, which contains files specific to GEM.
-    x.  A 'win/gnome' subdirectory, which contains files specific to GNOME.
-    y.  A 'win/tty' subdirectory, which contains files specific to ttys.
-    z.  A 'win/win32' subdirectory, which contains files specific to the
+    v.  A 'win/Qt' subdirectory, which contains files specific to Qt.
+    w.  A 'win/X11' subdirectory, which contains files specific to X11.
+    x.  A 'win/gem' subdirectory, which contains files specific to GEM.
+    y.  A 'win/gnome' subdirectory, which contains files specific to GNOME.
+    z.  A 'win/tty' subdirectory, which contains files specific to ttys.
+    A.  A 'win/win32' subdirectory, which contains files specific to the
         Windows Win32 API.
 
     The names of these directories should not be changed unless you are

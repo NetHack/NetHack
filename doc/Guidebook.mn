@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "July 1, 2002
+.ds f2 "July 23, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2431,7 +2431,8 @@ Macintosh port of 3.4.
 .pg
 \fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBAlex Kompel\fP, \fBDion Nicolaas\fP, and 
 \fBYitzhak Sapir\fP maintained and enhanced 3.4 for the Microsoft Windows platform.
-\fBAlex Kompel\fP contributed a new graphical interface for the Windows port.
+\fBAlex Kompel\fP contributed a new graphical interface for the Windows port. 
+\fBAlex Kompel\fP also contributed a Windows CE port for 3.4.1.
 .pg
 \fBRon Van Iwaarden\fP maintained 3.4 for OS/2.
 .pg

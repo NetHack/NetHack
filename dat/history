@@ -139,7 +139,8 @@ Macintosh port of 3.4.
 
 Michael Allison, David Cohrs, Alex Kompel, Dion Nicolaas, and Yitzhak Sapir 
 maintained and enhanced 3.4 for the Microsoft Windows platform. Alex Kompel 
-contributed a new graphical interface for the Windows port.
+contributed a new graphical interface for the Windows port. Alex Kompel also
+contributed a Windows CE port for 3.4.1.
 
 Ron Van Iwaarden maintained 3.4 for OS/2.
 
