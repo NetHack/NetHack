@@ -825,18 +825,28 @@ register char *op;
 void
 load_keyboard_handler()
 {
-	char suffx[] = ".dll";	
+	char suffx[] = ".dll";
+	char *truncspot;
 #define MAX_DLLNAME 25
 	char kh[MAX_ALTKEYHANDLER];
 	if (iflags.altkeyhandler[0]) {
 		if (hLibrary) {	/* already one loaded apparently */
 			FreeLibrary(hLibrary);
 			hLibrary = (HANDLE)0;
+		   pNHkbhit = (NHKBHIT)0;
+		   pCheckInput = (CHECKINPUT)0; 
+		   pSourceWhere = (SOURCEWHERE)0; 
+		   pSourceAuthor = (SOURCEAUTHOR)0; 
+		   pKeyHandlerName = (KEYHANDLERNAME)0; 
+		   pProcessKeystroke = (PROCESS_KEYSTROKE)0;
 		}
+		if ((truncspot = strstri(iflags.altkeyhandler, suffx)) != 0)
+			*truncspot = '\0';
 		(void) strncpy(kh, iflags.altkeyhandler,
 				(MAX_ALTKEYHANDLER - sizeof suffx) - 1);
 		kh[(MAX_ALTKEYHANDLER - sizeof suffx) - 1] = '\0';
 		Strcat(kh, suffx);
+		Strcpy(iflags.altkeyhandler, kh);
 		hLibrary = LoadLibrary(kh);
 		if (hLibrary) {
 		   pProcessKeystroke =
@@ -853,12 +863,21 @@ load_keyboard_handler()
 		   (KEYHANDLERNAME) GetProcAddress (hLibrary, TEXT ("KeyHandlerName"));
 		}
 	}
-	if (!pProcessKeystroke || !pNHkbhit) {
+	if (!pProcessKeystroke || !pNHkbhit || !pCheckInput) {
 		if (hLibrary) {
 			FreeLibrary(hLibrary);
 			hLibrary = (HANDLE)0;
+			pNHkbhit = (NHKBHIT)0; 
+			pCheckInput = (CHECKINPUT)0; 
+			pSourceWhere = (SOURCEWHERE)0; 
+			pSourceAuthor = (SOURCEAUTHOR)0; 
+			pKeyHandlerName = (KEYHANDLERNAME)0; 
+			pProcessKeystroke = (PROCESS_KEYSTROKE)0;
 		}
-		hLibrary = LoadLibrary("nhdefkey.dll");
+		(void)strncpy(kh, "nhdefkey.dll", (MAX_ALTKEYHANDLER - sizeof suffx) - 1);
+		kh[(MAX_ALTKEYHANDLER - sizeof suffx) - 1] = '\0';
+		Strcpy(iflags.altkeyhandler, kh);
+		hLibrary = LoadLibrary(kh);
 		if (hLibrary) {
 		   pProcessKeystroke =
 		   (PROCESS_KEYSTROKE) GetProcAddress (hLibrary, TEXT ("ProcessKeystroke"));
@@ -874,7 +893,7 @@ load_keyboard_handler()
 		   (KEYHANDLERNAME) GetProcAddress (hLibrary, TEXT ("KeyHandlerName"));
 		}
 	}
-	if (!pProcessKeystroke || !pNHkbhit) {
+	if (!pProcessKeystroke || !pNHkbhit || !pCheckInput) {
 		if (!hLibrary)
 			raw_printf("\nNetHack was unable to load keystroke handler.\n");
 		else {

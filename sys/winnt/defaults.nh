@@ -13,6 +13,15 @@
 # for tty window-port.
 OPTIONS=IBMGraphics
 
+# Keyboard handling
+# Different keyboard handlers can be loaded.
+# Default is nhdefkey.dll but you can override that.
+# Ray Chason's keyboard handler
+# OPTIONS=altkeyhandler:nhraykey.dll
+#
+# NetHack 3.4.0 keyboard handling
+# OPTIONS=altkeyhandler:nh340key.dll
+
 # *** Personal Preferences ***
 # Some options to set personal preferences.  Uncomment and change these to
 # suit your personal preference.  If several people are to use the same
