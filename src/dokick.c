@@ -61,14 +61,7 @@ register boolean clumsy;
 
 	if(mon->m_ap_type) seemimic(mon);
 
-	/* it is unchivalrous to attack the defenseless or from behind */
-	if (Role_if(PM_KNIGHT) &&
-		u.ualign.type == A_LAWFUL && u.ualign.record > -10 &&
-		(!mon->mcanmove || mon->msleeping ||
-		(mon->mflee && !mon->mavenge))) {
-	    You_feel("like a caitiff!");
-	    adjalign(-1);
-	}
+	check_caitiff(mon);
 
 	/* squeeze some guilt feelings... */
 	if(mon->mtame) {

@@ -205,6 +205,22 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 	return(FALSE);
 }
 
+/*
+ * It is unchivalrous for a knight to attack the defenseless or from behind.
+ */
+void
+check_caitiff(mtmp)
+struct monst *mtmp;
+{
+	if (Role_if(PM_KNIGHT) && u.ualign.type == A_LAWFUL &&
+	    (!mtmp->mcanmove || mtmp->msleeping ||
+	     (mtmp->mflee && !mtmp->mavenge)) &&
+	    u.ualign.record > -10) {
+	    You("caitiff!");
+	    adjalign(-1);
+	}
+}
+
 schar
 find_roll_to_hit(mtmp)
 register struct monst *mtmp;
@@ -215,14 +231,7 @@ register struct monst *mtmp;
 	tmp = 1 + Luck + abon() + find_mac(mtmp) + u.uhitinc +
 		maybe_polyd(youmonst.data->mlevel, u.ulevel);
 
-/*	it is unchivalrous to attack the defenseless or from behind */
-	if (Role_if(PM_KNIGHT) && u.ualign.type == A_LAWFUL &&
-	    (!mtmp->mcanmove || mtmp->msleeping ||
-	    (mtmp->mflee && !mtmp->mavenge)) &&
-	    u.ualign.record > -10) {
-	    You("caitiff!");
-	    adjalign(-1);
-	}
+	check_caitiff(mtmp);
 
 /*	attacking peaceful creatures is bad for the samurai's giri */
 	if (Role_if(PM_SAMURAI) && mtmp->mpeaceful &&

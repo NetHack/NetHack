@@ -2367,6 +2367,8 @@ use_pole (obj)
 	if ((mtmp = m_at(cc.x, cc.y)) != (struct monst *)0) {
 	    int oldhp = mtmp->mhp;
 
+	    bhitpos = cc;
+	    check_caitiff(mtmp);
 	    (void) thitmonst(mtmp, uwep);
 	    /* check the monster's HP because thitmonst() doesn't return
 	     * an indication of whether it hit.  Not perfect (what if it's a
