@@ -91,6 +91,7 @@ void mswin_display_splash_window (BOOL show_ver)
      /* Show news, if any */
      FILE *nf;
 
+     iflags.news = 0; /* prevent newgame() from re-displaying news */
      nf = fopen(NEWS, "r");
      if (nf != NULL) {
   char *buf = NULL;

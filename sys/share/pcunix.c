@@ -133,7 +133,7 @@ getlock()
 			     "\nThere are files from a game in progress under your name.");
 		    Strcat(oops, "\nThe files are locked or inaccessible.");
 		    Strcat(oops, " Is the other game still running?\n");
-		    if (strlen(fq_lock) < ((OOPS_BUFSZ - 1) - strlen(oops)))
+		    if (strlen(fq_lock) < ((OOPS_BUFSZ -16) - strlen(oops)))
 			    Sprintf(eos(oops), "Cannot open %s", fq_lock);
 		    unlock_file(HLOCK);
 		    error(oops);
