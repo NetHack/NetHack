@@ -203,6 +203,11 @@ dothrow()
 	shotlimit = (multi || save_cm) ? multi + 1 : 0;
 	multi = 0;		/* reset; it's been used up */
 
+	if (notake(youmonst.data)) {
+	    You("are physically incapable of throwing anything.");
+	    return 0;
+	}
+
 	if(check_capacity((char *)0)) return(0);
 	obj = getobj(uslinging() ? bullets : toss_objs, "throw");
 	/* it is also possible to throw food */
@@ -284,6 +289,11 @@ int
 dofire()
 {
 	int shotlimit;
+
+	if (notake(youmonst.data)) {
+	    You("are physically incapable of doing that.");
+	    return 0;
+	}
 
 	if(check_capacity((char *)0)) return(0);
 	if (!uquiver) {
