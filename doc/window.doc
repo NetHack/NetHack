@@ -7,6 +7,9 @@ supports multiple window systems in the same binary.  Even if you only
 wish to support one window-port on your port, you will need to follow
 the instructions in Section IX to get a compilable binary.
 
+Copyright 2003, David Cohrs
+NetHack may be freely redistributed.  See license for details.
+
 Contents:
 	I.    Window Types and Terminology
 	II.   Interface Specification
