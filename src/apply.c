@@ -2025,7 +2025,6 @@ struct obj *otmp;
 	   should be incorporated here instead of in set_trap]*/
 #ifdef STEED
 	if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
-	    char buf[BUFSZ];
 	    boolean chance;
 
 	    if (Fumbling || otmp->cursed) chance = (rnl(10) > 3);

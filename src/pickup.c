@@ -1154,19 +1154,25 @@ boolean telekinesis;
  * finally using the fallback as a last resort.
  * last_restort is expected to be very short.
  */
-char *
+const char *
 safe_qbuf(qbuf, padlength, planA, planB, last_resort)
-char *qbuf, *planA, *planB, *last_resort;
+const char *qbuf, *planA, *planB, *last_resort;
 unsigned padlength;
 {
-	unsigned textleft = QBUFSZ - (strlen(qbuf) + padlength);
-	if (strlen(last_resort) >= textleft) {
-		impossible("safe_qbuf: last_resort too large at %d characters.",
-			strlen(last_resort));
-		return "";
+	/* convert size_t (or int for ancient systems) to ordinary unsigned */
+	unsigned len_qbuf = (unsigned)strlen(qbuf),
+	         len_planA = (unsigned)strlen(planA),
+	         len_planB = (unsigned)strlen(planB),
+	         len_lastR = (unsigned)strlen(last_resort);
+	unsigned textleft = QBUFSZ - (len_qbuf + padlength);
+
+	if (len_lastR >= textleft) {
+	    impossible("safe_qbuf: last_resort too large at %u characters.",
+		       len_lastR);
+	    return "";
 	}
-	return (strlen(planA) < textleft) ? planA :
-	       (strlen(planB) < textleft) ? planB : last_resort;
+	return (len_planA < textleft) ? planA :
+		    (len_planB < textleft) ? planB : last_resort;
 }
 
 /*

@@ -2803,6 +2803,7 @@ drown()
 	}
 #endif
 	crawl_ok = FALSE;
+	x = y = 0;		/* lint suppression */
 	/* if sleeping, wake up now so that we don't crawl out of water
 	   while still asleep; we can't do that the same way that waking
 	   due to combat is handled; note unmul() clears u.usleep */
