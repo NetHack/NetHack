@@ -14,6 +14,8 @@ any golem statue hit with stone-to-flesh spell animates as flesh golem
 only humanoid angelic minions should get/use sword and armor
 paper, straw and wood golems resist cold
 the options lootabc, showrace, travelcmd, and runmode are now saved
+use mons[] array offsets in mnum field in save file rather than storing
+	the ptr and calculating the distance from beginning of array
 
 
 Platform- and/or Interface-Specific Fixes
