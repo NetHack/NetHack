@@ -580,7 +580,7 @@ endif
 
 $(GAMEFILE) : $(ALLOBJ) $(NHRES)
 	@echo Linking....
- @$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES) $(WINPLIBS)
+	@$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES) $(WINPLIBS)
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 $(GAME)_.ico : $(NTSYS)/$(GAME).ico
