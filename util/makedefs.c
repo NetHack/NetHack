@@ -725,6 +725,9 @@ static const char *build_opts[] = {
 #ifdef ZEROCOMP
 		"zero-compressed save files",
 #endif
+# ifdef SAVEFILE_340_CONVERT
+		"converts standard flags in 3.4.0 savefile",
+# endif
 		"basic NetHack features"
 	};
 
