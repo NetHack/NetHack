@@ -318,29 +318,29 @@ bot()
 /* If entries are added to this, botl.h will require updating too */
 struct istat_s blstats[2][MAXBLSTATS] = {
     {
-    { 0L, ANY_STR,  {(genericptr_t)0}, (char *)0, 80, 0 },	/*  0 BL_TITLE */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  1 BL_STR */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  2 BL_DX */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  3 BL_CO */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  4 BL_IN */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  5 BL_WI */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  6 BL_CH */
-    { 0L, ANY_STR,  {(genericptr_t)0}, (char *)0, 40,  0},	/*  7 BL_ALIGN */
-    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 20, 0},	/*  8 BL_SCORE */
-    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 20, 0},	/*  9 BL_CAP */
-    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 10,  0},	/* 10 BL_GOLD */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
-    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 10,  0},	/* 13 BL_XP */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/* 14 BL_AC */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/* 15 BL_HD */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 20, 0},	/* 16 BL_TIME */
-    { 0L, ANY_UINT, {(genericptr_t)0}, (char *)0, 40, 0},	/* 17 BL_HUNGER */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,BL_HPMAX},	/* 18 BL_HP */
-    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10, 0},	/* 19 BL_HPMAX */
-    { 0L, ANY_STR,  {(genericptr_t)0}, (char *)0, 80, 0},	/* 20 BL_LEVELDESC */
-    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 20, 0},	/* 21 BL_EXP */
-    { 0L, ANY_MASK32,{(genericptr_t)0}, (char *)0, 0, 0}	/* 22 BL_CONDITION */
+    { 0L, ANY_STR,  {(long)0L}, (char *)0, 80, 0 },	/*  0 BL_TITLE */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/*  1 BL_STR */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/*  2 BL_DX */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/*  3 BL_CO */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/*  4 BL_IN */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/*  5 BL_WI */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/*  6 BL_CH */
+    { 0L, ANY_STR,  {(long)0L}, (char *)0, 40,  0},	/*  7 BL_ALIGN */
+    { 0L, ANY_LONG, {(long)0L}, (char *)0, 20,  0},	/*  8 BL_SCORE */
+    { 0L, ANY_LONG, {(long)0L}, (char *)0, 20,  0},	/*  9 BL_CAP */
+    { 0L, ANY_LONG, {(long)0L}, (char *)0, 10,  0},	/* 10 BL_GOLD */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
+    { 0L, ANY_LONG, {(long)0L}, (char *)0, 10,  0},	/* 13 BL_XP */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/* 14 BL_AC */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/* 15 BL_HD */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 20,  0},	/* 16 BL_TIME */
+    { 0L, ANY_UINT, {(long)0L}, (char *)0, 40,  0},	/* 17 BL_HUNGER */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10, BL_HPMAX},  /* 18 BL_HP */
+    { 0L, ANY_INT,  {(long)0L}, (char *)0, 10,  0},	/* 19 BL_HPMAX */
+    { 0L, ANY_STR,  {(long)0L}, (char *)0, 80,  0},	/* 20 BL_LEVELDESC */
+    { 0L, ANY_LONG, {(long)0L}, (char *)0, 20,  0},	/* 21 BL_EXP */
+    { 0L, ANY_MASK32,{(long)0L},(char *)0,  0,  0}	/* 22 BL_CONDITION */
     }
 };
 
@@ -409,23 +409,8 @@ init_blstats()
 		blstats[1][i] = blstats[0][i];
 
 		switch(blstats[0][i].anytype) {
-		    case ANY_INT:
-			blstats[0][i].a.a_int = 0;
-			blstats[1][i].a.a_int = 0;
-			break;
-		    case ANY_ULONG:
-		    case ANY_MASK32:
 			blstats[0][i].a.a_ulong = 0UL;
 			blstats[1][i].a.a_ulong = 0UL;
-			break;
-		    case ANY_LONG:
-			blstats[0][i].a.a_long = 0L;
-			blstats[1][i].a.a_long = 0L;
-			break;
-		    case ANY_UINT:
-			blstats[0][i].a.a_uint = 0U;
-			blstats[1][i].a.a_uint = 0U;
-			break;
 		}
 		if (blstats[0][i].valwidth) {
 		    blstats[0][i].val = (char *)alloc(blstats[0][i].valwidth);
