@@ -38,8 +38,6 @@ extern void msmsg(const char *,...);
 # endif
 #endif
 
-#define DEBUG
-
 extern char mapped_menu_cmds[]; /* from options.c */
 
 /* Interface definition, for windows.c */
