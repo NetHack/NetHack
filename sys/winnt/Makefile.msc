@@ -38,7 +38,12 @@ APPVER=4.0
 #  Set the gamedir according to your preference.  
 #  If not present prior to compilation it gets created.
 
+!IF "$(GRAPHICAL)" == "Y"
 GAME    = NetHack                 # Game Name
+!ELSE
+GAME    = NetHackW                # Game Name
+!ENDIF
+
 GAMEDIR = ..\binary               # Game directory
 
 #

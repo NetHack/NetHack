@@ -2,16 +2,16 @@
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
                  Instructions for compiling and installing
-             NetHack 3.4 on a Windows 9x, Me, NT, 2000, or XP system
+             NetHack 3.4 on a Windows 9x, NT, 2000, or XP system
          ==============================================================
-		 Last revision: $Date$
+                 Last revision: $Date$
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
 
-Credit for the Win32 Graphical version of NetHack (aka 
-"NetHack for Windows" or Nethackw) goes to Alex Kompel who initially 
-developed and contributed the port.
+Credit for the Win32 Graphical version of NetHack (aka "NetHack for
+Windows" or NetHackW) goes to Alex Kompel who initially developed and
+contributed the port.
 
 The PC Windows porting team consisting of Michael Allison, David Cohrs, 
 Alex Kompel, Dion Nicolaas, Yitzhak Sapir, and Janet Walz maintained the 
@@ -22,8 +22,8 @@ version.  In either case you can use one of the following build
 environments:
 
   o A copy of Microsoft Visual C V6.0 SP3 or later.  Things may work with 
-    an earlier version of the compiler, but the current code has not been
-    tested with an earlier version.
+    an earlier version of the compiler, but the current code has not
+    been tested with an earlier version.
 		
 	OR
 
@@ -32,17 +32,23 @@ environments:
     registration at:
     http://www.borland.com/bcppbuilder/freecompiler/.
 
-Additionally, you can build a TTY version of NetHack with the following
-build environment:
+        OR
 
-  o A copy of MinGW 1.0. MinGW is a collection of header files and import
-    libraries with which native Windows32 programs can be made; MinGW 1.0
-    ships with the GNU Compiler Collection.
+  o A copy of MinGW 2.0. MinGW is a collection of header files and import
+    libraries with which native Windows32 programs can be made; the
+    MinGW 2.0 distribution contains the GNU Compiler Collection.
     You can download MinGW at
     http://www.mingw.org/
+    Earlier versions of MinGW will not allow you to build the Windows
+    Graphical version.
+    
+In addition to the makefiles that allow you to build NetHack from the
+command line, there is also a set of project files and a workspace file
+that allow you to build the Windows Graphical version from Microsoft
+Visual C's IDE (Integrated Development Environment.)
 
 
-FIRST STEP:
+FIRST STEP
 
 The first step in building either version of NetHack is to execute
 sys/winnt/nhsetup.bat.  
@@ -61,20 +67,29 @@ A build subdirectory will also be created off the top of the NetHack
 source tree, and many files appropriate for a graphical build will be 
 moved there.
 
-If you wish to build the TTY version, proceed now to "BUILDING TTY VERSION."
-If you wish to build the graphical version, proceed now to "BUILDING GRAPHICAL VERSION."
+If you wish to build from the command line, proceed to "BUILDING FROM
+THE COMMAND LINE."
+If you wish to build using Visual C's IDE, proceed now to "BUILDING
+USING VISUAL C'S IDE."
 
 
-------------------------
-| BUILDING TTY VERSION |
-------------------------
+BUILDING FROM THE COMMAND LINE
 
-This version of NetHack for Win32 is a tty port utilizing the WIN32 
-Console I/O subsystem.
+You can built two different versions of NetHack for Win32 from the
+command line:
+    A tty port utilizing the Win32 Console I/O subsystem, Console
+        NetHack;
+    A Win32 native port built on the Windows API, Graphical NetHack or
+        NetHackW.
+
+The executable for Console NetHack will be named NetHack.exe. The
+executable for Graphical NetHack will be named NetHackW.exe. You can opt
+to build both; they will be able to use the same datafiles, save files
+and bones files.
 
 I.  Dispelling the Myths:
 
-    Compiling NetHack for WIN32 TTY is not as easy as it sounds, nor as hard 
+    Compiling NetHack for Win32 is not as easy as it sounds, nor as hard
     as it looks, however it will behoove you to read this entire section 
     through before beginning the task.
 
@@ -82,48 +97,48 @@ I.  Dispelling the Myths:
 
         o Microsoft Visual C++ V6.0 SP3 or greater
         o Borland C 5.5.1
-        o MinGW 1.0 with GCC 2.95.3-6
+        o MinGW 2.0 (with GCC 3.2)
 
     The Microsoft Visual C Makefile was created for use with MS NMAKE 
     which is provided with the Microsoft compiler. The supplied Makefile
     may work with earlier versions of the Microsoft 32-bit compiler, but 
     that has not been tested. 
 
-    The Borland C Makefile was created for use with Borland MAKE 
-    which is provided with the Borland compiler.
+    The Borland C Makefile was created for use with Borland MAKE which
+    is provided with the Borland compiler.
 
     The GCC Makefile was created for use with GNU Make version 3.79.1,
     which comes with the MinGW package.
 
-    You may find it useful to obtain copies of lex (flex) and yacc (bison,
-    or byacc).  While not strictly necessary to compile nethack, they are 
-    required should you desire to make any changes to the level and dungeon 
-    compilers.
+    You may find it useful to obtain copies of lex (flex) and yacc
+    (bison, or byacc).  While not strictly necessary to compile nethack,
+    they are required should you desire to make any changes to the level
+    and dungeon compilers.
 
-
-II. To compile your copy of NetHack on a 32 bit Windows machine (NT or 2000):
-    (Note: build has not been tested on Windows XP.  That isn't to say that
-           it doesn't work, it just hasn't been tried by us.)
+II. To compile your copy of NetHack on a Windows NT/2000/XP machine:
 
 Setting Up
 
-1.  It almost goes without saying that you should make sure that your tools
-    are set up and running correctly.  That includes ensuring that all the
-    necessary environment variables for the compiler environment
+1.  It almost goes without saying that you should make sure that your
+    tools are set up and running correctly.  That includes ensuring that
+    all the necessary environment variables for the compiler environment
     are set correctly.  (Examples: For the Microsoft compiler by
     executing vcvars32.bat, which is probably in the bin directory of 
     your compilers directory tree. For the Borland Makefile, you can 
     simply invoke the Make utility from the Makefile's directory (For 
-    the standard Borland compiler installation you can just 
-    use the explicit path "c:\borland\bcc55\bin\make /f Makefile.bcc".
-    For the GCC Makefile, add <mingw>\bin to your path, where <mingw> is
-    your MinGW root directory.)
+    the standard Borland compiler installation you can just use the
+    explicit path "c:\borland\bcc55\bin\make /f Makefile.bcc".  For the
+    GCC Makefile, add <mingw>\bin to your path, where <mingw> is your
+    MinGW root directory.)
 
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
-    dat, doc, include, src, sys\share, sys\winnt, util, win\tty, and
-    binary (The "binary" directory was created by nhsetup.bat earlier 
-    if you followed the steps appropriately).
+    dat, doc, include, src, sys\share, sys\winnt, util, and binary (The
+    "binary" directory was created by nhsetup.bat earlier if you
+    followed the steps appropriately).
+
+    For Console NetHack you need win\tty in addition to these; for
+    Graphical NetHack you need win\win32 in addition to these.
 
     Other subdirectories may also be included in your distribution, but
     they are not necessary for building the TTY version for the Win32 
@@ -142,6 +157,18 @@ Setting Up
                                        share  winnt  tty  
  
 
+    Required Directories for a Win32 Graphical NetHack:
+
+                            top
+                             |
+        ----------------------------------------------------/ /----- 
+        |       |     |        |       |     |          |        |
+       util    dat   doc    include   src   sys        win     binary
+                                             |          |
+                                          ------      ----- 
+                                          |    |          |
+                                       share  winnt      win32 
+ 
     Check the file "Files" in your top level directory for an exact
     listing of what file is in which directory.  In order for the
     Makefiles to work, all the source files must be in the proper
@@ -149,38 +176,38 @@ Setting Up
 
     If you downloaded or ftp'd the sources from a UNIX system, the lines
     will probably end in UNIX-style newlines, instead of the carriage
-    return and line feed pairs used by Windows.  Some programs have trouble
-    with them, so you may need to convert them. The compiler should not
-    have any problems with them however.
+    return and line feed pairs used by Windows.  Some programs have
+    trouble with them, so you may need to convert them. The compiler
+    should not have any problems with them however.
 
 3.  Now go to the include subdirectory to check a couple of the header
     files there.  Things *should* work as they are, but since you have
-    probably set up your system in some sort of custom configuration
-    it doesn't hurt to check out the following:
+    probably set up your system in some sort of custom configuration it
+    doesn't hurt to check out the following:
 
-    First check config.h according to the comments to match your system and
-    desired set of features.  Mostly you need to check the WIZARD option.
+    First check config.h according to the comments to match your system
+    and desired set of features.  Mostly you need to check section 4 and
+    5.
 
-    You may include all or as few of the special game features as you wish
-    (they are located last in the file).
+    You may include all or as few of the special game features as you
+    wish (they are located last in the file).
 
 4.  Edit your Makefile. 
 
-    For building the TTY version, ensure that GRAPHICAL is set to "N",
-    or commented out.  (If you aren't building the TTY version, you are
-    currently reading the wrong section, and following the wrong set of
-    steps.  In that case, you may wish to start reading from the top
-    again.)
+    For building Console NetHack, ensure that GRAPHICAL is set to "N",
+    or commented out. For building Graphical NetHack, set GRAPHICAL to
+    "Y".
 
     Optional step:
-      If you elected not to use the high-quality BSD random number routines by
-      commenting out RANDOM in ntconf.h, comment out (or set equal to nothing) 
-      the RANDOM macro in your Makefile.
+        If you elected not to use the high-quality BSD random number
+        routines by commenting out RANDOM in ntconf.h, comment out (or
+        set equal to nothing) the RANDOM macro in your Makefile.
 
-    If you are recompiling after patching your sources, or if you got your
-    files from somewhere other than the official distribution, "touch
-    makedefs.c" to ensure that certain files (onames.h and pm.h) are remade,
-    lest potentially troublesome timestamps fool your make (or nmake) utility.
+    If you are recompiling after patching your sources, or if you got
+    your files from somewhere other than the official distribution,
+    "touch makedefs.c" to ensure that certain files (onames.h and pm.h)
+    are remade, lest potentially troublesome timestamps fool your make
+    (or nmake) utility.
 
 Compiling
 
@@ -196,54 +223,20 @@ Compiling
         make -f Makefile.gcc install
 
     If you get any errors along the way then something has not been set
-    up correctly. The time it takes to compile depends on your particular 
-    machine of course, but you should be able to go for lunch and return 
-    to find everything finished.  The less memory, and slower your machine, 
-    the longer the lunch you may take. :-)
+    up correctly. The time it takes to compile depends on your
+    particular machine of course, but you should be able to go for lunch
+    and return to find everything finished.  The less memory, and slower
+    your machine, the longer the lunch you may take. :-)
     
-    In any case, it is likely that the command prompt window where you are 
-    doing the compiling will be occupied for a while.  If all goes well, 
-    you will get an NetHack executable.
-
-Running NetHack
-
-6.  Make sure all of the support files -- Guidebook.txt, license,
-    Defaults.nh, NetHack.exe, nhdat, and recover.exe -- were copied to the 
-    game directory.  If not, move them there yourself.
-
-    Edit Defaults.nh to reflect your particular setup and personal 
-    preferences, by following the comments.  As with all releases since
-    3.2.1, HACKDIR defaults to the same directory as that where the NetHack.exe
-    executable resides.  You only need to set HACKDIR in defaults.nh if,
-    for some reason, you wish to override that (be careful).
-  
-7. Executing the game
-
-    a) Running from the command prompt:
-
-    If you add the directory containing the NetHack executable
-    to your PATH, you can just type "nethack" or "nethack -umike"
-    to start it up.  Alternatively, you can explicitly invoke it with 
-    a command such as "c:\nethack\binary\nethack.exe" (specifying whatever 
-    drive and directory your NetHack executable resides in) each time.
-
-    b) Running from a Windows shortcut.
-
-    If you will be running it by launching it from a shortcut, just 
-    use the following information when setting up the shortcut.
-
-         Description      :  NetHack 3.4.1 
-         Command Line     :  C:\NETHACK\BINARY\NETHACK.EXE
-
-   (changing the directory to the appropriate one of course)
-
-8. Play NetHack.  If it works, you're done!
+    In any case, it is likely that the command prompt window where you
+    are doing the compiling will be occupied for a while.  If all goes
+    well, you will get an NetHack executable.
 
 Notes:
 
-1)  To install an update of NetHack after changing something, change
-    your current directory to src and issue the appropriate command
-    for your compiler:
+1.  To install an update of NetHack after changing something, change
+    your current directory to src and issue the appropriate command for
+    your compiler:
 
     For Microsoft compiler: 
         nmake
@@ -254,61 +247,65 @@ Notes:
     For GCC:
         make -f Makefile.gcc
 
-    If you add, delete, or reorder monsters or objects, or you change the
-    format of saved level files, delete any save and bones files.  (Trying
-    to use such files sometimes produces amusing confusions on the game's
-    part, but usually crashes.)
+    If you add, delete, or reorder monsters or objects, or you change
+    the format of saved level files, delete any save and bones files.
+    (Trying to use such files sometimes produces amusing confusions on
+    the game's part, but usually crashes.)
 
-    If you made changes to any of the level compiler software, you may have
-    to delete dgn_flex.c, dgn_yacc.c, lev_flex.c, and lev_yacc.c from the
-    util directory to ensure that they are remade.
+    If you made changes to any of the level compiler software, you may
+    have to delete dgn_flex.c, dgn_yacc.c, lev_flex.c, and lev_yacc.c
+    from the util directory to ensure that they are remade.
 
-2)  The executable produced by the TTY build is a 32-bit, flat-address space, 
-    non-overlayed .exe file, which should run on any true Win32 environment
-    with console I/O support. 
+2.  The executable produced by the TTY build is a 32-bit, flat-address
+    space, non-overlayed .exe file, which should run on any true Win32
+    environment with console I/O support. 
+
+    The executable built by the graphical built is a 32-bit,
+    flat-address space, non-overlayed .exe file, which should run on any
+    true Win32 graphical environment.
+
+    To run NetHack, proceed to RUNNING NETHACK.
 
 
-------------------------------
-| BUILDING GRAPHICAL VERSION |
-------------------------------
+BUILDING USING VISUAL C'S IDE
 
-
-This version of NetHack is a Win32 native port built on the Windows API.
+Only the Win32 native port built on the Windows API, or Graphical
+NetHack, can be built using the Visual C IDE.
 
 I.  Dispelling the Myths:
 
-    Compiling NetHack for Windows is straightforward, as long as you have 
-    your compiler and tools correctly installed.  
+    Compiling NetHack using the Visual C IDE is straightforward, as long
+    as you have your compiler and tools correctly installed.  
 
-    It is also assumed that you already changed your directory to 
+    It is again assumed that you already changed your directory to
     sys\winnt and executed:
 	nhsetup
-    as described at the top of this document. If you didn't, you must
-    go back and do so before proceeding.
+    as described at the top of this document. If you didn't, you must go
+    back and do so before proceeding.
 
-II. To compile your copy of NetHack for Windows on a 
-    Windows NT/2000/XP machine:
+II. To compile your copy of NetHack for Windows on a Windows NT/2000/XP
+    machine using the Visual C IDE:
 
 Setting Up
 
-1.  It almost goes without saying that you should make sure that your tools
-    are set up and running correctly. (Examples: For the Microsoft Visual
-    Studio C compiler it should correctly fire up when you choose it in
-    your Start | Programs menus, and for Borland make sure that the compiler
-    is in your PATH, or that you know where the make.exe executable resides.)
+1.  It almost goes without saying that you should make sure that your
+    tools are set up and running correctly. (For the Microsoft Visual C
+    IDE it should correctly fire up when you choose it in your Start |
+    Programs menus.)
 
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
-    dat, doc, include, src, sys\share, sys\winnt, util, win\win32, 
-    and at this point you should also have a build directory and a
-    binary directory (both created by nhsetup.bat executed from 
-    sys\winnt earlier.)
+    dat, doc, include, src, sys\share, sys\winnt, util, win\win32, and
+    at this point you should also have a build directory and a binary
+    directory (both created by nhsetup.bat executed from sys\winnt
+    earlier.)
 
     Other subdirectories may also be included in your distribution, but
     they are not necessary for building the graphical version of NetHack
     (you can delete them to save space if you wish.)
 
-    Required Directories for a Win32 Graphical NetHack:
+    Required Directories for building Graphical NetHack with the Visual
+    C IDE:
 
                             top
                              |
@@ -322,52 +319,36 @@ Setting Up
  
     Those last two (build and binary) are created during the building
     process.  They are not disributed as part of the NetHack source 
-    distribution.  nhsetup.bat creates the build directory and moves 
-    a few files into it, including the Visual C project files.
-    The "binary" directory will house everything you need to play the 
-    game after building is complete.
+    distribution.  nhsetup.bat creates the build directory and moves a
+    few files into it, including the Visual C project files.  The
+    "binary" directory will house everything you need to play the game
+    after building is complete.
 
     Check the file "Files" in your top level directory for an exact
-    listing of what file is in which directory.  In order for the
-    build process to work, all the source files must be in the proper
+    listing of what file is in which directory.  In order for the build
+    process to work, all the source files must be in the proper
     locations.  Remember that nhsetup.bat moves/copies many files around
     to their intended locations for building NetHack.
 
     If you downloaded or ftp'd the sources from a UNIX system, the lines
     will probably end in UNIX-style newlines, instead of the carriage
-    return and line feed pairs used by Windows.  Visual Studio project
-    files and workspace files (dsp and dsw files) in particular need to 
-    have their lines end in carriage-return-line-feed or they won't work
+    return and line feed pairs used by Windows.  Visual C project files
+    and workspace files (dsp and dsw files) in particular need to have
+    their lines end in carriage-return-line-feed or they won't work
     properly.
 
 3.  Ready your tool.
-    Microsoft compiler users, perform step 3a.
-    Borland compiler users, perform step 3b.
+    Note: It's possible to build a graphical version using the Makefile,
+    as explained above. However, the IDE build has full game
+    functionality and is the officially released build.
 
-    Note for Microsoft users: It's possible to build a graphical version
-    using the Makefile.  For simplicity's sake, however, only the Visual
-    C IDE build will be explained.  The IDE build has full game
-    functionality and is the officially released build.s
-
-    a) Microsoft compiler:
-       Start the Visual C IDE. In the Visual C IDE Menus, choose:
+    Start the Visual C IDE. In the Visual C IDE menus, choose:
            File | Open Workspace
 
-    b) Borland compiler:
-       Chdir to the NetHack src directory:
-           chdir ../../src
-       if your current directory was still sys/winnt, 
-       or:
-           chdir src
-       if your current directory was the top of the NetHack tree.
-
 4.  Set up for the build.
-    Microsoft compiler users, perform step 4a.
-    Borland compiler users, perform step 4b.
 
-    a) Microsoft compiler only:
-        o In the Visual C "Open Workspace" dialog box, navigate to the top
-            of  your NetHack source directory.
+    In the Visual C "Open Workspace" dialog box, navigate to the top of
+    your NetHack source directory.
  
             In there, highlight "nethack.dsw" and click on Open.
             Once the workspace has been opened, you should see the following
@@ -384,95 +365,76 @@ Setting Up
               + tilemap files
               + uudecode files
 
-        o On the Visual C menus, choose:
-              Project | Set Active Project | nethackw
+    On the Visual C menus, choose:
+        Project | Set Active Project | NetHackW
 
-        o On the Visual C menus again, choose either:
-              Build | Set Active Configuration | nethackw - Win32 Release
+    On the Visual C menus again, choose either:
+        Build | Set Active Configuration | NetHackW - Win32 Release
             or
-              Build | Set Active Configuration | nethackw - Win32 Debug
+        Build | Set Active Configuration | NetHackW - Win32 Debug
 
-            The first will create the Release build of NetHackW which does
-            not contain all the debugging information and is smaller, and
-            runs quicker.  The second will create the Debug build of NetHackW
-            and will spend a lot of time writing debug information to the disk
-            as the game is played. Unless you are debugging or enhancing NetHack 
+    The first will create the Release build of NetHackW which does not
+    contain all the debugging information and is smaller, and runs
+    quicker.  The second will create the Debug build of NetHackW and
+    will spend a lot of time writing debug information to the disk as
+    the game is played. Unless you are debugging or enhancing NetHack
             for Windows, choose the Release build.
-
-        o For Microsoft compiler build, you may now proceed to step 5.
-
-    b) Borland Compiler only:
-
-        o Edit the Makefile. Ensure the following are set correctly.
-          GRAPHICAL should be set to "Y"
-
-        o Ensure that all your tools directories are set up properly.
-          By default, your tools are assumed to be in the same
-          directory as the MAKE program.
-
 
 Building
     
 5.  Start your build.
-    Microsoft compiler users, perform step 5a.
-    Borland compiler users, perform step 5b.
 
-    a) Microsoft Compiler only:
-        o On the Visual C menus once again, choose:
-              Build | Build nethackw.exe
+    On the Visual C menus once again, choose:
+        Build | Build NetHackW.exe
           This starts the build.  It is likely that the IDE message window 
           where you are doing the compiling will be occupied for a while.
-          If all goes well, you will get an NetHack executable called 
-          nethackw.exe in the "binary" directory, along with all the support
-          files that it needs.
 
-        o For Microsoft compiler build, you may now proceed to step 6.
-
-    b) Borland Compiler only:
-        o With your current directory the NetHack src directory,
-          issue the following command:
-              make /f Makefile.bcc install
-
-6.  If all has gone well to this point, you should now have a playable 
-    game of "NetHack for Windows" in the "binary" directory.
+6.  If all has gone well to this point, you should now have a NetHack
+    executable called NetHackW.exe in the "binary" directory, along with
+    all the support files that it needs.
  
 
-Running NetHack
+RUNNING NETHACK
 
-7.  Make sure all of the support files -- Guidebook.txt, license,
-    Defaults.nh, nethackw.exe, nhdat, and recover.exe 
-    -- were copied to the binary directory.  
-    (If not, find them in the tree and move them there yourself if they
-     exist.  If they don't exist, something has gone wrong)
+I. Checking the installation:
+    Make sure all of the support files -- Guidebook.txt, license,
+    Defaults.nh, NetHack.exe or NetHackW.exe, nhdat, and recover.exe --
+    were copied to the game directory.  If not, move them there
+    yourself.
 
     Edit Defaults.nh to reflect your particular setup and personal 
     preferences, by following the comments.  As with all releases since
-    3.2.1, HACKDIR defaults to the same directory as that where the nethackw.exe 
-    executable resides.  You only need to set HACKDIR in Defaults.nh if, 
-    for some reason, you wish to override that (be careful).
+    3.2.1, HACKDIR defaults to the same directory as that where the
+    NetHack.exe or NetHackW.exe executable resides.  You only need to
+    set HACKDIR in defaults.nh if, for some reason, you wish to override
+    that (be careful).
   
-8.  Executing the game
-    a) Running from the command prompt:
+II. Executing the game
 
-    If you add the directory containing the NetHack executable
-    to your PATH, 
-    You can just type "nethackw" to start it up.  Alternatively, you 
-    can explicitly invoke it with a command such as 
-    "c:\nethack\binary\nethackw.exe" (specifying whatever drive 
-    and directory your NetHack executable resides in) each time.
+1.  Running from the command prompt:
 
-    b) Running from a Windows shortcut
+    If you add the directory containing the NetHack executable to your
+    PATH, you can just type "nethack" or "nethack -umike" or "nethackw"
+    or "nethackw -umike" to start it up.  Alternatively, you can
+    explicitly invoke it with a command such as
+    "c:\nethack\binary\nethack.exe" or "c:\nethack\binary\nethackw.exe"
+    (specifying whatever drive and directory your NetHack executable
+    resides in) each time.
 
-    If you will be running it by launching it from program manager
-    or from a shortcut, just use the following information when 
-    setting up the icon or shortcut.
+2.  Running from a Windows shortcut.
 
-         Description      :  NetHack 3.4.1 
+    If you will be running it by launching it from a shortcut, just use
+    the following information when setting up the shortcut.
+
+        Description      :  NetHack 3.4.1 Console version
+        Command Line     :  C:\NETHACK\BINARY\NETHACK.EXE
+
+        Description      :  NetHack 3.4.1 Graphical Interface
          Command Line     :  C:\NETHACK\BINARY\NETHACKW.EXE
 
-   (changing the directory in the Command Line to the appropriate one of course)
+   (changing the directory to the appropriate one of course)
 
-9. Play NetHack for Windows.  If it works, you're done!
+III. Play NetHack.  If it works, you're done!
 
 
 PROBLEMS
@@ -480,11 +442,13 @@ PROBLEMS
     If you encounter a bug and wish to report it, please send e-mail to:
         nethack-bugs@nethack.org
 
-    If you have any comments or suggestions, feel free to drop us a line c/o:
+    If you have any comments or suggestions, feel free to drop us a line
+    c/o:
         DevTeam@nethack.org
 
-    You may wish to vist the NetHack Development Team's website occasionally
-    to check for updates or known bugs.  The website can be found at:
+    You may wish to vist the NetHack Development Team's website
+    occasionally to check for updates or known bugs.  The website can be
+    found at:
              http://www.nethack.org/
 
     Happy NetHacking!

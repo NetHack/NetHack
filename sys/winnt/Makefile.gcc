@@ -58,8 +58,13 @@ endif
 #  Set the gamedir according to your preference.
 #  If not present prior to compilation it gets created.
 
+ifeq  "$(GRAPHICAL)" "Y"
+# Game Name
+GAME    = NetHackW
+else
 # Game Name
 GAME    = NetHack
+endif
 # Game directory
 GAMEDIR = ../binary
 
@@ -156,19 +161,21 @@ WINPORT  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
 # WIN32_IE=0x400 is currently unsupported by MinGW
 WINPFLAG   = -DTILES -DMSWIN_GRAPHICS -D_WIN32_IE=0x0400
-NHRES   = $(O)winhack.o
+NHRES   = $(O)winres.o
 WINPINC = -I$(WIN32)
 WINPHDR = $(WIN32)/mhaskyn.h $(WIN32)/mhdlg.h $(WIN32)/mhfont.h \
 	$(WIN32)/mhinput.h $(WIN32)/mhmain.h $(WIN32)/mhmap.h \
 	$(WIN32)/mhmenu.h $(WIN32)/mhmsg.h $(WIN32)/mhmsgwnd.h \
 	$(WIN32)/mhrip.h $(WIN32)/mhstatus.h \
 	$(WIN32)/mhtext.h $(WIN32)/resource.h $(WIN32)/winMS.h
+WINPLIBS =  -lcomctl32
 else
 WINPORT = $(O)nttty.o
 WINPFLAG= -DWIN32CON
 WINPHDR =
 NHRES   = $(O)console.o
 WINPINC =
+WINPLIBS =
 endif
 
 TILEUTIL16  = $(UTIL)/tile2bmp.exe
@@ -555,10 +562,10 @@ tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
 ifeq  "$(GRAPHICAL)" "Y"
-$(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
-	$(WIN32)\mnselcnt.bmp $(WIN32)\mnunsel.bmp \
-	$(WIN32)\petmark.bmp $(WIN32)\NetHack.ico $(WIN32)\rip.bmp \
-	$(WIN32)\splash.bmp
+$(NHRES): $(TILEBMP16) $(WIN32)/winhack.rc $(WIN32)/mnsel.bmp \
+ $(WIN32)/mnselcnt.bmp $(WIN32)/mnunsel.bmp \
+ $(WIN32)/petmark.bmp $(WIN32)/NetHack.ico $(WIN32)/rip.bmp \
+ $(WIN32)/splash.bmp
 	@$(rc) -o$@ --include-dir $(WIN32) -i $(WIN32)/winhack.rc
 else
 $(NHRES): $(NTSYS)/console.rc $(NTSYS)/NetHack.ico 
@@ -571,7 +578,7 @@ endif
 
 $(GAMEFILE) : $(ALLOBJ) $(NHRES)
 	@echo Linking....
-	@$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES)
+ @$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES) $(WINPLIBS)
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 $(GAME)_.ico : $(NTSYS)/$(GAME).ico

@@ -92,7 +92,11 @@ libsmt  = $(bcclib)\cw32mt.lib $(bcclib)\import32.lib
 #  Set the gamedir according to your preference.  
 #  It must be present prior to compilation.
 
+!IF "$(GRAPHICAL)" == "Y"
+GAME    = NetHackW                # Game Name
+!ELSE
 GAME    = NetHack                 # Game Name
+!ENDIF
 GAMEDIR = ..\binary               # Game directory
 
 #

@@ -96,7 +96,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "nethackw"=.\build\nethackw.dsp - Package Owner=<4>
+Project: "NetHackW"=.\build\NetHackW.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
