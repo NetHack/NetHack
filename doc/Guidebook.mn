@@ -1785,8 +1785,9 @@ off makes just looking at things faster, since you aren't interrupted with the
 interesting and/or important information.
 .lp hilite_pet
 Visually distinguish pets from similar animals (default off).
-In text windowing, use text highlighting when color is turned off;
-with X tiles, display a heart symbol near pets.
+The behavior of this option depends on the type of windowing you use.
+In text windowing, text highlighting or inverse video is often used;
+with tiles, generally displays a heart symbol near pets.
 .lp horsename
 Name your starting horse (ex. ``horsename:Trigger'').
 Cannot be set with the `O' command.
