@@ -256,7 +256,9 @@ add_menu(windid window, int glyph, const anything identifier,
 		   window port cannot or does not want to display it, this
 		   is OK.  If there is no glyph applicable, then this
 		   value will be NO_GLYPH.
-		-- All accelerators should be in the range [A-Za-z].
+		-- All accelerators should be in the range [A-Za-z],
+		   but there are a few exceptions such as the tty player
+		   selection code which uses '*'.
 	        -- It is expected that callers do not mix accelerator
 		   choices.  Either all selectable items have an accelerator
 		   or let the window system pick them.  Don't do both.
