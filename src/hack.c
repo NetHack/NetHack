@@ -772,7 +772,7 @@ boolean guess;
 		for (ty = 0; ty < ROWNO; ++ty)
 		    if (travel[tx][ty]) {
 			d = distmin(ux, uy, tx, ty);
-			if (d < dist && couldsee(ux, uy)) {
+			if (d < dist && couldsee(tx, ty)) {
 			    px = tx; py = ty; dist = d;
 			}
 		    }
