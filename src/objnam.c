@@ -231,12 +231,11 @@ register struct obj *obj;
 	buf[0] = '\0';
 	/*
 	 * clean up known when it's tied to oc_name_known, eg after AD_DRIN
-	 * This is only required for unique objects and the Fake AoY since the
-	 * article printed for the object is tied to the combination of the two
+	 * This is only required for unique objects since the article
+	 * printed for the object is tied to the combination of the two
 	 * and printing the wrong article gives away information.
 	 */
-	if (!nn && ocl->oc_uses_known &&
-	    (ocl->oc_unique || typ == FAKE_AMULET_OF_YENDOR)) obj->known = 0;
+	if (!nn && ocl->oc_uses_known && ocl->oc_unique) obj->known = 0;
 	if (!Blind) obj->dknown = TRUE;
 	if (Role_if(PM_PRIEST)) obj->bknown = TRUE;
 	if (obj_is_pname(obj))
