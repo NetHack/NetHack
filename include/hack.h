@@ -24,11 +24,11 @@
 
 /* symbolic names for capacity levels */
 #define UNENCUMBERED	0
-#define SLT_ENCUMBER	1
-#define MOD_ENCUMBER	2
-#define HVY_ENCUMBER	3
-#define EXT_ENCUMBER	4
-#define OVERLOADED	5
+#define SLT_ENCUMBER	1	/* Burdened */
+#define MOD_ENCUMBER	2	/* Stressed */
+#define HVY_ENCUMBER	3	/* Strained */
+#define EXT_ENCUMBER	4	/* Overtaxed */
+#define OVERLOADED	5	/* Overloaded */
 
 /* Macros for how a rumor was delivered in outrumor() */
 #define BY_ORACLE	0
