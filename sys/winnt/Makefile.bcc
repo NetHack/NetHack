@@ -1,4 +1,4 @@
-#   SCCS Id: @(#)Makefile.bcc       3.4     2002/02/04
+#   SCCS Id: @(#)Makefile.bcc       3.4     2002/03/03
 #   Copyright (c) NetHack PC Development Team 1993-2002
 #
 #   NetHack 3.4.x Makefile for Borland C++ V5.5.1 and above and Borland's MAKE
@@ -191,27 +191,30 @@ PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 ################################################
 
 !IF "$(GRAPHICAL)" == "Y"
-TILEGAME  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
+WINPORT  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
-TILEDEF   = -DTILES -DMSWIN_GRAPHICS
-TILERES   = $(O)winhack.res
-TILEINCL  = -I$(WIN32)
-TILEHDR   = $(WIN32)\mhaskyn.h $(WIN32)\mhdlg.h $(WIN32)\mhfont.h \
+WINPFLAG   = -DTILES -DMSWIN_GRAPHICS
+NHRES   = $(O)winhack.res
+WINPINC  = -I$(WIN32)
+WINPHDR   = $(WIN32)\mhaskyn.h $(WIN32)\mhdlg.h $(WIN32)\mhfont.h \
 	$(WIN32)\mhinput.h $(WIN32)\mhmain.h $(WIN32)\mhmap.h $(WIN32)\mhmenu.h \
 	$(WIN32)\mhmsg.h $(WIN32)\mhmsgwnd.h $(WIN32)\mhrip.h $(WIN32)\mhstatus.h \
 	$(WIN32)\mhtext.h $(WIN32)\resource.h $(WIN32)\winMS.h
 !ELSE
-TILEGAME  = $(O)nttty.o    
-TILEDEF   = -DWIN32CON
-TILEHDR   =
-TILERES   = $(O)console.res
-TILEINCL  =
+WINPORT  = $(O)nttty.o    
+WINPFLAG   = -DWIN32CON
+WINPHDR   =
+NHRES   = $(O)console.res
+WINPINC  =
 !ENDIF
 
-TILEUTIL  = $(UTIL)\tile2bmp.exe
-TILEBMP   = $(SRC)\tiles.bmp
+TILEUTIL16  = $(UTIL)\tile2bmp.exe
+TILEBMP16   = $(SRC)\tiles.bmp
+
+TILEUTIL32  = $(UTIL)\til2bm32.exe
+TILEBMP32   = $(SRC)\tiles32.bmp
 
 # These should be left commented in 3.4.x
 #
@@ -241,14 +244,14 @@ DLBFLG =
 # macros. All builds include the base ones.
 #==========================================
 
-CFLAGSBASE  = -c $(cflags) $(cvarsmt) -I$(INCL) $(TILEINCL) -q $(cdebug) -v
+CFLAGSBASE  = -c $(cflags) $(cvarsmt) -I$(INCL) $(WINPINC) -q $(cdebug) -v
 LFLAGSBASE  = $(linkdebug) $(verlflags) -L$(bcclib) -v
 
 #==========================================
 # Util builds
 #==========================================
 
-CFLAGSU = $(CFLAGSBASE) 
+CFLAGSU = $(CFLAGSBASE) $(WINPFLAG)
 LFLAGSU	= $(LFLAGSBASE)
 
 #==========================================
@@ -256,7 +259,7 @@ LFLAGSU	= $(LFLAGSBASE)
 #==========================================
 
 LFLAGSBASE = $(linkdebug) $(conflags) 
-CFLAGS	 = $(CFLAGSBASE) $(TILEDEF) $(DLBFLG)
+CFLAGS	 = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
 NHLFLAGS1 = /Gn /v /m /s /Gz /q /c
 lflags	= $(LFLAGSBASE) $(NHLFLAGS1)
 
@@ -431,12 +434,18 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
          $(VOBJ26) $(VOBJ27)
 
-TILOBJ = $(TILEGAME)
+TILOBJ = $(WINPORT)
 
 VVOBJ  = $(O)version.o
 
 ALLOBJ  = $(TILOBJ) $(SOBJ) $(DLBOBJ)  $(TTYOBJ) $(WOBJ) $(OBJS) $(VVOBJ)
 
+
+!IF "$(GRAPHICAL)" == "Y"
+OPTIONS_FILE = $(DAT)\guioptions
+!ELSE
+OPTIONS_FILE = $(DAT)\ttyoptions
+!ENDIF
 #==========================================
 # Header file macros
 #==========================================
@@ -566,7 +575,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
 		$(SRC)\monstr.c		$(SRC)\vis_tab.c  \
 		$(U)lev_comp.exe	$(INCL)\vis_tab.h \
-		$(U)dgn_comp.exe $(U)recover.exe  $(TILEUTIL)
+		$(U)dgn_comp.exe $(U)recover.exe  $(TILEUTIL16)
              @echo utilities made >$@
 	     @echo utilities made.
 
@@ -574,10 +583,10 @@ tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
 !IF "$(GRAPHICAL)"=="Y"
-$(TILERES): $(TILEBMP) $(WIN32)\winhack.rc
+$(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc
 	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
 !ELSE
-$(TILERES): $(NTSYS)\console.rc
+$(NHRES): $(NTSYS)\console.rc
 	@$(rc) -r -fo$@ -i$(NTSYS) -dNDEBUG $(NTSYS)\console.rc
 !ENDIF
 
@@ -588,9 +597,9 @@ $(TILERES): $(NTSYS)\console.rc
 $(SRC)\uuid.lib: $(bcclib)\uuid.lib
 	@copy $(bcclib)\uuid.lib $@
 
-$(GAMEFILE) : $(ALLOBJ) $(TILERES) $(SRC)\uuid.lib
+$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(SRC)\uuid.lib
 	@echo Linking....
-	@$(link) $(lflags) $(startobjg) $(ALLOBJ), $@, $(GAME).map,$(libsmt),,$(TILERES)
+	@$(link) $(lflags) $(startobjg) $(ALLOBJ), $@, $(GAME).map,$(libsmt),,$(NHRES)
 	@if exist $(O)install.tag del $(O)install.tag
 	@if exist $(GAMEDIR)\$(GAME).bak del $(GAMEDIR)\$(GAME).bak
 
@@ -802,14 +811,16 @@ $(O)dlb.o:	$(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 	@$(cc) $(CFLAGS) -o$@ $(UTIL)\dlb_main.c
 
-nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(DAT)\options \
+nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon \
 	$(DAT)\license $(O)sp_lev.tag
 	cd $(DAT)
 	echo data >dlb.lst
 	echo oracles >>dlb.lst
-	echo options >>dlb.lst
+	if exist options echo options >>dlb.lst
+	if exist ttyoptions echo ttyoptions >>dlb.lst
+	if exist guioptions echo guioptions >>dlb.lst
 	echo quest.dat >>dlb.lst
 	echo rumors >>dlb.lst
 	echo help >>dlb.lst
@@ -877,9 +888,9 @@ $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO) $(SRC)\uuid.lib
 
 
 !IF "$(GRAPHICAL)"=="Y"
-$(TILEBMP): $(TILEUTIL) $(TILEFILES)
-	@echo Creating binary tile files (this may take some time)
-	@$(U)tile2bmp $(TILEBMP)
+$(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
+	@echo Creating 16x16 binary tile files (this may take some time)
+	@$(U)tile2bmp $(TILEBMP16)
 !ENDIF
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO) $(SRC)\uuid.lib
@@ -929,6 +940,8 @@ spotless: clean
 	if exist $(DAT)\medusa-?.lev	del $(DAT)\medusa-?.lev
 	if exist $(DAT)\mine*.lev	del $(DAT)\mine*.lev
 	if exist $(DAT)\options		del $(DAT)\options
+	if exist $(DAT)\ttyoptions	del $(DAT)\ttyoptions
+	if exist $(DAT)\guioptions	del $(DAT)\guioptions
 	if exist $(DAT)\oracle.lev	del $(DAT)\oracle.lev
 	if exist $(DAT)\oracles		del $(DAT)\oracles
 	if exist $(DAT)\orcus.lev	del $(DAT)\orcus.lev
@@ -954,7 +967,7 @@ clean:
 	if exist $(U)dgn_comp.exe  del $(U)dgn_comp.exe
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
-	if exist $(TILEBMP)        del $(TILEBMP)
+	if exist $(TILEBMP16)        del $(TILEBMP16)
 
 #===================================================================
 # OTHER DEPENDENCIES

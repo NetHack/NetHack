@@ -36,6 +36,16 @@
 #define NO_TERMS
 #define ASCIIGRAPH
 
+#ifdef OPTIONS_USED
+#undef OPTIONS_USED
+#endif
+#ifdef MSWIN_GRAPHICS
+#define OPTIONS_USED	"guioptions"
+#else
+#define OPTIONS_USED	"ttyoptions"
+#endif
+#define OPTIONS_FILE OPTIONS_USED
+
 /* The following is needed for prototypes of certain functions */
 #if defined(_MSC_VER)
 #include <process.h>	/* Provides prototypes of exit(), spawn()      */

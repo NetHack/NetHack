@@ -191,7 +191,7 @@ LFLAGSBASEG = $(linkdebug) $(guiflags) $(guilibsmt) comctl32.lib
 # Util builds
 #==========================================
 
-CFLAGSU = $(CFLAGSBASE)
+CFLAGSU = $(CFLAGSBASE) $(WINPFLAG)
 LFLAGSU	= $(LFLAGSBASEC)
 
 #==========================================
@@ -390,6 +390,11 @@ VVOBJ  = $(O)version.o
 
 ALLOBJ  = $(WINPOBJ) $(SOBJ) $(DLBOBJ)  $(TTYOBJ) $(WOBJ) $(OBJS) $(VVOBJ)
 
+!IF "$(GRAPHICAL)" == "Y"
+OPTIONS_FILE = $(DAT)\guioptions
+!ELSE
+OPTIONS_FILE = $(DAT)\ttyoptions
+!ENDIF
 #==========================================
 # Header file macros
 #==========================================
@@ -834,14 +839,16 @@ $(O)dlb.o:	$(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 	@$(CC) $(CFLAGS) /Fo$@ $(UTIL)\dlb_main.c
 
-nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(DAT)\options \
+nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon \
 	$(DAT)\license $(O)sp_lev.tag
 	cd $(DAT)
 	echo data >dlb.lst
 	echo oracles >>dlb.lst
-	echo options >>dlb.lst
+	if exist options echo options >>dlb.lst
+	if exist ttyoptions echo ttyoptions >>dlb.lst
+	if exist guioptions echo guioptions >>dlb.lst
 	echo quest.dat >>dlb.lst
 	echo rumors >>dlb.lst
 	echo help >>dlb.lst
@@ -1006,6 +1013,8 @@ spotless: clean
 	if exist $(DAT)\medusa-?.lev	del $(DAT)\medusa-?.lev
 	if exist $(DAT)\mine*.lev	del $(DAT)\mine*.lev
 	if exist $(DAT)\options		del $(DAT)\options
+	if exist $(DAT)\ttyoptions	del $(DAT)\ttyoptions
+	if exist $(DAT)\guioptions	del $(DAT)\guioptions
 	if exist $(DAT)\oracle.lev	del $(DAT)\oracle.lev
 	if exist $(DAT)\oracles		del $(DAT)\oracles
 	if exist $(DAT)\orcus.lev	del $(DAT)\orcus.lev
