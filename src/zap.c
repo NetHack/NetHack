@@ -3666,9 +3666,16 @@ boolean *shopdamage;
 			    newsym(x,y);
 			}
 		    }
+		    if (!lava) {
+			start_melt_ice_timeout(x,y);
+			obj_ice_effects(x,y,TRUE);
+		    }
 		}
-		start_melt_ice_timeout(x,y);
-		obj_ice_effects(x,y,TRUE);
+	}
+	else if(abstype == ZT_COLD && is_ice(x,y)) {
+		/* Already ice here, so just firm it up. */
+		spot_stop_timers(x, y, MELT_ICE_AWAY); /* stop existing timer */
+		start_melt_ice_timeout(x,y);	       /* start new timer */
 	}
 	if(closed_door(x, y)) {
 		int new_doormask = -1;
