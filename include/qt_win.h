@@ -22,7 +22,7 @@
 #include <qlabel.h>
 #include <qlineedit.h> 
 #if defined(QWS)
-#include <qpeapplication.h> 
+#include <qpe/qpeapplication.h> 
 #else
 #include <qapplication.h> 
 #endif
@@ -711,6 +711,7 @@ public slots:
 protected:
 	virtual void resizeEvent(QResizeEvent*);
 	virtual void keyPressEvent(QKeyEvent*);
+	virtual void keyReleaseEvent(QKeyEvent* event);
 	virtual void closeEvent(QCloseEvent*);
 
 private slots:
@@ -734,6 +735,7 @@ private:
 
 	NetHackQtKeyBuffer& keysink;
 	QWidgetStack* stack;
+	int dirkey;
 
 	const char* *macro;
 };

@@ -3482,7 +3482,7 @@ public:
 
 NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     message(0), map(0), status(0), invusage(0),
-    keysink(ks)
+    keysink(ks), dirkey(0)
 {
     QToolBar* toolbar = new QToolBar(this);
 #if QT_VERSION >= 210
@@ -3889,6 +3889,15 @@ void NetHackQtMainWindow::resizeEvent(QResizeEvent*)
 #endif         
 }
 
+void NetHackQtMainWindow::keyReleaseEvent(QKeyEvent* event)
+{
+    if ( dirkey ) {
+	doKeys(QString(QChar(dirkey)));
+	if ( !event->isAutoRepeat() )
+	    dirkey = 0;
+    }
+}
+
 void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 {
     // Global key controls
@@ -3897,33 +3906,52 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
     // to think that's the way to move. For handhelds, the normal way is to
     // click-to-travel, so we allow the cursor keys for fine movements.
 
+    //  321
+    //  4 0
+    //  567
+
+    if ( event->isAutoRepeat() &&
+	event->key() >= Key_Left && event->key() <= Key_Down )
+	return;
+
     const char* d = iflags.num_pad ? ndir : sdir; 
     switch (event->key()) {
      case Key_Up:
-	if (qt_compact_mode)
-	    keysink.Put(d[2]);
+	if ( dirkey == d[0] )
+	    dirkey = d[1];
+	else if ( dirkey == d[4] )
+	    dirkey = d[3];
 	else
-	    if (map) map->Scroll(0,-1);
+	    dirkey = d[2];
     break; case Key_Down:
-	if (qt_compact_mode)
-	    keysink.Put(d[6]);
+	if ( dirkey == d[0] )
+	    dirkey = d[7];
+	else if ( dirkey == d[4] )
+	    dirkey = d[5];
 	else
-	    if (map) map->Scroll(0,+1);
+	    dirkey = d[6];
     break; case Key_Left:
-	if (qt_compact_mode)
-	    keysink.Put(d[0]);
+	if ( dirkey == d[2] )
+	    dirkey = d[1];
+	else if ( dirkey == d[6] )
+	    dirkey = d[7];
 	else
-	    if (map) map->Scroll(-1,0);
+	    dirkey = d[0];
     break; case Key_Right:
-	if (qt_compact_mode)
-	    keysink.Put(d[4]);
+	if ( dirkey == d[2] )
+	    dirkey = d[3];
+	else if ( dirkey == d[6] )
+	    dirkey = d[5];
 	else
-	    if (map) map->Scroll(+1,0);
+	    dirkey = d[4];
     break; case Key_Prior:
+	dirkey = 0;
 	if (message) message->Scroll(0,-1);
     break; case Key_Next:
+	dirkey = 0;
 	if (message) message->Scroll(0,+1);
     break; default:
+	dirkey = 0;
 	event->ignore();
     }
 }
@@ -4391,7 +4419,7 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
 
 void NetHackQtBind::qt_init_nhwindows(int* argc, char** argv)
 {
-#ifdef _WS_X11_
+#ifdef UNIX
 // Userid control
 //
 // Michael Hohmuth <hohmuth@inf.tu-dresden.de>...
@@ -4409,7 +4437,7 @@ void NetHackQtBind::qt_init_nhwindows(int* argc, char** argv)
     QApplication::setColorSpec(ManyColor);
     instance=new NetHackQtBind(*argc,argv);
 
-#ifdef _WS_X11_
+#ifdef UNIX
     seteuid(gamesuid);
 #endif
 
@@ -5019,7 +5047,8 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 {
     // Ignore Alt-key navigation to menubar, it's annoying when you
     // use Alt-Direction to move around.
-    if ( main && event->type()==QEvent::KeyRelease && main==receiver )
+    if ( main && event->type()==QEvent::KeyRelease && main==receiver
+	    && ((QKeyEvent*)event)->key() == Key_Alt )
 	return TRUE;
 
     bool result=QApplication::notify(receiver,event);
