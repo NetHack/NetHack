@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkmaze.c	3.4	2001/09/06	*/
+/*	SCCS Id: @(#)mkmaze.c	3.4	2002/03/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -523,7 +523,7 @@ register const char *s;
 		/* rindex always succeeds due to code in prior block */
 		int len = (rindex(protofile, '-') - protofile) + 1;
 
-		while (*ep) {
+		while (ep && *ep) {
 		    if (!strncmp(ep, protofile, len)) {
 			int pick = atoi(ep + len);
 			/* use choice only if valid */
@@ -544,7 +544,7 @@ register const char *s;
 	    if(load_special(protofile)) {
 		fixup_special();
 		/* some levels can end up with monsters
-                   on dead mon list, including light source monsters */
+		   on dead mon list, including light source monsters */
 		dmonsfree();
 		return;	/* no mazification right now */
 	    }
