@@ -3548,7 +3548,7 @@ register int dx,dy;
 		}
 	    } else if (!Blind) {
 		pline("%s whizzes by you!", The(fltxt));
-	    } else {
+	    } else if (abstype == ZT_LIGHTNING) {
 		Your("%s tingles.", body_part(ARM));
 	    }
 	    if (abstype == ZT_LIGHTNING) (void) flashburn((long)d(nd,50));
