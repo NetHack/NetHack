@@ -608,11 +608,11 @@ dismount_steed(reason)
 	    in_steed_dismounting = TRUE;
 	    (void) float_down(0L, W_SADDLE);
 	    in_steed_dismounting = FALSE;
-	    flags.botl = 1;
+	    context.botl = 1;
 	    (void)encumber_msg();
 	    vision_full_recalc = 1;
 	} else
-	    flags.botl = 1;
+	    context.botl = 1;
 	/* polearms behave differently when not mounted */
 	if (uwep && is_pole(uwep)) unweapon = TRUE;
 	return;

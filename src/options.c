@@ -524,8 +524,6 @@ initoptions()
 		warnsyms[i] = def_warnsyms[i].sym;
 	iflags.bouldersym = 0;
 	iflags.travelcc.x = iflags.travelcc.y = -1;
-	flags.warnlevel = 1;
-	flags.warntype = 0L;
 
      /* assert( sizeof flags.inv_order == sizeof def_inv_order ); */
 	(void)memcpy((genericptr_t)flags.inv_order,
@@ -2162,7 +2160,7 @@ goodfruit:
 			 || (boolopt[i].addr) == &flags.showscore
 #endif
 			    )
-			    flags.botl = TRUE;
+			    context.botl = TRUE;
 
 			else if ((boolopt[i].addr) == &flags.invlet_constant) {
 			    if (flags.invlet_constant) reassign();

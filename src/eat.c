@@ -134,28 +134,6 @@ static const struct { const char *txt; int nut; } tintxts[] = {
 };
 #define TTSZ	SIZE(tintxts)
 
-static NEARDATA struct {
-	struct	obj *tin;
-	int	usedtime, reqtime;
-} tin;
-
-static NEARDATA struct {
-	struct	obj *piece;	/* the thing being eaten, or last thing that
-				 * was partially eaten, unless that thing was
-				 * a tin, which uses the tin structure above,
-				 * in which case this should be 0 */
-	/* doeat() initializes these when piece is valid */
-	int	usedtime,	/* turns spent eating */
-		reqtime;	/* turns required to eat */
-	int	nmod;		/* coded nutrition per turn */
-	Bitfield(canchoke,1);	/* was satiated at beginning */
-
-	/* start_eating() initializes these */
-	Bitfield(fullwarn,1);	/* have warned about being full */
-	Bitfield(eating,1);	/* victual currently being eaten */
-	Bitfield(doreset,1);	/* stop eating at end of turn */
-} victual;
-
 static char *eatmbuf = 0;	/* set by cpostfx() */
 
 STATIC_PTR
@@ -260,12 +238,12 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 STATIC_OVL void
 recalc_wt()
 {
-	struct obj *piece = victual.piece;
+	struct obj *piece = context.victual.piece;
 
 #ifdef DEBUG
 	debugpline("Old weight = %d", piece->owt);
 	debugpline("Used time = %d, Req'd time = %d",
-		victual.usedtime, victual.reqtime);
+		context.victual.usedtime, context.victual.reqtime);
 #endif
 	piece->owt = weight(piece);
 #ifdef DEBUG
@@ -279,11 +257,11 @@ reset_eat()		/* called when eating interrupted by an event */
     /* we only set a flag here - the actual reset process is done after
      * the round is spent eating.
      */
-	if(victual.eating && !victual.doreset) {
+	if(context.victual.eating && !context.victual.doreset) {
 #ifdef DEBUG
 	    debugpline("reset_eat...");
 #endif
-	    victual.doreset = TRUE;
+	    context.victual.doreset = TRUE;
 	}
 	return;
 }
@@ -339,7 +317,10 @@ void
 food_disappears(obj)
 register struct obj *obj;
 {
-	if (obj == victual.piece) victual.piece = (struct obj *)0;
+	if (obj == context.victual.piece) {
+		context.victual.piece = (struct obj *)0;
+		context.victual.o_id = 0;
+	}
 	if (obj->timed) obj_stop_timers(obj);
 }
 
@@ -350,8 +331,11 @@ void
 food_substitution(old_obj, new_obj)
 struct obj *old_obj, *new_obj;
 {
-	if (old_obj == victual.piece) victual.piece = new_obj;
-	if (old_obj == tin.tin) tin.tin = new_obj;
+	if (old_obj == context.victual.piece) {
+		context.victual.piece = new_obj;
+		context.victual.o_id = new_obj->o_id;
+	}
+	if (old_obj == context.tin.tin) context.tin.tin = new_obj;
 }
 
 STATIC_OVL void
@@ -360,11 +344,12 @@ do_reset_eat()
 #ifdef DEBUG
 	debugpline("do_reset_eat...");
 #endif
-	if (victual.piece) {
-		victual.piece = touchfood(victual.piece);
+	if (context.victual.piece) {
+		context.victual.o_id = 0;
+		context.victual.piece = touchfood(context.victual.piece);
 		recalc_wt();
 	}
-	victual.fullwarn = victual.eating = victual.doreset = FALSE;
+	context.victual.fullwarn = context.victual.eating = context.victual.doreset = FALSE;
 	/* Do not set canchoke to FALSE; if we continue eating the same object
 	 * we need to know if canchoke was set when they started eating it the
 	 * previous time.  And if we don't continue eating the same object
@@ -378,15 +363,16 @@ STATIC_PTR
 int
 eatfood()		/* called each move during eating process */
 {
-	if(!victual.piece ||
-	 (!carried(victual.piece) && !obj_here(victual.piece, u.ux, u.uy))) {
+	if(!context.victual.piece ||
+	   (!carried(context.victual.piece) &&
+	    !obj_here(context.victual.piece, u.ux, u.uy))) {
 		/* maybe it was stolen? */
 		do_reset_eat();
 		return(0);
 	}
-	if(!victual.eating) return(0);
+	if(!context.victual.eating) return(0);
 
-	if(++victual.usedtime <= victual.reqtime) {
+	if(++context.victual.usedtime <= context.victual.reqtime) {
 	    if(bite()) return(0);
 	    return(1);	/* still busy */
 	} else {	/* done */
@@ -399,24 +385,25 @@ STATIC_OVL void
 done_eating(message)
 boolean message;
 {
-	victual.piece->in_use = TRUE;
+	context.victual.piece->in_use = TRUE;
 	occupation = 0; /* do this early, so newuhs() knows we're done */
 	newuhs(FALSE);
 	if (nomovemsg) {
 		if (message) pline(nomovemsg);
 		nomovemsg = 0;
 	} else if (message)
-		You("finish eating %s.", food_xname(victual.piece, TRUE));
+		You("finish eating %s.", food_xname(context.victual.piece, TRUE));
 
-	if(victual.piece->otyp == CORPSE)
-		cpostfx(victual.piece->corpsenm);
+	if(context.victual.piece->otyp == CORPSE)
+		cpostfx(context.victual.piece->corpsenm);
 	else
-		fpostfx(victual.piece);
+		fpostfx(context.victual.piece);
 
-	if (carried(victual.piece)) useup(victual.piece);
-	else useupf(victual.piece, 1L);
-	victual.piece = (struct obj *) 0;
-	victual.fullwarn = victual.eating = victual.doreset = FALSE;
+	if (carried(context.victual.piece)) useup(context.victual.piece);
+	else useupf(context.victual.piece, 1L);
+	context.victual.piece = (struct obj *) 0;
+	context.victual.o_id = 0;
+	context.victual.fullwarn = context.victual.eating = context.victual.doreset = FALSE;
 }
 
 STATIC_OVL void
@@ -439,8 +426,8 @@ register int pm;
 		killer = killer_buf;
 		You("turn to stone.");
 		done(STONING);
-		if (victual.piece)
-		    victual.eating = FALSE;
+		if (context.victual.piece)
+		    context.victual.eating = FALSE;
 		return; /* lifesaved */
 	    }
 	}
@@ -471,10 +458,10 @@ register int pm;
 		    killer_format = NO_KILLER_PREFIX;
 		    done(DIED);
 		    /* It so happens that since we know these monsters */
-		    /* cannot appear in tins, victual.piece will always */
+		    /* cannot appear in tins, context.victual.piece will always */
 		    /* be what we want, which is not generally true. */
-		    if (revive_corpse(victual.piece))
-			victual.piece = (struct obj *)0;
+		    if (revive_corpse(context.victual.piece))
+			context.victual.piece = (struct obj *)0;
 		    return;
 		}
 	    case PM_GREEN_SLIME:
@@ -485,7 +472,7 @@ register int pm;
 			youmonst.data != &mons[PM_GREEN_SLIME]) {
 		    You("don't feel very well.");
 		    Slimed = 10L;
-		    flags.botl = 1;
+		    context.botl = 1;
 		}
 		/* Fall through */
 	    default:
@@ -776,7 +763,7 @@ register int pm;
 		    }
 		    if (old_uen != u.uen) {
 			    You_feel("a mild buzz.");
-			    flags.botl = 1;
+			    context.botl = 1;
 		    }
 		}
 		break;
@@ -798,7 +785,7 @@ register int pm;
 	    case PM_NURSE:
 		if (Upolyd) u.mh = u.mhmax;
 		else u.uhp = u.uhpmax;
-		flags.botl = 1;
+		context.botl = 1;
 		break;
 	    case PM_STALKER:
 		if(!Invis) {
@@ -975,74 +962,74 @@ opentin()		/* called during each move whilst opening a tin */
 	const char *what;
 	int which;
 
-	if(!carried(tin.tin) && !obj_here(tin.tin, u.ux, u.uy))
+	if(!carried(context.tin.tin) && !obj_here(context.tin.tin, u.ux, u.uy))
 					/* perhaps it was stolen? */
 		return(0);		/* %% probably we should use tinoid */
-	if(tin.usedtime++ >= 50) {
+	if(context.tin.usedtime++ >= 50) {
 		You("give up your attempt to open the tin.");
 		return(0);
 	}
-	if(tin.usedtime < tin.reqtime)
+	if(context.tin.usedtime < context.tin.reqtime)
 		return(1);		/* still busy */
-	if(tin.tin->otrapped ||
-	   (tin.tin->cursed && tin.tin->spe != -1 && !rn2(8))) {
+	if(context.tin.tin->otrapped ||
+	   (context.tin.tin->cursed && context.tin.tin->spe != -1 && !rn2(8))) {
 		b_trapped("tin", 0);
 		goto use_me;
 	}
 	You("succeed in opening the tin.");
-	if(tin.tin->spe != 1) {
-	    if (tin.tin->corpsenm == NON_PM) {
+	if(context.tin.tin->spe != 1) {
+	    if (context.tin.tin->corpsenm == NON_PM) {
 		pline("It turns out to be empty.");
-		tin.tin->dknown = tin.tin->known = TRUE;
+		context.tin.tin->dknown = context.tin.tin->known = TRUE;
 		goto use_me;
 	    }
-	    r = tin.tin->cursed ? ROTTEN_TIN :	/* always rotten if cursed */
-		    (tin.tin->spe == -1) ? HOMEMADE_TIN :  /* player made it */
+	    r = context.tin.tin->cursed ? ROTTEN_TIN :	/* always rotten if cursed */
+		    (context.tin.tin->spe == -1) ? HOMEMADE_TIN :  /* player made it */
 			rn2(TTSZ-1);		/* else take your pick */
-	    if (r == ROTTEN_TIN && (tin.tin->corpsenm == PM_LIZARD ||
-			tin.tin->corpsenm == PM_LICHEN))
+	    if (r == ROTTEN_TIN && (context.tin.tin->corpsenm == PM_LIZARD ||
+			context.tin.tin->corpsenm == PM_LICHEN))
 		r = HOMEMADE_TIN;		/* lizards don't rot */
-	    else if (tin.tin->spe == -1 && !tin.tin->blessed && !rn2(7))
+	    else if (context.tin.tin->spe == -1 && !context.tin.tin->blessed && !rn2(7))
 		r = ROTTEN_TIN;			/* some homemade tins go bad */
 	    which = 0;	/* 0=>plural, 1=>as-is, 2=>"the" prefix */
 	    if (Hallucination) {
 		what = rndmonnam();
 	    } else {
-		what = mons[tin.tin->corpsenm].mname;
-		if (mons[tin.tin->corpsenm].geno & G_UNIQ)
-		    which = type_is_pname(&mons[tin.tin->corpsenm]) ? 1 : 2;
+		what = mons[context.tin.tin->corpsenm].mname;
+		if (mons[context.tin.tin->corpsenm].geno & G_UNIQ)
+		    which = type_is_pname(&mons[context.tin.tin->corpsenm]) ? 1 : 2;
 	    }
 	    if (which == 0) what = makeplural(what);
 	    pline("It smells like %s%s.", (which == 2) ? "the " : "", what);
 	    if (yn("Eat it?") == 'n') {
-		if (!Hallucination) tin.tin->dknown = tin.tin->known = TRUE;
+		if (!Hallucination) context.tin.tin->dknown = context.tin.tin->known = TRUE;
 		if (flags.verbose) You("discard the open tin.");
 		goto use_me;
 	    }
 	    /* in case stop_occupation() was called on previous meal */
-	    victual.piece = (struct obj *)0;
-	    victual.fullwarn = victual.eating = victual.doreset = FALSE;
+	    context.victual.piece = (struct obj *)0;
+	    context.victual.fullwarn = context.victual.eating = context.victual.doreset = FALSE;
 
 	    You("consume %s %s.", tintxts[r].txt,
-			mons[tin.tin->corpsenm].mname);
+			mons[context.tin.tin->corpsenm].mname);
 
 	    /* KMH, conduct */
 	    u.uconduct.food++;
-	    if (!vegan(&mons[tin.tin->corpsenm]))
+	    if (!vegan(&mons[context.tin.tin->corpsenm]))
 		u.uconduct.unvegan++;
-	    if (!vegetarian(&mons[tin.tin->corpsenm]))
+	    if (!vegetarian(&mons[context.tin.tin->corpsenm]))
 		violated_vegetarian();
 
-	    tin.tin->dknown = tin.tin->known = TRUE;
-	    cprefx(tin.tin->corpsenm); cpostfx(tin.tin->corpsenm);
+	    context.tin.tin->dknown = context.tin.tin->known = TRUE;
+	    cprefx(context.tin.tin->corpsenm); cpostfx(context.tin.tin->corpsenm);
 
-	    if(((!carried(tin.tin) && costly_spot(tin.tin->ox, tin.tin->oy) &&
-		 !tin.tin->no_charge)
-		|| tin.tin->unpaid)) {
+	    if(((!carried(context.tin.tin) && costly_spot(context.tin.tin->ox, context.tin.tin->oy) &&
+		 !context.tin.tin->no_charge)
+		|| context.tin.tin->unpaid)) {
 		verbalize("You open it, you bought it!");
 		/* charge for one at pre-eating cost */
-		if(tin.tin->quan > 1L) tin.tin = splitobj(tin.tin, 1L);
-		bill_dummy_object(tin.tin);
+		if(context.tin.tin->quan > 1L) context.tin.tin = splitobj(context.tin.tin, 1L);
+		bill_dummy_object(context.tin.tin);
 	    }
 
 	    /* check for vomiting added by GAN 01/16/87 */
@@ -1056,41 +1043,41 @@ opentin()		/* called during each move whilst opening a tin */
 		      makeplural(body_part(FINGER)));
 	    }
 	} else {
-	    if (tin.tin->cursed)
+	    if (context.tin.tin->cursed)
 		pline("It contains some decaying%s%s substance.",
 			Blind ? "" : " ", Blind ? "" : hcolor(NH_GREEN));
 	    else
 		pline("It contains spinach.");
 
 	    if (yn("Eat it?") == 'n') {
-		if (!Hallucination && !tin.tin->cursed)
-		    tin.tin->dknown = tin.tin->known = TRUE;
+		if (!Hallucination && !context.tin.tin->cursed)
+		    context.tin.tin->dknown = context.tin.tin->known = TRUE;
 		if (flags.verbose)
 		    You("discard the open tin.");
 		goto use_me;
 	    }
 
-	    tin.tin->dknown = tin.tin->known = TRUE;
-	    if(((!carried(tin.tin) && costly_spot(tin.tin->ox, tin.tin->oy) &&
-		 !tin.tin->no_charge)
-		|| tin.tin->unpaid)) {
+	    context.tin.tin->dknown = context.tin.tin->known = TRUE;
+	    if(((!carried(context.tin.tin) && costly_spot(context.tin.tin->ox, context.tin.tin->oy) &&
+		 !context.tin.tin->no_charge)
+		|| context.tin.tin->unpaid)) {
 		verbalize("You open it, you bought it!");
 		/* charge for one at pre-eating cost */
-		if(tin.tin->quan > 1L) tin.tin = splitobj(tin.tin, 1L);
-		bill_dummy_object(tin.tin);
+		if(context.tin.tin->quan > 1L) context.tin.tin = splitobj(context.tin.tin, 1L);
+		bill_dummy_object(context.tin.tin);
 	    }
 
-	    if (!tin.tin->cursed)
+	    if (!context.tin.tin->cursed)
 		pline("This makes you feel like %s!",
 		      Hallucination ? "Swee'pea" : "Popeye");
 	    lesshungry(600);
-	    gainstr(tin.tin, 0);
+	    gainstr(context.tin.tin, 0);
 	    u.uconduct.food++;
 	}
 use_me:
-	if (carried(tin.tin)) useup(tin.tin);
-	else useupf(tin.tin, 1L);
-	tin.tin = (struct obj *) 0;
+	if (carried(context.tin.tin)) useup(context.tin.tin);
+	else useupf(context.tin.tin, 1L);
+	context.tin.tin = (struct obj *) 0;
 	return(0);
 }
 
@@ -1146,9 +1133,9 @@ no_opener:
 		}
 		tmp = rn1(1 + 500/((int)(ACURR(A_DEX) + ACURRSTR)), 10);
 	}
-	tin.reqtime = tmp;
-	tin.usedtime = 0;
-	tin.tin = otmp;
+	context.tin.reqtime = tmp;
+	context.tin.usedtime = 0;
+	context.tin.tin = otmp;
 	set_occupation(opentin, "opening the tin", 0);
 	return;
 }
@@ -1265,7 +1252,7 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	}
 
 	/* delay is weight dependent */
-	victual.reqtime = 3 + (mons[mnum].cwt >> 6);
+	context.victual.reqtime = 3 + (mons[mnum].cwt >> 6);
 
 	if (!tp && mnum != PM_LIZARD && mnum != PM_LICHEN &&
 			(otmp->orotten || !rn2(7))) {
@@ -1302,18 +1289,18 @@ start_eating(otmp)		/* called as you start to eat */
 	register struct obj *otmp;
 {
 #ifdef DEBUG
-	debugpline("start_eating: %lx (victual = %lx)", otmp, victual.piece);
-	debugpline("reqtime = %d", victual.reqtime);
+	debugpline("start_eating: %lx (victual = %lx)", otmp, context.victual.piece);
+	debugpline("reqtime = %d", context.victual.reqtime);
 	debugpline("(original reqtime = %d)", objects[otmp->otyp].oc_delay);
-	debugpline("nmod = %d", victual.nmod);
+	debugpline("nmod = %d", context.victual.nmod);
 	debugpline("oeaten = %d", otmp->oeaten);
 #endif
-	victual.fullwarn = victual.doreset = FALSE;
-	victual.eating = TRUE;
+	context.victual.fullwarn = context.victual.doreset = FALSE;
+	context.victual.eating = TRUE;
 
 	if (otmp->otyp == CORPSE) {
-	    cprefx(victual.piece->corpsenm);
-	    if (!victual.piece || !victual.eating) {
+	    cprefx(context.victual.piece->corpsenm);
+	    if (!context.victual.piece || !context.victual.eating) {
 		/* rider revived, or died and lifesaved */
 		return;
 	    }
@@ -1321,9 +1308,9 @@ start_eating(otmp)		/* called as you start to eat */
 
 	if (bite()) return;
 
-	if (++victual.usedtime >= victual.reqtime) {
+	if (++context.victual.usedtime >= context.victual.reqtime) {
 	    /* print "finish eating" message if they just resumed -dlc */
-	    done_eating(victual.reqtime > 1 ? TRUE : FALSE);
+	    done_eating(context.victual.reqtime > 1 ? TRUE : FALSE);
 	    return;
 	}
 
@@ -1361,7 +1348,7 @@ struct obj *otmp;
 		    /* not cannibalism, but we use similar criteria
 		       for deciding whether to be sickened by this meal */
 		    if (rn2(2) && !CANNIBAL_ALLOWED())
-			make_vomiting((long)rn1(victual.reqtime, 14), FALSE);
+			make_vomiting((long)rn1(context.victual.reqtime, 14), FALSE);
 		}
 		break;
 	    case MEATBALL:
@@ -1372,7 +1359,7 @@ struct obj *otmp;
 	     /* break; */
 	    case CLOVE_OF_GARLIC:
 		if (is_undead(youmonst.data)) {
-			make_vomiting((long)rn1(victual.reqtime, 5), FALSE);
+			make_vomiting((long)rn1(context.victual.reqtime, 5), FALSE);
 			break;
 		}
 		/* Fall through otherwise */
@@ -1512,7 +1499,7 @@ struct obj *otmp;
 		accessory_has_effect(otmp);
 		HProtection |= FROMOUTSIDE;
 		u.ublessed += otmp->spe;
-		flags.botl = 1;
+		context.botl = 1;
 		break;
 	    case RIN_FREE_ACTION:
 		/* Give sleep resistance instead */
@@ -1528,7 +1515,7 @@ struct obj *otmp;
 		change_sex();
 		You("are suddenly very %s!",
 		    flags.female ? "feminine" : "masculine");
-		flags.botl = 1;
+		context.botl = 1;
 		break;
 	    case AMULET_OF_STRANGULATION: /* bad idea! */
 		/* no message--this gives no permanent effect */
@@ -1554,14 +1541,14 @@ struct obj *otmp;
 STATIC_OVL void
 eatspecial() /* called after eating non-food */
 {
-	register struct obj *otmp = victual.piece;
+	register struct obj *otmp = context.victual.piece;
 
 	/* lesshungry wants an occupation to handle choke messages correctly */
 	set_occupation(eatfood, "eating non-food", 0);
-	lesshungry(victual.nmod);
+	lesshungry(context.victual.nmod);
 	occupation = 0;
-	victual.piece = (struct obj *)0;
-	victual.eating = 0;
+	context.victual.piece = (struct obj *)0;
+	context.victual.eating = 0;
 	if (otmp->oclass == COIN_CLASS) {
 #ifdef GOLDOBJ
 		if (carried(otmp))
@@ -1899,11 +1886,11 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	}
 	if (otmp->oclass != FOOD_CLASS) {
 	    int material;
-	    victual.reqtime = 1;
-	    victual.piece = otmp;
+	    context.victual.reqtime = 1;
+	    context.victual.piece = otmp;
 		/* Don't split it, we don't need to if it's 1 move */
-	    victual.usedtime = 0;
-	    victual.canchoke = (u.uhs == SATIATED);
+	    context.victual.usedtime = 0;
+	    context.victual.canchoke = (u.uhs == SATIATED);
 		/* Note: gold weighs 1 pt. for each 1000 pieces (see */
 		/* pickup.c) so gold and non-gold is consistent. */
 	    if (otmp->oclass == COIN_CLASS)
@@ -1913,8 +1900,8 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		basenutrit = weight(otmp);
 	    /* oc_nutrition is usually weight anyway */
 	    else basenutrit = objects[otmp->otyp].oc_nutrition;
-	    victual.nmod = basenutrit;
-	    victual.eating = TRUE; /* needed for lesshungry() */
+	    context.victual.nmod = basenutrit;
+	    context.victual.eating = TRUE; /* needed for lesshungry() */
 
 	    material = objects[otmp->otyp].oc_material;
 	    if (material == LEATHER ||
@@ -1944,16 +1931,16 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    return 1;
 	}
 
-	if(otmp == victual.piece) {
+	if(otmp == context.victual.piece) {
 	/* If they weren't able to choke, they don't suddenly become able to
 	 * choke just because they were interrupted.  On the other hand, if
 	 * they were able to choke before, if they lost food it's possible
 	 * they shouldn't be able to choke now.
 	 */
-	    if (u.uhs != SATIATED) victual.canchoke = FALSE;
-	    victual.piece = touchfood(otmp);
+	    if (u.uhs != SATIATED) context.victual.canchoke = FALSE;
+	    context.victual.piece = touchfood(otmp);
 	    You("resume your meal.");
-	    start_eating(victual.piece);
+	    start_eating(context.victual.piece);
 	    return(1);
 	}
 
@@ -1968,8 +1955,8 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	/* KMH, conduct */
 	u.uconduct.food++;
 
-	victual.piece = otmp = touchfood(otmp);
-	victual.usedtime = 0;
+	context.victual.piece = otmp = touchfood(otmp);
+	context.victual.usedtime = 0;
 
 	/* Now we need to calculate delay and nutritional info.
 	 * The base nutrition calculated here and in eatcorpse() accounts
@@ -1980,7 +1967,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    int tmp = eatcorpse(otmp);
 	    if (tmp == 2) {
 		/* used up */
-		victual.piece = (struct obj *)0;
+		context.victual.piece = (struct obj *)0;
 		return(1);
 	    } else if (tmp)
 		dont_start = TRUE;
@@ -2007,7 +1994,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		break;
 	    }
 
-	    victual.reqtime = objects[otmp->otyp].oc_delay;
+	    context.victual.reqtime = objects[otmp->otyp].oc_delay;
 	    if (otmp->otyp != FORTUNE_COOKIE &&
 		(otmp->cursed ||
 		 (((monstermoves - otmp->age) > (int) otmp->blessed ? 50:30) &&
@@ -2026,13 +2013,13 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	else basenutrit = objects[otmp->otyp].oc_nutrition;
 
 #ifdef DEBUG
-	debugpline("before rounddiv: victual.reqtime == %d", victual.reqtime);
+	debugpline("before rounddiv: context.victual.reqtime == %d", context.victual.reqtime);
 	debugpline("oeaten == %d, basenutrit == %d", otmp->oeaten, basenutrit);
 #endif
-	victual.reqtime = (basenutrit == 0 ? 0 :
-		rounddiv(victual.reqtime * (long)otmp->oeaten, basenutrit));
+	context.victual.reqtime = (basenutrit == 0 ? 0 :
+		rounddiv(context.victual.reqtime * (long)otmp->oeaten, basenutrit));
 #ifdef DEBUG
-	debugpline("after rounddiv: victual.reqtime == %d", victual.reqtime);
+	debugpline("after rounddiv: context.victual.reqtime == %d", context.victual.reqtime);
 #endif
 	/* calculate the modulo value (nutrit. units per round eating)
 	 * note: this isn't exact - you actually lose a little nutrition
@@ -2040,14 +2027,14 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	 * TODO: add in a "remainder" value to be given at the end of the
 	 *	 meal.
 	 */
-	if (victual.reqtime == 0 || otmp->oeaten == 0)
+	if (context.victual.reqtime == 0 || otmp->oeaten == 0)
 	    /* possible if most has been eaten before */
-	    victual.nmod = 0;
-	else if ((int)otmp->oeaten >= victual.reqtime)
-	    victual.nmod = -((int)otmp->oeaten / victual.reqtime);
+	    context.victual.nmod = 0;
+	else if ((int)otmp->oeaten >= context.victual.reqtime)
+	    context.victual.nmod = -((int)otmp->oeaten / context.victual.reqtime);
 	else
-	    victual.nmod = victual.reqtime % otmp->oeaten;
-	victual.canchoke = (u.uhs == SATIATED);
+	    context.victual.nmod = context.victual.reqtime % otmp->oeaten;
+	context.victual.canchoke = (u.uhs == SATIATED);
 
 	if (!dont_start) start_eating(otmp);
 	return(1);
@@ -2059,21 +2046,21 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 STATIC_OVL int
 bite()
 {
-	if(victual.canchoke && u.uhunger >= 2000) {
-		choke(victual.piece);
+	if(context.victual.canchoke && u.uhunger >= 2000) {
+		choke(context.victual.piece);
 		return 1;
 	}
-	if (victual.doreset) {
+	if (context.victual.doreset) {
 		do_reset_eat();
 		return 0;
 	}
 	force_save_hs = TRUE;
-	if(victual.nmod < 0) {
-		lesshungry(-victual.nmod);
-		consume_oeaten(victual.piece, victual.nmod); /* -= -nmod */
-	} else if(victual.nmod > 0 && (victual.usedtime % victual.nmod)) {
+	if(context.victual.nmod < 0) {
+		lesshungry(-context.victual.nmod);
+		consume_oeaten(context.victual.piece, context.victual.nmod); /* -= -nmod */
+	} else if(context.victual.nmod > 0 && (context.victual.usedtime % context.victual.nmod)) {
 		lesshungry(1);
-		consume_oeaten(victual.piece, -1);		  /* -= 1 */
+		consume_oeaten(context.victual.piece, -1);		  /* -= 1 */
 	}
 	force_save_hs = FALSE;
 	recalc_wt();
@@ -2141,12 +2128,12 @@ register int num;
 #endif
 	u.uhunger += num;
 	if(u.uhunger >= 2000) {
-	    if (!iseating || victual.canchoke) {
+	    if (!iseating || context.victual.canchoke) {
 		if (iseating) {
-		    choke(victual.piece);
+		    choke(context.victual.piece);
 		    reset_eat();
 		} else
-		    choke(occupation == opentin ? tin.tin : (struct obj *)0);
+		    choke(occupation == opentin ? context.tin.tin : (struct obj *)0);
 		/* no reset_eat() */
 	    }
 	} else {
@@ -2154,14 +2141,14 @@ register int num;
 	     * warns when you're about to choke.
 	     */
 	    if (u.uhunger >= 1500) {
-		if (!victual.eating || (victual.eating && !victual.fullwarn)) {
+		if (!context.victual.eating || (context.victual.eating && !context.victual.fullwarn)) {
 		    pline("You're having a hard time getting all of it down.");
 		    nomovemsg = "You're finally finished.";
-		    if (!victual.eating)
+		    if (!context.victual.eating)
 			multi = -2;
 		    else {
-			victual.fullwarn = TRUE;
-			if (victual.canchoke && victual.reqtime > 1) {
+			context.victual.fullwarn = TRUE;
+			if (context.victual.canchoke && context.victual.reqtime > 1) {
 			    /* a one-gulp food will not survive a stop */
 			    if (yn_function("Stop eating?",ynchars,'y')=='y') {
 				reset_eat();
@@ -2183,7 +2170,7 @@ unfaint()
 	if(u.uhs > FAINTING)
 		u.uhs = FAINTING;
 	stop_occupation();
-	flags.botl = 1;
+	context.botl = 1;
 	return 0;
 }
 
@@ -2280,7 +2267,7 @@ boolean incr;
 		} else
 		if(u.uhunger < -(int)(200 + 20*ACURR(A_CON))) {
 			u.uhs = STARVED;
-			flags.botl = 1;
+			context.botl = 1;
 			bot();
 			You("die from starvation.");
 			killer_format = KILLED_BY;
@@ -2331,7 +2318,7 @@ boolean incr;
 			break;
 		}
 		u.uhs = newhs;
-		flags.botl = 1;
+		context.botl = 1;
 		bot();
 		if ((Upolyd ? u.mh : u.uhp) < 1) {
 			You("die from hunger and exhaustion.");
@@ -2474,7 +2461,7 @@ int amt;
      * victual handling mechanism from scratch using a less complex
      * model.  Alternatively, this routine could call done_eating()
      * or food_disappears() but its callers would need revisions to
-     * cope with victual.piece unexpectedly going away.
+     * cope with context.victual.piece unexpectedly going away.
      *
      * Multi-turn eating operates by setting the food's oeaten field
      * to its full nutritional value and then running a counter which
@@ -2506,8 +2493,8 @@ int amt;
     }
 
     if (obj->oeaten == 0) {
-	if (obj == victual.piece)	/* always true unless wishing... */
-	    victual.reqtime = victual.usedtime;	/* no bites left */
+	if (obj == context.victual.piece)	/* always true unless wishing... */
+	    context.victual.reqtime = context.victual.usedtime;	/* no bites left */
 	obj->oeaten = 1;	/* smallest possible positive value */
     }
 }
@@ -2519,9 +2506,9 @@ maybe_finished_meal(stopping)
 boolean stopping;
 {
 	/* in case consume_oeaten() has decided that the food is all gone */
-	if (occupation == eatfood && victual.usedtime >= victual.reqtime) {
+	if (occupation == eatfood && context.victual.usedtime >= context.victual.reqtime) {
 	    if (stopping) occupation = 0;	/* for do_reset_eat */
-	    (void) eatfood(); /* calls done_eating() to use up victual.piece */
+	    (void) eatfood(); /* calls done_eating() to use up context.victual.piece */
 	    return TRUE;
 	}
 	return FALSE;

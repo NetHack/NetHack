@@ -417,7 +417,7 @@ pick_lock(pick) /* pick a lock with a given object */
 		    xlock.box = 0;
 	    }
 	}
-	flags.move = 0;
+	context.move = 0;
 	xlock.chance = ch;
 	xlock.picktyp = picktyp;
 	xlock.usedtime = 0;

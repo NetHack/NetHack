@@ -14,7 +14,7 @@ take_gold()
 	} else {
 		You("notice you have no gold!");
 		u.ugold = 0;
-		flags.botl = 1;
+		context.botl = 1;
 	}
 #else
         struct obj *otmp, *nobj;
@@ -30,7 +30,7 @@ take_gold()
 		You_feel("a strange sensation.");
 	} else {
 		You("notice you have no money!");
-		flags.botl = 1;
+		context.botl = 1;
 	}
 #endif
 }
@@ -187,7 +187,7 @@ dosit()
 			make_blinded(0L,TRUE);
 			make_sick(0L, (char *) 0, FALSE, SICK_ALL);
 			heal_legs();
-			flags.botl = 1;
+			context.botl = 1;
 			break;
 		    case 5:
 			take_gold();

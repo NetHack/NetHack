@@ -286,7 +286,7 @@ bot()
 {
 	bot1();
 	bot2();
-	flags.botl = flags.botlx = 0;
+	context.botl = context.botlx = 0;
 }
 
 /*botl.c*/

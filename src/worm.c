@@ -377,7 +377,7 @@ cutworm(worm, x, y, weap)
     /* Create the second worm. */
     new_worm  = newmonst(0);
     *new_worm = *worm;			/* make a copy of the old worm */
-    new_worm->m_id = flags.ident++;	/* make sure it has a unique id */
+    new_worm->m_id = context.ident++;	/* make sure it has a unique id */
     new_worm->wormno = new_wnum;	/* affix new worm number */
 
     if (worm->mtame)

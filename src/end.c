@@ -422,10 +422,10 @@ int how;
 	}
 	if (how == CHOKING) init_uhunger();
 	nomovemsg = "You survived that attempt on your life.";
-	flags.move = 0;
+	context.move = 0;
 	if(multi > 0) multi = 0; else multi = -1;
 	if(u.utrap && u.utraptype == TT_LAVA) u.utrap = 0;
-	flags.botl = 1;
+	context.botl = 1;
 	u.ugrave_arise = NON_PM;
 	HUnchanging = 0L;
 	curs_on_u();

@@ -203,9 +203,7 @@ STATIC_OVL int
 use_stethoscope(obj)
 	register struct obj *obj;
 {
-	static long last_used_move = -1;
-	static short last_used_movement = 0;
-	struct monst *mtmp;
+ 	struct monst *mtmp;
 	struct rm *lev;
 	int rx, ry, res;
 	boolean interference = (u.uswallow && is_whirly(u.ustuck->data) &&
@@ -220,10 +218,10 @@ use_stethoscope(obj)
 	}
 	if (!getdir((char *)0)) return 0;
 
-	res = (moves == last_used_move) &&
-	      (youmonst.movement == last_used_movement);
-	last_used_move = moves;
-	last_used_movement = youmonst.movement;
+	res = (moves == context.stethoscope_move) &&
+	      (youmonst.movement == context.stethoscope_movement);
+	context.stethoscope_move = moves;
+	context.stethoscope_movement = youmonst.movement;
 
 #ifdef STEED
 	if (u.usteed && u.dz > 0) {
@@ -1579,7 +1577,7 @@ struct obj *obj;
 	else if (!did_prop)
 	    pline("Nothing seems to happen.");
 
-	flags.botl = (did_attr || did_prop);
+	context.botl = (did_attr || did_prop);
 #undef PROP_COUNT
 #undef ATTR_COUNT
 #undef prop2trbl
@@ -1729,7 +1727,7 @@ struct obj **optr;
 			return;
 	}
 	if(!getdir((char *)0)) {
-		flags.move = multi = 0;
+		context.move = multi = 0;
 		return;
 	}
 	x = u.ux + u.dx; y = u.uy + u.dy;
@@ -2183,7 +2181,7 @@ struct obj *obj;
 	You("hit your %s with your bullwhip.", body_part(FOOT));
 	Sprintf(buf, "killed %sself with %s bullwhip", uhim(), uhis());
 	losehp(dam, buf, NO_KILLER_PREFIX);
-	flags.botl = 1;
+	context.botl = 1;
 	return 1;
 
     } else if ((Fumbling || Glib) && !rn2(5)) {
@@ -2713,21 +2711,21 @@ do_break_wand(obj)
 		if (obj->otyp == WAN_TELEPORTATION &&
 		    affects_objects && level.objects[x][y]) {
 		    (void) bhitpile(obj, bhito, x, y);
-		    if (flags.botl) bot();		/* potion effects */
+		    if (context.botl) bot();		/* potion effects */
 		}
 		damage = zapyourself(obj, FALSE);
 		if (damage) {
 		    Sprintf(buf, "killed %sself by breaking a wand", uhim());
 		    losehp(damage, buf, NO_KILLER_PREFIX);
 		}
-		if (flags.botl) bot();		/* blindness */
+		if (context.botl) bot();		/* blindness */
 	    } else if ((mon = m_at(x, y)) != 0) {
 		(void) bhitm(mon, obj);
-	     /* if (flags.botl) bot(); */
+	     /* if (context.botl) bot(); */
 	    }
 	    if (affects_objects && level.objects[x][y]) {
 		(void) bhitpile(obj, bhito, x, y);
-		if (flags.botl) bot();		/* potion effects */
+		if (context.botl) bot();		/* potion effects */
 	    }
 	}
     }

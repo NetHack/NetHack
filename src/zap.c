@@ -155,7 +155,7 @@ struct obj *otmp;
 			if(dbldam) dmg *= 2;
 			if (otyp == SPE_TURN_UNDEAD)
 				dmg += spell_damage_bonus();
-			flags.bypasses = TRUE;	/* for make_corpse() */
+			context.bypasses = TRUE;	/* for make_corpse() */
 			if (!resist(mtmp, otmp->oclass, dmg, NOTELL)) {
 			    if (mtmp->mhp > 0) monflee(mtmp, 0, FALSE, TRUE);
 			}
@@ -180,7 +180,7 @@ struct obj *otmp;
 			/* dropped inventory shouldn't be hit by this zap */
 			for (obj = mtmp->minvent; obj; obj = obj->nobj)
 			    bypass_obj(obj);
-			/* flags.bypasses = TRUE; ## for make_corpse() */
+			/* context.bypasses = TRUE; ## for make_corpse() */
 			/* no corpse after system shock */
 			xkilled(mtmp, 3);
 		    } else if (newcham(mtmp, (struct permonst *)0,
@@ -801,19 +801,19 @@ register struct obj *obj;
 		case RIN_GAIN_STRENGTH:
 			if ((obj->owornmask & W_RING) && u_ring) {
 				ABON(A_STR) -= obj->spe;
-				flags.botl = 1;
+				context.botl = 1;
 			}
 			break;
 		case RIN_GAIN_CONSTITUTION:
 			if ((obj->owornmask & W_RING) && u_ring) {
 				ABON(A_CON) -= obj->spe;
-				flags.botl = 1;
+				context.botl = 1;
 			}
 			break;
 		case RIN_ADORNMENT:
 			if ((obj->owornmask & W_RING) && u_ring) {
 				ABON(A_CHA) -= obj->spe;
-				flags.botl = 1;
+				context.botl = 1;
 			}
 			break;
 		case RIN_INCREASE_ACCURACY:
@@ -827,14 +827,14 @@ register struct obj *obj;
 		case GAUNTLETS_OF_DEXTERITY:
 			if ((obj->owornmask & W_ARMG) && (obj == uarmg)) {
 				ABON(A_DEX) -= obj->spe;
-				flags.botl = 1;
+				context.botl = 1;
 			}
 			break;
 		case HELM_OF_BRILLIANCE:
 			if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
 				ABON(A_INT) -= obj->spe;
 				ABON(A_WIS) -= obj->spe;
-				flags.botl = 1;
+				context.botl = 1;
 			}
 			break;
 		/* case RIN_PROTECTION:  not needed */
@@ -917,19 +917,19 @@ register struct obj *obj;
 	case RIN_GAIN_STRENGTH:
 	    if ((obj->owornmask & W_RING) && u_ring) {
 	    	ABON(A_STR)--;
-	    	flags.botl = 1;
+	    	context.botl = 1;
 	    }
 	    break;
 	case RIN_GAIN_CONSTITUTION:
 	    if ((obj->owornmask & W_RING) && u_ring) {
 	    	ABON(A_CON)--;
-	    	flags.botl = 1;
+	    	context.botl = 1;
 	    }
 	    break;
 	case RIN_ADORNMENT:
 	    if ((obj->owornmask & W_RING) && u_ring) {
 	    	ABON(A_CHA)--;
-	    	flags.botl = 1;
+	    	context.botl = 1;
 	    }
 	    break;
 	case RIN_INCREASE_ACCURACY:
@@ -944,17 +944,17 @@ register struct obj *obj;
 	    if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
 	    	ABON(A_INT)--;
 	    	ABON(A_WIS)--;
-	    	flags.botl = 1;
+	    	context.botl = 1;
 	    }
 	    break;
 	case GAUNTLETS_OF_DEXTERITY:
 	    if ((obj->owornmask & W_ARMG) && (obj == uarmg)) {
 	    	ABON(A_DEX)--;
-	    	flags.botl = 1;
+	    	context.botl = 1;
 	    }
 	    break;
 	case RIN_PROTECTION:
-	    flags.botl = 1;
+	    context.botl = 1;
 	    break;
 	}
 	if (carried(obj)) update_inventory();
@@ -1444,13 +1444,13 @@ struct obj *obj, *otmp;
 		 *	       immediately revived by the same effect.
 		 *
 		 * The bypass bit on all objects is reset each turn, whenever
-		 * flags.bypasses is set.
+		 * context.bypasses is set.
 		 *
-		 * We check the obj->bypass bit above AND flags.bypasses
+		 * We check the obj->bypass bit above AND context.bypasses
 		 * as a safeguard against any stray occurrence left in an obj
 		 * struct someplace, although that should never happen.
 		 */
-		if (flags.bypasses)
+		if (context.bypasses)
 			return 0;
 		else {
 #ifdef DEBUG
@@ -1526,7 +1526,7 @@ struct obj *obj, *otmp;
 		else if (obj->otyp == STATUE)
 			(void) break_statue(obj);
 		else {
-			if (!flags.mon_moving)
+			if (!context.mon_moving)
 			    (void)hero_breaks(obj, obj->ox, obj->oy, FALSE);
 			else
 			    (void)breaks(obj, obj->ox, obj->oy);
@@ -2206,7 +2206,7 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 			    otmp; otmp = otmp->nobj)
 		cancel_item(otmp);
 	    if (youdefend) {
-		flags.botl = 1;	/* potential AC change */
+		context.botl = 1;	/* potential AC change */
 		find_ac();
 	    }
 	}
@@ -3711,7 +3711,7 @@ fracture_rock(obj)	/* fractured by pick-axe or wand of striking */
 register struct obj *obj;		   /* no texts here! */
 {
 	/* A little Sokoban guilt... */
-	if (obj->otyp == BOULDER && In_sokoban(&u.uz) && !flags.mon_moving)
+	if (obj->otyp == BOULDER && In_sokoban(&u.uz) && !context.mon_moving)
 	    change_luck(-1);
 
 	obj->otyp = ROCK;
@@ -3749,7 +3749,7 @@ register struct obj *obj;
 	    obj_extract_self(item);
 	    place_object(item, obj->ox, obj->oy);
 	}
-	if (Role_if(PM_ARCHEOLOGIST) && !flags.mon_moving && (obj->spe & STATUE_HISTORIC)) {
+	if (Role_if(PM_ARCHEOLOGIST) && !context.mon_moving && (obj->spe & STATUE_HISTORIC)) {
 	    You_feel("guilty about damaging such a historic statue.");
 	    adjalign(-1);
 	}

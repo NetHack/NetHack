@@ -268,7 +268,7 @@ boolean picked_some;
 
 	/* If there are objects here, take a look. */
 	if (ct) {
-	    if (flags.run) nomul(0);
+	    if (context.run) nomul(0);
 	    flush_screen(1);
 	    (void) look_here(ct, picked_some);
 	} else {
@@ -400,7 +400,7 @@ int what;		/* should be a long */
 	if (!u.uswallow) {
 		struct trap *ttmp = t_at(u.ux, u.uy);
 		/* no auto-pick if no-pick move, nothing there, or in a pool */
-		if (autopickup && (flags.nopick || !OBJ_AT(u.ux, u.uy) ||
+		if (autopickup && (context.nopick || !OBJ_AT(u.ux, u.uy) ||
 			(is_pool(u.ux, u.uy) && !Underwater) || is_lava(u.ux, u.uy))) {
 			read_engr_at(u.ux, u.uy);
 			return (0);
@@ -408,7 +408,7 @@ int what;		/* should be a long */
 
 		/* no pickup if levitating & not on air or water level */
 		if (!can_reach_floor()) {
-		    if ((multi && !flags.run) || (autopickup && !flags.pickup))
+		    if ((multi && !context.run) || (autopickup && !flags.pickup))
 			read_engr_at(u.ux, u.uy);
 		    return (0);
 		}
@@ -424,11 +424,11 @@ int what;		/* should be a long */
 			return(0);
 		    }
 		}
-		/* multi && !flags.run means they are in the middle of some other
+		/* multi && !context.run means they are in the middle of some other
 		 * action, or possibly paralyzed, sleeping, etc.... and they just
 		 * teleported onto the object.  They shouldn't pick it up.
 		 */
-		if ((multi && !flags.run) || (autopickup && !flags.pickup)) {
+		if ((multi && !context.run) || (autopickup && !flags.pickup)) {
 		    check_here(FALSE);
 		    return (0);
 		}
@@ -441,7 +441,7 @@ int what;		/* should be a long */
 		}
 
 		/* if there's anything here, stop running */
-		if (OBJ_AT(u.ux,u.uy) && flags.run && flags.run != 8 && !flags.nopick) nomul(0);
+		if (OBJ_AT(u.ux,u.uy) && context.run && context.run != 8 && !context.nopick) nomul(0);
 	}
 
 	add_valid_menu_class(0);	/* reset */
@@ -1266,8 +1266,8 @@ boolean telekinesis;	/* not picking it up directly by hand */
 		else
 		    obj->quan -= count;
 	    }
-	    flags.botl = 1;
-	    if (flags.run) nomul(0);
+	    context.botl = 1;
+	    if (context.run) nomul(0);
 	    return 1;
 #endif
 	} else if (obj->otyp == CORPSE) {
@@ -1312,7 +1312,7 @@ boolean telekinesis;	/* not picking it up directly by hand */
 
 #ifdef GOLDOBJ
         /* Whats left of the special case for gold :-) */
-	if (obj->oclass == COIN_CLASS) flags.botl = 1;
+	if (obj->oclass == COIN_CLASS) context.botl = 1;
 #endif
 	if (obj->quan != count && obj->otyp != LOADSTONE)
 	    obj = splitobj(obj, count);
@@ -1386,7 +1386,7 @@ encumber_msg()
 		     newcap == 4 ? "can barely" : "can't even");
 		break;
 	}
-	flags.botl = 1;
+	context.botl = 1;
     } else if(oldcap > newcap) {
 	switch(newcap) {
 	case 0: Your("movements are now unencumbered.");
@@ -1399,7 +1399,7 @@ encumber_msg()
 		    stagger(youmonst.data, "stagger"));
 		break;
 	}
-	flags.botl = 1;
+	context.botl = 1;
     }
 
     oldcap = newcap;

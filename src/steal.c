@@ -60,7 +60,7 @@ register struct monst *mtmp;
 	if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 	    mtmp->mavenge = 1;
 	    monflee(mtmp, 0, FALSE, FALSE);
-	    flags.botl = 1;
+	    context.botl = 1;
 	}
 }
 
@@ -131,7 +131,7 @@ register struct monst *mtmp;
 	    Your("purse feels lighter.");
 	    if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 	    monflee(mtmp, 0, FALSE, FALSE);
-	    flags.botl = 1;
+	    context.botl = 1;
 	}
 }
 #endif /* GOLDOBJ */

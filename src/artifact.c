@@ -431,10 +431,10 @@ long wp_mask;
 	    if (spec_m2(otmp)) {
 	    	if (on) {
 			EWarn_of_mon |= wp_mask;
-			flags.warntype |= spec_m2(otmp);
+			context.warntype |= spec_m2(otmp);
 	    	} else {
 			EWarn_of_mon &= ~wp_mask;
-	    		flags.warntype &= ~spec_m2(otmp);
+	    		context.warntype &= ~spec_m2(otmp);
 		}
 		see_monsters();
 	    } else {
@@ -816,7 +816,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 		    You("lose magical energy!");
 		    u.uenmax--;
 		    if (u.uen > 0) u.uen--;
-		    flags.botl = 1;
+		    context.botl = 1;
 		}
 	    } else {
 		if (mdef->data == &mons[PM_CLAY_GOLEM])
@@ -825,7 +825,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 		    You("absorb magical energy!");
 		    u.uenmax++;
 		    u.uen++;
-		    flags.botl = 1;
+		    context.botl = 1;
 		}
 	    }
 	}
@@ -1212,7 +1212,7 @@ arti_invoke(obj)
 	    if(Sick) make_sick(0L,(char *)0,FALSE,SICK_ALL);
 	    if(Slimed) Slimed = 0L;
 	    if (Blinded > creamed) make_blinded(creamed, FALSE);
-	    flags.botl = 1;
+	    context.botl = 1;
 	    break;
 	  }
 	case ENERGY_BOOST: {
@@ -1222,7 +1222,7 @@ arti_invoke(obj)
 	    if(epboost) {
 		You_feel("re-energized.");
 		u.uen += epboost;
-		flags.botl = 1;
+		context.botl = 1;
 	    } else
 		goto nothing_special;
 	    break;

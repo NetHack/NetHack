@@ -239,7 +239,7 @@ struct obj *obj;
 #ifndef GOLDOBJ
 		u.ugold += obj->quan;
 #else
-		flags.botl = 1;
+		context.botl = 1;
 #endif
 	} else if (obj->otyp == AMULET_OF_YENDOR) {
 		if (u.uhave.amulet) impossible("already have amulet?");
@@ -479,7 +479,7 @@ struct obj *obj;
 		u.ugold -= obj->quan;
 		obj->in_use = FALSE;
 #endif
-		flags.botl = 1;
+		context.botl = 1;
 		return;
 	} else if (obj->otyp == AMULET_OF_YENDOR) {
 		if (!u.uhave.amulet) impossible("don't have amulet?");
@@ -506,7 +506,7 @@ struct obj *obj;
 		curse(obj);
 	} else if (confers_luck(obj)) {
 		set_moreluck();
-		flags.botl = 1;
+		context.botl = 1;
 	} else if (obj->otyp == FIGURINE && obj->timed) {
 		(void) stop_timer(FIG_TRANSFORM, (genericptr_t) obj);
 	}
@@ -658,7 +658,7 @@ register long q;
 	u.ugold -= q;
 	otmp->quan = q;
 	otmp->owt = weight(otmp);
-	flags.botl = 1;
+	context.botl = 1;
 	return(otmp);
 }
 #endif
@@ -1011,7 +1011,7 @@ register const char *let,*word;
 		    }
 		}
 #ifdef GOLDOBJ
-		flags.botl = 1; /* May have changed the amount of money */
+		context.botl = 1; /* May have changed the amount of money */
 #endif
 #ifdef REDO
 		savech(ilet);
@@ -1262,7 +1262,7 @@ unsigned *resultflags;
 		    You("have no gold.");
 		allowgold = 2;
 #else
-		flags.botl = 1;
+		context.botl = 1;
 #endif
 	    } else if (sym == 'a') {
 		allflag = TRUE;

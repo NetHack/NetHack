@@ -284,6 +284,7 @@ register int fd, mode;
 #endif
 	uid = getuid();
 	bwrite(fd, (genericptr_t) &uid, sizeof uid);
+	bwrite(fd, (genericptr_t) &context, sizeof(struct context_info));
 	bwrite(fd, (genericptr_t) &flags, sizeof(struct flag));
 #ifndef GOLDOBJ
 	if (u.ugold) {
@@ -872,7 +873,17 @@ register struct obj *otmp;
 	    if (Has_contents(otmp))
 		saveobjchn(fd,otmp->cobj,mode);
 	    if (release_data(mode)) {
-		if (otmp->oclass == FOOD_CLASS) food_disappears(otmp);
+/*		if (otmp->oclass == FOOD_CLASS) food_disappears(otmp); */
+		if (otmp == context.victual.piece) {
+			/* Store the o_id of the victual if mismatched */
+			if (context.victual.o_id != otmp->o_id)
+			    context.victual.o_id = otmp->o_id;
+		}
+		if (otmp == context.tin.tin) {
+			/* Store the o_id of your tin */
+			if (context.tin.o_id != otmp->o_id)
+			    context.tin.o_id = otmp->o_id;
+		}
 		if (otmp->oclass == SPBOOK_CLASS) book_disappears(otmp);
 		otmp->where = OBJ_FREE;	/* set to free so dealloc will work */
 		otmp->timed = 0;	/* not timed any more */

@@ -110,8 +110,6 @@ NEARDATA schar tbx = 0, tby = 0;	/* mthrowu: target */
    number of shots, index of current one, validity check, shoot vs throw */
 NEARDATA struct multishot m_shot = { 0, 0, STRANGE_OBJECT, FALSE };
 
-NEARDATA struct dig_info digging;
-
 NEARDATA dungeon dungeons[MAXDUNGEON];	/* ini'ed by init_dungeon() */
 NEARDATA s_level *sp_levchn;
 NEARDATA stairway upstair = { 0, 0 }, dnstair = { 0, 0 };
@@ -140,6 +138,7 @@ struct mkroom *upstairs_room, *dnstairs_room, *sstairs_room;
 dlevel_t level;		/* level map */
 struct trap *ftrap = (struct trap *)0;
 NEARDATA struct monst youmonst = DUMMY;
+NEARDATA struct context_info context = DUMMY;
 NEARDATA struct flag flags = DUMMY;
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;

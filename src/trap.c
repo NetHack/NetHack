@@ -271,7 +271,7 @@ register int x, y, typ;
 			 IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
 		    add_damage(x, y,		/* schedule repair */
 			       ((IS_DOOR(lev->typ) || IS_WALL(lev->typ))
-				&& !flags.mon_moving) ? 200L : 0L);
+				&& !context.mon_moving) ? 200L : 0L);
 		lev->doormask = 0;	/* subsumes altarmask, icedpool... */
 		if (IS_ROOM(lev->typ)) /* && !IS_AIR(lev->typ) */
 		    lev->typ = ROOM;
@@ -393,7 +393,7 @@ int *fail_reason;
 	struct monst *mon = 0;
 	struct obj *item;
 	coord cc;
-	boolean historic = (Role_if(PM_ARCHEOLOGIST) && !flags.mon_moving && (statue->spe & STATUE_HISTORIC));
+	boolean historic = (Role_if(PM_ARCHEOLOGIST) && !context.mon_moving && (statue->spe & STATUE_HISTORIC));
 	char statuename[BUFSZ];
 
 	Strcpy(statuename,the(xname(statue)));
@@ -1325,8 +1325,9 @@ int style;
 	   launched (perhaps a monster triggered it), destroy context so that
 	   next dig attempt never thinks you're resuming previous effort */
 	if ((otyp == BOULDER || otyp == STATUE) &&
-	    singleobj->ox == digging.pos.x && singleobj->oy == digging.pos.y)
-	    (void) memset((genericptr_t)&digging, 0, sizeof digging);
+	    singleobj->ox == context.digging.pos.x &&
+	    singleobj->oy == context.digging.pos.y)
+	    (void) memset((genericptr_t)&context.digging, 0, sizeof(struct dig_info));
 
 	dist = distmin(x1,y1,x2,y2);
 	bhitpos.x = x1;
@@ -2415,11 +2416,11 @@ struct obj *box;	/* null for floor trap */
 	    }
 	    if (alt > num) num = alt;
 	    if (u.mhmax > mons[u.umonnum].mlevel)
-		u.mhmax -= rn2(min(u.mhmax,num + 1)), flags.botl = 1;
+		u.mhmax -= rn2(min(u.mhmax,num + 1)), context.botl = 1;
 	} else {
 	    num = d(2,4);
 	    if (u.uhpmax > u.ulevel)
-		u.uhpmax -= rn2(min(u.uhpmax,num + 1)), flags.botl = 1;
+		u.uhpmax -= rn2(min(u.uhpmax,num + 1)), context.botl = 1;
 	}
 	if (!num)
 	    You("are uninjured.");
@@ -2924,7 +2925,7 @@ register int n;
 		if(u.uenmax < 0) u.uenmax = 0;
 		u.uen = 0;
 	}
-	flags.botl = 1;
+	context.botl = 1;
 }
 
 int

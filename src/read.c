@@ -1065,7 +1065,7 @@ register struct obj	*sobj;
 			else
 			    u.uen = (u.uenmax += d(5,4));
 		    }
-		    flags.botl = 1;
+		    context.botl = 1;
 		    break;
 		}
 		known = TRUE;

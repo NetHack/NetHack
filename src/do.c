@@ -477,7 +477,7 @@ register struct obj *obj;
 		if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
 #else
 		/* Ensure update when we drop gold objects */
-		if (obj->oclass == COIN_CLASS) flags.botl = 1;
+		if (obj->oclass == COIN_CLASS) context.botl = 1;
 		freeinv(obj);
 #endif
 		hitfloor(obj);
@@ -500,7 +500,7 @@ register struct obj *obj;
 	if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
 #else
         /* Ensure update when we drop gold objects */
-        if (obj->oclass == COIN_CLASS) flags.botl = 1;
+        if (obj->oclass == COIN_CLASS) context.botl = 1;
         freeinv(obj);
 #endif
 	if (!u.uswallow) {
@@ -761,7 +761,7 @@ dodown()
 			(trap->ttyp != TRAPDOOR && trap->ttyp != HOLE)
 			|| !Can_fall_thru(&u.uz) || !trap->tseen) {
 
-			if (flags.autodig && !flags.nopick &&
+			if (flags.autodig && !context.nopick &&
 				uwep && is_pick(uwep)) {
 				return use_pick_axe2(uwep);
 			} else {
@@ -1608,7 +1608,7 @@ register int timex;
 
 	if(!Wounded_legs) {
 		ATEMP(A_DEX)--;
-		flags.botl = 1;
+		context.botl = 1;
 	}
 
 	if(!Wounded_legs || (HWounded_legs & TIMEOUT))
@@ -1623,7 +1623,7 @@ heal_legs()
 	if(Wounded_legs) {
 		if (ATEMP(A_DEX) < 0) {
 			ATEMP(A_DEX)++;
-			flags.botl = 1;
+			context.botl = 1;
 		}
 
 #ifdef STEED

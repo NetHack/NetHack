@@ -447,7 +447,7 @@ register struct monst *priest;
 		    else
 			u.ugold = 1L;
 		    priest->mgold -= u.ugold;
-		    flags.botl = 1;
+		    context.botl = 1;
 #else
 	if(!money_cnt(invent)) {
 	    if(coaligned && !strayed) {

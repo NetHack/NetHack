@@ -208,7 +208,7 @@ STATIC_OVL int
 dig()
 {
 	register struct rm *lev;
-	register xchar dpx = digging.pos.x, dpy = digging.pos.y;
+	register xchar dpx = context.digging.pos.x, dpy = context.digging.pos.y;
 	register boolean ispick = uwep && is_pick(uwep);
 	const char *verb =
 	    (!uwep || is_pick(uwep)) ? "dig into" : "chop through";
@@ -217,14 +217,14 @@ dig()
 	/* perhaps a nymph stole your pick-axe while you were busy digging */
 	/* or perhaps you teleported away */
 	if (u.uswallow || !uwep || (!ispick && !is_axe(uwep)) ||
-	    !on_level(&digging.level, &u.uz) ||
-	    ((digging.down ? (dpx != u.ux || dpy != u.uy)
+	    !on_level(&context.digging.level, &u.uz) ||
+	    ((context.digging.down ? (dpx != u.ux || dpy != u.uy)
 			   : (distu(dpx,dpy) > 2))))
 		return(0);
 
-	if (digging.down) {
+	if (context.digging.down) {
 	    if(!dig_check(BY_YOU, TRUE, u.ux, u.uy)) return(0);
-	} else { /* !digging.down */
+	} else { /* !context.digging.down */
 	    if (IS_TREE(lev->typ) && !may_dig(dpx,dpy) &&
 			dig_typ(uwep, dpx, dpy) == DIGTYP_TREE) {
 		pline("This tree seems to be petrified.");
@@ -265,20 +265,21 @@ dig()
 	    return(0);
 	}
 
-	digging.effort += 10 + rn2(5) + abon() +
+	context.digging.effort += 10 + rn2(5) + abon() +
 			   uwep->spe - greatest_erosion(uwep) + u.udaminc;
 	if (Race_if(PM_DWARF))
-	    digging.effort *= 2;
-	if (digging.down) {
+	    context.digging.effort *= 2;
+	if (context.digging.down) {
 		register struct trap *ttmp;
 
-		if (digging.effort > 250) {
+		if (context.digging.effort > 250) {
 		    (void) dighole(FALSE);
-		    (void) memset((genericptr_t)&digging, 0, sizeof digging);
+		    (void) memset((genericptr_t)&context.digging, 0,
+					sizeof (struct dig_info));
 		    return(0);	/* done with digging */
 		}
 
-		if (digging.effort <= 50 ||
+		if (context.digging.effort <= 50 ||
 		    ((ttmp = t_at(dpx,dpy)) != 0 &&
 			(ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT ||
 			 ttmp->ttyp == TRAPDOOR || ttmp->ttyp == HOLE)))
@@ -290,13 +291,13 @@ dig()
 		}
 
 		if (dighole(TRUE)) {	/* make pit at <u.ux,u.uy> */
-		    digging.level.dnum = 0;
-		    digging.level.dlevel = -1;
+		    context.digging.level.dnum = 0;
+		    context.digging.level.dlevel = -1;
 		}
 		return(0);
 	}
 
-	if (digging.effort > 100) {
+	if (context.digging.effort > 100) {
 		register const char *digtxt, *dmgtxt = (const char*) 0;
 		register struct obj *obj;
 		register boolean shopedge = *in_rooms(dpx, dpy, SHOPBASE);
@@ -375,7 +376,7 @@ dig()
 		    feel_location(dpx, dpy);
 		else
 		    newsym(dpx, dpy);
-		if(digtxt && !digging.quiet) pline(digtxt); /* after newsym */
+		if(digtxt && !context.digging.quiet) pline(digtxt); /* after newsym */
 		if(dmgtxt)
 		    pay_for_damage(dmgtxt, FALSE);
 
@@ -400,10 +401,10 @@ dig()
 			newsym(dpx, dpy);
 		}
 cleanup:
-		digging.lastdigtime = moves;
-		digging.quiet = FALSE;
-		digging.level.dnum = 0;
-		digging.level.dlevel = -1;
+		context.digging.lastdigtime = moves;
+		context.digging.quiet = FALSE;
+		context.digging.level.dnum = 0;
+		context.digging.level.dlevel = -1;
 		return(0);
 	} else {		/* not enough effort has been spent yet */
 		static const char *const d_target[6] = {
@@ -433,7 +434,7 @@ int
 holetime()
 {
 	if(occupation != dig || !*u.ushops) return(-1);
-	return ((250 - digging.effort) / 20);
+	return ((250 - context.digging.effort) / 20);
 }
 
 /* Return typ of liquid to fill a hole with, or ROOM, if no liquid nearby */
@@ -888,7 +889,7 @@ struct obj *obj;
 		Sprintf(buf, "%s own %s", uhis(),
 				OBJ_NAME(objects[obj->otyp]));
 		losehp(dam, buf, KILLED_BY);
-		flags.botl=1;
+		context.botl=1;
 		return(1);
 	} else if(u.dz == 0) {
 		if(Stunned || (Confusion && !rn2(5))) confdir();
@@ -945,31 +946,33 @@ struct obj *obj;
 						"cutting the tree"
 			};
 			did_dig_msg = FALSE;
-			digging.quiet = FALSE;
-			if (digging.pos.x != rx || digging.pos.y != ry ||
-			    !on_level(&digging.level, &u.uz) || digging.down) {
+			context.digging.quiet = FALSE;
+			if (context.digging.pos.x != rx ||
+				context.digging.pos.y != ry ||
+				!on_level(&context.digging.level, &u.uz) ||
+				context.digging.down) {
 			    if (flags.autodig &&
-				dig_target == DIGTYP_ROCK && !digging.down &&
-				digging.pos.x == u.ux &&
-				digging.pos.y == u.uy &&
-				(moves <= digging.lastdigtime+2 &&
-				 moves >= digging.lastdigtime)) {
+				dig_target == DIGTYP_ROCK && !context.digging.down &&
+				context.digging.pos.x == u.ux &&
+				context.digging.pos.y == u.uy &&
+				(moves <= context.digging.lastdigtime+2 &&
+				 moves >= context.digging.lastdigtime)) {
 				/* avoid messages if repeated autodigging */
 				did_dig_msg = TRUE;
-				digging.quiet = TRUE;
+				context.digging.quiet = TRUE;
 			    }
-			    digging.down = digging.chew = FALSE;
-			    digging.warned = FALSE;
-			    digging.pos.x = rx;
-			    digging.pos.y = ry;
-			    assign_level(&digging.level, &u.uz);
-			    digging.effort = 0;
-			    if (!digging.quiet)
+			    context.digging.down = context.digging.chew = FALSE;
+			    context.digging.warned = FALSE;
+			    context.digging.pos.x = rx;
+			    context.digging.pos.y = ry;
+			    assign_level(&context.digging.level, &u.uz);
+			    context.digging.effort = 0;
+			    if (!context.digging.quiet)
 				You("start %s.", d_action[dig_target]);
 			} else {
-			    You("%s %s.", digging.chew ? "begin" : "continue",
+			    You("%s %s.", context.digging.chew ? "begin" : "continue",
 					d_action[dig_target]);
-			    digging.chew = FALSE;
+			    context.digging.chew = FALSE;
 			}
 			set_occupation(dig, verbing, 0);
 		}
@@ -987,15 +990,15 @@ struct obj *obj;
 				Yobjnam2(obj, (char *)0), surface(u.ux,u.uy));
 		u_wipe_engr(3);
 	} else {
-		if (digging.pos.x != u.ux || digging.pos.y != u.uy ||
-			!on_level(&digging.level, &u.uz) || !digging.down) {
-		    digging.chew = FALSE;
-		    digging.down = TRUE;
-		    digging.warned = FALSE;
-		    digging.pos.x = u.ux;
-		    digging.pos.y = u.uy;
-		    assign_level(&digging.level, &u.uz);
-		    digging.effort = 0;
+		if (context.digging.pos.x != u.ux || context.digging.pos.y != u.uy ||
+		    !on_level(&context.digging.level, &u.uz) || !context.digging.down) {
+		    context.digging.chew = FALSE;
+		    context.digging.down = TRUE;
+		    context.digging.warned = FALSE;
+		    context.digging.pos.x = u.ux;
+		    context.digging.pos.y = u.uy;
+		    assign_level(&context.digging.level, &u.uz);
+		    context.digging.effort = 0;
 		    You("start %s downward.", verbing);
 		    if (*u.ushops) shopdig(0);
 		} else
@@ -1035,7 +1038,7 @@ watch_dig(mtmp, x, y, zap)
 	    }
 
 	    if (mtmp) {
-		if(zap || digging.warned) {
+		if(zap || context.digging.warned) {
 		    verbalize("Halt, vandal!  You're under arrest!");
 		    (void) angry_guards(!(flags.soundok));
 		} else {
@@ -1050,7 +1053,7 @@ watch_dig(mtmp, x, y, zap)
 		    else
 			str = "fountain";
 		    verbalize("Hey, stop damaging that %s!", str);
-		    digging.warned = TRUE;
+		    context.digging.warned = TRUE;
 		}
 		if (is_digging())
 		    stop_occupation();

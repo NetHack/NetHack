@@ -63,7 +63,7 @@ moveloop()
 	do_positionbar();
 #endif
 
-	didmove = flags.move;
+	didmove = context.move;
 	if(didmove) {
 	    /* actual time passed */
 	    youmonst.movement -= NORMAL_SPEED;
@@ -71,13 +71,13 @@ moveloop()
 	    do { /* hero can't move this turn loop */
 		wtcap = encumber_msg();
 
-		flags.mon_moving = TRUE;
+		context.mon_moving = TRUE;
 		do {
 		    monscanmove = movemon();
 		    if (youmonst.movement > NORMAL_SPEED)
 			break;	/* it's now your turn */
 		} while (monscanmove);
-		flags.mon_moving = FALSE;
+		context.mon_moving = FALSE;
 
 		if (!monscanmove && youmonst.movement < NORMAL_SPEED) {
 		    /* both you and the monsters are out of steam this round */
@@ -133,14 +133,14 @@ moveloop()
 		    /* once-per-turn things go here */
 		    /********************************/
 
-		    if (flags.bypasses) clear_bypasses();
+		    if (context.bypasses) clear_bypasses();
 		    if(Glib) glibr();
 		    nh_timeout();
 		    run_regions();
 
 		    if (u.ublesscnt)  u.ublesscnt--;
-		    if(flags.time && !flags.run)
-			flags.botl = 1;
+		    if(flags.time && !context.run)
+			context.botl = 1;
 
 		    /* One possible result of prayer is healing.  Whether or
 		     * not you get healed depends on your current hit points.
@@ -155,7 +155,7 @@ moveloop()
 		    } else if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux,u.uy) && !Is_waterlevel(&u.uz)) {
 			if (u.mh > 1) {
 			    u.mh--;
-			    flags.botl = 1;
+			    context.botl = 1;
 			} else if (u.mh < 1)
 			    rehumanize();
 		    } else if (Upolyd && u.mh < u.mhmax) {
@@ -163,7 +163,7 @@ moveloop()
 			    rehumanize();
 			else if (Regeneration ||
 				    (wtcap < MOD_ENCUMBER && !(moves%20))) {
-			    flags.botl = 1;
+			    context.botl = 1;
 			    u.mh++;
 			}
 		    } else if (u.uhp < u.uhpmax &&
@@ -177,14 +177,14 @@ moveloop()
 				heal = rnd(Con);
 				if (heal > u.ulevel-9) heal = u.ulevel-9;
 			    }
-			    flags.botl = 1;
+			    context.botl = 1;
 			    u.uhp += heal;
 			    if(u.uhp > u.uhpmax)
 				u.uhp = u.uhpmax;
 			} else if (Regeneration ||
 			     (u.ulevel <= 9 &&
 			      !(moves % ((MAXULEV+12) / (u.ulevel+2) + 1)))) {
-			    flags.botl = 1;
+			    context.botl = 1;
 			    u.uhp++;
 			}
 		    }
@@ -211,7 +211,7 @@ moveloop()
 			 || Energy_regeneration)) {
 			u.uen += rn1((int)(ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1,1);
 			if (u.uen > u.uenmax)  u.uen = u.uenmax;
-			flags.botl = 1;
+			context.botl = 1;
 		    }
 
 		    if(!u.uinvulnerable) {
@@ -300,7 +300,7 @@ moveloop()
 	/****************************************/
 
 	find_ac();
-	if(!flags.mv || Blind) {
+	if(!context.mv || Blind) {
 	    /* redo monsters if hallu or wearing a helm of telepathy */
 	    if (Hallucination) {	/* update screen randomly */
 		see_monsters();
@@ -314,9 +314,9 @@ moveloop()
 
 	    if (vision_full_recalc) vision_recalc(0);	/* vision! */
 	}
-	if(flags.botl || flags.botlx) bot();
+	if(context.botl || context.botlx) bot();
 
-	flags.move = 1;
+	context.move = 1;
 
 	if(multi >= 0 && occupation) {
 #if defined(MICRO) || defined(WIN32)
@@ -387,13 +387,13 @@ moveloop()
 	    lookaround();
 	    if (!multi) {
 		/* lookaround may clear multi */
-		flags.move = 0;
-		if (flags.time) flags.botl = 1;
+		context.move = 0;
+		if (flags.time) context.botl = 1;
 		continue;
 	    }
-	    if (flags.mv) {
+	    if (context.mv) {
 		if(multi < COLNO && !--multi)
-		    flags.travel = flags.mv = flags.run = 0;
+		    context.travel = context.mv = context.run = 0;
 		domove();
 	    } else {
 		--multi;
@@ -407,15 +407,15 @@ moveloop()
 	}
 	if (u.utotype)		/* change dungeon level */
 	    deferred_goto();	/* after rhack() */
-	/* !flags.move here: multiple movement command stopped */
-	else if (flags.time && (!flags.move || !flags.mv))
-	    flags.botl = 1;
+	/* !context.move here: multiple movement command stopped */
+	else if (flags.time && (!context.move || !context.mv))
+	    context.botl = 1;
 
 	if (vision_full_recalc) vision_recalc(0);	/* vision! */
 	/* when running in non-tport mode, this gets done through domove() */
-	if ((!flags.run || flags.runmode == RUN_TPORT) &&
-		(multi && (!flags.travel ? !(multi % 7) : !(moves % 7L)))) {
-	    if (flags.time && flags.run) flags.botl = 1;
+	if ((!context.run || flags.runmode == RUN_TPORT) &&
+		(multi && (!context.travel ? !(multi % 7) : !(moves % 7L)))) {
+	    if (flags.time && context.run) context.botl = 1;
 	    display_nhwindow(WIN_MAP, FALSE);
 	}
     }
@@ -428,7 +428,7 @@ stop_occupation()
 		if (!maybe_finished_meal(TRUE))
 		    You("stop %s.", occtxt);
 		occupation = 0;
-		flags.botl = 1; /* in case u.uhs changed */
+		context.botl = 1; /* in case u.uhs changed */
 /* fainting stops your occupation, there's no reason to sync.
 		sync_hunger();
 */
@@ -477,7 +477,10 @@ newgame()
 	gameDiskPrompt();
 #endif
 
-	flags.ident = 1;
+	context.botlx = 1;
+	context.ident = 1;
+	context.stethoscope_move = -1L;
+	context.warnlevel = 1;
 
 	for (i = 0; i < NUMMONS; i++)
 		mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
@@ -509,7 +512,6 @@ newgame()
 	vision_reset();		/* set up internals for level (after mklev) */
 	check_special_room(FALSE);
 
-	flags.botlx = 1;
 
 	/* Move the monster from under you or else
 	 * makedog() will fail when it calls makemon().

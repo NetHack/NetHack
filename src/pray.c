@@ -278,13 +278,13 @@ register int trouble;
 	    case TROUBLE_STONED:
 		    You_feel("more limber.");
 		    Stoned = 0;
-		    flags.botl = 1;
+		    context.botl = 1;
 		    delayed_killer = 0;
 		    break;
 	    case TROUBLE_SLIMED:
 		    pline_The("slime disappears.");
 		    Slimed = 0;
-		    flags.botl = 1;
+		    context.botl = 1;
 		    delayed_killer = 0;
 		    break;
 	    case TROUBLE_STRANGLED:
@@ -294,7 +294,7 @@ register int trouble;
 		    }
 		    You("can breathe again.");
 		    Strangled = 0;
-		    flags.botl = 1;
+		    context.botl = 1;
 		    break;
 	    case TROUBLE_LAVA:
 		    You("are back on solid ground.");
@@ -310,7 +310,7 @@ register int trouble;
 	    case TROUBLE_HUNGRY:
 		    Your("%s feels content.", body_part(STOMACH));
 		    init_uhunger();
-		    flags.botl = 1;
+		    context.botl = 1;
 		    break;
 	    case TROUBLE_SICK:
 		    You_feel("better.");
@@ -329,11 +329,11 @@ register int trouble;
 		    if (u.uhpmax < u.ulevel * 5 + 11) u.uhpmax += rnd(5);
 		    if (u.uhpmax <= 5) u.uhpmax = 5+1;
 		    u.uhp = u.uhpmax;
-		    flags.botl = 1;
+		    context.botl = 1;
 		    break;
 	    case TROUBLE_COLLAPSING:
 		    ABASE(A_STR) = AMAX(A_STR);
-		    flags.botl = 1;
+		    context.botl = 1;
 		    break;
 	    case TROUBLE_STUCK_IN_WALL:
 		    Your("surroundings change.");
@@ -415,7 +415,7 @@ decurse:
 		    for(i=0; i<A_MAX; i++) {
 			if(ABASE(i) < AMAX(i)) {
 				ABASE(i) = AMAX(i);
-				flags.botl = 1;
+				context.botl = 1;
 			}
 		    }
 		    (void) encumber_msg();
@@ -935,7 +935,7 @@ pleased(g_align)
 	    if (u.uhunger < 900) init_uhunger();
 	    if (u.uluck < 0) u.uluck = 0;
 	    make_blinded(0L,TRUE);
-	    flags.botl = 1;
+	    context.botl = 1;
 	    break;
 	case 4: {
 	    register struct obj *otmp;
@@ -1361,7 +1361,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		    else
 			u.ualign.type = u.ualignbase[A_CURRENT] = altaralign;
 		    u.ublessed = 0;
-		    flags.botl = 1;
+		    context.botl = 1;
 
 		    You("have a sudden sense of a new direction.");
 		    /* Beware, Conversion is costly */

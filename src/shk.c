@@ -107,7 +107,7 @@ long amount;
 	remove_worn_item(ygold, FALSE);		/* quiver */
     freeinv(ygold);
     add_to_minv(mon, ygold);
-    flags.botl = 1;
+    context.botl = 1;
     return amount;
 }
 
@@ -142,7 +142,7 @@ long amount;
 	dropy(mongold);
     } else {
 	addinv(mongold);
-	flags.botl = 1;
+	context.botl = 1;
     }
 }
 
@@ -855,7 +855,7 @@ register struct monst *shkp;
 	if (balance > 0) money2mon(shkp, balance);
 	else if (balance < 0) money2u(shkp, -balance);
 #endif
-	flags.botl = 1;
+	context.botl = 1;
 	if(robbed) {
 		robbed -= tmp;
 		if(robbed < 0) robbed = 0L;
@@ -1339,7 +1339,7 @@ proceed:
 			eshkp->debit = 0L;
 			eshkp->loan = 0L;
 			You("pay that debt.");
-			flags.botl = 1;
+			context.botl = 1;
 		    } else {
 			dtmp -= eshkp->credit;
 			eshkp->credit = 0L;
@@ -1353,7 +1353,7 @@ proceed:
 			eshkp->loan = 0L;
 			pline("That debt is partially offset by your credit.");
 			You("pay the remainder.");
-			flags.botl = 1;
+			context.botl = 1;
 		    }
 		    paid = TRUE;
 		}
@@ -1671,7 +1671,7 @@ int croaked;
 			if (eshkp->robbed < 0L) eshkp->robbed = 0L;
                         if (umoney > 0) money2mon(shkp, umoney);
 #endif
-			flags.botl = 1;
+			context.botl = 1;
 			pline("%s %s all your possessions.",
 			      shkname(shkp), takes);
 			taken = TRUE;
@@ -1684,7 +1684,7 @@ int croaked;
 #else
                         money2mon(shkp, loss);
 #endif
-			flags.botl = 1;
+			context.botl = 1;
 			pline("%s %s the %ld %s %sowed %s.",
 			      Monnam(shkp), takes,
 			      loss, currency(loss),
@@ -2301,7 +2301,7 @@ register struct monst *shkp;
 		if(bp->bquan > obj->quan){
 			otmp = newobj(0);
 			*otmp = *obj;
-			bp->bo_id = otmp->o_id = flags.ident++;
+			bp->bo_id = otmp->o_id = context.ident++;
 			otmp->where = OBJ_FREE;
 			otmp->quan = (bp->bquan -= obj->quan);
 			otmp->owt = 0;	/* superfluous */
@@ -3528,7 +3528,7 @@ getcad:
 #else
                 money2mon(shkp, cost_of_damage);
 #endif
-		flags.botl = 1;
+		context.botl = 1;
 		pline("Mollified, %s accepts your restitution.",
 			shkname(shkp));
 		/* move shk back to his home loc */

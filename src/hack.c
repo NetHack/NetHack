@@ -313,24 +313,24 @@ still_chewing(x,y)
     struct obj *boulder = sobj_at(BOULDER,x,y);
     const char *digtxt = (char *)0, *dmgtxt = (char *)0;
 
-    if (digging.down)		/* not continuing previous dig (w/ pick-axe) */
-	(void) memset((genericptr_t)&digging, 0, sizeof digging);
+    if (context.digging.down)		/* not continuing previous dig (w/ pick-axe) */
+	(void) memset((genericptr_t)&context.digging, 0, sizeof(struct dig_info));
 
     if (!boulder && IS_ROCK(lev->typ) && !may_dig(x,y)) {
 	You("hurt your teeth on the %s.",
 	    IS_TREE(lev->typ) ? "tree" : "hard stone");
 	nomul(0);
 	return 1;
-    } else if (digging.pos.x != x || digging.pos.y != y ||
-		!on_level(&digging.level, &u.uz)) {
-	digging.down = FALSE;
-	digging.chew = TRUE;
-	digging.warned = FALSE;
-	digging.pos.x = x;
-	digging.pos.y = y;
-	assign_level(&digging.level, &u.uz);
+    } else if (context.digging.pos.x != x || context.digging.pos.y != y ||
+		!on_level(&context.digging.level, &u.uz)) {
+	context.digging.down = FALSE;
+	context.digging.chew = TRUE;
+	context.digging.warned = FALSE;
+	context.digging.pos.x = x;
+	context.digging.pos.y = y;
+	assign_level(&context.digging.level, &u.uz);
 	/* solid rock takes more work & time to dig through */
-	digging.effort =
+	context.digging.effort =
 	    (IS_ROCK(lev->typ) && !IS_TREE(lev->typ) ? 30 : 60) + u.udaminc;
 	You("start chewing %s %s.",
 	    (boulder || IS_TREE(lev->typ)) ? "on a" : "a hole in the",
@@ -338,14 +338,14 @@ still_chewing(x,y)
 	    IS_TREE(lev->typ) ? "tree" : IS_ROCK(lev->typ) ? "rock" : "door");
 	watch_dig((struct monst *)0, x, y, FALSE);
 	return 1;
-    } else if ((digging.effort += (30 + u.udaminc)) <= 100)  {
+    } else if ((context.digging.effort += (30 + u.udaminc)) <= 100)  {
 	if (flags.verbose)
 	    You("%s chewing on the %s.",
-		digging.chew ? "continue" : "begin",
+		context.digging.chew ? "continue" : "begin",
 		boulder ? "boulder" :
 		IS_TREE(lev->typ) ? "tree" :
 		IS_ROCK(lev->typ) ? "rock" : "door");
-	digging.chew = TRUE;
+	context.digging.chew = TRUE;
 	watch_dig((struct monst *)0, x, y, FALSE);
 	return 1;
     }
@@ -368,7 +368,7 @@ still_chewing(x,y)
 	if (IS_ROCK(lev->typ) || closed_door(x,y) || sobj_at(BOULDER,x,y)) {
 	    block_point(x,y);	/* delobj will unblock the point */
 	    /* reset dig state */
-	    (void) memset((genericptr_t)&digging, 0, sizeof digging);
+	    (void) memset((genericptr_t)&context.digging, 0, sizeof(struct dig_info));
 	    return 1;
 	}
 
@@ -421,7 +421,7 @@ still_chewing(x,y)
     newsym(x, y);
     if (digtxt) You(digtxt);	/* after newsym */
     if (dmgtxt) pay_for_damage(dmgtxt, FALSE);
-    (void) memset((genericptr_t)&digging, 0, sizeof digging);
+    (void) memset((genericptr_t)&context.digging, 0, sizeof(struct dig_info));
     return 0;
 }
 
@@ -553,7 +553,7 @@ int mode;
 	} else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
 	    /* Eat the rock. */
 	    if (mode == DO_MOVE && still_chewing(x,y)) return FALSE;
-	} else if (flags.autodig && !flags.run && !flags.nopick &&
+	} else if (flags.autodig && !context.run && !context.nopick &&
 		   uwep && is_pick(uwep)) {
 	/* MRKR: Automatic digging when wielding the appropriate tool */
 	    if (mode == DO_MOVE)
@@ -634,7 +634,7 @@ int mode;
 	}
     }
     /* pick a path that does not require crossing a trap */
-    if (flags.run == 8 && mode != DO_MOVE) {
+    if (context.run == 8 && mode != DO_MOVE) {
 	struct trap* t = t_at(x, y);
 
 	if (t && t->tseen) return FALSE;
@@ -655,7 +655,7 @@ int mode;
     }
 
     if (sobj_at(BOULDER,x,y) && (In_sokoban(&u.uz) || !Passes_walls)) {
-	if (!(Blind || Hallucination) && (flags.run >= 2) && mode != TEST_TRAV)
+	if (!(Blind || Hallucination) && (context.run >= 2) && mode != TEST_TRAV)
 	    return FALSE;
 	if (mode == DO_MOVE) {
 	    /* tunneling monsters will chew before pushing */
@@ -756,7 +756,7 @@ boolean guess;
 				if (x == u.tx && y == u.ty) {
 				    nomul(0);
 				    /* reset run so domove run checks work */
-				    flags.run = 8;
+				    context.run = 8;
 				    iflags.travelcc.x = iflags.travelcc.y = -1;
 				}
 				return TRUE;
@@ -834,7 +834,7 @@ domove()
 
 	u_wipe_engr(rnd(5));
 
-	if (flags.travel)
+	if (context.travel)
 	    if (!findtravelpath(FALSE))
 		(void) findtravelpath(TRUE);
 
@@ -926,9 +926,9 @@ domove()
 		    (Blind && !Levitation && !Flying &&
 		     !is_clinger(youmonst.data) &&
 		     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv)) {
-			if(flags.run >= 2) {
+			if(context.run >= 2) {
 				nomul(0);
-				flags.move = 0;
+				context.move = 0;
 				return;
 			} else
 				nomul(0);
@@ -982,14 +982,14 @@ domove()
 		if (mtmp) {
 			/* Don't attack if you're running, and can see it */
 			/* We should never get here if forcefight */
-			if (flags.run &&
+			if (context.run &&
 			    ((!Blind && mon_visible(mtmp) &&
 			      ((mtmp->m_ap_type != M_AP_FURNITURE &&
 				mtmp->m_ap_type != M_AP_OBJECT) ||
 			       Protection_from_shape_changers)) ||
 			     sensemon(mtmp))) {
 				nomul(0);
-				flags.move = 0;
+				context.move = 0;
 				return;
 			}
 		}
@@ -1018,7 +1018,7 @@ domove()
 	     * invisible monster--then, we fall through to attack() and
 	     * attack_check(), which still wastes a turn, but prints a
 	     * different message and makes the player remember the monster.		     */
-	    if(flags.nopick &&
+	    if(context.nopick &&
 		  (canspotmon(mtmp) || glyph_is_invisible(levl[x][y].glyph))){
 		if(mtmp->m_ap_type && !Protection_from_shape_changers
 						    && !sensemon(mtmp))
@@ -1029,7 +1029,7 @@ domove()
 		    You("move right into %s.", mon_nam(mtmp));
 		return;
 	    }
-	    if(flags.forcefight || !mtmp->mundetected || sensemon(mtmp) ||
+	    if(context.forcefight || !mtmp->mundetected || sensemon(mtmp) ||
 		    ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL) &&
 			!is_safepet(mtmp))){
 		gethungry();
@@ -1053,9 +1053,9 @@ domove()
 	}
 
 	/* specifying 'F' with no monster wastes a turn */
-	if (flags.forcefight ||
+	if (context.forcefight ||
 	    /* remembered an 'I' && didn't use a move command */
-	    (glyph_is_invisible(levl[x][y].glyph) && !flags.nopick)) {
+	    (glyph_is_invisible(levl[x][y].glyph) && !context.nopick)) {
 		boolean expl = (Upolyd && attacktype(youmonst.data, AT_EXPL));
 	    	char buf[BUFSZ];
 		Sprintf(buf,"a vacant spot on the %s", surface(x,y));
@@ -1219,7 +1219,7 @@ domove()
 	}
 
 	if (!test_move(u.ux, u.uy, x-u.ux, y-u.uy, DO_MOVE)) {
-	    flags.move = 0;
+	    context.move = 0;
 	    nomul(0);
 	    return;
 	}
@@ -1332,8 +1332,8 @@ domove()
 	}
 
 	reset_occupations();
-	if (flags.run) {
-	    if ( flags.run < 8 )
+	if (context.run) {
+	    if ( context.run < 8 )
 		if (IS_DOOR(tmpr->typ) || IS_ROCK(tmpr->typ) ||
 			IS_FURNITURE(tmpr->typ))
 		    nomul(0);
@@ -1378,10 +1378,10 @@ domove()
 	    nomovemsg = "";
 	}
 
-	if (flags.run && flags.runmode != RUN_TPORT) {
+	if (context.run && flags.runmode != RUN_TPORT) {
 	    /* display every step or every 7th step depending upon mode */
 	    if (flags.runmode != RUN_LEAP || !(moves % 7L)) {
-		if (flags.time) flags.botl = 1;
+		if (flags.time) context.botl = 1;
 		curs_on_u();
 		delay_output();
 		if (flags.runmode == RUN_CRAWL) {
@@ -1885,7 +1885,7 @@ lookaround()
 	return;
     }
 
-    if(Blind || flags.run == 0) return;
+    if(Blind || context.run == 0) return;
     for(x = u.ux-1; x <= u.ux+1; x++) for(y = u.uy-1; y <= u.uy+1; y++) {
 	if(!isok(x,y)) continue;
 
@@ -1897,7 +1897,7 @@ lookaround()
 		    mtmp->m_ap_type != M_AP_FURNITURE &&
 		    mtmp->m_ap_type != M_AP_OBJECT &&
 		    (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
-	    if((flags.run != 1 && !mtmp->mtame)
+	    if((context.run != 1 && !mtmp->mtame)
 					|| (x == u.ux+u.dx && y == u.uy+u.dy))
 		goto stop;
 	}
@@ -1913,12 +1913,12 @@ lookaround()
 		  (mtmp->mappearance == S_hcdoor ||
 		   mtmp->mappearance == S_vcdoor))) {
 	    if(x != u.ux && y != u.uy) continue;
-	    if(flags.run != 1) goto stop;
+	    if(context.run != 1) goto stop;
 	    goto bcorr;
 	} else if (levl[x][y].typ == CORR) {
 bcorr:
 	    if(levl[u.ux][u.uy].typ != ROOM) {
-		if(flags.run == 1 || flags.run == 3 || flags.run == 8) {
+		if(context.run == 1 || context.run == 3 || context.run == 8) {
 		    i = dist2(x,y,u.ux+u.dx,u.uy+u.dy);
 		    if(i > 2) continue;
 		    if(corrct == 1 && dist2(x,y,x0,y0) != 1)
@@ -1934,7 +1934,7 @@ bcorr:
 	    }
 	    continue;
 	} else if ((trap = t_at(x,y)) && trap->tseen) {
-	    if(flags.run == 1) goto bcorr;	/* if you must */
+	    if(context.run == 1) goto bcorr;	/* if you must */
 	    if(x == u.ux+u.dx && y == u.uy+u.dy) goto stop;
 	    continue;
 	} else if (is_pool(x,y) || is_lava(x,y)) {
@@ -1950,8 +1950,8 @@ bcorr:
 			goto stop;
 	    continue;
 	} else {		/* e.g. objects or trap or stairs */
-	    if(flags.run == 1) goto bcorr;
-	    if(flags.run == 8) continue;
+	    if(context.run == 1) goto bcorr;
+	    if(context.run == 8) continue;
 	    if(mtmp) continue;		/* d */
 	    if(((x == u.ux - u.dx) && (y != u.uy + u.dy)) ||
 	       ((y == u.uy - u.dy) && (x != u.ux + u.dx)))
@@ -1962,8 +1962,8 @@ stop:
 	return;
     } /* end for loops */
 
-    if(corrct > 1 && flags.run == 2) goto stop;
-    if((flags.run == 1 || flags.run == 3 || flags.run == 8) &&
+    if(corrct > 1 && context.run == 2) goto stop;
+    if((context.run == 1 || context.run == 3 || context.run == 8) &&
 	!noturn && !m0 && i0 && (corrct == 1 || (corrct == 2 && i0 == 1)))
     {
 	/* make sure that we do not turn too far */
@@ -2028,7 +2028,7 @@ nomul(nval)
 	u.uinvulnerable = FALSE;	/* Kludge to avoid ctrl-C bug -dlc */
 	u.usleep = 0;
 	multi = nval;
-	flags.travel = flags.mv = flags.run = 0;
+	context.travel = context.mv = context.run = 0;
 }
 
 /* called when a non-movement, multi-turn action has completed */
@@ -2086,7 +2086,7 @@ boolean k_format;
 	if (Upolyd) {
 		u.mh -= n;
 		if (u.mhmax < u.mh) u.mhmax = u.mh;
-		flags.botl = 1;
+		context.botl = 1;
 		if (u.mh < 1)
 		    rehumanize();
 		else if (n > 0 && u.mh*10 < u.mhmax && Unchanging)
@@ -2097,7 +2097,7 @@ boolean k_format;
 	u.uhp -= n;
 	if(u.uhp > u.uhpmax)
 		u.uhpmax = u.uhp;	/* perhaps n was negative */
-	flags.botl = 1;
+	context.botl = 1;
 	if(u.uhp < 1) {
 		killer_format = k_format;
 		killer = knam;		/* the thing that killed you */

@@ -579,7 +579,7 @@ clear_bypasses()
 	    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
 		otmp->bypass = 0;
 	}
-	flags.bypasses = FALSE;
+	context.bypasses = FALSE;
 }
 
 void
@@ -587,7 +587,7 @@ bypass_obj(obj)
 struct obj *obj;
 {
 	obj->bypass = 1;
-	flags.bypasses = TRUE;
+	context.bypasses = TRUE;
 }
 
 void

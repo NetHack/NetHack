@@ -146,7 +146,7 @@ burn_away_slime()
 	if (Slimed) {
 	    pline_The("slime that covers you is burned away!");
 	    Slimed = 0L;
-	    flags.botl = 1;
+	    context.botl = 1;
 	}
 	return;
 }

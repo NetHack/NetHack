@@ -211,7 +211,7 @@ boolean ghostly, frozen;
 		mread(fd, (genericptr_t) otmp,
 					(unsigned) xl + sizeof(struct obj));
 		if (ghostly) {
-		    unsigned nid = flags.ident++;
+		    unsigned nid = context.ident++;
 		    add_id_mapping(otmp->o_id, nid);
 		    otmp->o_id = nid;
 		}
@@ -232,7 +232,13 @@ boolean ghostly, frozen;
 			otmp3->ocontainer = otmp;
 		}
 		if (otmp->bypass) otmp->bypass = 0;
-
+		if (!ghostly) {
+		    /* fix the pointers */
+		    if (context.victual.o_id == otmp->o_id)
+			context.victual.piece = otmp;
+		    if (context.tin.o_id == otmp->o_id)
+			context.tin.tin = otmp;
+		}
 		otmp2 = otmp;
 	}
 	if(first && otmp2->nobj){
@@ -260,7 +266,7 @@ boolean ghostly;
 		else mtmp2->nmon = mtmp;
 		mread(fd, (genericptr_t) mtmp, (unsigned) xl + sizeof(struct monst));
 		if (ghostly) {
-			unsigned nid = flags.ident++;
+			unsigned nid = context.ident++;
 			add_id_mapping(mtmp->m_id, nid);
 			mtmp->m_id = nid;
 		}
@@ -371,9 +377,8 @@ unsigned int *stuckid, *steedid;	/* STEED */
 #endif
 		return FALSE;
 	}
-
+	mread(fd, (genericptr_t) &context, sizeof(struct context_info));
 	mread(fd, (genericptr_t) &flags, sizeof(struct flag));
-	flags.bypasses = 0;	/* never use the saved value of bypasses */
 	if (remember_discover) discover = remember_discover;
 
 	role_init();	/* Reset the initial role, race, gender, and alignment */

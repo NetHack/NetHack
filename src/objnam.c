@@ -2107,13 +2107,13 @@ boolean from_user;
 		if (from_user)
 		    pline("%d gold piece%s.", cnt, plur(cnt));
 		u.ugold += cnt;
-		flags.botl=1;
+		context.botl=1;
 		return (&zeroobj);
 #else
                 otmp = mksobj(GOLD_PIECE, FALSE, FALSE);
 		otmp->quan = cnt;
                 otmp->owt = weight(otmp);
-		flags.botl=1;
+		context.botl=1;
 		return (otmp);
 #endif
 	}

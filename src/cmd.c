@@ -922,10 +922,10 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	if (See_invisible) enl_msg(You_, "see", "saw", " invisible");
 	if (Blind_telepat) you_are("telepathic");
 	if (Warning) you_are("warned");
-	if (Warn_of_mon && flags.warntype) {
+	if (Warn_of_mon && context.warntype) {
 		Sprintf(buf, "aware of the presence of %s",
-			(flags.warntype & M2_ORC) ? "orcs" :
-			(flags.warntype & M2_DEMON) ? "demons" :
+			(context.warntype & M2_ORC) ? "orcs" :
+			(context.warntype & M2_DEMON) ? "demons" :
 			something); 
 		you_are(buf);
 	}
@@ -1798,11 +1798,11 @@ register char *cmd;
 	if (program_state.done_hup) end_of_input();
 #endif
 	if (firsttime) {
-		flags.nopick = 0;
+		context.nopick = 0;
 		cmd = parse();
 	}
 	if (*cmd == '\033') {
-		flags.move = FALSE;
+		context.move = FALSE;
 		return;
 	}
 #ifdef REDO
@@ -1820,7 +1820,7 @@ register char *cmd;
 #endif
 	{
 		nhbell();
-		flags.move = FALSE;
+		context.move = FALSE;
 		return;		/* probably we just had an interrupt */
 	}
 	if (iflags.num_pad && iflags.num_pad_mode == 1) {
@@ -1837,17 +1837,17 @@ register char *cmd;
         }
 	/* handle most movement commands */
 	do_walk = do_rush = prefix_seen = FALSE;
-	flags.travel = 0;
+	context.travel = 0;
 	switch (*cmd) {
 	 case 'g':  if (movecmd(cmd[1])) {
-			flags.run = 2;
+			context.run = 2;
 			do_rush = TRUE;
 		    } else
 			prefix_seen = TRUE;
 		    break;
 	 case '5':  if (!iflags.num_pad) break;	/* else FALLTHRU */
 	 case 'G':  if (movecmd(lowc(cmd[1]))) {
-			flags.run = 3;
+			context.run = 3;
 			do_rush = TRUE;
 		    } else
 			prefix_seen = TRUE;
@@ -1859,55 +1859,55 @@ register char *cmd;
 	 * normal movement: attack if 'I', move otherwise
 	 */
 	 case 'F':  if (movecmd(cmd[1])) {
-			flags.forcefight = 1;
+			context.forcefight = 1;
 			do_walk = TRUE;
 		    } else
 			prefix_seen = TRUE;
 		    break;
 	 case 'm':  if (movecmd(cmd[1]) || u.dz) {
-			flags.run = 0;
-			flags.nopick = 1;
+			context.run = 0;
+			context.nopick = 1;
 			if (!u.dz) do_walk = TRUE;
 			else cmd[0] = cmd[1];	/* "m<" or "m>" */
 		    } else
 			prefix_seen = TRUE;
 		    break;
 	 case 'M':  if (movecmd(lowc(cmd[1]))) {
-			flags.run = 1;
-			flags.nopick = 1;
+			context.run = 1;
+			context.nopick = 1;
 			do_rush = TRUE;
 		    } else
 			prefix_seen = TRUE;
 		    break;
 	 case '0':  if (!iflags.num_pad) break;
 		    (void)ddoinv(); /* a convenience borrowed from the PC */
-		    flags.move = FALSE;
+		    context.move = FALSE;
 		    multi = 0;
 		    return;
 	 case CMD_CLICKLOOK:
 		    if (iflags.clicklook) {
-		    	flags.move = FALSE;
+		    	context.move = FALSE;
 			do_look(2, &clicklook_cc);
 		    }
 		    return;
 	 case CMD_TRAVEL:
 		    if (flags.travelcmd) {
-			    flags.travel = 1;
-			    flags.run = 8;
-			    flags.nopick = 1;
+			    context.travel = 1;
+			    context.run = 8;
+			    context.nopick = 1;
 			    do_rush = TRUE;
 			    break;
 		    }
 		    /*FALLTHRU*/
 	 default:   if (movecmd(*cmd)) {	/* ordinary movement */
-			flags.run = 0;	/* only matters here if it was 8 */
+			context.run = 0;	/* only matters here if it was 8 */
 			do_walk = TRUE;
 		    } else if (movecmd(iflags.num_pad ?
 				       unmeta(*cmd) : lowc(*cmd))) {
-			flags.run = 1;
+			context.run = 1;
 			do_rush = TRUE;
 		    } else if (movecmd(unctrl(*cmd))) {
-			flags.run = 3;
+			context.run = 3;
 			do_rush = TRUE;
 		    }
 		    break;
@@ -1921,16 +1921,16 @@ register char *cmd;
 	}
 
 	if (do_walk) {
-	    if (multi) flags.mv = TRUE;
+	    if (multi) context.mv = TRUE;
 	    domove();
-	    flags.forcefight = 0;
+	    context.forcefight = 0;
 	    return;
 	} else if (do_rush) {
 	    if (firsttime) {
 		if (!multi) multi = max(COLNO,ROWNO);
 		u.last_str_turn = 0;
 	    }
-	    flags.mv = TRUE;
+	    context.mv = TRUE;
 	    domove();
 	    return;
 	} else if (prefix_seen && cmd[1] == '\033') {	/* <prefix><escape> */
@@ -1959,7 +1959,7 @@ register char *cmd;
 		    res = (*func)();		/* perform the command */
 		}
 		if (!res) {
-		    flags.move = FALSE;
+		    context.move = FALSE;
 		    multi = 0;
 		}
 		return;
@@ -1990,7 +1990,7 @@ register char *cmd;
 		Norep("Unknown command '%s'.", expcmd);
 	}
 	/* didn't move */
-	flags.move = FALSE;
+	context.move = FALSE;
 	multi = 0;
 	return;
 }
@@ -2323,7 +2323,7 @@ parse()
 	boolean prezero = FALSE;
 
 	multi = 0;
-	flags.move = 1;
+	context.move = 1;
 	flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
 	if (!iflags.num_pad || (foo = readchar()) == 'n')

@@ -63,7 +63,7 @@ register struct monst *mtmp;
 		}
 	    } else if (is_digging()) {
 		/* chewing, wand/spell of digging are checked elsewhere */
-		watch_dig(mtmp, digging.pos.x, digging.pos.y, FALSE);
+		watch_dig(mtmp, context.digging.pos.x, context.digging.pos.y, FALSE);
 	    }
 	}
 }

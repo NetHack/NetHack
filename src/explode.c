@@ -299,9 +299,9 @@ int expltype;
 		}
 		if (mtmp->mhp <= 0) {
 			/* KMH -- Don't blame the player for pets killing gas spores */
-			if (!flags.mon_moving) killed(mtmp);
+			if (!context.mon_moving) killed(mtmp);
 			else monkilled(mtmp, "", (int)adtyp);
-		} else if (!flags.mon_moving) setmangry(mtmp);
+		} else if (!context.mon_moving) setmangry(mtmp);
 	}
 
 	/* Do your injury last */
@@ -329,7 +329,7 @@ int expltype;
 		    	u.mh  -= damu;
 		    else
 			u.uhp -= damu;
-		    flags.botl = 1;
+		    context.botl = 1;
 		}
 
 		if (u.uhp <= 0 || (Upolyd && u.mh <= 0)) {

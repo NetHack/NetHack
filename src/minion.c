@@ -243,7 +243,7 @@ struct monst *mtmp;
 	}
 	(void) money2mon(mtmp, offer);
 #endif
-	flags.botl = 1;
+	context.botl = 1;
 	return(offer);
 }
 
