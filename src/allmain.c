@@ -240,7 +240,8 @@ moveloop()
 			    change = 0;
 			if(Polymorph && !rn2(100))
 			    change = 1;
-			else if (u.ulycn >= LOW_PM && !rn2(80 - (20 * night())))
+			else if (u.ulycn >= LOW_PM && !Upolyd &&
+				 !rn2(80 - (20 * night())))
 			    change = 2;
 			if (change && !Unchanging) {
 			    if (multi >= 0) {
