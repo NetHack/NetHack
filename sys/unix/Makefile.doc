@@ -14,6 +14,10 @@ GUIDEBOOK = Guidebook		# regular ASCII file
 COLCMD = col -bx
 #COLCMD = col -b
 
+# The command to use to generate a PostScript file
+# PSCMD = ditroff | psdit
+PSCMD = groff
+
 # Use the "cat" GUIDECMD if nroff and/or tbl and/or col are not installed
 # GUIDECMD = cat Guidebook.txt
 GUIDECMD = tbl tmac.n Guidebook.mn | nroff | $(COLCMD)
@@ -24,7 +28,7 @@ Guidebook:	Guidebook.mn
 
 # Fancier output for those with ditroff, psdit and a PostScript printer.
 Guidebook.ps:	Guidebook.mn
-	tbl tmac.n Guidebook.mn | ditroff | psdit > Guidebook.ps
+	tbl tmac.n Guidebook.mn | $(PSCMD) > Guidebook.ps
 
 # Guidebook.tex is the same as Guidebook.mn but formatted with LaTeX.
 # - The invocation command for LaTeX may vary in different installations.
