@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sounds.c	3.4	2001/02/14	*/
+/*	SCCS Id: @(#)sounds.c	3.4	2002/05/06	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -901,6 +901,9 @@ dochat()
 	    pline("%s seems not to notice you.", Monnam(mtmp));
 	return(0);
     }
+
+    /* if this monster is waiting for something, prod it into action */
+    mtmp->mstrategy &= ~STRAT_WAITMASK;
 
     if (mtmp->mtame && mtmp->meating) {
 	if (!canspotmon(mtmp))
