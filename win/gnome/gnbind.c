@@ -9,6 +9,7 @@
 
 #include "gnbind.h"
 #include "gnmain.h"
+#include "gnmenu.h"
 #include "gnaskstr.h"
 #include "gnyesno.h"
 
@@ -1098,7 +1099,7 @@ int get_ext_cmd(void)
 */
 int gnome_get_ext_cmd()
 {
-    return -1;
+    return ghack_menu_ext_cmd();
 }
 
 

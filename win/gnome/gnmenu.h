@@ -27,6 +27,6 @@ typedef struct _GHackMenuItem GHackMenuItem;
 
 int ghack_menu_window_select_menu (GtkWidget *menuWin, 
 	MENU_ITEM_P **_selected, gint how);
-
+int ghack_menu_ext_cmd(void);
 
 #endif  /* GnomeHackMenuWindow_h */

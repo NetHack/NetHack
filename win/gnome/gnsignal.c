@@ -369,8 +369,8 @@ ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 
 	/* can't just ignore "#", it's a core feature */
     case GDK_numbersign:
-	was_pound = 1;
-	return;
+	key='#';
+	break;
 
 	/* We will probably want to do something with these later... */
     case GDK_KP_Begin:
@@ -416,6 +416,7 @@ ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 
     default:
 	key = event->keyval;
+	break;
     }
 
     if ((event->state & alt) || was_pound) {

@@ -8,6 +8,7 @@
 #include "gnmenu.h"
 #include "gnmain.h"
 #include "gnbind.h"
+#include "func_tab.h"
 
 typedef enum {
 	MenuUnknown = 0,
@@ -22,65 +23,60 @@ typedef struct {
 	int selected;
 } menuItem;
 
+typedef struct {
+	int curItem;
+	int numRows;
+	int charIdx;
+	guint32 lastTime;
+} extMenu;
 
 static GdkColor color_blue = { 0, 0, 0, 0xffff };
 
 
-void ghack_menu_window_key_press(GtkWidget *menuWin, GdkEventKey *event, 
-	gpointer data)
+static void
+ghack_menu_window_key(GtkWidget *menuWin, GdkEventKey *event, gpointer data)
 {
-	int i, numRows;
-	menuItem* item;
-	MenuWinType isMenu;
+    int i, numRows;
+    menuItem* item;
+    MenuWinType isMenu;
 
-	/* Turn this on to debug key events */
-#if 0  
-	int ctl=GDK_CONTROL_MASK;
-	int alt=GDK_MOD1_MASK;
+    isMenu = (MenuWinType) GPOINTER_TO_INT
+	(gtk_object_get_data (GTK_OBJECT (menuWin), "isMenu"));
 
-	g_message("I got a \"%s\" key (%d) %s%s",
-		gdk_keyval_name (event->keyval), event->keyval,
-		(event->state&ctl)? "+CONTROL":"", 
-		(event->state&alt)? "+ALT":"");
-#endif
+    if (isMenu == MenuMenu) {
+	GtkWidget *clist;
+	gint selection_mode;
 
-	isMenu = (MenuWinType) GPOINTER_TO_INT
-		(gtk_object_get_data (GTK_OBJECT (menuWin), "isMenu"));
+	clist = GTK_WIDGET(gtk_object_get_data (GTK_OBJECT (menuWin), "clist"));
+	g_assert (clist != NULL);
+	numRows = GPOINTER_TO_INT
+	    (gtk_object_get_data(GTK_OBJECT(clist), "numRows"));
+	selection_mode = GPOINTER_TO_INT
+	    (gtk_object_get_data (GTK_OBJECT(clist), "selection_mode"));
+	for (i = 0; i <= numRows; ++i) {
+	    item = (menuItem*) gtk_clist_get_row_data(GTK_CLIST(clist), i);
+	    if (item == NULL) continue;
+	    if (!strcmp(item->accelerator, "")) continue;
 
-	if (isMenu == MenuMenu) {
-		GtkWidget *clist;
-		gint selection_mode;
-
-		clist = GTK_WIDGET(gtk_object_get_data (GTK_OBJECT (menuWin), "clist"));
-		g_assert (clist != NULL);
-		numRows = GPOINTER_TO_INT( gtk_object_get_data(
-			GTK_OBJECT(clist), "numRows") );
-		selection_mode = GPOINTER_TO_INT( gtk_object_get_data 
-			(GTK_OBJECT (clist), "selection_mode"));
-		for( i=0; i<=numRows; i++) {
-			item = (menuItem*) gtk_clist_get_row_data( 
-			GTK_CLIST (clist), i);
-			if (item == NULL)
-				continue;
-			if (!strcmp(item->accelerator, "")) {
-				continue;
-			}
-			if ( (!strcmp(item->accelerator, event->string)) ||
-				 ((selection_mode == GTK_SELECTION_MULTIPLE) &&
-						 (event->keyval == ','))) {
-				if (item->selected==TRUE) {
-					gtk_clist_unselect_row( GTK_CLIST (clist), 
-						item->itemNumber, 0);
-					item->selected=FALSE;
-				}
-				else {
-					gtk_clist_select_row( GTK_CLIST (clist), 
-						item->itemNumber, 0);
-					item->selected=TRUE;
-				}
-			}
+	    if ((!strcmp(item->accelerator, event->string)) ||
+		((selection_mode == GTK_SELECTION_MULTIPLE) &&
+		 (event->keyval == ','))) {
+		if (item->selected) {
+		    gtk_clist_unselect_row( GTK_CLIST (clist),
+					    item->itemNumber, 0);
+		    item->selected = FALSE;
+		} else {
+		    gtk_clist_select_row(GTK_CLIST (clist),
+					 item->itemNumber, 0);
+		    if (gtk_clist_row_is_visible(GTK_CLIST(clist),
+				item->itemNumber) != GTK_VISIBILITY_FULL)
+			gtk_clist_moveto(GTK_CLIST(clist),
+					 item->itemNumber, 0, 0.5, 0);
+		    item->selected = TRUE;
 		}
+	    }
 	}
+    }
 }
 
 
@@ -240,22 +236,6 @@ ghack_menu_window_select_menu (GtkWidget *menuWin,
 		       GTK_SELECTION_MULTIPLE : GTK_SELECTION_SINGLE));
    gtk_clist_set_selection_mode (GTK_CLIST (clist), 
 	   (how == PICK_ANY)? GTK_SELECTION_MULTIPLE : GTK_SELECTION_SINGLE);
-#if 0
-   /* Turn this on, and an "All" button will be appended to the
-    * menu dialog when it is in SELECTION_MULTIPLE mode.  I commented
-    * this out because 1) it doesn't work very well, and 2) it is ugly.
-    * A better job of doing this is very welcome....
-    *  -Erik */
-   if (how == PICK_ANY) {
-       static GdkEventKey event;
-       event.keyval='\'';
-       event.state=0;
-       gnome_dialog_append_button( GNOME_DIALOG(menuWin), "All");
-       gnome_dialog_button_connect( GNOME_DIALOG(menuWin), 2, 
-		GTK_SIGNAL_FUNC(ghack_menu_window_key_press),
-                       &event);
-   }
-#endif
    gnome_dialog_close_hides (GNOME_DIALOG (menuWin), TRUE);
    rc = gnome_dialog_run_and_close (GNOME_DIALOG (menuWin));
    if ((rc == 1) || (GTK_CLIST (clist)->selection == NULL)) {
@@ -368,9 +348,7 @@ ghack_menu_window_add_menu( GtkWidget *menuWin, gpointer menu_item,
 		else if ( ('A'+numItems-26)<='Z') {
 		    g_snprintf(accelBuf, sizeof(accelBuf), "%c ", 'A'+numItems-26); 
 		    gtk_clist_set_text(GTK_CLIST(clist), nCurrentRow, 0, accelBuf);
-		}
-		else {
-		    g_warning( "I've run out of accelerator letters!");
+		} else {
 		    accelBuf[0] = buf[0] = 0;
 		}
 		g_snprintf(buf, sizeof(buf), "%s", item->str);
@@ -641,7 +619,7 @@ ghack_init_menu_window (void)
                        NULL);
 
     gtk_signal_connect(GTK_OBJECT(menuWin), "key_press_event",
-                       GTK_SIGNAL_FUNC(ghack_menu_window_key_press),
+                       GTK_SIGNAL_FUNC(ghack_menu_window_key),
                        NULL);
 
     /* Center the dialog over parent */
@@ -654,3 +632,124 @@ ghack_init_menu_window (void)
     return menuWin;
 }
 
+static void
+ghack_ext_key_hit(GtkWidget *menuWin, GdkEventKey *event, gpointer data)
+{
+    GtkWidget* clist;
+    extMenu* info = (extMenu*) data;
+    int i;
+    char c = event->string[0];
+
+    clist = GTK_WIDGET(gtk_object_get_data(GTK_OBJECT(menuWin), "clist"));
+    g_assert(clist != NULL);
+
+    /* if too long between keystrokes, reset to initial state */
+    if (event->time - info->lastTime > 500) goto init_state;
+
+    /* see if current item continue to match */
+    if (info->charIdx > 0) {
+	if (extcmdlist[info->curItem].ef_txt[info->charIdx] == c) {
+	    ++info->charIdx;
+	    goto found;
+	}
+    }
+
+    /* see if the prefix matches a later command in the list */
+    if (info->curItem >= 0) {
+	for (i = info->curItem + 1; i < info->numRows; ++i) {
+	    if (!strncmp(extcmdlist[info->curItem].ef_txt,
+			 extcmdlist[i].ef_txt, info->charIdx-1)) {
+		if (extcmdlist[i].ef_txt[info->charIdx] == c) {
+		    ++info->charIdx;
+		    info->curItem = i;
+		    goto found;
+		}
+	    }
+	}
+    }
+		
+init_state:
+    /* reset to initial state, look for matching 1st character */
+    for (i = 0; i < info->numRows; ++i) {
+	if (extcmdlist[i].ef_txt[0] == c) {
+	    info->charIdx = 1;
+	    info->curItem = i;
+	    goto found;
+	}
+    }
+
+    /* no match: leave prior, if any selection in place */
+    return;
+
+found:
+    info->lastTime = event->time;
+    gtk_clist_select_row(GTK_CLIST(clist), info->curItem, 0);
+    if (gtk_clist_row_is_visible(GTK_CLIST(clist),
+				 info->curItem) != GTK_VISIBILITY_FULL)
+	gtk_clist_moveto(GTK_CLIST(clist), info->curItem, 0, 0.5, 0);
+}
+
+int
+ghack_menu_ext_cmd(void)
+{
+    int n;
+    GtkWidget* dialog;
+    GtkWidget* swin;
+    GtkWidget* frame1;
+    GtkWidget* clist;
+    extMenu info;
+
+    dialog = gnome_dialog_new("Extended Commands",
+			      GNOME_STOCK_BUTTON_OK,
+			      GNOME_STOCK_BUTTON_CANCEL,
+			      NULL);
+    gnome_dialog_close_hides(GNOME_DIALOG(dialog), FALSE);
+    gtk_signal_connect(GTK_OBJECT(dialog), "key_press_event",
+		       GTK_SIGNAL_FUNC(ghack_ext_key_hit), &info);
+
+    frame1 = gtk_frame_new("Make your selection");
+    gtk_object_set_data(GTK_OBJECT(dialog), "frame1", frame1);
+    gtk_widget_show(frame1);
+    gtk_container_border_width(GTK_CONTAINER(frame1), 3);
+
+    swin = gtk_scrolled_window_new(NULL, NULL);
+    clist = gtk_clist_new(2);
+    gtk_object_set_data(GTK_OBJECT(dialog), "clist", clist);
+    gtk_widget_set_usize(clist, 500, 400);
+    gtk_container_add(GTK_CONTAINER(swin), clist);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(swin),
+				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+    gtk_signal_connect(GTK_OBJECT(clist), "select_row",
+		       GTK_SIGNAL_FUNC(ghack_menu_row_selected), NULL);
+
+    gtk_container_add(GTK_CONTAINER(frame1), swin);
+    gtk_box_pack_start_defaults(GTK_BOX(GNOME_DIALOG(dialog)->vbox), frame1);
+
+    /* Add the extended commands into the list here... */
+    for (n = 0; extcmdlist[n].ef_txt; ++n) {
+	const char *text[3]={extcmdlist[n].ef_txt,extcmdlist[n].ef_desc,NULL};
+	gtk_clist_insert(GTK_CLIST(clist), n, (char**) text);
+    }
+
+    /* fill in starting info fields */
+    info.curItem = -1;
+    info.numRows = n;
+    info.charIdx = 0;
+    info.lastTime = 0;
+
+    gtk_clist_columns_autosize(GTK_CLIST(clist));
+    gtk_widget_show_all(swin);
+
+    /* Center the dialog over over parent */
+    gnome_dialog_set_default(GNOME_DIALOG(dialog), 0);
+    gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
+    gnome_dialog_set_parent(GNOME_DIALOG(dialog),
+			    GTK_WINDOW(ghack_get_main_window()));
+
+    /* Run the dialog -- returning whichever button was pressed */
+    n = gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
+
+    /* Quit on button 2 or error */
+    return (n != 0) ? -1 : info.curItem;
+}
