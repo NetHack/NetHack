@@ -1558,7 +1558,7 @@ const char *filename;
 	    /* e.g., problems when setuid NetHack can't search home
 	     * directory restricted to user */
 
-#if defined(POSIX_TYPES) || defined(BSD) || defined(SYSV)
+#if defined (NHSTDC) && !defined(NOTSTDC)
 	    if ((details = strerror(errno)) == 0)
 #endif
 		details = "";
