@@ -839,12 +839,16 @@ int thrown;
 					  mon->mcansee ? "" : " further");
 			    } else {
 				char *whom = mon_nam(mon);
+				char *what = The(xname(obj));
+				if (!thrown && obj->quan > 1)
+				    what = An(singular(obj, xname));
 				/* note: s_suffix returns a modifiable buffer */
 				if (haseyes(mdat)
 				    && mdat != &mons[PM_FLOATING_EYE])
-				    whom = strcat(s_suffix(whom), " face");
-				pline_The("%s splashes over %s!",
-					  xname(obj), whom);
+				    whom = strcat(strcat(s_suffix(whom), " "),
+						  mbodypart(mon, FACE));
+				pline("%s %s over %s!",
+				      what, vtense(what, "splash"), whom);
 			    }
 			    setmangry(mon);
 			    mon->mcansee = 0;
