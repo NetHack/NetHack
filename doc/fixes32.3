@@ -1,0 +1,30 @@
+General Fixes and Modified Features
+-----------------------------------
+Y2K fix: use 4 digit year values for the dates in the score file
+updated COPYRIGHT_BANNER_A to reflect year of release
+prevent "late" pline calls from triggering a crash when the RIP window was
+	displayed at end of game (observed when bones file rename failure
+	under Win95 was reported to wizard mode users)
+being punished on the Plane of Water doesn't trigger a panic when air bubbles
+	try to move the ball&chain or you around
+avoid rn2(0) divide by 0 for empty inventory when trying to crawl out of water
+don't let randomly placed monsters on special levels prevent explicitly
+	placed monsters who target that location from being created (a web
+	trap's spider resulted in no quest nemesis)
+don't let randomly placed stairs on special levels be covered by explicitly
+	placed features such as fountains
+pager: guard against '%' in output from being treated as a printf formatting
+	directive (using '/' or ';' to look at food yields "% blah blah")
+prayer result of ``escape from solid rock'' isn't inhibited by teleport
+	restrictions (attempting to fix all troubles got stuck in a loop)
+report "file empty?" rather than "version mismatch" when that's the reason
+	why a data file fails its validation check
+drum of earthquake can't destroy the high altars
+
+
+Platform- and/or Interface-Specific Fixes
+-----------------------------------------
+micro (assorted): readmail()--don't show fake mail text when blind; also,
+	update the "report bugs to" message to specify <nethack-bugs@nethack.org>
+msdos: fix missing $(INCL) in dependency in djgpp Makefile
+mac: Will only dispatch events if the window system is initialized
