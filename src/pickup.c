@@ -465,8 +465,8 @@ int what;		/* should be a long */
 		    pick_list[i].count = count;
 	    } else {
 		n = query_objlist("Pick up what?", objchain,
-			    traverse_how|AUTOSELECT_SINGLE|INVORDER_SORT,
-			    &pick_list, PICK_ANY, all_but_uchain);
+			traverse_how|AUTOSELECT_SINGLE|INVORDER_SORT|FEEL_COCKATRICE,
+			&pick_list, PICK_ANY, all_but_uchain);
 	    }
 menu_pickup:
 	    n_tried = n;
@@ -683,7 +683,13 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	pack = flags.inv_order;
 	do {
 	    printed_type_name = FALSE;
-	    for (curr = olist; curr; curr = FOLLOW(curr, qflags))
+	    for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
+		if ((qflags & FEEL_COCKATRICE) && curr->otyp == CORPSE &&
+		     will_feel_cockatrice(curr, FALSE)) {
+			destroy_nhwindow(win);	/* stop the menu and revert */
+			look_here(0, FALSE);
+			return 0;
+		}
 		if ((!(qflags & INVORDER_SORT) || curr->oclass == *pack)
 							&& (*allow)(curr)) {
 
@@ -701,6 +707,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 			    def_oc_syms[(int)objects[curr->otyp].oc_class],
 			    ATR_NONE, doname(curr), MENU_UNSELECTED);
 		}
+	    }
 	    pack++;
 	} while (qflags & INVORDER_SORT && *pack);
 

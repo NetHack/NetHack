@@ -797,6 +797,7 @@ E int NDECL(dotypeinv);
 E const char *FDECL(dfeature_at, (int,int,char *));
 E int FDECL(look_here, (int,BOOLEAN_P));
 E int NDECL(dolook);
+E boolean FDECL(will_feel_cockatrice, (struct obj *,BOOLEAN_P));
 E void FDECL(feel_cockatrice, (struct obj *,BOOLEAN_P));
 E void FDECL(stackobj, (struct obj *));
 E int NDECL(doprgold);

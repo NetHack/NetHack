@@ -2158,7 +2158,7 @@ boolean picked_some;
 	const char *dfeature = (char *)0;
 	char fbuf[BUFSZ], fbuf2[BUFSZ];
 	winid tmpwin;
-	boolean skip_objects = (obj_cnt >= 5);
+	boolean skip_objects = (obj_cnt >= 5), felt_cockatrice = FALSE;
 
 	if (u.uswallow && u.ustuck) {
 	    struct monst *mtmp = u.ustuck;
@@ -2242,13 +2242,22 @@ boolean picked_some;
 		putstr(tmpwin, 0, fbuf);
 		putstr(tmpwin, 0, "");
 	    }
-	    putstr(tmpwin, 0, "Things that are here:");
+	    putstr(tmpwin, 0, Blind ? "Things that you feel here:" :
+				      "Things that are here:");
 	    for ( ; otmp; otmp = otmp->nexthere) {
+		if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
+			char buf[BUFSZ];
+			felt_cockatrice = TRUE;
+			Strcpy(buf, doname(otmp));
+			Strcat(buf, "...");
+			putstr(tmpwin, 0, buf);
+			break;
+		}
 		putstr(tmpwin, 0, doname(otmp));
-		if (otmp->otyp == CORPSE) feel_cockatrice(otmp, FALSE);
 	    }
 	    display_nhwindow(tmpwin, TRUE);
 	    destroy_nhwindow(tmpwin);
+	    if (felt_cockatrice) feel_cockatrice(otmp, FALSE);
 	    read_engr_at(u.ux, u.uy); /* Eric Backus */
 	}
 	return(!!Blind);
@@ -2261,6 +2270,17 @@ dolook()
 	return look_here(0, FALSE);
 }
 
+boolean
+will_feel_cockatrice(otmp, force_touch)
+struct obj *otmp;
+boolean force_touch;
+{
+	if ((Blind || force_touch) && !uarmg && !Stone_resistance &&
+		(otmp->otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])))
+			return TRUE;
+	return FALSE;
+}
+
 void
 feel_cockatrice(otmp, force_touch)
 struct obj *otmp;
@@ -2268,8 +2288,7 @@ boolean force_touch;
 {
 	char kbuf[BUFSZ];
 
-	if ((Blind || force_touch) && !uarmg && !Stone_resistance &&
-		(otmp->otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm]))) {
+	if (will_feel_cockatrice(otmp, force_touch)) {
 	    if(poly_when_stoned(youmonst.data))
 			You("touched the %s corpse with your bare %s.",
 				mons[otmp->corpsenm].mname, makeplural(body_part(HAND)));
