@@ -40,7 +40,10 @@ OPTIONS=IBMGraphics
 # General options.  You might also set "silent" so as not to attract
 # the boss's attention.
 #
-OPTIONS=time,noshowexp,number_pad,lit_corridor
+# number_pad option can have an optional value of 0 (off), 1 (on), 
+# or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
+OPTIONS=time,noshowexp,number_pad:2,lit_corridor
+
 #
 # If you want to get rid of "use #quit to quit..." use:
 OPTIONS=suppress_alert:3.3.1
