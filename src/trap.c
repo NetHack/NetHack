@@ -552,6 +552,10 @@ unsigned trflags;
 	    }
 	}
 
+#ifdef STEED
+	if (u.usteed) u.usteed->mtrapseen |= (1 << (ttype-1));
+#endif
+
 	switch(ttype) {
 	    case ARROW_TRAP:
 		seetrap(trap);
