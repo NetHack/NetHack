@@ -534,8 +534,8 @@ LIBFILES= \
 all:  $(COMPACT_HEADERS) $(SBIN)lev_comp $(SBIN)dgn_comp $(SBIN)NetHack \
 	$(SBIN)dlb $(NETHACK)recover
 
-install: inst-data inst-dungeon inst-fonts inst-sounds inst-tiles \
-	 $(NETHACK)recover $(NETHACK)NetHack $(NETHACK)nhdat
+install: all inst-data inst-dungeon inst-fonts inst-sounds inst-tiles \
+	$(NETHACK)nhdat $(NETHACK)NetHack
 
 $(SBIN)NetHack:  $(HOBJ) $(AMI)ami.lnk
 	$(LINK) $(LNSPEC) $(SBIN)NetHack $(LIN) $(LLINK) $(LLIB)
@@ -1332,7 +1332,7 @@ $(NETHACK)HackWB.info:  $(AMI)HackWB.uu
 
 # If DLB is defined, create the nhdat library file in the playground
 # directory.  If not, move all the data files there.
-$(NETHACK)nhdat:  $(LIBFILES)
+$(NETHACK)nhdat:  $(LIBFILES) $(SBIN)dlb
 	list to T:nhdat.lst $(SLIB) QUICK NOHEAD FILES
 	echo  >T:make-nhdat $(SBIN)dlb cCfI $(SLIB) $(NETHACK)nhdat T:nhdat.lst
 	echo >>T:make-nhdat if not exists $(NETHACK)nhdat
