@@ -2133,7 +2133,8 @@ long hmask, emask;     /* might cancel timeout */
 				break;
 			/* fall into next case */
 		default:
-			dotrap(trap, 0);
+			if (!u.utrap) /* not already in the trap */
+				dotrap(trap, 0);
 	}
 
 	if (!Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz) && !u.uswallow &&
