@@ -29,6 +29,7 @@ prayer/unicorn-horn won't fix blindness while still engulfed in a dust
 being confused and reading cursed scroll of charging drains your energy
 class genocide recognizes species name as an example of the class to
 	genocide (Martin Snyder)
+internals: use Is_box rather than explicitly checking what it checks
 
 
 Platform- and/or Interface-Specific Fixes
