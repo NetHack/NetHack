@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)teleport.c	3.4	2001/12/06	*/
+/*	SCCS Id: @(#)teleport.c	3.4	2002/03/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -332,7 +332,7 @@ boolean force_it;
 	    } else {
 		Your("leash goes slack.");
  release_it:
-		m_unleash(mtmp);
+		m_unleash(mtmp, FALSE);
 		return TRUE;
 	    }
 	}

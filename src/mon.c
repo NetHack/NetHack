@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)mon.c	3.4	2002/03/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1241,7 +1241,7 @@ m_detach(mtmp, mptr)
 struct monst *mtmp;
 struct permonst *mptr;	/* reflects mtmp->data _prior_ to mtmp's death */
 {
-	if(mtmp->mleashed) m_unleash(mtmp);
+	if (mtmp->mleashed) m_unleash(mtmp, FALSE);
 	    /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
 	mtmp->mtrapped = 0;
 	mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */

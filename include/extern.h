@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.4	2002/01/04	*/
+/*	SCCS Id: @(#)extern.h	3.4	2002/03/09	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,7 +34,7 @@ E int NDECL(dojump);
 E int FDECL(jump, (int));
 E int NDECL(number_leashed);
 E void FDECL(o_unleash, (struct obj *));
-E void FDECL(m_unleash, (struct monst *));
+E void FDECL(m_unleash, (struct monst *,BOOLEAN_P));
 E void NDECL(unleash_all);
 E boolean NDECL(next_to_u);
 E struct obj *FDECL(get_mleash, (struct monst *));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.4	1999/10/20	*/
+/*	SCCS Id: @(#)dog.c	3.4	2002/03/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -473,7 +473,7 @@ boolean pets_only;	/* true for ascension or final escape */
 					humanoid(mtmp->data)
 					    ? (mtmp->female ? "Her" : "His")
 					    : "Its");
-				m_unleash(mtmp);
+				m_unleash(mtmp, FALSE);
 			}
 			continue;
 		}
@@ -512,7 +512,7 @@ boolean pets_only;	/* true for ascension or final escape */
 		/* this can happen if your quest leader ejects you from the
 		   "home" level while a leashed pet isn't next to you */
 		pline("%s leash goes slack.", s_suffix(Monnam(mtmp)));
-		m_unleash(mtmp);
+		m_unleash(mtmp, FALSE);
 	    }
 	}
 }
@@ -554,7 +554,7 @@ migrate_to_level(mtmp, tolev, xyloc, cc)
 	mtmp->nmon = migrating_mons;
 	migrating_mons = mtmp;
 	if (mtmp->mleashed)  {
-		m_unleash(mtmp);
+		m_unleash(mtmp, FALSE);
 		mtmp->mtame--;
 		pline_The("leash comes off!");
 	}
@@ -833,7 +833,7 @@ struct monst *mtmp;
 
 	if (!mtmp->mtame && mtmp->mleashed) {
 	    pline("%s breaks loose of %s leash!", Monnam(mtmp), mhis(mtmp));
-	    m_unleash(mtmp);
+	    m_unleash(mtmp, FALSE);
 	}
 
 	/* don't make a sound if pet is in the middle of leaving the level */

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.4	1997/05/25	*/
+/*	SCCS Id: @(#)dogmove.c	3.4	2002/03/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -717,7 +717,7 @@ newdogpos:
 			if (mtmp->mleashed) { /* play it safe */
 				pline("%s breaks loose of %s leash!",
 				      Monnam(mtmp), mhis(mtmp));
-				m_unleash(mtmp);
+				m_unleash(mtmp, FALSE);
 			}
 			(void) mattacku(mtmp);
 			return(0);

@@ -360,11 +360,18 @@ register struct obj *otmp;
 }
 
 void
-m_unleash(mtmp)		/* mtmp is about to die, or become untame */
+m_unleash(mtmp, feedback)	/* mtmp is about to die, or become untame */
 register struct monst *mtmp;
+boolean feedback;
 {
 	register struct obj *otmp;
 
+	if (feedback) {
+	    if (canseemon(mtmp))
+		pline("%s pulls free of %s leash!", Monnam(mtmp), mhis(mtmp));
+	    else
+		Your("leash falls slack.");
+	}
 	for(otmp = invent; otmp; otmp = otmp->nobj)
 		if(otmp->otyp == LEASH &&
 				otmp->leashmon == (int)mtmp->m_id)
@@ -542,7 +549,7 @@ register xchar x, y;
 			    if(um_dist(mtmp->mx, mtmp->my, 5)) {
 				pline("%s leash snaps loose!",
 					s_suffix(Monnam(mtmp)));
-				m_unleash(mtmp);
+				m_unleash(mtmp, FALSE);
 			    } else {
 				if(um_dist(mtmp->mx, mtmp->my, 3)) {
 				    You("pull on the leash.");
