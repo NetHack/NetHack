@@ -2373,11 +2373,11 @@ register boolean ininv;
 	    if (!Has_contents(otmp)) {
 		if(ininv) {
 		    if(otmp->unpaid)
-			price += get_cost(otmp, shkp);
+			price += otmp->quan * get_cost(otmp, shkp);
 		} else {
 		    if(!otmp->no_charge) {
 			if(otmp->oclass != FOOD_CLASS || !otmp->oeaten)
-			    price += get_cost(otmp, shkp);
+			    price += otmp->quan * get_cost(otmp, shkp);
 		    }
 		    otmp->no_charge = 0;
 		}
