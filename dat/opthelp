@@ -74,9 +74,6 @@ timed_delay    on unix and VMS, use a timer instead of sending
                display effect.  on MSDOS without the termcap
                lib, whether or not to pause for visual effect.    [TRUE]
 
-Boolean option if TTY_GRAPHICS was set at compile time:
-msg_window show previous messages in a screen-size window         [FALSE]
-
 Boolean option if USE_TILES was set at compile time (MSDOS protected mode only):
 preload_tiles  control whether tiles get pre-loaded into RAM at the
                start of the game.  Doing so enhances performance
@@ -204,6 +201,12 @@ traps      like dungeon, but for trap symbols
            default:  ^^^^^^^^^^^^^^^^^"^^^^
 windowtype windowing system to be used  [depends on operating system]
 
+Compound option if TTY_GRAPHICS was set at compile time:
+msg_window the type of message window to use:
+           Single      -- One message at a time
+           Full        -- Full window with all saved top line messages
+           Reverse     -- Same as full, but messages printed most-recent-first
+           Combination -- Two single messages, then as full
 
 Some sample options lists are:
 !autopickup,!tombstone,name:Gandalf,scores:own/3 top/2 around

@@ -123,11 +123,6 @@ static struct Bool_Opt
 #else
 	{"menu_tab_sep", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-#ifdef TTY_GRAPHICS
-	{"msg_window", &iflags.prevmsg_window, FALSE, SET_IN_GAME},
-#else
-	{"msg_window", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},
@@ -258,6 +253,11 @@ static struct Comp_Opt
 						MAXMCLASSES, SET_IN_FILE },
 	{ "msghistory", "number of top line messages to save",
 						5, DISP_IN_GAME },
+# ifdef TTY_GRAPHICS
+	{"msg_window", "the type of message window required",1, SET_IN_GAME},
+# else
+	{"msg_window", "the type of message window required", 1, SET_IN_FILE},
+# endif
 	{ "name",     "your character's name (e.g., name:Merlin-W)",
 						PL_NSIZ, DISP_IN_GAME },
 	{ "objects",  "the symbols to use for objects",
@@ -476,6 +476,7 @@ initoptions()
 	flags.end_top = 3;
 	flags.end_around = 2;
 	iflags.msg_history = 20;
+	iflags.prevmsg_window = 's';
 
 	/* Use negative indices to indicate not yet selected */
 	flags.initrole = -1;
@@ -1055,6 +1056,40 @@ boolean tinitial, tfrom_file;
 		} else if (negated) bad_negation(fullname, TRUE);
 		return;
 	}
+
+#ifdef TTY_GRAPHICS
+	fullname="msg_window";
+	/* msg_window:single, combo, full or reversed */
+	if (match_optname(opts, fullname, 4, TRUE)) {
+		int tmp;
+		if (!(op = string_for_opt(opts, TRUE))) {
+		    tmp = negated ? 's' : 'f';
+		} else {
+			  if (negated) {
+			  	bad_negation(fullname, TRUE);
+			  	return;
+				  }
+		    tmp = tolower(*op);
+		}
+		switch (tmp) {
+			case 's':	/* single message history cycle (default if negated) */
+				iflags.prevmsg_window = 's';
+				break;
+			case 'c':	/* combination: two singles, then full page reversed */
+				iflags.prevmsg_window = 'c';
+				break;
+			case 'f':	/* full page (default if no opts) */
+				iflags.prevmsg_window = 'f';
+				break;
+			case 'r':	/* full page (reversed) */
+				iflags.prevmsg_window = 'r';
+				break;
+			default:
+				badoption(opts);
+		}
+		return;
+	}
+#endif
 
 	/* WINCAP
 	 * setting font options  */
@@ -2331,7 +2366,8 @@ boolean setinitial,setfromfile;
     char buf[BUFSZ];
     boolean retval = FALSE;
     
-    /* Special handling of menustyle, pickup_burden, and pickup_types, disclose options. */
+    /* Special handling of menustyle, pickup_burden, and pickup_types, disclose
+       and msg_window options. */
     if (!strcmp("menustyle", optname)) {
 	const char *style_name;
 	menu_item *style_pick = (menu_item *)0;
@@ -2438,6 +2474,30 @@ boolean setinitial,setfromfile;
 	    }
 	}
 	retval = TRUE;
+    } else if (!strcmp("msg_window", optname)) {
+	/* by Christian W. Cooper */
+	menu_item *window_pick = (menu_item *)0;
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	any.a_char = 's';
+	add_menu(tmpwin, NO_GLYPH, &any, 's', 0,
+		ATR_NONE, "single", MENU_UNSELECTED);
+	any.a_char = 'c';
+	add_menu(tmpwin, NO_GLYPH, &any, 'c', 0,
+		ATR_NONE, "combination", MENU_UNSELECTED);
+	any.a_char = 'f';
+	add_menu(tmpwin, NO_GLYPH, &any, 'f', 0,
+		ATR_NONE, "full", MENU_UNSELECTED);
+	any.a_char = 'r';
+	add_menu(tmpwin, NO_GLYPH, &any, 'r', 0,
+		ATR_NONE, "reversed", MENU_UNSELECTED);
+	end_menu(tmpwin, "Select message history display type:");
+	if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
+		iflags.prevmsg_window = window_pick->item.a_char;
+		free((genericptr_t)window_pick);
+	}
+	destroy_nhwindow(tmpwin);
+        retval = TRUE;
     }
     return retval;
 }
@@ -2575,6 +2635,10 @@ char *buf;
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "msghistory"))
 		Sprintf(buf, "%u", iflags.msg_history);
+	else if (!strcmp(optname, "msg_window"))
+		Sprintf(buf, "%s", (iflags.prevmsg_window=='s') ? "single" :
+					(iflags.prevmsg_window=='c') ? "combination" :
+					(iflags.prevmsg_window=='f') ? "full" : "reversed");
 	else if (!strcmp(optname, "name"))
 		Sprintf(buf, "%s", plname);
 	else if (!strcmp(optname, "objects"))

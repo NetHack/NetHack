@@ -174,7 +174,7 @@ struct instance_flags {
 	boolean  mon_polycontrol;	/* debug: control monster polymorphs */
 #endif
 #ifdef TTY_GRAPHICS
-	boolean prevmsg_window;	/* show more old messages at a time */
+	char prevmsg_window;	/* type of old message window to use */
 	boolean  extmenu;	/* extended commands use menu interface */
 #endif
 #ifdef MFLOPPY

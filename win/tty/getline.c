@@ -72,7 +72,7 @@ getlin_hook_proc hook;
 		    *bufp = 0;
 		}
 		if(c == '\020') { /* ctrl-P */
-		    if (iflags.prevmsg_window) {
+		    if (iflags.prevmsg_window != 's') {
 			int sav = ttyDisplay->inread;
 			ttyDisplay->inread = 0;
 			(void) tty_doprev_message();
@@ -90,7 +90,7 @@ getlin_hook_proc hook;
 			doprev = 1;
 			continue;
 		    }
-		} else if (doprev && !iflags.prevmsg_window) {
+		} else if (doprev && iflags.prevmsg_window == 's') {
 		    tty_clear_nhwindow(WIN_MESSAGE);
 		    cw->maxcol = cw->maxrow;
 		    doprev = 0;

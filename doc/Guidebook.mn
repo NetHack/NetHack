@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 3, 2002
+.ds f2 "April 20, 2002
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1906,8 +1906,19 @@ Cannot be set with the `O' command.
 The number of top line messages to save (and recall with ^P) (default 20).
 Cannot be set with the `O' command.
 .lp msg_window
-Use a screen-size window to show the previous messages with ^P instead of 
-showing them one at a time.  (Currently implemented for tty only.)
+Allows you to change the way recalled messages are displayed.
+(It is currently implemented for tty only.)
+The possible values are:
+.sd
+.si
+s - single message (the default prior to 3.4.0).
+c - combination, two messages as `single', then as `full'.
+f - full window, oldest message first.
+r - full window, newest message first.
+.ei
+.ed
+For backward compatibility, no value needs to be specified (which
+defaults to `full'), or it can be negated (which defaults to `single').
 .lp "name    "
 Set your character's name (defaults to your user name).  You can also
 set your character's role by appending a dash and one or more letters of

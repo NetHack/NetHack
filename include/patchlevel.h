@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2002/03/29	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2002/04/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -40,11 +40,16 @@
 /*****************************************************************************/
 /* Version 3.4.x */
 
-/*  Patch 1, March 31, 2002
- *  Fix a fatal error involving land mines and boulders/statues
- *  Several message and other glitches corrected 
+/*  Patch 1, May 1, 2002
+ *  Fix a couple of fatal errors including one for reentering shops, one
+ *     involving land mines and boulders/statues, and one for delayed
+ *     polymorph
+ *  Dozens of general bug fixes
+ *  Several message and other glitches corrected
+ *  Travel command adjustments and ability to disable travel command
  *  win32: some interface improvements
  *  unix: improved tile support
+ *  message recall window extensions (by Christian Cooper)
  */
 
 /*
