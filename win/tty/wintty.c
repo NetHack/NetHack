@@ -1851,7 +1851,7 @@ tty_putstr(window, attr, str)
 	    cw->maxrow = cw->cury;
 	if(n0 > CO) {
 	    /* attempt to break the line */
-	    for(i = CO-1; i && str[i] != ' ';)
+	    for(i = CO-1; i && str[i] != ' ' && str[i] != '\n';)
 		i--;
 	    if(i) {
 		cw->data[cw->cury-1][++i] = '\0';
