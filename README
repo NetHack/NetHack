@@ -6,7 +6,7 @@ NetHack 3.3.
 
 NetHack 3.4.1 is a bugfix release for 3.4.0.
  *  Fix a few fatal errors including one for reentering shops, one
-       involving land mines and boulders/statues, and one for delayed
+       involving land mines and boulders/statues, one for delayed
        polymorph
  *  Dozens of general bug fixes
  *  Several message and other glitches corrected
@@ -20,6 +20,11 @@ A fuller list of changes for this release can be found in the file
 doc/fixes34.1 in the source distribution.  The text in there was written 
 for the development team's own use and is provided "as is", so please do 
 not ask us to further explain the entries in that file.
+
+We've also added a trouble log (paniclog) that will keep a record of the
+details behind a "dungeon collapses" message, or a "perhaps you better
+quit" message to assist in getting the required information included in
+bug reports to us.
 
                         - - - - - - - - - - -
 
