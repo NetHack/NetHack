@@ -1,0 +1,57 @@
+/*    SCCS Id: @(#)winami.p	3.1 93/01/08			 */
+/*    Copyright (c) Gregg Wonderly, Naperville, IL, 1992, 1993	 */
+/* NetHack may be freely redistributed. See license for details. */
+/* winami.c */
+void FDECL(amii_raw_print, (const char *));
+void FDECL(amii_raw_print_bold, (const char *));
+void FDECL(amii_start_menu, (winid ));
+void FDECL(amii_add_menu, (winid  , char  , int  , const char *));
+void FDECL(amii_end_menu, (winid  , char  , const char * , const char *));
+char FDECL(amii_select_menu, (winid ));
+void NDECL(amii_update_inventory );
+void NDECL(amii_mark_synch );
+void NDECL(amii_wait_synch );
+void NDECL(amii_setclipped );
+void FDECL(amii_cliparound, (int  , int ));
+void NDECL(amii_askname );
+void NDECL(amii_player_selection );
+void NDECL(flush_output );
+void FDECL(amii_destroy_nhwindow, (winid ));
+int FDECL(amii_create_nhwindow, (int ));
+void NDECL(amii_init_nhwindows );
+int NDECL(amii_get_ext_cmd);
+char FDECL(amii_yn_function, (const char * , const char * , char ));
+void FDECL(amii_addtopl, (const char *));
+void FDECL(TextSpaces, (struct RastPort * , int ));
+void FDECL(amii_putstr, (winid  , int  , const char *));
+void FDECL(amii_putsym, (winid  , int  , int  , CHAR_P ));
+void FDECL(amii_clear_nhwindow, (winid ));
+void FDECL(amii_exit_nhwindows, (const char *));
+int FDECL(amii_nh_poskey, (int * , int * , int *));
+int NDECL(amii_nhgetch );
+void NDECL(amii_get_nh_event );
+void NDECL(amii_remember_topl );
+int NDECL(amii_doprev_message );
+void FDECL(amii_display_nhwindow, (winid  , boolean ));
+void FDECL(amii_display_file, (const char * , boolean ));
+void FDECL(amii_curs, (winid  , int  , int ));
+void FDECL(amii_print_glyph, (winid  , xchar  , xchar  , int ));
+void FDECL(DoMenuScroll, (int  , int ));
+void FDECL(DisplayData, (int  , int  , int ));
+void FDECL(SetPropInfo, (struct Window * , struct Gadget * , long  , long  , long ));
+void FDECL(kill_nhwindows, (int ));
+void FDECL(amii_cl_end, (struct amii_WinDesc * , int ));
+void FDECL(cursor_off, (winid ));
+void FDECL(cursor_on, (winid ));
+void NDECL(amii_getret );
+void FDECL(amii_getlin, (const char * , char *));
+void FDECL(getlind, (const char * , char * , const char *));
+void FDECL(amii_suspend_nhwindows, (char * ));
+void NDECL(amii_resume_nhwindows);
+void NDECL(amii_bell);
+void NDECL(EditColor);
+void FDECL(DrawCol, ( struct Window *, int, UWORD * ) );
+void FDECL( DispCol, ( struct Window *w, int idx, UWORD * ) );
+void FDECL( SetBorder, (struct Gadget *) );
+void NDECL( port_help );
+void FDECL( dismiss_nhwindow, (winid) );
