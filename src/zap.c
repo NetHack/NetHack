@@ -166,8 +166,10 @@ struct obj *otmp;
 			if(dbldam) dmg *= 2;
 			if (otyp == SPE_TURN_UNDEAD)
 				dmg += spell_damage_bonus();
-			if(!resist(mtmp, otmp->oclass, dmg, NOTELL))
-			    monflee(mtmp, 0, FALSE, TRUE);
+			flags.bypasses = TRUE;	/* for make_corpse() */
+			if (!resist(mtmp, otmp->oclass, dmg, NOTELL)) {
+			    if (mtmp->mhp > 0) monflee(mtmp, 0, FALSE, TRUE);
+			}
 		}
 		break;
 	case WAN_POLYMORPH:
@@ -186,12 +188,14 @@ struct obj *otmp;
 			    pline("%s shudders!", Monnam(mtmp));
 			    makeknown(otyp);
 			}
+			/* flags.bypasses = TRUE; ## for make_corpse() */
 			/* no corpse after system shock */
 			xkilled(mtmp, 3);
-		    }
-		    else if (newcham(mtmp, (struct permonst *)0, (otyp != POT_POLYMORPH)) )
+		    } else if (newcham(mtmp, (struct permonst *)0,
+				       (otyp != POT_POLYMORPH))) {
 			if (!Hallucination && canspotmon(mtmp))
 			    makeknown(otyp);
+		    }
 		}
 		break;
 	case WAN_CANCELLATION:
@@ -1435,6 +1439,10 @@ struct obj *obj, *otmp;
 		 *             consistent with items that remain in the
 		 *             monster's inventory. They are not polymorphed
 		 *             either.
+		 * UNDEAD_TURNING - When an undead creature gets killed via
+		 *	       undead turning, prevent its corpse from being
+		 *	       immediately revived by the same effect.
+		 *
 		 * The bypass bit on all objects is reset each turn, whenever
 		 * flags.bypasses is set.
 		 *

@@ -437,6 +437,8 @@ throwing an artifact upwards will trigger artifact hit effects when it falls
 being hit by Fire Brand stops the turning-into-slime process
 monsters hitting other monsters can split puddings with weapons
 be consistent with checking for iron weapons when splitting puddings
+prevent corpses of undead creatures just killed by undead turning from being
+	instantly revived by the same undead turning attack
 
 
 Platform- and/or Interface-Specific Fixes

@@ -238,6 +238,10 @@ register struct monst *mtmp;
 	}
 	/* All special cases should precede the G_NOCORPSE check */
 
+	/* if polymorph or undead turning has killed this monster,
+	   prevent the same attack beam from hitting its corpse */
+	if (flags.bypasses) bypass_obj(obj);
+
 	if (mtmp->mnamelth)
 	    obj = oname(obj, NAME(mtmp));
 
