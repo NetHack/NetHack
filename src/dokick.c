@@ -214,6 +214,10 @@ doit:
 		} else {
 		    mnexto(mon);
 		    if(mon->mx != x || mon->my != y) {
+			if(glyph_is_invisible(levl[x][y].glyph)) {
+			    unmap_object(x, y);
+			    newsym(x, y);
+			}
 			pline("%s %s, %s evading your %skick.", Monnam(mon),
 				(can_teleport(mon->data) ? "teleports" :
 				 is_floater(mon->data) ? "floats" :
@@ -715,7 +719,8 @@ dokick()
 		kick_monster(x, y);
 		flags.forcefight = FALSE;
 		/* see comment in attack_checks() */
-		if (!canspotmon(mtmp) &&
+		if (!DEADMONSTER(mtmp) &&
+		    !canspotmon(mtmp) &&
 		    /* check x and y; a monster that evades your kick by
 		       jumping to an unseen square doesn't leave an I behind */
 		    mtmp->mx == x && mtmp->my == y &&
