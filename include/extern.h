@@ -1956,6 +1956,7 @@ E void FDECL(remove_worn_item, (struct obj *,BOOLEAN_P));
 E int FDECL(steal, (struct monst *, char *));
 E int FDECL(mpickobj, (struct monst *,struct obj *));
 E void FDECL(stealamulet, (struct monst *));
+E void FDECL(mdrop_special_objs, (struct monst *));
 E void FDECL(relobj, (struct monst *,int,BOOLEAN_P));
 #ifdef GOLDOBJ
 E struct obj *FDECL(findgold, (struct obj *));

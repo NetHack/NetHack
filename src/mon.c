@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.4	2003/11/26	*/
+/*	SCCS Id: @(#)mon.c	3.4	2003/12/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1583,13 +1583,18 @@ void
 mongone(mdef)
 register struct monst *mdef;
 {
+	mdef->mhp = 0;	/* can skip some inventory bookkeeping */
 #ifdef STEED
 	/* Player is thrown from his steed when it disappears */
 	if (mdef == u.usteed)
 		dismount_steed(DISMOUNT_GENERIC);
 #endif
 
-	discard_minvent(mdef);	/* release monster's inventory */
+	/* drop special items like the Amulet so that a dismissed Kop or nurse
+	   can't remove them from the game */
+	mdrop_special_objs(mdef);
+	/* release rest of monster's inventory--it is removed from game */
+	discard_minvent(mdef);
 #ifndef GOLDOBJ
 	mdef->mgold = 0L;
 #endif

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2003/08/18	*/
+/*	SCCS Id: @(#)shk.c	3.4	2003/12/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -975,6 +975,9 @@ register boolean silentkops;
 		} else {
 			/* if sensed, does disappear regardless whether seen */
 			if (sensemon(shkp)) vanished = TRUE;
+			/* can't act as porter for the Amulet, even if shk
+			   happens to be going farther down rather than up */
+			mdrop_special_objs(shkp);
 			/* arrive near shop's door */
 			migrate_to_level(shkp, ledger_no(&eshkp->shoplevel),
 					 MIGR_APPROX_XY, &eshkp->shd);

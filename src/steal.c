@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.4	2003/11/14	*/
+/*	SCCS Id: @(#)steal.c	3.4	2003/12/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,6 +7,7 @@
 STATIC_PTR int NDECL(stealarm);
 
 STATIC_DCL const char *FDECL(equipname, (struct obj *));
+STATIC_DCL void FDECL(mdrop_obj, (struct monst *,struct obj *,BOOLEAN_P));
 
 STATIC_OVL const char *
 equipname(otmp)
@@ -508,6 +509,59 @@ struct monst *mtmp;
     }
 }
 
+/* drop one object taken from a (possibly dead) monster's inventory */
+STATIC_OVL void
+mdrop_obj(mon, obj, verbosely)
+struct monst *mon;
+struct obj *obj;
+boolean verbosely;
+{
+    int omx = mon->mx, omy = mon->my;
+
+    if (obj->owornmask) {
+	/* perform worn item handling if the monster is still alive */
+	if (mon->mhp > 0) {
+	    mon->misc_worn_check &= ~obj->owornmask;
+	    update_mon_intrinsics(mon, obj, FALSE, TRUE);
+	 /* obj_no_longer_held(obj); -- done by place_object */
+	    if (obj->owornmask & W_WEP) setmnotwielded(mon, obj);
+#ifdef STEED
+	/* don't charge for an owned saddle on dead steed */
+	} else if (mon->mtame && (obj->owornmask & W_SADDLE) && 
+		!obj->unpaid && costly_spot(omx, omy)) {
+	    obj->no_charge = 1;
+#endif
+	}
+	obj->owornmask = 0L;
+    }
+    if (verbosely && cansee(omx, omy))
+	pline("%s drops %s.", Monnam(mon), distant_name(obj, doname));
+    if (!flooreffects(obj, omx, omy, "fall")) {
+	place_object(obj, omx, omy);
+	stackobj(obj);
+    }
+}
+
+/* some monsters bypass the normal rules for moving between levels or
+   even leaving the game entirely; when that happens, prevent them from
+   taking the Amulet or invocation tools with them */
+void
+mdrop_special_objs(mon)
+struct monst *mon;
+{
+    struct obj *obj, *otmp;
+
+    for (obj = mon->minvent; obj; obj = otmp) {
+	otmp = obj->nobj;
+	/* the Amulet, invocation tools, and Rider corpses resist even when
+	   artifacts and ordinary objects are given 0% resistance chance */
+	if (obj_resists(obj, 0, 0)) {
+	    obj_extract_self(obj);
+	    mdrop_obj(mon, obj, FALSE);
+	}
+    }
+}
+
 /* release the objects the creature is carrying */
 void
 relobj(mtmp,show,is_pet)
@@ -525,11 +579,12 @@ boolean is_pet;		/* If true, pet should keep wielded/worn items */
 		item1 = item2 = TRUE;
 	if (!tunnels(mtmp->data) || !needspick(mtmp->data))
 		item1 = TRUE;
+
 	while ((otmp = mtmp->minvent) != 0) {
 		obj_extract_self(otmp);
 		/* special case: pick-axe and unicorn horn are non-worn */
 		/* items that we also want pets to keep 1 of */
-		/* (It is a coincidence that these can also be wielded. */
+		/* (It is a coincidence that these can also be wielded.) */
 		if (otmp->owornmask || otmp == wep ||
 		    ((!item1 && otmp->otyp == PICK_AXE) ||
 		     (!item2 && otmp->otyp == UNICORN_HORN && !otmp->cursed))) {
@@ -542,28 +597,10 @@ boolean is_pet;		/* If true, pet should keep wielded/worn items */
 				keepobj = otmp;
 				continue;
 			}
-			mtmp->misc_worn_check &= ~(otmp->owornmask);
-#ifdef STEED
-			/* don't charge for an owned saddle on dead pet */
-			if (mtmp->mtame && mtmp->mhp == 0 &&
-			    (otmp->owornmask & W_SADDLE) && !otmp->unpaid &&
-			    costly_spot(mtmp->mx, mtmp->my))
-				otmp->no_charge = 1;
-#endif
-			if (otmp->owornmask)
-			    update_mon_intrinsics(mtmp, otmp, FALSE, TRUE);
-		     /* obj_no_longer_held(otmp); -- done by place_object */
-			if (otmp->owornmask & W_WEP)
-			    setmnotwielded(mtmp, otmp);
-			otmp->owornmask = 0L;
 		}
-		if (is_pet && cansee(omx, omy) && flags.verbose)
-			pline("%s drops %s.", Monnam(mtmp),
-					distant_name(otmp, doname));
-		if (flooreffects(otmp, omx, omy, "fall")) continue;
-		place_object(otmp, omx, omy);
-		stackobj(otmp);
+		mdrop_obj(mtmp, otmp, is_pet && flags.verbose);
 	}
+
 	/* put kept objects back */
 	while ((otmp = keepobj) != (struct obj *)0) {
 	    keepobj = otmp->nobj;
