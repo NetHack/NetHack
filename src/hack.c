@@ -422,7 +422,7 @@ still_chewing(x,y)
     unblock_point(x, y);	/* vision */
     newsym(x, y);
     if (digtxt) You(digtxt);	/* after newsym */
-    if (dmgtxt) pay_for_damage(dmgtxt);
+    if (dmgtxt) pay_for_damage(dmgtxt, FALSE);
     (void) memset((genericptr_t)&digging, 0, sizeof digging);
     return 0;
 }

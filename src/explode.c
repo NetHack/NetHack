@@ -367,7 +367,8 @@ int expltype;
 	if (shopdamage) {
 		pay_for_damage(adtyp == AD_FIRE ? "burn away" :
 			       adtyp == AD_COLD ? "shatter" :
-			       adtyp == AD_DISN ? "disintegrate" : "destroy");
+			       adtyp == AD_DISN ? "disintegrate" : "destroy",
+			       FALSE);
 	}
 
 	/* explosions are noisy */

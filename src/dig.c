@@ -186,7 +186,7 @@ dig_check(madeby, verbose, x, y)
 	} else if (Is_waterlevel(&u.uz)) {
 	    if(verbose) pline_The("water splashes and subsides.");
 	    return(FALSE);
-	} else if ((IS_WALL(levl[x][y].typ) &&
+	} else if ((IS_ROCK(levl[x][y].typ) && levl[x][y].typ != SDOOR &&
 		      (levl[x][y].wall_info & W_NONDIGGABLE) != 0)
 		|| (ttmp &&
 		      (ttmp->ttyp == MAGIC_PORTAL || !Can_dig_down(&u.uz)))) {
@@ -381,7 +381,7 @@ dig()
 		    newsym(dpx, dpy);
 		if(digtxt && !digging.quiet) pline(digtxt); /* after newsym */
 		if(dmgtxt)
-		    pay_for_damage(dmgtxt);
+		    pay_for_damage(dmgtxt, FALSE);
 
 		if(Is_earthlevel(&u.uz) && !rn2(3)) {
 		    register struct monst *mtmp;
@@ -531,7 +531,7 @@ int ttyp;
 
 	    if(madeby_u) {
 		You("dig a pit in the %s.", surface_type);
-		if (shopdoor) pay_for_damage("ruin");
+		if (shopdoor) pay_for_damage("ruin", FALSE);
 	    } else if (!madeby_obj && canseemon(madeby))
 		pline("%s digs a pit in the %s.", Monnam(madeby), surface_type);
 	    else if (cansee(x, y) && flags.verbose)
@@ -580,13 +580,15 @@ int ttyp;
 			impact_drop((struct obj *)0, x, y, 0);
 		    if (oldobjs != newobjs)
 			(void) pickup(1);
-		    if (shopdoor && madeby_u) pay_for_damage("ruin");
+		    if (shopdoor && madeby_u) pay_for_damage("ruin", FALSE);
 
 		} else {
 		    d_level newlevel;
 
 		    if (*u.ushops && madeby_u)
 			shopdig(1); /* shk might snatch pack */
+		    /* handle earlier damage, eg breaking wand of digging */
+		    else if (!madeby_u) pay_for_damage("dig into", TRUE);
 
 		    You("fall through...");
 		    /* Earlier checks must ensure that the destination
@@ -599,7 +601,7 @@ int ttyp;
 		    spoteffects(FALSE);
 		}
 	    } else {
-		if (shopdoor && madeby_u) pay_for_damage("ruin");
+		if (shopdoor && madeby_u) pay_for_damage("ruin", FALSE);
 		if (newobjs)
 		    impact_drop((struct obj *)0, x, y, 0);
 		if (mtmp) {
@@ -643,7 +645,8 @@ boolean pit_only;
 	boolean nohole = !Can_dig_down(&u.uz);
 
 	if ((ttmp && (ttmp->ttyp == MAGIC_PORTAL || nohole)) ||
-	   (IS_WALL(lev->typ) && (lev->wall_info & W_NONDIGGABLE) != 0)) {
+	   (IS_ROCK(lev->typ) && lev->typ != SDOOR &&
+	    (lev->wall_info & W_NONDIGGABLE) != 0)) {
 		pline_The("%s here is too hard to dig in.", surface(u.ux,u.uy));
 
 	} else if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) {
@@ -1261,7 +1264,7 @@ zap_dig()
 	} /* while */
 	tmp_at(DISP_END,0);	/* closing call */
 	if (shopdoor || shopwall)
-	    pay_for_damage(shopdoor ? "destroy" : "dig into");
+	    pay_for_damage(shopdoor ? "destroy" : "dig into", FALSE);
 	return;
 }
 

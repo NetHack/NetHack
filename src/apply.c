@@ -2556,6 +2556,7 @@ do_break_wand(obj)
     register struct monst *mon;
     int dmg, damage;
     boolean affects_objects;
+    boolean shop_damage = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
 
@@ -2643,10 +2644,13 @@ do_break_wand(obj)
 	if (!isok(x,y)) continue;
 
 	if (obj->otyp == WAN_DIGGING) {
-	    if(dig_check(BY_OBJECT, FALSE, x, y))
+	    if(dig_check(BY_OBJECT, FALSE, x, y)) {
+		if ((IS_WALL(levl[x][y].typ) || IS_DOOR(levl[x][y].typ)) &&
+		    *in_rooms(x,y,SHOPBASE)) shop_damage = TRUE;
 		digactualhole(x, y, BY_OBJECT,
 			      (rn2(obj->spe) < 3 || !Can_dig_down(&u.uz)) ?
 			       PIT : HOLE);
+	    }
 	    continue;
 	} else if(obj->otyp == WAN_CREATE_MONSTER) {
 	    /* u.ux,u.uy creates it near you--x,y might create it in rock */
@@ -2678,6 +2682,10 @@ do_break_wand(obj)
 	    }
 	}
     }
+
+    /* Note: if player fell thru, this call is a no-op.
+       Damage is handled in digactualhole in that case */
+    if (shop_damage) pay_for_damage("dig into", FALSE);
 
     if (obj->otyp == WAN_LIGHT)
 	litroom(TRUE, obj);	/* only needs to be done once */

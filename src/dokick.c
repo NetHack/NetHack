@@ -541,8 +541,15 @@ xchar x, y;
 	}
 
 	/* the object might have fallen down a hole */
-	if (kickobj->where == OBJ_MIGRATING)
+	if (kickobj->where == OBJ_MIGRATING) {
+	    if (costly) {
+		if(isgold)
+		    costly_gold(x, y, kickobj->quan);
+		else (void)stolen_value(kickobj, x, y,
+					(boolean)shkp->mpeaceful, FALSE);
+	    }
 	    return 1;
+	}
 
 	bhitroom = *in_rooms(bhitpos.x, bhitpos.y, SHOPBASE);
 	if (costly && (!costly_spot(bhitpos.x, bhitpos.y) ||
@@ -1014,7 +1021,7 @@ dumb:
 		unblock_point(x,y);		/* vision */
 		if (shopdoor) {
 		    add_damage(x, y, 400L);
-		    pay_for_damage("break");
+		    pay_for_damage("break", FALSE);
 		}
 		if (in_town(x, y))
 		  for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {

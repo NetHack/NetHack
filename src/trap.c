@@ -283,9 +283,11 @@ register int x, y, typ;
 	    case TRAPDOOR:
 		lev = &levl[x][y];
 		if (*in_rooms(x, y, SHOPBASE) &&
-			((typ == HOLE || typ == TRAPDOOR) || IS_DOOR(lev->typ)))
+			((typ == HOLE || typ == TRAPDOOR) ||
+			 IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
 		    add_damage(x, y,		/* schedule repair */
-			(IS_DOOR(lev->typ) && !flags.mon_moving) ? 200L : 0L);
+			       ((IS_DOOR(lev->typ) || IS_WALL(lev->typ))
+				&& !flags.mon_moving) ? 200L : 0L);
 		lev->doormask = 0;	/* subsumes altarmask, icedpool... */
 		if (IS_ROOM(lev->typ)) /* && !IS_AIR(lev->typ) */
 		    lev->typ = ROOM;

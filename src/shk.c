@@ -3410,8 +3410,9 @@ coord *mm;
 #endif	/* KOPS */
 
 void
-pay_for_damage(dmgstr)
+pay_for_damage(dmgstr, cant_mollify)
 const char *dmgstr;
+boolean cant_mollify;
 {
 	register struct monst *shkp = (struct monst *)0;
 	char shops_affected[5];
@@ -3521,11 +3522,11 @@ const char *dmgstr;
 	    (void) mnearto(shkp, x, y, TRUE);
 	}
 
-	if((um_dist(x, y, 1) && !uinshp) ||
+	if((um_dist(x, y, 1) && !uinshp) || cant_mollify ||
 #ifndef GOLDOBJ
-			(u.ugold + ESHK(shkp)->credit) < cost_of_damage
+	   (u.ugold + ESHK(shkp)->credit) < cost_of_damage
 #else
-			(money_cnt(invent) + ESHK(shkp)->credit) < cost_of_damage
+	   (money_cnt(invent) + ESHK(shkp)->credit) < cost_of_damage
 #endif
 				|| !rn2(50)) {
 		if(um_dist(x, y, 1) && !uinshp) {

@@ -2783,7 +2783,7 @@ struct obj *obj;			/* object tossed/used */
 	if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM) tmp_at(DISP_END, 0);
 
 	if(shopdoor)
-	    pay_for_damage("destroy");
+	    pay_for_damage("destroy", FALSE);
 
 	return (struct monst *)0;
 }
@@ -3456,7 +3456,7 @@ register int dx,dy;
     if (shopdamage)
 	pay_for_damage(abstype == ZT_FIRE ?  "burn away" :
 		       abstype == ZT_COLD ?  "shatter" :
-		       abstype == ZT_DEATH ? "disintegrate" : "destroy");
+		       abstype == ZT_DEATH ? "disintegrate" : "destroy", FALSE);
     bhitpos = save_bhitpos;
 }
 #endif /*OVLB*/
