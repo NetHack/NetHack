@@ -1,5 +1,5 @@
-#   SCCS Id: @(#)Makefile.bcc       3.3     2001/06/11
-#   Copyright (c) NetHack PC Development Team 1993-2001
+#   SCCS Id: @(#)Makefile.bcc       3.3     2002/01/23
+#   Copyright (c) NetHack PC Development Team 1993-2002
 #
 #   NetHack 3.3.x Makefile for Borland C++ V5.5 and above and Borland's MAKE
 #  
@@ -47,7 +47,7 @@ APPVER = 4.0
 # Graphical interface
 # Set to Y for a graphical version
 
-GRAPHICAL = Y					
+GRAPHICAL = Y
 
 !IF "$(APPVER)" == "4.0"
 MAKE_WINVER = 0x0400
@@ -81,9 +81,9 @@ libsmt  = $(bcclib)\cw32mt.lib $(bcclib)\import32.lib
 
 GAME    = NetHack                 # Game Name
 !IF "$(GRAPHICAL)" == "Y"
-GAMEDIR = \games\winhack	      # Game directory
+GAMEDIR = \games\nethackwin	      # Game directory
 !ELSE
-GAMEDIR = \games\nethackntty      # Game directory
+GAMEDIR = \games\nethacktty       # Game directory
 !ENDIF
 
 #
@@ -202,7 +202,7 @@ TILEINCL  =
 !ENDIF
 
 TILEUTIL  = $(UTIL)\tile2bmp.exe
-TILEBMP   = $(OBJ)\tiles.bmp
+TILEBMP   = $(SRC)\tiles.bmp
 
 # These should be left commented in 3.3.x
 #
@@ -325,8 +325,6 @@ DLB =
 
 {$(WIN32)}.c{$(OBJ)}.o:
 	@$(cc) $(CFLAGS)  -o$@  $<
-{$(WIN32)}.rc{$(OBJ)}.res :
-	$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $<
 
 #==========================================
 #================ MACROS ==================
@@ -487,17 +485,13 @@ $(O)obj.tag:
 # options.
 #==========================================
 
-envchk:
-!	IF "$(CL)"!=""
-	   @echo Warning, the CL Environment variable is defined:
-	   @echo CL=$(CL)
-!	ENDIF
-!	IF "$(TILEGAME)"!=""
+graphicschk:
+!	IF "$(GRAPHICAL)"=="Y"
 	   @echo ----
 	   @echo NOTE: This build will include tile support.
 	   @echo ----
 !	ENDIF
-	@echo envchk > envchk
+	@echo graphicschk > graphicschk
 
 #==========================================
 #=============== TARGETS ==================
@@ -512,7 +506,7 @@ default : $(GAMEFILE)
 #  The main target.
 #
 
-$(GAME): $(O)obj.tag $(O)utility.tag envchk $(GAMEFILE)
+$(GAME): $(O)obj.tag $(O)utility.tag graphicschk $(GAMEFILE)
 	@echo $(GAME) is up to date.
 
 #
@@ -521,7 +515,7 @@ $(GAME): $(O)obj.tag $(O)utility.tag envchk $(GAMEFILE)
 
 all :	install
 
-install: envchk $(GAME) $(TILEBMP) $(O)install.tag
+install: graphicschk $(GAME) $(O)install.tag
 	 @echo Done.
 
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
@@ -595,6 +589,10 @@ $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
+!IF "$(GRAPHICAL)"=="Y"
+$(TILERES): $(TILEBMP) $(WIN32)\winhack.rc
+	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
+!ENDIF
 
 #==========================================
 #  The main target.
@@ -619,7 +617,7 @@ $(GAME)_.ico : $(NTSYS)\$(GAME).ico
 # Makedefs Stuff
 #==========================================
 
-$(U)makedefs.exe:	$(O)obj.tag $(MAKEOBJS)
+$(U)makedefs.exe:	$(O)obj.tag $(MAKEOBJS) $(SRC)\uuid.lib
 	@$(link) $(LFLAGSU) $(startobj) $(MAKEOBJS), $@,,$(libsmt)
 
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
@@ -659,7 +657,7 @@ $(SRC)\vis_tab.c: $(U)makedefs.exe
 
 LEVCFLAGS=$(cflags) -DWIN32 -D_WIN32 -D_MT -I..\include $(cdebug) -DDLB
 
-$(U)lev_comp.exe: $(SPLEVOBJS)
+$(U)lev_comp.exe: $(SPLEVOBJS) $(SRC)\uuid.lib
 	@echo Linking $@...
 	@$(link) $(LFLAGSU) $(startobj) $(SPLEVOBJS), $@,,$(libsmt)
 
@@ -715,7 +713,7 @@ $(U)lev_$(LEX).c: $(U)lev_comp.l
 # Dungeon Compiler Stuff
 #==========================================
 
-$(U)dgn_comp.exe: $(DGNCOMPOBJS)
+$(U)dgn_comp.exe: $(DGNCOMPOBJS) $(SRC)\uuid.lib
     @echo Linking $@...
 	@$(link) $(LFLAGSU) $(startobj) $(DGNCOMPOBJS), $@,,$(libsmt)
 
@@ -784,7 +782,7 @@ $(INCL)\win32api.h: $(NTSYS)\win32api.h
 # DLB utility and nhdat file creation
 #==========================================
 
-$(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
+$(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o $(SRC)\uuid.lib
 	@$(link) $(LFLAGSU) $(startobj) $(O)dlb_main.o $(O)dlb.o $(O)alloc.o $(O)panic.o, $@,,$(libsmt)
 
 
@@ -820,7 +818,7 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(DAT)\options \
 #  Recover Utility
 #==========================================
 
-$(U)recover.exe: $(RECOVOBJS)
+$(U)recover.exe: $(RECOVOBJS) $(SRC)\uuid.lib
 	@$(link) $(LFLAGSU) $(startobj) $(RECOVOBJS), $@,,$(libsmt)
 
 
@@ -835,7 +833,7 @@ $(SRC)\tile.c: $(U)tilemap.exe
 	@echo A new $@ has been created
 	@$(U)tilemap
 
-$(U)tilemap.exe: $(O)tilemap.o
+$(U)tilemap.exe: $(O)tilemap.o $(SRC)\uuid.lib
 	@$(link) $(LFLAGSU) $(startobj) $(O)tilemap.o, $@,,$(libsmt)
 
 
@@ -858,12 +856,12 @@ $(O)tiletext.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 # Optional Tile Utilities
 #==========================================
 
-$(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
+$(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO) $(SRC)\uuid.lib
     @echo Linking $@...
 	@$(link) $(LFLAGSU) $(startobj) $(GIFREADERS) $(TEXT_IO), $@,,$(libsmt)
 
 
-$(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
+$(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO) $(SRC)\uuid.lib
     @echo Linking $@...
 	@$(link) $(LFLAGSU) $(startobj) $(PPMWRITERS) $(TEXT_IO), $@,,$(libsmt)
 
@@ -874,7 +872,7 @@ $(TILEBMP): $(TILEUTIL) $(TILEFILES)
 	@$(U)tile2bmp $(TILEBMP)
 !ENDIF
 
-$(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
+$(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO) $(SRC)\uuid.lib
     @echo Linking $@...
 	@$(link) $(LFLAGSU) $(startobj) $(O)tile2bmp.o $(TEXT_IO), $@,,$(libsmt)
 
