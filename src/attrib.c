@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)attrib.c	3.4	2002/10/07	*/
+/*	SCCS Id: @(#)attrib.c	3.4	2003/11/26	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -191,6 +191,90 @@ losestr(num)	/* may kill you; cause may be poison or monster like 'a' */
 	    }
 	}
 	(void) adjattrib(A_STR, -num, TRUE);
+}
+
+static const struct poison_effect_message {
+    void VDECL((*delivery_func), (const char *,...));
+    const char *effect_msg;
+} poiseff[] = {
+    { You_feel,	"weaker" },			/* A_STR */
+    { Your,	"brain is on fire" },		/* A_INT */
+    { Your,	"judgement is impaired" },	/* A_WIS */
+    { Your,	"muscles won't obey you" },	/* A_DEX */
+    { You_feel,	"very sick" },			/* A_CON */
+    { You,	"break out in hives" }		/* A_CHA */
+};
+
+/* feedback for attribute loss due to poisoning */
+void
+poisontell(typ, exclaim)
+int typ;		/* which attribute */
+boolean exclaim;	/* emphasis */
+{
+    void VDECL((*func), (const char *,...)) = poiseff[typ].delivery_func;
+
+    (*func)("%s%c", poiseff[typ].effect_msg, exclaim ? '!' : '.');
+}
+
+/* called when an attack or trap has poisoned the hero (used to be in mon.c) */
+void
+poisoned(reason, typ, pkiller, fatal, thrown_weapon)
+const char *reason,	/* controls what messages we display */
+	   *pkiller;	/* for score+log file if fatal */
+int  typ, fatal;
+boolean thrown_weapon;	/* thrown weapons are less deadly */
+{
+	int i, kprefix = KILLED_BY_AN;
+
+	/* inform player about being poisoned unless that's already been done;
+	   "blast" has given a "blast of poison gas" message; "poison arrow",
+	   "poison dart", etc have implicitly given poison messages too... */
+	if (strcmp(reason, "blast") && !strstri(reason, "poison")) {
+	    boolean plural = (reason[strlen(reason) - 1] == 's') ? 1 : 0;
+
+	    /* avoid "The" Orcus's sting was poisoned... */
+	    pline("%s%s %s poisoned!",
+		  isupper(*reason) ? "" : "The ", reason,
+		  plural ? "were" : "was");
+	}
+	if (Poison_resistance) {
+	    if (!strcmp(reason, "blast")) shieldeff(u.ux, u.uy);
+	    pline_The("poison doesn't seem to affect you.");
+	    return;
+	}
+
+	/* suppress killer prefix if it already has one */
+	i = name_to_mon(pkiller);
+	if (i >= LOW_PM && (mons[i].geno & G_UNIQ)) {
+	    kprefix = KILLED_BY;
+	    if (!type_is_pname(&mons[i])) pkiller = the(pkiller);
+	} else if (!strncmpi(pkiller, "the ", 4) ||
+		   !strncmpi(pkiller, "an ", 3) ||
+		   !strncmpi(pkiller, "a ", 2)) {
+	    /*[ does this need a plural check too? ]*/
+	    kprefix = KILLED_BY;
+	}
+
+	i = rn2(fatal + (thrown_weapon ? 20 : 0));
+	if (i == 0 && typ != A_CHA) {
+	    u.uhp = -1;
+	    pline_The("poison was deadly...");
+	} else if (i <= 5) {
+	    /* check that a stat change was made */
+	    if (adjattrib(typ, thrown_weapon ? -1 : -rn1(3,3), 1))
+		poisontell(typ, TRUE);
+	} else {
+	    i = thrown_weapon ? rnd(6) : rn1(10,6);
+	    losehp(i, pkiller, kprefix);	/* poison damage */
+	}
+
+	if (u.uhp < 1) {
+	    killer.format = kprefix;
+	    Strcpy(killer.name, pkiller);
+	    /* "Poisoned by a poisoned ___" is redundant */
+	    done(strstri(pkiller, "poison") ? DIED : POISONING);
+	}
+	(void) encumber_msg();
 }
 
 void

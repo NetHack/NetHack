@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/10/20	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/11/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -664,7 +664,7 @@ unsigned trflags;
 #endif
 		if (thitu(7, dmgval(otmp, &youmonst), otmp, "little dart")) {
 		    if (otmp->opoisoned)
-			poisoned("dart", A_CON, "little dart", -10);
+			poisoned("dart", A_CON, "little dart", 10, TRUE);
 		    obfree(otmp, (struct obj *)0);
 		} else {
 		    place_object(otmp, u.ux, u.uy);
@@ -909,7 +909,8 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 			"fell into a pit of iron spikes",
 			NO_KILLER_PREFIX);
 		    if (!rn2(6))
-			poisoned("spikes", A_STR, "fall onto poison spikes", 8);
+			poisoned("spikes", A_STR, "fall onto poison spikes",
+				 8, FALSE);
 		} else
 		    losehp(Maybe_Half_Phys(rnd(6)),"fell into a pit",
 			NO_KILLER_PREFIX);
@@ -3672,16 +3673,19 @@ boolean disarm;
 		case 18:
 		case 17:
 			pline("A cloud of noxious gas billows from %s.",
-							the(xname(obj)));
-			poisoned("gas cloud", A_STR, "cloud of poison gas",15);
+			      the(xname(obj)));
+			poisoned("gas cloud", A_STR, "cloud of poison gas",
+				 15, FALSE);
 			exercise(A_CON, FALSE);
 			break;
 		case 16:
 		case 15:
 		case 14:
 		case 13:
-			You_feel("a needle prick your %s.",body_part(bodypart));
-			poisoned("needle", A_CON, "poisoned needle",10);
+			You_feel("a needle prick your %s.",
+				 body_part(bodypart));
+			poisoned("needle", A_CON, "poisoned needle",
+				 10, FALSE);
 			exercise(A_CON, FALSE);
 			break;
 		case 12:

@@ -85,11 +85,13 @@ E long FDECL(arti_cost, (struct obj *));
 /* ### attrib.c ### */
 
 E boolean FDECL(adjattrib, (int,int,int));
+E void FDECL(gainstr, (struct obj *,int));
+E void FDECL(losestr, (int));
+E void FDECL(poisontell, (int,BOOLEAN_P));
+E void FDECL(poisoned, (const char *,int,const char *,int,BOOLEAN_P));
 E void FDECL(change_luck, (SCHAR_P));
 E int FDECL(stone_luck, (BOOLEAN_P));
 E void NDECL(set_moreluck);
-E void FDECL(gainstr, (struct obj *,int));
-E void FDECL(losestr, (int));
 E void NDECL(restore_attrib);
 E void FDECL(exercise, (int,BOOLEAN_P));
 E void NDECL(exerchk);
@@ -1161,8 +1163,6 @@ E void FDECL(xkilled, (struct monst *,int));
 E void FDECL(mon_to_stone, (struct monst*));
 E void FDECL(mnexto, (struct monst *));
 E boolean FDECL(mnearto, (struct monst *,XCHAR_P,XCHAR_P,BOOLEAN_P));
-E void FDECL(poisontell, (int));
-E void FDECL(poisoned, (const char *,int,const char *,int));
 E void FDECL(m_respond, (struct monst *));
 E void FDECL(setmangry, (struct monst *));
 E void FDECL(wakeup, (struct monst *));

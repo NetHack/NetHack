@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2003/08/24	*/
+/*	SCCS Id: @(#)zap.c	3.4	2003/11/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3152,7 +3152,7 @@ xchar sx, sy;
 	    if (!rn2(3)) destroy_item(RING_CLASS, AD_ELEC);
 	    break;
 	case ZT_POISON_GAS:
-	    poisoned("blast", A_DEX, "poisoned blast", 15);
+	    poisoned("blast", A_DEX, "poisoned blast", 15, FALSE);
 	    break;
 	case ZT_ACID:
 	    if (Acid_resistance) {

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.4	2003/08/24	*/
+/*	SCCS Id: @(#)mon.c	3.4	2003/11/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1986,76 +1986,6 @@ boolean move_other;	/* make sure mtmp gets to x, y! so move m_at(x, y) */
 	}
 
 	return(FALSE);
-}
-
-
-static const char *poiseff[] = {
-
-	" feel weaker", "r brain is on fire",
-	"r judgement is impaired", "r muscles won't obey you",
-	" feel very sick", " break out in hives"
-};
-
-void
-poisontell(typ)
-
-	int	typ;
-{
-	pline("You%s.", poiseff[typ]);
-}
-
-void
-poisoned(string, typ, pname, fatal)
-const char *string, *pname;
-int  typ, fatal;
-{
-	int i, plural, kprefix = KILLED_BY_AN;
-	boolean thrown_weapon = (fatal < 0);
-
-	if (thrown_weapon) fatal = -fatal;
-	if(strcmp(string, "blast") && !thrown_weapon) {
-	    /* 'blast' has already given a 'poison gas' message */
-	    /* so have "poison arrow", "poison dart", etc... */
-	    plural = (string[strlen(string) - 1] == 's')? 1 : 0;
-	    /* avoid "The" Orcus's sting was poisoned... */
-	    pline("%s%s %s poisoned!", isupper(*string) ? "" : "The ",
-			string, plural ? "were" : "was");
-	}
-
-	if(Poison_resistance) {
-		if(!strcmp(string, "blast")) shieldeff(u.ux, u.uy);
-		pline_The("poison doesn't seem to affect you.");
-		return;
-	}
-	/* suppress killer prefix if it already has one */
-	if ((i = name_to_mon(pname)) >= LOW_PM && mons[i].geno & G_UNIQ) {
-	    kprefix = KILLED_BY;
-	    if (!type_is_pname(&mons[i])) pname = the(pname);
-	} else if (!strncmpi(pname, "the ", 4) ||
-	    !strncmpi(pname, "an ", 3) ||
-	    !strncmpi(pname, "a ", 2)) {
-	    /*[ does this need a plural check too? ]*/
-	    kprefix = KILLED_BY;
-	}
-	i = rn2(fatal + 20*thrown_weapon);
-	if(i == 0 && typ != A_CHA) {
-		u.uhp = -1;
-		pline_The("poison was deadly...");
-	} else if(i <= 5) {
-		/* Check that a stat change was made */
-		if (adjattrib(typ, thrown_weapon ? -1 : -rn1(3,3), 1))
-		    pline("You%s!", poiseff[typ]);
-	} else {
-		i = thrown_weapon ? rnd(6) : rn1(10,6);
-		losehp(i, pname, kprefix); /* poison damage */
-	}
-	if(u.uhp < 1) {
-		killer.format = kprefix;
-		Strcpy(killer.name, pname);
-		/* "Poisoned by a poisoned ___" is redundant */
-		done(strstri(pname, "poison") ? DIED : POISONING);
-	}
-	(void) encumber_msg();
 }
 
 /* monster responds to player action; not the same as a passive attack */

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2003/10/21	*/
+/*	SCCS Id: @(#)potion.c	3.4	2003/11/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -683,10 +683,10 @@ peffects(otmp)
 			int typ = rn2(A_MAX);
 
 			if (!Fixed_abil) {
-			    poisontell(typ);
+			    poisontell(typ, FALSE);
 			    (void) adjattrib(typ,
-			    		Poison_resistance ? -1 : -rn1(4,3),
-			    		TRUE);
+					    Poison_resistance ? -1 : -rn1(4,3),
+					    1);
 			}
 			if(!Poison_resistance) {
 			    if (otmp->fromsink)

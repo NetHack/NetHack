@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2003/09/09	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2003/11/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1032,7 +1032,7 @@ dopois:
 		if (uncancelled && !rn2(8)) {
 		    Sprintf(buf, "%s %s",
 			    s_suffix(Monnam(mtmp)), mpoisons_subj(mtmp, mattk));
-		    poisoned(buf, ptmp, mdat->mname, 30);
+		    poisoned(buf, ptmp, mdat->mname, 30, FALSE);
 		}
 		break;
 	    case AD_DRIN:

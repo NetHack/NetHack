@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.4	2003/05/09	*/
+/*	SCCS Id: @(#)mthrowu.c	3.4	2003/11/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -376,7 +376,7 @@ m_throw(mon, x, y, dx, dy, range, obj)
 
 			Strcpy(onmbuf, xname(singleobj));
 			Strcpy(knmbuf, killer_xname(singleobj));
-			poisoned(onmbuf, A_STR, knmbuf, -10);
+			poisoned(onmbuf, A_STR, knmbuf, 10, TRUE);
 		    }
 		    if(hitu &&
 		       can_blnd((struct monst*)0, &youmonst,
