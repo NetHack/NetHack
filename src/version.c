@@ -14,7 +14,7 @@
 #include "patchlevel.h"
 #endif
 
-#define BETA_INFO " [beta13]"
+#define BETA_INFO " [beta14]"
 
 /* fill and return the given buffer with the nethack version string */
 char *
