@@ -366,8 +366,10 @@ boolean creation;
 	 */
 	if (verysmall(mon->data) || nohands(mon->data) || is_animal(mon->data))
 		return;
-	/* give mummies a chance to wear their wrappings */
-	if (mindless(mon->data) && (mon->data->mlet != S_MUMMY || !creation))
+	/* give mummies a chance to wear their wrappings
+	 * and let skeletons wear their initial armor */
+	if (mindless(mon->data) && (!creation ||
+	    (mon->data->mlet != S_MUMMY && mon->data != &mons[PM_SKELETON])))
 		return;
 
 	m_dowear_type(mon, W_AMUL, creation);
