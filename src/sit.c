@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sit.c	3.4	2002/07/12	*/
+/*	SCCS Id: @(#)sit.c	3.4	2002/09/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -325,14 +325,27 @@ rndcurse()			/* curse a few inventory items at random! */
 	    You(mal_aura, "you");
 	}
 
-	for (otmp = invent; otmp; otmp = otmp->nobj)  nobj++;
-
+	for (otmp = invent; otmp; otmp = otmp->nobj) {
+#ifdef GOLDOBJ
+	    /* gold isn't subject to being cursed or blessed */
+	    if (otmp->oclass == COIN_CLASS) continue;
+#endif
+	    nobj++;
+	}
 	if (nobj) {
 	    for (cnt = rnd(6/((!!Antimagic) + (!!Half_spell_damage) + 1));
 		 cnt > 0; cnt--)  {
-		onum = rn2(nobj);
-		for(otmp = invent; onum != 0; onum--)
-		    otmp = otmp->nobj;
+		onum = rnd(nobj);
+		for (otmp = invent; otmp; otmp = otmp->nobj) {
+#ifdef GOLDOBJ
+		    /* as above */
+		    if (otmp->oclass == COIN_CLASS) continue;
+#endif
+		    if (--onum == 0) break;	/* found the target */
+		}
+		/* the !otmp case should never happen; picking an already
+		   cursed item happens--avoid "resists" message in that case */
+		if (!otmp || otmp->cursed) continue;	/* next target */
 
 		if(otmp->oartifact && spec_ability(otmp, SPFX_INTEL) &&
 		   rn2(10) < 8) {

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.4	2002/08/02	*/
+/*	SCCS Id: @(#)mkobj.c	3.4	2002/09/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -679,6 +679,9 @@ void
 bless(otmp)
 register struct obj *otmp;
 {
+#ifdef GOLDOBJ
+	if (otmp->oclass == COIN_CLASS) return;
+#endif
 	otmp->cursed = 0;
 	otmp->blessed = 1;
 	if (otmp->otyp == LUCKSTONE
@@ -707,6 +710,9 @@ void
 curse(otmp)
 register struct obj *otmp;
 {
+#ifdef GOLDOBJ
+	if (otmp->oclass == COIN_CLASS) return;
+#endif
 	otmp->blessed = 0;
 	otmp->cursed = 1;
 	/* welded two-handed weapon interferes with some armor removal */

@@ -2228,16 +2228,12 @@ STATIC_OVL boolean
 mergable(otmp, obj)	/* returns TRUE if obj  & otmp can be merged */
 	register struct obj *otmp, *obj;
 {
-#ifndef GOLDOBJ
-	if (obj->otyp != otmp->otyp || obj->unpaid != otmp->unpaid ||
-#else
 	if (obj->otyp != otmp->otyp) return FALSE;
-       
-        /* Coins of the same kind will always merge. */
-        if (obj->oclass == COIN_CLASS) return TRUE;
-
-        if (obj->unpaid != otmp->unpaid ||
+#ifdef GOLDOBJ
+	/* coins of the same kind will always merge */
+	if (obj->oclass == COIN_CLASS) return TRUE;
 #endif
+	if (obj->unpaid != otmp->unpaid ||
 	    obj->spe != otmp->spe || obj->dknown != otmp->dknown ||
 	    (obj->bknown != otmp->bknown && !Role_if(PM_PRIEST)) ||
 	    obj->cursed != otmp->cursed || obj->blessed != otmp->blessed ||

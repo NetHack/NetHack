@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2002/09/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -797,6 +797,10 @@ boolean
 not_fully_identified(otmp)
 register struct obj *otmp;
 {
+#ifdef GOLDOBJ
+    /* gold doesn't have any interesting attributes [yet?] */
+    if (otmp->oclass == COIN_CLASS) return FALSE;	/* always fully ID'd */
+#endif
     /* check fundamental ID hallmarks first */
     if (!otmp->known || !otmp->dknown ||
 #ifdef MAIL
