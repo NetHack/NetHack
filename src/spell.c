@@ -814,7 +814,10 @@ boolean atme;
 	case SPE_STONE_TO_FLESH:
 		if (!(objects[pseudo->otyp].oc_dir == NODIR)) {
 			if (atme) u.dx = u.dy = u.dz = 0;
-			else (void) getdir((char *)0);
+			else if (!getdir((char *)0)) {
+			    /* getdir cancelled, re-use previous direction */
+			    pline_The("magical energy is released!");
+			}
 			if(!u.dx && !u.dy && !u.dz) {
 			    if ((damage = zapyourself(pseudo, TRUE)) != 0) {
 				char buf[BUFSZ];

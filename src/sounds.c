@@ -860,7 +860,10 @@ dochat()
 	return(1);
     }
 
-    (void) getdir("Talk to whom? (in what direction)");
+    if (!getdir("Talk to whom? (in what direction)")) {
+	/* decided not to chat */
+	return(0);
+    }
 
 #ifdef STEED
     if (u.usteed && u.dz > 0)
