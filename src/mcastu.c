@@ -542,9 +542,12 @@ int spellnum;
 	boolean success;
 	int i;
 	coord bypos;
+	int quan;
 
+	quan = (mtmp->m_lev < 2) ? 1 : rnd((int)mtmp->m_lev / 2);
+	if (quan < 3) quan = 3;
 	success = pm ? TRUE : FALSE;
-	for (i = 0; i <= (int) mtmp->m_lev; i++) {
+	for (i = 0; i <= quan; i++) {
 	    if (!enexto(&bypos, mtmp->mux, mtmp->muy, mtmp->data))
 		break;
 	    if ((pm = mkclass(let,0)) != 0 &&

@@ -491,7 +491,7 @@ toofar:
 		/* arbitrary distance restriction to keep monster far away
 		   from you from having cast dozens of sticks-to-snakes
 		   or similar spells by the time you reach it */
-		if (dist2(mtmp->mx, mtmp->my, u.ux, u.uy) <= 64 && !mtmp->mspec_used) {
+		if (dist2(mtmp->mx, mtmp->my, u.ux, u.uy) <= 49 && !mtmp->mspec_used) {
 		    struct attack *a;
 
 		    for (a = &mdat->mattk[0]; a < &mdat->mattk[NATTK]; a++) {
