@@ -113,6 +113,8 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 		Windows 95/98/NT/2000/XP
 	Intel Pentium or better (or clone) running BeOS 4.5
         Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
+	Pocket PC devices running Windows CE 3.0 and higher.
+	H/PC Pro devices running Windows CE 2.11 and higher.
 
     Previous versions of NetHack were tested on the following systems,
     and we expect that NetHack 3.4 will work on them as well:
