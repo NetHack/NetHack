@@ -450,6 +450,30 @@ see_wsegs(worm)
     }
 }
 
+/*
+ *  detect_wsegs()
+ *
+ *  Display all of the segments of the given worm for detection.
+ */
+void
+detect_wsegs(worm, use_detection_glyph)
+    struct monst *worm;
+    boolean use_detection_glyph;
+{
+    int num;
+    struct wseg *curr = wtails[worm->wormno];
+
+/*  if (!mtmp->wormno) return;  bullet proofing */
+
+    while (curr != wheads[worm->wormno]) {
+	num = use_detection_glyph ?
+		detected_monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL)) :
+		monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
+	show_glyph(curr->wx,curr->wy,num);
+	curr = curr->nseg;
+    }
+}
+
 
 /*
  *  save_worm()

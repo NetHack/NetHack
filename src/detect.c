@@ -597,9 +597,13 @@ int mclass;			/* monster class, 0 for all */
 	cls();
 	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 	    if (DEADMONSTER(mtmp)) continue;
-	    if (!mclass || mtmp->data->mlet == mclass)
-	    if (mtmp->mx > 0)
-		show_glyph(mtmp->mx,mtmp->my,mon_to_glyph(mtmp));
+	    if (!mclass || mtmp->data->mlet == mclass ||
+		(mtmp->data == &mons[PM_LONG_WORM] && mclass == S_WORM_TAIL))
+		    if (mtmp->mx > 0) {
+			show_glyph(mtmp->mx,mtmp->my,mon_to_glyph(mtmp));
+			/* don't be stingy - display entire worm */
+			if (mtmp->data == &mons[PM_LONG_WORM]) detect_wsegs(mtmp,0);
+		    }
 	    if (otmp && otmp->cursed &&
 		(mtmp->msleeping || !mtmp->mcanmove)) {
 		mtmp->msleeping = mtmp->mfrozen = 0;

@@ -2322,6 +2322,7 @@ E void FDECL(wormgone, (struct monst *));
 E void FDECL(wormhitu, (struct monst *));
 E void FDECL(cutworm, (struct monst *,XCHAR_P,XCHAR_P,struct obj *));
 E void FDECL(see_wsegs, (struct monst *));
+E void FDECL(detect_wsegs, (struct monst *,BOOLEAN_P));
 E void FDECL(save_worm, (int,int));
 E void FDECL(rest_worm, (int));
 E void FDECL(place_wsegs, (struct monst *));
