@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vault.c	3.4	2002/04/18	*/
+/*	SCCS Id: @(#)vault.c	3.4	2002/08/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -234,14 +234,12 @@ fnd:
 	EGD(guard)->vroom = vaultroom;
 	EGD(guard)->warncnt = 0;
 
-	if(!cansee(guard->mx, guard->my)) {
-		mongone(guard);
-		return;
-	}
-
 	reset_faint();			/* if fainted - wake up */
-	pline("Suddenly one of the Vault's %s enters!",
-	      makeplural(g_monnam(guard)));
+	if (canspotmon(guard))
+	    pline("Suddenly one of the Vault's %s enters!",
+		  makeplural(g_monnam(guard)));
+	else
+	    pline("Someone else has entered the Vault.");
 	newsym(guard->mx,guard->my);
 	if ((youmonst.m_ap_type == M_AP_OBJECT &&
 		youmonst.mappearance == GOLD_PIECE) || u.uundetected) {
@@ -736,7 +734,7 @@ cleanup:
 		restfakecorr(grd);
 		if(!semi_dead && (in_fcorridor(grd, u.ux, u.uy) ||
 				     cansee(x, y))) {
-		    if (!disappear_msg_seen)
+		    if (!disappear_msg_seen && canspotmon(grd))
 			pline("Suddenly, the %s disappears.", g_monnam(grd));
 		    return(1);
 		}
