@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.4	2002/03/02	*/
+/*	SCCS Id: @(#)pray.c	3.4	2002/09/09	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -137,8 +137,8 @@ in_trouble()
 		return(TROUBLE_STUCK_IN_WALL);
 
 	if((uarmf && uarmf->otyp==LEVITATION_BOOTS && uarmf->cursed) ||
-		(uleft && uleft->otyp==RIN_LEVITATION && uleft->cursed) ||
-		(uright && uright->otyp==RIN_LEVITATION && uright->cursed))
+		stuck_ring(uleft, RIN_LEVITATION) ||
+		stuck_ring(uright, RIN_LEVITATION))
 		return(TROUBLE_CURSED_LEVITATION);
 	if(Blindfolded && ublindf->cursed) return(TROUBLE_CURSED_BLINDFOLD);
 
@@ -189,7 +189,7 @@ fix_worst_trouble(trouble)
 register int trouble;
 {
 	int i;
-	struct obj *otmp;
+	struct obj *otmp = 0;
 	const char *what = (const char *)0;
 
 	switch (trouble) {
@@ -259,16 +259,13 @@ register int trouble;
 		    (void) safe_teleds(FALSE);
 		    break;
 	    case TROUBLE_CURSED_LEVITATION:
-		    if (uarmf && uarmf->otyp==LEVITATION_BOOTS
-						&& uarmf->cursed)
+		    if (uarmf && uarmf->otyp == LEVITATION_BOOTS &&
+			    uarmf->cursed) {
 			otmp = uarmf;
-		    else if (uleft && uleft->otyp==RIN_LEVITATION
-						&& uleft->cursed) {
-			otmp = uleft;
-			what = leftglow;
-		    } else {
-			otmp = uright;
-			what = rightglow;
+		    } else if ((otmp = stuck_ring(uleft,RIN_LEVITATION)) !=0) {
+			if (otmp == uleft) what = leftglow;
+		    } else if ((otmp = stuck_ring(uright,RIN_LEVITATION))!=0) {
+			if (otmp == uright) what = rightglow;
 		    }
 		    goto decurse;
 	    case TROUBLE_CURSED_BLINDFOLD:

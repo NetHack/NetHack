@@ -382,6 +382,7 @@ E void NDECL(find_ac);
 E void NDECL(glibr);
 E struct obj *FDECL(some_armor,(struct monst *));
 E void FDECL(erode_armor, (struct monst *,BOOLEAN_P));
+E struct obj *FDECL(stuck_ring, (struct obj *,int));
 E void NDECL(reset_remarm);
 E int NDECL(doddoremarm);
 E int FDECL(destroy_arm, (struct obj *));

@@ -1620,6 +1620,31 @@ boolean acid_dmg;
 	}
 }
 
+/* used for praying to check and fix levitation trouble */
+struct obj *
+stuck_ring(ring, otyp)
+struct obj *ring;
+int otyp;
+{
+    if (ring != uleft && ring != uright) {
+	impossible("stuck_ring: neither left nor right?");
+	return (struct obj *)0;
+    }
+
+    if (ring && ring->otyp == otyp) {
+	/* reasons ring can't be removed match those checked by select_off();
+	   limbless case has extra checks because ordinarily it's temporary */
+	if (nolimbs(youmonst.data) &&
+		uamul && uamul->otyp == AMULET_OF_UNCHANGING && uamul->cursed)
+	    return uamul;
+	if (welded(uwep) && (ring == uright || bimanual(uwep))) return uwep;
+	if (uarmg && uarmg->cursed) return uarmg;
+	if (ring->cursed) return ring;
+    }
+    /* either no ring or not right type or nothing prevents its removal */
+    return (struct obj *)0;
+}
+
 STATIC_PTR
 int
 select_off(otmp)
