@@ -32,7 +32,7 @@
 /*
  * Mac Stuff.
  */
-#ifdef applec		/*	MPW auto-defined symbol */
+#ifdef macintosh	/*	Auto-defined symbol for MPW compilers (sc and mrc) */
 # define MAC
 #endif
 
@@ -41,7 +41,7 @@
 # define NEED_VARARGS
 #endif
 
-#ifdef __MWERKS__	/* defined by Metrowerks compiler */
+#ifdef __MWERKS__	/* defined by Metrowerks' Codewarrior compiler */
 # ifndef __BEOS__	/* BeOS */
 #  define MAC
 # endif

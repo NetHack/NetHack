@@ -9,9 +9,10 @@
 /*
  * Compiler selection is based on the following symbols:
  *
- *	applec			MPW compiler
+ *  __SC__			sc, a MPW 68k compiler
+ *  __MRC__			mrc, a MPW PowerPC compiler
  *	THINK_C			Think C compiler
- *	__MWERKS__		Metrowerks compiler
+ *	__MWERKS__		Metrowerks' Codewarrior compiler
  *
  * We use these early in config.h to define some needed symbols,
  * including MAC.
@@ -20,21 +21,18 @@
  # WIDENED_PROTOTYPES (defined if UNWIDENED_PROTOTYPES is undefined and
  # NHSTDC is defined).
  */
-#  ifdef applec
-#   define MAC_MPW32		/* Headers, and for avoiding a bug */
-#  endif
 
-#  ifndef __powerc
-#   define MAC68K		/* 68K mac (non-powerpc) */
-#  endif
+#ifndef __powerc
+# define MAC68K		/* 68K mac (non-powerpc) */
+#endif
 
-#  define RANDOM
-#  define NO_SIGNAL		/* You wouldn't believe our signals ... */
-#  define FILENAME 256
-#  define NO_TERMS		/* For tty port (see wintty.h) */
+#define RANDOM
+#define NO_SIGNAL		/* You wouldn't believe our signals ... */
+#define FILENAME 256
+#define NO_TERMS		/* For tty port (see wintty.h) */
 
-#  define TEXTCOLOR		/* For Mac TTY interface */
-#  define CHANGE_COLOR
+#define TEXTCOLOR		/* For Mac TTY interface */
+#define CHANGE_COLOR
 
 /* Use these two includes instead of system.h. */
 #include <string.h>
@@ -42,60 +40,49 @@
 
 /* Uncomment this line if your headers don't already define off_t */
 /*typedef long off_t;*/
+#include <time.h>	/* for time_t */
 
 /*
  * Try and keep the number of files here to an ABSOLUTE minimum !
  * include the relevant files in the relevant .c files instead !
  */
 #include <MacTypes.h>
-/*
- * Turn off the Macsbug calls for the production version.
- */
-#if 0
-#  undef Debugger
-#  undef DebugStr
-#  define Debugger()
-#  define DebugStr(aStr)
-#endif
 
 /*
  * We could use the PSN under sys 7 here ...
+ * ...but it wouldn't matter...
  */
-#ifndef __CONDITIONALMACROS__	/* universal headers */
-#  define getpid() 1
-#  define getuid() 1
-#endif
-#  define index strchr
-#  define rindex strrchr
+#define getpid() 1
+#define getuid() 1
+#define index strchr
+#define rindex strrchr
 
-#  define Rand random
+#define Rand random
 extern void error(const char *,...);
 
-# if !defined(O_WRONLY)
-#  ifdef __MWERKS__
-#include <unix.h>
-#   ifndef O_EXCL
-     /* MW 4.5 doesn't have this, so just use a bogus value */
-#    define O_EXCL 0x80000000
-#   endif
-#  else
-#include <fcntl.h>
-#  endif
+#if !defined(O_WRONLY)
+# ifdef __MWERKS__
+#  include <unix.h>
 # endif
+# include <fcntl.h>
+#endif
 
 /*
  * Don't redefine these Unix IO functions when making LevComp or DgnComp for
  * MPW.  With MPW, we make them into MPW tools, which use unix IO.  SPEC_LEV
  * and DGN_COMP are defined when compiling for LevComp and DgnComp respectively.
  */
-#if !(defined(applec) && (defined(SPEC_LEV) || defined(DGN_COMP)))
+#if !((defined(__SC__) || defined(__MRC__)) && (defined(SPEC_LEV) || defined(DGN_COMP)))
 # define creat maccreat
 # define open macopen
 # define close macclose
 # define read macread
 # define write macwrite
 # define lseek macseek
+# define unlink _unlink
 #endif
+
+#define YY_NEVER_INTERACTIVE
 
 # define TEXT_TYPE 'TEXT'
 # define LEVL_TYPE 'LEVL'
