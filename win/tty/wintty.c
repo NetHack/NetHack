@@ -688,6 +688,9 @@ tty_askname()
 		if (c == '\b' || c == '\177') {
 			if(ct) {
 				ct--;
+#ifdef WIN32CON
+				ttyDisplay->curx--;
+#endif
 #if defined(MICRO) || defined(WIN32CON)
 # if defined(WIN32CON) || defined(MSDOS)
 				backsp();       /* \b is visible on NT */
@@ -720,6 +723,9 @@ tty_askname()
 			(void) putchar(c);
 #endif
 			plname[ct++] = c;
+#ifdef WIN32CON
+			ttyDisplay->curx++;
+#endif
 		}
 	}
 	plname[ct] = 0;
@@ -1217,8 +1223,13 @@ struct WinDesc *cw;
 		     */
 		    term_start_attr(curr->attr);
 		    for (n = 0, cp = curr->str;
+#ifndef WIN32CON
 			  *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
 			  cp++, n++)
+#else
+			  *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
+			  cp++, n++, ttyDisplay->curx++)
+#endif
 			if (n == 2 && curr->identifier.a_void != 0 &&
 							curr->selected) {
 			    if (curr->count == -1L)
@@ -1453,8 +1464,13 @@ struct WinDesc *cw;
 	    }
 	    term_start_attr(attr);
 	    for (cp = &cw->data[i][1];
+#ifndef WIN32CON
 		    *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
 		    cp++)
+#else
+		    *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
+		    cp++, ttyDisplay->curx++)
+#endif
 		(void) putchar(*cp);
 	    term_end_attr(attr);
 	}

@@ -9,6 +9,7 @@
  */
 
 #ifdef WIN32CON
+#define LOW_LEVEL_OUTPUT
 #define NEED_VARARGS /* Uses ... */
 #include "hack.h"
 #include "wintty.h"
@@ -32,7 +33,8 @@ int FDECL(process_keystroke, (INPUT_RECORD *, boolean *,
  * SetConsoleCtrlHandler
  * PeekConsoleInput
  * ReadConsoleInput
- * WriteConsole
+ * WriteConsoleOutputCharacter
+ * FillConsoleOutputAttribute
  */
 
 /* Win32 Console handles for input and output */
@@ -110,21 +112,15 @@ static void NDECL(init_ttycolor);
 #define MAX_OVERRIDES	256
 unsigned char key_overrides[MAX_OVERRIDES];
 
-#define DEFTEXTCOLOR  ttycolors[7]
-#ifdef TEXTCOLOR
-#define DEFGLYPHBGRND (0)
-#else
-#define DEFGLYPHBGRND (0)
-#endif
-
 static char nullstr[] = "";
 char erase_char,kill_char;
 
-static char currentcolor = FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_BLUE;
-static char noninvertedcurrentcolor = FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_BLUE;
-static char currenthilite = 0;
-static char currentbackground = 0;
-static boolean colorchange = TRUE;
+#define DEFTEXTCOLOR  ttycolors[7]
+static WORD background = 0;
+static WORD foreground = (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED);
+static WORD attr = (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED);
+static DWORD ccount, acount;
+static COORD cursor;
 
 /*
  * Called after returning from ! or ^Z
@@ -151,41 +147,10 @@ void
 settty(s)
 const char *s;
 {
+	nocmov(ttyDisplay->curx, ttyDisplay->cury);
 	end_screen();
 	if(s) raw_print(s);
 }
-
-/*
- * mode == 0	set processed console output mode.
- * mode == 1	set raw console output mode (no control character expansion).
- */
-void
-set_output_mode(mode)
-int mode;
-{
-	static DWORD save_output_cmode = 0;
-	static boolean initmode = FALSE;
-	DWORD cmode, mask = ENABLE_PROCESSED_OUTPUT;
-	if (!initmode) {
-		/* fetch original output mode */
-		GetConsoleMode(hConOut,&save_output_cmode);
-		initmode = TRUE;
-	}
-	if (mode == 0) {
-		cmode = save_output_cmode;
-		/* Turn ON the settings specified in the mask */
-		cmode |= mask;
-		SetConsoleMode(hConOut,cmode);
-		iflags.rawio = 0;
-	} else {
-		cmode = save_output_cmode;
-		/* Turn OFF the settings specified in the mask */
-		cmode &= ~mask;
-		SetConsoleMode(hConOut,cmode);
-		iflags.rawio = 1;
-	}
-}
-
 
 /* called by init_nhwindows() and resume_nhwindows() */
 void
@@ -198,7 +163,6 @@ void
 tty_startup(wid, hgt)
 int *wid, *hgt;
 {
-/*	int twid = origcsbi.dwSize.X; */
 	int twid = origcsbi.srWindow.Right - origcsbi.srWindow.Left + 1;
 
 	if (twid > 80) twid = 80;
@@ -253,7 +217,6 @@ DWORD ctrltype;
 		case CTRL_CLOSE_EVENT:
 		case CTRL_LOGOFF_EVENT:
 		case CTRL_SHUTDOWN_EVENT:
-			set_output_mode(0);  /* Allow processed output */
 			getreturn_disable = TRUE;
 #ifndef NOSAVEONHANGUP
 			hangup(0);
@@ -293,10 +256,11 @@ nttty_open()
                            (origcsbi.dwCursorPosition.Y == 0));
         if ((origcsbi.dwSize.X <= 0) || (origcsbi.dwSize.Y <= 0))
             GUILaunched = 0;
+
+        /* Obtain handles for the standard Console I/O devices */
 	hConIn = GetStdHandle(STD_INPUT_HANDLE);
 	hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
 #if 0
-        /* Obtain handles for the standard Console I/O devices */
 	hConIn = CreateFile("CONIN$",
 			GENERIC_READ |GENERIC_WRITE,
 			FILE_SHARE_READ |FILE_SHARE_WRITE,
@@ -306,6 +270,7 @@ nttty_open()
 			FILE_SHARE_READ |FILE_SHARE_WRITE,
 			0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,0);
 #endif       
+
 	GetConsoleMode(hConIn,&cmode);
 #ifdef NO_MOUSE_ALLOWED
 	mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT |
@@ -320,8 +285,6 @@ nttty_open()
 	cmode |= ENABLE_MOUSE_INPUT;
 #endif
 	SetConsoleMode(hConIn,cmode);
-
-	set_output_mode(1);	/* raw output mode; no tab expansion */
 	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE)) {
 		/* Unable to set control handler */
 		cmode = 0; 	/* just to have a statement to break on for debugger */
@@ -376,6 +339,7 @@ tgetch()
 	int mod;
 	coord cc;
 	DWORD count;
+	nocmov(ttyDisplay->curx, ttyDisplay->cury);
 	return (program_state.done_hup) ?
 		'\033' :
 		pCheckInput(hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
@@ -388,6 +352,7 @@ int *x, *y, *mod;
 	int ch;
 	coord cc;
 	DWORD count;
+	nocmov(ttyDisplay->curx, ttyDisplay->cury);
 	ch = (program_state.done_hup) ?
 		'\033' :
 		pCheckInput(hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
@@ -399,56 +364,50 @@ int *x, *y, *mod;
 }
 
 void
-nocmov(x, y)
-int x,y;
-{
-	ntcoord.X = x;
-	ntcoord.Y = y;
-	SetConsoleCursorPosition(hConOut,ntcoord);
-}
-
-void
 cmov(x, y)
 register int x, y;
 {
-	ntcoord.X = x;
-	ntcoord.Y = y;
-	SetConsoleCursorPosition(hConOut,ntcoord);
-	ttyDisplay->cury = y;
 	ttyDisplay->curx = x;
+	ttyDisplay->cury = y;
+	cursor.X = x;
+	cursor.Y = y;
+	SetConsoleCursorPosition(hConOut, cursor);
 }
 
 void
-xputc(c)
-char c;
+nocmov(x, y)
+int x,y;
 {
-	DWORD count;
+	cursor.Y = y;
+	cursor.X = x;
+	SetConsoleCursorPosition(hConOut, cursor);
+}
 
-	switch(c) {
+void
+xputc(ch)
+char ch;
+{
+	cursor.X = ttyDisplay->curx;
+	cursor.Y = ttyDisplay->cury;
+	switch(ch) {
 	    case '\n':
 	    case '\r':
 		    cmov(ttyDisplay->curx, ttyDisplay->cury);
 		    return;
 	}
-	if (colorchange) {
-		SetConsoleTextAttribute(hConOut,
-			(currentcolor | currenthilite | currentbackground));
-		colorchange = FALSE;
-	}
-	WriteConsole(hConOut,&c,1,&count,0);
+	WriteConsoleOutputAttribute(hConOut,&attr,1,cursor,&acount);
+	WriteConsoleOutputCharacter(hConOut,&ch,1,cursor,&ccount);
 }
 
 void
 xputs(s)
 const char *s;
 {
-	DWORD count;
-	if (colorchange) {
-		SetConsoleTextAttribute(hConOut,
-			(currentcolor | currenthilite | currentbackground));
-		colorchange = FALSE;
-	}
-	WriteConsole(hConOut,s,strlen(s),&count,0);
+	int slen = strlen(s);
+	cursor.X = ttyDisplay->curx;
+	cursor.Y = ttyDisplay->cury;
+	FillConsoleOutputAttribute(hConOut,attr,slen,cursor,&acount);
+	WriteConsoleOutputCharacter(hConOut,s,slen,cursor,&ccount);
 }
 
 /*
@@ -459,36 +418,32 @@ void
 g_putch(in_ch)
 int in_ch;
 {
-    char ch = (char)in_ch;
-    DWORD count = 1;
-    int tcolor;
-    int bckgnd = currentbackground;
-
-    if (colorchange) {
-	tcolor = currentcolor | bckgnd | currenthilite;
-	SetConsoleTextAttribute(hConOut, tcolor);
-    }
-    WriteConsole(hConOut,&ch,1,&count,0);
-    colorchange = TRUE;		/* force next output back to current nethack values */
-    return;
+	char ch = (char)in_ch;
+	cursor.X = ttyDisplay->curx;
+	cursor.Y = ttyDisplay->cury;
+#if 0
+	switch(ch) {
+	    case '\n':
+	    case '\r':
+		    cmov(cursor.X, cursor.Y);
+		    return;
+	}
+#endif
+	WriteConsoleOutputAttribute(hConOut,&attr,1,cursor,&acount);
+	WriteConsoleOutputCharacter(hConOut,&ch,1,cursor,&ccount);
 }
 
 void
 cl_end()
 {
-		DWORD count;
-
-		ntcoord.X = ttyDisplay->curx;
-		ntcoord.Y = ttyDisplay->cury;
-	    	FillConsoleOutputAttribute(hConOut, DEFTEXTCOLOR,
-	    		CO - ntcoord.X,ntcoord, &count);
-		ntcoord.X = ttyDisplay->curx;
-		ntcoord.Y = ttyDisplay->cury;
-		FillConsoleOutputCharacter(hConOut,' ',
-			CO - ntcoord.X,ntcoord,&count);
-		tty_curs(BASE_WINDOW, (int)ttyDisplay->curx+1,
-						(int)ttyDisplay->cury);
-		colorchange = TRUE;
+	int cx;
+	cursor.X = ttyDisplay->curx;
+	cursor.Y = ttyDisplay->cury;
+	cx = CO - cursor.X;
+	FillConsoleOutputAttribute(hConOut, DEFTEXTCOLOR, cx, cursor, &acount);
+	FillConsoleOutputCharacter(hConOut,' ', cx, cursor,&ccount);
+	tty_curs(BASE_WINDOW, (int)ttyDisplay->curx+1,
+			(int)ttyDisplay->cury);
 }
 
 
@@ -505,13 +460,10 @@ clear_screen()
 	    		FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
 	    		csbi.dwSize.X * csbi.dwSize.Y,
 	    		newcoord, &ccnt);
-	    newcoord.X = 0;
-	    newcoord.Y = 0;
 	    FillConsoleOutputCharacter(hConOut,' ',
 			csbi.dwSize.X * csbi.dwSize.Y,
 			newcoord, &ccnt);
 	}
-	colorchange = TRUE;
 	home();
 }
 
@@ -519,7 +471,7 @@ clear_screen()
 void
 home()
 {
-	tty_curs(BASE_WINDOW, 1, 0);
+	cursor.X = cursor.Y = 0;
 	ttyDisplay->curx = ttyDisplay->cury = 0;
 }
 
@@ -527,17 +479,34 @@ home()
 void
 backsp()
 {
-	GetConsoleScreenBufferInfo(hConOut,&csbi);
-	if (csbi.dwCursorPosition.X > 0)
-		ntcoord.X = csbi.dwCursorPosition.X-1;
-	ntcoord.Y = csbi.dwCursorPosition.Y;
-	SetConsoleCursorPosition(hConOut,ntcoord);
-	/* colorchange shouldn't ever happen here but.. */
-	if (colorchange) {
-		SetConsoleTextAttribute(hConOut,
-				(currentcolor|currenthilite|currentbackground));
-		colorchange = FALSE;
+ 	GetConsoleScreenBufferInfo(hConOut,&csbi);
+ 	if (csbi.dwCursorPosition.X > 0)
+ 		ntcoord.X = csbi.dwCursorPosition.X-1;
+ 	ntcoord.Y = csbi.dwCursorPosition.Y;
+ 	SetConsoleCursorPosition(hConOut,ntcoord);
+}
+
+void
+cl_eos()
+{
+	register int cy = ttyDisplay->cury+1;		
+	if (GetConsoleScreenBufferInfo(hConOut,&csbi)) {
+	    DWORD ccnt;
+	    COORD newcoord;
+	    
+	    newcoord.X = 0;
+	    newcoord.Y = ttyDisplay->cury;
+	    FillConsoleOutputAttribute(hConOut,
+	    		FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+	    		csbi.dwSize.X * csbi.dwSize.Y - cy,
+	    		newcoord, &ccnt);
+	    newcoord.X = 0;
+	    newcoord.Y = ttyDisplay->cury;
+	    FillConsoleOutputCharacter(hConOut,' ',
+			csbi.dwSize.X * csbi.dwSize.Y - cy,
+			newcoord, &ccnt);
 	}
+	tty_curs(BASE_WINDOW, (int)ttyDisplay->curx+1, (int)ttyDisplay->cury);
 }
 
 void
@@ -561,41 +530,6 @@ tty_delay_output()
 	    k = junk;  /* Do nothing */
 	}
 }
-
-void
-cl_eos()
-{
-	    register int cy = ttyDisplay->cury+1;		
-#if 0
-		while(cy <= LI-2) {
-			cl_end();
-			xputc('\n');
-			cy++;
-		}
-		cl_end();
-#else
-	if (GetConsoleScreenBufferInfo(hConOut,&csbi)) {
-	    DWORD ccnt;
-	    COORD newcoord;
-	    
-	    newcoord.X = 0;
-	    newcoord.Y = ttyDisplay->cury;
-	    FillConsoleOutputAttribute(hConOut,
-	    		FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-	    		csbi.dwSize.X * csbi.dwSize.Y - cy,
-	    		newcoord, &ccnt);
-	    newcoord.X = 0;
-	    newcoord.Y = ttyDisplay->cury;
-	    FillConsoleOutputCharacter(hConOut,' ',
-			csbi.dwSize.X * csbi.dwSize.Y - cy,
-			newcoord, &ccnt);
-	}
-	colorchange = TRUE;
-#endif
-		tty_curs(BASE_WINDOW, (int)ttyDisplay->curx+1,
-						(int)ttyDisplay->cury);
-}
-
 
 # ifdef TEXTCOLOR
 /*
@@ -661,111 +595,97 @@ has_color(int color)
 }
 
 void
-term_start_attr(int attr)
+term_start_attr(int attrib)
 {
-    switch(attr){
+    switch(attrib){
         case ATR_INVERSE:
 		if (iflags.wc_inverse) {
- 		   noninvertedcurrentcolor = currentcolor;
 		   /* Suggestion by Lee Berger */
-		   if ((currentcolor & (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED)) ==
+		   if ((foreground & (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED)) ==
 			(FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED))
-			currentcolor = 0;
-		   currentbackground = (BACKGROUND_RED|BACKGROUND_BLUE|BACKGROUND_GREEN);
-		   colorchange = TRUE;
+			foreground &= ~(FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED);
+		   background = (BACKGROUND_RED|BACKGROUND_BLUE|BACKGROUND_GREEN);
 		   break;
-		} /* else */
+		}
 		/*FALLTHRU*/
         case ATR_ULINE:
-        case ATR_BOLD:
         case ATR_BLINK:
-		standoutbeg();
+        case ATR_BOLD:
+		foreground |= FOREGROUND_INTENSITY;
                 break;
         default:
-#ifdef DEBUG
-		impossible("term_start_attr: strange attribute %d", attr);
-#endif
-		standoutend();
-		if (currentcolor == 0)
-			currentcolor = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED;
-		currentbackground = 0;
+		foreground &= ~FOREGROUND_INTENSITY;
                 break;
     }
+    attr = (foreground | background);
 }
 
 void
-term_end_attr(int attr)
+term_end_attr(int attrib)
 {
-    switch(attr){
+    switch(attrib){
 
         case ATR_INVERSE:
-       	  if (iflags.wc_inverse) {
-			if (currentcolor == 0 && noninvertedcurrentcolor != 0)
-				currentcolor = noninvertedcurrentcolor;
-			noninvertedcurrentcolor = 0;
-		    currentbackground = 0;
-		    colorchange = TRUE;
-		    break;
-		  } /* else */
-		/*FALLTHRU*/
+		if ((foreground & (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED)) == 0)
+		     foreground |= (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED);
+		background = 0;
+		break;
         case ATR_ULINE:
-        case ATR_BOLD:
         case ATR_BLINK:
-        default:
-		standoutend();
-		if (currentcolor == 0)
-			currentcolor = FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED;
-		currentbackground = 0;
-                break;
+        case ATR_BOLD:
+		foreground &= ~FOREGROUND_INTENSITY;
+		break;
     }                
+    attr = (foreground | background);
 }
 
 void
 term_end_raw_bold(void)
 {
-    standoutend();    
+    term_end_attr(ATR_BOLD);
 }
 
 void
 term_start_raw_bold(void)
 {
-    standoutbeg();
+    term_start_attr(ATR_BOLD);
 }
 
 void
 term_start_color(int color)
 {
-# ifdef TEXTCOLOR
+#ifdef TEXTCOLOR
         if (color >= 0 && color < CLR_MAX) {
-	    currentcolor = ttycolors[color];
-	    colorchange = TRUE;
+	    foreground = (background != 0 && (color == CLR_GRAY | color == CLR_WHITE)) ?
+			ttycolors[0] : ttycolors[color];
 	}
-# endif
+#else
+	foreground = DEFTEXTCOLOR;
+#endif
+	attr = (foreground | background);
 }
 
 void
 term_end_color(void)
 {
-# ifdef TEXTCOLOR
-	currentcolor = DEFTEXTCOLOR;
-	colorchange = TRUE;
-# endif
+#ifdef TEXTCOLOR
+	foreground = DEFTEXTCOLOR;
+#endif
+	attr = (foreground | background);
 }
 
 
 void
 standoutbeg()
 {
-	currenthilite = FOREGROUND_INTENSITY;
-	colorchange = TRUE;
+    term_start_attr(ATR_BOLD);
 }
 
 
 void
 standoutend()
 {
-	currenthilite = 0;
-	colorchange = TRUE;
+    term_end_attr(ATR_BOLD);
 }
 
 #ifndef NO_MOUSE_ALLOWED
@@ -803,6 +723,7 @@ win32con_debug_keystrokes()
 	int ch;
 	xputs("\n");
 	while (!valid || ch != 27) {
+	   nocmov(ttyDisplay->curx, ttyDisplay->cury);
 	   ReadConsoleInput(hConIn,&ir,1,&count);
 	   if ((ir.EventType == KEY_EVENT) && ir.Event.KeyEvent.bKeyDown)
 		ch = process_keystroke(&ir, &valid, iflags.num_pad, 1);
