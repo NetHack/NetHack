@@ -33,6 +33,7 @@ void ghack_quit_game(GtkWidget *widget, int button)
     if (button == 0) {
 	gnome_exit_nhwindows(0);
 	gtk_object_unref(GTK_OBJECT(session_id));
+	gtk_exit(0);
     }
 }
 
@@ -64,6 +65,7 @@ void ghack_save_game(GtkWidget *widget, int button)
 	    /* make sure they see the Saving message */
 	    display_nhwindow(WIN_MESSAGE, TRUE);
 	    gnome_exit_nhwindows("Be seeing you...");
+	    gtk_exit(0);
 	} else (void)doredraw();
     }
 }
@@ -216,8 +218,8 @@ GnomeUIInfo game_tree[] =
     GNOMEUIINFO_MENU_SAVE_ITEM(ghack_save_game_cb, NULL),
     { 
 	GNOME_APP_UI_ITEM, N_("Exit"), NULL, 
-	ghack_quit_game_cb, GINT_TO_POINTER('Q'), NULL, 
-	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 'Q', GDK_SHIFT_MASK
+	ghack_quit_game_cb, GINT_TO_POINTER(M('Q')), NULL, 
+	GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 'Q', GDK_MOD1_MASK
     }, 
     GNOMEUIINFO_END
 };
@@ -360,6 +362,12 @@ GnomeUIInfo action_menu[] = {
 	       N_("throw or shoot a weapon"),
 	       ghack_accelerator_selected, 
 	       GINT_TO_POINTER('t'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 't',0
+	   },
+	   {
+	       GNOME_APP_UI_ITEM, N_("Quiver/Ready"),
+	       N_("ready or quiver some ammunition"),
+	       ghack_accelerator_selected,
+	       GINT_TO_POINTER('Q'), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'Q',GDK_SHIFT_MASK,
 	   },
 	   { 
 	       GNOME_APP_UI_ITEM, N_("Open Door"), 
