@@ -1008,7 +1008,7 @@ int *spell_no;
 		Sprintf(buf, "%-20s     Level  %-12s Fail", "    Name", "Category");
 	else
 		Sprintf(buf, "Name\tLevel\tCategory\tFail");
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_BOLD, buf, MENU_UNSELECTED);
 	for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
 		Sprintf(buf, iflags.menu_tab_sep ?
 			"%s\t%-d%s\t%s\t%-d%%" : "%-20s  %2d%s   %-12s %3d%%",
