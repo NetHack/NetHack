@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.4	2003/03/10	*/
+/*	SCCS Id: @(#)end.c	3.4	2004/08/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -667,6 +667,8 @@ die:
 
 	if (how == TURNED_SLIME)
 	    u.ugrave_arise = PM_GREEN_SLIME;
+
+	if (bones_ok && launch_in_progress()) force_launch_placement();
 
 	if (bones_ok && u.ugrave_arise < LOW_PM) {
 	    /* corpse gets burnt up too */

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)trap.c	3.4	2004/08/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,6 +21,7 @@ STATIC_DCL int FDECL(disarm_shooting_trap, (struct trap *, int));
 STATIC_DCL int FDECL(try_lift, (struct monst *, struct trap *, int, BOOLEAN_P));
 STATIC_DCL int FDECL(help_monster_out, (struct monst *, struct trap *));
 STATIC_DCL boolean FDECL(thitm, (int,struct monst *,struct obj *,int,BOOLEAN_P));
+STATIC_DCL void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
 STATIC_DCL int FDECL(mkroll_launch,
 			(struct trap *,XCHAR_P,XCHAR_P,SHORT_P,long));
 STATIC_DCL boolean FDECL(isclearpath,(coord *, int, SCHAR_P, SCHAR_P));
@@ -1283,6 +1284,48 @@ struct trap *trap;
 }
 
 /*
+ * The following are used to track launched objects to
+ * prevent them from vanishing if you are killed. They
+ * will reappear at the launchplace in bones files.
+ */
+static struct {
+	struct obj *obj;
+	xchar x,y;
+} launchplace;
+
+static void
+launch_drop_spot(obj,x,y)
+struct obj *obj;
+xchar x,y;
+{
+	if (!obj) {
+		launchplace.obj = (struct obj *)0;
+		launchplace.x = 0;
+		launchplace.y = 0;
+	} else {
+		launchplace.obj = obj;
+		launchplace.x = x;
+		launchplace.y = y;
+	}
+}
+
+boolean
+launch_in_progress()
+{
+	if (launchplace.obj) return TRUE;
+	return FALSE;
+}
+
+void
+force_launch_placement()
+{
+	if (launchplace.obj) {
+		launchplace.obj->otrapped = 0;
+		place_object(launchplace.obj, launchplace.x, launchplace.y);
+	}
+}
+
+/*
  * Move obj from (x1,y1) to (x2,y2)
  *
  * Return 0 if no object was launched.
@@ -1366,6 +1409,15 @@ int style;
 			tmp_at(DISP_FLASH, obj_to_glyph(singleobj));
 			tmp_at(bhitpos.x, bhitpos.y);
 	}
+	/* Mark a spot to place object in bones files to prevent
+	 * loss of object. Use the starting spot to ensure that
+	 * a rolling boulder will still launch, which it wouldn't
+	 * do if left midstream. Unfortunately we can't use the
+	 * target resting spot, because there are some things/situations
+	 * that would prevent it from ever getting there (bars), and we
+	 * can't tell that yet.
+	 */
+	launch_drop_spot(singleobj, bhitpos.x, bhitpos.y);
 
 	/* Set the object in motion */
 	while(dist-- > 0 && !used_up) {
@@ -1389,12 +1441,14 @@ int style;
 				singleobj->otrapped = 0;
 				(void) mpickobj(mtmp, singleobj);
 				used_up = TRUE;
+				launch_drop_spot((struct obj *)0, 0, 0);
 				break;
 			    }
 			}
 			if (ohitmon(mtmp,singleobj,
 					(style==ROLL) ? -1 : dist, FALSE)) {
 				used_up = TRUE;
+				launch_drop_spot((struct obj *)0, 0, 0);
 				break;
 			}
 		} else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
@@ -1408,6 +1462,7 @@ int style;
 		    if (down_gate(bhitpos.x, bhitpos.y) != -1) {
 		        if(ship_object(singleobj, bhitpos.x, bhitpos.y, FALSE)){
 				used_up = TRUE;
+				launch_drop_spot((struct obj *)0, 0, 0);
 				break;
 			}
 		    }
@@ -1430,6 +1485,7 @@ int style;
 				if (cansee(bhitpos.x,bhitpos.y))
 					newsym(bhitpos.x,bhitpos.y);
 			        used_up = TRUE;
+				launch_drop_spot((struct obj *)0, 0, 0);
 			    }
 			    break;		
 			case LEVEL_TELEP:
@@ -1455,6 +1511,7 @@ int style;
 			    }
 		    	    seetrap(t);
 			    used_up = TRUE;
+			    launch_drop_spot((struct obj *)0, 0, 0);
 			    break;
 			case PIT:
 			case SPIKED_PIT:
@@ -1463,8 +1520,10 @@ int style;
 			    /* the boulder won't be used up if there is a
 			       monster in the trap; stop rolling anyway */
 			    x2 = bhitpos.x,  y2 = bhitpos.y;  /* stops here */
-			    if (flooreffects(singleobj, x2, y2, "fall"))
+			    if (flooreffects(singleobj, x2, y2, "fall")) {
 				used_up = TRUE;
+				launch_drop_spot((struct obj *)0, 0, 0);
+			    }
 			    dist = -1;	/* stop rolling immediately */
 			    break;
 			}
@@ -1472,6 +1531,7 @@ int style;
 		    }
 		    if (flooreffects(singleobj, bhitpos.x, bhitpos.y, "fall")) {
 			used_up = TRUE;
+			launch_drop_spot((struct obj *)0, 0, 0);
 			break;
 		    }
 		    if (otyp == BOULDER &&
@@ -1507,12 +1567,16 @@ int style;
 			levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS) {
 		    x2 = bhitpos.x,  y2 = bhitpos.y;	/* object stops here */
 		    if (hits_bars(&singleobj, x2, y2, !rn2(20), 0)) {
-			if (!singleobj) used_up = TRUE;
+			if (!singleobj) {
+				used_up = TRUE;
+				launch_drop_spot((struct obj *)0, 0, 0);
+			}
 			break;
 		    }
 		}
 	}
 	tmp_at(DISP_END, 0);
+	launch_drop_spot((struct obj *)0, 0, 0);
 	if (!used_up) {
 		singleobj->otrapped = 0;
 		place_object(singleobj, x2,y2);
