@@ -1136,7 +1136,7 @@ decide if thou art ready for this great undertaking."
 "Welcome again, %p.  We hope thou art ready now."
 %E
 %Cp Kni 00017
-"Once again, thou standest before us, %p.  Art thou ready now?"
+"Once again, thou standest before Us, %p.  Art thou ready now?"
 %E
 %Cc Kni 00018
 "Thou disgracest this noble court with thine impure presence.  We have been
@@ -1154,7 +1154,7 @@ pure, could never hope to defeat the foul %n.
 Our presence when thou hast attained the noble title of %R."
 %E
 %Cc Kni 00020
-"Thou dishonourest us, %p!  Thou hast strayed from the path of
+"Thou dishonourest Us, %p!  Thou hast strayed from the path of
 chivalry! Go from Our presence and do penance.  Only when thou art again
 pure mayst thou return hence."
 %E
@@ -1164,7 +1164,7 @@ been.  Hear now Our words:
 
 "As thou noticed as thou approached %H, a great battle hath
 been fought recently in these fields.  Know thou that Merlin himself
-came to aid us here as We battled the foul %n.  In the midst of that
+came to aid Us here as We battled the foul %n.  In the midst of that
 battle, %n struck Merlin a great blow, felling him.  Then, as Our
 forces were pressed back, %n stole %o.
 
@@ -1201,7 +1201,7 @@ shall therewith be thwarted."
 Go carefully."
 %E
 %Cp Kni 00031
-"Return %o to us quickly, %p."
+"Return %o to Us quickly, %p."
 %E
 %Cp Kni 00032
 "Destroy %n, %p, else %H shall surely fall."
@@ -1296,9 +1296,9 @@ As you approach %l, he beams at you and says:
 
     Well done!  Thou art truly the Champion of %H.  We
     have received word that Merlin is recovering, and shall soon
-    rejoin us.
+    rejoin Us.
 
-    He hath instructed us that thou art now to be the guardian of
+    He hath instructed Us that thou art now to be the guardian of
     %o.  He feeleth that thou mayst have need of
     its powers in thine adventures.  It is Our wish that thou keepest
     %o with thee as thou searchest for the fabled
@@ -1318,7 +1318,7 @@ return through the magic portal that brought thee here."
 "Thou hast succeeded, We see, %p!  Now thou art commanded to take
 the Amulet to be sacrificed to %d in the plane of the astral.
 
-"Merlin hath counseled us that thou must travel always upwards through
+"Merlin hath counseled Us that thou must travel always upwards through
 the planes of the elements, to achieve this goal.
 
 "Go with %d, %p."
