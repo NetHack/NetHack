@@ -49,8 +49,8 @@
 /*****************************************************************************/
 /* Version 3.4.x */
 
-/*  Patch 3, December 5, 2003
- *  Several dozen general bug fixes
+/*  Patch 3, December 7, 2003
+ *  Several dozen general bug fixes including at least one fatal bug
  *  Correct several inconsistencies
  *  Handle level completely filled with monsters better
  *  Performance enhancements for win32tty port on Windows 98 and Me
