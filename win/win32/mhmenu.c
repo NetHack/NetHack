@@ -11,9 +11,11 @@
 #include "mhfont.h"
 #include "mhdlg.h"
 
-#define MENU_MARGIN			0
-#define NHMENU_STR_SIZE     BUFSZ
-#define MIN_TABSTOP_SIZE	8
+#define MENU_MARGIN		0
+#define NHMENU_STR_SIZE		BUFSZ
+#define MIN_TABSTOP_SIZE	0
+#define NUMTABS			15
+#define TAB_SEPARATION		10 /* pixels between each tab stop */
 
 #define DEFAULT_COLOR_BG_TEXT	COLOR_WINDOW
 #define DEFAULT_COLOR_FG_TEXT	COLOR_WINDOWTEXT
@@ -21,14 +23,14 @@
 #define DEFAULT_COLOR_FG_MENU	COLOR_WINDOWTEXT
 
 typedef struct mswin_menu_item {
-	int				glyph;
+	int			glyph;
 	ANY_P			identifier;
-	CHAR_P			accelerator;
-	CHAR_P			group_accel;
-	int				attr;
+	CHAR_P		accelerator;
+	CHAR_P		group_accel;
+	int			attr;
 	char			str[NHMENU_STR_SIZE];
 	BOOLEAN_P		presel;
-	int				count;
+	int			count;
 	BOOL			has_focus;
 } NHMenuItem, *PNHMenuItem;
 
@@ -38,13 +40,13 @@ typedef struct mswin_nethack_menu_window {
 
 	union {
 		struct menu_list {
-			int				 size;			/* number of items in items[] */
-			int				 allocated;		/* number of allocated slots in items[] */
+			int			 size;			/* number of items in items[] */
+			int			 allocated;			/* number of allocated slots in items[] */
 			PNHMenuItem		 items;			/* menu items */
-			char			 gacc[QBUFSZ];	/* group accelerators */
-			BOOL			 counting;		/* counting flag */
-			char			 prompt[QBUFSZ]; /* menu prompt */
-			int				 tab_stop_size; /* for options menu we use tabstops to align option values */
+			char			 gacc[QBUFSZ];		/* group accelerators */
+			BOOL			 counting;			/* counting flag */
+			char			 prompt[QBUFSZ]; 		/* menu prompt */
+			int			 tab_stop_size[NUMTABS];/* tabstops to align option values */
 		} menu;
 
 		struct menu_text {
@@ -488,6 +490,8 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	} break;
 
 	case MSNH_MSG_STARTMENU:
+	{
+		int i;
 		if( data->type!=MENU_TYPE_MENU )
 			SetMenuType(hWnd, MENU_TYPE_MENU);
 
@@ -498,14 +502,18 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		data->menu.allocated = 0;
 		data->done = 0;
 		data->result = 0;
-		data->menu.tab_stop_size = MIN_TABSTOP_SIZE;
-	break;
+		for (i = 0; i < NUMTABS; ++i)
+			data->menu.tab_stop_size[i] = MIN_TABSTOP_SIZE;
+	} break;
 
 	case MSNH_MSG_ADDMENU:
 	{
 		PMSNHMsgAddMenu msg_data = (PMSNHMsgAddMenu)lParam;
 		char *p, *p1;
 		int new_item;
+		HDC hDC;
+		int column;
+		HFONT saveFont;
 		
 		if( data->type!=MENU_TYPE_MENU ) break;
 		if( strlen(msg_data->str)==0 ) break;
@@ -526,14 +534,33 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		data->menu.items[new_item].presel = msg_data->presel;
 
 		/* calculate tabstop size */
+		hDC = GetDC(hWnd);
+		saveFont = SelectObject(hDC, mswin_get_font(NHW_MENU, msg_data->attr, hDC, FALSE));
 		p1 = data->menu.items[new_item].str;
 		p = strchr(data->menu.items[new_item].str, '\t');
-		while( p ) {
-			data->menu.tab_stop_size = 
-				max( data->menu.tab_stop_size, p - p1 + 1 );
-			p1 = p;
-			p = strchr(p+1, '\t');
+		column = 0;
+		for (;;) {
+			TCHAR wbuf[BUFSZ];
+			RECT drawRect;
+			SetRect ( &drawRect, 0, 0, 1, 1 );
+			if (p != NULL) *p = '\0'; /* for time being, view tab field as zstring */
+			DrawText(hDC,
+				NH_A2W(p1, wbuf, BUFSZ),
+				strlen(p1),
+				&drawRect,
+				DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_EXPANDTABS | DT_SINGLELINE
+			);
+			data->menu.tab_stop_size[column] =
+				max( data->menu.tab_stop_size[column], drawRect.right - drawRect.left );
+			if (p != NULL) *p = '\t';
+			else /* last string so, */ break;
+
+			++column;
+			p1 = p + 1;
+			p = strchr(p1, '\t');
 		}
+		SelectObject(hDC, saveFont);
+		ReleaseDC(hWnd, hDC);
 
 		/* increment size */
 		data->menu.size++;
@@ -757,10 +784,10 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 /*-----------------------------------------------------------------------------*/
 BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    LPDRAWITEMSTRUCT lpdis; 
+	LPDRAWITEMSTRUCT lpdis;
 	PNHMenuItem item;
 	PNHMenuWindow data;
-    TEXTMETRIC tm;
+	TEXTMETRIC tm;
 	HGDIOBJ saveFont;
 	HDC tileDC;
 	short ntile;
@@ -770,6 +797,8 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	RECT drawRect;
 	DRAWTEXTPARAMS dtp;
 	COLORREF OldBg, OldFg, NewBg;
+	char *p, *p1;
+	int column;
 
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
@@ -844,18 +873,30 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	x += TILE_X + 5;
 
 	/* draw item text */
-	SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
 
-	ZeroMemory(&dtp, sizeof(dtp));
-	dtp.cbSize = sizeof(dtp);
-	dtp.iTabLength = max(MIN_TABSTOP_SIZE, data->menu.tab_stop_size);
-	DrawTextEx(lpdis->hDC, 
-		NH_A2W(item->str, wbuf, BUFSZ), 
-		strlen(item->str),
-		&drawRect, 
-		DT_LEFT | DT_VCENTER | DT_EXPANDTABS | DT_SINGLELINE | DT_TABSTOP, 
-		&dtp
-	); 
+	p1 = item->str;
+	p = strchr(item->str, '\t');
+	column = 0;
+	SetRect( &drawRect, x, lpdis->rcItem.top, min(x + data->menu.tab_stop_size[0], lpdis->rcItem.right),
+	    lpdis->rcItem.bottom );
+	for (;;) {
+		TCHAR wbuf[BUFSZ];
+		if (p != NULL) *p = '\0'; /* for time being, view tab field as zstring */
+		DrawText(lpdis->hDC,
+			NH_A2W(p1, wbuf, BUFSZ),
+			strlen(p1),
+			&drawRect,
+			DT_LEFT | DT_VCENTER | DT_SINGLELINE
+		);
+		if (p != NULL) *p = '\t';
+		else /* last string so, */ break;
+
+		p1 = p + 1;
+		p = strchr(p1, '\t');
+		drawRect.left = drawRect.right + TAB_SEPARATION;
+		++column;
+		drawRect.right = min (drawRect.left + data->menu.tab_stop_size[column], lpdis->rcItem.right);
+	}
 
 	/* draw focused item */
 	if( item->has_focus ) {
@@ -1247,21 +1288,41 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 			for(i=0; i<data->menu.size; i++ ) {
 				DRAWTEXTPARAMS dtp;
 				RECT drawRect;
+				LONG menuitemwidth = 0;
+				int column;
+				char *p, *p1;
 
-				SetRect(&drawRect, 0, 0, 1, 1);
-				ZeroMemory(&dtp, sizeof(dtp));
-				dtp.cbSize = sizeof(dtp);
-				dtp.iTabLength = max(MIN_TABSTOP_SIZE, data->menu.tab_stop_size);
-				DrawTextEx(hdc, 
-					NH_A2W(data->menu.items[i].str, wbuf, BUFSZ), 
-					strlen(data->menu.items[i].str),
-					&drawRect, 
-					DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_EXPANDTABS | DT_SINGLELINE | DT_TABSTOP, 
-					&dtp
-				); 
+				p1 = data->menu.items[i].str;
+				p = strchr(data->menu.items[i].str, '\t');
+				column = 0;
+				for (;;) {
+					TCHAR wbuf[BUFSZ];
+					RECT tabRect;
+					SetRect ( &tabRect, 0, 0, 1, 1 );
+					if (p != NULL) *p = '\0'; /* for time being, view tab field as zstring */
+					DrawText(hdc,
+						NH_A2W(p1, wbuf, BUFSZ),
+						strlen(p1),
+						&tabRect,
+						DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_SINGLELINE
+					);
+					/* it probably isn't necessary to recompute the tab width now, but do so
+					 * just in case, honoring the previously computed value
+					 */
+					menuitemwidth += max(data->menu.tab_stop_size[column],
+					    tabRect.right - tabRect.left);
+					if (p != NULL) *p = '\t';
+					else /* last string so, */ break;
+					/* add the separation only when not the last item */
+					/* in the last item, we break out of the loop, in the statement just above */
+					menuitemwidth += TAB_SEPARATION;
+					++column;
+					p1 = p + 1;
+					p = strchr(p1, '\t');
+				}
 
 				sz->cx = max(sz->cx, 
-					(LONG)(2*TILE_X + (drawRect.right - drawRect.left) + tm.tmAveCharWidth*12 + tm.tmOverhang));
+					(LONG)(2*TILE_X + menuitemwidth + tm.tmAveCharWidth*12 + tm.tmOverhang));
 			}
 			SelectObject(hdc, saveFont);
 		} else {
