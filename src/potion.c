@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2002/08/18	*/
+/*	SCCS Id: @(#)potion.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -563,7 +563,8 @@ peffects(otmp)
 		    pline(Hallucination ?
 		      "This tastes like 10%% real %s%s all-natural beverage." :
 				"This tastes like %s%s.",
-			 otmp->odiluted ? "reconstituted " : "", fruitjuice());
+			  otmp->odiluted ? "reconstituted " : "",
+			  fruitname(TRUE));
 		if (otmp->otyp == POT_FRUIT_JUICE) {
 		    u.uhunger += (otmp->odiluted ? 5 : 10) * (2 + bcsign(otmp));
 		    newuhs(FALSE);
@@ -654,7 +655,7 @@ peffects(otmp)
 		pline("Yecch!  This stuff tastes like poison.");
 		if (otmp->blessed) {
 		    pline("(But in fact it was mildly stale %s.)",
-			  fruitjuice());
+			  fruitname(TRUE));
 		    if (!Role_if(PM_HEALER)) {
 			if (otmp->corpsenm)
 			    losehp(1,
@@ -667,7 +668,7 @@ peffects(otmp)
 		    if(Poison_resistance)
 			pline(
 			  "(But in fact it was biologically contaminated %s.)",
-			      fruitjuice());
+			      fruitname(TRUE));
 		    if (Role_if(PM_HEALER))
 			pline("Fortunately, you have been immunized.");
 		    else {

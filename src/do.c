@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.4	2002/08/11	*/
+/*	SCCS Id: @(#)do.c	3.4	2002/09/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -260,7 +260,7 @@ giveback:
 		pline_The("sink quivers upward for a moment.");
 		break;
 	    case RIN_POISON_RESISTANCE:
-		You("smell rotten %s.", makeplural(pl_fruit));
+		You("smell rotten %s.", makeplural(fruitname(FALSE)));
 		break;
 	    case RIN_AGGRAVATE_MONSTER:
 		pline("Several flies buzz angrily around the sink.");

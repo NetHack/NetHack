@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)fountain.c	3.4	2002/07/10	*/
+/*	SCCS Id: @(#)fountain.c	3.4	2002/09/08	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -255,7 +255,9 @@ drinkfountain()
 
 			pline_The("water is contaminated!");
 			if (Poison_resistance) {
-	   pline("Perhaps it is runoff from the nearby %s farm.", pl_fruit);
+			   pline(
+			      "Perhaps it is runoff from the nearby %s farm.",
+				 fruitname(FALSE));
 			   losehp(rnd(4),"unrefrigerated sip of juice",
 				KILLED_BY_AN);
 			   break;
