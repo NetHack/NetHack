@@ -1090,10 +1090,11 @@ boolean tinitial, tfrom_file;
 		return;
 	}
 
-#ifdef TTY_GRAPHICS
 	fullname="msg_window";
 	/* msg_window:single, combo, full or reversed */
 	if (match_optname(opts, fullname, 4, TRUE)) {
+	/* allow option to be silently ignored by non-tty ports */
+#ifdef TTY_GRAPHICS
 		int tmp;
 		if (!(op = string_for_opt(opts, TRUE))) {
 		    tmp = negated ? 's' : 'f';
@@ -1120,9 +1121,9 @@ boolean tinitial, tfrom_file;
 			default:
 				badoption(opts);
 		}
+#endif
 		return;
 	}
-#endif
 
 	/* WINCAP
 	 * setting font options  */
