@@ -474,16 +474,18 @@ touch_artifact(obj,mon)
     /* all quest artifacts are self-willed; it this ever changes, `badclass'
        will have to be extended to explicitly include quest artifacts */
     self_willed = ((oart->spfx & SPFX_INTEL) != 0);
-    if (yours || !(mon->data->mflags3 & M3_WANTSALL)) {
-	badclass = (self_willed && (!yours ||
-			(oart->role != NON_PM && !Role_if(oart->role)) ||
-			(oart->race != NON_PM && !Race_if(oart->race))));
-	badalign = (oart->spfx & SPFX_RESTR) &&
-		   oart->alignment != A_NONE &&
-	    ((oart->alignment !=
-	      (yours ? u.ualign.type : sgn(mon->data->maligntyp))) ||
-	     (yours && u.ualign.record < 0));
-    } else {	/* an M3_WANTSxxx monster */
+    if (yours) {
+	badclass = self_willed &&
+		   ((oart->role != NON_PM && !Role_if(oart->role)) ||
+		    (oart->race != NON_PM && !Race_if(oart->race)));
+	badalign = (oart->spfx & SPFX_RESTR) && oart->alignment != A_NONE &&
+		   (oart->alignment != u.ualign.type || u.ualign.record < 0);
+    } else if (!is_covetous(mon->data) && !is_mplayer(mon->data)) {
+	badclass = self_willed &&
+		   oart->role != NON_PM && oart != &artilist[ART_EXCALIBUR];
+	badalign = (oart->spfx & SPFX_RESTR) && oart->alignment != A_NONE &&
+		   (oart->alignment != sgn(mon->data->maligntyp));
+    } else {    /* an M3_WANTSxxx monster or a fake player */
 	/* special monsters trying to take the Amulet, invocation tools or
 	   quest item can touch anything except for `spec_applies' artifacts */
 	badclass = badalign = FALSE;

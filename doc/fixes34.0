@@ -439,6 +439,8 @@ monsters hitting other monsters can split puddings with weapons
 be consistent with checking for iron weapons when splitting puddings
 prevent corpses of undead creatures just killed by undead turning from being
 	instantly revived by the same undead turning attack
+allow fake player monsters to handle artifacts that don't match alignment/role
+chaotic monsters can use Stormbringer; lawful monsters can use Excalibur
 
 
 Platform- and/or Interface-Specific Fixes
