@@ -595,8 +595,8 @@ E void NDECL(makerogueghost);
 
 /* ### files.c ### */
 
-E char *FDECL(fname_encode, (const char *, char, char *, char *, int));
-E char *FDECL(fname_decode, (char, char *, char *, int));
+E char *FDECL(fname_encode, (const char *, CHAR_P, char *, char *, int));
+E char *FDECL(fname_decode, (CHAR_P, char *, char *, int));
 E const char *FDECL(fqname, (const char *, int, int));
 E FILE *FDECL(fopen_datafile, (const char *,const char *,int));
 E boolean FDECL(uptodate, (int,const char *));
