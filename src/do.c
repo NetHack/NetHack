@@ -183,10 +183,17 @@ const char *verb;
 		return fire_damage(obj, FALSE, FALSE, x, y);
 	} else if (is_pool(x, y)) {
 		/* Reasonably bulky objects (arbitrary) splash when dropped.
+		 * If you're floating above the water even small things make noise.
 		 * Stuff dropped near fountains always misses */
-		if (Blind && !Deaf && ((x == u.ux) && (y == u.uy)) &&
-		    weight(obj) > 9) {
-		    pline("Splash!");
+		if ((Blind || (Levitation || Flying)) && !Deaf &&
+		    ((x == u.ux) && (y == u.uy))) {
+		    if (!Underwater) {
+			if (weight(obj) > 9) {
+				pline("Splash!");
+		        } else if (Levitation || Flying) {
+				pline("Plop!");
+		        }
+		    }
 		    map_background(x, y, 0);
 		    newsym(x, y);
 		}
