@@ -88,7 +88,7 @@ static int map_cnt = 0;
 		  map_cnt = 0;
 		  return MAP_ID;
 		}
-<MAPC>[-|}{+ABCISHKPLWTF\\#. ]*\n	{
+<MAPC>[-|}{+ABCISHKPLWTF\\#. 0123456789]*\n	{
 		  line_number++;
 		  (void) strncpy(map + map_cnt, yytext, yyleng);
 		  map_cnt += yyleng;

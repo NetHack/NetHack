@@ -516,8 +516,13 @@ char *map;
 	int max_hig = 0;
 	char msg[256];
 
-	/* First : find the max width of the map */
+	/* First, strip out digits 0-9 (line numbering) */
+	for (s1 = s2 = map; *s1; s1++)
+	    if (*s1 < '0' || *s1 > '9')
+		*s2++ = *s1;
+	*s2 = '\0';
 
+	/* Second, find the max width of the map */
 	s1 = map;
 	while (s1 && *s1) {
 		s2 = index(s1, NEWLINE);
@@ -532,7 +537,6 @@ char *map;
 	}
 
 	/* Then parse it now */
-
 	while (map && *map) {
 		tmpmap[max_hig] = (char *) alloc(max_len);
 		s1 = index(map, NEWLINE);
