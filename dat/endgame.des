@@ -1,0 +1,611 @@
+#	SCCS Id: @(#)endgame.des	3.3	96/11/09
+#	Copyright (c) 1989 by Jean-Christophe Collet
+#	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
+#                      and Timo Hakulinen
+# NetHack may be freely redistributed.  See license for details.
+#
+# These are the ENDGAME levels: earth, air, fire, water, and astral.
+# The top-most level, the Astral Level, has 3 temples and shrines.
+# Players are supposed to sacrifice the Amulet of Yendor on the appropriate
+# shrine.
+
+MAZE:"earth",' '
+FLAGS: noteleport,hardfloor,shortsighted
+MESSAGE: "Well done, mortal!"
+MESSAGE: "But now thou must face the final Test..."
+MESSAGE: "Prove thyself worthy or perish!"
+
+GEOMETRY:center,center
+# The player lands, upon arrival, in the
+# lower-right cavern.  The location of the
+# portal to the next level is randomly chosen.
+# This map has no visible outer boundary, and
+# is mostly diggable "rock".
+MAP
+                                                                            
+  ...                                                                       
+ ....                ..                                                     
+ .....             ...                                      ..              
+  ....              ....                                     ...            
+   ....              ...                ....                 ...      .     
+    ..                ..              .......                 .      ..     
+                                      ..  ...                        .      
+              .                      ..    .                         ...    
+             ..  ..                  .     ..                         .     
+            ..   ...                        .                               
+            ...   ...                                                       
+              .. ...                                 ..                     
+               ....                                 ..                      
+                          ..                                       ...      
+                         ..                                       .....     
+  ...                                                              ...      
+ ....                                                                       
+   ..                                                                       
+                                                                            
+ENDMAP
+#  Since there are no stairs, this forces the hero's initial placement
+TELEPORT_REGION:(69,16,69,16),(0,0,0,0)
+PORTAL:(0,0,75,19),(65,13,75,19),"air"
+#  Some helpful monsters.  Making sure a
+#  pick axe and at least one wand of digging
+#  are available.
+MONSTER:'@',"Elvenking",(67,16)
+MONSTER:'H',"minotaur",(67,14)
+#  An assortment of earth-appropriate nasties
+#  in each cavern.
+MONSTER:'E',"earth elemental",(52,13),hostile
+MONSTER:'E',"earth elemental",(53,13),hostile
+MONSTER:'T',"rock troll",(53,12)
+MONSTER:'H',"stone giant",(54,12)
+#
+MONSTER:'S',"pit viper",(70,05)
+MONSTER:'&',"barbed devil",(69,06)
+MONSTER:'H',"stone giant",(69,08)
+MONSTER:''',"stone golem",(71,08)
+MONSTER:'&',"pit fiend",(70,09)
+MONSTER:'E',"earth elemental",(70,08),hostile
+#
+MONSTER:'E',"earth elemental",(60,03),hostile
+MONSTER:'H',"stone giant",(61,04)
+MONSTER:'E',"earth elemental",(62,04),hostile
+MONSTER:'E',"earth elemental",(61,05),hostile
+MONSTER:'s',"scorpion",(62,05)
+MONSTER:'p',"rock piercer",(63,05)
+#
+MONSTER:'U',"umber hulk",(40,05)
+MONSTER:'v',"dust vortex",(42,05)
+MONSTER:'T',"rock troll",(38,06)
+MONSTER:'E',"earth elemental",(39,06),hostile
+MONSTER:'E',"earth elemental",(41,06),hostile
+MONSTER:'E',"earth elemental",(38,07),hostile
+MONSTER:'H',"stone giant",(39,07)
+MONSTER:'E',"earth elemental",(43,07),hostile
+MONSTER:''',"stone golem",(37,08)
+MONSTER:'S',"pit viper",(43,08)
+MONSTER:'S',"pit viper",(43,09)
+MONSTER:'T',"rock troll",(44,10)
+#
+MONSTER:'E',"earth elemental",(02,01),hostile
+MONSTER:'E',"earth elemental",(03,01),hostile
+MONSTER:''',"stone golem",(01,02)
+MONSTER:'E',"earth elemental",(02,02),hostile
+MONSTER:'T',"rock troll",(04,03)
+MONSTER:'T',"rock troll",(03,03)
+MONSTER:'&',"pit fiend",(03,04)
+MONSTER:'E',"earth elemental",(04,05),hostile
+MONSTER:'S',"pit viper",(05,06)
+#
+MONSTER:'E',"earth elemental",(21,02),hostile
+MONSTER:'E',"earth elemental",(21,03),hostile
+MONSTER:'H',"minotaur",(21,04)
+MONSTER:'E',"earth elemental",(21,05),hostile
+MONSTER:'T',"rock troll",(22,05)
+MONSTER:'E',"earth elemental",(22,06),hostile
+MONSTER:'E',"earth elemental",(23,06),hostile
+#
+MONSTER:'S',"pit viper",(14,08)
+MONSTER:'&',"barbed devil",(14,09)
+MONSTER:'E',"earth elemental",(13,10),hostile
+MONSTER:'T',"rock troll",(12,11)
+MONSTER:'E',"earth elemental",(14,12),hostile
+MONSTER:'E',"earth elemental",(15,13),hostile
+MONSTER:'H',"stone giant",(17,13)
+MONSTER:''',"stone golem",(18,13)
+MONSTER:'&',"pit fiend",(18,12)
+MONSTER:'E',"earth elemental",(18,11),hostile
+MONSTER:'E',"earth elemental",(18,10),hostile
+#
+MONSTER:'&',"barbed devil",(02,16)
+MONSTER:'E',"earth elemental",(03,16),hostile
+MONSTER:'T',"rock troll",(02,17)
+MONSTER:'E',"earth elemental",(04,17),hostile
+MONSTER:'E',"earth elemental",(04,18),hostile
+
+OBJECT:'`',"boulder",random
+
+
+MAZE:"air",' '
+FLAGS: noteleport,hardfloor,shortsighted
+# The following messages are somewhat obtuse, to make then
+# equally meaningful if the player can see or not.
+MESSAGE: "What a strange feeling!"
+MESSAGE: "You notice that there is no gravity here."
+GEOMETRY:center,center
+# The player lands, upon arrival, in the
+# lower-left area.  The location of the
+# portal to the next level is randomly chosen.
+# This map has no visible outer boundary, and
+# is all "air".
+MAP
+AAAAAAAAAAAAAAAAAAAAAAAACCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAACCCCCCAAAAAAAACCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAACCAACCCCCAAAAAACCCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAACCACCCCCCCAAAAACCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAACCCCCCCCCCAAAAACCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAACCCCAAACCAAACCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAACCCCAAAAAACCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAACCCCCCCAAAACCACCCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAACCCCAAAAAAACCACAACCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACCAACCCCCCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAACCCCAAACCCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACCCCCAAACCCCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAACCCCCCCAAAACCCCCCCAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACCCCCCCCAAACCCCCCCCAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACCCCCCCCCCAACCCCCCCCAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAACACCCCCCCCCCACCCCCCCCAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAACCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAACCCCCCAAACCCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAACCAAAAAACCCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACCCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+ENDMAP
+TELEPORT_REGION:(09,16,09,16),(0,0,0,0)
+PORTAL:(30,0,75,19),(00,00,09,16),"fire"
+REGION:(00,00,75,19),lit,"ordinary"
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+MONSTER:'E',"air elemental",random,hostile
+
+MONSTER:'e',"floating eye",random,hostile
+MONSTER:'e',"floating eye",random,hostile
+MONSTER:'e',"floating eye",random,hostile
+
+MONSTER:'y',"yellow light",random,hostile
+MONSTER:'y',"yellow light",random,hostile
+MONSTER:'y',"yellow light",random,hostile
+
+MONSTER:'A',"couatl",random
+
+MONSTER:'D',random,random
+MONSTER:'D',random,random
+MONSTER:'D',random,random
+MONSTER:'D',random,random
+MONSTER:'D',random,random
+
+MONSTER:'E',random,random
+MONSTER:'E',random,random
+MONSTER:'E',random,random
+MONSTER:'J',random,random
+MONSTER:'J',random,random
+
+MONSTER:'&',"djinni",random,hostile
+MONSTER:'&',"djinni",random,hostile
+MONSTER:'&',"djinni",random,hostile
+
+MONSTER:'v',"fog cloud",random,hostile
+MONSTER:'v',"fog cloud",random,hostile
+MONSTER:'v',"fog cloud",random,hostile
+MONSTER:'v',"fog cloud",random,hostile
+MONSTER:'v',"fog cloud",random,hostile
+MONSTER:'v',"fog cloud",random,hostile
+MONSTER:'v',"fog cloud",random,hostile
+MONSTER:'v',"fog cloud",random,hostile
+MONSTER:'v',"fog cloud",random,hostile
+MONSTER:'v',"energy vortex",random,hostile
+MONSTER:'v',"energy vortex",random,hostile
+MONSTER:'v',"energy vortex",random,hostile
+MONSTER:'v',"energy vortex",random,hostile
+MONSTER:'v',"energy vortex",random,hostile
+MONSTER:'v',"steam vortex",random,hostile
+MONSTER:'v',"steam vortex",random,hostile
+MONSTER:'v',"steam vortex",random,hostile
+MONSTER:'v',"steam vortex",random,hostile
+MONSTER:'v',"steam vortex",random,hostile
+
+
+MAZE:"fire",' '
+FLAGS: noteleport,hardfloor,shortsighted
+GEOMETRY:center,center
+# The player lands, upon arrival, in the
+# lower-right.  The location of the
+# portal to the next level is randomly chosen.
+# This map has no visible outer boundary, and
+# is mostly open area, with lava lakes and bunches of fire traps.
+MAP
+............................................................................
+....LLLLLLLL............L.......................LLL.........................
+...LL...................L......................LLLL................LL.......
+...L.............LLLL...LL....LL...............LLLLL.............LLL........
+.LLLL..............LL....L.....LLL..............LLLL..............LLLL......
+..........LLLL...LLLL...LLL....LLL......L........LLLL....LL........LLL......
+........LLLLLLL...LL.....L......L......LL.........LL......LL........LL...L..
+........LL..LLL..LL......LL......LLLL..L.........LL......LLL............LL..
+....L..LL....LLLLL.................LLLLLLL.......L......LL............LLLLLL
+....L..L.....LL.LLLL.......L............L........LLLLL.LL......LL.........LL
+....LL........L...LL......LL.............LLL.....L...LLL.......LLL.........L
+.....LLLLLL........L.......LLL.............L....LL...L.LLL......LLLLLLL.....
+..........LLLL............LL.L.............L....L...LL.........LLL..LLL.....
+...........................LLLLL...........LL...L...L........LLLL..LLLLLL...
+.....LLLL.............LL....LL.......LLL...LL.......L..LLL....LLLLLLL.......
+.......LLL.........LLLLLLLLLLL......LLLLL...L...........LL...LL...LL........
+.........LL.......LL.........LL.......LLL....L..LLL....LL.........LL........
+..........LLLLLLLLL...........LL....LLL.......LLLLL.....LL........LL........
+.................L.............LLLLLL............LL...LLLL.........LL.......
+.................................LL....................LL...................
+ENDMAP
+TELEPORT_REGION:(69,16,69,16),(0,0,0,0)
+PORTAL:(0,0,75,19),(65,13,75,19),"water"
+
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+TRAP:"fire",random
+#  An assortment of fire-appropriate nasties
+MONSTER:'D',"red dragon",random
+MONSTER:'&',"balrog",random
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'v',"fire vortex",random
+MONSTER:'d',"hell hound",random
+#
+MONSTER:'H',"fire giant",random
+MONSTER:'&',"barbed devil",random
+MONSTER:'d',"hell hound",random
+MONSTER:''',"stone golem",random
+MONSTER:'&',"pit fiend",random
+MONSTER:'E',"fire elemental",random,hostile
+#
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'d',"hell hound",random
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'s',"scorpion",random
+MONSTER:'H',"fire giant",random
+#
+MONSTER:'d',"hell hound",random
+MONSTER:'v',"dust vortex",random
+MONSTER:'v',"fire vortex",random
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'d',"hell hound",random
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:''',"stone golem",random
+MONSTER:'S',"pit viper",random
+MONSTER:'S',"pit viper",random
+MONSTER:'v',"fire vortex",random
+#
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'H',"fire giant",random
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'v',"fire vortex",random
+MONSTER:'v',"fire vortex",random
+MONSTER:'&',"pit fiend",random
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'S',"pit viper",random
+#
+MONSTER:':',"salamander",random,hostile
+MONSTER:':',"salamander",random,hostile
+MONSTER:'H',"minotaur",random
+MONSTER:':',"salamander",random,hostile
+MONSTER:'v',"steam vortex",random
+MONSTER:':',"salamander",random,hostile
+MONSTER:':',"salamander",random,hostile
+#
+MONSTER:'H',"fire giant",random
+MONSTER:'&',"barbed devil",random
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'v',"fire vortex",random
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'d',"hell hound",random
+MONSTER:'H',"fire giant",random
+MONSTER:'&',"pit fiend",random
+MONSTER:'E',"fire elemental",random,hostile
+MONSTER:'E',"fire elemental",random,hostile
+#
+MONSTER:'&',"barbed devil",random
+MONSTER:':',"salamander",random,hostile
+MONSTER:'v',"steam vortex",random
+MONSTER:':',"salamander",random,hostile
+MONSTER:':',"salamander",random,hostile
+
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+OBJECT:'`',"boulder",random
+
+
+MAZE:"water",' '
+FLAGS: noteleport,hardfloor,shortsighted
+MESSAGE: "You find yourself suspended in an air bubble surrounded by water."
+GEOMETRY:center,center
+# The player lands upon arrival to an air bubble
+# within the leftmost third of the level.  The
+# portal to the next level is randomly located in an air
+# bubble within the rightmost third of the level.
+# Bubbles are generated by special code in mkmaze.c for now.
+MAP
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+ENDMAP
+TELEPORT_REGION:(0,0,25,19),(0,0,0,0)
+PORTAL:(51,0,75,19),(0,0,0,0),"astral"
+# A fisherman's dream...
+MONSTER:';',"giant eel",random
+MONSTER:';',"giant eel",random
+MONSTER:';',"giant eel",random
+MONSTER:';',"giant eel",random
+MONSTER:';',"giant eel",random
+MONSTER:';',"giant eel",random
+MONSTER:';',"giant eel",random
+MONSTER:';',"giant eel",random
+MONSTER:';',"electric eel",random
+MONSTER:';',"electric eel",random
+MONSTER:';',"electric eel",random
+MONSTER:';',"electric eel",random
+MONSTER:';',"electric eel",random
+MONSTER:';',"electric eel",random
+MONSTER:';',"electric eel",random
+MONSTER:';',"electric eel",random
+MONSTER:';',"kraken",random
+MONSTER:';',"kraken",random
+MONSTER:';',"kraken",random
+MONSTER:';',"kraken",random
+MONSTER:';',"kraken",random
+MONSTER:';',"kraken",random
+MONSTER:';',"kraken",random
+MONSTER:';',"kraken",random
+MONSTER:';',"kraken",random
+MONSTER:';',"shark",random
+MONSTER:';',"shark",random
+MONSTER:';',"shark",random
+MONSTER:';',"shark",random
+MONSTER:';',"piranha",random
+MONSTER:';',"piranha",random
+MONSTER:';',"piranha",random
+MONSTER:';',"piranha",random
+MONSTER:';',"jellyfish",random
+MONSTER:';',"jellyfish",random
+MONSTER:';',"jellyfish",random
+MONSTER:';',"jellyfish",random
+MONSTER:';',random,random
+MONSTER:';',random,random
+MONSTER:';',random,random
+MONSTER:';',random,random
+# These guys feel like home here
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+MONSTER:'E',"water elemental",random,hostile
+
+
+MAZE:"astral",' '
+FLAGS: noteleport,hardfloor,nommap,shortsighted
+MESSAGE: "You arrive on the Astral Plane!"
+MESSAGE: "Here the High Temples of the aligned gods are located."
+MESSAGE: "You sense alarm, hostility, and excitement in the air!"
+GEOMETRY:center,center
+MAP
+                              ---------------                              
+                              |.............|                              
+                              |..---------..|                              
+                              |..|.......|..|                              
+---------------               |..|.......|..|               ---------------
+|.............|               |..|.......|..|               |.............|
+|..---------..-|   |-------|  |..|.......|..|  |-------|   |-..---------..|
+|..|.......|...-| |-.......-| |..|.......|..| |-.......-| |-...|.......|..|
+|..|.......|....-|-.........-||..----+----..||-.........-|-....|.......|..|
+|..|.......+.....+...........||.............||...........+.....+.......|..|
+|..|.......|....-|-.........-|--|.........|--|-.........-|-....|.......|..|
+|..|.......|...-| |-.......-|   -|---+---|-   |-.......-| |-...|.......|..|
+|..---------..-|   |---+---|    |-.......-|    |---+---|   |-..---------..|
+|.............|      |...|-----|-.........-|-----|...|      |.............|
+---------------      |.........|...........|.........|      ---------------
+                     -------...|-.........-|...-------                     
+                           |....|-.......-|....|                           
+                           ---...|---+---|...---                           
+                             |...............|                             
+                             -----------------                             
+ENDMAP
+# Rider locations
+RANDOM_PLACES:(23,9),(37,14),(51,9)
+# Where the player will land on arrival
+TELEPORT_REGION:(29,15,45,15),(30,15,44,15)
+# Lit courts
+REGION:(01,05,16,14),lit,"ordinary",filled,true
+REGION:(31,01,44,10),lit,"ordinary",filled,true
+REGION:(61,05,74,14),lit,"ordinary",filled,true
+# A Sanctum for each alignment
+# The shrines' alignments are shuffled for
+# each game
+REGION:(04,07,10,11),lit,"temple"
+REGION:(34,03,40,07),lit,"temple"
+REGION:(64,07,70,11),lit,"temple"
+ALTAR:(07,09),align[0],sanctum
+ALTAR:(37,05),align[1],sanctum
+ALTAR:(67,09),align[2],sanctum
+# Doors
+DOOR:closed,(11,09)
+DOOR:closed,(17,09)
+DOOR:locked,(23,12)
+DOOR:locked,(37,08)
+DOOR:closed,(37,11)
+DOOR:closed,(37,17)
+DOOR:locked,(51,12)
+DOOR:locked,(57,09)
+DOOR:closed,(63,09)
+# Non diggable and phazeable everywhere
+NON_DIGGABLE:(00,00,74,19)
+NON_PASSWALL:(00,00,74,19)
+# Moloch's horde
+# West round room
+MONSTER:'@',"aligned priest",(18,09),noalign,hostile
+MONSTER:'@',"aligned priest",(19,08),noalign,hostile
+MONSTER:'@',"aligned priest",(19,09),noalign,hostile
+MONSTER:'@',"aligned priest",(19,10),noalign,hostile
+MONSTER:'A',"Angel",(20,09),noalign,hostile
+MONSTER:'A',"Angel",(20,10),noalign,hostile
+MONSTER:'&',"Pestilence",place[0],hostile
+# South-central round room
+MONSTER:'@',"aligned priest",(36,12),noalign,hostile
+MONSTER:'@',"aligned priest",(37,12),noalign,hostile
+MONSTER:'@',"aligned priest",(38,12),noalign,hostile
+MONSTER:'@',"aligned priest",(36,13),noalign,hostile
+MONSTER:'A',"Angel",(38,13),noalign,hostile
+MONSTER:'A',"Angel",(37,13),noalign,hostile
+MONSTER:'&',"Death",place[1],hostile
+# East round room
+MONSTER:'@',"aligned priest",(56,09),noalign,hostile
+MONSTER:'@',"aligned priest",(55,08),noalign,hostile
+MONSTER:'@',"aligned priest",(55,09),noalign,hostile
+MONSTER:'@',"aligned priest",(55,10),noalign,hostile
+MONSTER:'A',"Angel",(54,09),noalign,hostile
+MONSTER:'A',"Angel",(54,10),noalign,hostile
+MONSTER:'&',"Famine",place[2],hostile
+#
+# The aligned horde
+#
+# We do not know in advance the alignment of the
+# player.  The mpeaceful bit will need resetting
+# when the level is created.  The setting here is
+# but a place holder.
+#
+# West court
+MONSTER:'@',"aligned priest",(12,07),chaos,hostile
+MONSTER:'@',"aligned priest",(13,07),chaos,peaceful
+MONSTER:'@',"aligned priest",(14,07),law,hostile
+MONSTER:'@',"aligned priest",(12,11),law,peaceful
+MONSTER:'@',"aligned priest",(13,11),neutral,hostile
+MONSTER:'@',"aligned priest",(14,11),neutral,peaceful
+MONSTER:'A',"Angel",(11,05),chaos,hostile
+MONSTER:'A',"Angel",(12,05),chaos,peaceful
+MONSTER:'A',"Angel",(13,05),law,hostile
+MONSTER:'A',"Angel",(11,13),law,peaceful
+MONSTER:'A',"Angel",(12,13),neutral,hostile
+MONSTER:'A',"Angel",(13,13),neutral,peaceful
+# Central court
+MONSTER:'@',"aligned priest",(32,09),chaos,hostile
+MONSTER:'@',"aligned priest",(33,09),chaos,peaceful
+MONSTER:'@',"aligned priest",(34,09),law,hostile
+MONSTER:'@',"aligned priest",(40,09),law,peaceful
+MONSTER:'@',"aligned priest",(41,09),neutral,hostile
+MONSTER:'@',"aligned priest",(42,09),neutral,peaceful
+MONSTER:'A',"Angel",(31,08),chaos,hostile
+MONSTER:'A',"Angel",(32,08),chaos,peaceful
+MONSTER:'A',"Angel",(31,09),law,hostile
+MONSTER:'A',"Angel",(42,08),law,peaceful
+MONSTER:'A',"Angel",(43,08),neutral,hostile
+MONSTER:'A',"Angel",(43,09),neutral,peaceful
+# East court
+MONSTER:'@',"aligned priest",(60,07),chaos,hostile
+MONSTER:'@',"aligned priest",(61,07),chaos,peaceful
+MONSTER:'@',"aligned priest",(62,07),law,hostile
+MONSTER:'@',"aligned priest",(60,11),law,peaceful
+MONSTER:'@',"aligned priest",(61,11),neutral,hostile
+MONSTER:'@',"aligned priest",(62,11),neutral,peaceful
+MONSTER:'A',"Angel",(61,05),chaos,hostile
+MONSTER:'A',"Angel",(62,05),chaos,peaceful
+MONSTER:'A',"Angel",(63,05),law,hostile
+MONSTER:'A',"Angel",(61,13),law,peaceful
+MONSTER:'A',"Angel",(62,13),neutral,hostile
+MONSTER:'A',"Angel",(63,13),neutral,peaceful
+#
+# Assorted nasties
+MONSTER:'L',random,random,hostile
+MONSTER:'L',random,random,hostile
+MONSTER:'L',random,random,hostile
+MONSTER:'V',random,random,hostile
+MONSTER:'V',random,random,hostile
+MONSTER:'V',random,random,hostile
+MONSTER:'D',random,random,hostile
+MONSTER:'D',random,random,hostile
+MONSTER:'D',random,random,hostile
