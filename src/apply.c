@@ -1827,7 +1827,7 @@ struct obj *otmp;
 	struct obj *obj;
 	char allowall[3];
 	const char *color = 0;
-	static const char *ambiguous = "You make scratch marks on the stone.";
+	static const char *ambiguous_scratch = "You make scratch marks on the stone.";
 	const char *scritch = "\"scritch, scritch\"";
 	unsigned material;
 
@@ -1866,7 +1866,7 @@ struct obj *otmp;
 	}
 
 	if (material == LIQUID || material == WAX ||
-		material == CLOTH || material == WOOD) {
+		material == CLOTH || material == WOOD || material == GOLD) {
 	    switch(material) {
 	    case LIQUID:
 		if (!obj->known)
@@ -1887,12 +1887,24 @@ struct obj *otmp;
 		goto see_streaks;	/* okay even if not touchstone */
 		/*NOTREACHED*/
 		break;
+	    case GOLD:
+		color = "golden";
+		goto see_streaks;
+		/*NOTREACHED*/
+		break;
 	    }
 	    return;
 	}
-
+	if (is_flimsy(obj)) {
+	    /* Objects passing the is_flimsy() test will not
+               scratch a stone.  They will leave streaks on
+               non-touchstones and touchstones alike */
+	    color = c_obj_colors[objects[obj->otyp].oc_color];
+	    goto see_streaks;
+	}
+	
 	if (otmp->otyp != TOUCHSTONE) {
-	    pline(ambiguous);
+	    pline(ambiguous_scratch);
 	    return;
 	}
 
@@ -1917,7 +1929,7 @@ struct obj *otmp;
 	    /* FALLTHROUGH */
 	  case RING_CLASS:
 	    if (objects[obj->otyp].oc_material == GLASS) {
-		pline(ambiguous); /* yet not amibguous if a known touchstone */
+		pline(ambiguous_scratch); /* yet not ambiguous if a known touchstone */
 		return;
 	    }
 	    color = c_obj_colors[objects[obj->otyp].oc_color];
