@@ -1920,8 +1920,10 @@ use_weapon:
 			impossible("strange attack of yours (%d)",
 				 mattk->aatyp);
 	    }
-	    if (dhit == -1)
+	    if (dhit == -1) {
+		u.mh = -1;	/* dead in the current form */
 		rehumanize();
+	    }
 	    if (sum[i] == 2)
 		return((boolean)passive(mon, 1, 0, mattk->aatyp));
 							/* defender dead */

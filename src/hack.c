@@ -1041,13 +1041,20 @@ domove()
 	if (flags.forcefight ||
 	    /* remembered an 'I' && didn't use a move command */
 	    (glyph_is_invisible(levl[x][y].glyph) && !flags.nopick)) {
+		boolean expl = (Upolyd && attacktype(youmonst.data, AT_EXPL));
 	    	char buf[BUFSZ];
 		Sprintf(buf,"a vacant spot on the %s", surface(x,y));
-		You("attack %s.",
-		    !Underwater ? "thin air" : is_pool(x,y) ? "empty water" : buf);
+		You("%s %s.",
+		    expl ? "explode at" : "attack",
+		    !Underwater ? "thin air" :
+		    is_pool(x,y) ? "empty water" : buf);
 		unmap_object(x, y); /* known empty -- remove 'I' if present */
 		newsym(x, y);
 		nomul(0);
+		if (expl) {
+		    u.mh = -1;		/* dead in the current form */
+		    rehumanize();
+		}
 		return;
 	}
 	if (glyph_is_invisible(levl[x][y].glyph)) {
