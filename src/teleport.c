@@ -398,7 +398,7 @@ tele()
 	    You_feel("disoriented for a moment.");
 	    return;
 	}
-	if (Teleport_control
+	if ((Teleport_control && !Stunned)
 #ifdef WIZARD
 			    || wizard
 #endif
@@ -556,7 +556,7 @@ level_tele()
 	    You_feel("very disoriented for a moment.");
 	    return;
 	}
-	if ((Teleport_control && !Confusion)
+	if ((Teleport_control && !Stunned)
 #ifdef WIZARD
 	   || wizard
 #endif
@@ -568,10 +568,18 @@ level_tele()
 	    do {
 		if (++trycnt == 2) Strcat(qbuf, " [type a number]");
 		getlin(qbuf, buf);
-		if (!strcmp(buf,"\033"))	/* cancelled */
+		if (!strcmp(buf,"\033")) {	/* cancelled */
+		    if (Confusion && rnl(5)) {
+			pline("Oops...");
+			goto random_levtport;
+		    }
 		    return;
-		else if (!strcmp(buf,"*"))
+		} else if (!strcmp(buf,"*")) {
 		    goto random_levtport;
+		} else if (Confusion && rnl(5)) {
+		    pline("Oops...");
+		    goto random_levtport;
+		}
 		if ((newlev = lev_by_name(buf)) == 0) newlev = atoi(buf);
 	    } while (!newlev && !digit(buf[0]) &&
 		     (buf[0] != '-' || !digit(buf[1])) &&
