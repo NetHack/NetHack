@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.54 $ $Date: 2002/09/24 09:42:53 $
+% $Revision: 1.55 $ $Date: 2002/09/26 07:37:12 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2488,6 +2488,10 @@ Suppress terminal beeps (default on).
 \item[\ib{sortpack}]
 Sort the pack contents by type when displaying inventory (default on).
 %.lp
+\item[\ib{sound}]
+Enable messages about what your character hears (default on).
+Note that this has nothing to do with your computer's audio capabilities.
+%.lp
 \item[\ib{standout}]
 Boldface monsters and ``{\tt --More--}'' (default off).
 %.lp
@@ -2750,15 +2754,15 @@ At this time the Qt port and the win32tty and win32gui ports support the
 use of user sounds.
 
 %.pg
-The following config file options are relevant to mapping user sounds
+The following config file entries are relevant to mapping user sounds
 to messages:
 
 \blist{}
 %.lp
-\item[\ib{soundir}]
+\item[\ib{SOUNDDIR}]
 The directory that houses the sound files to be played.
 %.lp
-\item[\ib{sound}]
+\item[\ib{SOUND}]
 An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
 

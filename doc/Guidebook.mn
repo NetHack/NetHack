@@ -2025,6 +2025,9 @@ Show your approximate accumulated score on bottom line (default off).
 Suppress terminal beeps (default on).
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).
+.lp sound
+Enable messages about what your character hears (default on).
+Note that this has nothing to do with your computer's audio capabilities.
 .lp sparkle
 Display a sparkly effect when a monster (including yourself) is hit by an
 attack to which it is resistant (default on).
@@ -2225,11 +2228,11 @@ that matches a user-defined pattern is delivered to the message window.
 At this time the Qt port and the win32tty and win32gui ports support the
 use of user sounds.
 .pg
-The following config file options are relevant to mapping user sounds
+The following config file entries are relevant to mapping user sounds
 to messages:
-.lp soundir
+.lp SOUNDDIR
 The directory that houses the sound files to be played.
-.lp sound
+.lp SOUND
 An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
 .sd
