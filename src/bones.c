@@ -435,7 +435,8 @@ getbones()
 			for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 			    if (mtmp->mhpmax == DEFUNCT_MONSTER) {
 #if defined(DEBUG) && defined(WIZARD)
-				pline("Removing defunct monster %s from bones.",
+				if (wizard)
+				    pline("Removing defunct monster %s from bones.",
 					mtmp->data->mname);
 #endif
 				mongone(mtmp);
