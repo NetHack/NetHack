@@ -2347,7 +2347,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	int mhp, hpn, hpd;
 	int mndx, tryct;
 	struct permonst *olddata = mtmp->data;
-	char oldname[BUFSZ];
+	char oldname[BUFSZ], newname[BUFSZ];
 
 	if (msg) {
 	    /* like Monnam() but never mention saddle */
@@ -2487,9 +2487,13 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	if (msg) {
 	    uchar save_mnamelth = mtmp->mnamelth;
 	    mtmp->mnamelth = 0;
-	    pline("%s turns into %s!", oldname,
-		  mdat == &mons[PM_GREEN_SLIME] ? "slime" :
-		  x_monnam(mtmp, ARTICLE_A, (char*)0, SUPPRESS_SADDLE, FALSE));
+	    Strcpy(newname,
+		   (mdat == &mons[PM_GREEN_SLIME]) ? "slime" :
+		   x_monnam(mtmp, ARTICLE_A, (char *)0,SUPPRESS_SADDLE, FALSE));
+	    if (!strcmpi(oldname,"it") && !strcmpi(newname,"it"))
+		    (void) usmellmon(mdat);
+	    else
+		    pline("%s turns into %s!", oldname, newname);
 	    mtmp->mnamelth = save_mnamelth;
 	}
 
@@ -2766,6 +2770,122 @@ short otyp;
 		}
 		break;
 	}
+}
+
+boolean
+usmellmon(mdat)
+struct permonst *mdat;
+{
+	int mndx;
+	boolean nonspecific = FALSE;
+	boolean msg_given = FALSE;
+
+	if (mdat) {
+	    if (!olfaction(youmonst.data)) return FALSE;
+	    mndx = monsndx(mdat);
+	    switch (mndx) {
+		case PM_MINOTAUR:
+			You("notice a bovine smell.");
+			msg_given = TRUE;
+			break;
+		case PM_CAVEMAN:
+		case PM_CAVEWOMAN:
+		case PM_BARBARIAN:
+		case PM_NEANDERTHAL:
+			You("smell body odor.");
+			msg_given = TRUE;
+			break;
+/*
+		case PM_PESTILENCE:
+		case PM_FAMINE:
+		case PM_DEATH:
+			break;
+*/
+		case PM_HORNED_DEVIL:
+		case PM_BALROG:
+		case PM_ASMODEUS:
+		case PM_DISPATER:
+		case PM_YEENOGHU:
+		case PM_ORCUS:
+			break;
+		case PM_HUMAN_WEREJACKAL:
+		case PM_HUMAN_WERERAT:
+		case PM_HUMAN_WEREWOLF:
+		case PM_WEREJACKAL:
+		case PM_WERERAT:
+		case PM_WEREWOLF:
+		case PM_OWLBEAR:
+			You("detect an odor reminiscent of an animal's den.");
+			msg_given = TRUE;
+			break;
+/*
+		case PM_PURPLE_WORM:
+			break;
+*/
+		case PM_STEAM_VORTEX:
+			You("smell steam.");
+			msg_given = TRUE;
+			break;
+		case PM_GREEN_SLIME:
+			pline("%s stinks.", Something);
+			msg_given = TRUE;
+			break;
+		case PM_VIOLET_FUNGUS:
+		case PM_SHRIEKER:
+			You("smell mushrooms.");
+			msg_given = TRUE;
+			break;
+		/* These are here to avoid triggering the
+		   nonspecific treatment through the default case below*/
+		case PM_WHITE_UNICORN:
+		case PM_GRAY_UNICORN:
+		case PM_BLACK_UNICORN:
+		case PM_JELLYFISH:
+			break;
+		default:
+			nonspecific = TRUE;
+			break;
+	    }
+
+	    if (nonspecific) switch(mdat->mlet) {
+	    	case S_DOG:
+			You("notice a dog smell.");
+			msg_given = TRUE;
+			break;
+		case S_DRAGON:
+			You("smell a dragon!");
+			msg_given = TRUE;
+			break;
+	    	case S_FUNGUS:
+			pline("%s smells moldy.", Something);
+			msg_given = TRUE;
+			break;
+		case S_UNICORN:
+			You("detect a%s odor reminiscent of a stable.",
+				(mndx == PM_PONY) ? "n" : " strong");
+			msg_given = TRUE;
+			break;
+		case S_ZOMBIE:
+			You("smell rotting flesh.");
+			msg_given = TRUE;
+			break;
+		case S_EEL:
+			You("smell fish.");
+			msg_given = TRUE;
+			break;
+		case S_ORC:
+			if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC)))
+			    You("notice an attractive smell.");
+			else
+			    pline(
+			    "A foul stench makes you feel a little nauseated.");
+			msg_given = TRUE;
+			break;
+		default:
+			break;
+	    }
+	}
+	return (msg_given) ? TRUE : FALSE;
 }
 
 /*mon.c*/

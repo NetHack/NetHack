@@ -973,6 +973,7 @@ E void FDECL(mkmonmoney, (struct monst *, long));
 #endif
 E void FDECL(bagotricks, (struct obj *));
 E boolean FDECL(propagate, (int, BOOLEAN_P,BOOLEAN_P));
+E boolean FDECL(usmellmon, (struct permonst *));
 
 /* ### mapglyph.c ### */
 
@@ -1223,6 +1224,7 @@ E const char *FDECL(locomotion, (const struct permonst *,const char *));
 E const char *FDECL(stagger, (const struct permonst *,const char *));
 E const char *FDECL(on_fire, (struct permonst *,struct attack *));
 E const struct permonst *FDECL(raceptr, (struct monst *));
+E boolean FDECL(olfaction, (struct permonst *));
 
 /* ### monmove.c ### */
 

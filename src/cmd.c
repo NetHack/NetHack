@@ -121,6 +121,7 @@ STATIC_PTR int NDECL(wiz_level_tele);
 STATIC_PTR int NDECL(wiz_level_change);
 STATIC_PTR int NDECL(wiz_show_seenv);
 STATIC_PTR int NDECL(wiz_show_vision);
+STATIC_PTR int NDECL(wiz_smell);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
 STATIC_PTR int NDECL(wiz_show_wmodes);
 #if defined(__BORLANDC__) && !defined(_WIN32)
@@ -750,6 +751,53 @@ wiz_show_wmodes()
 	return 0;
 }
 
+/* #wizsmell command - test usmellmon(). */
+STATIC_PTR int
+wiz_smell()
+{
+	char	out_str[BUFSZ];
+	const char *firstmatch = 0;
+	struct permonst *pm = 0;
+	int     ans = 0;
+	int     mndx;		/* monster index */
+	int	found;		/* count of matching mndxs found */
+	coord   cc;		/* screen pos of unknown glyph */
+	int glyph;		/* glyph at selected position */
+
+	cc.x = u.ux;
+	cc.y = u.uy;
+	mndx = 0;		/* gcc -Wall lint */
+	if (!olfaction(youmonst.data)) {
+		You("are incapable of detecting odors in your present form.");
+		return 0;
+	}
+
+	pline("You can move the cursor to a monster that you want to smell.");
+	do {
+		/* Reset some variables. */
+		pm = (struct permonst *)0;
+		found = 0;
+		out_str[0] = '\0';
+	
+		pline("Pick a monster to smell.");
+		ans = getpos(&cc, TRUE, "a monster");
+		if (ans < 0 || cc.x < 0) {
+			return 0;	/* done */
+		}
+		/* Convert the glyph at the selected position to a mndxbol. */
+		glyph = glyph_at(cc.x,cc.y);
+		if (glyph_is_monster(glyph))
+			mndx = glyph_to_mon(glyph);
+		else
+			mndx = 0;
+		/* Is it a monster? */
+		if (mndx) {
+			if (!usmellmon(&mons[mndx]))
+				pline("That monster seems to give off no smell.");
+		} else pline("That is not a monster.");
+	} while (TRUE);
+	return 0;
+}
 #endif /* WIZARD */
 
 
@@ -1516,6 +1564,7 @@ struct ext_func_tab extcmdlist[] = {
         {(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},
 #ifdef DEBUG
 	{(char *)0, (char *)0, donull, TRUE},
 #endif
@@ -1541,6 +1590,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
 	{"timeout", "look at timeout queue", wiz_timeout_queue, TRUE},
 	{"vision", "show vision array", wiz_show_vision, TRUE},
+	{"wizsmell", "smell monster", wiz_smell, TRUE},
 #ifdef DEBUG
 	{"wizdebug", "wizard debug command", wiz_debug_cmd, TRUE},
 #endif
