@@ -1238,7 +1238,7 @@ int damtype, dam;
 	if (u.umonnum != PM_FLESH_GOLEM && u.umonnum != PM_IRON_GOLEM)
 		return;
 	switch (damtype) {
-		case AD_ELEC: if (u.umonnum == PM_IRON_GOLEM)
+		case AD_ELEC: if (u.umonnum == PM_FLESH_GOLEM)
 				heal = dam / 6; /* Approx 1 per die */
 			break;
 		case AD_FIRE: if (u.umonnum == PM_IRON_GOLEM)
