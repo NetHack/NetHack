@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2003/02/08	*/
+/*	SCCS Id: @(#)zap.c	3.4	2003/08/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -507,10 +507,16 @@ coord *cc;
 		mtmp2->mtrapped = 0;
 		mtmp2->msleeping = 0;
 		mtmp2->mfrozen = 0;
-		mtmp2->mcan = 0;
+		mtmp2->mcanmove = 1;
+		/* most cancelled monsters return to normal,
+		   but some need to stay cancelled */
+		if (!dmgtype(mtmp2->data, AD_SEDU)
+#ifdef SEDUCE
+				&& !dmgtype(mtmp2->data, AD_SSEX)
+#endif
+		    ) mtmp2->mcan = 0;
 		mtmp2->mcansee = 1;	/* set like in makemon */
 		mtmp2->mblinded = 0;
-		mtmp2->mcanmove = 1;	/* set like in makemon */
 		mtmp2->mstun = 0;
 		mtmp2->mconf = 0;
 		replmon(mtmp,mtmp2);

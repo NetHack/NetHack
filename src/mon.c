@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.4	2003/05/09	*/
+/*	SCCS Id: @(#)mon.c	3.4	2003/08/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1627,8 +1627,7 @@ register struct monst *mdef;
 		/* defer statue creation until after inventory removal
 		   so that saved monster traits won't retain any stale
 		   item-conferred attributes */
-		otmp = mkcorpstat(STATUE, KEEPTRAITS(mdef) ? mdef : 0,
-				  mdef->data, x, y, FALSE);
+		otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, FALSE);
 		if (mdef->mnamelth) otmp = oname(otmp, NAME(mdef));
 		while ((obj = oldminvent) != 0) {
 		    oldminvent = obj->nobj;
