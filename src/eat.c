@@ -1395,6 +1395,14 @@ struct obj *otmp;
 }
 
 STATIC_OVL void
+accessory_has_effect(otmp)
+struct obj *otmp;
+{
+	pline("Magic spreads through your body as you digest the %s.",
+	    otmp->oclass == RING_CLASS ? "ring" : "amulet");
+}
+
+STATIC_OVL void
 eataccessory(otmp)
 struct obj *otmp;
 {
@@ -1409,14 +1417,13 @@ struct obj *otmp;
 	    if (u.uhp <= 0) return; /* died from sink fall */
 	}
 	otmp->known = otmp->dknown = 1; /* by taste */
-	if (!rn2(otmp->oclass == RING_CLASS ? 3 : 5))
+	if (!rn2(otmp->oclass == RING_CLASS ? 3 : 5)) {
 	  switch (otmp->otyp) {
 	    default:
 	        if (!objects[typ].oc_oprop) break; /* should never happen */
 
 		if (!(u.uprops[objects[typ].oc_oprop].intrinsic & FROMOUTSIDE))
-		    pline("Magic spreads through your body as you digest the %s.",
-			  otmp->oclass == RING_CLASS ? "ring" : "amulet");
+		    accessory_has_effect(otmp);
 
 		u.uprops[objects[typ].oc_oprop].intrinsic |= FROMOUTSIDE;
 
@@ -1455,35 +1462,44 @@ struct obj *otmp;
 		}
 		break;
 	    case RIN_ADORNMENT:
+		accessory_has_effect(otmp);
 		if (adjattrib(A_CHA, otmp->spe, -1))
 		    makeknown(typ);
 		break;
 	    case RIN_GAIN_STRENGTH:
+		accessory_has_effect(otmp);
 		if (adjattrib(A_STR, otmp->spe, -1))
 		    makeknown(typ);
 		break;
 	    case RIN_GAIN_CONSTITUTION:
+		accessory_has_effect(otmp);
 		if (adjattrib(A_CON, otmp->spe, -1))
 		    makeknown(typ);
 		break;
 	    case RIN_INCREASE_ACCURACY:
+		accessory_has_effect(otmp);
 		u.uhitinc += otmp->spe;
 		break;
 	    case RIN_INCREASE_DAMAGE:
+		accessory_has_effect(otmp);
 		u.udaminc += otmp->spe;
 		break;
 	    case RIN_PROTECTION:
+		accessory_has_effect(otmp);
 		HProtection |= FROMOUTSIDE;
 		u.ublessed += otmp->spe;
 		flags.botl = 1;
 		break;
 	    case RIN_FREE_ACTION:
 		/* Give sleep resistance instead */
+		if (!(HSleep_resistance & FROMOUTSIDE))
+		    accessory_has_effect(otmp);
 		if (!Sleep_resistance)
 		    You_feel("wide awake.");
 		HSleep_resistance |= FROMOUTSIDE;
 		break;
 	    case AMULET_OF_CHANGE:
+		accessory_has_effect(otmp);
 		makeknown(typ);
 		change_sex();
 		You("are suddenly very %s!",
@@ -1491,9 +1507,12 @@ struct obj *otmp;
 		flags.botl = 1;
 		break;
 	    case AMULET_OF_STRANGULATION: /* bad idea! */
+		/* no message--this gives no permanent effect */
 		choke(otmp);
 		break;
 	    case AMULET_OF_RESTFUL_SLEEP: /* another bad idea! */
+		if (!(HSleeping & FROMOUTSIDE))
+		    accessory_has_effect(otmp);
 		HSleeping = FROMOUTSIDE | rnd(100);
 		break;
 	    case RIN_SUSTAIN_ABILITY:
@@ -1505,6 +1524,7 @@ struct obj *otmp;
 	     */
 		break;
 	  }
+	}
 }
 
 STATIC_OVL void
