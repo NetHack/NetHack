@@ -438,7 +438,7 @@ struct obj *obj;			/* only scatter this obj        */
 			&& rn2(10)) {
 		if (otmp->otyp == BOULDER) {
 		    pline("%s apart.", Tobjnam(otmp, "break"));
-		    fracture_rock(otmp); /* the will place fragments on floor */
+		    fracture_rock(otmp); /* this will place fragments on floor */
 		    obj_extract_self(otmp);
 		    place_object(otmp, sx, sy);
 		    if ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -452,7 +452,8 @@ struct obj *obj;			/* only scatter this obj        */
 		    if ((trap = t_at(sx,sy)) && trap->ttyp == STATUE_TRAP)
 			    deltrap(trap);
 		    pline("%s.", Tobjnam(otmp, "crumble"));
-		    (void) break_statue(otmp);
+		    (void) break_statue(otmp); /*this will place fragments on floor */
+		    obj_extract_self(otmp);
 		    place_object(otmp, sx, sy);	/* put fragments on floor */
 		}
 		used_up = TRUE;
