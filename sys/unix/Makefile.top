@@ -124,6 +124,9 @@ dungeon: $(GAME)
 	( cd util ; $(MAKE) dgn_comp )
 	( cd dat ; $(MAKE) dungeon )
 
+nhtiles.bmp: $(GAME)
+	( cd dat ; $(MAKE) nhtiles.bmp )
+
 x11tiles: $(GAME)
 	( cd util ; $(MAKE) tile2x11 )
 	( cd dat ; $(MAKE) x11tiles )
