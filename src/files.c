@@ -1554,6 +1554,9 @@ const char *filename;
 		Sprintf(tmp_config, "%s/%s", envp, "Library/Preferences/NetHack Defaults");
 		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 			return(fp);
+		Sprintf(tmp_config, "%s/%s", envp, "Library/Preferences/NetHack Defaults.txt");
+		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+			return(fp);
 	}
 # endif
 	if (errno != ENOENT) {
