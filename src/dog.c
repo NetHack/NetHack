@@ -596,6 +596,7 @@ register struct obj *obj;
 	boolean carni = carnivorous(mon->data);
 	boolean herbi = herbivorous(mon->data);
 	struct permonst *fptr = &mons[obj->corpsenm];
+	boolean starving;
 
 	if (is_quest_artifact(obj) || obj_resists(obj, 0, 95))
 	    return (obj->cursed ? TABU : APPORT);
@@ -609,11 +610,16 @@ register struct obj *obj;
 
 	    /* Ghouls only eat old corpses... yum! */
 	    if (mon->data == &mons[PM_GHOUL])
-	    	return (obj->otyp == CORPSE && obj->age+50 <= monstermoves) ?
-	       			DOGFOOD : TABU;
+		return (obj->otyp == CORPSE &&
+			peek_at_iced_corpse_age(obj) + 50L <= monstermoves) ?
+				DOGFOOD : TABU;
 
 	    if (!carni && !herbi)
 		    return (obj->cursed ? UNDEF : APPORT);
+
+	    /* a starving pet will eat almost anything */
+	    starving = (mon->mtame && !mon->isminion &&
+			EDOG(mon)->mhpmax_penalty);
 
 	    switch (obj->otyp) {
 		case TRIPE_RATION:
@@ -627,7 +633,7 @@ register struct obj *obj;
 			return POISON;
 		    return (carni ? CADAVER : MANFOOD);
 		case CORPSE:
-		   if ((peek_at_iced_corpse_age(obj)+50 <= monstermoves
+		   if ((peek_at_iced_corpse_age(obj) + 50L <= monstermoves
 					    && obj->corpsenm != PM_LIZARD
 					    && obj->corpsenm != PM_LICHEN
 					    && mon->data->mlet != S_FUNGUS) ||
@@ -640,24 +646,25 @@ register struct obj *obj;
 		    else return (carni ? CADAVER : MANFOOD);
 		case CLOVE_OF_GARLIC:
 		    return (is_undead(mon->data) ? TABU :
-			    (herbi ? ACCFOOD : MANFOOD));
+			    ((herbi || starving) ? ACCFOOD : MANFOOD));
 		case TIN:
 		    return (metallivorous(mon->data) ? ACCFOOD : MANFOOD);
 		case APPLE:
 		case CARROT:
-		    return (herbi ? DOGFOOD : MANFOOD);
+		    return (herbi ? DOGFOOD : starving ? ACCFOOD : MANFOOD);
 		case BANANA:
 		    return ((mon->data->mlet == S_YETI) ? DOGFOOD :
-			    (herbi ? ACCFOOD : MANFOOD));
+			    ((herbi || starving) ? ACCFOOD : MANFOOD));
 		default:
+		    if (starving) return ACCFOOD;
 		    return (obj->otyp > SLIME_MOLD ?
 			    (carni ? ACCFOOD : MANFOOD) :
 			    (herbi ? ACCFOOD : MANFOOD));
 	    }
 	default:
 	    if (obj->otyp == AMULET_OF_STRANGULATION ||
-	    		obj->otyp == RIN_SLOW_DIGESTION)
-	    	return (TABU);
+			obj->otyp == RIN_SLOW_DIGESTION)
+		return TABU;
 	    if (hates_silver(mon->data) &&
 		objects[obj->otyp].oc_material == SILVER)
 		return(TABU);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.4	2002/04/06	*/
+/*	SCCS Id: @(#)dogmove.c	3.4	2002/09/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -232,7 +232,7 @@ register struct edog *edog;
 		    You_feel("worried about %s.", y_monnam(mtmp));
 		stop_occupation();
 	    } else if (monstermoves > edog->hungrytime + 750 || mtmp->mhp < 1) {
-	    dog_died:
+ dog_died:
 		if (mtmp->mleashed
 #ifdef STEED
 		    && mtmp != u.usteed
@@ -240,8 +240,7 @@ register struct edog *edog;
 		    )
 		    Your("leash goes slack.");
 		else if (cansee(mtmp->mx, mtmp->my))
-		    pline("%s dies%s.", Monnam(mtmp),
-			    (mtmp->mhp >= 1) ? "" : " from hunger");
+		    pline("%s starves.", Monnam(mtmp));
 		else
 		    You_feel("%s for a moment.",
 			Hallucination ? "bummed" : "sad");
@@ -290,7 +289,11 @@ int udist;
 			&& obj->otyp != SCR_MAIL
 #endif
 									){
-		if (dogfood(mtmp, obj) <= CADAVER)
+		int edible = dogfood(mtmp, obj);
+
+		if (edible <= CADAVER ||
+			/* starving pet is more aggressive about eating */
+			(edog->mhpmax_penalty && edible == ACCFOOD))
 		    return dog_eat(mtmp, obj, omx, omy, FALSE);
 
 		if(can_carry(mtmp, obj) && !obj->cursed &&
@@ -327,11 +330,10 @@ struct edog *edog;
 int after, udist, whappr;
 {
 	register int omx, omy;
-	boolean in_masters_sight;
+	boolean in_masters_sight, dog_has_minvent;
 	register struct obj *obj;
 	xchar otyp;
 	int appr;
-
 
 #ifdef STEED
 	/* Steeds don't move on their own will */
@@ -343,6 +345,7 @@ int after, udist, whappr;
 	omy = mtmp->my;
 
 	in_masters_sight = couldsee(omx, omy);
+	dog_has_minvent = (DROPPABLES(mtmp) != 0);
 
 	if (!edog || mtmp->mleashed) {	/* he's not going anywhere... */
 	    gtyp = APPORT;
@@ -357,7 +360,7 @@ int after, udist, whappr;
 	    gtyp = UNDEF;	/* no goal as yet */
 	    gx = gy = 0;	/* suppress 'used before set' message */
 
-	    if ((min_x = omx - SQSRCHRADIUS) < 0) min_x = 0;
+	    if ((min_x = omx - SQSRCHRADIUS) < 1) min_x = 1;
 	    if ((max_x = omx + SQSRCHRADIUS) >= COLNO) max_x = COLNO - 1;
 	    if ((min_y = omy - SQSRCHRADIUS) < 0) min_y = 0;
 	    if ((max_y = omy + SQSRCHRADIUS) >= ROWNO) max_y = ROWNO - 1;
@@ -368,9 +371,12 @@ int after, udist, whappr;
 		ny = obj->oy;
 		if (nx >= min_x && nx <= max_x && ny >= min_y && ny <= max_y) {
 		    otyp = dogfood(mtmp, obj);
+		    /* skip inferior goals */
 		    if (otyp > gtyp || otyp == UNDEF)
 			continue;
-		    if (cursed_object_at(nx, ny))
+		    /* avoid cursed items unless starving */
+		    if (cursed_object_at(nx, ny) &&
+			    !(edog->mhpmax_penalty && otyp < MANFOOD))
 			continue;
 		    if (otyp < MANFOOD &&
 			    can_reach_food(mtmp, mtmp->mx, mtmp->my, nx, ny)) {
@@ -380,7 +386,7 @@ int after, udist, whappr;
 			    gtyp = otyp;
 			}
 		    } else if(gtyp == UNDEF && in_masters_sight &&
-			      !mtmp->minvent &&
+			      !dog_has_minvent &&
 			      (!levl[omx][omy].lit || levl[u.ux][u.uy].lit) &&
 			      (otyp == MANFOOD || m_cansee(mtmp, nx, ny)) &&
 			      edog->apport > rn2(8) &&
@@ -404,7 +410,7 @@ int after, udist, whappr;
 		if (udist > 1) {
 			if (!IS_ROOM(levl[u.ux][u.uy].typ) || !rn2(4) ||
 			   whappr ||
-			   (mtmp->minvent && rn2(edog->apport)))
+			   (dog_has_minvent && rn2(edog->apport)))
 				appr = 1;
 		}
 		/* if you have dog food it'll follow you more closely */
