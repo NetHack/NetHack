@@ -391,7 +391,7 @@ char ch;
 	switch(ch) {
 	    case '\n':
 	    case '\r':
-! 		    cmov(cursor.X, cursor.Y);
+		    cmov(cursor.X, cursor.Y);
 		    return;
 	}
 	WriteConsoleOutputAttribute(hConOut,&attr,1,cursor,&acount);
