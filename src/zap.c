@@ -2363,9 +2363,6 @@ struct obj *obj;	/* wand or spell */
 		case SPE_FORCE_BOLT:
 		    wipe_engr_at(x, y, d(2,4));
 		    break;
-		case SPE_DRAIN_LIFE:
-		    u_wipe_engr(3);
-		    break;
 		default:
 		    break;
 		}
