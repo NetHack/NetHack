@@ -2399,12 +2399,6 @@ tty_print_glyph(window, x, y, glyph)
     }
 #endif
 
-    if (((special & MG_PET) && iflags.hilite_pet) ||
-	((special & MG_DETECT) && iflags.use_inverse)) {
-	term_start_attr(ATR_INVERSE);
-	reverse_on = TRUE;
-    }
-
 #ifdef TEXTCOLOR
     if (color != ttyDisplay->color) {
 	if(ttyDisplay->color != NO_COLOR)
@@ -2414,6 +2408,13 @@ tty_print_glyph(window, x, y, glyph)
 	    term_start_color(color);
     }
 #endif /* TEXTCOLOR */
+
+    /* must be after color check; term_end_color may turn off inverse too */
+    if (((special & MG_PET) && iflags.hilite_pet) ||
+	((special & MG_DETECT) && iflags.use_inverse)) {
+	term_start_attr(ATR_INVERSE);
+	reverse_on = TRUE;
+    }
 
 #if defined(USE_TILES) && defined(MSDOS)
     if (iflags.grmode && iflags.tile_view)
