@@ -2154,6 +2154,7 @@ E boolean NDECL(gd_sound);
 
 /* ### version.c ### */
 
+E char *FDECL(version_string, (char *));
 E char *FDECL(getversionstring, (char *));
 E int NDECL(doversion);
 E int NDECL(doextversion);

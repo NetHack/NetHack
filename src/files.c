@@ -2267,20 +2267,23 @@ const char *dir;
 
 /*ARGSUSED*/
 void
-paniclog(why, s)
-const char* why;
-const char* s;
+paniclog(type, reason)
+const char *type;	/* panic, impossible, trickery */
+const char *reason;	/* explanation */
 {
 #ifdef PANICLOG
 	FILE *lfile;
+	char buf[BUFSZ];
 
 	lfile = fopen_datafile(PANICLOG, "a", TROUBLEPREFIX);
 	if (lfile) {
-	    (void) fprintf(lfile, "%08ld: %s %s\n",
-			   yyyymmdd((time_t)0L), why, s);
+	    (void) fprintf(lfile, "%s %08ld: %s %s\n",
+			   version_string(buf), yyyymmdd((time_t)0L),
+			   type, reason);
 	    (void) fclose(lfile);
 	}
 #endif /* PANICLOG */
+	return;
 }
 
 /* ----------  END PANIC/IMPOSSIBLE LOG ----------- */
