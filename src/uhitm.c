@@ -2184,6 +2184,8 @@ struct attack *mattk;		/* null means we find one internally */
 	  default:
 	    break;
 	}
+
+	if (carried(obj)) update_inventory();
 }
 
 /* Note: caller must ascertain mtmp is mimicking... */

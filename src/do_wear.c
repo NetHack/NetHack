@@ -1636,6 +1636,7 @@ boolean acid_dmg;
 
 	if (otmph && (otmph != uarmf)) {
 	    erode_obj(otmph, acid_dmg, FALSE);
+	    if (carried(otmph)) update_inventory();
 	}
 }
 
