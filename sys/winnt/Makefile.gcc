@@ -92,7 +92,7 @@ WSHR  = ../win/share
 #  Object directory.
 #
 
-OBJ     = o
+OBJ = o
 
 
 #
@@ -151,18 +151,18 @@ RANDOM  = $(OBJ)/random.o
 
 ifeq  "$(GRAPHICAL)" "Y"
 WINPORT  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
-   $(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
-   $(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
-   $(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
+	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
+	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
+	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
 # WIN32_IE=0x400 is currently unsupported by MinGW
 WINPFLAG   = -DTILES -DMSWIN_GRAPHICS -D_WIN32_IE=0x0400
 NHRES   = $(O)winhack.o
 WINPINC = -I$(WIN32)
 WINPHDR = $(WIN32)/mhaskyn.h $(WIN32)/mhdlg.h $(WIN32)/mhfont.h \
-   $(WIN32)/mhinput.h $(WIN32)/mhmain.h $(WIN32)/mhmap.h \
-   $(WIN32)/mhmenu.h $(WIN32)/mhmsg.h $(WIN32)/mhmsgwnd.h \
-   $(WIN32)/mhrip.h $(WIN32)/mhstatus.h \
-   $(WIN32)/mhtext.h $(WIN32)/resource.h $(WIN32)/winMS.h
+	$(WIN32)/mhinput.h $(WIN32)/mhmain.h $(WIN32)/mhmap.h \
+	$(WIN32)/mhmenu.h $(WIN32)/mhmsg.h $(WIN32)/mhmsgwnd.h \
+	$(WIN32)/mhrip.h $(WIN32)/mhstatus.h \
+	$(WIN32)/mhtext.h $(WIN32)/resource.h $(WIN32)/winMS.h
 else
 WINPORT = $(O)nttty.o
 WINPFLAG= -DWIN32CON
@@ -242,61 +242,61 @@ endif
 #==========================================
 
 $(OBJ)/%.o : /%.c
-   @$(cc) $(CFLAGS)  -o$@ $<
+	@$(cc) $(CFLAGS)  -o$@ $<
 
 $(OBJ)/%.o : $(SRC)/%.c
-   @$(cc) $(CFLAGS)   -o$@  $<
+	@$(cc) $(CFLAGS)   -o$@  $<
 
 #==========================================
 # Rules for files in sys/share
 #==========================================
 
 $(OBJ)/%.o : $(SSYS)/%.c
-   @$(cc) $(CFLAGS)  -o$@  $<
+	@$(cc) $(CFLAGS)  -o$@  $<
 
 #==========================================
 # Rules for files in sys/winnt
 #==========================================
 
 $(OBJ)/%.o : $(NTSYS)/%.c
-   @$(cc) $(CFLAGS)  -o$@  $<
+	@$(cc) $(CFLAGS)  -o$@  $<
 
 $(INCL)/%.h : $(NTSYS)/%.h
-   @copy $< $@
+	@copy $< $@
 
 #==========================================
 # Rules for files in util
 #==========================================
 
 $(OBJ)/%.o : $(UTIL)/%.c
-   @$(cc) $(CFLAGSU) -o$@ $<
+	@$(cc) $(CFLAGSU) -o$@ $<
 
 #==========================================
 # Rules for files in win/share
 #==========================================
 
 $(OBJ)/%.o : $(WSHR)/%.c
-   @$(cc) $(CFLAGS)  -o$@ $<
+	@$(cc) $(CFLAGS)  -o$@ $<
 
 $(INCL)/%.h : $(WSHR)/%.h
-   @copy $< $@
+	@copy $< $@
 
 #{$(WSHR)}.txt{$(DAT)}.txt:
-#  @copy $< $@
+#	@copy $< $@
 
 #==========================================
 # Rules for files in win/tty
 #==========================================
 
 $(OBJ)/%.o : $(TTY)/%.c
-   @$(cc) $(CFLAGS)  -o$@  $<
+	@$(cc) $(CFLAGS)  -o$@  $<
 
 #==========================================
 # Rules for files in win/win32
 #==========================================
 
 $(OBJ)/%.o : $(WIN32)/%.c
-   @$(cc) $(CFLAGS)  -o$@  $<
+	@$(cc) $(CFLAGS)  -o$@  $<
 
 #==========================================
 #================ MACROS ==================
@@ -328,11 +328,11 @@ DGNCOMPSRC     = $(U)dgn_yacc.c  $(U)dgn_$(LEX).c $(U)dgn_main.c
 MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
 
 SPLEVOBJS      = $(O)lev_yacc.o  $(O)lev_$(LEX).o $(O)lev_main.o \
-         $(O)alloc.o   $(O)decl.o      $(O)drawing.o \
-         $(O)monst.o   $(O)objects.o   $(O)panic.o
+	$(O)alloc.o   $(O)decl.o      $(O)drawing.o \
+	$(O)monst.o   $(O)objects.o   $(O)panic.o
 
 DGNCOMPOBJS    = $(O)dgn_yacc.o  $(O)dgn_$(LEX).o $(O)dgn_main.o \
-         $(O)alloc.o   $(O)panic.o
+	$(O)alloc.o   $(O)panic.o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -342,10 +342,10 @@ TILEFILES      = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
 # These are not invoked during a normal game build in 3.4.0
 #
 TEXT_IO        = $(O)tiletext.o  $(O)tiletxt.o   $(O)drawing.o \
-         $(O)decl.o    $(O)monst.o     $(O)objects.o
+	$(O)decl.o    $(O)monst.o     $(O)objects.o
 
 TEXT_IO32      = $(O)tilete32.o $(O)tiletx32.o $(O)drawing.o \
-         $(O)decl.o    $(O)monst.o     $(O)objects.o
+	$(O)decl.o    $(O)monst.o     $(O)objects.o
 
 GIFREADERS     = $(O)gifread.o   $(O)alloc.o $(O)panic.o
 GIFREADERS32   = $(O)gifrd32.o $(O)alloc.o $(O)panic.o
@@ -389,14 +389,14 @@ DLBOBJ = $(O)dlb.o
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
 SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
-      $(SOUND) $(O)pcmain.o $(O)mapimail.o $(O)nhlan.o
+	$(SOUND) $(O)pcmain.o $(O)mapimail.o $(O)nhlan.o
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
-         $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
-         $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
-         $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
-         $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-         $(VOBJ26) $(VOBJ27)
+	$(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
+	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
+	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
+	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
+	$(VOBJ26) $(VOBJ27)
 
 WINPOBJ = $(WINPORT)
 
@@ -471,8 +471,8 @@ default : $(GAMEFILE)
 #  The main target.
 #
 
-$(GAME): $(O)obj.tag $(O)utility.tag graphicschk $(GAMEFILE)
-   @echo $(GAME) is up to date.
+$(GAME) : $(O)obj.tag $(O)utility.tag graphicschk $(GAMEFILE)
+	@echo $(GAME) is up to date.
 
 #
 #  Everything
@@ -481,28 +481,28 @@ $(GAME): $(O)obj.tag $(O)utility.tag graphicschk $(GAMEFILE)
 all :   install
 
 install: graphicschk $(GAME) $(O)install.tag
-    @echo Done.
+	@echo Done.
 
 
 $(O)install.tag:  $(DAT)/data    $(DAT)/rumors    $(DAT)/dungeon \
         $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag $(DLB)
 ifeq  "$(USE_DLB)" "Y"
-   $(subst /,\,copy nhdat                $(GAMEDIR))
-   $(subst /,\,copy $(DAT)/license       $(GAMEDIR))
+	$(subst /,\,copy nhdat                $(GAMEDIR))
+	$(subst /,\,copy $(DAT)/license       $(GAMEDIR))
 else
-   $(subst /,\,copy $(DAT)/*.            $(GAMEDIR))
-   $(subst /,\,copy $(DAT)/*.dat         $(GAMEDIR))
-   $(subst /,\,copy $(DAT)/*.lev         $(GAMEDIR))
-   $(subst /,\,if exist $(GAMEDIR)/makefile del $(GAMEDIR)/makefile)
+	$(subst /,\,copy $(DAT)/*.            $(GAMEDIR))
+	$(subst /,\,copy $(DAT)/*.dat         $(GAMEDIR))
+	$(subst /,\,copy $(DAT)/*.lev         $(GAMEDIR))
+	$(subst /,\,if exist $(GAMEDIR)/makefile del $(GAMEDIR)/makefile)
 endif
-   $(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
-   $(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
-   $(subst /,\,if exist $(DOC)/recover.txt copy $(DOC)/recover.txt $(GAMEDIR)/recover.txt)
-   $(subst /,\,@if exist $(SRC)/$(GAME).PDB copy $(SRC)/$(GAME).pdb $(GAMEDIR)/$(GAME).pdb)
-   $(subst /,\,@if exist $(GAMEDIR)/$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)/$(GAME).pdb to conserve space)
-   $(subst /,\,-copy $(NTSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
-   $(subst /,\,copy $(U)recover.exe  $(GAMEDIR))
-   $(subst /,\,echo install done > $@)
+	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
+	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
+	$(subst /,\,if exist $(DOC)/recover.txt copy $(DOC)/recover.txt $(GAMEDIR)/recover.txt)
+	$(subst /,\,@if exist $(SRC)/$(GAME).PDB copy $(SRC)/$(GAME).pdb $(GAMEDIR)/$(GAME).pdb)
+	$(subst /,\,@if exist $(GAMEDIR)/$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)/$(GAME).pdb to conserve space)
+	$(subst /,\,-copy $(NTSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
+	$(subst /,\,copy $(U)recover.exe  $(GAMEDIR))
+	$(subst /,\,echo install done > $@)
 
 #  copy $(NTSYS)/winnt.hlp    $(GAMEDIR)
 
@@ -514,53 +514,53 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
    $(DAT)/monk.des    $(DAT)/priest.des   $(DAT)/ranger.des \
    $(DAT)/rogue.des   $(DAT)/samurai.des  $(DAT)/sokoban.des \
    $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des
-   $(subst /,\,cd $(DAT)) & \
-   $(subst /,\,$(U)lev_comp bigroom.des) & \
-   $(subst /,\,$(U)lev_comp castle.des) & \
-   $(subst /,\,$(U)lev_comp endgame.des) & \
-   $(subst /,\,$(U)lev_comp gehennom.des) & \
-   $(subst /,\,$(U)lev_comp knox.des) & \
-   $(subst /,\,$(U)lev_comp mines.des) & \
-   $(subst /,\,$(U)lev_comp medusa.des) & \
-   $(subst /,\,$(U)lev_comp oracle.des) & \
-   $(subst /,\,$(U)lev_comp sokoban.des) & \
-   $(subst /,\,$(U)lev_comp tower.des) & \
-   $(subst /,\,$(U)lev_comp yendor.des) & \
-   $(subst /,\,$(U)lev_comp arch.des) & \
-   $(subst /,\,$(U)lev_comp barb.des) & \
-   $(subst /,\,$(U)lev_comp caveman.des) & \
-   $(subst /,\,$(U)lev_comp healer.des) & \
-   $(subst /,\,$(U)lev_comp knight.des) & \
-   $(subst /,\,$(U)lev_comp monk.des) & \
-   $(subst /,\,$(U)lev_comp priest.des) & \
-   $(subst /,\,$(U)lev_comp ranger.des) & \
-   $(subst /,\,$(U)lev_comp rogue.des) & \
-   $(subst /,\,$(U)lev_comp samurai.des) & \
-   $(subst /,\,$(U)lev_comp tourist.des) & \
-   $(subst /,\,$(U)lev_comp valkyrie.des) & \
-   $(subst /,\,$(U)lev_comp wizard.des) & \
-   $(subst /,\,cd $(SRC))
-   $(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
+	$(subst /,\,cd $(DAT)) & \
+	$(subst /,\,$(U)lev_comp bigroom.des) & \
+	$(subst /,\,$(U)lev_comp castle.des) & \
+	$(subst /,\,$(U)lev_comp endgame.des) & \
+	$(subst /,\,$(U)lev_comp gehennom.des) & \
+	$(subst /,\,$(U)lev_comp knox.des) & \
+	$(subst /,\,$(U)lev_comp mines.des) & \
+	$(subst /,\,$(U)lev_comp medusa.des) & \
+	$(subst /,\,$(U)lev_comp oracle.des) & \
+	$(subst /,\,$(U)lev_comp sokoban.des) & \
+	$(subst /,\,$(U)lev_comp tower.des) & \
+	$(subst /,\,$(U)lev_comp yendor.des) & \
+	$(subst /,\,$(U)lev_comp arch.des) & \
+	$(subst /,\,$(U)lev_comp barb.des) & \
+	$(subst /,\,$(U)lev_comp caveman.des) & \
+	$(subst /,\,$(U)lev_comp healer.des) & \
+	$(subst /,\,$(U)lev_comp knight.des) & \
+	$(subst /,\,$(U)lev_comp monk.des) & \
+	$(subst /,\,$(U)lev_comp priest.des) & \
+	$(subst /,\,$(U)lev_comp ranger.des) & \
+	$(subst /,\,$(U)lev_comp rogue.des) & \
+	$(subst /,\,$(U)lev_comp samurai.des) & \
+	$(subst /,\,$(U)lev_comp tourist.des) & \
+	$(subst /,\,$(U)lev_comp valkyrie.des) & \
+	$(subst /,\,$(U)lev_comp wizard.des) & \
+	$(subst /,\,cd $(SRC))
+	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
 
 $(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
-        $(SRC)/monstr.c          $(SRC)/vis_tab.c  \
-        $(U)lev_comp.exe    $(INCL)/vis_tab.h \
-        $(U)dgn_comp.exe $(U)recover.exe  $(TILEUTIL16)
-        $(subst /,\,@echo utilities made >$@)
-        @echo utilities made.
+	$(SRC)/monstr.c          $(SRC)/vis_tab.c  \
+	$(U)lev_comp.exe    $(INCL)/vis_tab.h \
+	$(U)dgn_comp.exe $(U)recover.exe  $(TILEUTIL16)
+	$(subst /,\,@echo utilities made >$@)
+	@echo utilities made.
 
 tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
-   @echo Optional tile development utilities are up to date.
+	@echo Optional tile development utilities are up to date.
 
 ifeq  "$(GRAPHICAL)" "Y"
 $(NHRES): $(TILEBMP) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
-   $(WIN32)\mnselcnt.bmp $(WIN32)\mnunsel.bmp \
-   $(WIN32)\petmark.bmp $(WIN32)\NetHack.ico $(WIN32)\rip.bmp \
-   $(WIN32)\splash.bmp
-   @$(rc) -o$@ --include-dir $(WIN32) -i $(WIN32)/winhack.rc
+	$(WIN32)\mnselcnt.bmp $(WIN32)\mnunsel.bmp \
+	$(WIN32)\petmark.bmp $(WIN32)\NetHack.ico $(WIN32)\rip.bmp \
+	$(WIN32)\splash.bmp
+	@$(rc) -o$@ --include-dir $(WIN32) -i $(WIN32)/winhack.rc
 else
 $(NHRES): $(NTSYS)/console.rc
-   @$(rc) -o$@ --include-dir $(NTSYS) $(NTSYS)/console.rc
+	@$(rc) -o$@ --include-dir $(NTSYS) $(NTSYS)/console.rc
 endif
 
 #==========================================
@@ -568,12 +568,12 @@ endif
 #==========================================
 
 $(GAMEFILE) : $(ALLOBJ) $(NHRES)
-   @echo Linking....
-   @$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES)
-   $(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
+	@echo Linking....
+	@$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES)
+	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 $(GAME)_.ico : $(NTSYS)/$(GAME).ico
-   $(subst /,\,@copy $(NTSYS)/$(GAME).ico $@)
+	$(subst /,\,@copy $(NTSYS)/$(GAME).ico $@)
 
 #==========================================
 # Create directory for holding object files
@@ -585,7 +585,7 @@ ifeq  "$(GRAPHICAL)" "Y"
       @echo NOTE: This build will include tile support.
       @echo ----
 endif
-   $(subst /,\,@echo graphicschk > graphicschk)
+	$(subst /,\,@echo graphicschk > graphicschk)
 
 #
 #  Secondary Targets.
@@ -596,88 +596,91 @@ endif
 #==========================================
 
 $(U)makedefs.exe: $(MAKEOBJS)
-   @$(link) $(LFLAGSU) -o$@ $(MAKEOBJS)
+	@$(link) $(LFLAGSU) -o$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H) $(INCL)/monattk.h $(INCL)/monflag.h $(INCL)/objclass.h \
-         $(INCL)/monsym.h    $(INCL)/qtext.h     $(INCL)/patchlevel.h \
-         $(U)makedefs.c
-   $(subst /,\,@if not exist $(O)*.* mkdir $(OBJ))
-   @$(cc) $(CFLAGSU) -o$@ $(U)makedefs.c
+	 $(INCL)/monsym.h    $(INCL)/qtext.h     $(INCL)/patchlevel.h \
+	 $(U)makedefs.c
+	$(subst /,\,@if not exist $(O)*.* mkdir $(OBJ))
+	@$(cc) $(CFLAGSU) -o$@ $(U)makedefs.c
 
 #
 #  date.h should be remade every time any of the source or include
 #  files is modified.
 #
 
-$(INCL)/date.h : $(U)makedefs.exe
-   $(subst /,\,$(U)makedefs -v)
+$(INCL)/date.h $(OPTIONS_FILE): $(U)makedefs.exe
+	$(subst /,\,$(U)makedefs -v)
+
+#$(OPTIONS_FILE): $(U)makedefs.exe
+#	$(subst /,\,$(U)makedefs -v)
 
 $(INCL)/onames.h : $(U)makedefs.exe
-   $(subst /,\,$(U)makedefs -o)
+	$(subst /,\,$(U)makedefs -o)
 
 $(INCL)/pm.h : $(U)makedefs.exe
-   $(subst /,\,$(U)makedefs -p)
+	$(subst /,\,$(U)makedefs -p)
 
 #$(INCL)/trap.h : $(U)makedefs.exe
 #  $(U)makedefs -t
 
 $(SRC)/monstr.c: $(U)makedefs.exe
-   $(subst /,\,$(U)makedefs -m)
+	$(subst /,\,$(U)makedefs -m)
 
 $(INCL)/vis_tab.h: $(U)makedefs.exe
-   $(subst /,\,$(U)makedefs -z)
+	$(subst /,\,$(U)makedefs -z)
 
 $(SRC)/vis_tab.c: $(U)makedefs.exe
-   $(subst /,\,$(U)makedefs -z)
+	$(subst /,\,$(U)makedefs -z)
 
 #==========================================
 # uudecode utility and uuencoded targets
 #==========================================
 
 $(U)uudecode.exe: $(O)uudecode.o
-   @$(link) $(LFLAGSU) -o$@ $(O)uudecode.o
+	@$(link) $(LFLAGSU) -o$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)\uudecode.c
 
 $(NTSYS)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu
-   $(subst /,\,chdir $(NTSYS)) & \
-   $(subst /,\,uudecode.exe nhico.uu) & \
-   $(subst /,\,chdir ..\..\src)
+	$(subst /,\,chdir $(NTSYS)) & \
+	$(subst /,\,uudecode.exe nhico.uu) & \
+	$(subst /,\,chdir ..\..\src)
 
 $(WIN32)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu
-   $(subst /,\,chdir $(WIN32)) & \
-   $(subst /,\,..\..\util\uudecode.exe ../../sys/winnt/nhico.uu) & \
-   $(subst /,\,chdir ..\..\src)
+	$(subst /,\,chdir $(WIN32)) & \
+	$(subst /,\,..\..\util\uudecode.exe ../../sys/winnt/nhico.uu) & \
+	$(subst /,\,chdir ..\..\src)
 
 $(WIN32)\mnsel.bmp: $(U)uudecode.exe $(WIN32)\mnsel.uu
-   $(subst /,\,chdir $(WIN32)) & \
-   $(subst /,\,..\..\util\uudecode.exe mnsel.uu) & \
-   $(subst /,\,chdir ..\..\src)
+	$(subst /,\,chdir $(WIN32)) & \
+	$(subst /,\,..\..\util\uudecode.exe mnsel.uu) & \
+	$(subst /,\,chdir ..\..\src)
 
 $(WIN32)\mnselcnt.bmp: $(U)uudecode.exe $(WIN32)\mnselcnt.uu
-   $(subst /,\,chdir $(WIN32)) & \
-   $(subst /,\,..\..\util\uudecode.exe mnselcnt.uu) & \
-   $(subst /,\,chdir ..\..\src)
+	$(subst /,\,chdir $(WIN32)) & \
+	$(subst /,\,..\..\util\uudecode.exe mnselcnt.uu) & \
+	$(subst /,\,chdir ..\..\src)
 
 $(WIN32)\mnunsel.bmp: $(U)uudecode.exe $(WIN32)\mnunsel.uu
-   $(subst /,\,chdir $(WIN32)) & \
-   $(subst /,\,..\..\util\uudecode.exe mnunsel.uu) & \
-   $(subst /,\,chdir ..\..\src)
+	$(subst /,\,chdir $(WIN32)) & \
+	$(subst /,\,..\..\util\uudecode.exe mnunsel.uu) & \
+	$(subst /,\,chdir ..\..\src)
 
 $(WIN32)\petmark.bmp: $(U)uudecode.exe $(WIN32)\petmark.uu
-   $(subst /,\,chdir $(WIN32)) & \
-   $(subst /,\,..\..\util\uudecode.exe petmark.uu) & \
-   $(subst /,\,chdir ..\..\src)
+	$(subst /,\,chdir $(WIN32)) & \
+	$(subst /,\,..\..\util\uudecode.exe petmark.uu) & \
+	$(subst /,\,chdir ..\..\src)
 
 $(WIN32)\rip.bmp: $(U)uudecode.exe $(WIN32)\rip.uu
-   $(subst /,\,chdir $(WIN32)) & \
-   $(subst /,\,..\..\util\uudecode.exe rip.uu) & \
-   $(subst /,\,chdir ..\..\src)
+	$(subst /,\,chdir $(WIN32)) & \
+	$(subst /,\,..\..\util\uudecode.exe rip.uu) & \
+	$(subst /,\,chdir ..\..\src)
 
 $(WIN32)\splash.bmp: $(U)uudecode.exe $(WIN32)\splash.uu
-   $(subst /,\,chdir $(WIN32)) & \
-   $(subst /,\,..\..\util\uudecode.exe splash.uu) & \
-   $(subst /,\,chdir ..\..\src)
+	$(subst /,\,chdir $(WIN32)) & \
+	$(subst /,\,..\..\util\uudecode.exe splash.uu) & \
+	$(subst /,\,chdir ..\..\src)
 
 
 #==========================================
@@ -687,55 +690,55 @@ $(WIN32)\splash.bmp: $(U)uudecode.exe $(WIN32)\splash.uu
 LEVCFLAGS=$(cflags) -c -DWIN32 -D_WIN32 -I../include $(cdebug) -DDLB
 
 $(U)lev_comp.exe: $(SPLEVOBJS)
-   @echo Linking $@...
-   @$(link) $(LFLAGSU) -o$@ $(SPLEVOBJS)
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(SPLEVOBJS)
 
 $(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)/lev_comp.h $(U)lev_yacc.c
-   @$(cc) $(LEVCFLAGS) -o$@ $(U)lev_yacc.c
+	@$(cc) $(LEVCFLAGS) -o$@ $(U)lev_yacc.c
 
 $(O)lev_$(LEX).o: $(HACK_H)   $(INCL)/lev_comp.h $(SP_LEV_H) \
-               $(U)lev_$(LEX).c
-   @$(cc) $(LEVCFLAGS) -o$@ $(U)lev_$(LEX).c
+	$(U)lev_$(LEX).c
+	@$(cc) $(LEVCFLAGS) -o$@ $(U)lev_$(LEX).c
 
 $(O)lev_main.o:   $(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
-   @$(cc) $(LEVCFLAGS) -o$@ $(U)lev_main.c
+	@$(cc) $(LEVCFLAGS) -o$@ $(U)lev_main.c
 
 
 $(U)lev_yacc.c $(INCL)/lev_comp.h : $(U)lev_comp.y
 ifeq  "$(DO_YACC)" "YACC_ACT"
-      $(subst /,\,chdir $(UTIL)) & \
-      $(subst /,\,$(YACC) -d lev_comp.y) & \
-      $(subst /,\,copy $(YTABC) lev_yacc.c) & \
-      $(subst /,\,copy $(YTABH) $(INCL)/lev_comp.h) & \
-      $(subst /,\,@del $(YTABC)) & \
-      $(subst /,\,@del $(YTABH)) & \
-      $(subst /,\,chdir $(SRC))
+	$(subst /,\,chdir $(UTIL)) & \
+	$(subst /,\,$(YACC) -d lev_comp.y) & \
+	$(subst /,\,copy $(YTABC) lev_yacc.c) & \
+	$(subst /,\,copy $(YTABH) $(INCL)/lev_comp.h) & \
+	$(subst /,\,@del $(YTABC)) & \
+	$(subst /,\,@del $(YTABH)) & \
+	$(subst /,\,chdir $(SRC))
 else
-      @echo $(U)lev_comp.y has changed.
-      @echo To update $(U)lev_yacc.c and $(INCL)/lev_comp.h run $(YACC).
-      @echo ---
-      @echo For now, we will copy the prebuilt lev_yacc.c and
-      @echo lev_comp.h from $(SSYS) into $(UTIL) and use them.
-      $(subst /,\,@copy $(SSYS)/lev_yacc.c $(U)lev_yacc.c >nul)
-      $(subst /,\,@copy $(SSYS)/lev_comp.h $(INCL)/lev_comp.h >nul)
-      @echo /**/ $(subst /,\,>>$(U)lev_yacc.c)
-      @echo /**/ $(subst /,\,>>$(INCL)/lev_comp.h)
+	@echo $(U)lev_comp.y has changed.
+	@echo To update $(U)lev_yacc.c and $(INCL)/lev_comp.h run $(YACC).
+	@echo ---
+	@echo For now, we will copy the prebuilt lev_yacc.c and
+	@echo lev_comp.h from $(SSYS) into $(UTIL) and use them.
+	$(subst /,\,@copy $(SSYS)/lev_yacc.c $(U)lev_yacc.c >nul)
+	$(subst /,\,@copy $(SSYS)/lev_comp.h $(INCL)/lev_comp.h >nul)
+	@echo /**/ $(subst /,\,>>$(U)lev_yacc.c)
+	@echo /**/ $(subst /,\,>>$(INCL)/lev_comp.h)
 endif
 
 $(U)lev_$(LEX).c: $(U)lev_comp.l
 ifeq  "$(DO_LEX)" "LEX_ACT"
-      $(subst /,\,chdir $(UTIL)) & \
-      $(subst /,\,$(LEX) $(FLEXSKEL) lev_comp.l) & \
-      $(subst /,\,copy $(LEXYYC) $@) & \
-      $(subst /,\,@del $(LEXYYC)) & \
-      $(subst /,\,chdir $(SRC))
+	$(subst /,\,chdir $(UTIL)) & \
+	$(subst /,\,$(LEX) $(FLEXSKEL) lev_comp.l) & \
+	$(subst /,\,copy $(LEXYYC) $@) & \
+	$(subst /,\,@del $(LEXYYC)) & \
+	$(subst /,\,chdir $(SRC))
 else
-      @echo $(U)lev_comp.l has changed. To update $@ run $(LEX).
-      @echo ---
-      @echo For now, we will copy the prebuilt lev_lex.c
-      @echo from $(SSYS) into $(UTIL) and use it.
-      $(subst /,\,@copy $(SSYS)/lev_lex.c $@ >nul)
-      @echo /**/ $(subst /,\,>>$@)
+	@echo $(U)lev_comp.l has changed. To update $@ run $(LEX).
+	@echo ---
+	@echo For now, we will copy the prebuilt lev_lex.c
+	@echo from $(SSYS) into $(UTIL) and use it.
+	$(subst /,\,@copy $(SSYS)/lev_lex.c $@ >nul)
+	@echo /**/ $(subst /,\,>>$@)
 endif
 
 #==========================================
@@ -743,55 +746,55 @@ endif
 #==========================================
 
 $(U)dgn_comp.exe: $(DGNCOMPOBJS)
-   @echo Linking $@...
-   @$(link) $(LFLAGSU) -o$@ $(DGNCOMPOBJS)
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(DGNCOMPOBJS)
 
 
 $(O)dgn_yacc.o:   $(HACK_H)   $(DGN_FILE_H) $(INCL)/dgn_comp.h $(U)dgn_yacc.c
-   @$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_yacc.c
+	@$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_yacc.c
 
 $(O)dgn_$(LEX).o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)/dgn_comp.h \
-   $(U)dgn_$(LEX).c
-   @$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_$(LEX).c
+	$(U)dgn_$(LEX).c
+	@$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_$(LEX).c
 
 $(O)dgn_main.o:   $(HACK_H) $(U)dgn_main.c
-   @$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_main.c
+	@$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_main.c
 
 $(U)dgn_yacc.c $(INCL)/dgn_comp.h : $(U)dgn_comp.y
 ifeq  "$(DO_YACC)" "YACC_ACT"
-      $(subst /,\,chdir $(UTIL)) & \
-      $(subst /,\,$(YACC) -d dgn_comp.y) & \
-      $(subst /,\,copy $(YTABC) dgn_yacc.c) & \
-      $(subst /,\,copy $(YTABH) $(INCL)/dgn_comp.h) & \
-      $(subst /,\,@del $(YTABC)) & \
-      $(subst /,\,@del $(YTABH)) & \
-      $(subst /,\,chdir $(SRC))
+	$(subst /,\,chdir $(UTIL)) & \
+	$(subst /,\,$(YACC) -d dgn_comp.y) & \
+	$(subst /,\,copy $(YTABC) dgn_yacc.c) & \
+	$(subst /,\,copy $(YTABH) $(INCL)/dgn_comp.h) & \
+	$(subst /,\,@del $(YTABC)) & \
+	$(subst /,\,@del $(YTABH)) & \
+	$(subst /,\,chdir $(SRC))
 else
-      @echo $(U)dgn_comp.y has changed. To update dgn_yacc.c and
-      @echo $(INCL)/dgn_comp.h run $(YACC).
-      @echo ---
-      @echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
-      @echo dgn_comp.h from $(SSYS) into $(UTIL) and use them.
-      $(subst /,\,@copy $(SSYS)/dgn_yacc.c $(U)dgn_yacc.c >nul)
-      $(subst /,\,@copy $(SSYS)/dgn_comp.h $(INCL)/dgn_comp.h >nul)
-      @echo /**/ $(subst /,\,>>$(U)dgn_yacc.c)
-      @echo /**/ $(subst /,\,>>$(INCL)/dgn_comp.h)
+	@echo $(U)dgn_comp.y has changed. To update dgn_yacc.c and
+	@echo $(INCL)/dgn_comp.h run $(YACC).
+	@echo ---
+	@echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
+	@echo dgn_comp.h from $(SSYS) into $(UTIL) and use them.
+	$(subst /,\,@copy $(SSYS)/dgn_yacc.c $(U)dgn_yacc.c >nul)
+	$(subst /,\,@copy $(SSYS)/dgn_comp.h $(INCL)/dgn_comp.h >nul)
+	@echo /**/ $(subst /,\,>>$(U)dgn_yacc.c)
+	@echo /**/ $(subst /,\,>>$(INCL)/dgn_comp.h)
 endif
 
 $(U)dgn_$(LEX).c: $(U)dgn_comp.l
 ifeq  "$(DO_LEX)" "LEX_ACT"
-      $(subst /,\,chdir $(UTIL)) & \
-      $(subst /,\,$(LEX) $(FLEXSKEL)  dgn_comp.l) & \
-      $(subst /,\,copy $(LEXYYC) $@) & \
-      $(subst /,\,@del $(LEXYYC)) & \
-      chdir $(SRC)
+	$(subst /,\,chdir $(UTIL)) & \
+	$(subst /,\,$(LEX) $(FLEXSKEL)  dgn_comp.l) & \
+	$(subst /,\,copy $(LEXYYC) $@) & \
+	$(subst /,\,@del $(LEXYYC)) & \
+	chdir $(SRC)
 else
-      @echo $(U)dgn_comp.l has changed. To update $@ run $(LEX).
-      @echo ---
-      @echo For now, we will copy the prebuilt dgn_lex.c
-      @echo from $(SSYS) into $(UTIL) and use it.
-      $(subst /,\,@copy $(SSYS)/dgn_lex.c $@ >nul)
-      @echo /**/ $(subst /,\,>>$@)
+	@echo $(U)dgn_comp.l has changed. To update $@ run $(LEX).
+	@echo ---
+	@echo For now, we will copy the prebuilt dgn_lex.c
+	@echo from $(SSYS) into $(UTIL) and use it.
+	$(subst /,\,@copy $(SSYS)/dgn_lex.c $@ >nul)
+	@echo /**/ $(subst /,\,>>$@)
 endif
 
 #==========================================
@@ -799,9 +802,9 @@ endif
 #==========================================
 
 $(O)obj.tag:
-   $(subst /,\,@if not exist $(OBJ)/*.* echo creating directory $(OBJ))
-   $(subst /,\,@if not exist $(OBJ)/*.* mkdir $(OBJ))
-   $(subst /,\,@echo directory created >$@)
+	$(subst /,\,@if not exist $(OBJ)/*.* echo creating directory $(OBJ))
+	$(subst /,\,@if not exist $(OBJ)/*.* mkdir $(OBJ))
+	$(subst /,\,@echo directory created > $@)
 
 
 #==========================================
@@ -813,7 +816,7 @@ $(O)obj.tag:
 #===========================================
 
 $(INCL)/win32api.h: $(NTSYS)/win32api.h
-   $(subst /,\,copy $(NTSYS)/win32api.h $@)
+	$(subst /,\,copy $(NTSYS)/win32api.h $@)
 
 
 #==========================================
@@ -821,107 +824,107 @@ $(INCL)/win32api.h: $(NTSYS)/win32api.h
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
-   @$(link) $(LFLAGSU) -o$@ $(O)dlb_main.o $(O)dlb.o $(O)alloc.o $(O)panic.o
+	@$(link) $(LFLAGSU) -o$@ $(O)dlb_main.o $(O)dlb.o $(O)alloc.o $(O)panic.o
 
 
 $(O)dlb.o:   $(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)/dlb.h
-   @$(cc) $(CFLAGS) -o$@ $(SRC)/dlb.c
+	@$(cc) $(CFLAGS) -o$@ $(SRC)/dlb.c
 
 $(O)dlb_main.o: $(UTIL)/dlb_main.c $(INCL)/config.h $(INCL)/dlb.h
-   @$(cc) $(CFLAGS) -o$@ $(UTIL)/dlb_main.c
+	@$(cc) $(CFLAGS) -o$@ $(UTIL)/dlb_main.c
 
 nhdat:  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
-   $(DAT)/quest.dat $(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp \
-   $(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp $(DAT)/dungeon \
-   $(DAT)/license $(O)sp_lev.tag
-   $(subst /,\,cd $(DAT)) & \
-   echo data >dlb.lst & \
-   echo oracles >>dlb.lst & \
-   (if exist options echo options >>dlb.lst) & \
-   (if exist ttyoptions echo ttyoptions >>dlb.lst) & \
-   (if exist guioptions echo guioptions >>dlb.lst) & \
-   echo quest.dat >>dlb.lst & \
-   echo rumors >>dlb.lst & \
-   echo help >>dlb.lst & \
-   echo hh >>dlb.lst & \
-   echo cmdhelp >>dlb.lst & \
-   echo history >>dlb.lst & \
-   echo opthelp >>dlb.lst & \
-   echo wizhelp >>dlb.lst & \
-   echo dungeon >>dlb.lst & \
-   echo license >>dlb.lst & \
-   (for %%N in (*.lev) do echo %%N >>dlb.lst) & \
-   $(subst /,\,$(U)dlb_main cIf dlb.lst $(SRC)/nhdat) & \
-   $(subst /,\,cd $(SRC))
+	$(DAT)/quest.dat $(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp \
+	$(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp $(DAT)/dungeon \
+	$(DAT)/license $(O)sp_lev.tag
+	$(subst /,\,cd $(DAT)) & \
+	echo data >dlb.lst & \
+	echo oracles >>dlb.lst & \
+	(if exist options echo options >>dlb.lst) & \
+	(if exist ttyoptions echo ttyoptions >>dlb.lst) & \
+	(if exist guioptions echo guioptions >>dlb.lst) & \
+	echo quest.dat >>dlb.lst & \
+	echo rumors >>dlb.lst & \
+	echo help >>dlb.lst & \
+	echo hh >>dlb.lst & \
+	echo cmdhelp >>dlb.lst & \
+	echo history >>dlb.lst & \
+	echo opthelp >>dlb.lst & \
+	echo wizhelp >>dlb.lst & \
+	echo dungeon >>dlb.lst & \
+	echo license >>dlb.lst & \
+	(for %%N in (*.lev) do echo %%N >>dlb.lst) & \
+	$(subst /,\,$(U)dlb_main cIf dlb.lst $(SRC)/nhdat) & \
+	$(subst /,\,cd $(SRC))
 
 #==========================================
 #  Recover Utility
 #==========================================
 
 $(U)recover.exe: $(RECOVOBJS)
-   @$(link) $(LFLAGSU) -o$@ $(RECOVOBJS)
+	@$(link) $(LFLAGSU) -o$@ $(RECOVOBJS)
 
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)/win32api.h
-   @$(cc) $(CFLAGSU) -o$@ $(U)recover.c
+	@$(cc) $(CFLAGSU) -o$@ $(U)recover.c
 
 #==========================================
 #  Tile Mapping
 #==========================================
 
 $(SRC)/tile.c: $(U)tilemap.exe
-   @echo A new $@ has been created
-   @$(U)tilemap
+	@echo A new $@ has been created
+	@$(U)tilemap
 
 $(U)tilemap.exe: $(O)tilemap.o
-   @$(link) $(LFLAGSU) -o$@ $(O)tilemap.o
+	@$(link) $(LFLAGSU) -o$@ $(O)tilemap.o
 
 $(O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H)
-   @$(cc) $(CFLAGSU) -o$@ $(WSHR)/tilemap.c
+	@$(cc) $(CFLAGSU) -o$@ $(WSHR)/tilemap.c
 
 $(O)tiletx32.o: $(WSHR)/tilemap.c $(HACK_H)
-   @$(CC) $(CFLAGS) -DTILETEXT -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)\tilemap.c
+	@$(CC) $(CFLAGS) -DTILETEXT -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)\tilemap.c
 
 $(O)tiletxt.o: $(WSHR)/tilemap.c $(HACK_H)
-   @$(cc) $(CFLAGS) -DTILETEXT -o$@ $(WSHR)/tilemap.c
+	@$(cc) $(CFLAGS) -DTILETEXT -o$@ $(WSHR)/tilemap.c
 
 $(O)gifread.o: $(WSHR)/gifread.c  $(CONFIG_H) $(TILE_H)
-   @$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WSHR)/gifread.c
+	@$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WSHR)/gifread.c
 
 $(O)gifrd32.o: $(WSHR)/gifread.c  $(CONFIG_H) $(TILE_H)
-   @$(CC) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)/gifread.c
+	@$(CC) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)/gifread.c
 
 $(O)ppmwrite.o: $(WSHR)/ppmwrite.c $(CONFIG_H) $(TILE_H)
-   @$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WSHR)/ppmwrite.c
+	@$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WSHR)/ppmwrite.c
 
 $(O)tiletext.o: $(WSHR)/tiletext.c  $(CONFIG_H) $(TILE_H)
-   @$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WSHR)/tiletext.c
+	@$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WSHR)/tiletext.c
 
 $(O)tilete32.o: $(WSHR)/tiletext.c  $(CONFIG_H) $(TILE_H)
-   @$(CC) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)/tiletext.c
+	@$(CC) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)/tiletext.c
 
 #==========================================
 # Optional Tile Utilities
 #==========================================
 
 $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
-   @echo Linking $@...
-   @$(link) $(LFLAGSU) -o$@ $(GIFREADERS) $(TEXT_IO)
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(GIFREADERS) $(TEXT_IO)
 
 $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
-   @echo Linking $@...
-   @$(link) $(LFLAGSU) -o$@ $(GIFREADERS32) $(TEXT_IO32)
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(GIFREADERS32) $(TEXT_IO32)
 
 
 $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
-   @echo Linking $@...
-   @$(link) $(LFLAGSU) -o$@ $(PPMWRITERS) $(TEXT_IO)
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(PPMWRITERS) $(TEXT_IO)
 
 
 ifeq  "$(GRAPHICAL)" "Y"
 $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
-   @echo Creating 16x16 binary tile files (this may take some time)
-   $(subst /,\,@$(U)tile2bmp $(TILEBMP16))
+	@echo Creating 16x16 binary tile files (this may take some time)
+	$(subst /,\,@$(U)tile2bmp $(TILEBMP16))
 #$(TILEBMP32): $(TILEUTIL32) $(TILEFILES32)
 #  @echo Creating 32x32 binary tile files (this may take some time)
 #  $(subst /,\,@$(U)til2bm32 $(TILEBMP32))
@@ -931,18 +934,18 @@ $(TILEBMP32):
 endif
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
-   @echo Linking $@...
-   @$(link) $(LFLAGSU) -o$@ $(O)tile2bmp.o $(TEXT_IO)
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(O)tile2bmp.o $(TEXT_IO)
 
 $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
-   @echo Linking $@...
-   @$(link) $(LFLAGSU) -o$@ $(O)til2bm32.o $(TEXT_IO32)
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(O)til2bm32.o $(TEXT_IO32)
 
 $(O)tile2bmp.o: $(WIN32)/tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
-   @$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WIN32)/tile2bmp.c
+	@$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WIN32)/tile2bmp.c
 
 $(O)til2bm32.o: $(WIN32)/til2bm32.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
-   @$(cc) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WIN32)/til2bm32.c
+	@$(cc) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WIN32)/til2bm32.c
 
 #==========================================
 # Housekeeping
@@ -950,70 +953,70 @@ $(O)til2bm32.o: $(WIN32)/til2bm32.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
 
 spotless: clean
 ifneq  "$(OBJ)" ""
-   -rmdir $(OBJ) /s /Q
+	-rmdir $(OBJ) /s /Q
 endif
-   $(subst /,\,if exist graphicschk       del graphicschk)
-   $(subst /,\,if exist $(INCL)/date.h    del $(INCL)/date.h)
-   $(subst /,\,if exist $(INCL)/onames.h  del $(INCL)/onames.h)
-   $(subst /,\,if exist $(INCL)/pm.h      del $(INCL)/pm.h)
-   $(subst /,\,if exist $(INCL)/vis_tab.h del $(INCL)/vis_tab.h)
-   $(subst /,\,if exist $(SRC)/vis_tab.c  del $(SRC)/vis_tab.c)
-   $(subst /,\,if exist $(SRC)/tile.c     del $(SRC)/tile.c)
-   $(subst /,\,if exist $(U)*.lnk         del $(U)*.lnk)
-   $(subst /,\,if exist $(U)*.map         del $(U)*.map)
-   $(subst /,\,if exist $(DAT)/data       del $(DAT)/data)
-   $(subst /,\,if exist $(DAT)/rumors     del $(DAT)/rumors)
-   $(subst /,\,if exist $(DAT)/???-fil?.lev      del $(DAT)/???-fil?.lev)
-   $(subst /,\,if exist $(DAT)/???-goal.lev      del $(DAT)/???-goal.lev)
-   $(subst /,\,if exist $(DAT)/???-loca.lev      del $(DAT)/???-loca.lev)
-   $(subst /,\,if exist $(DAT)/???-strt.lev      del $(DAT)/???-strt.lev)
-   $(subst /,\,if exist $(DAT)/air.lev      del $(DAT)/air.lev)
-   $(subst /,\,if exist $(DAT)/asmodeus.lev      del $(DAT)/asmodeus.lev)
-   $(subst /,\,if exist $(DAT)/astral.lev   del $(DAT)/astral.lev)
-   $(subst /,\,if exist $(DAT)/baalz.lev    del $(DAT)/baalz.lev)
-   $(subst /,\,if exist $(DAT)/bigrm-*.lev  del $(DAT)/bigrm-*.lev)
-   $(subst /,\,if exist $(DAT)/castle.lev   del $(DAT)/castle.lev)
-   $(subst /,\,if exist $(DAT)/data    del $(DAT)/data)
-   $(subst /,\,if exist $(DAT)/dungeon      del $(DAT)/dungeon)
-   $(subst /,\,if exist $(DAT)/dungeon.pdf  del $(DAT)/dungeon.pdf)
-   $(subst /,\,if exist $(DAT)/earth.lev    del $(DAT)/earth.lev)
-   $(subst /,\,if exist $(DAT)/fakewiz?.lev      del $(DAT)/fakewiz?.lev)
-   $(subst /,\,if exist $(DAT)/fire.lev     del $(DAT)/fire.lev)
-   $(subst /,\,if exist $(DAT)/juiblex.lev  del $(DAT)/juiblex.lev)
-   $(subst /,\,if exist $(DAT)/knox.lev     del $(DAT)/knox.lev)
-   $(subst /,\,if exist $(DAT)/medusa-?.lev      del $(DAT)/medusa-?.lev)
-   $(subst /,\,if exist $(DAT)/mine*.lev    del $(DAT)/mine*.lev)
-   $(subst /,\,if exist $(DAT)/options      del $(DAT)/options)
-   $(subst /,\,if exist $(DAT)\ttyoptions   del $(DAT)\ttyoptions)
-   $(subst /,\,if exist $(DAT)\guioptions   del $(DAT)\guioptions)
-   $(subst /,\,if exist $(DAT)/oracle.lev   del $(DAT)/oracle.lev)
-   $(subst /,\,if exist $(DAT)/oracles      del $(DAT)/oracles)
-   $(subst /,\,if exist $(DAT)/orcus.lev    del $(DAT)/orcus.lev)
-   $(subst /,\,if exist $(DAT)/rumors  del $(DAT)/rumors)
-   $(subst /,\,if exist $(DAT)/quest.dat    del $(DAT)/quest.dat)
-   $(subst /,\,if exist $(DAT)/sanctum.lev  del $(DAT)/sanctum.lev)
-   $(subst /,\,if exist $(DAT)/soko?-?.lev  del $(DAT)/soko?-?.lev)
-   $(subst /,\,if exist $(DAT)/tower?.lev   del $(DAT)/tower?.lev)
-   $(subst /,\,if exist $(DAT)/valley.lev   del $(DAT)/valley.lev)
-   $(subst /,\,if exist $(DAT)/water.lev    del $(DAT)/water.lev)
-   $(subst /,\,if exist $(DAT)/wizard?.lev  del $(DAT)/wizard?.lev)
-   $(subst /,\,if exist $(O)sp_lev.tag     del $(O)sp_lev.tag)
-   $(subst /,\,if exist $(SRC)/monstr.c    del $(SRC)/monstr.c)
-   $(subst /,\,if exist $(SRC)/vis_tab.c   del $(SRC)/vis_tab.c)
-   $(subst /,\,if exist $(U)recover.exe    del $(U)recover.exe)
-   $(subst /,\,if exist $(DAT)/dlb.lst      del $(DAT)/dlb.lst)
-   $(subst /,\,if exist nhdat.         del nhdat.)
+	$(subst /,\,if exist graphicschk       del graphicschk)
+	$(subst /,\,if exist $(INCL)/date.h    del $(INCL)/date.h)
+	$(subst /,\,if exist $(INCL)/onames.h  del $(INCL)/onames.h)
+	$(subst /,\,if exist $(INCL)/pm.h      del $(INCL)/pm.h)
+	$(subst /,\,if exist $(INCL)/vis_tab.h del $(INCL)/vis_tab.h)
+	$(subst /,\,if exist $(SRC)/vis_tab.c  del $(SRC)/vis_tab.c)
+	$(subst /,\,if exist $(SRC)/tile.c     del $(SRC)/tile.c)
+	$(subst /,\,if exist $(U)*.lnk         del $(U)*.lnk)
+	$(subst /,\,if exist $(U)*.map         del $(U)*.map)
+	$(subst /,\,if exist $(DAT)/data       del $(DAT)/data)
+	$(subst /,\,if exist $(DAT)/rumors     del $(DAT)/rumors)
+	$(subst /,\,if exist $(DAT)/???-fil?.lev      del $(DAT)/???-fil?.lev)
+	$(subst /,\,if exist $(DAT)/???-goal.lev      del $(DAT)/???-goal.lev)
+	$(subst /,\,if exist $(DAT)/???-loca.lev      del $(DAT)/???-loca.lev)
+	$(subst /,\,if exist $(DAT)/???-strt.lev      del $(DAT)/???-strt.lev)
+	$(subst /,\,if exist $(DAT)/air.lev      del $(DAT)/air.lev)
+	$(subst /,\,if exist $(DAT)/asmodeus.lev      del $(DAT)/asmodeus.lev)
+	$(subst /,\,if exist $(DAT)/astral.lev   del $(DAT)/astral.lev)
+	$(subst /,\,if exist $(DAT)/baalz.lev    del $(DAT)/baalz.lev)
+	$(subst /,\,if exist $(DAT)/bigrm-*.lev  del $(DAT)/bigrm-*.lev)
+	$(subst /,\,if exist $(DAT)/castle.lev   del $(DAT)/castle.lev)
+	$(subst /,\,if exist $(DAT)/data    del $(DAT)/data)
+	$(subst /,\,if exist $(DAT)/dungeon      del $(DAT)/dungeon)
+	$(subst /,\,if exist $(DAT)/dungeon.pdf  del $(DAT)/dungeon.pdf)
+	$(subst /,\,if exist $(DAT)/earth.lev    del $(DAT)/earth.lev)
+	$(subst /,\,if exist $(DAT)/fakewiz?.lev      del $(DAT)/fakewiz?.lev)
+	$(subst /,\,if exist $(DAT)/fire.lev     del $(DAT)/fire.lev)
+	$(subst /,\,if exist $(DAT)/juiblex.lev  del $(DAT)/juiblex.lev)
+	$(subst /,\,if exist $(DAT)/knox.lev     del $(DAT)/knox.lev)
+	$(subst /,\,if exist $(DAT)/medusa-?.lev      del $(DAT)/medusa-?.lev)
+	$(subst /,\,if exist $(DAT)/mine*.lev    del $(DAT)/mine*.lev)
+	$(subst /,\,if exist $(DAT)/options      del $(DAT)/options)
+	$(subst /,\,if exist $(DAT)/ttyoptions   del $(DAT)/ttyoptions)
+	$(subst /,\,if exist $(DAT)/guioptions   del $(DAT)/guioptions)
+	$(subst /,\,if exist $(DAT)/oracle.lev   del $(DAT)/oracle.lev)
+	$(subst /,\,if exist $(DAT)/oracles      del $(DAT)/oracles)
+	$(subst /,\,if exist $(DAT)/orcus.lev    del $(DAT)/orcus.lev)
+	$(subst /,\,if exist $(DAT)/rumors  del $(DAT)/rumors)
+	$(subst /,\,if exist $(DAT)/quest.dat    del $(DAT)/quest.dat)
+	$(subst /,\,if exist $(DAT)/sanctum.lev  del $(DAT)/sanctum.lev)
+	$(subst /,\,if exist $(DAT)/soko?-?.lev  del $(DAT)/soko?-?.lev)
+	$(subst /,\,if exist $(DAT)/tower?.lev   del $(DAT)/tower?.lev)
+	$(subst /,\,if exist $(DAT)/valley.lev   del $(DAT)/valley.lev)
+	$(subst /,\,if exist $(DAT)/water.lev    del $(DAT)/water.lev)
+	$(subst /,\,if exist $(DAT)/wizard?.lev  del $(DAT)/wizard?.lev)
+	$(subst /,\,if exist $(O)sp_lev.tag     del $(O)sp_lev.tag)
+	$(subst /,\,if exist $(SRC)/monstr.c    del $(SRC)/monstr.c)
+	$(subst /,\,if exist $(SRC)/vis_tab.c   del $(SRC)/vis_tab.c)
+	$(subst /,\,if exist $(U)recover.exe    del $(U)recover.exe)
+	$(subst /,\,if exist $(DAT)/dlb.lst      del $(DAT)/dlb.lst)
+	$(subst /,\,if exist nhdat.         del nhdat.)
 
 clean:
-   $(subst /,\,if exist $(O)*.o del $(O)*.o)
-   $(subst /,\,if exist $(O)utility.tag   del $(O)utility.tag)
-   $(subst /,\,if exist $(U)makedefs.exe  del $(U)makedefs.exe)
-   $(subst /,\,if exist $(U)lev_comp.exe  del $(U)lev_comp.exe)
-   $(subst /,\,if exist $(U)dgn_comp.exe  del $(U)dgn_comp.exe)
-   $(subst /,\,if exist $(SRC)/*.lnk      del $(SRC)/*.lnk)
-   $(subst /,\,if exist $(SRC)/*.map      del $(SRC)/*.map)
-   $(subst /,\,if exist $(TILEBMP16)      del $(TILEBMP16))
-   $(subst /,\,if exist $(TILEBMP32)      del $(TILEBMP32))
+	$(subst /,\,if exist $(O)*.o del $(O)*.o)
+	$(subst /,\,if exist $(O)utility.tag   del $(O)utility.tag)
+	$(subst /,\,if exist $(U)makedefs.exe  del $(U)makedefs.exe)
+	$(subst /,\,if exist $(U)lev_comp.exe  del $(U)lev_comp.exe)
+	$(subst /,\,if exist $(U)dgn_comp.exe  del $(U)dgn_comp.exe)
+	$(subst /,\,if exist $(SRC)/*.lnk      del $(SRC)/*.lnk)
+	$(subst /,\,if exist $(SRC)/*.map      del $(SRC)/*.map)
+	$(subst /,\,if exist $(TILEBMP16)      del $(TILEBMP16))
+	$(subst /,\,if exist $(TILEBMP32)      del $(TILEBMP32))
 
 #===================================================================
 # OTHER DEPENDENCIES
@@ -1024,42 +1027,42 @@ clean:
 #
 
 $(DAT)/data: $(O)utility.tag    $(DATABASE)
-   $(subst /,\,$(U)makedefs -d)
+	$(subst /,\,$(U)makedefs -d)
 
 $(DAT)/rumors: $(O)utility.tag    $(DAT)/rumors.tru   $(DAT)/rumors.fal
-   $(subst /,\,$(U)makedefs -r)
+	$(subst /,\,$(U)makedefs -r)
 
 $(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
-   $(subst /,\,$(U)makedefs -q)
+	$(subst /,\,$(U)makedefs -q)
 
 $(DAT)/oracles: $(O)utility.tag    $(DAT)/oracles.txt
-   $(subst /,\,$(U)makedefs -h)
+	$(subst /,\,$(U)makedefs -h)
 
 $(DAT)/dungeon: $(O)utility.tag  $(DAT)/dungeon.def
-   $(subst /,\,$(U)makedefs -e)
-   $(subst /,\,cd $(DAT)) & \
-   $(subst /,\,$(U)dgn_comp dungeon.pdf) & \
-   $(subst /,\,cd $(SRC))
+	$(subst /,\,$(U)makedefs -e)
+	$(subst /,\,cd $(DAT)) & \
+	$(subst /,\,$(U)dgn_comp dungeon.pdf) & \
+	$(subst /,\,cd $(SRC))
 
 #
 # NT dependencies
 #
 
 $(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)/win32api.h $(NTSYS)/nttty.c
-   @$(cc) $(CFLAGS) -I$(WSHR) -o$@  $(NTSYS)/nttty.c
+	@$(cc) $(CFLAGS) -I$(WSHR) -o$@  $(NTSYS)/nttty.c
 $(O)winnt.o: $(HACK_H) $(INCL)/win32api.h $(NTSYS)/winnt.c
-   @$(cc) $(CFLAGS) -o$@  $(NTSYS)/winnt.c
+	@$(cc) $(CFLAGS) -o$@  $(NTSYS)/winnt.c
 $(O)ntsound.o: $(HACK_H) $(NTSYS)/ntsound.c
-   @$(cc) $(CFLAGS)  -o$@ $(NTSYS)/ntsound.c
+	@$(cc) $(CFLAGS)  -o$@ $(NTSYS)/ntsound.c
 $(O)mapimail.o: $(HACK_H) $(INCL)/nhlan.h $(NTSYS)/mapimail.c
-   @$(cc) $(CFLAGS) -DMAPI_VERBOSE  -o$@ $(NTSYS)/mapimail.c
+	@$(cc) $(CFLAGS) -DMAPI_VERBOSE  -o$@ $(NTSYS)/mapimail.c
 
 #
 # util dependencies
 #
 
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
-   @$(cc) $(CFLAGS) -o$@ $(U)panic.c
+	@$(cc) $(CFLAGS) -o$@ $(U)panic.c
 
 #
 # The rest are stolen from sys/unix/Makefile.src,
@@ -1069,119 +1072,119 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 # in here, but maintenance should be easier.
 #
 $(O)tos.o: ../sys/atari/tos.c $(HACK_H) $(INCL)/tcap.h
-   $(cc) $(CFLAGS) -o$@ ../sys/atari/tos.c
+	$(cc) $(CFLAGS) -o$@ ../sys/atari/tos.c
 $(O)pcmain.o: ../sys/share/pcmain.c $(HACK_H) $(INCL)/dlb.h \
-        $(INCL)/win32api.h
-   $(cc) $(CFLAGS) -o$@ ../sys/share/pcmain.c
+	     $(INCL)/win32api.h
+	$(cc) $(CFLAGS) -o$@ ../sys/share/pcmain.c
 $(O)pcsys.o: ../sys/share/pcsys.c $(HACK_H)
-   $(cc) $(CFLAGS) -o$@ ../sys/share/pcsys.c
+	$(cc) $(CFLAGS) -o$@ ../sys/share/pcsys.c
 $(O)pctty.o: ../sys/share/pctty.c $(HACK_H)
-   $(cc) $(CFLAGS) -o$@ ../sys/share/pctty.c
+	$(cc) $(CFLAGS) -o$@ ../sys/share/pctty.c
 $(O)pcunix.o: ../sys/share/pcunix.c $(HACK_H)
-   $(cc) $(CFLAGS) -o$@ ../sys/share/pcunix.c
+	$(cc) $(CFLAGS) -o$@ ../sys/share/pcunix.c
 $(O)random.o: ../sys/share/random.c $(HACK_H)
-   $(cc) $(CFLAGS) -o$@ ../sys/share/random.c
+	$(cc) $(CFLAGS) -o$@ ../sys/share/random.c
 $(O)ioctl.o: ../sys/share/ioctl.c $(HACK_H) $(INCL)/tcap.h
-   $(cc) $(CFLAGS) -o$@ ../sys/share/ioctl.c
+	$(cc) $(CFLAGS) -o$@ ../sys/share/ioctl.c
 $(O)unixtty.o: ../sys/share/unixtty.c $(HACK_H)
-   $(cc) $(CFLAGS) -o$@ ../sys/share/unixtty.c
+	$(cc) $(CFLAGS) -o$@ ../sys/share/unixtty.c
 $(O)unixmain.o: ../sys/unix/unixmain.c $(HACK_H) $(INCL)/dlb.h
-   $(cc) $(CFLAGS) -o$@ ../sys/unix/unixmain.c
+	$(cc) $(CFLAGS) -o$@ ../sys/unix/unixmain.c
 $(O)unixunix.o: ../sys/unix/unixunix.c $(HACK_H)
-   $(cc) $(CFLAGS) -o$@ ../sys/unix/unixunix.c
+	$(cc) $(CFLAGS) -o$@ ../sys/unix/unixunix.c
 $(O)bemain.o: ../sys/be/bemain.c $(HACK_H) $(INCL)/dlb.h
-   $(cc) $(CFLAGS) -o$@ ../sys/be/bemain.c
+	$(cc) $(CFLAGS) -o$@ ../sys/be/bemain.c
 $(O)getline.o: ../win/tty/getline.c $(HACK_H) $(INCL)/func_tab.h
-   $(cc) $(CFLAGS) -o$@ ../win/tty/getline.c
+	$(cc) $(CFLAGS) -o$@ ../win/tty/getline.c
 $(O)termcap.o: ../win/tty/termcap.c $(HACK_H) $(INCL)/tcap.h
-   $(cc) $(CFLAGS) -o$@ ../win/tty/termcap.c
+	$(cc) $(CFLAGS) -o$@ ../win/tty/termcap.c
 $(O)topl.o: ../win/tty/topl.c $(HACK_H) $(INCL)/tcap.h
-   $(cc) $(CFLAGS) -o$@ ../win/tty/topl.c
+	$(cc) $(CFLAGS) -o$@ ../win/tty/topl.c
 $(O)wintty.o: ../win/tty/wintty.c $(HACK_H) $(INCL)/dlb.h \
-        $(INCL)/patchlevel.h $(INCL)/tcap.h
-   $(cc) $(CFLAGS) -o$@ ../win/tty/wintty.c
+	     $(INCL)/patchlevel.h $(INCL)/tcap.h
+	$(cc) $(CFLAGS) -o$@ ../win/tty/wintty.c
 $(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
-        $(CONFIG_H)
-   $(cc) $(CFLAGS) -o$@ ../win/X11/Window.c
+	     $(CONFIG_H)
+	$(cc) $(CFLAGS) -o$@ ../win/X11/Window.c
 $(O)dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
-   $(cc) $(CFLAGS) -o$@ ../win/X11/dialogs.c
+	$(cc) $(CFLAGS) -o$@ ../win/X11/dialogs.c
 $(O)winX.o: ../win/X11/winX.c $(HACK_H) $(INCL)/winX.h $(INCL)/dlb.h \
-        $(INCL)/patchlevel.h ../win/X11/nh72icon \
-        ../win/X11/nh56icon ../win/X11/nh32icon
-   $(cc) $(CFLAGS) -o$@ ../win/X11/winX.c
+	     $(INCL)/patchlevel.h ../win/X11/nh72icon \
+	     ../win/X11/nh56icon ../win/X11/nh32icon
+	$(cc) $(CFLAGS) -o$@ ../win/X11/winX.c
 $(O)winmap.o: ../win/X11/winmap.c $(INCL)/xwindow.h $(HACK_H) $(INCL)/dlb.h \
-        $(INCL)/winX.h $(INCL)/tile2x11.h
-   $(cc) $(CFLAGS) -o$@ ../win/X11/winmap.c
+	     $(INCL)/winX.h $(INCL)/tile2x11.h
+	$(cc) $(CFLAGS) -o$@ ../win/X11/winmap.c
 $(O)winmenu.o: ../win/X11/winmenu.c $(HACK_H) $(INCL)/winX.h
-   $(cc) $(CFLAGS) -o$@ ../win/X11/winmenu.c
+	$(cc) $(CFLAGS) -o$@ ../win/X11/winmenu.c
 $(O)winmesg.o: ../win/X11/winmesg.c $(INCL)/xwindow.h $(HACK_H) $(INCL)/winX.h
-   $(cc) $(CFLAGS) -o$@ ../win/X11/winmesg.c
+	$(cc) $(CFLAGS) -o$@ ../win/X11/winmesg.c
 $(O)winmisc.o: ../win/X11/winmisc.c $(HACK_H) $(INCL)/func_tab.h \
-        $(INCL)/winX.h
-   $(cc) $(CFLAGS) -o$@ ../win/X11/winmisc.c
+	     $(INCL)/winX.h
+	$(cc) $(CFLAGS) -o$@ ../win/X11/winmisc.c
 $(O)winstat.o: ../win/X11/winstat.c $(HACK_H) $(INCL)/winX.h
-   $(cc) $(CFLAGS) -o$@ ../win/X11/winstat.c
+	$(cc) $(CFLAGS) -o$@ ../win/X11/winstat.c
 $(O)wintext.o: ../win/X11/wintext.c $(HACK_H) $(INCL)/winX.h $(INCL)/xwindow.h
-   $(cc) $(CFLAGS) -o$@ ../win/X11/wintext.c
+	$(cc) $(CFLAGS) -o$@ ../win/X11/wintext.c
 $(O)winval.o: ../win/X11/winval.c $(HACK_H) $(INCL)/winX.h
-   $(cc) $(CFLAGS) -o$@ ../win/X11/winval.c
+	$(cc) $(CFLAGS) -o$@ ../win/X11/winval.c
 $(O)tile.o: $(SRC)/tile.c $(HACK_H)
 $(O)gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
-        ../win/gnome/gnmain.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnaskstr.c
+	     ../win/gnome/gnmain.h
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnaskstr.c
 $(O)gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnmain.h \
-        ../win/gnome/gnaskstr.h ../win/gnome/gnyesno.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnbind.c
+	     ../win/gnome/gnaskstr.h ../win/gnome/gnyesno.h
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnbind.c
 $(O)gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnglyph.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnglyph.c
 $(O)gnmain.o: ../win/gnome/gnmain.c ../win/gnome/gnmain.h ../win/gnome/gnsignal.h \
-        ../win/gnome/gnbind.h ../win/gnome/gnopts.h $(HACK_H) \
-        $(INCL)/date.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmain.c
+	     ../win/gnome/gnbind.h ../win/gnome/gnopts.h $(HACK_H) \
+	     $(INCL)/date.h
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmain.c
 $(O)gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h ../win/gnome/gnglyph.h \
-        ../win/gnome/gnsignal.h $(HACK_H)
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmap.c
+	     ../win/gnome/gnsignal.h $(HACK_H)
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmap.c
 $(O)gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h ../win/gnome/gnmain.h \
-        ../win/gnome/gnbind.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmenu.c
+	     ../win/gnome/gnbind.h
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmenu.c
 $(O)gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h ../win/gnome/gnsignal.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmesg.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmesg.c
 $(O)gnopts.o: ../win/gnome/gnopts.c ../win/gnome/gnopts.h ../win/gnome/gnglyph.h \
-        ../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnopts.c
+	     ../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnopts.c
 $(O)gnplayer.o: ../win/gnome/gnplayer.c ../win/gnome/gnplayer.h \
-        ../win/gnome/gnmain.h $(HACK_H)
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnplayer.c
+	     ../win/gnome/gnmain.h $(HACK_H)
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnplayer.c
 $(O)gnsignal.o: ../win/gnome/gnsignal.c ../win/gnome/gnsignal.h \
-        ../win/gnome/gnmain.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnsignal.c
+	     ../win/gnome/gnmain.h
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnsignal.c
 $(O)gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h \
-        ../win/gnome/gnsignal.h ../win/gnome/gn_xpms.h \
-        ../win/gnome/gnomeprv.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnstatus.c
+	     ../win/gnome/gnsignal.h ../win/gnome/gn_xpms.h \
+	     ../win/gnome/gnomeprv.h
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnstatus.c
 $(O)gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h ../win/gnome/gnmain.h \
-        ../win/gnome/gn_rip.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gntext.c
+	     ../win/gnome/gn_rip.h
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gntext.c
 $(O)gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
-   $(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnyesno.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnyesno.c
 $(O)wingem.o: ../win/gem/wingem.c $(HACK_H) $(INCL)/func_tab.h $(INCL)/dlb.h \
-        $(INCL)/patchlevel.h $(INCL)/wingem.h
-   $(cc) $(CFLAGS) -o$@ ../win/gem/wingem.c
+	     $(INCL)/patchlevel.h $(INCL)/wingem.h
+	$(cc) $(CFLAGS) -o$@ ../win/gem/wingem.c
 $(O)wingem1.o: ../win/gem/wingem1.c $(INCL)/gem_rsc.h $(INCL)/load_img.h \
-        $(INCL)/wintype.h $(INCL)/wingem.h
-   $(cc) $(CFLAGS) -o$@ ../win/gem/wingem1.c
+	     $(INCL)/wintype.h $(INCL)/wingem.h
+	$(cc) $(CFLAGS) -o$@ ../win/gem/wingem1.c
 $(O)load_img.o: ../win/gem/load_img.c $(INCL)/load_img.h
-   $(cc) $(CFLAGS) -o$@ ../win/gem/load_img.c
+	$(cc) $(CFLAGS) -o$@ ../win/gem/load_img.c
 $(O)tile.o: tile.c $(HACK_H)
 $(O)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) $(INCL)/func_tab.h \
-        $(INCL)/dlb.h $(INCL)/patchlevel.h $(INCL)/qt_win.h \
-        $(INCL)/qt_clust.h $(INCL)/qt_kde0.h \
-        $(INCL)/qt_xpms.h qt_win.moc qt_kde0.moc
-   $(CXX) $(CXXFLAGS) -c ../win/Qt/qt_win.cpp
+	     $(INCL)/dlb.h $(INCL)/patchlevel.h $(INCL)/qt_win.h \
+	     $(INCL)/qt_clust.h $(INCL)/qt_kde0.h \
+	     $(INCL)/qt_xpms.h qt_win.moc qt_kde0.moc
+	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_win.cpp
 $(O)qt_clust.o: ../win/Qt/qt_clust.cpp $(INCL)/qt_clust.h
-   $(CXX) $(CXXFLAGS) -c ../win/Qt/qt_clust.cpp
-$(O)monstr.o: monstr.c $(CONFIG_H)
-$(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_clust.cpp
+$(O)monstr.o: $(SRC)/monstr.c $(CONFIG_H)
+$(O)vis_tab.o: $(SRC)/vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H) $(INCL)/edog.h
@@ -1221,7 +1224,7 @@ $(O)light.o: light.c $(HACK_H) $(INCL)/lev.h
 $(O)lock.o: lock.c $(HACK_H)
 $(O)mail.o: mail.c $(HACK_H) $(INCL)/mail.h
 $(O)makemon.o: makemon.c $(HACK_H) $(INCL)/epri.h $(INCL)/emin.h \
-        $(INCL)/edog.h
+	$(INCL)/edog.h
 $(O)mapglyph.o: mapglyph.c $(HACK_H)
 $(O)mcastu.o: mcastu.c $(HACK_H)
 $(O)mhitm.o: mhitm.c $(HACK_H) $(INCL)/artifact.h $(INCL)/edog.h
@@ -1236,19 +1239,19 @@ $(O)mon.o: mon.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/edog.h
 $(O)mondata.o: mondata.c $(HACK_H) $(INCL)/eshk.h $(INCL)/epri.h
 $(O)monmove.o: monmove.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/artifact.h
 $(O)monst.o: monst.c $(CONFIG_H) $(INCL)/permonst.h $(INCL)/align.h \
-        $(INCL)/monattk.h $(INCL)/monflag.h $(INCL)/monsym.h \
-        $(INCL)/dungeon.h $(INCL)/eshk.h $(INCL)/vault.h \
-        $(INCL)/epri.h $(INCL)/color.h
+	$(INCL)/monattk.h $(INCL)/monflag.h $(INCL)/monsym.h \
+	$(INCL)/dungeon.h $(INCL)/eshk.h $(INCL)/vault.h \
+	$(INCL)/epri.h $(INCL)/color.h
 $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H) $(INCL)/edog.h
 $(O)music.o: music.c $(HACK_H) #interp.c
 $(O)o_init.o: o_init.c $(HACK_H) $(INCL)/lev.h
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)/obj.h $(INCL)/objclass.h \
-        $(INCL)/prop.h $(INCL)/skills.h $(INCL)/color.h
+	$(INCL)/prop.h $(INCL)/skills.h $(INCL)/color.h
 $(O)objnam.o: objnam.c $(HACK_H)
 $(O)options.o: options.c $(CONFIG_H) $(INCL)/objclass.h $(INCL)/flag.h \
-        $(HACK_H) $(INCL)/tcap.h
+	$(HACK_H) $(INCL)/tcap.h
 $(O)pager.o: pager.c $(HACK_H) $(INCL)/dlb.h
 $(O)pickup.o: pickup.c $(HACK_H)
 $(O)pline.o: pline.c $(HACK_H) $(INCL)/epri.h $(INCL)/edog.h
@@ -1256,7 +1259,7 @@ $(O)polyself.o: polyself.c $(HACK_H)
 $(O)potion.o: potion.c $(HACK_H)
 $(O)pray.o: pray.c $(HACK_H) $(INCL)/epri.h
 $(O)priest.o: priest.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/eshk.h \
-        $(INCL)/epri.h $(INCL)/emin.h
+	$(INCL)/epri.h $(INCL)/emin.h
 $(O)quest.o: quest.c $(HACK_H) $(INCL)/qtext.h
 $(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)/dlb.h $(INCL)/qtext.h
 $(O)read.o: read.c $(HACK_H)

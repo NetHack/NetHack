@@ -652,7 +652,7 @@ $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objcla
 #  files is modified.
 #
 
-$(INCL)\date.h : $(U)makedefs.exe
+$(INCL)\date.h $(OPTIONS_FILE) : $(U)makedefs.exe
 	$(U)makedefs -v
 
 $(INCL)\onames.h : $(U)makedefs.exe
@@ -1187,8 +1187,8 @@ $(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) $(INCL)\func_tab.h \
 	$(CXX) $(CXXFLAGS) -c ..\win\Qt\qt_win.cpp
 $(O)qt_clust.o: ..\win\Qt\qt_clust.cpp $(INCL)\qt_clust.h
 	$(CXX) $(CXXFLAGS) -c ..\win\Qt\qt_clust.cpp
-$(O)monstr.o: monstr.c $(CONFIG_H)
-$(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
+$(O)monstr.o: $(SRC)\monstr.c $(CONFIG_H)
+$(O)vis_tab.o: $(SRC)\vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H) $(INCL)\edog.h
