@@ -625,6 +625,8 @@ level_tele()
 		    is_silent(youmonst.data) ? "writhe" : "scream");
 		display_nhwindow(WIN_MESSAGE, FALSE);
 		You("cease to exist.");
+		if (invent) Your("possessions land on the %s with a thud.",
+				surface(u.ux, u.uy));
 		killer.format = NO_KILLER_PREFIX;
 		Strcpy(killer.name, "committed suicide");
 		done(DIED);
