@@ -1851,7 +1851,7 @@ static NEARDATA int last_multi;
 /*
  * convert a MAP window position into a movecmd
  */
-const char*
+const char *
 click_to_cmd(x, y, mod)
     int x, y, mod;
 {
