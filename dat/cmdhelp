@@ -1,0 +1,120 @@
+^       Show the type of a trap
+^[      Cancel command
+^A      Redo the previous command
+^C      Quit the game
+^D      Kick something (usually a door, chest, or box)
+^E      Search a room (available in debug mode only)
+^F      Map the level (available in debug mode only)
+^G      Create a monster (available in debug mode only)
+^I      Identify all items (available in debug mode only)
+^O      Show location of special levels (available in debug mode only)
+^P      Toggle through previously displayed game messages
+^R      Redraw screen
+^T      Teleport around level
+^V      Teleport between levels (available in debug mode only)
+^W      Wish (available in debug mode only)
+^X      Show your attributes (intrinsic ones included in debug or explore mode)
+^Z      Suspend game (only if defined)
+a       Apply (use) a tool
+A       Remove all armor
+b       Go southwest 1 space
+B       Go southwest until you are on top of something
+^B      Go southwest until you are near something
+c       Close a door
+C       Call (name) a particular monster
+d       Drop an item
+D       Drop specific item types
+e       Eat something
+E       Engrave writing on the floor
+f       Fire ammunition from quiver
+F       Followed by direction, fight a monster (even if you don't sense it)
+g       Followed by direction, move until you are near something
+G       Followed by direction, same as control-direction
+h       Go west 1 space
+H       Go west until you are on top of something
+^H      Go west until you are near something
+i       Show your inventory
+I       Inventory specific item types
+j       Go south 1 space (or if number_pad is on, jump to another location)
+J       Go south until you are on top of something
+^J      Go south until you are near something
+k       Go north 1 space (or if number_pad is on, kick something)
+K       Go north until you are on top of something
+^K      Go north until you are near something
+l       Go east 1 space (or if number_pad is on, loot a box on the floor)
+L       Go east until you are on top of something
+^L      Go east until you are near something
+m       Followed by direction, move without picking anything up or fighting
+M       Followed by direction, move a distance without picking anything up
+n       Go southeast 1 space
+N       Go southeast until you are on something (if number_pad, name an object)
+^N      Go southeast until you are near something
+o       Open a door
+O       Show option settings, possibly change them
+p       Pay your shopping bill
+P       Put on an accessory (ring, amulet, etc)
+q       Quaff (drink) something
+Q       Select ammunition for quiver
+r       Read a scroll or spellbook
+R       Remove an accessory (ring, amulet, etc)
+s       Search for traps and secret doors
+S       Save the game
+t       Throw something
+T       Take off one piece of armor
+u       Go northeast 1 space (or if number_pad is on, untrap something)
+U       Go northeast until you are on top of something
+^U      Go northeast until you are near something
+v       Show version
+V       Show long version and game history
+w       Wield (put in use) a weapon
+W       Wear a piece of armor
+x       Swap wielded and secondary weapons
+X       Enter explore (discovery) mode (only if defined)
+y       Go northwest 1 space
+Y       Go northwest until you are on top of something
+^Y      Go northwest until you are near something
+z       Zap a wand
+Z       Zap (cast) a spell
+<       Go up a staircase
+>       Go down a staircase
+/       Show what type of thing a symbol corresponds to
+?       Give a help message
+&       Tell what a command does
+!       Do a shell escape (only if defined)
+\       Show what object types have been discovered
+_       Travel via a shortest-path algorithm to a point on the map 
+.       Rest one move while doing nothing
+        Rest one move while doing nothing (if rest_on_space option is on)
+:       Look at what is on the floor
+;       Show what type of thing a map symbol on the level corresponds to
+,       Pick up things at the current location
+@       Toggle the pickup option on/off
+)       Show the weapon currently wielded
+[       Show the armor currently worn
+=       Show the ring(s) currently worn
+"       Show the amulet currently worn
+(       Show the tools currently in use
+*       Show all equipment in use (combination of the ),[,=,",( commands)
+$       Count your gold
++       List known spells
+#       Perform an extended command
+M-2     Toggle two-weapon combat
+M-a     Adjust inventory letters
+M-c     Talk to someone
+M-d     Dip an object into something
+M-e     Advance or check weapons skills
+M-f     Force a lock
+M-i     Invoke an object's special powers
+M-j     Jump to another location
+M-l     Loot a box on the floor
+M-m     Use a monster's special ability
+M-n     Name an item or type of object
+M-o     Offer a sacrifice to the gods
+M-p     Pray to the gods for help
+M-q     Quit
+M-r     Rub a lamp
+M-s     Sit down
+M-t     Turn undead
+M-u     Untrap something (trap, door, or chest)
+M-v     Print compile time options for this version of NetHack
+M-w     Wipe off your face
