@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)teleport.c	3.4	2002/11/20	*/
+/*	SCCS Id: @(#)teleport.c	3.4	2003/05/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1173,15 +1173,11 @@ register struct obj *obj;
 int
 random_teleport_level()
 {
-	int nlev, max_depth, min_depth;
+	int nlev, max_depth, min_depth,
+	    cur_depth = (int)depth(&u.uz);
 
 	if (!rn2(5) || Is_knox(&u.uz))
-		return (int)depth(&u.uz);
-
-	/* Get a random value relative to the current dungeon */
-	/* Range is 1 to current+3, current not counting */
-	nlev = rnd((int)depth(&u.uz) + 2);
-	if (nlev >= (int)depth(&u.uz)) nlev++;
+	    return cur_depth;
 
 	/* What I really want to do is as follows:
 	 * -- If in a dungeon that goes down, the new level is to be restricted
@@ -1198,10 +1194,17 @@ random_teleport_level()
 	 * above; endgame is handled in the caller due to its different
 	 * message ("disoriented").
 	 * --KAA
+	 * 3.4.2: explicitly handle quest here too, to fix the problem of
+	 * monsters sometimes level teleporting out of it into main dungeon.
 	 */
-	min_depth = 1;
+	min_depth = In_quest(&u.uz) ? dungeons[u.uz.dnum].depth_start : 1;
 	max_depth = dunlevs_in_dungeon(&u.uz) +
 			(dungeons[u.uz.dnum].depth_start - 1);
+
+	/* Get a random value relative to the current dungeon */
+	/* Range is 1 to current+3, current not counting */
+	nlev = rn2(cur_depth + 3 - min_depth) + min_depth;
+	if (nlev >= cur_depth) nlev++;
 
 	if (nlev > max_depth) {
 	    nlev = max_depth;
@@ -1210,9 +1213,9 @@ random_teleport_level()
 	}
 	if (nlev < min_depth) {
 	    nlev = min_depth;
-	    if ((int)depth(&u.uz) == min_depth) {
-		nlev += rnd(3);
-		if (nlev > max_depth)
+	    if (nlev == cur_depth) {
+	        nlev += rnd(3);
+	        if (nlev > max_depth)
 		    nlev = max_depth;
 	    }
 	}
