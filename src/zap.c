@@ -2558,7 +2558,8 @@ register const char *str;
 register struct monst *mtmp;
 register const char *force;		/* usually either "." or "!" */
 {
-	if((!cansee(bhitpos.x,bhitpos.y) && !canspotmon(mtmp))
+	if((!cansee(bhitpos.x,bhitpos.y) && !canspotmon(mtmp) &&
+	     !(u.uswallow && mtmp == u.ustuck))
 	   || !flags.verbose)
 	    pline("%s %s it.", The(str), vtense(str, "hit"));
 	else pline("%s %s %s%s", The(str), vtense(str, "hit"),
