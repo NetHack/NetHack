@@ -833,8 +833,8 @@ register int	mmflags;
 	 * the caller manually decrement mvitals if the monster is created
 	 * under circumstances where one would not logically expect the
 	 * creation to reduce the supply of wild monsters.  Monster cloning
- 	 * might be one such case, but we go against logic there in order to
-	 * reduce the possibility of abuse.
+ 	 * might be one case that requires that in order to reduce the
+	 * possibility of abuse, but currently doesn't.
 	 */
 	if (mvitals[mndx].born < 255 && countbirth) mvitals[mndx].born++;
 	lim = mbirth_limit(mndx);
