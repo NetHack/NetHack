@@ -1847,6 +1847,7 @@ create_particular()
 	struct monst *mtmp;
 	boolean madeany = FALSE;
 	boolean maketame, makepeaceful, makehostile;
+	boolean randmonst = FALSE;
 
 	tries = 0;
 	do {
@@ -1869,6 +1870,12 @@ create_particular()
 	    }
 	    /* decide whether a valid monster was chosen */
 	    if (strlen(bufp) == 1) {
+#ifdef WIZARD
+		if (wizard && *bufp == '*') {
+			randmonst = TRUE;
+			break;
+		}
+#endif
 		monclass = def_char_to_monclass(*bufp);
 		if (monclass != MAXMCLASSES) break;	/* got one */
 	    } else {
@@ -1882,9 +1889,13 @@ create_particular()
 	if (tries == 5) {
 	    pline(thats_enough_tries);
 	} else {
-	    (void) cant_create(&which, FALSE);
-	    whichpm = &mons[which];
+	    if (!randmonst) {
+		(void) cant_create(&which, FALSE);
+		whichpm = &mons[which];
+	    }
 	    for (i = 0; i <= multi; i++) {
+		if (randmonst)
+		    whichpm = rndmonst();
 		if (monclass != MAXMCLASSES)
 		    whichpm = mkclass(monclass, 0);
 		if (maketame) {

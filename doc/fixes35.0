@@ -80,6 +80,7 @@ the following actions can now be continued after save/restore: digging,
 hero-created and monster-created ice will eventually melt away
 extend Warning to include ice danger
 wishing for particular variety of tin contents (deep fried, broiled, etc.)
+debug-mode wishing for random monster(s) via '*'
 
 
 Platform- and/or Interface-Specific New Features
