@@ -504,11 +504,16 @@ Panic button.  Quit the game.
 Drop something.  Ex. ``d7a'' means drop seven items of object \fIa\fP.
 .lp D
 Drop several things.  In answer to the question
-``What kinds of things do you want to drop? [!%= aium]''
+``What kinds of things do you want to drop? [!%= BUCXaium]''
 you should type zero or more object symbols possibly followed by 
-`a' and/or `i' and/or `u' and/or `m'.
+`a' and/or `i' and/or `u' and/or `m'.  In addition, one or more of
+the blessed/uncursed/cursed groups may be typed.
 .sd
 .si
+DB  - drop all objects known to be blessed.
+DU  - drop all objects known to be uncursed.
+DC  - drop all objects known to be cursed.
+DX  - drop all objects of unknown B/U/C status.
 Da  - drop all objects, without asking for confirmation.
 Di  - examine your inventory before dropping anything.
 Du  - drop only unpaid objects (when in a shop).

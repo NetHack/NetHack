@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.46 $ $Date: 2002/07/28 10:45:46 $
+% $Revision: 1.47 $ $Date: 2002/08/04 16:48:05 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -677,13 +677,19 @@ Drop something.\\
 %.lp
 \item[\tb{D}]
 Drop several things.  In answer to the question
-``{\tt What kinds of things do you want to drop? [!\%= aium]}''
+``{\tt What kinds of things do you want to drop? [!\%= BUCXaium]}''
 you should type zero or more object symbols possibly followed by
-`{\tt a}' and/or `{\tt i}' and/or `{\tt u}' and/or `{\tt m}'.\\
+`{\tt a}' and/or `{\tt i}' and/or `{\tt u}' and/or `{\tt m}'.
+In addition, one or more of
+the blessed/uncursed/cursed groups may be typed.\\
 %.sd
 %.si
+{\tt DB}  --- drop all objects known to be blessed.\\
+{\tt DU}  --- drop all objects known to be uncursed.\\
+{\tt DC}  --- drop all objects known to be cursed.\\
+{\tt DX}  --- drop all objects of unknown B/U/C status.\\
 {\tt Da}  --- drop all objects, without asking for confirmation.\\
-{\tt Di}  --- examine your intentory before dropping anything.\\
+{\tt Di}  --- examine your inventory before dropping anything.\\
 {\tt Du}  --- drop only unpaid objects (when in a shop).\\
 {\tt Dm}  --- use a menu to pick which object(s) to drop.\\
 {\tt D\%u} --- drop only unpaid food.
