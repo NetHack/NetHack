@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)mondata.c	3.4	2003/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -523,20 +523,29 @@ int
 pronoun_gender(mtmp)
 register struct monst *mtmp;
 {
-	if (!canspotmon(mtmp) || !humanoid(mtmp->data))
-		return 2;
-	return mtmp->female;
+	if (is_neuter(mtmp->data) || !canspotmon(mtmp)) return 2;
+	return (humanoid(mtmp->data) || (mtmp->data->geno & G_UNIQ) ||
+		type_is_pname(mtmp->data)) ? (int)mtmp->female : 2;
 }
 
 #endif /* OVL2 */
 #ifdef OVLB
 
+/* used for nearby monsters when you go to another level */
 boolean
 levl_follower(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
-	return((boolean)(mtmp->mtame || (mtmp->data->mflags2 & M2_STALK) || is_fshk(mtmp)
-		|| (mtmp->iswiz && !mon_has_amulet(mtmp))));
+	/* monsters with the Amulet--even pets--won't follow across levels */
+	if (mon_has_amulet(mtmp)) return FALSE;
+
+	/* some monsters will follow even while intending to flee from you */
+	if (mtmp->mtame || mtmp->iswiz || is_fshk(mtmp)) return TRUE;
+
+	/* stalking types follow, but won't when fleeing unless you hold
+	   the Amulet */
+	return (boolean)((mtmp->data->mflags2 & M2_STALK) &&
+				(!mtmp->mflee || u.uhave.amulet));
 }
 
 static const short grownups[][2] = {
