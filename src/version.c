@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)version.c	3.4	2002/08/14	*/
+/*	SCCS Id: @(#)version.c	3.4	2003/02/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,7 +14,7 @@
 #include "patchlevel.h"
 #endif
 
-#define BETA_INFO "[beta20]"
+/* #define BETA_INFO "" */
 
 /* fill and return the given buffer with the nethack version string */
 char *
