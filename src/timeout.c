@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.4	2002/10/12	*/
+/*	SCCS Id: @(#)timeout.c	3.4	2002/12/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -287,10 +287,11 @@ nh_timeout()
 			break;
 		case INVIS:
 			newsym(u.ux,u.uy);
-			if (!Invis && !BInvis &&
-			    !See_invisible && !Blind) {
-				You("are no longer invisible.");
-				stop_occupation();
+			if (!Invis && !BInvis && !Blind) {
+			    You(!See_invisible ?
+				    "are no longer invisible." :
+				    "can no longer see through yourself.");
+			    stop_occupation();
 			}
 			break;
 		case SEE_INVIS:
