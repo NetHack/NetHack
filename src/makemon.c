@@ -1170,8 +1170,10 @@ rndmonst()
 
 	    rndmonst_state.choice_count = 0;
 	    /* look for first common monster */
-	    for (mndx = LOW_PM; mndx < SPECIAL_PM; mndx++)
+	    for (mndx = LOW_PM; mndx < SPECIAL_PM; mndx++) {
 		if (!uncommon(mndx)) break;
+		rndmonst_state.mchoices[mndx] = 0;
+	    }		
 	    if (mndx == SPECIAL_PM) {
 		/* evidently they've all been exterminated */
 #ifdef DEBUG
