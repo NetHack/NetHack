@@ -75,6 +75,9 @@ error VA_DECL(const char *,s)
 	VA_INIT(s, const char *);
 	/* error() may get called before tty is initialized */
 	if (iflags.window_inited) end_screen();
+#ifdef WIN32CON
+	if (iflags.rawio) set_output_mode(0);
+#endif
 	putchar('\n');
 	Vprintf(s,VA_ARGS);
 	putchar('\n');

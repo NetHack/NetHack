@@ -153,6 +153,38 @@ const char *s;
 	if(s) raw_print(s);
 }
 
+/*
+ * mode == 0	set processed console output mode.
+ * mode == 1	set raw console output mode (no control character expansion).
+ */
+void
+set_output_mode(mode)
+int mode;
+{
+	static DWORD save_output_cmode = 0;
+	static boolean initmode = FALSE;
+	DWORD cmode, mask = ENABLE_PROCESSED_OUTPUT;
+	if (!initmode) {
+		/* fetch original output mode */
+		GetConsoleMode(hConOut,&save_output_cmode);
+		initmode = TRUE;
+	}
+	if (mode == 0) {
+		cmode = save_output_cmode;
+		/* Turn ON the settings specified in the mask */
+		cmode |= mask;
+		SetConsoleMode(hConOut,cmode);
+		iflags.rawio = 0;
+	} else {
+		cmode = save_output_cmode;
+		/* Turn OFF the settings specified in the mask */
+		cmode &= ~mask;
+		SetConsoleMode(hConOut,cmode);
+		iflags.rawio = 1;
+	}
+}
+
+
 /* called by init_nhwindows() and resume_nhwindows() */
 void
 setftty()
@@ -219,6 +251,7 @@ DWORD ctrltype;
 		case CTRL_CLOSE_EVENT:
 		case CTRL_LOGOFF_EVENT:
 		case CTRL_SHUTDOWN_EVENT:
+			set_output_mode(0);  /* Allow processed output */
 			getreturn_disable = TRUE;
 #ifndef NOSAVEONHANGUP
 			hangup(0);
@@ -285,6 +318,8 @@ nttty_open()
 	cmode |= ENABLE_MOUSE_INPUT;
 #endif
 	SetConsoleMode(hConIn,cmode);
+
+	set_output_mode(1);	/* raw output mode; no tab expansion */
 	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE)) {
 		/* Unable to set control handler */
 		cmode = 0; 	/* just to have a statement to break on for debugger */

@@ -291,8 +291,19 @@ char *argv[];
 # endif
 #endif
 
-	if (!*plname)
+	if (!*plname) {
+#ifdef WIN32CON
+		boolean revert = FALSE;
+		if (!iflags.rawio) {
+			set_output_mode(1);
+			revert = TRUE;
+		}
+#endif
 		askname();
+#ifdef WIN32CON
+		if (revert && iflags.rawio) set_output_mode(0);
+#endif
+	}
 	plnamesuffix(); 	/* strip suffix from name; calls askname() */
 				/* again if suffix was whole name */
 				/* accepts any suffix */

@@ -707,7 +707,7 @@ tty_askname()
 		if(c < 'A' || (c > 'Z' && c < 'a') || c > 'z') c = '_';
 #endif
 		if (ct < (int)(sizeof plname) - 1) {
-#if defined(MICRO) || defined(WIN32CON)
+#if defined(MICRO)
 # if defined(MSDOS)
 			if (iflags.grmode) {
 				(void) putchar(c);

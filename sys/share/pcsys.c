@@ -416,6 +416,9 @@ msmsg VA_DECL(const char *, fmt)
 	if (iflags.grmode)
 		gr_finish();
 # endif
+#ifdef WIN32CON
+	if (iflags.rawio) set_output_mode(0);
+#endif
 	Vprintf(fmt, VA_ARGS);
 	flushout();
 	VA_END();

@@ -263,6 +263,9 @@ gotlock:
 # if defined(MSDOS) && defined(NO_TERMS)
 	if (grmode) gr_init();
 # endif
+#ifdef WIN32CON
+	if (!iflags.rawio) set_output_mode(1);
+#endif
 }	
 #endif /* PC_LOCKING */
 
