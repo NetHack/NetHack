@@ -432,8 +432,10 @@ int *x, *y, *mod;
 		     (ch || (iskeypad(scan)) || altseq)) {
 		     	*mod = 0;
 			return process_keystroke(&ir, &valid);
-		} else if ((ir.EventType == MOUSE_EVENT &&
-		  (ir.Event.MouseEvent.dwButtonState & MOUSEMASK))) {
+		} else if (
+		  (ir.EventType == MOUSE_EVENT &&
+		   (ir.Event.MouseEvent.dwEventFlags == 0) &&
+		   (ir.Event.MouseEvent.dwButtonState & MOUSEMASK))) {
 		  	*x = ir.Event.MouseEvent.dwMousePosition.X + 1;
 		  	*y = ir.Event.MouseEvent.dwMousePosition.Y - 1;
 
