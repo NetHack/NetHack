@@ -481,33 +481,6 @@ void FDECL(init_yyout, (FILE *));
 extern YYSTYPE yylval;
 
 int line_number = 1;
-/*
- *	This is a hack required by Michael Hamel to get things
- *	working on the Mac.
- */
-#if defined(applec) && !defined(FLEX_SCANNER) && !defined(FLEXHACK_SCANNER)
-#undef input
-#undef unput
-#define unput(c) { yytchar = (c); if (yytchar == 10) yylineno--; *yysptr++ = yytchar; }				
-# ifndef YYNEWLINE
-# define YYNEWLINE 10
-# endif
-
-char
-input()		/* Under MPW \n is chr(13)! Compensate for this. */
-{
-	if (yysptr > yysbuf) return(*--yysptr);
-	else {
-		yytchar = getc(yyin);
-		if (yytchar == '\n') {
-		    yylineno++;
-		    return(YYNEWLINE);
-		}
-		if (yytchar == EOF) return(0);
-		else		    return(yytchar);
-	}
-}
-#endif	/* applec && !FLEX_SCANNER && !FLEXHACK_SCANNER */
 
 
 /* Macros after this point can all be overridden by user definitions in
