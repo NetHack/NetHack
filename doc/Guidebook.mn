@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 2, 2003
+.ds f2 "October 29, 2004
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -683,7 +683,7 @@ List voluntary challenges you have maintained.  See the section below entitled
 .lp #dip
 Dip an object into something.
 .lp #enhance
-Advance or check weapons and spell skills.
+Advance or check weapon and spell skills.
 .lp #force
 Force a lock.
 .lp #invoke

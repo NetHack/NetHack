@@ -88,7 +88,7 @@ M-2     twoweapon toggle two-weapon combat (unless number_pad is enabled)
 M-a     adjust  adjust inventory letters
 M-c     chat    talk to someone
 M-d     dip     dip an object into something
-M-e     enhance advance or check weapons or spell skills
+M-e     enhance advance or check weapon and spell skills
 M-f     force   force a lock
 M-i     invoke  invoke an object's special powers
 M-j     jump    jump to another location

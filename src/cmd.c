@@ -1548,7 +1548,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"conduct", "list voluntary challenges you have maintained",
 						doconduct, TRUE},
 	{"dip", "dip an object into something", dodip, FALSE},
-	{"enhance", "advance or check weapons and spell skills",
+	{"enhance", "advance or check weapon and spell skills",
 						enhance_weapon_skill, TRUE},
 	{"force", "force a lock", doforce, FALSE},
 	{"invoke", "invoke an object's powers", doinvoke, TRUE},
