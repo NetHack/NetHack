@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.4	2002/09/07	*/
+/*	SCCS Id: @(#)steal.c	3.4	2003/11/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -195,6 +195,10 @@ boolean unchain_ball;	/* whether to unpunish or just unwield */
 	    else if (obj == uarmg) (void) Gloves_off();
 	    else if (obj == uarmh) (void) Helmet_off();
 	    else if (obj == uarms) (void) Shield_off();
+#ifdef TOURIST
+	    else if (obj == uarmu) (void) Shirt_off();
+#endif
+	    /* catchall -- should never happen */
 	    else setworn((struct obj *)0, obj->owornmask & W_ARMOR);
 	} else if (obj->owornmask & W_AMUL) {
 	    Amulet_off();

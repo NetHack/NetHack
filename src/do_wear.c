@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2003/05/25	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2003/11/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -35,6 +35,10 @@ STATIC_PTR int NDECL(Boots_on);
 STATIC_DCL int NDECL(Cloak_on);
 STATIC_PTR int NDECL(Helmet_on);
 STATIC_PTR int NDECL(Gloves_on);
+STATIC_PTR int NDECL(Shield_on);
+#ifdef TOURIST
+STATIC_PTR int NDECL(Shirt_on);
+#endif
 STATIC_DCL void NDECL(Amulet_on);
 STATIC_DCL void FDECL(Ring_off_or_gone, (struct obj *, BOOLEAN_P));
 STATIC_PTR int FDECL(select_off, (struct obj *));
@@ -128,7 +132,7 @@ Boots_off()
     int otyp = uarmf->otyp;
     long oldprop = u.uprops[objects[otyp].oc_oprop].extrinsic & ~WORN_BOOTS;
 
-
+    context.takeoff.mask &= ~W_ARMF;
 	/* For levitation, float_down() returns if Levitation, so we
 	 * must do a setworn() _before_ the levitation case.
 	 */
@@ -150,7 +154,8 @@ Boots_off()
 		}
 		break;
 	case ELVEN_BOOTS:
-		if (!oldprop && !HStealth && !BStealth && !context.takeoff.cancelled_don) {
+		if (!oldprop && !HStealth && !BStealth &&
+				!context.takeoff.cancelled_don) {
 			makeknown(otyp);
 			You("sure are noisy.");
 		}
@@ -232,7 +237,7 @@ Cloak_off()
     int otyp = uarmc->otyp;
     long oldprop = u.uprops[objects[otyp].oc_oprop].extrinsic & ~WORN_CLOAK;
 
-
+    context.takeoff.mask &= ~W_ARMC;
 	/* For mummy wrapping, taking it off first resets `Invisible'. */
     setworn((struct obj *)0, W_ARMC);
     switch (otyp) {
@@ -333,6 +338,8 @@ Helmet_on()
 int
 Helmet_off()
 {
+    context.takeoff.mask &= ~W_ARMH;
+
     switch(uarmh->otyp) {
 	case FEDORA:
 	case HELMET:
@@ -402,6 +409,8 @@ Gloves_off()
     long oldprop =
 	u.uprops[objects[uarmg->otyp].oc_oprop].extrinsic & ~WORN_GLOVES;
 
+    context.takeoff.mask &= ~W_ARMG;
+
     switch(uarmg->otyp) {
 	case LEATHER_GLOVES:
 	    break;
@@ -450,11 +459,11 @@ Gloves_off()
     return 0;
 }
 
-/*
 STATIC_OVL int
 Shield_on()
 {
-    switch(uarms->otyp) {
+/*
+    switch (uarms->otyp) {
 	case SMALL_SHIELD:
 	case ELVEN_SHIELD:
 	case URUK_HAI_SHIELD:
@@ -465,15 +474,16 @@ Shield_on()
 		break;
 	default: impossible(unknown_type, c_shield, uarms->otyp);
     }
+*/
     return 0;
 }
-*/
 
 int
 Shield_off()
 {
+    context.takeoff.mask &= ~W_ARMS;
 /*
-    switch(uarms->otyp) {
+    switch (uarms->otyp) {
 	case SMALL_SHIELD:
 	case ELVEN_SHIELD:
 	case URUK_HAI_SHIELD:
@@ -489,6 +499,38 @@ Shield_off()
     return 0;
 }
 
+#ifdef TOURIST
+STATIC_OVL int
+Shirt_on()
+{
+/*
+    switch (uarmu->otyp) {
+	case HAWAIIAN_SHIRT:
+	case T_SHIRT:
+		break;
+	default: impossible(unknown_type, c_shirt, uarmu->otyp);
+    }
+*/
+    return 0;
+}
+
+int
+Shirt_off()
+{
+    context.takeoff.mask &= ~W_ARMU;
+/*
+    switch (uarmu->otyp) {
+	case HAWAIIAN_SHIRT:
+	case T_SHIRT:
+		break;
+	default: impossible(unknown_type, c_shirt, uarmu->otyp);
+    }
+*/
+    setworn((struct obj *)0, W_ARMU);
+    return 0;
+}
+#endif	/*TOURIST*/
+
 /* This must be done in worn.c, because one of the possible intrinsics conferred
  * is fire resistance, and we have to immediately set HFire_resistance in worn.c
  * since worn.c will check it before returning.
@@ -503,6 +545,7 @@ Armor_on()
 int
 Armor_off()
 {
+    context.takeoff.mask &= ~W_ARM;
     setworn((struct obj *)0, W_ARM);
     context.takeoff.cancelled_don = FALSE;
     return 0;
@@ -514,6 +557,7 @@ Armor_off()
 int
 Armor_gone()
 {
+    context.takeoff.mask &= ~W_ARM;
     setnotworn(uarm);
     context.takeoff.cancelled_don = FALSE;
     return 0;
@@ -573,6 +617,8 @@ Amulet_on()
 void
 Amulet_off()
 {
+    context.takeoff.mask &= ~W_AMUL;
+
     switch(uamul->otyp) {
 	case AMULET_OF_ESP:
 		/* need to update ability before calling see_monsters() */
@@ -729,9 +775,10 @@ Ring_off_or_gone(obj,gone)
 register struct obj *obj;
 boolean gone;
 {
-    register long mask = obj->owornmask & W_RING;
+    long mask = (obj->owornmask & W_RING);
     int old_attrib, which;
 
+    context.takeoff.mask &= ~mask;
     if(!(u.uprops[objects[obj->otyp].oc_oprop].extrinsic & mask))
 	impossible("Strange... I didn't know you had that ring.");
     if(gone) setnotworn(obj);
@@ -882,6 +929,7 @@ register struct obj *otmp;
 {
 	boolean was_blind = Blind, changed = FALSE;
 
+	context.takeoff.mask &= ~W_TOOL;
 	setworn((struct obj *)0, otmp->owornmask);
 	off_msg(otmp);
 
@@ -916,22 +964,51 @@ register struct obj *otmp;
 void
 set_wear()
 {
+#ifdef TOURIST
+	if (uarmu) (void) Shirt_on();
+#endif
 	if (uarm)  (void) Armor_on();
 	if (uarmc) (void) Cloak_on();
 	if (uarmf) (void) Boots_on();
 	if (uarmg) (void) Gloves_on();
 	if (uarmh) (void) Helmet_on();
-/*	if (uarms) (void) Shield_on(); */
+	if (uarms) (void) Shield_on();
 }
 
+/* check whether the target object is currently being put on (or taken off) */
 boolean
-donning(otmp)
+donning(otmp)		/* also checks for doffing */
 register struct obj *otmp;
 {
-    return((boolean)((otmp == uarmf && (afternmv == Boots_on || afternmv == Boots_off))
-	|| (otmp == uarmh && (afternmv == Helmet_on || afternmv == Helmet_off))
-	|| (otmp == uarmg && (afternmv == Gloves_on || afternmv == Gloves_off))
-	|| (otmp == uarm && (afternmv == Armor_on || afternmv == Armor_off))));
+ /* long what = (occupation == take_off) ? context.takeoff.what : 0L; */
+    long what = context.takeoff.what;	/* if nonzero, occupation is implied */
+    boolean result = FALSE;
+
+    if (otmp == uarm)
+	result = (afternmv == Armor_on || afternmv == Armor_off ||
+		  what == WORN_ARMOR);
+#ifdef TOURIST
+    else if (otmp == uarmu)
+	result = (afternmv == Shirt_on || afternmv == Shirt_off ||
+		  what == WORN_SHIRT);
+#endif
+    else if (otmp == uarmc)
+	result = (afternmv == Cloak_on || afternmv == Cloak_off ||
+		  what == WORN_CLOAK);
+    else if (otmp == uarmf)
+	result = (afternmv == Boots_on || afternmv == Boots_off ||
+		  what == WORN_BOOTS);
+    else if (otmp == uarmh)
+	result = (afternmv == Helmet_on || afternmv == Helmet_off ||
+		  what == WORN_HELMET);
+    else if (otmp == uarmg)
+	result = (afternmv == Gloves_on || afternmv == Gloves_off ||
+		  what == WORN_GLOVES);
+    else if (otmp == uarms)
+	result = (afternmv == Shield_on || afternmv == Shield_off ||
+		  what == WORN_SHIELD);
+
+    return result;
 }
 
 void
@@ -941,11 +1018,15 @@ cancel_don()
 	 * wasting time on it (and don't dereference it when donning would
 	 * otherwise finish)
 	 */
-	context.takeoff.cancelled_don = (afternmv == Boots_on || afternmv == Helmet_on ||
-			 afternmv == Gloves_on || afternmv == Armor_on);
+	context.takeoff.cancelled_don = (afternmv == Boots_on ||
+					 afternmv == Helmet_on ||
+					 afternmv == Gloves_on ||
+					 afternmv == Armor_on);
 	afternmv = 0;
 	nomovemsg = (char *)0;
 	multi = 0;
+	context.takeoff.delay = 0;
+	context.takeoff.what = 0L;
 }
 
 static NEARDATA const char clothes[] = {ARMOR_CLASS, 0};
@@ -1362,7 +1443,10 @@ dowear()
 		nomovemsg = "You finish your dressing maneuver.";
 	} else {
 		if(is_cloak(otmp)) (void) Cloak_on();
-/*		if(is_shield(otmp)) (void) Shield_on(); */
+		if (is_shield(otmp)) (void) Shield_on();
+#ifdef TOURIST
+		if (is_shirt(otmp)) (void) Shirt_on();
+#endif
 		on_msg(otmp);
 	}
 	context.takeoff.mask = context.takeoff.what = 0L;
@@ -1773,57 +1857,59 @@ register struct obj *otmp;
 STATIC_OVL struct obj *
 do_takeoff()
 {
-	register struct obj *otmp = (struct obj *)0;
+    struct obj *otmp = (struct obj *)0;
+    struct takeoff_info *doff = &context.takeoff;
 
-	if (context.takeoff.what == W_WEP) {
-	  if(!cursed(uwep)) {
+    if (doff->what == W_WEP) {
+	if (!cursed(uwep)) {
 	    setuwep((struct obj *) 0);
 	    You("are empty %s.", body_part(HANDED));
 	    u.twoweap = FALSE;
-	  }
-	} else if (context.takeoff.what == W_SWAPWEP) {
-	  setuswapwep((struct obj *) 0);
-	  You("no longer have a second weapon readied.");
-	  u.twoweap = FALSE;
-	} else if (context.takeoff.what == W_QUIVER) {
-	  setuqwep((struct obj *) 0);
-	  You("no longer have ammunition readied.");
-	} else if (context.takeoff.what == WORN_ARMOR) {
-	  otmp = uarm;
-	  if(!cursed(otmp)) (void) Armor_off();
-	} else if (context.takeoff.what == WORN_CLOAK) {
-	  otmp = uarmc;
-	  if(!cursed(otmp)) (void) Cloak_off();
-	} else if (context.takeoff.what == WORN_BOOTS) {
-	  otmp = uarmf;
-	  if(!cursed(otmp)) (void) Boots_off();
-	} else if (context.takeoff.what == WORN_GLOVES) {
-	  otmp = uarmg;
-	  if(!cursed(otmp)) (void) Gloves_off();
-	} else if (context.takeoff.what == WORN_HELMET) {
-	  otmp = uarmh;
-	  if(!cursed(otmp)) (void) Helmet_off();
-	} else if (context.takeoff.what == WORN_SHIELD) {
-	  otmp = uarms;
-	  if(!cursed(otmp)) (void) Shield_off();
+	}
+    } else if (doff->what == W_SWAPWEP) {
+	setuswapwep((struct obj *) 0);
+	You("no longer have a second weapon readied.");
+	u.twoweap = FALSE;
+    } else if (doff->what == W_QUIVER) {
+	setuqwep((struct obj *) 0);
+	You("no longer have ammunition readied.");
+    } else if (doff->what == WORN_ARMOR) {
+	otmp = uarm;
+	if (!cursed(otmp)) (void) Armor_off();
+    } else if (doff->what == WORN_CLOAK) {
+	otmp = uarmc;
+	if (!cursed(otmp)) (void) Cloak_off();
+    } else if (doff->what == WORN_BOOTS) {
+	otmp = uarmf;
+	if (!cursed(otmp)) (void) Boots_off();
+    } else if (doff->what == WORN_GLOVES) {
+	otmp = uarmg;
+	if (!cursed(otmp)) (void) Gloves_off();
+    } else if (doff->what == WORN_HELMET) {
+	otmp = uarmh;
+	if (!cursed(otmp)) (void) Helmet_off();
+    } else if (doff->what == WORN_SHIELD) {
+	otmp = uarms;
+	if (!cursed(otmp)) (void) Shield_off();
 #ifdef TOURIST
-	} else if (context.takeoff.what == WORN_SHIRT) {
-	  otmp = uarmu;
-	  if(!cursed(otmp))
-	    setworn((struct obj *)0, uarmu->owornmask & W_ARMOR);
+    } else if (doff->what == WORN_SHIRT) {
+	otmp = uarmu;
+	if (!cursed(otmp)) (void) Shirt_off();
 #endif
-	} else if (context.takeoff.what == WORN_AMUL) {
-	  otmp = uamul;
-	  if(!cursed(otmp)) Amulet_off();
-	} else if (context.takeoff.what == LEFT_RING) {
-	  otmp = uleft;
-	  if(!cursed(otmp)) Ring_off(uleft);
-	} else if (context.takeoff.what == RIGHT_RING) {
-	  otmp = uright;
-	  if(!cursed(otmp)) Ring_off(uright);
-	} else if (context.takeoff.what == WORN_BLINDF) {
-	  if (!cursed(ublindf)) Blindf_off(ublindf);
-	} else impossible("do_takeoff: taking off %lx", context.takeoff.what);
+    } else if (doff->what == WORN_AMUL) {
+	otmp = uamul;
+	if (!cursed(otmp)) Amulet_off();
+    } else if (doff->what == LEFT_RING) {
+	otmp = uleft;
+	if (!cursed(otmp)) Ring_off(uleft);
+    } else if (doff->what == RIGHT_RING) {
+	otmp = uright;
+	if (!cursed(otmp)) Ring_off(uright);
+    } else if (doff->what == WORN_BLINDF) {
+	if (!cursed(ublindf)) Blindf_off(ublindf);
+    } else {
+	impossible("do_takeoff: taking off %lx", doff->what);
+    }
 
 	return(otmp);
 }
@@ -1834,84 +1920,83 @@ take_off()
 {
 	register int i;
 	register struct obj *otmp;
+	struct takeoff_info *doff = &context.takeoff;
 
-	if (context.takeoff.what) {
-	    if (context.takeoff.delay > 0) {
-		context.takeoff.delay--;
+	if (doff->what) {
+	    if (doff->delay > 0) {
+		doff->delay--;
 		return(1);	/* still busy */
 	    } else {
 		if ((otmp = do_takeoff())) off_msg(otmp);
 	    }
-	    context.takeoff.mask &= ~context.takeoff.what;
-	    context.takeoff.what = 0L;
+	    doff->mask &= ~doff->what;
+	    doff->what = 0L;
 	}
 
 	for(i = 0; takeoff_order[i]; i++)
-	    if(context.takeoff.mask & takeoff_order[i]) {
-		context.takeoff.what = takeoff_order[i];
+	    if(doff->mask & takeoff_order[i]) {
+		doff->what = takeoff_order[i];
 		break;
 	    }
 
 	otmp = (struct obj *) 0;
-	context.takeoff.delay = 0;
+	doff->delay = 0;
 
-	if (context.takeoff.what == 0L) {
-	  You("finish %s.", context.takeoff.disrobing);
+	if (doff->what == 0L) {
+	  You("finish %s.", doff->disrobing);
 	  return 0;
-	} else if (context.takeoff.what == W_WEP) {
-	  context.takeoff.delay = 1;
-	} else if (context.takeoff.what == W_SWAPWEP) {
-	  context.takeoff.delay = 1;
-	} else if (context.takeoff.what == W_QUIVER) {
-	  context.takeoff.delay = 1;
-	} else if (context.takeoff.what == WORN_ARMOR) {
+	} else if (doff->what == W_WEP) {
+	  doff->delay = 1;
+	} else if (doff->what == W_SWAPWEP) {
+	  doff->delay = 1;
+	} else if (doff->what == W_QUIVER) {
+	  doff->delay = 1;
+	} else if (doff->what == WORN_ARMOR) {
 	  otmp = uarm;
 	  /* If a cloak is being worn, add the time to take it off and put
 	   * it back on again.  Kludge alert! since that time is 0 for all
 	   * known cloaks, add 1 so that it actually matters...
 	   */
-	  if (uarmc) context.takeoff.delay += 2 * objects[uarmc->otyp].oc_delay + 1;
-	} else if (context.takeoff.what == WORN_CLOAK) {
+	  if (uarmc) doff->delay += 2 * objects[uarmc->otyp].oc_delay + 1;
+	} else if (doff->what == WORN_CLOAK) {
 	  otmp = uarmc;
-	} else if (context.takeoff.what == WORN_BOOTS) {
+	} else if (doff->what == WORN_BOOTS) {
 	  otmp = uarmf;
-	} else if (context.takeoff.what == WORN_GLOVES) {
+	} else if (doff->what == WORN_GLOVES) {
 	  otmp = uarmg;
-	} else if (context.takeoff.what == WORN_HELMET) {
+	} else if (doff->what == WORN_HELMET) {
 	  otmp = uarmh;
-	} else if (context.takeoff.what == WORN_SHIELD) {
+	} else if (doff->what == WORN_SHIELD) {
 	  otmp = uarms;
 #ifdef TOURIST
-	} else if (context.takeoff.what == WORN_SHIRT) {
+	} else if (doff->what == WORN_SHIRT) {
 	  otmp = uarmu;
 	  /* add the time to take off and put back on armor and/or cloak */
-	  if (uarm)  context.takeoff.delay += 2 * objects[uarm->otyp].oc_delay;
-	  if (uarmc) context.takeoff.delay += 2 * objects[uarmc->otyp].oc_delay + 1;
+	  if (uarm)  doff->delay += 2 * objects[uarm->otyp].oc_delay;
+	  if (uarmc) doff->delay += 2 * objects[uarmc->otyp].oc_delay + 1;
 #endif
-	} else if (context.takeoff.what == WORN_AMUL) {
-	  context.takeoff.delay = 1;
-	} else if (context.takeoff.what == LEFT_RING) {
-	  context.takeoff.delay = 1;
-	} else if (context.takeoff.what == RIGHT_RING) {
-	  context.takeoff.delay = 1;
-	} else if (context.takeoff.what == WORN_BLINDF) {
-	  context.takeoff.delay = 2;
+	} else if (doff->what == WORN_AMUL) {
+	  doff->delay = 1;
+	} else if (doff->what == LEFT_RING) {
+	  doff->delay = 1;
+	} else if (doff->what == RIGHT_RING) {
+	  doff->delay = 1;
+	} else if (doff->what == WORN_BLINDF) {
+	  doff->delay = 2;
 	} else {
-	  impossible("take_off: taking off %lx", context.takeoff.what);
+	  impossible("take_off: taking off %lx", doff->what);
 	  return 0;	/* force done */
 	}
 
-	if (otmp) context.takeoff.delay += objects[otmp->otyp].oc_delay;
+	if (otmp) doff->delay += objects[otmp->otyp].oc_delay;
 
 	/* Since setting the occupation now starts the counter next move, that
-         * would always produce a delay 1 too big per item unless we subtract
+	 * would always produce a delay 1 too big per item unless we subtract
 	 * 1 here to account for it.
 	 */
-	if (context.takeoff.delay>0) context.takeoff.delay--;
+	if (doff->delay > 0) doff->delay--;
 
-	set_occupation(take_off,
-		(context.takeoff.disrobing[0]) ?
-		context.takeoff.disrobing : (char *)0, 0);
+	set_occupation(take_off, doff->disrobing, 0);
 	return(1);		/* get busy */
 }
 
@@ -2002,6 +2087,7 @@ int retry;
     return 0;
 }
 
+/* hit by destroy armor scroll/black dragon breath/monster spell */
 int
 destroy_arm(atmp)
 register struct obj *atmp;
@@ -2012,11 +2098,12 @@ register struct obj *atmp;
 			(!obj_resists(otmp, 0, 90)))
 
 	if (DESTROY_ARM(uarmc)) {
-		Your("%s crumbles and turns to dust!", cloak_simple_name(uarmc));
+		if (donning(otmp)) cancel_don();
+		Your("%s crumbles and turns to dust!",
+		     cloak_simple_name(uarmc));
 		(void) Cloak_off();
 		useup(otmp);
 	} else if (DESTROY_ARM(uarm)) {
-		/* may be disintegrated by spell or dragon breath... */
 		if (donning(otmp)) cancel_don();
 		Your("armor turns to dust and falls to the %s!",
 			surface(u.ux,u.uy));
@@ -2024,7 +2111,9 @@ register struct obj *atmp;
 		useup(otmp);
 #ifdef TOURIST
 	} else if (DESTROY_ARM(uarmu)) {
+		if (donning(otmp)) cancel_don();
 		Your("shirt crumbles into tiny threads and falls apart!");
+		(void) Shirt_off();
 		useup(otmp);
 #endif
 	} else if (DESTROY_ARM(uarmh)) {
@@ -2044,12 +2133,16 @@ register struct obj *atmp;
 		(void) Boots_off();
 		useup(otmp);
 	} else if (DESTROY_ARM(uarms)) {
+		if (donning(otmp)) cancel_don();
 		Your("shield crumbles away!");
 		(void) Shield_off();
 		useup(otmp);
-	} else	return(0);		/* could not destroy anything */
+	} else {
+		return 0;		/* could not destroy anything */
+	}
 
 #undef DESTROY_ARM
+	stop_occupation();
 	return(1);
 }
 
