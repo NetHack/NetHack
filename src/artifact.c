@@ -1332,6 +1332,15 @@ void arti_speak(obj)
 	return;
 }
 
+boolean
+artifact_has_invprop(otmp, inv_prop)
+struct obj *otmp;
+uchar inv_prop;
+{
+	const struct artifact *arti = get_artifact(otmp);
+
+	return((boolean)(arti && (arti->inv_prop == inv_prop)));
+}
 
 #endif /* OVLB */
 

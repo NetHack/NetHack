@@ -77,6 +77,7 @@ E int NDECL(doinvoke);
 E void FDECL(arti_speak, (struct obj *));
 E boolean FDECL(artifact_light, (struct obj *));
 E long FDECL(spec_m2, (struct obj *));
+E boolean FDECL(artifact_has_invprop, (struct obj *,UCHAR_P));
 
 /* ### attrib.c ### */
 

@@ -3,10 +3,6 @@ Buglist: actual bugs that may get fixed someday
 -----------------------------------------------------------------------------
 
 =============================================================================
-Using the '>' command to end controlled levitation doesn't set the
-Heart of Ahriman's invocation timeout, allowing the player to resume
-levitating immediately via #invoke.
-
 A funny thing happened at the portal to Rodney's tower. Wearing
 levitation boots, I floated onto the portal, and was ported to the
 tower. Then I took off my boots, and got "You activated the magic
@@ -250,17 +246,13 @@ small and quick (so the missile whizzed by)?  Is the monster flying or on the
 ground?  Is the player levitating?  Is the player unusually short or tall
 (i.e., if the player is polymorphed), etc....
 
-There is a problem with alignment: if you change alignment, peaceful monsters
-all stay the same and killing them is now bad for your new alignment--and thus
-good for your old alignment.  The "obvious" solution is to change the
-peacefulness and relative alignment of the monsters whenever your alignment
-changes.  This does not work because since monsters only have a percentage
-chance of peacefulness due to alignment, you can change and change back,
-whereupon the monster peacefulness will be distributed differently than when
-you started.  This also ignores monsters on other levels, whose peacefulness
-distribution would not change--for consistency, if you changed from lawful to
-chaotic and back, since peacefulness of monsters on your own level got
-redistributed, so would peacefulness on those other levels.
+Monsters don't change either peacefulness or malign when the player changes
+alignment.  This can't be fixed because it would be impossible to ensure that
+two alignment switches put the monsters back the way they were.  For one thing,
+monster peacefulness is based on the player's alignment record as well as his
+type (and we don't want to change peacefulness every time the record changes!),
+and for another, the monster's peacefulness might have changed from its initial
+value and two switches wouldn't bring it back to normal.
 
 You can open/close doors diagonally, but cannot enter them diagonally.  This
 seems inconsistent.  [Comment:  The main reason why this is blocked is

@@ -711,8 +711,21 @@ dodown()
 	if (Levitation) {
 	    if ((HLevitation & I_SPECIAL) || (ELevitation & W_ARTI)) {
 		/* end controlled levitation */
-			if (float_down(I_SPECIAL|TIMEOUT, W_ARTI))
-			    return (1);   /* came down, so moved */
+		if (ELevitation & W_ARTI) {
+		    struct obj *obj;
+
+		    for(obj = invent; obj; obj = obj->nobj) {
+			if (obj->oartifact &&
+					artifact_has_invprop(obj,LEVITATION)) {
+			    if (obj->age < monstermoves)
+				obj->age = monstermoves + rnz(100);
+			    else
+				obj->age += rnz(100);
+			}
+		    }
+		}
+		if (float_down(I_SPECIAL|TIMEOUT, W_ARTI))
+		    return (1);   /* came down, so moved */
 	    }
 	    floating_above(stairs_down ? "stairs" : ladder_down ?
 			   "ladder" : surface(u.ux, u.uy));
