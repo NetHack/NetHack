@@ -101,7 +101,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
         sprintf(buf, "Cannot load common control library.\n"
               "Visit %s\n"
               "to download the common control library.", COMCTL_URL);
-        prepanic(buf);
+        panic(buf);
     }
     if (major < MIN_COMCTLMAJOR
         || (major == MIN_COMCTLMAJOR && minor < MIN_COMCTLMINOR))
@@ -111,7 +111,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
               "NetHack requires at least version %d.%d\n"
               "Visit %s\n"
               "for an updated version.", MIN_COMCTLMAJOR, MIN_COMCTLMINOR, COMCTL_URL);
-        prepanic(buf);
+        panic(buf);
     }
 	ZeroMemory(&InitCtrls, sizeof(InitCtrls));
 	InitCtrls.dwSize = sizeof(InitCtrls);
