@@ -113,6 +113,9 @@
 #define _NAIVE_DOS_REGS
 #include <stdlib.h>
 #include <string.h>	/* Provides prototypes of strncmpi(), etc.     */
+# ifndef M
+#define M(c)		((char) (0x80 | (c)))
+# endif
 #endif
 
 /*
