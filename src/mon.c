@@ -640,7 +640,7 @@ meatmetal(mtmp)
 			pline("%s spits %s out in disgust!",
 			      Monnam(mtmp), distant_name(otmp,doname));
 		    }
-		/* KMH -- Don't eat undigestable/choking objects */
+		/* KMH -- Don't eat indigestible/choking objects */
 		} else if (otmp->otyp != AMULET_OF_STRANGULATION &&
 				otmp->otyp != RIN_SLOW_DIGESTION) {
 		    if (cansee(mtmp->mx,mtmp->my) && flags.verbose)

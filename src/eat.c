@@ -1892,9 +1892,9 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		stackobj(otmp);
 		return 1;
 	}
-	/* KMH -- Slow digestion is... undigestable */
+	/* KMH -- Slow digestion is... indigestible */
 	if (otmp->otyp == RIN_SLOW_DIGESTION) {
-		pline("This ring is undigestable!");
+		pline("This ring is indigestible!");
 		(void) rottenfood(otmp);
 		if (otmp->dknown && !objects[otmp->otyp].oc_name_known
 				&& !objects[otmp->otyp].oc_uname)
