@@ -1444,6 +1444,7 @@ register struct attack *mattk;
 	    case AD_SLIM:
 	    	if (!rn2(4) && mdef->data != &mons[PM_FIRE_VORTEX] &&
 	    			mdef->data != &mons[PM_FIRE_ELEMENTAL] &&
+	    			mdef->data != &mons[PM_SALAMANDER] &&
 	    			mdef->data != &mons[PM_GREEN_SLIME]) {
 	    	    You("turn %s into slime.", mon_nam(mdef));
 	    	    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE);

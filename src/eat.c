@@ -491,6 +491,7 @@ register int pm;
 		if (!Slimed && !Unchanging &&
 			youmonst.data != &mons[PM_FIRE_VORTEX] &&
 			youmonst.data != &mons[PM_FIRE_ELEMENTAL] &&
+			youmonst.data != &mons[PM_SALAMANDER] &&
 			youmonst.data != &mons[PM_GREEN_SLIME]) {
 		    You("don't feel very well.");
 		    Slimed = 10L;

@@ -1416,6 +1416,7 @@ do_stone:
 		hitmsg(mtmp, mattk);
 		if (!uncancelled) break;
 		if (youmonst.data == &mons[PM_FIRE_VORTEX] ||
+				youmonst.data == &mons[PM_SALAMANDER] ||
 				youmonst.data == &mons[PM_FIRE_ELEMENTAL]) {
 		    pline_The("slime burns away!");
 		    dmg = 0;

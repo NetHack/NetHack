@@ -404,7 +404,7 @@ int	mntmp;
 		You("no longer feel sick.");
 	}
 	if (Slimed) {
-	    if (mntmp == PM_FIRE_VORTEX || mntmp == PM_FIRE_ELEMENTAL) {
+	    if (mntmp == PM_FIRE_VORTEX || mntmp == PM_FIRE_ELEMENTAL || mntmp == PM_SALAMANDER) {
 		pline_The("slime burns away!");
 		Slimed = 0L;
 		flags.botl = 1;

@@ -1018,6 +1018,7 @@ label2:			if (mdef->mhp > 0) return 0;
 	    case AD_SLIM:
 	    	if (!rn2(4) && mdef->data != &mons[PM_FIRE_VORTEX] &&
 	    			mdef->data != &mons[PM_FIRE_ELEMENTAL] &&
+	    			mdef->data != &mons[PM_SALAMANDER] &&
 	    			mdef->data != &mons[PM_GREEN_SLIME]) {
 	    	    if (vis) pline("%s turns into slime.", Monnam(mdef));
 	    	    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE);
