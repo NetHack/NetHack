@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)data.base	3.4	2001/09/01
+#	SCCS Id: @(#)data.base	3.4	2002/05/20
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -3329,6 +3329,12 @@ sasquatch
 	addition will protect anyone who carries it from magic
 	missile attacks.  When invoked, it causes conflict in the
 	area around it.
+scimitar
+	Oh, how handsome, how noble was the Vizier Ali Tebelin,
+	my father, as he stood there in the midst of the shot, his
+	scimitar in his hand, his face black with powder!  How his
+	enemies fled before hiim!
+		[ The Count of Monte Cristo, by Alexandre Dumas ]
 scorpio*
 	A sub-species of the spider (_Scorpionidae_), the scorpion
 	distinguishes itself from them by having a lower body that
