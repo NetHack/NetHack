@@ -213,21 +213,22 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 
 			default: {
-				WORD c[4];
+				WORD c;
 				BYTE kbd_state[256];
-				
+
+				c = 0;
 				ZeroMemory(kbd_state, sizeof(kbd_state));
-				ZeroMemory(c, sizeof(c));
 				GetKeyboardState(kbd_state);
-				
-				if( ToAscii( LOWORD(wParam), 0, kbd_state, c, 0)==1 ) {
-					NHEVENT_KBD(c[0]);
+
+				if( ToAscii( wParam, (lParam>>16)&0xFF, kbd_state, &c, 0) ) {
+					NHEVENT_KBD( c&0xFF );
 					return 0;
 				} else {
 					return 1;
 				}
-			} 
 			}
+
+			} /* end switch */
 		} break;
 
 		case WM_COMMAND:
