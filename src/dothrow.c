@@ -169,6 +169,11 @@ int shotlimit;
 		otmp = obj;
 		if (otmp->owornmask && otmp != uball)
 		    remove_worn_item(otmp);
+		else if ((obj->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER)) != 0) {
+		    /* wielded ball, special case */
+		    setworn((struct obj *)0,
+			    (obj->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER)));
+		}
 	    }
 	    freeinv(otmp);
 	    throwit(otmp, wep_mask, twoweap);
