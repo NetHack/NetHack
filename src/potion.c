@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2002/03/05	*/
+/*	SCCS Id: @(#)potion.c	3.4	2002/03/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1480,7 +1480,7 @@ register struct obj *obj;
 			} else {
 			    if (!Blind) {
 				    boolean oq1 = obj->quan == 1L;
-				    pline_The("spellbook%s fade%s.",
+				    pline_The("spellbook%s %s.",
 					oq1 ? "" : "s", otense(obj, "fade"));
 			    }
 			    if(obj->unpaid && costly_spot(u.ux, u.uy)) {
