@@ -141,6 +141,15 @@ DO_LEX  = LEX_MSG
 #DO_YACC  = YACC_ACT
 #DO_LEX   = LEX_ACT
 
+# Wilbur Streett's Win32 ports of GNU bison and flex are available at:
+#    http://www.monmouth.com/~wstreett/lex-yacc/lex-yacc.html
+#
+# To use them, download the executables and templates (bison.simple,
+# bison.hairy) to some directory, and set the environment variables
+# BISON_SIMPLE and BISON_HAIRY to point to this directory.
+#
+# The following settings are configured for Wilbur Streett's ports.
+
 # - Specify your yacc and lex programs (or work-alikes) here.
 
 YACC	= bison -y
@@ -157,8 +166,10 @@ LEX	= flex
 FLEXSKEL =
 #FLEXSKEL = -S../tools/flex.ske
 
-YTABC   = y.tab.c
-YTABH   = y.tab.h
+#YTABC   = y.tab.c
+#YTABH   = y.tab.h
+YTABC   = y_tab.c
+YTABH   = y_tab.h
 LEXYYC  = lex.yy.c
 
 #
