@@ -1600,6 +1600,7 @@ struct obj *obj, *otmp;
 			    (void) get_obj_location(obj, &oox, &ooy, 0);
 			    if (!animate_statue(obj, oox, ooy,
 						ANIMATE_SPELL, (int *)0)) {
+				struct obj *item;
 makecorpse:			if (mons[obj->corpsenm].geno &
 							(G_NOCORPSE|G_UNIQ)) {
 				    res = 0;
@@ -1607,7 +1608,12 @@ makecorpse:			if (mons[obj->corpsenm].geno &
 				}
 				/* Unlikely to get here since genociding
 				 * monsters also sets the G_NOCORPSE flag.
+				 * Drop the contents, poly_obj looses them.
 				 */
+				while ((item = obj->cobj) != 0) {
+				    obj_extract_self(item);
+				    place_object(item, obj->ox, obj->oy);
+				}
 				obj = poly_obj(obj, CORPSE);
 				break;
 			    }
