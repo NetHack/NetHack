@@ -2362,6 +2362,7 @@ autopickup_exception=">* cursed*"
 The first example above will result in autopickup of any type of arrow.
 The second example results in the exclusion of any corpse from autopickup.
 The last example results in the exclusion of items known to be cursed from autopickup.
+A `never pickup' rule takes precedence over an `always pickup' rule if both match.
 .hn 2
 Configuring User Sounds
 .pg

@@ -2848,7 +2848,7 @@ boolean setinitial,setfromfile;
 #ifdef AUTOPICKUP_EXCEPTIONS
     } else if (!strcmp("autopickup_exception", optname)) {
     	boolean retval;
-	int pick_cnt, pick_idx, opt_idx = 0, pass;
+	int pick_cnt, pick_idx, opt_idx, pass;
 	int totalapes = 0, numapes[2] = {0,0};
 	menu_item *pick_list = (menu_item *)0;
 	anything any;
@@ -2857,31 +2857,31 @@ boolean setinitial,setfromfile;
 	static const char *action_titles[] = {
 		"a", "add new autopickup exception",
 		"l", "list autopickup exceptions",
-		"r", "remove existing autopickup exception"
+		"r", "remove existing autopickup exception",
+		"e", "exit this menu",
 	};
-	totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
 ape_again:
-	if (totalapes > 0) {
-		tmpwin = create_nhwindow(NHW_MENU);
-		start_menu(tmpwin);
-		any.a_int = 0;
-		for (i = 0; i < (totalapes ? SIZE(action_titles) :
-				 SIZE(action_titles) - 4); i += 2) {
-			any.a_int++;
-			add_menu(tmpwin, NO_GLYPH, &any, *action_titles[i],
-			      0, ATR_NONE, action_titles[i+1], MENU_UNSELECTED);
-        	}
-		end_menu(tmpwin, "Do what with autopickup exception list?");
-		if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
-			for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
-				opt_idx = pick_list[pick_idx].item.a_int - 1;
-			}
-			free((genericptr_t)pick_list);
-			pick_list = (menu_item *)0;
+	opt_idx = 0;
+	totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	any.a_int = 0;
+	for (i = 0; i < SIZE(action_titles) ; i += 2) {
+		any.a_int++;
+		if (!totalapes && (i >= 2 && i < 6)) continue;
+		add_menu(tmpwin, NO_GLYPH, &any, *action_titles[i],
+		      0, ATR_NONE, action_titles[i+1], MENU_UNSELECTED);
+        }
+	end_menu(tmpwin, "Do what?");
+	if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
+		for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+			opt_idx = pick_list[pick_idx].item.a_int - 1;
 		}
-		destroy_nhwindow(tmpwin);
-		if (pick_cnt < 1) return FALSE;
-	} /* else just ask for new pickup exception string */
+		free((genericptr_t)pick_list);
+		pick_list = (menu_item *)0;
+	}
+	destroy_nhwindow(tmpwin);
+	if (pick_cnt < 1) return FALSE;
 
 	if (opt_idx == 0) {	/* add new */
 		getlin("What new autopickup exception pattern?", &apebuf[1]);
@@ -2889,6 +2889,9 @@ ape_again:
 		apebuf[0] = '"';
 		Strcat(apebuf,"\"");
 		add_autopickup_exception(apebuf);
+		goto ape_again;
+	} else if (opt_idx == 3) {
+		retval = TRUE;
 	} else {	/* remove */
 		tmpwin = create_nhwindow(NHW_MENU);
 		start_menu(tmpwin);
@@ -2921,7 +2924,7 @@ ape_again:
 	        free((genericptr_t)pick_list);
 	        pick_list = (menu_item *)0;
 		destroy_nhwindow(tmpwin);
-		if (opt_idx == 1) goto ape_again;
+		goto ape_again;
 	}
 	retval = TRUE;
 #endif /* AUTOPICKUP_EXCEPTIONS */
