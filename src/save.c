@@ -204,7 +204,9 @@ dosave0()
 #endif /* MFLOPPY */
 
 	store_version(fd);
+#ifdef STORE_PLNAME_IN_FILE
 	bwrite(fd, (genericptr_t) plname, PL_NSIZ);
+#endif
 	ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
 #ifdef STEED
 	usteed_id = (u.usteed ? u.usteed->m_id : 0);
@@ -373,7 +375,9 @@ savestateinlock()
 		    (void) write(fd, (genericptr_t) &currlev, sizeof(currlev));
 		    save_savefile_name(fd);
 		    store_version(fd);
+#ifdef STORE_PLNAME_IN_FILE
 		    bwrite(fd, (genericptr_t) plname, PL_NSIZ);
+#endif
 		    ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
 #ifdef STEED
 		    usteed_id = (u.usteed ? u.usteed->m_id : 0);

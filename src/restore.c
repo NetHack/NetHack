@@ -542,7 +542,9 @@ register int fd;
 	int rtmp;
 	struct obj *otmp;
 
+#ifdef STORE_PLNAME_IN_FILE
 	mread(fd, (genericptr_t) plname, PL_NSIZ);
+#endif
 
 	restoring = TRUE;
 	getlev(fd, 0, (xchar)0, FALSE);
@@ -623,7 +625,9 @@ register int fd;
 	(void) lseek(fd, (off_t)0, 0);
 #endif
 	(void) uptodate(fd, (char *)0);		/* skip version info */
+#ifdef STORE_PLNAME_IN_FILE
 	mread(fd, (genericptr_t) plname, PL_NSIZ);
+#endif
 	getlev(fd, 0, (xchar)0, FALSE);
 	(void) close(fd);
 

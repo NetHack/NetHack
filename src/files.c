@@ -19,7 +19,7 @@
 #include <errno.h>
 #endif
 
-#if defined(UNIX)
+#if defined(UNIX) && defined(QT_GRAPHICS)
 #include <dirent.h>
 #endif
 
@@ -812,6 +812,7 @@ static char*
 plname_from_file(filename)
 const char* filename;
 {
+#ifdef STORE_PLNAME_IN_FILE
     int fd;
     char* result = 0;
 
@@ -831,12 +832,35 @@ const char* filename;
     compress(SAVEF);
 
     return result;
+#else
+    /* Name not stored in save file, so we have to extract it from
+       the filename, which loses information
+       (eg. "/", "_", and "." characters are lost. */
+    int k;
+    int uid;
+    char name[NAME_MAX];
+#ifdef COMPRESS_EXTENSION
+#define EXTSTR COMPRESS_EXTENSION
+#else
+#define EXTSTR ""
+#endif
+    if ( sscanf( filename, "%*[^/]/%d%[^.]" EXTSTR, &uid, name ) == 2 ) {
+#undef EXTSTR
+    /* "_" most likely means " ", which certainly looks nicer */
+	for (k=0; name[k]; k++)
+	    if ( name[k]=='_' )
+		name[k]=' ';
+	return strdup(name);
+    } else {
+	return 0;
+    }
+#endif
 }
 
 char**
 get_saved_games()
 {
-#ifdef UNIX
+#if defined(UNIX) && defined(QT_GRAPHICS)
     int myuid=getuid();
     struct dirent **namelist;
     int n = scandir("save", &namelist, 0, alphasort);;
@@ -852,9 +876,8 @@ get_saved_games()
 		    char* r;
 		    Sprintf(filename,"save/%d%s",uid,name);
 		    r = plname_from_file(filename);
-		    if ( r ) {
+		    if ( r )
 			result[j++] = r;
-		    }
 		}
 	    }
 	}
