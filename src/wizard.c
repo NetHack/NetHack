@@ -10,6 +10,8 @@
 #include "hack.h"
 #include "qtext.h"
 
+extern const int monstr[];
+
 #ifdef OVLB
 
 STATIC_DCL short FDECL(which_arti, (int));
@@ -435,10 +437,19 @@ nasty(mcast)
 	bypos.y = u.uy;
 	for(i = rnd(tmp); i > 0; --i)
 	    for(j=0; j<20; j++) {
+		int makeindex;
+
 		if (mcast &&
 			!enexto(&bypos, mcast->mux, mcast->muy, mcast->data))
 		    continue;
-		if ((mtmp = makemon(&mons[pick_nasty()],
+		/* Don't create more spellcasters of the monsters' level or
+		 * higher--avoids chain summoners filling up the level.
+		 */
+		do {
+		    makeindex = pick_nasty();
+		} while(mcast && attacktype(&mons[makeindex], AT_MAGC) &&
+			monstr[makeindex] >= monstr[mcast->mnum]);
+		if ((mtmp = makemon(&mons[makeindex],
 				    bypos.x, bypos.y, NO_MM_FLAGS)) != 0) {
 		    mtmp->msleeping = mtmp->mpeaceful = mtmp->mtame = 0;
 		    set_malign(mtmp);
