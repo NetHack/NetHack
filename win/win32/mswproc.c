@@ -1782,6 +1782,7 @@ void mswin_preference_update(const char *pref)
 		mswin_get_font(NHW_STATUS, ATR_INVERSE, hdc, TRUE);
 		ReleaseDC(GetNHApp()->hMainWnd, hdc);
 
+		InvalidateRect(mswin_hwnd_from_winid(WIN_STATUS), NULL, TRUE);
 		mswin_layout_main_window(NULL);
 		return;
 	}
@@ -1802,6 +1803,7 @@ void mswin_preference_update(const char *pref)
 		mswin_get_font(NHW_MESSAGE, ATR_INVERSE, hdc, TRUE);
 		ReleaseDC(GetNHApp()->hMainWnd, hdc);
 
+		InvalidateRect(mswin_hwnd_from_winid(WIN_MESSAGE), NULL, TRUE);
 		mswin_layout_main_window(NULL);
 		return;
 	}

@@ -60,7 +60,6 @@ static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static COLORREF setMsgTextColor(HDC hdc, int gray);
 static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
-static HDC prepareDC( HDC hdc );
 
 HWND mswin_init_message_window () {
 	static int run_once = 0;
@@ -679,10 +678,8 @@ void onPaint(HWND hWnd)
 
 void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	HDC hdc;
-	TEXTMETRIC tm; 
 	PNHMessageWindow data;
-	HGDIOBJ saveFont;
+	SIZE	dummy;
 
 	/* set window data */
 	data = (PNHMessageWindow)malloc(sizeof(NHMessageWindow));
@@ -691,8 +688,24 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	data->max_text = MAXWINDOWTEXT;
 	SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 
+	/* re-calculate window size (+ font size) */
+	mswin_message_window_size(hWnd, &dummy);
+}
+
+void mswin_message_window_size (HWND hWnd, LPSIZE sz)
+{
+	HDC hdc;
+	HGDIOBJ saveFont;
+	TEXTMETRIC tm; 
+	PNHMessageWindow data;
+	RECT rt, client_rt;
+
+	data = (PNHMessageWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	if( !data ) return;
+
+	/* -- Calculate the font size -- */
     /* Get the handle to the client area's device context. */
-    hdc = prepareDC( GetDC(hWnd) ); 
+    hdc = GetDC(hWnd); 
 	saveFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, FALSE));
 
     /* Extract font dimensions from the text metrics. */
@@ -705,31 +718,15 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
     /* Free the device context.  */
 	SelectObject(hdc, saveFont);
     ReleaseDC (hWnd, hdc); 
-}
-
-HDC prepareDC( HDC hdc )
-{
-	// set font here
-	return hdc;
-}
-
-
-void mswin_message_window_size (HWND hWnd, LPSIZE sz)
-{
-	PNHMessageWindow data;
-	RECT rt, client_rt;
-
+	
+	/* -- calculate window size -- */
 	GetWindowRect(hWnd, &rt);
-
 	sz->cx = rt.right - rt.left;
 	sz->cy = rt.bottom - rt.top;
 
-	data = (PNHMessageWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	if(data) {
-		/* set size to accomodate MSG_VISIBLE_LINES, highligh rectangle and
-		   horizontal scroll bar (difference between window rect and client rect */
-		GetClientRect(hWnd, &client_rt);
-		sz->cy = sz->cy-(client_rt.bottom - client_rt.top) +
-			     data->yChar * MSG_VISIBLE_LINES + 4;
-	}
+	/* set size to accomodate MSG_VISIBLE_LINES and
+	   horizontal scroll bar (difference between window rect and client rect */
+	GetClientRect(hWnd, &client_rt);
+	sz->cy = sz->cy - (client_rt.bottom - client_rt.top) +
+			 data->yChar * MSG_VISIBLE_LINES;
 }
