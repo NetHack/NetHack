@@ -342,7 +342,7 @@ dodrink()
 		return 0;
 	}
 	/* Is there a fountain to drink from here? */
-	if (IS_FOUNTAIN(levl[u.ux][u.uy].typ) && !Levitation && !u.uswallow) {
+	if (IS_FOUNTAIN(levl[u.ux][u.uy].typ) && can_reach_floor()) {
 		if(yn("Drink from the fountain?") == 'y') {
 			drinkfountain();
 			return 1;
@@ -350,7 +350,7 @@ dodrink()
 	}
 #ifdef SINKS
 	/* Or a kitchen sink? */
-	if (IS_SINK(levl[u.ux][u.uy].typ) && !Levitation && !u.uswallow) {
+	if (IS_SINK(levl[u.ux][u.uy].typ) && can_reach_floor()) {
 		if (yn("Drink from the sink?") == 'y') {
 			drinksink();
 			return 1;
