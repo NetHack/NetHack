@@ -14,7 +14,7 @@ static struct font_table_entry {
 } font_table[MAXFONTS] ;
 static int font_table_size = 0;
 
-#define NHFONT_CODE(win, attr) (((win_type&0xFF)<<8)|(attr&0xFF))
+#define NHFONT_CODE(win, attr) (((attr&0xFF)<<8)|(win_type&0xFF))
 
 
 /* create font based on window type, charater attributes and
@@ -104,6 +104,24 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
 		lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
 		/* lgfnt.lfFaceName */
+		break;
+
+	case NHW_MAP:
+		lgfnt.lfHeight			=	-TILE_Y;			 // height of font
+		lgfnt.lfWidth			=	-TILE_X;		     // average character width
+		lgfnt.lfEscapement		=	0;					 // angle of escapement
+		lgfnt.lfOrientation		=	0;					 // base-line orientation angle
+		lgfnt.lfWeight			=	FW_NORMAL;			 // font weight
+		lgfnt.lfItalic			=	FALSE;			     // italic attribute option
+		lgfnt.lfUnderline		=	FALSE;				 // underline attribute option
+		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
+		lgfnt.lfCharSet			=	DEFAULT_CHARSET;	     // character set identifier
+														// we need OEM charset for Rogue level
+		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
+		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
+		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
+		lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
+		_tcscpy( lgfnt.lfFaceName, TEXT("Terminal"));
 		break;
 	}
 

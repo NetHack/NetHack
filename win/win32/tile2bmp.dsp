@@ -55,7 +55,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Desc=Building nhtiles.bmp
-PostBuild_Cmds=pushd ..\src	..\util\tile2bmp.exe tiles.bmp	popd
+PostBuild_Cmds=pushd ..\src	..\util\tile2bmp.exe tiles.bmp	if exist tiles.bmp copy tiles.bmp ..\win\win32	popd
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "tile2bmp - Win32 Debug"

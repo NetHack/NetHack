@@ -6,6 +6,7 @@
 #include "mhstatus.h"
 #include "mhmsg.h"
 #include "mhinput.h"
+#include "mhfont.h"
 
 #define MAXWINDOWTEXT 255
 extern short glyph2tile[];
@@ -27,6 +28,9 @@ static void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
+#ifdef TEXTCOLOR
+static COLORREF nhcolor_to_RGB(int c);
+#endif
 
 HWND mswin_init_map_window () {
 	static int run_once = 0;
@@ -301,31 +305,127 @@ void onPaint(HWND hWnd)
 
 	/* calculate paint rectangle */
 	if( !IsRectEmpty(&ps.rcPaint) ) {
-		/* prepare tiles DC for mapping */
-		tileDC = CreateCompatibleDC(hDC);
-		saveBmp = SelectObject(tileDC, GetNHApp()->bmpTiles);
-
 		/* calculate paint rectangle */
 		paint_rt.top = data->yPos + ps.rcPaint.top/TILE_X;
 		paint_rt.left = data->xPos + ps.rcPaint.left/TILE_Y;
 		paint_rt.bottom = min(data->yPos+ps.rcPaint.bottom/TILE_Y+1, ROWNO);
 		paint_rt.right = min(data->xPos+ps.rcPaint.right/TILE_X+1, COLNO);
 
-		/* draw the map */
-		for(i=paint_rt.left; i<paint_rt.right; i++) 
-		for(j=paint_rt.top; j<paint_rt.bottom; j++) 
+#ifdef REINCARNATION
+		if (Is_rogue_level(&u.uz)) {
+			/* You enter a VERY primitive world! */
+			HGDIOBJ oldFont;
+			int offset;
+
+			oldFont = SelectObject(hDC, mswin_create_font(NHW_MAP, ATR_NONE, hDC));
+			SetBkMode(hDC, TRANSPARENT);
+
+			/* draw the map */
+			for(i=paint_rt.left; i<paint_rt.right; i++) 
+			for(j=paint_rt.top; j<paint_rt.bottom; j++) 
 			if(data->map[i][j]>0) {
-				short ntile;
-				int t_x, t_y;
+				uchar ch;
+				TCHAR wch;
+				RECT  glyph_rect;
+				unsigned short g=data->map[i][j];
+				
+				/* (from wintty, naturally)
+				 *
+				 *  Map the glyph back to a character.
+				 *
+				 *  Warning:  For speed, this makes an assumption on the order of
+				 *		  offsets.  The order is set in display.h.
+				 */
 
-				ntile = glyph2tile[ data->map[i][j] ];
-				t_x = (ntile % TILES_PER_LINE)*TILE_X;
-				t_y = (ntile / TILES_PER_LINE)*TILE_Y;
+#ifdef TEXTCOLOR
+				int	    color;
 
-				BitBlt(hDC, (i-data->xPos)*TILE_X, (j-data->yPos)*TILE_Y, TILE_X, TILE_Y, tileDC, t_x, t_y, SRCCOPY );
+#define zap_color(n)  color = iflags.use_color ? zapcolors[n] : NO_COLOR
+#define cmap_color(n) color = iflags.use_color ? defsyms[n].color : NO_COLOR
+#define obj_color(n)  color = iflags.use_color ? objects[n].oc_color : NO_COLOR
+#define mon_color(n)  color = iflags.use_color ? mons[n].mcolor : NO_COLOR
+#define pet_color(n)  color = iflags.use_color ? mons[n].mcolor : NO_COLOR
+#define warn_color(n) color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
+
+# else /* no text color */
+
+#define zap_color(n)
+#define cmap_color(n)
+#define obj_color(n)
+#define mon_color(n)
+#define pet_color(c)
+#define warn_color(c)
+				SetTextColor( hDC, nhcolor_to_RGB(CLR_WHITE) );
+#endif
+
+				if ((offset = (g - GLYPH_WARNING_OFF)) >= 0) { 	  /* a warning flash */
+					ch = warnsyms[offset];
+					warn_color(offset);
+				} else if ((offset = (g - GLYPH_SWALLOW_OFF)) >= 0) {	/* swallow */
+					/* see swallow_to_glyph() in display.c */
+					ch = (uchar) showsyms[S_sw_tl + (offset & 0x7)];
+					mon_color(offset >> 3);
+				} else if ((offset = (g - GLYPH_ZAP_OFF)) >= 0) {	/* zap beam */
+					/* see zapdir_to_glyph() in display.c */
+					ch = showsyms[S_vbeam + (offset & 0x3)];
+					zap_color((offset >> 2));
+				} else if ((offset = (g - GLYPH_CMAP_OFF)) >= 0) {	/* cmap */
+					ch = showsyms[offset];
+					cmap_color(offset);
+				} else if ((offset = (g - GLYPH_OBJ_OFF)) >= 0) {	/* object */
+					ch = oc_syms[(int)objects[offset].oc_class];
+					obj_color(offset);
+				} else if ((offset = (g - GLYPH_BODY_OFF)) >= 0) {	/* a corpse */
+					ch = oc_syms[(int)objects[CORPSE].oc_class];
+					mon_color(offset);
+				} else if ((offset = (g - GLYPH_PET_OFF)) >= 0) {	/* a pet */
+					ch = monsyms[(int)mons[offset].mlet];
+					pet_color(offset);
+				} else {							/* a monster */
+					ch = monsyms[(int)mons[g].mlet];
+					mon_color(g);
+				}	
+				// end of wintty code
+
+#ifdef TEXTCOLOR
+				if( color == NO_COLOR ) continue;
+				else SetTextColor( hDC,  nhcolor_to_RGB(color) );
+#endif
+				glyph_rect.left = (i-data->xPos)*TILE_X;
+				glyph_rect.top  = (j-data->yPos)*TILE_Y;
+				glyph_rect.right = glyph_rect.left + TILE_X;
+				glyph_rect.bottom = glyph_rect.top + TILE_Y;
+				DrawText(hDC, 
+						 NH_A2W(&ch, &wch, 1),
+						 1,
+						 &glyph_rect,
+						 DT_CENTER | DT_VCENTER | DT_NOPREFIX
+						 );
 			}
-		SelectObject(tileDC, saveBmp);
-		DeleteDC(tileDC);
+			mswin_destroy_font( SelectObject(hDC, oldFont) );
+		} else
+#endif
+		{
+			/* prepare tiles DC for mapping */
+			tileDC = CreateCompatibleDC(hDC);
+			saveBmp = SelectObject(tileDC, GetNHApp()->bmpTiles);
+
+			/* draw the map */
+			for(i=paint_rt.left; i<paint_rt.right; i++) 
+			for(j=paint_rt.top; j<paint_rt.bottom; j++) 
+				if(data->map[i][j]>0) {
+					short ntile;
+					int t_x, t_y;
+
+					ntile = glyph2tile[ data->map[i][j] ];
+					t_x = (ntile % TILES_PER_LINE)*TILE_X;
+					t_y = (ntile / TILES_PER_LINE)*TILE_Y;
+
+					BitBlt(hDC, (i-data->xPos)*TILE_X, (j-data->yPos)*TILE_Y, TILE_X, TILE_Y, tileDC, t_x, t_y, SRCCOPY );
+				}
+			SelectObject(tileDC, saveBmp);
+			DeleteDC(tileDC);
+		}
 
 		/* draw focus rect */
 		paint_rt.left = (data->xCur - data->xPos)*TILE_X;
@@ -464,3 +564,28 @@ void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
     SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
 }
 
+#ifdef TEXTCOLOR
+static
+COLORREF nhcolor_to_RGB(int c)
+{
+	switch(c) {
+	case CLR_BLACK:			return	RGB(  0,   0,   0);		
+	case CLR_RED:			return RGB(255,   0,   0);		
+	case CLR_GREEN:			return RGB(  0, 128,   0);		
+	case CLR_BROWN:			return RGB(165,  42,   42);
+	case CLR_BLUE:			return RGB(  0,   0, 255);	
+	case CLR_MAGENTA:		return RGB(255,   0, 255);	
+	case CLR_CYAN:			return RGB(  0, 255, 255);		
+	case CLR_GRAY:			return RGB(192, 192, 192);	
+	case NO_COLOR:			return RGB(  0,   0,   0);		
+	case CLR_ORANGE:		return RGB(255, 165,   0);	
+	case CLR_BRIGHT_GREEN:	return RGB(  0, 255,   0);
+	case CLR_YELLOW:		return RGB(255, 255,   0);	
+	case CLR_BRIGHT_BLUE:	return RGB(0,   191, 255);
+	case CLR_BRIGHT_MAGENTA: return RGB(255, 127, 255);
+	case CLR_BRIGHT_CYAN:	return RGB(127, 255, 255);	/* something close to aquamarine */
+	case CLR_WHITE:			return RGB(255, 255, 255);
+	default:				return RGB(  0,   0,   0);	/* black */
+	}
+}
+#endif

@@ -115,7 +115,8 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			
 			for(i=0; i<NHSW_LINES; i++ ) {
 				GetTextExtentPoint32(hdc, NH_A2W(data->window_text[i], wbuf, sizeof(wbuf)), strlen(data->window_text[i]), &sz);
-				DrawText(hdc, NH_A2W(data->window_text[i], wbuf, sizeof(wbuf)), strlen(data->window_text[i]), &rt, DT_LEFT);
+				OemToChar(data->window_text[i], wbuf);
+				DrawText(hdc, wbuf, strlen(data->window_text[i]), &rt, DT_LEFT);
 				rt.top += sz.cy;
 			}
 

@@ -45,7 +45,7 @@ goto done
 
 :do_win
 set opt=Graphical NetHack for Windows
-if not exist ..\..\win\win32\winnt.dsw goto err_win
+if not exist ..\..\win\win32\nethack.dsw goto err_win
 
 echo.
 echo "Copying Visual C project files file to ..\..\build directory"
@@ -54,7 +54,7 @@ REM copy ..\..\win\win32\winnt.dsw ..\.. >nul
 echo copy ..\..\win\win32\nethack.dsw  ..\..
 copy ..\..\win\win32\nethack.dsw  ..\..
 
-if NOT exist ..\..\build\*.* mkdir ..\..\build >nul
+if NOT exist ..\..\build\*.* mkdir ..\..\build
 copy ..\..\win\win32\dgncomp.dsp   ..\..\build >nul
 copy ..\..\win\win32\dgnstuff.dsp  ..\..\build >nul
 copy ..\..\win\win32\dgnstuff.mak  ..\..\build >nul
@@ -131,15 +131,15 @@ goto done
 :err_set
 echo.
 echo Usage:
-echo "%0 <TTY | WINHACK | CE >"
+echo "%0 <TTY | win | CE >"
 echo.
 echo    Run this batch file specifying one of the following:
-echo            tty, winhack, ce
+echo            tty, win, ce
 echo.
 echo    The tty argument is for preparing to build a console I/O TTY version
 echo    of NetHack.
 echo.
-echo    The winhack argument is for preparing to build a graphical version
+echo    The win argument is for preparing to build a graphical version
 echo    of NetHack.
 echo.
 echo    The CE argument is for preparing to build a Windows CE version

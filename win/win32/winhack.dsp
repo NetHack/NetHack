@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Application" 0x0101
 
-CFG=winhack - Win32 Unicode Debug
+CFG=winhack - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,14 +13,12 @@ CFG=winhack - Win32 Unicode Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "winhack.mak" CFG="winhack - Win32 Unicode Debug"
+!MESSAGE NMAKE /f "winhack.mak" CFG="winhack - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "winhack - Win32 Release" (based on "Win32 (x86) Application")
 !MESSAGE "winhack - Win32 Debug" (based on "Win32 (x86) Application")
-!MESSAGE "winhack - Win32 Unicode Release" (based on "Win32 (x86) Application")
-!MESSAGE "winhack - Win32 Unicode Debug" (based on "Win32 (x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -97,83 +95,12 @@ PostBuild_Desc=Install exe
 PostBuild_Cmds=if NOT exist ..\binary\*.* mkdir ..\binary	copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "winhack - Win32 Unicode Release"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "winhack___Win32_Unicode_Release"
-# PROP BASE Intermediate_Dir "winhack___Win32_Unicode_Release"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Unicode_Release"
-# PROP Intermediate_Dir "Unicode_Release"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /FD /c
-# SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
-# SUBTRACT CPP /YX /Yc /Yu
-# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
-# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib comctl32.lib advapi32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib comctl32.lib advapi32.lib /nologo /subsystem:windows /machine:I386
-# Begin Special Build Tool
-OutDir=.\Unicode_Release
-SOURCE="$(InputPath)"
-PostBuild_Desc=Install exe
-PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
-# End Special Build Tool
-
-!ELSEIF  "$(CFG)" == "winhack - Win32 Unicode Debug"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "winhack___Win32_Unicode_Debug"
-# PROP BASE Intermediate_Dir "winhack___Win32_Unicode_Debug"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Unicode_Debug"
-# PROP Intermediate_Dir "Unicode_Debug"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /FD /GZ /c
-# SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /GZ /c
-# SUBTRACT CPP /YX /Yc /Yu
-# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
-# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib comctl32.lib advapi32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib comctl32.lib advapi32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# Begin Special Build Tool
-OutDir=.\Unicode_Debug
-SOURCE="$(InputPath)"
-PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist ..\src\tiles.bmp copy ..\src\tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
-# End Special Build Tool
-
 !ENDIF 
 
 # Begin Target
 
 # Name "winhack - Win32 Release"
 # Name "winhack - Win32 Debug"
-# Name "winhack - Win32 Unicode Release"
-# Name "winhack - Win32 Unicode Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -608,23 +535,6 @@ SOURCE=..\src\windows.c
 # Begin Source File
 
 SOURCE=..\sys\winnt\winnt.c
-
-!IF  "$(CFG)" == "winhack - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "winhack - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "winhack - Win32 Unicode Release"
-
-# ADD CPP /D "_MBCS"
-# SUBTRACT CPP /D "_UNICODE" /D "UNICODE"
-
-!ELSEIF  "$(CFG)" == "winhack - Win32 Unicode Debug"
-
-# ADD CPP /D "_MBCS"
-# SUBTRACT CPP /D "_UNICODE" /D "UNICODE"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
