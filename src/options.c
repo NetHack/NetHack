@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.4	2002/02/04	*/
+/*	SCCS Id: @(#)options.c	3.4	2002/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1134,7 +1134,7 @@ boolean tinitial, tfrom_file;
 			wintype = NHW_STATUS;
 				
 		if (wintype > 0 &&
-		    (op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+		    (op = string_for_opt(opts, FALSE)) != 0) {
 			wc_set_font_name(wintype, op);
 #ifdef MAC
 			set_font_name (wintype, op);
@@ -1153,7 +1153,7 @@ boolean tinitial, tfrom_file;
 			wintype = NHW_STATUS;
 
 		if (wintype > 0 && !negated &&
-		    (op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+		    (op = string_for_opt(opts, FALSE)) != 0) {
 		    switch(wintype)  {
 		    	case NHW_MAP:
 				iflags.wc_fontsiz_map = atoi(op);
@@ -1481,8 +1481,8 @@ goodfruit:
 	 * align_status:[left|top|right|bottom] */
 	fullname = "align_status";
 	if (match_optname(opts, fullname, sizeof("align_status")-1, TRUE)) {
-		op = string_for_env_opt(fullname, opts, negated);
-		if (!negated) {
+		op = string_for_opt(opts, negated);
+		if (op && !negated) {
 		    if (!strncmpi (op, "left", sizeof("left")-1))
 			iflags.wc_align_status = ALIGN_LEFT;
 		    else if (!strncmpi (op, "top", sizeof("top")-1))
@@ -1500,8 +1500,8 @@ goodfruit:
 	 * align_message:[left|top|right|bottom] */
 	fullname = "align_message";
 	if (match_optname(opts, fullname, sizeof("align_message")-1, TRUE)) {
-		op = string_for_env_opt(fullname, opts, negated);
-		if (!negated) {
+		op = string_for_opt(opts, negated);
+		if (op && !negated) {
 		    if (!strncmpi (op, "left", sizeof("left")-1))
 			iflags.wc_align_message = ALIGN_LEFT;
 		    else if (!strncmpi (op, "top", sizeof("top")-1))
@@ -1835,8 +1835,8 @@ goodfruit:
 			ascii15x12|ascii12x16|ascii10x18|fit_to_screen] */
 	fullname = "map_mode";
 	if (match_optname(opts, fullname, sizeof("map_mode")-1, TRUE)) {
-		op = string_for_env_opt(fullname, opts, negated);
-		if (!negated) {
+		op = string_for_opt(opts, negated);
+		if (op && !negated) {
 		    if (!strncmpi (op, "tiles", sizeof("tiles")-1))
 			iflags.wc_map_mode = MAP_MODE_TILES;
 		    else if (!strncmpi (op, "ascii4x6", sizeof("ascii4x6")-1))
@@ -1868,7 +1868,7 @@ goodfruit:
 	 * scroll_margin:nn */
 	fullname = "scroll_margin";
 	if (match_optname(opts, fullname, sizeof("scroll_margin")-1, TRUE)) {
-		op = string_for_env_opt(fullname, opts, negated);
+		op = string_for_opt(opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.wc_scroll_margin = negated ? 5 : atoi(op);
 		} else if (negated) bad_negation(fullname, TRUE);
@@ -1878,7 +1878,7 @@ goodfruit:
 	 * tile_width:nn */
 	fullname = "tile_width";
 	if (match_optname(opts, fullname, sizeof("tile_width")-1, TRUE)) {
-		op = string_for_env_opt(fullname, opts, negated);
+		op = string_for_opt(opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.wc_tile_width = negated ? 0 : atoi(op);
 		} else if (negated) bad_negation(fullname, TRUE);
@@ -1888,7 +1888,7 @@ goodfruit:
 	 * tile_file:name */
 	fullname = "tile_file";
 	if (match_optname(opts, fullname, sizeof("tile_file")-1, TRUE)) {
-		if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+		if ((op = string_for_opt(opts, FALSE)) != 0) {
 			if (iflags.wc_tile_file) free(iflags.wc_tile_file);
 			iflags.wc_tile_file = (char *)alloc(strlen(op) + 1);
 			Strcpy(iflags.wc_tile_file, op);
@@ -1899,7 +1899,7 @@ goodfruit:
 	 * tile_height:nn */
 	fullname = "tile_height";
 	if (match_optname(opts, fullname, sizeof("tile_height")-1, TRUE)) {
-		op = string_for_env_opt(fullname, opts, negated);
+		op = string_for_opt(opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.wc_tile_height = negated ? 0 : atoi(op);
 		} else if (negated) bad_negation(fullname, TRUE);
@@ -1909,7 +1909,7 @@ goodfruit:
 	 * vary_msgcount:nn */
 	fullname = "vary_msgcount";
 	if (match_optname(opts, fullname, sizeof("vary_msgcount")-1, TRUE)) {
-		op = string_for_env_opt(fullname, opts, negated);
+		op = string_for_opt(opts, negated);
 		if ((negated && !op) || (!negated && op)) {
 			iflags.wc_vary_msgcount = negated ? 0 : atoi(op);
 		} else if (negated) bad_negation(fullname, TRUE);
