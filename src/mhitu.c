@@ -356,6 +356,7 @@ mattacku(mtmp)
 		u.uundetected = 0;
 		if (is_hider(youmonst.data)) {
 		    coord cc; /* maybe we need a unexto() function? */
+		    struct obj *obj;
 
 		    You("fall from the %s!", ceiling(u.ux,u.uy));
 		    if (enexto(&cc, u.ux, u.uy, youmonst.data)) {
@@ -377,7 +378,8 @@ mattacku(mtmp)
 		    if (youmonst.data->mlet != S_PIERCER)
 			return(0);	/* trappers don't attack */
 
-		    if (which_armor(mtmp, WORN_HELMET)) {
+		    obj = which_armor(mtmp, WORN_HELMET);
+		    if (obj && is_metallic(obj)) {
 			Your("blow glances off %s helmet.",
 			               s_suffix(mon_nam(mtmp)));
 		    } else {
