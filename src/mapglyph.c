@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mapglyph.c	3.4	2000/08/18	*/
+/*	SCCS Id: @(#)mapglyph.c	3.4	2002/07/17	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,6 +7,7 @@
 #include "wintty.h"	/* for prototype of has_color() only */
 #endif
 #include "color.h"
+#define HI_DOMESTIC CLR_WHITE	/* monst.c */
 
 int explcolors[] = {
 	CLR_BLACK,	/* dark    */
@@ -194,7 +195,15 @@ unsigned *ospecial;
 		color = NO_COLOR;
 	} else
 #endif
+	{
 	    mon_color(glyph);
+	    /* special case the hero for `showrace' option */
+#ifdef TEXTCOLOR
+	    if (iflags.use_color && x == u.ux && y == u.uy &&
+		    iflags.showrace && !Upolyd)
+		color = HI_DOMESTIC;
+#endif
+	}
     }
 
 #ifdef TEXTCOLOR
@@ -210,21 +219,11 @@ unsigned *ospecial;
 # endif
 	color = NO_COLOR;
 #endif
-    if (ochar)
-	*ochar = (int)ch;
-    else
-    	impossible("glyphmap(): Invalid output character buffer.");
 
-    if (ospecial)
-	*ospecial = special;
-    else
-    	impossible("glyphmap(): Invalid special feature return buffer.");
-
+    *ochar = (int)ch;
+    *ospecial = special;
 #ifdef TEXTCOLOR
-    if (ocolor)
-	*ocolor = color;
-    else
-    	impossible("glyphmap(): Invalid color  buffer.");
+    *ocolor = color;
 #endif
     return;
 }
