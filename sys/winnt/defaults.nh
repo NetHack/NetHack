@@ -21,18 +21,25 @@ OPTIONS=IBMGraphics
 #                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
 #                                    ascii10x18|ascii_fit_to_screen
 OPTIONS=map_mode:tiles,scroll_margin:5
+
 #
 # Message window settings
-OPTIONS=align_message:top,hilite_pet
+OPTIONS=align_message:top
+
 #
 # Menu settings
 OPTIONS=font_menu:Arial,font_size_menu:9
+
 #
 # Status window settings
 OPTIONS=font_size_status:10
+
 #
 # Other
-OPTIONS=font_size_text:9,font_size_message:9,toptenwin
+OPTIONS=font_size_text:9,font_size_message:9,hilite_pet
+
+# Top Ten Window.  Highly Recommended.
+OPTIONS=toptenwin
 
 # *** Personal Preferences ***
 # Some options to set personal preferences.  Uncomment and change these to

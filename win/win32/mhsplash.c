@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 Yitzhak Sapir */
+/* Copyright (C) 2001 by Alex Kompel <shurikk@pacbell.net> */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
@@ -108,8 +108,9 @@ BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		HDC hdcBitmap;
 		HANDLE OldBitmap;
 		HANDLE OldFont;
+		PAINTSTRUCT ps;
 
-		hdc = GetDC (hWnd);
+		hdc = BeginPaint (hWnd, &ps);
 		/* Show splash graphic */
 
 		hdcBitmap = CreateCompatibleDC(hdc);
@@ -149,7 +150,7 @@ BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		    DT_LEFT | DT_NOPREFIX | DT_LEFT | DT_VCENTER);
 
 		SelectObject(hdc, OldFont);
-		ReleaseDC(hWnd, hdc);
+		EndPaint (hWnd, &ps);
 	}
 	break;
 

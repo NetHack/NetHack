@@ -553,18 +553,30 @@ void onPaint(HWND hWnd)
 				RECT  glyph_rect;
 				int   color;
 				unsigned special, mgch;
+				HBRUSH back_brush;
+
+				nhcoord2display(data, i, j, &glyph_rect);
 
 #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
 				nhglyph2charcolor(data->map[i][j], &ch, &color);
+				SetTextColor (hDC, nhcolor_to_RGB(color) );
 #else
 				/* rely on NetHack core helper routine */
 				mapglyph(data->map[i][j], &mgch, &color,
 						&special, i, j);
 				ch = (uchar)mgch;
+				if (((special & MG_PET) && iflags.hilite_pet) ||
+				    ((special & MG_DETECT) && iflags.use_inverse)) {
+					back_brush = CreateSolidBrush(RGB(192, 192, 192));
+					FillRect (hDC, &glyph_rect, back_brush);
+					DeleteObject (back_brush);
+					SetTextColor( hDC,  RGB(0, 0, 0) );
+				} else
+				{
+					SetTextColor (hDC, nhcolor_to_RGB(color) );
+				}
 #endif
-				SetTextColor( hDC,  nhcolor_to_RGB(color) );
 
-				nhcoord2display(data, i, j, &glyph_rect);
 				DrawText(hDC, 
 						 NH_A2W(&ch, &wch, 1),
 						 1,

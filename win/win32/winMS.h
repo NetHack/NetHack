@@ -134,9 +134,30 @@ void nhapply_image_transparent(
 	COLORREF cTransparent
 );
 
-void mswin_read_reg();
-void mswin_destroy_reg();
-void mswin_write_reg();
+void mswin_read_reg(void);
+void mswin_destroy_reg(void);
+void mswin_write_reg(void);
+
+extern HBRUSH menu_bg_brush;
+extern HBRUSH menu_fg_brush;
+extern HBRUSH text_bg_brush;
+extern HBRUSH text_fg_brush;
+extern HBRUSH status_bg_brush;
+extern HBRUSH status_fg_brush;
+extern HBRUSH message_bg_brush;
+extern HBRUSH message_fg_brush;
+
+extern COLORREF menu_bg_color;
+extern COLORREF menu_fg_color;
+extern COLORREF text_bg_color;
+extern COLORREF text_fg_color;
+extern COLORREF status_bg_color;
+extern COLORREF status_fg_color;
+extern COLORREF message_bg_color;
+extern COLORREF message_fg_color;
+
+
+#define SYSCLR_TO_BRUSH(x) ((HBRUSH)((x) + 1))
 
 /* unicode stuff */
 #ifdef UNICODE

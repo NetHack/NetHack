@@ -176,7 +176,8 @@ Setting Up
     For building the TTY version, ensure that GRAPHICAL is set to "N",
     or commented out.  (If you aren't building the TTY version, you are
     currently reading the wrong section, and following the wrong set of
-    steps.  In that case, you may wish to start reading from the top again.)
+    steps.  In that case, you may wish to start reading from the top
+    again.)
 
     Optional step:
       If you elected not to use the high-quality BSD random number routines by
@@ -314,7 +315,7 @@ Setting Up
     they are not necessary for building the graphical version of NetHack
     (you can delete them to save space if you wish.)
 
-    Required Directories for a Win32 Console NetHack:
+    Required Directories for a Win32 Graphical NetHack:
 
                             top
                              |
@@ -349,6 +350,11 @@ Setting Up
 3.  Ready your tool.
     Microsoft compiler users, perform step 3a.
     Borland compiler users, perform step 3b.
+
+    Note for Microsoft users: It's possible to build a graphical version
+    using the Makefile.  For simplicity's sake, however, only the Visual
+    C IDE build will be explained.  The IDE build has full game
+    functionality and is the officially released build.s
 
     a) Microsoft compiler:
        Start the Visual C IDE. In the Visual C IDE Menus, choose:
@@ -405,8 +411,11 @@ Setting Up
     b) Borland Compiler only:
 
         o Edit the Makefile. Ensure the following are set correctly.
-          GRAPHICS should be set to "Y"
-          {TODO: put a list of other things to check in Makefile.bcc here}
+          GRAPHICAL should be set to "Y"
+
+        o Ensure that all your tools directories are set up properly.
+          By default, your tools are assumed to be in the same
+          directory as the MAKE program.
 
 
 Building

@@ -35,10 +35,10 @@
 TARGETOS=BOTH
 APPVER=4.0
 
-bccroot = c:\borland\bcc55
+bccbin = $(MAKEDIR)
+bccroot = $(MAKEDIR)\..
 bccinc = $(bccroot)\include
 bcclib = $(bccroot)\lib
-bccbin = $(bccroot)\bin
 
 !IFNDEF APPVER
 APPVER = 4.0
@@ -136,8 +136,8 @@ DO_LEX  = LEX_MSG
 
 # - Specify your yacc and lex programs (or work-alikes) here.
 
-#YACC	= bison -y
-YACC   = byacc
+YACC	= bison -y
+#YACC   = byacc
 #YACC	= yacc
 
 #LEX	= lex
@@ -150,9 +150,9 @@ LEX	= flex
 FLEXSKEL =
 #FLEXSKEL = -S../tools/flex.ske
 
-YTABC   = y_tab.c
-YTABH   = y_tab.h
-LEXYYC  = lexyy.c
+YTABC   = y.tab.c
+YTABH   = y.tab.h
+LEXYYC  = lex.yy.c
 
 #
 # Optional high-quality BSD random number generation routines
@@ -587,10 +587,10 @@ $(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
 	$(WIN32)\mnselcnt.bmp $(WIN32)\mnunsel.bmp \
 	$(WIN32)\petmark.bmp $(WIN32)\NetHack.ico $(WIN32)\rip.bmp \
 	$(WIN32)\splash.bmp
-	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
+	@$(rc) -r -fo$@ -i$(WIN32) -i$(bccinc) -dNDEBUG $(WIN32)\winhack.rc
 !ELSE
 $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
-	@$(rc) -r -fo$@ -i$(NTSYS) -dNDEBUG $(NTSYS)\console.rc
+	@$(rc) -r -fo$@ -i$(NTSYS) -i$(bccinc) -dNDEBUG $(NTSYS)\console.rc
 !ENDIF
 
 #==========================================
@@ -737,7 +737,7 @@ $(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)\lev_comp.h $(U)lev_yacc.c
 
 $(O)lev_$(LEX).o: $(HACK_H)   $(INCL)\lev_comp.h $(SP_LEV_H) \
                $(U)lev_$(LEX).c
-	@$(cc) $(LEVCFLAGS) -o$@ $(U)lev_$(LEX).c
+	@$(cc) $(LEVCFLAGS) -D__IO_H -o$@ $(U)lev_$(LEX).c
 
 $(O)lev_main.o:	$(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
 	@$(cc) $(LEVCFLAGS) -o$@ $(U)lev_main.c
@@ -794,7 +794,7 @@ $(O)dgn_yacc.o:	$(HACK_H)   $(DGN_FILE_H) $(INCL)\dgn_comp.h $(U)dgn_yacc.c
 
 $(O)dgn_$(LEX).o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)\dgn_comp.h \
 	$(U)dgn_$(LEX).c
-	@$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_$(LEX).c
+	@$(cc) $(LEVCFLAGS) -D__IO_H -o$@ $(U)dgn_$(LEX).c
 
 $(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
 	@$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_main.c

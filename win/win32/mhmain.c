@@ -132,7 +132,18 @@ numpad[KEY_LAST][3] = {
 							  (mode)==MAP_MODE_TILES_FIT_TO_SCREEN )
   
 #define IS_MAP_ASCII(mode) ((mode)!=MAP_MODE_TILES && (mode)!=MAP_MODE_TILES_FIT_TO_SCREEN)
-    
+
+static const char *extendedlist_nhmode = "abcdefijlmnopqrstuvw?";
+static const char *extendedlist_winmode = "abcdeijlnopqrtuvw?";
+
+#define SCANLO		0x02
+static const char scanmap[] = { 	/* ... */
+	'1','2','3','4','5','6','7','8','9','0',0,0,0,0,
+	'q','w','e','r','t','y','u','i','o','p','[',']', '\n',
+	0, 'a','s','d','f','g','h','j','k','l',';','\'', '`',
+	0, '\\', 'z','x','c','v','b','n','m',',','.','?'	/* ... */
+};
+
 /*
 //  FUNCTION: WndProc(HWND, unsigned, WORD, LONG)
 //
@@ -367,11 +378,25 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
               If not nethackmode, don't handle Alt-keys here.
               If no Alt-key pressed it can never be an extended command 
             */
-            if (GetNHApp()->regNetHackMode && (lParam & 1<<29))
+	    if ((lParam & 1<<29) != 0)
             {
                 unsigned char c = (unsigned char)(wParam & 0xFF);
-				NHEVENT_KBD(M(c));
-				return 0;
+		unsigned char scancode = (lParam >> 16) & 0xFF;
+                if (index(
+		    GetNHApp()->regNetHackMode
+			? extendedlist_nhmode :  extendedlist_winmode,
+		    tolower(c)) != 0)
+		{
+		    if (tolower(c) == 'b') {
+			NHEVENT_KBD(M('2'));
+		    } else {
+			NHEVENT_KBD(M(tolower(c)));
+		    }
+		} else if (scancode == (SCANLO + SIZE(scanmap)) - 1) {
+		    NHEVENT_KBD(M('?'));
+		} else
+		    return DefWindowProc(hWnd, message, wParam, lParam);
+		return 0;
             }
             return DefWindowProc(hWnd, message, wParam, lParam);
         } 

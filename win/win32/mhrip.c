@@ -144,7 +144,9 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		RECT textrect;
 		HDC hdcBitmap;
 		HANDLE OldBitmap;
-		hdc = GetDC (hWnd);
+		PAINTSTRUCT ps;
+
+		hdc = BeginPaint (hWnd, &ps);
 		hdcBitmap = CreateCompatibleDC(hdc);
 		SetBkMode (hdc, TRANSPARENT);
 		GetClientRect (hWnd, &clientrect);
@@ -176,7 +178,7 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		}
 		SelectObject (hdcBitmap, OldBitmap);
 		DeleteDC (hdcBitmap);
-		ReleaseDC(hWnd, hdc);
+		EndPaint (hWnd, &ps);
 	}
 	break;
 

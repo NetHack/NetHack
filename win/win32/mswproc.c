@@ -35,6 +35,29 @@ void logDebug(const char *fmt, ...) { }
 
 static void mswin_main_loop(void);
 static BOOL initMapTiles(void);
+static void mswin_color_from_string(char *colorstring, HBRUSH* brushptr, COLORREF *colorptr);
+
+#define TOTAL_BRUSHES	10
+HBRUSH brush_table[TOTAL_BRUSHES];
+int max_brush = 0;
+
+HBRUSH menu_bg_brush = NULL;
+HBRUSH menu_fg_brush = NULL;
+HBRUSH text_bg_brush = NULL;
+HBRUSH text_fg_brush = NULL;
+HBRUSH status_bg_brush = NULL;
+HBRUSH status_fg_brush = NULL;
+HBRUSH message_bg_brush = NULL;
+HBRUSH message_fg_brush = NULL;
+
+COLORREF menu_bg_color = RGB(0, 0, 0);
+COLORREF menu_fg_color = RGB(0xFF, 0xFF, 0xFF);
+COLORREF text_bg_color = RGB(0, 0, 0);
+COLORREF text_fg_color = RGB(0xFF, 0xFF, 0xFF);
+COLORREF status_bg_color = RGB(0, 0, 0);
+COLORREF status_fg_color = RGB(0xFF, 0xFF, 0xFF);
+COLORREF message_bg_color = RGB(0, 0, 0);
+COLORREF message_fg_color = RGB(0xFF, 0xFF, 0xFF);
 
 /* Interface definition, for windows.c */
 struct window_procs mswin_procs = {
@@ -43,7 +66,7 @@ struct window_procs mswin_procs = {
 	WC_INVERSE|WC_SCROLL_MARGIN|WC_MAP_MODE|
 	WC_FONT_MESSAGE|WC_FONT_STATUS|WC_FONT_MENU|WC_FONT_TEXT|
 	WC_FONTSIZ_MESSAGE|WC_FONTSIZ_STATUS|WC_FONTSIZ_MENU|WC_FONTSIZ_TEXT|
-	WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE|WC_VARY_MSGCOUNT,
+	WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE|WC_VARY_MSGCOUNT|WC_WINDOWCOLORS,
     mswin_init_nhwindows,
     mswin_player_selection,
     mswin_askname,
@@ -184,6 +207,15 @@ void mswin_init_nhwindows(int* argc, char** argv)
 		SET_IN_GAME 
 	);
 
+	mswin_color_from_string(iflags.wc_foregrnd_menu, &menu_fg_brush, &menu_fg_color);
+	mswin_color_from_string(iflags.wc_foregrnd_message, &message_fg_brush, &message_fg_color);
+	mswin_color_from_string(iflags.wc_foregrnd_status, &status_fg_brush, &status_fg_color);
+	mswin_color_from_string(iflags.wc_foregrnd_text, &text_fg_brush, &text_fg_color);
+	mswin_color_from_string(iflags.wc_backgrnd_menu, &menu_bg_brush, &menu_bg_color);
+	mswin_color_from_string(iflags.wc_backgrnd_message, &message_bg_brush, &message_bg_color);
+	mswin_color_from_string(iflags.wc_backgrnd_status, &status_bg_brush, &status_bg_color);
+	mswin_color_from_string(iflags.wc_backgrnd_text, &text_bg_brush, &text_bg_color);
+
 	mswin_display_splash_window();
 	iflags.window_inited = TRUE;
 }
@@ -276,6 +308,8 @@ void mswin_exit_nhwindows(const char *str)
 	logDebug("mswin_exit_nhwindows(%s)\n", str);
     /* Write Window settings to the registry */
     mswin_write_reg();
+    while (max_brush) 
+	DeleteObject(brush_table[--max_brush]);
 }
 
 /* Prepare the window to be suspended. */
@@ -1299,6 +1333,7 @@ void mswin_preference_update(const char *pref)
 		mswin_layout_main_window(NULL);
 		return;
 	}
+
 }
 
 
@@ -1501,4 +1536,104 @@ mswin_destroy_reg()
 
     /* Prevent saving on exit */
     GetNHApp()->saveRegistrySettings = 0;
+}
+
+typedef struct ctv
+{
+	char *colorstring;
+	COLORREF colorvalue;
+} color_table_value;
+
+static color_table_value color_table[] = {
+	{ "black", 		RGB(0x00, 0x00, 0x00)},
+	{ "silver",		RGB(0xC0, 0xC0, 0xC0)},
+	{ "gray", 		RGB(0x80, 0x80, 0x80)},
+	{ "grey", 		RGB(0x80, 0x80, 0x80)},
+	{ "white", 		RGB(0xFF, 0xFF, 0xFF)},
+	{ "maroon",		RGB(0x80, 0x00, 0x00)},
+	{ "red", 		RGB(0xFF, 0x00, 0x00)},
+	{ "purple",		RGB(0x80, 0x00, 0x80)},
+	{ "fuchsia",	RGB(0xFF, 0x00, 0xFF)},
+	{ "green", 		RGB(0x00, 0x80, 0x00)},
+	{ "lime", 		RGB(0x00, 0xFF, 0x00)},
+	{ "olive", 		RGB(0x80, 0x80, 0x00)},
+	{ "yellow", 	RGB(0xFF, 0xFF, 0x00)},
+	{ "navy", 		RGB(0x00, 0x00, 0x80)},
+	{ "blue", 		RGB(0x00, 0x00, 0xFF)},
+	{ "teal", 		RGB(0x00, 0x80, 0x80)},
+	{ "aqua", 		RGB(0x00, 0xFF, 0xFF)},
+	{ "", 		RGB(0x00, 0x00, 0x00)},
+};
+
+typedef struct ctbv
+{
+	char *colorstring;
+	int syscolorvalue;
+} color_table_brush_value;
+
+static color_table_brush_value color_table_brush[] = {
+	{ "activeborder", 	COLOR_ACTIVEBORDER	},
+	{ "activecaption",	COLOR_ACTIVECAPTION	},
+	{ "appworkspace",		COLOR_APPWORKSPACE	},
+	{ "background",		COLOR_BACKGROUND		},
+	{ "btnface",		COLOR_BTNFACE		},
+	{ "btnshadow",		COLOR_BTNSHADOW		},
+	{ "btntext", 		COLOR_BTNTEXT		},
+	{ "captiontext",		COLOR_CAPTIONTEXT		},
+	{ "graytext",		COLOR_GRAYTEXT		},
+	{ "greytext",		COLOR_GRAYTEXT 		},
+	{ "highlight",		COLOR_HIGHLIGHT 		},
+	{ "highlighttext",	COLOR_HIGHLIGHTTEXT	},
+	{ "inactiveborder", 	COLOR_INACTIVEBORDER 	},
+	{ "inactivecaption",	COLOR_INACTIVECAPTION 	},
+	{ "menu",			COLOR_MENU 			},
+	{ "menutext",		COLOR_MENUTEXT 		},
+	{ "scrollbar",		COLOR_SCROLLBAR 		},
+	{ "window",			COLOR_WINDOW 		},
+	{ "windowframe", 		COLOR_WINDOWFRAME 	},
+	{ "windowtext",		COLOR_WINDOWTEXT 		},
+	{ "", 			-1				},
+};
+
+static void mswin_color_from_string(char *colorstring, HBRUSH* brushptr, COLORREF *colorptr)
+{
+	color_table_value *ctv_ptr = color_table;
+	color_table_brush_value *ctbv_ptr = color_table_brush;
+	int red_value, blue_value, green_value;
+	static char *hexadecimals = "0123456789abcdef";
+
+	if (colorstring == NULL) return;
+	if (*colorstring == '#') {
+		if (strlen(++colorstring) != 6) return;
+
+		red_value = index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		red_value *= 16;
+		red_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+
+		green_value = index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		green_value *= 16;
+		green_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+
+		blue_value = index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		blue_value *= 16;
+		blue_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+
+		*colorptr = RGB(red_value, blue_value, green_value);
+	} else {
+	    while (*ctv_ptr->colorstring && stricmp(ctv_ptr->colorstring, colorstring))
+		++ctv_ptr;
+	    if (*ctv_ptr->colorstring) {
+		*colorptr = ctv_ptr->colorvalue;
+	    } else {
+	      while (*ctbv_ptr->colorstring && stricmp(ctbv_ptr->colorstring, colorstring))
+		    ++ctbv_ptr;
+		if (*ctbv_ptr->colorstring) {
+		    *brushptr = SYSCLR_TO_BRUSH(ctbv_ptr->syscolorvalue);
+		    *colorptr = GetSysColor(ctbv_ptr->syscolorvalue);
+		}
+	    }
+	}
+	if (max_brush > TOTAL_BRUSHES) panic("Too many colors!");
+	*brushptr = CreateSolidBrush(*colorptr);
+	brush_table[max_brush++] = *brushptr;
 }

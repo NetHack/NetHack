@@ -6,12 +6,32 @@
 
 #include <process.h>
 #include "winMS.h"
-#include <shlwapi.h>
 #include "hack.h"
 #include "dlb.h"
 #include "resource.h"
 #include "mhmain.h"
 #include "mhmap.h"
+
+#ifndef __BORLANDC__
+#include <shlwapi.h>
+#else /* Borland redefines "boolean" in shlwapi.h so just use the little bit we need */
+typedef struct _DLLVERSIONINFO
+{
+    DWORD cbSize;
+    DWORD dwMajorVersion;                   // Major version
+    DWORD dwMinorVersion;                   // Minor version
+    DWORD dwBuildNumber;                    // Build number
+    DWORD dwPlatformID;                     // DLLVER_PLATFORM_*
+} DLLVERSIONINFO;
+
+//
+// The caller should always GetProcAddress("DllGetVersion"), not
+// implicitly link to it.
+//
+
+typedef HRESULT (CALLBACK* DLLGETVERSIONPROC)(DLLVERSIONINFO *);
+
+#endif
 
 #ifdef OVL0
 #define SHARED_DCL

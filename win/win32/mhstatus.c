@@ -18,6 +18,9 @@ static TCHAR szStatusWindowClass[] = TEXT("MSNHStatusWndClass");
 LRESULT CALLBACK	StatusWndProc(HWND, UINT, WPARAM, LPARAM);
 static void register_status_window_class(void);
 
+#define DEFAULT_COLOR_BG_STATUS	COLOR_WINDOW
+#define DEFAULT_COLOR_FG_STATUS	COLOR_WINDOWTEXT
+
 HWND mswin_init_status_window () {
 	static int run_once = 0;
 	HWND ret;
@@ -64,7 +67,8 @@ void register_status_window_class()
 	wcex.hInstance		= GetNHApp()->hApp;
 	wcex.hIcon			= NULL;
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
+	wcex.hbrBackground	= status_bg_brush 
+		? status_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_STATUS);
 	wcex.lpszMenuName	= NULL;
 	wcex.lpszClassName	= szStatusWindowClass;
 
@@ -107,11 +111,17 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			SIZE sz;
 			HGDIOBJ oldFont;
 			TCHAR wbuf[BUFSZ];
+			COLORREF OldBg, OldFg;
 
 			hdc = BeginPaint(hWnd, &ps);
 			GetClientRect(hWnd, &rt);
 			
 			oldFont = SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));
+
+			OldBg = SetBkColor(hdc, status_bg_brush 
+				? status_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_STATUS));
+			OldFg = SetTextColor(hdc, status_fg_brush 
+				? status_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_STATUS));
 			
 			for(i=0; i<NHSW_LINES; i++ ) {
 				GetTextExtentPoint32(hdc, NH_A2W(data->window_text[i], wbuf, sizeof(wbuf)), strlen(data->window_text[i]), &sz);
@@ -121,7 +131,8 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			}
 
 			SelectObject(hdc, oldFont);
-			
+			SetTextColor (hdc, OldFg);
+			SetBkColor (hdc, OldBg);
 			EndPaint(hWnd, &ps);
 		} break;
 

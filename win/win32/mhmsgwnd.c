@@ -12,7 +12,9 @@
 #define MAX_MSG_LINES		  32
 #define MSG_LINES			  (int)min(iflags.msg_history, MAX_MSG_LINES)
 #define MAXWINDOWTEXT		  200
-#define NHMSG_BKCOLOR         RGB(192, 192, 192)
+
+#define DEFAULT_COLOR_BG_MSG	COLOR_WINDOW
+#define DEFAULT_COLOR_FG_MSG	COLOR_WINDOWTEXT
 
 struct window_line {
 	int  attr;
@@ -92,7 +94,7 @@ void register_message_window_class()
 	wcex.hInstance		= GetNHApp()->hApp;
 	wcex.hIcon			= NULL;
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)CreateSolidBrush(NHMSG_BKCOLOR);
+	wcex.hbrBackground	= message_bg_brush ? message_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_MSG);
 	wcex.lpszMenuName	= NULL;
 	wcex.lpszClassName	= szMessageWindowClass;
 
@@ -408,10 +410,12 @@ void onPaint(HWND hWnd)
 	HGDIOBJ oldFont;
 	TCHAR wbuf[MAXWINDOWTEXT+2];
 	size_t wlen;
+	COLORREF OldBg, OldFg;
 
 	hdc = BeginPaint(hWnd, &ps);
 
-	SetBkColor(hdc, NHMSG_BKCOLOR);
+	OldBg = SetBkColor(hdc, message_bg_brush ? message_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_MSG));
+	OldFg = SetTextColor(hdc, message_fg_brush ? message_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_MSG));
 
 	data = (PNHMessageWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
@@ -473,6 +477,8 @@ void onPaint(HWND hWnd)
 		}
 	}
 
+	SetTextColor (hdc, OldFg);
+	SetBkColor (hdc, OldBg);
 	EndPaint(hWnd, &ps);
 }
 

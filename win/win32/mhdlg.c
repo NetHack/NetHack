@@ -50,11 +50,17 @@ int mswin_getlin_window (
 BOOL CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct getlin_data* data;
-	RECT   main_rt, text_rt, dlg_rt, edit_rt;
+	RECT   main_rt, dlg_rt;
 	SIZE   dlg_sz;
 	TCHAR  wbuf[BUFSZ];
-	HDC hdc;
-	HWND   control;
+	HDC WindowDC;
+	HWND ControlHWND;
+	SIZE   WindowExtents;
+	SIZE   ViewPortExtents;
+	RECT   ControlRect;
+	RECT   ClientRect;
+	LONG   Division;
+	LONG   ButtonOffset;
 
 	switch (message) 
 	{
@@ -63,17 +69,28 @@ BOOL CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		SetWindowText(hWnd, NH_A2W(data->question, wbuf, sizeof(wbuf)));
 		SetWindowLong(hWnd, GWL_USERDATA, lParam);
 
-		/* get title text width */
-		SetRect(&text_rt, 0, 0, 100, 50);
-		hdc = GetWindowDC(hWnd);
-		DrawText(hdc, wbuf, _tcslen(wbuf), &text_rt, 
-			     DT_CALCRECT | DT_SINGLELINE | DT_NOPREFIX | DT_LEFT | DT_VCENTER );
-		ReleaseDC(hWnd, hdc);
-
 		/* center dialog in the main window */
 		GetWindowRect(hWnd, &dlg_rt);
 		GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
-		dlg_sz.cx = max(dlg_rt.right-dlg_rt.left, text_rt.right-text_rt.left );
+		WindowDC = GetWindowDC(hWnd);
+
+		if (!GetWindowExtEx(WindowDC, &WindowExtents) ||
+			!GetViewportExtEx(WindowDC, &ViewPortExtents) ||
+			!GetTextExtentPoint32(GetWindowDC (hWnd), wbuf, _tcslen(wbuf), &dlg_sz))
+		{
+			dlg_sz.cx = 0;
+		}
+		else
+		{
+			/* I think we need to do the following scaling */
+			dlg_sz.cx *= ViewPortExtents.cx; dlg_sz.cx /= WindowExtents.cx;
+			/* Add the size of the various items in the caption bar */
+			dlg_sz.cx += GetSystemMetrics(SM_CXSIZE) +
+				2 * (GetSystemMetrics (SM_CXBORDER) + GetSystemMetrics(SM_CXFRAME));
+		}
+
+		if (dlg_sz.cx < dlg_rt.right - dlg_rt.left)
+			dlg_sz.cx = dlg_rt.right - dlg_rt.left;
 		dlg_sz.cy = dlg_rt.bottom - dlg_rt.top;
 		dlg_rt.left = (main_rt.left+main_rt.right-dlg_sz.cx)/2;
 		dlg_rt.right = dlg_rt.left + dlg_sz.cx;
@@ -86,38 +103,31 @@ BOOL CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 					dlg_sz.cy,
 					TRUE );
 
-		/* change layout of controls */
-		GetClientRect(hWnd, &dlg_rt);
+		/* set focus and size of the edit control */
+		ControlHWND = GetDlgItem(hWnd, IDC_GETLIN_EDIT);
+		SetFocus(ControlHWND);
+		GetClientRect (hWnd, &ClientRect);
+		GetWindowRect (ControlHWND, &ControlRect);
+		MoveWindow (ControlHWND, 0, 0,
+			ClientRect.right - ClientRect.left,
+			ControlRect.bottom - ControlRect.top, TRUE);
+		ButtonOffset = ControlRect.bottom - ControlRect.top;
 
-		control = GetDlgItem(hWnd, IDC_GETLIN_EDIT);
-		GetWindowRect(control, &edit_rt);
-		MoveWindow( control,
-					0,
-					0,
-					dlg_rt.right - dlg_rt.left,
-					edit_rt.bottom - edit_rt.top,
-					TRUE );
-
-		control = GetDlgItem(hWnd, IDOK);
-		GetWindowRect(control, &text_rt);
-		MoveWindow( control,
-					0,
-					edit_rt.bottom - edit_rt.top,
-					(dlg_rt.right-dlg_rt.left)/2,
-					text_rt.bottom - text_rt.top,
-					TRUE );
-
-		control = GetDlgItem(hWnd, IDCANCEL);
-		GetWindowRect(control, &text_rt);
-		MoveWindow( control,
-					(dlg_rt.right-dlg_rt.left)/2,
-					edit_rt.bottom - edit_rt.top,
-					(dlg_rt.right-dlg_rt.left)/2,
-					text_rt.bottom - text_rt.top,
-					TRUE );
-
-		/* set focus to the edit control */
-		SetFocus(GetDlgItem(hWnd, IDC_GETLIN_EDIT));
+		/* Now get the OK and CANCEL buttons */
+		ControlHWND = GetDlgItem(hWnd, IDOK);
+		GetWindowRect (ControlHWND, &ControlRect);
+		Division = ((ClientRect.right - ClientRect.left) -
+			2 * (ControlRect.right - ControlRect.left)) / 3;
+		MoveWindow (ControlHWND, Division,
+			ButtonOffset,
+			ControlRect.right - ControlRect.left,
+			ControlRect.bottom - ControlRect.top, TRUE);
+		ControlHWND = GetDlgItem(hWnd, IDCANCEL);
+		MoveWindow (ControlHWND,
+			Division * 2 + ControlRect.right - ControlRect.left,
+			ButtonOffset,
+			ControlRect.right - ControlRect.left,
+			ControlRect.bottom - ControlRect.top, TRUE);
 
 		/* tell windows that we've set the focus */
 		return FALSE; 
