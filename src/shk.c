@@ -2570,12 +2570,13 @@ xchar x, y;
 		    dropped_container(obj, shkp, TRUE);
 		if (!obj->unpaid)
 		    obj->no_charge = 1;
-		if (!shkp->mcanmove) {
+		if (shkp->msleeping) {
+		    if(!rn2(3))
+			pline("%s snores indifferently.", Monnam(shkp));
+		} else {
 		    if(ANGRY(shkp) && !rn2(4))
 			pline("%s utters a curse.", Monnam(shkp));
 		    else pline("%s is indisposed.", Monnam(shkp));
-		} else if(!rn2(3)) {
-		    pline("%s snores indifferently.", Monnam(shkp));
 		}
 		subfrombill(obj, shkp);
 		return;
