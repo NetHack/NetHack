@@ -1140,12 +1140,12 @@ struct WinDesc *cw;
     int n, curr_page, page_lines;
     boolean finished, counting, reset_count;
     char *cp, *rp, resp[QBUFSZ], gacc[QBUFSZ],
-	 *msave, morestr[QBUFSZ];
+	 *msave, *morestr;
 
     curr_page = page_lines = 0;
     page_start = page_end = 0;
     msave = cw->morestr;	/* save the morestr */
-    cw->morestr = morestr;
+    cw->morestr = morestr = (char*) alloc((unsigned) QBUFSZ);
     counting = FALSE;
     count = 0L;
     reset_count = TRUE;
@@ -1429,6 +1429,7 @@ struct WinDesc *cw;
 
     } /* while */
     cw->morestr = msave;
+    free((genericptr_t)morestr);
 }
 
 STATIC_OVL void
