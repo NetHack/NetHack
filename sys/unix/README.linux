@@ -57,37 +57,47 @@ nethack-bugs@nethack.org
 
 
 
-Steps used to build this binary release
+Steps used to build this binary release, in addition to the basic
+instructions found in sys/unix/Install.unx.  The step numbers below
+correspond to the step numbers in sys/unix/Install.unx.
 
 System:  gcc-3.2, XFree86-libs-4.2.0, ncurses-5.2, glibc-2.2.93 (GLIBC_2.3)
 
-0.  Makefile.top: GAMEGRP = games
+3.  Edit include/config.h and include/unixconf.h
+    config.h: define X11_GRAPHICS window support.
+              define USE_XPM support.
+              define COMPRESS as /bin/gzip as that is where it
+              seems to reside on newer Linux's.
+              define COMPRESS_EXTENSION as ".gz"
+              define DLB
+
+    unixconf.h: define LINUX
+                define TIMED_DELAY
+
+6.  Makefile.src: define modern, non-BSD Linux and linux options throughout
+		  CC = gcc
+		  LFLAGS = -L/usr/X11R6/lib
+		  WINSRC = $(WINTTYSRC) $(WINX11SRC)
+		  WINOBJ = $(WINTTYOBJ) $(WINX11OBJ)
+		  WINTTYLIB = /usr/lib/libncurses.a
+		  WINX11LIB = -lXaw -lXmu -lXext -lXt -lXpm -lX11
+		  WINLIB = $(WINTTYLIB) $(WINX11LIB)
+
+    Makefile.utl: define modern, non-BSD Linux and linux options throughout
+                  Use bison/flex instead of yacc/lex
+		  CC = gcc
+		  LFLAGS = -L/usr/X11R6/lib
+		  YACC = bison -y
+		  LEX = flex
+
+7.  Makefile.top: GAMEGRP = games
 		  GAMEPERM = 02755
 		  FILEPERM = 0664
 		  EXEPERM = 0755
 		  DIRPERM = 0775
 		  VARDATND = x11tiles pet_mark.xbm rip.xpm
 
-1.  Makefile.src: define LINUX and linux options throughout
-		  WINSRC = $(WINTTYSRC) $(WINX11SRC)
-		  WINOBJ = $(WINTTYOBJ) $(WINX11OBJ)
-		  WINTTYLIB = /usr/lib/libncurses.a
-                  Include Xpm libs in WINX11LIB
-		  WINLIB = $(WINTTYLIB) $(WINX11LIB)
+    make all; su; make install
 
-2.  Makefile.utl: define LINUX and linux options throughout
-                  Use bison/flex instead of yacc/lex
-
-3.  config.h: define X11 window support, XPM support.
-              define COMPRESS as /bin/gzip as that is where it
-              seems to reside on newer Linux's.
-              define COMPRESS_EXTENSION as ".gz"
-              define DLB
-
-4.  unixconf.h: define LINUX
-                define TIMED_DELAY
-
-5.  make all; su; make install
-
-6.  Convert nh10.bdf and ibm.bdf to proper font files and place in
-    font path.
+9.  Additional step: As discussed in win/X11/Install.X11, convert nh10.bdf
+    and ibm.bdf to proper font files and place in font path.
