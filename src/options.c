@@ -2554,6 +2554,38 @@ boolean setinitial,setfromfile;
         retval = TRUE;
     }
 #endif
+     else if (!strcmp("align_message", optname) ||
+		!strcmp("align_status", optname)) {
+	menu_item *window_pick = (menu_item *)0;
+	char abuf[BUFSZ];
+	boolean msg = (*(optname+6) == 'm');
+
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	any.a_int = ALIGN_TOP;
+	add_menu(tmpwin, NO_GLYPH, &any, 't', 0,
+		ATR_NONE, "top", MENU_UNSELECTED);
+	any.a_int = ALIGN_BOTTOM;
+	add_menu(tmpwin, NO_GLYPH, &any, 'b', 0,
+		ATR_NONE, "bottom", MENU_UNSELECTED);
+	any.a_int = ALIGN_LEFT;
+	add_menu(tmpwin, NO_GLYPH, &any, 'l', 0,
+		ATR_NONE, "left", MENU_UNSELECTED);
+	any.a_int = ALIGN_RIGHT;
+	add_menu(tmpwin, NO_GLYPH, &any, 'r', 0,
+		ATR_NONE, "right", MENU_UNSELECTED);
+	Sprintf(abuf, "Select %s window placement relative to the map:",
+		msg ? "message" : "status");
+	end_menu(tmpwin, abuf);
+	if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
+		int reslt = window_pick->item.a_int;
+		if (msg) iflags.wc_align_message = reslt;
+		else iflags.wc_align_status = reslt;
+		free((genericptr_t)window_pick);
+	}
+	destroy_nhwindow(tmpwin);
+        retval = TRUE;
+    }
     return retval;
 }
 
