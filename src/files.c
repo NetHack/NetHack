@@ -91,6 +91,7 @@ char SAVEP[SAVESIZE];	/* holds path of directory for save file */
 
 #ifdef HOLD_LOCKFILE_OPEN
 struct level_ftrack {
+int init;
 int fd;					/* file descriptor for level file     */
 int oflag;				/* open flags                         */
 boolean nethack_thinks_it_is_open;	/* Does NetHack think it's open?       */
@@ -535,7 +536,11 @@ const char *name;
 int lev, oflag;
 {
 	int reslt, fd;
-	if (lftrack.fd) {
+	if (!lftrack.init) {
+		lftrack.init = 1;
+		lftrack.fd = -1;
+	}
+	if (lftrack.fd >= 0) {
 		/* check for compatible access */
 		if (lftrack.oflag == oflag) {
 			fd = lftrack.fd;
@@ -554,7 +559,7 @@ int lev, oflag;
 			fd = sopen(name, oflag,SH_DENYRW, FCMASK);
 			lftrack.fd = fd;
 			lftrack.oflag = oflag;
-			if (fd)
+			if (fd >= 0)
 			    lftrack.nethack_thinks_it_is_open = TRUE;
 	}
 	return fd;
@@ -565,12 +570,13 @@ really_close()
 {
 	int fd = lftrack.fd;
 	lftrack.nethack_thinks_it_is_open = FALSE;
-	lftrack.fd = 0;
+	lftrack.fd = -1;
 	lftrack.oflag = 0;
 	(void)_close(fd);
 	return;
 }
 
+int
 close(fd)
 int fd;
 {
@@ -1349,15 +1355,20 @@ int retryct;
 #endif  /* UNIX || VMS */
 
 #if defined(AMIGA) || defined(WIN32) || defined(MSDOS)
+# ifdef AMIGA
+#define OPENFAILURE(fd) (!fd)
+# else
+#define OPENFAILURE(fd) (fd < 0)
+# endif
     lockptr = 0;
-    while (retryct-- && !lockptr) {
+    while (retryct-- && OPENFAILURE(lockptr)) {
 # ifdef AMIGA
 	(void)DeleteFile(lockname); /* in case dead process was here first */
 	lockptr = Open(lockname,MODE_NEWFILE);
 # else
 	lockptr = open(lockname, O_RDWR|O_CREAT|O_EXCL, S_IWRITE);
 # endif
-	if (!lockptr) {
+	if (OPENFAILURE(lockptr)) {
 	    raw_printf("Waiting for access to %s.  (%d retries left).",
 			filename, retryct);
 	    Delay(50);
