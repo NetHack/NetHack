@@ -741,6 +741,14 @@ dodown()
 		    (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)),
 		ladder_down = (u.ux == xdnladder && u.uy == ydnladder);
 
+	if(!youmonst.data->mmove) {
+	    You("are rooted %s.",
+		Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ?
+		"in place" : "to the ground");
+	    nomul(0);
+	    return 1;
+	}
+
 #ifdef STEED
 	if (u.usteed && !u.usteed->mcanmove) {
 		pline("%s won't move!", Monnam(u.usteed));
@@ -839,6 +847,20 @@ dodown()
 int
 doup()
 {
+	if(!youmonst.data->mmove) {
+	    You("are rooted %s.",
+		Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ?
+		"in place" : "to the ground");
+	    nomul(0);
+	    return 1;
+	}
+
+	/* "up" to get out of a pit... */
+	if (u.utrap && u.utraptype == TT_PIT) {
+	    climb_pit();
+	    return 1;
+	}
+
 	if( (u.ux != xupstair || u.uy != yupstair)
 	     && (!xupladder || u.ux != xupladder || u.uy != yupladder)
 	     && (!sstairs.sx || u.ux != sstairs.sx || u.uy != sstairs.sy

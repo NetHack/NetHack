@@ -75,6 +75,8 @@ charge for reviving a shop owned corpse or reanimating a shop owned statue
 filled trap doors on castle can be re-dug
 message order when swapping places with a pet (e.g. into a trap), also use
 	different term instead of "displace"
+flyers can get out of pits more easily than non-flyers
+allow use of the < command to try to exit a pit
 
 
 Platform- and/or Interface-Specific Fixes
