@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)do.c	3.4	2003/04/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -801,7 +801,7 @@ dodown()
 		trap->ttyp == HOLE ? "down the hole" : "through the trap door");
 
 	if (trap && Is_stronghold(&u.uz)) {
-		goto_hell(TRUE, TRUE);
+		goto_hell(FALSE, TRUE);
 	} else {
 		at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
 		next_level(!trap);
