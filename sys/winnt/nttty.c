@@ -3,8 +3,11 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* tty.c - (Windows NT) version */
+
 /*                                                  
- * Initial Creation 				M. Allison	93/01/31 
+ * Initial Creation 				M. Allison	1993/01/31 
+ * Switch to low level console output routines	M. Allison	2003/10/01
+ * Restrict cursor movement until input pending	M. Lehotay	2003/10/02
  *
  */
 
