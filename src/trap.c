@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/09/25	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1095,7 +1095,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 	    case LANDMINE: {
 #ifdef STEED
 		unsigned steed_mid = 0;
-		struct obj *saddle;
+		struct obj *saddle = 0;
 #endif
 		if (Levitation || Flying) {
 		    if (!already_seen && rn2(3)) break;
@@ -1106,8 +1106,8 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 					     "a trigger");
 		    if (already_seen && rn2(3)) break;
 		    pline("KAABLAMM!!!  %s %s%s off!",
-		    	    forcebungle ? "Your inept attempt sets" :
-		    	    		  "The air currents set",
+			  forcebungle ? "Your inept attempt sets" :
+					"The air currents set",
 			    already_seen ? a_your[trap->madeby_u] : "",
 			    already_seen ? " land mine" : "it");
 		} else {

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.4	2003/05/19	*/
+/*	SCCS Id: @(#)options.c	3.4	2003/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2704,13 +2704,13 @@ boolean setinitial,setfromfile;
 	}
 	destroy_nhwindow(tmpwin);
         retval = TRUE;
-    }
-    else if (!strcmp("number_pad", optname)) {
+    } else if (!strcmp("number_pad", optname)) {
 	static const char *npchoices[3] =
 		{"0 (off)", "1 (on)", "2 (on, DOS compatible)"};
-	char *npletters = "abc";
+	const char *npletters = "abc";
 	menu_item *mode_pick = (menu_item *)0;
-        tmpwin = create_nhwindow(NHW_MENU);
+
+	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
 	for (i = 0; i < SIZE(npchoices); i++) {
 		any.a_int = i + 1;
@@ -2738,12 +2738,12 @@ boolean setinitial,setfromfile;
         }
 	destroy_nhwindow(tmpwin);
         retval = TRUE;
-    }
-    else if (!strcmp("menu_headings", optname)) {
+    } else if (!strcmp("menu_headings", optname)) {
 	static const char *mhchoices[3] = {"bold", "inverse", "underline"};
-	char *npletters = "biu";
+	const char *npletters = "biu";
 	menu_item *mode_pick = (menu_item *)0;
-        tmpwin = create_nhwindow(NHW_MENU);
+
+	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
 	for (i = 0; i < SIZE(mhchoices); i++) {
 		any.a_int = i + 1;
