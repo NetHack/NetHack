@@ -2598,7 +2598,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# placeholder 136 (explosion fiery 8)
+# tile 136 (explosion fiery 8)
 {
   CCCCLCCDDDDDDDMM
   CCDCCDCDDCDCDDMM
