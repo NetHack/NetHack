@@ -264,6 +264,9 @@ hitting with a polearm counts as hitting with a weapon for conduct
 traps detected while blind and levitating were not displayed
 when a mind flayer uses its mind attack, it should wake the victim
 shapechangers restored from disk would no longer change shape
+allow "tame" prefix when using the wizmode C-g command to create new monster(s)
+display a more appropriate name for a high priestess when using ;/ commands
+change "The water elemental is on fire" to "The water elemental is boiling"
 blind, cancelled or nonseen invisible Medusa cannot gaze at other monsters
 fix impossible when spinning web on falling rock, rolling boulder and fire traps
 rust monsters can only eat items made of rustable material
