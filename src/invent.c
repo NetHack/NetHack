@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2002/10/07	*/
+/*	SCCS Id: @(#)invent.c	3.4	2002/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1142,6 +1142,7 @@ unsigned *resultflags;
 	int oletct, iletct, unpaid, oc_of_sym;
 #endif
 	char sym, *ip, olets[MAXOCLASSES+5], ilets[MAXOCLASSES+5];
+	char extra_removeables[3+1];	/* uwep,uswapwep,uquiver */
 	char buf[BUFSZ], qbuf[QBUFSZ];
 
 	if (resultflags) *resultflags = 0;
@@ -1203,20 +1204,31 @@ unsigned *resultflags;
 		break;
 	}
 
+	extra_removeables[0] = '\0';
+	if (takeoff) {
+	    /* arbitrary types of items can be placed in the weapon slots
+	       [any duplicate entries in extra_removeables[] won't matter] */
+	    if (uwep) (void)strkitten(extra_removeables, uwep->oclass);
+	    if (uswapwep) (void)strkitten(extra_removeables, uswapwep->oclass);
+	    if (uquiver) (void)strkitten(extra_removeables, uquiver->oclass);
+	}
+
 	ip = buf;
 	olets[oletct = 0] = '\0';
 	while ((sym = *ip++) != '\0') {
 	    if (sym == ' ') continue;
 	    oc_of_sym = def_char_to_objclass(sym);
-	    if (takeoff && !(uwep && oc_of_sym == uwep->oclass) &&
-		    (oc_of_sym != MAXOCLASSES)) {
-		if (!index(removeables, oc_of_sym)) {
+	    if (takeoff && oc_of_sym != MAXOCLASSES) {
+		if (index(extra_removeables, oc_of_sym)) {
+		    ;	/* skip rest of takeoff checks */
+		} else if (!index(removeables, oc_of_sym)) {
 		    pline("Not applicable.");
 		    return 0;
 		} else if (oc_of_sym == ARMOR_CLASS && !wearing_armor()) {
 		    You("are not wearing any armor.");
 		    return 0;
-		} else if (oc_of_sym == WEAPON_CLASS && !uwep && !uswapwep && !uquiver) {
+		} else if (oc_of_sym == WEAPON_CLASS &&
+			!uwep && !uswapwep && !uquiver) {
 		    You("are not wielding anything.");
 		    return 0;
 		} else if (oc_of_sym == RING_CLASS && !uright && !uleft) {

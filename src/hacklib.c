@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hacklib.c	3.4	1999/04/10	*/
+/*	SCCS Id: @(#)hacklib.c	3.4	2002/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,6 +18,7 @@ NetHack, except that rounddiv may call panic().
 	char *		upstart		(char *)
 	char *		mungspaces	(char *)
 	char *		eos		(char *)
+	char *		strkitten	(char *,char)
 	char *		s_suffix	(const char *)
 	char *		xcrypt		(const char *, char *)
 	boolean		onlyspace	(const char *)
@@ -127,6 +128,19 @@ eos(s)			/* return the end of a string (pointing at '\0') */
     register char *s;
 {
     while (*s) s++;	/* s += strlen(s); */
+    return s;
+}
+
+/* strcat(s, {c,'\0'}); */
+char *
+strkitten(s, c)		/* append a character to a string (in place) */
+    char *s;
+    char c;
+{
+    char *p = eos(s);
+
+    *p++ = c;
+    *p = '\0';
     return s;
 }
 
