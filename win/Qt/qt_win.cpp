@@ -4476,9 +4476,17 @@ static char** get_saved_names()
 	    char name[NAME_MAX];
 	    if ( sscanf( namelist[i]->d_name, "%d%s", &uid, name ) == 2 ) {
 		if ( uid == myuid ) {
+		    /* Name should be stored in save file, but currently we
+			have to extract it from the filename, which loses
+			information (eg. "/", "_", and "." characters are lost. */
+		    int k;
 		    char* end = strstr(name,".gz");
 		    if ( !end ) end = strstr(name,".Z");
 		    if ( end ) *end = 0;
+		    /* "_" most likely means " ", which certainly looks nicer */
+		    for (k=0; name[k]; k++)
+			if ( name[k]=='_' )
+			    name[k]=' ';
 		    result[j++] = strdup(name);
 		}
 	    }
