@@ -1076,7 +1076,6 @@ electric eel
 elvenking
 elven cave*man
 elven healer
-elven priest
 	The Elves sat round the fire upon the grass or upon the sawn
 	rings of old trunks.  Some went to and fro bearing cups and
 	pouring drinks; others brought food on heaped plates and
@@ -1745,10 +1744,8 @@ human
 human cave*man
 human healer
 human monk
-human samurai
 acolyte
 apprentice
-arch priest
 attendant
 cave*man
 chieftain
@@ -1760,9 +1757,7 @@ monk
 ninja
 nurse
 page
-*priest*
 ronin
-samurai
 shopkeeper
 student
 thug
@@ -3026,6 +3021,24 @@ poseido*n
 	preservative instinct of the race is to be unscientific --
 	and without science we are as the snakes and toads.
 		[ The Devil's Dictionary, by Ambrose Bierce ]
+priest*
+* priest*
+	[...]  For the two priests were talking exactly like priests,
+	piously, with learning and leisure, about the most aerial
+	enigmas of theology.  The little Essex priest spoke the more
+	simply, with his round face turned to the strengthening stars;
+	the other talked with his head bowed, as if he were not even
+	worthy to look at them.  But no more innocently clerical
+	conversation could have been heard in any white Italian cloister
+	or black Spanish cathedral.  The first he heard was the tail of
+	one of Father Brown's sentences, which ended:  "... what they
+	really meant in the Middle Ages by the heavens being
+	incorruptible."  The taller priest nodded his bowed head and
+	said:  "Ah, yes, these modern infidels appeal to their reason;
+	but who can look at those millions of worlds and not feel that
+	there may well be wonderful universes above us where reason is
+	utterly unreasonable?"
+		[ The Innocence of Father Brown, by G.K. Chesterton ]
 prisoner
 	Where am I?
 		In the Village.
@@ -3274,6 +3287,19 @@ salamander
 	salamander, in fact, comes from a Greek word meaning "fire
 	animal".
 		[ Salamanders, by Cherie Winner ]
+samurai
+* samurai
+	By that time, Narahara had already slipped his arm from the
+	sleeve of his outer robe, drew out his two-and-a-half-foot
+	Fujiwara Tadahiro sword, and, brandishing it over his head,
+	began barreling toward the foreigners.  In less than a minute,
+	he had charged upon them and cut one of them through the torso.
+	The man fled, clutching his bulging guts, finally to fall from
+	his horse at the foot of a pine tree about a thousand yards
+	away.  Kaeda Takeji finished him off.  The other two Englishmen
+	were severely wounded as they tried to flee.  Only the woman
+	managed to escape virtually unscathed.
+		[ The Fox-horse, from Drunk as a Lord, by Ryotaro Shiba ]
 sandestin
 	Ildefonse left the terrace and almost immediately sounds
 	of contention came from the direction of the work-room.
