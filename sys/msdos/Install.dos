@@ -47,6 +47,10 @@ I.  Dispelling the Myths:
     If you want to build a copy of NetHack that is identical to the
     "official binary", please see appendix A.
 
+    The unsupported sys/msdos/Makefile.MSC was for the old 16 bit
+    Microsoft Visual C 1.52c compiler and has not been made compliant
+    with 3.4.x.
+
     You may find it useful to obtain copies of lex (flex) and yacc (bison
     or byacc).  While not strictly necessary to compile nethack, they are 
     required should you desire to make any changes to the level and dungeon 
