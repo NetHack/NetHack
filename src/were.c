@@ -81,17 +81,19 @@ register struct monst *mon;
 	possibly_unwield(mon, FALSE);
 }
 
-boolean
-were_summon(ptr,yours)	/* were-creature (even you) summons a horde */
+int
+were_summon(ptr,yours,visible)	/* were-creature (even you) summons a horde */
 register struct permonst *ptr;
 register boolean yours;
+int *visible;			/* number of visible helpers created */
 {
 	register int i, typ, pm = monsndx(ptr);
 	register struct monst *mtmp;
-	boolean success = FALSE;
+	int total = 0;
 
+	*visible = 0;
 	if(Protection_from_shape_changers && !yours)
-		return FALSE;
+		return 0;
 	for(i = rnd(5); i > 0; i--) {
 	   switch(pm) {
 
@@ -111,11 +113,14 @@ register boolean yours;
 			continue;
 	    }
 	    mtmp = makemon(&mons[typ], u.ux, u.uy, NO_MM_FLAGS);
-	    if (mtmp) success = TRUE;
+	    if (mtmp) {
+		total++;
+		if (canseemon(mtmp)) *visible += 1;
+	    }
 	    if (yours && mtmp)
 		(void) tamedog(mtmp, (struct obj *) 0);
 	}
-	return success;
+	return total;
 }
 
 void

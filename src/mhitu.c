@@ -477,15 +477,36 @@ mattacku(mtmp)
 	    mdat = mtmp->data;
 
 	    if(!rn2(10) && !mtmp->mcan) {
-		if(youseeit) {
+	    	int numseen, numhelp;
+		char buf[BUFSZ];
+
+		numhelp = were_summon(mdat, FALSE, &numseen);
+		if (youseeit) {
 			pline("%s summons help!", Monnam(mtmp));
-		} else
-			You_feel("hemmed in.");
-		/* Technically wrong; we really should check if you can see the
-		 * help, but close enough...
-		 */
-		if (!were_summon(mdat,FALSE) && youseeit)
-		    pline("But none comes.");
+			if (numhelp > 0) {
+			    if (numseen == 0)
+				You_feel("hemmed in.");
+			} else pline("But none comes.");
+		} else {
+			char *from_nowhere;
+			if (!Deaf) {
+				pline("%s %s!", Something,
+					makeplural(growl_sound(mtmp)));
+				from_nowhere = "";
+			} else from_nowhere = " from nowhere";
+			if (numhelp > 0) {
+			    if (numseen < 1) You_feel("hemmed in.");
+			    else {
+				if (numseen == 1)
+			    		Sprintf(buf, "%s appears",
+							an(mdat->mname));
+			    	else
+			    		Sprintf(buf, "%s appear",
+							s_suffix(mdat->mname));
+				pline("%s%s!", upstart(buf), from_nowhere);
+			    }
+			} /* else no help came; but you didn't know it tried */
+		}
 	    }
 	}
 

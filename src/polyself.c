@@ -913,6 +913,7 @@ dospinweb()
 int
 dosummon()
 {
+	int placeholder;
 	if (u.uen < 10) {
 	    You("lack the energy to send forth a call for help!");
 	    return(0);
@@ -922,7 +923,7 @@ dosummon()
 
 	You("call upon your brethren for help!");
 	exercise(A_WIS, TRUE);
-	if (!were_summon(youmonst.data,TRUE))
+	if (!were_summon(youmonst.data, TRUE, &placeholder))
 		pline("But none arrive.");
 	return(1);
 }
