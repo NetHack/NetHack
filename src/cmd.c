@@ -1906,7 +1906,9 @@ register char *cmd;
 		}
 	    }
 	    *cp = '\0';
-	    Norep("Unknown command '%s'.", expcmd);
+	    if (!prefix_seen || !iflags.cmdassist ||
+		!help_dir(0, "Invalid direction key!"))
+		Norep("Unknown command '%s'.", expcmd);
 	}
 	/* didn't move */
 	flags.move = FALSE;
@@ -1998,6 +2000,7 @@ char *msg;
 	winid win;
 	char *wiz_only_list = "EFGIOVW";
 	char buf[BUFSZ], buf2[BUFSZ], *expl;
+
 	win = create_nhwindow(NHW_TEXT);
 	if (!win) return FALSE;
 	if (msg) {
