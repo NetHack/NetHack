@@ -15,9 +15,9 @@
 #include "qttableview.h"
 #if QT_VERSION >= 300
 #ifndef QT_NO_QTTABLEVIEW
-#include "qscrollbar.h"
-#include "qpainter.h"
-#include "qdrawutil.h"
+#include <qscrollbar.h>
+#include <qpainter.h>
+#include <qdrawutil.h>
 #include <limits.h>
 
 enum ScrollBarDirtyFlags {

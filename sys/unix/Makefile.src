@@ -305,8 +305,9 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
 	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
-	   files.c fountain.c hack.c hacklib.c invent.c light.c lock.c mail.c \
-	   makemon.c mcastu.c mhitm.c mhitu.c minion.c mklev.c mkmap.c \
+	   files.c fountain.c hack.c hacklib.c invent.c light.c lock.c \
+	   mail.c makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c minion.c \
+	   mklev.c mkmap.c \
 	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
 	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
@@ -361,8 +362,9 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
 	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
-	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o lock.o \
-	mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o minion.o mklev.o mkmap.o \
+	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o \
+	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
+	minion.o mklev.o mkmap.o \
 	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o monstr.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
@@ -675,7 +677,7 @@ qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qttableview.cpp
 monstr.o: monstr.c $(CONFIG_H)
-vis_tab.o: vis_tab.c $(CONFIG_H)
+vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
 allmain.o: allmain.c $(HACK_H)
 alloc.o: alloc.c $(CONFIG_H)
 apply.o: apply.c $(HACK_H) ../include/edog.h
@@ -745,7 +747,7 @@ options.o: options.c $(CONFIG_H) ../include/objclass.h ../include/flag.h \
 		$(HACK_H) ../include/tcap.h
 pager.o: pager.c $(HACK_H) ../include/dlb.h
 pickup.o: pickup.c $(HACK_H)
-pline.o: pline.c $(HACK_H) ../include/epri.h
+pline.o: pline.c $(HACK_H) ../include/epri.h ../include/edog.h
 polyself.o: polyself.c $(HACK_H)
 potion.o: potion.c $(HACK_H)
 pray.o: pray.c $(HACK_H) ../include/epri.h
@@ -755,7 +757,7 @@ quest.o: quest.c $(HACK_H) ../include/qtext.h
 questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h ../include/qtext.h
 read.o: read.c $(HACK_H)
 rect.o: rect.c $(HACK_H)
-region.o: region.c $(HACK_H)
+region.o: region.c $(HACK_H) ../include/lev.h
 restore.o: restore.c $(HACK_H) ../include/lev.h ../include/tcap.h
 rip.o: rip.c $(HACK_H)
 rnd.o: rnd.c $(HACK_H)
