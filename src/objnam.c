@@ -2040,6 +2040,8 @@ boolean from_user;
 		oclass = GEM_CLASS;
 		dn = actualn = bp;
 		goto srch;
+	} else if (!strcmpi(bp, "looking glass")) {
+		;	/* avoid false hit on "* glass" */
 	} else if (!BSTRCMPI(bp, p-6, " glass") || !strcmpi(bp, "glass")) {
 		register char *g = bp;
 		if (strstri(g, "broken")) return (struct obj *)0;
@@ -2052,7 +2054,7 @@ boolean from_user;
 			typ = LAST_GEM + rnd(9);
 			if (objects[typ].oc_class == GEM_CLASS) goto typfnd;
 			else typ = 0;	/* somebody changed objects[]? punt */
-		} else if (g > bp) {	/* try to construct canonical form */
+		} else {		/* try to construct canonical form */
 			char tbuf[BUFSZ];
 			Strcpy(tbuf, "worthless piece of ");
 			Strcat(tbuf, g);  /* assume it starts with the color */
