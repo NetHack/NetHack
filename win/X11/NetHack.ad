@@ -8,7 +8,7 @@ NetHack*display_file*font:		fixed
 NetHack*tombstone*font:			fixed
 NetHack*rip*font:			-*-times-medium-r-*-*-12-*-*-*-*-*-*-*
 NetHack*menu*font:			fixed
-!NetHack*text*font:			fixed
+NetHack*text*font:			fixed
 NetHack*map*font:			nh10
 
 ! To use full-color tiles for the map, uncomment the tile file name.
