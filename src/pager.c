@@ -674,7 +674,7 @@ do_look(quick)
 		}
 		/* Kludge: warning trumps boulders on the display.
 		   Reveal the boulder too or player can get confused */
-		if (sobj_at(BOULDER, cc.x, cc.y))
+		if (from_screen && sobj_at(BOULDER, cc.x, cc.y))
 			Strcat(out_str, " co-located with a boulder");
 		break;	/* out of for loop*/
 	    }
