@@ -1031,7 +1031,7 @@ struct obj *obj;
 	        /* if it catches while you have it, then it's your tough luck */
 		check_unpaid(obj);
 	        verbalize("That's in addition to the cost of %s %s, of course.",
-				Yname2(obj), obj->quan == 1 ? "itself" : "themselves");
+			  yname(obj), obj->quan == 1 ? "itself" : "themselves");
 		bill_dummy_object(obj);
 	    }
 	    begin_burn(obj, FALSE);
