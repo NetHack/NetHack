@@ -1920,11 +1920,7 @@ boolean ordinary;
 		    }
 		    destroy_item(WAND_CLASS, AD_ELEC);
 		    destroy_item(RING_CLASS, AD_ELEC);
-		    if (!resists_blnd(&youmonst)) {
-			    You(are_blinded_by_the_flash);
-			    make_blinded((long)rnd(100),FALSE);
-			    if (!Blind) Your(vision_clears);
-		    }
+		    (void) flashburn((long)rnd(100));
 		    break;
 
 		case SPE_FIREBALL:
@@ -2099,12 +2095,7 @@ boolean ordinary;
 		case EXPENSIVE_CAMERA:
 #endif
 		    damage += rnd(25);
-		    if (!resists_blnd(&youmonst)) {
-			You(are_blinded_by_the_flash);
-			make_blinded((long)damage, FALSE);
-			makeknown(obj->otyp);
-			if (!Blind) Your(vision_clears);
-		    }
+		    if (flashburn((long)damage)) makeknown(obj->otyp);
 		    damage = 0;	/* reset */
 		    break;
 		case WAN_OPENING:
@@ -2159,6 +2150,19 @@ boolean ordinary;
 		    break;
 	}
 	return(damage);
+}
+
+boolean
+flashburn(duration)
+long duration;
+{
+	if (!resists_blnd(&youmonst)) {
+		You(are_blinded_by_the_flash);
+		make_blinded(duration, FALSE);
+		if (!Blind) Your(vision_clears);
+		return TRUE;
+	}
+	return FALSE;
 }
 
 #ifdef STEED
@@ -3459,11 +3463,7 @@ register int dx,dy;
 	    } else {
 		pline("%s whizzes by you!", The(fltxt));
 	    }
-	    if (abstype == ZT_LIGHTNING && !resists_blnd(&youmonst)) {
-		You(are_blinded_by_the_flash);
-		make_blinded((long)d(nd,50),FALSE);
-		if (!Blind) Your(vision_clears);
-	    }
+	    if (abstype == ZT_LIGHTNING) (void) flashburn((long)d(nd,50));
 	    stop_occupation();
 	    nomul(0);
 	}

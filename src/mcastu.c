@@ -522,6 +522,7 @@ int spellnum;
 	if (Half_spell_damage) dmg = (dmg + 1) / 2;
 	destroy_item(WAND_CLASS, AD_ELEC);
 	destroy_item(RING_CLASS, AD_ELEC);
+	(void) flashburn((long)rnd(100));
 	break;
     }
     case CLC_CURSE_ITEMS:
