@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.78 $ $Date: 2003/11/23 21:51:15 $
+% $Revision: 1.79 $ $Date: 2003/11/26 08:37:08 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.4)}
-\date{November 25, 2003}
+\date{December 1, 2003}
 
 \maketitle
 
@@ -2897,10 +2897,12 @@ Here's a couple of examples of autopickup\_exceptions:
 \begin{verbatim}
     autopickup_exception="<*arrow"
     autopickup_exception=">*corpse"
+    autopickup_exception=">* cursed*"
 \end{verbatim}
 
 The first example above will result in autopickup of any type of arrow.
 The second example results in the exclusion of any corpse from autopickup.
+The last example results in the exclusion of items known to be cursed from autopickup.
 
 %.lp
 %.hn 2

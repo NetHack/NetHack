@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "November 25, 2003
+.ds f2 "December 1, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2356,10 +2356,12 @@ Here's a couple of examples of autopickup_exceptions:
 .si
 autopickup_exception="<*arrow"
 autopickup_exception=">*corpse"
+autopickup_exception=">* cursed*"
 .ei
 .ed
 The first example above will result in autopickup of any type of arrow.
 The second example results in the exclusion of any corpse from autopickup.
+The last example results in the exclusion of items known to be cursed from autopickup.
 .hn 2
 Configuring User Sounds
 .pg
