@@ -388,7 +388,7 @@ gaze attacks now stop occupation
 proper death message when killed by "plain" high priest
 don't conceal the identity of Moloch's high priest
 blessed full healing can't recover levels lost when polymorphing into new man
-blessed full healing can reciver at most half of other lost levels
+blessed full healing can recover at most half of other lost levels
 golden glow when praying will recover lost level if blessed full healing could
 gaining a level while polymorphed increases current monst hit points as well
 	as latent human (or whatever) hit points
@@ -465,6 +465,7 @@ X11: general solution to the problem that the meaning of font height varies
 	among different implementations of X11
 X11: make "slow" mode the default since it seems to be very prevalent
 tty: pet was not always hilited
+tty: don't crash if the news file is present but empty
 
 
 General New Features
@@ -548,6 +549,9 @@ made each of the end disclosure options customizable to "prompt;default no",
 add female role level names "Medica ossium", "Magistra", "Chevaliere",  
 	and "Dame"
 more feedback about skill advancement from #enhance command
+USER_SOUNDS compilation option to enable use of SOUND and SOUNDDIR variables
+	in the config file for user-specified sound clips for
+	user-specified, regex-based message patterns
 
 
 Platform- and/or Interface-Specific New Features
