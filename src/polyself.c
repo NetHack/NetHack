@@ -668,6 +668,8 @@ int alone;
 		    dropx(otmp2);
 	    }
 	    untwoweapon();
+	} else if (!could_twoweap(youmonst.data)) {
+	    untwoweapon();
 	}
     }
 }
