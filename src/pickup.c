@@ -1998,7 +1998,7 @@ register int held;
 	    }
 	}
 
-	if (cnt && loss)
+	if (lcnt && loss)
 	    You("owe %ld %s for lost item%s.",
 		loss, currency(loss), lcnt > 1 ? "s" : "");
 
