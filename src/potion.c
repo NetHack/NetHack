@@ -157,6 +157,8 @@ boolean talk;
 	set_itimeout(&Vomiting, xtime);
 }
 
+static const char vismsg[] = "vision seems to %s for a moment but is %s now.";
+static const char eyemsg[] = "%s momentarily %s.";
 
 void
 make_blinded(xtime, talk)
@@ -167,9 +169,6 @@ boolean talk;
 	boolean u_could_see, can_see_now;
 	int eyecnt;
 	char buf[BUFSZ];
-	static const char
-		vismsg[] = "vision seems to %s for a moment but is %s now.",
-		eyemsg[] = "%s momentarily %s.";
 
 	/* we need to probe ahead in case the Eyes of the Overworld
 	   are or will be overriding blindness */
@@ -245,6 +244,7 @@ long xtime;	/* nonzero if this is an attempt to turn on hallucination */
 boolean talk;
 long mask;	/* nonzero if resistance status should change by mask */
 {
+	long old = HHallucination;
 	boolean changed = 0;
 	const char *message, *verb;
 
@@ -261,6 +261,22 @@ long mask;	/* nonzero if resistance status should change by mask */
 	    if (!EHalluc_resistance && (!!HHallucination != !!xtime))
 		changed = TRUE;
 	    set_itimeout(&HHallucination, xtime);
+
+	    /* clearing temporary hallucination without toggling vision */
+	    if (!changed && !HHallucination && old && talk) {
+		if (!haseyes(youmonst.data)) {
+		    strange_feeling((struct obj *)0, (char *)0);
+		} else if (Blind) {
+		    char buf[BUFSZ];
+		    int eyecnt = eyecount(youmonst.data);
+
+		    Strcpy(buf, body_part(EYE));
+		    Your(eyemsg, (eyecnt == 1) ? buf : makeplural(buf),
+			 (eyecnt == 1) ? "itches" : "itch");
+		} else {	/* Grayswandir */
+		    Your(vismsg, "flatten", "normal");
+		}
+	    }
 	}
 
 	if (changed) {
