@@ -539,7 +539,7 @@ menu_pickup:
 		if (!all_of_a_type) {
 		    char qbuf[BUFSZ];
 		    Sprintf(qbuf, "Pick up %s?",
-			safe_qbuf(qbuf, sizeof("Pick up ?"), doname(obj),
+			safe_qbuf("", sizeof("Pick up ?"), doname(obj),
 					an(simple_typename(obj->otyp)), something));
 		    switch ((obj->quan < 2L) ? ynaq(qbuf) : ynNaq(qbuf)) {
 		    case 'q': goto end_query;	/* out 2 levels */
@@ -1479,7 +1479,7 @@ lootcont:
 
 	    if (Is_container(cobj)) {
 		Sprintf(qbuf, "There is %s here, loot it?",
-			safe_qbuf(qbuf, sizeof("There is  here, loot it?"),
+			safe_qbuf("", sizeof("There is  here, loot it?"),
 			     doname(cobj), an(simple_typename(cobj->otyp)),
 			     "a container"));
 		c = ynq(qbuf);

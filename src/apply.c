@@ -2564,7 +2564,7 @@ do_break_wand(obj)
 
     Strcpy(the_wand, yname(obj));
     Sprintf(confirm, "Are you really sure you want to break %s?",
-	safe_qbuf(confirm, sizeof("Are you really sure you want to break ?"),
+	safe_qbuf("", sizeof("Are you really sure you want to break ?"),
 				the_wand, ysimple_name(obj), "the wand"));
     if (yn(confirm) == 'n' ) return 0;
 
