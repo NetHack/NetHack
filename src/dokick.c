@@ -434,8 +434,10 @@ xchar x, y;
 				if (otmp->otyp == MIRROR)
 				    change_luck(-2);
 				/* eggs laid by you */
+				/* penalty is -1 per egg, max 5, but it's always
+				   exactly 1 that breaks */
 				if (otmp->otyp == EGG && otmp->spe && otmp->corpsenm >= LOW_PM)
-				    change_luck(-5);
+				    change_luck(-1);
 				You_hear("a muffled %s.",result);
 				if(costly) loss += stolen_value(otmp, x, y,
 					    (boolean)shkp->mpeaceful, TRUE);
