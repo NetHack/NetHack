@@ -347,7 +347,7 @@ wintext.obj :	$(X11)wintext.c $(HACK_H) $(INC)winX.h $(INC)xwindow.h
 winval.obj :	$(X11)winval.c $(CONFIG_H) $(INC)winX.h
 tile.obj :	$(SRC)tile.c $(HACK_H)
 monstr.obj :	monstr.c $(CONFIG_H)
-vis_tab.obj :	vis_tab.c $(CONFIG_H)
+vis_tab.obj :	vis_tab.c $(CONFIG_H) $(INC)vis_tab.h
 #	general code
 allmain.obj :	allmain.c $(HACK_H)
 alloc.obj :	alloc.c $(CONFIG_H)
@@ -417,7 +417,7 @@ options.obj :	options.c $(CONFIG_H) $(INC)objclass.h $(INC)flag.h \
 		$(HACK_H) $(INC)tcap.h
 pager.obj :	pager.c $(HACK_H) $(INC)dlb.h
 pickup.obj :	pickup.c $(HACK_H)
-pline.obj :	pline.c $(HACK_H) $(INC)epri.h
+pline.obj :	pline.c $(HACK_H) $(INC)epri.h $(INC)edog.h
 polyself.obj :	polyself.c $(HACK_H)
 potion.obj :	potion.c $(HACK_H)
 pray.obj :	pray.c $(HACK_H) $(INC)epri.h
@@ -427,7 +427,7 @@ quest.obj :	quest.c $(HACK_H) $(INC)qtext.h
 questpgr.obj :	questpgr.c $(HACK_H) $(INC)dlb.h $(INC)qtext.h
 read.obj :	read.c $(HACK_H)
 rect.obj :	rect.c $(HACK_H)
-region.obj :	region.c $(HACK_H)
+region.obj :	region.c $(HACK_H) $(INC)lev.h
 restore.obj :	restore.c $(HACK_H) $(INC)lev.h $(INC)tcap.h
 rip.obj :	rip.c $(HACK_H)
 rnd.obj :	rnd.c $(HACK_H)
