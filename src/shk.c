@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2002/11/20	*/
+/*	SCCS Id: @(#)shk.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2441,7 +2441,8 @@ register boolean peaceful, silent;
 	    ESHK(shkp)->debit += value;
 
 	    if(!silent) {
-		char *still = "";
+		const char *still = "";
+
 		if (credit_use) {
 		    if (ESHK(shkp)->credit) {
 			You("have %ld %s credit remaining.",
@@ -2454,10 +2455,11 @@ register boolean peaceful, silent;
 		    still = "still ";
 		}
 		if(obj->oclass == COIN_CLASS)
-		    You("%sowe %s %ld %s!", still, mon_nam(shkp), value, currency(value));
-		else You("%sowe %s %ld %s for %s!", still,
-			mon_nam(shkp),
-			value, currency(value),
+		    You("%sowe %s %ld %s!", still,
+			mon_nam(shkp), value, currency(value));
+		else
+		    You("%sowe %s %ld %s for %s!", still,
+			mon_nam(shkp), value, currency(value),
 			obj->quan > 1L ? "them" : "it");
 	    }
 	} else {

@@ -147,7 +147,7 @@ int adjust;	/* positive => increase speed, negative => decrease */
 struct obj *obj;	/* item to make known if effect can be seen */
 {
     struct obj *otmp;
-    boolean give_msg = !in_mklev, stoned = FALSE;
+    boolean give_msg = !in_mklev, petrify = FALSE;
     unsigned int oldspeed = mon->mspeed;
 
     switch (adjust) {
@@ -172,7 +172,7 @@ struct obj *obj;	/* item to make known if effect can be seen */
      case -3:			/* petrification */
 	/* take away intrinsic speed but don't reduce normal speed */
 	if (mon->permspeed == MFAST) mon->permspeed = 0;
-	stoned = TRUE;
+	petrify = TRUE;
 	break;
     }
 
@@ -184,12 +184,12 @@ struct obj *obj;	/* item to make known if effect can be seen */
     else
 	mon->mspeed = mon->permspeed;
 
-    if (give_msg && (mon->mspeed != oldspeed || stoned) && canseemon(mon)) {
+    if (give_msg && (mon->mspeed != oldspeed || petrify) && canseemon(mon)) {
 	/* fast to slow (skipping intermediate state) or vice versa */
 	const char *howmuch = (mon->mspeed + oldspeed == MFAST + MSLOW) ?
 				"much " : "";
 
-	if (stoned) {
+	if (petrify) {
 	    /* mimic the player's petrification countdown; "slowing down"
 	       even if fast movement rate retained via worn speed boots */
 	    if (flags.verbose) pline("%s is slowing down.", Monnam(mon));

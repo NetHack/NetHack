@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mapglyph.c	3.4	2002/07/17	*/
+/*	SCCS Id: @(#)mapglyph.c	3.4	2003/01/08	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -65,7 +65,9 @@ int *ochar;
 unsigned *ospecial;
 {
 	register int offset;
+#if defined(TEXTCOLOR) || defined(ROGUE_COLOR)
 	int color = NO_COLOR;
+#endif
 	uchar ch;
 	unsigned special = 0;
 

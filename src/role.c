@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)role.c	3.4	2000/08/20	*/
+/*	SCCS Id: @(#)role.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1100,7 +1100,7 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 {
 	int k, gendercount = 0, aligncount = 0;
 	char buf[BUFSZ];
-	char *err_ret = " character's";
+	static char err_ret[] = " character's";
 	boolean donefirst = FALSE;
 
 	if (!suppliedbuf || buflen < 1) return err_ret;

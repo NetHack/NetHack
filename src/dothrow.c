@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.4	2002/03/29	*/
+/*	SCCS Id: @(#)dothrow.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -443,7 +443,7 @@ hurtle_step(arg, x, y)
 
     if (!Passes_walls || !(may_pass = may_passwall(x, y))) {
 	if (IS_ROCK(levl[x][y].typ) || closed_door(x,y)) {
-	    char *s;
+	    const char *s;
 
 	    pline("Ouch!");
 	    if (IS_TREE(levl[x][y].typ))

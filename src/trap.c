@@ -1,10 +1,10 @@
-/*	SCCS Id: @(#)trap.c	3.4	2002/10/12	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-extern const char *destroy_strings[];
+extern const char * const destroy_strings[];	/* from zap.c */
 
 STATIC_DCL void FDECL(dofiretrap, (struct obj *));
 STATIC_DCL void NDECL(domagictrap);
@@ -793,13 +793,14 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 			u.umonnum == PM_PIT_FIEND)
 		    pline("How pitiful.  Isn't that the pits?");
 		if (ttype == SPIKED_PIT) {
-		    char *predicament = "on a set of sharp iron spikes";
+		    const char *predicament = "on a set of sharp iron spikes";
 #ifdef STEED
 		    if (u.usteed) {
 			pline("%s lands %s!",
 				upstart(x_monnam(u.usteed,
 					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 "poor", SUPPRESS_SADDLE, FALSE)), predicament);
+					 "poor", SUPPRESS_SADDLE, FALSE)),
+			      predicament);
 		    } else
 #endif
 		    You("land %s!", predicament);
@@ -1360,13 +1361,14 @@ int style;
 		    }
 		    if (otyp == BOULDER &&
 		       (otmp2 = sobj_at(BOULDER, bhitpos.x, bhitpos.y)) != 0) {
-			char *bmsg = " as one boulder sets another in motion";
+			const char *bmsg =
+				     " as one boulder sets another in motion";
 
 			if (!isok(bhitpos.x + dx, bhitpos.y + dy) || !dist ||
 			    IS_ROCK(levl[bhitpos.x + dx][bhitpos.y + dy].typ))
 			    bmsg = " as one boulder hits another";
-			    
-		    	You_hear("a loud crash%s!",
+
+			You_hear("a loud crash%s!",
 				cansee(bhitpos.x, bhitpos.y) ? bmsg : "");
 			obj_extract_self(otmp2);
 			/* pass off the otrapped flag to the next boulder */

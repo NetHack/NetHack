@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)rip.c	3.4	2001/09/24	*/
+/*	SCCS Id: @(#)rip.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,7 +6,7 @@
 
 STATIC_DCL void FDECL(center, (int, char *));
 
-extern const char *killed_by_prefix[];
+extern const char * const killed_by_prefix[];	/* from topten.c */
 
 #if defined(TTY_GRAPHICS) || defined(X11_GRAPHICS) || defined(GEM_GRAPHICS) || defined(MSWIN_GRAPHICS)
 # define TEXT_TOMBSTONE

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.4	2002/12/18	*/
+/*	SCCS Id: @(#)dig.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1037,7 +1037,8 @@ watch_dig(mtmp, x, y, zap)
 		    verbalize("Halt, vandal!  You're under arrest!");
 		    (void) angry_guards(!(flags.soundok));
 		} else {
-		    char *str;
+		    const char *str;
+
 		    if (IS_DOOR(lev->typ))
 			str = "door";
 		    else if (IS_TREE(lev->typ))

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)winprocs.h 3.4	1996/02/18	*/
+/*	SCCS Id: @(#)winprocs.h 3.4	2003/01/08	*/
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -202,7 +202,7 @@ extern NEARDATA struct window_procs windowprocs;
 #endif
 
 struct wc_Opt {
-	char *wc_name;
+	const char *wc_name;
 	unsigned long wc_bit;
 };
 

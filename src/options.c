@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.4	2002/08/24	*/
+/*	SCCS Id: @(#)options.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3207,12 +3207,13 @@ struct wc_Opt wc_options[] = {
  */
 void
 set_option_mod_status(optnam, status)
-char *optnam;
+const char *optnam;
 int status;
 {
 	int k;
 	if (status < SET_IN_FILE || status > SET_IN_GAME) {
-		impossible("set_option_mod_status: status out of range %d.", status);
+		impossible("set_option_mod_status: status out of range %d.",
+			   status);
 		return;
 	}
 	for (k = 0; boolopt[k].name; k++) {
@@ -3244,7 +3245,8 @@ int status;
 {
 	int k = 0;
 	if (status < SET_IN_FILE || status > SET_IN_GAME) {
-		impossible("set_option_mod_status: status out of range %d.", status);
+		impossible("set_option_mod_status: status out of range %d.",
+			   status);
 		return;
 	}
 	while (wc_options[k].wc_name) {
@@ -3327,8 +3329,8 @@ char *op;
 	int j;
 	char buf[BUFSZ];
 	char *wn, *tfg, *tbg, *newop;
-	static char *wnames[] = {"menu", "message", "status", "text"};
-	static char *shortnames[] = {"mnu", "msg", "sts", "txt"};
+	static const char *wnames[] = { "menu", "message", "status", "text" };
+	static const char *shortnames[] = { "mnu", "msg", "sts", "txt" };
 	static char **fgp[] = {
 		&iflags.wc_foregrnd_menu,
 		&iflags.wc_foregrnd_message,

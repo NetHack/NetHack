@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2002/09/14	*/
+/*	SCCS Id: @(#)hack.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -787,15 +787,15 @@ boolean guess;
 	/* if guessing, find best location in travel matrix and go there */
 	if (guess) {
 	    int px = tx, py = ty;	/* pick location */
-	    int dist, d;
+	    int dist, nxtdist;
 
 	    dist = distmin(ux, uy, tx, ty);
 	    for (tx = 1; tx < COLNO; ++tx)
 		for (ty = 0; ty < ROWNO; ++ty)
 		    if (travel[tx][ty]) {
-			d = distmin(ux, uy, tx, ty);
-			if (d < dist && couldsee(tx, ty)) {
-			    px = tx; py = ty; dist = d;
+			nxtdist = distmin(ux, uy, tx, ty);
+			if (nxtdist < dist && couldsee(tx, ty)) {
+			    px = tx; py = ty; dist = nxtdist;
 			}
 		    }
 
@@ -838,6 +838,7 @@ domove()
 	xchar chainx, chainy, ballx, bally;	/* ball&chain new positions */
 	int bc_control;				/* control for ball&chain */
 	boolean cause_delay = FALSE;	/* dragging ball will skip a move */
+	const char *predicament;
 
 	u_wipe_engr(rnd(5));
 
@@ -1128,7 +1129,7 @@ domove()
 		    }
 		} else if (u.utraptype == TT_LAVA) {
 		    if(flags.verbose) {
-			char *predicament = "stuck in the lava";
+			predicament = "stuck in the lava";
 #ifdef STEED
 			if (u.usteed)
 			    Norep("%s is %s.", upstart(y_monnam(u.usteed)),
@@ -1159,7 +1160,7 @@ domove()
 		    }
 		    if(--u.utrap) {
 			if(flags.verbose) {
-			    char *predicament = "stuck to the web";
+			    predicament = "stuck to the web";
 #ifdef STEED
 			    if (u.usteed)
 				Norep("%s is %s.", upstart(y_monnam(u.usteed)),
@@ -1180,7 +1181,7 @@ domove()
 		} else if (u.utraptype == TT_INFLOOR) {
 		    if(--u.utrap) {
 			if(flags.verbose) {
-			    char *predicament = "stuck in the";
+			    predicament = "stuck in the";
 #ifdef STEED
 			    if (u.usteed)
 				Norep("%s is %s %s.",
@@ -1202,7 +1203,7 @@ domove()
 		    }
 		} else {
 		    if(flags.verbose) {
-			char *predicament = "caught in a bear trap";
+			predicament = "caught in a bear trap";
 #ifdef STEED
 			if (u.usteed)
 			    Norep("%s is %s.", upstart(y_monnam(u.usteed)),

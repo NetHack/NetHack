@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2002/11/07	*/
+/*	SCCS Id: @(#)apply.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -874,7 +874,7 @@ STATIC_OVL void
 use_candelabrum(obj)
 register struct obj *obj;
 {
-	char *s = obj->spe != 1 ? "candles" : "candle";
+	const char *s = (obj->spe != 1) ? "candles" : "candle";
 
 	if(Underwater) {
 		You("cannot make fire under water.");
@@ -926,7 +926,7 @@ use_candle(obj)
 register struct obj *obj;
 {
 	register struct obj *otmp;
-	char *s = obj->quan != 1 ? "candles" : "candle";
+	const char *s = (obj->quan != 1) ? "candles" : "candle";
 	char qbuf[QBUFSZ];
 
 	if(u.uswallow) {

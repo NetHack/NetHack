@@ -18,7 +18,7 @@
  
 struct valuable_data { long count; int typ; };
 
-struct valuable_data
+static struct valuable_data
 	gems[LAST_GEM+1 - FIRST_GEM + 1], /* 1 extra for glass */
 	amulets[LAST_AMULET+1 - FIRST_AMULET];
 
@@ -39,9 +39,9 @@ STATIC_DCL void FDECL(get_valuables, (struct obj *));
 STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *,int));
 STATIC_DCL void FDECL(artifact_score, (struct obj *,BOOLEAN_P,winid));
 STATIC_DCL void FDECL(savelife, (int));
-STATIC_DCL void FDECL(list_vanquished, (int, BOOLEAN_P));
-STATIC_DCL void FDECL(list_genocided, (int, BOOLEAN_P));
-STATIC_DCL boolean FDECL(should_query_disclose_option, (int, int*));
+STATIC_DCL void FDECL(list_vanquished, (CHAR_P,BOOLEAN_P));
+STATIC_DCL void FDECL(list_genocided, (CHAR_P,BOOLEAN_P));
+STATIC_DCL boolean FDECL(should_query_disclose_option, (int,char *));
 
 #if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
 extern void FDECL(nethack_exit,(int));
@@ -84,8 +84,7 @@ static NEARDATA const char *ends[] = {		/* "when you..." */
 	"quit", "escaped", "ascended"
 };
 
-extern const char *killed_by_prefix[];
-
+extern const char * const killed_by_prefix[];	/* from topten.c */
 
 /*ARGSUSED*/
 void
@@ -308,36 +307,39 @@ panic VA_DECL(const char *, str)
 STATIC_OVL boolean
 should_query_disclose_option(category, defquery)
 int category;
-int *defquery;
+char *defquery;
 {
-	int idx;
-	char *dop = index(disclosure_options, category);
-	if (dop && defquery) {
-		idx = (dop - disclosure_options) / sizeof(char);
-		if (idx < 0 || idx > (NUM_DISCLOSURE_OPTIONS - 1)) {
-			impossible(
-				"should_query_disclose_option: bad disclosure index %d %c",
-				idx, category);
-			*defquery = DISCLOSE_PROMPT_DEFAULT_YES;
-			return TRUE;
-		}
-		if (flags.end_disclose[idx] == DISCLOSE_YES_WITHOUT_PROMPT) {
-			*defquery = 'y';
-			return FALSE;
-		} else if (flags.end_disclose[idx] == DISCLOSE_NO_WITHOUT_PROMPT) {
-			*defquery = 'n';
-			return FALSE;
-		} else if (flags.end_disclose[idx] == DISCLOSE_PROMPT_DEFAULT_YES) {
-			*defquery = 'y';
-			return TRUE;
-		} else if (flags.end_disclose[idx] == DISCLOSE_PROMPT_DEFAULT_NO) {
-			*defquery = 'n';
-			return TRUE;
-		}
+    int idx;
+    char *dop = index(disclosure_options, category);
+
+    if (dop && defquery) {
+	idx = dop - disclosure_options;
+	if (idx < 0 || idx > (NUM_DISCLOSURE_OPTIONS - 1)) {
+	    impossible(
+		   "should_query_disclose_option: bad disclosure index %d %c",
+		       idx, category);
+	    *defquery = DISCLOSE_PROMPT_DEFAULT_YES;
+	    return TRUE;
 	}
-	if (defquery)impossible("should_query_disclose_option: bad category %c", category);
-	else impossible("should_query_disclose_option: null defquery");
-	return TRUE;
+	if (flags.end_disclose[idx] == DISCLOSE_YES_WITHOUT_PROMPT) {
+	    *defquery = 'y';
+	    return FALSE;
+	} else if (flags.end_disclose[idx] == DISCLOSE_NO_WITHOUT_PROMPT) {
+	    *defquery = 'n';
+	    return FALSE;
+	} else if (flags.end_disclose[idx] == DISCLOSE_PROMPT_DEFAULT_YES) {
+	    *defquery = 'y';
+	    return TRUE;
+	} else if (flags.end_disclose[idx] == DISCLOSE_PROMPT_DEFAULT_NO) {
+	    *defquery = 'n';
+	    return TRUE;
+	}
+    }
+    if (defquery)
+	impossible("should_query_disclose_option: bad category %c", category);
+    else
+	impossible("should_query_disclose_option: null defquery");
+    return TRUE;
 }
 
 STATIC_OVL void
@@ -345,9 +347,8 @@ disclose(how,taken)
 int how;
 boolean taken;
 {
-	char	c = 0;
+	char	c = 0, defquery;
 	char	qbuf[QBUFSZ];
-	int defquery;
 	boolean ask;
 
 	if (invent) {
@@ -359,12 +360,10 @@ boolean taken;
 
 	    ask = should_query_disclose_option('i', &defquery);
 	    if (!done_stopprint) {
-		if (ask)
-		   c = yn_function(qbuf, ynqchars, defquery);
-		if ((!ask && defquery == 'y') || (ask && c == 'y')) {
-			/* New dump format by maartenj@cs.vu.nl */
+		c = ask ? yn_function(qbuf, ynqchars, defquery) : defquery;
+		if (c == 'y') {
 			struct obj *obj;
-			
+
 			for (obj = invent; obj; obj = obj->nobj) {
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
@@ -372,17 +371,17 @@ boolean taken;
 			(void) display_inventory((char *)0, TRUE);
 			container_contents(invent, TRUE, TRUE);
 		}
-		if (ask && c == 'q')  done_stopprint++;
+		if (c == 'q')  done_stopprint++;
 	    }
 	}
 
- 	ask = should_query_disclose_option('a', &defquery);
+	ask = should_query_disclose_option('a', &defquery);
 	if (!done_stopprint) {
-	    if (ask)
-		c = yn_function("Do you want to see your attributes?",ynqchars, defquery);
-	    if ((!ask && defquery == 'y') || (ask && c == 'y'))
+	    c = ask ? yn_function("Do you want to see your attributes?",
+				  ynqchars, defquery) : defquery;
+	    if (c == 'y')
 		enlightenment(how >= PANICKED ? 1 : 2); /* final */
-	    if (ask && c == 'q') done_stopprint++;
+	    if (c == 'q') done_stopprint++;
 	}
 
 	ask = should_query_disclose_option('v', &defquery);
@@ -395,11 +394,11 @@ boolean taken;
 
 	ask = should_query_disclose_option('c', &defquery);
 	if (!done_stopprint) {
-	    if (ask)
-		c = yn_function("Do you want to see your conduct?",ynqchars,defquery);
-	    if ((!ask && defquery == 'y') || (ask && c == 'y'))
+	    c = ask ? yn_function("Do you want to see your conduct?",
+				  ynqchars, defquery) : defquery;
+	    if (c == 'y')
 		show_conduct(how >= PANICKED ? 1 : 2);
-	    if (ask && c == 'q') done_stopprint++;
+	    if (c == 'q') done_stopprint++;
 	}
 }
 
@@ -969,7 +968,7 @@ int status;
 
 STATIC_OVL void
 list_vanquished(defquery, ask)
-int defquery;
+char defquery;
 boolean ask;
 {
     register int i, lev;
@@ -990,11 +989,10 @@ boolean ask;
      * includes all dead monsters, not just those killed by the player
      */
     if (ntypes != 0) {
-    	if (ask)
-	    c = yn_function("Do you want an account of creatures vanquished?",
-				ynqchars, defquery);
-	if (ask && c == 'q') done_stopprint++;
-	if ((!ask && defquery == 'y') || (ask && c == 'y')) {
+	c = ask ? yn_function("Do you want an account of creatures vanquished?",
+			      ynqchars, defquery) : defquery;
+	if (c == 'q') done_stopprint++;
+	if (c == 'y') {
 	    klwin = create_nhwindow(NHW_MENU);
 	    putstr(klwin, 0, "Vanquished creatures:");
 	    putstr(klwin, 0, "");
@@ -1009,11 +1007,11 @@ boolean ask;
 				mons[i].mname);
 			if (nkilled > 1) {
 			    switch (nkilled) {
-	    			case 2:  Sprintf(eos(buf)," (twice)");  break;
-	    			case 3:  Sprintf(eos(buf)," (thrice)");  break;
-	    			default: Sprintf(eos(buf)," (%d time%s)",
-				    		nkilled, plur(nkilled));
-				break;
+				case 2:  Sprintf(eos(buf)," (twice)");  break;
+				case 3:  Sprintf(eos(buf)," (thrice)");  break;
+				default: Sprintf(eos(buf)," (%d time%s)",
+						 nkilled, plur(nkilled));
+					 break;
 			    }
 			}
 		    } else {
@@ -1056,7 +1054,7 @@ num_genocides()
 
 STATIC_OVL void
 list_genocided(defquery, ask)
-int defquery;
+char defquery;
 boolean ask;
 {
     register int i;
@@ -1069,11 +1067,10 @@ boolean ask;
 
     /* genocided species list */
     if (ngenocided != 0) {
-    	if (ask)
-	    c = yn_function("Do you want a list of species genocided?",
-				ynqchars, defquery);
-	if (ask && c == 'q') done_stopprint++;
-	if ((!ask && defquery == 'y') || (ask && c == 'y')) {
+	c = ask ? yn_function("Do you want a list of species genocided?",
+			      ynqchars, defquery) : defquery;
+	if (c == 'q') done_stopprint++;
+	if (c == 'y') {
 	    klwin = create_nhwindow(NHW_MENU);
 	    putstr(klwin, 0, "Genocided species:");
 	    putstr(klwin, 0, "");

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.4	2002/10/18	*/
+/*	SCCS Id: @(#)cmd.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -149,7 +149,7 @@ static void NDECL(end_of_input);
 static const char* readchar_queue="";
 
 STATIC_DCL char *NDECL(parse);
-STATIC_DCL boolean FDECL(help_dir, (CHAR_P, char *));
+STATIC_DCL boolean FDECL(help_dir, (CHAR_P,const char *));
 
 #ifdef OVL1
 
@@ -2035,11 +2035,11 @@ const char *s;
 STATIC_OVL boolean
 help_dir(sym, msg)
 char sym;
-char *msg;
+const char *msg;
 {
 	char ctrl;
 	winid win;
-	char *wiz_only_list = "EFGIOVW";
+	const char wiz_only_list[] = "EFGIOVW";
 	char buf[BUFSZ], buf2[BUFSZ], *expl;
 
 	win = create_nhwindow(NHW_TEXT);

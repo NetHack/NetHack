@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2226,7 +2226,7 @@ boolean outokay, inokay;
     menu_item *pick_list;
     char buf[BUFSZ];
     int n;
-    char *menuselector = iflags.lootabc ? "abc" : "oib";
+    const char *menuselector = iflags.lootabc ? "abc" : "oib";
 
     any.a_void = 0;
     win = create_nhwindow(NHW_MENU);

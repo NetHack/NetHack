@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mcastu.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)mcastu.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -40,7 +40,7 @@ STATIC_DCL boolean FDECL(spell_would_be_useless,(struct monst *,unsigned int,int
 
 #ifdef OVL0
 
-extern const char *flash_types[];	/* from zap.c */
+extern const char * const flash_types[];	/* from zap.c */
 
 /* feedback when frustrated monster couldn't cast a spell */
 STATIC_OVL

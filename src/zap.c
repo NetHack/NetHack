@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2002/11/07	*/
+/*	SCCS Id: @(#)zap.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -58,11 +58,11 @@ STATIC_DCL int FDECL(spell_hit_bonus, (int));
 
 #ifndef OVLB
 STATIC_VAR const char are_blinded_by_the_flash[];
-extern const char *flash_types[];
+extern const char * const flash_types[];
 #else
 STATIC_VAR const char are_blinded_by_the_flash[] = "are blinded by the flash!";
 
-const char * const flash_types[] = {		/* also used in buzzmu(mcastu.c) */
+const char * const flash_types[] = {	/* also used in buzzmu(mcastu.c) */
 	"magic missile",	/* Wands must be 0-9 */
 	"bolt of fire",
 	"bolt of cold",
@@ -3763,7 +3763,7 @@ register struct obj *obj;
 	return TRUE;
 }
 
-const char * const destroy_strings[] = {
+const char * const destroy_strings[] = {	/* also used in trap.c */
 	"freezes and shatters", "freeze and shatter", "shattered potion",
 	"boils and explodes", "boil and explode", "boiling potion",
 	"catches fire and burns", "catch fire and burn", "burning scroll",

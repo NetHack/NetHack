@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.4	2002/09/18	*/
+/*	SCCS Id: @(#)dokick.c	3.4	2003/01/08	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1314,7 +1314,8 @@ boolean shop_floor_obj;
 
 	/* some things break rather than ship */
 	if (breaktest(otmp)) {
-	    char *result;
+	    const char *result;
+
 	    if (objects[otmp->otyp].oc_material == GLASS
 #ifdef TOURIST
 		|| otmp->otyp == EXPENSIVE_CAMERA
