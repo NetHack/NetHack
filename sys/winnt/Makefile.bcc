@@ -146,7 +146,14 @@ DO_LEX  = LEX_MSG
 #
 # To use them, download the executables and templates (bison.simple,
 # bison.hairy) to some directory, and set the environment variables
-# BISON_SIMPLE and BISON_HAIRY to point to this directory.
+# BISON_SIMPLE and BISON_HAIRY, and your path to point to this
+# directory.
+#
+# For example, if you placed them in C:\BIN, you should set:
+#   C:> SET BISON_SIMPLE=C:\BIN\BISON.SIMPLE
+#   C:> SET BISON_HAIRY=C:\BIN\BISON.HAIRY
+#
+# Also, make sure your path points to the bison/flex directories.
 #
 # The following settings are configured for Wilbur Streett's ports.
 
@@ -1080,109 +1087,109 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 # in here, but maintenance should be easier.
 #
 $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
-	$(CC) $(CFLAGS) -o$@ ..\sys\atari\tos.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\atari\tos.c
 $(O)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\win32api.h
-	$(CC) $(CFLAGS) -o$@ ..\sys\share\pcmain.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\share\pcmain.c
 $(O)pcsys.o: ..\sys\share\pcsys.c $(HACK_H)
-	$(CC) $(CFLAGS) -o$@ ..\sys\share\pcsys.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\share\pcsys.c
 $(O)pctty.o: ..\sys\share\pctty.c $(HACK_H)
-	$(CC) $(CFLAGS) -o$@ ..\sys\share\pctty.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\share\pctty.c
 $(O)pcunix.o: ..\sys\share\pcunix.c $(HACK_H)
-	$(CC) $(CFLAGS) -o$@ ..\sys\share\pcunix.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\share\pcunix.c
 $(O)random.o: ..\sys\share\random.c $(HACK_H)
-	$(CC) $(CFLAGS) -o$@ ..\sys\share\random.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\share\random.c
 $(O)ioctl.o: ..\sys\share\ioctl.c $(HACK_H) $(INCL)\tcap.h
-	$(CC) $(CFLAGS) -o$@ ..\sys\share\ioctl.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\share\ioctl.c
 $(O)unixtty.o: ..\sys\share\unixtty.c $(HACK_H)
-	$(CC) $(CFLAGS) -o$@ ..\sys\share\unixtty.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\share\unixtty.c
 $(O)unixmain.o: ..\sys\unix\unixmain.c $(HACK_H) $(INCL)\dlb.h
-	$(CC) $(CFLAGS) -o$@ ..\sys\unix\unixmain.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\unix\unixmain.c
 $(O)unixunix.o: ..\sys\unix\unixunix.c $(HACK_H)
-	$(CC) $(CFLAGS) -o$@ ..\sys\unix\unixunix.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\unix\unixunix.c
 $(O)bemain.o: ..\sys\be\bemain.c $(HACK_H) $(INCL)\dlb.h
-	$(CC) $(CFLAGS) -o$@ ..\sys\be\bemain.c
+	$(cc) $(CFLAGS) -o$@ ..\sys\be\bemain.c
 $(O)getline.o: ..\win\tty\getline.c $(HACK_H) $(INCL)\func_tab.h
-	$(CC) $(CFLAGS) -o$@ ..\win\tty\getline.c
+	$(cc) $(CFLAGS) -o$@ ..\win\tty\getline.c
 $(O)termcap.o: ..\win\tty\termcap.c $(HACK_H) $(INCL)\tcap.h
-	$(CC) $(CFLAGS) -o$@ ..\win\tty\termcap.c
+	$(cc) $(CFLAGS) -o$@ ..\win\tty\termcap.c
 $(O)topl.o: ..\win\tty\topl.c $(HACK_H) $(INCL)\tcap.h
-	$(CC) $(CFLAGS) -o$@ ..\win\tty\topl.c
+	$(cc) $(CFLAGS) -o$@ ..\win\tty\topl.c
 $(O)wintty.o: ..\win\tty\wintty.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\patchlevel.h $(INCL)\tcap.h
-	$(CC) $(CFLAGS) -o$@ ..\win\tty\wintty.c
+	$(cc) $(CFLAGS) -o$@ ..\win\tty\wintty.c
 $(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
 		$(CONFIG_H)
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\Window.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\Window.c
 $(O)dialogs.o: ..\win\X11\dialogs.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\dialogs.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\dialogs.c
 $(O)winX.o: ..\win\X11\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
 		$(INCL)\patchlevel.h ..\win\X11\nh72icon \
 		..\win\X11\nh56icon ..\win\X11\nh32icon
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\winX.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\winX.c
 $(O)winmap.o: ..\win\X11\winmap.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\winX.h $(INCL)\tile2x11.h
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\winmap.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\winmap.c
 $(O)winmenu.o: ..\win\X11\winmenu.c $(HACK_H) $(INCL)\winX.h
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\winmenu.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\winmenu.c
 $(O)winmesg.o: ..\win\X11\winmesg.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\winX.h
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\winmesg.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\winmesg.c
 $(O)winmisc.o: ..\win\X11\winmisc.c $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\winX.h
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\winmisc.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\winmisc.c
 $(O)winstat.o: ..\win\X11\winstat.c $(HACK_H) $(INCL)\winX.h
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\winstat.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\winstat.c
 $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\wintext.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\wintext.c
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
-	$(CC) $(CFLAGS) -o$@ ..\win\X11\winval.c
+	$(cc) $(CFLAGS) -o$@ ..\win\X11\winval.c
 $(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnmain.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnaskstr.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnaskstr.c
 $(O)gnbind.o: ..\win\gnome\gnbind.c ..\win\gnome\gnbind.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gnaskstr.h ..\win\gnome\gnyesno.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnbind.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnbind.c
 $(O)gnglyph.o: ..\win\gnome\gnglyph.c ..\win\gnome\gnglyph.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnglyph.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnglyph.c
 $(O)gnmain.o: ..\win\gnome\gnmain.c ..\win\gnome\gnmain.h ..\win\gnome\gnsignal.h \
 		..\win\gnome\gnbind.h ..\win\gnome\gnopts.h $(HACK_H) \
 		$(INCL)\date.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnmain.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnmain.c
 $(O)gnmap.o: ..\win\gnome\gnmap.c ..\win\gnome\gnmap.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnsignal.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnmap.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnmap.c
 $(O)gnmenu.o: ..\win\gnome\gnmenu.c ..\win\gnome\gnmenu.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gnbind.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnmenu.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnmenu.c
 $(O)gnmesg.o: ..\win\gnome\gnmesg.c ..\win\gnome\gnmesg.h ..\win\gnome\gnsignal.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnmesg.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnmesg.c
 $(O)gnopts.o: ..\win\gnome\gnopts.c ..\win\gnome\gnopts.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnmain.h ..\win\gnome\gnmap.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnopts.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnopts.c
 $(O)gnplayer.o: ..\win\gnome\gnplayer.c ..\win\gnome\gnplayer.h \
 		..\win\gnome\gnmain.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnplayer.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnplayer.c
 $(O)gnsignal.o: ..\win\gnome\gnsignal.c ..\win\gnome\gnsignal.h \
 		..\win\gnome\gnmain.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnsignal.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnsignal.c
 $(O)gnstatus.o: ..\win\gnome\gnstatus.c ..\win\gnome\gnstatus.h \
 		..\win\gnome\gnsignal.h ..\win\gnome\gn_xpms.h \
 		..\win\gnome\gnomeprv.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnstatus.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnstatus.c
 $(O)gntext.o: ..\win\gnome\gntext.c ..\win\gnome\gntext.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gn_rip.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gntext.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gntext.c
 $(O)gnyesno.o: ..\win\gnome\gnyesno.c ..\win\gnome\gnbind.h ..\win\gnome\gnyesno.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnyesno.c
+	$(cc) $(CFLAGS) $(GNOMEINC) -c ..\win\gnome\gnyesno.c
 $(O)wingem.o: ..\win\gem\wingem.c $(HACK_H) $(INCL)\func_tab.h $(INCL)\dlb.h \
 		$(INCL)\patchlevel.h $(INCL)\wingem.h
-	$(CC) $(CFLAGS) -o$@ ..\win\gem\wingem.c
+	$(cc) $(CFLAGS) -o$@ ..\win\gem\wingem.c
 $(O)wingem1.o: ..\win\gem\wingem1.c $(INCL)\gem_rsc.h $(INCL)\load_img.h \
 		$(INCL)\wintype.h $(INCL)\wingem.h
-	$(CC) $(CFLAGS) -o$@ ..\win\gem\wingem1.c
+	$(cc) $(CFLAGS) -o$@ ..\win\gem\wingem1.c
 $(O)load_img.o: ..\win\gem\load_img.c $(INCL)\load_img.h
-	$(CC) $(CFLAGS) -o$@ ..\win\gem\load_img.c
+	$(cc) $(CFLAGS) -o$@ ..\win\gem\load_img.c
 $(O)tile.o: tile.c $(HACK_H)
 $(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\dlb.h $(INCL)\patchlevel.h $(INCL)\qt_win.h \
