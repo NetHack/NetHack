@@ -14,6 +14,8 @@ typedef struct mswin_nethack_text_window {
 } NHTextWindow, *PNHTextWindow;
 
 static WNDPROC  editControlWndProc = 0;
+#define DEFAULT_COLOR_BG_TEXT	COLOR_WINDOW
+#define DEFAULT_COLOR_FG_TEXT	COLOR_WINDOWTEXT
 
 BOOL	CALLBACK	NHTextWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	NHEditHookWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -134,6 +136,21 @@ BOOL CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
             }
 		}
 	break;
+
+	case WM_CTLCOLORSTATIC: { /* sent by edit control before it is drawn */
+		HDC hdcEdit = (HDC) wParam; 
+		HWND hwndEdit = (HWND) lParam;
+		if( hwndEdit == GetDlgItem(hWnd, IDC_TEXT_CONTROL) ) {
+			SetBkColor(hdcEdit, 
+				text_bg_brush ? text_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_TEXT)
+				);
+			SetTextColor(hdcEdit, 
+				text_fg_brush ? text_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_TEXT) 
+				); 
+			return (BOOL)(text_bg_brush 
+					? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
+		}
+	} return FALSE;
 
 	case WM_DESTROY:
 		if( data ) {
