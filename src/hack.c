@@ -2111,7 +2111,7 @@ weight_cap()
 {
 	register long carrcap;
 
-	carrcap = (((ACURRSTR + ACURR(A_CON))/2)+1)*50;
+	carrcap = 25*(ACURRSTR + ACURR(A_CON)) + 50;
 	if (Upolyd) {
 		/* consistent with can_carry() in mon.c */
 		if (youmonst.data->mlet == S_NYMPH)
