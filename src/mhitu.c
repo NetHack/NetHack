@@ -111,7 +111,7 @@ register struct obj *otemp;
 		return;
 	pline("%s %s %s %s.", Monnam(mtmp),
 	      (objects[otemp->otyp].oc_dir & PIERCE) ? "thrusts" : "swings",
-	      mhis(mtmp), xname(otemp));
+	      mhis(mtmp), singular(otemp, xname));
 }
 
 /* return how a poison attack was delivered */

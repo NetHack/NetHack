@@ -1188,7 +1188,7 @@ register struct obj *otemp;
 	Strcpy(buf, mon_nam(mdef));
 	pline("%s %s %s %s at %s.", Monnam(magr),
 	      (objects[otemp->otyp].oc_dir & PIERCE) ? "thrusts" : "swings",
-	      mhis(magr), xname(otemp), buf);
+	      mhis(magr), singular(otemp, xname), buf);
 }
 
 /*

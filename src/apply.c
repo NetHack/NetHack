@@ -2163,7 +2163,7 @@ struct obj *obj;
 	    const char *mon_hand;
 	    boolean gotit = proficient && (!Fumbling || !rn2(10));
 
-	    Strcpy(onambuf, xname(otmp));
+	    Strcpy(onambuf, cxname(otmp));
 	    if (gotit) {
 		mon_hand = mbodypart(mtmp, HAND);
 		if (bimanual(otmp)) mon_hand = makeplural(mon_hand);

@@ -2685,7 +2685,7 @@ move_on:
 			    offer, plur(offer),
 			    (!ltmp && cltmp && only_partially_your_contents) ?
 			     " your items in" : (!ltmp && cltmp) ? " the contents of" : "",
-			    obj->unpaid ? "the" : "your", xname(obj),
+			    obj->unpaid ? "the" : "your", cxname(obj),
 			    (obj->quan == 1L &&
 			    !(!ltmp && cltmp && only_partially_your_contents)) ?
 			    "it" : "them");

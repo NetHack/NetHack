@@ -824,6 +824,16 @@ boolean ignore_oquan;	/* to force singular */
 	    return makeplural(nambuf);
 }
 
+/* xname, unless it's a corpse, then corpse_xname(obj, FALSE) */
+char *
+cxname(obj)
+struct obj *obj;
+{
+	if (obj->otyp == CORPSE)
+	    return corpse_xname(obj, FALSE);
+	return xname(obj);
+}
+
 /*
  * Used if only one of a collection of objects is named (e.g. in eat.c).
  */
@@ -1092,10 +1102,7 @@ struct obj *obj;
 	char *s = shk_your(outbuf, obj);	/* assert( s == outbuf ); */
 	int space_left = BUFSZ - strlen(s) - sizeof " ";
 
-	/* "your corpse" is silly, use corpse_xname for this case */
-	return strncat(strcat(s, " "),
-		       (obj->otyp == CORPSE) ?
-		       corpse_xname(obj, FALSE) : xname(obj), space_left);
+	return strncat(strcat(s, " "), cxname(obj), space_left);
 }
 
 /* capitalized variant of yname() */
