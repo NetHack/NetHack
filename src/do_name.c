@@ -6,8 +6,22 @@
 
 STATIC_DCL void FDECL(do_oname, (struct obj *));
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P,const char *));
+STATIC_DCL char *NDECL(nextmbuf);
 
 extern const char what_is_an_unknown_object[];		/* from pager.c */
+
+#define NUMMBUF 5
+
+/* manage a pool of BUFSZ buffers, so callers don't have to */
+STATIC_OVL char *
+nextmbuf()
+{
+	static char NEARDATA bufs[NUMMBUF][BUFSZ];
+	static int bufidx = 0;
+
+	bufidx = (bufidx + 1) % NUMMBUF;
+	return bufs[bufidx];
+}
 
 /* the response for '?' help request in getpos() */
 STATIC_OVL void
@@ -579,11 +593,7 @@ int suppress;
  */
 boolean called;
 {
-#ifdef LINT	/* static char buf[BUFSZ]; */
-	char buf[BUFSZ];
-#else
-	static char buf[BUFSZ];
-#endif
+	char *buf = nextmbuf();
 	struct permonst *mdat = mtmp->data;
 	boolean do_hallu, do_invis, do_it, do_saddle;
 	boolean name_at_start, has_adjectives;
@@ -606,7 +616,7 @@ boolean called;
 	    !(suppress & SUPPRESS_IT);
 	do_saddle = !(suppress & SUPPRESS_SADDLE);
 
-	buf[0] = 0;
+	buf[0] = '\0';
 
 	/* unseen monsters, etc.  Use "it" */
 	if (do_it) {

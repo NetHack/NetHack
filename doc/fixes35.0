@@ -48,6 +48,7 @@ make it possible for the code to recognize your starting pet throughout the
 healers notice when a wand of undead turning revives a monster so the
 	wand is then identified
 update display if bestowed a spellbook while unable to see invisible self
+use small pool of static buffers for mon_nam() and Monnam()
 
 
 Platform- and/or Interface-Specific Fixes
