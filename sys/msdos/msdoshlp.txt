@@ -1,0 +1,188 @@
+            MSDOS specific help file for NetHack 3.3.0
+		  (Last Revision: December 4, 1999)
+
+Copyright (c) NetHack PC Development Team 1993-1999.
+NetHack may be freely distributed.  See license for details.
+
+New players should be sure to read GuideBoo.txt which contains essential
+information about playing NetHack.  It can be found in the same
+directory as your NetHack executable.
+
+The MSDOS port of NetHack supports some additional or enhanced commands
+as well as some defaults.nh file options specific to configuration choices 
+used during the building of PC NetHack.  Listed below are those commands
+and defaults.nh file options.
+
+Recognized MSDOS specific defaults.nh entries are outlined below.
+
+Boolean Options:
+
+        IBMgraphics             Use IBM extended characters for the dungeon
+                                Default: [FALSE]
+        BIOS                    Allow the use of IBM ROM BIOS calls
+                                Default: [FALSE]
+        rawio                   Allow the use of raw I/O (may only be set
+                                on startup)
+                                Default: [FALSE]
+        preload_tiles           Preload tiles into RAM at start of game.
+                                Faster, but uses more memory.
+                                Default: [TRUE]
+
+Color Options:
+
+OPTIONS=!color
+
+		Players will need this if they have a real, true, (old)
+		monochrome adapter, and they are seeing underlined,
+		and flashing, and reverse-video characters on the
+		screen. Or they find that some things are missing from
+		the display.  This means that the auto-detection
+		for monochromes has failed.  The color support
+		stuff is active in video.c, but may be (will have
+		to be) overridden by adding an OPTIONS=nocolor to
+		defaults.nh.
+
+OPTIONS=VIDEO
+		(defaults.nh only)
+
+		ie: OPTIONS=video:autodetect
+
+		Possible values are: AUTODETECT, DEFAULT, VGA
+
+		AUTODETECT Checks for a supported hi-res video
+                           adaptor, and if it detects one, NetHack 
+                           will run in "TILE MODE." 
+
+		DEFAULT	   NetHack will run in TTY mode.  This is
+                           the same as not specifying OPTIONS=VIDEO
+                           at all.
+
+		VGA        Forces use of VGA specific video routines.
+                           Any forcing of specific video routines has
+                           potential to cause machine lock-ups if 
+                           the specified video hardware is not present.	
+
+OPTIONS=VIDEOSHADES
+		(defaults.nh only)
+		Players may wish to add this option because one of their
+		shades of gray is difficult to read on their video
+		display hardware.  Allows a level of intensity to be
+		assigned to the 3 possible shades of gray in NetHack,
+		those being BLACK, GRAY, WHITE.  To each of those
+		shades, the player may assign a DARK, NORMAL, or LIGHT value.
+		Here is the default if not specified:
+
+		ie. OPTIONS=VIDEOSHADES:dark-normal-light
+
+		Anytime the same intensity value (DARK NORMAL LIGHT) is used
+		for more than one shade of gray, it will not be possible
+		to visually distinguish those two shades from each
+		other.
+
+		ie. OPTIONS=VIDEOSHADES:normal-normal-light
+
+		This, while eliminating the dark shade normally used for
+		displaying black items, means that the player won't be
+		able to distinguish black items and creatures from gray
+		items and creatures visually.
+
+		Note also that the controversial gray schema used in
+		pl 3.1.2 as the default, corresponded to:
+
+		OPTIONS=VIDEOSHADES:normal-dark-normal
+
+		This is NOT the default in pl 3.1.3 and above, so many people
+		will probably not even need to use this option, and will find
+		the default just fine. The maps are built using gray,
+		and in pl 3.1.3, that is mapped to normal by default. In
+		3.1.2, it was mapped to dark (as above).
+
+OPTIONS=VIDEOCOLORS
+		(defaults.nh only)
+		This option is only provided because some people on
+		r.g.r.n mentioned how they liked to modify the color
+		values from the default ANSI.SYS behaviour, and were
+		"upset" to find out that they could no longer do so
+		under 3.1.2.  The color map is as accurate as possible
+		on standard PC video hardware as it stands, and any
+		deviation from the default, will mean that people
+		are mapping blue to green for example.  The option is
+		available to provide as much flexibility as possible,
+		but it is not encouraged to be used.
+
+		One possible use might be for the dark blue in
+		fountains.  On video hardware that has trouble
+		displaying blacks, there may also be problems displaying
+		the darker blue used in fountains.  If that is the case
+		then the default map:
+
+		OPTIONS=VIDEOCOLORS:4-2-6-1-5-3-12-10-14-9-13-11
+
+		could be changed to the following to map blue to br.
+		blue:
+
+		OPTIONS=VIDEOCOLORS:4-2-6-9-5-3-12-10-14-9-13-11
+
+		The mapping order for the options:
+
+			red, green, brown, blue, magenta, cyan
+			br.red, br.green, yellow, br.blue,
+			br.magenta, br.cyan
+
+		The PC hardware uses the following values:
+
+		red(4), green(2), brown(6), blue(1), magenta(5),
+		cyan(3), bright red(12), bright green(10), yellow(14),
+		bright blue(9), bright magenta(13), bright cyan(11),
+                normal white(7), bright white(15).
+
+
+The following options are NOT currently recognized under the MSDOS
+port of PC NetHack:
+
+        LEVELS=                 Where to store/create per level
+                                data files.
+        SAVE=                   Where to save games.
+        BONES=                  Where to store bones files.
+
+
+MSDOS Additional/Enhanced Commands:
+
+If you have opted to use the "graphical" or "tiled" option, (usually set via
+OPTIONS=VIDEO:AUTODETECT ((see above)), then the following function keys are
+active:
+
+F3	cycle through the current position indicator, or halo.	Usually this
+	halo highlights the player's tile, unless the game is asking you for
+	an answer to a question that requires positional information, (ie,
+	the discover command).
+F4	toggle level overview mode on/off
+F5	toggle tiled display on/off.  (Switches between tiled and traditional
+	ASCII display.)
+
+While playing NetHack under MSDOS you can press the ALT key in combination 
+with another key to execute an extended command as an alternative method
+to pressing a # key sequence:
+
+Alt-2    twoweapon      - toggle two-weapon combat
+Alt-a    adjust         - adjust inventory letters.
+Alt-c    chat           - talk to someone or something.
+Alt-d    dip            - dip an object into something.
+Alt-e    enhance        - enhance your skill with a weapon.
+Alt-f    force          - force a lock.
+Alt-i    invoke         - invoke an object's powers.
+Alt-j    jump           - jump to a location.
+Alt-l    loot           - loot a box on the floor.
+Alt-m    monster        - use a monster's special ability.
+Alt-n    name           - name an item or type of object.
+Alt-o    offer          - offer a sacrifice to the gods.
+Alt-p    pray           - pray to the gods for help.
+Alt-q    quit           - quit the game. (Same as #quit)
+Alt-r    rub            - rub a lamp.
+Alt-s    sit            - sit down.
+Alt-t    turn           - turn undead.
+Alt-u    untrap         - untrap something.
+Alt-v    version        - list compile time options for this version of NetHack.
+Alt-w    wipe           - wipe off your face.
+
+If you are playing on NEC PC-9800, use the GRPH key instead of the ALT key.
