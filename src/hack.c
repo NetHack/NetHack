@@ -553,6 +553,9 @@ int mode;
     register struct rm *tmpr = &levl[x][y];
     register struct rm *ust;
 
+    /* no diagonal movement for grid bugs */
+    if (dx && dy && u.umonnum == PM_GRID_BUG) return FALSE;
+
     /*
      *  Check for physical obstacles.  First, the place we are going.
      */
