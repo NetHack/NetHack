@@ -2559,7 +2559,10 @@ typfnd:
 			    /* beware of random troll or lizard corpse,
 			       or of ordinary one being forced to such */
 			    if (otmp->timed) obj_stop_timers(otmp);
-			    otmp->corpsenm = mntmp;
+			    if (mons[mntmp].msound == MS_GUARDIAN)
+			    	otmp->corpsenm = genus(mntmp);
+			    else
+				otmp->corpsenm = mntmp;
 			    start_corpse_timeout(otmp);
 			}
 			break;

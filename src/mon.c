@@ -84,6 +84,46 @@ int mndx;
 	return mndx;
 }
 
+/* Convert the monster index of some monsters (such as quest guardians)
+ * to their generic species type.
+ */
+int
+genus(mndx)
+int mndx;
+{
+	switch (mndx) {
+/* Quest guardians */
+	case PM_STUDENT:
+	case PM_CHIEFTAIN:
+	case PM_NEANDERTHAL:
+	case PM_ATTENDANT:
+	case PM_PAGE:
+	case PM_ABBOT:
+	case PM_ACOLYTE:
+	case PM_HUNTER:
+	case PM_THUG:
+	case PM_ROSHI:
+#ifdef TOURIST
+	case PM_GUIDE:
+#endif
+	case PM_WARRIOR:
+	case PM_APPRENTICE:
+		mndx = PM_HUMAN;
+		break;
+	default:
+		if (mndx >= LOW_PM && mndx < NUMMONS) {
+			struct permonst *ptr = &mons[mndx];
+			if (is_human(ptr))      mndx = PM_HUMAN;
+			else if (is_elf(ptr))   mndx = PM_ELF;
+			else if (is_dwarf(ptr)) mndx = PM_DWARF;
+			else if (is_gnome(ptr)) mndx = PM_GNOME;
+			else if (is_orc(ptr))   mndx = PM_ORC;
+		}
+		break;
+	}
+	return mndx;
+}
+
 /* convert monster index to chameleon index */
 int
 pm_to_cham(mndx)
