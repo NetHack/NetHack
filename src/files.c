@@ -1059,17 +1059,15 @@ get_saved_games()
     int myuid=getuid();
     DIR *dir;
     if((dir=opendir("save"))) {
-	int n;
 	for(n=0; readdir(dir); n++)
 		;
 	closedir(dir);
 	if(n>0) {
-		int i,j=0;
-		char **result;
+		int i;
 		if(!(dir=opendir("save")))
 			return 0;
 	        result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
-		for (i=0; i<n; i++) {
+		for (i=0, j=0; i<n; i++) {
 		    int uid;
 		    char name[64]; /* more than PL_NSIZ */
 		    struct dirent *entry=readdir(dir);
