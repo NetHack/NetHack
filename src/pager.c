@@ -121,6 +121,16 @@ lookat(x, y, buf, monbuf)
 	    if (mtmp->mleashed)
 		Strcat(buf, ", leashed to you");
 
+	    if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
+		struct trap *t = t_at(mtmp->mx, mtmp->my);
+		int tt = t ? t->ttyp : NO_TRAP;
+
+		/* newsym lets you know of the trap, so mention it here */
+		if (tt == BEAR_TRAP || tt == PIT ||
+		    tt == SPIKED_PIT ||tt == WEB)
+		    Strcat(buf, ", trapped");
+	    }
+
 	    {
 		int ways_seen = 0, normal = 0, xraydist;
 		boolean useemon = (boolean) canseemon(mtmp);
