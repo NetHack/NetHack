@@ -666,12 +666,8 @@ peffects(otmp)
 		    pline("(But in fact it was mildly stale %s.)",
 			  fruitname(TRUE));
 		    if (!Role_if(PM_HEALER)) {
-			if (otmp->corpsenm)
-			    losehp(1,
-				   "mildly contaminated tap water", KILLED_BY);
-			else
-			    losehp(1,
-				   "mildly contaminated potion", KILLED_BY_AN);
+			/* NB: blessed otmp->fromsink is not possible */
+			losehp(1, "mildly contaminated potion", KILLED_BY_AN);
 		    }
 		} else {
 		    if(Poison_resistance)
@@ -690,7 +686,7 @@ peffects(otmp)
 			    		TRUE);
 			}
 			if(!Poison_resistance) {
-			    if (otmp->corpsenm)
+			    if (otmp->fromsink)
 				losehp(rnd(10)+5*!!(otmp->cursed),
 				       "contaminated tap water", KILLED_BY);
 			    else

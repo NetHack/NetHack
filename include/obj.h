@@ -96,7 +96,8 @@ struct obj {
 
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */
-#define spestudied corpsenm	/* how many times a spellbook has been studied */
+#define spestudied corpsenm	/* # of times a spellbook has been studied */
+#define fromsink  corpsenm	/* a potion from a sink */
 	unsigned oeaten;	/* nutrition left in food, if partly eaten */
 	long age;		/* creation date */
 
