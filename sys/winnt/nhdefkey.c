@@ -28,6 +28,10 @@ extern INPUT_RECORD ir;
 char dllname[512];
 char *shortdllname;
 
+int FDECL(__declspec(dllexport) __stdcall
+ProcessKeystroke, (HANDLE hConIn, INPUT_RECORD *ir, 
+    boolean *valid, BOOLEAN_P numberpad, int portdebug));
+
 int WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 {
 	char dlltmpname[512];
@@ -246,7 +250,7 @@ int __declspec(dllexport) __stdcall
 CheckInput(hConIn, ir, count, numpad, mode, mod, cc)
 HANDLE hConIn;
 INPUT_RECORD *ir;
-int *count; 
+DWORD *count; 
 boolean numpad;
 int mode;
 int *mod;

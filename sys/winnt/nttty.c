@@ -18,6 +18,8 @@
 
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
+int FDECL(process_keystroke, (INPUT_RECORD *, boolean *,
+    BOOLEAN_P numberpad, int portdebug));
 
 /*
  * The following WIN32 Console API routines are used in this file.
@@ -69,7 +71,7 @@ typedef int (__stdcall * NHKBHIT)(
 typedef int (__stdcall * CHECKINPUT)(
 	HANDLE,
 	INPUT_RECORD *,
-	int *,
+	DWORD *,
 	BOOLEAN_P,
 	int,
 	int *,
@@ -799,7 +801,7 @@ win32con_debug_keystrokes()
 	while (!valid || ch != 27) {
 	   ReadConsoleInput(hConIn,&ir,1,&count);
 	   if ((ir.EventType == KEY_EVENT) && ir.Event.KeyEvent.bKeyDown)
-		ch = process_keystroke(&ir, &valid, 1);
+		ch = process_keystroke(&ir, &valid, iflags.num_pad, 1);
 	}
 	(void)doredraw();
 }

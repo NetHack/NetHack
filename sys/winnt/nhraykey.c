@@ -4,6 +4,7 @@
 
 /*
  * Keystroke handling contributed by Ray Chason.
+ * The following text was written by Ray Chason.
  *  
  * The problem
  * ===========
@@ -153,6 +154,7 @@
  *     * After pushing the bogus key and calling ReadConsole, check to see
  *       if we got the bogus key; if so, and an Alt is pressed, process the
  *       event as an Alt sequence.
+ * 
  */
 
 static char where_to_get_source[] = "http://www.nethack.org/";
@@ -166,6 +168,10 @@ extern HANDLE hConIn;
 extern INPUT_RECORD ir;
 char dllname[512];
 char *shortdllname;
+
+int FDECL(__declspec(dllexport) __stdcall
+ProcessKeystroke, (HANDLE hConIn, INPUT_RECORD *ir, 
+    boolean *valid, BOOLEAN_P numberpad, int portdebug));
 
 static INPUT_RECORD bogus_key;
 
@@ -444,7 +450,8 @@ int __declspec(dllexport) __stdcall
 CheckInput(hConIn, ir, count, numpad, mode, mod, cc)
 HANDLE hConIn;
 INPUT_RECORD *ir;
-int *count, *mod;
+DWORD *count;
+int *mod;
 boolean numpad;
 coord *cc;
 {

@@ -136,14 +136,18 @@ OBJ     = o
 # Yacc/Lex ... if you got 'em.
 #
 # If you have yacc and lex programs (or work-alike such as bison 
-# and flex), comment out the upper two macros and uncomment 
-# the lower two.
+# and flex), uncomment the upper two macros.
 #
 
-DO_YACC = YACC_MSG
-DO_LEX  = LEX_MSG
 #DO_YACC  = YACC_ACT
 #DO_LEX   = LEX_ACT
+
+!IFNDEF DO_YACC
+DO_YACC = YACC_MSG
+!ENDIF
+!IFNDEF DO_LEX
+DO_LEX  = LEX_MSG
+!ENDIF
 
 # Wilbur Streett's Win32 ports of GNU bison and flex are available at:
 #    http://www.monmouth.com/~wstreett/lex-yacc/lex-yacc.html
