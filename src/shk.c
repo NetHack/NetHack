@@ -2622,7 +2622,7 @@ move_on:
 		char c, qbuf[BUFSZ];
 		long tmpcr = ((offer * 9L) / 10L) + (offer <= 1L);
 
-		if (sell_how == SELL_NORMAL) {
+		if (sell_how == SELL_NORMAL || sell_response == 'y') {
 		    c = sell_response = 'y';
 		} else if (sell_response != 'n') {
 		    pline("%s cannot pay you at present.", Monnam(shkp));
@@ -2630,7 +2630,13 @@ move_on:
 			    "Will you accept %ld zorkmid%s in credit for %s?",
 			    tmpcr, plur(tmpcr), doname(obj));
 		    /* won't accept 'a' response here */
-		    c = ynq(qbuf);
+		    /* KLY - 3/2000 yes, we will, it's a damn nuisance
+                       to have to constantly hit 'y' to sell for credit */
+		    c = ynaq(qbuf);
+		    if (c == 'a') {
+			c = 'y';
+			sell_response = 'y';
+		    }
 		} else		/* previously specified "quit" */
 		    c = 'n';
 
