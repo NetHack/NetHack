@@ -1,7 +1,8 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	SCCS Id: @(#)Makefile.src	3.4	2001/12/09
+#	SCCS Id: @(#)Makefile.src	3.4	2002/03/02
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
+#  The default configuration is for building with DEC C (aka Compaq C).
 #  If you changed CC or CFLAGS, make similar changes in [.util]Makefile.
 #
 #  Note:  modifying this Makefile will cause crtl.opt to be rebuilt,
@@ -32,16 +33,15 @@ MAKEFILE= $(SRC)Makefile.
 
 # set option flags for C compiler and linker
 #
-#CFLAGS	= /Debug/noOptimize/Include=$(INC)
-CFLAGS	= /Include=$(INC)/noList	# VAXC or GNUC
-#CFLAGS	= /Prefix=All/Incl=$(INC)/noList	# DECC in native mode
+CFLAGS	= /Prefix=All/Incl=$(INC)/noList	# DECC in native mode
+#CFLAGS	= /Include=$(INC)/noList	# VAXC or GNUC
 #LFLAGS	= /Debug/Map/Cross_Ref			# for development
 #LFLAGS	= /noTraceback/noMap			# for installing w/ privs
 LFLAGS	= /noMap
 LINK	= link
 
-LIBS	= sys$share:vaxcrtl.exe/Shareable
-#LIBS	=					# blank for DECC
+LIBS	=					# blank for DECC
+#LIBS	= sys$share:vaxcrtl.exe/Shareable	# VAX C or GNU C
 MORELIBS =
 # GCC needs an extra library
 #MORELIBS = gnu_cc:[000000]gcclib.olb/Library

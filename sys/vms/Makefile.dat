@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - data files: special levels and other data.
-#	SCCS Id: @(#)Makefile.dat	3.4	1999/03/19
+#	SCCS Id: @(#)Makefile.dat	3.4	2002/03/02
 
 #  Copy this file to [.dat]Makefile.; no editing needed.
 
@@ -20,6 +20,7 @@ LEVCOMP  = $(UTL)lev_comp.exe;
 DGNCOMP  = $(UTL)dgn_comp.exe;
 DLB	 = $(UTL)dlb.exe;
 TILE2X11 = $(UTL)tile2x11.exe;
+UTILMARKER = $(UTL)util.timestamp;
 
 # note: filespecs have enough punctuation to satisfy DELETE
 MARKERS = spec_levs.timestamp;,quest_levs.timestamp; 
@@ -56,27 +57,27 @@ options :	options.;
 x11tiles :	$(X11TILES)
       @ $(NOOP)
 
-$(MAKEDEFS) :
+$(MAKEDEFS) : $(UTILMARKER)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(MAKEDEFS)
       @ $(CD) $(DAT)
 
-$(DGNCOMP) :
+$(DGNCOMP) : $(UTILMARKER)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(DGNCOMP)
       @ $(CD) $(DAT)
 
-$(LEVCOMP) :
+$(LEVCOMP) : $(UTILMARKER)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(LEVCOMP)
       @ $(CD) $(DAT)
 
-$(DLB) :
+$(DLB) : $(UTILMARKER)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(DLB)
       @ $(CD) $(DAT)
 
-$(TILE2X11) :
+$(TILE2X11) : $(UTILMARKER)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(TILE2X11)
       @ $(CD) $(DAT)

@@ -1,13 +1,14 @@
 #	NetHack Makefile (VMS) - for utility programs.
-#	SCCS Id: @(#)Makefile.utl	3.4	2000/08/05
+#	SCCS Id: @(#)Makefile.utl	3.4	2002/03/02
 
 #  Copy this file to [.util]Makefile. and then edit it as needed.
+#  The default configuration is for building with DEC C (aka Compaq C).
 #  Settings for CC and CFLAGS ought to match the ones used in [.src]Makefile.
 
 MAKE	= $(MMS)
 CD	= set default
 ECHO	= write sys$output
-MOVE	= rename/New		# within save device only
+MOVE	= rename/New		# within same device only
 MUNG	= search/Exact/Match=NOR	# to strip bogus #module directives
 NOOP	= continue
 RM	= delete/noConfirm
@@ -28,13 +29,15 @@ LEVCOMP = $(UTL)lev_comp.exe;
 DGNCOMP = $(UTL)dgn_comp.exe;
 DLB	= $(UTL)dlb.exe;
 RECOVER = $(UTL)recover.exe;
+# used by $(DAT)Makefile for synchronization
+MARKER	= $(UTL)util.timestamp;
 
 # if you are using gcc as your compiler,
 #	uncomment the CC definition below if it's not in your environment
 # CC = gcc
 
-CFLAGS	= /Include=$(INC)/noList	# VAXC or GNUC
-#CFLAGS	= /Prefix=All/Incl=$(INC)/noList	# DECC in native mode
+CFLAGS	= /Prefix=All/Incl=$(INC)/noList	# DECC in native mode
+#CFLAGS	= /Include=$(INC)/noList	# VAXC or GNUC
 LFLAGS	= /noMap
 LIBS	= $(SRC)crtl.opt/Options		# run-time library(s) needed
 LINK	= link
@@ -153,6 +156,7 @@ $(LIBOPT) : $(SRC)Makefile.;		# linker options file
 #
 $(MAKEDEFS) :	$(MAKEOBJS) $(VMSMAKEOBJS) $(LIBOPT)
 	$(LINK) $(LFLAGS) $(MAKEOBJS),$(VMSMAKEOBJS),$(LIBS)
+      @ $(TOUCH) $(MARKER)
 
 makedefs.obj :	makedefs.c \
 		$(CONFIG_H) $(INC)permonst.h $(INC)objclass.h \
@@ -365,3 +369,4 @@ spotless :	clean
       - if f$search("*.exe").nes."" then \
  $(RM) $(MAKEDEFS),$(LEVCOMP),$(DGNCOMP),$(RECOVER),$(DLB)
       - if f$search("*.exe").nes."" then  $(RM) $(TILEUTILS)
+      - if f$search("$(MARKER)").nes."" then  $(RM) $(MARKER)
