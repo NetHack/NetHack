@@ -5,6 +5,7 @@
 /* Contains code for 't' (throw) */
 
 #include "hack.h"
+#include "edog.h"
 
 STATIC_DCL int FDECL(throw_obj, (struct obj *,int));
 STATIC_DCL void NDECL(autoquiver);
@@ -1346,7 +1347,8 @@ register struct obj   *obj;
 	    potionhit(mon, obj, TRUE);
 	    return 1;
 
-	} else if (befriend_with_obj(mon->data, obj)) {
+	} else if (befriend_with_obj(mon->data, obj) ||
+		   (mon->mtame && dogfood(mon, obj) <= ACCFOOD)) {
 	    if (tamedog(mon, obj))
 		return 1;           	/* obj is gone */
 	    else {
