@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.4	2002/04/06	*/
+/*	SCCS Id: @(#)dig.c	3.4	2002/12/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1228,19 +1228,19 @@ zap_dig()
 		    } else if (!Blind)
 			pline_The("wall glows then fades.");
 		    break;
+		} else if (IS_TREE(room->typ)) { /* check trees before stone */
+		    if (!(room->wall_info & W_NONDIGGABLE)) {
+			room->typ = ROOM;
+			unblock_point(zx,zy); /* vision */
+		    } else if (!Blind)
+			pline_The("tree shudders but is unharmed.");
+		    break;
 		} else if (room->typ == STONE || room->typ == SCORR) {
 		    if (!(room->wall_info & W_NONDIGGABLE)) {
 			room->typ = CORR;
 			unblock_point(zx,zy); /* vision */
 		    } else if (!Blind)
 			pline_The("rock glows then fades.");
-		    break;
-		} else if (IS_TREE(room->typ)) {
-		    if (!(room->wall_info & W_NONDIGGABLE)) {
-			room->typ = ROOM;
-			unblock_point(zx,zy); /* vision */
-		    } else if (!Blind)
-			pline_The("tree glows then fades.");
 		    break;
 		}
 	    } else if (IS_ROCK(room->typ)) {
