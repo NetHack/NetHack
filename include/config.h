@@ -168,7 +168,8 @@
  *	la unixmain.c if so inclined.
  *
  *	Defining ZLIB_COMP builds in support for zlib compression. If you
- *	define ZLIB_COMP, you must link with a zlib library.
+ *	define ZLIB_COMP, you must link with a zlib library. Not all ports
+ *	support ZLIB_COMP.
  *
  *	COMPRESS and ZLIB_COMP are mutually exclusive.
  *

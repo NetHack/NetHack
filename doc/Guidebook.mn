@@ -2087,8 +2087,8 @@ value is examined; `r' is an exception with ``Rogue'', ``Ranger'',
 and ``random'' values. If you prefix a `!' or ``no'' to the value, you can 
 exclude that role from being picked randomly.
 .lp rlecomp
-When writing out a save file, perform run length compression of level 
-structures. Not all ports support run length compression. It has no
+When writing out a save file, perform run length compression of the map. 
+Not all ports support run length compression. It has no
 effect on reading an existing save file.
 .lp runmode
 Controls the amount of screen updating for the map window when engaged

@@ -803,7 +803,7 @@ static const char *build_opts[] = {
 		"zero-compressed save files",
 #endif
 #ifdef RLECOMP
-		"run-length compression of levl array in save files",
+		"run-length compression of map in save files",
 #endif
 		save_bones_compat_buf,
 		"basic NetHack features"

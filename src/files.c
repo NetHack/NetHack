@@ -97,6 +97,15 @@ char lock[PL_NSIZ+25];		/* long enough for username+-+name+.99 */
 # endif
 #endif
 
+#if !defined(SAVE_EXTENSION)
+# ifdef MICRO
+#define SAVE_EXTENSION	".sav"
+# endif
+# ifdef WIN32
+#define SAVE_EXTENSION	".NetHack-saved-game"
+# endif
+#endif
+
 char SAVEF[SAVESIZE];	/* holds relative path of save file from playground */
 #ifdef MICRO
 char SAVEP[SAVESIZE];	/* holds path of directory for save file */
@@ -168,6 +177,9 @@ STATIC_DCL void FDECL(redirect, (const char *,const char *,FILE *,BOOLEAN_P));
 #endif
 #if defined(COMPRESS) || defined(ZLIB_COMP)
 STATIC_DCL void FDECL(docompress_file, (const char *,BOOLEAN_P));
+#endif
+#if defined(ZLIB_COMP)
+STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
 #endif
 STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
@@ -839,7 +851,7 @@ set_savefile_name()
 #  endif
 		regularize(SAVEF+i);
 	}
-	Strcat(SAVEF, ".sav");
+	Strcat(SAVEF, SAVE_EXTENSION);
 # else
 #  if defined(WIN32)
 	/* Obtain the name of the logged on user and incorporate
@@ -847,7 +859,7 @@ set_savefile_name()
 	Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
 	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
 				'%', fnamebuf, encodedfnamebuf, BUFSZ);
-	Sprintf(SAVEF, "%s.NetHack-saved-game", encodedfnamebuf);
+	Sprintf(SAVEF, "%s%s", encodedfnamebuf,SAVE_EXTENSION);
 #  else
 	Sprintf(SAVEF, "save/%d%s", (int)getuid(), plname);
 	regularize(SAVEF+5);	/* avoid . or / in name */
@@ -1042,7 +1054,7 @@ get_saved_games()
 	Sprintf(fnamebuf, "%s-", get_username(0));
 	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
 				'%', fnamebuf, encodedfnamebuf, BUFSZ);
-	Sprintf(SAVEF, "%s*.NetHack-saved-game", encodedfnamebuf);
+	Sprintf(SAVEF, "%s*%s", encodedfnamebuf, SAVE_EXTENSION);
 #if defined(ZLIB_COMP)
 	Strcat(SAVEF, COMPRESS_EXTENSION);
 #endif
@@ -1319,45 +1331,36 @@ const char *filename;
 }
 
 #ifdef ZLIB_COMP /* RLC 09 Mar 1999: Support internal ZLIB */
-static int
+STATIC_OVL boolean
 make_compressed_name(filename,cfn)
 const char *filename;
 char *cfn;
 {
 #ifndef SHORT_FILENAMES
-	/* Assume free-form filename */
-
+	/* Assume free-form filename with no 8.3 restrictions */
 	strcpy(cfn, filename);
 	strcat(cfn, COMPRESS_EXTENSION);
 	return TRUE;
 #else
-	/* Accomodates 8.3 restriction, but otherwise assumes free-form filenames.
-	   This may need to be revised for some systems.  If a name cannot be
-	   generated, this function may return FALSE and the file will then remain
-	   uncompressed. */
-	unsigned len;
-
-	/* Assume DOS style filename */
-
+# ifdef SAVE_EXTENSION
+	char *bp = (char *)0;
 	strcpy(cfn, filename);
-	len = strlen(cfn);
-	if (len>4 && stricmp(cfn+len-4,".sav")==0) {
-		/* Save file; change .SAV extension to .SAZ */
-		/* EMX/GCC (for OS/2) seems to miscompile cfn[len-1] */
-
-		cfn[strlen(cfn)-1]='z';
-		return TRUE;
-	} else if (strnicmp(cfn,"bones",5)==0) {
-		/* Bones file; change BONES prefix to BONEZ */
-
-		cfn[4]='z';
+	if ((bp = strstri(cfn, SAVE_EXTENSION))) {
+		strsubst(bp, SAVE_EXTENSION, ".saz");
 		return TRUE;
 	} else {
-		/* Don't know how to convert this filename */
-
-		return FALSE;
+		/* find last occurrence of bon */
+		bp = eos(cfn);
+		while (bp-- > cfn) {
+			if (strstri(bp,"bon")) {
+				strsubst(bp, "bon", "boz");
+				return TRUE;
+			}
+		}
 	}
-#endif /* !MSDOS */
+# endif /* SAVE_EXTENSION */
+	return FALSE;
+#endif /* SHORT_FILENAMES */
 }
 
 STATIC_OVL void
@@ -1371,11 +1374,8 @@ boolean uncomp;
 	char buf[1024];
 	unsigned len, len2;
 
-	if (!make_compressed_name(filename, cfn)) {
-		/* Can't generate a name for the compressed file
-		   due to 8.3 restriction */
+	if (!make_compressed_name(filename, cfn))
 		return;
-	}
 
 	if (!uncomp) {
 		/* Open the input and output files */
@@ -1383,8 +1383,8 @@ boolean uncomp;
 		   fopen takes "r" and "w" */
 
 		uncompressedfile = fopen(filename, RDBMODE);
-		if (uncompressedfile == NULL) {
-			perror(filename);
+		if (!uncompressedfile) {
+			pline("Error in zlib docompress_file %s", filename);
 			return;
 		}
 		compressedfile = gzopen(cfn, "wb");
@@ -1392,7 +1392,8 @@ boolean uncomp;
 			if (errno == 0) {
 				pline("zlib failed to allocate memory");
 			} else {
-				perror(filename);
+				panic("Error in docompress_file %d",
+					errno);
 			}
 			fclose(uncompressedfile);
 			return;
@@ -1441,13 +1442,15 @@ boolean uncomp;
 			if (errno == 0) {
 				pline("zlib failed to allocate memory");
 			} else if (errno != ENOENT) {
-				perror(filename);
+				panic("Error in zlib docompress_file %s, %d",
+					filename, errno);
 			}
 			return;
 		}
 		uncompressedfile = fopen(filename, WRBMODE);
-		if (uncompressedfile == NULL) {
-			perror(filename);
+		if (!uncompressedfile) {
+			pline("Error in zlib docompress file uncompress %s",
+				filename);
 			gzclose(compressedfile);
 			return;
 		}
