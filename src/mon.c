@@ -254,6 +254,14 @@ register struct monst *mtmp;
 	if (mtmp->mnamelth)
 	    obj = oname(obj, NAME(mtmp));
 
+	/* Avoid "It was hidden under a green mold corpse!" 
+	 *  during Blind combat. An unseen monster referred to as "it"
+	 *  could be killed and leave a corpse.  If a hider then hid
+	 *  underneath it, you could be told the corpse type of a
+	 *  monster that you never knew was there without this.
+	 */
+	if (Blind && !sensemon(mtmp)) obj->dknown = 0;
+
 #ifdef INVISIBLE_OBJECTS
 	/* Invisible monster ==> invisible corpse */
 	obj->oinvis = mtmp->minvis;
