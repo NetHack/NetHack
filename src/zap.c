@@ -2981,6 +2981,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 	if (tmp > 0 && type >= 0 &&
 		resist(mon, type < ZT_SPELL(0) ? WAND_CLASS : '\0', 0, NOTELL))
 	    tmp /= 2;
+	if (tmp < 0) tmp = 0;		/* don't allow negative damage */
 #ifdef WIZ_PATCH_DEBUG
 	pline("zapped monster hp = %d (= %d - %d)", mon->mhp-tmp,mon->mhp,tmp);
 #endif
