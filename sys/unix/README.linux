@@ -17,9 +17,9 @@ creating them first.
 gunzip and untar the package, preserving permissions, from / to put the
 NetHack files in /usr/games/nethack and /usr/games/lib/nethackdir.
 
-(If you have old record and logfile entries from a previous NetHack
-version, you might want to save copies before they get overwritten by the
-new empty files; old saved games and bones files from 3.4.0 will work with 3.4.1).
+(If you have old record and logfile entries from a previous NetHack version,
+you might want to save copies before they get overwritten by the new empty
+files; old saved games and bones files from 3.4.0 will work with 3.4.1).
 
 In addition to data files for running the game, you will find other useful
 things in /usr/games/lib/nethackdir (such as a copy of this README :-).
