@@ -1538,7 +1538,7 @@ long timeout;	/* unused */
 		char *cname = corpse_xname(obj, FALSE);
 		Your("%s%s %s away%c",
 		     obj == uwep ? "wielded " : nul, cname,
-		     vtense(cname, "rot"), obj == uwep ? '!' : '.');
+		     otense(obj, "rot"), obj == uwep ? '!' : '.');
 	    }
 	    if (obj == uwep) {
 		uwepgone();	/* now bare handed */
