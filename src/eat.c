@@ -197,40 +197,44 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 	exercise(A_CON, FALSE);
 
 	if (Breathless || (!Strangled && !rn2(20))) {
-		/* choking by eating AoS doesn't involve stuffing yourself */
-		if (food && food->otyp == AMULET_OF_STRANGULATION) {
-			You("choke, but recover your composure.");
-			return;
-		}
-		You("stuff yourself and then vomit voluminously.");
-		morehungry(1000);	/* you just got *very* sick! */
-		nomovemsg = 0;
-		vomit();
+	    /* choking by eating AoS doesn't involve stuffing yourself */
+	    if (food && food->otyp == AMULET_OF_STRANGULATION) {
+		You("choke, but recover your composure.");
+		return;
+	    }
+	    You("stuff yourself and then vomit voluminously.");
+	    morehungry(1000);	/* you just got *very* sick! */
+	    nomovemsg = 0;
+	    vomit();
 	} else {
-		killer.format = KILLED_BY_AN;
-		/*
-		 * Note all "killer"s below read "Choked on %s" on the
-		 * high score list & tombstone.  So plan accordingly.
-		 */
-		if(food) {
-			You("choke over your %s.", foodword(food));
-			if (food->oclass == COIN_CLASS) {
-				Strcpy(killer.name, "a very rich meal");
-			} else {
-				Strcpy(killer.name, food_xname(food, FALSE));
-				if (food->otyp == CORPSE &&
-				    (mons[food->corpsenm].geno & G_UNIQ)) {
-				    if (!type_is_pname(&mons[food->corpsenm]))
-					Strcpy(killer.name, the(killer.name));
-				    killer.format = KILLED_BY;
-				}
-			}
+	    killer.format = KILLED_BY_AN;
+	    /*
+	     * Note all "killer"s below read "Choked on %s" on the
+	     * high score list & tombstone.  So plan accordingly.
+	     */
+	    if(food) {
+		You("choke over your %s.", foodword(food));
+		if (food->oclass == COIN_CLASS) {
+		    Strcpy(killer.name, "a very rich meal");
 		} else {
-			You("choke over it.");
-			Strcpy(killer.name, "quick snack");
+		    Strcpy(killer.name, food_xname(food, FALSE));
+		    if (food->otyp == CORPSE &&
+			(mons[food->corpsenm].geno & G_UNIQ)) {
+			if (!type_is_pname(&mons[food->corpsenm]))
+			    Strcpy(killer.name, the(killer.name));
+			killer.format = KILLED_BY;
+		    } else if (obj_is_pname(food)) {
+			killer.format = KILLED_BY;
+			if (food->oartifact >= ART_ORB_OF_DETECTION)
+			    Strcpy(killer.name, the(killer.name));
+		    }
 		}
-		You("die...");
-		done(CHOKING);
+	    } else {
+		You("choke over it.");
+		Strcpy(killer.name, "quick snack");
+	    }
+	    You("die...");
+	    done(CHOKING);
 	}
 }
 
@@ -2024,7 +2028,9 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		} else
 		    You("seem unaffected by the poison.");
 	    } else if (!otmp->cursed)
-		pline("This %s is delicious!",
+		pline("%s%s is delicious!",
+		      (obj_is_pname(otmp) &&
+		       (otmp->oartifact < ART_ORB_OF_DETECTION)) ? "" : "This ",
 		      otmp->oclass == COIN_CLASS ? foodword(otmp) :
 		      singular(otmp, xname));
 
