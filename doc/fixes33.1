@@ -1,0 +1,444 @@
+General Fixes and Modified Features
+-----------------------------------
+discarding a tin without eating should not count towards food conduct
+expand 'nethack.cnf' in dat/help to include new names on some platforms
+using 'C' to name a steed produces a "pony tail"
+stopping reading a spellbook when "too much to comprehend" left in_use set
+conduct: eating meat{ball,stick,ring,huge chunk} counts as eating meat
+don't select gems--aside from rocks and known glass or flint--via autoquiver
+skilled slingers can shoot multiple rocks with one shot, like other archers
+orcs shooting orcish arrows from orcish bows get multishot bonus, like elves
+have 'Q' offer gems/stones as likely quiver candidates when wielding a sling
+'Q' command--don't offer tools as likely quiver candidates
+spell hunger effect for wizards of high intelligence was not computed correctly
+fix "killed by the [master] mind flayer" bug
+redisplay correct trap glyphs when hallucination ends
+monsters under Conflict cannot attack other monsters that are already dead
+monsters that steal gold from monsters should teleport
+fix mummy wrappings worn by monsters to block invisibility
+applying a weapon or wieldable tool would sometimes give spurious messages
+	about two-weapon combat
+applying a weapon or wieldable tool might not always end two-weapon combat
+receiving a divine gift artifact while wielding two weapons would unrestrict
+	two-weapon skill instead of the skill for the artifact's type
+throwing and kicking while wielding two weapons exercised two-weapon skill
+when wielding two weapons, ')' command should show both
+giants cannot "easily pick up" boulders on the Sokoban level
+W command would let you wear an arbitrary item in your body armor slot if that
+	was empty & uncovered and you carried extra armor for any filled slot
+W command would list entire inventory if you answered '?' to the "what do
+	you want to wear?" prompt when all unworn armor couldn't be worn
+#looting and applying containers with menustyle != traditional would do bad
+	things if you split a merged stack in quiver or secondary weapon slot
+save/restore while mounted or stuck could cause a game crash or other errors
+baby gray dragons should not be visible to infravision
+dying from a failed saddle attempt should name the monster without using
+	hallucination
+spurious "Bummer, you've hit the ground" when hallucinating and dismounting
+constitution of <3 and >18 (possible in 3.3 because the ring of gain
+	constitution was added) was not handled properly
+potion and wand of invisibility (on yourself) should not print message if you
+	are already invisible, even if you can see invisible
+reviving tame monsters ended up tame but not peaceful and would attack you
+wishing for "rotproof" item is recognized as synonym for erodeproof
+your pair of boots "are" not affected when kicking rust monster should be "is"
+use article "a", not "an", with "eucalyptus leaf"
+fix crash if reviving troll has been genocided
+shouldn't see candles flicker when blind
+gas clouds use cloud symbol
+unchanging suppresses amulet of change, intrinsic lost by life-saving
+missing lucern hammer, silver dagger, silver spear in monster weapons
+buckled boots are brown
+Scorpius and centipedes are not web-makers
+race placeholders are M2_NOPOLY
+Monk species/leader/guardians are M1_HERBIVORE
+leader/nemesis flags fixed with |= instead of =
+freezing spheres won't leave corpses
+artifacts should add to ending score even if they are inside a bag
+being killed by a gas spore should not be treated as burning (most noticeable
+	problem was that the death message did not include "killed by")
+remove a double period from "Caught himself in his own fireball.."
+automatic dog names restricted to dogs
+chatting with a monster that teleports after the chat (succubus, bribable
+	demon) would put an 'I' symbol at the monster's destination
+stethoscope/probing should reveal identity of invisible monster, not use "it"
+wand of probing zapped at 'I' square with no monster should clear the 'I'
+cursed potion of invisibility drunk by monster should reveal 'I'
+kicked monster that evades kick by moving to unseen square should not leave
+	'I' in original position of monster
+closing a door on an invisible monster reveals the 'I'
+gas spores are recognized as having passive damage for purposes of pet attack
+since iron armor can now corrode, don't call all corroded armor "bronze armor"
+properly handle attacking a black pudding with a corrodeable weapon
+do not print "You still cannot see" when blind and removing lenses
+remove possibility of crashes when unseen monster engulfs items
+object shattered by wand should use plural verb when object is plural
+don't anger monsters when hitting them with invisibility or helpful unholy water
+for initial inventory, don't give out spellbooks in restricted spell skills
+for tourists' initial inventory, put darts in quiver rather than wield them
+artifact discoveries sometimes showed undiscovered object types (for example,
+	Snickersnee as "katana" when katana was still known as "samurai sword")
+"iron bars" singularization exception should not also catch "candy bars"
+if a monster kills a monster by throwing acid, don't credit the kill to you
+leave two-weapon combat mode if either weapon is stolen or otherwise unwielded
+use worse of (two weapon skill, current weapon skill) when figuring skill
+	bonuses and penaltys while fighting with two weapons
+never give back-stabbing or weapon-shattering bonus when using two weapons
+engulfing monster will not engulf your pony while you are riding
+arch-lich usually starts with an athame or quarterstaff
+do not say that "an" Asmodeus reads a scroll
+'?' command--short options help sometimes included garbage output
+'?' command--longer options help omitted several recent options
+eating an amulet of restful sleep now works properly
+getting hit by a potion of sleeping now works properly
+sleeping is reported by enlightenment
+detect unseen / secret door detection refreshes unseen monster (`I') glyphs
+monsters won't pick up objects in water (especially kelp)
+unseen check for monsters in explosions
+fixed "petrified by an "
+silver arrows cost a little more than other arrows
+javelin back in its own class
+dipping weapons in potion of oil now works properly
+freed prisoners become peaceful
+monk titles shortened so they aren't cut off
+elven Priests get their starting musical instrument
+you can now correctly ride centaurs
+fixed steed getting teleported (e.g. by Quantum mechanic)
+fix stethoscope/probing speed reporting, and slowing attack on player
+blessed detect monsters increments (not sets) the timeout, and produces a
+	message if no monsters are on the level
+put "Elbereth" under the sokoban prize so that monsters don't eat it
+a weak race can still have a high strength if polymorphed into a strong monster
+make dingos non barking canines
+suppress zap up/down message for stone to flesh on non-stone levels
+fix missing spaces on sokoban level that made level impossible without cheating
+use case-insensitive comparison for wishing (needed for Master Key of Thievery)
+avoid commas in the player name because they confuse the record file
+note Sliming when using probing/stethoscope on yourself
+fix inconsistency: reflecting medusa's gaze while invisible didn't work,
+	reflecting floating eye's gaze did
+Medusa should not drink potion of invisibility (the code only checked for wands)
+restore confirmation prompt for kicking pets and peaceful monsters
+ask for confirmation about kicking steed when kicking while mounted
+converting secondary weapon into an artifact (naming, dipping) stops #twoweapon
+a fully ID'd object converted into an artifact is no longer fully ID'd
+polymorphing an object by dipping in potion while inside a shop will only
+	anger the shopkeeper if the object is shop merchandize
+make {wand,spellbook,potion} of polymorph immune to being polymorphed
+turning undead should count as calling on a deity for purposes of conduct
+fix "monster trail" problem caused by reading a scroll of magic mapping while
+	engulfed
+don't give Slow_digestion-related message when non-digesting engulfer expels you
+vary vampire's chat responses according to time of day, tameness, and player
+	form
+added fish_parts to mbodypart/body_part
+fixed do-while loop test criteria in create_mplayers()
+fix crash if reviving troll has been completely drained by Stormbringer, et al
+a stinking cloud should not kill a monster more than once
+player stops riding when nymph steals saddle
+don't ask for name for eaten ring of slow digestion if already identified
+don't let engulfed lifesaved monster beat you up while supposedly being
+	totally digested
+lev_comp: honor class in OBJECT entries (user's '+',"identify" made scroll)
+fix uninitialized buffer/unprintable characters error when eggs hatch
+accept "aluminium" as variant spelling for "aluminum"
+don't die from lava while praying
+correctly display gems for the final score even when blinded
+throwing a boomerang from {wielded,secondary,quiver} weapon slot will have
+	it be restored to that slot if caught upon return
+don't allow iron balls to pass through iron bars
+fix "What weird role is this? (E)" for names taken from 3.2.x score records
+make spell of jumping work properly when restricted in escape spells
+save traits of petrified monsters; animated statues are like revived corpses
+unmoving monsters seen by infrared are removed from/displayed on the screen
+	when they leave/enter direct line-of-sight
+Sting and Orcrist get their anti-orc bonus against orc player characters
+buffer overrun caused by many long names in a single message
+polymorph can't indirectly transform scrolls of mail into blank scrolls via
+	paper golem creation
+don't let savebones() name a ghost without checking for sufficient space
+don't report "killed by ghost of Foo called Foo" on tombstone or in record
+when breaking create monster wands, don't place monsters inside solid rock
+don't allow tainted cockatrice corpses to prevent stoning if you eat one
+oil isn't seen as dimly glowing if you're blind
+properly consider hallucination and blindness when printing sliming messages
+don't allow the player to jump through iron bars or walls (the latter only
+	when wearing the Eyes of the Overworld)
+don't allow the player to hurtle through iron bars
+work around race condition between breaking a wand of teleportation,
+	teleport control and autopickup
+rust traps should affect scrolls
+lev_comp returns error if level cannot be fully written out
+blank scrolls/spellbooks don't count as reading material
+fix seduction attacks to treat characters polymorphed into golems as neuter
+chaotic sacrificing on a chaotic altar may crash if demon creation fails
+failed demon summoning might cause monsndx panic
+avoid possible crash when casting fireball spell while engulfed or near the
+	edge of the map
+prevent observation of dust clouds in rogue level doorways when blind
+cans of grease will no longer rust
+skip already dead monsters when scanning the full monster list; avoids
+	monsndx panic and other potential trouble
+skip already dead shopkeepers when checking for tended shops
+level teleport high in the air while lifesaved should result in an escape
+the "stoned" flag wasn't reset when a monster was lifesaved from turning to
+	stone, so the next monster you killed would always turn to stone
+wooden harp is not a magical object
+player characters got left at 10 when "normal" speed was increased to 12
+time it takes a monster to change armor doesn't depend on whether you see it
+character can't be totally digested on first turn of being swallowed
+level 25 engulfer would trigger divide by 0 crash via evaluating rnd(0)
+wielded egg that hatched wasn't cleaning up worn objects and might cause crash
+mirror shouldn't show location of unseen monsters
+cloth headwear was being reported as leather when fire damaged
+modify moveloop so that time (moves) is not relative to the player's speed
+fix moveloop to account for player not accumulating enough movement points
+	to move in a turn -- this fixes the reported "time is wrong when
+	burdened" problem
+monsters should not teleport on levels that disallow teleportation
+consider existing poison resistance when printing message while eating
+don't allow various spells/effects to turn monsters into genocided species
+don't crash on abusing guardian angel (accessing edog)
+call useupall() rather than useup() for organic items burned by lava
+revive any Rider corpse which gets teleported
+wishing for gold should affect conduct
+gold detection should detect gold golems
+grease should affect the secondary weapon in two-weapon mode
+falling drawbridge, eating cockatrice eggs, delayed self-genocide all caused
+	monsters to be fully named instead of using "it".	
+change the You_hear message if hero is asleep
+various inventory changes did not immediately update when perm_invent was set
+avoid crash when multiple, cascading explosions occur
+pets are no longer permanently weakened by a brush with starvation
+doeat() doesn't leave rotten food half-set-up for resumption
+don't allow trying to resume eating a revived rider corpse
+shopkeepers, priests and peaceful monsters should get angry when you cast
+	stinking cloud on them
+when crowning a neutral wizard who knows finger of death but isn't carrying
+	its spellbook, don't drop his weapon (crash likely)
+similar greased and non-greased objects would merge together into one stack
+monster reading scroll of earth may be allowed an extra attack
+change message for failed attempt to mount steed while punished
+fix multi-shot throwing for darts and shuriken
+update monster multi-shot throwing to match player throwing
+prevent inappropriate use of "lungs" in creatures that have none
+change several instances of 'pline("The ' to 'pline_The("'
+monk characters kick as characters rather than as kicking monsters
+fix kicking shades by character polymorphed into kicking monster
+fix articles in some Sokoban trap messages and eliminate some
+	superfluous messages
+restoring with damaged subroom shops on non-current level could dereference
+	stale shk pointer
+prevent removal of levitation in sokoban pits from causing you to
+	"float gently to the ground" 
+peaceful/tame mindflayer now mindblasts hostile monsters and vice versa (the
+	check was backwards)
+fix suppression of stone-to-flesh on unique monster statues
+kill player when drain life induces negative HPs
+rumors used as engravings should not refer to fortune cookies
+magic-resistant players/monsters unhurt by monsters zapping wands of striking
+fix time problem where disrobing took too long
+saddle that comes with a knight's initial horse should be known to player
+iron golems are sensitive to more ways of getting wet with water
+prevent odd contents of initial tourist tins and eggs (the contents were
+	mostly from the quest level, producing many cave spider eggs)
+breaking a wielded wand doesn't leave it wielded
+if nymph hits monster on first attack and teleports away, suppress second attack
+kicking a mimic should reveal its presence
+using 'F' command on a pet with safepet should not produce "thin air" message
+polymorphing into slime or fire creature removes Slimed; becoming a new man
+	resets the Slimed timer
+throwing cockatrice corpse barehanded should stone the player
+avoid "petrified by petrification" on tombstone
+avoid "turning into green slime" on tombstone (KILLED_BY didn't work if Slimed)
+since unchanging prevents sliming, make it reset any sliming already present
+avoid "You turn into a female succubus" redundancy
+player hit by potion of acid should take damage like monster
+"You are protected" in enlightenment display should include u.uspellprot
+chameleons that change into a non-moving, non-attacking form shouldn't get stuck
+fix bug where monsters didn't wield bow (etc.) before shooting arrows (etc.)
+medium size is too large for giant bats (it allows leaving plate mails when
+	killed)
+player polymorphed to a ghoul resists sickness just like a ghoul monster
+player in werecritter beast form shouldn't polymorph into "human"
+player wearing scales of genocided dragon was getting duplicate "you feel
+	dragon-ish" messages when polymorphing
+fix luck timeout for full moon and friday 13th
+monsters must wield polearms before using them, just like players
+when saving bones data, shopkeepers will claim dropped objects inside shops
+pets will now wear objects they pick up
+pets will now wield pick-axes when necessary
+limbless pets are no longer able to carry objects
+monsters cannot consider a mattock for digging if they are wearing a shield
+avoid a case where monsters keep switching between pick-axe and weapon
+override hallucination when reporting pets that ascended or escaped with player
+avoid duplicate pickup() calls when landing after falling through a hole
+added squeaky board traps to Lord Surtur's lair entrances
+cursed lenses no longer considered a major problem by deity
+prevent "seeing an image of someone stalking you" when Blind
+disallow potion of polymorph / ring of polymorph control starting combo
+disallow starting with blank paper
+tools shouldn't charge beyond 127 charges
+getting money from a fountain should set the looted flag
+pole-weapons won't bash and will advance skill when on steed
+blessed genocide of polymorphed unchanging player should kill
+picking up nothing should take no time
+quiver command should take no time
+potions should not be autoquivered as worthless glass
+players should not get double-billed when using or altering items
+silver dragons should have same resistance as other dragons
+golems should be un (reverse-)genocidable
+player should get blamed for destroying Minetown fountains by Excalibur dipping
+player should not get blamed for others destroying Minetown fountains
+digesting ghosts and shades as a purple worm should be nonvegan but vegetarian
+eating brains as a mind flayer should be nonvegetarian
+eating eggs should be nonvegan but vegetarian
+eating tripe, meat sticks, chunks of meat should be nonvegetarian
+headstones now implemented through engraving
+luck penalty for the remaining forms of "creative NetHacking" in sokoban
+don't penalize a turn if player cancels #ride direction
+Ranger quest is no longer a rip-off of the old Elf quest
+several Hello() messages were inappropriate for various monsters
+storm giants should talk
+monk leader and guardians should use clerical spells
+monks shouldn't start with scrolls of enchant weapon
+movement rate when saddled was miscalculated
+items under lava shouldn't been seen or picked up
+clicking in status line during `/' shouldn't cause getpos error
+huge chunk of meat should count as dogfood
+"Pardon me" when moving directly into peaceful monster
+shouldn't glow amulet and save life of digested monsters
+"<monster> gets angry!" only when you can see the square
+"Never hit with a wielded weapon" conduct should only count
+	weapons and weptools
+lynxes should not have cold attacks
+Naming a specific object asks "What do you want to name *this* ___"
+"Having fun sitting on the floor" shouldn't over fountain
+"ball lightning" changed to "ball of lightning"
+"poisoned by a poisoned crude arrow" should be "killed by a poisoned
+	orcish arrow"
+shouldn't see invisible monsters oozing under a door
+fix apostrophe for invisible seen-invisible crumbling-to-dust liches
+amulet of change when polymorphed into single-gender monster could produce
+	inconsistent role name for Priest(ess) and Cave(wo)man
+prevent Fire Brand from "burning" a water elemental
+snatching cockatrice corpse gloveless by applying bullwhip will now stone
+inventory description of wielded two-handed weapon uses "weapon in hands"
+inventory description of secondary weapon explicitly lists it as non-wielded
+	to reduce confusion about two weapon combat
+Bell of Opening removes attached iron ball when performing opening magic
+chatting to a monster who responds with "I'm trapped" reveals the trap
+Make tmp_at() work when called in the midst of a previous tmp_at() sequence
+Make the messages for attempting to wear lenses over a blindfold more clear
+Prevent buffer overflow when reading engravings that are BUFSZ in length
+paralyzation message on steed should not say your feet are frozen to the floor
+avoid buffer overflows and associated security problems from getenv(),
+	program name, and user name
+
+
+Platform- and/or Interface-Specific Fixes
+-----------------------------------------
+Mac: legacy message was being truncated
+Mac: black background left mess on backspace
+Mac: backgrounds set too early on game startup
+Mac: tty window positions not remembered after move
+Mac: tty window turned B&W when moved to bottom of screen
+Mac: tty quit command fixed
+Mac: remnants of previous hunger status now cleared
+MFLOPPY: add checkspace option to avoid problems with >2GB free space
+MSDOS: fix clearlocks() to look for the right file names, 
+	and not LEVELS.* (MFLOPPY only)
+MSDOS: remove djgpp stuff from the Microsoft C Makefile
+MSDOS: change NetHack.cnf to defaults.nh in NHAccess.nh comments
+MSDOS: add missing files to gcc 'make spotless'
+NT: WIN32 specific code in tty_nh_poskey() was missing the
+	necessary code to clear window flags so after hitting ESC 
+	messages that should have displayed did not
+Linux: set MAILPATH properly
+Linux: don't use control characters on Rogue level with IBM graphics
+DEC UNIX: set MAILPATH properly, type lex functions properly, avoid conflict
+	with curses over naming
+Qt: remove intermediate files on 'make spotless'
+Qt: modify makefile to allow use with BSD make and FreeBSD
+Qt: have player selection dialog come up when name specified
+Qt: use default menu accelerators and allow remapping
+X11: fix memory leaks is reading from dialogs
+X11, tty: avoid crashing when displaying empty menus, as from 'i' with
+	perm_invent and no inventory
+tty: when given the choice of ANSI color (AF) vs standard color (Sf), choose
+	ANSI since there is some disagreement as to the correct color order
+	for Sf, but no such disagreement for AF.
+tty: add workaround for termcap misfeature in some Linux distributions which
+	affects DECgraphics display
+Amiga: minimal functionality restored
+Amiga: recover created empty (and unused) save.info files
+Amiga: ^P works properly
+Amiga: windowcreating modified for better adaptivity
+Amiga: changed from intuition menus to gadtools menus
+Amiga: changed default colors in tilemode to those of gfxfile
+Amiga: window backfill works
+Amiga: playerselection adopted from tty-port
+Amiga: linesplitting in msg/inv/menu windows fixed
+Amiga: obey user configured pens in nethack.cnf
+Atari: tty port rescued from oblivion, Gem windowing added
+
+
+General New Features
+--------------------
+gold/glass golems, glass piercers now resist acid
+added sharks, piranha, jellyfish, prisoners, and iron bars to special levels
+piranha can appear in swamp rooms
+hero falls off steed when fumbling or falling down stairs
+artifacts speak when applied
+engraving "x" is not literacy
+demons and vampires engrave in blood
+shopkeepers don't like riding customers
+can #chat down to steed
+own race in Gnomish Mines replaced with random monsters
+differentiate between light/gaze-induced blindness and other causes of blindness
+yellow dragon scale mail provides acid resistance
+polymorphed player digests engulf victims more slowly if Slow_digestion
+Conflict now affects steed's desire to keep its rider
+undead turning of bones level player corpse causes ghost to reunite with
+	the corpse
+control-x in regular mode displays name, role, race, gender, and your deities.
+wizard mode can wish for pools of lava
+pythons now have infravision to emulate real pythons heat sense organ
+M-2 added as a shortcut for #twoweapon
+general file location mechanism
+you can choose to #loot the saddle from something now
+message changes for silver dragon scale mail glowing silver and pit vipers
+	falling into pits
+support explicit `race=random', `alignment=random', and `gender=random'
+	in startup options
+manes now grow up into lemures
+potions of healing and sickness affect Pestilence in the opposite way to
+	their effect on other monsters
+introduction of a new method of warning where you sense the danger level of
+	monsters on the level by displaying it at the monster's location
+introduction of a new method of warning for specific monsters the way Sting
+	does for Orcs; you sense their presence anywhere on the current level
+artifacts can belong to specific races and won't be given as gift when "hated"
+Archeologists get a penalty for breaking "historic" statues
+hatching eggs in male player's inventory have chance of "Daddy?"
+steeds affected by more types of wands zapped down
+opening/knock versus steed drops saddle
+unwearing your steed's saddle (e.g. stolen, opening) causes dismount
+yet another funny message when whipping a horse corpse
+yet another funny message when mounting when hallucinating
+Bell, Book, and Candelabrum added to final score like artifacts
+new keywords coaligned and noncoaligned for altars (and monsters/priests) 
+	in special level descriptions
+quest start levels get coaligned altars if their roles have multiple 
+	alignments, and goal levels get noncoaligned altars
+ice vortices and freezing spheres are infravisible
+
+
+Platform- and/or Interface-Specific New Features
+------------------------------------------------
+X11, tty, Amiga: offer for player selection only choices consistent with those
+	already made by config file/command line (e.g., only offer roles that
+	are compatible with specified race)
+tty: eight_bit_tty option
+Amiga: implement menu_* accelerators and counting
+mac: the "record" file is created if it does not exist
