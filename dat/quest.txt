@@ -2658,7 +2658,6 @@ bad influences on your actions.  Remember, only by following the %a
 path can you hope to overcome the obstacles you will face."
 %E
 %Cc Tou 00021
-%E
 "You have indeed proven yourself a worthy %c, %p.
 
 "But now your kinfolk and I must ask you to put aside your travels and
@@ -2673,6 +2672,7 @@ and recover %o.
 "Do not be distracted on your quest.  If you do not return quickly I fear
 that all will be lost.  Let us both pray now that %d will guide you
 and keep you safe."
+%E
 %Cp Tou 00025
 "Do not be fooled by the false promises of %n."
 %E
@@ -3153,7 +3153,6 @@ in ruins and simplify the task of %n.
 truly ready for this quest.  May %d guide you in this task."
 %E
 %Cc Wiz 00021
-%E
 "Yes, %p, you truly are ready for this dire task.  Listen,
 carefully, for what I tell you now will be of vital importance.
 
@@ -3176,6 +3175,7 @@ shall soon perish.
 find and overcome %n, and return %o to me.
 
 "Go now, with %d, and complete this quest before it is too late."
+%E
 %Cp Wiz 00025
 "Beware, for %n is immune to most magical attacks."
 %E

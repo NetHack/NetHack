@@ -1511,6 +1511,9 @@ static void
 do_qt_text(s)
 	char *s;
 {
+	if (!in_msg) {
+	    Fprintf(stderr, TEXT_NOT_IN_MSG, qt_line);
+	}
 	curr_msg->size += strlen(s);
 	return;
 }
