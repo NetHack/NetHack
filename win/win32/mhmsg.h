@@ -25,6 +25,7 @@ typedef struct mswin_nhmsg_add_wnd {
 typedef struct mswin_nhmsg_putstr {
   int		  attr;
   const char* text;
+  boolean	  append;
 } MSNHMsgPutstr, *PMSNHMsgPutstr;
 
 typedef struct mswin_nhmsg_print_glyph {

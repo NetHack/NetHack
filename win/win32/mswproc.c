@@ -193,9 +193,50 @@ void mswin_player_selection(void)
 
 	logDebug("mswin_player_selection()\n");
 
-	/* select a role */
-	if( mswin_player_selection_window( &nRole ) == IDCANCEL ) {
-		bail(0);
+	/* pick player type randomly (use pre-selected role/race/gender/alignment) */
+	if( flags.randomall ) {
+		if (flags.initrole < 0) {
+			flags.initrole = pick_role(flags.initrace, flags.initgend,
+							flags.initalign, PICK_RANDOM);
+			if (flags.initrole < 0) {
+				raw_print("Incompatible role!");
+				flags.initrole = randrole();
+			}
+		}
+
+		if (flags.initrace < 0 || !validrace(flags.initrole, flags.initrace)) {
+			flags.initrace = pick_race(flags.initrole, flags.initgend,
+								flags.initalign, PICK_RANDOM);
+			if (flags.initrace < 0) {
+				raw_print("Incompatible race!");
+				flags.initrace = randrace(flags.initrole);
+			}
+		}
+
+		if (flags.initgend < 0 || !validgend(flags.initrole, flags.initrace,
+						flags.initgend)) {
+			flags.initgend = pick_gend(flags.initrole, flags.initrace,
+							flags.initalign, PICK_RANDOM);
+			if (flags.initgend < 0) {
+				raw_print("Incompatible gender!");
+				flags.initgend = randgend(flags.initrole, flags.initrace);
+			}
+		}
+
+		if (flags.initalign < 0 || !validalign(flags.initrole, flags.initrace,
+								flags.initalign)) {
+			flags.initalign = pick_align(flags.initrole, flags.initrace,
+								flags.initgend, PICK_RANDOM);
+			if (flags.initalign < 0) {
+				raw_print("Incompatible alignment!");
+				flags.initalign = randalign(flags.initrole, flags.initrace);
+			}
+		}
+	} else {
+		/* select a role */
+		if( mswin_player_selection_window( &nRole ) == IDCANCEL ) {
+			bail(0);
+		}
 	}
 }
 
@@ -485,7 +526,12 @@ Attributes
 void mswin_putstr(winid wid, int attr, const char *text)
 {
 	logDebug("mswin_putstr(%d, %d, %s)\n", wid, attr, text);
+	
+	mswin_putstr_ex(wid, attr, text, 0);
+}
 
+void mswin_putstr_ex(winid wid, int attr, const char *text, boolean app)
+{
 	if( (wid >= 0) && 
         (wid < MAXWINDOWS) )
 	{
@@ -498,8 +544,10 @@ void mswin_putstr(winid wid, int attr, const char *text)
 		if (GetNHApp()->windowlist[wid].win != NULL)
 		{
 			 MSNHMsgPutstr data;
+			 ZeroMemory(&data, sizeof(data));
 			 data.attr = attr;
 			 data.text = text;
+			 data.append = app;
 			 SendMessage( 
 				 GetNHApp()->windowlist[wid].win, 
 				 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_PUTSTR, (LPARAM)&data );
@@ -918,6 +966,7 @@ char mswin_yn_function(const char *question, const char *choices,
     char ch;
     char yn_esc_map='\033';
     char message[BUFSZ];
+	char res_ch[2];
 
 	logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
 
@@ -951,6 +1000,7 @@ char mswin_yn_function(const char *question, const char *choices,
 		 (index(choices, 'n') ? 'n' : def));
     } else {
 	Strcpy(message, question);
+	Strcat(message, " ");
     }
 
     mswin_putstr(WIN_MESSAGE, ATR_BOLD, message);
@@ -972,6 +1022,14 @@ char mswin_yn_function(const char *question, const char *choices,
 	    result=ch;
 	}
     }
+
+	/* display selection in the message window */
+	if( isprint(ch) ) {
+		res_ch[0] = ch;
+		res_ch[1] = '\x0';
+		mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, res_ch, 1);
+	}
+
     return result;
 }
 

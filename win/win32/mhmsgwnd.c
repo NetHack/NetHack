@@ -199,19 +199,24 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		SCROLLINFO si;
 		char* p;
 
-		/* check if the string is empty */
-		for(p = data->window_text[MSG_LINES-1].text; *p && isspace(*p); p++);
+		if( msg_data->append ) {
+			strncat(data->window_text[MSG_LINES-1].text, msg_data->text, 
+				    MAXWINDOWTEXT - strlen(data->window_text[MSG_LINES-1].text));
+		} else {
+			/* check if the string is empty */
+			for(p = data->window_text[MSG_LINES-1].text; *p && isspace(*p); p++);
 
-		if( *p ) {
-			/* last string is not empty - scroll up */
-			memmove(&data->window_text[0],
-					&data->window_text[1],
-					(MSG_LINES-1)*sizeof(data->window_text[0]));
+			if( *p ) {
+				/* last string is not empty - scroll up */
+				memmove(&data->window_text[0],
+						&data->window_text[1],
+						(MSG_LINES-1)*sizeof(data->window_text[0]));
+			}
+
+			/* append new text to the end of the array */
+			data->window_text[MSG_LINES-1].attr = msg_data->attr;
+			strncpy(data->window_text[MSG_LINES-1].text, msg_data->text, MAXWINDOWTEXT);
 		}
-
-		/* append new text to the end of the array */
-		data->window_text[MSG_LINES-1].attr = msg_data->attr;
-		strncpy(data->window_text[MSG_LINES-1].text, msg_data->text, MAXWINDOWTEXT);
 		
 		/* reset V-scroll position to display new text */
 		data->yPos = data->yMax;
