@@ -1,11 +1,10 @@
-/*	SCCS Id: @(#)attrib.c	3.4	2002/07/17	*/
+/*	SCCS Id: @(#)attrib.c	3.4	2002/10/07	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*  attribute modification routines. */
 
 #include "hack.h"
-#include "artifact.h"
 
 /* #define DEBUG */	/* uncomment for debugging info */
 
@@ -211,9 +210,8 @@ boolean parameter; /* So I can't think up of a good name.  So sue me. --KAA */
 	register struct obj *otmp;
 	register long bonchance = 0;
 
-	for(otmp = invent; otmp; otmp=otmp->nobj)
-	    if (otmp->otyp == LUCKSTONE
-		|| (otmp->oartifact && spec_ability(otmp, SPFX_LUCK))) {
+	for (otmp = invent; otmp; otmp = otmp->nobj)
+	    if (confers_luck(otmp)) {
 		if (otmp->cursed) bonchance -= otmp->quan;
 		else if (otmp->blessed) bonchance += otmp->quan;
 		else if (parameter) bonchance += otmp->quan;

@@ -248,6 +248,17 @@ unsigned long abil;
 	return((boolean)(arti && (arti->spfx & abil)));
 }
 
+/* used so that callers don't need to known about SPFX_ codes */
+boolean
+confers_luck(obj)
+struct obj *obj;
+{
+    /* might as well check for this too */
+    if (obj->otyp == LUCKSTONE) return TRUE;
+
+    return (obj->oartifact && spec_ability(obj, SPFX_LUCK));
+}
+
 #endif /* OVL0 */
 #ifdef OVLB
 

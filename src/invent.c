@@ -1,9 +1,8 @@
-/*	SCCS Id: @(#)invent.c	3.4	2002/09/30	*/
+/*	SCCS Id: @(#)invent.c	3.4	2002/10/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "artifact.h"
 
 #define NOINVSYM	'#'
 #define CONTAINED_SYM	'>'	/* designator for inside a container */
@@ -287,8 +286,7 @@ void
 addinv_core2(obj)
 struct obj *obj;
 {
-	if (obj->otyp == LUCKSTONE ||
-	    (obj->oartifact && spec_ability(obj, SPFX_LUCK))) {
+	if (confers_luck(obj)) {
 		/* new luckstone must be in inventory by this point
 		 * for correct calculation */
 		set_moreluck();
@@ -514,8 +512,7 @@ struct obj *obj;
 
 	if (obj->otyp == LOADSTONE) {
 		curse(obj);
-	} else if (obj->otyp == LUCKSTONE ||
-		    (obj->oartifact && spec_ability(obj, SPFX_LUCK))) {
+	} else if (confers_luck(obj)) {
 		set_moreluck();
 		flags.botl = 1;
 	} else if (obj->otyp == FIGURINE && obj->timed) {

@@ -4,7 +4,6 @@
 
 #include "hack.h"
 #include "epri.h"
-#include "artifact.h"
 
 STATIC_PTR int NDECL(prayer_done);
 STATIC_DCL struct obj *NDECL(worst_cursed_item);
@@ -242,8 +241,7 @@ worst_cursed_item()
     } else {
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
 	    if (!otmp->cursed) continue;
-	    if (otmp->otyp == LOADSTONE || otmp->otyp == LUCKSTONE ||
-		    (otmp->oartifact && spec_ability(otmp, SPFX_LUCK)))
+	    if (otmp->otyp == LOADSTONE || confers_luck(otmp))
 		break;
 	}
     }

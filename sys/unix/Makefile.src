@@ -688,7 +688,7 @@ allmain.o: allmain.c $(HACK_H)
 alloc.o: alloc.c $(CONFIG_H)
 apply.o: apply.c $(HACK_H) ../include/edog.h
 artifact.o: artifact.c $(HACK_H) ../include/artifact.h ../include/artilist.h
-attrib.o: attrib.c $(HACK_H) ../include/artifact.h
+attrib.o: attrib.c $(HACK_H)
 ball.o: ball.c $(HACK_H)
 bones.o: bones.c $(HACK_H) ../include/lev.h
 botl.o: botl.c $(HACK_H)
@@ -718,7 +718,7 @@ files.o: files.c $(HACK_H) ../include/dlb.h
 fountain.o: fountain.c $(HACK_H)
 hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
-invent.o: invent.c $(HACK_H) ../include/artifact.h
+invent.o: invent.c $(HACK_H)
 light.o: light.c $(HACK_H) ../include/lev.h
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) ../include/mail.h
@@ -732,7 +732,7 @@ minion.o: minion.c $(HACK_H) ../include/emin.h ../include/epri.h
 mklev.o: mklev.c $(HACK_H)
 mkmap.o: mkmap.c $(HACK_H) ../include/sp_lev.h
 mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h ../include/lev.h
-mkobj.o: mkobj.c $(HACK_H) ../include/artifact.h
+mkobj.o: mkobj.c $(HACK_H)
 mkroom.o: mkroom.c $(HACK_H)
 mon.o: mon.c $(HACK_H) ../include/mfndpos.h ../include/edog.h
 mondata.o: mondata.c $(HACK_H) ../include/eshk.h ../include/epri.h

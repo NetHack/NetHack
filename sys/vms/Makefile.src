@@ -351,7 +351,7 @@ allmain.obj :	allmain.c $(HACK_H)
 alloc.obj :	alloc.c $(CONFIG_H)
 apply.obj :	apply.c $(HACK_H) $(INC)edog.h
 artifact.obj :	artifact.c $(HACK_H) $(INC)artifact.h $(INC)artilist.h
-attrib.obj :	attrib.c $(HACK_H) $(INC)artifact.h
+attrib.obj :	attrib.c $(HACK_H)
 ball.obj :	ball.c $(HACK_H)
 bones.obj :	bones.c $(HACK_H) $(INC)lev.h
 botl.obj :	botl.c $(HACK_H)
@@ -381,7 +381,7 @@ files.obj :	files.c $(HACK_H) $(INC)dlb.h
 fountain.obj :	fountain.c $(HACK_H)
 hack.obj :	hack.c $(HACK_H)
 hacklib.obj :	hacklib.c $(HACK_H)
-invent.obj :	invent.c $(HACK_H) $(INC)artifact.h
+invent.obj :	invent.c $(HACK_H)
 light.obj :	light.c $(HACK_H) $(INC)lev.h
 lock.obj :	lock.c $(HACK_H)
 mail.obj :	mail.c $(HACK_H) $(INC)mail.h
@@ -394,7 +394,7 @@ minion.obj :	minion.c $(HACK_H) $(INC)emin.h $(INC)epri.h
 mklev.obj :	mklev.c $(HACK_H)
 mkmap.obj :	mkmap.c $(HACK_H) $(INC)sp_lev.h
 mkmaze.obj :	mkmaze.c $(HACK_H) $(INC)sp_lev.h $(INC)lev.h
-mkobj.obj :	mkobj.c $(HACK_H) $(INC)artifact.h
+mkobj.obj :	mkobj.c $(HACK_H)
 mkroom.obj :	mkroom.c $(HACK_H)
 mon.obj :	mon.c $(HACK_H) $(INC)mfndpos.h $(INC)edog.h
 mondata.obj :	mondata.c $(HACK_H) $(INC)eshk.h $(INC)epri.h

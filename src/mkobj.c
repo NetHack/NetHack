@@ -1,9 +1,8 @@
-/*	SCCS Id: @(#)mkobj.c	3.4	2002/09/21	*/
+/*	SCCS Id: @(#)mkobj.c	3.4	2002/10/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "artifact.h"
 #include "prop.h"
 
 STATIC_DCL void FDECL(mkbox_cnts,(struct obj *));
@@ -684,8 +683,7 @@ register struct obj *otmp;
 #endif
 	otmp->cursed = 0;
 	otmp->blessed = 1;
-	if (otmp->otyp == LUCKSTONE
-		|| (otmp->oartifact && spec_ability(otmp, SPFX_LUCK)))
+	if (carried(otmp) && confers_luck(otmp))
 	    set_moreluck();
 	else if (otmp->otyp == BAG_OF_HOLDING)
 	    otmp->owt = weight(otmp);
@@ -699,8 +697,7 @@ unbless(otmp)
 register struct obj *otmp;
 {
 	otmp->blessed = 0;
-	if (otmp->otyp == LUCKSTONE
-		|| (otmp->oartifact && spec_ability(otmp, SPFX_LUCK)))
+	if (carried(otmp) && confers_luck(otmp))
 	    set_moreluck();
 	else if (otmp->otyp == BAG_OF_HOLDING)
 	    otmp->owt = weight(otmp);
@@ -718,8 +715,7 @@ register struct obj *otmp;
 	/* welded two-handed weapon interferes with some armor removal */
 	if (otmp == uwep && bimanual(uwep)) reset_remarm();
 	/* some cursed items need immediate updating */
-	if (carried(otmp) && (otmp->otyp == LUCKSTONE ||
-		(otmp->oartifact && spec_ability(otmp, SPFX_LUCK))))
+	if (carried(otmp) && confers_luck(otmp))
 	    set_moreluck();
 	else if (otmp->otyp == BAG_OF_HOLDING)
 	    otmp->owt = weight(otmp);
@@ -737,13 +733,12 @@ uncurse(otmp)
 register struct obj *otmp;
 {
 	otmp->cursed = 0;
-	if (otmp->otyp == LUCKSTONE
-		|| (otmp->oartifact && spec_ability(otmp, SPFX_LUCK)))
+	if (carried(otmp) && confers_luck(otmp))
 	    set_moreluck();
 	else if (otmp->otyp == BAG_OF_HOLDING)
-		otmp->owt = weight(otmp);
+	    otmp->owt = weight(otmp);
 	else if (otmp->otyp == FIGURINE && otmp->timed)
-		(void) stop_timer(FIG_TRANSFORM, (genericptr_t) otmp);
+	    (void) stop_timer(FIG_TRANSFORM, (genericptr_t) otmp);
 	return;
 }
 
