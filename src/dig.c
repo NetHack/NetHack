@@ -546,8 +546,7 @@ int ttyp;
 
 	    if(at_u) {
 		if (!wont_fall) {
-		    if (!Passes_walls)
-			u.utrap = rn1(4,2);
+		    u.utrap = rn1(4,2);
 		    u.utraptype = TT_PIT;
 		    vision_full_recalc = 1;	/* vision limits change */
 		} else

@@ -36,7 +36,6 @@ const char *fmt, *arg;
 {
 	boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
 		was_mimicking = (youmonst.m_ap_type == M_AP_OBJECT);
-	boolean could_pass_walls = Passes_walls;
 	boolean was_blind = !!Blind;
 
 	if (Upolyd) {
@@ -86,10 +85,8 @@ const char *fmt, *arg;
 	if (u.twoweap && !could_twoweap(youmonst.data))
 	    untwoweapon();
 
-	if (u.utraptype == TT_PIT) {
-	    if (could_pass_walls) {	/* player forms cannot pass walls */
-		u.utrap = rn1(6,2);
-	    }
+	if (u.utraptype == TT_PIT && u.utrap) {
+	    u.utrap = rn1(6,2);		/* time to escape resets */
 	}
 	if (was_blind && !Blind) {	/* reverting from eyeless */
 	    Blinded = 1L;
@@ -340,7 +337,6 @@ int	mntmp;
 {
 	boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
 		was_blind = !!Blind, dochange = FALSE;
-	boolean could_pass_walls = Passes_walls;
 	int mlvl;
 
 	if (mvitals[mntmp].mvflags & G_GENOD) {	/* allow G_EXTINCT */
@@ -464,12 +460,8 @@ int	mntmp;
 	drop_weapon(1);
 	(void) hideunder(&youmonst);
 
-	if (u.utraptype == TT_PIT) {
-	    if (could_pass_walls && !Passes_walls) {
-		u.utrap = rn1(6,2);
-	    } else if (!could_pass_walls && Passes_walls) {
-		u.utrap = 0;
-	    }
+	if (u.utraptype == TT_PIT && u.utrap) {
+	    u.utrap = rn1(6,2);		/* time to escape resets */
 	}
 	if (was_blind && !Blind) {	/* previous form was eyeless */
 	    Blinded = 1L;

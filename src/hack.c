@@ -1169,7 +1169,13 @@ domove()
 	}
 	if(u.utrap) {
 		if(u.utraptype == TT_PIT) {
-		    if (!rn2(2) && sobj_at(BOULDER, u.ux, u.uy)) {
+		    if (Passes_walls) {
+			/* marked as trapped so they can pick things up */
+			You("ascend from the pit.");
+			u.utrap = 0;
+			fill_pit(u.ux, u.uy);
+			vision_full_recalc = 1;	/* vision limits change */
+		    } else if (!rn2(2) && sobj_at(BOULDER, u.ux, u.uy)) {
 			Your("%s gets stuck in a crevice.", body_part(LEG));
 			display_nhwindow(WIN_MESSAGE, FALSE);
 			clear_nhwindow(WIN_MESSAGE);

@@ -663,9 +663,12 @@ dokick()
 		Your("slow motion kick doesn't hit anything.");
 		no_kick = TRUE;
 	} else if (u.utrap) {
+		no_kick = TRUE;
 		switch (u.utraptype) {
 		    case TT_PIT:
-			pline("There's not enough room to kick down here.");
+			if (!Passes_walls)
+			    pline("There's not enough room to kick down here.");
+			else no_kick = FALSE;
 			break;
 		    case TT_WEB:
 		    case TT_BEARTRAP:
@@ -674,7 +677,6 @@ dokick()
 		    default:
 			break;
 		}
-		no_kick = TRUE;
 	}
 
 	if (no_kick) {
@@ -706,6 +708,10 @@ dokick()
 		default: Your("feeble kick has no effect."); break;
 		}
 		return(1);
+	} else if(u.utrap && u.utraptype == TT_PIT) {
+	    /* must be Passes_walls */
+	    You("kick at the side of the pit.");
+	    return 1;
 	}
 	if (Levitation) {
 		int xx, yy;

@@ -65,9 +65,7 @@ dosit()
 
 	if (OBJ_AT(u.ux, u.uy) && 
 	   /* ensure we're not standing on the precipice */
-	   !((!u.utrap || u.utraptype != TT_PIT) &&
-	     (trap && trap->tseen &&
-	     (trap->ttyp==PIT || trap->ttyp==SPIKED_PIT)))) {
+	   !uteetering_at_seen_pit(trap)) {
 	    register struct obj *obj;
 
 	    obj = level.objects[u.ux][u.uy];
