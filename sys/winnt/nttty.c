@@ -258,9 +258,9 @@ DWORD ctrltype;
 #ifndef NOSAVEONHANGUP
 			hangup(0);
 #endif
-#if 0
-			clearlocks();
-			terminate(EXIT_FAILURE);
+#if defined(SAFERHANGUP)
+			CloseHandle(hConIn);	/* trigger WAIT_FAILED */
+			return TRUE;
 #endif
 		default:
 			return FALSE;
@@ -376,7 +376,9 @@ tgetch()
 	int mod;
 	coord cc;
 	DWORD count;
-	return pCheckInput(hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
+	return (program_state.done_hup) ?
+		'\033' :
+		pCheckInput(hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
 }
 
 int
@@ -386,7 +388,9 @@ int *x, *y, *mod;
 	int ch;
 	coord cc;
 	DWORD count;
-	ch = pCheckInput(hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
+	ch = (program_state.done_hup) ?
+		'\033' :
+		pCheckInput(hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
 	if (!ch) {
 		*x = cc.x;
 		*y = cc.y;

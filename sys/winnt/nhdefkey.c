@@ -25,6 +25,8 @@ static char author[] = "The NetHack Development Team";
 
 extern HANDLE hConIn;
 extern INPUT_RECORD ir;
+extern struct sinfo program_state;
+
 char dllname[512];
 char *shortdllname;
 
@@ -256,9 +258,20 @@ int mode;
 int *mod;
 coord *cc;
 {
+#if defined(SAFERHANGUP)
+	DWORD dwWait;
+#endif
 	int ch;
 	boolean valid = 0, done = 0;
 	while (!done) {
+
+#if defined(SAFERHANGUP)
+		dwWait = WaitForSingleObjectEx( 
+         		hConIn,  // event object to wait for 
+         		INFINITE,       // waits indefinitely 
+         		TRUE);          // alertable wait enabled
+		if (dwWait == WAIT_FAILED) return '\033';
+#endif
 		ReadConsoleInput(hConIn,ir,1,count);
 		if (mode == 0) {
 		    if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {

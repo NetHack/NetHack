@@ -455,11 +455,17 @@ int *mod;
 boolean numpad;
 coord *cc;
 {
+#if defined(SAFERHANGUP)
+	DWORD dwWait;
+#endif
 	int ch;
 	boolean valid = 0, done = 0;
 	while (!done) {
     	   *count = 0;
-	   WaitForSingleObject(hConIn, INFINITE);
+	   dwWait = WaitForSingleObject(hConIn, INFINITE);
+#if defined(SAFERHANGUP)
+	   if (dwWait == WAIT_FAILED) return '\033';
+#endif
 	   PeekConsoleInput(hConIn,ir,1,count);
 	   if (mode == 0) {
 		if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {

@@ -57,6 +57,11 @@
 
 #ifdef WIN32CON
 #define PORT_DEBUG	/* include ability to debug international keyboard issues */
+#define SAFERHANGUP	/* Define SAFERHANGUP to delay hangup processing
+			 * until the main command loop. 'safer' because it
+			 * avoids certain cheats and also avoids losing
+			 * objects being thrown when the hangup occurs.
+			 */
 #endif
 
 /* The following is needed for prototypes of certain functions */
