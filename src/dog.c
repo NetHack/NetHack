@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)dog.c	3.4	2004/11/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -507,6 +507,19 @@ boolean pets_only;	/* true for ascension or final escape */
 		/* monster won't follow if it hasn't noticed you yet */
 		&& !(mtmp->mstrategy & STRAT_WAITFORU)) {
 		stay_behind = FALSE;
+#ifdef STEED
+		if (mtmp == u.usteed) {
+		    /* make sure steed is eligible to accompany hero;
+		       start by having mintrap() give a chance to escape
+		       trap normally but if that fails, force the untrap
+		       (note: handle traps first because normal escape
+		       has the potential to set monster->meating) */
+		    if (mtmp->mtrapped && mintrap(mtmp))
+			mtmp->mtrapped = 0;		/* escape trap */
+		    mtmp->meating = 0;		/* terminate eating */
+		    mdrop_special_objs(mtmp);	/* drop Amulet */
+		} else
+#endif
 		if (mtmp->mtame && mtmp->meating) {
 			if (canseemon(mtmp))
 			    pline("%s is still eating.", Monnam(mtmp));
@@ -521,9 +534,6 @@ boolean pets_only;	/* true for ascension or final escape */
 			    pline("%s is still trapped.", Monnam(mtmp));
 			stay_behind = TRUE;
 		}
-#ifdef STEED
-		if (mtmp == u.usteed) stay_behind = FALSE;
-#endif
 		if (stay_behind) {
 			if (mtmp->mleashed) {
 				pline("%s leash suddenly comes loose.",
@@ -532,6 +542,14 @@ boolean pets_only;	/* true for ascension or final escape */
 					    : "Its");
 				m_unleash(mtmp, FALSE);
 			}
+#ifdef STEED
+			if (mtmp == u.usteed) {
+			    /* can't happen unless someone makes a change
+			       which scrambles the stay_behind logic above */
+			    impossible("steed left behind?");
+			    dismount_steed(DISMOUNT_GENERIC);
+			}
+#endif
 			continue;
 		}
 		if (mtmp->isshk)
