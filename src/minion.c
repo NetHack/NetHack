@@ -11,7 +11,7 @@ msummon(ptr)		/* ptr summons a monster */
 register struct permonst *ptr;
 {
 	register int dtype = NON_PM, cnt = 0;
-	aligntyp atyp = sgn(ptr->maligntyp);
+	aligntyp atyp = (ptr->maligntyp==A_NONE) ? A_NONE : sgn(ptr->maligntyp);
 
 	if (is_dprince(ptr) || (ptr == &mons[PM_WIZARD_OF_YENDOR])) {
 	    dtype = (!rn2(20)) ? dprince(atyp) :
