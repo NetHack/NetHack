@@ -6,6 +6,7 @@
 
 #include <process.h>
 #include "winMS.h"
+#include <shlwapi.h>
 #include "hack.h"
 #include "dlb.h"
 #include "resource.h"
@@ -18,8 +19,23 @@
 #define SHARED_DCL extern
 #endif
 
+/* Minimal common control library version
+Version     _WIN_32IE   Platform/IE
+=======     =========   ===========
+4.00        0x0200      Microsoft® Windows® 95/Windows NT® 4.0
+4.70        0x0300      Microsoft® Internet Explorer 3.x
+4.71        0x0400      Microsoft® Internet Explorer 4.0
+4.72        0x0401      Microsoft® Internet Explorer 4.01
+...and probably going on infinitely...
+*/
+#define MIN_COMCTLMAJOR 4
+#define MIN_COMCTLMINOR 71
+#define COMCTL_URL "http://www.microsoft.com/msdownload/ieplatform/ie/comctrlx86.asp"
+
 extern void FDECL(nethack_exit,(int));
 static TCHAR* _get_cmd_arg(TCHAR* pCmdLine);
+static HRESULT GetComCtlVersion(LPDWORD pdwMajor, LPDWORD pdwMinor);
+
 
 // Global Variables:
 NHWinApp _nethack_app;
@@ -49,6 +65,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	TCHAR *p;
 	TCHAR wbuf[BUFSZ];
 	char buf[BUFSZ];
+    DWORD major, minor;
 
 
 	/* ensure that we don't access violate on a panic() */
@@ -77,7 +94,25 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	_nethack_app.bNoVScroll = FALSE;
 	_nethack_app.saved_text = strdup("");
 
-	// init controls
+    // init controls
+    if (FAILED(GetComCtlVersion(&major, &minor)))
+    {
+        char buf[TBUFSZ];
+        sprintf(buf, "Cannot load common control library.\n"
+              "Visit %s\n"
+              "to download the common control library.", COMCTL_URL);
+        prepanic(buf);
+    }
+    if (major < MIN_COMCTLMAJOR
+        || (major == MIN_COMCTLMAJOR && minor < MIN_COMCTLMINOR))
+    {
+        char buf[TBUFSZ];
+        sprintf(buf, "Common control library is outdated.\n"
+              "NetHack requires at least version %d.%d\n"
+              "Visit %s\n"
+              "for an updated version.", MIN_COMCTLMAJOR, MIN_COMCTLMINOR, COMCTL_URL);
+        prepanic(buf);
+    }
 	ZeroMemory(&InitCtrls, sizeof(InitCtrls));
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	InitCtrls.dwICC = ICC_LISTVIEW_CLASSES;
@@ -115,12 +150,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 //
 //   FUNCTION: InitInstance(HANDLE, int)
 //
-//   PURPOSE: Saves instance handle and creates main window
+//   PURPOSE: Creates main window
 //
 //   COMMENTS:
 //
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
+//        In this function, we create and display the main program window.
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
@@ -182,4 +216,50 @@ TCHAR* _get_cmd_arg(TCHAR* pCmdLine)
 
 		return pRetArg;
 }
+
+/* Get the version of the Common Control library on this machine.
+   Copied from the Microsoft SDK
+ */
+HRESULT GetComCtlVersion(LPDWORD pdwMajor, LPDWORD pdwMinor)
+{
+	HINSTANCE   hComCtl;
+	HRESULT           hr = S_OK;
+	DLLGETVERSIONPROC pDllGetVersion;
+
+	if(IsBadWritePtr(pdwMajor, sizeof(DWORD)) ||
+	   IsBadWritePtr(pdwMinor, sizeof(DWORD)))
+		return E_INVALIDARG;
+	//load the DLL
+	hComCtl = LoadLibrary(TEXT("comctl32.dll"));
+	if (!hComCtl) return E_FAIL;
+
+	/*
+	You must get this function explicitly because earlier versions of the DLL
+	don't implement this function. That makes the lack of implementation of the
+	function a version marker in itself.
+	*/
+	pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hComCtl, TEXT("DllGetVersion"));
+	if(pDllGetVersion) {
+		DLLVERSIONINFO    dvi;
+		ZeroMemory(&dvi, sizeof(dvi));
+		dvi.cbSize = sizeof(dvi);
+		hr = (*pDllGetVersion)(&dvi);
+		if(SUCCEEDED(hr)) {
+			*pdwMajor = dvi.dwMajorVersion;
+			*pdwMinor = dvi.dwMinorVersion;
+                } else {
+			hr = E_FAIL;
+                }
+        } else {
+		/*
+		If GetProcAddress failed, then the DLL is a version previous to the one
+		shipped with IE 3.x.
+		*/
+		*pdwMajor = 4;
+		*pdwMinor = 0;
+	}
+	FreeLibrary(hComCtl);
+	return hr;
+}
+
 
