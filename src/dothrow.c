@@ -1006,7 +1006,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 				  body_part(ARM));
 			    (void) artifact_hit((struct monst *)0,
 						&youmonst, obj, &dmg, 0);
-			    losehp(dmg, xname(obj), KILLED_BY);
+			    losehp(dmg, xname(obj),
+				obj_is_pname(obj) ? KILLED_BY : KILLED_BY_AN);
 			}
 			if (ship_object(obj, u.ux, u.uy, FALSE))
 			    return;

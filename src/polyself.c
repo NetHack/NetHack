@@ -1020,8 +1020,7 @@ dogaze()
 			/* as if gazing at a sleeping anything is fruitful... */
 			You("turn to stone...");
 			killer_format = KILLED_BY;
-			killer =
-			 "deliberately gazing at Medusa's hideous countenance";
+			killer = "deliberately meeting Medusa's gaze";
 			done(STONING);
 		    }
 		}

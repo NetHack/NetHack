@@ -409,7 +409,7 @@ struct obj *instr;
 		    if ((damage = zapyourself(instr, TRUE)) != 0) {
 			char buf[BUFSZ];
 			Sprintf(buf, "using a magical horn on %sself", uhim());
-			losehp(damage, buf, NO_KILLER_PREFIX);
+			losehp(damage, buf, KILLED_BY);
 		    }
 		} else {
 		    buzz((instr->otyp == FROST_HORN) ? AD_COLD-1 : AD_FIRE-1,
