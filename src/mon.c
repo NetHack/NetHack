@@ -1979,9 +1979,15 @@ int  typ, fatal;
 		pline_The("poison doesn't seem to affect you.");
 		return;
 	}
+	/* suppress killer prefix if it already has one */
 	if (!strncmpi(pname, "the ", 4) ||
 		!strncmpi(pname, "an ", 3) ||
-		!strncmpi(pname, "a ", 2)) kprefix = KILLED_BY_AN;
+		!strncmpi(pname, "a ", 2) ||
+	    /* ... or if it seems to be a proper name */
+		isupper(*pname)) {
+	    /*[ does this need a plural check too? ]*/
+	    kprefix = KILLED_BY;
+	}
 	i = rn2(fatal + 20*thrown_weapon);
 	if(i == 0 && typ != A_CHA) {
 		u.uhp = -1;
