@@ -279,15 +279,15 @@ struct proto_dungeon *pd;
  * or dungeon entrance can occupy.
  *
  * Note: This follows the acouple (instead of the rcouple) rules for a
- *	 negative random component (rand < 0).  These rules are found
+ *	 negative random component (randc < 0).  These rules are found
  *	 in dgn_comp.y.  The acouple [absolute couple] section says that
  *	 a negative random component means from the (adjusted) base to the
  *	 end of the dungeon.
  */
 STATIC_OVL int
-level_range(dgn, base, rand, chain, pd, adjusted_base)
+level_range(dgn, base, randc, chain, pd, adjusted_base)
 	xchar	dgn;
-	int	base, rand, chain;
+	int	base, randc, chain;
 	struct proto_dungeon *pd;
 	int *adjusted_base;
 {
@@ -308,11 +308,11 @@ level_range(dgn, base, rand, chain, pd, adjusted_base)
 
 	*adjusted_base = base;
 
-	if (rand == -1) {	/* from base to end of dungeon */
+	if (randc == -1) {	/* from base to end of dungeon */
 	    return (lmax - base + 1);
-	} else if (rand) {
+	} else if (randc) {
 	    /* make sure we don't run off the end of the dungeon */
-	    return (((base + rand - 1) > lmax) ? lmax-base+1 : rand);
+	    return (((base + randc - 1) > lmax) ? lmax-base+1 : randc);
 	} /* else only one choice */
 	return 1;
 }

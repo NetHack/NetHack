@@ -97,20 +97,20 @@ experience(mtmp, nk)	/* return # of exp points for mtmp after nk killed */
 }
 
 void
-more_experienced(exp, rexp)
-	register int exp, rexp;
+more_experienced(exper, rexp)
+	register int exper, rexp;
 {
-	long newexp = u.uexp + exp;
-	long rexpincr = 4*exp + rexp;
+	long newexp = u.uexp + exper;
+	long rexpincr = 4*exper + rexp;
 	long newrexp = u.urexp + rexpincr;
 
 	/* cap experience and score on wraparound */
-	if (newexp < 0 && exp > 0) newexp = LONG_MAX;
+	if (newexp < 0 && exper > 0) newexp = LONG_MAX;
 	if (newrexp < 0 && rexpincr > 0) newrexp = LONG_MAX;
 	u.uexp = newexp;
 	u.urexp = newrexp;
 
-	if(exp
+	if(exper
 #ifdef SCORE_ON_BOTL
 	   || flags.showscore
 #endif

@@ -280,30 +280,30 @@ int bufsz;
 /*ARGSUSED*/
 #endif
 const char *
-fqname(basename, whichprefix, buffnum)
-const char *basename;
+fqname(basenam, whichprefix, buffnum)
+const char *basenam;
 int whichprefix, buffnum;
 {
 #ifndef PREFIXES_IN_USE
-	return basename;
+	return basenam;
 #else
-	if (!basename || whichprefix < 0 || whichprefix >= PREFIX_COUNT)
-		return basename;
+	if (!basenam || whichprefix < 0 || whichprefix >= PREFIX_COUNT)
+		return basenam;
 	if (!fqn_prefix[whichprefix])
-		return basename;
+		return basenam;
 	if (buffnum < 0 || buffnum >= FQN_NUMBUF) {
 		impossible("Invalid fqn_filename_buffer specified: %d",
 								buffnum);
 		buffnum = 0;
 	}
-	if (strlen(fqn_prefix[whichprefix]) + strlen(basename) >=
+	if (strlen(fqn_prefix[whichprefix]) + strlen(basenam) >=
 						    FQN_MAX_FILENAME) {
 		impossible("fqname too long: %s + %s", fqn_prefix[whichprefix],
-						basename);
-		return basename;	/* XXX */
+						basenam);
+		return basenam;	/* XXX */
 	}
 	Strcpy(fqn_filename_buffer[buffnum], fqn_prefix[whichprefix]);
-	return strcat(fqn_filename_buffer[buffnum], basename);
+	return strcat(fqn_filename_buffer[buffnum], basenam);
 #endif
 }
 

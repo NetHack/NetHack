@@ -2202,7 +2202,7 @@ const char *msg;
 	char ctrl;
 	winid win;
 	static const char wiz_only_list[] = "EFGIOVW";
-	char buf[BUFSZ], buf2[BUFSZ], *expl;
+	char buf[BUFSZ], buf2[BUFSZ], *explain;
 
 	win = create_nhwindow(NHW_TEXT);
 	if (!win) return FALSE;
@@ -2214,7 +2214,7 @@ const char *msg;
 	if (letter(sym)) { 
 	    sym = highc(sym);
 	    ctrl = (sym - 'A') + 1;
-	    if ((expl = dowhatdoes_core(ctrl, buf2))
+	    if ((explain = dowhatdoes_core(ctrl, buf2))
 		&& (!index(wiz_only_list, sym)
 #ifdef WIZARD
 		    || wizard
@@ -2225,7 +2225,7 @@ const char *msg;
 			" as specified in the Guidebook");
 		putstr(win, 0, buf);
 		putstr(win, 0, "");
-		putstr(win, 0, expl);
+		putstr(win, 0, explain);
 		putstr(win, 0, "");
 		putstr(win, 0, "To use that command, you press");
 		Sprintf(buf,

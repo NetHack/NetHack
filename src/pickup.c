@@ -2077,7 +2077,7 @@ register int held;
 #endif
 	boolean one_by_one, allflag, quantum_cat = FALSE,
 		loot_out = FALSE, loot_in = FALSE;
-	char select[MAXOCLASSES+1];
+	char selection[MAXOCLASSES+1];
 	char qbuf[BUFSZ], emptymsg[BUFSZ], pbuf[QBUFSZ];
 	long loss = 0L;
 	int cnt = 0, used = 0,
@@ -2182,7 +2182,7 @@ ask_again2:
 		    container_contents(current_container, FALSE, FALSE);
 		    goto ask_again2;
 		case 'y':
-		    if (query_classes(select, &one_by_one, &allflag,
+		    if (query_classes(selection, &one_by_one, &allflag,
 				      "take out", current_container->cobj,
 				      FALSE,
 #ifndef GOLDOBJ
@@ -2190,7 +2190,7 @@ ask_again2:
 #endif
 				      &menu_on_request)) {
 			if (askchain((struct obj **)&current_container->cobj,
-				     (one_by_one ? (char *)0 : select),
+				     (one_by_one ? (char *)0 : selection),
 				     allflag, out_container,
 				     (int FDECL((*),(OBJ_P)))0,
 				     0, "nodot"))
@@ -2273,14 +2273,14 @@ ask_again2:
 	    } else {
 		/* traditional code */
 		menu_on_request = 0;
-		if (query_classes(select, &one_by_one, &allflag, "put in",
+		if (query_classes(selection, &one_by_one, &allflag, "put in",
 				   invent, FALSE,
 #ifndef GOLDOBJ
 				   (u.ugold != 0L),
 #endif
 				   &menu_on_request)) {
 		    (void) askchain((struct obj **)&invent,
-				    (one_by_one ? (char *)0 : select), allflag,
+				    (one_by_one ? (char *)0 : selection), allflag,
 				    in_container, ck_bag, 0, "nodot");
 		    used = 1;
 		} else if (menu_on_request < 0) {

@@ -1057,13 +1057,13 @@ promptsep(buf, num_post_attribs)
 char *buf;
 int num_post_attribs;
 {
-	const char *conj = "and ";
+	const char *conjuct = "and ";
 	if (num_post_attribs > 1
 	    && post_attribs < num_post_attribs && post_attribs > 1)
 	 	Strcat(buf, ","); 
 	Strcat(buf, " ");
 	--post_attribs;
-	if (!post_attribs && num_post_attribs > 1) Strcat(buf, conj);
+	if (!post_attribs && num_post_attribs > 1) Strcat(buf, conjuct);
 	return buf;
 }
 
