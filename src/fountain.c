@@ -43,9 +43,9 @@ STATIC_OVL
 void
 dowaterdemon() /* Water demon */
 {
-	register struct monst *mtmp;
+    register struct monst *mtmp;
 
-	if(mvitals[PM_WATER_DEMON].mvflags & G_GONE) return;
+    if(mvitals[PM_WATER_DEMON].mvflags & G_GONE) {
 	if((mtmp = makemon(&mons[PM_WATER_DEMON],u.ux,u.uy, NO_MM_FLAGS))) {
 	    if (!Blind)
 		You("unleash %s!", a_monnam(mtmp));
@@ -61,6 +61,8 @@ dowaterdemon() /* Water demon */
 	    } else if (t_at(mtmp->mx, mtmp->my))
 		(void) mintrap(mtmp);
 	}
+    } else
+	pline_The("fountain bubbles furiously for a moment, then calms.");
 }
 
 STATIC_OVL void
@@ -68,8 +70,8 @@ dowaternymph() /* Water Nymph */
 {
 	register struct monst *mtmp;
 
-	if(mvitals[PM_WATER_NYMPH].mvflags & G_GONE) return;
-	if((mtmp = makemon(&mons[PM_WATER_NYMPH],u.ux,u.uy, NO_MM_FLAGS))) {
+	if(!(mvitals[PM_WATER_NYMPH].mvflags & G_GONE) &&
+	   (mtmp = makemon(&mons[PM_WATER_NYMPH],u.ux,u.uy, NO_MM_FLAGS))) {
 		if (!Blind)
 		   You("attract %s!", a_monnam(mtmp));
 		else
