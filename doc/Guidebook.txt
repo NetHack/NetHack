@@ -126,7 +126,7 @@
           as well as tracking and stealthy movement.
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -192,7 +192,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -390,7 +390,7 @@
                played.
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -522,7 +522,7 @@
           ed.  Typing a `*' lists your entire inventory, so you can see the
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -852,7 +852,7 @@
           (R)UNIX is a registered trademark of AT&T.
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -918,7 +918,7 @@
                suitable weapons for this type of  combat,  or  it  will  be
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1050,7 +1050,7 @@
           doors are not restricted in this fashion.
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1116,7 +1116,7 @@
           sionally one of these creatures  will  displace  you  during  the
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1182,7 +1182,7 @@
           worried about it or want to train it, you can feed  it,  too,  by
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1248,7 +1248,7 @@
           will  add  the  object(s) to your pack and tell you what you just
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1314,7 +1314,7 @@
           better  or  more  beneficially  than  normal uncursed items.  For
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1380,7 +1380,7 @@
           the  ``two  weapon combat'' skill, you may wield both primary and
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1446,7 +1446,7 @@
           `t'  or  `f'  command.   For example, ``2f'' (or ``n2f'' if using
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1578,7 +1578,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1710,7 +1710,7 @@
           two rings, one on each ring finger.
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1776,7 +1776,7 @@
           example,   lamps  burn  out  after  a  while.   Other  tools  are
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1908,7 +1908,7 @@
           monster while polymorphed is treated as if you ate the creature's
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -1974,7 +1974,7 @@
           any  object into another object of the same type (``polypiling'')
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2040,7 +2040,7 @@
           NETHACKOPTIONS.     Any    line   starting   with   ``DUNGEON='',
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2172,7 +2172,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2238,7 +2238,7 @@
                fault ``|-\\/*!)(0#@*/-\\||\\-//-\\| |\\-/'').  The  effects
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2304,7 +2304,7 @@
                with  the  `/'  command,  ask if you want to see it (default
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2370,7 +2370,7 @@
                Menu character accelerator to deselect all items in a  menu.
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2436,7 +2436,7 @@
                VWXYZ@ '&;:~]'').   This  string  is  subjected  to the same
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2568,7 +2568,7 @@
                value  is  examined;  `r'  is  an  exception with ``Rogue'',
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2634,7 +2634,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2700,7 +2700,7 @@
           config file, and if the window port is capable  of  adjusting  to
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2766,7 +2766,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2832,7 +2832,7 @@
                port.
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2898,7 +2898,7 @@
                A lot of speech access programs use the number-pad to review
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -2908,8 +2908,8 @@
 
 
 
-               the screen.  If this is the case, turn  off  the  number_pad
-               option and use the traditional Rogue-like commands.
+               the screen.  If this is the case, disable the number_pad op-
+               tion and use the traditional Rogue-like commands.
 
           Character graphics
                Comment  out all character graphics sets found near the bot-
@@ -2964,7 +2964,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -3030,7 +3030,7 @@
           Day,  Timo Hakulinen, Steve Linhart, Dean Luick, Pat Rankin, Eric
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -3096,7 +3096,7 @@
           wick  Allison  improved  the spell casting system with the Wizard
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -3228,7 +3228,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
@@ -3294,7 +3294,7 @@
 
 
 
-          NetHack 3.4                                        March 12, 2002
+          NetHack 3.4                                        March 17, 2002
 
 
 
