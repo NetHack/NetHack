@@ -184,7 +184,8 @@ char *reasonbuf;
 			}
 			/* the paniclog entry gets the value of errno as well */
 			Sprintf(panicbuf1,"Invalid %s", fqn_prefix_names[prefcnt]);
-			Sprintf(panicbuf2,"\"%s\" (errno=%d)", fqn_prefix[prefcnt], errno);
+			Sprintf(panicbuf2,"\"%s\", (%d) %s",
+				fqn_prefix[prefcnt], errno, strerror(errno));
 			paniclog(panicbuf1, panicbuf2);
 			failcount++;
 		}	
