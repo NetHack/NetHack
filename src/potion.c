@@ -277,6 +277,11 @@ long mask;	/* nonzero if resistance status should change by mask */
 		see_objects();
 		see_traps();
 	    }
+
+	    /* for perm_inv and anything similar
+	    (eg. Qt windowport's equipped items display) */
+	    update_inventory();
+
 	    flags.botl = 1;
 	    if (!Blind && talk) pline(message);
 	}
