@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.4	2002/11/07	*/
+/*	SCCS Id: @(#)mthrowu.c	3.4	2003/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,30 +41,21 @@ const char *name;	/* if null, then format `obj' */
 {
 	const char *onm, *knm;
 	boolean is_acid;
+	int kprefix = KILLED_BY_AN;
 	char onmbuf[BUFSZ], knmbuf[BUFSZ];
 
 	if (!name) {
-	    struct obj otmp;
-	    unsigned save_ocknown;
-
 	    if (!obj) panic("thitu: name & obj both null?");
 	    name = strcpy(onmbuf,
 			 (obj->quan > 1L) ? doname(obj) : mshot_xname(obj));
-	    /* killer name should be more specific; however, exact info
-	       like blessed/cursed and rustproof make things too verbose */
-	    otmp = *obj;
-	    save_ocknown = objects[otmp.otyp].oc_name_known;
-	    otmp.known = otmp.dknown = 1;
-	    otmp.bknown = otmp.rknown = otmp.greased = 0;
-	    /* "killed by poisoned <obj>" would be misleading
-	       since poison is not the cause of death */
-	    otmp.opoisoned = 0;
-	    objects[otmp.otyp].oc_name_known = 1;
-	    knm = strcpy(knmbuf,
-			 (otmp.quan > 1L) ? doname(&otmp) : xname(&otmp));
-	    objects[otmp.otyp].oc_name_known = save_ocknown;
+	    knm = strcpy(knmbuf, killer_xname(obj));
+	    kprefix = KILLED_BY;  /* killer_name supplies "an" if warranted */
 	} else {
 	    knm = name;
+	    /* [perhaps ought to check for plural here to] */
+	    if (!strncmpi(name, "the ", 4) ||
+		    !strncmpi(name, "an ", 3) ||
+		    !strncmpi(name, "a ", 2)) kprefix = KILLED_BY;
 	}
 	onm = (obj && obj_is_pname(obj)) ? the(name) :
 			    (obj && obj->quan > 1L) ? name : an(name);
@@ -89,8 +80,7 @@ const char *name;	/* if null, then format `obj' */
 		else {
 			if (is_acid) pline("It burns!");
 			if (Half_physical_damage) dam = (dam+1) / 2;
-			losehp(dam, knm, (obj && obj_is_pname(obj)) ?
-			       KILLED_BY : KILLED_BY_AN);
+			losehp(dam, knm, kprefix);
 			exercise(A_STR, FALSE);
 		}
 		return(1);
@@ -393,21 +383,10 @@ m_throw(mon, x, y, dx, dy, range, obj)
 		    if (hitu && singleobj->opoisoned &&
 			is_poisonable(singleobj)) {
 			char onmbuf[BUFSZ], knmbuf[BUFSZ];
-			struct obj otmp;
-			unsigned save_ocknown;
 
-			/* [see thitu()'s handling of `name'] */
 			Strcpy(onmbuf, xname(singleobj));
-			otmp = *singleobj;
-			save_ocknown = objects[otmp.otyp].oc_name_known;
-			otmp.known = otmp.dknown = 1;
-			otmp.bknown = otmp.rknown = otmp.greased = 0;
-			/* "poisoned by poisoned <obj>" would be redundant */
-			otmp.opoisoned = 0;
-			objects[otmp.otyp].oc_name_known = 1;
-			Strcpy(knmbuf, xname(&otmp));
-			poisoned(onmbuf, A_STR, knmbuf, 10);
-			objects[otmp.otyp].oc_name_known = save_ocknown;
+			Strcpy(knmbuf, killer_xname(singleobj));
+			poisoned(onmbuf, A_STR, knmbuf, -10);
 		    }
 		    if(hitu &&
 		       can_blnd((struct monst*)0, &youmonst,

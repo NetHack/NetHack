@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/04/30	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -615,7 +615,7 @@ unsigned trflags;
 #endif
 		if (thitu(7, dmgval(otmp, &youmonst), otmp, "little dart")) {
 		    if (otmp->opoisoned)
-			poisoned("dart",A_CON,"poison dart",10);
+			poisoned("dart", A_CON, "little dart", -10);
 		    obfree(otmp, (struct obj *)0);
 		} else {
 		    place_object(otmp, u.ux, u.uy);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2003/03/30	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2003/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -852,6 +852,47 @@ struct obj *obj;
 	if (obj->otyp == CORPSE)
 	    return corpse_xname(obj, FALSE);
 	return xname(obj);
+}
+
+/* treat an object as fully ID'd when it might be used as reason for death */
+char *
+killer_xname(obj)
+struct obj *obj;
+{
+    struct obj save_obj;
+    unsigned save_ocknown;
+    char *buf, *save_ocuname;
+
+    /* remember original settings for core of the object;
+       oname and oattached extensions don't matter here--since they
+       aren't modified they don't need to be saved and restored */
+    save_obj = *obj;
+    /* killer name should be more specific than general xname; however, exact
+       info like blessed/cursed and rustproof makes things be too verbose */
+    obj->known = obj->dknown = 1;
+    obj->bknown = obj->rknown = obj->greased = 0;
+    /* if character is a priest[ess], bknown will get toggled back on */
+    obj->blessed = obj->cursed = 0;
+    /* "killed by poisoned <obj>" would be misleading when poison is
+       not the cause of death and "poisoned by poisoned <obj>" would
+       be redundant when it is, so suppress "poisoned" prefix */
+    obj->opoisoned = 0;
+    /* strip user-supplied name; artifacts keep theirs */
+    if (!obj->oartifact) obj->onamelth = 0;
+    /* temporarily identify the type of object */
+    save_ocknown = objects[obj->otyp].oc_name_known;
+    objects[obj->otyp].oc_name_known = 1;
+    save_ocuname = objects[obj->otyp].oc_uname;
+    objects[obj->otyp].oc_uname = 0;	/* avoid "foo called bar" */
+
+    buf = xname(obj);
+    if (obj->quan == 1L) buf = obj_is_pname(obj) ? the(buf) : an(buf);
+
+    objects[obj->otyp].oc_name_known = save_ocknown;
+    objects[obj->otyp].oc_uname = save_ocuname;
+    *obj = save_obj;	/* restore object's core settings */
+
+    return buf;
 }
 
 /*

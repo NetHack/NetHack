@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.4	2003/01/29	*/
+/*	SCCS Id: @(#)mon.c	3.4	2003/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1958,13 +1958,13 @@ poisontell(typ)
 
 void
 poisoned(string, typ, pname, fatal)
-register const char *string, *pname;
-register int  typ, fatal;
+const char *string, *pname;
+int  typ, fatal;
 {
-	register int i, plural;
-	boolean thrown_weapon = !strncmp(string, "poison", 6);
-		/* admittedly a kludge... */
+	int i, plural, kprefix = KILLED_BY_AN;
+	boolean thrown_weapon = (fatal < 0);
 
+	if (thrown_weapon) fatal = -fatal;
 	if(strcmp(string, "blast") && !thrown_weapon) {
 	    /* 'blast' has already given a 'poison gas' message */
 	    /* so have "poison arrow", "poison dart", etc... */
@@ -1979,6 +1979,9 @@ register int  typ, fatal;
 		pline_The("poison doesn't seem to affect you.");
 		return;
 	}
+	if (!strncmpi(pname, "the ", 4) ||
+		!strncmpi(pname, "an ", 3) ||
+		!strncmpi(pname, "a ", 2)) kprefix = KILLED_BY_AN;
 	i = rn2(fatal + 20*thrown_weapon);
 	if(i == 0 && typ != A_CHA) {
 		u.uhp = -1;
@@ -1986,17 +1989,17 @@ register int  typ, fatal;
 	} else if(i <= 5) {
 		/* Check that a stat change was made */
 		if (adjattrib(typ, thrown_weapon ? -1 : -rn1(3,3), 1))
-  		    pline("You%s!", poiseff[typ]);
+		    pline("You%s!", poiseff[typ]);
 	} else {
 		i = thrown_weapon ? rnd(6) : rn1(10,6);
 		if(Half_physical_damage) i = (i+1) / 2;
-		losehp(i, pname, KILLED_BY_AN);
+		losehp(i, pname, kprefix);
 	}
 	if(u.uhp < 1) {
-		killer_format = KILLED_BY_AN;
+		killer_format = kprefix;
 		killer = pname;
 		/* "Poisoned by a poisoned ___" is redundant */
-		done(thrown_weapon ? DIED : POISONING);
+		done(strstri(pname, "poison") ? DIED : POISONING);
 	}
 	(void) encumber_msg();
 }
