@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objects.c	3.4	2002/02/13	*/
+/*	SCCS Id: @(#)objects.c	3.4	2002/07/31	*/
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -321,40 +321,44 @@ HELM("helm of telepathy", "visored helmet",
 /* suits of armor */
 /*
  * There is code in polyself.c that assumes (1) and (2).
- * There is code in objnam.c, mon.c, read.c that assumes (2).
+ * There is code in obj.h, objnam.c, mon.c, read.c that assumes (2).
  *
  *	(1) The dragon scale mails and the dragon scales are together.
  *	(2) That the order of the dragon scale mail and dragon scales is the
  *	    the same defined in monst.c.
  */
-#define DRGN_ARMR(name,power,cost,ac,color) \
-	ARMOR(name,(char *)0,1,0,1,power,0,5,40,cost,ac,0,ARM_SUIT,DRAGON_HIDE,color)
-DRGN_ARMR("gray dragon scale mail",   ANTIMAGIC,  1200, 1, CLR_GRAY),
-DRGN_ARMR("silver dragon scale mail", REFLECTING, 1200, 1, SILVER),
+#define DRGN_ARMR(name,mgc,power,cost,ac,color) \
+	ARMOR(name,(char *)0,1,mgc,1,power,0,5,40,cost,ac,0,ARM_SUIT,DRAGON_HIDE,color)
+/* 3.4.1: dragon scale mail reclassified as "magic" since magic is
+   needed to create them */
+DRGN_ARMR("gray dragon scale mail",   1, ANTIMAGIC,  1200, 1, CLR_GRAY),
+DRGN_ARMR("silver dragon scale mail", 1, REFLECTING, 1200, 1, SILVER),
 #if 0	/* DEFERRED */
-DRGN_ARMR("shimmering dragon scale mail", DISPLACED, 1200, 1, CLR_CYAN),
+DRGN_ARMR("shimmering dragon scale mail", 1, DISPLACED, 1200, 1, CLR_CYAN),
 #endif
-DRGN_ARMR("red dragon scale mail",    FIRE_RES,    900, 1, CLR_RED),
-DRGN_ARMR("white dragon scale mail",  COLD_RES,    900, 1, CLR_WHITE),
-DRGN_ARMR("orange dragon scale mail", SLEEP_RES,   900, 1, CLR_ORANGE),
-DRGN_ARMR("black dragon scale mail",  DISINT_RES, 1200, 1, CLR_BLACK),
-DRGN_ARMR("blue dragon scale mail",   SHOCK_RES,   900, 1, CLR_BLUE),
-DRGN_ARMR("green dragon scale mail",  POISON_RES,  900, 1, CLR_GREEN),
-DRGN_ARMR("yellow dragon scale mail", ACID_RES,    900, 1, CLR_YELLOW),
+DRGN_ARMR("red dragon scale mail",    1, FIRE_RES,    900, 1, CLR_RED),
+DRGN_ARMR("white dragon scale mail",  1, COLD_RES,    900, 1, CLR_WHITE),
+DRGN_ARMR("orange dragon scale mail", 1, SLEEP_RES,   900, 1, CLR_ORANGE),
+DRGN_ARMR("black dragon scale mail",  1, DISINT_RES, 1200, 1, CLR_BLACK),
+DRGN_ARMR("blue dragon scale mail",   1, SHOCK_RES,   900, 1, CLR_BLUE),
+DRGN_ARMR("green dragon scale mail",  1, POISON_RES,  900, 1, CLR_GREEN),
+DRGN_ARMR("yellow dragon scale mail", 1, ACID_RES,    900, 1, CLR_YELLOW),
 
 /* For now, only dragons leave these. */
-DRGN_ARMR("gray dragon scales",   ANTIMAGIC,  700, 7, CLR_GRAY),
-DRGN_ARMR("silver dragon scales", REFLECTING, 700, 7, SILVER),
+/* 3.4.1: dragon scales left classified as "non-magic"; they confer
+   magical properties but are produced "naturally" */
+DRGN_ARMR("gray dragon scales",   0, ANTIMAGIC,  700, 7, CLR_GRAY),
+DRGN_ARMR("silver dragon scales", 0, REFLECTING, 700, 7, SILVER),
 #if 0	/* DEFERRED */
-DRGN_ARMR("shimmering dragon scales", DISPLACED,  700, 7, CLR_CYAN),
+DRGN_ARMR("shimmering dragon scales", 0, DISPLACED,  700, 7, CLR_CYAN),
 #endif
-DRGN_ARMR("red dragon scales",    FIRE_RES,   500, 7, CLR_RED),
-DRGN_ARMR("white dragon scales",  COLD_RES,   500, 7, CLR_WHITE),
-DRGN_ARMR("orange dragon scales", SLEEP_RES,  500, 7, CLR_ORANGE),
-DRGN_ARMR("black dragon scales",  DISINT_RES, 700, 7, CLR_BLACK),
-DRGN_ARMR("blue dragon scales",   SHOCK_RES,  500, 7, CLR_BLUE),
-DRGN_ARMR("green dragon scales",  POISON_RES, 500, 7, CLR_GREEN),
-DRGN_ARMR("yellow dragon scales", ACID_RES,   500, 7, CLR_YELLOW),
+DRGN_ARMR("red dragon scales",    0, FIRE_RES,   500, 7, CLR_RED),
+DRGN_ARMR("white dragon scales",  0, COLD_RES,   500, 7, CLR_WHITE),
+DRGN_ARMR("orange dragon scales", 0, SLEEP_RES,  500, 7, CLR_ORANGE),
+DRGN_ARMR("black dragon scales",  0, DISINT_RES, 700, 7, CLR_BLACK),
+DRGN_ARMR("blue dragon scales",   0, SHOCK_RES,  500, 7, CLR_BLUE),
+DRGN_ARMR("green dragon scales",  0, POISON_RES, 500, 7, CLR_GREEN),
+DRGN_ARMR("yellow dragon scales", 0, ACID_RES,   500, 7, CLR_YELLOW),
 #undef DRGN_ARMR
 
 ARMOR("plate mail", (char *)0,
@@ -647,6 +651,7 @@ WEPTOOL("pick-axe", (char *)0,
 	1, 0, 0, 20, 100,  50,	6,  3, WHACK,  P_PICK_AXE, IRON, HI_METAL),
 WEPTOOL("grappling hook", "iron hook",
 	0, 0, 0,  5,  30,  50,  2,  6, WHACK,  P_FLAIL, IRON, HI_METAL),
+/* 3.4.1: unicorn horn left classified as "magic" */
 WEPTOOL("unicorn horn", (char *)0,
 	1, 1, 1,  0,  20, 100, 12, 12, PIERCE, P_UNICORN_HORN, BONE, CLR_WHITE),
 
