@@ -600,7 +600,11 @@ int mclass;			/* monster class, 0 for all */
 	    if (!mclass || mtmp->data->mlet == mclass ||
 		(mtmp->data == &mons[PM_LONG_WORM] && mclass == S_WORM_TAIL))
 		    if (mtmp->mx > 0) {
-			show_glyph(mtmp->mx,mtmp->my,mon_to_glyph(mtmp));
+		    	if (mclass && def_monsyms[mclass] == ' ')
+				show_glyph(mtmp->mx,mtmp->my,
+					detected_mon_to_glyph(mtmp));
+			else
+				show_glyph(mtmp->mx,mtmp->my,mon_to_glyph(mtmp));
 			/* don't be stingy - display entire worm */
 			if (mtmp->data == &mons[PM_LONG_WORM]) detect_wsegs(mtmp,0);
 		    }
@@ -837,7 +841,8 @@ struct obj *obj;
     /* read a single character */
     if (flags.verbose) You("may look for an object or monster symbol.");
     ch = yn_function("What do you look for?", (char *)0, '\0');
-    if (index(quitchars,ch)) {
+    /* Don't filter out ' ' here; it has a use */
+    if ((ch != def_monsyms[S_GHOST]) && index(quitchars,ch)) { 
 	if (flags.verbose) pline(Never_mind);
 	return;
     }
