@@ -1122,6 +1122,7 @@ boolean telekinesis;
 		case 'n':  result =  0; break;
 		default:   break;	/* 'y' => result == 1 */
 		}
+		clear_nhwindow(WIN_MESSAGE);
 	    }
 	}
     }
