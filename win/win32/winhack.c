@@ -75,12 +75,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	wizard = TRUE;
 #endif
 
-	/* get command line parameters */
-	GetModuleFileName(NULL, wbuf, BUFSZ);
-	argv[0] = _strdup(NH_W2A(wbuf, buf, BUFSZ));
-	
+	/* get command line parameters */	
 	p = _tcstok(GetCommandLine(), TEXT(" "));
-	for( argc=1; p && argc<MAX_CMDLINE_PARAM; argc++ ) {
+	for( argc=0; p && argc<MAX_CMDLINE_PARAM; argc++ ) {
 		len = _tcslen(p);
 		if( len>0 ) {
 			argv[argc] = _strdup( NH_W2A(p, buf, BUFSZ) );
@@ -89,7 +86,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		}
 		p = _tcstok(NULL, TEXT(" "));
 	}
-
+	GetModuleFileName(NULL, wbuf, BUFSZ);
+	argv[0] = _strdup(NH_W2A(wbuf, buf, BUFSZ));
+	
 	pcmain(argc,argv);
 
 	moveloop();
