@@ -162,7 +162,8 @@
 				 (ptr) == &mons[PM_MASTER_MIND_FLAYER])
 
 #define nonliving(ptr)		(is_golem(ptr) || is_undead(ptr) || \
-				 (ptr)->mlet == S_VORTEX)
+				 (ptr)->mlet == S_VORTEX || \
+				 (ptr) == &mons[PM_MANES])
 
 /* Used for conduct with corpses, tins, and digestion attacks */
 /* G_NOCORPSE monsters might still be swallowed as a purple worm */
