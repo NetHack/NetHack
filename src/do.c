@@ -218,11 +218,7 @@ void
 doaltarobj(obj)  /* obj is an object dropped on an altar */
 	register struct obj *obj;
 {
-#ifndef GOLDOBJ
-	if (Blind)
-#else
 	if (Blind || obj->oclass == GOLD_CLASS)
-#endif
 		return;
 
 	/* KMH, conduct */
