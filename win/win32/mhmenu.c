@@ -141,8 +141,10 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 
 				next_char ++;
 			}
+		}
 
-			/* collect group accelerators */
+		/* collect group accelerators */
+		for( i=0; i<data->menu.size;  i++) {
 			if( data->how != PICK_NONE ) {
 				if( data->menu.items[i].group_accel && 
 					!strchr(data->menu.gacc, data->menu.items[i].group_accel) ) {
