@@ -269,13 +269,14 @@ struct obj *otmp;
 		if (canseemon(mtmp)) {
 		    if (disguised_mimic) {
 			if (mtmp->m_ap_type == M_AP_OBJECT &&
-				mtmp->mappearance == STRANGE_OBJECT)
-				/* it can do better now */
-				set_mimic_sym(mtmp);
-			else
-				mimic_hit_msg(mtmp, otyp);
+			    mtmp->mappearance == STRANGE_OBJECT) {
+			    /* it can do better now */
+			    set_mimic_sym(mtmp);
+			    newsym(mtmp->mx, mtmp->my);
+			} else
+			    mimic_hit_msg(mtmp, otyp);
 		    } else pline("%s looks%s better.", Monnam(mtmp),
-					otyp == SPE_EXTRA_HEALING ? " much" : "" );
+				 otyp == SPE_EXTRA_HEALING ? " much" : "" );
 		}
 		if (mtmp->mtame || mtmp->mpeaceful) {
 		    adjalign(Role_if(PM_HEALER) ? 1 : sgn(u.ualign.type));
