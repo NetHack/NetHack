@@ -51,6 +51,8 @@ extern "C" {
 // enough, and we undefine NetHack macros which conflict with Qt
 // identifiers.
 
+#define alloc hide_alloc // avoid treading on STL symbol
+#define lock hide_lock // avoid treading on STL symbol
 #ifdef _MSC_VER
 #define NHSTDC
 #endif
@@ -68,10 +70,13 @@ extern "C" {
 #undef FALSE
 #undef min
 #undef max
+#undef alloc
+#undef lock
 
 }
 
 #include "qt_win.h"
+#include <qregexp.h>
 #include <qpainter.h>
 #include <qdir.h>
 #include <qbitmap.h>
@@ -5098,4 +5103,7 @@ extern "C" void play_usersound(const char* filename, int volume)
 #include "qt_win.moc"
 #ifndef KDE
 #include "qt_kde0.moc"
+#endif
+#if QT_VERSION >= 300
+#include "qttableview.moc"
 #endif

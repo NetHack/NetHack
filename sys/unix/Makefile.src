@@ -175,8 +175,8 @@ WINX11OBJ = Window.o dialogs.o winX.o winmap.o winmenu.o winmesg.o \
 #
 # Files for a Qt port
 #
-WINQTSRC = ../win/Qt/qt_win.cpp ../win/Qt/qt_clust.cpp
-WINQTOBJ = qt_win.o qt_clust.o tile.o
+WINQTSRC = ../win/Qt/qt_win.cpp ../win/Qt/qt_clust.cpp ../win/Qt/qttableview.cpp
+WINQTOBJ = qt_win.o qt_clust.o tile.o qttableview.o
 #
 # Files for a Gnome port
 #
@@ -453,6 +453,9 @@ qt_kde0.moc: ../include/qt_kde0.h
 qt_win.moc: ../include/qt_win.h
 	$(QTDIR)/bin/moc ../include/qt_win.h > qt_win.moc
 
+qttableview.moc: ../include/qttableview.h
+	$(QTDIR)/bin/moc ../include/qttableview.h > qttableview.moc
+
 $(MAKEDEFS): ../util/makedefs.c  $(CONFIG_H) ../include/permonst.h \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
@@ -665,10 +668,12 @@ tile.o: tile.c $(HACK_H)
 qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
 		../include/dlb.h ../include/patchlevel.h ../include/qt_win.h \
 		../include/qt_clust.h ../include/qt_kde0.h \
-		../include/qt_xpms.h qt_win.moc qt_kde0.moc
+		../include/qt_xpms.h qt_win.moc qt_kde0.moc qttableview.moc
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_win.cpp
 qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_clust.cpp
+qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt/qttableview.cpp
 monstr.o: monstr.c $(CONFIG_H)
 vis_tab.o: vis_tab.c $(CONFIG_H)
 allmain.o: allmain.c $(HACK_H)

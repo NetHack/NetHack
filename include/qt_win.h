@@ -36,7 +36,13 @@
 #include <qarray.h>
 #include <qcombobox.h>
 #include <qscrollview.h>
+#if QT_VERSION >= 300
+#include <qttableview.h>
+// Should stop using QTableView
+#define QTableView QtTableView
+#else
 #include <qtableview.h>
+#endif
 #include <qmainwindow.h>
 #include <qwidgetstack.h>
 
