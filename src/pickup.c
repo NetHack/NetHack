@@ -596,6 +596,36 @@ end_query:
 	return (n_tried > 0);
 }
 
+#ifdef AUTOPICKUP_EXCEPTIONS
+boolean
+is_autopickup_exception(obj)
+struct obj *obj;
+{
+	/* The pickup exceptions are a series of null-terminated
+	 * pattern string to match the item description against.
+	 * The list ends with a double null terminator.
+	 *
+	 * You can only match against the strings that would shown
+	 * in an inventory display, not the specific exact object
+	 * name, unless that object was fully identified.
+	 * For example, if you specified pattern "loadstone", and
+	 * you had never identified "loadstone", it wouldn't match
+	 * when you came across a loadstone, because it would be
+	 * identified as "a gray stone".  You could match on
+	 * "gray stone" for an exception to autopickup, of course,
+	 * and decide manually.  This is in keeping with autopickup
+	 * being an interface convenience only.
+	 */
+	char *objdesc = makesingular(xname(obj));
+	struct autopickup_exception *ape = iflags.autopickup_exceptions;
+	while (ape) {
+		if (pmatch(ape->pattern, objdesc)) return TRUE;
+		ape = ape->next;
+	}
+	return FALSE;
+}
+#endif /* AUTOPICKUP_EXCEPTIONS */
+
 /*
  * Pick from the given list using flags.pickup_types.  Return the number
  * of items picked (not counts).  Create an array that returns pointers
@@ -616,13 +646,22 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 
 	/* first count the number of eligible items */
 	for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
-	    if (!*otypes || index(otypes, curr->oclass))
+
+	    if ((!*otypes || index(otypes, curr->oclass))
+#ifdef AUTOPICKUP_EXCEPTIONS
+	    	 && !is_autopickup_exception(curr)
+#endif
+						       );
 		n++;
 
 	if (n) {
 	    *pick_list = pi = (menu_item *) alloc(sizeof(menu_item) * n);
 	    for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow))
-		if (!*otypes || index(otypes, curr->oclass)) {
+		if ((!*otypes || index(otypes, curr->oclass))
+#ifdef AUTOPICKUP_EXCEPTIONS
+		    && !is_autopickup_exception(curr)
+#endif
+							     ) {
 		    pi[n].item.a_obj = curr;
 		    pi[n].count = curr->quan;
 		    n++;

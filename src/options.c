@@ -442,6 +442,10 @@ STATIC_OVL boolean FDECL(is_wc_option, (const char *));
 STATIC_OVL boolean FDECL(wc_supported, (const char *));
 STATIC_OVL boolean FDECL(is_wc2_option, (const char *));
 STATIC_OVL boolean FDECL(wc2_supported, (const char *));
+#ifdef AUTOPICKUP_EXCEPTIONS
+STATIC_DCL void FDECL(remove_autopickup_exception, (struct autopickup_exception *));
+STATIC_OVL int NDECL(count_ape_maps);
+#endif
 
 /* check whether a user-supplied option string is a proper leading
    substring of a particular option name; option string might have
@@ -2461,9 +2465,17 @@ doset()
 				doset_add_menu(tmpwin, compopt[i].name,
 					(pass == DISP_IN_GAME) ? 0 : indexoffset);
 		}
+#ifdef AUTOPICKUP_EXCEPTIONS
+	any.a_int = -1;
+	Sprintf(buf, "autopickup exceptions (%d currently set)",
+		count_ape_maps());
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+
+#endif /* AUTOPICKUP_EXCEPTIONS */
 #ifdef PREFIXES_IN_USE
+	any.a_void = 0;
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
- add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 		 "Variable playground locations:", MENU_UNSELECTED);
 	for (i = 0; i < PREFIX_COUNT; i++)
 		doset_add_menu(tmpwin, fqn_prefix_names[i], 0);
@@ -2479,6 +2491,12 @@ doset()
 	     */
 	    for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
 		opt_indx = pick_list[pick_idx].item.a_int - 1;
+#ifdef AUTOPICKUP_EXCEPTIONS
+		if (opt_indx == -2) {
+		    special_handling("autopickup_exception",
+		    			setinitial, fromfile);
+		} else
+#endif
 		if (opt_indx < boolcount) {
 		    /* boolean option */
 		    Sprintf(buf, "%s%s", *boolopt[opt_indx].addr ? "!" : "",
@@ -2528,7 +2546,11 @@ boolean setinitial,setfromfile;
     boolean retval = FALSE;
     
     /* Special handling of menustyle, pickup_burden, pickup_types,
-       disclose, runmode, msg_window, menu_headings, and number_pad options. */
+     * disclose, runmode, msg_window, menu_headings, and number_pad options.
+#ifdef AUTOPICKUP_EXCEPTIONS
+     * Also takes care of interactive autopickup_exception_handling changes.
+#endif
+     */
     if (!strcmp("menustyle", optname)) {
 	const char *style_name;
 	menu_item *style_pick = (menu_item *)0;
@@ -2775,6 +2797,89 @@ boolean setinitial,setfromfile;
         }
 	destroy_nhwindow(tmpwin);
         retval = TRUE;
+#ifdef AUTOPICKUP_EXCEPTIONS
+    } else if (!strcmp("autopickup_exception", optname)) {
+    	boolean retval;
+	int pick_cnt, pick_idx, opt_idx = 0, numapes = 0, ilet;
+	struct autopickup_exception *ape = iflags.autopickup_exceptions;
+	menu_item *pick_list = (menu_item *)0;
+	anything any;
+	char apebuf[BUFSZ];
+	static const char *action_titles[] = {
+		"a", "add new autopickup exception",
+		"l", "list autopickup exceptions",
+		"r", "remove existing autopickup exception"
+	};
+
+	while(ape) {
+		ape = ape->next;
+		numapes++;
+	}
+	if (numapes > 0) {
+		tmpwin = create_nhwindow(NHW_MENU);
+		start_menu(tmpwin);
+		any.a_int = 0;
+		for (i = 0; i < (numapes ? SIZE(action_titles) :
+				 SIZE(action_titles) - 4); i += 2) {
+			any.a_int++;
+			add_menu(tmpwin, NO_GLYPH, &any, *action_titles[i],
+			      0, ATR_NONE, action_titles[i+1], MENU_UNSELECTED);
+        	}
+		end_menu(tmpwin, "Adjust autopickup exception list how?");
+		if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list)) > 0) {
+			for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+				opt_idx = pick_list[pick_idx].item.a_int - 1;
+			}
+			free((genericptr_t)pick_list);
+			pick_list = (menu_item *)0;
+		}
+		destroy_nhwindow(tmpwin);
+	} /* else just ask for new pickup exception string */
+
+	if (opt_idx == 0) {
+		getlin("What new autopickup exception pattern?", &apebuf[1]);
+		if (apebuf[0] == '\033') retval = FALSE;
+		apebuf[0] = '"';
+		Strcat(apebuf,"\"");
+		add_autopickup_exception_mapping(apebuf);
+	} else if (opt_idx == 1) {
+		tmpwin = create_nhwindow(NHW_TEXT);
+		ape = iflags.autopickup_exceptions;
+		for (i = 0; i < numapes && ape; i++) {
+			Sprintf(apebuf, "\"%s\"", ape->pattern);
+			putstr(tmpwin, 0, ape->pattern);
+			ape = ape->next;
+		}
+		display_nhwindow(tmpwin, FALSE);
+		destroy_nhwindow(tmpwin);
+	} else {
+		ape = iflags.autopickup_exceptions;
+		ilet = 'a';
+		tmpwin = create_nhwindow(NHW_MENU);
+		start_menu(tmpwin);
+		for (i = 0; i < numapes && ape; i++) {
+			any.a_void = ape;
+			Sprintf(apebuf, "\"%s\"", ape->pattern);
+			add_menu(tmpwin, NO_GLYPH, &any, ilet, 0,
+				ATR_NONE, apebuf, MENU_UNSELECTED);
+			if (ilet == 'z') ilet = 'A';
+			else if (ilet == 'Z') ilet = 'a';	/* shouldn't happen */
+			else ilet++;
+			ape = ape->next;
+		}
+		end_menu(tmpwin, "Remove which autopickup exceptions?");
+		pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list);
+		if (pick_cnt) {
+	    	    for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx)
+			remove_autopickup_exception(
+			 (struct autopickup_exception *)pick_list[pick_idx].item.a_void);
+	        }
+	        free((genericptr_t)pick_list);
+	        pick_list = (menu_item *)0;
+		destroy_nhwindow(tmpwin);
+	}
+	retval = TRUE;
+#endif /* AUTOPICKUP_EXCEPTIONS */
     }
     return retval;
 }
@@ -3060,6 +3165,87 @@ dotogglepickup()
 	pline("Autopickup: %s.", buf);
 	return 0;
 }
+
+#ifdef AUTOPICKUP_EXCEPTIONS
+int
+add_autopickup_exception_mapping(mapping)
+const char *mapping;
+{
+	struct autopickup_exception *newape, *ape;
+	char text[256];
+	static int allocsize = 0;
+	int textsize = 0;
+
+	if (sscanf(mapping, "\"%255[^\"]\"", text) == 1) {
+		textsize = strlen(text);
+		if (!iflags.autopickup_exceptions) {
+		    iflags.autopickup_exceptions = (struct autopickup_exception *)
+					alloc(sizeof(struct autopickup_exception));
+		    iflags.autopickup_exceptions->pattern = (char *)
+					alloc(textsize+1);
+		    Strcpy(iflags.autopickup_exceptions->pattern, text);
+		    iflags.autopickup_exceptions->next =
+					(struct autopickup_exception *)0;
+		} else {
+		    ape = iflags.autopickup_exceptions;
+		    newape = (struct autopickup_exception *)alloc(
+					sizeof(struct autopickup_exception));
+		    newape->pattern = (char *)alloc(textsize+1);
+		    Strcpy(newape->pattern, text);
+		    newape->next = iflags.autopickup_exceptions;
+		    iflags.autopickup_exceptions = newape;
+		}
+	} else {
+	    raw_print("syntax error in AUTOPICKUP_EXCEPTION");
+	    return 0;
+	}
+	return 1;
+}
+
+STATIC_OVL void
+remove_autopickup_exception(whichape)
+struct autopickup_exception *whichape;
+{
+    struct autopickup_exception *ape, *prev = 0;
+
+    for (ape = iflags.autopickup_exceptions; ape;) {
+	if (ape == whichape) {
+	    struct autopickup_exception *freeape = ape;
+	    ape = ape->next;
+	    if (prev) prev->next = ape;
+	    else iflags.autopickup_exceptions = ape;
+	    free(freeape->pattern);
+	    free(freeape);
+	} else {
+	    prev = ape;
+	    ape = ape->next;
+	}
+    }
+}
+
+STATIC_OVL int
+count_ape_maps()
+{
+	struct autopickup_exception *ape = iflags.autopickup_exceptions;
+	int cnt = 0;
+	while(ape) {
+		++cnt;
+		ape = ape->next;
+	}
+	return cnt;
+}
+
+void
+free_autopickup_exception_mappings()
+{
+	struct autopickup_exception *ape = iflags.autopickup_exceptions;
+	while((ape = iflags.autopickup_exceptions) != 0) {
+		free(ape->pattern);
+		iflags.autopickup_exceptions = ape->next;
+		free(ape);
+	}
+}
+#endif /* AUTOPICKUP_EXCEPTIONS */
 
 /* data for option_help() */
 static const char *opt_intro[] = {

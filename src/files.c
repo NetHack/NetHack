@@ -1743,6 +1743,10 @@ char		*tmp_levels;
 		parseoptions(bufp, TRUE, TRUE);
 		if (plname[0])		/* If a name was given */
 			plnamesuffix();	/* set the character class */
+#ifdef AUTOPICKUP_EXCEPTIONS
+	} else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
+		add_autopickup_exception_mapping(bufp);
+#endif
 #ifdef NOCWD_ASSUMPTIONS
 	} else if (match_varname(buf, "HACKDIR", 4)) {
 		adjust_prefix(bufp, HACKPREFIX);
