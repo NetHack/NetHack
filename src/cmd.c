@@ -2452,5 +2452,31 @@ wiz_port_debug()
 # endif /*PORT_DEBUG*/
 
 #endif /* OVL0 */
+#ifdef OVLB
+/*
+ *   Parameter validator for generic yes/no function to prevent
+ *   the core from sending too long a prompt string to the
+ *   window port causing a buffer overflow there.
+ */
+char
+yn_function(query,resp, def)
+const char *query,*resp;
+char def;
+{
+	char qbuf[QBUFSZ];
+	unsigned truncspot, reduction = sizeof(" [N]  ?") + 1;
+
+	if (resp) reduction += strlen(resp) + sizeof(" () ");
+	if (strlen(query) < (QBUFSZ - reduction))
+		return (*windowprocs.win_yn_function)(query, resp, def);
+	paniclog("Query truncated: ", query);
+	reduction += sizeof("...");
+	truncspot = QBUFSZ - reduction;
+	(void) strncpy(qbuf, query, truncspot);
+	qbuf[truncspot] = '\0';
+	Strcat(qbuf,"...");
+	return (*windowprocs.win_yn_function)(qbuf, resp, def);
+}
+#endif
 
 /*cmd.c*/

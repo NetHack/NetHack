@@ -108,7 +108,6 @@ extern NEARDATA struct window_procs windowprocs;
 #define nh_poskey (*windowprocs.win_nh_poskey)
 #define nhbell (*windowprocs.win_nhbell)
 #define nh_doprev_message (*windowprocs.win_doprev_message)
-#define yn_function (*windowprocs.win_yn_function)
 #define getlin (*windowprocs.win_getlin)
 #define get_ext_cmd (*windowprocs.win_get_ext_cmd)
 #define number_pad (*windowprocs.win_number_pad)
@@ -121,6 +120,12 @@ extern NEARDATA struct window_procs windowprocs;
 #endif
 #define get_color_string (*windowprocs.win_get_color_string)
 #endif
+
+/* 3.4.2: There is a real yn_function() in the core now, which does
+ *        some buffer length validation on the parameters prior to
+ *        invoking the window port routine. yn_function() is in cmd.c
+ */
+/* #define yn_function (*windowprocs.win_yn_function) */
 
 /* other defs that really should go away (they're tty specific) */
 #define start_screen (*windowprocs.win_start_screen)

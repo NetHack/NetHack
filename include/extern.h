@@ -178,6 +178,7 @@ E char NDECL(readchar);
 #ifdef WIZARD
 E void NDECL(sanity_check);
 #endif
+E char FDECL(yn_function, (const char *, const char *, CHAR_P));
 
 /* ### dbridge.c ### */
 
