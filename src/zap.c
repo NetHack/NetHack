@@ -29,6 +29,7 @@ STATIC_DCL void FDECL(revive_egg, (struct obj *));
 #ifdef STEED
 STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
 #endif
+STATIC_DCL void FDECL(skiprange, (int,int *,int *));
 
 STATIC_DCL int FDECL(zap_hit, (int,int));
 STATIC_DCL void FDECL(backfire, (struct obj *));
@@ -49,6 +50,10 @@ STATIC_DCL int FDECL(spell_hit_bonus, (int));
 #define ZT_BREATH(x)		(20+(x))
 
 #define is_hero_spell(type)	((type) >= 10 && (type) < 20)
+
+#define M_IN_WATER(ptr)		((ptr)->mlet == S_EEL || \
+				 amphibious(ptr) || \
+		 		 is_swimmer(ptr))
 
 STATIC_VAR const char are_blinded_by_the_flash[] = "are blinded by the flash!";
 
@@ -2602,6 +2607,16 @@ register struct monst *mtmp;
 	      mon_nam(mtmp) : "it");
 }
 
+STATIC_OVL void
+skiprange(range, skipstart, skipend)
+int range, *skipstart, *skipend;
+{
+	int tmp = range - (rnd(range / 4));
+	*skipstart = tmp;
+	*skipend = tmp - ((tmp / 4) * rnd(3));
+	if (*skipend >= tmp) *skipend = tmp - 1;
+}
+
 /*
  *  Called for the following distance effects:
  *	when a weapon is thrown (weapon == THROWN_WEAPON)
@@ -2631,6 +2646,8 @@ struct obj *obj;			/* object tossed/used */
 	struct monst *mtmp;
 	uchar typ;
 	boolean shopdoor = FALSE, point_blank = TRUE;
+	boolean in_skip = FALSE, allow_skip = FALSE;
+	int skiprange_start = 0, skiprange_end = 0, skipcount = 0;
 
 	if (weapon == KICKED_WEAPON) {
 	    /* object starts one square in front of player */
@@ -2640,6 +2657,11 @@ struct obj *obj;			/* object tossed/used */
 	} else {
 	    bhitpos.x = u.ux;
 	    bhitpos.y = u.uy;
+	}
+
+	if (weapon == THROWN_WEAPON && obj && obj->otyp == ROCK) {
+		skiprange(range, &skiprange_start, &skiprange_end);
+		allow_skip = !rn2(3);
 	}
 
 	if (weapon == FLASHED_LIGHT) {
@@ -2704,7 +2726,39 @@ struct obj *obj;			/* object tossed/used */
 			break;
 		}
 
-	    if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
+	    mtmp = m_at(bhitpos.x, bhitpos.y);
+		
+	    /*
+	     * skipping rocks
+	     *
+	     * skiprange_start is only set if this is a thrown rock
+	     */
+	    if (skiprange_start && (range == skiprange_start) && allow_skip) {
+		if (is_pool(bhitpos.x, bhitpos.y) && !mtmp) {
+			in_skip = TRUE;
+			if (!Blind) pline("%s %s%s.", Yname2(obj),
+					  otense(obj, "skip"),
+					  skipcount ? " again" : "");
+			else if (!Deaf) You_hear("%s skip.", Yname2(obj));
+			skipcount++;
+		} else if (skiprange_start > skiprange_end + 1) {
+			--skiprange_start;
+		}
+	    }
+	    if (in_skip) {
+ 		if (range <= skiprange_end) {
+			in_skip = FALSE;
+			if (range > 3)	/* another bounce? */
+			    skiprange(range, &skiprange_start, &skiprange_end);
+		} else if (mtmp && M_IN_WATER(mtmp->data)) {
+			if ((!Blind && canseemon(mtmp)) || sensemon(mtmp))
+				pline("%s %s over %s.",
+					Yname2(obj), otense(obj, "pass"),
+					mon_nam(mtmp));
+		}
+	    }
+
+	    if (mtmp && !(in_skip && M_IN_WATER(mtmp->data))) {
 		notonhead = (bhitpos.x != mtmp->mx ||
 			     bhitpos.y != mtmp->my);
 		if (weapon != FLASHED_LIGHT) {

@@ -107,6 +107,7 @@ debug-mode wishing for random monster(s) via '*'
 health-food store that stocks monk-appropriate foods in mine town when monk
 give more information about your attributes in debug mode
 polywarn to give intrinsic monster detection of limited species while polymorphed
+rocks can skip on the water sometimes allowing them to pass over water creatures
 
 
 Platform- and/or Interface-Specific New Features
