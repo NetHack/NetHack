@@ -35,6 +35,9 @@ SHELL=/bin/sh
 # for Atari
 # SHELL=E:/GEMINI2/MUPFEL.TTP
 
+# Usually, the C compiler driver is used for linking:
+LINK=$(CC)
+
 # Pick the SYSSRC and SYSOBJ lines corresponding to your desired operating
 # system.
 #
@@ -70,6 +73,10 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 #
 #	For HP/UX 10.20 with GCC:
 # CC = gcc -D_POSIX_SOURCE
+#
+#	For cross-compiling, eg. with gcc on Linux (see also CXX further down):
+# CC = arm-linux-gcc
+#
 #
 # if you're debugging and want gcc to check as much as possible, use:
 # CC = gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
@@ -127,11 +134,11 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 #   on a Mac/BeBox:
 #CC = mwcc
 #CFLAGS = -r -I../include
-#LD = mwld
+#LINK = mwld
 #LFLAGS = -map nethack.xMAP
 #   on Intel:
 #CFLAGS = -O -I../include
-#LD = gcc
+#LINK = gcc
 #LFLAGS = -Xlinker -soname=_APP_
 
 # Only used for the Gnome interface.
@@ -148,11 +155,14 @@ CFLAGS = -O -I../include
 LFLAGS =
 
 # The Qt and Be window systems are written in C++, while the rest of
-# NetHack is standard C.  If using Qt, uncomment the LD line here to get
+# NetHack is standard C.  If using Qt, uncomment the LINK line here to get
 # the C++ libraries linked in.
 CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include
 CXX=g++
-#LD=g++
+#LINK=g++
+#	For cross-compiling, eg. with gcc on Linux (see also CC further up):
+#CXX=arm-linux-g++
+#LINK=arm-linux-gcc
 
 # Set the WINSRC, WINOBJ, and WINLIB lines to correspond to your desired
 # combination of windowing systems.  Also set windowing systems in config.h.
@@ -382,32 +392,32 @@ $(GAME):	$(SYSTEM)
 
 Sysunix:	$(HOBJ) Makefile
 	@echo "Loading ..."
-	@$(CC) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
+	$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
 	@touch Sysunix
 
 Sys3B2:	$(HOBJ) Makefile
 	@echo "Loading ..."
-	@$(CC) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) -lmalloc
+	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) -lmalloc
 	@touch Sys3B2
 
 Sysatt:	$(HOBJ) Makefile
 	@echo "Loading ..."
-	@$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
+	@$(LINK) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
 	@touch Sysatt
 
 Systos:	$(HOBJ) Makefile
 	@echo "Loading ..."
-	@$(CC) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
+	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
 	@touch Systos
 
 SysV-AT:	DUMB.Setup $(HOBJ) Makefile
 	@echo "Loading ..."
-	@$(CC) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
+	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
 	@touch SysV-AT
 
 SysBe: $(HOBJ) Makefile
 	@echo "Loading ..."
-	@$(LD) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
+	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
 	@xres -o $(GAME) ../win/BeOS/nethack.rsrc
 	@mimeset -f $(GAME)
 	@touch SysBe
