@@ -1268,11 +1268,15 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 	HDC hdc;
 	PNHMenuWindow data;
 	int i;
-	RECT rt;
+	RECT rt, wrt;
+	int extra_cx;
 
 	GetClientRect(hWnd, &rt);
 	sz->cx = rt.right - rt.left;
 	sz->cy = rt.bottom - rt.top;
+
+	GetWindowRect(hWnd, &wrt);
+	extra_cx = (wrt.right-wrt.left) - sz->cx;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	if(data) {
@@ -1331,7 +1335,7 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 			sz->cx = max(sz->cx, text_rt.right - text_rt.left + 5*tm.tmAveCharWidth + tm.tmOverhang);
 			SelectObject(hdc, saveFont);
 		}
-		sz->cx += GetSystemMetrics(SM_CXVSCROLL) + 2*GetSystemMetrics(SM_CXSIZEFRAME);
+		sz->cx += extra_cx;
 
 		ReleaseDC(control, hdc);
 	}
