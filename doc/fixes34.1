@@ -370,6 +370,8 @@ Asmodeus fails an is_armed() check, so code in m_initweap() to give him wands
 #rub would wield the target tool even when already being worn as eyewear
 monks lose their to-hit bonus for bare-handed attacking if wearing a shield
 fix case on leading character in "Crunched in the head..." in ball.c
+using travel mode to move next to a known trap and then trying to step onto
+	that trap required an extra step; the first one ended up as a no-op
 
 
 Platform- and/or Interface-Specific Fixes
