@@ -820,6 +820,7 @@ register int pm;
 	    case PM_STALKER:
 		if(!Invis) {
 			set_itimeout(&HInvis, (long)rn1(100, 50));
+			if (!Blind && !BInvis) self_invis_message();
 		} else {
 			if (!(HInvis & INTRINSIC)) You_feel("hidden!");
 			HInvis |= FROMOUTSIDE;
