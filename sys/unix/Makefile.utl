@@ -335,6 +335,9 @@ gifread.o: ../win/share/gifread.c $(CONFIG_H) ../include/tile.h
 ppmwrite.o: ../win/share/ppmwrite.c $(CONFIG_H) ../include/tile.h
 	$(CC) $(CFLAGS) -c ../win/share/ppmwrite.c
 
+tile2bmp.o: ../win/share/tile2bmp.c $(HACK_H) ../include/tile.h
+	$(CC) $(CFLAGS) -c ../win/share/tile2bmp.c
+
 tile2x11.o: ../win/X11/tile2x11.c $(HACK_H) ../include/tile.h \
 						../include/tile2x11.h
 	$(CC) $(CFLAGS) -c ../win/X11/tile2x11.c
