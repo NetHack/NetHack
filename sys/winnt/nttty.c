@@ -59,7 +59,7 @@ int GUILaunched;
 static BOOL FDECL(CtrlHandler, (DWORD));
 
 #ifdef PORT_DEBUG
-static boolean display_cursor_info = TRUE;
+static boolean display_cursor_info = FALSE;
 #endif
 
 extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
@@ -429,11 +429,6 @@ char ch;
 			break;
 	    case '\b':
 	    		cursor.X--;
-	    		ch = ' ';
-			WriteConsoleOutputAttribute(hConOut,&attr,1,
-							cursor,&acount);
-			WriteConsoleOutputCharacter(hConOut,&ch,1,
-							cursor,&ccount);
 			break;
 	    default:
 			WriteConsoleOutputAttribute(hConOut,&attr,1,
