@@ -646,7 +646,17 @@ die:
 		u.ugrave_arise = (NON_PM - 1);	/* statue instead of corpse */
 	    else if (u.ugrave_arise == NON_PM &&
 		     !(mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
-		corpse = mk_named_object(CORPSE, &mons[u.umonnum],
+		int mnum = u.umonnum;
+
+		if (!Upolyd) {
+		    /* Base corpse on race when not poly'd since original
+		     * u.umonnum is based on role, and all role monsters
+		     * are human.
+		     */
+		    mnum = (flags.female && urace.femalenum != NON_PM) ?
+			urace.femalenum : urace.malenum;
+		}
+		corpse = mk_named_object(CORPSE, &mons[mnum],
 				       u.ux, u.uy, plname);
 		Sprintf(pbuf, "%s, %s%s", plname,
 			killer_format == NO_KILLER_PREFIX ? "" :
