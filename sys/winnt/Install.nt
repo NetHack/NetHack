@@ -4,7 +4,7 @@
                  Instructions for compiling and installing
              NetHack 3.4 on a Windows 9x, Me, NT, 2000, or XP system
          ==============================================================
-		      Last revision: March 29, 2002
+		 Last revision: $Date$
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
