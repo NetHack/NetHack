@@ -891,6 +891,13 @@ dospinweb()
 		default:
 			impossible("Webbing over trap type %d?", ttmp->ttyp);
 			return(0);
+		}
+	else if (On_stairs(u.ux, u.uy)) {
+	    /* cop out: don't let them hide the stairs */
+	    Your("web fails to impede access to the %s.",
+		 (levl[u.ux][u.uy].typ == STAIRS) ? "stairs" : "ladder");
+	    return(1);
+		 
 	}
 	ttmp = maketrap(u.ux, u.uy, WEB);
 	if (ttmp) {
