@@ -7,6 +7,7 @@ autopickup     automatically pick up objects you move over        [TRUE]
 autoquiver     when firing with an empty quiver, select some
                suitable inventory weapon to fill the quiver       [FALSE]
 BIOS           allow the use of IBM ROM BIOS calls                [FALSE]
+cmdassist      give help for errors on direction & other commands [TRUE]
 confirm        ask before hitting tame or peaceful monsters       [TRUE]
 DECgraphics    use DEC/VT line-drawing characters for the dungeon [FALSE]
 eight_bit_tty  send 8-bit characters straight to terminal         [FALSE]
