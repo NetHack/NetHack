@@ -1473,7 +1473,8 @@ register struct monst *mdef;
 	mondead(mdef);
 	if (mdef->mhp > 0) return;	/* lifesaved */
 
-	if (corpse_chance(mdef, (struct monst *)0, FALSE))
+	if (corpse_chance(mdef, (struct monst *)0, FALSE) &&
+	    (accessible(mdef->mx, mdef->my) || is_pool(mdef->mx, mdef->my)))
 		(void) make_corpse(mdef);
 }
 
@@ -2061,16 +2062,21 @@ void
 seemimic(mtmp)
 register struct monst *mtmp;
 {
-	/*
-	 *  Discovered mimics don't block light.
-	 */
-	if ((mtmp->m_ap_type == M_AP_FURNITURE &&
-		(mtmp->mappearance==S_hcdoor || mtmp->mappearance==S_vcdoor))||
-	    (mtmp->m_ap_type == M_AP_OBJECT && mtmp->mappearance == BOULDER))
-	    unblock_point(mtmp->mx,mtmp->my);
+	unsigned old_app = mtmp->mappearance;
+	uchar old_ap_type = mtmp->m_ap_type;
 
 	mtmp->m_ap_type = M_AP_NOTHING;
 	mtmp->mappearance = 0;
+
+	/*
+	 *  Discovered mimics don't block light.
+	 */
+	if (((old_ap_type == M_AP_FURNITURE &&
+	      (old_app == S_hcdoor || old_app == S_vcdoor)) ||
+	     (old_ap_type == M_AP_OBJECT && old_app == BOULDER)) &&
+	    !does_block(mtmp->mx, mtmp->my, &levl[mtmp->mx][mtmp->my]))
+	    unblock_point(mtmp->mx, mtmp->my);
+
 	newsym(mtmp->mx,mtmp->my);
 }
 
