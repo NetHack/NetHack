@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2002/02/23	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2002/03/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1267,6 +1267,13 @@ boolean noisy;
 	    err++;
 	} else if (Upolyd && slithy(youmonst.data)) {
 	    if (noisy) You("have no feet...");	/* not body_part(FOOT) */
+	    err++;
+	} else if (Upolyd && youmonst.data->mlet == S_CENTAUR) {
+	    /* break_armor() pushes boots off for centaurs,
+	       so don't let dowear() put them back on... */
+	    if (noisy) pline("You have too many hooves to wear %s.",
+			     c_boots);	/* makeplural(body_part(FOOT)) yields
+					   "rear hooves" which sounds odd */
 	    err++;
 	} else if (u.utrap && (u.utraptype == TT_BEARTRAP ||
 				u.utraptype == TT_INFLOOR)) {
