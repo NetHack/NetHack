@@ -561,7 +561,7 @@ register struct monst *mtmp;
 			mtmp->mtame < 5)
 		    pline_msg = "yowls.";
 		else if (moves > EDOG(mtmp)->hungrytime)
-		    pline_msg = "miaos.";
+		    pline_msg = "meows.";
 		else if (EDOG(mtmp)->hungrytime > moves + 1000)
 		    pline_msg = "purrs.";
 		else
