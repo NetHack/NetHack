@@ -268,13 +268,6 @@ because of shop behavior.  Allowing diagonal entry will nullify the body
 block by the shk, when you carry unpaid items.  If diagonal moves are
 allowed, shopkeepers should close the door when you're inside.  IM]
 
-Some of the data.base descriptions are either misleading or downright false
-when applied to the NetHack monsters.  (I'd hate to try counting the number of
-times people posted to rec.games.hack mentioning using a mirror on a
-cockatrice, for instance).  On the other hand, these descriptions are based
-on the traditional properties of monsters, so it's not clear people are trying
-things based on the descriptions.
-
 Monsters cannot use AD_STCK or AD_WRAP on other monsters.  The complications
 are too great, and would add little to the game.
 
