@@ -2459,6 +2459,9 @@ register boolean peaceful, silent;
 /* auto-response flag for/from "sell foo?" 'a' => 'y', 'q' => 'n' */
 static char sell_response = 'a';
 static int sell_how = SELL_NORMAL;
+/* can't just use sell_response='y' for auto_credit because the 'a' response
+   shouldn't carry over from ordinary selling to credit selling */
+static boolean auto_credit = FALSE;
 
 void
 sellobj_state(deliberate)
@@ -2472,6 +2475,7 @@ int deliberate;
 	 */
 	sell_response = (deliberate != SELL_NORMAL) ? '\0' : 'a';
 	sell_how = deliberate;
+	auto_credit = FALSE;
 }
 
 void
@@ -2622,7 +2626,7 @@ move_on:
 		char c, qbuf[BUFSZ];
 		long tmpcr = ((offer * 9L) / 10L) + (offer <= 1L);
 
-		if (sell_how == SELL_NORMAL || sell_response == 'y') {
+		if (sell_how == SELL_NORMAL || auto_credit) {
 		    c = sell_response = 'y';
 		} else if (sell_response != 'n') {
 		    pline("%s cannot pay you at present.", Monnam(shkp));
@@ -2635,7 +2639,7 @@ move_on:
 		    c = ynaq(qbuf);
 		    if (c == 'a') {
 			c = 'y';
-			sell_response = 'y';
+			auto_credit = TRUE;
 		    }
 		} else		/* previously specified "quit" */
 		    c = 'n';
