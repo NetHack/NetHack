@@ -275,6 +275,9 @@ E NEARDATA struct c_color_names {
 #define purple		c_color_names.c_purple
 #define White		c_color_names.c_white
 
+/* The names of the colors used for gems, etc. */
+E const char *c_obj_colors[];
+
 E struct c_common_strings {
     const char	*const c_nothing_happens, *const c_thats_enough_tries,
 		*const c_silly_thing_to, *const c_shudder_for_moment,

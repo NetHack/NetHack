@@ -9,7 +9,7 @@
 
 static const char tools[] = { TOOL_CLASS, WEAPON_CLASS, WAND_CLASS, 0 };
 static const char tools_too[] = { ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
-					  WEAPON_CLASS, WAND_CLASS, 0 };
+				  WEAPON_CLASS, WAND_CLASS, GEM_CLASS, 0 };
 
 #ifdef TOURIST
 STATIC_DCL int FDECL(use_camera, (struct obj *));
@@ -1761,6 +1761,73 @@ reset_trapset()
 	trapinfo.tobj = 0;
 }
 
+STATIC_OVL void
+use_stone(otmp)
+struct obj *otmp;
+{
+	struct obj *obj;
+	char allowall[2];
+	const char *color = 0;
+	static const char *ambiguous = "You make scratch marks on the stone";
+
+	allowall[0] = ALL_CLASSES;
+	allowall[1] = '\0';
+	if (!(obj = getobj(allowall, "rub on the stone")))
+	    return;
+
+	if (otmp->cursed && obj->oclass == GEM_CLASS && rnd(5) == 1) {
+	    pline(
+		(Blind ? "You feel something shatter" :
+		 (Hallucination ? "Oh, wow, look at the pretty shards" :
+		 "A sharp crack shatters %s %s")),
+		(obj->quan == 1 ? "the" : "a"),
+		lcase(makesingular(let_to_name(obj->oclass, FALSE))));
+	    useup(obj);
+	    return;
+	}
+
+	if (Blind) {
+	    pline("\"scritch, scritch\"");
+	    return;
+	}
+
+	if (Hallucination) {
+	    pline("Oh wow, man: Fractals!");
+	    return;
+	}
+
+	if (otmp->otyp != TOUCHSTONE) {
+	    pline(ambiguous);
+	    return;
+	}
+
+	switch (obj->oclass) {
+	  case GOLD:
+	    color = "golden";
+	    break;
+	  case GEM_CLASS:
+	    if (otmp->blessed) {
+		makeknown(TOUCHSTONE);
+		makeknown(obj->otyp);
+		prinv((char *)0, obj, 0L);
+		return;
+	    }
+	    /* FALLTHROUGH */
+	  case RING_CLASS:
+	    if (objects[obj->otyp].oc_material == GLASS) {
+		pline(ambiguous); /* yet not amibguous if a known touchstone */
+		return;
+	    }
+	    color = c_obj_colors[objects[obj->otyp].oc_color];
+	    break;
+	  default:
+	    pline("\"scritch, scritch\"");
+	    return;
+	}
+	pline("You see %s streaks on the stone", color);
+	return;
+}
+
 /* Place a landmine/bear trap.  Helge Hafting */
 STATIC_OVL void
 use_trap(otmp)
@@ -2417,7 +2484,8 @@ doapply()
 	register int res = 1;
 
 	if(check_capacity((char *)0)) return (0);
-	obj = getobj(carrying(POT_OIL) ? tools_too : tools, "use or apply");
+	obj = getobj(carrying(POT_OIL) || carrying(TOUCHSTONE)
+		? tools_too : tools, "use or apply");
 	if(!obj) return 0;
 
 	if (obj->oclass == WAND_CLASS)
@@ -2600,6 +2668,9 @@ doapply()
 	case LAND_MINE:
 	case BEARTRAP:
 		use_trap(obj);
+		break;
+	case TOUCHSTONE:
+		use_stone(obj);
 		break;
 	default:
 		/* Pole-weapons can strike at a distance */

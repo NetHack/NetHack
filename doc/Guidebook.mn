@@ -2258,40 +2258,40 @@ in this, the list of Dungeoneers:
 center;
 c c c.
 .\"TABLE_START
-Adam Aronow	Irina Rempt-Drijfhout	Mike Gallop
-Andreas Dorn	Izchak Miller	Mike Passaretti
-Andy Church	J. Ali Harlow	Mike Stephenson
-Andy Swanson	Janet Walz	Norm Meluch
-Ari Huttunen	Janne Salmijarvi	Olaf Seibert
-Barton House	Jean-Christophe Collet	Pat Rankin
-Benson I. Margulies	Jochen Erwied	Paul Winner
-Bill Dyer	John Kallen	Pierre Martineau
-Boudewijn Waijers	John Rupley	Ralf Brown
-Bruce Cox	John S. Bien	Richard Addison
-Bruce Holloway	Johnny Lee	Richard Beigel
-Bruce Mewborne	Jon W{tte	Richard P. Hughey
-Carl Schelin	Jonathan Handler	Rob Menke
-Chris Russo	Joshua Delahunty	Robin Johnson
-David Cohrs	Keizo Yamamoto	Roland McGrath
-David Damerell	Ken Arromdee	Ron Van Iwaarden
-David Gentzel	Ken Lorber	Ronnen Miller
-David Hairston	Ken Washikita	Ross Brown
-Dean Luick	Kevin Darcy	Sascha Wostmann
-Del Lamb	Kevin Hugo	Scott Bigham
-Deron Meranda	Kevin Sitze	Scott R. Turner
-Dylan O'Donnell	Kevin Smolkowski	Stephen Spackman
-Eric Backus	Kevin Sweet	Stephen White
-Eric Hendrickson	Lars Huttar	Steve Creps
-Eric R. Smith	Mark Gooderum	Steve Linhart
-Eric S. Raymond	Mark Modrall	Steve VanDevender
-Erik Andersen	Marvin Bressler	Tim Lennan
-Frederick Roeber	Matthew Day	Timo Hakulinen
-Gil Neiger	Merlyn LeRoy	Tom Almy
-Greg Laskin	Michael Allison	Tom West
-Greg Olson	Michael Feir	Warren Cheung
-Gregg Wonderly	Michael Hamel	Warwick Allison
-Hao-yang Wang	Michael Sokolov	Yitzhak Sapir
-Helge Hafting	Mike Engber
+Adam Aronow	Irina Rempt-Drijfhout	Mike Engber 
+Andreas Dorn	Izchak Miller	Mike Gallop
+Andy Church	J. Ali Harlow	Mike Passaretti
+Andy Swanson	Janet Walz	Mike Stephenson
+Ari Huttunen	Janne Salmijarvi	Norm Meluch
+Barton House	Jean-Christophe Collet	Olaf Seibert
+Benson I. Margulies	Jochen Erwied	Pat Rankin
+Bill Dyer	John Kallen	Paul Winner
+Boudewijn Waijers	John Rupley	Pierre Martineau
+Bruce Cox	John S. Bien	Ralf Brown
+Bruce Holloway	Johnny Lee	Richard Addison
+Bruce Mewborne	Jon W{tte	Richard Beigel
+Carl Schelin	Jonathan Handler	Richard P. Hughey
+Chris Russo	Joshua Delahunty	Rob Menke
+David Cohrs	Keizo Yamamoto	Robin Johnson
+David Damerell	Ken Arnold	Roland McGrath
+David Gentzel	Ken Arromdee	Ron Van Iwaarden
+David Hairston	Ken Lorber	Ronnen Miller
+Dean Luick	Ken Washikita	Ross Brown
+Del Lamb	Kevin Darcy	Sascha Wostmann
+Deron Meranda	Kevin Hugo	Scott Bigham
+Dylan O'Donnell	Kevin Sitze	Scott R. Turner
+Eric Backus	Kevin Smolkowski	Stephen Spackman
+Eric Hendrickson	Kevin Sweet	Stephen White
+Eric R. Smith	Lars Huttar	Steve Creps
+Eric S. Raymond	Mark Gooderum	Steve Linhart
+Erik Andersen	Mark Modrall	Steve VanDevender
+Frederick Roeber	Marvin Bressler	Tim Lennan
+Gil Neiger	Matthew Day	Timo Hakulinen
+Greg Laskin	Merlyn LeRoy	Tom Almy
+Greg Olson	Michael Allison	Tom West
+Gregg Wonderly	Michael Feir	Warren Cheung
+Hao-yang Wang	Michael Hamel	Warwick Allison
+Helge Hafting	Michael Sokolov	Yitzhak Sapir
 .\"TABLE_END  Do not delete this line.
 .TE
 .ed

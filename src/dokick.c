@@ -873,7 +873,7 @@ dokick()
 		    	int cnt = rnl(5);
 		    	coord mm;
 		    	mm.x = x; mm.y = y;
-			pline("You've disturbed the occupants!");
+			pline("You've attracted the tree's former occupants!");
 			while (cnt--)
 			    if (enexto(&mm, mm.x, mm.y, &mons[PM_KILLER_BEE]))
 				(void) makemon(&mons[PM_KILLER_BEE],

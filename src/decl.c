@@ -210,6 +210,25 @@ NEARDATA struct c_color_names c_color_names = {
 	"white"
 };
 
+const char *c_obj_colors[] = {
+	"black",		/* CLR_BLACK */
+	"red",			/* CLR_RED */
+	"green",		/* CLR_GREEN */
+	"brown",		/* CLR_BROWN */
+	"blue",			/* CLR_BLUE */
+	"magenta",		/* CLR_MAGENTA */
+	"cyan",			/* CLR_CYAN */
+	"gray",			/* CLR_GRAY */
+	"transparent",		/* no_color */
+	"orange",		/* CLR_ORANGE */
+	"bright green",		/* CLR_BRIGHT_GREEN */
+	"yellow",		/* CLR_YELLOW */
+	"bright blue",		/* CLR_BRIGHT_BLUE */
+	"bright magenta",	/* CLR_BRIGHT_MAGENTA */
+	"bright cyan",		/* CLR_BRIGHT_CYAN */
+	"white",		/* CLR_WHITE */
+};
+
 struct c_common_strings c_common_strings = {
 	"Nothing happens.",		"That's enough tries!",
 	"That is a silly thing to %s.",	"shudder for a moment.",

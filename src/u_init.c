@@ -33,6 +33,7 @@ static struct trobj Archeologist[] = {
 	{ FOOD_RATION, 0, FOOD_CLASS, 3, 0 },
 	{ PICK_AXE, UNDEF_SPE, TOOL_CLASS, 1, UNDEF_BLESS },
 	{ TINNING_KIT, UNDEF_SPE, TOOL_CLASS, 1, UNDEF_BLESS },
+	{ TOUCHSTONE, 0, GEM_CLASS, 1, 1 },
 	{ SACK, 0, TOOL_CLASS, 1, 0 },
 	{ 0, 0, 0, 0, 0 }
 };
@@ -606,7 +607,6 @@ u_init()
 		if(!rn2(10)) ini_inv(Tinopener);
 		else if(!rn2(4)) ini_inv(Lamp);
 		else if(!rn2(10)) ini_inv(Magicmarker);
-		knows_class(GEM_CLASS);
 		knows_object(SACK);
 		skill_init(Skill_A);
 		break;
