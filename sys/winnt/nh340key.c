@@ -196,7 +196,11 @@ INPUT_RECORD *ir;
 			if (ch || iskeypad(scan) || altseq) {
 				done = 1;	    /* Stop looking         */
 				retval = 1;         /* Found what we sought */
+			} else {
+				/* Strange Key event; let's purge it to avoid trouble */
+				ReadConsoleInput(hConIn,ir,1,&count);
 			}
+
 		}
 		else if ((ir->EventType == MOUSE_EVENT &&
 		  (ir->Event.MouseEvent.dwButtonState & MOUSEMASK))) {
