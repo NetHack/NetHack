@@ -272,6 +272,7 @@ register int nux,nuy;
 	see_monsters();
 	vision_full_recalc = 1;
 	nomul(0);
+	vision_recalc(0);	/* vision before effects */
 	spoteffects(TRUE);
 	invocation_message();
 }

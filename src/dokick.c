@@ -1022,7 +1022,10 @@ dumb:
 			mtmp->data == &mons[PM_WATCH_CAPTAIN]) &&
 			couldsee(mtmp->mx, mtmp->my) &&
 			mtmp->mpeaceful) {
-			pline("%s yells:", Amonnam(mtmp));
+			if (canspotmon(mtmp))
+			    pline("%s yells:", Amonnam(mtmp));
+			else
+			    You_hear("someone yell:");
 			verbalize("Halt, thief!  You're under arrest!");
 			(void) angry_guards(FALSE);
 			break;
@@ -1038,7 +1041,10 @@ dumb:
 		    if ((mtmp->data == &mons[PM_WATCHMAN] ||
 				mtmp->data == &mons[PM_WATCH_CAPTAIN]) &&
 			    mtmp->mpeaceful && couldsee(mtmp->mx, mtmp->my)) {
-			pline("%s yells:", Amonnam(mtmp));
+			if (canspotmon(mtmp))
+			    pline("%s yells:", Amonnam(mtmp));
+			else
+			    You_hear("someone yell:");
 			if(levl[x][y].looted & D_WARNED) {
 			    verbalize("Halt, vandal!  You're under arrest!");
 			    (void) angry_guards(FALSE);

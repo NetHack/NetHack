@@ -213,7 +213,7 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 	if (!foundyou && thinks_it_foundyou &&
 		!is_undirected_spell(mattk->adtyp, spellnum)) {
 	    pline("%s casts a spell at %s!",
-		canseemon(mtmp) ? Monnam(mtmp) : "It",
+		canseemon(mtmp) ? Monnam(mtmp) : "Something",
 		levl[mtmp->mux][mtmp->muy].typ == WATER
 		    ? "empty water" : "thin air");
 	    return(0);
@@ -225,14 +225,17 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 		pline_The("air crackles around %s.", mon_nam(mtmp));
 	    return(0);
 	}
-	pline("%s casts a spell%s!", Monnam(mtmp),
-	    is_undirected_spell(mattk->adtyp, spellnum) ? "" :
-	    (Invisible && !perceives(mtmp->data) && 
-		    (mtmp->mux != u.ux || mtmp->muy != u.uy)) ?
-		" at a spot near you" :
-	    (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy)) ?
-		" at your displaced image" :
-		" at you");
+	if (canspotmon(mtmp) || !is_undirected_spell(mattk->adtyp, spellnum)) {
+	    pline("%s casts a spell%s!",
+		  canspotmon(mtmp) ? Monnam(mtmp) : "Something",
+		  is_undirected_spell(mattk->adtyp, spellnum) ? "" :
+		  (Invisible && !perceives(mtmp->data) && 
+		   (mtmp->mux != u.ux || mtmp->muy != u.uy)) ?
+		  " at a spot near you" :
+		  (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy)) ?
+		  " at your displaced image" :
+		  " at you");
+	}
 
 /*
  *	As these are spells, the damage is related to the level
