@@ -2420,6 +2420,7 @@ do_break_wand(obj)
     register struct monst *mon;
     int dmg, damage;
     boolean affects_objects;
+    int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
 
     Strcpy(the_wand, yname(obj));
@@ -2469,12 +2470,17 @@ do_break_wand(obj)
 	goto discard_broken_wand;
     case WAN_DEATH:
     case WAN_LIGHTNING:
-	dmg *= 2;
+	dmg *= 4;
+	goto wanexpl;
     case WAN_FIRE:
+	expltype = EXPL_FIERY;
     case WAN_COLD:
+	if (expltype == EXPL_MAGICAL) expltype = EXPL_FROSTY;
 	dmg *= 2;
     case WAN_MAGIC_MISSILE:
-	explode(u.ux, u.uy, (obj->otyp - WAN_MAGIC_MISSILE), dmg, WAND_CLASS, EXPL_MAGICAL);
+    wanexpl:
+	explode(u.ux, u.uy,
+		(obj->otyp - WAN_MAGIC_MISSILE), dmg, WAND_CLASS, expltype);
 	makeknown(obj->otyp);	/* explode described the effect */
 	goto discard_broken_wand;
     case WAN_STRIKING:
