@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2004/12/15	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2004/12/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,7 +13,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL	15
+#define EDITLEVEL	16
 
 #define COPYRIGHT_BANNER_A \
 "NetHack, Copyright 1985-2004"
