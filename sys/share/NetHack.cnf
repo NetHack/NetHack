@@ -59,7 +59,7 @@ OPTIONS=boulder:0
 # or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
 OPTIONS=time,noshowexp,number_pad:2,lit_corridor
 
-# Treat space the same as rest. Warning: may be dangerous for new players.
+# Treat space bar as rest. Warning: may be dangerous for new players.
 # OPTIONS=rest_on_space
 
 #
