@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.5	2004/11/22	*/
+/*	SCCS Id: @(#)files.c	3.5	2005/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,6 +32,13 @@ const
 extern int errno;
 #endif
 
+#ifdef ZLIB_COMP	/* RLC 09 Mar 1999: Support internal ZLIB */
+#include "zlib.h"
+# ifndef COMPRESS_EXTENSION
+#define COMPRESS_EXTENSION ".gz"
+# endif
+#endif
+  
 #if defined(UNIX) && defined(QT_GRAPHICS)
 #include <sys/types.h>
 #include <dirent.h>
@@ -158,6 +165,8 @@ STATIC_DCL char *FDECL(set_bonesfile_name, (char *,d_level*));
 STATIC_DCL char *NDECL(set_bonestemp_name);
 #ifdef COMPRESS
 STATIC_DCL void FDECL(redirect, (const char *,const char *,FILE *,BOOLEAN_P));
+#endif
+#if defined(COMPRESS) || defined(ZLIB_COMP)
 STATIC_DCL void FDECL(docompress_file, (const char *,BOOLEAN_P));
 #endif
 STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
@@ -770,7 +779,7 @@ char **bonesid;
 
 	*bonesid = set_bonesfile_name(bones, lev);
 	fq_bones = fqname(bones, BONESPREFIX, 0);
-	uncompress(fq_bones);	/* no effect if nonexistent */
+	nh_uncompress(fq_bones);	/* no effect if nonexistent */
 #ifdef MAC
 	fd = macopen(fq_bones, O_RDONLY | O_BINARY, BONE_TYPE);
 #else
@@ -794,7 +803,7 @@ d_level *lev;
 void
 compress_bonesfile()
 {
-	compress(fqname(bones, BONESPREFIX, 0));
+	nh_compress(fqname(bones, BONESPREFIX, 0));
 }
 
 /* ----------  END BONES FILE HANDLING ----------- */
@@ -945,6 +954,7 @@ restore_saved_game()
 	const char *fq_save;
 	int fd;
 
+	reset_restpref();
 	set_savefile_name();
 #ifdef MFLOPPY
 	if (!saveDiskPrompt(1))
@@ -952,10 +962,10 @@ restore_saved_game()
 #endif /* MFLOPPY */
 	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
 
-	uncompress(fq_save);
+	nh_uncompress(fq_save);
 	if ((fd = open_savefile()) < 0) return fd;
 
-	if (!uptodate(fd, fq_save)) {
+	if (validate(fd, fq_save) != 0) {
 	    (void) close(fd),  fd = -1;
 	    (void) delete_savefile();
 	}
@@ -975,16 +985,16 @@ const char* filename;
 #  ifdef COMPRESS_EXTENSION
     SAVEF[strlen(SAVEF)-strlen(COMPRESS_EXTENSION)] = '\0';
 #  endif
-    uncompress(SAVEF);
+    nh_uncompress(SAVEF);
     if ((fd = open_savefile()) >= 0) {
-	if (uptodate(fd, filename)) {
+	if (validate(fd, filename)==0) {
 	    char tplname[PL_NSIZ];
 	    get_plname_from_file(fd, tplname);
 	    result = strdup(tplname);
 	}
 	(void) close(fd);
     }
-    compress(SAVEF);
+    nh_compress(SAVEF);
 
     return result;
 # if 0
@@ -1033,6 +1043,9 @@ get_saved_games()
 	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
 				'%', fnamebuf, encodedfnamebuf, BUFSZ);
 	Sprintf(SAVEF, "%s*.NetHack-saved-game", encodedfnamebuf);
+#if defined(ZLIB_COMP)
+	Strcat(SAVEF, COMPRESS_EXTENSION);
+#endif
 	fq_save = fqname(SAVEF, SAVEPREFIX, 0);
 
 	n = 0;
@@ -1278,10 +1291,10 @@ boolean uncomp;
 
 /* compress file */
 void
-compress(filename)
+nh_compress(filename)
 const char *filename;
 {
-#ifndef COMPRESS
+#if !defined(COMPRESS) && !defined(ZLIB_COMP)
 #if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(filename)
 #endif
@@ -1293,10 +1306,10 @@ const char *filename;
 
 /* uncompress file if it exists */
 void
-uncompress(filename)
+nh_uncompress(filename)
 const char *filename;
 {
-#ifndef COMPRESS
+#if !defined(COMPRESS) && !defined(ZLIB_COMP)
 #if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(filename)
 #endif
@@ -1304,6 +1317,174 @@ const char *filename;
 	docompress_file(filename, TRUE);
 #endif
 }
+
+#ifdef ZLIB_COMP /* RLC 09 Mar 1999: Support internal ZLIB */
+static int
+make_compressed_name(filename,cfn)
+const char *filename;
+char *cfn;
+{
+#ifndef SHORT_FILENAMES
+	/* Assume free-form filename */
+
+	strcpy(cfn, filename);
+	strcat(cfn, COMPRESS_EXTENSION);
+	return TRUE;
+#else
+	/* Accomodates 8.3 restriction, but otherwise assumes free-form filenames.
+	   This may need to be revised for some systems.  If a name cannot be
+	   generated, this function may return FALSE and the file will then remain
+	   uncompressed. */
+	unsigned len;
+
+	/* Assume DOS style filename */
+
+	strcpy(cfn, filename);
+	len = strlen(cfn);
+	if (len>4 && stricmp(cfn+len-4,".sav")==0) {
+		/* Save file; change .SAV extension to .SAZ */
+		/* EMX/GCC (for OS/2) seems to miscompile cfn[len-1] */
+
+		cfn[strlen(cfn)-1]='z';
+		return TRUE;
+	} else if (strnicmp(cfn,"bones",5)==0) {
+		/* Bones file; change BONES prefix to BONEZ */
+
+		cfn[4]='z';
+		return TRUE;
+	} else {
+		/* Don't know how to convert this filename */
+
+		return FALSE;
+	}
+#endif /* !MSDOS */
+}
+
+STATIC_OVL void
+docompress_file(filename, uncomp)
+const char *filename;
+boolean uncomp;
+{
+	gzFile *compressedfile;
+	FILE *uncompressedfile;
+	char cfn[256];
+	char buf[1024];
+	unsigned len, len2;
+
+	if (!make_compressed_name(filename, cfn)) {
+		/* Can't generate a name for the compressed file
+		   due to 8.3 restriction */
+		return;
+	}
+
+	if (!uncomp) {
+		/* Open the input and output files */
+		/* Note that gzopen takes "wb" as its mode, even on systems where
+		   fopen takes "r" and "w" */
+
+		uncompressedfile = fopen(filename, RDBMODE);
+		if (uncompressedfile == NULL) {
+			perror(filename);
+			return;
+		}
+		compressedfile = gzopen(cfn, "wb");
+		if (compressedfile == NULL) {
+			if (errno == 0) {
+				pline("zlib failed to allocate memory");
+			} else {
+				perror(filename);
+			}
+			fclose(uncompressedfile);
+			return;
+		}
+
+		/* Copy from the uncompressed to the compressed file */
+
+		while (1) {
+			len = fread(buf, 1, sizeof(buf), uncompressedfile);
+			if (ferror(uncompressedfile)) {
+				pline("Failure reading uncompressed file");
+				pline("Can't compress %s.", filename);
+				fclose(uncompressedfile);
+				gzclose(compressedfile);
+				(void)unlink(cfn);
+				return;
+			}
+			if (len == 0) break;	/* End of file */
+
+			len2 = gzwrite(compressedfile, buf, len);
+			if (len2 == 0) {
+				pline("Failure writing compressed file");
+				pline("Can't compress %s.", filename);
+				fclose(uncompressedfile);
+				gzclose(compressedfile);
+				(void)unlink(cfn);
+				return;
+			}
+		}
+
+		fclose(uncompressedfile);
+		gzclose(compressedfile);
+
+		/* Delete the file left behind */
+
+		(void)unlink(filename);
+
+	} else {	/* uncomp */
+
+		/* Open the input and output files */
+		/* Note that gzopen takes "rb" as its mode, even on systems where
+		   fopen takes "r" and "w" */
+
+		compressedfile = gzopen(cfn, "rb");
+		if (compressedfile == NULL) {
+			if (errno == 0) {
+				pline("zlib failed to allocate memory");
+			} else if (errno != ENOENT) {
+				perror(filename);
+			}
+			return;
+		}
+		uncompressedfile = fopen(filename, WRBMODE);
+		if (uncompressedfile == NULL) {
+			perror(filename);
+			gzclose(compressedfile);
+			return;
+		}
+
+		/* Copy from the compressed to the uncompressed file */
+
+		while (1) {
+			len = gzread(compressedfile, buf, sizeof(buf));
+			if (len == (unsigned)-1) {
+				pline("Failure reading compressed file");
+				pline("Can't uncompress %s.", filename);
+				fclose(uncompressedfile);
+				gzclose(compressedfile);
+				(void)unlink(filename);
+				return;
+			}
+			if (len == 0) break;	/* End of file */
+
+			fwrite(buf, 1, len, uncompressedfile);
+			if (ferror(uncompressedfile)) {
+				pline("Failure writing uncompressed file");
+				pline("Can't uncompress %s.", filename);
+				fclose(uncompressedfile);
+				gzclose(compressedfile);
+				(void)unlink(filename);
+				return;
+			}
+		}
+
+		fclose(uncompressedfile);
+		gzclose(compressedfile);
+
+		/* Delete the file left behind */
+		(void)unlink(cfn);
+	}
+}
+#endif /* RLC 09 Mar 1999: End ZLIB patch */
 
 /* ----------  END FILE COMPRESSION HANDLING ----------- */
 

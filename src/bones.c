@@ -427,12 +427,14 @@ getbones()
 	fd = open_bonesfile(&u.uz, &bonesid);
 	if (fd < 0) return(0);
 
-	if ((ok = uptodate(fd, bones)) == 0) {
+	if (validate(fd, bones) != 0) {
 #ifdef WIZARD
 	    if (!wizard)
 #endif
 		pline("Discarding unuseable bones; no need to panic...");
+	    ok = FALSE;
 	} else {
+		ok = TRUE;
 #ifdef WIZARD
 		if(wizard)  {
 			if(yn("Get bones?") == 'n') {

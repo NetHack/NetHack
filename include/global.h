@@ -305,6 +305,20 @@ struct version_info {
 	unsigned long	struct_sizes2;	/* size of more key structs */
 };
 
+struct savefile_info {
+	unsigned long	sfi1;	/* compression etc. */
+	unsigned long	sfi2;	/* miscellaneous */
+	unsigned long	sfi3;	/* thirdparty */
+};
+#ifdef NHSTDC
+#define SFI1_EXTERNALCOMP	(1UL)
+#define SFI1_RLECOMP		(1UL << 1)
+#define SFI1_ZEROCOMP		(1UL << 2)
+#else
+#define SFI1_EXTERNALCOMP	(1L)
+#define SFI1_RLECOMP		(1L << 1)
+#define SFI1_ZEROCOMP		(1L << 2)
+#endif
 
 /*
  * Configurable internal parameters.

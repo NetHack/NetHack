@@ -2086,6 +2086,10 @@ of specifying your role.  Normally only the first letter of the
 value is examined; `r' is an exception with ``Rogue'', ``Ranger'',
 and ``random'' values. If you prefix a `!' or ``no'' to the value, you can 
 exclude that role from being picked randomly.
+.lp rlecomp
+When writing out a save file, perform run length compression of level 
+structures. Not all ports support run length compression. It has no
+effect on reading an existing save file.
 .lp runmode
 Controls the amount of screen updating for the map window when engaged
 in multi-turn movement (running via shift+direction or control+direction
@@ -2173,6 +2177,10 @@ Provide more commentary during the game (default on).
 Select which windowing system to use, such as ``tty'' or ``X11''
 (default depends on version).
 Cannot be set with the `O' command.
+.lp zerocomp
+When writing out a save file, perform zero-comp compression of the 
+contents. Not all ports support zero-comp compression. It has no effect 
+on reading an existing save file.
 .hn 2
 Window Port Customization options
 .pg

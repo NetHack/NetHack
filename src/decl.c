@@ -275,6 +275,52 @@ char *fqn_prefix_names[PREFIX_COUNT] = { "hackdir", "leveldir", "savedir",
 					"lockdir", "configdir", "troubledir" };
 #endif
 
+NEARDATA struct savefile_info sfcap = {
+#ifdef NHSTDC
+		0x00000000UL
+#else
+		0x00000000L
+#endif
+#if defined(COMPRESS) || defined(ZLIB_COMP)
+		| SFI1_EXTERNALCOMP
+#endif
+#if defined(ZEROCOMP)
+		| SFI1_ZEROCOMP
+#endif
+#if defined(RLECOMP)
+		| SFI1_RLECOMP
+#endif
+	,
+#ifdef NHSTDC
+	0x00000000UL, 0x00000000UL
+#else
+	0x00000000L, 0x00000000L
+#endif
+};
+
+NEARDATA struct savefile_info sfrestinfo, sfsaveinfo = {
+#ifdef NHSTDC
+		0x00000000UL
+#else
+		0x00000000L
+#endif
+#if defined(COMPRESS) || defined(ZLIB_COMP)
+		| SFI1_EXTERNALCOMP
+#endif
+#if defined(ZEROCOMP)
+		| SFI1_ZEROCOMP
+#endif
+#if defined(RLECOMP)
+		| SFI1_RLECOMP
+#endif
+	,
+#ifdef NHSTDC
+	0x00000000UL, 0x00000000UL
+#else
+	0x00000000L, 0x00000000L
+#endif
+};
+
 /* dummy routine used to force linkage */
 void
 decl_init()

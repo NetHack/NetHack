@@ -287,7 +287,7 @@ char *argv[];
 			    (void) delete_savefile();
 			else {
 			    (void) chmod(fq_save,FCMASK); /* back to readable */
-			    compress(fq_save);
+			    nh_compress(fq_save);
 			}
 		}
 		context.move = 0;

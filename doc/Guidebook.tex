@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.89 $ $Date: 2005/01/09 21:40:02 $
+% $Revision: 1.90 $ $Date: 2005/01/16 03:57:39 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2554,6 +2554,11 @@ value is examined; `r' is an exception with ``{\tt Rogue}'', {\tt Ranger}'',
 and ``{\tt random}'' values. If you prefix `{\tt !}' or ``{\tt no}'' to the 
 value, you can exclude that role from being picked randomly.
 %.lp
+\item[\ib{rlecomp}]
+When writing out a save file, perform run length compression of level 
+structures. Not all ports support run length compression. It has no
+effect on reading an existing save file.
+%.lp
 \item[\ib{runmode}]
 Controls the amount of screen updating for the map window when engaged
 in multi-turn movement (running via {\tt shift}+direction
@@ -2658,6 +2663,11 @@ Provide more commentary during the game (default on).
 Select which windowing system to use, such as ``{\tt tty}'' or ``{\tt X11}''
 (default depends on version).
 Cannot be set with the `{\tt O}' command.
+%.lp
+\item[\ib{zerocomp}]
+When writing out a save file, perform zero-comp compression of the 
+contents. Not all ports support zero-comp compression. It has no effect 
+on reading an existing save file.
 \elist
 
 %.hn 2

@@ -159,18 +159,22 @@
 
 /*
  *	If COMPRESS is defined, it should contain the full path name of your
- *	'compress' program.  Defining INTERNAL_COMP causes NetHack to do
- *	simpler byte-stream compression internally.  Both COMPRESS and
- *	INTERNAL_COMP create smaller bones/level/save files, but require
- *	additional code and time.  Currently, only UNIX fully implements
- *	COMPRESS; other ports should be able to uncompress save files a
- *	la unixmain.c if so inclined.
+ *	'compress' program.
+ *
  *	If you define COMPRESS, you must also define COMPRESS_EXTENSION
  *	as the extension your compressor appends to filenames after
- *	compression.
+ *	compression. Currently, only UNIX fully implements
+ *	COMPRESS; other ports should be able to uncompress save files a
+ *	la unixmain.c if so inclined.
+ *
+ *	Defining ZLIB_COMP builds in support for zlib compression. If you
+ *	define ZLIB_COMP, you must link with a zlib library.
+ *
+ *	COMPRESS and ZLIB_COMP are mutually exclusive.
+ *
  */
-
-#ifdef UNIX
+ 
+#if defined(UNIX) && !defined(ZLIB_COMP) && !defined(COMPRESS)
 /* path and file name extension for compression program */
 #define COMPRESS "/usr/bin/compress"	/* Lempel-Ziv compression */
 #define COMPRESS_EXTENSION ".Z"		/* compress's extension */
@@ -180,8 +184,40 @@
 #endif
 
 #ifndef COMPRESS
-# define INTERNAL_COMP	/* control use of NetHack's compression routines */
+# define ZLIB_COMP			/* ZLIB for compression */
 #endif
+
+/*
+ *	Internal Compression Options
+ *
+ *	Internal compression options RLECOMP and ZEROCOMP alter the data
+ *	that gets written to the save file by NetHack, in contrast
+ *	to COMPRESS or ZLIB_COMP which compress the entire file after
+ *	the NetHack data is written out.
+ *
+ *	Defining RLECOMP builds in support for internal run-length
+ *	compression of level structures. If RLECOMP support is included
+ *	it can be toggled on/off at runtime via the config file option
+ *	rlecomp.
+ *
+ *	Defining ZEROCOMP builds in support for internal zero-comp
+ *	compression of data. If ZEROCOMP support is included it can still
+ *	be toggled on/off at runtime via the config file option zerocomp.
+ *
+ *	RLECOMP and ZEROCOMP support can be included even if
+ *	COMPRESS or ZLIB_COMP support is included. One reason for doing
+ *	so would be to provide savefile read compatibility with a savefile
+ *	where those options were in effect. With RLECOMP and/or ZEROCOMP
+ *	defined, NetHack can read an rlecomp or zerocomp savefile in, yet
+ *	re-save without them.
+ *
+ *	Using any compression option will create smaller bones/level/save
+ *	files at the cost of additional code and time.
+ */
+
+/* # define INTERNAL_COMP	*/	/* Forces both ZEROCOMP and RLECOMP */
+/* # define ZEROCOMP		*/	/* Support ZEROCOMP compression */
+/* # define RLECOMP		*/	/* Support RLECOMP compression  */
 
 /*
  *	Data librarian.  Defining DLB places most of the support files into

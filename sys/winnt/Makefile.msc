@@ -1,5 +1,5 @@
 #       SCCS Id: @(#)Makefile.msc       3.5     $Date$
-#       Copyright (c) NetHack PC Development Team 1993-2003
+#       Copyright (c) NetHack PC Development Team 1993-2005
 #
 #       NetHack 3.5.x Makefile for MS Visual C++ V6.x and above and MS NMAKE
 #  
@@ -126,6 +126,15 @@ RANDOM	= $(OBJ)\random.o
 #
 
 PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
+
+#
+# If you defined ZLIB_COMP in include/config.h and you need
+# to link with the zlib.lib library, uncomment the line below.
+# If necessary, prefix explicit path information to the file name
+# otherwise it assumes the NetHack src directory.
+#
+
+#ZLIB = zlib.lib
 
 #===============================================
 #======= End of Modification Section ===========
@@ -578,7 +587,7 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag $(WINDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
-	$(link) $(LFLAGS) user32.lib winmm.lib -out:$@ @<<$(GAME).lnk
+	$(link) $(LFLAGS) $(ZLIB) user32.lib winmm.lib -out:$@ @<<$(GAME).lnk
 		$(ALLOBJ:^	=^
 		) $(NHRES)
 <<

@@ -673,8 +673,8 @@ E int NDECL(create_savefile);
 E int NDECL(open_savefile);
 E int NDECL(delete_savefile);
 E int NDECL(restore_saved_game);
-E void FDECL(compress, (const char *));
-E void FDECL(uncompress, (const char *));
+E void FDECL(nh_compress, (const char *));
+E void FDECL(nh_uncompress, (const char *));
 E boolean FDECL(lock_file, (const char *,int,int));
 E void FDECL(unlock_file, (const char *));
 #ifdef USER_SOUNDS
@@ -1751,14 +1751,14 @@ E void FDECL(getlev, (int,int,XCHAR_P,BOOLEAN_P));
 E void FDECL(get_plname_from_file, (int, char *));
 E void NDECL(minit);
 E boolean FDECL(lookup_id_mapping, (unsigned, unsigned *));
-#ifdef ZEROCOMP
-E int FDECL(mread, (int,genericptr_t,unsigned int));
-#else
 E void FDECL(mread, (int,genericptr_t,unsigned int));
-#endif
 #ifndef GOLDOBJ
 E void FDECL(put_gold_back, (struct obj **,long *));
 #endif
+E int FDECL(validate, (int,const char *));
+E void NDECL(reset_restpref);
+E void FDECL(set_restpref, (const char *));
+E void FDECL(set_savepref, (const char *));
 
 /* ### rip.c ### */
 
@@ -1835,10 +1835,15 @@ E void FDECL(bufoff, (int));
 E void FDECL(bflush, (int));
 E void FDECL(bwrite, (int,genericptr_t,unsigned int));
 E void FDECL(bclose, (int));
+E void FDECL(def_bclose, (int));
+#if defined(ZEROCOMP)
+E void FDECL(zerocomp_bclose, (int));
+#endif
 E void FDECL(savefruitchn, (int,int));
 E void FDECL(store_plname_in_file, (int));
 E void NDECL(free_dungeons);
 E void NDECL(freedynamicdata);
+E void FDECL(store_savefileinfo, (int));
 
 /* ### shk.c ### */
 

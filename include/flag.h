@@ -164,6 +164,8 @@ struct instance_flags {
 	boolean  menu_tab_sep;	/* Use tabs to separate option menu fields */
 	boolean  menu_requested; /* Flag for overloaded use of 'm' prefix
 				  * on some non-move commands */
+	boolean  zerocomp;	/* write zero-compressed save files */
+	boolean  rlecomp;	/* run-length comp of levels when writing savefile */
 	uchar num_pad_mode;
 	int	menu_headings;	/* ATR for menu headings */
 	int      purge_monsters;	/* # of dead monsters still on fmon list */

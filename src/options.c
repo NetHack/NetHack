@@ -165,6 +165,15 @@ static struct Bool_Opt
 	{"rawio", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"rest_on_space", &flags.rest_on_space, FALSE, SET_IN_GAME},
+#ifdef RLECOMP
+	{"rlecomp", &iflags.rlecomp,
+# if defined(COMPRESS) || defined(ZLIB_COMP)
+		FALSE,
+# else
+		TRUE,
+# endif
+		DISP_IN_GAME},
+#endif
 	{"safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME},
 #ifdef WIZARD
 	{"sanity_check", &iflags.sanity_check, FALSE, SET_IN_GAME},
@@ -206,6 +215,15 @@ static struct Bool_Opt
 #endif
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
 	{"wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME},
+#ifdef ZEROCOMP
+	{"zerocomp", &iflags.zerocomp,
+# if defined(COMPRESS) || defined(ZLIB_COMP)
+		FALSE,
+# else
+		TRUE,
+# endif
+		DISP_IN_GAME},
+#endif
 	{(char *)0, (boolean *)0, FALSE, 0}
 };
 
@@ -515,6 +533,23 @@ initoptions()
 		if (boolopt[i].addr)
 			*(boolopt[i].addr) = boolopt[i].initvalue;
 	}
+#if defined(COMPRESS) || defined(ZLIB_COMP)
+	set_savepref("externalcomp");
+	set_restpref("externalcomp");
+# ifdef RLECOMP
+	set_savepref("!rlecomp");
+	set_restpref("!rlecomp");
+# endif
+#else
+# ifdef ZEROCOMP
+	set_savepref("zerocomp");
+	set_restpref("zerocomp");
+# endif
+# ifdef RLECOMP
+	set_savepref("rlecomp");
+	set_restpref("rlecomp");
+# endif
+#endif
 #ifdef SYSFLAGS
 	Strcpy(sysflags.sysflagsid, "sysflags");
 	sysflags.sysflagsid[9] = (char)sizeof(struct sysflag);
@@ -2328,7 +2363,22 @@ goodfruit:
 # endif
 			}
 #endif /* TERMLIB || ASCIIGRAPH || MAC_GRAPHICS_ENV */
-
+#ifdef RLECOMP
+			if ((boolopt[i].addr) == &iflags.rlecomp) {
+				if (*boolopt[i].addr)
+					set_savepref("rlecomp");
+				else
+					set_savepref("!rlecomp");
+			}
+#endif
+#ifdef ZEROCOMP
+			if ((boolopt[i].addr) == &iflags.zerocomp) {
+				if (*boolopt[i].addr)
+					set_savepref("zerocomp");
+				else
+					set_savepref("externalcomp");
+			}
+#endif
 			/* only do processing below if setting with doset() */
 			if (initial) return;
 

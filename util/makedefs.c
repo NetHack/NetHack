@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makedefs.c	3.5	2002/08/14	*/
+/*	SCCS Id: @(#)makedefs.c	3.5	2005/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -411,11 +411,24 @@ do_rumors()
 
 /*
  * Use this to explicitly mask out features during version checks.
+ *
+ * ZEROCOMP, RLECOMP, and ZLIB_COMP describe compression features
+ * that the port/plaform which wrote the savefile was capable of
+ * dealing with. Don't reject a savefile just because the port
+ * reading the savefile doesn't match on all/some of them.
+ * The actual compression features used to produce the savefile are
+ * recorded in the savefile_info structure immediately following the
+ * version_info, and that is what needs to be checked against the
+ * feature set of the port that is reading the savefile back in.
+ * That check is done in src/restore.c now.
+ * 
  */
 #define IGNORED_FEATURES	( 0L \
 				| (1L << 12)	/* GOLDOBJ */ \
 				| (1L << 20)	/* EXP_ON_BOTL */ \
 				| (1L << 21)	/* SCORE_ON_BOTL */ \
+				| (1L << 27)	/* ZEROCOMP */ \
+				| (1L << 28)	/* RLECOMP */ \
 				)
 
 static void
@@ -478,7 +491,9 @@ make_version()
 #ifdef SCORE_ON_BOTL
 			| (1L << 21)
 #endif
-		/* data format [COMPRESS excluded] (27..31) */
+		/* data format (27..31)
+		 * External compression methods such as COMPRESS and ZLIB_COMP
+		 * do not affect the contents and are thus excluded from here */
 #ifdef ZEROCOMP
 			| (1L << 27)
 #endif
@@ -653,6 +668,9 @@ static const char *build_opts[] = {
 #ifdef COMPRESS
 		"data file compression",
 #endif
+#ifdef ZLIB_COMP
+		"ZLIB data file compression",
+#endif
 #ifdef DLB
 		"data librarian",
 #endif
@@ -783,6 +801,9 @@ static const char *build_opts[] = {
 #endif
 #ifdef ZEROCOMP
 		"zero-compressed save files",
+#endif
+#ifdef RLECOMP
+		"run-length compression of levl array in save files",
 #endif
 		save_bones_compat_buf,
 		"basic NetHack features"

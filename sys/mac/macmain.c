@@ -117,7 +117,7 @@ main (void)
 				if(yn("Do you want to keep the save file?") == 'n')
 					(void) delete_savefile();
 				else {
-					compress(fqname(SAVEF, SAVEPREFIX, 0));
+					nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
 				}
 			}
 		}

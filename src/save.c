@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)save.c	3.5	2003/11/14	*/
+/*	SCCS Id: @(#)save.c	3.5	2005/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,9 +22,6 @@ static int count_only;
 int dotcnt, dotrow;	/* also used in restore */
 #endif
 
-#ifdef ZEROCOMP
-STATIC_DCL void FDECL(bputc, (int));
-#endif
 STATIC_DCL void FDECL(savelevchn, (int,int));
 STATIC_DCL void FDECL(savedamage, (int,int));
 STATIC_DCL void FDECL(saveobjchn, (int,struct obj *,int));
@@ -37,6 +34,44 @@ STATIC_DCL void FDECL(savelev0, (int,XCHAR_P,int));
 STATIC_DCL boolean NDECL(swapout_oldest);
 STATIC_DCL void FDECL(copyfile, (char *,char *));
 #endif /* MFLOPPY */
+STATIC_DCL void FDECL(savelevl, (int fd, BOOLEAN_P));
+STATIC_DCL void FDECL(def_bufon, (int));
+STATIC_DCL void FDECL(def_bufoff, (int));
+STATIC_DCL void FDECL(def_bflush, (int));
+STATIC_DCL void FDECL(def_bwrite, (int,genericptr_t,unsigned int));
+#ifdef ZEROCOMP
+STATIC_DCL void FDECL(zerocomp_bufon, (int));
+STATIC_DCL void FDECL(zerocomp_bufoff, (int));
+STATIC_DCL void FDECL(zerocomp_bflush, (int));
+STATIC_DCL void FDECL(zerocomp_bwrite, (int,genericptr_t,unsigned int));
+STATIC_DCL void FDECL(zerocomp_bputc, (int));
+#endif
+
+static struct save_procs {
+	const char *name;
+	void FDECL((*save_bufon), (int));
+	void FDECL((*save_bufoff), (int));
+	void FDECL((*save_bflush), (int));
+	void FDECL((*save_bwrite), (int,genericptr_t,unsigned int));
+	void FDECL((*save_bclose), (int));
+} saveprocs = {
+#if !defined(ZEROCOMP) || (defined(COMPRESS) || defined(ZLIB_COMP))
+	"externalcomp",
+	def_bufon,
+	def_bufoff,
+	def_bflush,
+	def_bwrite,
+	def_bclose,
+#else
+	"zerocomp",
+	zerocomp_bufon,
+	zerocomp_bufoff,
+	zerocomp_bflush,
+	zerocomp_bwrite,
+	zerocomp_bclose,
+#endif
+};
+
 #ifdef GCC_WARN
 static long nulls[10];
 #else
@@ -140,14 +175,14 @@ dosave0()
 #endif
 
 	HUP if (iflags.window_inited) {
-	    uncompress(fq_save);
+	    nh_uncompress(fq_save);
 	    fd = open_savefile();
 	    if (fd > 0) {
 		(void) close(fd);
 		clear_nhwindow(WIN_MESSAGE);
 		There("seems to be an old save file.");
 		if (yn("Overwrite the old file?") == 'n') {
-		    compress(fq_save);
+		    nh_compress(fq_save);
 		    return 0;
 		}
 	    }
@@ -209,6 +244,7 @@ dosave0()
 #endif /* MFLOPPY */
 
 	store_version(fd);
+	store_savefileinfo(fd);
 	store_plname_in_file(fd);
 	ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
 #ifdef STEED
@@ -269,7 +305,7 @@ dosave0()
 	/* get rid of current level --jgm */
 	delete_levelfile(ledger_no(&u.uz));
 	delete_levelfile(0);
-	compress(fq_save);
+	nh_compress(fq_save);
 	return(1);
 }
 
@@ -405,6 +441,7 @@ savestateinlock()
 		    (void) write(fd, (genericptr_t) &currlev, sizeof(currlev));
 		    save_savefile_name(fd);
 		    store_version(fd);
+		    store_savefileinfo(fd);
 		    store_plname_in_file(fd);
 
 		    ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
@@ -489,54 +526,7 @@ int mode;
 #else
 	bwrite(fd,(genericptr_t) &lev,sizeof(lev));
 #endif
-#ifdef RLECOMP
-	{
-	    /* perform run-length encoding of rm structs */
-	    struct rm *prm, *rgrm;
-	    int x, y;
-	    uchar match;
-
-	    rgrm = &levl[0][0];		/* start matching at first rm */
-	    match = 0;
-
-	    for (y = 0; y < ROWNO; y++) {
-		for (x = 0; x < COLNO; x++) {
-		    prm = &levl[x][y];
-		    if (prm->glyph == rgrm->glyph
-			&& prm->typ == rgrm->typ
-			&& prm->seenv == rgrm->seenv
-			&& prm->horizontal == rgrm->horizontal
-			&& prm->flags == rgrm->flags
-			&& prm->lit == rgrm->lit
-			&& prm->waslit == rgrm->waslit
-			&& prm->roomno == rgrm->roomno
-			&& prm->edge == rgrm->edge) {
-			match++;
-			if (match > 254) {
-			    match = 254;	/* undo this match */
-			    goto writeout;
-			}
-		    } else {
-			/* the run has been broken,
-			 * write out run-length encoding */
-		    writeout:
-			bwrite(fd, (genericptr_t)&match, sizeof(uchar));
-			bwrite(fd, (genericptr_t)rgrm, sizeof(struct rm));
-			/* start encoding again. we have at least 1 rm
-			 * in the next run, viz. this one. */
-			match = 1;
-			rgrm = prm;
-		    }
-		}
-	    }
-	    if (match > 0) {
-		bwrite(fd, (genericptr_t)&match, sizeof(uchar));
-		bwrite(fd, (genericptr_t)rgrm, sizeof(struct rm));
-	    }
-	}
-#else
-	bwrite(fd,(genericptr_t) levl,sizeof(levl));
-#endif /* RLECOMP */
+	savelevl(fd, (boolean)((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
 
 	bwrite(fd,(genericptr_t) &monstermoves,sizeof(monstermoves));
 	bwrite(fd,(genericptr_t) &upstair,sizeof(stairway));
@@ -575,6 +565,202 @@ int mode;
 	if (mode != FREE_SAVE) bflush(fd);
 }
 
+STATIC_OVL void
+savelevl(fd, rlecomp)
+int fd;
+boolean rlecomp;
+{
+#ifdef RLECOMP
+	struct rm *prm, *rgrm;
+	int x, y;
+	uchar match;
+
+	if (rlecomp) {
+	    /* perform run-length encoding of rm structs */
+
+	    rgrm = &levl[0][0];		/* start matching at first rm */
+	    match = 0;
+
+	    for (y = 0; y < ROWNO; y++) {
+		for (x = 0; x < COLNO; x++) {
+		    prm = &levl[x][y];
+		    if (prm->glyph == rgrm->glyph
+			&& prm->typ == rgrm->typ
+			&& prm->seenv == rgrm->seenv
+			&& prm->horizontal == rgrm->horizontal
+			&& prm->flags == rgrm->flags
+			&& prm->lit == rgrm->lit
+			&& prm->waslit == rgrm->waslit
+			&& prm->roomno == rgrm->roomno
+			&& prm->edge == rgrm->edge) {
+			match++;
+			if (match > 254) {
+			    match = 254;	/* undo this match */
+			    goto writeout;
+			}
+		    } else {
+			/* the run has been broken,
+			 * write out run-length encoding */
+		    writeout:
+			bwrite(fd, (genericptr_t)&match, sizeof(uchar));
+			bwrite(fd, (genericptr_t)rgrm, sizeof(struct rm));
+			/* start encoding again. we have at least 1 rm
+			 * in the next run, viz. this one. */
+			match = 1;
+			rgrm = prm;
+		    }
+		}
+	    }
+	    if (match > 0) {
+		bwrite(fd, (genericptr_t)&match, sizeof(uchar));
+		bwrite(fd, (genericptr_t)rgrm, sizeof(struct rm));
+	    }
+	} else
+#endif /* RLECOMP */
+	bwrite(fd,(genericptr_t) levl,sizeof(levl));
+}
+
+/*ARGSUSED*/
+void
+bufon(fd)
+int fd;
+{
+    (*saveprocs.save_bufon)(fd);
+    return;
+}
+
+/*ARGSUSED*/
+void
+bufoff(fd)
+int fd;
+{
+    (*saveprocs.save_bufoff)(fd);
+    return;
+}
+
+void
+bflush(fd)  /* flush run and buffer */
+register int fd;
+{
+    (*saveprocs.save_bflush)(fd);
+    return;
+}
+
+void
+bwrite(fd, loc, num)
+int fd;
+genericptr_t loc;
+register unsigned num;
+{
+    (*saveprocs.save_bwrite)(fd, loc, num);
+    return;
+}
+
+void
+bclose(fd)
+int fd;
+{
+    (*saveprocs.save_bclose)(fd);
+    return;
+}
+
+static int bw_fd = -1;
+static FILE *bw_FILE = 0;
+static boolean buffering = FALSE;
+
+STATIC_OVL void
+def_bufon(fd)
+    int fd;
+{
+#ifdef UNIX
+    if(bw_fd != fd) {
+	if(bw_fd >= 0)
+	    panic("double buffering unexpected");
+	bw_fd = fd;
+	if((bw_FILE = fdopen(fd, "w")) == 0)
+	    panic("buffering of file %d failed", fd);
+    }
+#endif
+    buffering = TRUE;
+}
+
+STATIC_OVL void
+def_bufoff(fd)
+int fd;
+{
+    def_bflush(fd);
+    buffering = FALSE;
+}
+
+STATIC_OVL void
+def_bflush(fd)
+    int fd;
+{
+#ifdef UNIX
+    if(fd == bw_fd) {
+	if(fflush(bw_FILE) == EOF)
+	    panic("flush of savefile failed!");
+    }
+#endif
+    return;
+}
+
+STATIC_OVL void
+def_bwrite(fd,loc,num)
+register int fd;
+register genericptr_t loc;
+register unsigned num;
+{
+	boolean failed;
+
+#ifdef MFLOPPY
+	bytes_counted += num;
+	if (count_only) return;
+#endif
+
+#ifdef UNIX
+	if (buffering) {
+	    if(fd != bw_fd)
+		panic("unbuffered write to fd %d (!= %d)", fd, bw_fd);
+
+	    failed = (fwrite(loc, (int)num, 1, bw_FILE) != 1);
+	} else
+#endif /* UNIX */
+	{
+/* lint wants the 3rd arg of write to be an int; lint -p an unsigned */
+#if defined(BSD) || defined(ULTRIX) || defined(WIN32)
+	    failed = (write(fd, loc, (int)num) != (int)num);
+#else /* e.g. SYSV, __TURBOC__ */
+	    failed = (write(fd, loc, num) != num);
+#endif
+	}
+
+	if (failed) {
+#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+	    if (program_state.done_hup)
+		terminate(EXIT_FAILURE);
+	    else
+#endif
+		panic("cannot write %u bytes to file #%d", num, fd);
+	}
+}
+
+void
+def_bclose(fd)
+    int fd;
+{
+    bufoff(fd);
+#ifdef UNIX
+    if (fd == bw_fd) {
+	(void) fclose(bw_FILE);
+	bw_fd = -1;
+	bw_FILE = 0;
+    } else
+#endif
+	(void) close(fd);
+    return;
+}
+
 #ifdef ZEROCOMP
 /* The runs of zero-run compression are flushed after the game state or a
  * level is written out.  This adds a couple bytes to a save file, where
@@ -585,7 +771,7 @@ int mode;
  */
 
 #define RLESC '\0'    /* Leading character for run of LRESC's */
-#define flushoutrun(ln) (bputc(RLESC), bputc(ln), ln = -1)
+#define flushoutrun(ln) (zerocomp_bputc(RLESC), zerocomp_bputc(ln), ln = -1)
 
 #ifndef ZEROCOMP_BUFSIZ
 # define ZEROCOMP_BUFSIZ BUFSZ
@@ -602,7 +788,7 @@ static NEARDATA boolean compressing = FALSE;
 }*/
 
 STATIC_OVL void
-bputc(c)
+zerocomp_bputc(c)
 int c;
 {
 #ifdef MFLOPPY
@@ -619,7 +805,7 @@ int c;
 
 /*ARGSUSED*/
 void
-bufon(fd)
+STATIC_OVL zerocomp_bufon(fd)
 int fd;
 {
     compressing = TRUE;
@@ -627,8 +813,8 @@ int fd;
 }
 
 /*ARGSUSED*/
-void
-bufoff(fd)
+STATIC_OVL void
+zerocomp_bufoff(fd)
 int fd;
 {
     if (outbufp) {
@@ -640,8 +826,8 @@ int fd;
     return;
 }
 
-void
-bflush(fd)  /* flush run and buffer */
+STATIC_OVL void
+zerocomp_bflush(fd)  /* flush run and buffer */
 register int fd;
 {
     bwritefd = fd;
@@ -659,14 +845,14 @@ register int fd;
 		terminate(EXIT_FAILURE);
 	    else
 #endif
-		bclose(fd);	/* panic (outbufp != 0) */
+		zerocomp_bclose(fd);	/* panic (outbufp != 0) */
 	}
 	outbufp = 0;
     }
 }
 
-void
-bwrite(fd, loc, num)
+STATIC_OVL void
+zerocomp_bwrite(fd, loc, num)
 int fd;
 genericptr_t loc;
 register unsigned num;
@@ -697,117 +883,18 @@ register unsigned num;
 		if (outrunlength >= 0) {	/* flush run */
 		    flushoutrun(outrunlength);
 		}
-		bputc(*bp);
+		zerocomp_bputc(*bp);
 	    }
 	}
     }
 }
 
 void
-bclose(fd)
+zerocomp_bclose(fd)
 int fd;
 {
-    bufoff(fd);
+    zerocomp_bufoff(fd);
     (void) close(fd);
-    return;
-}
-
-#else /* ZEROCOMP */
-
-static int bw_fd = -1;
-static FILE *bw_FILE = 0;
-static boolean buffering = FALSE;
-
-void
-bufon(fd)
-    int fd;
-{
-#ifdef UNIX
-    if(bw_fd != fd) {
-	if(bw_fd >= 0)
-	    panic("double buffering unexpected");
-	bw_fd = fd;
-	if((bw_FILE = fdopen(fd, "w")) == 0)
-	    panic("buffering of file %d failed", fd);
-    }
-#endif
-    buffering = TRUE;
-}
-
-void
-bufoff(fd)
-int fd;
-{
-    bflush(fd);
-    buffering = FALSE;
-}
-
-void
-bflush(fd)
-    int fd;
-{
-#ifdef UNIX
-    if(fd == bw_fd) {
-	if(fflush(bw_FILE) == EOF)
-	    panic("flush of savefile failed!");
-    }
-#endif
-    return;
-}
-
-void
-bwrite(fd,loc,num)
-register int fd;
-register genericptr_t loc;
-register unsigned num;
-{
-	boolean failed;
-
-#ifdef MFLOPPY
-	bytes_counted += num;
-	if (count_only) return;
-#endif
-
-#ifdef UNIX
-	if (buffering) {
-	    if(fd != bw_fd)
-		panic("unbuffered write to fd %d (!= %d)", fd, bw_fd);
-
-	    failed = (fwrite(loc, (int)num, 1, bw_FILE) != 1);
-	} else
-#endif /* UNIX */
-	{
-/* lint wants the 3rd arg of write to be an int; lint -p an unsigned */
-#if defined(BSD) || defined(ULTRIX)
-	    failed = (write(fd, loc, (int)num) != (int)num);
-#else /* e.g. SYSV, __TURBOC__ */
-	    failed = (write(fd, loc, num) != num);
-#endif
-	}
-
-	if (failed) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
-	    if (program_state.done_hup)
-		terminate(EXIT_FAILURE);
-	    else
-#endif
-		panic("cannot write %u bytes to file #%d", num, fd);
-	}
-}
-
-void
-bclose(fd)
-    int fd;
-{
-    bufoff(fd);
-#ifdef UNIX
-    if (fd == bw_fd) {
-	(void) fclose(bw_FILE);
-	bw_fd = -1;
-	bw_FILE = 0;
-    } else
-#endif
-	(void) close(fd);
     return;
 }
 #endif /* ZEROCOMP */
@@ -1046,6 +1133,65 @@ register int fd, mode;
 	bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 #ifdef DEBUG_MSGCOUNT
 	pline("Stored %d messages into savefile.", msgcount);
+#endif
+}
+
+void
+store_savefileinfo(fd)
+int fd;
+{
+	/* sfcap (decl.c) describes the savefile feature capabilities
+	 * that are supported by this port/platform build.
+	 * 
+	 * sfsaveinfo (decl.c) describes the savefile info that actually
+	 * gets written into the savefile, and is used to determine the
+	 * save file being written.
+
+	 * sfrestinfo (decl.c) describes the savefile info that is
+	 * being used to read the information from an existing savefile.
+	 *
+	 */
+
+	bufoff(fd);
+	/* bwrite() before bufon() uses plain write() */
+	bwrite(fd,(genericptr_t)&sfsaveinfo, (unsigned)(sizeof sfsaveinfo));
+	bufon(fd);
+	return;
+}
+
+void
+set_savepref(suitename)
+const char *suitename;
+{
+	if (!strcmpi(suitename, "externalcomp")) {
+		saveprocs.name = "externalcomp";
+    		saveprocs.save_bufon = def_bufon;
+    		saveprocs.save_bufoff = def_bufoff;
+    		saveprocs.save_bflush = def_bflush;
+    		saveprocs.save_bwrite = def_bwrite;
+    		saveprocs.save_bclose = def_bclose;
+		sfsaveinfo.sfi1 |= SFI1_EXTERNALCOMP;
+		sfsaveinfo.sfi1 &= ~SFI1_ZEROCOMP;
+	}
+	if (!strcmpi(suitename, "!rlecomp")) {
+		sfsaveinfo.sfi1 &= ~SFI1_RLECOMP;
+	}
+#ifdef ZEROCOMP
+	if (!strcmpi(suitename, "zerocomp")) {
+		saveprocs.name = "zerocomp";
+    		saveprocs.save_bufon = zerocomp_bufon;
+    		saveprocs.save_bufoff = zerocomp_bufoff;
+    		saveprocs.save_bflush = zerocomp_bflush;
+    		saveprocs.save_bwrite = zerocomp_bwrite;
+    		saveprocs.save_bclose = zerocomp_bclose;
+		sfsaveinfo.sfi1 |= SFI1_ZEROCOMP;
+		sfsaveinfo.sfi1 &= ~SFI1_EXTERNALCOMP;
+	}
+#endif
+#ifdef RLECOMP
+	if (!strcmpi(suitename, "rlecomp")) {
+		sfsaveinfo.sfi1 |= SFI1_RLECOMP;
+	}
 #endif
 }
 	

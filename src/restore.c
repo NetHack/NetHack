@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.5	2003/09/06	*/
+/*	SCCS Id: @(#)restore.c	3.5	2005/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,8 +16,14 @@ extern void FDECL(substitute_tiles, (d_level *));       /* from tile.c */
 #endif
 
 #ifdef ZEROCOMP
-static int NDECL(mgetc);
+STATIC_DCL void NDECL(zerocomp_minit);
+STATIC_DCL void FDECL(zerocomp_mread, (int,genericptr_t,unsigned int));
+STATIC_DCL int NDECL(zerocomp_mgetc);
 #endif
+
+STATIC_DCL void NDECL(def_minit);
+STATIC_DCL void FDECL(def_mread, (int,genericptr_t,unsigned int));
+
 STATIC_DCL void NDECL(find_lev_obj);
 STATIC_DCL void FDECL(restlevchn, (int));
 STATIC_DCL void FDECL(restdamage, (int,BOOLEAN_P));
@@ -34,6 +40,27 @@ STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
 #ifndef GOLDOBJ
 STATIC_DCL struct obj *FDECL(gold_in, (struct obj *));
 #endif
+STATIC_DCL void FDECL(rest_levl, (int,BOOLEAN_P));
+
+static struct restore_procs {
+	const char *name;
+	int mread_flags;
+	void NDECL((*restore_minit));
+	void FDECL((*restore_mread), (int,genericptr_t,unsigned int));
+	void FDECL((*restore_bclose), (int));
+} restoreprocs = {
+#if !defined(ZEROCOMP) || (defined(COMPRESS) || defined(ZLIB_COMP))
+	"externalcomp", 0,
+	def_minit,
+	def_mread,
+	def_bclose,
+#else
+	"zerocomp", 0,
+	zerocomp_minit,
+	zerocomp_mread,
+	zerocomp_bclose,
+#endif
+};
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -547,7 +574,7 @@ xchar ltmp;
 			playwoRAMdisk();
 			/* Rewind save file and try again */
 			(void) lseek(fd, (off_t)0, 0);
-			(void) uptodate(fd, (char *)0);	/* skip version */
+			(void) validate(fd, (char *)0);	/* skip version etc */
 			return dorecover(fd);	/* 0 or 1 */
 		} else {
 # endif
@@ -624,12 +651,10 @@ register int fd;
 	if (strncmpi("X11", windowprocs.name, 3))
     	  putstr(WIN_MAP, 0, "Restoring:");
 #endif
+	restoreprocs.mread_flags = 1;	/* return despite error */
 	while(1) {
-#ifdef ZEROCOMP
-		if(mread(fd, (genericptr_t) &ltmp, sizeof ltmp) < 0)
-#else
-		if(read(fd, (genericptr_t) &ltmp, sizeof ltmp) != sizeof ltmp)
-#endif
+		mread(fd, (genericptr_t) &ltmp, sizeof ltmp);
+		if (restoreprocs.mread_flags == -1)
 			break;
 		getlev(fd, 0, ltmp, FALSE);
 #ifdef MICRO
@@ -646,17 +671,23 @@ register int fd;
 		rtmp = restlevelfile(fd, ltmp);
 		if (rtmp < 2) return(rtmp);  /* dorecover called recursively */
 	}
+	restoreprocs.mread_flags = 0;
 
 #ifdef BSD
 	(void) lseek(fd, 0L, 0);
 #else
 	(void) lseek(fd, (off_t)0, 0);
 #endif
-	(void) uptodate(fd, (char *)0);		/* skip version info */
+	(void) validate(fd, (char *)0);		/* skip version and savefile info */
 	get_plname_from_file(fd, plname);
 
 	getlev(fd, 0, (xchar)0, FALSE);
 	(void) close(fd);
+
+	/* Now set the restore settings to match the
+	 * settings used by the save file output routines
+	 */
+	reset_restpref();
 
 	if (!wizard && !discover)
 		(void) delete_savefile();
@@ -698,6 +729,41 @@ register int fd;
 	/* Success! */
 	welcome(FALSE);
 	return(1);
+}
+
+STATIC_OVL void
+rest_levl(fd, rlecomp)
+int fd;
+boolean rlecomp;
+{
+#ifdef RLECOMP
+	short	i, j;
+	uchar	len;
+	struct rm r;
+
+	if (rlecomp) {
+# if defined(MAC)
+		/* Suppress warning about used before set */
+		(void) memset((genericptr_t) &r, 0, sizeof(r));
+# endif
+		i = 0; j = 0; len = 0;
+		while(i < ROWNO) {
+		    while(j < COLNO) {
+			if(len > 0) {
+			    levl[j][i] = r;
+			    len -= 1;
+			    j += 1;
+			} else {
+			    mread(fd, (genericptr_t)&len, sizeof(uchar));
+			    mread(fd, (genericptr_t)&r, sizeof(struct rm));
+			}
+		    }
+		    j = 0;
+		    i += 1;
+		}
+	} else
+#endif /* RLECOMP */
+	mread(fd, (genericptr_t) levl, sizeof(levl));
 }
 
 void
@@ -760,37 +826,7 @@ boolean ghostly;
 #endif
 	    trickery(trickbuf);
 	}
-
-#ifdef RLECOMP
-	{
-		short	i, j;
-		uchar	len;
-		struct rm r;
-		
-#if defined(MAC)
-		/* Suppress warning about used before set */
-		(void) memset((genericptr_t) &r, 0, sizeof(r));
-#endif
-		i = 0; j = 0; len = 0;
-		while(i < ROWNO) {
-		    while(j < COLNO) {
-			if(len > 0) {
-			    levl[j][i] = r;
-			    len -= 1;
-			    j += 1;
-			} else {
-			    mread(fd, (genericptr_t)&len, sizeof(uchar));
-			    mread(fd, (genericptr_t)&r, sizeof(struct rm));
-			}
-		    }
-		    j = 0;
-		    i += 1;
-		}
-	}
-#else
-	mread(fd, (genericptr_t) levl, sizeof(levl));
-#endif	/* RLECOMP */
-
+	rest_levl(fd, (boolean)((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
 	mread(fd, (genericptr_t)&omoves, sizeof(omoves));
 	mread(fd, (genericptr_t)&upstair, sizeof(stairway));
 	mread(fd, (genericptr_t)&dnstair, sizeof(stairway));
@@ -1051,6 +1087,145 @@ boolean ghostly;
 }
 
 
+void
+minit()
+{
+    (*restoreprocs.restore_minit)();
+    return;
+}
+
+void
+mread(fd, buf, len)
+register int fd;
+register genericptr_t buf;
+register unsigned int len;
+{
+    (*restoreprocs.restore_mread)(fd, buf, len);
+    return;
+}
+
+/* examine the version info and the savefile_info data
+   that immediately follows it.
+   Return 0 if it passed the checks.
+   Return 1 if it failed the version check.
+   Return 2 if it failed the savefile feature check.
+   Return -1 if it failed for some unknown reason.
+ */
+int
+validate(fd, name)
+int fd;
+const char *name;
+{
+    int rlen;
+    struct savefile_info sfi;
+    unsigned long compatible;
+    boolean verbose = name ? TRUE : FALSE, reslt = FALSE;
+
+    if (!(reslt = uptodate(fd, name))) return 1;
+
+    rlen = read(fd, (genericptr_t) &sfi, sizeof sfi);
+    minit();		/* ZEROCOMP */
+    if (rlen == 0) {
+	if (verbose) {
+	    pline("File \"%s\" is empty during save file feature check?", name);
+	    wait_synch();
+	}
+	return -1;
+    }
+
+    compatible = (sfi.sfi1 & sfcap.sfi1);
+
+    if ((sfi.sfi1 & SFI1_ZEROCOMP) == SFI1_ZEROCOMP) {
+	if ((compatible & SFI1_ZEROCOMP) != SFI1_ZEROCOMP) {
+	    if (verbose) {
+		pline("File \"%s\" has incompatible ZEROCOMP compression.", name);
+		wait_synch();
+	    }
+	    return 2;
+	} else if ((sfrestinfo.sfi1 & SFI1_ZEROCOMP) != SFI1_ZEROCOMP) {
+	    set_restpref("zerocomp");
+	}
+    }
+
+    if ((sfi.sfi1 & SFI1_EXTERNALCOMP) == SFI1_EXTERNALCOMP) {
+	if ((compatible & SFI1_EXTERNALCOMP) != SFI1_EXTERNALCOMP) {
+	    if (verbose) {
+		pline("File \"%s\" lacks required internal compression.", name);
+		wait_synch();
+	    }
+	    return 2;
+	} else if ((sfrestinfo.sfi1 & SFI1_EXTERNALCOMP) != SFI1_EXTERNALCOMP) {
+	    set_restpref("externalcomp");
+	}
+    }
+
+    /* RLECOMP check must be last, after ZEROCOMP or INTERNALCOMP adjustments */
+    if ((sfi.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP) {
+	if ((compatible & SFI1_RLECOMP) != SFI1_RLECOMP) {
+	    if (verbose) {
+		pline("File \"%s\" has incompatible run-length compression.", name);
+		wait_synch();
+	    }
+	    return 2;
+	} else if ((sfrestinfo.sfi1 & SFI1_RLECOMP) != SFI1_RLECOMP) {
+	    set_restpref("rlecomp");
+        }
+    }
+    /* savefile does not have RLECOMP level location compression, so adjust */
+    else set_restpref("!rlecomp");
+
+    return 0;
+}
+
+void
+reset_restpref()
+{
+#ifdef ZEROCOMP
+	if (iflags.zerocomp)
+		set_restpref("zerocomp");
+	else 
+#endif
+		set_restpref("externalcomp");
+#ifdef RLECOMP
+	if (iflags.rlecomp)
+		set_restpref("rlecomp");
+	else
+#endif
+		set_restpref("!rlecomp");
+}
+
+void
+set_restpref(suitename)
+const char *suitename;
+{
+	if (!strcmpi(suitename, "externalcomp")) {
+		restoreprocs.name = "externalcomp";
+    		restoreprocs.restore_mread = def_mread;
+    		restoreprocs.restore_minit = def_minit;
+		sfrestinfo.sfi1 |= SFI1_EXTERNALCOMP;
+		sfrestinfo.sfi1 &= ~SFI1_ZEROCOMP;
+		def_minit();
+	}
+	if (!strcmpi(suitename, "!rlecomp")) {
+		sfrestinfo.sfi1 &= ~SFI1_RLECOMP;
+	}
+#ifdef ZEROCOMP
+	if (!strcmpi(suitename, "zerocomp")) {
+		restoreprocs.name = "zerocomp";
+    		restoreprocs.restore_mread = zerocomp_mread;
+    		restoreprocs.restore_minit = zerocomp_minit;
+		sfrestinfo.sfi1 |= SFI1_ZEROCOMP;
+		sfrestinfo.sfi1 &= ~SFI1_EXTERNALCOMP;
+		zerocomp_minit();
+	}
+#endif
+#ifdef RLECOMP
+	if (!strcmpi(suitename, "rlecomp")) {
+		sfrestinfo.sfi1 |= SFI1_RLECOMP;
+	}
+#endif
+}
+
 #ifdef ZEROCOMP
 #define RLESC '\0'	/* Leading character for run of RLESC's */
 
@@ -1063,8 +1238,8 @@ static NEARDATA unsigned short inbufsz = 0;
 static NEARDATA short inrunlength = -1;
 static NEARDATA int mreadfd;
 
-static int
-mgetc()
+STATIC_OVL int
+zerocomp_mgetc()
 {
     if (inbufp >= inbufsz) {
 	inbufsz = read(mreadfd, (genericptr_t)inbuf, sizeof inbuf);
@@ -1079,16 +1254,16 @@ mgetc()
     return inbuf[inbufp++];
 }
 
-void
-minit()
+STATIC_OVL void
+zerocomp_minit()
 {
     inbufsz = 0;
     inbufp = 0;
     inrunlength = -1;
 }
 
-int
-mread(fd, buf, len)
+STATIC_OVL void
+zerocomp_mread(fd, buf, len)
 int fd;
 genericptr_t buf;
 register unsigned len;
@@ -1101,27 +1276,28 @@ register unsigned len;
 	    inrunlength--;
 	    *(*((char **)&buf))++ = '\0';
 	} else {
-	    register short ch = mgetc();
-	    if (ch < 0) return -1; /*readlen;*/
+	    register short ch = zerocomp_mgetc();
+	    if (ch < 0) {
+		restoreprocs.mread_flags = -1;
+		return;
+	    }
 	    if ((*(*(char **)&buf)++ = (char)ch) == RLESC) {
-		inrunlength = mgetc();
+		inrunlength = zerocomp_mgetc();
 	    }
 	}
 	/*readlen++;*/
     }
-    return 0; /*readlen;*/
 }
+#endif /* ZEROCOMP */
 
-#else /* ZEROCOMP */
-
-void
-minit()
+STATIC_OVL void
+def_minit()
 {
     return;
 }
 
-void
-mread(fd, buf, len)
+STATIC_OVL void
+def_mread(fd, buf, len)
 register int fd;
 register genericptr_t buf;
 register unsigned int len;
@@ -1135,6 +1311,10 @@ register unsigned int len;
 	rlen = read(fd, buf, (unsigned) len);
 	if((unsigned)rlen != len){
 #endif
+	    if (restoreprocs.mread_flags == 1) { /* means "return anyway" */
+		restoreprocs.mread_flags = -1;
+		return;
+	    } else {
 		pline("Read %d instead of %u bytes.", rlen, len);
 		if(restoring) {
 			(void) close(fd);
@@ -1142,9 +1322,10 @@ register unsigned int len;
 			error("Error restoring old game.");
 		}
 		panic("Error reading level file.");
+	    }
 	}
 }
-#endif /* ZEROCOMP */
+
 #ifndef GOLDOBJ
 /*
  * Takes all of the gold objects out of the invent or
