@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.4	2004/10/15	*/
+/*	SCCS Id: @(#)eat.c	3.4	2004/11/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1062,7 +1062,7 @@ opentin()		/* called during each move whilst opening a tin */
 {
 	register int r;
 	const char *what;
-	int which;
+	int which, mnum;
 
 	if(!carried(context.tin.tin) && !obj_here(context.tin.tin, u.ux, u.uy))
 					/* perhaps it was stolen? */
@@ -1079,9 +1079,11 @@ opentin()		/* called during each move whilst opening a tin */
 		costly_tin("destroyed");
 		goto use_me;
 	}
+
 	You("succeed in opening the tin.");
 	if(context.tin.tin->spe != 1) {
-	    if (context.tin.tin->corpsenm == NON_PM) {
+	    mnum = context.tin.tin->corpsenm;
+	    if (mnum == NON_PM) {
 		pline("It turns out to be empty.");
 		context.tin.tin->dknown = context.tin.tin->known = TRUE;
 		costly_tin((const char*)0);
@@ -1089,17 +1091,23 @@ opentin()		/* called during each move whilst opening a tin */
 	    }
 	    r = tin_variety(context.tin.tin);
 	    which = 0;	/* 0=>plural, 1=>as-is, 2=>"the" prefix */
-	    if (Hallucination) {
+	    if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE) &&
+		    (Stone_resistance || Hallucination)) {
+		what = "chicken";
+		which = 1;	/* suppress pluralization */
+	    } else if (Hallucination) {
 		what = rndmonnam();
 	    } else {
-		what = mons[context.tin.tin->corpsenm].mname;
-		if (mons[context.tin.tin->corpsenm].geno & G_UNIQ)
-		    which = type_is_pname(&mons[context.tin.tin->corpsenm]) ? 1 : 2;
+		what = mons[mnum].mname;
+		if (mons[mnum].geno & G_UNIQ)
+		    which = type_is_pname(&mons[mnum]) ? 1 : 2;
 	    }
 	    if (which == 0) what = makeplural(what);
+
 	    pline("It smells like %s%s.", (which == 2) ? "the " : "", what);
 	    if (yn("Eat it?") == 'n') {
-		if (!Hallucination) context.tin.tin->dknown = context.tin.tin->known = TRUE;
+		if (!Hallucination)
+		    context.tin.tin->dknown = context.tin.tin->known = TRUE;
 		if (flags.verbose) You("discard the open tin.");
 		costly_tin((const char*)0);
 		goto use_me;
@@ -1107,21 +1115,21 @@ opentin()		/* called during each move whilst opening a tin */
 	    /* in case stop_occupation() was called on previous meal */
 	    context.victual.piece = (struct obj *)0;
 	    context.victual.o_id = 0;
-	    context.victual.fullwarn = context.victual.eating = context.victual.doreset = FALSE;
+	    context.victual.fullwarn = context.victual.eating =
+		    context.victual.doreset = FALSE;
 
-	    You("consume %s %s.", tintxts[r].txt,
-			mons[context.tin.tin->corpsenm].mname);
+	    You("consume %s %s.", tintxts[r].txt, mons[mnum].mname);
 
 	    /* KMH, conduct */
 	    u.uconduct.food++;
-	    if (!vegan(&mons[context.tin.tin->corpsenm]))
+	    if (!vegan(&mons[mnum]))
 		u.uconduct.unvegan++;
-	    if (!vegetarian(&mons[context.tin.tin->corpsenm]))
+	    if (!vegetarian(&mons[mnum]))
 		violated_vegetarian();
 
 	    context.tin.tin->dknown = context.tin.tin->known = TRUE;
-	    cprefx(context.tin.tin->corpsenm);
-	    cpostfx(context.tin.tin->corpsenm);
+	    cprefx(mnum);
+	    cpostfx(mnum);
 
 	    /* charge for one at pre-eating cost */
 	    costly_tin((const char*)0);
@@ -1368,6 +1376,9 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	    }
 		    
 	    if (!retcode) consume_oeaten(otmp, 2);	/* oeaten >>= 2 */
+	} else if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE) &&
+		(Stone_resistance || Hallucination)) {
+	    pline("This tastes just like chicken!");
 	} else {
 	    pline("%s%s %s!",
 		  !uniq ? "This " : !type_is_pname(&mons[mnum]) ? "The " : "",
@@ -1772,6 +1783,7 @@ register struct obj *otmp;
 			    delayed_killer(STONED, KILLED_BY_AN, killer.name);
 			}
 		    }
+		    /* note: no "tastes like chicken" message for eggs */
 		}
 		break;
 	    case EUCALYPTUS_LEAF:
