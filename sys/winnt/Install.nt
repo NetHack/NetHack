@@ -103,16 +103,13 @@ Setting Up
 
 1.  It almost goes without saying that you should make sure that your tools
     are set up and running correctly.  That includes ensuring that all the
-    necessary environment variables for the Microsoft compiler environment
+    necessary environment variables for the compiler environment
     are set correctly.  ( Examples: For the Microsoft compiler by 
     executing vcvars32.bat, which is probably in the bin directory of 
-    your compilers directory tree.)
-
-
-For the Borland Makefile, you can simply
-    run the Makefile directory assuming all directories are properly set 
-    in the Makefile's macro variables.  For the standard Borland compiler 
-    installation you can just run c:\borland\bcc55\bin\make)
+    your compilers directory tree. For the Borland Makefile, you can 
+    simply invoke the Make utility from the Makefile's directory (For 
+    the standard Borland compiler installation you can just 
+    use the explicit path "c:\borland\bcc55\bin\make /f Makefile.bcc")
 
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
@@ -208,7 +205,9 @@ Running NetHack
     executable resides.  You only need to set HACKDIR in defaults.nh if,
     for some reason, you wish to override that (be careful).
   
-7a. Running from the command prompt:
+7. Executing the game
+
+    a) Running from the command prompt:
 
     If you add the directory containing the NetHack executable
     to your PATH, you can just type "nethack" or "nethack -umike"
@@ -216,7 +215,7 @@ Running NetHack
     a command such as "c:\nethack\binary\nethack.exe" (specifying whatever 
     drive and directory your NetHack executable resides in) each time.
 
-7b. Running from a Windows shortcut.
+    b) Running from a Windows shortcut.
 
     If you will be running it by launching it from a shortcut, just 
     use the following information when setting up the shortcut.
@@ -281,7 +280,7 @@ Setting Up
     are set up and running correctly. (Examples: For the Microsoft Visual
     Studio C compiler it should correctly fire up when you choose it in
     your Start | Programs menus, and for Borland make sure that the compiler
-    is in your PATH)
+    is in your PATH, or that you know where the make.exe executable resides.)
 
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
@@ -319,6 +318,13 @@ Setting Up
     locations.  Remember that nhsetup.bat moves/copies many files around
     to their intended locations for building NetHack.
 
+    If you downloaded or ftp'd the sources from a UNIX system, the lines
+    will probably end in UNIX-style newlines, instead of the carriage
+    return and line feed pairs used by Windows.  Visual Studio project
+    files and workspace files (dsp and dsw files) in particular need to 
+    have their lines end in carriage-return-line-feed or they won't work
+    properly.
+
 3.  Ready your tool.
     Microsoft compiler users, perform step 3a.
     Borland compiler users, perform step 3b.
@@ -326,6 +332,7 @@ Setting Up
     a) Microsoft compiler:
        Start the Visual C IDE. In the Visual C IDE Menus, choose:
            File | Open Workspace
+
     b) Borland compiler:
        Chdir to the NetHack src directory:
            chdir ../../src
@@ -421,7 +428,8 @@ Running NetHack
     executable resides.  You only need to set HACKDIR in Defaults.nh if, 
     for some reason, you wish to override that (be careful).
   
-8.  Running from the command prompt:
+8.  Executing the game
+    a) Running from the command prompt:
 
     If you add the directory containing the NetHack executable
     to your PATH, 
@@ -430,7 +438,7 @@ Running NetHack
     "c:\nethack\binary\nethackw.exe" (specifying whatever drive 
     and directory your NetHack executable resides in) each time.
 
-9. Running from a Windows shortcut (win95 or NT4.x)
+    b) Running from a Windows shortcut (win95 or NT4.x)
 
     If you will be running it by launching it from program manager
     or from a shortcut, just use the following information when 
