@@ -1827,7 +1827,17 @@ register struct attack *mattk;
 			end_engulf();
 			return(2);
 		    case AD_PHYS:
-			pline("%s is pummeled with your debris!",Monnam(mdef));
+			if (youmonst.data == &mons[PM_FOG_CLOUD]) {
+			    pline("%s is laden with your moisture.",
+				  Monnam(mdef));
+			    if (amphibious(mdef->data) &&
+				!flaming(mdef->data)) {
+				dam = 0;
+				pline("%s seems unharmed.", Monnam(mdef));
+			    }
+			} else
+			    pline("%s is pummeled with your debris!",
+				  Monnam(mdef));
 			break;
 		    case AD_ACID:
 			pline("%s is covered with your goo!", Monnam(mdef));

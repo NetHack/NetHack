@@ -1687,11 +1687,15 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		    }
 		    break;
 		case AD_PHYS:
-		    if (mtmp->data == &mons[PM_FOG_CLOUD])
-			You("are laden with moisture and can barely %s!",
-				!breathless(youmonst.data) ? "breathe" :
-				"stay conscious");
-		    else {
+		    if (mtmp->data == &mons[PM_FOG_CLOUD]) {
+			You("are laden with moisture and %s",
+			    flaming(youmonst.data) ? "are smoldering out!" :
+			    Breathless ? "find it mildly uncomfortable." :
+			    amphibious(youmonst.data) ? "feel comforted." :
+			    "can barely breathe!");
+			/* NB: Amphibious includes Breathless */
+			if (Amphibious && !flaming(youmonst.data)) tmp = 0;
+		    } else {
 			You("are pummeled with debris!");
 			exercise(A_STR, FALSE);
 		    }
