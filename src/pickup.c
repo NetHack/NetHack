@@ -1938,7 +1938,6 @@ register int held;
 #ifndef GOLDOBJ
 	struct obj *u_gold = (struct obj *)0;
 #endif
-	struct monst *shkp;
 	boolean one_by_one, allflag, loot_out = FALSE, loot_in = FALSE;
 	char select[MAXOCLASSES+1];
 	char qbuf[BUFSZ], emptymsg[BUFSZ], pbuf[QBUFSZ];
