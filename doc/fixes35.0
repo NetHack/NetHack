@@ -55,6 +55,7 @@ player polymorphed as a ceiling hider cannot reach the floor, but
 	automatically unhide on #sit
 trappers do not hide on the ceiling
 non-magical whistles do not work underwater
+try to restrict whistle use to monsters that can blow a whistle
 
 
 Platform- and/or Interface-Specific Fixes

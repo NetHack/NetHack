@@ -389,7 +389,11 @@ STATIC_OVL void
 use_whistle(obj)
 struct obj *obj;
 {
-	if(Underwater) {
+	if ((is_silent(youmonst.data) || youmonst.data->msound == MS_BUZZ) &&
+	    (breathless(youmonst.data) || verysmall(youmonst.data) ||
+	     !has_head(youmonst.data) || youmonst.data->mlet == S_EEL)) {
+	    You("are incapable of using the whistle.");
+	} else if(Underwater) {
 	    You("blow bubbles through %s.", yname(obj));
 	} else {
 	    You(whistle_str, obj->cursed ? "shrill" : "high");
@@ -403,13 +407,17 @@ struct obj *obj;
 {
 	register struct monst *mtmp, *nextmon;
 
-	/* it's magic!  it works underwater too (at a higher pitch) */
-	if(obj->cursed && !rn2(2)) {
+	if ((is_silent(youmonst.data) || youmonst.data->msound == MS_BUZZ) &&
+	    (breathless(youmonst.data) || verysmall(youmonst.data) ||
+	     !has_head(youmonst.data) || youmonst.data->mlet == S_EEL)) {
+		You("are incapable of using the whistle.");
+	} else if (obj->cursed && !rn2(2)) {
 		You("produce a %shigh-pitched humming noise.",
 		    Underwater ? "very " : "");
 		wake_nearby();
 	} else {
 		int pet_cnt = 0;
+		/* it's magic!  it works underwater too (at a higher pitch) */
 		You(whistle_str, Hallucination ? "normal" :
 		    Underwater ? "strange, high-pitched" : "strange");
 		for(mtmp = fmon; mtmp; mtmp = nextmon) {
