@@ -20,7 +20,7 @@ STATIC_DCL int FDECL(disarm_squeaky_board, (struct trap *));
 STATIC_DCL int FDECL(disarm_shooting_trap, (struct trap *, int));
 STATIC_DCL int FDECL(try_lift, (struct monst *, struct trap *, int, BOOLEAN_P));
 STATIC_DCL int FDECL(help_monster_out, (struct monst *, struct trap *));
-STATIC_DCL boolean FDECL(thitm, (int, struct monst *, struct obj *, int));
+STATIC_DCL boolean FDECL(thitm, (int,struct monst *,struct obj *,int,BOOLEAN_P));
 STATIC_DCL int FDECL(mkroll_launch,
 			(struct trap *,XCHAR_P,XCHAR_P,SHORT_P,long));
 STATIC_DCL boolean FDECL(isclearpath,(coord *, int, SCHAR_P, SCHAR_P));
@@ -1054,7 +1054,7 @@ struct obj *otmp;
 				impossible("steed hit by non-existant arrow?");
 				return 0;
 			}
-			if(thitm(8, mtmp, otmp, 0)) trapkilled = TRUE;
+			if (thitm(8, mtmp, otmp, 0, FALSE)) trapkilled = TRUE;
 			steedhit = TRUE;
 			break;
 		case DART_TRAP:
@@ -1062,7 +1062,7 @@ struct obj *otmp;
 				impossible("steed hit by non-existant dart?");
 				return 0;
 			}
-			if(thitm(7, mtmp, otmp, 0)) trapkilled = TRUE;
+			if (thitm(7, mtmp, otmp, 0, FALSE)) trapkilled = TRUE;
 			steedhit = TRUE;
 			break;
 		case SLP_GAS_TRAP:
@@ -1078,7 +1078,7 @@ struct obj *otmp;
 			steedhit = TRUE;
 			break;
 		case LANDMINE:
-			if (thitm(0, mtmp, (struct obj *)0, rnd(16)))
+			if (thitm(0, mtmp, (struct obj *)0, rnd(16), FALSE))
 			    trapkilled = TRUE;
 			steedhit = TRUE;
 			break;
@@ -1086,7 +1086,7 @@ struct obj *otmp;
 		case SPIKED_PIT:
 			if (mtmp->mhp <= 0 ||
 				thitm(0, mtmp, (struct obj *)0,
-				      rnd((tt == PIT) ? 6 : 10)))
+				      rnd((tt == PIT) ? 6 : 10), FALSE))
 			    trapkilled = TRUE;
 			steedhit = TRUE;
 			break;
@@ -1537,7 +1537,7 @@ register struct monst *mtmp;
 			otmp->owt = weight(otmp);
 			otmp->opoisoned = 0;
 			if (in_sight) seetrap(trap);
-			if(thitm(8, mtmp, otmp, 0)) trapkilled = TRUE;
+			if (thitm(8, mtmp, otmp, 0, FALSE)) trapkilled = TRUE;
 			break;
 		case DART_TRAP:
 			otmp = mksobj(DART, TRUE, FALSE);
@@ -1545,14 +1545,14 @@ register struct monst *mtmp;
 			otmp->owt = weight(otmp);
 			if (!rn2(6)) otmp->opoisoned = 1;
 			if (in_sight) seetrap(trap);
-			if(thitm(7, mtmp, otmp, 0)) trapkilled = TRUE;
+			if (thitm(7, mtmp, otmp, 0, FALSE)) trapkilled = TRUE;
 			break;
 		case ROCKTRAP:
 			otmp = mksobj(ROCK, TRUE, FALSE);
 			otmp->quan = 1L;
 			otmp->owt = weight(otmp);
 			if (in_sight) seetrap(trap);
-			if (thitm(0, mtmp, otmp, d(2, 6)))
+			if (thitm(0, mtmp, otmp, d(2, 6), FALSE))
 			    trapkilled = TRUE;
 			break;
 
@@ -1686,11 +1686,13 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    }
 			} else {
 			    int num = d(2,4), alt;
+			    boolean immolate = FALSE;
 
 			    /* paper burns very fast, assume straw is tightly
 			     * packed and burns a bit slower */
 			    switch (monsndx(mtmp->data)) {
-			    case PM_PAPER_GOLEM:   alt = mtmp->mhpmax; break;
+			    case PM_PAPER_GOLEM:   immolate = TRUE;
+						   alt = mtmp->mhpmax; break;
 			    case PM_STRAW_GOLEM:   alt = mtmp->mhpmax / 2; break;
 			    case PM_WOOD_GOLEM:    alt = mtmp->mhpmax / 4; break;
 			    case PM_LEATHER_GOLEM: alt = mtmp->mhpmax / 8; break;
@@ -1698,7 +1700,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    }
 			    if (alt > num) num = alt;
 
-			    if (thitm(0, mtmp, (struct obj *)0, num))
+			    if (thitm(0, mtmp, (struct obj *)0, num, immolate))
 				trapkilled = TRUE;
 			    else
 				/* we know mhp is at least `num' below mhpmax,
@@ -1740,7 +1742,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			mselftouch(mtmp, "Falling, ", FALSE);
 			if (mtmp->mhp <= 0 ||
 				thitm(0, mtmp, (struct obj *)0,
-				      rnd((tt == PIT) ? 6 : 10)))
+				      rnd((tt == PIT) ? 6 : 10), FALSE))
 			    trapkilled = TRUE;
 			break;
 		case HOLE:
@@ -1884,7 +1886,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			if (!in_sight)
 				pline("Kaablamm!  You hear an explosion in the distance!");
 			blow_up_landmine(trap);
-			if(thitm(0, mtmp, (struct obj *)0, rnd(16)))
+			if (thitm(0, mtmp, (struct obj *)0, rnd(16), FALSE))
 				trapkilled = TRUE;
 			else {
 				/* monsters recursively fall into new pit */
@@ -3586,14 +3588,15 @@ register int bodypart;
 /* Monster is hit by trap. */
 /* Note: doesn't work if both obj and d_override are null */
 STATIC_OVL boolean
-thitm(tlev, mon, obj, d_override)
-register int tlev;
-register struct monst *mon;
-register struct obj *obj;
+thitm(tlev, mon, obj, d_override, nocorpse)
+int tlev;
+struct monst *mon;
+struct obj *obj;
 int d_override;
+boolean nocorpse;
 {
-	register int strike;
-	register boolean trapkilled = FALSE;
+	int strike;
+	boolean trapkilled = FALSE;
 
 	if (d_override) strike = 1;
 	else if (obj) strike = (find_mac(mon) + tlev + obj->spe <= rnd(20));
@@ -3619,7 +3622,7 @@ int d_override;
 			int xx = mon->mx;
 			int yy = mon->my;
 
-			monkilled(mon, "", AD_PHYS);
+			monkilled(mon, "", nocorpse ? -AD_RBRE : AD_PHYS);
 			if (mon->mhp <= 0) {
 				newsym(xx, yy);
 				trapkilled = TRUE;
