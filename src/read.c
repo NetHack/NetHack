@@ -1575,7 +1575,15 @@ int how;
 			buf);
 		(void)mungspaces(buf);
 		/* choosing "none" preserves genocideless conduct */
-		if (!strcmpi(buf, "none")) return;
+		if (!strcmpi(buf, "none")) {
+		    /* ... but no free pass if cursed */
+		    if (!(how & REALLY)) {
+			ptr = rndmonst();
+			if (!ptr) return; /* no message, like normal case */
+			mndx = monsndx(ptr);
+			break;		/* remaining checks don't apply */
+		    } else return;
+		}
 
 		mndx = name_to_mon(buf);
 		if (mndx == NON_PM || (mvitals[mndx].mvflags & G_GENOD)) {
