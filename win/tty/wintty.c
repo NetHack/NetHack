@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wintty.c	3.4	2000/06/27	*/
+/*	SCCS Id: @(#)wintty.c	3.4	2002/02/05	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
