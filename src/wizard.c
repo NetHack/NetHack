@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wizard.c	3.4	2001/12/06	*/
+/*	SCCS Id: @(#)wizard.c	3.4	2002/04/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -361,7 +361,7 @@ tactics(mtmp)
 			return(0);
 		    }
 	        } else { /* a monster has it - 'port beside it. */
-		    (void) mnearto(mtmp, tx, ty, TRUE);
+		    (void) mnearto(mtmp, tx, ty, FALSE);
 		    return(0);
 		}
 	    }
