@@ -1045,7 +1045,7 @@ dosacrifice()
     int pm;
     aligntyp altaralign = a_align(u.ux,u.uy);
 
-    if (!on_altar()) {
+    if (!on_altar() || u.uswallow) {
 	You("are not standing on an altar.");
 	return 0;
     }
