@@ -496,8 +496,8 @@ register struct obj *obj;
 	return(1);
 }
 
-/* Called in several places - should not produce texts */
-/* ship_object() _can_ produce texts--is that comment still correct? */
+/* Called in several places - may produce output */
+/* eg ship_object() and dropy() -> sellobj() both produce output */
 void
 dropx(obj)
 register struct obj *obj;
