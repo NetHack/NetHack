@@ -129,25 +129,25 @@ just before the release of NetHack 3.4.0 in March 2002.
 As with version 3.3, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
 
-Pat Rankin maintained 3.4 for VMS.
+Pat Rankin maintained 3.5 for VMS.
 
-Michael Allison maintained NetHack 3.4 for the MS-DOS platform.  
+Michael Allison maintained NetHack 3.5 for the MS-DOS platform.  
 Paul Winner and Yitzhak Sapir provided encouragement.
 
 Dean Luick, Mark Modrall, and Kevin Hugo maintained and enhanced the
 Macintosh port of 3.4.
 
 Michael Allison, David Cohrs, Alex Kompel, Dion Nicolaas, and Yitzhak Sapir 
-maintained and enhanced 3.4 for the Microsoft Windows platform. Alex Kompel 
+maintained and enhanced 3.5 for the Microsoft Windows platform. Alex Kompel 
 contributed a new graphical interface for the Windows port. Alex Kompel also
 contributed a Windows CE port for 3.4.1.
 
-Ron Van Iwaarden maintained 3.4 for OS/2.
+Ron Van Iwaarden maintained 3.5 for OS/2.
 
 Janne Salmijarvi and Teemu Suikki maintained and enhanced the 
-Amiga port of 3.4 after Janne Salmijarvi resurrected it for 3.3.1.
+Amiga port of 3.5 after Janne Salmijarvi resurrected it for 3.3.1.
 
-Christian `Marvin' Bressler maintained 3.4 for the Atari after he
+Christian `Marvin' Bressler maintained 3.5 for the Atari after he
 resurrected it for 3.3.1.
 
 There is a NetHack web site maintained by Ken Lorber at http://www.nethack.org/.
