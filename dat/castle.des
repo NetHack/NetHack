@@ -1,0 +1,240 @@
+#	SCCS Id: @(#)castle.des	3.3	95/11/19
+#	Copyright (c) 1989 by Jean-Christophe Collet
+# NetHack may be freely redistributed.  See license for details.
+#
+# This is the stronghold level :
+# there are several ways to enter it :
+#	- opening the drawbridge (wand of opening, knock spell, playing
+#	  the appropriate tune)
+#
+#	- enter via the back entry (this suppose a ring of levitation, boots
+#	  of water walking, etc.)
+#
+# Note : If you don't play the right tune, you get indications like in the
+#	 MasterMind game...
+#
+# To motivate the player : there are 4 storerooms (armors, weapons, food and
+# gems) and a wand of wishing in one of the 4 towers...
+
+MAZE:"castle",random
+FLAGS: noteleport
+GEOMETRY:center,center
+MAP
+}}}}}}}}}.............................................}}}}}}}}}
+}-------}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}-------}
+}|.....|-----------------------------------------------|.....|}
+}|.....+...............................................+.....|}
+}-------------------------------+-----------------------------}
+}}}}}}|........|..........+...........|.......S.S.......|}}}}}}
+.....}|........|..........|...........|.......|.|.......|}.....
+.....}|........------------...........---------S---------}.....
+.....}|...{....+..........+.........\.S.................+......
+.....}|........------------...........---------S---------}.....
+.....}|........|..........|...........|.......|.|.......|}.....
+}}}}}}|........|..........+...........|.......S.S.......|}}}}}}
+}-------------------------------+-----------------------------}
+}|.....+...............................................+.....|}
+}|.....|-----------------------------------------------|.....|}
+}-------}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}-------}
+}}}}}}}}}.............................................}}}}}}}}}
+ENDMAP
+
+# Random registers initialisation
+RANDOM_OBJECTS:'[',')','*','%'
+RANDOM_PLACES:(04,02),(58,02),(04,14),(58,14)
+RANDOM_MONSTERS:'L','N','E','H','M','O','R','T','X','Z'
+
+TELEPORT_REGION:levregion(01,00,10,20),(1,1,61,15),down
+TELEPORT_REGION:levregion(69,00,79,20),(1,1,61,15),up
+STAIR:levregion(01,00,10,20),(0,0,62,16),up
+# Doors
+DOOR:closed,(07,03)
+DOOR:closed,(55,03)
+DOOR:locked,(32,04)
+DOOR:locked,(26,05)
+DOOR:locked,(46,05)
+DOOR:locked,(48,05)
+DOOR:locked,(47,07)
+DOOR:closed,(15,08)
+DOOR:closed,(26,08)
+DOOR:locked,(38,08)
+DOOR:locked,(56,08)
+DOOR:locked,(47,09)
+DOOR:locked,(26,11)
+DOOR:locked,(46,11)
+DOOR:locked,(48,11)
+DOOR:locked,(32,12)
+DOOR:closed,(07,13)
+DOOR:closed,(55,13)
+# The drawbridge
+DRAWBRIDGE:(05,08),east,closed
+# Storeroom number 1
+OBJECT:object[0],random,(39,05)
+OBJECT:object[0],random,(40,05)
+OBJECT:object[0],random,(41,05)
+OBJECT:object[0],random,(42,05)
+OBJECT:object[0],random,(43,05)
+OBJECT:object[0],random,(44,05)
+OBJECT:object[0],random,(45,05)
+OBJECT:object[0],random,(39,06)
+OBJECT:object[0],random,(40,06)
+OBJECT:object[0],random,(41,06)
+OBJECT:object[0],random,(42,06)
+OBJECT:object[0],random,(43,06)
+OBJECT:object[0],random,(44,06)
+OBJECT:object[0],random,(45,06)
+# Storeroom number 2
+OBJECT:object[1],random,(49,05)
+OBJECT:object[1],random,(50,05)
+OBJECT:object[1],random,(51,05)
+OBJECT:object[1],random,(52,05)
+OBJECT:object[1],random,(53,05)
+OBJECT:object[1],random,(54,05)
+OBJECT:object[1],random,(55,05)
+OBJECT:object[1],random,(49,06)
+OBJECT:object[1],random,(50,06)
+OBJECT:object[1],random,(51,06)
+OBJECT:object[1],random,(52,06)
+OBJECT:object[1],random,(53,06)
+OBJECT:object[1],random,(54,06)
+OBJECT:object[1],random,(55,06)
+# Storeroom number 3
+OBJECT:object[2],random,(39,10)
+OBJECT:object[2],random,(40,10)
+OBJECT:object[2],random,(41,10)
+OBJECT:object[2],random,(42,10)
+OBJECT:object[2],random,(43,10)
+OBJECT:object[2],random,(44,10)
+OBJECT:object[2],random,(45,10)
+OBJECT:object[2],random,(39,11)
+OBJECT:object[2],random,(40,11)
+OBJECT:object[2],random,(41,11)
+OBJECT:object[2],random,(42,11)
+OBJECT:object[2],random,(43,11)
+OBJECT:object[2],random,(44,11)
+OBJECT:object[2],random,(45,11)
+# Storeroom number 4
+OBJECT:object[3],random,(49,10)
+OBJECT:object[3],random,(50,10)
+OBJECT:object[3],random,(51,10)
+OBJECT:object[3],random,(52,10)
+OBJECT:object[3],random,(53,10)
+OBJECT:object[3],random,(54,10)
+OBJECT:object[3],random,(55,10)
+OBJECT:object[3],random,(49,11)
+OBJECT:object[3],random,(50,11)
+OBJECT:object[3],random,(51,11)
+OBJECT:object[3],random,(52,11)
+OBJECT:object[3],random,(53,11)
+OBJECT:object[3],random,(54,11)
+OBJECT:object[3],random,(55,11)
+# THE WAND OF WISHING in 1 of the 4 towers
+CONTAINER:'(',"chest",place[0]
+OBJECT:'/',"wishing",contained
+# Prevent monsters from eating it.  (@'s never eat objects)
+ENGRAVING:place[0],burn,"Elbereth"
+# The treasure of the lord
+OBJECT:'(',"chest",(37,08)
+# Traps
+TRAP:"trap door",(40,08)
+TRAP:"trap door",(44,08)
+TRAP:"trap door",(48,08)
+TRAP:"trap door",(52,08)
+TRAP:"trap door",(55,08)
+# Soldiers guarding the entry hall
+MONSTER:'@',"soldier",(08,06)
+MONSTER:'@',"soldier",(09,05)
+MONSTER:'@',"soldier",(11,05)
+MONSTER:'@',"soldier",(12,06)
+MONSTER:'@',"soldier",(08,10)
+MONSTER:'@',"soldier",(09,11)
+MONSTER:'@',"soldier",(11,11)
+MONSTER:'@',"soldier",(12,10)
+MONSTER:'@',"lieutenant",(09,08)
+# Soldiers guarding the towers
+MONSTER:'@',"soldier",(03,02)
+MONSTER:'@',"soldier",(05,02)
+MONSTER:'@',"soldier",(57,02)
+MONSTER:'@',"soldier",(59,02)
+MONSTER:'@',"soldier",(03,14)
+MONSTER:'@',"soldier",(05,14)
+MONSTER:'@',"soldier",(57,14)
+MONSTER:'@',"soldier",(59,14)
+# The four dragons that are guarding the storerooms
+MONSTER:'D',random,(47,05)
+MONSTER:'D',random,(47,06)
+MONSTER:'D',random,(47,10)
+MONSTER:'D',random,(47,11)
+# Sea monsters in the moat
+MONSTER:';',"giant eel",(05,07)
+MONSTER:';',"giant eel",(05,09)
+MONSTER:';',"giant eel",(57,07)
+MONSTER:';',"giant eel",(57,09)
+MONSTER:';',"shark",(05,00)
+MONSTER:';',"shark",(05,16)
+MONSTER:';',"shark",(57,00)
+MONSTER:';',"shark",(57,16)
+# The throne room and the court monsters
+MONSTER:monster[0],random,(27,05)
+MONSTER:monster[1],random,(30,05)
+MONSTER:monster[2],random,(33,05)
+MONSTER:monster[3],random,(36,05)
+MONSTER:monster[4],random,(28,06)
+MONSTER:monster[5],random,(31,06)
+MONSTER:monster[6],random,(34,06)
+MONSTER:monster[7],random,(37,06)
+MONSTER:monster[8],random,(27,07)
+MONSTER:monster[9],random,(30,07)
+MONSTER:monster[0],random,(33,07)
+MONSTER:monster[1],random,(36,07)
+MONSTER:monster[2],random,(28,08)
+MONSTER:monster[3],random,(31,08)
+MONSTER:monster[4],random,(34,08)
+MONSTER:monster[5],random,(27,09)
+MONSTER:monster[6],random,(30,09)
+MONSTER:monster[7],random,(33,09)
+MONSTER:monster[8],random,(36,09)
+MONSTER:monster[9],random,(28,10)
+MONSTER:monster[0],random,(31,10)
+MONSTER:monster[1],random,(34,10)
+MONSTER:monster[2],random,(37,10)
+MONSTER:monster[3],random,(27,11)
+MONSTER:monster[4],random,(30,11)
+MONSTER:monster[5],random,(33,11)
+MONSTER:monster[6],random,(36,11)
+# MazeWalks
+MAZEWALK:(00,10),west
+MAZEWALK:(62,06),east
+# Non diggable walls
+NON_DIGGABLE:(00,00,62,16)
+# Subrooms:
+#   Entire castle area
+REGION:(00,00,62,16),unlit,"ordinary"
+#   Courtyards
+REGION:(00,05,05,11),lit,"ordinary"
+REGION:(57,05,62,11),lit,"ordinary"
+#   Throne room
+REGION:(27,05,37,11),lit,"throne",unfilled
+#   Antechamber
+REGION:(07,05,14,11),lit,"ordinary"
+#   Storerooms
+REGION:(39,05,45,06),lit,"ordinary"
+REGION:(39,10,45,11),lit,"ordinary"
+REGION:(49,05,55,06),lit,"ordinary"
+REGION:(49,10,55,11),lit,"ordinary"
+#   Corners
+REGION:(02,02,06,03),lit,"ordinary"
+REGION:(56,02,60,03),lit,"ordinary"
+REGION:(02,13,06,14),lit,"ordinary"
+REGION:(56,13,60,14),lit,"ordinary"
+#   Barracks
+REGION:(16,05,25,06),lit,"barracks"
+REGION:(16,10,25,11),lit,"barracks"
+#   Hallways
+REGION:(08,03,54,03),unlit,"ordinary"
+REGION:(08,13,54,13),unlit,"ordinary"
+REGION:(16,08,25,08),unlit,"ordinary"
+REGION:(39,08,55,08),unlit,"ordinary"
+#   Storeroom alcoves
+REGION:(47,05,47,06),unlit,"ordinary"
+REGION:(47,10,47,11),unlit,"ordinary"
