@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bones.c	3.4	2003/11/29	*/
+/*	SCCS Id: @(#)bones.c	3.4	2004/12/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -84,6 +84,8 @@ boolean restore;
 			if(objects[otmp->otyp].oc_uses_known) otmp->known = 0;
 			otmp->dknown = otmp->bknown = 0;
 			otmp->rknown = 0;
+			otmp->lknown = 0;
+			otmp->cknown = 0;
 			otmp->invlet = 0;
 			otmp->no_charge = 0;
 

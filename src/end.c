@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.4	2004/08/23	*/
+/*	SCCS Id: @(#)end.c	3.4	2004/12/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -379,6 +379,8 @@ boolean taken;
 			for (obj = invent; obj; obj = obj->nobj) {
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
+			    if (Is_container(obj))
+				obj->cknown = obj->lknown = 1;
 			}
 			(void) display_inventory((char *)0, TRUE);
 			container_contents(invent, TRUE, TRUE);
@@ -975,6 +977,7 @@ boolean identified, all_containers;
 			if (cat) Schroedingers_cat = TRUE;
 			else deadcat = TRUE;
 			box->spe = 0;
+			box->cknown = box->lknown = 1;
 		}
 		if (box->otyp == BAG_OF_TRICKS) {
 		    continue;	/* wrong type of container */
@@ -988,6 +991,8 @@ boolean identified, all_containers;
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown =
 			    obj->dknown = obj->rknown = 1;
+			    if (Is_container(obj))
+				obj->cknown = obj->lknown = 1;
 			}
 			putstr(tmpwin, 0, doname(obj));
 		    }
@@ -998,14 +1003,13 @@ boolean identified, all_containers;
 		    if (all_containers)
 			container_contents(box->cobj, identified, TRUE);
 		} else {
-		    if (cat || deadcat)
+		    if (cat || deadcat) {
 			pline("%s%s contains Schroedinger's %scat!",
 			      (box->quan > 1) ? "One of the " : "",
 			      (box->quan > 1) ? xname(box) : upstart(xname(box)),
 			      (deadcat) ? "dead " : "");
-		    else
-			pline("%s empty.", Tobjnam(box, "are"));
-		    display_nhwindow(WIN_MESSAGE, FALSE);
+			display_nhwindow(WIN_MESSAGE, FALSE);
+		    }
 		}
 	    }
 	    if (!all_containers)
