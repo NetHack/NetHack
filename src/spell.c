@@ -281,7 +281,7 @@ learn()
 	boolean costly = TRUE;
 
 	/* JDS: lenses give 50% faster reading; 33% smaller read time */
-	if (ublindf && ublindf->otyp == LENSES && rn2(2)) delay++;
+	if (delay && ublindf && ublindf->otyp == LENSES && rn2(2)) delay++;
 	if (delay) {	/* not if (delay++), so at end delay == 0 */
 		delay++;
 		return(1); /* still busy */
