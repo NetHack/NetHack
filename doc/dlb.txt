@@ -1,0 +1,132 @@
+
+
+
+DLB(6)                        1993                         DLB(6)
+
+
+
+NAME
+     dlb - NetHack data librarian
+
+SYNOPSIS
+     dlb { xct } [ vfIC ] arguments...  [ files... ]
+
+DESCRIPTION
+     Dlb is a file archiving tool in the spirit  (and  tradition)
+     of  tar  for  NetHack version 3.1 and higher.  It is used to
+     maintain the archive files from which NetHack reads  special
+     level files and other read-only information.  Note that like
+     tar the command and option specifiers  are  specified  as  a
+     continuous string and are followed by any arguments required
+     in the same order as the option specifiers.
+
+     This facility is optional and may be excluded during NetHack
+     configuration.
+
+COMMANDS
+     The x command causes dlb to  extract  the  contents  of  the
+     archive into the current directory.
+
+     The c command causes dlb to create a new archive from  files
+     in the current directory.
+
+     The t command lists the files in the archive.
+
+OPTIONS AND ARGUMENTS
+     v           verbose output
+
+     f archive   specify the archive.  Default if f not specified
+     is LIBFILE (usually the nhdat file in the playground).
+
+     I lfile     specify the file containing the list of files to
+     put in to or extract from the archive if no files are listed
+     on the command line.  Default for  archive  creation  if  no
+     files are listed is LIBLISTFILE.
+
+     C dir       change directory.  Changes directory before try-
+     ing to read any files (including the archive and the lfile).
+
+EXAMPLES
+     Create the default archive from the default file list:
+                 dlb c
+
+     List the contents of the archive 'foo':
+                 dlb tf foo
+
+AUTHOR
+     Kenneth Lorber
+
+
+
+
+
+Oct                      Last change: 28                        1
+
+
+
+
+
+
+DLB(6)                        1993                         DLB(6)
+
+
+
+SEE ALSO
+     nethack(6), tar(1)
+
+BUGS
+     Not a good tar emulation; - does not mean stdin  or  stdout.
+     Should  include  an  optional compression facility.  Not all
+     read-only files for NetHack can be read out of  an  archive;
+     examining the source is the only way to know which files can
+     be.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Oct                      Last change: 28                        2
+
+
+
