@@ -73,6 +73,8 @@ reviving invisible troll could appear visible until it moves
 adjust some of the shop repair messages
 charge for reviving a shop owned corpse or reanimating a shop owned statue
 filled trap doors on castle can be re-dug
+message order when swapping places with a pet (e.g. into a trap), also use
+	different term instead of "displace"
 
 
 Platform- and/or Interface-Specific Fixes
