@@ -181,7 +181,7 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 	 * attacking casts spells only a small portion of the time that an
 	 * attacking monster does.
 	 */
-	if (mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) {
+	if ((mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) && ml) {
 	    int cnt = 40;
 
 	    do {
