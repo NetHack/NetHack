@@ -1596,31 +1596,31 @@ fopen_wizkit_file()
 	char *envp;
 #endif
 
-	if (wizkit[0]) {
+	if (!wizkit[0]) return (FILE *)0;
+
 #ifdef UNIX
-		if (access(wizkit, 4) == -1) {
-			/* 4 is R_OK on newer systems */
-			/* nasty sneaky attempt to read file through
-			 * NetHack's setuid permissions -- this is a
-			 * place a file name may be wholly under the player's
-			 * control
-			 */
-			raw_printf("Access to %s denied (%d).",
-					wizkit, errno);
-			wait_synch();
-			/* fall through to standard names */
-		} else
+	if (access(wizkit, 4) == -1) {
+		/* 4 is R_OK on newer systems */
+		/* nasty sneaky attempt to read file through
+		 * NetHack's setuid permissions -- this is a
+		 * place a file name may be wholly under the player's
+		 * control
+		 */
+		raw_printf("Access to %s denied (%d).",
+				wizkit, errno);
+		wait_synch();
+		/* fall through to standard names */
+	} else
 #endif
-		if ((fp = fopenp(wizkit, "r")) != (FILE *)0) {
-		    return(fp);
+	if ((fp = fopenp(wizkit, "r")) != (FILE *)0) {
+	    return(fp);
 #if defined(UNIX) || defined(VMS)
-		} else {
-		    /* access() above probably caught most problems for UNIX */
-		    raw_printf("Couldn't open requested config file %s (%d).",
-					wizkit, errno);
-		    wait_synch();
+	} else {
+	    /* access() above probably caught most problems for UNIX */
+	    raw_printf("Couldn't open requested config file %s (%d).",
+				wizkit, errno);
+	    wait_synch();
 #endif
-		}
 	}
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
@@ -1652,7 +1652,6 @@ fopen_wizkit_file()
 # endif
 #endif
 	return (FILE *)0;
-
 }
 
 void
