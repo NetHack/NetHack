@@ -26,7 +26,7 @@ OPTIONS=map_mode:tiles,scroll_margin:5
 OPTIONS=align_message:top,hilite_pet
 #
 # Menu settings
-OPTIONS=font_menu:Arial,font_size_menu:9,menu_tab_sep
+OPTIONS=font_menu:Arial,font_size_menu:9
 #
 # Status window settings
 OPTIONS=font_size_status:10
