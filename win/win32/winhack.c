@@ -153,6 +153,27 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	GetModuleFileName(NULL, wbuf, BUFSZ);
 	argv[0] = _strdup(NH_W2A(wbuf, buf, BUFSZ));
 
+    if (argc == 2) {
+	    TCHAR *savefile = strdup(argv[1]);
+	    TCHAR *plname;
+        for (p = savefile; *p && *p != '-'; p++)
+            ;
+        if (*p) {
+            /* we found a '-' */
+            plname = p + 1;
+            for (p = plname; *p && *p != '.'; p++)
+                ;
+            if (*p) {
+                if (strcmp(p + 1, "NetHack-saved-game") == 0) {
+                    *p = '\0';
+                    argv[1] = "-u";
+                    argv[2] = _strdup(plname);
+                    argc = 3;
+                }
+            }
+        }
+        free(savefile);
+    }
 	pcmain(argc,argv);
 
 	moveloop();
