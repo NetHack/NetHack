@@ -20,6 +20,10 @@ extern int FDECL(vms_creat, (const char *,unsigned));
 extern int FDECL(vms_open, (const char *,int,unsigned));
 #endif	/* VMS */
 
+#if defined(WIN32) && !defined(WIN_CE)
+static boolean is_NetHack_process(pid);
+#endif
+
 int FDECL(restore_savefile, (char *));
 void FDECL(set_levelfile_name, (int));
 int FDECL(open_levelfile, (int));
@@ -230,6 +234,15 @@ char *basename;
 	    Close(gfd);
 	    return(-1);
 	}
+#if defined(WIN32) && !defined(WIN_CE)
+	if (is_NetHack_process(hpid)) {
+		Fprintf(stderr, "%s\n%s%s%s\n",
+	   "Those level files belong to an active NetHack process and cannot be recovered.",
+		"recovery for \"", basename, "\" aborting.");
+		Close(gfd);
+		return(-1);
+	}
+#endif
 	if (read(gfd, (genericptr_t) &savelev, sizeof(savelev))
 							!= sizeof(savelev)) {
 	    Fprintf(stderr,
@@ -382,6 +395,39 @@ void nhce_message(FILE* f, const char* str, ...)
     va_end(ap);
 
 	MessageBox(NULL, NH_A2W(buf, wbuf, NHSTR_BUFSIZE), TEXT("Recover"), MB_OK);
+}
+#endif
+
+#if defined(WIN32) && !defined(WIN_CE)
+#include <tlhelp32.h>
+
+boolean
+is_NetHack_process(pid) 
+int pid;
+{ 
+    HANDLE hProcessSnap = NULL; 
+    PROCESSENTRY32 pe32      = {0};
+    boolean bRet      = FALSE; 
+ 
+    hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); 
+    if (hProcessSnap == INVALID_HANDLE_VALUE) 
+        return FALSE; 
+ 
+    /*  Set size of the processentry32 structure before using it. */
+    pe32.dwSize = sizeof(PROCESSENTRY32); 
+    if (Process32First(hProcessSnap, &pe32)) { 
+        do {
+            if (pe32.th32ProcessID == (unsigned)pid &&
+            	(!strcmpi(pe32.szExeFile, "nethack.exe") ||
+            	 !strcmpi(pe32.szExeFile, "nethackw.exe")))
+	    bRet = TRUE;
+        }
+        while (Process32Next(hProcessSnap, &pe32)); 
+    } 
+    else 
+        bRet = FALSE;
+    CloseHandle(hProcessSnap); 
+    return bRet; 
 }
 #endif
 

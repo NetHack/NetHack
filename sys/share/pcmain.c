@@ -342,7 +342,11 @@ char *argv[];
 	if (fd < 0) {
 		raw_print("Cannot create lock file");
 	} else {
+#ifdef WIN32
+		hackpid = GetCurrentProcessId();
+#else
 		hackpid = 1;
+#endif
 		write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
 		close(fd);
 	}

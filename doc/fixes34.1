@@ -207,7 +207,6 @@ zero entries in DUNGEON, MONSTERS, et al, of config file are now treated
 	as preserving the default rather than being ignored
 enlightenment: don't misreport polymorphed lycanthrope as "in beast form"
 remove TIMED_DELAY from the features checked for version compatibility
-rolling boulder hitting monster stuck in pit should stop even when mon survives
 
 
 Platform- and/or Interface-Specific Fixes
@@ -216,6 +215,8 @@ wince: added Windows CE port from Alex Kompel
 win32: win32 build no longer defines MICRO
 win32: allow error save files to be generated
 win32: strip illegal file name characters from plname and replace with '_'
+win32: don't let recover build a save file out of level files belonging 
+	to an active NetHack.exe or NetHackw.exe process
 win32gui: make error() work; it was essentially non-operative in 3.4.0
 win32gui: fix alignment of columns in menu windows
 win32gui: Window menu File|Save worked during #quit disclosure processing
@@ -227,6 +228,7 @@ win32gui: A caret bug was fixed
 win32gui: fix bug that caused two lines too many to be drawn on each paint
 win32gui: last line no longer highlighted
 win32gui: reduce the number of popups and support for !popup
+win32gui: support for not having popup windows
 win32tty: honour the use_inverse option and default to ATR_BOLD if disabled
 win32tty: respond only to mouse clicks not mouse movement
 win32tty: allow ^C to abort the game at the "Who are you?" prompt
