@@ -4,6 +4,7 @@ General Fixes and Modified Features
 -----------------------------------
 setmangry should not be called when a monster enters a bones region
 avoid panic when secondary weapon is cursed while generating bones level
+typos fixed in data.base
 
 
 Platform- and/or Interface-Specific Fixes
