@@ -377,7 +377,9 @@ register int roomno;
 
 		    if(!(mtmp = makemon(&mons[PM_GHOST],u.ux,u.uy,NO_MM_FLAGS)))
 			return;
-		    pline("An enormous ghost appears next to you!");
+		    if (!Blind || sensemon(mtmp))
+			pline("An enormous ghost appears next to you!");
+		    else You("sense a presence close by!");
 		    mtmp->mpeaceful = 0;
 		    set_malign(mtmp);
 		    if(flags.verbose)
