@@ -201,30 +201,31 @@ doit:
 	   mon->data->mlet != S_EEL && haseyes(mon->data) && mon->mcanmove &&
 	   !mon->mstun && !mon->mconf && !mon->msleeping &&
 	   mon->data->mmove >= 12) {
-		if(!nohands(mon->data) && !rn2(martial() ? 5 : 3)) {
-		    pline("%s blocks your %skick.", Monnam(mon),
-				clumsy ? "clumsy " : "");
+	    if(!nohands(mon->data) && !rn2(martial() ? 5 : 3)) {
+		pline("%s blocks your %skick.", Monnam(mon),
+		      clumsy ? "clumsy " : "");
+		(void) passive(mon, FALSE, 1, AT_KICK, FALSE);
+		return;
+	    } else {
+		mnexto(mon);
+		if(mon->mx != x || mon->my != y) {
+		    if(glyph_is_invisible(levl[x][y].glyph)) {
+			unmap_object(x, y);
+			newsym(x, y);
+		    }
+		    pline("%s %s, %s evading your %skick.", Monnam(mon),
+			  (!level.flags.noteleport && can_teleport(mon->data)) ?
+				"teleports" :
+				is_floater(mon->data) ? "floats" :
+				is_flyer(mon->data) ? "swoops" :
+				(nolimbs(mon->data) || slithy(mon->data)) ?
+					"slides" : "jumps",
+			  clumsy ? "easily" : "nimbly",
+			  clumsy ? "clumsy " : "");
 		    (void) passive(mon, FALSE, 1, AT_KICK, FALSE);
 		    return;
-		} else {
-		    mnexto(mon);
-		    if(mon->mx != x || mon->my != y) {
-			if(glyph_is_invisible(levl[x][y].glyph)) {
-			    unmap_object(x, y);
-			    newsym(x, y);
-			}
-			pline("%s %s, %s evading your %skick.", Monnam(mon),
-				(can_teleport(mon->data) ? "teleports" :
-				 is_floater(mon->data) ? "floats" :
-				 is_flyer(mon->data) ? "swoops" :
-				 (nolimbs(mon->data) || slithy(mon->data)) ?
-					"slides" : "jumps"),
-				clumsy ? "easily" : "nimbly",
-				clumsy ? "clumsy " : "");
-			(void) passive(mon, FALSE, 1, AT_KICK, FALSE);
-			return;
-		    }
 		}
+	    }
 	}
 	kickdmg(mon, clumsy);
 }
