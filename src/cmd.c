@@ -2392,7 +2392,6 @@ static
 void
 end_of_input()
 {
-	exit_nhwindows("End of input?");
 #ifndef NOSAVEONHANGUP
 # ifndef SAFERHANGUP
 	if (!program_state.done_hup++)
