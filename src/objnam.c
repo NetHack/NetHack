@@ -748,7 +748,15 @@ ring:
 	}
 	if(obj->owornmask & W_QUIVER) Strcat(bp, " (in quiver)");
 	if(obj->unpaid) {
+		xchar ox, oy; 
 		long quotedprice = unpaid_cost(obj);
+		struct monst *shkp = (struct monst *)0;
+
+		if (Has_contents(obj) &&
+		    get_obj_location(obj, &ox, &oy, BURIED_TOO|CONTAINED_TOO) &&
+		    costly_spot(ox, oy) &&
+		    (shkp = shop_keeper(*in_rooms(ox, oy, SHOPBASE))))
+			quotedprice += contained_cost(obj, shkp, 0L, FALSE, TRUE);
 		Sprintf(eos(bp), " (unpaid, %ld %s)",
 			quotedprice, currency(quotedprice));
 	}

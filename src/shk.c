@@ -1879,11 +1879,12 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
  * a different price quoted for selling as vs. buying.
  */
 long
-contained_cost(obj, shkp, price, usell)
+contained_cost(obj, shkp, price, usell, unpaid_only)
 register struct obj *obj;
 register struct monst *shkp;
 long price;
 register boolean usell;
+register boolean unpaid_only;
 {
 	register struct obj *otmp;
 
@@ -1898,12 +1899,13 @@ register boolean usell;
 			!(Is_candle(otmp) && otmp->age <
 				20L * (long)objects[otmp->otyp].oc_cost))
 		    price += set_cost(otmp, shkp);
-	    } else if (!otmp->no_charge) {
+	    } else if (!otmp->no_charge &&
+		      (!unpaid_only || (unpaid_only && otmp->unpaid))) {
 		    price += get_cost(otmp, shkp) * otmp->quan;
 	    }
 
 	    if (Has_contents(otmp))
-		    price += contained_cost(otmp, shkp, price, usell);
+		    price += contained_cost(otmp, shkp, price, usell, unpaid_only);
 	}
 
 	return(price);
@@ -2185,7 +2187,7 @@ register boolean ininv, dummy, silent;
 		    goto speak;
 		}
 	    } else {
-		cltmp += contained_cost(obj, shkp, cltmp, FALSE);
+		cltmp += contained_cost(obj, shkp, cltmp, FALSE, FALSE);
 		gltmp += contained_gold(obj);
 	    }
 
@@ -2491,6 +2493,7 @@ xchar x, y;
 	long ltmp = 0L, cltmp = 0L, gltmp = 0L, offer;
 	boolean saleitem, cgold = FALSE, container = Has_contents(obj);
 	boolean isgold = (obj->oclass == GOLD_CLASS);
+	boolean only_partially_your_contents = FALSE;
 
 	if(!(shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) ||
 	   !inhishop(shkp)) return;
@@ -2503,7 +2506,7 @@ xchar x, y;
 	}
 	if(container) {
 		/* find the price of content before subfrombill */
-		cltmp += contained_cost(obj, shkp, cltmp, TRUE);
+		cltmp += contained_cost(obj, shkp, cltmp, TRUE, FALSE);
 		/* find the value of contained gold */
 		gltmp += contained_gold(obj);
 		cgold = (gltmp > 0L);
@@ -2673,13 +2676,18 @@ move_on:
 		if (short_funds) offer = shkmoney;
 #endif
 		if (!sell_response) {
+		    only_partially_your_contents =
+			(contained_cost(obj, shkp, 0L, FALSE, FALSE) !=
+			 contained_cost(obj, shkp, 0L, FALSE, TRUE));
 		    Sprintf(qbuf,
 			 "%s offers%s %ld gold piece%s for%s %s %s.  Sell %s?",
 			    Monnam(shkp), short_funds ? " only" : "",
 			    offer, plur(offer),
-			    (!ltmp && cltmp) ? " the contents of" : "",
+			    (!ltmp && cltmp && only_partially_your_contents) ?
+			     " your items in" : (!ltmp && cltmp) ? " the contents of" : "",
 			    obj->unpaid ? "the" : "your", xname(obj),
-			    (obj->quan == 1L) ? "it" : "them");
+			    (obj->quan == 1L && !only_partially_your_contents) ?
+			    "it" : "them");
 		} else  qbuf[0] = '\0';		/* just to pacify lint */
 
 		switch (sell_response ? sell_response : ynaq(qbuf)) {
@@ -2696,6 +2704,8 @@ move_on:
 			    subfrombill(obj, shkp);
 			    pay(-offer, shkp);
 			    shk_names_obj(shkp, obj, (sell_how != SELL_NORMAL) ?
+			    	    only_partially_your_contents ?
+			    	    "sold some items inside %s for %ld gold pieces%s.%s" :
 				    "sold %s for %ld gold piece%s.%s" :
 	       "relinquish %s and receive %ld gold piece%s in compensation.%s",
 				    offer, "");
@@ -3586,7 +3596,7 @@ register struct obj *first_obj;
 	cost = (otmp->no_charge || otmp == uball || otmp == uchain) ? 0L :
 		get_cost(otmp, (struct monst *)0);
 	if (Has_contents(otmp))
-	    cost += contained_cost(otmp, shkp, 0L, FALSE);
+	    cost += contained_cost(otmp, shkp, 0L, FALSE, FALSE);
 	if (!cost) {
 	    Strcpy(price, "no charge");
 	} else {
@@ -3605,7 +3615,7 @@ register struct obj *first_obj;
 	    /* print cost in slightly different format, so can't reuse buf */
 	    cost = get_cost(first_obj, (struct monst *)0);
 	    if (Has_contents(first_obj))
-		cost += contained_cost(first_obj, shkp, 0L, FALSE);
+		cost += contained_cost(first_obj, shkp, 0L, FALSE, FALSE);
 	    pline("%s, price %ld %s%s%s", doname(first_obj),
 		cost, currency(cost), first_obj->quan > 1L ? " each" : "",
 		shk_embellish(first_obj, cost));

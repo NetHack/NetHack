@@ -1400,7 +1400,7 @@ no_unwear:
 
 	    if ((!obj->no_charge ||
 		 (Has_contents(obj) &&
-		    (contained_cost(obj, shkp, 0L, FALSE) != 0L)))
+		    (contained_cost(obj, shkp, 0L, FALSE, FALSE) != 0L)))
 	       && inhishop(shkp)) {
 		if(shkp->mpeaceful) {
 		    if(*u.ushops && *in_rooms(u.ux, u.uy, 0) ==
