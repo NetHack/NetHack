@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mcastu.c	3.3	97/11/02	*/
+/*	SCCS Id: @(#)mcastu.c	3.3	2002/01/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -76,8 +76,9 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 	if (mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) {
 	    spellnum = rn2(ml);
 	    /* not trying to attack?  don't allow directed spells */
-	    if (!thinks_it_foundyou && (!is_undirected_spell(mattk->adtyp, spellnum) || spell_would_be_useless(mtmp, mattk->adtyp, spellnum)))
-	    {
+	    if (!thinks_it_foundyou &&
+		    (!is_undirected_spell(mattk->adtyp, spellnum) ||
+		    spell_would_be_useless(mtmp, mattk->adtyp, spellnum))) {
 		if (foundyou)
 		    impossible("spellcasting monster found you and doesn't know it?");
 		return 0;
@@ -96,9 +97,10 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 	}
 
 	/* monster can cast spells, but is casting a directed spell at the
-           wrong place?  If so, give a message, and return.  Do this *after*
+	   wrong place?  If so, give a message, and return.  Do this *after*
 	   penalizing mspec_used. */
-	if (!foundyou && thinks_it_foundyou && !is_undirected_spell(mattk->adtyp, spellnum)) {
+	if (!foundyou && thinks_it_foundyou &&
+		!is_undirected_spell(mattk->adtyp, spellnum)) {
 	    pline("%s casts a spell at %s!",
 		canseemon(mtmp) ? Monnam(mtmp) : "It",
 		levl[mtmp->mux][mtmp->muy].typ == WATER
@@ -122,7 +124,9 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 	if (!foundyou) {
 	    dmg = 0;
 	    if (mattk->adtyp != AD_SPEL && mattk->adtyp != AD_CLRC) {
-		impossible("%s casting non-hand-to-hand version of hand-to-hand spell %d?", Monnam(mtmp), mattk->adtyp);
+		impossible(
+	      "%s casting non-hand-to-hand version of hand-to-hand spell %d?",
+			   Monnam(mtmp), mattk->adtyp);
 		return(0);
 	    }
 	} else if (mattk->damd)
@@ -132,7 +136,7 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 
 	ret = 1;
 
-	switch(mattk->adtyp)   {
+	switch (mattk->adtyp) {
 
 	    case AD_FIRE:
 		pline("You're enveloped in flames.");
@@ -175,11 +179,13 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 }
 
 /* monster wizard and cleric spellcasting functions */
-/* If dmg is zero, then the monster is not casting at you */
-/* If the monster is intentionally not casting at you, we have previously
-   called spell_would_be_useless() and the fallthroughs shouldn't happen */
-/* If you modify either of these, be sure to change is_undirected_spell()
-   and spell_would_be_useless(). */
+/*
+   If dmg is zero, then the monster is not casting at you.
+   If the monster is intentionally not casting at you, we have previously
+   called spell_would_be_useless() and the fallthroughs shouldn't happen.
+   If you modify either of these, be sure to change is_undirected_spell()
+   and spell_would_be_useless().
+ */
 STATIC_OVL
 void
 cast_wizard_spell(mtmp, dmg, spellnum)
