@@ -24,6 +24,9 @@ all:	$(VARDAT) spec_levs quest_levs dungeon
 ../util/tile2beos:
 	(cd ../util ; make tile2beos)
 
+../util/tile2bmp:
+	(cd ../util ; make tile2bmp)
+
 x11tiles: ../util/tile2x11 ../win/share/monsters.txt ../win/share/objects.txt \
 				../win/share/other.txt
 	../util/tile2x11 ../win/share/monsters.txt ../win/share/objects.txt \
@@ -33,6 +36,10 @@ beostiles: ../util/tile2beos ../win/share/monsters.txt ../win/share/objects.txt 
 				../win/share/other.txt
 	../util/tile2beos ../win/share/monsters.txt ../win/share/objects.txt \
 				../win/share/other.txt
+
+nhtiles.bmp: ../util/tile2bmp ../win/share/monsters.txt ../win/share/objects.txt \
+				../win/share/other.txt
+	../util/tile2bmp $@
 
 pet_mark.xbm: ../win/X11/pet_mark.xbm
 	cp ../win/X11/pet_mark.xbm pet_mark.xbm

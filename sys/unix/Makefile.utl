@@ -304,8 +304,12 @@ tile2x11: tile2x11.o $(TEXT_IO)
 tile2img.ttp: tile2img.o bitmfile.o $(TEXT_IO)
 	$(CC) $(LFLAGS) -o tile2img.ttp tile2img.o bitmfile.o $(TEXT_IO) $(LIBS)
 
+tile2bmp: tile2bmp.o $(TEXT_IO)
+	$(CC) $(LFLAGS) -o tile2bmp tile2bmp.o $(TEXT_IO)
+
 xpm2img.ttp: xpm2img.o bitmfile.o
 	$(CC) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
+
 tile2beos: tile2beos.o $(TEXT_IO)
 	$(CC) $(LFLAGS) -o tile2beos tile2beos.o $(TEXT_IO) -lbe
 
@@ -386,3 +390,7 @@ spotless: clean
 	-rm -f ../include/tile.h
 	-rm -f makedefs lev_comp dgn_comp recover dlb
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp tilemap
+
+tileedit: tileedit.cpp $(TEXT_IO)
+	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
+	$(CC) -o tileedit -I../include -I$(QTDIR)/include -L$(QTDIR)/lib tileedit.cpp $(TEXT_IO) -lqt
