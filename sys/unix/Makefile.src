@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.src	3.4	2001/12/09
+#	SCCS Id: @(#)Makefile.src	3.4	2002/03/02
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used
@@ -176,7 +176,7 @@ WINX11OBJ = Window.o dialogs.o winX.o winmap.o winmenu.o winmesg.o \
 # Files for a Qt port
 #
 WINQTSRC = ../win/Qt/qt_win.cpp ../win/Qt/qt_clust.cpp ../win/Qt/qttableview.cpp
-WINQTOBJ = qt_win.o qt_clust.o tile.o qttableview.o
+WINQTOBJ = qt_win.o qt_clust.o qttableview.o tile.o
 #
 # Files for a Gnome port
 #
