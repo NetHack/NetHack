@@ -912,13 +912,11 @@ struct obj *obj;
 			    You("need a pick to dig rock.");
 			else if (!ispick && (sobj_at(STATUE, rx, ry) ||
 					     sobj_at(BOULDER, rx, ry))) {
-			    struct obj *otmp;
 			    boolean vibrate = !rn2(3);
 			    pline("Sparks fly as you whack the %s.%s",
 				sobj_at(STATUE, rx, ry) ? "statue" : "boulder",
 				vibrate ? " The axe-handle vibrates violently!" : "");
 			    if (vibrate) losehp(2, "axing a hard object", KILLED_BY);
-			    if ((otmp = carrying(POT_OIL))) catch_lit(otmp);
 			}
 			else
 			    You("swing your %s through thin air.",
