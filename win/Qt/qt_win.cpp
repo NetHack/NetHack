@@ -1146,7 +1146,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 	a = rn2(ROLE_ALIGNS);
     }
     alignment[a]->setChecked(TRUE);
-    selectAlignment(g);
+    selectAlignment(a);
 
     QListViewItem* li;
 
@@ -1157,6 +1157,9 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     li = race->firstChild();
     while (ra--) li=li->nextSibling();
     race->setSelected(li,TRUE);
+
+    flags.initrace = race->selectedItemNumber();
+    flags.initrole = role->selectedItemNumber();
 }
 
 
