@@ -480,7 +480,18 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		case WM_CLOSE: 
 		{
 			/* exit gracefully */
+#ifdef SAFERHANGUP
+			/* destroy popup window - it has its own loop and we need to 
+			   return control to NetHack core at this point */
+			if( IsWindow( GetNHApp()->hPopupWnd ) )
+				SendMessage( GetNHApp()->hPopupWnd, WM_COMMAND, IDCANCEL, 0);
+
+			/* tell NetHack core that "hangup" is requested */
+			hangup(1);
+#else
 			dosave0();
+			terminate(EXIT_SUCCESS);
+#endif
 		} return 0;
 
 		/*-----------------------------------------------------------------------*/

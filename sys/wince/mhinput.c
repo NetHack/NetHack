@@ -33,7 +33,12 @@ void mswin_nh_input_init()
 /* check for input */
 int	mswin_have_input()
 {
-	return (nhi_read_pos!=nhi_write_pos);
+	return
+#ifdef SAFERHANGUP
+		/* we always have input (ESC) if hangup was requested */
+		program_state.done_hup || 
+#endif
+		(nhi_read_pos!=nhi_write_pos);
 }
 
 /* add event to the queue */
@@ -57,6 +62,16 @@ PMSNHEvent mswin_input_pop()
 {
 	PMSNHEvent retval;
 
+#ifdef SAFERHANGUP
+	/* always return ESC when hangup was requested */
+	if( program_state.done_hup ) {
+		static MSNHEvent hangup_event;
+		hangup_event.type = NHEVENT_CHAR;
+		hangup_event.kbd.ch = '\033';
+		return &hangup_event;
+	}
+#endif
+
 	if( !nhi_init_input ) mswin_nh_input_init();
 
 	if( nhi_read_pos!=nhi_write_pos ) {
@@ -73,6 +88,16 @@ PMSNHEvent mswin_input_pop()
 PMSNHEvent mswin_input_peek()
 {
 	PMSNHEvent retval;
+
+#ifdef SAFERHANGUP
+	/* always return ESC when hangup was requested */
+	if( program_state.done_hup ) {
+		static MSNHEvent hangup_event;
+		hangup_event.type = NHEVENT_CHAR;
+		hangup_event.kbd.ch = '\033';
+		return &hangup_event;
+	}
+#endif
 
 	if( !nhi_init_input ) mswin_nh_input_init();
 

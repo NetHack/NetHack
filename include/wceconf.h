@@ -74,6 +74,12 @@
 
 #define PORT_HELP	"porthelp"
 
+#define SAFERHANGUP /* Define SAFERHANGUP to delay hangup processing
+                     * until the main command loop. 'safer' because it
+                     * avoids certain cheats and also avoids losing
+                     * objects being thrown when the hangup occurs.
+                     */
+
 #if defined(WIN_CE_POCKETPC)
 #	define PORT_CE_PLATFORM "Pocket PC"
 #elif defined(WIN_CE_PS2xx)
