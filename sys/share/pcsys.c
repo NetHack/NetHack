@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pcsys.c	3.3	1999/12/10		  */
+/*	SCCS Id: @(#)pcsys.c	3.3	2002/01/22		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -451,7 +451,7 @@ const char *name, *mode;
 				ccnt++;
 			}
 			(void) strncpy(bp, name, (BUFSIZ - ccnt) - 2);
-			bp[BUFSIZ-1] = '\0';
+			bp[BUFSIZ - ccnt - 1] = '\0';
 			if ((fp = fopen(buf, mode)))
 				return fp;
 			if (*pp)
