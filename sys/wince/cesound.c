@@ -3,7 +3,7 @@
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */
 /*
- * cesound.c - Windows NT NetHack sound support
+ * cesound.c - Windows CE NetHack sound support
  *                                                  
  *
  */
