@@ -83,8 +83,9 @@ LEXYYC = lexyy.c
 
 USE_DLB = Y
 
-# djgpp ships with an ls.exe command so changing this should
-# not be necessary
+# djgpp includes ls.exe and touch.exe in fil41b.zip from the v2gnu 
+# folder so be sure to include that when downloading djgpp. Doing
+# so will make changing this unnecessary.
 
 LS = ls -1		# ls.exe from djgpp distribution
 #LS = dir /l/b		# DOS command
@@ -938,7 +939,7 @@ $(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors $(DAT)/dungeon \
 	@$(subst /,\,echo wizhelp >>dlb.lst)
 	@$(subst /,\,echo license >>dlb.lst)
 	@$(subst /,\,echo msdoshlp.txt >>dlb.lst)
-	@$(subst /,\,$(LS) *.lev >>dlb.lst)
+	$(LS) $(subst /,\,*.lev) >>dlb.lst
 	@$(subst /,\,$(U)dlb_main cvIf dlb.lst nhdat)
 	@$(subst /,\,cd $(SRC))
 
