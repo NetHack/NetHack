@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.3	2001/11/28	*/
+/*	SCCS Id: @(#)apply.c	3.3	2002/01/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,6 +37,7 @@ STATIC_DCL int FDECL(use_grapple, (struct obj *));
 STATIC_DCL int FDECL(do_break_wand, (struct obj *));
 STATIC_DCL boolean FDECL(figurine_location_checks,
 				(struct obj *, coord *, BOOLEAN_P));
+STATIC_DCL boolean NDECL(uhave_greystone);
 
 #ifdef	AMIGA
 void FDECL( amii_speaker, ( struct obj *, char *, int ) );
@@ -1771,18 +1772,24 @@ struct obj *otmp;
 	struct obj *obj;
 	char allowall[2];
 	const char *color = 0;
-	static const char *ambiguous = "You make scratch marks on the stone";
+	static const char *ambiguous = "You make scratch marks on the stone.";
+	const char *scritch = "\"scritch, scritch\"";
 
 	allowall[0] = ALL_CLASSES;
 	allowall[1] = '\0';
 	if (!(obj = getobj(allowall, "rub on the stone")))
 	    return;
 
+	if (otmp == obj) {
+	    You_cant("rub %s on itself.", the(xname(obj)));
+	    return;
+	}
+
 	if (otmp->cursed && obj->oclass == GEM_CLASS && rnd(5) == 1) {
 	    pline(
 		(Blind ? "You feel something shatter" :
-		 (Hallucination ? "Oh, wow, look at the pretty shards" :
-		 "A sharp crack shatters %s %s")),
+		 (Hallucination ? "Oh, wow, look at the pretty shards." :
+		 "A sharp crack shatters %s %s.")),
 		(obj->quan == 1 ? "the" : "a"),
 		lcase(makesingular(let_to_name(obj->oclass, FALSE))));
 	    useup(obj);
@@ -1790,7 +1797,7 @@ struct obj *otmp;
 	}
 
 	if (Blind) {
-	    pline("\"scritch, scritch\"");
+	    pline(scritch);
 	    return;
 	}
 
@@ -1824,10 +1831,10 @@ struct obj *otmp;
 	    color = c_obj_colors[objects[obj->otyp].oc_color];
 	    break;
 	  default:
-	    pline("\"scritch, scritch\"");
+	    pline(scritch);
 	    return;
 	}
-	pline("You see %s streaks on the stone", color);
+	pline("You see %s streaks on the stone.", color);
 	return;
 }
 
@@ -2479,6 +2486,19 @@ do_break_wand(obj)
     return 1;
 }
 
+boolean uhave_greystone()
+{
+	register struct obj *otmp;
+
+	for(otmp = invent; otmp; otmp = otmp->nobj)
+		if(otmp->otyp == LOADSTONE ||
+		   otmp->otyp == FLINT ||
+		   otmp->otyp == LUCKSTONE ||
+		   otmp->otyp == TOUCHSTONE)
+			return TRUE;
+	return FALSE;
+}
+
 int
 doapply()
 {
@@ -2486,7 +2506,7 @@ doapply()
 	register int res = 1;
 
 	if(check_capacity((char *)0)) return (0);
-	obj = getobj(carrying(POT_OIL) || carrying(TOUCHSTONE)
+	obj = getobj(carrying(POT_OIL) || uhave_greystone()
 		? tools_too : tools, "use or apply");
 	if(!obj) return 0;
 
@@ -2671,6 +2691,9 @@ doapply()
 	case BEARTRAP:
 		use_trap(obj);
 		break;
+	case FLINT:
+	case LUCKSTONE:
+	case LOADSTONE:
 	case TOUCHSTONE:
 		use_stone(obj);
 		break;
