@@ -1328,7 +1328,7 @@ specialmaze *maze;
 		    return FALSE;
 
 	    /* The gold piles */
-	    Write(fd, &(pt->ngold), sizeof(pt->naltar));
+	    Write(fd, &(pt->ngold), sizeof(pt->ngold));
 	    for(j=0;j<pt->ngold;j++) {
 		    Write(fd, pt->golds[j], sizeof(gold));
 		    Free(pt->golds[j]);
