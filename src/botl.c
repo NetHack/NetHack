@@ -408,10 +408,8 @@ init_blstats()
 		/* ensure initial field values set on blstats[1][i] too */
 		blstats[1][i] = blstats[0][i];
 
-		switch(blstats[0][i].anytype) {
-			blstats[0][i].a.a_ulong = 0UL;
-			blstats[1][i].a.a_ulong = 0UL;
-		}
+		blstats[0][i].a.a_ulong = 0UL;
+		blstats[1][i].a.a_ulong = 0UL;
 		if (blstats[0][i].valwidth) {
 		    blstats[0][i].val = (char *)alloc(blstats[0][i].valwidth);
 		    blstats[1][i].val = (char *)alloc(blstats[0][i].valwidth);
