@@ -192,7 +192,7 @@ const char *verb;
 		}
 		water_damage(obj, FALSE, FALSE);
 	} else if (u.ux == x && u.uy == y &&
-		(!u.utrap || (u.utrap && u.utraptype != TT_PIT)) &&
+		(!u.utrap || u.utraptype != TT_PIT) &&
 		(t = t_at(x,y)) != 0 && t->tseen &&
 			(t->ttyp==PIT || t->ttyp==SPIKED_PIT)) {
 		/* you escaped a pit and are standing on the precipice */
