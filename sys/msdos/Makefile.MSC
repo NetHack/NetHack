@@ -1,5 +1,5 @@
-#	SCCS Id: @(#)Makefile.MSC	      3.4     2000/08/20
-#	Copyright (c) NetHack PC Development Team 1997, 2000.
+#	SCCS Id: @(#)Makefile.MSC	      3.4     2002/03/17
+#	Copyright (c) NetHack PC Development Team 1997 - 2002.
 #	PC NetHack 3.4 Makefile for MSC
 #
 #	For questions or comments: nethack-bugs@nethack.org
@@ -17,7 +17,7 @@
 # NOTE: Make sure GAMEDIR exists before make is started.
 
 GAME = nethack
-GAMEDIR = \games\nethack
+GAMEDIR =..\binary
 
 #
 # Directories

@@ -1,9 +1,9 @@
-#	SCCS Id: @(#)Makefile.GCC	      3.4     1999/11/06
-#	Copyright (c) NetHack PC Development Team 1996.
+#	SCCS Id: @(#)Makefile.GCC	      3.4     2002/03/17
+#	Copyright (c) NetHack PC Development Team 1996-2002.
 #	PC NetHack 3.4 Makefile for djgpp V2
 #
 #	Gnu gcc compiler for msdos (djgpp)
-#	Requires Gnu Make utility (V3.73 or greater) supplied with djgpp V2
+#	Requires Gnu Make utility (V3.79 or greater) supplied with djgpp
 #
 #	For questions or comments: devteam@nethack.org
 #
@@ -23,7 +23,7 @@
 
 GAME = nethack
 # The GNU Make has a problem if you include a drive spec below (unfortunately).
-GAMEDIR = \games\nethackd
+GAMEDIR =..\binary
 
 #
 # Directories, gcc likes unix style directory specs

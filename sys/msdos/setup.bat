@@ -1,10 +1,10 @@
 @echo off
-REM    SCCS Id: @(#)setup.bat   97/09/28
-REM    Copyright (c) NetHack PC Development Team 1990 - 1997
+REM    SCCS Id: @(#)setup.bat   2002/03/17
+REM    Copyright (c) NetHack PC Development Team 1990 - 2002
 REM    NetHack may be freely redistributed.  See license for details.
 
 echo.
-echo   Copyright (c) NetHack PC Development Team 1990 - 1997
+echo   Copyright (c) NetHack PC Development Team 1990 - 2002
 echo   NetHack may be freely redistributed.  See license for details.
 echo.
 REM setup batch file for msdos, see Install.dos for details.
@@ -21,6 +21,9 @@ if not exist ..\..\util\makedefs.c goto err_dir
 if not exist ..\..\win\tty\wintty.c goto err_dir
 if not exist ..\share\lev_yacc.c   goto err_dir
 echo Directories OK.
+
+if not exist ..\..\binary\* mkdir ..\..\binary
+if NOT exist ..\..\binary\license copy ..\..\dat\license ..\..\binary\license >nul
 
 if exist ..\..\dat\data.bas goto long1ok
 if exist ..\..\dat\data.base goto long1a
