@@ -3946,6 +3946,7 @@ char NetHackQtYnDialog::Exec()
     QString enable;
     if ( qt_compact_mode && !choices ) {
 	// expand choices from prompt
+	// ##### why isn't choices set properly???
 	const char* c=question;
 	while ( *c && *c != '[' )
 	    c++;
@@ -3956,13 +3957,16 @@ char NetHackQtYnDialog::Exec()
 		ch.append(*c++);
 	    char from=0;
 	    while ( *c && *c != ']' && *c != ' ' ) {
-		if ( *c == '-' )
+		if ( *c == '-' ) {
 		    from = c[-1];
-		else if ( from )
-		    for (char f=from; f<=*c; f++)
+		} else if ( from ) {
+		    for (char f=from+1; f<=*c; f++)
 			ch.append(f);
-		else
+		    from = 0;
+		} else {
 		    ch.append(*c);
+		    from = 0;
+		}
 		c++;
 	    }
 	    if ( *c == ' ' ) {
@@ -4415,8 +4419,10 @@ NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
 
 int NetHackQtSavedGameSelector::choose()
 {
+#if defined(QWS) // probably safe with Qt 3, too (where show!=exec in QDialog).
     if ( qt_compact_mode )
 	showMaximized();
+#endif
     return exec()-2;
 }
 
