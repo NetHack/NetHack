@@ -25,7 +25,7 @@ continue to contribute to the win32 port, and that invitation was accepted.
 
 
 You can build either the TTY version of NetHack or the Windows Graphical 
-version.  In either case you will need one of the following build 
+version.  In either case you can use one of the following build
 environments:
 
   o A copy of Microsoft Visual C V6.0 SP3 or later.  Things may work with 
@@ -38,6 +38,15 @@ environments:
     version of its command line tools available for download after
     registration at:
     http://www.borland.com/bcppbuilder/freecompiler/.
+
+Additionally, you can build a TTY version of NetHack with the following
+build environment:
+
+  o A copy of MinGW 1.0. MinGW is a collection of header files and import
+    libraries with which native Windows32 programs can be made; MinGW 1.0
+    ships with the GNU Compiler Collection.
+    You can download MinGW at
+    http://www.mingw.org/
 
 
 FIRST STEP:
@@ -80,6 +89,7 @@ I.  Dispelling the Myths:
 
         o Microsoft Visual C++ V6.0 SP3 or greater
         o Borland C 5.5.1
+        o MinGW 1.0 with GCC 2.95.3-6
 
     The Microsoft Visual C Makefile was created for use with MS NMAKE 
     which is provided with the Microsoft compiler. The supplied Makefile
@@ -88,6 +98,9 @@ I.  Dispelling the Myths:
 
     The Borland C Makefile was created for use with Borland MAKE 
     which is provided with the Borland compiler.
+
+    The GCC Makefile was created for use with GNU Make version 3.79.1,
+    which comes with the MinGW package.
 
     You may find it useful to obtain copies of lex (flex) and yacc (bison,
     or byacc).  While not strictly necessary to compile nethack, they are 
@@ -104,12 +117,14 @@ Setting Up
 1.  It almost goes without saying that you should make sure that your tools
     are set up and running correctly.  That includes ensuring that all the
     necessary environment variables for the compiler environment
-    are set correctly.  ( Examples: For the Microsoft compiler by 
+    are set correctly.  (Examples: For the Microsoft compiler by
     executing vcvars32.bat, which is probably in the bin directory of 
     your compilers directory tree. For the Borland Makefile, you can 
     simply invoke the Make utility from the Makefile's directory (For 
     the standard Borland compiler installation you can just 
-    use the explicit path "c:\borland\bcc55\bin\make /f Makefile.bcc")
+    use the explicit path "c:\borland\bcc55\bin\make /f Makefile.bcc".
+    For the GCC Makefile, add <mingw>\bin to your path, where <mingw> is
+    your MinGW root directory.)
 
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
@@ -183,7 +198,10 @@ Compiling
     For Borland compiler:
         make /f Makefile.bcc install
 
-    If you get any errors along the way  then something has not been set 
+    For GCC:
+        make -f Makefile.gcc install
+
+    If you get any errors along the way then something has not been set
     up correctly. The time it takes to compile depends on your particular 
     machine of course, but you should be able to go for lunch and return 
     to find everything finished.  The less memory, and slower your machine, 
@@ -239,10 +257,13 @@ Notes:
     For Borland compiler:
         make /f Makefile.bcc
 
-    If you add, delete, or reorder monsters or
-    objects, or you change the format of saved level files, delete any save
-    and bones files.  (Trying to use such files sometimes produces amusing
-    confusions on the game's part, but usually crashes.)
+    For GCC:
+        make -f Makefile.gcc
+
+    If you add, delete, or reorder monsters or objects, or you change the
+    format of saved level files, delete any save and bones files.  (Trying
+    to use such files sometimes produces amusing confusions on the game's
+    part, but usually crashes.)
 
     If you made changes to any of the level compiler software, you may have
     to delete dgn_flex.c, dgn_yacc.c, lev_flex.c, and lev_yacc.c from the
