@@ -1188,3 +1188,5 @@ nh_compose_ascii_screenshot()
 	free( text );
 	return retval;
 }
+
+
