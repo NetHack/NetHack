@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.4	2002/01/17	*/
+/*	SCCS Id: @(#)cmd.c	3.4	2002/06/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -566,6 +566,7 @@ wiz_mon_polycontrol()
     return 0;
 }
 
+/* #levelchange command */
 STATIC_PTR int
 wiz_level_change()
 {
@@ -591,7 +592,7 @@ wiz_level_change()
 	}
 	if (newlevel < 1) newlevel = 1;
 	while (u.ulevel > newlevel)
-	    losexp((const char *)0);
+	    losexp("#levelchange");
     } else {
 	if (u.ulevel >= MAXULEV) {
 	    You("are already as experienced as you can get.");

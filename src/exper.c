@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)exper.c	3.4	2002/01/15	*/
+/*	SCCS Id: @(#)exper.c	3.4	2002/06/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -115,7 +115,14 @@ const char *drainer;	/* cause of death, if drain should be fatal */
 {
 	register int num;
 
-	if (resists_drli(&youmonst)) return;
+#ifdef WIZARD
+	/* override life-drain resistance when handling an explicit
+	   wizard mode request to reduce level; never fatal though */
+	if (drainer && !strcmp(drainer, "#levelchange"))
+	    drainer = 0;
+	else
+#endif
+	    if (resists_drli(&youmonst)) return;
 
 	if (u.ulevel > 1) {
 		pline("%s level %d.", Goodbye(), u.ulevel--);
@@ -140,10 +147,10 @@ const char *drainer;	/* cause of death, if drain should be fatal */
 
 	if (u.ulevel < urole.xlev)
 	    num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.lornd + urace.enadv.lornd,
-	    		urole.enadv.lofix + urace.enadv.lofix);
+			urole.enadv.lofix + urace.enadv.lofix);
 	else
 	    num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.hirnd + urace.enadv.hirnd,
-	    		urole.enadv.hifix + urace.enadv.hifix);
+			urole.enadv.hifix + urace.enadv.hifix);
 	num = enermod(num);		/* M. Stephenson */
 	u.uenmax -= num;
 	if (u.uenmax < 0) u.uenmax = 0;
