@@ -87,7 +87,7 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 		lgfnt.lfItalic			=	FALSE;		         // italic attribute option
 		lgfnt.lfUnderline		=	FALSE;			     // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-		lgfnt.lfCharSet			=	OEM_CHARSET;     // character set identifier
+		lgfnt.lfCharSet			=	iflags.IBMgraphics? OEM_CHARSET : ANSI_CHARSET;     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
@@ -109,7 +109,7 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
 		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;				// strikeout attribute option
-		lgfnt.lfCharSet			=	OEM_CHARSET;     // character set identifier
+		lgfnt.lfCharSet			=	iflags.IBMgraphics? OEM_CHARSET : ANSI_CHARSET;     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
@@ -132,7 +132,7 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
 		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-		lgfnt.lfCharSet			=	OEM_CHARSET;     // character set identifier
+		lgfnt.lfCharSet			=	iflags.IBMgraphics? OEM_CHARSET : ANSI_CHARSET;     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
@@ -154,7 +154,7 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 		lgfnt.lfItalic			=	(attr==ATR_BLINK)? TRUE: FALSE;		     // italic attribute option
 		lgfnt.lfUnderline		=	(attr==ATR_ULINE)? TRUE : FALSE;		 // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-		lgfnt.lfCharSet			=	OEM_CHARSET;     // character set identifier
+		lgfnt.lfCharSet			=	iflags.IBMgraphics? OEM_CHARSET : ANSI_CHARSET;     // character set identifier
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality

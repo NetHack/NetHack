@@ -159,12 +159,18 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	lgfnt.lfItalic			=	FALSE;				 // italic attribute option
 	lgfnt.lfUnderline		=	FALSE;				 // underline attribute option
 	lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option
-	lgfnt.lfCharSet			=	OEM_CHARSET;         // character set identifier
+	lgfnt.lfCharSet			=	iflags.IBMgraphics? OEM_CHARSET : ANSI_CHARSET;     // character set identifier
 	lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 	lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 	lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
-	lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
-	_tcscpy(lgfnt.lfFaceName, NHMAP_FONT_NAME);
+	if( iflags.wc_font_map &&
+		*iflags.wc_font_map ) {
+		lgfnt.lfPitchAndFamily	= DEFAULT_PITCH;		 // pitch and family
+		NH_A2W(iflags.wc_font_map, lgfnt.lfFaceName, LF_FACESIZE);
+	} else {
+		lgfnt.lfPitchAndFamily	= FIXED_PITCH;		 // pitch and family
+		NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+	}
 	data->hMapFont = CreateFontIndirect(&lgfnt);
 
 	mswin_cliparound(data->xCur, data->yCur);
