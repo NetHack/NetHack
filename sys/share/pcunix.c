@@ -106,9 +106,9 @@ getlock()
 	/* we ignore QUIT and INT at this point */
 	if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
 		wait_synch();
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 		chdirx(orgdir, 0);
-#endif
+# endif
 		error("Quitting.");
 	}
 
@@ -118,15 +118,15 @@ getlock()
 	fq_lock = fqname(lock, LEVELPREFIX, 1);
 	if((fd = open(fq_lock,0)) == -1) {
 		if(errno == ENOENT) goto gotlock;    /* no such file */
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 		chdirx(orgdir, 0);
-#endif
-#if defined(WIN32)
+# endif
+# if defined(WIN32)
 		error("Bad directory or name: %s\n%s\n",
 				fq_lock, strerror(errno));
-#else
+# else
 		perror(fq_lock);
-#endif
+# endif
 		unlock_file(HLOCK); 
 		error("Cannot open %s", fq_lock);
 	}
@@ -134,9 +134,13 @@ getlock()
 	(void) close(fd);
 
 	if(iflags.window_inited) { 
+# ifdef SELF_RECOVER
+	  c = yn("There are files from a game in progress under your name. Recover?");
+# else
 	  pline("There is already a game in progress under your name.");
 	  pline("You may be able to use \"recover %s\" to get it back.\n",tbuf);
 	  c = yn("Do you want to destroy the old game?");
+# endif
 	} else {
 # if defined(MSDOS) && defined(NO_TERMS)
 		grmode = iflags.grmode;
@@ -144,10 +148,15 @@ getlock()
 # endif
 		c = 'n';
 		ct = 0;
+# ifdef SELF_RECOVER
+		msmsg(
+		"There are files from a game in progress under your name. Recover? [yn]");
+# else
 		msmsg("\nThere is already a game in progress under your name.\n");
 		msmsg("If this is unexpected, you may be able to use \n");
 		msmsg("\"recover %s\" to get it back.",tbuf);
 		msmsg("\nDo you want to destroy the old game? [yn] ");
+# endif
 		while ((ci=nhgetch()) != '\n') {
 		    if (ct > 0) {
 # if defined(WIN32CON)
@@ -166,23 +175,38 @@ getlock()
 		}
 	}
 	if(c == 'y' || c == 'Y')
+# ifndef SELF_RECOVER
 		if(eraseoldlocks()) {
-# if defined(WIN32CON)
+#  if defined(WIN32CON)
 			clear_screen();		/* display gets fouled up otherwise */
-# endif
+#  endif
 			goto gotlock;
 		} else {
 			unlock_file(HLOCK);
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+#  if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 			chdirx(orgdir, 0);
-#endif
+#  endif
 			error("Couldn't destroy old game.");
 		}
+# else /*SELF_RECOVER*/
+		if(recover_savefile()) {
+#  if defined(WIN32CON)
+			clear_screen();		/* display gets fouled up otherwise */
+#  endif
+			goto gotlock;
+		} else {
+			unlock_file(HLOCK);
+#  if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+			chdirx(orgdir, 0);
+#  endif
+			error("Couldn't recover old game.");
+		}
+# endif /*SELF_RECOVER*/
 	else {
 		unlock_file(HLOCK);
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 		chdirx(orgdir, 0);
-#endif
+# endif
 		error("%s", "");
 	}
 
@@ -191,28 +215,28 @@ gotlock:
 	if (fd == -1) ern = errno;
 	unlock_file(HLOCK);
 	if(fd == -1) {
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 		chdirx(orgdir, 0);
-#endif
-#if defined(WIN32)
+# endif
+# if defined(WIN32)
 		error("cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n", 
 				fq_lock, strerror(ern), " Are you sure that the directory",
 				fqn_prefix[LEVELPREFIX]);
-#else
+# else
 		error("cannot creat file (%s.)", fq_lock);
-#endif
+# endif
 	} else {
 		if(write(fd, (char *) &hackpid, sizeof(hackpid))
 		    != sizeof(hackpid)){
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 			chdirx(orgdir, 0);
-#endif
+# endif
 			error("cannot write lock (%s)", fq_lock);
 		}
 		if(close(fd) == -1) {
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 			chdirx(orgdir, 0);
-#endif
+# endif
 			error("cannot close lock (%s)", fq_lock);
 		}
 	}
@@ -220,7 +244,7 @@ gotlock:
 	if (grmode) gr_init();
 # endif
 }	
-# endif /* PC_LOCKING */
+#endif /* PC_LOCKING */
 
 # ifndef WIN32
 void

@@ -234,6 +234,39 @@ void win32_abort()
 	abort();
 }
 
+#if !defined(WIN_CE)
+#include <tlhelp32.h>
+boolean
+is_NetHack_process(pid) 
+int pid;
+{ 
+    HANDLE hProcessSnap = NULL; 
+    PROCESSENTRY32 pe32      = {0};
+    boolean bRet      = FALSE; 
+ 
+    hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); 
+    if (hProcessSnap == INVALID_HANDLE_VALUE) 
+        return FALSE; 
+ 
+    /*  Set size of the processentry32 structure before using it. */
+    pe32.dwSize = sizeof(PROCESSENTRY32); 
+    if (Process32First(hProcessSnap, &pe32)) { 
+        do {
+            if (pe32.th32ProcessID == (unsigned)pid && pe32.szExeFile &&
+	       ((strlen(pe32.szExeFile) >= 12 &&
+		 !strcmpi(&pe32.szExeFile[strlen(pe32.szExeFile) - 12], "nethackw.exe")) ||
+		(strlen(pe32.szExeFile) >= 11 &&
+        	 !strcmpi(&pe32.szExeFile[strlen(pe32.szExeFile) - 11], "nethack.exe"))))
+	    bRet = TRUE;
+        }
+        while (Process32Next(hProcessSnap, &pe32)); 
+    } 
+    else 
+        bRet = FALSE;
+    CloseHandle(hProcessSnap); 
+    return bRet; 
+}
+#endif /* WIN_CE*/
 #endif /* WIN32 */
 
 /*winnt.c*/

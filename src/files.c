@@ -132,6 +132,9 @@ int FDECL(parse_config_line, (FILE *,char *,char *,char *));
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
+#ifdef SELF_RECOVER
+STATIC_DCL boolean FDECL(copy_bytes, (int, int));
+#endif
 
 
 /*
@@ -2082,5 +2085,168 @@ const char* s;
 }
 
 /* ----------  END PANIC/IMPOSSIBLE LOG ----------- */
+
+#ifdef SELF_RECOVER
+
+/* ----------  BEGIN INTERNAL RECOVER ----------- */
+boolean
+recover_savefile()
+{
+	int gfd, lfd, sfd;
+	int lev, savelev, hpid;
+	xchar levc;
+	struct version_info version_data;
+	int processed[256];
+	char savename[SAVESIZE];
+
+	for (lev = 0; lev < 256; lev++)
+		processed[lev] = 0;
+
+	/* level 0 file contains:
+	 *	pid of creating process (ignored here)
+	 *	level number for current level of save file
+	 *	name of save file nethack would have created
+	 *	and game state
+	 */
+	gfd = open_levelfile(0);
+	if (gfd < 0) {
+	    raw_printf("Cannot open level 0 for %s.\n", lock);
+	    return FALSE;
+	}
+	if (read(gfd, (genericptr_t) &hpid, sizeof hpid) != sizeof hpid) {
+	    raw_printf(
+"\nCheckpoint data incompletely written or subsequently clobbered. Recovery impossible.");
+	    (void)close(gfd);
+	    return FALSE;
+	}
+#if defined(WIN32) && !defined(WIN_CE)
+	if (is_NetHack_process(hpid)) {
+		raw_printf(
+	  "\nThe level files belong to an active NetHack process and cannot be recovered.");
+		(void)close(gfd);
+		return FALSE;
+	}
+#endif
+	if (read(gfd, (genericptr_t) &savelev, sizeof(savelev))
+							!= sizeof(savelev)) {
+	    raw_printf("\nCheckpointing was not in effect for %s -- recovery impossible.\n",
+			lock);
+	    (void)close(gfd);
+	    return FALSE;
+	}
+	if ((read(gfd, (genericptr_t) savename, sizeof savename)
+		!= sizeof savename) ||
+	    (read(gfd, (genericptr_t) &version_data, sizeof version_data)
+		!= sizeof version_data)) {
+	    raw_printf("\nError reading %s -- can't recover.\n", lock);
+	    (void)close(gfd);
+	    return FALSE;
+	}
+
+	/* save file should contain:
+	 *	version info
+	 *	current level (including pets)
+	 *	(non-level-based) game state
+	 *	other levels
+	 */
+	set_savefile_name();
+	sfd = create_savefile();
+	if (sfd < 0) {
+	    raw_printf("\nCannot recover savefile %s.\n", SAVEF);
+	    (void)close(gfd);
+	    return FALSE;
+	}
+
+	lfd = open_levelfile(savelev);
+	if (lfd < 0) {
+	    raw_printf("\nCannot open level of save for %s.\n", lock);
+	    (void)close(gfd);
+	    (void)close(sfd);
+	    delete_savefile();
+	    return FALSE;
+	}
+
+	if (write(sfd, (genericptr_t) &version_data, sizeof version_data)
+		!= sizeof version_data) {
+	    raw_printf("\nError writing %s; recovery failed.", SAVEF);
+	    (void)close(gfd);
+	    (void)close(sfd);
+	    delete_savefile();
+	    return FALSE;
+	}
+
+	if (!copy_bytes(lfd, sfd)) {
+		(void) close(lfd);
+		(void) close(sfd);
+		delete_savefile();
+		return FALSE;
+	}
+	(void)close(lfd);
+	processed[savelev] = 1;
+
+	if (!copy_bytes(gfd, sfd)) {
+		(void) close(lfd);
+		(void) close(sfd);
+		delete_savefile();
+		return FALSE;
+	}
+	(void)close(gfd);
+	processed[0] = 1;
+
+	for (lev = 1; lev < 256; lev++) {
+		/* level numbers are kept in xchars in save.c, so the
+		 * maximum level number (for the endlevel) must be < 256
+		 */
+		if (lev != savelev) {
+			lfd = open_levelfile(lev);
+			if (lfd >= 0) {
+				/* any or all of these may not exist */
+				levc = (xchar) lev;
+				write(sfd, (genericptr_t) &levc, sizeof(levc));
+				if (!copy_bytes(lfd, sfd)) {
+					(void) close(lfd);
+					(void) close(sfd);
+					delete_savefile();
+					return FALSE;
+				}
+				(void)close(lfd);
+				processed[lev] = 1;
+			}
+		}
+	}
+	(void)close(sfd);
+
+	/*
+	 * We have a successful savefile!
+	 * Only now do we erase the level files.
+	 */
+	for (lev = 0; lev < 256; lev++) {
+		if (processed[lev]) {
+			const char *fq_lock;
+			set_levelfile_name(lock, lev);
+			fq_lock = fqname(lock, LEVELPREFIX, 3);
+			(void) unlink(fq_lock);
+		}
+	}
+	return TRUE;
+}
+
+boolean
+copy_bytes(ifd, ofd)
+int ifd, ofd;
+{
+	char buf[BUFSIZ];
+	int nfrom, nto;
+
+	do {
+		nfrom = read(ifd, buf, BUFSIZ);
+		nto = write(ofd, buf, nfrom);
+		if (nto != nfrom) return FALSE;
+	} while (nfrom == BUFSIZ);
+	return TRUE;
+}
+
+/* ----------  END INTERNAL RECOVER ----------- */
+#endif /*SELF_RECOVER*/
 
 /*files.c*/

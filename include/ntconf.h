@@ -19,6 +19,7 @@
 #define PC_LOCKING		/* Prevent overwrites of aborted or in-progress games */
 				/* without first receiving confirmation. */
 
+#define SELF_RECOVER		/* Allow the game itself to recover from an aborted game */
 
 /*
  * -----------------------------------------------------------------
