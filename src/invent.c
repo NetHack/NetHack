@@ -945,7 +945,7 @@ register const char *let,*word;
 		    ilet = display_pickinv(allowed_choices, TRUE,
 					   allowcnt ? &ctmp : (long *)0);
 		    if(!ilet) continue;
-		    if (ctmp >= 0) {
+		    if (allowcnt && ctmp >= 0) {
 			cnt = ctmp;
 			if (!cnt) prezero = TRUE;
 			allowcnt = 2;
