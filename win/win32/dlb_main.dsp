@@ -63,6 +63,8 @@ chdir	\
  if exist options echo options >>dlb.lst	\
  if exist ttyoptions echo ttyoptions >>dlb.lst	\
  if exist guioptions echo guioptions >>dlb.lst	\
+ if NOT exist porthelp copy ..\sys\winnt\porthelp porthelp	\
+ if exist porthelp echo porthelp >>dlb.lst	\
  echo quest.dat >>dlb.lst	\
  echo rumors >>dlb.lst	\
  echo help >>dlb.lst	\
@@ -115,6 +117,8 @@ chdir	\
  if exist options echo options >>dlb.lst	\
  if exist ttyoptions echo ttyoptions >>dlb.lst	\
  if exist guioptions echo guioptions >>dlb.lst	\
+ if NOT exist porthelp copy ..\sys\winnt\porthelp porthelp	\
+ if exist porthelp echo porthelp >>dlb.lst	\
  echo quest.dat >>dlb.lst	\
  echo rumors >>dlb.lst	\
  echo help >>dlb.lst	\

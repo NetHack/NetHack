@@ -82,6 +82,7 @@ BEGIN
         MENUITEM "&Longer list of game options", IDM_HELP_OPTIONS_LONG
         MENUITEM "List of e&xtended commands",  IDM_HELP_EXTCMD
         MENUITEM "The &NetHack license",        IDM_HELP_LICENSE
+        MENUITEM "NetHack for &Windows help",   IDM_HELP_PORTHELP
     END
 END
 

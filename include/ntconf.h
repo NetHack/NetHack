@@ -43,6 +43,8 @@
 #endif
 #define OPTIONS_FILE OPTIONS_USED
 
+#define PORT_HELP	"porthelp"
+
 /* The following is needed for prototypes of certain functions */
 #if defined(_MSC_VER)
 #include <process.h>	/* Provides prototypes of exit(), spawn()      */
