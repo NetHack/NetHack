@@ -341,22 +341,30 @@ ghack_map_cursor_to( GtkWidget *win, int x, int y, gpointer data)
   static GnomeCanvasRE *cursor = NULL;
 
   double x1, y1, x2, y2;
+  float hp;
+  guint r, g, b;
 
   x1 = x * ghack_glyph_width() - 1;
   y1 = y * ghack_glyph_height() - 1;
   x2 = x1 + ghack_glyph_width() + 2;
   y2 = y1 + ghack_glyph_height() + 2;
+  hp = u.mtimedone
+	  ? (u.mhmax  ? (float)u.mh/u.mhmax   : 1)
+	  : (u.uhpmax ? (float)u.uhp/u.uhpmax : 1);
 
+  r = 255;
+  g = (hp >= 0.75) ? 255             : (hp >= 0.25 ? 255*2*(hp-0.25) : 0);
+  b = (hp >= 0.75) ? 255*4*(hp-0.75) : (hp >= 0.25 ? 0 : 255*4*(0.25-hp));
 
   group = gnome_canvas_root(GNOME_CANVAS(ghack_map.canvas));
 
   if (!cursor) {
     cursor = GNOME_CANVAS_RE (gnome_canvas_item_new (group, 
 		gnome_canvas_rect_get_type (), 
-		"outline_color", "antiquewhite2", 
 		"width_units", 1.0, NULL));
   }
   gnome_canvas_item_set (GNOME_CANVAS_ITEM (cursor),
+		  	"outline_color_rgba", GNOME_CANVAS_COLOR(r, g, b),
 			 "x1", x1,
 			 "y1", y1,
 			 "x2", x2,

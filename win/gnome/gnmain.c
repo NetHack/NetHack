@@ -750,7 +750,7 @@ void ghack_init_main_window( int argc, char** argv)
 
     /* Put some stuff into our main window */
     vBoxMain = gtk_vbox_new (FALSE, 0);
-    hBoxFirstRow = gtk_hbox_new (TRUE, 0);
+    hBoxFirstRow = gtk_hbox_new (FALSE, 0);
    
     /* pack Boxes into other boxes to produce the right structure */
     gtk_box_pack_start (GTK_BOX (vBoxMain), hBoxFirstRow, FALSE, TRUE, 0);   
@@ -793,7 +793,14 @@ ghack_main_window_add_message_window(GtkWidget* win)
 void
 ghack_main_window_add_status_window(GtkWidget* win)
 {
-    gtk_box_pack_start (GTK_BOX (hBoxFirstRow), win, TRUE, TRUE, 2);
+    gtk_box_pack_start (GTK_BOX (hBoxFirstRow), win, FALSE, TRUE, 2);
+    gtk_widget_show_all(win);
+}
+
+void
+ghack_main_window_add_worn_window(GtkWidget* win)
+{
+    gtk_box_pack_end (GTK_BOX (hBoxFirstRow), win, FALSE, TRUE, 2);
     gtk_widget_show_all(win);
 }
 
@@ -812,10 +819,11 @@ ghack_main_window_remove_window(GtkWidget *win)
 void
 ghack_main_window_update_inventory()
 {
-/* For now, do nothing.  Eventually we may allow the inv. window
+/* For now, do very little.  Eventually we may allow the inv. window
      to stay active.  When we do this, we'll need to implement this...
    g_warning("Fixme!!! updateInventory is not yet implemented");
 */
+	gnome_display_nhwindow(WIN_WORN, FALSE);
 }
 
 GtkWidget*

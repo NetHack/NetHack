@@ -13,6 +13,7 @@
 #include "gnyesno.h"
 
 GNHWinData gnome_windowlist[MAXWINDOWS];
+winid WIN_WORN = WIN_ERR;
 
 extern void tty_raw_print(const char *);
 extern void tty_raw_print_bold(const char *);
@@ -105,6 +106,9 @@ void gnome_init_nhwindows(int* argc, char** argv)
     //wizard = TRUE;
     
     iflags.window_inited = TRUE;
+
+    /* gnome-specific window creation */
+    WIN_WORN = gnome_create_nhwindow(NHW_WORN);
 }
 
 
@@ -434,6 +438,13 @@ gnome_create_nhwindow_by_id( int type, winid i)
 	  ghack_main_window_add_status_window( gnome_windowlist[i].win);
 	  break;
 	}    
+      case NHW_WORN:
+	{
+	  gnome_windowlist[i].win = ghack_init_worn_window( );
+	  gnome_windowlist[i].type = NHW_WORN;
+	  ghack_main_window_add_worn_window(gnome_windowlist[i].win);
+	  break;
+	}
       case NHW_MENU:
 	{
 	  gnome_windowlist[i].type = NHW_MENU;
@@ -502,9 +513,9 @@ void gnome_display_nhwindow(winid wid, BOOLEAN_P block)
 */
 void gnome_destroy_nhwindow(winid wid)
 {
-    if ((wid == NHW_MAP) || 
-        (wid == NHW_MESSAGE) || 
-        (wid == NHW_STATUS)) {
+    if ((wid == WIN_MAP) || 
+        (wid == WIN_MESSAGE) || 
+        (wid == WIN_STATUS)) {
 	/* no thanks, I'll do these myself */
 	return;
     }

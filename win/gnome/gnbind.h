@@ -24,6 +24,7 @@
 #include "gnmesg.h"
 #include "gnyesno.h"
 #include "gnglyph.h"
+#include "gnworn.h"
 
 
 /* Create an array to keep track of the various windows */

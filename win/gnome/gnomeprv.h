@@ -10,6 +10,8 @@
 #include "dlb.h"
 #include "patchlevel.h"
 
+#include "winGnome.h"
+
 #endif    /* GnomeHack_h */
 
 
