@@ -1557,6 +1557,12 @@ struct obj *no_wish;
 			while(digit(*bp)) bp++;
 			while(*bp == ' ') bp++;
 			l = 0;
+		} else if (*bp == '+' || *bp == '-') {
+			spesgn = (*bp++ == '+') ? 1 : -1;
+			spe = atoi(bp);
+			while(digit(*bp)) bp++;
+			while(*bp == ' ') bp++;
+			l = 0;
 		} else if (!strncmpi(bp, "blessed ", l=8) ||
 			   !strncmpi(bp, "holy ", l=5)) {
 			blessed = 1;
@@ -1616,21 +1622,14 @@ struct obj *no_wish;
 			ishistoric = 1;
 		} else if (!strncmpi(bp, "diluted ", l=8)) {
 			isdiluted = 1;
+		} else if(!strncmpi(bp, "empty ", l=6)) {
+			contents = EMPTY;
 		} else break;
 		bp += l;
 	}
 	if(!cnt) cnt = 1;		/* %% what with "gems" etc. ? */
-	if(!strncmpi(bp, "empty ", 6)) {
-		contents = EMPTY;
-		bp += 6;
-	}
 	if (strlen(bp) > 1) {
-	    if (*bp == '+' || *bp == '-') {
-		spesgn = (*bp++ == '+') ? 1 : -1;
-		spe = atoi(bp);
-		while(digit(*bp)) bp++;
-		while(*bp == ' ') bp++;
-	    } else if ((p = rindex(bp, '(')) != 0) {
+	    if ((p = rindex(bp, '(')) != 0) {
 		if (p > bp && p[-1] == ' ') p[-1] = 0;
 		else *p = 0;
 		p++;
