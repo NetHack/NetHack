@@ -1768,9 +1768,9 @@ struct obj *obj;
 	char buf[BUFSZ];
 
 	if (Glib) {
-	    dropx(obj);
 	    pline("%s from your %s.", Tobjnam(obj, "slip"),
 		  makeplural(body_part(FINGER)));
+	    dropx(obj);
 	    return;
 	}
 
@@ -1778,9 +1778,9 @@ struct obj *obj;
 		if ((obj->cursed || Fumbling) && !rn2(2)) {
 			check_unpaid(obj);
 			obj->spe--;
-			dropx(obj);
 			pline("%s from your %s.", Tobjnam(obj, "slip"),
 			      makeplural(body_part(FINGER)));
+			dropx(obj);
 			return;
 		}
 		otmp = getobj(lubricables, "grease");

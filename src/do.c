@@ -492,10 +492,8 @@ register struct obj *obj;
 		hitfloor(obj);
 		return(1);
 	    }
-	    if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
-		doaltarobj(obj);	/* set bknown */
-	    } else
-		if(flags.verbose) You("drop %s.", doname(obj));
+	    if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
+		You("drop %s.", doname(obj));
 	}
 	dropx(obj);
 	return(1);
@@ -514,7 +512,11 @@ register struct obj *obj;
         if (obj->oclass == COIN_CLASS) flags.botl = 1;
         freeinv(obj);
 #endif
-	if (!u.uswallow && ship_object(obj, u.ux, u.uy, FALSE)) return;
+	if (!u.uswallow) {
+	    if (ship_object(obj, u.ux, u.uy, FALSE)) return;
+	    if (IS_ALTAR(levl[u.ux][u.uy].typ))
+		doaltarobj(obj); /* set bknown */
+	}
 	dropy(obj);
 }
 

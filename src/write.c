@@ -84,9 +84,9 @@ register struct obj *pen;
 	    You("need hands to be able to write!");
 	    return 0;
 	} else if (Glib) {
-	    dropx(pen);
 	    pline("%s from your %s.",
 		  Tobjnam(pen, "slip"), makeplural(body_part(FINGER)));
+	    dropx(pen);
 	    return 1;
 	}
 
