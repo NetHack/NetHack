@@ -33,7 +33,7 @@ STATIC_PTR int FDECL(ck_bag,(struct obj *));
 STATIC_PTR int FDECL(out_container,(struct obj *));
 STATIC_DCL long FDECL(mbag_item_gone, (int,struct obj *));
 STATIC_DCL void FDECL(observe_quantum_cat, (struct obj *));
-STATIC_DCL int FDECL(menu_loot, (int, struct obj *, BOOLEAN_P));
+STATIC_DCL int FDECL(menu_loot, (int,BOOLEAN_P));
 STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int,int,BOOLEAN_P));
@@ -2169,7 +2169,7 @@ register int held;
 		}
 		if (loot_out) {
 		    add_valid_menu_class(0);	/* reset */
-		    used |= menu_loot(0, current_container, FALSE) > 0;
+		    used |= menu_loot(0, FALSE) > 0;
 		}
 	    } else {
 		/* traditional code */
@@ -2197,15 +2197,14 @@ ask_again2:
 				     0, "nodot"))
 			    used = 1;
 		    } else if (menu_on_request < 0) {
-			used |= menu_loot(menu_on_request,
-					  current_container, FALSE) > 0;
+			used |= menu_loot(menu_on_request, FALSE) > 0;
 		    }
 		    /*FALLTHRU*/
 		case 'n':
 		    break;
 		case 'm':
 		    menu_on_request = -2; /* triggers ALL_CLASSES */
-		    used |= menu_loot(menu_on_request, current_container, FALSE) > 0;
+		    used |= menu_loot(menu_on_request, FALSE) > 0;
 		    break;
 		case 'q':
 		default:
@@ -2241,7 +2240,7 @@ ask_again2:
 		case 'm':
 		    add_valid_menu_class(0);	  /* reset */
 		    menu_on_request = -2; /* triggers ALL_CLASSES */
-		    used |= menu_loot(menu_on_request, current_container, TRUE) > 0;
+		    used |= menu_loot(menu_on_request, TRUE) > 0;
 		    break;
 		case 'q':
 		default:
@@ -2270,7 +2269,7 @@ ask_again2:
 #endif
 	    add_valid_menu_class(0);	  /* reset */
 	    if (flags.menu_style != MENU_TRADITIONAL) {
-		used |= menu_loot(0, current_container, TRUE) > 0;
+		used |= menu_loot(0, TRUE) > 0;
 	    } else {
 		/* traditional code */
 		menu_on_request = 0;
@@ -2285,8 +2284,7 @@ ask_again2:
 				    in_container, ck_bag, 0, "nodot");
 		    used = 1;
 		} else if (menu_on_request < 0) {
-		    used |= menu_loot(menu_on_request,
-				      current_container, TRUE) > 0;
+		    used |= menu_loot(menu_on_request, TRUE) > 0;
 		}
 	    }
 	}
@@ -2303,17 +2301,16 @@ ask_again2:
 	return used;
 }
 
-/* Loot a container (take things out, put things in), using a menu. */
+/* Loot current_container (take things out, put things in), using a menu. */
 STATIC_OVL int
-menu_loot(retry, container, put_in)
+menu_loot(retry, put_in)
 int retry;
-struct obj *container;
 boolean put_in;
 {
     int n, i, n_looted = 0;
     boolean all_categories = TRUE, loot_everything = FALSE;
     char buf[BUFSZ];
-    const char *takeout = "Take out", *putin = "Put in";
+    const char *action = put_in ? "Put in" : "Take out";
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
     int mflags, res;
@@ -2323,10 +2320,10 @@ boolean put_in;
 	all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
 	all_categories = FALSE;
-	Sprintf(buf,"%s what type of objects?", put_in ? putin : takeout);
+	Sprintf(buf, "%s what type of objects?", action);
 	mflags = put_in ? ALL_TYPES | BUC_ALLBKNOWN | BUC_UNKNOWN :
 		          ALL_TYPES | CHOOSE_ALL | BUC_ALLBKNOWN | BUC_UNKNOWN;
-	n = query_category(buf, put_in ? invent : container->cobj,
+	n = query_category(buf, put_in ? invent : current_container->cobj,
 			   mflags, &pick_list, PICK_ANY);
 	if (!n) return 0;
 	for (i = 0; i < n; i++) {
@@ -2341,8 +2338,8 @@ boolean put_in;
     }
 
     if (loot_everything) {
-	container->cknown = 1;
-	for (otmp = container->cobj; otmp; otmp = otmp2) {
+	current_container->cknown = 1;
+	for (otmp = current_container->cobj; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
 	    res = out_container(otmp);
 	    if (res < 0) break;
@@ -2350,9 +2347,9 @@ boolean put_in;
     } else {
 	mflags = INVORDER_SORT;
 	if (put_in && flags.invlet_constant) mflags |= USE_INVLET;
-	if (takeout) container->cknown = 1;
-	Sprintf(buf,"%s what?", put_in ? putin : takeout);
-	n = query_objlist(buf, put_in ? invent : container->cobj,
+	if (!put_in) current_container->cknown = 1;
+	Sprintf(buf, "%s what?", action);
+	n = query_objlist(buf, put_in ? invent : current_container->cobj,
 			  mflags, &pick_list, PICK_ANY,
 			  all_categories ? allow_all : allow_category);
 	if (n) {
@@ -2366,7 +2363,11 @@ boolean put_in;
 		    }
 		    res = put_in ? in_container(otmp) : out_container(otmp);
 		    if (res < 0) {
-			if (otmp != pick_list[i].item.a_obj) {
+			if (!current_container) {
+			    /* otmp caused current_container to explode;
+			       both are now gone */
+			    otmp = 0;		/* and break loop */
+			} else if (otmp && otmp != pick_list[i].item.a_obj) {
 			    /* split occurred, merge again */
 			    (void) merged(&pick_list[i].item.a_obj, &otmp);
 			}
