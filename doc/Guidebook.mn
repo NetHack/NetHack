@@ -2271,7 +2271,7 @@ Cannot be set with the `O' command.
 Configuring autopickup exceptions
 .pg
 There is an experimental compile time option called AUTOPICKUP_EXCEPTIONS.  
-If your copy of the game was build with that option defined, you can 
+If your copy of the game was built with that option defined, you can 
 further refine the behavior of the
 .op autopickup
 option beyond what is available through the 
