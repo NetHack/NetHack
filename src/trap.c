@@ -26,6 +26,8 @@ STATIC_DCL int FDECL(mkroll_launch,
 STATIC_DCL boolean FDECL(isclearpath,(coord *, int, SCHAR_P, SCHAR_P));
 #ifdef STEED
 STATIC_OVL int FDECL(steedintrap, (struct trap *, struct obj *));
+STATIC_OVL boolean FDECL(keep_saddle_with_steedcorpse,
+			(unsigned, struct obj *, struct obj *));
 #endif
 
 #ifndef OVLB
@@ -518,6 +520,37 @@ boolean shatter;
 	else newsym(x, y);
 	return mtmp;
 }
+
+#ifdef STEED
+STATIC_OVL boolean
+keep_saddle_with_steedcorpse(steed_mid, objchn, saddle)
+unsigned steed_mid;
+struct obj *objchn, *saddle;
+{
+	if (!saddle) return FALSE;
+	while(objchn) {
+		if(objchn->otyp == CORPSE &&
+		   objchn->oattached == OATTACHED_MONST && objchn->oxlth) {
+			struct monst *mtmp = (struct monst *)objchn->oextra;
+			if (mtmp->m_id == steed_mid) {
+				/* move saddle */
+				xchar x,y;
+				if (get_obj_location(objchn, &x, &y, 0)) {
+					obj_extract_self(saddle);
+					place_object(saddle, x, y);
+					stackobj(saddle);
+				}
+				return TRUE;
+			}
+		}
+		if (Has_contents(objchn) &&
+		    keep_saddle_with_steedcorpse(steed_mid, objchn->cobj, saddle))
+			return TRUE;
+		objchn = objchn->nobj;
+	}
+	return FALSE;
+}
+#endif /*STEED*/
 
 void
 dotrap(trap, trflags)
@@ -1044,7 +1077,11 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		}
 		break;
 	    }
-	    case LANDMINE:
+	    case LANDMINE: {
+#ifdef STEED
+		unsigned steed_mid = 0;
+		struct obj *saddle;
+#endif
 		if (Levitation || Flying) {
 		    if (!already_seen && rn2(3)) break;
 		    seetrap(trap);
@@ -1072,22 +1109,28 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		    pline("KAABLAMM!!!  You triggered %s land mine!",
 					    a_your[trap->madeby_u]);
 #ifdef STEED
+		    if (u.usteed) steed_mid = u.usteed->m_id;
 		    recursive_mine = TRUE;
 		    (void) steedintrap(trap, (struct obj *)0);
 		    recursive_mine = FALSE;
+		    saddle = sobj_at(SADDLE,u.ux, u.uy);
 #endif
 		    set_wounded_legs(LEFT_SIDE, rn1(35, 41));
 		    set_wounded_legs(RIGHT_SIDE, rn1(35, 41));
 		    exercise(A_DEX, FALSE);
 		}
 		blow_up_landmine(trap);
+#ifdef STEED
+		if (steed_mid && saddle && !u.usteed)
+			(void)keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
+#endif
 		newsym(u.ux,u.uy);		/* update trap symbol */
 		losehp(rnd(16), "land mine", KILLED_BY_AN);
 		/* fall recursively into the pit... */
 		if ((trap = t_at(u.ux, u.uy)) != 0) dotrap(trap, RECURSIVETRAP);
 		fill_pit(u.ux, u.uy);
 		break;
-
+	    }
 	    case ROLLING_BOULDER_TRAP: {
 		int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
 
