@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.4	2002/12/18	*/
+/*	SCCS Id: @(#)artifact.c 3.4	2003/02/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,8 +20,11 @@ extern boolean notonhead;	/* for long worms */
 
 #define get_artifact(o) \
 		(((o)&&(o)->oartifact) ? &artilist[(int) (o)->oartifact] : 0)
+
 STATIC_DCL int FDECL(spec_applies, (const struct artifact *,struct monst *));
 STATIC_DCL int FDECL(arti_invoke, (struct obj*));
+STATIC_DCL boolean FDECL(Mb_hit, (struct monst *magr,struct monst *mdef,
+				  struct obj *,int *,int,BOOLEAN_P,char *));
 
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.
@@ -717,6 +720,184 @@ winid tmpwin;		/* supplied by dodiscover() */
 
 #ifdef OVLB
 
+
+	/*
+	 * Magicbane's intrinsic magic is incompatible with normal
+	 * enchantment magic.  Thus, its effects have a negative
+	 * dependence on spe.  Against low mr victims, it typically
+	 * does "double athame" damage, 2d4.  Occasionally, it will
+	 * cast unbalancing magic which effectively averages out to
+	 * 4d4 damage (2.5d4 against high mr victims), for spe = 0.
+	 */
+#define MB_MAX_DIEROLL		8	/* rolls above this aren't magical */
+static const char * const mb_verb[4] = {
+	"probe", "stun", "scare", "cancel"
+};
+#define MB_INDEX_PROBE		0
+#define MB_INDEX_STUN		1
+#define MB_INDEX_SCARE		2
+#define MB_INDEX_CANCEL		3
+
+/* called when someone is being hit by Magicbane */
+STATIC_OVL boolean
+Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee)
+struct monst *magr, *mdef;	/* attacker and defender */
+struct obj *mb;			/* Magicbane */
+int *dmgptr;			/* extra damage target will suffer */
+int dieroll;			/* d20 that has already scored a hit */
+boolean vis;			/* whether the action can be seen */
+char *hittee;			/* target's name: "you" or mon_nam(mdef) */
+{
+    struct permonst *old_uasmon;
+    boolean youattack = (magr == &youmonst),
+	    youdefend = (mdef == &youmonst),
+	    resisted = FALSE, do_stun, do_confuse, result;
+    int attack_indx, scare_dieroll = MB_MAX_DIEROLL / 2;
+
+    result = FALSE;		/* no message given yet */
+    /* the most severe effects are less likely at higher enchantment */
+    if (mb->spe >= 3)
+	scare_dieroll /= (1 << (mb->spe / 3));
+
+    /* might stun even when attempting a more severe effect, but
+       in that case it will only happen if the other effect fails;
+       extra damage will apply regardless */
+    do_stun = (mb->spe <= rn2(10));
+
+    /* the special effects also boost physical damage (base 2d4 assumed);
+       increments are generally cumulative, but since the stun effect is
+       based on a different criterium its damage might not be included */
+    attack_indx = MB_INDEX_PROBE;
+    *dmgptr += rnd(4);			/* 3d4 */
+    if (do_stun) {
+	attack_indx = MB_INDEX_STUN;
+	*dmgptr += rnd(4);		/* 4d4 */
+    }
+    if (dieroll <= scare_dieroll) {
+	attack_indx = MB_INDEX_SCARE;
+	*dmgptr += rnd(4);		/* 5d4; actually (4 or 5)d4 */
+    }
+    if (dieroll <= (scare_dieroll / 2)) {
+	attack_indx = MB_INDEX_CANCEL;
+	*dmgptr += rnd(4);		/* 6d4; actually (5 or 6)d4 */
+    }
+
+    /* give the hit message prior to inflicting the effects */
+    if (youattack || youdefend || vis) {
+	result = TRUE;
+	pline_The("magic-absorbing blade %s %s!",
+		  vtense((const char *)0, mb_verb[attack_indx]), hittee);
+	/* assume probing has some sort of noticeable feedback
+	   even if it is being done by one monster to another */
+	if (attack_indx == MB_INDEX_PROBE && !canspotmon(mdef))
+	    map_invisible(mdef->mx, mdef->my);
+    }
+
+    /* now perform special effects */
+    switch (attack_indx) {
+    case MB_INDEX_CANCEL:
+	old_uasmon = youmonst.data;
+	if (!cancel_monst(mdef, mb, youattack, FALSE, FALSE)) {
+	    resisted = TRUE;
+	} else {
+	    do_stun = FALSE;
+	    if (youdefend) {
+		if (youmonst.data != old_uasmon)
+		    *dmgptr = 0;    /* rehumanized, so no more damage */
+		if (u.uenmax > 0) {
+		    You("lose magical energy!");
+		    u.uenmax--;
+		    if (u.uen > 0) u.uen--;
+		    flags.botl = 1;
+		}
+	    } else {
+		if (mdef->data == &mons[PM_CLAY_GOLEM])
+		    mdef->mhp = 1;	/* cancelled clay golems will die */
+		if (youattack && attacktype(mdef->data, AT_MAGC)) {
+		    You("absorb magical energy!");
+		    u.uenmax++;
+		    u.uen++;
+		    flags.botl = 1;
+		}
+	    }
+	}
+	break;
+
+    case MB_INDEX_SCARE:
+	if (youdefend) {
+	    if (Antimagic) {
+		resisted = TRUE;
+	    } else {
+		nomul(-3);
+		nomovemsg = "";
+		if (magr && magr == u.ustuck && sticks(youmonst.data)) {
+		    u.ustuck = (struct monst *)0;
+		    You("release %s!", mon_nam(magr));
+		}
+	    }
+	} else {
+	    if (rn2(2) && resist(mdef, WEAPON_CLASS, 0, NOTELL))
+		resisted = TRUE;
+	    else
+		monflee(mdef, 3, FALSE, (mdef->mhp > *dmgptr));
+	}
+	if (!resisted) do_stun = FALSE;
+	break;
+
+    case MB_INDEX_STUN:
+	do_stun = TRUE;		/* (this is redundant...) */
+	break;
+
+    case MB_INDEX_PROBE:
+	/* note: can't get probe result unless mb->spe >= 1, but
+	   guard against passing bad argument to rn2() anyway */
+	if (youattack && (mb->spe < 1 || !rn2(4 * mb->spe))) {
+	    pline_The("probe is insightful.");
+	    /* pre-damage status */
+	    probe_monster(mdef);
+	}
+	break;
+    }
+    /* stun if that was selected and a worse effect didn't occur */
+    if (do_stun) {
+	if (youdefend)
+	    make_stunned((HStun + 3), FALSE);
+	else
+	    mdef->mstun = 1;
+	/* avoid extra stun message below if we used mb_verb["stun"] above */
+	if (attack_indx == MB_INDEX_STUN) do_stun = FALSE;
+    }
+    /* lastly, all this magic can be confusing... */
+    do_confuse = !rn2(12);
+    if (do_confuse) {
+	if (youdefend)
+	    make_confused(HConfusion + 4, FALSE);
+	else
+	    mdef->mconf = 1;
+    }
+
+    if (youattack || youdefend || vis) {
+	(void) upstart(hittee);	/* capitalize */
+	if (resisted) {
+	    pline("%s %s!", hittee, vtense(hittee, "resist"));
+	    shieldeff(youdefend ? u.ux : mdef->mx,
+		      youdefend ? u.uy : mdef->my);
+	}
+	if ((do_stun || do_confuse) && flags.verbose) {
+	    char buf[BUFSZ];
+
+	    buf[0] = '\0';
+	    if (do_stun) Strcat(buf, "stunned");
+	    if (do_stun && do_confuse) Strcat(buf, " and ");
+	    if (do_confuse) Strcat(buf, "confused");
+	    pline("%s %s %s%c", hittee, vtense(hittee, "are"),
+		  buf, (do_stun && do_confuse) ? '!' : '.');
+	}
+    }
+
+    return result;
+}
+  
 /* Function used when someone attacks someone else with an artifact
  * weapon.  Only adds the special (artifact) damage, and returns a 1 if it
  * did something special (in which case the caller won't print the normal
@@ -798,169 +979,16 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	    return realizes_damage;
 	}
 
+	if (attacks(AD_STUN, otmp) && dieroll <= MB_MAX_DIEROLL) {
+	    /* Magicbane's special attacks (possibly modifies hittee[]) */
+	    return Mb_hit(magr, mdef, otmp, dmgptr, dieroll, vis, hittee);
+	}
+
 	if (!spec_dbon_applies) {
 	    /* since damage bonus didn't apply, nothing more to do;  
 	       no further attacks have side-effects on inventory */
 	    return FALSE;
 	}
-
-	/*
-	 * Magicbane's intrinsic magic is incompatible with normal
-	 * enchantment magic.  Thus, its effects have a negative
-	 * dependence on spe.  Against low mr victims, it typically
-	 * does "double athame" damage, 2d4.  Occasionally, it will
-	 * cast unbalancing magic which effectively averages out to
-	 * 4d4 damage (2.5d4 against high mr victims), for spe = 0.
-	 */
-
-#define MB_MAX_DIEROLL		8    /* rolls above this aren't magical */
-#define MB_INDEX_INIT		(-1)
-#define MB_INDEX_PROBE		0
-#define MB_INDEX_STUN		1
-#define MB_INDEX_SCARE		2
-#define MB_INDEX_PURGE		3
-#define MB_RESIST_ATTACK	(resist_index = attack_index)
-#define MB_RESISTED_ATTACK	(resist_index == attack_index)
-#define MB_UWEP_ATTACK		(youattack && (otmp == uwep))
-
-	if (attacks(AD_STUN, otmp) && (dieroll <= MB_MAX_DIEROLL)) {
-		int attack_index = MB_INDEX_INIT;
-		int resist_index = MB_INDEX_INIT;
-		int scare_dieroll = MB_MAX_DIEROLL / 2;
-
-		if (otmp->spe >= 3)
-			scare_dieroll /= (1 << (otmp->spe / 3));
-
-		*dmgptr += rnd(4);			/* 3d4 */
-
-		if (otmp->spe > rn2(10))		/* probe */
-			attack_index = MB_INDEX_PROBE;
-		else {					/* stun */
-			attack_index = MB_INDEX_STUN;
-			*dmgptr += rnd(4);		/* 4d4 */
-
-			if (youdefend)
-				make_stunned((HStun + 3), FALSE);
-			else
-				mdef->mstun = 1;
-		}
-		if (dieroll <= scare_dieroll) {		/* scare */
-			attack_index = MB_INDEX_SCARE;
-			*dmgptr += rnd(4);		/* 5d4 */
-
-			if (youdefend) {
-				if (Antimagic)
-					MB_RESIST_ATTACK;
-				else {
-					nomul(-3);
-					nomovemsg = "";
-					if (magr && magr == u.ustuck
-						&& sticks(youmonst.data)) {
-					    u.ustuck = (struct monst *)0;
-					    You("release %s!", mon_nam(magr));
-					}
-				}
-			} else if (youattack) {
-				if (rn2(2) && resist(mdef,SPBOOK_CLASS,0,0)) {
-				    MB_RESIST_ATTACK;
-				} else {
-				    monflee(mdef, 3, FALSE, TRUE);
-				}
-			}
-		}
-		if (dieroll <= (scare_dieroll / 2)) {	/* purge */
-			struct obj *ospell;
-			struct permonst *old_uasmon = youmonst.data;
-
-			attack_index = MB_INDEX_PURGE;
-			*dmgptr += rnd(4);		/* 6d4 */
-
-			/* Create a fake spell object, ala spell.c */
-			ospell = mksobj(SPE_CANCELLATION, FALSE, FALSE);
-			ospell->blessed = ospell->cursed = 0;
-			ospell->quan = 20L;
-
-			cancel_monst(mdef, ospell, youattack, FALSE, FALSE);
-
-			if (youdefend) {
-				if (old_uasmon != youmonst.data)
-					/* rehumanized, no more damage */
-					*dmgptr = 0;
-				if (Antimagic)
-					MB_RESIST_ATTACK;
-			} else {
-				if (!mdef->mcan)
-					MB_RESIST_ATTACK;
-
-				/* cancelled clay golems will die ... */
-				else if (mdef->data == &mons[PM_CLAY_GOLEM])
-					mdef->mhp = 1;
-			}
-
-			obfree(ospell, (struct obj *)0);
-		}
-
-		if (youdefend || mdef->mhp > 0) {  /* ??? -dkh- */
-			static const char * const mb_verb[4] =
-				{"probe", "stun", "scare", "purge"};
-
-			if (youattack || youdefend || vis) {
-				pline_The("magic-absorbing blade %ss %s!",
-					mb_verb[attack_index], hittee);
-
-				if (MB_RESISTED_ATTACK) {
-					pline("%s resist%s!",
-					youdefend ? "You" : Monnam(mdef),
-					youdefend ? "" : "s");
-
-					shieldeff(youdefend ? u.ux : mdef->mx,
-						youdefend ? u.uy : mdef->my);
-				}
-			}
-
-			/* Much ado about nothing.  More magic fanfare! */
-			if (MB_UWEP_ATTACK) {
-				if (attack_index == MB_INDEX_PURGE) {
-				    if (!MB_RESISTED_ATTACK &&
-					attacktype(mdef->data, AT_MAGC)) {
-					You("absorb magical energy!");
-					u.uenmax++;
-					u.uen++;
-					flags.botl = 1;
-				    }
-				} else if (attack_index == MB_INDEX_PROBE) {
-				    if (!rn2(4 * otmp->spe)) {
-					pline_The("probe is insightful!");
-					if (!canspotmon(mdef))
-					    map_invisible(u.ux+u.dx,u.uy+u.dy);
-					/* pre-damage status */
-					probe_monster(mdef);
-				    }
-				}
-			} else if (youdefend && !MB_RESISTED_ATTACK
-				   && (attack_index == MB_INDEX_PURGE)) {
-				You("lose magical energy!");
-				if (u.uenmax > 0) u.uenmax--;
-				if (u.uen > 0) u.uen--;
-					flags.botl = 1;
-			}
-
-			/* all this magic is confusing ... */
-			if (!rn2(12)) {
-			    if (youdefend)
-				make_confused((HConfusion + 4), FALSE);
-			    else
-				mdef->mconf = 1;
-
-			    if (youattack || youdefend || vis)
-				pline("%s %s confused.",
-				      youdefend ? "You" : Monnam(mdef),
-				      youdefend ? "are" : "is");
-			}
-		}
-		return TRUE;
-	}
-	/* end of Magicbane code */
 
 	/* We really want "on a natural 20" but Nethack does it in */
 	/* reverse from AD&D. */
