@@ -185,6 +185,13 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	/* force tabs in menus */
 	iflags.menu_tab_sep = 1;
 
+	/* force toptenwin to be true.  toptenwin is the option that decides whether to
+	 * write output to a window or stdout.  stdout doesn't make sense on Windows
+	 * non-console applications
+	 */
+	flags.toptenwin = 1;
+	set_option_mod_status("toptenwin", SET_IN_FILE);
+
 	/* initialize map tiles bitmap */
 	initMapTiles();
 
@@ -1943,24 +1950,24 @@ typedef struct ctbv
 static color_table_brush_value color_table_brush[] = {
 	{ "activeborder", 	COLOR_ACTIVEBORDER	},
 	{ "activecaption",	COLOR_ACTIVECAPTION	},
-	{ "appworkspace",		COLOR_APPWORKSPACE	},
-	{ "background",		COLOR_BACKGROUND		},
+	{ "appworkspace",	COLOR_APPWORKSPACE	},
+	{ "background",		COLOR_BACKGROUND	},
 	{ "btnface",		COLOR_BTNFACE		},
 	{ "btnshadow",		COLOR_BTNSHADOW		},
 	{ "btntext", 		COLOR_BTNTEXT		},
-	{ "captiontext",		COLOR_CAPTIONTEXT		},
+	{ "captiontext",	COLOR_CAPTIONTEXT	},
 	{ "graytext",		COLOR_GRAYTEXT		},
 	{ "greytext",		COLOR_GRAYTEXT 		},
-	{ "highlight",		COLOR_HIGHLIGHT 		},
+	{ "highlight",		COLOR_HIGHLIGHT 	},
 	{ "highlighttext",	COLOR_HIGHLIGHTTEXT	},
 	{ "inactiveborder", 	COLOR_INACTIVEBORDER 	},
 	{ "inactivecaption",	COLOR_INACTIVECAPTION 	},
-	{ "menu",			COLOR_MENU 			},
+	{ "menu",		COLOR_MENU 		},
 	{ "menutext",		COLOR_MENUTEXT 		},
-	{ "scrollbar",		COLOR_SCROLLBAR 		},
-	{ "window",			COLOR_WINDOW 		},
-	{ "windowframe", 		COLOR_WINDOWFRAME 	},
-	{ "windowtext",		COLOR_WINDOWTEXT 		},
+	{ "scrollbar",		COLOR_SCROLLBAR 	},
+	{ "window",		COLOR_WINDOW 		},
+	{ "windowframe", 	COLOR_WINDOWFRAME 	},
+	{ "windowtext",		COLOR_WINDOWTEXT 	},
 	{ "", 			-1				},
 };
 

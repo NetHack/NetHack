@@ -58,11 +58,20 @@ OPTIONS=font_text:Courier New,font_size_text:9
 OPTIONS=font_status:Courier New,font_size_status:10
 
 # Other
-OPTIONS=hilite_pet
+OPTIONS=hilite_pet,!toptenwin
 #OPTIONS=!splash_screen,player_selection:prompts
 
-# Top Ten Window.  Highly Recommended.
-#OPTIONS=toptenwin
+# Status/message window colors
+# Possible color options include:
+# six digit hexadecimal RGB color value ("#8F8F8F"), black, red, green, brown,
+# blue, magenta, cyan, gray (or grey), orange, brightgreen, yellow, brightblue,
+# brightmagenta, brightcyan, white, trueblack, purple, silver, maroon, fuchsia,
+# lime, olive, navy, teal, aqua, activeborder, activecaption, appworkspace,
+# background, btnface, btnshadow, btntext, captiontext, graytext, highlight,
+# highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
+# window, windowframe, windowtext.
+
+OPTIONS=windowcolors:status windowtext/window message windowtext/window
 
 #
 #HACKDIR=c:\games\nethack

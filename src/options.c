@@ -1782,7 +1782,7 @@ goodfruit:
 
 	/* WINCAP
 	 * map_mode:[tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|ascii7x12|ascii8x12|
-			ascii15x12|ascii12x16|ascii10x18|fit_to_screen] */
+			ascii16x12|ascii12x16|ascii10x18|fit_to_screen] */
 	fullname = "map_mode";
 	if (match_optname(opts, fullname, sizeof("map_mode")-1, TRUE)) {
 		op = string_for_opt(opts, negated);
@@ -1801,7 +1801,7 @@ goodfruit:
 			iflags.wc_map_mode = MAP_MODE_ASCII7x12;
 		    else if (!strncmpi (op, "ascii8x12", sizeof("ascii8x12")-1))
 			iflags.wc_map_mode = MAP_MODE_ASCII8x12;
-		    else if (!strncmpi (op, "ascii15x12", sizeof("ascii15x12")-1))
+		    else if (!strncmpi (op, "ascii16x12", sizeof("ascii16x12")-1))
 			iflags.wc_map_mode = MAP_MODE_ASCII16x12;
 		    else if (!strncmpi (op, "ascii12x16", sizeof("ascii12x16")-1))
 			iflags.wc_map_mode = MAP_MODE_ASCII12x16;
