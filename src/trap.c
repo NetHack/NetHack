@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2002/05/08	*/
+/*	SCCS Id: @(#)trap.c	3.4	2002/07/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1685,14 +1685,18 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				pline("%s is uninjured.", Monnam(mtmp));
 			    }
 			} else {
-			    int num = d(2,4);
+			    int num = d(2,4), alt;
 
 			    /* paper burns very fast, assume straw is tightly
 			     * packed and burns a bit slower */
-			    if (mptr == &mons[PM_PAPER_GOLEM])
-				num = mtmp->mhp;
-			    else if (mptr == &mons[PM_STRAW_GOLEM])
-				num = mtmp->mhpmax / 2;
+			    switch (monsndx(mtmp->data)) {
+			    case PM_PAPER_GOLEM:   alt = mtmp->mhpmax; break;
+			    case PM_STRAW_GOLEM:   alt = mtmp->mhpmax / 2; break;
+			    case PM_WOOD_GOLEM:    alt = mtmp->mhpmax / 4; break;
+			    case PM_LEATHER_GOLEM: alt = mtmp->mhpmax / 8; break;
+			    default: alt = 0; break;
+			    }
+			    if (alt > num) num = alt;
 
 			    if (thitm(0, mtmp, (struct obj *)0, num))
 				trapkilled = TRUE;
@@ -2190,7 +2194,7 @@ dofiretrap(box)
 struct obj *box;	/* null for floor trap */
 {
 	boolean see_it = !Blind;
-	int num;
+	int num, alt;
 
 /* Bug: for box case, the equivalent of burn_floor_paper() ought
  * to be done upon its contents.
@@ -2209,6 +2213,18 @@ struct obj *box;	/* null for floor trap */
 	if (Fire_resistance) {
 	    shieldeff(u.ux, u.uy);
 	    num = rn2(2);
+	} else if (Upolyd) {
+	    num = d(2,4);
+	    switch (u.umonnum) {
+	    case PM_PAPER_GOLEM:   alt = u.mhmax; break;
+	    case PM_STRAW_GOLEM:   alt = u.mhmax / 2; break;
+	    case PM_WOOD_GOLEM:    alt = u.mhmax / 4; break;
+	    case PM_LEATHER_GOLEM: alt = u.mhmax / 8; break;
+	    default: alt = 0; break;
+	    }
+	    if (alt > num) num = alt;
+	    if (u.mhmax > mons[u.umonnum].mlevel)
+		u.mhmax -= rn2(min(u.mhmax,num + 1)), flags.botl = 1;
 	} else {
 	    num = d(2,4);
 	    if (u.uhpmax > u.ulevel)
