@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.4	2003/12/02	*/
+/*	SCCS Id: @(#)do.c	3.4	2003/12/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -74,7 +74,14 @@ boolean pushing;
 		
 		newsym(rx,ry);
 		if (pushing) {
-		    You("push %s into the %s.", the(xname(otmp)), what);
+		    char whobuf[BUFSZ];
+
+		    Strcpy(whobuf, "you");
+#ifdef STEED
+		    if (u.usteed) Strcpy(whobuf, y_monnam(u.usteed));
+#endif
+		    pline("%s %s %s into the %s.", upstart(whobuf),
+		          vtense(whobuf, "push"), the(xname(otmp)), what);
 		    if (flags.verbose && !Blind)
 			pline("Now you can cross it!");
 		    /* no splashing in this case */
