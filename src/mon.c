@@ -20,6 +20,15 @@ STATIC_DCL int FDECL(select_newcham_form, (struct monst *));
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 #endif
 
+#ifdef REINCARNATION
+#define LEVEL_SPECIFIC_NOCORPSE(mdat) \
+	 (Is_rogue_level(&u.uz) || \
+	   (level.flags.graveyard && is_undead(mdat) && rn2(3)))
+#else
+#define LEVEL_SPECIFIC_NOCORPSE(mdat) \
+	   (level.flags.graveyard && is_undead(mdat) && rn2(3))
+#endif
+
 
 #if 0
 /* part of the original warning code which was replaced in 3.3.1 */
@@ -1409,6 +1418,7 @@ boolean swallowed;			/* digestion */
 	    	else if(mdat->mattk[i].damd)
 	    	    tmp = d((int)mdat->mlevel+1, (int)mdat->mattk[i].damd);
 	    	else tmp = 0;
+		if (Half_physical_damage) tmp = (tmp+1) / 2;
 		if (swallowed && magr) {
 		    if (magr == &youmonst) {
 			There("is an explosion in your %s!",
@@ -1442,11 +1452,7 @@ boolean swallowed;			/* digestion */
 	/* must duplicate this below check in xkilled() since it results in
 	 * creating no objects as well as no corpse
 	 */
-	if (
-#ifdef REINCARNATION
-		 Is_rogue_level(&u.uz) ||
-#endif
-	   (level.flags.graveyard && is_undead(mdat) && rn2(3)))
+	if (LEVEL_SPECIFIC_NOCORPSE(mdat))
 		return FALSE;
 
 	if (bigmonst(mdat) || mdat == &mons[PM_LIZARD]
@@ -1691,11 +1697,7 @@ xkilled(mtmp, dest)
 		goto cleanup;
 	}
 
-	if((dest & 2)
-#ifdef REINCARNATION
-		 || Is_rogue_level(&u.uz)
-#endif
-	   || (level.flags.graveyard && is_undead(mdat) && rn2(3)))
+	if((dest & 2) || LEVEL_SPECIFIC_NOCORPSE(mdat))
 		goto cleanup;
 
 #ifdef MAIL

@@ -447,6 +447,7 @@ if you see a monster jump into a trap in a secret corridor, it's not secret
 fixed a few places where unblock_point wasn't called but should have been
 cloned monsters should have the same name and tameness as the original
 you should stop eating (etc.) if a monster attacks you and misses
+half physical damage should apply to gas spores
 
 
 Platform- and/or Interface-Specific Fixes
