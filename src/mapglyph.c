@@ -122,6 +122,14 @@ unsigned *ospecial;
 		color = NO_COLOR;
 	} else
 #endif
+#ifdef TEXTCOLOR
+	    /* provide a visible difference if normal and lit corridor
+	     * use the same symbol */
+	    if (iflags.use_color &&
+		offset == S_litcorr && ch == showsyms[S_corr])
+		color = CLR_WHITE;
+	    else
+#endif
 	    cmap_color(offset);
     } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) {	/* object */
 	if (offset == BOULDER && iflags.bouldersym) ch = iflags.bouldersym;
