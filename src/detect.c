@@ -391,7 +391,7 @@ register struct obj	*sobj;
 }
 
 /*
- * Used for scrolls, potions, and crystal balls.  Returns:
+ * Used for scrolls, potions, spells, and crystal balls.  Returns:
  *
  *	1 - nothing was detected
  *	0 - something was detected
@@ -403,8 +403,9 @@ int		class;		/* an object class, 0 for all */
 {
     register int x, y;
     int is_cursed = (detector && detector->cursed);
-    int do_dknown =
-	(detector && detector->oclass == POTION_CLASS && detector->blessed);
+    int do_dknown = (detector && (detector->oclass == POTION_CLASS ||
+				    detector->oclass == SPBOOK_CLASS) &&
+			detector->blessed);
     int ct = 0, ctu = 0;
     register struct obj *obj, *otmp = (struct obj *)0;
     register struct monst *mtmp;
