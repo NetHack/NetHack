@@ -268,8 +268,9 @@ register struct monst *mtmp;
 	    if (uarm) {
 		Your("armor is rather cumbersome...");
 		tmp -= urole.spelarmr;
-	    } else if (!uwep)
+	    } else if (!uwep && !uarms) {
 		tmp += (u.ulevel / 3) + 2;
+	    }
 	}
 
 /*	with a lot of luggage, your agility diminishes */
