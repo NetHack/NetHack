@@ -1008,13 +1008,13 @@ int forcetype;
 		return;
 	} else if (forcetype >= 0 && forcetype < TTSZ-1) {
 		r = forcetype;
-	} else {
+	} else {	/* RANDOM_TIN */
 		r = rn2(TTSZ-1);		/* take your pick */
 		if (r == ROTTEN_TIN && (obj->corpsenm == PM_LIZARD ||
 			 		obj->corpsenm == PM_LICHEN))
 			r = HOMEMADE_TIN;	/* lizards don't rot */
 	}
-	obj->spe = -(r+1);
+	obj->spe = -(r+1);	/* offset by 1 to allow index 0 */
 }
 
 STATIC_OVL int
@@ -1027,7 +1027,7 @@ struct obj *obj;
 		r = ROTTEN_TIN;			/* always rotten if cursed */
 	} else if (obj->spe < 0) {
 		r = -(obj->spe);
-		--r;
+		--r;		/* get rid of the offset */
 	} else 
 		r = rn2(TTSZ-1);
 

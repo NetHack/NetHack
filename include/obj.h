@@ -30,7 +30,7 @@ struct obj {
 
 	schar spe;		/* quality of weapon, armor or ring (+ or -)
 				   number of charges for wand ( >= -1 )
-				   marks your eggs, spinach tins
+				   marks your eggs, tin variety and spinach tins
 				   royal coffers for a court ( == 2)
 				   tells which fruit a fruit is
 				   special for uball and amulet

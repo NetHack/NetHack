@@ -1802,7 +1802,7 @@ boolean from_user;
 #endif
 		ispoisoned = isgreased = eroded = eroded2 = erodeproof =
 		halfeaten = islit = unlabeled = ishistoric = isdiluted = 0;
-	tvariety = -1;
+	tvariety = RANDOM_TIN;
 	mntmp = NON_PM;
 #define UNDEFINED 0
 #define EMPTY 1

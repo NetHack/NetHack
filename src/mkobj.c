@@ -431,7 +431,7 @@ boolean artif;
 		    if (mons[mndx].cnutrit &&
 			    !(mvitals[mndx].mvflags & G_NOCORPSE)) {
 			otmp->corpsenm = mndx;
-			set_tin_variety(otmp, 0);
+			set_tin_variety(otmp, RANDOM_TIN);
 			break;
 		    }
 		}

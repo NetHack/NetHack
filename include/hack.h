@@ -257,6 +257,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define HOMEMADE_TIN 5
 #define FRENCH_FRIED_TIN 11
 #define SPINACH_TIN (-1)
+#define RANDOM_TIN (-2)
 
 /* Flags to control menus */
 #define MENUTYPELEN sizeof("traditional ")
