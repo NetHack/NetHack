@@ -1695,10 +1695,10 @@ register struct monst *mtmp;
 
 		if(!mtmp->minvis || See_invisible)
 		    block_point(mx,my);	/* vision */
-	} else if (level.flags.is_maze_lev && rn2(2)) {
+	} else if (level.flags.is_maze_lev && !In_sokoban(&u.uz) && rn2(2)) {
 		ap_type = M_AP_OBJECT;
 		appear = STATUE;
-	} else if (roomno < 0) {
+	} else if (roomno < 0 && !t_at(mx, my)) {
 		ap_type = M_AP_OBJECT;
 		appear = BOULDER;
 		if(!mtmp->minvis || See_invisible)
