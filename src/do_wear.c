@@ -1914,6 +1914,7 @@ do_takeoff()
 	return(otmp);
 }
 
+/* occupation callback for 'A' */
 STATIC_PTR
 int
 take_off()
@@ -2000,6 +2001,7 @@ take_off()
 	return(1);		/* get busy */
 }
 
+/* clear saved context to avoid inappropriate resumption of interrupted 'A' */
 void
 reset_remarm()
 {
@@ -2007,7 +2009,7 @@ reset_remarm()
 	context.takeoff.disrobing[0] = '\0';
 }
 
-/* the 'A' command */
+/* the 'A' command -- remove multiple worn items */
 int
 doddoremarm()
 {
@@ -2016,7 +2018,6 @@ doddoremarm()
     if (context.takeoff.what || context.takeoff.mask) {
 	You("continue %s.", context.takeoff.disrobing);
 	set_occupation(take_off, context.takeoff.disrobing, 0);
-	(void) take_off();
 	return 0;
     } else if (!uwep && !uswapwep && !uquiver && !uamul && !ublindf &&
 		!uleft && !uright && !wearing_armor()) {
