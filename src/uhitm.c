@@ -544,7 +544,7 @@ int thrown;
 	boolean hittxt = FALSE, destroyed = FALSE, already_killed = FALSE;
 	boolean get_dmg_bonus = TRUE;
 	boolean ispoisoned = FALSE, needpoismsg = FALSE, poiskilled = FALSE;
-	boolean silvermsg = FALSE;
+	boolean silvermsg = FALSE, silverobj = FALSE;
 	boolean valid_weapon_attack = FALSE;
 	boolean unarmed = !uwep && !uarm && !uarms;
 #ifdef STEED
@@ -665,8 +665,9 @@ int thrown;
 			hittxt = TRUE;
 		    }
 		    if (objects[obj->otyp].oc_material == SILVER
-				&& hates_silver(mdat))
-			silvermsg = TRUE;
+				&& hates_silver(mdat)) {
+			silvermsg = TRUE; silverobj = TRUE;
+		    }
 #ifdef STEED
 		    if (u.usteed && !thrown && tmp > 0 &&
 			    weapon_type(obj) == P_LANCE && mon != u.ustuck) {
@@ -888,6 +889,15 @@ int thrown;
 			if(tmp < 1) tmp = 1;
 			else tmp = rnd(tmp);
 			if(tmp > 6) tmp = 6;
+			/*
+			 * Things like silver wands can arrive here so
+			 * so we need another silver check.
+			 */
+			if (objects[obj->otyp].oc_material == SILVER
+						&& hates_silver(mdat)) {
+				tmp += rnd(20);
+				silvermsg = TRUE; silverobj = TRUE;
+			}
 		    }
 		}
 	    }
@@ -1026,13 +1036,20 @@ int thrown;
 	if (silvermsg) {
 		const char *fmt;
 		char *whom = mon_nam(mon);
+		char silverobjbuf[BUFSZ];
 
 		if (canspotmon(mon)) {
 		    if (barehand_silver_rings == 1)
 			fmt = "Your silver ring sears %s!";
 		    else if (barehand_silver_rings == 2)
 			fmt = "Your silver rings sear %s!";
-		    else
+		    else if (silverobj) {
+		    	Sprintf(silverobjbuf, "Your %s%s %s %%s!",
+		    		strstri(xname(obj), "silver") ?
+					"" : "silver ",
+				xname(obj), otense(obj, "sear"));
+		    	fmt = silverobjbuf;
+		    } else
 			fmt = "The silver sears %s!";
 		} else {
 		    *whom = highc(*whom);	/* "it" -> "It" */
