@@ -108,10 +108,11 @@ README          bemain.c
 sys/mac:
 (files for Macintosh versions)
 Files.r         Install.mw      MacHelp         NHDeflts        NHrsrc.hqx
-NHsound.hqx     News            README          dprintf.c       maccurs.c
-macerrs.c       macfile.c       machelp.hqx     macmain.c       macmenu.c
-macsnd.c        mactopl.c       mactty.c        macunix.c       macwin.c
-mgetline.c      mmodal.c        mrecover.c      mrecover.hqx    mttymain.c
+NHsound.hqx     News            README          carbon.plist    dprintf.c
+maccurs.c       macerrs.c       macfile.c       machelp.hqx     macmain.c
+macmenu.c       macsnd.c        mactopl.c       mactty.c        macunix.c
+macwin.c        mgetline.c      mmodal.c        mrecover.c      mrecover.hqx
+mttymain.c
 
 sys/msdos:
 (files for MSDOS version)
