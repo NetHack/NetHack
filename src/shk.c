@@ -1534,7 +1534,9 @@ boolean itemize;
 	}
 
 	pay(ltmp, shkp);
-	shk_names_obj(shkp, obj, "bought %s for %ld gold piece%s.%s", ltmp, "");
+	shk_names_obj(shkp, obj, consumed ?
+			"paid for %s at a cost of %ld gold piece%s.%s" :
+			"bought %s for %ld gold piece%s.%s", ltmp, "");
 	obj->quan = save_quan;		/* restore original count */
 	/* quan => amount just bought, save_quan => remaining unpaid count */
 	if (consumed) {
