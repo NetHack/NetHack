@@ -70,6 +70,7 @@ struct obj {
 	Bitfield(olocked,1);	/* object is locked */
 	Bitfield(obroken,1);	/* lock has been broken */
 	Bitfield(otrapped,1);	/* container is trapped */
+				/* or accidental tripped rolling boulder trap */
 #define opoisoned otrapped	/* object (weapon) is coated with poison */
 
 	Bitfield(recharged,3);	/* number of times it's been recharged */

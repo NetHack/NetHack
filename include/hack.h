@@ -195,8 +195,9 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define MAY_FRACTURE	0x10	/* boulders & statues may fracture */
 
 /* Macros for launching objects */
-#define ROLL	1
-#define FLING	2
+#define ROLL		0x01	/* the object is rolling */
+#define FLING		0x02	/* the object is flying thru the air */
+#define LAUNCH_KNOWN	0x80	/* the hero caused this by explicit action */
 
 /* Macros for explosion types */
 #define EXPL_DARK	0

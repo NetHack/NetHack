@@ -188,7 +188,7 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 	    if (vis) hit(distant_name(otmp,mshot_xname), mtmp, exclam(damage));
 	    else if (verbose) pline("It is hit%s", exclam(damage));
 
-	    if (otmp->opoisoned) {
+	    if (otmp->opoisoned && is_poisonable(otmp)) {
 		if (resists_poison(mtmp)) {
 		    if (vis) pline_The("poison doesn't seem to affect %s.",
 				   mon_nam(mtmp));
@@ -223,7 +223,10 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 		    pline("%s is %s!", Monnam(mtmp),
 			(nonliving(mtmp->data) || !vis)
 			? "destroyed" : "killed");
-		if (!flags.mon_moving) xkilled(mtmp,0);
+		/* don't blame hero for unknown rolling boulder trap */
+		if (!flags.mon_moving &&
+		    (otmp->otyp != BOULDER || range >= 0 || !otmp->otrapped))
+		    xkilled(mtmp,0);
 		else mondied(mtmp);
 	    }
 
@@ -377,7 +380,8 @@ m_throw(mon, x, y, dx, dy, range, obj)
 			    if (dam < 1) dam = 1;
 			    hitu = thitu(hitv, dam, singleobj, (char *)0);
 		    }
-		    if (hitu && singleobj->opoisoned) {
+		    if (hitu && singleobj->opoisoned &&
+			is_poisonable(singleobj)) {
 			char onmbuf[BUFSZ], knmbuf[BUFSZ];
 			struct obj otmp;
 			unsigned save_ocknown;

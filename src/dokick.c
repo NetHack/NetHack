@@ -1313,6 +1313,8 @@ boolean shop_floor_obj;
 	otmp->ox = cc.x;
 	otmp->oy = cc.y;
 	otmp->owornmask = (long)toloc;
+	/* boulder from rolling boulder trap, no longer part of the trap */
+	if (otmp->otyp == BOULDER) otmp->otrapped = 0;
 
 	if(impact) {
 	    /* the objs impacted may be in a shop other than

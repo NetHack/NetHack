@@ -1000,17 +1000,19 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		fill_pit(u.ux, u.uy);
 		break;
 
-	    case ROLLING_BOULDER_TRAP:
+	    case ROLLING_BOULDER_TRAP: {
+		int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
+
 		seetrap(trap);
 		pline("Click! You trigger a rolling boulder trap!");
 		if(!launch_obj(BOULDER, trap->launch.x, trap->launch.y,
-		      trap->launch2.x,trap->launch2.y, ROLL)) {
+		      trap->launch2.x, trap->launch2.y, style)) {
 		    deltrap(trap);
 		    newsym(u.ux,u.uy);	/* get rid of trap symbol */
 		    pline("Fortunately for you, no boulder was released.");
 		}
 		break;
-
+	    }
 	    case MAGIC_PORTAL:
 		seetrap(trap);
 		domagicportal(trap);
@@ -1194,6 +1196,11 @@ int style;
 	dx = sgn(x2 - x1);
 	dy = sgn(y2 - y1);
 	switch (style) {
+	    case ROLL|LAUNCH_KNOWN:
+			/* use otrapped as a flag to ohitmon */
+			singleobj->otrapped = 1;
+			style &= ~LAUNCH_KNOWN;
+			/* fall through */
 	    case ROLL:
 			delaycnt = 2;
 			/* fall through */
@@ -1223,6 +1230,7 @@ int style;
 			    if (rn2(3)) {
 				pline("%s snatches the boulder.",
 					Monnam(mtmp));
+				singleobj->otrapped = 0;
 				(void) mpickobj(mtmp, singleobj);
 				used_up = TRUE;
 				break;
@@ -1242,7 +1250,7 @@ int style;
 		}
 		if (style == ROLL) {
 		    if (down_gate(bhitpos.x, bhitpos.y) != -1) {
-		       if (ship_object(singleobj, bhitpos.x, bhitpos.y, FALSE)){
+		        if(ship_object(singleobj, bhitpos.x, bhitpos.y, FALSE)){
 				used_up = TRUE;
 				break;
 			}
@@ -1258,6 +1266,7 @@ int style;
 				deltrap(t);
 				del_engr_at(bhitpos.x,bhitpos.y);
 				place_object(singleobj, bhitpos.x, bhitpos.y);
+				singleobj->otrapped = 0;
 				fracture_rock(singleobj);
 				scatter(bhitpos.x,bhitpos.y, 4,
 					MAY_DESTROY|MAY_HIT|MAY_FRACTURE|VIS_EFFECTS,
@@ -1273,6 +1282,7 @@ int style;
 			    	pline("Suddenly the rolling boulder disappears!");
 			    else
 			    	You_hear("a rumbling stop abruptly.");
+			    singleobj->otrapped = 0;
 			    if (t->ttyp == TELEP_TRAP)
 				rloco(singleobj);
 			    else {
@@ -1304,6 +1314,9 @@ int style;
 		    	You_hear("a loud crash%s!",
 				cansee(bhitpos.x, bhitpos.y) ? bmsg : "");
 			obj_extract_self(otmp2);
+			/* pass off the otrapped flag to the next boulder */
+			otmp2->otrapped = singleobj->otrapped;
+			singleobj->otrapped = 0;
 			place_object(singleobj, bhitpos.x, bhitpos.y);
 			singleobj = otmp2;
 			otmp2 = (struct obj *)0;
@@ -1319,6 +1332,7 @@ int style;
 	}
 	tmp_at(DISP_END, 0);
 	if (!used_up) {
+		singleobj->otrapped = 0;
 		place_object(singleobj, x2,y2);
 		newsym(x2,y2);
 		return 1;
