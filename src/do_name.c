@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.4	2002/09/19	*/
+/*	SCCS Id: @(#)do_name.c	3.4	2003/01/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -275,11 +275,10 @@ do_mname()
 	/* strip leading and trailing spaces; unnames monster if all spaces */
 	(void)mungspaces(buf);
 
-	if (mtmp->iswiz || type_is_pname(mtmp->data) ||
-	    mtmp->data->msound == MS_LEADER ||
-	    mtmp->data->msound == MS_NEMESIS)
+	if (mtmp->data->geno & G_UNIQ)
 	    pline("%s doesn't like being called names!", Monnam(mtmp));
-	else (void) christen_monst(mtmp, buf);
+	else
+	    (void) christen_monst(mtmp, buf);
 	return(0);
 }
 
@@ -471,6 +470,11 @@ ddocall()
 #endif
 		obj = getobj(callable, "call");
 		if (obj) {
+			/* behave as if examining it in inventory;
+			   this might set dknown if it was picked up
+			   while blind and the hero can now see */
+			(void) xname(obj);
+
 			if (!obj->dknown) {
 				You("would never recognize another one.");
 				return 0;
@@ -719,8 +723,7 @@ boolean called;
 		article = ARTICLE_THE;
 	    else
 		article = ARTICLE_NONE;
-	} else if ((mons[monsndx(mdat)].geno & G_UNIQ) &&
-		   article == ARTICLE_A) {
+	} else if ((mdat->geno & G_UNIQ) && article == ARTICLE_A) {
 	    article = ARTICLE_THE;
 	}
 
