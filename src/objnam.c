@@ -222,7 +222,7 @@ fruitjuice()
     else
 	juice = pl_fruit;	/* use it as is */
 
-    Sprintf(buf, "%s juice", juice);
+    Sprintf(buf, "%s juice", makesingular(juice));
     return buf;
 }
 
