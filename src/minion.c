@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)minion.c	3.3	2000/09/14	*/
+/*	SCCS Id: @(#)minion.c	3.3	2002/01/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -178,9 +178,10 @@ struct monst *mtmp;
 	if (offer < 0L) {
 		You("try to shortchange %s, but fumble.",
 			mon_nam(mtmp));
-		offer = 0L;
+		return 0L;
 	} else if (offer == 0L) {
 		You("refuse.");
+		return 0L;
 #ifndef GOLDOBJ
 	} else if (offer >= u.ugold) {
 		You("give %s all your gold.", mon_nam(mtmp));
@@ -197,7 +198,7 @@ struct monst *mtmp;
 	} else You("give %s %ld %s.", mon_nam(mtmp), offer,
 		   currency(offer));
 
-        money2mon(mtmp, offer);
+	money2mon(mtmp, offer);
 #endif
 	flags.botl = 1;
 	return(offer);
