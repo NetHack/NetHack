@@ -18,7 +18,7 @@ typedef struct mswin_nethack_main_window {
 
 static TCHAR szMainWindowClass[] = TEXT("MSNHMainWndClass");
 static TCHAR szTitle[MAX_LOADSTRING];
-extern void mswin_display_splash_window(void);
+extern void mswin_display_splash_window(BOOL);
 
 LRESULT CALLBACK	MainWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
@@ -702,7 +702,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	switch (wmId)
 	{
 		case IDM_ABOUT:
-		   mswin_display_splash_window();
+     mswin_display_splash_window(TRUE);
 		   break;
 
 		case IDM_EXIT:

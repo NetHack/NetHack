@@ -8,6 +8,6 @@
 #include "config.h"
 #include "global.h"
 
-void mswin_display_splash_window (void);
+void mswin_display_splash_window (BOOL);
 
 #endif /* MSWINSplashWindow_h */

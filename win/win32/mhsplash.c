@@ -7,13 +7,16 @@
 #include "mhmsg.h"
 #include "mhfont.h"
 #include "patchlevel.h"
+#include "dlb.h"
+
+#define LLEN 128
 
 PNHWinApp GetNHApp(void);
 
 BOOL CALLBACK NHSplashWndProc(HWND, UINT, WPARAM, LPARAM);
 
 #define SPLASH_WIDTH		440
-#define SPLASH_HEIGHT		240
+#define SPLASH_HEIGHT  301
 #define SPLASH_VERSION_X		290
 #define SPLASH_VERSION_Y		10
 #define SPLASH_EXTRA_X_BEGIN	15
@@ -25,7 +28,7 @@ BOOL CALLBACK NHSplashWndProc(HWND, UINT, WPARAM, LPARAM);
 extern HFONT version_splash_font;
 extern HFONT extrainfo_splash_font;
 
-void mswin_display_splash_window ()
+void mswin_display_splash_window (BOOL show_ver)
 {
 	MSG msg;
 	RECT rt;
@@ -34,6 +37,7 @@ void mswin_display_splash_window ()
 	RECT clientrt;
 	RECT controlrt;
 	HWND hWnd;
+ int buttop;
 
 	hWnd = CreateDialog(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_SPLASH),
 	    GetNHApp()->hMainWnd, NHSplashWndProc);
@@ -60,12 +64,74 @@ void mswin_display_splash_window ()
 	rt.left += (rt.right - rt.left - splashrt.right) / 2;
 	rt.top += (rt.bottom - rt.top - splashrt.bottom) / 2;
 	MoveWindow(hWnd, rt.left, rt.top, splashrt.right, splashrt.bottom, TRUE);
-	/* Place the control */
+ /* Place the OK control */
 	GetClientRect (hWnd, &clientrt);
 	MoveWindow (GetDlgItem(hWnd, IDOK),
 	    (clientrt.right - clientrt.left - controlrt.right) / 2,
 	    clientrt.bottom - controlrt.bottom - SPLASH_OFFSET_Y,
 	    controlrt.right, controlrt.bottom, TRUE);
+ buttop = clientrt.bottom - controlrt.bottom - SPLASH_OFFSET_Y;
+ /* Place the text control */
+ GetWindowRect (GetDlgItem(hWnd, IDC_EXTRAINFO), &controlrt);
+ controlrt.right -= controlrt.left;
+ controlrt.bottom -= controlrt.top;
+ GetClientRect (hWnd, &clientrt);
+ MoveWindow (GetDlgItem(hWnd, IDC_EXTRAINFO),
+     clientrt.left + SPLASH_OFFSET_X,
+     buttop - controlrt.bottom - SPLASH_OFFSET_Y,
+     clientrt.right - 2 * SPLASH_OFFSET_X, controlrt.bottom, TRUE);
+ if (show_ver) {
+     /* Show complete version informatoin */
+      char buf[BUFSZ];
+
+  getversionstring(buf);
+  sprintf(eos(buf), "%s",
+#if defined(BETA) && defined(BETA_INFO)
+      BETA_INFO);
+#else
+      "");
+#endif
+  SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), buf);
+
+ } else {
+     /* Show news, if any */
+     FILE *nf;
+
+     nf = fopen(NEWS, "r");
+     if (nf != NULL) {
+  char *buf = NULL;
+  int bufsize = 0;
+  int strsize = 0;
+  char line[LLEN + 1];
+
+  while (fgets(line, LLEN, nf)) {
+      size_t len;
+      len = strlen(line);
+      if (line[len - 1] == '\n') {
+   line[len - 1] = '\r';
+   line[len] = '\n';
+   line[len + 1] = '\0';
+   len++;
+      }
+      if (strsize + (int)len > bufsize)
+      {
+   bufsize += BUFSZ;
+   buf = realloc(buf, bufsize);
+   if (buf == NULL)
+       panic("out of memory");
+   if (strsize == 0)
+       buf[0] = '\0';
+      }
+      strcat(buf, line);
+      strsize += len;
+  }
+  (void) fclose(nf);
+  SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), buf);
+  free(buf);
+     }
+     else
+  SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), "No news.");
+ }
 	ShowWindow(hWnd, SW_SHOW);
 
 	while( IsWindow(hWnd) &&
@@ -111,8 +177,11 @@ BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		hdcBitmap = CreateCompatibleDC(hdc);
 		SetBkMode (hdc, OPAQUE);
 		OldBitmap = SelectObject(hdcBitmap, GetNHApp()->bmpSplash);
-		BitBlt (hdc, SPLASH_OFFSET_X, SPLASH_OFFSET_Y, SPLASH_WIDTH,
-		    SPLASH_HEIGHT, hdcBitmap, 0, 0, SRCCOPY);
+		nhapply_image_transparent(hdc, SPLASH_OFFSET_X, SPLASH_OFFSET_Y,
+		    SPLASH_WIDTH, SPLASH_HEIGHT, 
+		    hdcBitmap, 0, 0, SPLASH_WIDTH, SPLASH_HEIGHT, 
+		    TILE_BK_COLOR);
+
 		SelectObject (hdcBitmap, OldBitmap);
 		DeleteDC (hdcBitmap);
 

@@ -241,7 +241,7 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	mswin_color_from_string(iflags.wc_backgrnd_status, &status_bg_brush, &status_bg_color);
 	mswin_color_from_string(iflags.wc_backgrnd_text, &text_bg_brush, &text_bg_color);
 
-	if (iflags.wc_splash_screen) mswin_display_splash_window();
+ if (iflags.wc_splash_screen) mswin_display_splash_window(FALSE);
 	iflags.window_inited = TRUE;
 }
 

@@ -898,26 +898,7 @@ void nhapply_image_transparent(
 	COLORREF cTransparent
 )
 {
-	static BOOL MSIInit = FALSE;
-	static HMODULE hMSIModule = NULL; 
-	static LPTRANSPARENTBLT pTransparentBlt = NULL; 
-
-	if( !MSIInit ) {
-		MSIInit = TRUE;
-		hMSIModule = LoadLibrary(_T("Msimg32.dll")); 
-		if (hMSIModule) { 
-			pTransparentBlt = (LPTRANSPARENTBLT) GetProcAddress(hMSIModule, "TransparentBlt"); 
-		} 
-	}
-
-	if ( pTransparentBlt )
-	{
-		(*pTransparentBlt)(
-			hDC, x, y, width, height,
-			sourceDC, s_x, s_y, s_width, s_height,
-			cTransparent
-		);
-	} else {
+    /* Don't use TransparentBlt; According to Microsoft, it contains a memory leak in Window 95/98. */
 		HDC        hdcMem, hdcBack, hdcObject, hdcSave;
 		COLORREF   cColor;
 		HBITMAP    bmAndBack, bmAndObject, bmAndMem, bmSave;
@@ -992,5 +973,4 @@ void nhapply_image_transparent(
 		DeleteDC(hdcBack);
 		DeleteDC(hdcObject);
 		DeleteDC(hdcSave);
-	}
 }

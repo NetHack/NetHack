@@ -111,6 +111,7 @@
 #define IDC_PLSEL_GENDER_LIST           1326
 #define IDC_ABOUT_VERSION               1327
 #define IDC_ABOUT_COPYRIGHT             1328
+#define IDC_EXTRAINFO                   1331
 #define IDM_SAVE                        32771
 #define IDM_HELP_LONG                   32772
 #define IDM_HELP_COMMANDS               32773
@@ -143,7 +144,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         32796
-#define _APS_NEXT_CONTROL_VALUE         1331
+#define _APS_NEXT_CONTROL_VALUE         1332
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
