@@ -1906,7 +1906,10 @@ lookaround()
 	if (IS_ROCK(levl[x][y].typ) || (levl[x][y].typ == ROOM) ||
 	    IS_AIR(levl[x][y].typ))
 	    continue;
-	else if (closed_door(x,y)) {
+	else if (closed_door(x,y) ||
+		 (mtmp && mtmp->m_ap_type == M_AP_FURNITURE &&
+		  (mtmp->mappearance == S_hcdoor ||
+		   mtmp->mappearance == S_vcdoor))) {
 	    if(x != u.ux && y != u.uy) continue;
 	    if(flags.run != 1) goto stop;
 	    goto bcorr;
