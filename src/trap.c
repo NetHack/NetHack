@@ -417,8 +417,8 @@ int *fail_reason;
 	    if (mon && mon->mtame && !mon->isminion)
 		wary_dog(mon, TRUE);
 	} else {
-	    /* statue of Stone golem hit with Stone-to-flesh becomes flesh golem */
-	    if (statue->corpsenm == PM_STONE_GOLEM && cause == ANIMATE_SPELL)
+	    /* statue of any golem hit with stone-to-flesh becomes flesh golem */
+	    if (is_golem(&mons[statue->corpsenm]) && cause == ANIMATE_SPELL)
 	    	mptr = &mons[PM_FLESH_GOLEM];
 	    else
 		mptr = &mons[statue->corpsenm];
@@ -454,8 +454,10 @@ int *fail_reason;
 	if (mon->m_ap_type) seemimic(mon);
 	else mon->mundetected = FALSE;
 	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
+	    const char *comes_to_life = nonliving(mon->data) ?
+					"moves" : "comes to life"; 
 	    pline_The("statue %s!",
-		canspotmon(mon) ? "comes to life" : "disappears");
+		canspotmon(mon) ? comes_to_life : "disappears");
 		if (historic) {
 		    You_feel("guilty that the historic statue is now gone.");
 		    adjalign(-1);
