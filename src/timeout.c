@@ -621,6 +621,8 @@ slip_or_trip()
 	if (u.usteed) on_foot = FALSE;
 #endif
 
+	if (otmp && on_foot && !u.uinwater && is_pool(u.ux, u.uy)) otmp = 0;
+
 	if (otmp && on_foot) {		/* trip over something in particular */
 	    /*
 		If there is only one item, it will have just been named
