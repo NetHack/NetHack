@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/05/25	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/09/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -446,6 +446,9 @@ int *fail_reason;
 	    return (struct monst *)0;
 	}
 
+	/* in case statue is wielded and hero zaps stone-to-flesh at self */
+	if (statue->owornmask) remove_worn_item(statue, TRUE);
+
 	/* allow statues to be of a specific gender */
 	if (statue->spe & STATUE_MALE)
 	    mon->female = FALSE;
@@ -461,6 +464,7 @@ int *fail_reason;
 	}
 	m_dowear(mon, TRUE);
 	delobj(statue);
+
 	/* mimic statue becomes seen mimic; other hiders won't be hidden */
 	if (mon->m_ap_type) seemimic(mon);
 	else mon->mundetected = FALSE;
