@@ -400,7 +400,8 @@ struct scatter_chain {
  *	MAY_FRACTURE	Stone objects can be fractured (statues, boulders)
  */
 
-void
+/* returns number of scattered objects */
+int
 scatter(sx,sy,blastforce,scflags, obj)
 int sx,sy;				/* location of objects to scatter */
 int blastforce;				/* force behind the scattering	*/
@@ -413,11 +414,11 @@ struct obj *obj;			/* only scatter this obj        */
 	uchar typ;
 	long qtmp;
 	boolean used_up;
-	boolean split_up = FALSE;
 	boolean individual_object = obj ? TRUE : FALSE;
 	struct monst *mtmp;
 	struct scatter_chain *stmp, *stmp2 = 0;
 	struct scatter_chain *schain = (struct scatter_chain *)0;
+	int total = 0;
 
 	while ((otmp = individual_object ? obj : level.objects[sx][sy]) != 0) {
 	    if (otmp->quan > 1L) {
@@ -425,17 +426,8 @@ struct obj *obj;			/* only scatter this obj        */
 		if (qtmp > LARGEST_INT) qtmp = LARGEST_INT;
 		qtmp = (long)rnd((int)qtmp);
 		otmp = splitobj(otmp, qtmp);
-		if (rn2(qtmp))
-		    split_up = TRUE;
-		else
-		    split_up = FALSE;
-	    } else
-		split_up = FALSE;
-	    if (individual_object) {
- 		if (split_up) {
-		    obj = otmp;
-		} else
-		    obj = (struct obj *)0;
+	    } else {
+		obj = (struct obj *)0; /* all used */
 	    }
 	    obj_extract_self(otmp);
 	    used_up = FALSE;
@@ -549,12 +541,16 @@ struct obj *obj;			/* only scatter this obj        */
 		stmp2 = stmp->next;
 		x = stmp->ox; y = stmp->oy;
 		if (stmp->obj) {
+			if ( x!=sx || y!=sy )
+			    total += stmp->obj->quan;
 			place_object(stmp->obj, x, y);
 			stackobj(stmp->obj);
 		}
 		free((genericptr_t)stmp);
 		newsym(x,y);
 	}
+
+	return total;
 }
 
 
