@@ -5,8 +5,8 @@ The MPW compilers are now supported again.
 Support for 68k has been discontinued due to a lack of a debugging
 system for 68k binaries.
 
-Note that the graphical MacOS X variant uses the Qt windowport and the UNIX
-build system.
+Note that the tiled MacOS X port uses the Qt windowport and the UNIX
+build system, not this windowport code.
 
 
 26 Nov, 1999
