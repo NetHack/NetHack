@@ -731,7 +731,7 @@ int thrown;
 
 			if (touch_petrifies(&mons[obj->corpsenm])) {
 			    /*learn_egg_type(obj->corpsenm);*/
-			    You("hit %s with %s %s egg%s.  Splat!",
+			    pline("Splat! You hit %s with %s %s egg%s!",
 				mon_nam(mon),
 				obj->known ? "the" : cnt > 1L ? "some" : "a",
 				obj->known ? mons[obj->corpsenm].mname : "petrifying",
