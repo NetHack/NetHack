@@ -1390,10 +1390,18 @@ invocation_message()
 {
 	/* a special clue-msg when on the Invocation position */
 	if(invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
+	    char buf[BUFSZ];
 	    struct obj *otmp = carrying(CANDELABRUM_OF_INVOCATION);
 
-	    You_feel("a strange vibration under your %s.",
-		    makeplural(body_part(FOOT)));
+	    nomul(0);		/* stop running or travelling */
+#ifdef STEED
+	    if (u.usteed) Sprintf(buf, "beneath %s", y_monnam(u.usteed));
+	    else
+#endif
+	    if (Levitation || Flying) Strcpy(buf, "beneath you");
+	    else Sprintf(buf, "under your %s", makeplural(body_part(FOOT)));
+
+	    You_feel("a strange vibration %s.", buf);
 	    if (otmp && otmp->spe == 7 && otmp->lamplit)
 		pline("%s %s!", The(xname(otmp)),
 		    Blind ? "throbs palpably" : "glows with a strange light");
