@@ -978,6 +978,10 @@ boolean your_fault;
 	register const char *botlnam = bottlename();
 	boolean isyou = (mon == &youmonst);
 	int distance;
+#ifdef STEED
+	struct obj *saddle = (struct obj *)0;
+	boolean hit_saddle = FALSE;
+#endif
 
 	if(isyou) {
 		distance = 0;
@@ -985,12 +989,29 @@ boolean your_fault;
 			botlnam, body_part(HEAD));
 		losehp(Maybe_Half_Phys(rnd(2)), "thrown potion", KILLED_BY_AN);
 	} else {
+#ifdef STEED
+		/* sometimes it hits the saddle */
+		if(((mon->misc_worn_check & W_SADDLE) &&
+		    (saddle = which_armor(mon, W_SADDLE))) &&
+		   (!rn2(10) ||
+		    (obj->otyp == POT_WATER &&
+		     ((rnl(10) > 7 && obj->cursed) ||
+		      (rnl(10) < 4 && obj->blessed) || !rn2(3)))))
+			hit_saddle = TRUE;
+#endif
 		distance = distu(mon->mx,mon->my);
 		if (!cansee(mon->mx,mon->my)) pline("Crash!");
 		else {
 		    char *mnam = mon_nam(mon);
 		    char buf[BUFSZ];
 
+#ifdef STEED
+		    if(hit_saddle && saddle) {
+			Sprintf(buf, "%s saddle", s_suffix(x_monnam(mon,
+					ARTICLE_THE, (char *)0,
+		    			(SUPPRESS_IT|SUPPRESS_SADDLE), FALSE)));
+		    } else
+#endif
 		    if(has_head(mon->data)) {
 			Sprintf(buf, "%s %s",
 				s_suffix(mnam),
@@ -1001,12 +1022,20 @@ boolean your_fault;
 		    pline_The("%s crashes on %s and breaks into shards.",
 			   botlnam, buf);
 		}
-		if(rn2(5) && mon->mhp > 1)
+		if(rn2(5) && mon->mhp > 1
+#ifdef STEED
+		   && !hit_saddle
+#endif
+					 )
 			mon->mhp--;
 	}
 
-	/* oil doesn't instantly evaporate */
-	if (obj->otyp != POT_OIL && cansee(mon->mx,mon->my))
+	/* oil doesn't instantly evaporate; Neither does a saddle hit */
+	if (obj->otyp != POT_OIL &&
+#ifdef STEED
+	    !hit_saddle &&
+#endif
+	    cansee(mon->mx,mon->my))
 		pline("%s.", Tobjnam(obj, "evaporate"));
 
     if (isyou) {
@@ -1030,6 +1059,72 @@ boolean your_fault;
 		}
 		break;
 	}
+#ifdef STEED
+    } else if (hit_saddle && saddle) {
+	const char *tmp;
+	char buf[BUFSZ];
+	char *mnam = x_monnam(mon, ARTICLE_THE, (char *)0,
+		    		(SUPPRESS_IT|SUPPRESS_SADDLE), FALSE);
+	boolean affected = FALSE;
+	boolean useeit = !Blind && canseemon(mon) && cansee(mon->mx,mon->my);
+
+	Sprintf(buf, "%s", upstart(s_suffix(mnam)));
+
+	switch (obj->otyp) {
+	case POT_WATER:
+		if (obj->blessed) {
+			if (saddle->cursed) {
+				if (useeit)
+				    pline("%s %s %s.",
+					  buf,
+					  aobjnam(saddle, "softly glow"),
+					  hcolor(NH_AMBER));
+				uncurse(saddle);
+				saddle->bknown=1;
+				affected = TRUE;
+			} else if(!saddle->blessed) {
+				if (useeit) {
+				    tmp = hcolor(NH_LIGHT_BLUE);
+				    pline("%s %s with a%s %s aura.",
+					  buf,
+					  aobjnam(saddle, "softly glow"),
+					  index(vowels, *tmp) ? "n" : "", tmp);
+				}
+				bless(saddle);
+				saddle->bknown=1;
+				affected = TRUE;
+			}
+		} else if (obj->cursed) {
+			if (saddle->blessed) {
+				if (useeit)
+				    pline("%s %s %s.",
+					  buf,
+					  aobjnam(saddle, "glow"),
+					  hcolor((const char *)"brown"));
+				unbless(saddle);
+				saddle->bknown=1;
+				affected = TRUE;
+			} else if(!saddle->cursed) {
+				if (useeit) {
+				    tmp = hcolor(NH_BLACK);
+				    pline("%s %s with a%s %s aura.",
+					  buf,
+					  aobjnam(saddle, "glow"),
+					  index(vowels, *tmp) ? "n" : "", tmp);
+				}
+				curse(saddle);
+				saddle->bknown=1;
+				affected = TRUE;
+			}
+		}
+		break;
+	case POT_POLYMORPH:
+		/* Do we allow the saddle to polymorph? */
+		break;
+	}
+	if (useeit && !affected) pline("%s %s wet.",
+					buf, aobjnam(saddle,"get"));
+#endif
     } else {
 	boolean angermon = TRUE;
 

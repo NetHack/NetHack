@@ -56,6 +56,7 @@ player polymorphed as a ceiling hider cannot reach the floor, but
 trappers do not hide on the ceiling
 non-magical whistles do not work underwater
 try to restrict whistles and musical instruments to monsters that can blow
+thrown potions can sometimes hit a steed's saddle
 
 
 Platform- and/or Interface-Specific Fixes
