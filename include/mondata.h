@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.h	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)mondata.h	3.4	2003/11/29	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -143,6 +143,10 @@
 				 (ptr) == &mons[PM_HUMAN])
 /* return TRUE if the monster tends to revive */
 #define is_reviver(ptr)		(is_rider(ptr) || (ptr)->mlet == S_TROLL)
+/* monsters whose corpses and statues need special handling;
+   note that high priests and the Wizard of Yendor are flagged
+   as unique even though they really aren't; that's ok here */
+#define unique_corpstat(ptr)	(((ptr)->geno & G_UNIQ) != 0)
 
 /* this returns the light's range, or 0 if none; if we add more light emitting
    monsters, we'll likely have to add a new light range field to mons[] */

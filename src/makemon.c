@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.4	2003/09/06	*/
+/*	SCCS Id: @(#)makemon.c	3.4	2003/11/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -898,7 +898,8 @@ register int	mmflags;
 	mtmp->m_id = context.ident++;
 	if (!mtmp->m_id) mtmp->m_id = context.ident++;	/* ident overflowed */
 	set_mon_data(mtmp, ptr, 0);
-	if (mtmp->data->msound == MS_LEADER)
+	if (mtmp->data->msound == MS_LEADER &&
+		quest_info(MS_LEADER) == mndx)
 	    quest_status.leader_m_id = mtmp->m_id;
 	mtmp->mxlth = xlth;
 	mtmp->mnum = mndx;
@@ -987,13 +988,16 @@ register int	mmflags;
 				 LS_MONSTER, (genericptr_t)mtmp);
 	mitem = 0;	/* extra inventory item for this monster */
 
+	mtmp->cham = CHAM_ORDINARY;	/* default is "not a shapechanger" */
 	if ((mcham = pm_to_cham(mndx)) != CHAM_ORDINARY) {
-		/* If you're protected with a ring, don't create
-		 * any shape-changing chameleons -dgk
-		 */
-		if (Protection_from_shape_changers)
-			mtmp->cham = CHAM_ORDINARY;
-		else {
+		/* this is a shapechanger after all */
+		if (Protection_from_shape_changers) {
+			;	/* stuck in its natural form (CHAM_ORDINARY) */
+		} else {
+			/* new shapechanger starts out with random form
+			   (this explicitly picks something from the normal
+			   selection for current difficulty level rather
+			   than from among shapechanger's preferred forms) */
 			mtmp->cham = mcham;
 			(void) newcham(mtmp, rndmonst(), FALSE, FALSE);
 		}

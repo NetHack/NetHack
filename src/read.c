@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.4	2003/10/22	*/
+/*	SCCS Id: @(#)read.c	3.4	2003/11/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1813,9 +1813,10 @@ unpunish()
  * one, the disoriented creature becomes a zombie
  */
 boolean
-cant_create(mtype, revival)
+cant_revive(mtype, revival, from_obj)
 int *mtype;
 boolean revival;
+struct obj *from_obj;
 {
 
 	/* SHOPKEEPERS can be revived now */
@@ -1825,6 +1826,12 @@ boolean revival;
 		return TRUE;
 	} else if (*mtype==PM_LONG_WORM_TAIL) {	/* for create_particular() */
 		*mtype = PM_LONG_WORM;
+		return TRUE;
+	} else if (from_obj && unique_corpstat(&mons[*mtype]) &&
+			from_obj->oattached != OATTACHED_MONST) {
+		/* unique corpses (from bones or wizard mode wish) or
+		   statues (bones or any wish) end up as shapechangers */
+		*mtype = PM_DOPPELGANGER;
 		return TRUE;
 	}
 	return FALSE;
@@ -1890,7 +1897,7 @@ create_particular()
 	    pline(thats_enough_tries);
 	} else {
 	    if (!randmonst) {
-		(void) cant_create(&which, FALSE);
+		(void) cant_revive(&which, FALSE, (struct obj *)0);
 		whichpm = &mons[which];
 	    }
 	    for (i = 0; i <= multi; i++) {

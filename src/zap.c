@@ -552,11 +552,13 @@ revive(obj)
 register struct obj *obj;
 {
 	register struct monst *mtmp = (struct monst *)0;
+	struct permonst *mptr;
 	struct obj *container = (struct obj *)0;
 	int container_nesting = 0;
 	schar savetame = 0;
 	boolean recorporealization = FALSE;
 	boolean in_container = FALSE;
+
 	if(obj->otyp == CORPSE) {
 		int montype = obj->corpsenm;
 		xchar x, y;
@@ -611,23 +613,37 @@ register struct obj *obj;
 			x = new_xy.x,  y = new_xy.y;
 		}
 
-		if(cant_create(&montype, TRUE)) {
-			/* make a zombie or worm instead */
-			mtmp = makemon(&mons[montype], x, y,
-				       NO_MINVENT|MM_NOWAIT);
-			if (mtmp) {
-				mtmp->mhp = mtmp->mhpmax = 100;
-				mon_adjust_speed(mtmp, 2, (struct obj *)0); /* MFAST */
+		mptr = &mons[montype];
+		if (cant_revive(&montype, TRUE, obj)) {
+		    /* make a zombie or doppelganger instead */
+		    mtmp = makemon(&mons[montype], x, y,
+				   NO_MINVENT | MM_NOWAIT);
+		    if (mtmp) {
+			if (mtmp->cham == CHAM_DOPPELGANGER) {
+			    /* change shape to match the corpse */
+			    (void) newcham(mtmp, mptr, FALSE, FALSE);
+			} else if (mtmp->data->mlet == S_ZOMBIE) {
+			    mtmp->mhp = mtmp->mhpmax = 100;
+			    mon_adjust_speed(mtmp, 2, (struct obj *)0); /* MFAST */
 			}
+		    }
 		} else {
 		    if (obj->oxlth && (obj->oattached == OATTACHED_MONST)) {
-			    coord xy;
-			    xy.x = x; xy.y = y;
-		    	    mtmp = montraits(obj, &xy);
-		    	    if (mtmp && mtmp->mtame && !mtmp->isminion)
+			coord xy;
+
+			xy.x = x; xy.y = y;
+			mtmp = montraits(obj, &xy);
+			if (mtmp) {
+			    if (mtmp->mtame && !mtmp->isminion)
 				wary_dog(mtmp, TRUE);
+			    /* might be reviving quest leader */
+			    if (quest_status.leader_is_dead &&
+				    /* _is_dead implies that _m_id is valid */
+				    mtmp->m_id == quest_status.leader_m_id)
+				quest_status.leader_is_dead = FALSE;
+			}
 		    } else
- 		            mtmp = makemon(&mons[montype], x, y,
+			mtmp = makemon(&mons[montype], x, y,
 				       NO_MINVENT|MM_NOWAIT|MM_NOCOUNTBIRTH);
 		    if (mtmp) {
 			if (obj->oxlth && (obj->oattached == OATTACHED_M_ID)) {
@@ -654,10 +670,6 @@ register struct obj *obj;
 			/* Monster retains its name */
 			if (obj->onamelth)
 			    mtmp = christen_monst(mtmp, ONAME(obj));
-			/* flag the quest leader as alive. */
-			if (mtmp->data->msound == MS_LEADER || mtmp->m_id ==
-				quest_status.leader_m_id)
-			    quest_status.leader_is_dead = FALSE;
 		    }
 		}
 		if (mtmp) {
@@ -665,6 +677,12 @@ register struct obj *obj;
 				mtmp->mhp = eaten_stat(mtmp->mhp, obj);
 			/* track that this monster was revived at least once */
 			mtmp->mrevived = 1;
+			/* in case this was a shapechanger corpse and
+			   Protection_from_shape_changers happens to be
+			   different now than it was when the monster
+			   was killed (probably a no-op here since
+			   KEEPTRAITS() doesn't include shapechangers) */
+			restore_cham(mtmp);
 
 			if (recorporealization) {
 				/* If mtmp is revivification of former tame ghost*/

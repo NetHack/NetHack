@@ -145,9 +145,16 @@ STATIC_VAR short cham_to_pm[] = {
 		PM_SANDESTIN,
 };
 
-#define KEEPTRAITS(mon)	(mon->isshk || mon->mtame || \
-			 (mon->data->geno & G_UNIQ) || is_reviver(mon->data) || \
-			 (mon->m_id == quest_status.leader_m_id))
+/* for deciding whether corpse will carry along full monster data */
+#define KEEPTRAITS(mon)	((mon)->isshk || (mon)->mtame ||		\
+			 unique_corpstat(mon->data) ||			\
+			 is_reviver((mon)->data) ||			\
+			 /* normally leader the will be unique, */	\
+			 /* but he might have been polymorphed  */	\
+			 (mon)->m_id == quest_status.leader_m_id ||	\
+			 /* special cancellation handling for these */	\
+			 (dmgtype((mon)->data, AD_SEDU) ||		\
+			  dmgtype((mon)->data, AD_SSEX)))
 
 /* Creates a monster corpse, a "special" corpse, or nothing if it doesn't
  * leave corpses.  Monsters which leave "special" corpses should have

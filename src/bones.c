@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bones.c	3.4	2003/09/06	*/
+/*	SCCS Id: @(#)bones.c	3.4	2003/11/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,17 +64,21 @@ boolean restore;
 		if (otmp->cobj)
 		    resetobjs(otmp->cobj,restore);
 
-		if (((otmp->otyp != CORPSE || otmp->corpsenm < SPECIAL_PM)
-			&& otmp->otyp != STATUE)
-			&& (!otmp->oartifact ||
-			   (restore && (exist_artifact(otmp->otyp, ONAME(otmp))
-					|| is_quest_artifact(otmp))))) {
-			otmp->oartifact = 0;
-			otmp->onamelth = 0;
-			*ONAME(otmp) = '\0';
-		} else if (otmp->oartifact && restore)
-			artifact_exists(otmp,ONAME(otmp),TRUE);
-		if (!restore) {
+		if (restore) {
+			/* artifact bookeeping needs to be done during
+			   restore; other fixups are done while saving */
+			if (otmp->oartifact) {
+			    if (exist_artifact(otmp->otyp, ONAME(otmp)) ||
+				    is_quest_artifact(otmp)) {
+				/* prevent duplicate--revert to ordinary obj */
+				otmp->oartifact = 0;
+				otmp->onamelth = 0;
+				*ONAME(otmp) = '\0';
+			    } else {
+				artifact_exists(otmp, ONAME(otmp), TRUE);
+			    }
+			}
+		} else {	/* saving */
 			/* do not zero out o_ids for ghost levels anymore */
 
 			if(objects[otmp->otyp].oc_uses_known) otmp->known = 0;
@@ -82,6 +86,23 @@ boolean restore;
 			otmp->rknown = 0;
 			otmp->invlet = 0;
 			otmp->no_charge = 0;
+
+			/* strip user-supplied names */
+			/* Statue and some corpse names are left intact,
+			   presumeably in case they came from score file.
+			   [TODO: this ought to be done differently--names
+			   which came from such a source or came from any
+			   stoned or killed monster should be flagged in
+			   some manner; then we could just check the flag
+			   here and keep "real" names (dead pets, &c) while
+			   discarding player notes attached to statues.] */
+			if (otmp->onamelth &&
+				!(otmp->oartifact || otmp->otyp == STATUE ||
+				    (otmp->otyp == CORPSE &&
+					 otmp->corpsenm >= SPECIAL_PM))) {
+			    otmp->onamelth = 0;
+			    *ONAME(otmp) = '\0';
+			}
 
 			if (otmp->otyp == SLIME_MOLD) goodfruit(otmp->spe);
 #ifdef MAIL
@@ -91,8 +112,21 @@ boolean restore;
 			else if (otmp->otyp == TIN) {
 			    /* make tins of unique monster's meat be empty */
 			    if (otmp->corpsenm >= LOW_PM &&
-				    (mons[otmp->corpsenm].geno & G_UNIQ))
+				    unique_corpstat(&mons[otmp->corpsenm]))
 				otmp->corpsenm = NON_PM;
+			} else if (otmp->otyp == CORPSE ||
+				 otmp->otyp == STATUE) {
+			    int mnum = otmp->corpsenm;
+
+			    /* Discard incarnation details of unique
+			       monsters (by passing null instead of otmp
+			       for object), shopkeepers (by passing false
+			       for revival flag), temple priests, and
+			       vault guards in order to prevent corpse
+			       revival or statue reanimation. */
+			    if (otmp->oattached == OATTACHED_MONST &&
+				    cant_revive(&mnum, FALSE, (struct obj *)0))
+				otmp->oattached = OATTACHED_NOTHING;
 			} else if (otmp->otyp == AMULET_OF_YENDOR) {
 			    /* no longer the real Amulet */
 			    otmp->otyp = FAKE_AMULET_OF_YENDOR;

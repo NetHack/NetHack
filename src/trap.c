@@ -389,60 +389,69 @@ xchar x, y;
 int cause;
 int *fail_reason;
 {
-	struct permonst *mptr;
+	int mnum = statue->corpsenm;
+	struct permonst *mptr = &mons[mnum];
 	struct monst *mon = 0;
 	struct obj *item;
 	coord cc;
-	boolean historic = (Role_if(PM_ARCHEOLOGIST) && !context.mon_moving && (statue->spe & STATUE_HISTORIC));
+	boolean historic = (Role_if(PM_ARCHEOLOGIST) && !context.mon_moving &&
+			    (statue->spe & STATUE_HISTORIC)),
+		use_saved_traits;
 	char statuename[BUFSZ];
 
 	Strcpy(statuename,the(xname(statue)));
 
-	if (statue->oxlth && statue->oattached == OATTACHED_MONST) {
+	if (cant_revive(&mnum, TRUE, statue)) {
+	    /* mnum has changed; we won't be animating this statue as itself */
+	    if (mnum != PM_DOPPELGANGER) mptr = &mons[mnum];
+	    use_saved_traits = FALSE;
+	} else if (is_golem(mptr) && cause == ANIMATE_SPELL) {
+	    /* statue of any golem hit by stone-to-flesh becomes flesh golem */
+	    mnum = PM_FLESH_GOLEM;
+	    mptr = &mons[PM_FLESH_GOLEM];
+	    use_saved_traits = FALSE;
+	} else {
+	    use_saved_traits = (statue->oxlth &&
+				statue->oattached == OATTACHED_MONST);
+	}
+
+	if (use_saved_traits) {
+	    /* restore a petrified monster */
 	    cc.x = x,  cc.y = y;
 	    mon = montraits(statue, &cc);
-	    if (mon && mon->mtame && !mon->isminion)
-		wary_dog(mon, TRUE);
-	} else {
-	    /* statue of any golem hit with stone-to-flesh becomes flesh golem */
-	    if (is_golem(&mons[statue->corpsenm]) && cause == ANIMATE_SPELL)
-	    	mptr = &mons[PM_FLESH_GOLEM];
-	    else
-		mptr = &mons[statue->corpsenm];
-	    /*
-	     * Guard against someone wishing for a statue of a unique monster
-	     * (which is allowed in normal play) and then tossing it onto the
-	     * [detected or guessed] location of a statue trap.  Normally the
-	     * uppermost statue is the one which would be activated.
-	     */
-	    if ((mptr->geno & G_UNIQ) && cause != ANIMATE_SPELL) {
-	        if (fail_reason) *fail_reason = AS_MON_IS_UNIQUE;
-	        return (struct monst *)0;
+	    if (mon) {
+		if (mon->mtame && !mon->isminion)
+		    wary_dog(mon, TRUE);
+		/* might be bringing quest leader back to life */
+		if (quest_status.leader_is_dead &&
+			/* leader_is_dead implies that leader_m_id is valid */
+			mon->m_id == quest_status.leader_m_id)
+		    quest_status.leader_is_dead = FALSE;
 	    }
-	    if (cause == ANIMATE_SPELL &&
-		((mptr->geno & G_UNIQ) || mptr->msound == MS_GUARDIAN)) {
-		/* Statues of quest guardians or unique monsters
-		 * will not stone-to-flesh as the real thing.
-		 */
+	} else {
+	    /* statues of unique monsters from bones or wishing end
+	       up here (cant_revive() sets mnum to be doppelganger;
+	       mptr reflects the original form for use by newcham()) */
+	    if ((mnum == PM_DOPPELGANGER &&
+		    mptr != &mons[PM_DOPPELGANGER]) ||
+		/* block quest guards from other roles */
+		(mptr->msound == MS_GUARDIAN &&
+		    quest_info(MS_GUARDIAN) != mnum)) {
 		mon = makemon(&mons[PM_DOPPELGANGER], x, y,
-			NO_MINVENT|MM_NOCOUNTBIRTH|MM_ADJACENTOK);
-		if (mon) {
-			/* makemon() will set mon->cham to
-			 * CHAM_ORDINARY if hero is wearing
-			 * ring of protection from shape changers
-			 * when makemon() is called, so we have to
-			 * check the field before calling newcham().
-			 */
-			if (mon->cham == CHAM_DOPPELGANGER)
-				(void) newcham(mon, mptr, FALSE, FALSE);
-		}
+			      NO_MINVENT | MM_NOCOUNTBIRTH | MM_ADJACENTOK);
+		/* if hero has protection from shape changers, cham field will
+		   be CHAM_ORDINARY; otherwise, set form to match the statue */
+		if (mon && mon->cham != CHAM_ORDINARY)
+		    (void) newcham(mon, mptr, FALSE, FALSE);
 	    } else
 		mon = makemon(mptr, x, y, (cause == ANIMATE_SPELL) ?
-			(NO_MINVENT | MM_ADJACENTOK) : NO_MINVENT);
+				(NO_MINVENT | MM_ADJACENTOK) : NO_MINVENT);
 	}
 
 	if (!mon) {
-	    if (fail_reason) *fail_reason = AS_NO_MON;
+	    if (fail_reason)
+		*fail_reason = unique_corpstat(&mons[statue->corpsenm]) ?
+				AS_MON_IS_UNIQUE : AS_NO_MON;
 	    return (struct monst *)0;
 	}
 
@@ -468,6 +477,10 @@ int *fail_reason;
 	/* mimic statue becomes seen mimic; other hiders won't be hidden */
 	if (mon->m_ap_type) seemimic(mon);
 	else mon->mundetected = FALSE;
+	/* when reanimating a stoned monster, protection from shape changers
+	   might be different now than it was when the monster was petrified */
+	if (use_saved_traits) restore_cham(mon);
+
 	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
 	    const char *comes_to_life = nonliving(mon->data) ?
 					"moves" : "comes to life"; 

@@ -1699,7 +1699,7 @@ E void FDECL(litroom, (BOOLEAN_P,struct obj *));
 E void FDECL(do_genocide, (int));
 E void FDECL(punish, (struct obj *));
 E void NDECL(unpunish);
-E boolean FDECL(cant_create, (int *, BOOLEAN_P));
+E boolean FDECL(cant_revive, (int *,BOOLEAN_P,struct obj *));
 #ifdef WIZARD
 E boolean NDECL(create_particular);
 #endif
