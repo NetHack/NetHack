@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.4	2003/02/13	*/
+/*	SCCS Id: @(#)eat.c	3.4	2004/10/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1307,7 +1307,7 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 		pline("Ulch - that %s was tainted%s!",
 		      mons[mnum].mlet == S_FUNGUS ? "fungoid vegetation" :
 		      !vegetarian(&mons[mnum]) ? "meat" : "protoplasm",
-		      cannibal ? " cannibal" : "");
+		      cannibal ? ", you cannibal" : "");
 		if (Sick_resistance) {
 			pline("It doesn't seem at all sickening, though...");
 		} else {
@@ -1966,7 +1966,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		    else
 			otmp = splitobj(otmp, 1L);
 		}
-		pline("Ulch - That %s was rustproofed!", xname(otmp));
+		pline("Ulch - that %s was rustproofed!", xname(otmp));
 		/* The regurgitated object's rustproofing is gone now */
 		otmp->oerodeproof = 0;
 		make_stunned(HStun + rn2(10), TRUE);
