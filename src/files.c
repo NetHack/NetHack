@@ -42,16 +42,6 @@ extern int errno;
 # define O_BINARY 0
 #endif
 
-#if defined(WIN32)
-#define _POSIX_
-#include <limits.h>
-#undef _POSIX_
-#endif
-
-#if defined(__DJGPP__)
-#include <limits.h>
-#endif
-
 #ifdef PREFIXES_IN_USE
 #define FQN_NUMBUF 4
 static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
@@ -818,8 +808,6 @@ restore_saved_game()
 	return fd;
 }
 
-#if !defined(WIN_CE)
-
 static char*
 plname_from_file(filename)
 const char* filename;
@@ -845,6 +833,7 @@ const char* filename;
 
     return result;
 #else
+# if defined(UNIX) && defined(QT_GRAPHICS)
     /* Name not stored in save file, so we have to extract it from
        the filename, which loses information
        (eg. "/", "_", and "." characters are lost. */
@@ -863,7 +852,9 @@ const char* filename;
 	    if ( name[k]=='_' )
 		name[k]=' ';
 	return strdup(name);
-    } else {
+    } else
+# endif
+    {
 	return 0;
     }
 #endif
@@ -913,7 +904,6 @@ char** saved;
     }
 }
 
-#endif /* !WIN_CE */
 
 /* ----------  END SAVE FILE HANDLING ----------- */
 
