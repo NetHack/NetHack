@@ -112,7 +112,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 		GetNHApp()->bNoHScroll = TRUE;
 	} else {
 		GetNHApp()->bNoHScroll = FALSE;
-		data->xPos = max(0, min(COLNO, u.ux - data->xPageSize/2));
+		data->xPos = max(0, min(COLNO-data->xPageSize+1, u.ux - data->xPageSize/2));
 	}
 
     si.cbSize = sizeof(si); 
@@ -134,7 +134,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 		GetNHApp()->bNoVScroll = TRUE;
 	} else {
 		GetNHApp()->bNoVScroll = FALSE;
-		data->yPos = max(0, min(ROWNO, u.uy - data->yPageSize/2));
+		data->yPos = max(0, min(ROWNO-data->yPageSize+1, u.uy - data->yPageSize/2));
 	}
 
     si.cbSize = sizeof(si); 
@@ -670,8 +670,7 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
              yNewPos = data->yPos; 
     } 
 
-	yNewPos = max(0, yNewPos);
-	yNewPos = min(ROWNO-data->yPageSize+1, yNewPos);
+	yNewPos = max(0, min(ROWNO-data->yPageSize+1, yNewPos));
 	if( yNewPos == data->yPos ) return;
 	
 	yDelta = yNewPos - data->yPos;
@@ -729,8 +728,7 @@ void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
              xNewPos = data->xPos; 
     } 
 
-	xNewPos = max(0, xNewPos);
-	xNewPos = min(COLNO-data->xPageSize+1, xNewPos);
+	xNewPos = max(0, min(COLNO-data->xPageSize+1, xNewPos));
 	if( xNewPos == data->xPos ) return;
 	
 	xDelta = xNewPos - data->xPos;
