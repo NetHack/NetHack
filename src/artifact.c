@@ -26,7 +26,7 @@ STATIC_DCL int FDECL(arti_invoke, (struct obj*));
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.
    Most such penalties are small, and 200 is plenty; the exception is
-   half physical damage.  3.3.2 and previous versions tried to use a very
+   half physical damage.  3.3.1 and previous versions tried to use a very
    large number to account for this case; now, we just compute the fatal
    damage by adding it to 2 times the total hit points instead of 1 time.
    Note: this will still break if they have more than about half the number
