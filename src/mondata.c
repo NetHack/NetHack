@@ -1,14 +1,10 @@
-/*	SCCS Id: @(#)mondata.c	3.4	2001/12/05	*/
+/*	SCCS Id: @(#)mondata.c	3.4	2002/03/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "eshk.h"
 #include "epri.h"
-
-/* fake attack and damage types */
-#define AT_ANY (-1)
-#define AD_ANY (-1)
 
 /*	These routines provide basic data for any type of monster. */
 

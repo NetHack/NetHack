@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.4	2002/01/15	*/
+/*	SCCS Id: @(#)polyself.c	3.4	2002/03/24	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -705,6 +705,8 @@ rehumanize()
 int
 dobreathe()
 {
+	struct attack *mattk;
+
 	if (Strangled) {
 	    You_cant("breathe.  Sorry.");
 	    return(0);
@@ -717,17 +719,13 @@ dobreathe()
 	flags.botl = 1;
 
 	if (!getdir((char *)0)) return(0);
-	else {
-	    register struct attack *mattk;
-	    register int i;
 
-	    for(i = 0; i < NATTK; i++) {
-		mattk = &(youmonst.data->mattk[i]);
-		if(mattk->aatyp == AT_BREA) break;
-	    }
+	mattk = attacktype_fordmg(youmonst.data, AT_BREA, AD_ANY);
+	if (!mattk)
+	    impossible("bad breath attack?");	/* mouthwash needed... */
+	else
 	    buzz((int) (20 + mattk->adtyp-1), (int)mattk->damn,
 		u.ux, u.uy, u.dx, u.dy);
-	}
 	return(1);
 }
 
