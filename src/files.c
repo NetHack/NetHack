@@ -33,7 +33,9 @@ extern int errno;
 #endif
 
 #if defined(UNIX) && defined(QT_GRAPHICS)
+#include <sys/types.h>
 #include <dirent.h>
+#include <stdlib.h>
 #endif
 
 #if defined(UNIX) || defined(VMS)
@@ -144,6 +146,9 @@ extern char *sounddir;
 
 extern int n_dgns;		/* from dungeon.c */
 
+#if defined(UNIX) && defined(QT_GRAPHICS)
+STATIC_DCL int FDECL(strcmp_wrap, (const void *, const void *));
+#endif
 STATIC_DCL char *FDECL(set_bonesfile_name, (char *,d_level*));
 STATIC_DCL char *NDECL(set_bonestemp_name);
 #ifdef COMPRESS
@@ -536,6 +541,16 @@ clearlocks()
 		delete_levelfile(x);	/* not all levels need be present */
 #endif
 }
+
+#if defined(UNIX) && defined(QT_GRAPHICS)
+STATIC_OVL int
+strcmp_wrap(p, q)
+const void *p;
+const void *q;
+{
+	return strncasecmp(*(char **) p, *(char **) q, 16);
+}
+#endif
 
 #ifdef HOLD_LOCKFILE_OPEN
 STATIC_OVL int
@@ -997,33 +1012,45 @@ char**
 get_saved_games()
 {
 #if defined(UNIX) && defined(QT_GRAPHICS)
+	/* posixly correct version */
     int myuid=getuid();
-    struct dirent **namelist;
-    int n = scandir("save", &namelist, 0, alphasort);;
-    if ( n > 0 ) {
-	int i,j=0;
-	char** result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
-	for (i=0; i<n; i++) {
-	    int uid;
-	    char name[64]; /* more than PL_NSIZ */
-	    if ( sscanf( namelist[i]->d_name, "%d%63s", &uid, name ) == 2 ) {
-		if ( uid == myuid ) {
-		    char filename[BUFSZ];
-		    char* r;
-		    Sprintf(filename,"save/%d%s",uid,name);
-		    r = plname_from_file(filename);
-		    if ( r )
-			result[j++] = r;
+    DIR *dir;
+    if((dir=opendir("save"))) {
+	int n;
+	for(n=0; readdir(dir); n++)
+		;
+	closedir(dir);
+	if(n>0) {
+		int i,j=0;
+		char **result;
+		if(!(dir=opendir("save")))
+			return 0;
+	        result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
+		for (i=0; i<n; i++) {
+		    int uid;
+		    char name[64]; /* more than PL_NSIZ */
+		    struct dirent *entry=readdir(dir);
+		    if(!entry)
+			    break;
+		    if ( sscanf( entry->d_name, "%d%63s", &uid, name ) == 2 ) {
+			if ( uid == myuid ) {
+			    char filename[BUFSZ];
+			    char* r;
+			    Sprintf(filename,"save/%d%s",uid,name);
+			    r = plname_from_file(filename);
+			    if ( r )
+				result[j++] = r;
+			}
+		    }
 		}
-	    }
+		closedir(dir);
+		qsort(result, j, sizeof(char *), strcmp_wrap);
+		result[j++] = 0;
+		return result;
 	}
-	result[j++] = 0;
-	return result;
-    } else
-#endif
-    {
-	return 0;
     }
+#endif
+    return 0;
 }
 
 void
