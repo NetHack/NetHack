@@ -49,10 +49,14 @@ nhsplash.xpm: ../win/Qt/nhsplash.xpm
 ../util/tile2img.ttp:
 	(cd ../util ; make tile2img.ttp)
 
+../util/xpm2img.ttp:
+	(cd ../util ; make xpm2img.ttp)
 nh16.img: ../util/tile2img.ttp ../win/share/monsters.txt \
 				../win/share/objects.txt ../win/share/other.txt
 	../util/tile2img.ttp nh16.img
 
+rip.img: ../util/xpm2img.ttp
+	../util/xpm2img.ttp ../win/X11/rip.xpm rip.img
 title.img:
 	# cp ../win/gem/title.img title.img
 	$(UUDECODE) ../win/gem/title.uu
@@ -121,3 +125,4 @@ dungeon: dungeon.def ../util/makedefs ../util/dgn_comp
 spotless:
 	-rm -f spec_levs quest_levs *.lev $(VARDAT) dungeon dungeon.pdf
 	-rm -f nhdat x11tiles beostiles pet_mark.xbm rip.xpm mapbg.xpm
+	-rm -f rip.img GEM_RSC.RSC title.img nh16.img

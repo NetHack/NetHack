@@ -191,8 +191,8 @@ WINGNOMEOBJ = gnaskstr.o gnbind.o gnglyph.o gnmain.o gnmap.o gnmenu.o \
 #
 # Files for a Gem port
 WINGEMSRC = ../win/gem/wingem.c ../win/gem/wingem1.c ../win/gem/load_img.c \
-	tile.c
-WINGEMOBJ = wingem.o wingem1.o load_img.o tile.o
+	../win/gem/gr_rect.c tile.c
+WINGEMOBJ = wingem.o wingem1.o load_img.o gr_rect.o tile.o
 #
 # Files for a BeOS InterfaceKit port -- not ready for prime time
 WINBESRC =
@@ -666,6 +666,8 @@ wingem1.o: ../win/gem/wingem1.c ../include/gem_rsc.h ../include/load_img.h \
 	$(CC) $(CFLAGS) -c ../win/gem/wingem1.c
 load_img.o: ../win/gem/load_img.c ../include/load_img.h
 	$(CC) $(CFLAGS) -c ../win/gem/load_img.c
+gr_rect.o: ../win/gem/gr_rect.c
+	$(CC) $(CFLAGS) -c ../win/gem/gr_rect.c
 tile.o: tile.c $(HACK_H)
 qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
 		../include/dlb.h ../include/patchlevel.h ../include/tile2x11.h \

@@ -44,7 +44,7 @@ VARDATND =
 # VARDATND = x11tiles pet_mark.xbm
 # VARDATND = x11tiles pet_mark.xbm rip.xpm
 # for Atari/Gem
-# VARDATND = nh16.img title.img GEM_RSC.RSC
+# VARDATND = nh16.img title.img GEM_RSC.RSC rip.img
 # for BeOS
 # VARDATND = beostiles
 # for Gnome
@@ -148,6 +148,9 @@ nh16.img: $(GAME)
 	( cd util ; $(MAKE) tile2img.ttp )
 	( cd dat ; $(MAKE) nh16.img )
 
+rip.img:
+	( cd util ; $(MAKE) xpm2img.ttp )
+	( cd dat ; $(MAKE) rip.img )
 GEM_RSC.RSC:
 	( cd dat ; $(MAKE) GEM_RSC.RSC )
 

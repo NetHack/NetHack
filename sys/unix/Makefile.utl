@@ -304,6 +304,8 @@ tile2x11: tile2x11.o $(TEXT_IO)
 tile2img.ttp: tile2img.o bitmfile.o $(TEXT_IO)
 	$(CC) $(LFLAGS) -o tile2img.ttp tile2img.o bitmfile.o $(TEXT_IO) $(LIBS)
 
+xpm2img.ttp: xpm2img.o bitmfile.o
+	$(CC) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
 tile2beos: tile2beos.o $(TEXT_IO)
 	$(CC) $(LFLAGS) -o tile2beos tile2beos.o $(TEXT_IO) -lbe
 
@@ -332,6 +334,8 @@ tile2x11.o: ../win/X11/tile2x11.c $(HACK_H) ../include/tile.h \
 tile2img.o: ../win/gem/tile2img.c $(HACK_H) ../include/tile.h \
 						../include/bitmfile.h
 	$(CC) $(CFLAGS) -c ../win/gem/tile2img.c
+xpm2img.o: ../win/gem/xpm2img.c $(HACK_H) ../include/bitmfile.h
+	$(CC) $(CFLAGS) -c ../win/gem/xpm2img.c
 bitmfile.o: ../win/gem/bitmfile.c ../include/bitmfile.h
 	$(CC) $(CFLAGS) -c ../win/gem/bitmfile.c
 
@@ -381,4 +385,4 @@ spotless: clean
 	-rm -f ../include/lev_comp.h ../include/dgn_comp.h
 	-rm -f ../include/tile.h
 	-rm -f makedefs lev_comp dgn_comp recover dlb
-	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp tilemap
+	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp tilemap
