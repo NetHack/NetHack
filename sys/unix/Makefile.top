@@ -188,8 +188,8 @@ dofiles:
 		< sys/unix/nethack.sh \
 		> $(SHELLDIR)/$(GAME)
 # set up their permissions
-	-( cd $(GAMEDIR) ; $(CHOWN) $(GAMEUID) $(GAME) ; \
-			$(CHGRP) $(GAMEGRP) $(GAME) )
+	-( cd $(GAMEDIR) ; $(CHOWN) $(GAMEUID) $(GAME) recover ; \
+			$(CHGRP) $(GAMEGRP) $(GAME) recover )
 	chmod $(GAMEPERM) $(GAMEDIR)/$(GAME)
 	chmod $(EXEPERM) $(GAMEDIR)/recover
 	-$(CHOWN) $(GAMEUID) $(SHELLDIR)/$(GAME)
