@@ -766,8 +766,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
     const char *verb;
     boolean youattack = (magr == &youmonst),
 	    youdefend = (mdef == &youmonst),
-	    resisted = FALSE, was_canceled = FALSE,
-	    do_stun, do_confuse, result;
+	    resisted = FALSE, do_stun, do_confuse, result;
     int attack_indx, scare_dieroll = MB_MAX_DIEROLL / 2;
 
     result = FALSE;		/* no message given yet */
@@ -810,11 +809,6 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
     verb = mb_verb[!!Hallucination][attack_indx];
     if (youattack || youdefend || vis) {
 	result = TRUE;
-	/* canceling monster only happens if not already canceled */
-	if (attack_indx == MB_INDEX_CANCEL && !youdefend && mdef->mcan) {
-	    was_canceled = TRUE;
-	    verb = "hit"; /* doesn't change its attack to, eg stun */
-	}
 	pline_The("magic-absorbing blade %s %s!",
 		  vtense((const char *)0, verb), hittee);
 	/* assume probing has some sort of noticeable feedback
@@ -827,9 +821,11 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
     switch (attack_indx) {
     case MB_INDEX_CANCEL:
 	old_uasmon = youmonst.data;
-	if (was_canceled) {
-	    /* nothing left to cancel */
-	} else if (!cancel_monst(mdef, mb, youattack, FALSE, FALSE)) {
+	/* No mdef->mcan check: even a cancelled monster can be polymorphed
+	 * into a golem, and the "cancel" effect acts as if some magical
+	 * energy remains in spellcasting defenders to be absorbed later.
+	 */
+	if (!cancel_monst(mdef, mb, youattack, FALSE, FALSE)) {
 	    resisted = TRUE;
 	} else {
 	    do_stun = FALSE;
