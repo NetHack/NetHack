@@ -48,6 +48,8 @@ $ dgn_comp := $sys$disk:[-.util]dgn_comp
 $ dlb	   := $sys$disk:[-.util]dlb
 $ milestone = "write sys$output f$fao("" !5%T "",0),"
 $ if p3.nes."" .and. f$edit(p4,"UPCASE").nes."VERBOSE" then  milestone = "!"
+$ echo = "write sys$output"
+$ warn = echo	!could be "write sys$error"
 $!
 $! make sure we've got a playground location
 $ gamedir := 'gamedir'
@@ -108,9 +110,11 @@ $dloop:
 $   g = f$element(i,",",dlb_files)
 $   if g.eqs."," then  goto ddone
 $   wild = f$locate("*",g).ne.f$locate("%",g)
+$   fcnt = 0
 $floop:
 $	f = f$search(g)
 $	if f.eqs."" then  goto fdone
+$	fcnt = fcnt + 1
 $! strip device, directory, and version from name
 $	f = f$parse(f,,,"NAME") + f$parse(f,,,"TYPE")
 $! strip trailing dot, if present, and change case
@@ -120,6 +124,7 @@ $	if f$extract(3,1,f).eqs."-" then -	!"xyz-foo.lev" -> "Xyz-foo.lev"
 $	write pfile$ f
 $	if wild then  goto floop
 $fdone:
+$   if fcnt.eq.0 then  warn "? no file(s) found for """,g,""""
 $   i = i + 1
 $   goto dloop
 $ddone:
@@ -223,7 +228,7 @@ $! done
 $	milestone "<done>"
 $ define/nolog nethackdir 'gamedir'
 $ define/nolog hackdir 'gamedir'
-$ write sys$output -
+$ echo -
     f$fao("!/ Nethack installation complete. !/ Playground is !AS !/",gamedir)
 $ exit
 $
@@ -244,14 +249,17 @@ $   g = f$element(i,",",p1)
 $   if g.eqs."," then  goto ldone
 $   g = p2 + g
 $   wild = f$locate("*",g).ne.f$locate("%",g)
+$   fcnt = 0
 $eloop:
 $	f = f$search(g)
 $	if f.eqs."" then  goto edone
+$	fcnt = fcnt + 1
 $	f = f - f$parse(f,,,"VERSION")
 $	e = f$parse(f,,,"NAME") + f$parse(f,,,"TYPE")
 $	call copy_file 'f' 'gamedir''e' "''p3'"
 $	if wild then  goto eloop
 $edone:
+$   if fcnt.eq.0 then  warn "? no file(s) found for """,g,""""
 $   i = i + 1
 $   goto lloop
 $ldone:
