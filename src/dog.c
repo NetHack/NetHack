@@ -790,19 +790,28 @@ register struct obj *obj;
  * If the pet wasn't abused and was very tame, it might revive tame.
  */
 void
-wary_dog(mtmp, quietly)
+wary_dog(mtmp, was_dead)
 struct monst *mtmp;
-boolean quietly;
+boolean was_dead;
 {
-    int has_edog;
+    struct edog *edog;
+    boolean quietly = was_dead;
 
+    mtmp->meating = 0;
     if (!mtmp->mtame) return;
-    has_edog = !mtmp->isminion;
-    if (has_edog &&
-		((EDOG(mtmp)->killed_by_u == 1) || (EDOG(mtmp)->abuse > 2))) {
+    edog = !mtmp->isminion ? EDOG(mtmp) : 0;
+
+    /* if monster was starving when it died, undo that now */
+    if (edog && edog->mhpmax_penalty) {
+	mtmp->mhpmax += edog->mhpmax_penalty;
+	mtmp->mhp += edog->mhpmax_penalty;	/* heal it */
+	edog->mhpmax_penalty = 0;
+    }
+
+    if (edog && (edog->killed_by_u == 1 || edog->abuse > 2)) {
 	mtmp->mpeaceful = mtmp->mtame = 0;
-	if (EDOG(mtmp)->abuse >= 0 && EDOG(mtmp)->abuse < 10)
-		if (!rn2(EDOG(mtmp)->abuse + 1)) mtmp->mpeaceful = 1;
+	if (edog->abuse >= 0 && edog->abuse < 10)
+	    if (!rn2(edog->abuse + 1)) mtmp->mpeaceful = 1;
 	if(!quietly && cansee(mtmp->mx, mtmp->my)) {
 	    if (haseyes(youmonst.data)) {
 		if (haseyes(mtmp->data))
@@ -817,10 +826,10 @@ boolean quietly;
 	    }
 	}
     } else {
-    	/* chance it goes wild anyway - Pet Semetary */
-    	if (!rn2(mtmp->mtame)) {
-    		mtmp->mpeaceful = mtmp->mtame = 0;
-    	}
+	/* chance it goes wild anyway - Pet Semetary */
+	if (!rn2(mtmp->mtame)) {
+	    mtmp->mpeaceful = mtmp->mtame = 0;
+	}
     }
     if (!mtmp->mtame) {
 	newsym(mtmp->mx, mtmp->my);
@@ -830,10 +839,19 @@ boolean quietly;
     }
 
     /* if its still a pet, start a clean pet-slate now */
-    if (has_edog && mtmp->mtame) {
-	EDOG(mtmp)->revivals++;
-    	EDOG(mtmp)->killed_by_u = 0;
-    	EDOG(mtmp)->abuse = 0;
+    if (edog && mtmp->mtame) {
+	edog->revivals++;
+	edog->killed_by_u = 0;
+	edog->abuse = 0;
+	edog->ogoal.x = edog->ogoal.y = -1;
+	if (was_dead || edog->hungrytime < monstermoves + 500L)
+	    edog->hungrytime = monstermoves + 500L;
+	if (was_dead) {
+	    edog->droptime = 0L;
+	    edog->dropdist = 10000;
+	    edog->whistletime = 0L;
+	    edog->apport = 5;
+	} /* else lifesaved, so retain current values */
     }
 }
 

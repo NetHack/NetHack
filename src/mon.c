@@ -1334,14 +1334,6 @@ struct monst *mtmp;
 		mtmp->mcanmove = 1;
 		mtmp->mfrozen = 0;
 		if (mtmp->mtame && !mtmp->isminion) {
-			struct edog *edog = EDOG(mtmp);
-			if (edog->hungrytime < moves+500)
-				edog->hungrytime = moves+500;
-			if (edog->mhpmax_penalty) {
-				/* was starving */
-				mtmp->mhpmax += edog->mhpmax_penalty;
-				edog->mhpmax_penalty = 0;
-			}
 			wary_dog(mtmp, FALSE);
 		}
 		if (mtmp->mhpmax <= 0) mtmp->mhpmax = 10;
