@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.4	2002/07/01	*/
+/*	SCCS Id: @(#)files.c	3.4	2002/08/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -72,7 +72,7 @@ char lock[PL_NSIZ+25];		/* long enough for username+-+name+.99 */
 #define SAVESIZE	(PL_NSIZ + 22)	/* [.save]<uid>player.e;1 */
 # else
 #  if defined(WIN32)
-#define SAVESIZE	(PL_NSIZ + 60)	/* username-player.NetHack-saved-game */
+#define SAVESIZE	(PL_NSIZ + 40)	/* username-player.NetHack-saved-game */
 #  else
 #define SAVESIZE	FILENAME	/* from macconf.h or pcconf.h */
 #  endif
