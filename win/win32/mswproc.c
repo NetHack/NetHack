@@ -1181,7 +1181,7 @@ int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 void mswin_update_inventory()
 {
 	logDebug("mswin_update_inventory()\n");
-    if (program_state.something_worth_saving) 
+    if (program_state.something_worth_saving && flags.perm_invent)
         display_inventory(NULL, FALSE);
 }
 
