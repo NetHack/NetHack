@@ -1058,25 +1058,64 @@ boolean tinitial, tfrom_file;
 	 * setting font options  */
 	fullname = "font";
 	if (!strncmpi(opts, fullname, 4))
-	{	int wintype = -1;
-	
-		opts += 4;
-		if (!strncmpi(opts, "map", 3) ||
-		    !strncmpi(opts, "_map", 4))
+	{
+		int wintype = -1;
+		char *fontopts = opts + 4;
+
+		if (!strncmpi(fontopts, "map", 3) ||
+		    !strncmpi(fontopts, "_map", 4))
 			wintype = NHW_MAP;
-		else if (!strncmpi(opts, "message", 7) ||
-			 !strncmpi(opts, "_message", 8))
+		else if (!strncmpi(fontopts, "message", 7) ||
+			 !strncmpi(fontopts, "_message", 8))
 			wintype = NHW_MESSAGE;
-		else if (!strncmpi(opts, "text", 4) ||
-			 !strncmpi(opts, "_text", 5))
+		else if (!strncmpi(fontopts, "text", 4) ||
+			 !strncmpi(fontopts, "_text", 5))
 			wintype = NHW_TEXT;			
-		else if (!strncmpi(opts, "menu", 4) ||
-			 !strncmpi(opts, "_menu", 5))
+		else if (!strncmpi(fontopts, "menu", 4) ||
+			 !strncmpi(fontopts, "_menu", 5))
 			wintype = NHW_MENU;
-		else if (!strncmpi(opts, "status", 6) ||
-			 !strncmpi(opts, "_status", 7))
+		else if (!strncmpi(fontopts, "status", 6) ||
+			 !strncmpi(fontopts, "_status", 7))
 			wintype = NHW_STATUS;
-				
+		else if (!strncmpi(fontopts, "_size", 5)) {
+			if (!strncmpi(fontopts, "_size_map", 8))
+				wintype = NHW_MAP;
+			else if (!strncmpi(fontopts, "_size_message", 12))
+				wintype = NHW_MESSAGE;
+			else if (!strncmpi(fontopts, "_size_text", 9))
+				wintype = NHW_TEXT;
+			else if (!strncmpi(fontopts, "_size_menu", 9))
+				wintype = NHW_MENU;
+			else if (!strncmpi(fontopts, "_size_status", 11))
+				wintype = NHW_STATUS;
+			else {
+				badoption(opts);
+				return;
+			}
+			if (wintype > 0 && !negated &&
+			    (op = string_for_opt(opts, FALSE)) != 0) {
+			    switch(wintype)  {
+			    	case NHW_MAP:
+					iflags.wc_fontsiz_map = atoi(op);
+					break;
+			    	case NHW_MESSAGE:
+					iflags.wc_fontsiz_message = atoi(op);
+					break;
+			    	case NHW_TEXT:
+					iflags.wc_fontsiz_text = atoi(op);
+					break;
+			    	case NHW_MENU:
+					iflags.wc_fontsiz_menu = atoi(op);
+					break;
+			    	case NHW_STATUS:
+					iflags.wc_fontsiz_status = atoi(op);
+					break;
+			    }
+			}
+			return;
+		} else {
+			badoption(opts);
+		}
 		if (wintype > 0 &&
 		    (op = string_for_opt(opts, FALSE)) != 0) {
 			wc_set_font_name(wintype, op);
@@ -1084,37 +1123,6 @@ boolean tinitial, tfrom_file;
 			set_font_name (wintype, op);
 #endif
 			return;
-		}
-		if (!strncmpi(opts, "_size_map", 8))
-			wintype = NHW_MAP;
-		else if (!strncmpi(opts, "_size_message", 12))
-			wintype = NHW_MESSAGE;
-		else if (!strncmpi(opts, "_size_text", 9))
-			wintype = NHW_TEXT;
-		else if (!strncmpi(opts, "_size_menu", 9))
-			wintype = NHW_MENU;
-		else if (!strncmpi(opts, "_size_status", 11))
-			wintype = NHW_STATUS;
-
-		if (wintype > 0 && !negated &&
-		    (op = string_for_opt(opts, FALSE)) != 0) {
-		    switch(wintype)  {
-		    	case NHW_MAP:
-				iflags.wc_fontsiz_map = atoi(op);
-				break;
-		    	case NHW_MESSAGE:
-				iflags.wc_fontsiz_message = atoi(op);
-				break;
-		    	case NHW_TEXT:
-				iflags.wc_fontsiz_text = atoi(op);
-				break;
-		    	case NHW_MENU:
-				iflags.wc_fontsiz_menu = atoi(op);
-				break;
-		    	case NHW_STATUS:
-				iflags.wc_fontsiz_status = atoi(op);
-				break;
-		    }
 		} else if (negated) bad_negation(fullname, TRUE);
 		return;
 	}
