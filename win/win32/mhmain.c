@@ -85,7 +85,7 @@ void register_main_window_class()
 
 enum KEY_INDEXES {
 KEY_NW, KEY_N, KEY_NE, KEY_MINUS,
-KEY_W, KEY_STAY, KEY_E, KEY_PLUS,
+KEY_W, KEY_GOINTERESTING, KEY_E, KEY_PLUS,
 KEY_SW, KEY_S, KEY_SE,
 KEY_INV, KEY_WAITLOOK,
 KEY_LAST};
@@ -98,7 +98,7 @@ keypad[KEY_LAST][3] = {
 	{'u', 'U', C('u')}, /* 9 */
 	{'m', C('p'), C('p')}, /* - */
 	{'h', 'H', C('h')}, /* 4 */
-	{'g', 'g', 'g'}, /* 5 */
+	{'g', 'G', 'g'}, /* 5 */
 	{'l', 'L', C('l')}, /* 6 */
 	{'+', 'P', C('p')}, /* + */
 	{'b', 'B', C('b')}, /* 1 */
@@ -124,8 +124,9 @@ numpad[KEY_LAST][3] = {
 };
 
 #define STATEON(x) ((GetKeyState(x) & 0xFFFE) != 0)
-#define KEYTABLE(x) ((iflags.num_pad ? numpad : keypad)[x] \
-[(STATEON(VK_SHIFT) ? 1 : STATEON(VK_CONTROL) ? 2 : 0)])
+#define KEYTABLE_REGULAR(x) ((iflags.num_pad ? numpad : keypad)[x][0])
+#define KEYTABLE_SHIFT(x) ((iflags.num_pad ? numpad : keypad)[x][1])
+#define KEYTABLE(x) (STATEON(VK_SHIFT) ? KEYTABLE_SHIFT(x) : KEYTABLE_REGULAR(x))
 
 /* map mode macros */
 #define IS_MAP_FIT_TO_SCREEN(mode) ((mode)==MAP_MODE_ASCII_FIT_TO_SCREEN || \
@@ -308,7 +309,6 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 
 			case VK_INSERT:
-			case VK_NUMPAD0:
 				NHEVENT_KBD(KEYTABLE(KEY_INV));
 			return 0;
 
