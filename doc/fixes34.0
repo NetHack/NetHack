@@ -421,6 +421,15 @@ don't allow untrapping of adjacent traps in locations you can't move to
 summoning should summon any alignment if summoner's base alignment is A_NONE
 when dipping unicorn horn in potion, the potion might change bless status, so
 	set bknown to FALSE
+grammar fixes such as "Eyes of the Overworld resists" and others
+score bonus was missing from scrolls of identify and fire 
+make wands of speed or slow monster known if their effect
+	on monsters is observed; likewise for speed boots
+avoid giving odd "the bat is moving faster" when seeing a bat created
+	in gehennom and inaccurate "the monster is moving slower" when
+	a monster puts on speed boots.
+gold detection "materially poor" message inappropriate if you have hidden_gold()
+
 
 
 Platform- and/or Interface-Specific Fixes
@@ -452,6 +461,7 @@ Gnome: workaround for GTK+ attempts to disallow setgid executables
 X11: general solution to the problem that the meaning of font height varies
 	among different implementations of X11
 X11: make "slow" mode the default since it seems to be very prevalent
+tty: pet was not always hilited
 
 
 General New Features
@@ -513,7 +523,7 @@ ninjas should get multishot bonus with yumi and ya (Dylan O'Donnell)
 put prisoners in the Dark One's dungeon (Dylan O'Donnell)
 touchstones; Archeologists start with one
 add leather cloak so soldiers don't have elven cloaks
-add Tom Friedetzky's BUC-patch
+add Tom Friedetzky's BUC-patch with some alterations to the original
 add wizard #poly and #levelchange (originally levelgain; Dylan O'Donnell),
 add Jason Short's additional lenses use patch
 add new Gnomish Mines levels from Kelly Bailey's patch
@@ -528,8 +538,10 @@ artifacts have individual prices
 new window-port preference options added, and some existing options
 	moved into the window-port preferences section
 made each of the end disclosure options customizable to "prompt;default no",
-	"prompt;default yes", "do it;without prompt", and 
-	"hide;without prompt"
+	"prompt;default yes", "show it without prompt", and 
+	"don't show it and don't prompt"
+add female role level names "Medica ossium", "Magistra", "Chevaliere",  
+	and "Dame"
 
 
 Platform- and/or Interface-Specific New Features
