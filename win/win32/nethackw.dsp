@@ -1049,7 +1049,15 @@ SOURCE=..\win\win32\mhmsgwnd.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\win\win32\mhsplash.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\win\win32\mhrip.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\win\win32\mhsplash.h
 # End Source File
 # Begin Source File
 

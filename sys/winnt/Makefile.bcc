@@ -193,7 +193,7 @@ PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 !IF "$(GRAPHICAL)" == "Y"
 WINPORT  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
-	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o \
+	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
 WINPFLAG   = -DTILES -DMSWIN_GRAPHICS
 NHRES   = $(O)winhack.res
@@ -583,10 +583,13 @@ tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
 !IF "$(GRAPHICAL)"=="Y"
-$(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc
+$(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
+	$(WIN32)\mnselcnt.bmp $(WIN32)\mnunsel.bmp \
+	$(WIN32)\petmark.bmp $(WIN32)\NetHack.ico $(WIN32)\rip.bmp \
+	$(WIN32)\splash.bmp
 	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
 !ELSE
-$(NHRES): $(NTSYS)\console.rc
+$(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 	@$(rc) -r -fo$@ -i$(NTSYS) -dNDEBUG $(NTSYS)\console.rc
 !ENDIF
 
@@ -669,6 +672,55 @@ $(INCL)\vis_tab.h: $(U)makedefs.exe
 
 $(SRC)\vis_tab.c: $(U)makedefs.exe
 	$(U)makedefs -z
+
+#==========================================
+# uudecode utility and uuencoded targets
+#==========================================
+
+$(U)uudecode.exe: $(O)uudecode.o
+	@$(link) $(LFLAGSU) $(startobj) $(O)\uudecode.o, $@,,$(libsmt)
+
+$(O)uudecode.o: $(SSYS)\uudecode.c
+
+$(NTSYS)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu
+	chdir $(NTSYS)
+	..\..\util\uudecode.exe nhico.uu
+	chdir ..\..\src
+
+$(WIN32)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu
+	chdir $(WIN32)
+	..\..\util\uudecode.exe ../../sys/winnt/nhico.uu
+	chdir ..\..\src
+
+$(WIN32)\mnsel.bmp: $(U)uudecode.exe $(WIN32)\mnsel.uu
+	chdir $(WIN32)
+	..\..\util\uudecode.exe mnsel.uu
+	chdir ..\..\src
+
+$(WIN32)\mnselcnt.bmp: $(U)uudecode.exe $(WIN32)\mnselcnt.uu
+	chdir $(WIN32)
+	..\..\util\uudecode.exe mnselcnt.uu
+	chdir ..\..\src
+
+$(WIN32)\mnunsel.bmp: $(U)uudecode.exe $(WIN32)\mnunsel.uu
+	chdir $(WIN32)
+	..\..\util\uudecode.exe mnunsel.uu
+	chdir ..\..\src
+
+$(WIN32)\petmark.bmp: $(U)uudecode.exe $(WIN32)\petmark.uu
+	chdir $(WIN32)
+	..\..\util\uudecode.exe petmark.uu
+	chdir ..\..\src
+
+$(WIN32)\rip.bmp: $(U)uudecode.exe $(WIN32)\rip.uu
+	chdir $(WIN32)
+	..\..\util\uudecode.exe rip.uu
+	chdir ..\..\src
+
+$(WIN32)\splash.bmp: $(U)uudecode.exe $(WIN32)\splash.uu
+	chdir $(WIN32)
+	..\..\util\uudecode.exe splash.uu
+	chdir ..\..\src
 
 #==========================================
 # Level Compiler Stuff

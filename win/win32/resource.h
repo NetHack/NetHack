@@ -25,6 +25,9 @@
 #define IDB_PETMARK                     143
 #define IDB_MENU_SEL_COUNT              144
 #define IDD_NHRIP                       145
+#define IDB_SPLASH			146
+#define IDB_RIP				147
+#define IDD_SPLASH			148
 #define IDC_TEXT_VIEW                   1000
 #define IDC_TEXT_CONTROL                1000
 #define IDC_CMD_MOVE_NW                 1001
@@ -108,7 +111,6 @@
 #define IDC_PLSEL_GENDER_LIST           1326
 #define IDC_ABOUT_VERSION               1327
 #define IDC_ABOUT_COPYRIGHT             1328
-#define IDB_RIP                         1329
 #define IDM_SAVE                        32771
 #define IDM_HELP_LONG                   32772
 #define IDM_HELP_COMMANDS               32773

@@ -110,7 +110,7 @@ END
 IDD_NHTEXT DIALOGEX 0, 0, 172, 178
 STYLE DS_SETFOREGROUND | WS_POPUP | WS_THICKFRAME
 EXSTYLE WS_EX_STATICEDGE
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,54,163,50,14
     EDITTEXT        IDC_TEXT_CONTROL,0,0,170,160,ES_MULTILINE | 
@@ -189,6 +189,13 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,82,188,50,14
 END
 
+IDD_SPLASH DIALOGEX 0, 0, 281, 209
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Welcome to NetHack"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,82,188,50,14
+END
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -233,6 +240,7 @@ IDB_MENU_UNSEL          BITMAP  DISCARDABLE     "mnunsel.bmp"
 IDB_PETMARK             BITMAP  DISCARDABLE     "petmark.bmp"
 IDB_MENU_SEL_COUNT      BITMAP  DISCARDABLE     "mnselcnt.bmp"
 IDB_RIP                 BITMAP  DISCARDABLE     "rip.bmp"
+IDB_SPLASH                 BITMAP  DISCARDABLE     "splash.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

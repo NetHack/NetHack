@@ -7,6 +7,8 @@
 #include "mhmsg.h"
 #include "mhfont.h"
 
+#define RIP_WIDTH	400
+#define RIP_HEIGHT	200
 
 PNHWinApp GetNHApp(void);
 
@@ -16,12 +18,8 @@ typedef struct mswin_nethack_text_window {
 	TCHAR*  rip_text;
 } NHRIPWindow, *PNHRIPWindow;
 
-static WNDPROC  editControlWndProc = 0;
-
-BOOL	CALLBACK	NHRIPWndProc(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK	NHEditHookWndProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK NHRIPWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
-static void LayoutText(HWND hwnd);
 
 HWND mswin_init_RIP_window () {
 	HWND ret;
@@ -50,7 +48,6 @@ void mswin_display_RIP_window (HWND hWnd)
 	PNHRIPWindow data;
 	HWND mapWnd;
 	RECT riprt;
-	SIZE bmpDims;
 	RECT clientrect;
 	RECT textrect;
 	HDC hdc;
@@ -74,13 +71,11 @@ void mswin_display_RIP_window (HWND hWnd)
 		DT_LEFT | DT_NOPREFIX | DT_CALCRECT);
 	    ReleaseDC(hWnd, hdc);
 	}
-	bmpDims.cx = 400;
-	bmpDims.cy = 200;
-	if (textrect.right - textrect.left > bmpDims.cx)
+	if (textrect.right - textrect.left > RIP_WIDTH)
 	    clientrect.right = textrect.right + 10 - clientrect.right;
 	else
-	    clientrect.right = textrect.left + 20 + bmpDims.cx - clientrect.right;
-	clientrect.bottom = textrect.bottom + bmpDims.cy + 10 - clientrect.bottom;
+	    clientrect.right = textrect.left + 20 + RIP_WIDTH - clientrect.right;
+	clientrect.bottom = textrect.bottom + RIP_HEIGHT + 10 - clientrect.bottom;
 	GetWindowRect (GetDlgItem(hWnd, IDOK), &textrect);
 	textrect.right -= textrect.left;
 	textrect.bottom -= textrect.top;
@@ -136,7 +131,6 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 	case WM_PAINT:
 	{
-		SIZE bmpDims;
 		int bitmap_offset;
 		RECT clientrect;
 		RECT textrect;
@@ -159,11 +153,9 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		}
 		OldBitmap = SelectObject(hdcBitmap, GetNHApp()->bmpRip);
 		SetBkMode (hdc, OPAQUE);
-		bmpDims.cx = 400;
-		bmpDims.cy = 200;
-		bitmap_offset = (textrect.right - textrect.left - bmpDims.cx) / 2;
-		BitBlt (hdc, textrect.left + bitmap_offset, textrect.bottom, bmpDims.cx,
-			bmpDims.cy, hdcBitmap, 0, 0, SRCCOPY);
+		bitmap_offset = (textrect.right - textrect.left - RIP_WIDTH) / 2;
+		BitBlt (hdc, textrect.left + bitmap_offset, textrect.bottom, RIP_WIDTH,
+			RIP_HEIGHT, hdcBitmap, 0, 0, SRCCOPY);
 		SetBkMode (hdc, TRANSPARENT);
 		if (data->rip_text)
 		{

@@ -139,7 +139,7 @@ PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 !IF "$(GRAPHICAL)" == "Y"
 WINPORT  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
-	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o \
+	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
 WINPFLAG   = -DTILES -DMSWIN_GRAPHICS
 NHRES   = $(O)winhack.res
@@ -533,8 +533,9 @@ tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 
 !IF "$(GRAPHICAL)"=="Y"
 $(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
-	$(WIN32)\mnselcnt.bmp $(WIN32)\mnunsel.bmp $(WIN32)\petmark.bmp \
-	$(WIN32)\NetHack.ico
+	$(WIN32)\mnselcnt.bmp $(WIN32)\mnunsel.bmp \
+	$(WIN32)\petmark.bmp $(WIN32)\NetHack.ico $(WIN32)\rip.bmp \
+	$(WIN32)\splash.bmp
 	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
 !ELSE
 $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
@@ -661,6 +662,16 @@ $(WIN32)\mnunsel.bmp: $(U)uudecode.exe $(WIN32)\mnunsel.uu
 $(WIN32)\petmark.bmp: $(U)uudecode.exe $(WIN32)\petmark.uu
 	chdir $(WIN32)
 	..\..\util\uudecode.exe petmark.uu
+	chdir ..\..\src
+
+$(WIN32)\rip.bmp: $(U)uudecode.exe $(WIN32)\rip.uu
+	chdir $(WIN32)
+	..\..\util\uudecode.exe rip.uu
+	chdir ..\..\src
+
+$(WIN32)\splash.bmp: $(U)uudecode.exe $(WIN32)\splash.uu
+	chdir $(WIN32)
+	..\..\util\uudecode.exe splash.uu
 	chdir ..\..\src
 
 #==========================================

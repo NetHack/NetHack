@@ -11,7 +11,6 @@
 
 HWND mswin_init_map_window (void);
 void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw);
-
 int mswin_map_mode(HWND hWnd, int mode);
 
 #define ROGUE_LEVEL_MAP_MODE		MAP_MODE_ASCII12x16	

@@ -14,6 +14,7 @@
 #include "mhtext.h"
 #include "mhmsgwnd.h"
 #include "mhmenu.h"
+#include "mhsplash.h"
 #include "mhmsg.h"
 #include "mhinput.h"
 #include "mhaskyn.h"
@@ -177,6 +178,7 @@ void mswin_init_nhwindows(int* argc, char** argv)
 		SET_IN_GAME 
 	);
 
+	mswin_display_splash_window();
 	iflags.window_inited = TRUE;
 }
 
