@@ -258,6 +258,11 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 				killer = "a very rich meal";
 			} else {
 				killer = food_xname(food, FALSE);
+				if (food->otyp == CORPSE &&
+				    (mons[food->corpsenm].geno & G_UNIQ)) {
+				    killer = the(killer);
+				    killer_format = KILLED_BY;
+				}
 			}
 		} else {
 			You("choke over it.");
