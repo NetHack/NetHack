@@ -1122,18 +1122,15 @@ boolean telekinesis;
 	    } else {
 		char qbuf[BUFSZ];
 		long savequan = obj->quan;
-		unsigned textleft;
 
 		obj->quan = *cnt_p;
 		Strcpy(qbuf,
 			(next_encumbr > HVY_ENCUMBER) ? overloadmsg :
 			(next_encumbr > MOD_ENCUMBER) ? nearloadmsg :
 			moderateloadmsg);
-		textleft = QBUFSZ - (strlen(qbuf) + sizeof(" . Continue?"));
 		Sprintf(eos(qbuf), " %s. Continue?",
-			(strlen(doname(obj)) < textleft) ? doname(obj) :
-			(strlen(simple_typename(obj->otyp)) < textleft) ?
-			an(simple_typename(obj->otyp)) : something);
+			safe_qbuf(qbuf, sizeof(" . Continue?"),
+				doname(obj), an(simple_typename(obj->otyp)), something));
 		obj->quan = savequan;
 		switch (ynq(qbuf)) {
 		case 'q':  result = -1; break;
@@ -1148,6 +1145,27 @@ boolean telekinesis;
     if (obj->otyp == SCR_SCARE_MONSTER && result <= 0 && !container)
 	obj->spe = 0;
     return result;
+}
+
+/* To prevent qbuf overflow in prompts use planA only
+ * if it fits, or planB if PlanA doesn't fit,
+ * finally using the fallback as a last resort.
+ * last_restort is expected to be very short.
+ */
+char *
+safe_qbuf(qbuf, padlength, planA, planB, last_resort)
+char *qbuf, *planA, *planB;
+const char *last_resort;
+unsigned padlength;
+{
+	unsigned textleft = QBUFSZ - (strlen(qbuf) + padlength);
+	if (strlen(last_resort) >= textleft) {
+		impossible("safe_qbuf: last_resort too large at %d characters.",
+			strlen(last_resort));
+		return "";
+	}
+	return (strlen(planA) < textleft) ? planA :
+	       (strlen(planB) < textleft) ? planB : last_resort;
 }
 
 /*
