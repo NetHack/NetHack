@@ -2071,9 +2071,9 @@ read_wizkit()
 
 	if (!wizard || !(fp = fopen_wizkit_file())) return;
 
-	while (fgets(buf, 4*BUFSZ, fp)) {
+	while (fgets(buf, BUFSZ, fp)) {
 		if ((ep = index(buf, '\n'))) *ep = '\0';
-		if (buf[0]) {
+		if (ep && buf[0]) {
 			otmp = readobjnam(buf, (struct obj *)0, FALSE);
 			if (otmp) {
 			    if (otmp != &zeroobj)
