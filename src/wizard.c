@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wizard.c	3.5	2004/12/20	*/
+/*	SCCS Id: @(#)wizard.c	3.5	2005/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -371,14 +371,15 @@ aggravate()
 {
 	register struct monst *mtmp;
 
-	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-	    if (!DEADMONSTER(mtmp)) {
-		mtmp->msleeping = 0;
-		if(!mtmp->mcanmove && !rn2(5)) {
-			mtmp->mfrozen = 0;
-			mtmp->mcanmove = 1;
-		}
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    mtmp->mstrategy &= ~STRAT_WAITFORU;
+	    mtmp->msleeping = 0;
+	    if (!mtmp->mcanmove && !rn2(5)) {
+		mtmp->mfrozen = 0;
+		mtmp->mcanmove = 1;
 	    }
+	}
 }
 
 void

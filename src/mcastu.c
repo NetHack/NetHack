@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mcastu.c	3.5	2003/01/08	*/
+/*	SCCS Id: @(#)mcastu.c	3.5	2005/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -731,6 +731,21 @@ int spellnum;
 	if ((!mtmp->iswiz || context.no_of_wizards > 1)
 						&& spellnum == MGC_CLONE_WIZ)
 	    return TRUE;
+	/* aggravation (global wakeup) when everyone is already active */
+	if (spellnum == MGC_AGGRAVATION) {
+	    struct monst *nxtmon;
+
+	    for (nxtmon = fmon; nxtmon; nxtmon = nxtmon->nmon) {
+		if (DEADMONSTER(nxtmon)) continue;
+		if ((nxtmon->mstrategy & STRAT_WAITFORU) != 0 ||
+			nxtmon->msleeping || !nxtmon->mcanmove) break;
+	    }
+	    /* if nothing needs to be awakened then this spell is useless
+	       but caster might not realize that [chance to pick it then
+	       must be very small otherwise caller's many retry attempts
+	       will eventually end up picking it too often] */
+	    if (!nxtmon) return rn2(100) ? TRUE : FALSE;
+	}
     } else if (adtyp == AD_CLRC) {
 	/* summon insects/sticks to snakes won't be cast by peaceful monsters */
 	if (mtmp->mpeaceful && spellnum == CLC_INSECTS)
