@@ -33,9 +33,8 @@ polyman(fmt, arg)
 const char *fmt, *arg;
 {
 	boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
-		was_mimicking = (youmonst.m_ap_type == M_AP_OBJECT &&
-		 		(youmonst.mappearance > STRANGE_OBJECT &&
-				 youmonst.mappearance < NUM_OBJECTS));
+		was_mimicking = (youmonst.m_ap_type == M_AP_OBJECT);
+
 	boolean was_blind = !!Blind;
 
 	if (Upolyd) {
@@ -332,9 +331,6 @@ int	mntmp;
 {
 	boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
 		was_blind = !!Blind, dochange = FALSE;
-	boolean was_mimicking = (youmonst.m_ap_type == M_AP_OBJECT &&
-		 		(youmonst.mappearance > STRANGE_OBJECT &&
-				 youmonst.mappearance < NUM_OBJECTS));
 	int mlvl;
 
 	if (mvitals[mntmp].mvflags & G_GENOD) {	/* allow G_EXTINCT */
@@ -360,7 +356,7 @@ int	mntmp;
 		flags.female = u.mfemale;
 	}
 
-	if (was_mimicking) {
+	if (youmonst.m_ap_type) {
 	    /* stop mimicking immediately */
 	    if (multi < 0) unmul("");
 	} else if (mons[mntmp].mlet != S_MIMIC) {

@@ -2671,14 +2671,12 @@ const char *
 mimic_obj_name(mtmp)
 struct monst *mtmp;
 {
-    boolean mimickobj = (mtmp->m_ap_type == M_AP_OBJECT &&
-    			(mtmp->mappearance > STRANGE_OBJECT &&
-			 mtmp->mappearance < NUM_OBJECTS));
-    if (mimickobj) {
-    	if (mtmp->mappearance == GOLD_PIECE) return "gold";
-	else return obj_descr[objects[mtmp->mappearance].oc_descr_idx].oc_name;
-    }
-    return "whatcha-may-callit";
+	if (mtmp->m_ap_type == M_AP_OBJECT && mtmp->mappearance != STRANGE_OBJECT) {
+		int idx = objects[mtmp->mappearance].oc_descr_idx;
+		if (mtmp->mappearance == GOLD_PIECE) return "gold";
+		return obj_descr[idx].oc_name;
+	}
+	return "whatcha-may-callit";
 }
 #endif /* OVLB */
 

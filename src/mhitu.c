@@ -316,10 +316,6 @@ mattacku(mtmp)
 		/* Might be attacking your image around the corner, or
 		 * invisible, or you might be blind....
 		 */
-	boolean mimickobj = (youmonst.m_ap_type == M_AP_OBJECT && 
-				(youmonst.mappearance > STRANGE_OBJECT &&
-				 youmonst.mappearance < NUM_OBJECTS));
-		/* you are mimicking an object */
 	
 	if(!ranged) nomul(0);
 	if(mtmp->mhp <= 0 || (Underwater && !is_swimmer(mtmp->data)))
@@ -443,7 +439,7 @@ mattacku(mtmp)
 	}
 
 	/* player might be mimicking an object */
-	if (mimickobj && !range2 && foundyou && !u.uswallow) {
+	if (youmonst.m_ap_type == M_AP_OBJECT && !range2 && foundyou && !u.uswallow) {
 	    if (!youseeit)
 		 pline("%s %s!", Something,
 			(likes_gold(mtmp->data) && youmonst.mappearance == GOLD_PIECE) ?

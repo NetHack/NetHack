@@ -134,9 +134,6 @@ invault()
 #endif
     struct monst *guard;
     int trycount, vaultroom = (int)vault_occupied(u.urooms);
-    boolean mimickobj = (youmonst.m_ap_type == M_AP_OBJECT &&
-    			(youmonst.mappearance > STRANGE_OBJECT &&
-			 youmonst.mappearance < NUM_OBJECTS));
 
     if(!vaultroom) {
 	u.uinvault = 0;
@@ -244,8 +241,9 @@ fnd:
 	else
 	    pline("Someone else has entered the Vault.");
 	newsym(guard->mx,guard->my);
-	if (mimickobj || u.uundetected) {
-	    if (mimickobj && youmonst.mappearance != GOLD_PIECE)
+	if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
+	    if (youmonst.m_ap_type == M_AP_OBJECT &&
+			youmonst.mappearance != GOLD_PIECE)
 	    	verbalize("Hey! who left that %s in here?", mimic_obj_name(&youmonst));
 	    /* You're mimicking some object or you're hidden. */
 	    pline("Puzzled, %s turns around and leaves.", mhe(guard));
