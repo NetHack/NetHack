@@ -175,11 +175,12 @@
  * tmp_at() control calls.
  */
 #define DISP_BEAM    (-1)  /* Keep all glyphs showing & clean up at end. */
-#define DISP_FLASH   (-2)  /* Clean up each glyph before displaying new one. */
-#define DISP_ALWAYS  (-3)  /* Like flash, but still displayed if not visible. */
-#define DISP_CHANGE  (-4)  /* Change glyph. */
-#define DISP_END     (-5)  /* Clean up. */
-#define DISP_FREEMEM (-6)  /* Free all memory during exit only. */
+#define DISP_ALL     (-2)  /* Like beam, but still displayed if not visible. */
+#define DISP_FLASH   (-3)  /* Clean up each glyph before displaying new one. */
+#define DISP_ALWAYS  (-4)  /* Like flash, but still displayed if not visible. */
+#define DISP_CHANGE  (-5)  /* Change glyph. */
+#define DISP_END     (-6)  /* Clean up. */
+#define DISP_FREEMEM (-7)  /* Free all memory during exit only. */
 
 
 /* Total number of cmap indices in the sheild_static[] array. */

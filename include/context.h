@@ -77,6 +77,7 @@ struct context_info {
 	long stethoscope_move;
 	short stethoscope_movement;
 	boolean  travel;	/* find way automatically to u.tx,u.ty */
+	boolean  travel1;	/* first travel step */
 	boolean  forcefight;
 	boolean  nopick;	/* do not pickup objects (as when running) */
 	boolean  made_amulet;

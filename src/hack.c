@@ -4,6 +4,8 @@
 
 #include "hack.h"
 
+/* #define DEBUG */	/* uncomment for debugging */
+
 STATIC_DCL void NDECL(maybe_wail);
 STATIC_DCL int NDECL(moverock);
 STATIC_DCL int FDECL(still_chewing,(XCHAR_P,XCHAR_P));
@@ -633,11 +635,17 @@ int mode;
 	    return FALSE;
 	}
     }
-    /* pick a path that does not require crossing a trap */
-    if (context.run == 8 && mode != DO_MOVE) {
+    /* Pick travel path that does not require crossing a trap.
+     * Avoid water and lava using the usual running rules.
+     * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
+    if (context.run == 8 && mode != DO_MOVE && (x != u.ux || y != u.uy)) {
 	struct trap* t = t_at(x, y);
 
-	if (t && t->tseen) return FALSE;
+	if ((t && t->tseen) ||
+	    (!Levitation && !Flying &&
+	     !is_clinger(youmonst.data) &&
+	     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv))
+	    return FALSE;
     }
 
     ust = &levl[ux][uy];
@@ -684,6 +692,17 @@ int mode;
     return TRUE;
 }
 
+#ifdef DEBUG
+static boolean trav_debug = FALSE;
+
+int
+wiz_debug_cmd() /* in this case, toggle display of travel debug info */
+{
+	trav_debug = !trav_debug;
+	return 0;
+}
+#endif /* DEBUG */
+
 /*
  * Find a path from the destination (u.tx,u.ty) back to (u.ux,u.uy).
  * A shortest path is returned.  If guess is TRUE, consider various
@@ -694,6 +713,18 @@ static boolean
 findtravelpath(guess)
 boolean guess;
 {
+    /* if travel to adjacent, reachable location, use normal movement rules */
+    if (!guess && context.travel1 && distmin(u.ux, u.uy, u.tx, u.ty) == 1) {
+	context.run = 0;
+	if (test_move(u.ux, u.uy, u.tx-u.ux, u.ty-u.uy, TEST_MOVE)) {
+	    u.dx = u.tx-u.ux;
+	    u.dy = u.ty-u.uy;
+	    nomul(0);
+	    iflags.travelcc.x = iflags.travelcc.y = -1;
+	    return TRUE;
+	}
+	context.run = 8;
+    }
     if (u.tx != u.ux || u.ty != u.uy) {
 	xchar travel[COLNO][ROWNO];
 	xchar travelstepx[2][COLNO*ROWNO];
@@ -770,7 +801,23 @@ boolean guess;
 		    }
 		}
 	    }
-	    
+
+#ifdef DEBUG
+	    if (trav_debug) {
+		/* Use of warning glyph is arbitrary. It stands out. */
+		tmp_at(DISP_ALL, warning_to_glyph(1));
+		for (i = 0; i < nn; ++i) {
+		    tmp_at(travelstepx[1-set][i], travelstepy[1-set][i]);
+		}
+		delay_output();
+		if (flags.runmode == RUN_CRAWL) {
+		    delay_output();
+		    delay_output();
+		}
+		tmp_at(DISP_END,0);
+	    }
+#endif /* DEBUG */
+
 	    n = nn;
 	    set = 1-set;
 	    radius++;
@@ -779,15 +826,25 @@ boolean guess;
 	/* if guessing, find best location in travel matrix and go there */
 	if (guess) {
 	    int px = tx, py = ty;	/* pick location */
-	    int dist, nxtdist;
+	    int dist, nxtdist, d2, nd2;
 
 	    dist = distmin(ux, uy, tx, ty);
+	    d2 = dist2(ux, uy, tx, ty);
 	    for (tx = 1; tx < COLNO; ++tx)
 		for (ty = 0; ty < ROWNO; ++ty)
 		    if (travel[tx][ty]) {
 			nxtdist = distmin(ux, uy, tx, ty);
-			if (nxtdist < dist && couldsee(tx, ty)) {
-			    px = tx; py = ty; dist = nxtdist;
+			if (nxtdist == dist && couldsee(tx, ty)) {
+			    nd2 = dist2(ux, uy, tx, ty);
+			    if (nd2 < d2) {
+				/* prefer non-zigzag path */
+				px = tx; py = ty;
+				d2 = nd2;
+			    }
+			} else if (nxtdist < dist && couldsee(tx, ty)) {
+			    px = tx; py = ty;
+			    dist = nxtdist;
+			    d2 = dist2(ux, uy, tx, ty);
 			}
 		    }
 
@@ -799,6 +856,21 @@ boolean guess;
 		    return TRUE;
 		goto found;
 	    }
+#ifdef DEBUG
+	    if (trav_debug) {
+		/* Use of warning glyph is arbitrary. It stands out. */
+		tmp_at(DISP_ALL, warning_to_glyph(2));
+		tmp_at(px, py);
+		delay_output();
+		if (flags.runmode == RUN_CRAWL) {
+		    delay_output();
+		    delay_output();
+		    delay_output();
+		    delay_output();
+		}
+		tmp_at(DISP_END,0);
+	    }
+#endif /* DEBUG */
 	    tx = px;
 	    ty = py;
 	    ux = u.ux;
@@ -834,9 +906,11 @@ domove()
 
 	u_wipe_engr(rnd(5));
 
-	if (context.travel)
+	if (context.travel) {
 	    if (!findtravelpath(FALSE))
 		(void) findtravelpath(TRUE);
+	    context.travel1 = 0;
+	}
 
 	if(((wtcap = near_capacity()) >= OVERLOADED
 	    || (wtcap > SLT_ENCUMBER &&
@@ -2038,7 +2112,7 @@ nomul(nval)
 	u.uinvulnerable = FALSE;	/* Kludge to avoid ctrl-C bug -dlc */
 	u.usleep = 0;
 	multi = nval;
-	context.travel = context.mv = context.run = 0;
+	context.travel = context.travel1 = context.mv = context.run = 0;
 }
 
 /* called when a non-movement, multi-turn action has completed */

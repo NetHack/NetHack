@@ -393,7 +393,8 @@ moveloop()
 	    }
 	    if (context.mv) {
 		if(multi < COLNO && !--multi)
-		    context.travel = context.mv = context.run = 0;
+		    context.travel = context.travel1 =
+			context.mv = context.run = 0;
 		domove();
 	    } else {
 		--multi;

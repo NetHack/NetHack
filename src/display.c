@@ -834,6 +834,7 @@ tmp_at(x, y)
 
     switch (x) {
 	case DISP_BEAM:
+	case DISP_ALL:
 	case DISP_FLASH:
 	case DISP_ALWAYS:
 	    if (!tglyph)
@@ -868,7 +869,7 @@ tmp_at(x, y)
 	    break;
 
 	case DISP_END:
-	    if (tglyph->style == DISP_BEAM) {
+	    if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
 		register int i;
 
 		/* Erase (reset) from source to end */
@@ -885,8 +886,9 @@ tmp_at(x, y)
 	    break;
 
 	default:	/* do it */
-	    if (tglyph->style == DISP_BEAM) {
-		if (!cansee(x,y)) break;
+	    if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
+		if (tglyph->style != DISP_ALL && !cansee(x,y)) break;
+		if (tglyph->sidx >= COLNO) break; /* too many locations */
 		/* save pos for later erasing */
 		tglyph->saved[tglyph->sidx].x = x;
 		tglyph->saved[tglyph->sidx].y = y;

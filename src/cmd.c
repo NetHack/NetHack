@@ -1845,7 +1845,7 @@ register char *cmd;
         }
 	/* handle most movement commands */
 	do_walk = do_rush = prefix_seen = FALSE;
-	context.travel = 0;
+	context.travel = context.travel1 = 0;
 	switch (*cmd) {
 	 case 'g':  if (movecmd(cmd[1])) {
 			context.run = 2;
@@ -1901,6 +1901,7 @@ register char *cmd;
 	 case CMD_TRAVEL:
 		    if (flags.travelcmd) {
 			    context.travel = 1;
+			    context.travel1 = 1;
 			    context.run = 8;
 			    context.nopick = 1;
 			    do_rush = TRUE;
