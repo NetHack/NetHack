@@ -241,7 +241,6 @@ raise_dead:
 	mm.y = u.uy;
 	mkundead(&mm, TRUE, NO_MINVENT);
     } else if(book2->blessed) {
-	/* the Book operates on nearby monsters even if you're swallowed */
 	for(mtmp = fmon; mtmp; mtmp = mtmp2) {
 	    mtmp2 = mtmp->nmon;		/* tamedog() changes chain */
 	    if (DEADMONSTER(mtmp)) continue;
