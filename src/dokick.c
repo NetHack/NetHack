@@ -880,7 +880,7 @@ dokick()
 			maploc->looted |= TREE_LOOTED;
 			return(1);
 		    } else if (!rn2(15) && !(maploc->looted & TREE_SWARM)){
-		    	int cnt = rnl(5);
+		    	int cnt = rnl(5) + 1;
 		    	coord mm;
 		    	mm.x = x; mm.y = y;
 			pline("You've attracted the tree's former occupants!");
