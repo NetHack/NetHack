@@ -2114,10 +2114,14 @@ register int held;
 		    int t;
 		    char menuprompt[BUFSZ];
 		    boolean outokay = (cnt != 0);
+#ifndef GOLDOBJ
+		    boolean inokay = (invent != 0) || (u.ugold != 0);
+#else
 		    boolean inokay = (invent != 0);
+#endif
 		    if (!outokay && !inokay) {
 			pline("%s", emptymsg);
-			pline("You don't have anything to put in.");
+			You("don't have anything to put in.");
 			return used;
 		    }
 		    menuprompt[0] = '\0';
