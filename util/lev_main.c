@@ -19,6 +19,7 @@
 #ifdef MAC
 # if defined(__SC__) || defined(__MRC__)
 #  define MPWTOOL
+#  define PREFIX ":dungeon:"	/* place output files here */
 #include <CursorCtl.h>
 # else
 #  define PREFIX ":lib:"	/* place output files here */
