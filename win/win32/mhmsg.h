@@ -16,6 +16,7 @@
 #define MSNH_MSG_ADDMENU		106
 #define MSNH_MSG_CURSOR			107
 #define MSNH_MSG_ENDMENU		108
+#define MSNH_MSG_DIED			109
 
 typedef struct mswin_nhmsg_add_wnd {
   winid		  wid;

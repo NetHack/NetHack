@@ -181,6 +181,14 @@ BEGIN
                     WS_VSCROLL | WS_TABSTOP
 END
 
+IDD_NHRIP DIALOGEX 0, 0, 281, 209
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Here lies..."
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,82,188,50,14
+END
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -224,6 +232,7 @@ IDB_MENU_SEL            BITMAP  DISCARDABLE     "mnsel.bmp"
 IDB_MENU_UNSEL          BITMAP  DISCARDABLE     "mnunsel.bmp"
 IDB_PETMARK             BITMAP  DISCARDABLE     "petmark.bmp"
 IDB_MENU_SEL_COUNT      BITMAP  DISCARDABLE     "mnselcnt.bmp"
+IDB_RIP                 BITMAP  DISCARDABLE     "rip.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -265,6 +274,14 @@ BEGIN
         RIGHTMARGIN, 137
         TOPMARGIN, 7
         BOTTOMMARGIN, 157
+    END
+
+    IDD_NHRIP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 274
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
     END
 END
 #endif    // APSTUDIO_INVOKED

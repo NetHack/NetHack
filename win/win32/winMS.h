@@ -50,6 +50,7 @@ typedef struct mswin_nhwindow_app {
 	HBITMAP		bmpTiles;
 	HBITMAP		bmpPetMark;
 	HBITMAP		bmpMapTiles; /* custom tiles bitmap */
+	HBITMAP		bmpRip;
 	int			mapTile_X;	/* tile width */
 	int			mapTile_Y;	/* tile height */
 	int			mapTilesPerLine;	/* number of tile per row in the bitmap */
