@@ -401,6 +401,7 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	return 0;
 
 	case WM_LBUTTONDBLCLK :
+	case WM_RBUTTONDOWN:
 		NHEVENT_MS( 
 			CLICK_2,
 			max(0, min(COLNO, data->xPos + (LOWORD(lParam)-data->map_orig.x)/data->xScrTile)),
