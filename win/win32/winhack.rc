@@ -64,6 +64,12 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Fit To Screen ",             IDM_MAP_FIT_TO_SCREEN
     END
+    POPUP "Windows &Settings"
+    BEGIN
+        MENUITEM "NetHack Mode",                IDM_NHMODE
+        MENUITEM SEPARATOR
+        MENUITEM "&Clear All Settings",         IDM_CLEARSETTINGS
+    END
     POPUP "&Help"
     BEGIN
         MENUITEM "&About ...",                  IDM_ABOUT
@@ -240,7 +246,7 @@ IDB_MENU_UNSEL          BITMAP  DISCARDABLE     "mnunsel.bmp"
 IDB_PETMARK             BITMAP  DISCARDABLE     "petmark.bmp"
 IDB_MENU_SEL_COUNT      BITMAP  DISCARDABLE     "mnselcnt.bmp"
 IDB_RIP                 BITMAP  DISCARDABLE     "rip.bmp"
-IDB_SPLASH                 BITMAP  DISCARDABLE     "splash.bmp"
+IDB_SPLASH              BITMAP  DISCARDABLE     "splash.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

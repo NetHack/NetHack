@@ -80,6 +80,7 @@ BOOL CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	HWND control;
 	HDC hdc;
 	PNHTextWindow data;
+    TCHAR title[MAX_LOADSTRING];
 	
 	data = (PNHTextWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch (message) 
@@ -100,6 +101,11 @@ BOOL CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		SetWindowLong(control, GWL_WNDPROC, (LONG)NHEditHookWndProc);
 
 		SetFocus(control);
+
+        /* Even though the dialog has no caption, you can still set the title 
+           which shows on Alt-Tab */
+        LoadString(GetNHApp()->hApp, IDS_APP_TITLE, title, MAX_LOADSTRING);
+        SetWindowText(hWnd, title);
 	return FALSE;
 
 	case WM_MSNH_COMMAND:

@@ -229,6 +229,8 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	PNHMenuWindow data;
 	HWND control;
 	HDC  hdc;
+    TCHAR title[MAX_LOADSTRING];
+
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch (message) 
@@ -254,6 +256,11 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		/* subclass edit control */
 		editControlWndProc = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
 		SetWindowLong(control, GWL_WNDPROC, (LONG)NHMenuTextWndProc);
+
+        /* Even though the dialog has no caption, you can still set the title 
+           which shows on Alt-Tab */
+        LoadString(GetNHApp()->hApp, IDS_APP_TITLE, title, MAX_LOADSTRING);
+        SetWindowText(hWnd, title);
 	break;
 
 	case WM_MSNH_COMMAND:

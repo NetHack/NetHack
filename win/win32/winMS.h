@@ -33,6 +33,8 @@
 #define NHFONT_SIZE_MIN 3
 #define NHFONT_SIZE_MAX 20
 
+#define MAX_LOADSTRING 100
+
 typedef struct mswin_nhwindow_data {
   HWND	      win;
   int		  type;
@@ -62,6 +64,9 @@ typedef struct mswin_nhwindow_app {
 	int			mapDisplayModeSave;	/* saved map display mode */
 
 	char*		saved_text;
+
+    DWORD       saveRegistrySettings; /* Flag if we should save this time */
+    DWORD       regNetHackMode;   /* NetHack mode means no Windows keys in some places */
 } NHWinApp, *PNHWinApp;
 
 #define E extern
@@ -128,6 +133,10 @@ void nhapply_image_transparent(
 	HDC sourceDC, int s_x, int s_y, int s_width, int s_height,
 	COLORREF cTransparent
 );
+
+void mswin_read_reg();
+void mswin_destroy_reg();
+void mswin_write_reg();
 
 /* unicode stuff */
 #ifdef UNICODE

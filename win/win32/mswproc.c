@@ -123,7 +123,13 @@ void mswin_init_nhwindows(int* argc, char** argv)
 #endif
     mswin_nh_input_init();
 
-	/* check default values */
+
+    /* Read Windows settings from the reqistry */
+    mswin_read_reg();
+    /* Set menu check mark for interface mode */
+    mswin_menu_check_intf_mode();
+
+    /* check default values */
 	if( iflags.wc_fontsiz_status<NHFONT_SIZE_MIN || 
 		iflags.wc_fontsiz_status>NHFONT_SIZE_MAX )
 		iflags.wc_fontsiz_status = NHFONT_DEFAULT_SIZE;
@@ -268,6 +274,8 @@ void mswin_get_nh_event(void)
 void mswin_exit_nhwindows(const char *str)
 {
 	logDebug("mswin_exit_nhwindows(%s)\n", str);
+    /* Write Window settings to the registry */
+    mswin_write_reg();
 }
 
 /* Prepare the window to be suspended. */
@@ -1399,3 +1407,98 @@ logDebug(const char *fmt, ...)
 }
 
 #endif
+
+
+/* Reading and writing settings from the registry. */
+#define CATEGORYKEY "Software"
+#define COMPANYKEY  "NetHack"
+#define PRODUCTKEY  "NetHack 3.4.0"
+#define SETTINGSKEY     "Settings"
+
+/* #define all the subkeys here */
+#define INTFKEY "Interface"
+
+void
+mswin_read_reg()
+{
+    HKEY key;
+    DWORD size;
+    char keystring[MAX_PATH];
+
+    sprintf(keystring, "%s\\%s\\%s\\%s", 
+        CATEGORYKEY, COMPANYKEY, PRODUCTKEY, SETTINGSKEY);
+
+    /* Set the defaults here. The very first time the app is started, nothing is 
+       read from the registry, so these defaults apply. */
+    GetNHApp()->saveRegistrySettings = 1;   /* Normally, we always save */
+    GetNHApp()->regNetHackMode = 0;
+
+    if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key) 
+            != ERROR_SUCCESS)
+        return;
+
+    /* Read the keys here. */
+    size = sizeof(DWORD);
+    RegQueryValueEx(key, INTFKEY, 0, NULL, 
+        (unsigned char *)(&(GetNHApp()->regNetHackMode)), &size);
+    
+    RegCloseKey(key);
+}
+
+void
+mswin_write_reg()
+{
+    HKEY key;
+    DWORD disposition;
+
+    if (GetNHApp()->saveRegistrySettings)
+    {
+        char keystring[MAX_PATH];
+
+        sprintf(keystring, "%s\\%s\\%s\\%s", 
+            CATEGORYKEY, COMPANYKEY, PRODUCTKEY, SETTINGSKEY);
+
+        if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_WRITE, &key) != ERROR_SUCCESS)
+        {
+            RegCreateKeyEx(HKEY_CURRENT_USER, keystring, 0, "",
+                REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, &disposition);
+        }
+
+        /* Write the keys here */
+        RegSetValueEx(key, INTFKEY, 0, REG_DWORD, (unsigned char *)(&(GetNHApp()->regNetHackMode)), sizeof(DWORD));
+
+        RegCloseKey(key);
+    }
+}
+
+void
+mswin_destroy_reg()
+{
+    char keystring[MAX_PATH];
+    HKEY key;
+    DWORD nrsubkeys;
+
+    /* Delete keys one by one, as NT does not delete trees */
+    sprintf(keystring, "%s\\%s\\%s\\%s", 
+        CATEGORYKEY, COMPANYKEY, PRODUCTKEY, SETTINGSKEY);
+    RegDeleteKey(HKEY_CURRENT_USER, keystring);
+    sprintf(keystring, "%s\\%s\\%s", 
+        CATEGORYKEY, COMPANYKEY, PRODUCTKEY);
+    RegDeleteKey(HKEY_CURRENT_USER, keystring);
+    /* The company key will also contain information about newer versions
+       of nethack (e.g. a subkey called NetHack 4.0), so only delete that
+       if it's empty now. */
+    sprintf(keystring, "%s\\%s", CATEGORYKEY, COMPANYKEY);
+    /* If we cannot open it, we probably cannot delete it either... Just
+       go on and see what happens. */
+    RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key); 
+    nrsubkeys = 0;
+    RegQueryInfoKey(key, NULL, NULL, NULL, &nrsubkeys, NULL, NULL, NULL, 
+        NULL, NULL, NULL, NULL);
+    RegCloseKey(key);
+    if (nrsubkeys == 0)
+        RegDeleteKey(HKEY_CURRENT_USER, keystring);
+
+    /* Prevent saving on exit */
+    GetNHApp()->saveRegistrySettings = 0;
+}

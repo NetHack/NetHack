@@ -12,8 +12,6 @@
 #include "mhmsgwnd.h"
 #include "mhmap.h"
 
-#define MAX_LOADSTRING 100
-
 typedef struct mswin_nethack_main_window {
 	int mapAcsiiModeSave;
 } NHMainWindow, *PNHMainWindow;
@@ -124,9 +122,6 @@ numpad[KEY_LAST][3] = {
 	{'i', 'I', C('i')}, /* Ins */
 	{'.', ':', ':'} /* Del */
 };
-
-static const unsigned char alt_commands[] = "acdeijlnNopqrstuvw?2";
-/* original: "acdefijlmnNopqrstuvw?2"; */ 
 
 #define STATEON(x) ((GetKeyState(x) & 0xFFFE) != 0)
 #define KEYTABLE(x) ((iflags.num_pad ? numpad : keypad)[x] \
@@ -366,24 +361,21 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			} /* end switch */
 		} break;
 
-        case WM_SYSKEYDOWN:
-		{
-			/* see if this is something we need */
-			WORD c;
-			BYTE kbd_state[256];
-
-			c = 0;
-			ZeroMemory(kbd_state, sizeof(kbd_state));
-			GetKeyboardState(kbd_state);
-
-			if( ToAscii( wParam, (lParam>>16)&0xFF, kbd_state, &c, 0) &&
-				index(alt_commands, c&0xFF) ) {
-				NHEVENT_KBD( M(c&0xFF) );
+        case WM_SYSCHAR: /* Alt-char pressed */
+        {
+            /*
+              If not nethackmode, don't handle Alt-keys here.
+              If no Alt-key pressed it can never be an extended command 
+            */
+            if (GetNHApp()->regNetHackMode && (lParam & 1<<29))
+            {
+                unsigned char c = (unsigned char)(wParam & 0xFF);
+				NHEVENT_KBD(M(c));
 				return 0;
-			} else {
-				return DefWindowProc(hWnd, message, wParam, lParam);
-			}
-		} break;
+            }
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        } 
+        break;
 
 		case WM_COMMAND:
 			/* process commands - menu commands mostly */
@@ -687,6 +679,21 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 
+        case IDM_NHMODE:
+        {
+            GetNHApp()->regNetHackMode = GetNHApp()->regNetHackMode ? 0 : 1;
+            mswin_menu_check_intf_mode();
+            break;
+        }
+        case IDM_CLEARSETTINGS:
+        {
+            mswin_destroy_reg();
+            /* Notify the user that windows settings will not be saved this time. */
+            MessageBox(GetNHApp()->hMainWnd, 
+                "Your Windows Settings will not be stored when you exit this time.", 
+                "NetHack", MB_OK | MB_ICONINFORMATION);
+            break;
+        }
 		case IDM_HELP_LONG:	
 			display_file(HELP, TRUE);  
 			break;
@@ -781,6 +788,17 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 	}
     return FALSE;
+}
+
+void mswin_menu_check_intf_mode()
+{
+    HMENU hMenu = GetMenu(GetNHApp()->hMainWnd);
+
+    if (GetNHApp()->regNetHackMode)
+        CheckMenuItem(hMenu, IDM_NHMODE, MF_CHECKED);
+    else
+        CheckMenuItem(hMenu, IDM_NHMODE, MF_UNCHECKED);
+
 }
 
 void mswin_select_map_mode(int mode)

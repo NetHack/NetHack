@@ -25,9 +25,9 @@
 #define IDB_PETMARK                     143
 #define IDB_MENU_SEL_COUNT              144
 #define IDD_NHRIP                       145
-#define IDB_SPLASH			146
-#define IDB_RIP				147
-#define IDD_SPLASH			148
+#define IDB_SPLASH                      146
+#define IDB_RIP                         147
+#define IDD_SPLASH                      148
 #define IDC_TEXT_VIEW                   1000
 #define IDC_TEXT_CONTROL                1000
 #define IDC_CMD_MOVE_NW                 1001
@@ -132,6 +132,8 @@
 #define IDM_MAP_ASCII12X16              32789
 #define IDM_MAP_ASCII10X18              32790
 #define IDM_MAP_FIT_TO_SCREEN           32791
+#define IDM_NHMODE                      32793
+#define IDM_CLEARSETTINGS               32794
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -139,7 +141,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
-#define _APS_NEXT_COMMAND_VALUE         32793
+#define _APS_NEXT_COMMAND_VALUE         32795
 #define _APS_NEXT_CONTROL_VALUE         1331
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
