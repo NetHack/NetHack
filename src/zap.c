@@ -1505,7 +1505,7 @@ struct obj *obj, *otmp;
 		res = !obj->dknown;
 		/* target object has now been "seen (up close)" */
 		obj->dknown = 1;
-		if (Has_contents(obj)) {
+		if (Is_contenter(obj) || obj->otyp == STATUE) {
 		    if (!obj->cobj)
 			pline("%s empty.", Tobjnam(obj, "are"));
 		    else {
