@@ -63,7 +63,6 @@ copy recover.vcp  ..\..\wince\recover.vcp
 copy resource.h   ..\..\wince\resource.h
 copy wince.vcp    ..\..\wince\wince.vcp
 copy winhack.c    ..\..\wince\winhack.c
-copy winhack.h    ..\..\wince\winhack.h
 copy winhack.rc   ..\..\wince\winhack.rc
 copy winmain.c    ..\..\wince\winmain.c
 copy winMS.h      ..\..\wince\winMS.h

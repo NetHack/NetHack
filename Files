@@ -183,8 +183,8 @@ mhmain.c        mhmain.h        mhmap.c         mhmap.h         mhmenu.c
 mhmenu.h        mhmsg.h         mhmsgwnd.c      mhmsgwnd.h      mhrip.c
 mhrip.h         mhstatus.c      mhstatus.h      mhtext.c        mhtext.h
 mswproc.c       newres.h        recover.vcp     resource.h      stat.h
-winMS.h         wince.vcp       wince.vcw       winhack.c       winhack.h
-winhack.rc      winmain.c
+winMS.h         wince.vcp       wince.vcw       winhack.c       winhack.rc
+winmain.c
 
 sys/winnt:
 (files for Windows 9x, NT and Windows2000 version)
@@ -250,7 +250,7 @@ mhstatus.h      mhtext.c        mhtext.h        mnsel.uu        mnselcnt.uu
 mnunsel.uu      mswproc.c       nethack.dsw     nethackw.dsp    petmark.uu
 recover.dsp     resource.h      rip.uu          splash.uu       tile2bmp.dsp
 tilemap.dsp     tiles.dsp       tiles.mak       uudecode.dsp    winhack.c
-winhack.h       winhack.rc      winMS.h
+winhack.rc      winMS.h
 
 
 

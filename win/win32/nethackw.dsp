@@ -910,10 +910,6 @@ SOURCE=..\include\winGnome.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\win\win32\winhack.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\winprocs.h
 # End Source File
 # Begin Source File

@@ -93574,10 +93574,6 @@ DEP_CPP_WINHA=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\wince\winhack.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\wince\winhack.rc
 
 !IF  "$(CFG)" == "winhack - Win32 (WCE MIPS) Release"
