@@ -30,8 +30,6 @@ get_line_from_key_queue (char * bufp) {
 
 static void
 topl_getlin(const char *query, char *bufp, Boolean ext) {
-	int q_len = strlen(query);
-
 	if (get_line_from_key_queue (bufp))
 		return;
 

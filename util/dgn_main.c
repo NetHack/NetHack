@@ -11,6 +11,11 @@
 #include "config.h"
 #include "dlb.h"
 
+/* Macintosh-specific code */
+#if defined(__APPLE__) && defined(__MACH__)
+  /* MacOS X has Unix-style files and processes */
+# undef MAC
+#endif
 #ifdef MAC
 # if defined(__SC__) || defined(__MRC__)
 #  define MPWTOOL

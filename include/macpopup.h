@@ -7,7 +7,7 @@
 
 /* ### mmodal.c ### */
 
-extern void FlashButton(WindowPtr, short);
+extern void FlashButton(DialogRef, short);
 extern char queued_resp(char *resp);
 extern char topl_yn_function(const char *query, const char *resp, char def);
 extern int get_line_from_key_queue(char *bufp);

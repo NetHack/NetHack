@@ -17,8 +17,12 @@
 #include "hack.h"
 #include "mactty.h"
 #include "macwin.h"
-#include <Sound.h>
-#include <Resources.h>
+#if !TARGET_API_MAC_CARBON
+# include <Sound.h>
+# include <Resources.h>
+#else
+# define freqDurationCmd 40
+#endif
 
 #define SND_BUFFER(s) (&(*s)[20])
 #define SND_LEN(s) (GetHandleSize(s)-42)

@@ -44,7 +44,9 @@
 #undef red			/* undef internal color const strings from decl */
 #undef green
 #undef blue
-#include <windows.h>
+#if !TARGET_API_MAC_CARBON
+# include <windows.h>
+#endif
 
 /*
  * Error code returned when it's probably our fault, or

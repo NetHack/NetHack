@@ -484,7 +484,9 @@ const char *ev;
 void
 initoptions()
 {
+#ifndef MAC
 	char *opts;
+#endif
 	int i;
 
 	/* initialize the random number generator */

@@ -7,8 +7,11 @@
 #undef red			/* undef internal color const strings from decl */
 #undef green
 #undef blue
+
+#ifndef __MACH__
 #include <windows.h>
 #include <dialogs.h>
+#endif
 
 /* more headers */
 #ifdef THINK_C
@@ -19,7 +22,7 @@
 #define PLAYER_NAME_RES_ID	1001
 
 /* fake some things if we don't have universal headers.. */
-#ifndef NewUserItemProc
+#if 0  /*ndef NewUserItemProc*/
 typedef pascal void (*UserItemProcPtr)(WindowPtr theWindow, short itemNo);
 typedef UserItemProcPtr UserItemUPP;
 #define NewUserItemProc(p)	(UserItemUPP)(p)

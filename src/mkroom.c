@@ -128,7 +128,9 @@ mkshop()
 		}
 #endif
 	}
+#ifndef MAC
 gottype:
+#endif
 #endif
 	for(sroom = &rooms[0]; ; sroom++){
 		if(sroom->hx < 0) return;

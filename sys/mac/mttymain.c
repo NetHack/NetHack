@@ -8,7 +8,9 @@
 #include "mactty.h"
 #include "wintty.h"
 
+#if !TARGET_API_MAC_CARBON
 #include <Palettes.h>
+#endif
 
 #define MT_WINDOW 135
 #define MT_WIDTH 80
@@ -157,9 +159,9 @@ static char color_buf [5 * (CLR_MAX + 5) + 1];
 
 		sprintf (ptr, "%s%s%x%x%x", count ? "/" : "" ,
 			flag ? "-" : "" ,
-			(_mt_colors [count] [flag] >> 20) & 0xf ,
-			(_mt_colors [count] [flag] >> 12) & 0xf ,
-			(_mt_colors [count] [flag] >> 4) & 0xf);
+			(int)(_mt_colors [count] [flag] >> 20) & 0xf ,
+			(int)(_mt_colors [count] [flag] >> 12) & 0xf ,
+			(int)(_mt_colors [count] [flag] >> 4) & 0xf);
 		ptr += strlen (ptr);
 	}
 	for (count = 0; count < 5; count ++) {
@@ -167,9 +169,9 @@ static char color_buf [5 * (CLR_MAX + 5) + 1];
 
 		sprintf (ptr, "/%s%x%x%x" ,
 			flag ? "-" : "" ,
-			(_mt_attrs [count] [flag] >> 20) & 0xf ,
-			(_mt_attrs [count] [flag] >> 12) & 0xf ,
-			(_mt_attrs [count] [flag] >> 4) & 0xf);
+			(int)(_mt_attrs [count] [flag] >> 20) & 0xf ,
+			(int)(_mt_attrs [count] [flag] >> 12) & 0xf ,
+			(int)(_mt_attrs [count] [flag] >> 4) & 0xf);
 		ptr += strlen (ptr);
 	}
 
@@ -183,7 +185,7 @@ extern struct DisplayDesc *ttyDisplay;	/* the tty display descriptor */
 char kill_char = CHAR_ESC;
 char erase_char = CHAR_BS;
 
-WindowPtr _mt_window = (WindowPtr) 0;
+WindowRef _mt_window = (WindowRef) 0;
 static Boolean _mt_in_color = 0;
 extern short win_fonts [NHW_TEXT + 1];
 
@@ -227,11 +229,11 @@ short hor, vert;
 
 	if (create_tty (&_mt_window, WIN_BASE_KIND + NHW_MAP, _mt_in_color) != noErr)
 		error("_mt_init_stuff: Couldn't create tty.");
-	((WindowPeek) _mt_window)->windowKind = (WIN_BASE_KIND + NHW_MAP);
-	SelectWindow (_mt_window);
-	SetPort (_mt_window);
-	SetOrigin (-1, -1);
-	
+	SetWindowKind(_mt_window, WIN_BASE_KIND + NHW_MAP);
+	SelectWindow(_mt_window);
+	SetPortWindowPort(_mt_window);
+	SetOrigin(-1, -1);
+
 	font_size = iflags.wc_fontsiz_map ? iflags.wc_fontsiz_map :
 		(iflags.large_font && !small_screen) ? 12 : 9;
 	if (init_tty_number (_mt_window, win_fonts [NHW_MAP], font_size, CO, LI) != noErr)
@@ -300,18 +302,18 @@ has_color (int color) {
 #if defined(__SC__) || defined(__MRC__)
 # pragma unused(color)
 #endif
-Rect r;
-Point p = {0, 0};
-GDHandle gh;
+	Rect r;
+//	Point p = {0, 0};
+	GDHandle gh;
 
-	if (!_mt_in_color) {
+
+	if (!_mt_in_color)
 		return 0;
-	}
 
-	r = _mt_window->portRect;
-	SetPort (_mt_window);
-	LocalToGlobal (&p);
-	OffsetRect (&r, p.h, p.v);
+	GetWindowBounds(_mt_window, kWindowContentRgn, &r);
+//	SetPortWindowPort(_mt_window);
+//	LocalToGlobal (&p);
+//	OffsetRect (&r, p.h, p.v);
 
 	gh = GetMaxDevice (&r);
 	if (!gh) {

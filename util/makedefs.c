@@ -78,7 +78,8 @@ static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.4\t2002/02/03";
 # define DATA_TEMPLATE		"NH:slib/%s"
 # define DATA_IN_TEMPLATE	"NH:dat/%s"
 #else /* not AMIGA */
-# ifdef MAC
+# if defined(MAC) && !defined(__MACH__)
+    /* MacOS 9 or earlier */
 #   define INCLUDE_TEMPLATE	":include:%s"
 #   define SOURCE_TEMPLATE	":src:%s"
 #   define DGN_TEMPLATE		":dat:%s"  /* where dungeon.pdf file goes */

@@ -9,9 +9,11 @@
 
 #include "hack.h"
 #include "macwin.h"
+#if !TARGET_API_MAC_CARBON
 #include <Dialogs.h>
 #include <TextUtils.h>
 #include <Resources.h>
+#endif
 
 
 void error(const char *format,...)

@@ -28,12 +28,17 @@
 #include "patchlevel.h"
 
 /******** Toolbox Defines ********/
+#if !TARGET_API_MAC_CARBON
 #include <Menus.h>
 #include <Devices.h>
 #include <Resources.h>
 #include <TextUtils.h>
 #include <ToolUtils.h>
 #include <Sound.h>
+#endif
+
+/* Borrowed from the Mac tty port */
+extern WindowPtr _mt_window;
 
 /******** Local Defines ********/
 
@@ -205,12 +210,12 @@ static	short		kAdjustWizardMenu = 1;
 
 
 /******** Prototypes ********/
+#if !TARGET_API_MAC_CARBON
 static	void alignAD(Rect *, short);
+#endif
 static	void mustGetMenuAlerts(void);
 static	void menuError(short);
-static	pascal void drawANUserItem(WindowPtr, short);
 static	void aboutNetHack(void);
-static	void optionEditor(void);
 static	void askSave(void);
 static	void askQuit(void);
 
@@ -239,9 +244,9 @@ static	void askQuit(void);
 #define CH_ESCAPE	0x001b
 
 static void ask_restring(const char *cstr, unsigned char *pstr);
-static void ask_enable(WindowPtr wind, short item, int enable);
-static pascal void ask_redraw(WindowPtr wind, DialogItemIndex item);
-static pascal Boolean ask_filter(WindowPtr wind, EventRecord *event, DialogItemIndex *item);
+static void ask_enable(DialogRef wind, short item, int enable);
+static pascal void ask_redraw(DialogRef wind, DialogItemIndex item);
+static pascal Boolean ask_filter(DialogRef wind, EventRecord *event, DialogItemIndex *item);
 #define noresource(t,n)	{SysBeep(3); ExitToShell();}
 #define fatal(s)	{SysBeep(3); ExitToShell();}
 
@@ -255,7 +260,7 @@ static int askselect[RSRC_ASK_MAX];
 
 static RGBColor
 	blackcolor = {0x0000, 0x0000, 0x0000},
-	indentcolor = {0x4000, 0x4000, 0x4000},
+//	indentcolor = {0x4000, 0x4000, 0x4000},
 	darkcolor = {0x8000, 0x8000, 0x8000},
 	backcolor = {0xdddd, 0xdddd, 0xdddd},
 	lightcolor = {0xffff, 0xffff, 0xffff},
@@ -280,7 +285,7 @@ ask_restring (const char *cstr, unsigned char *pstr)
 
 /* Enable the dialog item with the given index */
 static void
-ask_enable (WindowPtr wind, short item, int enable)
+ask_enable (DialogRef wind, short item, int enable)
 {
 	short type;
 	Handle handle;
@@ -298,7 +303,7 @@ ask_enable (WindowPtr wind, short item, int enable)
 
 
 static pascal void
-ask_redraw (WindowPtr wind, DialogItemIndex item)
+ask_redraw (DialogRef wind, DialogItemIndex item)
 {
 	short type;
 	Handle handle;
@@ -431,7 +436,7 @@ ask_redraw (WindowPtr wind, DialogItemIndex item)
 
 
 static pascal Boolean
-ask_filter (WindowPtr wind, EventRecord *event, DialogItemIndex *item)
+ask_filter (DialogRef wind, EventRecord *event, DialogItemIndex *item)
 {
 	short ch, key;
 
@@ -444,7 +449,7 @@ ask_filter (WindowPtr wind, EventRecord *event, DialogItemIndex *item)
 			/* Handle equivalents for OK */
 			if ((ch == CH_RETURN) || (key == KEY_RETURN) ||
 				(ch == CH_ENTER) || (key == KEY_ENTER)) {
-				if ((*((DialogRecord *)wind)->textH)->teLength) {
+				if (GetDialogTextEditHandle(wind)[0]->teLength) {
 					FlashButton(wind, RSRC_ASK_PLAY);
 					*item = RSRC_ASK_PLAY;
 				} else
@@ -491,21 +496,21 @@ ask_filter (WindowPtr wind, EventRecord *event, DialogItemIndex *item)
 void mac_askname ()
 {
 	GrafPtr oldport;
-	WindowPtr askdialog;
+	DialogRef askdialog;
 	short i, j, item, type;
 	Handle handle;
 	Rect rect;
 	Str255 str;
 	Point pt;
-	UserItemUPP redraw = NewUserItemProc(ask_redraw);
-	ModalFilterUPP filter = NewModalFilterProc(ask_filter);
+	UserItemUPP redraw = NewUserItemUPP(ask_redraw);
+	ModalFilterUPP filter = NewModalFilterUPP(ask_filter);
 
 
 	/* Create the dialog */
-	if (!(askdialog = GetNewDialog(RSRC_ASK, NULL, (WindowPtr)-1)))
+	if (!(askdialog = GetNewDialog(RSRC_ASK, NULL, (WindowRef)-1)))
 	    noresource('DLOG', RSRC_ASK);
 	GetPort(&oldport);
-	SetPort(askdialog);
+	SetPortDialogPort(askdialog);
 
 	/* Initialize the name text item */
 	ask_restring(plname, str);
@@ -628,18 +633,18 @@ void mac_askname ()
 	do {
 	    /* Adjust the Play button */
 	    ask_enable(askdialog, RSRC_ASK_PLAY,
-				(*((DialogRecord *)askdialog)->textH)->teLength);
+				GetDialogTextEditHandle(askdialog)[0]->teLength);
 
 	    /* Adjust the race popup menu */
 	    i = j = currrace;
 	    do {
 	    	if (validrace(currrole, j)) {
-	    		EnableItem(askmenu[RSRC_ASK_RACE], j+1);
-	    		CheckItem(askmenu[RSRC_ASK_RACE], j+1,
+	    		EnableMenuItem(askmenu[RSRC_ASK_RACE], j+1);
+	    		CheckMenuItem(askmenu[RSRC_ASK_RACE], j+1,
 	    				currrace == j);
 	    	} else {
-	    		DisableItem(askmenu[RSRC_ASK_RACE], j+1);
-	    		CheckItem(askmenu[RSRC_ASK_RACE], j+1, FALSE);
+	    		DisableMenuItem(askmenu[RSRC_ASK_RACE], j+1);
+	    		CheckMenuItem(askmenu[RSRC_ASK_RACE], j+1, FALSE);
 	    		if ((currrace == j) && !races[++currrace].noun)
 	    			currrace = 0;
 	    	}
@@ -647,19 +652,19 @@ void mac_askname ()
 	    } while (i != j);
 	    if (currrace != i) {
 	    	GetDialogItem(askdialog, RSRC_ASK_RACE, &type, &handle, &rect);
-	    	InvalRect(&rect);
+	    	InvalWindowRect(GetDialogWindow(askdialog), &rect);
 	    }
 
 	    /* Adjust the gender popup menu */
 	    i = j = currgend;
 	    do {
 	    	if (validgend(currrole, currrace, j)) {
-	    		EnableItem(askmenu[RSRC_ASK_GEND], j+1);
-	    		CheckItem(askmenu[RSRC_ASK_GEND], j+1,
+	    		EnableMenuItem(askmenu[RSRC_ASK_GEND], j+1);
+	    		CheckMenuItem(askmenu[RSRC_ASK_GEND], j+1,
 	    				currgend == j);
 	    	} else {
-	    		DisableItem(askmenu[RSRC_ASK_GEND], j+1);
-	    		CheckItem(askmenu[RSRC_ASK_GEND], j+1, FALSE);
+	    		DisableMenuItem(askmenu[RSRC_ASK_GEND], j+1);
+	    		CheckMenuItem(askmenu[RSRC_ASK_GEND], j+1, FALSE);
 	    		if ((currgend == j) && (++currgend >= ROLE_GENDERS))
 	    			currgend = 0;
 	    	}
@@ -667,19 +672,19 @@ void mac_askname ()
 	    } while (i != j);
 	    if (currgend != i) {
 	    	GetDialogItem(askdialog, RSRC_ASK_GEND, &type, &handle, &rect);
-	    	InvalRect(&rect);
+	    	InvalWindowRect(GetDialogWindow(askdialog), &rect);
 	    }
 
 	    /* Adjust the alignment popup menu */
 	    i = j = curralign;
 	    do {
 	    	if (validalign(currrole, currrace, j)) {
-	    		EnableItem(askmenu[RSRC_ASK_ALIGN], j+1);
-	    		CheckItem(askmenu[RSRC_ASK_ALIGN], j+1,
+	    		EnableMenuItem(askmenu[RSRC_ASK_ALIGN], j+1);
+	    		CheckMenuItem(askmenu[RSRC_ASK_ALIGN], j+1,
 	    				curralign == j);
 	    	} else {
-	    		DisableItem(askmenu[RSRC_ASK_ALIGN], j+1);
-	    		CheckItem(askmenu[RSRC_ASK_ALIGN], j+1, FALSE);
+	    		DisableMenuItem(askmenu[RSRC_ASK_ALIGN], j+1);
+	    		CheckMenuItem(askmenu[RSRC_ASK_ALIGN], j+1, FALSE);
 	    		if ((curralign == j) && (++curralign >= ROLE_ALIGNS))
 	    			curralign = 0;
 	    	}
@@ -687,7 +692,7 @@ void mac_askname ()
 	    } while (i != j);
 	    if (curralign != i) {
 	    	GetDialogItem(askdialog, RSRC_ASK_ALIGN, &type, &handle, &rect);
-	    	InvalRect(&rect);
+	    	InvalWindowRect(GetDialogWindow(askdialog), &rect);
 	    }
 
 	    /* Adjust the role popup menu */
@@ -695,14 +700,14 @@ void mac_askname ()
 	    	ask_restring((currgend && roles[i].name.f) ?
 	    			roles[i].name.f : roles[i].name.m, str);
 	    	SetMenuItemText(askmenu[RSRC_ASK_ROLE], i+1, str);
-	    	CheckItem(askmenu[RSRC_ASK_ROLE], i+1, currrole == i);
+	    	CheckMenuItem(askmenu[RSRC_ASK_ROLE], i+1, currrole == i);
 	    }
 
 	    /* Adjust the mode popup menu */
-	    CheckItem(askmenu[RSRC_ASK_MODE], 1, currmode == 0);
-	    CheckItem(askmenu[RSRC_ASK_MODE], 2, currmode == 1);
+	    CheckMenuItem(askmenu[RSRC_ASK_MODE], 1, currmode == 0);
+	    CheckMenuItem(askmenu[RSRC_ASK_MODE], 2, currmode == 1);
 #ifdef WIZARD
-	    CheckItem(askmenu[RSRC_ASK_MODE], 3, currmode == 2);
+	    CheckMenuItem(askmenu[RSRC_ASK_MODE], 3, currmode == 2);
 #endif
 
 	    /* Wait for an action on an item */
@@ -724,7 +729,7 @@ void mac_askname ()
 	    	if (!!(i = PopUpMenuSelect(askmenu[item], pt.v, pt.h,
 	    			askselect[item] + 1)))
 	    		askselect[item] = LoWord(i) - 1;
-	    	InvalRect(&rect);
+	    	InvalWindowRect(GetDialogWindow(askdialog), &rect);
 	    	break;
 	    case RSRC_ASK_NAME:
 #if 0
@@ -806,22 +811,29 @@ void mac_askname ()
 
 /*** Menu bar routines ***/
 
+#if !TARGET_API_MAC_CARBON
 static void
 alignAD(Rect *pRct, short vExempt)
 {
+	BitMap qbitmap;
+
+
+	GetQDGlobalsScreenBits(&qbitmap);
 	(*pRct).right -= (*pRct).left;		/* width */
 	(*pRct).bottom -= (*pRct).top;		/* height */
-	(*pRct).left = (qd.screenBits.bounds.right - (*pRct).right) / 2;
-	(*pRct).top = (qd.screenBits.bounds.bottom - (*pRct).bottom - vExempt) / 2;
+	(*pRct).left = (qbitmap.bounds.right - (*pRct).right) / 2;
+	(*pRct).top = (qbitmap.bounds.bottom - (*pRct).bottom - vExempt) / 2;
 	(*pRct).top += vExempt;
 	(*pRct).right += (*pRct).left;
 	(*pRct).bottom += (*pRct).top;
 }
+#endif
+
 
 static void
 mustGetMenuAlerts()
 {
-	short		i, mbarHgt = GetMBarHeight();
+	short		i;
 	Rect		**hRct;
 
 	for (i = alrt_Menu_start; i < alrt_Menu_limit; i++)
@@ -833,7 +845,9 @@ mustGetMenuAlerts()
 			ExitToShell();
 		}
 
-		alignAD(*hRct, mbarHgt);
+#if !TARGET_API_MAC_CARBON
+		alignAD(*hRct, GetMBarHeight());
+#endif
 	}
 }
 
@@ -857,7 +871,7 @@ InitMenuRes()
 	static Boolean was_inited = 0;
 	short			i, j;
 	menuListHandle	mlHnd;
-	MenuHandle		mHnd;
+	MenuHandle		menu;
 
 	if (was_inited)
 		return;
@@ -865,30 +879,30 @@ InitMenuRes()
 
 	mustGetMenuAlerts();
 
-	for (i = listMenubar; i <= listSubmenu; i++)
-	{
+	for (i = listMenubar; i <= listSubmenu; i++) {
 		if (! (mlHnd = (menuListHandle) GetResource('MNU#', (menuBarListID + i))))
 			menuError(errGetMenuList);
 
-		pMenuList[i] = *mlHnd;
+		pMenuList[i] = (menuListPtr) NewPtr(GetHandleSize((Handle) mlHnd));
+		*pMenuList[i] = **mlHnd;
 
-		for (j = 0; j < (**mlHnd).numMenus; j++)
+		for (j = 0; j < pMenuList[i]->numMenus; j++)
 		{
-			if (! (mHnd = (MenuHandle) GetMenu((**mlHnd).mref[j].mresID))) {
+			if (! (menu = (MenuHandle) GetMenu((**mlHnd).mref[j].mresID))) {
 			Str31 d;
 				NumToString ((**mlHnd).mref[j].mresID, d);
 				menuError(errGetMenu);
 			}
 
-			(**mlHnd).mref[j].mhnd = mHnd;
-			* ((short *) *mHnd) = j + (**mlHnd).firstMenuID;	/* consecutive IDs */
+			pMenuList[i]->mref[j].mhnd = menu;
+			SetMenuID(menu, j + (**mlHnd).firstMenuID);	/* consecutive IDs */
 
 			/* expand apple menu */
 			if ((i == listMenubar) && (j == menuApple)) {
-				AppendResMenu(mHnd, 'DRVR');
+				AppendResMenu(menu, 'DRVR');
 			}
 
-			InsertMenu(mHnd, ((i == listSubmenu) ? hierMenu : 0));
+			InsertMenu(menu, ((i == listSubmenu) ? hierMenu : 0));
 		}
 	}
 	DrawMenuBar();
@@ -899,7 +913,7 @@ void
 AdjustMenus(short dimMenubar)
 {
 	short		newMenubar = mbarRegular;
-	WindowPeek	peekWindow = (WindowPeek) FrontWindow();
+	WindowRef win = FrontWindow();
 	short		i;
 
 	/*
@@ -908,20 +922,14 @@ AdjustMenus(short dimMenubar)
 	 *	}
 	 */
 	/* determine the new menubar state */
-	if (dimMenubar) {
+	if (dimMenubar)
 		newMenubar = mbarDim;
-	} else if (! peekWindow) {
+	else if (!win)
 		newMenubar = mbarNoWindows;
-	} else if (peekWindow->windowKind < 0) {
+	else if (GetWindowKind(win) < 0)
 		newMenubar = mbarDA;
-	} else {
-		while (peekWindow && (peekWindow->windowKind != WKND_MAP)) {
-			peekWindow = peekWindow->nextWindow;
-		}
-		if ((! peekWindow) || (! peekWindow->visible)) {
-			newMenubar = mbarNoMap;
-		}
-	}
+	else if (!IsWindowVisible(_mt_window))
+		newMenubar = mbarNoMap;
 
 	if (newMenubar != mbarRegular)
 		;							/* we've already found its state */
@@ -949,7 +957,7 @@ AdjustMenus(short dimMenubar)
 
 			SetMenuItemText(MHND_FILE, menuFilePlayMode, "\pExplore");
 
-			for (i = CountMItems(MHND_WIZ); i > menuWizardAttributes; i--)
+			for (i = CountMenuItems(MHND_WIZ); i > menuWizardAttributes; i--)
 				DeleteMenuItem(MHND_WIZ, i);
 		}
 	}
@@ -962,25 +970,25 @@ AdjustMenus(short dimMenubar)
 		case mbarDim:
 			/* disable all menus (except the apple menu) */
 			for (i = menuFile; i < NUM_MBAR; i++)
-				DisableItem(MBARHND(i), 0);
+				DisableMenuItem(MBARHND(i), 0);
 			break;
 
 		case mbarNoWindows:
 		case mbarDA:
 		case mbarNoMap:
 			/* enable the file menu, but ... */
-			EnableItem(MHND_FILE, 0);
+			EnableMenuItem(MHND_FILE, 0);
 
 			/* ... disable the window commands! */
 			for (i = menuFileRedraw; i <= menuFileEnterExplore; i++)
-				DisableItem(MHND_FILE, i);
+				DisableMenuItem(MHND_FILE, i);
 
 			/* ... and disable the rest of the menus */
 			for (i = menuEdit; i < NUM_MBAR; i++)
-				DisableItem(MBARHND(i), 0);
+				DisableMenuItem(MBARHND(i), 0);
 
 			if (theMenubar == mbarDA)
-				EnableItem(MHND_EDIT, 0);
+				EnableMenuItem(MHND_EDIT, 0);
 
 			break;
 
@@ -988,19 +996,19 @@ AdjustMenus(short dimMenubar)
 		case mbarSpecial:
 			/* enable all menus ... */
 			for (i = menuFile; i < NUM_MBAR; i++)
-				EnableItem(MBARHND(i), 0);
+				EnableMenuItem(MBARHND(i), 0);
 
 			/* ... except the unused Edit menu */
-			DisableItem(MHND_EDIT, 0);
+			DisableMenuItem(MHND_EDIT, 0);
 
 			/* ... enable the window commands */
 			for (i = menuFileRedraw; i <= menuFileEnterExplore; i++)
-				EnableItem(MHND_FILE, i);
+				EnableMenuItem(MHND_FILE, i);
 
 			if (theMenubar == mbarRegular)
-				DisableItem(MHND_FILE, menuFilePlayMode);
+				DisableMenuItem(MHND_FILE, menuFilePlayMode);
 			else
-				DisableItem(MHND_FILE, menuFileEnterExplore);
+				DisableMenuItem(MHND_FILE, menuFileEnterExplore);
 
 			break;
 		}
@@ -1020,6 +1028,7 @@ DoMenuEvt(long menuEntry)
 	case menuApple:
 		if (menuItem == menuAppleAboutBox)
 			aboutNetHack();
+#if !TARGET_API_MAC_CARBON
 		else
 		{
 			unsigned char daName[32];
@@ -1027,6 +1036,7 @@ DoMenuEvt(long menuEntry)
 			GetMenuItemText(MHND_APPLE, menuItem, * (Str255 *) daName);
 			(void) OpenDeskAcc(daName);
 		}
+#endif
 		break;
 
 	/*
@@ -1064,7 +1074,9 @@ DoMenuEvt(long menuEntry)
 		break;
 
 	case menuEdit:
+#if !TARGET_API_MAC_CARBON
 		(void) SystemEdit(menuItem - 1);
+#endif
 		break;
 
 	default:	/* get associated string and add to key queue */

@@ -2,6 +2,9 @@
 #include "date.h"
 #include "patchlevel.h"
 
+resource 'plst' (0, purgeable) {
+};
+
 resource 'vers' (1, purgeable) {
 	VERSION_MAJOR, (VERSION_MINOR<<4) | PATCHLEVEL, final, EDITLEVEL, verUS,
 	VERSION_STRING,

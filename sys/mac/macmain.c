@@ -9,6 +9,7 @@
 #include "macwin.h"
 #include "mactty.h"
 
+#if !TARGET_API_MAC_CARBON
 #include <OSUtils.h>
 #include <files.h>
 #include <Types.h>
@@ -17,6 +18,7 @@
 #include <ToolUtils.h>
 #include <Resources.h>
 #include <Errors.h>
+#endif
 
 #ifndef O_RDONLY
 #include <fcntl.h>

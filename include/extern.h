@@ -877,6 +877,7 @@ E int FDECL(macclose, (int));
 E int FDECL(macread, (int,void *,unsigned));
 E int FDECL(macwrite, (int,void *,unsigned));
 E long FDECL(macseek, (int,long,short));
+E int FDECL(macunlink, (const char *));
 
 /* ### macsnd.c ### */
 

@@ -12,7 +12,9 @@
 
 #include "hack.h"	/* to get flags */
 #include "mttypriv.h"
+#if !TARGET_API_MAC_CARBON
 #include <Resources.h>
+#endif
 
 char game_active = 0;	/* flag to window rendering routines not to use ppat */
 
@@ -103,6 +105,7 @@ dispose_ptr (void *ptr) {
 }
 
 
+#if 0	/* Use alloc.c instead */
 /*
  * Allocate a pointer using the set memory-allocator
  */
@@ -111,6 +114,7 @@ alloc_ptr (void **ptr, long size) {
 	*ptr = NewPtr (size);
 	return MemError ();
 }
+#endif
 
 
 /*
@@ -185,6 +189,7 @@ free_bits (tty_record *record) {
 
 	if (record->uses_gworld) {
 		s_err = deallocate_gworld (record);
+#if !TARGET_API_MAC_CARBON
 	} else {
 		s_err = dispose_ptr (record->its_bits.baseAddr);
 		if (!s_err) {
@@ -197,6 +202,7 @@ free_bits (tty_record *record) {
 				}
 			}
 		}
+#endif
 	}
 	return s_err;
 }
@@ -207,14 +213,16 @@ free_bits (tty_record *record) {
  * Otherwise, do nothing.
  */
 
-short create_tty (WindowPtr *window, short resource_id, Boolean in_color) {
-tty_record * record;
-Boolean was_allocated = !!*window;
+short
+create_tty (WindowRef *window, short resource_id, Boolean in_color)
+{
+	tty_record * record;
+	Boolean was_allocated = !!*window;
 
 	if (in_color) {
-		*window = GetNewCWindow (resource_id, (Ptr) *window, (WindowPtr) -1L);
+		*window = GetNewCWindow (resource_id, (Ptr) *window, (WindowRef) -1L);
 	} else {
-		*window = GetNewWindow (resource_id, (Ptr) *window, (WindowPtr) -1L);
+		*window = GetNewWindow (resource_id, (Ptr) *window, (WindowRef) -1L);
 	}
 	if (!*window) {
 		return mem_err ();
@@ -222,11 +230,15 @@ Boolean was_allocated = !!*window;
 
 	record = (tty_record *) NewPtrClear (sizeof (tty_record));
 	if (!record) {
+#if !TARGET_API_MAC_CARBON
 		if (was_allocated) {
 			CloseWindow (*window);
 		} else {
+#endif
 			DisposeWindow (*window);
+#if !TARGET_API_MAC_CARBON
 		}
+#endif
 		return mem_err ();
 	}
 	record->its_window = *window;
@@ -243,8 +255,8 @@ Boolean was_allocated = !!*window;
 	if (in_color) {
 	GDHandle gh;
 
-		SetPort (*window);
-		GetGWorld ( &(record ->its_window_world), &gh);
+		SetPortWindowPort(*window);
+		GetGWorld(&(record->its_window_world), &gh);
 	} else {
 		record->its_window_world = (GWorldPtr)0;
 	}
@@ -287,11 +299,15 @@ RECORD_EXISTS (record);
 
 	s_err = free_bits (record);
 	if (!s_err) {
+#if !TARGET_API_MAC_CARBON
 		if (record->was_allocated) {
 			CloseWindow (window);
 		} else {
+#endif
 			DisposeWindow (window);
+#if !TARGET_API_MAC_CARBON
 		}
+#endif
 		s_err = dispose_ptr (record);
 	}
 	
@@ -348,6 +364,7 @@ short s_err;
 
 	if (record->uses_gworld) {
 		s_err = allocate_offscreen_world (record);
+#if !TARGET_API_MAC_CARBON
 	} else {
 		s_err = alloc_ptr ((void **) &(record->its_bits.baseAddr),
 			record->its_bits.rowBytes * record->its_bits.bounds.bottom);
@@ -361,6 +378,7 @@ short s_err;
 			ClipRect (&(record->its_bits.bounds));
 			SetPortBits (&(record->its_bits));
 		}
+#endif
 	}
 	return s_err;
 }
@@ -427,9 +445,9 @@ static void
 select_onscreen_window (tty_record *record) {
 	if (record->uses_gworld) {
 		use_port (record, record->its_window_world);
-		SetPort (record->its_window);
+		SetPortWindowPort(record->its_window);
 	} else {
-		use_port (record, record->its_window);
+		use_port(record, record->its_window);
 	}
 }
 
@@ -438,18 +456,21 @@ select_onscreen_window (tty_record *record) {
  * Do bits copy depending on if we're using color or not
  */
 static void
-copy_bits (tty_record *record, Rect *bounds, short xfer_mode, RgnHandle mask_rgn) {
-GWorldFlags pix_state;
-BitMap * source;
+copy_bits(tty_record *record, Rect *bounds, short xfer_mode, RgnHandle mask_rgn)
+{
+	GWorldFlags pix_state;
+	BitMap * source;
 
 	if (record->uses_gworld) {
 		pix_state = GetPixelsState (GetGWorldPixMap (record->offscreen_world));
 		LockPixels (GetGWorldPixMap (record->offscreen_world));
-		source = (BitMap *) &record->offscreen_world->portPixMap;
+		source = (BitMapPtr) *GetGWorldPixMap(record->offscreen_world);
 	}
 	else	source = &record->its_bits;
-	
-	CopyBits (source, &(record->its_window->portBits), bounds, bounds, xfer_mode, mask_rgn);
+
+	SetPortWindowPort(record->its_window);
+	CopyBits(source, GetPortBitMapForCopyBits(GetWindowPort(record->its_window)),
+		bounds, bounds, xfer_mode, mask_rgn);
 
 	if (record->uses_gworld) {
 		SetPixelsState (GetGWorldPixMap (record->offscreen_world), pix_state);
@@ -506,6 +527,7 @@ RECORD_EXISTS (record);
 }
 
 
+#if 0
 /*
  * Update TTY according to new color environment for the window
  */
@@ -526,6 +548,7 @@ Rect r_screen;
 	}
 	return 0;
 }
+#endif
 
 
 /*
@@ -600,7 +623,7 @@ short get_invalid_region (WindowPtr window, Rect *inval_rect) {
 	*inval_rect = record->invalid_rect;
 #else
 	if (EmptyRgn (record->invalid_part)) {
-		return return general_failure;
+		return general_failure;
 	}
 	*inval_rect = (*(record->invalid_part))->rgnBBox;
 #endif
@@ -835,12 +858,13 @@ RECORD_EXISTS (record);
  * Add a null-terminated string of characters
  */
 short
-add_tty_string (WindowPtr window, const char *string) {
-register const unsigned char * start_c;
-register const unsigned char * the_c;
-register unsigned char ch, is_control, tty_wrap;
-register short max_x, pos_x;
-RECORD_EXISTS (record);
+add_tty_string(WindowPtr window, const char *string)
+{
+	register const unsigned char * start_c;
+	register const unsigned char * the_c;
+	register unsigned char ch, is_control = 0, tty_wrap;
+	register short max_x, pos_x;
+	RECORD_EXISTS (record);
 
 	if (record->curs_state != 0)
 		curs_pos (record, record->x_curs, record->y_curs, 0);

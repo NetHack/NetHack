@@ -6,9 +6,11 @@
 #include "mactty.h"
 #include "macwin.h"
 
+#if !TARGET_API_MAC_CARBON
 #include <Folders.h>
 #include <TextUtils.h>
 #include <Resources.h>
+#endif
 
 
 static Boolean winFileInit = 0;
@@ -100,7 +102,7 @@ Point p;
 	*left = p.h;
 	*top = p.v;
 	dprintf ("Retrieve Kind %d Pt (%d,%d)", kind, p.h, p.v);
-	return PtInRgn (p, GetGrayRgn ());
+	return (PtInRgn (p, GetGrayRgn ()));
 }
 
 
@@ -131,12 +133,12 @@ SavePosition (short kind, short top, short left)
 		dprintf ("Save bad kind %d", kind);
 		return;
 	}
-	InitWinFile ();
-	savePos [kind].validPos = 1;
-	savePos [kind].top = top;
-	savePos [kind].left = left;
-	dprintf ("Save kind %d pt (%d,%d)", kind, left, top);
-	FlushWinFile ();
+	InitWinFile();
+	savePos[kind].validPos = 1;
+	savePos[kind].top = top;
+	savePos[kind].left = left;
+	dprintf("Save kind %d pt (%d,%d)", kind, left, top);
+	FlushWinFile();
 }
 
 
@@ -163,7 +165,7 @@ GetWinKind (WindowPtr win)
 	if (!CheckNhWin (win)) {
 		return -1;
 	}
-	kind = ((WindowPeek) win)->windowKind - WIN_BASE_KIND;
+	kind = GetWindowKind(win) - WIN_BASE_KIND;
 	if (kind < 0 || kind > NHW_TEXT) {
 		return -1;
 	}
@@ -190,32 +192,32 @@ GetWinKind (WindowPtr win)
 
 
 Boolean
-RetrieveWinPos (WindowPtr win, short *top, short *left)
-{	return RetrievePosition (GetWinKind (win), top, left);
-}
-
-
-void
-SaveWindowPos (WindowPtr win)
+RetrieveWinPos(WindowPtr win, short *top, short *left)
 {
-	GrafPtr gp;
-	Point p = { 0, 0 };
-
-	GetPort (&gp);
-	SetPort (win);
-	LocalToGlobal (&p);
-	AddPt (*(Point *) &(win->portRect), &p); /* Adjust for origin */
-	SetPort (gp);
-	SavePosition (GetWinKind (win), p.v, p.h);
+	return RetrievePosition(GetWinKind (win), top, left);
 }
 
 
 void
-SaveWindowSize (WindowPtr win)
+SaveWindowPos(WindowPtr win)
+{
+	Rect r;
+
+
+	GetWindowBounds(win, kWindowContentRgn, &r);
+	SavePosition(GetWinKind(win), r.top, r.left);
+}
+
+
+void
+SaveWindowSize(WindowPtr win)
 {
 	short width, height;
+	Rect r;
 
-	width = win->portRect.right - win->portRect.left;
-	height = win->portRect.bottom - win->portRect.top;
-	SaveSize (GetWinKind (win), height, width);
+
+	GetWindowBounds(win, kWindowContentRgn, &r);
+	width = r.right - r.left;
+	height = r.bottom - r.top;
+	SaveSize(GetWinKind (win), height, width);
 }

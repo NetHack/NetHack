@@ -130,6 +130,10 @@ static int lockptr;
 #endif
 #endif
 
+#ifdef MAC
+# define unlink macunlink
+#endif
+
 #ifdef USER_SOUNDS
 extern char *sounddir;
 #endif

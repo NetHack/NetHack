@@ -20,9 +20,11 @@
 # if defined(__SC__) || defined(__MRC__)
 #  define MPWTOOL
 #  define PREFIX ":dungeon:"	/* place output files here */
-#include <CursorCtl.h>
+#  include <CursorCtl.h>
 # else
-#  define PREFIX ":lib:"	/* place output files here */
+#  if !defined(__MACH__)
+#   define PREFIX ":lib:"	/* place output files here */
+#  endif
 # endif
 #endif
 

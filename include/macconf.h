@@ -25,8 +25,14 @@
 #ifndef __powerc
 # define MAC68K		/* 68K mac (non-powerpc) */
 #endif
+#ifndef TARGET_API_MAC_CARBON
+# define TARGET_API_MAC_CARBON 0
+#endif
 
+
+#ifndef __MACH__
 #define RANDOM
+#endif
 #define NO_SIGNAL		/* You wouldn't believe our signals ... */
 #define FILENAME 256
 #define NO_TERMS		/* For tty port (see wintty.h) */
@@ -46,7 +52,13 @@
  * Try and keep the number of files here to an ABSOLUTE minimum !
  * include the relevant files in the relevant .c files instead !
  */
-#include <MacTypes.h>
+#if TARGET_API_MAC_CARBON
+  /* Avoid including <CarbonCore/fp.h> -- it has a conflicting expl() */
+# define __FP__
+# include <Carbon/Carbon.h>
+#else
+# include <MacTypes.h>
+#endif
 
 /*
  * We could use the PSN under sys 7 here ...
@@ -72,7 +84,7 @@ extern void error(const char *,...);
  * MPW.  With MPW, we make them into MPW tools, which use unix IO.  SPEC_LEV
  * and DGN_COMP are defined when compiling for LevComp and DgnComp respectively.
  */
-#if !((defined(__SC__) || defined(__MRC__)) && (defined(SPEC_LEV) || defined(DGN_COMP)))
+#if !((defined(__SC__) || defined(__MRC__) || defined(__MACH__)) && (defined(SPEC_LEV) || defined(DGN_COMP)))
 # define creat maccreat
 # define open macopen
 # define close macclose
