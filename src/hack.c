@@ -382,12 +382,15 @@ still_chewing(x,y)
 	digtxt = "chew a hole in the wall.";
 	if (level.flags.is_maze_lev) {
 	    lev->typ = ROOM;
-	} else if (level.flags.is_cavernous_lev) {
+	} else if (level.flags.is_cavernous_lev && !in_town(x, y)) {
 	    lev->typ = CORR;
 	} else {
 	    lev->typ = DOOR;
 	    lev->doormask = D_NODOOR;
 	}
+    } else if (IS_TREE(lev->typ)) {
+	digtxt = "chew through the tree.";
+	lev->typ = ROOM;
     } else if (lev->typ == SDOOR) {
 	if (lev->doormask & D_TRAPPED) {
 	    lev->doormask = D_NODOOR;

@@ -350,7 +350,8 @@ dig()
 			}
 			if (level.flags.is_maze_lev) {
 			    lev->typ = ROOM;
-			} else if (level.flags.is_cavernous_lev) {
+			} else if (level.flags.is_cavernous_lev &&
+				   !in_town(dpx, dpy)) {
 			    lev->typ = CORR;
 			} else {
 			    lev->typ = DOOR;
@@ -1095,7 +1096,8 @@ register struct monst *mtmp;
 		add_damage(mtmp->mx, mtmp->my, 0L);
 	    if (level.flags.is_maze_lev) {
 		here->typ = ROOM;
-	    } else if (level.flags.is_cavernous_lev) {
+	    } else if (level.flags.is_cavernous_lev &&
+		       !in_town(mtmp->mx, mtmp->my)) {
 		here->typ = CORR;
 	    } else {
 		here->typ = DOOR;
@@ -1222,6 +1224,13 @@ zap_dig()
 		    } else if (!Blind)
 			pline_The("rock glows then fades.");
 		    break;
+		} else if (IS_TREE(room->typ)) {
+		    if (!(room->wall_info & W_NONDIGGABLE)) {
+			room->typ = ROOM;
+			unblock_point(zx,zy); /* vision */
+		    } else if (!Blind)
+			pline_The("tree glows then fades.");
+		    break;
 		}
 	    } else if (IS_ROCK(room->typ)) {
 		if (!may_dig(zx,zy)) break;
@@ -1231,12 +1240,15 @@ zap_dig()
 			shopwall = TRUE;
 		    }
 		    watch_dig((struct monst *)0, zx, zy, TRUE);
-		    if (level.flags.is_cavernous_lev) {
+		    if (level.flags.is_cavernous_lev && !in_town(zx, zy)) {
 			room->typ = CORR;
 		    } else {
 			room->typ = DOOR;
 			room->doormask = D_NODOOR;
 		    }
+		    digdepth -= 2;
+		} else if (IS_TREE(room->typ)) {
+		    room->typ = ROOM;
 		    digdepth -= 2;
 		} else {	/* IS_ROCK but not IS_WALL or SDOOR */
 		    room->typ = CORR;
