@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2002/07/23	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2002/12/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,7 +16,7 @@
 #define EDITLEVEL	0
 
 #define COPYRIGHT_BANNER_A \
-"NetHack, Copyright 1985-2002"
+"NetHack, Copyright 1985-2003"
 
 #define COPYRIGHT_BANNER_B \
 "         By Stichting Mathematisch Centrum and M. Stephenson."
@@ -40,7 +40,7 @@
 /*****************************************************************************/
 /* Version 3.4.x */
 
-/*  Patch 1, August 1, 2002
+/*  Patch 1, ?????, 2003
  *  Fix a few fatal errors including one for reentering shops, one
  *     involving land mines and boulders/statues, and one for delayed
  *     polymorph
