@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2002/07/14	*/
+/*	SCCS Id: @(#)trap.c	3.4	2002/08/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1310,8 +1310,19 @@ int style;
 		    	    seetrap(t);
 			    used_up = TRUE;
 			    break;
+			case PIT:
+			case SPIKED_PIT:
+			case HOLE:
+			case TRAPDOOR:
+			    /* the boulder won't be used up if there is a
+			       monster in the trap; stop rolling anyway */
+			    x2 = bhitpos.x,  y2 = bhitpos.y;  /* stops here */
+			    if (flooreffects(singleobj, x2, y2, "fall"))
+				used_up = TRUE;
+			    dist = -1;	/* stop rolling immediately */
+			    break;
 			}
-			if (used_up) break;
+			if (used_up || dist == -1) break;
 		    }
 		    if (flooreffects(singleobj, bhitpos.x, bhitpos.y, "fall")) {
 			used_up = TRUE;
