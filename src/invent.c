@@ -1108,7 +1108,7 @@ unsigned *resultflags;
 		You("have nothing to %s.", word);
 		return(0);
 	}
-	if (combo) add_valid_menu_class(0);	/* reset */
+	add_valid_menu_class(0);	/* reset */
 	if (!strcmp(word, "take off")) {
 	    takeoff = TRUE;
 	    filter = is_worn;
