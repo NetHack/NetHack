@@ -523,7 +523,7 @@ int spellnum;
 		pline("%s casts at a clump of sticks, but nothing happens.",
 		    Monnam(mtmp));
 	    else if (let == S_SNAKE)
-		pline("%s transforms clump of sticks into snakes!",
+		pline("%s transforms a clump of sticks into snakes!",
 		    Monnam(mtmp));
 	    else
 		pline("%s summons insects!", Monnam(mtmp));
@@ -593,7 +593,7 @@ int spellnum;
 	else if (dmg <= 20)
 	    pline("Severe wounds appear on your body!");
 	else
-	    pline("Your body is covered with painful wounds!");
+	    Your("body is covered with painful wounds!");
 	break;
     default:
 	impossible("mcastu: invalid clerical spell (%d)", spellnum);
