@@ -869,7 +869,7 @@ get_saved_games()
     int n = scandir("save", &namelist, 0, alphasort);;
     if ( n > 0 ) {
 	int i,j=0;
-	char** result = (char**)malloc((n+1)*sizeof(char*)); /* at most */
+	char** result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
 	for (i=0; i<n; i++) {
 	    int uid;
 	    char name[NAME_MAX];
