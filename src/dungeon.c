@@ -1561,7 +1561,7 @@ print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices)
 }
 
 /* Print available dungeon information. */
-boolean
+schar
 print_dungeon(bymenu, rlev, rdgn)
 boolean bymenu;
 schar *rlev;
