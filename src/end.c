@@ -185,7 +185,9 @@ register struct monst *mtmp;
 	You("die...");
 	mark_synch();	/* flush buffered screen output */
 	buf[0] = '\0';
-	if ((mtmp->data->geno & G_UNIQ) != 0) {
+	/* "killed by the high priest of Crom" is okay, "killed by the high
+	   priest" alone isn't */
+	if ((mtmp->data->geno & G_UNIQ) != 0 && !(mtmp->data == &mons[PM_HIGH_PRIEST] && !mtmp->ispriest)) {
 	    if (!type_is_pname(mtmp->data))
 		Strcat(buf, "the ");
 	    killer_format = KILLED_BY;
