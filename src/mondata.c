@@ -703,12 +703,37 @@ on_fire(mptr, mattk)
 struct permonst *mptr;
 struct attack *mattk;
 {
-    return (mptr == &mons[PM_WATER_ELEMENTAL]) ? "boiling" :
-	   (mptr == &mons[PM_FLAMING_SPHERE]) ? "already on fire" :
-	   (mptr == &mons[PM_STONE_GOLEM] || mptr == &mons[PM_CLAY_GOLEM] ||
-	    mptr == &mons[PM_GOLD_GOLEM]) ? "heating up" :
-	   (mptr == &mons[PM_GLASS_GOLEM]) ? "getting soft" :
-	   (mattk->aatyp == AT_HUGS) ? "being roasted" : "on fire";
+    const char *what;
+
+    switch (monsndx(mptr)) {
+    case PM_FLAMING_SPHERE:
+    case PM_FIRE_VORTEX:
+    case PM_FIRE_ELEMENTAL:
+	what = "already on fire";
+	break;
+    case PM_WATER_ELEMENTAL:
+    case PM_FOG_CLOUD:
+    case PM_STEAM_VORTEX:
+	what = "boiling";
+	break;
+    case PM_ICE_VORTEX:
+    case PM_GLASS_GOLEM:
+	what = "melting";
+	break;
+    case PM_STONE_GOLEM:
+    case PM_CLAY_GOLEM:
+    case PM_GOLD_GOLEM:
+    case PM_AIR_ELEMENTAL:
+    case PM_EARTH_ELEMENTAL:
+    case PM_DUST_VORTEX:
+    case PM_ENERGY_VORTEX:
+	what = "heating up";
+	break;
+    default:
+	what = (mattk->aatyp == AT_HUGS) ? "being roasted" : "on fire";
+	break;
+    }
+    return what;
 }
 
 #endif /* OVLB */
