@@ -1200,6 +1200,8 @@ poly_obj(obj, id)
 	boolean can_merge = (id == STRANGE_OBJECT);
 	int obj_location = obj->where;
 
+	if (obj->otyp == BOULDER && In_sokoban(&u.uz))
+	    change_luck(-1);	/* Sokoban guilt */
 	if (id == STRANGE_OBJECT) { /* preserve symbol */
 	    int try_limit = 3;
 	    /* Try up to 3 times to make the magic-or-not status of
@@ -1603,8 +1605,6 @@ struct obj *obj, *otmp;
 		    case ROCK_CLASS:	/* boulders and statues */
 			if (obj->otyp == BOULDER) {
 			    obj = poly_obj(obj, HUGE_CHUNK_OF_MEAT);
-			    if (In_sokoban(&u.uz))
-				change_luck(-1);	/* Sokoban guilt */
 			    goto smell;
 			} else if (obj->otyp == STATUE) {
 			    xchar oox, ooy;
