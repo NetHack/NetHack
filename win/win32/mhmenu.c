@@ -860,6 +860,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	int i = 0;
 	PNHMenuWindow data;
 	int topIndex, pageSize;
+	boolean is_accelerator = FALSE;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
@@ -1085,8 +1086,16 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 			return -2;
 		}
 
+		is_accelerator = FALSE;
+		for(i=0; i<data->menu.size; i++) {
+			if( data->menu.items[i].accelerator == ch ) {
+				is_accelerator = TRUE;
+				break;
+			}
+		}
+
 		if( (ch>='a' && ch<='z') ||
-			(ch>='A' && ch<='Z') ) {
+			(ch>='A' && ch<='Z') || is_accelerator) {
 			if (data->how == PICK_ANY || data->how == PICK_ONE) {
 				for(i=0; i<data->menu.size; i++ ) {
 					if( data->menu.items[i].accelerator == ch ) {
