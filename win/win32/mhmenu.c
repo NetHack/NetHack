@@ -14,6 +14,11 @@
 #define NHMENU_STR_SIZE     BUFSZ
 #define MIN_TABSTOP_SIZE	8
 
+#define DEFAULT_COLOR_BG_TEXT	COLOR_WINDOW
+#define DEFAULT_COLOR_FG_TEXT	COLOR_WINDOWTEXT
+#define DEFAULT_COLOR_BG_MENU	COLOR_WINDOW
+#define DEFAULT_COLOR_FG_MENU	COLOR_WINDOWTEXT
+
 typedef struct mswin_menu_item {
 	int				glyph;
 	ANY_P			identifier;
@@ -416,6 +421,21 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		else
 			return FALSE;
 
+	case WM_CTLCOLORSTATIC: { /* sent by edit control before it is drawn */
+		HDC hdcEdit = (HDC) wParam; 
+		HWND hwndEdit = (HWND) lParam;
+		if( hwndEdit == GetDlgItem(hWnd, IDC_MENU_TEXT) ) {
+			SetBkColor(hdcEdit, 
+				text_bg_brush ? text_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_TEXT)
+				);
+			SetTextColor(hdcEdit, 
+				text_fg_brush ? text_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_TEXT) 
+				); 
+			return (BOOL)(text_bg_brush 
+					? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
+		}
+	} return FALSE;
+
 	case WM_DESTROY:
 		if( data ) {
 			DeleteObject(data->bmpChecked);
@@ -656,6 +676,14 @@ void SetMenuListType(HWND hWnd, int how)
 	wndProcListViewOrig = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
 	SetWindowLong(control, GWL_WNDPROC, (LONG)NHMenuListWndProc);
 
+	/* set control colors */
+	ListView_SetBkColor(control, 
+		menu_bg_brush ? menu_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_MENU));
+	ListView_SetTextBkColor(control, 
+		menu_bg_brush ? menu_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_MENU));
+	ListView_SetTextColor(control, 
+		menu_fg_brush ? menu_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_MENU));
+
 	/* set control font */
 	fnt = SendMessage(hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0);
 	SendMessage(control, WM_SETFONT, (WPARAM)fnt, (LPARAM)0);
@@ -740,6 +768,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	TCHAR wbuf[BUFSZ];
 	RECT drawRect;
 	DRAWTEXTPARAMS dtp;
+	COLORREF OldBg, OldFg, NewBg;
 
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
@@ -752,23 +781,33 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	tileDC = CreateCompatibleDC(lpdis->hDC);
 	saveFont = SelectObject(lpdis->hDC, mswin_get_font(NHW_MENU, item->attr, lpdis->hDC, FALSE));
+	NewBg = menu_bg_brush ? menu_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_MENU);
+	OldBg = SetBkColor(lpdis->hDC, NewBg);
+	OldFg = SetTextColor(lpdis->hDC, 
+		menu_fg_brush ? menu_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_MENU)); 
+
     GetTextMetrics(lpdis->hDC, &tm);
 
 	x = lpdis->rcItem.left + 1;
 
 	/* print check mark */
 	if( NHMENU_IS_SELECTABLE(*item) ) {
-		HGDIOBJ saveBmp;
+		HGDIOBJ saveBrush;
+		HBRUSH	hbrCheckMark;
 		char buf[2];
 
 		switch(item->count) {
-		case -1: saveBmp = SelectObject(tileDC, data->bmpChecked); break;
-		case 0: saveBmp = SelectObject(tileDC, data->bmpNotChecked); break;
-		default: saveBmp = SelectObject(tileDC, data->bmpCheckedCount); break;
+		case -1: hbrCheckMark = CreatePatternBrush(data->bmpChecked); break;
+		case 0: hbrCheckMark = CreatePatternBrush(data->bmpNotChecked); break;
+		default: hbrCheckMark = CreatePatternBrush(data->bmpCheckedCount); break;
 		}
 
 		y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
-		BitBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, tileDC, 0, 0, SRCCOPY );
+		SetBrushOrgEx(lpdis->hDC, x, y, NULL);
+		saveBrush = SelectObject(lpdis->hDC, hbrCheckMark);
+		PatBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, PATCOPY);
+		SelectObject(lpdis->hDC, saveBrush);
+		DeleteObject(hbrCheckMark);
 
 		x += TILE_X + 5;
 
@@ -780,7 +819,6 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 		}
 		x += tm.tmAveCharWidth + tm.tmOverhang + 5;
-		SelectObject(tileDC, saveBmp);
 	} else {
 		x += TILE_X + tm.tmAveCharWidth + tm.tmOverhang + 10;
 	}
@@ -844,7 +882,8 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			drawRect.right = client_rt.right-1;
 			drawRect.top = lpdis->rcItem.top;
 			drawRect.bottom = lpdis->rcItem.bottom;
-			FillRect(lpdis->hDC, &drawRect, (HBRUSH)GetClassLong(lpdis->hwndItem, GCL_HBRBACKGROUND) );
+			FillRect(lpdis->hDC, &drawRect, 
+					 menu_bg_brush ? menu_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_MENU));
 
 			/* draw text */
 			DrawText(lpdis->hDC, wbuf, _tcslen(wbuf), &drawRect, 
@@ -856,6 +895,8 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		DrawFocusRect(lpdis->hDC, &drawRect);
 	}
 
+	SetTextColor (lpdis->hDC, OldFg);
+	SetBkColor (lpdis->hDC, OldBg);
 	SelectObject(lpdis->hDC, saveFont);
 	DeleteDC(tileDC);
 	return TRUE;
