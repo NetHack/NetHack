@@ -112,7 +112,7 @@ static struct Bool_Opt
 	{"large_font", &iflags.wc_large_font, FALSE, SET_IN_FILE},	/*WC*/
 	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
 	{"lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME},
-	{"lootabc", &Xflags.lootabc, FALSE, SET_IN_GAME},
+	{"lootabc", &iflags.lootabc, FALSE, SET_IN_GAME},
 #ifdef MAC_GRAPHICS_ENV
 	{"Macgraphics", &iflags.MACgraphics, TRUE, SET_IN_GAME},
 #else
@@ -164,7 +164,7 @@ static struct Bool_Opt
 #else
 	{"showexp", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-	{"showrace", &Xflags.showrace, FALSE, SET_IN_GAME},
+	{"showrace", &iflags.showrace, FALSE, SET_IN_GAME},
 #ifdef SCORE_ON_BOTL
 	{"showscore", &flags.showscore, FALSE, SET_IN_GAME},
 #else
@@ -185,7 +185,7 @@ static struct Bool_Opt
 #endif
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&flags.toptenwin, FALSE, SET_IN_GAME},
-	{"travel", &Xflags.travelcmd, TRUE, SET_IN_GAME},
+	{"travel", &iflags.travelcmd, TRUE, SET_IN_GAME},
 	{"use_inverse",   &iflags.wc_inverse, FALSE, SET_IN_GAME},		/*WC*/
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
 	{(char *)0, (boolean *)0, FALSE, 0}
@@ -480,13 +480,10 @@ initoptions()
 		if (boolopt[i].addr)
 			*(boolopt[i].addr) = boolopt[i].initvalue;
 	}
-#ifdef SAVEFILE_340_CONVERT
-	flags.version = 341;
-#endif
 	flags.end_own = FALSE;
 	flags.end_top = 3;
 	flags.end_around = 2;
-	Xflags.runmode = RUN_LEAP;
+	iflags.runmode = RUN_LEAP;
 	iflags.msg_history = 20;
 #ifdef TTY_GRAPHICS
 	iflags.prevmsg_window = 's';
@@ -1065,16 +1062,16 @@ boolean tinitial, tfrom_file;
 	fullname = "runmode";
 	if (match_optname(opts, fullname, 4, TRUE)) {
 		if (negated) {
-			Xflags.runmode = RUN_TPORT;
+			iflags.runmode = RUN_TPORT;
 		} else if ((op = string_for_opt(opts, FALSE)) != 0) {
 		    if (!strncmpi(op, "teleport", strlen(op)))
-			Xflags.runmode = RUN_TPORT;
+			iflags.runmode = RUN_TPORT;
 		    else if (!strncmpi(op, "run", strlen(op)))
-			Xflags.runmode = RUN_LEAP;
+			iflags.runmode = RUN_LEAP;
 		    else if (!strncmpi(op, "walk", strlen(op)))
-			Xflags.runmode = RUN_STEP;
+			iflags.runmode = RUN_STEP;
 		    else if (!strncmpi(op, "crawl", strlen(op)))
-			Xflags.runmode = RUN_CRAWL;
+			iflags.runmode = RUN_CRAWL;
 		    else
 			badoption(opts);
 		}
@@ -2108,7 +2105,7 @@ goodfruit:
 			    vision_full_recalc = 1;	/* delayed recalc */
 			}
 			else if ((boolopt[i].addr) == &iflags.use_inverse ||
-					(boolopt[i].addr) == &Xflags.showrace ||
+					(boolopt[i].addr) == &iflags.showrace ||
 					(boolopt[i].addr) == &iflags.hilite_pet) {
 			    need_redraw = TRUE;
 			}
@@ -2523,7 +2520,7 @@ boolean setinitial,setfromfile;
 	}
 	end_menu(tmpwin, "Select run/travel display mode:");
 	if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
-		Xflags.runmode = mode_pick->item.a_int - 1;
+		iflags.runmode = mode_pick->item.a_int - 1;
 		free((genericptr_t)mode_pick);
 	}
 	destroy_nhwindow(tmpwin);
@@ -2725,7 +2722,7 @@ char *buf;
 	else if (!strcmp(optname, "role"))
 		Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
 	else if (!strcmp(optname, "runmode"))
-		Sprintf(buf, "%s", runmodes[Xflags.runmode]);
+		Sprintf(buf, "%s", runmodes[iflags.runmode]);
 	else if (!strcmp(optname, "scores")) {
 		Sprintf(buf, "%d top/%d around%s", flags.end_top,
 				flags.end_around, flags.end_own ? "/own" : "");

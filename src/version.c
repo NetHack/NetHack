@@ -53,15 +53,6 @@ struct version_info *version_data;
 const char *filename;
 boolean complain;
 {
-#ifdef SAVEFILE_340_CONVERT
-	unsigned long	old_struct_sizes, vsanity2;
-	vsanity2 = VERSION_SANITY2;
-	old_struct_sizes = (((unsigned long)sizeof (struct flag340) << 24) |
-			    ((unsigned long)sizeof (struct obj)     << 17) |
-		 	    ((unsigned long)sizeof (struct monst)   << 10) |
-			    ((unsigned long)sizeof (struct you)));
-#endif
-
 	if (
 #ifdef VERSION_COMPATIBILITY
 	    version_data->incarnation < VERSION_COMPATIBILITY ||
@@ -76,13 +67,6 @@ boolean complain;
 	} else if (version_data->feature_set != VERSION_FEATURES ||
 		   version_data->entity_count != VERSION_SANITY1 ||
 		   version_data->struct_sizes != VERSION_SANITY2) {
-#ifdef SAVEFILE_340_CONVERT
-	    /* Check for older, convertible structure size compatibility */
-	    if (version_data->feature_set == VERSION_FEATURES &&
-		   version_data->entity_count == VERSION_SANITY1 &&
-		   version_data->struct_sizes == old_struct_sizes)
-		return TRUE;
-#endif
 	    if (complain)
 		pline("Configuration incompatibility for file \"%s\".",
 		      filename);

@@ -200,7 +200,7 @@ unsigned *ospecial;
 	    /* special case the hero for `showrace' option */
 #ifdef TEXTCOLOR
 	    if (iflags.use_color && x == u.ux && y == u.uy &&
-		    Xflags.showrace && !Upolyd)
+		    iflags.showrace && !Upolyd)
 		color = HI_DOMESTIC;
 #endif
 	}

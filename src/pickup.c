@@ -2210,7 +2210,7 @@ struct obj *obj;
     menu_item *pick_list;
     char buf[BUFSZ];
     int n;
-    char *menuselector = Xflags.lootabc ? "abc" : "oib";
+    char *menuselector = iflags.lootabc ? "abc" : "oib";
 
     any.a_void = 0;
     win = create_nhwindow(NHW_MENU);
