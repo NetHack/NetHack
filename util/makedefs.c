@@ -90,7 +90,7 @@ static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.3\t1999/08/16";
 #  if __SC__ || __MRC__
 #   define DATA_TEMPLATE	":Dungeon:%s"
 #  else
-#   define DATA_TEMPLATE	":lib:%s"
+#   define DATA_TEMPLATE	"..\\dat\\%s"
 #  endif /* __SC__ || __MRC__ */
 #   define DATA_IN_TEMPLATE	"..\\dat\\%s"
 #  else /* OS2 */

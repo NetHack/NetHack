@@ -5,8 +5,7 @@
 #	The supported compilers list is mainly from the NetHack 3.1 era.
 #	There should be newer versions of all these compilers nowadays.
 #
-#	Supported compilers: Microsoft C 5.1 and 6.0A, GCC emx 0.8f,
-#	GCC emx 0.9c, IBM C Set/2 1.00 with Toolkit/2 2.00, IBM CSet++ 2.01.
+#	Supported compilers: GCC emx 0.9g
 #
 #	NDMAKE ver 4.5, Microsoft/IBM NMAKE, or Dennis Vadura's DMAKE is
 #	required; old MS-MAKE will not work.  To enable the appropriate
@@ -25,18 +24,9 @@
 #	$(SRC).  If required, termcap library can be built from termcap
 #	sources using makefile.lib in "sys\share" directory.
 #
-#	"MSC" in this makefile refers to Microsoft C 5.1 and 6.0A.
-#	Whenever the distinction is significant, it is indicated.
-#
 #	"GCC" refers to GCC emx only.  No other ports of GCC are supported.
 #	Additional credits for honing GCC support for 3.2 go to Ronald
 #	Van Iwaarden (rrt0136@ibm.net) and Stefan Neis (neis@cs.uni-sb.de).
-#
-#	"CSet/2" refers to both older CSet/2 ver 1 (IBM 32 bit C compiler for
-#	OS/2 2.0) and newer CSet++ ver 2 (C/C++ compiler).  Original CSet/2
-#	support courtesy Jeff Urlwin (jurlwin@gandalf.umcs.maine.edu).
-#	CSet++ support courtesy Helge Hafting (hhafting@intermec.no) and
-#	Justin Frank (belford-manor@worldnet.att.net).
 #
 #	"OMF" is short for "Object Module Format" and refers to the
 #	standard OS/2 object format, which e.g. link386 uses.  MSC and
@@ -57,12 +47,41 @@
 #	Compiler and linker selection.
 #
 
-#CC	= cl		# MSC
 CC	= gcc		# GCC
-#CC	= icc		# CSet/2
 
-#LINK	= link		# MSC
-LINK	= link386	# GCC OMF, CSet/2
+LINK    = gcc
+#LINK	= link386	# GCC OMF, CSet/2
+
+#
+#  Uncomment the following to compile for X11 and set X11ROOT apropriately
+#
+#WINX11OBJ01 =  $(OBJ)/Window.o
+#WINX11OBJ02 = $(OBJ)/dialogs.o
+#WINX11OBJ03 = $(OBJ)/winX.o
+#WINX11OBJ04 = $(OBJ)/winmap.o
+#WINX11OBJ05 = $(OBJ)/winmenu.o
+#WINX11OBJ06 = $(OBJ)/winmesg.o
+#WINX11OBJ07 = $(OBJ)/winmisc.o
+#WINX11OBJ08 = $(OBJ)/winstat.o
+#WINX11OBJ09 = $(OBJ)/wintext.o
+#WINX11OBJ10 = $(OBJ)/winval.o
+#WINX11OBJ11 = $(OBJ)/tile.o
+#X11ROOT = e:/xfree86
+#WINX11CFLAGS = -DUSE_XPM -DX11_GRAPHICS \
+#            -I$(X11ROOT)/include -Zmtd
+#WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11 -lXpm -L$(X11ROOT)/lib -lc_app
+#WINX11SRC = ../win/X11/Window.c ../win/X11/dialogs.c ../win/X11/winX.c \
+#	../win/X11/winmap.c  ../win/X11/winmenu.c ../win/X11/winmesg.c \
+#	../win/X11/winmisc.c ../win/X11/winstat.c ../win/X11/wintext.c \
+#	../win/X11/winval.c tile.c
+#WINX11OBJ = $(WINX11OBJ01) $(WINX11OBJ02) $(WINX11OBJ03) $(WINX11OBJ04) \
+#	$(WINX11OBJ05) $(WINX11OBJ06) $(WINX11OBJ07) $(WINX11OBJ08) \
+#	$(WINX11OBJ09) $(WINX11OBJ10) $(WINX11OBJ11)
+#WINX11VARDAT=x11tiles pet_mark.xbm rip.xpm
+#X11ECHO	= $(CMD) @echo
+
+
+
 
 #
 #	Make syntax peculiarities.
@@ -148,7 +167,7 @@ LEXYYC	= lexyy.c
 #	Source tree base directory.
 #
 
-NHSRC	= \nethack\3.3.1\uunet
+NHSRC	= \nh020122
 
 #
 #	Source directories.  Makedefs hardcodes these, don't change them.
@@ -160,8 +179,10 @@ DOC	= $(NHSRC)\doc		# NetHack documentation files
 UTIL	= $(NHSRC)\util		# Utility source
 SRC	= $(NHSRC)\src		# Main source
 WIN	= $(NHSRC)\win\tty	# Window system specific source
+WINX11	= $(NHSRC)\win\x11	# Window system specific source
 SYS	= $(NHSRC)\sys\os2	# System specific source
 SSYS	= $(NHSRC)\sys\share	# Shared system files
+WINSHARE= $(NHSRC)\win\share	# Shared system files
 
 #
 #	Modifiable directories.  Set these according to your setup and
@@ -175,11 +196,9 @@ SSYS	= $(NHSRC)\sys\share	# Shared system files
 
 OBJ	= \tmp\obj		# Object files
 TEMP	= \tmp\bin		# Temporary files during make process
-GAMEDIR = \games\nh331		# Game directory
+GAMEDIR = \games\nh332		# Game directory
 PLIBP	= c:\emx\lib		# Protected mode C libraries
 RLIBP	= c:\emx\lib		# Possible real mode C libraries
-
-TLIBP	= \toolkt20\os2lib	# CSet/2 Toolkit libpath (OS2386.LIB)
 
 #
 #	The game name and description.
@@ -187,14 +206,6 @@ TLIBP	= \toolkt20\os2lib	# CSet/2 Toolkit libpath (OS2386.LIB)
 
 GAME	= nethack
 GAMEDES = "NetHack 3.3.1"
-
-#
-#	Only if you're using CSet/2.  Define the upper line for ver. 1,
-#	the lower one for ver. 2 (= CSet++).
-#
-
-#CSETVER = /DOS2_CSET2_VER_1
-CSETVER = /DOS2_CSET2_VER_2
 
 #
 #	The uppermost two lines for MSC, the middle two for GCC, and
@@ -216,12 +227,8 @@ CSETVER = /DOS2_CSET2_VER_2
 #	include file path, debug flags, ANSI conformance.
 #
 
-#CFLAGS	= /c /DOS2_MSC /AL /O /Gs /G2 /Gt10 /Zp1 /FPi $(WARN) /I$(INCL) $(BIGC) $(CDFLAGS) $(STDC)
-#O	= /Fo
-CFLAGS	= -c -DOS2_GCC $(GCCO) $(WARN) -I$(INCL) $(CDFLAGS) $(STDC)
+CFLAGS	= -c $(GCCO) $(WARN) -I$(INCL) $(CDFLAGS) $(STDC) $(WINX11CFLAGS)
 O	= -s -O -o
-#CFLAGS	= /c /DOS2_CSET2 $(CSETVER) /Sm /Gs+ /Gt- /Gi+ /O+ /Q+ /Mp $(WARN) /I$(INCL) $(CDFLAGS) $(STDC)
-#O	= /Fo
 
 #
 #	Compiler warning levels.  These are really for development, so
@@ -241,17 +248,15 @@ O	= -s -O -o
 #	lots of extra warnings.
 #
 
-#WARN	= /W0 #/W3		# MSC
 WARN	= #-W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN # GCC
-#WARN	= #/W3 #/Kbper	# CSet/2
 
 #
 #	GCC object format selection.  The upper line for standard OS/2 OMF
 #	object format, the lower for Unix style a.out format.
 #
 
-GCCO	= -Zomf -Zsys	# GCC OMF
-#GCCO	=		# GCC a.out
+#GCCO	= -Zomf -Zsys	# GCC OMF
+GCCO	=		# GCC a.out
 
 #
 #	MSC 5.1 needs the large model first pass of the compiler.
@@ -259,7 +264,6 @@ GCCO	= -Zomf -Zsys	# GCC OMF
 #
 
 BIGC	=
-#BIGC	= /B1 d:\binb\c1l.exe	# MSC 5.1
 
 #
 #	Unset CL to avoid troubles with conflicting switches in MSC 6.0.
@@ -268,45 +272,26 @@ BIGC	=
 CL	=
 
 #
-#	MSC, CSet/2: don't ignore case in symbols, no default lib search,
-#	stack 8KB, allow max 1024 segments in program.
-#
-#	GCC: likes a big stack.
-#
-#	CSet/2: give it a bit more stack since we can.
-#
-
-#LFLAGS	= /noig /nod /stack:8192 /seg:1024 $(LDFLAGS)	# MSC
-LFLAGS	= /noig /stack:40000				# GCC OMF
-#LFLAGS	= /noig /nod /stack:32768 /seg:1024 $(LDFLAGS)	# CSet/2
-
-#
 #	Prepare for a debugger.
 #
 
 CDFLAGS =
 LDFLAGS =
-#CDFLAGS = /Zi		# CodeView (MSC)
-#LDFLAGS = /CO		# - " -
-#CDFLAGS = -g		# GDB (GCC a.out)
-#LDFLAGS = -g		# - " -
-#CDFLAGS = /Ti+		# IPMD (CSet/2)
-#LDFLAGS = /CO		# - " -
+CDFLAGS = -g		# GDB (GCC a.out)
+LDFLAGS = -g		# - " -
 
 #
 #	How to produce the most ANSI-like environment.
 #
 
-#STDC	=		# MSC 5.1
-STDC	= /D__STDC__	# MSC 6.0, CSet/2
 STDC	= -ansi		# GCC
 
 #
 #	Possible system object files required during linking.
 #
 
-#SYSOBJ	=			# MSC, GCC a.out, CSet/2
-SYSOBJ	= $(PLIBP)\crt0.obj	$(PLIBP)\end.lib# GCC OMF
+SYSOBJ	=			# MSC, GCC a.out, CSet/2
+#SYSOBJ	= $(PLIBP)\crt0.obj	$(PLIBP)\end.lib# GCC OMF
 
 #
 #	Compiler library selection.  Change if necessary.
@@ -324,17 +309,9 @@ SYSOBJ	= $(PLIBP)\crt0.obj	$(PLIBP)\end.lib# GCC OMF
 #	GCC a.out: extra GCC lib, C standard lib, extra GCC lib (again),
 #	OS/2 API entry points.
 #
-#	CSet/2: C standard libraries, OS/2 API entry points.
-#	Note that ver 1 needs lib dde4sbm.lib whereas ver 2 doesn't.
-#
 
-#PLIBS	= $(PLIBP)\llibcep $(PLIBP)\doscalls	# MSC 5.1
-#PLIBS	= $(PLIBP)\llibcep $(PLIBP)\os2		# MSC 6.0
-#PLIBS	= $(PLIBP)\libc $(PLIBP)\libgcc $(PLIBP)\libsys $(PLIBP)\libos2	# GCC emx 0.8 OMF
-PLIBS	= $(PLIBP)\st\c $(PLIBP)\st\c_app $(PLIBP)\c_alias $(PLIBP)\gcc $(PLIBP)\st\sys $(PLIBP)\os2	# GCC emx 0.9 OMF
-#PLIBS	= -lgcc -lc -lgcc -los2			# GCC a.out (defining -lgcc twice is required)
-#PLIBS	= $(PLIBP)\dde4sbs.lib $(PLIBP)\dde4sbm.lib $(TLIBP)\os2386.lib # CSet/2 ver 1
-#PLIBS	= $(PLIBP)\dde4sbs.lib $(TLIBP)\os2386.lib # CSet++ ver 2
+#PLIBS	= $(PLIBP)\st\c $(PLIBP)\st\c_app $(PLIBP)\c_alias $(PLIBP)\gcc $(PLIBP)\st\sys $(PLIBP)\os2	# GCC emx 0.9 OMF
+PLIBS	= -lgcc -lc -lgcc -los2 $(X11LIBS)	# GCC a.out
 
 #
 #	C libraries used by makedefs, lev_comp and dgn_comp (change if
@@ -346,17 +323,6 @@ PLIBS	= $(PLIBP)\st\c $(PLIBP)\st\c_app $(PLIBP)\c_alias $(PLIBP)\gcc $(PLIBP)\s
 #RLIBS	= $(RLIBP)\llibcer
 RLIBS	= $(PLIBS)
 
-#
-#	Default compilation skeletons.	The uppermost six are for
-#	MSC and CSet/2 and the lowermost six for GCC.
-#
-
-#SRCCC	= $(CC) $(CFLAGS) $(O)$@ $(SRC)\$(AB)
-#UTILCC	= $(CC) $(CFLAGS) $(O)$@ $(UTIL)\$(AB)
-#SYSCC	= $(CC) $(CFLAGS) $(O)$@ $(SYS)\$(AB)
-#SSYSCC	= $(CC) $(CFLAGS) $(O)$@ $(SSYS)\$(AB)
-#PSYSCC	= $(CC) $(CFLAGS) $(O)$@ $(SSYS)\pc$(AB)
-#WINCC	= $(CC) $(CFLAGS) $(O)$@ $(WIN)\$(AB)
 SRCCC	= $(CC) $(CFLAGS) $(O) $@ $(AB)
 UTILCC	= $(B) cd $(UTIL) $(S) $(CC) $(CFLAGS) $(O) $@ $(AB) $(E)
 SYSCC	= $(B) cd $(SYS) $(S) $(CC) $(CFLAGS) $(O) $@ $(AB) $(E)
@@ -370,18 +336,18 @@ WINCC	= $(B) cd $(WIN) $(S) $(CC) $(CFLAGS) $(O) $@ $(AB) $(E)
 #	the lower six for GCC a.out format.
 #
 
-GAMELN	= $(LINK) @$(TEMP)\$(GAME).rsp
-MKDFLN	= $(LINK) @$(TEMP)\makedefs.rsp
-LEVCLN	= $(LINK) @$(TEMP)\lev_comp.rsp
-DGNCLN	= $(LINK) @$(TEMP)\dgn_comp.rsp
-RCVRLN	= $(LINK) @$(TEMP)\recover.rsp
-DLBRLN	= $(LINK) @$(TEMP)\dlb.rsp
-#GAMELN	= $(CC) $(LDFLAGS) -o $(GAMEDIR)\$(GAME).exe $(TEMP)\$(GAMEDEF) $(SYSOBJ) $(HOBJ) $(PLIBS) $(TERMLIB)
-#MKDFLN	= $(CC) $(LDFLAGS) -o $(TEMP)\makedefs.exe $(TEMP)\$(MKDFDEF) $(SYSOBJ) $(MAKEOBJS) $(PLIBS)
-#LEVCLN	= $(CC) $(LDFLAGS) -o $(TEMP)\lev_comp.exe $(TEMP)\$(LEVCDEF) $(SYSOBJ) $(SPLEVOBJS) $(PLIBS)
-#DGNCLN	= $(CC) $(LDFLAGS) -o $(TEMP)\dgn_comp.exe $(TEMP)\$(DGNCDEF) $(SYSOBJ) $(DGNCOMPOBJS) $(PLIBS)
-#RCVRLN	= $(CC) $(LDFLAGS) -o $(GAMEDIR)\recover.exe $(TEMP)\$(RCVRDEF) $(SYSOBJ) $(RECOVOBJS) $(PLIBS)
-#DLBRLN	= $(CC) $(LDFLAGS) -o $(TEMP)\dlb.exe $(TEMP)\$(DLBDEF) $(SYSOBJ) $(DLBOBJS) $(PLIBS)
+#GAMELN	= $(LINK) @$(TEMP)\$(GAME).rsp
+#MKDFLN	= $(LINK) @$(TEMP)\makedefs.rsp
+#LEVCLN	= $(LINK) @$(TEMP)\lev_comp.rsp
+#DGNCLN	= $(LINK) @$(TEMP)\dgn_comp.rsp
+#RCVRLN	= $(LINK) @$(TEMP)\recover.rsp
+#DLBRLN	= $(LINK) @$(TEMP)\dlb.rsp
+GAMELN	= $(CC) $(LDFLAGS) -o $(GAMEDIR)\$(GAME).exe @$(TEMP)\$(GAME).r $(PLIBS) $(WINX11CFLAGS) $(WINX11LIB)
+MKDFLN	= $(CC) $(LDFLAGS) -o $(TEMP)\makedefs.exe $(TEMP)\$(MKDFDEF) $(SYSOBJ) $(MAKEOBJS) $(PLIBS)
+LEVCLN	= $(CC) $(LDFLAGS) -o $(TEMP)\lev_comp.exe $(TEMP)\$(LEVCDEF) $(SYSOBJ) $(SPLEVOBJS) $(PLIBS)
+DGNCLN	= $(CC) $(LDFLAGS) -o $(TEMP)\dgn_comp.exe $(TEMP)\$(DGNCDEF) $(SYSOBJ) $(DGNCOMPOBJS) $(PLIBS)
+RCVRLN	= $(CC) $(LDFLAGS) -o $(GAMEDIR)\recover.exe $(TEMP)\$(RCVRDEF) $(SYSOBJ) $(RECOVOBJS) $(PLIBS)
+DLBRLN	= $(CC) $(LDFLAGS) -o $(TEMP)\dlb.exe $(TEMP)\$(DLBDEF) $(SYSOBJ) $(DLBOBJS) $(PLIBS)
 
 #
 #	OS/2 module definition files for NetHack,
@@ -454,7 +420,11 @@ GUIDE	=
 #	only choice for now.
 #
 
-WINOBJ = $(OBJ)\getline.o $(OBJ)\termcap.o $(OBJ)\topl.o $(OBJ)\wintty.o
+WINOBJ1 = $(OBJ)\getline.o
+WINOBJ2 = $(OBJ)\termcap.o
+WINOBJ3 = $(OBJ)\topl.o
+WINOBJ4 = $(OBJ)\wintty.o
+WINOBJ = $(WINOBJ1) $(WINOBJ2) $(WINOBJ3) $(WINOBJ4) $(WINX11OBJ)
 
 #
 #	The default make target, so just typing 'make' is useful.
@@ -514,8 +484,8 @@ do_cmd : cmd_act	# generate nethack.cmd
 #	NOTE: this feature is presently	untested under OS/2.
 #
 
-#do_dlb : dlb_yup
-do_dlb : dlb_nope
+do_dlb : dlb_yup
+#do_dlb : dlb_nope
 
 ######################################################################
 #
@@ -566,107 +536,204 @@ RECOVOBJS = $(OBJ)\recover.o
 #	Object files for dlb.
 #
 
-DLBOBJS = $(OBJ)\dlb_main.o $(OBJ)\dlb.o $(OBJ)\alloc.c $(OBJ)\panic.o
+DLBOBJS = $(OBJ)\dlb_main.o $(OBJ)\dlb.o $(OBJ)\alloc.o $(OBJ)\panic.o
 
 #
 #	Data files for dlb.
 #
 
 DATHELP = \
-	$(GAMEDIR)\help $(GAMEDIR)\hh $(GAMEDIR)\cmdhelp $(GAMEDIR)\history \
-	$(GAMEDIR)\opthelp $(GAMEDIR)\wizhelp
-SPEC_LEVS = \
-	$(GAMEDIR)\asmodeus.lev $(GAMEDIR)\baalz.lev    $(GAMEDIR)\bigrm-1.lev \
-	$(GAMEDIR)\bigrm-2.lev  $(GAMEDIR)\bigrm-3.lev  $(GAMEDIR)\bigrm-4.lev \
-	$(GAMEDIR)\castle.lev   $(GAMEDIR)\fakewiz1.lev $(GAMEDIR)\fakewiz2.lev \
-	$(GAMEDIR)\juiblex.lev 	$(GAMEDIR)\knox.lev     $(GAMEDIR)\medusa-1.lev \
-	$(GAMEDIR)\medusa-2.lev $(GAMEDIR)\minend-1.lev $(GAMEDIR)\minend-2.lev \
-	$(GAMEDIR)\minefill.lev $(GAMEDIR)\minetn-1.lev $(GAMEDIR)\minetn-2.lev \
-	$(GAMEDIR)\oracle.lev 	$(GAMEDIR)\orcus.lev    $(GAMEDIR)\sanctum.lev \
-	$(GAMEDIR)\tower1.lev   $(GAMEDIR)\tower2.lev   $(GAMEDIR)\tower3.lev \
-	$(GAMEDIR)\valley.lev   $(GAMEDIR)\wizard1.lev  $(GAMEDIR)\wizard2.lev \
-	$(GAMEDIR)\wizard3.lev  $(GAMEDIR)\astral.lev 	$(GAMEDIR)\air.lev \
-	$(GAMEDIR)\earth.lev    $(GAMEDIR)\fire.lev 	$(GAMEDIR)\water.lev \
-	$(GAMEDIR)\soko1-1.lev  $(GAMEDIR)\soko1-2.lev  \
-	$(GAMEDIR)\soko2-1.lev  $(GAMEDIR)\soko2-2.lev  \
-	$(GAMEDIR)\soko3-1.lev  $(GAMEDIR)\soko3-2.lev  \
-	$(GAMEDIR)\soko4-1.lev  $(GAMEDIR)\soko4-2.lev
-QUEST_LEVS = \
-	$(GAMEDIR)\Arc-goal.lev $(GAMEDIR)\Arc-fila.lev $(GAMEDIR)\Arc-filb.lev \
-	$(GAMEDIR)\Arc-loca.lev $(GAMEDIR)\Arc-strt.lev \
-	$(GAMEDIR)\Bar-goal.lev $(GAMEDIR)\Bar-fila.lev $(GAMEDIR)\Bar-filb.lev \
-	$(GAMEDIR)\Bar-loca.lev $(GAMEDIR)\Bar-strt.lev \
-	$(GAMEDIR)\Cav-goal.lev $(GAMEDIR)\Cav-fila.lev $(GAMEDIR)\Cav-filb.lev \
-	$(GAMEDIR)\Cav-loca.lev $(GAMEDIR)\Cav-strt.lev \
-	$(GAMEDIR)\Hea-goal.lev $(GAMEDIR)\Hea-fila.lev $(GAMEDIR)\Hea-filb.lev \
-	$(GAMEDIR)\Hea-loca.lev $(GAMEDIR)\Hea-strt.lev \
-	$(GAMEDIR)\Kni-goal.lev $(GAMEDIR)\Kni-fila.lev $(GAMEDIR)\Kni-filb.lev \
-	$(GAMEDIR)\Kni-loca.lev $(GAMEDIR)\Kni-strt.lev \
-	$(GAMEDIR)\Mon-goal.lev $(GAMEDIR)\Mon-fila.lev $(GAMEDIR)\Mon-filb.lev \
-	$(GAMEDIR)\Mon-loca.lev $(GAMEDIR)\Mon-strt.lev \
-	$(GAMEDIR)\Pri-goal.lev $(GAMEDIR)\Pri-fila.lev $(GAMEDIR)\Pri-filb.lev \
-	$(GAMEDIR)\Pri-loca.lev $(GAMEDIR)\Pri-strt.lev \
-	$(GAMEDIR)\Ran-goal.lev $(GAMEDIR)\Ran-fila.lev $(GAMEDIR)\Ran-filb.lev \
-	$(GAMEDIR)\Ran-loca.lev $(GAMEDIR)\Ran-strt.lev \
-	$(GAMEDIR)\Rog-goal.lev $(GAMEDIR)\Rog-fila.lev $(GAMEDIR)\Rog-filb.lev \
-	$(GAMEDIR)\Rog-loca.lev $(GAMEDIR)\Rog-strt.lev \
-	$(GAMEDIR)\Sam-goal.lev $(GAMEDIR)\Sam-fila.lev $(GAMEDIR)\Sam-filb.lev \
-	$(GAMEDIR)\Sam-loca.lev $(GAMEDIR)\Sam-strt.lev \
-	$(GAMEDIR)\Tou-goal.lev $(GAMEDIR)\Tou-fila.lev $(GAMEDIR)\Tou-filb.lev \
-	$(GAMEDIR)\Tou-loca.lev $(GAMEDIR)\Tou-strt.lev \
-	$(GAMEDIR)\Val-goal.lev $(GAMEDIR)\Val-fila.lev $(GAMEDIR)\Val-filb.lev \
-	$(GAMEDIR)\Val-loca.lev $(GAMEDIR)\Val-strt.lev \
-	$(GAMEDIR)\Wiz-goal.lev $(GAMEDIR)\Wiz-fila.lev $(GAMEDIR)\Wiz-filb.lev \
-	$(GAMEDIR)\Wiz-loca.lev $(GAMEDIR)\Wiz-strt.lev
-VARDATD = \
-	$(GAMEDIR)\data $(GAMEDIR)\oracles $(GAMEDIR)\options \
-	$(GAMEDIR)\quest.dat $(GAMEDIR)\rumors
+ help hh cmdhelp history opthelp wizhelp
 
-DATDLB = $(DATHELP) $(GAMEDIR)\dungeon $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
+SPEC_LEVS = \
+ asmodeus.lev baalz.lev    bigrm-1.lev \
+ bigrm-2.lev  bigrm-3.lev  bigrm-4.lev castle.lev   fakewiz1.lev fakewiz2.lev \
+ juiblex.lev  knox.lev     medusa-1.lev medusa-2.lev minend-1.lev minend-2.lev \
+ minefill.lev minetn-1.lev minetn-2.lev oracle.lev   orcus.lev    sanctum.lev \
+ tower1.lev   tower2.lev   tower3.lev valley.lev   wizard1.lev  wizard2.lev \
+ wizard3.lev  astral.lev   air.lev earth.lev    fire.lev     water.lev \
+ soko1-1.lev  soko1-2.lev  soko2-1.lev  soko2-2.lev  \
+ soko3-1.lev  soko3-2.lev  soko4-1.lev  soko4-2.lev
+
+QUEST_LEVS = \
+ Arc-goal.lev Arc-fila.lev Arc-filb.lev Arc-loca.lev Arc-strt.lev \
+ Bar-goal.lev Bar-fila.lev Bar-filb.lev Bar-loca.lev Bar-strt.lev \
+ Cav-goal.lev Cav-fila.lev Cav-filb.lev Cav-loca.lev Cav-strt.lev \
+ Hea-goal.lev Hea-fila.lev Hea-filb.lev Hea-loca.lev Hea-strt.lev \
+ Kni-goal.lev Kni-fila.lev Kni-filb.lev Kni-loca.lev Kni-strt.lev \
+ Mon-goal.lev Mon-fila.lev Mon-filb.lev Mon-loca.lev Mon-strt.lev \
+ Pri-goal.lev Pri-fila.lev Pri-filb.lev Pri-loca.lev Pri-strt.lev \
+ Ran-goal.lev Ran-fila.lev Ran-filb.lev Ran-loca.lev Ran-strt.lev \
+ Rog-goal.lev Rog-fila.lev Rog-filb.lev Rog-loca.lev Rog-strt.lev \
+ Sam-goal.lev Sam-fila.lev Sam-filb.lev Sam-loca.lev Sam-strt.lev \
+ Tou-goal.lev Tou-fila.lev Tou-filb.lev Tou-loca.lev Tou-strt.lev \
+ Val-goal.lev Val-fila.lev Val-filb.lev Val-loca.lev Val-strt.lev \
+ Wiz-goal.lev Wiz-fila.lev Wiz-filb.lev Wiz-loca.lev Wiz-strt.lev
+VARDATD = \
+ data oracles options quest.dat rumors
+
+DATDLB = $(DATHELP) dungeon $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 
 #
 #	Object files for the game itself.
 #
 
-VOBJ01 = $(OBJ)\allmain.o  $(OBJ)\alloc.o    $(OBJ)\apply.o    $(OBJ)\artifact.o
-VOBJ02 = $(OBJ)\attrib.o   $(OBJ)\ball.o     $(OBJ)\bones.o    $(OBJ)\botl.o
-VOBJ03 = $(OBJ)\cmd.o      $(OBJ)\dbridge.o  $(OBJ)\decl.o     $(OBJ)\detect.o
-VOBJ04 = $(OBJ)\dig.o      $(OBJ)\display.o  $(OBJ)\dlb.o      $(OBJ)\do.o
-VOBJ05 = $(OBJ)\do_name.o  $(OBJ)\do_wear.o  $(OBJ)\dog.o      $(OBJ)\dogmove.o
-VOBJ06 = $(OBJ)\dokick.o   $(OBJ)\dothrow.o  $(OBJ)\drawing.o  $(OBJ)\dungeon.o
-VOBJ07 = $(OBJ)\eat.o      $(OBJ)\end.o      $(OBJ)\engrave.o  $(OBJ)\exper.o
-VOBJ08 = $(OBJ)\explode.o  $(OBJ)\extralev.o $(OBJ)\files.o    $(OBJ)\fountain.o
-VOBJ09 = $(OBJ)\hack.o     $(OBJ)\hacklib.o  $(OBJ)\invent.o   $(OBJ)\light.o
-VOBJ10 = $(OBJ)\lock.o     $(OBJ)\mail.o     $(OBJ)\main.o     $(OBJ)\makemon.o
-VOBJ11 = $(OBJ)\mapglyph.o $(OBJ)\mcastu.o   $(OBJ)\mhitm.o    $(OBJ)\mhitu.o $(OBJ)\minion.o
-VOBJ12 = $(OBJ)\mklev.o    $(OBJ)\mkmap.o    $(OBJ)\mkmaze.o   $(OBJ)\mkobj.o
-VOBJ13 = $(OBJ)\mkroom.o   $(OBJ)\mon.o      $(OBJ)\mondata.o  $(OBJ)\monmove.o
-VOBJ14 = $(OBJ)\monst.o    $(OBJ)\monstr.o   $(OBJ)\mplayer.o  $(OBJ)\mthrowu.o
-VOBJ15 = $(OBJ)\muse.o     $(OBJ)\music.o    $(OBJ)\o_init.o   $(OBJ)\objects.o
-VOBJ16 = $(OBJ)\objnam.o   $(OBJ)\options.o  $(OBJ)\os2.o      $(OBJ)\pager.o
-VOBJ17 = $(OBJ)\pcsys.o    $(OBJ)\pickup.o   $(OBJ)\pline.o    $(OBJ)\polyself.o
-VOBJ18 = $(OBJ)\potion.o   $(OBJ)\pray.o     $(OBJ)\priest.o   $(OBJ)\quest.o
-VOBJ19 = $(OBJ)\questpgr.o $(OBJ)\read.o     $(OBJ)\rect.o     $(OBJ)\region.o $(OBJ)\restore.o
-VOBJ20 = $(OBJ)\rip.o      $(OBJ)\rnd.o      $(OBJ)\rumors.o   $(OBJ)\save.o
-VOBJ21 = $(OBJ)\shk.o      $(OBJ)\shknam.o   $(OBJ)\sit.o      $(OBJ)\sounds.o
-VOBJ22 = $(OBJ)\sp_lev.o   $(OBJ)\spell.o    $(OBJ)\steal.o    $(OBJ)\teleport.o
-VOBJ23 = $(OBJ)\timeout.o  $(OBJ)\topten.o   $(OBJ)\track.o    $(OBJ)\trap.o
-VOBJ24 = $(OBJ)\tty.o      $(OBJ)\u_init.o   $(OBJ)\uhitm.o    $(OBJ)\unix.o
-VOBJ25 = $(OBJ)\vault.o    $(OBJ)\vision.o   $(OBJ)\vis_tab.o  $(OBJ)\weapon.o
-VOBJ26 = $(OBJ)\were.o     $(OBJ)\wield.o    $(OBJ)\windows.o  $(OBJ)\wizard.o
-VOBJ27 = $(OBJ)\worm.o     $(OBJ)\worn.o     $(OBJ)\write.o    $(OBJ)\zap.o
-VOBJ28 = $(WINOBJ)         $(OBJ)\role.o     $(OBJ)\steed.o
-VOBJ29 = $(RANDOM)
+VOBJ011 = $(OBJ)\allmain.o
+VOBJ012 = $(OBJ)\alloc.o
+VOBJ013 = $(OBJ)\apply.o
+VOBJ014 = $(OBJ)\artifact.o
+VOBJ021 = $(OBJ)\attrib.o 
+VOBJ022 = $(OBJ)\ball.o
+VOBJ023 = $(OBJ)\bones.o
+VOBJ024 = $(OBJ)\botl.o
+VOBJ031 = $(OBJ)\cmd.o
+VOBJ032 = $(OBJ)\dbridge.o
+VOBJ033 = $(OBJ)\decl.o
+VOBJ034 = $(OBJ)\detect.o
+VOBJ041 = $(OBJ)\dig.o
+VOBJ042 = $(OBJ)\display.o
+VOBJ043 = $(OBJ)\dlb.o
+VOBJ044 = $(OBJ)\do.o
+VOBJ051 = $(OBJ)\do_name.o
+VOBJ052 = $(OBJ)\do_wear.o
+VOBJ053 = $(OBJ)\dog.o
+VOBJ054 = $(OBJ)\dogmove.o
+VOBJ061 = $(OBJ)\dokick.o
+VOBJ062 = $(OBJ)\dothrow.o
+VOBJ063 = $(OBJ)\drawing.o
+VOBJ064 = $(OBJ)\dungeon.o
+VOBJ071 = $(OBJ)\eat.o
+VOBJ072 = $(OBJ)\end.o
+VOBJ073 = $(OBJ)\engrave.o
+VOBJ074 = $(OBJ)\exper.o
+VOBJ071 = $(OBJ)\eat.o
+VOBJ072 = $(OBJ)\end.o
+VOBJ073 = $(OBJ)\engrave.o
+VOBJ074 = $(OBJ)\exper.o
+VOBJ081 = $(OBJ)\explode.o
+VOBJ082 = $(OBJ)\extralev.o
+VOBJ083 = $(OBJ)\files.o
+VOBJ084 = $(OBJ)\fountain.o
+VOBJ091 = $(OBJ)\hack.o
+VOBJ092 = $(OBJ)\hacklib.o
+VOBJ093 = $(OBJ)\invent.o
+VOBJ094 = $(OBJ)\light.o
+VOBJ101 = $(OBJ)\lock.o
+VOBJ102 = $(OBJ)\mail.o
+VOBJ103 = $(OBJ)\main.o
+VOBJ104 = $(OBJ)\makemon.o
+VOBJ111 = $(OBJ)\mapglyph.o
+VOBJ112 = $(OBJ)\mcastu.o
+VOBJ113 = $(OBJ)\mhitm.o
+VOBJ114 = $(OBJ)\mhitu.o
+VOBJ115 = $(OBJ)\minion.o
+VOBJ121 = $(OBJ)\mklev.o
+VOBJ122 = $(OBJ)\mkmap.o
+VOBJ123 = $(OBJ)\mkmaze.o
+VOBJ124 = $(OBJ)\mkobj.o
+VOBJ131 = $(OBJ)\mkroom.o
+VOBJ132 = $(OBJ)\mon.o
+VOBJ133 = $(OBJ)\mondata.o
+VOBJ134 = $(OBJ)\monmove.o
+VOBJ141 = $(OBJ)\monst.o
+VOBJ142 = $(OBJ)\monstr.o
+VOBJ143 = $(OBJ)\mplayer.o
+VOBJ144 = $(OBJ)\mthrowu.o
+VOBJ151 = $(OBJ)\muse.o
+VOBJ152 = $(OBJ)\music.o
+VOBJ153 = $(OBJ)\o_init.o
+VOBJ154 = $(OBJ)\objects.o
+VOBJ161 = $(OBJ)\objnam.o
+VOBJ162 = $(OBJ)\options.o
+VOBJ163 = $(OBJ)\os2.o
+VOBJ164 = $(OBJ)\pager.o
+VOBJ171 = $(OBJ)\pcsys.o
+VOBJ172 = $(OBJ)\pickup.o
+VOBJ173 = $(OBJ)\pline.o
+VOBJ174 = $(OBJ)\polyself.o
+VOBJ181 = $(OBJ)\potion.o
+VOBJ182 = $(OBJ)\pray.o
+VOBJ183 = $(OBJ)\priest.o
+VOBJ184 = $(OBJ)\quest.o
+VOBJ191 = $(OBJ)\questpgr.o
+VOBJ192 = $(OBJ)\read.o
+VOBJ193 = $(OBJ)\rect.o
+VOBJ194 = $(OBJ)\region.o
+VOBJ195 = $(OBJ)\restore.o
+VOBJ201 = $(OBJ)\rip.o
+VOBJ202 = $(OBJ)\rnd.o
+VOBJ203 = $(OBJ)\rumors.o
+VOBJ204 = $(OBJ)\save.o
+VOBJ211 = $(OBJ)\shk.o
+VOBJ212 = $(OBJ)\shknam.o
+VOBJ213 = $(OBJ)\sit.o
+VOBJ214 = $(OBJ)\sounds.o
+VOBJ221 = $(OBJ)\sp_lev.o
+VOBJ222 = $(OBJ)\spell.o
+VOBJ223 = $(OBJ)\steal.o
+VOBJ224 = $(OBJ)\teleport.o
+VOBJ231 = $(OBJ)\timeout.o
+VOBJ232 = $(OBJ)\topten.o
+VOBJ233 = $(OBJ)\track.o
+VOBJ234 = $(OBJ)\trap.o
+VOBJ241 = $(OBJ)\tty.o
+VOBJ242 = $(OBJ)\u_init.o
+VOBJ243 = $(OBJ)\uhitm.o
+VOBJ244 = $(OBJ)\unix.o
+VOBJ251 = $(OBJ)\vault.o
+VOBJ252 = $(OBJ)\vision.o
+VOBJ253 = $(OBJ)\vis_tab.o
+VOBJ254 = $(OBJ)\weapon.o
+VOBJ261 = $(OBJ)\were.o
+VOBJ262 = $(OBJ)\wield.o
+VOBJ263 = $(OBJ)\windows.o
+VOBJ264 = $(OBJ)\wizard.o
+VOBJ271 = $(OBJ)\worm.o
+VOBJ272 = $(OBJ)\worn.o
+VOBJ273 = $(OBJ)\write.o
+VOBJ274 = $(OBJ)\zap.o
+VOBJ281 = $(OBJ)\role.o
+VOBJ282 = $(OBJ)\steed.o
+
+VOBJ01 = $(VOBJ011) $(VOBJ012) $(VOBJ013) $(VOBJ014)
+VOBJ02 = $(VOBJ021) $(VOBJ022) $(VOBJ023) $(VOBJ024)
+VOBJ03 = $(VOBJ031) $(VOBJ032) $(VOBJ033) $(VOBJ034)
+VOBJ04 = $(VOBJ041) $(VOBJ042) $(VOBJ043) $(VOBJ044)
+VOBJ05 = $(VOBJ051) $(VOBJ052) $(VOBJ053) $(VOBJ054)
+VOBJ06 = $(VOBJ061) $(VOBJ062) $(VOBJ063) $(VOBJ064)
+VOBJ07 = $(VOBJ071) $(VOBJ072) $(VOBJ073) $(VOBJ074)
+VOBJ08 = $(VOBJ081) $(VOBJ082) $(VOBJ083) $(VOBJ084)
+VOBJ09 = $(VOBJ091) $(VOBJ092) $(VOBJ093) $(VOBJ094)
+VOBJ10 = $(VOBJ101) $(VOBJ102) $(VOBJ103) $(VOBJ104)
+VOBJ11 = $(VOBJ111) $(VOBJ112) $(VOBJ113) $(VOBJ114) $(VOBJ115)
+VOBJ12 = $(VOBJ121) $(VOBJ122) $(VOBJ123) $(VOBJ124)
+VOBJ13 = $(VOBJ131) $(VOBJ132) $(VOBJ133) $(VOBJ134)
+VOBJ14 = $(VOBJ141) $(VOBJ142) $(VOBJ143) $(VOBJ144)
+VOBJ15 = $(VOBJ151) $(VOBJ152) $(VOBJ153) $(VOBJ154)
+VOBJ16 = $(VOBJ161) $(VOBJ162) $(VOBJ163) $(VOBJ164)
+VOBJ17 = $(VOBJ171) $(VOBJ172) $(VOBJ173) $(VOBJ174)
+VOBJ18 = $(VOBJ181) $(VOBJ182) $(VOBJ183) $(VOBJ184)
+VOBJ19 = $(VOBJ191) $(VOBJ192) $(VOBJ193) $(VOBJ194) $(VOBJ195)
+VOBJ20 = $(VOBJ201) $(VOBJ202) $(VOBJ203) $(VOBJ204)
+VOBJ21 = $(VOBJ211) $(VOBJ212) $(VOBJ213) $(VOBJ214)
+VOBJ22 = $(VOBJ221) $(VOBJ222) $(VOBJ223) $(VOBJ224)
+VOBJ23 = $(VOBJ231) $(VOBJ232) $(VOBJ233) $(VOBJ234)
+VOBJ24 = $(VOBJ241) $(VOBJ242) $(VOBJ243) $(VOBJ244)
+VOBJ25 = $(VOBJ251) $(VOBJ252) $(VOBJ253) $(VOBJ254)
+VOBJ26 = $(VOBJ261) $(VOBJ262) $(VOBJ263) $(VOBJ264)
+VOBJ27 = $(VOBJ271) $(VOBJ272) $(VOBJ273) $(VOBJ274)
+VOBJ28 = $(VOBJ281) $(VOBJ282)
+VOBJ29 = $(WINOBJ) $(RANDOM)
 HHOBJ  = $(OBJ)\version.o
 
-VOBJ =	$(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) $(VOBJ06) $(VOBJ07) \
-	$(VOBJ08) $(VOBJ09) $(VOBJ10) $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) \
-	$(VOBJ15) $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) $(VOBJ21) \
-	$(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) $(VOBJ26) $(VOBJ27) $(VOBJ28) \
-	$(VOBJ29)
-HOBJ =	$(VOBJ) $(HHOBJ)
+VOBJ =	 $(VOBJ01)  $(VOBJ02)  $(VOBJ03)  $(VOBJ04)  $(VOBJ05)  $(VOBJ06)  $(VOBJ07) \
+	 $(VOBJ08)  $(VOBJ09)  $(VOBJ10)  $(VOBJ11)  $(VOBJ12)  $(VOBJ13)  $(VOBJ14) \
+	 $(VOBJ15)  $(VOBJ16)  $(VOBJ17)  $(VOBJ18)  $(VOBJ19)  $(VOBJ20)  $(VOBJ21) \
+	 $(VOBJ22)  $(VOBJ23)  $(VOBJ24)  $(VOBJ25)  $(VOBJ26)  $(VOBJ27)  $(VOBJ28) \
+	 $(VOBJ29)
+HOBJ =	 $(VOBJ)  $(HHOBJ)
 
-EXTERN_H   = #$(INCL)\extern.h
+EXTERN_H   = # $(INCL)\extern.h
 OS2CONF_H  = $(INCL)\os2conf.h $(INCL)\micro.h $(INCL)\system.h $(EXTERN_H)
 GLOBAL_H   = $(INCL)\global.h $(INCL)\coord.h $(OS2CONF_H)
 CONFIG_H   = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h $(GLOBAL_H)
@@ -704,7 +771,7 @@ $(TEMP)\$(LEVCDEF) :
 $(TEMP)\$(RCVRDEF) :
 	$(MAKEB) DD_NAME=recover DD_DESC="Recovery utility" DD_TARG=$@ do_def
 $(TEMP)\$(DLBDEF) :
-	$(MAKEB) DD_NAME=dld DD_DESC="Archive utility" DD_TARG=$@ do_def
+	$(MAKEB) DD_NAME=dlb DD_DESC="Archive utility" DD_TARG=$@ do_def
 
 do_def :
 	$(ECHO) NAME $(DD_NAME) WINDOWCOMPAT> $(DD_TARG)
@@ -718,8 +785,141 @@ do_def :
 
 $(GAME) : $(GAMEDIR)\$(GAME).exe
 $(GAME).exe : $(GAMEDIR)\$(GAME).exe
-$(GAMEDIR)\$(GAME).exe : $(TEMP)\$(GAME).rsp
+$(GAMEDIR)\$(GAME).exe : $(TEMP)\$(GAME).rsp $(TEMP)\$(GAME).r
 	$(GAMELN)
+
+$(TEMP)\$(GAME).r : $(HOBJ) $(TEMP)\$(GAMEDEF)
+	$(ECHO) $(VOBJ011) > $@
+	$(ECHO) $(VOBJ012) >> $@
+	$(ECHO) $(VOBJ013) >> $@
+	$(ECHO) $(VOBJ014) >> $@
+	$(ECHO) $(VOBJ021) >> $@
+	$(ECHO) $(VOBJ022) >> $@
+	$(ECHO) $(VOBJ023) >> $@
+	$(ECHO) $(VOBJ024) >> $@
+	$(ECHO) $(VOBJ031) >> $@
+	$(ECHO) $(VOBJ032) >> $@
+	$(ECHO) $(VOBJ033) >> $@
+	$(ECHO) $(VOBJ034) >> $@
+	$(ECHO) $(VOBJ041) >> $@
+	$(ECHO) $(VOBJ042) >> $@
+	$(ECHO) $(VOBJ043) >> $@
+	$(ECHO) $(VOBJ044) >> $@
+	$(ECHO) $(VOBJ051) >> $@
+	$(ECHO) $(VOBJ052) >> $@
+	$(ECHO) $(VOBJ053) >> $@
+	$(ECHO) $(VOBJ054) >> $@
+	$(ECHO) $(VOBJ061) >> $@
+	$(ECHO) $(VOBJ062) >> $@
+	$(ECHO) $(VOBJ063) >> $@
+	$(ECHO) $(VOBJ064) >> $@
+	$(ECHO) $(VOBJ071) >> $@
+	$(ECHO) $(VOBJ072) >> $@
+	$(ECHO) $(VOBJ073) >> $@
+	$(ECHO) $(VOBJ074) >> $@
+	$(ECHO) $(VOBJ081) >> $@
+	$(ECHO) $(VOBJ082) >> $@
+	$(ECHO) $(VOBJ083) >> $@
+	$(ECHO) $(VOBJ084) >> $@
+	$(ECHO) $(VOBJ091) >> $@
+	$(ECHO) $(VOBJ092) >> $@
+	$(ECHO) $(VOBJ093) >> $@
+	$(ECHO) $(VOBJ094) >> $@
+	$(ECHO) $(VOBJ101) >> $@
+	$(ECHO) $(VOBJ102) >> $@
+	$(ECHO) $(VOBJ103) >> $@
+	$(ECHO) $(VOBJ104) >> $@
+	$(ECHO) $(VOBJ111) >> $@
+	$(ECHO) $(VOBJ112) >> $@
+	$(ECHO) $(VOBJ113) >> $@
+	$(ECHO) $(VOBJ114) >> $@
+	$(ECHO) $(VOBJ115) >> $@
+	$(ECHO) $(VOBJ121) >> $@
+	$(ECHO) $(VOBJ122) >> $@
+	$(ECHO) $(VOBJ123) >> $@
+	$(ECHO) $(VOBJ124) >> $@
+	$(ECHO) $(VOBJ131) >> $@
+	$(ECHO) $(VOBJ132) >> $@
+	$(ECHO) $(VOBJ133) >> $@
+	$(ECHO) $(VOBJ134) >> $@
+	$(ECHO) $(VOBJ141) >> $@
+	$(ECHO) $(VOBJ142) >> $@
+	$(ECHO) $(VOBJ143) >> $@
+	$(ECHO) $(VOBJ144) >> $@
+	$(ECHO) $(VOBJ151) >> $@
+	$(ECHO) $(VOBJ152) >> $@
+	$(ECHO) $(VOBJ153) >> $@
+	$(ECHO) $(VOBJ154) >> $@
+	$(ECHO) $(VOBJ161) >> $@
+	$(ECHO) $(VOBJ162) >> $@
+	$(ECHO) $(VOBJ163) >> $@
+	$(ECHO) $(VOBJ164) >> $@
+	$(ECHO) $(VOBJ171) >> $@
+	$(ECHO) $(VOBJ172) >> $@
+	$(ECHO) $(VOBJ173) >> $@
+	$(ECHO) $(VOBJ174) >> $@
+	$(ECHO) $(VOBJ181) >> $@
+	$(ECHO) $(VOBJ182) >> $@
+	$(ECHO) $(VOBJ183) >> $@
+	$(ECHO) $(VOBJ184) >> $@
+	$(ECHO) $(VOBJ191) >> $@
+	$(ECHO) $(VOBJ192) >> $@
+	$(ECHO) $(VOBJ193) >> $@
+	$(ECHO) $(VOBJ194) >> $@
+	$(ECHO) $(VOBJ195) >> $@
+	$(ECHO) $(VOBJ201) >> $@
+	$(ECHO) $(VOBJ202) >> $@
+	$(ECHO) $(VOBJ203) >> $@
+	$(ECHO) $(VOBJ204) >> $@
+	$(ECHO) $(VOBJ211) >> $@
+	$(ECHO) $(VOBJ212) >> $@
+	$(ECHO) $(VOBJ213) >> $@
+	$(ECHO) $(VOBJ214) >> $@
+	$(ECHO) $(VOBJ221) >> $@
+	$(ECHO) $(VOBJ222) >> $@
+	$(ECHO) $(VOBJ223) >> $@
+	$(ECHO) $(VOBJ224) >> $@
+	$(ECHO) $(VOBJ231) >> $@
+	$(ECHO) $(VOBJ232) >> $@
+	$(ECHO) $(VOBJ233) >> $@
+	$(ECHO) $(VOBJ234) >> $@
+	$(ECHO) $(VOBJ241) >> $@
+	$(ECHO) $(VOBJ242) >> $@
+	$(ECHO) $(VOBJ243) >> $@
+	$(ECHO) $(VOBJ244) >> $@
+	$(ECHO) $(VOBJ251) >> $@
+	$(ECHO) $(VOBJ252) >> $@
+	$(ECHO) $(VOBJ253) >> $@
+	$(ECHO) $(VOBJ254) >> $@
+	$(ECHO) $(VOBJ261) >> $@
+	$(ECHO) $(VOBJ262) >> $@
+	$(ECHO) $(VOBJ263) >> $@
+	$(ECHO) $(VOBJ264) >> $@
+	$(ECHO) $(VOBJ271) >> $@
+	$(ECHO) $(VOBJ272) >> $@
+	$(ECHO) $(VOBJ273) >> $@
+	$(ECHO) $(VOBJ274) >> $@
+	$(ECHO) $(VOBJ281) >> $@
+	$(ECHO) $(VOBJ282) >> $@
+	$(ECHO) $(WINOBJ1) >> $@
+	$(ECHO) $(WINOBJ2) >> $@
+	$(ECHO) $(WINOBJ3) >> $@
+	$(ECHO) $(WINOBJ4) >> $@
+	$(ECHO) $(HHOBJ) >> $@
+	$(ECHO) $(RANDOM) >> $@
+	$(X11ECHO) $(WINX11OBJ01) >> $@
+	$(X11ECHO) $(WINX11OBJ02) >> $@
+	$(X11ECHO) $(WINX11OBJ03) >> $@
+	$(X11ECHO) $(WINX11OBJ04) >> $@
+	$(X11ECHO) $(WINX11OBJ05) >> $@
+	$(X11ECHO) $(WINX11OBJ06) >> $@
+	$(X11ECHO) $(WINX11OBJ07) >> $@
+	$(X11ECHO) $(WINX11OBJ08) >> $@
+	$(X11ECHO) $(WINX11OBJ09) >> $@
+	$(X11ECHO) $(WINX11OBJ10) >> $@
+	$(X11ECHO) $(WINX11OBJ11) >> $@
+
+
 
 $(TEMP)\$(GAME).rsp : $(HOBJ) $(TEMP)\$(GAMEDEF)
 	$(ECHO) $(SYSOBJ) $(VOBJ01) +> $@
@@ -751,6 +951,7 @@ $(TEMP)\$(GAME).rsp : $(HOBJ) $(TEMP)\$(GAMEDEF)
 	$(ECHO) $(VOBJ27) +>> $@
 	$(ECHO) $(VOBJ28) +>> $@
 	$(ECHO) $(VOBJ29) +>> $@
+	$(ECHO) $(VOBJ30) +>> $@
 	$(ECHO) $(HHOBJ)>> $@
 	$(ECHO) $(GAMEDIR)\$(GAME).exe>> $@
 	$(ECHO) $(TEMP)\$(GAME)>> $@
@@ -908,7 +1109,7 @@ $(OBJ)\recover.o : $(UTIL)\$(CB) $(CONFIG_H)
 
 dlb : $(TEMP)\dlb.exe
 $(TEMP)\dlb.exe : $(TEMP)\dlb.rsp
-	$(RCVRLN)
+	$(DLBRLN)
 
 $(TEMP)\dlb.rsp : $(DLBOBJS) $(TEMP)\$(DLBDEF)
 	$(ECHO) $(SYSOBJ) $(DLBOBJS)> $@
@@ -924,7 +1125,7 @@ $(GAMEDIR)\nhdat :
 	$(MAKEB) do_dlb
 
 dlb_yup : dlb
-	$(TEMP)\dlb cf $(GAMEDIR)\nhdat $(DATDLB)
+	$(TEMP)\dlb cCf $(GAMEDIR) $(GAMEDIR)\nhdat $(DATDLB)
 	-$(RM) $(GAMEDIR)\help
 	-$(RM) $(GAMEDIR)\hh
 	-$(RM) $(GAMEDIR)\cmdhelp
@@ -962,6 +1163,8 @@ dlb_yup : dlb
 	-$(RM) $(GAMEDIR)\options
 	-$(RM) $(GAMEDIR)\quest.dat
 	-$(RM) $(GAMEDIR)\rumors
+	-$(RM) $(GAMEDIR)\dungeon
+	-$(RM) $(GAMEDIR)\soko?-?.lev
 
 dlb_nope :
 	$(ECHO) DLB not requested.
@@ -1533,3 +1736,53 @@ $(OBJ)\write.o    : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\zap.o      : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
+
+$(OBJ)/Window.o: $(WINX11)\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
+		$(CONFIG_H)
+	$(CC) -o$(OBJ)\Window.o $(CFLAGS) -c $(WINX11)\Window.c
+$(OBJ)/dialogs.o: $(WINX11)\dialogs.c $(CONFIG_H)
+	$(CC) -o$(OBJ)\dialogs.o $(CFLAGS) -c $(WINX11)\dialogs.c
+$(OBJ)/winX.o: $(WINX11)\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
+		$(INCL)\patchlevel.h $(WINX11)\nh72icon \
+		$(WINX11)\nh56icon $(WINX11)\nh32icon
+	$(CC) $(CFLAGS) -c $(WINX11)\winX.c -o$(OBJ)\winX.o
+$(OBJ)/winmap.o: $(WINX11)\winmap.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\dlb.h \
+		$(INCL)\winX.h $(INCL)\tile2x11.h
+	$(CC) $(CFLAGS) -c $(WINX11)\winmap.c -o $(OBJ)\winmap.o
+$(OBJ)/winmenu.o: $(WINX11)\winmenu.c $(HACK_H) $(INCL)\winX.h
+	$(CC) $(CFLAGS) -c $(WINX11)\winmenu.c -o $(OBJ)\winmenu.o
+$(OBJ)/winmesg.o: $(WINX11)\winmesg.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\winX.h
+	$(CC) $(CFLAGS) -c $(WINX11)\winmesg.c -o$(OBJ)\winmesg.o
+$(OBJ)/winmisc.o: $(WINX11)\winmisc.c $(HACK_H) $(INCL)\func_tab.h \
+		$(INCL)\winX.h
+	$(CC) $(CFLAGS) -c $(WINX11)\winmisc.c -o$(OBJ)\winmisc.o
+$(OBJ)/winstat.o: $(WINX11)\winstat.c $(HACK_H) $(INCL)\winX.h
+	$(CC) $(CFLAGS) -c $(WINX11)\winstat.c -o$(OBJ)\winstat.o
+$(OBJ)/wintext.o: $(WINX11)\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
+	$(CC) $(CFLAGS) -c $(WINX11)\wintext.c -o$(OBJ)\wintext.o
+$(OBJ)/winval.o: $(WINX11)\winval.c $(HACK_H) $(INCL)\winX.h
+	$(CC) $(CFLAGS) -c $(WINX11)\winval.c -o$(OBJ)\winval.o
+
+$(OBJ)/tile.o: $(NHSRC)\src\tile.c $(HACK_H)
+	$(CC) $(CFLAGS) -c $(NHSRC)\src\tile.c -o$(OBJ)\tile.o
+
+$(TEMP)\tilemap.exe: ..\win\share\tilemap.c $(HACK_H)
+	$(CC) $(GCCO) $(WARN) -I$(INCL) $(CDFLAGS) $(STDC) $(WINX11CFLAGS) $(LFLAGS) -o $(TEMP)\tilemap.exe ..\win\share\tilemap.c $(LIBS)
+$(NHSRC)\src\tile.c: $(TEMP)\tilemap.exe
+	$(TEMP)\tilemap
+
+x11tiles: $(TEMP)\tile2x11.exe $(WINSHARE)\monsters.txt \
+				$(WINSHARE)\objects.txt \
+				$(WINSHARE)\other.txt
+	$(TEMP)\tile2x11.exe $(WINSHARE)\monsters.txt $(WINSHARE)\objects.txt \
+				$(WINSHARE)\other.txt
+	cp x11tiles $(GAMEDIR)\x11tiles
+
+$(TEMP)\tile2x11.exe: tile2x11.o $(TEXT_IO)
+	$(CC) $(LFLAGS) -o tile2x11 tile2x11.o $(TEXT_IO) $(LIBS)
+
+pet_mark.xbm: $(WINX11)\pet_mark.xbm
+	cp $(WINX11)\pet_mark.xbm $(GAMEDIR)\pet_mark.xbm
+
+rip.xpm: $(WINX11)\rip.xpm
+	cp $(WINX11)\rip.xpm $(GAMEDIR)\rip.xpm
