@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2003/01/08	*/
+/*	SCCS Id: @(#)trap.c	3.4	2003/02/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2718,8 +2718,8 @@ drown()
 		vision_full_recalc = 1;
 		return(FALSE);
 	}
-	if((Teleportation || can_teleport(youmonst.data)) &&
-	   (Teleport_control || rn2(3) < Luck+2)) {
+	if ((Teleportation || can_teleport(youmonst.data)) &&
+		    !u.usleep && (Teleport_control || rn2(3) < Luck+2)) {
 		You("attempt a teleport spell.");	/* utcsri!carroll */
 		(void) dotele();
 		if(!is_pool(u.ux,u.uy))
@@ -2733,6 +2733,12 @@ drown()
 	}
 #endif
 	crawl_ok = FALSE;
+	/* if sleeping, wake up now so that we don't crawl out of water
+	   while still asleep; we can't do that the same way that waking
+	   due to combat is handled; note unmul() clears u.usleep */
+	if (u.usleep) unmul("Suddenly you wake up!");
+	/* can't crawl if unable to move (crawl_ok flag stays false) */
+	if (multi < 0 || (Upolyd && !youmonst.data->mmove)) goto crawl;
 	/* look around for a place to crawl to */
 	for (i = 0; i < 100; i++) {
 		x = rn1(3,u.ux - 1);
@@ -2749,7 +2755,7 @@ drown()
 				crawl_ok = TRUE;
 				goto crawl;
 			}
-crawl:;
+ crawl:
 	if (crawl_ok) {
 		boolean lost = FALSE;
 		/* time to do some strip-tease... */
