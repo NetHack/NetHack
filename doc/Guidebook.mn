@@ -483,7 +483,7 @@ Stops on most of
 the same conditions as the `G' command, but without picking up
 objects, similar to the `M' command.  For ports with mouse 
 support, the command is also invoked when a mouse-click takes place on a 
-location further than 1 cell away from the current position.
+location other than the current position.
 .lp .
 Rest, do nothing for one turn.
 .lp a
