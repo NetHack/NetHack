@@ -216,49 +216,53 @@ autoquiver()
 	register struct obj *otmp, *oammo = 0, *omissile = 0, *omisc = 0;
 
 	if (uquiver)
-		return;
+	    return;
 
 	/* Scan through the inventory */
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
-		if (otmp->owornmask || otmp->oartifact || !otmp->dknown) {
-			;	/* Skip it */
-		} else if (otmp->otyp == ROCK ||
+	    if (otmp->owornmask || otmp->oartifact || !otmp->dknown) {
+		;	/* Skip it */
+	    } else if (otmp->otyp == ROCK ||
 			/* seen rocks or known flint or known glass */
 			(objects[otmp->otyp].oc_name_known &&
 			 otmp->otyp == FLINT) ||
 			(objects[otmp->otyp].oc_name_known &&
 			 otmp->oclass == GEM_CLASS &&
 			 objects[otmp->otyp].oc_material == GLASS)) {
-			if (uslinging())
-			    oammo = otmp;
-			else if (!omisc)
-			    omisc = otmp;
-		} else if (otmp->oclass == GEM_CLASS) {
-			;	/* skip non-rock gems--they're ammo but
-				   player has to select them explicitly */
-		} else if (is_ammo(otmp)) {
-			if (ammo_and_launcher(otmp, uwep))
-				/* Ammo matched with launcher (bow and arrow, crossbow and bolt) */
-				oammo = otmp;
-			else
-				/* Mismatched ammo (no better than an ordinary weapon) */
-				omisc = otmp;
-		} else if (is_missile(otmp)) {
-			/* Missile (dart, shuriken, etc.) */
-			omissile = otmp;
-		} else if (otmp->oclass == WEAPON_CLASS && !is_launcher(otmp)) {
-			/* Ordinary weapon */
-			omisc = otmp;
-		}
+		if (uslinging())
+		    oammo = otmp;
+		else if (!omisc)
+		    omisc = otmp;
+	    } else if (otmp->oclass == GEM_CLASS) {
+		;	/* skip non-rock gems--they're ammo but
+			   player has to select them explicitly */
+	    } else if (is_ammo(otmp)) {
+		if (ammo_and_launcher(otmp, uwep))
+		    /* Ammo matched with launcher (bow and arrow, crossbow and bolt) */
+		    oammo = otmp;
+		else
+		    /* Mismatched ammo (no better than an ordinary weapon) */
+		    omisc = otmp;
+	    } else if (is_missile(otmp)) {
+		/* Missile (dart, shuriken, etc.) */
+		omissile = otmp;
+	    } else if (otmp->oclass == WEAPON_CLASS && throwing_weapon(otmp)) {
+		/* Ordinary weapon */
+		if (objects[otmp->otyp].oc_skill == P_DAGGER
+			&& !omissile) 
+		    omissile = otmp;
+		else
+		    omisc = otmp;
+	    }
 	}
 
 	/* Pick the best choice */
 	if (oammo)
-		setuqwep(oammo);
+	    setuqwep(oammo);
 	else if (omissile)
-		setuqwep(omissile);
+	    setuqwep(omissile);
 	else if (omisc)
-		setuqwep(omisc);
+	    setuqwep(omisc);
 
 	return;
 }
