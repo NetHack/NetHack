@@ -1,0 +1,188 @@
+        Welcome to NetHack!                ( description of version 3.3 )
+
+        NetHack is a Dungeons and Dragons like game where you (the adventurer)
+descend into the depths of the dungeon in search of the Amulet of Yendor,
+reputed to be hidden somewhere below the twentieth level.  You begin your
+adventure with a pet that can help you in many ways, and can be trained
+to do all sorts of things.  On the way you will find useful (or useless)
+items, quite possibly with magic properties, and assorted monsters.  You can
+attack a monster by trying to move onto the space a monster is on (but often
+it is much wiser to leave it alone).
+
+        Unlike most adventure games, which give you a verbal description of
+your location, NetHack gives you a visual image of the dungeon level you are
+on.
+
+        NetHack uses the following symbols:
+
+        - and |  The walls of a room, possibly also open doors or a grave.
+        .        The floor of a room or a doorway.
+        #        A corridor, or iron bars, or a tree, or possibly a kitchen
+                 sink (if your dungeon has sinks), or a drawbridge.
+        >        Stairs down: a way to the next level.
+        <        Stairs up: a way to the previous level.
+        @        You (usually), or another human.
+        )        A weapon of some sort.
+        [        A suit or piece of armor.
+        %        Something edible (not necessarily healthy).
+        /        A wand.
+        =        A ring.
+        ?        A scroll.
+        !        A potion.
+        (        Some other useful object (pick-axe, key, lamp...)
+        $        A pile of gold.
+        *        A gem or rock (possibly valuable, possibly worthless).
+        +        A closed door, or a spellbook containing a spell
+                 you can learn.
+        ^        A trap (once you detect it).
+        "        An amulet, or a spider web.
+        0        An iron ball.
+        _        An altar, or an iron chain.
+        {        A fountain.
+        }        A pool of water or moat or a pool of lava.
+        \        An opulent throne.
+        `        A boulder or statue.
+        A to Z, a to z, and several others:  Monsters.
+        I        Invisible monster's last known location
+
+                 You can find out what a symbol represents by typing
+                 '/' and following the directions to move the cursor
+                 to the symbol in question.  For instance, a 'd' may
+                 turn out to be a dog.
+
+
+y k u   7 8 9   Move commands:
+ \|/     \|/            yuhjklbn: go one step in specified direction
+h-.-l   4-.-6           YUHJKLBN: go in specified direction until you
+ /|\     /|\                        hit a wall or run into something
+b j n   1 2 3           g<dir>:   run in direction <dir> until something
+      numberpad                     interesting is seen
+                        G<dir>,   same, except a branching corridor isn't
+ <  up                  ^<dir>:     considered interesting
+ >  down                m<dir>:   move without picking up objects
+                If the number_pad option is set, the number keys move instead.
+
+Commands:
+        NetHack knows the following commands:
+        ?       Help menu.
+        /       Tell what a symbol represents.  You may choose to specify
+                a location or give a symbol argument.
+        &       Tell what a command does.
+        <       Go up a staircase (if you are standing on it).
+        >       Go down a staircase (if you are standing on it).
+        .       Rest, do nothing for one turn.
+        _       Travel via a shortest-path algorithm to a point on the map 
+        a       Apply (use) a tool (pick-axe, key, lamp...)
+        A       Remove all armor.
+        ^A      Redo the previous command
+        c       Close a door.
+        C       Call (name) an individual monster.
+        d       Drop something.  d7a:  drop seven items of object a.
+        D       Drop multiple items.  This command is implemented in two
+                different ways.  One way is:
+                "D" displays a list of all of your items, from which you can
+                pick and choose what to drop.  A "+" next to an item means
+                that it will be dropped, a "-" means that it will not be
+                dropped.  Toggle an item to be selected/deselected by typing
+                the letter adjacent to its description.  Select all items
+                with "+", deselect all items with "=".  The <SPACEBAR> moves
+                you from one page of the listing to the next.
+                The other way is:
+                "D" will ask the question "What kinds of things do you want
+                to drop? [!%= au]".  You should type zero or more object
+                symbols possibly followed by 'a' and/or 'u'.
+                Da - drop all objects, without asking for confirmation.
+                Du - drop only unpaid objects (when in a shop).
+                D%u - drop only unpaid food.
+        ^D      Kick (for doors, usually).
+        e       Eat food.
+        E       Engrave a message on the floor.
+                E- - write in the dust with your fingers.
+        f       Fire ammunition from quiver.
+        F       Followed by direction, fight a monster (even if you don't
+                sense it).
+        i       Display your inventory.
+        I       Display selected parts of your inventory, as in
+                I* - list all gems in inventory.
+                Iu - list all unpaid items.
+                Ix - list all used up items that are on your shopping bill.
+                I$ - count your money.
+        o       Open a door.
+        O       Review current options and possibly change them.
+                A menu displaying the option settings will be displayed
+                and most can be changed by simply selecting their entry.
+                Options are usually set before the game with a NETHACKOPTIONS
+                environment variable, or via a config file (defaults.nh,
+                NetHack Defaults, nethack.cnf, .nethackrc, etc.), not with 
+                the 'O' command.
+        p       Pay your shopping bill.
+        P       Put on an accessory (ring, amulet, etc).
+        ^P      Repeat last message (subsequent ^P's repeat earlier messages).
+        q       Drink (quaff) a potion.
+        Q       Select ammunition for quiver.
+        r       Read a scroll or spellbook.
+        R       Remove an accessory (ring, amulet, etc).
+        ^R      Redraw the screen.
+        s       Search for secret doors and traps around you.
+        S       Save the game.
+        t       Throw an object or shoot a projectile.
+        T       Take off armor.
+        ^T      Teleport, if you are able.
+        v       Displays the version number.
+        V       Display a longer identification of the version, including the
+                history of the game.
+        w       Wield weapon.  w- means wield nothing, use bare hands.
+        W       Wear armor.
+        x       Swap wielded and secondary weapons.
+        X       Switch the game to explore (discovery) mode.
+        ^X      Show your attributes.
+        z       Zap a wand.
+        Z       Cast a spell.
+        ^Z      Suspend the game.
+        :       Look at what is here.
+        ;       Look at what is somewhere else.
+        ,       Pick up some things.
+        @       Toggle the pickup option.
+        ^       Ask for the type of a trap you found earlier.
+        )       Tell what weapon you are wielding.
+        [       Tell what armor you are wearing.
+        =       Tell what rings you are wearing.
+        "       Tell what amulet you are wearing.
+        (       Tell what tools you are using.
+        *       Tell what equipment you are using; combines the preceding five.
+        $       Count your gold pieces.
+        +       List the spells you know; also rearrange them if desired.
+        \       Show what types of objects have been discovered.
+        !       Escape to a shell, if supported in your version and OS.
+        #       Introduces one of the "extended" commands.  To get a list of
+                the commands you can use with "#" type "#?".  The extended
+                commands you can use depends upon what options the game was
+                compiled with, along with your class and what type of monster
+                you most closely resemble at a given moment.  If your keyboard
+                has a meta key (which, when pressed in combination with another
+                key, modifies it by setting the 'meta' (8th, or 'high') bit),
+                these extended commands can be invoked by meta-ing the first
+                letter of the command.
+
+        If the "number_pad" option is on, some additional letter commands
+        are available:
+
+        j       Jump to another location.
+        k       Kick (for doors, usually).
+        l       Loot a box on the floor.
+        n       Name an object or type of object.
+        u       Untrap a trapped object or door.
+
+        You can put a number before a command to repeat it that many times,
+        as in "40." or "20s.".  If you have the number_pad option set, you
+        must type 'n' to prefix the count, as in "n40." or "n20s".
+
+
+        Some information is displayed on the bottom line.  You see your
+        attributes, your alignment, what dungeon level you are on, how many
+        hit points you have now (and will have when fully recovered), what
+        your armor class is (the lower the better), your experience level,
+        and the state of your stomach.  Optionally, you may or may not see
+        other information such as spell points, how much gold you have, etc.
+
+        Have Fun, and Happy Hacking!
