@@ -428,6 +428,7 @@ make wands of speed or slow monster known if their effect
 gold detection "materially poor" message inappropriate if you have hidden_gold()
 cannot reflect back an invisible umber hulk or medusa's attack
 monsters with M3_WANTSBOOK often couldn't move in the Wizard-level
+Vlad should want the Candelabrum
 
 
 Platform- and/or Interface-Specific Fixes
