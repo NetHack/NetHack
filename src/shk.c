@@ -2624,7 +2624,7 @@ move_on:
 	   || (obj->oclass == FOOD_CLASS && obj->oeaten)
 	   || (Is_candle(obj) &&
 		   obj->age < 20L * (long)objects[obj->otyp].oc_cost)) {
-		pline("%s seems not interested%s.", Monnam(shkp),
+		pline("%s seems uninterested%s.", Monnam(shkp),
 			cgold ? " in the rest" : "");
 		if (container)
 		    dropped_container(obj, shkp, FALSE);
