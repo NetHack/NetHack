@@ -2138,7 +2138,23 @@ goodfruit:
 		return;
 	    }
 	}
-
+#if defined(STATUS_VIA_WINDOWPORT) && defined(STATUS_HILITES)
+	/* hilite fields in status prompt */
+	if (match_optname(opts, "hilite_status", 13, TRUE)) {
+		op = string_for_opt(opts, TRUE);
+		if (op && negated) {
+			clear_status_hilites();
+			return;
+		} else if (!op) {
+			/* a value is mandatory */
+			badoption(opts);
+			return;
+		}
+		if (!set_status_hilites(op))
+			badoption(opts);
+		return;
+	}
+#endif
 	/* OK, if we still haven't recognized the option, check the boolean
 	 * options list
 	 */
@@ -2474,12 +2490,23 @@ doset()
 				doset_add_menu(tmpwin, compopt[i].name,
 					(pass == DISP_IN_GAME) ? 0 : indexoffset);
 		}
+#ifdef STATUS_VIA_WINDOWPORT
+# ifdef STATUS_HILITES
+	any.a_int = -2;
+	get_status_hilites(buf2, 60);
+	if (!iflags.menu_tab_sep)
+		Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
+			"status_hilites", buf2);
+	else
+		Sprintf(buf, fmtstr_doset_add_menu_tab, "status_hilites", buf2);
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+# endif
+#endif
 #ifdef AUTOPICKUP_EXCEPTIONS
 	any.a_int = -1;
 	Sprintf(buf, "autopickup exceptions (%d currently set)",
 		count_ape_maps((int *)0, (int *)0));
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
-
 #endif /* AUTOPICKUP_EXCEPTIONS */
 #ifdef PREFIXES_IN_USE
 	any.a_void = 0;
@@ -2501,10 +2528,22 @@ doset()
 	    for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
 		opt_indx = pick_list[pick_idx].item.a_int - 1;
 #ifdef AUTOPICKUP_EXCEPTIONS
-		if (opt_indx == -2) {
+		if (opt_indx == -2) {	/* -3 due to -1 offset for select_menu() */
 		    special_handling("autopickup_exception",
 		    			setinitial, fromfile);
 		} else
+#endif
+#ifdef STATUS_VIA_WINDOWPORT
+# ifdef STATUS_HILITES
+		if (opt_indx == -3) {	/* -3 due to -1 offset for select_menu() */
+			if (!status_hilite_menu())
+				pline("Bad status hilite(s) specified.");
+			else {
+			    	if (wc2_supported("status_hilites"))
+					preference_update("status_hilites");
+			}
+		} else
+# endif
 #endif
 		if (opt_indx < boolcount) {
 		    /* boolean option */
@@ -3605,6 +3644,9 @@ struct wc_Opt wc2_options[] = {
 	{"fullscreen", WC2_FULLSCREEN},
 	{"softkeyboard", WC2_SOFTKEYBOARD},
 	{"wraptext", WC2_WRAPTEXT},
+#ifdef STATUS_VIA_WINDOWPORT
+	{"hilite_status", WC2_HILITE_STATUS},
+#endif
 	{(char *)0, 0L}
 };
 

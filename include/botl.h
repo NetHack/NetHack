@@ -5,6 +5,8 @@
 #ifndef BOTL_H
 #define BOTL_H
 
+#ifdef STATUS_VIA_WINDOWPORT
+
 #define BL_FLUSH	-1
 #define BL_TITLE	0
 #define BL_STR		1
@@ -42,5 +44,21 @@
 #define BL_MASK_SLIMED		0x00000040L
 
 #define REASSESS_ONLY	TRUE
+
+#ifdef STATUS_HILITES
+/* hilite status field behavior - coloridx values */
+#define BL_HILITE_NONE		-1	/* no hilite of this field */
+#define BL_HILITE_INVERSE	-2	/* inverse hilite */
+#define BL_HILITE_BOLD		-3	/* bold hilite */
+					/* or any CLR_ index (0 - 15) */
+#define BL_TH_NONE		0
+#define BL_TH_VAL_PERCENTAGE	100	/* threshold is percentage */
+#define BL_TH_VAL_ABSOLUTE	101	/* threshold is particular value */
+#define BL_TH_UPDOWN		102	/* threshold is up or down change */
+#define BL_TH_CONDITION		103	/* threshold is bitmask of conditions */
+#endif
+
+extern const char *status_fieldnames[];		/* in botl.c */
+#endif
 
 #endif /* BOTL_H */

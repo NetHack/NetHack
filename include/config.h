@@ -355,6 +355,7 @@ typedef unsigned char	uchar;
 /*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
 #define AUTOPICKUP_EXCEPTIONS	/* exceptions to autopickup */
 #define STATUS_VIA_WINDOWPORT	/* re-work of the status line updating process */
+#define STATUS_HILITES		/* support hilites of status fields */
 
 /* End of Section 5 */
 

@@ -105,6 +105,9 @@ struct window_procs Gem_procs = {
     genl_status_finish,
     genl_status_enablefield,
     genl_status_update,
+# ifdef STATUS_HILITES
+    genl_status_threshold,
+# endif
 #endif
 };
 

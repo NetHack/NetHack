@@ -15,14 +15,35 @@ typedef union any {
     char a_char;
     schar a_schar;
     unsigned int a_uint;
+    long a_long;
+    unsigned long a_ulong;
     int *a_iptr;
     long *a_lptr;
+    unsigned long *a_ulptr;
     unsigned *a_uptr;
     /* add types as needed */
 } anything;
 #define ANY_P union any /* avoid typedef in prototypes */
 			/* (buggy old Ultrix compiler) */
 
+/* symbolic names for the data types housed in anything */
+#define ANY_VOID	 1
+#define ANY_OBJ		 2	/* struct obj */
+#define ANY_MONST	 3	/* struct monst (not used) */
+#define ANY_INT		 4	/* int */
+#define ANY_CHAR	 5	/* char */
+#define ANY_UCHAR	 6	/* unsigned char */
+#define ANY_SCHAR	 7	/* signed char */
+#define ANY_UINT	 8	/* unsigned int */
+#define ANY_LONG	 9	/* long */
+#define ANY_ULONG	10	/* unsigned long */
+#define ANY_IPTR	11	/* pointer to int */
+#define ANY_UPTR	12	/* pointer to unsigned int */
+#define ANY_LPTR	13	/* pointer to long */
+#define ANY_ULPTR	14	/* pointer to unsigned long */
+#define	ANY_STR		15	/* pointer to null-terminated char string */
+#define ANY_MASK32	16	/* mask of 32 bits (stored as unsigned long) */
+			
 /* menu return list */
 typedef struct mi {
     anything item;		/* identifier */

@@ -16,7 +16,16 @@ const char * const enc_stat[] = {
 };
 
 #ifdef STATUS_VIA_WINDOWPORT
-STATIC_OVL void NDECL(init_blstats);
+STATIC_DCL void NDECL(init_blstats);
+STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
+STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
+STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
+STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
+STATIC_OVL int FDECL(de_pointer_type, (int));
+# ifdef STATUS_HILITES
+STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *));
+STATIC_DCL char *FDECL(clridx_to_s, (char *, int));
+# endif
 #else
 STATIC_DCL void NDECL(bot1);
 STATIC_DCL void NDECL(bot2);
@@ -297,55 +306,53 @@ bot()
 
 #else	/* STATUS_VIA_WINDOWPORT */
 
-/* These are used within botl.c only */
-#define P_MASK 1
-#define P_STR  2
-#define P_INT  3
-#define P_LNG  4
-#define P_UINT 5
-
 struct istat_s {
 	long time;
-	unsigned ptype;
-	anything ptr;
+	unsigned anytype;
+	anything a;
 	char *val;
 	int valwidth;
 	int idxmax;
 };
 
-#define percentage(current, maximum)	((100 * current) / maximum)
-#define percentagel(current, maximum)	((int)((100L * current) / maximum))
-
 /* If entries are added to this, botl.h will require updating too */
 struct istat_s blstats[2][MAXBLSTATS] = {
     {
-    { 0L, P_STR, {(genericptr_t)0}, (char *)0, 80, 0 },	/*  0 BL_TITLE */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  1 BL_STR */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  2 BL_DX */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  3 BL_CO */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  4 BL_IN */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  5 BL_WI */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/*  6 BL_CH */
-    { 0L, P_STR, {(genericptr_t)0}, (char *)0, 40,  0},	/*  7 BL_ALIGN */
-    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 20, 0},	/*  8 BL_SCORE */
-    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 20, 0},	/*  9 BL_CAP */
-    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 10,  0},	/* 10 BL_GOLD */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
-    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 10,  0},	/* 13 BL_XP */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/* 14 BL_AC */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,  0},	/* 15 BL_HD */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 20, 0},	/* 16 BL_TIME */
-    { 0L, P_UINT,{(genericptr_t)0}, (char *)0, 40, 0},	/* 17 BL_HUNGER */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10,BL_HPMAX},	/* 18 BL_HP */
-    { 0L, P_INT, {(genericptr_t)0}, (char *)0, 10, 0},	/* 19 BL_HPMAX */
-    { 0L, P_STR, {(genericptr_t)0}, (char *)0, 80, 0},	/* 20 BL_LEVELDESC */
-    { 0L, P_LNG, {(genericptr_t)0}, (char *)0, 20, 0},	/* 21 BL_EXP */
-    { 0L, P_MASK,{(genericptr_t)0}, (char *)0, 0, 0}	/* 22 BL_CONDITION */
+    { 0L, ANY_STR,  {(genericptr_t)0}, (char *)0, 80, 0 },	/*  0 BL_TITLE */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  1 BL_STR */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  2 BL_DX */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  3 BL_CO */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  4 BL_IN */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  5 BL_WI */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/*  6 BL_CH */
+    { 0L, ANY_STR,  {(genericptr_t)0}, (char *)0, 40,  0},	/*  7 BL_ALIGN */
+    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 20, 0},	/*  8 BL_SCORE */
+    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 20, 0},	/*  9 BL_CAP */
+    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 10,  0},	/* 10 BL_GOLD */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
+    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 10,  0},	/* 13 BL_XP */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/* 14 BL_AC */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,  0},	/* 15 BL_HD */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 20, 0},	/* 16 BL_TIME */
+    { 0L, ANY_UINT, {(genericptr_t)0}, (char *)0, 40, 0},	/* 17 BL_HUNGER */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10,BL_HPMAX},	/* 18 BL_HP */
+    { 0L, ANY_INT,  {(genericptr_t)0}, (char *)0, 10, 0},	/* 19 BL_HPMAX */
+    { 0L, ANY_STR,  {(genericptr_t)0}, (char *)0, 80, 0},	/* 20 BL_LEVELDESC */
+    { 0L, ANY_LONG, {(genericptr_t)0}, (char *)0, 20, 0},	/* 21 BL_EXP */
+    { 0L, ANY_MASK32,{(genericptr_t)0}, (char *)0, 0, 0}	/* 22 BL_CONDITION */
     }
 };
 
 static boolean blinit = FALSE, update_all = FALSE;
+const char *status_fieldnames[] = {
+		"title", "strength", "dexterity", "constitution", "intelligence",
+		"wisdom", "charisma", "alignment", "score", "carrying-capacity",
+		"gold", "power", "power-max", "experience-level", "armor-class",
+		"HD", "time", "hunger", "hitpoints", "hitpoints-max",
+		"dungeon-level", "experience", "condition"
+		};
+
 
 void
 status_initialize(reassessment)
@@ -356,13 +363,6 @@ boolean reassessment;	/* TRUE = just reassess fields w/o other initialization*/
 		"%s"," St:%s"," Dx:%s"," Co:%s"," In:%s"," Wi:%s"," Ch:%s",
 		" %s"," S:%s"," %s"," %s"," Pw:%s", "(%s)"," Xp:%s", " AC:%s",
 		" HD:%s"," T:%s"," %s"," HP:%s","(%s)","%s","/%s","%s"
-		};
-	const char *fieldnames[] = {
-		"title", "strength", "dexterity", "constitution", "intelligence",
-		"wisdom", "charisma", "alignment", "score", "capacity",
-		"gold", "power", "power-max", "experience-level", "armor-class",
-		"HD", "time", "hunger", "hitpoints", "hitpoints-max",
-		"dungeon-level", "experience", "condition"
 		};
 	if (!reassessment) {
 		init_blstats();
@@ -375,9 +375,11 @@ boolean reassessment;	/* TRUE = just reassess fields w/o other initialization*/
 		    (i == BL_TIME  && !flags.time)	||
 		    (i == BL_HD    && !Upolyd)		||
 		    ((i == BL_XP || i == BL_EXP) && Upolyd))
-			status_enablefield(i, fieldnames[i], fieldfmts[i], FALSE);
+			status_enablefield(i, status_fieldnames[i],
+						fieldfmts[i], FALSE);
 		else
-			status_enablefield(i, fieldnames[i], fieldfmts[i], TRUE);
+			status_enablefield(i, status_fieldnames[i],
+						fieldfmts[i], TRUE);
 	}
 	update_all = TRUE;
 }
@@ -392,8 +394,6 @@ status_finish()
 
 	/* free memory that we alloc'd now */
 	for (i = 0; i < MAXBLSTATS; ++i) {
-		free((genericptr_t)blstats[0][i].ptr.a_void);
-		free((genericptr_t)blstats[1][i].ptr.a_void);
 		if (blstats[0][i].val) free((genericptr_t)blstats[0][i].val);
 		if (blstats[1][i].val) free((genericptr_t)blstats[1][i].val);
 	}
@@ -405,25 +405,26 @@ init_blstats()
 	int i;
 
 	for (i = 0; i < MAXBLSTATS; ++i) {
-		switch(blstats[0][i].ptype) {
-		    case P_INT:
-			blstats[0][i].ptr.a_iptr = (int *)alloc(sizeof(int));
-			blstats[1][i].ptr.a_iptr = (int *)alloc(sizeof(int));
-			*(blstats[0][i].ptr.a_iptr) = 0;
-			*(blstats[1][i].ptr.a_iptr) = 0;
+		/* ensure initial field values set on blstats[1][i] too */
+		blstats[1][i] = blstats[0][i];
+
+		switch(blstats[0][i].anytype) {
+		    case ANY_INT:
+			blstats[0][i].a.a_int = 0;
+			blstats[1][i].a.a_int = 0;
 			break;
-		    case P_LNG:
-		    case P_MASK:
-			blstats[0][i].ptr.a_lptr = (long *)alloc(sizeof(long));
-			blstats[1][i].ptr.a_lptr = (long *)alloc(sizeof(long));
-			*(blstats[0][i].ptr.a_lptr) = 0L;
-			*(blstats[1][i].ptr.a_lptr) = 0L;
+		    case ANY_ULONG:
+		    case ANY_MASK32:
+			blstats[0][i].a.a_ulong = 0UL;
+			blstats[1][i].a.a_ulong = 0UL;
 			break;
-		    case P_UINT:
-			blstats[0][i].ptr.a_uptr = (unsigned *)alloc(sizeof(unsigned));
-			blstats[1][i].ptr.a_uptr = (unsigned *)alloc(sizeof(unsigned));
-			*(blstats[0][i].ptr.a_uptr) = 0;
-			*(blstats[1][i].ptr.a_uptr) = 0;
+		    case ANY_LONG:
+			blstats[0][i].a.a_long = 0L;
+			blstats[1][i].a.a_long = 0L;
+			break;
+		    case ANY_UINT:
+			blstats[0][i].a.a_uint = 0U;
+			blstats[1][i].a.a_uint = 0U;
 			break;
 		}
 		if (blstats[0][i].valwidth) {
@@ -433,8 +434,183 @@ init_blstats()
 		    blstats[0][i].val = (char *)0;
 		    blstats[1][i].val = (char *)0;
 		}
-		blstats[1][i].ptype = blstats[0][i].ptype;
 	}
+}
+
+STATIC_OVL char *
+anything_to_s(buf, a, anytype)
+char *buf;
+anything *a;
+int anytype;
+{
+	if (!buf) return (char *)0;
+
+	switch (anytype) {
+	    case ANY_ULONG:	Sprintf(buf,"%lu", a->a_ulong); break;
+	    case ANY_MASK32:	Sprintf(buf,"%lx", a->a_ulong); break;
+	    case ANY_LONG:	Sprintf(buf,"%ld", a->a_long); break;
+	    case ANY_INT:	Sprintf(buf,"%d",  a->a_int); break;
+	    case ANY_UINT:	Sprintf(buf,"%u",  a->a_uint); break;
+	    case ANY_IPTR:	Sprintf(buf,"%d",  *a->a_iptr); break;
+	    case ANY_LPTR:	Sprintf(buf,"%ld", *a->a_lptr); break;
+	    case ANY_ULPTR:	Sprintf(buf,"%lu", *a->a_ulptr); break;
+	    case ANY_UPTR:	Sprintf(buf,"%u",  *a->a_uptr); break;
+	    case ANY_STR: 	/* do nothing */; break;
+	    default:
+	    		buf[0] = '\0';
+	}
+	return buf;
+}
+
+STATIC_OVL void
+s_to_anything(a, buf, anytype)
+anything *a;
+char *buf;
+int anytype;
+{
+	if (!buf || !a) return;
+
+	switch (anytype) {
+	    case ANY_LONG:	a->a_long = atol(buf); break;
+	    case ANY_INT:	a->a_int  = atoi(buf); break;
+	    case ANY_UINT:	a->a_uint = (unsigned) atoi(buf); break;
+	    case ANY_ULONG:	a->a_ulong = (unsigned long) atol(buf); break;
+	    case ANY_IPTR:	if (a->a_iptr)
+	    			    *a->a_iptr = atoi(buf); break;
+	    case ANY_UPTR:	if (a->a_uptr)
+				    *a->a_uptr = (unsigned) atoi(buf); break;
+	    case ANY_LPTR:	if (a->a_lptr)
+				    *a->a_lptr = atol(buf); break;
+	    case ANY_ULPTR:	if (a->a_ulptr)
+				    *a->a_ulptr = (unsigned long) atol(buf); break;
+	    case ANY_MASK32:	a->a_ulong = (unsigned long) atol(buf); break;
+	    default:		a->a_void = 0; break;
+	}
+	return;
+}
+
+STATIC_OVL int
+compare_blstats(bl1, bl2)
+struct istat_s *bl1, *bl2;
+{
+	int anytype, result = 0;
+	if (!bl1 || !bl2) {
+		panic("compare_blstat: bad istat pointer %ld, %ld",
+			(long)bl1, (long)bl2);
+	}
+
+	anytype = bl1->anytype;
+	if ((!bl1->a.a_void || !bl2->a.a_void) &&
+	    (anytype == ANY_IPTR || anytype == ANY_UPTR ||
+	     anytype == ANY_LPTR || anytype == ANY_ULPTR)) {
+		panic("compare_blstat: invalid pointer %ls, %ld",
+			(long)bl1->a.a_void, (long)bl2->a.a_void);
+	}
+
+	switch(anytype) {
+	    case ANY_INT:
+			result =(bl1->a.a_int < bl2->a.a_int) ?  1 :
+	    			(bl1->a.a_int > bl2->a.a_int) ? -1 :
+				0;
+	    		break;
+	    case ANY_IPTR:
+			result =(*bl1->a.a_iptr < *bl2->a.a_iptr) ?  1 :
+	    			(*bl1->a.a_iptr > *bl2->a.a_iptr) ? -1 :
+				0;
+	    		break;
+	    case ANY_LONG:
+			result =(bl1->a.a_long < bl2->a.a_long) ?  1 :
+	    			(bl1->a.a_long > bl2->a.a_long) ? -1 :
+				0;
+	    		break;
+	    case ANY_LPTR:
+			result =(*bl1->a.a_lptr < *bl2->a.a_lptr) ?  1 :
+	    			(*bl1->a.a_lptr > *bl2->a.a_lptr) ? -1 :
+				0;
+	    		break;
+	    case ANY_UINT:
+			result =(bl1->a.a_uint < bl2->a.a_uint) ?  1 :
+	    			(bl1->a.a_uint > bl2->a.a_uint) ? -1 :
+				0;
+	    		break;
+	    case ANY_UPTR:
+			result =(*bl1->a.a_uptr < *bl2->a.a_uptr) ?  1 :
+	    			(*bl1->a.a_uptr > *bl2->a.a_uptr) ? -1 :
+				0;
+	    		break;
+	    case ANY_ULONG:
+			result =(bl1->a.a_ulong < bl2->a.a_ulong) ?  1 :
+	    			(bl1->a.a_ulong > bl2->a.a_ulong) ? -1 :
+				0;
+	    		break;
+	    case ANY_ULPTR:
+			result =(*bl1->a.a_ulptr < *bl2->a.a_ulptr) ?  1 :
+	    			(*bl1->a.a_ulptr > *bl2->a.a_ulptr) ? -1 :
+				0;
+	    		break;
+	    case ANY_STR:
+			if (strcmp(bl1->val, bl2->val) == 0) result = 0;
+			else result = 1;
+			break;
+	    case ANY_MASK32:
+			if (bl1->a.a_ulong == bl2->a.a_ulong) result = 0;
+			else result = 1;
+			break;
+	    default:
+	    		result = 1;
+	}
+	return result;
+}
+
+STATIC_OVL int
+percentage(bl, maxbl)
+struct istat_s *bl, *maxbl;
+{
+	int result = 0;
+	int anytype;
+	if (!bl || !maxbl) {
+		impossible("percentage: bad istat pointer %ld, %ld",
+			(long)bl, (long)maxbl);
+		return 0;
+	}
+
+	anytype = bl->anytype;
+	if (maxbl->a.a_void) {
+	    switch(anytype) {
+		case ANY_INT:
+			result = ((100 * bl->a.a_int) / maxbl->a.a_int);
+			break;
+		case ANY_LONG:
+			result = (int) ((100L * bl->a.a_long) /
+					maxbl->a.a_long);
+			break;
+		case ANY_UINT:
+			result = (int) ((100U * bl->a.a_uint) /
+					maxbl->a.a_uint);
+			break;
+		case ANY_ULONG:
+			result = (int) ((100UL * bl->a.a_ulong) /
+					maxbl->a.a_ulong);
+		    	break;
+		case ANY_IPTR:
+			result = ((100 * (*bl->a.a_iptr)) /
+					(*maxbl->a.a_iptr));
+			break;
+		case ANY_LPTR:
+			result = (int) ((100L * (*bl->a.a_lptr)) /
+					(*maxbl->a.a_lptr));
+			break;
+		case ANY_UPTR:
+			result = (int) ((100U * (*bl->a.a_uptr)) /
+					(*maxbl->a.a_uptr));
+			break;
+		case ANY_ULPTR:
+			result = (int) ((100UL * (*bl->a.a_ulptr)) /
+					(*maxbl->a.a_ulptr));
+		    	break;
+	    }
+	}
+	return result;
 }
 
 void
@@ -444,9 +620,9 @@ bot()
 	register char *nb;
 	static int idx = 0, idx_p, idxmax;
 	boolean updated = FALSE;
-	unsigned ptype;
-	int i, pc, cap = near_capacity();
-	anything curr, prev;
+	unsigned anytype;
+	int i, pc, chg, cap = near_capacity();
+	struct istat_s *curr, *prev;
 	boolean valset[MAXBLSTATS];
 
 	if (!blinit) panic("bot before init.");
@@ -480,11 +656,12 @@ bot()
 	} else
 		Sprintf(nb = eos(nb), rank());
 	Sprintf(blstats[idx][BL_TITLE].val, "%-29s", buf);
+	valset[BL_TITLE] = TRUE;		/* indicate val already set */
 
 	/* Strength */
 
 	buf[0] = '\0';
-	*(blstats[idx][BL_STR].ptr.a_iptr) = ACURR(A_STR);
+	blstats[idx][BL_STR].a.a_int = ACURR(A_STR);
 	if (ACURR(A_STR) > 18) {
 		if (ACURR(A_STR) > STR18(100))
 		    Sprintf(buf,"%2d",ACURR(A_STR)-100);
@@ -500,11 +677,11 @@ bot()
 
 	/*  Dexterity, constitution, intelligence, wisdom, charisma. */
 	 
-	*(blstats[idx][BL_DX].ptr.a_iptr) = ACURR(A_DEX);
-	*(blstats[idx][BL_CO].ptr.a_iptr) = ACURR(A_CON);
-	*(blstats[idx][BL_IN].ptr.a_iptr) = ACURR(A_INT);
-	*(blstats[idx][BL_WI].ptr.a_iptr) = ACURR(A_WIS);
-	*(blstats[idx][BL_CH].ptr.a_iptr) = ACURR(A_CHA);
+	blstats[idx][BL_DX].a.a_int = ACURR(A_DEX);
+	blstats[idx][BL_CO].a.a_int = ACURR(A_CON);
+	blstats[idx][BL_IN].a.a_int = ACURR(A_INT);
+	blstats[idx][BL_WI].a.a_int = ACURR(A_WIS);
+	blstats[idx][BL_CH].a.a_int = ACURR(A_CHA);
 
 	/* Alignment */
 
@@ -514,7 +691,7 @@ bot()
 
 	/* Score */
 
-	*(blstats[idx][BL_SCORE].ptr.a_lptr) =
+	blstats[idx][BL_SCORE].a.a_long =
 #ifdef SCORE_ON_BOTL
 		botl_score();
 #else
@@ -522,18 +699,19 @@ bot()
 #endif
 	/*  Hit points  */
 
-	*(blstats[idx][BL_HP].ptr.a_iptr) = Upolyd ? u.mh : u.uhp;
-	*(blstats[idx][BL_HPMAX].ptr.a_iptr) = Upolyd ? u.mhmax : u.uhpmax;
-	if( *(blstats[idx][BL_HP].ptr.a_iptr) < 0)
-		*(blstats[idx][BL_HP].ptr.a_iptr) = 0;
+	blstats[idx][BL_HP].a.a_int = Upolyd ? u.mh : u.uhp;
+	blstats[idx][BL_HPMAX].a.a_int = Upolyd ? u.mhmax : u.uhpmax;
+	if( blstats[idx][BL_HP].a.a_int < 0)
+		blstats[idx][BL_HP].a.a_int = 0;
 
 	/*  Dungeon level. */
 
 	(void) describe_level(blstats[idx][BL_LEVELDESC].val);
+	valset[BL_LEVELDESC] = TRUE;		/* indicate val already set */
 
 	/* Gold */
 
-	*(blstats[idx][BL_GOLD].ptr.a_lptr) =
+	blstats[idx][BL_GOLD].a.a_long =
 #ifndef GOLDOBJ
 		   u.ugold;
 #else
@@ -548,37 +726,37 @@ bot()
 	 * for the BL_GOLD case.
 	 */
 	Sprintf(blstats[idx][BL_GOLD].val, "%c:%ld",
-			oc_syms[COIN_CLASS], *(blstats[idx][BL_GOLD].ptr.a_lptr));
+			oc_syms[COIN_CLASS], blstats[idx][BL_GOLD].a.a_long);
 	valset[BL_GOLD] = TRUE;		/* indicate val already set */
 
 	/* Power (magical energy) */
 
-	*(blstats[idx][BL_ENE].ptr.a_iptr) = u.uen;
-	*(blstats[idx][BL_ENEMAX].ptr.a_iptr) = u.uenmax;
+	blstats[idx][BL_ENE].a.a_int = u.uen;
+	blstats[idx][BL_ENEMAX].a.a_int = u.uenmax;
 
 	/* Armor class */
 
-	*(blstats[idx][BL_AC].ptr.a_iptr) = u.uac;
+	blstats[idx][BL_AC].a.a_int = u.uac;
 
 	/* Monster level (if Upolyd) */
 
 	if (Upolyd)
-		*(blstats[idx][BL_HD].ptr.a_iptr) = mons[u.umonnum].mlevel;
+		blstats[idx][BL_HD].a.a_int = mons[u.umonnum].mlevel;
 	else
-		*(blstats[idx][BL_HD].ptr.a_iptr) = 0;
+		blstats[idx][BL_HD].a.a_int = 0;
 
 	/* Experience */
 
-	*(blstats[idx][BL_XP].ptr.a_iptr) = u.ulevel;
-	*(blstats[idx][BL_EXP].ptr.a_lptr) = u.uexp;
+	blstats[idx][BL_XP].a.a_int = u.ulevel;
+	blstats[idx][BL_EXP].a.a_int = u.uexp;
 
 	/* Time (moves) */
 
-	*(blstats[idx][BL_TIME].ptr.a_lptr)  = moves;
+	blstats[idx][BL_TIME].a.a_long  = moves;
 
 	/* Hunger */
 
-	*(blstats[idx][BL_HUNGER].ptr.a_uptr) = u.uhs;
+	blstats[idx][BL_HUNGER].a.a_uint = u.uhs;
 	*(blstats[idx][BL_HUNGER].val) = '\0';
 	if(strcmp(hu_stat[u.uhs], "        ") != 0)
 		Strcpy(blstats[idx][BL_HUNGER].val, hu_stat[u.uhs]);
@@ -587,35 +765,35 @@ bot()
 	/* Carrying capacity */
 
 	*(blstats[idx][BL_CAP].val) = '\0';
-	*(blstats[idx][BL_CAP].ptr.a_iptr) = cap;
+	blstats[idx][BL_CAP].a.a_int = cap;
 	if(cap > UNENCUMBERED)
 		Strcpy(blstats[idx][BL_CAP].val, enc_stat[cap]);
 	valset[BL_CAP] = TRUE;
 
 	/* Conditions */
 
-	if (Blind) *(blstats[idx][BL_CONDITION].ptr.a_lptr) |= BL_MASK_BLIND;
-	else *(blstats[idx][BL_CONDITION].ptr.a_lptr) &= ~BL_MASK_BLIND;
+	if (Blind) blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_BLIND;
+	else blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_BLIND;
 	
-	if (Confusion) *(blstats[idx][BL_CONDITION].ptr.a_lptr) |= BL_MASK_CONF;
-	else *(blstats[idx][BL_CONDITION].ptr.a_lptr) &= ~BL_MASK_CONF;
+	if (Confusion) blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_CONF;
+	else blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_CONF;
 
 	if (Sick && u.usick_type & SICK_VOMITABLE)
-		*(blstats[idx][BL_CONDITION].ptr.a_lptr) |= BL_MASK_FOODPOIS;
-	else *(blstats[idx][BL_CONDITION].ptr.a_lptr) &= ~BL_MASK_FOODPOIS;
+		blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FOODPOIS;
+	else blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_FOODPOIS;
 
 	if (Sick && u.usick_type & SICK_NONVOMITABLE)
-		*(blstats[idx][BL_CONDITION].ptr.a_lptr) |= BL_MASK_ILL;
-	else *(blstats[idx][BL_CONDITION].ptr.a_lptr) &= ~BL_MASK_ILL;
+		blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_ILL;
+	else blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_ILL;
 				
-	if (Hallucination) *(blstats[idx][BL_CONDITION].ptr.a_lptr) |= BL_MASK_HALLU;
-	else *(blstats[idx][BL_CONDITION].ptr.a_lptr) &= ~BL_MASK_HALLU;
+	if (Hallucination) blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_HALLU;
+	else blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_HALLU;
 	
-	if (Stunned) *(blstats[idx][BL_CONDITION].ptr.a_lptr) |= BL_MASK_STUNNED;
-	else *(blstats[idx][BL_CONDITION].ptr.a_lptr) &= ~BL_MASK_STUNNED;
+	if (Stunned) blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STUNNED;
+	else blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_STUNNED;
 
-	if (Slimed) *(blstats[idx][BL_CONDITION].ptr.a_lptr) |= BL_MASK_SLIMED;
-	else *(blstats[idx][BL_CONDITION].ptr.a_lptr) &= ~BL_MASK_SLIMED;
+	if (Slimed) blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_SLIMED;
+	else blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_SLIMED;
 	
 	/*
 	 *  Now pass the changed values to window port.
@@ -627,81 +805,24 @@ bot()
 		    ((i == BL_HD)    && !Upolyd)	  ||
 		    ((i == BL_XP || i == BL_EXP) && Upolyd))
 			continue;
-		ptype = blstats[idx][i].ptype;
-		switch (ptype) {
-		    case P_INT:
-			    curr.a_iptr = blstats[idx][i].ptr.a_iptr;
-			    prev.a_iptr = blstats[idx_p][i].ptr.a_iptr;
-			    if (update_all || (*curr.a_iptr != *prev.a_iptr)) {
-				idxmax = blstats[idx][i].idxmax;
-				pc = (idxmax) ? percentage(*curr.a_iptr,
-				 	*(blstats[idx][idxmax].ptr.a_iptr)) : 0;
-				if (!valset[i])
-					Sprintf(blstats[idx][i].val,
-						"%d", *curr.a_iptr);
+		anytype = blstats[idx][i].anytype;
+		curr = &blstats[idx][i];
+		prev = &blstats[idx_p][i];
+		chg = 0;
+		if (update_all || (chg = compare_blstats(prev, curr)) != 0) {
+			idxmax = blstats[idx][i].idxmax;
+			pc = (idxmax) ?
+				percentage(curr, &blstats[idx][idxmax]) : 0;
+			if (!valset[i]) (void) anything_to_s(curr->val,
+							&curr->a, anytype);
+			if (anytype != ANY_MASK32) {
+				status_update(i, (genericptr_t)curr->val, chg, pc);
+			} else {
 				status_update(i,
-				    (genericptr_t)blstats[idx][i].val,
-				    (update_all || *curr.a_iptr > *prev.a_iptr) ?
-					1 : -1, pc);
-				updated = TRUE;
-			    }
-			    break;
-		    case P_LNG:
-			    curr.a_lptr = blstats[idx][i].ptr.a_lptr;
-			    prev.a_lptr = blstats[idx_p][i].ptr.a_lptr;
-			    if (update_all || (*curr.a_lptr != *prev.a_lptr)) {
-				idxmax = blstats[idx][i].idxmax;
-				pc = (idxmax) ? percentagel(*curr.a_lptr,
-					*(blstats[idx][idxmax].ptr.a_lptr)) : 0;
-				if (!valset[i])
-					Sprintf(blstats[idx][i].val,
-						"%-1ld", *curr.a_lptr);
-				status_update(i,
-				    (genericptr_t)blstats[idx][i].val,
-				    (update_all || *curr.a_lptr > *prev.a_lptr) ?
-					1 : -1, pc);
-				updated = TRUE;
-			    }
-			    break;
-		    case P_UINT:
-			    curr.a_uptr = blstats[idx][i].ptr.a_uptr;
-			    prev.a_uptr = blstats[idx_p][i].ptr.a_uptr;
-			    if (update_all || (*curr.a_uptr != *prev.a_uptr)) {
-			/*
-			 *	idxmax = blstats[idx][i].idxmax);
-			 *	pc = (idxmax) ? percentage(*curr.a_uptr,
-			 *		*(blstats[idx][idxmax].ptr.a_uptr)) : 0;
-			 *	status_via_win(i, val,
-			 *	     (*curr.a_uptr > *prev.a_uptr) ? 1 : -1, pc);
-			 */
-				if (!valset[i])
-					Sprintf(blstats[idx][i].val,
-						"%u", *curr.a_uptr);
-				status_update(i,
-				    (genericptr_t)blstats[idx][i].val,
-				     (update_all || *curr.a_uptr > *prev.a_uptr) ?
-					1 : -1, 0);
-				updated = TRUE;
-			    }
-			    break;
-		    case P_STR:
-			    if (update_all ||
-			    	strcmp(blstats[idx][i].val, blstats[idx_p][i].val)) {
-				status_update(i,
-				    (genericptr_t) blstats[idx][i].val,0,0);
-				updated = TRUE;
-			    }
-			    break;
-		    case P_MASK:
-			    curr.a_lptr = blstats[idx][i].ptr.a_lptr;
-			    prev.a_lptr = blstats[idx_p][i].ptr.a_lptr;
-			    if (update_all || (*curr.a_lptr != *prev.a_lptr)) {
-				status_update(i,
-				    /* send the actual mask, not a pointer to it */
-				    (genericptr_t)*curr.a_lptr,0,0);
-				updated = TRUE;
-			    }
-			    break;
+				    /* send actual mask, not a pointer to it */
+				    (genericptr_t) curr->a.a_ulong, chg, 0);
+			}
+			updated = TRUE;
 		}
 	}
 	/*
@@ -723,6 +844,502 @@ bot()
 }
 
 /*****************************************************************************/
+/* Core status hiliting support                                              */
+/*****************************************************************************/
+
+#ifdef STATUS_HILITES
+
+struct hilite_s {
+	boolean set;
+	anything threshold;
+	int behavior;
+	int coloridx[2];
+};
+
+struct hilite_s status_hilites[MAXBLSTATS];
+
+/*
+ * This is the parser for the hilite options
+ * Example:
+ *    OPTION=hilite_status: hitpoints/10%/red/normal
+ *
+ * set_hilite_status() separates each hilite entry into its 4 component
+ * strings, then calls assign_hilite() to make the adjustments.
+ */
+boolean
+set_status_hilites(op)
+char *op;
+{
+	char hsbuf[4][QBUFSZ];
+	boolean rslt, badopt = FALSE;
+	int fldnum, num =0, ccount = 0;
+	char c;
+
+	num = fldnum = 0;
+	hsbuf[0][0] = hsbuf[1][0] = hsbuf[2][0] = hsbuf[3][0] = '\0';
+	while (*op && fldnum < 4 && ccount < (QBUFSZ - 2)) {
+		c = lowc(*op);
+		if (c == ' ') {
+			if (fldnum >= 2) {
+				rslt = assign_hilite(&hsbuf[0][0],
+						     &hsbuf[1][0],
+					             &hsbuf[2][0],
+					             &hsbuf[3][0]);
+				if (!rslt) {
+					badopt = TRUE;
+					break;
+				}
+			}
+			hsbuf[0][0] = hsbuf[1][0] = '\0';
+			hsbuf[2][0] = hsbuf[3][0] = '\0';
+			fldnum = 0;
+			ccount = 0;
+		} else if (c == '/') {
+			fldnum++;
+			ccount = 0;
+		} else {
+			hsbuf[fldnum][ccount++] = c;
+			hsbuf[fldnum][ccount] = '\0';
+		}
+		op++;
+	}
+	if (fldnum >= 2 && !badopt) {
+		rslt = assign_hilite(&hsbuf[0][0],
+				     &hsbuf[1][0],
+			             &hsbuf[2][0],
+			             &hsbuf[3][0]);
+		if (!rslt) badopt = TRUE;
+	}
+	if (badopt) return FALSE;
+	return TRUE;
+}
+
+void
+clear_status_hilites()
+{
+	int i;
+	anything it;
+	it.a_void = 0;
+	for (i = 0; i < MAXBLSTATS; ++i) {
+		(void) memset((genericptr_t)&status_hilites[i],
+				0, sizeof(struct hilite_s));
+		/* notify window port */
+		status_threshold(i, blstats[0][i].anytype,it,0,0,0);
+	}
+}
+
+STATIC_OVL boolean
+assign_hilite(a,b,c,d)
+char *a, *b, *c, *d;
+{
+	char *tmp, *how;
+	int i, dt, idx = -1;
+	int coloridx[2] = {-1, -1};
+	boolean inverse[2] = {FALSE, FALSE};
+	boolean bold[2]	   = {FALSE, FALSE};
+	boolean normal[2]  = {0,0};
+	boolean percentage = FALSE, down_up = FALSE, changed = FALSE;
+	anything threshold;
+
+	threshold.a_void = 0;
+
+	/* Example:
+	 * 	hilite_status: hitpoints/10%/red/normal
+	 */
+
+	/* field name to idx */
+	for (i = 0; a && i < MAXBLSTATS; ++i) {
+		if (strcmpi(a,status_fieldnames[i]) == 0) {
+			idx = i;
+			break;
+		}
+	}
+	if (idx == -1) return FALSE;
+	status_hilites[idx].set = FALSE;	/* mark it "unset" */
+
+	/* threshold */
+	if (!b) return FALSE;
+	if ((strcmpi(b, "updown") == 0) || (strcmpi(b, "downup") == 0) ||
+	    (strcmpi(b, "up") == 0)     || (strcmpi(b, "down") == 0)) {
+	    	down_up = TRUE;
+	} else if ((strcmpi(b, "changed") == 0) &&
+		 (idx == BL_TITLE     || idx == BL_ALIGN ||
+		  idx == BL_LEVELDESC || idx == BL_CONDITION)) {
+		changed = TRUE;		/* changed is only thing allowed */
+	} else {
+		tmp = b;
+		while (*tmp) {
+			if (*tmp == '%') {
+				*tmp = '\0';
+				percentage = TRUE;
+				break;
+			} else if (!index("0123456789", *tmp))
+				return FALSE;
+			tmp++;
+		}
+		if (strlen(b) > 0) {
+			dt = blstats[0][idx].anytype;
+			if (percentage) dt = ANY_INT;
+			(void) s_to_anything(&threshold, b, dt);
+		} else return FALSE;
+		if (percentage &&
+			(threshold.a_int < 1 || threshold.a_int > 100))
+				return FALSE;
+		if (!threshold.a_void && (strcmp(b, "0") != 0)) return FALSE;
+	}
+
+	/* actions */
+	for (i = 0; i < 2; ++i) {
+	    if (!i) how = c;
+	    else how = d;
+	    if (!how) {
+	    	if (!i) return FALSE;
+	    	else break;		/* c is mandatory; d is not */
+	    }
+
+	    if (strcmpi(how, "bold") == 0) {
+	    	bold[i] = TRUE;
+	    } else if (strcmpi(how, "inverse") == 0) {
+	    	inverse[i] = TRUE;
+	    } else if (strcmpi(how, "normal") == 0) {
+	    	normal[i] = TRUE;
+	    } else {
+		int k;
+		char colorname[BUFSZ];
+		for (k = 0; k < CLR_MAX; ++k) {
+			/* we have to make a copy to change space to dash */
+			(void) strcpy(colorname, c_obj_colors[k]);
+			for(tmp = index(colorname,' ');
+			    tmp; tmp = index(colorname, ' '))
+				*tmp = '-';
+			if (strcmpi(how, colorname) == 0) {
+				coloridx[i] = k;
+				break;
+			}
+	        }
+	        if (k >= CLR_MAX) return FALSE;
+	    }
+	}
+
+	/* Assign the values */
+
+	for (i = 0; i < 2; ++i) {
+	    if (inverse[i]) status_hilites[idx].coloridx[i] = BL_HILITE_INVERSE;
+	    else if (bold[i])   status_hilites[idx].coloridx[i] = BL_HILITE_BOLD;
+	    else if (coloridx[i]) status_hilites[idx].coloridx[i] = coloridx[i];
+	    else status_hilites[idx].coloridx[i] = BL_HILITE_NONE;
+	}
+
+	if (percentage)
+		status_hilites[idx].behavior = BL_TH_VAL_PERCENTAGE;
+	else if (down_up)
+		status_hilites[idx].behavior = BL_TH_UPDOWN;
+	else if (threshold.a_void)
+		status_hilites[idx].behavior = BL_TH_VAL_ABSOLUTE;
+	else
+		status_hilites[idx].behavior = BL_TH_NONE;
+
+	if (status_hilites[idx].behavior != BL_TH_NONE) {
+		status_hilites[idx].threshold = threshold;
+		status_hilites[idx].set = TRUE;
+	}
+
+	/* Now finally, we notify the window port */
+	status_threshold(idx, dt, threshold,
+			status_hilites[idx].behavior,
+			status_hilites[idx].coloridx[0],
+			status_hilites[idx].coloridx[1]);
+	return TRUE;
+}
+/*
+ * get_status_hilites
+ *
+ * Returns a string containing all the status hilites in the
+ * same format that is used to specify a status hilite preference
+ * in the config file.  
+ */
+char *
+get_status_hilites(buf, bufsiz)
+char *buf;
+int bufsiz;
+{
+	int i, j, k, coloridx;
+	const char *text = (char *)0;
+	char tmp[BUFSZ], colorname[BUFSZ];
+	boolean val_percentage, val_absolute, up_down;
+	boolean added_one = FALSE;
+
+	if (!buf) return (char *)0;
+	*buf = '\0';
+
+	bufsiz--;	/* required trailing null */
+	for (i = 0; i < MAXBLSTATS; ++i) {
+		val_percentage = val_absolute = up_down = FALSE;
+		if (status_hilites[i].set) {
+			if (!added_one)
+				added_one = TRUE;
+			else {
+				Strcat(buf, " ");
+				bufsiz--;
+			}
+			k = strlen(status_fieldnames[i]);
+			if (k < bufsiz) {
+				Strcat(buf,status_fieldnames[i]);
+				bufsiz -= k;
+			}
+			if (bufsiz > 1) {
+				Strcat(buf, "/");
+				bufsiz--;
+			}
+			if (status_hilites[i].behavior == BL_TH_VAL_PERCENTAGE) {
+				val_percentage = TRUE;
+			} else if (status_hilites[i].behavior ==
+							BL_TH_VAL_ABSOLUTE) {
+				val_absolute = TRUE;
+			} else if (status_hilites[i].behavior == BL_TH_UPDOWN) {
+				up_down = TRUE;
+				text = "updown";
+			}
+
+			anything_to_s(tmp, &status_hilites[i].threshold,
+					blstats[0][i].anytype);
+			text = tmp;
+			k = strlen(text);
+			if (k < (bufsiz - 1)) {
+				Strcat(buf, text);
+				if (val_percentage) Strcat(buf, "%"), k++;
+				bufsiz -= k;
+			}
+			for (j = 0; j < 2; ++j) {
+				if (bufsiz > 1) {
+				    Strcat(buf, "/");
+				    bufsiz--;
+				}
+				coloridx = status_hilites[i].coloridx[j];
+				if (coloridx < 0) {
+				    if (coloridx == BL_HILITE_BOLD)
+						text = "bold";
+				    else if (coloridx == BL_HILITE_INVERSE)
+						text = "inverse";
+				    else 
+						text = "normal";
+				} else {
+				    char *blank;
+				    (void) strcpy(colorname, c_obj_colors[coloridx]);
+				    for(blank = index(colorname,' ');
+			    			blank; blank = index(colorname, ' '))
+					*blank = '-';
+				    text = colorname;
+				}
+				k = strlen(text);
+				if (k < bufsiz) {
+					Strcat(buf, text); 
+					bufsiz -= k;
+				}
+			}
+		}
+	}
+	return buf;
+}
+
+STATIC_OVL char *
+clridx_to_s(buf, idx)
+char *buf;
+int idx;
+{
+	char *a[] = {"bold", "inverse", "normal"};
+
+	if (buf) {
+		buf[0] = '\0';
+		if (idx < 0 && idx >= BL_HILITE_BOLD)
+			Strcpy(buf, a[idx + 3]);
+		else if (idx >= 0 && idx < CLR_MAX)
+			Strcpy(buf, c_obj_colors[idx]);
+	}
+	return buf;
+}
+
+STATIC_OVL int
+de_pointer_type(anytype)
+int anytype;
+{
+	int dt = anytype;
+	if (anytype == ANY_IPTR)	dt = ANY_INT;
+	else if (anytype == ANY_LPTR)	dt = ANY_LONG;
+	else if (anytype == ANY_UPTR)	dt = ANY_UINT;
+	else if (anytype == ANY_ULPTR)	dt = ANY_ULONG;
+	return dt;
+}
+
+boolean
+status_hilite_menu()
+{
+	int i, j, k, pick_cnt, pick_idx, opt_idx;
+	menu_item *statfield_picks = (menu_item *)0;
+	const char *fieldname;
+	int field_picks[MAXBLSTATS], res;
+	struct hilite_s hltemp[MAXBLSTATS];
+	char buf[BUFSZ], thresholdbuf[BUFSZ], below[BUFSZ], above[BUFSZ];
+	winid tmpwin;
+	anything any;
+
+        tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	for (i = 0; i < MAXBLSTATS; i++) {
+		(void) memset(&hltemp[i], 0, sizeof(struct hilite_s));
+		fieldname = status_fieldnames[i];
+		any.a_int = i + 1;
+		add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+			 ATR_NONE, fieldname, MENU_UNSELECTED);
+		field_picks[i] = 0;
+        }
+	end_menu(tmpwin, "Change hilite on which status field(s):");
+	if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &statfield_picks)) > 0) {
+	    for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+		opt_idx = statfield_picks[pick_idx].item.a_int - 1;
+		field_picks[opt_idx] = 1;
+	    }
+	    free((genericptr_t)statfield_picks);
+	    statfield_picks = (menu_item *)0;
+	}
+	destroy_nhwindow(tmpwin);
+	if (pick_cnt < 0) return FALSE;
+
+	for (i = 0; i < MAXBLSTATS; i++) {
+	    if (field_picks[i]) {
+		menu_item *pick = (menu_item *)0;
+		Sprintf(buf, "Threshold behavior options for %s:",
+			status_fieldnames[i]);
+	        tmpwin = create_nhwindow(NHW_MENU);
+		start_menu(tmpwin);
+		if (i == BL_CONDITION) {
+			any.a_void = 0;
+			any.a_int = BL_TH_CONDITION + 1;
+			add_menu(tmpwin, NO_GLYPH, &any, 'c', 0,
+				ATR_NONE, "Condition bitmask threshold.",
+				MENU_UNSELECTED);
+		}
+		any.a_void = 0;
+		any.a_int = BL_TH_NONE + 1;
+		add_menu(tmpwin, NO_GLYPH, &any, 'n', 0,
+			ATR_NONE,"None", MENU_UNSELECTED);
+ 	    	if (i != BL_CONDITION) {
+			if (blstats[0][i].idxmax > 0) {
+				any.a_void = 0;
+				any.a_int = BL_TH_VAL_PERCENTAGE + 1;
+				add_menu(tmpwin, NO_GLYPH, &any, 'p', 0,
+					ATR_NONE, "Percentage threshold.",
+					MENU_UNSELECTED);
+			}
+			any.a_void = 0;
+			any.a_int = BL_TH_UPDOWN + 1;
+			add_menu(tmpwin, NO_GLYPH, &any, 'u', 0,
+				ATR_NONE, "UpDown threshold.",
+				MENU_UNSELECTED);
+			any.a_void = 0;
+			any.a_int = BL_TH_VAL_ABSOLUTE + 1;
+			add_menu(tmpwin, NO_GLYPH, &any, 'v', 0,
+				ATR_NONE,"Value threshold.",
+				MENU_UNSELECTED);
+		}
+		end_menu(tmpwin, buf);
+		if ((res=select_menu(tmpwin, PICK_ONE, &pick)) > 0) {
+			hltemp[i].behavior = pick->item.a_int - 1;
+			free((genericptr_t)pick);
+		}
+		destroy_nhwindow(tmpwin);
+		if (res < 0) return FALSE;
+
+		if (hltemp[i].behavior == BL_TH_UPDOWN) {
+			Sprintf(below, "%s decreases",
+				status_fieldnames[i]);
+			Sprintf(above, "%s increases",
+				status_fieldnames[i]);
+		} else if (hltemp[i].behavior) {
+			/* Have them enter the threshold*/
+			Sprintf(buf, "Set %s threshold to what%s?",
+				status_fieldnames[i],
+				(hltemp[i].behavior == BL_TH_VAL_PERCENTAGE) ?
+				" percentage" :
+				(hltemp[i].behavior == BL_TH_CONDITION) ?
+				" mask" : "");
+			getlin(buf, thresholdbuf);
+			if (thresholdbuf[0] == '\033') return FALSE;
+			(void) s_to_anything(&hltemp[i].threshold,
+						thresholdbuf,
+						blstats[0][i].anytype);
+			if (!hltemp[i].threshold.a_void) return FALSE;
+
+			Sprintf(below, "%s falls below %s%s",
+				status_fieldnames[i],
+				thresholdbuf,
+				(hltemp[i].behavior == BL_TH_VAL_PERCENTAGE) ?
+					"%" : "");
+			Sprintf(above, "%s rises above %s%s",
+				status_fieldnames[i],
+				thresholdbuf,
+				(hltemp[i].behavior == BL_TH_VAL_PERCENTAGE) ?
+					"%" : "");
+		}
+		for (j = 0; j < 2 && (hltemp[i].behavior != BL_TH_NONE); ++j) {
+		    char prompt[QBUFSZ];
+		    /* j == 0 below, j == 1 above */
+		    menu_item *pick = (menu_item *)0;
+		    Sprintf(prompt, "Display how when %s?",
+				j ? above : below);
+	            tmpwin = create_nhwindow(NHW_MENU);
+		    start_menu(tmpwin);
+		    for (k = -3; k < CLR_MAX; ++k) {
+/*		    	if (k == -1) continue; */
+			any.a_void = 0;
+			any.a_int = (k >= 0) ? k + 1 : k;
+			if (k > 0) add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+						ATR_NONE, c_obj_colors[k],
+						MENU_UNSELECTED);
+			else if (k == -1) add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+						ATR_NONE,"normal",
+						MENU_UNSELECTED);
+			else if (k == -2) add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+						ATR_NONE,"inverse",
+						MENU_UNSELECTED);
+			else if (k == -3) add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+						ATR_NONE,"bold",
+						MENU_UNSELECTED);
+		    }
+		    end_menu(tmpwin, prompt);
+		    if ((res = select_menu(tmpwin, PICK_ONE, &pick)) > 0) {
+			hltemp[i].coloridx[j] = (pick->item.a_char > 0) ?
+						pick->item.a_int - 1 :
+						pick->item.a_int;
+			free((genericptr_t)pick);
+		    }
+		    destroy_nhwindow(tmpwin);
+		    if (res < 0) return FALSE;
+		}
+	    }
+	}
+	buf[0] = '\0';
+	for (i = 0; i < MAXBLSTATS; i++) {
+	    if (field_picks[i]) {
+	    	Sprintf(eos(buf), "%s/%s%s/",
+	    		status_fieldnames[i],
+			(hltemp[i].behavior == BL_TH_UPDOWN) ?  "updown" :
+			anything_to_s(thresholdbuf,
+					&hltemp[i].threshold,
+					blstats[0][i].anytype),
+			(hltemp[i].behavior == BL_TH_VAL_PERCENTAGE) ? "%" : "");
+		/* borrow thresholdbuf for use with these last two */
+	    	Sprintf(eos(buf), "%s/",
+			clridx_to_s(thresholdbuf, hltemp[i].coloridx[0]));
+	    	Sprintf(eos(buf), "%s ",
+			clridx_to_s(thresholdbuf, hltemp[i].coloridx[1]));
+	    }
+	}
+	return set_status_hilites(buf);
+}
+#endif /*STATUS_HILITES*/
+
+/*****************************************************************************/
 /* genl backward compat stuff - probably doesn't belong in botl.c any longer */
 /*****************************************************************************/
 
@@ -730,6 +1347,7 @@ const char *fieldnm[MAXBLSTATS];
 const char *fieldfmt[MAXBLSTATS];
 char *vals[MAXBLSTATS];
 boolean activefields[MAXBLSTATS];
+struct hilite_s hilites[MAXBLSTATS];
 NEARDATA winid WIN_STATUS;
 
 void
@@ -770,6 +1388,15 @@ boolean enable;
 	fieldfmt[fieldidx] = fmt;
 	fieldnm[fieldidx] = nm;
 	activefields[fieldidx] = enable;
+}
+
+void
+genl_status_threshold(fldidx, thresholdtype, threshold, behavior, under, over)
+int fldidx,thresholdtype;
+int behavior, under, over;
+anything threshold;
+{
+	
 }
 
 void
@@ -831,6 +1458,7 @@ genericptr_t ptr;
 	curs(WIN_STATUS, 1, 1);
 	putstr(WIN_STATUS, 0, newbot2);
 }
+
 #endif /*STATUS_VIA_WINDOWPORT*/
 
 /*botl.c*/

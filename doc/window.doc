@@ -386,6 +386,43 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
 status_finish() -- called when it is time for the window port to tear down
 		   the status display and free allocated memory, etc.
 
+status_threshold(int fldidx, int threshholdtype, anything threshold, 
+					int behavior, int under, int over)
+		-- called when a hiliting preference is added, changed, or
+		   removed.
+		-- the fldindex identifies which field is having its hiliting
+		   preference set. It is an integer index value from botl.h
+		-- fldindex could be any one of the following from botl.h:
+		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
+		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
+		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+		   BL_LEVELDESC, BL_EXP, BL_CONDITION
+		-- datatype is P_INT, P_UINT, P_LONG, or P_MASK.
+		-- threshold is an "anything" union which can contain the 
+		   datatype value.
+		-- behavior is used to define how threshold is used and can
+		   be BL_TH_NONE, BL_TH_VAL_PERCENTAGE, BL_TH_VAL_ABSOLUTE,
+		   or BL_TH_UPDOWN. BL_TH_NONE means don't do anything above
+		   or below the threshold.  BL_TH_VAL_PERCENTAGE treats the
+		   threshold value as a precentage of the maximum possible
+		   value. BL_TH_VAL_ABSOLUTE means that the threshold is an
+		   actual value. BL_TH_UPDOWN means that threshold is not
+		   used, and the two below/above hilite values indicate how
+		   to display something going down (under) or rising (over).		    
+		-- under is the hilite attribute used if value is below the 
+		   threshold. The attribute can be BL_HILITE_NONE, 
+		   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
+		   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
+		   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
+		   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
+		   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
+		-- over is the hilite attribute used if value is at or above 
+		   the threshold. The attribute can be BL_HILITE_NONE, 
+		   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
+		   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
+		   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
+		   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
+		   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
 
 E.  Misc. Routines
 
