@@ -226,7 +226,13 @@ castmu(mtmp, mattk, thinks_it_foundyou, foundyou)
 	    return(0);
 	}
 	pline("%s casts a spell%s!", Monnam(mtmp),
-	    is_undirected_spell(mattk->adtyp, spellnum) ? "" : " at you");
+	    is_undirected_spell(mattk->adtyp, spellnum) ? "" :
+	    (Invisible && !perceives(mtmp->data) && 
+		    (mtmp->mux != u.ux || mtmp->muy != u.uy)) ?
+		" at a spot near you" :
+	    (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy)) ?
+		" at your displaced image" :
+		" at you");
 
 /*
  *	As these are spells, the damage is related to the level
@@ -337,12 +343,29 @@ int spellnum;
 	}
 	/* else FALLTHRU */
     case MGC_SUMMON_MONS:		/* also aggravates */
+    {
+	int count;
+
+	count = nasty(mtmp);	/* summon something nasty */
 	if (mtmp->iswiz)
-	    verbalize("Destroy the thief, my pets!");
-	else
-	    pline("A monster appears!");
-	nasty(mtmp);	/* summon something nasty */
-	/* FALLTHRU */
+	    verbalize("Destroy the thief, my pet%s!", plur(count));
+	else {
+	    const char *mappear =
+		(count == 1) ? "A monster appears" : "Monsters appear";
+
+	    /* messages not quite right if plural monsters created but
+	       only a single monster is seen */
+	    if (Invisible && !perceives(mtmp->data) &&
+				    (mtmp->mux != u.ux || mtmp->muy != u.uy))
+		pline("%s around a spot near you!", mappear);
+	    else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
+		pline("%s around your displaced image!", mappear);
+	    else
+		pline("%s from nowhere!", mappear);
+	}
+	dmg = 0;
+	break;
+    }
     case MGC_AGGRAVATION:
 	You_feel("that monsters are aware of your presence.");
 	aggravate();
@@ -502,31 +525,45 @@ int spellnum;
 	/* Try for insects, and if there are none
 	   left, go for (sticks to) snakes.  -3. */
 	struct permonst *pm = mkclass(S_ANT,0);
-	struct monst *mtmp2;
+	struct monst *mtmp2 = (struct monst *)0;
 	char let = (pm ? S_ANT : S_SNAKE);
 	boolean success;
 	int i;
+	coord bypos;
 
 	success = pm ? TRUE : FALSE;
 	for (i = 0; i <= (int) mtmp->m_lev; i++) {
-	   if ((pm = mkclass(let,0)) != 0 &&
-		    (mtmp2 = makemon(pm, u.ux, u.uy, NO_MM_FLAGS)) != 0) {
+	    if (!enexto(&bypos, mtmp->mux, mtmp->muy, mtmp->data))
+		break;
+	    if ((pm = mkclass(let,0)) != 0 &&
+		    (mtmp2 = makemon(pm, bypos.x, bypos.y, NO_MM_FLAGS)) != 0) {
 		success = TRUE;
 		mtmp2->msleeping = mtmp2->mpeaceful = mtmp2->mtame = 0;
 		set_malign(mtmp2);
 	    }
 	}
-	if (canseemon(mtmp)) {
-	    /* wrong--should check if you can see the insects/snakes */
-	    if (!success)
-		pline("%s casts at a clump of sticks, but nothing happens.",
-		    Monnam(mtmp));
-	    else if (let == S_SNAKE)
-		pline("%s transforms a clump of sticks into snakes!",
-		    Monnam(mtmp));
-	    else
-		pline("%s summons insects!", Monnam(mtmp));
-	}
+	/* Not quite right:
+         * -- message doesn't always make sense for unseen caster (particularly
+	 *    the first message)
+         * -- message assumes plural monsters summoned (non-plural should be
+         *    very rare, unlike in nasty())
+         * -- message assumes plural monsters seen
+         */
+	if (!success)
+	    pline("%s casts at a clump of sticks, but nothing happens.",
+		Monnam(mtmp));
+	else if (let == S_SNAKE)
+	    pline("%s transforms a clump of sticks into snakes!",
+		Monnam(mtmp));
+	else if (Invisible && !perceives(mtmp->data) &&
+				(mtmp->mux != u.ux || mtmp->muy != u.uy))
+	    pline("%s summons insects around a spot near you!",
+		Monnam(mtmp));
+	else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
+	    pline("%s summons insects around your displaced image!",
+		Monnam(mtmp));
+	else
+	    pline("%s summons insects!", Monnam(mtmp));
 	dmg = 0;
 	break;
       }
@@ -563,9 +600,15 @@ int spellnum;
 	    shieldeff(u.ux, u.uy);
 	    You_feel("momentarily dizzy.");
 	} else {
+	    boolean oldprop = Confusion;
+
 	    dmg = (int)mtmp->m_lev;
 	    if (Half_spell_damage) dmg = (dmg + 1) / 2;
 	    make_confused(HConfusion + dmg, TRUE);
+	    if (Hallucination)
+		You_feel("%s!", oldprop ? "trippier" : "trippy");
+	    else
+		You_feel("%sconfused!", oldprop ? "more " : "");
 	}
 	dmg = 0;
 	break;
@@ -633,7 +676,9 @@ int spellnum;
     return FALSE;
 }
 
-/* Some undirected spells are useless under some circumstances */
+/* Some undirected spells are useless under some circumstances. */
+/* This isn't called when the monster is deliberately casting at you; we
+   handle that using fallthroughs. */
 STATIC_DCL
 boolean
 spell_would_be_useless(mtmp, adtyp, spellnum)
@@ -641,6 +686,14 @@ struct monst *mtmp;
 int spellnum;
 int adtyp;
 {
+    /* Some spells don't require the player to really be there and can be cast
+     * by the monster when you're invisible, yet still shouldn't be cast when
+     * the monster doesn't even think you're there.
+     * This check isn't quite right because it always uses your real position.
+     * We really want something like "if the monster could see mux, muy".
+     */
+    boolean couldsee = couldsee(mtmp->mx, mtmp->my);
+
     if (adtyp == AD_SPEL) {
 	/* aggravate monsters, etc. won't be cast by peaceful monsters */
 	if (mtmp->mpeaceful && (spellnum == MGC_AGGRAVATION ||
@@ -661,12 +714,19 @@ int adtyp;
 	/* healing when already healed */
 	if (mtmp->mhp == mtmp->mhpmax && spellnum == MGC_CURE_SELF)
 	    return TRUE;
+	/* don't summon monsters if it doesn't think you're around */
+	if (!couldsee && (spellnum == MGC_SUMMON_MONS ||
+		(!mtmp->iswiz && spellnum == MGC_CLONE_WIZ)))
+	    return TRUE;
     } else if (adtyp == AD_CLRC) {
 	/* summon insects/sticks to snakes won't be cast by peaceful monsters */
 	if (mtmp->mpeaceful && spellnum == CLC_INSECTS)
 	    return TRUE;
 	/* healing when already healed */
 	if (mtmp->mhp == mtmp->mhpmax && spellnum == CLC_CURE_SELF)
+	    return TRUE;
+	/* don't summon insects if it doesn't think you're around */
+	if (!couldsee && spellnum == CLC_INSECTS)
 	    return TRUE;
     }
     return FALSE;

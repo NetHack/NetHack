@@ -410,33 +410,44 @@ pick_nasty()
 
 /* create some nasty monsters, aligned or neutral with the caster */
 /* a null caster defaults to a chaotic caster (e.g. the wizard) */
-void
+int
 nasty(mcast)
 	struct monst *mcast;
 {
     register struct monst	*mtmp;
     register int	i, j, tmp;
     int castalign = (mcast ? mcast->data->maligntyp : -1);
+    coord bypos;
+    int count=0;
 
-    if(!rn2(10) && Inhell) msummon(&mons[PM_WIZARD_OF_YENDOR]);
-    else {
+    if(!rn2(10) && Inhell) {
+	msummon(&mons[PM_WIZARD_OF_YENDOR]);
+	count++;
+    } else {
 	tmp = (u.ulevel > 3) ? u.ulevel/3 : 1; /* just in case -- rph */
-
+	/* if we don't have a casting monster, the nasties appear around you */
+	bypos.x = u.ux;
+	bypos.y = u.uy;
 	for(i = rnd(tmp); i > 0; --i)
 	    for(j=0; j<20; j++) {
+		if (mcast &&
+			!enexto(&bypos, mcast->mux, mcast->muy, mcast->data))
+		    continue;
 		if ((mtmp = makemon(&mons[pick_nasty()],
-				    u.ux, u.uy, NO_MM_FLAGS)) != 0) {
+				    bypos.x, bypos.y, NO_MM_FLAGS)) != 0) {
 		    mtmp->msleeping = mtmp->mpeaceful = mtmp->mtame = 0;
 		    set_malign(mtmp);
 		} else /* GENOD? */
 		    mtmp = makemon((struct permonst *)0,
-					u.ux, u.uy, NO_MM_FLAGS);
+					bypos.x, bypos.y, NO_MM_FLAGS);
 		if(mtmp && (mtmp->data->maligntyp == 0 ||
-		            sgn(mtmp->data->maligntyp) == sgn(castalign)) )
+		            sgn(mtmp->data->maligntyp) == sgn(castalign)) ) {
+		    count++;
 		    break;
+		}
 	    }
     }
-    return;
+    return count;
 }
 
 /*	Let's resurrect the wizard, for some unexpected fun.	*/
@@ -506,7 +517,7 @@ intervene()
 			break;
 	    case 3:	aggravate();
 			break;
-	    case 4:	nasty((struct monst *)0);
+	    case 4:	(void)nasty((struct monst *)0);
 			break;
 	    case 5:	resurrect();
 			break;
