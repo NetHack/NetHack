@@ -73,7 +73,6 @@
  */
 
 
-#ifdef OVLB
 void
 get_scr_size()
 {
@@ -84,7 +83,6 @@ get_scr_size()
 #  endif
 		txt_get_scr_size();
 }
-#endif /*OVLB*/
 
 /*
  * --------------------------------------------------------------
@@ -122,7 +120,6 @@ void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
 STATIC_DCL void NDECL(init_ttycolor);
 
-# ifdef OVLB
 int savevmode;		  /* store the original video mode in here */
 int curcol,currow;	  /* graphics mode current cursor locations */
 int g_attribute;	  /* Current attribute to use */
@@ -136,23 +133,7 @@ boolean inmap = FALSE;	  /* in the map window */
 #  ifdef TEXTCOLOR
 char ttycolors[CLR_MAX];	/* also used/set in options.c */
 #  endif /* TEXTCOLOR */
-# else
-extern int savevmode;
-extern int curcol,currow;
-extern int g_attribute;
-extern int monoflag;
-extern int attrib_text_normal;
-extern int attrib_gr_normal;
-extern int attrib_text_intense;
-extern int attrib_gr_intense;
-extern boolean traditonal;
-extern boolean inmap;
-#  ifdef TEXTCOLOR
-extern char ttycolors[CLR_MAX];	/* also used/set in options.c */
-#  endif /* TEXTCOLOR */
-# endif /* OVLB */
 
-# ifdef OVLB
 void
 backsp()
 {
@@ -164,9 +145,7 @@ backsp()
 #  endif
 	}
 }
-# endif /* OVLB */
 
-# ifdef OVL0
 void
 clear_screen()
 {
@@ -227,9 +206,7 @@ register int col, row;
 #  endif
 	}
 }
-# endif /* OVL0 */
 
-# ifdef OVLB
 int
 has_color(int color)
 {
@@ -240,9 +217,7 @@ has_color(int color)
 	return 0;
 #  endif
 }
-# endif /* OVLB */
 
-# ifdef OVL0
 void
 home()
 {
@@ -283,10 +258,7 @@ standoutend()
 	g_attribute = iflags.grmode ? attrib_gr_normal
 				   : attrib_text_normal;
 }
-# endif /* OVL0 */
 
-
-# ifdef OVLB
 void
 term_end_attr(int attr)
 {
@@ -378,9 +350,7 @@ term_start_raw_bold(void)
 {
     standoutbeg();
 }
-# endif /* OVLB */
 
-# ifdef OVL0
 void
 tty_delay_output()
 {
@@ -393,9 +363,6 @@ tty_delay_output()
 #endif
 }
 
-# endif /* OVL0 */
-
-# ifdef OVLB
 void
 tty_end_screen()
 {
@@ -514,8 +481,6 @@ gr_finish()
 	}
 }
 
-# endif /* OVLB */
-
 /*
  * Screen output routines (these are heavily used).
  *
@@ -546,7 +511,6 @@ gr_finish()
  *	   (that include wintty.h) are actually using these routines.
  */
 
-# ifdef OVL0
 void
 xputs(s)
 const char *s;
@@ -659,7 +623,6 @@ HideCursor()
 }
 
 #  endif /* SIMULATE_CURSOR */
-# endif /* OVL0 */
 
 # ifdef TEXTCOLOR
 /*
@@ -688,21 +651,12 @@ HideCursor()
 /* assign_videocolors() is prototyped in extern.h */
 /* assign_video()	is prototyped in extern.h */
 
-#   ifdef OVLB
 int shadeflag;					/* shades are initialized */
 int colorflag;					/* colors are initialized */
 char *schoice[3] = {"dark","normal","light"};
 char *shade[3];
-#   else
-extern int shadeflag;
-extern int colorflag;
-extern char *schoice[3];
-extern char *shade[3];
-#   endif /* OVLB */
-
 #  endif /* VIDEOSHADES */
 
-#  ifdef OVLB
 STATIC_OVL void
 init_ttycolor()
 {
@@ -741,9 +695,7 @@ init_ttycolor()
 	}
 #   endif
 }
-#  endif /* OVLB */
 
-#  ifdef OVL1
 	static int FDECL(convert_uchars,(char *, uchar *, int));
 #   ifdef VIDEOSHADES
 int assign_videoshades(char *choiceptr)
@@ -872,7 +824,6 @@ convert_uchars(bufp,list,size)
 }
 
 #   endif /* VIDEOSHADES */
-#  endif /* OVL1 */
 # endif /* TEXTCOLOR */
 
 /*
@@ -884,7 +835,6 @@ convert_uchars(bufp,list,size)
  *    default	 (force use of the default video method for environment)
  *    vga	 (use vga adapter code)
  */
-# ifdef OVL1
 int
 assign_video(sopt)
 char *sopt;
@@ -948,8 +898,6 @@ char *sopt;
 	}
 	return 1;
 }
-# endif /* OVL1 */
-# ifdef OVL0
 
 void tileview(enable)
 boolean enable;
@@ -958,12 +906,15 @@ boolean enable;
 	if (iflags.grmode) vga_traditional(enable ? FALSE : TRUE);
 #endif
 }
-# endif /* OVL0 */
 #endif /* NO_TERMS  */
+
 #else	/* STUBVIDEO */
+
 void tileview(enable)
 boolean enable;
 {
 }
 #endif /* STUBVIDEO */
+
+/*video.c*/
 

@@ -23,22 +23,18 @@ static char * FDECL(e_atr2str, (int));
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
 #if defined(TEXTCOLOR) && defined(TERMLIB)
-# ifdef OVLB
-#  if !defined(UNIX) || !defined(TERMINFO)
-#   ifndef TOS
+# if !defined(UNIX) || !defined(TERMINFO)
+#  ifndef TOS
 static void FDECL(analyze_seq, (char *, int *, int *));
-#   endif
 #  endif
+# endif
 static void NDECL(init_hilite);
 static void NDECL(kill_hilite);
-# endif /* OVLB */
 #endif
 
-#ifdef OVLB
 	/* (see tcap.h) -- nh_CM, nh_ND, nh_CD, nh_HI,nh_HE, nh_US,nh_UE,
 				ul_hack */
 struct tc_lcl_data tc_lcl_data = { 0, 0, 0, 0,0, 0,0, FALSE };
-#endif /* OVLB */
 
 STATIC_VAR char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
 STATIC_VAR char *VS, *VE;
@@ -48,18 +44,15 @@ STATIC_VAR char *MR;
 STATIC_VAR char *MB, *MH;
 STATIC_VAR char *MD;     /* may already be in use below */
 #endif
+
 #ifdef TERMLIB
 # ifdef TEXTCOLOR
 STATIC_VAR char *MD;
 # endif
 STATIC_VAR int SG;
-#ifdef OVLB
 STATIC_OVL char PC = '\0';
-#else /* OVLB */
-STATIC_DCL char PC;
-#endif /* OVLB */
 STATIC_VAR char tbuf[512];
-#endif
+#endif /*TERMLIB*/
 
 #ifdef TEXTCOLOR
 # ifdef TOS
@@ -69,10 +62,8 @@ char NEARDATA *hilites[CLR_MAX]; /* terminal escapes for the various colors */
 # endif
 #endif
 
-#ifdef OVLB
 static char *KS = (char *)0, *KE = (char *)0;	/* keypad sequences */
 static char nullstr[] = "";
-#endif /* OVLB */
 
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
 extern boolean HE_resets_AS;
@@ -86,8 +77,6 @@ STATIC_VAR char tgotobuf[20];
 #define tgoto(fmt, x, y)	(Sprintf(tgotobuf, fmt, y+1, x+1), tgotobuf)
 # endif
 #endif /* TERMLIB */
-
-#ifdef OVLB
 
 void
 tty_startup(wid, hgt)
@@ -489,10 +478,7 @@ tty_end_screen()
 
 /* Cursor movements */
 
-#endif /* OVLB */
-
-#ifdef OVL0
-/* Note to OVLx tinkerers.  The placement of this overlay controls the location
+/* Note to overlay tinkerers.  The placement of this overlay controls the location
    of the function xputc().  This function is not currently in trampoli.[ch]
    files for what is deemed to be performance reasons.  If this define is moved
    and or xputc() is taken out of the ROOT overlay, then action must be taken
@@ -554,7 +540,7 @@ register int x, y;
 	ttyDisplay->curx = x;
 }
 
-/* See note at OVLx ifdef above.   xputc() is a special function. */
+/* See note above. xputc() is a special function. */
 void
 xputc(c)
 #if defined(apollo)
@@ -600,9 +586,6 @@ cl_end()
 	}
 }
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 void
 clear_screen()
 {
@@ -614,9 +597,6 @@ clear_screen()
 		home();
 	}
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 void
 home()
@@ -675,9 +655,6 @@ m_end()
 }
 #endif
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 void
 backsp()
 {
@@ -692,9 +669,6 @@ tty_nhbell()
 	(void) fflush(stdout);
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 #ifdef ASCIIGRAPH
 void
 graph_on() {
@@ -706,9 +680,6 @@ graph_off() {
 	if (AE) xputs(AE);
 }
 #endif
-
-#endif /* OVL0 */
-#ifdef OVL1
 
 #if !defined(MICRO)
 # ifdef VMS
@@ -775,9 +746,6 @@ tty_delay_output()
 	}
 #endif /* MICRO */
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 void
 cl_eos()			/* free after Robert Viduya */
@@ -1174,8 +1142,6 @@ int color;
 }
 
 #endif /* TEXTCOLOR */
-
-#endif /* OVLB */
 
 #endif /* TTY_GRAPHICS */
 

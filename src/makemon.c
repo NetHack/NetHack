@@ -19,17 +19,13 @@ STATIC_VAR NEARDATA struct monst zeromonst;
 		(mptr->mlet == S_HUMAN && Role_if(role_pm) && \
 		  (mptr->msound == MS_LEADER || mptr->msound == MS_NEMESIS))
 
-#ifdef OVL0
 STATIC_DCL boolean FDECL(uncommon, (int));
 STATIC_DCL int FDECL(align_shift, (struct permonst *));
-#endif /* OVL0 */
 STATIC_DCL boolean FDECL(wrong_elem_type, (struct permonst *));
 STATIC_DCL void FDECL(m_initgrp,(struct monst *,int,int,int));
 STATIC_DCL void FDECL(m_initthrow,(struct monst *,int,int));
 STATIC_DCL void FDECL(m_initweap,(struct monst *));
-#ifdef OVL1
 STATIC_DCL void FDECL(m_initinv,(struct monst *));
-#endif /* OVL1 */
 
 extern const int monstr[];
 
@@ -38,7 +34,6 @@ extern const int monstr[];
 #define toostrong(monindx, lev) (monstr[monindx] > lev)
 #define tooweak(monindx, lev)	(monstr[monindx] < lev)
 
-#ifdef OVLB
 boolean
 is_home_elemental(ptr)
 register struct permonst *ptr;
@@ -156,9 +151,6 @@ int otyp,oquan;
 	if (otyp == ORCISH_ARROW) otmp->opoisoned = TRUE;
 	(void) mpickobj(mtmp, otmp);
 }
-
-#endif /* OVLB */
-#ifdef OVL2
 
 STATIC_OVL void
 m_initweap(mtmp)
@@ -464,9 +456,6 @@ register struct monst *mtmp;
 	if ((int) mtmp->m_lev > rn2(75))
 		(void) mongets(mtmp, rnd_offensive_item(mtmp));
 }
-
-#endif /* OVL2 */
-#ifdef OVL1
 
 #ifdef GOLDOBJ
 /*
@@ -1101,9 +1090,6 @@ struct permonst *mptr;		/* usually null; used for confused reading */
 	return known;
 }
 
-#endif /* OVL1 */
-#ifdef OVL0
-
 STATIC_OVL boolean
 uncommon(mndx)
 int mndx;
@@ -1254,9 +1240,6 @@ int mndx;	/* particular species that can no longer be created */
 	} /* note: safe to ignore extinction of unique monsters */
 }
 
-#endif /* OVL0 */
-#ifdef OVL1
-
 /*	The routine below is used to make one of the multiple types
  *	of a given monster class.  The second parameter specifies a
  *	special casing bit mask to allow the normal genesis
@@ -1342,9 +1325,6 @@ register struct permonst *ptr;
 	if (tmp2 > 49) tmp2 = 49;		/* hard upper limit */
 	return((tmp > tmp2) ? tmp2 : (tmp > 0 ? tmp : 0)); /* 0 lower limit */
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 struct permonst *
 grow_up(mtmp, victim)	/* `mtmp' might "grow up" into a bigger version */
@@ -1435,9 +1415,6 @@ struct monst *mtmp, *victim;
 	return ptr;
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 int
 mongets(mtmp, otyp)
 register struct monst *mtmp;
@@ -1487,9 +1464,6 @@ register int otyp;
 	} else return(0);
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 int
 golemhp(type)
 int type;
@@ -1509,9 +1483,6 @@ int type;
 		default: return 0;
 	}
 }
-
-#endif /* OVLB */
-#ifdef OVL1
 
 /*
  *	Alignment vs. yours determines monster's attitude to you.
@@ -1608,9 +1579,6 @@ struct monst *mtmp;
 	} else	/* not coaligned and therefore hostile */
 		mtmp->malign = abs(mal);
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 static NEARDATA char syms[] = {
 	MAXOCLASSES, MAXOCLASSES+1, RING_CLASS, WAND_CLASS, WEAPON_CLASS,
@@ -1751,7 +1719,5 @@ struct obj *bag;
 	if (gotone) makeknown(BAG_OF_TRICKS);
     }
 }
-
-#endif /* OVLB */
 
 /*makemon.c*/

@@ -54,11 +54,6 @@
  *     the Video BIOS ROM on board the VGA adapter.  Code in vga_WriteChar
  *     copies the appropriate pixels from the video ROM to the Video buffer.
  *
- *   - Currently, most of the routines are in an ifdef OVLB.
- *     If you change that, you may have to muck with some of the 
- *     variable declarations which now assume this.  This is not a 
- *     problem in a non-overlaid environment (djgpp for example).
- *
  *   - VGA 640 by 480, 16 colour mode (0x12) uses an odd method to 
  *     represent a colour value from the palette. There are four 
  *     planes of video memory, all overlaid at the same memory location.
@@ -153,7 +148,7 @@ STATIC_VAR struct map_struct {
 	for (x=0; x < COLNO; ++x) { map[y][x].glyph = cmap_to_glyph(S_stone); \
 	map[y][x].ch = S_stone; map[y][x].attr = 0; map[y][x].special = 0;} }
 # define TOP_MAP_ROW 1
-#  if defined(OVLB)
+
 STATIC_VAR int vgacmap[CLR_MAX] = {0,3,5,9,4,8,12,14,11,2,6,7,1,8,12,13};
 STATIC_VAR int viewport_size = 40;
 /* STATIC_VAR char masktable[8]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01}; */
@@ -183,17 +178,6 @@ STATIC_VAR char defpalette[] = {	/* Default VGA palette         */
 int vp[SCREENPLANES] = {8,4,2,1};
 #   endif
 int vp2[SCREENPLANES] = {1,2,4,8};
-#  else
-extern int vgacmap[CLR_MAX];
-extern int viewport_size;
-extern char masktable[8];
-extern char bittable[8];
-extern char defpalette[];
-#   ifndef ALTERNATE_VIDEO_METHOD
-extern int vp[SCREENPLANES];
-#   endif
-extern int vp2[SCREENPLANES];
-#  endif /* OVLB */
 
 STATIC_VAR struct planar_cell_struct *planecell;
 STATIC_VAR struct overview_planar_cell_struct *planecell_O;
@@ -205,18 +189,12 @@ STATIC_VAR struct tibhdr_struct tibheader;
 
 /* STATIC_VAR int  g_attribute;	*/	/* Current attribute to use */
 
-#ifdef OVLB
 void
 vga_get_scr_size()
 {
 	CO = 80;
 	LI = 29;
 }
-#endif /*OVLB*/
-
-
-
-# ifdef OVLB
 
 void
 vga_backsp()
@@ -229,9 +207,6 @@ vga_backsp()
 	if (col > 0) col = col-1;
 	vga_gotoloc(col,row);
 }
-
-# endif /* OVLB */
-# ifdef OVL0
 
 void
 vga_clear_screen(colour)
@@ -292,10 +267,6 @@ int cy;
 	}
 }
 
-
-# endif /* OVL0 */
-
-# ifdef OVLB
 void
 vga_tty_end_screen()
 {
@@ -321,7 +292,6 @@ vga_tty_startup(wid, hgt)
 	attrib_gr_intense   = ATTRIB_VGA_INTENSE;
 	g_attribute         = attrib_gr_normal;	/* Give it a starting value */
 }
-# endif /* OVLB */
 
 /*
  * Screen output routines (these are heavily used).
@@ -344,7 +314,6 @@ vga_tty_startup(wid, hgt)
  *
  */
 
-# ifdef OVL0
 void
 vga_xputs(s,col,row)
 const char *s;
@@ -537,8 +506,6 @@ boolean clearfirst;
 		}
 }
 #  endif /* USE_TILES && CLIPPING */
-# endif /* OVL0 */
-# ifdef OVL2
 
 void
 vga_userpan(left)
@@ -668,9 +635,7 @@ boolean left;
 	}
 }
 #   endif /* SCROLLMAP */
-# endif /* OVL2 */
 
-# ifdef OVLB
 STATIC_OVL void
 decal_planar(gp, special)
 struct planar_cell_struct *gp;
@@ -1004,10 +969,6 @@ int len,col,row,colour;
 	}
 }
 
-# endif /* OVLB */
-
-
-# ifdef OVLB
 /*
  * Initialize the VGA palette with the desired colours. This
  * must be a series of 48 bytes for use with a card in
@@ -1474,7 +1435,6 @@ vga_HideCursor()
 	    egawriteplane(15);
 }
 #  endif /* SIMULATE_CURSOR */
-# endif /* OVLB */
 #endif /* SCREEN_VGA  */
 
 /* vidvga.c */

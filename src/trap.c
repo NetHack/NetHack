@@ -30,16 +30,6 @@ STATIC_OVL boolean FDECL(keep_saddle_with_steedcorpse,
 			(unsigned, struct obj *, struct obj *));
 #endif
 
-#ifndef OVLB
-STATIC_VAR const char *a_your[2];
-STATIC_VAR const char *A_Your[2];
-STATIC_VAR const char *the_your[2];
-STATIC_VAR const char tower_of_flame[];
-STATIC_VAR const char *A_gush_of_water_hits;
-STATIC_VAR const char * const blindgas[6];
-
-#else
-
 STATIC_VAR const char * const a_your[2] = { "a", "your" };
 STATIC_VAR const char * const A_Your[2] = { "A", "Your" };
 STATIC_VAR const char * const the_your[2] = { "the", "your" };
@@ -47,10 +37,6 @@ STATIC_VAR const char tower_of_flame[] = "tower of flame";
 STATIC_VAR const char * const A_gush_of_water_hits = "A gush of water hits";
 STATIC_VAR const char * const blindgas[6] = 
 	{"humid", "odorless", "pungent", "chilling", "acrid", "biting"};
-
-#endif /* OVLB */
-
-#ifdef OVLB
 
 /* called when you're hit by fire (dofiretrap,buzz,zapyourself,explode) */
 boolean			/* returns TRUE if hit on torso */
@@ -1292,9 +1278,6 @@ struct trap *trap;
 	seetrap(trap);			/* and it isn't concealed */
 }
 
-#endif /* OVLB */
-#ifdef OVL3
-
 /*
  * Move obj from (x1,y1) to (x2,y2)
  *
@@ -1534,9 +1517,6 @@ int style;
 		return 2;
 }
 
-#endif /* OVL3 */
-#ifdef OVLB
-
 void
 seetrap(trap)
 	register struct trap *trap;
@@ -1546,9 +1526,6 @@ seetrap(trap)
 	    newsym(trap->tx, trap->ty);
 	}
 }
-
-#endif /* OVLB */
-#ifdef OVL3
 
 STATIC_OVL int
 mkroll_launch(ttmp, x, y, otyp, ocount)
@@ -1634,8 +1611,6 @@ schar dx,dy;
 	cc->y = y;
 	return TRUE;
 }
-#endif /* OVL3 */
-#ifdef OVL1
 
 int
 mintrap(mtmp)
@@ -2151,9 +2126,6 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 	if(trapkilled) return 2;
 	return mtmp->mtrapped;
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 /* Combine cockatrice checks into single functions to avoid repeating code. */
 void
@@ -2980,8 +2952,6 @@ dountrap()	/* disarm a trap */
 	}
 	return untrap(FALSE);
 }
-#endif /* OVLB */
-#ifdef OVL2
 
 /* Probability of disabling a trap.  Helge Hafting */
 STATIC_OVL int
@@ -3576,8 +3546,6 @@ boolean force;
 		return(1);
 	}
 }
-#endif /* OVL2 */
-#ifdef OVLB
 
 /* only called when the player is doing something to the chest directly */
 boolean
@@ -3758,9 +3726,6 @@ boolean disarm;
 	return FALSE;
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 struct trap *
 t_at(x,y)
 register int x, y;
@@ -3772,9 +3737,6 @@ register int x, y;
 	}
 	return((struct trap *)0);
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 void
 deltrap(trap)
@@ -3993,7 +3955,5 @@ burn_stuff:
     destroy_item(POTION_CLASS, AD_FIRE);
     return(FALSE);
 }
-
-#endif /* OVLB */
 
 /*trap.c*/

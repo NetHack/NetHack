@@ -12,7 +12,6 @@
 
 #include "hack.h"
 
-#ifdef OVLB
 STATIC_DCL void FDECL(polyman, (const char *,const char *));
 STATIC_DCL void NDECL(break_armor);
 STATIC_DCL void FDECL(drop_weapon,(int));
@@ -1135,9 +1134,6 @@ boolean silently;
 	}
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 const char *
 mbodypart(mon, part)
 struct monst *mon;
@@ -1258,9 +1254,6 @@ int part;
 	return mbodypart(&youmonst, part);
 }
 
-#endif /* OVL1 */
-#ifdef OVL0
-
 int
 poly_gender()
 {
@@ -1270,9 +1263,6 @@ poly_gender()
 	if (is_neuter(youmonst.data) || !humanoid(youmonst.data)) return 2;
 	return flags.female;
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 void
 ugolemeffects(damtype, dam)
@@ -1343,7 +1333,5 @@ int atyp;
 		return -1;
 	}
 }
-
-#endif /* OVLB */
 
 /*polyself.c*/

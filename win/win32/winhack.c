@@ -33,12 +33,6 @@ typedef HRESULT (CALLBACK* DLLGETVERSIONPROC)(DLLVERSIONINFO *);
 
 #endif
 
-#ifdef OVL0
-#define SHARED_DCL
-#else
-#define SHARED_DCL extern
-#endif
-
 /* Minimal common control library version
 Version     _WIN_32IE   Platform/IE
 =======     =========   ===========

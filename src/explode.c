@@ -4,8 +4,6 @@
 
 #include "hack.h"
 
-#ifdef OVL0
-
 /* Note: Arrays are column first, while the screen is row first */
 static int expl[3][3] = {
 	{ S_explode1, S_explode4, S_explode7 },
@@ -376,8 +374,6 @@ int expltype;
 	if (i < 50) i = 50;	/* in case random damage is very small */
 	wake_nearto(x, y, i);
 }
-#endif /* OVL0 */
-#ifdef OVL1
 
 struct scatter_chain {
 	struct scatter_chain *next;	/* pointer to next scatter item	*/
@@ -574,7 +570,5 @@ splatter_burning_oil(x, y)
 #define ZT_SPELL_O_FIRE 11 /* value kludge, see zap.c */
     explode(x, y, ZT_SPELL_O_FIRE, d(4,4), BURNING_OIL, EXPL_FIERY);
 }
-
-#endif /* OVL1 */
 
 /*explode.c*/

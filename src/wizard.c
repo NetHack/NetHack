@@ -13,8 +13,6 @@
 
 extern const int monstr[];
 
-#ifdef OVLB
-
 STATIC_DCL short FDECL(which_arti, (int));
 STATIC_DCL boolean FDECL(mon_has_arti, (struct monst *,SHORT_P));
 STATIC_DCL struct monst *FDECL(other_mon_has_arti, (struct monst *,SHORT_P));
@@ -43,9 +41,6 @@ static NEARDATA const unsigned wizapp[] = {
 	PM_GUARDIAN_NAGA,
 	PM_TRAPPER
 };
-
-#endif /* OVLB */
-#ifdef OVL0
 
 /* If you've found the Amulet, make the Wizard appear after some time */
 /* Also, give hints about portal locations, if amulet is worn/wielded -dlc */
@@ -91,9 +86,6 @@ amulet()
 		return;
 	    }
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 int
 mon_has_amulet(mtmp)
@@ -632,7 +624,5 @@ register struct monst	*mtmp;
 	        com_pager(rn2(QTN_DEMONIC) + QT_DEMONIC);
 	}
 }
-
-#endif /* OVLB */
 
 /*wizard.c*/

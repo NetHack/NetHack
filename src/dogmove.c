@@ -9,8 +9,6 @@
 
 extern boolean notonhead;
 
-#ifdef OVL0
-
 STATIC_DCL boolean FDECL(dog_hunger,(struct monst *,struct edog *));
 STATIC_DCL int FDECL(dog_invent,(struct monst *,struct edog *,int));
 STATIC_DCL int FDECL(dog_goal,(struct monst *,struct edog *,int,int,int));
@@ -48,15 +46,12 @@ register struct monst *mon;
 
 static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
 
-#endif /* OVL0 */
-
 STATIC_OVL boolean FDECL(cursed_object_at, (int, int));
 
 STATIC_VAR xchar gtyp, gx, gy;	/* type and position of dog's current goal */
 
 STATIC_PTR void FDECL(wantdoor, (int, int, genericptr_t));
 
-#ifdef OVLB
 STATIC_OVL boolean
 cursed_object_at(x, y)
 int x, y;
@@ -203,9 +198,6 @@ boolean devour;
 	if (heal) mtmp->mhp = mtmp->mhpmax;
 	return 1;
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 /* hunger effects -- returns TRUE on starvation */
 STATIC_OVL boolean
@@ -832,9 +824,6 @@ xchar mx, my, fx, fy;
     return FALSE;
 }
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 /*ARGSUSED*/	/* do_clear_area client */
 STATIC_PTR void
 wantdoor(x, y, distance)
@@ -849,7 +838,5 @@ genericptr_t distance;
 	*(int*)distance = ndist;
     }
 }
-
-#endif /* OVLB */
 
 /*dogmove.c*/

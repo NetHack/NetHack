@@ -28,14 +28,6 @@
 
 STATIC_DCL void FDECL(give_may_advance_msg, (int));
 
-#ifndef OVLB
-
-STATIC_DCL NEARDATA const short skill_names_indices[];
-STATIC_DCL NEARDATA const char *odd_skill_names[];
-STATIC_DCL NEARDATA const char *barehands_or_martial[];
-
-#else	/* OVLB */
-
 STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 	0,                DAGGER,         KNIFE,        AXE,
 	PICK_AXE,         SHORT_SWORD,    BROADSWORD,   LONG_SWORD,
@@ -92,19 +84,12 @@ int skill;
 		"fighting ");
 }
 
-#endif	/* OVLB */
-
 STATIC_DCL boolean FDECL(can_advance, (int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(could_advance, (int));
 STATIC_DCL boolean FDECL(peaked_skill, (int));
 STATIC_DCL int FDECL(slots_required, (int));
-
-#ifdef OVL1
-
 STATIC_DCL char *FDECL(skill_level_name, (int,char *));
 STATIC_DCL void FDECL(skill_advance, (int));
-
-#endif	/* OVL1 */
 
 #define P_NAME(type) ((skill_names_indices[type] > 0) ? \
 		      OBJ_NAME(objects[skill_names_indices[type]]) : \
@@ -112,7 +97,6 @@ STATIC_DCL void FDECL(skill_advance, (int));
 			barehands_or_martial[martial_bonus()] : \
 			odd_skill_names[-skill_names_indices[type]])
 
-#ifdef OVLB
 static NEARDATA const char kebabable[] = {
 	S_XORN, S_DRAGON, S_JABBERWOCK, S_NAGA, S_GIANT, '\0'
 };
@@ -313,9 +297,6 @@ struct monst *mon;
 
 	return(tmp);
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 STATIC_DCL struct obj *FDECL(oselect, (struct monst *,int));
 #define Oselect(x)	if ((otmp = oselect(mtmp, x)) != 0) return(otmp);
@@ -709,9 +690,6 @@ abon()		/* attack bonus for strength & dexterity */
 	else return(sbon + dex-14);
 }
 
-#endif /* OVL0 */
-#ifdef OVL1
-
 int
 dbon()		/* damage bonus for strength */
 {
@@ -1005,9 +983,6 @@ int skill;
 	P_ADVANCE(skill) = 0;
     }
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 void
 use_skill(skill,degree)
@@ -1313,7 +1288,5 @@ register struct obj *obj;
     }
     obj->owornmask &= ~W_WEP;
 }
-
-#endif /* OVLB */
 
 /*weapon.c*/

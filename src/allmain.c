@@ -14,8 +14,6 @@
 STATIC_DCL void NDECL(do_positionbar);
 #endif
 
-#ifdef OVL0
-
 void
 moveloop()
 {
@@ -423,9 +421,6 @@ moveloop()
     }
 }
 
-#endif /* OVL0 */
-#ifdef OVL1
-
 void
 stop_occupation()
 {
@@ -443,9 +438,6 @@ stop_occupation()
 #endif
 	}
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 void
 display_gamewindows()
@@ -627,7 +619,5 @@ do_positionbar()
 	update_positionbar(pbar);
 }
 #endif
-
-#endif /* OVLB */
 
 /*allmain.c*/

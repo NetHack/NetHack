@@ -11,8 +11,6 @@
 /* this matches the categorizations shown by enlightenment */
 #define ALGN_SINNED	(-4)	/* worse than strayed */
 
-#ifdef OVLB
-
 STATIC_DCL boolean FDECL(histemple_at,(struct monst *,XCHAR_P,XCHAR_P));
 STATIC_DCL boolean FDECL(has_shrine,(struct monst *));
 
@@ -109,10 +107,6 @@ pick_move:
 	return(0);
 }
 
-#endif /* OVLB */
-
-#ifdef OVL0
-
 char
 temple_occupied(array)
 register char *array;
@@ -124,9 +118,6 @@ register char *array;
 			return(*ptr);
 	return('\0');
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 STATIC_OVL boolean
 histemple_at(priest, x, y)
@@ -713,7 +704,5 @@ boolean ghostly;
 	    assign_level(&(EPRI(mtmp)->shrlevel), &u.uz);
     }
 }
-
-#endif /* OVLB */
 
 /*priest.c*/

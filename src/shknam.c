@@ -7,11 +7,6 @@
 #include "hack.h"
 #include "eshk.h"
 
-#ifndef OVLB
-extern const struct shclass shtypes[];
-
-#else
-
 STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *,int,int));
 STATIC_DCL void FDECL(nameshk, (struct monst *,const char * const *));
 STATIC_DCL int  FDECL(shkinit, (const struct shclass *,struct mkroom *));
@@ -498,9 +493,6 @@ register struct mkroom *sroom;
     level.flags.has_shop = TRUE;
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 /* does shkp's shop stock this item type? */
 boolean
 saleable(shkp, obj)
@@ -533,7 +525,5 @@ int type;
 
 	return shp->iprobs[i].itype;
 }
-
-#endif /* OVL0 */
 
 /*shknam.c*/

@@ -14,8 +14,6 @@ STATIC_VAR NEARDATA struct xlock_s {
 	int picktyp, chance, usedtime;
 } xlock;
 
-#ifdef OVLB
-
 STATIC_DCL const char *NDECL(lock_action);
 STATIC_DCL boolean FDECL(obstructed,(int,int));
 STATIC_DCL void FDECL(chest_shatter_msg, (struct obj *));
@@ -208,9 +206,6 @@ forcelock()	/* try to force a locked chest */
 	return((xlock.usedtime = 0));
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 void
 reset_pick()
 {
@@ -218,9 +213,6 @@ reset_pick()
 	xlock.door = 0;
 	xlock.box = 0;
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 int
 pick_lock(pick) /* pick a lock with a given object */
@@ -915,7 +907,5 @@ struct obj *otmp;
 	}
 	pline("%s %s!", An(thing), disposition);
 }
-
-#endif /* OVLB */
 
 /*lock.c*/

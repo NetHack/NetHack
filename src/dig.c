@@ -6,8 +6,6 @@
 #include "edog.h"
 /* #define DEBUG */	/* turn on for diagnostics */
 
-#ifdef OVLB
-
 static NEARDATA boolean did_dig_msg;
 
 STATIC_DCL boolean NDECL(rm_waslit);
@@ -1062,9 +1060,6 @@ watch_dig(mtmp, x, y, zap)
 	}
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 /* Return TRUE if monster died, FALSE otherwise.  Called from m_move(). */
 boolean
 mdig_tunnel(mtmp)
@@ -1137,9 +1132,6 @@ register struct monst *mtmp;
 
 	return FALSE;
 }
-
-#endif /* OVL0 */
-#ifdef OVL3
 
 /* digging via wand zap or spell cast */
 void
@@ -1663,8 +1655,6 @@ wiz_debug_cmd() /* in this case, bury everything at your loc and around */
 		if (isok(x,y)) bury_objs(x,y);
 	return 0;
 }
-
 #endif /* DEBUG */
-#endif /* OVL3 */
 
 /*dig.c*/

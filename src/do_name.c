@@ -4,8 +4,6 @@
 
 #include "hack.h"
 
-#ifdef OVLB
-
 STATIC_DCL void FDECL(do_oname, (struct obj *));
 static void FDECL(getpos_help, (BOOLEAN_P,const char *));
 
@@ -528,9 +526,6 @@ register struct obj *obj;
 	}
 }
 
-#endif /*OVLB*/
-#ifdef OVL0
-
 static const char * const ghostnames[] = {
 	/* these names should have length < PL_NSIZ */
 	/* Capitalize the names for aesthetics -dgk */
@@ -750,9 +745,6 @@ boolean called;
 	}
 }
 
-#endif /* OVL0 */
-#ifdef OVLB
-
 char *
 l_monnam(mtmp)
 register struct monst *mtmp;
@@ -760,9 +752,6 @@ register struct monst *mtmp;
 	return(x_monnam(mtmp, ARTICLE_NONE, (char *)0, 
 		mtmp->mnamelth ? SUPPRESS_SADDLE : 0, TRUE));
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 char *
 mon_nam(mtmp)
@@ -830,9 +819,6 @@ struct monst *mtmp;
 
 	return x_monnam(mtmp, prefix, (char *)0, suppression_flag, FALSE);
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 char *
 Adjmonnam(mtmp, adj)
@@ -978,9 +964,6 @@ roguename() /* Name of a Rogue player */
 		: "Glenn Wichman";
 }
 #endif /* REINCARNATION */
-#endif /* OVLB */
-
-#ifdef OVL2
 
 static NEARDATA const char * const hcolors[] = {
 	"ultraviolet", "infrared", "bluish-orange",
@@ -1039,6 +1022,5 @@ char *buf;
     }
     return buf;
 }
-#endif /* OVL2 */
 
 /*do_name.c*/

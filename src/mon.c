@@ -14,11 +14,9 @@
 
 STATIC_DCL boolean FDECL(restrap,(struct monst *));
 STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));
-#ifdef OVL2
 STATIC_DCL int NDECL(pick_animal);
 STATIC_DCL int FDECL(select_newcham_form, (struct monst *));
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
-#endif
 
 #ifdef REINCARNATION
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
@@ -32,7 +30,6 @@ STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 
 #if 0
 /* part of the original warning code which was replaced in 3.3.1 */
-#ifdef OVL1
 #define warnDelay 10
 long lastwarntime;
 int lastwarnlev;
@@ -42,12 +39,8 @@ const char *warnings[] = {
 };
 
 STATIC_DCL void NDECL(warn_effects);
-#endif /* OVL1 */
 #endif /* 0 */
 
-#ifndef OVLB
-STATIC_VAR short cham_to_pm[];
-#else
 STATIC_DCL struct obj *FDECL(make_corpse,(struct monst *));
 STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
 STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
@@ -314,9 +307,6 @@ register struct monst *mtmp;
 	newsym(x, y);
 	return obj;
 }
-
-#endif /* OVLB */
-#ifdef OVL1
 
 #if 0
 /* part of the original warning code which was replaced in 3.3.1 */
@@ -636,9 +626,6 @@ movemon()
     return somebody_can_move;
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 #define mstoning(obj)	(ofood(obj) && \
 					(touch_petrifies(&mons[(obj)->corpsenm]) || \
 					(obj)->corpsenm == PM_MEDUSA))
@@ -853,8 +840,6 @@ mpickgold(mtmp)
 	}
     }
 }
-#endif /* OVLB */
-#ifdef OVL2
 
 boolean
 mpickstuff(mtmp, str)
@@ -898,9 +883,6 @@ mpickstuff(mtmp, str)
 	}
 	return FALSE;
 }
-
-#endif /* OVL2 */
-#ifdef OVL0
 
 int
 curr_mon_load(mtmp)
@@ -1197,9 +1179,6 @@ impossible("A monster looked at a very strange trap of type %d.", ttmp->ttyp);
 	return(cnt);
 }
 
-#endif /* OVL0 */
-#ifdef OVL1
-
 /* Monster against monster special attacks; for the specified monster
    combinations, this allows one monster to attack another adjacent one
    in the absence of Conflict.  There is no provision for targetting
@@ -1254,9 +1233,6 @@ dmonsfree()
 		   count, iflags.purge_monsters);
     iflags.purge_monsters = 0;
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 /* called when monster is moved to larger structure */
 void
@@ -2080,9 +2056,6 @@ register struct monst *mtmp;
     }
 }
 
-#endif /* OVLB */
-#ifdef OVL2
-
 void
 setmangry(mtmp)
 register struct monst *mtmp;
@@ -2689,9 +2662,6 @@ kill_genocided_monsters()
 	kill_eggs(level.buriedobjlist);
 }
 
-#endif /* OVL2 */
-#ifdef OVLB
-
 void
 golemeffects(mon, damtype, dam)
 register struct monst *mon;
@@ -2798,6 +2768,5 @@ short otyp;
 		break;
 	}
 }
-#endif /* OVLB */
 
 /*mon.c*/

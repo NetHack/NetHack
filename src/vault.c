@@ -10,8 +10,6 @@ STATIC_DCL struct monst *NDECL(findgd);
 #define g_monnam(mtmp) \
 	x_monnam(mtmp, ARTICLE_NONE, (char *)0, SUPPRESS_IT, FALSE)
 
-#ifdef OVLB
-
 STATIC_DCL boolean FDECL(clear_fcorr, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(restfakecorr,(struct monst *));
 STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *,int,int));
@@ -110,9 +108,6 @@ findgd()
 		return(mtmp);
 	return((struct monst *)0);
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 char
 vault_occupied(array)
@@ -345,9 +340,6 @@ fnd:
 	EGD(guard)->warncnt = 1;
     }
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 STATIC_OVL void
 move_gold(gold, vroom)
@@ -820,7 +812,5 @@ gd_sound()  /* prevent "You hear footsteps.." when inappropriate */
 	if (vault_occupied(u.urooms)) return(FALSE);
 	else return((boolean)(grd == (struct monst *)0));
 }
-
-#endif /* OVLB */
 
 /*vault.c*/

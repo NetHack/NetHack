@@ -47,8 +47,6 @@
 
 void FDECL(get_cursor,(int *, int *));
 
-#ifdef OVL0
-
 /* direct bios calls are used only when iflags.BIOS is set */
 
 static char NDECL(DOSgetch);
@@ -514,7 +512,5 @@ unsigned setvalue;
 	intdos(&regs, &regs);
 	return (regs.x.dx);
 }
-
-# endif /* OVLB */
 
 #endif /* MSDOS */

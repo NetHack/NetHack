@@ -8,13 +8,7 @@
 #include "mhmain.h"
 #include "mhmap.h"
 
-#ifdef OVL0
-#define SHARED_DCL
-#else
-#define SHARED_DCL extern
-#endif
-
-SHARED_DCL char orgdir[PATHLEN];	/* also used in pcsys.c, amidos.c */
+extern char orgdir[PATHLEN];	/* also used in pcsys.c, amidos.c */
 
 extern void FDECL(nethack_exit,(int));
 static TCHAR* _get_cmd_arg(TCHAR* pCmdLine);

@@ -8,8 +8,6 @@
 
 /* #define DEBUG */	/* uncomment for debugging info */
 
-#ifdef OVLB
-
 	/* part of the output on gain or loss of attribute */
 static
 const char	* const plusattr[] = {
@@ -232,9 +230,6 @@ set_moreluck()
 	else u.moreluck = -LUCKADD;
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 void
 restore_attrib()
 {
@@ -253,9 +248,6 @@ restore_attrib()
 	}
 	(void)encumber_msg();
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 #define AVAL	50		/* tune value for exercise gains */
 
@@ -658,9 +650,6 @@ newhp()
 	return((hp <= 0) ? 1 : hp);
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 schar
 acurr(x)
 int x;
@@ -703,9 +692,6 @@ acurrstr()
 	else return((schar)(str - 100));
 }
 
-#endif /* OVL0 */
-#ifdef OVL2
-
 /* avoid possible problems with alignment overflow, and provide a centralized
  * location for any future alignment limits
  */
@@ -725,7 +711,5 @@ register int n;
 				u.ualign.record = ALIGNLIM;
 		}
 }
-
-#endif /* OVL2 */
 
 /*attrib.c*/

@@ -18,7 +18,6 @@ STATIC_PTR int NDECL(eatfood);
 STATIC_PTR int NDECL(opentin);
 STATIC_PTR int NDECL(unfaint);
 
-#ifdef OVLB
 STATIC_DCL const char *FDECL(food_xname, (struct obj *,BOOLEAN_P));
 STATIC_DCL void FDECL(choke, (struct obj *));
 STATIC_DCL void NDECL(recalc_wt);
@@ -45,8 +44,6 @@ STATIC_DCL const char *FDECL(foodword, (struct obj *));
 
 char msgbuf[BUFSZ];
 
-#endif /* OVLB */
-
 /* hunger texts used on bottom line (each 8 chars long) */
 #define SATIATED	0
 #define NOT_HUNGRY	1
@@ -58,14 +55,6 @@ char msgbuf[BUFSZ];
 
 /* also used to see if you're allowed to eat cats and dogs */
 #define CANNIBAL_ALLOWED() (Role_if(PM_CAVEMAN) || Race_if(PM_ORC))
-
-#ifndef OVLB
-
-STATIC_DCL NEARDATA const char comestibles[];
-STATIC_DCL NEARDATA const char allobj[];
-STATIC_DCL boolean force_save_hs;
-
-#else
 
 STATIC_OVL NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
 
@@ -86,9 +75,6 @@ const char *hu_stat[] = {
 	"Fainted ",
 	"Starved "
 };
-
-#endif /* OVLB */
-#ifdef OVL1
 
 /*
  * Decide whether a particular object can be eaten by the possibly
@@ -117,9 +103,6 @@ register struct obj *obj;
      /* return((boolean)(!!index(comestibles, obj->oclass))); */
 	return (boolean)(obj->oclass == FOOD_CLASS);
 }
-
-#endif /* OVL1 */
-#ifdef OVLB
 
 void
 init_uhunger()
@@ -2097,9 +2080,6 @@ bite()
 	return 0;
 }
 
-#endif /* OVLB */
-#ifdef OVL0
-
 void
 gethungry()	/* as time goes by - called by moveloop() and domove() */
 {
@@ -2140,9 +2120,6 @@ gethungry()	/* as time goes by - called by moveloop() and domove() */
 	}
 	newuhs(TRUE);
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 void
 morehungry(num)	/* called after vomiting and after performing feats of magic */
@@ -2209,9 +2186,6 @@ unfaint()
 	flags.botl = 1;
 	return 0;
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 boolean
 is_fainted()
@@ -2368,9 +2342,6 @@ boolean incr;
 		}
 	}
 }
-
-#endif /* OVL0 */
-#ifdef OVLB
 
 /* Returns an object representing food.  Object may be either on floor or
  * in inventory.
@@ -2541,9 +2512,6 @@ int amt;
     }
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 /* called when eatfood occupation has been interrupted,
    or in the case of theft, is about to be interrupted */
 boolean
@@ -2558,7 +2526,5 @@ boolean stopping;
 	}
 	return FALSE;
 }
-
-#endif /* OVL1 */
 
 /*eat.c*/

@@ -4,7 +4,6 @@
 
 #include "hack.h"
 
-#ifdef OVL0
 extern const char *hu_stat[];	/* defined in eat.c */
 
 const char * const enc_stat[] = {
@@ -18,7 +17,6 @@ const char * const enc_stat[] = {
 
 STATIC_DCL void NDECL(bot1);
 STATIC_DCL void NDECL(bot2);
-#endif /* OVL0 */
 
 /* MAXCO must hold longest uncompressed status line, and must be larger
  * than COLNO
@@ -34,15 +32,8 @@ STATIC_DCL void NDECL(bot2);
 #define MAXCO (COLNO+20)
 #endif
 
-#ifndef OVLB
-STATIC_DCL int mrank_sz;
-#else /* OVLB */
 STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
-#endif /* OVLB */
-
 STATIC_DCL const char *NDECL(rank);
-
-#ifdef OVL1
 
 /* convert experience level (1..30) to rank index (0..8) */
 int
@@ -126,9 +117,6 @@ int *rank_indx, *title_length;
 	return NON_PM;
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
 void
 max_rank_sz()
 {
@@ -140,9 +128,6 @@ max_rank_sz()
 	mrank_sz = maxr;
 	return;
 }
-
-#endif /* OVLB */
-#ifdef OVL0
 
 #ifdef SCORE_ON_BOTL
 long
@@ -303,7 +288,5 @@ bot()
 	bot2();
 	flags.botl = flags.botlx = 0;
 }
-
-#endif /* OVL0 */
 
 /*botl.c*/

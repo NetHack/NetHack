@@ -38,8 +38,6 @@ extern int attrib_gr_normal;	/* graphics mode normal attribute */
 extern int attrib_text_intense;	/* text mode intense attribute */
 extern int attrib_gr_intense;	/* graphics mode intense attribute */
 
-#ifdef OVLB
-
 void
 txt_get_scr_size()
 {
@@ -84,7 +82,6 @@ txt_get_scr_size()
 	CO = regs.h.ah;
 # endif /* PC9800 */
 }
-#endif /*OVLB*/
 
 /*
  * --------------------------------------------------------------
@@ -113,7 +110,6 @@ void FDECL(txt_get_cursor, (int *, int *));
 extern int  g_attribute;	/* Current attribute to use */
 extern int  monoflag;		/* 0 = not monochrome, else monochrome */
 
-# ifdef OVLB
 void
 txt_backsp()
 {
@@ -145,9 +141,7 @@ txt_nhbell()
         regs.h.ah = 0x02; 			/* Character Output function */
         (void) int86(DOSCALL, &regs, &regs);
 }
-# endif /* OVLB */
 
-# ifdef OVL0
 void
 txt_clear_screen()
 /* djgpp provides ScreenClear(), but in version 1.09 it is broken
@@ -254,9 +248,7 @@ txt_cl_eos()	/* clear to end of screen */
 	(void) int86(VIDEO_BIOS, &regs, &regs); /* Scroll or initialize window */
 # endif
 }
-# endif /* OVL0 */
 
-# ifdef OVLB
 void
 txt_startup(wid, hgt)
     int *wid, *hgt;
@@ -269,7 +261,6 @@ txt_startup(wid, hgt)
 	attrib_gr_intense   = attrib_text_intense;
 	g_attribute         = attrib_text_normal;		/* Give it a starting value */
 }
-# endif /* OVLB */
 
 /*
  * Screen output routines (these are heavily used).
@@ -295,7 +286,6 @@ txt_startup(wid, hgt)
  *         (that include wintty.h) are actually using these routines.
  */
 
-# ifdef OVL0
 void
 txt_xputs(s,col,row)
 const char *s;
@@ -372,7 +362,6 @@ int attr;
 	txt_gotoxy(col,row);
 #  endif /* PC9800 */
 }
-# endif /* OVL0 */
 
 /*
  * This marks the end of the general screen output routines that are
@@ -396,7 +385,6 @@ int attr;
  *                    the location of the player on the NetHack level.
  */
  
-# ifdef OVL0
 #  if defined(SCREEN_BIOS) && !defined(PC9800)
 /*
  * This is implemented as a macro under DJGPPFAST.
@@ -447,14 +435,12 @@ int x,y;
 	 * returns nothing.  -3.
 	 */
 }
-# endif /* OVL0 */
 
 /*
  * This marks the end of the cursor manipulation/information routines.
  * -------------------------------------------------------------------
  */ 
 
-# ifdef OVLB
 #  ifdef MONO_CHECK
 int txt_monoadapt_check()
 {
@@ -466,7 +452,6 @@ int txt_monoadapt_check()
 	return (regs.h.al == 7) ? 1 : 0;	/* 7 means monochrome mode */
 }
 #  endif /* MONO_CHECK */
-# endif /* OVLB */
 #endif /* NO_TERMS  */
 
 /* vidtxt.c */

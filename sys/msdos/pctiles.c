@@ -45,8 +45,6 @@ boolean otiles_in_ram = FALSE;
 extern int total_tiles_used;		/* tile.c */
 #endif
 
-# ifdef OVLB
-
 /*
  * Read the header/palette information at the start of the
  * NetHack.tib file.
@@ -161,9 +159,6 @@ boolean filestyle;
 	}
 #endif
 }
-# endif /* OVLB      */
-
-# ifdef OVL0
 
 struct planar_cell_struct plancell;
 struct overview_planar_cell_struct oplancell;
@@ -253,7 +248,6 @@ char (*pta)[TILE_X];
 	return 0;
 }
 #  endif
-# endif /* OVL0 */
 #endif /* USE_TILES */
 
 /* pctiles.c */

@@ -13,9 +13,7 @@
 #include "wintty.h"
 #include "func_tab.h"
 
-#ifdef OVL1
 char morc = 0;	/* tell the outside world what char you chose */
-#endif /* OVL1 */
 STATIC_DCL boolean FDECL(ext_cmd_getlin_hook, (char *));
 
 typedef boolean FDECL((*getlin_hook_proc), (char *));
@@ -24,8 +22,6 @@ STATIC_DCL void FDECL(hooked_tty_getlin, (const char*,char*,getlin_hook_proc));
 extern int NDECL(extcmd_via_menu);	/* cmd.c */
 
 extern char erase_char, kill_char;	/* from appropriate tty.c file */
-
-#ifdef OVL1
 
 /*
  * Read a line closed with '\n' into the array char bufp[BUFSZ].
@@ -197,9 +193,6 @@ register const char *s;	/* chars allowed besides return */
 
 }
 
-#endif /* OVL1 */
-#ifdef OVL2
-
 /*
  * Implement extended command completion by using this hook into
  * tty_getlin.  Check the characters already typed, if they uniquely
@@ -276,8 +269,6 @@ tty_get_ext_cmd()
 
 	return i;
 }
-
-#endif /* OVL2 */
 
 #endif /* TTY_GRAPHICS */
 
