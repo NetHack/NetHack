@@ -2,6 +2,7 @@ $RCSfile$ $Revision$ $Date$
 
 General Fixes and Modified Features
 -----------------------------------
+setmangry should not be called when a monster enters a bones region
 
 
 Platform- and/or Interface-Specific Fixes
