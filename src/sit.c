@@ -68,7 +68,8 @@ dosit()
 	    if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
 		pline("It's not very comfortable...");
 
-	} else if ((trap = t_at(u.ux, u.uy)) != 0) {
+	} else if ((trap = t_at(u.ux, u.uy)) != 0 ||
+		   (u.utrap && (u.utraptype >= TT_LAVA))) {
 
 	    if (u.utrap) {
 		exercise(A_WIS, FALSE);	/* you're getting stuck longer */
