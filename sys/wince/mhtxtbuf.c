@@ -1,4 +1,5 @@
-/* Copyright (C) 2003 by Alex Kompel <shurikk@pacbell.net> */
+/*	SCCS Id: @(#)mhtxtbuf.c	3.5	2005/01/23	*/
+/* Copyright (C) 2003 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "mhtxtbuf.h"
