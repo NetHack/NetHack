@@ -1802,6 +1802,9 @@ register struct obj *obj;
 	    Strcpy(buf, the(xname(current_container)));
 	    You("put %s into %s.", doname(obj), buf);
 
+	    /* gold in container always needs to be added to credit */
+	    if (floor_container && obj->oclass == COIN_CLASS)
+		sellobj(obj, current_container->ox, current_container->oy);
 	    (void) add_to_container(current_container, obj);
 	    current_container->owt = weight(current_container);
 	}
