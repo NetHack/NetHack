@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2002/03/29	*/
+/*	SCCS Id: @(#)shk.c	3.4	2002/04/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,7 +64,7 @@ STATIC_DCL void FDECL(add_to_billobjs, (struct obj *));
 STATIC_DCL void FDECL(bill_box_content, (struct obj *, BOOLEAN_P, BOOLEAN_P,
 				     struct monst *));
 #ifdef OVL1
-static void FDECL(rob_shop, (struct monst *));
+static boolean FDECL(rob_shop, (struct monst *));
 #endif
 
 #ifdef OVLB
@@ -425,13 +425,13 @@ boolean newlev;
 	    return;
 	}
 
-	rob_shop(shkp);
-
+	if (rob_shop(shkp)) {
 #ifdef KOPS
-	call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
+	    call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
 #else
-	(void) angry_guards(FALSE);
+	    (void) angry_guards(FALSE);
 #endif
+	}
 }
 
 /* robbery from outside the shop via telekinesis or grappling hook */
@@ -450,17 +450,19 @@ xchar x, y;
 	if (!eshkp->billct && !eshkp->debit)	/* bill is settled */
 	    return;
 
-	rob_shop(shkp);
-
+	if (rob_shop(shkp)) {
 #ifdef KOPS
-	/* [might want to set 2nd arg based on distance from shop doorway] */
-	call_kops(shkp, FALSE);
+	    /*[might want to set 2nd arg based on distance from shop doorway]*/
+	    call_kops(shkp, FALSE);
 #else
-	(void) angry_guards(FALSE);
+	    (void) angry_guards(FALSE);
 #endif
+	}
 }
 
-static void
+/* shop merchanize has been taken; pay for it with any credit available;  
+   return false if the debt is fully covered by credit, true otherwise */
+static boolean
 rob_shop(shkp)
 struct monst *shkp;
 {
@@ -478,7 +480,7 @@ struct monst *shkp;
 	    total -= eshkp->credit;
 	}
 	setpaid(shkp);
-	if (!total) return;
+	if (!total) return FALSE;
 
 	/* by this point, we know an actual robbery has taken place */
 	eshkp->robbed += total;
@@ -488,6 +490,7 @@ struct monst *shkp;
 	    adjalign(-sgn(u.ualign.type));
 
 	hot_pursuit(shkp);
+	return TRUE;
 }
 
 void
