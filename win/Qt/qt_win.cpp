@@ -594,6 +594,7 @@ NetHackQtSettings::NetHackQtSettings(int w, int h) :
     tileheight(TILEHMIN,64,1,this),
     widthlbl(&tilewidth,"&Width:",this),
     heightlbl(&tileheight,"&Height:",this),
+    whichsize("&Zoomed",this),
     fontsize(this),
     normal("times"),
 #ifdef WS_WIN
@@ -664,6 +665,7 @@ NetHackQtSettings::NetHackQtSettings(int w, int h) :
 
     connect(&tilewidth,SIGNAL(valueChanged(int)),this,SLOT(resizeTiles()));
     connect(&tileheight,SIGNAL(valueChanged(int)),this,SLOT(resizeTiles()));
+    connect(&whichsize,SIGNAL(toggled(bool)),this,SLOT(setGlyphSize(bool)));
 
     fontsize.insertItem("Huge");
     fontsize.insertItem("Large");
@@ -673,17 +675,18 @@ NetHackQtSettings::NetHackQtSettings(int w, int h) :
     fontsize.setCurrentItem(default_fontsize);
     connect(&fontsize,SIGNAL(activated(int)),this,SIGNAL(fontChanged()));
 
-    QGridLayout* grid = new QGridLayout(this, 4, 2, 8);
-    grid->addWidget(&tilewidth, 0, 1);  grid->addWidget(&widthlbl, 0, 0);
-    grid->addWidget(&tileheight, 1, 1); grid->addWidget(&heightlbl, 1, 0);
+    QGridLayout* grid = new QGridLayout(this, 5, 2, 8);
+    grid->addMultiCellWidget(&whichsize, 0, 0, 0, 1);
+    grid->addWidget(&tilewidth, 1, 1);  grid->addWidget(&widthlbl, 1, 0);
+    grid->addWidget(&tileheight, 2, 1); grid->addWidget(&heightlbl, 2, 0);
     QLabel* flabel=new QLabel(&fontsize, "&Font:",this);
-    grid->addWidget(flabel, 2, 0); grid->addWidget(&fontsize, 2, 1);
+    grid->addWidget(flabel, 3, 0); grid->addWidget(&fontsize, 3, 1);
     QPushButton* dismiss=new QPushButton("Dismiss",this);
     dismiss->setDefault(TRUE);
-    grid->addMultiCellWidget(dismiss, 3, 3, 0, 1);
-    grid->setRowStretch(3,0);
-    grid->setColStretch(0,1);
-    grid->setColStretch(1,2);
+    grid->addMultiCellWidget(dismiss, 4, 4, 0, 1);
+    grid->setRowStretch(4,0);
+    grid->setColStretch(1,1);
+    grid->setColStretch(2,2);
     grid->activate();
 
     connect(dismiss,SIGNAL(clicked()),this,SLOT(accept()));
@@ -700,8 +703,28 @@ void NetHackQtSettings::resizeTiles()
     int w = tilewidth.value();
     int h = tileheight.value();
 
-    theglyphs->resize(w,h);
+    theglyphs->setSize(w,h);
     emit tilesChanged();
+}
+
+void NetHackQtSettings::toggleGlyphSize()
+{
+    whichsize.toggle();
+}
+
+void NetHackQtSettings::setGlyphSize(bool which)
+{
+    QSize n = QSize(tilewidth.value(),tileheight.value());
+    if ( othersize.isValid() ) {
+	tilewidth.blockSignals(TRUE);
+	tileheight.blockSignals(TRUE);
+	tilewidth.setValue(othersize.width());
+	tileheight.setValue(othersize.height());
+	tileheight.blockSignals(FALSE);
+	tilewidth.blockSignals(FALSE);
+	resizeTiles();
+    }
+    othersize = n;
 }
 
 const QFont& NetHackQtSettings::normalFont()
@@ -1526,6 +1549,12 @@ void NetHackQtMapWindow::Clear()
 
     change.clear();
     change.add(0,0,COLNO,ROWNO);
+}
+
+void NetHackQtMapWindow::clickCursor()
+{
+    clicksink.Put(cursor.x(),cursor.y(),CLICK_1);
+    qApp->exit_loop();
 }
 
 void NetHackQtMapWindow::mousePressEvent(QMouseEvent* event)
@@ -3735,9 +3764,18 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     }
 }
 
+void NetHackQtMainWindow::zoomMap()
+{
+    qt_settings->toggleGlyphSize();
+}
+
 void NetHackQtMainWindow::raiseMap()
 {
-    stack->raiseWidget(0);
+    if ( stack->id(stack->visibleWidget()) == 0 ) {
+	zoomMap();
+    } else {
+	stack->raiseWidget(0);
+    }
 }
 
 void NetHackQtMainWindow::raiseMessages()
@@ -3950,6 +3988,14 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
     break; case Key_Next:
 	dirkey = 0;
 	if (message) message->Scroll(0,+1);
+    break; case Key_Space:
+	if ( flags.rest_on_space ) {
+	    event->ignore();
+	    return;
+	}
+	case Key_Enter:
+	if ( map )
+	    map->clickCursor();
     break; default:
 	dirkey = 0;
 	event->ignore();
@@ -4237,7 +4283,7 @@ NetHackQtGlyphs::NetHackQtGlyphs()
     else
 	tilefile_tile_H = tilefile_tile_W;
 
-    resize(tilefile_tile_W, tilefile_tile_H);
+    setSize(tilefile_tile_W, tilefile_tile_H);
 }
 
 void NetHackQtGlyphs::drawGlyph(QPainter& painter, int glyph, int x, int y)
@@ -4258,11 +4304,24 @@ void NetHackQtGlyphs::drawCell(QPainter& painter, int glyph, int cellx, int cell
 {
     drawGlyph(painter,glyph,cellx*width(),celly*height());
 }
-void NetHackQtGlyphs::resize(int w, int h)
+void NetHackQtGlyphs::setSize(int w, int h)
 {
+    if ( size == QSize(w,h) )
+	return;
+
+    bool was1 = size == pm1.size();
     size = QSize(w,h);
     if (!w || !h)
 	return; // Still not decided
+
+    if ( size == pm1.size() ) {
+	pm = pm1;
+	return;
+    }
+    if ( size == pm2.size() ) {
+	pm = pm2;
+	return;
+    }
 
     if (w==tilefile_tile_W && h==tilefile_tile_H) {
 	pm.convertFromImage(img);
@@ -4275,6 +4334,7 @@ void NetHackQtGlyphs::resize(int w, int h)
 	pm.convertFromImage(scaled,Qt::ThresholdDither|Qt::PreferDither);
 	QApplication::restoreOverrideCursor();
     }
+    (was1 ? pm2 : pm1) = pm;
 }
 
 

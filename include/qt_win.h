@@ -27,6 +27,7 @@
 #include <qapplication.h> 
 #endif
 #include <qspinbox.h>
+#include <qcheckbox.h>
 #include <qfile.h> 
 #include <qlistbox.h> 
 #include <qlistview.h> 
@@ -91,11 +92,17 @@ signals:
 	void fontChanged();
 	void tilesChanged();
 
+public slots:
+	void toggleGlyphSize();
+	void setGlyphSize(bool);
+
 private:
 	QSpinBox tilewidth;
 	QSpinBox tileheight;
 	QLabel widthlbl;
 	QLabel heightlbl;
+	QCheckBox whichsize;
+	QSize othersize;
 
 	QComboBox fontsize;
 
@@ -259,14 +266,15 @@ public:
 
 	int width() const { return size.width(); }
 	int height() const { return size.height(); }
-	void resize(int w, int h);
+	void toggleSize();
+	void setSize(int w, int h);
 
 	void drawGlyph(QPainter&, int glyph, int pixelx, int pixely);
 	void drawCell(QPainter&, int glyph, int cellx, int celly);
 
 private:
 	QImage img;
-	QPixmap pm;
+	QPixmap pm,pm1, pm2;
 	QSize size;
 	int tiles_per_row;
 };
@@ -326,6 +334,8 @@ public:
 	void displayMessages(bool block);
 	void putMessage(int attr, const char* text);
 	void clearMessages();
+
+	void clickCursor();
 };
 
 class NetHackQtScrollText;
@@ -717,6 +727,7 @@ protected:
 private slots:
 	void layout();
 	void raiseMap();
+	void zoomMap();
 	void raiseMessages();
 	void raiseStatus();
 
