@@ -494,7 +494,8 @@ long timeout;
 	    if (cansee_hatchspot) {
 		Sprintf(monnambuf, "%s%s",
 			siblings ? "some " : "",
-			siblings ? makeplural(m_monnam(mon)) : a_monnam(mon));
+			siblings ?
+			makeplural(m_monnam(mon)) : an(m_monnam(mon)));
 		/* we don't learn the egg type here because learning
 		   an egg type requires either seeing the egg hatch
 		   or being familiar with the egg already,
