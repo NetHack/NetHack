@@ -302,21 +302,21 @@ m_throw(mon, x, y, dx, dy, range, obj)
 	    }
 	    dx = rn2(3)-1;
 	    dy = rn2(3)-1;
-	    /* pre-check validity of new direction */
-	    if((!dx && !dy)
-	       || !isok(bhitpos.x+dx,bhitpos.y+dy)
-	       /* missile hits the wall */
-	       || IS_ROCK(levl[bhitpos.x+dx][bhitpos.y+dy].typ)) {
+	    /* check validity of new direction */
+	    if (!dx && !dy) {
 		(void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
 		return;
 	    }
 	}
 
-	/* also need to pre-check for bars regardless of direction,
-	   but we know that isok() has already been verified;
+	/* pre-check for doors, walls and boundaries.
+	   Also need to pre-check for bars regardless of direction;
 	   the random chance for small objects hitting bars is
 	   skipped when reaching them at point blank range */
-	if ((levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS &&
+	if (!isok(bhitpos.x+dx,bhitpos.y+dy)
+	    || IS_ROCK(levl[bhitpos.x+dx][bhitpos.y+dy].typ)
+	    || closed_door(bhitpos.x+dx, bhitpos.y+dy)
+	    || (levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS &&
 		hits_bars(&singleobj, bhitpos.x, bhitpos.y, 0, 0))) {
 	    (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
 	    return;
@@ -447,6 +447,8 @@ m_throw(mon, x, y, dx, dy, range, obj)
 			|| !isok(bhitpos.x+dx,bhitpos.y+dy)
 			/* missile hits the wall */
 			|| IS_ROCK(levl[bhitpos.x+dx][bhitpos.y+dy].typ)
+			/* missile hit closed door */
+			|| closed_door(bhitpos.x+dx, bhitpos.y+dy)
 			/* missile might hit iron bars */
 			|| (levl[bhitpos.x+dx][bhitpos.y+dy].typ == IRONBARS &&
 			hits_bars(&singleobj, bhitpos.x, bhitpos.y, !rn2(2), 0))
