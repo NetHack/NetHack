@@ -82,6 +82,7 @@ E long FDECL(spec_m2, (struct obj *));
 E boolean FDECL(artifact_has_invprop, (struct obj *,UCHAR_P));
 E long FDECL(arti_cost, (struct obj *));
 E struct obj *FDECL(what_gives, (long *));
+E void FDECL(Sting_effects, (int));
 
 /* ### attrib.c ### */
 

@@ -36,6 +36,7 @@ E NEARDATA int occtime;
 
 #define WARNCOUNT 6			/* number of different warning levels */
 E uchar warnsyms[WARNCOUNT];
+E NEARDATA int warn_obj_cnt;		/* count of monsters meeting criteria */
 
 E int x_maze_max, y_maze_max;
 E int otg_temp;
@@ -214,6 +215,7 @@ E NEARDATA boolean stoned;
 E NEARDATA boolean unweapon;
 E NEARDATA boolean mrg_to_wielded;
 E NEARDATA struct obj *current_wand;
+E NEARDATA boolean defer_see_monsters;
 
 E NEARDATA boolean in_steed_dismounting;
 

@@ -1067,12 +1067,28 @@ void
 see_monsters()
 {
     register struct monst *mon;
+    int new_warn_obj_cnt = 0;
+
+    if (defer_see_monsters) return;
 
     for (mon = fmon; mon; mon = mon->nmon) {
 	if (DEADMONSTER(mon)) continue;
 	newsym(mon->mx,mon->my);
 	if (mon->wormno) see_wsegs(mon);
+	if (MATCH_WARN_OF_MON(mon)) {
+	    if (context.warntype.obj &&
+		(context.warntype.obj & mon->data->mflags2)) new_warn_obj_cnt++;
+	}
     }
+    /*
+     * Make Sting glow blue or stop glowing if required.
+     */
+    if (new_warn_obj_cnt != warn_obj_cnt &&
+	uwep && uwep->oartifact == ART_STING) {
+	Sting_effects(new_warn_obj_cnt);
+	warn_obj_cnt = new_warn_obj_cnt;
+    }
+
 #ifdef STEED
     /* when mounted, hero's location gets caught by monster loop */
     if (!u.usteed)

@@ -1540,5 +1540,18 @@ long *abil;
 	}
 	return (struct obj *)0;
 }
+
+void
+Sting_effects(orc_count)
+int orc_count;
+{
+      if (uwep && uwep->oartifact == ART_STING) {
+          if (orc_count > 0 && warn_obj_cnt == 0)
+              pline("%s %s %s!", bare_artifactname(uwep),
+                      otense(uwep,"glow"), hcolor(NH_LIGHT_BLUE));
+          else if (orc_count == 0 && warn_obj_cnt > 0)
+              pline("%s stops glowing.", bare_artifactname(uwep));
+      }
+}
 /*artifact.c*/
 

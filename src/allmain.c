@@ -53,6 +53,10 @@ moveloop()
 #endif
 
     (void) encumber_msg(); /* in case they auto-picked up something */
+    if (defer_see_monsters) {
+	defer_see_monsters = FALSE;
+	see_monsters();
+    }
 
     u.uz0.dlevel = u.uz.dlevel;
     youmonst.movement = NORMAL_SPEED;	/* give the hero some movement points */

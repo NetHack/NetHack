@@ -43,6 +43,7 @@ struct dgn_topology dungeon_topology = {DUMMY};
 #include "quest.h"
 struct q_score	quest_status = DUMMY;
 
+NEARDATA int warn_obj_cnt = 0;
 NEARDATA int smeq[MAXNROFROOMS+1] = DUMMY;
 NEARDATA int doorindex = 0;
 NEARDATA char *save_cm = 0;
@@ -116,6 +117,7 @@ NEARDATA dest_area updest = { 0, 0, 0, 0, 0, 0, 0, 0 };
 NEARDATA dest_area dndest = { 0, 0, 0, 0, 0, 0, 0, 0 };
 NEARDATA coord inv_pos = { 0, 0 };
 
+NEARDATA boolean defer_see_monsters = FALSE;
 NEARDATA boolean in_mklev = FALSE;
 NEARDATA boolean stoned = FALSE;	/* done to monsters hit by 'c' */
 NEARDATA boolean unweapon = FALSE;

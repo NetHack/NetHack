@@ -423,6 +423,13 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	migrating_mons = restmonchn(fd, FALSE);
 	mread(fd, (genericptr_t) mvitals, sizeof(mvitals));
 
+	/*
+	 * There are some things after this that can have unintended display
+	 * side-effects too early in the game.
+	 * Disable see_monsters() here, re-enable it at the top of moveloop()
+	 */
+	defer_see_monsters = TRUE;
+
 	/* this comes after inventory has been loaded */
 	for(otmp = invent; otmp; otmp = otmp->nobj)
 		if(otmp->owornmask)
