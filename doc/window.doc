@@ -517,6 +517,7 @@ to support:
   |--------------------+--------------------+--------------------+--------+
   |  fullscreen        | WC2_FULLSCREEN     | wc2_fullscreen     |boolean |
   |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
+  |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
   +--------------------+--------------------+--------------------+--------+
 
 align_message	-- where to place message window (top, bottom, left, right)
@@ -561,6 +562,8 @@ windowcolors
 		-- port should use these colors for window foreground/background
 		   colors.  Syntax:
 		     menu fore/back message fore/back status fore/back text fore/back
+wraptext	-- port should wrap long lines of text if they don't fit in 
+		   the visible area of the window
 mouse_support	-- port should enable mouse support if possible
 
 Whenever one of these settings is adjusted, the port is notified of a change

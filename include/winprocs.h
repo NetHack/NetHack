@@ -174,9 +174,10 @@ extern NEARDATA struct window_procs windowprocs;
 #define WC_MOUSE_SUPPORT 0x80000000L	/* 32 mouse support                          */
 					/* no free bits */
 
-#define WC2_FULLSCREEN		0x01L	/* 01 mouse support                          */
+#define WC2_FULLSCREEN		0x01L	/* 01 display full screen                    */
 #define WC2_SOFTKEYBOARD	0x02L	/* 02 software keyboard                      */
-					/* 30 free bits */
+#define WC2_WRAPTEXT		0x04L	/* 04 wrap long lines of text                */
+					/* 29 free bits */
 
 #define ALIGN_LEFT	1
 #define ALIGN_RIGHT	2

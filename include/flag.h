@@ -265,6 +265,7 @@ struct instance_flags {
 	boolean wc_mouse_support;	/* allow mouse support */
 	boolean wc2_fullscreen;		/* run fullscreen */
 	boolean wc2_softkeyboard;	/* use software keyboard */
+	boolean wc2_wraptext;		/* wrap text */
 
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 clicklook;	/* allow right-clicking for look */

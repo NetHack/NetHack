@@ -195,6 +195,7 @@ static struct Bool_Opt
 	{"use_inverse",   &iflags.wc_inverse, FALSE, SET_IN_GAME},		/*WC*/
 #endif
 	{"verbose", &flags.verbose, TRUE, SET_IN_GAME},
+	{"wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME},
 	{(char *)0, (boolean *)0, FALSE, 0}
 };
 
@@ -3314,6 +3315,7 @@ struct wc_Opt wc_options[] = {
 struct wc_Opt wc2_options[] = {
 	{"fullscreen", WC2_FULLSCREEN},
 	{"softkeyboard", WC2_SOFTKEYBOARD},
+	{"wraptext", WC2_WRAPTEXT},
 	{(char *)0, 0L}
 };
 
@@ -3411,7 +3413,7 @@ const char *optnam;
  * the appropriate bits for each option that you
  * are setting in the optmask argument
  * prior to calling.
- *    example: set_wc2_option_mod_status(WC2_FULLSCREEN|WC2_SOFTKEYBOARD, SET_IN_FILE);
+ *    example: set_wc2_option_mod_status(WC2_FULLSCREEN|WC2_SOFTKEYBOARD|WC2_WRAPTEXT, SET_IN_FILE);
  */
 
 void

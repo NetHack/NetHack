@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "July 16, 2003
+.ds f2 "August 14, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2188,6 +2188,9 @@ the message window.
 .lp windowcolors
 NetHack should display windows with the specified foreground/background
 colors if it can.
+.lp wraptext
+NetHack port should wrap long lines of text if they don't fit in 
+the visible area of the window.
 .hn 2
 Platform-specific Customization options
 .pg
