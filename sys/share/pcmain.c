@@ -638,7 +638,15 @@ char *str;
 # ifndef WIN32
 	Strcpy (tmp, str);
 # else
-	*(tmp + GetModuleFileName((HANDLE)0, tmp, bsize)) = '\0';
+	#ifdef UNICODE
+	{
+		TCHAR wbuf[BUFSZ];
+		GetModuleFileName((HANDLE)0, wbuf, BUFSZ);
+		WideCharToMultiByte(CP_ACP, 0, wbuf, -1, tmp, bsize, NULL, NULL);
+	}
+	#else
+		*(tmp + GetModuleFileName((HANDLE)0, tmp, bsize)) = '\0';
+	#endif
 # endif
 	tmp2 = strrchr(tmp, PATH_SEPARATOR);
 	if (tmp2) *tmp2 = '\0';

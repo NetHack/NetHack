@@ -34,7 +34,13 @@ STATIC_DCL struct mkroom *FDECL(pos_to_room, (XCHAR_P, XCHAR_P));
 STATIC_DCL boolean FDECL(place_niche,(struct mkroom *,int*,int*,int*));
 STATIC_DCL void FDECL(makeniche,(int));
 STATIC_DCL void NDECL(make_niches);
+
+#ifdef WIN_CE
+static int __cdecl do_comp(const void *vx, const void *vy);
+#else
 STATIC_PTR int FDECL(do_comp,(const genericptr,const genericptr));
+#endif
+
 STATIC_DCL void FDECL(dosdoor,(XCHAR_P,XCHAR_P,struct mkroom *,int));
 STATIC_DCL void FDECL(join,(int,int,BOOLEAN_P));
 STATIC_DCL void FDECL(do_room_or_subroom, (struct mkroom *,int,int,int,int,
@@ -53,10 +59,14 @@ static boolean made_branch;	/* used only during level creation */
 
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
+#ifdef WIN_CE
+static int __cdecl do_comp(const void *vx, const void *vy)
+#else
 STATIC_PTR int
 do_comp(vx,vy)
 const genericptr vx;
 const genericptr vy;
+#endif
 {
 #ifdef LINT
 /* lint complains about possible pointer alignment problems, but we know
@@ -108,7 +118,11 @@ sort_rooms()
 #if defined(SYSV) || defined(DGUX)
 	qsort((genericptr_t) rooms, (unsigned)nroom, sizeof(struct mkroom), do_comp);
 #else
+# if defined(WIN_CE)
+	qsort((genericptr_t) rooms, (unsigned)nroom, sizeof(struct mkroom), (int (__cdecl*)(const void *, const void *))do_comp);
+# else
 	qsort((genericptr_t) rooms, nroom, sizeof(struct mkroom), do_comp);
+# endif
 #endif
 }
 

@@ -99,7 +99,9 @@ static int lockptr;
 #define Delay(a) msleep(a)
 # endif
 #define Close close
+#ifndef WIN_CE
 #define DeleteFile unlink
+#endif
 #endif
 
 #ifdef USER_SOUNDS

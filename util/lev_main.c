@@ -25,6 +25,10 @@
 # endif
 #endif
 
+#ifdef WIN_CE
+#define PREFIX "\\nethack\\dat\\"
+#endif
+
 #ifndef MPWTOOL
 # define SpinCursor(x)
 #endif

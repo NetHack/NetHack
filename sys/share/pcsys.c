@@ -11,7 +11,7 @@
 
 #include <ctype.h>
 #include <fcntl.h>
-#ifndef MSDOS			/* already done */
+#if !defined(MSDOS) && !defined(WIN_CE) 	/* already done */
 #include <process.h>
 #endif
 #ifdef __GO32__

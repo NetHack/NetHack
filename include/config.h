@@ -46,6 +46,7 @@
 /* #define X11_GRAPHICS */	/* X11 interface */
 /* #define QT_GRAPHICS */	/* Qt interface */
 /* #define GNOME_GRAPHICS */	/* Gnome interface */
+/* #define MSWIN_GRAPHICS */	/* Windows NT, CE, Graphics */
 
 /*
  * Define the default window system.  This should be one that is compiled
@@ -96,6 +97,16 @@
 # ifndef DEFAULT_WINDOW_SYS
 #  define DEFAULT_WINDOW_SYS "Gnome"
 # endif
+#endif
+
+#ifdef MSWIN_GRAPHICS
+# ifdef TTY_GRAPHICS
+# undef TTY_GRAPHICS
+# endif
+# ifndef DEFAULT_WINDOW_SYS
+#  define DEFAULT_WINDOW_SYS "mswin"
+# endif
+# define HACKDIR "\\nethack"
 #endif
 
 #ifndef DEFAULT_WINDOW_SYS

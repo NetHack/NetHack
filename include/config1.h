@@ -108,6 +108,11 @@
 /*
  * Windows NT Autodetection
  */
+#ifdef _WIN32_WCE
+# ifndef WIN32
+# define WIN32
+# endif
+#endif
 
 #ifdef WIN32
 # undef UNIX
@@ -116,6 +121,16 @@
 # define STRNCMPI
 # define USE_STDARG
 # define NEED_VARARGS
+
+# ifdef UNDER_CE
+# define WIN_CE
+# define STRCMPI
+# endif 
+
+/* ARM - the processor; avoids conflict with ARM in hack.h */
+# ifdef ARM
+# undef ARM
+# endif
 #endif
 
 
