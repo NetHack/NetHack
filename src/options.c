@@ -22,6 +22,9 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
  *  options help (option_help()), the long options help (dat/opthelp),
  *  and the current options setting display function (doset()),
  *  and also the Guidebooks.
+ *
+ *  The order matters.  If an option is a an initial substring of another
+ *  option (e.g. time and timed_delay) the shorter one must come first.
  */
 
 static struct Bool_Opt
@@ -164,8 +167,8 @@ static struct Bool_Opt
 	{"sound", &flags.soundok, TRUE, SET_IN_GAME},
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
 	{"standout", &flags.standout, FALSE, SET_IN_GAME},
-	{"time", &flags.time, FALSE, SET_IN_GAME},
 	{"tiled_map",     &iflags.wc_tiled_map, FALSE, DISP_IN_GAME},	/*WC*/
+	{"time", &flags.time, FALSE, SET_IN_GAME},
 #ifdef TIMED_DELAY
 	{"timed_delay", &flags.nap, TRUE, SET_IN_GAME},
 #else
@@ -386,9 +389,6 @@ static boolean initial, from_file;
 STATIC_DCL void FDECL(doset_add_menu, (winid,const char *,int));
 STATIC_DCL void FDECL(nmcpy, (char *, const char *, int));
 STATIC_DCL void FDECL(escapes, (const char *, char *));
-#if 0
-STATIC_DCL int FDECL(boolopt_only_initial, (int));
-#endif
 STATIC_DCL void FDECL(rejectoption, (const char *));
 STATIC_DCL void FDECL(badoption, (const char *));
 STATIC_DCL char *FDECL(string_for_opt, (char *,BOOLEAN_P));
@@ -401,9 +401,6 @@ STATIC_DCL int FDECL(feature_alert_opts, (char *, const char *));
 STATIC_DCL const char *FDECL(get_compopt_value, (const char *, char *));
 STATIC_DCL boolean FDECL(special_handling, (const char *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(warning_opts, (char *,const char *));
-#if 0
-STATIC_DCL int FDECL(warnlevel_opts, (char *, const char *));
-#endif
 STATIC_DCL void FDECL(duplicate_opt_detection, (const char *, int));
 
 STATIC_OVL void FDECL(wc_set_font_name, (int, char *));
@@ -642,25 +639,6 @@ char *tp;
     *tp = '\0';
 }
 
-#if 0
-/* some boolean options can only be set on start-up */
-STATIC_OVL int
-boolopt_only_initial(i)
-int i;
-{
-	return (boolopt[i].addr == &flags.female
-	     || boolopt[i].addr == &flags.legacy
-#if defined(MICRO) && !defined(AMIGA)
-	     || boolopt[i].addr == &iflags.rawio
-	     || boolopt[i].addr == &iflags.BIOS
-#endif
-#if defined(MSDOS) && defined(USE_TILES)
-	     || boolopt[i].addr == &iflags.preload_tiles
-#endif
-	);
-}
-#endif
-
 STATIC_OVL void
 rejectoption(optname)
 const char *optname;
@@ -835,48 +813,6 @@ register uchar *graph_chars;
 	    warnsyms[i] = graph_chars[i];
 }
 
-#if 0
-/* warnlevel is unnecessary with the new warning introduced in 3.3.1 */
-STATIC_OVL int
-warnlevel_opts(op, optn)
-char *op;
-const char *optn;
-{
-	char buf[BUFSZ];
-	int twarnlevel;
-	boolean rejectlevel = FALSE;
-
-	if (op) {
-		twarnlevel = atoi(op);
-		if (twarnlevel >= WARNCOUNT || twarnlevel < 1)
-			rejectlevel = TRUE;
-		else {
-			flags.warnlevel = twarnlevel;
-			see_monsters();
-		}
-	}
-	if (rejectlevel) {
-		if (!initial)
-			pline("warnlevel must be 1 to %d.", WARNCOUNT - 1);
-		else {
-			Sprintf(buf,
-			    "\n%s=%s Invalid warnlevel ignored (must be 1 to %d)",
-				optn, op, WARNCOUNT - 1);
-			badoption(buf);
-		}
-		return 0;
-	}
-	if (!initial) {
-		if (flags.warnlevel < WARNCOUNT -1)
-			Sprintf(buf, "s %d to %d", flags.warnlevel, WARNCOUNT - 1);
-		else
-			Sprintf(buf, " %d", flags.warnlevel);
-		pline("Warning level%s will be displayed.", buf);
-	}
-	return 1;
-}
-#endif
-
 STATIC_OVL int
 feature_alert_opts(op, optn)
 char *op;
@@ -963,6 +899,7 @@ int bool_or_comp;	/* 0 == boolean option, 1 == compound */
 			        wait_synch();
 			}
 			*optptr += 1;
+			break; /* don't match multiple options */
 		}
 	    }
 	} else if ((bool_or_comp == 1) && iflags.opt_compdup && initial && from_file) {
@@ -976,6 +913,7 @@ int bool_or_comp;	/* 0 == boolean option, 1 == compound */
 			        wait_synch();
 			}
 			*optptr += 1;
+			break; /* don't match multiple options */
 		}
 	    }
 	}
@@ -1201,9 +1139,9 @@ boolean tinitial, tfrom_file;
 
 	if (match_optname(opts, "palette", 3, TRUE)
 # ifdef MAC
-					|| match_optname(opts, "hicolor", 3, TRUE)
+	    || match_optname(opts, "hicolor", 3, TRUE)
 # endif
-									) {
+							) {
 	    int color_number, color_incr;
 
 # ifdef MAC
@@ -1399,15 +1337,6 @@ goodfruit:
 		else warning_opts(opts, fullname);
 		return;
 	}
-#if 0	/* do not enable post 3.3.0 */
-	fullname = "warnlevel";
-	if (match_optname(opts, fullname, 5, TRUE)) {
-	    op = string_for_opt(opts, negated);
-	    if (negated) bad_negation(fullname, FALSE);
-	    else if (op) (void) warnlevel_opts(op,fullname);
-	    return;
-	}
-#endif
 	/* boulder:symbol */
 	fullname = "boulder";
 	if (match_optname(opts, fullname, 7, TRUE)) {
@@ -2006,11 +1935,7 @@ goodfruit:
 			    return;
 			}
 			/* options that must come from config file */
-#if 0
-			if (!initial && boolopt_only_initial(i)) {
-#else
 			if (!initial && (boolopt[i].optflags == SET_IN_FILE)) {
-#endif
 			    rejectoption(boolopt[i].name);
 			    return;
 			}
@@ -2711,10 +2636,6 @@ char *buf;
 			ttycolors[CLR_BRIGHT_MAGENTA],
 			ttycolors[CLR_BRIGHT_CYAN]);
 #endif /* VIDEOSHADES */
-#if 0
-	else if (!strcmp(optname, "warnlevel"))
-		Sprintf(buf, "%d", flags.warnlevel);
-#endif
 	else if (!strcmp(optname, "windowtype"))
 		Sprintf(buf, "%s", windowprocs.name);
 #ifdef PREFIXES_IN_USE
