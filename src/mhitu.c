@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2004/12/20	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -104,7 +104,7 @@ register struct obj *otemp;
 		return;
 	pline("%s %s %s%s %s.", Monnam(mtmp),
 	      (objects[otemp->otyp].oc_dir & PIERCE) ? "thrusts" : "swings",
-	      (otemp->quan > 1) ? "one of " : "",
+	      (otemp->quan > 1L) ? "one of " : "",
 	      mhis(mtmp), xname(otemp));
 }
 

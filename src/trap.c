@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2004/11/11	*/
+/*	SCCS Id: @(#)trap.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2729,14 +2729,14 @@ xchar x, y;
 	    }
 	    dindx = (obj->oclass == SCROLL_CLASS) ? 2 : 3;
 	    if (in_sight)
-		pline("%s %s.", Yname2(obj), (obj->quan > 1) ?
+		pline("%s %s.", Yname2(obj), (obj->quan > 1L) ?
 		      destroy_strings[dindx*3 + 1] : destroy_strings[dindx*3]);
 	    delobj(obj);
 	    retval++;
 	} else if (obj->oclass == POTION_CLASS) {
 	    dindx = 1;
 	    if (in_sight)
-		pline("%s %s.", Yname2(obj), (obj->quan > 1) ?
+		pline("%s %s.", Yname2(obj), (obj->quan > 1L) ?
 		      destroy_strings[dindx*3 + 1] : destroy_strings[dindx*3]);
 	    delobj(obj);
 	    retval++;

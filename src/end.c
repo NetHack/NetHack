@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.4	2004/12/17	*/
+/*	SCCS Id: @(#)end.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1005,8 +1005,8 @@ boolean identified, all_containers;
 		} else {
 		    if (cat || deadcat) {
 			pline("%s%s contains Schroedinger's %scat!",
-			      (box->quan > 1) ? "One of the " : "",
-			      (box->quan > 1) ? xname(box) : upstart(xname(box)),
+			      (box->quan > 1L) ? "One of the " : "",
+			      (box->quan > 1L) ? xname(box) : upstart(xname(box)),
 			      (deadcat) ? "dead " : "");
 			display_nhwindow(WIN_MESSAGE, FALSE);
 		    }

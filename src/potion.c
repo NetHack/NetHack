@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2004/09/22	*/
+/*	SCCS Id: @(#)potion.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1991,7 +1991,7 @@ dodip()
 		char oldbuf[BUFSZ], newbuf[BUFSZ];
 		short old_otyp = potion->otyp;
 		boolean old_dknown = FALSE;
-		boolean more_than_one = potion->quan > 1;
+		boolean more_than_one = potion->quan > 1L;
 
 		oldbuf[0] = '\0';
 		if (potion->dknown) {

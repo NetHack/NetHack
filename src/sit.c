@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sit.c	3.4	2002/09/21	*/
+/*	SCCS Id: @(#)sit.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -301,7 +301,7 @@ dosit()
 
 		uegg = mksobj(EGG, FALSE, FALSE);
 		uegg->spe = 1;
-		uegg->quan = 1;
+		uegg->quan = 1L;
 		uegg->owt = weight(uegg);
 		uegg->corpsenm = egg_type_from_parent(u.umonnum, FALSE);
 		uegg->known = uegg->dknown = 1;

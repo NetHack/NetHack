@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2004/11/11	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -758,7 +758,7 @@ int thrown;
 			    You("hit %s with %s %s.", mon_nam(mon),
 				obj->dknown ? the(mons[obj->corpsenm].mname) :
 				an(mons[obj->corpsenm].mname),
-				(obj->quan > 1) ? makeplural(withwhat) : withwhat);
+				(obj->quan > 1L) ? makeplural(withwhat) : withwhat);
 			    if (!munstone(mon, TRUE))
 				minstapetrify(mon, TRUE);
 			    if (resists_ston(mon)) break;
@@ -786,7 +786,7 @@ int thrown;
 			   hand-to-hand attack should yield a "bashing" mesg */
 			if (obj == uwep) unweapon = TRUE;
 			if (obj->spe && obj->corpsenm >= LOW_PM) {
-			    if (obj->quan < 5)
+			    if (obj->quan < 5L)
 				change_luck((schar) -(obj->quan));
 			    else
 				change_luck(-5);
@@ -854,7 +854,7 @@ int thrown;
 			    } else {
 				char *whom = mon_nam(mon);
 				char *what = The(xname(obj));
-				if (!thrown && obj->quan > 1)
+				if (!thrown && obj->quan > 1L)
 				    what = An(singular(obj, xname));
 				/* note: s_suffix returns a modifiable buffer */
 				if (haseyes(mdat)

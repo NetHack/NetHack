@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)apply.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1135,7 +1135,7 @@ struct obj *obj;
 	        /* if it catches while you have it, then it's your tough luck */
 		check_unpaid(obj);
 	        verbalize("That's in addition to the cost of %s %s, of course.",
-			  yname(obj), obj->quan == 1 ? "itself" : "themselves");
+			  yname(obj), obj->quan == 1L ? "itself" : "themselves");
 		bill_dummy_object(obj);
 	    }
 	    begin_burn(obj, FALSE);
@@ -1987,7 +1987,7 @@ struct obj *tstone;
     }
 #endif
 
-    if (obj == tstone && obj->quan == 1) {
+    if (obj == tstone && obj->quan == 1L) {
 	You_cant("rub %s on itself.", the(xname(obj)));
 	return;
     }
@@ -2001,7 +2001,7 @@ struct obj *tstone;
 	    pline("Oh, wow, look at the pretty shards.");
 	else
 	    pline("A sharp crack shatters %s%s.",
-		  (obj->quan > 1) ? "one of " : "", the(xname(obj)));
+		  (obj->quan > 1L) ? "one of " : "", the(xname(obj)));
 #ifndef GOLDOBJ
      /* assert(obj != &goldobj); */
 #endif

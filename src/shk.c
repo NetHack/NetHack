@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.4	2004/11/17	*/
+/*	SCCS Id: @(#)shk.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2137,7 +2137,7 @@ const char *arg;
 	if (was_unknown) {
 	    Sprintf(fmtbuf, "%%s; you %s", fmt);
 	    obj_name[0] = highc(obj_name[0]);
-	    pline(fmtbuf, obj_name, (obj->quan > 1) ? "them" : "it",
+	    pline(fmtbuf, obj_name, (obj->quan > 1L) ? "them" : "it",
 		  amt, plur(amt), arg);
 	} else {
 	    You(fmt, obj_name, amt, plur(amt), arg);
@@ -3073,7 +3073,7 @@ boolean catchup;	/* restoring a level */
 		/* convert to an object */
 		otmp = mksobj((ttmp->ttyp == LANDMINE) ? LAND_MINE :
 				BEARTRAP, TRUE, FALSE);
-		otmp->quan= 1;
+		otmp->quan= 1L;
 		otmp->owt = weight(otmp);
 		(void) mpickobj(shkp, otmp);
 	    }

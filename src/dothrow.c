@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.4	2004/11/11	*/
+/*	SCCS Id: @(#)dothrow.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1689,7 +1689,7 @@ boolean in_view;
 			    You_hear("%s shatter!", something);
 			else
 			    pline("%s shatter%s%s!", Doname2(obj),
-				(obj->quan==1) ? "s" : "", to_pieces);
+				(obj->quan==1L) ? "s" : "", to_pieces);
 			break;
 		case EGG:
 		case MELON:

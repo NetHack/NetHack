@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)explode.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)explode.c	3.4	2004/12/21	*/
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -428,7 +428,7 @@ struct obj *obj;			/* only scatter this obj        */
 
 	while ((otmp = individual_object ? obj : level.objects[sx][sy]) != 0) {
 	    if (otmp->quan > 1L) {
-		qtmp = otmp->quan - 1;
+		qtmp = otmp->quan - 1L;
 		if (qtmp > LARGEST_INT) qtmp = LARGEST_INT;
 		qtmp = (long)rnd((int)qtmp);
 		otmp = splitobj(otmp, qtmp);

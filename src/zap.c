@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2004/11/22	*/
+/*	SCCS Id: @(#)zap.c	3.4	2004/12/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3300,16 +3300,16 @@ boolean u_caused;
 			obj_resists(obj, 2, 100))
 		    continue;
 		scrquan = obj->quan;	/* number present */
-		delquan = 0;		/* number to destroy */
-		for (i = scrquan; i > 0; i--)
+		delquan = 0L;		/* number to destroy */
+		for (i = scrquan; i > 0L; i--)
 		    if (!rn2(3)) delquan++;
 		if (delquan) {
 		    /* save name before potential delobj() */
 		    if (give_feedback) {
-			obj->quan = 1;
+			obj->quan = 1L;
 			Strcpy(buf1, (x == u.ux && y == u.uy) ?
 				xname(obj) : distant_name(obj, xname));
-			obj->quan = 2;
+			obj->quan = 2L;
 		    	Strcpy(buf2, (x == u.ux && y == u.uy) ?
 				xname(obj) : distant_name(obj, xname));
 			obj->quan = scrquan;
@@ -3320,7 +3320,7 @@ boolean u_caused;
 		    else delobj(obj);
 		    cnt += delquan;
 		    if (give_feedback) {
-			if (delquan > 1)
+			if (delquan > 1L)
 			    pline("%ld %s burn.", delquan, buf2);
 			else
 			    pline("%s burns.", An(buf1));
@@ -3963,7 +3963,7 @@ register int osym, dmgtyp;
 	    physical_damage = FALSE;
 	    if(obj->oclass != osym) continue; /* test only objs of type osym */
 	    if(obj->oartifact) continue; /* don't destroy artifacts */
-	    if(obj->in_use && obj->quan == 1) continue; /* not available */
+	    if(obj->in_use && obj->quan == 1L) continue; /* not available */
 	    xresist = skip = 0;
 #ifdef GCC_WARN
 	    dmg = dindx = 0;
