@@ -603,7 +603,7 @@ do_date()
 
 static char save_bones_compat_buf[BUFSZ];
 
-void
+static void
 build_savebones_compat_string()
 {
 #ifdef VERSION_COMPATIBILITY
