@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2003/05/25	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2003/07/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1437,7 +1437,7 @@ boolean looting;	/* loot vs tip */
 	} else if (nolimbs(youmonst.data)) {
 		pline("Without limbs, you cannot %s anything.", verb);
 		return FALSE;
-	} else if (!freehand()) {
+	} else if (looting && !freehand()) {
 		pline("Without a free %s, you cannot loot anything.",
 			body_part(HAND));
 		return FALSE;
