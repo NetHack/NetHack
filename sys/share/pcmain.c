@@ -105,7 +105,7 @@ char *argv[];
 	register char *dir;
 #if defined(WIN32)
 	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
-	boolean save_getreturn_status;
+	boolean save_getreturn_status = getreturn_enabled;
 #endif
 #ifdef NOCWD_ASSUMPTIONS
 	char failbuf[BUFSZ];
