@@ -29,7 +29,7 @@ static const char *developers[] = {
 	/* Atari team */
 	"Eric", "Marvin", "Warwick",
 	/* NT team */
-	"Michael",
+	"Alex", "Dion", "Michael",
 	/* OS/2 team */
 	"Helge", "Ron", "Timo",
 	/* VMS team */
