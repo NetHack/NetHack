@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2002/02/03	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2002/03/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,9 +41,9 @@
 /* Version 3.4.0 */
 
 /*
- *  NetHack 3.4.0, February ??, 2002
+ *  NetHack 3.4.0, March 10, 2002
  *
- *  Many, many bug general fixes including some for sliming, zapping, conduct,
+ *  Hundreds of general bug fixes including some for sliming, zapping, conduct,
  *	and several more for riding
  *  Eliminated a few potentially fatal bugs including one for stone-to-flesh,
  *	trouble-fixing during prayer, riding down stairs while punished,
@@ -57,9 +57,12 @@
  *  Changes to Wizard quest
  *  Added the travel command which works by mouse click or '_' command
  *  Config file BOULDER option to specify the symbol for displaying boulders
+ *  Incorporate modified versions of several 3.3.1 patches that have been
+ *      in circulation in the NetHack community
+ *  New Gnomish Mines levels (courtesy Kelly Bailey)
  *  Mac: command-key shortcuts in the player selection dialog
  *  Amiga: screenmode requester, and several amiga specific bug fixes
- *  Win32 graphical port contributed by Alex Kompel included in source tree
+ *  Win32 graphical port contributed by Alex Kompel is now included
  */
 
 /* Version 3.4 */
