@@ -1017,6 +1017,7 @@ doengrave()
 		multi = -(len/10);
 		if (multi) nomovemsg = "You finish writing in the dust.";
 		break;
+	    case HEADSTONE:
 	    case ENGRAVE:
 		multi = -(len/10);
 		if ((otmp->oclass == WEAPON_CLASS) &&
