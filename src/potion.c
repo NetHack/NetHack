@@ -246,16 +246,11 @@ boolean talk;
 long mask;	/* nonzero if resistance status should change by mask */
 {
 	boolean changed = 0;
-#ifdef LINT
-	const char *message = 0;
-#else
-	const char *message;
-#endif
+	const char *message, *verb;
 
-	if (!xtime)
-	    message = "Everything looks SO boring now.";
-	else
-	    message = "Oh wow!  Everything seems so cosmic!";
+	message = (!xtime) ? "Everything %s SO boring now." :
+			     "Oh wow!  Everything %s so cosmic!";
+	verb = (!Blind) ? "looks" : "feels";
 
 	if (mask) {
 	    if (HHallucination) changed = TRUE;
@@ -283,7 +278,7 @@ long mask;	/* nonzero if resistance status should change by mask */
 	    update_inventory();
 
 	    flags.botl = 1;
-	    if (!Blind && talk) pline(message);
+	    if (talk) pline(message, verb);
 	}
 }
 
