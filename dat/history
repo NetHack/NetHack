@@ -102,7 +102,7 @@ DevTeam and incorporated the best of these ideas in NetHack 3.3.
 
 The 3.3 development team initially consisted of Michael Allison, Ken Arromdee, 
 David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, 
-Kevin Hugo, Steve Linhart, Dean Luick, Pat Rankin, Eric Smith, 
+Kevin Hugo, Steve Linhart, Ken Lorber, Dean Luick, Pat Rankin, Eric Smith, 
 Mike Stephenson, Janet Walz, and Paul Winner. Warwick Allison joined just 
 before the release of NetHack 3.3.2.
 
@@ -122,7 +122,7 @@ the Microsoft Windows NT/2000 platform.
 
 Ron Van Iwaarden maintained 3.3 for OS/2.
 
-Janne Salmijarvi, Ken Lorber, and Teemu Suikki maintained and enhanced the 
+Janne Salmijarvi and Teemu Suikki maintained and enhanced the 
 Amiga port of 3.3 after Janne Salmijarvi resurrected it for 3.3.1.
 
 Christian `Marvin' Bressler maintained 3.3 for the Atari after he
@@ -130,6 +130,7 @@ resurrected it for 3.3.1.
 
 Alex Kompel contributed a new graphical port of 3.3 for Microsoft Windows.
 
+There is a NetHack web site maintained by Ken Lorber at http://www.nethack.org.
 
 			   - - - - - - - - - -
 

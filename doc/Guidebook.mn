@@ -2223,11 +2223,10 @@ DevTeam and incorporated the best of these ideas in NetHack 3.3.
 .pg
 The 3.3 development team initially consisted of \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSteve Creps\fP, \fBKevin Darcy\fP, 
-\fBTimo Hakulinen\fP, \fBKevin Hugo\fP, \fBSteve Linhart\fP,
+\fBTimo Hakulinen\fP, \fBKevin Hugo\fP, \fBSteve Linhart\fP, \fBKen Lorber\fP,
 \fBDean Luick\fP, \fBPat Rankin\fP, \fBEric Smith\fP, \fBMike Stephenson\fP, 
 \fBJanet Walz\fP, and \fBPaul Winner\fP.  \fB Warwick Allison\fP joined 
 just before the release of NetHack 3.3.2.
-
 .pg
 As with version 3.2, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
@@ -2245,13 +2244,15 @@ the Microsoft Windows NT/2000 platform.
 .pg
 \fBRon Van Iwaarden\fP maintained 3.3 for OS/2.
 .pg
-\fBJanne Salmijarvi\fP, \fBKen Lorber\fP, and \fBTeemu Suikki\fP maintained and 
+\fBJanne Salmijarvi\fP and \fBTeemu Suikki\fP maintained and 
 enhanced the Amiga port of 3.3 after \fBJanne Salmijarvi\fP resurrected it for 3.3.1.
 .pg
 \fBChristian ``Marvin'' Bressler\fP maintained 3.3 for the Atari after he 
 resurrected it for 3.3.1.
 .pg
 \fBAlex Kompel\fP contributed a new graphical port of 3.3 for Microsoft Windows.
+.pg
+There is a NetHack web site maintained by \fBKen Lorber\fP at http://www.nethack.org.
 .pg
 			   - - - - - - - - - -
 .pg

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mail.c	3.3	1999/08/24	*/
+/*	SCCS Id: @(#)mail.c	3.3	2002/01/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -446,7 +446,8 @@ struct obj *otmp;
     "Only Amiga makes it possible.",
     "CATS have all the answers.",
 #endif
-    "Report bugs to <devteam@nethack.org>."
+    "Report bugs to <devteam@nethack.org>.",
+    "Invitation: Visit the NetHack web site at http://www.nethack.org!"
     };
 
     if (Blind) {
