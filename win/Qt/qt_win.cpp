@@ -4981,6 +4981,11 @@ void NetHackQtBind::qt_outrip(winid wid, int how)
 
 bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 {
+    // Ignore Alt-key navigation to menubar, it's annoying when you
+    // use Alt-Direction to move around.
+    if ( main && event->type()==QEvent::KeyRelease && main==receiver )
+	return TRUE;
+
     bool result=QApplication::notify(receiver,event);
     if (event->type()==QEvent::KeyPress) {
 	QKeyEvent* key_event=(QKeyEvent*)event;
