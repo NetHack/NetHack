@@ -1,4 +1,4 @@
-               Instructions for Installing NetHack 3.4.1
+               Instructions for Installing NetHack 3.4.2
                      on a VMS (aka OpenVMS) system
                =========================================
 
@@ -44,6 +44,8 @@
         [.sys   .share   .sounds] -- AIFF format audio files
         [.sys   .unix]  -- guess :-)
         [.sys   .wince] -- Windows CE
+        [.sys   .wince   .ceinc] -- more WinCE
+        [.sys   .wince   .ceinc   .sys] -- ditto
         [.sys   .winnt] -- Windows NT
         [.win   .gem]   -- window routines for Atari/GEM
         [.win   .gnome] -- window routines for Unix/GNOME
@@ -134,10 +136,10 @@
 
 Notes:
 
-1.  Save files and bones files from versions 3.4.0 will work with 3.4.1;
-    those from earlier versions will not.  The scoreboard file (RECORD)
-    from 3.4.0 or 3.3.x will also work; one from version 3.2.x is
-    slightly different format but should be compatible.
+1.  Save files and bones files from versions 3.4.0 and 3.4.1 will work
+    with 3.4.2; those from earlier versions will not.  The scoreboard
+    file (RECORD) from 3.4.x or 3.3.x will also work; one from version
+    3.2.x is slightly different format but should be compatible.
 
 2.  To specify user-preference options in your environment, define the
     logical name NETHACKOPTIONS to have the value of a quoted string
@@ -474,4 +476,4 @@ Notes:
     Always include version information for NetHack, the operating system,
     and the C compiler used.
 
-10-FEB-2003
+21-AUG-2003

@@ -90,7 +90,7 @@ RANDOBJ = random.obj
 # Other things that have to be reconfigured are in vmsconf.h,
 # and config.h
 
-VERSION  = 3.4.1
+VERSION  = 3.4.2
 
 MAKEDEFS = $(UTL)makedefs.exe;
 
