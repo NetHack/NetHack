@@ -452,7 +452,6 @@ half physical damage should apply to gas spores
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
-X11: map not displayed in color when using X11 windowtype w/o tiles
 amiga: random crashes when opening menu window in fontmode eliminated
 amiga: proper action taken (cancel) when closing the menu window
 	with closegadget or escape
@@ -461,26 +460,27 @@ amiga: prevent plname[] overflow from askname()
 amiga: prevent writing outside basewindow (bottom)
 amiga: tilemode tombstone corrected on cybergfx screen
 amiga: don't clutter levels/ with foo.0 when quitting at playerselection
-tiles: use pixel-accurate grid bug tile for grid bugs
-Qt: honor user preferences in startup dialog
-tty: correctly dismiss 1-line menus
-tty: clear screen before version incompatibility message so it doesn't just
-    print the message overwriting previous screen text
-unix/tty: give user a chance to see any error produced by (de)compression
-win32/tty: menus can take advantage of consoles larger than 80x25
-win32/tty: add support for inverse attribute
 micro: prevent a guaranteed impossible() if we ever have more than (COLNO - 1) 
 	levels in the game
 micro: fix out of bounds memory modification for file opens via PATH
 msdos: placeholder tiles accepted by the thin tile builder
+tiles: use pixel-accurate grid bug tile for grid bugs
+tty: correctly dismiss 1-line menus
+tty: clear screen before version incompatibility message so it doesn't just
+    print the message overwriting previous screen text
+tty: pet was not always hilited
+tty: don't crash if the news file is present but empty
+unix/tty: give user a chance to see any error produced by (de)compression
+win32/tty: menus can take advantage of consoles larger than 80x25
+win32/tty: add support for inverse attribute
+Gnome: workaround for GTK+ attempts to disallow setgid executables
+Qt: honor user preferences in startup dialog
+X11: map not displayed in color when using X11 windowtype w/o tiles
 X11: viewport scrolling could scroll the the wrong place with resized window
 X11: allow extra space added to map widget to be removed if widget shrinks
-Gnome: workaround for GTK+ attempts to disallow setgid executables
 X11: general solution to the problem that the meaning of font height varies
 	among different implementations of X11
 X11: make "slow" mode the default since it seems to be very prevalent
-tty: pet was not always hilited
-tty: don't crash if the news file is present but empty
 
 
 General New Features
@@ -573,8 +573,9 @@ phrase the prompts for P and R commands using "put on" and "remove" as the
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------
-mac: command-key shortcuts in the player selection dialog
 amiga: screenmode requester
 amiga: 16 color font mode
+mac: command-key shortcuts in the player selection dialog
+vms: default compiler configuration in sys/vms/Makefile.* switched to DEC C
 win32: new graphical port contribution by Alex Kompel
 
