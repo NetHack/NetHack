@@ -2222,8 +2222,7 @@ tty_wait_synch()
 	    /* this can only happen if we were reading and got interrupted */
 	    ttyDisplay->toplin = 3;
 	    /* do this twice; 1st time gets the Quit? message again */
-	    if (!iflags.prevmsg_window)
-		(void) tty_doprev_message();
+	    (void) tty_doprev_message();
 	    (void) tty_doprev_message();
 	    ttyDisplay->intr++;
 	    (void) fflush(stdout);

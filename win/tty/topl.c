@@ -29,7 +29,7 @@ tty_doprev_message()
     winid prevmsg_win;
     int i;
 
-    if (iflags.prevmsg_window) {
+    if (iflags.prevmsg_window && !ttyDisplay->inread) {
 	prevmsg_win = create_nhwindow(NHW_MENU);
 	putstr(prevmsg_win, 0, "Message History");
 	putstr(prevmsg_win, 0, "");
