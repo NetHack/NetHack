@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "February 12, 2003
+.ds f2 "March 14, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2182,6 +2182,11 @@ Platform-specific Customization options
 .pg
 Here are explanations of options that are used by specific platforms or ports 
 to customize and change the port behaviour.
+.lp altkeyhandler
+Select an alternate keystroke handler dll to load (Win32 tty NetHack only).
+The name of the handler is specified without the .dll extension and without any
+path information.
+Cannot be set with the `O' command.
 .lp altmeta
 (default on, AMIGA NetHack only).
 .lp "BIOS    "
@@ -2203,6 +2208,14 @@ Note:  DEC Rainbows hang if this is turned on.
 Cannot be set with the `O' command.
 .lp soundcard
 (default on, PC NetHack only).
+Cannot be set with the `O' command.
+.lp subkeyval
+(Win32 tty NetHackonly).
+May be used to alter the value of keystrokes that the operating system
+returns to NetHack to help compensate for international keyboard issues.
+OPTIONS=subkeyvalue:171/92
+will return 92 to NetHack, if 171 was originally going to be returned.
+You can use multiple subkeyvalue statements in the config file if needed.
 Cannot be set with the `O' command.
 .lp video
 Set the video mode used (PC NetHack only).

@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.60 $ $Date: 2003/01/11 17:21:42 $
+% $Revision: 1.61 $ $Date: 2003/02/13 04:55:28 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.4)}
-\date{February 12, 2003}
+\date{March 14, 2003}
 
 \maketitle
 
@@ -2692,6 +2692,12 @@ Here are explanations of options that are used by specific platforms
 or ports to customize and change the port behaviour.
 
 \blist{}
+%.lp
+\item[\ib{altkeyhandler}]
+Select an alternate keystroke handler dll to load ({\it Win32 tty\/ NetHack\/} only).
+The name of the handler is specified without the .dll extension and without any
+path information.
+Cannot be set with the `{\tt O}' command.
 %.lp 
 \item[\ib{altmeta}]
 (default on, {\it Amiga NetHack \/} only).
@@ -2716,9 +2722,18 @@ bulletproof input (MS-DOS sometimes treats `{\tt \^{}P}' as a printer toggle
 without it) (default off, {\it OS/2, PC\/ {\rm and} ST NetHack\/} only).  
 Note:  DEC Rainbows hang if this is turned on.
 Cannot be set with the `{\tt O}' command.
-%.lp 
+%.lp
 \item[\ib{soundcard}]
 (default off, {\it PC NetHack \/} only).
+Cannot be set with the `{\tt O}' command.
+%.lp
+\item[\ib{subkeyval}]
+({\it Win32 tty NetHack \/} only).
+May be used to alter the value of keystrokes that the operating system
+returns to NetHack to help compensate for international keyboard issues.
+OPTIONS=subkeyvalue:171/92
+will return 92 to NetHack, if 171 was originally going to be returned.
+You can use multiple subkeyvalue statements in the config file if needed.
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{video}]
