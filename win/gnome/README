@@ -1,0 +1,53 @@
+This directory contains the windowing code written for GnomeHack. The NetHack
+devteam is in the process of making it part of the normal distribution.  
+It should be noted that this is still work in progress and that there are
+still problems with this code.  So use at your own risk.  Of course any
+contributions, especially bug fixes, are more than welcome!
+
+These files are based on the files from GnomeHack 1.0.5 by Erik Andersen.
+Some files have been renamed to fit into 8.3 name constraints (yuk!).
+These are:
+
+	GnomeHack.h			gnomeprv.h
+	GnomeHackAskStringDialog.c	gnaskstr.c
+	GnomeHackAskStringDialog.h	gnaskstr.h
+	GnomeHackBind.c			gnbind.c
+	GnomeHackBind.h			gnbind.h
+	GnomeHackGlyph.c		gnglyph.c
+	GnomeHackGlyph.h		gnglyph.h
+	GnomeHackMainWindow.c		gnmain.c
+	GnomeHackMainWindow.h		gnmain.h
+	GnomeHackMapWindow.c		gnmap.c
+	GnomeHackMapWindow.h		gnmap.h
+	GnomeHackMenuWindow.c		gnmenu.c
+	GnomeHackMenuWindow.h		gnmenu.h
+	GnomeHackMessageWindow.c	gnmesg.c
+	GnomeHackMessageWindow.h	gnmesg.h
+	GnomeHackPlayerSelDialog.c	gnplayer.c
+	GnomeHackPlayerSelDialog.h	gnplayer.h
+	GnomeHackSettings.c		gnopts.c
+	GnomeHackSettings.h		gnopts.h
+	GnomeHackSignals.c		gnsignal.c
+	GnomeHackSignals.h		gnsignal.h
+	GnomeHackStatusWindow.c		gnstatus.c
+	GnomeHackStatusWindow.h		gnstatus.h
+	GnomeHackTextWindow.c		gntext.c
+	GnomeHackTextWindow.h		gntext.h
+	GnomeHackYesNoDialog.c		gnyesno.c
+	GnomeHackYesNoDialog.h		gnyesno.h
+
+Other files have been removed because we don't or can't use them (yet).
+
+	Makefile.am
+	Makefile.in
+	gnomehack.desktop
+	gnomehack.desktop.in
+
+NetHack currently doesn't use autoconf, so the setup for that has not
+made the translation.
+
+Note:  All loss in style, elegance, and readability is entirely our fault
+and not Erik's.
+
+
+
