@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.4	2002/10/04	*/
+/*	SCCS Id: @(#)read.c	3.4	2002/11/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -911,15 +911,43 @@ register struct obj	*sobj;
 		if (sobj->cursed) {
 		    pline_The("scroll disintegrates.");
 		} else {
-		    for (obj = invent; obj; obj = obj->nobj)
-			if (sobj->blessed ||
-			     (obj->owornmask &&
-			       ((obj->owornmask & ~W_SWAPWEP) || u.twoweap)) ||
+		    for (obj = invent; obj; obj = obj->nobj) {
+			long wornmask;
+#ifdef GOLDOBJ
+			/* gold isn't subject to cursing and blessing */
+			if (obj->oclass == COIN_CLASS) continue;
+#endif
+			wornmask = (obj->owornmask & ~(W_BALL|W_ART|W_ARTI));
+			if (wornmask && !sobj->blessed) {
+			    /* handle a couple of special cases; we don't
+			       allow auxiliary weapon slots to be used to
+			       artificially increase number of worn items */
+			    if (obj == uswapwep) {
+				if (!u.twoweap) wornmask = 0L;
+			    } else if (obj == uquiver) {
+				if (obj->oclass == WEAPON_CLASS) {
+				    /* mergeable weapon test covers ammo,
+				       missiles, spears, daggers & knives */
+				    if (!objects[obj->otyp].oc_merge) 
+					wornmask = 0L;
+				} else if (obj->oclass == GEM_CLASS) {
+				    /* possibly ought to check whether
+				       alternate weapon is a sling... */
+				    if (!uslinging()) wornmask = 0L;
+				} else {
+				    /* weptools don't merge and aren't
+				       reasonable quivered weapons */
+				    wornmask = 0L;
+				}
+			    }
+			}
+			if (sobj->blessed || wornmask ||
 			     obj->otyp == LOADSTONE ||
 			     (obj->otyp == LEASH && obj->leashmon)) {
 			    if(confused) blessorcurse(obj, 2);
 			    else uncurse(obj);
 			}
+		    }
 		}
 		if(Punished && !confused) unpunish();
 		update_inventory();
