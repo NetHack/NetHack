@@ -90,9 +90,7 @@ RANDOBJ = random.obj
 # Other things that have to be reconfigured are in vmsconf.h,
 # and config.h
 
-# note: no trailing whitespace (or comment) after version or patchlevel numbers
-VERSION  =3.4
-PATCHLVL =0
+VERSION  = 3.4.1
 
 MAKEDEFS = $(UTL)makedefs.exe;
 
@@ -196,7 +194,7 @@ nethack.opt :	$(MAKEFILE)	# this file
       @ write f f$edit("$(HOBJ5)","COLLAPSE")
       @ write f f$edit("$(HOBJ6)","COLLAPSE")
       @ write f "iosegment=128"
-	write f "identification=$(VERSION).$(PATCHLVL)"
+	write f "identification=$(VERSION)"
 	close f
 
 # linker options file for run-time libraries, also used by $(UTL)Makefile
