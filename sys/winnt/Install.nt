@@ -191,9 +191,7 @@ Running NetHack
 
 7.  Make sure all of the support files -- Guidebook.txt, license,
     Defaults.nh, NetHack.exe, nhdat, and recover.exe -- were copied to the 
-    game directory.  If not, move them there yourself.  Defaults.nh is 
-    actually distributed in the sources as sys/winnt/winnt.cnf, 
-    but the Makefile should take care of moving it and renaming it correctly.
+    game directory.  If not, move them there yourself.
 
     Edit Defaults.nh to reflect your particular setup and personal 
     preferences, by following the comments.  As with all releases since
@@ -347,10 +345,6 @@ Running NetHack
     -- were copied to the binary directory.  
     (If not, find them in the tree and move them there yourself if they
      exist.  If they don't exist, something has gone wrong)
-
-    Defaults.nh is actually distributed in the sources as sys/winnt/winnt.cnf, 
-    but the build process should take care of moving it and renaming it 
-    correctly.
 
     Edit Defaults.nh to reflect your particular setup and personal 
     preferences, by following the comments.  As with all releases since
