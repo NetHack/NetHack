@@ -2099,6 +2099,10 @@ logDebug(const char *fmt, ...)
 #define TEXTRIGHT			"TextRight"
 #define TEXTTOP				"TextTop"
 #define TEXTBOTTOM			"TextBottom"
+#define INVENTLEFT			"InventLeft"
+#define INVENTRIGHT			"InventRight"
+#define INVENTTOP			"InventTop"
+#define INVENTBOTTOM		"InventBottom"
 
 /* #define all the subkeys here */
 #define INTFKEY "Interface"
@@ -2163,10 +2167,10 @@ mswin_read_reg()
 		NHGETREG_DWORD(TEXTRIGHT, GetNHApp()->rtTextWindow.right);
 		NHGETREG_DWORD(TEXTTOP, GetNHApp()->rtTextWindow.top);
 		NHGETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtTextWindow.bottom);
-		NHGETREG_DWORD(TEXTLEFT, GetNHApp()->rtInvenWindow.left);
-		NHGETREG_DWORD(TEXTRIGHT, GetNHApp()->rtInvenWindow.right);
-		NHGETREG_DWORD(TEXTTOP, GetNHApp()->rtInvenWindow.top);
-		NHGETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
+		NHGETREG_DWORD(INVENTLEFT, GetNHApp()->rtInvenWindow.left);
+		NHGETREG_DWORD(INVENTRIGHT, GetNHApp()->rtInvenWindow.right);
+		NHGETREG_DWORD(INVENTTOP, GetNHApp()->rtInvenWindow.top);
+		NHGETREG_DWORD(INVENTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
 #undef NHGETREG_DWORD
     
     RegCloseKey(key);
