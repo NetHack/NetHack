@@ -1346,6 +1346,12 @@ struct monst *mtmp, *victim;
 	if (mtmp->mhp <= 0)
 	    return ((struct permonst *)0);
 
+	/* note:  none of the monsters with special hit point calculations
+	   have both little and big forms */
+	oldtype = monsndx(ptr);
+	newtype = little_to_big(oldtype);
+	if (newtype == PM_PRIEST && mtmp->female) newtype = PM_PRIESTESS;
+
 	/* growth limits differ depending on method of advancement */
 	if (victim) {		/* killed a monster */
 	    /*
@@ -1362,6 +1368,9 @@ struct monst *mtmp, *victim;
 	    else if (is_home_elemental(ptr))
 		hp_threshold *= 3;
 	    lev_limit = 3 * (int)ptr->mlevel / 2;	/* same as adj_lev() */
+	    /* If they can grow up, be sure the level is high enough for that */
+	    if (oldtype != newtype && mons[newtype].mlevel > lev_limit)
+		lev_limit = (int)mons[newtype].mlevel;
 	    /* number of hit points to gain; unlike for the player, we put
 	       the limit at the bottom of the next level rather than the top */
 	    max_increase = rnd((int)victim->m_lev + 1);
@@ -1386,11 +1395,6 @@ struct monst *mtmp, *victim;
 	else if (lev_limit < 5) lev_limit = 5;	/* arbitrary */
 	else if (lev_limit > 49) lev_limit = (ptr->mlevel > 49 ? 50 : 49);
 
-	/* note:  none of the monsters with special hit point calculations
-	   have both little and big forms */
-	oldtype = monsndx(ptr);
-	newtype = little_to_big(oldtype);
-	if (newtype == PM_PRIEST && mtmp->female) newtype = PM_PRIESTESS;
 	if ((int)++mtmp->m_lev >= mons[newtype].mlevel && newtype != oldtype) {
 	    ptr = &mons[newtype];
 	    if (mvitals[newtype].mvflags & G_GENOD) {	/* allow G_EXTINCT */
