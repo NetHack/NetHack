@@ -96,7 +96,7 @@
 #	define PORT_CE_CPU "SH4"
 #elif defined(MIPS)
 #	define PORT_CE_CPU "MIPS"
-#elif defined(X86)
+#elif defined(X86) || defined(_X86_)
 #	define PORT_CE_CPU "X86"
 #else
 #	error Only ARM, PPC, ALPHA, SH3, SH4, MIPS and X86 supported

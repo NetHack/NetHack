@@ -246,6 +246,7 @@ void FormatStatusString(char* text, int format)
 	else
 		Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
 	if( format==NHSTAT_LINES_4 ) strcat(text, "\r\n");
+	else                         strcat(text, " ");
 
 	/* forth line */
 	if(flags.time)
