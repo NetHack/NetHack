@@ -95,7 +95,9 @@ dosh()
 #   endif
 		suspend_nhwindows((char *)0);
 #  endif /* TOS */
+#  ifndef NOCWD_ASSUMPTIONS
 		chdirx(orgdir, 0);
+#  endif
 #  ifdef __GO32__
 		if (system(comspec) < 0) {  /* wsu@eecs.umich.edu */
 #  else
@@ -120,7 +122,9 @@ dosh()
 		if (iflags.BIOS)
 			(void)Cursconf(1, -1);
 #  endif
+#  ifndef NOCWD_ASSUMPTIONS
 		chdirx(hackdir, 0);
+#  endif
 		get_scr_size(); /* maybe the screen mode changed (TH) */
 #  if defined(MSDOS) && defined(NO_TERMS)
 		if (grmode) gr_init();
@@ -512,7 +516,7 @@ static void msexit()
 #ifdef MFLOPPY
 	if (ramdisk) copybones(TOPERM);
 #endif
-#ifdef CHDIR
+#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 	chdir(orgdir);		/* chdir, not chdirx */
 	chdrive(orgdir);
 #endif

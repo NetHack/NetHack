@@ -221,7 +221,7 @@ char *argv[];
 		 */
 		if (!strncmp(argv[1], "-s", 2)) {
 #if !defined(MSWIN_GRAPHICS)
-# ifdef CHDIR
+# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 			chdirx(hackdir,0);
 # endif
 			prscore(argc, argv);
@@ -252,7 +252,7 @@ char *argv[];
 	/* chdir shouldn't be called before this point to keep the
 	 * code parallel to other ports.
 	 */
-#ifdef CHDIR
+#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 	chdirx(hackdir,1);
 #endif
 
