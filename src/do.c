@@ -97,10 +97,12 @@ boolean pushing;
 		    vision_full_recalc = 1;
 		    You("find yourself on dry land again!");
 		} else if (lava && distu(rx,ry) <= 2) {
+		    int dmg;
 		    You("are hit by molten lava%c",
 			Fire_resistance ? '.' : '!');
 			burn_away_slime();
-		    losehp(d((Fire_resistance ? 1 : 3), 6),
+		    dmg = d((Fire_resistance ? 1 : 3), 6);
+		    losehp(Maybe_Half_Phys(dmg),
 			   "molten lava", KILLED_BY);
 		} else if (!fills_up && flags.verbose &&
 			   (pushing ? !Blind : cansee(rx,ry)))
@@ -1158,7 +1160,8 @@ boolean at_stairs, falling, portal;
 			dismount_steed(DISMOUNT_FELL);
 		    else
 #endif
-			losehp(rnd(3), "falling downstairs", KILLED_BY);
+			losehp(Maybe_Half_Phys(rnd(3)),
+				"falling downstairs", KILLED_BY);
 		    selftouch("Falling, you");
 		} else if (u.dz && at_ladder)
 		    You("climb down the ladder.");

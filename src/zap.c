@@ -1789,9 +1789,11 @@ STATIC_OVL void
 backfire(otmp)
 struct obj *otmp;
 {
+	int dmg;
 	otmp->in_use = TRUE;	/* in case losehp() is fatal */
 	pline("%s suddenly explodes!", The(xname(otmp)));
-	losehp(d(otmp->spe+2,6), "exploding wand", KILLED_BY_AN);
+	dmg = d(otmp->spe+2,6);
+	losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
 	useup(otmp);
 }
 
@@ -1823,7 +1825,7 @@ dozap()
 	    if ((damage = zapyourself(obj, TRUE)) != 0) {
 		char buf[BUFSZ];
 		Sprintf(buf, "zapped %sself with a wand", uhim());
-		losehp(damage, buf, NO_KILLER_PREFIX);
+		losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
 	    }
 	} else {
 
@@ -2313,10 +2315,12 @@ struct obj *obj;	/* wand or spell */
 	    } else if (striking && u.dz < 0 && rn2(3) &&
 			!Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz) &&
 			!Underwater && !Is_qstart(&u.uz)) {
+		int dmg;
 		/* similar to zap_dig() */
 		pline("A rock is dislodged from the %s and falls on your %s.",
 		      ceiling(x, y), body_part(HEAD));
-		losehp(rnd((uarmh && is_metallic(uarmh)) ? 2 : 6),
+		dmg = rnd((uarmh && is_metallic(uarmh)) ? 2 : 6);
+		losehp(Maybe_Half_Phys(dmg),
 		       "falling rock", KILLED_BY_AN);
 		if ((otmp = mksobj_at(ROCK, x, y, FALSE, FALSE)) != 0) {
 		    (void)xname(otmp);	/* set dknown, maybe bknown */
@@ -3835,9 +3839,11 @@ register int osym, dmgtyp;
 	register long i, cnt, quan;
 	register int dindx;
 	const char *mult;
+	boolean physical_damage;
 
 	for(obj = invent; obj; obj = obj2) {
 	    obj2 = obj->nobj;
+	    physical_damage = FALSE;
 	    if(obj->oclass != osym) continue; /* test only objs of type osym */
 	    if(obj->oartifact) continue; /* don't destroy artifacts */
 	    if(obj->in_use && obj->quan == 1) continue; /* not available */
@@ -3856,6 +3862,7 @@ register int osym, dmgtyp;
 		    break;
 		case AD_FIRE:
 		    xresist = (Fire_resistance && obj->oclass != POTION_CLASS);
+		    physical_damage = TRUE;
 
 		    if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
 			skip++;
@@ -3941,6 +3948,7 @@ register int osym, dmgtyp;
 			const char *how = destroy_strings[dindx * 3 + 2];
 			boolean one = (cnt == 1L);
 
+			if (physical_damage) dmg = Maybe_Half_Phys(dmg);
 			losehp(dmg, one ? how : (const char *)makeplural(how),
 			       one ? KILLED_BY_AN : KILLED_BY);
 			exercise(A_STR, FALSE);

@@ -2324,7 +2324,7 @@ uchar aatyp;
 			break;
 		    }
 		    You("are suddenly very hot!");
-		    mdamageu(mon, tmp);
+		    mdamageu(mon, Maybe_Half_Phys(tmp));
 		}
 		break;
 	      case AD_ELEC:

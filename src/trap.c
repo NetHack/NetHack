@@ -2443,7 +2443,7 @@ struct obj *box;	/* null for floor trap */
 	if (!num)
 	    You("are uninjured.");
 	else
-	    losehp(num, tower_of_flame, KILLED_BY_AN);
+	    losehp(Maybe_Half_Phys(num), tower_of_flame, KILLED_BY_AN);
 	burn_away_slime();
 
 	if (burnarmor(&youmonst) || rn2(3)) {

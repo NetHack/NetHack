@@ -1310,7 +1310,8 @@ int magic; /* 0=Physical, otherwise skill level */
 		case TT_BEARTRAP: {
 		    register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
 		    You("rip yourself free of the bear trap!  Ouch!");
-		    losehp(rnd(10), "jumping out of a bear trap", KILLED_BY);
+		    losehp(Maybe_Half_Phys(rnd(10)),
+				"jumping out of a bear trap", KILLED_BY);
 		    set_wounded_legs(side, rn1(1000,500));
 		    break;
 		  }

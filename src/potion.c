@@ -474,7 +474,8 @@ peffects(otmp)
 				you_unwere(FALSE);
 			    u.ulycn = NON_PM;	/* cure lycanthropy */
 			}
-			losehp(d(2,6), "potion of holy water", KILLED_BY_AN);
+			losehp(Maybe_Half_Phys(d(2,6)),
+				"potion of holy water", KILLED_BY_AN);
 		    } else if(otmp->cursed) {
 			You_feel("quite proud of yourself.");
 			healup(d(2,6),0,0,0);
@@ -493,7 +494,8 @@ peffects(otmp)
 		    } else {
 			if(u.ualign.type == A_LAWFUL) {
 			    pline("This burns like acid!");
-			    losehp(d(2,6), "potion of unholy water",
+			    losehp(Maybe_Half_Phys(d(2,6)),
+				"potion of unholy water",
 				KILLED_BY_AN);
 			} else
 			    You_feel("full of dread.");
@@ -835,10 +837,11 @@ peffects(otmp)
 	   && (u.ux != sstairs.sx || u.uy != sstairs.sy || !sstairs.up)
 	   && (!xupladder || u.ux != xupladder || u.uy != yupladder)
 	) {
+					int dmg = uarmh ? 1 : rnd(10);
 					You("hit your %s on the %s.",
 						body_part(HEAD),
 						ceiling(u.ux,u.uy));
-					losehp(uarmh ? 1 : rnd(10),
+					losehp(Maybe_Half_Phys(dmg),
 						"colliding with the ceiling",
 						KILLED_BY);
 				} else (void) doup();
@@ -976,7 +979,7 @@ boolean your_fault;
 		distance = 0;
 		pline_The("%s crashes on your %s and breaks into shards.",
 			botlnam, body_part(HEAD));
-		losehp(rnd(2), "thrown potion", KILLED_BY_AN);
+		losehp(Maybe_Half_Phys(rnd(2)), "thrown potion", KILLED_BY_AN);
 	} else {
 		distance = distu(mon->mx,mon->my);
 		if (!cansee(mon->mx,mon->my)) pline("Crash!");

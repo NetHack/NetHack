@@ -912,7 +912,7 @@ genericptr_t p2;
 	if (!Poison_resistance) {
 	    pline("%s is burning your %s!", Something, makeplural(body_part(LUNG)));
 	    You("cough and spit blood!");
-	    losehp(rnd(dam) + 5, "gas cloud", KILLED_BY_AN);
+	    losehp(Maybe_Half_Phys(rnd(dam) + 5), "gas cloud", KILLED_BY_AN);
 	    return FALSE;
 	} else {
 	    You("cough!");

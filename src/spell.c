@@ -107,6 +107,7 @@ cursed_book(bp)
 	struct obj *bp;
 {
 	int lev = objects[bp->otyp].oc_level;
+	int dmg = 0;
 
 	switch(rn2(lev)) {
 	case 0:
@@ -161,7 +162,8 @@ cursed_book(bp)
 		} else {
 		    pline("As you read the book, it %s in your %s!",
 			  explodes, body_part(FACE));
-		    losehp(2*rnd(10)+5, "exploding rune", KILLED_BY_AN);
+		    dmg = 2*rnd(10)+5;
+		    losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
 		}
 		return TRUE;
 	default:
@@ -726,6 +728,7 @@ boolean atme;
 	int energy, damage, chance, n, intell;
 	int skill, role_skill;
 	boolean confused = (Confusion != 0);
+	boolean physical_damage = FALSE;
 	struct obj *pseudo;
 	coord cc;
 
@@ -833,8 +836,10 @@ boolean atme;
 	 * effects, e.g. more damage, further distance, and so on, without
 	 * additional cost to the spellcaster.
 	 */
-	case SPE_CONE_OF_COLD:
 	case SPE_FIREBALL:
+	    physical_damage = TRUE;
+	    /* fall through */
+	case SPE_CONE_OF_COLD:
 	    if (role_skill >= P_SKILLED) {
 	        if (throwspell()) {
 		    cc.x=u.dx;cc.y=u.dy;
@@ -844,6 +849,8 @@ boolean atme;
 			    if ((damage = zapyourself(pseudo, TRUE)) != 0) {
 				char buf[BUFSZ];
 				Sprintf(buf, "zapped %sself with a spell", uhim());
+				if (physical_damage)
+					damage = Maybe_Half_Phys(damage);
 				losehp(damage, buf, NO_KILLER_PREFIX);
 			    }
 			} else {
@@ -867,6 +874,8 @@ boolean atme;
 
 	/* these spells are all duplicates of wand effects */
 	case SPE_FORCE_BOLT:
+		physical_damage = TRUE;
+		/* fall through */
 	case SPE_SLEEP:
 	case SPE_MAGIC_MISSILE:
 	case SPE_KNOCK:
@@ -894,6 +903,7 @@ boolean atme;
 			    if ((damage = zapyourself(pseudo, TRUE)) != 0) {
 				char buf[BUFSZ];
 				Sprintf(buf, "zapped %sself with a spell", uhim());
+				if (physical_damage) damage = Maybe_Half_Phys(damage);
 				losehp(damage, buf, NO_KILLER_PREFIX);
 			    }
 			} else weffects(pseudo);

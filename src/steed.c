@@ -324,7 +324,7 @@ mount_steed(mtmp, force)
 		    x_monnam(mtmp, ARTICLE_A, (char *)0,
 			SUPPRESS_IT|SUPPRESS_INVISIBLE|SUPPRESS_HALLUCINATION,
 			     TRUE));
-	    losehp(rn1(5,10), buf, NO_KILLER_PREFIX);
+	    losehp(Maybe_Half_Phys(rn1(5,10)), buf, NO_KILLER_PREFIX);
 	    return (FALSE);
 	}
 
@@ -483,7 +483,7 @@ dismount_steed(reason)
 	    case DISMOUNT_FELL:
 		You("%s off of %s!", verb, mon_nam(mtmp));
 		if (!have_spot) have_spot = landing_spot(&cc,reason,1);
-		losehp(rn1(10,10), "riding accident", KILLED_BY_AN);
+		losehp(Maybe_Half_Phys(rn1(10,10)), "riding accident", KILLED_BY_AN);
 		set_wounded_legs(BOTH_SIDES, (int)HWounded_legs + rn1(5,5));
 		repair_leg_damage = FALSE;
 		break;

@@ -79,7 +79,8 @@ dosit()
 	        } else if(u.utraptype == TT_PIT) {
 		    if(trap->ttyp == SPIKED_PIT) {
 			You("sit down on a spike.  Ouch!");
-			losehp(1, "sitting on an iron spike", KILLED_BY);
+			losehp(Half_physical_damage ? rn2(2) : 1,
+				"sitting on an iron spike", KILLED_BY);
 			exercise(A_STR, FALSE);
 		    } else
 			You("sit down in the pit.");
