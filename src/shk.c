@@ -939,7 +939,7 @@ rouse_shk(shkp, verbosely)
 struct monst *shkp;
 boolean verbosely;
 {
-	if (!shkp->mcanmove) {
+	if (!shkp->mcanmove || shkp->msleeping) {
 	    /* greed induced recovery... */
 	    if (verbosely && canspotmon(shkp))
 		pline("%s %s.", Monnam(shkp),
@@ -1168,7 +1168,7 @@ proceed:
 	if (ltmp || eshkp->billct || eshkp->debit) 
 	    rouse_shk(shkp, TRUE);
 
-	if (!shkp->mcanmove) {	    /* still asleep or paralyzed */
+	if (!shkp->mcanmove || shkp->msleeping) { /* still asleep/paralyzed */
 		pline("%s %s.", Monnam(shkp),
 		      rn2(2) ? "seems to be napping" : "doesn't respond");
 		return 0;
@@ -1617,7 +1617,7 @@ int croaked;
 	    if (cansee(shkp->mx, shkp->my && croaked))
 		pline("%s %slooks at your corpse%s and %s.",
 		      Monnam(shkp),
-		      !shkp->mcanmove ? "wakes up, " : "",
+		      (!shkp->mcanmove || shkp->msleeping) ? "wakes up, " : "",
 		      !rn2(2) ? (shkp->female ? ", shakes her head," :
 			   ", shakes his head,") : "",
 		      !inhishop(shkp) ? "disappears" : "sighs");
@@ -1653,7 +1653,7 @@ int croaked;
                 umoney = money_cnt(invent);
 #endif
 		takes[0] = '\0';
-		if (!shkp->mcanmove)
+		if (!shkp->mcanmove || shkp->msleeping)
 			Strcat(takes, "wakes up and ");
 		if (distu(shkp->mx, shkp->my) > 2)
 			Strcat(takes, "comes and ");
