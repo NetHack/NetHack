@@ -4533,10 +4533,24 @@ void NetHackQtBind::qt_get_nh_event()
 {
 }
 
+#if defined(QWS)
+// Kludge to access lastWindowClosed() signal.
+class TApp : public QApplication {
+public:
+    TApp(int& c, char**v) : QApplication(c,v) {}
+    void lwc() { emit lastWindowClosed(); }
+};
+#endif
+ 
 void NetHackQtBind::qt_exit_nhwindows(const char *)
 {
-    delete instance;
-    delete qApp;
+#if defined(QWS)
+    // Avoids bug in SHARP SL5500
+    ((TApp*)qApp)->lwc();
+    qApp->quit();
+#endif
+ 
+    delete instance; // ie. qApp
 }
 
 void NetHackQtBind::qt_suspend_nhwindows(const char *)
