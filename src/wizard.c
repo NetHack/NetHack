@@ -439,9 +439,6 @@ nasty(mcast)
 	    for(j=0; j<20; j++) {
 		int makeindex;
 
-		if (mcast &&
-			!enexto(&bypos, mcast->mux, mcast->muy, mcast->data))
-		    continue;
 		/* Don't create more spellcasters of the monsters' level or
 		 * higher--avoids chain summoners filling up the level.
 		 */
@@ -449,6 +446,10 @@ nasty(mcast)
 		    makeindex = pick_nasty();
 		} while(mcast && attacktype(&mons[makeindex], AT_MAGC) &&
 			monstr[makeindex] >= monstr[mcast->mnum]);
+		/* do this after picking the monster to place */
+		if (mcast &&
+		    !enexto(&bypos, mcast->mux, mcast->muy, &mons[makeindex]))
+		    continue;
 		if ((mtmp = makemon(&mons[makeindex],
 				    bypos.x, bypos.y, NO_MM_FLAGS)) != 0) {
 		    mtmp->msleeping = mtmp->mpeaceful = mtmp->mtame = 0;
