@@ -706,6 +706,8 @@ doengrave()
 			}
 			if (!Blind)
 			    Strcpy(post_engr_text,
+				IS_GRAVE(levl[u.ux][u.uy].typ) ?
+				"Chips fly out from the headstone." :
 				is_ice(u.ux,u.uy) ?
 				"Ice chips fly up from the ice surface!" :
 				"Gravel flies up from the floor.");
