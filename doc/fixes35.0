@@ -67,6 +67,7 @@ when a giant carrying a boulder dies in a pit, ensure that the corpse is
 when blind and levitating > shouldn't say "stairs" if player has not seen them
 a slow-moving monster hidden under a rotting corpse was not immediately
 	displayed when the corpse rotted away
+mimic that ends up on the rogue level should not mimic a closed door
 
 
 Platform- and/or Interface-Specific Fixes

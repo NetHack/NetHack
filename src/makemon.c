@@ -1665,6 +1665,8 @@ register struct monst *mtmp;
 		 *  If there is a wall to the left that connects to this
 		 *  location, then the mimic mimics a horizontal closed door.
 		 *  This does not allow doors to be in corners of rooms.
+		 *  Since rogue has no closed doors, mimic a wall there
+		 *  (yes, mimics can end up on this level by various means).
 		 */
 		if (mx != 0 &&
 			(levl[mx-1][my].typ == HWALL    ||
@@ -1674,9 +1676,9 @@ register struct monst *mtmp;
 			 levl[mx-1][my].typ == TDWALL   ||
 			 levl[mx-1][my].typ == CROSSWALL||
 			 levl[mx-1][my].typ == TUWALL    ))
-		    appear = S_hcdoor;
+		    appear = Is_rogue_level(&u.uz) ? S_hwall : S_hcdoor;
 		else
-		    appear = S_vcdoor;
+		    appear = Is_rogue_level(&u.uz) ? S_vwall : S_vcdoor;
 
 		if(!mtmp->minvis || See_invisible)
 		    block_point(mx,my);	/* vision */
