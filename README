@@ -166,7 +166,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     or Windows XP at this point.  It may work, but then again it may not.
     
     A build for Intel 80286 machines and DOS "real mode" overlaid versions 
-    has been not been produced for 3.4.0.  Nobody on the porting team has
+    has not been produced for 3.4.0.  Nobody on the porting team has
     the time or the software to attempt the necessary tuning that will allow 
     it achieve the balance of having just the right amount of available 
     memory, and still have acceptable performance.  The sources necessary 
