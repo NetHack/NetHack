@@ -3171,15 +3171,24 @@ boolean force;
 		deal_with_floor_trap = TRUE;
 		Strcpy(the_trap, the(defsyms[trap_to_defsym(ttmp->ttyp)].explanation));
 		if (box_here) {
-			Sprintf(qbuf, "There %s and %s here. %s %s?",
+			if (ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT) {
+			    You_cant("do much about %s%s.",
+					the_trap, u.utrap ?
+					" that you're stuck in" :
+					" while standing on the edge of it");
+			    trap_skipped = TRUE;
+			    deal_with_floor_trap = FALSE;
+			} else {
+			    Sprintf(qbuf, "There %s and %s here. %s %s?",
 				(containercnt == 1) ? "is a container" : "are containers",
 				an(defsyms[trap_to_defsym(ttmp->ttyp)].explanation),
 				ttmp->ttyp == WEB ? "Remove" : "Disarm", the_trap);
-			switch (ynq(qbuf)) {
-			  case 'q': return(0);
-			  case 'n': trap_skipped = TRUE;
-				    deal_with_floor_trap = FALSE;
-				    break;
+			    switch (ynq(qbuf)) {
+				case 'q': return(0);
+				case 'n': trap_skipped = TRUE;
+					  deal_with_floor_trap = FALSE;
+					  break;
+			    }
 			}
 		}
 		if (deal_with_floor_trap) {
@@ -3221,9 +3230,8 @@ boolean force;
 	if(!u.dx && !u.dy) {
 	    for(otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
 		if(Is_box(otmp)) {
-		    There("is %s here.", doname(otmp));
-
-		    switch (ynq("Check for traps?")) {
+		    Sprintf(qbuf, "There is %s here. Check it for traps?", doname(otmp));
+		    switch (ynq(qbuf)) {
 			case 'q': return(0);
 			case 'n': continue;
 		    }
