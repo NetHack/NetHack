@@ -897,12 +897,8 @@ char *sopt;
  *	getch();
  */
 	iflags.grmode  = 0;
-	iflags.hasvesa = 0;
 	iflags.hasvga  = 0;
-	iflags.has8514 = 0;
-	iflags.usevesa = 0;
 	iflags.usevga  = 0;
-	iflags.use8514 = 0;
 
 	if (strncmpi(sopt,"def",3) == 0) {              /* default */
 		/* do nothing - default */
@@ -939,11 +935,9 @@ char *sopt;
 #  endif
 	/*
 	 * Auto-detect Priorities (arbitrary for now):
-	 *	VESA, 8514, VGA
+	 *	VGA
 	 */
-		if (iflags.hasvesa) iflags.usevesa = 1;
-		else if (iflags.has8514) iflags.use8514 = 1;
-		else if (iflags.hasvga)	{
+		if (iflags.hasvga)	{
 			iflags.usevga  = 1;
 			/* VGA depends on BIOS to enable function keys*/
 			iflags.BIOS = 1;

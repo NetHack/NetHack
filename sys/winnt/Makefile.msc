@@ -184,7 +184,7 @@ DLBFLG =
 #==========================================
 
 CFLAGSBASE  = -c $(cflags) $(cvarsmt) -I$(INCL) -nologo $(cdebug) $(WINPINC)
-LFLAGSBASEC = $(linkdebug) $(conflags) $(conlibsmt)
+LFLAGSBASEC = $(linkdebug) /NODEFAULTLIB /INCREMENTAL:NO /RELEASE /NOLOGO -subsystem:console,4.0 $(conlibsmt)
 LFLAGSBASEG = $(linkdebug) $(guiflags) $(guilibsmt) comctl32.lib
 
 #==========================================
@@ -197,8 +197,7 @@ LFLAGSU	= $(LFLAGSBASEC)
 #==========================================
 # - Game build
 #==========================================
-
-LFLAGSBASE = $(linkdebug) $(conflags) $(conlibsmt)
+LFLAGSBASE = $(linkdebug) /NODEFAULTLIB /INCREMENTAL:NO /RELEASE /NOLOGO -subsystem:console,4.0 $(conlibsmt)
 CFLAGS	 = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
 NHLFLAGS1 = /NODEFAULTLIB /INCREMENTAL:NO /PDB:"$(GAME).PDB" /RELEASE /NOLOGO
 NHLFLAGS2 = /MAP:"$(GAME).MAP" /MACHINE:$(CPU) -IGNORE:505 
@@ -574,7 +573,7 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 $(GAMEFILE) : $(ALLOBJ) $(NHRES)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
-	@$(link) $(LFLAGS) -out:$@ @<<$(GAME).lnk
+	$(link) $(LFLAGS) -out:$@ @<<$(GAME).lnk
 		$(ALLOBJ:^	=^
 		) $(NHRES)
 <<
