@@ -1846,16 +1846,23 @@ struct obj *tstone;
 {
     struct obj *obj;
     boolean do_scratch;
-    const char *streak_color;
+    const char *streak_color, *choices;
     char stonebuf[QBUFSZ];
     static const char scritch[] = "\"scritch, scritch\"";
     static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
+    static const char justgems[3] = { ALLOW_NONE, GEM_CLASS, 0 };
 #ifndef GOLDOBJ
     struct obj goldobj;
 #endif
 
+    /* in case it was acquired while blinded */
+    if (!Blind) tstone->dknown = 1;
+    /* when the touchstone is fully known, don't bother listing extra
+       junk as likely candidates for rubbing */
+    choices = (tstone->otyp == TOUCHSTONE && tstone->dknown &&
+		objects[TOUCHSTONE].oc_name_known) ? justgems : allowall;
     Sprintf(stonebuf, "rub on the stone%s", plur(tstone->quan));
-    if ((obj = getobj(allowall, stonebuf)) == 0)
+    if ((obj = getobj(choices, stonebuf)) == 0)
 	return;
 #ifndef GOLDOBJ
     if (obj->oclass == COIN_CLASS) {

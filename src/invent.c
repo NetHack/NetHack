@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2002/09/16	*/
+/*	SCCS Id: @(#)invent.c	3.4	2002/09/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -863,6 +863,9 @@ register const char *let,*word;
 		      otyp != OIL_LAMP && otyp != MAGIC_LAMP &&
 		      otyp != BRASS_LANTERN) ||
 		     (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
+		|| (!strncmp(word, "rub on the stone", 16) &&
+		    *let == GEM_CLASS &&	/* using known touchstone */
+		    otmp->dknown && objects[otyp].oc_name_known)
 		|| ((!strcmp(word, "use or apply") ||
 			!strcmp(word, "untrap with")) &&
 		     /* Picks, axes, pole-weapons, bullwhips */
