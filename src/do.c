@@ -671,6 +671,11 @@ int retry;
 		cnt = pick_list[i].count;
 		if (cnt < otmp->quan && !welded(otmp) &&
 			(!otmp->cursed || otmp->otyp != LOADSTONE)) {
+#ifndef GOLDOBJ
+		    if (otmp->oclass == GOLD_CLASS)
+			(void) splitobj(otmp, otmp->quan - cnt);
+		    else
+#endif
 		    otmp = splitobj(otmp, cnt);
 		}
 		n_dropped += drop(otmp);
