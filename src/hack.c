@@ -537,7 +537,7 @@ boolean test_only;
      *  Check for physical obstacles.  First, the place we are going.
      */
     if (IS_ROCK(tmpr->typ) || tmpr->typ == IRONBARS) {
-	if (Blind) feel_location(x,y);
+	if (Blind && !test_only) feel_location(x,y);
 	if (Passes_walls && may_passwall(x,y)) {
 	    ;	/* do nothing */
 	} else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
@@ -546,20 +546,15 @@ boolean test_only;
 	} else if (flags.autodig && !flags.run && !flags.nopick && uwep &&
 		   (uwep->otyp == PICK_AXE || uwep->otyp == DWARVISH_MATTOCK)) {
 	/* MRKR: Automatic digging when wielding the appropriate tool */
-	    if (!test_only) {
+	    if (!test_only)
 		use_pick_axe2(uwep);
-		flags.move = 0;
-		nomul(0);
-		return FALSE;
-	    }
+	    return FALSE;
 	} else {
 	    if ( !test_only ) {
 		if (Is_stronghold(&u.uz) && is_db_wall(x,y))
 		    pline_The("drawbridge is up!");
 		if (Passes_walls && !may_passwall(x,y) && In_sokoban(&u.uz))
 	    		pline_The("Sokoban walls resist your ability.");
-		flags.move = 0;
-		nomul(0);
 	    }
 	    return FALSE;
 	}
@@ -575,7 +570,6 @@ boolean test_only;
 		if (!test_only && still_chewing(x,y)) return FALSE;
 	    } else {
 		if ( !test_only ) {
-		    flags.move = 0;
 		    if (amorphous(youmonst.data))
 			You("try to ooze under the door, but can't squeeze your possessions through.");
 		    else if (x == ux || y == uy) {
@@ -596,7 +590,6 @@ boolean test_only;
 #endif
 			} else pline("That door is closed.");
 		    }
-		    nomul(0);
 		}
 		return FALSE;
 	    }
@@ -607,11 +600,8 @@ boolean test_only;
 #endif
 				    || block_door(x,y))) {
 	    /* Diagonal moves into a door are not allowed. */
-	    if ( !test_only ) {
-		if (Blind) feel_location(x,y);	/* ?? */
-		flags.move = 0;
-		nomul(0);
-	    }
+	    if ( Blind && !test_only )
+		feel_location(x,y);
 	    return FALSE;
 	}
     }
@@ -619,24 +609,18 @@ boolean test_only;
 	    && bad_rock(youmonst.data,ux,y) && bad_rock(youmonst.data,x,uy)) {
 	/* Move at a diagonal. */
 	if (In_sokoban(&u.uz)) {
-	    if ( !test_only ) {
+	    if ( !test_only )
 		You("cannot pass that way.");
-		nomul(0);
-	    }
 	    return FALSE;
 	}
 	if (bigmonst(youmonst.data)) {
-	    if ( !test_only ) {
+	    if ( !test_only )
 		Your("body is too large to fit through.");
-		nomul(0);
-	    }
 	    return FALSE;
 	}
 	if (invent && (inv_weight() + weight_cap() > 600)) {
-	    if ( !test_only ) {
+	    if ( !test_only )
 		You("are carrying too much to get through.");
-		nomul(0);
-	    }
 	    return FALSE;
 	}
     }
@@ -652,27 +636,21 @@ boolean test_only;
 			     || block_entry(x, y))
 			 )) {
 	/* Can't move at a diagonal out of a doorway with door. */
-	if ( !test_only ) {
-	    flags.move = 0;
-	    nomul(0);
-	}
 	return FALSE;
     }
 
     if (sobj_at(BOULDER,x,y) && (In_sokoban(&u.uz) || !Passes_walls)) {
-	if (!(Blind || Hallucination) && (flags.run >= 2)) {
-	    if ( !test_only ) {
-		nomul(0);
-		flags.move = 0;
-	    }
+	if (!(Blind || Hallucination) && (flags.run >= 2))
 	    return FALSE;
+	if (!test_only) {
+	    /* tunneling monsters will chew before pushing */
+	    if (tunnels(youmonst.data) && !needspick(youmonst.data) &&
+		!In_sokoban(&u.uz)) {
+		if (still_chewing(x,y)) return FALSE;
+	    } else
+		if (moverock() < 0) return FALSE;
 	}
-	/* tunneling monsters will chew before pushing */
-	if (tunnels(youmonst.data) && !needspick(youmonst.data) &&
-	    !In_sokoban(&u.uz)) {
-	    if (!test_only && still_chewing(x,y)) return FALSE;
-	} else
-	    if (moverock() < 0) return FALSE;
+	/* test_only will assume you'll be able to push it when you get there... */
     }
 
     /* OK, it is a legal place to move. */
@@ -1138,8 +1116,11 @@ domove()
 		return;
 	}
 
-	if ( !test_move( u.ux, u.uy, x-u.ux, y-u.uy, 0 ) )
+	if ( !test_move( u.ux, u.uy, x-u.ux, y-u.uy, 0 ) ) {
+	    flags.move = 0;
+	    nomul(0);
 	    return;
+	}
 
 	/* Move ball and chain.  */
 	if (Punished)
