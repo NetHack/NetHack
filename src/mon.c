@@ -100,11 +100,8 @@ STATIC_VAR short cham_to_pm[] = {
 		PM_SANDESTIN,
 };
 
-/* return TRUE if the monster tends to revive */
-#define REVIVER(ptr)	(is_rider(ptr) || ptr->mlet == S_TROLL)
-
 #define KEEPTRAITS(mon)	(mon->isshk || mon->mtame || \
-			 (mon->data->geno & G_UNIQ) || REVIVER(mon->data) || \
+			 (mon->data->geno & G_UNIQ) || is_reviver(mon->data) || \
 			 (mon->m_id == quest_status.leader_m_id))
 
 /* Creates a monster corpse, a "special" corpse, or nothing if it doesn't

@@ -2155,7 +2155,7 @@ mergable(otmp, obj)	/* returns TRUE if obj  & otmp can be merged */
 	/* hatching eggs don't merge; ditto for revivable corpses */
 	if ((obj->otyp == EGG && (obj->timed || otmp->timed)) ||
 	    (obj->otyp == CORPSE && otmp->corpsenm >= LOW_PM &&
-		mons[otmp->corpsenm].mlet == S_TROLL))
+		is_reviver(&mons[otmp->corpsenm])))
 	    return FALSE;
 
 	/* allow candle merging only if their ages are close */

@@ -129,6 +129,9 @@
 				 (ptr) == &mons[PM_GIANT] || \
 				 (ptr) == &mons[PM_ELF] || \
 				 (ptr) == &mons[PM_HUMAN])
+/* return TRUE if the monster tends to revive */
+#define is_reviver(ptr)		(is_rider(ptr) || (ptr)->mlet == S_TROLL)
+
 /* this returns the light's range, or 0 if none; if we add more light emitting
    monsters, we'll likely have to add a new light range field to mons[] */
 #define emits_light(ptr)	(((ptr)->mlet == S_LIGHT || \
