@@ -209,16 +209,16 @@ struct instance_flags {
 /*
  * Window capability support.
  */
-	boolean wc_color;		/* use color graphics */
-	boolean wc_hilite_pet;		/* hilight pets */
-	boolean wc_ascii_map;		/* show map using traditional ascii */
-	boolean wc_tiled_map;		/* show map using tiles */
-	boolean wc_preload_tiles;	/* preload tiles into memory */
-	boolean wc_tiles_8x16;		/* use 8x16  tiles */
-	boolean wc_tiles_16x16;		/* use 16x16 tiles */
-	boolean wc_tiles_32x32;		/* use 32x32 tiles */
+	boolean wc_color;		/* use color graphics                  */
+	boolean wc_hilite_pet;		/* hilight pets                        */
+	boolean wc_ascii_map;		/* show map using traditional ascii    */
+	boolean wc_tiled_map;		/* show map using tiles                */
+	boolean wc_preload_tiles;	/* preload tiles into memory           */
+	int	wc_tile_width;		/* tile width                          */
+	int	wc_tile_height;		/* tile height                         */
+	char	*wc_tile_file;		/* name of tile file;overrides default */
 	boolean wc_inverse;		/* use inverse video for some things   */
-	int	wc_align_status;	/*  status win at top|bot|right|left    */
+	int	wc_align_status;	/*  status win at top|bot|right|left   */
 	int	wc_align_message;	/* message win at top|bot|right|left   */
 	int     wc_vary_msgcount;	/* show more old messages at a time    */
 	char    *wc_font_map;		/* points to font name for the map win */

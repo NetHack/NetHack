@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.3	2002/02/02	*/
+/*	SCCS Id: @(#)options.c	3.3	2002/02/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -171,9 +171,6 @@ static struct Bool_Opt
 	{"standout", &flags.standout, FALSE, SET_IN_GAME},
 	{"time", &flags.time, FALSE, SET_IN_GAME},
 	{"tiled_map",     &iflags.wc_tiled_map, FALSE, DISP_IN_GAME},	/*WC*/
-	{"tiles_8x16",    &iflags.wc_tiles_8x16, FALSE, DISP_IN_GAME},	/*WC*/
-	{"tiles_16x16",   &iflags.wc_tiles_16x16, FALSE, DISP_IN_GAME},	/*WC*/
-	{"tiles_32x32",   &iflags.wc_tiles_32x32, FALSE, DISP_IN_GAME},	/*WC*/
 #ifdef TIMED_DELAY
 	{"timed_delay", &flags.nap, TRUE, SET_IN_GAME},
 #else
@@ -289,6 +286,9 @@ static struct Comp_Opt
 #endif
 	{ "suppress_alert", "suppress alerts about version-specific features",
 						8, SET_IN_GAME },
+	{ "tile_width", "width of tiles", 20, DISP_IN_GAME},	/*WC*/
+	{ "tile_height", "height of tiles", 20, DISP_IN_GAME},	/*WC*/
+	{ "tile_file", "name of tile file", 70, DISP_IN_GAME},	/*WC*/
 	{ "traps",    "the symbols to use in drawing traps",
 						MAXTCHARS+1, SET_IN_FILE },
 #ifdef MAC
@@ -1880,6 +1880,36 @@ goodfruit:
 		return;
 	}
 	/* WINCAP
+	 * tile_width:nn */
+	fullname = "tile_width";
+	if (match_optname(opts, fullname, sizeof("tile_width")-1, TRUE)) {
+		op = string_for_env_opt(fullname, opts, negated);
+		if ((negated && !op) || (!negated && op)) {
+			iflags.wc_tile_width = negated ? 0 : atoi(op);
+		} else if (negated) bad_negation(fullname, TRUE);
+		return;
+	}
+	/* WINCAP
+	 * tile_file:name */
+	fullname = "tile_file";
+	if (match_optname(opts, fullname, sizeof("tile_file")-1, TRUE)) {
+		if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+			if (iflags.wc_tile_file) free(iflags.wc_tile_file);
+			iflags.wc_tile_file = (char *)alloc(strlen(op) + 1);
+			Strcpy(iflags.wc_tile_file, op);
+		}
+	}
+	/* WINCAP
+	 * tile_height:nn */
+	fullname = "tile_height";
+	if (match_optname(opts, fullname, sizeof("tile_height")-1, TRUE)) {
+		op = string_for_env_opt(fullname, opts, negated);
+		if ((negated && !op) || (!negated && op)) {
+			iflags.wc_tile_height = negated ? 0 : atoi(op);
+		} else if (negated) bad_negation(fullname, TRUE);
+		return;
+	}
+	/* WINCAP
 	 * vary_msgcount:nn */
 	fullname = "vary_msgcount";
 	if (match_optname(opts, fullname, sizeof("vary_msgcount")-1, TRUE)) {
@@ -2627,7 +2657,14 @@ char *buf;
 			FEATURE_NOTICE_VER_MAJ,
 			FEATURE_NOTICE_VER_MIN,
 			FEATURE_NOTICE_VER_PATCH);
-	} else if (!strcmp(optname, "traps"))
+	}
+	else if (!strcmp(optname, "tile_file"))
+		Sprintf(buf, "%s", iflags.wc_tile_file ? iflags.wc_tile_file : none);
+	else if (!strcmp(optname, "tile_height"))
+		Sprintf(buf, "%d", iflags.wc_tile_width);
+	else if (!strcmp(optname, "tile_width"))
+		Sprintf(buf, "%d", iflags.wc_tile_width);
+	else if (!strcmp(optname, "traps"))
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "vary_msgcount"))
 		Sprintf(buf, "%d", iflags.wc_vary_msgcount);
@@ -2979,9 +3016,9 @@ struct wc_Opt wc_options[] = {
 	{"popup_dialog", WC_POPUP_DIALOG},
 	{"preload_tiles", WC_PRELOAD_TILES},
 	{"tiled_map", WC_TILED_MAP},
-	{"tiles_16x16", WC_TILES_16x16},
-	{"tiles_32x32", WC_TILES_32x32},
-	{"tiles_8x16", WC_TILES_8x16},
+	{"tile_file", WC_TILE_FILE},
+	{"tile_width", WC_TILE_WIDTH},
+	{"tile_height", WC_TILE_HEIGHT},
 	{"use_inverse", WC_INVERSE},
 	{"align_message", WC_ALIGN_MESSAGE},
 	{"align_status", WC_ALIGN_STATUS},
@@ -3037,6 +3074,7 @@ int wtype;
 char *fontname;
 {
 	char **fn = (char **)0;
+	if (!fontname) return;
 	switch(wtype) {
 	    case NHW_MAP:
 	    		fn = &iflags.wc_font_map;
@@ -3053,6 +3091,8 @@ char *fontname;
 	    case NHW_STATUS:
 	    		fn = &iflags.wc_font_status;
 			break;
+	    default:
+	    		return;
 	}
 	if (fn) {
 		if (*fn) free(*fn);

@@ -139,9 +139,9 @@ extern NEARDATA struct window_procs windowprocs;
 #define WC_ASCII_MAP	 0x04L		/* 03 supports an ascii map                  */
 #define WC_TILED_MAP	 0x08L		/* 04 supports a tiled map                   */
 #define WC_PRELOAD_TILES 0x10L		/* 05 supports pre-loading tiles             */
-#define WC_TILES_8x16	 0x20L		/* 06 supports 8x16 tiles                    */
-#define WC_TILES_16x16	 0x40L		/* 07 supports 16x16 tiles                   */
-#define WC_TILES_32x32	 0x80L		/* 08 supports 32x32 tiles                   */
+#define WC_TILE_WIDTH	 0x20L		/* 06 prefer this width of tile              */
+#define WC_TILE_HEIGHT	 0x40L		/* 07 prefer this height of tile             */
+#define WC_TILE_FILE	 0x80L		/* 08 alternative tile file name             */
 #define WC_INVERSE	 0x100L		/* 09 Port supports inverse video            */
 #define WC_ALIGN_MESSAGE 0x200L		/* 10 supports message alignmt top|b|l|r     */
 #define WC_ALIGN_STATUS	 0x400L		/* 11 supports status alignmt top|b|l|r      */
@@ -168,6 +168,7 @@ extern NEARDATA struct window_procs windowprocs;
 #define ALIGN_TOP	3
 #define ALIGN_BOTTOM	4
 
+/* map_mode settings - deprecated */
 #define MAP_MODE_TILES		0
 #define MAP_MODE_ASCII4x6	1
 #define MAP_MODE_ASCII6x8	2

@@ -440,9 +440,9 @@ to support:
   |  preload_tiles    | WC_PRELOAD_TILES   | wc_preload_tiles  |boolean |
   |  scroll_margin    | WC_SCROLL_MARGIN   | wc_scroll_margin  |int     |
   |  tiled_map        | WC_TILED_MAP       | wc_tiled_map      |boolean |
-  |  tiles_16x16      | WC_TILES_16x16     | wc_tiles_16x16    |boolean |
-  |  tiles_32x32      | WC_TILES_32x32     | wc_tiles_32x32    |boolean |
-  |  tiles_8x16       | WC_TILES_8x16      | wc_tiles_8x16     |boolean |
+  |  tile_width       | WC_TILE_WIDTH      | wc_tile_width     |int     |
+  |  tile_height      | WC_TILE_HEIGHT     | wc_tile_height    |int     |
+  |  tile_file        | WC_TILE_FILE       | wc_tile_file      |char *  |
   |  use_inverse      | WC_INVERSE         | wc_inverse        |boolean |
   |  vary_msgcount    | WC_VARY_MSGCOUNT   | wc_vary_msgcount  |int     |
   +-------------------+--------------------+-------------------+--------+
@@ -471,9 +471,12 @@ preload_tiles	-- port should preload tiles into memory.
 scroll_margin	-- port should scroll the display when the hero or cursor
 		   is this number of cells away from the edge of the window.
 tiled_map	-- port should display a tiled map if it can.
-tiles_16x16	-- port should display 16x16 tiles if it can.
-tiles_32x32	-- port should display 32x32 tiles if it can.
-tiles_8x16	-- port should display 8x16 tiles if it can.
+tile_width	-- port should display tiles with this width or round to closest
+		   if it can.
+tile_height	-- port should display tiles with this height or round to closest
+		   if it can.
+tile_file	-- open this alterntive tile file. The file name is likely to be
+		   window-port or platform specific.
 use_inverse	-- port should display inverse when NetHack asks for it.
 vary_msgcount	-- port should display this number of messages at a time in
 		   the message window.
