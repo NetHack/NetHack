@@ -2507,6 +2507,7 @@ register struct obj *obj;
 long numused;
 {
 	register struct obj *otmp;
+	boolean at_u = (obj->ox == u.ux && obj->oy == u.uy);
 
 	/* burn_floor_paper() keeps an object pointer that it tries to
 	 * useupf() multiple times, so obj must survive if plural */
@@ -2520,6 +2521,8 @@ long numused;
 	    else (void)stolen_value(otmp, otmp->ox, otmp->oy, FALSE, FALSE);
 	}
 	delobj(otmp);
+	if (at_u && u.uundetected && hides_under(youmonst.data))
+	    u.uundetected = OBJ_AT(u.ux, u.uy);
 }
 
 #endif /* OVLB */

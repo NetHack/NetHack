@@ -3601,6 +3601,7 @@ boolean *shopdamage;
 			if (u.uinwater) {   /* not just `if (Underwater)' */
 			    /* leave the no longer existent water */
 			    u.uinwater = 0;
+			    u.uundetected = 0;
 			    docrt();
 			    vision_full_recalc = 1;
 			} else if (u.utrap && u.utraptype == TT_LAVA) {

@@ -1570,9 +1570,12 @@ eatspecial() /* called after eating non-food */
 #ifdef GOLDOBJ
 		if (carried(otmp))
 		    useupall(otmp);
-		else
+#else
+		if (otmp->where == OBJ_FREE)
+		    dealloc_obj(otmp);
 #endif
-		dealloc_obj(otmp);
+		else
+		    useupf(otmp, otmp->quan);
 		return;
 	}
 	if (otmp->oclass == POTION_CLASS) {
@@ -2407,7 +2410,6 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 		    Sprintf(qbuf, "There are %ld gold pieces here; eat them?",
 			    gold->quan);
 		if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
-		    obj_extract_self(gold);
 		    return gold;
 		} else if (c == 'q') {
 		    return (struct obj *)0;
