@@ -1330,7 +1330,10 @@ dowear()
 
 	if (otmp->otyp == HELM_OF_OPPOSITE_ALIGNMENT &&
 			qstart_level.dnum == u.uz.dnum) {	/* in quest */
-		You("narrowly avoid losing all chance at your goal.");
+		if (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL])
+			You("narrowly avoid losing all chance at your goal.");
+		else	/* converted */
+			You("are suddenly overcome with shame and change your mind.");
 		u.ublessed = 0; /* lose your god's protection */
 		makeknown(otmp->otyp);
 		flags.botl = 1;
