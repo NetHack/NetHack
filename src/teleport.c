@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)teleport.c	3.4	2002/03/09	*/
+/*	SCCS Id: @(#)teleport.c	3.4	2002/05/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -215,7 +215,8 @@ teleds(nux, nuy, allow_drag)
 register int nux,nuy;
 boolean allow_drag;
 {
-	boolean ball_still_in_range = FALSE;
+	boolean ball_active = (Punished && uball->where != OBJ_FREE),
+		ball_still_in_range = FALSE;
 
 	/* If they have to move the ball, then drag if allow_drag is true;
 	 * otherwise they are teleporting, so unplacebc().  
@@ -232,7 +233,7 @@ boolean allow_drag;
 	 * dragging the ball is completely impossible (ball in range but there's
 	 * rock in the way), in which case it teleports the ball on its own.
 	 */
-	if (Punished) {
+	if (ball_active) {
 	    if (!carried(uball) && distmin(nux, nuy, uball->ox, uball->oy) <= 2)
 		ball_still_in_range = TRUE; /* don't have to move the ball */
 	    else {
@@ -266,7 +267,7 @@ boolean allow_drag;
 		u.uswldtim = u.uswallow = 0;
 		docrt();
 	}
-	if (Punished) {
+	if (ball_active) {
 	    if (ball_still_in_range || allow_drag) {
 		int bc_control;
 		xchar ballx, bally, chainx, chainy;
@@ -282,7 +283,7 @@ boolean allow_drag;
 	u.ux = nux;
 	u.uy = nuy;
 	fill_pit(u.ux0, u.uy0);
-	if (Punished) {
+	if (ball_active) {
 	    if (!ball_still_in_range && !allow_drag)
 		placebc();
 	}

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.4	2001/11/29	*/
+/*	SCCS Id: @(#)do.c	3.4	2002/05/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1120,13 +1120,13 @@ boolean at_stairs, falling, portal;
 			    freeinv(uball);
 			}
 		    }
-		    losehp(rnd(3), "falling downstairs", KILLED_BY);
 #ifdef STEED
-		    if (u.usteed) {
+		    /* falling off steed has its own losehp() call */
+		    if (u.usteed)
 			dismount_steed(DISMOUNT_FELL);
-			if (Punished) unplacebc();
-		    }
+		    else
 #endif
+			losehp(rnd(3), "falling downstairs", KILLED_BY);
 		    selftouch("Falling, you");
 		} else if (u.dz && at_ladder)
 		    You("climb down the ladder.");
