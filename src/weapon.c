@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.4	2000/09/17	*/
+/*	SCCS Id: @(#)weapon.c	3.4	2002/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1046,7 +1046,7 @@ struct obj *weapon;
 	 */
 	bonus = P_SKILL(type);
 	bonus = max(bonus,P_UNSKILLED) - 1;	/* unskilled => 0 */
-	bonus = (bonus * (martial_bonus() ? 2 : 1)) / 2;
+	bonus = ((bonus + 2) * (martial_bonus() ? 2 : 1)) / 2;
     }
 
 #ifdef STEED
