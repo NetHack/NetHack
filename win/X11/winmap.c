@@ -127,12 +127,6 @@ X11_print_glyph(window, x, y, glyph)
 	    update_bbox = TRUE;
 	} else
 	    update_bbox = FALSE;
-
-#undef zap_color
-#undef cmap_color
-#undef obj_color
-#undef mon_color
-#undef pet_color
     }
 
     if (update_bbox) {		/* update row bbox */
