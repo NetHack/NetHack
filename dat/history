@@ -100,30 +100,33 @@ Warren Cheung combined SLASH with the Wizard Patch to produce Slash'em, and
 with the help of Kevin Hugo, added more features.  Kevin later joined the
 DevTeam and incorporated the best of these ideas in NetHack 3.3.
 
-The 3.3 development team consisted of Michael Allison, Ken Arromdee,
-David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen,
-Kevin Hugo, Steve Linhart, Dean Luick, Pat Rankin, Eric Smith, Mike
-Stephenson, Janet Walz, and Paul Winner.
+The 3.3 development team initially consisted of Michael Allison, Ken Arromdee, 
+David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, 
+Kevin Hugo, Steve Linhart, Dean Luick, Pat Rankin, Eric Smith, 
+Mike Stephenson, Janet Walz, and Paul Winner. Warwick Allison joined just 
+before the release of NetHack 3.3.2.
 
 As with version 3.2, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
 
 Pat Rankin maintained 3.3 for VMS.
 
-Michael Allison ported NetHack 3.3 for the MS-DOS platform.  Paul Winner
-and Yitzhak Sapir provided encouragement.
+Michael Allison maintained NetHack 3.3 for the MS-DOS platform.  
+Paul Winner and Yitzhak Sapir provided encouragement.
 
 Dean Luick, Mark Modrall, and Kevin Hugo maintained and enhanced the
 Macintosh port of 3.3.
 
-Michael Allison ported 3.3 for the Microsoft Windows NT platform.
+Michael Allison maintained 3.3 for the Microsoft Windows NT platform.
 
-Ron Van Iwaarden took over responsibility for the OS/2 port.
+Ron Van Iwaarden maintained 3.3 for OS/2.
 
-The Amiga port of NetHack was resurrected for 3.3.1 by Janne Salmijarvi.
+Janne Salmijarvi, Ken Lorber, and Teemu Suikki maintained and enhanced the 
+Amiga port of 3.3 after Janne Salmijarvi resurrected it for 3.3.1.
 
-The Atari port of NetHack was resurrected for 3.3.1 by Christian "Marvin"
-Bressler.
+Christian `Marvin' Bressler maintained 3.3 for the Atari after he
+resurrected it for 3.3.1.
+
 
 			   - - - - - - - - - -
 
