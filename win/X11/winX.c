@@ -92,8 +92,11 @@ int click_x, click_y, click_button;	/* Click position on a map window   */
 					/* (filled by set_button_values()). */
 int updated_inventory;
 
-#ifndef NO_SIGNAL
+#if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
+# if XtSpecificationRelease >= 6
+#define X11_HANGUP_SIGNAL
 static XtSignalId X11_sig_id;
+# endif
 #endif
 
 /* Interface definition, for windows.c */
@@ -169,7 +172,7 @@ static void FDECL(X11_hangup, (Widget, XEvent*, String*, Cardinal*));
 static int FDECL(input_event, (int));
 static void FDECL(win_visible, (Widget,XtPointer,XEvent *,Boolean *));
 static void NDECL(init_standard_windows);
-#if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
+#ifdef X11_HANGUP_SIGNAL
 static void FDECL(X11_sig, (int));
 static void FDECL(X11_sig_cb, (XtPointer, XtSignalId*));
 #endif
@@ -614,29 +617,29 @@ X11_create_nhwindow(type)
     if (!x_inited)
 	panic("create_nhwindow:  windows not initialized");
 
-#if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
+#ifdef X11_HANGUP_SIGNAL
     /* set up our own signal handlers on the first call.  Can't do this in
      * X11_init_nhwindows because unixmain sets its handler after calling
      * all the init routines. */
     if (X11_sig_id == 0) {
 	X11_sig_id = XtAppAddSignal(app_context, X11_sig_cb, (XtPointer)0);
-#ifdef SA_RESTART
+# ifdef SA_RESTART
 	{
 	    struct sigaction sact;
 
 	    (void) memset((char*) &sact, 0, sizeof(struct sigaction));
 	    sact.sa_handler = (SIG_RET_TYPE)X11_sig;
 	    (void) sigaction(SIGHUP, &sact, (struct sigaction*)0);
-#ifdef SIGXCPU
+#  ifdef SIGXCPU
 	    (void) sigaction(SIGXCPU, &sact, (struct sigaction*)0);
-#endif
+#  endif
 	}
-#else
+# else
 	(void) signal(SIGHUP, (SIG_RET_TYPE) X11_sig);
-#ifdef SIGXCPU
+#  ifdef SIGXCPU
 	(void) signal(SIGXCPU, (SIG_RET_TYPE) X11_sig);
-#endif
-#endif
+#  endif
+# endif
     }
 #endif
 
@@ -1100,8 +1103,8 @@ void X11_exit_nhwindows(dummy)
 	X11_destroy_nhwindow(WIN_MESSAGE);
 }
 
-#if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
-void
+#ifdef X11_HANGUP_SIGNAL
+static void
 X11_sig(sig)  /* Unix signal handler */
 int sig;
 {
@@ -1109,7 +1112,7 @@ int sig;
     hangup(sig);
 }
 
-void
+static void
 X11_sig_cb(not_used, id)
 	XtPointer not_used;
 	XtSignalId* id;
