@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2003/01/24	*/
+/*	SCCS Id: @(#)invent.c	3.4	2003/04/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -890,6 +890,7 @@ register const char *let,*word;
 		      (otmp->dknown && objects[OIL_LAMP].oc_name_known))))
 		|| (!strcmp(word, "untrap with") &&
 		    (otmp->oclass == TOOL_CLASS && otyp != CAN_OF_GREASE))
+		|| (!strcmp(word, "tip") && !Is_container(otmp))
 		|| (!strcmp(word, "charge") && !is_chargeable(otmp))
 		    )
 			foo--;

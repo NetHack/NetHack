@@ -37,6 +37,7 @@ win32gui: better handling of "more" prompt for messages that would have scrolled
 General New Features
 --------------------
 burying a punishment ball no longer ends your punishment
+#tip command--pay a modest gratuity
 
 
 Platform- and/or Interface-Specific New Features

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.4	2003/02/06	*/
+/*	SCCS Id: @(#)cmd.c	3.4	2003/04/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -77,6 +77,7 @@ extern int NDECL(dodrink); /**/
 extern int NDECL(dodip); /**/
 extern int NDECL(dosacrifice); /**/
 extern int NDECL(dopray); /**/
+extern int NDECL(dotip); /**/
 extern int NDECL(doturn); /**/
 extern int NDECL(doredraw); /**/
 extern int NDECL(doread); /**/
@@ -1486,6 +1487,7 @@ struct ext_func_tab extcmdlist[] = {
 #endif
 	{"rub", "rub a lamp or a stone", dorub, FALSE},
 	{"sit", "sit down", dosit, FALSE},
+	{"tip", "empty a container", dotip, FALSE},
 	{"turn", "turn undead", doturn, TRUE},
 	{"twoweapon", "toggle two-weapon combat", dotwoweapon, FALSE},
 	{"untrap", "untrap something", dountrap, FALSE},

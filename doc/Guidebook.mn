@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 14, 2003
+.ds f2 "April 2, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -707,6 +707,8 @@ Ride (or stop riding) a monster.
 Rub a lamp or a stone.
 .lp #sit
 Sit down.
+.lp #tip
+Tip over a container to pour out its contents.
 .lp #turn
 Turn undead.
 .lp #twoweapon

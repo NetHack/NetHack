@@ -1477,6 +1477,7 @@ E int NDECL(encumber_msg);
 E int NDECL(doloot);
 E int FDECL(use_container, (struct obj *,int));
 E int FDECL(loot_mon, (struct monst *,int *,boolean *));
+E int NDECL(dotip);
 
 /* ### pline.c ### */
 
