@@ -172,7 +172,7 @@ vmsmisc.c       vmstty.c        vmsunix.c
 
 sys/winnt:
 (files for Windows 9x, NT and Windows2000 version)
-console.rc      defaults.nh     Install.nt      Makefile.bcc    Makefile.nt
+console.rc      defaults.nh     Install.nt      Makefile.bcc    Makefile.msc
 mapimail.c      nethack.def     nhico.uu        nhsetup.bat     ntsound.c
 nttty.c         win32api.h      winnt.c
 

@@ -1,4 +1,4 @@
-@REM  SCCS Id: @(#)nhsetup.bat      2002/03/02
+@REM  SCCS Id: @(#)nhsetup.bat      2002/03/06
 @REM  Copyright (c) NetHack PC Development Team 1993, 1996, 2002
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.nt for details
@@ -22,8 +22,8 @@ echo Directories look ok.
 set _opt=NetHack for NT Console
 if NOT exist ..\..\binary\*.* mkdir ..\..\binary
 if NOT exist ..\..\binary\license copy ..\..\dat\license ..\..\binary\license >nul
-echo Copying Microsoft Makefile - Makefile.nt to ..\..\src\Makefile.
-copy Makefile.nt ..\..\src\Makefile >nul
+echo Copying Microsoft Makefile - Makefile.msc to ..\..\src\Makefile.
+copy Makefile.msc ..\..\src\Makefile >nul
 echo Microsoft Makefile copied ok.
 echo Copying Borland Makefile - Makefile.bcc to ..\..\src\Makefile.bcc
 if NOT exist ..\..\src\Makefile.bcc goto dobor
