@@ -10,6 +10,7 @@
 
 #define MENU_MARGIN			0
 #define NHMENU_STR_SIZE     BUFSZ
+#define MIN_TABSTOP_SIZE	8
 
 typedef struct mswin_menu_item {
 	int				glyph;
@@ -35,6 +36,7 @@ typedef struct mswin_nethack_menu_window {
 			char			 gacc[QBUFSZ];	/* group accelerators */
 			BOOL			 counting;		/* counting flag */
 			char			 prompt[QBUFSZ]; /* menu prompt */
+			int				 tab_stop_size; /* for options menu we use tabstops to align option values */
 		} menu;
 
 		struct menu_text {
@@ -71,6 +73,7 @@ static void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int coun
 static void reset_menu_count(HWND hwndList, PNHMenuWindow data);
 static BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch);
 
+/*-----------------------------------------------------------------------------*/
 HWND mswin_init_menu_window (int type) {
 	HWND ret;
 
@@ -87,8 +90,7 @@ HWND mswin_init_menu_window (int type) {
 	SetMenuType(ret, type);
 	return ret;
 }
-
-
+/*-----------------------------------------------------------------------------*/
 int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 {
 	MSG msg;
@@ -219,7 +221,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 
 	return ret_val;
 }
-   
+/*-----------------------------------------------------------------------------*/   
 BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMenuWindow data;
@@ -405,7 +407,7 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE;
 }
-
+/*-----------------------------------------------------------------------------*/
 void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHMenuWindow data;
@@ -451,11 +453,14 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		data->menu.allocated = 0;
 		data->done = 0;
 		data->result = 0;
+		data->menu.tab_stop_size = MIN_TABSTOP_SIZE;
 	break;
 
 	case MSNH_MSG_ADDMENU:
 	{
 		PMSNHMsgAddMenu msg_data = (PMSNHMsgAddMenu)lParam;
+		char *p, *p1;
+		int new_item;
 		
 		if( data->type!=MENU_TYPE_MENU ) break;
 		if( strlen(msg_data->str)==0 ) break;
@@ -465,15 +470,27 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			data->menu.items = (PNHMenuItem)realloc(data->menu.items, data->menu.allocated*sizeof(NHMenuItem));
 		}
 
-		ZeroMemory( &data->menu.items[data->menu.size], sizeof(data->menu.items[data->menu.size]));
-		data->menu.items[data->menu.size].glyph = msg_data->glyph;
-		data->menu.items[data->menu.size].identifier = *msg_data->identifier;
-		data->menu.items[data->menu.size].accelerator = msg_data->accelerator;
-		data->menu.items[data->menu.size].group_accel = msg_data->group_accel;
-		data->menu.items[data->menu.size].attr = msg_data->attr;
-		strncpy(data->menu.items[data->menu.size].str, msg_data->str, NHMENU_STR_SIZE);
-		data->menu.items[data->menu.size].presel = msg_data->presel;
+		new_item = data->menu.size;
+		ZeroMemory( &data->menu.items[new_item], sizeof(data->menu.items[new_item]));
+		data->menu.items[new_item].glyph = msg_data->glyph;
+		data->menu.items[new_item].identifier = *msg_data->identifier;
+		data->menu.items[new_item].accelerator = msg_data->accelerator;
+		data->menu.items[new_item].group_accel = msg_data->group_accel;
+		data->menu.items[new_item].attr = msg_data->attr;
+		strncpy(data->menu.items[new_item].str, msg_data->str, NHMENU_STR_SIZE);
+		data->menu.items[new_item].presel = msg_data->presel;
 
+		/* calculate tabstop size */
+		p1 = data->menu.items[new_item].str;
+		p = strchr(data->menu.items[new_item].str, '\t');
+		while( p ) {
+			data->menu.tab_stop_size = 
+				max( data->menu.tab_stop_size, p - p1 );
+			p1 = p;
+			p = strchr(p+1, '\t');
+		}
+
+		/* increment size */
 		data->menu.size++;
 	} break;
 
@@ -489,7 +506,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	}
 }
-
+/*-----------------------------------------------------------------------------*/
 void LayoutMenu(HWND hWnd) 
 {
 	PNHMenuWindow data;
@@ -528,7 +545,7 @@ void LayoutMenu(HWND hWnd)
 	MoveWindow(menu_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE );
 	MoveWindow(menu_cancel, pt_cancel.x, pt_cancel.y, sz_cancel.cx, sz_cancel.cy, TRUE );
 }
-
+/*-----------------------------------------------------------------------------*/
 void SetMenuType(HWND hWnd, int type)
 {
 	PNHMenuWindow data;
@@ -555,7 +572,7 @@ void SetMenuType(HWND hWnd, int type)
 	}
 	LayoutMenu(hWnd);
 }
-
+/*-----------------------------------------------------------------------------*/
 void SetMenuListType(HWND hWnd, int how)
 {
 	PNHMenuWindow data;
@@ -645,8 +662,7 @@ void SetMenuListType(HWND hWnd, int how)
 	}
 	SetFocus(control);
 }
-
-
+/*-----------------------------------------------------------------------------*/
 HWND GetMenuControl(HWND hWnd)
 {
 	PNHMenuWindow data;
@@ -659,8 +675,7 @@ HWND GetMenuControl(HWND hWnd)
 		return GetDlgItem(hWnd, IDC_MENU_LIST);
 	}
 }
-
-
+/*-----------------------------------------------------------------------------*/
 BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     LPMEASUREITEMSTRUCT lpmis; 
@@ -686,7 +701,7 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	ReleaseDC(GetMenuControl(hWnd), hdc);
 	return TRUE;
 }
-
+/*-----------------------------------------------------------------------------*/
 BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     LPDRAWITEMSTRUCT lpdis; 
@@ -700,6 +715,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int x, y;
 	TCHAR wbuf[BUFSZ];
 	RECT drawRect;
+	DRAWTEXTPARAMS dtp;
 
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
@@ -739,8 +755,10 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
 			DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 		}
-		x += tm.tmAveCharWidth + 5;
+		x += tm.tmAveCharWidth + tm.tmOverhang + 5;
 		SelectObject(tileDC, saveBmp);
+	} else {
+		x += TILE_X + tm.tmAveCharWidth + tm.tmOverhang + 10;
 	}
 
 	/* print glyph if present */
@@ -762,12 +780,18 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	x += TILE_X + 5;
 
+	/* draw item text */
 	SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
-    DrawText(lpdis->hDC, 
-        NH_A2W(item->str, wbuf, BUFSZ), 
-        strlen(item->str),
-        &drawRect, 
-		DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX
+
+	ZeroMemory(&dtp, sizeof(dtp));
+	dtp.cbSize = sizeof(dtp);
+	dtp.iTabLength = max(MIN_TABSTOP_SIZE, data->menu.tab_stop_size);
+	DrawTextEx(lpdis->hDC, 
+		NH_A2W(item->str, wbuf, BUFSZ), 
+		strlen(item->str),
+		&drawRect, 
+		DT_LEFT | DT_VCENTER | DT_EXPANDTABS | DT_SINGLELINE | DT_TABSTOP, 
+		&dtp
 	); 
 
 	/* draw focused item */
@@ -812,7 +836,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	DeleteDC(tileDC);
 	return TRUE;
 }
-
+/*-----------------------------------------------------------------------------*/
 BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 {
 	int i = 0;
@@ -1079,7 +1103,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	reset_menu_count(hwndList, data);
 	return -1;
 }
-
+/*-----------------------------------------------------------------------------*/
 void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 {
     TEXTMETRIC tm;
@@ -1089,6 +1113,7 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 	PNHMenuWindow data;
 	int i;
 	RECT rt;
+	TCHAR wbuf[BUFSZ];
 
 	GetClientRect(hWnd, &rt);
 	sz->cx = rt.right - rt.left;
@@ -1100,15 +1125,31 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 		hdc = GetDC(control);
 
 		if( data->type==MENU_TYPE_MENU ) {
-			/* Set the height of the list box items. */
+			/* Calculate the width of the list box. */
 			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
 			GetTextMetrics(hdc, &tm);
 			for(i=0; i<data->menu.size; i++ ) {
+				DRAWTEXTPARAMS dtp;
+				RECT drawRect;
+
+				SetRect(&drawRect, 0, 0, 1, 1);
+				ZeroMemory(&dtp, sizeof(dtp));
+				dtp.cbSize = sizeof(dtp);
+				dtp.iTabLength = max(MIN_TABSTOP_SIZE, data->menu.tab_stop_size);
+				DrawTextEx(hdc, 
+					NH_A2W(data->menu.items[i].str, wbuf, BUFSZ), 
+					strlen(data->menu.items[i].str),
+					&drawRect, 
+					DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_EXPANDTABS | DT_SINGLELINE | DT_TABSTOP, 
+					&dtp
+				); 
+
 				sz->cx = max(sz->cx, 
-					(LONG)(2*TILE_X + tm.tmAveCharWidth*(strlen(data->menu.items[i].str)+12) + tm.tmOverhang));
+					(LONG)(2*TILE_X + (drawRect.right - drawRect.left) + tm.tmAveCharWidth*12 + tm.tmOverhang));
 			}
 			SelectObject(hdc, saveFont);
 		} else {
+			/* Calculate the width of the text box. */
 			RECT text_rt;
 			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
 			GetTextMetrics(hdc, &tm);
@@ -1122,7 +1163,7 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 		ReleaseDC(control, hdc);
 	}
 }
-
+/*-----------------------------------------------------------------------------*/
 void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count)
 {
 	int i;
@@ -1141,7 +1182,7 @@ void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count)
 	ListView_RedrawItems( hwndList, item, item );
 	reset_menu_count(hwndList, data);
 }
-
+/*-----------------------------------------------------------------------------*/
 void reset_menu_count(HWND hwndList, PNHMenuWindow data) 
 {
 	int i; 
@@ -1151,7 +1192,7 @@ void reset_menu_count(HWND hwndList, PNHMenuWindow data)
 		if( i>=0 ) ListView_RedrawItems( hwndList, i, i ); 
 	}
 }
-
+/*-----------------------------------------------------------------------------*/
 /* List window Proc */
 LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1203,7 +1244,7 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	else 
 		return 0;
 }
-
+/*-----------------------------------------------------------------------------*/
 /* Text control window proc - implements close on space */
 LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1223,4 +1264,4 @@ LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	else 
 		return 0;
 }
-
+/*-----------------------------------------------------------------------------*/

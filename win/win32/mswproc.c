@@ -133,8 +133,7 @@ void mswin_player_selection(void)
 
 	/* select a role */
 	if( mswin_player_selection_window( &nRole ) == IDCANCEL ) {
-		clearlocks();
-		mswin_exit_nhwindows(0);
+		bail(0);
 	}
 }
 
