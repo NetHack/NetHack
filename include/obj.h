@@ -216,6 +216,12 @@ struct obj {
 			 otmp->otyp == WAX_CANDLE)
 #define MAX_OIL_IN_FLASK 400	/* maximum amount of oil in a potion of oil */
 
+/* special stones */
+#define is_greystone(obj)	((obj)->otyp == LUCKSTONE || \
+				 (obj)->otyp == LOADSTONE || \
+				 (obj)->otyp == FLINT     || \
+				 (obj)->otyp == TOUCHSTONE)
+
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO	0x1
 #define BURIED_TOO	0x2

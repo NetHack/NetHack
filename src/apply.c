@@ -2519,15 +2519,13 @@ do_break_wand(obj)
     return 1;
 }
 
-boolean uhave_greystone()
+STATIC_OVL boolean
+uhave_greystone()
 {
 	register struct obj *otmp;
 
 	for(otmp = invent; otmp; otmp = otmp->nobj)
-		if(otmp->otyp == LOADSTONE ||
-		   otmp->otyp == FLINT ||
-		   otmp->otyp == LUCKSTONE ||
-		   otmp->otyp == TOUCHSTONE)
+		if(is_greystone(otmp))
 			return TRUE;
 	return FALSE;
 }

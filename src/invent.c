@@ -819,7 +819,8 @@ register const char *let,*word;
 		     /* only applicable potion is oil, and it will only
 			be offered as a choice when already discovered */
 		     (otyp != POT_OIL || !otmp->dknown ||
-		      !objects[POT_OIL].oc_name_known))))
+		      !objects[POT_OIL].oc_name_known))
+		|| (otmp->oclass == GEM_CLASS && !is_greystone(otmp))))
 		|| (!strcmp(word, "invoke") &&
 		    (!otmp->oartifact && !objects[otyp].oc_unique &&
 		     (otyp != FAKE_AMULET_OF_YENDOR || otmp->known) &&
