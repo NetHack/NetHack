@@ -184,7 +184,7 @@
 #endif
 
 #ifndef COMPRESS
-# define ZLIB_COMP			/* ZLIB for compression */
+/* # define ZLIB_COMP		*/	/* ZLIB for compression */
 #endif
 
 /*
