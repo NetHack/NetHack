@@ -78,6 +78,7 @@ struct obj {
 #define opoisoned otrapped	/* object (weapon) is coated with poison */
 
 	Bitfield(recharged,3);	/* number of times it's been recharged */
+#define on_ice recharged	/* corpse on ice */
 	Bitfield(lamplit,1);	/* a light-source -- can be lit */
 #ifdef INVISIBLE_OBJECTS
 	Bitfield(oinvis,1);	/* invisible */

@@ -1119,7 +1119,6 @@ int x, y;
     if (otmp->timed) obj_timer_checks(otmp, x, y, 0);
 }
 
-#define ON_ICE(a) ((a)->recharged)
 #define ROT_ICE_ADJUSTMENT 2	/* rotting on ice takes 2 times as long */
 
 /* If ice was affecting any objects correct that now
@@ -1157,7 +1156,7 @@ struct obj *otmp;
 {
     long age, retval = otmp->age;
     
-    if (otmp->otyp == CORPSE && ON_ICE(otmp)) {
+    if (otmp->otyp == CORPSE && otmp->on_ice) {
 	/* Adjust the age; must be same as obj_timer_checks() for off ice*/
 	age = monstermoves - otmp->age;
 	retval = otmp->age + (age / ROT_ICE_ADJUSTMENT);
@@ -1195,7 +1194,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 	    
 	    tleft = tleft - monstermoves;
 	    /* mark the corpse as being on ice */
-	    ON_ICE(otmp) = 1;
+	    otmp->on_ice = 1;
 #ifdef DEBUG_EFFECTS
 	    pline("%s is now on ice at %d,%d.", The(xname(otmp)),x,y);
 #endif
@@ -1209,7 +1208,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
     }
     /* Check for corpses coming off ice */
     else if ((force < 0) ||
-	     (otmp->otyp == CORPSE && ON_ICE(otmp) &&
+	     (otmp->otyp == CORPSE && otmp->on_ice &&
 	     ((on_floor && !is_ice(x,y)) || !on_floor))) {
 	tleft = stop_timer(action, (genericptr_t)otmp);
 	if (tleft == 0L) {
@@ -1220,7 +1219,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 		long age;
 
 		tleft = tleft - monstermoves;
-		ON_ICE(otmp) = 0;
+		otmp->on_ice = 0;
 #ifdef DEBUG_EFFECTS
 	    	pline("%s is no longer on ice at %d,%d.", The(xname(otmp)),x,y);
 #endif
@@ -1237,7 +1236,6 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 	(void) start_timer(tleft, TIMER_OBJECT, action, (genericptr_t)otmp);
 }
 
-#undef ON_ICE
 #undef ROT_ICE_ADJUSTMENT
 
 void
