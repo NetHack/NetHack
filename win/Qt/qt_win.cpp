@@ -199,9 +199,8 @@ extern int total_tiles_used; // from tile.c
 extern short glyph2tile[]; // from tile.c
 }
 
-// ### Try to replace these by looking at image size
-#define TILEWBASE 16
-#define TILEHBASE 16
+static int tilefile_tile_W=16;
+static int tilefile_tile_H=16;
 
 #define TILEWMIN 1
 #define TILEHMIN 1
@@ -4169,33 +4168,37 @@ void NetHackQtYnDialog::done(int i)
 
 NetHackQtGlyphs::NetHackQtGlyphs()
 {
-    const char* tile_file = "x11tiles";
-
-    int tw = TILEWBASE;
-    int th = TILEHBASE;
-
+    const char* tile_file = "nhtiles.bmp";
+    if ( iflags.wc_tile_file )
+	tile_file = iflags.wc_tile_file;
 
     if (!img.load(tile_file)) {
-	tile_file = "nhtiles.bmp";
+	tile_file = "x11tiles";
 	if (!img.load(tile_file)) {
 	    QString msg;
 	    msg.sprintf("Cannot load x11tiles or nhtiles.bmp");
 	    QMessageBox::warning(0, "IO Error", msg);
 	} else {
-	    tiles_per_row = 40;
+	    tiles_per_row = TILES_PER_ROW;
+	    if (img.width()%tiles_per_row) {
+		impossible("Tile file \"%s\" has %d columns, not multiple of row count (%d)",
+		   tile_file, img.width(), tiles_per_row);
+	    }
 	}
     } else {
-        tiles_per_row = TILES_PER_ROW;
-        if (img.width()%tiles_per_row) {
-            impossible("Tile file \"%s\" has %d columns, not multiple of row count (%d)",
-               tile_file, img.width(), tiles_per_row);
-        }
+	tiles_per_row = 40;
     }
     int rows = ((total_tiles_used+tiles_per_row-1) / tiles_per_row);
-    tw = img.width() / tiles_per_row;
-    th = img.height() / rows;
+    if ( iflags.wc_tile_width )
+	tilefile_tile_W = iflags.wc_tile_width;
+    else
+	tilefile_tile_W = img.width() / tiles_per_row;
+    if ( iflags.wc_tile_height )
+	tilefile_tile_H = iflags.wc_tile_height;
+    else
+	tilefile_tile_H = tilefile_tile_W;
 
-    resize(tw, th);
+    resize(tilefile_tile_W, tilefile_tile_H);
 }
 
 void NetHackQtGlyphs::drawGlyph(QPainter& painter, int glyph, int x, int y)
@@ -4222,13 +4225,13 @@ void NetHackQtGlyphs::resize(int w, int h)
     if (!w || !h)
 	return; // Still not decided
 
-    if (w==TILEWBASE && h==TILEHBASE) {
+    if (w==tilefile_tile_W && h==tilefile_tile_H) {
 	pm.convertFromImage(img);
     } else {
 	QApplication::setOverrideCursor( Qt::waitCursor );
 	QImage scaled = img.smoothScale(
-	    w*img.width()/TILEWBASE,
-	    h*img.height()/TILEHBASE
+	    w*img.width()/tilefile_tile_W,
+	    h*img.height()/tilefile_tile_H
 	);
 	pm.convertFromImage(scaled,Qt::ThresholdDither|Qt::PreferDither);
 	QApplication::restoreOverrideCursor();
