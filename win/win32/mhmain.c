@@ -133,8 +133,8 @@ numpad[KEY_LAST][3] = {
   
 #define IS_MAP_ASCII(mode) ((mode)!=MAP_MODE_TILES && (mode)!=MAP_MODE_TILES_FIT_TO_SCREEN)
 
-static const char *extendedlist_nhmode = "abcdefijlmnopqrstuvw?";
-static const char *extendedlist_winmode = "abcdeijlnopqrtuvw?";
+static const char *extendedlist_nhmode = "acdefijlmnopqrstuvw?2";
+static const char *extendedlist_winmode = "acdeijlnopqrtuvw?2";
 
 #define SCANLO		0x02
 static const char scanmap[] = { 	/* ... */
@@ -387,11 +387,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			? extendedlist_nhmode :  extendedlist_winmode,
 		    tolower(c)) != 0)
 		{
-		    if (tolower(c) == 'b') {
-			NHEVENT_KBD(M('2'));
-		    } else {
-			NHEVENT_KBD(M(tolower(c)));
-		    }
+		    NHEVENT_KBD(M(tolower(c)));
 		} else if (scancode == (SCANLO + SIZE(scanmap)) - 1) {
 		    NHEVENT_KBD(M('?'));
 		} else
