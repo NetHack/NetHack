@@ -94,6 +94,10 @@ LFLAGS =
 
 LIBS =
  
+# If you are cross-compiling, you must use this:
+#OBJDIR = .
+# otherwise, you can save a little bit of disk space with this:
+OBJDIR = ../src
 
 # yacc/lex programs to use to generate *_comp.h, *_lex.c, and *_yacc.c.
 # if, instead of yacc/lex you have bison/flex, comment/uncomment the following.
@@ -132,13 +136,13 @@ UTILSRCS = $(MAKESRC) panic.c $(SPLEVSRC) $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
 
 # files that define all monsters and objects
 CMONOBJ = ../src/monst.c ../src/objects.c
-OMONOBJ = ../src/monst.o ../src/objects.o
+OMONOBJ = $(OBJDIR)/monst.o $(OBJDIR)/objects.o
 # files that provide access to NetHack's names
 CNAMING = ../src/drawing.c ../src/decl.c $(CMONOBJ)
-ONAMING = ../src/drawing.o ../src/decl.o $(OMONOBJ)
+ONAMING = $(OBJDIR)/drawing.o $(OBJDIR)/decl.o $(OMONOBJ)
 # dynamic memory allocation
 CALLOC = ../src/alloc.c panic.c
-OALLOC = ../src/alloc.o panic.o
+OALLOC = $(OBJDIR)/alloc.o panic.o
 
 # object files for makedefs
 MAKEOBJS = makedefs.o $(OMONOBJ)
@@ -153,7 +157,7 @@ DGNCOMPOBJS = dgn_yacc.o dgn_lex.o dgn_main.o $(OALLOC)
 RECOVOBJS = recover.o
 
 # object files for the data librarian
-DLBOBJS = dlb_main.o ../src/dlb.o $(OALLOC)
+DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
 
 # flags for creating distribution versions of sys/share/*_lex.c, using
 # a more portable flex skeleton, which is not included in the distribution.
@@ -359,18 +363,18 @@ tile2beos.o: ../win/BeOS/tile2beos.cpp $(HACK_H) ../include/tile.h
 
 # make sure object files from src are available when needed
 #
-../src/alloc.o: ../src/alloc.c $(CONFIG_H)
-	@( cd ../src ; $(MAKE) alloc.o )
-../src/drawing.o: ../src/drawing.c $(CONFIG_H)
-	@( cd ../src ; $(MAKE) drawing.o )
-../src/decl.o: ../src/decl.c $(CONFIG_H)
-	@( cd ../src ; $(MAKE) decl.o )
-../src/monst.o: ../src/monst.c $(CONFIG_H)
-	@( cd ../src ; $(MAKE) monst.o )
-../src/objects.o: ../src/objects.c $(CONFIG_H)
-	@( cd ../src ; $(MAKE) objects.o )
-../src/dlb.o: ../src/dlb.c $(HACK_H) ../include/dlb.h
-	@( cd ../src ; $(MAKE) dlb.o )
+$(OBJDIR)/alloc.o: ../src/alloc.c $(CONFIG_H)
+	$(CC) $(CFLAGS) -c ../src/alloc.c
+$(OBJDIR)/drawing.o: ../src/drawing.c $(CONFIG_H)
+	$(CC) $(CFLAGS) -c ../src/drawing.c
+$(OBJDIR)/decl.o: ../src/decl.c $(CONFIG_H)
+	$(CC) $(CFLAGS) -c ../src/decl.c
+$(OBJDIR)/monst.o: ../src/monst.c $(CONFIG_H)
+	$(CC) $(CFLAGS) -c ../src/monst.c
+$(OBJDIR)/objects.o: ../src/objects.c $(CONFIG_H)
+	$(CC) $(CFLAGS) -c ../src/objects.c
+$(OBJDIR)/dlb.o: ../src/dlb.c $(HACK_H) ../include/dlb.h
+	$(CC) $(CFLAGS) -c ../src/dlb.c
 
 # make sure hack.h dependencies get transitive information
 $(HACK_H): $(CONFIG_H)
