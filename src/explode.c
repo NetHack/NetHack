@@ -401,7 +401,7 @@ struct scatter_chain {
  */
 
 /* returns number of scattered objects */
-int
+long
 scatter(sx,sy,blastforce,scflags, obj)
 int sx,sy;				/* location of objects to scatter */
 int blastforce;				/* force behind the scattering	*/
@@ -418,7 +418,7 @@ struct obj *obj;			/* only scatter this obj        */
 	struct monst *mtmp;
 	struct scatter_chain *stmp, *stmp2 = 0;
 	struct scatter_chain *schain = (struct scatter_chain *)0;
-	int total = 0;
+	long total = 0L;
 
 	while ((otmp = individual_object ? obj : level.objects[sx][sy]) != 0) {
 	    if (otmp->quan > 1L) {

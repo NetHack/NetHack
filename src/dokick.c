@@ -874,7 +874,7 @@ dokick()
 		    }
 		    if (rn2(15) && !(maploc->looted & TREE_LOOTED) &&
 			  (treefruit = rnd_treefruit_at(x, y))) {
-			int nfruit = 8-rnl(7), nfall;
+			long nfruit = 8L-rnl(7), nfall;
 			treefruit->quan = nfruit;
 			if (is_plural(treefruit))
 			    pline("Some %s fall from the tree!", xname(treefruit));
@@ -883,7 +883,7 @@ dokick()
 			nfall = scatter(x,y,2,MAY_HIT,treefruit);
 			if ( nfall != nfruit ) {
 			    /* scatter left some in the tree */
-			    pline("%d %s got caught in the branches.",
+			    pline("%ld %s got caught in the branches.",
 				nfruit-nfall, xname(treefruit));
 			}
 			exercise(A_DEX, TRUE);
