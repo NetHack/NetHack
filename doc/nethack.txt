@@ -200,8 +200,9 @@ BUGS
 
 
 
-       Dungeons & Dragons is a Trademark of TSR Inc.
+       Dungeons & Dragons is a Trademark of Wizards of the Coast,
+       Inc.
 
 
 
-                          12 March 2002                NETHACK(6)
+                          9 August 2002                NETHACK(6)
