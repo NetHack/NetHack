@@ -2001,7 +2001,8 @@ nomul(nval)
 }
 
 /* called when a non-movement, multi-turn action has completed */
-void unmul(msg_override)
+void
+unmul(msg_override)
 const char *msg_override;
 {
 	multi = 0;	/* caller will usually have done this already */
@@ -2211,7 +2212,8 @@ inv_cnt()
 /* Intended use is for your or some monsters inventory, */
 /* now that u.gold/m.gold is gone.*/
 /* Counting money in a container might be possible too. */
-long money_cnt(otmp)
+long
+money_cnt(otmp)
 struct obj *otmp;
 {
         while(otmp) {

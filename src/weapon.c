@@ -78,8 +78,8 @@ STATIC_VAR NEARDATA const char *barehands_or_martial[] = {
     "bare handed combat", "martial arts"
 };
 
-STATIC_OVL
-void give_may_advance_msg(skill)
+STATIC_OVL void
+give_may_advance_msg(skill)
 int skill;
 {
 	You_feel("more confident in your %sskills.",

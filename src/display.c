@@ -331,7 +331,8 @@ unmap_object(x, y)
 	map_background(x,y,show);					\
 }
 
-void map_location(x,y,show)
+void
+map_location(x,y,show)
     int x, y, show;
 {
     _map_location(x,y,show);

@@ -88,7 +88,8 @@ static boolean FDECL(rob_shop, (struct monst *));
     Returns the amount actually paid, so we can know
     if the monster kept the change.
  */
-long money2mon(mon, amount)
+long
+money2mon(mon, amount)
 struct monst *mon;
 long amount;
 {
@@ -615,7 +616,8 @@ register char *enterstring;
    making sure they're unpaid and the same type of object; we check the price
    quoted by the shopkeeper and also that they both belong to the same shk.
  */
-boolean same_price(obj1, obj2)
+boolean
+same_price(obj1, obj2)
 struct obj *obj1, *obj2;
 {
 	register struct monst *shkp1, *shkp2;
@@ -1734,7 +1736,8 @@ struct eshk *eshkp;
 }
 
 /* called at game exit, after inventory disclosure but before making bones */
-void finish_paybill()
+void
+finish_paybill()
 {
 	register struct obj *otmp;
 	int ox = repo_location.x,

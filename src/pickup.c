@@ -906,8 +906,8 @@ int qflags;
 }
 
 /* could we carry `obj'? if not, could we carry some of it/them? */
-STATIC_OVL
-long carry_count(obj, container, count, telekinesis, wt_before, wt_after)
+STATIC_OVL long
+carry_count(obj, container, count, telekinesis, wt_before, wt_after)
 struct obj *obj, *container;	/* object to pick up, bag it's coming out of */
 long count;
 boolean telekinesis;
@@ -1387,8 +1387,8 @@ int x, y;
 	return TRUE;
 }
 
-STATIC_OVL
-boolean mon_beside(x,y)
+STATIC_OVL boolean
+mon_beside(x,y)
 int x, y;
 {
 	int i,j,nx,ny;

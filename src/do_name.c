@@ -1005,7 +1005,8 @@ static const char *coynames[] = {
 	"Nemesis Riduclii","Canis latrans"
 };
 	
-char *coyotename(mtmp, buf)
+char *
+coyotename(mtmp, buf)
 struct monst *mtmp;
 char *buf;
 {

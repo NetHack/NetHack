@@ -55,8 +55,8 @@ static boolean made_branch;	/* used only during level creation */
 
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
-STATIC_PTR int
-CFDECLSPEC do_comp(vx,vy)
+STATIC_PTR int CFDECLSPEC
+do_comp(vx,vy)
 const genericptr vx;
 const genericptr vy;
 {

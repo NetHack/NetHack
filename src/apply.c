@@ -2950,7 +2950,8 @@ doapply()
 /* Keep track of unfixable troubles for purposes of messages saying you feel
  * great.
  */
-int unfixable_trouble_count(is_horn)
+int
+unfixable_trouble_count(is_horn)
 	boolean is_horn;
 {
 	int unfixable_trbl = 0;

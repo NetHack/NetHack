@@ -1329,7 +1329,8 @@ artifact_light(obj)
 }
 
 /* KMH -- Talking artifacts are finally implemented */
-void arti_speak(obj)
+void
+arti_speak(obj)
     struct obj *obj;
 {
 	register const struct artifact *oart = get_artifact(obj);

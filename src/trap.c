@@ -3543,7 +3543,8 @@ register struct trap *trap;
 	dealloc_trap(trap);
 }
 
-boolean delfloortrap(ttmp)
+boolean
+delfloortrap(ttmp)
 register struct trap *ttmp;
 {
 	/* Destroy a trap that emanates from the floor. */
