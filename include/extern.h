@@ -938,6 +938,7 @@ E void FDECL(mimic_hit_msg, (struct monst *, SHORT_P));
 E void FDECL(mkmonmoney, (struct monst *, long));
 #endif
 E void FDECL(bagotricks, (struct obj *));
+E boolean FDECL(propagate, (int, BOOLEAN_P));
 
 /* ### mapglyph.c ### */
 

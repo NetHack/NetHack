@@ -266,6 +266,13 @@ boolean ghostly;
 		}
 		offset = mtmp->mnum;
 		mtmp->data = &mons[offset];
+		if (ghostly) {
+			int mndx = monsndx(mtmp->data);
+			if (propagate(mndx, TRUE) == 0) {
+				/* cookie to trigger purge in getbones() */
+				mtmp->mhpmax = DEFUNCT_MONSTER;	
+			}
+		}
 		if(mtmp->minvent) {
 			struct obj *obj;
 			mtmp->minvent = restobjchn(fd, ghostly, FALSE);

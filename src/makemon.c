@@ -737,6 +737,44 @@ struct monst *mon;
 }
 
 /*
+ * Propagate a species
+ *
+ * Once a certain number of monsters are created, don't create any more
+ * at random (i.e. make them extinct).  The previous (3.2) behavior was
+ * to do this when a certain number had _died_, which didn't make
+ * much sense.
+ *
+ * Returns FALSE propagation unsuccessful
+ *         TRUE  propagation successful
+ */
+boolean
+propagate(mndx, tally)
+int mndx;
+boolean tally;
+{
+	uchar lim = mbirth_limit(mndx);
+	boolean not_gone_yet = (!(mons[mndx].geno & G_NOGEN) &&
+				!(mvitals[mndx].mvflags & G_EXTINCT));
+	if ((int) mvitals[mndx].born < lim && not_gone_yet) {
+		if (tally) mvitals[mndx].born++;
+		/* if it's unique, or we've reached the limit
+		 * don't ever make it again.
+		 */
+		if ((mvitals[mndx].born >= lim) || (mons[mndx].geno & G_UNIQ)) {
+#if defined(WIZARD) && defined(DEBUG)
+			if (wizard)
+				pline("Automatically extinguished %s.",
+					makeplural(mons[mndx].mname));
+#endif
+			mvitals[mndx].mvflags |= G_EXTINCT;
+			reset_rndmonst(mndx);
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+/*
  * called with [x,y] = coordinates;
  *	[0,0] means anyplace
  *	[u.ux,u.uy] means: near player (if !in_mklev)
@@ -756,7 +794,6 @@ register int	mmflags;
 	boolean allow_minvent = ((mmflags & NO_MINVENT) == 0);
 	boolean countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0);
 	unsigned gpflags = (mmflags & MM_IGNOREWATER) ? MM_IGNOREWATER : 0;
-	uchar lim;
 
 	/* if caller wants random location, do it here */
 	if(x == 0 && y == 0) {
@@ -797,7 +834,7 @@ register int	mmflags;
 		/* if you are to make a specific monster and it has
 		   already been genocided, return */
 		if (mvitals[mndx].mvflags & G_GENOD) return((struct monst *) 0);
-#ifdef DEBUG
+#if defined(WIZARD) && defined(DEBUG)
 		if (wizard && (mvitals[mndx].mvflags & G_EXTINCT))
 		    pline("Explicitly creating extinct monster %s.",
 			mons[mndx].mname);
@@ -821,32 +858,7 @@ register int	mmflags;
 		} while(!goodpos(x, y, &fakemon, gpflags) && tryct++ < 50);
 		mndx = monsndx(ptr);
 	}
-	/* if it's unique, don't ever make it again */
-	if (ptr->geno & G_UNIQ) mvitals[mndx].mvflags |= G_EXTINCT;
-
-	/* Once a certain number of monsters are created, don't create any more
-	 * at random (i.e. make them extinct).  The previous (3.2) behavior was
-	 * to do this when a certain number had _died_, which didn't make
-	 * much sense.
-	 * This version makes a little more sense but still requires that
-	 * the caller manually decrement mvitals if the monster is created
-	 * under circumstances where one would not logically expect the
-	 * creation to reduce the supply of wild monsters.  Monster cloning
- 	 * might be one case that requires that in order to reduce the
-	 * possibility of abuse, but currently doesn't.
-	 */
-	if (mvitals[mndx].born < 255 && countbirth) mvitals[mndx].born++;
-	lim = mbirth_limit(mndx);
-	if ((int) mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN) &&
-		!(mvitals[mndx].mvflags & G_EXTINCT)) {
-#ifdef DEBUG
-		pline("Automatically extinguished %s.",
-					makeplural(mons[mndx].mname));
-#endif
-		mvitals[mndx].mvflags |= G_EXTINCT;
-		reset_rndmonst(mndx);
-	}
-
+	propagate(mndx, countbirth);
 	xlth = ptr->pxlth;
 	if (mmflags & MM_EDOG) xlth += sizeof(struct edog);
 	else if (mmflags & MM_EMIN) xlth += sizeof(struct emin);
@@ -1050,6 +1062,7 @@ int
 mbirth_limit(mndx)
 int mndx;
 {
+	/* assert(MAXMONNO < 255); */
 	return (mndx == PM_NAZGUL ? 9 : mndx == PM_ERINYS ? 3 : MAXMONNO); 
 }
 

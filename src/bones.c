@@ -422,21 +422,21 @@ getbones()
 			trickery(errbuf);
 		} else {
 			register struct monst *mtmp;
-			int mndx;
 
 			getlev(fd, 0, 0, TRUE);
 
-			/* to correctly reset named artifacts on the level and
-			   to keep tabs on unique monsters like demon lords */
+			/* Note that getlev() now keeps tabs on unique
+			 * monsters such as demon lords, and tracks the
+			 * birth counts of all species just as makemon()
+			 * does.  If a bones monster is extinct or has been
+			 * subject to genocide, their mhpmax will be
+			 * set to the magic DEFUNCT_MONSTER cookie value.
+			 */
 			for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-			    mndx = monsndx(mtmp->data);
-			    if (mvitals[mndx].mvflags & G_EXTINCT) {
-				mongone(mtmp);
-			    } else {
-				if (mons[mndx].geno & G_UNIQ)
-				    mvitals[mndx].mvflags |= G_EXTINCT;
+			    if (mtmp->mhpmax == DEFUNCT_MONSTER) mongone(mtmp);
+			    else
+				/* to correctly reset named artifacts on the level */
 				resetobjs(mtmp->minvent,TRUE);
-			    }
 			}
 			resetobjs(fobj,TRUE);
 			resetobjs(level.buriedobjlist,TRUE);

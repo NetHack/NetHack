@@ -142,6 +142,9 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define MM_IGNOREWATER	  0x80	/* ignore water when positioning */
 #define MM_ADJACENTOK	  0x100 /* it is acceptable to use adjacent coordinates */
 
+/* special mhpmax value when loading bones monster to flag as extinct or genocided */
+#define DEFUNCT_MONSTER	(-100)
+
 /* flags for special ggetobj status returns */
 #define ALL_FINISHED	  0x01  /* called routine already finished the job */
 
