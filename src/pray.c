@@ -1207,6 +1207,7 @@ dosacrifice()
 			dmon->mpeaceful = TRUE;
 		    You("are terrified, and unable to move.");
 		    nomul(-3);
+		    nomovemsg = 0;
 		} else pline_The("%s.", demonless_msg);
 	    }
 
@@ -1737,6 +1738,7 @@ doturn()
 	    }
 	}
 	nomul(-5);
+	nomovemsg = 0;
 	return(1);
 }
 

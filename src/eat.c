@@ -2590,6 +2590,7 @@ vomit()		/* A good idea from David Neves */
 {
 	make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
 	nomul(-2);
+	nomovemsg = 0;
 }
 
 int

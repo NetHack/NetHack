@@ -606,6 +606,7 @@ int spellnum;
 	    if (Half_spell_damage) dmg = (dmg + 1) / 2;
 	    nomul(-dmg);
 	}
+	nomovemsg = 0;
 	dmg = 0;
 	break;
     case CLC_CONFUSE_YOU:

@@ -44,6 +44,7 @@ stoned_dialogue()
 	case 3:		/* limbs turned to stone */
 		stop_occupation();
 		nomul(-3);	/* can't move anymore */
+		nomovemsg = 0;
 		break;
 	default:
 		break;
@@ -1239,6 +1240,7 @@ do_storms()
 	if(!u.uinvulnerable) {
 	    stop_occupation();
 	    nomul(-3);
+	    nomovemsg = 0;
 	}
     } else
 	You_hear("a rumbling noise.");

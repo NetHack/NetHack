@@ -2317,6 +2317,7 @@ boolean wep_was_destroyed;
 			    You("are frozen by %s gaze!",
 				  s_suffix(mon_nam(mon)));
 			    nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
+			    nomovemsg = 0;
 			}
 		    } else {
 			pline("%s cannot defend itself.",

@@ -391,12 +391,12 @@ gotobj:
 			named++;
 			/* the following is to set multi for later on */
 			nomul(-armordelay);
+			nomovemsg = 0;
 			remove_worn_item(otmp, TRUE);
 			otmp->cursed = curssv;
-			if(multi < 0){
+			if(multi < 0) {
 				/*
 				multi = 0;
-				nomovemsg = 0;
 				afternmv = 0;
 				*/
 				stealoid = otmp->o_id;

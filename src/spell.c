@@ -326,7 +326,8 @@ learn()
 	    (void) confused_book(context.spbook.book);
 	    context.spbook.book = 0;			/* no longer studying */
 	    context.spbook.o_id = 0;
-	    nomul(context.spbook.delay);		/* remaining delay is uninterrupted */
+	    nomul(context.spbook.delay); /* remaining delay is uninterrupted */
+	    nomovemsg = 0;
 	    context.spbook.delay = 0;
 	    return(0);
 	}
@@ -466,7 +467,8 @@ register struct obj *spellbook;
 		if (too_hard) {
 		    boolean gone = cursed_book(spellbook);
 
-		    nomul(context.spbook.delay);			/* study time */
+		    nomul(context.spbook.delay);	/* study time */
+		    nomovemsg = 0;
 		    context.spbook.delay = 0;
 		    if(gone || !rn2(3)) {
 			if (!gone) pline_The("spellbook crumbles to dust!");
@@ -482,6 +484,7 @@ register struct obj *spellbook;
 			spellbook->in_use = FALSE;
 		    }
 		    nomul(context.spbook.delay);
+		    nomovemsg = 0;
 		    context.spbook.delay = 0;
 		    return(1);
 		}

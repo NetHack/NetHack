@@ -1043,6 +1043,7 @@ dogaze()
 				    -d((int)mtmp->m_lev+1,
 					    (int)mtmp->data->mattk[0].damd)
 				    : -200);
+			    nomovemsg = 0;
 			    return 1;
 			} else
 			    You("stiffen momentarily under %s gaze.",

@@ -633,6 +633,7 @@ hurtle(dx, dy, range, verbose)
     if(!range || (!dx && !dy) || u.ustuck) return; /* paranoia */
 
     nomul(-range);
+    nomovemsg = 0;
     if (verbose)
 	You("%s in the opposite direction.", range > 1 ? "hurtle" : "float");
     /* if we're in the midst of shooting multiple projectiles, stop */
