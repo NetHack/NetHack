@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2003/03/31	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2003/10/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,18 +24,17 @@
 #define COPYRIGHT_BANNER_C \
 "         See license for details."
 
-#if 0
 /*
- * If two successive patchlevels have compatible data files (fat chance),
- * defining this with the value of the older one will allow its bones and
- * save files to work with the newer one.  The format is
+ * If two or more successive releases have compatible data files, define
+ * this with the version number of the oldest such release so that the
+ * new release will accept old save and bones files.  The format is
  *	0xMMmmPPeeL
  * 0x = literal prefix "0x", MM = major version, mm = minor version,
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x03040200L
-#endif
+/* #define VERSION_COMPATIBILITY 0x03050000L */
+
 
 /*****************************************************************************/
 /* Version 3.5.x */
