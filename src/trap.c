@@ -577,6 +577,7 @@ unsigned trflags;
 	boolean already_seen = trap->tseen;
 	boolean webmsgok = (!(trflags & NOWEBMSG));
 	boolean forcebungle = (trflags & FORCEBUNGLE);
+	boolean plunged = (trflags & TOOKPLUNGE);
 
 	nomul(0);
 
@@ -604,7 +605,7 @@ unsigned trflags;
 		return;
 	    }
 	    if(!Fumbling && ttype != MAGIC_PORTAL &&
-		ttype != ANTI_MAGIC && !forcebungle &&
+		ttype != ANTI_MAGIC && !forcebungle && !plunged &&
 		(!rn2(5) ||
 	    ((ttype == PIT || ttype == SPIKED_PIT) && is_clinger(youmonst.data)))) {
 		You("escape %s %s.",
@@ -877,7 +878,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 				 	 "poor", SUPPRESS_SADDLE, FALSE));
 		    } else
 #endif
-		    Strcpy(verbbuf,"fall");
+		    Strcpy(verbbuf, plunged ? "plunge" : "fall");
 		    You("%s into %s pit!", verbbuf, a_your[trap->madeby_u]);
 		}
 		/* wumpus reference */
@@ -909,13 +910,16 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 #endif
 		if (ttype == SPIKED_PIT) {
 		    losehp(Maybe_Half_Phys(rnd(10)),
-			"fell into a pit of iron spikes",
+			plunged ? "deliberately plunged into a pit of iron spikes" :
+				  "fell into a pit of iron spikes",
 			NO_KILLER_PREFIX);
 		    if (!rn2(6))
 			poisoned("spikes", A_STR, "fall onto poison spikes",
 				 8, FALSE);
 		} else
-		    losehp(Maybe_Half_Phys(rnd(6)),"fell into a pit",
+		    losehp(Maybe_Half_Phys(rnd(6)),
+			plunged ? "deliberately plunged into a pit" :
+				  "fell into a pit",
 			NO_KILLER_PREFIX);
 		if (Punished && !carried(uball)) {
 		    unplacebc();
@@ -3778,6 +3782,21 @@ register struct trap *trap;
 	}
 	dealloc_trap(trap);
 }
+
+/*
+ * Returns TRUE if you escaped a pit and are standing on the precipice.
+ */
+boolean
+uteetering_at_seen_pit(trap)
+struct trap *trap;
+{
+   if (trap && trap->tseen &&
+	(!u.utrap || u.utraptype != TT_PIT) &&
+	(trap->ttyp==PIT || trap->ttyp==SPIKED_PIT))
+	return TRUE;
+   else 
+	return FALSE;
+} 
 
 boolean
 delfloortrap(ttmp)

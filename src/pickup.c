@@ -412,17 +412,14 @@ int what;		/* should be a long */
 			read_engr_at(u.ux, u.uy);
 		    return (0);
 		}
-		if (ttmp && ttmp->tseen) {
+		if (ttmp && uteetering_at_seen_pit(ttmp)) {
 		    /* Allow pickup from holes and trap doors that you escaped
 		     * from because that stuff is teetering on the edge just
 		     * like you, but not pits, because there is an elevation
 		     * discrepancy with stuff in pits.
 		     */
-		    if ((ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT) &&
-			(!u.utrap || (u.utrap && u.utraptype != TT_PIT))) {
-			read_engr_at(u.ux, u.uy);
-			return(0);
-		    }
+		     read_engr_at(u.ux, u.uy);
+		     return(0);
 		}
 		/* multi && !context.run means they are in the middle of some other
 		 * action, or possibly paralyzed, sleeping, etc.... and they just

@@ -1937,17 +1937,14 @@ dopickup()
 		return(0);
 	}
 
- 	if (traphere && traphere->tseen) {
+ 	if (traphere && uteetering_at_seen_pit(traphere)) {
 		/* Allow pickup from holes and trap doors that you escaped from
 		 * because that stuff is teetering on the edge just like you, but
 		 * not pits, because there is an elevation discrepancy with stuff
 		 * in pits.
 		 */
-		if ((traphere->ttyp == PIT || traphere->ttyp == SPIKED_PIT) &&
-		     (!u.utrap || (u.utrap && u.utraptype != TT_PIT))) {
-			You("cannot reach the bottom of the pit.");
-			return(0);
-		}
+		You("cannot reach the bottom of the pit.");
+		return(0);
 	}
 
 	return (pickup(-count));

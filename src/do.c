@@ -209,10 +209,7 @@ const char *verb;
 		}
 		water_damage(obj, FALSE, FALSE);
 	} else if (u.ux == x && u.uy == y &&
-		(!u.utrap || u.utraptype != TT_PIT) &&
-		(t = t_at(x,y)) != 0 && t->tseen &&
-			(t->ttyp==PIT || t->ttyp==SPIKED_PIT)) {
-		/* you escaped a pit and are standing on the precipice */
+		(t = t_at(x,y)) != 0 && uteetering_at_seen_pit(t)) {
 		if (Blind && !Deaf)
 			You_hear("%s tumble downwards.",
 				the(xname(obj)));
@@ -778,10 +775,13 @@ dodown()
 	    return (0);   /* didn't move */
 	}
 	if (!stairs_down && !ladder_down) {
-		if (!(trap = t_at(u.ux,u.uy)) ||
-			(trap->ttyp != TRAPDOOR && trap->ttyp != HOLE)
-			|| !Can_fall_thru(&u.uz) || !trap->tseen) {
-
+		trap = t_at(u.ux,u.uy);
+		if (trap && uteetering_at_seen_pit(trap)) {
+			dotrap(trap, TOOKPLUNGE);
+			return(1);
+		} else if (!trap ||
+		    (trap->ttyp != TRAPDOOR && trap->ttyp != HOLE) ||
+		    !Can_fall_thru(&u.uz) || !trap->tseen) {
 			if (flags.autodig && !context.nopick &&
 				uwep && is_pick(uwep)) {
 				return use_pick_axe2(uwep);
