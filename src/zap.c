@@ -1573,6 +1573,7 @@ struct obj *obj, *otmp;
 			    		s_suffix(an(mons[corpsenm].mname)),
 					nonliving(&mons[corpsenm]) ?
 					"motility" : "health");
+				u_noticed = TRUE;
 			    }
 			    if (u_noticed) {
 				    makeknown(otmp->otyp);
