@@ -356,6 +356,9 @@ int	mntmp;
 		youmonst.mappearance == GOLD_PIECE) {
 	    /* stop mimicking gold immediately */
 	    if (multi < 0) unmul("");
+	} else if (mons[mntmp].mlet != S_MIMIC) {
+	    /* as in polyman() */
+	    youmonst.m_ap_type = M_AP_NOTHING;
 	}
 	if (is_male(&mons[mntmp])) {
 		if(flags.female) dochange = TRUE;
