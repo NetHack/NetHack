@@ -936,8 +936,9 @@ enhance_weapon_skill()
 			    prefix, P_NAME(i), sklnambuf,
 			    P_ADVANCE(i),
 			    practice_needed_to_advance(P_SKILL(i)));
-		 } else {
+		 } else
 #endif
+		{
 		    if (!iflags.menu_tab_sep)
 			Sprintf(buf, " %s %-*s [%s]",
 			    prefix, longest, P_NAME(i), sklnambuf);
