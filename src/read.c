@@ -1328,7 +1328,11 @@ struct obj *obj;
 			pline("It seems even darker in here than before.");
 			return;
 		    }
-		    You("are surrounded by darkness!");
+		    if (uwep && artifact_light(uwep) && uwep->lamplit)
+			pline("Suddenly, the only light left comes from %s!",
+				the(xname(uwep)));
+		    else
+			You("are surrounded by darkness!");
 		}
 
 		/* the magic douses lamps, et al, too */
