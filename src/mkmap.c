@@ -17,7 +17,7 @@ STATIC_DCL void FDECL(pass_three,(SCHAR_P,SCHAR_P));
 STATIC_DCL void NDECL(wallify_map);
 STATIC_DCL void FDECL(join_map,(SCHAR_P,SCHAR_P));
 STATIC_DCL void FDECL(finish_map,(SCHAR_P,SCHAR_P,XCHAR_P,XCHAR_P));
-STATIC_DCL void FDECL(remove_room,(int));
+STATIC_DCL void FDECL(remove_room,(unsigned));
 void FDECL(mkmap, (lev_init *));
 
 char *new_locations;
@@ -402,7 +402,7 @@ remove_rooms(lx, ly, hx, hy)
 	    if (croom->ly >= ly && croom->hy >= hy) croom->ly = hy;
 	} else {
 	    /* total overlap, remove the room */
-	    remove_room(i);
+	    remove_room((unsigned)i);
 	}
     }
 }
@@ -415,11 +415,12 @@ remove_rooms(lx, ly, hx, hy)
  */
 STATIC_OVL void
 remove_room(roomno)
-    int roomno;
+    unsigned roomno;
 {
     struct mkroom *croom = &rooms[roomno];
     struct mkroom *maxroom = &rooms[--nroom];
-    int i, j, oroomno;
+    int i, j;
+    unsigned oroomno;
 
     if (croom != maxroom) {
 	/* since the order in the array only matters for making corridors,
