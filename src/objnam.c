@@ -1256,6 +1256,16 @@ struct obj *obj;
 	return s;
 }
 
+char *
+bare_artifactname(obj)
+struct obj *obj;
+{
+	char *outbuf = nextobuf();
+	if (obj->oartifact) Strcpy(outbuf, artiname(obj->oartifact));
+	else Strcpy(outbuf, xname(obj));
+	return outbuf;
+}
+
 static const char *wrp[] = {
 	"wand", "ring", "potion", "scroll", "gem", "amulet",
 	"spellbook", "spell book",

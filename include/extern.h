@@ -81,6 +81,7 @@ E boolean FDECL(artifact_light, (struct obj *));
 E long FDECL(spec_m2, (struct obj *));
 E boolean FDECL(artifact_has_invprop, (struct obj *,UCHAR_P));
 E long FDECL(arti_cost, (struct obj *));
+E struct obj *FDECL(what_gives, (long *));
 
 /* ### attrib.c ### */
 
@@ -102,6 +103,8 @@ E int NDECL(newhp);
 E schar FDECL(acurr, (int));
 E schar NDECL(acurrstr);
 E void FDECL(adjalign, (int));
+E int FDECL(is_innate, (int));
+E char *FDECL(from_what, (int));
 
 /* ### ball.c ### */
 
@@ -1430,6 +1433,7 @@ E struct obj *FDECL(readobjnam, (char *,struct obj *,BOOLEAN_P));
 E int FDECL(rnd_class, (int,int));
 E const char *FDECL(cloak_simple_name, (struct obj *));
 E const char *FDECL(mimic_obj_name, (struct monst *));
+E char *FDECL(bare_artifactname, (struct obj *));
 
 /* ### options.c ### */
 

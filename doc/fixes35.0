@@ -105,6 +105,7 @@ extend Warning to include ice danger
 wishing for particular variety of tin contents (deep fried, broiled, etc.)
 debug-mode wishing for random monster(s) via '*'
 health-food store that stocks monk-appropriate foods in mine town when monk
+give more information about your attributes in debug mode
 
 
 Platform- and/or Interface-Specific New Features

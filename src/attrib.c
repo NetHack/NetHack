@@ -97,6 +97,8 @@ const struct innate {
 
 STATIC_DCL void NDECL(exerper);
 STATIC_DCL void FDECL(postadjabil, (long *));
+STATIC_DCL const struct innate *FDECL(check_innate_abil,(long *, long));
+STATIC_DCL int FDECL(innately, (long *));
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -598,6 +600,101 @@ long *ability;
 	if (!ability) return;
 	if (ability == &(HWarning) || ability == &(HSee_invisible))
 		see_monsters();
+}
+
+STATIC_OVL const struct innate *
+check_innate_abil(ability, frommask)
+long *ability;
+long frommask;
+{
+	const struct innate *abil;
+
+	if (frommask == FROMEXPER)
+	switch (Role_switch) {
+	case PM_ARCHEOLOGIST:   abil = arc_abil;	break;
+	case PM_BARBARIAN:      abil = bar_abil;	break;
+	case PM_CAVEMAN:        abil = cav_abil;	break;
+	case PM_HEALER:         abil = hea_abil;	break;
+	case PM_KNIGHT:         abil = kni_abil;	break;
+	case PM_MONK:           abil = mon_abil;	break;
+	case PM_PRIEST:         abil = pri_abil;	break;
+	case PM_RANGER:         abil = ran_abil;	break;
+	case PM_ROGUE:          abil = rog_abil;	break;
+	case PM_SAMURAI:        abil = sam_abil;	break;
+#ifdef TOURIST
+	case PM_TOURIST:        abil = tou_abil;	break;
+#endif
+	case PM_VALKYRIE:       abil = val_abil;	break;
+	case PM_WIZARD:         abil = wiz_abil;	break;
+	default:                abil = 0;		break;
+	}
+	else if (frommask == FROMRACE)
+	switch (Race_switch) {
+	case PM_ELF:            abil = elf_abil;	break;
+	case PM_ORC:            abil = orc_abil;	break;
+	case PM_HUMAN:
+	case PM_DWARF:
+	case PM_GNOME:
+	default:                abil = 0;		break;
+	}
+
+	while (abil && abil->ability) {
+	    if((abil->ability == ability) && (u.ulevel >= abil->ulevel))
+		return abil;
+	    abil++;
+	}
+	return (struct innate *)0;
+}
+
+/*
+ * returns 1 if FROMRACE or FROMEXPER and exper level == 1
+ * returns 2 if FROMEXPER and exper level > 1
+ * otherwise returns 0
+ */
+STATIC_OVL int
+innately(ability)
+long *ability;
+{
+	const struct innate *iptr;
+	if ((iptr=check_innate_abil(ability, FROMRACE)))
+	    return 1;
+	else if ((iptr=check_innate_abil(ability, FROMEXPER))) {
+	    if (iptr->ulevel == 1) return 1;
+	    return 2;
+	}
+	return 0;
+}
+
+int
+is_innate(propidx)
+int propidx;
+{
+	return innately(&u.uprops[propidx].intrinsic);
+}
+
+char *
+from_what(propidx)
+int propidx;
+{
+	struct obj *obj = (struct obj *)0;
+	static char buf[BUFSZ];
+
+	buf[0] = '\0';
+	/*
+	 * Restrict the source of the attributes just to debug mode for now
+	 */
+#ifdef WIZARD
+	if (wizard) {
+	    if (is_innate(propidx) == 2)
+		Strcpy(buf, " because of your experience");
+	    else if (is_innate(propidx) == 1)
+		Strcpy(buf, " innately");
+	    else if (wizard && (obj = what_gives(&u.uprops[propidx].extrinsic)))
+		Sprintf(buf, " because of %s",
+			(obj->oartifact) ? bare_artifactname(obj) : yname(obj));
+	}
+#endif
+	return buf;
 }
 
 void

@@ -22,6 +22,9 @@ STATIC_DCL int FDECL(spec_applies, (const struct artifact *,struct monst *));
 STATIC_DCL int FDECL(arti_invoke, (struct obj*));
 STATIC_DCL boolean FDECL(Mb_hit, (struct monst *magr,struct monst *mdef,
 				  struct obj *,int *,int,BOOLEAN_P,char *));
+STATIC_DCL unsigned long FDECL(abil_to_spfx, (long *));
+STATIC_DCL uchar FDECL(abil_to_adtyp,(long *));
+
 
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.
@@ -1436,4 +1439,103 @@ struct obj *otmp;
 	    return (100L * (long)objects[otmp->otyp].oc_cost);
 }
 
+STATIC_OVL uchar
+abil_to_adtyp(abil)
+long *abil;
+{
+	struct abil2adtyp_tag {
+		long *abil;
+		uchar adtyp;
+	} abil2adtyp[] = {
+		{&EFire_resistance, AD_FIRE},
+		{&ECold_resistance, AD_COLD},
+		{&EShock_resistance, AD_ELEC},
+		{&EAntimagic, AD_MAGM},
+		{&EDisint_resistance, AD_DISN},
+		{&EPoison_resistance, AD_DRST},
+	};
+	int k;
+	long adtyp = 0;
+
+	for (k = 0; k < SIZE(abil2adtyp); k++) {
+		if (abil2adtyp[k].abil == abil)
+			return abil2adtyp[k].adtyp;
+	}
+	return 0;
+}
+
+STATIC_OVL unsigned long
+abil_to_spfx(abil)
+long *abil;
+{
+	struct abil2spfx_tag {
+		long *abil;
+		unsigned long spfx;
+	} abil2spfx[] = {
+		{&ESearching, SPFX_SEARCH},
+		{&EHalluc_resistance, SPFX_HALRES},
+		{&ETelepat, SPFX_ESP},
+		{&EStealth, SPFX_STLTH},
+		{&ERegeneration, SPFX_REGEN},
+		{&ETeleport_control, SPFX_TCTRL},
+		{&EWarn_of_mon, SPFX_WARN},
+		{&EWarning, SPFX_WARN},
+		{&EEnergy_regeneration, SPFX_EREGEN},
+		{&EHalf_spell_damage, SPFX_HSPDAM},
+		{&EHalf_physical_damage, SPFX_HPHDAM},
+		{&EReflecting, SPFX_REFLECT},
+	};
+	int k;
+	long spfx = 0L;
+
+	for (k = 0; k < SIZE(abil2spfx); k++) {
+		if (abil2spfx[k].abil == abil)
+			return abil2spfx[k].spfx;
+	}
+	return 0L;
+}
+
+/*
+ * Return the first item that is conveying a particular intrinsic.
+ */
+
+struct obj *
+what_gives(abil)
+long *abil;
+{
+	struct obj *obj;
+	uchar dtyp;
+	unsigned long spfx;
+	long wornbits;
+	long wornmask = (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF |
+			 W_WEP | W_QUIVER | W_SWAPWEP | W_ART | W_ARTI | W_AMUL |
+			 W_RINGL | W_RINGR | W_TOOL | W_SADDLE | W_BALL | W_CHAIN
+#ifdef TOURIST
+			 | W_ARMU
+#endif
+			);
+
+	dtyp = abil_to_adtyp(abil);
+	spfx = abil_to_spfx(abil);
+	wornbits = (wornmask & *abil);
+
+	for(obj = invent; obj; obj = obj->nobj) {		
+	    if(obj->oartifact) {
+		register const struct artifact *art = get_artifact(obj);
+		if (art) {
+		    if (dtyp &&
+			(art->cary.adtyp == dtyp || art->defn.adtyp == dtyp))
+				return obj;
+		    if (spfx && ((art->cspfx & spfx) == spfx ||
+				(art->spfx &spfx) == spfx))
+				return obj;
+		}
+	    } else {
+		if (wornbits == (wornmask & obj->owornmask))
+				return obj;
+	    }
+	}
+	return (struct obj *)0;
+}
 /*artifact.c*/
+
