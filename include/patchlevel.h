@@ -51,7 +51,14 @@
 /* Version 3.4.x */
 
 /*  Patch 2, March 17, 2003
- *  Fix a few fatal errors
+ *  Fix a fatal bug that caused a crash when applying figurine, candle, or
+ *     bell that gets used up
+ *  Fix a fatal bug that triggered a panic when your secondary weapon was
+ *     cursed during bones file creation
+ *  Several other general bug fixes
+ *  Fixed some Gnome compilation problems on Redhat 7.2 and 8.0
+ *  Fixed a problem in the util Makefile
+ *  win32 tty adjustments and support for loading alternative key handlers
  */
 
 /*  Patch 1, February 22, 2003

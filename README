@@ -73,7 +73,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     to compile and run on your particular system.  It is worth mentioning
     that the default configuration is SysV/Sun/Solaris2.x (simply because
     the code was housed on such a system).  It is also worth mentioning
-    here that NetHack 3.4 is a huge program.  If you intend to run it on a
+    here that NetHack 3.5 is a huge program.  If you intend to run it on a
     small machine, you'll have to make hard choices among the options
     available in config.h.
 
@@ -83,7 +83,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     for particular windowing environments.  Reading them, and the man pages,
     should answer most of your questions.
 
-    At the time of this release, NetHack 3.4 is known to run/compile on:
+    At the time of this release, NetHack 3.5 is known to run/compile on:
 
         Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
         Atari ST/TT/Falcon running TOS (or MultiTOS) with GCC
@@ -99,7 +99,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Intel Pentium or better (or clone) running BeOS 4.5
         Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
 
-    NetHack 3.4 will also run on the following, but a cross-compiler hosted
+    NetHack 3.5 will also run on the following, but a cross-compiler hosted
     on another platform, such as win32, is required to build from source.
 
         Pocket PC devices running Windows CE 3.0 and higher
@@ -107,7 +107,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 	Palm Size PC 1.1 devices running Windows CE 2.11
 
     Previous versions of NetHack were tested on the following systems,
-    and we expect that NetHack 3.4 will work on them as well:
+    and we expect that NetHack 3.5 will work on them as well:
 
         AT&T 3B1 running System V (3.51)
         AT&T 3B2/600 & 3B2/622 running System V R3.2.1
@@ -139,13 +139,13 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     C compiler.
 
     With the demise of Windows NT on the DEC Alpha, no attempt has been
-    made to build NetHack 3.4.1 on that platform.
+    made to build NetHack 3.5 on that platform.
 
-    No attempt has been made to build or run NetHack 3.4.1 on Windows Me
+    No attempt has been made to build or run NetHack 3.5 on Windows Me
     at this point.  It may work, but then again it may not.
     
     A build for Intel 80286 machines and DOS "real mode" overlaid versions 
-    has not been produced for 3.4.1.  Nobody on the porting team has
+    has not been produced for NetHack 3.5.  Nobody on the porting team has
     the time or the software to attempt the necessary tuning that will allow 
     it to achieve the balance of having just the right amount of available 
     memory, and still have acceptable performance.  The sources necessary 
