@@ -472,6 +472,11 @@ coord *cc;
 		   (we cleared it when loading bones) */
 		if (!mtmp2->m_id)
 		    mtmp2->m_id = mtmp->m_id;
+		/* might be bringing quest leader back to life */
+		else if (quest_status.leader_is_dead &&
+			/* leader_is_dead implies that leader_m_id is valid */
+			mtmp2->m_id == quest_status.leader_m_id)
+		    quest_status.leader_is_dead = FALSE;
 		mtmp2->mx   = mtmp->mx;
 		mtmp2->my   = mtmp->my;
 		mtmp2->mux  = mtmp->mux;
@@ -507,6 +512,10 @@ coord *cc;
 		mtmp2->mstun = 0;
 		mtmp2->mconf = 0;
 		replmon(mtmp,mtmp2);
+
+		/* in case Protection_from_shape_changers is different
+		   now than it was when the traits were stored */
+		restore_cham(mtmp2);
 	}
 	return mtmp2;
 }
@@ -633,15 +642,8 @@ register struct obj *obj;
 
 			xy.x = x; xy.y = y;
 			mtmp = montraits(obj, &xy);
-			if (mtmp) {
-			    if (mtmp->mtame && !mtmp->isminion)
-				wary_dog(mtmp, TRUE);
-			    /* might be reviving quest leader */
-			    if (quest_status.leader_is_dead &&
-				    /* _is_dead implies that _m_id is valid */
-				    mtmp->m_id == quest_status.leader_m_id)
-				quest_status.leader_is_dead = FALSE;
-			}
+			if (mtmp && mtmp->mtame && !mtmp->isminion)
+			    wary_dog(mtmp, TRUE);
 		    } else
 			mtmp = makemon(&mons[montype], x, y,
 				       NO_MINVENT|MM_NOWAIT|MM_NOCOUNTBIRTH);
@@ -677,12 +679,6 @@ register struct obj *obj;
 				mtmp->mhp = eaten_stat(mtmp->mhp, obj);
 			/* track that this monster was revived at least once */
 			mtmp->mrevived = 1;
-			/* in case this was a shapechanger corpse and
-			   Protection_from_shape_changers happens to be
-			   different now than it was when the monster
-			   was killed (probably a no-op here since
-			   KEEPTRAITS() doesn't include shapechangers) */
-			restore_cham(mtmp);
 
 			if (recorporealization) {
 				/* If mtmp is revivification of former tame ghost*/

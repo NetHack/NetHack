@@ -419,15 +419,8 @@ int *fail_reason;
 	    /* restore a petrified monster */
 	    cc.x = x,  cc.y = y;
 	    mon = montraits(statue, &cc);
-	    if (mon) {
-		if (mon->mtame && !mon->isminion)
-		    wary_dog(mon, TRUE);
-		/* might be bringing quest leader back to life */
-		if (quest_status.leader_is_dead &&
-			/* leader_is_dead implies that leader_m_id is valid */
-			mon->m_id == quest_status.leader_m_id)
-		    quest_status.leader_is_dead = FALSE;
-	    }
+	    if (mon && mon->mtame && !mon->isminion)
+		wary_dog(mon, TRUE);
 	} else {
 	    /* statues of unique monsters from bones or wishing end
 	       up here (cant_revive() sets mnum to be doppelganger;
@@ -477,9 +470,6 @@ int *fail_reason;
 	/* mimic statue becomes seen mimic; other hiders won't be hidden */
 	if (mon->m_ap_type) seemimic(mon);
 	else mon->mundetected = FALSE;
-	/* when reanimating a stoned monster, protection from shape changers
-	   might be different now than it was when the monster was petrified */
-	if (use_saved_traits) restore_cham(mon);
 
 	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
 	    const char *comes_to_life = nonliving(mon->data) ?
