@@ -879,11 +879,14 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
 	case MENU_SELECT_PAGE:
 		if( data->how == PICK_ANY ) {
+			int from, to;
 			reset_menu_count(hwndList, data);
 			topIndex = ListView_GetTopIndex( hwndList );
 			pageSize = ListView_GetCountPerPage( hwndList );
-			for(i=0; i<pageSize; i++ ) {
-				SelectMenuItem(hwndList, data, topIndex+i, -1);
+			from = max(0, topIndex);
+			to = min(data->menu.size, from+pageSize);
+			for(i=from; i<to; i++ ) {
+				SelectMenuItem(hwndList, data, i, -1);
 			}
 			return -2;
 		}
@@ -891,11 +894,14 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
 	case MENU_UNSELECT_PAGE:
 		if( data->how == PICK_ANY ) {
+			int from, to;
 			reset_menu_count(hwndList, data);
 			topIndex = ListView_GetTopIndex( hwndList );
 			pageSize = ListView_GetCountPerPage( hwndList );
-			for(i=0; i<pageSize; i++ ) {
-				SelectMenuItem(hwndList, data, topIndex+i, 0);
+			from = max(0, topIndex);
+			to = min(data->menu.size, from+pageSize);
+			for(i=from; i<to; i++ ) {
+				SelectMenuItem(hwndList, data, i, 0);
 			}
 			return -2;
 		}
@@ -903,15 +909,18 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
 	case MENU_INVERT_PAGE:
 		if( data->how == PICK_ANY ) {
+			int from, to;
 			reset_menu_count(hwndList, data);
 			topIndex = ListView_GetTopIndex( hwndList );
 			pageSize = ListView_GetCountPerPage( hwndList );
-			for(i=0; i<pageSize; i++ ) {
+			from = max(0, topIndex);
+			to = min(data->menu.size, from+pageSize);
+			for(i=from; i<to; i++ ) {
 				SelectMenuItem(
 					hwndList, 
 					data, 
-					topIndex+i, 
-					NHMENU_IS_SELECTED(data->menu.items[topIndex+i])? 0 : -1
+					i, 
+					NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
 				);
 			}
 			return -2;
@@ -1096,6 +1105,9 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count)
 {
 	int i;
+
+	if( item<0 || item>=data->menu.size ) return;
+
 	if( data->how==PICK_ONE && count!=0 ) {
 		for(i=0; i<data->menu.size; i++) 
 			if( item!=i && data->menu.items[i].count!=0 ) {
@@ -1190,3 +1202,4 @@ LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	else 
 		return 0;
 }
+
