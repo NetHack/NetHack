@@ -465,7 +465,13 @@ boolean pets_only;	/* true for ascension or final escape */
 		   the amulet; if you don't have it, will chase you
 		   only if in range. -3. */
 			(u.uhave.amulet && mtmp->iswiz))
-		&& !mtmp->msleeping && mtmp->mcanmove
+		&& ((!mtmp->msleeping && mtmp->mcanmove)
+#ifdef STEED
+		    /* eg if level teleport or new trap, steed has no control
+		       to avoid following */
+		    || (mtmp == u.usteed)
+#endif
+		    )
 		/* monster won't follow if it hasn't noticed you yet */
 		&& !(mtmp->mstrategy & STRAT_WAITFORU)) {
 		stay_behind = FALSE;
