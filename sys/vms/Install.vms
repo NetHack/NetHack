@@ -1,4 +1,4 @@
-               Instructions for Installing NetHack 3.4.2
+               Instructions for Installing NetHack 3.4.3
                      on a VMS (aka OpenVMS) system
                =========================================
 
@@ -7,7 +7,7 @@
 
 1.  Building NetHack requires a C compiler (either Compaq C, DEC C,
     VAX C, or GNU C) and VMS version V4.6 or later (but see note #9).
-    This release has been tested with Compaq C V6.4 on Alpha/VMS V7.1
+    This release has been tested with Compaq C V6.4 on Alpha/VMS V7.3-1
     and with VAX C V3.2 and GNU C 2.7.1 on VAX/VMS V5.5-2.  The build
     procedure (vmsbuild.com) should not need to be modified; it accepts
     an option for selecting the compiler, and it can detect different
@@ -136,8 +136,8 @@
 
 Notes:
 
-1.  Save files and bones files from versions 3.4.0 and 3.4.1 will work
-    with 3.4.2; those from earlier versions will not.  The scoreboard
+1.  Save files and bones files from versions 3.4.0, 3.4.1 and 3.4.2 will
+    work with 3.4.3; those from earlier versions will not.  The scoreboard
     file (RECORD) from 3.4.x or 3.3.x will also work; one from version
     3.2.x is slightly different format but should be compatible.
 
@@ -476,4 +476,4 @@ Notes:
     Always include version information for NetHack, the operating system,
     and the C compiler used.
 
-21-AUG-2003
+20-OCT-2003

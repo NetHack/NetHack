@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmstty.c	3.4	2002/08/21	*/
+/*	SCCS Id: @(#)vmstty.c	3.4	2003/09/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* tty.c - (VMS) version */
@@ -106,12 +106,20 @@ int
 vms_getchar()
 {
     short key;
-
 #ifdef USE_QIO_INPUT
     struct _rd_iosb iosb;
     unsigned long sts;
     unsigned char kb_buf;
+#else	/* SMG input */
+    static volatile int recurse = 0;	/* SMG is not AST re-entrant! */
+#endif
 
+    if (program_state.done_hup) {
+	/* hangup has occurred; do not attempt to get further user input */
+	return ESC;
+    }
+
+#ifdef USE_QIO_INPUT
     if (inc > 0) {
 	/* we have buffered character(s) from previous read */
 	kb_buf = *inp++;
@@ -146,8 +154,6 @@ vms_getchar()
 	key = getchar();
 
 #else   /*!USE_QIO_INPUT*/
-    static volatile int recurse = 0;	/* SMG is not AST re-entrant! */
-
     if (recurse++ == 0 && kb != 0) {
 	smg$read_keystroke(&kb, &key);
 	switch (key) {

@@ -90,7 +90,7 @@ RANDOBJ = random.obj
 # Other things that have to be reconfigured are in vmsconf.h,
 # and config.h
 
-VERSION  = 3.4.2
+VERSION  = 3.4.3
 
 MAKEDEFS = $(UTL)makedefs.exe;
 
@@ -368,7 +368,7 @@ do_wear.obj :	do_wear.c $(HACK_H)
 dog.obj :	dog.c $(HACK_H) $(INC)edog.h
 dogmove.obj :	dogmove.c $(HACK_H) $(INC)mfndpos.h $(INC)edog.h
 dokick.obj :	dokick.c $(HACK_H) $(INC)eshk.h
-dothrow.obj :	dothrow.c $(HACK_H)
+dothrow.obj :	dothrow.c $(HACK_H) $(INC)edog.h
 drawing.obj :	drawing.c $(HACK_H) $(INC)tcap.h
 dungeon.obj :	dungeon.c $(HACK_H) $(INC)dgn_file.h $(INC)dlb.h
 eat.obj :	eat.c $(HACK_H)
