@@ -1241,17 +1241,21 @@ bool NetHackQtPlayerSelector::Choose()
 {
     if (fully_specified_role) return TRUE;
 
+#if defined(QWS) // probably safe with Qt 3, too (where show!=exec in QDialog).
     if ( qt_compact_mode ) {
 	showMaximized();
-    } else {
+    } else
+#endif
+    {
 	adjustSize();
 	centerOnMain(this);
     }
 
     if ( exec() ) {
 	return TRUE;
-    } else
+    } else {
 	return FALSE;
+    }
 }
 
 
