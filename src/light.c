@@ -485,14 +485,7 @@ obj_is_burning(obj)
     struct obj *obj;
 {
     return (obj->lamplit &&
-		(  obj->otyp == MAGIC_LAMP
-		|| obj->otyp == BRASS_LANTERN
-		|| obj->otyp == OIL_LAMP
-		|| obj->otyp == CANDELABRUM_OF_INVOCATION
-		|| obj->otyp == TALLOW_CANDLE
-		|| obj->otyp == WAX_CANDLE
-		|| obj->otyp == POT_OIL
-		|| artifact_light(obj)));
+		(obj->otyp == MAGIC_LAMP || ignitable(obj) || artifact_light(obj)));
 }
 
 /* copy the light source(s) attachted to src, and attach it/them to dest */

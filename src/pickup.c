@@ -1772,8 +1772,7 @@ register struct obj *obj;
 		sellobj_state(SELL_NORMAL);
 	    }
 	}
-	if (Icebox && obj->otyp != OIL_LAMP && obj->otyp != BRASS_LANTERN
-			&& !Is_candle(obj)) {
+	if (Icebox && !age_is_relative(obj)) {
 		obj->age = monstermoves - obj->age; /* actual age */
 		/* stop any corpse timeouts when frozen */
 		if (obj->otyp == CORPSE && obj->timed) {
@@ -1868,8 +1867,7 @@ register struct obj *obj;
 	obj_extract_self(obj);
 	current_container->owt = weight(current_container);
 
-	if (Icebox && obj->otyp != OIL_LAMP && obj->otyp != BRASS_LANTERN
-			&& !Is_candle(obj)) {
+	if (Icebox && !age_is_relative(obj)) {
 		obj->age = monstermoves - obj->age; /* actual age */
 		if (obj->otyp == CORPSE)
 			start_corpse_timeout(obj);

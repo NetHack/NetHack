@@ -1015,10 +1015,7 @@ struct obj *obj;
 {
 	xchar x, y;
 
-	if (!obj->lamplit && (obj->otyp == CANDELABRUM_OF_INVOCATION ||
-		obj->otyp == WAX_CANDLE || obj->otyp == TALLOW_CANDLE ||
-		obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
-		obj->otyp == BRASS_LANTERN || obj->otyp == POT_OIL)) {
+	if (!obj->lamplit && (obj->otyp == MAGIC_LAMP || ignitable(obj))) {
 	    if ((obj->otyp == MAGIC_LAMP ||
 		 obj->otyp == CANDELABRUM_OF_INVOCATION) &&
 		obj->spe == 0)
