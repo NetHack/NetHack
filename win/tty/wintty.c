@@ -2436,8 +2436,14 @@ tty_print_glyph(window, x, y, glyph)
 #endif
 	g_putch(ch);		/* print the character */
 
-    if (reverse_on)
+    if (reverse_on) {
     	term_end_attr(ATR_INVERSE);
+	/* turn off color as well, ATR_INVERSE may have done this already */
+	if(ttyDisplay->color != NO_COLOR) {
+	    term_end_color();
+	    ttyDisplay->color = NO_COLOR;
+	}
+    }
 
     wins[window]->curx++;	/* one character over */
     ttyDisplay->curx++;		/* the real cursor moved too */
