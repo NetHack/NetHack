@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.4	2002/07/27	*/
+/*	SCCS Id: @(#)options.c	3.4	2002/08/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2520,7 +2520,7 @@ boolean setinitial,setfromfile;
 	    }
 	}
 	retval = TRUE;
-    } if (!strcmp("runmode", optname)) {
+    } else if (!strcmp("runmode", optname)) {
 	const char *mode_name;
 	menu_item *mode_pick = (menu_item *)0;
 	tmpwin = create_nhwindow(NHW_MENU);
@@ -2540,7 +2540,7 @@ boolean setinitial,setfromfile;
 	retval = TRUE;
     } 
 #ifdef TTY_GRAPHICS
-	else if (!strcmp("msg_window", optname)) {
+      else if (!strcmp("msg_window", optname)) {
 	/* by Christian W. Cooper */
 	menu_item *window_pick = (menu_item *)0;
 	tmpwin = create_nhwindow(NHW_MENU);
