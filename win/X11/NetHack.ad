@@ -1,0 +1,190 @@
+! The display_file, tombstone, and menu windows are all formatted assuming
+! a fixed width font.  Text windows may or may not be formatted as above.
+! The rip window applies if the GRAPHIC_TOMBSTONE option is turned on, and
+! requires a 12 pixel font for correct appearance.
+!
+NetHack*font:				variable
+NetHack*display_file*font:		fixed
+NetHack*tombstone*font:			fixed
+NetHack*rip*font:			-*-times-medium-r-*-*-12-*-*-*-*-*-*-*
+NetHack*menu*font:			fixed
+!NetHack*text*font:			fixed
+NetHack*map*font:			nh10
+
+! To use full-color tiles for the map, uncomment the tile file name.
+! If you use a 100dpi (or greater) monitor you may wish to double the
+! tile size so you can see the figures.  If NetHack was compiled to
+! use XPM (USE_XPM in config.h), the tile_file is a standard XPM file.
+! Otherwise, it is a custom format.  double_tile_size only applies to
+! the custom format - to enlarge an XPM file, use processing tools
+! such as XV or preferably PBMplus.
+!
+!NetHack.tile_file: x11tiles
+!NetHack.double_tile_size: True
+!
+! The annotation of pets.
+!NetHack.pet_mark_bitmap: pet_mark.xbm
+!NetHack.pet_mark_color: Red
+
+! Tombstone
+! The image file
+!NetHack.tombstone: rip.xpm
+! Text starts at (tombtext_x, tombtext_y) and subsequent lines
+! are displaced by (tombtext_dx, tombtext_dy) pixels.  If you
+!NetHack.tombtext_x: 155
+!NetHack.tombtext_y: 78
+!NetHack.tombtext_dx: 0
+!NetHack.tombtext_dy: 13
+! The color to use for the text on the hero's tombstone
+NetHack*rip*foreground: black
+
+! Translation tables.  There are currently several actions in nethack, but
+! the only one you should be using is "input()", which, with no parameters,
+! uses XLookupString to translate your keypress into a command.  You
+! can optionally give it parameters to change the behavior, see the example
+! below.  Note that you have to specify the translations in every appropriate
+! window.
+NetHack*message*translations:	<KeyPress>: input()
+!
+! Example extra translations for the map window.
+!
+!NetHack*map*translations:	#override \
+!				!<Key>Left: input(h) \n\
+!				!<Key>Right: input(l) \n\
+!				!<Key>Up: input(k) \n\
+!				!<Key>Down: input(j)
+!
+! The icon to use; supported values are nh72, nh56, and nh32; nh72 is the
+! default.  Some window managers may not support the larger icon sizes.
+! It is not guaranteed that the window manager will honor the icon selection.
+!NetHack*icon: nh56
+!
+! If True, a popup for single character prompts such as y/n questions is _not_
+! used.
+!NetHack*slow: True
+!
+! The number of lines the message window will show without scrolling.
+!NetHack*message_lines: 12
+!
+! If True, the message window has a line that seperates old and new messages.
+!NetHack*message_line: True
+!
+! If True, force keyboard to attach to popup windows.  Some window managers
+! enforce a click-to-focus-keyboard policy (e.g. the DECwindows wm).  NetHack
+! has a lot of popups and is almost unplayable without some kind of autofocus.
+!NetHack*autofocus: True
+!
+! Specify the number of rows and columns of the map window.  The default
+! is the standard 80x21 window.  Note: this _does_not_ change nethack's
+! level size, only what you see of it.
+!NetHack*map*rows:	21
+!NetHack*map*columns:	80
+
+! Parts of the fancy status display.
+!
+NetHack*status_condition.borderWidth:	0
+NetHack*status_info*borderWidth:	0
+
+! Sample color screen entries.
+!
+NetHack*nethack.background: 	wheat
+NetHack*map*yellow:		gold
+NetHack*map*brown:		tan
+NetHack*map*gray:		grey85
+NetHack*map*foreground:		wheat
+NetHack*map*background:		grey40
+
+NetHack*fancy_status.skipAdjust:        True
+NetHack*fancy_status.background:	wheat
+NetHack*status_info*foreground:		Sienna
+NetHack*status_info*background:		wheat
+NetHack*status_info.background:		wheat
+NetHack*status_attributes*foreground:	black
+NetHack*status_attributes*background:	white
+NetHack*status_condition*foreground:	red
+NetHack*status_condition*background:	wheat
+NetHack*Scrollbar*foreground:		Sienna
+NetHack*Scrollbar*background:		wheat
+NetHack*status_info*showGrip:		False
+NetHack*status_attributes*showGrip:	False
+
+NetHack*player_selection*random.borderColor:	blue
+NetHack*player_selection*random.borderWidth:    2
+NetHack*player_selection*random.foreground:	blue
+NetHack*player_selection*random.accelerators: #override\n\
+				<Key>Return:	set() notify() unset()
+NetHack*player_selection*quit.borderColor:	blue
+NetHack*player_selection*quit.foreground:	blue
+NetHack*player_selection*Command.borderColor:	red
+NetHack*player_selection*Command.foreground:	red
+NetHack*player_selection*quit.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+
+NetHack*race_selection*random.borderColor:	blue
+NetHack*race_selection*random.borderWidth:	2
+NetHack*race_selection*random.foreground:	blue
+NetHack*race_selection*random.accelerators: #override\n\
+				<Key>Return:	set() notify() unset()
+NetHack*race_selection*quit.borderColor:	blue
+NetHack*race_selection*quit.foreground:		blue
+NetHack*race_selection*Command.borderColor:	red
+NetHack*race_selection*Command.foreground:	red
+NetHack*race_selection*quit.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+
+NetHack*gender_selection*random.borderColor:	blue
+NetHack*gender_selection*random.borderWidth:	2
+NetHack*gender_selection*random.foreground:	blue
+NetHack*gender_selection*random.accelerators: #override\n\
+				<Key>Return:	set() notify() unset()
+NetHack*gender_selection*quit.borderColor:	blue
+NetHack*gender_selection*quit.foreground:	blue
+NetHack*gender_selection*Command.borderColor:	red
+NetHack*gender_selection*Command.foreground:	red
+NetHack*gender_selection*quit.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+
+NetHack*alignment_selection*random.borderColor:	blue
+NetHack*alignment_selection*random.borderWidth:	2
+NetHack*alignment_selection*random.foreground:	blue
+NetHack*alignment_selection*random.accelerators: #override\n\
+				<Key>Return:	set() notify() unset()
+NetHack*alignment_selection*quit.borderColor:	blue
+NetHack*alignment_selection*quit.foreground:	blue
+NetHack*alignment_selection*Command.borderColor: red
+NetHack*alignment_selection*Command.foreground:	red
+NetHack*alignment_selection*quit.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+
+NetHack*extended_commands*dismiss.borderColor:	blue
+NetHack*extended_commands*dismiss.foreground:	blue
+NetHack*extended_commands*help.borderColor:	blue
+NetHack*extended_commands*help.foreground:	blue
+NetHack*extended_commands*Command.borderColor:	red
+NetHack*extended_commands*Command.foreground:	red
+NetHack*extended_commands*help.accelerators: #override\n\
+				:<Key>?:	set() notify() unset()
+NetHack*extended_commands*dismiss.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+!
+!
+! The following are the default 15 colors that the nethack map uses.
+! If they don't look good on your screen, change them.
+!
+! The foreground color is used as "no color".
+!
+!NetHack*map*black:		black
+!NetHack*map*red:		red
+!NetHack*map*green:		pale green
+!NetHack*map*brown:		brown
+!NetHack*map*blue:		blue
+!NetHack*map*magenta:		magenta
+!NetHack*map*cyan:		light cyan
+!NetHack*map*gray:		gray
+!NetHack*map*orange:		orange
+!NetHack*map*bright_green:	green
+!NetHack*map*yellow:		yellow
+!NetHack*map*bright_blue:	royal blue
+!NetHack*map*bright_magenta:	violet
+!NetHack*map*bright_cyan:	cyan
+!NetHack*map*white:		white
