@@ -38,9 +38,9 @@ it to your home directory as .nethackrc and modifying it to your liking.
 If you are running X11 copy the nh10.pcf and ibm.pcf font files from
 /usr/games/lib/nethackdir to a X11 fonts directory (such as
 /usr/X11/lib/X11/fonts/misc) and run "mkfontdir", then restart X
-windows to load them.  Also consider putting NetHack.ad in
-/usr/X11/lib/X11/app-defaults or its contents in your .Xdefaults or
-.Xresources.
+windows to load them.  Also consider copying NetHack.ad to
+/usr/X11/lib/X11/app-defaults/NetHack or adding its contents to your
+.Xdefaults or .Xresources.
 
 
 The official Linux binary is set up to run setgid games, which allows
