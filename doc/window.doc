@@ -402,14 +402,56 @@ access the fields directly.
 
 Your window port identifies what options it will react to and support
 by setting bits in the window_procs wincap mask. See section IX for
-details of where the wincap mask resides. Any preference settings 
-marked as being supported by having its bit set in the wincap mask 
-will be available for the user of your window port to set via the 'O' 
-command, while those not marked as supported will not appear in the 
-menus of the 'O' command.
+details of where the wincap mask resides. 
 
-Setting of any wincap option is handled by the NetHack core option
-code, you do not have to provide a parser in your window port.
+Two things control whether any preference setting appears in the 
+'O' command options menu during the game:
+ 1. The option must be marked as being supported by having its 
+    bit set in the window_procs wincap mask.
+ 2. The option must have its optflag field set to SET_IN_GAME in order
+    to be able to set the option, or marked DISP_IN_GAME if you just
+    want to reveal what the option is set to. 
+Both conditions must be true to be able to see or set the option from
+within NetHack.  
+
+The default values for the optflag field for all the options are 
+hard-coded into the option in options.c.  The default value for 
+the options can be altered by calling 
+	set_wc_option_mod_status(optmask, status)
+specifying the option modification status to one of SET_IN_FILE, 
+DISP_IN_GAME, or SET_IN_GAME.
+
+The setting of any wincap option is handled by the NetHack core option
+processing code. You do not have to provide a parser in your window 
+port, nor should you set the values for the iflags.wc_* fields 
+directly within the port code. The port code should honor whatever
+values were put there by the core when processing options, either
+in the config file, or by the 'O' command.  
+
+You may be wondering what values your window port will find in the 
+iflags.wc_* fields for options that the user has not specified
+in his/her config file. Put another way, how does you port code
+tell if an option has not been set? The next paragraph explains that.
+
+If the core does not set an option, it will still be initialized 
+to its default value. Those default values for the 
+iflags.wc_* fields are:
+
+ o All boolean fields are initialized to the starting 
+   value specified for that option in the boolopt array in 
+   options.c.  The window-port should respect that setting 
+   unless it has a very good reason for not doing so. 
+ o All int fields are initialized to zero. Zero is not a valid
+   setting for any of the int options, so if your port code
+   encounters a zero there, it can assume that the preference
+   option was not specified.  In that case, the window-port code
+   should use a default setting that the port is comfortable with.  
+   It should write the default setting back into the iflags.wc_*
+   field.  That is the only time that your window-port could should
+   update those fields.
+ o All "char *" fields will be null pointers. Be sure to check for
+   that in your window-port code before using such a pointer, or 
+   you'll end up triggering a nasty fault.
 
 Here are the wincap preference settings that your port can choose
 to support:
@@ -481,10 +523,26 @@ use_inverse	-- port should display inverse when NetHack asks for it.
 vary_msgcount	-- port should display this number of messages at a time in
 		   the message window.
 
-Whenever one of these settings is adjusted (and if supported by the port
-by marking it so in the wincap mask), the port is notified of a change
+Whenever one of these settings is adjusted, the port is notified of a change
 to the setting by calling the port's preference_update() routine. The port
-can choose to adjust for the change or ignore it.
+is only notified if it has indicated that it supports that option by setting
+the option's bit in the port's wincap mask.  The port can choose to adjust 
+for the change to an option that it receives notification about, or ignore it.
+The former approach is recommended.  If you don't want to deal with a
+user-initiated setting change, then the port should call 
+set_wc_option_mod_status(mask, SET_IN_FILE) to make the option invisible to 
+the user.
+
+Functions available for the window port to call:
+
+set_wc_option_mod_status(optmask, status)
+		-- Adjust the optflag field for a set of options to 
+		   specify whether the port wants the option to appear 
+		   in the 'O' command options menu, The second parameter,
+		   "status" can be set to SET_IN_FILE, DISP_IN_GAME,
+		   or SET_IN_GAME (SET_IN_FILE implies that the option
+		   is completely hidden during the game).
+
 
 V.  New or respecified common, high level routines
 

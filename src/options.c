@@ -24,17 +24,6 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
  *  and also the Guidebooks.
  */
 
-/*
- * Option flags
- * Each higher number includes the characteristics of the numbers
- * below it.
- */
-#define SET_IN_FILE	0 /* config file option only, not visible in game
-			   * or via program */
-#define SET_VIA_PROG	1 /* may be set via extern program, not seen in game */
-#define DISP_IN_GAME	2 /* may be set via extern program, displayed in game */
-#define SET_IN_GAME	3 /* may be set via extern program or set in the game */
-
 static struct Bool_Opt
 {
 	const char *name;
@@ -3057,6 +3046,64 @@ struct wc_Opt wc_options[] = {
 	{"vary_msgcount",WC_VARY_MSGCOUNT},
 	{(char *)0, 0L}
 };
+
+
+/*
+ * If a port wants to change or ensure that the
+ * SET_IN_FILE, DISP_IN_GAME, or SET_IN_GAME status of an option is
+ * correct (for controlling its display in the option menu) call
+ * set_option_mod_status()
+ * with the second argument of 0,2, or 3 respectively.
+ */
+void
+set_option_mod_status(optnam, status)
+char *optnam;
+int status;
+{
+	int k;
+	if (status < SET_IN_FILE || status > SET_IN_GAME) {
+		impossible("set_option_mod_status: status out of range %d.", status);
+		return;
+	}
+	for (k = 0; boolopt[k].name; k++) {
+		if (!strncmpi(boolopt[k].name, optnam, strlen(optnam))) {
+			boolopt[k].optflags = status;
+			return;
+		}
+	}
+	for (k = 0; compopt[k].name; k++) {
+		if (!strncmpi(compopt[k].name, optnam, strlen(optnam))) {
+			compopt[k].optflags = status;
+			return;
+		}
+	}
+}
+
+/*
+ * You can set several wc_options in one call to
+ * set_wc_option_mod_status() by setting
+ * the appropriate bits for each option that you
+ * are setting in the optmask argument
+ * prior to calling.
+ *    example: set_wc_option_mod_status(WC_COLOR|WC_SCROLL_MARGIN, SET_IN_GAME);
+ */
+void
+set_wc_option_mod_status(optmask, status)
+unsigned long optmask;
+int status;
+{
+	int k = 0;
+	if (status < SET_IN_FILE || status > SET_IN_GAME) {
+		impossible("set_option_mod_status: status out of range %d.", status);
+		return;
+	}
+	while (wc_options[k].wc_name) {
+		if (optmask & wc_options[k].wc_bit) {
+			set_option_mod_status(wc_options[k].wc_name, status);
+		}
+		k++;
+	}
+}
 
 STATIC_OVL boolean
 is_wc_option(optnam)
