@@ -38,7 +38,7 @@ STATIC_DCL int FDECL(use_grapple, (struct obj *));
 STATIC_DCL int FDECL(do_break_wand, (struct obj *));
 STATIC_DCL boolean FDECL(figurine_location_checks,
 				(struct obj *, coord *, BOOLEAN_P));
-STATIC_DCL boolean NDECL(uhave_greystone);
+STATIC_DCL boolean NDECL(uhave_graystone);
 
 #ifdef	AMIGA
 void FDECL( amii_speaker, ( struct obj *, char *, int ) );
@@ -1154,8 +1154,7 @@ dorub()
 	struct obj *obj = getobj(cuddly, "rub");
 
 	if (obj && obj->oclass == GEM_CLASS) {
-	    if (obj->otyp == FLINT || obj->otyp == LUCKSTONE ||
-		obj->otyp == LOADSTONE || obj->otyp == TOUCHSTONE) {
+	    if (is_graystone(obj)) {
 		use_stone(obj);
 		return 1;
 	    } else {
@@ -1826,7 +1825,7 @@ struct obj *otmp;
 	material = objects[obj->otyp].oc_material;
 
 	if (otmp->cursed &&
-	    obj->oclass == GEM_CLASS && !is_greystone(obj) && !rn2(5)) {
+	    obj->oclass == GEM_CLASS && !is_graystone(obj) && !rn2(5)) {
 	    pline(
 		(Blind ? "You feel something shatter." :
 		 (Hallucination ? "Oh, wow, look at the pretty shards." :
@@ -2571,12 +2570,12 @@ do_break_wand(obj)
 }
 
 STATIC_OVL boolean
-uhave_greystone()
+uhave_graystone()
 {
 	register struct obj *otmp;
 
 	for(otmp = invent; otmp; otmp = otmp->nobj)
-		if(is_greystone(otmp))
+		if(is_graystone(otmp))
 			return TRUE;
 	return FALSE;
 }
@@ -2588,7 +2587,7 @@ doapply()
 	register int res = 1;
 
 	if(check_capacity((char *)0)) return (0);
-	obj = getobj(carrying(POT_OIL) || uhave_greystone()
+	obj = getobj(carrying(POT_OIL) || uhave_graystone()
 		? tools_too : tools, "use or apply");
 	if(!obj) return 0;
 

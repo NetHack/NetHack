@@ -838,9 +838,7 @@ register const char *let,*word;
 		    ((otmp->oclass == TOOL_CLASS &&
 		      otyp != OIL_LAMP && otyp != MAGIC_LAMP &&
 		      otyp != BRASS_LANTERN) ||
-		     (otmp->oclass == GEM_CLASS &&
-		      otyp != LUCKSTONE && otyp != LOADSTONE &&
-		      otyp != TOUCHSTONE && otyp != FLINT)))
+		     (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
 		|| ((!strcmp(word, "use or apply") ||
 			!strcmp(word, "untrap with")) &&
 		     /* Picks, axes, pole-weapons, bullwhips */
@@ -851,7 +849,7 @@ register const char *let,*word;
 			be offered as a choice when already discovered */
 		     (otyp != POT_OIL || !otmp->dknown ||
 		      !objects[POT_OIL].oc_name_known))
-		|| (otmp->oclass == GEM_CLASS && !is_greystone(otmp))))
+		|| (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
 		|| (!strcmp(word, "invoke") &&
 		    (!otmp->oartifact && !objects[otyp].oc_unique &&
 		     (otyp != FAKE_AMULET_OF_YENDOR || otmp->known) &&
