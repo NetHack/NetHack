@@ -157,8 +157,10 @@ boolean devour;
 	    /* TODO: Reveal presence of sea monster (especially sharks) */
 	} else
 	/* hack: observe the action if either new or old location is in view */
+	/* However, invisible monsters should still be "it" even though out of
+	   sight locations should not. */
 	if (cansee(x, y) || cansee(mtmp->mx, mtmp->my))
-	    pline("%s %s %s.", noit_Monnam(mtmp),
+	    pline("%s %s %s.", mon_visible(mtmp) ? noit_Monnam(mtmp) : "It",
 		  devour ? "devours" : "eats",
 		  (obj->oclass == FOOD_CLASS) ?
 			singular(obj, doname) : doname(obj));

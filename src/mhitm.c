@@ -78,6 +78,8 @@ missmm(magr, mdef, mattk)
 	char buf[BUFSZ], mdef_name[BUFSZ];
 
 	if (vis) {
+		if (!canspotmon(magr))
+		    map_invisible(magr->mx, magr->my);
 		if (!canspotmon(mdef))
 		    map_invisible(mdef->mx, mdef->my);
 		if (mdef->m_ap_type) seemimic(mdef);
@@ -221,7 +223,7 @@ mattackm(magr, mdef)
 
 
     /* Set up the visibility of action */
-    vis = (cansee(magr->mx,magr->my) && cansee(mdef->mx,mdef->my));
+    vis = (cansee(magr->mx,magr->my) && cansee(mdef->mx,mdef->my) && (canspotmon(magr) || canspotmon(mdef)));
 
     /*	Set flag indicating monster has moved this turn.  Necessary since a
      *	monster might get an attack out of sequence (i.e. before its move) in
@@ -371,6 +373,8 @@ hitmm(magr, mdef, mattk)
 		int compat;
 		char buf[BUFSZ], mdef_name[BUFSZ];
 
+		if (!canspotmon(magr))
+		    map_invisible(magr->mx, magr->my);
 		if (!canspotmon(mdef))
 		    map_invisible(mdef->mx, mdef->my);
 		if(mdef->m_ap_type) seemimic(mdef);

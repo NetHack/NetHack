@@ -11,6 +11,10 @@ expert fireball/cone of cold could not target a monster seen only with
 	infravision or ESP
 display "lotus juice", not "lotu juice" for the fruit juice name
 statue of any golem hit with stone-to-flesh spell animates as flesh golem
+two invisible monsters hitting one another should not be visible
+if only one monster in a monster-vs-monster fight is visible, show an I symbol
+	for the other one whether it is an attacker or defender
+display "It" and not "The invisible <pet>" when an invisible pet eats food.
 
 
 Platform- and/or Interface-Specific Fixes
