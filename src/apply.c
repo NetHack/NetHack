@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2003/01/29	*/
+/*	SCCS Id: @(#)apply.c	3.4	2003/02/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -542,18 +542,31 @@ register xchar x, y;
 	    }
 	    if (dist2(u.ux,u.uy,mtmp->mx,mtmp->my) >
 		    dist2(x,y,mtmp->mx,mtmp->my)) {
-		if (otmp->cursed && !breathless(mtmp->data)) {
-		    if (um_dist(mtmp->mx, mtmp->my, 5)) {
-			pline("%s chokes to death!", Monnam(mtmp));
-			mondied(mtmp);
-		    } else if (um_dist(mtmp->mx, mtmp->my, 3)) {
+		if (!um_dist(mtmp->mx, mtmp->my, 3)) {
+		    ;	/* still close enough */
+		} else if (otmp->cursed && !breathless(mtmp->data)) {
+		    if (um_dist(mtmp->mx, mtmp->my, 5) ||
+			    (mtmp->mhp -= rnd(2)) <= 0) {
+			long save_pacifism = u.uconduct.killer;
+
+			Your("leash chokes %s to death!", mon_nam(mtmp));
+			/* hero might not have intended to kill pet, but
+			   that's the result of his actions; gain experience,
+			   lose pacifism, take alignment and luck hit, make
+			   corpse less likely to remain tame after revival */
+			xkilled(mtmp, 0);	/* no "you kill it" message */
+			/* life-saving doesn't ordinarily reset this */
+			if (mtmp->mhp > 0) u.uconduct.killer = save_pacifism;
+		    } else {
 			pline("%s chokes on the leash!", Monnam(mtmp));
+			/* tameness eventually drops to 1 here (never 0) */
+			if (mtmp->mtame && rn2(mtmp->mtame)) mtmp->mtame--;
 		    }
 		} else {
 		    if (um_dist(mtmp->mx, mtmp->my, 5)) {
 			pline("%s leash snaps loose!", s_suffix(Monnam(mtmp)));
 			m_unleash(mtmp, FALSE);
-		    } else if (um_dist(mtmp->mx, mtmp->my, 3)) {
+		    } else {
 			You("pull on the leash.");
 			if (mtmp->data->msound != MS_SILENT)
 			    switch (rn2(3)) {
