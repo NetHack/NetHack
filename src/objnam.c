@@ -2560,7 +2560,7 @@ typfnd:
 			       or of ordinary one being forced to such */
 			    if (otmp->timed) obj_stop_timers(otmp);
 			    if (mons[mntmp].msound == MS_GUARDIAN)
-			    	otmp->corpsenm = genus(mntmp);
+			    	otmp->corpsenm = genus(mntmp,1);
 			    else
 				otmp->corpsenm = mntmp;
 			    start_corpse_timeout(otmp);

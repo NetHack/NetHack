@@ -86,30 +86,31 @@ int mndx;
 
 /* Convert the monster index of some monsters (such as quest guardians)
  * to their generic species type.
+ *
+ * Return associated character class monster, rather than species
+ * if mode is 1.
  */
 int
-genus(mndx)
-int mndx;
+genus(mndx, mode)
+int mndx, mode;
 {
 	switch (mndx) {
 /* Quest guardians */
-	case PM_STUDENT:
-	case PM_CHIEFTAIN:
-	case PM_NEANDERTHAL:
-	case PM_ATTENDANT:
-	case PM_PAGE:
-	case PM_ABBOT:
-	case PM_ACOLYTE:
-	case PM_HUNTER:
-	case PM_THUG:
-	case PM_ROSHI:
+	case PM_STUDENT:     mndx = mode ? PM_VALKYRIE  : PM_HUMAN; break;
+	case PM_CHIEFTAIN:   mndx = mode ? PM_BARBARIAN : PM_HUMAN; break;
+	case PM_NEANDERTHAL: mndx = mode ? PM_CAVEMAN   : PM_HUMAN; break;
+	case PM_ATTENDANT:   mndx = mode ? PM_HEALER    : PM_HUMAN; break;
+	case PM_PAGE:        mndx = mode ? PM_KNIGHT    : PM_HUMAN; break;
+	case PM_ABBOT:       mndx = mode ? PM_MONK      : PM_HUMAN; break;
+	case PM_ACOLYTE:     mndx = mode ? PM_PRIEST    : PM_HUMAN; break;
+	case PM_HUNTER:      mndx = mode ? PM_RANGER    : PM_HUMAN; break;
+	case PM_THUG:        mndx = mode ? PM_ROGUE     : PM_HUMAN; break;
+	case PM_ROSHI:       mndx = mode ? PM_SAMURAI   : PM_HUMAN; break;
 #ifdef TOURIST
-	case PM_GUIDE:
+	case PM_GUIDE:       mndx = mode ? PM_TOURIST   : PM_HUMAN; break;
 #endif
-	case PM_WARRIOR:
-	case PM_APPRENTICE:
-		mndx = PM_HUMAN;
-		break;
+	case PM_APPRENTICE:  mndx = mode ? PM_WIZARD    : PM_HUMAN; break;
+	case PM_WARRIOR:     mndx = mode ? PM_VALKYRIE  : PM_HUMAN; break;
 	default:
 		if (mndx >= LOW_PM && mndx < NUMMONS) {
 			struct permonst *ptr = &mons[mndx];

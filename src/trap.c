@@ -444,7 +444,16 @@ int *fail_reason;
 		 */
 		mon = makemon(&mons[PM_DOPPELGANGER], x, y,
 			NO_MINVENT|MM_NOCOUNTBIRTH|MM_ADJACENTOK);
-		if (mon) (void) newcham(mon, mptr, FALSE, FALSE);
+		if (mon) {
+			/* makemon() will set mon->cham to
+			 * CHAM_ORDINARY if hero is wearing
+			 * ring of protection from shape changers
+			 * when makemon() is called, so we have to
+			 * check the field before calling newcham().
+			 */
+			if (mon->cham == CHAM_DOPPELGANGER)
+				(void) newcham(mon, mptr, FALSE, FALSE);
+		}
 	    } else
 		mon = makemon(mptr, x, y, (cause == ANIMATE_SPELL) ?
 			(NO_MINVENT | MM_ADJACENTOK) : NO_MINVENT);
