@@ -1547,7 +1547,7 @@ struct obj *obj, *otmp;
 		break;
 	case WAN_TELEPORTATION:
 	case SPE_TELEPORT_AWAY:
-		rloco(obj);
+		(void) rloco(obj);
 		break;
 	case WAN_MAKE_INVISIBLE:
 #ifdef INVISIBLE_OBJECTS

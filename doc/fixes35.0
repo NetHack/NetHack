@@ -39,6 +39,7 @@ hiding monsters don't hide under cockatrice/chickatrice corpses
 "sound" option renamed to "acoustics"
 deafness now a full-fledged attribute
 water should flow into pits from broken wand of digging
+objects that fall thru trapdoors, et al, can break on impact
 
 
 Platform- and/or Interface-Specific Fixes

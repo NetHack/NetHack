@@ -1129,7 +1129,8 @@ int in_sight;
 }
 
 
-void
+/* place object randomly, returns FALSE if it's gone (eg broken) as a result */
+boolean
 rloco(obj)
 register struct obj *obj;
 {
@@ -1138,7 +1139,7 @@ register struct obj *obj;
 	int try_limit = 4000;
 
 	if (obj->otyp == CORPSE && is_rider(&mons[obj->corpsenm])) {
-	    if (revive_corpse(obj)) return;
+	    if (revive_corpse(obj)) return FALSE;
 	}
 
 	obj_extract_self(obj);
@@ -1159,7 +1160,7 @@ register struct obj *obj;
 						dndest.nhx, dndest.nhy)))));
 
 	if (flooreffects(obj, tx, ty, "fall")) {
-	    return;
+	    return FALSE;
 	} else if (otx == 0 && oty == 0) {
 	    ;	/* fell through a trap door; no update of old loc needed */
 	} else {
@@ -1175,6 +1176,7 @@ register struct obj *obj;
 	}
 	place_object(obj, tx, ty);
 	newsym(tx, ty);
+	return TRUE;
 }
 
 /* Returns an absolute depth */

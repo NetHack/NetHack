@@ -896,7 +896,7 @@ boolean init;
 	    impossible("making corpstat type %d", objtype);
 	if (x == 0 && y == 0) {		/* special case - random placement */
 		otmp = mksobj(objtype, init, FALSE);
-		if (otmp) rloco(otmp);
+		if (otmp) (void)rloco(otmp);
 	} else
 		otmp = mksobj_at(objtype, x, y, init, FALSE);
 	if (otmp) {

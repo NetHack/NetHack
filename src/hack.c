@@ -185,7 +185,7 @@ moverock()
 		    You("push %s and suddenly it disappears!",
 			the(xname(otmp)));
 		    if (ttmp->ttyp == TELEP_TRAP)
-			rloco(otmp);
+			(void)rloco(otmp);
 		    else {
 			int newlev = random_teleport_level();
 			d_level dest;

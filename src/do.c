@@ -1188,7 +1188,7 @@ boolean at_stairs, falling, portal;
 	}
 
 	if (Punished) placebc();
-	obj_delivery();		/* before killing geno'd monsters' eggs */
+	obj_delivery(FALSE);
 	losedogs();
 	kill_genocided_monsters();  /* for those wiped out while in limbo */
 	/*
@@ -1247,6 +1247,9 @@ boolean at_stairs, falling, portal;
 
 	/* give room entrance message, if any */
 	check_special_room(FALSE);
+
+	/* deliver objects traveling with player */
+	obj_delivery(TRUE);
 
 	/* Check whether we just entered Gehennom. */
 	if (!In_hell(&u.uz0) && Inhell) {

@@ -1137,10 +1137,12 @@ schar loc;
 	}
 }
 
+/* player or missile impacts location, causing objects to fall down */
 void
 impact_drop(missile, x, y, dlev)
-struct obj *missile;
-xchar x, y, dlev;
+struct obj *missile;			/* caused impact, won't drop itself */
+xchar x, y;				/* location affected */
+xchar dlev;				/* if !0 send to dlev near player */
 {
 	schar toloc;
 	register struct obj *obj, *obj2;
@@ -1379,18 +1381,26 @@ boolean shop_floor_obj;
 }
 
 void
-obj_delivery()
+obj_delivery(near_hero)
+boolean near_hero;
 {
 	register struct obj *otmp, *otmp2;
 	register int nx, ny;
 	long where;
+	boolean nobreak;
 
 	for (otmp = migrating_objs; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
 	    if (otmp->ox != u.uz.dnum || otmp->oy != u.uz.dlevel) continue;
 
-	    obj_extract_self(otmp);
 	    where = otmp->owornmask;		/* destination code */
+	    nobreak = (where & MIGR_NOBREAK) != 0;
+	    where &= ~MIGR_NOBREAK;
+
+	    if ((!near_hero && where == MIGR_NEAR_PLAYER) ||
+		(near_hero && where != MIGR_NEAR_PLAYER)) continue;
+
+	    obj_extract_self(otmp);
 	    otmp->owornmask = 0L;
 
 	    switch ((int)where) {
@@ -1408,13 +1418,25 @@ obj_delivery()
 	    }
 	    if (nx > 0) {
 		place_object(otmp, nx, ny);
+		if (!nobreak && !IS_SOFT(levl[nx][ny].typ)) {
+		    if (where == MIGR_NEAR_PLAYER) {
+			if (breaks(otmp, nx, ny)) continue;
+		    } else if (breaktest(otmp)) {
+			/* assume it broke before player arrived, no messages */
+			delobj(otmp);
+			continue;
+		    }
+		}
 		stackobj(otmp);
 		(void)scatter(nx, ny, rnd(2), 0, otmp);
 	    } else {		/* random location */
 		/* set dummy coordinates because there's no
 		   current position for rloco() to update */
 		otmp->ox = otmp->oy = 0;
-		rloco(otmp);
+		if (rloco(otmp) && !nobreak && breaktest(otmp)) {
+		    /* assume it broke before player arrived, no messages */
+		    delobj(otmp);
+		}
 	    }
 	}
 }

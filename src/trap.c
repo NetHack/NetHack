@@ -1436,7 +1436,7 @@ int style;
 			    	You_hear("a rumbling stop abruptly.");
 			    singleobj->otrapped = 0;
 			    if (t->ttyp == TELEP_TRAP)
-				rloco(singleobj);
+				(void)rloco(singleobj);
 			    else {
 				int newlev = random_teleport_level();
 				d_level dest;

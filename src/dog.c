@@ -372,8 +372,7 @@ boolean with_you;
 		    obj->owornmask = 0L;
 		    if (xlocale && ylocale)
 			    place_object(obj, xlocale, ylocale);
-		    else {
-		    	rloco(obj);
+		    else if (rloco(obj)) {
 			get_obj_location(obj, &xlocale, &ylocale, 0);
 		    }
 		}
