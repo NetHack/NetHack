@@ -1448,6 +1448,7 @@ goodfruit:
 	/* boulder:symbol */
 	fullname = "boulder";
 	if (match_optname(opts, fullname, 7, TRUE)) {
+		int clash = 0;
 		if (negated) {
 		    bad_negation(fullname, FALSE);
 		    return;
@@ -1456,11 +1457,22 @@ goodfruit:
 		if (!(opts = string_for_opt(opts, FALSE)))
 			return;
 		escapes(opts, opts);
-
-		/*
-		 * Override the default boulder symbol.
-		 */
-		iflags.bouldersym = (uchar) opts[0];
+		if (def_char_to_monclass(opts[0]) != MAXMCLASSES)
+			clash = 1;
+		else if (opts[0] >= '1' && opts[0] <= '5')
+			clash = 2;
+		if (clash) {
+			/* symbol chosen matches a used monster or warning
+			   symbol which is not good - reject it*/
+			pline(
+		  "Badoption - boulder symbol '%c' conflicts with a %s symbol.",
+				opts[0], (clash == 1) ? "monster" : "warning");
+		} else {
+			/*
+			 * Override the default boulder symbol.
+			 */
+			iflags.bouldersym = (uchar) opts[0];
+		}
 		if (!initial) need_redraw = TRUE;
 		return;
 	}

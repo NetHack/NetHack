@@ -402,6 +402,7 @@ struct obj	*detector;	/* object doing the detecting */
 int		class;		/* an object class, 0 for all */
 {
     register int x, y;
+    char stuff[BUFSZ];
     int is_cursed = (detector && detector->cursed);
     int do_dknown = (detector && (detector->oclass == POTION_CLASS ||
 				    detector->oclass == SPBOOK_CLASS) &&
@@ -410,22 +411,33 @@ int		class;		/* an object class, 0 for all */
     register struct obj *obj, *otmp = (struct obj *)0;
     register struct monst *mtmp;
     int uw = u.uinwater;
-    const char *stuff;
+    int sym, boulder = 0;
 
     if (class < 0 || class >= MAXOCLASSES) {
 	impossible("object_detect:  illegal class %d", class);
 	class = 0;
     }
 
+    /* Special boulder symbol check - does the class symbol happen
+     * to match iflags.bouldersym which is a user-defined?
+     * If so, that means we aren't sure what they really wanted to
+     * detect. Rather than trump anything, show both possibilities.
+     * We can exclude checking the buried obj chain for boulders below.
+     */
+    sym = class ? def_oc_syms[class] : 0;
+    if (sym && iflags.bouldersym && sym == iflags.bouldersym)
+    	boulder = ROCK_CLASS;
+
     if (Hallucination || (Confusion && class == SCROLL_CLASS))
-	stuff = something;
+	Strcpy(stuff, something);
     else
-	stuff = class ? oclass_names[class] : "objects";
+    	Strcpy(stuff, class ? oclass_names[class] : "objects");
+    if (boulder && class != ROCK_CLASS) Strcat(stuff, " and/or large stones");
 
     if (do_dknown) for(obj = invent; obj; obj = obj->nobj) do_dknown_of(obj);
 
     for (obj = fobj; obj; obj = obj->nobj) {
-	if (!class || o_in(obj, class)) {
+	if ((!class && !boulder) || o_in(obj, class) || o_in(obj, boulder)) {
 	    if (obj->ox == u.ux && obj->oy == u.uy) ctu++;
 	    else ct++;
 	}
@@ -443,7 +455,7 @@ int		class;		/* an object class, 0 for all */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 	if (DEADMONSTER(mtmp)) continue;
 	for (obj = mtmp->minvent; obj; obj = obj->nobj) {
-	    if (!class || o_in(obj, class)) ct++;
+	    if ((!class && !boulder) || o_in(obj, class) || o_in(obj, boulder)) ct++;
 	    if (do_dknown) do_dknown_of(obj);
 	}
 	if ((is_cursed && mtmp->m_ap_type == M_AP_OBJECT &&
@@ -497,8 +509,9 @@ int		class;		/* an object class, 0 for all */
     for (x = 1; x < COLNO; x++)
 	for (y = 0; y < ROWNO; y++)
 	    for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
-		if (!class || (otmp = o_in(obj, class))) {
-		    if (class) {
+		if ((!class && !boulder) ||
+		    (otmp = o_in(obj, class)) || (otmp = o_in(obj, boulder))) {
+		    if (class || boulder) {
 			if (otmp != obj) {
 			    otmp->ox = obj->ox;
 			    otmp->oy = obj->oy;
@@ -513,8 +526,9 @@ int		class;		/* an object class, 0 for all */
     for (mtmp = fmon ; mtmp ; mtmp = mtmp->nmon) {
 	if (DEADMONSTER(mtmp)) continue;
 	for (obj = mtmp->minvent; obj; obj = obj->nobj)
-	    if (!class || (otmp = o_in(obj, class))) {
-		if (!class) otmp = obj;
+	    if ((!class && !boulder) ||
+		 (otmp = o_in(obj, class)) || (otmp = o_in(obj, boulder))) {
+		if (!class && !boulder) otmp = obj;
 		otmp->ox = mtmp->mx;		/* at monster location */
 		otmp->oy = mtmp->my;
 		map_object(otmp, 1);
@@ -858,10 +872,17 @@ struct obj *obj;
 	makeknown(CRYSTAL_BALL);
 	consume_obj_charge(obj, TRUE);
 
+	/* special case: accept ']' as synonym for mimic
+	 * we have to do this before the def_char_to_objclass check
+	 */
+	if (ch == DEF_MIMIC_DEF) ch = DEF_MIMIC;
+
 	if ((class = def_char_to_objclass(ch)) != MAXOCLASSES)
 		ret = object_detect((struct obj *)0, class);
 	else if ((class = def_char_to_monclass(ch)) != MAXMCLASSES)
 		ret = monster_detect((struct obj *)0, class);
+	else if (iflags.bouldersym && (ch == iflags.bouldersym))
+		ret = object_detect((struct obj *)0, ROCK_CLASS);
 	else switch(ch) {
 		case '^':
 		    ret = trap_detect((struct obj *)0);

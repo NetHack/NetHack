@@ -612,8 +612,8 @@ void NDECL((*ascgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
 
 /*
  * Convert the given character to an object class.  If the character is not
- * recognized, then MAXOCLASSES is returned.  Used in invent.c, options.c,
- * pickup.c, sp_lev.c, and lev_main.c.
+ * recognized, then MAXOCLASSES is returned.  Used in detect.c invent.c,
+ * options.c, pickup.c, sp_lev.c, and lev_main.c.
  */
 int
 def_char_to_objclass(ch)
