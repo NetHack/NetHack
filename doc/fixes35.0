@@ -6,6 +6,7 @@ setmangry should not be called when a monster enters a bones region
 avoid panic when secondary weapon is cursed while generating bones level
 typos fixed in data.base
 bad capitalization of msg when charging for something that catches light
+missing opthelp for use_inverse
 
 
 Platform- and/or Interface-Specific Fixes
