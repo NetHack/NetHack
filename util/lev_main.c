@@ -1163,8 +1163,19 @@ specialmaze *maze;
 	    Write(fd, &(pt->ysize), sizeof(pt->ysize));
 	    for(j=0;j<pt->ysize;j++) {
 		if(!maze->init_lev.init_present ||
-		   pt->xsize > 1 || pt->ysize > 1)
-		    Write(fd, pt->map[j], pt->xsize * sizeof *pt->map[j]);
+		   pt->xsize > 1 || pt->ysize > 1) {
+#ifndef _MSC_VER
+			Write(fd, pt->map[j], pt->xsize * sizeof *pt->map[j]);
+#else
+			/*
+			 * On MSVC compiler the Write macro above caused: 
+			 * warning '!=' : signed/unsigned mismatch
+			 */
+			unsigned reslt, sz = pt->xsize * sizeof *pt->map[j];
+			reslt = write(fd, (genericptr_t)(pt->map[j]), sz);
+			if (reslt != sz) return FALSE;
+#endif
+		}
 		Free(pt->map[j]);
 	    }
 	    Free(pt->map);
