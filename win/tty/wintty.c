@@ -1761,6 +1761,9 @@ tty_putstr(window, attr, str)
     switch(cw->type) {
     case NHW_MESSAGE:
 	/* really do this later */
+#if defined(USER_SOUNDS) && defined(WIN32CON)
+	play_sound_for_message(str);
+#endif
 	update_topl(str);
 	break;
 

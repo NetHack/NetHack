@@ -162,7 +162,7 @@ TILEBMP16   = $(SRC)\tiles.bmp
 TILEUTIL32  = $(UTIL)\til2bm32.exe
 TILEBMP32   = $(SRC)\tiles32.bmp
 
-#SOUND = $(OBJ)\ntsound.o
+SOUND = $(OBJ)\ntsound.o
 
 #SOUND =
 
@@ -573,7 +573,7 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 $(GAMEFILE) : $(ALLOBJ) $(NHRES)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
-	$(link) $(LFLAGS) user32.lib -out:$@ @<<$(GAME).lnk
+	$(link) $(LFLAGS) user32.lib winmm.lib -out:$@ @<<$(GAME).lnk
 		$(ALLOBJ:^	=^
 		) $(NHRES)
 <<

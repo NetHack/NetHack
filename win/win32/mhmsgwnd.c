@@ -18,8 +18,6 @@
 
 #define MORE "--More--"
 
-
-
 struct window_line {
 	int  attr;
 	char text[MAXWINDOWTEXT];
@@ -60,6 +58,10 @@ static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static COLORREF setMsgTextColor(HDC hdc, int gray);
 static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
+
+#ifdef USER_SOUNDS
+extern void play_sound_for_message(const char* str);
+#endif
 
 HWND mswin_init_message_window () {
 	static int run_once = 0;
@@ -242,6 +244,10 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 		/* update window content */
 		InvalidateRect(hWnd, NULL, TRUE);
+
+#ifdef USER_SOUNDS
+		play_sound_for_message(msg_data->text);
+#endif
 	}
 	break;
 

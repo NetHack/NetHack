@@ -5,7 +5,9 @@
 #include "hack.h"
 #include "edog.h"
 #ifdef USER_SOUNDS
+# ifdef USER_SOUNDS_REGEX
 #include <regex.h>
+# endif
 #endif
 
 #ifdef OVLB
@@ -923,7 +925,11 @@ dochat()
 extern void FDECL(play_usersound, (const char*, int));
 
 typedef struct audio_mapping_rec {
+#ifdef USER_SOUNDS_REGEX
 	struct re_pattern_buffer regex;
+#else
+	char *pattern;
+#endif
 	char *filename;
 	int volume;
 	struct audio_mapping_rec *next;
@@ -956,17 +962,25 @@ const char *mapping;
 
 	    if (can_read_file(filespec)) {
 		new_map = (audio_mapping *)alloc(sizeof(audio_mapping));
+#ifdef USER_SOUNDS_REGEX
 		new_map->regex.translate = 0;
 		new_map->regex.fastmap = 0;
 		new_map->regex.buffer = 0;
 		new_map->regex.allocated = 0;
 		new_map->regex.regs_allocated = REGS_FIXED;
+#else
+		new_map->pattern = (char *)alloc(strlen(text) + 1);
+		Strcpy(new_map->pattern, text);
+#endif
 		new_map->filename = strdup(filespec);
 		new_map->volume = volume;
 		new_map->next = soundmap;
 
+#ifdef USER_SOUNDS_REGEX
 		err = re_compile_pattern(text, strlen(text), &new_map->regex);
-
+#else
+		err = 0;
+#endif
 		if (err) {
 		    raw_print(err);
 		    free(new_map->filename);
@@ -995,7 +1009,11 @@ const char* msg;
 	audio_mapping* cursor = soundmap;
 
 	while (cursor) {
+#ifdef USER_SOUNDS_REGEX
 	    if (re_search(&cursor->regex, msg, strlen(msg), 0, 9999, 0) >= 0) {
+#else
+	    if (pmatch(cursor->pattern, msg)) {
+#endif
 		play_usersound(cursor->filename, cursor->volume);
 	    }
 	    cursor = cursor->next;
