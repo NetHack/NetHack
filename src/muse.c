@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.4	2002/08/29	*/
+/*	SCCS Id: @(#)muse.c	3.4	2002/12/23	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -2033,6 +2033,11 @@ const char *str;
 		pline(str, s_suffix(mon_nam(mon)), "shield");
 		makeknown(SHIELD_OF_REFLECTION);
 	    }
+	    return TRUE;
+	} else if (arti_reflects(MON_WEP(mon))) {
+	    /* due to wielded artifact weapon */
+	    if (str)
+		pline(str, s_suffix(mon_nam(mon)), "weapon");
 	    return TRUE;
 	} else if ((orefl = which_armor(mon, W_AMUL)) &&
 				orefl->otyp == AMULET_OF_REFLECTION) {

@@ -63,6 +63,7 @@ E void FDECL(artifact_exists, (struct obj *,const char *,BOOLEAN_P));
 E int NDECL(nartifact_exist);
 E boolean FDECL(spec_ability, (struct obj *,unsigned long));
 E boolean FDECL(confers_luck, (struct obj *));
+E boolean FDECL(arti_reflects, (struct obj *));
 E boolean FDECL(restrict_name, (struct obj *,const char *));
 E boolean FDECL(defends, (int,struct obj *));
 E boolean FDECL(protects, (int,struct obj *));

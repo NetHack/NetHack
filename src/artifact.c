@@ -259,6 +259,23 @@ struct obj *obj;
     return (obj->oartifact && spec_ability(obj, SPFX_LUCK));
 }
 
+/* used to check whether a monster is getting reflection from an artifact */
+boolean
+arti_reflects(obj)
+struct obj *obj;
+{
+    const struct artifact *arti = get_artifact(obj);
+
+    if (arti) {      
+	/* while being worn */
+	if ((obj->owornmask & ~W_ART) && (arti->spfx & SPFX_REFLECT))
+	    return TRUE;
+	/* just being carried */
+	if (arti->cspfx & SPFX_REFLECT) return TRUE;
+    }
+    return FALSE;
+}
+
 #endif /* OVL0 */
 #ifdef OVLB
 
