@@ -2517,7 +2517,7 @@ char def;
 	paniclog("Query truncated: ", query);
 	reduction += sizeof("...");
 	truncspot = QBUFSZ - reduction;
-	(void) strncpy(qbuf, query, truncspot);
+	(void) strncpy(qbuf, query, (int)truncspot);
 	qbuf[truncspot] = '\0';
 	Strcat(qbuf,"...");
 	return (*windowprocs.win_yn_function)(qbuf, resp, def);

@@ -230,7 +230,7 @@ struct monst *mtmp;
 int
 find_roll_to_hit(mtmp, aatyp, weapon, attk_count, role_roll_penalty)
 register struct monst *mtmp;
-int aatyp;		/* usually AT_WEAP or AT_KICK */
+uchar aatyp;		/* usually AT_WEAP or AT_KICK */
 struct obj *weapon;	/* uwep or uswapwep or NULL */
 int *attk_count, *role_roll_penalty;
 {

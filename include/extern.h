@@ -2036,7 +2036,7 @@ E void NDECL(u_init);
 E void FDECL(hurtmarmor,(struct monst *,int));
 E boolean FDECL(attack_checks, (struct monst *,struct obj *));
 E void FDECL(check_caitiff, (struct monst *));
-E int FDECL(find_roll_to_hit, (struct monst *,int,struct obj *,int *,int *));
+E int FDECL(find_roll_to_hit, (struct monst *,UCHAR_P,struct obj *,int *,int *));
 E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *,struct obj *,int));
 E int FDECL(damageum, (struct monst *,struct attack *));

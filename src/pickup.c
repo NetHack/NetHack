@@ -688,7 +688,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		if ((qflags & FEEL_COCKATRICE) && curr->otyp == CORPSE &&
 		     will_feel_cockatrice(curr, FALSE)) {
 			destroy_nhwindow(win);	/* stop the menu and revert */
-			look_here(0, FALSE);
+			(void) look_here(0, FALSE);
 			return 0;
 		}
 		if ((!(qflags & INVORDER_SORT) || curr->oclass == *pack)
