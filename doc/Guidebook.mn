@@ -2355,10 +2355,10 @@ available web-site listing all the bugs that had been discovered.  Despite
 that constantly growing bug list, 3.3 proved stable enough to last for
 more than a year and a half.
 .pg
-The 3.4 development team initially consisted of \fBMichael Allison\fP, \fBKen Arromdee\fP,
-\fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSteve Creps\fP, \fBKevin Darcy\fP, 
-\fBTimo Hakulinen\fP, \fBKevin Hugo\fP, \fBSteve Linhart\fP, \fBKen Lorber\fP,
-\fBDean Luick\fP, \fBPat Rankin\fP, \fBEric Smith\fP, \fBMike Stephenson\fP, 
+The 3.4 development team initially consisted of
+\fBMichael Allison\fP, \fBKen Arromdee\fP,
+\fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBKevin Hugo\fP, \fBKen Lorber\fP,
+\fBDean Luick\fP, \fBPat Rankin\fP, \fBMike Stephenson\fP, 
 \fBJanet Walz\fP, and \fBPaul Winner\fP, with \fB Warwick Allison\fP joining 
 just before the release of NetHack 3.4.0 in March 2002.
 .pg
