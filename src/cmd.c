@@ -136,7 +136,7 @@ STATIC_PTR int NDECL(wiz_show_stats);
 STATIC_PTR int NDECL(enter_explore_mode);
 STATIC_PTR int NDECL(doattributes);
 STATIC_PTR int NDECL(doconduct); /**/
-STATIC_PTR void NDECL(minimal_enlightenment);
+STATIC_PTR boolean NDECL(minimal_enlightenment);
 
 #ifdef OVLB
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *));
@@ -1083,13 +1083,15 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 /*
  * Courtesy function for non-debug, non-explorer mode players
  * to help refresh them about who/what they are.
+ * Returns FALSE if menu cancelled (dismissed with ESC), TRUE otherwise.
  */
-STATIC_OVL void
+STATIC_OVL boolean
 minimal_enlightenment()
 {
 	winid tmpwin;
 	menu_item *selected;
 	anything any;
+	int genidx, n;
 	char buf[BUFSZ], buf2[BUFSZ];
 	static const char fmtstr[] = "%-15s: %-12s";
 	static const char deity_fmtstr[] = "%-17s%s";
@@ -1129,10 +1131,11 @@ minimal_enlightenment()
 		(flags.female && urole.name.f) ? urole.name.f : urole.name.m);
 	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 	}
-	Sprintf(buf, fmtstr, "gender", genders[poly_gender()].adj);
+	/* don't want poly_gender() here; it forces `2' for non-humanoids */
+	genidx = is_neuter(youmonst.data) ? 2 : flags.female;
+	Sprintf(buf, fmtstr, "gender", genders[genidx].adj);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-
-	if (Upolyd) {
+	if (Upolyd && (int)u.mfemale != genidx) {
 	    Sprintf(buf, fmtstr, "gender (base)", genders[u.mfemale].adj);
 	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 	}
@@ -1149,7 +1152,7 @@ minimal_enlightenment()
 		&& u.ualign.type == A_CHAOTIC) ? " (s,c)" :
 	    (u.ualignbase[A_ORIGINAL] == A_CHAOTIC)       ? " (s)" :
 	    (u.ualign.type   == A_CHAOTIC)       ? " (c)" : "");
-    	Sprintf(buf, fmtstr, "chaotic deity", buf2);
+	Sprintf(buf, fmtstr, "Chaotic", buf2);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	Sprintf(buf2, deity_fmtstr, align_gname(A_NEUTRAL),
@@ -1157,25 +1160,28 @@ minimal_enlightenment()
 		&& u.ualign.type == A_NEUTRAL) ? " (s,c)" :
 	    (u.ualignbase[A_ORIGINAL] == A_NEUTRAL)       ? " (s)" :
 	    (u.ualign.type   == A_NEUTRAL)       ? " (c)" : "");
-    	Sprintf(buf, fmtstr, "neutral deity", buf2);
+	Sprintf(buf, fmtstr, "Neutral", buf2);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	Sprintf(buf2, deity_fmtstr, align_gname(A_LAWFUL),
-	    (u.ualignbase[A_ORIGINAL] == u.ualign.type && u.ualign.type == A_LAWFUL)  ? " (s,c)" :
+	    (u.ualignbase[A_ORIGINAL] == u.ualign.type &&
+		u.ualign.type == A_LAWFUL)  ? " (s,c)" :
 	    (u.ualignbase[A_ORIGINAL] == A_LAWFUL)        ? " (s)" :
 	    (u.ualign.type   == A_LAWFUL)        ? " (c)" : "");
-    	Sprintf(buf, fmtstr, "lawful  deity", buf2);
+	Sprintf(buf, fmtstr, "Lawful", buf2);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
 	end_menu(tmpwin, "Base Attributes");
-	(void) select_menu(tmpwin, PICK_NONE, &selected);
+	n = select_menu(tmpwin, PICK_NONE, &selected);
 	destroy_nhwindow(tmpwin);
+	return (n != -1);
 }
 
 STATIC_PTR int
 doattributes()
 {
-	minimal_enlightenment();
+	if (!minimal_enlightenment())
+		return 0;
 	if (wizard || discover)
 		enlightenment(0);
 	return 0;
