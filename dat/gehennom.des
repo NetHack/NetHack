@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)gehennom.des	3.5	1996/11/09
+#	SCCS Id: @(#)gehennom.des	3.5	2005/02/02
 #	Copyright (c) 1989 by Jean-Christophe Collet
 #	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 # NetHack may be freely redistributed.  See license for details.
@@ -672,3 +672,6 @@ MONSTER:'V',random,random
 MONSTER:'V',random,random
 MONSTER:'V',random,random
 STAIR:(63,15),up
+# Teleporting to this level is allowed after the invocation creates its
+# entrance.  Force arrival in that case to be on rightmost third of level.
+TELEPORT_REGION:levregion(54,1,79,18),(0,0,0,0),down
