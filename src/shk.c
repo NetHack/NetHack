@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)shk.c	3.5	2005/03/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -58,6 +58,8 @@ STATIC_DCL void FDECL(rouse_shk, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(remove_damage, (struct monst *, BOOLEAN_P));
 STATIC_DCL void FDECL(sub_one_frombill, (struct obj *, struct monst *));
 STATIC_DCL void FDECL(add_one_tobill, (struct obj *, BOOLEAN_P));
+STATIC_DCL boolean FDECL(billable, (struct monst **,struct obj *,
+				    CHAR_P,BOOLEAN_P));
 STATIC_DCL void FDECL(dropped_container, (struct obj *, struct monst *,
 				      BOOLEAN_P));
 STATIC_DCL void FDECL(add_to_billobjs, (struct obj *));
@@ -2144,58 +2146,74 @@ const char *arg;
 	}
 }
 
+/* decide whether a shopkeeper thinks an item belongs to her */
+STATIC_OVL boolean
+billable(shkpp, obj, roomno, reset_nocharge)
+struct monst **shkpp;	/* in: non-null if shk has been validated; out: shk */
+struct obj *obj;
+char roomno;
+boolean reset_nocharge;
+{
+    struct monst *shkp = *shkpp;
+
+    /* if caller hasn't supplied a shopkeeper, look one up now */
+    if (!shkp) {
+	if (!roomno) return FALSE;
+	shkp = shop_keeper(roomno);
+	if (!shkp || !inhishop(shkp)) return FALSE;
+	*shkpp = shkp;
+    }
+    /* perhaps we threw it away earlier */
+    if (onbill(obj, shkp, FALSE) ||
+	    (obj->oclass == FOOD_CLASS && obj->oeaten))
+	return FALSE;
+    /* outer container might be marked no_charge but still have contents
+       which should be charged for; clear no_charge when picking things up */
+    if (obj->no_charge) {
+	if (!Has_contents(obj) ||
+		(contained_gold(obj) == 0L &&
+		    contained_cost(obj, shkp, 0L, FALSE, TRUE) == 0L))
+	    shkp = 0;		/* not billable */
+	if (reset_nocharge && !shkp && obj->oclass != COIN_CLASS)
+	    obj->no_charge = 0;
+    }
+    return shkp ? TRUE : FALSE;
+}
+
 void
 addtobill(obj, ininv, dummy, silent)
-register struct obj *obj;
-register boolean ininv, dummy, silent;
+struct obj *obj;
+boolean ininv, dummy, silent;
 {
-	register struct monst *shkp;
-	register char roomno = *u.ushops;
-	long ltmp = 0L, cltmp = 0L, gltmp = 0L;
-	register boolean container = Has_contents(obj);
+	struct monst *shkp = 0;
+	long ltmp, cltmp, gltmp;
+	boolean container;
 
-	if(!*u.ushops) return;
+	if (!billable(&shkp, obj, *u.ushops, TRUE))
+	    return;
 
-	if(!(shkp = shop_keeper(roomno))) return;
-
-	if(!inhishop(shkp)) return;
-
-	if(/* perhaps we threw it away earlier */
-		 onbill(obj, shkp, FALSE) ||
-		 (obj->oclass == FOOD_CLASS && obj->oeaten)
-	      ) return;
-
-	if(ESHK(shkp)->billct == BILLSZ) {
-		You("got that for free!");
-		return;
+	if (obj->oclass == COIN_CLASS) {
+	    costly_gold(obj->ox, obj->oy, obj->quan);
+	    return;
+	} else if (ESHK(shkp)->billct == BILLSZ) {
+	    You("got that for free!");
+	    return;
 	}
 
-	if(obj->oclass == COIN_CLASS) {
-		costly_gold(obj->ox, obj->oy, obj->quan);
-		return;
-	}
+	ltmp = cltmp = gltmp = 0L;
+	container = Has_contents(obj);
 
 	if(!obj->no_charge)
 	    ltmp = get_cost(obj, shkp);
 
 	if (obj->no_charge && !container) {
-		obj->no_charge = 0;
-		return;
+	    obj->no_charge = 0;
+	    return;
 	}
 
 	if(container) {
-	    if(obj->cobj == (struct obj *)0) {
-		if(obj->no_charge) {
-		    obj->no_charge = 0;
-		    return;
-		} else {
-		    add_one_tobill(obj, dummy);
-		    goto speak;
-		}
-	    } else {
-		cltmp += contained_cost(obj, shkp, cltmp, FALSE, FALSE);
-		gltmp += contained_gold(obj);
-	    }
+	    cltmp = contained_cost(obj, shkp, cltmp, FALSE, FALSE);
+	    gltmp = contained_gold(obj);
 
 	    if(ltmp) add_one_tobill(obj, dummy);
 	    if(cltmp) bill_box_content(obj, ininv, dummy, shkp);
@@ -2213,6 +2231,7 @@ register boolean ininv, dummy, silent;
 
 	} else /* i.e., !container */
 	    add_one_tobill(obj, dummy);
+
 speak:
 	if (shkp->mcanmove && !shkp->msleeping && !silent) {
 	    char buf[BUFSZ];
@@ -2355,37 +2374,26 @@ register struct monst *shkp;
 
 STATIC_OVL long
 stolen_container(obj, shkp, price, ininv)
-register struct obj *obj;
-register struct monst *shkp;
+struct obj *obj;
+struct monst *shkp;
 long price;
-register boolean ininv;
+boolean ininv;
 {
-	register struct obj *otmp;
+	struct obj *otmp;
 
-	if(ininv && obj->unpaid)
-	    price += get_cost(obj, shkp);
-	else {
-	    if(!obj->no_charge)
-		price += get_cost(obj, shkp);
+	if (ininv ? obj->unpaid : !obj->no_charge)
+	    price += get_cost(obj, shkp);	/* container itself (quan 1) */
+	else
 	    obj->no_charge = 0;
-	}
 
 	/* the price of contained objects, if any */
 	for(otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-
-	    if(otmp->oclass == COIN_CLASS) continue;
+	    if (otmp->oclass == COIN_CLASS) continue;
+	    if (!billable(&shkp, otmp, ESHK(shkp)->shoproom, TRUE)) continue;
 
 	    if (!Has_contents(otmp)) {
-		if(ininv) {
-		    if(otmp->unpaid)
-			price += otmp->quan * get_cost(otmp, shkp);
-		} else {
-		    if(!otmp->no_charge) {
-			if(otmp->oclass != FOOD_CLASS || !otmp->oeaten)
-			    price += otmp->quan * get_cost(otmp, shkp);
-		    }
-		    otmp->no_charge = 0;
-		}
+		if (otmp->unpaid || !ininv)
+		    price += otmp->quan * get_cost(otmp, shkp);
 	    } else
 		price += stolen_container(otmp, shkp, price, ininv);
 	}
@@ -2395,28 +2403,26 @@ register boolean ininv;
 
 long
 stolen_value(obj, x, y, peaceful, silent)
-register struct obj *obj;
-register xchar x, y;
-register boolean peaceful, silent;
+struct obj *obj;
+xchar x, y;
+boolean peaceful, silent;
 {
-	register long value = 0L, gvalue = 0L;
-	register struct monst *shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
+	long value = 0L, gvalue = 0L;
+	char roomno = *in_rooms(x, y, SHOPBASE);
+	struct monst *shkp = 0;
 
-	if (!shkp || !inhishop(shkp))
-	    return (0L);
+	if (!billable(&shkp, obj, roomno, FALSE))
+	    return 0L;
 
 	if(obj->oclass == COIN_CLASS) {
 	    gvalue += obj->quan;
 	} else if (Has_contents(obj)) {
-	    register boolean ininv = !!count_unpaid(obj->cobj);
+	    boolean ininv = !!count_unpaid(obj->cobj);
 
 	    value += stolen_container(obj, shkp, value, ininv);
 	    if(!ininv) gvalue += contained_gold(obj);
 	} else if (!obj->no_charge) {
-	    /* treat items inside containers as "saleable" */
-	    if ((saleable(shkp, obj) || obj->where == OBJ_CONTAINED) &&
-		    (obj->oclass != FOOD_CLASS || !obj->oeaten))
-		value += obj->quan * get_cost(obj, shkp);
+	    value += obj->quan * get_cost(obj, shkp);
 	}
 
 	if(gvalue + value == 0L) return(0L);
