@@ -682,7 +682,7 @@ int thrown;
 		mdat = mon->data;
 		tmp = (mdat == &mons[PM_SHADE]) ? 0 : 1;
 	    } else {
-		if (!shade_aware(obj)) {
+		if (mdat == &mons[PM_SHADE] && !shade_aware(obj)) {
 		    tmp = 0;
 		    Strcpy(unconventional, cxname(obj));
 		} else {
