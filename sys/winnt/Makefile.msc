@@ -629,7 +629,7 @@ $(SRC)\vis_tab.c: $(U)makedefs.exe
 #==========================================
 
 $(U)uudecode.exe: $(O)uudecode.o
-	@$(link) $(LFLAGSU) -out:$@ $(O)\uudecode.o
+	@$(link) $(LFLAGSU) -out:$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)\uudecode.c
 
