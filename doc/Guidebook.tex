@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.80 $ $Date: 2003/12/02 03:29:38 $
+% $Revision: 1.81 $ $Date: 2003/12/02 04:59:02 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.4)}
-\date{December 1, 2003}
+\date{December 2, 2003}
 
 \maketitle
 
@@ -1174,7 +1174,7 @@ inter-level connections are nearly indistinguishable during game play.
 
 %.pg
 Occasionally you will run across a room with a shopkeeper near the door
-and many items laying on the floor.  You can buy items by picking them
+and many items lying on the floor.  You can buy items by picking them
 up and then using the `{\tt p}' command.  You can inquire about the price
 of an item prior to picking it up by using the ``{\tt \#chat}'' command
 while standing on it.  Using an item prior to paying for it will incur a
@@ -1186,7 +1186,7 @@ You can sell items to a shopkeeper by dropping them to the floor while
 inside a shop.  You will either be offered an amount of gold and asked
 whether you're willing to sell, or you'll be told that the shopkeeper
 isn't interested (generally, your item needs to be compatible with the
-type of merchandize carried by the shop).
+type of merchandise carried by the shop).
 
 %.pg
 If you drop something in a shop by accident, the shopkeeper will usually
@@ -1200,6 +1200,14 @@ can be used to pay for purchases, but it is only good in the shop where
 it was obtained; other shopkeepers won't honor it.  (If you happen to
 find a ``credit card'' in the dungeon, don't bother trying to use it in
 shops; shopkeepers will not accept it.)
+
+%.pg
+The {\tt \$} command, which reports the amount of gold you are carrying
+(in inventory, not inside bags or boxes), will also show current shop
+debt or credit, if any.  The {\tt Iu} command lists unpaid items
+(those which still belong to the shop) if you are carrying any.
+The {\tt Ix} command shows an inventory-like display of any unpaid
+items which have been used up, along with other shop fees, if any.
 
 %.hn 3
 \subsubsection*{Shop idiosyncracies}

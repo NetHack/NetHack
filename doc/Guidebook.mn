@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 1, 2003
+.ds f2 "December 2, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -881,7 +881,7 @@ inter-level connections are nearly indistinguishable during game play.
 Shops and shopping
 .pg
 Occasionally you will run across a room with a shopkeeper near the door
-and many items laying on the floor.  You can buy items by picking them
+and many items lying on the floor.  You can buy items by picking them
 up and then using the `p' command.  You can inquire about the price
 of an item prior to picking it up by using the ``#chat'' command
 while standing on it.  Using an item prior to paying for it will incur a
@@ -892,7 +892,7 @@ You can sell items to a shopkeeper by dropping them to the floor while
 inside a shop.  You will either be offered an amount of gold and asked
 whether you're willing to sell, or you'll be told that the shopkeeper
 isn't interested (generally, your item needs to be compatible with the
-type of merchandize carried by the shop).
+type of merchandise carried by the shop).
 .pg
 If you drop something in a shop by accident, the shopkeeper will usually
 claim ownership without offering any compensation.  You'll have to buy
@@ -904,6 +904,13 @@ can be used to pay for purchases, but it is only good in the shop where
 it was obtained; other shopkeepers won't honor it.  (If you happen to
 find a "credit card" in the dungeon, don't bother trying to use it in
 shops; shopkeepers will not accept it.)
+.pg
+The `$' command, which reports the amount of gold you are carrying
+(in inventory, not inside bags or boxes), will also show current shop
+debt or credit, if any.  The `Iu' command lists unpaid items
+(those which still belong to the shop) if you are carrying any.
+The `Ix' command shows an inventory-like display of any unpaid
+items which have been used up, along with other shop fees, if any.
 .hn 3
 Shop idiosyncracies
 .pg
