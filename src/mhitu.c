@@ -1702,8 +1702,14 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		    }
 		    break;
 		case AD_PHYS:
-		    You("are pummeled with debris!");
-		    exercise(A_STR, FALSE);
+		    if (mtmp->data == &mons[PM_FOG_CLOUD])
+			You("are laden with moisture and can barely %s!",
+				!breathless(youmonst.data) ? "breathe" :
+				"stay conscious");
+		    else {
+			You("are pummeled with debris!");
+			exercise(A_STR, FALSE);
+		    }
 		    break;
 		case AD_ACID:
 		    if (Acid_resistance) {
