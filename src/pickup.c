@@ -32,7 +32,7 @@ STATIC_PTR int FDECL(in_container,(struct obj *));
 STATIC_PTR int FDECL(ck_bag,(struct obj *));
 STATIC_PTR int FDECL(out_container,(struct obj *));
 STATIC_DCL int FDECL(menu_loot, (int, struct obj *, BOOLEAN_P));
-STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *));
+STATIC_DCL int FDECL(in_or_out_menu, (const char *,struct obj *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int, int));
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
@@ -1911,11 +1911,12 @@ register int held;
 	struct monst *shkp;
 	boolean one_by_one, allflag, loot_out = FALSE, loot_in = FALSE;
 	char select[MAXOCLASSES+1];
-	char qbuf[QBUFSZ];
+	char qbuf[QBUFSZ], emptymsg[QBUFSZ];
 	long loss = 0L;
 	int cnt = 0, used = 0, lcnt = 0,
 	    menu_on_request;
 
+	emptymsg[0] = '\0';
 	if (obj->olocked) {
 	    pline("%s to be locked.", Tobjnam(obj, "seem"));
 	    if (held) You("must put it down to unlock.");
@@ -2003,14 +2004,20 @@ register int held;
 
 	obj->owt = weight(obj);
 
-	if (!cnt) {
-	    pline("%s %s empty.", Yname2(obj), otense(obj, "are"));
-	} else {
+	if (!cnt) Sprintf(emptymsg, "%s %s empty.", Yname2(obj), otense(obj, "are"));
+	if (cnt || flags.menu_style == MENU_FULL) {
 	    Sprintf(qbuf, "Do you want to take %s out of %s?",
 		    something, yname(obj));
 	    if (flags.menu_style != MENU_TRADITIONAL) {
 		if (flags.menu_style == MENU_FULL) {
-		    int t = in_or_out_menu("Do what?", current_container);
+		    int t;
+		    char menuprompt[QBUFSZ];
+		    boolean outokay = (cnt != 0);
+		    boolean inokay = (invent != 0);
+		    menuprompt[0] = '\0';
+		    if (!cnt) Sprintf(menuprompt, "%s ", emptymsg);
+		    Strcat(menuprompt, "Do what?");
+		    t = in_or_out_menu(menuprompt, current_container, outokay, inokay);
 		    if (t <= 0) return 0;
 		    loot_out = (t & 0x01) != 0;
 		    loot_in  = (t & 0x02) != 0;
@@ -2056,6 +2063,8 @@ ask_again2:
 		    return used;
 		}
 	    }
+	} else {
+	    pline("%s", emptymsg);		/* <whatever> is empty. */
 	}
 
 #ifndef GOLDOBJ
@@ -2067,7 +2076,7 @@ ask_again2:
 	    You("don't have anything to put in.");
 	    return used;
 	}
-	if (flags.menu_style != MENU_FULL || !cnt) {
+	if (flags.menu_style != MENU_FULL) {
 	    loot_in = (yn_function("Do you wish to put something in?",
 				   ynqchars, 'n') == 'y');
 	}
@@ -2200,9 +2209,10 @@ boolean put_in;
 }
 
 STATIC_OVL int
-in_or_out_menu(prompt, obj)
+in_or_out_menu(prompt, obj, outokay, inokay)
 const char *prompt;
 struct obj *obj;
+boolean outokay, inokay;
 {
     winid win;
     anything any;
@@ -2214,15 +2224,24 @@ struct obj *obj;
     any.a_void = 0;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
-    any.a_int = 1;
-    Sprintf(buf,"Take %s out of %s", something, the(xname(obj)));
-    add_menu(win, NO_GLYPH, &any, *menuselector++, 0, ATR_NONE, buf, MENU_UNSELECTED);
-    any.a_int = 2;
-    Sprintf(buf,"Put %s into %s", something, the(xname(obj)));
-    add_menu(win, NO_GLYPH, &any, *menuselector++, 0, ATR_NONE, buf, MENU_UNSELECTED);
-    any.a_int = 3;
-    add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE,
-		"Both of the above", MENU_UNSELECTED);
+    if (outokay) {
+	any.a_int = 1;
+	Sprintf(buf,"Take %s out of %s", something, the(xname(obj)));
+	add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE,
+			buf, MENU_UNSELECTED);
+    }
+    menuselector++;
+    if (inokay) {
+	any.a_int = 2;
+	Sprintf(buf,"Put %s into %s", something, the(xname(obj)));
+	add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE, buf, MENU_UNSELECTED);
+    }
+    menuselector++;
+    if (outokay && inokay) {
+	any.a_int = 3;
+	add_menu(win, NO_GLYPH, &any, *menuselector, 0, ATR_NONE,
+			"Both of the above", MENU_UNSELECTED);
+    }
     end_menu(win, prompt);
     n = select_menu(win, PICK_ONE, &pick_list);
     destroy_nhwindow(win);
