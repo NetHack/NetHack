@@ -1527,17 +1527,12 @@ get the impression that you must return to %l as soon
 as possible.
 %E
 %Cc Mon 00080
-You feel a wrenching shift in the ether as %ns body dissolves
-into a cloud of noxious gas.
+%nC gasps:
 
-Suddenly, a voice booms out:
+    "You have only defeated this mortal body.  Know this: my spirit
+    is strong.  I shall return and reclaim what is mine!"
 
-    Thou hast defeated the least of my minions, %r.
-    Know now that Moloch is aware of thy presence.
-    As for thee, %n, I shall deal with thy failure
-    at my leisure.
-
-You then hear the voice of %n, screaming in terror...
+With that, %n expires.
 %E
 %Cc Mon 00081
 "You have returned, %p.  And with %o, I see.
