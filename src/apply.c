@@ -530,44 +530,44 @@ check_leash(x, y)
 register xchar x, y;
 {
 	register struct obj *otmp;
-	register struct monst *mtmp = fmon;
+	register struct monst *mtmp;
 
-	for(otmp = invent; otmp; otmp = otmp->nobj)
-	    if(otmp->otyp == LEASH && otmp->leashmon != 0) {
-		while(mtmp) {
-		    if(!DEADMONSTER(mtmp) && ((int)mtmp->m_id == otmp->leashmon &&
-			    (dist2(u.ux,u.uy,mtmp->mx,mtmp->my) >
-				dist2(x,y,mtmp->mx,mtmp->my)))
-			) {
-			if(otmp->cursed && !breathless(mtmp->data)) {
-			    if(um_dist(mtmp->mx, mtmp->my, 5)) {
-				pline("%s chokes to death!",Monnam(mtmp));
-				mondied(mtmp);
-			    } else
-				if(um_dist(mtmp->mx, mtmp->my, 3))
-					pline("%s chokes on the leash!",
-						Monnam(mtmp));
-			} else {
-			    if(um_dist(mtmp->mx, mtmp->my, 5)) {
-				pline("%s leash snaps loose!",
-					s_suffix(Monnam(mtmp)));
-				m_unleash(mtmp, FALSE);
-			    } else {
-				if(um_dist(mtmp->mx, mtmp->my, 3)) {
-				    You("pull on the leash.");
-				    if (mtmp->data->msound != MS_SILENT)
-					switch(rn2(3)) {
-					    case 0:  growl(mtmp);	break;
-					    case 1:  yelp(mtmp);	break;
-					    default: whimper(mtmp); break;
-					}
-				}
-			    }
-			}
+	for (otmp = invent; otmp; otmp = otmp->nobj) {
+	    if (otmp->otyp != LEASH || otmp->leashmon == 0) continue;
+	    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+		if (DEADMONSTER(mtmp)) continue;
+		if ((int)mtmp->m_id == otmp->leashmon) break; 
+	    }
+	    if (!mtmp) {
+		impossible("leash in use isn't attached to anything?");
+		otmp->leashmon = 0;
+		continue;
+	    }
+	    if (dist2(u.ux,u.uy,mtmp->mx,mtmp->my) >
+		    dist2(x,y,mtmp->mx,mtmp->my)) {
+		if (otmp->cursed && !breathless(mtmp->data)) {
+		    if (um_dist(mtmp->mx, mtmp->my, 5)) {
+			pline("%s chokes to death!", Monnam(mtmp));
+			mondied(mtmp);
+		    } else if (um_dist(mtmp->mx, mtmp->my, 3)) {
+			pline("%s chokes on the leash!", Monnam(mtmp));
 		    }
-		    mtmp = mtmp->nmon;
+		} else {
+		    if (um_dist(mtmp->mx, mtmp->my, 5)) {
+			pline("%s leash snaps loose!", s_suffix(Monnam(mtmp)));
+			m_unleash(mtmp, FALSE);
+		    } else if (um_dist(mtmp->mx, mtmp->my, 3)) {
+			You("pull on the leash.");
+			if (mtmp->data->msound != MS_SILENT)
+			    switch (rn2(3)) {
+			    case 0:  growl(mtmp);   break;
+			    case 1:  yelp(mtmp);    break;
+			    default: whimper(mtmp); break;
+			    }
+		    }
 		}
 	    }
+	}
 }
 
 #endif /* OVL0 */
