@@ -1,0 +1,110 @@
+Makefile.utl vs. GNU make (*_lex.o needs explicit *_lex.c dependency)
+defining MAKE in more makefiles (symptom is "sh: makedefs: not found")
+finding test in makefiles (needs shell meta-char, >/dev/null or || exit 1)
+splitter hunk sizes with SAS 6.x (wouldn't fit on floppy)
+
+OpenWindows 2.x documentation (?)
+',' and ';' in help files, including Guidebook
+Guidebook date (nroff and pre-processed versions)
+VMS options syntax (config file description omitted "OPTIONS=" requirement)
+
+phase of moon for Mac and MSDOS ports -- revert to old, portable phase of
+	moon code
+polymorphing into bees (divide by zero core dump, reported as 
+	floating point error on Sparcs)
+monster throwing boulder into pool could free object twice
+candle burn-out accessing free'd object while traversing list (Mac core dump)
+inappropriate candle merging (lit with unlit)
+several levelflags (fountains, etc.) not being handled on special levels
+subrooms[] not initialized
+coredump on messed DEFAULT_WIN_SYS
+deleting lock.0 files on early quit
+number_pad/mouse coexistence
+jumping onto doors or boulders
+tombstone gold neglected gold in containers, although score was correct
+initial gold record neglected gold in containers
+reeling monsters leaving ghosts (missing newsym)
+display getobj prompt for non-REDO
+packorder option parsing
+inconsisent option parsing with IBM vs. IBMg, etc.
+throwing Mjollnir at adjacent hard things causes panic/core dump
+throwing at ghosts in walls left objects stuck in walls
+throwing unpaid objects in shops (donated to player by shk)
+Shopkeeper administration out of order (buying group of used up items)
+pricing chains, uball, or other nocharge objects, when they couldn't be sold
+knocking uball down a hole by dropping another object caused crash
+kicking monsters while levitating (core dump if monster "reels" or killed)
+kicking empty space while levitating could give free move (recoil)
+panic when nurse is fixing your damage and disappears
+core dump 'D'ropping everything with gold but no inventory (null pointer access)
+core dump using getpos() "move to feature" response when map shows something
+	covering furniture (displayed glyph leads to invalid subscript use)
+deity gender reference in opening legacy message
+makeplural() said "poisoned yas" instead of "poisoned ya"
+zapping on entry to water left trails
+allow level teleports to be cancelled
+excess choking when eating corpses
+funny death message (or coredump) when you choke on a tin of spinach
+	after partially eating something else
+Magicbane expulsion confused cutworm()
+charging for several overlooked items (mainly magical instruments)
+taming a sticking monster (e.g mimic) wouldn't set you free
+panic when tinning while standing on stairs with a full pack and object drops
+zapping down into ice with wand of digging (core dump)
+rust monsters wouldn't ever hurt armor, even non-rustproof armor.  conversely,
+	unrustable things rusted.
+mysterious rust damage on damp levels (improper object chain traversal
+	when any item landed in pool after being thrown or dropped)
+very eroded nonrustable/corrodable/flammable objects displayed as "very +0..."
+map window wasn't being initialized correctly, causing some 'a'filled screens
+using magic marker with full pack leaves you with an item in the '#' slot
+spellbook merging caused multiple books to fade away when you re-read
+	them enough times
+Master of Thieves in Tourist quest not created with Bell of Opening, making
+	game virtually un-winnable
+could wish for quest items
+If an eel managed to drown you, it would say "Drowned by a drowning"
+stop making bones from non-branch portal levels
+reading blank scrolls exercised wisdom
+inverted use of crystal ball "vision in unclear" feedback message
+special room entry messages (shop welcome) given before level change map update
+limbless blobs like gelatinous cubes could not pick up
+The level compiler missed first level flag if more than one was specified.
+The level compiler accumulated level flags when compiling multiple files.
+make the 32-bit monster flags fields unsigned long rather than just long
+mksobj() created gold a factor of 10 too light
+indefinite articles in quest text
+Alt-n didn't execute #name on some ports, made Alt-? do #?
+correct tense and grammar of various messages
+obsolete oracle about using mirror to locate Wizard & Medusa removed
+Nurses would zap you with wands, et al, instead of healing you
+Shopkeepers residence was sometimes wrong on bones level, esp. in the minetown
+Some zaps, esp. by monsters, at the map edge could cause core dumps
+panic relmon bug possible when #turn'ing multiple monsters at once
+it wasn't possible to get underwater when polymorphed to a swimmer
+total digestion wasn't working
+lycanthropy could change sex
+interrupting dosinkring() allowed free ring identification
+killing some hostile humans (like Croesus and priests) lost telepathy, etc.
+
+tty specific: long input lines and improved interrupt handling
+X11: NetHack.ad: "*map*grey" should be "*map*gray"
+X11: NetHack.ad: remove excess quotes
+HPs and X (SYSV conflict caused by X11 headers)
+Handle WM_DELETE_WINDOW protocol in X11 window-port.
+X11 popups are now positioned so that the cursor is bottom center.
+Both X11 fonts now have a pool symbol that coveres the whole rectangle.
+X11_getlin will now allow empty strings to be returned.
+X11: implement score in the status window.
+X11: make displaying experience optional.
+X11: position getline and yn popups center,bottom instead of center,center.
+X11: autofocus mode made more reliable at program startup
+X11: number of objects removed from containers could wrap negative
+X11: allow translation tables
+X11: initial window would "sweep" shut and reopen
+micros: save and restore progress reports weren't appearing during save
+	and restore (they would appear immediately afterwards)
+	also error messages from dots aimed off right edge of screen
+Atari: colors were not properly set in medium resolution
+Atari: terminal size was set incorrectly after a ^Z
+OS/2: HPFS support was incomplete
