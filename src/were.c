@@ -15,16 +15,16 @@ register struct monst *mon;
 
 	if (is_human(mon->data)) {
 	    if (!Protection_from_shape_changers &&
-		    !rn2(night() ? (flags.moonphase == FULL_MOON ?  3 : 30)
-				 : (flags.moonphase == FULL_MOON ? 10 : 50))) {
+		!rn2(night() ? (flags.moonphase == FULL_MOON ?  3 : 30)
+			     : (flags.moonphase == FULL_MOON ? 10 : 50))) {
 		new_were(mon);		/* change into animal form */
-		if (flags.soundok) {
+		if (flags.soundok && !canseemon(mon)) {
 		    const char *howler;
 
 		    switch (monsndx(mon->data)) {
-		    case PM_HUMAN_WEREWOLF:	  howler = "wolf";    break;
-		    case PM_HUMAN_WEREJACKAL: howler = "jackal";  break;
-		    default:		  howler = (char *)0; break;
+		    case PM_WEREWOLF:	howler = "wolf";    break;
+		    case PM_WEREJACKAL: howler = "jackal";  break;
+		    default:		howler = (char *)0; break;
 		    }
 		    if (howler)
 			You_hear("a %s howling at the moon.", howler);
