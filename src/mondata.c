@@ -606,7 +606,8 @@ int montype;
 }
 
 static const char *levitate[4]	= { "float", "Float", "wobble", "Wobble" };
-static const char *fly[4]	= { "fly", "Fly", "flutter", "Flutter" };
+static const char *flys[4]	= { "fly", "Fly", "flutter", "Flutter" };
+static const char *flyl[4]	= { "fly", "Fly", "stagger", "Stagger" };
 static const char *slither[4]	= { "slither", "Slither", "falter", "Falter" };
 static const char *ooze[4]	= { "ooze", "Ooze", "tremble", "Tremble" };
 static const char *immobile[4]	= { "wiggle", "Wiggle", "pulsate", "Pulsate" };
@@ -621,7 +622,8 @@ const char *def;
 
 	return (
 		is_floater(ptr) ? levitate[capitalize] :
-		is_flyer(ptr)   ? fly[capitalize] :
+		(is_flyer(ptr) && ptr->msize <= MZ_SMALL) ? flys[capitalize] :
+		(is_flyer(ptr) && ptr->msize > MZ_SMALL)  ? flyl[capitalize] :
 		slithy(ptr)     ? slither[capitalize] :
 		amorphous(ptr)  ? ooze[capitalize] :
 		!ptr->mmove	? immobile[capitalize] :
@@ -640,7 +642,8 @@ const char *def;
 
 	return (
 		is_floater(ptr) ? levitate[capitalize] :
-		is_flyer(ptr)   ? fly[capitalize] :
+		(is_flyer(ptr) && ptr->msize <= MZ_SMALL) ? flys[capitalize] :
+		(is_flyer(ptr) && ptr->msize > MZ_SMALL)  ? flyl[capitalize] :
 		slithy(ptr)     ? slither[capitalize] :
 		amorphous(ptr)  ? ooze[capitalize] :
 		!ptr->mmove	? immobile[capitalize] :
