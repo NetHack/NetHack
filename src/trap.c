@@ -2782,6 +2782,18 @@ boolean force_failure;
 		There("is a boulder in your way.");
 		return 0;
 	}
+	/* duplicate tight-space checks from test_move */
+	if (u.dx && u.dy &&
+	    bad_rock(youmonst.data,u.ux,ttmp->ty) &&
+	    bad_rock(youmonst.data,ttmp->tx,u.uy)) {
+	    if ((invent && (inv_weight() + weight_cap() > 600)) ||
+		bigmonst(youmonst.data)) {
+		/* don't allow untrap if they can't get thru to it */
+		You("are unable to reach the %s!",
+		    defsyms[trap_to_defsym(ttype)].explanation);
+		return 0;
+	    }
+	}
 	/* untrappable traps are located on the ground. */
 	if (!can_reach_floor()) {
 #ifdef STEED

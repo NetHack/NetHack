@@ -419,6 +419,7 @@ if player teleports a monster while swallowed on a noteleport level, the
 prefixes that can appear in any order when wishing should include +/- and empty
 word-order in wishes, allow "blessed +2 fireproof", not just 
 	"blessed fireproof +2"
+don't allow untrapping of adjacent traps in locations you can't move to
 
 
 Platform- and/or Interface-Specific Fixes
