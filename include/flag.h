@@ -163,6 +163,7 @@ struct instance_flags {
 	boolean  num_pad;	/* use numbers for movement commands */
 	boolean  news;		/* print news */
 	boolean  window_inited; /* true if init_nhwindows() completed */
+	boolean  menu_tab_sep;	/* Use tabs to separate option menu fields */
 	int      purge_monsters;	/* # of dead monsters still on fmon list */
 	int *opt_booldup;	/* for duplication of boolean opts in config file */
 	int *opt_compdup;	/* for duplication of compound opts in config file */

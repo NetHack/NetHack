@@ -120,6 +120,12 @@ static struct Bool_Opt
 #else
 	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
+#ifdef WIZARD
+	/* for menu debugging only*/
+	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
+#else
+	{"menu_tab_sep", (boolean *)0, FALSE, SET_IN_FILE},
+#endif
 #ifdef TTY_GRAPHICS
 	{"msg_window", &iflags.prevmsg_window, FALSE, SET_IN_GAME},
 #else
@@ -2200,6 +2206,7 @@ map_menu_cmd(ch)
 #endif
 
 static char fmtstr_doset_add_menu[] = "%s%-15s [%s]   "; 
+static char fmtstr_doset_add_menu_tab[] = "%s\t%s\t[%s]   "; 
 
 STATIC_OVL void
 doset_add_menu(win, option, indexoffset)
@@ -2232,7 +2239,8 @@ doset_add_menu(win, option, indexoffset)
 	}
     }
     /* "    " replaces "a - " -- assumes menus follow that style */
-    Sprintf(buf, fmtstr_doset_add_menu, (any.a_int ? "" : "    "), option, value);
+    Sprintf(buf, iflags.menu_tab_sep ? fmtstr_doset_add_menu_tab : fmtstr_doset_add_menu,
+		any.a_int ? "" : iflags.menu_tab_sep ? "" : "    ", option, value);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 }
 
@@ -2266,11 +2274,17 @@ doset()
 		    if (bool_p == &flags.female) continue;  /* obsolete */
 #ifdef WIZARD
 		    if (bool_p == &iflags.sanity_check && !wizard) continue;
+		    if (bool_p == &iflags.menu_tab_sep && !wizard) continue;
 #endif
 		    if (is_wc_option(boolopt[i].name) &&
 			!wc_supported(boolopt[i].name)) continue;
 		    any.a_int = (pass == 0) ? 0 : i + 1;
-		    Sprintf(buf, "%s%-13s [%s]",
+		    if (!iflags.menu_tab_sep)
+			Sprintf(buf, "%s%-13s [%s]",
+			    pass == 0 ? "    " : "",
+			    boolopt[i].name, *bool_p ? "true" : "false");
+ 		    else
+			Sprintf(buf, "%s\t%s\t[%s]",
 			    pass == 0 ? "    " : "",
 			    boolopt[i].name, *bool_p ? "true" : "false");
 		    add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
@@ -2296,8 +2310,9 @@ doset()
 		    strlen(compopt[i].name) > (unsigned) biggest_name)
 			biggest_name = (int) strlen(compopt[i].name);
 	if (biggest_name > 30) biggest_name = 30;
-	Sprintf(fmtstr_doset_add_menu, "%%s%%-%ds [%%s]", biggest_name);
-
+	if (!iflags.menu_tab_sep)
+		Sprintf(fmtstr_doset_add_menu, "%%s%%-%ds [%%s]", biggest_name);
+	
 	/* deliberately put `name', `role', `race', `gender' first */
 	doset_add_menu(tmpwin, "name", 0);
 	doset_add_menu(tmpwin, "role", 0);
@@ -2764,6 +2779,7 @@ option_help()
 	if (boolopt[i].addr) {
 #ifdef WIZARD
 	    if (boolopt[i].addr == &iflags.sanity_check && !wizard) continue;
+	    if (boolopt[i].addr == &iflags.menu_tab_sep && !wizard) continue;
 #endif
 	    next_opt(datawin, boolopt[i].name);
 	}
