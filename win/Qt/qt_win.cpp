@@ -191,7 +191,11 @@ extern "C" {
 char *qt_tilewidth=NULL;
 char *qt_tileheight=NULL;
 char *qt_fontsize=NULL;
+#if defined(QWS)
+int qt_compact_mode = 1;
+#else
 int qt_compact_mode = 0;
+#endif
 extern const char *enc_stat[]; /* from botl.c */
 extern const char *hu_stat[]; /* from eat.c */
 extern const char *killed_by_prefix[];
