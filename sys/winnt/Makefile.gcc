@@ -723,8 +723,8 @@ else
 	@echo lev_comp.h from $(SSYS) into $(UTIL) and use them.
 	$(subst /,\,@copy $(SSYS)/lev_yacc.c $(U)lev_yacc.c >nul)
 	$(subst /,\,@copy $(SSYS)/lev_comp.h $(INCL)/lev_comp.h >nul)
-	@echo /**/ $(subst /,\,>>$(U)lev_yacc.c)
-	@echo /**/ $(subst /,\,>>$(INCL)/lev_comp.h)
+	$(subst /,\,echo.>>$(U)lev_yacc.c)
+	$(subst /,\,echo.>>$(INCL)/lev_comp.h)
 endif
 
 $(U)lev_$(LEX).c: $(U)lev_comp.l
@@ -740,7 +740,7 @@ else
 	@echo For now, we will copy the prebuilt lev_lex.c
 	@echo from $(SSYS) into $(UTIL) and use it.
 	$(subst /,\,@copy $(SSYS)/lev_lex.c $@ >nul)
-	@echo /**/ $(subst /,\,>>$@)
+	$(subst /,\,echo.>>$@)
 endif
 
 #==========================================
@@ -779,8 +779,8 @@ else
 	@echo dgn_comp.h from $(SSYS) into $(UTIL) and use them.
 	$(subst /,\,@copy $(SSYS)/dgn_yacc.c $(U)dgn_yacc.c >nul)
 	$(subst /,\,@copy $(SSYS)/dgn_comp.h $(INCL)/dgn_comp.h >nul)
-	@echo /**/ $(subst /,\,>>$(U)dgn_yacc.c)
-	@echo /**/ $(subst /,\,>>$(INCL)/dgn_comp.h)
+	@$(subst /,\,echo.>>$(U)dgn_yacc.c)
+	@$(subst /,\,echo.>>$(INCL)/dgn_comp.h)
 endif
 
 $(U)dgn_$(LEX).c: $(U)dgn_comp.l
@@ -796,7 +796,7 @@ else
 	@echo For now, we will copy the prebuilt dgn_lex.c
 	@echo from $(SSYS) into $(UTIL) and use it.
 	$(subst /,\,@copy $(SSYS)/dgn_lex.c $@ >nul)
-	@echo /**/ $(subst /,\,>>$@)
+	@$(subst /,\,echo.>>$@)
 endif
 
 #==========================================
