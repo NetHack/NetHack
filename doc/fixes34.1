@@ -15,6 +15,8 @@ left word in format string in get_wet() causing "The spellbook fadefades"
 two bad wizkit items in a row shouldn't make the user hit space many times
 kicking thrones no longer loosens rocks
 wall symbol not replaced when digging while blind and levitating
+increment FQN_NUMBUF from 2 to 3 to prevent premature reuse of a buffer
+	that caused a level creation error to be reported as a lock file error
 print regular death message when leashed, mounted steed dies of starvation
 fix more funny messages, new and old
 restore the behavior of bumping into closed doors when moving while impaired
@@ -120,6 +122,7 @@ Platform- and/or Interface-Specific Fixes
 -----------------------------------------
 win32: win32 build no longer defines MICRO
 win32: allow error save files to be generated
+win32: strip illegal file name characters from plname and replace with '_'
 win32gui: make error() work; it was essentially non-operative in 3.4.0
 win32gui: fix alignment of columns in menu windows
 win32tty: honour the use_inverse option and default to ATR_BOLD if disabled
