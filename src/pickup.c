@@ -2542,12 +2542,12 @@ struct obj *box;	/* or bag */
 	char yourbuf[BUFSZ];
 
 	observe_quantum_cat(box);
-	box->cknown = 1;
 	if (!Has_contents(box))	/* evidently a live cat came out */
 	    /* container type of "large box" is inferred */
 	    pline("%sbox is now empty.", Shk_Your(yourbuf, box));
 	else			/* holds cat corpse or other random stuff */
 	    empty_it = TRUE;
+	box->cknown = 1;
     } else if (!Has_contents(box)) {
 	box->cknown = 1;
 	pline("It's empty.");
