@@ -117,7 +117,7 @@ STATIC_PTR int NDECL(wiz_where);
 STATIC_PTR int NDECL(wiz_detect);
 STATIC_PTR int NDECL(wiz_polyself);
 STATIC_PTR int NDECL(wiz_level_tele);
-STATIC_PTR int NDECL(wiz_level_gain);
+STATIC_PTR int NDECL(wiz_level_change);
 STATIC_PTR int NDECL(wiz_show_seenv);
 STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
@@ -565,22 +565,30 @@ wiz_mon_polycontrol()
 }
 
 STATIC_PTR int
-wiz_level_gain()
+wiz_level_change()
 {
         char buf[BUFSZ];
         int newlevel;
+	int ret;
 
-        if (u.ulevel >= MAXULEV) {
-               You("are already as experienced as you can get.");
-               return 0;
-        }
         getlin("To what experience level do you want to be raised?", buf);
-        (void) sscanf(buf, "%d", &newlevel);
-        if (newlevel <= 0) {
+        ret = sscanf(buf, "%d", &newlevel);
+	if (ret < 1 || ret == EOF)
                pline(Never_mind);
-        } else if (newlevel <= u.ulevel) {
+        else if (newlevel == u.ulevel)
                You("are already that experienced.");
-        } else {
+        else if (newlevel < u.ulevel) {
+		if (u.ulevel == 1) {
+		       You("are already as inexperienced as you can get.");
+		       return 0;
+		}
+               if (newlevel < 1) newlevel = 1;
+               while (u.ulevel > newlevel) losexp((const char *)0);
+	} else {
+		if (u.ulevel >= MAXULEV) {
+		       You("are already as experienced as you can get.");
+		       return 0;
+		}
                if (newlevel > MAXULEV) newlevel = MAXULEV;
                while (u.ulevel < newlevel) pluslvl(FALSE);
         }
@@ -1404,7 +1412,7 @@ struct ext_func_tab extcmdlist[] = {
 
 #if defined(WIZARD)
 static const struct ext_func_tab debug_extcmdlist[] = {
-        {"levelgain", "gain experience levels", wiz_level_gain, TRUE},
+        {"levelchange", "change experience change", wiz_level_change, TRUE},
 	{"light sources", "show mobile light sources", wiz_light_sources, TRUE},
 	{"monpoly_control", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
         {"poly", "polymorph self", wiz_polyself, TRUE},
