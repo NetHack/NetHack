@@ -17,13 +17,14 @@ typedef struct mswin_event {
 		} kbd;
 
 		struct {
+			int mod;
 			int x, y;
 		} ms;
 	};
 } MSNHEvent, *PMSNHEvent;
 
 #define NHEVENT_KBD(c) { MSNHEvent e; e.type=NHEVENT_CHAR; e.kbd.ch=(c); mswin_input_push(&e); }
-#define NHEVENT_MS(_x, _y) { MSNHEvent e; e.type=NHEVENT_MOUSE; e.ms.x=(_x); e.ms.y=(_y); mswin_input_push(&e); }
+#define NHEVENT_MS(_mod, _x, _y) { MSNHEvent e; e.type=NHEVENT_MOUSE; e.ms.mod = (_mod); e.ms.x=(_x); e.ms.y=(_y); mswin_input_push(&e); }
 
 void		mswin_nh_input_init();
 int			mswin_have_input();

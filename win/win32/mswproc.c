@@ -471,7 +471,6 @@ void mswin_display_file(const char *filename,BOOLEAN_P must_exist)
 	} else {
 		HWND hwnd;
 		char line[LLEN];
-		RECT rt;
 
 		hwnd = mswin_init_text_window();
 
@@ -487,10 +486,7 @@ void mswin_display_file(const char *filename,BOOLEAN_P must_exist)
 		}
 		(void) dlb_fclose(f);
 
-		GetNHApp()->hMenuWnd = hwnd;
-		GetWindowRect(mswin_hwnd_from_winid(WIN_MAP), &rt);
-		MoveWindow(hwnd, rt.left, rt.top, rt.right-rt.left, rt.bottom-rt.top, TRUE);
-		ShowWindow(hwnd, SW_SHOW);
+		mswin_display_text_window(hwnd);
 	}
 }
 
@@ -788,7 +784,7 @@ int mswin_nh_poskey(int *x, int *y, int *mod)
 	while( (event = mswin_input_pop())==NULL ) mswin_main_loop();
 
 	if( event->type==NHEVENT_MOUSE ) {
-		*mod = CLICK_1;
+		*mod = event->ms.mod;
 		*x = event->ms.x;
 		*y = event->ms.y;
 		key = 0;

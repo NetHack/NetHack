@@ -7,20 +7,31 @@
 #include "mhmsg.h"
 #include "mhfont.h"
 
+typedef struct mswin_nethack_text_window {
+	TCHAR*  window_text;
+} NHTextWindow, *PNHTextWindow;
+
 LRESULT CALLBACK	TextWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void LayoutText(HWND hwnd);
 
 HWND mswin_init_text_window () {
 	HWND ret;
+	PNHTextWindow data;
 
 	ret = CreateDialog(
 			GetNHApp()->hApp,
-			MAKEINTRESOURCE(IDD_TEXT),
+			MAKEINTRESOURCE(IDD_NHTEXT),
 			GetNHApp()->hMainWnd,
 			TextWndProc
 	);
 	if( !ret ) panic("Cannot create text window");
+
+	data = (PNHTextWindow)malloc(sizeof(NHTextWindow));
+	if( !data ) panic("out of memory");
+
+	ZeroMemory(data, sizeof(NHTextWindow));
+	SetWindowLong(ret, GWL_USERDATA, (LONG)data);
 	return ret;
 }
 
@@ -28,12 +39,21 @@ void mswin_display_text_window (HWND hWnd)
 {
 	MSG msg;
 	RECT rt;
-	HWND map_wnd;
+	PNHTextWindow data;
+	HWND mapWnd;
+	
+	data = (PNHTextWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	if( data && data->window_text ) {
+		HWND control;
+		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+		SendMessage(control, EM_FMTLINES, 1, 0 );
+		SetWindowText(GetDlgItem(hWnd, IDC_TEXT_CONTROL), data->window_text);
+	}
 
 	GetNHApp()->hMenuWnd = hWnd;
-	map_wnd = mswin_hwnd_from_winid(WIN_MAP);
-	if( !IsWindow(map_wnd) ) map_wnd = GetNHApp()->hMainWnd;
-	GetWindowRect(map_wnd, &rt);
+	mapWnd = mswin_hwnd_from_winid(WIN_MAP);
+	if( !IsWindow(mapWnd) ) mapWnd = GetNHApp()->hMainWnd;
+	GetWindowRect(mapWnd, &rt);
 	MoveWindow(hWnd, rt.left, rt.top, rt.right-rt.left, rt.bottom-rt.top, TRUE);
 	ShowWindow(hWnd, SW_SHOW);
 	SetFocus(hWnd);
@@ -55,17 +75,22 @@ LRESULT CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 {
 	HWND control;
 	HDC hdc;
-
+	PNHTextWindow data;
+	
+	data = (PNHTextWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch (message) 
 	{
-
 	case WM_INITDIALOG:
 	    /* set text control font */
-		control = GetDlgItem(hWnd, IDC_TEXT_VIEW);
+		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+		if( !control ) {
+			panic("cannot get text view window");
+		}
+
 		hdc = GetDC(control);
 		SendMessage(control, WM_SETFONT, (WPARAM)mswin_create_font(NHW_TEXT, ATR_NONE, hdc), 0);
 		ReleaseDC(control, hdc);
-		
+
 		SetFocus(control);
 	return FALSE;
 
@@ -89,34 +114,43 @@ LRESULT CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			SetFocus(GetNHApp()->hMainWnd);
 			return TRUE;
 		}
+	break;
+
+	case WM_DESTROY:
+		if( data ) {
+			if( data->window_text ) free(data->window_text);
+			free(data);
+			SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
+		}
+	break;
+
 	}
 	return FALSE;
 }
 
 void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	PNHTextWindow data;
+	
+	data = (PNHTextWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch( wParam ) {
 	case MSNH_MSG_PUTSTR: {
 		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
-		HWND   text_view;
-		TCHAR*  text;
 		TCHAR	wbuf[BUFSZ];
 		size_t text_size;
 
-		text_view = GetDlgItem(hWnd, IDC_TEXT_VIEW);
-		if( !text_view ) panic("cannot get text view window");
+		if( !data->window_text ) {
+			text_size = strlen(msg_data->text) + 4;
+			data->window_text = (TCHAR*)malloc(text_size*sizeof(data->window_text[0]));
+			ZeroMemory(data->window_text, text_size*sizeof(data->window_text[0]));
+		} else {
+			text_size = _tcslen(data->window_text) + strlen(msg_data->text) + 4;
+			data->window_text = (TCHAR*)realloc(data->window_text, text_size*sizeof(data->window_text[0]));
+		}
+		if( !data->window_text ) break;
 		
-		text_size = GetWindowTextLength(text_view) + strlen(msg_data->text) + 3;
-		text = (TCHAR*)malloc(text_size*sizeof(text[0]));
-		if( !text ) break;
-		ZeroMemory(text, text_size*sizeof(text[0]));
-		
-		GetWindowText(text_view, text, GetWindowTextLength(text_view));
-		_tcscat(text, NH_A2W(msg_data->text, wbuf, sizeof(wbuf))); 
-		_tcscat(text, TEXT("\n"));
-		SetWindowText(text_view, text);
-
-		free(text);
+		_tcscat(data->window_text, NH_A2W(msg_data->text, wbuf, BUFSZ)); 
+		_tcscat(data->window_text, TEXT("\r\n"));
 		break;
 	}
 	}
@@ -130,7 +164,7 @@ void LayoutText(HWND hWnd)
 	POINT pt_elem, pt_ok;
 	SIZE  sz_elem, sz_ok;
 
-	text = GetDlgItem(hWnd, IDC_TEXT_VIEW);
+	text = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
 	btn_ok = GetDlgItem(hWnd, IDOK);
 
 	/* get window coordinates */

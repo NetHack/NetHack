@@ -175,7 +175,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			/* exit gracefully */
 			switch(MessageBox(hWnd, TEXT("Save?"), TEXT("WinHack"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
 			case IDYES:	NHEVENT_KBD('y'); dosave(); break;
-			case IDNO: NHEVENT_KBD('y'); done2(); break;
+			case IDNO: NHEVENT_KBD('q'); done(QUIT); break;
 			case IDCANCEL: break;
 			}
 		} return 0;
@@ -235,10 +235,14 @@ void mswin_layout_main_window(HWND changed_child)
 {
 	winid i;
 	POINT pt;
-	RECT client_rt;
+	RECT client_rt, wnd_rect;
 	SIZE menu_size;
+	POINT status_org;
 	SIZE status_size;
+	POINT msg_org;
 	SIZE msg_size;
+	POINT map_org;
+	SIZE map_size;
 	HWND wnd_status, wnd_msg;
 	PNHMainWindow  data;
 
@@ -257,8 +261,81 @@ void mswin_layout_main_window(HWND changed_child)
 	if( IsWindow(wnd_msg) ) { 
 		mswin_message_window_size(wnd_msg, &msg_size);
 	} else {
-		status_size.cx = status_size.cy = 0;
+		msg_size.cx = msg_size.cy = 0;
 	}
+
+	/* set window positions */
+	SetRect(&wnd_rect, client_rt.left, client_rt.top, client_rt.right, client_rt.bottom);
+	switch(GetNHApp()->winStatusAlign) {
+	case NHWND_ALIGN_LEFT:
+		status_size.cx = (wnd_rect.right-wnd_rect.left)/4;
+		status_size.cy = (wnd_rect.bottom-wnd_rect.top); // that won't look good
+		status_org.x = wnd_rect.left;
+		status_org.y = wnd_rect.top;
+		wnd_rect.left += status_size.cx;
+		break;
+
+	case NHWND_ALIGN_RIGHT:  
+		status_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
+		status_size.cy = (wnd_rect.bottom-wnd_rect.top); // that won't look good
+		status_org.x = wnd_rect.right - status_size.cx;
+		status_org.y = wnd_rect.top;
+		wnd_rect.right -= status_size.cx;
+		break;
+
+	case NHWND_ALIGN_TOP:    
+		status_size.cx = (wnd_rect.right-wnd_rect.left);
+		status_org.x = wnd_rect.left;
+		status_org.y = wnd_rect.top;
+		wnd_rect.top += status_size.cy;
+		break;
+
+	case NHWND_ALIGN_BOTTOM:
+	default:
+		status_size.cx = (wnd_rect.right-wnd_rect.left);
+		status_org.x = wnd_rect.left;
+		status_org.y = wnd_rect.bottom - status_size.cy;
+		wnd_rect.bottom -= status_size.cy;
+		break;
+	}
+
+	switch(GetNHApp()->winMessageAlign) {
+	case NHWND_ALIGN_LEFT:
+		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4;
+		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
+		msg_org.x = wnd_rect.left;
+		msg_org.y = wnd_rect.top;
+		wnd_rect.left += msg_size.cx;
+		break;
+
+	case NHWND_ALIGN_RIGHT:  
+		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
+		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
+		msg_org.x = wnd_rect.right - msg_size.cx;
+		msg_org.y = wnd_rect.top;
+		wnd_rect.right -= msg_size.cx;
+		break;
+
+	case NHWND_ALIGN_TOP:    
+		msg_size.cx = (wnd_rect.right-wnd_rect.left);
+		msg_org.x = wnd_rect.left;
+		msg_org.y = wnd_rect.top;
+		wnd_rect.top += msg_size.cy;
+		break;
+
+	case NHWND_ALIGN_BOTTOM:
+	default:
+		msg_size.cx = (wnd_rect.right-wnd_rect.left);
+		msg_org.x = wnd_rect.left;
+		msg_org.y = wnd_rect.bottom - msg_size.cy;
+		wnd_rect.bottom -= msg_size.cy;
+		break;
+	}
+
+	map_org.x = wnd_rect.left;
+	map_org.y = wnd_rect.top;
+	map_size.cx = wnd_rect.right - wnd_rect.left;
+	map_size.cy = wnd_rect.bottom - wnd_rect.top;
 
 	/* go through the windows list and adjust sizes */
 	for( i=0; i<MAXWINDOWS; i++ ) {
@@ -266,27 +343,27 @@ void mswin_layout_main_window(HWND changed_child)
 			switch( GetNHApp()->windowlist[i].type ) {
 			case NHW_STATUS:
 				MoveWindow(GetNHApp()->windowlist[i].win, 
-					       client_rt.left, 
-						   client_rt.top,
-						   client_rt.right-client_rt.left, 
+					       status_org.x,
+						   status_org.y,
+						   status_size.cx, 
 						   status_size.cy, 
 						   TRUE );
 				break;
 
 			case NHW_MAP:
 				MoveWindow(GetNHApp()->windowlist[i].win, 
-					       client_rt.left, 
-						   client_rt.top+status_size.cy,
-						   client_rt.right-client_rt.left, 
-						   client_rt.bottom-client_rt.top-msg_size.cy-status_size.cy, 
+					       map_org.x, 
+						   map_org.y,
+						   map_size.cx, 
+						   map_size.cy, 
 						   TRUE );
 				break;
 
 			case NHW_MESSAGE:
 				MoveWindow(GetNHApp()->windowlist[i].win, 
-					       client_rt.left,
-						   client_rt.bottom-msg_size.cy,
-						   client_rt.right-client_rt.left, 
+					       msg_org.x, 
+						   msg_org.y,
+						   msg_size.cx, 
 						   msg_size.cy, 
 						   TRUE );
 				break;
@@ -295,14 +372,14 @@ void mswin_layout_main_window(HWND changed_child)
 				mswin_menu_window_size(GetNHApp()->windowlist[i].win, &menu_size);
 				menu_size.cx = min(menu_size.cx, (client_rt.right-client_rt.left));
 
-				pt.x = max(0, (int)(client_rt.right-menu_size.cx));
-				pt.y = client_rt.top+status_size.cy;
+				pt.x = map_org.x + max(0, (int)(map_size.cx-menu_size.cx));
+				pt.y = map_org.y;
 				ClientToScreen(GetNHApp()->hMainWnd, &pt);
 				MoveWindow(GetNHApp()->windowlist[i].win, 
 						   pt.x, 
 						   pt.y,
-						   min(menu_size.cx, client_rt.right), 
-						   client_rt.bottom-client_rt.top-msg_size.cy-status_size.cy, 
+						   min(menu_size.cx, map_size.cx), 
+						   map_size.cy, 
 						   TRUE );
 				break;
 			}

@@ -25,6 +25,9 @@
 
 #define TILES_PER_LINE  40
 
+/* tile background color */
+#define TILE_BK_COLOR RGB(71, 108, 108)
+
 typedef struct mswin_nhwindow_data {
   HWND	      win;
   int		  type;
@@ -40,12 +43,16 @@ typedef struct mswin_nhwindow_app {
 	MSNHWinData windowlist[MAXWINDOWS];
 
 	HBITMAP		bmpTiles;
+	HBITMAP		bmpPetMark;
 
 	boolean		bNoHScroll;	/* disable cliparound for horizontal grid (map) */
 	boolean		bNoVScroll; /* disable cliparound for vertical grid (map) */
 
 	int			mapDisplayMode;		/* regular map display mode */
 	int			mapDisplayModeSave;	/* saved map display mode */
+
+	int			winStatusAlign;		/* alignment of the status window */
+	int			winMessageAlign;	/* alignment of the status window */
 } NHWinApp, *PNHWinApp;
 extern PNHWinApp GetNHApp();
 
@@ -105,6 +112,11 @@ winid mswin_winid_from_type(int type);
 winid mswin_winid_from_handle(HWND hWnd);
 void mswin_window_mark_dead(winid wid);
 void bail(const char *mesg);
+void nhapply_image_transparent( 
+	HDC hDC, int x, int y, int width, int height,
+	HDC sourceDC, int s_x, int s_y, int s_width, int s_height,
+	COLORREF cTransparent
+);
 
 /* unicode stuff */
 #ifdef UNICODE

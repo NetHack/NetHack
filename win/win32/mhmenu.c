@@ -3,7 +3,6 @@
 
 #include "winMS.h"
 #include <assert.h>
-#include <richedit.h>
 #include "resource.h"
 #include "mhmenu.h"
 #include "mhmain.h"
@@ -35,8 +34,7 @@ typedef struct mswin_nethack_menu_window {
 		} menu;
 
 		struct menu_text {
-			int				size;
-			char*			text;
+			TCHAR*			text;
 		} text;
 	};
 	int result;
@@ -54,17 +52,12 @@ LRESULT CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static LRESULT onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
+static LRESULT onListChar(HWND hWnd, HWND hwndList, WORD ch);
 static void LayoutMenu(HWND hwnd);
 static void SetMenuType(HWND hwnd, int type);
 static void SetMenuListType(HWND hwnd, int now);
 static HWND GetMenuControl(HWND hwnd);
-DWORD CALLBACK NHTextStreamCallback(
-  DWORD dwCookie, // application-defined value
-  LPBYTE pbBuff,      // data buffer
-  LONG cb,            // number of bytes to read or write
-  LONG *pcb           // number of bytes transferred
-);
-
+static int GetListPageSize( HWND hwndList );
 
 HWND mswin_init_menu_window (int type) {
 	HWND ret;
@@ -256,6 +249,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 	case WM_SIZE:
 		LayoutMenu(hWnd);
+	break;
 	return FALSE;
 
 	case WM_COMMAND: 
@@ -293,7 +287,6 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			}
 		}
 		break;
-
 		}
 	} break;
 
@@ -309,7 +302,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
     case WM_DRAWITEM:
 		return onDrawItem(hWnd, wParam, lParam);
 
-	case WM_VKEYTOITEM: 
+	case WM_VKEYTOITEM:
 	{ 
 		WORD c[4];
 		BYTE kbd_state[256];
@@ -319,29 +312,16 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		GetKeyboardState(kbd_state);
 		
 		if( ToAscii( LOWORD(wParam), 0, kbd_state, c, 0)==1 ) {
-			int i = 0;
-			for(i=0; i<data->menu.size; i++ ) {
-				if( data->menu.items[i].accelerator == c[0] ) {
-					if( data->how == PICK_ANY ) {
-						SendMessage((HWND)lParam, 
-							        LB_SETSEL, 
-									(WPARAM)!SendMessage((HWND)lParam, LB_GETSEL, (WPARAM)i, (LPARAM)0),
-									(LPARAM)i);
-						return -2;
-					} else if( data->how == PICK_ONE ) {
-						SendMessage((HWND)lParam, LB_SETCURSEL, (WPARAM)i, (LPARAM)0);
-						data->result = 0;
-						data->done = 1;
-						return -2;
-					}
-				}
-			}
+			return onListChar(hWnd, (HWND)lParam, c[0]);
 		}
 	} return -1;
 
 	case WM_DESTROY:
 		DeleteObject(data->bmpChecked);
 		DeleteObject(data->bmpNotChecked);
+		if( data->type == MENU_TYPE_TEXT ) {
+			if( data->text.text ) free(data->text.text);
+		}
 		free(data);
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
 		return TRUE;
@@ -359,37 +339,28 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	{
 		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
 		HWND   text_view;
-		EDITSTREAM txt_edit;
-		CHARFORMAT txt_format;
+		TCHAR	wbuf[BUFSZ];
+		size_t text_size;
 
 		if( data->type!=MENU_TYPE_TEXT )
 			SetMenuType(hWnd, MENU_TYPE_TEXT);
 
+		if( !data->text.text ) {
+			text_size = strlen(msg_data->text) + 4;
+			data->text.text = (TCHAR*)malloc(text_size*sizeof(data->text.text[0]));
+			ZeroMemory(data->text.text, text_size*sizeof(data->text.text[0]));
+		} else {
+			text_size = _tcslen(data->text.text) + strlen(msg_data->text) + 4;
+			data->text.text = (TCHAR*)realloc(data->text.text, text_size*sizeof(data->text.text[0]));
+		}
+		if( !data->text.text ) break;
+		
+		_tcscat(data->text.text, NH_A2W(msg_data->text, wbuf, BUFSZ)); 
+		_tcscat(data->text.text, TEXT("\r\n"));
+		
 		text_view = GetDlgItem(hWnd, IDC_MENU_TEXT);
 		if( !text_view ) panic("cannot get text view window");
-	
-		/* apply text format to the selection */
-		ZeroMemory(&txt_format, sizeof(txt_format));
-		txt_format.cbSize = sizeof(txt_format); 
-		txt_format.dwMask = CFM_BOLD | CFM_ITALIC | CFM_STRIKEOUT; 
-		txt_format.dwEffects = 
-				((msg_data->attr==ATR_BOLD || msg_data->attr==ATR_INVERSE)? CFE_BOLD : 0)  |
-				((msg_data->attr==ATR_BLINK)? CFE_ITALIC : 0) | 
-				((msg_data->attr==ATR_ULINE)? CFE_STRIKEOUT : 0)
-				;
-		/* txt_format.yHeight;  */
-		/* txt_format.yOffset;  */
-		/* txt_format.crTextColor; */
-		/* txt_format.bCharSet; */
-		/* txt_format.bPitchAndFamily = FIXED_PITCH; */
-		/* txt_format.szFaceName[LF_FACESIZE]; */
-		SendMessage(text_view, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&txt_format); 
-
-		/* inject text into control (see NHTextStreamCallback) */
-		ZeroMemory(&txt_edit, sizeof(txt_edit));
-		txt_edit.dwCookie = (DWORD)msg_data->text;
-		txt_edit.pfnCallback = NHTextStreamCallback;
-		SendMessage(text_view, EM_STREAMIN, SF_TEXT | SFF_SELECTION, (LPARAM)&txt_edit);
+		SetWindowText(text_view, data->text.text);
 	} break;
 
 	case MSNH_MSG_STARTMENU:
@@ -433,8 +404,6 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 void LayoutMenu(HWND hWnd) 
 {
 	PNHMenuWindow data;
-//	HWND  menu_list;
-//	HWND  menu_text;
 	HWND  menu_ok;
 	HWND  menu_cancel;
 	RECT  clrt, rt;
@@ -442,8 +411,6 @@ void LayoutMenu(HWND hWnd)
 	SIZE  sz_elem, sz_ok, sz_cancel;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
-//	menu_list = GetDlgItem(hWnd, IDC_MENU_LIST);
-//	menu_text = GetDlgItem(hWnd, IDC_MENU_TEXT);
 	menu_ok = GetDlgItem(hWnd, IDOK);
 	menu_cancel = GetDlgItem(hWnd, IDCANCEL);
 
@@ -479,7 +446,6 @@ void SetMenuType(HWND hWnd, int type)
 	HWND list, text;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
-//	if( type == data->type ) return;
 
 	data->type = type;
 	
@@ -525,13 +491,14 @@ void SetMenuListType(HWND hWnd, int how)
 	case PICK_ONE: 
 		dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD 
 			| WS_VSCROLL | WS_HSCROLL | LBS_WANTKEYBOARDINPUT
-			| LBS_NOTIFY | LBS_NOINTEGRALHEIGHT	| LBS_OWNERDRAWFIXED; 
+			| LBS_NOTIFY | LBS_NOINTEGRALHEIGHT	| LBS_OWNERDRAWFIXED 
+			| LBS_HASSTRINGS; 
 		break;
 	case PICK_ANY: 
 		dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD 
 			| WS_VSCROLL | WS_HSCROLL | LBS_WANTKEYBOARDINPUT
 			| LBS_NOTIFY | LBS_NOINTEGRALHEIGHT | LBS_MULTIPLESEL 
-			| LBS_OWNERDRAWFIXED; 
+			| LBS_OWNERDRAWFIXED | LBS_HASSTRINGS; 
 		break;
 	default: panic("how should be one of PICK_NONE, PICK_ONE or PICK_ANY");
 	};
@@ -617,7 +584,6 @@ LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	PNHMenuItem item;
 	PNHMenuWindow data;
     TEXTMETRIC tm;
-	HGDIOBJ saveBmp;
 	HGDIOBJ saveFont;
 	HGDIOBJ savePen;
 	HPEN    pen;
@@ -630,7 +596,7 @@ LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
     /* If there are no list box items, skip this message. */
-    if (lpdis->itemID == -1) return FALSE;
+    if ( (int)(lpdis->itemID) < 0) return FALSE;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
     switch (lpdis->itemAction) 
@@ -647,6 +613,7 @@ LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			/* print check mark */
 			if( NHMENU_IS_SELECTABLE(*item) ) {
+				HGDIOBJ saveBmp;
 				char buf[2];
 
 				saveBmp = SelectObject(tileDC, 
@@ -664,16 +631,25 @@ LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 					TextOut(lpdis->hDC, x, y, NH_A2W(buf, wbuf, sizeof(wbuf)), 1); 
 				}
 				x += tm.tmAveCharWidth + 5;
+				SelectObject(tileDC, saveBmp);
 			}
-			
-			SelectObject(tileDC, GetNHApp()->bmpTiles);
-			ntile = glyph2tile[ item->glyph ];
-			t_x = (ntile % TILES_PER_LINE)*TILE_X;
-			t_y = (ntile / TILES_PER_LINE)*TILE_Y;
 
-			y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
+			/* print glyph if present */
+			if( item->glyph != NO_GLYPH ) {
+				HGDIOBJ saveBmp;
 
-			BitBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, tileDC, t_x, t_y, SRCCOPY );
+				saveBmp = SelectObject(tileDC, GetNHApp()->bmpTiles);				
+				ntile = glyph2tile[ item->glyph ];
+				t_x = (ntile % TILES_PER_LINE)*TILE_X;
+				t_y = (ntile / TILES_PER_LINE)*TILE_Y;
+
+				y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
+
+				nhapply_image_transparent(
+					lpdis->hDC, x, y, TILE_X, TILE_Y, 
+					tileDC, t_x, t_y, TILE_X, TILE_Y, TILE_BK_COLOR );
+				SelectObject(tileDC, saveBmp);
+			}
 			x += TILE_X + 5;
 
             y = (lpdis->rcItem.bottom + lpdis->rcItem.top - 
@@ -686,8 +662,8 @@ LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 strlen(item->str)); 
 
 			mswin_destroy_font(SelectObject(lpdis->hDC, saveFont));
-			SelectObject(tileDC, saveBmp);
 			DeleteDC(tileDC);
+			
             break; 
 
         case ODA_FOCUS:
@@ -712,6 +688,168 @@ LRESULT onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
+LRESULT onListChar(HWND hWnd, HWND hwndList, WORD ch)
+{
+	int i = 0;
+	PNHMenuWindow data;
+	int topIndex, pageSize;
+
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+
+	switch( ch ) {
+	case MENU_FIRST_PAGE:
+		SendMessage(hwndList, LB_SETTOPINDEX, 0, 0);
+	return -2;
+
+	case MENU_LAST_PAGE:
+		SendMessage(hwndList, 
+					LB_SETTOPINDEX, 
+					(WPARAM)max(0, data->menu.size-1),
+					(LPARAM)0);
+	return -2;
+
+	case MENU_NEXT_PAGE:
+		topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
+		pageSize = GetListPageSize( hwndList );
+		SendMessage(hwndList, 
+					LB_SETTOPINDEX, 
+					(WPARAM)min(topIndex+pageSize, data->menu.size-1),
+					(LPARAM)0);
+	return -2;
+
+	case MENU_PREVIOUS_PAGE:
+		topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
+		pageSize = GetListPageSize( hwndList );
+		SendMessage(hwndList, 
+					LB_SETTOPINDEX, 
+					(WPARAM)max(topIndex-pageSize, 0),
+					(LPARAM)0);
+	break;
+
+	case MENU_SELECT_ALL:
+		if( data->how == PICK_ANY ) {
+			for(i=0; i<data->menu.size; i++ ) {
+				SendMessage(hwndList, LB_SETSEL, (WPARAM)TRUE, (LPARAM)i);
+			}
+			return -2;
+		}
+	break;
+
+	case MENU_UNSELECT_ALL:
+		if( data->how == PICK_ANY ) {
+			for(i=0; i<data->menu.size; i++ ) {
+				SendMessage(hwndList, LB_SETSEL, (WPARAM)FALSE, (LPARAM)i);
+			}
+			return -2;
+		}
+	break;
+
+	case MENU_INVERT_ALL:
+		if( data->how == PICK_ANY ) {
+			for(i=0; i<data->menu.size; i++ ) {
+				SendMessage(hwndList, 
+							LB_SETSEL, 
+							(WPARAM)!SendMessage(hwndList, LB_GETSEL, (WPARAM)i, (LPARAM)0),
+							(LPARAM)i);
+			}
+			return -2;
+		}
+	break;
+
+	case MENU_SELECT_PAGE:
+		if( data->how == PICK_ANY ) {
+			topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
+			pageSize = GetListPageSize( hwndList );
+			for(i=0; i<pageSize; i++ ) {
+				SendMessage(hwndList, LB_SETSEL, (WPARAM)TRUE, (LPARAM)topIndex+i);
+			}
+			return -2;
+		}
+	break;
+
+	case MENU_UNSELECT_PAGE:
+		if( data->how == PICK_ANY ) {
+			topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
+			pageSize = GetListPageSize( hwndList );
+			for(i=0; i<pageSize; i++ ) {
+				SendMessage(hwndList, LB_SETSEL, (WPARAM)FALSE, (LPARAM)topIndex+i);
+			}
+			return -2;
+		}
+	break;
+
+	case MENU_INVERT_PAGE:
+		if( data->how == PICK_ANY ) {
+			topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
+			pageSize = GetListPageSize( hwndList );
+			for(i=0; i<pageSize; i++ ) {
+				SendMessage(hwndList, 
+							LB_SETSEL, 
+							(WPARAM)!SendMessage(hwndList, LB_GETSEL, (WPARAM)topIndex+i, (LPARAM)0),
+							(LPARAM)topIndex+i);
+			}
+			return -2;
+		}
+	break;
+
+	case MENU_SEARCH:
+	    if( data->how==PICK_ANY || data->how==PICK_ONE ) {
+			char buf[BUFSZ];
+			mswin_getlin("Search for:", buf);
+			if (!*buf || *buf == '\033') return -2;
+			for(i=0; i<data->menu.size; i++ ) {
+				if( NHMENU_IS_SELECTABLE(data->menu.items[i])
+					&& strstr(data->menu.items[i].str, buf) ) {
+					if (data->how == PICK_ANY) {
+						SendMessage(hwndList, 
+									LB_SETSEL, 
+									(WPARAM)!SendMessage(hwndList, LB_GETSEL, (WPARAM)i, (LPARAM)0),
+									(LPARAM)i);
+					} else if( data->how == PICK_ONE ) {
+						SendMessage(hwndList, LB_SETCURSEL, (WPARAM)i, (LPARAM)0);
+						break;
+					}
+				}
+			} 
+		} else {
+			mswin_nhbell();
+	    }
+	return -2;
+
+	case ' ':
+		if( data->how==PICK_ONE || data->how==PICK_NONE ) {
+			data->done = 1;
+			data->result = 0;
+			return -2;
+		}
+	break;
+	
+	default:
+		if( (ch>='a' && ch<='z') ||
+			(ch>='A' && ch<='Z') ) {
+			for(i=0; i<data->menu.size; i++ ) {
+				if( data->menu.items[i].accelerator == ch ) {
+					if( data->how == PICK_ANY ) {
+						SendMessage(hwndList, 
+									LB_SETSEL, 
+									(WPARAM)!SendMessage(hwndList, LB_GETSEL, (WPARAM)i, (LPARAM)0),
+									(LPARAM)i);
+						return -2;
+					} else if( data->how == PICK_ONE ) {
+						SendMessage(hwndList, LB_SETCURSEL, (WPARAM)i, (LPARAM)0);
+						data->result = 0;
+						data->done = 1;
+						return -2;
+					}
+				}
+			}
+		}
+	break;
+	}
+	
+	return -1;
+}
+
 void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 {
     TEXTMETRIC tm;
@@ -726,7 +864,7 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 	sz->cy = rt.bottom - rt.top;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	if(data) {
+	if(data && data->type==MENU_TYPE_MENU ) {
 		hdc = GetDC(GetMenuControl(hWnd));
 		saveFont = SelectObject(hdc, mswin_create_font(NHW_MENU, ATR_INVERSE, hdc));
 		GetTextMetrics(hdc, &tm);
@@ -742,43 +880,16 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 	}
 }
 
-DWORD CALLBACK NHTextStreamCallback(
-  DWORD dwCookie, // application-defined value
-  LPBYTE pbBuff,      // data buffer
-  LONG cb,            // number of bytes to read or write
-  LONG *pcb           // number of bytes transferred
-)
+int GetListPageSize( HWND hwndList ) 
 {
-	static int   st = 0;
-	static char* _text_buf = 0;
-	size_t to_copy;
+   int ntop, nRectheight, nVisibleItems;
+   RECT rc, itemrect;
 
-	switch(st) {
-	case 0: 
-		_text_buf = (char*)dwCookie;
-		st = 1;
-		/* fall through */
+   ntop = SendMessage(hwndList, LB_GETTOPINDEX, 0, 0);	/* Top item index. */
+   GetClientRect(hwndList, &rc);						/* Get list box rectangle. */
+   nRectheight = rc.bottom - rc.top;					/* Compute list box height. */
 
-	case 1:
-		to_copy = min((size_t)cb, strlen(_text_buf));
-		if( *pcb>0 ) {
-			strncpy((char*)pbBuff, _text_buf, to_copy);
-			_text_buf += to_copy;
-			*pcb = (LONG)to_copy;
-		}
-		if( !_text_buf[0] ) st = 3;
-		break;
-
-	case 3: 
-		*pcb = 2;
-		strncpy( (char*)pbBuff, "\r\n", *pcb);
-		st = 4;
-		break;
-		
-	case 4:
-		*pcb = 0;
-		st = 0;
-		break;
-	}
-	return 0;
+   SendMessage(hwndList, LB_GETITEMRECT, ntop, (DWORD)(&itemrect)); /* Get current line's rectangle. */
+   nVisibleItems = nRectheight/(itemrect.bottom - itemrect.top);
+   return max(1, nVisibleItems);
 }

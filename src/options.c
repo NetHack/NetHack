@@ -302,6 +302,11 @@ static struct Comp_Opt
 #if 0
 	{ "warnlevel", "minimum monster level to trigger warning", 4, SET_IN_GAME },
 #endif
+#ifdef MSWIN_GRAPHICS
+	{ "win32_map_mode", "map display mode under Windows", 20, SET_IN_FILE },
+	{ "win32_align_status", "status window alignment", 20, SET_IN_FILE },
+	{ "win32_align_message", "message window alignment", 20, SET_IN_FILE },
+#endif
 	{ "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
 	{ (char *)0, (char *)0, 0, 0 }
 };
@@ -1689,6 +1694,52 @@ goodfruit:
 	}
 #endif /* MSDOS */
 
+#ifdef MSWIN_GRAPHICS
+	/* win32_map_mode:[tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|ascii7x12|ascii8x12|ascii15x12
+	                   |ascii12x16|ascii10x18|fit_to_screen] */
+	fullname = "win32_map_mode";
+	if (match_optname(opts, fullname, sizeof("win32_map_mode")-1, TRUE)) {
+		if (negated) {
+			bad_negation(fullname, FALSE);
+			return;
+		}
+		else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+			return;
+		}
+		if (!set_win32_option(fullname, opts))
+			badoption(opts);
+		return;
+	}
+
+	/* win32_align_status:[left|top|right|bottom] */
+	fullname = "win32_align_status";
+	if (match_optname(opts, fullname, sizeof("win32_align_status")-1, TRUE)) {
+		if (negated) {
+			bad_negation(fullname, FALSE);
+			return;
+		}
+		else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+			return;
+		}
+		if (!set_win32_option(fullname, opts))
+			badoption(opts);
+		return;
+	}
+	/* win32_align_message:[left|top|right|bottom] */
+	fullname = "win32_align_message";
+	if (match_optname(opts, fullname, sizeof("win32_align_message")-1, TRUE)) {
+		if (negated) {
+			bad_negation(fullname, FALSE);
+			return;
+		}
+		else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+			return;
+		}
+		if (!set_win32_option(fullname, opts))
+			badoption(opts);
+		return;
+	}
+#endif /* MSWIN_GRAPHICS */
 
 	fullname = "windowtype";
 	if (match_optname(opts, fullname, 3, TRUE)) {

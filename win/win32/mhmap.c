@@ -9,6 +9,7 @@
 
 #define NHMAP_FONT_NAME TEXT("Terminal")
 #define MAXWINDOWTEXT 255
+#define CLIPAROUND_MARGIN  5
 
 extern short glyph2tile[];
 
@@ -262,7 +263,7 @@ void register_map_window_class()
 	ZeroMemory( &wcex, sizeof(wcex));
 
 	/* window class */
-	wcex.style			= CS_NOCLOSE;
+	wcex.style			= CS_NOCLOSE | CS_DBLCLKS;
 	wcex.lpfnWndProc	= (WNDPROC)MapWndProc;
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
@@ -329,10 +330,19 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 	case WM_LBUTTONDOWN:
 		NHEVENT_MS( 
+			CLICK_1,
 			max(0, min(COLNO, data->xPos + (LOWORD(lParam)-data->map_orig.x)/data->xScrTile)),
 			max(0, min(ROWNO, data->yPos + (HIWORD(lParam)-data->map_orig.y)/data->yScrTile))
 		);
-	break;
+	return 0;
+
+	case WM_LBUTTONDBLCLK :
+		NHEVENT_MS( 
+			CLICK_2,
+			max(0, min(COLNO, data->xPos + (LOWORD(lParam)-data->map_orig.x)/data->xScrTile)),
+			max(0, min(ROWNO, data->yPos + (HIWORD(lParam)-data->map_orig.y)/data->yScrTile))
+		);
+	return 0;
 
 	case WM_DESTROY:
 		if( data->hMapFont ) DeleteObject(data->hMapFont);
@@ -369,16 +379,39 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	{
 		PMSNHMsgClipAround msg_data = (PMSNHMsgClipAround)lParam;
 		int x, y;
+		BOOL scroll_x, scroll_y;
 
-		/* get page size and center horizontally on x-position*/
-		if( !GetNHApp()->bNoHScroll ) {
-			x = max(0, min(COLNO, msg_data->x - data->xPageSize/2));
+		/* calculate if you should clip around */
+		scroll_x =  
+			!GetNHApp()->bNoHScroll &&
+			( msg_data->x<(data->xPos+CLIPAROUND_MARGIN) ||
+			  msg_data->x>(data->xPos+data->xPageSize-CLIPAROUND_MARGIN) );
+		scroll_y =  
+			!GetNHApp()->bNoVScroll &&
+			( msg_data->y<(data->yPos+CLIPAROUND_MARGIN) ||
+			  msg_data->y>(data->yPos+data->yPageSize-CLIPAROUND_MARGIN) );
+		
+		/* get page size and center horizontally on x-position */
+		if( scroll_x ) {
+			if( data->xPageSize<=2*CLIPAROUND_MARGIN ) {
+				x = max(0, min(COLNO, msg_data->x - data->xPageSize/2));
+			} else if( msg_data->x < data->xPos+data->xPageSize/2 ) {
+				x = max(0, min(COLNO, msg_data->x - CLIPAROUND_MARGIN));
+			} else {
+				x = max(0, min(COLNO, msg_data->x - data->xPageSize + CLIPAROUND_MARGIN));
+			}
 			SendMessage( hWnd, WM_HSCROLL, (WPARAM)MAKELONG(SB_THUMBTRACK, x), (LPARAM)NULL	);
 		}
 
-		/* get page size and center vertically on y-position*/
-		if( !GetNHApp()->bNoVScroll ) {
-			y = max(0, min(ROWNO, msg_data->y - data->yPageSize/2));
+		/* get page size and center vertically on y-position */
+		if( scroll_y ) {
+			if( data->yPageSize<=2*CLIPAROUND_MARGIN ) {
+				y = max(0, min(ROWNO, msg_data->y - data->yPageSize/2));
+			} else if( msg_data->y < data->yPos+data->yPageSize/2 ) {
+				y = max(0, min(ROWNO, msg_data->y - CLIPAROUND_MARGIN));
+			} else {
+				y = max(0, min(ROWNO, msg_data->y - data->yPageSize + CLIPAROUND_MARGIN));
+			}
 			SendMessage( hWnd, WM_VSCROLL, (WPARAM)MAKELONG(SB_THUMBTRACK, y), (LPARAM)NULL );
 		}
 	} 
@@ -495,8 +528,7 @@ void onPaint(HWND hWnd)
 				
 				nhglyph2charcolor(data->map[i][j], &ch, &color);
 				
-				if( color == NO_COLOR ) continue;
-				else SetTextColor( hDC,  nhcolor_to_RGB(color) );
+				SetTextColor( hDC,  nhcolor_to_RGB(color) );
 
 				nhcoord2display(data, i, j, &glyph_rect);
 				DrawText(hDC, 
@@ -539,6 +571,32 @@ void onPaint(HWND hWnd)
 						TILE_Y, 
 						SRCCOPY 
 					);
+					if( glyph_is_pet(data->map[i][j]) && iflags.hilite_pet ) {
+						/* apply pet mark transparently over 
+						   pet image */
+						HDC hdcPetMark;
+						HBITMAP    bmPetMarkOld;
+
+						/* this is DC for petmark bitmap */
+						hdcPetMark = CreateCompatibleDC(hDC);
+						bmPetMarkOld = SelectObject(hdcPetMark, GetNHApp()->bmpPetMark);
+
+						nhapply_image_transparent( 
+							hDC,
+							glyph_rect.left,
+							glyph_rect.top, 
+							data->xScrTile,
+							data->yScrTile,
+							hdcPetMark,
+							0,
+							0,
+							TILE_X, 
+							TILE_Y,
+							TILE_BK_COLOR 
+						);
+						SelectObject(hdcPetMark, bmPetMarkOld);
+						DeleteDC(hdcPetMark);
+					}
 				}
 			SelectObject(tileDC, saveBmp);
 			DeleteDC(tileDC);
@@ -752,7 +810,7 @@ COLORREF nhcolor_to_RGB(int c)
 	case CLR_MAGENTA:		return RGB(255,   0, 255);	
 	case CLR_CYAN:			return RGB(  0, 255, 255);		
 	case CLR_GRAY:			return RGB(192, 192, 192);	
-	case NO_COLOR:			return RGB(  0,   0,   0);		
+	case NO_COLOR:			return RGB(255, 255, 255);		
 	case CLR_ORANGE:		return RGB(255, 165,   0);	
 	case CLR_BRIGHT_GREEN:	return RGB(  0, 255,   0);
 	case CLR_YELLOW:		return RGB(255, 255,   0);	
@@ -762,4 +820,88 @@ COLORREF nhcolor_to_RGB(int c)
 	case CLR_WHITE:			return RGB(255, 255, 255);
 	default:				return RGB(  0,   0,   0);	/* black */
 	}
+}
+
+/* apply bitmap pointed by sourceDc transparently over 
+   bitmap pointed by hDC */
+void nhapply_image_transparent( 
+	HDC hDC, int x, int y, int width, int height,
+	HDC sourceDC, int s_x, int s_y, int s_width, int s_height,
+	COLORREF cTransparent
+)
+{
+	HDC        hdcMem, hdcBack, hdcObject, hdcSave;
+	COLORREF   cColor;
+	HBITMAP    bmAndBack, bmAndObject, bmAndMem, bmSave;
+	HBITMAP    bmBackOld, bmObjectOld, bmMemOld, bmSaveOld;
+
+	/* Create some DCs to hold temporary data. */
+	hdcBack   = CreateCompatibleDC(hDC);
+	hdcObject = CreateCompatibleDC(hDC);
+	hdcMem    = CreateCompatibleDC(hDC);
+	hdcSave   = CreateCompatibleDC(hDC);
+
+	/* this is bitmap for our pet image */
+	bmSave = CreateCompatibleBitmap(hDC, s_width, s_height);
+
+	/* Monochrome DC */
+	bmAndBack   = CreateBitmap(s_width, s_height, 1, 1, NULL);
+	bmAndObject = CreateBitmap(s_width, s_height, 1, 1, NULL);
+
+	/* resulting bitmap */
+	bmAndMem    = CreateCompatibleBitmap(hDC, s_width, s_height);
+
+	/* Each DC must select a bitmap object to store pixel data. */
+	bmBackOld   = SelectObject(hdcBack, bmAndBack);
+	bmObjectOld = SelectObject(hdcObject, bmAndObject);
+	bmMemOld    = SelectObject(hdcMem, bmAndMem);
+	bmSaveOld   = SelectObject(hdcSave, bmSave);
+
+	/* copy source image because it is going to be overwritten */
+	BitBlt(hdcSave, 0, 0, s_width, s_height, sourceDC, s_x, s_y, SRCCOPY);
+
+	/* Set the background color of the source DC to the color.
+	   contained in the parts of the bitmap that should be transparent */
+	cColor = SetBkColor(hdcSave, cTransparent);
+
+	/* Create the object mask for the bitmap by performing a BitBlt
+	   from the source bitmap to a monochrome bitmap. */
+	BitBlt(hdcObject, 0, 0, s_width, s_height, hdcSave, 0, 0, SRCCOPY);
+
+	/* Set the background color of the source DC back to the original
+	   color. */
+	SetBkColor(hdcSave, cColor);
+
+	/* Create the inverse of the object mask. */
+	BitBlt(hdcBack, 0, 0, s_width, s_height, hdcObject, 0, 0, NOTSRCCOPY);
+
+	/* Copy background to the resulting image  */
+	StretchBlt(hdcMem, 0, 0, s_width, s_height, hDC, x, y, width, height, SRCCOPY);
+
+	/* Mask out the places where the source image will be placed. */
+	BitBlt(hdcMem, 0, 0, s_width, s_height, hdcObject, 0, 0, SRCAND);
+
+	/* Mask out the transparent colored pixels on the source image. */
+	BitBlt(hdcSave, 0, 0, s_width, s_height, hdcBack, 0, 0, SRCAND);
+
+	/* XOR the source image with the beckground. */
+	BitBlt(hdcMem, 0, 0, s_width, s_height, hdcSave, 0, 0, SRCPAINT);
+
+	/* blt resulting image to the screen */
+	StretchBlt( 
+		hDC, 
+		x, y, width, height, hdcMem,
+		0, 0, s_width, s_height, SRCCOPY 
+	);
+
+	/* cleanup */
+	DeleteObject(SelectObject(hdcBack, bmBackOld));
+	DeleteObject(SelectObject(hdcObject, bmObjectOld));
+	DeleteObject(SelectObject(hdcMem, bmMemOld));
+	DeleteObject(SelectObject(hdcSave, bmSaveOld));
+
+	DeleteDC(hdcMem);
+	DeleteDC(hdcBack);
+	DeleteDC(hdcObject);
+	DeleteDC(hdcSave);
 }

@@ -132,4 +132,6 @@ int  _RTLENTRY _EXPFUNC open  (const char _FAR *__path, int __access,... /*unsig
 #endif
 #endif
 
+extern int FDECL(set_win32_option, (const char *, const char *));
+
 #endif /* NTCONF_H */

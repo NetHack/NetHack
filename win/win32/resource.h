@@ -14,6 +14,7 @@
 #define IDR_MAINFRAME                   128
 #define IDB_TILES                       129
 #define IDD_TEXT                        130
+#define IDD_NHTEXT                      130
 #define IDD_MENU                        132
 #define IDB_MENU_SEL                    133
 #define IDB_MENU_UNSEL                  134
@@ -21,7 +22,9 @@
 #define IDD_GETLIN                      138
 #define IDD_EXTCMD                      139
 #define IDD_PLAYER_SELECTOR             141
+#define IDB_PETMARK                     143
 #define IDC_TEXT_VIEW                   1000
+#define IDC_TEXT_CONTROL                1000
 #define IDC_CMD_MOVE_NW                 1001
 #define IDC_CMD_MOVE_N                  1002
 #define IDC_MENU_LIST                   1003
@@ -130,9 +133,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        143
+#define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         32793
-#define _APS_NEXT_CONTROL_VALUE         1329
+#define _APS_NEXT_CONTROL_VALUE         1331
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
