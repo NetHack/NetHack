@@ -10,9 +10,10 @@ Never say "It moves only reluctantly"
 expert fireball/cone of cold could not target a monster seen only with
 	infravision or ESP
 display "lotus juice", not "lotu juice" for the fruit juice name
-statue of any golem hit with stone-to-flesh spell animates as flesh golem
+any golem statue hit with stone-to-flesh spell animates as flesh golem
 only humanoid angelic minions should get/use sword and armor
 paper, straw and wood golems resist cold
+the options lootabc, showrace, travelcmd, and runmode are now saved
 
 
 Platform- and/or Interface-Specific Fixes
