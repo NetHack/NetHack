@@ -331,6 +331,7 @@ boolean td;	/* td == TRUE : trap door or hole */
 
 	if(td) {
 	    struct trap *t=t_at(u.ux,u.uy);
+	    seetrap(t);
 	    if (!In_sokoban(&u.uz)) {
 		if (t->ttyp == TRAPDOOR)
 			pline("A trap door opens up under you!");
@@ -823,8 +824,8 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		break;
 	    case HOLE:
 	    case TRAPDOOR:
-		seetrap(trap);
 		if (!Can_fall_thru(&u.uz)) {
+		    seetrap(trap);	/* normally done in fall_through */
 		    impossible("dotrap: %ss cannot exist on this level.",
 			       defsyms[trap_to_defsym(ttype)].explanation);
 		    break;		/* don't activate it after all */
