@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)teleport.c	3.4	2003/12/01	*/
+/*	SCCS Id: @(#)teleport.c	3.4	2003/12/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1222,7 +1222,8 @@ random_teleport_level()
 	int nlev, max_depth, min_depth,
 	    cur_depth = (int)depth(&u.uz);
 
-	if (!rn2(5) || Is_knox(&u.uz))
+	/* [the endgame case can only occur in wizard mode] */
+	if (!rn2(5) || Is_knox(&u.uz) || In_endgame(&u.uz))
 	    return cur_depth;
 
 	/* What I really want to do is as follows:
