@@ -243,7 +243,20 @@ int pid;
     HANDLE hProcessSnap = NULL; 
     PROCESSENTRY32 pe32      = {0};
     boolean bRet      = FALSE; 
+    HINSTANCE hinstLib; 
+    genericptr_t ProcTest; 
+    BOOL fFreeResult; 
  
+    hinstLib = LoadLibrary("KERNEL32"); 
+    if (hinstLib != NULL)  { 
+        ProcTest = (genericptr_t) GetProcAddress(hinstLib, "Process32Next"); 
+        if (!ProcTest) {
+		fFreeResult = FreeLibrary(hinstLib);
+		return FALSE;
+        }
+        fFreeResult = FreeLibrary(hinstLib); 
+    } 
+     
     hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); 
     if (hProcessSnap == INVALID_HANDLE_VALUE) 
         return FALSE; 
