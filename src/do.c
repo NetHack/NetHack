@@ -195,7 +195,6 @@ const char *verb;
 		(!u.utrap || (u.utrap && u.utraptype != TT_PIT)) &&
 		(t = t_at(x,y)) != 0 && t->tseen &&
 			(t->ttyp==PIT || t->ttyp==SPIKED_PIT)) {
-		static const char * const the_your[2] = { "the", "your" };
 		/* you escaped a pit and are standing on the precipice */
 		if (Blind && flags.soundok)
 			You_hear("%s %s downwards.",
