@@ -1194,6 +1194,9 @@ postmov:
 			(is_pool(mtmp->mx, mtmp->my) && !Is_waterlevel(&u.uz));
 		newsym(mtmp->mx, mtmp->my);
 	    }
+	    if (mtmp->isshk) {
+		after_shk_move(mtmp);
+	    }
 	}
 	return(mmoved);
 }

@@ -891,6 +891,7 @@ register boolean killkops;
 #endif
 		pacify_guards();
 	}
+	after_shk_move(shkp);
 }
 
 STATIC_OVL boolean
@@ -3257,8 +3258,24 @@ register struct monst *shkp;
 		}
 	}
 
-	return(move_special(shkp,inhishop(shkp),
-			    appr,uondoor,avoid,omx,omy,gx,gy));
+	z = move_special(shkp,inhishop(shkp),appr,uondoor,avoid,omx,omy,gx,gy);
+	if (z > 0) after_shk_move(shkp);
+
+	return z;
+}
+
+/* called after shopkeeper moves, in case the move causes re-entry into shop */
+void
+after_shk_move(shkp)
+struct monst *shkp;
+{
+	struct eshk *eshkp = ESHK(shkp);
+
+	if (eshkp->bill_p == (struct bill_x *) -1000 && inhishop(shkp)) {
+	    /* reset bill_p, need to re-calc player's occupancy too */
+	    eshkp->bill_p = &eshkp->bill[0];
+	    check_special_room(FALSE);
+	}
 }
 
 #endif /*OVL3*/
