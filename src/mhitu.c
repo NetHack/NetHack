@@ -1724,9 +1724,10 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		case AD_BLND:
 		    if (can_blnd(mtmp, &youmonst, mattk->aatyp, (struct obj*)0)) {
 			if(!Blind) {
-			    You_cant("see in here!");
+			    long was_blinded = Blinded;
+			    if (!Blinded) You_cant("see in here!");
 			    make_blinded((long)tmp,FALSE);
-			    if (!Blind) Your(vision_clears);
+			    if (!was_blinded && !Blind) Your(vision_clears);
 			} else
 			    /* keep him blind until disgorged */
 			    make_blinded(Blinded+1,FALSE);
