@@ -526,7 +526,7 @@ ENDMAP
 
 REGION:(00,00,38,15),lit,"ordinary"
 STAIR:levregion(01,03,20,19),(0,0,39,15),up
-STAIR:levregion(21,03,75,19),(0,0,39,15),down
+STAIR:levregion(61,03,75,19),(0,0,39,15),down
 FOUNTAIN:(22,07)
 FOUNTAIN:(09,13)
 REGION:(13,5,14,6),unlit,"ordinary"
