@@ -31,6 +31,7 @@ STATIC_DCL void FDECL(saveobjchn, (int,struct obj *,int));
 STATIC_DCL void FDECL(savemonchn, (int,struct monst *,int));
 STATIC_DCL void FDECL(savetrapchn, (int,struct trap *,int));
 STATIC_DCL void FDECL(savegamestate, (int,int));
+STATIC_OVL void FDECL(save_msghistory, (int,int));
 #ifdef MFLOPPY
 STATIC_DCL void FDECL(savelev0, (int,XCHAR_P,int));
 STATIC_DCL boolean NDECL(swapout_oldest);
@@ -985,6 +986,7 @@ register int fd, mode;
 	    ffruit = 0;
 }
 
+STATIC_OVL void
 save_msghistory(fd, mode)
 register int fd, mode;
 {

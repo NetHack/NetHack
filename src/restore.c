@@ -29,6 +29,7 @@ STATIC_DCL void FDECL(ghostfruit, (struct obj *));
 STATIC_DCL boolean FDECL(restgamestate, (int, unsigned int *, unsigned int *));
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
 STATIC_DCL int FDECL(restlevelfile, (int,XCHAR_P));
+STATIC_OVL void FDECL(restore_msghistory, (int));
 STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
 #ifndef GOLDOBJ
 STATIC_DCL struct obj *FDECL(gold_in, (struct obj *));
@@ -911,10 +912,11 @@ boolean ghostly;
 	    clear_id_mapping();
 }
 
+STATIC_OVL void
 restore_msghistory(fd)
 register int fd;
 {
-	int msgsize, k, msgcount = 0;
+	int msgsize, msgcount = 0;
 	char msg[BUFSZ];
 
 	while(1) {
