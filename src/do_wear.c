@@ -10,7 +10,8 @@ STATIC_DCL long takeoff_mask, taking_off;
 
 #else /* OVLB */
 
-STATIC_OVL NEARDATA long takeoff_mask = 0L, taking_off = 0L;
+STATIC_OVL NEARDATA long takeoff_mask = 0L;
+static taking_off = 0L;
 
 static NEARDATA int todelay;
 static boolean cancelled_don = FALSE;

@@ -1,4 +1,4 @@
-; SCCS Id: @(#)schema3.MSC	3.4	 2000/07/31
+; SCCS Id: @(#)schema3.MSC	3.4	 2003/08/03
 ; Copyright (c) NetHack PC Development Team, 2000
 ;
 ; NetHack Overlay Schema
@@ -43,7 +43,7 @@ functions:17 _awaken_monsters _awaken_soldiers
 functions:18 _backfire _backsp _bad_location _bad_negation _bad_rock _badoption _bail _ballfall
 functions:19 _bc_order _bclose _bcsign _beg _begin_burn _bflush _bhit _bhitm
 functions:20 _bhito _bhitpile _big_to_little _bill_box_content _bill_dummy_object _bite _bless _blessorcurse
-functions:21 _Blindf_off _Blindf_on _block_door _block_entry _block_point _blow_up_landmine _body_part _boolopt_only_initial
+functions:21 _Blindf_off _Blindf_on _block_door _block_entry _block_point _blow_up_landmine _body_part
 functions:22 _boomhit _Boots_off _Boots_on _bot _bot1 _bot2 _boulder_hits_pool _bound_digging
 functions:23 _boxlock _br_string _break_armor _break_statue _breakarm _breakmsg
 functions:24 _breakobj _breaks _breaksink _breaktest _breamu _bribe _bufoff _bufon
@@ -74,7 +74,7 @@ functions:48 _defends _deferred_goto _del_engr _del_engr_at _del_light_source _d
 functions:49 _delete_levelfile _delete_savefile _delfloortrap _deliver_by_pline _deliver_by_window _delobj _deltrap _demon_talk
 functions:50 _demonpet _destroy_arm _destroy_drawbridge _destroy_item _destroy_mitem _dev_name _dig
 functions:51 _dig_check _dig_corridor _dig_point _dig_typ _digactualhole _dighole _digit _dipfountain
-functions:52 _disable_ctrlP _disarm_beartrap _disarm_landmine _disarm_shooting_trap _disarm_squeaky_board _discard_minvent _disclose _discover_object
+functions:52 _disable_ctrlP _disarm_landmine _disarm_shooting_trap _disarm_squeaky_board _discard_minvent _disclose _discover_object
 functions:53 _diseasemu _display_binventory _display_cinventory _display_gamewindows _display_inventory _display_minventory
 functions:54 _distant_name _distfleeck _disturb _djinni_from_bottle _dlb_cleanup _dlb_fclose
 functions:55 _dlb_fgets _dlb_fopen _dlb_fread _dlb_fseek _dlb_ftell _dlb_init _dlord _dmgtype
@@ -82,7 +82,7 @@ functions:56 _dmgval _dmonsfree _dmore _dname_to_dnum _do_break_wand _do_clear_a
 functions:57 _do_earthquake _do_entity _do_genocide _do_improvisation _do_light_sources _do_look _do_mapping _do_mname
 functions:57 _vga_xputg _vga_xputs _video_update_positionbar _view_from _view_init _visctrl _vision_init _vision_recalc
 functions:58 _do_oname _do_osshock _do_play_instrument _do_reset_eat _do_room_or_subroom _do_storms _do_takeoff
-functions:60 _doclose _doconfuse _doconsult _docorner _docrt _doddoremarm _doddrop _dodip
+functions:60 _doclose _doconsult _docorner _docrt _doddoremarm _doddrop _dodip
 functions:61 _adjust_prefix _build_plselection_prompt _duplicate_opt_detection _enter_explore_mode _maybe_wail
 functions:62 _doextcmd _doextlist _doextversion _dofindgem _dofiretrap _doforce _dog_eat _dog_goal
 functions:63 _dog_hunger _dog_invent _dog_move _dog_nutrition _dogfood _dogushforth _dohelp _dohide
@@ -117,7 +117,7 @@ functions:91 _fopenp _forcelock _forget_levels _forget_map _forget_objects _forg
 functions:92 _fprefx _fracture_rock _free_dungeons _free_rooms _free_ttlist _free_window_info _freediskspace _freedynamicdata
 functions:93 _freefruitchn _freehand _freeinv _friday_13th _fruitadd _fry_by_god _fully_identify_obj _g_at
 functions:94 _gainstr _gameDiskPrompt _gazemm _gazemu _gd_move _gd_sound _gem_accept
-functions:95 _display_artifact_score _display_warning _dlb_fgetc _doattributes _dochug _dochugw
+functions:95 _display_warning _dlb_fgetc _doattributes _dochug _dochugw
 functions:96 _fill_point _fill_room _fill_zoo _fillholetyp _find_ac _find_branch _find_branch_room _find_defensive
 functions:96 _get_mon_location _get_mplname _get_obj_location _get_rect _get_rect_ind _get_room_loc _get_scr_size _get_shop_item
 functions:97 _get_uchars _get_unused_cs _get_valuables _get_wall_for_db _get_wet _get_wormno _getbones _getdir
@@ -145,7 +145,7 @@ functions:119 _itimeout_incr _its_dead _itsstuck _Japanese_item_name _join _join
 functions:119 _sticks _still_chewing _stock_room _stolen_container _stolen_value _stone_luck _stoned_dialogue _stop_occupation
 functions:120 _kick_monster _kick_object _kickdmg _kickstr _kill_egg _kill_eggs _kill_genocided_monsters _killed
 functions:121 _kind_name _known_hitum _kops_gone _l_monnam _lantern_message _launch_obj _lava_effects 
-functions:122 _ldrname _leader_speaks _leaderless _learn_egg_type _ledger_no _ledger_to_dlev _ledger_to_dnum
+functions:122 _ldrname _leader_speaks _learn_egg_type _ledger_no _ledger_to_dlev _ledger_to_dnum
 functions:123 _left_side _lesshungry _let_to_name _letter _lev_by_name _level_difficulty _level_distance _level_range
 functions:124 _level_tele _level_tele_trap _levl_follower _lifesaved_monster _lift_object _light_cocktail _light_region _lined_up
 functions:125 _linedup _list_genocided _list_vanquished _litroom _litter _little_to_big _llord _lminion
@@ -161,7 +161,7 @@ functions:134 _makerooms
 functions:135 _map_menu_cmd _map_object _map_trap _match_optname _mattackm _mattacku _max_capacity _max_mon_load
 functions:136 _max_passive_dmg _max_rank_sz _maxledgerno _may_dig _may_passwall _maybe_write_ls _maybe_write_timer _mayberem
 functions:137 _maze0xy _maze1xy _mazexy _mb_trapped _mbag_explodes _mbhit _mbhitm _mcalcdistress
-functions:138 _md_rush _md_start _md_stop _mdig_tunnel _meatgold
+functions:138 _md_rush _md_start _md_stop _mdig_tunnel
 functions:139 _meatobj _melt_ice _menu_drop _menu_identify _menu_loot _menu_remarm _mergable _merge_choice
 functions:140 _merged _mfndpos _midnight _migrate_to_level _mineralize _minit _miniwalk _minstapetrify
 functions:140 _On_stairs _on_start _On_W_tower_level _oname _onbill _online2 _only_here _onlyspace
@@ -326,8 +326,6 @@ functions:291 _y_monnam
 ; the following were 225
 functions:294 _erode_armor
 functions:295 _swallowed
-; the following were 233
-functions:296 _erode_weapon
 ; the following were 7
 functions:298 _acurrstr
 ; the following were 17
@@ -387,7 +385,7 @@ functions:348 _wake_nearto
 functions:349 _wakeup 
 functions:350 _walkfrom 
 functions:351 _wall_angle
-functions:352 _able_to_loot _add_artifact_score _add_mon_to_reg _add_rect_to_reg _add_region _addinv_core1
+functions:352 _able_to_loot _add_mon_to_reg _add_rect_to_reg _add_region _addinv_core1
 functions:352 _addinv_core2 _age_spells _align_gtitle _align_shift  _align_str _all_but_uchain 
 functions:353 _allow_all _allow_category  _already_wearing _already_wearing2 _angrygods
 functions:354 _animate_statue _antholemon _arti_speak _assign_warnings _attach_fig_transform_timeout _blocked_boulder
