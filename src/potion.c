@@ -1215,6 +1215,9 @@ boolean your_fault;
 		    if (obj->blessed) {
 			pline("%s %s in pain!", Monnam(mon),
 			      is_silent(mon->data) ? "writhes" : "shrieks");
+			if (!is_silent(mon->data))
+				wake_nearto(mon->mx, mon->my,
+					    mon->data->mlevel * 10);
 			mon->mhp -= d(2,6);
 			/* should only be by you */
 			if (mon->mhp < 1) killed(mon);
@@ -1249,6 +1252,9 @@ boolean your_fault;
 		if (!resists_acid(mon) && !resist(mon, POTION_CLASS, 0, NOTELL)) {
 		    pline("%s %s in pain!", Monnam(mon),
 			  is_silent(mon->data) ? "writhes" : "shrieks");
+		    if (!is_silent(mon->data))
+				wake_nearto(mon->mx, mon->my,
+					    mon->data->mlevel * 10);
 		    mon->mhp -= d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
 		    if (mon->mhp < 1) {
 			if (your_fault)
