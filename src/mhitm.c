@@ -1411,7 +1411,7 @@ int mdead;
 		    if (magr->mcansee && haseyes(madat) && mdef->mcansee &&
 			(perceives(madat) || !mdef->minvis)) {
 			Sprintf(buf, "%s gaze is reflected by %%s %%s.",
-				s_suffix(mon_nam(mdef)));
+				s_suffix(Monnam(mdef)));
 			if (mon_reflects(magr,
 					 canseemon(magr) ? buf : (char *)0))
 				return(mdead|mhit);
