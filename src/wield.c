@@ -52,14 +52,6 @@
 
 STATIC_DCL int FDECL(ready_weapon, (struct obj *));
 
-/* elven weapons vibrate warningly when enchanted beyond a limit */
-#define is_elven_weapon(optr)	((optr)->otyp == ELVEN_ARROW\
-				|| (optr)->otyp == ELVEN_SPEAR\
-				|| (optr)->otyp == ELVEN_DAGGER\
-				|| (optr)->otyp == ELVEN_SHORT_SWORD\
-				|| (optr)->otyp == ELVEN_BROADSWORD\
-				|| (optr)->otyp == ELVEN_BOW)
-
 /* used by will_weld() */
 /* probably should be renamed */
 #define erodeable_wep(optr)	((optr)->oclass == WEAPON_CLASS \
@@ -701,6 +693,7 @@ register int amount;
 	}
 
 	/* an elven magic clue, cookie@keebler */
+	/* elven weapons vibrate warningly when enchanted beyond a limit */
 	if ((uwep->spe > 5)
 		&& (is_elven_weapon(uwep) || uwep->oartifact || !rn2(7)))
 	    Your("%s unexpectedly.",

@@ -185,6 +185,12 @@ struct obj {
 				|| (otmp)->otyp == ELVEN_CLOAK\
 				|| (otmp)->otyp == ELVEN_SHIELD\
 				|| (otmp)->otyp == ELVEN_BOOTS)
+#define is_elven_weapon(otmp)	((otmp)->otyp == ELVEN_ARROW\
+				|| (otmp)->otyp == ELVEN_SPEAR\
+				|| (otmp)->otyp == ELVEN_DAGGER\
+				|| (otmp)->otyp == ELVEN_SHORT_SWORD\
+				|| (otmp)->otyp == ELVEN_BROADSWORD\
+				|| (otmp)->otyp == ELVEN_BOW)
 #define is_orcish_armor(otmp)	((otmp)->otyp == ORCISH_HELM\
 				|| (otmp)->otyp == ORCISH_CHAIN_MAIL\
 				|| (otmp)->otyp == ORCISH_RING_MAIL\
