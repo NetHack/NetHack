@@ -43,7 +43,7 @@ on.
         \        An opulent throne.
         `        A boulder or statue.
         A to Z, a to z, and several others:  Monsters.
-        I        Invisible monster's last known location
+        I        Invisible or unseen monster's last known location
 
                  You can find out what a symbol represents by typing
                  '/' and following the directions to move the cursor
@@ -60,7 +60,10 @@ b j n   1 2 3           g<dir>:   run in direction <dir> until something
                         G<dir>,   same, except a branching corridor isn't
  <  up                  ^<dir>:     considered interesting
  >  down                m<dir>:   move without picking up objects
+                        F<dir>:   fight even if you don't sense a monster
                 If the number_pad option is set, the number keys move instead.
+                Depending on the platform, Shift number (on the numberpad),
+                Meta number, or Alt number will invoke the YUHJKLBN commands.
 
 Commands:
         NetHack knows the following commands:
@@ -162,15 +165,17 @@ Commands:
                 has a meta key (which, when pressed in combination with another
                 key, modifies it by setting the 'meta' (8th, or 'high') bit),
                 these extended commands can be invoked by meta-ing the first
-                letter of the command.
+                letter of the command.  An alt key may have a similar effect.
 
         If the "number_pad" option is on, some additional letter commands
         are available:
 
+        h       displays the help menu, like '?'
         j       Jump to another location.
         k       Kick (for doors, usually).
         l       Loot a box on the floor.
-        n       Name an object or type of object.
+        n       followed by number of times to repeat the next command
+        N       Name an object or type of object.
         u       Untrap a trapped object or door.
 
         You can put a number before a command to repeat it that many times,
@@ -178,7 +183,8 @@ Commands:
         must type 'n' to prefix the count, as in "n40." or "n20s".
 
 
-        Some information is displayed on the bottom line.  You see your
+        Some information is displayed on the bottom line or perhaps in a
+        box, depending on the platform you are using.  You see your
         attributes, your alignment, what dungeon level you are on, how many
         hit points you have now (and will have when fully recovered), what
         your armor class is (the lower the better), your experience level,

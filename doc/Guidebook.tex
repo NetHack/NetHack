@@ -274,6 +274,7 @@ In order to understand what is going on in {\it NetHack}, first you must
 understand what {\it NetHack\/} is doing with the screen.  The {\it NetHack\/}
 screen replaces the ``You see \ldots'' descriptions of text adventure games.
 Figure 1 is a sample of what a {\it NetHack\/} screen might look like.
+The way the screen looks for you depends on your platform.
 
 \vbox{
 \begin{verbatim}
@@ -288,7 +289,7 @@ Figure 1 is a sample of what a {\it NetHack\/} screen might look like.
 
 
 
-        Player the Rambler         St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15  Neutral
+        Player the Rambler     St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15  Neutral
         Dlvl:1  $:0  HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:257 Weak
 \end{verbatim}
 \begin{center}
@@ -960,9 +961,12 @@ letter of the command.
 In {\it NT, OS/2, {\rm and} PC NetHack},
 the `Alt' key can be used in this fashion.
 \blist{}
+%.lp 
+\item[\tb{M-?}]
+{\tt\#?} (not supported by all platforms)
 %.lp
 \item[\tb{M-2}]
-{\tt\#twoweapon}
+{\tt\#twoweapon} (unless the {\it number\_pad\/} option is enabled)
 %.lp
 \item[\tb{M-a}]
 {\tt\#adjust}
@@ -1026,6 +1030,9 @@ the `Alt' key can be used in this fashion.
 \nd If the {\it number\_pad\/} option is on, some additional letter commands
 are available:
 \blist{}
+%.lp 
+\item[\tb{h}]
+Help menu:  display one of several help texts available, like ``{\tt ?}''.
 %.lp
 \item[\tb{j}]
 Jump to another location.  Same as ``{\tt \#jump}'' or ``{\tt M-j}''.
@@ -1038,7 +1045,7 @@ Loot a box or bag on the floor beneath you, or the saddle
 from a horse standing next to you.  Same as ``{\tt \#loot}'' or ``{\tt M-l}''.
 %.lp
 \item[\tb{N}]
-Name an object or type of object.  Same as ``{\tt \#name}'' or ``{\tt M-N}''.
+Name an object or type of object.  Same as ``{\tt \#name}'' or ``{\tt M-n}''.
 %.lp
 \item[\tb{u}]
 Untrap a trap, door, or chest.  Same as ``{\tt \#untrap}'' or ``{\tt M-u}''.

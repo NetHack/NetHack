@@ -30,7 +30,7 @@ f       Fire ammunition from quiver
 F       Followed by direction, fight a monster (even if you don't sense it)
 g       Followed by direction, move until you are near something
 G       Followed by direction, same as control-direction
-h       Go west 1 space
+h       Go west 1 space (if number_pad is on, display help message)
 H       Go west until you are on top of something
 ^H      Go west until you are near something
 i       Show your inventory
@@ -98,7 +98,8 @@ _       Travel via a shortest-path algorithm to a point on the map
 $       Count your gold
 +       List known spells
 #       Perform an extended command
-M-2     Toggle two-weapon combat
+M-?     Display extended command help (if the platform allows this)
+M-2     Toggle two-weapon combat (unless number_pad is enabled)
 M-a     Adjust inventory letters
 M-c     Talk to someone
 M-d     Dip an object into something

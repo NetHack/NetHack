@@ -1,8 +1,10 @@
-.TH NETHACK 6 "17 November 1999"
+.TH NETHACK 6 "12 March 2002"
 .UC 4
 .SH NAME
 nethack \- Exploring The Mazes of Menace
 .SH SYNOPSIS
+.na
+.hy 0
 .B nethack
 [
 .B \-d
@@ -32,7 +34,7 @@ nethack \- Exploring The Mazes of Menace
 [
 .B \-ibm
 ]
-.br
+.PP
 .B nethack
 [
 .B \-d
@@ -53,6 +55,8 @@ nethack \- Exploring The Mazes of Menace
 [
 .I playernames
 ]
+.ad
+.hy 14
 .SH DESCRIPTION
 .PP
 .I NetHack
@@ -105,8 +109,8 @@ graphics characters), options may also be included in a configuration
 file.
 The default is located in your home directory and
 named .nethackrc on Unix systems.  On other systems, the default may be
-different, usually NetHack.cnf.  On DOS the name is defaults.nh, while
-on the Macintosh or BeOS, it is NetHack Defaults.
+different, usually NetHack.cnf.  On DOS or Windows, the name is
+defaults.nh, while on the Macintosh or BeOS, it is NetHack Defaults.
 The configuration file's location may be specified by setting NETHACKOPTIONS
 to a string consisting of an @ character followed by the filename.
 .PP
@@ -123,7 +127,20 @@ Conversely, you must use the appropriate player name to restore a saved game.
 .PP
 A
 .I playername
-suffix or a separate option,
+suffix can be used to specify the profession, race, alignment and/or gender
+of the character.  The full syntax of the playername that includes a
+suffix is "name-ppp-rrr-aaa-ggg".  "ppp" are at least the first three letters
+of the profession (this can also be specified using a separate 
+.B \-p
+.I profession
+option).  "rrr" are at least the first three letters of the character's
+race (this can also be specified using a separate 
+.B \-r
+.I race
+option).  "aaa" are at last the first three letters of the character's
+alignment, and "ggg" are at least the first three letters of the
+character's gender.  Any of the parts of the suffix may be left out.
+.PP
 .B \-p
 .I profession
 can be used to determine the character role.  You can specify either the
@@ -140,9 +157,9 @@ Likewise,
 .I race
 can be used to explicitly request that a race be chosen.
 .PP
+Leaving out any of these characteristics will result in you being prompted
+during the game startup for the information.
 .PP
-Leaving out either of these will result in you being prompted during
-the game startup for the information.
 .PP
 The
 .B \-s

@@ -9,6 +9,8 @@ b j n   1 2 3           g<dir>:   run in direction <dir> until something
  >  down                m<dir>:   move without picking up objects/fighting
                         F<dir>:   fight even if you don't sense a monster
                 If the number_pad option is set, the number keys move instead.
+                Depending on the platform, Shift number (on the numberpad),
+                Meta number, or Alt number will invoke the YUHJKLBN commands.
 
 General commands:
 ?       help    display one of several informative texts
@@ -78,7 +80,8 @@ _       travel  move via a shortest-path algorithm to a point on the map
 Keyboards that have a meta key can also use these extended commands
 via the meta modifier instead of the # prefix:
 
-M-2     twoweapon toggle two-weapon combat
+M-?             Display extended command help (if the platform allows this)
+M-2     twoweapon toggle two-weapon combat (unless number_pad is enabled)
 M-a     adjust  adjust inventory letters
 M-c     chat    talk to someone
 M-d     dip     dip an object into something
@@ -102,6 +105,7 @@ M-w     wipe    wipe off your face
 If the "number_pad" option is on, these additional variants are available:
 
 n               followed by number of times to repeat the next command
+h       help    display one of several informative texts, like '?'
 j       jump    jump to another location
 k       kick    kick something (usually a door)
 l       loot    loot a box on the floor

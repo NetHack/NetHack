@@ -189,6 +189,7 @@ In order to understand what is going on in NetHack, first you must
 understand what NetHack is doing with the screen.  The NetHack screen
 replaces the ``You see ...'' descriptions of text adventure games.
 Figure 1 is a sample of what a NetHack screen might look like.
+The way the screen looks for you depends on your platform.
 
 .TS S
 center tab(~);
@@ -205,7 +206,7 @@ The bat bites!
 
 
 
-Player the Rambler         St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15  Neutral
+Player the Rambler     St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15  Neutral
 Dlvl:1 $:0  HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:257 Weak
 
 _
@@ -719,8 +720,10 @@ letter of the command.
 .\" on the Amiga set the {\it altmeta\/} option to get this behavior.
 In NT, OS/2, and PC NetHack, the `Alt' key
 can be used in this fashion.
+.lp M-?
+#? (not supported by all platforms)
 .lp M-2
-#twoweapon
+#twoweapon (unless the number_pad option is enabled)
 .lp M-a
 #adjust
 .lp M-c
@@ -763,6 +766,8 @@ can be used in this fashion.
 If the
 .op number_pad
 option is on, some additional letter commands are available:
+.lp h
+Help menu:  display one of several help texts available, like ``?''.
 .lp j
 Jump to another location.  Same as ``#jump'' or ``M-j''.
 .lp k
@@ -771,7 +776,7 @@ Kick something (usually a door).  Same as `^D'.
 Loot a box or bag on the floor beneath you, or the saddle 
 from a horse standing next to you.  Same as ``#loot'' or ``M-l''.
 .lp N
-Name an item or type of object.  Same as ``#name'' or ``M-N''.
+Name an item or type of object.  Same as ``#name'' or ``M-n''.
 .lp u
 Untrap a trap, door, or chest.  Same as ``#untrap'' or ``M-u''.
 
