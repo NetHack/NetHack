@@ -46,7 +46,7 @@ STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 void FDECL( amii_speaker, ( struct obj *, char *, int ) );
 #endif
 
-static char no_elbow_room[] = "don't have enough elbow-room to maneuver.";
+static const char no_elbow_room[] = "don't have enough elbow-room to maneuver.";
 
 #ifdef TOURIST
 STATIC_OVL int
@@ -192,7 +192,7 @@ int rx, ry, *resp;
 	return FALSE;
 }
 
-static char hollow_str[] = "a hollow sound.  This must be a secret %s!";
+static const char hollow_str[] = "a hollow sound.  This must be a secret %s!";
 
 /* Strictly speaking it makes no sense for usage of a stethoscope to
    not take any time; however, unless it did, the stethoscope would be
@@ -291,7 +291,7 @@ use_stethoscope(obj)
 	return res;
 }
 
-static char whistle_str[] = "produce a %s whistling sound.";
+static const char whistle_str[] = "produce a %s whistling sound.";
 
 STATIC_OVL void
 use_whistle(obj)
@@ -617,7 +617,7 @@ struct obj *obj;
 
 #define WEAK	3	/* from eat.c */
 
-static char look_str[] = "look %s.";
+static const char look_str[] = "look %s.";
 
 STATIC_OVL int
 use_mirror(obj)
@@ -1839,7 +1839,7 @@ struct obj *tstone;
     const char *streak_color;
     char stonebuf[QBUFSZ];
     static const char scritch[] = "\"scritch, scritch\"";
-    static char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
+    static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
 #ifndef GOLDOBJ
     struct obj goldobj;
 #endif
@@ -2317,9 +2317,9 @@ struct obj *obj;
 
 
 static const char
-	*not_enough_room = "There's not enough room here to use that.",
-	*where_to_hit = "Where do you want to hit?",
-	*cant_see_spot = "won't hit anything if you can't see that spot.";
+	not_enough_room[] = "There's not enough room here to use that.",
+	where_to_hit[] = "Where do you want to hit?",
+	cant_see_spot[] = "won't hit anything if you can't see that spot.";
 
 /* Distance attacks by pole-weapons */
 STATIC_OVL int

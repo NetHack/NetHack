@@ -753,7 +753,7 @@ d_level *where;
 	    else	return "near you";
 }
 
-static struct {
+static const struct {
     const char *what;
     d_level *where;
 } level_detects[] = {

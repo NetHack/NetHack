@@ -17,7 +17,7 @@ STATIC_DCL void FDECL(cleanup_burn, (genericptr_t,long));
 #ifdef OVLB
 
 /* He is being petrified - dialogue by inmet!tower */
-static NEARDATA const char *stoned_texts[] = {
+static NEARDATA const char * const stoned_texts[] = {
 	"You are slowing down.",		/* 5 */
 	"Your limbs are stiffening.",		/* 4 */
 	"Your limbs have turned to stone.",	/* 3 */
@@ -40,7 +40,7 @@ stoned_dialogue()
 }
 
 /* He is getting sicker and sicker prior to vomiting */
-static NEARDATA const char *vomiting_texts[] = {
+static NEARDATA const char * const vomiting_texts[] = {
 	"are feeling mildly nauseous.",		/* 14 */
 	"feel slightly confused.",		/* 11 */
 	"can't seem to think straight.",	/* 8 */
@@ -72,7 +72,7 @@ vomiting_dialogue()
 	exercise(A_CON, FALSE);
 }
 
-static NEARDATA const char *choke_texts[] = {
+static NEARDATA const char * const choke_texts[] = {
 	"You find it hard to breathe.",
 	"You're gasping for air.",
 	"You can no longer breathe.",
@@ -80,7 +80,7 @@ static NEARDATA const char *choke_texts[] = {
 	"You suffocate."
 };
 
-static NEARDATA const char *choke_texts2[] = {
+static NEARDATA const char * const choke_texts2[] = {
 	"Your %s is becoming constricted.",
 	"Your blood is having trouble reaching your brain.",
 	"The pressure on your %s increases.",
@@ -108,7 +108,7 @@ choke_dialogue()
 	exercise(A_STR, FALSE);
 }
 
-static NEARDATA const char *slime_texts[] = {
+static NEARDATA const char * const slime_texts[] = {
 	"You are turning a little %s.",           /* 5 */
 	"Your limbs are getting oozy.",              /* 4 */
 	"Your skin begins to peel away.",            /* 3 */
@@ -1309,7 +1309,7 @@ typedef struct {
 } ttable;
 
 /* table of timeout functions */
-static ttable timeout_funcs[NUM_TIME_FUNCS] = {
+static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
     TTAB(rot_organic,	(timeout_proc)0,	"rot_organic"),
     TTAB(rot_corpse,	(timeout_proc)0,	"rot_corpse"),
     TTAB(revive_mon,	(timeout_proc)0,	"revive_mon"),

@@ -7,7 +7,7 @@
 #ifdef OVL0
 extern const char *hu_stat[];	/* defined in eat.c */
 
-const char *enc_stat[] = {
+const char * const enc_stat[] = {
 	"",
 	"Burdened",
 	"Stressed",

@@ -13,10 +13,10 @@
 
 	/* part of the output on gain or loss of attribute */
 static
-const char	*plusattr[] = {
+const char	* const plusattr[] = {
 	"strong", "smart", "wise", "agile", "tough", "charismatic"
 },
-		*minusattr[] = {
+		* const minusattr[] = {
 	"weak", "stupid", "foolish", "clumsy", "fragile", "repulsive"
 };
 

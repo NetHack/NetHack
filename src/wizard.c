@@ -550,7 +550,7 @@ wizdead()
 	}
 }
 
-const char *random_insult[] = {
+const char * const random_insult[] = {
 	"antic",
 	"blackguard",
 	"caitiff",
@@ -581,7 +581,7 @@ const char *random_insult[] = {
 	"wretch",
 };
 
-const char *random_malediction[] = {
+const char * const random_malediction[] = {
 	"Hell shall soon claim thy remains,",
 	"I chortle at thee, thou pathetic",
 	"Prepare to die, thou",

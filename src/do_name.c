@@ -49,7 +49,7 @@ const char *goal;
     int cx, cy, i, c;
     int sidx, tx, ty;
     boolean msg_given = TRUE;	/* clear message window by default */
-    static const char *pick_chars = ".,;:";
+    static const char pick_chars[] = ".,;:";
     const char *cp;
     const char *sdp;
     if(iflags.num_pad) sdp = ndir; else sdp = sdir;	/* DICE workaround */
@@ -525,7 +525,7 @@ register struct obj *obj;
 #endif /*OVLB*/
 #ifdef OVL0
 
-static const char *ghostnames[] = {
+static const char * const ghostnames[] = {
 	/* these names should have length < PL_NSIZ */
 	/* Capitalize the names for aesthetics -dgk */
 	"Adri", "Andries", "Andreas", "Bert", "David", "Dirk", "Emile",
@@ -871,7 +871,7 @@ char *outbuf;
     return outbuf;
 }
 
-static const char *bogusmons[] = {
+static const char * const bogusmons[] = {
 	"jumbo shrimp", "giant pigmy", "gnu", "killer penguin",
 	"giant cockroach", "giant slug", "maggot", "pterodactyl",
 	"tyrannosaurus rex", "basilisk", "beholder", "nightmare",
@@ -968,7 +968,7 @@ roguename() /* Name of a Rogue player */
 
 #ifdef OVL2
 
-static NEARDATA const char *hcolors[] = {
+static NEARDATA const char * const hcolors[] = {
 	"ultraviolet", "infrared", "bluish-orange",
 	"reddish-green", "dark white", "light black", "sky blue-pink",
 	"salty", "sweet", "sour", "bitter",
@@ -991,7 +991,7 @@ const char *colorpref;
 /* Aliases for road-runner nemesis
  * See also http://www.geocities.com/EnchantedForest/1141/latin.html
  */
-static const char *coynames[] = {
+static const char * const coynames[] = {
 	"Carnivorous Vulgaris","Road-Runnerus Digestus",
 	"Eatibus Anythingus"  ,"Famishus-Famishus",
 	"Eatibus Almost Anythingus","Eatius Birdius",

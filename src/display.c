@@ -1857,7 +1857,7 @@ STATIC_OVL void
 t_warn(lev)
     struct rm *lev;
 {
-    static const char *warn_str = "wall_angle: %s: case %d: seenv = 0x%x";
+    static const char warn_str[] = "wall_angle: %s: case %d: seenv = 0x%x";
     const char *wname;
 
     if (lev->typ == TUWALL) wname = "tuwall";

@@ -56,7 +56,7 @@ STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 };
 
 /* note: entry [0] isn't used */
-STATIC_VAR NEARDATA const char *odd_skill_names[] = {
+STATIC_VAR NEARDATA const char * const odd_skill_names[] = {
     "no skill",
     "bare hands",		/* use barehands_or_martial[] instead */
     "two weapon combat",
@@ -74,7 +74,7 @@ STATIC_VAR NEARDATA const char *odd_skill_names[] = {
     "matter spells",
 };
 /* indexed vis `is_martial() */
-STATIC_VAR NEARDATA const char *barehands_or_martial[] = {
+STATIC_VAR NEARDATA const char * const barehands_or_martial[] = {
     "bare handed combat", "martial arts"
 };
 
@@ -472,7 +472,7 @@ register struct monst *mtmp;
 }
 
 /* Weapons in order of preference */
-static NEARDATA short hwep[] = {
+static const NEARDATA short hwep[] = {
 	  CORPSE,  /* cockatrice corpse */
 	  TSURUGI, RUNESWORD, DWARVISH_MATTOCK, TWO_HANDED_SWORD, BATTLE_AXE,
 	  KATANA, UNICORN_HORN, CRYSKNIFE, TRIDENT, LONG_SWORD,
@@ -835,7 +835,7 @@ int skill;
 	P_NAME(skill));
 }
 
-static struct skill_range {
+const static struct skill_range {
 	short first, last;
 	const char *name;
 } skill_ranges[] = {
@@ -1237,7 +1237,7 @@ struct obj *weapon;
  */
 void
 skill_init(class_skill)
-struct def_skill *class_skill;
+const struct def_skill *class_skill;
 {
 	struct obj *obj;
 	int skmax, skill;

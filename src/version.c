@@ -112,7 +112,7 @@ void
 store_version(fd)
 int fd;
 {
-	static struct version_info version_data = {
+	const static struct version_info version_data = {
 			VERSION_NUMBER, VERSION_FEATURES,
 			VERSION_SANITY1, VERSION_SANITY2
 	};

@@ -410,7 +410,7 @@ cleanup:
 		digging.level.dlevel = -1;
 		return(0);
 	} else {		/* not enough effort has been spent yet */
-		static const char *d_target[6] = {
+		static const char *const d_target[6] = {
 			"", "rock", "statue", "boulder", "door", "tree"
 		};
 		int dig_target = dig_typ(uwep, dpx, dpy);
@@ -923,7 +923,7 @@ struct obj *obj;
 			    You("swing your %s through thin air.",
 				aobjnam(obj, (char *)0));
 		} else {
-			static const char *d_action[6] = {
+			static const char * const d_action[6] = {
 						"swinging",
 						"digging",
 						"chipping the statue",

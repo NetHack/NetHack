@@ -76,7 +76,7 @@ STATIC_DCL void FDECL(nsb_unmung_line,(char*));
 #endif
 
 /* must fit with end.c; used in rip.c */
-NEARDATA const char *killed_by_prefix[] = {
+NEARDATA const char * const killed_by_prefix[] = {
 	"killed by ", "choked on ", "poisoned by ", "", "drowned in ",
 	"burned by ", "dissolved in ", "crushed to death by ", "petrified by ",
 	"turned to slime by ", "killed by ", "", "", "", "", ""
@@ -128,13 +128,13 @@ FILE *rfile;
 struct toptenentry *tt;
 {
 #ifdef NO_SCAN_BRACK /* Version_ Pts DgnLevs_ Hp___ Died__Born id */
-	static const char *fmt = "%d %d %d %ld %d %d %d %d %d %d %ld %ld %d%*c";
-	static const char *fmt32 = "%c%c %s %s%*c";
-	static const char *fmt33 = "%s %s %s %s %s %s%*c";
+	static const char fmt[] = "%d %d %d %ld %d %d %d %d %d %d %ld %ld %d%*c";
+	static const char fmt32[] = "%c%c %s %s%*c";
+	static const char fmt33[] = "%s %s %s %s %s %s%*c";
 #else
-	static const char *fmt = "%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ";
-	static const char *fmt32 = "%c%c %[^,],%[^\n]%*c";
-	static const char *fmt33 = "%s %s %s %s %[^,],%[^\n]%*c";
+	static const char fmt[] = "%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ";
+	static const char fmt32[] = "%c%c %[^,],%[^\n]%*c";
+	static const char fmt33[] = "%s %s %s %s %[^,],%[^\n]%*c";
 #endif
 
 #ifdef UPDATE_RECORD_IN_PLACE

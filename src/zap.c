@@ -62,7 +62,7 @@ extern const char *flash_types[];
 #else
 STATIC_VAR const char are_blinded_by_the_flash[] = "are blinded by the flash!";
 
-const char *flash_types[] = {		/* also used in buzzmu(mcastu.c) */
+const char * const flash_types[] = {		/* also used in buzzmu(mcastu.c) */
 	"magic missile",	/* Wands must be 0-9 */
 	"bolt of fire",
 	"bolt of cold",
@@ -3752,7 +3752,7 @@ register struct obj *obj;
 	return TRUE;
 }
 
-const char *destroy_strings[] = {
+const char * const destroy_strings[] = {
 	"freezes and shatters", "freeze and shatter", "shattered potion",
 	"boils and explodes", "boil and explode", "boiling potion",
 	"catches fire and burns", "catch fire and burn", "burning scroll",

@@ -17,20 +17,20 @@ static boolean cancelled_don = FALSE;
 
 static NEARDATA const char see_yourself[] = "see yourself";
 static NEARDATA const char unknown_type[] = "Unknown type of %s (%d)";
-static NEARDATA const char *c_armor  = "armor",
-			   *c_suit   = "suit",
+static NEARDATA const char c_armor[]  = "armor",
+			   c_suit[]   = "suit",
 #ifdef TOURIST
-			   *c_shirt  = "shirt",
+			   c_shirt[]  = "shirt",
 #endif
-			   *c_cloak  = "cloak",
-			   *c_gloves = "gloves",
-			   *c_boots  = "boots",
-			   *c_helmet = "helmet",
-			   *c_shield = "shield",
-			   *c_weapon = "weapon",
-			   *c_sword  = "sword",
-			   *c_axe    = "axe",
-			   *c_that_  = "that";
+			   c_cloak[]  = "cloak",
+			   c_gloves[] = "gloves",
+			   c_boots[]  = "boots",
+			   c_helmet[] = "helmet",
+			   c_shield[] = "shield",
+			   c_weapon[] = "weapon",
+			   c_sword[]  = "sword",
+			   c_axe[]    = "axe",
+			   c_that_[]  = "that";
 
 static NEARDATA const long takeoff_order[] = { WORN_BLINDF, W_WEP,
 	WORN_SHIELD, WORN_GLOVES, LEFT_RING, RIGHT_RING, WORN_CLOAK,

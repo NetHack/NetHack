@@ -876,7 +876,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 		}
 
 		if (youdefend || mdef->mhp > 0) {  /* ??? -dkh- */
-			static const char *mb_verb[4] =
+			static const char * const mb_verb[4] =
 				{"probe", "stun", "scare", "purge"};
 
 			if (youattack || youdefend || vis) {
@@ -987,7 +987,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 		}
 	    } else if (otmp->oartifact == ART_VORPAL_BLADE &&
 			(dieroll == 1 || mdef->data == &mons[PM_JABBERWOCK])) {
-		static const char *behead_msg[2] = {
+		static const char * const behead_msg[2] = {
 		     "%s beheads %s!",
 		     "%s decapitates %s!"
 		};

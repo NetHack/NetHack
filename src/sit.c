@@ -37,7 +37,7 @@ take_gold()
 int
 dosit()
 {
-	static const char *sit_message = "sit on the %s.";
+	static const char sit_message[] = "sit on the %s.";
 	register struct trap *trap;
 	register int typ = levl[u.ux][u.uy].typ;
 
@@ -312,7 +312,7 @@ rndcurse()			/* curse a few inventory items at random! */
 	int	nobj = 0;
 	int	cnt, onum;
 	struct	obj	*otmp;
-	static const char *mal_aura = "feel a malignant aura surround %s.";
+	static const char mal_aura[] = "feel a malignant aura surround %s.";
 
 	if (uwep && (uwep->oartifact == ART_MAGICBANE) && rn2(20)) {
 	    You(mal_aura, "the magic-absorbing blade");

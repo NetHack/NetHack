@@ -38,11 +38,11 @@ STATIC_VAR const char * const blindgas[6];
 
 #else
 
-STATIC_VAR const char *a_your[2] = { "a", "your" };
-STATIC_VAR const char *A_Your[2] = { "A", "Your" };
-STATIC_VAR const char *the_your[2] = { "the", "your" };
+STATIC_VAR const char * const a_your[2] = { "a", "your" };
+STATIC_VAR const char * const A_Your[2] = { "A", "Your" };
+STATIC_VAR const char * const the_your[2] = { "the", "your" };
 STATIC_VAR const char tower_of_flame[] = "tower of flame";
-STATIC_VAR const char *A_gush_of_water_hits = "A gush of water hits";
+STATIC_VAR const char * const A_gush_of_water_hits = "A gush of water hits";
 STATIC_VAR const char * const blindgas[6] = 
 	{"humid", "odorless", "pungent", "chilling", "acrid", "biting"};
 
@@ -120,8 +120,8 @@ int type;
 boolean print;
 struct monst *victim;
 {
-	static NEARDATA const char *action[] = { "smoulder", "rust", "rot", "corrode" };
-	static NEARDATA const char *msg[] =  { "burnt", "rusted", "rotten", "corroded" };
+	static NEARDATA const char * const action[] = { "smoulder", "rust", "rot", "corrode" };
+	static NEARDATA const char * const msg[] =  { "burnt", "rusted", "rotten", "corroded" };
 	boolean vulnerable = FALSE;
 	boolean grprot = FALSE;
 	boolean is_primary = TRUE;
@@ -3668,7 +3668,7 @@ unconscious()
 		!strncmp(nomovemsg,"You are consci", 14))));
 }
 
-static char lava_killer[] = "molten lava";
+static const char lava_killer[] = "molten lava";
 
 boolean
 lava_effects()

@@ -251,7 +251,7 @@ static struct inv_sub { short race_pm, item_otyp, subs_otyp; } inv_subs[] = {
     { NON_PM,	STRANGE_OBJECT,		STRANGE_OBJECT	      }
 };
 
-static struct def_skill Skill_A[] = {
+static const struct def_skill Skill_A[] = {
     { P_DAGGER, P_BASIC },		{ P_KNIFE,  P_BASIC },
     { P_PICK_AXE, P_EXPERT },		{ P_SHORT_SWORD, P_BASIC },
     { P_SCIMITAR, P_SKILLED },		{ P_SABER, P_EXPERT },
@@ -269,7 +269,7 @@ static struct def_skill Skill_A[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_B[] = {
+static const struct def_skill Skill_B[] = {
     { P_DAGGER, P_BASIC },		{ P_AXE, P_EXPERT },
     { P_PICK_AXE, P_EXPERT },		{ P_SHORT_SWORD, P_BASIC },
     { P_BROAD_SWORD, P_SKILLED },	{ P_LONG_SWORD, P_SKILLED },
@@ -288,7 +288,7 @@ static struct def_skill Skill_B[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_C[] = {
+static const struct def_skill Skill_C[] = {
     { P_DAGGER, P_BASIC },		{ P_KNIFE,  P_SKILLED },
     { P_AXE, P_SKILLED },		{ P_PICK_AXE, P_BASIC },
     { P_CLUB, P_EXPERT },		{ P_MACE, P_EXPERT },
@@ -303,7 +303,7 @@ static struct def_skill Skill_C[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_H[] = {
+static const struct def_skill Skill_H[] = {
     { P_DAGGER, P_SKILLED },		{ P_KNIFE, P_EXPERT },
     { P_SHORT_SWORD, P_SKILLED },	{ P_SCIMITAR, P_BASIC },
     { P_SABER, P_BASIC },		{ P_CLUB, P_SKILLED },
@@ -317,7 +317,7 @@ static struct def_skill Skill_H[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_K[] = {
+static const struct def_skill Skill_K[] = {
     { P_DAGGER, P_BASIC },		{ P_KNIFE, P_BASIC },
     { P_AXE, P_SKILLED },		{ P_PICK_AXE, P_BASIC },
     { P_SHORT_SWORD, P_SKILLED },	{ P_BROAD_SWORD, P_SKILLED },
@@ -339,7 +339,7 @@ static struct def_skill Skill_K[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_Mon[] = {
+static const struct def_skill Skill_Mon[] = {
     { P_QUARTERSTAFF, P_BASIC },    { P_SPEAR, P_BASIC },
     { P_JAVELIN, P_BASIC },		    { P_CROSSBOW, P_BASIC },
     { P_SHURIKEN, P_BASIC },
@@ -351,7 +351,7 @@ static struct def_skill Skill_Mon[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_P[] = {
+static const struct def_skill Skill_P[] = {
     { P_CLUB, P_EXPERT },		{ P_MACE, P_EXPERT },
     { P_MORNING_STAR, P_EXPERT },	{ P_FLAIL, P_EXPERT },
     { P_HAMMER, P_EXPERT },		{ P_QUARTERSTAFF, P_EXPERT },
@@ -367,7 +367,7 @@ static struct def_skill Skill_P[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_R[] = {
+static const struct def_skill Skill_R[] = {
     { P_DAGGER, P_EXPERT },		{ P_KNIFE,  P_EXPERT },
     { P_SHORT_SWORD, P_EXPERT },	{ P_BROAD_SWORD, P_SKILLED },
     { P_LONG_SWORD, P_SKILLED },	{ P_TWO_HANDED_SWORD, P_BASIC },
@@ -387,7 +387,7 @@ static struct def_skill Skill_R[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_Ran[] = {
+static const struct def_skill Skill_Ran[] = {
     { P_DAGGER, P_EXPERT },		 { P_KNIFE,  P_SKILLED },
     { P_AXE, P_SKILLED },	 { P_PICK_AXE, P_BASIC },
     { P_SHORT_SWORD, P_BASIC },	 { P_MORNING_STAR, P_BASIC },
@@ -408,7 +408,7 @@ static struct def_skill Skill_Ran[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_S[] = {
+static const struct def_skill Skill_S[] = {
     { P_DAGGER, P_BASIC },		{ P_KNIFE,  P_SKILLED },
     { P_SHORT_SWORD, P_EXPERT },	{ P_BROAD_SWORD, P_SKILLED },
     { P_LONG_SWORD, P_EXPERT },		{ P_TWO_HANDED_SWORD, P_EXPERT },
@@ -427,7 +427,7 @@ static struct def_skill Skill_S[] = {
 };
 
 #ifdef TOURIST
-static struct def_skill Skill_T[] = {
+static const struct def_skill Skill_T[] = {
     { P_DAGGER, P_EXPERT },		{ P_KNIFE,  P_SKILLED },
     { P_AXE, P_BASIC },			{ P_PICK_AXE, P_BASIC },
     { P_SHORT_SWORD, P_EXPERT },	{ P_BROAD_SWORD, P_BASIC },
@@ -453,7 +453,7 @@ static struct def_skill Skill_T[] = {
 };
 #endif /* TOURIST */
 
-static struct def_skill Skill_V[] = {
+static const struct def_skill Skill_V[] = {
     { P_DAGGER, P_EXPERT },		{ P_AXE, P_EXPERT },
     { P_PICK_AXE, P_SKILLED },		{ P_SHORT_SWORD, P_SKILLED },
     { P_BROAD_SWORD, P_SKILLED },	{ P_LONG_SWORD, P_EXPERT },
@@ -472,7 +472,7 @@ static struct def_skill Skill_V[] = {
     { P_NONE, 0 }
 };
 
-static struct def_skill Skill_W[] = {
+static const struct def_skill Skill_W[] = {
     { P_DAGGER, P_EXPERT },		{ P_KNIFE,  P_SKILLED },
     { P_AXE, P_SKILLED },		{ P_SHORT_SWORD, P_BASIC },
     { P_CLUB, P_SKILLED },		{ P_MACE, P_BASIC },
@@ -850,7 +850,7 @@ STATIC_OVL boolean
 restricted_spell_discipline(otyp)
 int otyp;
 {
-    struct def_skill *skills;
+    const struct def_skill *skills;
     int this_skill = spell_skilltype(otyp);
 
     switch (Role_switch) {

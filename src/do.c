@@ -1233,13 +1233,13 @@ boolean at_stairs, falling, portal;
 	}
 
 	if (familiar) {
-	    static const char *fam_msgs[4] = {
+	    static const char * const fam_msgs[4] = {
 		"You have a sense of deja vu.",
 		"You feel like you've been here before.",
 		"This place %s familiar...",
 		0	/* no message */
 	    };
-	    static const char *halu_fam_msgs[4] = {
+	    static const char * const halu_fam_msgs[4] = {
 		"Whoa!  Everything %s different.",
 		"You are surrounded by twisty little passages, all alike.",
 		"Gee, this %s like uncle Conan's place...",

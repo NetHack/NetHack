@@ -736,13 +736,13 @@ wiz_show_wmodes()
 /* -enlightenment and conduct- */
 static winid en_win;
 static const char
-	*You_ = "You ",
-	*are  = "are ",  *were  = "were ",
-	*have = "have ", *had   = "had ",
-	*can  = "can ",  *could = "could ";
+	You_[] = "You ",
+	are[]  = "are ",  were[]  = "were ",
+	have[] = "have ", had[]   = "had ",
+	can[]  = "can ",  could[] = "could ";
 static const char
-	*have_been  = "have been ",
-	*have_never = "have never ", *never = "never ";
+	have_been[]  = "have been ",
+	have_never[] = "have never ", never[] = "never ";
 
 #define enl_msg(prefix,present,past,suffix) \
 			enlght_line(prefix, final ? past : present, suffix)
@@ -776,7 +776,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 
 #ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) {
-	    static const char *hofe_titles[3] = {
+	    static const char * const hofe_titles[3] = {
 				"the Hand of Elbereth",
 				"the Envoy of Balance",
 				"the Glory of Arioch"
@@ -1061,8 +1061,8 @@ minimal_enlightenment()
 	menu_item *selected;
 	anything any;
 	char buf[BUFSZ], buf2[BUFSZ];
-	static char fmtstr[] = "%-15s: %-12s";
-	static char deity_fmtstr[] = "%-17s%s";
+	static const char fmtstr[] = "%-15s: %-12s";
+	static const char deity_fmtstr[] = "%-17s%s";
 
 	any.a_void = 0;
 	buf[0] = buf2[0] = '\0';
@@ -1482,9 +1482,9 @@ add_debug_extended_commands()
 }
 
 
-static const char *template = "%-18s %4ld  %6ld";
-static const char *count_str = "                   count  bytes";
-static const char *separator = "------------------ -----  ------";
+static const char template[] = "%-18s %4ld  %6ld";
+static const char count_str[] = "                   count  bytes";
+static const char separator[] = "------------------ -----  ------";
 
 STATIC_OVL void
 count_obj(chain, total_count, total_size, top, recurse)

@@ -31,7 +31,7 @@ struct shclass {
 	    int iprob;		/* probability of an item type */
 	    int itype;	/* item type: if >=0 a class, if < 0 a specific item */
 	} iprobs[5];
-	const char **shknms;	/* list of shopkeeper names for this type */
+	const char * const *shknms;	/* list of shopkeeper names for this type */
 };
 
 extern NEARDATA struct mkroom rooms[(MAXNROFROOMS+1)*2];
