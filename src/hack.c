@@ -600,19 +600,22 @@ int mode;
 			    }
 			} else pline("That door is closed.");
 		    }
-		}
-		if (mode != TEST_TRAV) return FALSE;
+		} else if (mode == TEST_TRAV) goto testdiag;
+		return FALSE;
 	    }
-	} else if (dx && dy && !Passes_walls
-		    && ((tmpr->doormask & ~D_BROKEN)
+	} else {
+	testdiag:
+	    if (dx && dy && !Passes_walls
+		&& ((tmpr->doormask & ~D_BROKEN)
 #ifdef REINCARNATION
-				    || Is_rogue_level(&u.uz)
+		    || Is_rogue_level(&u.uz)
 #endif
-				    || block_door(x,y))) {
-	    /* Diagonal moves into a door are not allowed. */
-	    if (Blind && mode == DO_MOVE)
-		feel_location(x,y);
-	    return FALSE;
+		    || block_door(x,y))) {
+		/* Diagonal moves into a door are not allowed. */
+		if (Blind && mode == DO_MOVE)
+		    feel_location(x,y);
+		return FALSE;
+	    }
 	}
     }
     if (dx && dy
@@ -734,6 +737,18 @@ boolean guess;
 		    int ny = y+ydir[ordered[dir]];
 
 		    if (!isok(nx, ny)) continue;
+		    if ((!Passes_walls && !can_ooze(&youmonst) &&
+			closed_door(x, y)) || sobj_at(BOULDER, x, y)) {
+			/* closed doors and boulders usually
+			 * cause a delay, so prefer another path */
+			if (travel[x][y] > radius-3) {
+			    travelstepx[1-set][nn] = x;
+			    travelstepy[1-set][nn] = y;
+			    /* don't change travel matrix! */
+			    nn++;
+			    continue;
+			}
+		    }
 		    if (test_move(x, y, nx-x, ny-y, TEST_TRAV) &&
 			(levl[nx][ny].seenv || (!Blind && couldsee(nx, ny)))) {
 			if (nx == ux && ny == uy) {
