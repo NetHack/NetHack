@@ -88,11 +88,11 @@ sys/amiga:
 Build.ami       Install.ami     Makefile.ami    Makefile.agc    NetHack.cnf
 amidos.c        amidos.p        amifont.uu      amifont8.uu     amigst.c
 amii.hlp        amimenu.c       amirip.c        amisnd.c        amistack.c
-amitty.c        amiwind.c       amiwind.p       ask.uu          clipwin.c
-colorwin.c      cvtsnd.c        grave16.xpm     ifchange        mkdmake
-txt2iff.c       winami.c        winami.p        winchar.c       windefs.h
-winext.h        winfuncs.c      winkey.c        winmenu.c       winproto.h
-winreq.c        winstr.c        xpm2iff.c
+amitty.c        amiwind.c       amiwind.p       clipwin.c       colorwin.c
+cvtsnd.c        grave16.xpm     ifchange        mkdmake         txt2iff.c
+winami.c        winami.p        winchar.c       windefs.h       winext.h
+winfuncs.c      winkey.c        winmenu.c       winproto.h      winreq.c
+winstr.c        xpm2iff.c
 
 sys/atari:
 (files for Atari version)
@@ -234,9 +234,9 @@ mhmenu.c        mhmenu.h        mhmsg.h         mhmsgwnd.c      mhmsgwnd.h
 mhrip.c         mhrip.h         mhsplash.h      mhsplash.c      mhstatus.c
 mhstatus.h      mhtext.c        mhtext.h        mnsel.uu        mnselcnt.uu
 mnunsel.uu      mswproc.c       nethack.dsw     nethackw.dsp    petmark.uu
-recover.dsp     resource.h      splash.uu       tile2bmp.dsp    tilemap.dsp
-tiles.dsp       tiles.mak       winhack.c       winhack.h       winhack.rc
-winMS.h
+recover.dsp     resource.h      rip.uu          splash.uu       tile2bmp.dsp
+tilemap.dsp     tiles.dsp       tiles.mak       uudecode.dsp    winhack.c
+winhack.h       winhack.rc      winMS.h
 
 
 
