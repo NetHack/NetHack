@@ -2060,7 +2060,7 @@ struct permonst _mons2[] = {
 	M1_BREATHLESS|M1_WALLWALK|M1_THICK_HIDE|M1_METALLIVORE,
 	M2_HOSTILE|M2_STRONG, 0, CLR_BROWN),
 /*
- * Yeti, apes and some large beasts
+ * Apelike beasts
  */
     MON("monkey", S_YETI,
 	LVL(2, 12, 6, 0, 0), (G_GENO|1),
