@@ -1014,6 +1014,13 @@ opentin()		/* called during each move whilst opening a tin */
 	    tin.tin->dknown = tin.tin->known = TRUE;
 	    cprefx(tin.tin->corpsenm); cpostfx(tin.tin->corpsenm);
 
+	    if(((!carried(tin.tin) && costly_spot(tin.tin->ox, tin.tin->oy) &&
+		 !tin.tin->no_charge)
+		|| tin.tin->unpaid)) {
+		verbalize("You open it, you bought it!");
+		bill_dummy_object(tin.tin);
+	    }
+
 	    /* check for vomiting added by GAN 01/16/87 */
 	    if(tintxts[r].nut < 0) make_vomiting((long)rn1(15,10), FALSE);
 	    else lesshungry(tintxts[r].nut);
@@ -1038,6 +1045,15 @@ opentin()		/* called during each move whilst opening a tin */
 		    You("discard the open tin.");
 		goto use_me;
 	    }
+
+	    tin.tin->dknown = tin.tin->known = TRUE;
+	    if(((!carried(tin.tin) && costly_spot(tin.tin->ox, tin.tin->oy) &&
+		 !tin.tin->no_charge)
+		|| tin.tin->unpaid)) {
+		verbalize("You open it, you bought it!");
+		bill_dummy_object(tin.tin);
+	    }
+
 	    if (!tin.tin->cursed)
 		pline("This makes you feel like %s!",
 		      Hallucination ? "Swee'pea" : "Popeye");
@@ -1045,7 +1061,6 @@ opentin()		/* called during each move whilst opening a tin */
 	    gainstr(tin.tin, 0);
 	    u.uconduct.food++;
 	}
-	tin.tin->dknown = tin.tin->known = TRUE;
 use_me:
 	if (carried(tin.tin)) useup(tin.tin);
 	else useupf(tin.tin, 1L);
