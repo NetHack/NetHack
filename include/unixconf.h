@@ -297,7 +297,7 @@
 #endif
 
 /* Use the high quality random number routines. */
-#if defined(BSD) || defined(ULTRIX) || defined(CYGWIN32) || defined(RANDOM)
+#if defined(BSD) || defined(ULTRIX) || defined(CYGWIN32) || defined(RANDOM) || defined(__APPLE__)
 #define Rand()	random()
 #else
 #define Rand()	lrand48()
