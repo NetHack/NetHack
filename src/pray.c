@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.4	2002/01/15	*/
+/*	SCCS Id: @(#)pray.c	3.4	2002/03/02	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1182,7 +1182,7 @@ dosacrifice()
     } /* corpse */
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
-	if (!In_endgame(&u.uz)) {
+	if (!Is_astralevel(&u.uz)) {
 	    if (Hallucination)
 		    You_feel("homesick.");
 	    else
@@ -1634,22 +1634,23 @@ doturn()
 			switch (mtmp->data->mlet) {
 			    /* this is intentional, lichs are tougher
 			       than zombies. */
-			case S_LICH:    xlev += 2;
-			case S_GHOST:   xlev += 2;
-			case S_VAMPIRE: xlev += 2;
-			case S_WRAITH:  xlev += 2;
-			case S_MUMMY:   xlev += 2;
+			case S_LICH:    xlev += 2;  /*FALLTHRU*/
+			case S_GHOST:   xlev += 2;  /*FALLTHRU*/
+			case S_VAMPIRE: xlev += 2;  /*FALLTHRU*/
+			case S_WRAITH:  xlev += 2;  /*FALLTHRU*/
+			case S_MUMMY:   xlev += 2;  /*FALLTHRU*/
 			case S_ZOMBIE:
-			    monflee(mtmp, 0, FALSE, TRUE);	/* at least */
-			    if(u.ulevel >= xlev &&
-			       !resist(mtmp, '\0', 0, NOTELL)) {
-				if(u.ualign.type == A_CHAOTIC) {
+			    if (u.ulevel >= xlev &&
+				    !resist(mtmp, '\0', 0, NOTELL)) {
+				if (u.ualign.type == A_CHAOTIC) {
 				    mtmp->mpeaceful = 1;
+				    set_malign(mtmp);
 				} else { /* damn them */
 				    killed(mtmp);
 				}
-			    }
-			    break;
+				break;
+			    } /* else flee */
+			    /*FALLTHRU*/
 			default:
 			    monflee(mtmp, 0, FALSE, TRUE);
 			    break;
