@@ -335,7 +335,10 @@ struct obj *old_obj, *new_obj;
 		context.victual.piece = new_obj;
 		context.victual.o_id = new_obj->o_id;
 	}
-	if (old_obj == context.tin.tin) context.tin.tin = new_obj;
+	if (old_obj == context.tin.tin) {
+		context.tin.tin = new_obj;
+		context.tin.o_id =new_obj->o_id;
+	}
 }
 
 STATIC_OVL void
@@ -460,8 +463,10 @@ register int pm;
 		    /* It so happens that since we know these monsters */
 		    /* cannot appear in tins, context.victual.piece will always */
 		    /* be what we want, which is not generally true. */
-		    if (revive_corpse(context.victual.piece))
+		    if (revive_corpse(context.victual.piece)) {
 			context.victual.piece = (struct obj *)0;
+			context.victual.o_id = 0;
+		    }
 		    return;
 		}
 	    case PM_GREEN_SLIME:
@@ -1008,6 +1013,7 @@ opentin()		/* called during each move whilst opening a tin */
 	    }
 	    /* in case stop_occupation() was called on previous meal */
 	    context.victual.piece = (struct obj *)0;
+	    context.victual.o_id = 0;
 	    context.victual.fullwarn = context.victual.eating = context.victual.doreset = FALSE;
 
 	    You("consume %s %s.", tintxts[r].txt,
@@ -1028,7 +1034,11 @@ opentin()		/* called during each move whilst opening a tin */
 		|| context.tin.tin->unpaid)) {
 		verbalize("You open it, you bought it!");
 		/* charge for one at pre-eating cost */
-		if(context.tin.tin->quan > 1L) context.tin.tin = splitobj(context.tin.tin, 1L);
+		if(context.tin.tin->quan > 1L) {
+			context.tin.tin = splitobj(context.tin.tin, 1L);
+			if (context.tin.tin)
+				context.tin.o_id = context.tin.tin->o_id;
+		}
 		bill_dummy_object(context.tin.tin);
 	    }
 
@@ -1063,7 +1073,11 @@ opentin()		/* called during each move whilst opening a tin */
 		|| context.tin.tin->unpaid)) {
 		verbalize("You open it, you bought it!");
 		/* charge for one at pre-eating cost */
-		if(context.tin.tin->quan > 1L) context.tin.tin = splitobj(context.tin.tin, 1L);
+		if(context.tin.tin->quan > 1L) {
+			context.tin.tin = splitobj(context.tin.tin, 1L);
+			if (context.tin.tin)
+				context.tin.o_id = context.tin.tin->o_id;
+		}
 		bill_dummy_object(context.tin.tin);
 	    }
 
@@ -1078,6 +1092,7 @@ use_me:
 	if (carried(context.tin.tin)) useup(context.tin.tin);
 	else useupf(context.tin.tin, 1L);
 	context.tin.tin = (struct obj *) 0;
+	context.tin.o_id = 0;
 	return(0);
 }
 
@@ -1136,6 +1151,7 @@ no_opener:
 	context.tin.reqtime = tmp;
 	context.tin.usedtime = 0;
 	context.tin.tin = otmp;
+	if (otmp) context.tin.o_id = otmp->o_id;
 	set_occupation(opentin, "opening the tin", 0);
 	return;
 }
@@ -1548,6 +1564,7 @@ eatspecial() /* called after eating non-food */
 	lesshungry(context.victual.nmod);
 	occupation = 0;
 	context.victual.piece = (struct obj *)0;
+	context.victual.o_id = 0;
 	context.victual.eating = 0;
 	if (otmp->oclass == COIN_CLASS) {
 #ifdef GOLDOBJ
@@ -1888,6 +1905,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    int material;
 	    context.victual.reqtime = 1;
 	    context.victual.piece = otmp;
+	    context.victual.o_id = otmp->o_id;
 		/* Don't split it, we don't need to if it's 1 move */
 	    context.victual.usedtime = 0;
 	    context.victual.canchoke = (u.uhs == SATIATED);
@@ -1939,6 +1957,8 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	 */
 	    if (u.uhs != SATIATED) context.victual.canchoke = FALSE;
 	    context.victual.piece = touchfood(otmp);
+	    if (context.victual.piece)
+	    	context.victual.o_id = context.victual.piece->o_id;
 	    You("resume your meal.");
 	    start_eating(context.victual.piece);
 	    return(1);
@@ -1956,6 +1976,8 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	u.uconduct.food++;
 
 	context.victual.piece = otmp = touchfood(otmp);
+	if (context.victual.piece)
+		context.victual.o_id = context.victual.piece->o_id;
 	context.victual.usedtime = 0;
 
 	/* Now we need to calculate delay and nutritional info.
@@ -1968,6 +1990,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	    if (tmp == 2) {
 		/* used up */
 		context.victual.piece = (struct obj *)0;
+		context.victual.o_id = 0;
 		return(1);
 	    } else if (tmp)
 		dont_start = TRUE;
