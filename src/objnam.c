@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2004/11/11	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2005/01/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1299,12 +1299,12 @@ static const char *wrp[] = {
 	"wand", "ring", "potion", "scroll", "gem", "amulet",
 	"spellbook", "spell book",
 	/* for non-specific wishes */
-	"weapon", "armor", "armour", "tool", "food", "comestible",
+	"weapon", "armor", "tool", "food", "comestible",
 };
 static const char wrpsym[] = {
 	WAND_CLASS, RING_CLASS, POTION_CLASS, SCROLL_CLASS, GEM_CLASS,
 	AMULET_CLASS, SPBOOK_CLASS, SPBOOK_CLASS,
-	WEAPON_CLASS, ARMOR_CLASS, ARMOR_CLASS, TOOL_CLASS, FOOD_CLASS,
+	WEAPON_CLASS, ARMOR_CLASS, TOOL_CLASS, FOOD_CLASS,
 	FOOD_CLASS
 };
 
@@ -1765,12 +1765,6 @@ struct alt_spellings {
 	{ "smooth shield", SHIELD_OF_REFLECTION },
 	{ "grey dragon scale mail", GRAY_DRAGON_SCALE_MAIL },
 	{ "grey dragon scales", GRAY_DRAGON_SCALES },
-	{ "enchant armour", SCR_ENCHANT_ARMOR },
-	{ "destroy armour", SCR_DESTROY_ARMOR },
-	{ "scroll of enchant armour", SCR_ENCHANT_ARMOR },
-	{ "scroll of destroy armour", SCR_DESTROY_ARMOR },
-	{ "leather armour", LEATHER_ARMOR },
-	{ "studded leather armour", STUDDED_LEATHER_ARMOR },
 	{ "iron ball", HEAVY_IRON_BALL },
 	{ "lantern", BRASS_LANTERN },
 	{ "mattock", DWARVISH_MATTOCK },
@@ -2112,6 +2106,12 @@ struct obj *no_wish;
 	/* can't use spellings list for this one due to shuffling */
 	if (!strncmpi(bp, "grey spell", 10))
 		*(bp + 2) = 'a';
+
+	if ((p = strstri(bp, "armour")) != 0) {
+		/* skip past "armo", then copy remainer beyond "u" */
+		p += 4;
+		while ((*p = *(p + 1)) != '\0') ++p;	/* self terminating */
+	}
     }
 
 	/* dragon scales - assumes order of dragons */
@@ -2159,9 +2159,9 @@ struct obj *no_wish;
 		context.botl=1;
 		return (&zeroobj);
 #else
-                otmp = mksobj(GOLD_PIECE, FALSE, FALSE);
+		otmp = mksobj(GOLD_PIECE, FALSE, FALSE);
 		otmp->quan = cnt;
-                otmp->owt = weight(otmp);
+		otmp->owt = weight(otmp);
 		context.botl=1;
 		return (otmp);
 #endif
@@ -2184,8 +2184,8 @@ struct obj *no_wish;
 	   strncmpi(bp, "destroy ", 8) &&
 	   strncmpi(bp, "food detection", 14) &&
 	   strncmpi(bp, "ring mail", 9) &&
-	   strncmpi(bp, "studded leather arm", 19) &&
-	   strncmpi(bp, "leather arm", 11) &&
+	   strncmpi(bp, "studded leather armor", 21) &&
+	   strncmpi(bp, "leather armor", 13) &&
 	   strncmpi(bp, "tooled horn", 11) &&
 	   strncmpi(bp, "food ration", 11) &&
 	   strncmpi(bp, "meat ring", 9)
@@ -2212,6 +2212,7 @@ struct obj *no_wish;
 		}
 	}
 
+retry:
 	/* "grey stone" check must be before general "stone" */
 	for (i = 0; i < SIZE(o_ranges); i++)
 	    if(!strcmpi(bp, o_ranges[i].name)) {
@@ -2292,6 +2293,15 @@ srch:
 			}
 			j++;
 		}
+	}
+	/* if we've stripped off "armor" and failed to match anything
+	   in objects[], append "mail" and try again to catch misnamed
+	   requests like "plate armor" and "yellow dragon scale armor" */
+	if (oclass == ARMOR_CLASS && !strstri(bp, "mail")) {
+		/* modifying bp's string is ok; we're about to resort
+		   to random armor if this also fails to match anything */
+		Strcat(bp, " mail");
+		goto retry;
 	}
 	if (!strcmpi(bp, "spinach")) {
 		contents = SPINACH;
