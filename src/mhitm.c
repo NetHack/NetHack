@@ -689,6 +689,8 @@ mdamagem(magr, mdef, mattk)
 		if (vis)
 		    pline("%s is %s!", Monnam(mdef),
 			  mdef->data == &mons[PM_WATER_ELEMENTAL] ? "boiling" :
+			  mdef->data == &mons[PM_FLAMING_SPHERE] ?
+				"already on fire" :
 			  mattk->aatyp == AT_HUGS ?
 				"being roasted" : "on fire");
 		if (pd == &mons[PM_STRAW_GOLEM] ||

@@ -917,6 +917,8 @@ hitmu(mtmp, mattk)
 		    pline("You're %s!",
 			  youmonst.data == &mons[PM_WATER_ELEMENTAL] ?
 				"boiling" :
+			  youmonst.data == &mons[PM_FLAMING_SPHERE] ?
+				"already on fire" :
 			  mattk->aatyp == AT_HUGS ? "being roasted" :
 			  "on fire");
 		    if (youmonst.data == &mons[PM_STRAW_GOLEM] ||
