@@ -54,7 +54,7 @@ nethack-bugs@nethack.org
 
 Steps used to build this binary release
 
-System:  gcc-3.2, XFree86-libs-4.2.0, ncurses-5.2, glibc-2.2.93
+System:  gcc-3.2, XFree86-libs-4.2.0, ncurses-5.2, glibc-2.2.93 (GLIBC_2.3)
 
 0.  Makefile.top: GAMEGRP = games
 		  GAMEPERM = 02755
