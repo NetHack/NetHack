@@ -751,7 +751,7 @@ static const char *window_opts[] = {
 		"Gem",
 #endif
 #ifdef MSWIN_GRAPHICS
-		"Win32",
+		"mswin",
 #endif
 #ifdef BEOS_GRAPHICS
 		"BeOS InterfaceKit",
