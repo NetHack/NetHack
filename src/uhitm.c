@@ -578,6 +578,17 @@ int thrown;
 			tmp = 0;
 		    else
 			tmp = rnd(2);
+		    if (!thrown && obj == uwep && obj->otyp == BOOMERANG &&
+			    rnl(4) == 4-1) {
+			pline("As you hit %s, %s %s breaks into splinters.",
+			    mon_nam(mon), shk_your(yourbuf, obj), xname(obj));
+			uwepgone();		/* set unweapon */
+			useup(obj);
+			obj = (struct obj *) 0;
+			hittxt = TRUE;
+			if (mdat != &mons[PM_SHADE])
+			    tmp++;
+		    }
 		} else {
 		    tmp = dmgval(obj, mon);
 		    /* a minimal hit doesn't exercise proficiency */
@@ -637,16 +648,7 @@ int thrown;
 			if (jousting) valid_weapon_attack = TRUE;
 		    }
 #endif
-		    if(!thrown && obj == uwep && obj->otyp == BOOMERANG &&
-		       !rnl(3)) {
-			pline("As you hit %s, %s breaks into splinters.",
-			      mon_nam(mon), the(xname(obj)));
-			useup(obj);
-			obj = (struct obj *) 0;
-			hittxt = TRUE;
-			if (mdat != &mons[PM_SHADE])
-			    tmp++;
-		    } else if(thrown && (is_ammo(obj) || is_missile(obj))) {
+		    if (thrown && (is_ammo(obj) || is_missile(obj))) {
 			if (ammo_and_launcher(obj, uwep)) {
 			    /* Elves and Samurai do extra damage using
 			     * their bows&arrows; they're highly trained.
