@@ -418,6 +418,12 @@ char c;
 {
 	DWORD count;
 
+	switch(c) {
+	    case '\n':
+	    case '\r':
+		    cmov(ttyDisplay->curx, ttyDisplay->cury);
+		    return;
+	}
 	if (colorchange) {
 		SetConsoleTextAttribute(hConOut,
 			(currentcolor | currenthilite | currentbackground));
