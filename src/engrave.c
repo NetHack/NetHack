@@ -153,7 +153,7 @@ register int x, y;
 	if ((x == u.ux) && (y == u.uy) && u.uswallow &&
 		is_animal(u.ustuck->data))
 	    return "maw";
-	else if (IS_AIR(lev->typ))
+	else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz))
 	    return "air";
 	else if (is_pool(x,y))
 	    return "water";

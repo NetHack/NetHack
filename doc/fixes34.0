@@ -453,6 +453,8 @@ potion of polymorph shouldn't be identified if object being dipped into
 	it ends up as the same type of object after polymorphing
 don't slap against the floor while riding and eating bad food
 got rid of "nori" (since it doesn't really translate "kelp frond" accurately)
+engraving in fog-covered location on in the Wizard quest said you
+	engraved in air, not dust
 
 
 Platform- and/or Interface-Specific Fixes
