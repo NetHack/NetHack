@@ -1348,8 +1348,21 @@ stillinwater:;
 	    /* limit recursive calls through teleds() */
 	    if(is_lava(u.ux,u.uy) && lava_effects())
 		    return;
-	    if(is_pool(u.ux,u.uy) && !Wwalking && drown())
+	    if (is_pool(u.ux, u.uy)) {
+#ifdef STEED
+		if (u.usteed && !is_flyer(u.usteed->data) &&
+			!is_floater(u.usteed->data) &&
+			!is_clinger(u.usteed->data)) {
+		    dismount_steed(Underwater ?
+			    DISMOUNT_FELL : DISMOUNT_GENERIC);
+		    /* dismount_steed() -> float_down() -> pickup() */
+		    if (!Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz))
+			pick = FALSE;
+		} else
+#endif
+		if (!Wwalking && drown())
 		    return;
+	    }
 	}
 	check_special_room(FALSE);
 #ifdef SINKS

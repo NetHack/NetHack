@@ -552,15 +552,19 @@ dismount_steed(reason)
 	     * able to walk onto a square with a hole, and autopickup before
 	     * falling into the hole).
 	     */
-		/* Keep steed here, move the player to cc; teleds() clears u.utrap */
-		in_steed_dismounting = TRUE;
-		teleds(cc.x, cc.y);
-		in_steed_dismounting = FALSE;
+		/* [ALI] No need to move the player if the steed died. */
+		if (!DEADMONSTER(mtmp)) {
+		    /* Keep steed here, move the player to cc;
+		     * teleds() clears u.utrap
+		     */
+		    in_steed_dismounting = TRUE;
+		    teleds(cc.x, cc.y);
+		    in_steed_dismounting = FALSE;
 
-		/* Put your steed in your trap */
-		if (save_utrap)
-		    (void) mintrap(mtmp);
-
+		    /* Put your steed in your trap */
+		    if (save_utrap)
+			(void) mintrap(mtmp);
+		}
 	    /* Couldn't... try placing the steed */
 	    } else if (enexto(&cc, u.ux, u.uy, mtmp->data)) {
 		/* Keep player here, move the steed to cc */
@@ -574,7 +578,9 @@ dismount_steed(reason)
 	}
 
 	/* Return the player to the floor */
+	in_steed_dismounting = TRUE;
 	(void) float_down(0L, W_SADDLE);
+	in_steed_dismounting = FALSE;
 	flags.botl = 1;
 	if (reason != DISMOUNT_ENGULFED) {
 		(void)encumber_msg();
