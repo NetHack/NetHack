@@ -184,14 +184,14 @@ LRESULT CALLBACK NHMessageWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 			SetScrollInfo(hWnd, SB_HORZ, &si, TRUE); 
 #endif
 		
-			data->yMax = MSG_LINES - MSG_VISIBLE_LINES - 1;
+			data->yMax = MSG_LINES-1;
  			data->yPos = min(data->yPos, data->yMax);
 
 			ZeroMemory(&si, sizeof(si));
 			si.cbSize = sizeof(si); 
 			si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS; 
-			si.nMin   = 0; 
-			si.nMax   = MSG_LINES; 
+			si.nMin   = MSG_VISIBLE_LINES; 
+			si.nMax   = data->yMax + MSG_VISIBLE_LINES - 1; 
 			si.nPage  = MSG_VISIBLE_LINES;
 			si.nPos   = data->yPos;
 			SetScrollInfo(hWnd, SB_VERT, &si, TRUE); 
@@ -332,7 +332,8 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// of the scroll box, and update the window. UpdateWindow 
 	// sends the WM_PAINT message. 
 
-	if (yInc = max(-data->yPos, min(yInc, data->yMax - data->yPos))) 
+	if (yInc = max( MSG_VISIBLE_LINES - data->yPos, 
+		            min(yInc, data->yMax - data->yPos))) 
 	{ 
 		data->yPos += yInc; 
 		/* ScrollWindowEx(hWnd, 0, -data->yChar * yInc, 
@@ -475,11 +476,11 @@ void onPaint(HWND hWnd)
 	GetClientRect(hWnd, &client_rt);
 
 	if( !IsRectEmpty(&ps.rcPaint) ) {
-	FirstLine = max (0, data->yPos + ps.rcPaint.top/data->yChar + 1); 
-		LastLine = min (MSG_LINES-1, data->yPos + ps.rcPaint.bottom/data->yChar); 
-		y = min( ps.rcPaint.bottom, client_rt.bottom - 2); 
+		FirstLine = max (0, data->yPos - (client_rt.bottom - ps.rcPaint.top)/data->yChar + 1); 
+		LastLine = min (MSG_LINES-1, data->yPos - (client_rt.bottom - ps.rcPaint.bottom)/data->yChar); 
+		y = min( ps.rcPaint.bottom, client_rt.bottom ); 
  		for (i=LastLine; i>=FirstLine; i--) { 
-	    int lineidx = (data->last_line + 1 + i) % MSG_LINES;
+				int lineidx = (data->last_line + 1 + i) % MSG_LINES;
 				x = data->xChar * (2 - data->xPos); 
 
 				draw_rt.left = x;
