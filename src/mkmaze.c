@@ -511,6 +511,30 @@ register const char *s;
 
 	} else Strcpy(protofile, "");
 
+#ifdef WIZARD
+	/* SPLEVTYPE format is "level-choice,level-choice"... */
+	if (wizard && *protofile && sp && sp->rndlevs) {
+	    char *ep = getenv("SPLEVTYPE");	/* not nh_getenv */
+	    if (ep) {
+		/* rindex always succeeds due to code in prior block */
+		int len = (rindex(protofile, '-') - protofile) + 1;
+
+		while (*ep) {
+		    if (!strncmp(ep, protofile, len)) {
+			int pick = atoi(ep + len);
+			/* use choice only if valid */
+			if (pick > 0 && pick <= (int) sp->rndlevs)
+			    Sprintf(protofile + len, "%d", pick);
+			break;
+		    } else {
+			ep = index(ep, ',');
+			if (ep) ++ep;
+		    }
+		}
+	    }
+	}
+#endif
+
 	if(*protofile) {
 	    Strcat(protofile, LEV_EXT);
 	    if(load_special(protofile)) {
