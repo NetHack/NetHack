@@ -535,16 +535,13 @@ clear_bypasses()
 		   have been transformed and won't be stacked in the usual
 		   manner afterwards; so don't bother with this */
 #if 0
-		if (otmp->where == OBJ_FLOOR) {
-		    struct obj *obj;
+		if (objects[otmp->otyp].oc_merge) {
 		    xchar ox, oy;
 
 		    (void) get_obj_location(otmp, &ox, &oy, 0);
 		    obj_extract_self(otmp);
-		    obj = merge_choice(level.objects[ox][oy], otmp);
-		    /* if it doesn't merge then place it back */
-		    if (!obj || !merged(&obj, &otmp))
-		        place_object(otmp, ox, oy);
+		    place_object(otmp, ox, oy);
+		    stack_object(otmp);
 		    newsym(ox, oy);
 		}
 #endif	/*0*/
