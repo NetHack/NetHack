@@ -26,6 +26,8 @@ static NEARDATA const char toss_objs[] =
 static NEARDATA const char bullets[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, GEM_CLASS, 0 };
 
+struct obj *thrownobj = 0;	/* tracks an object until it lands */
+
 extern boolean notonhead;	/* for long worms */
 
 
@@ -882,6 +884,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 	    u.dz = 1;
 	}
 
+	thrownobj = obj;
+
 	if(u.uswallow) {
 		mon = u.ustuck;
 		bhitpos.x = mon->mx;
@@ -901,6 +905,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 	    } else {
 		hitfloor(obj);
 	    }
+	    thrownobj = (struct obj*)0;
 	    return;
 
 	} else if(obj->otyp == BOOMERANG && !Underwater) {
@@ -915,6 +920,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 			    setworn(obj, wep_mask);
 			    u.twoweap = twoweap;
 			}
+			thrownobj = (struct obj*)0;
 			return;
 		}
 	} else {
@@ -972,8 +978,10 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		boolean obj_gone;
 
 		if (mon->isshk &&
-			obj->where == OBJ_MINVENT && obj->ocarry == mon)
+		    obj->where == OBJ_MINVENT && obj->ocarry == mon) {
+		    thrownobj = (struct obj*)0;
 		    return;		/* alert shk caught it */
+		}
 		(void) snuff_candle(obj);
 		notonhead = (bhitpos.x != mon->mx || bhitpos.y != mon->my);
 		obj_gone = thitmonst(mon, obj);
@@ -1026,10 +1034,13 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 			    losehp(dmg, xname(obj),
 				obj_is_pname(obj) ? KILLED_BY : KILLED_BY_AN);
 			}
-			if (ship_object(obj, u.ux, u.uy, FALSE))
+			if (ship_object(obj, u.ux, u.uy, FALSE)) {
+		    	    thrownobj = (struct obj*)0;
 			    return;
+			}
 			dropy(obj);
 		    }
+		    thrownobj = (struct obj*)0;
 		    return;
 		}
 
@@ -1052,11 +1063,15 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		    if(*u.ushops)
 			check_shop_obj(obj, bhitpos.x, bhitpos.y, FALSE);
 		    (void) mpickobj(mon, obj);	/* may merge and free obj */
+		    thrownobj = (struct obj*)0;
 		    return;
 		}
 		(void) snuff_candle(obj);
-		if (!mon && ship_object(obj, bhitpos.x, bhitpos.y, FALSE))
+		if (!mon && ship_object(obj, bhitpos.x, bhitpos.y, FALSE)) {
+		    thrownobj = (struct obj*)0;
 		    return;
+		}
+		thrownobj = (struct obj*)0;
 		place_object(obj, bhitpos.x, bhitpos.y);
 		if(*u.ushops && obj != uball)
 		    check_shop_obj(obj, bhitpos.x, bhitpos.y, FALSE);

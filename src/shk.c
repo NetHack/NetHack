@@ -24,6 +24,7 @@ STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
 #define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
 
 extern const struct shclass shtypes[];	/* defined in shknam.c */
+extern struct obj *thrownobj;		/* defined in dothrow.c */
 
 STATIC_VAR NEARDATA long int followmsg;	/* last time of follow message */
 
@@ -285,6 +286,7 @@ register struct monst *shkp;
 	clear_unpaid(invent);
 	clear_unpaid(fobj);
 	clear_unpaid(level.buriedobjlist);
+	if (thrownobj) thrownobj->unpaid = 0;
 	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 		clear_unpaid(mtmp->minvent);
 	for(mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon)
