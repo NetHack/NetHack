@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.4	2003/10/20	*/
+/*	SCCS Id: @(#)options.c	3.4	2003/11/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2841,7 +2841,7 @@ boolean setinitial,setfromfile;
 		if (apebuf[0] == '\033') retval = FALSE;
 		apebuf[0] = '"';
 		Strcat(apebuf,"\"");
-		add_autopickup_exception_mapping(apebuf);
+		add_autopickup_exception(apebuf);
 	} else if (opt_idx == 1) {
 		tmpwin = create_nhwindow(NHW_TEXT);
 		ape = iflags.autopickup_exceptions;
@@ -3170,7 +3170,7 @@ dotogglepickup()
 
 #ifdef AUTOPICKUP_EXCEPTIONS
 int
-add_autopickup_exception_mapping(mapping)
+add_autopickup_exception(mapping)
 const char *mapping;
 {
 	struct autopickup_exception *newape, *ape;
@@ -3249,9 +3249,10 @@ count_ape_maps()
 }
 
 void
-free_autopickup_exception_mappings()
+free_autopickup_exceptions()
 {
 	struct autopickup_exception *ape = iflags.autopickup_exceptions;
+
 	while((ape = iflags.autopickup_exceptions) != 0) {
 		free(ape->pattern);
 		iflags.autopickup_exceptions = ape->next;

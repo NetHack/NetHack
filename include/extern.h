@@ -1417,8 +1417,8 @@ E void FDECL(set_wc_option_mod_status, (unsigned long, int));
 E void FDECL(set_wc2_option_mod_status, (unsigned long, int));
 E void FDECL(set_option_mod_status, (const char *,int));
 #ifdef AUTOPICKUP_EXCEPTIONS
-E int FDECL(add_autopickup_exception_mapping, (const char *));
-E void NDECL(free_autopickup_exception_mappings);
+E int FDECL(add_autopickup_exception, (const char *));
+E void NDECL(free_autopickup_exceptions);
 #endif /* AUTOPICKUP_EXCEPTIONS */
 
 /* ### pager.c ### */
