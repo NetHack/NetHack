@@ -190,9 +190,9 @@ winmain.c
 sys/winnt:
 (files for Windows 9x, NT and Windows2000 version)
 Install.nt      Makefile.bcc    Makefile.gcc    Makefile.msc    console.rc
-defaults.nh     mapimail.c      nethack.def     nhdefkey.c      nhico.uu
-nhsetup.bat     ntsound.c       nttty.c         porthelp        win32api.h
-winnt.c
+defaults.nh     mapimail.c      nethack.def     nhdefkey.c      nh340key.c
+nhico.uu        nhsetup.bat     ntsound.c       nttty.c         porthelp
+win32api.h      winnt.c
 
 util:
 (files for all versions)

@@ -572,7 +572,7 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 #  DO NOT INDENT THE << below!
 #
 
-$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(GAMEDIR)\nhdefkey.dll
+$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
 	$(link) $(LFLAGS) user32.lib winmm.lib -out:$@ @<<$(GAME).lnk
@@ -591,6 +591,21 @@ $(O)nhdefkey.def:
 	@echo    KeyHandlerName >>$@
 
 $(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)$(@B).def
+	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
+	@echo Linking $@
+	$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
+		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
+		-out:$@ $(O)$(@B).o
+
+$(O)nh340key.def:
+	@echo EXPORTS >$@
+	@echo    ProcessKeystroke >>$@
+	@echo    NHkbhit >>$@
+	@echo    SourceWhere >>$@
+	@echo    SourceAuthor >>$@
+	@echo    KeyHandlerName >>$@
+
+$(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)$(@B).def
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $@
 	$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
