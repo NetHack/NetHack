@@ -380,6 +380,15 @@ window-port should also declare this variable in one of your sys/*.c files.
 short ospeed;		Set and declared in sys/unix/unixtty.c (don't
 			know about other sys files).
 
+The following global variable is defined in options.c. It equates a 
+list of wincap option names with their associated bit-mask [see
+section IV WINCAP preferences support].  The array is zero-terminated.
+
+struct wc_Opt wc_options[];
+			One entry for each available WINCAP option.
+			Each entry has a wc_name field and a wc_bit
+			field.  
+
 IV. WINCAP preferences support
 
 Starting with NetHack 3.3.2, the window interface was enhanced to provide
@@ -417,13 +426,13 @@ to support:
   |  font_map         | WC_FONT_MAP        | wc_font_map       |char *  |
   |  font_menu        | WC_FONT_MENU       | wc_font_menu      |char *  |
   |  font_message     | WC_FONT_MESSAGE    | wc_font_message   |char *  |
+  |  font_status      | WC_FONT_STATUS     | wc_font_status    |char *  |
+  |  font_text        | WC_FONT_TEXT       | wc_font_text      |char *  |
   |  font_size_map    | WC_FONTSIZ_MAP     | wc_fontsiz_map    |int     |
   |  font_size_menu   | WC_FONTSIZ_MENU    | wc_fontsiz_menu   |int     |
   |  font_size_message| WC_FONTSIZ_MESSAGE | wc_fontsiz_message|int     |
   |  font_size_status | WC_FONTSIZ_STATUS  | wc_fontsiz_status |int     |
   |  font_size_text   | WC_FONTSIZ_TEXT    | wc_fontsiz_text   |int     |
-  |  font_status      | WC_FONT_STATUS     | wc_font_status    |char *  |
-  |  font_text        | WC_FONT_TEXT       | wc_font_text      |char *  |
   |  hilite_pet       | WC_HILITE_PET      | wc_hilite_pet     |boolean |
   |  large_font       | WC_LARGE_FONT      | wc_large_font     |boolean |
   |  map_mode         | WC_MAP_MODE        | wc_map_mode       |int     |
@@ -471,7 +480,7 @@ vary_msgcount	-- port should display this number of messages at a time in
 
 Whenever one of these settings is adjusted (and if supported by the port
 by marking it so in the wincap mask), the port is notified of a change
-to a setting by calling the port's preference_update() routine. The port
+to the setting by calling the port's preference_update() routine. The port
 can choose to adjust for the change or ignore it.
 
 V.  New or respecified common, high level routines
