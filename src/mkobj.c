@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2002/10/07	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2005/03/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -342,7 +342,9 @@ register struct obj *otmp;
 	    (void)strncpy(ONAME(dummy), ONAME(otmp), (int)otmp->onamelth);
 	if (Is_candle(dummy)) dummy->lamplit = 0;
 	addtobill(dummy, FALSE, TRUE, TRUE);
-	otmp->no_charge = 1;
+	/* no_charge is only valid for some locations */
+	otmp->no_charge = (otmp->where == OBJ_FLOOR ||
+			   otmp->where == OBJ_CONTAINED) ? 1 : 0;
 	otmp->unpaid = 0;
 	return;
 }
