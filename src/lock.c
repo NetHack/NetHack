@@ -707,7 +707,10 @@ register struct obj *obj, *otmp;	/* obj *is* a box */
 		pline("Klunk!");
 		obj->olocked = 1;
 		obj->obroken = 0;
-		if (Role_if(PM_WIZARD)) obj->lknown = 1;
+		if (Role_if(PM_WIZARD))
+			obj->lknown = 1;
+		else
+			obj->lknown = 0;
 		res = 1;
 	    } /* else already closed and locked */
 	    break;
@@ -717,7 +720,10 @@ register struct obj *obj, *otmp;	/* obj *is* a box */
 		pline("Klick!");
 		obj->olocked = 0;
 		res = 1;
-		if (Role_if(PM_WIZARD)) obj->lknown = 1;
+		if (Role_if(PM_WIZARD))
+			obj->lknown = 1;
+		else
+			obj->lknown = 0;
 	    } else			/* silently fix if broken */
 		obj->obroken = 0;
 	    break;
