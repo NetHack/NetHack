@@ -31,6 +31,7 @@ static void		select_map_mode(int map_mode);
 static int		menuid2mapmode(int menuid);
 static int		mapmode2menuid(int map_mode);
 static HMENU	_get_main_menu(UINT menu_id);
+static void     mswin_direct_command();
 
 HWND mswin_init_main_window () {
 	static int run_once = 0;
@@ -915,6 +916,10 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			doset();
 			break;
 
+		case IDM_DIRECT_COMMAND: /* SmartPhone: display dialog to type in arbitary command text */
+			mswin_direct_command();
+			break;
+
 		case IDM_HELP_LONG:	
 			display_file(HELP, TRUE);  
 			break;
@@ -1058,7 +1063,7 @@ void mswin_select_map_mode(int mode)
 	/* update "Fit To Screen" item text */
 	{
 		TCHAR wbuf[BUFSZ];
-		TBBUTTONINFO tbbi;
+		MENUITEMINFO mi;
 
 		ZeroMemory( wbuf, sizeof(wbuf) );
 		if( !LoadString( 
@@ -1069,15 +1074,17 @@ void mswin_select_map_mode(int mode)
 			panic("cannot load main menu strings");
 		}
 
-		ZeroMemory( &tbbi, sizeof(tbbi) );
-		tbbi.cbSize = sizeof(tbbi);
-		tbbi.dwMask = TBIF_TEXT;
-		tbbi.pszText = wbuf;
-		if( !SendMessage( 
-				GetNHApp()->hMenuBar, 
-				TB_SETBUTTONINFO, 
+		ZeroMemory( &mi, sizeof(mi) );
+		mi.cbSize = sizeof(mi);
+		mi.fType = MFT_STRING;
+		mi.fMask = MIIM_TYPE;
+		mi.dwTypeData = wbuf;
+		mi.cch = wcslen(wbuf);
+		if( !SetMenuItemInfo( 
+				hmenuMap, 
 				IDM_MAP_FIT_TO_SCREEN, 
-				(LPARAM)&tbbi) ) {
+				FALSE, 
+				&mi) ) {
 			error( "Cannot update IDM_MAP_FIT_TO_SCREEN menu item." );
 		}
 	}
@@ -1160,3 +1167,20 @@ HMENU _get_main_menu(UINT menu_id)
 	return hmenuMap;
 }
 
+/* SmartPhone: display dialog to type arbitrary command text */
+void mswin_direct_command()
+{
+	char cmd[BUFSZ];
+	ZeroMemory(cmd, sizeof(cmd));
+	mswin_getlin("Type cmd text", cmd);
+	if( cmd[0] ) {
+		/* feed command to nethack */
+		char *p = cmd;
+		cmd[32] = '\x0'; /* truncate at 32 chars */
+		while(*p) {
+			NHEVENT_KBD(*p);
+			p++;
+		}
+		if( cmd[0]!='\033' ) mswin_putstr(WIN_MESSAGE, ATR_NONE, cmd);
+	}
+}

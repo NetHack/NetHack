@@ -203,7 +203,7 @@ NHCmdPadCell cells_layout_attack[NH_CMDPAD_CELLNUM] =
 	{ -1, "a", "a", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "q", "q", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "\x04", "^D", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
-	{ -1, "F", "F", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "F", "F", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)NH_LAYOUT_MOVEMENT },
 	{ -1, "X", "X", 13, NH_CELL_LAYOUT_MENU, 1 , 0 }
 };
 
@@ -216,7 +216,7 @@ NHCmdPadCell cells_layout_item_handling[NH_CMDPAD_CELLNUM] =
 	{ -1, "T", "T", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "R", "R", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "D", "D", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
-	{ -1, "=", "=", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "Q", "Q", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "i", "i", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "[", "[", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "A", "A", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },

@@ -37,12 +37,13 @@ IDI_WINHACK             ICON    DISCARDABLE     "..\\..\\wince\\NETHACK.ICO"
 
 IDC_WINHACK MENU DISCARDABLE 
 BEGIN
-    MENUITEM "Entire Map",                  IDM_MAP_FIT_TO_SCREEN
+    MENUITEM "Type Cmd",                    IDM_DIRECT_COMMAND
     POPUP "Menu"
     BEGIN
         MENUITEM "Options",                     IDM_VIEW_OPTIONS
         MENUITEM "Keypad",                      IDM_VIEW_KEYPAD
         MENUITEM SEPARATOR
+        MENUITEM "Entire Map",                  IDM_MAP_FIT_TO_SCREEN
         MENUITEM "ASCII",                       IDM_MAP_ASCII8X8
         MENUITEM "Use Tiles",                   IDM_MAP_TILES
         MENUITEM SEPARATOR
@@ -232,7 +233,7 @@ END
 IDC_WINHACK SHMENUBAR DISCARDABLE 
 BEGIN
     IDC_WINHACK, 2,
-    I_IMAGENONE, IDM_MAP_FIT_TO_SCREEN, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, IDM_MAP_FIT_TO_SCREEN, 0, NOMENU, 
+    I_IMAGENONE, IDM_DIRECT_COMMAND, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, IDM_DIRECT_COMMAND, 0, NOMENU, 
     I_IMAGENONE, ID_VIEW, TBSTATE_ENABLED, TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDS_CAP_VIEW, 0, 1,
 END
 
@@ -252,8 +253,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,4,1,0
- PRODUCTVERSION 3,4,1,0
+ FILEVERSION 3,5,0,0
+ PRODUCTVERSION 3,5,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -276,7 +277,7 @@ BEGIN
             VALUE "LegalCopyright", "Copyright © 2005\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "nethackm.exe\0"
-            VALUE "PrivateBuild", "050102\0"
+            VALUE "PrivateBuild", "050309\0"
             VALUE "ProductName", "NetHack For Smartphone\0"
             VALUE "ProductVersion", "3, 5, 0, 0\0"
             VALUE "SpecialBuild", "\0"
@@ -305,6 +306,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDM_MAP_FIT_TO_SCREEN   "Entire Map"
+    IDM_DIRECT_COMMAND   "Type Cmd"
     IDS_CAP_FILE            "File"
     IDS_CAP_HELP            "Help"
     IDS_CAP_MAP             "Map"
