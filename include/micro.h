@@ -14,7 +14,7 @@ extern int ramdisk;
 #define C(c)	(0x1f & (c))
 #endif
 #ifndef M
-#define M(c)	(0x80 | (c))
+#define M(c)	(((char)0x80) | (c))
 #endif
 #define ABORT C('a')
 
