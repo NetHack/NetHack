@@ -1542,6 +1542,13 @@ struct obj *otmp;
 		    flags.female ? "feminine" : "masculine");
 		context.botl = 1;
 		break;
+	    case AMULET_OF_UNCHANGING:
+		/* remove intrinsic polymorph only */
+		if (HPolymorph & INTRINSIC) {
+		    HPolymorph &= ~INTRINSIC;
+		    accessory_has_effect(otmp);
+		}
+		break;
 	    case AMULET_OF_STRANGULATION: /* bad idea! */
 		/* no message--this gives no permanent effect */
 		choke(otmp);
@@ -1552,7 +1559,6 @@ struct obj *otmp;
 		HSleeping = FROMOUTSIDE | rnd(100);
 		break;
 	    case RIN_SUSTAIN_ABILITY:
-	    case AMULET_OF_UNCHANGING:
 	    case AMULET_OF_LIFE_SAVING:
 	    case AMULET_OF_REFLECTION: /* nice try */
 	    /* can't eat Amulet of Yendor or fakes,
