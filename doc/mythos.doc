@@ -1,0 +1,213 @@
+	    SCCS Id: @(#)mythos.doc	3.3	    2000/07/25
+
+
+Part I	    General Mythos
+
+"Gehennom" (Gehenna) is a contraction of "Gei-ben-hinnom" (the valley of
+the son of Hinnom).  It is a name of a small, deep, and dark valley south-
+east of ancient Jerusalem.  In the pre-Hebraic era, that valley was the
+center for the worship of Moloch, who demanded that children be sacrificed
+to him.  It was (and still is) considered a fearful, dreadful place, where
+suffering souls of dead people roam and seek revenge.  Gehennom was consid-
+ered the place where a hidden port to the Under World exists.  Through that
+port, demons, devils, and other servants of evil gods emerge sometimes to
+do havoc among the living.
+
+Part II     Quests Mythos
+
+	    Archeologist
+
+    Leader: Lord Carnarvon
+	    (co-discoverer of Tutankhamen's tomb)
+      Home: College of Archeology
+   Nemesis: Minion of Huhetotl
+      Goal: Tomb of the Toltec Kings
+  Artifact: Orb of Detection
+Background:
+   General:
+     Ranks:
+
+	    Barbarian
+
+    Leader: Pelias
+      Home: Camp of the Duali Tribe
+   Nemesis: Thoth Amon
+      Goal: Duali Oasis
+  Artifact: Heart of Ahriman
+Background: Conan the Barbarian series
+   General:
+     Ranks:
+
+	    Caveman
+
+    Leader: Shaman Karnov
+      Home: Caves of the Ancestors
+   Nemesis: Chromatic Dragon
+      Goal: Dragon's Lair
+  Artifact: Sceptre of Might
+Background:
+   General:
+     Ranks:
+
+	    Elf (retired in 3.3.0)
+
+    Leader: Earendil/Elwing
+      Home: Great Circle of Earendil/Elwing
+   Nemesis: Goblin King
+      Goal: Goblins' Cave
+  Artifact: Palantir of Westernesse
+Background: Loosely based on Tolkien, particularly pre-Third Age
+   General:
+     Ranks:
+
+	    Healer
+    Leader: Hippocrates
+      Home: Temple of Epidaurus
+	    The temple of Epidaurus was the largest and most well known
+	    temple built by the cult of Aesculapius
+   Nemesis: Cyclops
+      Goal: Temple of Coeus
+  Artifact: Staff of Aesculapius
+Background: Based on the greek mythology surrounding Aesculapius
+   General:
+     Ranks:
+
+	    Knight
+    Leader: King Arthur
+      Home: Camelot Castle
+   Nemesis: Ixoth
+      Goal: Isle of Glass
+  Artifact: Magic Mirror of Merlin
+Background: Legend of King Arthur
+   General:
+     Ranks:
+
+	    Monk (added in 3.3.0)
+    Leader: the Grand Master
+      Home: the Monastery of Chan-Sune
+   Nemesis: Master Kaen
+      Goal: the Monastery of the Earth-Lord
+  Artifact: Eyes of the Overworld
+Background: Militant Chinese cleric (Wu-dang Taoist, Shao-lin Buddhist)
+   General: martial arts, enlightenment, vegetarianism
+     Ranks:
+
+	    Priest
+    Leader: Arch Priest
+      Home: Great Temple
+   Nemesis: Nalzok
+      Goal: Temple of Nalzok
+  Artifact: Mitre of Holiness
+Background: As of 3.3.0, more of a Western-style cleric
+   General: holy water, undead turning
+     Ranks:
+
+	    Ranger (replaced Elf in 3.3.0)
+    Leader: Orion
+      Home: Orion's camp
+   Nemesis: Scorpius
+      Goal: the cave of the wumpus
+  Artifact: Longbow of Diana
+Background: Roman version of Orion/Sirius/Scorpius myth
+   General: Locate level is in honor to the "wumpus" game
+     Ranks:
+
+	    Rogue
+    Leader: Master of Thieves
+      Home: Thieves' Guild Hall
+   Nemesis: Master Assassin
+      Goal: Assassins' Guild Hall
+  Artifact: Master Key of Thievery
+Background: Fritz Leiber's Fafhrd and the Gray Mouser series of books
+   General:
+     Ranks:
+
+	    Samurai
+    Leader: Lord Sato
+      Home: Castle of the Taro Clan
+   Nemesis: Ashikaga Takauji
+      Goal: Shogun's Castle
+  Artifact: Tsurugi of Muramasa
+Background: Shogun.  The Forty-Seven Ronin.  The Crysanthemum and The
+	    Sword, by Ruth Benedict.  Mirror, Sword and Jewel, by Kurt
+	    Singer.
+   General: The player is referred to as player_name-san ('san' being an
+	    honorable title), once he has completed the quest, or obtained
+	    the artifact the reference changes to player_name-sama.  'Sama'
+	    is the title for Lord.
+     Ranks: Hatamoto. "Banner Knights".	"They were originally personal
+	    body guards to a military commander, but after completing
+	    their service they became samurai."
+	    Ronin.  Samurai without alliegance to a daimyo, exiled or
+	    renegades.
+	    Ninja.  Secretive society of samurai trained in killing arts.
+	    Joshu.  A samurai who headed a castle.
+	    Ryoshu.  A samurai who headed a small piece of territory.
+	    Kokushu.  A samurai who headed a province-sized area.
+	    Daimyo.  A samurai lord.
+	    Kuge.  Nobles of the imperial court, they held presedence over
+	    the daimyos at court.
+	    Shogun.  The reigning samurai "king".
+
+	    Tourist
+    Leader: Twoflower
+      Home: Traveller's Aid Office
+   Nemesis: Master of Thieves
+      Goal: Thieves' Guild Hall
+  Artifact: Yendorian Express Card
+Background: Terry Pratchett's Discworld series of books
+   General:
+     Ranks:
+
+	    Valkyrie
+    Leader: the Norn
+      Home: Shrine of Destiny
+   Nemesis: Lord Surtur
+      Goal: Cave of Surtur
+  Artifact: Orb of Fate
+Background: Norse mythology
+   General:
+     Ranks:
+
+	    Wizard
+    Leader: Neferet the Green
+      Home: The Lonely Tower
+   Nemesis: Dark One
+      Goal: Tower of Darkness
+  Artifact: Eye of the Aethiopica
+Background:
+   General:
+     Ranks:
+
+Part III    Game Objects (not described in data.base)
+
+Maud	    and the DUAM XNAHT scroll.	Maud was the suggestor of the intro-
+	    duction of amnesia into the game.
+
+Part IV		Artifacts (not described in data.base or artilist.h)
+Excalibur	King Arthur's sword
+Stormbringer	Michael Moorcock's Elric saga
+Mjollnir	Thor's hammer (Norse mythology)
+Orcrist, Sting	Tolkien
+Magicbane	loosely based on the magic knife "Carnwennan"
+		in "The Coming of the King" by Nikolai Tolstoy
+Grayswandir	Corwin's sword in Roger Zelazny's Amber saga
+
+Part V	   Game Monsters (not described in data.base)
+
+Part VI	    Miscellaneous Knowledge
+
+Elbereth    is the Star-Queen of the elves of Middle Earth.
+-----
+"Lasciate ogni speranza voi ch'entrate" is italian for 'All hope abandon, ye
+who enter here'.
+-----
+"The throne vanishes in a puff of logic." analogy comes from Douglas Adams'
+Hitchikers Guide to the Galaxy:
+
+    "But," says man, "the Babel fish is a dead giveaway, isn't it?  It could
+not have evolved by chance.  It proves you exist, and so therefore, by your
+own argument, you don't.  QED."
+    "Oh dear," says God, "I hadn't thought of that," and promptly vanishes in
+a puff of logic.
+-----
