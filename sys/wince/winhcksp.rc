@@ -251,8 +251,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,1,0
- PRODUCTVERSION 1,0,1,0
+ FILEVERSION 3,4,1,0
+ PRODUCTVERSION 3,4,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -267,17 +267,17 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Nethack 3.4.1 for Smartphone  (GUI by Alex Kompel)\0"
+            VALUE "Comments", "NetHack 3.4.1 for Smartphone 2002\0"
             VALUE "CompanyName", " \0"
-            VALUE "FileDescription", "winhack\0"
-            VALUE "FileVersion", "1, 0, 1, 0\0"
-            VALUE "InternalName", "winhack\0"
-            VALUE "LegalCopyright", "Copyright © 2002\0"
+            VALUE "FileDescription", "nethackm\0"
+            VALUE "FileVersion", "3, 4, 1, 0\0"
+            VALUE "InternalName", "nethackm\0"
+            VALUE "LegalCopyright", "Copyright © 2003\0"
             VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "winhack.exe\0"
-            VALUE "PrivateBuild", "021111\0"
-            VALUE "ProductName", "Nethack For Smartphone\0"
-            VALUE "ProductVersion", "1, 0, 1, 0\0"
+            VALUE "OriginalFilename", "nethackm.exe\0"
+            VALUE "PrivateBuild", "030219\0"
+            VALUE "ProductName", "NetHack For Smartphone\0"
+            VALUE "ProductVersion", "3, 4, 1, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -297,8 +297,8 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_APP_TITLE           "winhack"
-    IDC_WINHACK             "WINHACK"
+    IDS_APP_TITLE           "NetHack"
+    IDC_WINHACK             "NETHACK"
 END
 
 STRINGTABLE DISCARDABLE 

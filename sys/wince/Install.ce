@@ -45,7 +45,7 @@ Boostrapping the build process on Windows NT/2000/XP
 
 Compiling
 
-2. Start the Embedded Visual C IDE. In the Embeddd Visual C IDE 
+2. Start the Embedded Visual C IDE. In the Embedded Visual C IDE 
        Menus, choose:
            File | Open Workspace
 
@@ -61,38 +61,43 @@ Compiling
               + nethack_palm_pc files
               + nethack_pocket_pc files
               + nethack_smartphone files
-              + recover_hpc files
-              + recover_palm_pc files
-              + recover_pocket_pc files
-              + recover_smartphone files
 
         o On the Embedded Visual C menus, choose:
-              Project | Set Active Platform | <platform>
-		where <platform> is:
-			Palm-size PC 2.11  - palm size PC running Windows CE version 2.11
-			Pocket PC          - palm-size PC running Windows CE 3.0 and higher (PocketPC)
-			H/PC Pro 2.11      - handheld computers running Windows CE 2.11 anf higher
-			Smartphone 2002	 - Microsoft SmartPhone device
-
-        o On the Embedded Visual C menus, choose:
-              Project | Set Active Project | <project>
-		where <project> is based on the platform you selected:
-			nethack_palm_pc    for Palm-size PC 2.11 platform
-			nethack_pocket_pc  for Pocket PC platform
-			nethack_hpc        for H/PC Pro 2.11 platform
-			nethack_smartphone for Smartphone 2002
+              Build | Set Active Platform
+		Select the platform that corresponds to your device:
+		Palm-size PC 2.11  - palm size PC running Windows CE version 2.11
+		Pocket PC          - palm-size PC running Windows CE 3.0 and higher (PocketPC)
+		H/PC Pro 2.11      - handheld computers running Windows CE 2.11 anf higher
+		Smartphone 2002	 - Microsoft SmartPhone device
 
         o On the Visual C menus again, choose either:
-              Build | Set Active Configuration | Release (for your handheld platform)
-            or
-              Build | Set Active Configuration | Debug (for your handheld platform)
+              Build | Set Active Configuration 
+                where configuration is one of the following (make sure it matches the platform 
+                you have selected):
+		nethack_hpc - Win32 (WCE MIPS) HPCRelease  - H/PC Pro 2.11 MIPS processor release executable
+		nethack_hpc - Win32 (WCE x86em) HPCDebug   - H/PC Pro 2.11 x86 emulation debug executable
+		nethack_hpc - Win32 (WCE ARM) HPCRelease   - H/PC Pro 2.11 ARM processor release executable
+		nethack_hpc - Win32 (WCE SH3) HPCRelease   - H/PC Pro 2.11 SH3 processor release executable
+		nethack_hpc - Win32 (WCE x86em) HPCRelease - H/PC Pro 2.11 x86 emulation release executable
+		nethack_hpc - Win32 (WCE SH4) HPCRelease   - H/PC Pro 2.11 SH4 processor release executable
+		nethack_palm_pc - Win32 (WCE MIPS) PalmPCRelease  - Palm-size PC 2.11 MIPS processor release executable
+		nethack_palm_pc - Win32 (WCE x86em) PalmPCDebug   - Palm-size PC 2.11 x86 emulation debug executable
+		nethack_palm_pc - Win32 (WCE SH3) PalmPCRelease   - Palm-size PC 2.11 SH3 processor release executable
+		nethack_palm_pc - Win32 (WCE x86em) PalmPCRelease - Palm-size PC 2.11 x86 emulation release executable
+		nethack_pocket_pc - Win32 (WCE MIPS) PocketPCRelease  - Pocket PC MIPS processor release executable
+		nethack_pocket_pc - Win32 (WCE ARM) PocketPCRelease   - Pocket PC ARM processor release executable
+		nethack_pocket_pc - Win32 (WCE x86em) PocketPCRelease - Pocket PC x86 emulation release executable
+		nethack_pocket_pc - Win32 (WCE x86em) PocketPCDebug   - Pocket PC x86 emulation debug executable
+		nethack_pocket_pc - Win32 (WCE SH3) PocketPCRelease   - Pocket PC SH3 processor release executable
+		nethack_smartphone - Win32 (WCE ARM) SPhoneRelease   - Smartphone 2002 ARM processor release executable
+		nethack_smartphone - Win32 (WCE x86em) SPhoneDebug   - Smartphone 2002 x86 emulation debug executable
 
 Building
     
 4.  Start your build.
  
         o On the Embedded Visual C menus once again, choose:
-              Build | Build winhack
+              Build | Build nethackm.exe
           This starts the build.  It is likely that the IDE message window 
           where you are doing the compiling will be occupied for a while.
     Notes: 
@@ -109,6 +114,13 @@ Transfer
 
 5.  Transfer the files and executables to your handheld by extracting the
     files into some folder on the CE device - that should do it. 
+
+
+Notes
+
+    If you want to use IBMGraphics make sure that you have a proper 
+    font installed on the device that supports OEM character set 
+    (for example, Lucida Console)
 
 
 PROBLEMS

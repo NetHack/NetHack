@@ -116,6 +116,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
         Pocket PC devices running Windows CE 3.0 and higher.
         H/PC Pro devices running Windows CE 2.11 and higher.
+	Palm Size PC 1.1 devices running Windows CE 2.11
 
     Previous versions of NetHack were tested on the following systems,
     and we expect that NetHack 3.4 will work on them as well:

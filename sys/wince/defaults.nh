@@ -49,7 +49,6 @@ OPTIONS=map_mode:tiles,scroll_margin:3
 # OPTIONS=font_menu:Arial
 
 # Other
-#OPTIONS=windowcolors:message yellow/black status white/#000000 menu yellow/black text yellow/black
 OPTIONS=hilite_pet,!toptenwin
 OPTIONS=!splash_screen,player_selection:prompts
 OPTIONS=vary_msgcount:4
