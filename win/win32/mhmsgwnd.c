@@ -11,7 +11,7 @@
 #define MSG_VISIBLE_LINES     max(iflags.wc_vary_msgcount, 2)
 #define MAX_MSG_LINES		  32
 #define MSG_LINES			  (int)min(iflags.msg_history, MAX_MSG_LINES)
-#define MAXWINDOWTEXT		  200
+#define MAXWINDOWTEXT		  TBUFSZ
 
 #define DEFAULT_COLOR_BG_MSG	COLOR_WINDOW
 #define DEFAULT_COLOR_FG_MSG	COLOR_WINDOWTEXT
