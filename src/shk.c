@@ -1666,7 +1666,7 @@ boolean croaked;
 		if (loss > umoney || !loss || roomno == eshkp->shoproom) {
 			eshkp->robbed -= umoney;
 			if (eshkp->robbed < 0L) eshkp->robbed = 0L;
-                        money2mon(shkp, umoney);
+                        if (umoney > 0) money2mon(shkp, umoney);
 #endif
 			flags.botl = 1;
 			pline("%s %s all your possessions.",
