@@ -513,7 +513,7 @@ initoptions()
 	 * config file/environment variable below.
 	 */
 	/* this detects the IBM-compatible console on most 386 boxes */
-	if (!strncmp(nh_getenv("TERM"), "AT", 2)) {
+	if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
 		switch_graphics(IBM_GRAPHICS);
 # ifdef TEXTCOLOR
 		iflags.use_color = TRUE;
@@ -523,7 +523,8 @@ initoptions()
 #if defined(UNIX) || defined(VMS)
 # ifdef TTY_GRAPHICS
 	/* detect whether a "vt" terminal can handle alternate charsets */
-	if (!strncmpi(nh_getenv("TERM"), "vt", 2) && (AS && AE) &&
+	if ((opts = nh_getenv("TERM")) &&
+	    !strncmpi(opts, "vt", 2) && AS && AE &&
 	    index(AS, '\016') && index(AE, '\017')) {
 		switch_graphics(DEC_GRAPHICS);
 	}
