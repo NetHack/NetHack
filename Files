@@ -22,11 +22,11 @@ wizhelp         yendor.des
 doc:
 (files for all versions)
 Guidebook.mn    Guidebook.tex   Guidebook.txt   dgn_comp.6      dgn_comp.txt
-dlb.6           dlb.txt         fixes22.0       fixes31.1       fixes31.2
-fixes31.3       fixes32.0       fixes32.1       fixes32.2       fixes32.3
-fixes33.0       fixes33.1       fixes34.0       fixes34.1       lev_comp.6
-lev_comp.txt    nethack.6       nethack.txt     recover.6       recover.txt
-tmac.n          window.doc
+dlb.6           dlb.txt         fixes22.0       fixes30.0       fixes31.1
+fixes31.2       fixes31.3       fixes32.0       fixes32.1       fixes32.2
+fixes32.3       fixes33.0       fixes33.1       fixes34.0       fixes34.1
+fixes34.2       fixes35.0       lev_comp.6      lev_comp.txt    nethack.6
+nethack.txt     recover.6       recover.txt     tmac.n          window.doc
 
 include:
 (files for all versions)
