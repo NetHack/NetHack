@@ -865,14 +865,15 @@ register const char *let,*word;
 			!strcmp(word, "untrap with")) &&
 		     /* Picks, axes, pole-weapons, bullwhips */
 		    ((otmp->oclass == WEAPON_CLASS && !is_pick(otmp) &&
-		      !is_axe(otmp) && !is_pole(otmp) && otyp != BULLWHIP)
-		|| (otmp->oclass == POTION_CLASS &&
+		      !is_axe(otmp) && !is_pole(otmp) && otyp != BULLWHIP) ||
+		     (otmp->oclass == POTION_CLASS &&
 		     /* only applicable potion is oil, and it will only
 			be offered as a choice when already discovered */
 		     (otyp != POT_OIL || !otmp->dknown ||
-		      !objects[POT_OIL].oc_name_known))
-		|| (otmp->oclass == FOOD_CLASS && otyp != CREAM_PIE)
-		|| (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
+		      !objects[POT_OIL].oc_name_known)) ||
+		     (otmp->oclass == FOOD_CLASS &&
+		      otyp != CREAM_PIE && otyp != EUCALYPTUS_LEAF) ||
+		     (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
 		|| (!strcmp(word, "invoke") &&
 		    (!otmp->oartifact && !objects[otyp].oc_unique &&
 		     (otyp != FAKE_AMULET_OF_YENDOR || otmp->known) &&

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2002/08/01	*/
+/*	SCCS Id: @(#)apply.c	3.4	2002/09/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -327,7 +327,7 @@ struct obj *obj;
 			if (mintrap(mtmp) == 2) change_luck(-1);
 		    }
 		}
-		if (pet_cnt > 0) makeknown(MAGIC_WHISTLE);
+		if (pet_cnt > 0) makeknown(obj->otyp);
 	}
 }
 
@@ -2740,7 +2740,7 @@ doapply()
 {
 	register struct obj *obj;
 	register int res = 1;
-	char class_list[MAXOCLASSES];
+	char class_list[MAXOCLASSES+2];
 
 	if(check_capacity((char *)0)) return (0);
 
@@ -2748,7 +2748,8 @@ doapply()
 		Strcpy(class_list, tools_too);
 	else
 		Strcpy(class_list, tools);
-	if (carrying(CREAM_PIE)) add_class(class_list, FOOD_CLASS);
+	if (carrying(CREAM_PIE) || carrying(EUCALYPTUS_LEAF))
+		add_class(class_list, FOOD_CLASS);
 
 	obj = getobj(class_list, "use or apply");
 	if(!obj) return 0;
@@ -2833,6 +2834,27 @@ doapply()
 		break;
 	case TIN_WHISTLE:
 		use_whistle(obj);
+		break;
+	case EUCALYPTUS_LEAF:
+		/* MRKR: Every Australian knows that a gum leaf makes an */
+		/*	 excellent whistle, especially if your pet is a  */
+		/*	 tame kangaroo named Skippy.			 */
+		if (obj->blessed) {
+		    use_magic_whistle(obj);
+		    /* sometimes the blessing will be worn off */
+		    if (!rn2(49)) {
+			if (!Blind) {
+			    char buf[BUFSZ];
+
+			    pline("%s %s %s.", Shk_Your(buf, obj),
+				  aobjnam(obj, "glow"), hcolor("brown"));
+			    obj->bknown = 1;
+			}
+			unbless(obj);
+		    }
+		} else {
+		    use_whistle(obj);
+		}
 		break;
 	case STETHOSCOPE:
 		res = use_stethoscope(obj);
