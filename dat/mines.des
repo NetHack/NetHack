@@ -47,6 +47,7 @@ TRAP: random, random
 
 
 # Minetown variant 1
+# "Frontier Town"
 #
 LEVEL: "minetn-1"
 
@@ -127,6 +128,7 @@ RANDOM_CORRIDORS
 
 
 # Minetown variant 2
+# "Town Square"
 #
 LEVEL: "minetn-2"
 ROOM: "ordinary" , lit, (3,3), (center,center), (31,15)
@@ -222,6 +224,7 @@ RANDOM_CORRIDORS
 
 
 # Minetown variant 3 by Kelly Bailey
+# "Alley Town"
 #
 LEVEL: "minetn-3"
 ROOM: "ordinary",lit,(3,3),(center,center),(31,15)
@@ -312,6 +315,7 @@ RANDOM_CORRIDORS
 
 
 # Minetown variant 4 by Kelly Bailey
+# "College Town"
 #
 LEVEL: "minetn-4"
 ROOM: "ordinary",lit,(3,3),(center,center),(30,15)
@@ -325,7 +329,6 @@ MONSTER: '@', "watchman", random, peaceful
 MONSTER: '@', "watch captain", random, peaceful
 
 SUBROOM:"book shop",lit,(4,2),(3,3),"town"
-CHANCE: 30
 DOOR: false,closed,south,random
 
 SUBROOM:"ordinary",random,(8,2),(2,2),"town"
@@ -354,10 +357,10 @@ DOOR:false,closed,north,random
 
 SUBROOM:"ordinary",random,(8,11),(2,2),"town"
 DOOR:false,locked,south,random
-MONSTER: 'r',random,random
-MONSTER: 'r',random,random
-MONSTER: '@',"wererat",random
-MONSTER: 'a',random,random
+MONSTER: 'k',"kobold shaman",random
+MONSTER: 'k',"kobold shaman",random
+MONSTER: 'f',"kitten",random
+MONSTER: 'f',random,random
 
 SUBROOM:"food shop",lit,(11,11),(3,2),"town"
 CHANCE:90
@@ -912,9 +915,9 @@ MAZE:"minend-3",'-'
 FLAGS:nommap
 GEOMETRY:center,bottom
 MAP
----- - - - - - - - - -- -- - - . - - - - - - - - - -- - - -- - - - - . - - |
-|.|---...---------.-----------...-----.-------.-------     ----------------|
----- - - - - - - - - - . - - - . - - - - - - - - - - -- - -- - . - - - - - |
+ - - - - - - - - - - -- -- - - . - - - - - - - - - -- - - -- - - - - . - - |
+------...---------.-----------...-----.-------.-------     ----------------|
+ - - - - - - - - - - - . - - - . - - - - - - - - - - -- - -- - . - - - - - |
 ------------.---------...-------------------------.---   ------------------|
  - - - - - - - - - - . . - - --- - . - - - - - - - - -- -- - - - - |.....| |
 --.---------------.......------------------------------- ----------|.....S-|
@@ -931,7 +934,6 @@ MAP
 --|. - - - - - - - -- - - - -- . - - - --- - - - . . - - - - -- - - - - - - 
 ENDMAP
 RANDOM_PLACES:(1,15),(68,6),(1,13)
-NON_DIGGABLE:(0,0,2,2)
 NON_DIGGABLE:(67,3,73,7)
 NON_DIGGABLE:(0,14,2,16)
 REGION:(0,0,75,16),unlit,"ordinary"
@@ -974,8 +976,6 @@ OBJECT:'+',random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
-OBJECT:'[',"helm of brilliance",(1,1)
-OBJECT:'*',"dilithium crystal",(1,1)
 TRAP:random,random
 TRAP:random,random
 TRAP:random,random
@@ -992,7 +992,6 @@ MONSTER:'M',random,random
 MONSTER:'M',random,random
 MONSTER:'M',random,random
 MONSTER:'M',"ettin mummy",random
-MONSTER:'M',"giant mummy",(1,1)
 MONSTER:'V',random,random
 MONSTER:'Z',random,random
 MONSTER:'Z',random,random
