@@ -175,11 +175,7 @@ typedef xchar	boolean;		/* 0 or 1 */
 #endif
 
 #ifdef WIN32
-#ifdef WIN_CE
-#include "wceconf.h"
-#else
 #include "ntconf.h"
-#endif
 #endif
 
 /* Displayable name of this port; don't redefine if defined in *conf.h */

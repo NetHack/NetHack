@@ -122,11 +122,6 @@
 # define USE_STDARG
 # define NEED_VARARGS
 
-# ifdef UNDER_CE
-# define WIN_CE
-# define STRCMPI
-# endif 
-
 /* ARM - the processor; avoids conflict with ARM in hack.h */
 # ifdef ARM
 # undef ARM
