@@ -100,11 +100,32 @@ Warren Cheung combined SLASH with the Wizard Patch to produce Slash'em, and
 with the help of Kevin Hugo, added more features.  Kevin later joined the
 DevTeam and incorporated the best of these ideas in NetHack 3.3.
 
+The final update to 3.2 was the bug fix release 3.2.3, which was released
+simultaneously with 3.3.0 in December 1999 just in time for the Year 2000.
+
+The 3.3 development team, consisting of Michael Allison, Ken Arromdee, 
+David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, 
+Kevin Hugo, Steve Linhart, Ken Lorber, Dean Luick, Pat Rankin, Eric Smith, 
+Mike Stephenson, Janet Walz, and Paul Winner, released 3.3.0 in 
+December 1999 and 3.3.1 in August of 2000.
+
+Version 3.3 offered many firsts. It was the first version to separate race 
+and profession. The Elf class was removed in preference to an Elf Race, 
+and the races of Dwarves, Gnomes, and Orcs made their first appearance in 
+the game alongside the familiar Human race.  Monk and Ranger roles joined 
+Archeologists, Barbarians, Cavemen, Healers, Knights, Priests, Rogues, 
+Tourists, Valkyries and of course, Wizards.  It was also the first version
+to allow you to ride a steed, and was the first version to have a publicly 
+available web-site listing all the bugs that had been discovered.  Despite 
+that constantly growing bug list, 3.3 proved stable enough to last for
+more than a year and a half.
+
+
 The 3.4 development team initially consisted of Michael Allison, Ken Arromdee, 
 David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, 
 Kevin Hugo, Steve Linhart, Ken Lorber, Dean Luick, Pat Rankin, Eric Smith, 
-Mike Stephenson, Janet Walz, and Paul Winner. Warwick Allison joined just 
-before the release of NetHack 3.4.0.
+Mike Stephenson, Janet Walz, and Paul Winner, with Warwick Allison joining
+just before the release of NetHack 3.4.0 in March 2002.
 
 As with version 3.3, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
@@ -117,8 +138,9 @@ Paul Winner and Yitzhak Sapir provided encouragement.
 Dean Luick, Mark Modrall, and Kevin Hugo maintained and enhanced the
 Macintosh port of 3.4.
 
-Michael Allison maintained and enhanced the console port of 3.4 for 
-the Microsoft Windows NT/2000 platform. 
+Michael Allison, Dave Cohrs, Alex Kompel, Dion Nicolaas, and Yitzhak Sapir 
+maintained and enhanced 3.4 for the Microsoft Windows platform. Alex Kompel 
+contributed a new graphical interface for the Windows port.
 
 Ron Van Iwaarden maintained 3.4 for OS/2.
 
@@ -127,8 +149,6 @@ Amiga port of 3.4 after Janne Salmijarvi resurrected it for 3.3.1.
 
 Christian `Marvin' Bressler maintained 3.4 for the Atari after he
 resurrected it for 3.3.1.
-
-Alex Kompel contributed a new graphical port of 3.4 for Microsoft Windows.
 
 There is a NetHack web site maintained by Ken Lorber at http://www.nethack.org/.
 
