@@ -539,9 +539,6 @@ int mode;
     register struct rm *tmpr = &levl[x][y];
     register struct rm *ust;
 
-    /* if this is the next step, must treat as if TEST_MOVE were used */
-    if (mode == TEST_TRAV && distmin(x, y, u.ux, u.uy) <= 1) mode = TEST_MOVE;
-
     /*
      *  Check for physical obstacles.  First, the place we are going.
      */
