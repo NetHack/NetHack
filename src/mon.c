@@ -1995,11 +1995,12 @@ int  typ, fatal;
 		return;
 	}
 	/* suppress killer prefix if it already has one */
-	if (!strncmpi(pname, "the ", 4) ||
-		!strncmpi(pname, "an ", 3) ||
-		!strncmpi(pname, "a ", 2) ||
-	    /* ... or if it seems to be a proper name */
-		isupper(*pname)) {
+	if ((i = name_to_mon(pname)) >= LOW_PM && mons[i].geno & G_UNIQ) {
+	    kprefix = KILLED_BY;
+	    if (!type_is_pname(&mons[i])) pname = the(pname);
+	} else if (!strncmpi(pname, "the ", 4) ||
+	    !strncmpi(pname, "an ", 3) ||
+	    !strncmpi(pname, "a ", 2)) {
 	    /*[ does this need a plural check too? ]*/
 	    kprefix = KILLED_BY;
 	}

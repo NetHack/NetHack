@@ -595,7 +595,7 @@ boolean so;
 	    if (!strncmp(t1->death, "quit", 4)) {
 		Strcat(linebuf, "quit");
 		second_line = FALSE;
-	    } else if (!strncmp(t1->death, "starv", 5)) {
+	    } else if (!strncmp(t1->death, "died of st", 10)) {
 		Strcat(linebuf, "starved to death");
 		second_line = FALSE;
 	    } else if (!strncmp(t1->death, "choked", 6)) {

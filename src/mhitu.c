@@ -1151,8 +1151,17 @@ dopois:
 				    && !(poly_when_stoned(youmonst.data) &&
 					polymon(PM_STONE_GOLEM))) {
 				Stoned = 5;
-				killer_format = KILLED_BY_AN;
 				delayed_killer = mtmp->data->mname;
+				if (mtmp->data->geno & G_UNIQ) {
+				    if (!type_is_pname(mtmp->data)) {
+					static char buf[BUFSZ];
+
+					/* "the" buffer may be reallocated */
+					Strcpy(buf, the(delayed_killer));
+					delayed_killer = buf;
+				    }
+				    killer_format = KILLED_BY;
+				} else killer_format = KILLED_BY_AN;
 				return(1);
 				/* You("turn to stone..."); */
 				/* done_in_by(mtmp); */

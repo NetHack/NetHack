@@ -221,7 +221,8 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 				killer = food_xname(food, FALSE);
 				if (food->otyp == CORPSE &&
 				    (mons[food->corpsenm].geno & G_UNIQ)) {
-				    killer = the(killer);
+				    if (!type_is_pname(&mons[food->corpsenm]))
+					killer = the(killer);
 				    killer_format = KILLED_BY;
 				}
 			}

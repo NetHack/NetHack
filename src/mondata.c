@@ -468,6 +468,10 @@ const char *in_str;
 			(str[m_i_len] == ' ' ||
 			 !strcmpi(&str[m_i_len], "s") ||
 			 !strncmpi(&str[m_i_len], "s ", 2) ||
+			 !strcmpi(&str[m_i_len], "'") ||
+			 !strncmpi(&str[m_i_len], "' ", 2) ||
+			 !strcmpi(&str[m_i_len], "'s") ||
+			 !strncmpi(&str[m_i_len], "'s ", 3) ||
 			 !strcmpi(&str[m_i_len], "es") ||
 			 !strncmpi(&str[m_i_len], "es ", 3))) {
 		    mntmp = i;
