@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.4	2001/12/03	*/
+/*	SCCS Id: @(#)mkobj.c	3.4	2002/08/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -709,18 +709,21 @@ register struct obj *otmp;
 {
 	otmp->blessed = 0;
 	otmp->cursed = 1;
-	if (otmp->otyp == LUCKSTONE
-		|| (otmp->oartifact && spec_ability(otmp, SPFX_LUCK)))
+	/* welded two-handed weapon interferes with some armor removal */
+	if (otmp == uwep && bimanual(uwep)) reset_remarm();
+	/* some cursed items need immediate updating */
+	if (carried(otmp) && (otmp->otyp == LUCKSTONE ||
+		(otmp->oartifact && spec_ability(otmp, SPFX_LUCK))))
 	    set_moreluck();
 	else if (otmp->otyp == BAG_OF_HOLDING)
 	    otmp->owt = weight(otmp);
 	else if (otmp->otyp == FIGURINE) {
 		if (otmp->corpsenm != NON_PM
-	    	    && !dead_species(otmp->corpsenm,TRUE)
+		    && !dead_species(otmp->corpsenm,TRUE)
 		    && (carried(otmp) || mcarried(otmp)))
 			attach_fig_transform_timeout(otmp);
 	}
- 	return;
+	return;
 }
 
 void

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.4	2002/05/13	*/
+/*	SCCS Id: @(#)wield.c	3.4	2002/08/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -260,6 +260,8 @@ dowield()
 		return (0);
 	} else if (welded(uwep)) {
 		weldmsg(uwep);
+		/* previously interrupted armor removal mustn't be resumed */
+		reset_remarm();
 		return (0);
 	}
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2002/03/28	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2002/08/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -966,6 +966,7 @@ cancel_don()
 static NEARDATA const char clothes[] = {ARMOR_CLASS, 0};
 static NEARDATA const char accessories[] = {RING_CLASS, AMULET_CLASS, TOOL_CLASS, FOOD_CLASS, 0};
 
+/* the 'T' command */
 int
 dotakeoff()
 {
@@ -1016,41 +1017,17 @@ dotakeoff()
 	    You_cant("take that off.");
 	    return 0;
 	}
-	if (otmp == uarmg && welded(uwep)) {
-	    You("seem unable to take off the gloves while holding your %s.",
-		is_sword(uwep) ? c_sword : c_weapon);
-	    uwep->bknown = TRUE;
-	    return 0;
-	} else if (welded(uwep) && bimanual(uwep) &&
-		   (otmp == uarm
-#ifdef TOURIST
-		    || otmp == uarmu
-#endif
-		    )) {
-	    You("seem unable to take off %s while holding your %s.",
-		the(xname(otmp)), is_sword(uwep) ? c_sword : c_weapon);
-	    uwep->bknown = TRUE;
-	    return 0;
-	}
-	if (otmp == uarmg && Glib) {
-	    You_cant("remove the slippery gloves with your slippery fingers.");
-	    return 0;
-	}
-	if (otmp == uarmf && u.utrap && (u.utraptype == TT_BEARTRAP ||
-					u.utraptype == TT_INFLOOR)) { /* -3. */
-	    if(u.utraptype == TT_BEARTRAP)
-		pline_The("bear trap prevents you from pulling your %s out.",
-		      body_part(FOOT));
-	    else
-		You("are stuck in the %s, and cannot pull your %s out.",
-		    surface(u.ux, u.uy), makeplural(body_part(FOOT)));
-		return(0);
-	}
-	reset_remarm();			/* since you may change ordering */
+
+	reset_remarm();		/* clear takeoff_mask and taking_off */
+	(void) select_off(otmp);
+	if (!takeoff_mask) return 0;
+	reset_remarm();		/* armoroff() doesn't use takeoff_mask */
+
 	(void) armoroff(otmp);
 	return(1);
 }
 
+/* the 'R' command */
 int
 doremring()
 {
@@ -1073,32 +1050,13 @@ doremring()
 		You("are not wearing that.");
 		return(0);
 	}
-	if(cursed(otmp)) return(0);
-	if(otmp->oclass == RING_CLASS || otmp->otyp == MEAT_RING) {
-		if (nolimbs(youmonst.data)) {
-			pline("It seems to be stuck.");
-			return(0);
-		}
-		if (uarmg && uarmg->cursed) {
-			uarmg->bknown = TRUE;
-			You(
-	    "seem unable to remove your ring without taking off your gloves.");
-			return(0);
-		}
-		if (welded(uwep) && bimanual(uwep)) {
-			uwep->bknown = TRUE;
-			You(
-	       "seem unable to remove the ring while your hands hold your %s.",
-			    is_sword(uwep) ? c_sword : c_weapon);
-			return(0);
-		}
-		if (welded(uwep) && otmp==uright) {
-			uwep->bknown = TRUE;
-			You(
-	 "seem unable to remove the ring while your right hand holds your %s.",
-			    is_sword(uwep) ? c_sword : c_weapon);
-			return(0);
-		}
+
+	reset_remarm();		/* clear takeoff_mask and taking_off */
+	(void) select_off(otmp);
+	if (!takeoff_mask) return 0;
+	reset_remarm();		/* not used by Ring_/Amulet_/Blindf_off() */
+
+	if (otmp == uright || otmp == uleft) {
 		/* Sometimes we want to give the off_msg before removing and
 		 * sometimes after; for instance, "you were wearing a moonstone
 		 * ring (on right hand)" is desired but "you were wearing a
@@ -1107,10 +1065,14 @@ doremring()
 		 */
 		off_msg(otmp);
 		Ring_off(otmp);
-	} else if(otmp->oclass == AMULET_CLASS) {
+	} else if (otmp == uamul) {
 		Amulet_off();
 		off_msg(otmp);
-	} else Blindf_off(otmp); /* does its own off_msg */
+	} else if (otmp == ublindf) {
+		Blindf_off(otmp);	/* does its own off_msg */
+	} else {
+		impossible("removing strange accessory?");
+	}
 	return(1);
 }
 
@@ -1121,9 +1083,9 @@ register struct obj *otmp;
 {
 	/* Curses, like chickens, come home to roost. */
 	if((otmp == uwep) ? welded(otmp) : (int)otmp->cursed) {
-		You("can't.  %s to be cursed.",
+		You("can't.  %s cursed.",
 			(is_boots(otmp) || is_gloves(otmp) || otmp->quan > 1L)
-			? "They seem" : "It seems");
+			? "They are" : "It is");
 		otmp->bknown = TRUE;
 		return(1);
 	}
@@ -1228,11 +1190,11 @@ boolean noisy;
     }
 
     if (welded(uwep) && bimanual(uwep) &&
-	(otmp == uarm
+	    (is_suit(otmp)
 #ifdef TOURIST
-	 || otmp == uarmu
+			|| is_shirt(otmp)
 #endif
-	 )) {
+	    )) {
 	if (noisy)
 	    You("cannot do that while holding your %s.",
 		is_sword(uwep) ? c_sword : c_weapon);
@@ -1660,45 +1622,82 @@ int
 select_off(otmp)
 register struct obj *otmp;
 {
+	struct obj *why;
 	char buf[BUFSZ];
 
-	if(!otmp) return(0);
-	if(cursed(otmp)) return(0);
-	if((otmp->oclass==RING_CLASS || otmp->otyp == MEAT_RING)
-				&& nolimbs(youmonst.data))
-		return(0);
-	if(welded(uwep) && (otmp==uarmg || otmp==uright || (otmp==uleft
-			&& bimanual(uwep)))) {
-		You("cannot free a weapon hand to take off the ring.");
-		return(0);
+	if (!otmp) return 0;
+	*buf = '\0';			/* lint suppresion */
+
+	if (otmp == uright || otmp == uleft) {
+	    if (nolimbs(youmonst.data)) {
+		pline_The("ring is stuck.");
+		return 0;
+	    }
+	    why = 0;	/* the item which prevents ring removal */
+	    if (welded(uwep) && (otmp == uright || bimanual(uwep))) {
+		Sprintf(buf, "free a weapon %s", body_part(HAND));
+		why = uwep;
+	    } else if (uarmg && uarmg->cursed) {
+		Sprintf(buf, "take off your %s", c_gloves);
+		why = uarmg;
+	    }
+	    if (why) {
+		You("cannot %s to remove the ring.", buf);
+		why->bknown = TRUE;
+		return 0;
+	    }
 	}
-	if(uarmg && uarmg->cursed && (otmp==uright || otmp==uleft)) {
-		uarmg->bknown = TRUE;
-		You("cannot remove your gloves to take off the ring.");
-		return(0);
+	if (otmp == uarmg) {
+	    if (welded(uwep)) {
+		You("are unable to take off your %s while wielding that %s.",
+		    c_gloves, is_sword(uwep) ? c_sword : c_weapon);
+		uwep->bknown = TRUE;
+		return 0;
+	    } else if (Glib) {
+		You_cant("take off the slippery %s with your slippery %s.",
+			 c_gloves, makeplural(body_part(FINGER)));
+		return 0;
+	    }
 	}
-	if(otmp == uarmf && u.utrap && (u.utraptype == TT_BEARTRAP ||
-					u.utraptype == TT_INFLOOR)) {
-		return (0);
+	if (otmp == uarmf) {
+	    if (u.utrap && u.utraptype == TT_BEARTRAP) {
+		pline_The("bear trap prevents you from pulling your %s out.",
+			  body_part(FOOT));
+		return 0;
+	    } else if (u.utrap && u.utraptype == TT_INFLOOR) {
+		You("are stuck in the %s, and cannot pull your %s out.",
+		    surface(u.ux, u.uy), makeplural(body_part(FOOT)));
+		return 0;
+	    }
 	}
-	if((otmp==uarm
+	if (otmp == uarm
 #ifdef TOURIST
-			|| otmp==uarmu
+			|| otmp == uarmu
 #endif
-					) && uarmc && uarmc->cursed) {
-		Strcpy(buf, the(xname(uarmc)));
-		You("cannot remove %s to take off %s.", buf, the(xname(otmp)));
-		uarmc->bknown = TRUE;
-		return(0);
-	}
+		) {
+	    why = 0;	/* the item which prevents disrobing */
+	    if (uarmc && uarmc->cursed) {
+		Sprintf(buf, "remove your %s", cloak_simple_name(uarmc));
+		why = uarmc;
 #ifdef TOURIST
-	if(otmp==uarmu && uarm && uarm->cursed) {
-		Strcpy(buf, the(xname(uarm)));
-		You("cannot remove %s to take off %s.", buf, the(xname(otmp)));
-		uarm->bknown = TRUE;
-		return(0);
-	}
+	    } else if (otmp == uarmu && uarm && uarm->cursed) {
+		Sprintf(buf, "remove your %s", c_suit);
+		why = uarm;
 #endif
+	    } else if (welded(uwep) && bimanual(uwep)) {
+		Sprintf(buf, "release your %s",
+			is_sword(uwep) ? c_sword :
+			(uwep->otyp == BATTLE_AXE) ? c_axe : c_weapon);
+		why = uwep;
+	    }
+	    if (why) {
+		You("cannot %s to take off %s.", buf, the(xname(otmp)));
+		why->bknown = TRUE;
+		return 0;
+	    }
+	}
+	/* fundamental, but other impediments are checked first */
+	if (cursed(otmp)) return 0;
 
 	if(otmp == uarm) takeoff_mask |= WORN_ARMOR;
 	else if(otmp == uarmc) takeoff_mask |= WORN_CLOAK;
@@ -1787,13 +1786,13 @@ take_off()
 	register int i;
 	register struct obj *otmp;
 
-	if(taking_off) {
-	    if(todelay > 0) {
-
+	if (taking_off) {
+	    if (todelay > 0) {
 		todelay--;
 		return(1);	/* still busy */
-	    } else if((otmp = do_takeoff())) off_msg(otmp);
-
+	    } else {
+		if ((otmp = do_takeoff())) off_msg(otmp);
+	    }
 	    takeoff_mask &= ~taking_off;
 	    taking_off = 0L;
 	}
@@ -1865,18 +1864,13 @@ take_off()
 	return(1);		/* get busy */
 }
 
-#endif /* OVLB */
-#ifdef OVL1
-
 void
 reset_remarm()
 {
 	taking_off = takeoff_mask = 0L;
 }
 
-#endif /* OVL1 */
-#ifdef OVLB
-
+/* the 'A' command */
 int
 doddoremarm()
 {
