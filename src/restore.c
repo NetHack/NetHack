@@ -465,7 +465,7 @@ STATIC_OVL int
 restlevelfile(fd, ltmp)
 register int fd;
 xchar ltmp;
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
 # pragma unused(fd)
 #endif
 {

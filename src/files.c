@@ -1004,7 +1004,7 @@ int retryct;
 void
 unlock_file(filename)
 const char *filename;
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
 # pragma unused(filename)
 #endif
 {
