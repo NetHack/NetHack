@@ -227,9 +227,10 @@ Your character's name and professional ranking (based on the
 experience level, see below).
 .lp Strength
 A measure of your character's strength; one of your six basic
-attributes.  Your attributes can range from 3 to 18 inclusive
+attributes.  A human character's attributes can range from 3 to 18 inclusive;
+non-humans may exceed these limits
 (occasionally you may get super-strengths of the form 18/xx, and magic can
-cause attributes to exceed the normal limits).  The
+also cause attributes to exceed the normal limits).  The
 higher your strength, the stronger you are.  Strength affects how
 successfully you perform physical tasks, how much damage you do in
 combat, and how much loot you can carry.
@@ -1332,10 +1333,11 @@ a time when your luck is particularly bad, you can end up wasting both the
 energy and the time required in casting.
 .pg
 Casting a spell calls forth magical energies and focuses them with
-your naked mind.  Releasing the magical energy releases some of your
-memory of the spell with it.  Each time you cast a spell, your
-familiarity with it will dwindle, until you eventually forget the
-details completely and must relearn it.
+your naked mind.  Some of the magical energy released comes from within
+you, and casting several spells in a row may tire you.
+Casting of spells also requires practice.  With practice, your
+skill in each category of spell casting will improve.  Over time, however,
+your memory of each spell will dim, and you will need to relearn it.
 .pg
 Some spells are
 directional\(emyou must give a direction in which to cast them.  You can also
@@ -1354,8 +1356,9 @@ Casting a spell also requires flexible movement, and wearing various types
 of armor may interfere with that.
 .pg
 The command to read a spellbook is the same as for scrolls, `r'
-(read).  The `+' command lists your current spells and the number of
-spell points they require.  The `Z' (cast) command casts a spell.
+(read).  The `+' command lists your current spells, their levels,
+categories, and chances for failure.  
+The `Z' (cast) command casts a spell.
 .hn 2
 Tools (`(')
 .pg
@@ -1802,7 +1805,7 @@ Display an introductory message when starting the game (default on).
 Show corridor squares seen by night vision or a light source held by your
 character as lit (default off).
 .lp "mail    "
-Enable mail delivery during the game.
+Enable mail delivery during the game (default on).
 .lp "male    "
 An obsolete synonym for ``gender:male''.
 Cannot be set with the `O' command.
