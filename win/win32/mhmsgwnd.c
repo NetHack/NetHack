@@ -491,10 +491,13 @@ void onPaint(HWND hWnd)
 	    oldFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, data->window_text[lineidx].attr, hdc, FALSE));
 
 	    /* find out if we can concatenate the scheduled message without wrapping,
-	       but only if no clear_nhwindow was done just before putstr'ing this one. 
+        but only if no clear_nhwindow was done just before putstr'ing this one,
+        and only if not in a more prompt already (to prevent concatenating to
+        a line containing --More-- when resizing while --More-- is displayed.) 
 	       */
 	    if (i == MSG_LINES-1 
-		    && strlen(data->new_line.text) > 0) {
+  && strlen(data->new_line.text) > 0
+  && !data->in_more) {
 		/* concatenate to the previous line if that is not empty, and
 		   if it has the same attribute, and no clear was done.
 		   */
