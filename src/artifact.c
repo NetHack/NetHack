@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.4	2002/08/01	*/
+/*	SCCS Id: @(#)artifact.c 3.4	2002/10/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -753,23 +753,20 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	    return realizes_damage;
 	}
 	if (attacks(AD_ELEC, otmp)) {
-	    if (realizes_damage) {
-		pline_The("massive hammer hits %s%c",
+	    if (realizes_damage)
+		pline_The("massive hammer hits%s %s%c",
+			  !spec_dbon_applies ? "" : "!  Lightning strikes",
 			  hittee, !spec_dbon_applies ? '.' : '!');
-		if (spec_dbon_applies)
-		    pline("Lightning strikes %s!", hittee);
-	    }
 	    if (!rn2(5)) (void) destroy_mitem(mdef, RING_CLASS, AD_ELEC);
 	    if (!rn2(5)) (void) destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
 	    return realizes_damage;
 	}
 	if (attacks(AD_MAGM, otmp)) {
-	    if (realizes_damage) {
-		pline_The("imaginary widget hits %s%c",
+	    if (realizes_damage)
+		pline_The("imaginary widget hits%s %s%c",
+			  !spec_dbon_applies ? "" :
+				"!  A hail of magic missiles strikes",
 			  hittee, !spec_dbon_applies ? '.' : '!');
-		if (spec_dbon_applies)
-		    pline("A hail of magic missiles strikes %s!", hittee);
-	    }
 	    return realizes_damage;
 	}
 
