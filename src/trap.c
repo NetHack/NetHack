@@ -3127,22 +3127,44 @@ boolean force;
 	struct trap *ttmp;
 	struct monst *mtmp;
 	boolean trap_skipped = FALSE;
+	boolean box_here = FALSE;
+	boolean deal_with_floor_trap = FALSE;
+	char the_trap[BUFSZ], qbuf[QBUFSZ];
+	int containercnt = 0;
 
 	if(!getdir((char *)0)) return(0);
 	x = u.ux + u.dx;
 	y = u.uy + u.dy;
 
-	if ((ttmp = t_at(x,y)) && ttmp->tseen) {
-		if (u.utrap) {
-			You("cannot deal with traps while trapped!");
-			return 1;
+	for(otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere) {
+		if(Is_box(otmp) && !u.dx && !u.dy) {
+			box_here = TRUE;
+			containercnt++;
+			if (containercnt > 1) break;
 		}
-		There("is %s here.", an(defsyms[trap_to_defsym(ttmp->ttyp)].explanation));
+	}
 
-		switch (ynq(ttmp->ttyp == WEB ? "Remove it?" : "Disarm it?")) {
-		  case 'q': return(0);
-		  case 'n': trap_skipped = TRUE; break;
-		  case 'y':
+	if ((ttmp = t_at(x,y)) && ttmp->tseen) {
+		deal_with_floor_trap = TRUE;
+		Strcpy(the_trap, the(defsyms[trap_to_defsym(ttmp->ttyp)].explanation));
+		if (box_here) {
+			Sprintf(qbuf, "There %s and %s here. %s %s?",
+				(containercnt == 1) ? "is a container" : "are containers",
+				an(defsyms[trap_to_defsym(ttmp->ttyp)].explanation),
+				ttmp->ttyp == WEB ? "Remove" : "Disarm", the_trap);
+			switch (ynq(qbuf)) {
+			  case 'q': return(0);
+			  case 'n': trap_skipped = TRUE;
+				    deal_with_floor_trap = FALSE;
+				    break;
+			}
+		}
+		if (deal_with_floor_trap) {
+		    if (u.utrap) {
+			You("cannot deal with %s while trapped%s!", the_trap,
+				(x == u.ux && y == u.uy) ? " in it" : "");
+			return 1;
+		    }
 		    switch(ttmp->ttyp) {
 			case BEAR_TRAP:
 			case WEB:
