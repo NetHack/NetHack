@@ -28,6 +28,7 @@
 #define LLEN 128
 
 extern const char *killed_by_prefix[];
+extern winid WIN_STATUS;
 
 #ifdef _DEBUG
 extern void logDebug(const char *fmt, ...);
