@@ -197,6 +197,14 @@ const char *verb;
 	} else if (is_lava(x, y)) {
 		return fire_damage(obj, FALSE, FALSE, x, y);
 	} else if (is_pool(x, y)) {
+		/* Reasonably bulky objects (arbitrary) splash when dropped.
+		 * Stuff dropped near fountains always misses */
+		if (Blind && flags.soundok && ((x == u.ux) && (y == u.uy)) &&
+		    weight(obj) > 9) {
+		    pline("Splash!");
+		    map_background(x, y, 0);
+		    newsym(x, y);
+		}
 		water_damage(obj, FALSE, FALSE);
 	}
 	return FALSE;
