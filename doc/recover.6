@@ -1,0 +1,116 @@
+.TH RECOVER 6 "9 January 1993"
+.UC 4
+.SH NAME
+recover \- recover a NetHack game interrupted by disaster
+.SH SYNOPSIS
+.B recover
+[
+.B \-d
+.I directory
+]
+.I "base1 base2" ...
+.SH DESCRIPTION
+.PP
+Occasionally, a NetHack game will be interrupted by disaster
+when the game or the system crashes.
+Prior to NetHack v3.1, these games were lost because various information
+like the player's inventory was kept only in memory.
+Now, all pertinent information can be written out to disk,
+so such games can be recovered at the point of the last level change.
+.PP
+The
+.I base
+options tell
+.I recover
+which files to process.
+Each base option specifies recovery of a separate game.
+.PP
+The
+.B \-d
+option, which must be the first argument if it appears,
+supplies a directory which is the NetHack playground.
+It overrides the value from NETHACKDIR, HACKDIR, or the directory
+specified by the game administrator during compilation
+(usually /usr/games/lib/nethackdir).
+.PP
+For recovery to be possible,
+.I nethack
+must have been compiled with the INSURANCE option, and the run-time option
+.I checkpoint
+must also have been on.
+NetHack normally writes out files for levels as the player leaves them,
+so they will be ready for return visits.
+When checkpointing, NetHack also writes out the level entered and
+the current game state on every level change.
+This naturally slows level changes down somewhat.
+.PP
+The level file names are of the form base.nn, where nn is an internal
+bookkeeping number for the level.
+The file base.0 is used for game identity, locking, and, when checkpointing,
+for the game state.
+Various OSes use different strategies for constructing the base name.
+Microcomputers use the character name, possibly truncated and modified
+to be a legal filename on that system.
+Multi-user systems use the (modified) character name prefixed
+by a user number to avoid conflicts,
+or "xlock" if the number of concurrent players is being limited.
+It may be necessary to look in the playground to find the correct
+base name of the interrupted game.
+.I recover
+will transform these level files into a save file of the same name as
+.I nethack
+would have used.
+.PP
+Since
+.I recover
+must be able to read and delete files from the playground
+and create files in the save directory,
+it has interesting interactions with game security.
+Giving ordinary players access to
+.I recover
+through setuid or setgid is tantamount to leaving the playground
+world-writable,
+with respect to both cheating and messing up other players.
+For a single-user system, this of course does not change anything,
+so some of the microcomputer ports install
+.I recover
+by default.
+.PP
+For a multi-user system,
+the game administrator may want to arrange for all .0 files in the
+playground to be fed to recover when the host machine boots,
+and handle game crashes individually.
+If the user population is sufficiently trustworthy,
+.I recover
+can be installed with the same permissions the
+.I nethack
+executable has.
+In either case,
+.I recover
+is easily compiled from the distribution utility directory.
+.SH NOTES
+.PP
+Like
+.I nethack
+itself,
+.I recover
+will overwrite existing savefiles of the same name.
+Savefiles created by
+.I recover
+are uncompressed;
+they may be compressed afterwards if desired,
+but even a compression-using
+.I nethack
+will find them in the uncompressed form.
+.SH "SEE ALSO"
+nethack(6)
+.SH BUGS
+.PP
+.I recover
+makes no attempt to find out if a base name specifies a game in progress.
+If multiple machines share a playground, this would be impossible to
+determine.
+.PP
+.I recover
+should be taught to use the nethack playground locking mechanism to
+avoid conflicts.
