@@ -34,6 +34,7 @@ STATIC_VAR const char *A_Your[2];
 STATIC_VAR const char *the_your[2];
 STATIC_VAR const char tower_of_flame[];
 STATIC_VAR const char *A_gush_of_water_hits;
+STATIC_VAR const char * const blindgas[6];
 
 #else
 
@@ -42,6 +43,8 @@ STATIC_VAR const char *A_Your[2] = { "A", "Your" };
 STATIC_VAR const char *the_your[2] = { "the", "your" };
 STATIC_VAR const char tower_of_flame[] = "tower of flame";
 STATIC_VAR const char *A_gush_of_water_hits = "A gush of water hits";
+STATIC_VAR const char * const blindgas[6] = 
+	{"humid", "odorless", "pungent", "chilling", "acrid", "biting"};
 
 #endif /* OVLB */
 
@@ -3497,8 +3500,8 @@ boolean disarm;
 		case 1:
 		case 0:
 			pline("A cloud of %s gas billows from %s.",
-						hcolor((char *)0),
-						the(xname(obj)));
+				Blind ? blindgas[rn2(SIZE(blindgas))] :
+				hcolor((char *)0), the(xname(obj)));
 			if(!Stunned) {
 			    if (Hallucination)
 				pline("What a groovy feeling!");
