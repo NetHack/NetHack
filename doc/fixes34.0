@@ -417,10 +417,10 @@ dragons have scales, not fur
 if player teleports a monster while swallowed on a noteleport level, the
 	player should not teleport along with the monster
 prefixes that can appear in any order when wishing should include +/- and empty
-word-order in wishes, allow "blessed +2 fireproof", not just 
-	"blessed fireproof +2"
 don't allow untrapping of adjacent traps in locations you can't move to
 summoning should summon any alignment if summoner's base alignment is A_NONE
+when dipping unicorn horn in potion, the potion might change bless status, so
+	set bknown to FALSE
 
 
 Platform- and/or Interface-Specific Fixes
