@@ -1612,7 +1612,7 @@ register int x, y;	/* not xchar: perhaps xchar is unsigned and
     cw->curx = --x;	/* column 0 is never used */
     cw->cury = y;
 #ifdef DEBUG
-    if(x<0 || y<0 || y >= cw->rows || x >= cw->cols) {
+    if(x<0 || y<0 || y >= cw->rows || x > cw->cols) {
 	const char *s = "[unknown type]";
 	switch(cw->type) {
 	case NHW_MESSAGE: s = "[topl window]"; break;
