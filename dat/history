@@ -1,4 +1,4 @@
-NetHack History file for release 3.3
+NetHack History file for release 3.4
 
 Behold, mortal, the origins of NetHack...
 
@@ -100,35 +100,35 @@ Warren Cheung combined SLASH with the Wizard Patch to produce Slash'em, and
 with the help of Kevin Hugo, added more features.  Kevin later joined the
 DevTeam and incorporated the best of these ideas in NetHack 3.3.
 
-The 3.3 development team initially consisted of Michael Allison, Ken Arromdee, 
+The 3.4 development team initially consisted of Michael Allison, Ken Arromdee, 
 David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, 
 Kevin Hugo, Steve Linhart, Ken Lorber, Dean Luick, Pat Rankin, Eric Smith, 
 Mike Stephenson, Janet Walz, and Paul Winner. Warwick Allison joined just 
-before the release of NetHack 3.3.2.
+before the release of NetHack 3.4.0.
 
-As with version 3.2, various people contributed to the game as a whole as
+As with version 3.3, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
 
-Pat Rankin maintained 3.3 for VMS.
+Pat Rankin maintained 3.4 for VMS.
 
-Michael Allison maintained NetHack 3.3 for the MS-DOS platform.  
+Michael Allison maintained NetHack 3.4 for the MS-DOS platform.  
 Paul Winner and Yitzhak Sapir provided encouragement.
 
 Dean Luick, Mark Modrall, and Kevin Hugo maintained and enhanced the
-Macintosh port of 3.3.
+Macintosh port of 3.4.
 
-Michael Allison maintained and enhanced the console port of 3.3 for 
+Michael Allison maintained and enhanced the console port of 3.4 for 
 the Microsoft Windows NT/2000 platform. 
 
-Ron Van Iwaarden maintained 3.3 for OS/2.
+Ron Van Iwaarden maintained 3.4 for OS/2.
 
 Janne Salmijarvi and Teemu Suikki maintained and enhanced the 
-Amiga port of 3.3 after Janne Salmijarvi resurrected it for 3.3.1.
+Amiga port of 3.4 after Janne Salmijarvi resurrected it for 3.3.1.
 
-Christian `Marvin' Bressler maintained 3.3 for the Atari after he
+Christian `Marvin' Bressler maintained 3.4 for the Atari after he
 resurrected it for 3.3.1.
 
-Alex Kompel contributed a new graphical port of 3.3 for Microsoft Windows.
+Alex Kompel contributed a new graphical port of 3.4 for Microsoft Windows.
 
 There is a NetHack web site maintained by Ken Lorber at http://www.nethack.org/.
 
