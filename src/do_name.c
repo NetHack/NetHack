@@ -275,7 +275,9 @@ do_mname()
 	/* strip leading and trailing spaces; unnames monster if all spaces */
 	(void)mungspaces(buf);
 
-	if (mtmp->iswiz || type_is_pname(mtmp->data))
+	if (mtmp->iswiz || type_is_pname(mtmp->data) ||
+	    mtmp->data->msound == MS_LEADER ||
+	    mtmp->data->msound == MS_NEMESIS)
 	    pline("%s doesn't like being called names!", Monnam(mtmp));
 	else (void) christen_monst(mtmp, buf);
 	return(0);
