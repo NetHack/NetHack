@@ -1393,12 +1393,12 @@ char yn_function(const char *ques, const char *choices, char default)
 char mswin_yn_function(const char *question, const char *choices,
 		CHAR_P def)
 {
-    int result=-1;
     char ch;
     char yn_esc_map='\033';
     char message[BUFSZ];
 	char res_ch[2];
     int createcaret;
+	boolean digit_ok, allow_num;
 
 	logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
 
@@ -1418,20 +1418,23 @@ char mswin_yn_function(const char *question, const char *choices,
     }
 
     if (choices) {
-	char *cb, choicebuf[QBUFSZ];
-	Strcpy(choicebuf, choices);
-	if ((cb = index(choicebuf, '\033')) != 0) {
-	    /* anything beyond <esc> is hidden */
-	    *cb = '\0';
-	}
-	sprintf(message, "%s [%s] ", question, choicebuf);
-	if (def) sprintf(eos(message), "(%c) ", def);
-	/* escape maps to 'q' or 'n' or default, in that order */
-	yn_esc_map = (index(choices, 'q') ? 'q' :
-		 (index(choices, 'n') ? 'n' : def));
+		char *cb, choicebuf[QBUFSZ];
+
+		allow_num = (index(choices, '#') != 0);
+
+		Strcpy(choicebuf, choices);
+		if ((cb = index(choicebuf, '\033')) != 0) {
+			/* anything beyond <esc> is hidden */
+			*cb = '\0';
+		}
+		sprintf(message, "%s [%s] ", question, choicebuf);
+		if (def) sprintf(eos(message), "(%c) ", def);
+		/* escape maps to 'q' or 'n' or default, in that order */
+		yn_esc_map = (index(choices, 'q') ? 'q' :
+			(index(choices, 'n') ? 'n' : def));
     } else {
-	Strcpy(message, question);
-	Strcat(message, " ");
+		Strcpy(message, question);
+		Strcat(message, " ");
     }
 
     createcaret = 1;
@@ -1442,41 +1445,83 @@ char mswin_yn_function(const char *question, const char *choices,
     mswin_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
     /* Only here if main window is not present */
-    while (result<0) {
-        ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
-	ch=mswin_nhgetch();
-	if (choices)
-		ch = lowc(ch);
-        HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
-	if (ch=='\033') {
-	    result=yn_esc_map;
-	} else if (choices && !index(choices,ch)) {
-	    /* FYI: ch==-115 is for KP_ENTER */
-	    if (def && (ch==' ' || ch=='\r' || ch=='\n' || ch==-115)) {
-		result=def;
-	    } else if( index(choices, '#') && isdigit(ch) ) {
-		yn_number = ch;
-		result = '#';
-	    } else {
-		mswin_nhbell();
-		/* and try again... */
-	    }
-	} else {
-	    result=ch;
-	}
-    }
+	ch = 0;
+    do {
+		ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
+		ch=mswin_nhgetch();
+		HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
+		if (choices) ch = lowc(ch);
+		else break; /* If choices is NULL, all possible inputs are accepted and returned. */
+
+		digit_ok = allow_num && digit(ch);
+		if (ch=='\033') {
+			if (index(choices, 'q'))
+				ch = 'q';
+			else if (index(choices, 'n'))
+				ch = 'n';
+			else
+				ch = def;
+			break;
+	    } else if (index(quitchars, ch)) {
+			ch = def;
+			break;
+		} else if (!index(choices, ch) && !digit_ok) {
+			mswin_nhbell();
+			ch = (char)0;
+			/* and try again... */
+		} else if (ch == '#' || digit_ok) {
+			char z, digit_string[2];
+			int n_len = 0;
+			long value = 0;
+			mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, ("#"), 1); n_len++;
+			digit_string[1] = '\0';
+			if (ch != '#') {
+				digit_string[0] = ch;
+				mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, 1); n_len++;
+				value = ch - '0';
+				ch = '#';
+			}
+			do {	/* loop until we get a non-digit */
+				z = lowc(readchar());
+				if (digit(z)) {
+					value = (10 * value) + (z - '0');
+					if (value < 0) break;	/* overflow: try again */
+					digit_string[0] = z;
+					mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, 1);
+					n_len++;
+				} else if (z == 'y' || index(quitchars, z)) {
+					if (z == '\033')  value = -1;	/* abort */
+					z = '\n';	/* break */
+				} else if (z == '\b') {
+					if (n_len <= 1) { value = -1;  break; }
+					else { value /= 10;  mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, -1);  n_len--; }
+				} else {
+					value = -1;	/* abort */
+					mswin_nhbell();
+					break;
+				}
+			} while (z != '\n');
+			if (value > 0) yn_number = value;
+			else if (value == 0) ch = 'n';		/* 0 => "no" */
+			else {	/* remove number from top line, then try again */
+				mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, -n_len); n_len = 0;
+				ch = (char)0;
+			}
+		}
+	} while( !ch );
 
     createcaret = 0;
     SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
         WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+
 	/* display selection in the message window */
-	if( isprint(ch) ) {
+	if( isprint(ch) && ch!='#' ) {
 		res_ch[0] = ch;
 		res_ch[1] = '\x0';
 		mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, res_ch, 1);
 	}
 
-    return result;
+    return ch;
 }
 
 /*
