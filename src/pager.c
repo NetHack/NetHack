@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.4	2002/10/03	*/
+/*	SCCS Id: @(#)pager.c	3.4	2002/12/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -79,6 +79,11 @@ lookat(x, y, buf, monbuf)
 		race,
 		mons[u.umonnum].mname,
 		plname);
+	/* file lookup can't distinguish between "gnomish wizard" monster
+	   and correspondingly named player character, always picking the
+	   former; force it to find the general "wizard" entry instead */
+	if (Role_if(PM_WIZARD) && Race_if(PM_GNOME) && !Upolyd)
+	    pm = &mons[PM_WIZARD];
 
 #ifdef STEED
 	if (u.usteed) {

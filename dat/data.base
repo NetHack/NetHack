@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)data.base	3.4	2002/05/20
+#	SCCS Id: @(#)data.base	3.4	2002/12/17
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -184,6 +184,7 @@ apple
 	when.
 		[ The Devil's Dictionary, by Ambrose Bierce ]
 archeologist
+* archeologist
 	Archeology is the search for fact, not truth. [...] 
 	So forget any ideas you've got about lost cities, exotic travel, 
 	and digging up the world. We do not follow maps to buried 
@@ -313,7 +314,7 @@ banana
 	And Dayna knew he was right.
 		[ The Stand, by Stephen King ]
 barbarian
-human barbarian
+* barbarian
 	They dressed alike -- in buckskin boots, leathern breeks and
 	deerskin shirts, with broad girdles that held axes and short
 	swords; and they were all gaunt and scarred and hard-eyed;
@@ -979,6 +980,7 @@ doppelganger
 		[ Tarzan of the Apes, by Edgar Rice Burroughs ]
 ~dwarf ??m*
 dwarf*
+dwarven cave*man
 	Dwarfs have faces like men (ugly men, with wrinkled, leathery
 	skins), but are generally either flat-footed, duck-footed, or
 	have feet pointing backwards.  They are of the earth, earthy,
@@ -1072,11 +1074,9 @@ electric eel
 ~elf ??m*
 *elf*
 elvenking
-elven archeologist
 elven cave*man
 elven healer
-elven samurai
-elven wizard
+elven priest
 	The Elves sat round the fire upon the grass or upon the sawn
 	rings of old trunks.  Some went to and fro bearing cups and
 	pouring drinks; others brought food on heaped plates and
@@ -1360,9 +1360,12 @@ giant humanoid
 	boulders as weapons, hurling them over large distances.  All
 	types of giants share a love for men - roasted, boiled, or
 	fried.  Their table manners are legendary.
+# note: "gnomish wizard" is a monster; caveman and healer lack role entries
 ~gnome ??m*
 gnome*
 gnomish wizard
+gnomish cave*man
+gnomish healer
 	...  And then a gnome came by, carrying a bundle, an old
 	fellow three times as large as an imp and wearing clothes of
 	a sort, especially a hat.  And he was clearly just as frightened
@@ -1739,15 +1742,12 @@ humanoid
 	hostile, they may even band together to raid and pillage
 	human settlements.
 human
-human archeologist
 human cave*man
 human healer
 human monk
 human samurai
-human wizard
 acolyte
 apprentice
-archeologist
 arch priest
 attendant
 cave*man
@@ -1768,7 +1768,6 @@ student
 thug
 warrior
 *watch*
-wizard
 player
 	These strange creatures live mostly on the surface of the
 	earth, gathering together in societies of various forms, but
@@ -2005,7 +2004,7 @@ stiletto
 	went into his back up to the butt.
 		[ Ulysses, by James Joyce ]
 knight
-human knight
+* knight
 	Here lies the noble fearless knight,
 	Whose valour rose to such a height;
 	When Death at last had struck him down,
@@ -2844,6 +2843,10 @@ orcus
 	stinger.  He is most feared, though, for his powerful magic
 	abilities.  His wand causes death to those he chooses.
 ~orc ??m*
+~orcish barbarian
+~orcish ranger
+~orcish rogue
+~orcish wizard
 orc*
 * orc
 uruk*hai
@@ -3108,8 +3111,8 @@ quit*
 raijin
 raiden
 	The god of thunder.
-human ranger
 ranger
+* ranger
 	"Lonely men are we, Rangers of the wild, hunters -- but hunters
 	ever of the servants of the Enemy; for they are found in many
 	places, not in Mordor only.
@@ -3200,7 +3203,7 @@ rock mole
 	is still unknown how they convert some of these things into
 	something of nutritional value.
 rogue
-human rogue
+* rogue
 	I understand the business, I hear it: to have an open ear, a
 	quick eye, and a nimble hand, is necessary for a cut-purse; a
 	good nose is requisite also, to smell out work for the other
@@ -3780,8 +3783,7 @@ touch*stone
 	"Gold is tried by a touchstone, men by gold."
 		[ Chilon (c. 560 BC) ]
 tourist
-elven tourist
-human tourist
+* tourist
 	The road from Ankh-Morpork to Chrim is high, white and
 	winding, a thirty-league stretch of potholes and half-buried
 	rocks that spirals around mountains and dips into cool green
@@ -3975,7 +3977,7 @@ unicorn horn
 	keep me right there."
 		[ Unicorn Variations, by Roger Zelazny ]
 valkyrie
-human valkyrie
+* valkyrie
 	The Valkyries were the thirteen choosers of the slain, the
 	beautiful warrior-maids of Odin who rode through the air and
 	over the sea.  They watched the progress of the battle and
@@ -4107,6 +4109,19 @@ web
 	flat on his back upon a cold stone with his hands on his
 	breast.
 		[ The Fellowship of the Ring, by J.R.R. Tolkien ]
+# note: need to convert player character "gnomish wizard" into just "wizard"
+# in the lookup code to avoid conflict with the monster of that same name
+~gnomish wizard
+wizard
+* wizard
+	Ebenezum walked before me along the closest thing we could
+	find to a path in these overgrown woods.  Every few paces he
+	would pause, so that I, burdened with a pack stuffed with
+	arcane and heavy paraphernalia, could catch up with his
+	wizardly strides.  He, as usual, carried nothing, preferring,
+	as he often said, to keep his hands free for quick conjuring
+	and his mind free for the thoughts of a mage.
+		[ A Dealing with Demons, by Craig Shaw Gardner ]
 wizard of yendor
 	No one knows how old this mighty wizard is, or from whence he
 	came.  It is known that, having lived a span far greater than
