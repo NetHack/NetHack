@@ -2178,7 +2178,6 @@ struct obj *obj;
 		    /* to floor near you */
 		    You("yank %s %s to the %s!", s_suffix(mon_nam(mtmp)),
 			onambuf, surface(u.ux, u.uy));
-		    obj_no_longer_held(otmp);
 		    place_object(otmp, u.ux, u.uy);
 		    stackobj(otmp);
 		    break;

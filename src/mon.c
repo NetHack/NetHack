@@ -1488,6 +1488,7 @@ register struct monst *mdef;
 		/* some objects may end up outside the statue */
 		while ((obj = mdef->minvent) != 0) {
 		    obj_extract_self(obj);
+		    obj_no_longer_held(obj);
 		    if (obj->owornmask & W_WEP)
 			setmnotwielded(mdef,obj);
 		    obj->owornmask = 0L;

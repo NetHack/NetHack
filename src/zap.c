@@ -4037,6 +4037,10 @@ retry:
 	u.uconduct.wishes++;
 
 	if (otmp != &zeroobj) {
+	    /* place_object looses these */
+	    boolean crysknife = (otmp->otyp == CRYSKNIFE);
+	    int oerode = otmp->oerodeproof;
+
 	    /* in case touching this object turns out to be fatal */
 	    place_object(otmp, u.ux, u.uy);
 
@@ -4045,6 +4049,10 @@ retry:
 		dropy(otmp);		/* now put it back again :-) */
 	    } else {
 		obj_extract_self(otmp);
+		if (crysknife) {
+		    otmp->otyp = CRYSKNIFE;
+		    otmp->oerodeproof = oerode;
+		}
 		/* The(aobjnam()) is safe since otmp is unidentified -dlc */
 		(void) hold_another_object(otmp, u.uswallow ?
 				       "Oops!  %s out of your reach!" :

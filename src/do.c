@@ -531,7 +531,6 @@ register struct obj *obj;
 
 	if (!u.uswallow && flooreffects(obj,u.ux,u.uy,"drop")) return;
 	/* uswallow check done by GAN 01/29/87 */
-	obj_no_longer_held(obj);
 	if(u.uswallow) {
 	    boolean could_petrify;
 	    if (obj != uball) {		/* mon doesn't pick up ball */
@@ -557,25 +556,28 @@ register struct obj *obj;
 	}
 }
 
+/* things that must change when not held; recurse into containers.
+   Called for both player and monsters */
 void
-obj_no_longer_held(obj)	/* things that must change when not held; recurse into containers */
+obj_no_longer_held(obj)
 struct obj *obj;
 {
 	if (!obj) {
-		return;
+	    return;
 	} else if ((Is_container(obj) || obj->otyp == STATUE) && obj->cobj) {
-		struct obj *contents;
-		for(contents=obj->cobj; contents; contents=contents->nobj)
-			obj_no_longer_held(contents);
+	    struct obj *contents;
+	    for(contents=obj->cobj; contents; contents=contents->nobj)
+		obj_no_longer_held(contents);
 	}
 	switch(obj->otyp) {
-		case CRYSKNIFE:
-			/* KMH -- Fixed crysknives have only 10% chance of reverting */
-			if (!obj->oerodeproof || !rn2(10)) {
-				obj->otyp = WORM_TOOTH;
-				obj->oerodeproof = 0;
-			}
-			break;
+	case CRYSKNIFE:
+	    /* KMH -- Fixed crysknives have only 10% chance of reverting */
+	    /* only changes when not held by player or monster */
+	    if (!obj->oerodeproof || !rn2(10)) {
+		obj->otyp = WORM_TOOTH;
+		obj->oerodeproof = 0;
+	    }
+	    break;
 	}
 }
 

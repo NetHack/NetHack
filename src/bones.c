@@ -126,11 +126,12 @@ struct obj *cont;
 
 	while ((otmp = invent) != 0) {
 		obj_extract_self(otmp);
+		obj_no_longer_held(otmp);
 
 		otmp->owornmask = 0;
 		/* lamps don't go out when dropped */
-		if ((cont || artifact_light(otmp)) && obj_is_burning(otmp))	/* smother in statue */
-			end_burn(otmp, otmp->otyp != MAGIC_LAMP && !artifact_light(otmp));
+		if ((cont || artifact_light(otmp)) && obj_is_burning(otmp))
+		    end_burn(otmp, TRUE);	/* smother in statue */
 
 		if(otmp->otyp == SLIME_MOLD) goodfruit(otmp->spe);
 

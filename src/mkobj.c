@@ -1082,6 +1082,7 @@ int x, y;
     if (otmp->where != OBJ_FREE)
 	panic("place_object: obj not free");
 
+    obj_no_longer_held(otmp);
     if (otmp->otyp == BOULDER) block_point(x,y);	/* vision */
 
     /* obj goes under boulders */
@@ -1393,6 +1394,8 @@ add_to_container(container, obj)
 
     if (obj->where != OBJ_FREE)
 	panic("add_to_container: obj not free");
+    if (container->where != OBJ_INVENT && container->where != OBJ_MINVENT)
+	obj_no_longer_held(obj);
 
     /* merge if possible */
     for (otmp = container->cobj; otmp; otmp = otmp->nobj)

@@ -1823,7 +1823,6 @@ skipmsg:
 			case 1:		/* onto floor beneath mon */
 			    pline("%s yanks %s from your %s!", Monnam(mtmp),
 				  the_weapon, hand);
-			    obj_no_longer_held(obj);
 			    place_object(obj, mtmp->mx, mtmp->my);
 			    break;
 			case 2:		/* onto floor beneath you */
