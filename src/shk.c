@@ -3228,7 +3228,7 @@ register struct monst *shkp;
 		    Such voluntary abandonment left unpaid objects in
 		    invent, triggering billing impossibilities on the
 		    next level once the character fell through the hole.] */
-		if (udist > 4 && eshkp->following)
+		if (udist > 4 && eshkp->following && !eshkp->billct)
 		    return(-1);	/* leave it to m_move */
 		gx = u.ux;
 		gy = u.uy;
