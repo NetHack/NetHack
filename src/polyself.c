@@ -54,17 +54,9 @@ const char *fmt, *arg;
 	find_ac();
 	if (was_mimicking) {
 	    if (multi < 0) unmul("");
-	} else {
-	    /*
-	     * Clear any in-progress imitations -- the case where not a
-	     * mimic is handled above.
-	     *
-	     * Except, this is not complete if the hero ever gets the
-	     * chance to imitate anything, then s/he may be mimicing
-	     * gold, but not the way its done for eating a mimic.
-	     */
 	    youmonst.m_ap_type = M_AP_NOTHING;
 	}
+
 	newsym(u.ux,u.uy);
 
 	You(fmt, arg);
