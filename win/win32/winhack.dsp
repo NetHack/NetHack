@@ -45,7 +45,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Yu"stdafx.h" /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "." /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -78,7 +78,7 @@ PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Yu"stdafx.h" /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /D "MSWIN_GRAPHICS" /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -111,9 +111,9 @@ PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	
 # PROP Intermediate_Dir "Unicode_Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /GX /O2 /I "." /I "..\include" /I "..\sys\winnt" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /FD /c
+# ADD BASE CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /FD /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /W3 /GX /O2 /I "." /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -146,9 +146,9 @@ PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	
 # PROP Intermediate_Dir "Unicode_Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I "..\include" /I "..\sys\winnt" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /FD /GZ /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "DLB" /FD /GZ /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\win\win32" /I "..\include" /I "..\sys\winnt" /I "..\sys\share" /I "..\win\share" /I "..\win\win32" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "DLB" /D "MSWIN_GRAPHICS" /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -977,7 +977,7 @@ SOURCE=..\include\winGnome.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\winhack.h
+SOURCE=..\win\win32\winhack.h
 # End Source File
 # Begin Source File
 
@@ -1017,35 +1017,35 @@ SOURCE=..\include\youprop.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
-SOURCE=.\bitmap1.bmp
+SOURCE=..\win\win32\bitmap1.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=.\bitmap2.bmp
+SOURCE=..\win\win32\bitmap2.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=.\mnsel.bmp
+SOURCE=..\win\win32\mnsel.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=.\mnunsel.bmp
+SOURCE=..\win\win32\mnunsel.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=.\NETHACK.ICO
+SOURCE=..\win\win32\NETHACK.ICO
 # End Source File
 # Begin Source File
 
-SOURCE=.\small.ico
+SOURCE=..\win\win32\small.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\tiles.bmp
+SOURCE=..\win\win32\tiles.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=.\winhack.ico
+SOURCE=..\win\win32\winhack.ico
 # End Source File
 # End Group
 # Begin Group "wnd"
@@ -1053,120 +1053,120 @@ SOURCE=.\winhack.ico
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\mhaskyn.c
+SOURCE=..\win\win32\mhaskyn.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhaskyn.h
+SOURCE=..\win\win32\mhaskyn.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhdlg.c
+SOURCE=..\win\win32\mhdlg.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhdlg.h
+SOURCE=..\win\win32\mhdlg.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhfont.c
+SOURCE=..\win\win32\mhfont.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhfont.h
+SOURCE=..\win\win32\mhfont.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhinput.c
+SOURCE=..\win\win32\mhinput.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhinput.h
+SOURCE=..\win\win32\mhinput.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhmain.c
+SOURCE=..\win\win32\mhmain.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhmain.h
+SOURCE=..\win\win32\mhmain.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhmap.c
+SOURCE=..\win\win32\mhmap.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhmap.h
+SOURCE=..\win\win32\mhmap.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhmenu.c
+SOURCE=..\win\win32\mhmenu.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhmenu.h
+SOURCE=..\win\win32\mhmenu.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhmsg.h
+SOURCE=..\win\win32\mhmsg.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhmsgwnd.c
+SOURCE=..\win\win32\mhmsgwnd.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhmsgwnd.h
+SOURCE=..\win\win32\mhmsgwnd.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhrip.c
+SOURCE=..\win\win32\mhrip.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhrip.h
+SOURCE=..\win\win32\mhrip.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhstatus.c
+SOURCE=..\win\win32\mhstatus.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhstatus.h
+SOURCE=..\win\win32\mhstatus.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhtext.c
+SOURCE=..\win\win32\mhtext.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mhtext.h
+SOURCE=..\win\win32\mhtext.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mswproc.c
+SOURCE=..\win\win32\mswproc.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\resource.h
+SOURCE=..\win\win32\resource.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\winhack.c
+SOURCE=..\win\win32\winhack.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\winhack.rc
+SOURCE=..\win\win32\winhack.rc
 # End Source File
 # Begin Source File
 
-SOURCE=.\winMS.h
+SOURCE=..\win\win32\winMS.h
 # End Source File
 # End Group
 # Begin Source File
 
-SOURCE=.\ReadMe.txt
+SOURCE=..\win\win32\ReadMe.txt
 # End Source File
 # End Target
 # End Project

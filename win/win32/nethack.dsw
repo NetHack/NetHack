@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "dgncomp"=.\winhacknt\dgncomp.dsp - Package Owner=<4>
+Project: "dgncomp"=.\build\dgncomp.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -18,7 +18,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dgnstuff"=.\winhacknt\dgnstuff.dsp - Package Owner=<4>
+Project: "dgnstuff"=.\build\dgnstuff.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -33,7 +33,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dlb_main"=.\winhacknt\dlb_main.dsp - Package Owner=<4>
+Project: "dlb_main"=.\build\dlb_main.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -54,7 +54,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "levcomp"=.\winhacknt\levcomp.dsp - Package Owner=<4>
+Project: "levcomp"=.\build\levcomp.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -69,7 +69,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "levstuff"=.\winhacknt\levstuff.dsp - Package Owner=<4>
+Project: "levstuff"=.\build\levstuff.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -84,7 +84,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "makedefs"=.\winhacknt\makedefs.dsp - Package Owner=<4>
+Project: "makedefs"=.\build\makedefs.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -96,7 +96,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "recover"=.\winhacknt\recover.dsp - Package Owner=<4>
+Project: "recover"=.\build\recover.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -114,7 +114,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "tile2bmp"=.\winhacknt\tile2bmp.dsp - Package Owner=<4>
+Project: "tile2bmp"=.\build\tile2bmp.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -126,7 +126,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "tilemap"=.\winhacknt\tilemap.dsp - Package Owner=<4>
+Project: "tilemap"=.\build\tilemap.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -138,7 +138,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "winhack"=.\winhacknt\winhack.dsp - Package Owner=<4>
+Project: "winhack"=.\build\winhack.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

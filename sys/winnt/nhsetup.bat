@@ -46,90 +46,67 @@ goto done
 :do_win
 set opt=Graphical NetHack for Windows
 if not exist ..\..\win\win32\winnt.dsw goto err_win
-echo "Copying Visual C project files to ..\..\winhacknt directory"
-if NOT exist ..\..\winhacknt\*.* mkdir ..\..\winhacknt
-REM copy ..\..\win\win32\winnt.dsw ..\.. >nul
-copy ..\..\win\win32\nethack.dsw ..\.. >nul
-copy ..\..\win\win32\dgncomp.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\dgnstuff.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\dgnstuff.mak ..\..\winhacknt >nul
-copy ..\..\win\win32\dlb_main.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\levcomp.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\levstuff.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\levstuff.mak ..\..\winhacknt >nul
-copy ..\..\win\win32\makedefs.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\mhaskyn.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhaskyn.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhcmd.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhcmd.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhdlg.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhdlg.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhfont.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhfont.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhinput.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhinput.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhmain.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhmain.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhmap.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhmap.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhmenu.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhmenu.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhmsg.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhmsgwnd.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhmsgwnd.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhrip.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhrip.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhstatus.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhstatus.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mhtext.c ..\..\winhacknt >nul
-copy ..\..\win\win32\mhtext.h ..\..\winhacknt >nul
-copy ..\..\win\win32\mswproc.c ..\..\winhacknt >nul
-copy ..\..\win\win32\recover.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\resource.h ..\..\winhacknt >nul
-copy ..\..\win\win32\tile2bmp.c ..\..\winhacknt >nul
-copy ..\..\win\win32\tile2bmp.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\tilemap.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\winMS.h ..\..\winhacknt >nul
-copy ..\..\win\win32\winhack.c ..\..\winhacknt >nul
-copy ..\..\win\win32\winhack.dsp ..\..\winhacknt >nul
-copy ..\..\win\win32\winhack.h ..\..\winhacknt >nul
-copy ..\..\win\win32\winhack.rc ..\..\winhacknt >nul
 
-if exist ..\..\winhacknt\mnsel.bmp goto hasmnsel2
+echo.
+echo "Copying Visual C project files file to ..\..\build directory"
+
+REM copy ..\..\win\win32\winnt.dsw ..\.. >nul
+echo copy ..\..\win\win32\nethack.dsw  ..\..
+copy ..\..\win\win32\nethack.dsw  ..\..
+
+if NOT exist ..\..\build\*.* mkdir ..\..\build >nul
+copy ..\..\win\win32\dgncomp.dsp   ..\..\build >nul
+copy ..\..\win\win32\dgnstuff.dsp  ..\..\build >nul
+copy ..\..\win\win32\dgnstuff.mak  ..\..\build >nul
+copy ..\..\win\win32\dlb_main.dsp  ..\..\build >nul
+copy ..\..\win\win32\levcomp.dsp   ..\..\build >nul
+copy ..\..\win\win32\levstuff.dsp  ..\..\build >nul
+copy ..\..\win\win32\levstuff.mak  ..\..\build >nul
+copy ..\..\win\win32\makedefs.dsp  ..\..\build >nul
+copy ..\..\win\win32\recover.dsp   ..\..\build >nul
+copy ..\..\win\win32\tile2bmp.dsp  ..\..\build >nul
+copy ..\..\win\win32\tilemap.dsp   ..\..\build >nul
+copy ..\..\win\win32\winhack.dsp   ..\..\build >nul
+
+echo.
+echo "Decoding/Copying a couple of bitmaps"
+if exist ..\..\win\win32\mnsel.bmp goto hasmnsel2
 if exist .\mnsel.bmp goto hasmnsel1
 if exist ..\..\win\win32\mnsel.uu uudecode ..\..\win\win32\mnsel.uu >nul
 if exist .\mnsel.bmp goto hasmnsel1
 echo Error - No UUDECODE utility to decode ..\..\win\win32\mnsel.uu
 goto hasmnsel2
 :hasmnsel1
-echo copy .\mnsel.bmp ..\..\winhacknt
-copy .\mnsel.bmp ..\..\winhacknt
+echo copy .\mnsel.bmp ..\..\win\win32
+copy .\mnsel.bmp ..\..\win\win32
 :hasmnsel2
-if NOT exist ..\..\winhacknt\mnsel.bmp set err_nouu=Y
+if NOT exist ..\..\win\win32\mnsel.bmp set err_nouu=Y
 
-if exist ..\..\winhacknt\mnunsel.bmp goto hasmnuns2
+if exist ..\..\win\win32\mnunsel.bmp goto hasmnuns2
 if exist .\mnunsel.bmp goto hasmnuns1
 if exist ..\..\win\win32\mnunsel.uu uudecode ..\..\win\win32\mnunsel.uu >nul
 if exist .\mnunsel.bmp goto hasmnuns1
 echo Error - No UUDECODE utility to decode ..\..\win\win32\mnunsel.uu
 goto hasmnuns2
 :hasmnuns1
-echo copy .\mnsel.bmp ..\..\winhacknt
-copy .\mnunsel.bmp ..\..\winhacknt
+echo copy .\mnunsel.bmp ..\..\win\win32
+copy .\mnunsel.bmp ..\..\win\win32
 :hasmnuns2
-if NOT exist ..\..\winhacknt\mnunsel.bmp set err_nouu=Y
+if NOT exist ..\..\win\win32\mnunsel.bmp set err_nouu=Y
 
-if exist ..\..\winhacknt\nethack.ico goto hasicon2
+echo "Decoding/Copying ICONS"
+if exist ..\..\win\win32\nethack.ico goto hasicon2
 if exist .\nethack.ico goto hasicon1
 if exist .\nhico.uu uudecode nhico.uu >nul
 if exist .\nethack.ico goto hasicon1
 echo Error - No UUDECODE utility to decode nhico.uu
 goto hasicon2
 :hasicon1
-echo copy .\nethack.ico ..\..\winhacknt
-copy .\nethack.ico ..\..\winhacknt
+echo.
+echo copy .\nethack.ico ..\..\win\win32
+copy .\nethack.ico ..\..\win\win32
 :hasicon2
-if NOT exist ..\..\winhacknt\nethack.ico set err_nouu=Y
+if NOT exist ..\..\win\win32\nethack.ico set err_nouu=Y
 
 goto done
 
@@ -184,3 +161,4 @@ echo Check "Install.nt" for a list of prerequisites for building NetHack.
 
 :fini
 :end
+
