@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.4	2002/06/24	*/
+/*	SCCS Id: @(#)do_name.c	3.4	2002/09/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -712,12 +712,12 @@ boolean called;
 	    name_at_start = (boolean)type_is_pname(mdat);
 	}
 
-	if (name_at_start && !has_adjectives) {
+	if (name_at_start && (article == ARTICLE_YOUR || !has_adjectives)) {
 	    if (mdat == &mons[PM_WIZARD_OF_YENDOR])
 		article = ARTICLE_THE;
 	    else
 		article = ARTICLE_NONE;
-	} else if (mons[monsndx(mdat)].geno & G_UNIQ &&
+	} else if ((mons[monsndx(mdat)].geno & G_UNIQ) &&
 		   article == ARTICLE_A) {
 	    article = ARTICLE_THE;
 	}
@@ -813,8 +813,17 @@ char *
 y_monnam(mtmp)
 struct monst *mtmp;
 {
-	return x_monnam(mtmp, ARTICLE_YOUR, (char *)0, 
-		mtmp->mnamelth ? SUPPRESS_SADDLE : 0, FALSE);
+	int prefix, suppression_flag;
+
+	prefix = mtmp->mtame ? ARTICLE_YOUR : ARTICLE_THE;
+	suppression_flag = (mtmp->mnamelth
+#ifdef STEED
+			    /* "saddled" is redundant when mounted */
+			    || mtmp == u.usteed
+#endif
+			    ) ? SUPPRESS_SADDLE : 0;
+
+	return x_monnam(mtmp, prefix, (char *)0, suppression_flag, FALSE);
 }
 
 #endif /* OVL0 */

@@ -124,7 +124,7 @@ moverock()
 		if (flags.verbose)
 		    pline("Perhaps that's why %s cannot move it.",
 #ifdef STEED
-				u.usteed ? mon_nam(u.usteed) :
+				u.usteed ? y_monnam(u.usteed) :
 #endif
 				"you");
 		goto cannot_push;
@@ -181,7 +181,7 @@ moverock()
 #ifdef STEED
 		    if (u.usteed)
 			pline("%s pushes %s and suddenly it disappears!",
-				Monnam(u.usteed), the(xname(otmp)));
+			      upstart(y_monnam(u.usteed)), the(xname(otmp)));
 		    else
 #endif
 		    You("push %s and suddenly it disappears!",
@@ -222,10 +222,9 @@ moverock()
 		long lastmovetime;
 		lastmovetime = 0;
 #else
+		/* note: reset to zero after save/restore cycle */
 		static NEARDATA long lastmovetime;
 #endif
-		/* note: this var contains garbage initially and
-		   after a restore */
 #ifdef STEED
 		if (!u.usteed) {
 #endif
@@ -236,7 +235,8 @@ moverock()
 		  exercise(A_STR, TRUE);
 #ifdef STEED
 		} else 
-		    pline("%s moves %s.", Monnam(u.usteed), the(xname(otmp)));
+		    pline("%s moves %s.",
+			  upstart(y_monnam(u.usteed)), the(xname(otmp)));
 #endif
 		lastmovetime = moves;
 	    }
@@ -256,7 +256,7 @@ moverock()
 #ifdef STEED
 	  if (u.usteed)
 	    pline("%s tries to move %s, but cannot.",
-		  	Monnam(u.usteed), the(xname(otmp)));
+		  upstart(y_monnam(u.usteed)), the(xname(otmp)));
 	  else
 #endif
 	    You("try to move %s, but in vain.", the(xname(otmp)));
@@ -268,7 +268,7 @@ moverock()
 		    You("aren't skilled enough to %s %s from %s.",
 			(flags.pickup && !In_sokoban(&u.uz))
 			    ? "pick up" : "push aside",
-			the(xname(otmp)), mon_nam(u.usteed));
+			the(xname(otmp)), y_monnam(u.usteed));
 		} else
 #endif
 		{
@@ -598,9 +598,7 @@ int mode;
 #ifdef STEED
 			    if (u.usteed) {
 				You_cant("lead %s through that closed door.",
-				      x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-					 (char *)0, SUPPRESS_SADDLE, FALSE));
+				         y_monnam(u.usteed));
 			    } else
 #endif
 			    {
@@ -1088,10 +1086,7 @@ domove()
 	/* not attacking an animal, so we try to move */
 #ifdef STEED
 	if (u.usteed && !u.usteed->mcanmove && (u.dx || u.dy)) {
-		pline("%s won't move!",
-			upstart(x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE)));
+		pline("%s won't move!", upstart(y_monnam(u.usteed)));
 		nomul(0);
 		return;
 	} else
@@ -1123,10 +1118,8 @@ domove()
 		    } else if (flags.verbose) {
 #ifdef STEED
 			if (u.usteed)
-			    	Norep("%s is still in a pit.",
-				      upstart(x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE)));
+			    Norep("%s is still in a pit.",
+				  upstart(y_monnam(u.usteed)));
 			else
 #endif
 			Norep( (Hallucination && !rn2(5)) ?
@@ -1138,11 +1131,8 @@ domove()
 			char *predicament = "stuck in the lava";
 #ifdef STEED
 			if (u.usteed)
-			    	Norep("%s is %s.",
-				      upstart(x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE)),
-					 predicament);
+			    Norep("%s is %s.", upstart(y_monnam(u.usteed)),
+				  predicament);
 			else
 #endif
 			Norep("You are %s.", predicament);
@@ -1153,9 +1143,7 @@ domove()
 #ifdef STEED
 			    if (u.usteed)
 				You("lead %s to the edge of the lava.",
-				      x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE));
+				    y_monnam(u.usteed));
 			    else
 #endif
 			     You("pull yourself to the edge of the lava.");
@@ -1174,11 +1162,8 @@ domove()
 			    char *predicament = "stuck to the web";
 #ifdef STEED
 			    if (u.usteed)
-			    	Norep("%s is %s.",
-				      upstart(x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE)),
-					 predicament);
+				Norep("%s is %s.", upstart(y_monnam(u.usteed)),
+				      predicament);
 			    else
 #endif
 			    Norep("You are %s.", predicament);
@@ -1186,10 +1171,8 @@ domove()
 		    } else {
 #ifdef STEED
 			if (u.usteed)
-				pline("%s breaks out of the web.",
-				      upstart(x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE)));
+			    pline("%s breaks out of the web.",
+				  upstart(y_monnam(u.usteed)));
 			else
 #endif
 			You("disentangle yourself.");
@@ -1200,22 +1183,19 @@ domove()
 			    char *predicament = "stuck in the";
 #ifdef STEED
 			    if (u.usteed)
-			    	Norep("%s is %s %s.",
-				      upstart(x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE)),
-					 predicament, surface(u.ux, u.uy));
+				Norep("%s is %s %s.",
+				      upstart(y_monnam(u.usteed)),
+				      predicament, surface(u.ux, u.uy));
 			    else
 #endif
-			    Norep("You are %s %s.", predicament, surface(u.ux, u.uy));
+			    Norep("You are %s %s.", predicament,
+				  surface(u.ux, u.uy));
 			}
 		    } else {
 #ifdef STEED
 			if (u.usteed)
-				pline("%s finally wiggles free.",
-				      upstart(x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE)));
+			    pline("%s finally wiggles free.",
+				  upstart(y_monnam(u.usteed)));
 			else
 #endif
 			You("finally wiggle free.");
@@ -1225,11 +1205,8 @@ domove()
 			char *predicament = "caught in a bear trap";
 #ifdef STEED
 			if (u.usteed)
-			    	Norep("%s is %s.",
-				      upstart(x_monnam(u.usteed,
-					 u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
-				 	 (char *)0, SUPPRESS_SADDLE, FALSE)),
-					 predicament);
+			    Norep("%s is %s.", upstart(y_monnam(u.usteed)),
+				  predicament);
 			else
 #endif
 			Norep("You are %s.", predicament);
@@ -1850,8 +1827,8 @@ dopickup()
 	if (!can_reach_floor()) {
 #ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
-			You("aren't skilled enough to reach from %s.",
-					mon_nam(u.usteed));
+		    You("aren't skilled enough to reach from %s.",
+			y_monnam(u.usteed));
 		else
 #endif
 		You("cannot reach the %s.", surface(u.ux,u.uy));
