@@ -1,0 +1,56 @@
+.KEY oper/a,tmp/a,real/a,f1,f2,f3,f4,f5
+
+. ; miscellaneous script functions for the Amiga
+. ; SCCS Id: @(#)ifchange	3.2	96/02/04
+. ; Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1992, 1993, 1996.
+. ; NetHack may be freely redistributed.  See license for details.
+
+FAILAT 6
+IF <oper> EQ "MOVE"
+  IF EXISTS <real>
+  diff >T:mic -c <tmp> <real>
+  search from T:mic SEARCH "---" QUIET
+    IF WARN
+      echo "MOVE: no change"
+      delete <tmp>
+    ELSE
+      echo "MOVE: copy"
+      copy <tmp> <real> clone
+      delete <tmp>
+    ENDIF
+  ELSE
+    echo "MOVE: copy2"
+    copy <tmp> <real> clone
+    delete <tmp>
+  ENDIF
+  QUIT
+ENDIF
+
+IF <oper> EQ "TOUCH"
+  IF EXISTS <real>
+  diff >T:mic -c <tmp> <real>
+  search from T:mic SEARCH "---" QUIET
+    IF NOT WARN
+      echo "TOUCH: touch"
+      IF NOT <f1$@> EQ "@"
+        setdate <f1>
+      ENDIF
+      IF NOT <f2$@> EQ "@"
+        setdate <f2>
+      ENDIF
+      IF NOT <f3$@> EQ "@"
+        setdate <f3>
+      ENDIF
+      IF NOT <f4$@> EQ "@"
+        setdate <f4>
+      ENDIF
+      IF NOT <f5$@> EQ "@"
+        setdate <f5>
+      ENDIF
+    ENDIF
+  ENDIF
+  QUIT
+ENDIF
+
+echo "ifchange: '<oper>' not recognized"
+quit 10
