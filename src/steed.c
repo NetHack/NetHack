@@ -132,6 +132,7 @@ use_saddle(otmp)
 	/* Make the attempt */
 	if (rn2(100) < chance) {
 	    You("put the saddle on %s.", mon_nam(mtmp));
+	    if (otmp->owornmask) remove_worn_item(otmp, FALSE);
 	    freeinv(otmp);
 	    /* mpickobj may free otmp it if merges, but we have already
 	       checked for a saddle above, so no merger should happen */
@@ -230,19 +231,19 @@ mount_steed(mtmp, force)
 	}
 
 	/* Can the player reach and see the monster? */
+	if (!mtmp || (!force && ((Blind && !Blind_telepat) ||
+		mtmp->mundetected ||
+		mtmp->m_ap_type == M_AP_FURNITURE ||
+		mtmp->m_ap_type == M_AP_OBJECT))) {
+	    pline("I see nobody there.");
+	    return (FALSE);
+	}
 	if (u.uswallow || u.ustuck || u.utrap || Punished ||
 	    !test_move(u.ux, u.uy, mtmp->mx-u.ux, mtmp->my-u.uy, TEST_MOVE)) {
 	    if (Punished || !(u.uswallow || u.ustuck || u.utrap))
 		You("are unable to swing your %s over.", body_part(LEG)); 
 	    else
 		You("are stuck here for now.");
-	    return (FALSE);
-	}
-	if (!mtmp || (!force && ((Blind && !Blind_telepat) ||
-		mtmp->mundetected ||
-		mtmp->m_ap_type == M_AP_FURNITURE ||
-		mtmp->m_ap_type == M_AP_OBJECT))) {
-	    pline("I see nobody there.");
 	    return (FALSE);
 	}
 
@@ -487,7 +488,8 @@ dismount_steed(reason)
 	    case DISMOUNT_BYCHOICE:
 	    default:
 		if (otmp && otmp->cursed) {
-		    You("can't.  The saddle seems to be cursed.");
+		    You("can't.  The saddle %s cursed.",
+			otmp->bknown ? "is" : "seems to be");
 		    otmp->bknown = TRUE;
 		    return;
 		}
