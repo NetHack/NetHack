@@ -548,11 +548,12 @@ void onPaint(HWND hWnd)
 			for(i=paint_rt.left; i<paint_rt.right; i++) 
 			for(j=paint_rt.top; j<paint_rt.bottom; j++) 
 			if(data->map[i][j]>=0) {
-				uchar ch;
+				char ch;
 				TCHAR wch;
 				RECT  glyph_rect;
 				int   color;
-				unsigned special, mgch;
+				unsigned special;
+				int mgch;
 				HBRUSH back_brush;
 
 				nhcoord2display(data, i, j, &glyph_rect);
@@ -564,7 +565,7 @@ void onPaint(HWND hWnd)
 				/* rely on NetHack core helper routine */
 				mapglyph(data->map[i][j], &mgch, &color,
 						&special, i, j);
-				ch = (uchar)mgch;
+				ch = (char)mgch;
 				if (((special & MG_PET) && iflags.hilite_pet) ||
 				    ((special & MG_DETECT) && iflags.use_inverse)) {
 					back_brush = CreateSolidBrush(RGB(192, 192, 192));
@@ -848,23 +849,23 @@ void nhglyph2charcolor(short g, uchar* ch, int* color)
 COLORREF nhcolor_to_RGB(int c)
 {
 	switch(c) {
-	case CLR_BLACK:			return RGB( 85,  85,   85);		
-	case CLR_RED:			return RGB(255,   0,   0);		
-	case CLR_GREEN:			return RGB(  0, 128,   0);		
-	case CLR_BROWN:			return RGB(165,  42,   42);
-	case CLR_BLUE:			return RGB(  0,   0, 255);	
-	case CLR_MAGENTA:		return RGB(255,   0, 255);	
-	case CLR_CYAN:			return RGB(  0, 255, 255);		
-	case CLR_GRAY:			return RGB(192, 192, 192);	
-	case NO_COLOR:			return RGB(255, 255, 255);		
-	case CLR_ORANGE:		return RGB(255, 165,   0);	
-	case CLR_BRIGHT_GREEN:	return RGB(  0, 255,   0);
-	case CLR_YELLOW:		return RGB(255, 255,   0);	
-	case CLR_BRIGHT_BLUE:	return RGB(0,   191, 255);
-	case CLR_BRIGHT_MAGENTA: return RGB(255, 127, 255);
-	case CLR_BRIGHT_CYAN:	return RGB(127, 255, 255);	/* something close to aquamarine */
-	case CLR_WHITE:			return RGB(255, 255, 255);
-	default:				return RGB(  0,   0,   0);	/* black */
+	case CLR_BLACK:			return RGB(0x55, 0x55, 0x55);
+	case CLR_RED:			return RGB(0xFF, 0x00, 0x00);
+	case CLR_GREEN:			return RGB(0x00, 0x80, 0x00);
+	case CLR_BROWN:			return RGB(0xA5, 0x2A, 0x2A);
+	case CLR_BLUE:			return RGB(0x00, 0x00, 0xFF);
+	case CLR_MAGENTA:		return RGB(0xFF, 0x00, 0xFF);
+	case CLR_CYAN:			return RGB(0x00, 0xFF, 0xFF);
+	case CLR_GRAY:			return RGB(0xC0, 0xC0, 0xC0);
+	case NO_COLOR:			return RGB(0xFF, 0xFF, 0xFF);
+	case CLR_ORANGE:		return RGB(0xFF, 0xA5, 0x00);
+	case CLR_BRIGHT_GREEN:		return RGB(0x00, 0xFF, 0x00);
+	case CLR_YELLOW:		return RGB(0xFF, 0xFF, 0x00);
+	case CLR_BRIGHT_BLUE:		return RGB(0x00, 0xC0, 0xFF);
+	case CLR_BRIGHT_MAGENTA: 	return RGB(0xFF, 0x80, 0xFF);
+	case CLR_BRIGHT_CYAN:		return RGB(0x80, 0xFF, 0xFF);	/* something close to aquamarine */
+	case CLR_WHITE:			return RGB(0xFF, 0xFF, 0xFF);
+	default:			return RGB(0x00, 0x00, 0x00);	/* black */
 	}
 }
 

@@ -59,6 +59,7 @@ void mswin_display_RIP_window (HWND hWnd)
 	RECT clientrect;
 	RECT textrect;
 	HDC hdc;
+	HFONT OldFont;
 
 	data = (PNHRIPWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
@@ -75,8 +76,10 @@ void mswin_display_RIP_window (HWND hWnd)
 	if (data->window_text)
 	{
 	    hdc = GetDC (hWnd);
+	    OldFont = SelectObject (hdc, mswin_get_font(NHW_TEXT, 0, hdc, FALSE));
 	    DrawText (hdc, data->window_text, strlen(data->window_text), &textrect,
 		DT_LEFT | DT_NOPREFIX | DT_CALCRECT);
+	    SelectObject (hdc, OldFont);
 	    ReleaseDC(hWnd, hdc);
 	}
 	if (textrect.right - textrect.left > RIP_WIDTH)
@@ -145,8 +148,10 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		HDC hdcBitmap;
 		HANDLE OldBitmap;
 		PAINTSTRUCT ps;
+		HFONT OldFont;
 
 		hdc = BeginPaint (hWnd, &ps);
+		OldFont = SelectObject (hdc, mswin_get_font(NHW_TEXT, 0, hdc, FALSE));
 		hdcBitmap = CreateCompatibleDC(hdc);
 		SetBkMode (hdc, TRANSPARENT);
 		GetClientRect (hWnd, &clientrect);
@@ -177,6 +182,7 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				DT_CENTER | DT_VCENTER | DT_NOPREFIX | DT_WORDBREAK);
 		}
 		SelectObject (hdcBitmap, OldBitmap);
+		SelectObject (hdc, OldFont);
 		DeleteDC (hdcBitmap);
 		EndPaint (hWnd, &ps);
 	}
