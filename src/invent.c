@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2001/12/27	*/
+/*	SCCS Id: @(#)invent.c	3.4	2002/02/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,6 +16,8 @@ STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
 STATIC_DCL boolean FDECL(only_here, (struct obj *));
 #endif /* OVL1 */
 STATIC_DCL void FDECL(compactify,(char *));
+STATIC_DCL boolean FDECL(taking_off, (const char *));
+STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
 STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
 static char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
@@ -688,6 +690,22 @@ register char *buf;
 	}
 }
 
+/* match the prompt for either 'T' or 'R' command */
+STATIC_OVL boolean
+taking_off(action)
+const char *action;
+{
+    return !strcmp(action, "take off") || !strcmp(action, "remove");
+}
+
+/* match the prompt for either 'W' or 'P' command */
+STATIC_OVL boolean
+putting_on(action)
+const char *action;
+{
+    return !strcmp(action, "wear") || !strcmp(action, "put on");
+}
+
 /*
  * getobj returns:
  *	struct obj *xxx:	object to do something with.
@@ -779,14 +797,14 @@ register const char *let,*word;
 		bp[foo++] = otmp->invlet;
 
 		/* ugly check: remove inappropriate things */
-		if((!strcmp(word, "take off") &&
+		if ((taking_off(word) &&
 		    (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))
 		     || (otmp==uarm && uarmc)
 #ifdef TOURIST
 		     || (otmp==uarmu && (uarm || uarmc))
 #endif
 		    ))
-		|| (!strcmp(word, "wear") &&
+		|| (putting_on(word) &&
 		     (otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)))
 							/* already worn */
 		|| (!strcmp(word, "wield") &&
@@ -801,7 +819,7 @@ register const char *let,*word;
 		/* Second ugly check; unlike the first it won't trigger an
 		 * "else" in "you don't have anything else to ___".
 		 */
-		else if ((!strcmp(word, "wear") &&
+		else if ((putting_on(word) &&
 		    ((otmp->oclass == FOOD_CLASS && otmp->otyp != MEAT_RING) ||
 		    (otmp->oclass == TOOL_CLASS &&
 		     otyp != BLINDFOLD && otyp != TOWEL && otyp != LENSES)))
@@ -849,7 +867,7 @@ register const char *let,*word;
 		    )
 			foo--;
 		/* ugly check for unworn armor that can't be worn */
-		else if (!strcmp(word, "wear") && *let == ARMOR_CLASS &&
+		else if (putting_on(word) && *let == ARMOR_CLASS &&
 			 !canwearobj(otmp, &dummymask, FALSE)) {
 			foo--;
 			allowall = TRUE;
@@ -1112,7 +1130,7 @@ unsigned *resultflags;
 		return(0);
 	}
 	add_valid_menu_class(0);	/* reset */
-	if (!strcmp(word, "take off")) {
+	if (taking_off(word)) {
 	    takeoff = TRUE;
 	    filter = is_worn;
 	} else if (!strcmp(word, "identify")) {
@@ -1274,7 +1292,7 @@ register int FDECL((*fn),(OBJ_P)), FDECL((*ckfn),(OBJ_P));
 	boolean takeoff, nodot, ident, ininv;
 	char qbuf[QBUFSZ];
 
-	takeoff = !strcmp(word, "take off");
+	takeoff = taking_off(word);
 	ident = !strcmp(word, "identify");
 	nodot = (!strcmp(word, "nodot") || !strcmp(word, "drop") ||
 		 ident || takeoff);

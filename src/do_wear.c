@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2001/12/06	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2002/02/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1067,7 +1067,7 @@ doremring()
 		pline("Not wearing any accessories.");
 		return(0);
 	}
-	if (Accessories != 1) otmp = getobj(accessories, "take off");
+	if (Accessories != 1) otmp = getobj(accessories, "remove");
 	if(!otmp) return(0);
 	if(!(otmp->owornmask & (W_RING | W_AMUL | W_TOOL))) {
 		You("are not wearing that.");
@@ -1406,7 +1406,7 @@ doputon()
 			ublindf->otyp==LENSES ? "some lenses" : "a blindfold");
 		return(0);
 	}
-	otmp = getobj(accessories, "wear");
+	otmp = getobj(accessories, "put on");
 	if(!otmp) return(0);
 	if(otmp->owornmask & (W_RING | W_AMUL | W_TOOL)) {
 		already_wearing(c_that_);
