@@ -2661,7 +2661,7 @@ boolean setinitial,setfromfile;
     }
     else if (!strcmp("number_pad", optname)) {
 	int i;
-	const char *npchoices[3] =
+	static const char *npchoices[3] =
 		{"0 (off)", "1 (on)", "2 (on, DOS compatible)"};
 	char *npletters = "abc";
 	menu_item *mode_pick = (menu_item *)0;
