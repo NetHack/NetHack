@@ -31,20 +31,20 @@ nethack.txt     recover.6       recover.txt     tmac.n          window.doc
 include:
 (files for all versions)
 align.h         amiconf.h       artifact.h      artilist.h      attrib.h
-beconf.h        color.h         config.h        config1.h       context.h
-coord.h         decl.h          def_os2.h       dgn_file.h      display.h
-dlb.h           dungeon.h       edog.h          emin.h          engrave.h
-epri.h          eshk.h          extern.h        flag.h          func_tab.h
-global.h        hack.h          lev.h           mail.h          mfndpos.h
-micro.h         mkroom.h        monattk.h       mondata.h       monflag.h
-monst.h         monsym.h        nhlan.h         ntconf.h        obj.h
-objclass.h      os2conf.h       patchlevel.h    pcconf.h        permonst.h
-prop.h          qtext.h         quest.h         rect.h          region.h
-rm.h            skills.h        sp_lev.h        spell.h         system.h
-tcap.h          timeout.h       tosconf.h       tradstdc.h      trampoli.h
-trap.h          unixconf.h      vault.h         vision.h        vmsconf.h
-wceconf.h       winami.h        winprocs.h      wintype.h       you.h
-youprop.h
+beconf.h        botl.h          color.h         config.h        config1.h
+context.h       coord.h         decl.h          def_os2.h       dgn_file.h
+display.h       dlb.h           dungeon.h       edog.h          emin.h
+engrave.h       epri.h          eshk.h          extern.h        flag.h
+func_tab.h      global.h        hack.h          lev.h           mail.h
+mfndpos.h       micro.h         mkroom.h        monattk.h       mondata.h
+monflag.h       monst.h         monsym.h        nhlan.h         ntconf.h
+obj.h           objclass.h      os2conf.h       patchlevel.h    pcconf.h
+permonst.h      prop.h          qtext.h         quest.h         rect.h
+region.h        rm.h            skills.h        sp_lev.h        spell.h
+system.h        tcap.h          timeout.h       tosconf.h       tradstdc.h
+trampoli.h      trap.h          unixconf.h      vault.h         vision.h
+vmsconf.h       wceconf.h       winami.h        winprocs.h      wintype.h
+you.h           youprop.h
 (file for tty versions)
 wintty.h
 (files for X versions)
