@@ -104,7 +104,7 @@ SOURCE=..\src\objects.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\win\win32\tile2bmp.c
+SOURCE=..\win\share\tile2bmp.c
 
 !IF  "$(CFG)" == "tile2bmp - Win32 Release"
 

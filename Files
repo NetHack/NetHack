@@ -216,14 +216,15 @@ gntext.h        gnyesno.c       gnyesno.h       gn_xpms.h       mapbg.xpm
 win/share:
 (files for versions using optional tiles)
 gifread.c       monsters.txt    objects.txt     other.txt       ppmwrite.c
-thintile.c      tile.doc        tile.h          tilemap.c       tiletext.c
+thintile.c      tile.doc        tile.h          tile2bmp.c      tilemap.c
+tiletext.c
 
 win/tty:
 (files for tty versions)
 getline.c       termcap.c       topl.c          wintty.c
 
 win/win32:
-(files for Windows NT and Windows 2000 version)
+(files for Windows 9x, NT, Windows 2000, and Windows XP version)
 dgncomp.dsp     dgnstuff.dsp    dgnstuff.mak    dlb_main.dsp    levcomp.dsp
 levstuff.dsp    levstuff.mak    makedefs.dsp    mhaskyn.c       mhaskyn.h
 mhdlg.c         mhdlg.h         mhfont.c        mhfont.h        mhinput.c
@@ -232,9 +233,9 @@ mhmenu.c        mhmenu.h        mhmsg.h         mhmsgwnd.c      mhmsgwnd.h
 mhrip.c         mhrip.h         mhsplash.h      mhsplash.c      mhstatus.c
 mhstatus.h      mhtext.c        mhtext.h        mnsel.uu        mnselcnt.uu
 mnunsel.uu      mswproc.c       nethack.dsw     nethackw.dsp    petmark.uu
-recover.dsp     resource.h      splash.uu       tile2bmp.c      tile2bmp.dsp
-tilemap.dsp     tiles.dsp       tiles.mak       winhack.c       winhack.h
-winhack.rc      winMS.h
+recover.dsp     resource.h      splash.uu       tile2bmp.dsp    tilemap.dsp
+tiles.dsp       tiles.mak       winhack.c       winhack.h       winhack.rc
+winMS.h
 
 
 

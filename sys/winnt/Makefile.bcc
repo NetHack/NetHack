@@ -954,8 +954,8 @@ $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO) $(SRC)\uuid.lib
 	@$(link) $(LFLAGSU) $(startobj) $(O)tile2bmp.o $(TEXT_IO), $@,,$(libsmt)
 
 
-$(O)tile2bmp.o: $(WIN32)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
-	@$(cc) $(CFLAGS) -I$(WSHR) /DPACKED_FILE -o$@ $(WIN32)\tile2bmp.c
+$(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
+	@$(cc) $(CFLAGS) -I$(WSHR) /DPACKED_FILE -o$@ $(WSHR)\tile2bmp.c
 
 #==========================================
 # Housekeeping

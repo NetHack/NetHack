@@ -947,11 +947,11 @@ $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
 	@echo Linking $@...
 	@$(link) $(LFLAGSU) -o$@ $(O)til2bm32.o $(TEXT_IO32)
 
-$(O)tile2bmp.o: $(WIN32)/tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
-	@$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WIN32)/tile2bmp.c
+$(O)tile2bmp.o: $(WSHR)/tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
+	@$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WSHR)/tile2bmp.c
 
-$(O)til2bm32.o: $(WIN32)/til2bm32.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
-	@$(cc) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WIN32)/til2bm32.c
+$(O)til2bm32.o: $(WSHR)/til2bm32.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
+	@$(cc) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)/til2bm32.c
 
 #==========================================
 # Housekeeping
