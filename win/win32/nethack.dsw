@@ -1,0 +1,185 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "dgncomp"=.\winhacknt\dgncomp.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name dgnstuff
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "dgnstuff"=.\winhacknt\dgnstuff.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name makedefs
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "dlb_main"=.\winhacknt\dlb_main.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name dgncomp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name levcomp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name makedefs
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "levcomp"=.\winhacknt\levcomp.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name levstuff
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "levstuff"=.\winhacknt\levstuff.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name makedefs
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "makedefs"=.\winhacknt\makedefs.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "recover"=.\winhacknt\recover.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name makedefs
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dlb_main
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "tile2bmp"=.\winhacknt\tile2bmp.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "tilemap"=.\winhacknt\tilemap.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "winhack"=.\winhacknt\winhack.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name dgncomp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dlb_main
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name levcomp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name makedefs
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name recover
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name tile2bmp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name tilemap
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+
