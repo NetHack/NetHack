@@ -606,10 +606,11 @@ boolean grab;	 /* forced pickup, rather than forced leave behind? */
 	 *  Does the text description of this match an exception?
 	 */
 	char *objdesc = makesingular(xname(obj));
-	struct autopickup_exception *ape = iflags.autopickup_exceptions;
+	struct autopickup_exception *ape = (grab) ?
+					iflags.autopickup_exceptions[AP_GRAB] :
+					iflags.autopickup_exceptions[AP_LEAVE];
 	while (ape) {
-		if (pmatch(ape->pattern, objdesc) &&
-		    ((grab && ape->grab) || (!grab && !ape->grab))) return TRUE;
+		if (pmatch(ape->pattern, objdesc)) return TRUE;
 		ape = ape->next;
 	}
 	return FALSE;

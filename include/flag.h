@@ -264,8 +264,10 @@ struct instance_flags {
 	boolean	 clicklook;	/* allow right-clicking for look */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
 #ifdef AUTOPICKUP_EXCEPTIONS
-	struct autopickup_exception *autopickup_exceptions;
-#endif /* AUTOPICKUP_EXCEPTIONS */
+	struct autopickup_exception *autopickup_exceptions[2];
+#define AP_LEAVE 0
+#define AP_GRAB	 1
+#endif
 #ifdef WIN32CON
 #define MAX_ALTKEYHANDLER 25
 	char	 altkeyhandler[MAX_ALTKEYHANDLER];
