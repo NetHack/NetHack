@@ -1244,8 +1244,17 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 		otmp->orotten = TRUE;
 		(void)touchfood(otmp);
 		retcode = 1;
-	    } else
-		consume_oeaten(otmp, 2);	/* oeaten >>= 2 */
+	    }
+
+	    if (!mons[otmp->corpsenm].cnutrit) {
+		/* no nutrution: rots away, no message if you passed out */
+		if (!retcode) pline_The("corpse rots away completely.");
+		if (carried(otmp)) useup(otmp);
+		else useupf(otmp, 1L);
+		retcode = 2;
+	    }
+		    
+	    if (!retcode) consume_oeaten(otmp, 2);	/* oeaten >>= 2 */
 	} else {
 	    pline("%s%s %s!",
 		  !uniq ? "This " : !type_is_pname(&mons[mnum]) ? "The " : "",
