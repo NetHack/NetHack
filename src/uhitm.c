@@ -508,7 +508,7 @@ int thrown;
 	 * associated with the damage don't come out until _after_ outputting
 	 * a hit message.
 	 */
-	boolean hittxt = FALSE, destroyed = FALSE;
+	boolean hittxt = FALSE, destroyed = FALSE, already_killed = FALSE;
 	boolean get_dmg_bonus = TRUE;
 	boolean ispoisoned = FALSE, needpoismsg = FALSE, poiskilled = FALSE;
 	boolean silvermsg = FALSE;
@@ -911,8 +911,10 @@ int thrown;
 	    You("joust %s%s",
 			 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
 	    /* avoid migrating a dead monster */
-	    if (mon->mhp > tmp)
+	    if (mon->mhp > tmp) {
 		mhurtle(mon, u.dx, u.dy, 1);
+		if (DEADMONSTER(mon)) already_killed = TRUE;
+	    }
 	    hittxt = TRUE;
 	} else
 #endif
@@ -925,13 +927,15 @@ int thrown;
 		    pline("%s %s from your powerful strike!", Monnam(mon),
 			  makeplural(stagger(mon->data, "stagger")));
 		/* avoid migrating a dead monster */
-		if (mon->mhp > tmp)
+		if (mon->mhp > tmp) {
 		    mhurtle(mon, u.dx, u.dy, 1);
+		    if (DEADMONSTER(mon)) already_killed = TRUE;
+		}
 		hittxt = TRUE;
 	    }
 	}
 
-	mon->mhp -= tmp;
+	if (!already_killed) mon->mhp -= tmp;
 	/* adjustments might have made tmp become less than what
 	   a level draining artifact has already done to max HP */
 	if (mon->mhp > mon->mhpmax) mon->mhp = mon->mhpmax;
@@ -985,10 +989,11 @@ int thrown;
 		pline_The("poison doesn't seem to affect %s.", mon_nam(mon));
 	if (poiskilled) {
 		pline_The("poison was deadly...");
-		xkilled(mon, 0);
+		if (!already_killed) xkilled(mon, 0);
 		return FALSE;
 	} else if (destroyed) {
-		killed(mon);	/* takes care of most messages */
+		if (!already_killed)
+		    killed(mon);	/* takes care of most messages */
 	} else if(u.umconf && !thrown) {
 		nohandglow(mon);
 		if(!mon->mconf && !resist(mon, '+', 0, NOTELL)) {
