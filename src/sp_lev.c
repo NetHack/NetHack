@@ -2167,6 +2167,11 @@ dlb *fd;
 		for(x = xstart; x < xstart+xsize; x++) {
 		    levl[x][y].typ = Fgetc(fd);
 		    levl[x][y].lit = FALSE;
+		    /* clear out levl: load_common_data may set them */
+		    levl[x][y].flags = 0;
+		    levl[x][y].horizontal = 0;
+		    levl[x][y].roomno = 0;
+		    levl[x][y].edge = 0;
 		    /*
 		     * Note: Even though levl[x][y].typ is type schar,
 		     *	 lev_comp.y saves it as type char. Since schar != char
@@ -2198,6 +2203,8 @@ dlb *fd;
 			has_bounds = TRUE;
 		    Map[x][y] = 1;
 		}
+	    if (init_lev.init_present && init_lev.joined)
+		remove_rooms(xstart, ystart, xstart+xsize, ystart+ysize);
 	}
 
 	Fread((genericptr_t) &n, 1, sizeof(n), fd);

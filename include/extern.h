@@ -1011,6 +1011,7 @@ E void NDECL(mkinvokearea);
 /* ### mkmap.c ### */
 
 void FDECL(flood_fill_rm, (int,int,int,BOOLEAN_P,BOOLEAN_P));
+void FDECL(remove_rooms, (int,int,int,int));
 
 /* ### mkmaze.c ### */
 

@@ -17,6 +17,7 @@ STATIC_DCL void FDECL(pass_three,(SCHAR_P,SCHAR_P));
 STATIC_DCL void NDECL(wallify_map);
 STATIC_DCL void FDECL(join_map,(SCHAR_P,SCHAR_P));
 STATIC_DCL void FDECL(finish_map,(SCHAR_P,SCHAR_P,XCHAR_P,XCHAR_P));
+STATIC_DCL void FDECL(remove_room,(int));
 void FDECL(mkmap, (lev_init *));
 
 char *new_locations;
@@ -361,13 +362,91 @@ finish_map(fg_typ, bg_typ, lit, walled)
 		    levl[i][j].lit = TRUE;
 }
 
+/*
+ * When level processed by join_map is overlaid by a MAP, some rooms may no
+ * longer be valid.  All rooms in the region lx <= x < hx, ly <= y < hy are
+ * removed.  Rooms partially in the region are truncated.  This function
+ * must be called before the REGIONs or ROOMs of the map are processed, or
+ * those rooms will be removed as well.  Assumes roomno fields in the
+ * region are already cleared, and roomno and irregular fields outside the
+ * region are all set.
+ */
+void
+remove_rooms(lx, ly, hx, hy)
+    int lx, ly, hx, hy;
+{
+    int i;
+    struct mkroom *croom;
+
+    for (i = nroom - 1; i >= 0; --i) {
+	croom = &rooms[i];
+	if (croom->hx < lx || croom->lx >= hx ||
+	    croom->hy < ly || croom->ly >= hy) continue; /* no overlap */
+
+	if (croom->lx < lx || croom->hx >= hx ||
+	    croom->ly < ly || croom->hy >= hy) { /* partial overlap */
+	    /* TODO: ensure remaining parts of room are still joined */
+
+	    if (!croom->irregular) impossible("regular room in joined map");
+
+	    /* if a "donut" or even disconnected room, leave bounds alone */
+	    if ((croom->lx < lx && croom->hx >= hx) ||
+		(croom->ly < ly && croom->hy >= hy)) {
+		continue;
+	    }
+
+	    /* truncate the side(s) that are covered by the region */
+	    if (croom->lx < lx && croom->hx < hx) croom->hx = lx - 1;
+	    if (croom->lx >= lx && croom->hx >= hx) croom->lx = hx;
+	    if (croom->ly < ly && croom->hy < hy) croom->hy = ly - 1;
+	    if (croom->ly >= ly && croom->hy >= hy) croom->ly = hy;
+	} else {
+	    /* total overlap, remove the room */
+	    remove_room(i);
+	}
+    }
+}
+
+/*
+ * Remove roomno from the rooms array, decrementing nroom.  Also updates
+ * all level roomno values of affected higher numbered rooms.  Assumes
+ * level structure contents corresponding to roomno have already been reset.
+ * Currently handles only the removal of rooms that have no subrooms.
+ */
+void
+remove_room(roomno)
+    int roomno;
+{
+    struct mkroom *croom = &rooms[roomno];
+    struct mkroom *maxroom = &rooms[--nroom];
+    int i, j, oroomno;
+
+    if (croom != maxroom) {
+	/* since the order in the array only matters for making corridors,
+	 * copy the last room over the one being removed on the assumption
+	 * that corridors have already been dug. */
+	(void) memcpy((genericptr_t)croom, (genericptr_t)maxroom,
+		      sizeof(struct mkroom));
+
+	/* since maxroom moved, update affected level roomno values */
+	oroomno = nroom + ROOMOFFSET;
+	roomno += ROOMOFFSET;
+	for (i = croom->lx; i <= croom->hx; ++i)
+	    for (j = croom->ly; j <= croom->hy; ++j) {
+		if (levl[i][j].roomno == oroomno)
+		    levl[i][j].roomno = roomno;
+	    }
+    }
+
+    maxroom->hx = -1;			/* just like add_room */
+}
+
 #define N_P1_ITER	1	/* tune map generation via this value */
 #define N_P2_ITER	1	/* tune map generation via this value */
 #define N_P3_ITER	2	/* tune map smoothing via this value */
 
 void
 mkmap(init_lev)
-
 	lev_init	*init_lev;
 {
 	schar	bg_typ = init_lev->bg,
