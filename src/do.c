@@ -207,8 +207,8 @@ const char *verb;
 			(t->ttyp==PIT || t->ttyp==SPIKED_PIT)) {
 		/* you escaped a pit and are standing on the precipice */
 		if (Blind && !Deaf)
-			You_hear("%s %s downwards.",
-				The(xname(obj)), otense(obj, "tumble"));
+			You_hear("%s tumble downwards.",
+				the(xname(obj)));
 		else
 			pline("%s %s into %s pit.",
 				The(xname(obj)), otense(obj, "tumble"),
