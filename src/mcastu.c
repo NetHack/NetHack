@@ -476,16 +476,23 @@ int spellnum;
 	burn_floor_paper(u.ux, u.uy, TRUE, FALSE);
 	break;
     case CLC_LIGHTNING:
+    {
+	boolean reflects;
+
 	pline("A bolt of lightning strikes down at you from above!");
-	if (ureflects("It bounces off your %s.", "") || Shock_resistance) {
+	reflects = ureflects("It bounces off your %s.", "");
+	if (reflects || Shock_resistance) {
 	    shieldeff(u.ux, u.uy);
 	    dmg = 0;
+	    if (reflects)
+		break;
 	} else
 	    dmg = d(8, 6);
 	if (Half_spell_damage) dmg = (dmg + 1) / 2;
 	destroy_item(WAND_CLASS, AD_ELEC);
 	destroy_item(RING_CLASS, AD_ELEC);
 	break;
+    }
     case CLC_CURSE_ITEMS:
 	You_feel("as if you need some help.");
 	rndcurse();
@@ -647,7 +654,7 @@ int adtyp;
 	if ((mtmp->minvis || mtmp->invis_blkd) && spellnum == MGC_DISAPPEAR)
 	    return TRUE;
 	/* peaceful monster won't cast invisibility if you can't see invisible,
-	   same as when monster drink potions of invisibility.  This doesn't
+	   same as when monsters drink potions of invisibility.  This doesn't
 	   really make a lot of sense, but lets the player avoid hitting
 	   peaceful monsters by mistake */
 	if (mtmp->mpeaceful && !See_invisible && spellnum == MGC_DISAPPEAR)
