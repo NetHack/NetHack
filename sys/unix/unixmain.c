@@ -290,14 +290,14 @@ char *argv[];
 			    compress(fq_save);
 			}
 		}
-		flags.move = 0;
+		context.move = 0;
 	} else {
 not_recovered:
 		player_selection();
 		newgame();
 		wd_message();
 
-		flags.move = 0;
+		context.move = 0;
 		set_wear();
 		(void) pickup(1);
 	}
