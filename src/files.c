@@ -34,7 +34,7 @@ extern int errno;
 #endif
 
 #ifdef PREFIXES_IN_USE
-#define FQN_NUMBUF 2
+#define FQN_NUMBUF 3
 static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #endif
 
@@ -909,7 +909,7 @@ int retryct;
 	lockname = make_lockname(filename, locknambuf);
 	filename = fqname(filename, whichprefix, 0);
 #ifndef NO_FILE_LINKS	/* LOCKDIR should be subsumed by LOCKPREFIX */
-	lockname = fqname(lockname, LOCKPREFIX, 1);
+	lockname = fqname(lockname, LOCKPREFIX, 2);
 #endif
 
 #if defined(UNIX) || defined(VMS)
@@ -1013,7 +1013,7 @@ const char *filename;
 	if (nesting == 1) {
 		lockname = make_lockname(filename, locknambuf);
 #ifndef NO_FILE_LINKS	/* LOCKDIR should be subsumed by LOCKPREFIX */
-		lockname = fqname(lockname, LOCKPREFIX, 1);
+		lockname = fqname(lockname, LOCKPREFIX, 2);
 #endif
 
 #if defined(UNIX) || defined(VMS)
