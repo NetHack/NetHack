@@ -161,34 +161,43 @@ Map Window options:
                    only be specified in the defaults.nh config file. 
                    Default: [default] 
 
-    tile_height    Used with tile_file to specify the width of each 
+    tile_height    Used with tile_file to specify the height of each 
                    tile in pixels. This option may only be specified
                    in the defaults.nh config file. 
                    Default: [16] 
 
-    tile_width     Used with tile_file to specify the height of each 
+    tile_width     Used with tile_file to specify the width of each 
                    tile in pixels. This option may only be specified
                    in the defaults.nh config file. 
                    Default: [16]
 
-   windowcolors    Specifies the colors for various windows
-                   This is a single option that has the following
+    windowcolors   Specifies the colors for various windows
+                   This option may only be specified in the
+                   defaults.nh config file and has the following
                    format:
-                      window-type foreground/background
+                       window-type foreground/background
                    Notes:
-                      - The slash is required.
-                      - window-type is one of: 
-                        "menu, "message", "status", or "text"  
-                        (Short forms are: "mnu", "msg", "sts", or "txt").
+                      - the slash is required.
+                      - window-type is either "message" or "status"  
+                        (Short forms are: "msg" or "sts").
                       - Foreground and background may be specified as
-                        a color name (for example "blue") or as a
-                        six digit hexadecimal RGB color-number (for
-                        example "#8F8F8F").
+                        a color name (such as "blue"), or by a six
+                        digit hexadecimal RGB color value (such as
+                        "#8F8F8F")
+                      - The following color names are available:
+                        black, red, green, brown, blue, magenta,
+                        cyan, gray (or grey), orange,
+                        yellow, purple, silver, maroon, fuchsia, 
+                        lime, olive, navy, teal, aqua. In addition, you 
+                        can use the following names to refer to default 
+                        Windows settings: activeborder, activecaption, 
+                        appworkspace, background, btnface, btnshadow, btntext, 
+                        captiontext, graytext, highlight, highlighttext, 
+                        inactiveborder, inactivecaption, menu, menutext, 
+                        scrollbar, window, windowframe, windowtext.
 
-                   Examples include:
-                      OPTIONS=windowcolors:menu white/black
-                      OPTIONS=msg green/yellow
-                      OPTIONS=windowcolors:sts white/blue txt white/blue
+                        Example:
+                        OPTIONS=windowcolors:sts #00FF80/blue msg menutext/menu
 
 Miscellaneous options: 
 

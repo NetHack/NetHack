@@ -21,7 +21,7 @@ o more feedback about skill advancement from #enhance command
 o End-of-game disclose options can be individually tuned to your liking
 o Mac: command-key shortcuts in the player selection dialog
 o Amiga: screenmode requester
-o Win32: new graphical port contributed by Alex Kompel
+o Win32: new graphical interface contributed by Alex Kompel
 
 We've also included variations of enhancements contributed by members 
 of the NetHack community at large. Among them:
@@ -83,7 +83,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     x.  A 'win/gnome' subdirectory, which contains files specific to GNOME.
     y.  A 'win/tty' subdirectory, which contains files specific to ttys.
     z.  A 'win/win32' subdirectory, which contains files specific to the
-        Windows NT Win32 API.
+        Windows Win32 API.
 
     The names of these directories should not be changed unless you are
     ready to go through the makefiles and the makedefs program and change
@@ -160,9 +160,6 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     Unless otherwise mentioned, the compiler used was the OS-vendor's
     C compiler.
 
-    The Atari and Amiga ports are struggling to stay supported due to a
-    lack of people with machines and time.
-
     With the demise of Windows NT on the DEC Alpha, no attempt has been
     made to build NetHack 3.4.0 on that platform.
 
@@ -172,7 +169,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     A build for Intel 80286 machines and DOS "real mode" overlaid versions 
     has not been produced for 3.4.0.  Nobody on the porting team has
     the time or the software to attempt the necessary tuning that will allow 
-    it achieve the balance of having just the right amount of available 
+    it to achieve the balance of having just the right amount of available 
     memory, and still have acceptable performance.  The sources necessary 
     to do so are still included in the source distribution, so if someone 
     has access to a real-mode compiler and lots of spare time on their hands, 
