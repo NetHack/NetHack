@@ -140,7 +140,8 @@ xchar x, y;
 	return (ispick && sobj_at(STATUE, x, y) ? DIGTYP_STATUE :
 		ispick && sobj_at(BOULDER, x, y) ? DIGTYP_BOULDER :
 		closed_door(x, y) ? DIGTYP_DOOR :
-		IS_TREE(levl[x][y].typ) ? (ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE) :
+		IS_TREE(levl[x][y].typ) ?
+			(ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE) :
 		ispick && IS_ROCK(levl[x][y].typ) &&
 			(!level.flags.arboreal || IS_WALL(levl[x][y].typ)) ?
 			DIGTYP_ROCK : DIGTYP_UNDIGGABLE);
@@ -408,18 +409,18 @@ cleanup:
 		return(0);
 	} else {		/* not enough effort has been spent yet */
 		static const char *d_target[6] = {
-					"", "rock", "statue", "boulder", "door", "tree"
+			"", "rock", "statue", "boulder", "door", "tree"
 		};
 		int dig_target = dig_typ(uwep, dpx, dpy);
 
-		if (IS_WALL(lev->typ) || dig_target == 3) {
+		if (IS_WALL(lev->typ) || dig_target == DIGTYP_DOOR) {
 		    if(*in_rooms(dpx, dpy, SHOPBASE)) {
 			pline("This %s seems too hard to %s.",
 			      IS_DOOR(lev->typ) ? "door" : "wall", verb);
 			return(0);
 		    }
-		} else if (!IS_ROCK(lev->typ) && !dig_target)
-			return(0); /* statue or boulder got taken */
+		} else if (!IS_ROCK(lev->typ) && dig_target == DIGTYP_ROCK)
+		    return(0); /* statue or boulder got taken */
 		if(!did_dig_msg) {
 		    You("hit the %s with all your might.",
 			d_target[dig_target]);
@@ -749,7 +750,6 @@ dig_up_grave()
 {
 	struct obj *otmp;
 
-
 	/* Grave-robbing is frowned upon... */
 	exercise(A_WIS, FALSE);
 	if (Role_if(PM_ARCHEOLOGIST)) {
@@ -827,7 +827,8 @@ struct obj *obj;
 		ry = u.uy + u.dy;
 		/* Include down even with axe, so we have at least one direction */
 		if (u.dz > 0 ||
-				(u.dz == 0 && isok(rx, ry) && dig_typ(obj, rx, ry)))
+		    (u.dz == 0 && isok(rx, ry) &&
+		     dig_typ(obj, rx, ry) != DIGTYP_UNDIGGABLE))
 			*dsp++ = *sdp;
 		sdp++;
 	}
@@ -934,7 +935,8 @@ struct obj *obj;
 			digging.quiet = FALSE;
 			if (digging.pos.x != rx || digging.pos.y != ry ||
 			    !on_level(&digging.level, &u.uz) || digging.down) {
-			    if (flags.autodig && !dig_target && !digging.down &&
+			    if (flags.autodig &&
+				dig_target == DIGTYP_ROCK && !digging.down &&
 				digging.pos.x == u.ux &&
 				digging.pos.y == u.uy &&
 				(moves <= digging.lastdigtime+2 &&
