@@ -1767,6 +1767,7 @@ char		*tmp_levels;
 		add_sound_mapping(bufp);
 #endif
 #ifdef QT_GRAPHICS
+	/* These should move to wc_ options */
 	} else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
 		extern char *qt_tilewidth;
 		if (qt_tilewidth == NULL)	
