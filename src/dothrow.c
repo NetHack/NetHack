@@ -542,7 +542,9 @@ mhurtle_step(arg, x, y)
 	    newsym(mon->mx, mon->my);
 	    set_apparxy(mon);
 	    (void) mintrap(mon);
+	    return TRUE;
 	}
+	return FALSE;
 }
 
 /*
