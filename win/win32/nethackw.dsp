@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="winhack" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="nethackw" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Application" 0x0101
 
-CFG=winhack - Win32 Debug
+CFG=nethackw - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "winhack.mak".
+!MESSAGE NMAKE /f "nethackw.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "winhack.mak" CFG="winhack - Win32 Debug"
+!MESSAGE NMAKE /f "nethackw.mak" CFG="nethackw - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "winhack - Win32 Release" (based on "Win32 (x86) Application")
-!MESSAGE "winhack - Win32 Debug" (based on "Win32 (x86) Application")
+!MESSAGE "nethackw - Win32 Release" (based on "Win32 (x86) Application")
+!MESSAGE "nethackw - Win32 Debug" (based on "Win32 (x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -29,7 +29,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "winhack - Win32 Release"
+!IF  "$(CFG)" == "nethackw - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -59,10 +59,10 @@ LINK32=link.exe
 OutDir=.\Release
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
-PostBuild_Cmds=copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
+PostBuild_Cmds=copy $(OutDir)\nethackw.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "winhack - Win32 Debug"
+!ELSEIF  "$(CFG)" == "nethackw - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -92,15 +92,15 @@ LINK32=link.exe
 OutDir=.\Debug
 SOURCE="$(InputPath)"
 PostBuild_Desc=Install exe
-PostBuild_Cmds=if NOT exist ..\binary\*.* mkdir ..\binary	copy $(OutDir)\winhack.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
+PostBuild_Cmds=if NOT exist ..\binary\*.* mkdir ..\binary	copy $(OutDir)\nethackw.exe ..\binary	copy ..\dat\nhdat ..\binary	copy ..\dat\license ..\binary	if exist tiles.bmp copy tiles.bmp ..\binary	if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt	if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	if exist ..\doc\recover.txt copy ..\doc\recover.txt ..\binary\recover.txt	copy ..\sys\winnt\winnt.cnf ..\binary\defaults.nh
 # End Special Build Tool
 
 !ENDIF 
 
 # Begin Target
 
-# Name "winhack - Win32 Release"
-# Name "winhack - Win32 Debug"
+# Name "nethackw - Win32 Release"
+# Name "nethackw - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
