@@ -59,6 +59,9 @@ getlin_hook_proc hook;
 		Sprintf(toplines, "%s ", query);
 		Strcat(toplines, obufp);
 		if((c = Getchar()) == EOF) {
+#ifndef NEWAUTOCOMP
+			*bufp = 0;
+#endif /* not NEWAUTOCOMP */
 			break;
 		}
 		if(c == '\033') {
@@ -100,32 +103,46 @@ getlin_hook_proc hook;
 		}
 		if(c == erase_char || c == '\b') {
 			if(bufp != obufp) {
+#ifdef NEWAUTOCOMP
 				char *i;
 
+#endif /* NEWAUTOCOMP */
 				bufp--;
+#ifndef NEWAUTOCOMP
+				putsyms("\b \b");/* putsym converts \b */
+#else /* NEWAUTOCOMP */
 				putsyms("\b");
 				for (i = bufp; *i; ++i) putsyms(" ");
 				for (; i > bufp; --i) putsyms("\b");
 				*bufp = 0;
+#endif /* NEWAUTOCOMP */
 			} else	tty_nhbell();
 #if defined(apollo)
 		} else if(c == '\n' || c == '\r') {
 #else
 		} else if(c == '\n') {
 #endif
+#ifndef NEWAUTOCOMP
+			*bufp = 0;
+#endif /* not NEWAUTOCOMP */
 			break;
 		} else if(' ' <= (unsigned char) c && c != '\177' &&
 			    (bufp-obufp < BUFSZ-1 && bufp-obufp < COLNO)) {
 				/* avoid isprint() - some people don't have it
 				   ' ' is not always a printing char */
+#ifdef NEWAUTOCOMP
 			char *i = eos(bufp);
 
+#endif /* NEWAUTOCOMP */
 			*bufp = c;
 			bufp[1] = 0;
 			putsyms(bufp);
 			bufp++;
 			if (hook && (*hook)(obufp)) {
 			    putsyms(bufp);
+#ifndef NEWAUTOCOMP
+			    bufp = eos(bufp);
+#else /* NEWAUTOCOMP */
 			    /* pointer and cursor left where they were */
 			    for (i = bufp; *i; ++i) putsyms("\b");
 			} else if (i > bufp) {
@@ -134,12 +151,20 @@ getlin_hook_proc hook;
 			    /* erase rest of prior guess */
 			    for (; i > bufp; --i) putsyms(" ");
 			    for (; s > bufp; --s) putsyms("\b");
+#endif /* NEWAUTOCOMP */
 			}
 		} else if(c == kill_char || c == '\177') { /* Robert Viduya */
 				/* this test last - @ might be the kill_char */
+#ifndef NEWAUTOCOMP
+			while(bufp != obufp) {
+				bufp--;
+				putsyms("\b \b");
+			}
+#else /* NEWAUTOCOMP */
 			for (; *bufp; ++bufp) putsyms(" ");
 			for (; bufp != obufp; --bufp) putsyms("\b \b");
 			*bufp = 0;
+#endif /* NEWAUTOCOMP */
 		} else
 			tty_nhbell();
 	}
