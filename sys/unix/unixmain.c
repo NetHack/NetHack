@@ -495,12 +495,12 @@ whoami() {
 	 * Note that we trust the user here; it is possible to play under
 	 * somebody else's name.
 	 */
-	register char *s;
-
 #if defined(__APPLE__)
 	/* Unixisms just confuse the user */
 	(void) strncpy(plname, "player", sizeof(plname)-1);
 #else
+	register char *s;
+
 	if (*plname) return FALSE;
 	if(/* !*plname && */ (s = nh_getenv("USER")))
 		(void) strncpy(plname, s, sizeof(plname)-1);
