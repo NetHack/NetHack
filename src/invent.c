@@ -1049,21 +1049,21 @@ STATIC_PTR int
 ckblessed(otmp)
 register struct obj *otmp;
 {
-	return((int)(otmp->blessed));
+	return((int)(otmp->bknown && otmp->blessed));
 }
 
 STATIC_PTR int
 ckuncursed(otmp)
 register struct obj *otmp;
 {
-	return((int)(!otmp->blessed && !otmp->cursed));
+	return((int)(otmp->bknown && !otmp->blessed && !otmp->cursed));
 }
 
 STATIC_PTR int
 ckcursed(otmp)
 register struct obj *otmp;
 {
-	return((int)(otmp->cursed));
+	return((int)(otmp->bknown && otmp->cursed));
 }
 
 STATIC_PTR int
