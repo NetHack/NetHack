@@ -3152,6 +3152,7 @@ struct trap *ttmp;
 	if (obj->otyp == CAN_OF_GREASE) {
 	    check_unpaid(obj);
 	    obj->spe--;
+	    update_inventory();
 	} else {
 	    useup(obj);	/* oil */
 	    makeknown(POT_OIL);
