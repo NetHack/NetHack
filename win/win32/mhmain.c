@@ -133,8 +133,7 @@ numpad[KEY_LAST][3] = {
   
 #define IS_MAP_ASCII(mode) ((mode)!=MAP_MODE_TILES && (mode)!=MAP_MODE_TILES_FIT_TO_SCREEN)
 
-static const char *extendedlist_nhmode = "acdefijlmnopqrstuvw?2";
-static const char *extendedlist_winmode = "acdeijlnopqrtuvw?2";
+static const char *extendedlist = "acdefijlmnopqrstuvw?2";
 
 #define SCANLO		0x02
 static const char scanmap[] = { 	/* ... */
@@ -378,14 +377,11 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
               If not nethackmode, don't handle Alt-keys here.
               If no Alt-key pressed it can never be an extended command 
             */
-	    if ((lParam & 1<<29) != 0)
+	    if (GetNHApp()->regNetHackMode && ((lParam & 1<<29) != 0))
             {
                 unsigned char c = (unsigned char)(wParam & 0xFF);
 		unsigned char scancode = (lParam >> 16) & 0xFF;
-                if (index(
-		    GetNHApp()->regNetHackMode
-			? extendedlist_nhmode :  extendedlist_winmode,
-		    tolower(c)) != 0)
+                if (index(extendedlist, tolower(c)) != 0)
 		{
 		    NHEVENT_KBD(M(tolower(c)));
 		} else if (scancode == (SCANLO + SIZE(scanmap)) - 1) {

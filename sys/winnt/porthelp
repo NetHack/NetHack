@@ -27,19 +27,19 @@ Some options are applicable only to the graphical port.
 These are discussed separately in their own section. 
 
 Contents
-1. Available ALT Key Combinations
+1. Available NetHack Mode ALT Key Combinations
 2. Boolean options
 3. Graphical Port Complex options
 4. Graphical Port Additional/Enhanced Commands
 5. Graphical Port Menus
 
-1. Available ALT Key Combinations
----------------------------------
-While playing NetHack under Windows you can press the ALT key in 
-combination with another key to execute an extended command as an 
-alternative method to pressing a # key sequence. (The non-graphical
+1. Available NetHack Mode ALT Key Combinations
+----------------------------------------------
+While playing NetHack under Windows in NetHack mode you can press the
+ALT key in combination with another key to execute an extended command
+as an alternative method to pressing a # key sequence.  The non-graphical
 (tty) version is always running in NetHack mode, but 
-"NetHack for Windows - Graphical Interface" can be toggled): 
+"NetHack for Windows - Graphical Interface" can be toggled:
 
     Alt-2    #twoweapon      - toggle two-weapon combat (unavailable
                                if number_pad mode is set)
@@ -47,18 +47,17 @@ alternative method to pressing a # key sequence. (The non-graphical
     Alt-c    #chat           - talk to someone or something.
     Alt-d    #dip            - dip an object into something.
     Alt-e    #enhance        - enhance your skill with a weapon.
-    Alt-f    #force          - force a lock. [works in NetHack mode only]
+    Alt-f    #force          - force a lock.
     Alt-i    #invoke         - invoke an object's powers.
     Alt-j    #jump           - jump to a location.
     Alt-l    #loot           - loot a box on the floor.
     Alt-m    #monster        - use a monster's special ability. 
-                               [works in NetHack mode only]
     Alt-n    #name           - name an item or type of object.
     Alt-o    #offer          - offer a sacrifice to the gods.
     Alt-p    #pray           - pray to the gods for help.
     Alt-q    #quit           - quit the game. (Same as #quit)
     Alt-r    #rub            - rub a lamp.
-    Alt-s    #sit            - sit down. [works in NetHack mode only]
+    Alt-s    #sit            - sit down.
     Alt-t    #turn           - turn undead.
     Alt-u    #untrap         - untrap something.
     Alt-v    #version        - list compile time options for this version of
