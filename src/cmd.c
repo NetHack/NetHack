@@ -833,18 +833,6 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 			if (u.usick_type & SICK_NONVOMITABLE)
 				you_are("sick from illness");
 		}
-		/* added by JDS */
-		if (u.uhitinc) {
-			Sprintf(buf, "%s%i %s to hit", u.uhitinc > 0 ? "+" : "",
-				u.uhitinc, u.uhitinc > 0 ? "bonus" : "penalty");
-			you_have(buf);
-			
-		}
-		if (u.udaminc) {
-			Sprintf(buf, "%s%i %s to damage", u.udaminc > 0 ? "+" : "",
-				u.udaminc, u.udaminc > 0 ? "bonus" : "penalty");
-			you_have(buf);
-		} /* end JDS portion */
 	}
 	if (Stoned) you_are("turning to stone");
 	if (Slimed) you_are("turning into slime");
@@ -939,6 +927,17 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	}
 
 	/*** Physical attributes ***/
+	/* added by JDS */
+	if (u.uhitinc) {
+		Sprintf(buf, "a %s%d %s to hit", u.uhitinc > 0 ? "+" : "",
+			u.uhitinc, u.uhitinc > 0 ? "bonus" : "penalty");
+		you_have(buf);
+	}
+	if (u.udaminc) {
+		Sprintf(buf, "a %s%d damage %s", u.udaminc > 0 ? "+" : "",
+			u.udaminc, u.udaminc > 0 ? "bonus" : "penalty");
+		you_have(buf);
+	}
 	if (Slow_digestion) you_have("slower digestion");
 	if (Regeneration) enl_msg("You regenerate", "", "d", "");
 	if (u.uspellprot || Protection) you_are("protected");
