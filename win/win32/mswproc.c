@@ -1454,6 +1454,9 @@ char mswin_yn_function(const char *question, const char *choices,
 	    /* FYI: ch==-115 is for KP_ENTER */
 	    if (def && (ch==' ' || ch=='\r' || ch=='\n' || ch==-115)) {
 		result=def;
+	    } else if( index(choices, '#') && isdigit(ch) ) {
+		yn_number = ch;
+		result = '#';
 	    } else {
 		mswin_nhbell();
 		/* and try again... */
