@@ -1653,13 +1653,13 @@ The possibilities are:
 .si
 i - disclose your inventory.
 a - disclose your attributes.
-v - summarizing monsters that have been vanquished.
-g - listing monster species that have been genocided.
-c - displaying your conduct.
+v - summarize monsters that have been vanquished.
+g - list monster species that have been genocided.
+c - display your conduct.
 .ei
 .ed
 Each disclosure possibility can optionally be preceded by a prefix which
-let you refine how it behaves. Here are some of the prefixes:
+let you refine how it behaves. Here are the valid prefixes:
 .sd
 .si
 y - prompt you and default to yes on the prompt.
@@ -1668,8 +1668,7 @@ n - prompt you and default to no on the prompt.
 - - do not disclose it and do not prompt.
 .ei
 .ed
-Note that the vanquished monsters list includes all monsters killed by
-traps and each other as well as by you.(ex. ``disclose:yina+v-g-c'')
+(ex. ``disclose:yi na +v -g -c'')
 The example sets 
 .op inventory
 to prompt and default to yes,
@@ -1681,6 +1680,8 @@ to disclose without prompting,
 to not disclose and not to prompt,
 .op conduct
 to not disclose and not to prompt.
+Note that the vanquished monsters list includes all monsters killed by
+traps and each other as well as by you.
 .lp dogname
 Name your starting dog (ex. ``dogname:Fang'').
 Cannot be set with the `O' command.

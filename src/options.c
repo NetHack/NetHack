@@ -1555,7 +1555,7 @@ goodfruit:
 	}
 
 	/* things to disclose at end of game */
-	if (match_optname(opts, "disclose", 4, TRUE)) {
+	if (match_optname(opts, "disclose", 7, TRUE)) {
 		/*
 		 * The order that the end_disclore options are stored:
 		 * inventory, attribs, vanquished, genocided, conduct
@@ -1604,7 +1604,8 @@ goodfruit:
 				DISCLOSE_PROMPT_DEFAULT_YES,
 				DISCLOSE_PROMPT_DEFAULT_NO,
 				DISCLOSE_YES_WITHOUT_PROMPT,
-				DISCLOSE_NO_WITHOUT_PROMPT
+				DISCLOSE_NO_WITHOUT_PROMPT,
+				'\0'
 			};
 			c = lowc(*op);
 			if (c == 'k') c = 'v';	/* killed -> vanquished */
@@ -1623,6 +1624,8 @@ goodfruit:
 				    flags.end_disclose[idx] = DISCLOSE_YES_WITHOUT_PROMPT;
 			} else if (index(valid_settings, c)) {
 				prefix_val = c;
+			} else if (c == ' ') {
+				/* do nothing */
 			} else
 				badopt = TRUE;				
 			op++;
@@ -2402,6 +2405,7 @@ char *buf;
 	else if (!strcmp(optname, "disclose")) {
 		for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
 			char topt[2];
+			if (i) Strcat(buf," ");
 			topt[1] = '\0';
 			topt[0] = flags.end_disclose[i];
 			Strcat(buf, topt);
