@@ -56,8 +56,20 @@ boolean quietly;
 	int chance, trycnt = 100;
 
 	do {
-	    if (otmp) {
-		pm = &mons[otmp->corpsenm]; /* Figurine; otherwise spell */
+	    if (otmp) {	/* figurine; otherwise spell */
+		int mndx = otmp->corpsenm;
+		pm = &mons[mndx];
+		/* activating a figurine provides one way to exceed the
+		   maximum number of the target critter created--unless
+		   it has a special limit (erinys, Nazgul) */
+		if ((mvitals[mndx].mvflags & G_EXTINCT) &&
+			mbirth_limit(mndx) != MAXMONNO) {
+		    if (!quietly)
+			/* have just been given "You <do something with>
+			   the figurine and it transforms." message */
+			pline("... into a pile of dust.");
+		    break;	/* mtmp is null */
+		}
 	    } else if (!rn2(3)) {
 		pm = &mons[pet_type()];
 	    } else {

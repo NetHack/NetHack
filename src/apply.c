@@ -1700,6 +1700,11 @@ boolean quietly;
 {
 	xchar x,y;
 
+	if (carried(obj) && u.uswallow) {
+		if (!quietly)
+			You("don't have enough room in here.");
+		return FALSE;
+	}
 	x = cc->x; y = cc->y;
 	if (!isok(x,y)) {
 		if (!quietly)
@@ -1729,6 +1734,11 @@ register struct obj *obj;
 	xchar x, y;
 	coord cc;
 
+	if (u.uswallow) {
+		/* can't activate a figurine while swallowed */
+		if (!figurine_location_checks(obj, (coord *)0, FALSE))
+			return;
+	}
 	if(!getdir((char *)0)) {
 		flags.move = multi = 0;
 		return;
