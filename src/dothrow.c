@@ -828,7 +828,7 @@ boolean hitsroof;
 	    }
 	}
 	hitfloor(obj);
-	losehp(dmg, "falling object", KILLED_BY_AN);
+	losehp(Maybe_Half_Phys(dmg), "falling object", KILLED_BY_AN);
     }
     return TRUE;
 }

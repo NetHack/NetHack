@@ -1601,6 +1601,7 @@ prayer_done()		/* M. Stephenson (1.0.3b) */
 	You_feel("like you are falling apart.");
 	/* KMH -- Gods have mastery over unchanging */
 	rehumanize();
+	/* no Half_physical_damage adjustment here */
 	losehp(rnd(20), "residual undead turning effect", KILLED_BY_AN);
 	exercise(A_CON, FALSE);
 	return(1);

@@ -1437,7 +1437,8 @@ struct monst *mtmp;
 			stackobj(otmp2);
 			newsym(u.ux, u.uy);
 		    }
-		    if (dmg) losehp(dmg, "scroll of earth", KILLED_BY_AN);
+		    if (dmg) losehp(Maybe_Half_Phys(dmg), "scroll of earth",
+					KILLED_BY_AN);
 		}
 	    xxx_noobj:
 

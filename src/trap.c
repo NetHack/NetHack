@@ -783,8 +783,7 @@ unsigned trflags;
 
 		    pline("%s you!", A_gush_of_water_hits);
 		    You("are covered with rust!");
-		    if (Half_physical_damage) dam = (dam+1) / 2;
-		    losehp(dam, "rusting away", KILLED_BY);
+		    losehp(Maybe_Half_Phys(dam), "rusting away", KILLED_BY);
 		    break;
 		} else if (u.umonnum == PM_GREMLIN && rn2(3)) {
 		    pline("%s you!", A_gush_of_water_hits);
@@ -2824,7 +2823,7 @@ drown()
 	    (void)split_mon(&youmonst, (struct monst *)0);
 	else if (u.umonnum == PM_IRON_GOLEM) {
 	    You("rust!");
-	    i = d(2,6);
+	    i = Maybe_Half_Phys(d(2,6));
 	    if (u.mhmax > i) u.mhmax -= i;
 	    losehp(i, "rusting away", KILLED_BY);
 	}
@@ -3652,7 +3651,7 @@ boolean disarm;
 			      delobj(otmp);
 			  }
 			  wake_nearby();
-			  losehp(d(6,6), buf, KILLED_BY_AN);
+			  losehp(Maybe_Half_Phys(d(6,6)), buf, KILLED_BY_AN);
 			  exercise(A_STR, FALSE);
 			  if(costly && loss) {
 			      if(insider)

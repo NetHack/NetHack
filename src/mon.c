@@ -1485,8 +1485,7 @@ boolean was_swallowed;			/* digestion */
 			      body_part(STOMACH));
 			Sprintf(killer.name, "%s explosion",
 				s_suffix(mdat->mname));
-			if (Half_physical_damage) tmp = (tmp+1) / 2;
-			losehp(tmp, killer.name, KILLED_BY_AN);
+			losehp(Maybe_Half_Phys(tmp), killer.name, KILLED_BY_AN);
 		    } else {
 			if (!Deaf) You_hear("an explosion.");
 			magr->mhp -= tmp;
@@ -2013,8 +2012,7 @@ int  typ, fatal;
 		    pline("You%s!", poiseff[typ]);
 	} else {
 		i = thrown_weapon ? rnd(6) : rn1(10,6);
-		if(Half_physical_damage) i = (i+1) / 2;
-		losehp(i, pname, kprefix);
+		losehp(Maybe_Half_Phys(i), pname, kprefix);
 	}
 	if(u.uhp < 1) {
 		killer.format = kprefix;

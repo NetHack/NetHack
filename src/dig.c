@@ -945,7 +945,8 @@ struct obj *obj;
 			    pline("Sparks fly as you whack the %s.%s",
 				sobj_at(STATUE, rx, ry) ? "statue" : "boulder",
 				vibrate ? " The axe-handle vibrates violently!" : "");
-			    if (vibrate) losehp(2, "axing a hard object", KILLED_BY);
+			    if (vibrate) losehp(Maybe_Half_Phys(2),
+						"axing a hard object", KILLED_BY);
 			}
 			else
 			    You("swing %s through thin air.",

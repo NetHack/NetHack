@@ -73,8 +73,7 @@ const char *name;	/* if null, then format `obj' */
 			pline("It doesn't seem to hurt you.");
 		else {
 			if (is_acid) pline("It burns!");
-			if (Half_physical_damage) dam = (dam+1) / 2;
-			losehp(dam, knm, kprefix);
+			losehp(Maybe_Half_Phys(dam), knm, kprefix);
 			exercise(A_STR, FALSE);
 		}
 		return(1);

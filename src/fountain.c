@@ -524,7 +524,8 @@ drinksink()
 		case 2: You("take a sip of scalding hot water.");
 			if (Fire_resistance)
 				pline("It seems quite tasty.");
-			else losehp(rnd(6), "sipping boiling water", KILLED_BY);
+			else losehp(Maybe_Half_Phys(rnd(6)),
+					"sipping boiling water", KILLED_BY);
 			break;
 		case 3: if (mvitals[PM_SEWER_RAT].mvflags & G_GONE)
 				pline_The("sink seems quite dirty.");

@@ -894,9 +894,11 @@ peffects(otmp)
 			/* Not necessarily a creature who _likes_ acid */
 			pline("This tastes %s.", Hallucination ? "tangy" : "sour");
 		else {
+			int dmg;
 			pline("This burns%s!", otmp->blessed ? " a little" :
 					otmp->cursed ? " a lot" : " like acid");
-			losehp(d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8),
+			dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
+			losehp(Maybe_Half_Phys(dmg),
 					"potion of acid", KILLED_BY_AN);
 			exercise(A_CON, FALSE);
 		}
@@ -1017,9 +1019,11 @@ boolean your_fault;
 		break;
 	case POT_ACID:
 		if (!Acid_resistance) {
+		    int dmg;
 		    pline("This burns%s!", obj->blessed ? " a little" :
 				    obj->cursed ? " a lot" : "");
-		    losehp(d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8),
+		    dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
+		    losehp(Maybe_Half_Phys(dmg),
 				    "potion of acid", KILLED_BY_AN);
 		}
 		break;
@@ -1447,7 +1451,8 @@ register struct obj *obj;
 		if (obj->otyp == POT_ACID) {
 			pline("It boils vigorously!");
 			You("are caught in the explosion!");
-			losehp(rnd(10), "elementary chemistry", KILLED_BY);
+			losehp(Maybe_Half_Phys(rnd(10)), "elementary chemistry",
+				KILLED_BY);
 			makeknown(obj->otyp);
 			update_inventory();
 			return (TRUE);
@@ -1678,7 +1683,8 @@ dodip()
 				potionbreathe(obj);
 			useup(obj);
 			useup(potion);
-			losehp(rnd(10), "alchemic blast", KILLED_BY_AN);
+			losehp(Maybe_Half_Phys(rnd(10)), "alchemic blast",
+					KILLED_BY_AN);
 			return(1);
 		}
 
