@@ -336,7 +336,8 @@ register int roomno;
 		shrined = has_shrine(priest);
 		sanctum = (priest->data == &mons[PM_HIGH_PRIEST] &&
 			   (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
-		can_speak = (priest->mcanmove && !priest->msleeping);
+		can_speak = (priest->mcanmove && !priest->msleeping &&
+			     flags.soundok);
 		if (can_speak)
 		    pline("%s intones:",
 			  (!Blind ? Monnam(priest) : "A nearby voice"));
