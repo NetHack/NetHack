@@ -1569,7 +1569,10 @@ eatspecial() /* called after eating non-food */
 {
 	register struct obj *otmp = victual.piece;
 
+	/* lesshungry wants an occupation to handle choke messages correctly */
+	set_occupation(eatfood, "eating non-food", 0);
 	lesshungry(victual.nmod);
+	occupation = 0;
 	victual.piece = (struct obj *)0;
 	victual.eating = 0;
 	if (otmp->oclass == COIN_CLASS) {
