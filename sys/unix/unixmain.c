@@ -518,7 +518,7 @@ wd_message()
 }
 
 /*
- * Add a backslash to any name not ending in /. There must
+ * Add a slash to any name not ending in /. There must
  * be room for the /
  */
 void
