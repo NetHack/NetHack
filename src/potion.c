@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)potion.c	3.4	2002/10/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1857,7 +1857,13 @@ dodip()
 	potion->in_use = FALSE;		/* didn't go poof */
 	if ((obj->otyp == UNICORN_HORN || obj->otyp == AMETHYST) &&
 	    (mixture = mixtype(obj, potion)) != 0) {
+		char oldbuf[BUFSZ], newbuf[BUFSZ];
 		boolean more_than_one = potion->quan > 1;
+
+		oldbuf[0] = '\0';
+		if (potion->dknown)
+		    Sprintf(oldbuf, "%s ",
+			    hcolor(OBJ_DESCR(objects[potion->otyp])));
 		/* with multiple merged potions, split off one and
 		   just clear it */
 		if (potion->quan > 1L) {
@@ -1875,24 +1881,20 @@ dodip()
 		else
 		    singlepotion->cursed = obj->cursed;  /* odiluted left as-is */
 		singlepotion->bknown = FALSE;
-		if (Blind)
-			singlepotion->dknown = FALSE;
-		else {
-			if (mixture == POT_WATER &&
-#ifdef DCC30_BUG
-			    (singlepotion->dknown = !Hallucination,
-			     singlepotion->dknown != 0))
-#else
-			    (singlepotion->dknown = !Hallucination) != 0)
-#endif
-				pline_The("potion%s clears.",
-					more_than_one ? " that you dipped into" : "");
-			else
-				pline_The("potion%s turns %s.",
-					more_than_one ? " that you dipped into" : "",
-					hcolor(OBJ_DESCR(objects[mixture])));
+		if (Blind) {
+		    singlepotion->dknown = FALSE;
+		} else {
+		    singlepotion->dknown = !Hallucination;
+		    if (mixture == POT_WATER && singlepotion->dknown)
+			Sprintf(newbuf, "clears");
+		    else
+			Sprintf(newbuf, "turns %s",
+				hcolor(OBJ_DESCR(objects[mixture])));
+		    pline_The("%spotion%s %s.", oldbuf,
+			      more_than_one ? " that you dipped into" : "",
+			      newbuf);
 		}
-	    	obj_extract_self(singlepotion);
+		obj_extract_self(singlepotion);
 		singlepotion = hold_another_object(singlepotion,
 					"You juggle and drop %s!",
 					doname(singlepotion), (const char *)0);
