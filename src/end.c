@@ -768,9 +768,7 @@ die:
 	    wait_synch();
 	    display_nhwindow(WIN_MESSAGE, TRUE);
 	    destroy_nhwindow(WIN_MAP);
-#ifdef STATUS_VIA_WINDOWPORT
-	    status_finish();
-#else
+#ifndef STATUS_VIA_WINDOWPORT
 	    destroy_nhwindow(WIN_STATUS);
 #endif
 	    destroy_nhwindow(WIN_MESSAGE);

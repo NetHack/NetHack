@@ -2212,7 +2212,7 @@ goodfruit:
 #endif
 			    ) {
 #ifdef STATUS_VIA_WINDOWPORT
-			    status_initialize(TRUE);   /* TRUE = reassess only */
+			    status_initialize(REASSESS_ONLY);
 #endif
 			    context.botl = TRUE;
 			}

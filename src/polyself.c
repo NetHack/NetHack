@@ -25,7 +25,7 @@ set_uasmon()
 {
 	set_mon_data(&youmonst, &mons[u.umonnum], 0);
 #ifdef STATUS_VIA_WINDOWPORT
-	status_initialize(TRUE);   /* TRUE = reassess fields only */
+	status_initialize(REASSESS_ONLY);
 #endif
 }
 

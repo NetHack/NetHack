@@ -320,32 +320,32 @@ struct istat_s {
 struct istat_s blstats[2][MAXBLSTATS] = {
 	{
 	{ 0L, P_STR, (genericptr_t)0, (char *)0, 80, 0},	/*  0 BL_TITLE */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6,  0},	/*  1 BL_STR */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6,  0},	/*  2 BL_DX */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6,  0},	/*  3 BL_CO */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6,  0},	/*  4 BL_IN */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6,  0},	/*  5 BL_WI */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6,  0},	/*  6 BL_CH */
-	{ 0L, P_STR, (genericptr_t)0, (char *)0, 8,  0},	/*  7 BL_ALIGN */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  1 BL_STR */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  2 BL_DX */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  3 BL_CO */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  4 BL_IN */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  5 BL_WI */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/*  6 BL_CH */
+	{ 0L, P_STR, (genericptr_t)0, (char *)0, 40,  0},	/*  7 BL_ALIGN */
 	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 20, 0},	/*  8 BL_SCORE */
 	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 20, 0},	/*  9 BL_CAP */
-	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 8,  0},	/* 10 BL_GOLD */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6, BL_ENEMAX}, /* 11 BL_ENE */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6,  0},	/* 12 BL_ENEMAX */
-	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 6,  0},	/* 13 BL_XP */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6,  0},	/* 14 BL_AC */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 6,  0},	/* 15 BL_HD */
-	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10, 0},	/* 16 BL_TIME */
-	{ 0L, P_UINT,(genericptr_t)0, (char *)0, 20, 0},	/* 17 BL_HUNGER */
+	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 10,  0},	/* 10 BL_GOLD */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
+	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 10,  0},	/* 13 BL_XP */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/* 14 BL_AC */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,  0},	/* 15 BL_HD */
+	{ 0L, P_INT, (genericptr_t)0, (char *)0, 20, 0},	/* 16 BL_TIME */
+	{ 0L, P_UINT,(genericptr_t)0, (char *)0, 40, 0},	/* 17 BL_HUNGER */
 	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10,BL_HPMAX},	/* 18 BL_HP */
 	{ 0L, P_INT, (genericptr_t)0, (char *)0, 10, 0},	/* 19 BL_HPMAX */
 	{ 0L, P_STR, (genericptr_t)0, (char *)0, 80, 0},	/* 20 BL_LEVELDESC */
 	{ 0L, P_LNG, (genericptr_t)0, (char *)0, 20, 0},	/* 21 BL_EXP */
-	{ 0L, P_MASK,(genericptr_t)0, (char *)0, 0, 0},	/* 22 BL_CONDITION */
+	{ 0L, P_MASK,(genericptr_t)0, (char *)0, 0, 0},		/* 22 BL_CONDITION */
 	}
 };
 
-static boolean update_all = FALSE;
+static boolean blinit = FALSE, update_all = FALSE;
 
 void
 status_initialize(reassessment)
@@ -367,6 +367,7 @@ boolean reassessment;	/* TRUE = just reassess fields w/o other initialization*/
 	if (!reassessment) {
 		init_blstats();
 		(*windowprocs.win_status_init)();
+		blinit = TRUE;
 	}
 	for (i = 0; i < MAXBLSTATS; ++i) {
 		if ((i == BL_SCORE && !flags.showscore)	||
@@ -391,8 +392,8 @@ status_finish()
 
 	/* free memory that we alloc'd now */
 	for (i = 0; i < MAXBLSTATS; ++i) {
-		free(blstats[0][i].ptr.a_void);
-		free(blstats[1][i].ptr.a_void);
+		free((genericptr_t)blstats[0][i].ptr.a_void);
+		free((genericptr_t)blstats[1][i].ptr.a_void);
 		if (blstats[0][i].val) free((genericptr_t)blstats[0][i].val);
 		if (blstats[1][i].val) free((genericptr_t)blstats[1][i].val);
 	}
@@ -408,21 +409,21 @@ init_blstats()
 		    case P_INT:
 			blstats[0][i].ptr.a_iptr = (int *)alloc(sizeof(int));
 			blstats[1][i].ptr.a_iptr = (int *)alloc(sizeof(int));
-			*blstats[0][i].ptr.a_iptr = 0;
-			*blstats[1][i].ptr.a_iptr = 0;
+			*(blstats[0][i].ptr.a_iptr) = 0;
+			*(blstats[1][i].ptr.a_iptr) = 0;
 			break;
 		    case P_LNG:
 		    case P_MASK:
 			blstats[0][i].ptr.a_lptr = (long *)alloc(sizeof(long));
 			blstats[1][i].ptr.a_lptr = (long *)alloc(sizeof(long));
-			*blstats[0][i].ptr.a_lptr = 0L;
-			*blstats[1][i].ptr.a_lptr = 0L;
+			*(blstats[0][i].ptr.a_lptr) = 0L;
+			*(blstats[1][i].ptr.a_lptr) = 0L;
 			break;
 		    case P_UINT:
 			blstats[0][i].ptr.a_uptr = (unsigned *)alloc(sizeof(unsigned));
 			blstats[1][i].ptr.a_uptr = (unsigned *)alloc(sizeof(unsigned));
-			*blstats[0][i].ptr.a_uptr = 0;
-			*blstats[1][i].ptr.a_uptr = 0;
+			*(blstats[0][i].ptr.a_uptr) = 0;
+			*(blstats[1][i].ptr.a_uptr) = 0;
 			break;
 		}
 		if (blstats[0][i].valwidth) {
@@ -449,6 +450,8 @@ bot()
 	anything curr, prev;
 	boolean valset[MAXBLSTATS];
 
+	if (!blinit) panic("bot before init.");
+	
 	idx_p = idx;
 	idx   = 1 - idx;	/* 0 -> 1, 1 -> 0 */
 
@@ -506,7 +509,7 @@ bot()
 
 	/* Alignment */
 
-	Sprintf(blstats[idx][BL_ALIGN].val,
+	Strcpy(blstats[idx][BL_ALIGN].val,
 			(u.ualign.type == A_CHAOTIC) ? "Chaotic" :
 			(u.ualign.type == A_NEUTRAL) ? "Neutral" : "Lawful");
 
@@ -752,8 +755,10 @@ genl_status_finish()
 	int i;
 
 	/* free alloc'd memory here */
-	for (i = 0; i < MAXBLSTATS; ++i)
-		free((genericptr_t)vals[i]);
+	for (i = 0; i < MAXBLSTATS; ++i) {
+		if (vals[i]) free((genericptr_t)vals[i]);
+		vals[i] = (char *)0;
+	}
 }
 
 void
@@ -777,6 +782,7 @@ genericptr_t ptr;
 	static int init = FALSE;
 	long cond;
 	register int i;
+	char *text = (char *)ptr;
 	int fieldorder1[] = {
 		 BL_TITLE, BL_STR, BL_DX,BL_CO, BL_IN,
 		 BL_WI, BL_CH,BL_ALIGN, BL_SCORE, -1
@@ -803,9 +809,8 @@ genericptr_t ptr;
 	    		if (cond & BL_MASK_SLIMED) Strcat(vals[idx], " Slime");
 	    		break;
 		default:
-	    		(void) Sprintf(vals[idx],
-					fieldfmt[idx] ? fieldfmt[idx] : "%s",
-					(char *)ptr, MAXCO);
+	    		Sprintf(vals[idx],
+				fieldfmt[idx] ? fieldfmt[idx] : "%s", text);
 	    		break;
 	    }
 	}

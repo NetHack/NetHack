@@ -41,4 +41,6 @@
 #define BL_MASK_STUNNED		0x00000020L
 #define BL_MASK_SLIMED		0x00000040L
 
+#define REASSESS_ONLY	TRUE
+
 #endif /* BOTL_H */
