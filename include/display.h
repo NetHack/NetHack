@@ -133,8 +133,7 @@
  * invisible.  If not, then we don't need the check.
  */
 #define canseeself()	(Blind || u.uswallow || (!Invisible && !u.uundetected))
-#define senseself()	(canseeself() || Infravision || Unblind_telepat || \
-			 Detect_monsters)
+#define senseself()	(canseeself() || Unblind_telepat || Detect_monsters)
 
 /*
  * random_monster()
