@@ -40,6 +40,9 @@ extern void msmsg(const char *,...);
 
 extern char mapped_menu_cmds[]; /* from options.c */
 
+/* this is only needed until tty_status_* routines are written */
+extern NEARDATA winid WIN_STATUS;
+
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
     "tty",
@@ -111,6 +114,12 @@ struct window_procs tty_procs = {
 #endif
     tty_getmsghistory,
     tty_putmsghistory,
+#ifdef STATUS_VIA_WINDOWPORT
+    genl_status_init,
+    genl_status_finish,
+    genl_status_enablefield,
+    genl_status_update,
+#endif
 };
 
 static int maxwin = 0;			/* number of windows in use */

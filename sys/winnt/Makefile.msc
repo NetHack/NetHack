@@ -418,7 +418,7 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h $(INCL)\context.h \
 		$(INCL)\skills.h $(INCL)\onames.h $(INCL)\timeout.h \
 		$(INCL)\trap.h $(INCL)\flag.h $(INCL)\rm.h \
 		$(INCL)\vision.h $(INCL)\display.h $(INCL)\engrave.h \
-		$(INCL)\rect.h $(INCL)\region.h $(INCL)\winprocs.h \
+		$(INCL)\rect.h $(INCL)\region.h $(INCL)\winprocs.h $(INCL)\botl.h \
 		$(INCL)\wintty.h $(INCL)\trampoli.h
 
 LEV_H       = $(INCL)\lev.h

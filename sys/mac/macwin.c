@@ -2647,6 +2647,12 @@ struct window_procs mac_procs = {
 	genl_preference_update,
 	genl_getmsghistory,
 	genl_putmsghistory,
+#ifdef STATUS_VIA_WINDOWPORT
+    genl_status_init,
+    genl_status_finish,
+    genl_status_enablefield,
+    genl_status_update,
+#endif
 };
 
 /*macwin.c*/

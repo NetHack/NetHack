@@ -123,6 +123,12 @@ struct window_procs mswin_procs = {
     mswin_preference_update,
     mswin_getmsghistory,
     mswin_putmsghistory,
+#ifdef STATUS_VIA_WINDOWPORT
+    genl_status_init,
+    genl_status_finish,
+    genl_status_enablefield,
+    genl_status_update,
+#endif
 };
 
 
