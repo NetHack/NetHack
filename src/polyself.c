@@ -628,7 +628,7 @@ break_armor()
 
 		/* Future possiblities: This could damage/destroy helmet */
 		Sprintf(hornbuf, "horn%s", plur(num_horns(youmonst.data)));
-		Your("%s through %s %s.", vtense(hornbuf, "pierce"),
+		Your("%s %s through %s %s.", hornbuf, vtense(hornbuf, "pierce"),
 		     shk_your(yourbuf, otmp), xname(otmp));
 	    } else {
 		if (donning(otmp)) cancel_don();
