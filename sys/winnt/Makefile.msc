@@ -1222,6 +1222,8 @@ $(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) $(INCL)\func_tab.h \
 	$(CXX) $(CXXFLAGS) -c ..\win\Qt\qt_win.cpp
 $(O)qt_clust.o: ..\win\Qt\qt_clust.cpp $(INCL)\qt_clust.h
 	$(CXX) $(CXXFLAGS) -c ..\win\Qt\qt_clust.cpp
+$(O)monstr.o: monstr.c $(CONFIG_H)
+$(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H) $(INCL)\edog.h
@@ -1291,7 +1293,7 @@ $(O)options.o: options.c $(CONFIG_H) $(INCL)\objclass.h $(INCL)\flag.h \
 		$(HACK_H) $(INCL)\tcap.h
 $(O)pager.o: pager.c $(HACK_H) $(INCL)\dlb.h
 $(O)pickup.o: pickup.c $(HACK_H)
-$(O)pline.o: pline.c $(HACK_H) $(INCL)\epri.h
+$(O)pline.o: pline.c $(HACK_H) $(INCL)\epri.h $(INCL)\edog.h
 $(O)polyself.o: polyself.c $(HACK_H)
 $(O)potion.o: potion.c $(HACK_H)
 $(O)pray.o: pray.c $(HACK_H) $(INCL)\epri.h
@@ -1301,7 +1303,7 @@ $(O)quest.o: quest.c $(HACK_H) $(INCL)\qtext.h
 $(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)\dlb.h $(INCL)\qtext.h
 $(O)read.o: read.c $(HACK_H)
 $(O)rect.o: rect.c $(HACK_H)
-$(O)region.o: region.c $(HACK_H)
+$(O)region.o: region.c $(HACK_H) $(INCL)\lev.h
 $(O)restore.o: restore.c $(HACK_H) $(INCL)\lev.h $(INCL)\tcap.h
 $(O)rip.o: rip.c $(HACK_H)
 $(O)rnd.o: rnd.c $(HACK_H)
