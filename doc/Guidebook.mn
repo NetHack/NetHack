@@ -2028,6 +2028,8 @@ Sort the pack contents by type when displaying inventory (default on).
 .lp sound
 Enable messages about what your character hears (default on).
 Note that this has nothing to do with your computer's audio capabilities.
+This option is only partly under player control.  The game toggles it
+off and on during and after sleep, for example.
 .lp sparkle
 Display a sparkly effect when a monster (including yourself) is hit by an
 attack to which it is resistant (default on).
