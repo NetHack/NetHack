@@ -361,8 +361,12 @@ const char *name;
 	}
 
 	if (obj->owornmask) {
+		boolean save_twoweap = u.twoweap;
+		/* unwearing the old instance will clear dual-wield mode
+		   if this object is either of the two weapons */
 		setworn((struct obj *)0, obj->owornmask);
 		setworn(otmp, otmp->owornmask);
+		u.twoweap = save_twoweap;
 	}
 
 	/* replace obj with otmp */
