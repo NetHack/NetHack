@@ -137,6 +137,8 @@ ioctl.c         unixtty.c
 nhlan.c
 (Berkeley random number file, which may be included in any version)
 random.c
+(Berkeley uudecode file, which may be used in build process of any version)
+uudecode.c
 (file for VMS version)
 tclib.c
 (file for MSDOS, OS/2, and VMS versions)
