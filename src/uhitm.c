@@ -575,7 +575,7 @@ int thrown;
 			  ((wtype = uwep_skill_type()) != P_NONE &&
 			    P_SKILL(wtype) >= P_SKILLED) &&
 			  ((monwep = MON_WEP(mon)) != 0 &&
-			   objects[monwep->otyp].oc_material >= WOOD &&
+			   !is_flimsy(monwep) &&
 			   !obj_resists(monwep,
 				 50 + 15 * greatest_erosion(obj), 100))) {
 			/*
