@@ -203,8 +203,21 @@ register struct obj *sobj;
     }
 
     if (!known) {
-	/* no gold found */
-	if (sobj) strange_feeling(sobj, "You feel materially poor.");
+	/* no gold found on floor or monster's inventory.
+	   adjust message if you have gold in your inventory */
+	if (sobj) {
+		if (youmonst.data == &mons[PM_GOLD_GOLEM])
+			You_feel("like a million %s!", currency(2L));
+		else if (sobj && hidden_gold() ||
+#ifndef GOLDOBJ
+				u.ugold)
+#else
+			        money_cnt(invent))
+#endif
+			You("worry about your future financial situation.");
+		else
+			strange_feeling(sobj, "You feel materially poor.");
+        }
 	return(1);
     }
     /* only under me - no separate display required */
