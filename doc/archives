@@ -1,0 +1,74 @@
+Known ftp archive sites as of 13 Aug 93 (having at least version 3.1.3
+unless otherwise noted).  The directory name is given, but not individual
+file names.
+
+linc.cis.upenn.edu	pub/NH3.1/source	source, linc packaging
+linc.cis.upenn.edu	pub/NH3.1/binaries/PC	PC binary package
+linc.cis.upenn.edu	pub/NH3.1/binaries/amiga Amiga binary package, lzh
+linc.cis.upenn.edu	pub/NH3.1/binaries/mac	Mac binary package, hqx
+linc.cis.upenn.edu	pub/NH3.1/binaries/nt	NT binary package, zip
+linc.cis.upenn.edu	pub/NH3.1/binaries/os2	OS/2 binary package
+
+hamlet.caltech.edu	[.nethack]	source, VMS packaging, and VMS binary
+  HAMLET::ANON_ROOT:[nethack]		same, from NSI/DECnet (15186::)
+uars.acd.ucar.edu	[.src.nethack]	source, VMS packaging, and VMS binary
+  ACDURS::SYS$LCL:[src.nethack]		same, from NSI/DECnet (34210::)
+
+ftp.uu.net		usenet/comp.sources.games/volume16/nethack31	source
+ftp.uu.net		usenet/comp.sources.games	source, single tar.Z
+wuarchive.wustl.edu	usenet/comp.sources.games/volume16/nethack31	source
+ftp.world.net		pub/games			source, single tar.Z
+prep.ai.mit.edu		pub/gnu		source, single tar.gz
+s.ecc.engr.uky.edu	pub/uploads/nethack3.1.2 source, single tar.Z (3.1.2)
+uxc.cso.uiuc.edu	pub		source, single tar.gz
+
+brolga.cc.uq.oz.au	comp.sources.games/volume16/nethack31	source
+ftp.uts.edu.au		pub/NH3.1	source, single tar.z (3.1.0)
+archie.au		usenet/comp.sources.games	source, single tar.Z
+archie.au		usenet/comp.sources.games/volume16/nethack31
+
+ftp.uni-erlangen.de	pub/games	source, single tar.Z (3.0.8, 3.1.0)
+ftp.uni-kl.de		pub/unix/games	source, single tar.Z
+ftp.inria.fr		games		source, single tar.Z (also 3.0.10)
+irisa.irisa.fr		pub/games	source, single tar.Z (3.1.0)
+dnpap.et.tudelft.nl	pub/Unix/Games	source, single tar.Z (3.1.2)
+ftp.luth.se		pub/misc/nethack-3.1	source, linc packaging (3.1.1)
+ftp.funet.fi		pub/unix/games		source, single tar.gz
+
+ftp.uts.edu.au		pub/NH3.1	linux binary package (3.1.0?)
+ftp.funet.fi		pub/os2/all/games	OS/2 binary package
+ftp-os2.nmsu.edu	os2/all/games	OS/2 binary package (3.1.1)
+sunsite.unc.edu		pub/Linux/games	linux binary package (3.1.2)
+
+CompuServe availability as of 14 JAN 94:
+			GAMERS		MSDOS binary package (.ZIP)
+			AMIGA ARTS	Amiga binary package (.lzh)
+			OS2USER 	OS2 binary package (.ZIP)
+			ATARI ST ARTS	Atari GEM binary package (.ZOO)
+			ATARINET	Atari binary package (.ZOO)
+			GAMERS		sources - all versions (.ZIP)
+			WUGNET		Windows NT binary package (.ZIP)
+			MACFUN		MAC binary package (.SEA)
+
+Soon:
+linc.cis.upenn.edu	pub/NH3.1/binaries/atari Atari binary package
+
+The comp.sources.games master site, and best general reference for UUCP:
+
+Site:         saab
+Contact:      Bill Randle (billr@saab.CNA.TEK.COM), 503-923-4422
+Location:     Redmond, OR
+Modems:       Courier V.32bis
+UUCP:         Anonymous
+FTP:          None
+Mail server:  None
+Bitnet Lsrv:  None
+Additional:   Can make 1/4" cartrige tapes, 8mm Exabyte tapes and
+	3 1/2" and 5 1/4" floppys. A sample L.sys file for anon uucp:
+	   saab Any ACU 19200 5039234494 in:-\r-in: ugames ssword: letmein
+	An index can be retrieved by (example):
+	   uucp saab!/usr1/ftp/games-archive/Index /usr/spool/uucppublic/Index
+	The Index file also contains further uucp instructions. Will
+	email selected missing parts for desperate people.
+	Note that ftp to this site is not available (except from
+	inside Tektronix).
