@@ -506,8 +506,6 @@ else
 endif
 	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
 	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
-	$(subst /,\,@if exist $(SRC)/$(GAME).PDB copy $(SRC)/$(GAME).pdb $(GAMEDIR)/$(GAME).pdb)
-	$(subst /,\,@if exist $(GAMEDIR)/$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)/$(GAME).pdb to conserve space)
 	$(subst /,\,-copy $(NTSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
 	$(subst /,\,echo install done > $@)
 
