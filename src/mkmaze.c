@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkmaze.c	3.4	2002/03/12	*/
+/*	SCCS Id: @(#)mkmaze.c	3.4	2002/04/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -288,13 +288,18 @@ xchar rtype;
 boolean oneshot;
 d_level *lev;
 {
-    if (bad_location(x, y, nlx, nly, nhx, nhy)) return FALSE;
-    if (oneshot) {
-	/* must make due with the only location possible */
-	/* avoid failure due to a misplaced trap */
-	/* it might still fail if there's a dungeon feature here */
-	struct trap *t = t_at(x,y);
-	if (t) deltrap(t);
+    if (bad_location(x, y, nlx, nly, nhx, nhy)) {
+	if (!oneshot) {
+	    return FALSE;		/* caller should try again */
+	} else {
+	    /* Must make due with the only location possible;
+	       avoid failure due to a misplaced trap.
+	       It might still fail if there's a dungeon feature here. */
+	    struct trap *t = t_at(x,y);
+
+	    if (t && t->ttyp != MAGIC_PORTAL) deltrap(t);
+	    if (bad_location(x, y, nlx, nly, nhx, nhy)) return FALSE;
+	}
     }
     switch (rtype) {
     case LR_TELE:
