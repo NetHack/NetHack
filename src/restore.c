@@ -106,6 +106,17 @@ boolean quietly;
 
 	for (otmp = invent; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
+#ifndef GOLDOBJ
+	    if (otmp->oclass == GOLD_CLASS) {
+		/* in_use gold is created by some menu operations */
+		if (!otmp->in_use) {
+		    impossible("inven_inuse: !in_use gold in inventory");
+		}
+		extract_nobj(otmp, &invent);
+		otmp->in_use = FALSE;
+		dealloc_obj(otmp);
+	    } else
+#endif /* GOLDOBJ */
 	    if (otmp->in_use) {
 		if (!quietly) pline("Finishing off %s...", xname(otmp));
 		useup(otmp);

@@ -480,6 +480,7 @@ struct obj *obj;
 	if (obj->oclass == GOLD_CLASS) {
 #ifndef GOLDOBJ
 		u.ugold -= obj->quan;
+		obj->in_use = FALSE;
 #endif
 		flags.botl = 1;
 		return;

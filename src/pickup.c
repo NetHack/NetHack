@@ -2084,6 +2084,7 @@ ask_again2:
 		 * and put it at the head of the inventory list.
 		 */
 		u_gold = mkgoldobj(u.ugold);	/* removes from u.ugold */
+		u_gold->in_use = TRUE;
 		u.ugold = u_gold->quan;		/* put the gold back */
 		assigninvlet(u_gold);		/* might end up as NOINVSYM */
 		u_gold->nobj = invent;
@@ -2118,6 +2119,7 @@ ask_again2:
 	    /* didn't stash [all of] it */
 	    u_gold = invent;
 	    invent = u_gold->nobj;
+	    u_gold->in_use = FALSE;
 	    dealloc_obj(u_gold);
 	}
 #endif

@@ -2494,64 +2494,64 @@ boolean *lostsome;
 {
 	int invc = inv_cnt();
 
-
 	while (near_capacity() > (Punished ? UNENCUMBERED : SLT_ENCUMBER)) {
-		register struct obj *obj, *otmp = (struct obj *)0;
-		register int i;
+	    register struct obj *obj, *otmp = (struct obj *)0;
+	    register int i;
 
-		/* Pick a random object */
-		if (invc > 0) {
-			i = rn2(invc);
+	    /* Pick a random object */
+	    if (invc > 0) {
+		i = rn2(invc);
 		for (obj = invent; obj; obj = obj->nobj) {
-			/*
-			 * Undroppables are: body armor, boots, gloves,
-			 * amulets, and rings because of the time and effort
-			 * in removing them + loadstone and other cursed stuff
-			 * for obvious reasons.
-			 */
-			if (!((obj->otyp == LOADSTONE && obj->cursed) ||
-			      obj == uamul || obj == uleft || obj == uright ||
-			      obj == ublindf || obj == uarm || obj == uarmc ||
-			      obj == uarmg || obj == uarmf ||
+		    /*
+		     * Undroppables are: body armor, boots, gloves,
+		     * amulets, and rings because of the time and effort
+		     * in removing them + loadstone and other cursed stuff
+		     * for obvious reasons.
+		     */
+		    if (!((obj->otyp == LOADSTONE && obj->cursed) ||
+			  obj == uamul || obj == uleft || obj == uright ||
+			  obj == ublindf || obj == uarm || obj == uarmc ||
+			  obj == uarmg || obj == uarmf ||
 #ifdef TOURIST
-			      obj == uarmu ||
+			  obj == uarmu ||
 #endif
-			      (obj->cursed && (obj == uarmh || obj == uarms)) ||
-			      welded(obj)))
-				otmp = obj;
-			/* reached the mark and found some stuff to drop? */
-			if (--i < 0 && otmp) break;
+			  (obj->cursed && (obj == uarmh || obj == uarms)) ||
+			  welded(obj)))
+			otmp = obj;
+		    /* reached the mark and found some stuff to drop? */
+		    if (--i < 0 && otmp) break;
 
-			/* else continue */
+		    /* else continue */
 		}
-		}
+	    }
 #ifndef GOLDOBJ
-		if (!otmp) {
-			/* Nothing available left to drop; try gold */
-			if (u.ugold) {
-				pline("In desperation, you drop your purse.");
-				/* Hack: gold is not in the inventory, so make a gold object
-				 * and put it at the head of the inventory list.
-				 */
-				obj = mkgoldobj(u.ugold);    /* removes from u.ugold */
-				u.ugold = obj->quan;         /* put the gold back */
-				assigninvlet(obj);           /* might end up as NOINVSYM */
-				obj->nobj = invent;
-				invent = obj;
-				*lostsome = TRUE;
-				dropx(obj);
-				continue;                    /* Try again */
-			}
-			/* We can't even drop gold! */
-			return (FALSE);
+	    if (!otmp) {
+		/* Nothing available left to drop; try gold */
+		if (u.ugold) {
+		    pline("In desperation, you drop your purse.");
+		    /* Hack: gold is not in the inventory, so make a gold object
+		     * and put it at the head of the inventory list.
+		     */
+		    obj = mkgoldobj(u.ugold);    /* removes from u.ugold */
+		    obj->in_use = TRUE;
+		    u.ugold = obj->quan;         /* put the gold back */
+		    assigninvlet(obj);           /* might end up as NOINVSYM */
+		    obj->nobj = invent;
+		    invent = obj;
+		    *lostsome = TRUE;
+		    dropx(obj);
+		    continue;                    /* Try again */
 		}
+		/* We can't even drop gold! */
+		return (FALSE);
+	    }
 #else
-		if (!otmp) return (FALSE); /* nothing to drop! */	
+	    if (!otmp) return (FALSE); /* nothing to drop! */	
 #endif
-		if (otmp->owornmask) remove_worn_item(otmp, FALSE);
-		*lostsome = TRUE;
-		dropx(otmp);
-		invc--;
+	    if (otmp->owornmask) remove_worn_item(otmp, FALSE);
+	    *lostsome = TRUE;
+	    dropx(otmp);
+	    invc--;
 	}
 	return(TRUE);
 }
