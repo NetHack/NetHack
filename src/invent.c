@@ -968,7 +968,12 @@ register const char *let,*word;
 		}
 		if(ilet == def_oc_syms[COIN_CLASS]) {
 			if (!usegold) {
-			    You("cannot %s gold.", word);
+			    if (!strncmp(word, "rub on ", 7)) {
+				/* the dangers of building sentences... */
+				You("cannot rub gold%s.", word + 3);
+			    } else {
+				You("cannot %s gold.", word);
+			    }
 			    return(struct obj *)0;
 #ifndef GOLDOBJ
 			} else if (!allowgold) {
