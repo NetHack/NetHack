@@ -734,7 +734,8 @@ void mswin_raw_print(const char *str)
 {
 	TCHAR wbuf[255];
     logDebug("mswin_raw_print(%s)\n", str);
-	MessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), TEXT("NetHack"), MB_OK );
+	if( str && *str )
+		MessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), TEXT("NetHack"), MB_OK );
 }
 
 /*
@@ -746,7 +747,8 @@ void mswin_raw_print_bold(const char *str)
 {
 	TCHAR wbuf[255];
     logDebug("mswin_raw_print_bold(%s)\n", str);
-	MessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), TEXT("NetHack"), MB_OK );
+	if( str && *str )
+		MessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), TEXT("NetHack"), MB_OK );
 }
 
 /*

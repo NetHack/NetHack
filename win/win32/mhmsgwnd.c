@@ -196,11 +196,19 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	{
 		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
 		SCROLLINFO si;
+		char* p;
 
-		/* append text to the end of the array */
-		memmove(&data->window_text[0],
-				&data->window_text[1],
-				(MSG_LINES-1)*sizeof(data->window_text[0]));
+		/* check if the string is empty */
+		for(p = data->window_text[MSG_LINES-1].text; *p && isspace(*p); p++);
+
+		if( *p ) {
+			/* last string is not empty - scroll up */
+			memmove(&data->window_text[0],
+					&data->window_text[1],
+					(MSG_LINES-1)*sizeof(data->window_text[0]));
+		}
+
+		/* append new text to the end of the array */
 		data->window_text[MSG_LINES-1].attr = msg_data->attr;
 		strncpy(data->window_text[MSG_LINES-1].text, msg_data->text, MAXWINDOWTEXT);
 		
@@ -220,6 +228,13 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	case MSNH_MSG_CLEAR_WINDOW:
 	{
+		MSNHMsgPutstr data;
+
+		/* append an empty line to the message window (send message to itself) */
+		data.attr = ATR_NONE;
+		data.text = " ";
+		onMSNHCommand(hWnd, (WPARAM)MSNH_MSG_PUTSTR, (LPARAM)&data);
+
 		InvalidateRect(hWnd, NULL, TRUE);
 		break;
 	}

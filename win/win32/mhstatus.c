@@ -106,7 +106,7 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		    int i;
 			SIZE sz;
 			HGDIOBJ oldFont;
-			TCHAR wbuf[255];
+			TCHAR wbuf[BUFSZ];
 
 			hdc = BeginPaint(hWnd, &ps);
 			GetClientRect(hWnd, &rt);
@@ -115,8 +115,8 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			
 			for(i=0; i<NHSW_LINES; i++ ) {
 				GetTextExtentPoint32(hdc, NH_A2W(data->window_text[i], wbuf, sizeof(wbuf)), strlen(data->window_text[i]), &sz);
-				OemToChar(data->window_text[i], wbuf);
-				DrawText(hdc, wbuf, strlen(data->window_text[i]), &rt, DT_LEFT);
+				NH_A2W(data->window_text[i], wbuf, BUFSZ);
+				DrawText(hdc, wbuf, strlen(data->window_text[i]), &rt, DT_LEFT | DT_END_ELLIPSIS);
 				rt.top += sz.cy;
 			}
 
