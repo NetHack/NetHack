@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)potion.c	3.4	2002/03/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1606,6 +1606,7 @@ dodip()
 		pline(nothing_happens);
 	    } else {
 	    	boolean was_wep = FALSE, was_swapwep = FALSE, was_quiver = FALSE;
+		short save_otyp = obj->otyp;
 		/* KMH, conduct */
 		u.uconduct.polypiles++;
 
@@ -1619,9 +1620,14 @@ dodip()
 		else if (was_swapwep) setuswapwep(obj);
 		else if (was_quiver) setuqwep(obj);
 
-		makeknown(POT_POLYMORPH);
-		useup(potion);
-		prinv((char *)0, obj, 0L);
+		if (obj->otyp != save_otyp) {
+			makeknown(POT_POLYMORPH);
+			useup(potion);
+			prinv((char *)0, obj, 0L);
+		} else {
+			pline("Nothing seems to happen.");
+			useup(potion);
+		}
 	    }
 	    return(1);
 	} else if(obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
