@@ -659,8 +659,10 @@ int retry;
 	/* Gather valid classes via traditional NetHack method */
 	i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
 	if (i == -2) all_categories = TRUE;
-	if (ggoresults & ALL_FINISHED)
-		return i;
+	if (ggoresults & ALL_FINISHED) {
+		n_dropped = i;
+		goto drop_done;
+	}
     }
 
     if (drop_everything) {
