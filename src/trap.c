@@ -2447,32 +2447,34 @@ long hmask, emask;     /* might cancel timeout */
 		if (!(emask & W_SADDLE))
 #endif
 		{
-		    boolean sokoban_trap = (In_sokoban(&u.uz) && trap);
-		    if (Hallucination)
-			pline("Bummer!  You've %s.",
-			      is_pool(u.ux,u.uy) ?
-			      "splashed down" : sokoban_trap ? "crashed" :
-			      "hit the ground");
-		    else {
-			if (!sokoban_trap)
-			    You("float gently to the %s.",
-				surface(u.ux, u.uy));
-			else {
-			    /* Justification elsewhere for Sokoban traps
-			     * is based on air currents. This is
-			     * consistent with that.
-			     * The unexpected additional force of the
-			     * air currents once leviation
-			     * ceases knocks you off your feet.
-			     */
+		    if (In_sokoban(&u.uz) && trap) {
+			/* Justification elsewhere for Sokoban traps
+			 * is based on air currents. This is
+			 * consistent with that.
+			 * The unexpected additional force of the
+			 * air currents once leviation
+			 * ceases knocks you off your feet.
+			 */
+			if (Hallucination)
+			    pline("Bummer!  You've crashed.");
+			else
 			    You("fall over.");
-			    losehp(rnd(2), "dangerous winds", KILLED_BY);
+			losehp(rnd(2), "dangerous winds", KILLED_BY);
 #ifdef STEED
-			    if (u.usteed) dismount_steed(DISMOUNT_FELL);
+			if (u.usteed) dismount_steed(DISMOUNT_FELL);
 #endif
-			    selftouch("As you fall, you");
-			}
-		    }
+			selftouch("As you fall, you");
+#ifdef STEED
+		    } else if (u.usteed && (is_floater(u.usteed->data) ||
+					    is_flyer(u.usteed->data))) {
+			You("settle more firmly in the saddle.");
+#endif
+		    } else if (Hallucination)
+			pline("Bummer!  You've %s.",
+			      is_pool(u.ux,u.uy) ? "splashed down" :
+			      "hit the ground");
+		    else
+			You("float gently to the %s.", surface(u.ux, u.uy));
 		}
 	    }
 	}

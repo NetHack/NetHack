@@ -77,6 +77,7 @@ message order when swapping places with a pet (e.g. into a trap), also use
 	different term instead of "displace"
 flyers can get out of pits more easily than non-flyers
 allow use of the < command to try to exit a pit
+clean up messages when you stop levitation while riding a flying steed
 
 
 Platform- and/or Interface-Specific Fixes
