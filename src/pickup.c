@@ -1829,8 +1829,9 @@ register struct obj *obj;
 	    if (current_container->no_charge && !obj->unpaid) {
 		/* don't sell when putting the item into your own container */
 		obj->no_charge = 1;
-	    } else {
-		/* sellobj() will take an unpaid item off the shop bill */
+	    } else if (obj->oclass != COIN_CLASS) {
+		/* sellobj() will take an unpaid item off the shop bill
+		 * note: coins are handled later */
 		was_unpaid = obj->unpaid ? TRUE : FALSE;
 		sellobj_state(SELL_DELIBERATE);
 		sellobj(obj, u.ux, u.uy);
