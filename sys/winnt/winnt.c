@@ -38,7 +38,6 @@
 HANDLE ffhandle = (HANDLE)0;
 WIN32_FIND_DATA ffd;
 
-
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
  * For the tty port it is tty_kbhit() [from nttty.c]
@@ -224,6 +223,17 @@ void Delay(int ms)
 {
 	(void)Sleep(ms);
 }
+
+void win32_abort()
+{
+
+#ifdef WIZARD
+   	if (wizard)
+		DebugBreak();
+#endif
+	abort();
+}
+
 #endif /* WIN32 */
 
 /*winnt.c*/

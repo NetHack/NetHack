@@ -111,12 +111,6 @@
 #endif
 
 #if 0
-#ifndef C
-#define C(c)	(0x1f & (c))
-#endif
-#ifndef M
-#define M(c)	(0x80 | (c))
-#endif
 extern char levels[], bones[], permbones[],
 #endif /* 0 */
 
@@ -126,6 +120,7 @@ extern char hackdir[];
 #define ABORT C('a')
 #define getuid() 1
 #define getlogin() ((char *)0)
+extern void NDECL(win32_abort);
 
 #include <fcntl.h>
 #ifndef __BORLANDC__
