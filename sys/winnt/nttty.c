@@ -791,7 +791,7 @@ term_start_attr(int attr)
                 break;
         case ATR_INVERSE:
 		/* Suggestion by Lee Berger */
-		if (currentcolor == (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED))
+		if (currentcolor & (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED))
 			currentcolor = 0;
 		currentbackground = (BACKGROUND_RED|BACKGROUND_BLUE|BACKGROUND_GREEN);
 		colorchange = TRUE;
