@@ -126,16 +126,15 @@ choose_clerical_spell(spellnum)
 int spellnum;
 {
     switch (spellnum) {
-    case 14:
-	return CLC_GEYSER;
     case 13:
-	return CLC_FIRE_PILLAR;
+	return CLC_GEYSER;
     case 12:
-	return CLC_LIGHTNING;
+	return CLC_FIRE_PILLAR;
     case 11:
+	return CLC_LIGHTNING;
     case 10:
-	return CLC_CURSE_ITEMS;
     case 9:
+	return CLC_CURSE_ITEMS;
     case 8:
 	return CLC_INSECTS;
     case 7:
