@@ -1,0 +1,1064 @@
+# This is a shell archive.  Save it in a file, remove anything before
+# this line, and then unpack it by entering "sh file".  Note, it may
+# create directories; files and directories will be owned by you and
+# have default permissions.
+#
+# This archive contains:
+#
+#	READ.ME
+#	install.bsd
+#	spkr.7
+#	Makefile
+#	spkr.c
+#	spkr.h
+#	interp.c
+#	Files
+#	Install
+#	Master
+#	Name
+#	Node
+#	Remove
+#	Size
+#	System
+#	playtest
+#
+echo x - READ.ME
+sed 's/^X//' >READ.ME << 'END-of-READ.ME'
+X		Console Speaker Driver Package (v1.1)
+X
+X		by Eric S. Raymond (esr@snark.thyrsus.com)
+X
+XThis package gives 80386 machines running SVr3.2 or later the ability to play
+Xtunes on the console speaker.  It has been extended to 386BSD (and possibly
+XBSDI) by Andrew A. Chernov, and to SCO UNIX 3.2.4 (and possibly other VPIX
+Xsystems) by Andreas Arens.
+X
+XThe following files are contained in the kit:
+X
+XDocumentation and examples:
+XREAD.ME		-- this file
+Xspeaker.7	-- man page for the driver
+Xplaytest	-- test script exercising familiar tunes
+X
+XInstallable driver kit parts, for SVr3.2 or later:
+XFiles		-- list of driver package file locations
+XInstall		-- installation script for driver kit
+XMaster		-- mdevice entry for speaker driver
+XName		-- name entry foe speaker driver
+XNode		-- /dev node specification file
+XRemove		-- Driver removal script
+XSize		-- installation size data
+XSystem		-- sdevice entry for speaker driver
+X
+XDriver source code, for SVr3.2 or later and 386BSD:
+XMakefile	-- Makefile for driver code
+Xspkr.c		-- the driver source
+Xspeaker.h	-- ioctl interface file
+X
+XCommon source code:
+Xinterp.c	-- play string interpretation code
+X
+XFor SVr3.2 or later, simply type `make' and wait. Then type ./Install
+Xand follow its instructions. You will have to install the man pages by hand.
+XBe aware that the speaker.7 man page uses tbl(1) constructs.
+X
+XFor 386BSD, follow the installation instructions in install.bsd.
+X
+XFor SCO UNIX 3.2.4, no new kernel drivers are needed, and you need only
+Xcopy interp.c to your src directory and proceed with making NetHack, with
+XVPIX_MUSIC set in unixconf.h.
+X
+XInteresting tunes mailed to the author will be periodically posted in batches
+Xand added to the test script for future versions.
+X
+X			Revision notes
+X
+X1.1 -- fixed minor bug in M[LSN] interpretation, added octave-tracking.
+X       Tweaked the playtest examples.
+END-of-READ.ME
+echo x - install.bsd
+sed 's/^X//' >install.bsd << 'END-of-install.bsd'
+XCopy spkr.c and interp.c to /sys/i386/isa
+XCopy spkr.h to /sys/sys
+X
+X-----------------------------------------------------------------------------
+X
+XFile /sys/i386/conf/YOUR_MACHINE_NAME
+Xadd following line:
+X
+Xpseudo-device   speaker
+X
+X-----------------------------------------------------------------------------
+X
+XFile /sys/i386/conf/files.i386
+Xadd following line:
+X
+Xi386/isa/spkr.c         optional speaker
+X
+X-----------------------------------------------------------------------------
+X
+XFile /sys/i386/i386/conf.c
+X[major number 20 (hex) is registered for spkr driver, don't change it]
+Xadd following code:
+X
+X#include "speaker.h"
+X#if NSPEAKER > 0
+Xint     spkropen(),spkrclose(),spkrwrite(),spkrioctl();
+X#else
+X#define spkropen  enxio
+X#define spkrclose enxio
+X#define spkrwrite enxio
+X#define spkrioctl enxio
+X#endif
+X	...
+X
+Xstruct cdevsw	cdevsw[] =
+X{
+X	...
+X
+X	{ spkropen,     spkrclose,      enxio,          spkrwrite,      /*20*/
+X	  spkrioctl,    enxio,          enxio,          NULL,
+X	  enxio,        enxio,          enxio },
+X	...
+X
+X-----------------------------------------------------------------------------
+X
+XMake corresponding device:
+X
+X	mknod /dev/speaker c 32 0
+X
+X[major number 32 (20 hex) is registered for spkr driver, don't change it]
+X
+X-----------------------------------------------------------------------------
+X
+XGo to /sys/i386/conf and type
+X	config YOUR_MACHINE_NAME
+Xthen go to /sys/compile/YOUR_MACHINE_NAME and type
+X	make depend
+X	make
+X
+END-of-install.bsd
+echo x - spkr.7
+sed 's/^X//' >spkr.7 << 'END-of-spkr.7'
+X.TH SPKR 7
+X.SH NAME
+Xspkr \- console speaker device driver
+X.SH DESCRIPTION
+XThe speaker device driver allows applications to control the PC console
+Xspeaker on an IBM-PC-compatible machine running UNIX.
+X.PP
+XOnly one process may have this device open at any given time; open() and
+Xclose() are used to lock and relinquish it. An attempt to open() when
+Xanother process has the device locked will return -1 with an EBUSY error
+Xindication. Writes to the device are interpreted as 'play strings' in a
+Xsimple ASCII melody notation. An ioctl() for tone generation at arbitrary
+Xfrequencies is also supported.
+X.PP
+XSound-generation does \fInot\fR monopolize the processor; in fact, the driver
+Xspends most of its time sleeping while the PC hardware is emitting
+Xtones. Other processes may emit beeps while the driver is running.
+X.PP
+XApplications may call ioctl() on a speaker file descriptor to control the
+Xspeaker driver directly; definitions for the ioctl() interface are in
+Xsys/spkr.h. The tone_t structure used in these calls has two fields,
+Xspecifying a frequency (in hz) and a duration (in 1/100ths of a second).
+XA frequency of zero is interpreted as a rest.
+X.PP
+XAt present there are two such ioctls. SPKRTONE accepts a pointer to a
+Xsingle tone structure as third argument and plays it. SPKRTUNE accepts a
+Xpointer to the first of an array of tone structures and plays them in
+Xcontinuous sequence; this array must be terminated by a final member with
+Xa zero duration.
+X.PP
+XThe play-string language is modelled on the PLAY statement conventions of
+XIBM BASIC 2.0. The MB, MF and X primitives of PLAY are not useful in a UNIX 
+Xenvironment and are omitted. The `octave-tracking' feature is also new.
+X.PP
+XThere are 84 accessible notes numbered 1-83 in 7 octaves, each running from
+XC to B, numbered 0-6; the scale is equal-tempered A440 and octave 3 starts
+Xwith middle C. By default, the play function emits half-second notes with the
+Xlast 1/16th second being `rest time'.
+X.PP
+XPlay strings are interpreted left to right as a series of play command groups;
+Xletter case is ignored. Play command groups are as follows:
+X.PP
+XCDEFGAB -- letters A through G cause the corresponding note to be played in the
+Xcurrent octave. A note letter may optionally be followed by an \fIaccidental
+Xsign\fR, one of # + or -; the first two of these cause it to be sharped one
+Xhalf-tone, the last causes it to be flatted one half-tone. It may also be
+Xfollowed by a time value number and by sustain dots (see below). Time values
+Xare interpreted as for the L command below;.
+X.PP
+XO <n> -- if <n> is numeric, this sets the current octave. <n> may also be one
+Xof 'L' or 'N' to enable or disable octave-tracking (it is disabled by default).
+XWhen octave-tracking is on, interpretation of a pair of letter notes will
+Xchange octaves if necessary in order to make the smallest possible jump between
+Xnotes. Thus "olbc" will be played as "olb>c", and "olcb" as "olc<b". Octave
+Xlocking is disabled for one letter note following by >, < and O[0123456].
+X.PP
+X> -- bump the current octave up one.
+X.PP
+X< -- drop the current octave down one.
+X.PP
+XN <n> -- play note n, n being 1 to 84 or 0 for a rest of current time value.
+XMay be followedv by sustain dots.
+X.PP
+XL <n> -- sets the current time value for notes. The default is L4, quarter
+Xnotes. The lowest possible value is 1; values up to 64 are accepted. L1 sets
+Xwhole notes, L2 sets half notes, L4 sets quarter notes, etc..
+X.PP
+XP <n> -- pause (rest), with <n> interpreted as for L. May be followed by
+Xsustain dots. May also be written '~'.
+X.PP
+XT <n> -- Sets the number of quarter notes per minute; default is 120. Musical
+Xnames for common tempi are:
+X
+X.TS
+Xa a a.
+X        	Tempo    	Beats Per Minute
+Xvery slow	Larghissimo	
+X        	Largo    	40-60
+X         	Larghetto    	60-66
+X        	Grave       	
+X        	Lento       	
+X        	Adagio       	66-76
+Xslow    	Adagietto    	
+X        	Andante   	76-108
+Xmedium   	Andantino	
+X        	Moderato	108-120
+Xfast    	Allegretto	
+X        	Allegro   	120-168
+X        	Vivace    	
+X        	Veloce    	
+X        	Presto    	168-208
+Xvery fast	Prestissimo	
+X.TE
+X.PP
+XM[LNS] -- set articulation. MN (N for normal) is the default; the last 1/8th of
+Xthe note's value is rest time. You can set ML for legato (no rest space) or
+XMS (staccato) 1/4 rest space.
+X.PP
+XNotes (that is, CDEFGAB or N command character groups) may be followed by
+Xsustain dots. Each dot causes the note's value to be lengthened by one-half
+Xfor each one. Thus, a note dotted once is held for 3/2 of its undotted value;
+Xdotted twice, it is held 9/4, and three times would give 27/8. 
+X.PP
+XWhitespace in play strings is simply skipped and may be used to separate
+Xmelody sections.
+X.SH BUGS
+XDue to roundoff in the pitch tables and slop in the tone-generation and timer
+Xhardware (neither of which was designed for precision), neither pitch accuracy
+Xnor timings will be mathematically exact. There is no volume control.
+X.PP
+XIn play strings which are very long (longer than your system's physical I/O
+Xblocks) note suffixes or numbers may occasionally be parsed incorrectly due
+Xto crossing a block boundary.
+X.SH FILES
+X/dev/speaker -- speaker device file
+X.SH AUTHOR
+XEric S. Raymond (esr@snark.thyrsus.com) Feb 1990
+END-of-spkr.7
+echo x - Makefile
+sed 's/^X//' >Makefile << 'END-of-Makefile'
+X#
+X# Speaker driver package makefile
+X#
+XCFLAGS = -I. -O # -DDEBUG
+XLDFLAGS = -s
+X
+Xall: Driver.o
+X
+Xinstall:
+X	./Install
+X
+XDriver.o: spkr.c
+X	$(CC) $(CFLAGS) -c spkr.c
+X	mv spkr.o Driver.o
+X
+Xclean:
+X	rm -f Driver.o *~ speaker.shar
+X
+XDSP =  Files Install Master Name Node Remove Size System 
+Xshar:
+X	shar READ.ME install.bsd spkr.7 Makefile spkr.[ch] \
+X		interp.c $(DSP) playtest >speaker.shar
+END-of-Makefile
+echo x - spkr.c
+sed 's/^X//' >spkr.c << 'END-of-spkr.c'
+X/*
+X * spkr.c -- device driver for console speaker on 80386
+X *
+X * v1.1 by Eric S. Raymond (esr@snark.thyrsus.com) Feb 1990
+X *      modified for 386bsd by Andrew A. Chernov <ache@astral.msk.su>
+X */
+X
+X#ifdef __386BSD__
+X#include "speaker.h"
+X#endif
+X#if !defined(__386BSD__) || (NSPEAKER > 0)
+X
+X#ifdef __386BSD__
+X#include "types.h"
+X#include "param.h"
+X#include "errno.h"
+X#include "buf.h"
+X#include "uio.h"
+X
+X#define CADDR caddr_t
+X#define err_ret(x) return(x)
+X#else /* SYSV */
+X#include <sys/types.h>
+X#include <sys/param.h>
+X#include <sys/dir.h>
+X#include <sys/signal.h>
+X#include <sys/errno.h>
+X#include <sys/ioctl.h>
+X#include <sys/user.h>
+X#include <sys/sysmacros.h> 
+X#include <limits.h>
+X
+X#define CADDR char *
+X#define err_ret(x) u.u_error = (x)
+X#endif
+X
+X#include "spkr.h"
+X
+X/**************** MACHINE DEPENDENT PART STARTS HERE *************************
+X *
+X * This section defines a function tone() which causes a tone of given
+X * frequency and duration from the 80x86's console speaker.
+X * Another function endtone() is defined to force sound off, and there is
+X * also a rest() entry point to do pauses.
+X *
+X * Audible sound is generated using the Programmable Interval Timer (PIT) and
+X * Programmable Peripheral Interface (PPI) attached to the 80x86's speaker. The
+X * PPI controls whether sound is passed through at all; the PIT's channel 2 is
+X * used to generate clicks (a square wave) of whatever frequency is desired.
+X *
+X * The non-BSD code requires SVr3.2-compatible inb(), outb(), timeout(),
+X * sleep(), and wakeup().
+X */
+X
+X/*
+X * PIT and PPI port addresses and control values
+X *
+X * Most of the magic is hidden in the TIMER_PREP value, which selects PIT
+X * channel 2, frequency LSB first, square-wave mode and binary encoding.
+X * The encoding is as follows:
+X *
+X * +----------+----------+---------------+-----+
+X * |  1    0  |  1    1  |  0    1    1  |  0  |
+X * | SC1  SC0 | RW1  RW0 | M2   M1   M0  | BCD |
+X * +----------+----------+---------------+-----+
+X *   Counter     Write        Mode 3      Binary
+X *  Channel 2  LSB first,  (Square Wave) Encoding 
+X *             MSB second
+X */
+X#define PPI		0x61	/* port of Programmable Peripheral Interface */
+X#define PPI_SPKR	0x03	/* turn these PPI bits on to pass sound */
+X#define PIT_CTRL	0x43	/* PIT control address */
+X#define PIT_COUNT	0x42	/* PIT count address */
+X#define PIT_MODE	0xB6	/* set timer mode for sound generation */
+X
+X/*
+X * Magic numbers for timer control. 
+X */
+X#define TIMER_CLK	1193180L	/* corresponds to 18.2 MHz tick rate */
+X
+Xstatic int endtone()
+X/* turn off the speaker, ending current tone */
+X{
+X    wakeup((CADDR)endtone);
+X    outb(PPI, inb(PPI) & ~PPI_SPKR);
+X}
+X
+Xstatic void tone(hz, ticks)
+X/* emit tone of frequency hz for given number of ticks */
+Xunsigned int hz, ticks;
+X{
+X    unsigned int divisor = TIMER_CLK / hz;
+X    int sps;
+X
+X#ifdef DEBUG
+X    printf("tone: hz=%d ticks=%d\n", hz, ticks);
+X#endif /* DEBUG */
+X
+X    /* set timer to generate clicks at given frequency in Hertz */
+X#ifdef __386BSD__
+X    sps = spltty();
+X#else
+X    sps = spl5();
+X#endif
+X    outb(PIT_CTRL, PIT_MODE);		/* prepare timer */
+X    outb(PIT_COUNT, (unsigned char) divisor);  /* send lo byte */
+X    outb(PIT_COUNT, (divisor >> 8));	/* send hi byte */
+X    splx(sps);
+X
+X    /* turn the speaker on */
+X    outb(PPI, inb(PPI) | PPI_SPKR);
+X
+X    /*
+X     * Set timeout to endtone function, then give up the timeslice.
+X     * This is so other processes can execute while the tone is being
+X     * emitted.
+X     */
+X    timeout((CADDR)endtone, (CADDR)NULL, ticks);
+X    sleep((CADDR)endtone, PZERO - 1);
+X}
+X
+Xstatic int endrest()
+X/* end a rest */
+X{
+X    wakeup((CADDR)endrest);
+X}
+X
+Xstatic void rest(ticks)
+X/* rest for given number of ticks */
+Xint	ticks;
+X{
+X    /*
+X     * Set timeout to endrest function, then give up the timeslice.
+X     * This is so other processes can execute while the rest is being
+X     * waited out.
+X     */
+X#ifdef DEBUG
+X    printf("rest: %d\n", ticks);
+X#endif /* DEBUG */
+X    timeout((CADDR)endrest, (CADDR)NULL, ticks);
+X    sleep((CADDR)endrest, PZERO - 1);
+X}
+X
+X#include "interp.c"	/* playinit() and playstring() */
+X
+X/******************* UNIX DRIVER HOOKS BEGIN HERE **************************
+X *
+X * This section implements driver hooks to run playstring() and the tone(),
+X * endtone(), and rest() functions defined above.  For non-BSD systems,
+X * SVr3.2-compatible copyin() is also required.
+X */
+X
+Xstatic int spkr_active;	/* exclusion flag */
+X#ifdef __386BSD__
+Xstatic struct  buf *spkr_inbuf; /* incoming buf */
+X#endif
+X
+Xint spkropen(dev)
+Xdev_t	dev;
+X{
+X#ifdef DEBUG
+X    printf("spkropen: entering with dev = %x\n", dev);
+X#endif /* DEBUG */
+X
+X    if (minor(dev) != 0)
+X	err_ret(ENXIO);
+X    else if (spkr_active)
+X	err_ret(EBUSY);
+X    else
+X    {
+X	playinit();
+X#ifdef __386BSD__
+X	spkr_inbuf = geteblk(DEV_BSIZE);
+X#endif
+X	spkr_active = 1;
+X    }
+X#ifdef __386BSD__
+X    return(0);
+X#endif
+X}
+X
+X#ifdef __386BSD__
+Xint spkrwrite(dev, uio)
+Xstruct uio *uio;
+X#else
+Xint spkrwrite(dev)
+X#endif
+Xdev_t	dev;
+X{
+X#ifdef __386BSD__
+X    register unsigned n;
+X    char *cp;
+X    int error;
+X#endif
+X#ifdef DEBUG
+X#ifdef __386BSD__
+X    printf("spkrwrite: entering with dev = %x, count = %d\n",
+X		dev, uio->uio_resid);
+X#else
+X    printf("spkrwrite: entering with dev = %x, u.u_count = %d\n",
+X		dev, u.u_count);
+X#endif
+X#endif /* DEBUG */
+X
+X    if (minor(dev) != 0)
+X	err_ret(ENXIO);
+X    else
+X    {
+X#ifdef __386BSD__
+X	n = MIN(DEV_BSIZE, uio->uio_resid);
+X	cp = spkr_inbuf->b_un.b_addr;
+X	error = uiomove(cp, n, uio);
+X	if (!error)
+X		playstring(cp, n);
+X	return(error);
+X#else
+X	char	bfr[STD_BLK];
+X
+X	copyin(u.u_base, bfr, u.u_count);
+X	playstring(bfr, u.u_count);
+X	u.u_base += u.u_count;
+X	u.u_count = 0;
+X#endif
+X    }
+X}
+X
+Xint spkrclose(dev)
+Xdev_t	dev;
+X{
+X#ifdef DEBUG
+X    printf("spkrclose: entering with dev = %x\n", dev);
+X#endif /* DEBUG */
+X
+X    if (minor(dev) != 0)
+X	err_ret(ENXIO);
+X    else
+X    {
+X	endtone();
+X#ifdef __386BSD__
+X	brelse(spkr_inbuf);
+X#endif
+X	spkr_active = 0;
+X    }
+X#ifdef __386BSD__
+X    return(0);
+X#endif
+X}
+X
+Xint spkrioctl(dev, cmd, cmdarg)
+Xdev_t	dev;
+Xint	cmd;
+XCADDR   cmdarg;
+X{
+X#ifdef DEBUG
+X    printf("spkrioctl: entering with dev = %x, cmd = %x\n", dev, cmd);
+X#endif /* DEBUG */
+X
+X    if (minor(dev) != 0)
+X	err_ret(ENXIO);
+X    else if (cmd == SPKRTONE)
+X    {
+X	tone_t	*tp = (tone_t *)cmdarg;
+X
+X	if (tp->frequency == 0)
+X	    rest(tp->duration);
+X	else
+X	    tone(tp->frequency, tp->duration);
+X    }
+X    else if (cmd == SPKRTUNE)
+X    {
+X#ifdef __386BSD__
+X	tone_t  *tp = (tone_t *)(*(caddr_t *)cmdarg);
+X	tone_t ttp;
+X	int error;
+X
+X	for (; ; tp++) {
+X	    error = copyin(tp, &ttp, sizeof(tone_t));
+X	    if (error)
+X		    return(error);
+X	    if (ttp.duration == 0)
+X		    break;
+X	    if (ttp.frequency == 0)
+X		rest(ttp.duration);
+X	    else
+X		tone(ttp.frequency, ttp.duration);
+X	}
+X#else
+X	tone_t	*tp = (tone_t *)cmdarg;
+X
+X	for (; tp->duration; tp++)
+X	    if (tp->frequency == 0)
+X		rest(tp->duration);
+X	    else
+X		tone(tp->frequency, tp->duration);
+X#endif
+X    }
+X    else
+X	err_ret(EINVAL);
+X#ifdef __386BSD__
+X    return(0);
+X#endif
+X}
+X
+X#endif  /* !defined(__386BSD__) || (NSPEAKER > 0) */
+X/* spkr.c ends here */
+END-of-spkr.c
+echo x - spkr.h
+sed 's/^X//' >spkr.h << 'END-of-spkr.h'
+X/*
+X * spkr.h -- interface definitions for speaker ioctl()
+X *
+X * v1.1 by Eric S. Raymond (esr@snark.thyrsus.com) Feb 1990
+X *      modified for 386bsd by Andrew A. Chernov <ache@astral.msk.su>
+X */
+X
+X#ifndef _SPKR_H_
+X#define _SPKR_H_
+X
+X#ifdef __386BSD__
+X#ifndef KERNEL
+X#include <sys/ioctl.h>
+X#else
+X#include "ioctl.h"
+X#endif
+X
+X#define SPKRTONE        _IOW('S', 1, tone_t)    /* emit tone */
+X#define SPKRTUNE        _IO('S', 2)             /* emit tone sequence*/
+X#else /* SYSV */
+X#define	SPKRIOC		('S'<<8)
+X#define	SPKRTONE	(SPKRIOC|1)	/* emit tone */
+X#define	SPKRTUNE	(SPKRIOC|2)	/* emit tone sequence*/
+X#endif
+X
+Xtypedef struct
+X{
+X    int	frequency;	/* in hertz */
+X    int duration;	/* in 1/100ths of a second */
+X}
+Xtone_t;
+X
+X#endif /* _SPKR_H_ */
+X/* spkr.h ends here */
+END-of-spkr.h
+echo x - interp.c
+sed 's/^X//' >interp.c << 'END-of-interp.c'
+X/*
+X * interp.c -- device driver for console speaker on 80386
+X *
+X * v1.1 by Eric S. Raymond (esr@snark.thyrsus.com) Feb 1990
+X *
+X * this is the part of the code common to all 386 UNIX OSes
+X *
+X * playinit() and playstring() are called from the appropriate driver
+X */
+X
+X#ifdef __386BSD__
+X#include "param.h"
+X#else
+X#include <sys/param.h>
+X#endif
+X
+X#ifndef HZ
+X#define HZ 60
+X#endif
+X
+X
+X/**************** PLAY STRING INTERPRETER BEGINS HERE **********************
+X *
+X * Play string interpretation is modelled on IBM BASIC 2.0's PLAY statement;
+X * M[LNS] are missing and the ~ synonym and octave-tracking facility is added.
+X * Requires tone(), rest(), and endtone(). String play is not interruptible
+X * except possibly at physical block boundaries.
+X */
+X
+Xtypedef int	bool;
+X#ifndef TRUE
+X#define TRUE	1
+X#endif
+X#ifndef FALSE
+X#define FALSE	0
+X#endif
+X
+X#define toupper(c)	((c) - ' ' * (((c) >= 'a') && ((c) <= 'z')))
+X#define isdigit(c)	(((c) >= '0') && ((c) <= '9'))
+X#define dtoi(c)		((c) - '0')
+X
+Xstatic int octave;	/* currently selected octave */
+Xstatic int whole;	/* whole-note time at current tempo, in ticks */
+Xstatic int value;	/* whole divisor for note time, quarter note = 1 */
+Xstatic int fill;	/* controls spacing of notes */
+Xstatic bool octtrack;	/* octave-tracking on? */
+Xstatic bool octprefix;	/* override current octave-tracking state? */
+X
+X/*
+X * Magic number avoidance...
+X */
+X#define SECS_PER_MIN	60	/* seconds per minute */
+X#define WHOLE_NOTE	4	/* quarter notes per whole note */
+X#define MIN_VALUE	64	/* the most we can divide a note by */
+X#define DFLT_VALUE	4	/* default value (quarter-note) */
+X#define FILLTIME	8	/* for articulation, break note in parts */
+X#define STACCATO	6	/* 6/8 = 3/4 of note is filled */
+X#define NORMAL		7	/* 7/8ths of note interval is filled */
+X#define LEGATO		8	/* all of note interval is filled */
+X#define DFLT_OCTAVE	4	/* default octave */
+X#define MIN_TEMPO	32	/* minimum tempo */
+X#define DFLT_TEMPO	120	/* default tempo */
+X#define MAX_TEMPO	255	/* max tempo */
+X#define NUM_MULT	3	/* numerator of dot multiplier */
+X#define DENOM_MULT	2	/* denominator of dot multiplier */
+X
+X/* letter to half-tone:  A   B  C  D  E  F  G */
+Xstatic int notetab[8] = {9, 11, 0, 2, 4, 5, 7};
+X
+X/*
+X * This is the American Standard A440 Equal-Tempered scale with frequencies
+X * rounded to nearest integer. Thank Goddess for the good ol' CRC Handbook...
+X * our octave 0 is standard octave 2.
+X */
+X#define OCTAVE_NOTES	12	/* semitones per octave */
+Xstatic int pitchtab[] =
+X{
+X/*        C     C#    D     D#    E     F     F#    G     G#    A     A#    B*/
+X/* 0 */   65,   69,   73,   78,   82,   87,   93,   98,  103,  110,  117,  123,
+X/* 1 */  131,  139,  147,  156,  165,  175,  185,  196,  208,  220,  233,  247,
+X/* 2 */  262,  277,  294,  311,  330,  349,  370,  392,  415,  440,  466,  494,
+X/* 3 */  523,  554,  587,  622,  659,  698,  740,  784,  831,  880,  932,  988,
+X/* 4 */ 1047, 1109, 1175, 1245, 1319, 1397, 1480, 1568, 1661, 1760, 1865, 1975,
+X/* 5 */ 2093, 2217, 2349, 2489, 2637, 2794, 2960, 3136, 3322, 3520, 3729, 3951,
+X/* 6 */ 4186, 4435, 4698, 4978, 5274, 5588, 5920, 6272, 6644, 7040, 7459, 7902,
+X};
+X
+Xstatic void playinit()
+X{
+X    octave = DFLT_OCTAVE;
+X    whole = (HZ * SECS_PER_MIN * WHOLE_NOTE) / DFLT_TEMPO;
+X    fill = NORMAL;
+X    value = DFLT_VALUE;
+X    octtrack = FALSE;
+X    octprefix = TRUE;	/* act as though there was an initial O(n) */
+X}
+X
+Xstatic void playtone(pitch, value, sustain)
+X/* play tone of proper duration for current rhythm signature */
+Xint	pitch, value, sustain;
+X{
+X    register int	sound, silence, snum = 1, sdenom = 1;
+X
+X    /* this weirdness avoids floating-point arithmetic */
+X    for (; sustain; sustain--)
+X    {
+X	snum *= NUM_MULT;
+X	sdenom *= DENOM_MULT;
+X    }
+X
+X    if (pitch == -1)
+X	rest(whole * snum / (value * sdenom));
+X    else
+X    {
+X	sound = (whole * snum) / (value * sdenom)
+X		- (whole * (FILLTIME - fill)) / (value * FILLTIME);
+X	silence = whole * (FILLTIME-fill) * snum / (FILLTIME * value * sdenom);
+X
+X#ifdef DEBUG
+X	printf("playtone: pitch %d for %d ticks, rest for %d ticks\n",
+X			pitch, sound, silence);
+X#endif /* DEBUG */
+X
+X	tone(pitchtab[pitch], sound);
+X	if (fill != LEGATO)
+X	    rest(silence);
+X    }
+X}
+X
+Xstatic int abs(n)
+Xint n;
+X{
+X    if (n < 0)
+X	return(-n);
+X    else
+X	return(n);
+X}
+X
+Xstatic void playstring(cp, slen)
+X/* interpret and play an item from a notation string */
+Xchar	*cp;
+Xsize_t	slen;
+X{
+X    int		pitch, lastpitch = OCTAVE_NOTES * DFLT_OCTAVE;
+X
+X#define GETNUM(cp, v)	for(v=0; isdigit(cp[1]) && slen > 0; ) \
+X				{v = v * 10 + (*++cp - '0'); slen--;}
+X    for (; slen--; cp++)
+X    {
+X	int		sustain, timeval, tempo;
+X	register char	c = toupper(*cp);
+X
+X#ifdef DEBUG
+X	printf("playstring: %c (%x)\n", c, c);
+X#endif /* DEBUG */
+X
+X	switch (c)
+X	{
+X	case 'A':  case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':
+X
+X	    /* compute pitch */
+X	    pitch = notetab[c - 'A'] + octave * OCTAVE_NOTES;
+X
+X	    /* this may be followed by an accidental sign */
+X	    if (cp[1] == '#' || cp[1] == '+')
+X	    {
+X		++pitch;
+X		++cp;
+X		slen--;
+X	    }
+X	    else if (cp[1] == '-')
+X	    {
+X		--pitch;
+X		++cp;
+X		slen--;
+X	    }
+X
+X	    /*
+X	     * If octave-tracking mode is on, and there has been no octave-
+X	     * setting prefix, find the version of the current letter note
+X	     * closest to the last regardless of octave.
+X	     */
+X	    if (octtrack && !octprefix)
+X	    {
+X		if (abs(pitch-lastpitch) > abs(pitch+OCTAVE_NOTES-lastpitch))
+X		{
+X		    ++octave;
+X		    pitch += OCTAVE_NOTES;
+X		}
+X
+X		if (abs(pitch-lastpitch) > abs((pitch-OCTAVE_NOTES)-lastpitch))
+X		{
+X		    --octave;
+X		    pitch -= OCTAVE_NOTES;
+X		}
+X	    }
+X	    octprefix = FALSE;
+X	    lastpitch = pitch;
+X
+X	    /* ...which may in turn be followed by an override time value */
+X	    GETNUM(cp, timeval);
+X	    if (timeval <= 0 || timeval > MIN_VALUE)
+X		timeval = value;
+X
+X	    /* ...and/or sustain dots */
+X	    for (sustain = 0; cp[1] == '.'; cp++)
+X	    {
+X		slen--;
+X		sustain++;
+X	    }
+X
+X	    /* time to emit the actual tone */
+X	    playtone(pitch, timeval, sustain);
+X	    break;
+X
+X	case 'O':
+X	    if (cp[1] == 'N' || cp[1] == 'n')
+X	    {
+X		octprefix = octtrack = FALSE;
+X		++cp;
+X		slen--;
+X	    }
+X	    else if (cp[1] == 'L' || cp[1] == 'l')
+X	    {
+X		octtrack = TRUE;
+X		++cp;
+X		slen--;
+X	    }
+X	    else
+X	    {
+X		GETNUM(cp, octave);
+X		if (octave >= sizeof(pitchtab) / OCTAVE_NOTES)
+X		    octave = DFLT_OCTAVE;
+X		octprefix = TRUE;
+X	    }
+X	    break;
+X
+X	case '>':
+X	    if (octave < sizeof(pitchtab) / OCTAVE_NOTES - 1)
+X		octave++;
+X	    octprefix = TRUE;
+X	    break;
+X
+X	case '<':
+X	    if (octave > 0)
+X		octave--;
+X	    octprefix = TRUE;
+X	    break;
+X
+X	case 'N':
+X	    GETNUM(cp, pitch);
+X	    for (sustain = 0; cp[1] == '.'; cp++)
+X	    {
+X		slen--;
+X		sustain++;
+X	    }
+X	    playtone(pitch - 1, value, sustain);
+X	    break;
+X
+X	case 'L':
+X	    GETNUM(cp, value);
+X	    if (value <= 0 || value > MIN_VALUE)
+X		value = DFLT_VALUE;
+X	    break;
+X
+X	case 'P':
+X	case '~':
+X	    /* this may be followed by an override time value */
+X	    GETNUM(cp, timeval);
+X	    if (timeval <= 0 || timeval > MIN_VALUE)
+X		timeval = value;
+X	    for (sustain = 0; cp[1] == '.'; cp++)
+X	    {
+X		slen--;
+X		sustain++;
+X	    }
+X	    playtone(-1, timeval, sustain);
+X	    break;
+X
+X	case 'T':
+X	    GETNUM(cp, tempo);
+X	    if (tempo < MIN_TEMPO || tempo > MAX_TEMPO)
+X		tempo = DFLT_TEMPO;
+X	    whole = (HZ * SECS_PER_MIN * WHOLE_NOTE) / tempo;
+X	    break;
+X
+X	case 'M':
+X	    if (cp[1] == 'N' || cp[1] == 'n')
+X	    {
+X		fill = NORMAL;
+X		++cp;
+X		slen--;
+X	    }
+X	    else if (cp[1] == 'L' || cp[1] == 'l')
+X	    {
+X		fill = LEGATO;
+X		++cp;
+X		slen--;
+X	    }
+X	    else if (cp[1] == 'S' || cp[1] == 's')
+X	    {
+X		fill = STACCATO;
+X		++cp;
+X		slen--;
+X	    }
+X	    break;
+X	}
+X    }
+X}
+END-of-interp.c
+echo x - Files
+sed 's/^X//' >Files << 'END-of-Files'
+X/usr/include/sys/spkr.h
+END-of-Files
+echo x - Install
+sed 's/^X//' >Install << 'END-of-Install'
+X#
+X# Speaker driver installation script
+X#
+XTMP=/tmp/speaker.err
+XERR1=" Errors have been written to the file $TMP."
+XERR2=" The Speaker Driver software was not installed."
+X
+Xecho "Installing Speaker Driver Software Package"
+X
+X/etc/conf/bin/idcheck -p speaker 2>$TMP
+Xif [ $? != 0 ]
+Xthen
+X	echo "The speaker package is already at least partly installed.
+X	Removing the old version now..."
+X	/etc/conf/bin/idinstall -d speaker
+Xfi
+X
+X/etc/conf/bin/idinstall -a -k speaker 2>>$TMP
+Xif [ $? != 0 ]
+Xthen
+X	message "There was an error during package installation. $ERR1 $ERR2"
+X	exit 1
+Xfi
+X
+X/etc/conf/bin/idbuild 2>>$TMP
+Xif [ $? != 0 ]
+Xthen
+X	message "There was an error during kernel reconfiguration. $ERR1 $ERR2"
+X	exit 1
+Xfi
+X
+Xrm -f $TMP
+X
+Xcp spkr.h /usr/include/sys/spkr.h
+X
+Xecho "Performing shutdown..."
+Xcd /; exec /etc/shutdown -g0 -y
+END-of-Install
+echo x - Master
+sed 's/^X//' >Master << 'END-of-Master'
+Xspeaker	ocwi	iocH	spkr	0	0	1	1	-1
+END-of-Master
+echo x - Name
+sed 's/^X//' >Name << 'END-of-Name'
+X386 UNIX Speaker Device Driver Package
+END-of-Name
+echo x - Node
+sed 's/^X//' >Node << 'END-of-Node'
+Xspeaker	speaker	c	0
+END-of-Node
+echo x - Remove
+sed 's/^X//' >Remove << 'END-of-Remove'
+X#
+X# Speaker driver remove script
+X#
+XTMP=/tmp/speaker.err
+XRERR="Errors have been written to the file $TMP."
+X
+Xecho "Removing Speaker Driver Software Package"
+X
+X/etc/conf/bin/idinstall -d speaker 2>$TMP
+Xif [ $? != 0 ]
+Xthen
+X	message "There was an error during package removal. $RERR"
+X	exit 1
+Xfi
+X
+X/etc/conf/bin/idbuild 2>>$TMP
+Xif [ $? != 0 ]
+Xthen
+X	message "There was an error during kernel reconfiguration. $RERR"
+X	exit 1
+Xfi
+X
+Xrm -f /dev/speaker $TMP /usr/include/sys/spkr.h
+X
+Xexit 0
+END-of-Remove
+echo x - Size
+sed 's/^X//' >Size << 'END-of-Size'
+XROOT=1400
+XUSR=100
+END-of-Size
+echo x - System
+sed 's/^X//' >System << 'END-of-System'
+Xspeaker	Y	1	0	0	0	0	0	0	0
+END-of-System
+echo x - playtest
+sed 's/^X//' >playtest << 'END-of-playtest'
+X:
+X# Test script for the speaker driver
+X#
+X# v1.0 by Eric S. Raymond (Feb 1990)
+X#      modified for 386bsd by Andrew A. Chernov <ache@astral.msk.su>
+X#
+Xreveille="t255l8c.f.afc~c.f.afc~c.f.afc.f.a..f.~c.f.afc~c.f.afc~c.f.afc~c.f.."
+Xcontact="<cd<a#~<a#>f"
+Xdance="t240<cfcfgagaa#b#>dc<a#a.~fg.gaa#.agagegc.~cfcfgagaa#b#>dc<a#a.~fg.gga.agfgfgf."
+Xloony="t255cf8f8edc<a.>~cf8f8edd#e.~ce8cdce8cd.<a>c8c8c#def8af8."
+X
+Xcase $1 in
+Xreveille) echo  $reveille >/dev/speaker;;
+Xcontact)  echo  $contact >/dev/speaker;;
+Xdance)  echo  $dance >/dev/speaker;;
+Xloony)  echo  $loony >/dev/speaker;;
+X*)
+X	echo "No such tune. Available tunes are:"
+X	echo
+X	echo "reveille -- Reveille"
+X	echo "contact -- Contact theme from Close Encounters"
+X	echo "dance -- Lord of the Dance (aka Simple Gifts)"
+X	echo "loony -- Loony Toons theme"
+X	;;
+Xesac
+END-of-playtest
+exit
