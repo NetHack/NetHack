@@ -440,18 +440,24 @@ can_twoweapon()
 		Sprintf(kbuf, "%s corpse", an(mons[uswapwep->corpsenm].mname));
 		instapetrify(kbuf);
 	} else if (Glib || uswapwep->cursed) {
-		char str[BUFSZ];
-		struct obj *obj = uswapwep;
-
-		/* Avoid trashing makeplural's static buffer */
-		Strcpy(str, makeplural(body_part(HAND)));
-		Your("%s from your %s!",  aobjnam(obj, "slip"), str);
 		if (!Glib)
-			obj->bknown = TRUE;
-		dropx(obj);
+			uswapwep->bknown = TRUE;
+		drop_uswapwep();
 	} else
 		return (TRUE);
 	return (FALSE);
+}
+
+void
+drop_uswapwep()
+{
+	char str[BUFSZ];
+	struct obj *obj = uswapwep;
+
+	/* Avoid trashing makeplural's static buffer */
+	Strcpy(str, makeplural(body_part(HAND)));
+	Your("%s from your %s!",  aobjnam(obj, "slip"), str);
+	dropx(obj);
 }
 
 int

@@ -714,6 +714,10 @@ register struct obj *otmp;
 	otmp->cursed = 1;
 	/* welded two-handed weapon interferes with some armor removal */
 	if (otmp == uwep && bimanual(uwep)) reset_remarm();
+	/* rules at top of wield.c state that twoweapon cannot be done
+	   with cursed alternate weapon */
+	if (otmp == uswapwep && u.twoweap)
+	    drop_uswapwep();
 	/* some cursed items need immediate updating */
 	if (carried(otmp) && confers_luck(otmp))
 	    set_moreluck();

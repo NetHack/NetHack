@@ -2237,6 +2237,7 @@ E int FDECL(chwepon, (struct obj *,int));
 E int FDECL(welded, (struct obj *));
 E void FDECL(weldmsg, (struct obj *));
 E void FDECL(setmnotwielded, (struct monst *,struct obj *));
+E void NDECL(drop_uswapwep);
 
 /* ### windows.c ### */
 
