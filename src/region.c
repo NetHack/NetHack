@@ -657,8 +657,9 @@ skip_lots:
 }
 
 void
-rest_regions(fd)
+rest_regions(fd, ghostly)
 int fd;
+boolean ghostly; /* If a bones file restore */
 {
     int i, j;
     unsigned n;
@@ -667,7 +668,8 @@ int fd;
 
     clear_regions();		/* Just for security */
     mread(fd, (genericptr_t) &tmstamp, sizeof (tmstamp));
-    tmstamp = (moves - tmstamp);
+    if (ghostly) tmstamp = 0;
+    else tmstamp = (moves - tmstamp);
     mread(fd, (genericptr_t) &n_regions, sizeof (n_regions));
     max_regions = n_regions;
     if (n_regions > 0)
@@ -715,6 +717,7 @@ int fd;
 	mread(fd, (genericptr_t) &regions[i]->leave_f, sizeof (short));
 	mread(fd, (genericptr_t) &regions[i]->inside_f, sizeof (short));
 	mread(fd, (genericptr_t) &regions[i]->player_inside, sizeof (boolean));
+	if (ghostly) regions[i]->player_inside = FALSE; /* old player */
 	mread(fd, (genericptr_t) &regions[i]->n_monst, sizeof (short));
 	if (regions[i]->n_monst > 0)
 	    regions[i]->monsters =

@@ -1317,6 +1317,8 @@ boolean at_stairs, falling, portal;
 	save_currentstate();
 #endif
 
+	/* assume this will always return TRUE when changing level */
+	(void) in_out_region(u.ux, u.uy);
 	(void) pickup(1);
 }
 

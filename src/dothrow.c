@@ -437,6 +437,8 @@ hurtle_step(arg, x, y)
     if (!isok(x,y)) {
 	You_feel("the spirits holding you back.");
 	return FALSE;
+    } else if (!in_out_region(x, y)) {
+	return FALSE;
     }
 
     if (!Passes_walls || !(may_pass = may_passwall(x, y))) {
