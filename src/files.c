@@ -1677,11 +1677,12 @@ read_wizkit()
 		if ((ep = index(buf, '\n'))) *ep = '\0';
 		if (buf[0]) {
 			otmp = readobjnam(buf, (struct obj *)0);
-			if (otmp)
+			if (otmp) {
+			    if (otmp != &zeroobj)
 				otmp = addinv(otmp);
-			else {
-				raw_printf("Bad wizkit item: \"%.50s\"", buf);
-				wait_synch();
+			} else {
+			    raw_printf("Bad wizkit item: \"%.50s\"", buf);
+			    wait_synch();
 			}
 		}
 	}
