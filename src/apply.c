@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.4	2002/04/18	*/
+/*	SCCS Id: @(#)apply.c	3.4	2002/08/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2730,6 +2730,10 @@ doapply()
 
 	obj = getobj(class_list, "use or apply");
 	if(!obj) return 0;
+
+	if (obj->oartifact && !touch_artifact(obj, &youmonst))
+	    return 1;	/* evading your grasp costs a turn; just be
+			   grateful that you don't drop it as well */
 
 	if (obj->oclass == WAND_CLASS)
 	    return do_break_wand(obj);

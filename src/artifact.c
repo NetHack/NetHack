@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.4	2002/03/22	*/
+/*	SCCS Id: @(#)artifact.c 3.4	2002/08/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1096,7 +1096,8 @@ doinvoke()
     register struct obj *obj;
 
     obj = getobj(invoke_types, "invoke");
-    if(!obj) return 0;
+    if (!obj) return 0;
+    if (obj->oartifact && !touch_artifact(obj, &youmonst)) return 1;
     return arti_invoke(obj);
 }
 
