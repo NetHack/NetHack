@@ -425,7 +425,7 @@ fuzzymatch(s1, s2, ignore_chars, caseblind)
 #if defined(AMIGA) && !defined(AZTEC_C) && !defined(__SASC_60) && !defined(_DCC) && !defined(__GNUC__)
 extern struct tm *FDECL(localtime,(time_t *));
 #endif
-static struct tm *NDECL(getlt);
+STATIC_DCL struct tm *NDECL(getlt);
 
 void
 setrandom()
@@ -455,7 +455,7 @@ setrandom()
 #endif
 }
 
-static struct tm *
+STATIC_OVL struct tm *
 getlt()
 {
 	time_t date;

@@ -426,4 +426,48 @@ functions:389 _missum
 functions:390 _mixtype _mk_artifact
 functions:391 _makesingular 
 functions:392 _maketrap _makevtele _makewish 
-
+functions:393 _add_erosion_words
+;
+functions:395 _display_pickinv
+functions:396 _do_class_genocide
+functions:397 _dochat
+functions:398 _domonnoise
+;
+;
+;
+;
+functions:403 _find_file
+functions:404 _forget
+functions:405 _forget_single_object
+functions:406 _getlt
+functions:407 _getpos_help
+;
+;
+;
+functions:411 _lib_dlb_cleanup
+functions:412 _lib_dlb_fclose
+functions:413 _lib_dlb_fgetc
+functions:414 _lib_dlb_fgets
+functions:415 _lib_dlb_fopen
+functions:416 _lib_dlb_fread
+functions:417 _lib_dlb_fseek
+functions:418 _lib_dlb_ftell
+functions:419 _lib_dlb_init
+functions:420 _maybe_tame
+;
+functions:422 _mon_in_room
+functions:423 _nextobuf
+functions:424 _p_glow1
+functions:425 _p_glow2
+functions:426 _popch
+functions:427 _randomize
+functions:428 _readlibdir
+functions:429 _reset_region_mids
+functions:430 _rob_shop
+functions:431 _stripspe
+;
+;
+;
+functions:435 _wand_explode
+functions:436 _wishymatch
+functions:437 _You_buf

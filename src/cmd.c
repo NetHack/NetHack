@@ -212,7 +212,7 @@ int xtime;
 
 #ifdef REDO
 
-static char NDECL(popch);
+STATIC_DCL char NDECL(popch);
 
 /* Provide a means to redo the last command.  The flag `in_doagain' is set
  * to true while redoing the command.  This flag is tested in commands that
@@ -224,7 +224,7 @@ static char NDECL(popch);
 static char pushq[BSIZE], saveq[BSIZE];
 static NEARDATA int phead, ptail, shead, stail;
 
-static char
+STATIC_OVL char
 popch() {
 	/* If occupied, return '\0', letting tgetch know a character should
 	 * be read from the keyboard.  If the character read is not the

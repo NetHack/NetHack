@@ -63,7 +63,7 @@ STATIC_DCL void FDECL(dropped_container, (struct obj *, struct monst *,
 STATIC_DCL void FDECL(add_to_billobjs, (struct obj *));
 STATIC_DCL void FDECL(bill_box_content, (struct obj *, BOOLEAN_P, BOOLEAN_P,
 				     struct monst *));
-static boolean FDECL(rob_shop, (struct monst *));
+STATIC_DCL boolean FDECL(rob_shop, (struct monst *));
 
 /*
 	invariants: obj->unpaid iff onbill(obj) [unless bp->useup]
@@ -453,7 +453,7 @@ xchar x, y;
 
 /* shop merchandise has been taken; pay for it with any credit available;  
    return false if the debt is fully covered by credit, true otherwise */
-static boolean
+STATIC_OVL boolean
 rob_shop(shkp)
 struct monst *shkp;
 {

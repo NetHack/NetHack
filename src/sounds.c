@@ -10,12 +10,12 @@
 # endif
 #endif
 
-static int FDECL(domonnoise,(struct monst *));
-static int NDECL(dochat);
-static int FDECL(mon_in_room, (struct monst *,int));
+STATIC_DCL int FDECL(domonnoise,(struct monst *));
+STATIC_DCL int NDECL(dochat);
+STATIC_DCL int FDECL(mon_in_room, (struct monst *,int));
 
 /* this easily could be a macro, but it might overtax dumb compilers */
-static int
+STATIC_OVL int
 mon_in_room(mon, rmtyp)
 struct monst *mon;
 int rmtyp;
@@ -412,7 +412,7 @@ register struct monst *mtmp;
     }
 }
 
-static int
+STATIC_OVL int
 domonnoise(mtmp)
 register struct monst *mtmp;
 {
@@ -822,7 +822,7 @@ dotalk()
     return result;
 }
 
-static int
+STATIC_OVL int
 dochat()
 {
     register struct monst *mtmp;

@@ -17,7 +17,7 @@ STATIC_DCL boolean FDECL(taking_off, (const char *));
 STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
 STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
-static char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
+STATIC_DCL char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
 STATIC_DCL struct obj *FDECL(find_unpaid,(struct obj *,struct obj **));
@@ -1644,7 +1644,7 @@ find_unpaid(list, last_found)
  * inventory and return a count as well as a letter. If out_cnt is not null,
  * any count returned from the menu selection is placed here.
  */
-static char
+STATIC_OVL char
 display_pickinv(lets, want_reply, out_cnt)
 register const char *lets;
 boolean want_reply;

@@ -21,15 +21,15 @@ static NEARDATA const char readable[] =
 		   { ALL_CLASSES, SCROLL_CLASS, SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
-static void FDECL(wand_explode, (struct obj *));
-static void NDECL(do_class_genocide);
-static void FDECL(stripspe,(struct obj *));
-static void FDECL(p_glow1,(struct obj *));
-static void FDECL(p_glow2,(struct obj *,const char *));
-static void FDECL(randomize,(int *, int));
-static void FDECL(forget_single_object, (int));
-static void FDECL(forget, (int));
-static void FDECL(maybe_tame, (struct monst *,struct obj *));
+STATIC_DCL void FDECL(wand_explode, (struct obj *));
+STATIC_DCL void NDECL(do_class_genocide);
+STATIC_DCL void FDECL(stripspe,(struct obj *));
+STATIC_DCL void FDECL(p_glow1,(struct obj *));
+STATIC_DCL void FDECL(p_glow2,(struct obj *,const char *));
+STATIC_DCL void FDECL(randomize,(int *, int));
+STATIC_DCL void FDECL(forget_single_object, (int));
+STATIC_DCL void FDECL(forget, (int));
+STATIC_DCL void FDECL(maybe_tame, (struct monst *,struct obj *));
 
 STATIC_PTR void FDECL(set_lit, (int,int,genericptr_t));
 
@@ -149,8 +149,7 @@ doread()
 	}
 	return(1);
 }
-
-static void
+STATIC_OVL void
 stripspe(obj)
 register struct obj *obj;
 {
@@ -164,16 +163,14 @@ register struct obj *obj;
 		} else pline(nothing_happens);
 	}
 }
-
-static void
+STATIC_OVL void
 p_glow1(otmp)
 register struct obj	*otmp;
 {
 	Your("%s %s briefly.", xname(otmp),
 	     otense(otmp, Blind ? "vibrate" : "glow"));
 }
-
-static void
+STATIC_OVL void
 p_glow2(otmp,color)
 register struct obj	*otmp;
 register const char *color;
@@ -426,7 +423,7 @@ int curse_bless;
 
 
 /* Forget known information about this object class. */
-static void
+STATIC_OVL void
 forget_single_object(obj_id)
 	int obj_id;
 {
@@ -444,7 +441,7 @@ forget_single_object(obj_id)
 
 #if 0	/* here if anyone wants it.... */
 /* Forget everything known about a particular object class. */
-static void
+STATIC_OVL void
 forget_objclass(oclass)
 	int oclass;
 {
@@ -458,7 +455,7 @@ forget_objclass(oclass)
 
 
 /* randomize the given list of numbers  0 <= i < count */
-static void
+STATIC_OVL void
 randomize(indices, count)
 	int *indices;
 	int count;
@@ -595,7 +592,7 @@ forget_levels(percent)
  *	howmuch & ALL_MAP	= forget whole map
  *	howmuch & ALL_SPELLS	= forget all spells
  */
-static void
+STATIC_OVL void
 forget(howmuch)
 int howmuch;
 {
@@ -626,7 +623,7 @@ int howmuch;
 }
 
 /* monster is hit by scroll of taming's effect */
-static void
+STATIC_OVL void
 maybe_tame(mtmp, sobj)
 struct monst *mtmp;
 struct obj *sobj;
@@ -1309,7 +1306,7 @@ register struct obj	*sobj;
 	return(0);
 }
 
-static void
+STATIC_OVL void
 wand_explode(obj)
 register struct obj *obj;
 {
@@ -1432,7 +1429,7 @@ do_it:
 	vision_full_recalc = 1;	/* delayed vision recalculation */
 }
 
-static void
+STATIC_OVL void
 do_class_genocide()
 {
 	int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;

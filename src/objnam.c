@@ -10,9 +10,9 @@
 #define NUMOBUF 12
 
 STATIC_DCL char *FDECL(strprepend,(char *,const char *));
-static boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
-static char *NDECL(nextobuf);
-static void FDECL(add_erosion_words, (struct obj *, char *));
+STATIC_DCL boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
+STATIC_DCL char *NDECL(nextobuf);
+STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
 
 struct Jitem {
 	int item;
@@ -62,7 +62,7 @@ register const char *pref;
 }
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
-static char *
+STATIC_OVL char *
 nextobuf()
 {
 	static char NEARDATA bufs[NUMOBUF][BUFSZ];
@@ -497,7 +497,7 @@ register struct obj *obj;
 			 (obj->known || obj->otyp == AMULET_OF_YENDOR));
 }
 
-static void
+STATIC_OVL void
 add_erosion_words(obj,prefix)
 struct obj *obj;
 char *prefix;
@@ -1606,7 +1606,7 @@ const char *oldstr;
 }
 
 /* compare user string against object name string using fuzzy matching */
-static boolean
+STATIC_OVL boolean
 wishymatch(u_str, o_str, retry_inverted)
 const char *u_str;	/* from user, so might be variant spelling */
 const char *o_str;	/* from objects[], so is in canonical form */
