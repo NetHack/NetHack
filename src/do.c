@@ -218,13 +218,13 @@ void
 doaltarobj(obj)  /* obj is an object dropped on an altar */
 	register struct obj *obj;
 {
-	if (Blind || obj->oclass == GOLD_CLASS)
+	if (Blind)
 		return;
 
 	/* KMH, conduct */
 	u.uconduct.gnostic++;
 
-	if (obj->blessed || obj->cursed) {
+	if ((obj->blessed || obj->cursed) && obj->oclass != GOLD_CLASS) {
 		There("is %s flash as %s %s the altar.",
 			an(hcolor(obj->blessed ? amber : Black)),
 			doname(obj), otense(obj, "hit"));
@@ -483,7 +483,13 @@ register struct obj *obj;
 #endif
 	    if (!can_reach_floor()) {
 		if(flags.verbose) You("drop %s.", doname(obj));
+#ifndef GOLDOBJ
 		if (obj->oclass != GOLD_CLASS || obj == invent) freeinv(obj);
+#else
+		/* Ensure update when we drop gold objects */
+		if (obj->oclass == GOLD_CLASS) flags.botl = 1;
+		freeinv(obj);
+#endif
 		hitfloor(obj);
 		return(1);
 	    }
@@ -507,10 +513,6 @@ register struct obj *obj;
 #else
         /* Ensure update when we drop gold objects */
         if (obj->oclass == GOLD_CLASS) flags.botl = 1;
-	/* Money is usually not in our inventory */
-	/*if (obj->oclass != GOLD_CLASS || obj == invent)*/ 
-        /* !!!! make sure we don't drop "created" gold not in inventory any more,*/
-        /* or this will crash !!!! */
         freeinv(obj);
 #endif
 	if (!u.uswallow && ship_object(obj, u.ux, u.uy, FALSE)) return;
