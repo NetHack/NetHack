@@ -67,7 +67,7 @@ rc     = $(bccbin)\brc32
 link   = $(bccbin)\ilink32
 implib = $(bccbin)\tlib
 
-cflags = -c -D_X86_=1 -DWINVER=$(MAKE_WINVER) -q -I$(bccinc) -w-pia -w-rch -w-par -w-aus
+cflags = -c -D_X86_=1 -DWINVER=$(MAKE_WINVER) -q -I$(bccinc) -w-pia -w-rch -w-csu -w-par -w-aus
 cdebug = -y -v -O2
 cvarsmt  = -DWIN32 -D_WIN32 -D_MT 
 lflags  = 

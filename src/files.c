@@ -544,13 +544,13 @@ int lev, oflag;
 			lftrack.nethack_thinks_it_is_open = TRUE;
 		} else {
 			really_close();
-			fd = sopen(name, oflag,_SH_DENYRW, FCMASK);
+			fd = sopen(name, oflag,SH_DENYRW, FCMASK);
 			lftrack.fd = fd;
 			lftrack.oflag = oflag;
 			lftrack.nethack_thinks_it_is_open = TRUE;
 		}
 	} else {
-			fd = sopen(name, oflag,_SH_DENYRW, FCMASK);
+			fd = sopen(name, oflag,SH_DENYRW, FCMASK);
 			lftrack.fd = fd;
 			lftrack.oflag = oflag;
 			if (fd)
