@@ -721,11 +721,11 @@ The air is close with the stench of sulphurous fumes.
 Once again, you find yourself in the lair of %n.
 %E
 %Cc Cav 00050
-"So, human, you seek to invade the lair of %n.
+"So, follower of %l, you seek to invade the lair of %n.
 Only my meals are allowed down here.  Prepare to be eaten!"
 %E
 %Cp Cav 00051
-"So, again you face me, %c.  No human has ever before escaped me.
+"So, again you face me, %c.  No one has ever before escaped me.
 Now I shall kill you."
 %E
 %Cp Cav 00052
@@ -738,7 +738,7 @@ Now I shall kill you."
 "You are weak, %c.  No challenge for the Mother of all Dragons."
 %E
 %Cp Cav 00061
-"I grow hungry, human.  You look like a nice appetizer!"
+"I grow hungry, %r.  You look like a nice appetizer!"
 %E
 %Cp Cav 00062
 "Join me for lunch?  You're the main course, %c."
@@ -3098,7 +3098,7 @@ You have an odd feeling this may be the last time you ever come here.
 portal spell!!"
 %E
 %Cp Wiz 00008
-"The spells of %n were just to powerful for us to withstand."
+"The spells of %n were just too powerful for us to withstand."
 %E
 %Cp Wiz 00009
 "I, too, will venture into the world, because %n is but one of
