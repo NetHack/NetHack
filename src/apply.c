@@ -1024,11 +1024,18 @@ struct obj *obj;
 		obj->otyp == WAX_CANDLE || obj->otyp == TALLOW_CANDLE ||
 		obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
 		obj->otyp == BRASS_LANTERN || obj->otyp == POT_OIL)) {
-	    if (obj->otyp == MAGIC_LAMP && obj->spe == 0)
+	    if ((obj->otyp == MAGIC_LAMP ||
+		 obj->otyp == CANDELABRUM_OF_INVOCATION) &&
+		obj->spe == 0)
 		return FALSE;
 	    else if (obj->otyp != MAGIC_LAMP && obj->age == 0)
 		return FALSE;
 	    if (!get_obj_location(obj, &x, &y, 0))
+		return FALSE;
+	    if (obj->otyp == CANDELABRUM_OF_INVOCATION && obj->cursed)
+		return FALSE;
+	    if ((obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
+		 obj->otyp == BRASS_LANTERN) && obj->cursed && !rn2(2))
 		return FALSE;
 	    if (obj->where == OBJ_MINVENT ? cansee(x,y) : !Blind)
 		pline("%s %s light!", Yname2(obj), otense(obj, "catch"));
