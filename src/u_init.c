@@ -70,8 +70,8 @@ static struct trobj Healer[] = {
 	{ 0, 0, 0, 0, 0 }
 };
 static struct trobj Knight[] = {
-	{ LONG_SWORD, 0, WEAPON_CLASS, 1, UNDEF_BLESS },
-	{ SPEAR, 2, WEAPON_CLASS, 1, UNDEF_BLESS },
+	{ LONG_SWORD, 1, WEAPON_CLASS, 1, UNDEF_BLESS },
+	{ LANCE, 1, WEAPON_CLASS, 1, UNDEF_BLESS },
 	{ RING_MAIL, 1, ARMOR_CLASS, 1, UNDEF_BLESS },
 	{ HELMET, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
 	{ SMALL_SHIELD, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
@@ -674,38 +674,6 @@ u_init()
 		 */
 		break;
 	case PM_RANGER:
-#if 0		/* superseded by inv_subs[] */
-		switch (rn2(100) / 20) {
-		case 0:	/* Special racial bow */
-		case 1:
-		case 2:
-		    switch (Race_switch) {
-		    case PM_ELF:
-			Ranger[RAN_BOW].trotyp = ELVEN_BOW;
-			Ranger[RAN_TWO_ARROWS].trotyp =
-			Ranger[RAN_ZERO_ARROWS].trotyp = ELVEN_ARROW;
-			break;
-		    case PM_GNOME:
-			Ranger[RAN_BOW].trotyp = CROSSBOW;
-			Ranger[RAN_TWO_ARROWS].trotyp =
-			Ranger[RAN_ZERO_ARROWS].trotyp = CROSSBOW_BOLT;
-			break;
-		    case PM_ORC:
-			Ranger[RAN_BOW].trotyp = ORCISH_BOW;
-			Ranger[RAN_TWO_ARROWS].trotyp =
-			Ranger[RAN_ZERO_ARROWS].trotyp = ORCISH_ARROW;
-			break;
-		    default: break;	/* Use default bow + arrow */
-		    }
-		    break;
-		case 3:	/* Missiles */
-		    Ranger[RAN_BOW].trotyp = BOOMERANG;
-		    Ranger[RAN_TWO_ARROWS].trotyp =
-		    Ranger[RAN_ZERO_ARROWS].trotyp = DART;
-		    break;
-		default: break;	/* Use default bow + arrow */
-		}
-#endif	/*0*/
 		Ranger[RAN_TWO_ARROWS].trquan = rn1(10, 50);
 		Ranger[RAN_ZERO_ARROWS].trquan = rn1(10, 30);
 		ini_inv(Ranger);
@@ -748,7 +716,6 @@ u_init()
 		break;
 #endif
 	case PM_VALKYRIE:
-		flags.female = TRUE;
 		ini_inv(Valkyrie);
 		if(!rn2(6)) ini_inv(Lamp);
 		knows_class(WEAPON_CLASS);
@@ -1044,9 +1011,10 @@ register struct trobj *trop;
 			discover_object(POT_OIL, TRUE, FALSE);
 
 		if(obj->oclass == ARMOR_CLASS){
-			if (is_shield(obj) && !uarms)
+			if (is_shield(obj) && !uarms) {
 				setworn(obj, W_ARMS);
-			else if (is_helmet(obj) && !uarmh)
+				if (uswapwep) setuswapwep((struct obj *) 0);
+			} else if (is_helmet(obj) && !uarmh)
 				setworn(obj, W_ARMH);
 			else if (is_gloves(obj) && !uarmg)
 				setworn(obj, W_ARMG);

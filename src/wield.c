@@ -110,8 +110,11 @@ register struct obj *obj;
 	if (obj) {
 		unweapon = (obj->oclass == WEAPON_CLASS) ?
 				is_launcher(obj) || is_ammo(obj) ||
-				is_missile(obj) || is_pole(obj) :
-			   !is_weptool(obj);
+				is_missile(obj) || (is_pole(obj)
+#ifdef STEED
+				&& !u.usteed
+#endif
+				) : !is_weptool(obj);
 	} else
 		unweapon = TRUE;	/* for "bare hands" message */
 	update_inventory();
