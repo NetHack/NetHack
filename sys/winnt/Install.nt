@@ -14,8 +14,8 @@ Nethackw) goes to Alex Kompel who contributed the port.
 
 You can build either the TTY version of NetHack or the Windows Graphical 
 version.  In either case you will need:
-  o A copy of Microsoft Visual C V6.0 or later.  Things may work with an
-    earlier version of the compiler, but the current code has not been
+  o A copy of Microsoft Visual C V6.0 SP3 or later.  Things may work with 
+    an earlier version of the compiler, but the current code has not been
     tested with an earlier compiler.
 
   o A version of a UUDECODE utility in your path.  The Makefiles and
