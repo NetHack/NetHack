@@ -199,6 +199,11 @@ OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
 OBJECT:random,random,random
+# Treasure?
+ENGRAVING:random,engrave,"X marks the spot."
+ENGRAVING:random,engrave,"X marks the spot."
+ENGRAVING:random,engrave,"X marks the spot."
+ENGRAVING:random,engrave,"X marks the spot."
 # Random traps
 TRAP:"spiked pit",(24,02)
 TRAP:"spiked pit",(37,00)
