@@ -413,7 +413,7 @@ remove_rooms(lx, ly, hx, hy)
  * level structure contents corresponding to roomno have already been reset.
  * Currently handles only the removal of rooms that have no subrooms.
  */
-void
+STATIC_OVL void
 remove_room(roomno)
     int roomno;
 {
