@@ -198,7 +198,11 @@
  * otherwise it will be the current directory.
  */
 # ifndef HACKDIR
-#  define HACKDIR "/usr/games/lib/nethackdir"	/* nethack directory */
+#  ifdef __APPLE__
+#    define HACKDIR "nethackdir"	/* nethack directory */
+#  else
+#    define HACKDIR "/usr/games/lib/nethackdir"
+#  endif
 # endif
 
 /*

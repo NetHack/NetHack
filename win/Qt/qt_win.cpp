@@ -99,7 +99,11 @@ extern "C" {
 #include "qt_xpms.h"
 
 #include <dirent.h>
-#include <malloc.h>
+#ifdef Q_WS_MACX
+#  include <sys/malloc.h>
+#else
+#  include <malloc.h>
+#endif
 
 #ifdef _WS_X11_
 // For userid control
