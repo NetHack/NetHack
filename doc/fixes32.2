@@ -1,0 +1,128 @@
+General Fixes and Modified Features
+-----------------------------------
+make `recover' work with the additional element of version info added in 3.2.1
+floating eyes cannot escape down stairs and ladders
+do not use body_part() inappropriately when snatching monster's weapon
+fix feedback for a confused long worm attacking itself
+avoid converting locked secret door into closed+locked normal door;
+	doors should be flagged as either locked or closed but not both
+kicking a locked secret door mustn't yield an open normal door
+fixes for dipping weapons into potions of oil
+fix crash triggered when knocking off worn blindfold by applying cursed towel
+update screen display for vault guard picking up gold from fake corridor
+Chromatic Dragon was missing appropriate resistances for orange (sleep) and
+	yellow (acid + stoning) dragons
+when triggering a chest trap, clear the trap flag immediately [bones fodder]
+when a boulder gets pushed into a pit where a monster is trapped, immediately
+	redisplay the monster after giving messages
+rings of hunger dropped in sinks should have an effect even if player is blind
+player #offering a cockatrice corpse must pass a touch check
+hitting a rust monster with a pick-axe, iron ball, or chain will trigger rust
+	damage to the weapon; ditto for rust traps when wielding such items
+cosmetic martial arts and bare-handed changes to skill arrays in u_init.c
+gain or lose weapon skill slots appropriately when polymorph into new person
+fix crash occuring when self-hit by uncaught boomerang
+when delivering a pline message during level change, don't display areas of
+	the new level using line-of-sight data from the old one
+heavy iron balls may be thrown multiple spaces (presumably they roll),
+	restoring old ball behavior
+get rid of "non-null minvent despite MM_NOINVENT" warning
+prevent a negative damage adjustment from boosting a target monster's HP
+give "bashing" message when first attacking something with unconventional
+	wielded items besides just throwing weapons and non-weapon tools
+when restoring, reset weapon so that "bashing" message can be given again
+hole traps in bones data shouldn't be marked as unseen
+when carrying 52 items, don't check shop goods for mergability with invent
+	because it will give false matches, yielding non-gold in slot '#'
+kicking a cockatrice corpse is now as dangerous as kicking a live cockatrice
+fix set_apparxy() crash when the Wizard returns via migrating monster list
+monster wearing armor is protected from disintegration breath like player
+monster wearing amulet of life saving survives disintegration breath
+greased helmets will block AD_DRIN attacks
+get rid of ancient check for welded weapons, which arbitrarily named or didn't
+	name the weapon for no particular reason.
+levitation: sitting makes you tumble, kicking requires bracing
+empty bag of tricks won't cause bag of holding to explode
+prevent "force bolt" from hitting false match on *orc* data.base entry
+prevent "{wand,scroll,spellbook} of light" from matching "* light" entry
+non-confused genocide of player should not kill by "genocidal confusion"
+re-word message for monster grasping already-wielded unicorn horn
+fix various killer reasons
+when pushing boulders, make sure current is always top object at its location
+always clear unpaid items off shop bill when shk is teleported away, even
+	if shk was already angry
+don't let broken wand of digging create traps at locations which already
+	have traps (prevent it from turning a hole into a pit)
+don't give messages about unseen objects falling down holes
+fix to prevent kicked objects which stop on holes/downstairs from becoming
+	unattached from any object list
+don't let flying creatures set off a rolling boulder trap
+fix to prevent seeing into a room by kicking an undiscovered locked secret 
+	door from outside
+account for case of monster throwing gem at PC unicorn
+schedule repair for shop door smashed by big monster
+update status line for energy used when "you fail to cast the spell correctly"
+polymorphed character will mimic gold after eating mimic corpse
+fix relmon panic when bashing weak undead with wielded potion of holy water
+holy and unholy water can trigger transformation in werecritters
+call update_inventory() when discovering or undiscovering (call " ") an object
+fix goto_level panic: if quest leader seals portal, delete portal trap from
+	quest home level as well as from main dungeon's branch level [possible
+	return to quest via 'W' quest artifact]
+prefix quest leader and/or nemesis name with "the" when appropriate at
+	run-time rather than using hard-coded text in quest.txt
+fix endgame crash caused by string overflow when formatting priest|minion names
+dokick.c compiles when WEAPON_SKILLS is disabled
+burning objects go out when kicked
+monsters with arms but not legs (salamander, marilith) can't kick
+knights can't jump while poly'd into anything without legs
+try harder to get names for corpses of unique monsters right
+very high dexterity doesn't guarantee a hit for thrown potions and eggs
+blinding ammo thrown from inside an engulfer can't blind it
+monsters going through endgame portals arrive in same area as the player
+	instead of ending up at the portal to the next level
+treat most of the moat on fakewiz levels as outside the special central
+	area, so that falling or wading into the water and auto-teleporting
+	out of it can't strand the character inside the room
+monsters created by animating a named figurine will inherit that name
+prevent possible player-controlled creation of unique monsters via tossing
+	statues of such onto statue trap locations
+activating a statue trap with wand or pick-axe won't discard statue contents
+cursed non-weapons can't slip when thrown, as it was in 3.1.x
+don't reveal patron deity of high priests with the 'C' command's prompt
+two flags structures now, flags and iflags, the latter not saved with the game
+object name prefix buffer wasn't big enough for biggest possible case
+negatively enchanted weapons thrown by monsters could do negative damage
+prevent xorns from phazing through walls on astral level
+live Wizard won't teleport to your level if he's carrying the Amulet
+can't use 'C' to give the Wizard a name
+fix charging for shop goods broken via striking/force bolt
+prevent disintegration breath from destroying Famine and Pestilence
+	and from triggering impossible("monster with zero hp?") for Death
+prevent attached ball and/or chain from becoming part of iron golem formed
+	during polypiling (ball & chain movement later accessed freed memory,
+      which either crashed or got "remove_object: obj not on floor" panic)
+
+
+Platform- and/or Interface-Specific Fixes
+-----------------------------------------
+Mac: update `mrecover'
+Mac: handle `-@' character name suffix for explicitly requesting random role
+msdos: suppress tiles on rogue level when restoring games that were saved there
+tty: support group accelerators for PICK_ONE menus
+tty: after <ctrl/P> at a yn() prompt, don't blindly accept the character
+	used to get back to the prompt as the yn() result [could trigger
+	impossible("invalid sell response")]
+Unix+tty: guard against <curses.h> problems with delay_output,TRUE/FALSE macros
+X11: fix group accelerators and support them for PICK_ONE menus
+X11: implement tty-style counts for menu selections
+X11: proper pop-up placement with old-style window managers (eg X11R6 twm)
+
+
+General New Features
+--------------------
+
+
+Platform- and/or Interface-Specific New Features
+------------------------------------------------
+
