@@ -142,6 +142,10 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
             case VK_NEXT: 
 				NHEVENT_KBD('3')
                 return 0; 
+
+            case VK_DELETE: 
+				NHEVENT_KBD('.')
+                return 0; 
             }
 			return 1;
 		} break;
@@ -165,8 +169,8 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		case WM_SETFOCUS:
 			/* if there is a menu window out there -
 			   transfer input focus to it */
-			if( IsWindow( GetNHApp()->hMenuWnd ) ) {
-				SetFocus( GetNHApp()->hMenuWnd );
+			if( IsWindow( GetNHApp()->hPopupWnd ) ) {
+				SetFocus( GetNHApp()->hPopupWnd );
 			}
 			break;
 

@@ -126,11 +126,6 @@ void mswin_player_selection(void)
 	logDebug("mswin_player_selection()\n");
 
 	/* select a role */
-	flags.initalign = -1;    /* reset */
-    flags.initgend = -1;
-    flags.initrace = -1;
-	flags.initrole = -1;
-  
 	if( mswin_player_selection_window( &nRole ) == IDCANCEL ) {
 		clearlocks();
 		mswin_exit_nhwindows(0);

@@ -13,7 +13,10 @@ typedef struct mswin_nethack_text_window {
 	TCHAR*  window_text;
 } NHTextWindow, *PNHTextWindow;
 
-BOOL CALLBACK	TextWndProc(HWND, UINT, WPARAM, LPARAM);
+static WNDPROC  editControlWndProc = 0;
+
+BOOL	CALLBACK	NHTextWndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK	NHEditHookWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void LayoutText(HWND hwnd);
 
@@ -25,7 +28,7 @@ HWND mswin_init_text_window () {
 			GetNHApp()->hApp,
 			MAKEINTRESOURCE(IDD_NHTEXT),
 			GetNHApp()->hMainWnd,
-			TextWndProc
+			NHTextWndProc
 	);
 	if( !ret ) panic("Cannot create text window");
 
@@ -52,13 +55,12 @@ void mswin_display_text_window (HWND hWnd)
 		SetWindowText(GetDlgItem(hWnd, IDC_TEXT_CONTROL), data->window_text);
 	}
 
-	GetNHApp()->hMenuWnd = hWnd;
+	GetNHApp()->hPopupWnd = hWnd;
 	mapWnd = mswin_hwnd_from_winid(WIN_MAP);
 	if( !IsWindow(mapWnd) ) mapWnd = GetNHApp()->hMainWnd;
 	GetWindowRect(mapWnd, &rt);
 	MoveWindow(hWnd, rt.left, rt.top, rt.right-rt.left, rt.bottom-rt.top, TRUE);
 	ShowWindow(hWnd, SW_SHOW);
-	SetFocus(hWnd);
 
 	while( IsWindow(hWnd) && 
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
@@ -70,10 +72,10 @@ void mswin_display_text_window (HWND hWnd)
 		}
 	}
 
-	GetNHApp()->hMenuWnd = NULL;
+	GetNHApp()->hPopupWnd = NULL;
 }
     
-BOOL CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HWND control;
 	HDC hdc;
@@ -92,6 +94,10 @@ BOOL CALLBACK TextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hdc = GetDC(control);
 		SendMessage(control, WM_SETFONT, (WPARAM)mswin_create_font(NHW_TEXT, ATR_NONE, hdc), 0);
 		ReleaseDC(control, hdc);
+
+		/* subclass edit control */
+		editControlWndProc = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
+		SetWindowLong(control, GWL_WNDPROC, (LONG)NHEditHookWndProc);
 
 		SetFocus(control);
 	return FALSE;
@@ -186,4 +192,24 @@ void LayoutText(HWND hWnd)
 
 	MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
 	MoveWindow(btn_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE );
+}
+
+/* Edit box hook */
+LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch(message) {
+
+	/* close on space */
+	case WM_KEYDOWN:
+		if( wParam==VK_SPACE ) {
+			PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
+		}
+	break;
+
+	}
+
+	if( editControlWndProc ) 
+		return CallWindowProc(editControlWndProc, hWnd, message, wParam, lParam);
+	else 
+		return 0;
 }

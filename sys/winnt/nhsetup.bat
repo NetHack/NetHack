@@ -1,4 +1,4 @@
-@REM  SCCS Id: @(#)nhsetup.bat      2002/01/21
+@REM  SCCS Id: @(#)nhsetup.bat      2002/01/25
 @REM  Copyright (c) NetHack PC Development Team 1993, 1996, 2002
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.nt for details
@@ -95,6 +95,18 @@ echo copy .\mnunsel.bmp ..\..\win\win32
 copy .\mnunsel.bmp ..\..\win\win32
 :hasmnuns2
 if NOT exist ..\..\win\win32\mnunsel.bmp set err_nouu=Y
+
+if exist ..\..\win\win32\mnselcnt.bmp goto hasmnselcnt2
+if exist .\mnselcnt.bmp goto hasmnselcnt1
+if exist ..\..\win\win32\mnselcnt.uu uudecode ..\..\win\win32\mnselcnt.uu >nul
+if exist .\mnselcnt.bmp goto hasmnselcnt1
+echo Error - No UUDECODE utility to decode ..\..\win\win32\mnselcnt.uu
+goto hasmnselcnt2
+:hasmnselcnt1
+echo copy .\mnselcnt.bmp ..\..\win\win32
+copy .\mnselcnt.bmp ..\..\win\win32
+:hasmnselcnt2
+if NOT exist ..\..\win\win32\mnselcnt.bmp set err_nouu=Y
 
 if exist ..\..\win\win32\petmark.bmp goto haspm2
 if exist .\petmark.bmp goto haspm1

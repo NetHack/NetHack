@@ -1,4 +1,3 @@
-/* Copyright (C) 2001 by Alex Kompel <shurikk@pacbell.net> */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
@@ -10,7 +9,7 @@
 #include "mhfont.h"
 
 #define MENU_MARGIN			0
-#define NHMENU_STR_SIZE     50
+#define NHMENU_STR_SIZE     BUFSZ
 
 typedef struct mswin_menu_item {
 	int				glyph;
@@ -20,17 +19,21 @@ typedef struct mswin_menu_item {
 	int				attr;
 	char			str[NHMENU_STR_SIZE];
 	BOOLEAN_P		presel;
+	int				count;
+	BOOL			has_focus;
 } NHMenuItem, *PNHMenuItem;
 
 typedef struct mswin_nethack_menu_window {
-	int type;
-	int how;
+	int type;		/* MENU_TYPE_TEXT or MENU_TYPE_MENU */
+	int how;		/* for menus: PICK_NONE, PICK_ONE, PICK_ANY */
 
 	union {
 		struct menu_list {
-			int				 size;
-			int				 allocated;
-			PNHMenuItem		 items;
+			int				 size;			/* number of items in items[] */
+			int				 allocated;		/* number of allocated slots in items[] */
+			PNHMenuItem		 items;			/* menu items */
+			char			 gacc[QBUFSZ];	/* group accelerators */
+			BOOL			 counting;		/* counting flag */
 		} menu;
 
 		struct menu_text {
@@ -41,23 +44,31 @@ typedef struct mswin_nethack_menu_window {
 	int done;
 
 	HBITMAP bmpChecked;
+	HBITMAP bmpCheckedCount;
 	HBITMAP bmpNotChecked;
 } NHMenuWindow, *PNHMenuWindow;
 
 extern short glyph2tile[];
 
-#define NHMENU_IS_SELECTABLE(item) ((item).identifier.a_obj!=NULL)
+static WNDPROC wndProcListViewOrig = NULL;
+static WNDPROC editControlWndProc = NULL;
 
-BOOL CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
+#define NHMENU_IS_SELECTABLE(item) ((item).identifier.a_obj!=NULL)
+#define NHMENU_IS_SELECTED(item) ((item).count!=0)
+
+BOOL	CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK	NHMenuListWndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK	NHMenuTextWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
-static BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch);
 static void LayoutMenu(HWND hwnd);
 static void SetMenuType(HWND hwnd, int type);
 static void SetMenuListType(HWND hwnd, int now);
 static HWND GetMenuControl(HWND hwnd);
-static int GetListPageSize( HWND hwndList );
+static void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count);
+static void reset_menu_count(HWND hwndList, PNHMenuWindow data);
+static BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch);
 
 HWND mswin_init_menu_window (int type) {
 	HWND ret;
@@ -68,7 +79,9 @@ HWND mswin_init_menu_window (int type) {
 			GetNHApp()->hMainWnd,
 			MenuWndProc
 	);
-	if( !ret ) panic("Cannot create menu window");
+	if( !ret ) {
+		panic("Cannot create menu window");
+	}
 	
 	SetMenuType(ret, type);
 	return ret;
@@ -82,6 +95,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 	int ret_val;
     MENU_ITEM_P *selected = NULL;
 	int i;
+	char* ap;
 
 	assert( _selected!=NULL );
 	*_selected = NULL;
@@ -89,10 +103,15 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
+	/* set menu type */
+	SetMenuListType(hWnd, how);
+
 	/* Ok, now give items a unique accelerators */
 	if( data->type == MENU_TYPE_MENU ) {
 		char next_char = 'a';
 
+		data->menu.gacc[0] = '\0';
+		ap = data->menu.gacc;
 		for( i=0; i<data->menu.size;  i++) {
 			if( data->menu.items[i].accelerator!=0 ) {
 				next_char = (char)(data->menu.items[i].accelerator+1);
@@ -109,23 +128,34 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 
 				next_char ++;
 			}
+
+			/* collect group accelerators */
+			if( data->how != PICK_NONE ) {
+				if( data->menu.items[i].group_accel && 
+					!strchr(data->menu.gacc, data->menu.items[i].group_accel) ) {
+					*ap++ = data->menu.items[i].group_accel;
+					*ap = '\x0';
+				}
+			}
 		}
+
+		reset_menu_count(NULL, data);
 	}
 
 	/* activate the menu window */
-	GetNHApp()->hMenuWnd = hWnd;
-
-	SetMenuListType(hWnd, how);
+	GetNHApp()->hPopupWnd = hWnd;
 
 	mswin_layout_main_window(hWnd);
 
+	/* disable game windows */
 	EnableWindow(mswin_hwnd_from_winid(WIN_MAP), FALSE);
 	EnableWindow(mswin_hwnd_from_winid(WIN_MESSAGE), FALSE);
 	EnableWindow(mswin_hwnd_from_winid(WIN_STATUS), FALSE);
-	EnableWindow(GetNHApp()->hMainWnd, FALSE);
 
+	/* bring menu window on top */
 	SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
+	/* go into message loop */
 	while( IsWindow(hWnd) && 
 		   !data->done &&
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
@@ -142,70 +172,49 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 		if(how==PICK_NONE) {
 			if(data->result>=0) ret_val=0;
 			else				ret_val=-1;
-		} else if(how==PICK_ONE) {
-			HWND menu_list;
-			int nItem;
-
-			menu_list = GetMenuControl(hWnd);
-			nItem = SendMessage(menu_list, LB_GETCURSEL, 0, 0);
-			if(nItem==LB_ERR) {
-				ret_val = 0;
-			} else {
-				assert(nItem>=0 && nItem<data->menu.size);
-
-				ret_val = 1;
-				selected =  malloc( sizeof(MENU_ITEM_P) );
-				assert (selected != NULL);
-				selected[0].item = data->menu.items[nItem].identifier;
-				selected[0].count = -1;
-				*_selected = selected;
+		} else if(how==PICK_ONE || how==PICK_ANY) {
+			/* count selected items */
+			ret_val = 0;
+			for(i=0; i<data->menu.size; i++ ) {
+				if( NHMENU_IS_SELECTABLE(data->menu.items[i]) &&
+					NHMENU_IS_SELECTED(data->menu.items[i]) ) {
+					ret_val++;
+				}
 			}
-		} else if(how==PICK_ANY) {
-			HWND menu_list;
-			int  buffer[255];
-			int  n_sel_items_in_buffer;
-			int  i;
-
-			menu_list = GetMenuControl(hWnd); 
-			ret_val = SendMessage(menu_list, LB_GETSELCOUNT, 0, 0); 
-			if( ret_val==LB_ERR ) ret_val = 0;
-
 			if( ret_val > 0 ) {
-				n_sel_items_in_buffer = SendMessage(menu_list, LB_GETSELITEMS, sizeof(buffer)/sizeof(buffer[0]), (LPARAM) buffer); 
-				ret_val = n_sel_items_in_buffer;
+				int sel_ind;
 
-				selected =  malloc( n_sel_items_in_buffer*sizeof(MENU_ITEM_P) );
-				assert (selected != NULL);
+				selected = (MENU_ITEM_P*)malloc(ret_val*sizeof(MENU_ITEM_P));
+				if( !selected ) panic("out of memory");
 
-				ret_val = 0;
-				for(i=0; i<n_sel_items_in_buffer; i++ ) {
-					assert(buffer[i]>=0 && buffer[i]<data->menu.size);
-
-					if( NHMENU_IS_SELECTABLE(data->menu.items[buffer[i]]) ) {
-						selected[ret_val].item = data->menu.items[buffer[i]].identifier;
-						selected[ret_val].count = -1;
-						ret_val++;
+				sel_ind = 0;
+				for(i=0; i<data->menu.size; i++ ) {
+					if( NHMENU_IS_SELECTABLE(data->menu.items[i]) &&
+						NHMENU_IS_SELECTED(data->menu.items[i]) ) {
+						selected[sel_ind].item = data->menu.items[i].identifier;
+						selected[sel_ind].count = data->menu.items[i].count;
+						sel_ind++;
 					}
 				}
+				ret_val = sel_ind;
 				*_selected = selected;
 			}
 		}
 	}
 
 	/* restore window state */
-	EnableWindow(GetNHApp()->hMainWnd, TRUE);
 	EnableWindow(mswin_hwnd_from_winid(WIN_MAP), TRUE);
 	EnableWindow(mswin_hwnd_from_winid(WIN_MESSAGE), TRUE);
 	EnableWindow(mswin_hwnd_from_winid(WIN_STATUS), TRUE);
 
 	SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW);
-	GetNHApp()->hMenuWnd = NULL;
-
+	GetNHApp()->hPopupWnd = NULL;
 	mswin_window_mark_dead( mswin_winid_from_handle(hWnd) );
 	DestroyWindow(hWnd);
+
 	mswin_layout_main_window(hWnd);
 
-	SetFocus(GetTopWindow(GetNHApp()->hMainWnd));
+	SetFocus(GetNHApp()->hMainWnd );
 
 	return ret_val;
 }
@@ -213,8 +222,6 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMenuWindow data;
-	int nItem;
-	HDC hdc;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch (message) 
@@ -227,20 +234,13 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		data->result = 0;
 		data->done = 0;
 		data->bmpChecked = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_SEL));
+		data->bmpCheckedCount = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_SEL_COUNT));
 		data->bmpNotChecked = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_UNSEL));
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 
-		/* set text control font & the rest*/
-		if( data->type==MENU_TYPE_MENU ) {
-			hdc = GetDC(GetDlgItem(hWnd, IDC_MENU_TEXT));
-			SendDlgItemMessage(hWnd, IDC_MENU_TEXT, WM_SETFONT, (WPARAM)mswin_create_font(NHW_MENU, ATR_NONE, hdc), 0);
-			ReleaseDC(GetDlgItem(hWnd, IDC_MENU_TEXT), hdc);
-
-			SetFocus(GetMenuControl(hWnd));
-		} else {
-			SetFocus(GetDlgItem(hWnd, IDOK));
-		}
-		return FALSE;
+		/* subclass edit control */
+		editControlWndProc = (WNDPROC)GetWindowLong(GetDlgItem(hWnd, IDC_MENU_TEXT), GWL_WNDPROC);
+		SetWindowLong(GetDlgItem(hWnd, IDC_MENU_TEXT), GWL_WNDPROC, (LONG)NHMenuTextWndProc);
 	break;
 
 	case WM_MSNH_COMMAND:
@@ -249,7 +249,6 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_SIZE:
 		LayoutMenu(hWnd);
-	break;
 	return FALSE;
 
 	case WM_COMMAND: 
@@ -257,73 +256,142 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam)) 
         { 
 		case IDCANCEL:
-			data->result = -1;
-			data->done = 1;
+			if( data->type == MENU_TYPE_MENU && 
+			    (data->how==PICK_ONE || data->how==PICK_ANY) &&
+			    data->menu.counting) {
+				HWND list;
+				int i;
+
+				/* reset counter if counting is in progress */
+				list = GetMenuControl(hWnd);
+				i = ListView_GetNextItem(list, -1,	LVNI_FOCUSED);
+				if( i>=0 ) {
+					SelectMenuItem(list, data, i,  0);
+				}
+				return TRUE;
+			} else {
+				data->result = -1;
+				data->done = 1;
+			}
 		return TRUE;
 
 		case IDOK:
 			data->done = 1;
 			data->result = 0;
 		return TRUE;
+		}
+	} break;
 
+	case WM_NOTIFY:
+	{
+		LPNMHDR	lpnmhdr = (LPNMHDR)lParam;
+		switch (LOWORD(wParam)) {
 		case IDC_MENU_LIST:
 		{
 			if( !data || data->type!=MENU_TYPE_MENU ) break;
 
-			switch(HIWORD(wParam)) {
-			case LBN_DBLCLK: 
+			switch(lpnmhdr->code) {
+			case LVN_ITEMACTIVATE: 
+			{
+				LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)lParam;
 				if(data->how==PICK_ONE) {
-					nItem = SendMessage((HWND)lParam, LB_GETCURSEL, (WPARAM)0, (LPARAM)0);
-					if( nItem!=LB_ERR &&
-						nItem>0 &&
-						nItem<data->menu.size &&
-						data->menu.items[nItem].accelerator!=0 ) {
+					if( lpnmlv->iItem>=0 &&
+						lpnmlv->iItem<data->menu.size &&
+						NHMENU_IS_SELECTABLE(data->menu.items[lpnmlv->iItem]) ) {
+						SelectMenuItem(
+							lpnmlv->hdr.hwndFrom, 
+							data, 
+							lpnmlv->iItem, 
+							-1
+						);
 						data->done = 1;
 						data->result = 0;
 						return TRUE;
 					}
 				}
+			} break;
+
+			case NM_CLICK: {
+				LPNMITEMACTIVATE lpnmitem = (LPNMITEMACTIVATE) lParam;
+				if( lpnmitem->iItem==-1 ) return 0;
+				if( data->how==PICK_ANY ) {
+					SelectMenuItem(
+						lpnmitem->hdr.hwndFrom, 
+						data, 
+						lpnmitem->iItem, 
+						NHMENU_IS_SELECTED(data->menu.items[lpnmitem->iItem])? 0 : -1
+					);
+				}
+			} break;
+
+			case LVN_ITEMCHANGED: 
+			{
+				LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)lParam;
+				if( lpnmlv->iItem==-1 ) return 0;
+				if( !(lpnmlv->uChanged & LVIF_STATE) ) return 0;
+
+				if( data->how==PICK_ONE || data->how==PICK_ANY ) {
+					data->menu.items[lpnmlv->iItem].has_focus = !!(lpnmlv->uNewState & LVIS_FOCUSED);
+					ListView_RedrawItems(lpnmlv->hdr.hwndFrom, lpnmlv->iItem, lpnmlv->iItem);
+				}
+
+				/* update count for single-selection menu (follow the listview selection) */
+				if( data->how==PICK_ONE ) {
+					if( lpnmlv->uNewState & LVIS_SELECTED ) {
+						SelectMenuItem(
+							lpnmlv->hdr.hwndFrom, 
+							data, 
+							lpnmlv->iItem, 
+							-1
+						);
+					}
+				}
+
+				/* check item focus */
+				if( data->how==PICK_ONE || data->how==PICK_ANY ) {
+					data->menu.items[lpnmlv->iItem].has_focus = !!(lpnmlv->uNewState & LVIS_FOCUSED);
+					ListView_RedrawItems(lpnmlv->hdr.hwndFrom, lpnmlv->iItem, lpnmlv->iItem);
+				}
+			} break;
+
+			case NM_KILLFOCUS:
+				reset_menu_count(lpnmhdr->hwndFrom, data);
 			break;
+
 			}
-		}
-		break;
+		} break;
 		}
 	} break;
 
 	case WM_SETFOCUS:
-		if( hWnd!=GetNHApp()->hMenuWnd ) {
-			SetFocus(GetNHApp()->hMainWnd );
+		if( hWnd!=GetNHApp()->hPopupWnd ) {
+			SetFocus(GetNHApp()->hPopupWnd );
 		}
 	break;
 	
     case WM_MEASUREITEM: 
-		return onMeasureItem(hWnd, wParam, lParam);
+		if( wParam==IDC_MENU_LIST )
+			return onMeasureItem(hWnd, wParam, lParam);
+		else
+			return FALSE;
 
     case WM_DRAWITEM:
-		return onDrawItem(hWnd, wParam, lParam);
-
-	case WM_VKEYTOITEM:
-	{ 
-		WORD c[4];
-		BYTE kbd_state[256];
-		
-		ZeroMemory(kbd_state, sizeof(kbd_state));
-		ZeroMemory(c, sizeof(c));
-		GetKeyboardState(kbd_state);
-		
-		if( ToAscii( LOWORD(wParam), 0, kbd_state, c, 0)==1 ) {
-			return onListChar(hWnd, (HWND)lParam, c[0]);
-		}
-	} return -1;
+		if( wParam==IDC_MENU_LIST )
+			return onDrawItem(hWnd, wParam, lParam);
+		else
+			return FALSE;
 
 	case WM_DESTROY:
-		DeleteObject(data->bmpChecked);
-		DeleteObject(data->bmpNotChecked);
-		if( data->type == MENU_TYPE_TEXT ) {
-			if( data->text.text ) free(data->text.text);
+		if( data ) {
+			DeleteObject(data->bmpChecked);
+			DeleteObject(data->bmpCheckedCount);
+			DeleteObject(data->bmpNotChecked);
+			if( data->type == MENU_TYPE_TEXT ) {
+				if( data->text.text ) free(data->text.text);
+			}
+			free(data);
+			SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
 		}
-		free(data);
-		SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
 		return TRUE;
 	}
 	return FALSE;
@@ -388,6 +456,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			data->menu.items = (PNHMenuItem)realloc(data->menu.items, data->menu.allocated*sizeof(NHMenuItem));
 		}
 
+		ZeroMemory( &data->menu.items[data->menu.size], sizeof(data->menu.items[data->menu.size]));
 		data->menu.items[data->menu.size].glyph = msg_data->glyph;
 		data->menu.items[data->menu.size].identifier = *msg_data->identifier;
 		data->menu.items[data->menu.size].accelerator = msg_data->accelerator;
@@ -456,11 +525,13 @@ void SetMenuType(HWND hWnd, int type)
 		EnableWindow(list, FALSE);
 		EnableWindow(text, TRUE);
 		ShowWindow(text, SW_SHOW);
+		SetFocus(text);
 	} else {
 		ShowWindow(text, SW_HIDE);
 		EnableWindow(text, FALSE);
 		EnableWindow(list, TRUE);
 		ShowWindow(list, SW_SHOW);
+		SetFocus(list);
 	}
 	LayoutMenu(hWnd);
 }
@@ -470,10 +541,12 @@ void SetMenuListType(HWND hWnd, int how)
 	PNHMenuWindow data;
 	RECT rt;
 	DWORD dwStyles;
-	char buf[255];
+	char buf[BUFSZ];
+	TCHAR wbuf[BUFSZ];
 	int nItem;
 	int i;
 	HWND control;
+	LVCOLUMN lvcol;
 	LRESULT fnt;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
@@ -484,52 +557,65 @@ void SetMenuListType(HWND hWnd, int how)
 	switch(how) {
 	case PICK_NONE: 
 		dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD 
-			| WS_VSCROLL | WS_HSCROLL | LBS_WANTKEYBOARDINPUT
-			| LBS_NOINTEGRALHEIGHT | LBS_NOTIFY | LBS_NOSEL 
-			| LBS_OWNERDRAWFIXED; 
+			| WS_VSCROLL | WS_HSCROLL | LVS_REPORT | LVS_NOCOLUMNHEADER 
+			| LVS_OWNERDRAWFIXED | LVS_SINGLESEL; 
 		break;
 	case PICK_ONE: 
 		dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD 
-			| WS_VSCROLL | WS_HSCROLL | LBS_WANTKEYBOARDINPUT
-			| LBS_NOTIFY | LBS_NOINTEGRALHEIGHT	| LBS_OWNERDRAWFIXED 
-			| LBS_HASSTRINGS; 
+			| WS_VSCROLL | WS_HSCROLL | LVS_REPORT | LVS_NOCOLUMNHEADER 
+			| LVS_OWNERDRAWFIXED | LVS_SINGLESEL; 
 		break;
 	case PICK_ANY: 
 		dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD 
-			| WS_VSCROLL | WS_HSCROLL | LBS_WANTKEYBOARDINPUT
-			| LBS_NOTIFY | LBS_NOINTEGRALHEIGHT | LBS_MULTIPLESEL 
-			| LBS_OWNERDRAWFIXED | LBS_HASSTRINGS; 
+			| WS_VSCROLL | WS_HSCROLL | LVS_REPORT | LVS_NOCOLUMNHEADER 
+			| LVS_OWNERDRAWFIXED | LVS_SINGLESEL; 
 		break;
 	default: panic("how should be one of PICK_NONE, PICK_ONE or PICK_ANY");
 	};
 
 	GetWindowRect(GetDlgItem(hWnd, IDC_MENU_LIST), &rt);
 	DestroyWindow(GetDlgItem(hWnd, IDC_MENU_LIST));
-	control = CreateWindow(
-		TEXT("LISTBOX"),	/* registered class name */
-		NULL,				/* window name */
-		dwStyles,			/* window style */
-		rt.left,			/* horizontal position of window */
-		rt.top,				/* vertical position of window */
-		rt.right - rt.left, /* window width */
-		rt.bottom - rt.top, /* window height */
-		hWnd,				/* handle to parent or owner window */
-		(HMENU)IDC_MENU_LIST, /* menu handle or child identifier */
-		GetNHApp()->hApp,	/* handle to application instance */
-		NULL );				/* window-creation data */
+	control = CreateWindow(WC_LISTVIEW, NULL, 
+		dwStyles,
+		rt.left,
+		rt.top,
+		rt.right - rt.left,
+		rt.bottom - rt.top,
+		hWnd,
+		(HMENU)IDC_MENU_LIST,
+		GetNHApp()->hApp,
+		NULL );
+	if( !control ) panic( "cannot create menu control" );
+	
+	/* install the hook for the control window procedure */
+	wndProcListViewOrig = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
+	SetWindowLong(control, GWL_WNDPROC, (LONG)NHMenuListWndProc);
+
+	/* set control font */
 	fnt = SendMessage(hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0);
 	SendMessage(control, WM_SETFONT, (WPARAM)fnt, (LPARAM)0);
 
+	/* add column to the list view */
+	ZeroMemory(&lvcol, sizeof(lvcol));
+	lvcol.mask = LVCF_WIDTH;
+	lvcol.cx = 1024;
+	ListView_InsertColumn(control, 0, &lvcol);
+
+	/* add items to the list view */
 	for(i=0; i<data->menu.size; i++ ) {
-		TCHAR wbuf[255];
+		LVITEM lvitem;
+		ZeroMemory( &lvitem, sizeof(lvitem) );
 		sprintf(buf, "%c - %s", max(data->menu.items[i].accelerator, ' '), data->menu.items[i].str );
-		nItem = SendMessage(control, LB_ADDSTRING, (WPARAM)0, (LPARAM) NH_A2W(buf, wbuf, sizeof(wbuf))); 
-		if( data->menu.items[i].presel ) {
-			if( data->how==PICK_ONE ) {
-				nItem = SendMessage(control, LB_SETCURSEL, (WPARAM)nItem, (LPARAM)0); 
-			} else if( data->how==PICK_ANY ) {
-				nItem = SendMessage(control, LB_SETSEL, (WPARAM)TRUE, (LPARAM)nItem); 
-			}
+
+		lvitem.mask = LVIF_PARAM | LVIF_STATE | LVIF_TEXT;
+		lvitem.iItem = i;
+		lvitem.iSubItem = 0;
+		lvitem.state = data->menu.items[i].presel? LVIS_SELECTED : 0;
+		lvitem.pszText = NH_A2W(buf, wbuf, BUFSZ);
+		lvitem.lParam = (LPARAM)&data->menu.items[i];
+		nItem = SendMessage(control, LB_ADDSTRING, (WPARAM)0, (LPARAM) buf); 
+		if( ListView_InsertItem(control, &lvitem)==-1 ) {
+			panic("cannot insert menu item");
 		}
 	}
 	SetFocus(control);
@@ -557,10 +643,11 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	HGDIOBJ saveFont;
 	HDC hdc;
 	PNHMenuWindow data;
-	RECT client_rect;
+	RECT list_rect;
 
     lpmis = (LPMEASUREITEMSTRUCT) lParam; 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	GetClientRect(GetMenuControl(hWnd), &list_rect);
 
 	hdc = GetDC(GetMenuControl(hWnd));
 	saveFont = SelectObject(hdc, mswin_create_font(NHW_MENU, ATR_INVERSE, hdc));
@@ -568,10 +655,7 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     /* Set the height of the list box items. */
     lpmis->itemHeight = max(tm.tmHeight, TILE_Y)+2;
-
-	/* Set windth of list box items */
-	GetClientRect(hWnd, &client_rect);
-	lpmis->itemWidth = client_rect.right - client_rect.left;
+	lpmis->itemWidth = list_rect.right - list_rect.left;
 
 	mswin_destroy_font(SelectObject(hdc, saveFont));
 	ReleaseDC(GetMenuControl(hWnd), hdc);
@@ -585,106 +669,122 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	PNHMenuWindow data;
     TEXTMETRIC tm;
 	HGDIOBJ saveFont;
-	HGDIOBJ savePen;
-	HPEN    pen;
 	HDC tileDC;
 	short ntile;
 	int t_x, t_y;
 	int x, y;
-	TCHAR wbuf[255];
+	TCHAR wbuf[BUFSZ];
+	RECT drawRect;
 
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
     /* If there are no list box items, skip this message. */
-    if ( (int)(lpdis->itemID) < 0) return FALSE;
+    if (lpdis->itemID == -1) return FALSE;
 
 	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
-    switch (lpdis->itemAction) 
-    { 
-        case ODA_SELECT: 
-        case ODA_DRAWENTIRE: 
-            item = &data->menu.items[lpdis->itemID];
 
-			tileDC = CreateCompatibleDC(lpdis->hDC);
-			saveFont = SelectObject(lpdis->hDC, mswin_create_font(NHW_MENU, item->attr, lpdis->hDC));
-            GetTextMetrics(lpdis->hDC, &tm);
+    item = &data->menu.items[lpdis->itemID];
 
-			x = lpdis->rcItem.left;
+	tileDC = CreateCompatibleDC(lpdis->hDC);
+	saveFont = SelectObject(lpdis->hDC, mswin_create_font(NHW_MENU, item->attr, lpdis->hDC));
+    GetTextMetrics(lpdis->hDC, &tm);
 
-			/* print check mark */
-			if( NHMENU_IS_SELECTABLE(*item) ) {
-				HGDIOBJ saveBmp;
-				char buf[2];
+	x = lpdis->rcItem.left + 1;
 
-				saveBmp = SelectObject(tileDC, 
-					(lpdis->itemState & ODS_SELECTED)? data->bmpChecked: data->bmpNotChecked );
+	/* print check mark */
+	if( NHMENU_IS_SELECTABLE(*item) ) {
+		HGDIOBJ saveBmp;
+		char buf[2];
 
-		        y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
-				BitBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, tileDC, 0, 0, SRCCOPY );
-				x += TILE_X + 5;
+		switch(item->count) {
+		case -1: saveBmp = SelectObject(tileDC, data->bmpChecked); break;
+		case 0: saveBmp = SelectObject(tileDC, data->bmpNotChecked); break;
+		default: saveBmp = SelectObject(tileDC, data->bmpCheckedCount); break;
+		}
 
-				if(item->accelerator!=0) {
-					y = (lpdis->rcItem.bottom + lpdis->rcItem.top - 
-						tm.tmHeight) / 2; 
-					buf[0] = item->accelerator;
-					buf[1] = '\x0';
-					TextOut(lpdis->hDC, x, y, NH_A2W(buf, wbuf, sizeof(wbuf)), 1); 
-				}
-				x += tm.tmAveCharWidth + 5;
-				SelectObject(tileDC, saveBmp);
+		y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
+		BitBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, tileDC, 0, 0, SRCCOPY );
+
+		x += TILE_X + 5;
+
+		if(item->accelerator!=0) {
+			buf[0] = item->accelerator;
+			buf[1] = '\x0';
+
+			SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
+			DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+		}
+		x += tm.tmAveCharWidth + 5;
+		SelectObject(tileDC, saveBmp);
+	}
+
+	/* print glyph if present */
+	if( item->glyph != NO_GLYPH ) {
+		HGDIOBJ saveBmp;
+
+		saveBmp = SelectObject(tileDC, GetNHApp()->bmpTiles);				
+		ntile = glyph2tile[ item->glyph ];
+		t_x = (ntile % TILES_PER_LINE)*TILE_X;
+		t_y = (ntile / TILES_PER_LINE)*TILE_Y;
+
+		y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
+
+		nhapply_image_transparent(
+			lpdis->hDC, x, y, TILE_X, TILE_Y, 
+			tileDC, t_x, t_y, TILE_X, TILE_Y, TILE_BK_COLOR );
+		SelectObject(tileDC, saveBmp);
+	}
+
+	x += TILE_X + 5;
+
+	SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
+    DrawText(lpdis->hDC, 
+        NH_A2W(item->str, wbuf, BUFSZ), 
+        strlen(item->str),
+        &drawRect, 
+		DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX
+	); 
+
+	/* draw focused item */
+	if( item->has_focus ) {
+		RECT client_rt;
+
+		GetClientRect(lpdis->hwndItem, &client_rt);
+		if( NHMENU_IS_SELECTABLE(*item) && 
+			data->menu.items[lpdis->itemID].count!=0 &&
+			item->glyph != NO_GLYPH ) {
+			if( data->menu.items[lpdis->itemID].count==-1 ) {
+				_stprintf(wbuf, TEXT("Count: All") );
+			} else {
+				_stprintf(wbuf, TEXT("Count: %d"), data->menu.items[lpdis->itemID].count );
 			}
 
-			/* print glyph if present */
-			if( item->glyph != NO_GLYPH ) {
-				HGDIOBJ saveBmp;
+			SelectObject(lpdis->hDC, mswin_create_font(NHW_MENU, ATR_BLINK, lpdis->hDC));
 
-				saveBmp = SelectObject(tileDC, GetNHApp()->bmpTiles);				
-				ntile = glyph2tile[ item->glyph ];
-				t_x = (ntile % TILES_PER_LINE)*TILE_X;
-				t_y = (ntile / TILES_PER_LINE)*TILE_Y;
-
-				y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2; 
-
-				nhapply_image_transparent(
-					lpdis->hDC, x, y, TILE_X, TILE_Y, 
-					tileDC, t_x, t_y, TILE_X, TILE_Y, TILE_BK_COLOR );
-				SelectObject(tileDC, saveBmp);
-			}
-			x += TILE_X + 5;
-
-            y = (lpdis->rcItem.bottom + lpdis->rcItem.top - 
-                tm.tmHeight) / 2; 
-
-            TextOut(lpdis->hDC, 
-                x, 
-                y, 
-                NH_A2W(item->str, wbuf, sizeof(wbuf)), 
-                strlen(item->str)); 
-
-			mswin_destroy_font(SelectObject(lpdis->hDC, saveFont));
-			DeleteDC(tileDC);
+			/* calculate text rectangle */
+			SetRect( &drawRect, client_rt.left, lpdis->rcItem.top, client_rt.right, lpdis->rcItem.bottom );
+			DrawText(lpdis->hDC, wbuf, _tcslen(wbuf), &drawRect, 
+					 DT_CALCRECT | DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX );
 			
-            break; 
+			/* erase text rectangle */
+			drawRect.left = max(client_rt.left+1, client_rt.right - (drawRect.right - drawRect.left) - 10);
+			drawRect.right = client_rt.right-1;
+			drawRect.top = lpdis->rcItem.top;
+			drawRect.bottom = lpdis->rcItem.bottom;
+			FillRect(lpdis->hDC, &drawRect, (HBRUSH)GetClassLong(lpdis->hwndItem, GCL_HBRBACKGROUND) );
 
-        case ODA_FOCUS:
-			if( data->how==PICK_NONE ) break;
+			/* draw text */
+			DrawText(lpdis->hDC, wbuf, _tcslen(wbuf), &drawRect, 
+					 DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX );
+		}
 
-			if( lpdis->itemState & ODS_FOCUS )
-				pen = CreatePen(PS_DOT, 0, RGB(0,0,0));
-			else 
-				pen = CreatePen(PS_DOT, 0, GetBkColor(lpdis->hDC));
+		/* draw focus rect */
+		SetRect( &drawRect, client_rt.left, lpdis->rcItem.top, client_rt.right, lpdis->rcItem.bottom );
+		DrawFocusRect(lpdis->hDC, &drawRect);
+	}
 
-			savePen = SelectObject(lpdis->hDC, pen);
-			
-			MoveToEx(lpdis->hDC,lpdis->rcItem.left, lpdis->rcItem.top, NULL);
-			LineTo(lpdis->hDC, lpdis->rcItem.right-1, lpdis->rcItem.top);
-			LineTo(lpdis->hDC, lpdis->rcItem.right-1, lpdis->rcItem.bottom-1);
-			LineTo(lpdis->hDC, lpdis->rcItem.left, lpdis->rcItem.bottom-1);
-			LineTo(lpdis->hDC, lpdis->rcItem.left, lpdis->rcItem.top);
-
-			DeleteObject(SelectObject(lpdis->hDC, savePen));
-           break; 
-    } 
+	mswin_destroy_font(SelectObject(lpdis->hDC, saveFont));
+	DeleteDC(tileDC);
 	return TRUE;
 }
 
@@ -698,38 +798,38 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
 	switch( ch ) {
 	case MENU_FIRST_PAGE:
-		SendMessage(hwndList, LB_SETTOPINDEX, 0, 0);
+		i = 0;
+		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+		ListView_EnsureVisible(hwndList, i, FALSE);
 	return -2;
 
 	case MENU_LAST_PAGE:
-		SendMessage(hwndList, 
-					LB_SETTOPINDEX, 
-					(WPARAM)max(0, data->menu.size-1),
-					(LPARAM)0);
+		i = max(0, data->menu.size-1);
+		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+		ListView_EnsureVisible(hwndList, i, FALSE);
 	return -2;
 
 	case MENU_NEXT_PAGE:
-		topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
-		pageSize = GetListPageSize( hwndList );
-		SendMessage(hwndList, 
-					LB_SETTOPINDEX, 
-					(WPARAM)min(topIndex+pageSize, data->menu.size-1),
-					(LPARAM)0);
+		topIndex = ListView_GetTopIndex( hwndList );
+		pageSize = ListView_GetCountPerPage( hwndList );
+		i = min(topIndex+pageSize, data->menu.size-1);
+		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+		ListView_EnsureVisible(hwndList, i, FALSE);
 	return -2;
 
 	case MENU_PREVIOUS_PAGE:
-		topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
-		pageSize = GetListPageSize( hwndList );
-		SendMessage(hwndList, 
-					LB_SETTOPINDEX, 
-					(WPARAM)max(topIndex-pageSize, 0),
-					(LPARAM)0);
+		topIndex = ListView_GetTopIndex( hwndList );
+		pageSize = ListView_GetCountPerPage( hwndList );
+		i = max(topIndex-pageSize, 0);
+		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+		ListView_EnsureVisible(hwndList, i, FALSE);
 	break;
 
 	case MENU_SELECT_ALL:
 		if( data->how == PICK_ANY ) {
+			reset_menu_count(hwndList, data);
 			for(i=0; i<data->menu.size; i++ ) {
-				SendMessage(hwndList, LB_SETSEL, (WPARAM)TRUE, (LPARAM)i);
+				SelectMenuItem(hwndList, data, i, -1);
 			}
 			return -2;
 		}
@@ -737,8 +837,9 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
 	case MENU_UNSELECT_ALL:
 		if( data->how == PICK_ANY ) {
+			reset_menu_count(hwndList, data);
 			for(i=0; i<data->menu.size; i++ ) {
-				SendMessage(hwndList, LB_SETSEL, (WPARAM)FALSE, (LPARAM)i);
+				SelectMenuItem(hwndList, data, i, 0);
 			}
 			return -2;
 		}
@@ -746,11 +847,14 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
 	case MENU_INVERT_ALL:
 		if( data->how == PICK_ANY ) {
+			reset_menu_count(hwndList, data);
 			for(i=0; i<data->menu.size; i++ ) {
-				SendMessage(hwndList, 
-							LB_SETSEL, 
-							(WPARAM)!SendMessage(hwndList, LB_GETSEL, (WPARAM)i, (LPARAM)0),
-							(LPARAM)i);
+				SelectMenuItem(
+					hwndList, 
+					data, 
+					i, 
+					NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
+				);
 			}
 			return -2;
 		}
@@ -758,10 +862,11 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
 	case MENU_SELECT_PAGE:
 		if( data->how == PICK_ANY ) {
-			topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
-			pageSize = GetListPageSize( hwndList );
+			reset_menu_count(hwndList, data);
+			topIndex = ListView_GetTopIndex( hwndList );
+			pageSize = ListView_GetCountPerPage( hwndList );
 			for(i=0; i<pageSize; i++ ) {
-				SendMessage(hwndList, LB_SETSEL, (WPARAM)TRUE, (LPARAM)topIndex+i);
+				SelectMenuItem(hwndList, data, topIndex+i, -1);
 			}
 			return -2;
 		}
@@ -769,10 +874,11 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
 	case MENU_UNSELECT_PAGE:
 		if( data->how == PICK_ANY ) {
-			topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
-			pageSize = GetListPageSize( hwndList );
+			reset_menu_count(hwndList, data);
+			topIndex = ListView_GetTopIndex( hwndList );
+			pageSize = ListView_GetCountPerPage( hwndList );
 			for(i=0; i<pageSize; i++ ) {
-				SendMessage(hwndList, LB_SETSEL, (WPARAM)FALSE, (LPARAM)topIndex+i);
+				SelectMenuItem(hwndList, data, topIndex+i, 0);
 			}
 			return -2;
 		}
@@ -780,13 +886,16 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
 	case MENU_INVERT_PAGE:
 		if( data->how == PICK_ANY ) {
-			topIndex = (int)SendMessage( hwndList, LB_GETTOPINDEX, 0, 0 );
-			pageSize = GetListPageSize( hwndList );
+			reset_menu_count(hwndList, data);
+			topIndex = ListView_GetTopIndex( hwndList );
+			pageSize = ListView_GetCountPerPage( hwndList );
 			for(i=0; i<pageSize; i++ ) {
-				SendMessage(hwndList, 
-							LB_SETSEL, 
-							(WPARAM)!SendMessage(hwndList, LB_GETSEL, (WPARAM)topIndex+i, (LPARAM)0),
-							(LPARAM)topIndex+i);
+				SelectMenuItem(
+					hwndList, 
+					data, 
+					topIndex+i, 
+					NHMENU_IS_SELECTED(data->menu.items[topIndex+i])? 0 : -1
+				);
 			}
 			return -2;
 		}
@@ -795,18 +904,27 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	case MENU_SEARCH:
 	    if( data->how==PICK_ANY || data->how==PICK_ONE ) {
 			char buf[BUFSZ];
+			
+			reset_menu_count(hwndList, data);
 			mswin_getlin("Search for:", buf);
 			if (!*buf || *buf == '\033') return -2;
 			for(i=0; i<data->menu.size; i++ ) {
 				if( NHMENU_IS_SELECTABLE(data->menu.items[i])
 					&& strstr(data->menu.items[i].str, buf) ) {
 					if (data->how == PICK_ANY) {
-						SendMessage(hwndList, 
-									LB_SETSEL, 
-									(WPARAM)!SendMessage(hwndList, LB_GETSEL, (WPARAM)i, (LPARAM)0),
-									(LPARAM)i);
+						SelectMenuItem(
+							hwndList, 
+							data, 
+							i, 
+							NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
+						);
 					} else if( data->how == PICK_ONE ) {
-						SendMessage(hwndList, LB_SETCURSEL, (WPARAM)i, (LPARAM)0);
+						SelectMenuItem(
+							hwndList, 
+							data, 
+							i, 
+							-1
+						);
 						break;
 					}
 				}
@@ -817,36 +935,111 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	return -2;
 
 	case ' ':
+		/* ends menu for PICK_ONE/PICK_NONE
+		   select item for PICK_ANY */
 		if( data->how==PICK_ONE || data->how==PICK_NONE ) {
 			data->done = 1;
 			data->result = 0;
 			return -2;
+		} else if( data->how==PICK_ANY ) {
+			i = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
+			if( i>=0 ) {
+				SelectMenuItem(
+					hwndList, 
+					data, 
+					i, 
+					NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
+				);
+			}
 		}
 	break;
-	
+
 	default:
+		if( strchr(data->menu.gacc, ch) &&
+			!(ch=='0' && data->menu.counting) ) {
+			/* matched a group accelerator */
+			if (data->how == PICK_ANY || data->how == PICK_ONE) {
+				reset_menu_count(hwndList, data);
+				for(i=0; i<data->menu.size; i++ ) {
+					if( NHMENU_IS_SELECTABLE(data->menu.items[i]) &&
+						data->menu.items[i].group_accel == ch ) {
+						if( data->how == PICK_ANY ) {
+							SelectMenuItem(
+								hwndList, 
+								data, 
+								i, 
+								NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
+							);
+						} else if( data->how == PICK_ONE ) {
+							SelectMenuItem(
+								hwndList, 
+								data, 
+								i, 
+								-1
+							);
+							data->result = 0;
+							data->done = 1;
+							return -2;
+						}
+					}
+				}
+				return -2;
+			} else {
+				mswin_nhbell();
+				return -2;
+			}
+		}
+
+		if (isdigit(ch)) {
+			int count;
+			i = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
+			if( i>=0 ) {
+				count = data->menu.items[i].count;
+				if( count==-1 ) count=0;
+				count *= 10L;
+				count += (int)(ch - '0');
+				if (count != 0)	/* ignore leading zeros */ {
+					data->menu.counting = TRUE;
+					data->menu.items[i].count = min(100000, count);
+					ListView_RedrawItems( hwndList, i, i ); /* update count mark */
+				}
+			}
+			return -2;
+		}
+
 		if( (ch>='a' && ch<='z') ||
 			(ch>='A' && ch<='Z') ) {
-			for(i=0; i<data->menu.size; i++ ) {
-				if( data->menu.items[i].accelerator == ch ) {
-					if( data->how == PICK_ANY ) {
-						SendMessage(hwndList, 
-									LB_SETSEL, 
-									(WPARAM)!SendMessage(hwndList, LB_GETSEL, (WPARAM)i, (LPARAM)0),
-									(LPARAM)i);
-						return -2;
-					} else if( data->how == PICK_ONE ) {
-						SendMessage(hwndList, LB_SETCURSEL, (WPARAM)i, (LPARAM)0);
-						data->result = 0;
-						data->done = 1;
-						return -2;
+			if (data->how == PICK_ANY || data->how == PICK_ONE) {
+				for(i=0; i<data->menu.size; i++ ) {
+					if( data->menu.items[i].accelerator == ch ) {
+						if( data->how == PICK_ANY ) {
+							SelectMenuItem(
+								hwndList, 
+								data, 
+								i, 
+								NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
+							);
+							ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+							return -2;
+						} else if( data->how == PICK_ONE ) {
+							SelectMenuItem(
+								hwndList, 
+								data, 
+								i, 
+								-1
+							);
+							data->result = 0;
+							data->done = 1;
+							return -2;
+						}
 					}
 				}
 			}
 		}
 	break;
 	}
-	
+
+	reset_menu_count(hwndList, data);
 	return -1;
 }
 
@@ -872,7 +1065,7 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 		/* Set the height of the list box items. */
 		for(i=0; i<data->menu.size; i++ ) {
 			sz->cx = max(sz->cx, 
-				(LONG)(2*TILE_X + tm.tmAveCharWidth*(strlen(data->menu.items[i].str)+1)));
+				(LONG)(2*TILE_X + tm.tmMaxCharWidth*(strlen(data->menu.items[i].str)+10)));
 		}
 
 		mswin_destroy_font(SelectObject(hdc, saveFont));
@@ -880,16 +1073,100 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 	}
 }
 
-int GetListPageSize( HWND hwndList ) 
+void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count)
 {
-   int ntop, nRectheight, nVisibleItems;
-   RECT rc, itemrect;
+	int i;
+	if( data->how==PICK_ONE && count!=0 ) {
+		for(i=0; i<data->menu.size; i++) 
+			if( item!=i && data->menu.items[i].count!=0 ) {
+				data->menu.items[i].count = 0;
+				ListView_RedrawItems( hwndList, i, i );
+			};
+	}
 
-   ntop = SendMessage(hwndList, LB_GETTOPINDEX, 0, 0);	/* Top item index. */
-   GetClientRect(hwndList, &rc);						/* Get list box rectangle. */
-   nRectheight = rc.bottom - rc.top;					/* Compute list box height. */
+	data->menu.items[item].count = count;
+	ListView_RedrawItems( hwndList, item, item );
+	reset_menu_count(hwndList, data);
+}
 
-   SendMessage(hwndList, LB_GETITEMRECT, ntop, (DWORD)(&itemrect)); /* Get current line's rectangle. */
-   nVisibleItems = nRectheight/(itemrect.bottom - itemrect.top);
-   return max(1, nVisibleItems);
+void reset_menu_count(HWND hwndList, PNHMenuWindow data) 
+{
+	int i; 
+	data->menu.counting = FALSE;
+	if( IsWindow(hwndList) ) {
+		i = ListView_GetNextItem((hwndList), -1, LVNI_FOCUSED);
+		if( i>=0 ) ListView_RedrawItems( hwndList, i, i ); 
+	}
+}
+
+/* List window Proc */
+LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	BOOL bUpdateFocusItem;
+
+	bUpdateFocusItem = FALSE;
+
+	switch(message) {
+
+	/* filter keyboard input for the control */
+	case WM_KEYDOWN:
+	case WM_KEYUP: {
+		MSG msg;
+		BOOL processed;
+
+		processed = FALSE;
+		if( PeekMessage(&msg, hWnd, WM_CHAR, WM_CHAR, PM_REMOVE) ) {
+			if( onListChar(GetParent(hWnd), hWnd, (char)msg.wParam)==-2 ) {
+				processed = TRUE;
+			}
+		}
+		if( processed ) return 0;
+
+		if( wParam==VK_LEFT || wParam==VK_RIGHT )
+			bUpdateFocusItem = TRUE;
+	} break;
+
+	case WM_SIZE:
+	case WM_HSCROLL:
+		bUpdateFocusItem = TRUE;
+	break;
+
+	}
+
+	if(	bUpdateFocusItem ) {
+		int i;
+		RECT rt;
+
+		/* invalidate the focus rectangle */
+		i = ListView_GetNextItem(hWnd, -1,	LVNI_FOCUSED);
+		if( i!=-1 ) {
+			ListView_GetItemRect(hWnd, i, &rt, LVIR_BOUNDS);
+			InvalidateRect(hWnd, &rt, TRUE);
+		}
+	}
+
+	if( wndProcListViewOrig ) 
+		return CallWindowProc(wndProcListViewOrig, hWnd, message, wParam, lParam);
+	else 
+		return 0;
+}
+
+/* Text control window proc - implements close on space */
+LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch(message) {
+
+	/* close on space */
+	case WM_KEYDOWN:
+		if( wParam==VK_SPACE ) {
+			PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
+		}
+	break;
+
+	}
+
+	if( editControlWndProc ) 
+		return CallWindowProc(editControlWndProc, hWnd, message, wParam, lParam);
+	else 
+		return 0;
 }

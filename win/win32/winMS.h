@@ -38,7 +38,7 @@ typedef struct mswin_nhwindow_app {
 	HINSTANCE   hApp;
 	HWND		hMainWnd;
 	HACCEL		hAccelTable;
-	HWND		hMenuWnd;	/* menu window in the selection process */
+	HWND		hPopupWnd;	/* current popup window  */
 
 	MSNHWinData windowlist[MAXWINDOWS];
 

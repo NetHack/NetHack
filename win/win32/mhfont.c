@@ -67,7 +67,7 @@ HGDIOBJ mswin_create_font(int win_type, int attr, HDC hdc)
 		lgfnt.lfOutPrecision	=	OUT_DEFAULT_PRECIS;  // output precision
 		lgfnt.lfClipPrecision	=	CLIP_DEFAULT_PRECIS; // clipping precision
 		lgfnt.lfQuality			=	DEFAULT_QUALITY;     // output quality
-		lgfnt.lfPitchAndFamily	=	VARIABLE_PITCH;		 // pitch and family
+		lgfnt.lfPitchAndFamily	=	FIXED_PITCH;		 // pitch and family
 		/* lgfnt.lfFaceName */
 		break;
 

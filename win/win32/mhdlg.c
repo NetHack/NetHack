@@ -50,9 +50,11 @@ int mswin_getlin_window (
 BOOL CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct getlin_data* data;
-	RECT   main_rt, dlg_rt;
+	RECT   main_rt, text_rt, dlg_rt, edit_rt;
 	SIZE   dlg_sz;
 	TCHAR  wbuf[BUFSZ];
+	HDC hdc;
+	HWND   control;
 
 	switch (message) 
 	{
@@ -61,12 +63,18 @@ BOOL CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		SetWindowText(hWnd, NH_A2W(data->question, wbuf, sizeof(wbuf)));
 		SetWindowLong(hWnd, GWL_USERDATA, lParam);
 
-		/* center dialog in the main window */
-		GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
-		GetWindowRect(hWnd, &dlg_rt);
-		dlg_sz.cx = dlg_rt.right - dlg_rt.left;
-		dlg_sz.cy = dlg_rt.bottom - dlg_rt.top;
+		/* get title text width */
+		SetRect(&text_rt, 0, 0, 100, 50);
+		hdc = GetWindowDC(hWnd);
+		DrawText(hdc, wbuf, _tcslen(wbuf), &text_rt, 
+			     DT_CALCRECT | DT_SINGLELINE | DT_NOPREFIX | DT_LEFT | DT_VCENTER );
+		ReleaseDC(hWnd, hdc);
 
+		/* center dialog in the main window */
+		GetWindowRect(hWnd, &dlg_rt);
+		GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
+		dlg_sz.cx = max(dlg_rt.right-dlg_rt.left, text_rt.right-text_rt.left );
+		dlg_sz.cy = dlg_rt.bottom - dlg_rt.top;
 		dlg_rt.left = (main_rt.left+main_rt.right-dlg_sz.cx)/2;
 		dlg_rt.right = dlg_rt.left + dlg_sz.cx;
 		dlg_rt.top = (main_rt.top+main_rt.bottom-dlg_sz.cy)/2;
@@ -76,6 +84,36 @@ BOOL CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 					(main_rt.top+main_rt.bottom-dlg_sz.cy)/2,
 					dlg_sz.cx,
 					dlg_sz.cy,
+					TRUE );
+
+		/* change layout of controls */
+		GetClientRect(hWnd, &dlg_rt);
+
+		control = GetDlgItem(hWnd, IDC_GETLIN_EDIT);
+		GetWindowRect(control, &edit_rt);
+		MoveWindow( control,
+					0,
+					0,
+					dlg_rt.right - dlg_rt.left,
+					edit_rt.bottom - edit_rt.top,
+					TRUE );
+
+		control = GetDlgItem(hWnd, IDOK);
+		GetWindowRect(control, &text_rt);
+		MoveWindow( control,
+					0,
+					edit_rt.bottom - edit_rt.top,
+					(dlg_rt.right-dlg_rt.left)/2,
+					text_rt.bottom - text_rt.top,
+					TRUE );
+
+		control = GetDlgItem(hWnd, IDCANCEL);
+		GetWindowRect(control, &text_rt);
+		MoveWindow( control,
+					(dlg_rt.right-dlg_rt.left)/2,
+					edit_rt.bottom - edit_rt.top,
+					(dlg_rt.right-dlg_rt.left)/2,
+					text_rt.bottom - text_rt.top,
 					TRUE );
 
 		/* set focus to the edit control */
@@ -401,20 +439,44 @@ void plselInitDialog(HWND hWnd)
 	plselAdjustLists(hWnd, -1);
 
 	/* intialize roles list */
-	CheckDlgButton(hWnd, IDC_PLSEL_ROLE_RANDOM, BST_CHECKED);
-	EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST), FALSE);
+	if( flags.initrole<0 ) {
+		CheckDlgButton(hWnd, IDC_PLSEL_ROLE_RANDOM, BST_CHECKED);
+		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST), FALSE);
+	} else {
+		CheckDlgButton(hWnd, IDC_PLSEL_ROLE_RANDOM, BST_UNCHECKED);
+		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST), TRUE);
+		SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_LIST, CB_SETCURSEL, (WPARAM)flags.initrole, 0);
+	}
 
 	/* intialize races list */
-	CheckDlgButton(hWnd, IDC_PLSEL_RACE_RANDOM, BST_CHECKED);
-	EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST), FALSE);
+	if( flags.initrace<0 || !validrace(flags.initrole, flags.initrace) ) {
+		CheckDlgButton(hWnd, IDC_PLSEL_RACE_RANDOM, BST_CHECKED);
+		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST), FALSE);
+	} else {
+		CheckDlgButton(hWnd, IDC_PLSEL_RACE_RANDOM, BST_UNCHECKED);
+		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST), TRUE);
+		SendDlgItemMessage(hWnd, IDC_PLSEL_RACE_LIST, CB_SETCURSEL, (WPARAM)flags.initrace, 0);
+	}
 
 	/* intialize genders list */
-	CheckDlgButton(hWnd, IDC_PLSEL_GENDER_RANDOM, BST_CHECKED);
-	EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_GENDER_LIST), FALSE);
+	if( flags.initgend<0 || !validgend(flags.initrole, flags.initrace, flags.initgend)) {
+		CheckDlgButton(hWnd, IDC_PLSEL_GENDER_RANDOM, BST_CHECKED);
+		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_GENDER_LIST), FALSE);
+	} else {
+		CheckDlgButton(hWnd, IDC_PLSEL_GENDER_RANDOM, BST_UNCHECKED);
+		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_GENDER_LIST), TRUE);
+		SendDlgItemMessage(hWnd, IDC_PLSEL_GENDER_LIST, CB_SETCURSEL, (WPARAM)flags.initgend, 0);
+	}
 
 	/* intialize alignments list */
-	CheckDlgButton(hWnd, IDC_PLSEL_ALIGN_RANDOM, BST_CHECKED);
-	EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LIST), FALSE);
+	if( flags.initalign<0 || !validalign(flags.initrole, flags.initrace, flags.initalign) ) {
+		CheckDlgButton(hWnd, IDC_PLSEL_ALIGN_RANDOM, BST_CHECKED);
+		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LIST), FALSE);
+	} else {
+		CheckDlgButton(hWnd, IDC_PLSEL_ALIGN_RANDOM, BST_UNCHECKED);
+		EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LIST), TRUE);
+		SendDlgItemMessage(hWnd, IDC_PLSEL_ALIGN_LIST, CB_SETCURSEL, (WPARAM)flags.initalign, 0);
+	}
 }
 
 /* adjust role/race/alignment/gender list - filter out
@@ -424,10 +486,8 @@ void plselInitDialog(HWND hWnd)
 */
 void  plselAdjustLists(HWND hWnd, int changed_sel)
 {
-	HWND control_role;
-	HWND control_race;
-	HWND control_gender;
-	HWND control_align;
+	HWND control_role, control_race, control_gender, control_align;
+	int  initrole, initrace, initgend, initalign;
 	int i;
 	int ind;
 	int valid_opt;
@@ -441,16 +501,16 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 
 	/* get current selections */	
 	ind = SendMessage(control_role, CB_GETCURSEL, 0, 0);
-	flags.initrole = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_role, CB_GETITEMDATA, ind, 0);
+	initrole = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_role, CB_GETITEMDATA, ind, 0);
 
 	ind = SendMessage(control_race, CB_GETCURSEL, 0, 0);
-	flags.initrace = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_race, CB_GETITEMDATA, ind, 0);
+	initrace = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_race, CB_GETITEMDATA, ind, 0);
 
 	ind = SendMessage(control_gender, CB_GETCURSEL, 0, 0);
-	flags.initgend = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_gender, CB_GETITEMDATA, ind, 0);
+	initgend = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_gender, CB_GETITEMDATA, ind, 0);
 
 	ind = SendMessage(control_align, CB_GETCURSEL, 0, 0);
-	flags.initalign = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_align, CB_GETITEMDATA, ind, 0);
+	initalign = (ind==LB_ERR)? ROLE_NONE : SendMessage(control_align, CB_GETITEMDATA, ind, 0);
 
 	/* intialize roles list */
 	if( changed_sel==-1 ) {
@@ -459,11 +519,14 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 		/* reset content and populate the list */
 		SendMessage(control_role, CB_RESETCONTENT, 0, 0); 
 		for (i = 0; roles[i].name.m; i++) {
-			if (ok_role(i, flags.initrace, flags.initgend,
-							flags.initalign)) {
-				ind = SendMessage(control_role, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(roles[i].name.m, wbuf, sizeof(wbuf)) ); 
+			if (ok_role(i, initrace, initgend, initalign)) {
+			    if (initgend>=0 && flags.female && roles[i].name.f)
+					ind = SendMessage(control_role, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(roles[i].name.f, wbuf, sizeof(wbuf)) );
+				else 
+					ind = SendMessage(control_role, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(roles[i].name.m, wbuf, sizeof(wbuf)) );
+
 				SendMessage(control_role, CB_SETITEMDATA, (WPARAM)ind, (LPARAM)i );
-				if( i==flags.initrole ) { 
+				if( i==initrole ) { 
 					SendMessage(control_role, CB_SETCURSEL, (WPARAM)ind, (LPARAM)0 );
 					valid_opt = 1;
 				}
@@ -473,10 +536,10 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 		/* set selection to the previously selected role
 		   if it is still valid */
 		if( !valid_opt ) {
-			flags.initrole = ROLE_NONE;
-			flags.initrace = ROLE_NONE;
-			flags.initgend = ROLE_NONE;
-			flags.initalign = ROLE_NONE;
+			initrole = ROLE_NONE;
+			initrace = ROLE_NONE;
+			initgend = ROLE_NONE;
+			initalign = ROLE_NONE;
 			SendMessage(control_role, CB_SETCURSEL, (WPARAM)-1, (LPARAM)0 );
 		}
 
@@ -491,10 +554,10 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 		/* reset content and populate the list */
 		SendMessage(control_race, CB_RESETCONTENT, 0, 0); 
 		for (i = 0; races[i].noun; i++)
-			if (ok_race(flags.initrole, i, ROLE_NONE, ROLE_NONE)) {
+			if (ok_race(initrole, i, ROLE_NONE, ROLE_NONE)) {
 				ind = SendMessage(control_race, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(races[i].noun, wbuf, sizeof(wbuf)) ); 
 				SendMessage(control_race, CB_SETITEMDATA, (WPARAM)ind, (LPARAM)i ); 
-				if( i==flags.initrace ) { 
+				if( i==initrace ) { 
 					SendMessage(control_race, CB_SETCURSEL, (WPARAM)ind, (LPARAM)0 );
 					valid_opt = 1;
 				}
@@ -503,9 +566,9 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 		/* set selection to the previously selected race
 		   if it is still valid */
 		if( !valid_opt ) {
-			flags.initrace = ROLE_NONE;
-			flags.initgend = ROLE_NONE;
-			flags.initalign = ROLE_NONE;
+			initrace = ROLE_NONE;
+			initgend = ROLE_NONE;
+			initalign = ROLE_NONE;
 			SendMessage(control_race, CB_SETCURSEL, (WPARAM)-1, (LPARAM)0 );
 		}
 
@@ -520,11 +583,10 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 		/* reset content and populate the list */
 		SendMessage(control_gender, CB_RESETCONTENT, 0, 0); 
 		for (i = 0; i < ROLE_GENDERS; i++)
-			if (ok_gend(flags.initrole, flags.initrace, i,
-						ROLE_NONE)) {
+			if (ok_gend(initrole, initrace, i, ROLE_NONE)) {
 				ind = SendMessage(control_gender, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(genders[i].adj, wbuf, sizeof(wbuf)) ); 
 				SendMessage(control_gender, CB_SETITEMDATA, (WPARAM)ind, (LPARAM)i ); 
-				if( i==flags.initgend ) { 
+				if( i==initgend ) { 
 					SendMessage(control_gender, CB_SETCURSEL, (WPARAM)ind, (LPARAM)0 );
 				}
 			}
@@ -532,8 +594,8 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 		/* set selection to the previously selected gender
 		   if it is still valid */
 		if( !valid_opt ) {
-			flags.initgend = ROLE_NONE;
-			flags.initalign = ROLE_NONE;
+			initgend = ROLE_NONE;
+			initalign = ROLE_NONE;
 			SendMessage(control_gender, CB_SETCURSEL, (WPARAM)-1, (LPARAM)0 );
 		}
 
@@ -548,11 +610,10 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 		/* reset content and populate the list */
 		SendMessage(control_align, CB_RESETCONTENT, 0, 0); 
 		for (i = 0; i < ROLE_ALIGNS; i++)
-			if (ok_align(flags.initrole, flags.initrace,
-							flags.initgend, i)) {
+			if (ok_align(initrole, initrace, initgend, i)) {
 				ind = SendMessage(control_align, CB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(aligns[i].adj, wbuf, sizeof(wbuf)) ); 
 				SendMessage(control_align, CB_SETITEMDATA, (WPARAM)ind, (LPARAM)i ); 
-				if( i==flags.initalign ) { 
+				if( i==initalign ) { 
 					SendMessage(control_align, CB_SETCURSEL, (WPARAM)ind, (LPARAM)0 );
 					valid_opt = 1;
 				}
@@ -561,7 +622,7 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 		/* set selection to the previously selected alignment
 		   if it is still valid */
 		if( !valid_opt ) {
-			flags.initalign = ROLE_NONE;
+			initalign = ROLE_NONE;
 			SendMessage(control_align, CB_SETCURSEL, (WPARAM)-1, (LPARAM)0 );
 		}
 	}
@@ -604,8 +665,7 @@ int	plselFinalSelection(HWND hWnd, int* selection)
 
 	/* check the role */
 	if( flags.initrole==ROLE_RANDOM ) {
-		flags.initrole = pick_role(flags.initrace, flags.initgend,
-					flags.initalign, PICK_RANDOM);
+		flags.initrole = pick_role(flags.initrace, flags.initgend, flags.initalign, PICK_RANDOM);
 		if (flags.initrole < 0) {
 			MessageBox(hWnd, TEXT("Incompatible role!"), TEXT("STOP"), MB_OK);
 			return FALSE;
@@ -617,8 +677,7 @@ int	plselFinalSelection(HWND hWnd, int* selection)
 	if (flags.initrace==ROLE_RANDOM || !validrace(flags.initrole, flags.initrace)) {
 		/* pre-selected race not valid */
 		if (flags.initrace == ROLE_RANDOM) {
-			flags.initrace = pick_race(flags.initrole, flags.initgend,
-							flags.initalign, PICK_RANDOM);
+			flags.initrace = pick_race(flags.initrole, flags.initgend, flags.initalign, PICK_RANDOM);
 		}
 		
 		if (flags.initrace < 0) {
@@ -634,8 +693,7 @@ int	plselFinalSelection(HWND hWnd, int* selection)
 		!validgend(flags.initrole, flags.initrace, flags.initgend)) {
 	    /* pre-selected gender not valid */
 	    if (flags.initgend == ROLE_RANDOM) {
-			flags.initgend = pick_gend(flags.initrole, flags.initrace,
-							flags.initalign, PICK_RANDOM);
+			flags.initgend = pick_gend(flags.initrole, flags.initrace, flags.initalign, PICK_RANDOM);
 		}
 		
 		if (flags.initgend < 0) {
@@ -650,8 +708,7 @@ int	plselFinalSelection(HWND hWnd, int* selection)
 		!validalign(flags.initrole, flags.initrace,	flags.initalign)) {
 		/* pre-selected alignment not valid */
 		if (flags.initalign == ROLE_RANDOM) {
-			flags.initalign = pick_align(flags.initrole, flags.initrace,
-							flags.initgend, PICK_RANDOM);
+			flags.initalign = pick_align(flags.initrole, flags.initrace, flags.initgend, PICK_RANDOM);
 		} else {
 			MessageBox(hWnd, TEXT("Incompatible alignment!"), TEXT("STOP"), MB_OK);
 			return FALSE;
