@@ -1297,6 +1297,7 @@ NetHackQtStringRequestor::NetHackQtStringRequestor(NetHackQtKeyBuffer& ks, const
     okay=new QPushButton("Okay",this);
     connect(okay,SIGNAL(clicked()),this,SLOT(accept()));
     connect(&input,SIGNAL(returnPressed()),this,SLOT(accept()));
+    okay->setDefault(TRUE);
 
     setFocusPolicy(StrongFocus);
 }
@@ -4437,6 +4438,7 @@ NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
     connect(q, SIGNAL(clicked()), this, SLOT(reject()));
     QPushButton* c = new QPushButton("New Game",hb);
     connect(c, SIGNAL(clicked()), this, SLOT(accept()));
+    c->setDefault(TRUE);
 
     QButtonGroup* bg = new QButtonGroup(3, Horizontal, "Saved Characters",this);
     vbl->addWidget(bg);
