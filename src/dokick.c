@@ -864,30 +864,46 @@ dokick()
 		    goto ouch;
 		if(IS_TREE(maploc->typ)) {
 		    struct obj *treefruit;
-		    if (rn2(8)) goto ouch;
-		    /* fruit or trouble ? */
-		    if (!rn2(2) && !(maploc->looted & TREE_LOOTED) &&
+		    /* nothing, fruit or trouble? 75:23.5:1.5% */
+		    if (rn2(3)) {
+			if ( !rn2(6) && !(mvitals[PM_KILLER_BEE].mvflags & G_GONE) )
+			    You_hear("a low buzzing."); /* a warning */
+			goto ouch;
+		    }
+		    if (rn2(15) && !(maploc->looted & TREE_LOOTED) &&
 			  (treefruit = rnd_treefruit_at(x, y))) {
-			treefruit->quan = (long)(8 - rnl(8));
+			int nfruit = 8-rnl(7), nfall;
+			treefruit->quan = nfruit;
 			if (is_plural(treefruit))
 			    pline("Some %s fall from the tree!", xname(treefruit));
 			else
 			    pline("%s falls from the tree!", An(xname(treefruit)));
-			scatter(x,y,2,MAY_HIT,treefruit);
+			nfall = scatter(x,y,2,MAY_HIT,treefruit);
+			if ( nfall != nfruit ) {
+			    /* scatter left some in the tree */
+			    pline("%d %s got caught in the branches.",
+				nfruit-nfall, xname(treefruit));
+			}
 			exercise(A_DEX, TRUE);
 			exercise(A_WIS, TRUE);	/* discovered a new food source! */
 			newsym(x, y);
 			maploc->looted |= TREE_LOOTED;
 			return(1);
-		    } else if (!rn2(15) && !(maploc->looted & TREE_SWARM)){
-		    	int cnt = rnl(5) + 1;
+		    } else if (!(maploc->looted & TREE_SWARM)) {
+		    	int cnt = rnl(4) + 2;
+			int made = 0;
 		    	coord mm;
 		    	mm.x = x; mm.y = y;
-			pline("You've attracted the tree's former occupants!");
-			while (cnt--)
-			    if (enexto(&mm, mm.x, mm.y, &mons[PM_KILLER_BEE]))
-				(void) makemon(&mons[PM_KILLER_BEE],
-					       mm.x, mm.y, MM_ANGRY);
+			while (cnt--) {
+			    if (enexto(&mm, mm.x, mm.y, &mons[PM_KILLER_BEE])
+				&& makemon(&mons[PM_KILLER_BEE],
+					       mm.x, mm.y, MM_ANGRY))
+				made++;
+			}
+			if ( made )
+			    pline("You've attracted the tree's former occupants!");
+			else
+			    You("smell stale honey.");
 			maploc->looted |= TREE_SWARM;
 			return(1);
 		    }
