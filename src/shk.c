@@ -522,7 +522,8 @@ register char *enterstring;
 
 	eshkp->bill_p = &(eshkp->bill[0]);
 
-	if (!eshkp->visitct || strncmpi(eshkp->customer, plname, PL_NSIZ)) {
+	if ((!eshkp->visitct || *eshkp->customer) &&
+	    strncmpi(eshkp->customer, plname, PL_NSIZ)) {
 	    /* You seem to be new here */
 	    eshkp->visitct = 0;
 	    eshkp->following = 0;
