@@ -50,14 +50,26 @@
 /*****************************************************************************/
 /* Version 3.4.x */
 
-/*  Patch 2, April 15, 2003
+/*  Patch 3, November 30, 2003
+ *  Several dozen general bug fixes
+ *  Correct several inconsistencies
+ *  Handle level completely filled with monsters better
+ *  Performance enhancements for win32tty port on Windows 98 and Me
+ *  win32gui player selection fixes
+ *  X11 player selection fixes, one of which could be fatal
+ *  Eliminated a gold-in-shop-container cheat
+ *  Synchronize save files and compression algorithms among various Mac ports
+ */
+
+/*  Patch 2, August 30, 2003
  *  Fix a fatal bug that caused a crash when applying figurine, candle, or
- *     bell that gets used up
+ *      bell that gets used up
  *  Fix a fatal bug that triggered a panic when your secondary weapon was
- *     cursed during bones file creation
- *  A few dozen general bug fixes
+ *      cursed during bones file creation
+ *  Several dozen general bug fixes
  *  Fixed some Gnome compilation problems on Redhat 7.2 and 8.0
  *  Fixed a problem in the util Makefile
+ *  Use random() by default under linux instead of lrand48()
  *  win32 tty adjustments and support for loading alternative key handlers
  */
 
