@@ -4,13 +4,13 @@
                     Instructions for compiling and installing
                  NetHack 3.3 on a Windows NT, 2000, or XP system
          ==============================================================
-		      Last revision: January 13, 2002
+		      Last revision: January 22, 2002
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
 
-Credit for the Win32 Graphical version of NetHack (aka Winhack) goes to
-Alex Kompel.
+Credit for the Win32 Graphical version of NetHack (aka Winhack or 
+Nethackw) goes to Alex Kompel who contributed the port.
 
 You can build either the TTY version of NetHack or the Windows Graphical 
 version.  In either case you will need:
@@ -33,11 +33,11 @@ For the tty version using the NT Console I/O subsystem:
 	cd sys\winnt
 	nhsetup TTY
 
-For the graphical version (WinHack)
+For the graphical version (NetHackW)
 	cd sys\winnt
 	nhsetup WIN
 
-The winhacknt subdirectory will be created off the top of the NetHack
+The build subdirectory will be created off the top of the NetHack
 source tree, and files appropriate for the selected build will be moved to the
 appropriate place.  
 
@@ -263,8 +263,8 @@ Setting Up
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
     dat, doc, include, src, sys\share, sys\winnt, util, win\win32, 
-    and at this point, you should also have winhacknt (created by
-    nhsetup.bat executed from sys\winnt.)
+    and at this point, you should also have a build directory (created 
+    by nhsetup.bat executed from sys\winnt.)
 
     Other subdirectories may also be included in your distribution, but
     they are not necessary for building the graphical version of NetHack
@@ -311,29 +311,39 @@ Setting Up
        + levcomp files
        + levstuff files
        + makedefs files
+       + nethackw files
        + recover files
        + tile2bmp files
        + tilemap files
-       + winhack files
 
 6.  On the Visual C menus, choose:
-      Project | Set Active Project | winhack
+      Project | Set Active Project | nethackw
 
-7.  On the Visual C menus once again, choose:
-      Build | Build winhack.exe
+7.  On the Visual C menus again, choose either:
+      Build | Set Active Configuration | nethackw - Win32 Release
+      or
+      Build | Set Active Configuration | nethackw - Win32 Debug
+    
+    The first will create the Release build of NetHackW which does
+    not contain all the debugging information and is smaller, and
+    runs quicker.  The second will create the Debug build of NetHackW.
+    Unless you are debugging NetHackW, choose the Release build.
+
+8.  On the Visual C menus once again, choose:
+      Build | Build nethackw.exe
 
     This starts the build.  If all goes well, you will have a playable
-    game of netack in the "binary" directory.
+    game of netackw in the "binary" directory.
  
     In any case, it is likely that the IDE message window where you are 
     doing the compiling will be occupied for a while.  If all goes well, 
-    you will get an NetHack executable called winhack.exe in the "binary"
+    you will get an NetHack executable called nethackw.exe in the "binary"
     directory, along with all the support files that it needs.
 
 Running NetHack
 
-7.  Make sure all of the support files -- Guidebook.txt, license,
-    Defaults.nh, winhack.exe, nhdat, tiles.bmp, and recover.exe 
+9.  Make sure all of the support files -- Guidebook.txt, license,
+    Defaults.nh, nethackw.exe, nhdat, tiles.bmp, and recover.exe 
     -- were copied to the binary directory.  
     (If not, find them in the tree and move them there yourself if they
      exist.  If they don't exist, something has gone wrong)
@@ -344,32 +354,32 @@ Running NetHack
 
     Edit Defaults.nh to reflect your particular setup and personal 
     preferences, by following the comments.  As with all releases since
-    3.2.1, HACKDIR defaults to the same directory as that where the winhack.exe 
+    3.2.1, HACKDIR defaults to the same directory as that where the nethackw.exe 
     executable resides.  You only need to set HACKDIR in Defaults.nh if, 
     for some reason, you wish to override that.
   
-8a. Running from the command prompt:
+10a. Running from the command prompt:
 
     If you add the directory containing the NetHack executable
     to your PATH, 
-    You can just type "winhack" to start it up.  Alternatively, you 
+    You can just type "nethackw" to start it up.  Alternatively, you 
     can explicitly invoke it with a command such as 
-    "c:\games\nethack\winhack" (specifying whatever drive and directory 
+    "c:\games\nethack\nethackw" (specifying whatever drive and directory 
     your NetHack executable resides in) each time.
 
 
-8b. Running from a Windows shortcut (win95 or NT4.x)
+10b. Running from a Windows shortcut (win95 or NT4.x)
 
     If you will be running it by launching it from program manager
     or from a shortcut, just use the following information when 
     setting up the icon or shortcut.
 
          Description      :  NetHack 3.3.2 
-         Command Line     :  C:\GAMES\NETHACK\WINHACK.EXE
+         Command Line     :  C:\GAMES\NETHACK\NETHACKW.EXE
 
    (changing the directory in the Command Line to the appropriate one of course)
 
-9. Play NetHack.  If it works, you're done!
+11. Play NetHack.  If it works, you're done!
 
 
 PROBLEMS

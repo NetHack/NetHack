@@ -68,7 +68,7 @@ copy ..\..\win\win32\tile2bmp.dsp  ..\..\build >nul
 copy ..\..\win\win32\tiles.dsp     ..\..\build >nul
 copy ..\..\win\win32\tiles.mak     ..\..\build >nul
 copy ..\..\win\win32\tilemap.dsp   ..\..\build >nul
-copy ..\..\win\win32\winhack.dsp   ..\..\build >nul
+copy ..\..\win\win32\nethackw.dsp   ..\..\build >nul
 
 echo.
 echo "Decoding/Copying a couple of bitmaps"

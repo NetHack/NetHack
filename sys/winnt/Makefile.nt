@@ -1,7 +1,7 @@
-#       SCCS Id: @(#)Makefile.nt       3.3     $Date$
+#       SCCS Id: @(#)Makefile.nt       3.3     2002/01/22
 #       Copyright (c) NetHack PC Development Team 1993-2001
 #
-#       NetHack 3.3.x Makefile for MS Visual C++ V4.x and above and MS NMAKE
+#       NetHack 3.3.x Makefile for MS Visual C++ V6.x and above and MS NMAKE
 #  
 #       Win32 Compilers Tested:
 #                              - Microsoft 32 bit Visual C++ V4.x
@@ -31,10 +31,10 @@ APPVER=4.0
 
 #
 #  Set the gamedir according to your preference.  
-#  It must be present prior to compilation.
+#  If not present prior to compilation it gets created.
 
 GAME    = NetHack                 # Game Name
-GAMEDIR = \games\nethackntty      # Game directory
+GAMEDIR = ..\binary               # Game directory
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -529,6 +529,7 @@ tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 #
 
 $(GAMEFILE) : $(ALLOBJ)
+	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
 	@$(link) $(LFLAGS) -out:$@ @<<$(GAME).lnk
 		$(ALLOBJ:^	=^
@@ -553,6 +554,8 @@ $(U)makedefs.exe:	$(MAKEOBJS)
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
 		 $(INCL)\monsym.h    $(INCL)\qtext.h	$(INCL)\patchlevel.h \
 		 $(U)makedefs.c
+	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
+	@if not exist $(OBJ)\*.* mkdir $(OBJ)
 	@$(CC) $(CFLAGSU) -Fo$@ $(U)makedefs.c
 
 #
@@ -706,8 +709,9 @@ $(U)dgn_$(LEX).c: $(U)dgn_comp.l
 #==========================================
 
 $(O)obj.tag:
-	@if not exist $(O)*.* mkdir $(OBJ)
-	@echo directory $(OBJ) created >$@
+	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
+	@if not exist $(OBJ)\*.* mkdir $(OBJ)
+	@echo directory created >$@
 
 #==========================================
 # Notify of any CL environment variables
