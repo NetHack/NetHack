@@ -1,0 +1,106 @@
+# Sample config file for win32 NetHack
+# A '#' at the beginning of a line means the rest of the line is a comment.
+#
+# Some options MUST be set in this file, other options can be toggled while
+# playing.  For a list of options available see the <opthelp.> file.
+#
+# To change the configuration, comment out the unwanted lines, and
+# uncomment the configuration you want.
+
+# Use the IBM character set rather than just plain ascii characters.
+OPTIONS=IBMGraphics
+
+# *** OPTIONS ***
+# Some options to set personal preferences.  Uncomment and change these to
+# suit your personal preference.  If several people are to use the same
+# configuration, options like these should not be set.
+#
+#OPTIONS=name:Janet,role:Valkyrie,race:Human,gender:female,align:lawful
+#OPTIONS=dogname:Fido,catname:Morris,fruit:guava
+#OPTIONS=horsename:Silver
+#OPTIONS=autopickup,pickup_types:$"=/!?+
+#OPTIONS=packorder:")[%?+/=!(*0_`
+#OPTIONS=scores:10 top/2 around/own
+#OPTIONS=nolegacy,noverbose
+#OPTIONS=menustyle:traditional
+
+#
+# General options.  You might also set "silent" so as not to attract
+# the boss's attention.
+#
+OPTIONS=time,noshowexp,number_pad,lit_corridor,rest_on_space
+#
+# If you want to get rid of "use #quit to quit..." use:
+#OPTIONS=suppress_alert:3.3.1
+#
+
+#
+#HACKDIR=c:\games\nethack
+# 
+# Note: Under MSDOS ports HACKDIR defaults to the location 
+#       of the NetHack.exe file. Setting HACKDIR above will override that.
+#
+#   LEVELS and SAVE default to HACKDIR
+#
+#LEVELS=c:\games\nethack\bones
+#SAVE=c:\games\nethack\bones
+
+# *** CHARACTER GRAPHICS ***
+#
+# See the on-line help or the Guidebook for which symbols are in which
+# positions.
+#
+# If you merely set the IBMgraphics option as above, NetHack will use IBM
+# extended ASCII for dungeon characters.  If you don't like the selections,
+# you can make up your own via these graphics options, but you should still
+# set IBMgraphics if you are using IBM graphics characters to get the correct
+# processing.
+#
+# ================================================
+# An example using the IBM graphics character set:
+#DUNGEON=  032 179 196 218 191 192 217 197 193 194 \
+#	   180 195 249 239 239 254 254 240 241 249 \
+#	   177 177 060 062 060 062 220 124 190 035 \
+#	   244 247 249 247 042 042 186 205 046 035 \
+#	   247
+#
+#TRAPS=    094 094 094 094 094 094 094 094 094 094 \
+#	   094 094 094 094 232 232 232 157 094 094 \
+#	   094 094
+#
+#EFFECTS=  179 196 092 047 042 033 041 040	   \
+#	   048 035 064 042			   \
+#	   047 045 092 058 058 092 045 047	   \
+#	   047 045 092 058 032 058 092 045 047
+#
+# ================================================
+# Some alternatives:
+#DUNGEON=  032 186 205 201 187 200 188 206 202 203 \
+#	   185 204 249 239 239 254 254 240 241 249 \
+#	   177 177 060 062 060 062 095 124 092 035 \
+#	   244 247 249 247 042 042 179 196 046 035 \
+#	   247
+#
+#TRAPS=    094 094 094 094 094 094 094 094 094 094 \
+#	   094 094 094 094 094 034 094 094 094 094 \
+#	   094 094
+
+# ================================================
+# Here is a recommendation sent in by Michael Feir
+# for use by blind NetHack players.
+#
+#DUNGEON=  032 124 045 124 124 124 124 045 045 045 \
+#          124 124 046 045 124 043 043 046 035 035 \
+#          060 062 060 062 095 092 035 126 126 126 \
+#          126 042 042 035 035 032 035 126
+#
+#TRAPS=    094 094 094 094 094 094 094 094 094 094 \
+#          094 094 094 094 094 094 094 094 094 094 \
+#          094 094
+#
+#EFFECTS=  124 095 092 047 042 033 041 040         \
+#          048 035 064 042                         \
+#          047 045 092 058 058 092 045 047         \
+#          047 045 092 058 032 058 092 045 047
+
+
