@@ -1057,6 +1057,8 @@ opentin()		/* called during each move whilst opening a tin */
 		 !tin.tin->no_charge)
 		|| tin.tin->unpaid)) {
 		verbalize("You open it, you bought it!");
+		/* charge for one at pre-eating cost */
+		if(tin.tin->quan > 1L) tin.tin = splitobj(tin.tin, 1L);
 		bill_dummy_object(tin.tin);
 	    }
 
@@ -1090,6 +1092,8 @@ opentin()		/* called during each move whilst opening a tin */
 		 !tin.tin->no_charge)
 		|| tin.tin->unpaid)) {
 		verbalize("You open it, you bought it!");
+		/* charge for one at pre-eating cost */
+		if(tin.tin->quan > 1L) tin.tin = splitobj(tin.tin, 1L);
 		bill_dummy_object(tin.tin);
 	    }
 
