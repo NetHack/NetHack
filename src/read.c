@@ -1060,11 +1060,16 @@ register struct obj	*sobj;
 		return(1);
 	case SCR_CHARGING:
 		if (confused) {
-		    You_feel("charged up!");
-		    if (u.uen < u.uenmax)
-			u.uen = u.uenmax;
-		    else
-			u.uen = (u.uenmax += d(5,4));
+		    if (sobj->cursed) {
+			You_feel("discharged.");
+			u.uen = 0;
+		    } else {
+			You_feel("charged up!");
+			if (u.uen < u.uenmax)
+			    u.uen = u.uenmax;
+			else
+			    u.uen = (u.uenmax += d(5,4));
+		    }
 		    flags.botl = 1;
 		    break;
 		}
