@@ -18,7 +18,9 @@ STATIC_DCL int  FDECL(shkinit, (const struct shclass *,struct mkroom *));
 
 static const char * const shkliquors[] = {
     /* Ukraine */
-    "Njezjin", "Tsjernigof", "Gomel", "Ossipewsk", "Gorlowka",
+    "Njezjin", "Tsjernigof", "Ossipewsk", "Gorlowka",
+    /* Belarus */
+    "Gomel",
     /* N. Russia */
     "Konosja", "Weliki Oestjoeg", "Syktywkar", "Sablja",
     "Narodnaja", "Kyzyl",
