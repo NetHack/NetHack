@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)maccurs.c	3.1	93/01/24		  */
+/*	SCCS Id: @(#)maccurs.c	3.5	1993/01/24		  */
 /* Copyright (c) Jon W{tte, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

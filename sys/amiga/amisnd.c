@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)amisnd.c	3.2	2000/01/12*/
+/*	SCCS Id: @(#)amisnd.c	3.5	2000/01/12*/
 /* 	Copyright (c) 1992, 1993, 1995 by Gregg Wonderly */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)winmenu.c	3.2	96/02/17	*/
+/*	SCCS Id: @(#)winmenu.c	3.5	1996/02/17	*/
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993,1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 

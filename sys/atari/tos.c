@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)tos.c	3.1	90/14/08
+/*	SCCS Id: @(#)tos.c	3.5	1990/14/08
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*

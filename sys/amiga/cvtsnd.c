@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cvtsnd.c	3.2	95/09/10                  */
+/*	SCCS Id: @(#)cvtsnd.c	3.5	1995/09/10                  */
 /* 	Copyright (c) 1995, Andrew Church, Olney, Maryland        */
 /* NetHack may be freely redistributed.  See license for details. */
 

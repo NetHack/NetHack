@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dprintf.c	3.1	94/01/29		  */
+/*	SCCS Id: @(#)dprintf.c	3.5	1994/01/29		  */
 /* Copyright (c) Jon W{tte, 1993.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
