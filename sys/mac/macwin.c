@@ -2267,7 +2267,7 @@ mac_putstr (winid win, int attr, const char *str) {
 	if (win == WIN_MESSAGE) {
 		r.right  -= SBARWIDTH;
 		r.bottom -= SBARHEIGHT;
-		if (flags.page_wait && 
+		if (sysflags.page_wait && 
 			aWin->last_more_lin <= aWin->y_size - (r.bottom - r.top) / aWin->row_height) {
 			aWin->last_more_lin = aWin->y_size;
 			mac_display_nhwindow(win, TRUE);

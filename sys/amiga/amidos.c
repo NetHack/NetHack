@@ -266,8 +266,7 @@ saveDiskPrompt(start)
 {
     char buf[BUFSIZ], *bp;
     BPTR fileLock;
-
-    if (flags.asksavedisk) {
+    if (sysflags.asksavedisk) {
 	    /* Don't prompt if you can find the save file */
 	if (fileLock = Lock(SAVEF, SHARED_LOCK)) {
 	    UnLock(fileLock);

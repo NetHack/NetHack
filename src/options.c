@@ -7,6 +7,9 @@
 #include "objclass.h"
 #include "flag.h"
 NEARDATA struct flag flags;	/* provide linkage */
+#ifdef SYSFLAGS
+NEARDATA struct sysflag sysflags;	/* provide linkage */
+#endif
 NEARDATA struct instance_flags iflags;	/* provide linkage */
 #define static
 #else
@@ -40,14 +43,14 @@ static struct Bool_Opt
 	int optflags;
 } boolopt[] = {
 	{"acoustics", &flags.acoustics, TRUE, SET_IN_GAME},
-#ifdef AMIGA
-	{"altmeta", &flags.altmeta, TRUE, DISP_IN_GAME},
+#if defined(SYSFLAGS) && defined(AMIGA)
+	{"altmeta", &sysflags.altmeta, TRUE, DISP_IN_GAME},
 #else
 	{"altmeta", (boolean *)0, TRUE, DISP_IN_GAME},
 #endif
 	{"ascii_map",     &iflags.wc_ascii_map, !PREFER_TILED, SET_IN_GAME},	/*WC*/
-#ifdef MFLOPPY
-	{"asksavedisk", &flags.asksavedisk, FALSE, SET_IN_GAME},
+#if defined(SYSFLAGS) && defined(MFLOPPY)
+	{"asksavedisk", &sysflags.asksavedisk, FALSE, SET_IN_GAME},
 #else
 	{"asksavedisk", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
@@ -95,8 +98,8 @@ static struct Bool_Opt
 #endif
 	{"female", &flags.female, FALSE, DISP_IN_GAME},
 	{"fixinv", &flags.invlet_constant, TRUE, SET_IN_GAME},
-#ifdef AMIFLUSH
-	{"flush", &flags.amiflush, FALSE, SET_IN_GAME},
+#if defined(SYSFLAGS) && defined(AMIFLUSH)
+	{"flush", &sysflags.amiflush, FALSE, SET_IN_GAME},
 #else
 	{"flush", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
@@ -140,8 +143,8 @@ static struct Bool_Opt
 	{"news", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"null", &flags.null, TRUE, SET_IN_GAME},
-#ifdef MAC
-	{"page_wait", &flags.page_wait, TRUE, SET_IN_GAME},
+#if defined(SYSFLAGS) && defined(MAC)
+	{"page_wait", &sysflags.page_wait, TRUE, SET_IN_GAME},
 #else
 	{"page_wait", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
@@ -500,6 +503,10 @@ initoptions()
 		if (boolopt[i].addr)
 			*(boolopt[i].addr) = boolopt[i].initvalue;
 	}
+#ifdef SYSFLAGS
+	Strcpy(sysflags.sysflagsid, "sysflags");
+	sysflags.sysflagsid[9] = (char)sizeof(struct sysflag);
+#endif
 	flags.end_own = FALSE;
 	flags.end_top = 3;
 	flags.end_around = 2;

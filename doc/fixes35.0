@@ -98,3 +98,7 @@ tty: add window port routines for saving/restoring message history
 Code Cleanup and Reorganization
 -------------------------------
 removed OVLx section dividers previously  used for TRAMPOLINE overlay system
+move all flags that are system or port specific from flag struct to sysflags 
+	struct which is used only if SYSFLAGS is defined
+all fields in flags struct are unconditionally present
+

@@ -137,6 +137,9 @@ struct trap *ftrap = (struct trap *)0;
 NEARDATA struct monst youmonst = DUMMY;
 NEARDATA struct context_info context = DUMMY;
 NEARDATA struct flag flags = DUMMY;
+#ifdef SYSFLAGS
+NEARDATA struct sysflag sysflags = DUMMY;
+#endif
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
 

@@ -277,7 +277,7 @@ int start;
 
 	int fd;
 
-	if (flags.asksavedisk) {
+	if (sysflags.asksavedisk) {
 		/* Don't prompt if you can find the save file */
 		if ((fd = open_savefile()) >= 0) {
 			(void) close(fd);
@@ -348,7 +348,7 @@ comspec_exists()
 void
 gameDiskPrompt()
 {
-	if (flags.asksavedisk) {
+	if (sysflags.asksavedisk) {
 		if (record_exists() && comspec_exists())
 			return;
 		(void) putchar('\n');

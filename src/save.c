@@ -287,6 +287,9 @@ register int fd, mode;
 	bwrite(fd, (genericptr_t) &uid, sizeof uid);
 	bwrite(fd, (genericptr_t) &context, sizeof(struct context_info));
 	bwrite(fd, (genericptr_t) &flags, sizeof(struct flag));
+#ifdef SYSFLAGS
+	bwrite(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
+#endif
 #ifndef GOLDOBJ
 	if (u.ugold) {
 		struct obj *goldobj = mksobj(GOLD_PIECE, FALSE, FALSE);

@@ -383,6 +383,9 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	mread(fd, (genericptr_t) &context, sizeof(struct context_info));
 	mread(fd, (genericptr_t) &flags, sizeof(struct flag));
 	if (remember_discover) discover = remember_discover;
+#ifdef SYSFLAGS
+	mread(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
+#endif
 
 	role_init();	/* Reset the initial role, race, gender, and alignment */
 #ifdef AMII_GRAPHICS

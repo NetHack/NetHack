@@ -187,7 +187,7 @@ register struct IntuiMessage *message;
 
     /* Allow ALT to function as a META key ... */
     /* But make it switchable - alt is needed for some non-US keymaps */
-    if(flags.altmeta)
+    if(sysflags.altmeta)
 	qualifier &= ~(IEQUALIFIER_LALT | IEQUALIFIER_RALT);
     numeric_pad = (qualifier & IEQUALIFIER_NUMERICPAD) != 0;
 
@@ -293,7 +293,7 @@ arrow:
            and prevent it from interfering with # command (M-#) */
 	if (length == ('#'|0x80))
 	    return '#';
-	if (alt && flags.altmeta)
+	if (alt && sysflags.altmeta)
 	    length |= 0x80;
 	return(length);
     } /* else shift, ctrl, alt, amiga, F-key, shift-tab, etc */
@@ -813,7 +813,7 @@ GetFMsg(port)
     struct IntuiMessage *msg,*succ,*succ1;
 
     if(msg=(struct IntuiMessage *)GetMsg(port)){
-	if(!flags.amiflush)return((struct Message *)msg);
+	if(!sysflags.amiflush)return((struct Message *)msg);
 	if(msg->Class==RAWKEY){
 	    Forbid();
 	    succ=(struct IntuiMessage *)(port->mp_MsgList.lh_Head);

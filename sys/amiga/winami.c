@@ -1256,7 +1256,7 @@ SetBorder( gd )
     register short *sp;
     register int i, inc = -1, dec = -1;
     int borders = 6;
-    int hipen = flags.amii_dripens[ SHINEPEN ], shadowpen = flags.amii_dripens[ SHADOWPEN ];
+    int hipen = sysflags.amii_dripens[ SHINEPEN ], shadowpen = sysflags.amii_dripens[ SHADOWPEN ];
 #ifdef	INTUI_NEW_LOOK
     struct DrawInfo *dip;
 #endif

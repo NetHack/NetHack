@@ -121,7 +121,7 @@ ami_wininit_data( void )
 #ifdef OPT_DISPMAP
     dispmap_sanity();
 #endif
-    memcpy(flags.amii_dripens,amii_defpens,sizeof(flags.amii_dripens));
+    memcpy(sysflags.amii_dripens,amii_defpens,sizeof(sysflags.amii_dripens));
 }
 
 # ifdef	INTUI_NEW_LOOK
@@ -1228,7 +1228,7 @@ amii_init_nhwindows(argcp,argv)
 		    break;
 
 		case SA_Pens:
-		    scrntags[i].ti_Data = (long)flags.amii_dripens;
+		    scrntags[i].ti_Data = (long)sysflags.amii_dripens;
 		    break;
 	    }
 	}
@@ -1239,7 +1239,7 @@ amii_init_nhwindows(argcp,argv)
 	amii_bmhd = ReadTileImageFiles( );
     else
 	memcpy( amii_initmap, amii_init_map, sizeof( amii_initmap ) );
-    memcpy(flags.amii_curmap,amii_initmap,sizeof(flags.amii_curmap));
+    memcpy(sysflags.amii_curmap,amii_initmap,sizeof(sysflags.amii_curmap));
 
     /* Find out how deep the screen needs to be, 32 planes is enough! */
     for( i = 0; i < 32; ++i )
@@ -1286,7 +1286,7 @@ amii_init_nhwindows(argcp,argv)
     amiIDisplay->ypix = HackScreen->Height;
     amiIDisplay->xpix = HackScreen->Width;
 
-    LoadRGB4(&HackScreen->ViewPort, flags.amii_curmap, amii_numcolors );
+    LoadRGB4(&HackScreen->ViewPort, sysflags.amii_curmap, amii_numcolors );
 
     VisualInfo = GetVisualInfo(HackScreen, TAG_END);
     MenuStrip = CreateMenus(GTHackMenu, TAG_END);

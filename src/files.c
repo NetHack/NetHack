@@ -1792,9 +1792,9 @@ char		*tmp_levels;
 			}
 #  endif
 		}
-# ifdef	MFLOPPY
+# if defined(SYSFLAGS) && defined(MFLOPPY)
 		else
-		    saveprompt = flags.asksavedisk;
+		    saveprompt = sysflags.asksavedisk;
 # endif
 
 		(void) strncpy(SAVEP, bufp, SAVESIZE-1);
@@ -1866,14 +1866,16 @@ char		*tmp_levels;
 		extern int amii_numcolors;
 		int val = atoi( bufp );
 		amii_numcolors = 1L << min( DEPTH, val );
+#if defined(SYSFLAGS)
 	} else if (match_varname(buf, "DRIPENS", 7)) {
 		int i, val;
 		char *t;
 		for (i = 0, t = strtok(bufp, ",/"); t != (char *)0;
 				i < 20 && (t = strtok((char*)0, ",/")), ++i) {
 			sscanf(t, "%d", &val );
-			flags.amii_dripens[i] = val;
+			sysflags.amii_dripens[i] = val;
 		}
+#endif
 	} else if (match_varname(buf, "SCREENMODE", 10 )) {
 		extern long amii_scrnmode;
 		if (!stricmp(bufp,"req"))

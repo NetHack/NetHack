@@ -517,7 +517,7 @@ amiv_flush_glyph_buffer( vw )
     amiv_start_glyphout( WIN_MAP );
 
 #ifdef OPT_DISPMAP
-    if(flags.fast_map){
+    if(sysflags.fast_map){
 #endif
 #ifdef DISPMAP
 	display_map( vw );
@@ -756,7 +756,7 @@ amiv_lprint_glyph(window,color_index, glyph)
 						w->Height - 1 );
 
 #ifdef OPT_DISPMAP
-	if(flags.fast_map){
+	if(sysflags.fast_map){
 #endif /* keni */
 #ifdef	DISPMAP
 	/* display_map() needs byte-aligned destinations, and we don't want to
@@ -789,7 +789,7 @@ amiv_lprint_glyph(window,color_index, glyph)
 	struct RastPort *rp = w->RPort;
 	x = rp->cp_x - pictdata.xsize - 3;
 #ifdef OPT_DISPMAP
-	if(flags.fast_map){
+	if(sysflags.fast_map){
 #endif
 #ifdef DISPMAP
 		x &= -8;
@@ -823,11 +823,11 @@ amiv_lprint_glyph(window,color_index, glyph)
 		pictdata.xsize, pictdata.ysize, 0xc0 );
 
 	    apen = rp->FgPen;
-	    SetAPen( rp, flags.amii_dripens[ SHINEPEN ] );
+	    SetAPen( rp, sysflags.amii_dripens[ SHINEPEN ] );
 	    Move( rp, x-1, y + pictdata.ysize );
 	    Draw( rp, x-1, y - 1 );
 	    Draw( rp, x + pictdata.xsize, y - 1 );
-	    SetAPen( rp, flags.amii_dripens[ SHADOWPEN ] );
+	    SetAPen( rp, sysflags.amii_dripens[ SHADOWPEN ] );
 	    Move( rp, x + pictdata.xsize, y );
 	    Draw( rp, x + pictdata.xsize, y + pictdata.ysize );
 	    Draw( rp, x, y + pictdata.ysize );
@@ -1232,7 +1232,7 @@ dispmap_sanity(){
 	    mxsize != mysize ||
 	    dispmap_sanity1(mxsize) ||
 	    dispmap_sanity1(mysize)){
-		flags.fast_map = 0;
+		sysflags.fast_map = 0;
 	}
 }
 int

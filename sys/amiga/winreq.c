@@ -336,8 +336,8 @@ EditColor( )
     if( okay )
     {
 	for( i = 0; i < ( amii_numcolors ); ++i )
-		flags.amii_curmap[ i ] = colors[ i ];
-	LoadRGB4( &scrn->ViewPort, flags.amii_curmap, amii_numcolors );
+		sysflags.amii_curmap[ i ] = colors[ i ];
+	LoadRGB4( &scrn->ViewPort, sysflags.amii_curmap, amii_numcolors );
     }
     else
 	LoadRGB4( &scrn->ViewPort, svcolors, amii_numcolors );
@@ -781,7 +781,7 @@ DrawCol( w, idx, colors )
 
 	if( i == idx )
 	{
-		SetAPen( w->RPort, flags.amii_dripens[ SHADOWPEN ] );
+		SetAPen( w->RPort, sysflags.amii_dripens[ SHADOWPEN ] );
 		Move( w->RPort, x, y+bxylen-4 );
 		Draw( w->RPort, x, y );
 		Draw( w->RPort, x+incx-1, y );
@@ -790,7 +790,7 @@ DrawCol( w, idx, colors )
 		Draw( w->RPort, x+1, y+1 );
 		Draw( w->RPort, x+incx-2, y+1 );
 
-		SetAPen( w->RPort, flags.amii_dripens[ SHINEPEN ] );
+		SetAPen( w->RPort, sysflags.amii_dripens[ SHINEPEN ] );
 		Move( w->RPort, x+incx-1, y+1 );
 		Draw( w->RPort, x+incx-1, y+bxylen-4 );
 		Draw( w->RPort, x, y+bxylen-4 );
@@ -908,7 +908,7 @@ amii_setpens( int count )
 	    args[1] = amii_numcolors;
 	    if( EasyRequest( NULL, &ea2, NULL, args ) == 1 )
 	    {
-		memcpy( flags.amii_curmap, amii_initmap,
+		memcpy( sysflags.amii_curmap, amii_initmap,
 			amii_numcolors*sizeof(amii_initmap[0]));
 	    }
 	}
@@ -919,7 +919,7 @@ amii_setpens( int count )
 	{
 	    if( EasyRequest( NULL, &ea, NULL, NULL ) == 1 )
 	    {
-		memcpy( flags.amii_curmap, amii_initmap,
+		memcpy( sysflags.amii_curmap, amii_initmap,
 			amii_numcolors*sizeof(amii_initmap[0]));
 	    }
 	}
@@ -928,7 +928,7 @@ amii_setpens( int count )
 #endif
     if( count != amii_numcolors )
     {
-	memcpy( flags.amii_curmap, amii_initmap,
+	memcpy( sysflags.amii_curmap, amii_initmap,
 		amii_numcolors*sizeof(amii_initmap[0]));
     }
 
@@ -937,7 +937,7 @@ amii_setpens( int count )
      */
     if( HackScreen != NULL )
     {
-	LoadRGB4( &HackScreen->ViewPort, flags.amii_curmap, amii_numcolors );
+	LoadRGB4( &HackScreen->ViewPort, sysflags.amii_curmap, amii_numcolors );
     }
 }
 
@@ -1151,12 +1151,12 @@ void amii_change_color( pen, val, rev )
     long val;
 {
     if( rev )
-	flags.amii_curmap[ pen ] = ~val;
+	sysflags.amii_curmap[ pen ] = ~val;
     else
-	flags.amii_curmap[ pen ] = val;
+	sysflags.amii_curmap[ pen ] = val;
 
     if( HackScreen )
-	LoadRGB4( &HackScreen->ViewPort, flags.amii_curmap, amii_numcolors );
+	LoadRGB4( &HackScreen->ViewPort, sysflags.amii_curmap, amii_numcolors );
 }
 
 char *
@@ -1169,7 +1169,7 @@ amii_get_color_string( )
     *buf = 0;
     for( i = 0; i < min(32,amii_numcolors); ++i )
     {
-    	sprintf( s, "%s%03lx", i ? "/" : "", (long)flags.amii_curmap[ i ] );
+    	sprintf( s, "%s%03lx", i ? "/" : "", (long)sysflags.amii_curmap[ i ] );
    	strcat( buf, s );
     }
 

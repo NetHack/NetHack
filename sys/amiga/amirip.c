@@ -121,7 +121,7 @@ int how;
     newwin.Screen = HackScreen;
 
     for( i = 0; i < amii_numcolors; ++i )
-	flags.amii_curmap[i] = GetRGB4( HackScreen->ViewPort.ColorMap, i );
+	sysflags.amii_curmap[i] = GetRGB4( HackScreen->ViewPort.ColorMap, i );
 
     ripwin = OpenWindow( (void *)&newwin );
     if( !ripwin ) goto cleanup;
@@ -310,7 +310,7 @@ cleanup:
 	CloseWindow( ripwin );
 	Permit();
     }
-    LoadRGB4( &HackScreen->ViewPort, flags.amii_curmap, amii_numcolors );
+    LoadRGB4( &HackScreen->ViewPort, sysflags.amii_curmap, amii_numcolors );
 
     if(tbmp[0])FreeImageFiles(load_list, tbmp);
     if(just_return) return;
