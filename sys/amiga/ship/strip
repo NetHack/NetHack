@@ -1,0 +1,13 @@
+.KEY fil/a
+
+. strip for Amiga
+IF NOT EXISTS <fil>
+  echo "File <fil> not found>"
+  QUIT 10
+ENDIF
+
+FAILAT 1
+
+slink <fil> TO t:striptmp NODEBUG
+copy t:striptmp TO <fil>
+QUIT
