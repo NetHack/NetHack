@@ -487,6 +487,12 @@ struct obj *instr;
     if (Underwater) {
 	You_cant("play music underwater!");
 	return(0);
+    } else if ((instr->otyp == WOODEN_FLUTE || instr->otyp == MAGIC_FLUTE ||
+		instr->otyp == TOOLED_HORN || instr->otyp == FROST_HORN ||
+		instr->otyp == FIRE_HORN || instr->otyp == BUGLE) &&
+	       !can_blow(&youmonst)) {
+	You("are incapable of playing %s.", the(distant_name(instr, xname)));
+	return(0);
     }
     if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE) {
 	c = yn("Improvise?");

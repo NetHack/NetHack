@@ -247,6 +247,18 @@ struct permonst *mptr;
 }
 
 boolean
+can_blow(mtmp)		/* returns TRUE if monster can blow (whistle, etc) */
+register struct monst *mtmp;
+{
+	if ((is_silent(mtmp->data) || mtmp->data->msound == MS_BUZZ) &&
+	    (breathless(mtmp->data) || verysmall(mtmp->data) ||
+	     !has_head(mtmp->data) || mtmp->data->mlet == S_EEL))
+	    return FALSE;
+	if ((mtmp == &youmonst) && Strangled) return FALSE;
+	return TRUE;
+}
+
+boolean
 can_track(ptr)		/* returns TRUE if monster can track well */
 	register struct permonst *ptr;
 {

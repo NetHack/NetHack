@@ -389,9 +389,7 @@ STATIC_OVL void
 use_whistle(obj)
 struct obj *obj;
 {
-	if ((is_silent(youmonst.data) || youmonst.data->msound == MS_BUZZ) &&
-	    (breathless(youmonst.data) || verysmall(youmonst.data) ||
-	     !has_head(youmonst.data) || youmonst.data->mlet == S_EEL)) {
+	if (!can_blow(&youmonst)) {
 	    You("are incapable of using the whistle.");
 	} else if(Underwater) {
 	    You("blow bubbles through %s.", yname(obj));
@@ -407,9 +405,7 @@ struct obj *obj;
 {
 	register struct monst *mtmp, *nextmon;
 
-	if ((is_silent(youmonst.data) || youmonst.data->msound == MS_BUZZ) &&
-	    (breathless(youmonst.data) || verysmall(youmonst.data) ||
-	     !has_head(youmonst.data) || youmonst.data->mlet == S_EEL)) {
+	if (!can_blow(&youmonst)) {
 		You("are incapable of using the whistle.");
 	} else if (obj->cursed && !rn2(2)) {
 		You("produce a %shigh-pitched humming noise.",
