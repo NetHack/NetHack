@@ -2782,6 +2782,32 @@ struct obj *obj;			/* object tossed/used */
 		    break;	/* physical objects fall onto sink */
 #endif
 	    }
+	    /* limit range of ball so hero won't make an invalid move */
+	    if (weapon == THROWN_WEAPON && range > 0 &&
+		obj->otyp == HEAVY_IRON_BALL) {
+		struct obj *bobj;
+		struct trap *t;
+		if ((bobj = sobj_at(BOULDER, x, y)) != 0) {
+		    if (cansee(x,y))
+			pline("%s hits %s.",
+			      The(distant_name(obj, xname)), an(xname(bobj)));
+		    range = 0;
+		} else if (obj == uball) {
+		    if (!test_move(x - ddx, y - ddy, ddx, ddy, TEST_MOVE)) {
+			/* nb: it didn't hit anything directly */
+			if (cansee(x,y))
+			    pline("%s jerks to an abrupt halt.",
+				  The(distant_name(obj, xname))); /* lame */
+			range = 0;
+		    } else if (In_sokoban(&u.uz) && (t = t_at(x, y)) != 0 &&
+			       (t->ttyp == PIT || t->ttyp == SPIKED_PIT ||
+				t->ttyp == HOLE || t->ttyp == TRAPDOOR)) {
+			/* hero falls into the trap, so ball stops */
+			range = 0;
+		    }
+		}
+	    }
+
 	    /* thrown/kicked missile has moved away from its starting spot */
 	    point_blank = FALSE;	/* affects passing through iron bars */
 	}
