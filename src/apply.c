@@ -925,7 +925,9 @@ struct obj **optr;
 	}
 
 	Sprintf(qbuf, "Attach %s", the(xname(obj)));
-	Sprintf(eos(qbuf), " to %s?", the(xname(otmp)));
+	Sprintf(eos(qbuf), " to %s?",
+		safe_qbuf(qbuf, sizeof(" to ?"), the(xname(otmp)),
+			the(simple_typename(otmp->otyp)), "it"));
 	if(yn(qbuf) == 'n') {
 		if (!obj->lamplit)
 		    You("try to light %s...", the(xname(obj)));
@@ -2561,7 +2563,9 @@ do_break_wand(obj)
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
 
     Strcpy(the_wand, yname(obj));
-    Sprintf(confirm, "Are you really sure you want to break %s?", the_wand);
+    Sprintf(confirm, "Are you really sure you want to break %s?",
+	safe_qbuf(confirm, sizeof("Are you really sure you want to break ?"),
+				the_wand, ysimple_name(obj), "the wand"));
     if (yn(confirm) == 'n' ) return 0;
 
     if (nohands(youmonst.data)) {
