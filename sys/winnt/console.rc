@@ -1,0 +1,11 @@
+/*	SCCS Id: @(#)console.rc	3.4	2002/02/14			*/
+/* Copyright (c) NetHack Win32 Porting Team, 2002. 			*/
+/* NetHack may be freely redistributed.  See license for details. 	*/
+
+#include "windows.h"
+
+1 ICON DISCARDABLE "NetHack.ICO"
+
+
+/*console.rc*/
+
