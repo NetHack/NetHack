@@ -583,17 +583,15 @@ ifeq  "$(GRAPHICAL)" "Y"
 $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag
 else
 $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag \
-	 $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll
+	 $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll $(GAMEDIR)/nhraykey.dll
 endif
 	@echo Linking....
 	@$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES) $(WINPLIBS)
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
-	
-
 
 $(O)nhdefkey.o:
-		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(NTSYS)/nhdefkey.c 
+	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(NTSYS)/nhdefkey.c 
 
 $(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o $(O)gamedir.tag
 	@echo Linking $@
@@ -604,6 +602,14 @@ $(O)nh340key.o:
 	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(NTSYS)/nh340key.c 
 
 $(GAMEDIR)/nh340key.dll : $(O)nh340key.o $(O)gamedir.tag
+	@echo Linking $@
+	$(cc) -shared -Wl,--export-all-symbols \
+		-Wl,--add-stdcall-alias -o $@ $<
+
+$(O)nhraykey.o:
+		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(NTSYS)/nhraykey.c 
+
+$(GAMEDIR)/nhraykey.dll : $(O)nhraykey.o $(O)gamedir.tag
 	@echo Linking $@
 	$(cc) -shared -Wl,--export-all-symbols \
 		-Wl,--add-stdcall-alias -o $@ $<

@@ -612,7 +612,7 @@ $(SRC)\uuid.lib: $(bcclib)\uuid.lib
 	@copy $(bcclib)\uuid.lib $@
 
 $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(SRC)\uuid.lib \
-		$(GAMEDIR)\nhdefkey.dll
+		$(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll $(GAMEDIR)\nhraykey.dll
 	@echo Linking....
 	@$(link) $(lflags) $(startobjg) $(ALLOBJ), $@, $(GAME).map,$(libsmt),,$(NHRES)
 	@if exist $(O)install.tag del $(O)install.tag
@@ -661,12 +661,26 @@ $(GAMEDIR)\nh340key.dll : $(O)nh340key.o
 	@echo EXPORTS >nh340key.def
 	@echo    ProcessKeystroke >>nh340key.def
 	@echo    NHkbhit >>nh340key.def
+	@echo    CheckInput >>nh340key.def
 	@echo    SourceWhere >>nh340key.def
 	@echo    SourceAuthor >>nh340key.def
 	@echo    KeyHandlerName >>nh340key.def
 	@echo Linking $@
 	$(link) $(linkdebug) /Gn /Gz /q -L$(bcclib) /c  /aa /Tpd /V$(APPVER) -L$(bcclib) -v \
 	    c0d32.obj $(O)nh340key.o, $@,nh340key.map,$(libsmt),nh340key.def
+
+$(GAMEDIR)\nhraykey.dll : $(O)nhraykey.o
+	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
+	@echo EXPORTS >nhraykey.def
+	@echo    ProcessKeystroke >>nhraykey.def
+	@echo    NHkbhit >>nhraykey.def
+	@echo    CheckInput >>nhraykey.def
+	@echo    SourceWhere >>nhraykey.def
+	@echo    SourceAuthor >>nhraykey.def
+	@echo    KeyHandlerName >>nhraykey.def
+	@echo Linking $@
+	$(link) $(linkdebug) /Gn /Gz /q -L$(bcclib) /c  /aa /Tpd /V$(APPVER) -L$(bcclib) -v \
+	    c0d32.obj $(O)nhraykey.o, $@,nhraykey.map,$(libsmt),nhraykey.def
 
 #
 #  Secondary Targets.
