@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.4	2002/09/08	*/
+/*	SCCS Id: @(#)do_wear.c	3.4	2002/09/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -635,7 +635,7 @@ Ring_on(obj)
 register struct obj *obj;
 {
     long oldprop = u.uprops[objects[obj->otyp].oc_oprop].extrinsic;
-    int old_attrib;
+    int old_attrib, which;
 
     if (obj == uwep) setuwep((struct obj *) 0);
     if (obj == uswapwep) setuswapwep((struct obj *) 0);
@@ -690,44 +690,31 @@ register struct obj *obj;
 		    self_invis_message();
 		}
 		break;
-	case RIN_ADORNMENT:
-		old_attrib = ACURR(A_CHA);
-		ABON(A_CHA) += obj->spe;
-		flags.botl = 1;
-		if (ACURR(A_CHA) != old_attrib ||
-		    (objects[RIN_ADORNMENT].oc_name_known &&
-		     old_attrib != 25 && old_attrib != 3)) {
-			makeknown(RIN_ADORNMENT);
-			obj->known = TRUE;
-		}
-		break;
 	case RIN_LEVITATION:
-		if(!oldprop && !HLevitation) {
-			float_up();
-			makeknown(RIN_LEVITATION);
-			obj->known = TRUE;
-			spoteffects(FALSE);	/* for sinks */
+		if (!oldprop && !HLevitation) {
+		    float_up();
+		    makeknown(RIN_LEVITATION);
+		    spoteffects(FALSE);	/* for sinks */
 		}
 		break;
 	case RIN_GAIN_STRENGTH:
-		old_attrib = ACURR(A_STR);
-		ABON(A_STR) += obj->spe;
-		flags.botl = 1;
-		if (ACURR(A_STR) != old_attrib ||
-		    (objects[RIN_GAIN_STRENGTH].oc_name_known &&
-		     old_attrib != STR19(25) && old_attrib != 3)) {
-			makeknown(RIN_GAIN_STRENGTH);
-			obj->known = TRUE;
-		}
-		break;
+		which = A_STR;
+		goto adjust_attrib;
 	case RIN_GAIN_CONSTITUTION:
-		old_attrib = ACURR(A_CON);
-		ABON(A_CON) += obj->spe;
-		flags.botl = 1;
-		if (ACURR(A_CON) != old_attrib ||
-		    objects[RIN_GAIN_CONSTITUTION].oc_name_known) {
-			makeknown(RIN_GAIN_CONSTITUTION);
-			obj->known = TRUE;
+		which = A_CON;
+		goto adjust_attrib;
+	case RIN_ADORNMENT:
+		which = A_CHA;
+ adjust_attrib:
+		old_attrib = ACURR(which);
+		ABON(which) += obj->spe;
+		if (ACURR(which) != old_attrib ||
+			(objects[obj->otyp].oc_name_known &&
+			    old_attrib != 25 && old_attrib != 3)) {
+		    flags.botl = 1;
+		    makeknown(obj->otyp);
+		    obj->known = 1;
+		    update_inventory();
 		}
 		break;
 	case RIN_INCREASE_ACCURACY:	/* KMH */
@@ -740,11 +727,11 @@ register struct obj *obj;
 		rescham();
 		break;
 	case RIN_PROTECTION:
-		flags.botl = 1;
 		if (obj->spe || objects[RIN_PROTECTION].oc_name_known) {
-			makeknown(RIN_PROTECTION);
-			obj->known = TRUE;
-			update_inventory();
+		    flags.botl = 1;
+		    makeknown(RIN_PROTECTION);
+		    obj->known = 1;
+		    update_inventory();
 		}
 		break;
     }
@@ -756,12 +743,13 @@ register struct obj *obj;
 boolean gone;
 {
     register long mask = obj->owornmask & W_RING;
-    int old_attrib;
+    int old_attrib, which;
 
     if(!(u.uprops[objects[obj->otyp].oc_oprop].extrinsic & mask))
 	impossible("Strange... I didn't know you had that ring.");
     if(gone) setnotworn(obj);
     else setworn((struct obj *)0, obj->owornmask);
+
     switch(obj->otyp) {
 	case RIN_TELEPORTATION:
 	case RIN_REGENERATION:
@@ -796,40 +784,40 @@ boolean gone;
 		}
 
 		if (Invisible && !Blind) {
-			newsym(u.ux,u.uy);
-			pline("Suddenly you cannot see yourself.");
-			makeknown(RIN_SEE_INVISIBLE);
+		    newsym(u.ux,u.uy);
+		    pline("Suddenly you cannot see yourself.");
+		    makeknown(RIN_SEE_INVISIBLE);
 		}
 		break;
 	case RIN_INVISIBILITY:
 		if (!Invis && !BInvis && !Blind) {
-			newsym(u.ux,u.uy);
-			Your("body seems to unfade%s.",
-			    See_invisible ? " completely" : "..");
-			makeknown(RIN_INVISIBILITY);
+		    newsym(u.ux,u.uy);
+		    Your("body seems to unfade%s.",
+			 See_invisible ? " completely" : "..");
+		    makeknown(RIN_INVISIBILITY);
 		}
-		break;
-	case RIN_ADORNMENT:
-		old_attrib = ACURR(A_CHA);
-		ABON(A_CHA) -= obj->spe;
-		if (ACURR(A_CHA) != old_attrib) makeknown(RIN_ADORNMENT);
-		flags.botl = 1;
 		break;
 	case RIN_LEVITATION:
 		(void) float_down(0L, 0L);
 		if (!Levitation) makeknown(RIN_LEVITATION);
 		break;
 	case RIN_GAIN_STRENGTH:
-		old_attrib = ACURR(A_STR);
-		ABON(A_STR) -= obj->spe;
-		if (ACURR(A_STR) != old_attrib) makeknown(RIN_GAIN_STRENGTH);
-		flags.botl = 1;
-		break;
+		which = A_STR;
+		goto adjust_attrib;
 	case RIN_GAIN_CONSTITUTION:
-		old_attrib = ACURR(A_CON);
-		ABON(A_CON) -= obj->spe;
-		flags.botl = 1;
-		if (ACURR(A_CON) != old_attrib) makeknown(RIN_GAIN_CONSTITUTION);
+		which = A_CON;
+		goto adjust_attrib;
+	case RIN_ADORNMENT:
+		which = A_CHA;
+ adjust_attrib:
+		old_attrib = ACURR(which);
+		ABON(which) -= obj->spe;
+		if (ACURR(which) != old_attrib) {
+		    flags.botl = 1;
+		    makeknown(obj->otyp);
+		    obj->known = 1;
+		    update_inventory();
+		}
 		break;
 	case RIN_INCREASE_ACCURACY:	/* KMH */
 		u.uhitinc -= obj->spe;
@@ -837,6 +825,14 @@ boolean gone;
 	case RIN_INCREASE_DAMAGE:
 		u.udaminc -= obj->spe;
 		break;
+	case RIN_PROTECTION:
+		/* might have forgotten it due to amnesia */
+		if (obj->spe) {
+		    flags.botl = 1;
+		    makeknown(RIN_PROTECTION);
+		    obj->known = 1;
+		    update_inventory();
+		}
 	case RIN_PROTECTION_FROM_SHAPE_CHAN:
 		/* If you're no longer protected, let the chameleons
 		 * change shape again -dgk
