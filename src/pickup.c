@@ -525,7 +525,7 @@ menu_pickup:
 		    continue;
 
 		if (!all_of_a_type) {
-		    char qbuf[QBUFSZ];
+		    char qbuf[BUFSZ];
 		    Sprintf(qbuf, "Pick up %s?", doname(obj));
 		    switch ((obj->quan < 2L) ? ynaq(qbuf) : ynNaq(qbuf)) {
 		    case 'q': goto end_query;	/* out 2 levels */
@@ -1108,7 +1108,7 @@ boolean telekinesis;
 	    if (telekinesis) {
 		result = 0;	/* don't lift */
 	    } else {
-		char qbuf[QBUFSZ];
+		char qbuf[BUFSZ];
 		long savequan = obj->quan;
 
 		obj->quan = *cnt_p;
@@ -1412,7 +1412,7 @@ doloot()	/* loot a container on the floor. */
     boolean underfoot = TRUE;
     const char *dont_find_anything = "don't find anything";
     struct monst *mtmp;
-    char qbuf[QBUFSZ];
+    char qbuf[BUFSZ];
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
 
@@ -1911,7 +1911,7 @@ register int held;
 	struct monst *shkp;
 	boolean one_by_one, allflag, loot_out = FALSE, loot_in = FALSE;
 	char select[MAXOCLASSES+1];
-	char qbuf[QBUFSZ], emptymsg[QBUFSZ];
+	char qbuf[BUFSZ], emptymsg[BUFSZ];
 	long loss = 0L;
 	int cnt = 0, used = 0, lcnt = 0,
 	    menu_on_request;
@@ -2011,11 +2011,12 @@ register int held;
 	    if (flags.menu_style != MENU_TRADITIONAL) {
 		if (flags.menu_style == MENU_FULL) {
 		    int t;
-		    char menuprompt[QBUFSZ];
+		    char menuprompt[BUFSZ];
 		    boolean outokay = (cnt != 0);
 		    boolean inokay = (invent != 0);
 		    if (!outokay && !inokay) {
-			pline("%s You don't have anything to put in.", emptymsg);
+			pline("%s", emptymsg);
+			pline("You don't have anything to put in.");
 			return used;
 		    }
 		    menuprompt[0] = '\0';
