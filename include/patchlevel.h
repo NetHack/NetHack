@@ -41,7 +41,7 @@
 /* Version 3.4.x */
 
 /*  Patch 1, May 1, 2002
- *  Fix a couple of fatal errors including one for reentering shops, one
+ *  Fix a few fatal errors including one for reentering shops, one
  *     involving land mines and boulders/statues, and one for delayed
  *     polymorph
  *  Dozens of general bug fixes
