@@ -1687,6 +1687,13 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			} else {
 			    int num = d(2,4);
 
+			    /* paper burns very fast, assume straw is tightly
+			     * packed and burns a bit slower */
+			    if (mptr == &mons[PM_PAPER_GOLEM])
+				num = mtmp->mhp;
+			    else if (mptr == &mons[PM_STRAW_GOLEM])
+				num = mtmp->mhpmax / 2;
+
 			    if (thitm(0, mtmp, (struct obj *)0, num))
 				trapkilled = TRUE;
 			    else
