@@ -3758,6 +3758,7 @@ register int osym, dmgtyp;
 	    obj2 = obj->nobj;
 	    if(obj->oclass != osym) continue; /* test only objs of type osym */
 	    if(obj->oartifact) continue; /* don't destroy artifacts */
+	    if(obj->in_use && obj->quan == 1) continue; /* not available */
 	    xresist = skip = 0;
 #ifdef GCC_WARN
 	    dmg = dindx = 0;
@@ -3829,6 +3830,7 @@ register int osym, dmgtyp;
 		    break;
 	    }
 	    if(!skip) {
+		if (obj->in_use) --quan; /* one will be used up elsewhere */
 		for(i = cnt = 0L; i < quan; i++)
 		    if(!rn2(3)) cnt++;
 
