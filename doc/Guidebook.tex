@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.81 $ $Date: 2003/12/02 04:59:02 $
+% $Revision: 1.82 $ $Date: 2003/12/02 15:08:59 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2886,8 +2886,16 @@ The {\it autopickup\_exception\/} option should be followed by a string of 1--80
 characters to be used as a pattern to match against the singular form
 of the description of an object at your location.
 
-Some characters are treated specially if they occur as the first 
-character in the string pattern, specifically:
+%.pg
+You may use the following special characters in a pattern:
+
+\begin{verbatim}
+    *--- matches 0 or more characters.
+    ?--- matches any single character.
+\end{verbatim}
+
+In addition, some characters are treated specially if they occur as the first 
+character in the specified string pattern, specifically:
 
 %.sd
 %.si

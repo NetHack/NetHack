@@ -2346,7 +2346,15 @@ option should be followed by a string of 1-80 characters to be used as a
 pattern to match against the singular form of the description of an 
 object at your location.
 .pg
-Some characters are treated specially if they occur as the first 
+You may use the following special characters in a pattern:
+.sd
+.si
+  *--- matches 0 or more characters.
+  ?--- matches any single character.
+.ei
+.ed
+.pg
+In addition, some characters are treated specially if they occur as the first 
 character in the string pattern, specifically:
 .sd
 .si
