@@ -555,14 +555,14 @@ tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
 ifeq  "$(GRAPHICAL)" "Y"
-$(NHRES): $(TILEBMP) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
+$(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
 	$(WIN32)\mnselcnt.bmp $(WIN32)\mnunsel.bmp \
 	$(WIN32)\petmark.bmp $(WIN32)\NetHack.ico $(WIN32)\rip.bmp \
 	$(WIN32)\splash.bmp
 	@$(rc) -o$@ --include-dir $(WIN32) -i $(WIN32)/winhack.rc
 else
-$(NHRES): $(NTSYS)/console.rc
-	@$(rc) -o$@ --include-dir $(NTSYS) $(NTSYS)/console.rc
+$(NHRES): $(NTSYS)/console.rc $(NTSYS)/NetHack.ico 
+	@$(rc) -o$@ --include-dir $(NTSYS) -i $(NTSYS)/console.rc
 endif
 
 #==========================================
@@ -583,9 +583,9 @@ $(GAME)_.ico : $(NTSYS)/$(GAME).ico
 
 graphicschk:
 ifeq  "$(GRAPHICAL)" "Y"
-      @echo ----
-      @echo NOTE: This build will include tile support.
-      @echo ----
+	@echo ----
+	@echo NOTE: This build will include tile support.
+	@echo ----
 endif
 	$(subst /,\,@echo graphicschk > graphicschk)
 
@@ -642,44 +642,44 @@ $(SRC)/vis_tab.c: $(U)makedefs.exe
 $(U)uudecode.exe: $(O)uudecode.o
 	@$(link) $(LFLAGSU) -o$@ $(O)uudecode.o
 
-$(O)uudecode.o: $(SSYS)\uudecode.c
+$(O)uudecode.o: $(SSYS)/uudecode.c
 
-$(NTSYS)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu
+$(NTSYS)/NetHack.ico : $(U)uudecode.exe $(NTSYS)/nhico.uu
 	$(subst /,\,chdir $(NTSYS)) & \
 	$(subst /,\,uudecode.exe nhico.uu) & \
 	$(subst /,\,chdir ..\..\src)
 
-$(WIN32)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu
+$(WIN32)/NetHack.ico : $(U)uudecode.exe $(NTSYS)/nhico.uu
 	$(subst /,\,chdir $(WIN32)) & \
 	$(subst /,\,..\..\util\uudecode.exe ../../sys/winnt/nhico.uu) & \
 	$(subst /,\,chdir ..\..\src)
 
-$(WIN32)\mnsel.bmp: $(U)uudecode.exe $(WIN32)\mnsel.uu
+$(WIN32)/mnsel.bmp: $(U)uudecode.exe $(WIN32)/mnsel.uu
 	$(subst /,\,chdir $(WIN32)) & \
 	$(subst /,\,..\..\util\uudecode.exe mnsel.uu) & \
 	$(subst /,\,chdir ..\..\src)
 
-$(WIN32)\mnselcnt.bmp: $(U)uudecode.exe $(WIN32)\mnselcnt.uu
+$(WIN32)/mnselcnt.bmp: $(U)uudecode.exe $(WIN32)/mnselcnt.uu
 	$(subst /,\,chdir $(WIN32)) & \
 	$(subst /,\,..\..\util\uudecode.exe mnselcnt.uu) & \
 	$(subst /,\,chdir ..\..\src)
 
-$(WIN32)\mnunsel.bmp: $(U)uudecode.exe $(WIN32)\mnunsel.uu
+$(WIN32)/mnunsel.bmp: $(U)uudecode.exe $(WIN32)/mnunsel.uu
 	$(subst /,\,chdir $(WIN32)) & \
 	$(subst /,\,..\..\util\uudecode.exe mnunsel.uu) & \
 	$(subst /,\,chdir ..\..\src)
 
-$(WIN32)\petmark.bmp: $(U)uudecode.exe $(WIN32)\petmark.uu
+$(WIN32)/petmark.bmp: $(U)uudecode.exe $(WIN32)/petmark.uu
 	$(subst /,\,chdir $(WIN32)) & \
 	$(subst /,\,..\..\util\uudecode.exe petmark.uu) & \
 	$(subst /,\,chdir ..\..\src)
 
-$(WIN32)\rip.bmp: $(U)uudecode.exe $(WIN32)\rip.uu
+$(WIN32)/rip.bmp: $(U)uudecode.exe $(WIN32)/rip.uu
 	$(subst /,\,chdir $(WIN32)) & \
 	$(subst /,\,..\..\util\uudecode.exe rip.uu) & \
 	$(subst /,\,chdir ..\..\src)
 
-$(WIN32)\splash.bmp: $(U)uudecode.exe $(WIN32)\splash.uu
+$(WIN32)/splash.bmp: $(U)uudecode.exe $(WIN32)/splash.uu
 	$(subst /,\,chdir $(WIN32)) & \
 	$(subst /,\,..\..\util\uudecode.exe splash.uu) & \
 	$(subst /,\,chdir ..\..\src)
