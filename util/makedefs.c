@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makedefs.c	3.4	1999/08/16	*/
+/*	SCCS Id: @(#)makedefs.c	3.4	2002/03/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -56,7 +56,9 @@ static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.4\t2002/02/03";
 #define DATE_FILE	"date.h"
 #define MONST_FILE	"pm.h"
 #define ONAME_FILE	"onames.h"
+#ifndef OPTIONS_FILE
 #define OPTIONS_FILE	"options"
+#endif
 #define ORACLE_FILE	"oracles"
 #define DATA_FILE	"data"
 #define RUMOR_FILE	"rumors"
@@ -671,17 +673,11 @@ static const char *build_opts[] = {
 # ifdef MAC
 		"screen control via mactty",
 # endif
-# ifdef SCREEN_8514
-		"screen control via 8514/A graphics",
-# endif
 # ifdef SCREEN_BIOS
 		"screen control via BIOS",
 # endif
 # ifdef SCREEN_DJGPPFAST
 		"screen control via DJGPP fast",
-# endif
-# ifdef SCREEN_VESA
-		"screen control via VESA graphics",
 # endif
 # ifdef SCREEN_VGA
 		"screen control via VGA graphics",
@@ -752,7 +748,7 @@ static const char *window_opts[] = {
 #ifdef GEM_GRAPHICS
 		"Gem",
 #endif
-#ifdef WIN32_GRAPHICS
+#ifdef MSWIN_GRAPHICS
 		"Win32",
 #endif
 #ifdef BEOS_GRAPHICS
