@@ -1072,11 +1072,7 @@ outrip(winid, int)
 #define STONE_LINE_LEN	16
 void mswin_outrip(winid wid, int how)
 {
-	register char **dp;
-	register char *dpx;
 	char buf[BUFSZ];
-	register int x;
-	int line;
 
    	logDebug("mswin_outrip(%d)\n", wid, how);
     if ((wid >= 0) && (wid < MAXWINDOWS) ) {
