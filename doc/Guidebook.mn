@@ -1804,6 +1804,9 @@ Display an introductory message when starting the game (default on).
 .lp lit_corridor
 Show corridor squares seen by night vision or a light source held by your
 character as lit (default off).
+.lp lootabc
+Use the old `a', `b', and `c' keyboard shortcuts when
+looting, rather than the mnemonics `o', `i', and `b' (default off).
 .lp "mail    "
 Enable mail delivery during the game (default on).
 .lp "male    "
@@ -1980,6 +1983,10 @@ Control what parts of the score list you are shown at the end (ex.
 letter of each category (`t', `a', or `o') is necessary.
 .lp showexp
 Show your accumulated experience points on bottom line (default off).
+.lp showrace
+Display yourself as the glyph for your race, rather than the glyph
+for your role (default off).  Note that this setting affects only
+the appearance of the display, not the way the game treats you.
 .lp showscore
 Show your approximate accumulated score on bottom line (default off).
 .lp "silent  "

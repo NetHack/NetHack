@@ -314,10 +314,12 @@
 #define ridden_monnum_to_glyph(mnum)	((int) (mnum) + GLYPH_RIDDEN_OFF)
 #define petnum_to_glyph(mnum)	((int) (mnum) + GLYPH_PET_OFF)
 
-/* The hero's glyph when seen as a monster.  Could also be...
- * mon_to_glyph(Upolyd || Race_if(PM_HUMAN) ? u.umonnum : urace.malenum)
+/* The hero's glyph when seen as a monster.
  */
-#define hero_glyph monnum_to_glyph(u.umonnum)
+#define hero_glyph \
+	monnum_to_glyph((Upolyd || !iflags.showrace) ? u.umonnum : \
+	                (flags.female && urace.femalenum != NON_PM) ? urace.femalenum : \
+	                urace.malenum)
 
 
 /*

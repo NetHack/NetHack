@@ -2202,10 +2202,8 @@ struct obj *obj;
     menu_item *pick_list;
     char buf[BUFSZ];
     int n;
-    char oldmenu[3] = {'a', 'b', 'c'}, newmenu[3] = {'o', 'i', 'b'};
-    char *menuselector = newmenu;
+    char *menuselector = iflags.lootabc ? "abc" : "oib";
 
-    if (feature_toggle(TOGGLE_LOOT_MENU_SELECTORS)) menuselector = oldmenu;
     any.a_void = 0;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);

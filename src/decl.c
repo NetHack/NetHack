@@ -271,21 +271,6 @@ char *fqn_prefix_names[PREFIX_COUNT] = { "hackdir", "leveldir", "savedir",
 					"lockdir", "configdir" };
 #endif
 
-/*
- * The following provide a way to offer two different
- * behaviours for a game interface feature, and allow
- * the player to toggle the alternate behaviour on.
- * The strings in the feature_toggles[] array can be
- * specified in an OPTIONS=feature_toggle:value1 value2
- * statement in the config file.
- */
-unsigned long toggled_features = 0L;
-
-struct features_that_toggle feature_toggles[] = {
-	{(char *)0,     0x00000000L},		/*  0 = TOGGLE_INVALID              */
-	{"loot_menu_selectors", 0x00000001L},	/*  1 = TOGGLE_LOOT_MENU_SELECTORS  */
-};
-			
 /* dummy routine used to force linkage */
 void
 decl_init()

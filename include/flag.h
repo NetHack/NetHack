@@ -252,6 +252,10 @@ struct instance_flags {
 	boolean wc_large_font;		/* draw in larger fonts (say, 12pt instead
 				   		of 9pt) */
 	boolean wc_eight_bit_input;	/* allow eight bit input               */
+
+	/* Items which belong in flags, but are here to allow save compatibility */
+	boolean  lootabc;	/* use "a/b/c" rather than "o/i/b" when looting */
+	boolean  showrace;	/* show hero glyph by race rather than by role */
 };
 
 /*

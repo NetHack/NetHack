@@ -106,6 +106,7 @@ static struct Bool_Opt
 	{"large_font", &iflags.wc_large_font, FALSE, SET_IN_FILE},	/*WC*/
 	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
 	{"lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME},
+	{"lootabc", &iflags.lootabc, FALSE, SET_IN_GAME},
 #ifdef MAC_GRAPHICS_ENV
 	{"Macgraphics", &iflags.MACgraphics, TRUE, SET_IN_GAME},
 #else
@@ -161,6 +162,7 @@ static struct Bool_Opt
 #else
 	{"showexp", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"showrace", &iflags.showrace, FALSE, SET_IN_GAME},
 #ifdef SCORE_ON_BOTL
 	{"showscore", &flags.showscore, FALSE, SET_IN_GAME},
 #else
@@ -202,10 +204,6 @@ static struct Comp_Opt
 						8, DISP_IN_GAME },
 	{ "align_message", "message window alignment", 20, DISP_IN_GAME }, 	/*WC*/
 	{ "align_status", "status window alignment", 20, DISP_IN_GAME }, 	/*WC*/
-#ifdef MAC
-	{ "background", "the color of the background (black or white)",
-						6, SET_IN_FILE },
-#endif
 	{ "boulder",  "the symbol to use for displaying boulders",
 						1, SET_IN_GAME },
 	{ "catname",  "the name of your (first) cat (e.g., catname:Tabby)",
@@ -219,7 +217,6 @@ static struct Comp_Opt
 						MAXDCHARS+1, SET_IN_FILE },
 	{ "effects",  "the symbols to use in drawing special effects",
 						MAXECHARS+1, SET_IN_FILE },
-	{ "feature_toggle",   "alternate feature behaviour", 79, SET_IN_FILE },
 	{ "font_map", "the font to use in the map window", 40, DISP_IN_GAME },	/*WC*/
 	{ "font_menu", "the font to use in menus", 40, DISP_IN_GAME },		/*WC*/
 	{ "font_message", "the font to use in the message window",
@@ -297,9 +294,6 @@ static struct Comp_Opt
 	{ "tile_file", "name of tile file", 70, DISP_IN_GAME},	/*WC*/
 	{ "traps",    "the symbols to use in drawing traps",
 						MAXTCHARS+1, SET_IN_FILE },
-#ifdef MAC
-	{"use_stone", "use stone background patterns", 8, SET_IN_FILE },
-#endif
 	{ "vary_msgcount", "show more old messages at a time", 20, DISP_IN_GAME }, /*WC*/
 #ifdef MSDOS
 	{ "video",    "method of video updating", 20, SET_IN_FILE },
@@ -1042,43 +1036,6 @@ boolean tinitial, tfrom_file;
 		return;
 	}
 
-	fullname = "feature_toggle";
-	if (match_optname(opts, fullname, 11, TRUE)) {
-		char buf[BUFSZ];
-		char *feature;
-		boolean matched = FALSE;
-		if (!(op = string_for_opt(opts, FALSE)))
-			return;
-		if (!negated) {
-		    boolean has_badfield = FALSE;
-		    char badfields[BUFSZ];
-		    buf[BUFSZ-1] = '\0';
-
-		    Strcpy(badfields, "feature_toggle:");
-		    (void)strncpy(buf, op, BUFSZ - 1);
-		    (void)mungspaces(buf);
-		    feature = strtok(buf, " \n");
-		    while(feature && *feature && *feature != ' ') {
-		    	matched = FALSE;
-			for (num = 1; num <= LAST_FEATURE_TOGGLE; num++) {
-			    if (!strcmpi(feature, feature_toggles[num].feature_name)) {
-				toggled_features |= feature_toggles[num].feature_bit;
-				matched = TRUE;
-			    }
-			}
-			if (!matched) {
-				if (has_badfield) Strcat(badfields, " ");
-				Strcat(badfields, feature);
-				has_badfield = TRUE;
-			}
-			feature = strtok((char *)0, " \n");
-		    }
-		    if (has_badfield) badoption(badfields);
-		} else
-			bad_negation(fullname, FALSE);
-		return;
-	}
-
 	fullname = "horsename";
 	if (match_optname(opts, fullname, 5, TRUE)) {
 		if (negated) bad_negation(fullname, FALSE);
@@ -1169,30 +1126,6 @@ boolean tinitial, tfrom_file;
 		return;
 	}
 #ifdef CHANGE_COLOR
-#ifdef MAC
-	fullname = "use_stone";
-	if (match_optname(opts, fullname, 6, TRUE)) {
-		op = string_for_env_opt(fullname, opts, negated);
-		if ((negated && !op) || (!negated && op)) {
-			iflags.use_stone = negated ? 0 : atoi(op);
-		} else if (negated) bad_negation(fullname, TRUE);
-		return;
-	}
-
-	fullname = "background";
-	if (match_optname(opts, fullname, 5,TRUE))
-	{
-		if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
-		{
-			if (!strncmpi (op, "white", 5))
-				change_background (1);
-			else if (!strncmpi (op, "black", 5))
-				change_background (0);
-		}
-		return;
-	}
-#endif	
-
 	if (match_optname(opts, "palette", 3, TRUE)
 # ifdef MAC
 	    || match_optname(opts, "hicolor", 3, TRUE)
@@ -2103,10 +2036,9 @@ goodfruit:
 			    vision_recalc(2);		/* shut down vision */
 			    vision_full_recalc = 1;	/* delayed recalc */
 			}
-			else if ((boolopt[i].addr) == &iflags.use_inverse) {
-			    need_redraw = TRUE;
-			}
-			else if ((boolopt[i].addr) == &iflags.hilite_pet) {
+			else if ((boolopt[i].addr) == &iflags.use_inverse ||
+					(boolopt[i].addr) == &iflags.showrace ||
+					(boolopt[i].addr) == &iflags.hilite_pet) {
 			    need_redraw = TRUE;
 			}
 #ifdef TEXTCOLOR
@@ -3287,16 +3219,6 @@ char *op;
 	return 1;
 }
 
-boolean
-feature_toggle(ftidx)
-int ftidx;
-{
-	if (ftidx > 0 && ftidx <= LAST_FEATURE_TOGGLE) {
-		if (toggled_features & feature_toggles[ftidx].feature_bit)
-			return TRUE;
-	}
-	return FALSE;
-}
 #endif	/* OPTION_LISTS_ONLY */
 
 /*options.c*/
