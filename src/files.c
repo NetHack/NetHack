@@ -215,12 +215,12 @@ int bufsz;
 		if ((bufsz - cnt) <= 2) return callerbuf;
 		if (*sp == quotechar) {
 			sp++;
-			for (k=0; k < 15; ++k) if (*sp == hexdigits[k]) break;
-			if (k >= 15) return callerbuf;	/* impossible, so bail */
+			for (k=0; k < 16; ++k) if (*sp == hexdigits[k]) break;
+			if (k >= 16) return callerbuf;	/* impossible, so bail */
 			calc = k << 4; 
 			sp++;
-			for (k=0; k < 15; ++k) if (*sp == hexdigits[k]) break;
-			if (k >= 15) return callerbuf;	/* impossible, so bail */
+			for (k=0; k < 16; ++k) if (*sp == hexdigits[k]) break;
+			if (k >= 16) return callerbuf;	/* impossible, so bail */
 			calc += k; 
 			sp++;
 			*op++ = calc;
