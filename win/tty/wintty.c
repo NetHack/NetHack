@@ -1243,8 +1243,10 @@ struct WinDesc *cw;
 	    if (cw->npages > 1)
 		Sprintf(cw->morestr, "(%d of %d)",
 			curr_page + 1, (int) cw->npages);
-	    else
+	    else if (msave)
 		Strcpy(cw->morestr, msave);
+	    else
+		Strcpy(cw->morestr, defmorestr);
 
 	    tty_curs(window, 1, page_lines);
 	    cl_end();
@@ -1517,7 +1519,7 @@ tty_display_nhwindow(window, blocking)
 	} else
 	    tty_clear_nhwindow(WIN_MESSAGE);
 
-	if (cw->data)
+	if (cw->data || !cw->maxrow)
 	    process_text_window(window, cw);
 	else
 	    process_menu_window(window, cw);
@@ -1910,6 +1912,8 @@ boolean complain;
 	    } else if(u.ux) docrt();
 	} else {
 	    winid datawin = tty_create_nhwindow(NHW_TEXT);
+	    boolean empty = TRUE;
+
 	    if(complain
 #ifndef NO_TERMS
 		&& nh_CD
@@ -1926,11 +1930,12 @@ boolean complain;
 		if ((cr = index(buf, '\r')) != 0) *cr = 0;
 #endif
 		if (index(buf, '\t') != 0) (void) tabexpand(buf);
+		empty = FALSE;
 		tty_putstr(datawin, 0, buf);
 		if(wins[datawin]->flags & WIN_CANCELLED)
 		    break;
 	    }
-	    tty_display_nhwindow(datawin, FALSE);
+	    if (!empty) tty_display_nhwindow(datawin, FALSE);
 	    tty_destroy_nhwindow(datawin);
 	    (void) dlb_fclose(f);
 	}
