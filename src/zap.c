@@ -2213,7 +2213,11 @@ boolean			youattack, allow_cancel_kill, self_cancel;
 	    if (Upolyd) {
 		if ((u.umonnum == PM_CLAY_GOLEM) && !Blind)
 		    pline(writing_vanishes, your);
-		rehumanize();
+
+		if (Unchanging)
+		    Your("amulet grows hot for a moment, then cools.");
+		else
+		    rehumanize();
 	    }
 	} else {
 	    mdef->mcan = TRUE;

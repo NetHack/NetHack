@@ -1496,7 +1496,8 @@ struct obj *otmp;
 	    case AMULET_OF_RESTFUL_SLEEP: /* another bad idea! */
 		HSleeping = FROMOUTSIDE | rnd(100);
 		break;
-		case RIN_SUSTAIN_ABILITY:
+	    case RIN_SUSTAIN_ABILITY:
+	    case AMULET_OF_UNCHANGING:
 	    case AMULET_OF_LIFE_SAVING:
 	    case AMULET_OF_REFLECTION: /* nice try */
 	    /* can't eat Amulet of Yendor or fakes,
