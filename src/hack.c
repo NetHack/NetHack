@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2003/04/30	*/
+/*	SCCS Id: @(#)hack.c	3.4	2004/01/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1913,8 +1913,8 @@ dopickup()
 	    }
 	}
 	if (is_lava(u.ux, u.uy)) {
-	    if (Wwalking || is_floater(youmonst.data) || is_clinger(youmonst.data)
-			|| (Flying && !Breathless)) {
+	    if (Wwalking || is_floater(youmonst.data) ||
+		    is_clinger(youmonst.data) || (Flying && !Breathless)) {
 		You_cant("reach the bottom to pick things up.");
 		return(0);
 	    } else if (!likes_lava(youmonst.data)) {
@@ -1922,29 +1922,21 @@ dopickup()
 		return(0);
 	    }
 	}
-	if(!OBJ_AT(u.ux, u.uy)) {
-		There("is nothing here to pick up.");
-		return(0);
+	if (!OBJ_AT(u.ux, u.uy)) {
+	    There("is nothing here to pick up.");
+	    return 0;
 	}
 	if (!can_reach_floor()) {
-#ifdef STEED
-		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
-		    You("aren't skilled enough to reach from %s.",
-			y_monnam(u.usteed));
-		else
-#endif
-		You("cannot reach the %s.", surface(u.ux,u.uy));
-		return(0);
-	}
-
- 	if (traphere && uteetering_at_seen_pit(traphere)) {
-		/* Allow pickup from holes and trap doors that you escaped from
-		 * because that stuff is teetering on the edge just like you, but
-		 * not pits, because there is an elevation discrepancy with stuff
-		 * in pits.
-		 */
+	    if (traphere && uteetering_at_seen_pit(traphere))
 		You("cannot reach the bottom of the pit.");
-		return(0);
+#ifdef STEED
+	    else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
+		You("aren't skilled enough to reach from %s.",
+		    y_monnam(u.usteed));
+#endif
+	    else
+		You("cannot reach the %s.", surface(u.ux,u.uy));
+	    return 0;
 	}
 
 	return (pickup(-count));

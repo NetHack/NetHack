@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)engrave.c	3.4	2001/11/04	*/
+/*	SCCS Id: @(#)engrave.c	3.4	2004/01/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -132,12 +132,18 @@ unsigned seed;		/* for semi-controlled randomization */
 boolean
 can_reach_floor()
 {
-	return (boolean)(!u.uswallow &&
+	struct trap *t;
+
+	if (u.uswallow) return FALSE;
 #ifdef STEED
-			/* Restricted/unskilled riders can't reach the floor */
-			!(u.usteed && P_SKILL(P_RIDING) < P_BASIC) &&
+	/* Restricted/unskilled riders can't reach the floor */
+	if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) return FALSE;
 #endif
-			 (!Levitation ||
+	if ((t = t_at(u.ux, u.uy)) != 0 && uteetering_at_seen_pit(t) &&
+		!Flying)
+	    return FALSE;
+
+	return (boolean)((!Levitation ||
 			  Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) &&
 			 (!u.uundetected || !is_hider(youmonst.data) ||
 			  u.umonnum == PM_TRAPPER));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.4	2003/07/27	*/
+/*	SCCS Id: @(#)pickup.c	3.4	2004/01/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -408,18 +408,11 @@ int what;		/* should be a long */
 
 		/* no pickup if levitating & not on air or water level */
 		if (!can_reach_floor()) {
-		    if ((multi && !context.run) || (autopickup && !flags.pickup))
+		    if ((multi && !context.run) ||
+			    (autopickup && !flags.pickup) ||
+			    (ttmp && uteetering_at_seen_pit(ttmp)))
 			read_engr_at(u.ux, u.uy);
 		    return (0);
-		}
-		if (ttmp && uteetering_at_seen_pit(ttmp)) {
-		    /* Allow pickup from holes and trap doors that you escaped
-		     * from because that stuff is teetering on the edge just
-		     * like you, but not pits, because there is an elevation
-		     * discrepancy with stuff in pits.
-		     */
-		     read_engr_at(u.ux, u.uy);
-		     return(0);
 		}
 		/* multi && !context.run means they are in the middle of some other
 		 * action, or possibly paralyzed, sleeping, etc.... and they just
