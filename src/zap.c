@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2004/06/12	*/
+/*	SCCS Id: @(#)zap.c	3.4	2004/08/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3866,10 +3866,11 @@ register struct obj *obj;		   /* no texts here! */
 	    change_luck(-1);
 
 	obj->otyp = ROCK;
+	obj->oclass = GEM_CLASS;
 	obj->quan = (long) rn1(60, 7);
 	obj->owt = weight(obj);
-	obj->oclass = GEM_CLASS;
-	obj->known = FALSE;
+	obj->dknown = obj->bknown = obj->rknown = 0;
+	obj->known = objects[obj->otyp].oc_uses_known ? 0 : 1;
 	obj->onamelth = 0;		/* no names */
 	obj->oxlth = 0;			/* no extra data */
 	obj->oattached = OATTACHED_NOTHING;
@@ -3877,7 +3878,7 @@ register struct obj *obj;		   /* no texts here! */
 		obj_extract_self(obj);		/* move rocks back on top */
 		place_object(obj, obj->ox, obj->oy);
 		if(!does_block(obj->ox,obj->oy,&levl[obj->ox][obj->oy]))
-	    		unblock_point(obj->ox,obj->oy);
+		    unblock_point(obj->ox,obj->oy);
 		if(cansee(obj->ox,obj->oy))
 		    newsym(obj->ox,obj->oy);
 	}
