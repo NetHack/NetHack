@@ -977,7 +977,7 @@ long flgs;
 	uchar len;
 	static struct version_info version_data = {
 			VERSION_NUMBER, VERSION_FEATURES,
-			VERSION_SANITY1, VERSION_SANITY2
+			VERSION_SANITY1, VERSION_SANITY2, VERSION_SANITY3
 	};
 
 	Write(fd, &version_data, sizeof version_data);
