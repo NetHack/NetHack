@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.h	3.5	2003/11/29	*/
+/*	SCCS Id: @(#)mondata.h	3.5	2005/01/31	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -115,7 +115,7 @@
 				 (((ptr)->mflags2 & (M2_LORD|M2_PRINCE)) == 0L))
 #define is_dlord(ptr)		(is_demon(ptr) && is_lord(ptr))
 #define is_dprince(ptr)		(is_demon(ptr) && is_prince(ptr))
-#define is_minion(ptr)		((ptr)->mflags2 & M2_MINION)
+#define is_minion(ptr)		(((ptr)->mflags2 & M2_MINION) != 0L)
 #define likes_gold(ptr)		(((ptr)->mflags2 & M2_GREEDY) != 0L)
 #define likes_gems(ptr)		(((ptr)->mflags2 & M2_JEWELS) != 0L)
 #define likes_objs(ptr)		(((ptr)->mflags2 & M2_COLLECT) != 0L || \
