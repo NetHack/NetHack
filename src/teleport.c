@@ -556,7 +556,7 @@ level_tele()
 	    You_feel("very disoriented for a moment.");
 	    return;
 	}
-	if (Teleport_control
+	if ((Teleport_control && !Confusion)
 #ifdef WIZARD
 	   || wizard
 #endif
