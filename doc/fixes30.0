@@ -4,7 +4,7 @@ $RCSfile$ $Revision$ $Date$
 
 General Fixes and Modified Features
 -----------------------------------
-dropping a weapon, then picking it up while blind causes it become 
+dropping a weapon, then picking it up while blind causes it to become 
 	unidentified but it remains that way after your vision returns
 when blind and feeling the floor, the objects then on the floor should
 	have their characteristics become unknown
