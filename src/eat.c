@@ -836,20 +836,23 @@ register int pm;
 		tmp += 20;
 		if (youmonst.data->mlet != S_MIMIC && !Unchanging) {
 		    char buf[BUFSZ];
-		    You_cant("resist the temptation to mimic a pile of gold.");
+		    You_cant("resist the temptation to mimic %s.",
+			Hallucination ? "an orange" : "a pile of gold");
 #ifdef STEED
                     /* A pile of gold can't ride. */
 		    if (u.usteed) dismount_steed(DISMOUNT_FELL);
 #endif
 		    nomul(-tmp);
-		    Sprintf(buf, "You now prefer mimicking %s again.",
-			    an(Upolyd ? youmonst.data->mname : urace.noun));
+		    Sprintf(buf, Hallucination ?
+			"You suddenly dread being peeled and mimick %s again!" :
+			"You now prefer mimicking %s again.",
+			an(Upolyd ? youmonst.data->mname : urace.noun));
 		    eatmbuf = strcpy((char *) alloc(strlen(buf) + 1), buf);
 		    nomovemsg = eatmbuf;
 		    afternmv = eatmdone;
 		    /* ??? what if this was set before? */
 		    youmonst.m_ap_type = M_AP_OBJECT;
-		    youmonst.mappearance = GOLD_PIECE;
+		    youmonst.mappearance = Hallucination ? ORANGE : GOLD_PIECE;
 		    newsym(u.ux,u.uy);
 		    curs_on_u();
 		    /* make gold symbol show up now */
