@@ -1640,9 +1640,9 @@ fopen_wizkit_file()
 	envp = nh_getenv("HOME");
 	if (envp)
 		Sprintf(tmp_wizkit, "%s/%s", envp, wizkit);
+	else 	Strcpy(tmp_wizkit, wizkit);
 	if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *)0)
 		return(fp);
-	else 	Strcpy(tmp_wizkit, wizkit);
 	else if (errno != ENOENT) {
 		/* e.g., problems when setuid NetHack can't search home
 		 * directory restricted to user */
