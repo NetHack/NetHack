@@ -213,7 +213,6 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 	    }
 	    You("stuff yourself and then vomit voluminously.");
 	    morehungry(1000);	/* you just got *very* sick! */
-	    nomovemsg = 0;
 	    vomit();
 	} else {
 	    killer.format = KILLED_BY_AN;
@@ -2575,7 +2574,7 @@ vomit()		/* A good idea from David Neves */
 {
 	make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
 	nomul(-2);
-	nomovemsg = 0;
+	nomovemsg = You_can_move_again;
 }
 
 int

@@ -1738,7 +1738,7 @@ doturn()
 	    }
 	}
 	nomul(-5);
-	nomovemsg = 0;
+	nomovemsg = You_can_move_again;
 	return(1);
 }
 

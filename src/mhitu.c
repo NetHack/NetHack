@@ -1108,7 +1108,7 @@ dopois:
 		    } else {
 			if (Blind) You("are frozen!");
 			else You("are frozen by %s!", mon_nam(mtmp));
-			nomovemsg = 0;	/* default: "you can move again" */
+			nomovemsg = You_can_move_again;
 			nomul(-rnd(10));
 			exercise(A_DEX, FALSE);
 		    }

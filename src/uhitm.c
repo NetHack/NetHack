@@ -2328,7 +2328,7 @@ boolean wep_was_destroyed;
 		    You("momentarily stiffen.");
 		} else { /* gelatinous cube */
 		    You("are frozen by %s!", mon_nam(mon));
-	    	    nomovemsg = 0;	/* default: "you can move again" */
+	    	    nomovemsg = You_can_move_again;
 		    nomul(-tmp);
 		    exercise(A_DEX, FALSE);
 		}

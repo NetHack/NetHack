@@ -2210,7 +2210,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			if (mtmp->mhp <= 0) trapkilled = TRUE;
 			if (unconscious()) {
 				multi = -1;
-				nomovemsg="The explosion awakens you!";
+				nomovemsg = "The explosion awakens you!";
 			}
 			break;
 
@@ -4066,6 +4066,7 @@ unconscious()
 {
 	return((boolean)(multi < 0 && (!nomovemsg ||
 		u.usleep ||
+		!strncmp(nomovemsg,"You awake", 9) ||
 		!strncmp(nomovemsg,"You regain con", 14) ||
 		!strncmp(nomovemsg,"You are consci", 14))));
 }

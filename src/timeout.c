@@ -44,7 +44,7 @@ stoned_dialogue()
 	case 3:		/* limbs turned to stone */
 		stop_occupation();
 		nomul(-3);	/* can't move anymore */
-		nomovemsg = 0;
+		nomovemsg = You_can_move_again; /* not unconscious */
 		break;
 	default:
 		break;
@@ -72,10 +72,9 @@ vomiting_dialogue()
 
 	switch ((int) i) {
 	case 0:
-		vomit();
-		morehungry(20);
 		stop_occupation();
-		if (multi > 0) nomul(0);
+		morehungry(20);
+		vomit();
 		break;
 	case 2:
 		make_stunned(HStun + d(2,4), FALSE);
