@@ -517,6 +517,7 @@ coord *cc;
 		mtmp2->mstun = 0;
 		mtmp2->mconf = 0;
 		replmon(mtmp,mtmp2);
+		newsym(mtmp2->mx, mtmp2->my);	/* Might now be invisible */
 
 		/* in case Protection_from_shape_changers is different
 		   now than it was when the traits were stored */
