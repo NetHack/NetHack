@@ -217,6 +217,14 @@ win32gui: make error() work; it was essentially non-operative in 3.4.0
 win32gui: fix alignment of columns in menu windows
 win32gui: Window menu File|Save worked during #quit disclosure processing
 win32gui: make mswin_yn_function() case insensitive like the tty version
+win32gui: In msg window, gray out lines that are old and concatenate msgs
+win32gui: --More-- prompt if there are more messages than can fit this turn
+win32gui: flicker reduction because clear_nhwindow no longer redraws window
+win32gui: A caret bug was fixed
+win32gui: fix bug that caused two lines too many to be drawn on each paint
+win32gui: last line no longer highlighted
+win32gui: reduce the number of popups and support for !popup
+win32gui: support for not having popup windows
 win32tty: honour the use_inverse option and default to ATR_BOLD if disabled
 win32tty: respond only to mouse clicks not mouse movement
 win32tty: allow ^C to abort the game at the "Who are you?" prompt
