@@ -2418,9 +2418,12 @@ water_damage(obj, force, here)
 register struct obj *obj;
 register boolean force, here;
 {
+	struct obj *otmp;
+
 	/* Scrolls, spellbooks, potions, weapons and
 	   pieces of armor may get affected by the water */
-	for (; obj; obj = (here ? obj->nexthere : obj->nobj)) {
+	for (; obj; obj = otmp) {
+		otmp = here ? obj->nexthere : obj->nobj;
 
 		(void) snuff_lit(obj);
 
@@ -2452,7 +2455,12 @@ register boolean force, here;
 				pline("Steam rises from %s.", the(xname(obj)));
 			else obj->otyp = SPE_BLANK_PAPER;
 		} else if (obj->oclass == POTION_CLASS) {
-			if (obj->odiluted) {
+			if (obj->otyp == POT_ACID) {
+				/* damage player/monster? */
+				pline("A potion explodes!");
+				delobj(obj);
+				continue;
+			} else if (obj->odiluted) {
 				obj->otyp = POT_WATER;
 				obj->blessed = obj->cursed = 0;
 				obj->odiluted = 0;
