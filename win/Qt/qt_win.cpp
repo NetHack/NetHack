@@ -72,6 +72,9 @@ extern "C" {
 #undef yn
 
 }
+#ifdef yn
+#undef yn
+#endif
 
 #include "qt_win.h"
 #include <qregexp.h>
