@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)write.c	3.4	2001/11/29	*/
+/*	SCCS Id: @(#)write.c	3.5	2001/11/29	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

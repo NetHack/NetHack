@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.4	2003/01/10	*/
+/*	SCCS Id: @(#)steed.c	3.5	2003/01/10	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 

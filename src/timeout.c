@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.4	2003/11/18	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2003/11/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

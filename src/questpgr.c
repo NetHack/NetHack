@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)questpgr.c	3.4	2004/11/22	*/
+/*	SCCS Id: @(#)questpgr.c	3.5	2004/11/22	*/
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 

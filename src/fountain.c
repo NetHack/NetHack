@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)fountain.c	3.4	2003/03/23	*/
+/*	SCCS Id: @(#)fountain.c	3.5	2003/03/23	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 

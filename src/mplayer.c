@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mplayer.c	3.4	1997/02/04	*/
+/*	SCCS Id: @(#)mplayer.c	3.5	1997/02/04	*/
 /*	Copyright (c) Izchak Miller, 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,7 @@ STATIC_DCL void FDECL(get_mplname, (struct monst *, char *));
 STATIC_DCL void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
 
 /* These are the names of those who
- * contributed to the development of NetHack 3.2/3.3/3.4.
+ * contributed to the development of NetHack 3.2/3.3/3.4/3.5.
  *
  * Keep in alphabetical order within teams.
  * Same first name is entered once within each team.
