@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)detect.c	3.4	2003/05/25	*/
+/*	SCCS Id: @(#)detect.c	3.4	2003/08/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -797,10 +797,11 @@ struct obj *obj;
 	    break;
 	case 5 : pline("%s!", Tobjnam(obj, "explode"));
 	    useup(obj);
+	    obj = 0;	/* it's gone */
 	    losehp(rnd(30), "exploding crystal ball", KILLED_BY_AN);
 	    break;
 	}
-	consume_obj_charge(obj, TRUE);
+	if (obj) consume_obj_charge(obj, TRUE);
 	return;
     }
 
