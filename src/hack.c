@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.4	2001/06/02	*/
+/*	SCCS Id: @(#)hack.c	3.4	2002/02/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -544,8 +544,8 @@ boolean test_only;
 	} else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
 	    /* Eat the rock. */
 	    if (!test_only && still_chewing(x,y)) return FALSE;
-	} else if (flags.autodig && !flags.run && !flags.nopick && uwep &&
-		   (uwep->otyp == PICK_AXE || uwep->otyp == DWARVISH_MATTOCK)) {
+	} else if (flags.autodig && !flags.run && !flags.nopick &&
+		   uwep && is_pick(uwep)) {
 	/* MRKR: Automatic digging when wielding the appropriate tool */
 	    if (!test_only)
 		use_pick_axe2(uwep);
