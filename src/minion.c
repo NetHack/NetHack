@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)minion.c	3.4	2003/01/09	*/
+/*	SCCS Id: @(#)minion.c	3.4	2004/12/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,12 +6,12 @@
 #include "emin.h"
 #include "epri.h"
 
-void
+int
 msummon(mon)		/* mon summons a monster */
 struct monst *mon;
 {
-	register struct permonst *ptr;
-	register int dtype = NON_PM, cnt = 0;
+	struct permonst *ptr;
+	int dtype = NON_PM, cnt = 0, result = 0;
 	aligntyp atyp;
 	struct monst *mtmp;
 
@@ -60,7 +60,7 @@ struct monst *mon;
 	    cnt = (!rn2(4) && !is_lord(&mons[dtype])) ? 2 : 1;
 	}
 
-	if (dtype == NON_PM) return;
+	if (dtype == NON_PM) return 0;
 
 	/* sanity checks */
 	if (cnt > 1 && (mons[dtype].geno & G_UNIQ)) cnt = 1;
@@ -70,17 +70,19 @@ struct monst *mon;
 	 */
 	if (mvitals[dtype].mvflags & G_GONE) {
 	    dtype = ndemon(atyp);
-	    if (dtype == NON_PM) return;
+	    if (dtype == NON_PM) return 0;
 	}
 
 	while (cnt > 0) {
 	    mtmp = makemon(&mons[dtype], u.ux, u.uy, NO_MM_FLAGS);
-	    if (mtmp && (dtype == PM_ANGEL)) {
-		/* alignment should match the summoner */
-		EPRI(mtmp)->shralign = atyp;
+	    if (mtmp) {
+		result++;
+		/* an angel's alignment should match the summoner */
+		if (dtype == PM_ANGEL) EPRI(mtmp)->shralign = atyp;
 	    }
 	    cnt--;
 	}
+	return result;
 }
 
 void

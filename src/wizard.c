@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wizard.c	3.4	2003/02/18	*/
+/*	SCCS Id: @(#)wizard.c	3.4	2004/12/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -416,14 +416,14 @@ nasty(mcast)
 {
     register struct monst	*mtmp;
     register int	i, j, tmp;
-    int castalign = (mcast ? mcast->data->maligntyp : -1);
+    int castalign = (mcast ? sgn(mcast->data->maligntyp) : -1);
     coord bypos;
-    int count=0;
+    int count;
 
     if(!rn2(10) && Inhell) {
-	msummon((struct monst *) 0);	/* summons like WoY */
-	count++;
+	count = msummon((struct monst *) 0);	/* summons like WoY */
     } else {
+	count = 0;
 	tmp = (u.ulevel > 3) ? u.ulevel/3 : 1; /* just in case -- rph */
 	/* if we don't have a casting monster, the nasties appear around you */
 	bypos.x = u.ux;
@@ -450,10 +450,11 @@ nasty(mcast)
 		} else /* GENOD? */
 		    mtmp = makemon((struct permonst *)0,
 					bypos.x, bypos.y, NO_MM_FLAGS);
-		if(mtmp && (mtmp->data->maligntyp == 0 ||
-		            sgn(mtmp->data->maligntyp) == sgn(castalign)) ) {
+		if (mtmp) {
 		    count++;
-		    break;
+		    if (mtmp->data->maligntyp == 0 ||
+			    sgn(mtmp->data->maligntyp) == castalign)
+			break;
 		}
 	    }
     }
