@@ -1521,6 +1521,15 @@ const char *u_str;	/* from user, so might be variant spelling */
 const char *o_str;	/* from objects[], so is in canonical form */
 boolean retry_inverted;	/* optional extra "of" handling */
 {
+	/* special case: wizards can wish for traps.  The object is "beartrap"
+	 * and the trap is "bear trap", so to let wizards wish for both we
+	 * must not fuzzymatch.
+	 */
+#ifdef WIZARD
+	if (wizard && !strcmp(o_str, "beartrap"))
+	    return !strncmpi(o_str, u_str, 8);
+#endif
+
 	/* ignore spaces & hyphens and upper/lower case when comparing */
 	if (fuzzymatch(u_str, o_str, " -", TRUE)) return TRUE;
 
