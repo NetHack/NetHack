@@ -71,10 +71,8 @@ void mswin_display_splash_window ()
 	while( IsWindow(hWnd) &&
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
 		if( !IsDialogMessage(hWnd, &msg) ) {
-			if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
 

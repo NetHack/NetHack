@@ -108,10 +108,8 @@ void mswin_display_RIP_window (HWND hWnd)
 	while( IsWindow(hWnd) &&
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
 		if( !IsDialogMessage(hWnd, &msg) ) {
-			if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
 
