@@ -631,9 +631,9 @@
                sidered interesting.
 
           _    Travel  to  a  map  location  via a shortest-path algorithm.
-               Stops on most of the same conditions as  the  Rush  commands
-               do.  For  ports  with mouse support, the command is also in-
-               voked when a mouse-click takes place on a  location  further
+               Stops  on  most  of  the  same conditions as the `G' command
+               does.  For  ports  with  mouse  support, the command is also
+               invoked when a mouse-click takes place on a location further
                than 1 cell away from the current position.
 
           .    Rest, do nothing for one turn.
