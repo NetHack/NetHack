@@ -54,7 +54,7 @@ I       Invent  list selected parts of your inventory
 o       open    open a door
 p       pay     pay your bill (in a shop)
 P       puton   put on an accessory (ring, amulet, etc)
-q       quaff   drink a potion
+q       quaff   drink something (potion, water, etc)
 Q       quiver  select ammunition for quiver
 r       read    read a scroll or spellbook
 R       remove  remove an accessory (ring, amulet, etc)

@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 2, 2003
+.ds f2 "April 4, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -573,7 +573,7 @@ Put on a ring or other accessory (amulet, blindfold).
 Repeat previous message.  Subsequent ^P's repeat earlier messages.
 The behavior can be varied via the msg_window option.
 .lp q
-Quaff (drink) a potion.
+Quaff (drink) something (potion, water, etc).
 .lp Q
 Select an object for your quiver.  You can then throw this using
 the `f' command.  (In versions prior to 3.3 this was the command to quit

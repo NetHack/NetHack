@@ -125,7 +125,7 @@ Commands:
         P       Put on an accessory (ring, amulet, etc).
         ^P      Repeat last message (subsequent ^P's repeat earlier messages).
                 The behavior can be varied via the msg_window option.
-        q       Drink (quaff) a potion.
+        q       Drink (quaff) something (potion, water, etc).
         Q       Select ammunition for quiver.
         r       Read a scroll or spellbook.
         R       Remove an accessory (ring, amulet, etc).
