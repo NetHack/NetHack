@@ -1,0 +1,147 @@
+#	NetHack Makefile (VMS) - top level for making & installing everything.
+#	SCCS Id: @(#)Makefile.top	3.3	96/03/02
+
+#  Copy this file to <top>Makefile.; edit the appropriate values for
+#  GAMEDIR ("playground" location) and GAMEOWNER (UIC or identifier
+#  for the owner of playground files).
+
+#	usage:	mms all,install
+#	  or	mms no_tools,all,install
+#	  or substitute freeware `MMK' for Digital's `MMS'.
+
+MAKE	= $(MMS)
+CD	= set default
+ECHO	= write sys$output
+EXEC	= @
+NOOP	= continue		# don't do anything interesting
+TOUCH	= set file/truncate	# multiple files per $(TOUCH), but no creation
+# support directories, relative to 'top'
+DAT = [.dat]
+DOC = [.doc]
+SRC = [.src]
+TOP = [-]	# relative to the others
+UTL = [.util]
+VMS = [.sys.vms]
+
+GAMEDIR =			# defaults to [.play]
+GAMEOWNER =			# defaults to installer's UIC
+# these are the distributed values in [.include]vmsconf.h
+#GAMEDIR = DISK$USERS:[GAMES.NETHACK.3-3-0.PLAY]
+#GAMEOWNER = NHWIZARD
+
+# just about everything, except installation
+all :	program utilities data dlb_data documentation
+      @ $(ECHO) "all code and data is now up to date."
+
+program :
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) all
+      @ $(CD) $(TOP)
+utilities :
+	$(CD) $(UTL)
+	$(MAKE)$(MAKEFLAGS) all
+      @ $(CD) $(TOP)
+data :
+	$(CD) $(DAT)
+	$(MAKE)$(MAKEFLAGS) all
+      @ $(CD) $(TOP)
+documentation :
+	$(CD) $(DOC)
+	$(MAKE)$(MAKEFLAGS) all
+      @ $(CD) $(TOP)
+
+install :	program all_data make_directories create_writeable_files update
+      @ $(ECHO) "installation is now complete."
+
+# assume there're no active games in progress
+update	:	place_readonly_files place_executable place_vms_support
+      @ open/Write f tmp-update.com;
+      @ write f "$ set noon"
+      @ write f "$ if p1.eqs."""" then  p1 = f$trnlnm(""HACKDIR"")"
+      @ write f "$ if p1.eqs."""" then  p1 = ""[.play]"""
+      @ write f "$ old_default = f$environ(""DEFAULT"")"
+      @ write f "$ set default 'p1'"
+      @ write f\
+ "$ if f$search(""*.*;-2"").nes."""" then  set file/prot=(s:rwed,o:rwed) *.*;-2"
+      @ write f\
+ "$ if f$search(""*.*;-1"").nes."""" then  set file/prot=(s:rwed,o:rwed) *.*;-1"
+      @ write f "$ if f$search(""*.*;-1"").nes."""" then  purge"
+      @ write f "$! if f$search(""bones*.*"").nes."""" then  $(TOUCH) bones*.*"
+      @ write f "$! if f$search(""[.save]*"").nes."""" then  $(TOUCH) [.save]*"
+      @ write f "$ set default 'old_default'"
+      @ write f "$ exit"
+      @ close f
+      - $(EXEC)tmp-update.com; $(GAMEDIR)  !purge old version
+      @ delete tmp-update.com; 
+      @ $(ECHO) "playground files updated."
+
+Guidebook :
+	$(CD) $(DOC)
+	$(MAKE)$(MAKEFLAGS) Guidebook
+      @ $(CD) $(TOP)
+manpages :
+	$(CD) $(DOC)
+	$(MAKE)$(MAKEFLAGS) manpages
+      @ $(CD) $(TOP)
+
+all_data : data dlb_data
+      @ $(NOOP)
+
+dlb_data :
+	$(EXEC)$(VMS)install.com "$(GAMEDIR)" "$(GAMEOWNER)" dlb
+
+make_directories :
+	$(EXEC)$(VMS)install.com "$(GAMEDIR)" "$(GAMEOWNER)" directories
+
+create_writeable_files :
+	$(EXEC)$(VMS)install.com "$(GAMEDIR)" "$(GAMEOWNER)" writeable_files
+
+place_readonly_files :
+	$(EXEC)$(VMS)install.com "$(GAMEDIR)" "$(GAMEOWNER)" readonly_files
+
+place_executable :
+	$(EXEC)$(VMS)install.com "$(GAMEDIR)" "$(GAMEOWNER)" executable
+
+place_vms_support :
+	$(EXEC)$(VMS)install.com "$(GAMEDIR)" "$(GAMEOWNER)" termcap
+	$(EXEC)$(VMS)install.com "$(GAMEDIR)" "$(GAMEOWNER)" procedure
+	$(EXEC)$(VMS)install.com "$(GAMEDIR)" "$(GAMEOWNER)" documentation
+
+
+# 'make no_tools' should be done first if you don't have the appropriate
+# tools to process the parser and scanner for the special level and
+# dungeon compilers; doing so will copy distributed, pre-processed files
+# from [.sys.share] to [.util].  If you _do_ have the tools, be sure to
+# edit [.util]Makefile so that it uses the right ones.
+no_tools :
+	$(CD) $(UTL)
+	$(MAKE)$(MAKEFLAGS) no_yacc
+	$(MAKE)$(MAKEFLAGS) no_lex
+      @ $(CD) $(TOP)
+
+
+# 'make clean' removes all the .obj files, but leaves around all the executables
+# and compiled data files.
+clean :
+	$(CD) $(SRC)
+      - $(MAKE)$(MAKEFLAGS) clean
+      @ $(CD) $(TOP)
+	$(CD) $(UTL)
+      - $(MAKE)$(MAKEFLAGS) clean
+      @ $(CD) $(TOP)
+
+# 'make spotless' returns the source tree to near-distribution condition.
+# it removes .obj files, executables, and compiled data files.
+spotless :
+	$(CD) $(SRC)
+      - $(MAKE)$(MAKEFLAGS) spotless
+      @ $(CD) $(TOP)
+	$(CD) $(UTL)
+      - $(MAKE)$(MAKEFLAGS) spotless
+      @ $(CD) $(TOP)
+	$(CD) $(DAT)
+      - $(MAKE)$(MAKEFLAGS) spotless
+      @ $(CD) $(TOP)
+	$(CD) $(DOC)
+      - $(MAKE)$(MAKEFLAGS) spotless
+      @ $(CD) $(TOP)
