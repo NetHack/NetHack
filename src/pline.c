@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pline.c	3.4	1999/11/28	*/
+/*	SCCS Id: @(#)pline.c	3.4	2003/11/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -174,7 +174,7 @@ void
 You_hear VA_DECL(const char *,line)
 	char *tmp;
 
-	if (Deaf || flags.acoustics) return;
+	if (Deaf || !flags.acoustics) return;
 	VA_START(line);
 	VA_INIT(line, const char *);
 	if (Underwater)
