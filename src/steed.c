@@ -12,7 +12,7 @@ static NEARDATA const char steeds[] = {
 	S_QUADRUPED, S_UNICORN, S_ANGEL, S_CENTAUR, S_DRAGON, S_JABBERWOCK, '\0'
 };
 
-STATIC_DCL boolean FDECL(landing_spot, (coord*, int));
+STATIC_DCL boolean FDECL(landing_spot, (coord *, int));
 
 /*** Putting the saddle on ***/
 
