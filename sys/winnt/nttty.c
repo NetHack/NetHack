@@ -164,6 +164,8 @@ tty_end_screen()
 	}
 }
 
+extern boolean getreturn_disable;	/* from sys/share/pcsys.c */
+
 static BOOL CtrlHandler(ctrltype)
 DWORD ctrltype;
 {
@@ -174,6 +176,7 @@ DWORD ctrltype;
 		case CTRL_CLOSE_EVENT:
 		case CTRL_LOGOFF_EVENT:
 		case CTRL_SHUTDOWN_EVENT:
+			getreturn_disable = TRUE;
 #ifndef NOSAVEONHANGUP
 			hangup(0);
 #endif

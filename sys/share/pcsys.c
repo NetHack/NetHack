@@ -384,10 +384,17 @@ char *name;
 	return;
 }
 
+#ifdef WIN32
+boolean getreturn_disable;
+#endif
+
 void
 getreturn(str)
 const char *str;
 {
+#ifdef WIN32
+	if (getreturn_disable) return;
+#endif
 #ifdef TOS
 	msmsg("Hit <Return> %s.", str);
 #else
