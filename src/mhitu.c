@@ -99,6 +99,7 @@ register struct attack *mattk;
 	    else
 		pline("%s just misses!", Monnam(mtmp));
 	}
+	stop_occupation();
 }
 
 STATIC_OVL void
@@ -1536,12 +1537,12 @@ do_stone:
 	    mdamageu(mtmp, dmg);
 	}
 
-	if (dmg) {
+	if (dmg)
 	    res = passiveum(olduasmon, mtmp, mattk);
-	    stop_occupation();
-	    return res;
-	} else
-	    return 1;
+	else
+	    res = 1;
+	stop_occupation();
+	return res;
 }
 
 #endif /* OVL1 */
