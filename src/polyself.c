@@ -1200,6 +1200,12 @@ int part;
 	if (mptr->mlet == S_CENTAUR || mptr->mlet == S_UNICORN ||
 		(mptr == &mons[PM_ROTHE] && part != HAIR))
 	    return horse_parts[part];
+	if (mptr->mlet == S_LIGHT) {
+		if (part == HANDED) return "rayed";
+		else if (part == ARM || part == FINGER ||
+				part == FINGERTIP || part == HAND) return "ray";
+		else return "beam";
+	}
 	if (mptr->mlet == S_EEL && mptr != &mons[PM_JELLYFISH])
 	    return fish_parts[part];
 	if (slithy(mptr) || (mptr->mlet == S_DRAGON && part == HAIR))
