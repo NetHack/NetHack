@@ -1,0 +1,289 @@
+Building a PPC NetHack 3.3 with the Metrowerks compilers
+
+
+You must be familiar with the Metrowerks compiler and know how to construct
+projects.  The NetHack source may come with the four pre-made projects that
+are needed to build NetHack and the files it needs.  These four projects are
+in :sys:mac and are MakeDefs.u, DgnComp.u, LevComp.u, and NetHack.u.  If you
+do not have them, or wish to construct them yourself, see the section "Project
+Contents" below.
+
+
+1. Move the projects MakeDefs.u, DgnComp.u, LevComp.u, and NetHack.u to the
+top level of the NetHack tree.  If you are building your own, create each
+project as needed, in the order given below.
+
+2. Create a folder "lib" in the top level.  This is where the files used by
+NetHack will be deposited by MakeDefs, DgnComp, and LevComp.
+
+3. Build and run MakeDefs.
+
+You will be presented with a list of options.  Initially choose them all (the
+default).  Later you may wish to only run a few of them.  The options are
+"odemvpqrhz", each of which makes a file:
+
+				-o creates :include:onames.h
+				-p creates :include:pm.h
+				-z creates :src:vis_tab.c
+				-m creates :src:monstr.c
+				-e creates :dat:dundeon.pdf
+				-v creates :lib:options
+				-d creates :lib:data
+				-r creates :lib:rumors
+				-h creates :lib:oracles
+				-q creates :lib:quest.dat
+
+
+4. If you are _not_ using DLB, follow these directions.  As of v3.3, DLB is ON
+for the Mac.  Copy the following files.  You may want to change News or NHDeflts.
+
+		a. copy ':sys:mac:MacHelp' to ':lib:MacHelp'
+		b. copy ':sys:mac:News' to ':lib:News'
+		c. copy ':sys:mac:NHDeflts' to ':lib:NetHack Defaults'
+
+		d. copy	':dat:cmdhelp' to ':lib:cmdhelp'
+		e. copy	':dat:help' to ':lib:help'
+		f. copy ':dat:hh' to 'lib:hh'
+		g. copy	':dat:history' to ':lib:history'
+		h. copy	':dat:license' to ':lib:license'
+		i. copy	':dat:opthelp' to ':lib:opthelp'
+		j. copy	':dat:wizhelp' to ':lib:wizhelp'
+
+5. Create an empty file, ':lib:record'
+
+6. Build and run DgnComp.
+		This will create a file "dungeon" in the lib directory.
+
+7. Build and run LevComp.
+		This will build the level files (*.lev) in the lib directory.
+
+8. Build NetHack.
+		Move NetHack in the lib directory.
+
+
+------------------------
+
+
+Building NetHack with MetroWerks IDE 1.x (DR7-DR10, DR11 was never used)
+
+
+To build NetHack, you will need to create four projects at the top level of
+the NetHack directory tree.  These four projects are MakeDefs.u, DgnComp.u,
+LevComp.u, and NetHack.u.  The projects don't have to end in ".u", but you
+should append some form of ".XXX" to the end of the project's name to
+distinguish the project from the executable that it produces.  The files
+and libraries to include in these projects are listed in the "Project
+Contents" section below.  You must create and run Makedefs before creating
+NetHack because MakeDefs will create files used by NetHack.
+
+Use the MacOS C/C++ template for each of the projects.  The libraries included
+will be overkill for all the projects (e.g. the C++ libraries are not needed).
+Add the .c and resource files as indicated below.  Unless otherwise noted, the
+projects can use the default preferences:
+
+	Font
+		The tabbing on all non-mac files is 8.  All mac files have a
+			tab of 4.
+	PPC Processor
+		All projects must have the same alignment to build a consistent
+			NetHack.  To share save files with 68K, the alignments
+			must match for their projects, as well.
+		Turn on Global Optimization (official version is compiled
+			with level 1).  If you don't turn it on, some files may
+			not compile because of register overflow.  [NetHack
+			only]
+	PPC Project
+		Set name to <MakeDefs, LevComp DgnComp, NetHack>
+		Other settings [NetHack only]
+			creator:			nh31
+			preferred heap size:2500
+			minimum heap size:	2000
+			stack size:			128		[PPC only]
+
+
+The SIOUX library may be replaced with console.stubs.c for the NetHack
+project.
+
+NOTE: As NetHack 3.3, you must turn on OLDROUTINENAMES -- so you can't use
+the default pre-compiled header.  You should either remove it from the
+preferences or insert another precompiled header that has this define off.
+
+
+------------------------
+
+
+Building NetHack with MetroWerks IDE 2.0.
+
+This is for building a PowerPC version only.  This doesn't take advantage
+of the IDE's subprojects.  These will be investigated later.
+
+
+MakeDefs.u, DgnComp.u, LevComp.u:  Select ANSI C Console PPC.
+	Settings:
+		PPC Target
+			+ Change File Name to MakeDefs, DgnComp, or LevComp respectively.
+		C/C++ Language
+			+ Turn off ANSI strict, ANSI Keywords Only, Expand Trigraphs
+		PPC Processor
+			+ Turn on global optimization (at least to level 1)
+
+NetHack.u: Basic ToolBox PPC
+		PPC Target
+			+ Change File Name to NetHack.  Other settings
+				creator:			nh31
+				preferred heap size:2500
+				minimum heap size:	2000
+				stack size:			128		[PPC only]
+		C/C++ Language
+			+ Options ANSI strict, ANSI Keywords Only, Expand Trigraphs
+			  are already turned off, so you don't have to do anything.
+		PPC Processor
+			+ Turn on global optimization (at least to level 1)
+
+
+------------------------
+Creating projects for NetHack with MetroWerks IDE 3.3 (Pro 4)
+
+This is what I changed from the default settings when creating a 68K version.  Some of
+the settings may not be necessary.  For example, NetHack doesn't use floating point,
+so I didn't have to check 8 byte doubles.  Some are interrelated.  For example, the
+codegen and the Math and MSL libraries used.
+
+For MakeDefs.u, DgnComp.u, LevComp.u: 
+1. Select File>>New Project...>>MacOS>>C_C++>>Standard Console>>Std C Console 68K
+2. 68K Settings:
+	Target Settings:
+		+ Set "Target Name" to {MakeDefs,DgnComp,LevComp}.
+	68K Target:
+		+ Set "File Name" to {MakeDefs,DgnComp,LevComp}.
+	C/C++ Language:
+		+ Check Require Function Prototypes, uncheck everything else.
+		+ Clear "Prefix File".
+	68K Processor:
+		+ Set "Code Model" to Large.
+		+ Check 68020 Codegen, 4-Byte Ints, 8-Byte Doubles, Far Data, Far Method Tables,
+			Far String Constants.  Uncheck everything else.
+3. Libraries 68K
+	+ Remove the C++ Library (it is not needed).
+	+ Change math library to MathLib68K Fa(4i_8d).Lib.
+	+ Change MSL C library to MSL C.68K Fa(4i_8d).Lib.
+	Note: The actual libraries used must match the CodeGen options in 68K Processor.
+
+
+For NetHack.u:
+1. Select File>>New Project...>>MacOS>>C_C++>>MacOS ToolBox>>MacOS ToolBox 68K
+2. 68K Settings
+	Target Settings:
+		+ Set "Target Name" to NetHack Debug and NetHack Final.
+	68K Target:
+		+ Set "File Name" to NetHack Debug and NetHack Final.
+		+ Set "Creator" to 'nh31'.
+		+ Set "Preferred Heap Size (k)" to 2500.
+		+ Set "Minimum Heap Size (k)" to 1500.
+	C/C++ Language:
+		+ Check Require Function Prototypes, uncheck everything else.
+		+ Set "Prefix File" to LocalDefines.h.  I use this header to define
+		  OLDROUTINENAMES because the pre-compiled header doesn't have it set
+		  any more.  One of these days we'll fix up the code...
+	68K Processor:
+		+ Set "Code Model" to Large.
+		+ Check 68020 Codegen, 4-Byte Ints, 8-Byte Doubles, Far Data, Far Method Tables,
+			Far String Constants.  Uncheck everything else.
+3. Libraries 68K
+	+ Remove the C++ Library (it is not needed).
+	+ Change math library to MathLib68K Fa(4i_8d).Lib.
+	+ Change MSL C library to MSL C.68K Fa(4i_8d).Lib.
+	Note: The actual libraries used must match the CodeGen options in 68K Processor.
+	
+
+For Recover.u:
+1. Select File>>New Project...>>MacOS>>C_C++>>MacOS ToolBox>>MacOS ToolBox 68K
+2. 68K Settings
+	Target Settings:
+		+ Set "Target Name" to Recover Debug and Recover Final.
+	68K Target:
+		+ Set "File Name" to Recover Debug and Recover Final.
+		+ Set "Creator" to 'nhRc'.
+	C/C++ Language:
+		+ Check Require Function Prototypes, uncheck everything else.
+		+ Set "Prefix File" to LocalDefines.h.  I use this header to define
+		  OLDROUTINENAMES because the pre-compiled header doesn't have it set
+		  any more.  One of these days we'll fix up the code...
+	68K Processor:
+		+ Set "Code Model" to Large.
+		+ Check 68020 Codegen, 4-Byte Ints, 8-Byte Doubles, Far Data, Far Method Tables,
+			Far String Constants.  Uncheck everything else.
+3. Libraries 68K
+	+ Remove the C++ Library (it is not needed).
+	+ Change math library to MathLib68K Fa(4i_8d).Lib.
+	+ Change MSL C library to MSL C.68K Fa(4i_8d).Lib.
+	Note: The actual libraries used must match the CodeGen options in 68K Processor.
+
+
+------------------------
+
+Project Contents:
+
+MakeDefs.u should contain the following source files:
+
+	src
+		objects.c
+		monst.c
+	util
+		makedefs.c
+
+
+DgnComp.u should contain the following source files:
+
+	src
+		alloc.c
+	sys:share
+		dgn_lex.c
+		dgn_yacc.c
+	util
+		dgn_main.c
+		panic.c
+
+
+LevComp.u should contain the following source files:
+
+	src
+		alloc.c
+		decl.c
+		drawing.c
+		monst.c
+		objects.c
+	sys:mac
+		macerrs.c
+		macfile.c
+	sys:share
+		lev_lex.c
+		lev_yacc.c
+	util
+		lev_main.c
+		panic.c
+	
+
+NetHack.u should contain the following source files:
+
+	src
+		*.c			[can do an add all]
+	sys:mac
+		*.c	except mrecover.c
+		NetHack.rsrc
+		machelp.bh	[for baloon help]
+		Sound.rsrc	[if you wish to have a few, crude sounds]
+		Files.r		[if you use DLB (on by default)]
+	sys:share
+		random.c
+	win:tty
+		*.c			[can do an add all - termcap.c is not needed, but will compile to nothing]
+
+	Note: src:monstr.c and src:vis_tab.c are created by MakeDefs -m and -s
+	respectively.
+
+Recover.u should contain the following source files:
+
+	sys:mac
+		mrecover.c
+		mrecover.rsrc
