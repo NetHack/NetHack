@@ -562,6 +562,14 @@ set_wc_option_mod_status(optmask, status)
 		   or SET_IN_GAME (SET_IN_FILE implies that the option
 		   is completely hidden during the game).
 
+set_option_mod_status(optnam, status)
+		-- Adjust the optflag field for one of the core options
+		   that is not part of the wincap suite.  A port might use
+		   this to override the default initialization setting for
+		   status specified in options.c.  Note that you have to
+		   specify the option by name and that you can only set 
+		   one option per call unlike set_wc_option_mod_status().
+
 
 Adding a new wincap option:
 
