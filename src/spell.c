@@ -1130,7 +1130,15 @@ int *spell_no;
 	return FALSE;
 }
 
-/* Integer square root function without using floating point. */
+/* Integer square root function without using floating point.
+ * This could be replaced by a faster algorithm, but has not because:
+ * + the simple algorithm is easy to read
+ * + this algorithm does not require 64-bit support
+ * + in current usage, the values passed to isqrt() are not really that
+ *   large, so the performance difference is negligible
+ * + isqrt() is used in only one place
+ * + that one place is not the bottle-neck
+ */
 STATIC_OVL int
 isqrt(val)
 int val;
