@@ -561,14 +561,14 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
 		../include/objclass.h ../include/youprop.h ../include/prop.h \
 		../include/permonst.h ../include/monattk.h \
 		../include/monflag.h ../include/mondata.h ../include/pm.h \
-		../include/wintype.h ../include/decl.h ../include/quest.h \
-		../include/spell.h ../include/color.h ../include/obj.h \
-		../include/you.h ../include/attrib.h ../include/monst.h \
-		../include/skills.h ../include/onames.h ../include/timeout.h \
-		../include/trap.h ../include/flag.h ../include/rm.h \
-		../include/vision.h ../include/display.h ../include/engrave.h \
-		../include/rect.h ../include/region.h ../include/winprocs.h \
-		../include/wintty.h ../include/trampoli.h
+		../include/wintype.h ../include/context.h ../include/decl.h \
+		../include/quest.h ../include/spell.h ../include/color.h \
+		../include/obj.h ../include/you.h ../include/attrib.h \
+		../include/monst.h ../include/skills.h ../include/onames.h \
+		../include/timeout.h ../include/trap.h ../include/flag.h \
+		../include/rm.h ../include/vision.h ../include/display.h \
+		../include/engrave.h ../include/rect.h ../include/region.h \
+		../include/winprocs.h ../include/wintty.h ../include/trampoli.h
 	touch $(HACK_H)
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
