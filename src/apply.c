@@ -1272,7 +1272,7 @@ int magic; /* 0=Physical, otherwise skill level */
 		if (wl == BOTH_SIDES) bp = makeplural(bp);
 #ifdef STEED
 		if (u.usteed)
-	 	    pline("%s is in no shape for jumping.", Monnam(u.usteed));
+		    pline("%s is in no shape for jumping.", Monnam(u.usteed));
 		else
 #endif
 		Your("%s%s %s in no shape for jumping.",
@@ -1614,17 +1614,17 @@ long timeout;
 	silent = (timeout != monstermoves); /* happened while away */
 	okay_spot = get_obj_location(figurine, &cc.x, &cc.y, 0);
 	if (figurine->where == OBJ_INVENT ||
-	    figurine->where == OBJ_MINVENT) 
-	        okay_spot = enexto(&cc, cc.x, cc.y,
+	    figurine->where == OBJ_MINVENT)
+		okay_spot = enexto(&cc, cc.x, cc.y,
 				   &mons[figurine->corpsenm]);
 	if (!okay_spot ||
 	    !figurine_location_checks(figurine,&cc, TRUE)) {
-	    	/* reset the timer to try again later */
+		/* reset the timer to try again later */
 		(void) start_timer((long)rnd(5000), TIMER_OBJECT,
 				FIG_TRANSFORM, (genericptr_t)figurine);
 		return;
 	}
-	
+
 	cansee_spot = cansee(cc.x, cc.y);
 	mtmp = make_familiar(figurine, cc.x, cc.y, TRUE);
 	if (mtmp) {
@@ -1650,8 +1650,8 @@ long timeout;
 
 		case OBJ_MINVENT:
 		    if (cansee_spot && !silent) {
-		    	struct monst *mon;
-		    	mon = figurine->ocarry;
+			struct monst *mon;
+			mon = figurine->ocarry;
 			/* figurine carring monster might be invisible */
 			if (canseemon(figurine->ocarry)) {
 			    Sprintf(carriedby, "%s pack",
@@ -1689,7 +1689,7 @@ coord *cc;
 boolean quietly;
 {
 	xchar x,y;
-	
+
 	x = cc->x; y = cc->y;
 	if (!isok(x,y)) {
 		if (!quietly)
@@ -1718,7 +1718,7 @@ register struct obj *obj;
 {
 	xchar x, y;
 	coord cc;
-	
+
 	if(!getdir((char *)0)) {
 		flags.move = multi = 0;
 		return;
@@ -1821,126 +1821,131 @@ reset_trapset()
 
 /* touchstones - by Ken Arnold */
 STATIC_OVL void
-use_stone(otmp)
-struct obj *otmp;
+use_stone(tstone)
+struct obj *tstone;
 {
-	struct obj *obj;
-	char allowall[3];
-	const char *color = 0;
-	static const char *ambiguous_scratch = "You make scratch marks on the stone.";
-	const char *scritch = "\"scritch, scritch\"";
-	unsigned material;
-
-	allowall[0] = GOLD_CLASS;
-	allowall[1] = ALL_CLASSES;
-	allowall[2] = '\0';
-	if (!(obj = getobj(allowall, "rub on the stone")))
-	    return;
-
-	if (otmp == obj) {
-	    You_cant("rub %s on itself.", the(xname(obj)));
-	    return;
-	}
-	material = objects[obj->otyp].oc_material;
-
-	if (otmp->cursed &&
-	    obj->oclass == GEM_CLASS && !is_graystone(obj) && !rn2(5)) {
-	    pline(
-		(Blind ? "You feel something shatter." :
-		 (Hallucination ? "Oh, wow, look at the pretty shards." :
-		 "A sharp crack shatters %s %s.")),
-		(obj->quan == 1 ? "the" : "a"),
-		lcase(makesingular(let_to_name(obj->oclass, FALSE))));
-	    useup(obj);
-	    return;
-	}
-
-	if (Blind) {
-	    pline(scritch);
-	    return;
-	}
-
-	if (Hallucination) {
-	    pline("Oh wow, man: Fractals!");
-	    return;
-	}
-
-	if (material == LIQUID || material == WAX ||
-		material == CLOTH || material == WOOD || material == GOLD) {
-	    switch(material) {
-	    case LIQUID:
-		if (!obj->known)
-		    You("must think this is a wetstone, do you?");
-		else
-		    pline("%s a little wetter now.", Tobjnam(otmp, "are"));
-		break;
-	    case WAX:
-		color = "waxy";
-		goto see_streaks;	/* okay even if not touchstone */
-		/*NOTREACHED*/
-		break;
-	    case CLOTH:
-		pline_The("stone looks a little more polished now.");
-		break;
-	    case WOOD:
-		color = "wooden";
-		goto see_streaks;	/* okay even if not touchstone */
-		/*NOTREACHED*/
-		break;
-	    }
-	    return;
-	}
-	if (is_flimsy(obj)) {
-	    /* Objects passing the is_flimsy() test will not
-               scratch a stone.  They will leave streaks on
-               non-touchstones and touchstones alike */
-	    color = c_obj_colors[objects[obj->otyp].oc_color];
-	    goto see_streaks;
-	}
-	
-	if (otmp->otyp != TOUCHSTONE) {
-	    pline(ambiguous_scratch);
-	    return;
-	}
-
-	if (material == GOLD) {
-	    color = "golden";
-	    goto see_streaks;
-	}
-
-	switch (obj->oclass) {
-	  case GOLD_CLASS:
-	    color = "golden";
+    struct obj *obj;
+    const char *streak_color = 0;
+    static const char scritch[] = "\"scritch, scritch\"",
+	    ambiguous_scratch[] = "You make scratch marks on the stone.";
+    static char allowall[3] = { GOLD_CLASS, ALL_CLASSES, 0 };
 #ifndef GOLDOBJ
-	    /* goldobj back to u.ugold */
-	    u.ugold = obj->quan;
-	    obj->quan = 0L;
-	    dealloc_obj(obj);
-	    obj = (struct obj *)0;
+    struct obj goldobj;
 #endif
+
+    if ((obj = getobj(allowall, "rub on the stone")) == 0)
+	return;
+#ifndef GOLDOBJ
+    if (obj->oclass == GOLD_CLASS) {
+	u.ugold += obj->quan;	/* keep botl up to date */
+	goldobj = *obj;
+	dealloc_obj(obj);
+	obj = &goldobj;
+    }
+#endif
+
+    if (obj == tstone) {
+	You_cant("rub %s on itself.", the(xname(obj)));
+	return;
+    }
+
+    if (tstone->cursed &&
+	    obj->oclass == GEM_CLASS && !is_graystone(obj) &&
+	    !obj_resists(obj, 80, 100)) {
+	if (Blind)
+	    pline("You feel something shatter.");
+	else if (Hallucination)
+	    pline("Oh, wow, look at the pretty shards.");
+	else
+	    pline("A sharp crack shatters %s%s.",
+		  (obj->quan > 1) ? "one of " : "", the(xname(obj)));
+#ifndef GOLDOBJ
+     /* assert(obj != &goldobj); */
+#endif
+	useup(obj);
+	return;
+    }
+
+    if (Blind) {
+	pline(scritch);
+	return;
+    } else if (Hallucination) {
+	pline("Oh wow, man: Fractals!");
+	return;
+    }
+
+    switch (obj->oclass) {
+    case GEM_CLASS:	/* these have class-specific handling below */
+    case RING_CLASS:
+	break;
+
+    default:
+	switch (objects[obj->otyp].oc_material) {
+	case CLOTH:
+	    pline_The("stone looks a little more polished now.");
+	    return;
+	case LIQUID:
+	    if (!obj->known)		/* note: not "whetstone" */
+		You("must think this is a wetstone, do you?");
+	    else
+		pline("%s a little wetter now.", Tobjnam(tstone, "are"));
+	    return;
+	case WAX:
+	    streak_color = "waxy";
+	    goto see_streaks;	/* okay even if not touchstone */
+	case WOOD:
+	    streak_color = "wooden";
+	    goto see_streaks;	/* okay even if not touchstone */
+	case GOLD:
+	    streak_color = "golden";
+	    goto see_streaks;
+	case SILVER:
+	    streak_color = "silvery";
+	    goto see_streaks;
+	default:
 	    break;
-	  case GEM_CLASS:
-	    if (otmp->blessed) {
-		makeknown(TOUCHSTONE);
-		makeknown(obj->otyp);
-		prinv((char *)0, obj, 0L);
-		return;
-	    }
-	    /* FALLTHROUGH */
-	  case RING_CLASS:
-	    if (objects[obj->otyp].oc_material == GLASS) {
-		pline(ambiguous_scratch); /* yet not ambiguous if a known touchstone */
-		return;
-	    }
-	    color = c_obj_colors[objects[obj->otyp].oc_color];
-	    break;
-	  default:
-	    pline(scritch);
+	}
+	break;  /* default oclass */
+    }
+
+    if (is_flimsy(obj)) {
+	/* Objects passing the is_flimsy() test will not
+	   scratch a stone.  They will leave streaks on
+	   non-touchstones and touchstones alike. */
+	streak_color = c_obj_colors[objects[obj->otyp].oc_color];
+	goto see_streaks;
+    }
+
+    if (tstone->otyp != TOUCHSTONE) {
+	pline(ambiguous_scratch);
+	return;
+    }
+
+    switch (obj->oclass) {
+    case GEM_CLASS:
+	if (tstone->blessed || (!tstone->cursed &&
+		(Role_if(PM_ARCHEOLOGIST) || Race_if(PM_GNOME)))) {
+	    makeknown(TOUCHSTONE);
+	    makeknown(obj->otyp);
+	    prinv((char *)0, obj, 0L);
 	    return;
 	}
-see_streaks:
-	pline("You see %s streaks on the stone.", color);
+	/* FALLTHROUGH */
+    case RING_CLASS:
+	if (objects[obj->otyp].oc_material == GLASS) {
+	    pline(ambiguous_scratch); /* yet not ambiguous if a known touchstone */
+	    return;
+	}
+	streak_color = c_obj_colors[objects[obj->otyp].oc_color];
+	break;
+    default:
+	pline(scritch);
 	return;
+    }
+
+ see_streaks:
+    pline("You see %s streaks on the stone.", streak_color);
+    return;
 }
 
 /* Place a landmine/bear trap.  Helge Hafting */
@@ -2255,7 +2260,7 @@ struct obj *obj;
 			char kbuf[BUFSZ];
 
 			Sprintf(kbuf, "%s corpse",
-			        an(mons[otmp->corpsenm].mname));
+				an(mons[otmp->corpsenm].mname));
 			pline("Snatching %s is a fatal mistake.", kbuf);
 			instapetrify(kbuf);
 		    }
@@ -2635,7 +2640,7 @@ doapply()
 		} else if (!ublindf)
 		    Blindf_on(obj);
 		else You("are already %s.",
-			ublindf->otyp == TOWEL ?     "covered by a towel" : 
+			ublindf->otyp == TOWEL ?     "covered by a towel" :
 			ublindf->otyp == BLINDFOLD ? "wearing a blindfold" :
 						     "wearing lenses");
 		break;

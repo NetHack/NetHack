@@ -33,7 +33,7 @@ static struct trobj Archeologist[] = {
 	{ FOOD_RATION, 0, FOOD_CLASS, 3, 0 },
 	{ PICK_AXE, UNDEF_SPE, TOOL_CLASS, 1, UNDEF_BLESS },
 	{ TINNING_KIT, UNDEF_SPE, TOOL_CLASS, 1, UNDEF_BLESS },
-	{ TOUCHSTONE, 0, GEM_CLASS, 1, 1 },
+	{ TOUCHSTONE, 0, GEM_CLASS, 1, 0 },
 	{ SACK, 0, TOOL_CLASS, 1, 0 },
 	{ 0, 0, 0, 0, 0 }
 };
@@ -81,7 +81,7 @@ static struct trobj Knight[] = {
 	{ 0, 0, 0, 0, 0 }
 };
 static struct trobj Monk[] = {
-#define M_BOOK          2
+#define M_BOOK		2
 	{ LEATHER_GLOVES, 2, ARMOR_CLASS, 1, UNDEF_BLESS },
 	{ ROBE, 1, ARMOR_CLASS, 1, UNDEF_BLESS },
 	{ UNDEF_TYP, UNDEF_SPE, SPBOOK_CLASS, 1, 1 },
@@ -215,10 +215,11 @@ static struct trobj Wishing[] = {
 };
 #ifdef GOLDOBJ
 static struct trobj Money[] = {
-        { GOLD_PIECE, 0 , GOLD_CLASS, 1, 0 },
-        { 0, 0, 0, 0, 0 }
+	{ GOLD_PIECE, 0 , GOLD_CLASS, 1, 0 },
+	{ 0, 0, 0, 0, 0 }
 };
 #endif
+
 /* race-based substitutions for initial inventory;
    the weaker cloak for elven rangers is intentional--they shoot better */
 static struct inv_sub { short race_pm, item_otyp, subs_otyp; } inv_subs[] = {
@@ -275,7 +276,7 @@ static struct def_skill Skill_B[] = {
     { P_TWO_HANDED_SWORD, P_EXPERT },	{ P_SCIMITAR, P_SKILLED },
     { P_SABER, P_BASIC },		{ P_CLUB, P_SKILLED },
     { P_MACE, P_SKILLED },		{ P_MORNING_STAR, P_SKILLED },
-    { P_FLAIL, P_BASIC },               { P_HAMMER, P_EXPERT },
+    { P_FLAIL, P_BASIC },		{ P_HAMMER, P_EXPERT },
     { P_QUARTERSTAFF, P_BASIC },	{ P_SPEAR, P_SKILLED },
     { P_TRIDENT, P_SKILLED },		{ P_BOW, P_BASIC },
     { P_ATTACK_SPELL, P_SKILLED },
@@ -388,15 +389,15 @@ static struct def_skill Skill_R[] = {
 
 static struct def_skill Skill_Ran[] = {
     { P_DAGGER, P_EXPERT },		 { P_KNIFE,  P_SKILLED },
-    { P_AXE, P_SKILLED },        { P_PICK_AXE, P_BASIC },
-    { P_SHORT_SWORD, P_BASIC },  { P_MORNING_STAR, P_BASIC },
-    { P_FLAIL, P_SKILLED },      { P_HAMMER, P_BASIC },
+    { P_AXE, P_SKILLED },	 { P_PICK_AXE, P_BASIC },
+    { P_SHORT_SWORD, P_BASIC },	 { P_MORNING_STAR, P_BASIC },
+    { P_FLAIL, P_SKILLED },	 { P_HAMMER, P_BASIC },
     { P_QUARTERSTAFF, P_BASIC }, { P_POLEARMS, P_SKILLED },
-    { P_SPEAR, P_SKILLED },      { P_JAVELIN, P_EXPERT },
-    { P_TRIDENT, P_BASIC },      { P_BOW, P_EXPERT },
-    { P_SLING, P_EXPERT },       { P_CROSSBOW, P_EXPERT },
-    { P_DART, P_EXPERT },        { P_SHURIKEN, P_SKILLED },
-    { P_BOOMERANG, P_EXPERT },   { P_WHIP, P_BASIC },
+    { P_SPEAR, P_SKILLED },	 { P_JAVELIN, P_EXPERT },
+    { P_TRIDENT, P_BASIC },	 { P_BOW, P_EXPERT },
+    { P_SLING, P_EXPERT },	 { P_CROSSBOW, P_EXPERT },
+    { P_DART, P_EXPERT },	 { P_SHURIKEN, P_SKILLED },
+    { P_BOOMERANG, P_EXPERT },	 { P_WHIP, P_BASIC },
     { P_HEALING_SPELL, P_BASIC },
     { P_DIVINATION_SPELL, P_EXPERT },
     { P_ESCAPE_SPELL, P_BASIC },
@@ -804,7 +805,7 @@ u_init()
 	default:	/* impossible */
 		break;
 	}
-		
+
 	if (discover)
 		ini_inv(Wishing);
 
@@ -816,7 +817,7 @@ u_init()
 #ifndef GOLDOBJ
 	u.ugold0 += hidden_gold();	/* in case sack has gold in it */
 #else
-        if (u.umoney0) ini_inv(Money);
+	if (u.umoney0) ini_inv(Money);
 	u.umoney0 += hidden_gold();	/* in case sack has gold in it */
 #endif
 
@@ -980,8 +981,8 @@ register struct trobj *trop;
 
 #ifdef GOLDOBJ
 		if (trop->trclass == GOLD_CLASS) {
-                        /* no "blessed" or "identified" money */
-		        obj->quan = u.umoney0;
+			/* no "blessed" or "identified" money */
+			obj->quan = u.umoney0;
 		} else {
 #endif
 			obj->dknown = obj->bknown = obj->rknown = 1;
