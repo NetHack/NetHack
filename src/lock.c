@@ -847,6 +847,8 @@ int x, y;
 		}
 		unblock_point(x,y);
 		newsym(x,y);
+		/* force vision recalc before printing more messages */
+		if (vision_full_recalc) vision_recalc(0);
 		loudness = 20;
 	    } else res = FALSE;
 	    break;
