@@ -13,6 +13,7 @@ Debug-Mode Quick Reference:
 #levelchange == change experience level
 #light sources == show mobile light sources
 #monpoly_control == control monster polymorphs
+#panic == panic test
 #poly == polymorph self
 #seenv == show seen vectors
 #stats == show memory statistics

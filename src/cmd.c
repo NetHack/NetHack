@@ -115,6 +115,7 @@ STATIC_PTR int NDECL(wiz_map);
 STATIC_PTR int NDECL(wiz_genesis);
 STATIC_PTR int NDECL(wiz_where);
 STATIC_PTR int NDECL(wiz_detect);
+STATIC_PTR int NDECL(wiz_panic);
 STATIC_PTR int NDECL(wiz_polyself);
 STATIC_PTR int NDECL(wiz_level_tele);
 STATIC_PTR int NDECL(wiz_level_change);
@@ -602,6 +603,14 @@ wiz_level_change()
     }
     u.ulevelmax = u.ulevel;
     return 0;
+}
+
+STATIC_PTR int
+wiz_panic()
+{
+	if (yn("Do you want to call panic() and end your game?") == 'y')
+		panic("crash test.");
+        return 0;
 }
 
 STATIC_PTR int
@@ -1409,6 +1418,7 @@ struct ext_func_tab extcmdlist[] = {
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},
         {(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
@@ -1425,6 +1435,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 	{"levelchange", "change experience level", wiz_level_change, TRUE},
 	{"light sources", "show mobile light sources", wiz_light_sources, TRUE},
 	{"monpoly_control", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
+	{"panic", "test panic routine (fatal to game)", wiz_panic, TRUE},
 	{"poly", "polymorph self", wiz_polyself, TRUE},
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
