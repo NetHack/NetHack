@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shknam.c	3.5	2003/01/09	*/
+/*	SCCS Id: @(#)shknam.c	3.5	2005/03/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -559,11 +559,25 @@ struct obj *obj;
     int i, shp_indx = ESHK(shkp)->shoptype - SHOPBASE;
     const struct shclass *shp = &shtypes[shp_indx];
 
-    if (shp->symb == RANDOM_CLASS) return TRUE;
-    else for (i = 0; i < SIZE(shtypes[0].iprobs) && shp->iprobs[i].iprob; i++)
-		if (shp->iprobs[i].itype < 0 ?
+    if (shp->symb == RANDOM_CLASS)
+	return TRUE;
+    for (i = 0; i < SIZE(shtypes[0].iprobs) && shp->iprobs[i].iprob; i++) {
+	/* pseudo-class needs special handling */
+	if (shp->iprobs[i].itype == VEGETARIAN_CLASS) {
+	    if ((obj->otyp == TIN || obj->otyp == CORPSE) &&
+		    ((obj->corpsenm >= LOW_PM &&
+			vegetarian(&mons[obj->corpsenm])) ||
+		     (obj->otyp == TIN && obj->spe == 1)))	/* spinach */
+		return TRUE;
+	    if (obj->oclass == FOOD_CLASS &&
+		    (objects[obj->otyp].oc_material == VEGGY ||
+			obj->otyp == EGG))
+		return TRUE;
+	} else if ((shp->iprobs[i].itype < 0) ?
 			shp->iprobs[i].itype == - obj->otyp :
-			shp->iprobs[i].itype == obj->oclass) return TRUE;
+			shp->iprobs[i].itype == obj->oclass)
+	    return TRUE;
+    }
     /* not found */
     return FALSE;
 }
