@@ -154,8 +154,11 @@ moveloop()
 			wtcap = UNENCUMBERED;
 		    } else if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux,u.uy) && !Is_waterlevel(&u.uz)) {
 			if (u.mh > 1) {
-			    u.mh--;
-			    context.botl = 1;
+			    if (!Half_physical_damage ||
+				(Half_physical_damage && !(moves % 2))) {
+				u.mh--;
+				context.botl = 1;
+			    }
 			} else if (u.mh < 1)
 			    rehumanize();
 		    } else if (Upolyd && u.mh < u.mhmax) {
