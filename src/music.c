@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)music.c	3.4	2001/12/03	*/
+/*	SCCS Id: @(#)music.c	3.4	2003/03/10	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -477,9 +477,7 @@ do_play_instrument(instr)
 struct obj *instr;
 {
     char buf[BUFSZ], c = 'y';
-#ifndef	AMIGA
-	char *s;
-#endif
+    char *s;
     int x,y;
     boolean ok;
 
@@ -491,14 +489,22 @@ struct obj *instr;
 	c = yn("Improvise?");
     }
     if (c == 'n') {
-	if (u.uevent.uheard_tune == 2 && yn("Play the passtune?") == 'y')
-		Strcpy(buf, tune);
-	else
-		getlin("What tune are you playing? [what 5 notes]", buf);
-#ifndef	AMIGA
-	/* The AMIGA supports two octaves of notes */
-	for (s=buf; *s; s++) *s = highc(*s);
+	if (u.uevent.uheard_tune == 2 && yn("Play the passtune?") == 'y') {
+	    Strcpy(buf, tune);
+	} else {
+	    getlin("What tune are you playing? [5 notes, A-G]", buf);
+	    (void)mungspaces(buf);
+	    /* convert to uppercase and change any "H" to the expected "B" */
+	    for (s = buf; *s; s++) {
+#ifndef AMIGA
+		*s = highc(*s);
+#else
+		/* The AMIGA supports two octaves of notes */
+		if (*s == 'h') *s = 'b';
 #endif
+		if (*s == 'H') *s = 'B';
+	    }
+	}
 	You("extract a strange sound from %s!", the(xname(instr)));
 #ifdef UNIX386MUSIC
 	/* if user is at the console, play through the console speaker */
