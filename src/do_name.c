@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.4	2002/01/17	*/
+/*	SCCS Id: @(#)do_name.c	3.4	2002/06/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -421,7 +421,12 @@ const char *name;
 			      (genericptr_t)obj->oextra, lth, name);
 	}
 	if (lth) artifact_exists(obj, name, TRUE);
-	if (obj->oartifact && obj == uswapwep) untwoweapon();
+	if (obj->oartifact) {
+	    /* can't dual-wield with artifact as secondary weapon */
+	    if (obj == uswapwep) untwoweapon();
+	    /* activate warning if you've just named your weapon "Sting" */
+	    if (obj == uwep) set_artifact_intrinsic(obj, TRUE, W_WEP);
+	}
 	if (carried(obj)) update_inventory();
 	return obj;
 }
