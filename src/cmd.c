@@ -2189,8 +2189,12 @@ const char *msg;
 	putstr(win, 0, "          <  up");
 	putstr(win, 0, "          >  down");
 	putstr(win, 0, "          .  direct at yourself");
-	putstr(win, 0, "");
-	putstr(win, 0, "(Suppress this message with !cmdassist in config file.)");
+	if (msg) {
+	    /* non-null msg means that this wasn't an explicit user request */
+	    putstr(win, 0, "");
+	    putstr(win, 0,
+		   "(Suppress this message with !cmdassist in config file.)");
+	}
 	display_nhwindow(win, FALSE);
 	destroy_nhwindow(win);
 	return TRUE;
