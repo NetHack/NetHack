@@ -72,8 +72,8 @@ struct obj *obj;
 
 	    potion_descr = OBJ_DESCR(objects[obj->otyp]);
 	    if (potion_descr && !strcmp(potion_descr, "milky")) {
-	        if ( context.ghost_count < MAXMONNO &&
-		    !rn2(POTION_OCCUPANT_CHANCE(context.ghost_count))) {
+		if (!(mvitals[PM_GHOST].mvflags & G_GONE) &&
+			!rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_GHOST].born))) {
 		    if (!enexto(&cc, mon->mx, mon->my, &mons[PM_GHOST])) return 0;
 		    mquaffmsg(mon, obj);
 		    m_useup(mon, obj);
@@ -95,8 +95,8 @@ struct obj *obj;
 		}
 	    }
 	    if (potion_descr && !strcmp(potion_descr, "smoky") &&
-		    context.djinni_count < MAXMONNO &&
-		    !rn2(POTION_OCCUPANT_CHANCE(context.djinni_count))) {
+			!(mvitals[PM_DJINNI].mvflags & G_GONE) &&
+			!rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_DJINNI].born))) {
 		if (!enexto(&cc, mon->mx, mon->my, &mons[PM_DJINNI])) return 0;
 		mquaffmsg(mon, obj);
 		m_useup(mon, obj);
