@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2002/03/22	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2002/04/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -867,6 +867,7 @@ register const char *str;
 	    strcmp(str, "iron bars") &&
 	    strcmp(str, "ice")) {
 		if (index(vowels, *str) &&
+		    strncmp(str, "one-", 4) &&
 		    strncmp(str, "useful", 6) &&
 		    strncmp(str, "unicorn", 7) &&
 		    strncmp(str, "uranium", 7) &&
