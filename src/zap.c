@@ -1674,6 +1674,8 @@ smell:
 			else
 			    Norep("You smell a delicious smell.");
 			break;
+		    case WEAPON_CLASS:	/* crysknife */
+		    	/* fall through */
 		    default:
 			res = 0;
 			break;
