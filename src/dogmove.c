@@ -248,7 +248,11 @@ register struct edog *edog;
 		stop_occupation();
 	    } else if (monstermoves > edog->hungrytime + 750 || mtmp->mhp < 1) {
 	    dog_died:
-		if (mtmp->mleashed)
+		if (mtmp->mleashed
+#ifdef STEED
+		    && mtmp != u.usteed
+#endif
+		    )
 		    Your("leash goes slack.");
 		else if (cansee(mtmp->mx, mtmp->my))
 		    pline("%s dies%s.", Monnam(mtmp),
