@@ -1212,7 +1212,7 @@ boolean at_stairs, falling, portal;
 
 	    if ((mtmp = m_at(u.ux, u.uy)) != 0) {
 		impossible("mnexto failed (do.c)?");
-		rloc(mtmp);
+		(void) rloc(mtmp, FALSE);
 	    }
 	}
 

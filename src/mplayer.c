@@ -121,7 +121,7 @@ register boolean special;
 		return((struct monst *)0);
 
 	if(MON_AT(x, y))
-		rloc(m_at(x, y)); /* insurance */
+		(void) rloc(m_at(x, y), FALSE); /* insurance */
 
 	if(!In_endgame(&u.uz)) special = FALSE;
 

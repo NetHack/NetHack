@@ -1470,7 +1470,7 @@ register struct obj *obj;
 
 nopick:
 	if(!Blind) pline("%s", buf);
-	if (!tele_restrict(mon)) rloc(mon);
+	if (!tele_restrict(mon)) (void) rloc(mon, FALSE);
 	return(ret);
 }
 

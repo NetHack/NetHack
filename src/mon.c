@@ -428,7 +428,7 @@ register struct monst *mtmp;
 	    if (mtmp->mhp > 0) {
 		(void) fire_damage(mtmp->minvent, FALSE, FALSE,
 						mtmp->mx, mtmp->my);
-		rloc(mtmp);
+		(void) rloc(mtmp, FALSE);
 		return 0;
 	    }
 	    return (1);
@@ -451,7 +451,7 @@ register struct monst *mtmp;
 	    }
 	    mondead(mtmp);
 	    if (mtmp->mhp > 0) {
-		rloc(mtmp);
+		(void) rloc(mtmp, FALSE);
 		water_damage(mtmp->minvent, FALSE, FALSE);
 		return 0;
 	    }

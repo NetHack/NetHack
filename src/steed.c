@@ -535,7 +535,7 @@ dismount_steed(reason)
 	    if (enexto(&cc, u.ux, u.uy, mtmp->data))
 		rloc_to(mtmp, cc.x, cc.y);
 	    else	/* evidently no room nearby; move steed elsewhere */
-		rloc(mtmp);
+		(void) rloc(mtmp, FALSE);
 	    return;
 	}
 	if (!DEADMONSTER(mtmp)) {

@@ -42,7 +42,7 @@ register boolean forceshow;
 			if(mtmp->isgd) return(FALSE);
 			else if(!in_fcorridor(grd, u.ux, u.uy)) {
 			    if(mtmp->mtame) yelp(mtmp);
-			    rloc(mtmp);
+			    (void) rloc(mtmp, FALSE);
 			}
 		}
 		levl[fcx][fcy].typ = EGD(grd)->fakecorr[fcbeg].ftyp;
@@ -380,7 +380,7 @@ struct monst *grd;
 		if (!IS_WALL(levl[x][y].typ) && !in_fcorridor(grd, x, y)) {
 		    if ((mon = m_at(x, y)) != 0 && mon != grd) {
 			if (mon->mtame) yelp(mon);
-			rloc(mon);
+			(void) rloc(mon, FALSE);
 		    }
 		    if ((gold = g_at(x, y)) != 0) {
 			move_gold(gold, EGD(grd)->vroom);
@@ -461,7 +461,7 @@ register struct monst *grd;
 	       (grd_in_vault ||
 		(in_fcorridor(grd, grd->mx, grd->my) &&
 		 !in_fcorridor(grd, u.ux, u.uy)))) {
-		rloc(grd);
+		(void) rloc(grd, FALSE);
 		wallify_vault(grd);
 		(void) clear_fcorr(grd, TRUE);
 		goto letknow;
@@ -507,7 +507,7 @@ register struct monst *grd;
 		if (u_carry_gold) {	/* player teleported */
 		    m = grd->mx;
 		    n = grd->my;
-		    rloc(grd);
+		    (void) rloc(grd, FALSE);
 		    levl[m][n].typ = egrd->fakecorr[0].ftyp;
 		    newsym(m,n);
 		    grd->mpeaceful = 0;
@@ -583,7 +583,7 @@ letknow:
 		    /* just for insurance... */
 		    if (MON_AT(m, n) && m != grd->mx && n != grd->my) {
 			verbalize("Out of my way, scum!");
-			rloc(m_at(m, n));
+			(void) rloc(m_at(m, n), FALSE);
 		    }
 		    remove_monster(grd->mx, grd->my);
 		    newsym(grd->mx, grd->my);

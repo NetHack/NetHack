@@ -186,7 +186,7 @@ boolean sanctum;   /* is it the seat of the high priest? */
 	int cnt;
 
 	if(MON_AT(sx+1, sy))
-		rloc(m_at(sx+1, sy)); /* insurance */
+		(void) rloc(m_at(sx+1, sy), FALSE); /* insurance */
 
 	priest = makemon(&mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST],
 			 sx + 1, sy, NO_MM_FLAGS);
@@ -532,7 +532,7 @@ boolean peaceful;
 	if (ptr != &mons[PM_ALIGNED_PRIEST] && ptr != &mons[PM_ANGEL])
 		return((struct monst *)0);
 	
-	if (MON_AT(x, y)) rloc(m_at(x, y));	/* insurance */
+	if (MON_AT(x, y)) (void) rloc(m_at(x, y), FALSE);	/* insurance */
 
 	if (!(roamer = makemon(ptr, x, y, NO_MM_FLAGS)))
 		return((struct monst *)0);

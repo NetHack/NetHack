@@ -953,16 +953,18 @@ register int x, y;
 }
 
 /* place a monster at a random location, typically due to teleport */
-void
-rloc(mtmp)
+/* return TRUE if successful, FALSE if not */
+boolean
+rloc(mtmp, suppress_impossible)
 struct monst *mtmp;	/* mx==0 implies migrating monster arrival */
+boolean suppress_impossible;
 {
 	register int x, y, trycount;
 
 #ifdef STEED
 	if (mtmp == u.usteed) {
 	    tele();
-	    return;
+	    return TRUE;
 	}
 #endif
 
@@ -996,11 +998,13 @@ struct monst *mtmp;	/* mx==0 implies migrating monster arrival */
 		    goto found_xy;
 
 	/* level either full of monsters or somehow faulty */
-	impossible("rloc(): couldn't relocate monster");
-	return;
+	if (!suppress_impossible)
+		impossible("rloc(): couldn't relocate monster");
+	return FALSE;
 
  found_xy:
 	rloc_to(mtmp, x, y);
+	return TRUE;
 }
 
 STATIC_OVL void
@@ -1015,7 +1019,7 @@ struct monst *mtmp;
 		rloc_to(mtmp, c.x, c.y);
 		return;
 	}
-	rloc(mtmp);
+	(void) rloc(mtmp, FALSE);
 }
 
 boolean
@@ -1049,7 +1053,7 @@ int in_sight;
 	     * the guard isn't going to come for it...
 	     */
 	    if (trap->once) mvault_tele(mtmp);
-	    else rloc(mtmp);
+	    else (void) rloc(mtmp, FALSE);
 
 	    if (in_sight) {
 		if (canseemon(mtmp))
@@ -1253,12 +1257,12 @@ boolean give_feedback;
 	    if (give_feedback)
 		You("are no longer inside %s!", mon_nam(mtmp));
 	    unstuck(mtmp);
-	    rloc(mtmp);
+	    (void) rloc(mtmp, FALSE);
 	} else if (is_rider(mtmp->data) && rn2(13) &&
 		   enexto(&cc, u.ux, u.uy, mtmp->data))
 	    rloc_to(mtmp, cc.x, cc.y);
 	else
-	    rloc(mtmp);
+	    (void) rloc(mtmp, FALSE);
 	return TRUE;
 }
 

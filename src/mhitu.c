@@ -1232,7 +1232,7 @@ dopois:
 			pline("%s %s.", Monnam(mtmp), mtmp->minvent ?
 		    "brags about the goods some dungeon explorer provided" :
 		    "makes some remarks about how difficult theft is lately");
-			if (!tele_restrict(mtmp)) rloc(mtmp);
+			if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 			return 3;
 		} else if (mtmp->mcan) {
 		    if (!Blind) {
@@ -1242,7 +1242,7 @@ dopois:
 			    flags.female ? "unaffected" : "uninterested");
 		    }
 		    if(rn2(3)) {
-			if (!tele_restrict(mtmp)) rloc(mtmp);
+			if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 			return 3;
 		    }
 		    break;
@@ -1255,7 +1255,7 @@ dopois:
 			break;
 		  default:
 			if (!is_animal(mtmp->data) && !tele_restrict(mtmp))
-			    rloc(mtmp);
+			    (void) rloc(mtmp, FALSE);
 			if (is_animal(mtmp->data) && *buf) {
 			    if (canseemon(mtmp))
 				pline("%s tries to %s away with %s.",
@@ -1359,7 +1359,7 @@ dopois:
 			mongone(mtmp);
 			return 2;
 		    } else if (!rn2(33)) {
-			if (!tele_restrict(mtmp)) rloc(mtmp);
+			if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 			monflee(mtmp, d(3, 6), TRUE, FALSE);
 			return 3;
 		    }
@@ -2219,7 +2219,7 @@ register struct monst *mon;
 	if (uarm || uarmc) {
 		verbalize("You're such a %s; I wish...",
 				flags.female ? "sweet lady" : "nice guy");
-		if (!tele_restrict(mon)) rloc(mon);
+		if (!tele_restrict(mon)) (void) rloc(mon, FALSE);
 		return 1;
 	}
 	if (u.ualign.type == A_CHAOTIC)
@@ -2351,7 +2351,7 @@ register struct monst *mon;
 #endif
 	}
 	if (!rn2(25)) mon->mcan = 1; /* monster is worn out */
-	if (!tele_restrict(mon)) rloc(mon);
+	if (!tele_restrict(mon)) (void) rloc(mon, FALSE);
 	return 1;
 }
 

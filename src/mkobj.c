@@ -894,7 +894,11 @@ boolean init;
 
 	if (objtype != CORPSE && objtype != STATUE)
 	    impossible("making corpstat type %d", objtype);
-	otmp = mksobj_at(objtype, x, y, init, FALSE);
+	if (x == 0 && y == 0) {		/* special case - random placement */
+		otmp = mksobj(objtype, init, FALSE);
+		if (otmp) rloco(otmp);
+	} else
+		otmp = mksobj_at(objtype, x, y, init, FALSE);
 	if (otmp) {
 	    if (mtmp) {
 		struct obj *otmp2;

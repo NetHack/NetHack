@@ -308,7 +308,7 @@ d_level *lev;
 	/* "something" means the player in this case */
 	if(MON_AT(x, y)) {
 	    /* move the monster if no choice, or just try again */
-	    if(oneshot) rloc(m_at(x,y));
+	    if(oneshot) (void) rloc(m_at(x,y), FALSE);
 	    else return(FALSE);
 	}
 	u_on_newpos(x, y);

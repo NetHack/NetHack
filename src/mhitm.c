@@ -839,7 +839,7 @@ mdamagem(magr, mdef, mattk)
 		       we'll get "it" in the suddenly disappears message */
 		    if (vis) Strcpy(mdef_Monnam, Monnam(mdef));
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
-		    rloc(mdef);
+		    (void) rloc(mdef, FALSE);
 		    if (vis && !canspotmon(mdef)
 #ifdef STEED
 		    	&& mdef != u.usteed
@@ -967,7 +967,7 @@ mdamagem(magr, mdef, mattk)
 		    pline("%s steals some gold from %s.", buf, mon_nam(mdef));
 		}
 		if (!tele_restrict(magr)) {
-		    rloc(magr);
+		    (void) rloc(magr, FALSE);
 		    if (vis && !canspotmon(magr))
 			pline("%s suddenly disappears!", buf);
 		}
@@ -1034,7 +1034,7 @@ mdamagem(magr, mdef, mattk)
 							0 : MM_AGR_DIED));
 			if (magr->data->mlet == S_NYMPH &&
 			    !tele_restrict(magr)) {
-			    rloc(magr);
+			    (void) rloc(magr, FALSE);
 			    if (vis && !canspotmon(magr))
 				pline("%s suddenly disappears!", buf);
 			}

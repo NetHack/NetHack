@@ -49,7 +49,7 @@ register struct monst *mtmp;
 	    pline("%s quickly snatches some gold from between your %s!",
 		    Monnam(mtmp), makeplural(body_part(FOOT)));
 	    if(!u.ugold || !rn2(5)) {
-		if (!tele_restrict(mtmp)) rloc(mtmp);
+		if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 		/* do not set mtmp->mavenge here; gold on the floor is fair game */
 		monflee(mtmp, 0, FALSE, FALSE);
 	    }
@@ -57,7 +57,7 @@ register struct monst *mtmp;
 	    u.ugold -= (tmp = somegold());
 	    Your("purse feels lighter.");
 	    mtmp->mgold += tmp;
-	if (!tele_restrict(mtmp)) rloc(mtmp);
+	if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 	    mtmp->mavenge = 1;
 	    monflee(mtmp, 0, FALSE, FALSE);
 	    flags.botl = 1;
@@ -118,7 +118,7 @@ register struct monst *mtmp;
 	    pline("%s quickly snatches some gold from between your %s!",
 		    Monnam(mtmp), makeplural(body_part(FOOT)));
 	    if(!ygold || !rn2(5)) {
-		if (!tele_restrict(mtmp)) rloc(mtmp);
+		if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 		monflee(mtmp, 0, FALSE, FALSE);
 	    }
 	} else if(ygold) {
@@ -129,7 +129,7 @@ register struct monst *mtmp;
             freeinv(ygold);
             add_to_minv(mtmp, ygold);
 	    Your("purse feels lighter.");
-	    if (!tele_restrict(mtmp)) rloc(mtmp);
+	    if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 	    monflee(mtmp, 0, FALSE, FALSE);
 	    flags.botl = 1;
 	}
@@ -161,7 +161,7 @@ stealarm()
 			/* Implies seduction, "you gladly hand over ..."
 			   so we don't set mavenge bit here. */
 			monflee(mtmp, 0, FALSE, FALSE);
-			if (!tele_restrict(mtmp)) rloc(mtmp);
+			if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 		        break;
 		    }
 		}
@@ -499,7 +499,7 @@ struct monst *mtmp;
 	(void) mpickobj(mtmp,otmp);	/* may merge and free otmp */
 	pline("%s stole %s!", Monnam(mtmp), doname(otmp));
 	if (can_teleport(mtmp->data) && !tele_restrict(mtmp))
-	    rloc(mtmp);
+	    (void) rloc(mtmp, FALSE);
     }
 }
 

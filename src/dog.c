@@ -356,8 +356,41 @@ boolean with_you;
 	mtmp->my = xyflags;
 	if (xlocale)
 	    (void) mnearto(mtmp, xlocale, ylocale, FALSE);
-	else
-	    rloc(mtmp);
+	else {
+	    if (!rloc(mtmp,TRUE)) {
+		/*
+		 * Failed to place migrating monster,
+		 * probably because the level is full.
+		 * Dump the monster's cargo and leave the monster dead.
+		 */
+	    	struct obj *obj, *corpse;
+		while ((obj = mtmp->minvent) != 0) {
+		    obj_extract_self(obj);
+		    obj_no_longer_held(obj);
+		    if (obj->owornmask & W_WEP)
+			setmnotwielded(mtmp,obj);
+		    obj->owornmask = 0L;
+		    if (xlocale && ylocale)
+			    place_object(obj, xlocale, ylocale);
+		    else {
+		    	rloco(obj);
+			get_obj_location(obj, &xlocale, &ylocale, 0);
+		    }
+		}
+		corpse = mkcorpstat(CORPSE, (struct monst *)0, mtmp->data,
+				xlocale, ylocale, FALSE);
+#ifndef GOLDOBJ
+		if (mtmp->mgold) {
+		    if (xlocale == 0 && ylocale == 0 && corpse) {
+			(void) get_obj_location(corpse, &xlocale, &ylocale, 0);
+			(void) mkgold(mtmp->mgold, xlocale, ylocale);
+		    }
+		    mtmp->mgold = 0L;
+		}
+#endif
+		mongone(mtmp);
+	    }
+	}
 }
 
 /* heal monster for time spent elsewhere */

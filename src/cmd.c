@@ -126,6 +126,9 @@ STATIC_PTR int NDECL(wiz_show_wmodes);
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern void FDECL(show_borlandc_stats, (winid));
 #endif
+#ifdef DEBUG_MIGRATING_MONS
+STATIC_PTR int NDECL(wiz_migrate_mons);
+#endif
 STATIC_DCL void FDECL(count_obj, (struct obj *, long *, long *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(obj_chain, (winid, const char *, struct obj *, long *, long *));
 STATIC_DCL void FDECL(mon_invent_chain, (winid, const char *, struct monst *, long *, long *));
@@ -1492,6 +1495,9 @@ struct ext_func_tab extcmdlist[] = {
 	 */
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
+#ifdef DEBUG_MIGRATING_MONS
+	{(char *)0, (char *)0, donull, TRUE},
+#endif
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
@@ -1514,6 +1520,9 @@ struct ext_func_tab extcmdlist[] = {
 static const struct ext_func_tab debug_extcmdlist[] = {
 	{"levelchange", "change experience level", wiz_level_change, TRUE},
 	{"lightsources", "show mobile light sources", wiz_light_sources, TRUE},
+#ifdef DEBUG_MIGRATING_MONS
+	{"migratemons", "migrate n random monsters", wiz_migrate_mons, TRUE},
+#endif
 	{"monpolycontrol", "control monster polymorphs", wiz_mon_polycontrol, TRUE},
 	{"panic", "test panic routine (fatal to game)", wiz_panic, TRUE},
 	{"polyself", "polymorph self", wiz_polyself, TRUE},
@@ -1741,6 +1750,35 @@ sanity_check()
 	obj_sanity_check();
 	timer_sanity_check();
 }
+
+#ifdef DEBUG_MIGRATING_MONS
+static int
+wiz_migrate_mons()
+{
+	int mcount = 0;
+	char inbuf[BUFSZ];
+	struct permonst *ptr;
+	struct monst *mtmp;
+	d_level tolevel;
+	getlin("How many random monsters to migrate? [0]", inbuf);
+	if (*inbuf == '\033') return 0;
+	mcount = atoi(inbuf);
+	if (mcount < 0 || mcount > (COLNO * ROWNO) || Is_botlevel(&u.uz))
+		return 0;
+	while (mcount > 0) {
+		if (Is_stronghold(&u.uz))
+		    assign_level(&tolevel, &valley_level);
+		else
+		    get_level(&tolevel, depth(&u.uz) + 1);
+		ptr = rndmonst();
+		mtmp = makemon(ptr, 0, 0, NO_MM_FLAGS);
+		if (mtmp) migrate_to_level(mtmp, ledger_no(&tolevel),
+				MIGR_RANDOM, (coord *)0);
+		mcount--;
+	}
+	return 0;
+}
+#endif
 
 #endif /* WIZARD */
 
