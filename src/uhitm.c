@@ -1863,8 +1863,18 @@ use_weapon:
 				if (mon->data == &mons[PM_SHADE])
 				    Your("attempt to surround %s is harmless.",
 					mon_nam(mon));
-				else
+				else {
 				    sum[i]= gulpum(mon,mattk);
+				    if (sum[i] == 2 &&
+					    (mon->data->mlet == S_ZOMBIE ||
+						mon->data->mlet == S_MUMMY) &&
+					    rn2(5) &&
+					    !Sick_resistance) {
+					You_feel("%ssick.",
+					    (Sick) ? "very " : "");
+					mdamageu(mon, rnd(8));
+				    }
+				}
 			} else
 				missum(mon, mattk);
 			break;
