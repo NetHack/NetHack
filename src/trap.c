@@ -1280,6 +1280,7 @@ int style;
 				     "someone bowling." :
 				     "rumbling in the distance.");
 			}
+			style &= ~LAUNCH_UNSEEN;
 			goto roll;
 	    case ROLL|LAUNCH_KNOWN:
 			/* use otrapped as a flag to ohitmon */
