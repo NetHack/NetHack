@@ -760,8 +760,14 @@ dodown()
 		if (!(trap = t_at(u.ux,u.uy)) ||
 			(trap->ttyp != TRAPDOOR && trap->ttyp != HOLE)
 			|| !Can_fall_thru(&u.uz) || !trap->tseen) {
-			You_cant("go down here.");
-			return(0);
+
+			if (flags.autodig && !flags.nopick &&
+				uwep && is_pick(uwep)) {
+				return use_pick_axe2(uwep);
+			} else {
+				You_cant("go down here.");
+				return(0);
+			}
 		}
 	}
 	if(u.ustuck) {
