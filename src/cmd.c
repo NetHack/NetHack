@@ -1007,11 +1007,12 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	   the situation when invisibility would be an expected attribute */
 	else if ((HInvis || EInvis || pm_invisible(youmonst.data)) && BInvis)
 	    you_are("visible","");
-	if (Displaced) you_are("displaced","");
+	if (Displaced) you_are("displaced",from_what(DISPLACED));
 	if (Stealth) you_are("stealthy",from_what(STEALTH));
 	if (Aggravate_monster)
-	    enl_msg("You aggravate", "", "d", " monsters","");
-	if (Conflict) enl_msg("You cause", "", "d", " conflict","");
+	    enl_msg("You aggravate", "", "d",
+			" monsters",from_what(AGGRAVATE_MONSTER));
+	if (Conflict) enl_msg("You cause", "", "d", " conflict",from_what(CONFLICT));
 
 	/*** Transportation ***/
 	if (Jumping) you_can("jump",from_what(JUMPING));
