@@ -148,7 +148,7 @@ static void NDECL(end_of_input);
 static const char* readchar_queue="";
 
 STATIC_DCL char *NDECL(parse);
-STATIC_DCL boolean FDECL(help_control, (CHAR_P, char *));
+STATIC_DCL boolean FDECL(help_dir, (CHAR_P, char *));
 
 #ifdef OVL1
 
@@ -1908,11 +1908,13 @@ const char *s;
 	if(dirsym == '.' || dirsym == 's')
 		u.dx = u.dy = u.dz = 0;
 	else if(!movecmd(dirsym) && !u.dz) {
-		boolean did_control = FALSE;
+		boolean did_help = FALSE;
 		if(!index(quitchars, dirsym)) {
-		    if (s && *s == '^' && iflags.cmdassist)
-			did_control = help_control(dirsym, "Invalid direction key!");
-		    if (!did_control) pline("What a strange direction!");
+		    if (iflags.cmdassist) {
+			did_help = help_dir((s && *s == '^') ? dirsym : 0,
+					    "Invalid direction key!");
+		    }
+		    if (!did_help) pline("What a strange direction!");
 		}
 		return 0;
 	}
@@ -1921,24 +1923,33 @@ const char *s;
 }
 
 STATIC_OVL boolean
-help_control(sym, msg)
+help_dir(sym, msg)
 char sym;
 char *msg;
 {
 	char ctrl;
 	winid win;
+	char *wiz_only_list = "EFGIOVW";
 	char buf[BUFSZ], buf2[BUFSZ], *expl;
+	win = create_nhwindow(NHW_TEXT);
+	if (!win) return FALSE;
+	if (msg) {
+		Sprintf(buf, "cmdassist: %s", msg);
+		putstr(win, 0, buf);
+		putstr(win, 0, "");
+	}
 	if (letter(sym)) { 
 	    sym = highc(sym);
 	    ctrl = (sym - 'A') + 1;
-	    if ((expl = dowhatdoes_core(ctrl, buf2))) {
-		win = create_nhwindow(NHW_TEXT);
-		putstr(win, 0, "cmdassist");
-		if (msg) putstr(win, 0, msg);
-		putstr(win, 0, "");
-		Sprintf(buf,
-			"Are you trying to use ^%c as specified in the Guidebook?",
-		    	sym);
+	    if ((expl = dowhatdoes_core(ctrl, buf2))
+		&& (!index(wiz_only_list, sym)
+#ifdef WIZARD
+		    || wizard)
+#endif
+		              ) {
+		Sprintf(buf, "Are you trying to use ^%c%s?", sym,
+			index(wiz_only_list, sym) ? "" :
+			" as specified in the Guidebook");
 		putstr(win, 0, buf);
 		putstr(win, 0, "");
 		putstr(win, 0, expl);
@@ -1948,13 +1959,28 @@ char *msg;
 			"the <Ctrl> key, and the <%c> key at the same time.", sym);
 		putstr(win, 0, buf);
 		putstr(win, 0, "");
-		putstr(win, 0, "(Suppress this message with !cmdassist in config file.)");
-		display_nhwindow(win, FALSE);
-		destroy_nhwindow(win);
-		return TRUE;
 	    }
 	}
-	return FALSE;
+	if (iflags.num_pad) {
+		putstr(win, 0, "Valid direction keys (with number_pad on) are:");
+		putstr(win, 0, "          7  8  9");
+		putstr(win, 0, "           \\ | / ");
+		putstr(win, 0, "          4- . -6");
+		putstr(win, 0, "           / | \\ ");
+		putstr(win, 0, "          1  2  3");
+	} else {
+		putstr(win, 0, "Valid direction keys are:");
+		putstr(win, 0, "          y  k  u");
+		putstr(win, 0, "           \\ | / ");
+		putstr(win, 0, "          h- . -l");
+		putstr(win, 0, "           / | \\ ");
+		putstr(win, 0, "          b  j  n");
+	};
+	putstr(win, 0, "");
+	putstr(win, 0, "(Suppress this message with !cmdassist in config file.)");
+	display_nhwindow(win, FALSE);
+	destroy_nhwindow(win);
+	return TRUE;
 }
 
 #endif /* OVL1 */
