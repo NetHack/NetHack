@@ -625,8 +625,6 @@ home()
 void
 backsp()
 {
-	DWORD count;
-
 	GetConsoleScreenBufferInfo(hConOut,&csbi);
 	if (csbi.dwCursorPosition.X > 0)
 		ntcoord.X = csbi.dwCursorPosition.X-1;
@@ -638,8 +636,6 @@ backsp()
 				(currentcolor|currenthilite|currentbackground));
 		colorchange = FALSE;
 	}
-	WriteConsole(hConOut," ",1,&count,0);
-	SetConsoleCursorPosition(hConOut,ntcoord);	
 }
 
 void

@@ -688,6 +688,8 @@ tty_askname()
 #if defined(MICRO) || defined(WIN32CON)
 # if defined(WIN32CON)
 				backsp();       /* \b is visible on NT */
+				(void) putchar(' ');
+				backsp();
 # else
 #  if defined(MSDOS)
 				if (iflags.grmode) {

@@ -6,6 +6,10 @@
 
 #ifdef TTY_GRAPHICS
 
+#if !defined(MSDOS) && !defined(MAC)
+#define NEWAUTOCOMP
+#endif
+
 #include "wintty.h"
 #include "func_tab.h"
 
