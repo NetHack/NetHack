@@ -428,7 +428,7 @@ CONFIG_H = $(INCL)/config.h $(INCL)/config1.h $(INCL)/tradstdc.h \
 	       $(INCL)/amiconf.h $(INCL)/macconf.h $(INCL)/beconf.h \
 	       $(INCL)/ntconf.h $(INCL)/nhlan.h
 
-HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/align.h \
+HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/align.h $(INCL)/context.h \
 	       $(INCL)/dungeon.h $(INCL)/monsym.h $(INCL)/mkroom.h \
 	       $(INCL)/objclass.h $(INCL)/youprop.h $(INCL)/prop.h \
 	       $(INCL)/permonst.h $(INCL)/monattk.h \

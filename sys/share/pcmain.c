@@ -423,7 +423,7 @@ char *argv[];
 			}
 		}
 
-		flags.move = 0;
+		context.move = 0;
 	} else {
 not_recovered:
 		player_selection();
@@ -431,7 +431,7 @@ not_recovered:
 		if (discover)
 			You("are in non-scoring discovery mode.");
 
-		flags.move = 0;
+		context.move = 0;
 		set_wear();
 		(void) pickup(1);
 		read_engr_at(u.ux,u.uy);

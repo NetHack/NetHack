@@ -264,7 +264,7 @@ DECL_H	   = $(YOU_H)		$(INCL)\spell.h	    $(INCL)\color.h   \
 	     $(INCL)\obj.h	$(INCL)\onames.h    $(INCL)\pm.h      \
 	      $(INCL)\decl.h
 GLOBAL_H   = $(PCCONF_H)	$(INCL)\coord.h	    $(INCL)\global.h
-HACK_H	   = $(CONFIG_H)	$(DUNGEON_H)	    $(DECL_H)	      \
+HACK_H	   = $(CONFIG_H)	$(INCL)\context.h   $(DUNGEON_H) $(DECL_H) \
 	       $(DISPLAY_H)	  $(INCL)\monsym.h    $(INCL)\mkroom.h	\
 	      $(INCL)\objclass.h $(INCL)\trap.h	     $(INCL)\flag.h    \
 	      $(RM_H)		 $(INCL)\vision.h    $(INCL)\wintype.h \

@@ -860,8 +860,8 @@ DECL_H      = $(INCL)\quest.h $(INCL)\spell.h $(INCL)\color.h \
 
 CONFIG_H    = $(INCL)\config1.h $(INCL)\tradstdc.h $(INCL)\coord.h $(PCCONF_H) \
 	      $(INCL)\config.h
-HACK_H      = $(CONFIG_H) $(INCL)\dungeon.h $(INCL)\align.h $(INCL)\monsym.h \
-              $(INCL)\mkroom.h $(INCL)\objclass.h $(DECL_H) \
+HACK_H      = $(CONFIG_H) $(INCL)\context.h $(INCL)\dungeon.h $(INCL)\align.h \
+	      $(INCL)\monsym.h $(INCL)\mkroom.h $(INCL)\objclass.h $(DECL_H) \
 	      $(INCL)\timeout.h $(INCL)\trap.h $(INCL)\flag.h $(INCL)\rm.h \
 	      $(INCL)\vision.h $(INCL)\mondata.h $(INCL)\wintype.h \
 	      $(INCL)\engrave.h $(INCL)\rect.h $(EXTERN_H) \
