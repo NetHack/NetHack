@@ -27,7 +27,7 @@
 #endif
 
 #ifdef MAC
-# ifdef applec	/* Means the MPW compiler, I hope */
+# if defined(__SC__) || defined(__MRC__)	/* MPW compilers */
 #  define MPWTOOL
 #include <CursorCtl.h>
 #include <string.h>
@@ -87,7 +87,11 @@ static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.3\t1999/08/16";
 #   define INCLUDE_TEMPLATE	"..\\include\\%s"
 #   define SOURCE_TEMPLATE	"..\\src\\%s"
 #   define DGN_TEMPLATE		"..\\dat\\%s"  /* where dungeon.pdf file goes */
-#   define DATA_TEMPLATE	"..\\dat\\%s"
+#  if __SC__ || __MRC__
+#   define DATA_TEMPLATE	":Dungeon:%s"
+#  else
+#   define DATA_TEMPLATE	":lib:%s"
+#  endif /* __SC__ || __MRC__ */
 #   define DATA_IN_TEMPLATE	"..\\dat\\%s"
 #  else /* OS2 */
 #   define INCLUDE_TEMPLATE	"../include/%s"

@@ -6,6 +6,8 @@
  * This file contains the main function for the parser
  * and some useful functions needed by yacc
  */
+#define SPEC_LEV	/* for MPW */
+/* although, why don't we move those special defined here.. and in dgn_main? */
 
 #include "hack.h"
 #include "date.h"
@@ -15,7 +17,7 @@
 #endif
 
 #ifdef MAC
-# ifdef applec
+# if defined(__SC__) || defined(__MRC__)
 #  define MPWTOOL
 #include <CursorCtl.h>
 # else
@@ -47,7 +49,7 @@
 # define OMASK 0644
 #endif
 
-#define NEWLINE	10	/* under Mac MPW C '\n' is 13 so don't use it. */
+#define NEWLINE	'\n'	/* changes to 13 for MPW */
 
 #define ERR		(-1)
 
@@ -1108,7 +1110,11 @@ specialmaze *maze_level;
 	Strcat(lbuf, filename);
 	Strcat(lbuf, LEV_EXT);
 
+#if defined(MAC) && (defined(__SC__) || defined(__MRC__))
+	fout = open(lbuf, O_WRONLY|O_CREAT|O_BINARY);
+#else
 	fout = open(lbuf, O_WRONLY|O_CREAT|O_BINARY, OMASK);
+#endif
 	if (fout < 0) return FALSE;
 
 	if (room_level) {

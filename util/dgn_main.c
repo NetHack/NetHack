@@ -12,7 +12,7 @@
 #include "dlb.h"
 
 #ifdef MAC
-# ifdef applec
+# if defined(__SC__) || defined(__MRC__)
 #  define MPWTOOL
 #include <CursorCtl.h>
 # else
