@@ -1,0 +1,276 @@
+             Instructions for compiling and installing NetHack 3.3
+                               on an OS/2 system
+             =====================================================
+                                Timo Hakulinen
+                        Last revision: 29 October 1996
+
+0.  Read this entire file before starting, and come back to the Notes below if
+    you have any problems.
+
+1.  Make sure all the NetHack files are in the appropriate directory
+    structure.  You should have a top directory (e.g. nh33, or whatever you
+    like) with subdirectories dat, doc, include, src, util, sys\share,
+    sys\os2, and win\tty.  You may have other subdirectories under sys and
+    win, but they will not affect compilation for an OS/2 system.  If you do
+    not follow this structure, the makefile will not function properly.  The
+    .c files for the main program belong in src, those for utility programs in
+    util, and OS/2-specific ones in sys\os2.  All the .h files belong in
+    include, the documentation in doc, and assorted data files in dat.  There
+    are also some necessary files in sys\share (pc*.c, random.c, dgn_*.*,
+    lev_*.*).  A more detailed explanation of the directory structure is found
+    in file Files, which should be in the top directory.
+
+    If you downloaded or ftp'd the sources from a UNIX system, the lines may
+    end in UNIX-style newlines instead of the carriage return and line feed
+    pairs used by DOS and OS/2.  You'll have to convert them (with a utility
+    like Rahul Dhesi's "flip").  Also, every file should end with a carriage
+    return / line feed pair, because Microsoft C has had a habit of ignoring
+    the last line of each file otherwise.  Besides, even editing UNIX-style
+    files with DOS editors is often a royal pain.
+
+2.  The makefile for OS/2, Makefile.os2, is found in directory sys\os2.  Copy
+    it to directory src and rename it Makefile.  From now on, Makefile.os2
+    will be referred to as "the makefile" in this document.
+
+    The makefile supports the following make utilities:
+
+    NDMAKE      a public domain make utility for DOS by Don Kneller
+    NMAKE       make shipped with Microsoft languages and IBM C Set/2
+    DMAKE       a public domain make for DOS and OS/2 by Dennis Vadura
+
+    Both NDMAKE and DMAKE are available at major archive sites.  The
+    following compilers are supported:
+
+    compiler:                           runs in:            compiles for:
+
+    Microsoft C 5.1                     DOS / OS/2 1.0-Warp OS/2 1.x
+    Microsoft 6.0A (see note 5)         - " -               - " -
+    IBM C Set/2 1.00, Toolkit/2 2.00    OS/2 2.x, Warp      OS/2 2.x, Warp
+    IBM CSet++ 2.00                     OS/2 2.x, Warp      OS/2 2.x, Warp
+    GCC emx 0.8f (see note 6)           OS/2 2.x, Warp      OS/2 2.x, Warp
+
+    Note that code compiled for OS/2 versions 1.0-1.3 runs unmodified in OS/2
+    versions 2.0 and up.  In principle it should be possible to cross compile
+    NetHack 3.3 for OS/2 in DOS using NDMAKE and MSC, but this is not
+    recommended (see note 3).
+
+    If you're using some other compiler than one listed above, you will have
+    to adapt the makefile to your needs.  In particular, change the CC,
+    CFLAGS, LINK, and LFLAGS macros to your C compiler's and linker's liking.
+    See the makefile for more information.
+
+    If you are going to be constructing Fred Fish's termcap library, you'll
+    need Makefile.lib in sys\share (see note 4).
+
+3.  Go to the include subdirectory.  First edit config.h according to the
+    comments to match your system and desired set of features.  In particular,
+    make sure that OS2 is defined, and that UNIX, HACKDIR, and COMPRESS are
+    *not* defined.  If you want to try out the new DLB data file library
+    scheme, uncomment DLB.  Note that although the makefile contains some
+    support for this scheme, it's new in NetHack 3.3 and hasn't been tested.
+    If your compiler is ANSI compliant (like practically all OS/2 compilers
+    are), it's probable that nothing else needs to be configured in config.h.
+
+    Next look at os2conf.h.  This file shouldn't need much changing.  If you
+    want to use the hardcoded OS/2 system definitions in def_os2.h instead of
+    the compiler's standard headers, comment out OS2_USESYSHEADERS.  This may
+    become necessary if you are using a compiler which doesn't come with
+    proper system headers by default.  In this case you may have to edit the
+    definitions there, because every compiler has its own way of declaring
+    the necessary system functions and data structures.  In general you
+    should prefer the compiler's offerings, if possible.
+
+    If you are going to compile the game on an HPFS drive, uncomment OS2_HPFS,
+    which enables the use of longer file names during compilation.  The
+    generated executable will only use file names compatible with FAT drives,
+    however.
+
+    If you are using a 32 bit compiler other than GCC emx 0.8f or C Set/2 in
+    OS/2 2.x, force OS2_32BITAPI to be defined.  Otherwise it is defined only
+    for the above mentioned compilers.
+
+    If you are not going to include random.c, because you are using the
+    random number generator provided by your compiler, you will need to
+    comment out RANDOM.
+
+    If you want to muck with different termcap settings, uncomment TERMLIB to
+    enable the use of termcap routines (see note 4).  This is not necessary to
+    create a fully functional game, however.
+
+4.  If you are using another compiler than MSC, GCC, or IBM C Set/2, you may
+    want to look through system.h in the include directory.  This file matches
+    the return and parameter types for system calls and library routines with
+    various flavors of compilers and operating systems.  Leaving this file
+    alone is unlikely to cause problems, but if you get compile errors with
+    any functions in the standard library, it's worth checking the
+    declarations there.
+
+5.  If you want to change the high score list behavior, examine the top of
+    topten.c, in the src directory.  You may want to change the definitions of
+    PERSMAX, POINTSMIN, and ENTRYMAX.
+
+6.  Go to the src directory and edit the top of the makefile.  Be sure that
+    the directory you want the game installed to actually exists.
+
+    You'll need nroff and/or TeX/LaTeX to do the files in doc.  If you don't
+    have either of these, you can skip it.
+
+    If you elected not to use the high quality BSD random number routines by
+    commenting out RANDOM in os2conf.h, comment out (or set equal to nothing)
+    the RANDOM macro in the makefile.
+
+    If you elected to use Fred Fish's termcap library (bundled in as
+    termcap.uu in directory sys\share), you will have to generate termlib.lib
+    from those sources by typing "make -f makefile.lib termlib.lib".  You must
+    set the TERMLIB option in the makefile to link the resulting termlib.lib
+    into the game.
+
+    If you are recompiling after patching your sources, or if you got your
+    files from somewhere other than the official distribution, "touch
+    makedefs.c" to ensure that certain files (onames.h and pm.h) are remade,
+    lest potentially troublesome time stamps fool make.
+
+    If you have lex and yacc programs, or the equivalent flex and bison
+    programs, you can set up the makefile to generate the appropriate .h and
+    .c files from their .l and .y counterparts whenever you recompile.  This
+    is done by changing the do_yacc and do_lex targets in the makefile to
+    depend on targets yacc_act and lex_act instead of yacc_cpy and lex_cpy.
+    Otherwise the makefile will copy pre-generated yacc and lex output files
+    dgn_*.* and lev_*.* from directory sys\share to util and include.
+
+    Now, enter "make all", and take a siesta; your computer will be occupied
+    for a fair amount of time.  If all goes well, you will get an executable.
+
+7.  All the support data files should have been copied to the game directory
+    by the make process.  Here is the complete list in alphabetical order of
+    all the files that should have gotten there during a full build:
+
+    Arc-fila.lev   Arc-filb.lev   Arc-goal.lev   Arc-loca.lev   Arc-strt.lev
+    Bar-fila.lev   Bar-filb.lev   Bar-goal.lev   Bar-loca.lev   Bar-strt.lev
+    Cav-fila.lev   Cav-filb.lev   Cav-goal.lev   Cav-loca.lev   Cav-strt.lev
+    Hea-fila.lev   Hea-filb.lev   Hea-goal.lev   Hea-loca.lev   Hea-strt.lev
+    Kni-fila.lev   Kni-filb.lev   Kni-goal.lev   Kni-loca.lev   Kni-strt.lev
+    Mon-fila.lev   Mon-filb.lev   Mon-goal.lev   Mon-loca.lev   Mon-strt.lev
+    Pri-fila.lev   Pri-filb.lev   Pri-goal.lev   Pri-loca.lev   Pri-strt.lev
+    Ran-fila.lev   Ran-filb.lev   Ran-goal.lev   Ran-loca.lev   Ran-strt.lev
+    Rog-fila.lev   Rog-filb.lev   Rog-goal.lev   Rog-loca.lev   Rog-strt.lev
+    Sam-fila.lev   Sam-filb.lev   Sam-goal.lev   Sam-loca.lev   Sam-strt.lev
+    Tou-fila.lev   Tou-filb.lev   Tou-goal.lev   Tou-loca.lev   Tou-strt.lev
+    Val-fila.lev   Val-filb.lev   Val-goal.lev   Val-loca.lev   Val-strt.lev
+    Wiz-fila.lev   Wiz-filb.lev   Wiz-goal.lev   Wiz-loca.lev   Wiz-strt.lev
+    air.lev        asmodeus.lev   astral.lev     baalz.lev      bigrm-1.lev
+    bigrm-2.lev	   bigrm-3.lev    bigrm-4.lev    bigrm-5.lev    castle.lev
+    cmdhelp        data           dungeon        earth.lev      fakewiz1.lev
+    fakewiz2.lev   fire.lev       help           hh             history
+    juiblex.lev    knox.lev       license        medusa-1.lev   medusa-2.lev
+    minefill.lev   minend-1.lev   minend-2.lev   minetn-1.lev   minetn-2.lev
+    nethack.cmd    nethack.cnf    nethack.exe    nethack.ico    opthelp
+    options        oracle.lev     oracles        orcus.lev      quest.dat
+    recover.exe    rumors         sanctum.lev    soko1-1.lev    soko1-2.lev
+    soko2-1.lev    soko2-2.lev    soko3-1.lev    soko3-2.lev    soko4-1.lev
+    soko4-2.lev    tower1.lev     tower2.lev     tower3.lev     valley.lev
+    water.lev      wizard1.lev    wizard2.lev    wizard3.lev    wizhelp
+
+    Yes.  It's 112 files for a full featured NetHack 3.3.  If any of the files
+    are missing, try to rerun make.  If that doesn't help, you'll have to try
+    to decipher the makefile to find out how to manually create the missing
+    files.  These kinds of troubles shouldn't happen except for two reasons:
+    You've run out of disk space while compiling or your make utility doesn't
+    understand the makefile properly for some reason.  In either case, you
+    should get some warnings from the make, though.
+
+    If you have old record, logfile, or news files in the game directory, they
+    are not overwritten.  Of course, old records from NetHack 3.1 and 3.2 are
+    not worth keeping with 3.3, since these games are really quite different.
+
+    Edit file nethack.cnf in the game directory to reflect your particular
+    setup and personal preferences, following the comments there.  More info
+    about settable options can be found in the file opthelp and the guidebook.
+
+    If you compiled in the TERMLIB feature, also move the sys\share\termcap
+    file to your game directory.
+
+8.  If you'll be running NetHack from a different subdirectory, you will want
+    to "set HACKDIR=c:\games\nh33" (or whatever directory you want to use).
+    Add it to your config.sys, if you'll be playing often.
+
+    You can also create a special NetHack entry in your Presentation Manager /
+    Workplace Shell desktop.  This will use the included NetHack icon.
+    The following is a sample program description for OS/2 1.3 desktop, but
+    it's similar for OS/2 2.0:
+
+    Program title:          NetHack 3.3
+    Path and file name:     c:\games\nh33\nethack.cmd
+    Parameters:
+    Working directory:      c:\games\nh33
+    Program type:           OS/2 Full screen
+
+    Naturally you must fill in your own game directory and parameters if you
+    want to set any.  The program type can be either OS/2 Full screen or OS/2
+    Windowed.  Note that you should set the executable path to use the .cmd
+    file generated by the makefile.  This file generates an extra pause after
+    the program exit, because otherwise you wouldn't get to see the high score
+    list upon quitting due to PM/WPS automatically closing the program window.
+    When starting NetHack normally from OS/2 command prompt, the command
+    processor starts nethack.exe instead, so no extra pause is generated.
+
+9.  If you want to clear up the temporary files and objects created by the
+    compilation process, you may issue "make spotless".  This will return your
+    source tree to near-distribution condition.  Naturally, it will not affect
+    your newly built game files in any way.
+
+10. Play NetHack.  If it works, you're done!
+
+
+Notes
+-----
+
+1)  Save-files and bones-files from previous versions will not work with
+    NetHack 3.3.  Don't bother trying to keep them.
+
+2)  To install an update of NetHack after changing something, enter "make"
+    from the src directory.  If you add, delete, or reorder monsters or
+    objects, or you change the format of saved level files, delete any save
+    and bones files.  (Trying to use such files sometimes produces amusing
+    confusions on the game's part, but usually crashes.)
+
+3)  When cross-compiling for OS/2 in DOS, NDMAKE is the best choice because it
+    requires the least RAM for itself.  Note however, that cross-compilation
+    in DOS is discouraged, because it is considered obsolete (OS/2 is really
+    a much better place to compile).  If you still want to try, here are some
+    suggestions:
+
+    During linking, Microsoft linker will need temporary storage space.  Make
+    sure you have about 1 MB of free disk where ever you have defined your
+    temporary storage.  It is also a good idea to compile with as much free
+    RAM as possible.  It may otherwise get crowded with the bigger, more
+    complex source files (compiler bombs with "out of heap space" or similar).
+    If this happens, strip your configuration, zap TSR's, get a better memory
+    manager etc.
+
+4)  The file sys\share\termcap.uu is the fixed version of the Fred Fish
+    termcap library.  You will need to run a uudecode utility on it to
+    generate the file termcap.zip.  termcap.zip contains several files of
+    termcap routines.  Using them with NetHack involves very little knowledge
+    of the UNIX concept of a termcap database; mostly you need to know enough
+    to set a TERM environment variable.  You can unzip termcap.zip in the
+    sys\share directory, but if you are going to use it, it is probably best
+    to unzip a copy in the src directory.  That way you will not miss copying
+    any files over.  Wherever you unzip it, get rid of the included makefile
+    since a better version has been provided as Makefile.lib.  After creating
+    the termcap library file termlib.lib, copy it to src before compiling the
+    game main source.
+
+5)  When compiling with MSC 6.0, the maintenance version 6.0A should be used
+    instead of the original 6.0, which was all too buggy to successfully build
+    NetHack.
+
+6)  Note that emx 0.8f is the first version of GCC for OS/2 that can properly
+    compile NetHack.  Earlier versions do not work, because they don't support
+    the 16 bit API calls of OS/2.
+
+    GCC emx 0.8f does not currently work properly when fseek() function is
+    used with text files.  This is well documented in the compiler's
+    documentation.  Unfortunately NetHack uses fseek() in several places in
+    connection with text data.  This means that some help texts may not come
+    out right, but no serious problems should emerge.
