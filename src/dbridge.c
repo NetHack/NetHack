@@ -399,6 +399,8 @@ int dest, how;
 		/* we might have crawled out of the moat to survive */
 		etmp->ex = u.ux,  etmp->ey = u.uy;
 	} else {
+		int entitycnt;
+
 		killer.name[0] = 0;
 		/* fake "digested to death" damage-type suppresses corpse */
 #define mk_message(dest) ((dest & 1) ? "" : (char *)0)
@@ -409,6 +411,13 @@ int dest, how;
 		else		/* you caused it */
 		    xkilled(etmp->emon, dest);
 		etmp->edata = (struct permonst *)0;
+
+		/* dead long worm handling */
+		for (entitycnt = 0; entitycnt < ENTITIES; entitycnt++) {
+		    if (etmp != &(occupants[entitycnt]) &&
+			etmp->emon == occupants[entitycnt].emon)
+			occupants[entitycnt].edata = (struct permonst *)0;
+		}
 #undef mk_message
 #undef mk_corpse
 	}
