@@ -1642,7 +1642,7 @@ that can be dug (default false).
 Automatically pick up things onto which you move (default on). 
 See
 .op pickup_types
-to refine the behaviour.
+to refine the behavior.
 .lp "autoquiver  "
 This option controls what happens when you attempt the `f' (fire)
 command with an empty quiver.  When true, the computer will fill
@@ -1964,7 +1964,7 @@ in setting this with the `O' command.
 Send padding nulls to the terminal (default off).
 .lp number_pad
 Use the number keys to move instead of [yuhjklbn] (default 0 or off).
-(number_pad:2 invokes the old DOS behaviour where `5' means `g', meta-`5'
+(number_pad:2 invokes the old DOS behavior where `5' means `g', meta-`5'
 means `G',  and meta-`0' means `I'.)
 .lp objects
 Set the characters used to display object classes
@@ -1998,12 +1998,12 @@ or overLoaded), you will be asked if you want to continue.
 .lp pickup_types
 Specify the object types to be picked up when
 .op autopickup
-is on.  Default is all types. If your copy of the game has the experimental
+is on.  Default is all types.  If your copy of the game has the experimental
 compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use 
 .op autopickup_exception
 configuration file lines to further refine
 .op autopickup
-behaviour.
+behavior.
 .lp prayconfirm
 Prompt for confirmation before praying (default on).
 .lp pushweapon
@@ -2212,7 +2212,7 @@ the visible area of the window.
 Platform-specific Customization options
 .pg
 Here are explanations of options that are used by specific platforms or ports 
-to customize and change the port behaviour.
+to customize and change the port behavior.
 .lp altkeyhandler
 Select an alternate keystroke handler dll to load (Win32 tty NetHack only).
 The name of the handler is specified without the .dll extension and without any
@@ -2272,7 +2272,7 @@ Configuring autopickup exceptions
 .pg
 There is an experimental compile time option called AUTOPICKUP_EXCEPTIONS.  
 If your copy of the game was build with that option defined, you can 
-further refine the behaviour of the
+further refine the behavior of the
 .op autopickup
 option beyond what is available through the 
 .op pickup_types
@@ -2288,7 +2288,7 @@ Sets an exception to the
 .op pickup_types
 option.
 The
-.op "autopickup_exception  "
+.op autopickup_exception
 option should be followed by a string of 1-80 characters to be used as a 
 pattern to match against the singular form of the description of an 
 object at your location.
