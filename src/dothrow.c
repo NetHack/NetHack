@@ -16,6 +16,7 @@ STATIC_DCL void FDECL(breakmsg, (struct obj *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(toss_up,(struct obj *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(throwing_weapon, (struct obj *));
 STATIC_DCL void FDECL(sho_obj_return_to_u, (struct obj *obj));
+STATIC_DCL boolean FDECL(mhurtle_step, (genericptr_t,int,int));
 
 
 static NEARDATA const char toss_objs[] =
@@ -407,7 +408,7 @@ walk_path(src_cc, dest_cc, check_proc, arg)
  * Single step for the hero flying through the air from jumping, flying,
  * etc.  Called from hurtle() and jump() via walk_path().  We expect the
  * argument to be a pointer to an integer -- the range -- which is
- * used in the calculation of points off it we hit something.
+ * used in the calculation of points off if we hit something.
  *
  * Bumping into monsters won't cause damage but will wake them and make
  * them angry.  Auto-pickup isn't done, since you don't have control over
@@ -524,6 +525,26 @@ hurtle_step(arg, x, y)
     return TRUE;
 }
 
+STATIC_OVL boolean
+mhurtle_step(arg, x, y)
+    genericptr_t arg;
+    int x, y;
+{
+	struct monst *mon = (struct monst *)arg;
+
+	/* TODO: Treat walls, doors, iron bars, pools, lava, etc. specially
+	 * rather than just stopping before.
+	 */
+	if (goodpos(x, y, mon) && m_in_out_region(mon, x, y)) {
+	    remove_monster(mon->mx, mon->my);
+	    newsym(mon->mx, mon->my);
+	    place_monster(mon, x, y);
+	    newsym(mon->mx, mon->my);
+	    set_apparxy(mon);
+	    (void) mintrap(mon);
+	}
+}
+
 /*
  * The player moves through the air for a few squares as a result of
  * throwing or kicking something.
@@ -582,6 +603,40 @@ hurtle(dx, dy, range, verbose)
     cc.x = u.ux + (dx * range);
     cc.y = u.uy + (dy * range);
     (void) walk_path(&uc, &cc, hurtle_step, (genericptr_t)&range);
+}
+
+/* Move a monster through the air for a few squares.
+ */
+void
+mhurtle(mon, dx, dy, range, verbose)
+	struct monst *mon;
+	int dx, dy, range;
+	boolean verbose;
+{
+    coord mc, cc;
+
+	/* At the very least, debilitate the monster */
+	mon->movement = 0;
+	mon->mstun = 1;
+
+	/* Is the monster stuck or too heavy to push?
+	 * (very large monsters have too much inertia, even floaters and flyers)
+	 */
+	if (mon->data->msize >= MZ_HUGE || mon == u.ustuck || mon->mtrapped)
+	    return;
+
+    /* Make sure dx and dy are [-1,0,1] */
+    dx = sgn(dx);
+    dy = sgn(dy);
+    if(!range || (!dx && !dy)) return; /* paranoia */
+
+	/* Send the monster along the path */
+	mc.x = mon->mx;
+	mc.y = mon->my;
+	cc.x = mon->mx + (dx * range);
+	cc.y = mon->my + (dy * range);
+	(void) walk_path(&mc, &cc, mhurtle_step, (genericptr_t)mon);
+	return;
 }
 
 STATIC_OVL void

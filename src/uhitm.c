@@ -503,6 +503,9 @@ int thrown;
 	boolean get_dmg_bonus = TRUE;
 	boolean ispoisoned = FALSE, needpoismsg = FALSE, poiskilled = FALSE;
 	boolean silvermsg = FALSE;
+#ifdef STEED
+	boolean jousting = FALSE;
+#endif
 	boolean valid_weapon_attack = FALSE;
 	int wtype;
 	struct obj *monwep;
@@ -606,6 +609,11 @@ int thrown;
 		    if (objects[obj->otyp].oc_material == SILVER
 				&& hates_silver(mdat))
 			silvermsg = TRUE;
+#ifdef STEED
+		    if (u.usteed && !thrown &&
+				weapon_type(obj) == P_LANCE && mon != u.ustuck)
+			jousting = TRUE;
+#endif
 		    if(!thrown && obj == uwep && obj->otyp == BOOMERANG &&
 		       !rnl(3)) {
 			pline("As you hit %s, %s breaks into splinters.",
@@ -884,6 +892,15 @@ int thrown;
 	    }
 	}
 
+#ifdef STEED
+	if (jousting) {
+	    You("joust %s%s",
+			 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
+	    mhurtle(mon, u.dx, u.dy, 1, TRUE);
+	    hittxt = TRUE;
+	} else
+#endif
+
 	/* VERY small chance of stunning opponent if unarmed. */
 	if (tmp > 1 && !thrown && !obj && !uwep && !uarm && !uarms && !Upolyd) {
 	    if (rnd(100) < P_SKILL(P_BARE_HANDED_COMBAT) &&
@@ -891,24 +908,8 @@ int thrown;
 		if (canspotmon(mon))
 		    pline("%s %s from your powerful strike!", Monnam(mon),
 			  makeplural(stagger(mon->data, "stagger")));
-		mon->mstun = 1;
+		mhurtle(mon, u.dx, u.dy, 1, TRUE);
 		hittxt = TRUE;
-		if (mon->mcanmove && mon != u.ustuck && !mon->mtrapped) {
-		    xchar mdx, mdy;
-
-		    /* see if the monster has a place to move into */
-		    mdx = mon->mx + u.dx;
-		    mdy = mon->my + u.dy;
-		    if (goodpos(mdx, mdy, mon) &&
-			m_in_out_region(mon, mdx, mdy)) {
-			remove_monster(mon->mx, mon->my);
-			newsym(mon->mx, mon->my);
-			place_monster(mon, mdx, mdy);
-			newsym(mon->mx, mon->my);
-			set_apparxy(mon);
-			(void) mintrap(mon);
-		    }
-		}
 	    }
 	}
 
