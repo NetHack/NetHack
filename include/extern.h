@@ -1154,6 +1154,7 @@ E boolean FDECL(can_track, (struct permonst *));
 E boolean FDECL(breakarm, (struct permonst *));
 E boolean FDECL(sliparm, (struct permonst *));
 E boolean FDECL(sticks, (struct permonst *));
+E int FDECL(num_horns, (struct permonst *));
 /* E boolean FDECL(canseemon, (struct monst *)); */
 E struct attack *FDECL(dmgtype_fromattack, (struct permonst *,int,int));
 E boolean FDECL(dmgtype, (struct permonst *,int));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.4	2002/11/07	*/
+/*	SCCS Id: @(#)worn.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -436,6 +436,8 @@ boolean racialexception;
 		    break;
 		case W_ARMH:
 		    if (!is_helmet(obj)) continue;
+		    /* (flimsy exception matches polyself handling) */
+		    if (has_horns(mon->data) && !is_flimsy(obj)) continue;
 		    break;
 		case W_ARMS:
 		    if (!is_shield(obj)) continue;
@@ -596,6 +598,7 @@ boolean polyspot;
 	register struct obj *otmp;
 	struct permonst *mdat = mon->data;
 	boolean vis = cansee(mon->mx, mon->my);
+	boolean handless_or_tiny = (nohands(mdat) || verysmall(mdat));
 	const char *pronoun = mhim(mon),
 			*ppronoun = mhis(mon);
 
@@ -675,7 +678,7 @@ boolean polyspot;
 	    }
 #endif
 	}
-	if (nohands(mdat) || verysmall(mdat)) {
+	if (handless_or_tiny) {
 	    /* [caller needs to handle weapon checks] */
 	    if ((otmp = which_armor(mon, W_ARMG)) != 0) {
 		if (vis)
@@ -693,7 +696,11 @@ boolean polyspot;
 		if (polyspot) bypass_obj(otmp);
 		m_lose_armor(mon, otmp);
 	    }
-	    if ((otmp = which_armor(mon, W_ARMH)) != 0) {
+	}
+	if (handless_or_tiny || has_horns(mdat)) {
+	    if ((otmp = which_armor(mon, W_ARMH)) != 0 &&
+		    /* flimsy test for horns matches polyself handling */
+		    (handless_or_tiny || !is_flimsy(otmp))) {
 		if (vis)
 		    pline("%s helmet falls to the %s!",
 			  s_suffix(Monnam(mon)), surface(mon->mx, mon->my));
@@ -703,8 +710,7 @@ boolean polyspot;
 		m_lose_armor(mon, otmp);
 	    }
 	}
-	if (nohands(mdat) || verysmall(mdat) || slithy(mdat) ||
-	    mdat->mlet == S_CENTAUR) {
+	if (handless_or_tiny || slithy(mdat) || mdat->mlet == S_CENTAUR) {
 	    if ((otmp = which_armor(mon, W_ARMF)) != 0) {
 		if (vis) {
 		    if (is_whirly(mon->data))

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.4	2002/07/11	*/
+/*	SCCS Id: @(#)polyself.c	3.4	2003/01/08	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -617,18 +617,20 @@ break_armor()
 #endif
     }
     if (has_horns(youmonst.data)) {
-    	if ((otmp = uarmh) != 0) {
-		if (is_flimsy(otmp) && !donning(otmp)) {
-			char yourbuf[BUFSZ];
-			/* Future possiblities: This could damage/destroy helmet*/
-			Your("horns pierce through %s %s.", shk_your(yourbuf, otmp),
-				xname(otmp));
-		} else {
-	    		if (donning(otmp)) cancel_don();
-			Your("helmet falls to the %s!", surface(u.ux, u.uy));
-			(void) Helmet_off();
-			dropx(otmp);
-		}
+	if ((otmp = uarmh) != 0) {
+	    if (is_flimsy(otmp) && !donning(otmp)) {
+		char hornbuf[BUFSZ], yourbuf[BUFSZ];
+
+		/* Future possiblities: This could damage/destroy helmet */
+		Sprintf(hornbuf, "horn%s", plur(num_horns(youmonst.data)));
+		Your("%s %s through %s %s.", vtense(hornbuf, "pierce"),
+		     shk_your(yourbuf, otmp), xname(otmp));
+	    } else {
+		if (donning(otmp)) cancel_don();
+		Your("helmet falls to the %s!", surface(u.ux, u.uy));
+		(void) Helmet_off();
+		dropx(otmp);
+	    }
 	}
     }
     if (nohands(youmonst.data) || verysmall(youmonst.data)) {

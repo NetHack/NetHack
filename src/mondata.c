@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.4	2002/12/09	*/
+/*	SCCS Id: @(#)mondata.c	3.4	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -301,6 +301,26 @@ sticks(ptr)	/* creature sticks other creatures it hits */
 		attacktype(ptr,AT_HUGS)));
 }
 
+/* number of horns this type of monster has on its head */
+int
+num_horns(ptr)
+struct permonst *ptr;
+{
+    switch (monsndx(ptr)) {
+    case PM_HORNED_DEVIL:	/* ? "more than one" */
+    case PM_MINOTAUR:
+	return 2;
+    case PM_WHITE_UNICORN:
+    case PM_GRAY_UNICORN:
+    case PM_BLACK_UNICORN:
+    case PM_KI_RIN:
+	return 1;
+    default:
+	break;
+    }
+    return 0;
+}
+
 struct attack *
 dmgtype_fromattack(ptr, dtyp, atyp)
 struct permonst *ptr;
@@ -365,7 +385,7 @@ monsndx(ptr)		/* return an index into the mons array */
 		/* ought to switch this to use `fmt_ptr' */
 	    panic("monsndx - could not index monster (%lx)",
 		  (unsigned long)ptr);
-	    return FALSE;		/* will not get here */
+	    return NON_PM;		/* will not get here */
 	}
 
 	return(i);

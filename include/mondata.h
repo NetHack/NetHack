@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.h	3.4	2001/02/14	*/
+/*	SCCS Id: @(#)mondata.h	3.4	2003/01/08	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,7 +45,7 @@
 #define nolimbs(ptr)		(((ptr)->mflags1 & M1_NOLIMBS) == M1_NOLIMBS)
 #define notake(ptr)		(((ptr)->mflags1 & M1_NOTAKE) != 0L)
 #define has_head(ptr)		(((ptr)->mflags1 & M1_NOHEAD) == 0L)
-#define has_horns(ptr)		((ptr) == &mons[PM_MINOTAUR])
+#define has_horns(ptr)		(num_horns(ptr) > 0)
 #define is_whirly(ptr)		((ptr)->mlet == S_VORTEX || \
 				 (ptr) == &mons[PM_AIR_ELEMENTAL])
 #define is_silent(ptr)		((ptr)->msound == MS_SILENT)
