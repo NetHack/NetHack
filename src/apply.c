@@ -2822,6 +2822,11 @@ do_break_wand(obj)
 		    watch_dig((struct monst *)0, x, y, TRUE);
 		    if (*in_rooms(x,y,SHOPBASE)) shop_damage = TRUE;
 		}
+		/*
+		 * Let liquid flow into the newly created pits.
+		 * Adjust corresponding code in music.c for
+		 * drum of earthquake if you alter this sequence.
+		 */
 		typ = fillholetyp(x,y); 
 		if (typ != ROOM) {
 			levl[x][y].typ = typ;

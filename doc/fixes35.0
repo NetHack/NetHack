@@ -38,7 +38,7 @@ don't place randomly-placed aquatic monsters in lava on special levels
 hiding monsters don't hide under cockatrice/chickatrice corpses
 "sound" option renamed to "acoustics"
 deafness now a full-fledged attribute
-water should flow into pits from broken wand of digging
+water should flow into pits from broken wand of digging and drum of earthquake
 objects that fall thru trapdoors, et al, can break on impact
 support engraving in blood in special level files
 many instances of physical damage were not taking Half_physical_damage
