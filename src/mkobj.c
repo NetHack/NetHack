@@ -449,7 +449,8 @@ boolean artif;
 		otmp->quan = (long) rnd(2);
 		break;
 	    }
-	    if (otmp->otyp == CORPSE || otmp->otyp == MEAT_RING) break;
+	    if (otmp->otyp == CORPSE || otmp->otyp == MEAT_RING ||
+		otmp->otyp == KELP_FROND) break;
 	    /* fall into next case */
 
 	case GEM_CLASS:
