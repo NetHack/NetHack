@@ -41,8 +41,10 @@ deafness now a full-fledged attribute
 water should flow into pits from broken wand of digging
 objects that fall thru trapdoors, et al, can break on impact
 support engraving in blood in special level files
+many instances of physical damage were not taking Half_physical_damage
+	into account when reducing your hitpoints
 make it possible for the code to recognize your starting pet throughout the 
-	game via is_starting_pet(mon) macro.
+	game via is_starting_pet(mon) macro
 
 
 Platform- and/or Interface-Specific Fixes
