@@ -451,13 +451,13 @@ objects.o:
 
 # Qt windowport meta-object-compiler output
 qt_kde0.moc: ../include/qt_kde0.h
-	$(QTDIR)/bin/moc ../include/qt_kde0.h > qt_kde0.moc
+	$(QTDIR)/bin/moc -o qt_kde0.moc ../include/qt_kde0.h
 
 qt_win.moc: ../include/qt_win.h
-	$(QTDIR)/bin/moc ../include/qt_win.h > qt_win.moc
+	$(QTDIR)/bin/moc -o qt_win.moc ../include/qt_win.h
 
 qttableview.moc: ../include/qttableview.h
-	$(QTDIR)/bin/moc ../include/qttableview.h > qttableview.moc
+	$(QTDIR)/bin/moc -o qttableview.moc ../include/qttableview.h
 
 $(MAKEDEFS): ../util/makedefs.c  $(CONFIG_H) ../include/permonst.h \
 		../include/objclass.h ../include/monsym.h \
