@@ -1912,6 +1912,13 @@ register int held;
 	    menu_on_request;
 
 	emptymsg[0] = '\0';
+	if (nohands(youmonst.data)) {
+		You("have no hands!");	/* not `body_part(HAND)' */
+		return 0;
+	} else if (!freehand()) {
+		You("have no free %s.", body_part(HAND));
+		return 0;
+	}
 	if (obj->olocked) {
 	    pline("%s to be locked.", Tobjnam(obj, "seem"));
 	    if (held) You("must put it down to unlock.");
