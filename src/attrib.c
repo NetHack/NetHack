@@ -5,6 +5,7 @@
 /*  attribute modification routines. */
 
 #include "hack.h"
+#include <ctype.h>
 
 /* #define DEBUG */	/* uncomment for debugging info */
 
