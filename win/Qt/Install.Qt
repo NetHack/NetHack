@@ -5,11 +5,10 @@ This document describes the installation of NetHack with a Qt interface
 on UNIX/X11 or Mac OS X. This code should also work with Qt/Windows, but
 support for that is not currently official.
 
-You can download Qt for UNIX and Qt for Windows from http://www.trolltech.com.
-Qt for Mac OS X is currently only available commercially.  You need Qt 2.0 or
-later to use this code.
+You can download Qt from http://www.trolltech.com.
+You need Qt 2.0 or later to use this code.
 
-To use this code:
+To use this code on UNIX (not Mac OS X):
 
    1. follow the directions for the UNIX installation (in ../../sys/unix)
       to create the Makefiles.
@@ -27,7 +26,7 @@ To use this code:
 	you installed Qt - $QTDIR/include/qwidget.h should exist, for
 	example.
 
-	ensure CXX and LD are set to the compiler and linker you need
+	ensure CXX and LINK are set to the compiler and linker you need
 	for compiling and linking C++ software (e.g., set both to g++).
 
         add $(WINQTSRC), $(WINQTOBJ), and $(WINQTLIB) to WINSRC, WINOBJ,
@@ -36,8 +35,8 @@ To use this code:
 
    4. ../../Makefile (the top-level makefile)
 
-        change the VARDATND setting to contain the files "x11tiles",
-        "rip.xpm", and "nhsplash.xpm":
+        Just change the VARDATND setting to contain the files
+	"x11tiles", "rip.xpm", and "nhsplash.xpm":
 
             VARDATND = x11tiles rip.xpm nhsplash.xpm
 
@@ -49,7 +48,6 @@ To use this code:
 
         OPTIONS=name:player,number_pad,menustyle:partial,!time,showexp
         OPTIONS=hilite_pet,toptenwin,msghistory:200,windowtype:Qt
-
 
 If you are using KDE, you may want to also try the KDE version. It just
 uses the KDE menubar and follows other KDE conventions - there is no
@@ -66,7 +64,6 @@ extra functionality. To do so:
    3. Some additional files here - knh-mini.xpm, knh.xpm, and
       knethack.lnk are useful if you want to install "knethack" in
       the KDE games directory.  
-
 
 If you are using Qtopia, you can compile NetHack for that environment
 with the following additional steps:
@@ -89,4 +86,25 @@ with the following additional steps:
    5. After building, use the "mkipks" program that ships with Qtopia
       to package the result into an ipk file.
 
+To use this code on Mac OS X:
+
+   1. follow the directions for the UNIX installation (in ../../sys/unix)
+      to create the Makefiles.
+
+   2. quite a number of changes are required to the Makefiles. They are
+        slowly being made 'official', but for now they are all in the patch
+	nethack-macosx-qt.patch:
+
+	    cd ../..
+	    patch -p0 < win/Qt/nethack-macosx-qt.patch
+
+   3. Follow all the instructions in ../../sys/unix/Install.unx for
+      the remainder of the installation process (basically run "make install").
+
+   4. Consider adding the lines below to a file called "NetHack Defaults",
+      in your "Library/Preferences" folder, as they are likely to give
+      the best interface for this window port:
+
+        OPTIONS=name:player,number_pad,menustyle:partial,!time,showexp
+        OPTIONS=hilite_pet,toptenwin,msghistory:200,windowtype:Qt
 

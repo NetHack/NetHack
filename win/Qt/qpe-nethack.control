@@ -1,9 +1,9 @@
-Files: bin/nethack apps/Games/nethack.desktop games/lib/nethackdir/[a-r]* games/lib/nethackdir/[t-z]* games/lib/nethackdir/save games/lib/nethackdir/s*.* games/lib/nethackdir/[A-Z0-9]*
+Files: bin/nethack pics/NetHack.png apps/Games/nethack.desktop games/lib/nethackdir/[a-r]* games/lib/nethackdir/[t-z]* games/lib/nethackdir/save games/lib/nethackdir/s*.* games/lib/nethackdir/[A-Z0-9]*
 Priority: optional
 Section: qpe/games
 Maintainer: Warwick Allison <warwick@trolltech.com>
 Architecture: arm
-Version: 3.4.0-1
+Version: 3.5.0-1
 Depends: qpe-base ($QPE_VERSION)
 Description: NetHack - The Dungeon Game
  Graphical version of NetHack for Qtopia
