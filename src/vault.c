@@ -245,7 +245,7 @@ fnd:
 	    pline("Someone else has entered the Vault.");
 	newsym(guard->mx,guard->my);
 	if (mimickobj || u.uundetected) {
-	    if (youmonst.mappearance != GOLD_PIECE)
+	    if (mimickobj && youmonst.mappearance != GOLD_PIECE)
 	    	verbalize("Hey! who left that %s in here?", mimic_obj_name(&youmonst));
 	    /* You're mimicking some object or you're hidden. */
 	    pline("Puzzled, %s turns around and leaves.", mhe(guard));
