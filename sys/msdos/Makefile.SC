@@ -4,7 +4,7 @@
 #	Symantec C compiler V7.2
 #	Written for Symantec SMAKE utility
 #
-#	NOTE: This Makefile has not been tested for NetHack 3.4.0
+#	NOTE: This Makefile has not been tested for NetHack 3.4.1
 #
 #	For questions or comments :  nethack-bugs@linc.cis.upenn.edu
 #

@@ -1,14 +1,14 @@
-/*	SCCS Id: @(#)patchlevel.h	3.4	2002/03/20	*/
+/*	SCCS Id: @(#)patchlevel.h	3.4	2002/03/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* NetHack 3.4.0 */
+/* NetHack 3.4.1 */
 #define VERSION_MAJOR	3
 #define VERSION_MINOR	4
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL	0
+#define PATCHLEVEL	1
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -24,7 +24,7 @@
 #define COPYRIGHT_BANNER_C \
 "         See license for details."
 
-#if 0
+#if 1
 /*
  * If two successive patchlevels have compatible data files (fat chance),
  * defining this with the value of the older one will allow its bones and
@@ -34,11 +34,25 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x03030100L
+#define VERSION_COMPATIBILITY 0x03040000L
 #endif
 
 /*****************************************************************************/
-/* Version 3.4.0 */
+/* Version 3.4.x */
+
+/*  Patch 1, March 31, 2002
+ *  Fix a fatal error involving land mines and boulders/statues
+ *  Several message glitches corrected
+ *  Restore bumping into closed doors while impaired
+ *  Fix iron ball cases that could put the chain in solid rock
+ *  A few glitches around gas spore explosions are corrected
+ *  Sunsword should extinguish if monster wielding it dies
+ *  Wizard will harass post-invocation even if you haven't kill him yet
+ *  non-square tile support for X11 and Gnome
+ *  win32: ensure error messages are delivered during game startup
+ *  win32: some cosmetic corrections and one crash fix from window sizing
+ *  win32: filter any punctuation characters from "Who are you" response
+ */
 
 /*
  *  NetHack 3.4.0, March 20, 2002

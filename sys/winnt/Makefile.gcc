@@ -27,7 +27,7 @@
 #   Dion Nicolaas
 #==============================================================================
 # Graphical interface
-# Don't uncomment this line for 3.4.0
+# Don't uncomment this line for 3.4.1
 # Set to Y for a graphical version
 # Set to anything else (or undefine) for a tty version
 
@@ -339,7 +339,7 @@ RECOVOBJS      = $(O)recover.o
 TILEFILES      = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
 
 #
-# These are not invoked during a normal game build in 3.4.0
+# These are not invoked during a normal game build in 3.4.1
 #
 TEXT_IO        = $(O)tiletext.o  $(O)tiletxt.o   $(O)drawing.o \
 	$(O)decl.o    $(O)monst.o     $(O)objects.o

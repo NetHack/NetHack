@@ -64,7 +64,7 @@ LEXYYC = lexyy.c
 #
 # Uncomment this line if you want to include support for ALT-numeric
 # sequences, such as ALT-2 for toggling #twoweapon mode.  
-# Note that this code did not get a thorough testing prior to 3.4.0
+# Note that this code did not get a thorough testing prior to 3.4.x
 #NEWALT=/DNEW_ALT
 
 #############################################################################

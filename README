@@ -1,51 +1,26 @@
-                NetHack 3.4.0 -- General information
+                NetHack 3.4.1 -- General information
 
-NetHack 3.4.0 is an enhancement to the dungeon exploration game NetHack.
+NetHack 3.4 is an enhancement to the dungeon exploration game NetHack.
 It is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.3.
 
-There are a great number of bug fixes in this release, as well as 
-many changes and surprises beyond what you see listed below.
-Here is a brief overview of some new additions and changes in the game.
-
-o Many, many bug fixes and tweaks to the core code and to several ports
-o Enhanced config file processing and player selection prompts for some ports
-o Stamina affects ability to throw heavy things
-o Objects merge in containers
-o Wish for "nothing", and genocide "none" to preserve your conduct
-o Several small refinements to race/role separation
-o Config file BOULDER option to specify the symbol for displaying boulders
-o New travel command which is particularly helpful for mouse navigation on
-  handheld computers
-o more feedback about skill advancement from #enhance command
-o End-of-game disclose options can be individually tuned to your liking
-o Mac: command-key shortcuts in the player selection dialog
-o Amiga: screenmode requester
-o Win32: new graphical interface contributed by Alex Kompel
-
-We've also included variations of enhancements contributed by members 
-of the NetHack community at large. Among them:
-
-o Scott Bigham's new T-shirt messages and his option to turn off 
-  resistance display effects
-o Malcolm Ryan's option for "autodig"
-o Jay Tilton's full-screen message window display via control-P
-o Dylan O'Donnell's patch for optionally starting with no pet
-o Tom Friedetzky's blessed/uncursed/cursed selection patch for menustyle:full
-o Jason Short's additonal lens uses
-o Kelly Bailey's Gnomish Mines changes
-o Ken Arnold's patch to display prices in your inventory
-
-Carried forward
-o The Gnome toolkit interface is still considered an experimental option. 
-  We have not enhanced the port ourselves, and so far we have not received
-  any contributions doing so from the NetHack community.
+NetHack 3.4.1 is a bugfix release for 3.4.0.
+ *  Fix a fatal error involving land mines and boulders/statues
+ *  Several message glitches corrected
+ *  Restore bumping into closed doors while impaired
+ *  Fix iron ball cases that could put the chain in solid rock
+ *  A few glitches around gas spore explosions are corrected
+ *  Sunsword should extinguish if monster wielding it dies
+ *  Wizard will harass post-invocation even if you haven't kill him yet
+ *  non-square tile support for X11 and Gnome
+ *  win32: ensure error messages are delivered during game startup
+ *  win32: some cosmetic corrections and one crash fix from window sizing
+ *  win32: filter any punctuation characters from "Who are you" response
 
 A fuller list of changes for this release can be found in the file 
-doc/fixes34.0 in the source distribution.  The text in there was written 
+doc/fixes34.1 in the source distribution.  The text in there was written 
 for the development team's own use and is provided "as is", so please do 
 not ask us to further explain the entries in that file.
-
 
                         - - - - - - - - - - -
 
@@ -166,13 +141,13 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     C compiler.
 
     With the demise of Windows NT on the DEC Alpha, no attempt has been
-    made to build NetHack 3.4.0 on that platform.
+    made to build NetHack 3.4.1 on that platform.
 
-    No attempt has been made to build or run NetHack 3.4.0 on Windows Me
+    No attempt has been made to build or run NetHack 3.4.1 on Windows Me
     or Windows XP at this point.  It may work, but then again it may not.
     
     A build for Intel 80286 machines and DOS "real mode" overlaid versions 
-    has not been produced for 3.4.0.  Nobody on the porting team has
+    has not been produced for 3.4.1.  Nobody on the porting team has
     the time or the software to attempt the necessary tuning that will allow 
     it to achieve the balance of having just the right amount of available 
     memory, and still have acceptable performance.  The sources necessary 

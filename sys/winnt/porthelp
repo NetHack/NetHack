@@ -1,4 +1,4 @@
-        Microsoft Windows specific help file for NetHack 3.4.0
+        Microsoft Windows specific help file for NetHack 3.4.1
         Copyright (c) NetHack PC Development Team 1993-2002.
         NetHack may be freely distributed.  See license for details.
                    (Last Revision: March 16, 2002)
@@ -242,7 +242,7 @@ Map - Provides for selection of map mode. Equivalent to using
 the map_mode option. 
 
 Window Settings - Changes your logged-on user's settings for NetHack.
-In 3.4.0, only one setting is available: NetHack mode, which can be
+In 3.4.1, only one setting is available: NetHack mode, which can be
 checked or unchecked. NetHack mode allows you to use the ALT key for
 game key commands [see list above]. You can use F10 to access the
 menu bar while in NetHack mode. You can also clear your logged-on

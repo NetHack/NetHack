@@ -15,8 +15,8 @@ developed and contributed the port.
 
 The PC Windows porting team consisting of Michael Allison, Dave Cohrs, 
 Alex Kompel, Yitzhak Sapir, and Janet Walz integrated the tty version 
-and the graphical version into the NetHack 3.4.0 sources.  Just as
-the release of NetHack 3.4.0 was being prepared, Dion Nicolaas submitted 
+and the graphical version into the NetHack 3.4.1 sources.  Just as
+the release of NetHack 3.4.1 was being prepared, Dion Nicolaas submitted 
 an entire win32 port of his own to the NetHack Development Team. Dion was
 subsequently invited to join the PC Windows porting team where he could 
 continue to contribute to the win32 port, and that invitation was accepted.
@@ -237,7 +237,7 @@ Running NetHack
     If you will be running it by launching it from a shortcut, just 
     use the following information when setting up the shortcut.
 
-         Description      :  NetHack 3.4.0 
+         Description      :  NetHack 3.4.1 
          Command Line     :  C:\NETHACK\BINARY\NETHACK.EXE
 
    (changing the directory to the appropriate one of course)
@@ -472,7 +472,7 @@ Running NetHack
     or from a shortcut, just use the following information when 
     setting up the icon or shortcut.
 
-         Description      :  NetHack 3.4.0 
+         Description      :  NetHack 3.4.1 
          Command Line     :  C:\NETHACK\BINARY\NETHACKW.EXE
 
    (changing the directory in the Command Line to the appropriate one of course)

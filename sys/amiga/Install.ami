@@ -3,11 +3,11 @@
       (or Everything You Never Wanted to Know Before NetHacking)
         (or Not Everything That Happens Always Comes Knocking)
 
-	     Last Revision: 28 March 2000 for NetHack 3.4.0
+	     Last Revision: 28 March 2000 for NetHack 3.4.1
 
 
-0. Pre-intro for NetHack 3.4.0:
-   Amiga-specific changes for 3.4.0:
+0. Pre-intro for NetHack 3.4.1:
+   Amiga-specific changes for 3.4.1:
      Most (around 99%) known bugs fixed (volunteers welcome).
      HackWB and HackCli are no longer supported.  Use the main binary.
 
