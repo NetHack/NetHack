@@ -354,7 +354,7 @@ BOOL CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 			if( plselFinalSelection(hWnd, data->selection) ) {
 				EndDialog(hWnd, wParam); 
 			} else {
-				NHMessageBox(hWnd, TEXT("Cannot match this role. Try something else."), MB_ICONSTOP | MB_OK );
+				MessageBox(hWnd, TEXT("Cannot match this role. Try something else."), TEXT("STOP"), MB_OK );
 			}
 		return TRUE;
 
@@ -677,7 +677,7 @@ int	plselFinalSelection(HWND hWnd, int* selection)
 	if( flags.initrole==ROLE_RANDOM ) {
 		flags.initrole = pick_role(flags.initrace, flags.initgend, flags.initalign, PICK_RANDOM);
 		if (flags.initrole < 0) {
-			NHMessageBox(hWnd, TEXT("Incompatible role!"), MB_ICONSTOP | MB_OK);
+			MessageBox(hWnd, TEXT("Incompatible role!"), TEXT("STOP"), MB_OK);
 			return FALSE;
 		}
 	}
@@ -691,7 +691,7 @@ int	plselFinalSelection(HWND hWnd, int* selection)
 		}
 		
 		if (flags.initrace < 0) {
-			NHMessageBox(hWnd, TEXT("Incompatible race!"), MB_ICONSTOP | MB_OK);
+			MessageBox(hWnd, TEXT("Incompatible race!"), TEXT("STOP"), MB_OK);
 			return FALSE;
 		}
 	}
@@ -707,7 +707,7 @@ int	plselFinalSelection(HWND hWnd, int* selection)
 		}
 		
 		if (flags.initgend < 0) {
-			NHMessageBox(hWnd, TEXT("Incompatible gender!"), MB_ICONSTOP | MB_OK);
+			MessageBox(hWnd, TEXT("Incompatible gender!"), TEXT("STOP"), MB_OK);
 			return FALSE;
 		}
 	}
@@ -720,7 +720,7 @@ int	plselFinalSelection(HWND hWnd, int* selection)
 		if (flags.initalign == ROLE_RANDOM) {
 			flags.initalign = pick_align(flags.initrole, flags.initrace, flags.initgend, PICK_RANDOM);
 		} else {
-			NHMessageBox(hWnd, TEXT("Incompatible alignment!"), MB_ICONSTOP | MB_OK);
+			MessageBox(hWnd, TEXT("Incompatible alignment!"), TEXT("STOP"), MB_OK);
 			return FALSE;
 		}
 	}

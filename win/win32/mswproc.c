@@ -23,7 +23,6 @@
 #include "mhrip.h"
 #include "mhmain.h"
 #include "mhfont.h"
-#include "resource.h"
 
 #define LLEN 128
 
@@ -334,8 +333,8 @@ void prompt_for_player_selection(void)
 
 	    /* tty_putstr(BASE_WINDOW, 0, ""); */
 	    /* echoline = wins[BASE_WINDOW]->cury; */
-            box_result = NHMessageBox(NULL, prompt, 
-					MB_ICONQUESTION | MB_YESNOCANCEL | MB_DEFBUTTON1);
+            box_result = MessageBox(NULL, prompt, TEXT("NetHack for Windows"),
+					MB_YESNOCANCEL | MB_DEFBUTTON1);
             pick4u = (box_result == IDYES) ? 'y' : (box_result == IDNO) ? 'n' : '\033';
 	    /* tty_putstr(BASE_WINDOW, 0, prompt); */
 	    do {
@@ -999,7 +998,7 @@ void mswin_display_file(const char *filename,BOOLEAN_P must_exist)
 		if (must_exist) {
 			TCHAR message[90];
 			_stprintf(message, TEXT("Warning! Could not find file: %s\n"), NH_A2W(filename, wbuf, sizeof(wbuf)));
-			NHMessageBox(GetNHApp()->hMainWnd, message, MB_OK | MB_ICONEXCLAMATION );
+			MessageBox(GetNHApp()->hMainWnd, message, TEXT("ERROR"), MB_OK | MB_ICONERROR );
 		} 
 	} else {
 		winid text;
@@ -1276,8 +1275,7 @@ void mswin_raw_print(const char *str)
 	TCHAR wbuf[255];
     logDebug("mswin_raw_print(%s)\n", str);
 	if( str && *str )
-		NHMessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), 
-		    MB_ICONINFORMATION | MB_OK );
+		MessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), TEXT("NetHack"), MB_OK );
 }
 
 /*
@@ -1290,8 +1288,7 @@ void mswin_raw_print_bold(const char *str)
 	TCHAR wbuf[255];
     logDebug("mswin_raw_print_bold(%s)\n", str);
 	if( str && *str )
-		NHMessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), 
-		    MB_ICONINFORMATION | MB_OK );
+		MessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), TEXT("NetHack"), MB_OK );
 }
 
 /*
@@ -1408,9 +1405,10 @@ char mswin_yn_function(const char *question, const char *choices,
 			+ strlen(GetNHApp()->saved_text) + 1);
         DWORD box_result;
         strcat(text, question);
-        box_result = NHMessageBox(NULL,
+        box_result = MessageBox(NULL,
              NH_W2A(text, message, sizeof(message)),
-             MB_YESNOCANCEL | MB_ICONQUESTION | 
+             TEXT("NetHack for Windows"),
+             MB_YESNOCANCEL |
              ((def == 'y') ? MB_DEFBUTTON1 :
               (def == 'n') ? MB_DEFBUTTON2 : MB_DEFBUTTON3));
         free(text);
@@ -2400,15 +2398,6 @@ static void mswin_color_from_string(char *colorstring, HBRUSH* brushptr, COLORRE
 	if (max_brush > TOTAL_BRUSHES) panic("Too many colors!");
 	*brushptr = CreateSolidBrush(*colorptr);
 	brush_table[max_brush++] = *brushptr;
-}
-
-int NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
-{
-    TCHAR title[MAX_LOADSTRING];
-    
-    LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);
-
-    return MessageBox(hWnd, text, title, type);
 }
 
 void mswin_get_window_placement(int type, LPRECT rt)

@@ -438,8 +438,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
             
             wp.length = sizeof(wp);
             if (GetWindowPlacement(hWnd, &wp)) {
-                GetNHApp()->regMainShowState = (wp.showCmd == SW_SHOWMAXIMIZED 
-		    ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL);
+                GetNHApp()->regMainShowState = wp.showCmd;
 
                 GetNHApp()->regMainMinX = wp.ptMinPosition.x;
                 GetNHApp()->regMainMinY = wp.ptMinPosition.y;
@@ -473,15 +472,9 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			    NHEVENT_KBD('\033'); /* and send keyboard input as if user pressed ESC */
 			    /* additional code for this is done in menu and rip windows */
 			}
-			else if (!program_state.something_worth_saving)
-			{
-			    /* User exited before the game started, e.g. during splash display */
-			    /* Just get out. */
-			    bail((char *)0);
-			}
 			else
 			{
-			    switch (NHMessageBox(hWnd, TEXT("Save?"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
+			    switch(MessageBox(hWnd, TEXT("Save?"), TEXT("NetHack for Windows"), MB_YESNOCANCEL | MB_ICONQUESTION)) {
 			    case IDYES: NHEVENT_KBD('y'); dosave(); break;
 			    case IDNO: NHEVENT_KBD('q'); done(QUIT); break;
 			    case IDCANCEL: break;
@@ -768,9 +761,9 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         {
             mswin_destroy_reg();
             /* Notify the user that windows settings will not be saved this time. */
-            NHMessageBox(GetNHApp()->hMainWnd, 
+            MessageBox(GetNHApp()->hMainWnd, 
                 "Your Windows Settings will not be stored when you exit this time.", 
-                MB_OK | MB_ICONINFORMATION);
+                "NetHack", MB_OK | MB_ICONINFORMATION);
             break;
         }
 
