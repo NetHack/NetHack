@@ -212,7 +212,9 @@ struct obj *corpse;
 		return;
 	}
 
+#ifdef WIZARD
  make_bones:
+#endif
 	unleash_all();
 	/* in case these characters are not in their home bases */
 	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
