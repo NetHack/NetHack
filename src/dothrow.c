@@ -611,10 +611,9 @@ hurtle(dx, dy, range, verbose)
 /* Move a monster through the air for a few squares.
  */
 void
-mhurtle(mon, dx, dy, range, verbose)
+mhurtle(mon, dx, dy, range)
 	struct monst *mon;
 	int dx, dy, range;
-	boolean verbose;
 {
     coord mc, cc;
 
@@ -852,7 +851,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 	}
 
 	if ((u.dx || u.dy || (u.dz < 1)) &&
-	    calc_capacity(obj->owt) > SLT_ENCUMBER &&
+	    calc_capacity((int)obj->owt) > SLT_ENCUMBER &&
 	    (Upolyd ? (u.mh < 5 && u.mh != u.mhmax)
 	     : (u.uhp < 10 && u.uhp != u.uhpmax)) &&
 	    obj->owt > (unsigned)((Upolyd ? u.mh : u.uhp) * 2) &&

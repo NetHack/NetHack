@@ -896,7 +896,7 @@ int thrown;
 	if (jousting) {
 	    You("joust %s%s",
 			 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
-	    mhurtle(mon, u.dx, u.dy, 1, TRUE);
+	    mhurtle(mon, u.dx, u.dy, 1);
 	    hittxt = TRUE;
 	} else
 #endif
@@ -908,7 +908,7 @@ int thrown;
 		if (canspotmon(mon))
 		    pline("%s %s from your powerful strike!", Monnam(mon),
 			  makeplural(stagger(mon->data, "stagger")));
-		mhurtle(mon, u.dx, u.dy, 1, TRUE);
+		mhurtle(mon, u.dx, u.dy, 1);
 		hittxt = TRUE;
 	    }
 	}
@@ -918,7 +918,7 @@ int thrown;
 		destroyed = TRUE;
 	if (mon->mtame && (!mon->mflee || mon->mfleetim) && tmp > 0) {
 		abuse_dog(mon);
-		monflee(mon, (unsigned)(10 * rnd(tmp)), FALSE, FALSE);
+		monflee(mon, 10 * rnd(tmp), FALSE, FALSE);
 	}
 	if((mdat == &mons[PM_BLACK_PUDDING] || mdat == &mons[PM_BROWN_PUDDING])
 		   && obj && obj == uwep

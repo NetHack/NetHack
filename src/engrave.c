@@ -336,7 +336,7 @@ register int x,y;
 	    	char *et;
 	    	unsigned maxelen = BUFSZ - sizeof("You feel the words: \"\". ");
 	    	if (strlen(ep->engr_txt) > maxelen) {
-	    		(void) strncpy(buf,  ep->engr_txt, maxelen);
+	    		(void) strncpy(buf,  ep->engr_txt, (int)maxelen);
 			buf[maxelen] = '\0';
 			et = buf;
 		} else

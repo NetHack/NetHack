@@ -670,7 +670,7 @@ static void findtravelpath()
 	int set=0;
 	int dia=1;
 
-	(void) memset(travel,0,sizeof(travel));
+	(void) memset((genericptr_t)travel,0,sizeof(travel));
 
 	travelstepx[0][0] = u.tx;
 	travelstepy[0][0] = u.ty;

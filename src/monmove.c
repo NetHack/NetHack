@@ -206,10 +206,10 @@ disturb(mtmp)
  * if fleemsg, prints a message about new flight, otherwise, caller should */
 void
 monflee(mtmp, fleetime, first, fleemsg)
-	struct monst *mtmp;
-	unsigned int fleetime;
-	boolean first;
-	boolean fleemsg;
+struct monst *mtmp;
+int fleetime;
+boolean first;
+boolean fleemsg;
 {
 	if (u.ustuck == mtmp) {
 	    if (u.uswallow)

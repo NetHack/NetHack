@@ -463,7 +463,7 @@ dismount_steed(reason)
 		You("%s off of %s!", verb, mon_nam(mtmp));
 		if (!have_spot) have_spot = landing_spot(&cc,1);
 		losehp(rn1(10,10), "riding accident", KILLED_BY_AN);
-		set_wounded_legs(BOTH_SIDES, HWounded_legs + rn1(5,5));
+		set_wounded_legs(BOTH_SIDES, (int)HWounded_legs + rn1(5,5));
 		repair_leg_damage = FALSE;
 		break;
 	    case DISMOUNT_POLY:

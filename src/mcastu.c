@@ -35,8 +35,8 @@ STATIC_DCL int FDECL(choose_magic_spell, (int));
 STATIC_DCL int FDECL(choose_clerical_spell, (int));
 STATIC_DCL void FDECL(cast_wizard_spell,(struct monst *, int,int));
 STATIC_DCL void FDECL(cast_cleric_spell,(struct monst *, int,int));
-STATIC_DCL boolean FDECL(is_undirected_spell,(int,int));
-STATIC_DCL boolean FDECL(spell_would_be_useless,(struct monst *,int,int));
+STATIC_DCL boolean FDECL(is_undirected_spell,(unsigned int,int));
+STATIC_DCL boolean FDECL(spell_would_be_useless,(struct monst *,unsigned int,int));
 
 #ifdef OVL0
 
@@ -660,7 +660,7 @@ int spellnum;
 STATIC_DCL
 boolean
 is_undirected_spell(adtyp, spellnum)
-int adtyp;
+unsigned int adtyp;
 int spellnum;
 {
     if (adtyp == AD_SPEL) {
@@ -692,8 +692,8 @@ STATIC_DCL
 boolean
 spell_would_be_useless(mtmp, adtyp, spellnum)
 struct monst *mtmp;
+unsigned int adtyp;
 int spellnum;
-int adtyp;
 {
     /* Some spells don't require the player to really be there and can be cast
      * by the monster when you're invisible, yet still shouldn't be cast when

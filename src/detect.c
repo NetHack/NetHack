@@ -169,7 +169,8 @@ register struct obj *sobj;
     struct obj *temp;
     boolean stale;
 
-    known = stale = clear_stale_map(GOLD_CLASS, sobj->blessed ? GOLD : 0);
+    known = stale = clear_stale_map(GOLD_CLASS,
+				(unsigned)(sobj->blessed ? GOLD : 0));
 
     /* look for gold carried by monsters (might be in a container) */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
