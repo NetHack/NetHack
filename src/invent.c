@@ -2135,9 +2135,14 @@ boolean picked_some;
 
 	if (Blind) {
 		boolean drift = Is_airlevel(&u.uz) || Is_waterlevel(&u.uz);
-		You("try to feel what is %s%s.",
-		    drift ? "floating here" : "lying here on the ",
-		    drift ?	""	    : surface(u.ux, u.uy));
+		if (dfeature && !strncmp(dfeature, "altar ", 6)) {
+		    /* don't say "altar" twice, dfeature has more info */
+		    You("try to feel what is here.");
+		} else {
+		    You("try to feel what is %s%s.",
+			drift ? "floating here" : "lying here on the ",
+			drift ? ""		: surface(u.ux, u.uy));
+		}
 		if (dfeature && !drift && !strcmp(dfeature, surface(u.ux,u.uy)))
 			dfeature = 0;		/* ice already identifed */
 		if (!can_reach_floor()) {
