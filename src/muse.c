@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)muse.c	3.4	2002/08/29	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -2122,6 +2122,10 @@ boolean stoning;
 {
     int nutrit = (obj->otyp == CORPSE) ? dog_nutrition(mon, obj) : 0;
     /* also sets meating */
+
+    /* give a "<mon> is slowing down" message and also remove
+       intrinsic speed (comparable to similar effect on the hero) */
+    mon_adjust_speed(mon, -3, (struct obj *)0);
 
     if (canseemon(mon)) {
 	long save_quan = obj->quan;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.4	2002/08/16	*/
+/*	SCCS Id: @(#)trap.c	3.4	2002/08/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1989,6 +1989,11 @@ boolean byplayer;
 		mon_to_stone(mon);
 		return;
 	}
+
+	/* give a "<mon> is slowing down" message and also remove
+	   intrinsic speed (comparable to similar effect on the hero) */
+	mon_adjust_speed(mon, -3, (struct obj *)0);
+
 	if (cansee(mon->mx, mon->my))
 		pline("%s turns to stone.", Monnam(mon));
 	if (byplayer) {

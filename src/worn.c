@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)worn.c	3.4	2002/08/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -147,7 +147,7 @@ int adjust;	/* positive => increase speed, negative => decrease */
 struct obj *obj;	/* item to make known if effect can be seen */
 {
     struct obj *otmp;
-    boolean give_msg = !in_mklev;
+    boolean give_msg = !in_mklev, stoned = FALSE;
     unsigned int oldspeed = mon->mspeed;
 
     switch (adjust) {
@@ -169,6 +169,11 @@ struct obj *obj;	/* item to make known if effect can be seen */
 	mon->permspeed = MSLOW;
 	give_msg = FALSE;	/* (not currently used) */
 	break;
+     case -3:			/* petrification */
+	/* take away intrinsic speed but don't reduce normal speed */
+	if (mon->permspeed == MFAST) mon->permspeed = 0;
+	stoned = TRUE;
+	break;
     }
 
     for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
@@ -179,12 +184,16 @@ struct obj *obj;	/* item to make known if effect can be seen */
     else
 	mon->mspeed = mon->permspeed;
 
-    if (give_msg && mon->mspeed != oldspeed && canseemon(mon)) {
+    if (give_msg && (mon->mspeed != oldspeed || stoned) && canseemon(mon)) {
 	/* fast to slow (skipping intermediate state) or vice versa */
 	const char *howmuch = (mon->mspeed + oldspeed == MFAST + MSLOW) ?
 				"much " : "";
 
-	if (adjust > 0 || mon->mspeed == MFAST)
+	if (stoned) {
+	    /* mimic the player's petrification countdown; "slowing down"
+	       even if fast movement rate retained via worn speed boots */
+	    if (flags.verbose) pline("%s is slowing down.", Monnam(mon));
+	} else if (adjust > 0 || mon->mspeed == MFAST)
 	    pline("%s is suddenly moving %sfaster.", Monnam(mon), howmuch);
 	else
 	    pline("%s seems to be moving %sslower.", Monnam(mon), howmuch);
