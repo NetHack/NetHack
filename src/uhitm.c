@@ -306,7 +306,6 @@ boolean
 attack(mtmp)
 register struct monst *mtmp;
 {
-	schar tmp;
 	register struct permonst *mdat = mtmp->data;
 
 	/* This section of code provides protection against accidentally
