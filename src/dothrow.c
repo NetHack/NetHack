@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.4	2001/12/10	*/
+/*	SCCS Id: @(#)dothrow.c	3.4	2002/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -743,8 +743,13 @@ boolean hitsroof;
 	}
 	return FALSE;
     } else {		/* neither potion nor other breaking object */
-	boolean less_damage = uarmh && is_metallic(uarmh);
+	boolean less_damage = uarmh && is_metallic(uarmh), artimsg = FALSE;
 	int dmg = dmgval(obj, &youmonst);
+
+	if (obj->oartifact)
+	    /* need a fake die roll here; rn1(18,2) avoids 1 and 20 */
+	    artimsg = artifact_hit((struct monst *)0, &youmonst,
+				   obj, &dmg, rn1(18,2));
 
 	if (!dmg) {	/* probably wasn't a weapon; base damage on weight */
 	    dmg = (int) obj->owt / 100;
@@ -757,11 +762,13 @@ boolean hitsroof;
 	if (dmg > 1 && less_damage) dmg = 1;
 	if (dmg > 0) dmg += u.udaminc;
 	if (dmg < 0) dmg = 0;	/* beware negative rings of increase damage */
+	if (Half_physical_damage) dmg = (dmg + 1) / 2;
 
 	if (uarmh) {
-	    if (less_damage && dmg < (Upolyd ? u.mh : u.uhp))
-		pline("Fortunately, you are wearing a hard helmet.");
-	    else if (flags.verbose &&
+	    if (less_damage && dmg < (Upolyd ? u.mh : u.uhp)) {
+		if (!artimsg)
+		    pline("Fortunately, you are wearing a hard helmet.");
+	    } else if (flags.verbose &&
 		    !(obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])))
 		Your("%s does not protect you.", xname(uarmh));
 	} else if (obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])) {

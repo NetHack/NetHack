@@ -433,6 +433,8 @@ stealing a container didn't multiply cost of stolen contained objects by quan
 halve air elemental damage to compensate for side effect of speed system
 strengthen Death; weaken Famine, Pestilence, and Demogorgon
 pet purple worms get nutrition from engulfing attack
+throwing an artifact upwards will trigger artifact hit effects when it falls
+being hit by Fire Brand when not resistant stops the turning-into-slime process
 
 
 Platform- and/or Interface-Specific Fixes
