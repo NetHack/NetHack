@@ -675,6 +675,12 @@ compiled with.
 Adjust inventory letters (most useful when the
 .op fixinv
 option is ``on'').
+This command allows you to move an item from one particular inventory
+slot to another so that it has a letter which is more meaningful for you
+or that it will appear in a particular location when inventory listings
+are displayed.
+``#adjust'' can also be used to split a stack of objects; when
+choosing the item to adjust, enter a count prior to its letter.
 .lp #chat
 Talk to someone.
 .lp #conduct
