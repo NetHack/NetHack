@@ -241,7 +241,7 @@ SetDialogResponse(w, s)
     Arg args[4];
     Widget response;
     XFontStruct *font;
-    Dimension width, nwidth, tmp, leftMargin, rightMargin;
+    Dimension width, nwidth, leftMargin, rightMargin;
 
     response = XtNameToWidget(w, "response");
     XtSetArg(args[0], XtNfont, &font);
@@ -249,10 +249,10 @@ SetDialogResponse(w, s)
     XtSetArg(args[2], XtNrightMargin, &rightMargin);
     XtSetArg(args[3], XtNwidth, &width);
     XtGetValues(response, args, FOUR);
+    /* width includes margins as per Xaw documentation */
     nwidth = (font->max_bounds.width * strlen(s))+leftMargin+rightMargin;
-    tmp = width-(leftMargin+rightMargin);
-    if (nwidth < tmp)
-	nwidth = tmp;
+    if (nwidth < width)
+	nwidth = width;
 
     XtSetArg(args[0], XtNstring, s);
     XtSetArg(args[1], XtNwidth, nwidth);
