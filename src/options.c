@@ -2510,7 +2510,8 @@ char *buf;
 {
 	char ocl[MAXOCLASSES+1];
 	static const char none[] = "(none)", randomrole[] = "random",
-		     to_be_done[] = "(to be done)";
+		     to_be_done[] = "(to be done)",
+		     defopt[] = "default";
 	int i;
 
 	buf[0] = '\0';
@@ -2519,13 +2520,13 @@ char *buf;
 				   iflags.wc_align_message == ALIGN_LEFT    ? "left" :
 				   iflags.wc_align_message == ALIGN_BOTTOM  ? "bottom" :
 				   iflags.wc_align_message == ALIGN_RIGHT   ? "right" :
-				   "unknown");
+				   defopt);
 	else if (!strcmp(optname,"align_status"))
 		Sprintf(buf, "%s", iflags.wc_align_status == ALIGN_TOP     ? "top" :
 				   iflags.wc_align_status == ALIGN_LEFT    ? "left" :
 				   iflags.wc_align_status == ALIGN_BOTTOM  ? "bottom" :
 				   iflags.wc_align_status == ALIGN_RIGHT   ? "right" :
-				   "unknown");
+				   defopt);
 	else if (!strcmp(optname,"align"))
 		Sprintf(buf, "%s", rolestring(flags.initalign, aligns, adj));
 	else if (!strcmp(optname, "boulder"))
@@ -2551,25 +2552,36 @@ char *buf;
 	else if (!strcmp(optname, "effects"))
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "font_map"))
-		Sprintf(buf, "%s", iflags.wc_font_map ? iflags.wc_font_map : none);
+		Sprintf(buf, "%s", iflags.wc_font_map ? iflags.wc_font_map : defopt);
 	else if (!strcmp(optname, "font_message"))
-		Sprintf(buf, "%s", iflags.wc_font_message ? iflags.wc_font_message : none);
+		Sprintf(buf, "%s", iflags.wc_font_message ? iflags.wc_font_message : defopt);
 	else if (!strcmp(optname, "font_status"))
-		Sprintf(buf, "%s", iflags.wc_font_status ? iflags.wc_font_status : none);
+		Sprintf(buf, "%s", iflags.wc_font_status ? iflags.wc_font_status : defopt);
 	else if (!strcmp(optname, "font_menu"))
-		Sprintf(buf, "%s", iflags.wc_font_menu ? iflags.wc_font_menu : none);
+		Sprintf(buf, "%s", iflags.wc_font_menu ? iflags.wc_font_menu : defopt);
 	else if (!strcmp(optname, "font_text"))
-		Sprintf(buf, "%s", iflags.wc_font_text ? iflags.wc_font_text : none);
-	else if (!strcmp(optname, "font_size_map"))
-		Sprintf(buf, "%d", iflags.wc_fontsiz_map);
-	else if (!strcmp(optname, "font_size_message"))
-		Sprintf(buf, "%d", iflags.wc_fontsiz_message);
-	else if (!strcmp(optname, "font_size_status"))
-		Sprintf(buf, "%d", iflags.wc_fontsiz_status);
-	else if (!strcmp(optname, "font_size_menu"))
-		Sprintf(buf, "%d", iflags.wc_fontsiz_menu);
-	else if (!strcmp(optname, "font_size_text"))
-		Sprintf(buf, "%d", iflags.wc_fontsiz_text);
+		Sprintf(buf, "%s", iflags.wc_font_text ? iflags.wc_font_text : defopt);
+	else if (!strcmp(optname, "font_size_map")) {
+		if (iflags.wc_fontsiz_map) Sprintf(buf, "%d", iflags.wc_fontsiz_map);
+		else Strcpy(buf, defopt);
+	}
+	else if (!strcmp(optname, "font_size_message")) {
+		if (iflags.wc_fontsiz_message) Sprintf(buf, "%d",
+							iflags.wc_fontsiz_message);
+		else Strcpy(buf, defopt);
+	}
+	else if (!strcmp(optname, "font_size_status")) {
+		if (iflags.wc_fontsiz_status) Sprintf(buf, "%d", iflags.wc_fontsiz_status);
+		else Strcpy(buf, defopt);
+	}
+	else if (!strcmp(optname, "font_size_menu")) {
+		if (iflags.wc_fontsiz_menu) Sprintf(buf, "%d", iflags.wc_fontsiz_menu);
+		else Strcpy(buf, defopt);
+	}
+	else if (!strcmp(optname, "font_size_text")) {
+		if (iflags.wc_fontsiz_text) Sprintf(buf, "%d",iflags.wc_fontsiz_text);
+		else Strcpy(buf, defopt);
+	}
 	else if (!strcmp(optname, "fruit")) 
 		Sprintf(buf, "%s", pl_fruit);
 	else if (!strcmp(optname, "gender"))
@@ -2589,7 +2601,7 @@ char *buf;
 			iflags.wc_map_mode == MAP_MODE_ASCII12x16 ? "ascii12x16" :
 			iflags.wc_map_mode == MAP_MODE_ASCII10x18 ? "ascii10x18" :
 			iflags.wc_map_mode == MAP_MODE_ASCII_FIT_TO_SCREEN ?
-			"fit_to_screen" : "unknown");
+			"fit_to_screen" : defopt);
 	else if (!strcmp(optname, "menustyle")) 
 		Sprintf(buf, "%s", menutype[(int)flags.menu_style] );
 	else if (!strcmp(optname, "menu_deselect_all"))
@@ -2648,8 +2660,10 @@ char *buf;
 		Sprintf(buf, "%d top/%d around%s", flags.end_top,
 				flags.end_around, flags.end_own ? "/own" : "");
 	}
-	else if (!strcmp(optname, "scroll_margin"))
-		Sprintf(buf, "%d", iflags.wc_scroll_margin);
+	else if (!strcmp(optname, "scroll_margin")) {
+		if (iflags.wc_scroll_margin) Sprintf(buf, "%d",iflags.wc_scroll_margin);
+		else Strcpy(buf, defopt);
+	}
 #ifdef MSDOS
 	else if (!strcmp(optname, "soundcard"))
 		Sprintf(buf, "%s", to_be_done);
@@ -2664,15 +2678,21 @@ char *buf;
 			FEATURE_NOTICE_VER_PATCH);
 	}
 	else if (!strcmp(optname, "tile_file"))
-		Sprintf(buf, "%s", iflags.wc_tile_file ? iflags.wc_tile_file : none);
-	else if (!strcmp(optname, "tile_height"))
-		Sprintf(buf, "%d", iflags.wc_tile_width);
-	else if (!strcmp(optname, "tile_width"))
-		Sprintf(buf, "%d", iflags.wc_tile_width);
+		Sprintf(buf, "%s", iflags.wc_tile_file ? iflags.wc_tile_file : defopt);
+	else if (!strcmp(optname, "tile_height")) {
+		if (iflags.wc_tile_height) Sprintf(buf, "%d",iflags.wc_tile_height);
+		else Strcpy(buf, defopt);
+	}
+	else if (!strcmp(optname, "tile_width")) {
+		if (iflags.wc_tile_width) Sprintf(buf, "%d",iflags.wc_tile_width);
+		else Strcpy(buf, defopt);
+	}
 	else if (!strcmp(optname, "traps"))
 		Sprintf(buf, "%s", to_be_done);
-	else if (!strcmp(optname, "vary_msgcount"))
-		Sprintf(buf, "%d", iflags.wc_vary_msgcount);
+	else if (!strcmp(optname, "vary_msgcount")) {
+		if (iflags.wc_vary_msgcount) Sprintf(buf, "%d",iflags.wc_vary_msgcount);
+		else Strcpy(buf, defopt);
+	}
 #ifdef MSDOS
 	else if (!strcmp(optname, "video"))
 		Sprintf(buf, "%s", to_be_done);
