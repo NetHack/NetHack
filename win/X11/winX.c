@@ -1210,12 +1210,20 @@ done_button(w, client_data, call_data)
     XtPointer client_data;
     XtPointer call_data;
 {
+    int len;
     char *s;
     Widget dialog = (Widget) client_data;
 
     s = (char *) GetDialogResponse(dialog);
-    Strcpy(getline_input, s);
+    len = strlen(s);
+
+    /* Truncate input if necessary */
+    if (len >= BUFSZ) len = BUFSZ - 1;
+
+    (void) strncpy(getline_input, s, len);
+    getline_input[len] = '\0';
     XtFree(s);
+
     nh_XtPopdown(XtParent(dialog));
     exit_x_event = TRUE;
 }
