@@ -963,8 +963,9 @@ struct monst *mtmp;
 	if (otmp && otmp->oxlth) {
 		struct monst *mtmp2 = (struct monst *)otmp->oextra;
 		if (mtmp->data) mtmp2->mnum = monsndx(mtmp->data);
-		/* invalidate pointers and m_id */
-		mtmp2->m_id     = 0;
+		/* invalidate pointers */
+		/* m_id is needed to know if this is a revived quest leader */
+		/* but m_id must be cleared when loading bones */
 		mtmp2->nmon     = (struct monst *)0;
 		mtmp2->data     = (struct permonst *)0;
 		mtmp2->minvent  = (struct obj *)0;
