@@ -3459,7 +3459,21 @@ essential in locating the Amulet of Yendor."
 %Cp - 00049
 "Why search for the Amulet?  Thou wouldst but lose it, cretin."
 %E
+#
+#	Banishment message (for converted hero)
+#
+%Cc - 00060
+"You have betrayed all those who hold allegiance to %d, as you once did.
+My allegiance to %d holds fast and I cannot condone or accept what you 
+have done.
 
+Leave this place.  You shall never set foot at %H again.
+That which you seek is now lost forever, for without the Bell of Opening, 
+you will never be able to enter the place where he who has the Amulet 
+resides.
+
+Go now!  You are banished from this place.
+%E
 #
 #	TEST PATTERN
 #

@@ -106,6 +106,7 @@ struct	qtlists {
 #define QT_DEMONIC	30
 #define QTN_DEMONIC	20
 
+#define QT_BANISHED	60
 #endif	/***** !MAKEDEFS *****/
 
 #endif /* QTEXT_H */

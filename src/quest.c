@@ -16,7 +16,7 @@ STATIC_DCL void NDECL(on_start);
 STATIC_DCL void NDECL(on_locate);
 STATIC_DCL void NDECL(on_goal);
 STATIC_DCL boolean NDECL(not_capable);
-STATIC_DCL boolean FDECL(is_pure, (BOOLEAN_P));
+STATIC_DCL int FDECL(is_pure, (BOOLEAN_P));
 STATIC_DCL void FDECL(expulsion, (BOOLEAN_P));
 STATIC_DCL void NDECL(chat_with_leader);
 STATIC_DCL void NDECL(chat_with_nemesis);
@@ -96,7 +96,7 @@ boolean
 ok_to_quest()
 {
 	return((boolean)((Qstat(got_quest) || Qstat(got_thanks)))
-			&& is_pure(FALSE));
+			&& (is_pure(FALSE) > 0));
 }
 
 STATIC_OVL boolean
@@ -105,10 +105,11 @@ not_capable()
 	return((boolean)(u.ulevel < MIN_QUEST_LEVEL));
 }
 
-STATIC_OVL boolean
+STATIC_OVL int
 is_pure(talk)
 boolean talk;
 {
+    int purity;
     aligntyp original_alignment = u.ualignbase[A_ORIGINAL];
 
 #ifdef WIZARD
@@ -126,9 +127,11 @@ boolean talk;
 	}
     }
 #endif
-    return (boolean)(u.ualign.record >= MIN_QUEST_ALIGN &&
-		     u.ualign.type == original_alignment &&
-		     u.ualignbase[A_CURRENT] == original_alignment);
+    purity = (u.ualign.record >= MIN_QUEST_ALIGN &&
+	      u.ualign.type == original_alignment &&
+	      u.ualignbase[A_CURRENT] == original_alignment) ?  1 :
+	     (u.ualignbase[A_CURRENT] != original_alignment) ? -1 : 0;
+    return purity;
 }
 
 /*
@@ -245,7 +248,10 @@ chat_with_leader()
 	    qt_pager(QT_BADLEVEL);
 	    exercise(A_WIS, TRUE);
 	    expulsion(FALSE);
-	  } else if(!is_pure(TRUE)) {
+	  } else if(is_pure(TRUE) < 0) {
+	    com_pager(QT_BANISHED);
+	    expulsion(TRUE);
+	  } else if(is_pure(TRUE) == 0) {
 	    qt_pager(QT_BADALIGN);
 	    if(Qstat(not_ready) == MAX_QUEST_TRIES) {
 	      qt_pager(QT_LASTLEADER);
