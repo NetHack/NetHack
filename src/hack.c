@@ -174,6 +174,8 @@ moverock()
 		    deltrap(ttmp);
 		    delobj(otmp);
 		    bury_objs(rx, ry);
+		    levl[rx][ry].wall_info &= ~W_NONDIGGABLE;
+		    levl[rx][ry].candig = 1;
 		    if (cansee(rx,ry)) newsym(rx,ry);
 		    continue;
 		case LEVEL_TELEP:

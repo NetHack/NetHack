@@ -340,6 +340,7 @@ struct rm {
 	Bitfield(waslit,1);	/* remember if a location was lit */
 	Bitfield(roomno,6);	/* room # for special rooms */
 	Bitfield(edge,1);	/* marks boundaries for special rooms*/
+	Bitfield(candig,1);	/* Exception to Can_dig_down; was a trapdoor */
 };
 
 /*

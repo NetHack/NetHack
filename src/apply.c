@@ -2839,7 +2839,8 @@ do_break_wand(obj)
 			fillmsg = TRUE;
 		} else
 			digactualhole(x, y, BY_OBJECT,
-			      (rn2(obj->spe) < 3 || !Can_dig_down(&u.uz)) ?
+			      (rn2(obj->spe) < 3 ||
+				(!Can_dig_down(&u.uz) && !levl[x][y].candig)) ?
 			       PIT : HOLE);
 	    }
 	    continue;

@@ -186,7 +186,8 @@ dig_check(madeby, verbose, x, y)
 	} else if ((IS_ROCK(levl[x][y].typ) && levl[x][y].typ != SDOOR &&
 		      (levl[x][y].wall_info & W_NONDIGGABLE) != 0)
 		|| (ttmp &&
-		      (ttmp->ttyp == MAGIC_PORTAL || !Can_dig_down(&u.uz)))) {
+		      (ttmp->ttyp == MAGIC_PORTAL ||
+			(!Can_dig_down(&u.uz) && !levl[x][y].candig)))) {
 	    if(verbose) pline_The("%s here is too hard to %s.",
 				  surface(x,y), verb);
 	    return(FALSE);
@@ -513,7 +514,7 @@ int ttyp;
 	    return;
 	}
 
-	if (ttyp != PIT && !Can_dig_down(&u.uz)) {
+	if (ttyp != PIT && (!Can_dig_down(&u.uz) && !lev->candig)) {
 	    impossible("digactualhole: can't dig %s on this level.",
 		       defsyms[trap_to_defsym(ttyp)].explanation);
 	    ttyp = PIT;
@@ -676,7 +677,7 @@ boolean pit_only;
 	struct rm *lev = &levl[u.ux][u.uy];
 	struct obj *boulder_here;
 	schar typ;
-	boolean nohole = !Can_dig_down(&u.uz);
+	boolean nohole = (!Can_dig_down(&u.uz) && !lev->candig);
 
 	if ((ttmp && (ttmp->ttyp == MAGIC_PORTAL || nohole)) ||
 	   (IS_ROCK(lev->typ) && lev->typ != SDOOR &&

@@ -333,7 +333,8 @@ boolean td;	/* td == TRUE : trap door or hole */
 
 	if (In_sokoban(&u.uz) && Can_fall_thru(&u.uz))
 	    ;	/* KMH -- You can't escape the Sokoban level traps */
-	else if(Levitation || u.ustuck || !Can_fall_thru(&u.uz)
+	else if(Levitation || u.ustuck
+	   || (!Can_fall_thru(&u.uz) && !levl[u.ux][u.uy].candig)
 	   || Flying || is_clinger(youmonst.data)
 	   || (Inhell && !u.uevent.invoked &&
 					newlevel == dunlevs_in_dungeon(&u.uz))
