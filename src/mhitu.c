@@ -1597,6 +1597,7 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 	int	tim_tmp;
 	register struct obj *otmp2;
 	int	i;
+	boolean physical_damage = FALSE;
 
 	if (!u.uswallow) {	/* swallows you */
 		if (youmonst.data->msize >= MZ_HUGE) return(0);
@@ -1666,6 +1667,7 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 	switch(mattk->adtyp) {
 
 		case AD_DGST:
+		    physical_damage = TRUE;
 		    if (Slow_digestion) {
 			/* Messages are handled below */
 			u.uswldtim = 0;
@@ -1682,6 +1684,7 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		    }
 		    break;
 		case AD_PHYS:
+		    physical_damage = TRUE;
 		    if (mtmp->data == &mons[PM_FOG_CLOUD]) {
 			You("are laden with moisture and %s",
 			    flaming(youmonst.data) ? "are smoldering out!" :
@@ -1754,11 +1757,12 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		    if (!diseasemu(mtmp->data)) tmp = 0;
 		    break;
 		default:
+		    physical_damage = TRUE;
 		    tmp = 0;
 		    break;
 	}
 
-	if (Half_physical_damage) tmp = (tmp+1) / 2;
+	if (physical_damage) tmp = Maybe_Half_Phys(tmp);
 
 	mdamageu(mtmp, tmp);
 	if (tmp) stop_occupation();
