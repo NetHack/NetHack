@@ -366,7 +366,7 @@ tactics(mtmp)
 		}
 	    }
 	}
-	/* NOTREACHED */
+	/*NOTREACHED*/
 	return(0);
 }
 

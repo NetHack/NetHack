@@ -216,7 +216,7 @@ int set, entry;
 	i = entry - tilenum;
 	if (i < (MAXEXPCHARS * EXPL_MAX)) {
 	    if (set == OTH_GLYPH) {
-		char *explosion_types[] = { /* hack.h */
+		static char *explosion_types[] = { /* hack.h */
 			"dark", "noxious", "muddy", "wet",
 			"magical", "fiery", "frosty"
 		};

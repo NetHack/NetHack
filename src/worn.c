@@ -701,7 +701,9 @@ boolean polyspot;
 /* currently only does speed boots, but might be expanded if monsters get to
    use more armor abilities */
 static int
-extra_pref(struct monst *mon, struct obj *obj)
+extra_pref(mon, obj)
+struct monst *mon;
+struct obj *obj;
 {
     if (obj) {
 	if (obj->otyp == SPEED_BOOTS && mon->permspeed != MFAST)

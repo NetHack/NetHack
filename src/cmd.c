@@ -1048,7 +1048,7 @@ minimal_enlightenment()
 	anything any;
 	char buf[BUFSZ], buf2[BUFSZ];
 	static char fmtstr[] = "%-15s: %-12s";
-	char deity_fmtstr[] = "%-17s%s";
+	static char deity_fmtstr[] = "%-17s%s";
 
 	any.a_void = 0;
 	buf[0] = buf2[0] = '\0';

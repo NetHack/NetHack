@@ -1617,7 +1617,7 @@ goodfruit:
 		prefix_val = -1;
 		while (*op && num < sizeof flags.end_disclose - 1) {
 			register char c, *dop;
-			char valid_settings[] = {
+			static char valid_settings[] = {
 				DISCLOSE_PROMPT_DEFAULT_YES,
 				DISCLOSE_PROMPT_DEFAULT_NO,
 				DISCLOSE_YES_WITHOUT_PROMPT,
@@ -2379,7 +2379,7 @@ boolean setinitial,setfromfile;
 	 * The order of disclose_names[]
          * must correspond to disclosure_options in decl.h
          */
-	const char *disclosure_names[] = {
+	static const char *disclosure_names[] = {
 		"inventory", "attributes", "vanquished", "genocides", "conduct"
 	};
 	int disc_cat[NUM_DISCLOSURE_OPTIONS];
@@ -3146,15 +3146,15 @@ char *op;
 	int j;
 	char buf[BUFSZ];
 	char *wn, *tfg, *tbg, *newop;
-	char *wnames[] = {"menu", "message", "status", "text"};
-	char *shortnames[] = {"mnu", "msg", "sts", "txt"};
-	char **fgp[] = {
+	static char *wnames[] = {"menu", "message", "status", "text"};
+	static char *shortnames[] = {"mnu", "msg", "sts", "txt"};
+	static char **fgp[] = {
 		&iflags.wc_foregrnd_menu,
 		&iflags.wc_foregrnd_message,
 		&iflags.wc_foregrnd_status,
 		&iflags.wc_foregrnd_text
 	};
-	char **bgp[] = {
+	static char **bgp[] = {
 		&iflags.wc_backgrnd_menu,
 		&iflags.wc_backgrnd_message,
 		&iflags.wc_backgrnd_status,
