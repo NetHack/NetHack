@@ -2233,7 +2233,10 @@ struct obj *obj;
 	    }
 	    wakeup(mtmp);
 	} else {
-	    You("flick your bullwhip towards %s.", mon_nam(mtmp));
+	    if (mtmp->m_ap_type &&
+		!Protection_from_shape_changers && !sensemon(mtmp))
+		stumble_onto_mimic(mtmp);
+	    else You("flick your bullwhip towards %s.", mon_nam(mtmp));
 	    if (proficient) {
 		if (attack(mtmp)) return 1;
 		else pline(msg_snap);

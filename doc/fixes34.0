@@ -430,6 +430,7 @@ cannot reflect back an invisible umber hulk or medusa's attack
 monsters with M3_WANTSBOOK often couldn't move in the Wizard-level
 Vlad should want the Candelabrum
 if you float_down on a trap in which you're already trapped, don't retrap
+applying whip toward hidden mimic displays mimic name before "Wait!" message
 
 
 Platform- and/or Interface-Specific Fixes
