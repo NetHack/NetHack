@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.4	2003/05/25	*/
+/*	SCCS Id: @(#)invent.c	3.4	2003/11/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -563,16 +563,36 @@ register struct obj *obj;
 	obfree(obj, (struct obj *) 0);	/* frees contents also */
 }
 
+/* try to find a particular type of object at designated map location */
 struct obj *
-sobj_at(n,x,y)
-register int n, x, y;
+sobj_at(otyp, x, y)
+int otyp;
+int x, y;
 {
 	register struct obj *otmp;
 
-	for(otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
-		if(otmp->otyp == n)
-		    return(otmp);
-	return((struct obj *)0);
+	for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
+	    if (otmp->otyp == otyp) break;
+
+	return otmp;
+}
+
+/* sobj_at(&c) traversal -- find next object of specified type */
+struct obj *
+nxtobj(obj, type, by_nexthere)
+struct obj *obj;
+int type;
+boolean by_nexthere;
+{
+	register struct obj *otmp;
+
+	otmp = obj;	/* start with the object after this one */
+	do {
+	    otmp = !by_nexthere ? otmp->nobj : otmp->nexthere;
+	    if (!otmp) break;
+	} while (otmp->otyp != type);
+
+	return otmp;
 }
 
 struct obj *

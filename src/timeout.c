@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.4	2002/12/17	*/
+/*	SCCS Id: @(#)timeout.c	3.4	2003/11/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1242,6 +1242,9 @@ do_storms()
  *		timer would have gone off.  If no timer is found, return 0.
  *		If an object, decrement the object's timer count.
  *
+ *	long peek_timer(short func_index, genericptr_t arg)
+ *		Return time specified timer will go off (0 if no such timer).
+ *
  *	void run_timers(void)
  *		Call timers that have timed out.
  *
@@ -1271,6 +1274,9 @@ do_storms()
  *
  *	void obj_stop_timers(struct obj *obj)
  *		Stop all timers attached to obj.
+ *
+ *	boolean obj_has_timer(struct obj *object, short timer_type)
+ *		Check whether object has a timer of type timer_type.
  */
 
 #ifdef WIZARD
@@ -1482,7 +1488,24 @@ genericptr_t arg;
 	free((genericptr_t) doomed);
 	return timeout;
     }
-    return 0;
+    return 0L;
+}
+
+/*
+ * Find the timeout of specified timer; return 0 if none.
+ */
+long
+peek_timer(type, arg)
+    short type;
+    genericptr_t arg;
+{
+    timer_element *curr;
+
+    for (curr = timer_base; curr; curr = curr->next) {
+	if (curr->func_index == type && curr->arg == arg)
+	    return curr->timeout;
+    }
+    return 0L;
 }
 
 
@@ -1554,6 +1577,20 @@ obj_stop_timers(obj)
     }
     obj->timed = 0;
 }
+
+/*
+ * Check whether object has a timer of type timer_type.
+ */
+boolean
+obj_has_timer(object, timer_type)
+    struct obj *object;
+    short timer_type;
+{
+    long timeout = peek_timer(timer_type, (genericptr_t)object);
+
+    return (boolean)(timeout != 0L);
+}
+
 
 /*
  * Stop all timers of index func_index at this spot.
