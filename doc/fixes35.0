@@ -32,6 +32,7 @@ fix some unreachable messages (either make then reachable or remove them)
 can quiver coins when GOLDOBJ is defined
 grammar, spelling and other typos
 oracle and rumor regarding priestly donations
+keep various delayed killers separate to avoid mixed up messages
 
 
 Platform- and/or Interface-Specific Fixes
