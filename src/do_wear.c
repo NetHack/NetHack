@@ -431,6 +431,7 @@ Gloves_off()
     }
     setworn((struct obj *)0, W_ARMG);
     cancelled_don = FALSE;
+    (void) encumber_msg();		/* immediate feedback for GoP */
 
     /* Prevent wielding cockatrice when not wearing gloves */
     if (uwep && uwep->otyp == CORPSE &&
