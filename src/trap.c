@@ -526,7 +526,8 @@ unsigned trflags;
 	register struct obj *otmp;
 	boolean already_seen = trap->tseen;
 	boolean webmsgok = (!(trflags & NOWEBMSG));
-	
+	boolean forcebungle = (trflags & FORCEBUNGLE);
+
 	nomul(0);
 
 	/* KMH -- You can't escape the Sokoban level traps */
@@ -552,7 +553,8 @@ unsigned trflags;
 		    defsyms[trap_to_defsym(ttype)].explanation);
 		return;
 	    }
-	    if(!Fumbling && ttype != MAGIC_PORTAL && ttype != ANTI_MAGIC &&
+	    if(!Fumbling && ttype != MAGIC_PORTAL &&
+		ttype != ANTI_MAGIC && !forcebungle &&
 		(!rn2(5) ||
 	    ((ttype == PIT || ttype == SPIKED_PIT) && is_clinger(youmonst.data)))) {
 		You("escape %s %s.",
@@ -1043,7 +1045,9 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 			    trap->madeby_u ? "the trigger of your mine" :
 					     "a trigger");
 		    if (already_seen && rn2(3)) break;
-		    pline("KAABLAMM!!!  The air currents set %s%s off!",
+		    pline("KAABLAMM!!!  %s %s%s off!",
+		    	    forcebungle ? "Your inept attempt sets" :
+		    	    		  "The air currents set",
 			    already_seen ? a_your[trap->madeby_u] : "",
 			    already_seen ? " land mine" : "it");
 		} else {
