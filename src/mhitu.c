@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.4	2001/12/06	*/
+/*	SCCS Id: @(#)mhitu.c	3.4	2002/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -265,6 +265,30 @@ boolean message;
 #endif /* OVLB */
 #ifdef OVL0
 
+/* select a monster's next attack, possibly substituting for its usual one */
+struct attack *
+getmattk(mptr, indx, prev_result, alt_attk_buf)
+struct permonst *mptr;
+int indx, prev_result[];
+struct attack *alt_attk_buf;
+{
+    struct attack *attk = &mptr->mattk[indx];
+
+    /* prevent a monster with two consecutive disease or hunger attacks
+       from hitting with both of them on the same turn; if the first has
+       already hit, switch to a stun attack for the second */
+    if (indx > 0 && prev_result[indx - 1] > 0 &&
+	    (attk->adtyp == AD_DISE ||
+		attk->adtyp == AD_PEST ||
+		attk->adtyp == AD_FAMN) &&
+	    attk->adtyp == mptr->mattk[indx - 1].adtyp) {
+	*alt_attk_buf = *attk;
+	attk = alt_attk_buf;
+	attk->adtyp = AD_STUN;
+    }
+    return attk;
+}
+
 /*
  * mattacku: monster attacks you
  *	returns 1 if monster dies (e.g. "yellow light"), 0 otherwise
@@ -278,7 +302,7 @@ int
 mattacku(mtmp)
 	register struct monst *mtmp;
 {
-	struct	attack	*mattk;
+	struct	attack	*mattk, alt_attk;
 	int	i, j, tmp, sum[NATTK];
 	struct	permonst *mdat = mtmp->data;
 	boolean ranged = (distu(mtmp->mx, mtmp->my) > 3);
@@ -399,7 +423,8 @@ mattacku(mtmp)
 		}
 		return(0);
 	}
-	if (youmonst.data->mlet == S_MIMIC && youmonst.m_ap_type && !range2 && foundyou && !u.uswallow) {
+	if (youmonst.data->mlet == S_MIMIC && youmonst.m_ap_type &&
+		    !range2 && foundyou && !u.uswallow) {
 		if (!youseeit) pline("It gets stuck on you.");
 		else pline("Wait, %s!  That's a %s named %s!",
 			   m_monnam(mtmp), youmonst.data->mname, plname);
@@ -498,7 +523,7 @@ mattacku(mtmp)
 	for(i = 0; i < NATTK; i++) {
 
 	    sum[i] = 0;
-	    mattk = &(mdat->mattk[i]);
+	    mattk = getmattk(mdat, i, sum, &alt_attk);
 	    if (u.uswallow && (mattk->aatyp != AT_ENGL))
 		continue;
 	    switch(mattk->aatyp) {
@@ -774,7 +799,7 @@ hitmu(mtmp, mattk)
 {
 	register struct permonst *mdat = mtmp->data;
 	register int uncancelled, ptmp;
-	int dmg, armpro;
+	int dmg, armpro, permdmg;
 	char	 buf[BUFSZ];
 	struct permonst *olduasmon = youmonst.data;
 	int res;
@@ -823,6 +848,7 @@ hitmu(mtmp, mattk)
 		armpro = objects[uarmh->otyp].a_can;
 	uncancelled = !mtmp->mcan && ((rn2(3) >= armpro) || !rn2(50));
 
+	permdmg = 0;
 /*	Now, adjust damages via resistances or specific attacks */
 	switch(mattk->adtyp) {
 	    case AD_PHYS:
@@ -1388,16 +1414,24 @@ do_stone:
 		    pline("Was that the touch of death?");
 		    break;
 		}
-		if(!Antimagic && rn2(20) > 16)  {
-		    killer_format = KILLED_BY_AN;
-		    killer = "touch of death";
-		    done(DIED);
-		} else {
-		    if(!rn2(5)) {
-			if(Antimagic) shieldeff(u.ux, u.uy);
-			pline("Lucky for you, it didn't work!");
+		switch (rn2(20)) {
+		case 19: case 18: case 17:
+		    if (!Antimagic) {
+			killer_format = KILLED_BY_AN;
+			killer = "touch of death";
+			done(DIED);
 			dmg = 0;
-		    } else You_feel("your life force draining away...");
+			break;
+		    } /* else FALLTHRU */
+		default: /* case 16: ... case 5: */
+		    You_feel("your life force draining away...");
+		    permdmg = 1;	/* actual damage done below */
+		    break;
+		case 4: case 3: case 2: case 1: case 0:
+		    if (Antimagic) shieldeff(u.ux, u.uy);
+		    pline("Lucky for you, it didn't work!");
+		    dmg = 0;
+		    break;
 		}
 		break;
 	    case AD_PEST:
@@ -1464,6 +1498,40 @@ do_stone:
 		|| (Role_if(PM_PRIEST) && uarmh && is_quest_artifact(uarmh) &&
 		    (is_undead(mtmp->data) || is_demon(mtmp->data))))
 		dmg = (dmg+1) / 2;
+
+	    if (permdmg) {	/* Death's life force drain */
+		int lowerlimit, *hpmax_p;
+		/*
+		 * Apply some of the damage to permanent hit points:
+		 *	polymorphed	    100% against poly'd hpmax
+		 *	hpmax > 25*lvl	    100% against normal hpmax
+		 *	hpmax > 10*lvl	50..100%
+		 *	hpmax >  5*lvl	25..75%
+		 *	otherwise	 0..50%
+		 * Never reduces hpmax below 1 hit point per level.
+		 */
+		permdmg = rn2(dmg / 2 + 1);
+		if (Upolyd || u.uhpmax > 25 * u.ulevel) permdmg = dmg;
+		else if (u.uhpmax > 10 * u.ulevel) permdmg += dmg / 2;
+		else if (u.uhpmax > 5 * u.ulevel) permdmg += dmg / 4;
+
+		if (Upolyd) {
+		    hpmax_p = &u.mhmax;
+		    /* [can't use youmonst.m_lev] */
+		    lowerlimit = min((int)youmonst.data->mlevel, u.ulevel);
+		} else {
+		    hpmax_p = &u.uhpmax;
+		    lowerlimit = u.ulevel;
+		}
+		if (*hpmax_p - permdmg > lowerlimit)
+		    *hpmax_p -= permdmg;
+		else if (*hpmax_p > lowerlimit)
+		    *hpmax_p = lowerlimit;
+		else	/* unlikely... */
+		    ;	/* already at or below minimum threshold; do nothing */
+		flags.botl = 1;
+	    }
+
 	    mdamageu(mtmp, dmg);
 	}
 

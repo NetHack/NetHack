@@ -929,6 +929,7 @@ E const char *FDECL(mpoisons_subj, (struct monst *,struct attack *));
 E void NDECL(u_slow_down);
 E struct monst *NDECL(cloneu);
 E void FDECL(expels, (struct monst *,struct permonst *,BOOLEAN_P));
+E struct attack *FDECL(getmattk, (struct permonst *,int,int *,struct attack *));
 E int FDECL(mattacku, (struct monst *));
 E int FDECL(gazemu, (struct monst *,struct attack *));
 E void FDECL(mdamageu, (struct monst *,int));

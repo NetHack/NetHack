@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.4	2002/02/07	*/
+/*	SCCS Id: @(#)mhitm.c	3.4	2002/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -189,7 +189,7 @@ mattackm(magr, mdef)
 		    attk,	/* attack attempted this time */
 		    struck = 0,	/* hit at least once */
 		    res[NATTK];	/* results of all attacks */
-    struct attack   *mattk;
+    struct attack   *mattk, alt_attk;
     struct permonst *pa, *pd;
 
     if (!magr || !mdef) return(MM_MISS);		/* mike@genat */
@@ -233,7 +233,7 @@ mattackm(magr, mdef)
     /* Now perform all attacks for the monster. */
     for (i = 0; i < NATTK; i++) {
 	res[i] = MM_MISS;
-	mattk = &(pa->mattk[i]);
+	mattk = getmattk(pa, i, res, &alt_attk);
 	otmp = (struct obj *)0;
 	attk = 1;
 	switch (mattk->aatyp) {

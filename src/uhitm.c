@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2001/09/06	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2002/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1735,7 +1735,7 @@ hmonas(mon, tmp)		/* attack monster as a monster. */
 register struct monst *mon;
 register int tmp;
 {
-	register struct attack *mattk;
+	struct attack *mattk, alt_attk;
 	int	i, sum[NATTK], hittmp = 0;
 	int	nsum = 0;
 	int	dhit = 0;
@@ -1743,7 +1743,7 @@ register int tmp;
 	for(i = 0; i < NATTK; i++) {
 
 	    sum[i] = 0;
-	    mattk = &(youmonst.data->mattk[i]);
+	    mattk = getmattk(youmonst.data, i, sum, &alt_attk);
 	    switch(mattk->aatyp) {
 		case AT_WEAP:
 use_weapon:
