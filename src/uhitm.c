@@ -970,6 +970,7 @@ int thrown;
 	    /* avoid migrating a dead monster */
 	    if (mon->mhp > tmp) {
 		mhurtle(mon, u.dx, u.dy, 1);
+		mdat = mon->data; /* in case of a polymorph trap */
 		if (DEADMONSTER(mon)) already_killed = TRUE;
 	    }
 	    hittxt = TRUE;
@@ -986,6 +987,7 @@ int thrown;
 		/* avoid migrating a dead monster */
 		if (mon->mhp > tmp) {
 		    mhurtle(mon, u.dx, u.dy, 1);
+		    mdat = mon->data; /* in case of a polymorph trap */
 		    if (DEADMONSTER(mon)) already_killed = TRUE;
 		}
 		hittxt = TRUE;
