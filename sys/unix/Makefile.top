@@ -87,7 +87,7 @@ DAT = $(DATNODLB) $(DATDLB)
 $(GAME):
 	( cd src ; $(MAKE) )
 
-all:	$(GAME) Guidebook $(VARDAT) dungeon spec_levs check-dlb
+all:	$(GAME) recover Guidebook $(VARDAT) dungeon spec_levs check-dlb
 	@echo "Done."
 
 # Note: many of the dependencies below are here to allow parallel make
@@ -164,6 +164,10 @@ dlb:
 	( cd util ; $(MAKE) dlb )
 	( cd dat ; ../util/dlb cf nhdat $(DATDLB) )
 
+# recover can be used when INSURANCE is defined in include/config.h
+# and the checkpoint option is true
+recover: $(GAME)
+	( cd util ; $(MAKE) recover )
 
 dofiles:
 	target=`sed -n					\
@@ -174,6 +178,7 @@ dofiles:
 	  	-e '$$s/.*/nodlb/p' < dat/options` ;	\
 	$(MAKE) dofiles-$${target-nodlb}
 	cp src/$(GAME) $(GAMEDIR)
+	cp util/recover $(GAMEDIR)
 	-rm -f $(SHELLDIR)/$(GAME)
 	sed -e 's;/usr/games/lib/nethackdir;$(GAMEDIR);' \
 		-e 's;HACKDIR/nethack;HACKDIR/$(GAME);' \
@@ -183,6 +188,7 @@ dofiles:
 	-( cd $(GAMEDIR) ; $(CHOWN) $(GAMEUID) $(GAME) ; \
 			$(CHGRP) $(GAMEGRP) $(GAME) )
 	chmod $(GAMEPERM) $(GAMEDIR)/$(GAME)
+	chmod $(EXEPERM) $(GAMEDIR)/recover
 	-$(CHOWN) $(GAMEUID) $(SHELLDIR)/$(GAME)
 	$(CHGRP) $(GAMEGRP) $(SHELLDIR)/$(GAME)
 	chmod $(EXEPERM) $(SHELLDIR)/$(GAME)
@@ -202,7 +208,7 @@ dofiles-nodlb:
 			$(CHGRP) $(GAMEGRP) $(DAT) ; \
 			chmod $(FILEPERM) $(DAT) )
 
-update: $(GAME) $(VARDAT) dungeon spec_levs
+update: $(GAME) recover $(VARDAT) dungeon spec_levs
 #	(don't yank the old version out from under people who're playing it)
 	-mv $(GAMEDIR)/$(GAME) $(GAMEDIR)/$(GAME).old
 #	quest.dat is also kept open and has the same problems over NFS
@@ -218,7 +224,7 @@ update: $(GAME) $(VARDAT) dungeon spec_levs
 # and a reminder
 	@echo You may also want to install the man pages via the doc Makefile.
 
-install: $(GAME) $(VARDAT) dungeon spec_levs
+install: $(GAME) recover $(VARDAT) dungeon spec_levs
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory
 	-mkdir -p $(SHELLDIR)

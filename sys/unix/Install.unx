@@ -77,10 +77,10 @@
     files the main executable will use.  Then become root if necessary and
     type 'make install'.  Everything should now be set.
 
-8.  Read doc/recover.man or doc/recover.txt, and think about whether and
-    how you want to install the recover program.  If you decide to install
-    it, type 'make recover' in the util directory and then install recover
-    by hand in your desired manner.
+8.  Read doc/recover.man or doc/recover.txt to learn how to use the recover
+    program.  The recover program can be used in case of a crash to recover
+    a game that was in progress.  The recover command is installed in the
+    GAMEDIR by default.
 
 Notes:
 
