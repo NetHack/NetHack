@@ -167,9 +167,8 @@ char *reasonbuf;
 	FILE *fp;
 	const char *filename;
 	int prefcnt, failcount = 0;
-	char failbuf[BUFSZ];
+	char panicbuf1[BUFSZ], panicbuf2[BUFSZ];
 	
-	failbuf[0] = '\0';
 	if (reasonbuf) reasonbuf[0] = '\0';
 	for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
 		/* don't test writing to configdir or datadir; they're readonly */
@@ -179,20 +178,20 @@ char *reasonbuf;
 			fclose(fp);
 			(void) unlink(filename);
 		} else {
-			if (failcount) {
-				Strcat(failbuf,", ");
-				if (reasonbuf) Strcat(reasonbuf,", ");
+			if (reasonbuf) {
+				if (failcount) Strcat(reasonbuf,", ");
+				Strcat(reasonbuf, fqn_prefix_names[prefcnt]);
 			}
-			/* the paniclog entry gets the value of errno */
-			Sprintf(eos(failbuf), "%s:%d", fqn_prefix_names[prefcnt], errno);
-			if (reasonbuf) Strcat(reasonbuf, fqn_prefix_names[prefcnt]);
+			/* the paniclog entry gets the value of errno as well */
+			Sprintf(panicbuf1,"Invalid %s", fqn_prefix_names[prefcnt]);
+			Sprintf(panicbuf2,"\"%s\" (errno=%d)", fqn_prefix[prefcnt], errno);
+			paniclog(panicbuf1, panicbuf2);
 			failcount++;
 		}	
 	}
-	if (failcount) {
-		paniclog("Invalid locations", failbuf);
+	if (failcount)
 		return 0;
-	}
+	else
 #endif
 	return 1;
 }
