@@ -1524,6 +1524,11 @@ const char *oldstr;
 			    !BSTRCMP(bp, p-6, "scales"))
 				return bp;
 
+		} else if (!BSTRCMP(bp, p-2, "us")) { /* lotus, fungus... */
+			if (BSTRCMP(bp, p-6, "tengus") && /* but not these... */
+			    BSTRCMP(bp, p-7, "hezrous"))
+				return bp;
+			
 		} else if (!BSTRCMP(bp, p-5, "boots") ||
 			   !BSTRCMP(bp, p-9, "gauntlets") ||
 			   !BSTRCMP(bp, p-6, "tricks") ||
@@ -1532,13 +1537,10 @@ const char *oldstr;
 			   !BSTRCMP(bp, p-4, "ness") ||
 			   !BSTRCMP(bp, p-14, "shape changers") ||
 			   !BSTRCMP(bp, p-15, "detect monsters") ||
-			   !BSTRCMPI(bp, p-11, "Aesculapius") || /* staff */
-			   !BSTRCMP(bp, p-10, "eucalyptus") ||
 #ifdef WIZARD
 			   !BSTRCMP(bp, p-9, "iron bars") ||
 #endif
-			   !BSTRCMP(bp, p-5, "aklys") ||
-			   !BSTRCMP(bp, p-6, "fungus"))
+			   !BSTRCMP(bp, p-5, "aklys"))
 				return bp;
 	mins:
 		p[-1] = '\0';
