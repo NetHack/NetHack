@@ -679,10 +679,10 @@ player_selection
 		-- dialog or prompts for choosing character.
 popup_dialog	-- port should pop up dialog boxes for input.
 preload_tiles	-- port should preload tiles into memory.
-saveselection   -- if port can display a menu of the user's saved games do so.
 scroll_amount   -- scroll this amount when scroll_margin is reached.
 scroll_margin	-- port should scroll the display when the hero or cursor
 		   is this number of cells away from the edge of the window.
+selectsaved     -- if port can display a menu of the user's saved games do so.
 softkeyboard    -- handhelds should display an on-screen keyboard if possible.
 splash_screen   -- port should/should not display an opening splashscreen.
 tiled_map	-- port should display a tiled map if it can.
