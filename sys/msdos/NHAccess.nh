@@ -1,0 +1,134 @@
+#	SCSS Id: @(#)NHAccess.nh	3.3	    1999/11/28
+#	Copyright (c) NetHack PC Development Team 1993, 1996, 1999
+#	NetHack may be freely redistributed.  See license for details.
+#
+# Modified defaults.nh for blind access.  Copy to working directory as
+# defaults.nh.
+#
+# A '#' at the beginning of a line means the rest of the line is a comment.
+#
+# This configuration file is set up for two cases, for a hard disk
+# (as drive C:), and for two floppy disks.
+#
+# Some options MUST be set in this file, other options can be toggled while
+# playing.  For a list of options available see the <opthelp.> file.  If
+# the game plays slowly you might notice some improvement by setting
+# !time and !showexp, which will reduce screen I/O somewhat.
+#
+# To change the configuration, comment out the unwanted lines, and
+# uncomment the configuration you want.
+
+
+# *** OPTIONS ***
+#
+# The three options on this line should be used for most setups.  
+# If your machine isn't very IBM-compatible, and NetHack doesn't work, 
+# try commenting out this line.
+#
+# Note to blind players:
+#
+# Turn off IBMgraphics, using the exclamation-mark, as done below.
+#
+OPTIONS=rawio,BIOS,!IBMgraphics
+# Some versions of NetHack use the pc speaker to play the notes given when
+# playing music instruments in NetHack.  To use this feature, if available,
+# uncomment the following line:
+#OPTIONS=soundcard:autodetect
+# If your machine is NEC PC-9800, use:
+#OPTIONS=rawio,BIOS,video:default
+#
+#
+# General options.  You might also set "silent" so as not to attract
+# the boss's attention.
+#
+# Note for blind players:
+#
+# A lot of speech access programs use the number-pad to review the screen.
+# If this is the case, exclamation-mark out the number_pad option (as done
+# below) and use the traditional Rogue-like commands.
+#
+OPTIONS=notime,noshowexp,!number_pad,lit_corridor,!rest_on_space
+#
+#
+# Some options to set personal preferences.  Uncomment and change these to
+# suit your personal preference.  If several people are to use the same
+# configuration, options like these should not be set.
+#
+# Note to blind players:
+#
+# Use menustyle:traditional for the best interface to speech synthesizers.
+#
+#OPTIONS=name:Janet-V,female,dogname:Fido,catname:Morris,fruit:apricot
+#OPTIONS=autopickup,pickup_types:$"=/!?+
+#OPTIONS=packorder:")[%?+/=!(*0_`
+#OPTIONS=scores:10 top/2 around/own
+#OPTIONS=nolegacy,noverbose
+OPTIONS=nolegacy,menustyle:traditional
+
+
+# *** HARD DISK CONFIGURATION ***
+#
+#HACKDIR=c:\games\nethack
+# 
+# Note: Under MSDOS ports HACKDIR defaults to the location 
+#       of the NetHack.exe file. Setting HACKDIR above will override that.
+#
+#   LEVELS and SAVE default to HACKDIR
+#
+#LEVELS=c:\games\nethack\bones
+#SAVE=c:\games\nethack\bones;n
+#
+#   appending a ";n" to SAVE means don't prompt to insert a disk.
+SAVE=;n
+#
+# Note that RAMDISK must *not* be the same (or even implicitly
+# get expanded to the same path by the OS) as HACKDIR.
+#
+#RAMDISK=d:
+
+
+# *** 2-FLOPPY CONFIGURATION ***
+#
+# HACKDIR=a:\
+# LEVELS=b:\
+# SAVE=b:\
+# RAMDISK=c:
+
+
+# *** CHARACTER GRAPHICS ***
+#
+# See the on-line help or the Guidebook for which symbols are in which
+# positions.
+#
+# Note to blind players:
+#
+# You very probably do not want to use these character graphics.
+#
+# If you merely set the IBMgraphics option, NetHack will use IBM
+# extended ASCII for dungeon characters.  If you don't like the selections,
+# you can make up your own via these graphics options, but you should still
+# set IBMgraphics if you are using IBM graphics characters to get the correct
+# processing.
+#
+#DUNGEON=  032 124 045 124 124 124 124 045 045 045 \
+#          124 124 046 045 124 043 043 035 035 046 \
+#          035 035 060 062 060 062 095 124 092 035 \
+#          126 126 126 126 042 042 035 035 032 035 \
+#          126
+#
+#TRAPS=    094 094 094 094 094 094 094 094 094 094 \
+#          094 094 094 094 094 094 094 094 094 094 \
+#          094 094
+#
+#EFFECTS=  124 095 092 047 042 033 041 040         \
+#          048 035 064 042                         \
+#          047 045 092 058 058 092 045 047         \
+#          047 045 092 058 032 058 092 045 047
+
+# =================================================
+# *** VIDEOCOLORS AND VIDEOSHADES ***
+#
+# While playing on NEC PC-9800, default game display may be difficult to
+# read.  Try following setting.
+#
+#OPTIONS=videocolors:4-2-6-1-5-3-4-2-6-1-5-3,videoshades:normal-normal-normal
