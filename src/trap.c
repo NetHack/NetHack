@@ -3479,6 +3479,18 @@ boolean disarm;
 			      loss += stolen_value(obj, ox, oy,
 						(boolean)shkp->mpeaceful, TRUE);
 			  delete_contents(obj);
+			  /* we're about to delete all things at this location,
+			   * which could include the ball & chain.
+			   * If we attempt to call unpunish() in the
+			   * for-loop below we can end up with otmp2
+			   * being invalid once the chain is gone.
+			   * Deal with ball & chain right now instead.
+			   */
+			  if (Punished && !carried(uball) &&
+				((uchain->ox == u.ux && uchain->oy == u.uy) ||
+				 (uball->ox == u.ux && uball->oy == u.uy)))
+				unpunish();
+
 			  for(otmp = level.objects[u.ux][u.uy];
 							otmp; otmp = otmp2) {
 			      otmp2 = otmp->nexthere;

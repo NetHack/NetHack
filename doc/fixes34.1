@@ -372,6 +372,8 @@ monks lose their to-hit bonus for bare-handed attacking if wearing a shield
 fix case on leading character in "Crunched in the head..." in ball.c
 using travel mode to move next to a known trap and then trying to step onto
 	that trap required an extra step; the first one ended up as a no-op
+punished with ball and chain on the same floor square as a trapped chest
+	when it exploded resulted in panic "remove_object: obj not on floor"
 
 
 Platform- and/or Interface-Specific Fixes
