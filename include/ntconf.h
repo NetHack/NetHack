@@ -135,6 +135,7 @@ extern void NDECL(toggle_mouse_support);
 #include <io.h>
 #include <direct.h>
 #else
+int  _RTLENTRY _EXPFUNC access  (const char _FAR *__path, int __amode);
 int  _RTLENTRY _EXPFUNC _chdrive(int __drive);
 int  _RTLENTRYF _EXPFUNC32   chdir( const char _FAR *__path );
 char _FAR * _RTLENTRY  _EXPFUNC     getcwd( char _FAR *__buf, int __buflen );

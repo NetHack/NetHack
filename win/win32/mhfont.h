@@ -11,6 +11,6 @@
 HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace);
 void mswin_init_splashfonts(HWND hWnd);
 void mswin_destroy_splashfonts(void);
-UINT mswin_charset();
+UINT mswin_charset(void);
 
 #endif /* MSWINFont_h */
