@@ -2178,8 +2178,13 @@ boolean put_in;
 			/* special split case also handled by askchain() */
 		    }
 		    res = put_in ? in_container(otmp) : out_container(otmp);
-		    if (res < 0)
+		    if (res < 0) {
+			if (otmp != pick_list[i].item.a_obj) {
+			    /* split occurred, merge again */
+			    (void) merged(&pick_list[i].item.a_obj, &otmp);
+			}
 			break;
+		    }
 		}
 		free((genericptr_t)pick_list);
 	}

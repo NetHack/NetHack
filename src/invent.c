@@ -1271,7 +1271,7 @@ register int allflag, mx;
 register const char *olets, *word;	/* olets is an Obj Class char array */
 register int FDECL((*fn),(OBJ_P)), FDECL((*ckfn),(OBJ_P));
 {
-	register struct obj *otmp, *otmp2;
+	struct obj *otmp, *otmp2, *otmpo;
 	register char sym, ilet;
 	register int cnt = 0, dud = 0, tmp;
 	boolean takeoff, nodot, ident, ininv;
@@ -1306,6 +1306,7 @@ nextclass:
 		}
 		else	sym = 'y';
 
+		otmpo = otmp;
 		if (sym == '#') {
 		 /* Number was entered; split the object unless it corresponds
 		    to 'none' or 'all'.  2 special cases: cursed loadstones and
@@ -1328,7 +1329,13 @@ nextclass:
 			allflag = 1;
 		case 'y':
 			tmp = (*fn)(otmp);
-			if(tmp < 0) goto ret;
+			if(tmp < 0) {
+			    if (otmp != otmpo) {
+				/* split occurred, merge again */
+				(void) merged(&otmpo, &otmp);
+			    }
+			    goto ret;
+			}
 			cnt += tmp;
 			if(--mx == 0) goto ret;
 		case 'n':
