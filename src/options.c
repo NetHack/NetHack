@@ -2468,8 +2468,8 @@ boolean setinitial,setfromfile;
     char buf[BUFSZ];
     boolean retval = FALSE;
     
-    /* Special handling of menustyle, pickup_burden, and pickup_types,
-       disclose, runmode, and msg_window options. */
+    /* Special handling of menustyle, pickup_burden, pickup_types,
+       disclose, runmode, msg_window, and number_pad options. */
     if (!strcmp("menustyle", optname)) {
 	const char *style_name;
 	menu_item *style_pick = (menu_item *)0;
@@ -2653,6 +2653,41 @@ boolean setinitial,setfromfile;
 	destroy_nhwindow(tmpwin);
         retval = TRUE;
     }
+    else if (!strcmp("number_pad", optname)) {
+	int i;
+	const char *npchoices[3] =
+		{"0 (off)", "1 (on)", "2 (on, DOS compatible)"};
+	char *npletters = "abc";
+	menu_item *mode_pick = (menu_item *)0;
+        tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	for (i = 0; i < SIZE(npchoices); i++) {
+		any.a_int = i + 1;
+		add_menu(tmpwin, NO_GLYPH, &any, npletters[i], 0,
+			 ATR_NONE, npchoices[i], MENU_UNSELECTED);
+        }
+	end_menu(tmpwin, "Select number_pad mode:");
+	if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
+		int mode = mode_pick->item.a_int - 1;
+		switch(mode) {
+			case 2:
+				iflags.num_pad = 1;
+				iflags.num_pad_mode = 1;
+				break;
+			case 1:
+				iflags.num_pad = 1;
+				iflags.num_pad_mode = 0;
+				break;
+			case 0:
+			default:
+				iflags.num_pad = 0;
+				iflags.num_pad_mode = 0;
+		}
+		free((genericptr_t)mode_pick);
+        }
+	destroy_nhwindow(tmpwin);
+        retval = TRUE;
+    }
     return retval;
 }
 
@@ -2802,6 +2837,10 @@ char *buf;
 #endif
 	else if (!strcmp(optname, "name"))
 		Sprintf(buf, "%s", plname);
+	else if (!strcmp(optname, "number_pad"))
+		Sprintf(buf, "%s",
+			(!iflags.num_pad) ? "0=off" :
+			(iflags.num_pad_mode) ? "2=on, DOS compatible" : "1=on");
 	else if (!strcmp(optname, "objects"))
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "packorder")) {
