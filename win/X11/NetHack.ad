@@ -11,7 +11,7 @@ NetHack*menu*font:			fixed
 NetHack*text*font:			fixed
 NetHack*map*font:			nh10
 
-! To use full-color tiles for the map, uncomment the tile file name.
+! tile_file names a file containing full-color tiles for the map.
 ! If you use a 100dpi (or greater) monitor you may wish to double the
 ! tile size so you can see the figures.  If NetHack was compiled to
 ! use XPM (USE_XPM in config.h), the tile_file is a standard XPM file.
@@ -19,7 +19,7 @@ NetHack*map*font:			nh10
 ! the custom format - to enlarge an XPM file, use processing tools
 ! such as XV or preferably PBMplus.
 !
-!NetHack.tile_file: x11tiles
+NetHack.tile_file: x11tiles
 !NetHack.double_tile_size: True
 !
 ! The annotation of pets.

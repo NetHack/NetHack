@@ -83,7 +83,9 @@
 #endif
 
 #ifdef QT_GRAPHICS
-# define DEFAULT_WC_TILED_MAP   /* Default to tiles if users doesn't say wc_ascii_map */
+# ifndef DEFAULT_WC_TILED_MAP
+#  define DEFAULT_WC_TILED_MAP	/* Default to tiles if users doesn't say wc_ascii_map */
+# endif
 # define USER_SOUNDS		/* Use sounds */
 /* # define USER_SOUNDS_REGEX */    /* Use regexps for sound message matches */
 # define USE_XPM		/* Use XPM format for images (required) */
@@ -127,6 +129,9 @@
 /* # define USE_XPM */		/* Disable if you do not have the XPM library */
 # ifdef USE_XPM
 #  define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.xpm) */
+# endif
+# ifndef DEFAULT_WC_TILED_MAP
+#  define DEFAULT_WC_TILED_MAP	/* Default to tiles */
 # endif
 #endif
 

@@ -102,7 +102,7 @@ static XtSignalId X11_sig_id;
 /* Interface definition, for windows.c */
 struct window_procs X11_procs = {
     "X11",
-    WC_COLOR|WC_HILITE_PET,
+    WC_COLOR|WC_HILITE_PET|WC_TILED_MAP,
     0L,
     X11_init_nhwindows,
     X11_player_selection,
@@ -156,7 +156,7 @@ struct window_procs X11_procs = {
 #else
     genl_outrip,
 #endif
-    genl_preference_update,
+    X11_preference_update,
 };
 
 /*
@@ -248,8 +248,7 @@ XtConvertArgRec const nhcolorConvertArgs[] = {
 		    return False;				\
 		}						\
 		*(type*)(toVal->addr) = (value);		\
-	    }							\
-	    else {						\
+	    } else {						\
 		static type static_val;				\
 		static_val = (value);				\
 		toVal->addr = (genericptr_t)&static_val;	\
@@ -257,11 +256,6 @@ XtConvertArgRec const nhcolorConvertArgs[] = {
 	    toVal->size = sizeof(type);				\
 	    return True;					\
 	}
-
-/* decl.h declares these, but it screws up structure references -dlc */
-#undef red
-#undef green
-#undef blue
 
 /*
  * Find a color that approximates the color named in "str".  The "str" color
@@ -952,7 +946,7 @@ static XtResource resources[] = {
     { "double_tile_size", "Double_tile_size", XtRBoolean, sizeof(Boolean),
       XtOffset(AppResources *,double_tile_size), XtRString, "False" },
     { "tile_file", "Tile_file", XtRString, sizeof(String),
-      XtOffset(AppResources *,tile_file), XtRString, "" },
+      XtOffset(AppResources *,tile_file), XtRString, "x11tiles" },
     { "icon", "Icon", XtRString, sizeof(String),
       XtOffset(AppResources *,icon), XtRString, "nh72" },
     { "message_lines", "Message_lines", XtRInt, sizeof(int),
@@ -997,6 +991,9 @@ char** argv;
     /* Init windows to nothing. */
     for (i = 0; i < MAX_WINDOWS; i++)
 	window_list[i].type = NHW_NONE;
+
+    /* add another option that can be set */
+    set_wc_option_mod_status(WC_TILED_MAP, SET_IN_GAME);
 
     /*
      * setuid hack: make sure that if nethack is setuid, to use real uid
@@ -1751,6 +1748,17 @@ X11_yn_function(ques, choices, def)
     return yn_return;
 }
 
+/*ARGSUSED*/
+void
+X11_preference_update(pref)
+    const char *pref;
+{
+    if (!strcmp(pref, "tiled_map")) {
+	if (WIN_MAP != WIN_ERR)
+	    display_map_window(&window_list[WIN_MAP]);
+    }
+}
+
 /* End global functions ==================================================== */
 
 /*
@@ -1972,11 +1980,6 @@ init_standard_windows()
 	    XtSetValues(message_viewport, args, ONE);
 	    max_width = status_width;
 	} else {
-/***** The status display looks better when left justified.
-	    XtSetArg(args[0], XtNhorizDistance,
-				status_hd+((message_vp_width-status_width)/2));
-	    XtSetValues(status, args, ONE);
-*****/
 	    max_width = message_vp_width;
 	}
 	XtSetArg(args[0], XtNhorizDistance, map_vp_hd+((int)(max_width-map_vp_width)/2));
@@ -1985,13 +1988,6 @@ init_standard_windows()
     } else {	/* map is widest */
 	XtSetArg(args[0], XtNwidth, map_vp_width);
 	XtSetValues(message_viewport, args, ONE);
-
-/***** The status display looks better when left justified.
-	XtSetArg(args[0], XtNhorizDistance,
-				status_hd+((map_vp_width-status_width)/2));
-
-	XtSetValues(status, args, ONE);
-*****/
     }
     /*
      * Clear all data values on the fancy status widget so that the values

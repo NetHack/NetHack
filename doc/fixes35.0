@@ -49,6 +49,7 @@ win32gui: made auto-arrange windows on/off option (it was reset automatically
 platforms that support hangup: SAFERHANGUP to avoid losing objects in transit
 	between lists when hangup occurs, and also avoid cheats due to
 	well-timed hangups to stop a long melee
+X11: support dynamic switching of map mode via tiled_map option
 
 
 General New Features

@@ -50,6 +50,11 @@ struct text_map_info_t {
     GC		    copy_gc,			/* Drawing GC */
 		    inv_copy_gc;		/* Inverse drawing GC */
 #endif
+
+    int		    square_width,	/* Saved font information so      */
+		    square_height,	/*   we can calculate the correct */
+		    square_ascent,	/*   placement of changes.	  */
+		    square_lbearing;
 };
 
 struct tile_map_info_t {
@@ -58,6 +63,11 @@ struct tile_map_info_t {
     GC	black_gc;
     unsigned long image_width;			/* dimensions of tile image */
     unsigned long image_height;
+
+    int		  square_width, 	/* Saved tile information so      */
+		  square_height,	/*   we can calculate the correct */
+		  square_ascent,	/*   placement of changes.	  */
+		  square_lbearing;
 };
 
 struct map_info_t {
@@ -65,15 +75,10 @@ struct map_info_t {
 		    viewport_height;	/*   clip to cursor on a resize.  */
     unsigned char   t_start[ROWNO],	/* Starting column for new info. */
 		    t_stop[ROWNO];	/* Ending column for new info. */
-    int		    square_width,	/* Saved font/tile information so */
-		    square_height,	/*   we can calculate the correct */
-		    square_ascent,	/*   placement of changes.	  */
-		    square_lbearing;
-    boolean	    is_tile;
-    union {
-	struct text_map_info_t *text_map;
-	struct tile_map_info_t *tile_map;
-    } mtype;
+
+    boolean	    is_tile;		/* true if currently using tiles */
+    struct text_map_info_t text_map;
+    struct tile_map_info_t tile_map;
 };
 
 
@@ -407,5 +412,7 @@ E void FDECL(X11_outrip, (winid,int));
 #else
 E void FDECL(genl_outrip, (winid,int));
 #endif
+
+E void FDECL(X11_preference_update, (const char *));
 
 #endif /* WINX_H */
