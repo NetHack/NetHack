@@ -1,0 +1,173 @@
+#
+#	MS/PC-DOS ANSI.SYS termcap
+#
+ansi|color|ansi-color|ibm|ibmpc|ANSI.SYS color:\
+	:co#80:li#24:bs:pt:bl=^G:le=^H:do=^J:\
+	:cl=\E[H\E[2J:ce=\E[K:\
+	:ho=\E[H:cm=\E[%i%d;%dH:\
+	:up=\E[A:do=\E[B:le=\E[C:ri=\E[D:nd=\E[C:\
+	:ti=\E[0;44m:te=\E[0m:\
+	:so=\E[1;35;44m:se=\E[0;44m:\
+	:us=\E[1;31;44m:ue=\E[0;44m:\
+	:mb=\E[5m:md=\E[1m:me=\E[0;44m:
+mono|ansi-mono|ANSI.SYS:\
+	:co#80:li#24:bs:pt:bl=^G:le=^H:do=^J:\
+	:cl=\E[H\E[2J:ce=\E[K:\
+	:ho=\E[H:cm=\E[%i%d;%dH:\
+	:up=\E[A:do=\E[B:le=\E[C:ri=\E[D:nd=\E[C:\
+	:so=\E[1m:se=\E[m:us=\E[4m:ue=\E[m:\
+	:mb=\E[5m:md=\E[1m:me=\E[m:
+#
+#	This is a termcap for NNANSI.SYS (New & Improved NANSI.SYS),
+#	a faster and more complete public domain replacement for
+#	ANSI.SYS, and two other ANSI.SYS replacements, NANSI.SYS and
+#	ZANSI.SYS.
+#
+#	NANSI and ZANSI support line insert (al) and delete (dl)
+#	and character insert (ic) and delete (dc) where ANSI.SYS
+#	does not.  NNANSI.SYS also supports clear to end of display
+#	(cd), does reverse video (mr) properly, and emulates SGR
+#	more fully, allowing correct end sequences for standout (se)
+#	and end of underline (ue).
+#
+nnansi-mono|NNANSI.SYS:\
+	:co#80:li#25:bs:pt:bl=^G:le=^H:do=^J:\
+	:cl=\E[2J:cd=\E[J:ce=\E[K:\
+	:ho=\E[H:cm=\E[%i%d;%dH:\
+	:up=\E[A:do=\E[B:le=\E[C:ri=\E[D:nd=\E[C:\
+	:so=\E[1m:se=\E[2m:\
+	:us=\E[4m:ue=\E[24m:\
+	:mb=\E[5m:md=\E[1m:mh=\E[2m:mr=\E[7m:me=\E[m:\
+	:al=\E[L:dl=\E[M:ic=\E[@:dc=\E[P:
+nnansi|NNANSI.SYS color:\
+	:co#80:li#25:bs:pt:bl=^G:le=^H:do=^J:\
+	:cl=\E[2J:cd=\E[J:ce=\E[K:\
+	:ho=\E[H:cm=\E[%i%d;%dH:\
+	:up=\E[A:do=\E[B:le=\E[C:ri=\E[D:nd=\E[C:\
+	:ti=\E[0;44m:te=\E[0m:\
+	:so=\E[1;35;44m:se=\E[2;37m:\
+	:us=\E[4m:ue=\E[24m:\
+	:mb=\E[5m:md=\E[1m:mh=\E[2m:mr=\E[7m:me=\E[0;44m:\
+	:al=\E[L:dl=\E[M:ic=\E[@:dc=\E[P:
+nansi-mono|zansi-mono|N/ZANSI.SYS:\
+	:co#80:li#25:bs:pt:bl=^G:le=^H:do=^J:\
+	:cl=\E[2J:ce=\E[K:\
+	:ho=\E[H:cm=\E[%i%d;%dH:\
+	:up=\E[A:do=\E[B:le=\E[C:ri=\E[D:nd=\E[C:\
+	:ti=\E[0m:te=\E[0m:\
+	:so=\E[1;35m:se=\E[0m:\
+	:us=\E[1;31m:ue=\E[0m:\
+	:mb=\E[5m:md=\E[1m:mr=\E[7m:me=\E[m:\
+	:al=\E[L:dl=\E[M:ic=\E[@:dc=\E[P:
+nansi|zansi|N/ZANSI.SYS color:\
+	:co#80:li#25:bs:pt:bl=^G:le=^H:do=^J:\
+	:cl=\E[2J:ce=\E[K:\
+	:ho=\E[H:cm=\E[%i%d;%dH:\
+	:up=\E[A:do=\E[B:le=\E[C:ri=\E[D:nd=\E[C:\
+	:ti=\E[0;44m:te=\E[0m:\
+	:so=\E[1;35;44m:se=\E[0;44m:\
+	:us=\E[1;31;44m:ue=\E[0;44m:\
+	:mb=\E[5m:md=\E[1m:mr=\E[7m:me=\E[0;44m:\
+	:al=\E[L:dl=\E[M:ic=\E[@:dc=\E[P:
+#
+# For ST NetHack:
+#       for VT100/200/&c in VT52 mode, add :ti=\E[?2l:
+vt52|atari|DEC VT52:\
+	:co#80:li#24:bs:pt:bl=^G:le=^H:do=^J:\
+	:cl=\EH\EJ:ce=\EK:cd=\EJ:\
+	:ho=\EH:cm=\EY%+ %+ :\
+	:up=\EA:do=\EB:le=\EC:ri=\ED:nd=\EC:\
+	:ku=\EA:kd=\EB:kl=\EC:kr=\ED:kb=^H:\
+	:sr=\EI:as=\EF:ae=\EG:
+#
+# For Amiga or VMS NetHack:
+#       VT100 or clone without the advanced video option installed
+vt100|amiga|vt100-80|vt100-noavo|DEC VT100:\
+	:co#80:li#24:bs:pt:am:mi:bl=^G:le=^H:do=^J:xo:vt#3:\
+	:cl=50\E[H\E[J:ce=3\E[K:cd=50\E[J:\
+	:ho=\E[H:cm=5\E[%i%d;%dH:cs=\E[%i%d;%dr:\
+	:up=\E[A:do=\E[B:le=\E[C:ri=\E[D:nd=\E[C:\
+	:UP=\E[%dA:DO=\E[%dB:LE=\E[%dC:RI=\E[%dD:\
+	:so=2\E[7m:se=2\E[m:us=2\E[4m:ue=2\E[m:\
+	:mb=2\E[5m:md=2\E[1m:mr=2\E[7m:me=2\E[m:\
+	:ti=4\E<\E(B\E)0:as=^N:ae=^O:\
+	:ks=\E[?1h\E=:ke=\E[?1l\E>:ku=\E[A:kd=\E[B:kl=\E[C:kr=\E[D:kb=^H:\
+	:kn#4:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:\
+	:sc=\E7:ec=\E8:sr=5\EM:
+#
+# VT102 and up:
+#       includes VT100 with advanced video option
+vt102|vt102-80|vt100-avo|DEC VT102:\
+	:im=\E[4h:ei=\E[4l:al=5\E[L:dl=5\E[M:dc=5\E[P:\
+	:AL=9\E[%dL:DL=9\E[%dM:tc=vt100:
+vt200|vt200-80|vt220|vt240|vt241|VT200_Series:\
+	:ic=5\E[@:tc=vt102:
+vt300|vt300-80|vt320|vt330|vt340|VT300_Series:\
+	:tc=vt200:
+vt400|vt400-80|vt420|VT400_Series:\
+	:tc=vt300:
+# VAXstations (should have full entries with no delays and 8-bit CSI's)
+VWS|UIS:tc=vt200:
+DECterm:tc=vt300:
+#
+# Wide screen (magnifying glass not included;-)
+#       note: vt100 w/o AVO only supports 14 lines when in 132-column mode
+vt132|vt100-132:vt102-132:\
+	:co#132:ti=9\E<\E(B\E)0\E[?3h:tc=vt102:
+vt200-132|vt300-132:\
+	:co#132:ti=9\E<\E(B\E)0\E[?3h:tc=vt200:
+#
+#
+# For really complete ANSI emulations (FANSI-CONSOLE?):
+#
+AX|ANSI X3.64|full ANSI X3.64 (1977) standard:\
+	:co#80:li#24:bs:pt:am:mi:bl=^G:le=^H:\
+	:cl=\E[2J:ce=\E[K:cd=\E[J:\
+	:ho=\E[H:cm=\E[%i%d;%dH:cs=\E[%i%d;%dr:\
+	:up=\E[A:do=\E[B:le=\E[C:ri=\E[D:nd=\E[C:\
+	:UP=\E[%dA:DO=\E[%dB:LE=\E[%dC:RI=\E[%dD:\
+	:so=\E[7m:se=\E[m:us=\E[4m:ue=\E[m:\
+	:mb=\E[5m:md=\E[1m:mr=\E[7m:me=\E[m:as=^N:ae=^O:\
+	:ku=\E[A:kd=\E[B:kl=\E[C:kr=\E[D:kb=^H:\
+	:kn#4:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:\
+	:im=\E[4h:ei=\E[4l:al=\E[L:dl=\E[M:ic=\E[@:dc=\E[P:sf=\ED:sr=\EM:
+#
+# For PC-9800 NetHack:
+#
+pc9800|pc9801|pc98|NEC PC-9800 Series:\
+	:co#80:li#25:\
+	:cm=\E[%i%d;%dH:ho=\E[H:ll=\E[25;1H:cr=^M:le=^H:nd=^L:\
+	:up=\EM:do=\ED:bw:nw=\EE:sc=\E[s:rc=\E[u:ta=^I:bc=^H:bs:nl=\ED:\
+	:am:xn:\
+	:sf=\ED:sr=\EM:\
+	:cl=\E*:cd=\E[J:ce=\E[K:\
+	:al=\E[L:dl=\E[M:AL=\E[%dL:DL=\E[%dM:\
+	:so=\E[36m:se=\E[m:\
+	:mb=\E[5m:md=\E[33m:mh=\E[32m:mk=\E[8m:me=\E[m:\
+	:as=\E)3:ae=\E)0:\
+	:us=\E[4m:ue=\E[m:\
+	:vi=\E[>5h:ve=\E[>5l:\
+	:bl=^G:\
+	:kl=\E[D:kr=\E[C:ku=\E[A:kd=\E[B:\
+	:k0=\EZ:k1=\ES:k2=\ET:k3=\EU:k4=\EV:\
+	:k5=\EW:k6=\EE:k7=\EJ:k8=\EP:k9=\EQ:\
+	:kb=^H:\
+	:ti=\E[0;37m\E[>1h\E[>5l:te=\E[0;37m\E[>1l:
+#
+# Display hacker's tool
+#
+debug|debugging entry:\
+	:ae=<ae>:AL=<AL%d>:al=<al>:am:as=<as>:bl=<bl>:bs:bt=<bt>:bw:CC=<CC>:\
+	:cd=<cd>:ce=<ce>:ch=<ch%d>:cl=<cl>:cm=<cm%d,%d>:co#80:cr=<cr>:\
+	:cs=<cs%d,%d>:ct=<ct>:cv=<cv%d>:da:db:DC=<DC%d>:dc=<dc>:DL=<DL%d>:\
+	:dl=<dl>:dm=<dm>:DO=<DO%d>:do=<do>:ds=<ds>:ec=<ec%d>:ed=<ed>:ei=<ei>:\
+	:es:fs=<fs>:ho=<ho>:hs:IC=<IC%d>:ic=<ic>:im=<im>:ip=<ip>:is=<is>:\
+	:it#8:ke=<ke>:LE=<LE%d>:le=<le>:li#24:ll=<ll>:mb=<mb>:md=<md>:me=<me>:\
+	:mh=<mh>:mi:mk=<mk>:mm=<mm>:mo=<mo>:mp=<mp>:mr=<mr>:ms=<ms>:nd=<nd>:\
+	:nw=<nw>:pc=<pc>:pf=<pf>:pO=<pO%d>:po=<po>:ps=<ps>:rc=<rc>:RI=<RI%d>:\
+	:rp=<rp%.%d>:rs=<rs>:sc=<sc>:se=<se>:SF=<SF%d>:sf=<sf>:so=<so>:\
+	:SR=<SR%d>:sr=<sr>:st=<st>:ta=<ta>:te=<te>:ti=<ti>:uc=<uc>:ue=<ue>:\
+	:UP=<UP%d>:up=<up>:us=<us>:vb=<vb>:ve=<ve>:vi=<vi>:vs=<vs>:
+#
+dumb:\
+	:am:bl=^G:co#80:do=^J:nl=^M^J:
