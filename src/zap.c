@@ -4073,7 +4073,10 @@ retry:
 		/* The(aobjnam()) is safe since otmp is unidentified -dlc */
 		(void) hold_another_object(otmp, u.uswallow ?
 				       "Oops!  %s out of your reach!" :
-				       Is_airlevel(&u.uz) || u.uinwater ?
+				       (Is_airlevel(&u.uz) ||
+					Is_waterlevel(&u.uz) ||
+					levl[u.ux][u.uy].typ < IRONBARS ||
+					levl[u.ux][u.uy].typ >= ICE) ?
 				       "Oops!  %s away from you!" :
 				       "Oops!  %s to the floor!",
 				       The(aobjnam(otmp,

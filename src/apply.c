@@ -2798,9 +2798,12 @@ doapply()
 		    otmp->blessed = obj->blessed;
 		    otmp->cursed = obj->cursed;
 		    otmp->owt = weight(otmp);
-		    otmp = hold_another_object(otmp,
-					(u.uswallow || Is_airlevel(&u.uz) ||
-					 u.uinwater || Is_waterlevel(&u.uz)) ?
+		    otmp = hold_another_object(otmp, u.uswallow ?
+				       "Oops!  %s out of your reach!" :
+					(Is_airlevel(&u.uz) ||
+					 Is_waterlevel(&u.uz) ||
+					 levl[u.ux][u.uy].typ < IRONBARS ||
+					 levl[u.ux][u.uy].typ >= ICE) ?
 					       "Oops!  %s away from you!" :
 					       "Oops!  %s to the floor!",
 					       The(aobjnam(otmp, "slip")),
