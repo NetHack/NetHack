@@ -2365,7 +2365,7 @@ use_grapple (obj)
 	    else {
 		You("are yanked toward the %s!", surface(cc.x, cc.y));
 		hurtle(sgn(cc.x-u.ux), sgn(cc.y-u.uy), 1, FALSE);
-		spoteffects();
+		spoteffects(TRUE);
 	    }
 	    return (1);
 	default:	/* Yourself (oops!) */
