@@ -120,6 +120,7 @@ X11_print_glyph(window, x, y, glyph)
 	{
 	    *ch_ptr = ch;
 #ifdef TEXTCOLOR
+	    if ((special & MG_PET) && iflags.hilite_pet) color += CLR_MAX;
 	    *co_ptr = color;
 #endif
 	    if (!map_info->is_tile) update_bbox = TRUE;
@@ -1188,10 +1189,9 @@ map_exposed(w, client_data, widget_data)
 /*
  * Do the actual work of the putting characters onto our X window.  This
  * is called from the expose event routine, the display window (flush)
- * routine, and the display cursor routine.  The later is a kludge that
- * involves the inverted parameter of this function.  A better solution
- * would be to double the color count, with any color above CLR_MAX
- * being inverted.
+ * routine, and the display cursor routine.  The later involves inverting
+ * the foreground and background colors, which are also inverted when the
+ * position's color is above CLR_MAX.
  *
  * This works for rectangular regions (this includes one line rectangles).
  * The start and stop columns are *inclusive*.
@@ -1292,6 +1292,7 @@ map_update(wp, start_row, stop_row, start_col, stop_col, inverted)
 	    register char *c_ptr;
 	    char *t_ptr;
 	    int cur_col, color, win_ystart;
+	    boolean cur_inv;
 
 	    for (row = start_row; row <= stop_row; row++) {
 		win_ystart = text_map->square_ascent +
@@ -1302,14 +1303,19 @@ map_update(wp, start_row, stop_row, start_col, stop_col, inverted)
 		cur_col = start_col;
 		while (cur_col <= stop_col) {
 		    color = *c_ptr++;
+		    cur_inv = inverted;
 		    count = 1;
 		    while ((cur_col + count) <= stop_col && *c_ptr == color) {
 			count++;
 			c_ptr++;
 		    }
+		    if (color >= CLR_MAX) {
+			color -= CLR_MAX;
+			cur_inv = !cur_inv;
+		    }
 
 		    XDrawImageString(XtDisplay(wp->w), XtWindow(wp->w),
-			inverted ? text_map->inv_color_gcs[color] :
+			cur_inv ? text_map->inv_color_gcs[color] :
 				   text_map->color_gcs[color],
 			text_map->square_lbearing +
 				   (text_map->square_width * cur_col),

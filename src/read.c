@@ -1889,6 +1889,7 @@ create_particular()
 		    if (mtmp) {
 			initedog(mtmp);
 			set_malign(mtmp);
+			newsym(mtmp->mx, mtmp->my);
 		    }
 		} else {
 		    mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);
