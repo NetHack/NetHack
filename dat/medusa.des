@@ -1,0 +1,215 @@
+#	SCCS Id: @(#)medusa.des	3.3	96/05/11
+#	Copyright (c) 1989 by Jean-Christophe Collet
+#	Copyright (c) 1990, 1991 by M. Stephenson
+# NetHack may be freely redistributed.  See license for details.
+#
+# These are the Medusa's levels :
+#
+
+MAZE:"medusa-1",' '
+FLAGS: noteleport
+GEOMETRY:center,center
+MAP
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+}}.}}}}}..}}}}}......}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}....}}}...}}}}}
+}...}}.....}}}}}....}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}...............}
+}....}}}}}}}}}}....}}}..}}}}}}}}}}}.......}}}}}}}}}}}}}}}}..}}.....}}}...}}
+}....}}}}}}}}.....}}}}..}}}}}}.................}}}}}}}}}}}.}}}}.....}}...}}
+}....}}}}}}}}}}}}.}}}}.}}}}}}.-----------------.}}}}}}}}}}}}}}}}}.........}
+}....}}}}}}}}}}}}}}}}}}.}}}...|...............S...}}}}}}}}}}}}}}}}}}}....}}
+}.....}.}}....}}}}}}}}}.}}....--------+--------....}}}}}}..}}}}}}}}}}}...}}
+}......}}}}..}}}}}}}}}}}}}........|.......|........}}}}}....}}}}}}}}}}}}}}}
+}.....}}}}}}}}}}}}}}}}}}}}........|.......|........}}}}}...}}}}}}}}}.}}}}}}
+}.....}}}}}}}}}}}}}}}}}}}}....--------+--------....}}}}}}.}.}}}}}}}}}}}}}}}
+}......}}}}}}}}}}}}}}}}}}}}...S...............|...}}}}}}}}}}}}}}}}}.}}}}}}}
+}.......}}}}}}}..}}}}}}}}}}}}.-----------------.}}}}}}}}}}}}}}}}}....}}}}}}
+}........}}.}}....}}}}}}}}}}}}.................}}}}}..}}}}}}}}}.......}}}}}
+}.......}}}}}}}......}}}}}}}}}}}}}}.......}}}}}}}}}.....}}}}}}...}}..}}}}}}
+}.....}}}}}}}}}}}.....}}}}}}}}}}}}}}}}}}}}}}.}}}}}}}..}}}}}}}}}}....}}}}}}}
+}}..}}}}}}}}}}}}}....}}}}}}}}}}}}}}}}}}}}}}...}}..}}}}}}}.}}.}}}}..}}}}}}}}
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+ENDMAP
+# Dungeon Description
+# (must maintain one room definition; `unfilled' forces its room to be kept)
+REGION:(00,00,74,19),lit,"ordinary"
+REGION:(31,07,45,07),unlit,"ordinary"
+REGION:(35,09,41,10),unlit,"ordinary",unfilled
+REGION:(31,12,45,12),unlit,"ordinary"
+# Teleport: down to up stairs island, up to Medusa's island
+TELEPORT_REGION:(01,01,05,17),(0,0,0,0),down
+TELEPORT_REGION:(26,04,50,15),(0,0,0,0),up
+# Stairs
+STAIR:(05,14),up
+STAIR:(36,10),down
+# Doors
+DOOR:closed,(46,07)
+DOOR:locked,(38,08)
+DOOR:locked,(38,11)
+DOOR:closed,(30,12)
+# Branch, not allowed inside Medusa's building.
+BRANCH:levregion(01,00,79,20),(30,06,46,13)
+# Non diggable walls
+NON_DIGGABLE:(30,06,46,13)
+# Objects
+CONTAINER:'`',"statue",(36,10),uncursed,"knight",1,"Perseus"
+OBJECT[75%]:'[',"shield of reflection",contained,cursed,+0
+OBJECT[25%]:'[',"levitation boots",contained,random,+0
+OBJECT[50%]:')',"scimitar",contained,blessed,+2
+OBJECT[50%]:'(',"sack",contained
+# These aren't really containers, but specifying CONTAINER forces them to be
+# empty, since CONTAINERs contain only what is explicitly specified.
+CONTAINER:'`',"statue",random
+CONTAINER:'`',"statue",random
+CONTAINER:'`',"statue",random
+CONTAINER:'`',"statue",random
+CONTAINER:'`',"statue",random
+CONTAINER:'`',"statue",random
+CONTAINER:'`',"statue",random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+# Random traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:"board",(38,07)
+TRAP:"board",(38,12)
+# Random monsters
+MONSTER:'@',"Medusa",(36,10),asleep
+MONSTER:';',"giant eel",(11,06)
+MONSTER:';',"giant eel",(23,13)
+MONSTER:';',"giant eel",(29,02)
+MONSTER:';',"jellyfish",(02,02)
+MONSTER:';',"jellyfish",(00,08)
+MONSTER:';',"jellyfish",(04,18)
+MONSTER:'T',"water troll",(51,03)
+MONSTER:'T',"water troll",(64,11)
+MONSTER:'S',random,(38,07)
+MONSTER:'S',random,(38,12)
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
+
+MAZE:"medusa-2",' '
+FLAGS: noteleport
+GEOMETRY:center,center
+MAP
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+}------}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}-------}}}}}}}}--------------}
+}|....|}}}}}}}}}..}.}}..}}}}}}}}}}}}}..}}}}}}-.....--}}}}}}}|............|}
+}|....|.}}}}}}}}}}}.}...}}..}}}}}}}}}}}}}}}}}---......}}}}}.|............|}
+}S....|.}}}}}}---}}}}}}}}}}}}}}}}}}}}}}}}}}---...|..-}}}}}}.S..----------|}
+}|....|.}}}}}}-...}}}}}}}}}.}}...}.}}}}.}}}......----}}}}}}.|............|}
+}|....|.}}}}}}-....--}}}}}}}}}}}}}}}}}}}}}}----...--}}}}}}}.|..--------+-|}
+}|....|.}}}}}}}......}}}}...}}}}}}.}}}}}}}}}}}---..---}}}}}.|..|..S...|..|}
+}|....|.}}}}}}-....-}}}}}}}------}}}}}}}}}}}}}}-...|.-}}}}}.|..|..|...|..|}
+}|....|.}}}}}}}}}---}}}}}}}........}}}}}}}}}}---.|....}}}}}.|..|..|...|..|}
+}|....|.}}}}}}}}}}}}}}}}}}-....|...-}}}}}}}}--...----.}}}}}.|..|..|...|..|}
+}|....|.}}}}}}..}}}}}}}}}}---..--------}}}}}-..---}}}}}}}}}.|..|..-------|}
+}|...}|...}}}.}}}}}}...}}}}}--..........}}}}..--}}}}}}}}}}}.|..|.........|}
+}|...}S...}}.}}}}}}}}}}}}}}}-..--------}}}}}}}}}}}}}}...}}}.|..--------..S}
+}|...}|...}}}}}}}..}}}}}}----..|....-}}}}}}}}}}}}}}}}}..}}}.|............|}
+}|....|}}}}}....}}}}..}}.-.......----}}......}}}}}}.......}}|............|}
+}------}}}}}}}}}}}}}}}}}}---------}}}}}}}}}}}}}}}}}}}}}}}}}}--------------}
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+ENDMAP
+# Dungeon Description
+REGION:(00,00,74,19),lit,"ordinary"
+REGION:(02,03,05,16),unlit,"ordinary"
+REGION:(61,03,72,16),unlit,"ordinary",unfilled,true
+REGION:(71,08,72,11),unlit,"ordinary"
+REGION:(67,08,69,11),lit,"ordinary"
+# Teleport: down to up stairs island, up to Medusa's island
+TELEPORT_REGION:(02,03,05,16),(0,0,0,0),down
+TELEPORT_REGION:(61,03,72,16),(0,0,0,0),up
+# Stairs
+STAIR:(04,09),up
+STAIR:(68,10),down
+# Doors
+DOOR:locked,(71,07)
+# Branch, not allowed on Medusa's island.
+BRANCH:levregion(01,00,79,20),(59,01,73,17)
+# Non diggable walls
+NON_DIGGABLE:(01,02,06,17)
+NON_DIGGABLE:(60,02,73,17)
+# Objects
+CONTAINER:'`',"statue",(68,10),uncursed,"knight",1,"Perseus"
+OBJECT[25%]:'[',"shield of reflection",contained,cursed,+0
+OBJECT[75%]:'[',"levitation boots",contained,random,+0
+OBJECT[50%]:')',"scimitar",contained,blessed,+2
+OBJECT[50%]:'(',"sack",contained
+CONTAINER:'`',"statue",(64,08)
+CONTAINER:'`',"statue",(65,08)
+CONTAINER:'`',"statue",(64,09)
+CONTAINER:'`',"statue",(65,09)
+CONTAINER:'`',"statue",(64,10)
+CONTAINER:'`',"statue",(65,10)
+CONTAINER:'`',"statue",(64,11)
+CONTAINER:'`',"statue",(65,11)
+OBJECT:'`',"boulder",(04,04)
+OBJECT:'/',random,(52,09)
+OBJECT:'`',"boulder",(52,09)
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+OBJECT:random,random,random
+# Traps
+TRAP:"magic",(03,12)
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+# Monsters.
+MONSTER:'@',"Medusa",(68,10),asleep
+MONSTER:'g',"gremlin",(02,14)
+MONSTER:'H',"titan",(02,05)
+MONSTER:';',"electric eel",(10,13)
+MONSTER:';',"electric eel",(11,13)
+MONSTER:';',"electric eel",(10,14)
+MONSTER:';',"electric eel",(11,14)
+MONSTER:';',"electric eel",(10,15)
+MONSTER:';',"electric eel",(11,15)
+MONSTER:';',"jellyfish",(01,01)
+MONSTER:';',"jellyfish",(00,08)
+MONSTER:';',"jellyfish",(04,19)
+MONSTER:''',"stone golem",(64,08),asleep
+MONSTER:''',"stone golem",(65,08),asleep
+MONSTER:''',"stone golem",(64,09),asleep
+MONSTER:''',"stone golem",(65,09),asleep
+MONSTER:'S',"cobra",(64,10),asleep
+MONSTER:'S',"cobra",(65,10),asleep
+MONSTER:'A',random,(72,08)
+MONSTER:'y',"yellow light",(72,11),asleep
+MONSTER:random,random,(17,07)
+MONSTER:random,random,(28,11)
+MONSTER:random,random,(32,13)
+MONSTER:random,random,(49,09)
+MONSTER:random,random,(48,07)
+MONSTER:random,random,(65,03)
+MONSTER:random,random,(70,04)
+MONSTER:random,random,(70,15)
+MONSTER:random,random,(65,16)
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
+MONSTER:random,random,random
