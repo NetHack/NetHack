@@ -382,7 +382,7 @@ dodiscovered()				/* free after Robert Viduya */
     for (i = dis = 0; i < SIZE(uniq_objs); i++)
 	if (objects[uniq_objs[i]].oc_name_known) {
 	    if (!dis++)
-		putstr(tmpwin, ATR_INVERSE, "Unique Items");
+		putstr(tmpwin, iflags.menu_headings, "Unique Items");
 		Sprintf(buf, "  %s", OBJ_NAME(objects[uniq_objs[i]]));
 	    putstr(tmpwin, 0, buf);
 	    ++ct;
@@ -406,7 +406,7 @@ dodiscovered()				/* free after Robert Viduya */
 	    if ((dis = disco[i]) && interesting_to_discover(dis)) {
 		ct++;
 		if (oclass != prev_class) {
-		    putstr(tmpwin, ATR_INVERSE, let_to_name(oclass, FALSE));
+		    putstr(tmpwin, iflags.menu_headings, let_to_name(oclass, FALSE));
 		    prev_class = oclass;
 		}
 		Sprintf(buf, "%s %s",(objects[dis].oc_pre_discovered ? "*" : " "),

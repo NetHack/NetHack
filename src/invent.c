@@ -1718,7 +1718,7 @@ nextclass:
 			if (!flags.sortpack || otmp->oclass == *invlet) {
 			    if (flags.sortpack && !classcount) {
 				any.a_void = 0;		/* zero */
-				add_menu(win, NO_GLYPH, &any, 0, 0, ATR_INVERSE,
+				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
 				classcount++;
 			    }
@@ -2678,7 +2678,7 @@ const char *hdr, *txt;
 	any.a_void = 0;
 	win = create_nhwindow(NHW_MENU);
 	start_menu(win);
-	add_menu(win, NO_GLYPH, &any, 0, 0, ATR_INVERSE, hdr, MENU_UNSELECTED);
+	add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, hdr, MENU_UNSELECTED);
 	add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
 	add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, txt, MENU_UNSELECTED);
 	end_menu(win, (char *)0);

@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "August 14, 2003
+.ds f2 "October 5, 2003
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1855,6 +1855,10 @@ Default '\e'.
 Menu character accelerator to jump to the first page in a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default '^'.
+.lp menu_headings
+Controls how the headings in a menu are highlighted.
+Values are 'bold', 'inverse', or 'underline'.
+Not all ports can actually display all three types.
 .lp menu_invert_all
 Menu character accelerator to invert all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.

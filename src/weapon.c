@@ -892,7 +892,7 @@ enhance_weapon_skill()
 		/* Print headings for skill types */
 		any.a_void = 0;
 		if (i == skill_ranges[pass].first)
-		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_BOLD,
+		    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 			     skill_ranges[pass].name, MENU_UNSELECTED);
 
 		if (P_RESTRICTED(i)) continue;

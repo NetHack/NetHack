@@ -254,6 +254,7 @@ static struct Comp_Opt
 						4, SET_IN_FILE },
 	{ "menu_first_page", "jump to the first page in a menu",
 						4, SET_IN_FILE },
+	{ "menu_headings", "bold, inverse, or underline headings", 9, SET_IN_GAME },
 	{ "menu_invert_all", "invert all items in a menu", 4, SET_IN_FILE },
 	{ "menu_invert_page", "invert all items on this page of a menu",
 						4, SET_IN_FILE },
@@ -507,6 +508,7 @@ initoptions()
 #ifdef TTY_GRAPHICS
 	iflags.prevmsg_window = 's';
 #endif
+	iflags.menu_headings = ATR_INVERSE;
 
 	/* Use negative indices to indicate not yet selected */
 	flags.initrole = -1;
@@ -2055,6 +2057,26 @@ goodfruit:
 		return;
 	}
 
+	fullname = "menu_headings";
+	if (match_optname(opts, fullname, 12, TRUE)) {
+		if (negated) {
+			bad_negation(fullname, FALSE);
+			return;
+		}
+		else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
+			return;
+		}
+		if (!strcmpi(opts,"bold"))
+			iflags.menu_headings = ATR_BOLD;
+		else if (!strcmpi(opts,"inverse"))
+			iflags.menu_headings = ATR_INVERSE;
+		else if (!strcmpi(opts,"underline"))
+			iflags.menu_headings = ATR_ULINE;
+		else
+			badoption(opts);
+		return;
+	}
+
 	/* check for menu command mapping */
 	for (i = 0; i < NUM_MENU_CMDS; i++) {
 	    fullname = default_menu_cmd_info[i].name;
@@ -2344,7 +2366,7 @@ doset()
 	start_menu(tmpwin);
 
 	any.a_void = 0;
- add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_BOLD,
+ add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 		 "Booleans (selecting will toggle value):", MENU_UNSELECTED);
 	any.a_int = 0;
 	/* first list any other non-modifiable booleans, then modifiable ones */
@@ -2378,7 +2400,7 @@ doset()
 	indexoffset = boolcount;
 	any.a_void = 0;
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
- add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_BOLD,
+ add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 		 "Compounds (selecting will prompt for new value):",
 		 MENU_UNSELECTED);
 
@@ -2422,7 +2444,7 @@ doset()
 		}
 #ifdef PREFIXES_IN_USE
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
- add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_BOLD,
+ add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 		 "Variable playground locations:", MENU_UNSELECTED);
 	for (i = 0; i < PREFIX_COUNT; i++)
 		doset_add_menu(tmpwin, fqn_prefix_names[i], 0);
@@ -2487,7 +2509,7 @@ boolean setinitial,setfromfile;
     boolean retval = FALSE;
     
     /* Special handling of menustyle, pickup_burden, pickup_types,
-       disclose, runmode, msg_window, and number_pad options. */
+       disclose, runmode, msg_window, menu_headings, and number_pad options. */
     if (!strcmp("menustyle", optname)) {
 	const char *style_name;
 	menu_item *style_pick = (menu_item *)0;
@@ -2705,6 +2727,36 @@ boolean setinitial,setfromfile;
 	destroy_nhwindow(tmpwin);
         retval = TRUE;
     }
+    else if (!strcmp("menu_headings", optname)) {
+	static const char *mhchoices[3] = {"bold", "inverse", "underline"};
+	char *npletters = "biu";
+	menu_item *mode_pick = (menu_item *)0;
+        tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	for (i = 0; i < SIZE(mhchoices); i++) {
+		any.a_int = i + 1;
+		add_menu(tmpwin, NO_GLYPH, &any, npletters[i], 0,
+			 ATR_NONE, mhchoices[i], MENU_UNSELECTED);
+        }
+	end_menu(tmpwin, "How to highlight menu headings:");
+	if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
+		int mode = mode_pick->item.a_int - 1;
+		switch(mode) {
+			case 2:
+				iflags.menu_headings = ATR_ULINE;
+				break;
+			case 0:
+				iflags.menu_headings = ATR_BOLD;
+				break;
+			case 1:
+			default:
+				iflags.menu_headings = ATR_INVERSE;
+		}
+		free((genericptr_t)mode_pick);
+        }
+	destroy_nhwindow(tmpwin);
+        retval = TRUE;
+    }
     return retval;
 }
 
@@ -2828,6 +2880,12 @@ char *buf;
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "menu_invert_all"))
 		Sprintf(buf, "%s", to_be_done);
+	else if (!strcmp(optname, "menu_headings")) {
+		Sprintf(buf, "%s", (iflags.menu_headings == ATR_BOLD) ?
+			"bold" :   (iflags.menu_headings == ATR_INVERSE) ?
+			"inverse" :   (iflags.menu_headings == ATR_ULINE) ?
+			"underline" : "unknown");
+	}
 	else if (!strcmp(optname, "menu_invert_page"))
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "menu_last_page"))

@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.70 $ $Date: 2003/09/27 15:55:35 $
+% $Revision: 1.71 $ $Date: 2003/09/28 03:42:24 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.4)}
-\date{August 14, 2003}
+\date{October 5, 2003}
 
 \maketitle
 
@@ -2294,6 +2294,10 @@ Default `\verb+\+'.
 Menu character accelerator to jump to the first page in a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+^+'.
+\item[\ib{menu\_headings}]
+Controls how the headings in a menu are highlighted.
+Values are ``{\tt bold}'', ``{\tt inverse}'', or ``{\tt underline}''.
+Not all ports can actually display all three types.
 \item[\ib{menu\_invert\_all}]
 Menu character accelerator to invert all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.

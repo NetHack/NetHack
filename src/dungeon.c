@@ -1584,7 +1584,7 @@ boolean bymenu;
 	}
 	if (bymenu) {
 	    any.a_void = 0;
-	    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_BOLD, buf, MENU_UNSELECTED);
+	    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf, MENU_UNSELECTED);
 	} else
 	    putstr(win, 0, buf);
 
@@ -1624,7 +1624,7 @@ boolean bymenu;
 	    if (first) {
 	    	if (bymenu) {
 		    any.a_void = 0;
-		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_BOLD,
+		    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 				"Floating branches", MENU_UNSELECTED);
 	    	} else {
 		    putstr(win, 0, "");
