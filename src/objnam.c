@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2002/02/22	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2002/03/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1659,7 +1659,8 @@ boolean from_user;
 	(void)mungspaces(bp);
 	/* allow wishing for "nothing" to preserve wishless conduct...
 	   [now requires "wand of nothing" if that's what was really wanted] */
-	if (!strcmpi(bp, "nothing") || !strcmpi(bp, "nil")) return no_wish;
+	if (!strcmpi(bp, "nothing") || !strcmpi(bp, "nil") ||
+	    !strcmpi(bp, "none")) return no_wish;
 	/* save the [nearly] unmodified choice string */
 	Strcpy(fruitbuf, bp);
 

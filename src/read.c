@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.4	2001/12/03	*/
+/*	SCCS Id: @(#)read.c	3.4	2002/03/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1424,7 +1424,8 @@ do_class_genocide()
 		    (void)mungspaces(buf);
 		} while (buf[0]=='\033' || !buf[0]);
 		/* choosing "none" preserves genocideless conduct */
-		if (!strcmpi(buf, "none")) return;
+		if (!strcmpi(buf, "none") ||
+		    !strcmpi(buf, "nothing")) return;
 
 		if (strlen(buf) == 1) {
 		    if (buf[0] == ILLOBJ_SYM)
@@ -1579,7 +1580,7 @@ int how;
 			buf);
 		(void)mungspaces(buf);
 		/* choosing "none" preserves genocideless conduct */
-		if (!strcmpi(buf, "none")) {
+		if (!strcmpi(buf, "none") || !strcmpi(buf, "nothing")) {
 		    /* ... but no free pass if cursed */
 		    if (!(how & REALLY)) {
 			ptr = rndmonst();

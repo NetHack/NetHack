@@ -1474,7 +1474,7 @@ found in the dungeon.  Swallowing and digesting a monster while polymorphed
 is treated as if you ate the creature's corpse.
 Eating leather, dragon hide, or bone items while
 polymorphed into a creature that can digest it, or eating monster brains
-while polymorphed into a (master) mind flayer, is considered eating
+while polymorphed into a mind flayer, is considered eating
 an animal, although wax is only an animal byproduct.
 .pg
 Regardless of conduct, there will be some items which are indigestible,
@@ -1520,15 +1520,21 @@ knowledge of spells) in your starting inventory is assumed to be
 learned from your teachers prior to the start of the game and isn't
 counted.
 .pg
-There are several other minor challenges.  It is possible to eliminate
-a species of monsters by genocide; playing without this feature is
-considered a challenge.  You can change the form of any object into
-another object of the same type (``polypiling'') or the form of your own
+There are several other challenges tracked by the game.  It is possible
+to eliminate one or more species of monsters by genocide; playing without
+this feature is considered a challenge.  When you game offers you an
+opportunity to genocide monsters, you may respond with the monster type
+``none'' if you want to decline.  You can change the form of an item into
+another item of the same type (``polypiling'') or the form of your own
 body into another creature (``polyself'') by wand, spell, or potion of
 polymorph; avoiding these effects are each considered challenges.
+Polymorphing monsters, including pets, does not break either of these
+challenges.
 Finally, you may sometimes receive wishes; a game without an attempt to
-wish for an object is a challenge, as is a game without wishing for
-an artifact (even if the artifact immediately disappears).
+wish for any items is a challenge, as is a game without wishing for
+an artifact (even if the artifact immediately disappears).  When the
+game offers you an opportunity to make a wish for an item, you may
+choose ``nothing'' if you want to decline.
 
 .hn 1
 Options
