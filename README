@@ -104,8 +104,8 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Atari ST/TT/Falcon running TOS (or MultiTOS) with GCC
         Commodore Amiga running AmigaDOS 3.0 or higher with SAS/C 6.x
                 (but see Makefile.ami about DICE and Manx)
-        DEC Alpha/VMS (aka OpenVMS AXP), running V1.x through V7.0
-        DEC VAX/VMS, running V4.6 through V7.0
+        DEC Alpha/VMS (aka OpenVMS AXP), running V1.x through V7.1
+        DEC VAX/VMS, running V4.6 through V7.1
         HP 9000s700 running HP-UX 10.x, 11.x
         IBM PS/2 and AT compatibles running OS/2 - 2.0 and up with GCC emx
         Intel 80386 or greater (or clone) boxes running MS-DOS with DPMI.
