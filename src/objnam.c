@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.4	2002/04/30	*/
+/*	SCCS Id: @(#)objnam.c	3.4	2002/05/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1452,27 +1452,32 @@ const char *oldstr;
 				Strcpy(p-3, "fe");
 				return bp;
 			}
-
 			if(!BSTRCMP(bp, p-6, "staves")) {
 				Strcpy(p-3, "ff");
 				return bp;
 			}
-
 			if (!BSTRCMPI(bp, p-6, "leaves")) {
 				Strcpy(p-3, "f");
 				return bp;
 			}
-
-			/* note: nurses, axes but boxes */
-			if(!BSTRCMP(bp, p-5, "boxes")) {
-				p[-2] = 0;
+			if (!BSTRCMP(bp, p-8, "vortices")) {
+				Strcpy(p-4, "ex");
 				return bp;
 			}
+
+			/* note: nurses, axes but boxes */
+			if (!BSTRCMP(bp, p-5, "boxes") ||
+			    !BSTRCMP(bp, p-4, "ches")) {
+				p[-2] = '\0';
+				return bp;
+			}
+
 			if (!BSTRCMP(bp, p-6, "gloves") ||
 			    !BSTRCMP(bp, p-6, "lenses") ||
 			    !BSTRCMP(bp, p-5, "shoes") ||
 			    !BSTRCMP(bp, p-6, "scales"))
 				return bp;
+
 		} else if (!BSTRCMP(bp, p-5, "boots") ||
 			   !BSTRCMP(bp, p-9, "gauntlets") ||
 			   !BSTRCMP(bp, p-6, "tricks") ||
@@ -1486,15 +1491,24 @@ const char *oldstr;
 #ifdef WIZARD
 			   !BSTRCMP(bp, p-9, "iron bars") ||
 #endif
-			   !BSTRCMP(bp, p-5, "aklys"))
+			   !BSTRCMP(bp, p-5, "aklys") ||
+			   !BSTRCMP(bp, p-6, "fungus"))
 				return bp;
 	mins:
-		p[-1] = 0;
+		p[-1] = '\0';
+
 	} else {
+
 		if(!BSTRCMP(bp, p-5, "teeth")) {
 			Strcpy(p-5, "tooth");
 			return bp;
 		}
+
+		if (!BSTRCMP(bp, p-5, "fungi")) {
+			Strcpy(p-5, "fungus");
+			return bp;
+		}
+
 		/* here we cannot find the plural suffix */
 	}
 	return bp;
