@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.3	2000/06/12	*/
+/*	SCCS Id: @(#)do_name.c	3.3	2002/01/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -268,10 +268,7 @@ do_mname()
 		return(0);
 	}
 	/* special case similar to the one in lookat() */
-	if (mtmp->data != &mons[PM_HIGH_PRIEST])
-	    Strcpy(buf, x_monnam(mtmp, ARTICLE_THE, (char *)0, 0, TRUE));
-	else
-	    Sprintf(buf, "the high priest%s", mtmp->female ? "ess" : "");
+	(void) distant_monnam(mtmp, ARTICLE_THE, buf);
 	Sprintf(qbuf, "What do you want to call %s?", buf);
 	getlin(qbuf,buf);
 	if(!*buf || *buf == '\033') return(0);
@@ -842,6 +839,27 @@ register struct monst *mtmp;
 
 	*bp = highc(*bp);
 	return(bp);
+}
+
+/* used for monster ID by the '/', ';', and 'C' commands to block remote
+   identification of the endgame altars via their attending priests */
+char *
+distant_monnam(mon, article, outbuf)
+struct monst *mon;
+int article;	/* only ARTICLE_NONE and ARTICLE_THE are handled here */
+char *outbuf;
+{
+    /* high priest(ess)'s identity is concealed on the Astral Plane,
+       unless you're adjacent (overridden for hallucination which does
+       its own obfuscation) */
+    if (mon->data == &mons[PM_HIGH_PRIEST] && !Hallucination &&
+	    Is_astralevel(&u.uz) && distu(mon->mx, mon->my) > 2) {
+	Strcpy(outbuf, article == ARTICLE_THE ? "the " : "");
+	Strcat(outbuf, mon->female ? "high priestess" : "high priest");
+    } else {
+	Strcpy(outbuf, x_monnam(mon, article, (char *)0, 0, TRUE));
+    }
+    return outbuf;
 }
 
 static const char *bogusmons[] = {

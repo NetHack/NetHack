@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.3	2001/06/10	*/
+/*	SCCS Id: @(#)pager.c	3.3	2002/01/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -98,26 +98,22 @@ lookat(x, y, buf, monbuf)
 	bhitpos.x = x;
 	bhitpos.y = y;
 	mtmp = m_at(x,y);
-	if(mtmp != (struct monst *) 0) {
-	    register boolean hp = (mtmp->data == &mons[PM_HIGH_PRIEST]);
-	    char coybuf[QBUFSZ];
-	    char *name;
+	if (mtmp != (struct monst *) 0) {
+	    char *name, monnambuf[BUFSZ];
+	    boolean accurate = !Hallucination;
 
-	    if (hp && !Hallucination)
-		name = (mtmp->female ? "high priestess" : "high priest");
-	    else if (mtmp->data == &mons[PM_COYOTE] && !Hallucination)
-		name = coyotename(mtmp, coybuf);
+	    if (mtmp->data == &mons[PM_COYOTE] && accurate)
+		name = coyotename(mtmp, monnambuf);
 	    else
-		name = x_monnam(mtmp, ARTICLE_NONE, (char *)0, 0, TRUE);
+		name = distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
 
 	    pm = mtmp->data;
 	    Sprintf(buf, "%s%s%s",
 		    (mtmp->mx != x || mtmp->my != y) ?
-			((mtmp->isshk && !Hallucination)
+			((mtmp->isshk && accurate)
 				? "tail of " : "tail of a ") : "",
-		    (!hp && mtmp->mtame && !Hallucination) ? "tame " :
-		    (!hp && mtmp->mpeaceful && !Hallucination) ?
-		                                          "peaceful " : "",
+		    (mtmp->mtame && accurate) ? "tame " :
+		    (mtmp->mpeaceful && accurate) ? "peaceful " : "",
 		    name);
 	    if (u.ustuck == mtmp)
 		Strcat(buf, (Upolyd && sticks(youmonst.data)) ?
