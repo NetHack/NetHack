@@ -1130,7 +1130,7 @@ create_altar(a, croom)
 	levl[x][y].typ = ALTAR;
 	levl[x][y].altarmask = amask;
 
-	if (a->shrine == -11) a->shrine = rn2(1);  /* handle random case */
+	if (a->shrine < 0) a->shrine = rn2(2);	/* handle random case */
 
 	if (oldtyp == FOUNTAIN)
 	    level.flags.nfountains--;
