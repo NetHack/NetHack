@@ -738,7 +738,8 @@ die:
 	    if(!done_stopprint || flags.tombstone)
 		endwin = create_nhwindow(NHW_TEXT);
 
-	    if(how < GENOCIDED && flags.tombstone) outrip(endwin, how);
+	    if (how < GENOCIDED && flags.tombstone && endwin != WIN_ERR)
+		outrip(endwin, how);
 	} else
 	    done_stopprint = 1; /* just avoid any more output */
 
