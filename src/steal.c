@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.5	2004/11/11	*/
+/*	SCCS Id: @(#)steal.c	3.5	2005/02/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -315,7 +315,11 @@ gotobj:
 	    else if (otmp == uquiver || (otmp == uswapwep && !u.twoweap))
 		ostuck = FALSE;	/* not really worn; curse doesn't matter */
 	    else
-		ostuck = (otmp->cursed && otmp->owornmask);
+		ostuck = ((otmp->cursed && otmp->owornmask) ||
+			  /* nymphs can steal rings from under
+			     cursed weapon but animals can't */
+			  (otmp == uright && welded(uwep)) ||
+			  (otmp == uleft && welded(uwep) && bimanual(uwep)));
 
 	    if (ostuck || !can_carry(mtmp, otmp)) {
 		static const char * const how[] = { "steal","snatch","grab","take" };
