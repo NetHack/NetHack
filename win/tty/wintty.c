@@ -147,8 +147,8 @@ boolean GFlag = FALSE;
 boolean HE_resets_AS;	/* see termcap.c */
 #endif
 
-#ifdef MICRO
-static char to_continue[] = "to continue";
+#if defined(MICRO) || defined(WIN32CON)
+static const char to_continue[] = "to continue";
 #define getret() getreturn(to_continue)
 #else
 STATIC_DCL void NDECL(getret);
@@ -741,7 +741,7 @@ tty_get_nh_event()
     return;
 }
 
-#ifndef MICRO
+#if !defined(MICRO) && !defined(WIN32CON)
 STATIC_OVL void
 getret()
 {

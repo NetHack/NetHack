@@ -490,10 +490,6 @@ void nethack_exit(code)
 int code;
 {
 	msexit();
-#ifdef MTHREAD_VIEW
-	if (iflags.mthreaded) nh_thread_exit(code);  /* no return from this */
-	else
-#endif
 	exit(code);
 }
 
@@ -536,8 +532,9 @@ static void msexit()
 	 * not vanish instantly after being created.
 	 * GUILaunched is defined and set in nttty.c.
 	 */
-
+	synch_cursor();
 	if (GUILaunched) getreturn("to end");
+	synch_cursor();
 #endif
 	return;
 }

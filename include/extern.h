@@ -1338,6 +1338,7 @@ E void NDECL(nttty_rubout);
 E int NDECL(tgetch);
 E int FDECL(ntposkey,(int *, int *, int *));
 E void FDECL(set_output_mode, (int));
+E void NDECL(synch_cursor);
 #endif
 
 /* ### o_init.c ### */

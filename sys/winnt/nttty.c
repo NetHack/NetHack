@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)nttty.c	3.4	$Date$   */
+ /*	SCCS Id: @(#)nttty.c	3.4	$Date$   */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -57,6 +57,10 @@ INPUT_RECORD ir;
  */
 int GUILaunched;
 static BOOL FDECL(CtrlHandler, (DWORD));
+
+#ifdef PORT_DEBUG
+static boolean display_cursor_info = TRUE;
+#endif
 
 extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
 
@@ -192,6 +196,7 @@ void
 tty_end_screen()
 {
 	clear_screen();
+	really_move_cursor();
 	if (GetConsoleScreenBufferInfo(hConOut,&csbi))
 	{
 	    DWORD ccnt;
@@ -371,6 +376,23 @@ int *x, *y, *mod;
 static void
 really_move_cursor()
 {
+#if defined(PORT_DEBUG) && defined(WIZARD)
+	char oldtitle[BUFSZ], newtitle[BUFSZ];
+	if (display_cursor_info && wizard) {
+		oldtitle[0] = '\0';
+		if (GetConsoleTitle(oldtitle, BUFSZ)) {
+			oldtitle[39] = '\0';
+		}
+		Sprintf(newtitle, "%-55s tty=(%02d,%02d) nttty=(%02d,%02d)",
+			oldtitle, ttyDisplay->curx, ttyDisplay->cury,
+			cursor.X, cursor.Y);
+		(void)SetConsoleTitle(newtitle);
+	}
+#endif
+	if (ttyDisplay) {
+		cursor.X = ttyDisplay->curx;
+		cursor.Y = ttyDisplay->cury;
+	}
 	SetConsoleCursorPosition(hConOut, cursor);
 }
 
@@ -378,24 +400,24 @@ void
 cmov(x, y)
 register int x, y;
 {
+	ttyDisplay->cury = y;
+	ttyDisplay->curx = x;
 	cursor.X = x;
 	cursor.Y = y;
-	ttyDisplay->curx = x;
-	ttyDisplay->cury = y;
 }
 
 void
 nocmov(x, y)
 int x,y;
 {
-	cursor.Y = y;
 	cursor.X = x;
+	cursor.Y = y;
 	ttyDisplay->curx = x;
 	ttyDisplay->cury = y;
 }
 
 void
-xputc(ch)
+xputc_core(ch)
 char ch;
 {
 	switch(ch) {
@@ -403,29 +425,55 @@ char ch;
 	    		cursor.Y++;
 	    		/* fall through */
 	    case '\r':
-	    		cursor.X = 0;
-			cmov(cursor.X, cursor.Y);
-			return;		
+	    		cursor.X = 1;
+			break;
+	    case '\b':
+	    		cursor.X--;
+	    		ch = ' ';
+			WriteConsoleOutputAttribute(hConOut,&attr,1,
+							cursor,&acount);
+			WriteConsoleOutputCharacter(hConOut,&ch,1,
+							cursor,&ccount);
+			break;
+	    default:
+			WriteConsoleOutputAttribute(hConOut,&attr,1,
+							cursor,&acount);
+			WriteConsoleOutputCharacter(hConOut,&ch,1,
+							cursor,&ccount);
+			cursor.X++;
 	}
-	WriteConsoleOutputAttribute(hConOut,&attr,1,cursor,&acount);
-	WriteConsoleOutputCharacter(hConOut,&ch,1,cursor,&ccount);
-	cursor.X++;
-	cmov(cursor.X, cursor.Y);
+}
+
+void
+xputc(ch)
+char ch;
+{
+	cursor.X = ttyDisplay->curx;
+	cursor.Y = ttyDisplay->cury;
+	xputc_core(ch);
 }
 
 void
 xputs(s)
 const char *s;
 {
-	int k, slen = strlen(s);
-	if (s)
+	int k;
+	int slen = strlen(s);
+
+	if (ttyDisplay) {
+		cursor.X = ttyDisplay->curx;
+		cursor.Y = ttyDisplay->cury;
+	}
+
+	if (s) {
 	    for (k=0; k < slen && s[k]; ++k)
-		xputc(s[k]);
+		xputc_core(s[k]);
+	}
 }
 
 
 /*
- * Overrides winntty.c function of the same name
+ * Overrides wintty.c function of the same name
  * for win32. It is used for glyphs only, not text.
  */
 void
@@ -444,6 +492,8 @@ void
 cl_end()
 {
 	int cx;
+	cursor.X = ttyDisplay->curx;
+	cursor.Y = ttyDisplay->cury;
 	cx = CO - cursor.X;
 	FillConsoleOutputAttribute(hConOut, DEFTEXTCOLOR, cx, cursor, &acount);
 	FillConsoleOutputCharacter(hConOut,' ', cx, cursor,&ccount);
@@ -484,27 +534,25 @@ home()
 void
 backsp()
 {
-	cursor.X--;
-	xputc(' ');
-	cursor.X--;
+	cursor.X = ttyDisplay->curx;
+	cursor.Y = ttyDisplay->cury;
+	xputc_core('\b');
 }
 
 void
 cl_eos()
 {
-	register int cy = ttyDisplay->cury+1;		
+	int cy = ttyDisplay->cury+1;
 	if (GetConsoleScreenBufferInfo(hConOut,&csbi)) {
 	    DWORD ccnt;
 	    COORD newcoord;
 	    
-	    newcoord.X = 0;
+	    newcoord.X = ttyDisplay->curx;
 	    newcoord.Y = ttyDisplay->cury;
 	    FillConsoleOutputAttribute(hConOut,
 	    		FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
 	    		csbi.dwSize.X * csbi.dwSize.Y - cy,
 	    		newcoord, &ccnt);
-	    newcoord.X = 0;
-	    newcoord.Y = ttyDisplay->cury;
 	    FillConsoleOutputCharacter(hConOut,' ',
 			csbi.dwSize.X * csbi.dwSize.Y - cy,
 			newcoord, &ccnt);
@@ -762,6 +810,11 @@ win32con_handler_info()
 		(void)doredraw();
 	}
 }
+
+void win32con_toggle_cursor_info()
+{
+	display_cursor_info = !display_cursor_info;
+}
 #endif
 
 void
@@ -877,19 +930,41 @@ load_keyboard_handler()
 	}
 }
 
-/* this is used when window system isn't initialized yet */
+/* this is used as a printf() replacement when the window
+ * system isn't initialized yet
+ */
 void
 msmsg VA_DECL(const char *, fmt)
 	char buf[ROWNO * COLNO];	/* worst case scenario */
-
 	VA_START(fmt);
 	VA_INIT(fmt, const char *);
 	Vsprintf(buf, fmt, VA_ARGS);
 	VA_END();
-
 	xputs(buf);
-	really_move_cursor();
+	curs(BASE_WINDOW, cursor.X+1, cursor.Y);
 	return;
 }
 
+/* fatal error */
+/*VARARGS1*/
+void
+error VA_DECL(const char *,s)
+	char buf[BUFSZ];
+	VA_START(s);
+	VA_INIT(s, const char *);
+	/* error() may get called before tty is initialized */
+	if (iflags.window_inited) end_screen();
+	buf[0] = '\n';
+	(void) vsprintf(&buf[1], s, VA_ARGS);
+	VA_END();
+	msmsg(buf);
+	really_move_cursor();
+	exit(EXIT_FAILURE);
+}
+
+void
+synch_cursor()
+{
+	really_move_cursor();
+}
 #endif /* WIN32CON */

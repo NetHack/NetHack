@@ -5,6 +5,7 @@
 /* This file collects some Unix dependencies; pager.c contains some more */
 
 #include "hack.h"
+#include "wintty.h"
 
 #include	<sys/stat.h>
 #if defined(WIN32) || defined(MSDOS)
@@ -174,13 +175,7 @@ getlock()
 # endif
 		while ((ci=nhgetch()) != '\n') {
 		    if (ct > 0) {
-# if defined(WIN32CON)
-			backsp();       /* \b is visible on NT */
-			(void) putchar(' ');
-			backsp();
-# else
 			msmsg("\b \b");
-# endif
 			ct = 0;
 			c = 'n';
 		    }

@@ -17,7 +17,9 @@
 #endif
 #include <ctype.h>
 #include "win32api.h"
-
+#ifdef WIN32CON
+#include "wintty.h"
+#endif
 #ifdef WIN32
 
 
@@ -195,21 +197,22 @@ return &szFullPath[0];
 }
 # endif
 
-
+#ifndef WIN32CON
 /* fatal error */
 /*VARARGS1*/
 void
 error VA_DECL(const char *,s)
+	char buf[BUFSZ];
 	VA_START(s);
 	VA_INIT(s, const char *);
 	/* error() may get called before tty is initialized */
 	if (iflags.window_inited) end_screen();
 	if (!strncmpi(windowprocs.name, "tty", 3)) {
-		putchar('\n');
-		Vprintf(s,VA_ARGS);
-		putchar('\n');
+		buf[0] = '\n';
+		(void) vsprintf(&buf[1], s, VA_ARGS);
+		Strcat(buf, "\n");
+		msmsg(buf);
 	} else {
-		char buf[BUFSZ];
 		(void) vsprintf(buf, s, VA_ARGS);
 		Strcat(buf, "\n");
 		raw_printf(buf);
@@ -217,6 +220,8 @@ error VA_DECL(const char *,s)
 	VA_END();
 	exit(EXIT_FAILURE);
 }
+#endif
+
 void Delay(int ms)
 {
 	(void)Sleep(ms);
@@ -292,9 +297,9 @@ genericptr_t ptr2;
 			    strstri(datadir, "TEMP")   ||
 			    (tempdir && strstri(datadir, tempdir))) {
 			(void)strncpy(interjection_buf[INTERJECT_PANIC],
-			"\nThe nature of the error seems to indicate that you may\n"
-			"be attempting to execute the game by double-clicking on \n"
-			"it from within the download distribution zip file.\n\n"
+			"\nOne common cause of this error is attempting to execute\n"
+			"the game by double-clicking on it while it is displayed\n"
+			"inside an unzip utility.\n\n"
 			"You have to unzip the contents of the zip file into a\n"
 			"folder on your system, and then run \"NetHack.exe\" or \n"
 			"\"NetHackW.exe\" from there.\n\n"
