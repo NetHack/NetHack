@@ -451,6 +451,7 @@ half physical damage should apply to gas spores
 iron bars should affect wall corner wallification
 potion of polymorph shouldn't be identified if object being dipped into
 	it ends up as the same type of object after polymorphing
+don't slap against the floor while riding and eating bad food
 
 
 Platform- and/or Interface-Specific Fixes

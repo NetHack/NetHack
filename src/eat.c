@@ -1159,7 +1159,11 @@ struct obj *obj;
 			 Is_waterlevel(&u.uz))
 		    what = "you lose control of",  where = "yourself";
 		else
-		    what = "you slap against the",  where = surface(u.ux,u.uy);
+		    what = "you slap against the", where =
+#ifdef STEED
+			   (u.usteed) ? "saddle" :
+#endif
+			   surface(u.ux,u.uy);
 		pline_The("world spins and %s %s.", what, where);
 		flags.soundok = 0;
 		nomul(-rnd(10));
