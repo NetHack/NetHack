@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.4	2002/04/06	*/
+/*	SCCS Id: @(#)mthrowu.c	3.4	2002/07/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -451,7 +451,7 @@ m_throw(mon, x, y, dx, dy, range, obj)
 			|| closed_door(bhitpos.x+dx, bhitpos.y+dy)
 			/* missile might hit iron bars */
 			|| (levl[bhitpos.x+dx][bhitpos.y+dy].typ == IRONBARS &&
-			hits_bars(&singleobj, bhitpos.x, bhitpos.y, !rn2(2), 0))
+			hits_bars(&singleobj, bhitpos.x, bhitpos.y, !rn2(5), 0))
 #ifdef SINKS
 			/* Thrown objects "sink" */
 			|| IS_SINK(levl[bhitpos.x][bhitpos.y].typ)
@@ -809,6 +809,9 @@ int whodidit;	/* 1==hero, 0=other, -1==just check whether it'll pass thru */
 	case FOOD_CLASS:
 		if (obj_type == CORPSE &&
 			mons[otmp->corpsenm].msize > MZ_TINY) hits = TRUE;
+		else
+		    hits = (obj_type == MEAT_STICK ||
+			    obj_type == HUGE_CHUNK_OF_MEAT);
 		break;
 	case SPBOOK_CLASS:
 	case WAND_CLASS:

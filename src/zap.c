@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.4	2002/04/06	*/
+/*	SCCS Id: @(#)zap.c	3.4	2002/07/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2587,7 +2587,7 @@ struct obj *obj;			/* object tossed/used */
 {
 	struct monst *mtmp;
 	uchar typ;
-	boolean shopdoor = FALSE;
+	boolean shopdoor = FALSE, point_blank = TRUE;
 
 	if (weapon == KICKED_WEAPON) {
 	    /* object starts one square in front of player */
@@ -2628,7 +2628,8 @@ struct obj *obj;			/* object tossed/used */
 	    /* iron bars will block anything big enough */
 	    if ((weapon == THROWN_WEAPON || weapon == KICKED_WEAPON) &&
 		    typ == IRONBARS &&
-		    hits_bars(&obj, x - ddx, y - ddy, !rn2(20), 1)) {
+		    hits_bars(&obj, x - ddx, y - ddy,
+			      point_blank ? 0 : !rn2(5), 1)) {
 		/* caveat: obj might now be null... */
 		bhitpos.x -= ddx;
 		bhitpos.y -= ddy;
@@ -2761,6 +2762,8 @@ struct obj *obj;			/* object tossed/used */
 		    break;	/* physical objects fall onto sink */
 #endif
 	    }
+	    /* thrown/kicked missile has moved away from its starting spot */
+	    point_blank = FALSE;	/* affects passing through iron bars */
 	}
 
 	if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM) tmp_at(DISP_END, 0);
