@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.4	2003/01/24	*/
+/*	SCCS Id: @(#)uhitm.c	3.4	2003/02/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1025,7 +1025,7 @@ int thrown;
 		    killed(mon);	/* takes care of most messages */
 	} else if(u.umconf && !thrown) {
 		nohandglow(mon);
-		if(!mon->mconf && !resist(mon, '+', 0, NOTELL)) {
+		if (!mon->mconf && !resist(mon, SPBOOK_CLASS, 0, NOTELL)) {
 			mon->mconf = 1;
 			if (!mon->mstun && mon->mcanmove && !mon->msleeping &&
 				canseemon(mon))
