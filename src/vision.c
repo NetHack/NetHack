@@ -242,6 +242,7 @@ vision_reset()
 	}
     }
 
+    iflags.vision_inited = 1;	/* vision is ready */
     vision_full_recalc = 1;	/* we want to run vision_recalc() */
 }
 
@@ -510,7 +511,7 @@ vision_recalc(control)
     int oldseenv;				/* previous seenv value */
 
     vision_full_recalc = 0;			/* reset flag */
-    if (in_mklev) return;
+    if (in_mklev || !iflags.vision_inited) return;
 
 #ifdef GCC_WARN
     row = 0;
@@ -794,12 +795,13 @@ not_in_sight:
     colbump[u.ux] = colbump[u.ux+1] = 0;
 
 skip:
-    /* This newsym() caused a crash delivering msg about failure to open dungeon file
-     * init_dungeons() -> panic() -> done(11) -> vision_recalc(2) -> newsym() -> crash!
-     * u.ux and u.uy are 0 and program_state.panicking == 1 under those circumstances
+    /* This newsym() caused a crash delivering msg about failure to open
+     * dungeon file init_dungeons() -> panic() -> done(11) ->
+     * vision_recalc(2) -> newsym() -> crash!  u.ux and u.uy are 0 and
+     * program_state.panicking == 1 under those circumstances
      */
     if (!program_state.panicking)
-		newsym(u.ux,u.uy);		/* Make sure the hero shows up! */
+	newsym(u.ux,u.uy);		/* Make sure the hero shows up! */
 
     /* Set the new min and max pointers. */
     viz_rmin  = next_rmin;
