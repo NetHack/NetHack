@@ -543,6 +543,8 @@ boolean is_pet;		/* If true, pet should keep wielded/worn items */
 			    costly_spot(mtmp->mx, mtmp->my))
 				otmp->no_charge = 1;
 #endif
+			if (otmp->owornmask & W_WEP)
+			    setmnotwielded(mtmp, otmp);
 			otmp->owornmask = 0L;
 		}
 		if (is_pet && cansee(omx, omy) && flags.verbose)
