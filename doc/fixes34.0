@@ -449,6 +449,8 @@ cloned monsters should have the same name and tameness as the original
 you should stop eating (etc.) if a monster attacks you and misses
 half physical damage should apply to gas spores
 iron bars should affect wall corner wallification
+potion of polymorph shouldn't be identified if object being dipped into
+	it ends up as the same type of object after polymorphing
 
 
 Platform- and/or Interface-Specific Fixes
