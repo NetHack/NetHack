@@ -20,6 +20,10 @@
 # if (_MSC_VER >= 600)
 #  define SKIP_ERRNO
 # endif
+#else
+# ifdef NHSTDC
+#  define SKIP_ERRNO
+# endif
 #endif
 #ifndef SKIP_ERRNO
 # ifdef _DCC

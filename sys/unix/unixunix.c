@@ -22,6 +22,10 @@ extern void NDECL(linux_mapon);
 extern void NDECL(linux_mapoff);
 #endif
 
+#ifndef NHSTDC
+extern int errno;
+#endif
+
 static struct stat buf;
 
 /* see whether we should throw away this xlock file */
@@ -41,9 +45,6 @@ int fd;
 	(void) time(&date);
 #endif
 	if(date - buf.st_mtime < 3L*24L*60L*60L) {	/* recent */
-#ifndef NETWORK
-		extern int errno;
-#endif
 		int lockedpid;	/* should be the same size as hackpid */
 
 		if(read(fd, (genericptr_t)&lockedpid, sizeof(lockedpid)) !=
@@ -88,7 +89,6 @@ eraseoldlocks()
 void
 getlock()
 {
-	extern int errno;
 	register int i = 0, fd, c;
 	const char *fq_lock;
 
