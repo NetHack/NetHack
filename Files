@@ -201,8 +201,9 @@ wintext.c       winval.c
 
 win/gem:
 (files for GEM versions)
-Install.gem     bitmfile.c      gem_rsc.uu      gem_rso.uu      load_img.c
-tile2img.c      title.uu        wingem.c        wingem1.c
+Install.gem     bitmfile.c      gem_rsc.uu      gem_rso.uu      gr_rect.c
+gr_rect.h       load_img.c      tile2img.c      title.uu        wingem.c
+wingem1.c       xpm2img.c
 
 win/gnome:
 (files for GNOME versions)
