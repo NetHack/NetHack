@@ -1138,7 +1138,7 @@ arti_invoke(obj)
 	    long creamed = (long)u.ucreamed;
 
 	    if (Upolyd) healamt = (u.mhmax + 1 - u.mh) / 2;
-	    if (healamt || Sick || Blinded > creamed)
+	    if (healamt || Sick || Slimed || Blinded > creamed)
 		You_feel("better.");
 	    else
 		goto nothing_special;
