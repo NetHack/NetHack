@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkroom.c	3.5	2004/06/10	*/
+/*	SCCS Id: @(#)mkroom.c	3.5	2005/03/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -119,6 +119,8 @@ mkshop()
 				    goto gottype;
 			if(*ep == 'g' || *ep == 'G')
 				i = 0;
+			else if (*ep == 'v' || *ep == 'V')
+				i = FODDERSHOP - SHOPBASE;  /* veggy food */
 			else
 				i = -1;
 		}

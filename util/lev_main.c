@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lev_main.c	3.5	2002/03/27	*/
+/*	SCCS Id: @(#)lev_main.c	3.5	2005/03/12	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -162,6 +162,7 @@ static struct {
 	{ "wand shop",	 WANDSHOP },
 	{ "tool shop",	 TOOLSHOP },
 	{ "book shop",	 BOOKSHOP },
+	{ "health food shop", FODDERSHOP },
 	{ "candle shop", CANDLESHOP },
 	{ 0, 0 }
 };

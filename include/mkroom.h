@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkroom.h	3.5	1992/11/14	*/
+/*	SCCS Id: @(#)mkroom.h	3.5	2005/03/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -71,9 +71,10 @@ extern NEARDATA coord doors[DOORMAX];
 #define WANDSHOP	21
 #define TOOLSHOP	22
 #define BOOKSHOP	23
-#define UNIQUESHOP	24	/* shops here & above not randomly gen'd. */
-#define CANDLESHOP	24
-#define MAXRTYPE	24	/* maximum valid room type */
+#define FODDERSHOP	24	/* health food store */
+#define UNIQUESHOP	25	/* shops here & below not randomly gen'd. */
+#define CANDLESHOP	25
+#define MAXRTYPE	25	/* maximum valid room type */
 
 /* Special type for search_special() */
 #define ANY_TYPE	(-1)

@@ -7,6 +7,9 @@
 #include "hack.h"
 #include "eshk.h"
 
+STATIC_DCL boolean FDECL(veggy_item, (struct obj *obj,int));
+STATIC_DCL int NDECL(shkveg);
+STATIC_DCL void FDECL(mkveggy_at, (int,int));
 STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *,int,int));
 STATIC_DCL void FDECL(nameshk, (struct monst *,const char * const *));
 STATIC_DCL int  FDECL(shkinit, (const struct shclass *,struct mkroom *));
@@ -267,6 +270,38 @@ init_shop_selection()
 }
 #endif /*0*/
 
+/* decide whether an object or object type is considered vegetarian;
+   for types, items which might go either way are assumed to be veggy */
+STATIC_OVL boolean
+veggy_item(obj, otyp)
+struct obj *obj;
+int otyp;		/* used iff obj is null */
+{
+    int corpsenm;
+    char oclass;
+
+    if (obj) {
+	/* actual object; will check tin content and corpse species */
+	otyp = (int) obj->otyp;
+	oclass = obj->oclass;
+	corpsenm = obj->corpsenm;
+    } else {
+	/* just a type; caller will have to handle tins and corpses */
+	oclass = objects[otyp].oc_class;
+	corpsenm = PM_LICHEN;		/* veggy standin */
+    }
+
+    if (oclass == FOOD_CLASS) {
+	if (objects[otyp].oc_material == VEGGY || otyp == EGG)
+	    return TRUE;
+	if (otyp == TIN && corpsenm == NON_PM)	/* implies obj is non-null */
+	    return (obj->spe == 1);		/* 0 = empty, 1 = spinach */
+	if (otyp == TIN || otyp == CORPSE)
+	    return (corpsenm >= LOW_PM && vegetarian(&mons[corpsenm]));
+    }
+    return FALSE;
+}
+
 STATIC_OVL int
 shkveg()
 {
@@ -276,11 +311,14 @@ shkveg()
 
 	j = maxprob = 0;
 	for (i = bases[(int)oclass]; i < NUM_OBJECTS; ++i) {
-		if (objects[i].oc_material == VEGGY) {
+		if (objects[i].oc_class != oclass) break;
+
+		if (veggy_item((struct obj *)0, i)) {
 			ok[j++] = i;
 			maxprob += objects[i].oc_prob;
 		}
 	}
+	if (maxprob < 1) panic("shkveg no veggy objects");
 	prob = rnd(maxprob);
 
 	j = 0;
@@ -293,6 +331,18 @@ shkveg()
 	if(objects[i].oc_class != oclass || !OBJ_NAME(objects[i]))
 		panic("shkveg probtype error, oclass=%d i=%d", (int) oclass, i);
 	return i;
+}
+
+/* make a random item for health food store */
+STATIC_OVL void
+mkveggy_at(sx, sy)
+int sx, sy;
+{
+    struct obj *obj = mksobj_at(shkveg(), sx, sy, TRUE, TRUE);
+
+    if (obj && obj->otyp == TIN)
+	set_tin_variety(obj, HEALTHY_TIN);
+    return;
 }
 
 STATIC_OVL void
@@ -316,7 +366,7 @@ int sx, sy;
 	} else {
 	    atype = get_shop_item(shp - shtypes);
 	    if (atype == VEGETARIAN_CLASS)
-		(void) mksobj_at(shkveg(), sx, sy, TRUE, TRUE);
+		mkveggy_at(sx, sy);
 	    else if (atype < 0)
 		(void) mksobj_at(-atype, sx, sy, TRUE, TRUE);
 	    else
@@ -564,15 +614,7 @@ struct obj *obj;
     for (i = 0; i < SIZE(shtypes[0].iprobs) && shp->iprobs[i].iprob; i++) {
 	/* pseudo-class needs special handling */
 	if (shp->iprobs[i].itype == VEGETARIAN_CLASS) {
-	    if ((obj->otyp == TIN || obj->otyp == CORPSE) &&
-		    ((obj->corpsenm >= LOW_PM &&
-			vegetarian(&mons[obj->corpsenm])) ||
-		     (obj->otyp == TIN && obj->spe == 1)))	/* spinach */
-		return TRUE;
-	    if (obj->oclass == FOOD_CLASS &&
-		    (objects[obj->otyp].oc_material == VEGGY ||
-			obj->otyp == EGG))
-		return TRUE;
+	    if (veggy_item(obj, 0)) return TRUE;
 	} else if ((shp->iprobs[i].itype < 0) ?
 			shp->iprobs[i].itype == - obj->otyp :
 			shp->iprobs[i].itype == obj->oclass)
