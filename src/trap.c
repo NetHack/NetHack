@@ -3586,7 +3586,7 @@ boolean disarm;
 		case 0:
 			pline("A cloud of %s gas billows from %s.",
 				Blind ? blindgas[rn2(SIZE(blindgas))] :
-				hcolor((char *)0), the(xname(obj)));
+				rndcolor(), the(xname(obj)));
 			if(!Stunned) {
 			    if (Hallucination)
 				pline("What a groovy feeling!");

@@ -1002,6 +1002,15 @@ const char *colorpref;
 		hcolors[rn2(SIZE(hcolors))] : colorpref;
 }
 
+/* return a random real color unless hallucinating */
+const char *
+rndcolor()
+{
+	int k = rn2(CLR_MAX);
+	return Hallucination ? hcolor((char *)0) : (k == NO_COLOR) ?
+		"colorless" : c_obj_colors[k];
+}
+
 /* Aliases for road-runner nemesis
  */
 static const char * const coynames[] = {
