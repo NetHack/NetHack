@@ -17,6 +17,12 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 
 #define WINTYPELEN 16
 
+#ifdef DEFAULT_WC_TILED_MAP
+#define PREFER_TILED TRUE
+#else
+#define PREFER_TILED FALSE
+#endif
+
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
  *  options help (option_help()), the long options help (dat/opthelp),
@@ -38,7 +44,7 @@ static struct Bool_Opt
 #else
 	{"altmeta", (boolean *)0, TRUE, DISP_IN_GAME},
 #endif
-	{"ascii_map",     &iflags.wc_ascii_map, TRUE, SET_IN_GAME},	/*WC*/
+	{"ascii_map",     &iflags.wc_ascii_map, !PREFER_TILED, SET_IN_GAME},	/*WC*/
 #ifdef MFLOPPY
 	{"asksavedisk", &flags.asksavedisk, FALSE, SET_IN_GAME},
 #else
@@ -170,7 +176,7 @@ static struct Bool_Opt
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
 	{"standout", &flags.standout, FALSE, SET_IN_GAME},
 	{"splash_screen",     &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/
-	{"tiled_map",     &iflags.wc_tiled_map, FALSE, DISP_IN_GAME},	/*WC*/
+	{"tiled_map",     &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME},	/*WC*/
 	{"time", &flags.time, FALSE, SET_IN_GAME},
 #ifdef TIMED_DELAY
 	{"timed_delay", &flags.nap, TRUE, SET_IN_GAME},

@@ -1583,8 +1583,13 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 
     painter.begin(this);
 
+    if (
 #ifdef REINCARNATION
-    if (Is_rogue_level(&u.uz)) {
+	Is_rogue_level(&u.uz) ||
+#endif
+	iflags.wc_ascii_map
+    )
+    {
 	// You enter a VERY primitive world!
 
 	painter.setClipRect( event->rect() ); // (normally we don't clip)
@@ -1595,8 +1600,16 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	if ( !rogue_font ) {
 	    // Find font...
 	    int pts = 5;
+	    QString fontfamily = iflags.wc_font_map
+		? iflags.wc_font_map : "Courier";
+	    bool bold = FALSE;
+	    if ( fontfamily.right(5).lower() == "-bold" ) {
+		fontfamily.truncate(fontfamily.length()-5);
+		bold = TRUE;
+	    }
 	    while ( pts < 32 ) {
-		painter.setFont(QFont("Courier", pts));
+		QFont f(fontfamily, pts, bold ? QFont::Bold : QFont::Normal);
+		painter.setFont(QFont(fontfamily, pts));
 		QFontMetrics fm = painter.fontMetrics();
 		if ( fm.width("M") > qt_settings->glyphs().width() )
 		    break;
@@ -1604,7 +1617,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		    break;
 		pts++;
 	    }
-	    rogue_font = new QFont("Courier",pts-1);
+	    rogue_font = new QFont(fontfamily,pts-1);
 	}
 	painter.setFont(*rogue_font);
 
@@ -1641,9 +1654,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	}
 
 	painter.setFont(font());
-    } else
-#endif
-    {
+    } else {
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
@@ -4335,7 +4346,7 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
 #endif
 {
     QPixmap pm("nhsplash.xpm");
-    if ( !pm.isNull() ) {
+    if ( iflags.wc_splash_screen && !pm.isNull() ) {
 	QVBox *vb = new QVBox(0,0,
 	    WStyle_Customize | WStyle_NoBorder | nh_WX11BypassWM | WStyle_StaysOnTop );
 	splash = vb;
@@ -5056,7 +5067,10 @@ extern "C" struct window_procs Qt_procs;
 
 struct window_procs Qt_procs = {
     "Qt",
-    WC_COLOR|WC_HILITE_PET,
+    WC_COLOR|WC_HILITE_PET|
+	WC_ASCII_MAP|WC_TILED_MAP|
+	WC_FONT_MAP|WC_TILE_FILE|WC_TILE_WIDTH|WC_TILE_HEIGHT|
+	WC_PLAYER_SELECTION|WC_SPLASH_SCREEN,
     NetHackQtBind::qt_init_nhwindows,
     NetHackQtBind::qt_player_selection,
     NetHackQtBind::qt_askname,
