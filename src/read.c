@@ -1022,6 +1022,7 @@ register struct obj	*sobj;
 			/* Note: if rn2(5)==0, identify all items */
 			if (cval == 1 && sobj->blessed && Luck > 0) ++cval;
 		} else	cval = 1;
+		if(!objects[sobj->otyp].oc_name_known) more_experienced(0,10);
 		useup(sobj);
 		makeknown(SCR_IDENTIFY);
 	id:
@@ -1100,6 +1101,7 @@ register struct obj	*sobj;
 		 * some damage under all potential cases.
 		 */
 		cval = bcsign(sobj);
+		if(!objects[sobj->otyp].oc_name_known) more_experienced(0,10);
 		useup(sobj);
 		makeknown(SCR_FIRE);
 		if(confused) {
