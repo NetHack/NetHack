@@ -47,6 +47,7 @@ struct artifact {
 	aligntyp    alignment;	/* alignment of bequeathing gods */
 	short	    role;	/* character role associated with */
 	short	    race;	/* character race associated with */
+	long        cost;	/* price when sold to hero (default 100 x base cost) */
 };
 
 /* invoked properties with special powers */

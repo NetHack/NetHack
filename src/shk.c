@@ -2800,6 +2800,10 @@ boolean shk_buying;
 {
 	register long tmp = (long) objects[obj->otyp].oc_cost;
 
+	if (obj->oartifact) {
+	    tmp = arti_cost(obj);
+	    if (shk_buying) tmp /= 4;
+	}
 	switch(obj->oclass) {
 	case FOOD_CLASS:
 		/* simpler hunger check, (2-4)*cost */
@@ -2823,7 +2827,6 @@ boolean shk_buying;
 		    tmp /= 2L;
 		break;
 	}
-	if (obj->oartifact) tmp *= 25L;
 	return tmp;
 }
 

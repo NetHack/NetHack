@@ -1342,6 +1342,19 @@ uchar inv_prop;
 	return((boolean)(arti && (arti->inv_prop == inv_prop)));
 }
 
+/* Return the price sold to the hero of a given artifact or unique item */
+long
+arti_cost(otmp)
+struct obj *otmp;
+{
+	if (!otmp->oartifact)
+	    return ((long)objects[otmp->otyp].oc_cost);
+	else if (artilist[otmp->oartifact].cost)
+	    return (artilist[otmp->oartifact].cost);
+	else
+	    return (100L * (long)objects[otmp->otyp].oc_cost);
+}
+
 #endif /* OVLB */
 
 /*artifact.c*/

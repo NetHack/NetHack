@@ -553,7 +553,7 @@ OBJECT(OBJ("cheap plastic imitation of the Amulet of Yendor",
 	AMULET_CLASS, 0, 0, 20,    0, 0, 0, 0, 0,  1, HI_METAL),
 OBJECT(OBJ("Amulet of Yendor",	/* note: description == name */
 	"Amulet of Yendor"), BITS(0,0,1,0,1,0,1,1,0,0,0,0,MITHRIL), 0,
-	AMULET_CLASS, 0, 0, 20, 3500, 0, 0, 0, 0, 20, HI_METAL),
+	AMULET_CLASS, 0, 0, 20, 30000, 0, 0, 0, 0, 20, HI_METAL),
 #undef AMULET
 
 /* tools ... */
@@ -653,10 +653,10 @@ WEPTOOL("unicorn horn", (char *)0,
 /* two special unique artifact "tools" */
 OBJECT(OBJ("Candelabrum of Invocation", "candelabrum"),
 		BITS(0,0,1,0,1,0,1,1,0,0,0,P_NONE,GOLD), 0,
-		TOOL_CLASS, 0, 0,10, 3000, 0, 0, 0, 0, 200, HI_GOLD),
+		TOOL_CLASS, 0, 0,10, 5000, 0, 0, 0, 0, 200, HI_GOLD),
 OBJECT(OBJ("Bell of Opening", "silver bell"),
 		BITS(0,0,1,0,1,1,1,1,0,0,0,P_NONE,SILVER), 0,
-		TOOL_CLASS, 0, 0,10, 1000, 0, 0, 0, 0, 50, HI_SILVER),
+		TOOL_CLASS, 0, 0,10, 5000, 0, 0, 0, 0, 50, HI_SILVER),
 #undef TOOL
 #undef WEPTOOL
 
@@ -835,7 +835,7 @@ SPELL("freeze sphere",   "hardcover",   P_MATTER_SPELL, 20,  2, 1, 1, NODIR, CLR
 SPELL("blank paper",     "plain",       P_NONE, 18,  0, 0, 0, 0,         HI_PAPER),
 /* a special, one of a kind, spellbook */
 OBJECT(OBJ("Book of the Dead", "papyrus"), BITS(0,0,1,0,1,0,1,1,0,0,0,P_NONE,PAPER), 0,
-	SPBOOK_CLASS, 0, 0,20, 3500, 0, 0, 0, 7, 20, HI_PAPER),
+	SPBOOK_CLASS, 0, 0,20, 10000, 0, 0, 0, 7, 20, HI_PAPER),
 #undef SPELL
 
 /* wands ... */

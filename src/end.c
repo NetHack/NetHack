@@ -469,8 +469,7 @@ struct obj *list;
 			otmp->otyp == BELL_OF_OPENING ||
 			otmp->otyp == SPE_BOOK_OF_THE_DEAD ||
 			otmp->otyp == CANDELABRUM_OF_INVOCATION) {
-	    /* shopkeepers charge 100x; 250x is arbitrary */
-	    u.urexp += 250L * (long)objects[otmp->otyp].oc_cost;
+	    u.urexp += (arti_cost(otmp) * 5 / 2);
 	if (Has_contents(otmp))
 	    add_artifact_score(otmp->cobj);
     }
@@ -498,8 +497,8 @@ winid endwin;
 	    Sprintf(pbuf, "%s (worth %ld %s and %ld points)",
 		otmp->oartifact ? artifact_name(xname(otmp), &dummy) :
 			OBJ_NAME(objects[otmp->otyp]),
-		100L * (long)objects[otmp->otyp].oc_cost, currency(2L), 
-		250L * (long)objects[otmp->otyp].oc_cost);
+		arti_cost(otmp), currency(2L), 
+		arti_cost(otmp) * 5 / 2);
 	    putstr(endwin, 0, pbuf);
 	}
 	if (Has_contents(otmp))
