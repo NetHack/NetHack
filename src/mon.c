@@ -30,7 +30,6 @@ STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 	   (level.flags.graveyard && is_undead(mdat) && rn2(3))
 #endif
 
-
 #if 0
 /* part of the original warning code which was replaced in 3.3.1 */
 #define warnDelay 10
@@ -44,7 +43,7 @@ const char *warnings[] = {
 STATIC_DCL void NDECL(warn_effects);
 #endif /* 0 */
 
-STATIC_DCL struct obj *FDECL(make_corpse,(struct monst *));
+STATIC_DCL struct obj *FDECL(make_corpse,(struct monst *, unsigned));
 STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
 STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
 
@@ -162,14 +161,17 @@ STATIC_VAR short cham_to_pm[] = {
  * etc....
  */
 STATIC_OVL struct obj *
-make_corpse(mtmp)
+make_corpse(mtmp,corpseflags)
 register struct monst *mtmp;
+unsigned corpseflags;
 {
 	register struct permonst *mdat = mtmp->data;
 	int num;
 	struct obj *obj = (struct obj *)0;
 	int x = mtmp->mx, y = mtmp->my;
 	int mndx = monsndx(mdat);
+	unsigned corpstatflags = corpseflags;
+	boolean burythem = ((corpstatflags & CORPSTAT_BURIED) != 0);
 
 	switch(mndx) {
 	    case PM_GRAY_DRAGON:
@@ -211,7 +213,8 @@ register struct monst *mtmp;
 	    case PM_VAMPIRE_LORD:
 		/* include mtmp in the mkcorpstat() call */
 		num = undead_to_corpse(mndx);
-		obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, TRUE);
+		corpstatflags |= CORPSTAT_INIT;
+		obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
 		obj->age -= 100;		/* this is an *OLD* corpse */
 		break;
 	    case PM_KOBOLD_MUMMY:
@@ -231,7 +234,8 @@ register struct monst *mtmp;
 	    case PM_GIANT_ZOMBIE:
 	    case PM_ETTIN_ZOMBIE:
 		num = undead_to_corpse(mndx);
-		obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, TRUE);
+		corpstatflags |= CORPSTAT_INIT;
+		obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
 		obj->age -= 100;		/* this is an *OLD* corpse */
 		break;
 	    case PM_IRON_GOLEM:
@@ -253,8 +257,9 @@ register struct monst *mtmp;
 		mtmp->mnamelth = 0;
 		break;
 	    case PM_STONE_GOLEM:
+	        corpstatflags &= ~CORPSTAT_INIT;
 		obj = mkcorpstat(STATUE, (struct monst *)0,
-			mdat, x, y, FALSE);
+			mdat, x, y, corpstatflags);
 		break;
 	    case PM_WOOD_GOLEM:
 		num = d(2,4);
@@ -284,9 +289,17 @@ register struct monst *mtmp;
 	    default:
 		if (mvitals[mndx].mvflags & G_NOCORPSE)
 		    return (struct obj *)0;
-		else	/* preserve the unique traits of some creatures */
+		else {
+		    corpstatflags |= CORPSTAT_INIT;
+		    /* preserve the unique traits of some creatures */
 		    obj = mkcorpstat(CORPSE, KEEPTRAITS(mtmp) ? mtmp : 0,
-				     mdat, x, y, TRUE);
+				     mdat, x, y, corpstatflags);
+		    if (burythem) {
+			(void) bury_an_obj(obj);
+			newsym(x, y);
+			return obj;
+		    }
+		}
 		break;
 	}
 	/* All special cases should precede the G_NOCORPSE check */
@@ -1578,7 +1591,7 @@ register struct monst *mdef;
 
 	if (corpse_chance(mdef, (struct monst *)0, FALSE) &&
 	    (accessible(mdef->mx, mdef->my) || is_pool(mdef->mx, mdef->my)))
-		(void) make_corpse(mdef);
+		(void) make_corpse(mdef,CORPSTAT_NONE);
 }
 
 /* monster disappears, not dies */
@@ -1650,7 +1663,7 @@ register struct monst *mdef;
 		/* defer statue creation until after inventory removal
 		   so that saved monster traits won't retain any stale
 		   item-conferred attributes */
-		otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, FALSE);
+		otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, CORPSTAT_NONE);
 		if (mdef->mnamelth) otmp = oname(otmp, NAME(mdef));
 		while ((obj = oldminvent) != 0) {
 		    oldminvent = obj->nobj;
@@ -1760,7 +1773,7 @@ xkilled(mtmp, dest)
 	register struct trap *t;
 	boolean redisp = FALSE;
 	boolean wasinside = u.uswallow && (u.ustuck == mtmp);
-
+	boolean burycorpse = FALSE;
 
 	/* KMH, conduct */
 	u.uconduct.killer++;
@@ -1782,14 +1795,18 @@ xkilled(mtmp, dest)
 	}
 
 	if (mtmp->mtrapped && (t = t_at(x, y)) != 0 &&
-		(t->ttyp == PIT || t->ttyp == SPIKED_PIT) &&
-		sobj_at(BOULDER, x, y))
-	    dest |= 2;     /*
+		(t->ttyp == PIT || t->ttyp == SPIKED_PIT)) {
+
+		if (sobj_at(BOULDER, x, y))
+	    		dest |= 2;     /*
 			    * Prevent corpses/treasure being created "on top"
 			    * of the boulder that is about to fall in. This is
 			    * out of order, but cannot be helped unless this
 			    * whole routine is rearranged.
 			    */
+		if (m_carrying(mtmp, BOULDER))
+			burycorpse = TRUE;
+	}
 
 	/* your pet knows who just killed it...watch out */
 	if (mtmp->mtame && !mtmp->isminion) EDOG(mtmp)->killed_by_u = 1;
@@ -1857,8 +1874,16 @@ xkilled(mtmp, dest)
 		 * different from whether or not the corpse is "special";
 		 * if we want both, we have to specify it explicitly.
 		 */
-		if (corpse_chance(mtmp, (struct monst *)0, FALSE))
-			(void) make_corpse(mtmp);
+		if (corpse_chance(mtmp, (struct monst *)0, FALSE)) {
+			struct obj *cadaver = make_corpse(mtmp, burycorpse ?
+					      CORPSTAT_BURIED : CORPSTAT_NONE);
+			if (burycorpse && cadaver && cansee(x,y) &&
+			    !mtmp->minvis &&
+			    cadaver->where == OBJ_BURIED && (dest & 1)) {
+				pline("%s corpse ends up buried.",
+					s_suffix(Monnam(mtmp)));
+			}
+		}
 	}
 	if(redisp) newsym(x,y);
 cleanup:

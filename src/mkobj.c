@@ -884,14 +884,15 @@ int x, y;
  * resurrection.
  */
 struct obj *
-mkcorpstat(objtype, mtmp, ptr, x, y, init)
+mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags)
 int objtype;	/* CORPSE or STATUE */
 struct monst *mtmp;
 struct permonst *ptr;
 int x, y;
-boolean init;
+unsigned corpstatflags;
 {
 	register struct obj *otmp;
+	boolean init = ((corpstatflags & CORPSTAT_INIT) != 0);
 
 	if (objtype != CORPSE && objtype != STATUE)
 	    impossible("making corpstat type %d", objtype);
@@ -1058,9 +1059,11 @@ int x, y;
 const char *nm;
 {
 	struct obj *otmp;
+	unsigned corpstatflags = (objtype != STATUE) ?
+				 CORPSTAT_INIT : CORPSTAT_NONE;
 
 	otmp = mkcorpstat(objtype, (struct monst *)0, ptr,
-				x, y, (boolean)(objtype != STATUE));
+				x, y, corpstatflags);
 	if (nm)
 		otmp = oname(otmp, nm);
 	return(otmp);

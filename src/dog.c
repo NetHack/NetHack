@@ -379,7 +379,7 @@ boolean with_you;
 		    }
 		}
 		corpse = mkcorpstat(CORPSE, (struct monst *)0, mtmp->data,
-				xlocale, ylocale, FALSE);
+				xlocale, ylocale, CORPSTAT_NONE);
 #ifndef GOLDOBJ
 		if (mtmp->mgold) {
 		    if (xlocale == 0 && ylocale == 0 && corpse) {

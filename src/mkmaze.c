@@ -431,7 +431,7 @@ fixup_special()
 	    otmp = mk_tt_object(STATUE, somex(croom), somey(croom));
 	else /* Medusa statues don't contain books */
 	    otmp = mkcorpstat(STATUE, (struct monst *)0, (struct permonst *)0,
-			      somex(croom), somey(croom), FALSE);
+			      somex(croom), somey(croom), CORPSTAT_NONE);
 	if (otmp) {
 	    while (pm_resistance(&mons[otmp->corpsenm],MR_STONE)
 		   || poly_when_stoned(&mons[otmp->corpsenm])) {

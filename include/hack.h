@@ -143,6 +143,11 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define MM_IGNOREWATER	  0x80	/* ignore water when positioning */
 #define MM_ADJACENTOK	  0x100 /* it is acceptable to use adjacent coordinates */
 
+/* flags for make_corpse() and mkcorpstat() */
+#define CORPSTAT_NONE	  0x00
+#define CORPSTAT_INIT	  0x01	/* pass init flag to mkcorpstat */
+#define CORPSTAT_BURIED	  0x02	/* bury the corpse or statue */
+
 /* special mhpmax value when loading bones monster to flag as extinct or genocided */
 #define DEFUNCT_MONSTER	(-100)
 
