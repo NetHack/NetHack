@@ -2358,7 +2358,8 @@ struct obj *obj;
 static const char
 	not_enough_room[] = "There's not enough room here to use that.",
 	where_to_hit[] = "Where do you want to hit?",
-	cant_see_spot[] = "won't hit anything if you can't see that spot.";
+	cant_see_spot[] = "won't hit anything if you can't see that spot.",
+	cant_reach[] = "can't reach that spot from here.";
 
 /* Distance attacks by pole-weapons */
 STATIC_OVL int
@@ -2404,6 +2405,9 @@ use_pole (obj)
 		    !canseemon(mtmp))) {
 	    You(cant_see_spot);
 	    return (res);
+	} else if (!couldsee(cc.x, cc.y)) { /* Eyes of the Overworld */
+	    You(cant_reach);
+	    return res;
 	}
 
 	/* Attack the monster there */
@@ -2502,6 +2506,9 @@ use_grapple (obj)
 	} else if (!cansee(cc.x, cc.y)) {
 	    You(cant_see_spot);
 	    return (res);
+	} else if (!couldsee(cc.x, cc.y)) { /* Eyes of the Overworld */
+	    You(cant_reach);
+	    return res;
 	}
 
 	/* What do you want to hit? */
