@@ -868,9 +868,10 @@ dochat()
 
 #ifdef STEED
     if (u.usteed && u.dz > 0) {
-	if (!u.usteed->mcanmove || u.usteed->msleeping)
+	if (!u.usteed->mcanmove || u.usteed->msleeping) {
 		pline("%s seems not to notice you.", Monnam(u.usteed));
-	else
+		return(1);
+	} else
 		return (domonnoise(u.usteed));
     }
 #endif
