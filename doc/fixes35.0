@@ -60,6 +60,7 @@ thrown potions can sometimes hit a steed's saddle
 sync default documentation of "null" option with the code
 tripping over a cockatrice corpse didn't petrify, even when not wearing boots
 do not call swamps on the Juiblex level "moat" when freezing
+keep score from wrapping around and becoming negative by capping it
 
 
 Platform- and/or Interface-Specific Fixes

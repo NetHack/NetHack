@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include <limits.h>
 
 extern const char *hu_stat[];	/* defined in eat.c */
 
@@ -154,20 +155,20 @@ max_rank_sz()
 long
 botl_score()
 {
-    int deepest = deepest_lev_reached(FALSE);
+    long deepest = deepest_lev_reached(FALSE);
+    long utotal;
+
 #ifndef GOLDOBJ
-    long ugold = u.ugold + hidden_gold();
-
-    if ((ugold -= u.ugold0) < 0L) ugold = 0L;
-    return ugold + u.urexp + (long)(50 * (deepest - 1))
+    utotal = u.ugold + hidden_gold();
+    if ((utotal -= u.ugold0) < 0L) utotal = 0L;
 #else
-    long umoney = money_cnt(invent) + hidden_gold();
-
-    if ((umoney -= u.umoney0) < 0L) umoney = 0L;
-    return umoney + u.urexp + (long)(50 * (deepest - 1))
+    utotal = money_cnt(invent) + hidden_gold();
+    if ((utotal -= u.umoney0) < 0L) utotal = 0L;
 #endif
-			  + (long)(deepest > 30 ? 10000 :
-				   deepest > 20 ? 1000*(deepest - 20) : 0);
+    utotal += u.urexp + (50 * (deepest - 1)) +
+	      (deepest > 30 ? 10000 : deepest > 20 ? 1000*(deepest - 20) : 0);
+    if (utotal < u.urexp) utotal = LONG_MAX; /* wrap around */
+    return utotal;
 }
 #endif
 
