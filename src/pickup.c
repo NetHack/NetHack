@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2005/02/05	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2005/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2145,9 +2145,15 @@ int held;
 	    You("owe %ld %s for lost merchandise.", loss, currency(loss));
 	obj->owt = weight(obj);	/* in case any items were lost */
 
-	if (!cnt)
+	if (!cnt) {
+	    unsigned save_cknown = obj->cknown;
+
+	    /* avoid redundant "Your empty chest is empty." */
+	    obj->cknown = 0;
 	    Sprintf(emptymsg, "%s is %sempty.", Yname2(obj),
 		    quantum_cat ? "now " : "");
+	    obj->cknown = save_cknown;	/* will be set to 1 */
+	}
 
 	if (cnt || flags.menu_style == MENU_FULL) {
 	    Strcpy(qbuf, "Do you want to take something out of ");
