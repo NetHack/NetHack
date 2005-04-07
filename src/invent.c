@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2005/02/07	*/
+/*	SCCS Id: @(#)invent.c	3.5	2005/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1923,7 +1923,6 @@ dounpaid()
     register char ilet;
     char *invlet = flags.inv_order;
     int classcount, count, num_so_far;
-    int save_unpaid = 0;	/* lint init */
     long cost, totcost;
 
     count = count_unpaid(invent);
@@ -1931,14 +1930,12 @@ dounpaid()
     if (count == 1) {
 	marker = (struct obj *) 0;
 	otmp = find_unpaid(invent, &marker);
-
-	/* see if the unpaid item is in the top level inventory */
-	for (marker = invent; marker; marker = marker->nobj)
-	    if (marker == otmp) break;
-
+	cost = unpaid_cost(otmp);
+	otmp->unpaid = 0;	/* suppress "(unpaid)" suffix */
 	pline("%s", xprname(otmp, distant_name(otmp, doname),
-			    marker ? otmp->invlet : CONTAINED_SYM,
-			    TRUE, unpaid_cost(otmp), 0L));
+			    carried(otmp) ? otmp->invlet : CONTAINED_SYM,
+			    TRUE, cost, 0L));
+	otmp->unpaid = 1;	/*(wouldn't be here if this wasn't true)*/
 	return;
     }
 
@@ -1959,12 +1956,10 @@ dounpaid()
 		    }
 
 		    totcost += cost = unpaid_cost(otmp);
-		    /* suppress "(unpaid)" suffix */
-		    save_unpaid = otmp->unpaid;
-		    otmp->unpaid = 0;
+		    otmp->unpaid = 0;	/* suppress "(unpaid)" suffix */
 		    putstr(win, 0, xprname(otmp, distant_name(otmp, doname),
 					   ilet, TRUE, cost, 0L));
-		    otmp->unpaid = save_unpaid;
+		    otmp->unpaid = 1;
 		    num_so_far++;
 		}
 	    }
@@ -1982,27 +1977,28 @@ dounpaid()
 	 */
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
 	    if (Has_contents(otmp)) {
-	    	long contcost = 0L;
+		long contcost = 0L;
+
 		marker = (struct obj *) 0;	/* haven't found any */
 		while (find_unpaid(otmp->cobj, &marker)) {
 		    totcost += cost = unpaid_cost(marker);
 		    contcost += cost;
 		    if (otmp->cknown) {
-			save_unpaid = marker->unpaid;
-			marker->unpaid = 0;    /* suppress "(unpaid)" suffix */
+			marker->unpaid = 0; /* suppress "(unpaid)" suffix */
 			putstr(win, 0,
-			   xprname(marker, distant_name(marker, doname),
-				   CONTAINED_SYM, TRUE, cost, 0L));
-			marker->unpaid = save_unpaid;
+			       xprname(marker, distant_name(marker, doname),
+				       CONTAINED_SYM, TRUE, cost, 0L));
+			marker->unpaid = 1;
 		    }
 		}
 		if (!otmp->cknown) {
-			char contbuf[BUFSZ];
-			/* Shopkeeper knows what to charge for contents */
-			Sprintf(contbuf, "%s contents", s_suffix(xname(otmp)));
-			putstr(win, 0,
-				xprname((struct obj *)0, contbuf,
-				CONTAINED_SYM, TRUE, contcost, 0L));
+		    char contbuf[BUFSZ];
+
+		    /* Shopkeeper knows what to charge for contents */
+		    Sprintf(contbuf, "%s contents", s_suffix(xname(otmp)));
+		    putstr(win, 0,
+			   xprname((struct obj *)0, contbuf,
+				   CONTAINED_SYM, TRUE, contcost, 0L));
 		}
 	    }
 	}
