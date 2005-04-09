@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2005/03/28	*/
+/*	SCCS Id: @(#)eat.c	3.5	2005/04/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,12 +33,13 @@ STATIC_DCL void FDECL(start_tin, (struct obj *));
 STATIC_DCL int FDECL(eatcorpse, (struct obj *));
 STATIC_DCL void FDECL(start_eating, (struct obj *));
 STATIC_DCL void FDECL(fprefx, (struct obj *));
-STATIC_DCL void FDECL(accessory_has_effect, (struct obj *));
 STATIC_DCL void FDECL(fpostfx, (struct obj *));
 STATIC_DCL int NDECL(bite);
 STATIC_DCL int FDECL(edibility_prompts, (struct obj *));
 STATIC_DCL int FDECL(rottenfood, (struct obj *));
 STATIC_DCL void NDECL(eatspecial);
+STATIC_DCL int FDECL(bounded_increase, (int,int,int));
+STATIC_DCL void FDECL(accessory_has_effect, (struct obj *));
 STATIC_DCL void FDECL(eataccessory, (struct obj *));
 STATIC_DCL const char *FDECL(foodword, (struct obj *));
 STATIC_DCL int FDECL(tin_variety, (struct obj *));
@@ -1536,6 +1537,35 @@ struct obj *otmp;
 	}
 }
 
+/* increment a combat intrinsic with limits on its growth */
+STATIC_OVL int
+bounded_increase(old, inc, typ)
+int old, inc, typ;
+{
+    int absold, absinc, sgnold, sgninc;
+
+    /* don't include any amount coming from worn rings */
+    if (uright && uright->otyp == typ) old -= uright->spe;
+    if (uleft && uleft->otyp == typ) old -= uleft->spe;
+    absold = abs(old), absinc = abs(inc);
+    sgnold = sgn(old), sgninc = sgn(inc);
+
+    if (absinc == 0 || sgnold != sgninc || absold + absinc < 10) {
+	;	/* use inc as-is */
+    } else if (absold + absinc < 20) {
+	absinc = rnd(absinc);	/* 1..n */
+	if (absold + absinc < 10) absinc = 10 - absold;
+	inc = sgninc * absinc;
+    } else if (absold + absinc < 40) {
+	absinc = rn2(absinc) ? 1 : 0;
+	if (absold + absinc < 20) absinc = rnd(20 - absold);
+	inc = sgninc * absinc;
+    } else {
+	inc = 0;	/* no further increase allowed via this method */
+    }
+    return old + inc;
+}
+
 STATIC_OVL void
 accessory_has_effect(otmp)
 struct obj *otmp;
@@ -1620,16 +1650,19 @@ struct obj *otmp;
 		break;
 	    case RIN_INCREASE_ACCURACY:
 		accessory_has_effect(otmp);
-		u.uhitinc += otmp->spe;
+		u.uhitinc = (schar)bounded_increase((int)u.uhitinc, otmp->spe,
+						    RIN_INCREASE_ACCURACY);
 		break;
 	    case RIN_INCREASE_DAMAGE:
 		accessory_has_effect(otmp);
-		u.udaminc += otmp->spe;
+		u.udaminc = (schar)bounded_increase((int)u.udaminc, otmp->spe,
+						    RIN_INCREASE_DAMAGE);
 		break;
 	    case RIN_PROTECTION:
 		accessory_has_effect(otmp);
 		HProtection |= FROMOUTSIDE;
-		u.ublessed += otmp->spe;
+		u.ublessed = bounded_increase(u.ublessed, otmp->spe,
+					      RIN_PROTECTION);
 		context.botl = 1;
 		break;
 	    case RIN_FREE_ACTION:
