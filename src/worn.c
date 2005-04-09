@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.5	2003/01/08	*/
+/*	SCCS Id: @(#)worn.c	3.5	2005/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -405,6 +405,7 @@ boolean racialexception;
 	struct obj *old, *best, *obj;
 	int m_delay = 0;
 	int unseen = !canseemon(mon);
+	boolean autocurse;
 	char nambuf[BUFSZ];
 
 	if (mon->mfrozen) return; /* probably putting previous item on */
@@ -467,6 +468,9 @@ boolean racialexception;
 outer_break:
 	if (!best || best == old) return;
 
+	/* same auto-cursing behavior as for hero */
+	autocurse = ((best->otyp == HELM_OF_OPPOSITE_ALIGNMENT ||
+			best->otyp == DUNCE_CAP) && !best->cursed);
 	/* if wearing a cloak, account for the time spent removing
 	   and re-wearing it when putting on a suit or shirt */
 	if ((flag == W_ARM
@@ -492,6 +496,10 @@ outer_break:
 		    buf[0] = '\0';
 		pline("%s%s puts on %s.", Monnam(mon),
 		      buf, distant_name(best,doname));
+		if (autocurse)
+		    pline("%s %s %s %s for a moment.",
+			  s_suffix(Monnam(mon)), simple_typename(best->otyp),
+			  otense(best, "glow"), hcolor(NH_BLACK));
 	    } /* can see it */
 	    m_delay += objects[best->otyp].oc_delay;
 	    mon->mfrozen = m_delay;
@@ -501,6 +509,7 @@ outer_break:
 	    update_mon_intrinsics(mon, old, FALSE, creation);
 	mon->misc_worn_check |= flag;
 	best->owornmask |= flag;
+	if (autocurse) curse(best);
 	update_mon_intrinsics(mon, best, TRUE, creation);
 	/* if couldn't see it but now can, or vice versa, */
 	if (!creation && (unseen ^ !canseemon(mon))) {
