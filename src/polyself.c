@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.5	2004/11/11	*/
+/*	SCCS Id: @(#)polyself.c	3.5	2005/04/13	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -919,10 +919,9 @@ dospinweb()
 	}
 	ttmp = maketrap(u.ux, u.uy, WEB);
 	if (ttmp) {
-		ttmp->tseen = 1;
 		ttmp->madeby_u = 1;
+		feeltrap(ttmp);
 	}
-	newsym(u.ux, u.uy);
 	return(1);
 }
 

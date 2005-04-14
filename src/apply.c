@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2005/03/28	*/
+/*	SCCS Id: @(#)apply.c	3.5	2005/04/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2209,16 +2209,16 @@ set_trap()
 	ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
 	ttmp = maketrap(u.ux, u.uy, ttyp);
 	if (ttmp) {
-	    ttmp->tseen = 1;
 	    ttmp->madeby_u = 1;
-	    newsym(u.ux, u.uy); /* if our hero happens to be invisible */
+	    feeltrap(ttmp);
 	    if (*in_rooms(u.ux,u.uy,SHOPBASE)) {
 		add_damage(u.ux, u.uy, 0L);		/* schedule removal */
 	    }
 	    if (!trapinfo.force_bungle)
 		You("finish arming %s.",
-			the(defsyms[trap_to_defsym(what_trap(ttyp))].explanation));
-	    if (((otmp->cursed || Fumbling) && (rnl(10) > 5)) || trapinfo.force_bungle)
+		    the(defsyms[trap_to_defsym(what_trap(ttyp))].explanation));
+	    if (((otmp->cursed || Fumbling) && (rnl(10) > 5)) ||
+		    trapinfo.force_bungle)
 		dotrap(ttmp,
 			(unsigned)(trapinfo.force_bungle ? FORCEBUNGLE : 0));
 	} else {

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2005/03/16	*/
+/*	SCCS Id: @(#)trap.c	3.5	2005/04/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -321,8 +321,8 @@ boolean td;	/* td == TRUE : trap door or hole */
 	} while(!rn2(4) && newlevel < dunlevs_in_dungeon(&u.uz));
 
 	if(td) {
-	    struct trap *t=t_at(u.ux,u.uy);
-	    seetrap(t);
+	    struct trap *t = t_at(u.ux,u.uy);
+	    feeltrap(t);
 	    if (!In_sokoban(&u.uz)) {
 		if (t->ttyp == TRAPDOOR)
 			pline("A trap door opens up under you!");
@@ -737,7 +737,7 @@ unsigned trflags;
 		    int dmg = d(2,6); /* should be std ROCK dmg? */
 
 		    trap->once = 1;
-		    seetrap(trap);
+		    feeltrap(trap);
 		    otmp = mksobj_at(ROCK, u.ux, u.uy, TRUE, FALSE);
 		    otmp->quan = 1L;
 		    otmp->owt = weight(otmp);
@@ -783,7 +783,7 @@ unsigned trflags;
 
 	    case BEAR_TRAP:
 		if(Levitation || Flying) break;
-		seetrap(trap);
+		feeltrap(trap);
 		if(amorphous(youmonst.data) || is_whirly(youmonst.data) ||
 						    unsolid(youmonst.data)) {
 		    pline("%s bear trap closes harmlessly through you.",
@@ -901,7 +901,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 	    case SPIKED_PIT:
 		/* KMH -- You can't escape the Sokoban level traps */
 		if (!In_sokoban(&u.uz) && (Levitation || Flying)) break;
-		seetrap(trap);
+		feeltrap(trap);
 		if (!In_sokoban(&u.uz) && is_clinger(youmonst.data)) {
 		    if(trap->tseen) {
 			You("see %s %spit below you.", a_your[trap->madeby_u],
@@ -1003,7 +1003,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		break;
 
 	    case WEB: /* Our luckless player has stumbled into a web. */
-		seetrap(trap);
+		feeltrap(trap);
 		if (amorphous(youmonst.data) || is_whirly(youmonst.data) ||
 						    unsolid(youmonst.data)) {
 		    if (acidic(youmonst.data) || u.umonnum == PM_GELATINOUS_CUBE ||
@@ -1022,7 +1022,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		}
 		if (webmaker(youmonst.data)) {
 		    if (webmsgok)
-		    	pline(trap->madeby_u ? "You take a walk on your web."
+			pline(trap->madeby_u ? "You take a walk on your web."
 					 : "There is a spider web here.");
 		    break;
 		}
@@ -1154,7 +1154,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 #endif
 		if (Levitation || Flying) {
 		    if (!already_seen && rn2(3)) break;
-		    seetrap(trap);
+		    feeltrap(trap);
 		    pline("%s %s in a pile of soil below you.",
 			    already_seen ? "There is" : "You discover",
 			    trap->madeby_u ? "the trigger of your mine" :
@@ -1175,7 +1175,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 
 		    if (recursive_mine) break;
 #endif
-		    seetrap(trap);
+		    feeltrap(trap);
 		    pline("KAABLAMM!!!  You triggered %s land mine!",
 					    a_your[trap->madeby_u]);
 #ifdef STEED
@@ -1204,7 +1204,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 	    case ROLLING_BOULDER_TRAP: {
 		int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
 
-		seetrap(trap);
+		feeltrap(trap);
 		pline("Click! You trigger a rolling boulder trap!");
 		if(!launch_obj(BOULDER, trap->launch.x, trap->launch.y,
 		      trap->launch2.x, trap->launch2.y, style)) {
@@ -1215,12 +1215,12 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		break;
 	    }
 	    case MAGIC_PORTAL:
-		seetrap(trap);
+		feeltrap(trap);
 		domagicportal(trap);
 		break;
 
 	    default:
-		seetrap(trap);
+		feeltrap(trap);
 		impossible("You hit a trap of type %u", trap->ttyp);
 	}
 }
@@ -1562,7 +1562,7 @@ int style;
 				singleobj->oy = dest.dlevel;
 				singleobj->owornmask = (long)MIGR_RANDOM;
 			    }
-		    	    seetrap(t);
+			    seetrap(t);
 			    used_up = TRUE;
 			    launch_drop_spot((struct obj *)0, 0, 0);
 			    break;
@@ -1641,12 +1641,23 @@ int style;
 
 void
 seetrap(trap)
-	register struct trap *trap;
+struct trap *trap;
 {
-	if(!trap->tseen) {
-	    trap->tseen = 1;
-	    newsym(trap->tx, trap->ty);
-	}
+    if (!trap->tseen) {
+	trap->tseen = 1;
+	newsym(trap->tx, trap->ty);
+    }
+}
+
+/* like seetrap() but overrides vision */
+void
+feeltrap(trap)
+struct trap *trap;
+{
+    trap->tseen = 1;
+    map_trap(trap, 1);
+    /* in case it's beneath something, redisplay the something */
+    newsym(trap->tx, trap->ty);
 }
 
 STATIC_OVL int
