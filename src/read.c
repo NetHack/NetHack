@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2005/03/28	*/
+/*	SCCS Id: @(#)read.c	3.5	2005/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -970,6 +970,9 @@ struct obj *sobj;
 
 			    if (confused) {
 				blessorcurse(obj, 2);
+				/* lose knowledge of this object's curse/bless
+				   state (even if it didn't actually change) */
+				obj->bknown = 0;
 				/* blessorcurse() only affects uncursed items
 				   so no need to worry about price of water
 				   going down (hence no costly_alteration) */
