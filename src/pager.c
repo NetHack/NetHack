@@ -162,8 +162,11 @@ lookat(x, y, buf, monbuf)
 		boolean useemon = (boolean) canseemon(mtmp);
 
 		xraydist = (u.xray_range<0) ? -1 : u.xray_range * u.xray_range;
-		/* normal vision */
-		if ((mtmp->wormno ? worm_known(mtmp) : cansee(mtmp->mx, mtmp->my)) &&
+		/* normal vision
+		 * cansee is true for both normal and astral vision,
+		 * but couldsee it not true for astral vision */
+		if ((mtmp->wormno ? worm_known(mtmp) :
+		     (cansee(mtmp->mx, mtmp->my) && couldsee(mtmp->mx, mtmp->my))) &&
 			mon_visible(mtmp) && !mtmp->minvis) {
 		    ways_seen++;
 		    normal++;
