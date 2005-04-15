@@ -369,6 +369,7 @@ int alter_type;
 {
     xchar ox, oy;
     char objroom;
+    boolean set_bknown;
     const char *those, *them, *what;
     struct monst *shkp = 0;
 
@@ -401,9 +402,15 @@ int alter_type;
     else
 	those = "those", them = "them";
 
+    /* when shopkeeper describes the object as being uncursed or unblessed
+       hero will know that it is now uncursed; will also make the feedback
+       from `I x' after bill_dummy_object() be more specific for this item */
+    set_bknown = (alter_type == COST_UNCURS || alter_type == COST_UNBLSS);
+
     switch (obj->where) {
     case OBJ_FREE:	/* obj_no_longer_held() */
     case OBJ_INVENT:
+	if (set_bknown) obj->bknown = 1;
 	what = simple_typename(obj->otyp);
 	if (obj->quan != 1L) what = makeplural(what);
 	verbalize("You %s %s %s, you pay for %s!",
@@ -411,6 +418,7 @@ int alter_type;
 	bill_dummy_object(obj);
 	break;
     case OBJ_FLOOR:
+	if (set_bknown) obj->bknown = 1;
 	if (costly_spot(u.ux, u.uy) && objroom == *u.ushops) {
 	    verbalize("You %s %s, you pay for %s!",
 		      alteration_verbs[alter_type], those, them);

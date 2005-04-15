@@ -64,7 +64,7 @@
 #define COST_DRAIN   1	/* drain life upon an object */
 #define COST_UNCHRG  2	/* cursed charging */
 #define COST_UNBLSS  3	/* unbless (devalues holy water) */
-#define COST_UNHOLY  4	/* uncurse (devalues unholy water) */
+#define COST_UNCURS  4	/* uncurse (devalues unholy water) */
 #define COST_DECHNT  5	/* disenchant weapons or armor */
 #define COST_DEGRD   6	/* removal of rustproofing, dulling via engraving */
 #define COST_DILUTE  7	/* potion dilution */

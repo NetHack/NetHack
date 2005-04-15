@@ -1693,7 +1693,7 @@ dodip()
 					  hcolor(NH_AMBER));
 				obj->bknown = 1;
 				if (obj->otyp == POT_WATER && obj->unpaid)
-				    costly_alteration(obj, COST_UNHOLY);
+				    costly_alteration(obj, COST_UNCURS);
 				uncurse(obj);
 	poof:
 				if(!(objects[potion->otyp].oc_name_known) &&

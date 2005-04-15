@@ -964,39 +964,22 @@ struct obj *sobj;
 			if (sobj->blessed || wornmask ||
 			     obj->otyp == LOADSTONE ||
 			     (obj->otyp == LEASH && obj->leashmon)) {
-			    unsigned save_bknown, save_cursed, save_blessed;
-			    boolean was_cursed = !!obj->cursed,
-			            was_blessed = !!obj->blessed,
-			            was_normal = !(was_cursed || was_blessed);
-
-			    if(confused) blessorcurse(obj, 2);
-			    else uncurse(obj);
 			    /* water price varies by curse/bless status */
-			    if (obj->unpaid && obj->otyp == POT_WATER) {
-				if ((was_cursed && !obj->cursed) ||
-					(was_blessed && !obj->blessed)) {
-				    /* make `Ix' more specific for this item */
-				    save_bknown = obj->bknown;
-				    obj->bknown = 1;
-				    /* temporarily restore curse/bless to
-				       obtain the right shop price (if potion
-				       went from cursed directly to blessed
-				       or vice versa its price didn't change
-				       but hero will have to buy it anyway) */
-				    save_cursed = obj->cursed;
-				    obj->cursed = was_cursed ? 1 : 0;
-				    save_blessed = obj->blessed;
-				    obj->blessed = was_blessed ? 1 : 0;
-				    costly_alteration(obj, was_cursed ?
-				                    COST_UNHOLY : COST_UNBLSS);
-				    obj->bknown = save_bknown;
-				    obj->cursed = save_cursed;
-				    obj->blessed = save_blessed;
-				} else if (was_normal &&
-					(obj->blessed || obj->cursed)) {
-				    alter_cost(obj, 0L);
-				}
-			    } /* unpaid water */
+			    boolean shop_h2o = (obj->unpaid &&
+						obj->otyp == POT_WATER);
+
+			    if (confused) {
+				blessorcurse(obj, 2);
+				/* blessorcurse() only affects uncursed items
+				   so no need to worry about price of water
+				   going down (hence no costly_alteration) */
+				if (shop_h2o && (obj->cursed || obj->blessed))
+				    alter_cost(obj, 0L);  /* price goes up */
+			    } else if (obj->cursed) {
+				if (shop_h2o)
+				    costly_alteration(obj, COST_UNCURS);
+				uncurse(obj);
+			    }
 			}
 		    }
 		}
