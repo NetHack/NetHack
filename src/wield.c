@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.5	2005/03/28	*/
+/*	SCCS Id: @(#)wield.c	3.5	2005/04/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -608,8 +608,7 @@ boolean for_dip;
 {
 	int erosion;
 	struct monst *victim;
-	boolean vismon;
-	boolean visobj;
+	boolean vismon, visobj, chill;
 	boolean ret = FALSE;
 
 	if (!target)
@@ -639,6 +638,26 @@ boolean for_dip;
 		target->spe = 0;
 		ret = TRUE;
 	    }
+	} else if (target->oartifact &&
+		/* (no artifacts currently meet either of these criteria) */
+		arti_immune(target, acid_dmg ? AD_ACID : AD_RUST)) {
+	    if (flags.verbose) {
+		if (victim == &youmonst)
+		    pline("%s.", Yobjnam2(target, "sizzle"));
+	    }
+	    /* no damage to object */
+	} else if (target->oartifact && !acid_dmg &&
+		/* cold and fire provide partial protection against rust */
+		((chill = arti_immune(target, AD_COLD)) != 0 ||
+		 arti_immune(target, AD_FIRE)) &&
+		/* once rusted, the chance for further rusting goes up */
+		rn2(2 * (MAX_ERODE + 1 - erosion))) {
+	    if (flags.verbose && target->oclass == WEAPON_CLASS) {
+		if (victim == &youmonst || vismon || visobj)
+		    pline("%s some water.",
+			  Yobjnam2(target, chill ? "freeze" : "boil"));
+	    }
+	    /* no damage to object */
 	} else if (target->oerodeproof ||
 		(acid_dmg ? !is_corrodeable(target) : !is_rustprone(target))) {
 	    if (flags.verbose || !(target->oerodeproof && target->rknown)) {

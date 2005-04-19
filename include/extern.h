@@ -60,6 +60,7 @@ E const char *FDECL(artifact_name, (const char *,short *));
 E boolean FDECL(exist_artifact, (int,const char *));
 E void FDECL(artifact_exists, (struct obj *,const char *,BOOLEAN_P));
 E int NDECL(nartifact_exist);
+E boolean FDECL(arti_immune, (struct obj *,int));
 E boolean FDECL(spec_ability, (struct obj *,unsigned long));
 E boolean FDECL(confers_luck, (struct obj *));
 E boolean FDECL(arti_reflects, (struct obj *));

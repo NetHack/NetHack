@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.5	2003/08/11	*/
+/*	SCCS Id: @(#)artifact.c 3.5	2005/04/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -543,6 +543,22 @@ touch_artifact(obj,mon)
     }
 
     return 1;
+}
+
+/* decide whether an artifact itself is vulnerable to a particular type
+   of erosion damage, independent of the properties of its bearer */
+boolean
+arti_immune(obj, dtyp)
+struct obj *obj;
+int dtyp;
+{
+    register const struct artifact *weap = get_artifact(obj);
+
+    if (!weap) return FALSE;
+    if (dtyp == AD_PHYS) return FALSE;	/* nothing is immune to phys dmg */
+    return (weap->attk.adtyp == dtyp ||
+	    weap->defn.adtyp == dtyp ||
+	    weap->cary.adtyp == dtyp);
 }
 
 /* decide whether an artifact's special attacks apply against mtmp */
@@ -1551,5 +1567,5 @@ int orc_count;
               pline("%s stops glowing.", bare_artifactname(uwep));
       }
 }
-/*artifact.c*/
 
+/*artifact.c*/
