@@ -1084,6 +1084,10 @@ struct monst *mtmp;
 		mtmp2->nmon     = (struct monst *)0;
 		mtmp2->data     = (struct permonst *)0;
 		mtmp2->minvent  = (struct obj *)0;
+#ifndef GOLDOBJ
+		/* not a pointer but is discarded along with minvent */
+		mtmp2->mgold	= 0L;
+#endif
 		otmp->oattached = OATTACHED_MONST;	/* mark it */
 	}
 	return otmp;
