@@ -525,7 +525,7 @@ int *fail_reason;
 	/* transfer any statue contents to monster's inventory */
 	while ((item = statue->cobj) != 0) {
 	    obj_extract_self(item);
-	    (void) add_to_minv(mon, item);
+	    (void) mpickobj(mon, item);
 	}
 	m_dowear(mon, TRUE);
 	/* in case statue is wielded and hero zaps stone-to-flesh at self */
