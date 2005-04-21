@@ -481,8 +481,15 @@ int *fail_reason;
 				"moves" : "comes to life";
 	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
 	    /* "the|your|Manlobbi's statue [of a wombat]" */
+	    shkp = shop_keeper(*in_rooms(mon->mx, mon->my, SHOPBASE));
 	    Sprintf(statuename, "%s%s", shk_your(tmpbuf, statue),
-		    (cause == ANIMATE_SPELL) ? xname(statue) : "statue");
+		    (cause == ANIMATE_SPELL &&
+			/* avoid "of a shopkeeper" if it's Manlobbi himself
+			   (if carried, it can't be unpaid--hence won't be
+			   described as "Manlobbi's statue"--because there
+			   wasn't any living shk when statue was picked up) */
+			(mon != shkp || carried(statue))) ? xname(statue) :
+			    "statue");
 	    pline("%s %s!", upstart(statuename), comes_to_life);
 	} else if (cause == ANIMATE_SHATTER) {
 	    if (cansee(x, y))
@@ -508,7 +515,10 @@ int *fail_reason;
 	       which refers to "it" so needs to follow a message describing
 	       the object ("the statue comes to life" one above) */
 	    if (cause != ANIMATE_NORMAL && costly_spot(x, y) &&
-		    (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0)
+		    (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0 &&
+		    /* avoid charging for Manlobbi's statue of Manlobbi
+		       if stone-to-flesh is used on petrified shopkeep */
+		    mon != shkp)
 		(void) stolen_value(statue, x, y,
 				    (boolean)shkp->mpeaceful, FALSE);
 

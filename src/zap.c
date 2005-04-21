@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2005/03/28	*/
+/*	SCCS Id: @(#)zap.c	3.5	2005/04/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -673,7 +673,8 @@ boolean by_hero;
 	       stolen_value() will refer to the object as "it" */
 	    pline("A corpse is resuscitated.");
 
-	if (shkp)
+	/* don't charge for shopkeeper's own corpse if we just revived him */
+	if (shkp && mtmp != shkp)
 	    (void) stolen_value(corpse, x, y, (boolean)shkp->mpeaceful, FALSE);
 
 	/* [we don't give any comparable message about the corpse for
