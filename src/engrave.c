@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)engrave.c	3.5	2005/03/28	*/
+/*	SCCS Id: @(#)engrave.c	3.5	2005/04/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,7 +64,8 @@ static const struct {
 	{'h', "n"},     {'j', "i"},     {'k', "|"},     {'l', "|"},
 	{'m', "nr"},    {'n', "r"},     {'o', "c"},     {'q', "c"},
 	{'w', "v"},     {'y', "v"},
-	{':', "."},     {';', ","},
+	{':', "."},     {';', ",:"},    {',', "."},     {'=', "-"},
+	{'+', "-|"},    {'*', "+"},     {'@', "0"},
 	{'0', "C("},    {'1', "|"},     {'6', "o"},     {'7', "/"},
 	{'8', "3o"}
 };
@@ -594,6 +595,10 @@ doengrave()
 	    case WAND_CLASS:
 		if (zappable(otmp)) {
 		    check_unpaid(otmp);
+		    if (otmp->cursed && !rn2(100)) { /* same as when zapping */
+			wand_explode(otmp, 0);
+			return 1;
+		    }
 		    zapwand = TRUE;
 		    if (Levitation) ptext = FALSE;
 
@@ -857,7 +862,8 @@ doengrave()
 	    pline("%s %sturns to dust.",
 		  The(xname(otmp)), Blind ? "" : "glows violently, then ");
 	    if (!IS_GRAVE(levl[u.ux][u.uy].typ))
-		You("are not going to get anywhere trying to write in the %s with your dust.",
+		You(
+     "are not going to get anywhere trying to write in the %s with your dust.",
 		    is_ice(u.ux,u.uy) ? "frost" : "dust");
 	    useup(otmp);
 	    ptext = FALSE;

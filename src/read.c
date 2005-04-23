@@ -17,7 +17,6 @@ static NEARDATA const char readable[] =
 		   { ALL_CLASSES, SCROLL_CLASS, SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
-STATIC_DCL void FDECL(wand_explode, (struct obj *));
 STATIC_DCL void NDECL(do_class_genocide);
 STATIC_DCL void FDECL(stripspe,(struct obj *));
 STATIC_DCL void FDECL(p_glow1,(struct obj *));
@@ -214,6 +213,9 @@ int curse_bless;
 	is_blessed = curse_bless > 0;
 
 	if (obj->oclass == WAND_CLASS) {
+	    int lim = (obj->otyp == WAN_WISHING) ? 3 :
+			(objects[obj->otyp].oc_dir != NODIR) ? 8 : 15;
+
 	    /* undo any prior cancellation, even when is_cursed */
 	    if (obj->spe == -1) obj->spe = 0;
 
@@ -234,7 +236,7 @@ int curse_bless;
 	    n = (int)obj->recharged;
 	    if (n > 0 && (obj->otyp == WAN_WISHING ||
 		    (n * n * n > rn2(7*7*7)))) {	/* recharge_limit */
-		wand_explode(obj);
+		wand_explode(obj, rnd(lim));
 		return;
 	    }
 	    /* didn't explode, so increment the recharge count */
@@ -244,16 +246,13 @@ int curse_bless;
 	    if (is_cursed) {
 		stripspe(obj);
 	    } else {
-		int lim = (obj->otyp == WAN_WISHING) ? 3 :
-			(objects[obj->otyp].oc_dir != NODIR) ? 8 : 15;
-
 		n = (lim == 3) ? 3 : rn1(5, lim + 1 - 5);
 		if (!is_blessed) n = rnd(n);
 
 		if (obj->spe < n) obj->spe = n;
 		else obj->spe++;
 		if (obj->otyp == WAN_WISHING && obj->spe > 3) {
-		    wand_explode(obj);
+		    wand_explode(obj, 1);
 		    return;
 		}
 		if (obj->spe >= lim) p_glow2(obj, NH_BLUE);
@@ -1364,17 +1363,45 @@ struct obj *sobj;
 	return(0);
 }
 
-STATIC_OVL void
-wand_explode(obj)
-register struct obj *obj;
+/* overcharging any wand or zapping/engraving cursed wand */
+void
+wand_explode(obj, chg)
+struct obj *obj;
+int chg;		/* recharging */
 {
-    int vibration_dmg;
-    obj->in_use = TRUE;	/* in case losehp() is fatal */
-    pline("%s vibrates violently, and explodes!", Yname2(obj));
-    nhbell();
-    vibration_dmg = rnd(2*(u.uhpmax+1)/3); 
-    losehp(Maybe_Half_Phys(vibration_dmg), "exploding wand", KILLED_BY_AN);
+    const char *expl = !chg ? "suddenly" : "vibrates violently and";
+    int dmg, n, k;
+
+    /* number of damage dice */
+    if (!chg) chg = 2;		/* zap/engrave adjustment */
+    n = obj->spe + chg;
+    if (n < 2) n = 2;		/* arbitrary minimum */
+    /* size of damage dice */
+    switch (obj->otyp) {
+    case WAN_WISHING:
+	k = 12; break;
+    case WAN_CANCELLATION:
+    case WAN_DEATH:
+    case WAN_POLYMORPH:
+    case WAN_UNDEAD_TURNING:
+	k = 10; break;
+    case WAN_COLD:
+    case WAN_FIRE:
+    case WAN_LIGHTNING:
+    case WAN_MAGIC_MISSILE:
+	k = 8; break;
+    case WAN_NOTHING:
+	k = 4; break;
+    default:
+	k = 6; break;
+    }
+    /* inflict damage and destroy the wand */
+    dmg = d(n, k);
+    obj->in_use = TRUE;		/* in case losehp() is fatal (or --More--^C) */
+    pline("%s %s explodes!", Yname2(obj), expl);
+    losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
     useup(obj);
+    /* obscure side-effect */
     exercise(A_STR, FALSE);
 }
 
