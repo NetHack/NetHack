@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)fountain.c	3.5	2003/03/23	*/
+/*	SCCS Id: @(#)fountain.c	3.5	2005/04/23	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,8 +56,10 @@ dowaterdemon() /* Water demon */
 	    if (rnd(100) > (80 + level_difficulty())) {
 		pline("Grateful for %s release, %s grants you a wish!",
 		      mhis(mtmp), mhe(mtmp));
-		makewish();
+		/* bones prep:  remove demon first in case the wish
+		   turns out to be fatal (artifact blast) */
 		mongone(mtmp);
+		makewish();
 	    } else if (t_at(mtmp->mx, mtmp->my))
 		(void) mintrap(mtmp);
 	}

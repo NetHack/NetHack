@@ -1271,21 +1271,28 @@ dorub()
 	if (uwep->otyp == MAGIC_LAMP) {
 	    if (uwep->spe > 0 && !rn2(3)) {
 		check_unpaid_usage(uwep, TRUE);		/* unusual item use */
-		djinni_from_bottle(uwep);
-		makeknown(MAGIC_LAMP);
+		/* bones preparation:  perform the lamp transformation
+		   before releasing the djinni in case the latter turns out
+		   to be fatal (a hostile djinni has no chance to attack yet,
+		   but an indebtted one who grants a wish might bestow an
+		   artifact which blasts the hero with lethal results) */
 		uwep->otyp = OIL_LAMP;
 		uwep->spe = 0; /* for safety */
 		uwep->age = rn1(500,1000);
 		if (uwep->lamplit) begin_burn(uwep, TRUE);
+		djinni_from_bottle(uwep);
+		makeknown(MAGIC_LAMP);
 		update_inventory();
-	    } else if (rn2(2) && !Blind)
-		You("see a puff of smoke.");
-	    else pline(nothing_happens);
+	    } else if (rn2(2)) {
+		You("%s smoke.", !Blind ? "see a puff of" : "smell");
+	    } else
+		pline(nothing_happens);
 	} else if (obj->otyp == BRASS_LANTERN) {
 	    /* message from Adventure */
 	    pline("Rubbing the electric lamp is not particularly rewarding.");
 	    pline("Anyway, nothing exciting happens.");
-	} else pline(nothing_happens);
+	} else
+	    pline(nothing_happens);
 	return 1;
 }
 

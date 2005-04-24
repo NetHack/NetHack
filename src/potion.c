@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2005/03/26	*/
+/*	SCCS Id: @(#)potion.c	3.5	2005/04/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2070,8 +2070,10 @@ register struct obj *obj;
 
 	switch (chance) {
 	case 0 : verbalize("I am in your debt.  I will grant one wish!");
-		makewish();
+		/* bones prep:  remove djinni first in case the wish
+		   turns out to be fatal (artifact blast) */
 		mongone(mtmp);
+		makewish();
 		break;
 	case 1 : verbalize("Thank you for freeing me!");
 		(void) tamedog(mtmp, (struct obj *)0);
