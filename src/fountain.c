@@ -43,7 +43,7 @@ STATIC_OVL
 void
 dowaterdemon() /* Water demon */
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     if(!(mvitals[PM_WATER_DEMON].mvflags & G_GONE)) {
 	if((mtmp = makemon(&mons[PM_WATER_DEMON],u.ux,u.uy, NO_MM_FLAGS))) {
