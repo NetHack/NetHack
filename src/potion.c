@@ -2042,6 +2042,34 @@ dodip()
 	return(1);
 }
 
+/* *monp grants a wish and then leaves the game */
+void
+mongrantswish(monp)
+struct monst **monp;
+{
+    /* note: `mon' is still valid after mongone() (til next dmonsfree())
+       but it's no longer on the map--affects coordinates and visibility */
+    struct monst *mon = *monp;
+    int mx = mon->mx, my = mon->my;
+    boolean monspotted = canspotmon(mon),
+	    /* no need to handle Warning since monster is peaceful */
+	    disp_hackery = monspotted || Detect_monsters;
+    
+    /* remove the monster first in case wish proves to be fatal
+       (blasted by artifact), to keep it out of resulting bones file */
+    mongone(mon); 
+    *monp = 0;		/* inform caller than monster is gone */
+    /* hide that removal from the player--map is visible during wish prompt */
+    if (disp_hackery) {
+	tmp_at(DISP_ALWAYS,
+	       monspotted ? mon_to_glyph(mon) : detected_mon_to_glyph(mon));
+	tmp_at(mx, my);
+    }
+    /* grant the wish */
+    makewish();
+    /* clean up */
+    if (disp_hackery) tmp_at(DISP_END, 0);
+}
 
 void
 djinni_from_bottle(obj)
@@ -2070,10 +2098,8 @@ register struct obj *obj;
 
 	switch (chance) {
 	case 0 : verbalize("I am in your debt.  I will grant one wish!");
-		/* bones prep:  remove djinni first in case the wish
-		   turns out to be fatal (artifact blast) */
-		mongone(mtmp);
-		makewish();
+		/* give a wish and discard the monster (mtmp set to null) */
+		mongrantswish(&mtmp);
 		break;
 	case 1 : verbalize("Thank you for freeing me!");
 		(void) tamedog(mtmp, (struct obj *)0);

@@ -56,10 +56,8 @@ dowaterdemon() /* Water demon */
 	    if (rnd(100) > (80 + level_difficulty())) {
 		pline("Grateful for %s release, %s grants you a wish!",
 		      mhis(mtmp), mhe(mtmp));
-		/* bones prep:  remove demon first in case the wish
-		   turns out to be fatal (artifact blast) */
-		mongone(mtmp);
-		makewish();
+		/* give a wish and discard the monster (mtmp set to null) */
+		mongrantswish(&mtmp);
 	    } else if (t_at(mtmp->mx, mtmp->my))
 		(void) mintrap(mtmp);
 	}
