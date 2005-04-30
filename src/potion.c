@@ -2047,28 +2047,21 @@ void
 mongrantswish(monp)
 struct monst **monp;
 {
-    /* note: `mon' is still valid after mongone() (til next dmonsfree())
-       but it's no longer on the map--affects coordinates and visibility */
     struct monst *mon = *monp;
-    int mx = mon->mx, my = mon->my;
-    boolean monspotted = canspotmon(mon),
-	    /* no need to handle Warning since monster is peaceful */
-	    disp_hackery = monspotted || Detect_monsters;
+    int mx = mon->mx, my = mon->my,
+	glyph = glyph_at(mx, my);
     
     /* remove the monster first in case wish proves to be fatal
        (blasted by artifact), to keep it out of resulting bones file */
     mongone(mon); 
-    *monp = 0;		/* inform caller than monster is gone */
-    /* hide that removal from the player--map is visible during wish prompt */
-    if (disp_hackery) {
-	tmp_at(DISP_ALWAYS,
-	       monspotted ? mon_to_glyph(mon) : detected_mon_to_glyph(mon));
-	tmp_at(mx, my);
-    }
+    *monp = 0;		/* inform caller that monster is gone */
+    /* hide that removal from player--map is visible during wish prompt */
+    tmp_at(DISP_ALWAYS, glyph);
+    tmp_at(mx, my);
     /* grant the wish */
     makewish();
     /* clean up */
-    if (disp_hackery) tmp_at(DISP_END, 0);
+    tmp_at(DISP_END, 0);
 }
 
 void
