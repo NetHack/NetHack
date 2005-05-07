@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.5	2003/01/14	*/
+/*	SCCS Id: @(#)do_name.c	3.5	2005/05/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,6 +22,11 @@ nextmbuf()
 	bufidx = (bufidx + 1) % NUMMBUF;
 	return bufs[bufidx];
 }
+
+/* same definition as in cmd.c */
+#ifndef C
+#define C(a) ((a) & 0x1f)	/* ^a */
+#endif
 
 /* the response for '?' help request in getpos() */
 STATIC_OVL void
@@ -97,7 +102,7 @@ const char *goal;
 	}
 	if ((cp = index(pick_chars, c)) != 0) {
 	    /* '.' => 0, ',' => 1, ';' => 2, ':' => 3 */
-	    result = cp - pick_chars;
+	    result = (int)(cp - pick_chars);
 	    break;
 	}
 	for (i = 0; i < 8; i++) {
@@ -136,6 +141,8 @@ const char *goal;
 
 	if(c == '?'){
 	    getpos_help(force, goal);
+	} else if (c == C('r')) {		/* ^R */
+	    docrt();		/* redraw */
 	} else {
 	    if (!index(quitchars, c)) {
 		char matching[MAXPCHARS];

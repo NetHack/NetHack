@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2004/10/27	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2005/05/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2170,15 +2170,24 @@ const char *s;
 #endif
 	    dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
 					(char *)0, '\0');
+
+	if (dirsym == C('r')) {		/* ^R */
+	    docrt();		/* redraw */
+	    goto retry;
+	}
 #ifdef REDO
 	savech(dirsym);
 #endif
+
 	if (dirsym == '.' || dirsym == 's') {
 	    u.dx = u.dy = u.dz = 0;
 	} else if (!movecmd(dirsym) && !u.dz) {
 	    boolean did_help = FALSE, help_requested;
 
-	    if (!index(quitchars, dirsym)) {
+	    if (index(quitchars, dirsym)) {
+		/* remove the prompt string */
+		clear_nhwindow(WIN_MESSAGE);
+	    } else {
 		help_requested = (dirsym == '?');
 		if (help_requested || iflags.cmdassist) {
 		    did_help = help_dir((s && *s == '^') ? dirsym : 0,
