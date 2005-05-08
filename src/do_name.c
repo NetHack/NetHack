@@ -23,11 +23,6 @@ nextmbuf()
 	return bufs[bufidx];
 }
 
-/* same definition as in cmd.c */
-#ifndef C
-#define C(a) ((a) & 0x1f)	/* ^a */
-#endif
-
 /* the response for '?' help request in getpos() */
 STATIC_OVL void
 getpos_help(force, goal)
@@ -71,6 +66,7 @@ const char *goal;
     const char *sdp;
     if(iflags.num_pad) sdp = ndir; else sdp = sdir;	/* DICE workaround */
 
+    if (!goal) goal = "desired location";
     if (flags.verbose) {
 	pline("(For instructions type a ?)");
 	msg_given = TRUE;
@@ -80,8 +76,8 @@ const char *goal;
 #ifdef CLIPPING
     cliparound(cx, cy);
 #endif
-    curs(WIN_MAP, cx,cy);
     flush_screen(0);
+    curs(WIN_MAP, cx, cy);
 #ifdef MAC
     lock_mouse_cursor(TRUE);
 #endif
@@ -139,10 +135,14 @@ const char *goal;
 	    goto nxtc;
 	}
 
-	if(c == '?'){
-	    getpos_help(force, goal);
-	} else if (c == C('r')) {		/* ^R */
-	    docrt();		/* redraw */
+	if (c == '?' || redraw_cmd(c)) {
+	    if (c == '?')
+		getpos_help(force, goal);
+	    else		/* ^R */
+		docrt();	/* redraw */
+	    /* update message window to reflect that we're still targetting */
+	    pline("Move cursor to %s:", goal);
+	    msg_given = TRUE;
 	} else {
 	    if (!index(quitchars, c)) {
 		char matching[MAXPCHARS];
@@ -197,8 +197,8 @@ const char *goal;
 #ifdef CLIPPING
 	cliparound(cx, cy);
 #endif
-	curs(WIN_MAP,cx,cy);
 	flush_screen(0);
+	curs(WIN_MAP, cx, cy);
     }
 #ifdef MAC
     lock_mouse_cursor(FALSE);

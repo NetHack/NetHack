@@ -1301,6 +1301,7 @@ minimal_enlightenment()
 	return (n != -1);
 }
 
+/* ^X command */
 STATIC_PTR int
 doattributes()
 {
@@ -1654,6 +1655,13 @@ add_debug_extended_commands()
 	}
 }
 
+/* decide whether a character (user input keystroke) requests screen repaint */
+boolean
+redraw_cmd(c)
+char c;
+{
+    return (c == C('r') || (iflags.num_pad && c == C('l')));
+}
 
 static const char template[] = "%-18s %4ld  %6ld";
 static const char count_str[] = "                   count  bytes";
@@ -2171,7 +2179,7 @@ const char *s;
 	    dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
 					(char *)0, '\0');
 
-	if (dirsym == C('r')) {		/* ^R */
+	if (redraw_cmd(dirsym)) {		/* ^R */
 	    docrt();		/* redraw */
 	    goto retry;
 	}

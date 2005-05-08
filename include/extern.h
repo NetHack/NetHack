@@ -155,12 +155,13 @@ E boolean NDECL(status_hilite_menu);
 
 /* ### cmd.c ### */
 
+E boolean FDECL(redraw_cmd, (CHAR_P));
 #ifdef USE_TRAMPOLI
 E int NDECL(doextcmd);
 E int NDECL(domonability);
 E int NDECL(doprev_message);
 E int NDECL(timed_occupation);
-E int NDECL(wiz_attributes);
+E int NDECL(doattributes);
 E int NDECL(enter_explore_mode);
 # ifdef WIZARD
 E int NDECL(wiz_detect);
