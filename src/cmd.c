@@ -2178,6 +2178,8 @@ const char *s;
 #endif
 	    dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
 					(char *)0, '\0');
+	/* remove the prompt string so caller won't have to */
+	clear_nhwindow(WIN_MESSAGE);
 
 	if (redraw_cmd(dirsym)) {		/* ^R */
 	    docrt();		/* redraw */
@@ -2192,10 +2194,7 @@ const char *s;
 	} else if (!movecmd(dirsym) && !u.dz) {
 	    boolean did_help = FALSE, help_requested;
 
-	    if (index(quitchars, dirsym)) {
-		/* remove the prompt string */
-		clear_nhwindow(WIN_MESSAGE);
-	    } else {
+	    if (!index(quitchars, dirsym)) {
 		help_requested = (dirsym == '?');
 		if (help_requested || iflags.cmdassist) {
 		    did_help = help_dir((s && *s == '^') ? dirsym : 0,
