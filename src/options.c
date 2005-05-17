@@ -3046,16 +3046,20 @@ boolean setinitial,setfromfile;
 	} else if (opt_idx == 0) {	/* add new */
 		getlin("What new autopickup exception pattern?", &apebuf[1]);
 		mungspaces(&apebuf[1]);	/* regularize whitespace */
-		if (apebuf[1] && apebuf[1] != '\033') {
-		    apebuf[0] = '\"';
-		    /* guarantee room for \" prefix and \"\0 suffix;
-		       -2 is good enough for apebuf[] but -3 makes
-		       sure the whole thing fits within normal BUFSZ */
-		    apebuf[sizeof apebuf - 3] = '\0';
-		    Strcat(apebuf, "\"");
-		    add_autopickup_exception(apebuf);
+		if (apebuf[1] == '\033') {
+		    ;	/* fall through to function exit */
+		} else {
+		    if (apebuf[1]) {
+			apebuf[0] = '\"';
+			/* guarantee room for \" prefix and \"\0 suffix;
+			   -2 is good enough for apebuf[] but -3 makes
+			   sure the whole thing fits within normal BUFSZ */
+			apebuf[sizeof apebuf - 3] = '\0';
+			Strcat(apebuf, "\"");
+			add_autopickup_exception(apebuf);
+		    }
 		    goto ape_again;
-		} /* else fall through to function exit */
+		}
 	} else {	/* list or remove */
 		tmpwin = create_nhwindow(NHW_MENU);
 		start_menu(tmpwin);
