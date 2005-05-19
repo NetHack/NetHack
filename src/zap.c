@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2005/04/20	*/
+/*	SCCS Id: @(#)zap.c	3.5	2005/05/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -472,15 +472,16 @@ coord *cc;
 		/* Get these ones from mtmp */
 		mtmp2->minvent = mtmp->minvent; /*redundant*/
 		/* monster ID is available if the monster died in the current
-		   game, but should be zero if the corpse was in a bones level
+		   game, but will be zero if the corpse was in a bones level
 		   (we cleared it when loading bones) */
-		if (!mtmp2->m_id)
+		if (mtmp->m_id) {
 		    mtmp2->m_id = mtmp->m_id;
-		/* might be bringing quest leader back to life */
-		else if (quest_status.leader_is_dead &&
-			/* leader_is_dead implies that leader_m_id is valid */
-			mtmp2->m_id == quest_status.leader_m_id)
-		    quest_status.leader_is_dead = FALSE;
+		    /* might be bringing quest leader back to life */
+		    if (quest_status.leader_is_dead &&
+			    /* leader_is_dead implies leader_m_id is valid */
+			    mtmp2->m_id == quest_status.leader_m_id)
+			quest_status.leader_is_dead = FALSE;
+		}
 		mtmp2->mx   = mtmp->mx;
 		mtmp2->my   = mtmp->my;
 		mtmp2->mux  = mtmp->mux;
