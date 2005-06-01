@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.91 $ $Date: 2005/01/22 15:27:20 $
+% $Revision: 1.92 $ $Date: 2005/01/23 14:33:46 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2514,7 +2514,11 @@ makes sense for windowing system interfaces that implement this feature.
 \item[\ib{pettype}]
 Specify the type of your initial pet, if you are playing a character class
 that uses multiple types of pets; or choose to have no initial pet at all.
-Possible values are ``{\tt cat}'', ``{\tt dog}'' and ``{\tt none}''.
+Possible values are ``{\tt cat}'', ``{\tt dog}'', ``{\tt horse}''
+and ``{\tt none}''.
+If the choice is not allowed for the role you are currently playing,
+it will be silently ignored.  For example, ``{\tt horse}'' will only be
+honored when playing a knight.
 Cannot be set with the `{\tt O}' command.
 %.Ip
 \item[\ib{pickup\_burden}]

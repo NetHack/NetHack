@@ -1200,20 +1200,25 @@ boolean tinitial, tfrom_file;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if ((op = string_for_env_opt(fullname, opts, negated)) != 0) {
 		    if (negated) bad_negation(fullname, TRUE);
-		    else switch (*op) {
+		    else switch (lowc(*op)) {
 			case 'd':	/* dog */
-			case 'D':
 			    preferred_pet = 'd';
 			    break;
 			case 'c':	/* cat */
-			case 'C':
 			case 'f':	/* feline */
-			case 'F':
 			    preferred_pet = 'c';
 			    break;
+			case 'h':	/* horse */
+			case 'q':	/* quadruped */
+			    /* avoids giving "unrecognized type of pet" but
+			       pet_type(dog.c) won't actually honor this */
+			    preferred_pet = 'h';
+			    break;
 			case 'n':	/* no pet */
-			case 'N':
 			    preferred_pet = 'n';
+			    break;
+			case '*':	/* random */
+			    preferred_pet = '\0';
 			    break;
 			default:
 			    pline("Unrecognized pet type '%s'.", op);
@@ -3271,6 +3276,7 @@ char *buf;
 	else if (!strcmp(optname, "pettype"))
 		Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :
 				(preferred_pet == 'd') ? "dog" :
+				(preferred_pet == 'h') ? "horse" :
 				(preferred_pet == 'n') ? "none" : "random");
 	else if (!strcmp(optname, "pickup_burden"))
 		Sprintf(buf, "%s", burdentype[flags.pickup_burden] );
