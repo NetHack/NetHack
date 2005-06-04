@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2005/03/28	*/
+/*	SCCS Id: @(#)do.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -482,7 +482,7 @@ register struct obj *obj;
 		return(1);
 	    }
 #endif
-	    if (!can_reach_floor()) {
+	    if (!can_reach_floor(TRUE)) {
 		if(flags.verbose) You("drop %s.", doname(obj));
 #ifndef GOLDOBJ
 		if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);

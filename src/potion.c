@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2005/04/23	*/
+/*	SCCS Id: @(#)potion.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -342,7 +342,9 @@ dodrink()
 		return 0;
 	}
 	/* Is there a fountain to drink from here? */
-	if (IS_FOUNTAIN(levl[u.ux][u.uy].typ) && can_reach_floor()) {
+	if (IS_FOUNTAIN(levl[u.ux][u.uy].typ) &&
+		/* not as low as floor level but similar restrictions apply */
+		can_reach_floor(FALSE)) {
 		if(yn("Drink from the fountain?") == 'y') {
 			drinkfountain();
 			return 1;
@@ -350,7 +352,9 @@ dodrink()
 	}
 #ifdef SINKS
 	/* Or a kitchen sink? */
-	if (IS_SINK(levl[u.ux][u.uy].typ) && can_reach_floor()) {
+	if (IS_SINK(levl[u.ux][u.uy].typ) &&
+		/* not as low as floor level but similar restrictions apply */
+		can_reach_floor(FALSE)) {
 		if (yn("Drink from the sink?") == 'y') {
 			drinksink();
 			return 1;

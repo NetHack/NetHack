@@ -597,7 +597,8 @@ E void FDECL(restore_killers, (int));
 
 E char *FDECL(random_engraving, (char *));
 E void FDECL(wipeout_text, (char *,int,unsigned));
-E boolean NDECL(can_reach_floor);
+E boolean FDECL(can_reach_floor, (BOOLEAN_P));
+E void FDECL(cant_reach_floor, (int,int,BOOLEAN_P,BOOLEAN_P));
 E const char *FDECL(surface, (int,int));
 E const char *FDECL(ceiling, (int,int));
 E struct engr *FDECL(engr_at, (XCHAR_P,XCHAR_P));

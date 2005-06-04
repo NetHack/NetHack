@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2005/04/06	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -413,7 +413,7 @@ int what;		/* should be a long */
 		}
 
 		/* no pickup if levitating & not on air or water level */
-		if (!can_reach_floor()) {
+		if (!can_reach_floor(TRUE)) {
 		    if ((multi && !context.run) ||
 			    (autopickup && !flags.pickup) ||
 			    (ttmp && uteetering_at_seen_pit(ttmp)))
@@ -1464,13 +1464,13 @@ boolean looting;	/* loot vs tip */
 {
 	const char *verb = looting ? "loot" : "tip";
 
-	if (!can_reach_floor()) {
+	if (!can_reach_floor(TRUE)) {
 #ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
 			rider_cant_reach(); /* not skilled enough to reach */
 		else
 #endif
-			You("cannot reach the %s.", surface(x, y));
+			cant_reach_floor(x, y, FALSE, TRUE);
 		return FALSE;
 	} else if ((is_pool(x, y) && (looting || !Underwater)) ||
 		    is_lava(x, y)) {
@@ -2591,7 +2591,7 @@ struct obj *box;	/* or bag */
     if (empty_it) {
 	struct obj *otmp, *nobj;
 	boolean verbose = FALSE,
-		highdrop = !can_reach_floor(),
+		highdrop = !can_reach_floor(TRUE),
 		altarizing = IS_ALTAR(levl[u.ux][u.uy].typ),
 		cursed_mbag = (Is_mbag(box) && box->cursed);
 	int held = carried(box);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2005/04/13	*/
+/*	SCCS Id: @(#)apply.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -169,7 +169,7 @@ int rx, ry, *resp;
     struct obj *corpse = sobj_at(CORPSE, rx, ry),
 	       *statue = sobj_at(STATUE, rx, ry);
 
-    if (!can_reach_floor()) {	/* levitation or unskilled riding */
+    if (!can_reach_floor(TRUE)) {	/* levitation or unskilled riding */
 	corpse = 0;		/* can't reach corpse on floor */
 	/* you can't reach tiny statues (even though you can fight
 	   tiny monsters while levitating--consistency, what's that?) */
@@ -322,9 +322,8 @@ use_stethoscope(obj)
 	} else if (u.dz) {
 		if (Underwater)
 		    You_hear("faint splashing.");
-		else if (u.dz < 0 || !can_reach_floor())
-		    You_cant("reach the %s.",
-			(u.dz > 0) ? surface(u.ux,u.uy) : ceiling(u.ux,u.uy));
+		else if (u.dz < 0 || !can_reach_floor(TRUE))
+		    cant_reach_floor(u.ux, u.uy, (u.dz < 0), TRUE);
 		else if (its_dead(u.ux, u.uy, &res))
 		    ;	/* message already given */
 		else if (Is_stronghold(&u.uz))

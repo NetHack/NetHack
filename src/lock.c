@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lock.c	3.5	2000/02/06	*/
+/*	SCCS Id: @(#)lock.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -240,7 +240,7 @@ pick_lock(pick) /* pick a lock with a given object */
 		pline(no_longer, "hold the", what);
 		reset_pick();
 		return 0;
-	    } else if (xlock.box && !can_reach_floor()) {
+	    } else if (xlock.box && !can_reach_floor(TRUE)) {
 		pline(no_longer, "reach the", "lock");
 		reset_pick();
 		return 0;
@@ -290,7 +290,7 @@ pick_lock(pick) /* pick a lock with a given object */
 	    for(otmp = level.objects[cc.x][cc.y]; otmp; otmp = otmp->nexthere)
 		if (Is_box(otmp)) {
 		    ++count;
-		    if (!can_reach_floor()) {
+		    if (!can_reach_floor(TRUE)) {
 			You_cant("reach %s from up here.", the(xname(otmp)));
 			return 0;
 		    }

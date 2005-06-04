@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2004/11/11	*/
+/*	SCCS Id: @(#)hack.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1944,7 +1944,7 @@ dopickup()
 	    There("is nothing here to pick up.");
 	    return 0;
 	}
-	if (!can_reach_floor()) {
+	if (!can_reach_floor(TRUE)) {
 	    if (traphere && uteetering_at_seen_pit(traphere))
 		You("cannot reach the bottom of the pit.");
 #ifdef STEED

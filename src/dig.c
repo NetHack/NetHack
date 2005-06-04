@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.5	2005/04/13	*/
+/*	SCCS Id: @(#)dig.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -880,6 +880,7 @@ struct obj *obj;
 {
 	register int rx, ry;
 	register struct rm *lev;
+	struct trap *trap;
 	int dig_target;
 	boolean ispick = is_pick(obj);
 	const char *verbing = ispick ? "digging" : "chopping";
@@ -919,8 +920,7 @@ struct obj *obj;
 		dig_target = dig_typ(obj, rx, ry);
 		if (dig_target == DIGTYP_UNDIGGABLE) {
 			/* ACCESSIBLE or POOL */
-			struct trap *trap = t_at(rx, ry);
-
+			trap = t_at(rx, ry);
 			if (trap && trap->ttyp == WEB) {
 			    if (!trap->tseen) {
 				seetrap(trap);
@@ -994,12 +994,17 @@ struct obj *obj;
 	} else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) {
 		/* it must be air -- water checked above */
 		You("swing %s through thin air.", yobjnam(obj, (char *)0));
-	} else if (!can_reach_floor()) {
-		You_cant("reach the %s.", surface(u.ux,u.uy));
+	} else if (!can_reach_floor(FALSE)) {
+		cant_reach_floor(u.ux, u.uy, FALSE, FALSE);
 	} else if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) {
 		/* Monsters which swim also happen not to be able to dig */
 		You("cannot stay under%s long enough.",
 				is_pool(u.ux, u.uy) ? "water" : " the lava");
+	} else if ((trap = t_at(u.ux, u.uy)) != 0 &&
+		    uteetering_at_seen_pit(trap)) {
+		dotrap(trap, FORCEBUNGLE);
+		/* might escape trap and still be teetering at brink */
+		if (!u.utrap) cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
 	} else if (!ispick) {
 		pline("%s merely scratches the %s.",
 				Yobjnam2(obj, (char *)0), surface(u.ux,u.uy));

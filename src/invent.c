@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2005/04/06	*/
+/*	SCCS Id: @(#)invent.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2257,7 +2257,7 @@ boolean picked_some;
 		}
 		if (dfeature && !drift && !strcmp(dfeature, surface(u.ux,u.uy)))
 			dfeature = 0;		/* ice already identifed */
-		if (!can_reach_floor()) {
+		if (!can_reach_floor(TRUE)) {
 			pline("But you can't reach it!");
 			return(0);
 		}

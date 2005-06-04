@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2005/04/13	*/
+/*	SCCS Id: @(#)trap.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3268,7 +3268,7 @@ boolean force_failure;
 	    }
 	}
 	/* untrappable traps are located on the ground. */
-	if (!can_reach_floor()) {
+	if (!can_reach_floor(TRUE)) {
 #ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
 			You("aren't skilled enough to reach from %s.",

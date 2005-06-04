@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2005/04/08	*/
+/*	SCCS Id: @(#)eat.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2515,7 +2515,7 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 	boolean feeding = (!strcmp(verb, "eat"));
 
 	/* if we can't touch floor objects then use invent food only */
-	if (!can_reach_floor() ||
+	if (!can_reach_floor(TRUE) ||
 #ifdef STEED
 		(feeding && u.usteed) || /* can't eat off floor while riding */
 #endif

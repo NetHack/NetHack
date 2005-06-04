@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sit.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)sit.c	3.5	2005/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -53,7 +53,7 @@ dosit()
 	if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER)
 	    u.uundetected = 0;		/* no longer on the ceiling */
 
-	if (!can_reach_floor()) {
+	if (!can_reach_floor(FALSE)) {
 	    if (Levitation)
 		You("tumble in place.");
 	    else
@@ -73,16 +73,15 @@ dosit()
 	    if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
 		pline("It's not very comfortable...");
 
-	} else if (trap != 0 ||
-		   (u.utrap && (u.utraptype >= TT_LAVA))) {
-
+	} else if (trap != 0 || (u.utrap && (u.utraptype >= TT_LAVA))) {
 	    if (u.utrap) {
 		exercise(A_WIS, FALSE);	/* you're getting stuck longer */
-		if(u.utraptype == TT_BEARTRAP) {
-		    You_cant("sit down with your %s in the bear trap.", body_part(FOOT));
+		if (u.utraptype == TT_BEARTRAP) {
+		    You_cant("sit down with your %s in the bear trap.",
+			     body_part(FOOT));
 		    u.utrap++;
-	        } else if(u.utraptype == TT_PIT) {
-		    if(trap && trap->ttyp == SPIKED_PIT) {
+		} else if (u.utraptype == TT_PIT) {
+		    if (trap && trap->ttyp == SPIKED_PIT) {
 			You("sit down on a spike.  Ouch!");
 			losehp(Half_physical_damage ? rn2(2) : 1,
 				"sitting on an iron spike", KILLED_BY);
@@ -90,20 +89,21 @@ dosit()
 		    } else
 			You("sit down in the pit.");
 		    u.utrap += rn2(5);
-		} else if(u.utraptype == TT_WEB) {
+		} else if (u.utraptype == TT_WEB) {
 		    You("sit in the spider web and get entangled further!");
 		    u.utrap += rn1(10, 5);
-		} else if(u.utraptype == TT_LAVA) {
+		} else if (u.utraptype == TT_LAVA) {
 		    /* Must have fire resistance or they'd be dead already */
 		    You("sit in the lava!");
 		    u.utrap += rnd(4);
 		    losehp(d(2,10), "sitting in lava", KILLED_BY); /* lava damage */
-		} else if(u.utraptype == TT_INFLOOR || u.utraptype == TT_BURIEDBALL) {
+		} else if (u.utraptype == TT_INFLOOR ||
+			u.utraptype == TT_BURIEDBALL) {
 		    You_cant("maneuver to sit!");
 		    u.utrap++;
 		}
 	    } else {
-	        You("sit down.");
+		You("sit down.");
 		dotrap(trap, 0);
 	    }
 	} else if(Underwater || Is_waterlevel(&u.uz)) {
