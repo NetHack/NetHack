@@ -845,10 +845,12 @@ register int pm;
 		tmp += 20;
 		if (youmonst.data->mlet != S_MIMIC && !Unchanging) {
 		    char buf[BUFSZ];
+
+		    u.uconduct.polyselfs++;	/* you're changing form */
 		    You_cant("resist the temptation to mimic %s.",
 			Hallucination ? "an orange" : "a pile of gold");
 #ifdef STEED
-                    /* A pile of gold can't ride. */
+		    /* A pile of gold can't ride. */
 		    if (u.usteed) dismount_steed(DISMOUNT_FELL);
 #endif
 		    nomul(-tmp);

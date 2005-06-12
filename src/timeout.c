@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.5	2005/01/31	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2005/06/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -238,6 +238,7 @@ nh_timeout()
 			    Strcpy(killer.name, "killed by petrification");
 			}
 			dealloc_killer(kptr);
+			/* (unlike sliming, you aren't changing form here) */
 			done(STONING);
 			break;
 		case SLIMED:
@@ -249,6 +250,8 @@ nh_timeout()
 			    Strcpy(killer.name, "turned into green slime");
 			}
 			dealloc_killer(kptr);
+			/* involuntarily break "never changed form" conduct */
+			u.uconduct.polyselfs++;
 			done(TURNED_SLIME);
 			break;
 		case VOMITING:
