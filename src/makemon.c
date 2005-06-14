@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.5	2004/06/12	*/
+/*	SCCS Id: @(#)makemon.c	3.5	2005/06/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1453,7 +1453,7 @@ struct monst *mtmp, *victim;
 	if ((int)++mtmp->m_lev >= mons[newtype].mlevel && newtype != oldtype) {
 	    ptr = &mons[newtype];
 	    if (mvitals[newtype].mvflags & G_GENOD) {	/* allow G_EXTINCT */
-		if (sensemon(mtmp))
+		if (canspotmon(mtmp))
 		    pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
 			an(ptr->mname), mhe(mtmp),
 			nonliving(ptr) ? "expires" : "dies");
