@@ -243,6 +243,13 @@ boolean talk;
 	if (u_could_see ^ can_see_now) {  /* one or the other but not both */
 	    context.botl = 1;
 	    vision_full_recalc = 1;	/* blindness just got toggled */
+	    /* this vision recalculation used to be deferred until
+	       moveloop(), but that made it possible for vision
+	       irregularities to occur (cited case was force bolt
+	       hitting adjacent potion of blindness and then a
+	       secret door; hero was blinded by vapors but then
+	       got the message "a door appears in the wall") */
+	    vision_recalc(0);
 	    if (Blind_telepat || Infravision) see_monsters();
 	}
 }
