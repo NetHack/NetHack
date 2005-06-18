@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.5	2003/08/13	*/
+/*	SCCS Id: @(#)pager.c	3.5	2005/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,7 +64,7 @@ lookat(x, y, buf, monbuf)
 
     buf[0] = monbuf[0] = 0;
     glyph = glyph_at(x,y);
-    if (u.ux == x && u.uy == y && senseself()) {
+    if (u.ux == x && u.uy == y && canspotself()) {
 	char race[QBUFSZ];
 
 	/* if not polymorphed, show both the role and the race */

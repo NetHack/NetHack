@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)display.h	3.5	1999/11/30	*/
+/*	SCCS Id: @(#)display.h	3.5	2005/06/21	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -126,14 +126,17 @@
 /*
  * canseeself()
  * senseself()
+ * canspotself()
  *
  * This returns true if the hero can see her/himself.
  *
- * The u.uswallow check assumes that you can see yourself even if you are
- * invisible.  If not, then we don't need the check.
+ * Sensing yourself by touch is treated as seeing yourself, even if
+ * unable to see.  So when blind, being invisible won't affect your
+ * self-perception, and when swallowed, the enclosing monster touches.
  */
 #define canseeself()	(Blind || u.uswallow || (!Invisible && !u.uundetected))
-#define senseself()	(canseeself() || Unblind_telepat || Detect_monsters)
+#define senseself()	(Unblind_telepat || Detect_monsters)
+#define canspotself()	(canseeself() || senseself())
 
 /*
  * random_monster()

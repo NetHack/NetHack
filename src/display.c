@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)display.c	3.5	2003/02/19	*/
+/*	SCCS Id: @(#)display.c	3.5	2005/06/21	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -672,7 +672,7 @@ newsym(x,y)
 	    return;
 	}
 	if (x == u.ux && y == u.uy) {
-	    if (senseself()) {
+	    if (canspotself()) {
 		_map_location(x,y,0);	/* map *under* self */
 		display_self();
 	    } else
@@ -714,7 +714,7 @@ newsym(x,y)
 	if (x == u.ux && y == u.uy) {
 	    feel_location(u.ux, u.uy);		/* forces an update */
 
-	    if (senseself()) display_self();
+	    if (canspotself()) display_self();
 	}
 	else if ((mon = m_at(x,y))
 		&& ((see_it = (tp_sensemon(mon) || MATCH_WARN_OF_MON(mon)
