@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)eat.c	3.5	2005/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -514,13 +514,14 @@ register int pm;
 void
 fix_petrification()
 {
-	Stoned = 0;
-	dealloc_killer(find_delayed_killer(STONED));
-	if (Hallucination)
-	    pline("What a pity - you just ruined a future piece of %sart!",
-		  ACURR(A_CHA) > 15 ? "fine " : "");
-	else
-	    You_feel("limber!");
+    char buf[BUFSZ];
+
+    if (Hallucination)
+	Sprintf(buf, "What a pity--you just ruined a future piece of %sart!",
+		ACURR(A_CHA) > 15 ? "fine " : "");
+    else
+	Strcpy(buf, "You feel limber!");
+    make_stoned(0L, buf, 0, (char *)0);
 }
 
 /*
@@ -1836,10 +1837,10 @@ register struct obj *otmp;
 			!(poly_when_stoned(youmonst.data) &&
 			    polymon(PM_STONE_GOLEM))) {
 			if (!Stoned) {
-			    Stoned = 5;
 			    Sprintf(killer.name,
 				    "%s egg", mons[otmp->corpsenm].mname);
-			    delayed_killer(STONED, KILLED_BY_AN, killer.name);
+			    make_stoned(5L, (char *)0,
+					KILLED_BY_AN, killer.name);
 			}
 		    }
 		    /* note: no "tastes like chicken" message for eggs */

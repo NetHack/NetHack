@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2004/06/12	*/
+/*	SCCS Id: @(#)pray.c	3.5	2005/06/21	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -276,10 +276,7 @@ register int trouble;
 
 	switch (trouble) {
 	    case TROUBLE_STONED:
-		    You_feel("more limber.");
-		    Stoned = 0;
-		    context.botl = 1;
-		    dealloc_killer(find_delayed_killer(STONED));
+		    make_stoned(0L, "You feel more limber.", 0, (char *)0);
 		    break;
 	    case TROUBLE_SLIMED:
 		    make_slimed(0L, "The slime disappears.");

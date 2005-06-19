@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)potion.c	3.5	2005/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -151,6 +151,25 @@ const char *msg;
 	}
 	set_itimeout(&Slimed, xtime);
 	if (!Slimed) dealloc_killer(find_delayed_killer(SLIMED));
+}
+
+/* start or stop petrification */
+void
+make_stoned(xtime, msg, killedby, killername)
+long xtime;
+const char *msg;
+int killedby;
+const char *killername;
+{
+	long old = Stoned;
+
+	if ((!xtime && old) || (xtime && !old)) {
+	    if (msg) pline("%s", msg);
+	 /* context.botl = 1;   --- Stoned is not a status line item */
+	}
+	set_itimeout(&Stoned, xtime);
+	if (!Stoned) dealloc_killer(find_delayed_killer(STONED));
+	else if (!old) delayed_killer(STONED, killedby, killername);
 }
 
 void

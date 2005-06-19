@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2005/04/15	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2005/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1182,13 +1182,12 @@ dopois:
 				int kformat = KILLED_BY_AN;
 				const char *kname = mtmp->data->mname;
 
-				Stoned = 5;
 				if (mtmp->data->geno & G_UNIQ) {
 				    if (!type_is_pname(mtmp->data))
 					kname = the(kname);
 				    kformat = KILLED_BY;
 				}
-				delayed_killer(STONED, kformat, kname);
+				make_stoned(5L, (char *)0, kformat, kname);
 				return(1);
 				/* You("turn to stone..."); */
 				/* done_in_by(mtmp); */

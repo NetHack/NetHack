@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2005/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1571,8 +1571,8 @@ register struct attack *mattk;
 		You("eat %s brain!", s_suffix(mon_nam(mdef)));
 		u.uconduct.food++;
 		if (touch_petrifies(mdef->data) && !Stone_resistance && !Stoned) {
-		    Stoned = 5;
-		    delayed_killer(STONED, KILLED_BY_AN, mdef->data->mname);
+		    make_stoned(5L, (char *)0,
+				KILLED_BY_AN, mdef->data->mname);
 		}
 		if (!vegan(mdef->data))
 		    u.uconduct.unvegan++;

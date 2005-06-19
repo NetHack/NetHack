@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.5	2004/08/16	*/
+/*	SCCS Id: @(#)mthrowu.c	3.5	2005/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -404,8 +404,7 @@ struct obj *obj;		/* missile (or stack providing it) */
 			if (!Stoned && !Stone_resistance
 			    && !(poly_when_stoned(youmonst.data) &&
 				 polymon(PM_STONE_GOLEM))) {
-			    Stoned = 5;
-			    delayed_killer(STONED, KILLED_BY, nul);
+			    make_stoned(5L, (char *)0, KILLED_BY, nul);
 			}
 		    }
 		    stop_occupation();

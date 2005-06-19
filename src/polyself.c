@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.5	2005/04/13	*/
+/*	SCCS Id: @(#)polyself.c	3.5	2005/06/21	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -193,8 +193,7 @@ newman()
 	redist_attr();
 	u.uhunger = rn1(500,500);
 	if (Sick) make_sick(0L, (char *) 0, FALSE, SICK_ALL);
-	Stoned = 0;
-	dealloc_killer(find_delayed_killer(STONED));
+	if (Stoned) make_stoned(0L, (char *)0, 0, (char *)0);
 	if (u.uhp <= 0 || u.uhpmax <= 0) {
 		if (Polymorph_control) {
 		    if (u.uhp <= 0) u.uhp = 1;
@@ -407,10 +406,8 @@ int	mntmp;
 	}
 	if (Stoned && poly_when_stoned(&mons[mntmp])) {
 		/* poly_when_stoned already checked stone golem genocide */
-		You("turn to stone!");
 		mntmp = PM_STONE_GOLEM;
-		Stoned = 0;
-		dealloc_killer(find_delayed_killer(STONED));
+		make_stoned(0L, "You turn to stone!", 0, (char *)0);
 	}
 
 	u.mtimedone = rn1(500, 500);
@@ -423,9 +420,8 @@ int	mntmp;
 	if(strongmonst(&mons[mntmp])) ABASE(A_STR) = AMAX(A_STR) = STR18(100);
 
 	if (Stone_resistance && Stoned) { /* parnes@eniac.seas.upenn.edu */
-		Stoned = 0;
-		dealloc_killer(find_delayed_killer(STONED));
-		You("no longer seem to be petrifying.");
+		make_stoned(0L, "You no longer seem to be petrifying.",
+			    0, (char *)0);
 	}
 	if (Sick_resistance && Sick) {
 		make_sick(0L, (char *) 0, FALSE, SICK_ALL);
