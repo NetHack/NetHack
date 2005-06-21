@@ -2465,7 +2465,7 @@ struct obj *obj;	/* wand or spell */
 /* called for various wand and spell effects - M. Stephenson */
 void
 weffects(obj)
-register struct	obj	*obj;
+struct	obj	*obj;
 {
 	int otyp = obj->otyp;
 	boolean disclose = FALSE, was_unkn = !objects[otyp].oc_name_known;
@@ -2486,7 +2486,7 @@ register struct	obj	*obj;
 	    } else if (u.dz) {
 		disclose = zap_updown(obj);
 	    } else {
-		(void) bhit(u.dx,u.dy, rn1(8,6),ZAPPED_WAND, bhitm,bhito, obj);
+		(void) bhit(u.dx,u.dy, rn1(8,6),ZAPPED_WAND, bhitm,bhito, &obj);
 	    }
 	    /* give a clue if obj_zapped */
 	    if (obj_zapped)
@@ -2634,20 +2634,25 @@ int range, *skipstart, *skipend;
  *  function) several objects and monsters on its path.  The return value
  *  is the monster hit (weapon != ZAPPED_WAND), or a null monster pointer.
  *
+ * Thrown and kicked objects (THROWN_WEAPON or KICKED_WEAPON) may be
+ * destroyed and *pobj set to NULL to indicate this.
+ *
  *  Check !u.uswallow before calling bhit().
  *  This function reveals the absence of a remembered invisible monster in
  *  necessary cases (throwing or kicking weapons).  The presence of a real
  *  one is revealed for a weapon, but if not a weapon is left up to fhitm().
  */
 struct monst *
-bhit(ddx,ddy,range,weapon,fhitm,fhito,obj)
+bhit(ddx,ddy,range,weapon,fhitm,fhito,pobj)
 register int ddx,ddy,range;		/* direction and range */
 int weapon;				/* see values in hack.h */
 int FDECL((*fhitm), (MONST_P, OBJ_P)),	/* fns called when mon/obj hit */
     FDECL((*fhito), (OBJ_P, OBJ_P));
-struct obj *obj;			/* object tossed/used */
+struct obj **pobj;			/* object tossed/used, set to NULL
+					 * if object is destroyed */
 {
 	struct monst *mtmp;
+	struct obj *obj = *pobj;
 	uchar typ;
 	boolean shopdoor = FALSE, point_blank = TRUE;
 	boolean in_skip = FALSE, allow_skip = FALSE;
@@ -2697,9 +2702,10 @@ struct obj *obj;			/* object tossed/used */
 	    /* iron bars will block anything big enough */
 	    if ((weapon == THROWN_WEAPON || weapon == KICKED_WEAPON) &&
 		    typ == IRONBARS &&
-		    hits_bars(&obj, x - ddx, y - ddy,
+		    hits_bars(pobj, x - ddx, y - ddy,
 			      point_blank ? 0 : !rn2(5), 1)) {
 		/* caveat: obj might now be null... */
+		obj = *pobj;
 		bhitpos.x -= ddx;
 		bhitpos.y -= ddy;
 		break;

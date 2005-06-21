@@ -557,7 +557,8 @@ xchar x, y;
 	mon = bhit(u.dx, u.dy, range, KICKED_WEAPON,
 		   (int FDECL((*),(MONST_P,OBJ_P)))0,
 		   (int FDECL((*),(OBJ_P,OBJ_P)))0,
-		   kickobj);
+		   &kickobj);
+	if (!kickobj) return 1;		/* object broken */
 
 	if(mon) {
 	    if (mon->isshk &&

@@ -873,9 +873,10 @@ struct obj *obj;
     }
 }
 
+/* throw an object, NB: obj may be consumed in the process */
 void
 throwit(obj, wep_mask, twoweap)
-register struct obj *obj;
+struct obj *obj;
 long wep_mask;	/* used to re-equip returning boomerang */
 boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 {
@@ -1000,11 +1001,14 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		mon = bhit(u.dx, u.dy, range, THROWN_WEAPON,
 			   (int FDECL((*),(MONST_P,OBJ_P)))0,
 			   (int FDECL((*),(OBJ_P,OBJ_P)))0,
-			   obj);
+			   &obj);
+		thrownobj = obj;	/* obj may be null now */
 
 		/* have to do this after bhit() so u.ux & u.uy are correct */
 		if(Is_airlevel(&u.uz) || Levitation)
 		    hurtle(-u.dx, -u.dy, urange, TRUE);
+
+		if (!obj) return;
 	}
 
 	if (mon) {
@@ -1777,7 +1781,8 @@ struct obj *obj;
 			mon = bhit(u.dx, u.dy, range, THROWN_WEAPON,
 				   (int FDECL((*),(MONST_P,OBJ_P)))0,
 				   (int FDECL((*),(OBJ_P,OBJ_P)))0,
-				   obj);
+				   &obj);
+			if (!obj) return 1; /* object is gone */
 			if(mon) {
 			    if (ghitm(mon, obj))	/* was it caught? */
 				return 1;
