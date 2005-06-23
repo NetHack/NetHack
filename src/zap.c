@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2005/05/18	*/
+/*	SCCS Id: @(#)zap.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2381,7 +2381,7 @@ struct obj *obj;	/* wand or spell */
 				pline("A trap door beneath you closes up then vanishes.");
 				disclose = TRUE;
 			} else {
-				You("see a swirl of %s beneath you.",
+				You_see("a swirl of %s beneath you.",
 					is_ice(x,y) ? "frost" : "dust");
 			}
 		} else {

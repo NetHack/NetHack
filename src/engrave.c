@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)engrave.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)engrave.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -335,7 +335,7 @@ register int x,y;
 		 */
 		if(!Blind) {
 			sensed = 1;
-			You("see a message scrawled in blood here.");
+			You_see("a message scrawled in blood here.");
 		}
 		break;
 	    default:

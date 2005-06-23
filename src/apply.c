@@ -1,10 +1,9 @@
-/*	SCCS Id: @(#)apply.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)apply.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "edog.h"
-
 
 static const char tools[] = { TOOL_CLASS, WEAPON_CLASS, WAND_CLASS, 0 };
 static const char tools_too[] = { ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
@@ -1756,7 +1755,7 @@ long timeout;
 			You_feel("%s %s from your pack!", something,
 			    locomotion(mtmp->data,"drop"));
 		    else
-			You("see %s %s out of your pack%s!",
+			You_see("%s %s out of your pack%s!",
 			    monnambuf,
 			    locomotion(mtmp->data,"drop"),
 			    and_vanish);
@@ -1767,7 +1766,7 @@ long timeout;
 			if (suppress_see)
 				pline("%s suddenly vanishes!", an(xname(figurine)));
 			else
-				You("suddenly see a figurine transform into %s%s!",
+				You_see("a figurine transform into %s%s!",
 					monnambuf, and_vanish);
 			redraw = TRUE;	/* update figurine's map location */
 		    }
@@ -1781,12 +1780,11 @@ long timeout;
 			if (canseemon(figurine->ocarry)) {
 			    Sprintf(carriedby, "%s pack",
 				     s_suffix(a_monnam(mon)));
-			}
-			else if (is_pool(mon->mx, mon->my))
+			} else if (is_pool(mon->mx, mon->my))
 			    Strcpy(carriedby, "empty water");
 			else
 			    Strcpy(carriedby, "thin air");
-			You("see %s %s out of %s%s!", monnambuf,
+			You_see("%s %s out of %s%s!", monnambuf,
 			    locomotion(mtmp->data, "drop"), carriedby,
 			    and_vanish);
 		    }
@@ -2090,11 +2088,11 @@ struct obj *tstone;
 
     Sprintf(stonebuf, "stone%s", plur(tstone->quan));
     if (do_scratch)
-	pline("You make %s%sscratch marks on the %s.",
+	You("make %s%sscratch marks on the %s.",
 	      streak_color ? streak_color : (const char *)"",
 	      streak_color ? " " : "", stonebuf);
     else if (streak_color)
-	pline("You see %s streaks on the %s.", streak_color, stonebuf);
+	You_see("%s streaks on the %s.", streak_color, stonebuf);
     else
 	pline(scritch);
     return;
@@ -2493,7 +2491,7 @@ static const char
 
 /* Distance attacks by pole-weapons */
 STATIC_OVL int
-use_pole (obj)
+use_pole(obj)
 	struct obj *obj;
 {
 	int res = 0, typ, max_range = 4, min_range = 4;

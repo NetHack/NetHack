@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monmove.c	3.5	2004/06/12	*/
+/*	SCCS Id: @(#)monmove.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,7 +22,7 @@ mb_trapped(mtmp)
 register struct monst *mtmp;
 {
 	if (flags.verbose) {
-	    if (cansee(mtmp->mx, mtmp->my))
+	    if (cansee(mtmp->mx, mtmp->my) && !u.usleep)
 		pline("KABOOM!!  You see a door explode.");
 	    else if (!Deaf)
 		You_hear("a distant explosion.");
@@ -1139,7 +1139,7 @@ postmov:
 			} else {
 			    if (flags.verbose) {
 				if (canseeit)
-				   You("see a door unlock and open.");
+				   You_see("a door unlock and open.");
 				else if (!Deaf)
 				   You_hear("a door unlock and open.");
 			    }
@@ -1156,7 +1156,7 @@ postmov:
 			} else {
 			    if (flags.verbose) {
 				if (canseeit)
-				     You("see a door open.");
+				     You_see("a door open.");
 				else if (!Deaf)
 				     You_hear("a door open.");
 			    }
@@ -1174,7 +1174,7 @@ postmov:
 			} else {
 			    if (flags.verbose) {
 				if (canseeit)
-				    You("see a door crash open.");
+				    You_see("a door crash open.");
 				else if (!Deaf)
 				    You_hear("a door crash open.");
 			    }

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)do.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -345,10 +345,10 @@ giveback:
 		    You("don't see anything happen to the sink.");
 		    break;
 		case RIN_FREE_ACTION:
-		    You("see the ring slide right down the drain!");
+		    You_see("the ring slide right down the drain!");
 		    break;
 		case RIN_SEE_INVISIBLE:
-		    You("see some air in the sink.");
+		    You_see("some air in the sink.");
 		    break;
 		case RIN_STEALTH:
 		pline_The("sink seems to blend into the floor for a moment.");
@@ -1567,24 +1567,27 @@ struct obj *corpse;
 		}
 		break;
 	   case OBJ_CONTAINED:
-	   	if (container_where == OBJ_MINVENT && cansee(mtmp->mx, mtmp->my) &&
+	      {
+		char sackname[BUFSZ];
+
+		if (container_where == OBJ_MINVENT &&
+		    cansee(mtmp->mx, mtmp->my) &&
 		    mcarry && canseemon(mcarry) && container) {
-	   		pline("%s writhes out of %s!",
+			pline("%s writhes out of %s!",
 			      Amonnam(mtmp), yname(container));
-	   	} else if (container_where == OBJ_INVENT && container) {
-		        char sackname[BUFSZ];
-		        Strcpy(sackname, an(xname(container)));
-	   		pline("%s %s out of %s in your pack!",
-	   			Blind ? Something : Amonnam(mtmp),
+		} else if (container_where == OBJ_INVENT && container) {
+			Strcpy(sackname, an(xname(container)));
+			pline("%s %s out of %s in your pack!",
+				Blind ? Something : Amonnam(mtmp),
 				locomotion(mtmp->data,"writhes"),
-	   			sackname);
-	   	} else if (container_where == OBJ_FLOOR && container &&
-		            cansee(mtmp->mx, mtmp->my)) {
-		        char sackname[BUFSZ];
-		        Strcpy(sackname, an(xname(container)));
+				sackname);
+		} else if (container_where == OBJ_FLOOR && container &&
+			    cansee(mtmp->mx, mtmp->my)) {
+			Strcpy(sackname, an(xname(container)));
 			pline("%s escapes from %s!", Amonnam(mtmp), sackname);
 		}
 		break;
+	      }
 	    default:
 		/* we should be able to handle the other cases... */
 		impossible("revive_corpse: lost corpse @ %d", where);

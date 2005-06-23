@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.5	2004/08/02	*/
+/*	SCCS Id: @(#)dokick.c	3.5	2005/06/22	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -993,7 +993,7 @@ dokick()
 				      "Muddy waste pops up from the drain"));
 			if(!(maploc->looted & S_LRING)) { /* once per sink */
 			    if (!Blind)
-				You("see a ring shining in its midst.");
+				You_see("a ring shining in its midst.");
 			    (void) mkobj_at(RING_CLASS, x, y, TRUE);
 			    newsym(x, y);
 			    exercise(A_DEX, TRUE);

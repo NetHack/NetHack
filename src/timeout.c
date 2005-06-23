@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.5	2005/06/11	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -535,7 +535,7 @@ long timeout;
 			You_feel("%s %s from your pack!", something,
 			    locomotion(mon->data, "drop"));
 		    else
-			You("see %s %s out of your pack!",
+			You_see("%s %s out of your pack!",
 			    monnambuf, locomotion(mon->data, "drop"));
 		    if (yours) {
 			pline("%s cries sound like \"%s%s\"",
@@ -550,7 +550,7 @@ long timeout;
 		case OBJ_FLOOR:
 		    if (cansee_hatchspot) {
 			knows_egg = TRUE;
-			You("see %s hatch.", monnambuf);
+			You_see("%s hatch.", monnambuf);
 			redraw = TRUE;	/* update egg's map location */
 		    }
 		    break;
@@ -567,7 +567,7 @@ long timeout;
 			    Strcpy(carriedby, "empty water");
 			else
 			    Strcpy(carriedby, "thin air");
-			You("see %s %s out of %s!", monnambuf,
+			You_see("%s %s out of %s!", monnambuf,
 			    locomotion(mon->data, "drop"), carriedby);
 		    }
 		    break;
@@ -737,7 +737,7 @@ const char *tailer;
 		pline("%s flickers%s.", Yname2(obj), tailer);
 		break;
 	    case OBJ_FLOOR:
-		You("see %s flicker%s.", an(xname(obj)), tailer);
+		You_see("%s flicker%s.", an(xname(obj)), tailer);
 		break;
 	}
 }
@@ -755,7 +755,7 @@ struct obj *obj;
 		    pline("Batteries have not been invented yet.");
 		break;
 	    case OBJ_FLOOR:
-		You("see a lantern getting dim.");
+		You_see("a lantern getting dim.");
 		break;
 	    case OBJ_MINVENT:
 		pline("%s lantern is getting dim.",
@@ -827,7 +827,7 @@ long timeout;
 				    whose);
 				break;
 			    case OBJ_FLOOR:
-				You("see a burning potion of oil go out.");
+				You_see("a burning potion of oil go out.");
 				need_newsym = TRUE;
 				break;
 			}
@@ -865,7 +865,7 @@ long timeout;
 					      Yname2(obj));
 					break;
 				    case OBJ_FLOOR:
-					You("see %s about to go out.",
+					You_see("%s about to go out.",
 					    an(xname(obj)));
 					break;
 				}
@@ -887,10 +887,9 @@ long timeout;
 				    break;
 				case OBJ_FLOOR:
 				    if (obj->otyp == BRASS_LANTERN)
-					You("see a lantern run out of power.");
+					You_see("a lantern run out of power.");
 				    else
-					You("see %s go out.",
-					    an(xname(obj)));
+					You_see("%s go out.", an(xname(obj)));
 				    break;
 			    }
 			}
@@ -926,7 +925,7 @@ long timeout;
 					many ? "s are" : " is");
 				    break;
 				case OBJ_FLOOR:
-				    You("see %scandle%s getting short.",
+				    You_see("%scandle%s getting short.",
 					    menorah ? "a candelabrum's " :
 						many ? "some " : "a ",
 					    many ? "s" : "");
@@ -948,7 +947,7 @@ long timeout;
 					    many ? "" : "s");
 				    break;
 				case OBJ_FLOOR:
-				    You("see %scandle%s flame%s flicker low!",
+				    You_see("%scandle%s flame%s flicker low!",
 					    menorah ? "a candelabrum's " :
 						many ? "some " : "a ",
 					    many ? "s'" : "'s",
@@ -968,7 +967,7 @@ long timeout;
 					    whose, many ? "s die" : " dies");
 					break;
 				    case OBJ_FLOOR:
-					You("see a candelabrum's flame%s die.",
+					You_see("a candelabrum's flame%s die.",
 						many ? "s" : "");
 					break;
 				}
@@ -985,9 +984,9 @@ long timeout;
 					You see some wax candles consumed!
 					You see a wax candle consumed!
 					*/
-					You("see %s%s consumed!",
-					    many ? "some " : "",
-					    many ? xname(obj):an(xname(obj)));
+					You_see("%s%s consumed!",
+						many ? "some " : "",
+					   many ? xname(obj) : an(xname(obj)));
 					need_newsym = TRUE;
 					break;
 				}

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2004/06/12	*/
+/*	SCCS Id: @(#)mon.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2829,7 +2829,7 @@ register boolean silent;
 			if(nct) pline_The("guard%s get%s angry!",
 				nct == 1 ? "" : "s", nct == 1 ? "s" : "");
 			else if(!Blind)
-				You("see %sangry guard%s approaching!",
+				You_see("%sangry guard%s approaching!",
 				  sct == 1 ? "an " : "", sct > 1 ? "s" : "");
 		} else if(!Deaf)
 			You_hear("the shrill sound of a guard's whistle.");

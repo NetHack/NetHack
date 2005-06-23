@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dbridge.c	3.5	2003/02/08	*/
+/*	SCCS Id: @(#)dbridge.c	3.5	2005/06/22	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -746,7 +746,7 @@ int x,y;
 	x2 = x; y2 = y;
 	get_wall_for_db(&x2,&y2);
 	if (cansee(x,y) || cansee(x2,y2))
-		You("see a drawbridge %s up!",
+		You_see("a drawbridge %s up!",
 		    (((u.ux == x || u.uy == y) && !Underwater) ||
 		     distu(x2,y2) < distu(x,y)) ? "coming" : "going");
 	lev1->typ = DRAWBRIDGE_UP;
@@ -798,7 +798,7 @@ int x,y;
 	x2 = x; y2 = y;
 	get_wall_for_db(&x2,&y2);
 	if (cansee(x,y) || cansee(x2,y2))
-		You("see a drawbridge %s down!",
+		You_see("a drawbridge %s down!",
 		    (distu(x2,y2) < distu(x,y)) ? "going" : "coming");
 	lev1->typ = DRAWBRIDGE_DOWN;
 	lev2 = &levl[x2][y2];

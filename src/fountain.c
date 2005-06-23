@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)fountain.c	3.5	2005/04/23	*/
+/*	SCCS Id: @(#)fountain.c	3.5	2005/06/22	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -297,7 +297,7 @@ drinkfountain()
 			    	pline("Then it passes.");
 			    }
 			} else {
-			   You("see an image of someone stalking you.");
+			   You_see("an image of someone stalking you.");
 			   pline("But it disappears.");
 			}
 			HSee_invisible |= FROMOUTSIDE;

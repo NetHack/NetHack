@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.5	2002/09/10	*/
+/*	SCCS Id: @(#)dogmove.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -955,7 +955,7 @@ struct monst *mtmp;
 	mtmp->mappearance = qm[idx].mappearance;
 
 	newsym(mtmp->mx,mtmp->my);
-	You("see %s appear where %s was!",
+	You_see("%s appear where %s was!",
 		(mtmp->m_ap_type == M_AP_FURNITURE) ?
 			an(defsyms[mtmp->mappearance].explanation) :
 		(mtmp->m_ap_type == M_AP_OBJECT &&

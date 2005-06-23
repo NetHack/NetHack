@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pline.c	3.5	2004/11/22	*/
+/*	SCCS Id: @(#)pline.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -187,6 +187,23 @@ You_hear VA_DECL(const char *,line)
 		YouPrefix(tmp, "You dream that you hear ", line);
 	else
 		YouPrefix(tmp, "You hear ", line);
+	vpline(strcat(tmp, line), VA_ARGS);
+	VA_END();
+}
+
+/*VARARGS1*/
+void
+You_see VA_DECL(const char *,line)
+	char *tmp;
+
+	VA_START(line);
+	VA_INIT(line, const char *);
+	if (u.usleep)
+		YouPrefix(tmp, "You dream that you see ", line);
+	else if (Blind)	/* caller should have caught this... */
+		YouPrefix(tmp, "You sense ", line);
+	else
+		YouPrefix(tmp, "You see ", line);
 	vpline(strcat(tmp, line), VA_ARGS);
 	VA_END();
 }

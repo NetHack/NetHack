@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)trap.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -914,7 +914,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		feeltrap(trap);
 		if (!In_sokoban(&u.uz) && is_clinger(youmonst.data)) {
 		    if(trap->tseen) {
-			You("see %s %spit below you.", a_your[trap->madeby_u],
+			You_see("%s %spit below you.", a_your[trap->madeby_u],
 			    ttype == SPIKED_PIT ? "spiked " : "");
 		    } else {
 			pline("%s pit %sopens up under you!",
@@ -2007,7 +2007,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				  tower_of_flame,
 				  surface(mtmp->mx,mtmp->my), mon_nam(mtmp));
 			else if (see_it)  /* evidently `mtmp' is invisible */
-			    You("see a %s erupt from the %s!",
+			    You_see("a %s erupt from the %s!",
 				tower_of_flame, surface(mtmp->mx,mtmp->my));
 
 			if (resists_fire(mtmp)) {
@@ -2662,7 +2662,7 @@ domagictrap()
 		make_blinded((long)rn1(5,10),FALSE);
 		if (!Blind) Your(vision_clears);
 	  } else if (!Blind) {
-		You("see a flash of light!");
+		You_see("a flash of light!");
 	  } else if (!Deaf) {
 		You_hear("a deafening roar!");
 	  }

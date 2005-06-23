@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)detect.c	3.5	2003/08/13	*/
+/*	SCCS Id: @(#)detect.c	3.5	2005/06/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -842,9 +842,9 @@ struct obj *obj;
 	    case 3 : pline_The("crystal pulses with sinister %s light!",
 				hcolor((char *)0));
 		break;
-	    case 4 : You("see goldfish swimming above fluorescent rocks.");
+	    case 4 : You_see("goldfish swimming above fluorescent rocks.");
 		break;
-	    case 5 : You("see tiny snowflakes spinning around a miniature farmhouse.");
+	    case 5 : You_see("tiny snowflakes spinning around a miniature farmhouse.");
 		break;
 	    default: pline("Oh wow... like a kaleidoscope!");
 		break;
@@ -892,7 +892,7 @@ struct obj *obj;
 		default:
 		    {
 		    int i = rn2(SIZE(level_detects));
-		    You("see %s, %s.",
+		    You_see("%s, %s.",
 			level_detects[i].what,
 			level_distance(level_detects[i].where));
 		    }
@@ -902,7 +902,7 @@ struct obj *obj;
 
 	if (ret) {
 	    if (!rn2(100))  /* make them nervous */
-		You("see the Wizard of Yendor gazing out at you.");
+		You_see("the Wizard of Yendor gazing out at you.");
 	    else pline_The("vision is unclear.");
 	}
     }
@@ -1282,12 +1282,12 @@ sokoban_detect()
 	/* Map the background and boulders */
 	for (x = 1; x < COLNO; x++)
 	    for (y = 0; y < ROWNO; y++) {
-	    	levl[x][y].seenv = SVALL;
-	    	levl[x][y].waslit = TRUE;
-	    	map_background(x, y, 1);
-	    	for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
-	    	    if (obj->otyp == BOULDER)
-	    	    	map_object(obj, 1);
+		levl[x][y].seenv = SVALL;
+		levl[x][y].waslit = TRUE;
+		map_background(x, y, 1);
+		for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
+		    if (obj->otyp == BOULDER)
+			map_object(obj, 1);
 	    }
 
 	/* Map the traps */
