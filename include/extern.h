@@ -1636,6 +1636,7 @@ E const char *NDECL(bottlename);
 
 /* ### pray.c ### */
 
+E boolean FDECL(critically_low_hp, (BOOLEAN_P));
 #ifdef USE_TRAMPOLI
 E int NDECL(prayer_done);
 #endif
