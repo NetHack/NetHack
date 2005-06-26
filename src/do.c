@@ -1315,6 +1315,8 @@ boolean at_stairs, falling, portal;
 		You_hear("groans and moans everywhere.");
 	    } else pline("It is hot here.  You smell smoke...");
 	}
+	/* in case we've managed to bypass the Valley's stairway down */
+	if (Inhell && !Is_valley(&u.uz)) u.uevent.gehennom_entered = 1;
 
 	if (familiar) {
 	    static const char * const fam_msgs[4] = {
