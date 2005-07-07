@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.5	2005/03/26	*/
+/*	SCCS Id: @(#)shk.c	3.5	2005/07/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2245,28 +2245,35 @@ boolean ininv, dummy, silent;
 					     the(xname(obj)));
 		return;
 	    }
-	    Strcpy(buf, "\"For you, ");
-	    if (ANGRY(shkp)) Strcat(buf, "scum ");
-	    else {
-		static const char *honored[5] = {
-		  "good", "honored", "most gracious", "esteemed",
-		  "most renowned and sacred"
-		};
-		Strcat(buf, honored[rn2(4) + u.uevent.udemigod]);
-		if (!is_human(youmonst.data)) Strcat(buf, " creature");
-		else
-		    Strcat(buf, (flags.female) ? " lady" : " sir");
-	    }
-	    if(ininv) {
-		long quan = obj->quan;
-		obj->quan = 1L; /* fool xname() into giving singular */
-		pline("%s; only %ld %s %s.\"", buf, ltmp,
-			(quan > 1L) ? "per" : "for this", xname(obj));
-		obj->quan = quan;
-	    } else
+	    if (!ininv) {
 		pline("%s will cost you %ld %s%s.",
-			The(xname(obj)), ltmp, currency(ltmp),
-			(obj->quan > 1L) ? " each" : "");
+		      The(xname(obj)), ltmp, currency(ltmp),
+		      (obj->quan > 1L) ? " each" : "");
+	    } else {
+		/* (chooses among [0]..[3] normally; [1]..[4] after the
+		   Wizard has been killed or invocation ritual performed) */
+		static const char * const honored[] = {
+		    "good", "honored", "most gracious", "esteemed",
+		    "most renowned and sacred"
+		};
+		long save_quan = obj->quan;
+
+		Strcpy(buf, "\"For you, ");
+		if (ANGRY(shkp)) {
+		    Strcat(buf, "scum;");
+		} else {
+		    int idx = rn2(SIZE(honored) - 1) + u.uevent.udemigod;
+
+		    Strcat(buf, honored[idx]);
+		    Strcat(buf, !is_human(youmonst.data) ? " creature" :
+				(flags.female) ? " lady" : " sir");
+		    Strcat(buf, "; only");
+		}
+		obj->quan = 1L; /* fool xname() into giving singular */
+		pline("%s %ld %s %s %s.\"", buf, ltmp, currency(ltmp),
+		      (save_quan > 1L) ? "per" : "for this", xname(obj));
+		obj->quan = save_quan;
+	    }
 	} else if(!silent) {
 	    if(ltmp) pline_The("list price of %s is %ld %s%s.",
 				   the(xname(obj)), ltmp, currency(ltmp),
