@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.5	2005/02/09	*/
+/*	SCCS Id: @(#)steal.c	3.5	2005/07/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -531,8 +531,6 @@ boolean verbosely;
 	if (mon->mhp > 0) {
 	    mon->misc_worn_check &= ~obj->owornmask;
 	    update_mon_intrinsics(mon, obj, FALSE, TRUE);
-	 /* obj_no_longer_held(obj); -- done by place_object */
-	    if (obj->owornmask & W_WEP) setmnotwielded(mon, obj);
 #ifdef STEED
 	/* don't charge for an owned saddle on dead steed */
 	} else if (mon->mtame && (obj->owornmask & W_SADDLE) && 
@@ -540,8 +538,11 @@ boolean verbosely;
 	    obj->no_charge = 1;
 #endif
 	}
+	/* this should be done even if the monster has died */
+	if (obj->owornmask & W_WEP) setmnotwielded(mon, obj);
 	obj->owornmask = 0L;
     }
+ /* obj_no_longer_held(obj); -- done by place_object */
     if (verbosely && cansee(omx, omy))
 	pline("%s drops %s.", Monnam(mon), distant_name(obj, doname));
     if (!flooreffects(obj, omx, omy, "fall")) {
