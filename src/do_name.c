@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.5	2005/05/06	*/
+/*	SCCS Id: @(#)do_name.c	3.5	2005/07/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -453,6 +453,8 @@ const char *name;
 	    if (obj == uswapwep) untwoweapon();
 	    /* activate warning if you've just named your weapon "Sting" */
 	    if (obj == uwep) set_artifact_intrinsic(obj, TRUE, W_WEP);
+	    /* if obj is owned by a shop, increase your bill */
+	    if (obj->unpaid) alter_cost(obj, 0L);
 	}
 	if (carried(obj)) update_inventory();
 	return obj;
