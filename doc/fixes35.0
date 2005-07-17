@@ -135,6 +135,7 @@ plname is stored in the save file on all platforms now
 introduce support for negation of role, race, align, gender values to eliminate
 	them from random selection and the pick list of startup choices
 some intelligent pets will avoid cannibalism
+keep track of which monsters were cloned from other monsters
 
 
 Platform- and/or Interface-Specific New Features

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)mon.c	3.5	2005/07/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1614,13 +1614,12 @@ boolean was_swallowed;			/* digestion */
 	if (LEVEL_SPECIFIC_NOCORPSE(mdat))
 		return FALSE;
 
-	if (bigmonst(mdat) || mdat == &mons[PM_LIZARD]
-		   || is_golem(mdat)
-		   || is_mplayer(mdat)
-		   || is_rider(mdat))
+	if (((bigmonst(mdat) || mdat == &mons[PM_LIZARD]) && !mon->mcloned) ||
+	    is_golem(mdat) || is_mplayer(mdat) || is_rider(mdat))
 		return TRUE;
-	return (boolean) (!rn2((int)
-		(2 + ((int)(mdat->geno & G_FREQ)<2) + verysmall(mdat))));
+	tmp = 2 + ((mdat->geno & G_FREQ) < 2) + verysmall(mdat);
+	if (mon->mcloned) tmp += mvitals[monsndx(mdat)].died / 25;
+	return (boolean) !rn2(tmp);
 }
 
 /* drop (perhaps) a cadaver and remove monster */
@@ -1892,11 +1891,11 @@ xkilled(mtmp, dest)
 	    if(wasinside) spoteffects(TRUE);
 	} else if(x != u.ux || y != u.uy) {
 		/* might be here after swallowed */
-		if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE)
+		if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE) &&
 #ifdef KOPS
-					&& mdat->mlet != S_KOP
+		    mdat->mlet != S_KOP &&
 #endif
-							) {
+		    (!mtmp->mcloned || !rn2(mvitals[mndx].died / 5 + 1))) {
 			int typ;
 
 			otmp = mkobj_at(RANDOM_CLASS, x, y, TRUE);

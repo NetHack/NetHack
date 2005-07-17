@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monst.h	3.5	2004/06/12	*/
+/*	SCCS Id: @(#)monst.h	3.5	2005/07/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -76,13 +76,14 @@ struct monst {
 				 * but not mimic (that is, snake, spider,
 				 * trapper, piercer, eel)
 				 */
+	Bitfield(mcansee,1);	/* cansee 1, temp.blinded 0, blind 0 */
 
 	Bitfield(mspeed,2);	/* current speed */
 	Bitfield(permspeed,2);	/* intrinsic mspeed value */
 	Bitfield(mrevived,1);	/* has been revived from the dead */
+	Bitfield(mcloned,1);	/* has been cloned from another */
 	Bitfield(mavenge,1);	/* did something to deserve retaliation */
 	Bitfield(mflee,1);	/* fleeing */
-	Bitfield(mcansee,1);	/* cansee 1, temp.blinded 0, blind 0 */
 
 	Bitfield(mfleetim,7);	/* timeout for mflee */
 	Bitfield(msleeping,1);	/* asleep until woken */

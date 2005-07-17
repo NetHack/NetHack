@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worm.c	3.5	1995/01/28	*/
+/*	SCCS Id: @(#)worm.c	3.5	2005/07/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -380,6 +380,7 @@ cutworm(worm, x, y, weap)
     remove_monster(x, y);		/* clone_mon puts new head here */
     new_worm = clone_mon(worm, x, y);
     new_worm->wormno = new_wnum;	/* affix new worm number */
+    new_worm->mcloned = 0;	/* treat second worm as a normal monster */
 
     /* Devalue the monster level of both halves of the worm. */
     worm->m_lev = ((unsigned)worm->m_lev <= 3) ?
