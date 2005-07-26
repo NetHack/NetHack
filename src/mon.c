@@ -1800,19 +1800,17 @@ register struct monst *mtmp;
 /* the player has killed the monster mtmp */
 void
 xkilled(mtmp, dest)
-	register struct monst *mtmp;
+struct monst *mtmp;
 /*
  * Dest=1, normal; dest=0, don't print message; dest=2, don't drop corpse
  * either; dest=3, message but no corpse
  */
-	int	dest;
+int dest;
 {
-	register int tmp, x = mtmp->mx, y = mtmp->my;
-	register struct permonst *mdat;
-	int mndx;
-	register struct obj *otmp;
-	register struct trap *t;
-	boolean redisp = FALSE;
+	int tmp, mndx, x = mtmp->mx, y = mtmp->my;
+	struct permonst *mdat;
+	struct obj *otmp;
+	struct trap *t;
 	boolean wasinside = u.uswallow && (u.ustuck == mtmp);
 	boolean burycorpse = FALSE;
 
@@ -1881,52 +1879,48 @@ xkilled(mtmp, dest)
 #ifdef MAIL
 	if(mdat == &mons[PM_MAIL_DAEMON]) {
 		stackobj(mksobj_at(SCR_MAIL, x, y, FALSE, FALSE));
-		redisp = TRUE;
 	}
 #endif
-	if((!accessible(x, y) && !is_pool(x, y)) ||
-	   (x == u.ux && y == u.uy)) {
-	    /* might be mimic in wall or corpse in lava or on player's spot */
-	    redisp = TRUE;
-	    if(wasinside) spoteffects(TRUE);
-	} else if(x != u.ux || y != u.uy) {
-		/* might be here after swallowed */
-		if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE) &&
+	if (accessible(x, y) || is_pool(x, y)) {
+	    struct obj *cadaver;
+	    int otyp;
+
+	    /* illogical but traditional "treasure drop" */
+	    if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE) &&
+		    /* no extra item from swallower or steed */
+		    (x != u.ux || y != u.uy) &&
 #ifdef KOPS
+		    /* no extra item from kops--too easy to abuse */
 		    mdat->mlet != S_KOP &&
 #endif
+		    /* reduced chance of item from cloned monster */
 		    (!mtmp->mcloned || !rn2(mvitals[mndx].died / 5 + 1))) {
-			int typ;
-
-			otmp = mkobj_at(RANDOM_CLASS, x, y, TRUE);
-			/* Don't create large objects from small monsters */
-			typ = otmp->otyp;
-			if (mdat->msize < MZ_HUMAN && typ != FOOD_RATION
-			    && typ != LEASH
-			    && typ != FIGURINE
-			    && (otmp->owt > 3 ||
-				objects[typ].oc_big /*oc_bimanual/oc_bulky*/ ||
-				is_spear(otmp) || is_pole(otmp) ||
-				typ == MORNING_STAR)) {
-			    delobj(otmp);
-			} else redisp = TRUE;
+		otmp = mkobj_at(RANDOM_CLASS, x, y, TRUE);
+		/* don't create large objects from small monsters */
+		otyp = otmp->otyp;
+		if (mdat->msize < MZ_HUMAN && otyp != FOOD_RATION &&
+			otyp != LEASH && otyp != FIGURINE &&
+			(otmp->owt > 3 ||
+			 objects[otyp].oc_big /*oc_bimanual/oc_bulky*/ ||
+			 is_spear(otmp) || is_pole(otmp) ||
+			 otyp == MORNING_STAR)) {
+		    delobj(otmp);
 		}
-		/* Whether or not it always makes a corpse is, in theory,
-		 * different from whether or not the corpse is "special";
-		 * if we want both, we have to specify it explicitly.
-		 */
-		if (corpse_chance(mtmp, (struct monst *)0, FALSE)) {
-			struct obj *cadaver = make_corpse(mtmp, burycorpse ?
-					      CORPSTAT_BURIED : CORPSTAT_NONE);
-			if (burycorpse && cadaver && cansee(x,y) &&
-			    !mtmp->minvis &&
-			    cadaver->where == OBJ_BURIED && (dest & 1)) {
-				pline("%s corpse ends up buried.",
-					s_suffix(Monnam(mtmp)));
-			}
+	    }
+	    /* corpse--none if hero was inside the monster */
+	    if (!wasinside && corpse_chance(mtmp, (struct monst *)0, FALSE)) {
+		cadaver = make_corpse(mtmp, burycorpse ?
+				      CORPSTAT_BURIED : CORPSTAT_NONE);
+		if (burycorpse && cadaver && cansee(x,y) && !mtmp->minvis &&
+			cadaver->where == OBJ_BURIED && (dest & 1)) {
+		    pline("%s corpse ends up buried.", s_suffix(Monnam(mtmp)));
 		}
+	    }
 	}
-	if(redisp) newsym(x,y);
+	if (wasinside) spoteffects(TRUE);	/* poor man's expels() */
+	/* monster is gone, corpse or other object might now be visible */
+	newsym(x, y);
+
 cleanup:
 	/* punish bad behaviour */
 	if(is_human(mdat) && (!always_hostile(mdat) && mtmp->malign <= 0) &&
