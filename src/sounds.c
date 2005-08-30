@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sounds.c	3.5	2004/06/12	*/
+/*	SCCS Id: @(#)sounds.c	3.5	2005/08/29	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -159,17 +159,19 @@ dosounds()
 	    if (DEADMONSTER(mtmp)) continue;
 	    if ((is_undead(mtmp->data) || is_vampshifter(mtmp)) &&
 		mon_in_room(mtmp, MORGUE)) {
+		const char *hair = body_part(HAIR);	/* hair/fur/scales */
+
 		switch (rn2(2)+hallu) {
 		    case 0:
 			You("suddenly realize it is unnaturally quiet.");
 			break;
 		    case 1:
-			pline_The("%s on the back of your %s stands up.",
-				body_part(HAIR), body_part(NECK));
+			pline_The("%s on the back of your %s %s up.",
+				  hair, body_part(NECK), vtense(hair, "stand"));
 			break;
 		    case 2:
-			pline_The("%s on your %s seems to stand up.",
-				body_part(HAIR), body_part(HEAD));
+			pline_The("%s on your %s %s to stand up.",
+				  hair, body_part(HEAD), vtense(hair, "seem"));
 			break;
 		}
 		return;
