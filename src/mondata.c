@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.5	2005/01/29	*/
+/*	SCCS Id: @(#)mondata.c	3.5	2005/09/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -82,6 +82,8 @@ struct monst *mon;
 	struct obj *wep = ((mon == &youmonst) ? uwep : MON_WEP(mon));
 
 	return (boolean)(is_undead(ptr) || is_demon(ptr) || is_were(ptr) ||
+			 /* is_were() doesn't handle hero in human form */
+			 (mon == &youmonst && u.ulycn >= LOW_PM) ||
 			 ptr == &mons[PM_DEATH] || is_vampshifter(mon) ||
 			 (wep && wep->oartifact && defends(AD_DRLI, wep)));
 }
