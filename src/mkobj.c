@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2005/03/26	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2005/09/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1198,6 +1198,7 @@ int x, y;
 	panic("place_object: obj not free");
 
     obj_no_longer_held(otmp);
+    /* (could bypass this vision update if there is already a boulder here) */
     if (otmp->otyp == BOULDER) block_point(x,y);	/* vision */
 
     /* obj goes under boulders */
@@ -1349,9 +1350,11 @@ register struct obj *otmp;
 
     if (otmp->where != OBJ_FLOOR)
 	panic("remove_object: obj not on floor");
-    if (otmp->otyp == BOULDER) unblock_point(x,y); /* vision */
     extract_nexthere(otmp, &level.objects[x][y]);
     extract_nobj(otmp, &fobj);
+    /* update vision iff this was the only boulder at its spot */
+    if (otmp->otyp == BOULDER && !sobj_at(BOULDER, x, y))
+	unblock_point(x,y); /* vision */
     if (otmp->timed) obj_timer_checks(otmp,x,y,0);
 }
 
