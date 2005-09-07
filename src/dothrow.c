@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2005/03/18	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2005/09/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,7 +10,7 @@
 STATIC_DCL int FDECL(throw_obj, (struct obj *,int));
 STATIC_DCL void NDECL(autoquiver);
 STATIC_DCL int FDECL(gem_accept, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(tmiss, (struct obj *, struct monst *));
+STATIC_DCL void FDECL(tmiss, (struct obj *, struct monst *,BOOLEAN_P));
 STATIC_DCL int FDECL(throw_gold, (struct obj *));
 STATIC_DCL void FDECL(check_shop_obj, (struct obj *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 STATIC_DCL void FDECL(breakmsg, (struct obj *,BOOLEAN_P));
@@ -1168,9 +1168,10 @@ boolean mon_notices;
 
 /* thrown object misses target monster */
 STATIC_OVL void
-tmiss(obj, mon)
+tmiss(obj, mon, maybe_wakeup)
 struct obj *obj;
 struct monst *mon;
+boolean maybe_wakeup;
 {
     const char *missile = mshot_xname(obj);
 
@@ -1183,7 +1184,7 @@ struct monst *mon;
 	pline("%s %s.", The(missile), otense(obj, "miss"));
     else
 	miss(missile, mon);
-    if (!rn2(3)) wakeup(mon);
+    if (maybe_wakeup && !rn2(3)) wakeup(mon);
     return;
 }
 
@@ -1258,7 +1259,10 @@ register struct obj   *obj;
 	}
 
 	if (obj->oclass == GEM_CLASS && is_unicorn(mon->data)) {
-	    if (mon->mtame) {
+	    if (mon->msleeping || !mon->mcanmove) {
+		tmiss(obj, mon, FALSE);
+		return 0;
+	    } else if (mon->mtame) {
 		pline("%s catches and drops %s.", Monnam(mon), the(xname(obj)));
 		return 0;
 	    } else {
@@ -1362,7 +1366,7 @@ register struct obj   *obj;
 		}
 		passive_obj(mon, obj, (struct attack *)0);
 	    } else {
-		tmiss(obj, mon);
+		tmiss(obj, mon, TRUE);
 	    }
 
 	} else if (otyp == HEAVY_IRON_BALL) {
@@ -1376,7 +1380,7 @@ register struct obj   *obj;
 			return 1;	/* already did placebc() */
 		}
 	    } else {
-		tmiss(obj, mon);
+		tmiss(obj, mon, TRUE);
 	    }
 
 	} else if (otyp == BOULDER) {
@@ -1385,7 +1389,7 @@ register struct obj   *obj;
 		exercise(A_DEX, TRUE);
 		(void) hmon(mon,obj,1);
 	    } else {
-		tmiss(obj, mon);
+		tmiss(obj, mon, TRUE);
 	    }
 
 	} else if ((otyp == EGG || otyp == CREAM_PIE ||
@@ -1401,11 +1405,10 @@ register struct obj   *obj;
 
 	} else if (befriend_with_obj(mon->data, obj) ||
 		   (mon->mtame && dogfood(mon, obj) <= ACCFOOD)) {
-	    if (tamedog(mon, obj))
+	    if (tamedog(mon, obj)) {
 		return 1;           	/* obj is gone */
-	    else {
-		/* not tmiss(), which angers non-tame monsters */
-		miss(xname(obj), mon);
+	    } else {
+		tmiss(obj, mon, FALSE);
 		mon->msleeping = 0;
 		mon->mstrategy &= ~STRAT_WAITMASK;
 	    }
@@ -1426,7 +1429,7 @@ register struct obj   *obj;
 		Tobjnam(obj, "vanish"), s_suffix(mon_nam(mon)),
 		is_animal(u.ustuck->data) ? "entrails" : "currents");
 	} else {
-	    tmiss(obj, mon);
+	    tmiss(obj, mon, TRUE);
 	}
 
 	return 0;
