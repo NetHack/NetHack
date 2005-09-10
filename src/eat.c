@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2005/06/21	*/
+/*	SCCS Id: @(#)eat.c	3.5	2005/09/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -224,7 +224,7 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 	    if(food) {
 		You("choke over your %s.", foodword(food));
 		if (food->oclass == COIN_CLASS) {
-		    Strcpy(killer.name, "a very rich meal");
+		    Strcpy(killer.name, "very rich meal");
 		} else {
 		    Strcpy(killer.name, food_xname(food, FALSE));
 		    if (food->otyp == CORPSE &&
