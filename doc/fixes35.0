@@ -84,6 +84,7 @@ various actions--such as enchanting--performed on an unpaid shop object
 	either force the hero to buy the item (when its value is lowered) or
 	increase the current bill (when its value is raised)
 adjust health threshold where wounded hero will be healed by successful prayer
+prevent lose-level+regain-level cycle from arbritrarily boosting HP and Pw
 
 
 Platform- and/or Interface-Specific Fixes

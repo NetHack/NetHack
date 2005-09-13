@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)you.h	3.5	2000/05/21	*/
+/*	SCCS Id: @(#)you.h	3.5	2005/09/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -333,6 +333,7 @@ struct you {
 	uchar	uspmtime;		/* #moves between uspellprot-- */
 	int	uhp,uhpmax;
 	int	uen, uenmax;		/* magical energy - M. Stephenson */
+	xchar uhpinc[MAXULEV], ueninc[MAXULEV]; /* increases from level gain */
 	int ugangr;			/* if the gods are angry at you */
 	int ugifts;			/* number of artifacts bestowed */
 	int ublessed, ublesscnt;	/* blessing/duration from #pray */

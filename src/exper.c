@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)exper.c	3.5	2002/11/20	*/
+/*	SCCS Id: @(#)exper.c	3.5	2005/09/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -148,20 +148,14 @@ const char *drainer;	/* cause of death, if drain should be fatal */
 		/* no drainer or lifesaved */
 		u.uexp = 0;
 	}
-	num = newhp();
+	num = (int) u.uhpinc[u.ulevel];
 	u.uhpmax -= num;
 	if (u.uhpmax < 1) u.uhpmax = 1;
 	u.uhp -= num;
 	if (u.uhp < 1) u.uhp = 1;
 	else if (u.uhp > u.uhpmax) u.uhp = u.uhpmax;
 
-	if (u.ulevel < urole.xlev)
-	    num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.lornd + urace.enadv.lornd,
-			urole.enadv.lofix + urace.enadv.lofix);
-	else
-	    num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.hirnd + urace.enadv.hirnd,
-			urole.enadv.hifix + urace.enadv.hifix);
-	num = enermod(num);		/* M. Stephenson */
+	num = (int) u.ueninc[u.ulevel];
 	u.uenmax -= num;
 	if (u.uenmax < 0) u.uenmax = 0;
 	u.uen -= num;
@@ -190,27 +184,40 @@ void
 pluslvl(incr)
 boolean incr;	/* true iff via incremental experience growth */
 {		/*	(false for potion of gain level)      */
-	register int num;
+	int hpinc, eninc, enrnd, enfix;
 
 	if (!incr) You_feel("more experienced.");
-	num = newhp();
-	u.uhpmax += num;
-	u.uhp += num;
+
+	/* increase hit points (when polymorphed, do monster form first
+	   in order to retain normal human/whatever increase for later) */
 	if (Upolyd) {
-	    num = rnd(8);
-	    u.mhmax += num;
-	    u.mh += num;
+	    hpinc = rnd(8);
+	    u.mhmax += hpinc;
+	    u.mh += hpinc;
 	}
-	if (u.ulevel < urole.xlev)
-	    num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.lornd + urace.enadv.lornd,
-			urole.enadv.lofix + urace.enadv.lofix);
-	else
-	    num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.hirnd + urace.enadv.hirnd,
-			urole.enadv.hifix + urace.enadv.hifix);
-	num = enermod(num);	/* M. Stephenson */
-	u.uenmax += num;
-	u.uen += num;
+	hpinc = newhp();
+	u.uhpmax += hpinc;
+	u.uhp += hpinc;
+
+	/* increase spell power/energy points */
+	enrnd = (int)ACURR(A_WIS) / 2;
+	if (u.ulevel < urole.xlev) {
+	    enrnd += urole.enadv.lornd + urace.enadv.lornd;
+	    enfix = urole.enadv.lofix + urace.enadv.lofix;
+	} else {
+	    enrnd += urole.enadv.hirnd + urace.enadv.hirnd;
+	    enfix = urole.enadv.hifix + urace.enadv.hifix;
+	}
+	eninc = enermod(rn1(enrnd, enfix));	/* M. Stephenson */
+	u.uenmax += eninc;
+	u.uen += eninc;
+
+	/* increase level (unless already maxxed) */
 	if (u.ulevel < MAXULEV) {
+	    /* remember hp and pw/en gains in case this level is later lost */
+	    u.uhpinc[u.ulevel] = (xchar) hpinc;
+	    u.ueninc[u.ulevel] = (xchar) eninc;
+	    /* increase experience points to reflect new level */
 	    if (incr) {
 		long tmp = newuexp(u.ulevel + 1);
 		if (u.uexp >= tmp) u.uexp = tmp - 1;
