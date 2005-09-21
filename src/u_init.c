@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)u_init.c	3.5	2002/10/22	*/
+/*	SCCS Id: @(#)u_init.c	3.5	2005/09/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -566,12 +566,7 @@ u_init()
 
 	u.ulevel = 0;	/* set up some of the initial attributes */
 	u.uhp = u.uhpmax = newhp();
-	u.uenmax = urole.enadv.infix + urace.enadv.infix;
-	if (urole.enadv.inrnd > 0)
-	    u.uenmax += rnd(urole.enadv.inrnd);
-	if (urace.enadv.inrnd > 0)
-	    u.uenmax += rnd(urace.enadv.inrnd);
-	u.uen = u.uenmax;
+	u.uen = u.uenmax = newpw();
 	u.uspellprot = 0;
 	adjabil(0,1);
 	u.ulevel = u.ulevelmax = 1;

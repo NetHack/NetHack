@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)exper.c	3.5	2005/09/12	*/
+/*	SCCS Id: @(#)exper.c	3.5	2005/09/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,6 +34,32 @@ int en;
 	default:
 	    return (en);
 	}
+}
+
+/* calculate spell power/energy points for new level */
+int
+newpw()
+{
+    int en = 0, enrnd, enfix;
+
+    if (u.ulevel == 0) {
+	en = urole.enadv.infix + urace.enadv.infix;
+	if (urole.enadv.inrnd > 0) en += rnd(urole.enadv.inrnd);
+	if (urace.enadv.inrnd > 0) en += rnd(urace.enadv.inrnd);
+    } else {
+	enrnd = (int)ACURR(A_WIS) / 2;
+	if (u.ulevel < urole.xlev) {
+	    enrnd += urole.enadv.lornd + urace.enadv.lornd;
+	    enfix = urole.enadv.lofix + urace.enadv.lofix;
+	} else {
+	    enrnd += urole.enadv.hirnd + urace.enadv.hirnd;
+	    enfix = urole.enadv.hifix + urace.enadv.hifix;
+	}
+	en = enermod(rn1(enrnd, enfix));
+    }
+    if (en <= 0) en = 1;
+    if (u.ulevel < MAXULEV) u.ueninc[u.ulevel] = (xchar)en;
+    return en;
 }
 
 int
@@ -184,7 +210,7 @@ void
 pluslvl(incr)
 boolean incr;	/* true iff via incremental experience growth */
 {		/*	(false for potion of gain level)      */
-	int hpinc, eninc, enrnd, enfix;
+	int hpinc, eninc;
 
 	if (!incr) You_feel("more experienced.");
 
@@ -200,23 +226,12 @@ boolean incr;	/* true iff via incremental experience growth */
 	u.uhp += hpinc;
 
 	/* increase spell power/energy points */
-	enrnd = (int)ACURR(A_WIS) / 2;
-	if (u.ulevel < urole.xlev) {
-	    enrnd += urole.enadv.lornd + urace.enadv.lornd;
-	    enfix = urole.enadv.lofix + urace.enadv.lofix;
-	} else {
-	    enrnd += urole.enadv.hirnd + urace.enadv.hirnd;
-	    enfix = urole.enadv.hifix + urace.enadv.hifix;
-	}
-	eninc = enermod(rn1(enrnd, enfix));	/* M. Stephenson */
+	eninc = newpw();
 	u.uenmax += eninc;
 	u.uen += eninc;
 
 	/* increase level (unless already maxxed) */
 	if (u.ulevel < MAXULEV) {
-	    /* remember hp and pw/en gains in case this level is later lost */
-	    u.uhpinc[u.ulevel] = (xchar) hpinc;
-	    u.ueninc[u.ulevel] = (xchar) eninc;
 	    /* increase experience points to reflect new level */
 	    if (incr) {
 		long tmp = newuexp(u.ulevel + 1);

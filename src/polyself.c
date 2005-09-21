@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.5	2005/06/21	*/
+/*	SCCS Id: @(#)polyself.c	3.5	2005/09/19	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -136,24 +136,23 @@ change_sex()
 STATIC_OVL void
 newman()
 {
-	int tmp, oldlvl;
+	int i, oldlvl, newlvl, hpmax, enmax;
 
-	tmp = u.uhpmax;
 	oldlvl = u.ulevel;
-	u.ulevel = u.ulevel + rn1(5, -2);
-	if (u.ulevel > 127 || u.ulevel < 1) { /* level went below 0? */
-	    u.ulevel = oldlvl; /* restore old level in case they lifesave */
-	    goto dead;
+	newlvl = oldlvl + rn1(5, -2);	/* new = old + {-2,-1,0,+1,+2} */
+	if (newlvl > 127 || newlvl < 1) { /* level went below 0? */
+	    goto dead;	/* old level is still intact (in case of lifesaving) */
 	}
-	if (u.ulevel > MAXULEV) u.ulevel = MAXULEV;
+	if (newlvl > MAXULEV) newlvl = MAXULEV;
 	/* If your level goes down, your peak level goes down by
 	   the same amount so that you can't simply use blessed
 	   full healing to undo the decrease.  But if your level
 	   goes up, your peak level does *not* undergo the same
 	   adjustment; you might end up losing out on the chance
 	   to regain some levels previously lost to other causes. */
-	if (u.ulevel < oldlvl) u.ulevelmax -= (oldlvl - u.ulevel);
-	if (u.ulevelmax < u.ulevel) u.ulevelmax = u.ulevel;
+	if (newlvl < oldlvl) u.ulevelmax -= (oldlvl - newlvl);
+	if (u.ulevelmax < newlvl) u.ulevelmax = newlvl;
+	u.ulevel = newlvl;
 
 	if (!rn2(10)) change_sex();
 
@@ -163,41 +162,49 @@ newman()
 	/* random experience points for the new experience level */
 	u.uexp = rndexp(FALSE);
 
-	/* u.uhpmax * u.ulevel / oldlvl: proportionate hit points to new level
-	 * -10 and +10: don't apply proportionate HP to 10 of a starting
-	 *   character's hit points (since a starting character's hit points
-	 *   are not on the same scale with hit points obtained through level
-	 *   gain)
-	 * 9 - rn2(19): random change of -9 to +9 hit points
-	 */
-#ifndef LINT
-	u.uhpmax = ((u.uhpmax - 10) * (long)u.ulevel / oldlvl + 10) +
-		(9 - rn2(19));
-#endif
-
-#ifdef LINT
-	u.uhp = u.uhp + tmp;
-#else
-	u.uhp = u.uhp * (long)u.uhpmax/tmp;
-#endif
-
-	tmp = u.uenmax;
-#ifndef LINT
-	u.uenmax = u.uenmax * (long)u.ulevel / oldlvl + 9 - rn2(19);
-#endif
-	if (u.uenmax < 0) u.uenmax = 0;
-#ifndef LINT
-	u.uen = (tmp ? u.uen * (long)u.uenmax / tmp : u.uenmax);
-#endif
-
+	/* set up new attribute points (particularly Con) */
 	redist_attr();
+
+	/*
+	 * New hit points:
+	 *	remove level-gain based HP from any extra HP accumulated
+	 *	(the "extra" might actually be negative);
+	 *	modify the extra, retaining {80%, 90%, 100%, or 110%};
+	 *	add in newly generated set of level-gain HP.
+	 * (This used to calculate new HP in direct proportion to old HP,
+	 * but that was subject to abuse:  accumulate a large amount of
+	 * extra HP, drain level down to 1, then polyself to level 2 or 3
+	 * [lifesaving capability needed to handle level 0 and -1 cases]
+	 * and the extra got multiplied by 2 or 3.  Repeat the level
+	 * drain and polyself steps until out of lifesaving capability.)
+	 */
+	hpmax = u.uhpmax;
+	for (i = 0; i < oldlvl; i++) hpmax -= (int)u.uhpinc[i];
+	/* hpmax * rn1(4,8) / 10; 0.95*hpmax on average */
+	hpmax = rounddiv((long)hpmax * (long)rn1(4, 8), 10);
+	for (i = 0; (u.ulevel = i) < newlvl; i++) hpmax += newhp();
+	if (hpmax < u.ulevel) hpmax = u.ulevel;	/* min of 1 HP per level */
+	/* retain same proportion for current HP; u.uhp * hpmax / u.uhpmax */
+	u.uhp = rounddiv((long)u.uhp * (long)hpmax, u.uhpmax);
+	u.uhpmax = hpmax;
+	/*
+	 * Do the same for spell power.
+	 */
+	enmax = u.uenmax;
+	for (i = 0; i < oldlvl; i++) enmax -= (int)u.ueninc[i];
+	enmax = rounddiv((long)enmax * (long)rn1(4, 8), 10);
+	for (i = 0; (u.ulevel = i) < newlvl; i++) enmax += newpw();
+	if (enmax < u.ulevel) enmax = u.ulevel;
+	u.uen = rounddiv((long)u.uen * (long)enmax, u.uenmax);
+	u.uenmax = enmax;
+	/* [should alignment record be tweaked too?] */
+
 	u.uhunger = rn1(500,500);
 	if (Sick) make_sick(0L, (char *) 0, FALSE, SICK_ALL);
 	if (Stoned) make_stoned(0L, (char *)0, 0, (char *)0);
-	if (u.uhp <= 0 || u.uhpmax <= 0) {
+	if (u.uhp <= 0) {
 		if (Polymorph_control) {
 		    if (u.uhp <= 0) u.uhp = 1;
-		    if (u.uhpmax <= 0) u.uhpmax = 1;
 		} else {
 dead: /* we come directly here if their experience level went to 0 or less */
 		    Your("new form doesn't seem healthy enough to survive.");

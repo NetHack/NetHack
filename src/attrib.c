@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)attrib.c	3.5	2003/11/26	*/
+/*	SCCS Id: @(#)attrib.c	3.5	2005/09/19	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -789,40 +789,39 @@ newhp()
 {
 	int	hp, conplus;
 
-
 	if (u.ulevel == 0) {
 	    /* Initialize hit points */
 	    hp = urole.hpadv.infix + urace.hpadv.infix;
 	    if (urole.hpadv.inrnd > 0) hp += rnd(urole.hpadv.inrnd);
 	    if (urace.hpadv.inrnd > 0) hp += rnd(urace.hpadv.inrnd);
-
-	    /* Initialize alignment stuff */
-	    u.ualign.type = aligns[flags.initalign].value;
-	    u.ualign.record = urole.initrecord;
-
-		return hp;
+	    if (moves <= 1L) { /* initial hero; skip for polyself to new man */
+		/* Initialize alignment stuff */
+		u.ualign.type = aligns[flags.initalign].value;
+		u.ualign.record = urole.initrecord;
+	    }
+	    /* no Con adjustment for initial hit points */
 	} else {
 	    if (u.ulevel < urole.xlev) {
-	    	hp = urole.hpadv.lofix + urace.hpadv.lofix;
-	    	if (urole.hpadv.lornd > 0) hp += rnd(urole.hpadv.lornd);
-	    	if (urace.hpadv.lornd > 0) hp += rnd(urace.hpadv.lornd);
+		hp = urole.hpadv.lofix + urace.hpadv.lofix;
+		if (urole.hpadv.lornd > 0) hp += rnd(urole.hpadv.lornd);
+		if (urace.hpadv.lornd > 0) hp += rnd(urace.hpadv.lornd);
 	    } else {
-	    	hp = urole.hpadv.hifix + urace.hpadv.hifix;
-	    	if (urole.hpadv.hirnd > 0) hp += rnd(urole.hpadv.hirnd);
-	    	if (urace.hpadv.hirnd > 0) hp += rnd(urace.hpadv.hirnd);
+		hp = urole.hpadv.hifix + urace.hpadv.hifix;
+		if (urole.hpadv.hirnd > 0) hp += rnd(urole.hpadv.hirnd);
+		if (urace.hpadv.hirnd > 0) hp += rnd(urace.hpadv.hirnd);
 	    }
+	    if (ACURR(A_CON) <= 3) conplus = -2;
+	    else if (ACURR(A_CON) <= 6) conplus = -1;
+	    else if (ACURR(A_CON) <= 14) conplus = 0;
+	    else if (ACURR(A_CON) <= 16) conplus = 1;
+	    else if (ACURR(A_CON) == 17) conplus = 2;
+	    else if (ACURR(A_CON) == 18) conplus = 3;
+	    else conplus = 4;
+	    hp += conplus;
 	}
-
-	if (ACURR(A_CON) <= 3) conplus = -2;
-	else if (ACURR(A_CON) <= 6) conplus = -1;
-	else if (ACURR(A_CON) <= 14) conplus = 0;
-	else if (ACURR(A_CON) <= 16) conplus = 1;
-	else if (ACURR(A_CON) == 17) conplus = 2;
-	else if (ACURR(A_CON) == 18) conplus = 3;
-	else conplus = 4;
-	
-	hp += conplus;
-	return((hp <= 0) ? 1 : hp);
+	if (hp <= 0) hp = 1;
+	if (u.ulevel < MAXULEV) u.uhpinc[u.ulevel] = (xchar)hp;
+	return hp;
 }
 
 schar
