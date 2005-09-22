@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)zap.c	3.5	2005/09/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -311,7 +311,7 @@ struct obj *otmp;
 		    wake = FALSE;
 		break;
 	case SPE_DRAIN_LIFE:
-		dmg = rnd(8);
+		dmg = monhp_per_lvl(mtmp);
 		if(dbldam) dmg *= 2;
 		if (otyp == SPE_DRAIN_LIFE)
 			dmg += spell_damage_bonus();

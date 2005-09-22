@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.5	2005/04/15	*/
+/*	SCCS Id: @(#)artifact.c 3.5	2005/09/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1133,7 +1133,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 			if (mdef->m_lev == 0) {
 			    *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
 			} else {
-			    int drain = rnd(8);
+			    int drain = monhp_per_lvl(mdef);
 			    *dmgptr += drain;
 			    mdef->mhpmax -= drain;
 			    mdef->m_lev--;

@@ -190,6 +190,14 @@ const char *drainer;	/* cause of death, if drain should be fatal */
 
 	if (u.uexp > 0)
 		u.uexp = newuexp(u.ulevel) - 1;
+
+	if (Upolyd) {
+	    num = monhp_per_lvl(&youmonst);
+	    u.mhmax -= num;
+	    u.mh -= num;
+	    if (u.mh <= 0) rehumanize();
+	}
+
 	context.botl = 1;
 }
 
@@ -217,7 +225,7 @@ boolean incr;	/* true iff via incremental experience growth */
 	/* increase hit points (when polymorphed, do monster form first
 	   in order to retain normal human/whatever increase for later) */
 	if (Upolyd) {
-	    hpinc = rnd(8);
+	    hpinc = monhp_per_lvl(&youmonst);
 	    u.mhmax += hpinc;
 	    u.mh += hpinc;
 	}

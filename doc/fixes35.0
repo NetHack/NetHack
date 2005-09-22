@@ -86,6 +86,8 @@ various actions--such as enchanting--performed on an unpaid shop object
 adjust health threshold where wounded hero will be healed by successful prayer
 prevent lose-level+regain-level cycle from arbritrarily boosting HP and Pw
 prevent polymorphing into "new man" at low level from magnifying HP and Pw
+losing a level while polymorphed affects hero's current monster HP as well as
+	underlying normal HP
 
 
 Platform- and/or Interface-Specific Fixes
