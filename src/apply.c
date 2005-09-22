@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)apply.c	3.5	2005/09/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -684,26 +684,31 @@ STATIC_OVL int
 use_mirror(obj)
 struct obj *obj;
 {
-	register struct monst *mtmp;
-	register char mlet;
+	const char *mirror;
+	struct monst *mtmp;
+	char mlet;
 	boolean vis;
 
 	if(!getdir((char *)0)) return 0;
+	mirror = simple_typename(obj->otyp); /* "mirror" or "looking glass" */
 	if(obj->cursed && !rn2(2)) {
 		if (!Blind)
-			pline_The("mirror fogs up and doesn't reflect!");
+		    pline_The("%s fogs up and doesn't reflect!", mirror);
 		return 1;
 	}
 	if(!u.dx && !u.dy && !u.dz) {
 		if(!Blind && !Invisible) {
 		    if (u.umonnum == PM_FLOATING_EYE) {
-			if (!Free_action) {
-			pline(Hallucination ?
-			      "Yow!  The mirror stares back!" :
-			      "Yikes!  You've frozen yourself!");
-			nomul(-rnd((MAXULEV+6) - u.ulevel));
-			nomovemsg = 0;
-			} else You("stiffen momentarily under your gaze.");
+			if (Free_action) {
+			    You("stiffen momentarily under your gaze.");
+			} else {
+			    if (Hallucination)
+				pline("Yow!  The %s stares back!", mirror);
+			    else
+				pline("Yikes!  You've frozen yourself!");
+			    nomul(-rnd((MAXULEV+6) - u.ulevel));
+			    nomovemsg = 0;  /* default, "you can move again" */
+			}
 		    } else if (youmonst.data->mlet == S_VAMPIRE)
 			You("don't have a reflection.");
 		    else if (u.umonnum == PM_UMBER_HULK) {
@@ -755,16 +760,16 @@ struct obj *obj;
 	vis = canseemon(mtmp);
 	mlet = mtmp->data->mlet;
 	if (mtmp->msleeping) {
-		if (vis)
-		    pline ("%s is too tired to look at your mirror.",
-			    Monnam(mtmp));
+	    if (vis)
+		pline("%s is too tired to look at your %s.",
+		      Monnam(mtmp), mirror);
 	} else if (!mtmp->mcansee) {
 	    if (vis)
 		pline("%s can't see anything right now.", Monnam(mtmp));
 	/* some monsters do special things */
 	} else if (mlet == S_VAMPIRE || mlet == S_GHOST || is_vampshifter(mtmp)) {
 	    if (vis)
-		pline ("%s doesn't have a reflection.", Monnam(mtmp));
+		pline("%s doesn't have a reflection.", Monnam(mtmp));
 	} else if(!mtmp->mcan && !mtmp->minvis &&
 					mtmp->data == &mons[PM_MEDUSA]) {
 		if (mon_reflects(mtmp, "The gaze is reflected away by %s %s!"))
@@ -778,8 +783,9 @@ struct obj *obj;
 		int tmp = d((int)mtmp->m_lev, (int)mtmp->data->mattk[0].damd);
 		if (!rn2(4)) tmp = 120;
 		if (vis)
-			pline("%s is frozen by its reflection.", Monnam(mtmp));
-		else You_hear("%s stop moving.",something);
+		    pline("%s is frozen by its reflection.", Monnam(mtmp));
+		else
+		    You_hear("%s stop moving.", something);
 		mtmp->mcanmove = 0;
 		if ( (int) mtmp->mfrozen + tmp > 127)
 			mtmp->mfrozen = 127;
@@ -787,14 +793,20 @@ struct obj *obj;
 	} else if(!mtmp->mcan && !mtmp->minvis &&
 					mtmp->data == &mons[PM_UMBER_HULK]) {
 		if (vis)
-			pline ("%s confuses itself!", Monnam(mtmp));
+		    pline("%s confuses itself!", Monnam(mtmp));
 		mtmp->mconf = 1;
-	} else if(!mtmp->mcan && !mtmp->minvis && (mlet == S_NYMPH
-				     || mtmp->data==&mons[PM_SUCCUBUS])) {
+	} else if (!mtmp->mcan && !mtmp->minvis &&
+		    (mlet == S_NYMPH ||
+		     mtmp->data == &mons[PM_SUCCUBUS] ||
+		     mtmp->data == &mons[PM_INCUBUS])) {
 		if (vis) {
-		    pline ("%s admires herself in your mirror.", Monnam(mtmp));
-		    pline ("She takes it!");
-		} else pline ("It steals your mirror!");
+		    char buf[BUFSZ];		/* "She" or "He" */
+
+		    pline("%s admires %sself in your %s.", Monnam(mtmp),
+			  mhim(mtmp), mirror);
+		    pline("%s takes it!", upstart(strcpy(buf, mhe(mtmp))));
+		} else
+		    pline("It steals your %s!", mirror);
 		setnotworn(obj); /* in case mirror was wielded */
 		freeinv(obj);
 		(void) mpickobj(mtmp,obj);
