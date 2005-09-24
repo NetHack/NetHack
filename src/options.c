@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2005/05/14	*/
+/*	SCCS Id: @(#)options.c	3.5	2005/09/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2309,6 +2309,8 @@ goodfruit:
 	 * options list
 	 */
 	for (i = 0; boolopt[i].name; i++) {
+		boolean was_set;
+
 		if (match_optname(opts, boolopt[i].name, 3, FALSE)) {
 			/* options that don't exist */
 			if (!boolopt[i].addr) {
@@ -2323,6 +2325,7 @@ goodfruit:
 			    return;
 			}
 
+			was_set = *(boolopt[i].addr);
 			*(boolopt[i].addr) = !negated;
 
 			/* 0 means boolean opts */
@@ -2347,19 +2350,25 @@ goodfruit:
 # endif
 			    need_redraw = TRUE;
 # ifdef TERMLIB
-			    if ((boolopt[i].addr) == &iflags.DECgraphics)
-				switch_graphics(iflags.DECgraphics ?
+			    if ((boolopt[i].addr) == &iflags.DECgraphics) {
+				if (iflags.DECgraphics != was_set)
+				    switch_graphics(iflags.DECgraphics ?
 						DEC_GRAPHICS : ASCII_GRAPHICS);
+			    }
 # endif
 # ifdef ASCIIGRAPH
-			    if ((boolopt[i].addr) == &iflags.IBMgraphics)
-				switch_graphics(iflags.IBMgraphics ?
+			    if ((boolopt[i].addr) == &iflags.IBMgraphics) {
+				if (iflags.IBMgraphics != was_set)
+				    switch_graphics(!negated ?
 						IBM_GRAPHICS : ASCII_GRAPHICS);
+			    }
 # endif
 # ifdef MAC_GRAPHICS_ENV
-			    if ((boolopt[i].addr) == &iflags.MACgraphics)
-				switch_graphics(iflags.MACgraphics ?
+			    if ((boolopt[i].addr) == &iflags.MACgraphics) {
+				if (iflags.MACgraphics != was_set)
+				    switch_graphics(iflags.MACgraphics ?
 						MAC_GRAPHICS : ASCII_GRAPHICS);
+			    }
 # endif
 # ifdef REINCARNATION
 			    if (!initial && Is_rogue_level(&u.uz))

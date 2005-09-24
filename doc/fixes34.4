@@ -153,6 +153,9 @@ incubi react to mirrors
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+tty: when loading user's run-time configuration, explicitly negating one of
+	{DEC,IBM,MAC}graphics options after enabling another of them switched
+	to regular ASCII and left the earlier option inaccurately set to "on"
 unix: remove use of parentheses in nethack man page usage that confused a
 	man page conversion tool
 winCE: disable processing of double-click messages if the first click

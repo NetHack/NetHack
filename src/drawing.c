@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)drawing.c	3.5	1999/12/02	*/
+/*	SCCS Id: @(#)drawing.c	3.5	2005/09/23	*/
 /* Copyright (c) NetHack Development Team 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -655,6 +655,16 @@ void
 switch_graphics(gr_set_flag)
 int gr_set_flag;
 {
+    /* We're either toggling back to ASCII, in which case it is
+       appropriate to negate all the other alternatives, or we're in
+       the process of toggling one of those other ones on, in which
+       case it will be set accurately below. */
+    iflags.IBMgraphics = FALSE;
+    iflags.DECgraphics = FALSE;
+#ifdef MAC_GRAPHICS_ENV
+    iflags.MACgraphics = FALSE;
+#endif
+
     switch (gr_set_flag) {
 	default:
 	case ASCII_GRAPHICS:
@@ -673,7 +683,6 @@ int gr_set_flag;
  * set the codepage to 437.
  */
 	    iflags.IBMgraphics = TRUE;
-	    iflags.DECgraphics = FALSE;
 	    assign_graphics(ibm_graphics, SIZE(ibm_graphics), MAXPCHARS, 0);
 #ifdef PC9800
 	    if (ibmgraphics_mode_callback) (*ibmgraphics_mode_callback)();
@@ -686,13 +695,13 @@ int gr_set_flag;
  * Use the VT100 line drawing character set.
  */
 	    iflags.DECgraphics = TRUE;
-	    iflags.IBMgraphics = FALSE;
 	    assign_graphics(dec_graphics, SIZE(dec_graphics), MAXPCHARS, 0);
 	    if (decgraphics_mode_callback) (*decgraphics_mode_callback)();
 	    break;
 #endif /* TERMLIB */
 #ifdef MAC_GRAPHICS_ENV
 	case MAC_GRAPHICS:
+	    iflags.MACgraphics = TRUE;
 	    assign_graphics(mac_graphics, SIZE(mac_graphics), MAXPCHARS, 0);
 	    break;
 #endif
