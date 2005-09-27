@@ -2309,9 +2309,16 @@ goodfruit:
 	 * options list
 	 */
 	for (i = 0; boolopt[i].name; i++) {
-		boolean was_set;
-
 		if (match_optname(opts, boolopt[i].name, 3, FALSE)) {
+#if defined(TERMLIB) || defined(ASCIIGRAPH) || defined(MAC_GRAPHICS_ENV)
+			/* need to remember previous XXXgraphics setting
+			   in order to prevent explicit "noXXXgraphics" from
+			   overriding a preceding "YYYgraphics" request;
+			   noXXXgraphics will reset to ordinary ASCII only
+			   if/when XXXgraphics is currently in effect */
+			boolean old_gfx = boolopt[i].addr && *boolopt[i].addr;
+#endif
+
 			/* options that don't exist */
 			if (!boolopt[i].addr) {
 			    if (!initial && !negated)
@@ -2325,7 +2332,6 @@ goodfruit:
 			    return;
 			}
 
-			was_set = *(boolopt[i].addr);
 			*(boolopt[i].addr) = !negated;
 
 			/* 0 means boolean opts */
@@ -2351,21 +2357,21 @@ goodfruit:
 			    need_redraw = TRUE;
 # ifdef TERMLIB
 			    if ((boolopt[i].addr) == &iflags.DECgraphics) {
-				if (iflags.DECgraphics != was_set)
+				if (iflags.DECgraphics != old_gfx)
 				    switch_graphics(iflags.DECgraphics ?
 						DEC_GRAPHICS : ASCII_GRAPHICS);
 			    }
 # endif
 # ifdef ASCIIGRAPH
 			    if ((boolopt[i].addr) == &iflags.IBMgraphics) {
-				if (iflags.IBMgraphics != was_set)
+				if (iflags.IBMgraphics != old_gfx)
 				    switch_graphics(!negated ?
 						IBM_GRAPHICS : ASCII_GRAPHICS);
 			    }
 # endif
 # ifdef MAC_GRAPHICS_ENV
 			    if ((boolopt[i].addr) == &iflags.MACgraphics) {
-				if (iflags.MACgraphics != was_set)
+				if (iflags.MACgraphics != old_gfx)
 				    switch_graphics(iflags.MACgraphics ?
 						MAC_GRAPHICS : ASCII_GRAPHICS);
 			    }
