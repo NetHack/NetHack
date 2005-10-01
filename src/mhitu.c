@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2005/07/13	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2005/09/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1060,45 +1060,12 @@ dopois:
 		if (Half_physical_damage) dmg = (dmg+1) / 2;
 		mdamageu(mtmp, dmg);
 
-		if (!uarmh || uarmh->otyp != DUNCE_CAP) {
-		    Your("brain is eaten!");
-		    /* No such thing as mindless players... */
-		    if (ABASE(A_INT) <= ATTRMIN(A_INT)) {
-			int lifesaved = 0;
-			struct obj *wore_amulet = uamul;
-
-			while(1) {
-			    /* avoid looping on "die(y/n)?" */
-			    if (lifesaved && (discover || wizard)) {
-				if (wore_amulet && !uamul) {
-				    /* used up AMULET_OF_LIFE_SAVING; still
-				       subject to dying from brainlessness */
-				    wore_amulet = 0;
-				} else {
-				    /* explicitly chose not to die;
-				       arbitrarily boost intelligence */
-				    ABASE(A_INT) = ATTRMIN(A_INT) + 2;
-				    You_feel("like a scarecrow.");
-				    break;
-				}
-			    }
-
-			    if (lifesaved)
-				pline("Unfortunately your brain is still gone.");
-			    else
-				Your("last thought fades away.");
-			    Strcpy(killer.name, "brainlessness");
-			    killer.format = KILLED_BY;
-			    done(DIED);
-			    lifesaved++;
-			}
-		    }
-		}
+		if (!uarmh || uarmh->otyp != DUNCE_CAP)
+		    (void) eat_brains(mtmp, &youmonst, TRUE, (int *)0);
 		/* adjattrib gives dunce cap message when appropriate */
 		(void) adjattrib(A_INT, -rnd(2), FALSE);
 		forget_levels(25);	/* lose memory of 25% of levels */
 		forget_objects(25);	/* lose memory of 25% of objects */
-		exercise(A_WIS, FALSE);
 		break;
 	    case AD_PLYS:
 		hitmsg(mtmp, mattk);

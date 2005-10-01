@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.5	2005/04/15	*/
+/*	SCCS Id: @(#)mhitm.c	3.5	2005/09/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -694,7 +694,8 @@ mdamagem(magr, mdef, mattk)
 	struct obj *obj;
 	char buf[BUFSZ];
 	struct permonst *pa = magr->data, *pd = mdef->data;
-	int armpro, num, tmp = d((int)mattk->damn, (int)mattk->damd);
+	int armpro, num, tmp = d((int)mattk->damn, (int)mattk->damd),
+	    res = MM_MISS;
 	boolean cancelled;
 
 	if (touch_petrifies(pd) && !resists_ston(magr)) {
@@ -1196,19 +1197,7 @@ mdamagem(magr, mdef, mattk)
 		    }
 		    break;
 		}
-		if (vis) pline("%s brain is eaten!", s_suffix(Monnam(mdef)));
-		if (mindless(pd)) {
-		    if (vis) pline("%s doesn't notice.", Monnam(mdef));
-		    break;
-		}
-		tmp += rnd(10); /* fakery, since monsters lack INT scores */
-		if (magr->mtame && !magr->isminion) {
-		    EDOG(magr)->hungrytime += rnd(60);
-		    magr->mconf = 0;
-		}
-		if (tmp >= mdef->mhp && vis)
-		    pline("%s last thought fades away...",
-			          s_suffix(Monnam(mdef)));
+		res = eat_brains(magr, mdef, vis, &tmp);
 		break;
 	    case AD_SLIM:
 		if (cancelled) break;	/* physical damage only */
@@ -1233,7 +1222,7 @@ mdamagem(magr, mdef, mattk)
 	    default:	tmp = 0;
 			break;
 	}
-	if(!tmp) return(MM_MISS);
+	if (!tmp) return res;
 
 	if((mdef->mhp -= tmp) < 1) {
 	    if (m_at(mdef->mx, mdef->my) == magr) {  /* see gulpmm() */
@@ -1243,7 +1232,8 @@ mdamagem(magr, mdef, mattk)
 		mdef->mhp = 0;
 	    }
 	    monkilled(mdef, "", (int)mattk->adtyp);
-	    if (mdef->mhp > 0) return 0; /* mdef lifesaved */
+	    if (mdef->mhp > 0) return res; /* mdef lifesaved */
+	    else if (res == MM_AGR_DIED) return (MM_DEF_DIED | MM_AGR_DIED);
 
 	    if (mattk->adtyp == AD_DGST) {
 		/* various checks similar to dog_eat and meatobj.
@@ -1263,7 +1253,7 @@ mdamagem(magr, mdef, mattk)
 
 	    return (MM_DEF_DIED | (grow_up(magr,mdef) ? 0 : MM_AGR_DIED));
 	}
-	return(MM_HIT);
+	return (res == MM_AGR_DIED) ? MM_AGR_DIED : MM_HIT;
 }
 
 /* `mon' is hit by a sleep attack; return 1 if it's affected, 0 otherwise */

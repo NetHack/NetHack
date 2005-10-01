@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2005/06/21	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2005/09/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1307,8 +1307,7 @@ register struct monst *mdef;
 register struct attack *mattk;
 {
 	register struct permonst *pd = mdef->data;
-	register int	tmp = d((int)mattk->damn, (int)mattk->damd);
-	int armpro;
+	int armpro, tmp = d((int)mattk->damn, (int)mattk->damd);
 	boolean negated;
 
 	armpro = magic_negation(mdef);
@@ -1568,29 +1567,7 @@ register struct attack *mattk;
 		    break;
 		}
 
-		You("eat %s brain!", s_suffix(mon_nam(mdef)));
-		u.uconduct.food++;
-		if (touch_petrifies(mdef->data) && !Stone_resistance && !Stoned) {
-		    make_stoned(5L, (char *)0,
-				KILLED_BY_AN, mdef->data->mname);
-		}
-		if (!vegan(mdef->data))
-		    u.uconduct.unvegan++;
-		if (!vegetarian(mdef->data))
-		    violated_vegetarian();
-		if (mindless(mdef->data)) {
-		    pline("%s doesn't notice.", Monnam(mdef));
-		    break;
-		}
-		tmp += rnd(10);
-		morehungry(-rnd(30)); /* cannot choke */
-		if (ABASE(A_INT) < AMAX(A_INT)) {
-			ABASE(A_INT) += rnd(4);
-			if (ABASE(A_INT) > AMAX(A_INT))
-				ABASE(A_INT) = AMAX(A_INT);
-			context.botl = 1;
-		}
-		exercise(A_WIS, TRUE);
+		(void) eat_brains(&youmonst, mdef, TRUE, &tmp);
 		break;
 	      }
 	    case AD_STCK:
