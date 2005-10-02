@@ -788,7 +788,7 @@ $(O)dokick.o: $(SRC)\dokick.c $(HACK_H) $(INCL)\eshk.h
 $(O)dothrow.o: $(SRC)\dothrow.c $(HACK_H)
 $(O)drawing.o: $(SRC)\drawing.c $(HACK_H) $(INCL)\tcap.h
 $(O)dungeon.o: $(SRC)\dungeon.c $(HACK_H) $(INCL)\dgn_file.h $(INCL)\dlb.h
-$(O)eat.o: $(SRC)\eat.c $(HACK_H)
+$(O)eat.o: $(SRC)\eat.c $(HACK_H) $(INCL)\edog.h
 $(O)end.o: $(SRC)\end.c $(HACK_H) $(INCL)\eshk.h $(INCL)\lev.h $(INCL)\dlb.h
 $(O)engrave.o: $(SRC)\engrave.c $(HACK_H) $(INCL)\lev.h
 $(O)exper.o: $(SRC)\exper.c $(HACK_H)

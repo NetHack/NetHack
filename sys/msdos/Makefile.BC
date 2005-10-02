@@ -1,5 +1,5 @@
-#	SCCS Id: @(#)Makefile.BC	3.5	2002/03/17
-# Copyright (c) Yitzhak Sapir, 1999-2002.
+#	SCCS Id: @(#)Makefile.BC	3.5	2005/10/02
+# Copyright (c) Yitzhak Sapir, 1999-2005.
 # NetHack may be freely distributed.  See license for details.
 #
 
@@ -1913,7 +1913,7 @@ $(O)do_wear.0:  $(PCH0) $(SRC)\do_wear.c  $(HACK_H)
 $(O)dogmove.0:  $(PCH0) $(SRC)\dogmove.c  $(HACK_H) $(MFNDPOS_H) $(EDOG_H)
 $(O)dungeon.0:	$(PCH0) $(SRC)\dungeon.c  $(HACK_H) $(ALIGN_H) $(DGN_FILE_H) \
 		$(DLB_H)
-$(O)eat.0:      $(PCH0) $(SRC)\eat.c      $(HACK_H)
+$(O)eat.0:      $(PCH0) $(SRC)\eat.c      $(HACK_H) $(EDOG_H)
 $(O)engrave.0:  $(PCH0) $(SRC)\engrave.c  $(HACK_H) $(LEV_H)
 $(O)explode.0:  $(PCH0) $(SRC)\explode.c  $(HACK_H)
 $(O)hacklib.0:  $(PCH0) $(SRC)\hacklib.c  $(HACK_H)
@@ -1963,7 +1963,7 @@ $(O)do.1:       $(PCH1) $(SRC)\do.c       $(HACK_H) $(LEV_H)
 $(O)do_wear.1:  $(PCH1) $(SRC)\do_wear.c  $(HACK_H)
 $(O)dog.1:      $(PCH1) $(SRC)\dog.c      $(HACK_H) $(EDOG_H)
 $(O)dungeon.1:	$(PCH1) $(SRC)\dungeon.c  $(HACK_H) $(ALIGN_H) $(DGN_FILE_H) $(DLB_H)
-$(O)eat.1:      $(PCH1) $(SRC)\eat.c      $(HACK_H)
+$(O)eat.1:      $(PCH1) $(SRC)\eat.c      $(HACK_H) $(EDOG_H)
 $(O)engrave.1:  $(PCH1) $(SRC)\engrave.c  $(HACK_H) $(LEV_H)
 $(O)explode.1:  $(PCH1) $(SRC)\explode.c  $(HACK_H)
 $(O)hack.1:     $(PCH1) $(SRC)\hack.c     $(HACK_H)
@@ -2036,7 +2036,7 @@ $(O)do_name.B:  $(PCHB) $(SRC)\do_name.c  $(HACK_H)
 $(O)do_wear.B:  $(PCHB) $(SRC)\do_wear.c  $(HACK_H)
 $(O)dog.B:      $(PCHB) $(SRC)\dog.c      $(HACK_H) $(EDOG_H)
 $(O)dogmove.B:  $(PCHB) $(SRC)\dogmove.c  $(HACK_H) $(MFNDPOS_H) $(EDOG_H)
-$(O)eat.B:      $(PCHB) $(SRC)\eat.c      $(HACK_H)
+$(O)eat.B:      $(PCHB) $(SRC)\eat.c      $(HACK_H) $(EDOG_H)
 $(O)engrave.B:  $(PCHB) $(SRC)\engrave.c  $(HACK_H) $(LEV_H)
 $(O)hack.B:     $(PCHB) $(SRC)\hack.c     $(HACK_H)
 $(O)hacklib.B:  $(PCHB) $(SRC)\hacklib.c  $(HACK_H)
