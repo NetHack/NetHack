@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)priest.c	3.5	2002/11/06	*/
+/*	SCCS Id: @(#)priest.c	3.5	2005/10/01	*/
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -219,6 +219,19 @@ boolean sanctum;   /* is it the seat of the high priest? */
 			curse(otmp);
 		}
 	}
+}
+
+/* get a monster's alignment type without caller needing EPRI & EMIN */
+aligntyp
+mon_aligntyp(mon)
+struct monst *mon;
+{
+    aligntyp algn = mon->ispriest ? EPRI(mon)->shralign :
+		    mon->isminion ? EMIN(mon)->min_align :
+		    mon->data->maligntyp;
+
+    if (algn == A_NONE) return A_NONE;	/* negative but differs from chaotic */
+    return (algn > 0) ? A_LAWFUL : (algn < 0) ? A_CHAOTIC : A_NEUTRAL;
 }
 
 /*

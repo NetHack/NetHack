@@ -1,10 +1,9 @@
-/*	SCCS Id: @(#)pline.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)pline.c	3.5	2005/10/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #define NEED_VARARGS /* Uses ... */	/* comment line for pre-compiled headers */
 #include "hack.h"
-#include "epri.h"
 #ifdef WIZARD
 #include "edog.h"
 #endif
@@ -304,17 +303,8 @@ void
 mstatusline(mtmp)
 register struct monst *mtmp;
 {
-	aligntyp alignment;
+	aligntyp alignment = mon_aligntyp(mtmp);
 	char info[BUFSZ], monnambuf[BUFSZ];
-
-	if (mtmp->ispriest || mtmp->data == &mons[PM_ALIGNED_PRIEST]
-				|| mtmp->data == &mons[PM_ANGEL])
-		alignment = EPRI(mtmp)->shralign;
-	else
-		alignment = mtmp->data->maligntyp;
-	alignment = (alignment > 0) ? A_LAWFUL :
-		(alignment < 0) ? A_CHAOTIC :
-		A_NEUTRAL;
 
 	info[0] = 0;
 	if (mtmp->mtame) {	  Strcat(info, ", tame");
