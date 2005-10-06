@@ -1,10 +1,8 @@
-/*	SCCS Id: @(#)mondata.c	3.5	2005/09/01	*/
+/*	SCCS Id: @(#)mondata.c	3.5	2005/10/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "eshk.h"
-#include "epri.h"
 
 /*	These routines provide basic data for any type of monster. */
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.h	3.5	2005/01/31	*/
+/*	SCCS Id: @(#)mondata.h	3.5	2005/10/05	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,10 +20,7 @@
 #define resists_ston(mon)	(((mon)->mintrinsics & MR_STONE) != 0)
 
 #define is_lminion(mon)		(is_minion((mon)->data) && \
-				 (mon)->data->maligntyp >= A_COALIGNED && \
-				 ((mon)->data != &mons[PM_ANGEL] || \
-				  EPRI(mon)->shralign > 0))
-
+				 mon_aligntyp(mon) == A_LAWFUL)
 #define is_flyer(ptr)		(((ptr)->mflags1 & M1_FLY) != 0L)
 #define is_floater(ptr)		((ptr)->mlet == S_EYE)
 #define is_clinger(ptr)		(((ptr)->mflags1 & M1_CLING) != 0L)

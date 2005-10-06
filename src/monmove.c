@@ -1,11 +1,10 @@
-/*	SCCS Id: @(#)monmove.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)monmove.c	3.5	2005/10/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "mfndpos.h"
 #include "artifact.h"
-#include "epri.h"
 
 extern boolean notonhead;
 
