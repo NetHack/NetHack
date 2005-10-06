@@ -507,7 +507,7 @@ touch_artifact(obj,mon)
 	badclass = self_willed &&
 		   oart->role != NON_PM && oart != &artilist[ART_EXCALIBUR];
 	badalign = (oart->spfx & SPFX_RESTR) && oart->alignment != A_NONE &&
-		   (oart->alignment != sgn(mon_aligntyp(mon)));
+		   (oart->alignment != mon_aligntyp(mon));
     } else {    /* an M3_WANTSxxx monster or a fake player */
 	/* special monsters trying to take the Amulet, invocation tools or
 	   quest item can touch anything except for `spec_applies' artifacts */
