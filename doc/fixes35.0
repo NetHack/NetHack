@@ -89,6 +89,7 @@ prevent polymorphing into "new man" at low level from magnifying HP and Pw
 losing a level while polymorphed affects hero's current monster HP as well as
 	underlying normal HP
 mind flayer brain eating is subject to certain fatal targets and to cannibalism
+corpses of unique monsters in bones behaved incorrectly if revived or eaten
 
 
 Platform- and/or Interface-Specific Fixes

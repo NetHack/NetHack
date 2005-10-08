@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bones.c	3.5	2004/12/17	*/
+/*	SCCS Id: @(#)bones.c	3.5	2005/10/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -127,8 +127,18 @@ boolean restore;
 			       vault guards in order to prevent corpse
 			       revival or statue reanimation. */
 			    if (otmp->oattached == OATTACHED_MONST &&
-				    cant_revive(&mnum, FALSE, (struct obj *)0))
+				  cant_revive(&mnum, FALSE, (struct obj *)0)) {
 				otmp->oattached = OATTACHED_NOTHING;
+				/* mnum is now either human_zombie or
+				   doppelganger; for corpses of uniques,
+				   we need to force the transformation
+				   now rather than wait until a revival
+				   attempt, otherwise eating this corpse
+				   would behave as if it remains unique */
+				if (mnum == PM_DOPPELGANGER &&
+					otmp->otyp == CORPSE)
+				    otmp->corpsenm = mnum;
+			    }
 			} else if (otmp->otyp == AMULET_OF_YENDOR) {
 			    /* no longer the real Amulet */
 			    otmp->otyp = FAKE_AMULET_OF_YENDOR;

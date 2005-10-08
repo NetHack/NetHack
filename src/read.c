@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2005/04/14	*/
+/*	SCCS Id: @(#)read.c	3.5	2005/10/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1893,8 +1893,8 @@ unpunish()
 }
 
 /* some creatures have special data structures that only make sense in their
- * normal locations -- if the player tries to create one elsewhere, or to revive
- * one, the disoriented creature becomes a zombie
+ * normal locations -- if the player tries to create one elsewhere, or to
+ * revive one, the disoriented creature becomes a zombie
  */
 boolean
 cant_revive(mtype, revival, from_obj)
@@ -1902,17 +1902,17 @@ int *mtype;
 boolean revival;
 struct obj *from_obj;
 {
-
 	/* SHOPKEEPERS can be revived now */
-	if (*mtype==PM_GUARD || (*mtype==PM_SHOPKEEPER && !revival)
-	     || *mtype==PM_ALIGNED_PRIEST || *mtype==PM_ANGEL) {
+	if (*mtype == PM_GUARD || (*mtype == PM_SHOPKEEPER && !revival) ||
+	    *mtype == PM_HIGH_PRIEST || *mtype == PM_ALIGNED_PRIEST ||
+	    *mtype == PM_ANGEL) {
 		*mtype = PM_HUMAN_ZOMBIE;
 		return TRUE;
-	} else if (*mtype==PM_LONG_WORM_TAIL) {	/* for create_particular() */
+	} else if (*mtype == PM_LONG_WORM_TAIL) { /* for create_particular() */
 		*mtype = PM_LONG_WORM;
 		return TRUE;
-	} else if (from_obj && unique_corpstat(&mons[*mtype]) &&
-			from_obj->oattached != OATTACHED_MONST) {
+	} else if (unique_corpstat(&mons[*mtype]) &&
+		    (!from_obj || from_obj->oattached != OATTACHED_MONST)) {
 		/* unique corpses (from bones or wizard mode wish) or
 		   statues (bones or any wish) end up as shapechangers */
 		*mtype = PM_DOPPELGANGER;
@@ -1933,7 +1933,7 @@ boolean
 create_particular()
 {
 	char buf[BUFSZ], *bufp, monclass = MAXMCLASSES;
-	int which, tries, i;
+	int which, tries, i, firstchoice = NON_PM;
 	struct permonst *whichpm;
 	struct monst *mtmp;
 	boolean madeany = FALSE;
@@ -1981,7 +1981,15 @@ create_particular()
 	    pline(thats_enough_tries);
 	} else {
 	    if (!randmonst) {
-		(void) cant_revive(&which, FALSE, (struct obj *)0);
+		firstchoice = which;
+		if (cant_revive(&which, FALSE, (struct obj *)0)) {
+#ifdef WIZARD	/* intentionally redundant... */
+		    /* wizard mode can override handling of special monsters */
+		    Sprintf(buf, "Creating %s instead; force %s?",
+			    mons[which].mname, mons[firstchoice].mname);
+		    if (yn(buf) == 'y') which = firstchoice;
+#endif
+		}
 		whichpm = &mons[which];
 	    }
 	    for (i = 0; i <= multi; i++) {
@@ -2004,7 +2012,11 @@ create_particular()
 			set_malign(mtmp);
 		    }
 		}
-		if (mtmp) madeany = TRUE;
+		if (mtmp) {
+		    madeany = TRUE;
+		    if (mtmp->cham && firstchoice != NON_PM)
+			(void)newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
+		}
 	    }
 	}
 	return madeany;
