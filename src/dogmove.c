@@ -25,12 +25,14 @@ register struct monst *mon;
 {
 	register struct obj *obj;
 	struct obj *wep = MON_WEP(mon);
-	boolean item1 = FALSE, item2 = FALSE;
+	boolean item1 = FALSE, item2 = FALSE, item3 = FALSE;
 
 	if (is_animal(mon->data) || mindless(mon->data))
-		item1 = item2 = TRUE;
+		item1 = item2 = item3 = TRUE;
 	if (!tunnels(mon->data) || !needspick(mon->data))
 		item1 = TRUE;
+	if (nohands(mon->data) || verysmall(mon->data))
+		item3 = TRUE;
 	for(obj = mon->minvent; obj; obj = obj->nobj) {
 		if (!item1 && is_pick(obj) && (obj->otyp != DWARVISH_MATTOCK
 						|| !which_armor(mon, W_ARMS))) {
@@ -39,6 +41,10 @@ register struct monst *mon;
 		}
 		if (!item2 && obj->otyp == UNICORN_HORN && !obj->cursed) {
 			item2 = TRUE;
+			continue;
+		}
+		if (!item3 && obj->otyp == SKELETON_KEY) {
+			item3 = TRUE;
 			continue;
 		}
 		if (!obj->owornmask && obj != wep) return obj;
@@ -588,8 +594,10 @@ register int after;	/* this is extra fast monster movement */
 	    You("get released!");
 	}
 	if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
-		allowflags |= OPENDOOR;
-		if (m_carrying(mtmp, SKELETON_KEY)) allowflags |= BUSTDOOR;
+	    allowflags |= OPENDOOR;
+	    if (m_carrying(mtmp, SKELETON_KEY)) allowflags |= UNLOCKDOOR;
+	    /* note:  the Wizard and Riders can unlock doors without a key;
+	       they won't use that ability if someone manages to tame them */
 	}
 	if (is_giant(mtmp->data)) allowflags |= BUSTDOOR;
 	if (tunnels(mtmp->data)

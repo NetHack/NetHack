@@ -1138,10 +1138,13 @@ postmov:
 			    if(mb_trapped(mtmp)) return(2);
 			} else {
 			    if (flags.verbose) {
-				if (canseeit)
-				   You_see("a door unlock and open.");
+				if (canseemon(mtmp))
+				    pline("%s unlocks and opens a door.",
+					  Monnam(mtmp));
+				else if (canseeit)
+				    You_see("a door unlock and open.");
 				else if (!Deaf)
-				   You_hear("a door unlock and open.");
+				    You_hear("a door unlock and open.");
 			    }
 			    here->doormask = D_ISOPEN;
 			    /* newsym(mtmp->mx, mtmp->my); */
