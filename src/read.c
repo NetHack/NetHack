@@ -2014,7 +2014,7 @@ create_particular()
 		}
 		if (mtmp) {
 		    madeany = TRUE;
-		    if (mtmp->cham && firstchoice != NON_PM)
+		    if (mtmp->cham != CHAM_ORDINARY && firstchoice != NON_PM)
 			(void)newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
 		}
 	    }
