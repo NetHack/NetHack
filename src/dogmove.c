@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)dogmove.c	3.5	2005/10/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -592,7 +592,11 @@ register int after;	/* this is extra fast monster movement */
 		if (m_carrying(mtmp, SKELETON_KEY)) allowflags |= BUSTDOOR;
 	}
 	if (is_giant(mtmp->data)) allowflags |= BUSTDOOR;
-	if (tunnels(mtmp->data)) allowflags |= ALLOW_DIG;
+	if (tunnels(mtmp->data)
+#ifdef REINCARNATION
+	    && !Is_rogue_level(&u.uz)	/* same restriction as m_move() */
+#endif
+	    ) allowflags |= ALLOW_DIG;
 	cnt = mfndpos(mtmp, poss, info, allowflags);
 
 	/* Normally dogs don't step on cursed items, but if they have no
