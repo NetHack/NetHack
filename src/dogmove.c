@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.5	2005/10/10	*/
+/*	SCCS Id: @(#)dogmove.c	3.5	2005/10/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,43 +13,109 @@ STATIC_DCL boolean FDECL(dog_hunger,(struct monst *,struct edog *));
 STATIC_DCL int FDECL(dog_invent,(struct monst *,struct edog *,int));
 STATIC_DCL int FDECL(dog_goal,(struct monst *,struct edog *,int,int,int));
 
-STATIC_DCL struct obj *FDECL(DROPPABLES, (struct monst *));
 STATIC_DCL boolean FDECL(can_reach_location,(struct monst *,XCHAR_P,XCHAR_P,
     XCHAR_P,XCHAR_P));
 STATIC_DCL boolean FDECL(could_reach_item,(struct monst *, XCHAR_P,XCHAR_P));
 STATIC_DCL void FDECL(quickmimic, (struct monst *));
 
-STATIC_OVL struct obj *
-DROPPABLES(mon)
-register struct monst *mon;
+/* pick a carried item for pet to drop */
+struct obj *
+droppables(mon)
+struct monst *mon;
 {
-	register struct obj *obj;
-	struct obj *wep = MON_WEP(mon);
-	boolean item1 = FALSE, item2 = FALSE, item3 = FALSE;
+    struct obj *obj, *wep,
+	       dummy, *pickaxe, *unihorn, *key;
 
-	if (is_animal(mon->data) || mindless(mon->data))
-		item1 = item2 = item3 = TRUE;
-	if (!tunnels(mon->data) || !needspick(mon->data))
-		item1 = TRUE;
-	if (nohands(mon->data) || verysmall(mon->data))
-		item3 = TRUE;
-	for(obj = mon->minvent; obj; obj = obj->nobj) {
-		if (!item1 && is_pick(obj) && (obj->otyp != DWARVISH_MATTOCK
-						|| !which_armor(mon, W_ARMS))) {
-			item1 = TRUE;
-			continue;
-		}
-		if (!item2 && obj->otyp == UNICORN_HORN && !obj->cursed) {
-			item2 = TRUE;
-			continue;
-		}
-		if (!item3 && obj->otyp == SKELETON_KEY) {
-			item3 = TRUE;
-			continue;
-		}
-		if (!obj->owornmask && obj != wep) return obj;
+#ifndef TOURIST
+#define CREDIT_CARD STRANGE_OBJECT	/* avoids messy conditionalization */
+#endif
+
+#ifndef GOLDOBJ
+    if (mon->mgold) return &zeroobj;	/* pet has something to drop */
+#endif
+    dummy = zeroobj;
+    dummy.otyp = GOLD_PIECE;	/* not STRANGE_OBJECT or tools of interest */
+    dummy.oartifact = 1; /* so real artifact won't override "don't keep it" */
+    pickaxe = unihorn = key = (struct obj *)0;
+    wep = MON_WEP(mon);
+
+    if (is_animal(mon->data) || mindless(mon->data)) {
+	/* won't hang on to any objects of these types */
+	pickaxe = unihorn = key = &dummy;   /* act as if already have them */
+    } else {
+	/* don't hang on to pick-axe if can't use one or don't need one */
+	if (!tunnels(mon->data) || !needspick(mon->data)) pickaxe = &dummy;
+	/* don't hang on to key if can't open doors */
+	if (nohands(mon->data) || verysmall(mon->data)) key = &dummy;
+    }
+    if (wep) {
+	if (is_pick(wep)) pickaxe = wep;
+	if (wep->otyp == UNICORN_HORN) unihorn = wep;
+	/* don't need any wielded check for keys... */
+    }
+
+    for (obj = mon->minvent; obj; obj = obj->nobj) {
+	switch (obj->otyp) {
+	case DWARVISH_MATTOCK:
+	    /* reject mattock if couldn't wield it */
+	    if (which_armor(mon, W_ARMS)) break;
+	    /* keep mattock in preference to pick unless pick is already
+	       wielded or is an artifact and mattock isn't */
+	    if (pickaxe && pickaxe->otyp == PICK_AXE &&
+		    pickaxe != wep && (!pickaxe->oartifact || obj->oartifact))  
+		return pickaxe;	/* drop the one we earlier decided to keep */   
+	    /*FALLTHRU*/
+	case PICK_AXE:
+	    if (!pickaxe || (obj->oartifact && !pickaxe->oartifact)) {
+		if (pickaxe) return pickaxe;
+		pickaxe = obj;		/* keep this digging tool */
+		continue;
+	    }
+	    break;
+
+	case UNICORN_HORN:
+	    /* reject cursed unicorn horns */
+	    if (obj->cursed) break;
+	    /* keep artifact unihorn in preference to ordinary one */
+	    if (!unihorn || (obj->oartifact && !unihorn->oartifact)) {
+		if (unihorn) return unihorn;
+		unihorn = obj;		/* keep this unicorn horn */
+		continue;
+	    }
+	    break;
+
+	case SKELETON_KEY:
+	    /* keep key in preference to lock-pick */
+	    if (key && key->otyp == LOCK_PICK &&
+		    (!key->oartifact || obj->oartifact))
+		return key;	/* drop the one we earlier decided to keep */   
+	    /*FALLTHRU*/
+	case LOCK_PICK:
+	    /* keep lock-pick in preference to credit card */
+	    if (key && key->otyp == CREDIT_CARD &&
+		    (!key->oartifact || obj->oartifact))
+		return key;
+	    /*FALLTHRU*/
+	case CREDIT_CARD:
+	    if (!key || (obj->oartifact && !key->oartifact)) {
+		if (key) return key;
+		key = obj;		/* keep this unlocking tool */
+		continue;
+	    }
+	    break;
+
+	default:
+	    break;
 	}
-	return (struct obj *)0;
+
+	if (!obj->owornmask && obj != wep) return obj;
+    }
+
+#ifndef TOURIST
+#undef CREDIT_CARD
+#endif
+
+    return (struct obj *)0;	/* don't drop anything */
 }
 
 static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
@@ -288,11 +354,7 @@ int udist;
 	/* if we are carrying sth then we drop it (perhaps near @) */
 	/* Note: if apport == 1 then our behaviour is independent of udist */
 	/* Use udist+1 so steed won't cause divide by zero */
-#ifndef GOLDOBJ
-	if(DROPPABLES(mtmp) || mtmp->mgold) {
-#else
-	if(DROPPABLES(mtmp)) {
-#endif
+	if (droppables(mtmp)) {
 	    if (!rn2(udist+1) || !rn2(edog->apport))
 		if(rn2(10) < edog->apport){
 		    relobj(mtmp, (int)mtmp->minvis, TRUE);
@@ -363,7 +425,7 @@ int after, udist, whappr;
 	omy = mtmp->my;
 
 	in_masters_sight = couldsee(omx, omy);
-	dog_has_minvent = (DROPPABLES(mtmp) != 0);
+	dog_has_minvent = (droppables(mtmp) != 0);
 
 	if (!edog || mtmp->mleashed) {	/* he's not going anywhere... */
 	    gtyp = APPORT;
@@ -595,7 +657,7 @@ register int after;	/* this is extra fast monster movement */
 	}
 	if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
 	    allowflags |= OPENDOOR;
-	    if (m_carrying(mtmp, SKELETON_KEY)) allowflags |= UNLOCKDOOR;
+	    if (monhaskey(mtmp, TRUE)) allowflags |= UNLOCKDOOR;
 	    /* note:  the Wizard and Riders can unlock doors without a key;
 	       they won't use that ability if someone manages to tame them */
 	}

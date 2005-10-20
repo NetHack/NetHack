@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.5	2005/07/14	*/
+/*	SCCS Id: @(#)steal.c	3.5	2005/10/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -573,59 +573,32 @@ struct monst *mon;
 
 /* release the objects the creature is carrying */
 void
-relobj(mtmp,show,is_pet)
-register struct monst *mtmp;
-register int show;
+relobj(mtmp, show, is_pet)
+struct monst *mtmp;
+int show;
 boolean is_pet;		/* If true, pet should keep wielded/worn items */
 {
-	register struct obj *otmp;
-	register int omx = mtmp->mx, omy = mtmp->my;
-	struct obj *keepobj = 0;
-	struct obj *wep = MON_WEP(mtmp);
-	boolean item1 = FALSE, item2 = FALSE;
+	struct obj *otmp;
+	int omx = mtmp->mx, omy = mtmp->my;
 
-	if (!is_pet || mindless(mtmp->data) || is_animal(mtmp->data))
-		item1 = item2 = TRUE;
-	if (!tunnels(mtmp->data) || !needspick(mtmp->data))
-		item1 = TRUE;
-
-	while ((otmp = mtmp->minvent) != 0) {
-		obj_extract_self(otmp);
-		/* special case: pick-axe and unicorn horn are non-worn */
-		/* items that we also want pets to keep 1 of */
-		/* (It is a coincidence that these can also be wielded.) */
-		if (otmp->owornmask || otmp == wep ||
-		    ((!item1 && otmp->otyp == PICK_AXE) ||
-		     (!item2 && otmp->otyp == UNICORN_HORN && !otmp->cursed))) {
-			if (is_pet) { /* dont drop worn/wielded item */
-				if (otmp->otyp == PICK_AXE)
-					item1 = TRUE;
-				if (otmp->otyp == UNICORN_HORN && !otmp->cursed)
-					item2 = TRUE;
-				otmp->nobj = keepobj;
-				keepobj = otmp;
-				continue;
-			}
-		}
-		mdrop_obj(mtmp, otmp, is_pet && flags.verbose);
-	}
-
-	/* put kept objects back */
-	while ((otmp = keepobj) != (struct obj *)0) {
-	    keepobj = otmp->nobj;
-	    (void) add_to_minv(mtmp, otmp);
-	}
 #ifndef GOLDOBJ
+	/* handle gold first since droppables() would get stuck on it */
 	if (mtmp->mgold) {
-		register long g = mtmp->mgold;
+		long g = mtmp->mgold;
+
 		(void) mkgold(g, omx, omy);
 		if (is_pet && cansee(omx, omy) && flags.verbose)
-			pline("%s drops %ld gold piece%s.", Monnam(mtmp),
-				g, plur(g));
+		    pline("%s drops %ld gold piece%s.", Monnam(mtmp),
+			  g, plur(g));
 		mtmp->mgold = 0L;
 	}
 #endif
-	
+
+	while ((otmp = (is_pet ? droppables(mtmp) : mtmp->minvent)) != 0) {
+		obj_extract_self(otmp);
+		mdrop_obj(mtmp, otmp, is_pet && flags.verbose);
+	}
+
 	if (show & cansee(omx, omy))
 		newsym(omx, omy);
 }

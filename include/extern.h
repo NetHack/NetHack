@@ -441,6 +441,7 @@ E void FDECL(wary_dog, (struct monst *, BOOLEAN_P));
 
 /* ### dogmove.c ### */
 
+E struct obj *FDECL(droppables, (struct monst *));
 E int FDECL(dog_nutrition, (struct monst *,struct obj *));
 E int FDECL(dog_eat, (struct monst *,struct obj *,int,int,BOOLEAN_P));
 E int FDECL(dog_move, (struct monst *,int));
@@ -1245,6 +1246,7 @@ E boolean FDECL(olfaction, (struct permonst *));
 
 E boolean FDECL(itsstuck, (struct monst *));
 E boolean FDECL(mb_trapped, (struct monst *));
+E boolean FDECL(monhaskey, (struct monst *,BOOLEAN_P));
 E void FDECL(mon_regen, (struct monst *,BOOLEAN_P));
 E int FDECL(dochugw, (struct monst *));
 E boolean FDECL(onscary, (int,int,struct monst *));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monmove.c	3.5	2005/10/05	*/
+/*	SCCS Id: @(#)monmove.c	3.5	2005/10/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,6 +37,18 @@ register struct monst *mtmp;
 			return(TRUE);
 	}
 	return(FALSE);
+}
+
+/* check whether a monster is carrying a locking/unlocking tool */
+boolean
+monhaskey(mon, for_unlocking)
+struct monst *mon;
+boolean for_unlocking;	/* true => credit card ok, false => not ok */
+{
+#ifdef TOURIST
+    if (for_unlocking && m_carrying(mon, CREDIT_CARD)) return TRUE;
+#endif
+    return m_carrying(mon, SKELETON_KEY) || m_carrying(mon, LOCK_PICK);
 }
 
 STATIC_OVL void
@@ -676,7 +688,7 @@ register int after;
 #endif
 	    can_tunnel = tunnels(ptr);
 	can_open = !(nohands(ptr) || verysmall(ptr));
-	can_unlock = ((can_open && m_carrying(mtmp, SKELETON_KEY)) ||
+	can_unlock = ((can_open && monhaskey(mtmp, TRUE)) ||
 		      mtmp->iswiz || is_rider(ptr));
 	doorbuster = is_giant(ptr);
 	if(mtmp->wormno) goto not_special;
@@ -1120,7 +1132,8 @@ postmov:
 			&& !can_tunnel /* taken care of below */
 		      ) {
 		    struct rm *here = &levl[mtmp->mx][mtmp->my];
-		    boolean btrapped = (here->doormask & D_TRAPPED);
+		    boolean btrapped = (here->doormask & D_TRAPPED),
+			    observeit = canseeit && canspotmon(mtmp);
 
 		    if(here->doormask & (D_LOCKED|D_CLOSED) &&
 			(amorphous(ptr) || (!amorphous(ptr) && can_fog(mtmp) &&
@@ -1138,7 +1151,7 @@ postmov:
 			    if(mb_trapped(mtmp)) return(2);
 			} else {
 			    if (flags.verbose) {
-				if (canseemon(mtmp))
+				if (observeit)
 				    pline("%s unlocks and opens a door.",
 					  Monnam(mtmp));
 				else if (canseeit)
@@ -1158,7 +1171,9 @@ postmov:
 			    if(mb_trapped(mtmp)) return(2);
 			} else {
 			    if (flags.verbose) {
-				if (canseeit)
+				if (observeit)
+				     pline("%s opens a door.", Monnam(mtmp));
+				else if (canseeit)
 				     You_see("a door open.");
 				else if (!Deaf)
 				     You_hear("a door open.");
@@ -1176,7 +1191,10 @@ postmov:
 			    if(mb_trapped(mtmp)) return(2);
 			} else {
 			    if (flags.verbose) {
-				if (canseeit)
+				if (observeit)
+				    pline("%s smashes down a door.",
+					  Monnam(mtmp));
+				else if (canseeit)
 				    You_see("a door crash open.");
 				else if (!Deaf)
 				    You_hear("a door crash open.");
