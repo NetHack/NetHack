@@ -90,6 +90,10 @@ losing a level while polymorphed affects hero's current monster HP as well as
 	underlying normal HP
 mind flayer brain eating is subject to certain fatal targets and to cannibalism
 corpses of unique monsters in bones behaved incorrectly if revived or eaten
+fix pluralization for "this tin smells like mother-in-laws" when hallucinating
+try harder to keep pluralization straight when user assigns an already plural
+	value for named fruit
+avoid false matches when looking up fruit names ("grapefruit" isn't "grape")
 
 
 Platform- and/or Interface-Specific Fixes
