@@ -1371,7 +1371,8 @@ const char *oldstr;
 				|| !strncmp(spot, " de ", 4)
 				|| !strncmp(spot, " d'", 3)
 				|| !strncmp(spot, " du ", 4)
-				|| !strncmp(spot, "-in-", 4)) {
+				|| !strncmp(spot, "-in-", 4)
+				|| !strncmp(spot, "-at-", 4)) {
 			excess = oldstr + (int) (spot - str);
 			*spot = 0;
 			break;
@@ -1612,7 +1613,10 @@ const char *oldstr;
 	   recursively since it can't recognize whether we should be
 	   removing "es" rather than just "s" */
 	if ((p = strstri(bp, " of ")) != 0 ||
-		(p = strstri(bp, "-in-")) != 0) {
+		(p = strstri(bp, "-in-")) != 0 ||
+		(p = strstri(bp, "-at-")) != 0) {
+	    /* [wo]men-at-arms -> [wo]man-at-arms; takes "not end in s" exit */
+	    if (!BSTRNCMP(bp, p-3, "men", 3)) *(p-2) = 'a';
 	    if (BSTRNCMP(bp, p-1, "s", 1)) return bp;	/* wasn't plural */
 	    --p;		/* back up to the 's' */
 	    /* but don't singularize "gauntlets", "boots", "Eyes of the.." */
@@ -1693,9 +1697,12 @@ const char *oldstr;
 			Strcpy(p-5, "tooth");
 			return bp;
 		}
-
 		if (!BSTRCMP(bp, p-5, "fungi")) {
 			Strcpy(p-5, "fungus");
+			return bp;
+		}
+		if (!BSTRCMP(bp, p-3, "men")) {
+			Strcpy(p-3, "man");
 			return bp;
 		}
 

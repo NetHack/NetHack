@@ -94,6 +94,7 @@ fix pluralization for "this tin smells like mother-in-laws" when hallucinating
 try harder to keep pluralization straight when user assigns an already plural
 	value for named fruit
 avoid false matches when looking up fruit names ("grapefruit" isn't "grape")
+handle pluralization of man-at-arms and singularization of men-at-arms
 
 
 Platform- and/or Interface-Specific Fixes
