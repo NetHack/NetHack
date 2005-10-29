@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vault.c	3.5	2003/01/15	*/
+/*	SCCS Id: @(#)vault.c	3.5	2005/10/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,19 +18,21 @@ STATIC_DCL void FDECL(wallify_vault,(struct monst *));
 
 STATIC_OVL boolean
 clear_fcorr(grd, forceshow)
-register struct monst *grd;
-register boolean forceshow;
+struct monst *grd;
+boolean forceshow;
 {
 	register int fcx, fcy, fcbeg;
-	register struct monst *mtmp;
+	struct monst *mtmp;
+	boolean sawcorridor = FALSE;
+	struct egd *egrd = EGD(grd);
 
-	if (!on_level(&(EGD(grd)->gdlevel), &u.uz)) return TRUE;
+	if (!on_level(&egrd->gdlevel, &u.uz)) return TRUE;
 
-	while((fcbeg = EGD(grd)->fcbeg) < EGD(grd)->fcend) {
-		fcx = EGD(grd)->fakecorr[fcbeg].fx;
-		fcy = EGD(grd)->fakecorr[fcbeg].fy;
+	while ((fcbeg = egrd->fcbeg) < egrd->fcend) {
+		fcx = egrd->fakecorr[fcbeg].fx;
+		fcy = egrd->fakecorr[fcbeg].fy;
 		if((grd->mhp <= 0 || !in_fcorridor(grd, u.ux, u.uy)) &&
-				   EGD(grd)->gddone)
+			    egrd->gddone)
 			forceshow = TRUE;
 		if((u.ux == fcx && u.uy == fcy && grd->mhp > 0)
 			|| (!forceshow && couldsee(fcx,fcy))
@@ -45,12 +47,14 @@ register boolean forceshow;
 			    (void) rloc(mtmp, FALSE);
 			}
 		}
-		levl[fcx][fcy].typ = EGD(grd)->fakecorr[fcbeg].ftyp;
+		if (levl[fcx][fcy].typ == CORR && cansee(fcx, fcy))
+		    sawcorridor = TRUE;
+		levl[fcx][fcy].typ = egrd->fakecorr[fcbeg].ftyp;
 		map_location(fcx, fcy, 1);	/* bypass vision */
 		if(!ACCESSIBLE(levl[fcx][fcy].typ)) block_point(fcx,fcy);
-		EGD(grd)->fcbeg++;
+		egrd->fcbeg++;
 	}
-	if(grd->mhp <= 0) {
+	if (sawcorridor) {
 	    pline_The("corridor disappears.");
 	    if(IS_ROCK(levl[u.ux][u.uy].typ)) You("are encased in rock.");
 	}
