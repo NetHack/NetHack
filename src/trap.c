@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)trap.c	3.5	2005/11/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3919,12 +3919,12 @@ boolean disarm;
 			if(!Stunned) {
 			    if (Hallucination)
 				pline("What a groovy feeling!");
-			    else if (Blind)
-				You("%s and get dizzy...",
-				    stagger(youmonst.data, "stagger"));
 			    else
-				You("%s and your vision blurs...",
-				    stagger(youmonst.data, "stagger"));
+				You("%s%s...",
+				    stagger(youmonst.data, "stagger"),
+				    Halluc_resistance ? "" :
+					Blind ? " and get dizzy" :
+					    " and your vision blurs");
 			}
 			make_stunned(HStun + rn1(7, 16),FALSE);
 			(void) make_hallucinated(HHallucination + rn1(5, 16),FALSE,0L);
