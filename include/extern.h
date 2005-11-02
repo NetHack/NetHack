@@ -1033,6 +1033,8 @@ E int FDECL(dlord, (ALIGNTYP_P));
 E int NDECL(llord);
 E int FDECL(ndemon, (ALIGNTYP_P));
 E int NDECL(lminion);
+E void FDECL(lose_guardian_angel, (struct monst *));
+E void NDECL(gain_guardian_angel);
 
 /* ### mklev.c ### */
 

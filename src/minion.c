@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)minion.c	3.5	2004/12/20	*/
+/*	SCCS Id: @(#)minion.c	3.5	2005/11/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -319,6 +319,86 @@ aligntyp atyp;
 	}
 
 	return NON_PM;
+}
+
+/* guardian angel has been affected by conflict so is abandoning hero */
+void
+lose_guardian_angel(mon)
+struct monst *mon;	/* if null, angel hasn't been created yet */
+{
+    coord mm;
+    int i;
+
+    if (mon) {
+	if (canspotmon(mon)) {
+	    if (!Deaf) {
+		pline("%s rebukes you, saying:", Monnam(mon));
+		verbalize("Since you desire conflict, have some more!");
+	    } else {
+		pline("%s vanishes!", Monnam(mon));
+	    }
+	}
+	mongone(mon);
+    }
+    /* create 1 to 4 hostile angels to replace the lost guardian */
+    for (i = rnd(4); i > 0; --i) {
+	mm.x = u.ux;
+	mm.y = u.uy;
+	if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL]))
+	    (void) mk_roamer(&mons[PM_ANGEL], u.ualign.type,
+			     mm.x, mm.y, FALSE);
+    }
+}
+
+/* just entered the Astral Plane; receive tame guardian angel if worthy */
+void
+gain_guardian_angel()
+{
+    struct monst *mtmp;
+    struct obj *otmp;
+    coord mm;
+
+    Hear_again();	/* attempt to cure any deafness now (divine
+			   message will be heard even if that fails) */
+    if (Conflict) {
+	pline("A voice booms:");
+	verbalize("Thy desire for conflict shall be fulfilled!");
+	/* send in some hostile angels instead */
+	lose_guardian_angel((struct monst *)0);
+    } else if (u.ualign.record > 8) {	/* fervent */
+	pline("A voice whispers:");
+	verbalize("Thou hast been worthy of me!");
+	mm.x = u.ux;
+	mm.y = u.uy;
+	if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL]) &&
+		(mtmp = mk_roamer(&mons[PM_ANGEL], u.ualign.type,
+				  mm.x, mm.y, TRUE)) != 0) {
+	    if (!Blind)
+		pline("An angel appears near you.");
+	    else
+		You_feel("the presence of a friendly angel near you.");
+	    /* guardian angel -- the one case mtame doesn't
+	     * imply an edog structure, so we don't want to
+	     * call tamedog().
+	     */
+	    mtmp->mtame = 10;
+	    /* make him strong enough vs. endgame foes */
+	    mtmp->m_lev = rn1(8,15);
+	    mtmp->mhp = mtmp->mhpmax = d((int)mtmp->m_lev,10) + 30 + rnd(30);
+	    if ((otmp = select_hwep(mtmp)) == 0) {
+		otmp = mksobj(SILVER_SABER, FALSE, FALSE);
+		if (mpickobj(mtmp, otmp))
+		    panic("merged weapon?");
+	    }
+	    bless(otmp);
+	    if (otmp->spe < 4) otmp->spe += rnd(4);
+	    if ((otmp = which_armor(mtmp, W_ARMS)) == 0 ||
+		    otmp->otyp != SHIELD_OF_REFLECTION) {
+		(void) mongets(mtmp, AMULET_OF_REFLECTION);
+		m_dowear(mtmp, TRUE);
+	    }
+	}
+    }
 }
 
 /*minion.c*/
