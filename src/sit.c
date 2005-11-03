@@ -219,7 +219,7 @@ dosit()
 		    case 8:
 			/* Magical voice not affected by deafness */
 			pline("A voice echoes:");
-			verbalize("By thy Imperious order, %s...",
+			verbalize("By thine Imperious order, %s...",
 				  flags.female ? "Dame" : "Sire");
 			do_genocide(5);	/* REALLY|ONTHRONE, see do_genocide() */
 			break;
