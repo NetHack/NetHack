@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.5	2005/03/11	*/
+/*	SCCS Id: @(#)end.c	3.5	2005/11/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -972,6 +972,8 @@ boolean identified, all_containers;
 
 	for (box = list; box; box = box->nobj) {
 	    if (Is_container(box) || box->otyp == STATUE) {
+		box->cknown = 1;	/* we're looking at the contents now */
+		if (identified) box->lknown = 1;
 		cat = deadcat = FALSE;
 		if (box->otyp == LARGE_BOX &&
 		    box->spe == 1 && !Schroedingers_cat) {
@@ -980,7 +982,6 @@ boolean identified, all_containers;
 			if (cat) Schroedingers_cat = TRUE;
 			else deadcat = TRUE;
 			box->spe = 0;
-			box->cknown = box->lknown = 1;
 		}
 		if (box->otyp == BAG_OF_TRICKS) {
 		    continue;	/* wrong type of container */

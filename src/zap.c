@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2005/09/20	*/
+/*	SCCS Id: @(#)zap.c	3.5	2005/11/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1527,6 +1527,7 @@ struct obj *obj, *otmp;
 		/* target object has now been "seen (up close)" */
 		obj->dknown = 1;
 		if (Is_container(obj) || obj->otyp == STATUE) {
+		    obj->cknown = obj->lknown = 1;
 		    if (!obj->cobj)
 			pline("%s empty.", Tobjnam(obj, "are"));
 		    else {
@@ -1536,7 +1537,6 @@ struct obj *obj, *otmp;
 			    o->dknown = 1;	/* "seen", even if blind */
 			(void) display_cinventory(obj);
 		    }
-		    obj->cknown = 1;
 		    res = 1;
 		}
 		if (res) makeknown(WAN_PROBING);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2005/11/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -219,6 +219,10 @@ ask_again:
 		    else if (sym == 'a') *everything = TRUE;
 		    else if (sym == ':') {
 			simple_look(objs, here);  /* dumb if objs==invent */
+			/* if we just scanned the contents of a container
+			   then mark it as having known contents */
+			if (objs->where == OBJ_CONTAINED)
+			    objs->ocontainer->cknown = 1;
 			goto ask_again;
 		    } else if (sym == 'i') {
 			(void) display_inventory((char *)0, TRUE);
