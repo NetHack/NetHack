@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)epri.h	3.5	1997/05/01	*/
+/*	SCCS Id: @(#)epri.h	3.5	2005/11/02	*/
 /* Copyright (c) Izchak Miller, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,10 +15,7 @@ struct epri {
 
 #define EPRI(mon)	((struct epri *)&(mon)->mextra[0])
 
-/* A priest without ispriest is a roaming priest without a shrine, so
- * the fields (except shralign, which becomes only the priest alignment)
- * are available for reuse.
- */
-#define renegade shroom
+/* note: roaming priests (no shrine) switch from ispriest to isminion
+   (and emin extension) */
 
 #endif /* EPRI_H */

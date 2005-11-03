@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)priest.c	3.5	2005/10/01	*/
+/*	SCCS Id: @(#)priest.c	3.5	2005/11/02	*/
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -199,6 +199,7 @@ boolean sanctum;   /* is it the seat of the high priest? */
 		priest->mtrapseen = ~0;	/* traps are known */
 		priest->mpeaceful = 1;
 		priest->ispriest = 1;
+		priest->isminion = 0;
 		priest->msleeping = 0;
 		set_malign(priest); /* mpeaceful may have changed */
 
@@ -238,10 +239,8 @@ struct monst *mon;
  * Specially aligned monsters are named specially.
  *	- aligned priests with ispriest and high priests have shrines
  *		they retain ispriest and epri when polymorphed
- *	- aligned priests without ispriest and Angels are roamers
- *		they retain isminion and access epri as emin when polymorphed
- *		(coaligned Angels are also created as minions, but they
- *		use the same naming convention)
+ *	- aligned priests without ispriest are roamers
+ *		they have isminion set and access epri as emin
  *	- minions do not have ispriest but have isminion and emin
  *	- caller needs to inhibit Hallucination if it wants to force
  *		the true name even when under that influence
@@ -251,41 +250,40 @@ priestname(mon, pname)
 register struct monst *mon;
 char *pname;		/* caller-supplied output buffer */
 {
-	const char *what = Hallucination ? rndmonnam() : mon->data->mname;
+    boolean aligned_priest = mon->data == &mons[PM_ALIGNED_PRIEST],
+	    high_priest = mon->data == &mons[PM_HIGH_PRIEST];
+    const char *what = Hallucination ? rndmonnam() : mon->data->mname;
 
-	Strcpy(pname, "the ");
-	if (mon->minvis) Strcat(pname, "invisible ");
-	if (mon->ispriest || mon->data == &mons[PM_ALIGNED_PRIEST] ||
-					mon->data == &mons[PM_ANGEL]) {
-		/* use epri */
-		if (mon->mtame && mon->data == &mons[PM_ANGEL])
-			Strcat(pname, "guardian ");
-		if (mon->data != &mons[PM_ALIGNED_PRIEST] &&
-				mon->data != &mons[PM_HIGH_PRIEST]) {
-			Strcat(pname, what);
-			Strcat(pname, " ");
-		}
-		if (mon->data != &mons[PM_ANGEL]) {
-			if (!mon->ispriest && EPRI(mon)->renegade)
-				Strcat(pname, "renegade ");
-			if (mon->data == &mons[PM_HIGH_PRIEST])
-				Strcat(pname, "high ");
-			if (Hallucination)
-				Strcat(pname, "poohbah ");
-			else if (mon->female)
-				Strcat(pname, "priestess ");
-			else
-				Strcat(pname, "priest ");
-		}
-		Strcat(pname, "of ");
-		Strcat(pname, halu_gname((int)EPRI(mon)->shralign));
-		return(pname);
+    if (!mon->ispriest && !mon->isminion)	/* should never happen...  */
+	return strcpy(pname, what);		/* caller must be confused */
+
+    Strcpy(pname, "the ");
+    if (mon->minvis) Strcat(pname, "invisible ");
+    if (mon->isminion && EMIN(mon)->renegade)
+	Strcat(pname, "renegade ");
+
+    if (mon->ispriest || aligned_priest) {  /* high_priest implies ispriest */
+	if (!aligned_priest && !high_priest) {
+	    ;	/* polymorphed priest; use ``what'' as is */
+	} else {
+	    if (high_priest)
+		Strcat(pname, "high ");
+	    if (Hallucination)
+		what = "poohbah";
+	    else if (mon->female)
+		what = "priestess";
+	    else
+		what = "priest";
 	}
-	/* use emin instead of epri */
-	Strcat(pname, what);
-	Strcat(pname, " of ");
-	Strcat(pname, halu_gname(EMIN(mon)->min_align));
-	return(pname);
+    } else {
+	if (mon->mtame)
+	    Strcat(pname, "guardian ");
+    }
+
+    Strcat(pname, what);
+    Strcat(pname, " of ");
+    Strcat(pname, halu_gname(mon_aligntyp(mon)));
+    return pname;
 }
 
 boolean
@@ -544,19 +542,20 @@ boolean peaceful;
 	register struct monst *roamer;
 	register boolean coaligned = (u.ualign.type == alignment);
 
+	/* Angel's have the emin extension; aligned priests have the epri
+	   extension, we access it as if it were emin */
 	if (ptr != &mons[PM_ALIGNED_PRIEST] && ptr != &mons[PM_ANGEL])
 		return((struct monst *)0);
-	
+
 	if (MON_AT(x, y)) (void) rloc(m_at(x, y), FALSE);	/* insurance */
 
-	if (!(roamer = makemon(ptr, x, y, NO_MM_FLAGS)))
+	if (!(roamer = makemon(ptr, x, y, MM_ADJACENTOK)))
 		return((struct monst *)0);
 
-	EPRI(roamer)->shralign = alignment;
-	if (coaligned && !peaceful)
-		EPRI(roamer)->renegade = TRUE;
-	/* roamer->ispriest == FALSE naturally */
-	roamer->isminion = TRUE;	/* borrowing this bit */
+	EMIN(roamer)->min_align = alignment;
+	EMIN(roamer)->renegade = (coaligned && !peaceful);
+	roamer->ispriest = 0;
+	roamer->isminion = 1;
 	roamer->mtrapseen = ~0;		/* traps are known */
 	roamer->mpeaceful = peaceful;
 	roamer->msleeping = 0;
@@ -570,11 +569,11 @@ void
 reset_hostility(roamer)
 register struct monst *roamer;
 {
-	if(!(roamer->isminion && (roamer->data == &mons[PM_ALIGNED_PRIEST] ||
-				  roamer->data == &mons[PM_ANGEL])))
-	        return;
+	if (!roamer->isminion) return;
+	if (roamer->data != &mons[PM_ALIGNED_PRIEST] &&
+		roamer->data != &mons[PM_ANGEL]) return;
 
-	if(EPRI(roamer)->shralign != u.ualign.type) {
+	if (EMIN(roamer)->min_align != u.ualign.type) {
 	    roamer->mpeaceful = roamer->mtame = 0;
 	    set_malign(roamer);
 	}
@@ -686,24 +685,25 @@ angry_priest()
 			EPRI(priest)->shralign)) {
 		priest->ispriest = 0;		/* now a roamer */
 		priest->isminion = 1;		/* but still aligned */
-		/* this overloads the `shroom' field, which is now clobbered */
-		EPRI(priest)->renegade = 0;
+		/* this overloads EPRI's shroom field, which is now clobbered */
+		EMIN(priest)->renegade = FALSE;
 	    }
 	}
 }
 
 /*
  * When saving bones, find priests that aren't on their shrine level,
- * and remove them.   This avoids big problems when restoring bones.
+ * and remove them.  This avoids big problems when restoring bones.
+ * [Perhaps we should convert them into roamers instead?]
  */
 void
 clearpriests()
 {
-    register struct monst *mtmp, *mtmp2;
+    struct monst *mtmp;
 
-    for(mtmp = fmon; mtmp; mtmp = mtmp2) {
-	mtmp2 = mtmp->nmon;
-	if (!DEADMONSTER(mtmp) && mtmp->ispriest && !on_level(&(EPRI(mtmp)->shrlevel), &u.uz))
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	if (DEADMONSTER(mtmp)) continue;
+	if (mtmp->ispriest && !on_level(&(EPRI(mtmp)->shrlevel), &u.uz))
 	    mongone(mtmp);
     }
 }

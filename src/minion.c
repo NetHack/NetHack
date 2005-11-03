@@ -17,15 +17,14 @@ struct monst *mon;
 
 	if (mon) {
 	    ptr = mon->data;
-	    atyp = (ptr->maligntyp==A_NONE) ? A_NONE : sgn(ptr->maligntyp);
-	    if (mon->ispriest || mon->data == &mons[PM_ALIGNED_PRIEST]
-		|| mon->data == &mons[PM_ANGEL])
-		atyp = EPRI(mon)->shralign;
+	    atyp = mon->ispriest ? EPRI(mon)->shralign :
+		   mon->isminion ? EMIN(mon)->min_align :
+		   (ptr->maligntyp == A_NONE) ? A_NONE : sgn(ptr->maligntyp);
 	} else {
 	    ptr = &mons[PM_WIZARD_OF_YENDOR];
 	    atyp = (ptr->maligntyp==A_NONE) ? A_NONE : sgn(ptr->maligntyp);
 	}
-	    
+
 	if (is_dprince(ptr) || (ptr == &mons[PM_WIZARD_OF_YENDOR])) {
 	    dtype = (!rn2(20)) ? dprince(atyp) :
 				 (!rn2(4)) ? dlord(atyp) : ndemon(atyp);
@@ -78,7 +77,14 @@ struct monst *mon;
 	    if (mtmp) {
 		result++;
 		/* an angel's alignment should match the summoner */
-		if (dtype == PM_ANGEL) EPRI(mtmp)->shralign = atyp;
+		if (dtype == PM_ANGEL) {
+		    mtmp->isminion = 1;
+		    EMIN(mtmp)->min_align = atyp;
+		    /* renegade if same alignment but not peaceful
+		       or peaceful but different alignment */
+		    EMIN(mtmp)->renegade =
+				(atyp != u.ualign.type) ^ !mtmp->mpeaceful;
+		}
 	    }
 	    cnt--;
 	}
@@ -111,21 +117,17 @@ boolean talk;
     }
     if (mnum == NON_PM) {
 	mon = 0;
-    } else if (mons[mnum].pxlth == 0) {
-	struct permonst *pm = &mons[mnum];
-	mon = makemon(pm, u.ux, u.uy, MM_EMIN);
+    } else if (mons[mnum].pxlth == 0 || mnum == PM_ANGEL) {
+	mon = makemon(&mons[mnum], u.ux, u.uy,
+		      (mnum == PM_ANGEL) ? NO_MM_FLAGS : MM_EMIN);
 	if (mon) {
-	    mon->isminion = TRUE;
+	    mon->isminion = 1;
 	    EMIN(mon)->min_align = alignment;
+	    EMIN(mon)->renegade = FALSE;
 	}
-    } else if (mnum == PM_ANGEL) {
+    } else {
 	mon = makemon(&mons[mnum], u.ux, u.uy, NO_MM_FLAGS);
-	if (mon) {
-	    mon->isminion = TRUE;
-	    EPRI(mon)->shralign = alignment;	/* always A_LAWFUL here */
-	}
-    } else
-	mon = makemon(&mons[mnum], u.ux, u.uy, NO_MM_FLAGS);
+    }
     if (mon) {
 	if (talk) {
 	    pline_The("voice of %s booms:", align_gname(alignment));
@@ -340,8 +342,8 @@ struct monst *mon;	/* if null, angel hasn't been created yet */
 	}
 	mongone(mon);
     }
-    /* create 1 to 4 hostile angels to replace the lost guardian */
-    for (i = rnd(4); i > 0; --i) {
+    /* create 2 to 4 hostile angels to replace the lost guardian */
+    for (i = rn1(3,2); i > 0; --i) {
 	mm.x = u.ux;
 	mm.y = u.uy;
 	if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL]))

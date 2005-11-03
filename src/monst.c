@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monst.c	3.5	2000/07/14	*/
+/*	SCCS Id: @(#)monst.c	3.5	2005/11/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,6 +9,7 @@
 #include "eshk.h"
 #include "vault.h"
 #include "epri.h"
+#include "emin.h"
 
 #define NO_ATTK {0,0,0,0}
 
@@ -1085,12 +1086,16 @@ NEARDATA struct permonst mons[] = {
 	M1_HUMANOID|M1_SEE_INVIS,
 	M2_MINION|M2_STALK|M2_NASTY|M2_COLLECT, M3_INFRAVISIBLE|M3_INFRAVISION,
 	CLR_YELLOW),
+	/* Angels start with the emin extension attached, and usually have
+	   the isminion flag set; however, non-minion Angels can be tamed
+	   and will switch to edog (guardian Angel is handled specially and
+	   always sticks with emin) */
     MON("Angel", S_ANGEL,
 	LVL(14, 10, -4, 55, 12), (G_NOHELL|G_NOCORPSE|1),
 	A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6), 
 	  ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_MAGC, AD_MAGM, 2, 6),
 	  NO_ATTK, NO_ATTK),
-	SIZ(WT_HUMAN, 400, sizeof(struct epri), MS_CUSS, MZ_HUMAN),
+	SIZ(WT_HUMAN, 400, sizeof(struct emin), MS_CUSS, MZ_HUMAN),
 	MR_COLD|MR_ELEC|MR_SLEEP|MR_POISON, 0,
 	M1_FLY|M1_HUMANOID|M1_SEE_INVIS,
 	M2_NOPOLY|M2_MINION|M2_STALK|M2_STRONG|M2_NASTY|M2_COLLECT,
@@ -2391,6 +2396,9 @@ struct permonst _mons2[] = {
 	SIZ(WT_HUMAN, 400, 0, MS_ORACLE, MZ_HUMAN), 0, 0,
 	M1_HUMANOID|M1_OMNIVORE,
 	M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_FEMALE, M3_INFRAVISIBLE, HI_ZAP),
+	/* aligned priests always have the epri extension attached;
+	   individual instantiations should always have either ispriest
+	   or isminion set */
     MON("aligned priest", S_HUMAN,
 	LVL(12, 12, 10, 50, 0), G_NOGEN,
 	A(ATTK(AT_WEAP, AD_PHYS, 4,10), ATTK(AT_KICK, AD_PHYS, 1, 4),
@@ -2399,6 +2407,7 @@ struct permonst _mons2[] = {
 	MR_ELEC, 0, M1_HUMANOID|M1_OMNIVORE,
 	M2_NOPOLY|M2_HUMAN|M2_LORD|M2_PEACEFUL|M2_COLLECT, M3_INFRAVISIBLE,
 	CLR_WHITE),
+	/* high priests always have epri and always have ispriest set */
     MON("high priest", S_HUMAN,
 	LVL(25, 15, 7, 70, 0), (G_NOGEN|G_UNIQ),
 	A(ATTK(AT_WEAP, AD_PHYS, 4,10), ATTK(AT_KICK, AD_PHYS, 2, 8),
