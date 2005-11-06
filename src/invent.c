@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)invent.c	3.5	2005/11/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1472,6 +1472,8 @@ struct obj *otmp;
     makeknown(otmp->otyp);
     if (otmp->oartifact) discover_artifact((xchar)otmp->oartifact);
     otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
+    if (Is_container(otmp) || otmp->otyp == STATUE)
+	otmp->cknown = otmp->lknown = 1;
     if (otmp->otyp == EGG && otmp->corpsenm != NON_PM)
 	learn_egg_type(otmp->corpsenm);
 }

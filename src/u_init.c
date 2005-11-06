@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)u_init.c	3.5	2005/09/19	*/
+/*	SCCS Id: @(#)u_init.c	3.5	2005/11/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -980,8 +980,12 @@ register struct trobj *trop;
 			obj->quan = u.umoney0;
 		} else {
 #endif
-			obj->dknown = obj->bknown = obj->rknown = 1;
 			if (objects[otyp].oc_uses_known) obj->known = 1;
+			obj->dknown = obj->bknown = obj->rknown = 1;
+			if (Is_container(obj) || obj->otyp == STATUE) {
+			    obj->cknown = obj->lknown = 1;
+			    obj->otrapped = 0;
+			}
 			obj->cursed = 0;
 			if (obj->opoisoned && u.ualign.type != A_CHAOTIC)
 			    obj->opoisoned = 0;

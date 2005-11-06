@@ -822,6 +822,9 @@ register struct obj *otmp;
 #endif
 	    !objects[otmp->otyp].oc_name_known)	/* ?redundant? */
 	return TRUE;
+    if ((!otmp->cknown && (Is_container(otmp) || otmp->otyp == STATUE)) ||
+	    (!otmp->lknown && Is_box(otmp)))
+	return TRUE;
     if (otmp->oartifact && undiscovered_artifact(otmp->oartifact))
 	return TRUE;
     /* otmp->rknown is the only item of interest if we reach here */
