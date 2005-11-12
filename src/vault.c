@@ -454,7 +454,7 @@ register struct monst *grd;
         long umoney = money_cnt(invent);
 	register boolean u_carry_gold = ((umoney + hidden_gold()) > 0L);
 #endif
-	boolean see_guard;
+	boolean see_guard, newspot = FALSE;
 
 	if(!on_level(&(egrd->gdlevel), &u.uz)) return(-1);
 	nx = ny = m = n = 0;
@@ -695,6 +695,7 @@ nextpos:
 	}
 	crm->typ = CORR;
 proceed:
+	newspot = TRUE;
 	unblock_point(nx, ny);	/* doesn't block light */
 	if (cansee(nx,ny))
 	    newsym(nx,ny);
@@ -738,7 +739,14 @@ cleanup:
 	egrd->ogy = grd->my;
 	remove_monster(grd->mx, grd->my);
 	place_monster(grd, nx, ny);
-	newsym(grd->mx,grd->my);
+	if (newspot && g_at(nx, ny)) {
+	    /* if there's gold already here (most likely from mineralize()),
+	       pick it up now so that guard doesn't later think hero dropped
+	       it and give an inappropriate message */
+	    mpickgold(grd);
+	    if (canspotmon(grd)) pline("%s picks up some gold.", Monnam(grd));
+	} else
+	    newsym(grd->mx, grd->my);
 	restfakecorr(grd);
 	return(1);
 }
