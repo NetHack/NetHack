@@ -95,6 +95,8 @@ try harder to keep pluralization straight when user assigns an already plural
 	value for named fruit
 avoid false matches when looking up fruit names ("grapefruit" isn't "grape")
 handle pluralization of man-at-arms and singularization of men-at-arms
+assigning an artifact name is rejected on objects with similar description to
+	corresponding artifact's type rather than just those of the same type
 
 
 Platform- and/or Interface-Specific Fixes

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.5	2005/10/01	*/
+/*	SCCS Id: @(#)artifact.c 3.5	2005/11/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -279,17 +279,27 @@ register struct obj *otmp;
 register const char *name;
 {
 	register const struct artifact *a;
-	register const char *aname;
+	const char *aname, *odesc, *other;
+	boolean sametype[NUM_OBJECTS];
+	int i, otyp = otmp->otyp, ocls = objects[otyp].oc_class;
 
 	if (!*name) return FALSE;
 	if (!strncmpi(name, "the ", 4)) name += 4;
+
+	/* find any alternate types which have the same description as otyp */
+	odesc = OBJ_DESCR(objects[otyp]);
+	for (i = 0; i < NUM_OBJECTS; i++)
+	    sametype[i] = (i == otyp ||
+			    (objects[i].oc_class == ocls &&
+			     odesc && (other = OBJ_DESCR(objects[i])) != 0 &&
+			     !strcmp(odesc, other)));
 
 		/* Since almost every artifact is SPFX_RESTR, it doesn't cost
 		   us much to do the string comparison before the spfx check.
 		   Bug fix:  don't name multiple elven daggers "Sting".
 		 */
 	for (a = artilist+1; a->otyp; a++) {
-	    if (a->otyp != otmp->otyp) continue;
+	    if (!sametype[a->otyp]) continue;
 	    aname = a->name;
 	    if (!strncmpi(aname, "the ", 4)) aname += 4;
 	    if (!strcmp(aname, name))
