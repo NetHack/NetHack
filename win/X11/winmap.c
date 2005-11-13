@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)winmap.c	3.5	1996/04/05	*/
+/*	SCCS Id: @(#)winmap.c	3.5	2005/11/12	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1105,7 +1105,7 @@ set_button_values(w, x, y, button)
     /* The values can be out of range if the map window has been resized */
     /* to be larger than the max size.					 */
     if (click_x >= COLNO) click_x = COLNO-1;
-    if (click_y >= ROWNO) click_x = ROWNO-1;
+    if (click_y >= ROWNO) click_y = ROWNO-1;
 
     /* Map all buttons but the first to the second click */
     click_button = (button == Button1) ? CLICK_1 : CLICK_2;
