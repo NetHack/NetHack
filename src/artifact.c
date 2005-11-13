@@ -286,13 +286,21 @@ register const char *name;
 	if (!*name) return FALSE;
 	if (!strncmpi(name, "the ", 4)) name += 4;
 
-	/* find any alternate types which have the same description as otyp */
-	odesc = OBJ_DESCR(objects[otyp]);
-	for (i = 0; i < NUM_OBJECTS; i++)
-	    sametype[i] = (i == otyp ||
-			    (objects[i].oc_class == ocls &&
-			     odesc && (other = OBJ_DESCR(objects[i])) != 0 &&
-			     !strcmp(odesc, other)));
+	/* decide what types of objects are the same as otyp;
+	   if it's been discovered, then only itself matches;
+	   otherwise, include all other undiscovered objects
+	   of the same class which have the same description */
+	(void) memset((genericptr_t)sametype, 0, sizeof sametype); /* FALSE */
+	sametype[otyp] = TRUE;
+	if (!objects[otyp].oc_name_known &&
+		(odesc = OBJ_DESCR(objects[otyp])) != 0)
+	    for (i = bases[ocls]; i < NUM_OBJECTS; i++) {
+		if (objects[i].oc_class != ocls) break;
+		if (!objects[i].oc_name_known &&
+			(other = OBJ_DESCR(objects[i])) != 0 &&
+			!strcmp(odesc, other))
+		    sametype[i] = TRUE;
+	    }
 
 		/* Since almost every artifact is SPFX_RESTR, it doesn't cost
 		   us much to do the string comparison before the spfx check.
