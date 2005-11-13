@@ -97,6 +97,7 @@ avoid false matches when looking up fruit names ("grapefruit" isn't "grape")
 handle pluralization of man-at-arms and singularization of men-at-arms
 assigning an artifact name is rejected on objects with similar description to
 	corresponding artifact's type rather than just those of the same type
+adjust feedback for gas spore explosion when hallucinating
 
 
 Platform- and/or Interface-Specific Fixes

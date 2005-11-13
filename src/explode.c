@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)explode.c	3.5	2004/12/21	*/
+/*	SCCS Id: @(#)explode.c	3.5	2005/11/12	*/
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,9 +44,9 @@ int expltype;
 	uchar adtyp;
 	int explmask[3][3];
 		/* 0=normal explosion, 1=do shieldeff, 2=do nothing */
-	boolean shopdamage = FALSE;
-	boolean generic = FALSE;
-	boolean physical_dmg = FALSE;
+	boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
+		do_hallu = FALSE;
+	char hallu_buf[BUFSZ];
 
 	if (olet == WAND_CLASS)		/* retributive strike */
 		switch (Role_switch) {
@@ -62,6 +62,7 @@ int expltype;
 
 	if (olet == MON_EXPLODE) {
 	    str = killer.name;
+	    do_hallu = Hallucination && strstri(str, "'s explosion");
 	    adtyp = AD_PHYS;
 	} else
 	switch (abs(type) % 10) {
@@ -248,6 +249,17 @@ int expltype;
 			mtmp = u.usteed;
 #endif
 		if (!mtmp) continue;
+		if (do_hallu) {
+		    /* replace "gas spore" with a different description
+		       for each target (we can't distinguish personal names
+		       like "Barney" here in order to suppress "the" below,
+		       so avoid any which begins with a capital letter) */
+		    do {
+			Sprintf(hallu_buf, "%s explosion",
+				s_suffix(rndmonnam())); 
+		    } while (*hallu_buf != lowc(*hallu_buf));
+		    str = hallu_buf;
+		}
 		if (u.uswallow && mtmp == u.ustuck) {
 			if (is_animal(u.ustuck->data))
 				pline("%s gets %s!",
@@ -316,8 +328,16 @@ int expltype;
 	/* Do your injury last */
 	if (uhurt) {
 		if ((type >= 0 || adtyp == AD_PHYS) &&	/* gas spores */
-				flags.verbose && olet != SCROLL_CLASS)
-			You("are caught in the %s!", str);
+				flags.verbose && olet != SCROLL_CLASS) {
+		    if (do_hallu) {	/* (see explanation above) */
+			do {
+			    Sprintf(hallu_buf, "%s explosion",
+				    s_suffix(rndmonnam())); 
+			} while (*hallu_buf != lowc(*hallu_buf));
+			str = hallu_buf;
+		    }
+		    You("are caught in the %s!", str);
+		}
 		/* do property damage first, in case we end up leaving bones */
 		if (adtyp == AD_FIRE) burn_away_slime();
 		if (Invulnerable) {
@@ -349,7 +369,7 @@ int expltype;
 			    /* killer handled by caller */
 			    if (generic)
 				killer.name[0] = 0;
-			    else if (str != killer.name)
+			    else if (str != killer.name && str != hallu_buf)
 				Strcpy(killer.name, str);
 			    killer.format = KILLED_BY_AN;
 			} else if (type >= 0 && olet != SCROLL_CLASS) {
