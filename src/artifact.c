@@ -281,7 +281,7 @@ register const char *name;
 	register const struct artifact *a;
 	const char *aname, *odesc, *other;
 	boolean sametype[NUM_OBJECTS];
-	int i, otyp = otmp->otyp, ocls = objects[otyp].oc_class;
+	int i, lo, hi, otyp = otmp->otyp, ocls = objects[otyp].oc_class;
 
 	if (!*name) return FALSE;
 	if (!strncmpi(name, "the ", 4)) name += 4;
@@ -289,18 +289,21 @@ register const char *name;
 	/* decide what types of objects are the same as otyp;
 	   if it's been discovered, then only itself matches;
 	   otherwise, include all other undiscovered objects
-	   of the same class which have the same description */
+	   of the same class which have the same description
+	   or share the same pool of shuffled descriptions */
 	(void) memset((genericptr_t)sametype, 0, sizeof sametype); /* FALSE */
 	sametype[otyp] = TRUE;
 	if (!objects[otyp].oc_name_known &&
-		(odesc = OBJ_DESCR(objects[otyp])) != 0)
+		(odesc = OBJ_DESCR(objects[otyp])) != 0) {
+	    obj_shuffle_range(otyp, &lo, &hi);
 	    for (i = bases[ocls]; i < NUM_OBJECTS; i++) {
 		if (objects[i].oc_class != ocls) break;
 		if (!objects[i].oc_name_known &&
 			(other = OBJ_DESCR(objects[i])) != 0 &&
-			!strcmp(odesc, other))
+			(!strcmp(odesc, other) || (i >= lo && i <= hi)))
 		    sametype[i] = TRUE;
 	    }
+	}
 
 		/* Since almost every artifact is SPFX_RESTR, it doesn't cost
 		   us much to do the string comparison before the spfx check.

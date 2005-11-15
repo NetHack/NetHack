@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)o_init.c	3.5	1999/12/09	*/
+/*	SCCS Id: @(#)o_init.c	3.5	2005/11/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -176,53 +176,92 @@ register char oclass;
 #endif
 }
 
+/* retrieve the range of objects that otyp shares descriptions with */
+void
+obj_shuffle_range(otyp, lo_p, hi_p)
+int otyp;		/* input: representative item */
+int *lo_p, *hi_p;	/* output: range that item belongs among */
+{
+    int i, ocls = objects[otyp].oc_class;
+
+    /* default is just the object itself */
+    *lo_p = *hi_p = otyp;
+
+    switch (ocls) {
+    case ARMOR_CLASS:
+	if (otyp >= HELMET && otyp <= HELM_OF_TELEPATHY)
+	    *lo_p = HELMET,  *hi_p = HELM_OF_TELEPATHY;
+	else if (otyp >= LEATHER_GLOVES && otyp <= GAUNTLETS_OF_DEXTERITY)
+	    *lo_p = LEATHER_GLOVES,  *hi_p = GAUNTLETS_OF_DEXTERITY;
+	else if (otyp >= CLOAK_OF_PROTECTION && otyp <= CLOAK_OF_DISPLACEMENT)
+	    *lo_p = CLOAK_OF_PROTECTION,  *hi_p = CLOAK_OF_DISPLACEMENT;
+	else if (otyp >= SPEED_BOOTS && otyp <= LEVITATION_BOOTS)
+	    *lo_p = SPEED_BOOTS,  *hi_p = LEVITATION_BOOTS;
+	break;
+    case POTION_CLASS:
+	/* potion of water has the only fixed description */
+	*lo_p = bases[POTION_CLASS];
+	*hi_p = POT_WATER - 1;
+	break;
+    case AMULET_CLASS:
+    case SCROLL_CLASS:
+    case SPBOOK_CLASS:
+	/* exclude non-magic types and also unique ones */
+	*lo_p = bases[ocls];
+	for (i = *lo_p; objects[i].oc_class == ocls; i++)
+	    if (objects[i].oc_unique || !objects[i].oc_magic) break;
+	*hi_p = i - 1;
+	break;
+    case RING_CLASS:
+    case WAND_CLASS:
+    case VENOM_CLASS:
+	/* entire class */
+	*lo_p = bases[ocls];
+	for (i = *lo_p; objects[i].oc_class == ocls; i++) continue;
+	*hi_p = i - 1;
+	break;
+    }
+
+    /* artifact checking might ask about item which isn't part of any range
+       but fell within the classes that do have ranges specified above */
+    if (otyp < *lo_p || otyp > *hi_p) *lo_p = *hi_p = otyp;
+    return;
+}
+
+/* randomize object descriptions */
 STATIC_OVL void
 shuffle_all()
 {
-	int first, last, oclass;
+    /* entire classes; obj_shuffle_range() handles their exceptions */
+    static char shuffle_classes[] = {
+	AMULET_CLASS,
+	POTION_CLASS,
+	RING_CLASS,
+	SCROLL_CLASS,
+	SPBOOK_CLASS,
+	WAND_CLASS,
+	VENOM_CLASS,
+    };
+    /* sub-class type ranges (one item from each group) */
+    static short shuffle_types[] = {
+	HELMET,
+	LEATHER_GLOVES,
+	CLOAK_OF_PROTECTION,
+	SPEED_BOOTS,
+    };
+    int first, last, idx;
 
-	for (oclass = 1; oclass < MAXOCLASSES; oclass++) {
-		first = bases[oclass];
-		last = first+1;
-		while (last < NUM_OBJECTS && objects[last].oc_class == oclass)
-			last++;
-
-		if (OBJ_DESCR(objects[first]) != (char *)0 &&
-				oclass != TOOL_CLASS &&
-				oclass != WEAPON_CLASS &&
-				oclass != ARMOR_CLASS &&
-				oclass != GEM_CLASS) {
-			int j = last-1;
-
-			if (oclass == POTION_CLASS)
-			    j -= 1;  /* only water has a fixed description */
-			else if (oclass == AMULET_CLASS ||
-				 oclass == SCROLL_CLASS ||
-				 oclass == SPBOOK_CLASS) {
-			    while (!objects[j].oc_magic || objects[j].oc_unique)
-				j--;
-			}
-
-			/* non-magical amulets, scrolls, and spellbooks
-			 * (ex. imitation Amulets, blank, scrolls of mail)
-			 * and one-of-a-kind magical artifacts at the end of
-			 * their class in objects[] have fixed descriptions.
-			 */
-			shuffle(first, j, TRUE);
-		}
-	}
-
-	/* shuffle the helmets */
-	shuffle(HELMET, HELM_OF_TELEPATHY, FALSE);
-
-	/* shuffle the gloves */
-	shuffle(LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY, FALSE);
-
-	/* shuffle the cloaks */
-	shuffle(CLOAK_OF_PROTECTION, CLOAK_OF_DISPLACEMENT, FALSE);
-
-	/* shuffle the boots [if they change, update find_skates() below] */
-	shuffle(SPEED_BOOTS, LEVITATION_BOOTS, FALSE);
+    /* do whole classes (amulets, &c) */
+    for (idx = 0; idx < SIZE(shuffle_classes); idx++) {
+	obj_shuffle_range(bases[shuffle_classes[idx]], &first, &last);
+	shuffle(first, last, TRUE);
+    }
+    /* do type ranges (helms, &c) */
+    for (idx = 0; idx < SIZE(shuffle_types); idx++) {
+	obj_shuffle_range(shuffle_types[idx], &first, &last);
+	shuffle(first, last, FALSE);
+    }
+    return;
 }
 
 /* find the object index for snow boots; used [once] by slippery ice code */
