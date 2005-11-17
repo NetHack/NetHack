@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2005/09/03	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2005/11/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -392,6 +392,7 @@ int alter_type;
 	   use hero's location */
 	if (!get_obj_location(obj, &ox, &oy, CONTAINED_TOO))
 	    ox = u.ux, oy = u.uy;
+	if (!costly_spot(ox, oy)) return;
 	objroom = *in_rooms(ox, oy, SHOPBASE);
 	/* if no shop cares about it, we're done */
 	if (!billable(&shkp, obj, objroom, FALSE)) return;
