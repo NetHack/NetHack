@@ -98,6 +98,7 @@ handle pluralization of man-at-arms and singularization of men-at-arms
 assigning an artifact name is rejected on objects with similar description to
 	corresponding artifact's type rather than just those of the same type
 adjust feedback for gas spore explosion when hallucinating
+traps detected by scroll or crystal ball overlooked carried or buried chests
 
 
 Platform- and/or Interface-Specific Fixes

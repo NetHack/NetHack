@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)detect.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)detect.c	3.5	2005/11/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,6 +16,7 @@ STATIC_DCL void FDECL(do_dknown_of, (struct obj *));
 STATIC_DCL boolean FDECL(check_map_spot, (int,int,CHAR_P,unsigned));
 STATIC_DCL boolean FDECL(clear_stale_map, (CHAR_P,unsigned));
 STATIC_DCL void FDECL(sense_trap, (struct trap *,XCHAR_P,XCHAR_P,int));
+STATIC_DCL int FDECL(detect_obj_traps, (struct obj *,BOOLEAN_P,int));
 STATIC_DCL void FDECL(show_map_spot, (int,int));
 STATIC_PTR void FDECL(findone,(int,int,genericptr_t));
 STATIC_PTR void FDECL(openone,(int,int,genericptr_t));
@@ -672,6 +673,35 @@ int src_cursed;
 
 }
 
+#define OTRAP_NONE	0	/* nothing found */
+#define OTRAP_HERE	1	/* found at hero's location */
+#define OTRAP_THERE	2	/* found at any other location */
+
+/* check a list of objects for chest traps; return 1 if found at <ux,uy>,
+   2 if found at some other spot, 3 if both, 0 otherwise; optionally
+   update the map to show where such traps were found */
+STATIC_OVL int
+detect_obj_traps(objlist, show_them, how)
+struct obj *objlist;
+boolean show_them;
+int how;		/* 1 for misleading map feedback */
+{
+    struct obj *otmp;
+    xchar x, y;
+    int result = OTRAP_NONE;
+
+    for (otmp = objlist; otmp; otmp = otmp->nobj) {
+	if (Is_box(otmp) && otmp->otrapped &&
+		get_obj_location(otmp, &x, &y, BURIED_TOO|CONTAINED_TOO)) {
+	    result |= (x == u.ux && y == u.uy) ? OTRAP_HERE : OTRAP_THERE;
+	    if (show_them) sense_trap((struct trap *)0, x, y, how);
+	}
+	if (Has_contents(otmp))
+	    result |= detect_obj_traps(otmp->cobj, show_them, how);
+    }
+    return result;
+}
+
 /* the detections are pulled out so they can	*/
 /* also be used in the crystal ball routine	*/
 /* returns 1 if nothing was detected		*/
@@ -683,23 +713,37 @@ register struct obj *sobj;
 {
     register struct trap *ttmp;
     register struct obj *obj;
-    register int door;
-    int uw = u.uinwater;
+    struct monst *mon;
+    int door, glyph, tr;
+    int uw = u.uinwater, cursed_src = sobj && sobj->cursed;
     boolean found = FALSE;
     coord cc;
 
+    /* floor/ceiling traps */
     for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
 	if (ttmp->tx != u.ux || ttmp->ty != u.uy)
 	    goto outtrapmap;
 	else found = TRUE;
     }
-    for (obj = fobj; obj; obj = obj->nobj) {
-	if (Is_box(obj) && obj->otrapped) {
-	    if (obj->ox != u.ux || obj->oy != u.uy)
-		goto outtrapmap;
+    /* chest traps (might be buried or carried) */
+    if ((tr = detect_obj_traps(fobj, FALSE, 0)) != OTRAP_NONE) {
+	if (tr & OTRAP_THERE) goto outtrapmap;
+	else found = TRUE;
+    }
+    if ((tr = detect_obj_traps(level.buriedobjlist, FALSE, 0)) != OTRAP_NONE) {
+	if (tr & OTRAP_THERE) goto outtrapmap;
+	else found = TRUE;
+    }
+    for (mon = fmon; mon; mon = mon->nmon) {
+	if (DEADMONSTER(mon)) continue;
+	if ((tr = detect_obj_traps(mon->minvent, FALSE, 0)) != OTRAP_NONE) {
+	    if (tr & OTRAP_THERE) goto outtrapmap;
 	    else found = TRUE;
 	}
     }
+    if (detect_obj_traps(invent, FALSE, 0) != OTRAP_NONE)
+	found = TRUE;
+    /* door traps */
     for (door = 0; door < doorindex; door++) {
 	cc = doors[door];
 	if (levl[cc.x][cc.y].doormask & D_TRAPPED) {
@@ -709,7 +753,8 @@ register struct obj *sobj;
 	}
     }
     if (!found) {
-	char buf[42];
+	char buf[BUFSZ];
+
 	Sprintf(buf, "Your %s stop itching.", makeplural(body_part(TOE)));
 	strange_feeling(sobj,buf);
 	return(1);
@@ -721,21 +766,33 @@ outtrapmap:
     cls();
 
     u.uinwater = 0;
-    for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
-	sense_trap(ttmp, 0, 0, sobj && sobj->cursed);
 
-    for (obj = fobj; obj; obj = obj->nobj)
-	if (Is_box(obj) && obj->otrapped)
-	sense_trap((struct trap *)0, obj->ox, obj->oy, sobj && sobj->cursed);
+    /* show chest traps first, so that subsequent floor trap display
+       will override if both types are present at the same location */
+    (void) detect_obj_traps(fobj, TRUE, cursed_src);
+    (void) detect_obj_traps(level.buriedobjlist, TRUE, cursed_src);
+    for (mon = fmon; mon; mon = mon->nmon) {
+	if (DEADMONSTER(mon)) continue;
+	(void) detect_obj_traps(mon->minvent, TRUE, cursed_src);
+    }
+    (void) detect_obj_traps(invent, TRUE, cursed_src);
+
+    for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
+	sense_trap(ttmp, 0, 0, cursed_src);
 
     for (door = 0; door < doorindex; door++) {
 	cc = doors[door];
 	if (levl[cc.x][cc.y].doormask & D_TRAPPED)
-	sense_trap((struct trap *)0, cc.x, cc.y, sobj && sobj->cursed);
+	    sense_trap((struct trap *)0, cc.x, cc.y, cursed_src);
     }
 
-    newsym(u.ux,u.uy);
-    You_feel("%s.", sobj && sobj->cursed ? "very greedy" : "entrapped");
+    /* redisplay hero unless sense_trap() revealed something at <ux,uy> */
+    glyph = glyph_at(u.ux, u.uy);
+    if (!(glyph_is_trap(glyph) || glyph_is_object(glyph)))
+	newsym(u.ux, u.uy);
+
+    You_feel("%s.", cursed_src ? "very greedy" : "entrapped");
+    /* wait for user to respond, then reset map display to normal */
     display_nhwindow(WIN_MAP, TRUE);
     docrt();
     u.uinwater = uw;
