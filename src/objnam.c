@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2005/10/21	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2005/11/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1835,7 +1835,7 @@ struct obj *no_wish;
 	int isinvisible;
 #endif
 	int halfeaten, mntmp, contents;
-	int islit, unlabeled, ishistoric, isdiluted;
+	int islit, unlabeled, ishistoric, isdiluted, trapped;
 	int tmp, tinv, tvariety;
 	struct fruit *f;
 	int ftype = current_fruit;
@@ -1865,7 +1865,8 @@ struct obj *no_wish;
 		isinvisible =
 #endif
 		ispoisoned = isgreased = eroded = eroded2 = erodeproof =
-		halfeaten = islit = unlabeled = ishistoric = isdiluted = 0;
+		halfeaten = islit = unlabeled = ishistoric = isdiluted =
+		trapped = 0;
 	tvariety = RANDOM_TIN;
 	mntmp = NON_PM;
 #define UNDEFINED 0
@@ -1935,12 +1936,16 @@ struct obj *no_wish;
 			   !strncmpi(bp,"unlabelled ", l=11) ||
 			   !strncmpi(bp,"blank ", l=6)) {
 			unlabeled = 1;
-		} else if(!strncmpi(bp, "poisoned ",l=9)
-#ifdef WIZARD
-			  || (wizard && !strncmpi(bp, "trapped ",l=8))
-#endif
-			  ) {
+		} else if(!strncmpi(bp, "poisoned ",l=9)) {
 			ispoisoned=1;
+		/* "trapped" recognized but not honored outside wizard mode */
+		} else if(!strncmpi(bp, "trapped ",l=8)) {
+			trapped = 0;	/* undo any previous "untrapped" */
+#ifdef WIZARD
+			if (wizard) trapped = 1;
+#endif
+		} else if(!strncmpi(bp, "untrapped ",l=10)) {
+			trapped = 2;	/* not trapped */
 		} else if(!strncmpi(bp, "greased ",l=8)) {
 			isgreased=1;
 		} else if (!strncmpi(bp, "very ", l=5)) {
@@ -2774,11 +2779,14 @@ typfnd:
 	if (ispoisoned) {
 	    if (is_poisonable(otmp))
 		otmp->opoisoned = (Luck >= 0);
-	    else if (Is_box(otmp) || typ == TIN)
-		otmp->otrapped = 1;
 	    else if (oclass == FOOD_CLASS)
 		/* try to taint by making it as old as possible */
 		otmp->age = 1L;
+	}
+	/* and [un]trapped */
+	if (trapped) {
+	    if (Is_box(otmp) || typ == TIN)
+		otmp->otrapped = (trapped == 1);
 	}
 
 	if (isgreased) otmp->greased = 1;
