@@ -23,7 +23,6 @@ mail           enable the mail daemon                             [TRUE]
 null           allow nulls to be sent to your terminal            [TRUE]
                try turning this option off (forcing NetHack to use its own
                delay code) if moving objects seem to teleport across rooms
-number_pad     use the number keys to move instead of yuhjklbn    [FALSE]
 perm_invent    keep inventory in a permanent window               [FALSE]
 prayconfirm    use confirmation prompt when #pray command issued  [TRUE]
 pushweapon     when wielding a new weapon, put your previously
@@ -102,6 +101,13 @@ menustyle     user interface for selection of multiple objects:
               Full        -- menu for classes of interest, then object menu;
               only the first letter ('T','C','P','F') matters; 'N' (None)
               is a synonym for 'T', as is boolean style negation  [Full]
+number_pad    alphabetic versus numeric control over movement:
+               0 -- traditional hjkl + yubn movement (default);
+               1 -- digits control movement, for use with numeric keypad;
+               2 -- same as 1, but '5' works as 'g' prefix rather than 'G';
+               3 -- numeric for phone keypad (1,2,3 above, 7,8,9 below);
+               4 -- phone keypad (3) combined with MSDOS compatibility (2);
+              -1 -- alphabetic movement but 'z' swapped with 'y'.  [0]
 packorder     a list of default symbols for kinds of objects that gives the
               order in which your pack will be displayed  [")[%?+!=/(*`0_]
               (If you specify only some kinds of items, the others from the

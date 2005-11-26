@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2005/09/23	*/
+/*	SCCS Id: @(#)options.c	3.5	2005/11/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -304,7 +304,7 @@ static struct Comp_Opt
 # endif
 	{ "name",     "your character's name (e.g., name:Merlin-W)",
 						PL_NSIZ, DISP_IN_GAME },
-	{ "number_pad", "use the number pad", 1, SET_IN_GAME},
+	{ "number_pad", "use the number pad for movement", 1, SET_IN_GAME},
 	{ "objects",  "the symbols to use for objects",
 						MAXOCLASSES, SET_IN_FILE },
 	{ "packorder", "the inventory order of the items in your pack",
@@ -522,6 +522,9 @@ initoptions()
 	char *opts;
 #endif
 	int i;
+
+	/* set up the command parsing */
+	reset_commands(TRUE);		/* init */
 
 	/* initialize the random number generator */
 	setrandom();
@@ -1258,30 +1261,40 @@ boolean tinitial, tfrom_file;
 	fullname = "number_pad";
 	if (match_optname(opts, fullname, 10, TRUE)) {
 		boolean compat = (strlen(opts) <= 10);
+
 		if (duplicate) complain_about_duplicate(opts,1);
-		number_pad(iflags.num_pad ? 1 : 0);
 		op = string_for_opt(opts, (compat || !initial));
 		if (!op) {
 		    if (compat || negated || initial) {
 			/* for backwards compatibility, "number_pad" without a
 			   value is a synonym for number_pad:1 */
 			iflags.num_pad = !negated;
-			if (iflags.num_pad) iflags.num_pad_mode = 0;
+			iflags.num_pad_mode = 0;
 		    }
-		    return;
-		}
-		if (negated) {
+		} else if (negated) {
 		    bad_negation("number_pad", TRUE);
 		    return;
-		}
-		if (*op == '1' || *op == '2') {
-			iflags.num_pad = 1;
-			if (*op == '2') iflags.num_pad_mode = 1;
-			else iflags.num_pad_mode = 0;
-		} else if (*op == '0') {
-			iflags.num_pad = 0;
+		} else {
+		    int mode = atoi(op);
+
+		    if (mode < -1 || mode > 4 || (mode == 0 && *op != '0')) {
+			badoption(opts);
+			return;
+		    } else if (mode <= 0) {
+			iflags.num_pad = FALSE;
+			/* German keyboard; y and z keys swapped */
+			iflags.num_pad_mode = (mode < 0);	/* 0 or 1 */
+		    } else {	/* mode > 0 */
+			iflags.num_pad = TRUE;
 			iflags.num_pad_mode = 0;
-		} else badoption(opts);
+			/* PC Hack / MSDOS compatibility */
+			if (mode == 2 || mode == 4) iflags.num_pad_mode |= 1;
+			/* phone keypad layout */
+			if (mode == 3 || mode == 4) iflags.num_pad_mode |= 2;
+		    }
+		}
+		reset_commands(FALSE);
+		number_pad(iflags.num_pad ? 1 : 0);
 		return;
 	}
 
@@ -2955,35 +2968,34 @@ boolean setinitial,setfromfile;
 	}
 	destroy_nhwindow(tmpwin);
     } else if (!strcmp("number_pad", optname)) {
-	static const char *npchoices[3] =
-		{"0 (off)", "1 (on)", "2 (on, DOS compatible)"};
-	const char *npletters = "abc";
+	static const char *npchoices[] = {
+		" 0 (off)", " 1 (on)", " 2 (on, MSDOS compatible)",
+		" 3 (on, phone-style digit layout)",
+		" 4 (on, phone-style layout, MSDOS compatible)",
+		"-1 (off, 'z' to move upper-left, 'y' to zap wands)"
+	};
 	menu_item *mode_pick = (menu_item *)0;
 
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
 	for (i = 0; i < SIZE(npchoices); i++) {
 		any.a_int = i + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, npletters[i], 0,
+		add_menu(tmpwin, NO_GLYPH, &any, 'a' + i, 0,
 			 ATR_NONE, npchoices[i], MENU_UNSELECTED);
 	}
 	end_menu(tmpwin, "Select number_pad mode:");
 	if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
-		int mode = mode_pick->item.a_int - 1;
-		switch(mode) {
-			case 2:
-				iflags.num_pad = 1;
-				iflags.num_pad_mode = 1;
-				break;
-			case 1:
-				iflags.num_pad = 1;
-				iflags.num_pad_mode = 0;
-				break;
-			case 0:
-			default:
-				iflags.num_pad = 0;
-				iflags.num_pad_mode = 0;
+		switch (mode_pick->item.a_int - 1) {
+		case 0: iflags.num_pad = FALSE; iflags.num_pad_mode = 0; break;
+		case 1: iflags.num_pad = TRUE;  iflags.num_pad_mode = 0; break;
+		case 2: iflags.num_pad = TRUE;  iflags.num_pad_mode = 1; break;
+		case 3: iflags.num_pad = TRUE;  iflags.num_pad_mode = 2; break;
+		case 4: iflags.num_pad = TRUE;  iflags.num_pad_mode = 3; break;
+			/* last menu choice: number_pad == -1 */
+		case 5: iflags.num_pad = FALSE; iflags.num_pad_mode = 1; break;
 		}
+		reset_commands(FALSE);
+		number_pad(iflags.num_pad ? 1 : 0);
 		free((genericptr_t)mode_pick);
 	}
 	destroy_nhwindow(tmpwin);
@@ -3274,11 +3286,20 @@ char *buf;
 #endif
 	else if (!strcmp(optname, "name"))
 		Sprintf(buf, "%s", plname);
-	else if (!strcmp(optname, "number_pad"))
-		Sprintf(buf, "%s",
-			(!iflags.num_pad) ? "0=off" :
-			(iflags.num_pad_mode) ? "2=on, DOS compatible" : "1=on");
-	else if (!strcmp(optname, "objects"))
+	else if (!strcmp(optname, "number_pad")) {
+		static const char *numpadmodes[] = {
+		    "0=off", "1=on",
+		    "2=on, MSDOS compatible", "3=on, phone-style layout",
+		    "4=on, phone layout, MSDOS compatible",
+		    "-1=off, y & z swapped", /*[5]*/
+		};
+		int indx = Cmd.num_pad ? 
+			    (Cmd.phone_layout ? (Cmd.pcHack_compat ? 4 : 3) :
+						(Cmd.pcHack_compat ? 2 : 1)) :
+			    Cmd.swap_yz ? 5 : 0;
+
+		Strcpy(buf, numpadmodes[indx]);
+	} else if (!strcmp(optname, "objects"))
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "packorder")) {
 		oc_to_str(flags.inv_order, ocl);

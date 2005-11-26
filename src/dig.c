@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)dig.c	3.5	2005/11/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -831,9 +831,7 @@ struct obj *obj;
 	register char *dsp = dirsyms;
 	register int rx, ry;
 	int res = 0;
-	register const char *sdp, *verb;
-
-	if(iflags.num_pad) sdp = ndir; else sdp = sdir;	/* DICE workaround */
+	const char *sdp = Cmd.dirchars, *verb;
 
 	/* Check tool */
 	if (obj != uwep) {

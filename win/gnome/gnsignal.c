@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)gnsignal.c	3.5	2000/07/16	*/
+/*	SCCS Id: @(#)gnsignal.c	3.5	2005/11/19	*/
 /* Copyright (C) 1998 by Anthony Taylor <tonyt@ptialaska.net> */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -268,24 +268,24 @@ ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 	/* First handle the arrow keys -- these always mean move */
     case GDK_Right:
     case GDK_rightarrow:
-	if (iflags.num_pad) key='6'; else  key='l'; break;
+	key = Cmd.move_E; break;
     case GDK_Left:
     case GDK_leftarrow:
-	if (iflags.num_pad) key='4'; else  key='h'; break;
+	key = Cmd.move_W; break;
     case GDK_Up:
     case GDK_uparrow:
-	if (iflags.num_pad) key='8'; else  key='k'; break;
+	key = Cmd.move_N; break;
     case GDK_Down:
     case GDK_downarrow:
-	if (iflags.num_pad) key='2'; else  key='j'; break;
+	key = Cmd.move_S; break;
     case GDK_Home:
-	if (iflags.num_pad) key='7'; else  key='y'; break;
+	key = Cmd.move_NW; break;
     case GDK_End:
-	if (iflags.num_pad) key='1'; else  key='b'; break;
+	key = Cmd.move_SW; break;
     case GDK_Page_Down:
-	if (iflags.num_pad) key='3'; else  key='n'; break;
+	key = Cmd.move_SE; break;
     case GDK_Page_Up:
-	if (iflags.num_pad) key='9'; else  key='u'; break;
+	key = Cmd.move_NE; break;
     case ' ':		 key='.'; break;
 
 	/* Now, handle the numberpad (move or numbers) */

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)termcap.c	3.5	2000/07/10	*/
+/*	SCCS Id: @(#)termcap.c	3.5	2005/11/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -465,7 +465,7 @@ tty_start_screen()
 	/* set up callback in case option is not set yet but toggled later */
 	decgraphics_mode_callback = tty_decgraphics_termcap_fixup;
 #endif
-	if (iflags.num_pad) tty_number_pad(1);	/* make keypad send digits */
+	if (Cmd.num_pad) tty_number_pad(1); /* make keypad send digits */
 }
 
 void

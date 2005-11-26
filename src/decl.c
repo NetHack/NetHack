@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)decl.c	3.5	2001/12/10	*/
+/*	SCCS Id: @(#)decl.c	3.5	2005/11/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -95,9 +95,7 @@ struct linfo level_info[MAXLINFO];
 
 NEARDATA struct sinfo program_state;
 
-/* 'rogue'-like direction commands (cmd.c) */
-const char sdir[] = "hykulnjb><";
-const char ndir[] = "47896321><";	/* number pad mode */
+/* x/y/z deltas for the 10 movement directions (8 compass pts, 2 up/down) */
 const schar xdir[10] = { -1,-1, 0, 1, 1, 1, 0,-1, 0, 0 };
 const schar ydir[10] = {  0,-1,-1,-1, 0, 1, 1, 1, 0, 0 };
 const schar zdir[10] = {  0, 0, 0, 0, 0, 0, 0, 0, 1,-1 };

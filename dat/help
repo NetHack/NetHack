@@ -67,6 +67,12 @@ b j n   1 2 3           g<dir>:   run in direction <dir> until something
                 Meta number, or Alt number will invoke the YUHJKLBN commands.
                 Control <dir> may or may not work when number_pad is enabled,
                 depending on the platform's capabilities.
+                Digit '5' acts as 'G' prefix, unless number_pad is set to 2
+                in which case it acts as 'g' instead.
+                If number_pad is set to 3, the roles of 1,2,3 and 7,8,9 are
+                reversed; when set to 4, behaves same as 3 combined with 2.
+                If number_pad is set to -1, alphabetic movement commands are
+                used but 'y' and 'z' are swapped.
 
 Commands:
         NetHack knows the following commands:
@@ -143,9 +149,9 @@ Commands:
         x       Swap wielded and secondary weapons.
         X       Switch the game to explore (discovery) mode.
         ^X      Show your attributes.
-        z       Zap a wand.
-        Z       Cast a spell.
-        ^Z      Suspend the game.
+        z       Zap a wand.  (Use y instead of z if number_pad is -1.)
+        Z       Cast a spell.  (Use Y instead of Z if number_pad is -1.)
+        ^Z      Suspend the game.  (^Y instead of ^Z if number_pad is -1.)
         :       Look at what is here.
         ;       Look at what is somewhere else.
         ,       Pick up some things.

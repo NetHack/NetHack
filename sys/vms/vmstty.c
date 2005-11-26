@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmstty.c	3.5	2003/09/18	*/
+/*	SCCS Id: @(#)vmstty.c	3.5	2005/11/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* tty.c - (VMS) version */
@@ -137,10 +137,10 @@ vms_getchar()
 	    key = (short)'\n';
 	} else if (kb_buf == ESC || kb_buf == CSI || kb_buf == SS3) {
 	    switch(parse_function_key((int)kb_buf)) {
-	      case SMG$K_TRM_UP:    key = iflags.num_pad ? '8' : 'k';  break;
-	      case SMG$K_TRM_DOWN:  key = iflags.num_pad ? '2' : 'j';  break;
-	      case SMG$K_TRM_LEFT:  key = iflags.num_pad ? '4' : 'h';  break;
-	      case SMG$K_TRM_RIGHT: key = iflags.num_pad ? '6' : 'l';  break;
+	      case SMG$K_TRM_UP:    key = Cmd.move_N;  break;
+	      case SMG$K_TRM_DOWN:  key = Cmd.move_S;  break;
+	      case SMG$K_TRM_LEFT:  key = Cmd.move_W;  break;
+	      case SMG$K_TRM_RIGHT: key = Cmd.move_E;  break;
 	      default:		    key = ESC;	break;
 	    }
 	} else {
@@ -157,10 +157,10 @@ vms_getchar()
     if (recurse++ == 0 && kb != 0) {
 	smg$read_keystroke(&kb, &key);
 	switch (key) {
-	  case SMG$K_TRM_UP:	iflags.num_pad ? '8' : key = 'k';  break;
-	  case SMG$K_TRM_DOWN:	iflags.num_pad ? '2' : key = 'j';  break;
-	  case SMG$K_TRM_LEFT:	iflags.num_pad ? '4' : key = 'h';  break;
-	  case SMG$K_TRM_RIGHT: iflags.num_pad ? '6' : key = 'l';  break;
+	  case SMG$K_TRM_UP:	key = Cmd.move_N;  break;
+	  case SMG$K_TRM_DOWN:	key = Cmd.move_S;  break;
+	  case SMG$K_TRM_LEFT:	key = Cmd.move_W;  break;
+	  case SMG$K_TRM_RIGHT:	key = Cmd.move_E;  break;
 	  case '\r':		key = '\n'; break;
 	  default:		if (key > 255)	key = ESC;
 				break;

@@ -1,10 +1,12 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2005/05/06	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2005/11/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "func_tab.h"
 /* #define DEBUG */	/* uncomment for debugging */
+
+struct cmd Cmd = { 0 };		/* flag.h */
 
 /*
  * Some systems may have getchar() return EOF for various reasons, and
@@ -16,6 +18,8 @@
 
 #define CMD_TRAVEL	(char)0x90
 #define CMD_CLICKLOOK	(char)0x8F
+
+#define NODIAG(monnum) ((monnum) == PM_GRID_BUG)
 
 #ifdef DEBUG
 /*
@@ -1655,12 +1659,101 @@ add_debug_extended_commands()
 	}
 }
 
+/* called at startup and after number_pad is twiddled */
+void
+reset_commands(initial)
+boolean initial;
+{
+    static const char
+	sdir[] = "hykulnjb><", sdir_swap_yz[] = "hzkulnjb><",
+	ndir[] = "47896321><", ndir_phone_layout[] = "41236987><";
+    static const int ylist[] = { 'y', 'Y', C('y'), M('y'), M('Y'), M(C('y')) };
+    const struct func_tab *cmdtmp;
+    boolean flagtemp;
+    int c, i, updated = 0;
+
+    if (initial) {
+	updated = 1;
+	for (i = 0; i < SIZE(cmdlist); i++) {
+	    c = cmdlist[i].f_char & 0xff;
+	    Cmd.commands[c] = &cmdlist[i];
+	}
+	Cmd.num_pad = FALSE;
+	Cmd.pcHack_compat = Cmd.phone_layout = Cmd.swap_yz = FALSE;
+    } else {
+	/* basic num_pad */
+	flagtemp = iflags.num_pad;
+	if (flagtemp != Cmd.num_pad) {
+	    Cmd.num_pad = flagtemp;
+	    ++updated;
+	}
+	/* swap_yz mode (only applicable for !num_pad) */
+	flagtemp = (iflags.num_pad_mode & 1) ? !Cmd.num_pad : FALSE;
+	if (flagtemp != Cmd.swap_yz) {
+	    Cmd.swap_yz = flagtemp;
+	    ++updated;
+	    /* Cmd.swap_yz has been toggled;
+	       perform the swap (or reverse previous one) */
+	    for (i = 0; i < SIZE(ylist); i++) {
+		c = ylist[i] & 0xff;
+		cmdtmp = Cmd.commands[c];		/* tmp = [y] */
+		Cmd.commands[c] = Cmd.commands[c + 1];	/* [y] = [z] */
+		Cmd.commands[c + 1] = cmdtmp;		/* [z] = tmp */
+	    }
+	}
+	/* MSDOS compatibility mode (only applicable for num_pad) */
+	flagtemp = (iflags.num_pad_mode & 1) ? Cmd.num_pad : FALSE;
+	if (flagtemp != Cmd.pcHack_compat) {
+	    Cmd.pcHack_compat = flagtemp;
+	    ++updated;
+	    /* pcHack_compat has been toggled */
+	    c = M('5') & 0xff;
+	    cmdtmp = Cmd.commands['5'];
+	    Cmd.commands['5'] = Cmd.commands[c];
+	    Cmd.commands[c] = cmdtmp;
+	    c = M('0') & 0xff;
+	    Cmd.commands[c] = Cmd.pcHack_compat ? Cmd.commands['I'] : 0;
+	}
+	/* phone keypad layout (only applicable for num_pad) */
+	flagtemp = (iflags.num_pad_mode & 2) ? Cmd.num_pad : FALSE;
+	if (flagtemp != Cmd.phone_layout) {
+	    Cmd.phone_layout = flagtemp;
+	    ++updated;
+	    /* phone_layout has been toggled */
+	    for (i = 0; i < 3; i++) {
+		c = '1' + i;		/* 1,2,3 <-> 7,8,9 */
+		cmdtmp = Cmd.commands[c];		/* tmp = [1] */
+		Cmd.commands[c] = Cmd.commands[c + 6];	/* [1] = [7] */
+		Cmd.commands[c + 6] = cmdtmp;		/* [7] = tmp */
+		c = (M('1') & 0xff) + i;    /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
+		cmdtmp = Cmd.commands[c];		/* tmp = [M-1] */
+		Cmd.commands[c] = Cmd.commands[c + 6];	/* [M-1] = [M-7] */
+		Cmd.commands[c + 6] = cmdtmp;		/* [M-7] = tmp */
+	    }
+	}
+    } /*?initial*/
+
+    if (updated) Cmd.serialno++;
+    Cmd.dirchars = !Cmd.num_pad ? (!Cmd.swap_yz ? sdir : sdir_swap_yz) :
+			(!Cmd.phone_layout ? ndir : ndir_phone_layout);
+    Cmd.alphadirchars = !Cmd.num_pad ? Cmd.dirchars : sdir;
+
+    Cmd.move_W  = Cmd.dirchars[0];
+    Cmd.move_NW = Cmd.dirchars[1];
+    Cmd.move_N  = Cmd.dirchars[2];
+    Cmd.move_NE = Cmd.dirchars[3];
+    Cmd.move_E  = Cmd.dirchars[4];
+    Cmd.move_SE = Cmd.dirchars[5];
+    Cmd.move_S  = Cmd.dirchars[6];
+    Cmd.move_SW = Cmd.dirchars[7];
+}
+
 /* decide whether a character (user input keystroke) requests screen repaint */
 boolean
 redraw_cmd(c)
 char c;
 {
-    return (c == C('r') || (iflags.num_pad && c == C('l')));
+    return (c == C('r') || (Cmd.num_pad && c == C('l')));
 }
 
 static const char template[] = "%-18s %4ld  %6ld";
@@ -1917,7 +2010,7 @@ register char *cmd;
 		context.move = FALSE;
 		return;		/* probably we just had an interrupt */
 	}
-	if (iflags.num_pad && iflags.num_pad_mode == 1) {
+	if (Cmd.pcHack_compat) {
 		/* This handles very old inconsistent DOS/Windows behaviour
 		 * in a new way: earlier, the keyboard handler mapped these,
 		 * which caused counts to be strange when entered from the
@@ -1927,8 +2020,9 @@ register char *cmd;
 		    case '5':       *cmd = 'g'; break;
 		    case M('5'):    *cmd = 'G'; break;
 		    case M('0'):    *cmd = 'I'; break;
-        	}
-        }
+		}
+	}
+
 	/* handle most movement commands */
 	do_walk = do_rush = prefix_seen = FALSE;
 	context.travel = context.travel1 = 0;
@@ -1939,14 +2033,14 @@ register char *cmd;
 		    } else
 			prefix_seen = TRUE;
 		    break;
-	 case '5':  if (!iflags.num_pad) break;	/* else FALLTHRU */
+	 case '5':  if (!Cmd.num_pad) break;	/* else FALLTHRU */
 	 case 'G':  if (movecmd(lowc(cmd[1]))) {
 			context.run = 3;
 			do_rush = TRUE;
 		    } else
 			prefix_seen = TRUE;
 		    break;
-	 case '-':  if (!iflags.num_pad) break;	/* else FALLTHRU */
+	 case '-':  if (!Cmd.num_pad) break;	/* else FALLTHRU */
 	/* Effects of movement commands and invisible monsters:
 	 * m: always move onto space (even if 'I' remembered)
 	 * F: always attack space (even if 'I' not remembered)
@@ -1973,7 +2067,7 @@ register char *cmd;
 		    } else
 			prefix_seen = TRUE;
 		    break;
-	 case '0':  if (!iflags.num_pad) break;
+	 case '0':  if (!Cmd.num_pad) break;
 		    (void)ddoinv(); /* a convenience borrowed from the PC */
 		    context.move = FALSE;
 		    multi = 0;
@@ -1997,7 +2091,7 @@ register char *cmd;
 	 default:   if (movecmd(*cmd)) {	/* ordinary movement */
 			context.run = 0;	/* only matters here if it was 8 */
 			do_walk = TRUE;
-		    } else if (movecmd(iflags.num_pad ?
+		    } else if (movecmd(Cmd.num_pad ?
 				       unmeta(*cmd) : lowc(*cmd))) {
 			context.run = 1;
 			do_rush = TRUE;
@@ -2039,8 +2133,12 @@ register char *cmd;
 	    register const struct func_tab *tlist;
 	    int res, NDECL((*func));
 
+#if 0
 	    for (tlist = cmdlist; tlist->f_char; tlist++) {
 		if ((*cmd & 0xff) != (tlist->f_char & 0xff)) continue;
+#else
+	    if ((tlist = Cmd.commands[*cmd & 0xff]) != 0) {
+#endif
 
 		if (u.uburied && !tlist->can_if_buried) {
 		    You_cant("do that while you are buried!");
@@ -2065,18 +2163,19 @@ register char *cmd;
 
 	if (bad_command) {
 	    char expcmd[10];
-	    register char *cp = expcmd;
+	    register char c, *cp = expcmd;
 
-	    while (*cmd && (int)(cp - expcmd) < (int)(sizeof expcmd - 3)) {
-		if (*cmd >= 040 && *cmd < 0177) {
-		    *cp++ = *cmd++;
-		} else if (*cmd & 0200) {
+	    while ((c = *cmd++) != '\0' &&
+		    (int)(cp - expcmd) < (int)(sizeof expcmd - 3)) {
+		if (c >= 040 && c < 0177) {
+		    *cp++ = c;
+		} else if (c & 0200) {
 		    *cp++ = 'M';
 		    *cp++ = '-';
-		    *cp++ = *cmd++ &= ~0200;
+		    *cp++ = c & ~0200;
 		} else {
 		    *cp++ = '^';
-		    *cp++ = *cmd++ ^ 0100;
+		    *cp++ = c ^ 0100;
 		}
 	    }
 	    *cp = '\0';
@@ -2116,16 +2215,14 @@ int
 movecmd(sym)	/* also sets u.dz, but returns false for <> */
 char sym;
 {
-	register const char *dp;
-	register const char *sdp;
-	if(iflags.num_pad) sdp = ndir; else sdp = sdir;	/* DICE workaround */
+	register const char *dp = index(Cmd.dirchars, sym);
 
 	u.dz = 0;
-	if(!(dp = index(sdp, sym))) return 0;
-	u.dx = xdir[dp-sdp];
-	u.dy = ydir[dp-sdp];
-	u.dz = zdir[dp-sdp];
-	if (u.dx && u.dy && u.umonnum == PM_GRID_BUG) {
+	if (!dp) return 0;
+	u.dx = xdir[dp - Cmd.dirchars];
+	u.dy = ydir[dp - Cmd.dirchars];
+	u.dz = zdir[dp - Cmd.dirchars];
+	if (u.dx && u.dy && NODIAG(u.umonnum)) {
 		u.dx = u.dy = 0;
 		return 0;
 	}
@@ -2250,34 +2347,28 @@ const char *msg;
 		putstr(win, 0, "");
 	    }
 	}
-	if (iflags.num_pad && u.umonnum == PM_GRID_BUG) {
-	    putstr(win, 0, "Valid direction keys in your current form (with number_pad on) are:");
-	    putstr(win, 0, "             8   ");
-	    putstr(win, 0, "             |   ");
-	    putstr(win, 0, "          4- . -6");
-	    putstr(win, 0, "             |   ");
-	    putstr(win, 0, "             2   ");
-	} else if (u.umonnum == PM_GRID_BUG) {
+	if (NODIAG(u.umonnum)) {
 	    putstr(win, 0, "Valid direction keys in your current form are:");
-	    putstr(win, 0, "             k   ");
+	    Sprintf(buf,   "             %c   ", Cmd.move_N);
+	    putstr(win, 0, buf);
 	    putstr(win, 0, "             |   ");
-	    putstr(win, 0, "          h- . -l");
+	    Sprintf(buf,   "          %c- . -%c", Cmd.move_W, Cmd.move_E);
+	    putstr(win, 0, buf);
 	    putstr(win, 0, "             |   ");
-	    putstr(win, 0, "             j   ");
-	} else if (iflags.num_pad) {
-	    putstr(win, 0, "Valid direction keys (with number_pad on) are:");
-	    putstr(win, 0, "          7  8  9");
-	    putstr(win, 0, "           \\ | / ");
-	    putstr(win, 0, "          4- . -6");
-	    putstr(win, 0, "           / | \\ ");
-	    putstr(win, 0, "          1  2  3");
+	    Sprintf(buf,   "             %c   ", Cmd.move_S);
+	    putstr(win, 0, buf);
 	} else {
 	    putstr(win, 0, "Valid direction keys are:");
-	    putstr(win, 0, "          y  k  u");
+	    Sprintf(buf,   "          %c  %c  %c",
+		    Cmd.move_NW, Cmd.move_N, Cmd.move_NE);
+	    putstr(win, 0, buf);
 	    putstr(win, 0, "           \\ | / ");
-	    putstr(win, 0, "          h- . -l");
+	    Sprintf(buf,   "          %c- . -%c", Cmd.move_W, Cmd.move_E);
+	    putstr(win, 0, buf);
 	    putstr(win, 0, "           / | \\ ");
-	    putstr(win, 0, "          b  j  n");
+	    Sprintf(buf,   "          %c  %c  %c",
+		    Cmd.move_SW, Cmd.move_S, Cmd.move_SE);
+	    putstr(win, 0, buf);
 	};
 	putstr(win, 0, "");
 	putstr(win, 0, "          <  up");
@@ -2297,7 +2388,8 @@ const char *msg;
 void
 confdir()
 {
-	register int x = (u.umonnum == PM_GRID_BUG) ? 2*rn2(4) : rn2(8);
+	register int x = NODIAG(u.umonnum) ? 2*rn2(4) : rn2(8);
+
 	u.dx = xdir[x];
 	u.dy = ydir[x];
 	return;
@@ -2373,8 +2465,8 @@ click_to_cmd(x, y, mod)
         dir = xytod(x, y);
 
 	if (!m_at(u.ux+x, u.uy+y) && !test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
-            cmd[1] = (iflags.num_pad ? ndir[dir] : sdir[dir]);
-            cmd[2] = 0;
+	    cmd[1] = Cmd.dirchars[dir];
+	    cmd[2] = '\0';
             if (IS_DOOR(levl[u.ux+x][u.uy+y].typ)) {
                 /* slight assistance to the player: choose kick/open for them */
                 if (levl[u.ux+x][u.uy+y].doormask & D_LOCKED) {
@@ -2414,10 +2506,10 @@ click_to_cmd(x, y, mod)
     /* move, attack, etc. */
     cmd[1] = 0;
     if(mod == CLICK_1) {
-	cmd[0] = (iflags.num_pad ? ndir[dir] : sdir[dir]);
+	cmd[0] = Cmd.dirchars[dir];
     } else {
-	cmd[0] = (iflags.num_pad ? M(ndir[dir]) :
-		(sdir[dir] - 'a' + 'A')); /* run command */
+	cmd[0] = (Cmd.num_pad ? M(Cmd.dirchars[dir]) :
+		(Cmd.dirchars[dir] - 'a' + 'A')); /* run command */
     }
 
     return cmd;
@@ -2438,7 +2530,7 @@ parse()
 	context.move = 1;
 	flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
-	if (!iflags.num_pad || (foo = readchar()) == 'n')
+	if (!Cmd.num_pad || (foo = readchar()) == 'n')
 	    for (;;) {
 		foo = readchar();
 		if (foo >= '0' && foo <= '9') {
@@ -2477,7 +2569,7 @@ parse()
 	in_line[0] = foo;
 	in_line[1] = '\0';
 	if (foo == 'g' || foo == 'G' || foo == 'm' || foo == 'M' ||
-	    foo == 'F' || (iflags.num_pad && (foo == '5' || foo == '-'))) {
+	    foo == 'F' || (Cmd.num_pad && (foo == '5' || foo == '-'))) {
 	    foo = readchar();
 #ifdef REDO
 	    savech((char)foo);

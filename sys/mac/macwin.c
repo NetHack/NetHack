@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)macwin.c	3.5	1996/01/15	*/
+/*	SCCS Id: @(#)macwin.c	3.5	2005/11/19	*/
 /* Copyright (c) Jon W{tte, Hao-Yang Wang, Jonathan Handler 1992. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1366,8 +1366,11 @@ mac_destroy_nhwindow (winid win) {
 
 
 void
-mac_number_pad (int pad) {
-	iflags.num_pad = pad;
+mac_number_pad (int pad) {	/* no effect */
+#if defined(__SC__) || defined(__MRC__)
+# pragma unused(pad)
+#endif
+	return;
 }
 
 
@@ -1382,7 +1385,7 @@ trans_num_keys(EventRecord *theEvent) {
  * The number_pad option controls how digits are interpreted.
  */
 #if 0
-	if (iflags.num_pad) {
+	if (Cmd.num_pad) {
 		Handle h = GetResource('Nump', theEvent->modifiers & shiftKey ? 129 : 128);
 		if (h) {
 			short inkey = (theEvent->message & keyCodeMask), *ab = (short *)*h;
@@ -2146,7 +2149,7 @@ BaseCursor(NhWindow *wind, Point pt)
 	if (cursor_locked)
 		dir = (char *)0;
 	else {
-		dir_bas = iflags.num_pad ? (char *) ndir : (char *) sdir;
+		dir_bas = (char *)Cmd.dirchars;
 		dir = strchr(dir_bas, *click_to_cmd(pt.h / wind->char_width + 1 ,
 			pt.v / wind->row_height, CLICK_1));
 	}

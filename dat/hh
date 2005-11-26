@@ -14,6 +14,12 @@ b j n   1 2 3           g<dir>:   run in direction <dir> until something
                 Meta number, or Alt number will invoke the YUHJKLBN commands.
                 Control <dir> may or may not work when number_pad is enabled,
                 depending on the platform's capabilities.
+                Digit '5' acts as 'G' prefix, unless number_pad is set to 2
+                in which case it acts as 'g' instead.
+                If number_pad is set to 3, the roles of 1,2,3 and 7,8,9 are
+                reversed; when set to 4, behaves same as 3 combined with 2.
+                If number_pad is set to -1, alphabetic movement commands are
+                used but 'y' and 'z' are swapped.
 
 General commands:
 ?       help    display one of several informative texts
@@ -64,8 +70,8 @@ T       takeoff take off some armor
 w       wield   wield a weapon  (w-  wield nothing)
 W       wear    put on some armor
 x       xchange swap wielded and secondary weapons
-z       zap     zap a wand
-Z       Zap     cast a spell
+z       zap     zap a wand  (use y instead of z if number_pad is -1)
+Z       Zap     cast a spell  (use Y instead of Z if number_pad is -1)
 <       up      go up the stairs
 >       down    go down the stairs
 ^       trap_id identify a previously found trap

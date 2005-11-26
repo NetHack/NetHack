@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.5	2005/07/15	*/
+/*	SCCS Id: @(#)do_name.c	3.5	2005/11/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,8 +33,8 @@ const char *goal;
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
 
-    Sprintf(sbuf, "Use [%s] to move the cursor to %s.",
-	    iflags.num_pad ? "2468" : "hjkl", goal);
+    Sprintf(sbuf, "Use [%c%c%c%c] to move the cursor to %s.",	/* hjkl */
+	    Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
@@ -63,8 +63,6 @@ const char *goal;
     boolean msg_given = TRUE;	/* clear message window by default */
     static const char pick_chars[] = ".,;:";
     const char *cp;
-    const char *sdp;
-    if(iflags.num_pad) sdp = ndir; else sdp = sdir;	/* DICE workaround */
 
     if (!goal) goal = "desired location";
     if (flags.verbose) {
@@ -104,12 +102,13 @@ const char *goal;
 	for (i = 0; i < 8; i++) {
 	    int dx, dy;
 
-	    if (sdp[i] == c) {
+	    if (Cmd.dirchars[i] == c) {
 		/* a normal movement letter or digit */
 		dx = xdir[i];
 		dy = ydir[i];
-	    } else if (sdir[i] == lowc((char)c)) {
-		/* a shifted movement letter */
+	    } else if (Cmd.alphadirchars[i] == lowc((char)c) ||
+		    (Cmd.num_pad && Cmd.dirchars[i] == (c & 0177))) {
+		/* a shifted movement letter or Meta-digit */
 		dx = 8 * xdir[i];
 		dy = 8 * ydir[i];
 	    } else
@@ -178,10 +177,14 @@ const char *goal;
 		    msg_given = TRUE;
 		    goto nxtc;
 		} else {
+		    char note[QBUFSZ];
+
+		    if (!force) Strcpy(note, "aborted");
+		    else Sprintf(note, "use %c%c%c%c or .",	/* hjkl */
+				 Cmd.move_W, Cmd.move_S,
+				 Cmd.move_N, Cmd.move_E);
 		    pline("Unknown direction: '%s' (%s).",
-			  visctrl((char)c),
-			  !force ? "aborted" :
-			  iflags.num_pad ? "use 2468 or ." : "use hjkl or .");
+			  visctrl((char)c), note);
 		    msg_given = TRUE;
 		} /* k => matching */
 	    } /* !quitchars */

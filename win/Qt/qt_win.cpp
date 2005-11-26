@@ -1,4 +1,4 @@
-//	SCCS Id: @(#)qt_win.cpp	3.5	1999/11/19
+//	SCCS Id: @(#)qt_win.cpp	3.5	2005/11/19
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 
@@ -3995,7 +3995,7 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 	event->key() >= Key_Left && event->key() <= Key_Down )
 	return;
 
-    const char* d = iflags.num_pad ? ndir : sdir; 
+    const char* d = Cmd.dirchars;
     switch (event->key()) {
      case Key_Up:
 	if ( dirkey == d[0] )
@@ -4141,7 +4141,7 @@ char NetHackQtYnDialog::Exec()
 	}
 	if ( strstr(question, "what direction") ) {
 	    // We replace this regardless, since sometimes you get choices.
-	    const char* d = iflags.num_pad ? ndir : sdir; 
+	    const char* d = Cmd.dirchars;
 	    enable=ch;
 	    ch="";
 	    ch.append(d[1]);
