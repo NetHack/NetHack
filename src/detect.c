@@ -712,7 +712,6 @@ register struct obj *sobj;
 /* sobj is null if crystal ball, *scroll if gold detection scroll */
 {
     register struct trap *ttmp;
-    register struct obj *obj;
     struct monst *mon;
     int door, glyph, tr;
     int uw = u.uinwater, cursed_src = sobj && sobj->cursed;
