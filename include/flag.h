@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)flag.h	3.5	2003/11/09	*/
+/*	SCCS Id: @(#)flag.h	3.5	2005/11/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -306,5 +306,35 @@ extern NEARDATA struct instance_flags iflags;
 #define RUN_LEAP	1	/* update display every 7 steps */
 #define RUN_STEP	2	/* update display every single step */
 #define RUN_CRAWL	3	/* walk w/ extra delay after each update */
+
+/* command parsing, mainly dealing with number_pad handling;
+   not saved and restored */
+
+#ifdef NHSTDC
+/* forward declaration sufficient to declare pointers */
+struct func_tab;		/* from func_tab.h */
+#endif
+
+/* commands[] is used to directly access cmdlist[] instead of looping
+   through it to find the entry for a given input character;
+   move_X is the character used for moving one step in direction X;
+   alphadirchars corresponds to old sdir,
+   dirchars corresponds to ``iflags.num_pad ? ndir : sdir'';
+   pcHack_compat and phone_layout only matter when num_pad is on,
+   swap_yz only matters when it's off */
+struct cmd {
+    unsigned serialno;	    /* incremented after each update */
+    boolean num_pad;	    /* same as iflags.num_pad except during updates */
+    boolean pcHack_compat;  /* for numpad:  affects 5, M-5, and M-0 */
+    boolean phone_layout;   /* inverted keypad:  1,2,3 above, 7,8,9 below */
+    boolean swap_yz;	    /* German keyboads; use z to move NW, y to zap */
+    char move_W, move_NW, move_N, move_NE,
+	 move_E, move_SE, move_S, move_SW;
+    const char *dirchars;   /* current movement/direction characters */
+    const char *alphadirchars;	/* same as dirchars if !numpad */
+    const struct func_tab *commands[256]; /* indexed by input character */
+};
+
+extern NEARDATA struct cmd Cmd;
 
 #endif /* FLAG_H */

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)decl.h	3.5	2004/11/22	*/
+/*	SCCS Id: @(#)decl.h	3.5	2005/11/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -203,7 +203,6 @@ E const char *nomovemsg;
 E const char nul[];
 E char lock[];
 
-E const char sdir[], ndir[];
 E const schar xdir[], ydir[], zdir[];
 
 E NEARDATA schar tbx, tby;		/* set in mthrowu.c */
