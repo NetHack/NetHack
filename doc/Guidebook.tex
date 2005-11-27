@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.92 $ $Date: 2005/01/23 14:33:46 $
+% $Revision: 1.93 $ $Date: 2005/06/01 04:11:55 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +40,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.5)}
-\date{January 15, 2005}
+\date{November 19, 2005}
 
 \maketitle
 
@@ -2487,9 +2487,32 @@ in setting this with the `{\tt O}' command.
 Send padding nulls to the terminal (default on).
 %.lp
 \item[\ib{number\_pad}]
-Use the number keys to move instead of {\tt [yuhjklbn]} (default 0 or off).
-(number\_pad:2 invokes the old DOS behavior where `{\tt 5}' means `{\tt g}', 
-meta-`{\tt 5}' means `{\tt G}',  and meta-`{\tt 0}' means `{\tt I}'.)
+Use digit keys instead of letters to move (default 0 or off).\\
+Valid settings are:
+
+%.sd
+%.si
+{\tt \ 0} --- move by letters; `{\tt yuhjklbn}'.\\
+{\tt \ 1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix.\\
+{\tt \ 2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'.\\
+{\tt \ 3} --- move by numbers using phone keypad layout; {\tt 123} above, {\tt 789} below.\\
+{\tt \ 4} --- combines {\tt 3} with {\tt 2}; phone layout plus MSDOS compatibility.\\
+{\tt  -1} --- move by letters but use `{\tt z}' to go northwest and `{\tt y}' to zap wands.
+%.ei
+%.ed
+
+For backward compatibility, omitting a value is the same as specifying {\tt 1}
+and negating
+{\it number\_pad\/}
+is the same as specifying {\tt 0}.
+(Settings {\tt 2} and {\tt 4} are for compatibility with MSDOS or old PC Hack;
+in addition to the different behavior for `{\tt 5}', `{\tt Alt-5}' acts as `{\tt G}'
+and `{\tt Alt-0}' acts as `{\tt I}'.
+Setting {\tt -1} is to accomodate some German keyboards which have the
+location of the `{\tt y}' and `{\tt z}' keys swapped.)
+When moving by numbers, to enter a count prefix for those commands
+which accept one (such as ``{\tt 12s}'' to search twelve times), precede it
+with the letter `{\tt n}' (``{\tt n12s}'').
 %.lp
 \item[\ib{objects}]
 Set the characters used to display object classes (default

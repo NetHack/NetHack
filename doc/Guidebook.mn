@@ -2026,9 +2026,30 @@ in setting this with the `O' command.
 .lp "null    "
 Send padding nulls to the terminal (default on).
 .lp number_pad
-Use the number keys to move instead of [yuhjklbn] (default 0 or off).
-(number_pad:2 invokes the old DOS behavior where `5' means `g', meta-`5'
-means `G',  and meta-`0' means `I'.)
+Use digit keys instead of letters to move (default 0 or off).
+Valid settings are:
+.sd
+.si
+\ 0 - move by letters; `yuhjklbn'.
+\ 1 - move by numbers; digit `5' acts as `G' movement prefix.
+\ 2 - like 1 but `5' works as `g' prefix instead of as `G'.
+\ 3 - move by numbers using phone keypad layout; 123 above, 789 below.
+\ 4 - combines 3 with 2; phone layout plus MSDOS compatibility.
+-1 - move by letters but use `z' to go northwest and `y' to zap wands.
+.ei
+.ed
+For backward compatibility, omitting a value is the same as specifying 1
+and negating
+.op number_pad
+is the same as specifying 0.
+(Settings 2 and 4 are for compatibility with MSDOS or old PC Hack;
+in addition to the different behavior for `5', `Alt-5' acts as `G'
+and `Alt-0' acts as `I'.
+Setting -1 is to accomodate some German keyboards which have the
+location of the `y' and `z' keys swapped.)
+When moving by numbers, to enter a count prefix for those commands
+which accept one (such as ``12s'' to search twelve times), precede it
+with the letter `n' (``n12s'').
 .lp objects
 Set the characters used to display object classes
 (default ``])[="(%!?+/$*`0_.'').
