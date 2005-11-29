@@ -871,9 +871,6 @@ register const char *let,*word;
 		      otyp != OIL_LAMP && otyp != MAGIC_LAMP &&
 		      otyp != BRASS_LANTERN) ||
 		     (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
-		|| (!strncmp(word, "rub on the stone", 16) &&
-		    *let == GEM_CLASS &&	/* using known touchstone */
-		    otmp->dknown && objects[otyp].oc_name_known)
 		|| ((!strcmp(word, "use or apply") ||
 			!strcmp(word, "untrap with")) &&
 		     /* Picks, axes, pole-weapons, bullwhips */
@@ -904,7 +901,12 @@ register const char *let,*word;
 			foo--;
 		/* ugly check for unworn armor that can't be worn */
 		else if (putting_on(word) && *let == ARMOR_CLASS &&
-			 !canwearobj(otmp, &dummymask, FALSE)) {
+		    !canwearobj(otmp, &dummymask, FALSE) 
+		/* or unsuitable items rubbed on known touchstone */
+		|| (!strncmp(word, "rub on the stone", 16) &&
+		    *let == GEM_CLASS &&
+		    otmp->dknown && objects[otyp].oc_name_known)
+		    ) {
 			foo--;
 			allowall = TRUE;
 			*ap++ = otmp->invlet;
