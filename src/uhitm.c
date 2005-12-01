@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2005/09/27	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2005/11/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,6 +6,7 @@
 
 STATIC_DCL boolean FDECL(known_hitum, (struct monst *,struct obj *,
 				       int *,int,int,struct attack *));
+STATIC_DCL boolean FDECL(theft_petrifies, (struct obj *));
 STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
 STATIC_DCL boolean FDECL(hitum, (struct monst *,struct attack *));
 STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *,struct obj *,int));
@@ -1210,6 +1211,36 @@ demonpet()
 	exercise(A_WIS, TRUE);
 }
 
+STATIC_OVL boolean
+theft_petrifies(otmp)
+struct obj *otmp;
+{
+    const char *fmt;
+    char *p, cbuf[BUFSZ], kbuf[BUFSZ];
+
+    if (uarmg || otmp->otyp != CORPSE ||
+	    !touch_petrifies(&mons[otmp->corpsenm])) return FALSE;
+
+    /* stealing this corpse is fatal... */
+    Strcpy(cbuf, cxname(otmp));		/* "cockatrice corpse" */
+    fmt = "a stolen %s";
+    if (otmp->quan > 1L) {
+	/* stack of multiple cockatrice corpses; no article for plural */
+	fmt += 2;	/* skip "a ", leaving "stolen %s" */
+    } else if ((p = strstri(cbuf, "'s corpse")) != 0 ||
+		(p = strstri(cbuf, "s' corpse")) != 0) {
+	/* in case a unique monster with petrifying touch and
+	   a personal name ever gets introduced:  we want to use
+	   "Foo's stolen corpse" instead of "a stolen Foo's corpse" */
+	*(p + 2) = '\0';	/* chop " corpse" off of cbuf */
+	fmt = "%s stolen corpse";
+    }
+    Sprintf(kbuf, fmt, cbuf);
+    instapetrify(kbuf);
+    /* apparently wasn't fatal after all... */
+    return TRUE;
+}
+
 /*
  * Player uses theft attack against monster.
  *
@@ -1280,14 +1311,8 @@ struct attack *mattk;
 	    otmp = hold_another_object(otmp, "You snatched but dropped %s.",
 				       doname(otmp), "You steal: ");
 	    if (otmp->where != OBJ_INVENT) continue;
-	    if (otmp->otyp == CORPSE &&
-		    touch_petrifies(&mons[otmp->corpsenm]) && !uarmg) {
-		char kbuf[BUFSZ];
-
-		Sprintf(kbuf, "stolen %s corpse", mons[otmp->corpsenm].mname);
-		instapetrify(kbuf);
-		break;		/* stop the theft even if hero survives */
-	    }
+	    if (theft_petrifies(otmp))
+		break;	/* stop thieving even though hero survived */
 	    /* more take-away handling, after theft message */
 	    if (unwornmask & W_WEP) {		/* stole wielded weapon */
 		possibly_unwield(mdef, FALSE);
