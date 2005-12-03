@@ -100,6 +100,8 @@ adjust feedback for gas spore explosion when hallucinating
 traps detected by scroll or crystal ball overlooked carried or buried chests
 can't wish for a trapped box/chest/tin by specifying "poisoned"
 grammar bit if killed by stealing a cockatrice corpse from a monster
+being petrified by swallowing a cockatrice violates foodless conduct
+devouring Medusa whole is fatal
 
 
 Platform- and/or Interface-Specific Fixes

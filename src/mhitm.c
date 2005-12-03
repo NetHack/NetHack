@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.5	2005/09/27	*/
+/*	SCCS Id: @(#)mhitm.c	3.5	2005/12/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -698,7 +698,9 @@ mdamagem(magr, mdef, mattk)
 	    res = MM_MISS;
 	boolean cancelled;
 
-	if (touch_petrifies(pd) && !resists_ston(magr)) {
+	if ((touch_petrifies(pd) ||	/* or flesh_petrifies() */
+		    (mattk->adtyp == AD_DGST && pd == &mons[PM_MEDUSA])) &&
+		!resists_ston(magr)) {
 	    long protector = attk_protection((int)mattk->aatyp),
 		 wornitems = magr->misc_worn_check;
 
@@ -1509,4 +1511,3 @@ int aatyp;
 }
 
 /*mhitm.c*/
-
