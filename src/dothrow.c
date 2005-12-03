@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2005/09/04	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2005/12/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1068,8 +1068,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 				  body_part(ARM));
 			    (void) artifact_hit((struct monst *)0,
 						&youmonst, obj, &dmg, 0);
-			    losehp(Maybe_Half_Phys(dmg), xname(obj),
-				obj_is_pname(obj) ? KILLED_BY : KILLED_BY_AN);
+			    losehp(Maybe_Half_Phys(dmg),
+				   killer_xname(obj), KILLED_BY);
 			}
 			if (ship_object(obj, u.ux, u.uy, FALSE)) {
 		    	    thrownobj = (struct obj*)0;
