@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)quest.txt	3.5	2005/08/26
+#	SCCS Id: @(#)quest.txt	3.5	2005/12/03
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -51,7 +51,7 @@
 #
 %Cc Arc 00001
 You are suddenly in familiar surroundings.  The buildings in the distance
-appear to be those of your old alma mater, but something is wrong.  It looks
+seem to be those of your old alma mater, but something is wrong.  It feels
 as if there has been a riot recently, or %H has
 been under siege.
 
@@ -1085,7 +1085,7 @@ You materialize in the shadows of %H.  Immediately, you notice
 that something is wrong.  The fields around the castle are trampled and
 withered, as if some great battle has been recently fought.
 
-Looking closer, you %x long gouges in the walls of %H.
+Exploring further, you %x long gouges in the walls of %H.
 You know of only one creature that makes those kinds of marks...
 %E
 %Cp Kni 00002
@@ -2347,7 +2347,7 @@ the kami of %H before you return again.
 "%nC has hired the Ninja -- be careful."
 %E
 %Cp Sam 00009
-"If %o is not returned, we will all be ninja."
+"If %o is not returned, we will all be ronin."
 %E
 %Cp Sam 00010
 "Come, join us in celebrating with some sake."
@@ -2578,7 +2578,7 @@ You quickly notice that things do not appear the way they did when you
 left.  The town is dark and quiet.  There are no sounds coming from
 behind the town walls, and no campfires burning in the fields.  As a
 matter of fact, you do not %x any movement in the fields at all, and
-the crops look as though they have been untended for many weeks.
+the crops seem as though they have been untended for many weeks.
 %E
 %Cp Tou 00002
 Once again, you are back at %H.
