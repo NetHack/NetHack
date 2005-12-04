@@ -156,6 +156,13 @@ register struct monst *mtmp;
 	    return 0;
 	}
 
+	if (is_fainted()) {
+	    reset_faint();		/* if fainted - wake up */
+	} else {
+	    stop_occupation();
+	    if (multi > 0) { nomul(0); unmul((char *)0); }
+	}
+
 	/* Slight advantage given. */
 	if (is_dprince(mtmp->data) && mtmp->minvis) {
 	    mtmp->minvis = mtmp->perminvis = 0;
@@ -176,7 +183,7 @@ register struct monst *mtmp;
 	demand = (cash * (rnd(80) + 20 * Athome)) /
 	    (100 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
 
-	if (!demand) {		/* you have no gold */
+	if (!demand || multi < 0) {	/* you have no gold or can't move */
 	    mtmp->mpeaceful = 0;
 	    set_malign(mtmp);
 	    return 0;

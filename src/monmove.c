@@ -396,6 +396,7 @@ register struct monst *mtmp;
 			    /* Why?  For the same reason in real demon talk */
 			    pline("%s gets angry!", Amonnam(mtmp));
 			    mtmp->mpeaceful = 0;
+			    set_malign(mtmp);
 			    /* since no way is an image going to pay it off */
 			}
 		} else if(demon_talk(mtmp)) return(1);	/* you paid it off */

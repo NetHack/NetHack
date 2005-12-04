@@ -2514,7 +2514,7 @@ is_fainted()
 void
 reset_faint()	/* call when a faint must be prematurely terminated */
 {
-	if(is_fainted()) nomul(0);
+	if (afternmv == unfaint) unmul("You revive.");
 }
 
 void
