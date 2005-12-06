@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dbridge.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)dbridge.c	3.5	2005/12/05	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -749,6 +749,8 @@ int x,y;
 		You_see("a drawbridge %s up!",
 		    (((u.ux == x || u.uy == y) && !Underwater) ||
 		     distu(x2,y2) < distu(x,y)) ? "coming" : "going");
+	else	/* "5 gears turn" for castle drawbridge tune */
+		You_hear("chains rattling and gears turning.");
 	lev1->typ = DRAWBRIDGE_UP;
 	lev2 = &levl[x2][y2];
 	lev2->typ = DBWALL;
@@ -800,6 +802,8 @@ int x,y;
 	if (cansee(x,y) || cansee(x2,y2))
 		You_see("a drawbridge %s down!",
 		    (distu(x2,y2) < distu(x,y)) ? "going" : "coming");
+	else	/* "5 gears turn" for castle drawbridge tune */
+		You_hear("gears turning and chains rattling.");
 	lev1->typ = DRAWBRIDGE_DOWN;
 	lev2 = &levl[x2][y2];
 	lev2->typ = DOOR;
@@ -829,7 +833,8 @@ int x,y;
 {
 	register struct rm *lev1, *lev2;
 	struct trap *t;
-	int x2, y2;
+	struct obj *otmp;
+	int x2, y2, i;
 	boolean e_inview;
 	struct entity *etmp1 = &(occupants[0]), *etmp2 = &(occupants[1]);
 
@@ -877,6 +882,17 @@ int x,y;
 	lev2->doormask = D_NODOOR;
 	if ((t = t_at(x, y)) != 0) deltrap(t);
 	if ((t = t_at(x2, y2)) != 0) deltrap(t);
+	for (i = rn2(6); i > 0; --i) {	/* scatter some debris */
+	    /* doesn't matter if we happen to pick <x,y2> or <x2,y>;
+	       since drawbridges are never placed diagonally, those
+	       pairings will always match one of <x,y> or <x2,y2> */
+	    otmp = mksobj_at(IRON_CHAIN,
+			     rn2(2) ? x : x2, rn2(2) ? y : y2,
+			     TRUE, FALSE);
+	    /* a force of 5 here would yield a radius of 2 for
+	       iron chain; anything less produces a radius of 1 */
+	    (void) scatter(otmp->ox, otmp->oy, 1, MAY_HIT, otmp);
+	}
 	newsym(x,y);
 	newsym(x2,y2);
 	if (!does_block(x2,y2,lev2)) unblock_point(x2,y2);	/* vision */
