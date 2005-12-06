@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2005/09/27	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2005/12/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2493,15 +2493,13 @@ register struct attack *mattk;
 					    "Your gaze is reflected by %s %s."))
 				return 1;
 			    pline("%s is frozen by your gaze!", Monnam(mtmp));
-			    mtmp->mcanmove = 0;
-			    mtmp->mfrozen = tmp;
+			    paralyze_monst(mtmp, tmp);
 			    return 3;
 			}
 		    }
 		} else { /* gelatinous cube */
 		    pline("%s is frozen by you.", Monnam(mtmp));
-		    mtmp->mcanmove = 0;
-		    mtmp->mfrozen = tmp;
+		    paralyze_monst(mtmp, tmp);
 		    return 3;
 		}
 		return 1;

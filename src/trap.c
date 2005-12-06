@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2005/11/01	*/
+/*	SCCS Id: @(#)trap.c	3.5	2005/12/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1272,9 +1272,8 @@ struct obj *otmp;
 	case SLP_GAS_TRAP:
 	    if (!resists_sleep(steed) && !breathless(steed->data) &&
 		    !steed->msleeping && steed->mcanmove) {
-		steed->mcanmove = 0;
-		steed->mfrozen = rnd(25);
-		if (in_sight)
+		if (sleep_monst(steed, rnd(25), -1))
+		    /* no in_sight check here; you can feel it even if blind */
 		    pline("%s suddenly falls asleep!", Monnam(steed));
 	    }
 	    steedhit = TRUE;
@@ -1920,9 +1919,7 @@ register struct monst *mtmp;
 		case SLP_GAS_TRAP:
 		    if (!resists_sleep(mtmp) && !breathless(mptr) &&
 				!mtmp->msleeping && mtmp->mcanmove) {
-			    mtmp->mcanmove = 0;
-			    mtmp->mfrozen = rnd(25);
-			    if (in_sight) {
+			    if (sleep_monst(mtmp, rnd(25), -1) && in_sight) {
 				pline("%s suddenly falls asleep!",
 				      Monnam(mtmp));
 				seetrap(trap);

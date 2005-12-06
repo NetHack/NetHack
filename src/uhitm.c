@@ -1629,8 +1629,7 @@ register struct attack *mattk;
 	    case AD_PLYS:
 		if (!negated && mdef->mcanmove && !rn2(3) && tmp < mdef->mhp) {
 		    if (!Blind) pline("%s is frozen by you!", Monnam(mdef));
-		    mdef->mcanmove = 0;
-		    mdef->mfrozen = rnd(10);
+		    paralyze_monst(mdef, rnd(10));
 		}
 		break;
 	    case AD_SLEE:

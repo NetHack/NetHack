@@ -1002,6 +1002,7 @@ E int FDECL(mattackm, (struct monst *,struct monst *));
 #ifdef BARGETHROUGH
 E int FDECL(mdisplacem, (struct monst *,struct monst *,BOOLEAN_P));
 #endif
+E void FDECL(paralyze_monst, (struct monst *,int));
 E int FDECL(sleep_monst, (struct monst *,int,int));
 E void FDECL(slept_monst, (struct monst *));
 E long FDECL(attk_protection, (int));

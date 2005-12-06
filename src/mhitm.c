@@ -987,9 +987,7 @@ mdamagem(magr, mdef, mattk)
 			Strcpy(buf, Monnam(mdef));
 			pline("%s is frozen by %s.", buf, mon_nam(magr));
 		    }
-		    mdef->mcanmove = 0;
-		    mdef->mfrozen = rnd(10);
-		    mdef->mstrategy &= ~STRAT_WAITFORU;
+		    paralyze_monst(mdef, rnd(10));
 		}
 		break;
 	    case AD_SLOW:
@@ -1258,6 +1256,19 @@ mdamagem(magr, mdef, mattk)
 	return (res == MM_AGR_DIED) ? MM_AGR_DIED : MM_HIT;
 }
 
+void
+paralyze_monst(mon, amt)
+struct monst *mon;
+int amt;
+{
+	if (amt > 127) amt = 127;
+
+	mon->mcanmove = 0;
+	mon->mfrozen = amt;
+	mon->meating = 0;	/* terminate any meal-in-progress */
+	mon->mstrategy &= ~STRAT_WAITFORU;
+}
+
 /* `mon' is hit by a sleep attack; return 1 if it's affected, 0 otherwise */
 int
 sleep_monst(mon, amt, how)
@@ -1268,6 +1279,7 @@ int amt, how;
 		(how >= 0 && resist(mon, (char)how, 0, NOTELL))) {
 	    shieldeff(mon->mx, mon->my);
 	} else if (mon->mcanmove) {
+	    mon->meating = 0;	/* terminate any meal-in-progress */
 	    amt += (int) mon->mfrozen;
 	    if (amt > 0) {	/* sleep for N turns */
 		mon->mcanmove = 0;
@@ -1392,16 +1404,14 @@ int mdead;
 			if(canseemon(magr))
 			    pline("%s is frozen by %s gaze!",
 				  buf, s_suffix(mon_nam(mdef)));
-			magr->mcanmove = 0;
-			magr->mfrozen = tmp;
+			paralyze_monst(magr, tmp);
 			return (mdead|mhit);
 		    }
 		} else { /* gelatinous cube */
 		    Strcpy(buf, Monnam(magr));
 		    if(canseemon(magr))
 			pline("%s is frozen by %s.", buf, mon_nam(mdef));
-		    magr->mcanmove = 0;
-		    magr->mfrozen = tmp;
+		    paralyze_monst(magr, tmp);
 		    return (mdead|mhit);
 		}
 		return 1;

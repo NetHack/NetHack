@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2005/06/21	*/
+/*	SCCS Id: @(#)potion.c	3.5	2005/12/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1219,11 +1219,10 @@ boolean your_fault;
 		break;
 	case POT_PARALYSIS:
 		if (mon->mcanmove) {
-			mon->mcanmove = 0;
 			/* really should be rnd(5) for consistency with players
 			 * breathing potions, but...
 			 */
-			mon->mfrozen = rnd(25);
+			paralyze_monst(mon, rnd(25));
 		}
 		break;
 	case POT_SPEED:

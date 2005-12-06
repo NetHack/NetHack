@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.5	2004/06/12	*/
+/*	SCCS Id: @(#)muse.c	3.5	2005/12/05	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -88,8 +88,7 @@ struct obj *obj;
 			    pline("%s is frightened to death, and unable to move.",
 				    Monnam(mon));
 			}
-			mon->mcanmove = 0;
-			mon->mfrozen = 3;
+			paralyze_monst(mon, 3);
 		    }
 		    return 2;
 		}

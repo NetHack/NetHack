@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2005/09/20	*/
+/*	SCCS Id: @(#)apply.c	3.5	2005/12/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -786,10 +786,7 @@ struct obj *obj;
 		    pline("%s is frozen by its reflection.", Monnam(mtmp));
 		else
 		    You_hear("%s stop moving.", something);
-		mtmp->mcanmove = 0;
-		if ( (int) mtmp->mfrozen + tmp > 127)
-			mtmp->mfrozen = 127;
-		else mtmp->mfrozen += tmp;
+		paralyze_monst(mtmp, (int)mtmp->mfrozen + tmp);
 	} else if(!mtmp->mcan && !mtmp->minvis &&
 					mtmp->data == &mons[PM_UMBER_HULK]) {
 		if (vis)
