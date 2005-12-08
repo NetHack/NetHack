@@ -729,19 +729,23 @@ struct obj *sobj;
 		/* KMH -- catch underflow */
 		s = sobj->cursed ? -otmp->spe : otmp->spe;
 		if (s > (special_armor ? 5 : 3) && rn2(s)) {
-		pline("%s violently %s%s%s for a while, then %s.",
-		     Yname2(otmp),
-		     otense(otmp, Blind ? "vibrate" : "glow"),
-		     (!Blind && !same_color) ? " " : nul,
-		     (Blind || same_color) ? nul :
-			hcolor(sobj->cursed ? NH_BLACK : NH_SILVER),
-		     otense(otmp, "evaporate"));
+			otmp->in_use = TRUE;
+			pline("%s violently %s%s%s for a while, then %s.",
+			      Yname2(otmp),
+			      otense(otmp, Blind ? "vibrate" : "glow"),
+			      (!Blind && !same_color) ? " " : nul,
+			      (Blind || same_color) ? nul :
+				hcolor(sobj->cursed ? NH_BLACK : NH_SILVER),
+			      otense(otmp, "evaporate"));
 			if(is_cloak(otmp)) (void) Cloak_off();
 			if(is_boots(otmp)) (void) Boots_off();
 			if(is_helmet(otmp)) (void) Helmet_off();
 			if(is_gloves(otmp)) (void) Gloves_off();
 			if(is_shield(otmp)) (void) Shield_off();
 			if(otmp == uarm) (void) Armor_gone();
+#ifdef TOURIST
+			if (is_shirt(otmp)) (void) Shirt_off();
+#endif
 			useup(otmp);
 			break;
 		}

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.5	2004/11/11	*/
+/*	SCCS Id: @(#)do_wear.c	3.5	2005/12/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -35,6 +35,7 @@ STATIC_PTR int NDECL(Boots_on);
 STATIC_DCL int NDECL(Cloak_on);
 STATIC_PTR int NDECL(Helmet_on);
 STATIC_PTR int NDECL(Gloves_on);
+STATIC_DCL void FDECL(wielding_corpse, (struct obj *,BOOLEAN_P));
 STATIC_PTR int NDECL(Shield_on);
 #ifdef TOURIST
 STATIC_PTR int NDECL(Shirt_on);
@@ -151,7 +152,9 @@ Boots_off()
 		/* check for lava since fireproofed boots make it viable */
 		if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) &&
 		    !Levitation && !Flying && !is_clinger(youmonst.data) &&
-		    !context.takeoff.cancelled_don) {
+		    !context.takeoff.cancelled_don &&
+		    /* avoid recursive call to lava_effects() */   
+		    !context.in_lava_effects) {
 			/* make boots known in case you survive the drowning */
 			makeknown(otyp);
 			spoteffects(TRUE);
@@ -407,6 +410,29 @@ Gloves_on()
     return 0;
 }
 
+STATIC_OVL void
+wielding_corpse(obj, voluntary)
+struct obj *obj;
+boolean voluntary;	/* taking gloves off on purpose? */
+{
+    char kbuf[BUFSZ];
+
+    if (!obj || obj->otyp != CORPSE) return;
+    if (obj != uwep && (obj != uswapwep || !u.twoweap)) return;
+
+    if (touch_petrifies(&mons[obj->corpsenm]) && !Stone_resistance) {
+	You("now wield %s in your bare %s.",
+	    the(corpse_xname(obj, TRUE)),
+	    makeplural(body_part(HAND)));
+	Sprintf(kbuf, "%s gloves while wielding %s",
+		voluntary ? "removing" : "losing",
+		killer_xname(obj));
+	instapetrify(kbuf);
+	/* life-saved; can't continue wielding cockatrice corpse though */
+	remove_worn_item(obj, FALSE);
+    }
+}
+
 int
 Gloves_off()
 {
@@ -414,6 +440,7 @@ Gloves_off()
 	u.uprops[objects[uarmg->otyp].oc_oprop].extrinsic & ~WORN_GLOVES;
 
     context.takeoff.mask &= ~W_ARMG;
+    boolean on_purpose = !context.mon_moving && !uarmg->in_use;
 
     switch(uarmg->otyp) {
 	case LEATHER_GLOVES:
@@ -435,30 +462,15 @@ Gloves_off()
     context.takeoff.cancelled_don = FALSE;
     (void) encumber_msg();		/* immediate feedback for GoP */
 
-    /* Prevent wielding cockatrice when not wearing gloves */
-    if (uwep && uwep->otyp == CORPSE &&
-		touch_petrifies(&mons[uwep->corpsenm])) {
-	char kbuf[BUFSZ];
+    /* prevent wielding cockatrice when not wearing gloves */
+    if (uwep && uwep->otyp == CORPSE)
+	wielding_corpse(uwep, on_purpose);
 
-	You("wield the %s in your bare %s.",
-	    corpse_xname(uwep, TRUE), makeplural(body_part(HAND)));
-	Strcpy(kbuf, an(corpse_xname(uwep, TRUE)));
-	instapetrify(kbuf);
-	uwepgone();  /* life-saved still doesn't allow touching cockatrice */
-    }
-
-    /* KMH -- ...or your secondary weapon when you're wielding it */
-    if (u.twoweap && uswapwep && uswapwep->otyp == CORPSE &&
-	touch_petrifies(&mons[uswapwep->corpsenm])) {
-	char kbuf[BUFSZ];
-
-	You("wield the %s in your bare %s.",
-	    corpse_xname(uswapwep, TRUE), body_part(HAND));
-
-	Strcpy(kbuf, an(corpse_xname(uswapwep, TRUE)));
-	instapetrify(kbuf);
-	uswapwepgone();	/* lifesaved still doesn't allow touching cockatrice */
-    }
+    /* KMH -- ...or your secondary weapon when you're wielding it
+       [This case can't actually happen; twoweapon mode won't
+       engage if a corpse has been set up as the alternate weapon.] */
+    if (u.twoweap && uswapwep && uswapwep->otyp == CORPSE)
+	wielding_corpse(uswapwep, on_purpose);
 
     return 0;
 }
@@ -2127,7 +2139,8 @@ register struct obj *atmp;
 	register struct obj *otmp;
 #define DESTROY_ARM(o) ((otmp = (o)) != 0 && \
 			(!atmp || atmp == otmp) && \
-			(!obj_resists(otmp, 0, 90)))
+			(!obj_resists(otmp, 0, 90)) ? \
+			(otmp->in_use = TRUE) : FALSE)
 
 	if (DESTROY_ARM(uarmc)) {
 		if (donning(otmp)) cancel_don();

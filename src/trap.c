@@ -4095,17 +4095,23 @@ boolean
 lava_effects()
 {
     register struct obj *obj, *obj2;
-    int dmg;
+    int dmg = d(6, 6);	/* only applicable for water walking */
     boolean usurvive;
+
+    usurvive = Fire_resistance || (Wwalking && dmg < u.uhp);
+    /* a timely interrupt might manage to salvage your life
+       but not your gear; do this before messages */
+    if (!usurvive)
+	for (obj = invent; obj; obj = obj->nobj)
+	    if (is_organic(obj) && !obj->oerodeproof) obj->in_use = TRUE;
 
     burn_away_slime();
     if (likes_lava(youmonst.data)) return FALSE;
 
     if (!Fire_resistance) {
 	if(Wwalking) {
-	    dmg = d(6,6);
 	    pline_The("lava here burns you!");
-	    if(dmg < u.uhp) {
+	    if (usurvive) {
 		losehp(dmg, lava_killer, KILLED_BY);	/* lava damage */
 		goto burn_stuff;
 	    }
@@ -4116,6 +4122,13 @@ lava_effects()
 #ifdef WIZARD
 	if (wizard) usurvive = TRUE;
 #endif
+
+	/* prevent Boots_off() -> spoteffects() -> lava_effects() recursion
+	   which would successfully delete (via useupall) the no-longer-worn
+	   boots; once recursive call returned, we would try to delete them
+	   again here in the outer call (access stale memory, probably panic) */
+	context.in_lava_effects++;
+
 	for(obj = invent; obj; obj = obj2) {
 	    obj2 = obj->nobj;
 	    if(is_organic(obj) && !obj->oerodeproof) {
@@ -4130,7 +4143,7 @@ lava_effects()
 		    else if(obj == uarmg) (void) Gloves_off();
 		    else if(obj == uarmf) (void) Boots_off();
 #ifdef TOURIST
-		    else if(obj == uarmu) setnotworn(obj);
+		    else if(obj == uarmu) (void) Shirt_off();
 #endif
 		    else if(obj == uleft) Ring_gone(obj);
 		    else if(obj == uright) Ring_gone(obj);
@@ -4143,6 +4156,8 @@ lava_effects()
 		useupall(obj);
 	    }
 	}
+
+	context.in_lava_effects--;
 
 	/* s/he died... */
 	u.uhp = -1;
