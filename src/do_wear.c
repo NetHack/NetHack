@@ -438,9 +438,9 @@ Gloves_off()
 {
     long oldprop =
 	u.uprops[objects[uarmg->otyp].oc_oprop].extrinsic & ~WORN_GLOVES;
+    boolean on_purpose = !context.mon_moving && !uarmg->in_use;
 
     context.takeoff.mask &= ~W_ARMG;
-    boolean on_purpose = !context.mon_moving && !uarmg->in_use;
 
     switch(uarmg->otyp) {
 	case LEATHER_GLOVES:
