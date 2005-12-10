@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2005/11/18	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2005/12/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -219,10 +219,10 @@ register struct obj *obj;
 	register char *buf;
 	register int typ = obj->otyp;
 	register struct objclass *ocl = &objects[typ];
-	register int nn = ocl->oc_name_known;
-	register const char *actualn = OBJ_NAME(*ocl);
-	register const char *dn = OBJ_DESCR(*ocl);
-	register const char *un = ocl->oc_uname;
+	int nn = ocl->oc_name_known, omndx = obj->corpsenm;
+	const char *actualn = OBJ_NAME(*ocl);
+	const char *dn = OBJ_DESCR(*ocl);
+	const char *un = ocl->oc_uname;
 	boolean pluralize = (obj->quan != 1L);
 
 	buf = nextobuf() + PREFIX;	/* leave room for "17 -3 " */
@@ -278,8 +278,8 @@ register struct obj *obj;
 		/* it whenever calling doname() or xname(). */
 		if (typ == FIGURINE)
 		    Sprintf(eos(buf), " of a%s %s",
-			index(vowels,*(mons[obj->corpsenm].mname)) ? "n" : "",
-			mons[obj->corpsenm].mname);
+			    index(vowels, *mons[omndx].mname) ? "n" : "",
+			    mons[omndx].mname);
 		break;
 	    case ARMOR_CLASS:
 		/* depends on order of the dragon scales objects */
@@ -344,12 +344,12 @@ register struct obj *obj;
 		if (typ == TIN && obj->known) {
 		    if(obj->spe > 0)
 			Strcat(buf, " of spinach");
-		    else if (obj->corpsenm == NON_PM)
-		        Strcpy(buf, "empty tin");
-		    else if (vegetarian(&mons[obj->corpsenm]))
-			Sprintf(eos(buf), " of %s", mons[obj->corpsenm].mname);
+		    else if (omndx == NON_PM)
+			Strcpy(buf, "empty tin");
+		    else if (vegetarian(&mons[omndx]))
+			Sprintf(eos(buf), " of %s", mons[omndx].mname);
 		    else
-			Sprintf(eos(buf), " of %s meat", mons[obj->corpsenm].mname);
+			Sprintf(eos(buf), " of %s meat", mons[omndx].mname);
 		}
 		break;
 	    case COIN_CLASS:
@@ -359,13 +359,13 @@ register struct obj *obj;
 	    case ROCK_CLASS:
 		if (typ == STATUE)
 		    Sprintf(buf, "%s%s of %s%s",
-			(Role_if(PM_ARCHEOLOGIST) && (obj->spe & STATUE_HISTORIC)) ? "historic " : "" ,
+			(Role_if(PM_ARCHEOLOGIST) &&
+			    (obj->spe & STATUE_HISTORIC)) ? "historic " : "",
 			actualn,
-			type_is_pname(&mons[obj->corpsenm]) ? "" :
-			  (mons[obj->corpsenm].geno & G_UNIQ) ? "the " :
-			    (index(vowels,*(mons[obj->corpsenm].mname)) ?
-								"an " : "a "),
-			mons[obj->corpsenm].mname);
+			type_is_pname(&mons[omndx]) ? "" :
+			  the_unique_pm(&mons[omndx]) ? "the " :
+			    index(vowels, *mons[omndx].mname) ? "an " : "a ",
+			mons[omndx].mname);
 		else Strcpy(buf, actualn);
 		break;
 	    case BALL_CLASS:
@@ -507,6 +507,29 @@ register struct obj *obj;
 			 (obj->known || obj->otyp == AMULET_OF_YENDOR));
 }
 
+/* should monster type be prefixed with "the"? (mostly used for corpses) */
+boolean
+the_unique_pm(ptr)
+struct permonst *ptr;
+{
+	boolean uniq;
+
+	/* even though monsters with personal names are unique, we want to
+	   describe them as "Name" rather than "the Name" */
+	if (type_is_pname(ptr)) return FALSE;
+
+	uniq = (ptr->geno & G_UNIQ) ? TRUE : FALSE;
+	/* high priest is unique if it includes "of <deity>", otherwise not
+	   (caller needs to handle the 1st possibility; we assume the 2nd);
+	   worm tail should be irrelevant but is included for completeness */
+	if (ptr == &mons[PM_HIGH_PRIEST] || ptr == &mons[PM_LONG_WORM_TAIL])
+	    uniq = FALSE;
+	/* Wizard no longer needs this; he's flagged as unique these days */
+	if (ptr == &mons[PM_WIZARD_OF_YENDOR])
+	    uniq = TRUE;
+	return uniq;
+}
+
 STATIC_OVL void
 add_erosion_words(obj,prefix)
 struct obj *obj;
@@ -548,6 +571,7 @@ doname(obj)
 register struct obj *obj;
 {
 	boolean ispoisoned = FALSE;
+	int omndx = obj->corpsenm;
 	char prefix[PREFIX];
 	char tmpbuf[PREFIX+1];
 	/* when we have to add something at the start of prefix instead of the
@@ -726,14 +750,14 @@ ring:
 		if (obj->oeaten)
 		    Strcat(prefix, "partly eaten ");
 		if (obj->otyp == CORPSE) {
-		    if (mons[obj->corpsenm].geno & G_UNIQ) {
+		    if (the_unique_pm(&mons[omndx]) ||
+			    type_is_pname(&mons[omndx])) {
 			Sprintf(prefix, "%s%s ",
-				(type_is_pname(&mons[obj->corpsenm]) ?
-					"" : "the "),
-				s_suffix(mons[obj->corpsenm].mname));
+				the_unique_pm(&mons[omndx]) ? "the " : "",
+				s_suffix(mons[omndx].mname));
 			if (obj->oeaten) Strcat(prefix, "partly eaten ");
 		    } else {
-			Strcat(prefix, mons[obj->corpsenm].mname);
+			Strcat(prefix, mons[omndx].mname);
 			Strcat(prefix, " ");
 		    }
 		} else if (obj->otyp == EGG) {
@@ -741,10 +765,9 @@ ring:
 		    if (obj->known && stale_egg(obj))
 			Strcat(prefix, "stale ");
 #endif
-		    if (obj->corpsenm >= LOW_PM &&
-			    (obj->known ||
-			    mvitals[obj->corpsenm].mvflags & MV_KNOWS_EGG)) {
-			Strcat(prefix, mons[obj->corpsenm].mname);
+		    if (omndx >= LOW_PM && (obj->known ||
+				    (mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
+			Strcat(prefix, mons[omndx].mname);
 			Strcat(prefix, " ");
 			if (obj->spe)
 			    Strcat(bp, " (laid by you)");
@@ -850,11 +873,21 @@ struct obj *otmp;
 boolean ignore_oquan;	/* to force singular */
 {
 	char *nambuf = nextobuf();
-	int mndx = otmp->corpsenm;
-	const char *mname = (mndx != NON_PM) ? mons[mndx].mname :
-				(const char *)"thing";	/* shouldn't happen */
+	int omndx = otmp->corpsenm;
+	const char *mname;
 
-	if (type_is_pname(&mons[mndx])) mname = s_suffix(mname);
+	if (omndx == NON_PM) return strcpy(nambuf, "thing");	/* paranoia */
+
+	/* [Possible enhancement:  check whether corpse has monster traits
+	    attached in order to use priestname() for priests and minions.] */
+	if (omndx == PM_ALIGNED_PRIEST) {
+	    /* avoid "aligned priest"; it just exposes internal details */
+	    mname = "priest";
+	} else {
+	    mname = mons[omndx].mname;
+	    if (the_unique_pm(&mons[omndx]) || type_is_pname(&mons[omndx]))
+		mname = s_suffix(mname);
+	}
 	Sprintf(nambuf, "%s corpse", mname);
 
 	if (ignore_oquan || otmp->quan < 2)
@@ -891,7 +924,8 @@ struct obj *obj;
     obj->known = obj->dknown = 1;
     obj->bknown = obj->rknown = obj->greased = 0;
     /* if character is a priest[ess], bknown will get toggled back on */
-    obj->blessed = obj->cursed = 0;
+    if (obj->otyp != POT_WATER) obj->blessed = obj->cursed = 0;
+    else obj->bknown = 1;	/* describe holy/unholy water as such */
     /* "killed by poisoned <obj>" would be misleading when poison is
        not the cause of death and "poisoned by poisoned <obj>" would
        be redundant when it is, so suppress "poisoned" prefix */
@@ -904,8 +938,25 @@ struct obj *obj;
     save_ocuname = objects[obj->otyp].oc_uname;
     objects[obj->otyp].oc_uname = 0;	/* avoid "foo called bar" */
 
-    buf = xname(obj);
-    if (obj->quan == 1L) buf = obj_is_pname(obj) ? the(buf) : an(buf);
+    /* format the object */
+    if (obj->otyp == CORPSE) {
+	buf = nextobuf();
+	Sprintf(buf, "%s%s",
+		/* can't use the(); capitalized name blocks its article */ 
+		the_unique_pm(&mons[obj->corpsenm]) ? "the " : "",
+		corpse_xname(obj, FALSE));
+    } else if (obj->otyp == SLIME_MOLD) {
+	/* concession to "most unique deaths competition" in the annual
+	   devnull tournament, suppress player supplied fruit names because
+	   those can be used to fake other objects and dungeon features */
+	buf = nextobuf();
+	Sprintf(buf, "deadly slime mold%s", plur(obj->quan));
+    } else {
+	buf = xname(obj);
+    }
+    /* apply an article if appropriate; caller should always use KILLED_BY */
+    if (obj->quan == 1L && !strstri(buf, "'s ") && !strstri(buf, "s' "))
+	buf = (obj_is_pname(obj) || the_unique_obj(obj)) ? the(buf) : an(buf);
 
     objects[obj->otyp].oc_name_known = save_ocknown;
     objects[obj->otyp].oc_uname = save_ocuname;
@@ -925,9 +976,8 @@ char *FDECL((*func), (OBJ_P));
 	long savequan;
 	char *nam;
 
-	/* Note: using xname for corpses will not give the monster type */
-	if (otmp->otyp == CORPSE && func == xname)
-		return corpse_xname(otmp, TRUE);
+	/* using xname for corpses does not give the monster type */
+	if (otmp->otyp == CORPSE && func == xname) func = cxname;
 
 	savequan = otmp->quan;
 	otmp->quan = 1L;
