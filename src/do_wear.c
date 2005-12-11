@@ -154,7 +154,7 @@ Boots_off()
 		    !Levitation && !Flying && !is_clinger(youmonst.data) &&
 		    !context.takeoff.cancelled_don &&
 		    /* avoid recursive call to lava_effects() */   
-		    !context.in_lava_effects) {
+		    !iflags.in_lava_effects) {
 			/* make boots known in case you survive the drowning */
 			makeknown(otyp);
 			spoteffects(TRUE);

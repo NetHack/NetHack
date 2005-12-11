@@ -4127,7 +4127,7 @@ lava_effects()
 	   which would successfully delete (via useupall) the no-longer-worn
 	   boots; once recursive call returned, we would try to delete them
 	   again here in the outer call (access stale memory, probably panic) */
-	context.in_lava_effects++;
+	iflags.in_lava_effects++;
 
 	for(obj = invent; obj; obj = obj2) {
 	    obj2 = obj->nobj;
@@ -4157,7 +4157,7 @@ lava_effects()
 	    }
 	}
 
-	context.in_lava_effects--;
+	iflags.in_lava_effects--;
 
 	/* s/he died... */
 	u.uhp = -1;

@@ -166,9 +166,10 @@ struct instance_flags {
 				  * on some non-move commands */
 	boolean  zerocomp;	/* write zero-compressed save files */
 	boolean  rlecomp;	/* run-length comp of levels when writing savefile */
-	uchar num_pad_mode;
-	int	menu_headings;	/* ATR for menu headings */
-	int      purge_monsters;	/* # of dead monsters still on fmon list */
+	uchar	 num_pad_mode;
+	int	 in_lava_effects;	/* hack for Boots_off() */
+	int	 menu_headings;	/* ATR for menu headings */
+	int	 purge_monsters;	/* # of dead monsters still on fmon list */
 	int *opt_booldup;	/* for duplication of boolean opts in config file */
 	int *opt_compdup;	/* for duplication of compound opts in config file */
 	uchar	bouldersym;	/* symbol for boulder display */
