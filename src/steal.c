@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.5	2005/10/14	*/
+/*	SCCS Id: @(#)steal.c	3.5	2005/12/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -43,13 +43,31 @@ register struct monst *mtmp;
 {
 	register struct obj *gold = g_at(u.ux, u.uy);
 	register long tmp;
+	struct monst *who;
+	const char *whose, *what;
 
-	if (gold && ( !u.ugold || gold->quan > u.ugold || !rn2(5))) {
+	if (gold && (!u.ugold || gold->quan > u.ugold || !rn2(5))) {
 	    mtmp->mgold += gold->quan;
 	    delobj(gold);
 	    newsym(u.ux, u.uy);
-	    pline("%s quickly snatches some gold from between your %s!",
-		    Monnam(mtmp), makeplural(body_part(FOOT)));
+#ifdef STEED
+	    if (u.usteed)
+		who = u.usteed,
+		  whose = s_suffix(y_monnam(who)),
+		    what = makeplural(mbodypart(who, FOOT));
+	    else
+#endif
+		who = &youmonst,
+		  whose = "your",
+		    what = makeplural(body_part(FOOT));
+	    /* [ avoid "between your rear regions" :-] */
+	    if (slithy(who->data)) what = "coils";
+	    /* reduce "rear hooves/claws" to "hooves/claws" */
+	    if (!strncmp(what, "rear ", 5)) what += 5;
+	    pline("%s quickly snatches some gold from %s %s %s!",
+		  Monnam(mtmp),
+		  (Levitation || Flying) ? "beneath" : "between",
+		  whose, what);
 	    if(!u.ugold || !rn2(5)) {
 		if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 		/* do not set mtmp->mavenge here; gold on the floor is fair game */
@@ -106,19 +124,37 @@ register struct monst *mtmp;
 	register struct obj *fgold = g_at(u.ux, u.uy);
 	register struct obj *ygold;
 	register long tmp;
+	struct monst *who;
+	const char *whose, *what;
 
-        /* skip lesser coins on the floor */        
-        while (fgold && fgold->otyp != GOLD_PIECE) fgold = fgold->nexthere; 
+	/* skip lesser coins on the floor */        
+	while (fgold && fgold->otyp != GOLD_PIECE) fgold = fgold->nexthere; 
 
-        /* Do you have real gold? */
-        ygold = findgold(invent);
+	/* Do you have real gold? */
+	ygold = findgold(invent);
 
-	if (fgold && ( !ygold || fgold->quan > ygold->quan || !rn2(5))) {
-            obj_extract_self(fgold);
+	if (fgold && (!ygold || fgold->quan > ygold->quan || !rn2(5))) {
+	    obj_extract_self(fgold);
 	    add_to_minv(mtmp, fgold);
 	    newsym(u.ux, u.uy);
-	    pline("%s quickly snatches some gold from between your %s!",
-		    Monnam(mtmp), makeplural(body_part(FOOT)));
+#ifdef STEED
+	    if (u.usteed)
+		who = u.usteed,
+		  whose = s_suffix(y_monnam(who)),
+		    what = makeplural(mbodypart(who, FOOT));
+	    else
+#endif
+		who = &youmonst,
+		  whose = "your",
+		    what = makeplural(body_part(FOOT));
+	    /* [ avoid "between your rear regions" :-] */
+	    if (slithy(who->data)) what = "coils";
+	    /* reduce "rear hooves/claws" to "hooves/claws" */
+	    if (!strncmp(what, "rear ", 5)) what += 5;
+	    pline("%s quickly snatches some gold from %s %s %s!",
+		  Monnam(mtmp),
+		  (Levitation || Flying) ? "beneath" : "between",
+		  whose, what);
 	    if(!ygold || !rn2(5)) {
 		if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 		monflee(mtmp, 0, FALSE, FALSE);
