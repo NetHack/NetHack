@@ -900,8 +900,8 @@ register const char *let,*word;
 		    )
 			foo--;
 		/* ugly check for unworn armor that can't be worn */
-		else if (putting_on(word) && *let == ARMOR_CLASS &&
-		    !canwearobj(otmp, &dummymask, FALSE) 
+		else if ((putting_on(word) && *let == ARMOR_CLASS &&
+			  !canwearobj(otmp, &dummymask, FALSE))
 		/* or unsuitable items rubbed on known touchstone */
 		|| (!strncmp(word, "rub on the stone", 16) &&
 		    *let == GEM_CLASS &&

@@ -253,7 +253,7 @@ shuffle_all()
 
     /* do whole classes (amulets, &c) */
     for (idx = 0; idx < SIZE(shuffle_classes); idx++) {
-	obj_shuffle_range(bases[shuffle_classes[idx]], &first, &last);
+	obj_shuffle_range(bases[(int) shuffle_classes[idx]], &first, &last);
 	shuffle(first, last, TRUE);
     }
     /* do type ranges (helms, &c) */

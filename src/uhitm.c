@@ -1801,7 +1801,7 @@ register struct attack *mattk;
 	    /* engulfing a cockatrice or digesting a Rider or Medusa */
 	    fatal_gulp = (touch_petrifies(pd) && !Stone_resistance) ||
 			(mattk->adtyp == AD_DGST && (is_rider(pd) ||
-			    (pd == &mons[PM_MEDUSA]) && !Stone_resistance));
+			    ((pd == &mons[PM_MEDUSA]) && !Stone_resistance)));
 
 	    if ((mattk->adtyp == AD_DGST && !Slow_digestion) || fatal_gulp) {
 		/* KMH, conduct */
