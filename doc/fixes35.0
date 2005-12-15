@@ -103,6 +103,7 @@ grammar bit if killed by stealing a cockatrice corpse from a monster
 being petrified by swallowing a cockatrice violates foodless conduct
 devouring Medusa whole is fatal
 eating pet won't continue eating after becoming paralyzed or falling asleep
+randomize shopkeeper names when hallucinating
 
 
 Platform- and/or Interface-Specific Fixes

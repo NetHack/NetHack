@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shknam.c	3.5	2005/03/05	*/
+/*	SCCS Id: @(#)shknam.c	3.5	2005/12/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -652,6 +652,22 @@ shkname(mtmp)
 struct monst *mtmp;
 {
     const char *shknm = ESHK(mtmp)->shknam;
+
+    if (Hallucination && !program_state.gameover) {
+	const char * const *nlp;
+	int num;
+
+	/* count the number of non-unique shop types;
+	   pick one randomly, ignoring shop generation probabilities;
+	   pick a name at random from that shop type's list */
+	for (num = 0; num < SIZE(shtypes); num++)
+	    if (shtypes[num].prob == 0) break;
+	if (num > 0) {
+	    nlp = shtypes[rn2(num)].shknms;
+	    for (num = 0; nlp[num]; num++) continue;
+	    if (num > 0) shknm = nlp[rn2(num)];
+	}
+    }
 
     /* strip prefix if present */
     if (!letter(*shknm)) ++shknm;
