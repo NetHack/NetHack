@@ -2423,6 +2423,7 @@ long hmask, emask;     /* might cancel timeout */
 	HLevitation &= ~hmask;
 	ELevitation &= ~emask;
 	if(Levitation) return(0); /* maybe another ring/potion/boots */
+	nomul(0);	/* stop running or resting */
 	if(u.uswallow) {
 	    You("float down, but you are still %s.",
 		is_animal(u.ustuck->data) ? "swallowed" : "engulfed");
