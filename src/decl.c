@@ -40,7 +40,6 @@ NEARDATA int in_doagain = 0;
  */
 struct dgn_topology dungeon_topology = {DUMMY};
 
-#include "quest.h"
 struct q_score	quest_status = DUMMY;
 
 NEARDATA int warn_obj_cnt = 0;

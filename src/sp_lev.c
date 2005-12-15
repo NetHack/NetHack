@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sp_lev.c	3.5	2001/09/06	*/
+/*	SCCS Id: @(#)sp_lev.c	3.5	2005/12/14	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,7 +22,6 @@
 #endif
 
 #include "sp_lev.h"
-#include "rect.h"
 
 extern void FDECL(mkmap, (lev_init *));
 

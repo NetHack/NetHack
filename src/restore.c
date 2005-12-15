@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.5	2005/01/04	*/
+/*	SCCS Id: @(#)restore.c	3.5	2005/12/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -86,8 +86,6 @@ static struct bucket *id_map = 0;
 void FDECL( amii_setpens, (int) );	/* use colors from save file */
 extern int amii_numcolors;
 #endif
-
-#include "quest.h"
 
 boolean restoring = FALSE;
 static NEARDATA struct fruit *oldfruit;
