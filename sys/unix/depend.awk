@@ -21,6 +21,7 @@
 #	assumed to be the last #include in the file where it occurs.
 # win32api.h gets special handling because it only exists for some ports;
 #	it's assumed to be the last #include in the file where it occurs
+# zlib.h ditto
 #
 BEGIN		{ FS = "\""			#for `#include "X"', $2 is X
 		  special[++sp_cnt] = "../include/config.h"
@@ -29,12 +30,13 @@ BEGIN		{ FS = "\""			#for `#include "X"', $2 is X
 		  alt_deps["../include/patchlev.h"] = ""
 		  alt_deps["interp.c"] = " #interp.c"	#comment it out
 		  alt_deps["../include/win32api.h"] = " #../include/win32api.h"
+		  alt_deps["../include/zlib.h"] = " #zlib.h"	#comment it out
 		}
 FNR == 1	{ output_dep()			#finish previous file
 		  file = FILENAME		#setup for current file
 		}
 /^\#[ \t]*include[ \t]+\"/  {			#find `#include "X"'
-		  incl = $2;
+		  incl = $2
 		  #[3.4.0: gnomehack headers currently aren't in include]
 		  if (incl ~ /\.h$/) {
 		    if (incl ~ /^gn/)	# gnomehack special case
