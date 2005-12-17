@@ -3269,8 +3269,7 @@ boolean force_failure;
 	if (!can_reach_floor(TRUE)) {
 #ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
-			You("aren't skilled enough to reach from %s.",
-				mon_nam(u.usteed));
+			rider_cant_reach();
 		else
 #endif
 		You("are unable to reach the %s!",
@@ -3653,8 +3652,7 @@ boolean force;
 		    }
 #ifdef STEED
 		    if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
-			You("aren't skilled enough to reach from %s.",
-				mon_nam(u.usteed));
+			rider_cant_reach();
 			return(0);
 		    }
 #endif

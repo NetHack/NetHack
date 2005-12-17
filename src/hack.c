@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)hack.c	3.5	2005/12/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1949,8 +1949,7 @@ dopickup()
 		You("cannot reach the bottom of the pit.");
 #ifdef STEED
 	    else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
-		You("aren't skilled enough to reach from %s.",
-		    y_monnam(u.usteed));
+		rider_cant_reach();
 #endif
 	    else
 		You("cannot reach the %s.", surface(u.ux,u.uy));
