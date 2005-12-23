@@ -526,6 +526,33 @@ register xchar x,y;
 		    && !(passes_walls(mdat) && may_passwall(x,y)))));
 }
 
+/* caller has already decided that it's a tight diagonal; check whether a
+   monster--who might be the hero--can fit through, and if not then return
+   the reason why:  1: can't fit, 2: possessions won't fit, 3: sokoban */
+int     /* returns 0 if we can squeeze through */
+cant_squeeze_thru(mon)
+struct monst *mon;
+{
+    int amt;
+    struct permonst *ptr = mon->data;
+
+    /* too big? */
+    if (bigmonst(ptr) &&
+	    !(amorphous(ptr) || is_whirly(ptr) ||
+	      noncorporeal(ptr) || slithy(ptr) || can_fog(mon))) return 1;
+
+    /* lugging too much junk? */
+    amt = (mon == &youmonst) ? inv_weight() + weight_cap() :
+		curr_mon_load(mon);
+    if (amt > 600) return 2;
+
+    /* Sokoban restriction applies to hero only */
+    if (mon == &youmonst && In_sokoban(&u.uz)) return 3;
+
+    /* can squeeze through */
+    return 0;
+}
+
 boolean
 invocation_pos(x, y)
 xchar x, y;
@@ -623,20 +650,18 @@ int mode;
     if (dx && dy
 	    && bad_rock(youmonst.data,ux,y) && bad_rock(youmonst.data,x,uy)) {
 	/* Move at a diagonal. */
-	if (In_sokoban(&u.uz)) {
-	    if (mode == DO_MOVE)
-		You("cannot pass that way.");
+	switch (cant_squeeze_thru(&youmonst)) {
+	case 3:
+	    if (mode == DO_MOVE) You("cannot pass that way.");
 	    return FALSE;
-	}
-	if (bigmonst(youmonst.data)) {
-	    if (mode == DO_MOVE)
-		Your("body is too large to fit through.");
+	case 2:
+	    if (mode == DO_MOVE) You("are carrying too much to get through.");
 	    return FALSE;
-	}
-	if (invent && (inv_weight() + weight_cap() > 600)) {
-	    if (mode == DO_MOVE)
-		You("are carrying too much to get through.");
+	case 1:
+	    if (mode == DO_MOVE) Your("body is too large to fit through.");
 	    return FALSE;
+	default:
+	    break;      /* can squeeze through */
 	}
     }
     /* Pick travel path that does not require crossing a trap.

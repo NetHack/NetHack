@@ -1051,8 +1051,7 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 	       !((IS_TREE(ntyp) ? treeok : rockok) && may_dig(nx,ny))) continue;
 	    /* KMH -- Added iron bars */
 	    if (ntyp == IRONBARS && !(flag & ALLOW_BARS)) continue;
-	    if(IS_DOOR(ntyp) && 
-		!(amorphous(mdat) || (!amorphous(mdat) && can_fog(mon))) &&
+	    if(IS_DOOR(ntyp) && !(amorphous(mdat) || can_fog(mon)) &&
 	       ((levl[nx][ny].doormask & D_CLOSED && !(flag & OPENDOOR)) ||
 		(levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))) &&
 	       !thrudoor) continue;
@@ -1151,9 +1150,9 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 			if(flag & NOTONL) continue;
 			info[cnt] |= NOTONL;
 		}
-		if (nx != x && ny != y && bad_rock(mdat, x, ny)
-			    && bad_rock(mdat, nx, y)
-			    && (bigmonst(mdat) || (curr_mon_load(mon) > 600)))
+		/* check for diagonal tight squeeze */
+		if (nx != x && ny != y && bad_rock(mdat, x, ny) &&
+			    bad_rock(mdat, nx, y) && cant_squeeze_thru(mon))
 			continue;
 		/* The monster avoids a particular type of trap if it's familiar
 		 * with the trap type.  Pets get ALLOW_TRAPS and checking is
