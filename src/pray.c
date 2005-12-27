@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2005/08/31	*/
+/*	SCCS Id: @(#)pray.c	3.5	2005/12/26	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1242,8 +1242,13 @@ dosacrifice()
 		    demonless_msg = "blood coagulates";
 		}
 		if ((pm = dlord(altaralign)) != NON_PM &&
-		    (dmon = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS))) {
-		    You("have summoned %s!", a_monnam(dmon));
+		  (dmon = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS)) != 0) {
+		    char dbuf[BUFSZ];
+
+		    Strcpy(dbuf, a_monnam(dmon));
+		    if (!strcmpi(dbuf, "it"))
+			Strcpy(dbuf, "something dreadful");
+		    You("have summoned %s!", dbuf);
 		    if (sgn(u.ualign.type) == sgn(dmon->data->maligntyp))
 			dmon->mpeaceful = TRUE;
 		    You("are terrified, and unable to move.");
