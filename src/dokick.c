@@ -432,16 +432,20 @@ xchar x, y;
 		return(1);
 	}
 
-	if(kickobj->otyp == CORPSE && touch_petrifies(&mons[kickobj->corpsenm])
-			&& !Stone_resistance && !uarmf) {
-	    You("kick the %s with your bare %s.",
-		corpse_xname(kickobj, TRUE), makeplural(body_part(FOOT)));
-	    if (!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
+	if (!uarmf && kickobj->otyp == CORPSE &&
+		touch_petrifies(&mons[kickobj->corpsenm]) &&
+		!Stone_resistance) {
+	    You("kick %s with your bare %s.",
+		corpse_xname(kickobj, (const char *)0, CXN_PFX_THE),
+		makeplural(body_part(FOOT)));
+	    if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
+		;	/* hero has been transformed but kick continues */
+	    } else {
 		You("turn to stone...");
 		killer.format = KILLED_BY;
-		/* KMH -- otmp should be kickobj */
-		Sprintf(killer.name, "kicking %s without boots",
-			an(corpse_xname(kickobj, TRUE)));
+		/* normalize body shape here; foot, not body_part(FOOT) */
+		Sprintf(killer.name, "kicking %s barefoot",
+			killer_xname(kickobj));
 		done(STONING);
 	    }
 	}

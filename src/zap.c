@@ -786,7 +786,9 @@ struct monst *mon;
 		revive_egg(otmp);
 	    if (otmp->otyp != CORPSE) continue;
 	    /* save the name; the object is liable to go away */
-	    if (youseeit) Strcpy(corpse, corpse_xname(otmp, TRUE));
+	    if (youseeit)
+		Strcpy(corpse,
+		       corpse_xname(otmp, (const char *)0, CXN_SINGULAR));
 
 	    /* for a merged group, only one is revived; should this be fixed? */
 	    if ((mtmp2 = revive(otmp, !context.mon_moving)) != 0) {

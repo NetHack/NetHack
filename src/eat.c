@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2005/09/27	*/
+/*	SCCS Id: @(#)eat.c	3.5	2005/12/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -163,7 +163,7 @@ eatmdone()		/* called after mimicing is over */
 	return 0;
 }
 
-/* ``[the(] singular(food, xname) [)]'' with awareness of unique monsters */
+/* ``[the(] singular(food, xname) [)]'' */
 STATIC_OVL const char *
 food_xname(food, the_pfx)
 struct obj *food;
@@ -172,18 +172,17 @@ boolean the_pfx;
 	const char *result;
 	int mnum = food->corpsenm;
 
-	if (food->otyp == CORPSE && (mons[mnum].geno & G_UNIQ)) {
-	    /* grab xname()'s modifiable return buffer for our own use */
-	    char *bufp = xname(food);
-	    Sprintf(bufp, "%s%s corpse",
-		    (the_pfx && !type_is_pname(&mons[mnum])) ? "the " : "",
-		    s_suffix(mons[mnum].mname));
-	    result = bufp;
+	if (food->otyp == CORPSE) {
+	    result = corpse_xname(food, (const char *)0,
+				CXN_SINGULAR | (the_pfx ? CXN_PFX_THE : 0));
+	    /* not strictly needed since pname values are capitalized
+	       and the() is a no-op for them */
+	    if (type_is_pname(&mons[food->corpsenm])) the_pfx = FALSE;
 	} else {
 	    /* the ordinary case */
 	    result = singular(food, xname);
-	    if (the_pfx) result = the(result);
 	}
+	if (the_pfx) result = the(result);
 	return result;
 }
 
@@ -227,17 +226,8 @@ choke(food)	/* To a full belly all food is bad. (It.) */
 		if (food->oclass == COIN_CLASS) {
 		    Strcpy(killer.name, "very rich meal");
 		} else {
-		    Strcpy(killer.name, food_xname(food, FALSE));
-		    if (food->otyp == CORPSE &&
-			(mons[food->corpsenm].geno & G_UNIQ)) {
-			if (!type_is_pname(&mons[food->corpsenm]))
-			    Strcpy(killer.name, the(killer.name));
-			killer.format = KILLED_BY;
-		    } else if (obj_is_pname(food)) {
-			killer.format = KILLED_BY;
-			if (food->oartifact >= ART_ORB_OF_DETECTION)
-			    Strcpy(killer.name, the(killer.name));
-		    }
+		    killer.format = KILLED_BY;
+		    Strcpy(killer.name, killer_xname(food));
 		}
 	    } else {
 		You("choke over it.");
@@ -1269,8 +1259,8 @@ opentin()		/* called during each move whilst opening a tin */
 		what = rndmonnam();
 	    } else {
 		what = mons[mnum].mname;
-		if (mons[mnum].geno & G_UNIQ)
-		    which = type_is_pname(&mons[mnum]) ? 1 : 2;
+		if (the_unique_pm(&mons[mnum])) which = 2;
+		else if (type_is_pname(&mons[mnum])) which = 1;
 	    }
 	    if (which == 0) what = makeplural(what);
 
@@ -1463,7 +1453,6 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 {
 	int tp = 0, mnum = otmp->corpsenm;
 	long rotted = 0L;
-	boolean uniq = !!(mons[mnum].geno & G_UNIQ);
 	int retcode = 0;
 	boolean stoneable = (flesh_petrifies(&mons[mnum]) &&
 				!Stone_resistance &&
@@ -1490,20 +1479,15 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 		if (Sick_resistance) {
 			pline("It doesn't seem at all sickening, though...");
 		} else {
-			char buf[BUFSZ];
 			long sick_time;
 
 			sick_time = (long) rn1(10, 10);
 			/* make sure new ill doesn't result in improvement */
 			if (Sick && (sick_time > Sick))
 			    sick_time = (Sick > 1L) ? Sick - 1L : 1L;
-			if (!uniq)
-			    Sprintf(buf, "rotted %s", corpse_xname(otmp,TRUE));
-			else
-			    Sprintf(buf, "%s%s rotted corpse",
-				    !type_is_pname(&mons[mnum]) ? "the " : "",
-				    s_suffix(mons[mnum].mname));
-			make_sick(sick_time, buf, TRUE, SICK_VOMITABLE);
+			make_sick(sick_time,
+			          corpse_xname(otmp, "rotted", CXN_NORMAL),
+			          TRUE, SICK_VOMITABLE);
 		}
 		if (carried(otmp)) useup(otmp);
 		else useupf(otmp, 1L);
@@ -1552,7 +1536,8 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	    pline("This tastes just like chicken!");
 	} else {
 	    pline("%s%s %s!",
-		  !uniq ? "This " : !type_is_pname(&mons[mnum]) ? "The " : "",
+		  type_is_pname(&mons[mnum]) ? "" :
+		    the_unique_pm(&mons[mnum]) ? "The " : "This ",
 		  food_xname(otmp, FALSE),
 		  (vegan(&mons[mnum]) ?
 		   (!carnivorous(youmonst.data) && herbivorous(youmonst.data)) :

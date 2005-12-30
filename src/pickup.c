@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2005/11/02	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2005/12/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,6 +16,7 @@ STATIC_DCL boolean FDECL(query_classes, (char *,boolean *,boolean *,
 STATIC_DCL boolean FDECL(query_classes, (char *,boolean *,boolean *,
 		const char *,struct obj *,BOOLEAN_P,int *));
 #endif
+STATIC_DCL boolean FDECL(fatal_corpse_mistake, (struct obj *,BOOLEAN_P));
 STATIC_DCL void FDECL(check_here, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(n_or_more, (struct obj *));
 STATIC_DCL boolean FDECL(all_but_uchain, (struct obj *));
@@ -260,6 +261,27 @@ ask_again:
 		}
 	}
 	return TRUE;
+}
+
+/* check whether hero is bare-handedly touching a cockatrice corpse */
+STATIC_OVL boolean
+fatal_corpse_mistake(obj, remotely)
+struct obj *obj;
+boolean remotely;
+{
+    if (uarmg || remotely || obj->otyp != CORPSE ||
+	    !touch_petrifies(&mons[obj->corpsenm]) || Stone_resistance)
+	return FALSE;
+
+    if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
+	display_nhwindow(WIN_MESSAGE, FALSE);	/* --More-- */
+	return FALSE;
+    }
+
+    pline("Touching %s is a fatal mistake.",
+	  corpse_xname(obj, (const char *)0, CXN_SINGULAR|CXN_ARTICLE));
+    instapetrify(killer_xname(obj));
+    return TRUE;
 }
 
 /* look at the objects at our location, unless there are too many of them */
@@ -1307,18 +1329,8 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    return 1;
 #endif
 	} else if (obj->otyp == CORPSE) {
-	    if ( (touch_petrifies(&mons[obj->corpsenm])) && !uarmg
-				&& !Stone_resistance && !telekinesis) {
-		if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
-		    display_nhwindow(WIN_MESSAGE, FALSE);
-		else {
-			char kbuf[BUFSZ];
-
-			Strcpy(kbuf, an(corpse_xname(obj, TRUE)));
-			pline("Touching %s is a fatal mistake.", kbuf);
-			instapetrify(kbuf);
-		    return -1;
-		}
+	    if (fatal_corpse_mistake(obj, telekinesis)) {
+		return -1;
 	    } else if (is_rider(&mons[obj->corpsenm])) {
 		pline("At your %s, the corpse suddenly moves...",
 			telekinesis ? "attempted acquisition" : "touch");
@@ -1823,21 +1835,7 @@ register struct obj *obj;
 		if (uquiver) return 0;     /* unwielded, died, rewielded */
 	}
 
-	if (obj->otyp == CORPSE) {
-	    if ( (touch_petrifies(&mons[obj->corpsenm])) && !uarmg
-		 && !Stone_resistance) {
-		if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
-		    display_nhwindow(WIN_MESSAGE, FALSE);
-		else {
-		    char kbuf[BUFSZ];
-
-		    Strcpy(kbuf, an(corpse_xname(obj, TRUE)));
-		    pline("Touching %s is a fatal mistake.", kbuf);
-		    instapetrify(kbuf);
-		    return -1;
-		}
-	    }
-	}
+	if (fatal_corpse_mistake(obj, FALSE)) return -1;
 
 	/* boxes, boulders, and big statues can't fit into any container */
 	if (obj->otyp == ICE_BOX || Is_box(obj) || obj->otyp == BOULDER ||
@@ -1946,21 +1944,7 @@ register struct obj *obj;
 
 	if(obj->oartifact && !touch_artifact(obj,&youmonst)) return 0;
 
-	if (obj->otyp == CORPSE) {
-	    if ( (touch_petrifies(&mons[obj->corpsenm])) && !uarmg
-		 && !Stone_resistance) {
-		if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
-		    display_nhwindow(WIN_MESSAGE, FALSE);
-		else {
-		    char kbuf[BUFSZ];
-
-		    Strcpy(kbuf, an(corpse_xname(obj, TRUE)));
-		    pline("Touching %s is a fatal mistake.", kbuf);
-		    instapetrify(kbuf);
-		    return -1;
-		}
-	    }
-	}
+	if (fatal_corpse_mistake(obj, FALSE)) return -1;
 
 	count = obj->quan;
 	if ((res = lift_object(obj, current_container, &count, FALSE)) <= 0)

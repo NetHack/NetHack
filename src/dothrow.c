@@ -91,11 +91,16 @@ int shotlimit;
 		return(0);
 	}
 	u_wipe_engr(2);
-	if (!uarmg && !Stone_resistance && (obj->otyp == CORPSE &&
-		    touch_petrifies(&mons[obj->corpsenm]))) {
-		You("throw the %s corpse with your bare %s.",
-		    mons[obj->corpsenm].mname, body_part(HAND));
-		Sprintf(killer.name, "%s corpse", an(mons[obj->corpsenm].mname));
+	if (!uarmg && obj->otyp == CORPSE &&
+		    touch_petrifies(&mons[obj->corpsenm]) &&
+		    !Stone_resistance) {
+		You("throw %s with your bare %s.",
+		    corpse_xname(obj, (const char *)0, CXN_PFX_THE),
+		    /* throwing with one hand, but pluralize since the
+		       expression "with your bare hands" sounds better */
+		    makeplural(body_part(HAND)));
+		Sprintf(killer.name, "throwing %s bare-handed",
+			killer_xname(obj));
 		instapetrify(killer.name);
 	}
 	if (welded(obj)) {

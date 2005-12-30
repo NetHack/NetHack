@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2005/03/28	*/
+/*	SCCS Id: @(#)hack.h	3.5	2005/12/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -75,6 +75,15 @@
 #define COST_SPLAT  12	/* cream pie to own face (ditto) */
 #define COST_BITE   13	/* start eating food */
 #define COST_OPEN   14	/* open tin */
+
+/* bitmask flags for corpse_xname();
+   PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */
+#define CXN_NORMAL	 0	/* no special handling */
+#define CXN_SINGULAR	 1	/* override quantity if greather than 1 */
+#define CXN_NO_PFX	 2	/* suppress "the" from "the Unique Monst */
+#define CXN_PFX_THE	 4	/* prefix with "the " (unless pname) */
+#define CXN_ARTICLE	 8	/* include a/an/the prefix */
+#define CXN_NOCORPSE	16	/* suppress " corpse" suffix */
 
 /*
  * This is the way the game ends.  If these are rearranged, the arrays

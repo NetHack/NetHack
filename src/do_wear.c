@@ -422,7 +422,7 @@ boolean voluntary;	/* taking gloves off on purpose? */
 
     if (touch_petrifies(&mons[obj->corpsenm]) && !Stone_resistance) {
 	You("now wield %s in your bare %s.",
-	    the(corpse_xname(obj, TRUE)),
+	    corpse_xname(obj, (const char *)0, CXN_ARTICLE),
 	    makeplural(body_part(HAND)));
 	Sprintf(kbuf, "%s gloves while wielding %s",
 		voluntary ? "removing" : "losing",

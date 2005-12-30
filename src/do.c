@@ -1486,28 +1486,29 @@ struct obj *corpse;
     struct monst *mtmp, *mcarry;
     boolean is_uwep, chewed;
     xchar where;
-    char *cname, cname_buf[BUFSZ];
+    char cname[BUFSZ];
     struct obj *container = (struct obj *)0;
     int container_where = 0;
     
     where = corpse->where;
-    is_uwep = corpse == uwep;
-    cname = eos(strcpy(cname_buf, "bite-covered "));
-    Strcpy(cname, corpse_xname(corpse, TRUE));
+    is_uwep = (corpse == uwep);
+    chewed = (corpse->oeaten != 0);
+    Strcpy(cname, corpse_xname(corpse,
+			       chewed ? "bite-covered" : (const char *)0,
+			       CXN_SINGULAR));
     mcarry = (where == OBJ_MINVENT) ? corpse->ocarry : 0;
 
     if (where == OBJ_CONTAINED) {
-    	struct monst *mtmp2 = (struct monst *)0;
+	struct monst *mtmp2;
+
 	container = corpse->ocontainer;
-    	mtmp2 = get_container_location(container, &container_where, (int *)0);
+	mtmp2 = get_container_location(container, &container_where, (int *)0);
 	/* container_where is the outermost container's location even if nested */
 	if (container_where == OBJ_MINVENT && mtmp2) mcarry = mtmp2;
     }
     mtmp = revive(corpse, FALSE);	/* corpse is gone if successful */
 
     if (mtmp) {
-	chewed = (mtmp->mhp < mtmp->mhpmax);
-	if (chewed) cname = cname_buf;	/* include "bite-covered" prefix */
 	switch (where) {
 	    case OBJ_INVENT:
 		if (is_uwep)

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.5	2005/04/15	*/
+/*	SCCS Id: @(#)wield.c	3.5	2005/12/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -50,6 +50,7 @@
  */
 
 
+STATIC_DCL boolean FDECL(cant_wield_corpse, (struct obj *));
 STATIC_DCL int FDECL(ready_weapon, (struct obj *));
 
 /* used by will_weld() */
@@ -112,6 +113,25 @@ register struct obj *obj;
 	update_inventory();
 }
 
+STATIC_OVL boolean
+cant_wield_corpse(obj)
+struct obj *obj;
+{
+	char kbuf[BUFSZ];
+
+	if (uarmg || obj->otyp != CORPSE ||
+		!touch_petrifies(&mons[obj->corpsenm]) || Stone_resistance)
+	    return FALSE;
+
+	/* Prevent wielding cockatrice when not wearing gloves --KAA */
+	You("wield %s in your bare %s.",
+	    corpse_xname(obj, (const char *)0, CXN_PFX_THE),
+	    makeplural(body_part(HAND)));
+	Sprintf(kbuf, "wielding %s bare-handed", killer_xname(obj));
+	instapetrify(kbuf);
+	return TRUE;
+}
+
 STATIC_OVL int
 ready_weapon(wep)
 struct obj *wep;
@@ -127,15 +147,9 @@ struct obj *wep;
 		res++;
 	    } else
 		You("are already empty %s.", body_part(HANDED));
-	} else if (!uarmg && !Stone_resistance && wep->otyp == CORPSE
-				&& touch_petrifies(&mons[wep->corpsenm])) {
-	    /* Prevent wielding cockatrice when not wearing gloves --KAA */
-	    char kbuf[BUFSZ];
-
-	    You("wield the %s corpse in your bare %s.",
-		mons[wep->corpsenm].mname, makeplural(body_part(HAND)));
-	    Sprintf(kbuf, "%s corpse", an(mons[wep->corpsenm].mname));
-	    instapetrify(kbuf);
+	} else if (wep->otyp == CORPSE && cant_wield_corpse(wep)) {
+	    /* hero must have been life-saved to get here; use a turn */
+	    res++;	/* corpse won't be wielded */
 	} else if (uarms && bimanual(wep))
 	    You("cannot wield a two-handed %s while wearing a shield.",
 		is_sword(wep) ? "sword" :
@@ -497,14 +511,9 @@ can_twoweapon()
 	else if (uswapwep->oartifact)
 		pline("%s being held second to another weapon!",
 			Yobjnam2(uswapwep, "resist"));
-	else if (!uarmg && !Stone_resistance && (uswapwep->otyp == CORPSE &&
-		    touch_petrifies(&mons[uswapwep->corpsenm]))) {
-		char kbuf[BUFSZ];
-
-		You("wield the %s corpse with your bare %s.",
-		    mons[uswapwep->corpsenm].mname, body_part(HAND));
-		Sprintf(kbuf, "%s corpse", an(mons[uswapwep->corpsenm].mname));
-		instapetrify(kbuf);
+	else if (uswapwep->otyp == CORPSE && cant_wield_corpse(uswapwep)) {
+		/* [Note: NOT_WEAPON() check prevents ever getting here...] */
+		;	/* must be life-saved to reach here; return FALSE */
 	} else if (Glib || uswapwep->cursed) {
 		if (!Glib)
 			uswapwep->bknown = TRUE;

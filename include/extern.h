@@ -1428,7 +1428,7 @@ E boolean FDECL(the_unique_obj, (struct obj *));
 E boolean FDECL(the_unique_pm, (struct permonst *));
 E char *FDECL(doname, (struct obj *));
 E boolean FDECL(not_fully_identified, (struct obj *));
-E char *FDECL(corpse_xname, (struct obj *,BOOLEAN_P));
+E char *FDECL(corpse_xname, (struct obj *,const char *,unsigned));
 E char *FDECL(cxname, (struct obj *));
 E char *FDECL(killer_xname, (struct obj *));
 E const char *FDECL(singular, (struct obj *,char *(*)(OBJ_P)));

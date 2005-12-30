@@ -753,13 +753,12 @@ int thrown;
 #endif
 		    case CORPSE:		/* fixed by polder@cs.vu.nl */
 			if (touch_petrifies(&mons[obj->corpsenm])) {
-			    static const char withwhat[] = "corpse";
 			    tmp = 1;
 			    hittxt = TRUE;
-			    You("hit %s with %s %s.", mon_nam(mon),
-				obj->dknown ? the(mons[obj->corpsenm].mname) :
-				an(mons[obj->corpsenm].mname),
-				(obj->quan > 1L) ? makeplural(withwhat) : withwhat);
+			    You("hit %s with %s.", mon_nam(mon),
+				corpse_xname(obj, (const char *)0,
+				    obj->dknown ? CXN_PFX_THE : CXN_ARTICLE));
+			    obj->dknown = 1;
 			    if (!munstone(mon, TRUE))
 				minstapetrify(mon, TRUE);
 			    if (resists_ston(mon)) break;
@@ -1215,28 +1214,20 @@ STATIC_OVL boolean
 theft_petrifies(otmp)
 struct obj *otmp;
 {
-    const char *fmt;
-    char *p, cbuf[BUFSZ], kbuf[BUFSZ];
-
     if (uarmg || otmp->otyp != CORPSE ||
-	    !touch_petrifies(&mons[otmp->corpsenm])) return FALSE;
+	    !touch_petrifies(&mons[otmp->corpsenm]) || Stone_resistance)
+	return FALSE;
+
+    /* no poly_when_stoned() critter has theft capability */
+#if 0
+    if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
+	display_nhwindow(WIN_MESSAGE, FALSE);	/* --More-- */
+	return TRUE;
+    }
+#endif
 
     /* stealing this corpse is fatal... */
-    Strcpy(cbuf, cxname(otmp));		/* "cockatrice corpse" */
-    fmt = "a stolen %s";
-    if (otmp->quan > 1L) {
-	/* stack of multiple cockatrice corpses; no article for plural */
-	fmt += 2;	/* skip "a ", leaving "stolen %s" */
-    } else if ((p = strstri(cbuf, "'s corpse")) != 0 ||
-		(p = strstri(cbuf, "s' corpse")) != 0) {
-	/* in case a unique monster with petrifying touch and
-	   a personal name ever gets introduced:  we want to use
-	   "Foo's stolen corpse" instead of "a stolen Foo's corpse" */
-	*(p + 2) = '\0';	/* chop " corpse" off of cbuf */
-	fmt = "%s stolen corpse";
-    }
-    Sprintf(kbuf, fmt, cbuf);
-    instapetrify(kbuf);
+    instapetrify(corpse_xname(otmp, "stolen", CXN_ARTICLE));
     /* apparently wasn't fatal after all... */
     return TRUE;
 }
@@ -1246,12 +1237,6 @@ struct obj *otmp;
  *
  * If the target is wearing body armor, take all of its possesions;
  * otherwise, take one object.  [Is this really the behavior we want?]
- *
- * This routine implicitly assumes that there is no way to be able to
- * resist petfication (ie, be polymorphed into a xorn or golem) at the
- * same time as being able to steal (poly'd into nymph or succubus).
- * If that ever changes, the check for touching a cockatrice corpse
- * will need to be smarter about whether to break out of the theft loop.
  */
 STATIC_OVL void
 steal_it(mdef, mattk)
@@ -1801,7 +1786,7 @@ register struct attack *mattk;
 	    /* engulfing a cockatrice or digesting a Rider or Medusa */
 	    fatal_gulp = (touch_petrifies(pd) && !Stone_resistance) ||
 			(mattk->adtyp == AD_DGST && (is_rider(pd) ||
-			    ((pd == &mons[PM_MEDUSA]) && !Stone_resistance)));
+			    (pd == &mons[PM_MEDUSA] && !Stone_resistance)));
 
 	    if ((mattk->adtyp == AD_DGST && !Slow_digestion) || fatal_gulp) {
 		/* KMH, conduct */

@@ -1538,7 +1538,8 @@ long timeout;	/* unused */
 	    y = obj->oy;
 	} else if (in_invent) {
 	    if (flags.verbose) {
-		char *cname = corpse_xname(obj, FALSE);
+		char *cname = corpse_xname(obj, (const char *)0, CXN_NO_PFX);
+
 		Your("%s%s %s away%c",
 		     obj == uwep ? "wielded " : nul, cname,
 		     otense(obj, "rot"), obj == uwep ? '!' : '.');
