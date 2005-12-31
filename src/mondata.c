@@ -517,6 +517,7 @@ const char *in_str;
 
 	if (!strncmp(str, "a ", 2)) str += 2;
 	else if (!strncmp(str, "an ", 3)) str += 3;
+	else if (!strncmp(str, "the ", 4)) str += 4;
 
 	slen = strlen(str);
 	term = str + slen;
@@ -542,6 +543,14 @@ const char *in_str;
 		{ "grey unicorn",	PM_GRAY_UNICORN },
 		{ "grey ooze",		PM_GRAY_OOZE },
 		{ "gray-elf",		PM_GREY_ELF },
+		{ "mindflayer",		PM_MIND_FLAYER },
+		{ "master mindflayer",	PM_MASTER_MIND_FLAYER },
+	    /* Inappropriate singularization by -ves check above */
+		{ "master of thief",	PM_MASTER_OF_THIEVES },
+	    /* Potential misspellings where we want to avoid falling back
+	       to the rank title prefix (input has been singularized) */
+		{ "master thief",	PM_MASTER_OF_THIEVES },
+		{ "master of assassin",	PM_MASTER_ASSASSIN },
 	    /* Hyphenated names */
 		{ "ki rin",		PM_KI_RIN },
 		{ "uruk hai",		PM_URUK_HAI },
@@ -568,8 +577,6 @@ const char *in_str;
 		{ "djinn",		PM_DJINNI },
 		{ "mumakil",		PM_MUMAK },
 		{ "erinyes",		PM_ERINYS },
-	    /* falsely caught by -ves check above */
-		{ "master of thief",	PM_MASTER_OF_THIEVES },
 	    /* end of list */
 		{ 0, 0 }
 	};
