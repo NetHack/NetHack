@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lock.c	3.5	2005/06/02	*/
+/*	SCCS Id: @(#)lock.c	3.5	2006/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,7 +11,8 @@ STATIC_PTR int NDECL(forcelock);
 STATIC_VAR NEARDATA struct xlock_s {
 	struct rm  *door;
 	struct obj *box;
-	int picktyp, chance, usedtime;
+	int picktyp, /* key|pick|card for unlock, sharp vs blunt for #force */
+	    chance, usedtime;
 } xlock;
 
 STATIC_DCL const char *NDECL(lock_action);
@@ -435,22 +436,20 @@ doforce()		/* try to force a chest with your weapon */
 	register int c, picktyp;
 	char qbuf[QBUFSZ];
 
-	if(!uwep ||	/* proper type test */
-	   (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep) &&
-	    uwep->oclass != ROCK_CLASS) ||
-	   (objects[uwep->otyp].oc_skill < P_DAGGER) ||
-	   (objects[uwep->otyp].oc_skill > P_LANCE) ||
-	   uwep->otyp == FLAIL || uwep->otyp == AKLYS
-#ifdef KOPS
-	   || uwep->otyp == RUBBER_HOSE
-#endif
-	  ) {
-	    You_cant("force anything without a %sweapon.",
-		  (uwep) ? "proper " : "");
+	if (!uwep ||	/* proper type test */
+		((uwep->oclass == WEAPON_CLASS || is_weptool(uwep)) ?
+		    (objects[uwep->otyp].oc_skill < P_DAGGER ||
+		     objects[uwep->otyp].oc_skill == P_FLAIL ||
+		     objects[uwep->otyp].oc_skill > P_LANCE) :
+		 uwep->oclass != ROCK_CLASS)) {
+	    You_cant("force anything %s weapon.",
+		     !uwep ? "when not wielding a" :
+		       (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep)) ?
+			 "without a proper" : "with that");
 	    return(0);
 	}
 
-	picktyp = is_blade(uwep);
+	picktyp = is_blade(uwep) && !is_pick(uwep);
 	if(xlock.usedtime && xlock.box && picktyp == xlock.picktyp) {
 	    You("resume your attempt to force the lock.");
 	    set_occupation(forcelock, "forcing the lock", 0);
