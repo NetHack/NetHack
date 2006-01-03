@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sp_lev.c	3.5	2005/12/14	*/
+/*	SCCS Id: @(#)sp_lev.c	3.5	2006/01/02	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1036,8 +1036,11 @@ struct mkroom	*croom;
 	     */
 	    for (wastyp = otmp->corpsenm; ; wastyp = rndmonnum()) {
 		/* makemon without rndmonst() might create a group */
-		was = makemon(&mons[wastyp], 0, 0, NO_MM_FLAGS);
-		if (!resists_ston(was)) break;
+		was = makemon(&mons[wastyp], 0, 0, MM_NOCOUNTBIRTH);
+		if (!resists_ston(was)) {
+	    		(void) propagate(wastyp, TRUE, FALSE);
+			break;
+		}
 		mongone(was);
 	    }
 	    otmp->corpsenm = wastyp;
