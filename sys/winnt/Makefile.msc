@@ -210,8 +210,8 @@ LFLAGSU	= $(LFLAGSBASEC)
 #==========================================
 LFLAGSBASE = $(linkdebug) /NODEFAULTLIB /INCREMENTAL:NO /RELEASE /NOLOGO -subsystem:console,4.0 $(conlibsmt)
 CFLAGS	 = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
-NHLFLAGS1 = /NODEFAULTLIB /INCREMENTAL:NO /PDB:"$(GAME).PDB" /RELEASE /NOLOGO
-NHLFLAGS2 = /MAP:"$(GAME).MAP" /MACHINE:$(CPU) -IGNORE:505 
+NHLFLAGS1 = /NODEFAULTLIB /INCREMENTAL:NO /PDB:"$(O)$(GAME).PDB" /RELEASE /NOLOGO
+NHLFLAGS2 = /MAP:"$(O)$(GAME).MAP" /MACHINE:$(CPU) -IGNORE:505 
 !IF ("$(GRAPHICAL)"=="Y")
 LFLAGS	= $(LFLAGSBASEG) $(NHLFLAGS1) $(NHLFLAGS2)
 !ELSE
@@ -487,7 +487,7 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 ! ENDIF
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
-	@if exist $(SRC)\$(GAME).PDB copy $(SRC)\$(GAME).pdb $(GAMEDIR)\$(GAME).pdb
+	@if exist $(O)\$(GAME).PDB copy $(O)\$(GAME).pdb $(GAMEDIR)\$(GAME).pdb
 	@if exist $(GAMEDIR)\$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)\$(GAME).pdb to conserve space
 	-copy $(NTSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
 	echo install done > $@
@@ -611,7 +611,7 @@ $(O)nhdefkey.def:
 $(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
 	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
-		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
+		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 $(O)nh340key.def:
@@ -626,7 +626,7 @@ $(O)nh340key.def:
 $(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
 	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
-		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
+		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 $(O)nhraykey.def:
@@ -641,7 +641,7 @@ $(O)nhraykey.def:
 $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
 	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
-		/PDB:"$(@B).PDB" /MAP:"$(@B).map" /DEF:$(O)$(@B).def \
+		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 #
@@ -653,7 +653,7 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 #==========================================
 
 $(U)makedefs.exe:	$(MAKEOBJS)
-	@$(link) $(LFLAGSU) -out:$@ $(MAKEOBJS)
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
 		 $(INCL)\monsym.h    $(INCL)\qtext.h	$(INCL)\patchlevel.h \
@@ -693,7 +693,7 @@ $(SRC)\vis_tab.c: $(U)makedefs.exe
 #==========================================
 
 $(U)uudecode.exe: $(O)uudecode.o
-	@$(link) $(LFLAGSU) -out:$@ $(O)uudecode.o
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)\uudecode.c
 
@@ -746,7 +746,7 @@ LEVCFLAGS=-c -nologo -DWINVER=0x0400 -DWIN32 -D_WIN32 \
 
 $(U)lev_comp.exe: $(SPLEVOBJS)
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
  		$(SPLEVOBJS:^	=^
 		)
 <<
@@ -805,7 +805,7 @@ $(U)lev_$(LEX).c: $(U)lev_comp.l
 
 $(U)dgn_comp.exe: $(DGNCOMPOBJS)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(DGNCOMPOBJS:^	=^
 		)
 <<
@@ -900,7 +900,7 @@ $(INCL)\win32api.h: $(NTSYS)\win32api.h
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
-	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)dlb_main.o
 		$(O)dlb.o
 		$(O)alloc.o
@@ -946,7 +946,7 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 #==========================================
 
 $(U)recover.exe: $(RECOVOBJS)
-	$(link) $(LFLAGSU) -out:$@ $(RECOVOBJS)
+	$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)\win32api.h
 	$(CC) $(CFLAGSU) -Fo$@ $(U)recover.c
@@ -960,7 +960,7 @@ $(SRC)\tile.c: $(U)tilemap.exe
 	@$(U)tilemap
 
 $(U)tilemap.exe: $(O)tilemap.o
-	@$(link) $(LFLAGSU) -out:$@ $(O)tilemap.o
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
 $(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(CC) $(CFLAGSU) -Fo$@ $(WSHR)\tilemap.c
@@ -992,7 +992,7 @@ $(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 
 $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS:^	=^
 		)
 		$(TEXT_IO:^	=^
@@ -1001,7 +1001,7 @@ $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
 
 $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS32:^	=^
 		)
 		$(TEXT_IO32:^	=^
@@ -1010,7 +1010,7 @@ $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
 
 $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(PPMWRITERS:^	=^
 		)
 		$(TEXT_IO:^	=^
@@ -1032,7 +1032,7 @@ $(TILEBMP32):
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)tile2bmp.o
 		$(TEXT_IO:^  =^
 		)
@@ -1040,7 +1040,7 @@ $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 
 $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)til2bm32.o
 		$(TEXT_IO32:^  =^
 		)
