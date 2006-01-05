@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.5	2005/12/05	*/
+/*	SCCS Id: @(#)muse.c	3.5	2006/01/04	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1237,7 +1237,7 @@ struct obj *obj;			/* 2nd arg to fhitm/fhito */
 			case WAN_LOCKING:
 			case WAN_STRIKING:
 			    if (doorlock(obj, bhitpos.x, bhitpos.y)) {
-				makeknown(obj->otyp);
+				if (zap_oseen) makeknown(obj->otyp);
 				/* if a shop door gets broken, add it to
 				   the shk's fix list (no cost to player) */
 				if (levl[bhitpos.x][bhitpos.y].doormask ==
