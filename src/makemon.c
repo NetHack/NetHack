@@ -737,7 +737,6 @@ xchar x, y;	/* clone's preferred location or 0 (near mon) */
 	    if (mon->isminion) {
 		newemin(m2);
 		if (EMIN(mon)) *(EMIN(m2)) = *(EMIN(mon));
-		if (EPRI(mon)) *(EPRI(m2)) = *(EPRI(mon));
 	    } else {
 		/* because m2 is a copy of mon it is tame but not init'ed.
 		 * however, tamedog will not re-tame a tame dog, so m2
