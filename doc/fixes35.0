@@ -105,6 +105,8 @@ devouring Medusa whole is fatal
 eating pet won't continue eating after becoming paralyzed or falling asleep
 randomize shopkeeper names when hallucinating
 fix wording for "leprechaun steals gold from between your feet" when mounted
+magic trap that causes taming of monster that just expelled hero won't result
+	in upstream use of stale pointer; taming no longer replaces monst
 
 
 Platform- and/or Interface-Specific Fixes
@@ -187,3 +189,5 @@ monst cham field now a short and uses mons[] index
 rearrange some monster ordering to follow rule #2 listed at top of monst.c
 change region player_flags to more appropriate unsigned int instead of boolean
 remove remains of sync_hunger, which has been ifdef'd out for years
+new mextra structure housing pointers to mname, egd, epri, eshk, emin, edog
+consolidate vault.h, epri.h, eshk.h, emin.h and edog.h into new mextra.h
