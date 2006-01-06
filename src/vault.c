@@ -1,9 +1,8 @@
-/*	SCCS Id: @(#)vault.c	3.5	2005/10/28	*/
+/*	SCCS Id: @(#)vault.c	3.5	2006/01/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "vault.h"
 
 STATIC_DCL struct monst *NDECL(findgd);
 
@@ -15,6 +14,28 @@ STATIC_DCL void FDECL(restfakecorr,(struct monst *));
 STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *,int,int));
 STATIC_DCL void FDECL(move_gold,(struct obj *,int));
 STATIC_DCL void FDECL(wallify_vault,(struct monst *));
+
+void
+newegd(mtmp)
+struct monst *mtmp;
+{
+	if (!mtmp->mextra) mtmp->mextra = newmextra();
+	if (!EGD(mtmp)) {
+	    EGD(mtmp) = (struct egd *)alloc(sizeof(struct egd));
+	    (void) memset((genericptr_t) EGD(mtmp), 0, sizeof(struct egd));
+	}
+}
+
+void
+free_egd(mtmp)
+struct monst *mtmp;
+{
+	if (mtmp->mextra && EGD(mtmp)) {
+		free((genericptr_t) EGD(mtmp));
+		EGD(mtmp) = (struct egd *)0;
+	}
+	mtmp->isgd = 0;
+}
 
 STATIC_OVL boolean
 clear_fcorr(grd, forceshow)
@@ -222,7 +243,7 @@ fnd:
 	}
 
 	/* make something interesting happen */
-	if(!(guard = makemon(&mons[PM_GUARD], x, y, NO_MM_FLAGS))) return;
+	if(!(guard = makemon(&mons[PM_GUARD], x, y, MM_EGD))) return;
 	guard->isgd = 1;
 	guard->mpeaceful = 1;
 	set_malign(guard);

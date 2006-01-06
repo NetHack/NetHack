@@ -426,6 +426,8 @@ E void FDECL(adj_abon, (struct obj *,SCHAR_P));
 
 /* ### dog.c ### */
 
+E void FDECL(newedog, (struct monst *));
+E void FDECL(free_edog, (struct monst *));
 E void FDECL(initedog, (struct monst *));
 E struct monst *FDECL(make_familiar, (struct obj *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E struct monst *NDECL(makedog);
@@ -436,7 +438,7 @@ E void FDECL(mon_catchup_elapsed_time, (struct monst *,long));
 E void FDECL(keepdogs, (BOOLEAN_P));
 E void FDECL(migrate_to_level, (struct monst *,XCHAR_P,XCHAR_P,coord *));
 E int FDECL(dogfood, (struct monst *,struct obj *));
-E struct monst *FDECL(tamedog, (struct monst *,struct obj *));
+E boolean FDECL(tamedog, (struct monst *,struct obj *));
 E void FDECL(abuse_dog, (struct monst *));
 E void FDECL(wary_dog, (struct monst *, BOOLEAN_P));
 
@@ -962,6 +964,7 @@ E void FDECL(readmail, (struct obj *));
 
 /* ### makemon.c ### */
 
+E void FDECL(dealloc_monst, (struct monst *));
 E boolean FDECL(is_home_elemental, (struct permonst *));
 E struct monst *FDECL(clone_mon, (struct monst *,XCHAR_P,XCHAR_P));
 E int FDECL(monhp_per_lvl, (struct monst *));
@@ -1027,6 +1030,8 @@ E int FDECL(doseduce, (struct monst *));
 
 /* ### minion.c ### */
 
+E void FDECL(newemin, (struct monst *));
+E void FDECL(free_emin, (struct monst *));
 E int FDECL(msummon, (struct monst *));
 E void FDECL(summon_minion, (ALIGNTYP_P,BOOLEAN_P));
 E int FDECL(demon_talk, (struct monst *));
@@ -1686,6 +1691,8 @@ E void FDECL(ghod_hitsu, (struct monst *));
 E void NDECL(angry_priest);
 E void NDECL(clearpriests);
 E void FDECL(restpriest, (struct monst *,BOOLEAN_P));
+E void FDECL(newepri, (struct monst *));
+E void FDECL(free_epri, (struct monst *));
 
 /* ### quest.c ### */
 
@@ -1774,6 +1781,7 @@ E void FDECL(getlev, (int,int,XCHAR_P,BOOLEAN_P));
 E void FDECL(get_plname_from_file, (int, char *));
 E void NDECL(minit);
 E boolean FDECL(lookup_id_mapping, (unsigned, unsigned *));
+E struct monst *FDECL(buffer_to_mon, (genericptr_t));
 E void FDECL(mread, (int,genericptr_t,unsigned int));
 #ifndef GOLDOBJ
 E void FDECL(put_gold_back, (struct obj **,long *));
@@ -1853,6 +1861,7 @@ E void NDECL(co_false);
 #else
 E void FDECL(savelev, (int,XCHAR_P,int));
 #endif
+E genericptr_t FDECL(mon_to_buffer, (struct monst *, int *));
 E void FDECL(bufon, (int));
 E void FDECL(bufoff, (int));
 E void FDECL(bflush, (int));
@@ -1932,6 +1941,8 @@ E char *FDECL(Shk_Your, (char *,struct obj *));
 
 /* ### shknam.c ### */
 
+E void FDECL(neweshk, (struct monst *));
+E void FDECL(free_eshk, (struct monst *));
 E void FDECL(stock_room, (int,struct mkroom *));
 E boolean FDECL(saleable, (struct monst *,struct obj *));
 E int FDECL(get_shop_item, (int));
@@ -2207,6 +2218,8 @@ E int FDECL(hide_privileges, (BOOLEAN_P));
 
 /* ### vault.c ### */
 
+E void FDECL(newegd, (struct monst *));
+E void FDECL(free_egd, (struct monst *));
 E boolean FDECL(grddead, (struct monst *));
 E char FDECL(vault_occupied, (char *));
 E void NDECL(invault);

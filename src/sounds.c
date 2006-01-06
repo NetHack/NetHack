@@ -3,7 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "edog.h"
+
 #ifdef USER_SOUNDS
 # ifdef USER_SOUNDS_REGEX
 #include <sys/types.h>

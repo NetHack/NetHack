@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monst.h	3.5	2005/07/13	*/
+/*	SCCS Id: @(#)monst.h	3.5	2006/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,8 +33,8 @@
 #define MINV_NOLET 0x01
 #define MINV_ALL   0x02
 
-#ifndef ALIGN_H
-#include "align.h"
+#ifndef MEXTRA_H
+#include "mextra.h"
 #endif
 
 struct monst {
@@ -138,39 +138,15 @@ struct monst {
 	long misc_worn_check;
 	xchar weapon_check;
 
-	uchar mnamelth;		/* length of name (following mxlth) */
-	short mxlth;		/* length of following data */
-	/* in order to prevent alignment problems mextra should
-	   be (or follow) a long int */
 	int meating;		/* monster is eating timeout */
-	long mextra[1]; /* monster dependent info */
+	struct mextra *mextra;	/* point to mextra struct */
 };
 
-/*
- * Note that mextra[] may correspond to any of a number of structures, which
- * are indicated by some of the other fields.
- *	isgd	 ->	struct egd
- *	ispriest ->	struct epri
- *	isshk	 ->	struct eshk
- *	isminion ->	struct emin
- *			(struct epri for roaming priests and angels, which is
- *			 compatible with emin for polymorph purposes)
- *	mtame	 ->	struct edog
- *			(struct epri for guardian angels, which do not eat
- *			 or do other doggy things)
- * Since at most one structure can be indicated in this manner, it is not
- * possible to tame any creatures using the other structures (the only
- * exception being the guardian angels which are tame on creation).
- */
-
-#define newmonst(xl) (struct monst *)alloc((unsigned)(xl) + sizeof(struct monst))
-#define dealloc_monst(mon) free((genericptr_t)(mon))
+#define newmonst() (struct monst *)alloc(sizeof(struct monst))
 
 /* these are in mspeed */
 #define MSLOW 1		/* slow monster */
 #define MFAST 2		/* speeded monster */
-
-#define NAME(mtmp)	(((char *)(mtmp)->mextra) + (mtmp)->mxlth)
 
 #define MON_WEP(mon)	((mon)->mw)
 #define MON_NOWEP(mon)	((mon)->mw = (struct obj *)0)

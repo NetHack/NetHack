@@ -1004,21 +1004,97 @@ register struct obj *otmp;
 	    bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 }
 
+/*
+ * Used by save_mtraits() in mkobj.c to ensure
+ * that all the monst related information is stored in
+ * an OATTACHED_MONST structure.
+ */
+genericptr_t
+mon_to_buffer(mtmp,isize)
+struct monst *mtmp;
+int *isize;
+{
+	char *spot;
+	int lth, k, xlth[6];
+	genericptr_t buffer, xptr[6];
+	struct monst *mbuf;
+
+	lth = sizeof(struct monst);
+
+	/* there is always one sizeof(int) for the name
+           and one for each of the 5 potential mextra fields */
+	for (k = 0; k < 6; ++k) {
+		xlth[k] = 0;
+		xptr[k] = (genericptr_t)0;
+	}
+	if (mtmp->mextra) {
+		if (MNAME(mtmp)) {
+			xlth[0] = strlen(MNAME(mtmp)) + 1;
+			xptr[0] = (genericptr_t)MNAME(mtmp);
+		}
+		if (EGD(mtmp)) {
+			xlth[1] = sizeof(struct egd);
+			xptr[1] = (genericptr_t)EGD(mtmp);
+		}
+		if (EPRI(mtmp)) {
+			xlth[2] = sizeof(struct epri);
+			xptr[2] = (genericptr_t)EPRI(mtmp);
+		}
+		if (ESHK(mtmp)) {
+			xlth[3] = sizeof(struct eshk);
+			xptr[3] = (genericptr_t)ESHK(mtmp);
+		}
+		if (EMIN(mtmp)) {
+			xlth[4] = sizeof(struct emin);
+			xptr[4] = (genericptr_t)EMIN(mtmp);
+		}
+		if (EDOG(mtmp)) {
+			xlth[5] = sizeof(struct edog);
+			xptr[5] = (genericptr_t)EDOG(mtmp);
+		}
+	}
+	for (k = 0; k < 6; ++k) {
+		lth += sizeof(int);
+		lth += xlth[k];
+	}
+	if (isize) *isize = lth;
+
+	buffer = alloc(lth);
+
+	spot = (char *)buffer;
+	(void) memcpy((genericptr_t)spot, (genericptr_t)mtmp,
+			sizeof(struct monst));
+	spot += sizeof(struct monst);
+
+	mbuf = (struct monst *)buffer;
+	mbuf->mextra = (struct mextra *)0;
+
+	for (k = 0; k < 6; ++k) {
+		lth = xlth[k];
+		(void) memcpy((genericptr_t)spot,
+		    		(genericptr_t)&lth, sizeof(lth));
+		spot += sizeof(lth);
+		if (lth > 0 && xptr[k] != 0) {
+			(void) memcpy((genericptr_t)spot, xptr[k], lth);
+			spot += lth;
+		}
+	}
+	return (genericptr_t)buffer;
+}
+
 STATIC_OVL void
 savemonchn(fd, mtmp, mode)
 register int fd, mode;
 register struct monst *mtmp;
 {
 	register struct monst *mtmp2;
-	unsigned int xl;
-	int minusone = -1;
+	int buflen, minusone = -1, zerobuf = 0;
+	genericptr_t buffer = (genericptr_t)0;
 
 	while (mtmp) {
 	    mtmp2 = mtmp->nmon;
 	    if (perform_bwrite(mode)) {
 		mtmp->mnum = monsndx(mtmp->data);
-		xl = mtmp->mxlth + mtmp->mnamelth;
-		bwrite(fd, (genericptr_t) &xl, sizeof(int));
 #ifndef GOLDOBJ
 		if (mtmp->mgold) {
 			struct obj *goldobj = mksobj(GOLD_PIECE, FALSE, FALSE);
@@ -1030,7 +1106,58 @@ register struct monst *mtmp;
 			mtmp->minvent = goldobj;
 		}
 #endif
-		bwrite(fd, (genericptr_t) mtmp, xl + sizeof(struct monst));
+		buflen = sizeof(struct monst);
+		bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+#if 0
+		buffer = mon_to_buffer(mtmp, &buflen);
+		bwrite(fd, buffer, buflen);
+#else
+		bwrite(fd, (genericptr_t) mtmp, buflen);
+		if (!mtmp->mextra) {
+			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		} else {
+			if (MNAME(mtmp)) buflen = strlen(MNAME(mtmp)) + 1;
+			else buflen = 0;
+			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+			if (buflen > 0)
+				bwrite(fd, (genericptr_t) MNAME(mtmp), buflen);
+
+			if (EGD(mtmp)) buflen = sizeof(struct egd);
+			else buflen = 0;
+			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+			if (buflen > 0)
+				bwrite(fd, (genericptr_t) EGD(mtmp), buflen);
+
+			if (EPRI(mtmp)) buflen = sizeof(struct epri);
+			else buflen = 0;
+			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+			if (buflen > 0)
+				bwrite(fd, (genericptr_t) EPRI(mtmp), buflen);
+
+			if (ESHK(mtmp)) buflen = sizeof(struct eshk);
+			else buflen = 0;
+			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+			if (buflen > 0)
+				bwrite(fd, (genericptr_t) ESHK(mtmp), buflen);
+
+			if (EMIN(mtmp)) buflen = sizeof(struct emin);
+			else buflen = 0;
+			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+			if (buflen > 0)
+				bwrite(fd, (genericptr_t) EMIN(mtmp), buflen);
+
+			if (EDOG(mtmp)) buflen = sizeof(struct edog);
+			else buflen = 0;
+			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+			if (buflen > 0)
+				bwrite(fd, (genericptr_t) EDOG(mtmp), buflen);
+		}
+#endif
 	    }
 	    if (mtmp->minvent)
 		saveobjchn(fd,mtmp->minvent,mode);

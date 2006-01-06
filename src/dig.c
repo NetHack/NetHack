@@ -3,7 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "edog.h"
+
 /* #define DEBUG */	/* turn on for diagnostics */
 
 static NEARDATA boolean did_dig_msg;

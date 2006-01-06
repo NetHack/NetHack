@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)permonst.h 3.5	1999/07/02	*/
+/*	SCCS Id: @(#)permonst.h 3.5	2006/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -50,7 +50,6 @@ struct permonst {
 	struct	attack	mattk[NATTK];		/* attacks matrix */
 	unsigned short	cwt,			/* weight of corpse */
 			cnutrit;		/* its nutritional value */
-	short		pxlth;			/* length of extension */
 	uchar		msound;			/* noise it makes (6 bits) */
 	uchar		msize;			/* physical size (3 bits) */
 	uchar		mresists;		/* resistances */

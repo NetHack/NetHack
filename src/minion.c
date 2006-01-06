@@ -1,10 +1,30 @@
-/*	SCCS Id: @(#)minion.c	3.5	2005/11/01	*/
+/*	SCCS Id: @(#)minion.c	3.5	2006/01/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "emin.h"
-#include "epri.h"
+
+void
+newemin(mtmp)
+struct monst *mtmp;
+{
+	if (!mtmp->mextra) mtmp->mextra = newmextra();
+	if (!EMIN(mtmp)) {
+	    EMIN(mtmp) = (struct emin *)alloc(sizeof(struct emin));
+	    (void) memset((genericptr_t) EMIN(mtmp), 0, sizeof(struct emin));
+	}
+}
+
+void
+free_emin(mtmp)
+struct monst *mtmp;
+{
+	if (mtmp->mextra && EMIN(mtmp)) {
+		free((genericptr_t) EMIN(mtmp));
+		EMIN(mtmp) = (struct emin *)0;
+	}
+	mtmp->isminion = 0;
+}
 
 int
 msummon(mon)		/* mon summons a monster */
@@ -73,7 +93,7 @@ struct monst *mon;
 	}
 
 	while (cnt > 0) {
-	    mtmp = makemon(&mons[dtype], u.ux, u.uy, NO_MM_FLAGS);
+	    mtmp = makemon(&mons[dtype], u.ux, u.uy, MM_EMIN);
 	    if (mtmp) {
 		result++;
 		/* an angel's alignment should match the summoner */
@@ -117,9 +137,19 @@ boolean talk;
     }
     if (mnum == NON_PM) {
 	mon = 0;
-    } else if (mons[mnum].pxlth == 0 || mnum == PM_ANGEL) {
-	mon = makemon(&mons[mnum], u.ux, u.uy,
-		      (mnum == PM_ANGEL) ? NO_MM_FLAGS : MM_EMIN);
+    } else if (mnum == PM_ANGEL) {
+	mon = makemon(&mons[mnum], u.ux, u.uy, MM_EPRI|MM_EMIN);
+	if (mon) {
+	    mon->isminion = 1;
+	    EMIN(mon)->min_align = alignment;
+	    EMIN(mon)->renegade = FALSE;
+	    EPRI(mon)->shralign = alignment;
+	}
+    } else if (mnum != PM_SHOPKEEPER && mnum != PM_GUARD &&
+                mnum != PM_ALIGNED_PRIEST && mnum != PM_HIGH_PRIEST) {
+        /* This was mons[mnum].pxlth == 0 but is this restriction
+	   appropriate or necessary now that the structures are separate? */
+	mon = makemon(&mons[mnum], u.ux, u.uy, MM_EMIN);
 	if (mon) {
 	    mon->isminion = 1;
 	    EMIN(mon)->min_align = alignment;

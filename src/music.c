@@ -321,7 +321,7 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 				    else {
 					You("destroy %s!", mtmp->mtame ?
 					    x_monnam(mtmp, ARTICLE_THE, "poor",
-				mtmp->mnamelth ? SUPPRESS_SADDLE : 0, FALSE):
+				(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE):
 					    mon_nam(mtmp));
 				    }
 				    xkilled(mtmp,0);

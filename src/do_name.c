@@ -218,7 +218,6 @@ struct monst *mtmp;
 const char *name;
 {
 	int lth;
-	struct monst *mtmp2;
 	char buf[PL_PSIZ];
 
 	/* dogname & catname are PL_PSIZ arrays; object names have same limit */
@@ -228,19 +227,16 @@ const char *name;
 		name = strncpy(buf, name, PL_PSIZ - 1);
 		buf[PL_PSIZ - 1] = '\0';
 	}
-	if (lth == mtmp->mnamelth) {
-		/* don't need to allocate a new monst struct */
-		if (lth) Strcpy(NAME(mtmp), name);
+	if (has_name(mtmp) && lth == (int)(strlen(MNAME(mtmp)) + 1)) {
+		/* don't need to allocate a new mname */
+		if (lth) Strcpy(MNAME(mtmp), name);
 		return mtmp;
 	}
-	mtmp2 = newmonst(mtmp->mxlth + lth);
-	*mtmp2 = *mtmp;
-	(void) memcpy((genericptr_t)mtmp2->mextra,
-		      (genericptr_t)mtmp->mextra, mtmp->mxlth);
-	mtmp2->mnamelth = lth;
-	if (lth) Strcpy(NAME(mtmp2), name);
-	replmon(mtmp,mtmp2);
-	return(mtmp2);
+	if (has_name(mtmp)) free((genericptr_t)MNAME(mtmp));
+
+	MNAME(mtmp) = (char *)alloc(lth);
+	if (lth) Strcpy(MNAME(mtmp), name);
+	return(mtmp);
 }
 
 int
@@ -701,8 +697,8 @@ boolean called;
 	if (do_hallu) {
 	    Strcat(buf, rndmonnam());
 	    name_at_start = FALSE;
-	} else if (mtmp->mnamelth) {
-	    char *name = NAME(mtmp);
+	} else if (has_name(mtmp)) {
+	    char *name = MNAME(mtmp);
 
 	    if (mdat == &mons[PM_GHOST]) {
 		Sprintf(eos(buf), "%s ghost", s_suffix(name));
@@ -775,7 +771,7 @@ l_monnam(mtmp)
 register struct monst *mtmp;
 {
 	return(x_monnam(mtmp, ARTICLE_NONE, (char *)0, 
-		mtmp->mnamelth ? SUPPRESS_SADDLE : 0, TRUE));
+		(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE));
 }
 
 char *
@@ -783,7 +779,7 @@ mon_nam(mtmp)
 register struct monst *mtmp;
 {
 	return(x_monnam(mtmp, ARTICLE_THE, (char *)0,
-		mtmp->mnamelth ? SUPPRESS_SADDLE : 0, FALSE));
+		(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE));
 }
 
 /* print the name as if mon_nam() was called, but assume that the player
@@ -795,7 +791,7 @@ noit_mon_nam(mtmp)
 register struct monst *mtmp;
 {
 	return(x_monnam(mtmp, ARTICLE_THE, (char *)0,
-		mtmp->mnamelth ? (SUPPRESS_SADDLE|SUPPRESS_IT) :
+		(has_name(mtmp)) ? (SUPPRESS_SADDLE|SUPPRESS_IT) :
 		    SUPPRESS_IT, FALSE));
 }
 
@@ -835,7 +831,7 @@ struct monst *mtmp;
 	int prefix, suppression_flag;
 
 	prefix = mtmp->mtame ? ARTICLE_YOUR : ARTICLE_THE;
-	suppression_flag = (mtmp->mnamelth
+	suppression_flag = (has_name(mtmp)
 #ifdef STEED
 			    /* "saddled" is redundant when mounted */
 			    || mtmp == u.usteed
@@ -851,7 +847,7 @@ register struct monst *mtmp;
 register const char *adj;
 {
 	register char *bp = x_monnam(mtmp, ARTICLE_THE, adj,
-		mtmp->mnamelth ? SUPPRESS_SADDLE : 0, FALSE);
+		(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
 
 	*bp = highc(*bp);
 	return(bp);
@@ -862,7 +858,7 @@ a_monnam(mtmp)
 register struct monst *mtmp;
 {
 	return x_monnam(mtmp, ARTICLE_A, (char *)0,
-		mtmp->mnamelth ? SUPPRESS_SADDLE : 0, FALSE);
+		(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 char *

@@ -2560,7 +2560,6 @@ register struct attack *mattk;
 	return 1;
 }
 
-#include "edog.h"
 struct monst *
 cloneu()
 {

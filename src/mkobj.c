@@ -1070,11 +1070,13 @@ struct obj *obj;
 struct monst *mtmp;
 {
 	struct obj *otmp;
+	genericptr_t buffer;
 	int lth, namelth;
 
-	lth = sizeof(struct monst) + mtmp->mxlth + mtmp->mnamelth;
 	namelth = obj->onamelth ? strlen(ONAME(obj)) + 1 : 0;
-	otmp = realloc_obj(obj, lth, (genericptr_t) mtmp, namelth, ONAME(obj));
+	buffer = mon_to_buffer(mtmp, &lth);
+	otmp = realloc_obj(obj, lth, buffer, namelth, ONAME(obj));
+	free(buffer);
 	if (otmp && otmp->oxlth) {
 		struct monst *mtmp2 = (struct monst *)otmp->oextra;
 		if (mtmp->data) mtmp2->mnum = monsndx(mtmp->data);
@@ -1084,6 +1086,7 @@ struct monst *mtmp;
 		mtmp2->nmon     = (struct monst *)0;
 		mtmp2->data     = (struct permonst *)0;
 		mtmp2->minvent  = (struct obj *)0;
+		/* mon_to_buffer() took care of x and mname */
 #ifndef GOLDOBJ
 		/* not a pointer but is discarded along with minvent */
 		mtmp2->mgold	= 0L;
@@ -1108,11 +1111,7 @@ boolean copyof;
 		mtmp = (struct monst *)obj->oextra;
 	if (mtmp) {
 	    if (copyof) {
-		int lth = mtmp->mxlth + mtmp->mnamelth;
-		mnew = newmonst(lth);
-		lth += sizeof(struct monst);
-		(void) memcpy((genericptr_t)mnew,
-				(genericptr_t)mtmp, lth);
+		mnew = buffer_to_mon((genericptr_t)mtmp);
 	    } else {
 	      /* Never insert this returned pointer into mon chains! */
 	    	mnew = mtmp;

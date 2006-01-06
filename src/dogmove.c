@@ -5,7 +5,6 @@
 #include "hack.h"
 
 #include "mfndpos.h"
-#include "edog.h"
 
 extern boolean notonhead;
 

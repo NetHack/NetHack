@@ -685,7 +685,7 @@ boolean by_hero;
     /* handle recorporealization of an active ghost */
     if (corpse->oxlth && corpse->oattached == OATTACHED_M_ID) {
 	unsigned m_id;
-	struct monst *ghost, *mtmp2;
+	struct monst *ghost;
 	struct obj *otmp;
 
 	(void) memcpy((genericptr_t)&m_id,
@@ -702,11 +702,9 @@ boolean by_hero;
 	    }
 	    /* tame the revived monster if its ghost was tame */
 	    if (ghost->mtame && !mtmp->mtame) {
-		mtmp2 = tamedog(mtmp, (struct obj *)0);
-		if (mtmp2) {
+		if (tamedog(mtmp, (struct obj *)0)) {
 		    /* ghost's edog data is ignored */
-		    mtmp2->mtame = ghost->mtame;
-		    mtmp = mtmp2;
+		    mtmp->mtame = ghost->mtame;
 		}
 	    }
 	    /* was ghost, now alive, it's all very confusing */

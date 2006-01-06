@@ -1,11 +1,10 @@
-/*	SCCS Id: @(#)shknam.c	3.5	2005/12/14	*/
+/*	SCCS Id: @(#)shknam.c	3.5	2006/01/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* shknam.c -- initialize a shop */
 
 #include "hack.h"
-#include "eshk.h"
 
 STATIC_DCL boolean FDECL(veggy_item, (struct obj *obj,int));
 STATIC_DCL int NDECL(shkveg);
@@ -450,6 +449,28 @@ const char * const *nlp;
 	ESHK(shk)->shknam[PL_NSIZ-1] = 0;
 }
 
+void
+neweshk(mtmp)
+struct monst *mtmp;
+{
+	if (!mtmp->mextra) mtmp->mextra = newmextra();
+	if (!ESHK(mtmp)) {
+	    ESHK(mtmp) = (struct eshk *)alloc(sizeof(struct eshk));
+	    (void) memset((genericptr_t) ESHK(mtmp), 0, sizeof(struct eshk));
+	}
+}
+
+void
+free_eshk(mtmp)
+struct monst *mtmp;
+{
+	if (mtmp->mextra && ESHK(mtmp)) {
+		free((genericptr_t) ESHK(mtmp));
+		ESHK(mtmp) = (struct eshk *)0;
+	}
+	mtmp->isshk = 0;
+}
+
 STATIC_OVL int
 shkinit(shp, sroom)	/* create a new shopkeeper in the given room */
 const struct shclass	*shp;
@@ -507,7 +528,7 @@ struct mkroom	*sroom;
 	if(MON_AT(sx, sy)) (void) rloc(m_at(sx, sy), FALSE); /* insurance */
 
 	/* now initialize the shopkeeper monster structure */
-	if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, NO_MM_FLAGS)))
+	if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, MM_ESHK)))
 		return(-1);
 	shk->isshk = shk->mpeaceful = 1;
 	set_malign(shk);

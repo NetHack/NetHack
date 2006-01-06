@@ -1,11 +1,32 @@
-/*	SCCS Id: @(#)dog.c	3.5	2005/03/17	*/
+/*	SCCS Id: @(#)dog.c	3.5	2006/01/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "edog.h"
 
 STATIC_DCL int NDECL(pet_type);
+
+void
+newedog(mtmp)
+struct monst *mtmp;
+{
+	if (!mtmp->mextra) mtmp->mextra = newmextra();
+	if (!EDOG(mtmp)) {
+	    EDOG(mtmp) = (struct edog *)alloc(sizeof(struct edog));
+	    (void) memset((genericptr_t) EDOG(mtmp), 0, sizeof(struct edog));
+	}
+}
+
+void
+free_edog(mtmp)
+struct monst *mtmp;
+{
+	if (mtmp->mextra && EDOG(mtmp)) {
+		free((genericptr_t) EDOG(mtmp));
+		EDOG(mtmp) = (struct edog *)0;
+	}
+	mtmp->mtame = 0;
+}
 
 void
 initedog(mtmp)
@@ -764,24 +785,27 @@ register struct obj *obj;
 	}
 }
 
-struct monst *
+/*
+ * With the separate mextra structure added in 3.5.x this always
+ * operates on the original mtmp. It now returns TRUE if the taming
+ * succeeded.
+ */
+boolean
 tamedog(mtmp, obj)
 register struct monst *mtmp;
 register struct obj *obj;
 {
-	register struct monst *mtmp2;
-
 	/* The Wiz, Medusa and the quest nemeses aren't even made peaceful. */
 	if (mtmp->iswiz || mtmp->data == &mons[PM_MEDUSA]
 				|| (mtmp->data->mflags3 & M3_WANTSARTI))
-		return((struct monst *)0);
+		return FALSE;
 
 	/* worst case, at least it'll be peaceful. */
 	mtmp->mpeaceful = 1;
 	set_malign(mtmp);
 	if(flags.moonphase == FULL_MOON && night() && rn2(6) && obj
 						&& mtmp->data->mlet == S_DOG)
-		return((struct monst *)0);
+		return FALSE;
 
 	/* If we cannot tame it, at least it's no longer afraid. */
 	mtmp->mflee = 0;
@@ -818,9 +842,9 @@ register struct obj *obj;
 		/* eating might have killed it, but that doesn't matter here;
 		   a non-null result suppresses "miss" message for thrown
 		   food and also implies that the object has been deleted */
-		return mtmp;
+		return TRUE;
 	    } else
-		return (struct monst *)0;
+		return FALSE;
 	}
 
 	if (mtmp->mtame || !mtmp->mcanmove ||
@@ -828,35 +852,30 @@ register struct obj *obj;
 	    mtmp->isshk || mtmp->isgd || mtmp->ispriest || mtmp->isminion ||
 	    is_covetous(mtmp->data) || is_human(mtmp->data) ||
 	    (is_demon(mtmp->data) && !is_demon(youmonst.data)) ||
-	    (obj && dogfood(mtmp, obj) >= MANFOOD)) return (struct monst *)0;
+	    (obj && dogfood(mtmp, obj) >= MANFOOD)) return FALSE;
 
 	if (mtmp->m_id == quest_status.leader_m_id)
-	    return((struct monst *)0);
+	    return FALSE;
 
-	/* make a new monster which has the pet extension */
-	mtmp2 = newmonst(sizeof(struct edog) + mtmp->mnamelth);
-	*mtmp2 = *mtmp;
-	mtmp2->mxlth = sizeof(struct edog);
-	if (mtmp->mnamelth) Strcpy(NAME(mtmp2), NAME(mtmp));
-	initedog(mtmp2);
-	replmon(mtmp, mtmp2);
-	/* `mtmp' is now obsolete */
+	/* add the pet extension */
+	newedog(mtmp);
+	initedog(mtmp);
 
 	if (obj) {		/* thrown food */
 	    /* defer eating until the edog extension has been set up */
-	    place_object(obj, mtmp2->mx, mtmp2->my);	/* put on floor */
+	    place_object(obj, mtmp->mx, mtmp->my);	/* put on floor */
 	    /* devour the food (might grow into larger, genocided monster) */
-	    if (dog_eat(mtmp2, obj, mtmp2->mx, mtmp2->my, TRUE) == 2)
-		return mtmp2;		/* oops, it died... */
+	    if (dog_eat(mtmp, obj, mtmp->mx, mtmp->my, TRUE) == 2)
+		return TRUE;		/* oops, it died... */
 	    /* `obj' is now obsolete */
 	}
 
-	newsym(mtmp2->mx, mtmp2->my);
-	if (attacktype(mtmp2->data, AT_WEAP)) {
-		mtmp2->weapon_check = NEED_HTH_WEAPON;
-		(void) mon_wield_item(mtmp2);
+	newsym(mtmp->mx, mtmp->my);
+	if (attacktype(mtmp->data, AT_WEAP)) {
+		mtmp->weapon_check = NEED_HTH_WEAPON;
+		(void) mon_wield_item(mtmp);
 	}
-	return(mtmp2);
+	return TRUE;
 }
 
 /*

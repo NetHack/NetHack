@@ -9,7 +9,6 @@
 
 #include "hack.h"
 #include "mfndpos.h"
-#include "edog.h"
 #include <ctype.h>
 
 STATIC_DCL boolean FDECL(restrap,(struct monst *));
@@ -19,6 +18,7 @@ STATIC_DCL long FDECL(mm_displacement, (struct monst *,struct monst *));
 #endif
 STATIC_DCL int NDECL(pick_animal);
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
+STATIC_DCL void FDECL(dealloc_mextra, (struct mextra *));
 
 #ifdef REINCARNATION
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
@@ -232,19 +232,28 @@ unsigned corpseflags;
 		num = d(2,6);
 		while (num--)
 			obj = mksobj_at(IRON_CHAIN, x, y, TRUE, FALSE);
-		mtmp->mnamelth = 0;
+		if (has_name(mtmp)) {
+			free((genericptr_t)MNAME(mtmp));
+			MNAME(mtmp) = (char *)0;
+		}
 		break;
 	    case PM_GLASS_GOLEM:
 		num = d(2,4);   /* very low chance of creating all glass gems */
 		while (num--)
 			obj = mksobj_at((LAST_GEM + rnd(9)), x, y, TRUE, FALSE);
-		mtmp->mnamelth = 0;
+		if (has_name(mtmp)) {
+			free((genericptr_t)MNAME(mtmp));
+			MNAME(mtmp) = (char *)0;
+		}
 		break;
 	    case PM_CLAY_GOLEM:
 		obj = mksobj_at(ROCK, x, y, FALSE, FALSE);
 		obj->quan = (long)(rn2(20) + 50);
 		obj->owt = weight(obj);
-		mtmp->mnamelth = 0;
+		if (has_name(mtmp)) {
+			free((genericptr_t)MNAME(mtmp));
+			MNAME(mtmp) = (char *)0;
+		}
 		break;
 	    case PM_STONE_GOLEM:
 	        corpstatflags &= ~CORPSTAT_INIT;
@@ -256,24 +265,36 @@ unsigned corpseflags;
 		while(num--) {
 			obj = mksobj_at(QUARTERSTAFF, x, y, TRUE, FALSE);
 		}
-		mtmp->mnamelth = 0;
+		if (has_name(mtmp)) {
+			free((genericptr_t)MNAME(mtmp));
+			MNAME(mtmp) = (char *)0;
+		}
 		break;
 	    case PM_LEATHER_GOLEM:
 		num = d(2,4);
 		while(num--)
 			obj = mksobj_at(LEATHER_ARMOR, x, y, TRUE, FALSE);
-		mtmp->mnamelth = 0;
+		if (has_name(mtmp)) {
+			free((genericptr_t)MNAME(mtmp));
+			MNAME(mtmp) = (char *)0;
+		}
 		break;
 	    case PM_GOLD_GOLEM:
 		/* Good luck gives more coins */
 		obj = mkgold((long)(200 - rnl(101)), x, y);
-		mtmp->mnamelth = 0;
+		if (has_name(mtmp)) {
+			free((genericptr_t)MNAME(mtmp));
+			MNAME(mtmp) = (char *)0;
+		}
 		break;
 	    case PM_PAPER_GOLEM:
 		num = rnd(4);
 		while (num--)
 			obj = mksobj_at(SCR_BLANK_PAPER, x, y, TRUE, FALSE);
-		mtmp->mnamelth = 0;
+		if (has_name(mtmp)) {
+			free((genericptr_t)MNAME(mtmp));
+			MNAME(mtmp) = (char *)0;
+		}
 		break;
 	    default_1:
 	    default:
@@ -298,8 +319,8 @@ unsigned corpseflags;
 	   prevent the same attack beam from hitting its corpse */
 	if (context.bypasses) bypass_obj(obj);
 
-	if (mtmp->mnamelth)
-	    obj = oname(obj, NAME(mtmp));
+	if (has_name(mtmp))
+	    obj = oname(obj, MNAME(mtmp));
 
 	/* Avoid "It was hidden under a green mold corpse!" 
 	 *  during Blind combat. An unseen monster referred to as "it"
@@ -1347,6 +1368,29 @@ register struct monst *mon;
 	}
 }
 
+void
+dealloc_mextra(x)
+struct mextra *x;
+{
+	if (x) {
+		if (x->mname) free((genericptr_t)x->mname);
+		if (x->egd) free((genericptr_t)x->egd);
+		if (x->epri) free((genericptr_t)x->epri);
+		if (x->eshk) free((genericptr_t)x->eshk);
+		if (x->emin) free((genericptr_t)x->emin);
+		if (x->edog) free((genericptr_t)x->edog);
+	}
+	free((genericptr_t)x);
+}
+
+void
+dealloc_monst(mon)
+struct monst *mon;
+{
+	if (mon->mextra) dealloc_mextra(mon->mextra);
+	free((genericptr_t)mon);
+}
+
 /* remove effects of mtmp from other data structures */
 STATIC_OVL void
 m_detach(mtmp, mptr)
@@ -1704,7 +1748,7 @@ register struct monst *mdef;
 		   so that saved monster traits won't retain any stale
 		   item-conferred attributes */
 		otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, CORPSTAT_NONE);
-		if (mdef->mnamelth) otmp = oname(otmp, NAME(mdef));
+		if (has_name(mdef)) otmp = oname(otmp, MNAME(mdef));
 		while ((obj = oldminvent) != 0) {
 		    oldminvent = obj->nobj;
 		    (void) add_to_container(otmp, obj);
@@ -1825,9 +1869,9 @@ int dest;
 		You("%s %s!", verb,
 		    !mtmp->mtame ? mon_nam(mtmp) :
 			x_monnam(mtmp,
-				 mtmp->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
+				 (has_name(mtmp)) ? ARTICLE_NONE : ARTICLE_THE,
 				 "poor",
-				 mtmp->mnamelth ? SUPPRESS_SADDLE : 0,
+				 (has_name(mtmp)) ? SUPPRESS_SADDLE : 0,
 				 FALSE));
 	    }
 	}
@@ -2485,17 +2529,16 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 		if(!rn2(10)) mtmp->female = !mtmp->female;
 	}
 
-	if (In_endgame(&u.uz) && is_mplayer(olddata)) {
+	if (In_endgame(&u.uz) && is_mplayer(olddata) && has_name(mtmp)) {
 		/* mplayers start out as "Foo the Bar", but some of the
 		 * titles are inappropriate when polymorphed, particularly
 		 * into the opposite sex.  players don't use ranks when
 		 * polymorphed, so dropping the rank for mplayers seems
 		 * reasonable.
 		 */
-		char *p = index(NAME(mtmp), ' ');
+		char *p = index(MNAME(mtmp), ' ');
 		if (p) {
 			*p = '\0';
-			mtmp->mnamelth = p - NAME(mtmp) + 1;
 		}
 	}
 
@@ -2579,8 +2622,8 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	newsym(mtmp->mx,mtmp->my);
 
 	if (msg) {
-	    uchar save_mnamelth = mtmp->mnamelth;
-	    mtmp->mnamelth = 0;
+	    char *save_mname = (has_name(mtmp)) ? MNAME(mtmp) : (char *)0;
+	    if (mtmp->mextra) MNAME(mtmp) = (char *)0; 
 	    Strcpy(newname,
 		   (mdat == &mons[PM_GREEN_SLIME]) ? "slime" :
 		   x_monnam(mtmp, ARTICLE_A, (char *)0,SUPPRESS_SADDLE, FALSE));
@@ -2588,7 +2631,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 		    (void) usmellmon(mdat);
 	    else
 		    pline("%s turns into %s!", oldname, newname);
-	    mtmp->mnamelth = save_mnamelth;
+	    if(mtmp->mextra) MNAME(mtmp) = save_mname;
 	}
 
 	possibly_unwield(mtmp, polyspot);	/* might lose use of weapon */

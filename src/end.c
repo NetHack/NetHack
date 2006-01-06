@@ -5,7 +5,6 @@
 #define NEED_VARARGS	/* comment line for pre-compiled headers */
 
 #include "hack.h"
-#include "eshk.h"
 #include "lev.h"
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -205,7 +204,7 @@ register struct monst *mtmp;
 	    killer.format = KILLED_BY;
 	}
 	/* _the_ <invisible> <distorted> ghost of Dudley */
-	if (mtmp->data == &mons[PM_GHOST] && mtmp->mnamelth) {
+	if (mtmp->data == &mons[PM_GHOST] && has_name(mtmp)) {
 		Strcat(buf, "the ");
 		killer.format = KILLED_BY;
 	}
@@ -216,7 +215,7 @@ register struct monst *mtmp;
 
 	if(mtmp->data == &mons[PM_GHOST]) {
 		Strcat(buf, "ghost");
-		if (mtmp->mnamelth) Sprintf(eos(buf), " of %s", NAME(mtmp));
+		if (has_name(mtmp)) Sprintf(eos(buf), " of %s", MNAME(mtmp));
 	} else if(mtmp->isshk) {
 		const char *shknm = shkname(mtmp),
 			   *honorific = shkname_is_pname(mtmp) ? "" :
@@ -230,8 +229,8 @@ register struct monst *mtmp;
 		Strcat(buf, m_monnam(mtmp));
 	} else {
 		Strcat(buf, mtmp->data->mname);
-		if (mtmp->mnamelth)
-		    Sprintf(eos(buf), " called %s", NAME(mtmp));
+		if (has_name(mtmp))
+		    Sprintf(eos(buf), " called %s", MNAME(mtmp));
 	}
 
 	if (multi) Strcat(buf, ", while helpless");

@@ -4,7 +4,6 @@
 
 #include "hack.h"
 #include "artifact.h"
-#include "edog.h"
 
 extern boolean notonhead;
 

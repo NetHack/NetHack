@@ -1,18 +1,37 @@
-/*	SCCS Id: @(#)priest.c	3.5	2005/11/02	*/
+/*	SCCS Id: @(#)priest.c	3.5	2006/01/03	*/
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "mfndpos.h"
-#include "eshk.h"
-#include "epri.h"
-#include "emin.h"
 
 /* this matches the categorizations shown by enlightenment */
 #define ALGN_SINNED	(-4)	/* worse than strayed */
 
 STATIC_DCL boolean FDECL(histemple_at,(struct monst *,XCHAR_P,XCHAR_P));
 STATIC_DCL boolean FDECL(has_shrine,(struct monst *));
+
+void
+newepri(mtmp)
+struct monst *mtmp;
+{
+	if (!mtmp->mextra) mtmp->mextra = newmextra();
+	if (!EPRI(mtmp)) {
+	    EPRI(mtmp) = (struct epri *)alloc(sizeof(struct epri));
+	    (void) memset((genericptr_t) EPRI(mtmp), 0, sizeof(struct epri));
+	}
+}
+
+void
+free_epri(mtmp)
+struct monst *mtmp;
+{
+	if (mtmp->mextra && EPRI(mtmp)) {
+		free((genericptr_t) EPRI(mtmp));
+		EPRI(mtmp) = (struct epri *)0;
+	}
+	mtmp->ispriest = 0;
+}
 
 /*
  * Move for priests and shopkeepers.  Called from shk_move() and pri_move().
@@ -189,7 +208,7 @@ boolean sanctum;   /* is it the seat of the high priest? */
 		(void) rloc(m_at(sx+1, sy), FALSE); /* insurance */
 
 	priest = makemon(&mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST],
-			 sx + 1, sy, NO_MM_FLAGS);
+			 sx + 1, sy, MM_EPRI);
 	if (priest) {
 		EPRI(priest)->shroom = (sroom - rooms) + ROOMOFFSET;
 		EPRI(priest)->shralign = Amask2align(levl[sx][sy].altarmask);
@@ -549,7 +568,7 @@ boolean peaceful;
 
 	if (MON_AT(x, y)) (void) rloc(m_at(x, y), FALSE);	/* insurance */
 
-	if (!(roamer = makemon(ptr, x, y, MM_ADJACENTOK)))
+	if (!(roamer = makemon(ptr, x, y, MM_ADJACENTOK|MM_EMIN)))
 		return((struct monst *)0);
 
 	EMIN(roamer)->min_align = alignment;
@@ -683,9 +702,15 @@ angry_priest()
 	    if (!IS_ALTAR(lev->typ) ||
 		((aligntyp)Amask2align(lev->altarmask & AM_MASK) !=
 			EPRI(priest)->shralign)) {
-		priest->ispriest = 0;		/* now a roamer */
-		priest->isminion = 1;		/* but still aligned */
-		/* this overloads EPRI's shroom field, which is now clobbered */
+		if (EPRI(priest)) {
+			if (!EMIN(priest)) newemin(priest);
+			priest->ispriest = 0;	/* roamer */
+						/* but still aligned */
+			priest->isminion = 1;
+			EMIN(priest)->min_align = EPRI(priest)->shralign;
+		}
+		/* this used to overload EPRI's shroom field, which was then clobbered
+		 * but not since adding the separate mextra structure */
 		EMIN(priest)->renegade = FALSE;
 	    }
 	}

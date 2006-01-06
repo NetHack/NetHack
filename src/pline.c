@@ -4,9 +4,6 @@
 
 #define NEED_VARARGS /* Uses ... */	/* comment line for pre-compiled headers */
 #include "hack.h"
-#ifdef WIZARD
-#include "edog.h"
-#endif
 
 static boolean no_repeat = FALSE;
 

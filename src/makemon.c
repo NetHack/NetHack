@@ -3,14 +3,13 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "epri.h"
-#include "emin.h"
-#include "edog.h"
+
 #ifdef REINCARNATION
 #include <ctype.h>
 #endif
 
 STATIC_VAR NEARDATA struct monst zeromonst;
+STATIC_VAR NEARDATA struct mextra zeromextra;
 
 /* this assumes that a human quest leader or nemesis is an archetype
    of the corresponding role; that isn't so for some roles (tourist
@@ -683,8 +682,9 @@ xchar x, y;	/* clone's preferred location or 0 (near mon) */
 		    return (struct monst *)0;
 	    }
 	}
-	m2 = newmonst(0);
+	m2 = newmonst();
 	*m2 = *mon;			/* copy condition of old monster */
+	m2->mextra = (struct mextra *)0;
 	m2->nmon = fmon;
 	fmon = m2;
 	m2->m_id = context.ident++;
@@ -714,16 +714,14 @@ xchar x, y;	/* clone's preferred location or 0 (near mon) */
 	if (mon->isshk) m2->isshk = FALSE;
 	if (mon->isgd) m2->isgd = FALSE;
 	if (mon->ispriest) m2->ispriest = FALSE;
-	m2->mxlth = 0;
 	place_monster(m2, m2->mx, m2->my);
 	if (emits_light(m2->data))
 	    new_light_source(m2->mx, m2->my, emits_light(m2->data),
 			     LS_MONSTER, (genericptr_t)m2);
-	if (m2->mnamelth) {
-	    m2->mnamelth = 0; /* or it won't get allocated */
-	    m2 = christen_monst(m2, NAME(mon));
+	if (has_name(mon)) {
+		m2 = christen_monst(m2, MNAME(mon));
 	} else if (mon->isshk) {
-	    m2 = christen_monst(m2, shkname(mon));
+		m2 = christen_monst(m2, shkname(mon));
 	}
 
 	/* not all clones caused by player are tame or peaceful */
@@ -736,24 +734,17 @@ xchar x, y;	/* clone's preferred location or 0 (near mon) */
 
 	newsym(m2->mx,m2->my);	/* display the new monster */
 	if (m2->mtame) {
-	    struct monst *m3;
-
 	    if (mon->isminion) {
-		m3 = newmonst(sizeof(struct epri) + mon->mnamelth);
-		*m3 = *m2;
-		m3->mxlth = sizeof(struct epri);
-		if (m2->mnamelth) Strcpy(NAME(m3), NAME(m2));
-		*(EPRI(m3)) = *(EPRI(mon));
-		replmon(m2, m3);
-		m2 = m3;
+		newemin(m2);
+		if (EMIN(mon)) *(EMIN(m2)) = *(EMIN(mon));
+		if (EPRI(mon)) *(EPRI(m2)) = *(EPRI(mon));
 	    } else {
 		/* because m2 is a copy of mon it is tame but not init'ed.
 		 * however, tamedog will not re-tame a tame dog, so m2
 		 * must be made non-tame to get initialized properly.
 		 */
 		m2->mtame = 0;
-		if ((m3 = tamedog(m2, (struct obj *)0)) != 0) {
-		    m2 = m3;
+		if (tamedog(m2, (struct obj *)0)) {
 		    *(EDOG(m2)) = *(EDOG(mon));
 		}
 	    }
@@ -877,7 +868,7 @@ register int	x, y;
 register int	mmflags;
 {
 	register struct monst *mtmp;
-	int mndx, mcham, ct, mitem, xlth;
+	int mndx, mcham, ct, mitem;
 	boolean anymon = (!ptr);
 	boolean byyou = (x == u.ux && y == u.uy);
 	boolean allow_minvent = ((mmflags & NO_MINVENT) == 0);
@@ -948,12 +939,15 @@ register int	mmflags;
 		mndx = monsndx(ptr);
 	}
 	(void) propagate(mndx, countbirth, FALSE);
-	xlth = ptr->pxlth;
-	if (mmflags & MM_EDOG) xlth += sizeof(struct edog);
-	else if (mmflags & MM_EMIN) xlth += sizeof(struct emin);
-	mtmp = newmonst(xlth);
+	mtmp = newmonst();
 	*mtmp = zeromonst;		/* clear all entries in structure */
-	(void)memset((genericptr_t)mtmp->mextra, 0, xlth);
+
+	if (mmflags & MM_EGD) newegd(mtmp);
+	if (mmflags & MM_EPRI) newepri(mtmp);
+	if (mmflags & MM_ESHK) neweshk(mtmp);
+	if (mmflags & MM_EMIN) newemin(mtmp);
+	if (mmflags & MM_EDOG) newedog(mtmp);
+
 	mtmp->nmon = fmon;
 	fmon = mtmp;
 	mtmp->m_id = context.ident++;
@@ -962,7 +956,6 @@ register int	mmflags;
 	if (mtmp->data->msound == MS_LEADER &&
 		quest_info(MS_LEADER) == mndx)
 	    quest_status.leader_m_id = mtmp->m_id;
-	mtmp->mxlth = xlth;
 	mtmp->mnum = mndx;
 
 	/* set up level and hit points */
@@ -1102,7 +1095,9 @@ register int	mmflags;
 	   types; make sure their extended data is initialized to
 	   something sensible (caller can override these settings) */
 	if (mndx == PM_ALIGNED_PRIEST || (mndx == PM_ANGEL && !rn2(3))) {
-	    struct emin *eminp = EMIN(mtmp);
+	    struct emin *eminp;
+	    newemin(mtmp);
+	    eminp = EMIN(mtmp);
 
 	    mtmp->isminion = 1;		/* make priest be a roamer */
 	    eminp->min_align = rn2(3) - 1;	/* no A_NONE */
@@ -1640,9 +1635,9 @@ struct monst *mtmp;
 
 	if (mtmp->ispriest || mtmp->isminion) {
 		/* some monsters have individual alignments; check them */
-		if (mtmp->ispriest)
+		if (mtmp->ispriest && EPRI(mtmp))
 			mal = EPRI(mtmp)->shralign;
-		else if (mtmp->isminion)
+		else if (mtmp->isminion && EMIN(mtmp))
 			mal = EMIN(mtmp)->min_align;
 		/* unless alignment is none, set mal to -5,0,5 */
 		/* (see align.h for valid aligntyp values)     */

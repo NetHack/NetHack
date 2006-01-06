@@ -134,6 +134,7 @@ extern void FDECL(show_borlandc_stats, (winid));
 #ifdef DEBUG_MIGRATING_MONS
 STATIC_PTR int NDECL(wiz_migrate_mons);
 #endif
+STATIC_DCL int FDECL(size_monst, (struct monst *));
 STATIC_DCL void FDECL(count_obj, (struct obj *, long *, long *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(obj_chain, (winid, const char *, struct obj *, long *, long *));
 STATIC_DCL void FDECL(mon_invent_chain, (winid, const char *, struct monst *, long *, long *));
@@ -1848,6 +1849,22 @@ contained(win, src, total_count, total_size)
 	putstr(win, 0, buf);
 }
 
+STATIC_OVL int
+size_monst(mtmp)
+struct monst *mtmp;
+{
+	int sz = sizeof(struct monst);
+	if (mtmp->mextra) {
+		if (MNAME(mtmp)) sz += strlen(MNAME(mtmp))+1;
+		if (EGD(mtmp)) sz += sizeof(struct egd);
+		if (EPRI(mtmp)) sz += sizeof(struct epri);
+		if (ESHK(mtmp)) sz += sizeof(struct eshk);
+		if (EMIN(mtmp)) sz += sizeof(struct emin);
+		if (EDOG(mtmp)) sz += sizeof(struct edog);
+	}
+	return sz;
+}
+
 STATIC_OVL void
 mon_chain(win, src, chain, total_count, total_size)
 	winid win;
@@ -1862,7 +1879,7 @@ mon_chain(win, src, chain, total_count, total_size)
 
 	for (count = size = 0, mon = chain; mon; mon = mon->nmon) {
 	    count++;
-	    size += sizeof(struct monst) + mon->mxlth + mon->mnamelth;
+	    size += size_monst(mon);
 	}
 	*total_count += count;
 	*total_size += size;

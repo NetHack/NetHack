@@ -5,7 +5,6 @@
 /* Contains code for 't' (throw) */
 
 #include "hack.h"
-#include "edog.h"
 
 STATIC_DCL int FDECL(throw_obj, (struct obj *,int));
 STATIC_DCL void NDECL(autoquiver);

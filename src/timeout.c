@@ -470,10 +470,9 @@ long timeout;
 		       while it's in your inventory */
 		    if ((yours && !silent) ||
 			(carried(egg) && mon->data->mlet == S_DRAGON)) {
-			if ((mon2 = tamedog(mon, (struct obj *)0)) != 0) {
-			    mon = mon2;
+			if (tamedog(mon, (struct obj *)0)) {
 			    if (carried(egg) && mon->data->mlet != S_DRAGON)
-				mon->mtame = 20;
+			        mon->mtame = 20;
 			}
 		    }
 		    if (mvitals[mnum].mvflags & G_EXTINCT)
@@ -680,7 +679,7 @@ slip_or_trip()
 	    pline("%s %s%s on the ice.",
 #ifdef STEED
 		u.usteed ? upstart(x_monnam(u.usteed,
-				u.usteed->mnamelth ? ARTICLE_NONE : ARTICLE_THE,
+				(has_name(u.usteed)) ? ARTICLE_NONE : ARTICLE_THE,
 				(char *)0, SUPPRESS_SADDLE, FALSE)) :
 #endif
 		"You", rn2(2) ? "slip" : "slide", on_foot ? "" : "s");

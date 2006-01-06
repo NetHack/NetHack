@@ -3,7 +3,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "eshk.h"
 
 #define is_bigfoot(x)	((x) == &mons[PM_SASQUATCH])
 #define martial()	(martial_bonus() || is_bigfoot(youmonst.data) || \

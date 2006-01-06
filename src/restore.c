@@ -277,6 +277,80 @@ boolean ghostly, frozen;
 	return(first);
 }
 
+/*
+ * used by get_mtraits() in mkobj.c
+ * to retrieve the bundled up OATTACHED_MONST info.
+ */
+struct monst *
+buffer_to_mon(buffer)
+genericptr_t buffer;
+{
+	int lth;
+	struct monst *mtmp;
+	char *spot = (char *)buffer;
+
+	mtmp = newmonst();
+	(void) memcpy((genericptr_t)mtmp, (genericptr_t)spot, sizeof(struct monst));
+	spot += sizeof(struct monst);
+	
+	/* obtain the stored length of the monster name */
+	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
+	spot += sizeof(int);
+	if (lth) {
+		if (!mtmp->mextra) mtmp->mextra = newmextra();
+		MNAME(mtmp) = (char *)alloc(lth);
+		(void) memcpy((genericptr_t)MNAME(mtmp),
+				(genericptr_t)spot, lth);
+		spot += lth;
+	}
+	/* obtain the length of the egd (guard) structure */
+	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
+	spot += sizeof(int);
+	if (lth) {
+		newegd(mtmp);
+		(void) memcpy((genericptr_t)EGD(mtmp),
+				(genericptr_t)spot, lth);
+		spot += lth;
+	}
+	/* obtain the length of the epri (priest) structure */
+	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
+	spot += sizeof(int);
+	if (lth) {
+		newepri(mtmp);
+		(void) memcpy((genericptr_t)EPRI(mtmp),
+				(genericptr_t)spot, lth);
+		spot += lth;
+	}
+	/* obtain the length of the eshk (shopkeeper) structure */
+	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
+	spot += sizeof(int);
+	if (lth) {
+		neweshk(mtmp);
+		(void) memcpy((genericptr_t)ESHK(mtmp),
+				(genericptr_t)spot, lth);
+		spot += lth;
+	}
+	/* obtain the length of the emin (minion) structure */
+	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
+	spot += sizeof(int);
+	if (lth) {
+		newemin(mtmp);
+		(void) memcpy((genericptr_t)EMIN(mtmp),
+				(genericptr_t)spot, lth);
+		spot += lth;
+	}
+	/* obtain the length of the edog (mtame) structure */
+	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
+	spot += sizeof(int);
+	if (lth) {
+		newedog(mtmp);
+		(void) memcpy((genericptr_t)EDOG(mtmp),
+				(genericptr_t)spot, lth);
+		spot += lth;	/* actually not necessary */
+	}
+	return mtmp;
+}
+
 STATIC_OVL struct monst *
 restmonchn(fd, ghostly)
 register int fd;
@@ -284,15 +358,66 @@ boolean ghostly;
 {
 	register struct monst *mtmp, *mtmp2 = 0;
 	register struct monst *first = (struct monst *)0;
-	int xl, offset;
+	int offset, buflen;
 
 	while(1) {
-		mread(fd, (genericptr_t) &xl, sizeof(xl));
-		if(xl == -1) break;
-		mtmp = newmonst(xl);
+		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+		if(buflen == -1) break;
+		mtmp = newmonst();
+		mread(fd, (genericptr_t) mtmp, sizeof(struct monst));
+		/* any saved mextra pointer is invalid */
+		mtmp->mextra = (struct mextra *)0;
+
+		/* read the length of the name and the name */
+		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+		if (buflen > 0) {
+			if (!mtmp->mextra) mtmp->mextra = newmextra();
+			MNAME(mtmp) = (char *)alloc(buflen);
+			mread(fd, (genericptr_t) MNAME(mtmp), buflen);
+		}
+
+		/* egd */		
+		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+		if (buflen > 0) {
+			newegd(mtmp);
+			mread(fd, (genericptr_t) EGD(mtmp),
+					sizeof(struct egd));
+		}
+
+		/* epri */
+		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+		if (buflen > 0) {
+			newepri(mtmp);
+			mread(fd, (genericptr_t) EPRI(mtmp),
+					sizeof(struct epri));
+		}
+
+		/* eshk */
+		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+		if (buflen > 0) {
+			neweshk(mtmp);
+			mread(fd, (genericptr_t) ESHK(mtmp),
+					sizeof(struct eshk));
+		}
+
+		/* emin */
+		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+		if (buflen > 0) {
+			newemin(mtmp);
+			mread(fd, (genericptr_t) EMIN(mtmp),
+					sizeof(struct emin));
+		}
+
+		/* edog */		
+		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+		if (buflen > 0) {
+			newedog(mtmp);
+			mread(fd, (genericptr_t) EDOG(mtmp),
+					sizeof(struct edog));
+		}
+
 		if(!first) first = mtmp;
 		else mtmp2->nmon = mtmp;
-		mread(fd, (genericptr_t) mtmp, (unsigned) xl + sizeof(struct monst));
 		if (ghostly) {
 			unsigned nid = context.ident++;
 			add_id_mapping(mtmp->m_id, nid);
