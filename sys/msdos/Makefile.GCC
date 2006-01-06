@@ -1,5 +1,5 @@
 #	SCCS Id: @(#)Makefile.GCC	      3.5     $Date$
-#	Copyright (c) NetHack PC Development Team 1996-2005.
+#	Copyright (c) NetHack PC Development Team 1996-2006.
 #	PC NetHack 3.5 Makefile for djgpp V2
 #
 #	Gnu gcc compiler for msdos (djgpp)
@@ -358,18 +358,14 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(VVOBJ)
 PATCHLEV_H = $(INCL)/patchlev.h
 DGN_FILE_H = $(INCL)/align.h	$(INCL)/dgn_file.h
 DUNGEON_H  = $(INCL)/align.h	$(INCL)/dungeon.h
-EMIN_H	   = $(DUNGEON_H)	$(INCL)/emin.h
-EPRI_H	   = $(DUNGEON_H)	$(INCL)/align.h	    $(INCL)/epri.h
-ESHK_H	   = $(DUNGEON_H)	$(INCL)/eshk.h
 MONDATA_H  = $(INCL)/align.h	$(INCL)/mondata.h
-MONST_H	   = $(INCL)/align.h	$(INCL)/monst.h
+MONST_H	   = $(INCL)/align.h	$(INCL)/mextra.h $(INCL)/monst.h
 PERMONST_H = $(INCL)/monattk.h	$(INCL)/monflag.h   $(INCL)/align.h   \
 	    $(INCL)/permonst.h
 REGION_H   = $(INCL)/region.h
 RM_H	   = $(INCL)/align.h	$(INCL)/rm.h
 SKILLS_H   = $(INCL)/skills.h
 SP_LEV_H   = $(INCL)/align.h	$(INCL)/sp_lev.h
-VAULT_H	   = $(DUNGEON_H)	$(INCL)/vault.h
 YOUPROP_H  = $(PERMONST_H)	$(MONDATA_H)	    $(INCL)/prop.h    \
 	    $(INCL)/pm.h       $(INCL)/youprop.h
 YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h   \
@@ -870,8 +866,7 @@ $(O)drawing.o: $(CONFIG_H) drawing.c $(MSYS)/pcvideo.h
 $(O)decl.o: $(CONFIG_H) decl.c
 	$(CC) $(cflags) -o$@ decl.c
 
-$(O)monst.o: $(CONFIG_H)	     $(PERMONST_H)	$(ESHK_H)	   \
-	$(EPRI_H)	      $(VAULT_H)	 $(INCL)/monsym.h   \
+$(O)monst.o: $(CONFIG_H) $(PERMONST_H) $(DUNGEON_H) $(INCL)/monsym.h   \
 	$(INCL)/color.h	 monst.c
 	$(CC) $(cflags) -o$@ monst.c
 
@@ -1163,7 +1158,7 @@ $(O)monstr.o: monstr.c $(CONFIG_H)
 $(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
-$(O)apply.o: apply.c $(HACK_H) $(INCL)/edog.h
+$(O)apply.o: apply.c $(HACK_H)
 $(O)artifact.o: artifact.c $(HACK_H) $(INCL)/artifact.h $(INCL)/artilist.h
 $(O)attrib.o: attrib.c $(HACK_H)
 $(O)ball.o: ball.c $(HACK_H)
@@ -1173,21 +1168,21 @@ $(O)cmd.o: cmd.c $(HACK_H) $(INCL)/func_tab.h
 $(O)dbridge.o: dbridge.c $(HACK_H)
 $(O)decl.o: decl.c $(HACK_H)
 $(O)detect.o: detect.c $(HACK_H) $(INCL)/artifact.h
-$(O)dig.o: dig.c $(HACK_H) $(INCL)/edog.h
+$(O)dig.o: dig.c $(HACK_H)
 $(O)display.o: display.c $(HACK_H)
 $(O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h
 	$(CC) $(cflags) -I../sys/msdos -o$@ dlb.c
 $(O)do.o: do.c $(HACK_H) $(INCL)/lev.h
 $(O)do_name.o: do_name.c $(HACK_H)
 $(O)do_wear.o: do_wear.c $(HACK_H)
-$(O)dog.o: dog.c $(HACK_H) $(INCL)/edog.h
-$(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/edog.h
-$(O)dokick.o: dokick.c $(HACK_H) $(INCL)/eshk.h
+$(O)dog.o: dog.c $(HACK_H)
+$(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)/mfndpos.h
+$(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
 $(O)drawing.o: drawing.c $(HACK_H) $(INCL)/tcap.h
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
-$(O)eat.o: eat.c $(HACK_H) $(INCL)/edog.h
-$(O)end.o: end.c $(HACK_H) $(INCL)/eshk.h $(INCL)/lev.h $(INCL)/dlb.h
+$(O)eat.o: eat.c $(HACK_H)
+$(O)end.o: end.c $(HACK_H) $(INCL)/lev.h $(INCL)/dlb.h
 $(O)engrave.o: engrave.c $(HACK_H) $(INCL)/lev.h
 $(O)exper.o: exper.c $(HACK_H)
 $(O)explode.o: explode.c $(HACK_H)
@@ -1200,29 +1195,26 @@ $(O)invent.o: invent.c $(HACK_H)
 $(O)light.o: light.c $(HACK_H) $(INCL)/lev.h
 $(O)lock.o: lock.c $(HACK_H)
 $(O)mail.o: mail.c $(HACK_H) $(INCL)/mail.h
-$(O)makemon.o: makemon.c $(HACK_H) $(INCL)/epri.h $(INCL)/emin.h \
-		$(INCL)/edog.h
+$(O)makemon.o: makemon.c $(HACK_H)
 $(O)mapglyph.o: mapglyph.c $(HACK_H)
 $(O)mcastu.o: mcastu.c $(HACK_H)
-$(O)mhitm.o: mhitm.c $(HACK_H) $(INCL)/artifact.h $(INCL)/edog.h
-$(O)mhitu.o: mhitu.c $(HACK_H) $(INCL)/artifact.h $(INCL)/edog.h
-$(O)minion.o: minion.c $(HACK_H) $(INCL)/emin.h $(INCL)/epri.h
+$(O)mhitm.o: mhitm.c $(HACK_H) $(INCL)/artifact.h
+$(O)mhitu.o: mhitu.c $(HACK_H) $(INCL)/artifact.h
+$(O)minion.o: minion.c $(HACK_H)
 $(O)mklev.o: mklev.c $(HACK_H)
 $(O)mkmap.o: mkmap.c $(HACK_H) $(INCL)/sp_lev.h
 $(O)mkmaze.o: mkmaze.c $(HACK_H) $(INCL)/sp_lev.h $(INCL)/lev.h
 $(O)mkobj.o: mkobj.c $(HACK_H)
 $(O)mkroom.o: mkroom.c $(HACK_H)
-$(O)mon.o: mon.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/edog.h
-$(O)mondata.o: mondata.c $(HACK_H) $(INCL)/eshk.h $(INCL)/epri.h
-$(O)monmove.o: monmove.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/artifact.h \
-		$(INCL)/epri.h
+$(O)mon.o: mon.c $(HACK_H) $(INCL)/mfndpos.h
+$(O)mondata.o: mondata.c $(HACK_H)
+$(O)monmove.o: monmove.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/artifact.h
 $(O)monst.o: monst.c $(CONFIG_H) $(INCL)/permonst.h $(INCL)/align.h \
 		$(INCL)/monattk.h $(INCL)/monflag.h $(INCL)/monsym.h \
-		$(INCL)/dungeon.h $(INCL)/eshk.h $(INCL)/vault.h \
-		$(INCL)/epri.h $(INCL)/color.h
+		$(INCL)/dungeon.h $(INCL)/color.h
 $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
-$(O)muse.o: muse.c $(HACK_H) $(INCL)/edog.h
+$(O)muse.o: muse.c $(HACK_H)
 $(O)music.o: music.c $(HACK_H) #interp.c
 $(O)o_init.o: o_init.c $(HACK_H) $(INCL)/lev.h
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)/obj.h $(INCL)/objclass.h \
@@ -1232,12 +1224,11 @@ $(O)options.o: options.c $(CONFIG_H) $(INCL)/objclass.h $(INCL)/flag.h \
 		$(HACK_H) $(INCL)/tcap.h
 $(O)pager.o: pager.c $(HACK_H) $(INCL)/dlb.h
 $(O)pickup.o: pickup.c $(HACK_H)
-$(O)pline.o: pline.c $(HACK_H) $(INCL)/epri.h $(INCL)/edog.h
+$(O)pline.o: pline.c $(HACK_H)
 $(O)polyself.o: polyself.c $(HACK_H)
 $(O)potion.o: potion.c $(HACK_H)
-$(O)pray.o: pray.c $(HACK_H) $(INCL)/epri.h
-$(O)priest.o: priest.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/eshk.h \
-		$(INCL)/epri.h $(INCL)/emin.h
+$(O)pray.o: pray.c $(HACK_H)
+$(O)priest.o: priest.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)quest.o: quest.c $(HACK_H) $(INCL)/qtext.h
 $(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)/dlb.h $(INCL)/qtext.h
 $(O)read.o: read.c $(HACK_H)
@@ -1249,10 +1240,10 @@ $(O)rnd.o: rnd.c $(HACK_H)
 $(O)role.o: role.c $(HACK_H)
 $(O)rumors.o: rumors.c $(HACK_H) $(INCL)/lev.h $(INCL)/dlb.h
 $(O)save.o: save.c $(HACK_H) $(INCL)/lev.h
-$(O)shk.o: shk.c $(HACK_H) $(INCL)/eshk.h
-$(O)shknam.o: shknam.c $(HACK_H) $(INCL)/eshk.h
+$(O)shk.o: shk.c $(HACK_H)
+$(O)shknam.o: shknam.c $(HACK_H)
 $(O)sit.o: sit.c $(HACK_H) $(INCL)/artifact.h
-$(O)sounds.o: sounds.c $(HACK_H) $(INCL)/edog.h
+$(O)sounds.o: sounds.c $(HACK_H)
 $(O)sp_lev.o: sp_lev.c $(HACK_H) $(INCL)/dlb.h $(INCL)/sp_lev.h
 $(O)spell.o: spell.c $(HACK_H)
 $(O)steal.o: steal.c $(HACK_H)
@@ -1264,14 +1255,14 @@ $(O)track.o: track.c $(HACK_H)
 $(O)trap.o: trap.c $(HACK_H)
 $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
-$(O)vault.o: vault.c $(HACK_H) $(INCL)/vault.h
+$(O)vault.o: vault.c $(HACK_H)
 $(O)version.o: version.c $(HACK_H) $(INCL)/date.h $(PATCHLEV_H)
 $(O)vision.o: vision.c $(HACK_H) $(INCL)/vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
 $(O)windows.o: windows.c $(HACK_H) $(INCL)/wingem.h $(INCL)/winGnome.h
-$(O)wizard.o: wizard.c $(HACK_H) $(INCL)/qtext.h $(INCL)/epri.h
+$(O)wizard.o: wizard.c $(HACK_H) $(INCL)/qtext.h
 $(O)worm.o: worm.c $(HACK_H) $(INCL)/lev.h
 $(O)worn.o: worn.c $(HACK_H)
 $(O)write.o: write.c $(HACK_H)

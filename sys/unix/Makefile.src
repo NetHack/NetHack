@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.src	3.5	2002/03/02
+#	SCCS Id: @(#)Makefile.src	3.5	2006/01/05
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used
@@ -358,12 +358,12 @@ CSOURCES = $(HACKCSRC) $(SYSSRC) $(WINCSRC) $(GENCSRC)
 #
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	config.h config1.h context.h coord.h decl.h def_os2.h display.h dlb.h \
-	dungeon.h edog.h emin.h engrave.h epri.h eshk.h extern.h flag.h \
-	func_tab.h global.h hack.h lev.h macconf.h mfndpos.h micro.h mkroom.h \
+	dungeon.h engrave.h extern.h flag.h func_tab.h global.h hack.h lev.h \
+	macconf.h mextra.h mfndpos.h micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h rm.h \
 	sp_lev.h spell.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
-	trampoli.h trap.h unixconf.h vault.h vision.h vmsconf.h wintty.h \
+	trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
 	winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
@@ -700,7 +700,7 @@ monstr.o: monstr.c $(CONFIG_H)
 vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
 allmain.o: allmain.c $(HACK_H)
 alloc.o: alloc.c $(CONFIG_H)
-apply.o: apply.c $(HACK_H) ../include/edog.h
+apply.o: apply.c $(HACK_H)
 artifact.o: artifact.c $(HACK_H) ../include/artifact.h ../include/artilist.h
 attrib.o: attrib.c $(HACK_H)
 ball.o: ball.c $(HACK_H)
@@ -710,20 +710,20 @@ cmd.o: cmd.c $(HACK_H) ../include/func_tab.h
 dbridge.o: dbridge.c $(HACK_H)
 decl.o: decl.c $(HACK_H)
 detect.o: detect.c $(HACK_H) ../include/artifact.h
-dig.o: dig.c $(HACK_H) ../include/edog.h
+dig.o: dig.c $(HACK_H)
 display.o: display.c $(HACK_H)
 dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h
 do.o: do.c $(HACK_H) ../include/lev.h
 do_name.o: do_name.c $(HACK_H)
 do_wear.o: do_wear.c $(HACK_H)
-dog.o: dog.c $(HACK_H) ../include/edog.h
-dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h ../include/edog.h
-dokick.o: dokick.c $(HACK_H) ../include/eshk.h
-dothrow.o: dothrow.c $(HACK_H) ../include/edog.h
+dog.o: dog.c $(HACK_H)
+dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h
+dokick.o: dokick.c $(HACK_H)
+dothrow.o: dothrow.c $(HACK_H)
 drawing.o: drawing.c $(HACK_H) ../include/tcap.h
 dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
 eat.o: eat.c $(HACK_H)
-end.o: end.c $(HACK_H) ../include/eshk.h ../include/lev.h ../include/dlb.h
+end.o: end.c $(HACK_H) ../include/lev.h ../include/dlb.h
 engrave.o: engrave.c $(HACK_H) ../include/lev.h
 exper.o: exper.c $(HACK_H)
 explode.o: explode.c $(HACK_H)
@@ -736,29 +736,26 @@ invent.o: invent.c $(HACK_H)
 light.o: light.c $(HACK_H) ../include/lev.h
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) ../include/mail.h
-makemon.o: makemon.c $(HACK_H) ../include/epri.h ../include/emin.h \
-		../include/edog.h
+makemon.o: makemon.c $(HACK_H)
 mapglyph.o: mapglyph.c $(HACK_H)
 mcastu.o: mcastu.c $(HACK_H)
-mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h ../include/edog.h
-mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h ../include/edog.h
-minion.o: minion.c $(HACK_H) ../include/emin.h ../include/epri.h
+mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
+mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
+minion.o: minion.c $(HACK_H)
 mklev.o: mklev.c $(HACK_H)
 mkmap.o: mkmap.c $(HACK_H) ../include/sp_lev.h
 mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h ../include/lev.h
 mkobj.o: mkobj.c $(HACK_H)
 mkroom.o: mkroom.c $(HACK_H)
-mon.o: mon.c $(HACK_H) ../include/mfndpos.h ../include/edog.h
-mondata.o: mondata.c $(HACK_H) ../include/eshk.h ../include/epri.h
-monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h ../include/artifact.h \
-		../include/epri.h
+mon.o: mon.c $(HACK_H) ../include/mfndpos.h
+mondata.o: mondata.c $(HACK_H)
+monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h ../include/artifact.h
 monst.o: monst.c $(CONFIG_H) ../include/permonst.h ../include/align.h \
 		../include/monattk.h ../include/monflag.h ../include/monsym.h \
-		../include/dungeon.h ../include/eshk.h ../include/vault.h \
-		../include/epri.h ../include/color.h
+		../include/dungeon.h ../include/color.h
 mplayer.o: mplayer.c $(HACK_H)
 mthrowu.o: mthrowu.c $(HACK_H)
-muse.o: muse.c $(HACK_H) ../include/edog.h
+muse.o: muse.c $(HACK_H)
 music.o: music.c $(HACK_H) #interp.c
 o_init.o: o_init.c $(HACK_H) ../include/lev.h
 objects.o: objects.c $(CONFIG_H) ../include/obj.h ../include/objclass.h \
@@ -768,12 +765,11 @@ options.o: options.c $(CONFIG_H) ../include/objclass.h ../include/flag.h \
 		$(HACK_H) ../include/tcap.h
 pager.o: pager.c $(HACK_H) ../include/dlb.h
 pickup.o: pickup.c $(HACK_H)
-pline.o: pline.c $(HACK_H) ../include/epri.h ../include/edog.h
+pline.o: pline.c $(HACK_H)
 polyself.o: polyself.c $(HACK_H)
 potion.o: potion.c $(HACK_H)
-pray.o: pray.c $(HACK_H) ../include/epri.h
-priest.o: priest.c $(HACK_H) ../include/mfndpos.h ../include/eshk.h \
-		../include/epri.h ../include/emin.h
+pray.o: pray.c $(HACK_H)
+priest.o: priest.c $(HACK_H) ../include/mfndpos.h
 quest.o: quest.c $(HACK_H) ../include/qtext.h
 questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h ../include/qtext.h
 read.o: read.c $(HACK_H)
@@ -785,10 +781,10 @@ rnd.o: rnd.c $(HACK_H)
 role.o: role.c $(HACK_H)
 rumors.o: rumors.c $(HACK_H) ../include/lev.h ../include/dlb.h
 save.o: save.c $(HACK_H) ../include/lev.h
-shk.o: shk.c $(HACK_H) ../include/eshk.h
-shknam.o: shknam.c $(HACK_H) ../include/eshk.h
+shk.o: shk.c $(HACK_H)
+shknam.o: shknam.c $(HACK_H)
 sit.o: sit.c $(HACK_H) ../include/artifact.h
-sounds.o: sounds.c $(HACK_H) ../include/edog.h
+sounds.o: sounds.c $(HACK_H)
 sp_lev.o: sp_lev.c $(HACK_H) ../include/dlb.h ../include/sp_lev.h
 spell.o: spell.c $(HACK_H)
 steal.o: steal.c $(HACK_H)
@@ -800,14 +796,14 @@ track.o: track.c $(HACK_H)
 trap.o: trap.c $(HACK_H)
 u_init.o: u_init.c $(HACK_H)
 uhitm.o: uhitm.c $(HACK_H)
-vault.o: vault.c $(HACK_H) ../include/vault.h
+vault.o: vault.c $(HACK_H)
 version.o: version.c $(HACK_H) ../include/date.h ../include/patchlevel.h
 vision.o: vision.c $(HACK_H) ../include/vis_tab.h
 weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
 windows.o: windows.c $(HACK_H) ../include/wingem.h ../include/winGnome.h
-wizard.o: wizard.c $(HACK_H) ../include/qtext.h ../include/epri.h
+wizard.o: wizard.c $(HACK_H) ../include/qtext.h
 worm.o: worm.c $(HACK_H) ../include/lev.h
 worn.o: worn.c $(HACK_H)
 write.o: write.c $(HACK_H)

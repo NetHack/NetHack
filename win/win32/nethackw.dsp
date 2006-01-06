@@ -660,23 +660,7 @@ SOURCE=..\include\dungeon.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\edog.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\emin.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\engrave.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\epri.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\eshk.h
 # End Source File
 # Begin Source File
 
@@ -729,6 +713,10 @@ SOURCE=..\include\macwin.h
 # Begin Source File
 
 SOURCE=..\include\mail.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\mextra.h
 # End Source File
 # Begin Source File
 
@@ -885,10 +873,6 @@ SOURCE=..\include\trap.h
 # Begin Source File
 
 SOURCE=..\include\unixconf.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\vault.h
 # End Source File
 # Begin Source File
 

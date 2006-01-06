@@ -1347,7 +1347,7 @@ $(O)allmain.o:  $(NHS)allmain.c $(HDEP)
 
 $(O)alloc.o:  $(NHS)alloc.c $(I)config.h
 
-$(O)apply.o:  $(NHS)apply.c $(HDEP) $(I)edog.h
+$(O)apply.o:  $(NHS)apply.c $(HDEP)
 #SFD_INSTEAD #none
 	$(CC) $(CFLAGS) $(CFLAGS2) $(OBJSPEC)$@ $(NHS)apply.c
 
@@ -1369,7 +1369,7 @@ $(O)decl.o:  $(NHS)decl.c $(HDEP) $(I)quest.h
 
 $(O)detect.o: $(NHS)detect.c $(HDEP) $(I)artifact.h
 
-$(O)dig.o: $(NHS)dig.c $(HDEP) $(I)edog.h
+$(O)dig.o: $(NHS)dig.c $(HDEP)
 
 $(O)display.o:  $(NHS)display.c $(HDEP)
 
@@ -1381,11 +1381,11 @@ $(O)do_name.o:  $(NHS)do_name.c $(HDEP)
 
 $(O)do_wear.o:  $(NHS)do_wear.c $(HDEP)
 
-$(O)dog.o:  $(NHS)dog.c $(HDEP) $(I)edog.h
+$(O)dog.o:  $(NHS)dog.c $(HDEP)
 
-$(O)dogmove.o:  $(NHS)dogmove.c $(HDEP) $(I)mfndpos.h $(I)edog.h
+$(O)dogmove.o:  $(NHS)dogmove.c $(HDEP) $(I)mfndpos.h
 
-$(O)dokick.o:  $(NHS)dokick.c $(HDEP) $(I)eshk.h
+$(O)dokick.o:  $(NHS)dokick.c $(HDEP)
 
 $(O)dothrow.o:  $(NHS)dothrow.c $(HDEP)
 
@@ -1396,7 +1396,7 @@ $(O)dungeon.o:  $(NHS)dungeon.c $(HDEP) $(I)dgn_file.h $(I)dlb.h
 
 $(O)eat.o:  $(NHS)eat.c $(HDEP)
 
-$(O)end.o:  $(NHS)end.c $(HDEP) $(I)eshk.h $(I)lev.h $(I)dlb.h
+$(O)end.o:  $(NHS)end.c $(HDEP) $(I)lev.h $(I)dlb.h
 
 $(O)engrave.o:  $(NHS)engrave.c $(HDEP) $(I)lev.h
 
@@ -1422,18 +1422,18 @@ $(O)lock.o:  $(NHS)lock.c $(HDEP)
 
 $(O)mail.o:  $(NHS)mail.c $(HDEP) $(I)mail.h
 
-$(O)makemon.o:  $(NHS)makemon.c $(HDEP) $(I)epri.h $(I)emin.h $(I)edog.h
+$(O)makemon.o:  $(NHS)makemon.c $(HDEP)
 
 $(O)mapglyph.o:  $(NHS)mapglyph.c $(HDEP)
 
 $(O)mcastu.o:  $(NHS)mcastu.c $(HDEP)
 
-$(O)mhitm.o:  $(NHS)mhitm.c $(HDEP) $(I)artifact.h $(I)edog.h
+$(O)mhitm.o:  $(NHS)mhitm.c $(HDEP) $(I)artifact.h
 
-$(O)mhitu.o:  $(NHS)mhitu.c $(HDEP) $(I)artifact.h $(I)edog.h
+$(O)mhitu.o:  $(NHS)mhitu.c $(HDEP) $(I)artifact.h
 	$(CC) $(CFLAGS) $(CFLAGS2) $(OBJSPEC)$@ $(NHS)mhitu.c
 
-$(O)minion.o:  $(NHS)minion.c $(HDEP) $(I)emin.h $(I)epri.h
+$(O)minion.o:  $(NHS)minion.c $(HDEP)
 
 $(O)mklev.o:  $(NHS)mklev.c $(HDEP)
 
@@ -1445,14 +1445,13 @@ $(O)mkobj.o:  $(NHS)mkobj.c $(HDEP) $(I)artifact.h $(I)prop.h
 
 $(O)mkroom.o:  $(NHS)mkroom.c $(HDEP)
 
-$(O)mon.o:  $(NHS)mon.c $(HDEP) $(I)mfndpos.h $(I)edog.h
+$(O)mon.o:  $(NHS)mon.c $(HDEP) $(I)mfndpos.h
 
-$(O)mondata.o:  $(NHS)mondata.c $(HDEP) $(I)eshk.h $(I)epri.h
+$(O)mondata.o:  $(NHS)mondata.c $(HDEP)
 
 $(O)monmove.o:  $(NHS)monmove.c $(HDEP) $(I)mfndpos.h $(I)artifact.h
 
-$(O)monst.o:  $(NHS)monst.c $(I)config.h $(I)permonst.h $(I)monsym.h \
-		$(I)eshk.h $(I)vault.h $(I)epri.h $(I)color.h
+$(O)monst.o:  $(NHS)monst.c $(I)config.h $(I)permonst.h $(I)monsym.h $(I)color.h
 
 $(O)monstr.o:  $(NHS)monstr.c $(HDEP)
 #SFD_INSTEAD 	$(CC) $(CFLAGS) $(OBJSPEC)%(left) $(NHS)monstr.c
@@ -1483,16 +1482,15 @@ $(O)pager.o:  $(NHS)pager.c $(HDEP) $(I)dlb.h
 
 $(O)pickup.o:  $(NHS)pickup.c $(HDEP)
 
-$(O)pline.o:	$(NHS)pline.c $(HDEP) $(I)epri.h
+$(O)pline.o:	$(NHS)pline.c $(HDEP)
 
 $(O)polyself.o:  $(NHS)polyself.c $(HDEP)
 
 $(O)potion.o:  $(NHS)potion.c $(HDEP)
 
-$(O)pray.o:  $(NHS)pray.c $(HDEP) $(I)epri.h
+$(O)pray.o:  $(NHS)pray.c $(HDEP)
 
-$(O)priest.o:  $(NHS)priest.c $(HDEP) $(I)mfndpos.h $(I)eshk.h $(I)epri.h \
-		$(I)emin.h
+$(O)priest.o:  $(NHS)priest.c $(HDEP) $(I)mfndpos.h
 
 $(O)quest.o:	$(NHS)quest.c $(HDEP) $(I)quest.h $(I)qtext.h
 
@@ -1514,15 +1512,15 @@ $(O)rumors.o:  $(NHS)rumors.c $(HDEP) $(I)dlb.h
 
 $(O)save.o:  $(NHS)save.c $(HDEP) $(I)lev.h $(I)quest.h
 
-$(O)shk.o:  $(NHS)shk.c $(HDEP) $(I)eshk.h
+$(O)shk.o:  $(NHS)shk.c $(HDEP)
 #SFD_INSTEAD #none
 	$(CC) $(CFLAGS) $(CFLAGS2) $(OBJSPEC)$@ $(NHS)shk.c
 
-$(O)shknam.o:  $(NHS)shknam.c $(HDEP) $(I)eshk.h
+$(O)shknam.o:  $(NHS)shknam.c $(HDEP)
 
 $(O)sit.o:  $(NHS)sit.c $(HDEP) $(I)artifact.h
 
-$(O)sounds.o:  $(NHS)sounds.c $(HDEP) $(I)edog.h
+$(O)sounds.o:  $(NHS)sounds.c $(HDEP)
 
 $(O)sp_lev.o:  $(NHS)sp_lev.c $(HDEP) $(I)sp_lev.h $(I)rect.h $(I)dlb.h
 
@@ -1549,7 +1547,7 @@ $(O)u_init.o:  $(NHS)u_init.c $(HDEP)
 $(O)uhitm.o:  $(NHS)uhitm.c $(HDEP)
 	$(CC) $(CFLAGS) $(CFLAGS2) $(OBJSPEC)$@ $(NHS)uhitm.c
 
-$(O)vault.o:  $(NHS)vault.c $(HDEP) $(I)vault.h
+$(O)vault.o:  $(NHS)vault.c $(HDEP)
 
 $(O)version.o:  $(NHS)version.c $(HDEP) $(I)date.h $(I)patchlevel.h
 
@@ -1618,7 +1616,7 @@ $(I)permonst.h:  $(I)monattk.h $(I)monflag.h $(I)align.h
 	-setdate $(I)permonst.h
 	-wait 2
 
-$(I)you.h:  $(I)align.h $(I)attrib.h $(I)monst.h $(I)youprop.h $(I)skills.h
+$(I)you.h:  $(I)align.h $(I)attrib.h $(I)mextra.h $(I)monst.h $(I)youprop.h $(I)skills.h
 	-setdate $(I)you.h
 	-wait 2
 
@@ -1636,27 +1634,19 @@ $(I)dungeon.h: $(I)align.h
 	-setdate $(I)dungeon.h
 	-wait 2
 
-$(I)emin.h: $(I)dungeon.h
-	-setdate $(I)emin.h
-	-wait 2
-
-$(I)epri.h: $(I)dungeon.h $(I)align.h
-	-setdate $(I)epri.h
-	-wait 2
-
-$(I)eshk.h: $(I)dungeon.h
-	-setdate $(I)eshk.h
-	-wait 2
-
 $(I)engrave.h: $(I)trampoli.h $(I)rect.h
 	-setdate $(I)engrave.h
+	-wait 2
+
+$(I)mextra.h: $(I)align.h
+	-setdate $(I)mextra.h
 	-wait 2
 
 $(I)mondata.h: $(I)align.h
 	-setdate $(I)mondata.h
 	-wait 2
 
-$(I)monst.h: $(I)align.h
+$(I)monst.h: $(I)align.h $(I)mextra.h
 	-setdate $(I)monst.h
 	-wait 2
 
@@ -1666,10 +1656,6 @@ $(I)pcconf.h: $(I)micro.h $(I)system.h
 
 $(I)rm.h: $(I)align.h
 	-setdate $(I)rm.h
-	-wait 2
-
-$(I)vault.h: $(I)dungeon.h
-	-setdate $(I)vault.h
 	-wait 2
 
 
