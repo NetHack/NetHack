@@ -969,6 +969,7 @@ E boolean FDECL(is_home_elemental, (struct permonst *));
 E struct monst *FDECL(clone_mon, (struct monst *,XCHAR_P,XCHAR_P));
 E int FDECL(monhp_per_lvl, (struct monst *));
 E void FDECL(newmonhp, (struct monst *,int));
+E struct mextra *NDECL(newmextra);
 E struct monst *FDECL(makemon, (struct permonst *,int,int,int));
 E boolean FDECL(create_critters, (int,struct permonst *));
 E struct permonst *NDECL(rndmonst);

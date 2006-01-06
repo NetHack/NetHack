@@ -110,10 +110,6 @@ struct mextra {
 	struct edog *edog;
 };
 
-#define newmextra()		\
-	(struct mextra *) memset((genericptr_t)alloc(sizeof(struct mextra)), \
-	0, sizeof(struct mextra))
-
 #define MNAME(mon)	((mon)->mextra->mname)
 #define EGD(mon)	((mon)->mextra->egd)
 #define EPRI(mon)	((mon)->mextra->epri)

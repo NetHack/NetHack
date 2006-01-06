@@ -233,6 +233,7 @@ const char *name;
 		return mtmp;
 	}
 	if (has_name(mtmp)) free((genericptr_t)MNAME(mtmp));
+	if (!mtmp->mextra) mtmp->mextra = newmextra();
 
 	MNAME(mtmp) = (char *)alloc(lth);
 	if (lth) Strcpy(MNAME(mtmp), name);

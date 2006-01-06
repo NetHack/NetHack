@@ -9,7 +9,6 @@
 #endif
 
 STATIC_VAR NEARDATA struct monst zeromonst;
-STATIC_VAR NEARDATA struct mextra zeromextra;
 
 /* this assumes that a human quest leader or nemesis is an archetype
    of the corresponding role; that isn't so for some roles (tourist
@@ -851,6 +850,16 @@ int mndx;
 	if (is_home_elemental(ptr))
 	    mon->mhpmax = (mon->mhp *= 3);
     }
+}
+
+struct mextra *
+newmextra()
+{
+	struct mextra *mextra;
+	mextra = (struct mextra *)alloc(sizeof(struct mextra));
+	if (mextra)
+	    (void) memset((genericptr_t)mextra, 0, sizeof(struct mextra));
+	return mextra;
 }
 
 /*
