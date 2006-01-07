@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2005/11/16	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2006/01/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1086,7 +1086,7 @@ struct monst *mtmp;
 		mtmp2->nmon     = (struct monst *)0;
 		mtmp2->data     = (struct permonst *)0;
 		mtmp2->minvent  = (struct obj *)0;
-		/* mon_to_buffer() took care of x and mname */
+		/* mon_to_buffer() took care of mextra */
 #ifndef GOLDOBJ
 		/* not a pointer but is discarded along with minvent */
 		mtmp2->mgold	= 0L;

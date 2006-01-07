@@ -359,7 +359,7 @@ PATCHLEV_H = $(INCL)/patchlev.h
 DGN_FILE_H = $(INCL)/align.h	$(INCL)/dgn_file.h
 DUNGEON_H  = $(INCL)/align.h	$(INCL)/dungeon.h
 MONDATA_H  = $(INCL)/align.h	$(INCL)/mondata.h
-MONST_H	   = $(INCL)/align.h	$(INCL)/mextra.h $(INCL)/monst.h
+MONST_H	   = $(INCL)/align.h	$(INCL)/monst.h $(INCL)/mextra.h
 PERMONST_H = $(INCL)/monattk.h	$(INCL)/monflag.h   $(INCL)/align.h   \
 	    $(INCL)/permonst.h
 REGION_H   = $(INCL)/region.h
@@ -866,7 +866,7 @@ $(O)drawing.o: $(CONFIG_H) drawing.c $(MSYS)/pcvideo.h
 $(O)decl.o: $(CONFIG_H) decl.c
 	$(CC) $(cflags) -o$@ decl.c
 
-$(O)monst.o: $(CONFIG_H) $(PERMONST_H) $(DUNGEON_H) $(INCL)/monsym.h   \
+$(O)monst.o: $(CONFIG_H) $(PERMONST_H) $(INCL)/monsym.h   \
 	$(INCL)/color.h	 monst.c
 	$(CC) $(cflags) -o$@ monst.c
 
@@ -1211,7 +1211,7 @@ $(O)mondata.o: mondata.c $(HACK_H)
 $(O)monmove.o: monmove.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/artifact.h
 $(O)monst.o: monst.c $(CONFIG_H) $(INCL)/permonst.h $(INCL)/align.h \
 		$(INCL)/monattk.h $(INCL)/monflag.h $(INCL)/monsym.h \
-		$(INCL)/dungeon.h $(INCL)/color.h
+		$(INCL)/color.h
 $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H)

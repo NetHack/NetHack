@@ -5,8 +5,6 @@
 #include "config.h"
 #include "permonst.h"
 #include "monsym.h"
-#include "dungeon.h"	/* prerequisite for eshk,vault,epri */
-#include "mextra.h"
 
 #define NO_ATTK {0,0,0,0}
 

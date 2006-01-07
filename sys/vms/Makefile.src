@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	SCCS Id: @(#)Makefile.src	3.5	2006/01/05
+#	SCCS Id: @(#)Makefile.src	3.5	2006/01/07
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -304,7 +304,8 @@ $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \
 		$(INC)monflag.h $(INC)mondata.h $(INC)pm.h \
 		$(INC)wintype.h $(INC)context.h $(INC)decl.h $(INC)quest.h \
 		$(INC)spell.h $(INC)color.h $(INC)obj.h \
-		$(INC)you.h $(INC)attrib.h $(INC)monst.h $(INC)skills.h \
+		$(INC)you.h $(INC)attrib.h $(INC)monst.h \
+		$(INC)mextra.h $(INC)skills.h \
 		$(INC)onames.h $(INC)timeout.h $(INC)trap.h \
 		$(INC)flag.h $(INC)rm.h $(INC)vision.h \
 		$(INC)display.h $(INC)engrave.h $(INC)rect.h $(INC)region.h \
@@ -401,7 +402,7 @@ mondata.obj :	mondata.c $(HACK_H)
 monmove.obj :	monmove.c $(HACK_H) $(INC)mfndpos.h $(INC)artifact.h
 monst.obj :	monst.c $(CONFIG_H) $(INC)permonst.h $(INC)align.h \
 		$(INC)monattk.h $(INC)monflag.h $(INC)monsym.h \
-		$(INC)dungeon.h $(INC)color.h
+		$(INC)color.h
 mplayer.obj :	mplayer.c $(HACK_H)
 mthrowu.obj :	mthrowu.c $(HACK_H)
 muse.obj :	muse.c $(HACK_H)

@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.src	3.5	2006/01/05
+#	SCCS Id: @(#)Makefile.src	3.5	2006/01/07
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used
@@ -567,11 +567,12 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
 		../include/wintype.h ../include/context.h ../include/decl.h \
 		../include/quest.h ../include/spell.h ../include/color.h \
 		../include/obj.h ../include/you.h ../include/attrib.h \
-		../include/monst.h ../include/skills.h ../include/onames.h \
-		../include/timeout.h ../include/trap.h ../include/flag.h \
-		../include/rm.h ../include/vision.h ../include/display.h \
-		../include/engrave.h ../include/rect.h ../include/region.h \
-		../include/winprocs.h ../include/wintty.h ../include/trampoli.h
+		../include/monst.h ../include/mextra.h ../include/skills.h \
+		../include/onames.h ../include/timeout.h ../include/trap.h \
+		../include/flag.h ../include/rm.h ../include/vision.h \
+		../include/display.h ../include/engrave.h ../include/rect.h \
+		../include/region.h ../include/winprocs.h ../include/wintty.h \
+		../include/trampoli.h
 	touch $(HACK_H)
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
@@ -752,7 +753,7 @@ mondata.o: mondata.c $(HACK_H)
 monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h ../include/artifact.h
 monst.o: monst.c $(CONFIG_H) ../include/permonst.h ../include/align.h \
 		../include/monattk.h ../include/monflag.h ../include/monsym.h \
-		../include/dungeon.h ../include/color.h
+		../include/color.h
 mplayer.o: mplayer.c $(HACK_H)
 mthrowu.o: mthrowu.c $(HACK_H)
 muse.o: muse.c $(HACK_H)

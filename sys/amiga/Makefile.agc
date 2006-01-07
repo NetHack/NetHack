@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.agc	3.5	2000/01/12
+#	SCCS Id: @(#)Makefile.agc	3.5	2006/01/07
 # Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.
 # NetHack may be freely redistributed.  See license for details.
 
@@ -1277,7 +1277,7 @@ $(I)permonst.h:  $(I)monattk.h $(I)monflag.h $(I)align.h
 	-setdate $(I)permonst.h
 	-c:wait 2
 
-$(I)you.h:  $(I)align.h $(I)attrib.h $(I)monst.h $(I)youprop.h $(I)skills.h
+$(I)you.h:  $(I)align.h $(I)attrib.h $(I)monst.h $(I)mextra.h $(I)youprop.h $(I)skills.h
 	-setdate $(I)you.h
 	-c:wait 2
 
