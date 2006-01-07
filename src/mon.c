@@ -1368,7 +1368,7 @@ register struct monst *mon;
 	}
 }
 
-void
+STATIC_OVL void
 dealloc_mextra(x)
 struct mextra *x;
 {
