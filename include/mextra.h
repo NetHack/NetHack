@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mextra.h	3.5	2006/01/03	*/
+/*	SCCS Id: @(#)mextra.h	3.5	2006/01/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,6 +9,54 @@
 #include "align.h"
 #endif
 
+/*
+ *  Adding new mextra structures:
+ *
+ *	 1. Add the structure definition and any required macros in this file
+ *	    above the mextra struct.
+ *	 2. Add a pointer to your new struct to the mextra struct in this file.
+ *	 3. Add a referencing macro at the bottom of this file after the mextra
+ *          struct (see MNAME, EGD, EPRI, ESHK, EMIN, or EDOG for examples).
+ *	 4. Create a newXX(mtmp) function and possibly a free_XX(mtmp) function
+ *          in an appropriate new or existing source file and add a prototype
+ *	    for it to include/extern.h.
+ *
+ *		void FDECL(newXX, (struct monst *));
+ *	        void FDECL(free_XX, (struct monst *));
+ *	
+ *	          void
+ *	          newXX(mtmp)
+ *	          struct monst *mtmp;
+ *	          {
+ *	              if (!mtmp->mextra) mtmp->mextra = newmextra();
+ *	              if (!XX(mtmp)) {
+ *	                  XX(mtmp) = (struct XX *)alloc(sizeof(struct XX));
+ *	                  (void) memset((genericptr_t) XX(mtmp),
+ *	                             0, sizeof(struct XX));
+ *	              }
+ *	          }
+ *	
+ *	 5. Consider adding a new makemon flag MM_XX flag to include/hack.h and
+ *	    a corresponding change to makemon() if you require your structure
+ *          to be added at monster creation time. Initialize your struct
+ *	    after a successful return from makemon().
+ *
+ *	     src/makemon.c:  if (mmflags & MM_XX) newXX(mtmp);
+ *	     your new code:  mon = makemon(&mons[mnum], x, y, MM_XX);
+ *
+ *	 6. Adjust size_monst() in src/cmd.c appropriately.
+ *       7. Adjust dealloc_mextra() in src/mon.c to clean up
+ *	    properly during monst deallocation.
+ *	 8. Adjust restmonchn() in src/restore.c to deal with your
+ *	    struct during a restore.
+ *       9. Adjust buffer_to_mon() in src/restore.c to properly
+ *	10. Adjust savemonchn() in src/save.c to deal with your
+ *	    struct during a save.
+ *	11. Adjust mon_to_buffer() in src/save.c to properly package
+ *	    up your struct when the rest of the monst struct is
+ *	    packaged up.
+ */
+ 
 #define FCSIZ	(ROWNO+COLNO)
 
 struct fakecorridor {
