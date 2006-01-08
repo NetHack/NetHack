@@ -348,6 +348,8 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E int FDECL(getpos, (coord *,BOOLEAN_P,const char *));
+E void FDECL(new_mname, (struct monst *,int));
+E void FDECL(free_mname, (struct monst *));
 E struct monst *FDECL(christen_monst, (struct monst *,const char *));
 E int NDECL(do_mname);
 E struct obj *FDECL(oname, (struct obj *,const char *));

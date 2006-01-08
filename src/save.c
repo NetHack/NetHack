@@ -1019,47 +1019,46 @@ int *isize;
 	genericptr_t buffer, xptr[6];
 	struct monst *mbuf;
 
-	lth = sizeof(struct monst);
+     /* assert((sizeof (*mbuf->mextra) / sizeof (char *)) == 6); */
+	lth = (int)sizeof (struct monst);
 
-	/* there is always one sizeof(int) for the name
-           and one for each of the 5 potential mextra fields */
-	for (k = 0; k < 6; ++k) {
+	/* there is always one sizeof(int) for each mextra field */
+	for (k = 0; k < SIZE(xlth); ++k) {
 		xlth[k] = 0;
 		xptr[k] = (genericptr_t)0;
 	}
 	if (mtmp->mextra) {
 		if (MNAME(mtmp)) {
-			xlth[0] = strlen(MNAME(mtmp)) + 1;
+			xlth[0] = (int)strlen(MNAME(mtmp)) + 1;
 			xptr[0] = (genericptr_t)MNAME(mtmp);
 		}
 		if (EGD(mtmp)) {
-			xlth[1] = sizeof(struct egd);
+			xlth[1] = (int)sizeof (struct egd);
 			xptr[1] = (genericptr_t)EGD(mtmp);
 		}
 		if (EPRI(mtmp)) {
-			xlth[2] = sizeof(struct epri);
+			xlth[2] = (int)sizeof (struct epri);
 			xptr[2] = (genericptr_t)EPRI(mtmp);
 		}
 		if (ESHK(mtmp)) {
-			xlth[3] = sizeof(struct eshk);
+			xlth[3] = (int)sizeof (struct eshk);
 			xptr[3] = (genericptr_t)ESHK(mtmp);
 		}
 		if (EMIN(mtmp)) {
-			xlth[4] = sizeof(struct emin);
+			xlth[4] = (int)sizeof (struct emin);
 			xptr[4] = (genericptr_t)EMIN(mtmp);
 		}
 		if (EDOG(mtmp)) {
-			xlth[5] = sizeof(struct edog);
+			xlth[5] = (int)sizeof (struct edog);
 			xptr[5] = (genericptr_t)EDOG(mtmp);
 		}
 	}
-	for (k = 0; k < 6; ++k) {
-		lth += sizeof(int);
-		lth += xlth[k];
+	for (k = 0; k < SIZE(xlth); ++k) {
+		lth += (int)sizeof (int) + xlth[k];
 	}
 	if (isize) *isize = lth;
 
-	buffer = alloc(lth);
+	buffer = alloc((unsigned) lth);
 
 	spot = (char *)buffer;
 	(void) memcpy((genericptr_t)spot, (genericptr_t)mtmp,
@@ -1069,10 +1068,10 @@ int *isize;
 	mbuf = (struct monst *)buffer;
 	mbuf->mextra = (struct mextra *)0;
 
-	for (k = 0; k < 6; ++k) {
+	for (k = 0; k < SIZE(xlth); ++k) {
 		lth = xlth[k];
 		(void) memcpy((genericptr_t)spot,
-		    		(genericptr_t)&lth, sizeof(lth));
+				(genericptr_t)&lth, sizeof(lth));
 		spot += sizeof(lth);
 		if (lth > 0 && xptr[k] != 0) {
 			(void) memcpy((genericptr_t)spot, xptr[k], lth);

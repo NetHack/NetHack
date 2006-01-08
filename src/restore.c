@@ -297,13 +297,12 @@ genericptr_t buffer;
 	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
 	spot += sizeof(int);
 	if (lth) {
-		if (!mtmp->mextra) mtmp->mextra = newmextra();
-		MNAME(mtmp) = (char *)alloc(lth);
+		new_mname(mtmp, lth);
 		(void) memcpy((genericptr_t)MNAME(mtmp),
 				(genericptr_t)spot, lth);
 		spot += lth;
 	}
-	/* obtain the length of the egd (guard) structure */
+	/* obtain the length of the egd (vault guard) structure */
 	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
 	spot += sizeof(int);
 	if (lth) {
@@ -371,8 +370,7 @@ boolean ghostly;
 		/* read the length of the name and the name */
 		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
 		if (buflen > 0) {
-			if (!mtmp->mextra) mtmp->mextra = newmextra();
-			MNAME(mtmp) = (char *)alloc(buflen);
+			new_mname(mtmp, buflen);
 			mread(fd, (genericptr_t) MNAME(mtmp), buflen);
 		}
 

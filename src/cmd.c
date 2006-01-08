@@ -1853,14 +1853,15 @@ STATIC_OVL int
 size_monst(mtmp)
 struct monst *mtmp;
 {
-	int sz = sizeof(struct monst);
+	int sz = (int)sizeof (struct monst);
+
 	if (mtmp->mextra) {
-		if (MNAME(mtmp)) sz += strlen(MNAME(mtmp))+1;
-		if (EGD(mtmp)) sz += sizeof(struct egd);
-		if (EPRI(mtmp)) sz += sizeof(struct epri);
-		if (ESHK(mtmp)) sz += sizeof(struct eshk);
-		if (EMIN(mtmp)) sz += sizeof(struct emin);
-		if (EDOG(mtmp)) sz += sizeof(struct edog);
+		if (MNAME(mtmp)) sz += (int)strlen(MNAME(mtmp)) + 1;
+		if (EGD(mtmp)) sz += (int)sizeof (struct egd);
+		if (EPRI(mtmp)) sz += (int)sizeof (struct epri);
+		if (ESHK(mtmp)) sz += (int)sizeof (struct eshk);
+		if (EMIN(mtmp)) sz += (int)sizeof (struct emin);
+		if (EDOG(mtmp)) sz += (int)sizeof (struct edog);
 	}
 	return sz;
 }
@@ -1964,6 +1965,7 @@ wiz_migrate_mons()
 	struct permonst *ptr;
 	struct monst *mtmp;
 	d_level tolevel;
+
 	getlin("How many random monsters to migrate? [0]", inbuf);
 	if (*inbuf == '\033') return 0;
 	mcount = atoi(inbuf);

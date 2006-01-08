@@ -212,6 +212,36 @@ const char *goal;
     return result;
 }
 
+/* allocate space for a monster's name; removes old name if there is one */
+void
+new_mname(mon, lth)
+struct monst *mon;
+int lth;	/* desired length (caller handles adding 1 for terminator) */
+{
+    if (lth) {
+	/* allocate mextra if necessary; otherwise get rid of old name */
+	if (!mon->mextra) mon->mextra = newmextra();
+	else free_mname(mon);	/* already has mextra, might also have name */
+	MNAME(mon) = (char *) alloc((unsigned) lth);
+    } else {
+	/* zero length: the new name is empty; get rid of the old name */
+	if (has_name(mon)) free_mname(mon);
+    }
+}
+
+/* release a monster's name; retains mextra even if all fields are now null */
+void
+free_mname(mon)
+struct monst *mon;
+{
+    if (has_name(mon)) {
+	free((genericptr_t)MNAME(mon));
+	MNAME(mon) = (char *)0;
+    }
+}
+
+/* historical note: this returns a monster pointer because it used to
+   allocate a new bigger block of memory to hold the monster and its name */
 struct monst *
 christen_monst(mtmp, name)
 struct monst *mtmp;
@@ -221,23 +251,15 @@ const char *name;
 	char buf[PL_PSIZ];
 
 	/* dogname & catname are PL_PSIZ arrays; object names have same limit */
-	lth = *name ? (int)(strlen(name) + 1) : 0;
-	if(lth > PL_PSIZ){
+	lth = (name && *name) ? ((int)strlen(name) + 1) : 0;
+	if (lth > PL_PSIZ) {
 		lth = PL_PSIZ;
 		name = strncpy(buf, name, PL_PSIZ - 1);
 		buf[PL_PSIZ - 1] = '\0';
 	}
-	if (has_name(mtmp) && lth == (int)(strlen(MNAME(mtmp)) + 1)) {
-		/* don't need to allocate a new mname */
-		if (lth) Strcpy(MNAME(mtmp), name);
-		return mtmp;
-	}
-	if (has_name(mtmp)) free((genericptr_t)MNAME(mtmp));
-	if (!mtmp->mextra) mtmp->mextra = newmextra();
-
-	MNAME(mtmp) = (char *)alloc(lth);
+	new_mname(mtmp, lth);	/* removes old name if one is present */
 	if (lth) Strcpy(MNAME(mtmp), name);
-	return(mtmp);
+	return mtmp;
 }
 
 int
@@ -287,8 +309,8 @@ do_mname()
 		return(0);
 	}
 	/* special case similar to the one in lookat() */
-	(void) distant_monnam(mtmp, ARTICLE_THE, monnambuf);
-	Sprintf(qbuf, "What do you want to call %s?", monnambuf);
+	Sprintf(qbuf, "What do you want to call %s?",
+		distant_monnam(mtmp, ARTICLE_THE, monnambuf));
 	getlin(qbuf,buf);
 	if(!*buf || *buf == '\033') return(0);
 	/* strip leading and trailing spaces; unnames monster if all spaces */

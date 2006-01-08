@@ -232,28 +232,19 @@ unsigned corpseflags;
 		num = d(2,6);
 		while (num--)
 			obj = mksobj_at(IRON_CHAIN, x, y, TRUE, FALSE);
-		if (has_name(mtmp)) {
-			free((genericptr_t)MNAME(mtmp));
-			MNAME(mtmp) = (char *)0;
-		}
+		free_mname(mtmp);	/* don't christen obj */
 		break;
 	    case PM_GLASS_GOLEM:
 		num = d(2,4);   /* very low chance of creating all glass gems */
 		while (num--)
 			obj = mksobj_at((LAST_GEM + rnd(9)), x, y, TRUE, FALSE);
-		if (has_name(mtmp)) {
-			free((genericptr_t)MNAME(mtmp));
-			MNAME(mtmp) = (char *)0;
-		}
+		free_mname(mtmp);
 		break;
 	    case PM_CLAY_GOLEM:
 		obj = mksobj_at(ROCK, x, y, FALSE, FALSE);
 		obj->quan = (long)(rn2(20) + 50);
 		obj->owt = weight(obj);
-		if (has_name(mtmp)) {
-			free((genericptr_t)MNAME(mtmp));
-			MNAME(mtmp) = (char *)0;
-		}
+		free_mname(mtmp);
 		break;
 	    case PM_STONE_GOLEM:
 	        corpstatflags &= ~CORPSTAT_INIT;
@@ -265,36 +256,24 @@ unsigned corpseflags;
 		while(num--) {
 			obj = mksobj_at(QUARTERSTAFF, x, y, TRUE, FALSE);
 		}
-		if (has_name(mtmp)) {
-			free((genericptr_t)MNAME(mtmp));
-			MNAME(mtmp) = (char *)0;
-		}
+		free_mname(mtmp);
 		break;
 	    case PM_LEATHER_GOLEM:
 		num = d(2,4);
 		while(num--)
 			obj = mksobj_at(LEATHER_ARMOR, x, y, TRUE, FALSE);
-		if (has_name(mtmp)) {
-			free((genericptr_t)MNAME(mtmp));
-			MNAME(mtmp) = (char *)0;
-		}
+		free_mname(mtmp);
 		break;
 	    case PM_GOLD_GOLEM:
 		/* Good luck gives more coins */
 		obj = mkgold((long)(200 - rnl(101)), x, y);
-		if (has_name(mtmp)) {
-			free((genericptr_t)MNAME(mtmp));
-			MNAME(mtmp) = (char *)0;
-		}
+		free_mname(mtmp);
 		break;
 	    case PM_PAPER_GOLEM:
 		num = rnd(4);
 		while (num--)
 			obj = mksobj_at(SCR_BLANK_PAPER, x, y, TRUE, FALSE);
-		if (has_name(mtmp)) {
-			free((genericptr_t)MNAME(mtmp));
-			MNAME(mtmp) = (char *)0;
-		}
+		free_mname(mtmp);
 		break;
 	    default_1:
 	    default:
@@ -1379,8 +1358,8 @@ struct mextra *x;
 		if (x->eshk) free((genericptr_t)x->eshk);
 		if (x->emin) free((genericptr_t)x->emin);
 		if (x->edog) free((genericptr_t)x->edog);
+		free((genericptr_t)x);
 	}
-	free((genericptr_t)x);
 }
 
 void
@@ -2622,8 +2601,12 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	newsym(mtmp->mx,mtmp->my);
 
 	if (msg) {
-	    char *save_mname = (has_name(mtmp)) ? MNAME(mtmp) : (char *)0;
-	    if (mtmp->mextra) MNAME(mtmp) = (char *)0; 
+	    char *save_mname = 0;
+
+	    if (has_name(mtmp)) {
+		save_mname = MNAME(mtmp);
+		MNAME(mtmp) = (char *)0; 
+	    }
 	    Strcpy(newname,
 		   (mdat == &mons[PM_GREEN_SLIME]) ? "slime" :
 		   x_monnam(mtmp, ARTICLE_A, (char *)0,SUPPRESS_SADDLE, FALSE));
@@ -2631,7 +2614,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 		    (void) usmellmon(mdat);
 	    else
 		    pline("%s turns into %s!", oldname, newname);
-	    if(mtmp->mextra) MNAME(mtmp) = save_mname;
+	    if (save_mname) MNAME(mtmp) = save_mname;
 	}
 
 	possibly_unwield(mtmp, polyspot);	/* might lose use of weapon */
