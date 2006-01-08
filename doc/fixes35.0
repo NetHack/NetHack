@@ -105,8 +105,9 @@ devouring Medusa whole is fatal
 eating pet won't continue eating after becoming paralyzed or falling asleep
 randomize shopkeeper names when hallucinating
 fix wording for "leprechaun steals gold from between your feet" when mounted
-magic trap that causes taming of monster that just expelled hero won't result
-	in upstream use of stale pointer; taming no longer replaces monst
+fix monsndx panic which happened after currently moving monster expelled
+	swallowed hero onto magic trap and was made tame by its effect; taming
+	no longer replaces monster
 
 
 Platform- and/or Interface-Specific Fixes
