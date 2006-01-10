@@ -1088,7 +1088,6 @@ register struct monst *mtmp;
 {
 	register struct monst *mtmp2;
 	int buflen, minusone = -1, zerobuf = 0;
-	genericptr_t buffer = (genericptr_t)0;
 
 	while (mtmp) {
 	    mtmp2 = mtmp->nmon;
@@ -1108,8 +1107,10 @@ register struct monst *mtmp;
 		buflen = sizeof(struct monst);
 		bwrite(fd, (genericptr_t) &buflen, sizeof(int));
 #if 0
-		buffer = mon_to_buffer(mtmp, &buflen);
-		bwrite(fd, buffer, buflen);
+		{
+		    genericptr_t buffer = mon_to_buffer(mtmp, &buflen);
+		    bwrite(fd, buffer, buflen);
+		}
 #else
 		bwrite(fd, (genericptr_t) mtmp, buflen);
 		if (!mtmp->mextra) {

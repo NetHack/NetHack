@@ -170,7 +170,6 @@ struct obj *food;
 boolean the_pfx;
 {
 	const char *result;
-	int mnum = food->corpsenm;
 
 	if (food->otyp == CORPSE) {
 	    result = corpse_xname(food, (const char *)0,
