@@ -57,10 +57,13 @@
  *	    packaged up.
  */
  
+/***
+ **	formerly vault.h -- vault guard extension
+ */
 #define FCSIZ	(ROWNO+COLNO)
 
 struct fakecorridor {
-	xchar fx,fy,ftyp;
+	xchar fx, fy, ftyp;
 };
 
 struct egd {
@@ -75,17 +78,21 @@ struct egd {
 	struct fakecorridor fakecorr[FCSIZ];
 };
 
+/***
+ **	formerly epri.h -- temple priest extension
+ */
 struct epri {
 	aligntyp shralign;	/* alignment of priest's shrine */
-				/* leave as first field to match emin */
 	schar shroom;		/* index in rooms */
 	coord shrpos;		/* position of shrine */
 	d_level shrlevel;	/* level (& dungeon) of shrine */
 };
-
 /* note: roaming priests (no shrine) switch from ispriest to isminion
    (and emin extension) */
 
+/***
+ **	formerly eshk.h -- shopkeeper extension
+ */
 #define REPAIR_DELAY	5	/* minimum delay between shop damage & repair */
 #define BILLSZ	200
 
@@ -117,16 +124,18 @@ struct eshk {
 	char shknam[PL_NSIZ];
 };
 
-#define NOTANGRY(mon)	((mon)->mpeaceful)
-#define ANGRY(mon)	(!NOTANGRY(mon))
-
+/***
+ **	formerly emin.h -- minion extension
+ */
 struct emin {
 	aligntyp min_align;	/* alignment of minion */
 	boolean  renegade;	/* hostile co-aligned priest or Angel */
 };
 
-/*	various types of pet food, the lower, the better liked.	*/
-
+/***
+ **	formerly edog.h -- pet extension
+ */
+/*	various types of pet food, the lower, the better liked */
 #define DOGFOOD 0
 #define CADAVER 1
 #define ACCFOOD 2
@@ -149,6 +158,9 @@ struct edog {
 	Bitfield(killed_by_u, 1);	/* you attempted to kill him */
 };
 
+/***
+ **	mextra.h -- collection of all monster extensions
+ */
 struct mextra {
 	char *mname;
 	struct egd *egd;

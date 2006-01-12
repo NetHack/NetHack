@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.5	2005/07/06	*/
+/*	SCCS Id: @(#)shk.c	3.5	2006/01/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,6 +18,8 @@ STATIC_DCL void FDECL(call_kops, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
 #endif /* KOPS */
 
+#define NOTANGRY(mon)	((mon)->mpeaceful)
+#define ANGRY(mon)	(!NOTANGRY(mon))
 #define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
 
 extern const struct shclass shtypes[];	/* defined in shknam.c */
