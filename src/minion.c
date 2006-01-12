@@ -138,12 +138,11 @@ boolean talk;
     if (mnum == NON_PM) {
 	mon = 0;
     } else if (mnum == PM_ANGEL) {
-	mon = makemon(&mons[mnum], u.ux, u.uy, MM_EPRI|MM_EMIN);
+	mon = makemon(&mons[mnum], u.ux, u.uy, MM_EMIN);
 	if (mon) {
 	    mon->isminion = 1;
 	    EMIN(mon)->min_align = alignment;
 	    EMIN(mon)->renegade = FALSE;
-	    EPRI(mon)->shralign = alignment;
 	}
     } else if (mnum != PM_SHOPKEEPER && mnum != PM_GUARD &&
                 mnum != PM_ALIGNED_PRIEST && mnum != PM_HIGH_PRIEST) {

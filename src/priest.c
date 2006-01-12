@@ -295,7 +295,7 @@ char *pname;		/* caller-supplied output buffer */
 		what = "priest";
 	}
     } else {
-	if (mon->mtame)
+	if (mon->mtame && !strcmpi(what, "Angel"))
 	    Strcat(pname, "guardian ");
     }
 
@@ -561,10 +561,10 @@ boolean peaceful;
 	register struct monst *roamer;
 	register boolean coaligned = (u.ualign.type == alignment);
 
-	/* Angel's have the emin extension; aligned priests have the epri
-	   extension, we access it as if it were emin */
+#if 0	/* this was due to permonst's pxlth field which is now gone */
 	if (ptr != &mons[PM_ALIGNED_PRIEST] && ptr != &mons[PM_ANGEL])
 		return((struct monst *)0);
+#endif
 
 	if (MON_AT(x, y)) (void) rloc(m_at(x, y), FALSE);	/* insurance */
 
@@ -690,6 +690,8 @@ angry_priest()
 	struct rm *lev;
 
 	if ((priest = findpriest(temple_occupied(u.urooms))) != 0) {
+	    struct epri *eprip = EPRI(priest);
+
 	    wakeup(priest);
 	    /*
 	     * If the altar has been destroyed or converted, let the
@@ -698,20 +700,19 @@ angry_priest()
 	     *	a fresh corpse nearby, the priest ought to have an
 	     *	opportunity to try converting it back; maybe someday...)
 	     */
-	    lev = &levl[EPRI(priest)->shrpos.x][EPRI(priest)->shrpos.y];
+	    lev = &levl[eprip->shrpos.x][eprip->shrpos.y];
 	    if (!IS_ALTAR(lev->typ) ||
 		((aligntyp)Amask2align(lev->altarmask & AM_MASK) !=
-			EPRI(priest)->shralign)) {
-		if (EPRI(priest)) {
-			if (!EMIN(priest)) newemin(priest);
-			priest->ispriest = 0;	/* roamer */
-						/* but still aligned */
-			priest->isminion = 1;
-			EMIN(priest)->min_align = EPRI(priest)->shralign;
-		}
-		/* this used to overload EPRI's shroom field, which was then clobbered
-		 * but not since adding the separate mextra structure */
+		eprip->shralign)) {
+		if (!EMIN(priest)) newemin(priest);
+		priest->ispriest = 0;	/* now a roaming minion */
+		priest->isminion = 1;
+		EMIN(priest)->min_align = eprip->shralign;
 		EMIN(priest)->renegade = FALSE;
+		/* discard priest's memory of his former shrine;
+		   if we ever implement the re-conversion mentioned
+		   above, this will need to be removed */
+		free_epri(priest);
 	    }
 	}
 }
