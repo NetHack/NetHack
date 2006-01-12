@@ -577,6 +577,7 @@ E void FDECL(consume_oeaten, (struct obj *,int));
 E boolean FDECL(maybe_finished_meal, (BOOLEAN_P));
 E void FDECL(set_tin_variety, (struct obj *,int));
 E int FDECL(tin_variety_txt, (char *,int *));
+E void FDECL(tin_details, (struct obj *,int,char *));
 E boolean FDECL(Popeye, (int));
 
 /* ### end.c ### */

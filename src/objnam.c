@@ -341,16 +341,8 @@ register struct obj *obj;
 		}
 
 		Strcpy(buf, actualn);
-		if (typ == TIN && obj->known) {
-		    if(obj->spe > 0)
-			Strcat(buf, " of spinach");
-		    else if (omndx == NON_PM)
-			Strcpy(buf, "empty tin");
-		    else if (vegetarian(&mons[omndx]))
-			Sprintf(eos(buf), " of %s", mons[omndx].mname);
-		    else
-			Sprintf(eos(buf), " of %s meat", mons[omndx].mname);
-		}
+		if (typ == TIN && obj->known)
+			tin_details(obj, omndx, buf);
 		break;
 	    case COIN_CLASS:
 	    case CHAIN_CLASS:

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2005/12/09	*/
+/*	SCCS Id: @(#)eat.c	3.5	2006/01/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -43,7 +43,7 @@ STATIC_DCL int FDECL(bounded_increase, (int,int,int));
 STATIC_DCL void FDECL(accessory_has_effect, (struct obj *));
 STATIC_DCL void FDECL(eataccessory, (struct obj *));
 STATIC_DCL const char *FDECL(foodword, (struct obj *));
-STATIC_DCL int FDECL(tin_variety, (struct obj *));
+STATIC_DCL int FDECL(tin_variety, (struct obj *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(maybe_cannibal, (int,BOOLEAN_P));
 
 char msgbuf[BUFSZ];
@@ -1159,6 +1159,43 @@ int *tinvariety;
 	return 0;
 }
 
+/*
+ * This assumes that buf already contains the word "tin",
+ * as is the case with caller xname().
+ */
+void
+tin_details(obj, mnum, buf)
+struct obj *obj;
+int mnum;
+char *buf;
+{
+	char buf2[BUFSZ];
+	if (obj && buf) {
+	    if(obj->spe > 0)
+		Strcat(buf, " of spinach");
+	    else if (mnum == NON_PM)
+		Strcpy(buf, "empty tin");
+	    else {
+		if (obj->cknown && obj->spe < 0) {
+		    int r = tin_variety(obj, TRUE);
+		    if (r == ROTTEN_TIN || r == HOMEMADE_TIN) {
+			/* put these before the word tin */
+			Sprintf(buf2,"%s %s of ", tintxts[r].txt, buf);
+			Strcpy(buf, buf2);
+		    } else {
+		    	Sprintf(eos(buf), " of %s ", tintxts[r].txt);
+		    }
+		} else {
+		    Strcpy(eos(buf), " of ");
+		}
+	        if (vegetarian(&mons[mnum]))
+		    Sprintf(eos(buf), "%s", mons[mnum].mname);
+	        else
+		    Sprintf(eos(buf), "%s meat", mons[mnum].mname);
+	    }
+	}
+}
+
 void
 set_tin_variety(obj, forcetype)
 struct obj *obj;
@@ -1174,7 +1211,7 @@ int forcetype;
 		obj->spe = 1;		/* spinach */
 		return;
 	} else if (forcetype == HEALTHY_TIN) {
-		r = tin_variety(obj);
+		r = tin_variety(obj, FALSE);
 		if (r < 0 || r >= TTSZ) r = ROTTEN_TIN;	/* shouldn't happen */
 		while ((r == ROTTEN_TIN && !obj->cursed) || !tintxts[r].fodder)
 		    r = rn2(TTSZ-1);
@@ -1190,8 +1227,9 @@ int forcetype;
 }
 
 STATIC_OVL int
-tin_variety(obj)
+tin_variety(obj, disp)
 struct obj *obj;
+boolean disp;		/* we're just displaying so leave things alone */
 {
 	register int r;
 
@@ -1205,7 +1243,7 @@ struct obj *obj;
 	} else 
 		r = rn2(TTSZ-1);
 
-	if (r == HOMEMADE_TIN &&
+	if (!disp && r == HOMEMADE_TIN &&
 		 !obj->blessed && !rn2(7))
 		r = ROTTEN_TIN;			/* some homemade tins go bad */	
 
@@ -1248,7 +1286,7 @@ opentin()		/* called during each move whilst opening a tin */
 		costly_tin(COST_OPEN);
 		goto use_me;
 	    }
-	    r = tin_variety(context.tin.tin);
+	    r = tin_variety(context.tin.tin, FALSE);
 	    which = 0;	/* 0=>plural, 1=>as-is, 2=>"the" prefix */
 	    if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE) &&
 		    (Stone_resistance || Hallucination)) {
