@@ -152,32 +152,39 @@ struct sysflag {
  */
 
 struct instance_flags {
-	boolean  cbreak;	/* in cbreak mode, rogue format */
-	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
-	boolean  echo;		/* 1 to echo characters */
-	boolean  IBMgraphics;	/* use IBM extended character set */
-	unsigned msg_history;	/* hint: # of top lines to save */
-	boolean  num_pad;	/* use numbers for movement commands */
-	boolean  news;		/* print news */
+	/* stuff that really isn't option or platform related. They are
+	 * set and cleared during the game to control the internal
+	 * behaviour of various NetHack functions and probably warrant
+	 * a structure of their own elsewhere some day.
+	 */
+	int	 in_lava_effects;	/* hack for Boots_off() */
+	int	 purge_monsters;	/* # of dead monsters still on fmon list */
+	int	 override_ID;	/* true to force full identification of objects */
+	coord	travelcc;	/* coordinates for travel_cache */
 	boolean  window_inited; /* true if init_nhwindows() completed */
 	boolean  vision_inited; /* true if vision is ready */
+#ifdef WIZARD
+	boolean  sanity_check;	/* run sanity checks */
+	boolean  mon_polycontrol;	/* debug: control monster polymorphs */
+#endif
+	/* stuff that is related to options and/or user or platform preferences */
+	unsigned msg_history;	/* hint: # of top lines to save */
+	int	 menu_headings;	/* ATR for menu headings */
+	int *opt_booldup;	/* for duplication of boolean opts in config file */
+	int *opt_compdup;	/* for duplication of compound opts in config file */
+	boolean  cbreak;	/* in cbreak mode, rogue format */
+	boolean  num_pad;	/* use numbers for movement commands */
+	boolean  news;		/* print news */
 	boolean  menu_tab_sep;	/* Use tabs to separate option menu fields */
 	boolean  menu_requested; /* Flag for overloaded use of 'm' prefix
 				  * on some non-move commands */
 	boolean  zerocomp;	/* write zero-compressed save files */
 	boolean  rlecomp;	/* run-length comp of levels when writing savefile */
 	uchar	 num_pad_mode;
-	int	 in_lava_effects;	/* hack for Boots_off() */
-	int	 menu_headings;	/* ATR for menu headings */
-	int	 purge_monsters;	/* # of dead monsters still on fmon list */
-	int *opt_booldup;	/* for duplication of boolean opts in config file */
-	int *opt_compdup;	/* for duplication of compound opts in config file */
+	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
+	boolean  echo;		/* 1 to echo characters */
+	boolean  IBMgraphics;	/* use IBM extended character set */
 	uchar	bouldersym;	/* symbol for boulder display */
-	coord	travelcc;	/* coordinates for travel_cache */
-#ifdef WIZARD
-	boolean  sanity_check;	/* run sanity checks */
-	boolean  mon_polycontrol;	/* debug: control monster polymorphs */
-#endif
 #ifdef TTY_GRAPHICS
 	char prevmsg_window;	/* type of old message window to use */
 	boolean  extmenu;	/* extended commands use menu interface */

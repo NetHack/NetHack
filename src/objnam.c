@@ -167,11 +167,13 @@ boolean
 obj_is_pname(obj)
 register struct obj *obj;
 {
-    return((boolean)(obj->dknown && obj->known && obj->onamelth &&
-		     /* Since there aren't any objects which are both
-		        artifacts and unique, the last check is redundant. */
-		     obj->oartifact && !objects[obj->otyp].oc_unique));
+    return((boolean)(
+	((obj->dknown && obj->known) || iflags.override_ID) && obj->onamelth &&
+		/* Since there aren't any objects which are both
+		   artifacts and unique, the last check is redundant. */
+		obj->oartifact && !objects[obj->otyp].oc_unique));
 }
+
 
 /* Give the name of an object seen at a distance.  Unlike xname/doname,
  * we don't want to set dknown if it's not set already.  The kludge used is
@@ -224,6 +226,7 @@ register struct obj *obj;
 	const char *dn = OBJ_DESCR(*ocl);
 	const char *un = ocl->oc_uname;
 	boolean pluralize = (obj->quan != 1L);
+	boolean known, dknown, bknown;
 
 	buf = nextobuf() + PREFIX;	/* leave room for "17 -3 " */
 	if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
@@ -239,16 +242,26 @@ register struct obj *obj;
 	if (!nn && ocl->oc_uses_known && ocl->oc_unique) obj->known = 0;
 	if (!Blind) obj->dknown = TRUE;
 	if (Role_if(PM_PRIEST)) obj->bknown = TRUE;
+
+	if (iflags.override_ID) {
+		known = dknown = bknown = TRUE;
+		nn = 1;
+	} else {
+		known = obj->known;
+		dknown = obj->dknown;
+		bknown = obj->bknown;
+	}
+
 	if (obj_is_pname(obj))
 	    goto nameit;
 	switch (obj->oclass) {
 	    case AMULET_CLASS:
-		if (!obj->dknown)
+		if (!dknown)
 			Strcpy(buf, "amulet");
 		else if (typ == AMULET_OF_YENDOR ||
 			 typ == FAKE_AMULET_OF_YENDOR)
 			/* each must be identified individually */
-			Strcpy(buf, obj->known ? actualn : dn);
+			Strcpy(buf, known ? actualn : dn);
 		else if (nn)
 			Strcpy(buf, actualn);
 		else if (un)
@@ -264,7 +277,7 @@ register struct obj *obj;
 		if (typ == LENSES)
 			Strcpy(buf, "pair of ");
 
-		if (!obj->dknown)
+		if (!dknown)
 			Strcat(buf, dn ? dn : actualn);
 		else if (nn)
 			Strcat(buf, actualn);
@@ -290,11 +303,11 @@ register struct obj *obj;
 		if(is_boots(obj) || is_gloves(obj)) Strcpy(buf,"pair of ");
 
 		if(obj->otyp >= ELVEN_SHIELD && obj->otyp <= ORCISH_SHIELD
-				&& !obj->dknown) {
+				&& !dknown) {
 			Strcpy(buf, "shield");
 			break;
 		}
-		if(obj->otyp == SHIELD_OF_REFLECTION && !obj->dknown) {
+		if(obj->otyp == SHIELD_OF_REFLECTION && !dknown) {
 			Strcpy(buf, "smooth shield");
 			break;
 		}
@@ -341,7 +354,7 @@ register struct obj *obj;
 		}
 
 		Strcpy(buf, actualn);
-		if (typ == TIN && obj->known)
+		if (typ == TIN && known)
 			tin_details(obj, omndx, buf);
 		break;
 	    case COIN_CLASS:
@@ -365,15 +378,15 @@ register struct obj *obj;
 			(obj->owt > ocl->oc_weight) ? "very " : "");
 		break;
 	    case POTION_CLASS:
-		if (obj->dknown && obj->odiluted)
+		if (dknown && obj->odiluted)
 			Strcpy(buf, "diluted ");
-		if(nn || un || !obj->dknown) {
+		if(nn || un || !dknown) {
 			Strcat(buf, "potion");
-			if(!obj->dknown) break;
+			if(!dknown) break;
 			if(nn) {
 			    Strcat(buf, " of ");
 			    if (typ == POT_WATER &&
-				obj->bknown && (obj->blessed || obj->cursed)) {
+				bknown && (obj->blessed || obj->cursed)) {
 				Strcat(buf, obj->blessed ? "holy " : "unholy ");
 			    }
 			    Strcat(buf, actualn);
@@ -388,7 +401,7 @@ register struct obj *obj;
 		break;
 	case SCROLL_CLASS:
 		Strcpy(buf, "scroll");
-		if(!obj->dknown) break;
+		if(!dknown) break;
 		if(nn) {
 			Strcat(buf, " of ");
 			Strcat(buf, actualn);
@@ -404,7 +417,7 @@ register struct obj *obj;
 		}
 		break;
 	case WAND_CLASS:
-		if(!obj->dknown)
+		if(!dknown)
 			Strcpy(buf, "wand");
 		else if(nn)
 			Sprintf(buf, "wand of %s", actualn);
@@ -414,7 +427,7 @@ register struct obj *obj;
 			Sprintf(buf, "%s wand", dn);
 		break;
 	case SPBOOK_CLASS:
-		if (!obj->dknown) {
+		if (!dknown) {
 			Strcpy(buf, "spellbook");
 		} else if (nn) {
 			if (typ != SPE_BOOK_OF_THE_DEAD)
@@ -426,7 +439,7 @@ register struct obj *obj;
 			Sprintf(buf, "%s spellbook", dn);
 		break;
 	case RING_CLASS:
-		if(!obj->dknown)
+		if(!dknown)
 			Strcpy(buf, "ring");
 		else if(nn)
 			Sprintf(buf, "ring of %s", actualn);
@@ -439,7 +452,7 @@ register struct obj *obj;
 	    {
 		const char *rock =
 			    (ocl->oc_material == MINERAL) ? "stone" : "gem";
-		if (!obj->dknown) {
+		if (!dknown) {
 		    Strcpy(buf, rock);
 		} else if (!nn) {
 		    if (un) Sprintf(buf,"%s called %s", rock, un);
@@ -455,7 +468,7 @@ register struct obj *obj;
 	}
 	if (pluralize) Strcpy(buf, makeplural(buf));
 
-	if (obj->onamelth && obj->dknown) {
+	if (obj->onamelth && dknown) {
 		Strcat(buf, " named ");
 nameit:
 		Strcat(buf, ONAME(obj));
@@ -490,13 +503,14 @@ boolean
 the_unique_obj(obj)
 register struct obj *obj;
 {
-    if (!obj->dknown)
+    boolean known = (obj->known || iflags.override_ID);
+    if (!obj->dknown && !iflags.override_ID)
 	return FALSE;
-    else if (obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known)
+    else if (obj->otyp == FAKE_AMULET_OF_YENDOR && !known)
 	return TRUE;		/* lie */
     else
 	return (boolean)(objects[obj->otyp].oc_unique &&
-			 (obj->known || obj->otyp == AMULET_OF_YENDOR));
+			 (known || obj->otyp == AMULET_OF_YENDOR));
 }
 
 /* should monster type be prefixed with "the"? (mostly used for corpses) */
@@ -528,7 +542,9 @@ struct obj *obj;
 char *prefix;
 {
 	boolean iscrys = (obj->otyp == CRYSKNIFE);
+	boolean rknown;
 
+	rknown = (iflags.override_ID == 0) ? obj->rknown : TRUE;
 
 	if (!is_damageable(obj) && !iscrys) return;
 
@@ -550,7 +566,7 @@ char *prefix;
 		Strcat(prefix, is_corrodeable(obj) ? "corroded " :
 			"rotted ");
 	}
-	if (obj->rknown && obj->oerodeproof)
+	if (rknown && obj->oerodeproof)
 		Strcat(prefix,
 		       iscrys ? "fixed " :
 		       is_rustprone(obj) ? "rustproof " :
@@ -563,6 +579,7 @@ doname(obj)
 register struct obj *obj;
 {
 	boolean ispoisoned = FALSE;
+	boolean known, cknown, bknown, lknown;
 	int omndx = obj->corpsenm;
 	char prefix[PREFIX];
 	char tmpbuf[PREFIX+1];
@@ -570,6 +587,14 @@ register struct obj *obj;
 	 * end (Strcat is used on the end)
 	 */
 	register char *bp = xname(obj);
+
+	if (iflags.override_ID) known = cknown = bknown = lknown = TRUE;
+	else {
+		known = obj->known;
+		cknown = obj->cknown;
+		bknown = obj->bknown;
+		lknown = obj->lknown;
+	}
 
 	/* When using xname, we want "poisoned arrow", and when using
 	 * doname, we want "poisoned +0 arrow".  This kludge is about the only
@@ -600,11 +625,11 @@ register struct obj *obj;
 #endif
 
 	/* "empty" goes at the beginning, but item count goes at the end */
-	if (obj->cknown &&
+	if (cknown &&
 	    (Is_container(obj) || obj->otyp == STATUE) && !Has_contents(obj))
 		Strcat(prefix, "empty ");
 
-	if (obj->bknown &&
+	if (bknown &&
 	    obj->oclass != COIN_CLASS &&
 	    (obj->otyp != POT_WATER || !objects[POT_WATER].oc_name_known
 		|| (!obj->cursed && !obj->blessed))) {
@@ -615,7 +640,7 @@ register struct obj *obj;
 		Strcat(prefix, "cursed ");
 	    else if (obj->blessed)
 		Strcat(prefix, "blessed ");
-	    else if ((!obj->known || !objects[obj->otyp].oc_charged ||
+	    else if ((!known || !objects[obj->otyp].oc_charged ||
 		      (obj->oclass == ARMOR_CLASS ||
 		       obj->oclass == RING_CLASS))
 		/* For most items with charges or +/-, if you know how many
@@ -637,7 +662,7 @@ register struct obj *obj;
 		Strcat(prefix, "uncursed ");
 	}
 
-	if (obj->lknown && Is_box(obj)) {
+	if (lknown && Is_box(obj)) {
 	    if (obj->obroken)
 	        Strcat(prefix, "unlockable ");
 	    else if (obj->olocked)
@@ -648,7 +673,7 @@ register struct obj *obj;
 
 	if (obj->greased) Strcat(prefix, "greased ");
 
-	if (obj->cknown && Has_contents(obj)) {
+	if (cknown && Has_contents(obj)) {
 	    struct obj *curr;
 	    long itemcount = 0L;
 
@@ -669,7 +694,7 @@ register struct obj *obj;
 			Strcat(prefix, "poisoned ");
 plus:
 		add_erosion_words(obj, prefix);
-		if(obj->known) {
+		if(known) {
 			Strcat(prefix, sitoa(obj->spe));
 			Strcat(prefix, " ");
 		}
@@ -721,7 +746,7 @@ plus:
 	case WAND_CLASS:
 		add_erosion_words(obj, prefix);
 charges:
-		if(obj->known)
+		if(known)
 		    Sprintf(eos(bp), " (%d:%d)", (int)obj->recharged, obj->spe);
 		break;
 	case POTION_CLASS:
@@ -737,7 +762,7 @@ ring:
 		    Strcat(bp, body_part(HAND));
 		    Strcat(bp, ")");
 		}
-		if(obj->known && objects[obj->otyp].oc_charged) {
+		if(known && objects[obj->otyp].oc_charged) {
 			Strcat(prefix, sitoa(obj->spe));
 			Strcat(prefix, " ");
 		}
@@ -751,10 +776,10 @@ ring:
 					 CXN_ARTICLE|CXN_NOCORPSE));
 		} else if (obj->otyp == EGG) {
 #if 0	/* corpses don't tell if they're stale either */
-		    if (obj->known && stale_egg(obj))
+		    if (known && stale_egg(obj))
 			Strcat(prefix, "stale ");
 #endif
-		    if (omndx >= LOW_PM && (obj->known ||
+		    if (omndx >= LOW_PM && (known ||
 				    (mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
 			Strcat(prefix, mons[omndx].mname);
 			Strcat(prefix, " ");

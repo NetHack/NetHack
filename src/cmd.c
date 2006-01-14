@@ -150,6 +150,7 @@ STATIC_PTR int NDECL(doattributes);
 STATIC_PTR int NDECL(doconduct); /**/
 STATIC_PTR boolean NDECL(minimal_enlightenment);
 
+STATIC_DCL char FDECL(cmd_from_func, (int NDECL((*))));
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *,char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
 #if defined(UNIX) || defined(SAFERHANGUP)
@@ -516,9 +517,13 @@ wiz_wish()	/* Unlimited wishes for debug mode by Paul Polderman */
 STATIC_PTR int
 wiz_identify()
 {
-	if (wizard)	identify_pack(0);
-	else		pline("Unavailable command '^I'.");
-	return 0;
+	if (wizard) {
+		iflags.override_ID = (int)cmd_from_func(wiz_identify);
+		if (display_inventory((char *)0, TRUE) == -1)
+			identify_pack(0);
+		iflags.override_ID = 0;
+	} else pline("Unavailable command '^I'.");
+  	return 0;
 }
 
 /* ^F command - reveal the level map and any traps on it */
@@ -1747,6 +1752,17 @@ boolean initial;
     Cmd.move_SE = Cmd.dirchars[5];
     Cmd.move_S  = Cmd.dirchars[6];
     Cmd.move_SW = Cmd.dirchars[7];
+}
+
+STATIC_OVL char
+cmd_from_func(fn)
+int NDECL((*fn));
+{
+	int i;
+	for (i = 0; i < SIZE(cmdlist); ++i)
+		if (cmdlist[i].f_funct == fn)
+			return cmdlist[i].f_char;
+	return 0;
 }
 
 /* decide whether a character (user input keystroke) requests screen repaint */

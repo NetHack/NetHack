@@ -1176,7 +1176,7 @@ char *buf;
 	    else if (mnum == NON_PM)
 		Strcpy(buf, "empty tin");
 	    else {
-		if (obj->cknown && obj->spe < 0) {
+		if ((obj->cknown || iflags.override_ID) && obj->spe < 0) {
 		    int r = tin_variety(obj, TRUE);
 		    if (r == ROTTEN_TIN || r == HOMEMADE_TIN) {
 			/* put these before the word tin */

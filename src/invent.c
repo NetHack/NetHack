@@ -1732,7 +1732,7 @@ long* out_cnt;
 	/* oxymoron? temporarily assign permanent inventory letters */
 	if (!flags.invlet_constant) reassign();
 
-	if (lets && strlen(lets) == 1) {
+	if (lets && strlen(lets) == 1 && !iflags.override_ID) {
 	    /* when only one item of interest, use pline instead of menus;
 	       we actually use a fake message-line menu in order to allow
 	       the user to perform selection at the --More-- prompt for tty */
@@ -1750,6 +1750,18 @@ long* out_cnt;
 	}
 
 	start_menu(win);
+#ifdef WIZARD
+	if (wizard && iflags.override_ID) {
+		char prompt[BUFSZ];
+		any.a_char = -1;
+		/* wiz_identify stuffed the wiz_identify cmd character
+		   into iflags.override_ID */
+		Sprintf(prompt, "Debug Identify (%s to permanently identify)",
+				visctrl(iflags.override_ID));
+		add_menu(win, NO_GLYPH, &any,' ', iflags.override_ID, ATR_NONE,
+				prompt, MENU_UNSELECTED);
+	}
+#endif
 nextclass:
 	classcount = 0;
 	any.a_void = 0;		/* set all bits to zero */
