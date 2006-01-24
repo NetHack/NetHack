@@ -1266,7 +1266,7 @@ puny %r.  Thou wilt die in agony!"
 "I shall suck the marrow from thy bones, %c."
 %E
 %Cp Kni 00067
-"Let's see...  Broiled?  No.  Fried?  Nay.  Baked?  Yea verily,
+"Let's see...  Baked?  No.  Fried?  Nay.  Broiled?  Yea verily,
 that is the way I like my %c for dinner."
 %E
 %Cp Kni 00068
