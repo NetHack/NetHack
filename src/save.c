@@ -1093,6 +1093,7 @@ register struct monst *mtmp;
 	    mtmp2 = mtmp->nmon;
 	    if (perform_bwrite(mode)) {
 		mtmp->mnum = monsndx(mtmp->data);
+		if (mtmp->ispriest) forget_temple_entry(mtmp);	/* EPRI() */
 #ifndef GOLDOBJ
 		if (mtmp->mgold) {
 			struct obj *goldobj = mksobj(GOLD_PIECE, FALSE, FALSE);

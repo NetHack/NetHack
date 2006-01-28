@@ -1074,6 +1074,7 @@ struct monst *mtmp;
 	int lth, namelth;
 
 	namelth = obj->onamelth ? strlen(ONAME(obj)) + 1 : 0;
+	if (mtmp->ispriest) forget_temple_entry(mtmp);	/* EPRI() */
 	buffer = mon_to_buffer(mtmp, &lth);
 	otmp = realloc_obj(obj, lth, buffer, namelth, ONAME(obj));
 	free(buffer);

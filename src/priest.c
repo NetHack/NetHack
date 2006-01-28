@@ -5,8 +5,9 @@
 #include "hack.h"
 #include "mfndpos.h"
 
-/* this matches the categorizations shown by enlightenment */
-#define ALGN_SINNED	(-4)	/* worse than strayed */
+/* these match the categorizations shown by enlightenment */
+#define ALGN_SINNED	(-4)	/* worse than strayed (-1..-3) */
+#define ALGN_PIOUS	14	/* better than fervent (9..13) */
 
 STATIC_DCL boolean FDECL(histemple_at,(struct monst *,XCHAR_P,XCHAR_P));
 STATIC_DCL boolean FDECL(has_shrine,(struct monst *));
@@ -317,13 +318,14 @@ has_shrine(pri)
 struct monst *pri;
 {
 	struct rm *lev;
+	struct epri *epri_p;
 
-	if(!pri)
-		return(FALSE);
-	lev = &levl[EPRI(pri)->shrpos.x][EPRI(pri)->shrpos.y];
-	if (!IS_ALTAR(lev->typ) || !(lev->altarmask & AM_SHRINE))
-		return(FALSE);
-	return((boolean)(EPRI(pri)->shralign == Amask2align(lev->altarmask & ~AM_SHRINE)));
+	if (!pri) return FALSE;
+	epri_p = EPRI(pri);
+	lev = &levl[epri_p->shrpos.x][epri_p->shrpos.y];
+	if (!IS_ALTAR(lev->typ) || !(lev->altarmask & AM_SHRINE)) return FALSE;
+	return (boolean)(epri_p->shralign ==
+				 (Amask2align(lev->altarmask & ~AM_SHRINE)));
 }
 
 struct monst *
@@ -344,81 +346,133 @@ char roomno;
 /* called from check_special_room() when the player enters the temple room */
 void
 intemple(roomno)
-register int roomno;
+int roomno;
 {
-	register struct monst *priest = findpriest((char)roomno);
-	boolean tended = (priest != (struct monst *)0);
-	boolean shrined, sanctum, can_speak;
-	const char *msg1, *msg2;
-	char buf[BUFSZ];
+    struct monst *priest, *mtmp;
+    struct epri *epri_p;
+    boolean shrined, sanctum, can_speak;
+    long *this_time, *other_time;
+    const char *msg1, *msg2;
+    char buf[BUFSZ];
 
-	if(!temple_occupied(u.urooms0)) {
-	    if(tended) {
-		shrined = has_shrine(priest);
-		sanctum = (priest->data == &mons[PM_HIGH_PRIEST] &&
-			   (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
-		can_speak = (priest->mcanmove && !priest->msleeping &&
-			     !Deaf);
-		if (can_speak) {
-		    unsigned save_priest = priest->ispriest;
-		    /* don't reveal the altar's owner upon temple entry in
-		       the endgame; for the Sanctum, the next message names
-		       Moloch so suppress the "of Moloch" for him here too */
-		    if (sanctum && !Hallucination) priest->ispriest = 0;
-		    pline("%s intones:",
-			canseemon(priest) ? Monnam(priest) : "A nearby voice");
-		    priest->ispriest = save_priest;
-		}
-		msg2 = 0;
-		if(sanctum && Is_sanctum(&u.uz)) {
-		    if(priest->mpeaceful) {
-			msg1 = "Infidel, you have entered Moloch's Sanctum!";
-			msg2 = "Be gone!";
-			priest->mpeaceful = 0;
-			set_malign(priest);
-		    } else
-			msg1 = "You desecrate this place by your presence!";
-		} else {
-		    Sprintf(buf, "Pilgrim, you enter a %s place!",
-			    !shrined ? "desecrated" : "sacred");
-		    msg1 = buf;
-		}
-		if (can_speak) {
-		    verbalize(msg1);
-		    if (msg2) verbalize(msg2);
-		}
-		if(!sanctum) {
-		    /* !tended -> !shrined */
-		    if (!shrined || !p_coaligned(priest) ||
-			    u.ualign.record <= ALGN_SINNED)
-			You("have a%s forbidding feeling...",
-				(!shrined) ? "" : " strange");
-		    else You("experience a strange sense of peace.");
-		}
+    /* don't do anything if hero is already in the room */
+    if (temple_occupied(u.urooms0)) return;
+
+    if ((priest = findpriest((char)roomno)) != 0) {
+	/* tended */
+
+	epri_p = EPRI(priest);
+	shrined = has_shrine(priest);
+	sanctum = (priest->data == &mons[PM_HIGH_PRIEST] &&
+		    (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
+	can_speak = (priest->mcanmove && !priest->msleeping);
+	if (can_speak && !Deaf && moves >= epri_p->intone_time) {
+	    unsigned save_priest = priest->ispriest;
+
+	    /* don't reveal the altar's owner upon temple entry in
+	       the endgame; for the Sanctum, the next message names
+	       Moloch so suppress the "of Moloch" for him here too */
+	    if (sanctum && !Hallucination) priest->ispriest = 0;
+	    pline("%s intones:",
+		  canseemon(priest) ? Monnam(priest) : "A nearby voice");
+	    priest->ispriest = save_priest;
+	    epri_p->intone_time = moves + (long)d(10, 500);	/* ~2505 */
+	    /* make sure that we don't suppress entry message when
+	       we've just given its "priest intones" introduction */
+	    epri_p->enter_time = 0L;
+	}
+	msg1 = msg2 = 0;
+	if (sanctum && Is_sanctum(&u.uz)) {
+	    if (priest->mpeaceful) {
+		/* first time inside */
+		msg1 = "Infidel, you have entered Moloch's Sanctum!";
+		msg2 = "Be gone!";
+		priest->mpeaceful = 0;
+		/* became angry voluntarily; no penalty for attacking him */
+		set_malign(priest);
 	    } else {
-		switch(rn2(3)) {
-		  case 0: You("have an eerie feeling..."); break;
-		  case 1: You_feel("like you are being watched."); break;
-		  default: pline("A shiver runs down your %s.",
-			body_part(SPINE)); break;
-		}
-		if(!rn2(5)) {
-		    struct monst *mtmp;
+		/* repeat visit, or attacked priest before entering */
+		msg1 = "You desecrate this place by your presence!";
+	    }
+	} else if (moves >= epri_p->enter_time) {
+	    Sprintf(buf, "Pilgrim, you enter a %s place!",
+		    !shrined ? "desecrated" : "sacred");
+	    msg1 = buf;
+	}
+	if (msg1 && can_speak && !Deaf) {
+	    verbalize(msg1);
+	    if (msg2) verbalize(msg2);
+	    epri_p->enter_time = moves + (long)d(10, 100);	/* ~505 */
+	}
+	if (!sanctum) {
+	    if (!shrined || !p_coaligned(priest) ||
+		    u.ualign.record <= ALGN_SINNED) {
+		msg1 = "have a%s forbidding feeling...";
+		msg2 = (!shrined || !p_coaligned(priest)) ? "" : " strange";
+		this_time = &epri_p->hostile_time;
+		other_time = &epri_p->peaceful_time;
+	    } else {
+		msg1 = "experience %s sense of peace.";
+		msg2 = (u.ualign.record >= ALGN_PIOUS) ? "a" : "an unusual";
+		this_time = &epri_p->peaceful_time;
+		other_time = &epri_p->hostile_time;
+	    }
+	    /* give message if we haven't seen it recently or
+	       if alignment update has caused it to switch from
+	       forbidding to sense-of-peace or vice versa */
+	    if (moves >= *this_time || *other_time >= *this_time) {
+		You(msg1, msg2);
+		*this_time = moves + (long)d(10, 20);	/* ~55 */
+		/* avoid being tricked by the RNG:  switch might have just
+		   happened and previous random threshold could be larger */
+		if (*this_time <= *other_time) *other_time = *this_time - 1L;
+	    }
+	}
+    } else {
+	/* untended */
 
-		    if(!(mtmp = makemon(&mons[PM_GHOST],u.ux,u.uy,NO_MM_FLAGS)))
-			return;
-		    if (!Blind || sensemon(mtmp))
-			pline("An enormous ghost appears next to you!");
-		    else You("sense a presence close by!");
-		    mtmp->mpeaceful = 0;
-		    set_malign(mtmp);
-		    if(flags.verbose)
-			You("are frightened to death, and unable to move.");
-		    nomul(-3);
-		    nomovemsg = "You regain your composure.";
-	       }
-	   }
-       }
+	switch (rn2(4)) {
+	case 0:  You("have an eerie feeling..."); break;
+	case 1:  You_feel("like you are being watched."); break;
+	case 2:  pline("A shiver runs down your %s.",
+		       body_part(SPINE)); break;
+	default: break;	/* no message; unfortunately there's no
+			   EPRI(priest)->eerie_time available to
+			   make sure we give one the first time */
+	}
+	if (!rn2(5) &&
+	    (mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, NO_MM_FLAGS)) != 0) {
+	    /* [TODO: alter this (at a minimum, by switching from
+	       an exclamation to a simple declaration) if hero has
+	       already killed enough ghosts.] */
+	    if (canspotmon(mtmp))
+		pline("An enormous ghost appears next to you!");
+	    else
+		You("sense a presence close by!");
+	    mtmp->mpeaceful = 0;
+	    set_malign(mtmp);
+	    if (flags.verbose)
+		You("are frightened to death, and unable to move.");
+	    nomul(-3);
+	    nomovemsg = "You regain your composure.";
+	}
+    }
+}
+
+/* reset the move counters used to limit temple entry feedback;
+   leaving the level and then returning yields a fresh start */
+void
+forget_temple_entry(priest)
+struct monst *priest;
+{
+    struct epri *epri_p = priest->ispriest ? EPRI(priest) : 0;
+
+    if (!epri_p) {
+	impossible("attempting to manipulate shrine data for non-priest?");
+	return;
+    }
+    epri_p->intone_time = epri_p->enter_time =
+	epri_p->peaceful_time = epri_p->hostile_time = 0L;
 }
 
 void

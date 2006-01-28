@@ -108,6 +108,7 @@ fix wording for "leprechaun steals gold from between your feet" when mounted
 fix monsndx panic which happened after currently moving monster expelled
 	swallowed hero onto magic trap and was made tame by its effect; taming
 	no longer replaces monster
+reduced message verbosity when re-entering a temple
 
 
 Platform- and/or Interface-Specific Fixes

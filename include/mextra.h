@@ -86,6 +86,10 @@ struct epri {
 	schar shroom;		/* index in rooms */
 	coord shrpos;		/* position of shrine */
 	d_level shrlevel;	/* level (& dungeon) of shrine */
+	long intone_time,	/* used to limit verbosity  +*/
+	     enter_time,	/*+ of temple entry messages */
+	     hostile_time,	/* forbidding feeling */
+	     peaceful_time;	/* sense of peace */
 };
 /* note: roaming priests (no shrine) switch from ispriest to isminion
    (and emin extension) */
