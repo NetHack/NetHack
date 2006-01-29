@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkroom.c	3.5	2005/03/12	*/
+/*	SCCS Id: @(#)mkroom.c	3.5	2006/01/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -483,11 +483,19 @@ shrine_pos(roomno)
 int roomno;
 {
 	static coord buf;
+	int delta;
 	struct mkroom *troom = &rooms[roomno - ROOMOFFSET];
 
-	buf.x = troom->lx + ((troom->hx - troom->lx) / 2);
-	buf.y = troom->ly + ((troom->hy - troom->ly) / 2);
-	return(&buf);
+	/* if width and height are odd, placement will be the exact center;
+	   if either or both are even, center point is a hypothetical spot
+	   between map locations and placement will be adjacent to that */
+	delta = troom->hx - troom->lx;
+	buf.x = troom->lx + delta / 2;
+	if ((delta % 2) && rn2(2)) buf.x++;
+	delta = troom->hy - troom->ly;
+	buf.y = troom->ly + delta / 2;
+	if ((delta % 2) && rn2(2)) buf.y++;
+	return &buf;
 }
 
 STATIC_OVL void
@@ -555,14 +563,14 @@ int
 somex(croom)
 register struct mkroom *croom;
 {
-	return rn2(croom->hx-croom->lx+1) + croom->lx;
+	return rn1(croom->hx - croom->lx + 1, croom->lx);
 }
 
 int
 somey(croom)
 register struct mkroom *croom;
 {
-	return rn2(croom->hy-croom->ly+1) + croom->ly;
+	return rn1(croom->hy - croom->ly + 1, croom->ly);
 }
 
 boolean

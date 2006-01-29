@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sp_lev.c	3.5	2006/01/02	*/
+/*	SCCS Id: @(#)sp_lev.c	3.5	2006/01/28	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -620,7 +620,8 @@ struct mkroom *broom;
 		dpos = dd->pos;
 		if (dpos == -1)	/* The position is RANDOM */
 		    dpos = rn2((dwall == W_WEST || dwall == W_EAST) ?
-			    (broom->hy - broom->ly) : (broom->hx - broom->lx));
+			       (broom->hy - broom->ly + 1) :
+			       (broom->hx - broom->lx + 1));
 
 		/* Convert wall and pos into an absolute coordinate! */
 

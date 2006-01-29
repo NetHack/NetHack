@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mklev.c	3.5	2001/11/29	*/
+/*	SCCS Id: @(#)mklev.c	3.5	2006/01/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -83,8 +83,8 @@ xchar xl,yl,xh,yh;
 {
 	register xchar x, y;
 
-	x = (xl == xh) ? xl : (xl + rn2(xh-xl+1));
-	y = (yl == yh) ? yl : (yl + rn2(yh-yl+1));
+	x = rn1(xh - xl + 1, xl);
+	y = rn1(yh - yl + 1, yl);
 	if(okdoor(x, y))
 		goto gotit;
 
