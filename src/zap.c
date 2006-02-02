@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2005/11/02	*/
+/*	SCCS Id: @(#)zap.c	3.5	2006/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -19,8 +19,9 @@ extern boolean notonhead;	/* for long worms */
 /* kludge to use mondied instead of killed */
 extern boolean m_using;
 
-STATIC_DCL void FDECL(polyuse, (struct obj*, int, int));
-STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
+STATIC_DCL void FDECL(learnwand, (struct obj *));
+STATIC_DCL void FDECL(polyuse, (struct obj *,int,int));
+STATIC_DCL void FDECL(create_polymon, (struct obj *,int));
 STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
 STATIC_DCL int FDECL(zhitm, (struct monst *,int,int,struct obj **));
 STATIC_DCL void FDECL(zhitu, (int,int,const char *,XCHAR_P,XCHAR_P));
@@ -91,6 +92,58 @@ const char * const flash_types[] = {	/* also used in buzzmu(mcastu.c) */
 	""
 };
 
+/*
+ * Recognizing unseen wands by zapping:  in 3.4.3 and earlier, zapping
+ * most wand types while blind would add that type to the discoveries
+ * list even if it had never been seen (ie, picked up while blinded
+ * and shown in inventory as simply "a wand").  This behavior has been
+ * changed; now such wands won't be discovered.  But if the type is
+ * already discovered, then the individual wand whose effect was just
+ * observed will be flagged as if seen.  [You already know wands of
+ * striking; you zap "a wand" and observe striking effect (presumeably
+ * by sound or touch); it'll become shown in inventory as "a wand of
+ * striking".]
+ *
+ * Unfortunately, the new behavior isn't really correct either.  There
+ * should be an `eknown' bit for "effect known" added for wands (and
+ * for potions since quaffing one of a stack is similar) so that the
+ * particular wand which has been zapped would have its type become
+ * known (it would change from "a wand" to "a wand of striking", for
+ * example) without the type becoming discovered or other unknown wands
+ * of that type showing additional information.  When blindness ends,
+ * all objects in inventory with the eknown bit set would be discovered
+ * and other items of the same type would become known as such.
+ */
+
+/* wand discovery gets special handling when hero is blinded */
+STATIC_OVL void
+learnwand(obj)
+struct obj *obj;
+{
+    /* For a wand (or wand-like tool) zapped by the player, if the
+       effect was observable (determined by caller; usually seen, but
+       possibly heard or felt if the hero is blinded) then discover the
+       object type provided that the object itself is known (as more
+       than just "a wand").  If object type is already discovered and
+       we observed the effect, mark the individual wand as having been
+       seen.  Suppress spells (which use fake spellbook object for `obj')
+       so that casting a spell won't re-discover its forgotten book. */
+    if (obj->oclass != SPBOOK_CLASS) {
+	/* if type already discovered, treat this item has having been seen
+	   even if the hero is currently blinded (skips redundant makeknown) */
+	if (objects[obj->otyp].oc_name_known) {
+	    obj->dknown = 1;	/* will usually be set already */
+	/* otherwise discover it if this item itself has been or can be seen */
+	} else {
+	    /* in case it was picked up while blind and then zapped without
+	       examining inventory after regaining sight (bypassing xname()) */
+	    if (!Blind) obj->dknown = 1;
+	    /* make the discovery iff we know what we're manipulating */
+	    if (obj->dknown) makeknown(obj->otyp);
+	}
+    }
+}
+
 /* Routines for IMMEDIATE wands and spells. */
 /* bhitm: monster mtmp was hit by the effect of wand or spell otmp */
 int
@@ -99,7 +152,7 @@ struct monst *mtmp;
 struct obj *otmp;
 {
 	boolean wake = TRUE;	/* Most 'zaps' should wake monster */
-	boolean reveal_invis = FALSE;
+	boolean reveal_invis = FALSE, learn_it = FALSE;
 	boolean dbldam = Role_if(PM_KNIGHT) && u.uhave.questart;
 	int dmg, otyp = otmp->otyp;
 	const char *zap_type_text = "spell";
@@ -127,7 +180,7 @@ struct obj *otmp;
 			hit(zap_type_text, mtmp, exclam(dmg));
 			(void) resist(mtmp, otmp->oclass, dmg, TELL);
 		} else miss(zap_type_text, mtmp);
-		makeknown(otyp);
+		learn_it = TRUE;
 		break;
 	case WAN_SLOW_MONSTER:
 	case SPE_SLOW_MONSTER:
@@ -179,7 +232,7 @@ struct obj *otmp;
 		    if (mtmp->cham == CHAM_ORDINARY && !rn2(25)) {
 			if (canseemon(mtmp)) {
 			    pline("%s shudders!", Monnam(mtmp));
-			    makeknown(otyp);
+			    learn_it = TRUE;
 			}
 			/* dropped inventory shouldn't be hit by this zap */
 			for (obj = mtmp->minvent; obj; obj = obj->nobj)
@@ -190,7 +243,7 @@ struct obj *otmp;
 		    } else if (newcham(mtmp, (struct permonst *)0,
 				       (otyp != POT_POLYMORPH), FALSE)) {
 			if (!Hallucination && canspotmon(mtmp))
-			    makeknown(otyp);
+			    learn_it = TRUE;
 		    }
 		}
 		break;
@@ -212,7 +265,7 @@ struct obj *otmp;
 		mon_set_minvis(mtmp);
 		if (!oldinvis && knowninvisible(mtmp)) {
 		    pline("%s turns transparent!", nambuf);
-		    makeknown(otyp);
+		    learn_it = TRUE;
 		}
 		break;
 	    }
@@ -225,7 +278,7 @@ struct obj *otmp;
 		wake = FALSE;
 		reveal_invis = TRUE;
 		probe_monster(mtmp);
-		makeknown(otyp);
+		learn_it = TRUE;
 		break;
 	case WAN_OPENING:
 	case SPE_KNOCK:
@@ -283,7 +336,7 @@ struct obj *otmp;
 		break;
 	case WAN_LIGHT:	/* (broken wand) */
 		if (flash_hits_mon(mtmp, otmp)) {
-		    makeknown(WAN_LIGHT);
+		    learn_it = TRUE;
 		    reveal_invis = TRUE;
 		}
 		break;
@@ -293,7 +346,7 @@ struct obj *otmp;
 		reveal_invis = TRUE;
 		if (sleep_monst(mtmp, d(1 + otmp->spe, 12), WAND_CLASS))
 		    slept_monst(mtmp);
-		if (!Blind) makeknown(WAN_SLEEP);
+		if (!Blind) learn_it = TRUE;
 		break;
 	case SPE_STONE_TO_FLESH:
 		if (monsndx(mtmp->data) == PM_STONE_GOLEM) {
@@ -351,6 +404,9 @@ struct obj *otmp;
 							!canspotmon(mtmp))
 		map_invisible(bhitpos.x, bhitpos.y);
 	}
+	/* if effect was observable then discover the wand type provided
+	   that the wand itself has been seen */
+	if (learn_it) learnwand(otmp);
 	return 0;
 }
 
@@ -1447,7 +1503,16 @@ bhito(obj, otmp)
 struct obj *obj, *otmp;
 {
 	int res = 1;	/* affected object by default */
+	boolean learn_it = FALSE, maybelearnit;
 	xchar refresh_x, refresh_y;
+
+	/* fundamental: a wand effect hitting itself doesn't do anything;
+	   otherwise we need to guard against accessing otmp after something
+	   strange has happened to it (along the lines of polymorph or
+	   stone-to-flesh [which aren't good examples since polymorph wands
+	   aren't affected by polymorph zaps and stone-to-flesh isn't
+	   available in wand form, but the concept still applies...]) */
+	if (obj == otmp) return 0;
 
 	if (obj->bypass) {
 		/* The bypass bit is currently only used as follows:
@@ -1493,8 +1558,8 @@ struct obj *obj, *otmp;
 		res = 0;
 	} else if (obj == uchain) {
 		if (otmp->otyp == WAN_OPENING || otmp->otyp == SPE_KNOCK) {
+		    learn_it = TRUE;
 		    unpunish();
-		    makeknown(otmp->otyp);
 		} else
 		    res = 0;
 	} else
@@ -1514,8 +1579,7 @@ struct obj *obj, *otmp;
 		if (Is_box(obj)) (void) boxlock(obj, otmp);
 
 		if (obj_shudders(obj)) {
-		    if (cansee(obj->ox, obj->oy))
-			makeknown(otmp->otyp);
+		    if (cansee(obj->ox, obj->oy)) learn_it = TRUE;
 		    do_osshock(obj);
 		    break;
 		}
@@ -1539,23 +1603,25 @@ struct obj *obj, *otmp;
 		    }
 		    res = 1;
 		}
-		if (res) makeknown(WAN_PROBING);
+		if (res) learn_it = TRUE;
 		break;
 	case WAN_STRIKING:
 	case SPE_FORCE_BOLT:
-		if (obj->otyp == BOULDER)
-			fracture_rock(obj);
-		else if (obj->otyp == STATUE)
-			(void) break_statue(obj);
-		else {
-			if (!context.mon_moving)
-			    (void)hero_breaks(obj, obj->ox, obj->oy, FALSE);
-			else
-			    (void)breaks(obj, obj->ox, obj->oy);
-			res = 0;
+		/* learn the type if you see or hear something break
+		   (the sound could be implicit) */
+		maybelearnit = cansee(obj->ox, obj->oy) || !Deaf;
+		if (obj->otyp == BOULDER) {
+		    fracture_rock(obj);
+		} else if (obj->otyp == STATUE) {
+		    (void) break_statue(obj);
+		} else {
+		    if (context.mon_moving ?
+			    !breaks(obj, obj->ox, obj->oy) :
+			    !hero_breaks(obj, obj->ox, obj->oy, FALSE))
+			maybelearnit = FALSE;	/* nothing broke */
+		    res = 0;
 		}
-		/* BUG[?]: shouldn't this depend upon you seeing it happen? */
-		makeknown(otmp->otyp);
+		if (maybelearnit) learn_it = TRUE;
 		break;
 	case WAN_CANCELLATION:
 	case SPE_CANCELLATION:
@@ -1586,22 +1652,17 @@ struct obj *obj, *otmp;
 
 		    res = !!revive(obj, TRUE);
 		    if (res && Role_if(PM_HEALER)) {
-			boolean u_noticed = FALSE;
-
 			if (Hallucination && !Deaf) {
 			    You_hear("the sound of a defibrillator.");
-			    u_noticed = TRUE;
+			    learn_it = TRUE;
 			} else if (!Blind) {
 			    You("observe %s %s change dramatically.",
 				s_suffix(an(mons[corpsenm].mname)),
 				nonliving(&mons[corpsenm]) ?
 					"motility" : "health");
-			    u_noticed = TRUE;
+			    learn_it = TRUE;
 			}
-			if (u_noticed) {
-			    makeknown(otmp->otyp);
-			    exercise(A_WIS, TRUE);
-			}
+			if (learn_it) exercise(A_WIS, TRUE);
 		    }
 		}
 		break;
@@ -1613,8 +1674,7 @@ struct obj *obj, *otmp;
 			res = boxlock(obj, otmp);
 		else
 			res = 0;
-		if (res /* && otmp->oclass == WAND_CLASS */)
-			makeknown(otmp->otyp);
+		if (res) learn_it = TRUE;
 		break;
 	case WAN_SLOW_MONSTER:		/* no effect on objects */
 	case SPE_SLOW_MONSTER:
@@ -1726,6 +1786,9 @@ smell:
 		impossible("What an interesting effect (%d)", otmp->otyp);
 		break;
 	}
+	/* if effect was observable then discover the wand type provided
+	   that the wand itself has been seen */
+	if (learn_it) learnwand(otmp);
 	return res;
 }
 
@@ -1748,8 +1811,8 @@ bhitpile(obj,fhito,tx,ty)
 	   (below), rather than on the current object, if it happens to
 	   encounter a statue which mustn't become animated. */
 	if (t && t->ttyp == STATUE_TRAP &&
-	    activate_statue_trap(t, tx, ty, TRUE) && obj->otyp == WAN_STRIKING)
-	    makeknown(obj->otyp);
+		activate_statue_trap(t, tx, ty, TRUE))
+	    learnwand(obj);
     }
 
     poly_zapped = -1;
@@ -1823,9 +1886,12 @@ register struct obj *obj;
 			exercise(A_WIS, TRUE);
 			break;
 	}
-	if (known && !objects[obj->otyp].oc_name_known) {
-		makeknown(obj->otyp);
+	if (known) {
+	    if (!objects[obj->otyp].oc_name_known)
 		more_experienced(0,10);
+	    /* effect was observable; discover the wand type provided
+	       that the wand itself has been seen */
+	    learnwand(obj);
 	}
 }
 
@@ -1897,12 +1963,13 @@ zapyourself(obj, ordinary)
 struct obj *obj;
 boolean ordinary;
 {
+	boolean learn_it = FALSE;
 	int	damage = 0;
 
 	switch(obj->otyp) {
 		case WAN_STRIKING:
-		    makeknown(WAN_STRIKING);
 		case SPE_FORCE_BOLT:
+		    learn_it = TRUE;
 		    if(Antimagic) {
 			shieldeff(u.ux, u.uy);
 			pline("Boing!");
@@ -1917,7 +1984,7 @@ boolean ordinary;
 		    break;
 
 		case WAN_LIGHTNING:
-		    makeknown(WAN_LIGHTNING);
+		    learn_it = TRUE;
 		    if (!Shock_resistance) {
 			You("shock yourself!");
 			damage = d(12,6);
@@ -1937,8 +2004,8 @@ boolean ordinary;
 		    explode(u.ux, u.uy, 11, d(6,6), WAND_CLASS, EXPL_FIERY);
 		    break;
 		case WAN_FIRE:
-		    makeknown(WAN_FIRE);
 		case FIRE_HORN:
+		    learn_it = TRUE;
 		    if (Fire_resistance) {
 			shieldeff(u.ux, u.uy);
 			You_feel("rather warm.");
@@ -1955,9 +2022,9 @@ boolean ordinary;
 		    break;
 
 		case WAN_COLD:
-		    makeknown(WAN_COLD);
 		case SPE_CONE_OF_COLD:
 		case FROST_HORN:
+		    learn_it = TRUE;
 		    if (Cold_resistance) {
 			shieldeff(u.ux, u.uy);
 			You_feel("a little chill.");
@@ -1970,8 +2037,8 @@ boolean ordinary;
 		    break;
 
 		case WAN_MAGIC_MISSILE:
-		    makeknown(WAN_MAGIC_MISSILE);
 		case SPE_MAGIC_MISSILE:
+		    learn_it = TRUE;
 		    if(Antimagic) {
 			shieldeff(u.ux, u.uy);
 			pline_The("missiles bounce!");
@@ -1982,11 +2049,11 @@ boolean ordinary;
 		    break;
 
 		case WAN_POLYMORPH:
-		    if (!Unchanging)
-		    	makeknown(WAN_POLYMORPH);
 		case SPE_POLYMORPH:
-		    if (!Unchanging)
-		    	polyself(0);
+		    if (!Unchanging) {
+			learn_it = TRUE;
+			polyself(0);
+		    }
 		    break;
 
 		case WAN_CANCELLATION:
@@ -1995,12 +2062,12 @@ boolean ordinary;
 		    break;
 
 		case SPE_DRAIN_LIFE:
-			if (!Drain_resistance) {
-				losexp("life drainage");
-				makeknown(obj->otyp);
-			}
-			damage = 0;	/* No additional damage */
-			break;
+		    if (!Drain_resistance) {
+			learn_it = TRUE;	/* (no effect for spells...) */
+			losexp("life drainage");
+		    }
+		    damage = 0;	/* No additional damage */
+		    break;
 
 		case WAN_MAKE_INVISIBLE: {
 		    /* have to test before changing HInvis but must change
@@ -2019,7 +2086,7 @@ boolean ordinary;
 		    	incr_itimeout(&HInvis, d(obj->spe, 250));
 		    }
 		    if (msg) {
-			makeknown(WAN_MAKE_INVISIBLE);
+			learn_it = TRUE;
 			newsym(u.ux, u.uy);
 			self_invis_message();
 		    }
@@ -2028,19 +2095,19 @@ boolean ordinary;
 
 		case WAN_SPEED_MONSTER:
 		    if (!(HFast & INTRINSIC)) {
+			learn_it = TRUE;
 			if (!Fast)
 			    You("speed up.");
 			else
 			    Your("quickness feels more natural.");
-			makeknown(WAN_SPEED_MONSTER);
 			exercise(A_DEX, TRUE);
 		    }
 		    HFast |= FROMOUTSIDE;
 		    break;
 
 		case WAN_SLEEP:
-		    makeknown(WAN_SLEEP);
 		case SPE_SLEEP:
+		    learn_it = TRUE;
 		    if(Sleep_resistance) {
 			shieldeff(u.ux, u.uy);
 			You("don't feel sleepy!");
@@ -2053,14 +2120,19 @@ boolean ordinary;
 		case WAN_SLOW_MONSTER:
 		case SPE_SLOW_MONSTER:
 		    if(HFast & (TIMEOUT | INTRINSIC)) {
+			learn_it = TRUE;
 			u_slow_down();
-			makeknown(obj->otyp);
 		    }
 		    break;
 
 		case WAN_TELEPORTATION:
 		case SPE_TELEPORT_AWAY:
 		    tele();
+		    /* same criteria as when mounted (zap_steed) */
+		    if ((Teleport_control && !Stunned) ||
+			    !couldsee(u.ux0, u.uy0) ||
+			    distu(u.ux0, u.uy0) >= 16)
+			learn_it = TRUE;
 		    break;
 
 		case WAN_DEATH:
@@ -2071,17 +2143,17 @@ boolean ordinary;
 			  : "You seem no deader than before.");
 			break;
 		    }
+		    learn_it = TRUE;
 		    Sprintf(killer.name,"shot %sself with a death ray",uhim());
 		    killer.format = NO_KILLER_PREFIX;
 		    You("irradiate yourself with pure energy!");
 		    You("die.");
-		    makeknown(obj->otyp);
 			/* They might survive with an amulet of life saving */
 		    done(DIED);
 		    break;
 		case WAN_UNDEAD_TURNING:
-		    makeknown(WAN_UNDEAD_TURNING);
 		case SPE_TURN_UNDEAD:
+		    learn_it = TRUE;
 		    (void) unturn_dead(&youmonst);
 		    if (is_undead(youmonst.data)) {
 			You_feel("frightened and %sstunned.",
@@ -2092,6 +2164,7 @@ boolean ordinary;
 		    break;
 		case SPE_HEALING:
 		case SPE_EXTRA_HEALING:
+		    learn_it = TRUE;	/* (no effect for spells...) */
 		    healup(d(6, obj->otyp == SPE_EXTRA_HEALING ? 8 : 4),
 			   0, FALSE, (obj->otyp == SPE_EXTRA_HEALING));
 		    You_feel("%sbetter.",
@@ -2104,13 +2177,15 @@ boolean ordinary;
 		case EXPENSIVE_CAMERA:
 #endif
 		    damage += rnd(25);
-		    if (flashburn((long)damage)) makeknown(obj->otyp);
+		    if (flashburn((long)damage)) learn_it = TRUE;
 		    damage = 0;	/* reset */
 		    break;
 		case WAN_OPENING:
-		    if (Punished) makeknown(WAN_OPENING);
 		case SPE_KNOCK:
-		    if (Punished) Your("chain quivers for a moment.");
+		    if (Punished) {
+			learn_it = TRUE;
+			unpunish();
+		    }
 		    break;
 		case WAN_DIGGING:
 		case SPE_DIG:
@@ -2120,25 +2195,33 @@ boolean ordinary;
 		case SPE_WIZARD_LOCK:
 		    break;
 		case WAN_PROBING:
-		    for (obj = invent; obj; obj = obj->nobj)
-			obj->dknown = 1;
-		    /* note: `obj' reused; doesn't point at wand anymore */
-		    makeknown(WAN_PROBING);
+		  {
+		    struct obj *otmp;
+
+		    for (otmp = invent; otmp; otmp = otmp->nobj)
+			otmp->dknown = 1;
+		    learn_it = TRUE;
 		    ustatusline();
 		    break;
+		  }
 		case SPE_STONE_TO_FLESH:
-		    {
-		    struct obj *otemp, *onext;
+		  {
+		    struct obj *otmp, *onxt;
 		    boolean didmerge;
 
-		    if (u.umonnum == PM_STONE_GOLEM)
+		    if (u.umonnum == PM_STONE_GOLEM) {
+			learn_it = TRUE;
 			(void) polymon(PM_FLESH_GOLEM);
-		    if (Stoned) fix_petrification();	/* saved! */
+		    }
+		    if (Stoned) {
+			learn_it = TRUE;
+			fix_petrification();	/* saved! */
+		    }
 		    /* but at a cost.. */
-		    for (otemp = invent; otemp; otemp = onext) {
-			onext = otemp->nobj;
-			(void) bhito(otemp, obj);
-			}
+		    for (otmp = invent; otmp; otmp = onxt) {
+			onxt = otmp->nobj;
+			if (bhito(otmp, obj)) learn_it = TRUE;
+		    }
 		    /*
 		     * It is possible that we can now merge some inventory.
 		     * Do a higly paranoid merge.  Restart from the beginning
@@ -2146,18 +2229,22 @@ boolean ordinary;
 		     */
 		    do {
 			didmerge = FALSE;
-			for (otemp = invent; !didmerge && otemp; otemp = otemp->nobj)
-			    for (onext = otemp->nobj; onext; onext = onext->nobj)
-			    	if (merged(&otemp, &onext)) {
-			    		didmerge = TRUE;
-			    		break;
-			    		}
+			for (otmp = invent; !didmerge && otmp; otmp = otmp->nobj)
+			    for (onxt = otmp->nobj; onxt; onxt = onxt->nobj)
+				if (merged(&otmp, &onxt)) {
+				    didmerge = TRUE;
+				    break;
+				}
 		    } while (didmerge);
-		    }
 		    break;
-		default: impossible("object %d used?",obj->otyp);
+		  }
+		default:
+		    impossible("zapyourself: object %d used?", obj->otyp);
 		    break;
 	}
+	/* if effect was observable then discover the wand type provided
+	   that the wand itself has been seen */
+	if (learn_it) learnwand(obj);
 	return(damage);
 }
 
@@ -2194,16 +2281,18 @@ struct obj *obj;	/* wand or spell */
 	    */
 		case WAN_PROBING:
 		    probe_monster(u.usteed);
-		    makeknown(WAN_PROBING);
+		    learnwand(obj);
 		    steedhit = TRUE;
 		    break;
 		case WAN_TELEPORTATION:
 		case SPE_TELEPORT_AWAY:
 		    /* you go together */
 		    tele();
-		    if(Teleport_control || !couldsee(u.ux0, u.uy0) ||
-			(distu(u.ux0, u.uy0) >= 16))
-				makeknown(obj->otyp);
+		    /* same criteria as when unmounted (zapyourself) */
+		    if ((Teleport_control && !Stunned) ||
+			    !couldsee(u.ux0, u.uy0) ||
+			    distu(u.ux0, u.uy0) >= 16)
+			learnwand(obj);
 		    steedhit = TRUE;
 		    break;
 
@@ -2512,9 +2601,9 @@ struct	obj	*obj;
 		impossible("weffects: unexpected spell or wand");
 	    disclose = TRUE;
 	}
-	if (disclose && was_unkn) {
-	    makeknown(otyp);
-	    more_experienced(0,10);
+	if (disclose) {
+	    learnwand(obj);
+	    if (was_unkn) more_experienced(0, 10);
 	}
 	return;
 }
@@ -2711,30 +2800,34 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 		break;
 	    }
 
-	    if (weapon == ZAPPED_WAND && find_drawbridge(&x,&y))
+	    if (weapon == ZAPPED_WAND && find_drawbridge(&x,&y)) {
+		boolean learn_it = FALSE;
+
 		switch (obj->otyp) {
 		    case WAN_OPENING:
 		    case SPE_KNOCK:
 			if (is_db_wall(bhitpos.x, bhitpos.y)) {
 			    if (cansee(x,y) || cansee(bhitpos.x,bhitpos.y))
-				makeknown(obj->otyp);
+				learn_it = TRUE;
 			    open_drawbridge(x,y);
 			}
 			break;
 		    case WAN_LOCKING:
 		    case SPE_WIZARD_LOCK:
-			if ((cansee(x,y) || cansee(bhitpos.x, bhitpos.y))
-			    && levl[x][y].typ == DRAWBRIDGE_DOWN)
-			    makeknown(obj->otyp);
+			if ((cansee(x,y) || cansee(bhitpos.x, bhitpos.y)) &&
+				levl[x][y].typ == DRAWBRIDGE_DOWN)
+			    learn_it = TRUE;
 			close_drawbridge(x,y);
 			break;
 		    case WAN_STRIKING:
 		    case SPE_FORCE_BOLT:
 			if (typ != DRAWBRIDGE_UP)
 			    destroy_drawbridge(x,y);
-			makeknown(obj->otyp);
+			learn_it = TRUE;
 			break;
 		}
+		if (learn_it) learnwand(obj);
+	    }
 
 	    mtmp = m_at(bhitpos.x, bhitpos.y);
 		
@@ -2833,10 +2926,10 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 		case SPE_FORCE_BOLT:
 		    if (doorlock(obj, bhitpos.x, bhitpos.y)) {
 			if (cansee(bhitpos.x, bhitpos.y) ||
-			    (obj->otyp == WAN_STRIKING))
-			    makeknown(obj->otyp);
-			if (levl[bhitpos.x][bhitpos.y].doormask == D_BROKEN
-			    && *in_rooms(bhitpos.x, bhitpos.y, SHOPBASE)) {
+				(obj->otyp == WAN_STRIKING && !Deaf))
+			    learnwand(obj);
+			if (levl[bhitpos.x][bhitpos.y].doormask == D_BROKEN &&
+				*in_rooms(bhitpos.x, bhitpos.y, SHOPBASE)) {
 			    shopdoor = TRUE;
 			    add_damage(bhitpos.x, bhitpos.y, 400L);
 			}
