@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2005/12/05	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2006/02/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -304,7 +304,9 @@ mattacku(mtmp)
 		/* Might be attacking your image around the corner, or
 		 * invisible, or you might be blind....
 		 */
-	
+	boolean giveup = FALSE;
+		/* Are further attack attempts useless? */
+
 	if(!ranged) nomul(0);
 	if(mtmp->mhp <= 0 || (Underwater && !is_swimmer(mtmp->data)))
 	    return(0);
@@ -561,8 +563,12 @@ mattacku(mtmp)
 					sum[i] = hitmu(mtmp, mattk);
 				} else
 				    missmu(mtmp, (tmp == j), mattk);
-			    } else
+			    } else {
 				wildmiss(mtmp, mattk);
+				/* skip any remaining attacks unless this
+				   monster might attempt undirected spell */
+				giveup = !attacktype(mtmp->data, AT_MAGC);
+			    }
 			}
 			break;
 
@@ -652,19 +658,19 @@ mattacku(mtmp)
 				/* KMH -- Don't accumulate to-hit bonuses */
 				if (otmp)
 					tmp -= hittmp;
-			    } else
+			    } else {
 				wildmiss(mtmp, mattk);
+				/* skip any remaining attacks unless this
+				   monster might attempt undirected spell */
+				giveup = !attacktype(mtmp->data, AT_MAGC);
+			    }
 			}
 			break;
 		case AT_MAGC:
 			if (range2)
 			    sum[i] = buzzmu(mtmp, mattk);
-			else {
-			    if (foundyou)
-				sum[i] = castmu(mtmp, mattk, TRUE, TRUE);
-			    else
-				sum[i] = castmu(mtmp, mattk, TRUE, FALSE);
-			}
+			else
+			    sum[i] = castmu(mtmp, mattk, TRUE, foundyou);
 			break;
 
 		default:		/* no attack */
@@ -681,6 +687,7 @@ mattacku(mtmp)
 	    if(sum[i] == 2) return 1;		/* attacker dead */
 	    if(sum[i] == 3) break;  /* attacker teleported, no more attacks */
 	    /* sum[i] == 0: unsuccessful attack */
+	    if (giveup) break;	/* skip any remaining attacks */
 	}
 	return(0);
 }

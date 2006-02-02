@@ -109,6 +109,7 @@ fix monsndx panic which happened after currently moving monster expelled
 	swallowed hero onto magic trap and was made tame by its effect; taming
 	no longer replaces monster
 reduced message verbosity when re-entering a temple
+reduced message verbosity when monster with multiple attacks missed wildly
 zapping a never seen wand while blinded won't make the wand a discovery
 zapping an unID'd wand of teleportation at self will discover it (usually)
 zapping unlocking magic at self while punished will remove attached chain
