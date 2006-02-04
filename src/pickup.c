@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2005/12/07	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2006/02/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -423,6 +423,13 @@ int what;		/* should be a long */
 	boolean autopickup = what > 0;
 	struct obj *objchain;
 	int traverse_how;
+
+	/* we might have arrived here while fainted or sleeping, via
+	   random teleport or levitation timeout; if so, skip check_here
+	   and read_engr_at in addition to bypassing autopickup itself
+	   [probably ought to check whether hero is using a cockatrice
+	   corpse for a pillow here... (also at initial faint/sleep)] */
+	if (autopickup && multi < 0 && unconscious()) return 0;
 
 	if (what < 0)		/* pick N of something */
 	    count = -what;
