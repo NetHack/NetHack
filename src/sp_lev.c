@@ -2114,6 +2114,7 @@ dlb *fd;
     xchar   mustfill[(MAXNROFROOMS+1)*2];
     struct trap *badtrap;
     boolean has_bounds;
+    boolean bounds_nodigpass;
 
     (void) memset((genericptr_t)&Map[0][0], 0, sizeof Map);
     load_common_data(fd, SP_LEV_MAZE);
@@ -2134,6 +2135,9 @@ dlb *fd;
 		    levl[x][y].typ = filling;
 	    }
     }
+
+    /* if filling with stone, surrounding stone may all be nondig, nonpass */
+    bounds_nodigpass = (filling == STONE);
 
     /* Start reading the file */
     Fread((genericptr_t) &numpart, 1, sizeof(numpart), fd);
@@ -2184,6 +2188,7 @@ dlb *fd;
 	    ystart = 0;
 	    xsize = COLNO-1;
 	    ysize = ROWNO;
+	    bounds_nodigpass = FALSE;
 	} else {
 	    /* Load the map */
 	    for(y = ystart; y < ystart+ysize; y++)
@@ -2445,6 +2450,38 @@ dlb *fd;
 				  tmpdig.x2, tmpdig.y2, W_NONPASSWALL);
 	}
 
+	/* walk bounds, reset bounds_nodigpass diggable or passable */
+	if (bounds_nodigpass) {
+	    for (x = xstart; x < xstart+xsize; x++) {
+		if (!IS_STWALL(levl[x][ystart].typ) ||
+		    (levl[x][ystart].wall_info &
+		     (W_NONDIGGABLE|W_NONPASSWALL)) !=
+		    (W_NONDIGGABLE|W_NONPASSWALL) ||
+		    !IS_STWALL(levl[x][ystart+ysize-1].typ) ||
+		    (levl[x][ystart+ysize-1].wall_info &
+		     (W_NONDIGGABLE|W_NONPASSWALL)) !=
+		    (W_NONDIGGABLE|W_NONPASSWALL)) {
+		    bounds_nodigpass = FALSE;
+		    break;
+		}
+	    }
+	}
+	if (bounds_nodigpass) {
+	    for(y = ystart; y < ystart+ysize; y++) {
+		if (!IS_STWALL(levl[xstart][y].typ) ||
+		    (levl[xstart][y].wall_info &
+		     (W_NONDIGGABLE|W_NONPASSWALL)) !=
+		    (W_NONDIGGABLE|W_NONPASSWALL) ||
+		    !IS_STWALL(levl[xstart+xsize-1][y].typ) ||
+		    (levl[xstart+xsize-1][y].wall_info &
+		     (W_NONDIGGABLE|W_NONPASSWALL)) !=
+		    (W_NONDIGGABLE|W_NONPASSWALL)) {
+		    bounds_nodigpass = FALSE;
+		    break;
+		}
+	    }
+	}
+
 	Fread((genericptr_t) &n, 1, sizeof(n), fd);
 						/* Number of ladders */
 	while(n--) {
@@ -2643,6 +2680,19 @@ dlb *fd;
 		    (void) maketrap(mm.x, mm.y, trytrap);
 	    }
     }
+
+    /*
+     * If bounds_nodigpass, and no mazewalks, mark all locations outside
+     * the map are mapped as nodig and nopass as well.  This avoids passwall
+     * monsters like Xorns from appearing outside the accessible area.
+     */
+    if (bounds_nodigpass && !nwalk_sav) {
+	for(x = 1; x < COLNO; x++)
+	    for(y = 0; y < ROWNO; y++)
+	    if(!Map[x][y])
+		levl[x][y].wall_info |= W_NONDIGGABLE|W_NONPASSWALL;
+    }
+
     return TRUE;
 }
 
