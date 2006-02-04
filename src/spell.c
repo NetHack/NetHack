@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.5	2004/06/12	*/
+/*	SCCS Id: @(#)spell.c	3.5	2006/02/03	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,6 @@
 #define SPELLMENU_VIEW (-1)
 
 #define KEEN 20000
-#define MAX_SPELL_STUDY 3
 #define incrnknow(spell)        spl_book[spell].sp_know = KEEN
 
 #define spellev(spell)		spl_book[spell].sp_lev
@@ -319,11 +318,13 @@ learn()
 	short booktype;
 	char splname[BUFSZ];
 	boolean costly = TRUE;
+	struct obj *book = context.spbook.book;
 
 	/* JDS: lenses give 50% faster reading; 33% smaller read time */
-	if (context.spbook.delay && ublindf && ublindf->otyp == LENSES && rn2(2)) context.spbook.delay++;
+	if (context.spbook.delay && ublindf && ublindf->otyp == LENSES && rn2(2))
+	    context.spbook.delay++;
 	if (Confusion) {		/* became confused while learning */
-	    (void) confused_book(context.spbook.book);
+	    (void) confused_book(book);
 	    context.spbook.book = 0;			/* no longer studying */
 	    context.spbook.o_id = 0;
 	    nomul(context.spbook.delay); /* remaining delay is uninterrupted */
@@ -336,55 +337,65 @@ learn()
 	    return(1); /* still busy */
 	}
 	exercise(A_WIS, TRUE);		/* you're studying. */
-	booktype = context.spbook.book->otyp;
+	booktype = book->otyp;
 	if(booktype == SPE_BOOK_OF_THE_DEAD) {
-	    deadbook(context.spbook.book);
+	    deadbook(book);
 	    return(0);
 	}
 
 	Sprintf(splname, objects[booktype].oc_name_known ?
 			"\"%s\"" : "the \"%s\" spell",
 		OBJ_NAME(objects[booktype]));
-	for (i = 0; i < MAXSPELL; i++)  {
-		if (spellid(i) == booktype)  {
-			if (context.spbook.book->spestudied > MAX_SPELL_STUDY) {
-			    pline("This spellbook is too faint to be read any more.");
-			    context.spbook.book->otyp = booktype = SPE_BLANK_PAPER;
-			} else if (spellknow(i) <= 1000) {
-			    Your("knowledge of %s is keener.", splname);
-			    incrnknow(i);
-			    context.spbook.book->spestudied++;
-			    exercise(A_WIS,TRUE);       /* extra study */
-			} else { /* 1000 < spellknow(i) <= MAX_SPELL_STUDY */
-			    You("know %s quite well already.", splname);
-			    costly = FALSE;
-			}
-			/* make book become known even when spell is already
-			   known, in case amnesia made you forget the book */
-			makeknown((int)booktype);
-			break;
-		} else if (spellid(i) == NO_SPELL)  {
-			spl_book[i].sp_id = booktype;
-			spl_book[i].sp_lev = objects[booktype].oc_level;
-			incrnknow(i);
-			context.spbook.book->spestudied++;
-			You(i > 0 ? "add %s to your repertoire." : "learn %s.",
-			    splname);
-			makeknown((int)booktype);
-			break;
-		}
-	}
-	if (i == MAXSPELL) impossible("Too many spells memorized!");
+	for (i = 0; i < MAXSPELL; i++)
+	    if (spellid(i) == booktype || spellid(i) == NO_SPELL) break;
 
-	if (context.spbook.book->cursed) {	/* maybe a demon cursed it */
-	    if (cursed_book(context.spbook.book)) {
-		useup(context.spbook.book);
+	if (i == MAXSPELL) {
+	    impossible("Too many spells memorized!");
+	} else if (spellid(i) == booktype) {
+	    /* normal book can be read and re-read a total of 4 times */
+	    if (book->spestudied > MAX_SPELL_STUDY) {
+		pline("This spellbook is too faint to be read any more.");
+		book->otyp = booktype = SPE_BLANK_PAPER;
+	    } else if (spellknow(i) <= 1000) {
+		Your("knowledge of %s is keener.", splname);
+		incrnknow(i);
+		book->spestudied++;
+		exercise(A_WIS,TRUE);       /* extra study */
+	    } else { /* 1000 < spellknow(i) <= KEEN */
+		You("know %s quite well already.", splname);
+		costly = FALSE;
+	    }
+	    /* make book become known even when spell is already
+	       known, in case amnesia made you forget the book */
+	    makeknown((int)booktype);
+	} else { /* (spellid(i) == NO_SPELL) */
+	    /* for a normal book, spestudied will be zero, but for
+	       a polymorphed one, spestudied will be non-zero and
+	       one less reading is available than when re-learning */
+	    if (book->spestudied >= MAX_SPELL_STUDY) {
+		/* pre-used due to being the product of polymorph */
+		pline("This spellbook is too faint to read even once.");
+		book->otyp = booktype = SPE_BLANK_PAPER;
+	    } else {
+		spl_book[i].sp_id = booktype;
+		spl_book[i].sp_lev = objects[booktype].oc_level;
+		incrnknow(i);
+		book->spestudied++;
+		You(i > 0 ? "add %s to your repertoire." : "learn %s.",
+		    splname);
+	    }
+	    makeknown((int)booktype);
+	}
+
+	if (book->cursed) {	/* maybe a demon cursed it */
+	    if (cursed_book(book)) {
+		useup(book);
 		context.spbook.book = 0;
 		context.spbook.o_id = 0;
 		return 0;
 	    }
 	}
-	if (costly) check_unpaid(context.spbook.book);
+	if (costly) check_unpaid(book);
 	context.spbook.book = 0;
 	context.spbook.o_id = 0;
 	return(0);

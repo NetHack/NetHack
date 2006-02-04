@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2005/12/10	*/
+/*	SCCS Id: @(#)hack.h	3.5	2006/02/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -84,6 +84,9 @@
 #define CXN_PFX_THE	 4	/* prefix with "the " (unless pname) */
 #define CXN_ARTICLE	 8	/* include a/an/the prefix */
 #define CXN_NOCORPSE	16	/* suppress " corpse" suffix */
+
+/* spellbook re-use control; used when reading and when polymorphing */
+#define MAX_SPELL_STUDY 3
 
 /*
  * This is the way the game ends.  If these are rearranged, the arrays

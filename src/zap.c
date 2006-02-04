@@ -1396,8 +1396,17 @@ poly_obj(obj, id)
 	case SPBOOK_CLASS:
 	    while (otmp->otyp == SPE_POLYMORPH)
 		otmp->otyp = rnd_class(SPE_DIG, SPE_BLANK_PAPER);
-	    /* reduce spellbook abuse */
-	    otmp->spestudied = obj->spestudied + 1;
+	    /* reduce spellbook abuse; non-blank books degrade */
+	    if (otmp->otyp != SPE_BLANK_PAPER) {
+		otmp->spestudied = obj->spestudied + 1;
+		if (otmp->spestudied > MAX_SPELL_STUDY) {
+		    otmp->otyp = SPE_BLANK_PAPER;
+		    /* writing a new book over it will yield an unstudied
+		       one; re-polymorphing this one as-is may or may not
+		       get something non-blank */
+		    otmp->spestudied = rn2(otmp->spestudied);
+		}
+	    }
 	    break;
 
 	case GEM_CLASS:

@@ -115,6 +115,7 @@ zapping an unID'd wand of teleportation at self will discover it (usually)
 zapping unlocking magic at self while punished will remove attached chain
 don't see objects or read engraving when hero changes location (random
 	teleport) or position (levitation timeout) while asleep or fainted
+polymorphed spellbooks may turn blank or be too faint to read
 
 
 Platform- and/or Interface-Specific Fixes
