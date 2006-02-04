@@ -2169,6 +2169,10 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    case PM_BALROG:
 			    case PM_KRAKEN:
 			    case PM_MASTODON:
+			    case PM_ORION:
+			    case PM_NORN:
+			    case PM_CYCLOPS:
+			    case PM_LORD_SURTUR:
 				tear_web = TRUE;
 				break;
 			}

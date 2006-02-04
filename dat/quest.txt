@@ -3276,7 +3276,7 @@ and attack the Wizard of Yendor, you know you must return it to its
 rightful owner, %l.
 %E
 %Cc Wiz 00080
-%nC croaks out, as his body begins to shrivel up:
+%nC, whose body begins to shrivel up, croaks out:
 
     I shall haunt your progress until the end of time.  A thousand
     curses on you and %l.
