@@ -788,12 +788,28 @@ int
 dospit()
 {
 	struct obj *otmp;
+	struct attack *mattk;
 
 	if (!getdir((char *)0)) return(0);
-	otmp = mksobj(u.umonnum==PM_COBRA ? BLINDING_VENOM : ACID_VENOM,
-			TRUE, FALSE);
-	otmp->spe = 1; /* to indicate it's yours */
-	throwit(otmp, 0L, FALSE);
+	mattk = attacktype_fordmg(youmonst.data, AT_SPIT, AD_ANY);
+	if (!mattk) {
+	    impossible("bad spit attack?");
+	} else {
+	    switch (mattk->adtyp) {
+	    case AD_BLND:
+	    case AD_DRST:
+		otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
+		break;
+	    default:
+		impossible("bad attack type in dospit");
+		/* fall through */
+	    case AD_ACID:
+		otmp = mksobj(ACID_VENOM, TRUE, FALSE);
+		break;
+	    }
+	    otmp->spe = 1; /* to indicate it's yours */
+	    throwit(otmp, 0L, FALSE);
+	}
 	return(1);
 }
 
