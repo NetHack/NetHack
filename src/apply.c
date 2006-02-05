@@ -1179,6 +1179,7 @@ struct obj *obj;
 		return;
 	}
 	if (obj->cursed && !rn2(2)) {
+	    if (!Blind)
 		pline("%s for a moment, then %s.",
 		      Tobjnam(obj, "flicker"), otense(obj, "die"));
 	} else {

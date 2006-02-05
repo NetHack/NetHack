@@ -116,6 +116,7 @@ zapping unlocking magic at self while punished will remove attached chain
 don't see objects or read engraving when hero changes location (random
 	teleport) or position (levitation timeout) while asleep or fainted
 polymorphed spellbooks may turn blank or be too faint to read
+avoid inappropriate message when using a cursed lamp while blind
 
 
 Platform- and/or Interface-Specific Fixes
