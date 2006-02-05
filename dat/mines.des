@@ -844,8 +844,9 @@ NON_DIGGABLE:(74,01,74,16)
 NON_DIGGABLE:(53,07,55,07)
 NON_DIGGABLE:(53,14,61,14)
 # The Gnome King's wine cellar.
+# the Trespassers sign is a long-running joke
 ENGRAVING:(12,03),engrave,"You are now entering the Gnome King's wine cellar."
-ENGRAVING:(12,04),engrave,"Trespassers will be prosecuted!"
+ENGRAVING:(12,04),engrave,"Trespassers will be persecuted!"
 OBJECT:'!',"booze",(10,07)
 OBJECT:'!',"booze",(10,07)
 OBJECT:'!',random,(10,07)
