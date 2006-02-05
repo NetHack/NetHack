@@ -1083,13 +1083,13 @@ get_saved_games()
 	/* posixly correct version */
     int myuid=getuid();
     DIR *dir;
-    if((dir=opendir("save"))) {
+    if((dir=opendir(fqname("save", SAVEPREFIX, 0)))) {
 	for(n=0; readdir(dir); n++)
 		;
 	closedir(dir);
 	if(n>0) {
 		int i;
-		if(!(dir=opendir("save")))
+		if(!(dir=opendir(fqname("save", SAVEPREFIX, 0))))
 			return 0;
 	        result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
 		for (i=0, j=0; i<n; i++) {
@@ -1116,7 +1116,7 @@ get_saved_games()
 		return result;
 	}
     }
-#endif
+#endif /* SELECTSAVED */
     return 0;
 }
 
