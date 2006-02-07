@@ -304,8 +304,8 @@ mattacku(mtmp)
 		/* Might be attacking your image around the corner, or
 		 * invisible, or you might be blind....
 		 */
-	boolean giveup = FALSE;
-		/* Are further attack attempts useless? */
+	boolean skipnonmagc = FALSE;
+		/* Are further physical attack attempts useless? */
 
 	if(!ranged) nomul(0);
 	if(mtmp->mhp <= 0 || (Underwater && !is_swimmer(mtmp->data)))
@@ -544,8 +544,10 @@ mattacku(mtmp)
 
 	    sum[i] = 0;
 	    mattk = getmattk(mdat, i, sum, &alt_attk);
-	    if (u.uswallow && (mattk->aatyp != AT_ENGL))
+	    if ((u.uswallow && mattk->aatyp != AT_ENGL) ||
+		(skipnonmagc && mattk->aatyp != AT_MAGC))
 		continue;
+
 	    switch(mattk->aatyp) {
 		case AT_CLAW:	/* "hand to hand" attacks */
 		case AT_KICK:
@@ -565,9 +567,8 @@ mattacku(mtmp)
 				    missmu(mtmp, (tmp == j), mattk);
 			    } else {
 				wildmiss(mtmp, mattk);
-				/* skip any remaining attacks unless this
-				   monster might attempt undirected spell */
-				giveup = !attacktype(mtmp->data, AT_MAGC);
+				/* skip any remaining non-spell attacks */
+				skipnonmagc = TRUE;
 			    }
 			}
 			break;
@@ -660,9 +661,8 @@ mattacku(mtmp)
 					tmp -= hittmp;
 			    } else {
 				wildmiss(mtmp, mattk);
-				/* skip any remaining attacks unless this
-				   monster might attempt undirected spell */
-				giveup = !attacktype(mtmp->data, AT_MAGC);
+				/* skip any remaining non-spell attacks */
+				skipnonmagc = TRUE;
 			    }
 			}
 			break;
@@ -687,7 +687,6 @@ mattacku(mtmp)
 	    if(sum[i] == 2) return 1;		/* attacker dead */
 	    if(sum[i] == 3) break;  /* attacker teleported, no more attacks */
 	    /* sum[i] == 0: unsuccessful attack */
-	    if (giveup) break;	/* skip any remaining attacks */
 	}
 	return(0);
 }
