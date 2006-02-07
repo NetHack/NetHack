@@ -356,6 +356,8 @@ learn()
 	    if (book->spestudied > MAX_SPELL_STUDY) {
 		pline("This spellbook is too faint to be read any more.");
 		book->otyp = booktype = SPE_BLANK_PAPER;
+		/* reset spestudied as if polymorph had taken place */
+		book->spestudied = rn2(book->spestudied);
 	    } else if (spellknow(i) <= 1000) {
 		Your("knowledge of %s is keener.", splname);
 		incrnknow(i);
@@ -376,6 +378,8 @@ learn()
 		/* pre-used due to being the product of polymorph */
 		pline("This spellbook is too faint to read even once.");
 		book->otyp = booktype = SPE_BLANK_PAPER;
+		/* reset spestudied as if polymorph had taken place */
+		book->spestudied = rn2(book->spestudied);
 	    } else {
 		spl_book[i].sp_id = booktype;
 		spl_book[i].sp_lev = objects[booktype].oc_level;
