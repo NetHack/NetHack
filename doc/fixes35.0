@@ -119,6 +119,7 @@ polymorphed spellbooks may turn blank or be too faint to read
 avoid inappropriate message when using a cursed lamp while blind
 player polymorphed as a guardian naga spit the wrong kind of venom
 put #define for potion occupant chance and cursed wand zap chance in one place
+candles should not be fireproof
 
 
 Platform- and/or Interface-Specific Fixes
