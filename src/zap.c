@@ -1932,7 +1932,7 @@ dozap()
 
 	/* zappable addition done by GAN 11/03/86 */
 	if(!zappable(obj)) pline(nothing_happens);
-	else if(obj->cursed && !rn2(100)) {
+	else if(obj->cursed && !rn2(WAND_BACKFIRE_CHANCE)) {
 		backfire(obj);	/* the wand blows up in your face! */
 		exercise(A_STR, FALSE);
 		return(1);

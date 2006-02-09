@@ -400,8 +400,6 @@ dodrink()
 	if(!otmp) return(0);
 	otmp->in_use = TRUE;		/* you've opened the stopper */
 
-#define POTION_OCCUPANT_CHANCE(n) (13 + 2*(n))	/* also in muse.c */
-
 	potion_descr = OBJ_DESCR(objects[otmp->otyp]);
 	if (potion_descr) {
 	    if (!strcmp(potion_descr, "milky") &&

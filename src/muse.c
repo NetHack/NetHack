@@ -67,7 +67,6 @@ struct obj *obj;
 	    static const char *empty = "The potion turns out to be empty.";
 	    const char *potion_descr;
 	    struct monst *mtmp;
-#define POTION_OCCUPANT_CHANCE(n) (13 + 2*(n))	/* also in potion.c */
 
 	    potion_descr = OBJ_DESCR(objects[obj->otyp]);
 	    if (potion_descr && !strcmp(potion_descr, "milky")) {
@@ -121,7 +120,7 @@ struct obj *obj;
 		return 2;
 	    }
 	}
-	if (obj->oclass == WAND_CLASS && obj->cursed && !rn2(100)) {
+	if (obj->oclass == WAND_CLASS && obj->cursed && !rn2(WAND_BACKFIRE_CHANCE)) {
 	    int dam = d(obj->spe+2, 6);
 
 	    if (!Deaf) {
