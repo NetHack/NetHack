@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.5	2005/11/19	*/
+/*	SCCS Id: @(#)do_name.c	3.5	2006/02/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -718,8 +718,10 @@ boolean called;
 	/* Put the actual monster name or type into the buffer now */
 	/* Be sure to remember whether the buffer starts with a name */
 	if (do_hallu) {
-	    Strcat(buf, rndmonnam());
-	    name_at_start = FALSE;
+	    const char *rname = rndmonnam();
+
+	    Strcat(buf, rname);
+	    name_at_start = bogon_is_pname(rname);
 	} else if (has_name(mtmp)) {
 	    char *name = MNAME(mtmp);
 
@@ -915,6 +917,15 @@ char *outbuf;
     return outbuf;
 }
 
+/*
+ *  Name prefix codes (same as shknam.c):
+ *	dash          _  female, personal name
+ *	underscore    _  female, general name
+ *	plus          +  male, personal name
+ *	vertical bar  |  male, general name (implied for most of shktools)
+ *	equals        =  gender not specified, personal name
+ */
+
 static const char * const bogusmons[] = {
 	"jumbo shrimp", "giant pigmy", "gnu", "killer penguin",
 	"giant cockroach", "giant slug", "maggot", "pterodactyl",
@@ -934,7 +945,8 @@ static const char * const bogusmons[] = {
 	"hydra", "siren",			/* Greek legend */
 	"killer bunny",				/* Monty Python */
 	"rodent of unusual size",		/* The Princess Bride */
-	"Smokey the bear",	/* "Only you can prevent forest fires!" */
+	"were-rabbit",				/* Wallace & Gromit */
+	"+Smokey Bear",		/* "Only you can prevent forest fires!" */
 	"Luggage",				/* Discworld */
 	"Ent",					/* Lord of the Rings */
 	"tangle tree", "nickelpede", "wiggle",	/* Xanth */
@@ -947,7 +959,7 @@ static const char * const bogusmons[] = {
 	"ohmu",					/* Nausicaa */
 	"youma",				/* Sailor Moon */
 	"nyaasu",				/* Pokemon (Meowth) */
-	"Godzilla", "King Kong",		/* monster movies */
+	"-Godzilla", "+King Kong",		/* monster movies */
 	"earthquake beast",			/* old L of SH */
 	"Invid",				/* Robotech */
 	"Terminator",				/* The Terminator */
@@ -958,26 +970,23 @@ static const char * const bogusmons[] = {
 	"teenage mutant ninja turtle",		/* TMNT */
 	"samurai rabbit",			/* Usagi Yojimbo */
 	"aardvark",				/* Cerebus */
-	"Audrey II",				/* Little Shop of Horrors */
+	"=Audrey II",				/* Little Shop of Horrors */
 	"witch doctor", "one-eyed one-horned flying purple people eater",
 						/* 50's rock 'n' roll */
-	"Barney the dinosaur",			/* saccharine kiddy TV */
-	"Morgoth",				/* Angband */
+	"+Barney the dinosaur",			/* saccharine kiddy TV */
+	"+Morgoth",				/* Angband */
 	"Vorlon",				/* Babylon 5 */
-	"questing beast",		/* King Arthur */
+	"questing beast",			/* King Arthur */
 	"Predator",				/* Movie */
 	"mother-in-law"				/* common pest */
 };
 
 
-/* Return a random monster name, for hallucination.
- * KNOWN BUG: May be a proper name (Godzilla, Barney), may not
- * (the Terminator, a Dalek).  There's no elegant way to deal
- * with this without radically modifying the calling functions.
- */
+/* return a random monster name, for hallucination */
 const char *
 rndmonnam()
 {
+	const char *mname;
 	int name;
 
 	do {
@@ -985,8 +994,36 @@ rndmonnam()
 	} while (name < SPECIAL_PM &&
 	    (type_is_pname(&mons[name]) || (mons[name].geno & G_NOGEN)));
 
-	if (name >= SPECIAL_PM) return bogusmons[name - SPECIAL_PM];
-	return mons[name].mname;
+	if (name >= SPECIAL_PM) {
+	    mname = bogusmons[name - SPECIAL_PM];
+	    /* strip prefix if present */
+	    if (!letter(*mname)) ++mname;
+	} else {
+	    mname = mons[name].mname;
+	}
+	return mname;
+}
+
+/* scan bogusmons to check whether this name is in the list and has a prefix */
+boolean
+bogon_is_pname(mname)
+const char *mname;
+{
+	const char *bname;
+	int name;
+
+	if (!mname || !*mname) return FALSE;
+	if (!strncmpi(mname, "the ", 4)) mname += 4;
+	/* scan the bogusmons[] list; case sensitive here */
+	for (name = 0; name < SIZE(bogusmons); name++) {
+	    bname = bogusmons[name];
+	    /* we can skip all ordinary entries */
+	    if (letter(*bname)) continue;
+	    /* starts with a classification code; does rest of name match? */
+	    if (!strcmp(mname, bname + 1))
+		return index("-+=", *bname) ? TRUE : FALSE;
+	}
+	return FALSE;
 }
 
 #ifdef REINCARNATION

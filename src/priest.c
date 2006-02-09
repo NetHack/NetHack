@@ -260,7 +260,7 @@ struct monst *mon;
  *	- aligned priests with ispriest and high priests have shrines
  *		they retain ispriest and epri when polymorphed
  *	- aligned priests without ispriest are roamers
- *		they have isminion set and access epri as emin
+ *		they have isminion set and use emin rather than epri
  *	- minions do not have ispriest but have isminion and emin
  *	- caller needs to inhibit Hallucination if it wants to force
  *		the true name even when under that influence
@@ -270,14 +270,16 @@ priestname(mon, pname)
 register struct monst *mon;
 char *pname;		/* caller-supplied output buffer */
 {
-    boolean aligned_priest = mon->data == &mons[PM_ALIGNED_PRIEST],
+    boolean do_hallu = Hallucination,
+	    aligned_priest = mon->data == &mons[PM_ALIGNED_PRIEST],
 	    high_priest = mon->data == &mons[PM_HIGH_PRIEST];
-    const char *what = Hallucination ? rndmonnam() : mon->data->mname;
+    const char *what = do_hallu ? rndmonnam() : mon->data->mname;
 
     if (!mon->ispriest && !mon->isminion)	/* should never happen...  */
 	return strcpy(pname, what);		/* caller must be confused */
 
-    Strcpy(pname, "the ");
+    *pname = '\0';
+    if (!do_hallu || !bogon_is_pname(what)) Strcat(pname, "the ");
     if (mon->minvis) Strcat(pname, "invisible ");
     if (mon->isminion && EMIN(mon)->renegade)
 	Strcat(pname, "renegade ");
