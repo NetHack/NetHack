@@ -176,6 +176,7 @@ some intelligent pets will avoid cannibalism
 keep track of which monsters were cloned from other monsters
 number_pad:3 run-time option to use inverted phone keypad layout for movement
 number_pad:-1 to swap function of y and z keys; z to move NW, y to zap wands
+display spell retention information in the spell menu
 
 
 Platform- and/or Interface-Specific New Features
