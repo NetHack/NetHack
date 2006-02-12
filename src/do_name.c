@@ -922,7 +922,7 @@ char *outbuf;
  *	dash          _  female, personal name
  *	underscore    _  female, general name
  *	plus          +  male, personal name
- *	vertical bar  |  male, general name (implied for most of shktools)
+ *	vertical bar  |  male, general name
  *	equals        =  gender not specified, personal name
  */
 
@@ -937,7 +937,7 @@ static const char * const bogusmons[] = {
 						/* misc. */
 	"grue", "Christmas-tree monster", "luck sucker", "paskald",
 	"brogmoid", "dornbeast",		/* Quendor (Zork, &c.) */
-	"Ancient Multi-Hued Dragon", "Evil Iggy",
+	"Ancient Multi-Hued Dragon", "+Evil Iggy",
 						/* Moria */
 	"emu", "kestrel", "xeroc", "venus flytrap",
 						/* Rogue */
