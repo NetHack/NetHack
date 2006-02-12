@@ -2155,7 +2155,8 @@ dlb *fd;
 	Fread((genericptr_t) &ysize, 1, sizeof(ysize), fd);
 					/* size in Y */
 	switch((int) halign) {
-	    case LEFT:	    xstart = 3;					break;
+	    /* mkmap always creates levels starting at x==1 */
+	    case LEFT:	    xstart = init_lev.init_present ? 1 : 3;	break;
 	    case H_LEFT:    xstart = 2+((x_maze_max-2-xsize)/4);	break;
 	    case CENTER:    xstart = 2+((x_maze_max-2-xsize)/2);	break;
 	    case H_RIGHT:   xstart = 2+((x_maze_max-2-xsize)*3/4);	break;
