@@ -85,9 +85,6 @@
 #define CXN_ARTICLE	 8	/* include a/an/the prefix */
 #define CXN_NOCORPSE	16	/* suppress " corpse" suffix */
 
-/* spellbook re-use control; used when reading and when polymorphing */
-#define MAX_SPELL_STUDY 3
-
 /*
  * This is the way the game ends.  If these are rearranged, the arrays
  * in end.c and topten.c will need to be changed.  Some parts of the
@@ -162,8 +159,6 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #undef EXTERN_H
 #include "extern.h"
 #endif /* USE_TRAMPOLI */
-
-#define NO_SPELL	0
 
 /* flags to control makemon() */
 #define NO_MM_FLAGS	  0x00000	/* use this rather than plain 0 */

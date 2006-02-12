@@ -772,17 +772,21 @@ boolean atme;
 	    pline("It invokes nightmarish images in your mind...");
 	    spell_backfire(spell);
 	    return(0);
-	} else if (spellknow(spell) <= 100) {
+	} else if (spellknow(spell) <= KEEN / 200) {	/* 100 turns left */
 	    You("strain to recall the spell.");
-	} else if (spellknow(spell) <= 1000) {
+	} else if (spellknow(spell) <= KEEN / 40) {	/* 500 turns left */
+	    You("have difficulty remembering the spell.");
+	} else if (spellknow(spell) <= KEEN / 20) {	/* 1000 turns left */
 	    Your("knowledge of this spell is growing faint.");
+	} else if (spellknow(spell) <= KEEN / 10) {	/* 2000 turns left */
+	    Your("recall of this spell is gradually fading.");
 	}
 	energy = (spellev(spell) * 5);    /* 5 <= energy <= 35 */
 
 	if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
 		You("are too hungry to cast that spell.");
 		return(0);
-	} else if (ACURR(A_STR) < 4)  {
+	} else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
 		You("lack the strength to cast spells.");
 		return(0);
 	} else if(check_capacity(

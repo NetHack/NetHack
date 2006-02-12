@@ -1,9 +1,14 @@
-/*	SCCS Id: @(#)spell.h	3.5	1995/06/01	*/
+/*	SCCS Id: @(#)spell.h	3.5	2006/02/11	*/
 /* Copyright 1986, M. Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef SPELL_H
 #define SPELL_H
+
+#define NO_SPELL	0
+
+/* spellbook re-use control; used when reading and when polymorphing */
+#define MAX_SPELL_STUDY 3
 
 struct spell {
     short	sp_id;			/* spell id (== object.otyp) */
