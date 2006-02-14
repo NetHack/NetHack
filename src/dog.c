@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.5	2006/01/03	*/
+/*	SCCS Id: @(#)dog.c	3.5	2006/02/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -687,7 +687,7 @@ dogfood(mon,obj)
 struct monst *mon;
 register struct obj *obj;
 {
-	struct permonst *mptr = mon->data, *fptr = &mons[obj->corpsenm];
+	struct permonst *mptr = mon->data, *fptr = 0;
 	boolean carni = carnivorous(mptr), herbi = herbivorous(mptr),
 		starving;
 
@@ -696,23 +696,33 @@ register struct obj *obj;
 
 	switch(obj->oclass) {
 	case FOOD_CLASS:
-	    if (obj->otyp == CORPSE &&
-		((touch_petrifies(fptr) && !resists_ston(mon))
-		 || is_rider(fptr)))
-		    return TABU;
+	    if (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG)
+		fptr = &mons[obj->corpsenm];
 
-	    /* Ghouls only eat old corpses... yum! */
-	    if (mptr == &mons[PM_GHOUL])
-		return (obj->otyp == CORPSE &&
-			peek_at_iced_corpse_age(obj) + 50L <= monstermoves) ?
-				DOGFOOD : TABU;
-
-	    if (!carni && !herbi)
-		    return (obj->cursed ? UNDEF : APPORT);
+	    if (obj->otyp == CORPSE && is_rider(fptr)) return TABU;
+	    if ((obj->otyp == CORPSE || obj->otyp == EGG) &&
+		touch_petrifies(fptr) && !resists_ston(mon)) return POISON;
+	    if (!carni && !herbi) return obj->cursed ? UNDEF : APPORT;
 
 	    /* a starving pet will eat almost anything */
 	    starving = (mon->mtame && !mon->isminion &&
 			EDOG(mon)->mhpmax_penalty);
+
+	    /* ghouls prefer old corpses and unhatchable eggs, yum!
+	       they'll eat fresh non-veggy corpses and hatchable eggs
+	       when starving; they never eat stone-to-flesh'd meat */
+	    if (mptr == &mons[PM_GHOUL]) {
+		if (obj->otyp == CORPSE)
+		    return
+			(peek_at_iced_corpse_age(obj) + 50L <= monstermoves &&
+			    fptr != &mons[PM_LIZARD] &&
+			    fptr != &mons[PM_LICHEN]) ? DOGFOOD :
+				(starving && !vegan(fptr)) ? ACCFOOD : POISON;
+		if (obj->otyp == EGG)
+		    return stale_egg(obj) ? CADAVER :
+				starving ? ACCFOOD : POISON;
+		return TABU;
+	    }
 
 	    switch (obj->otyp) {
 		case TRIPE_RATION:
@@ -722,8 +732,6 @@ register struct obj *obj;
 		case HUGE_CHUNK_OF_MEAT:
 		    return (carni ? DOGFOOD : MANFOOD);
 		case EGG:
-		    if (touch_petrifies(fptr) && !resists_ston(mon))
-			return POISON;
 		    return (carni ? CADAVER : MANFOOD);
 		case CORPSE:
 		   if ((peek_at_iced_corpse_age(obj) + 50L <= monstermoves

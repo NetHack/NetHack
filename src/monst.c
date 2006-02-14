@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monst.c	3.5	2006/01/04	*/
+/*	SCCS Id: @(#)monst.c	3.5	2006/02/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2169,7 +2169,7 @@ struct permonst _mons2[] = {
 	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
 	SIZ(400, 50, MS_SILENT, MZ_SMALL),
 	MR_COLD|MR_SLEEP|MR_POISON, 0,
-	M1_BREATHLESS|M1_MINDLESS|M1_HUMANOID|M1_POIS,
+	M1_BREATHLESS|M1_MINDLESS|M1_HUMANOID|M1_POIS|M1_OMNIVORE,
 	M2_UNDEAD|M2_WANDER|M2_HOSTILE, M3_INFRAVISION, CLR_BLACK),
     MON("giant zombie", S_ZOMBIE,
 	LVL(8, 8, 6, 0, -4), (G_GENO|G_NOCORPSE|1),
