@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2005/11/19	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2006/02/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -513,14 +513,14 @@ wiz_wish()	/* Unlimited wishes for debug mode by Paul Polderman */
 	return 0;
 }
 
-/* ^I command - identify hero's inventory */
+/* ^I command - reveal and optionally identify hero's inventory */
 STATIC_PTR int
 wiz_identify()
 {
 	if (wizard) {
 		iflags.override_ID = (int)cmd_from_func(wiz_identify);
 		if (display_inventory((char *)0, TRUE) == -1)
-			identify_pack(0);
+			identify_pack(0, FALSE);
 		iflags.override_ID = 0;
 	} else pline("Unavailable command '^I'.");
   	return 0;

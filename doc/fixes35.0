@@ -122,6 +122,7 @@ put #define for potion occupant chance and cursed wand zap chance in one place
 candles should not be fireproof
 recognize most instances where hallucinatory monster name should be treated
 	as a personal name (to avoid "the Barney") instead of a description
+avoid giving misleading or redundant feedback when reading scrolls
 
 
 Platform- and/or Interface-Specific Fixes

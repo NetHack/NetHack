@@ -947,13 +947,13 @@ boolean atme;
 	case SPE_CONFUSE_MONSTER:
 	case SPE_DETECT_FOOD:
 	case SPE_CAUSE_FEAR:
+	case SPE_IDENTIFY:
 		/* high skill yields effect equivalent to blessed scroll */
 		if (role_skill >= P_SKILLED) pseudo->blessed = 1;
 		/* fall through */
 	case SPE_CHARM_MONSTER:
 	case SPE_MAGIC_MAPPING:
 	case SPE_CREATE_MONSTER:
-	case SPE_IDENTIFY:
 		(void) seffects(pseudo);
 		break;
 

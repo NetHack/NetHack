@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2005/10/07	*/
+/*	SCCS Id: @(#)read.c	3.5	2006/02/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,7 +32,7 @@ int
 doread()
 {
 	register struct obj *scroll;
-	register boolean confused;
+	boolean confused, nodisappear;
 
 	known = FALSE;
 	if(check_capacity((char *)0)) return (0);
@@ -116,19 +116,26 @@ doread()
 	    return(study_book(scroll));
 	}
 	scroll->in_use = TRUE;	/* scroll, not spellbook, now being read */
-	if(scroll->otyp != SCR_BLANK_PAPER) {
-	  if(Blind)
-	    pline("As you %s the formula on it, the scroll disappears.",
-			is_silent(youmonst.data) ? "cogitate" : "pronounce");
-	  else
-	    pline("As you read the scroll, it disappears.");
-	  if(confused) {
-	    if (Hallucination)
-		pline("Being so trippy, you screw up...");
+	if (scroll->otyp != SCR_BLANK_PAPER) {
+	    /* a few scroll feedback messages describe something happening
+	       to the scroll itself, so avoid "it disappears" for those */
+	    nodisappear = (scroll->otyp == SCR_FIRE ||
+			(scroll->otyp == SCR_REMOVE_CURSE && scroll->cursed));
+	    if (Blind)
+		pline(nodisappear ? "You %s the formula on the scroll." :
+		        "As you %s the formula on it, the scroll disappears.",
+		      is_silent(youmonst.data) ? "cogitate" : "pronounce");
 	    else
-		pline("Being confused, you mis%s the magic words...",
-			is_silent(youmonst.data) ? "understand" : "pronounce");
-	  }
+		pline(nodisappear ? "You read the scroll." :
+		        "As you read the scroll, it disappears.");
+	    if (confused) {
+		if (Hallucination)
+		    pline("Being so trippy, you screw up...");
+		else
+		    pline("Being confused, you %s the magic words...",
+			  is_silent(youmonst.data) ? "misunderstand" :
+				"mispronounce");
+	    }
 	}
 	if(!seffects(scroll))  {
 		if(!objects[scroll->otyp].oc_name_known) {
@@ -647,12 +654,15 @@ seffects(sobj)
 struct obj *sobj;
 {
 	int cval;
-	boolean confused = (Confusion != 0),
+	boolean confused = (Confusion != 0), already_known,
 		old_erodeproof, new_erodeproof;
 	struct obj *otmp;
 
 	if (objects[sobj->otyp].oc_magic)
 		exercise(A_WIS, TRUE);		/* just for trying */
+	already_known = (sobj->oclass == SPBOOK_CLASS ||	/* spell */
+			objects[sobj->otyp].oc_name_known);
+
 	switch(sobj->otyp) {
 #ifdef MAIL
 	case SCR_MAIL:
@@ -1059,7 +1069,8 @@ struct obj *sobj;
 		}
 		break;
 	case SCR_GENOCIDE:
-		You("have found a scroll of genocide!");
+		if (!already_known)
+		    You("have found a scroll of genocide!");
 		known = TRUE;
 		if (sobj->blessed) do_class_genocide();
 		else do_genocide(!sobj->cursed | (2 * !!Confusion));
@@ -1090,26 +1101,33 @@ struct obj *sobj;
 		if (food_detect(sobj))
 			return(1);	/* nothing detected */
 		break;
-	case SPE_IDENTIFY:
-		cval = rn2(5);
-		goto id;
 	case SCR_IDENTIFY:
 		/* known = TRUE; */
-		if(confused)
-			You("identify this as an identify scroll.");
-		else
-			pline("This is an identify scroll.");
-		if (sobj->blessed || (!sobj->cursed && !rn2(5))) {
-			cval = rn2(5);
-			/* Note: if rn2(5)==0, identify all items */
-			if (cval == 1 && sobj->blessed && Luck > 0) ++cval;
-		} else	cval = 1;
-		if(!objects[sobj->otyp].oc_name_known) more_experienced(0,10);
+		if (confused)
+		    You("identify this as an identify scroll.");
+		else if (!already_known ||
+			/* force feedback now if invent will become
+			   empty after using up this scroll */
+			    (sobj->quan == 1L && inv_cnt() == 1))
+		    pline("This is an identify scroll.");
+		if (!already_known) more_experienced(0, 10);
 		useup(sobj);
 		makeknown(SCR_IDENTIFY);
-	id:
-		if(invent && !confused) {
-		    identify_pack(cval);
+		/*FALLTHRU*/
+	case SPE_IDENTIFY:
+		cval = 1;
+		if (sobj->blessed || (!sobj->cursed && !rn2(5))) {
+		    cval = rn2(5);
+		    /* note: if cval==0, identify all items */
+		    if (cval == 1 && sobj->blessed && Luck > 0) ++cval;
+		}
+		if (invent && !confused) {
+		    identify_pack(cval, !already_known);
+		} else if (sobj->otyp == SPE_IDENTIFY) {
+		    /* when casting a spell we know we're not confused,
+		       so inventory must be empty (another message has
+		       already been given above if reading a scroll) */
+		    pline("You're not carrying anything to be identified.");
 		}
 		return(1);
 	case SCR_CHARGING:
@@ -1128,7 +1146,8 @@ struct obj *sobj;
 		    break;
 		}
 		known = TRUE;
-		pline("This is a charging scroll.");
+		if (!already_known)
+		    pline("This is a charging scroll.");
 		otmp = getobj(all_count, "charge");
 		if (!otmp) break;
 		recharge(otmp, sobj->cursed ? -1 : (sobj->blessed ? 1 : 0));
@@ -1183,12 +1202,8 @@ struct obj *sobj;
 		exercise(A_WIS, FALSE);
 		break;
 	case SCR_FIRE:
-		/*
-		 * Note: Modifications have been made as of 3.0 to allow for
-		 * some damage under all potential cases.
-		 */
 		cval = bcsign(sobj);
-		if(!objects[sobj->otyp].oc_name_known) more_experienced(0,10);
+		if (!already_known) more_experienced(0,10);
 		useup(sobj);
 		makeknown(SCR_FIRE);
 		if(confused) {
@@ -1206,9 +1221,9 @@ struct obj *sobj;
 		    }
 		    return(1);
 		}
-		if (Underwater)
-			pline_The("water around you vaporizes violently!");
-		else {
+		if (Underwater) {
+		    pline_The("water around you vaporizes violently!");
+		} else {
 		    pline_The("scroll erupts in a tower of flame!");
 		    burn_away_slime();
 		}
@@ -1344,9 +1359,11 @@ struct obj *sobj;
 	    {
 		coord cc;
 
-		You("have found a scroll of stinking cloud!");
+		if (!already_known)
+		    You("have found a scroll of stinking cloud!");
 		known = TRUE;
-		pline("Where do you want to center the cloud?");
+		pline("Where do you want to center the %scloud?",
+		      already_known ? "stinking " : "");
 		cc.x = u.ux;
 		cc.y = u.uy;
 		if (getpos(&cc, TRUE, "the desired position") < 0) {
