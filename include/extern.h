@@ -1082,6 +1082,7 @@ void FDECL(remove_rooms, (int,int,int,int));
 
 E void FDECL(wallification, (int,int,int,int));
 E void FDECL(walkfrom, (int,int));
+E void NDECL(deliver_splev_message);
 E void FDECL(makemaz, (const char *));
 E void FDECL(mazexy, (coord *));
 E void NDECL(bound_digging);

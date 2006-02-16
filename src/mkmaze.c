@@ -475,21 +475,29 @@ fixup_special()
 	    }
     }
 
-    if(lev_message) {
-	char *str, *nl;
-	for(str = lev_message; (nl = index(str, '\n')) != 0; str = nl+1) {
+    if (lregions)
+	free((genericptr_t) lregions),  lregions = 0;
+    num_lregions = 0;
+}
+
+/* special levels can include a custom arrival message; display it */
+void
+deliver_splev_message()
+{
+    char *str, *nl;
+
+    /* this used to be inline within fixup_special(),
+       but then the message ended up being given too soon */
+    if (lev_message) {
+	for (str = lev_message; (nl = index(str, '\n')) != 0; str = nl + 1) {
 	    *nl = '\0';
 	    pline("%s", str);
 	}
-	if(*str)
+	if (*str)
 	    pline("%s", str);
 	free((genericptr_t)lev_message);
 	lev_message = 0;
     }
-
-    if (lregions)
-	free((genericptr_t) lregions),  lregions = 0;
-    num_lregions = 0;
 }
 
 void

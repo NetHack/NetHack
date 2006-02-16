@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2005/09/02	*/
+/*	SCCS Id: @(#)do.c	3.5	2006/02/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1307,6 +1307,9 @@ boolean at_stairs, falling, portal;
 	/*
 	 *  Move all plines beyond the screen reset.
 	 */
+
+	/* special levels can have a custom arrival message */
+	deliver_splev_message();
 
 	/* give room entrance message, if any */
 	check_special_room(FALSE);
