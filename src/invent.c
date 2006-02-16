@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2005/11/05	*/
+/*	SCCS Id: @(#)invent.c	3.5	2006/02/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1522,8 +1522,9 @@ int id_limit;
 
 /* dialog with user to identify a given number of items; 0 means all */
 void
-identify_pack(id_limit)
+identify_pack(id_limit, learning_id)
 int id_limit;
+boolean learning_id;	/* true if we just read unknown identify scroll */
 {
     struct obj *obj, *the_obj;
     int n, unid_cnt;
@@ -1534,7 +1535,8 @@ int id_limit;
 	if (not_fully_identified(obj)) ++unid_cnt, the_obj = obj;
 
     if (!unid_cnt) {
-	You("have already identified all of your possessions.");
+	You("have already identified all %sof your possessions."
+	    learning_id ? "the rest " : "");
     } else if (!id_limit) {
 	/* identify everything */
 	if (unid_cnt == 1) {
