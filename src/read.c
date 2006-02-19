@@ -653,17 +653,18 @@ int
 seffects(sobj)
 struct obj *sobj;
 {
-	int cval;
-	boolean confused = (Confusion != 0), already_known,
-		old_erodeproof, new_erodeproof;
+	int cval, otyp = sobj->otyp;
+	boolean confused = (Confusion != 0),
+		sblessed = sobj->blessed, scursed = sobj->cursed,
+		already_known, old_erodeproof, new_erodeproof;
 	struct obj *otmp;
 
-	if (objects[sobj->otyp].oc_magic)
+	if (objects[otyp].oc_magic)
 		exercise(A_WIS, TRUE);		/* just for trying */
 	already_known = (sobj->oclass == SPBOOK_CLASS ||	/* spell */
-			objects[sobj->otyp].oc_name_known);
+			objects[otyp].oc_name_known);
 
-	switch(sobj->otyp) {
+	switch (otyp) {
 #ifdef MAIL
 	case SCR_MAIL:
 		known = TRUE;
@@ -687,13 +688,13 @@ struct obj *sobj;
 			strange_feeling(sobj,
 					!Blind ? "Your skin glows then fades." :
 					"Your skin feels warm for a moment.");
-			exercise(A_CON, !sobj->cursed);
-			exercise(A_STR, !sobj->cursed);
+			exercise(A_CON, !scursed);
+			exercise(A_STR, !scursed);
 			return(1);
 		}
 		if(confused) {
 			old_erodeproof = (otmp->oerodeproof != 0);
-			new_erodeproof = !sobj->cursed;
+			new_erodeproof = !scursed;
 			otmp->oerodeproof = 0;	/* for messages */
 			if(Blind) {
 			    otmp->rknown = FALSE;
@@ -703,9 +704,9 @@ struct obj *sobj;
 			    otmp->rknown = TRUE;
 			    pline("%s covered by a %s %s %s!",
 				Yobjnam2(otmp, "are"),
-				sobj->cursed ? "mottled" : "shimmering",
-				hcolor(sobj->cursed ? NH_BLACK : NH_GOLDEN),
-				sobj->cursed ? "glow" :
+				scursed ? "mottled" : "shimmering",
+				hcolor(scursed ? NH_BLACK : NH_GOLDEN),
+				scursed ? "glow" :
 				  (is_shield(otmp) ? "layer" : "shield"));
 			}
 			if (new_erodeproof &&
@@ -725,7 +726,7 @@ struct obj *sobj;
 		/* elven armor vibrates warningly when enchanted beyond a limit */
 		special_armor = is_elven_armor(otmp) ||
 			(Role_if(PM_WIZARD) && otmp->otyp == CORNUTHAUM);
-		if (sobj->cursed)
+		if (scursed)
 		    same_color =
 			(otmp->otyp == BLACK_DRAGON_SCALE_MAIL ||
 			 otmp->otyp == BLACK_DRAGON_SCALES);
@@ -737,7 +738,7 @@ struct obj *sobj;
 		if (Blind) same_color = FALSE;
 
 		/* KMH -- catch underflow */
-		s = sobj->cursed ? -otmp->spe : otmp->spe;
+		s = scursed ? -otmp->spe : otmp->spe;
 		if (s > (special_armor ? 5 : 3) && rn2(s)) {
 			otmp->in_use = TRUE;
 			pline("%s violently %s%s%s for a while, then %s.",
@@ -745,7 +746,7 @@ struct obj *sobj;
 			      otense(otmp, Blind ? "vibrate" : "glow"),
 			      (!Blind && !same_color) ? " " : nul,
 			      (Blind || same_color) ? nul :
-				hcolor(sobj->cursed ? NH_BLACK : NH_SILVER),
+				hcolor(scursed ? NH_BLACK : NH_SILVER),
 			      otense(otmp, "evaporate"));
 			if(is_cloak(otmp)) (void) Cloak_off();
 			if(is_boots(otmp)) (void) Boots_off();
@@ -759,9 +760,9 @@ struct obj *sobj;
 			useup(otmp);
 			break;
 		}
-		s = sobj->cursed ? -1 :
+		s = scursed ? -1 :
 		    otmp->spe >= 9 ? (rn2(otmp->spe) == 0) :
-		    sobj->blessed ? rnd(3-otmp->spe/3) : 1;
+		    sblessed ? rnd(3 - otmp->spe / 3) : 1;
 		if (s >= 0 && otmp->otyp >= GRAY_DRAGON_SCALES &&
 					otmp->otyp <= YELLOW_DRAGON_SCALES) {
 			/* dragon scales get turned into dragon scale mail */
@@ -770,7 +771,7 @@ struct obj *sobj;
 			/* assumes same order */
 			otmp->otyp = GRAY_DRAGON_SCALE_MAIL +
 						otmp->otyp - GRAY_DRAGON_SCALES;
-			if (sobj->blessed) {
+			if (sblessed) {
 			    otmp->spe++;
 			    if (!otmp->blessed) bless(otmp);
 			} else if (otmp->cursed)
@@ -786,13 +787,13 @@ struct obj *sobj;
 		      otense(otmp, Blind ? "vibrate" : "glow"),
 		      (!Blind && !same_color) ? " " : nul,
 		      (Blind || same_color) ? nul :
-			  hcolor(sobj->cursed ? NH_BLACK : NH_SILVER),
+			  hcolor(scursed ? NH_BLACK : NH_SILVER),
 		      (s * s > 1) ? "while" : "moment");
 		/* [this cost handling will need updating if shop pricing is
 		   ever changed to care about curse/bless status of armor] */
 		if (s < 0) costly_alteration(otmp, COST_DECHNT);
-		if (sobj->cursed && !otmp->cursed) curse(otmp);
-		else if (sobj->blessed && !otmp->blessed) bless(otmp);
+		if (scursed && !otmp->cursed) curse(otmp);
+		else if (sblessed && !otmp->blessed) bless(otmp);
 		if (s) {
 			otmp->spe += s;
 			adj_abon(otmp, s);
@@ -819,7 +820,7 @@ struct obj *sobj;
 				return(1);
 			}
 			old_erodeproof = (otmp->oerodeproof != 0);
-			new_erodeproof = (sobj->cursed != 0);
+			new_erodeproof = scursed;
 			otmp->oerodeproof = 0;	/* for messages */
 			p_glow2(otmp, NH_PURPLE);
 			if (old_erodeproof && !new_erodeproof) {
@@ -830,8 +831,8 @@ struct obj *sobj;
 			otmp->oerodeproof = new_erodeproof ? 1 : 0;
 			break;
 		}
-		if(!sobj->cursed || !otmp || !otmp->cursed) {
-		    if(!destroy_arm(otmp)) {
+		if (!scursed || !otmp || !otmp->cursed) {
+		    if (!destroy_arm(otmp)) {
 			strange_feeling(sobj,"Your skin itches.");
 			exercise(A_STR, FALSE);
 			exercise(A_CON, FALSE);
@@ -850,11 +851,11 @@ struct obj *sobj;
 	    break;
 	case SCR_CONFUSE_MONSTER:
 	case SPE_CONFUSE_MONSTER:
-		if(youmonst.data->mlet != S_HUMAN || sobj->cursed) {
-			if(!HConfusion) You_feel("confused.");
+		if (youmonst.data->mlet != S_HUMAN || scursed) {
+			if (!HConfusion) You_feel("confused.");
 			make_confused(HConfusion + rnd(100),FALSE);
-		} else  if(confused) {
-		    if(!sobj->blessed) {
+		} else if (confused) {
+		    if (!sblessed) {
 			Your("%s begin to %s%s.",
 			    makeplural(body_part(HAND)),
 			    Blind ? "tingle" : "glow ",
@@ -868,7 +869,7 @@ struct obj *sobj;
 			make_confused(0L,TRUE);
 		    }
 		} else {
-		    if (!sobj->blessed) {
+		    if (!sblessed) {
 			Your("%s%s %s%s.",
 			makeplural(body_part(HAND)),
 			Blind ? "" : " begin to glow",
@@ -902,7 +903,7 @@ struct obj *sobj;
 		for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 		    if (DEADMONSTER(mtmp)) continue;
 		    if(cansee(mtmp->mx,mtmp->my)) {
-			if(confused || sobj->cursed) {
+			if (confused || scursed) {
 			    mtmp->mflee = mtmp->mfrozen = mtmp->msleeping = 0;
 			    mtmp->mcanmove = 1;
 			} else
@@ -911,14 +912,11 @@ struct obj *sobj;
 			if(!mtmp->mtame) ct++;	/* pets don't laugh at you */
 		    }
 		}
-		if(!ct)
-		      You_hear("%s in the distance.",
-			       (confused || sobj->cursed) ? "sad wailing" :
-							"maniacal laughter");
-		else if(sobj->otyp == SCR_SCARE_MONSTER)
-			You_hear("%s close by.",
-				  (confused || sobj->cursed) ? "sad wailing" :
-						 "maniacal laughter");
+		if (otyp == SCR_SCARE_MONSTER || !ct)
+		    You_hear("%s %s.",
+			     (confused || scursed) ? "sad wailing" :
+				"maniacal laughter",
+			     !ct ? "in the distance" : "close by");
 		break;
 	    }
 	case SCR_BLANK_PAPER:
@@ -941,7 +939,7 @@ struct obj *sobj;
 				"in touch with the Universal Oneness." :
 				"the power of the Force against you!"));
 
-		if (sobj->cursed) {
+		if (scursed) {
 		    pline_The("scroll disintegrates.");
 		} else {
 		    for (obj = invent; obj; obj = obj->nobj) {
@@ -951,7 +949,7 @@ struct obj *sobj;
 			if (obj->oclass == COIN_CLASS) continue;
 #endif
 			wornmask = (obj->owornmask & ~(W_BALL|W_ART|W_ARTI));
-			if (wornmask && !sobj->blessed) {
+			if (wornmask && !sblessed) {
 			    /* handle a couple of special cases; we don't
 			       allow auxiliary weapon slots to be used to
 			       artificially increase number of worn items */
@@ -974,7 +972,7 @@ struct obj *sobj;
 				}
 			    }
 			}
-			if (sobj->blessed || wornmask ||
+			if (sblessed || wornmask ||
 			     obj->otyp == LOADSTONE ||
 			     (obj->otyp == LEASH && obj->leashmon)) {
 			    /* water price varies by curse/bless status */
@@ -1010,8 +1008,8 @@ struct obj *sobj;
 	    }
 	case SCR_CREATE_MONSTER:
 	case SPE_CREATE_MONSTER:
-	    if (create_critters(1 + ((confused || sobj->cursed) ? 12 : 0) +
-				((sobj->blessed || rn2(73)) ? 0 : rnd(4)),
+	    if (create_critters(1 + ((confused || scursed) ? 12 : 0) +
+				((sblessed || rn2(73)) ? 0 : rnd(4)),
 			confused ? &mons[PM_ACID_BLOB] : (struct permonst *)0))
 		known = TRUE;
 	    /* no need to flush monsters; we ask for identification only if the
@@ -1022,7 +1020,7 @@ struct obj *sobj;
 		if (confused && uwep &&
 		    (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))) {
 			old_erodeproof = (uwep->oerodeproof != 0);
-			new_erodeproof = !sobj->cursed;
+			new_erodeproof = !scursed;
 			uwep->oerodeproof = 0;	/* for messages */
 			if (Blind) {
 			    uwep->rknown = FALSE;
@@ -1031,9 +1029,9 @@ struct obj *sobj;
 			    uwep->rknown = TRUE;
 			    pline("%s covered by a %s %s %s!",
 				Yobjnam2(uwep, "are"),
-				sobj->cursed ? "mottled" : "shimmering",
-				hcolor(sobj->cursed ? NH_PURPLE : NH_GOLDEN),
-				sobj->cursed ? "glow" : "shield");
+				scursed ? "mottled" : "shimmering",
+				hcolor(scursed ? NH_PURPLE : NH_GOLDEN),
+				scursed ? "glow" : "shield");
 			}
 			if (uwep->oerodeproof && (uwep->oeroded || uwep->oeroded2)) {
 			    uwep->oeroded = uwep->oeroded2 = 0;
@@ -1049,10 +1047,10 @@ struct obj *sobj;
 			break;
 		}
 		return !chwepon(sobj,
-				sobj->cursed ? -1 :
+				scursed ? -1 :
 				!uwep ? 1 :
 				uwep->spe >= 9 ? (rn2(uwep->spe) == 0) :
-				sobj->blessed ? rnd(3 - uwep->spe / 3) : 1);
+				sblessed ? rnd(3 - uwep->spe / 3) : 1);
 	case SCR_TAMING:
 	case SPE_CHARM_MONSTER:
 		if (u.uswallow) {
@@ -1072,17 +1070,18 @@ struct obj *sobj;
 		if (!already_known)
 		    You("have found a scroll of genocide!");
 		known = TRUE;
-		if (sobj->blessed) do_class_genocide();
-		else do_genocide(!sobj->cursed | (2 * !!Confusion));
+		if (sblessed) do_class_genocide();
+		else do_genocide(!scursed | (2 * !!Confusion));
 		break;
 	case SCR_LIGHT:
 		if(!Blind) known = TRUE;
-		litroom(!confused && !sobj->cursed, sobj);
+		litroom(!confused && !scursed, sobj);
 		break;
 	case SCR_TELEPORTATION:
-		if(confused || sobj->cursed) level_tele();
-		else {
-			if (sobj->blessed && !Teleport_control) {
+		if (confused || scursed) {
+			level_tele();
+		} else {
+			if (sblessed && !Teleport_control) {
 				known = TRUE;
 				if (yn("Do you wish to teleport?")=='n')
 					break;
@@ -1094,7 +1093,7 @@ struct obj *sobj;
 		}
 		break;
 	case SCR_GOLD_DETECTION:
-		if (confused || sobj->cursed) return(trap_detect(sobj));
+		if (confused || scursed) return(trap_detect(sobj));
 		else return(gold_detect(sobj));
 	case SCR_FOOD_DETECTION:
 	case SPE_DETECT_FOOD:
@@ -1116,14 +1115,14 @@ struct obj *sobj;
 		/*FALLTHRU*/
 	case SPE_IDENTIFY:
 		cval = 1;
-		if (sobj->blessed || (!sobj->cursed && !rn2(5))) {
+		if (sblessed || (!scursed && !rn2(5))) {
 		    cval = rn2(5);
 		    /* note: if cval==0, identify all items */
-		    if (cval == 1 && sobj->blessed && Luck > 0) ++cval;
+		    if (cval == 1 && sblessed && Luck > 0) ++cval;
 		}
 		if (invent && !confused) {
 		    identify_pack(cval, !already_known);
-		} else if (sobj->otyp == SPE_IDENTIFY) {
+		} else if (otyp == SPE_IDENTIFY) {
 		    /* when casting a spell we know we're not confused,
 		       so inventory must be empty (another message has
 		       already been given above if reading a scroll) */
@@ -1132,7 +1131,7 @@ struct obj *sobj;
 		return(1);
 	case SCR_CHARGING:
 		if (confused) {
-		    if (sobj->cursed) {
+		    if (scursed) {
 			You_feel("discharged.");
 			u.uen = 0;
 		    } else {
@@ -1150,7 +1149,7 @@ struct obj *sobj;
 		    pline("This is a charging scroll.");
 		otmp = getobj(all_count, "charge");
 		if (!otmp) break;
-		recharge(otmp, sobj->cursed ? -1 : (sobj->blessed ? 1 : 0));
+		recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
 		break;
 	case SCR_MAGIC_MAPPING:
 		if (level.flags.nommap) {
@@ -1162,7 +1161,7 @@ struct obj *sobj;
 		    make_confused(HConfusion + rnd(30), FALSE);
 		    break;
 		}
-		if (sobj->blessed) {
+		if (sblessed) {
 		    register int x, y;
 
 		    for (x = 1; x < COLNO; x++)
@@ -1179,7 +1178,7 @@ struct obj *sobj;
 		    break;
 		}
 		pline("A map coalesces in your mind!");
-		cval = (sobj->cursed && !confused);
+		cval = (scursed && !confused);
 		if(cval) HConfusion = 1;	/* to screw up map */
 		do_mapping();
 		if(cval) {
@@ -1189,8 +1188,8 @@ struct obj *sobj;
 		break;
 	case SCR_AMNESIA:
 		known = TRUE;
-		forget(	(!sobj->blessed ? ALL_SPELLS : 0) |
-			(!confused || sobj->cursed ? ALL_MAP : 0) );
+		forget((!sblessed ? ALL_SPELLS : 0) |
+			(!confused || scursed ? ALL_MAP : 0));
 		if (Hallucination) /* Ommmmmm! */
 			Your("mind releases itself from mundane concerns.");
 		else if (!strncmpi(plname, "Maud", 4))
@@ -1241,13 +1240,13 @@ struct obj *sobj;
 
 	    	/* Identify the scroll */
 	    	pline_The("%s rumbles %s you!", ceiling(u.ux,u.uy),
-	    			sobj->blessed ? "around" : "above");
+	    		  sblessed ? "around" : "above");
 	    	known = 1;
 	    	if (In_sokoban(&u.uz))
 	    	    change_luck(-1);	/* Sokoban guilt */
 
 	    	/* Loop through the surrounding squares */
-	    	if (!sobj->cursed) for (x = u.ux-1; x <= u.ux+1; x++) {
+		if (!scursed) for (x = u.ux-1; x <= u.ux+1; x++) {
 	    	    for (y = u.uy-1; y <= u.uy+1; y++) {
 
 	    	    	/* Is this a suitable spot? */
@@ -1309,7 +1308,7 @@ struct obj *sobj;
 		    }
 		}
 		/* Attack the player */
-		if (!sobj->blessed) {
+		if (!sblessed) {
 		    int dmg;
 		    struct obj *otmp2;
 
@@ -1325,7 +1324,7 @@ struct obj *sobj;
 				!unsolid(youmonst.data)) {
 			You("are hit by %s!", doname(otmp2));
 			dmg = dmgval(otmp2, &youmonst) * otmp2->quan;
-			if (uarmh && !sobj->cursed) {
+			if (uarmh && !scursed) {
 			    if(is_metallic(uarmh)) {
 				pline("Fortunately, you are wearing a hard helmet.");
 				if (dmg > 2) dmg = 2;
@@ -1349,7 +1348,7 @@ struct obj *sobj;
 	    break;
 	case SCR_PUNISHMENT:
 		known = TRUE;
-		if(confused || sobj->blessed) {
+		if (confused || sblessed) {
 			You_feel("guilty.");
 			break;
 		}
@@ -1379,7 +1378,7 @@ struct obj *sobj;
 		break;
 	}
 	default:
-		impossible("What weird effect is this? (%u)", sobj->otyp);
+		impossible("What weird effect is this? (%u)", otyp);
 	}
 	return(0);
 }

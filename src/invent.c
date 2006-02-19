@@ -1535,7 +1535,7 @@ boolean learning_id;	/* true if we just read unknown identify scroll */
 	if (not_fully_identified(obj)) ++unid_cnt, the_obj = obj;
 
     if (!unid_cnt) {
-	You("have already identified all %sof your possessions."
+	You("have already identified all %sof your possessions.",
 	    learning_id ? "the rest " : "");
     } else if (!id_limit) {
 	/* identify everything */
