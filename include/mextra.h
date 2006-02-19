@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mextra.h	3.5	2006/01/07	*/
+/*	SCCS Id: @(#)mextra.h	3.5	2006/02/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -50,6 +50,7 @@
  *	 8. Adjust restmonchn() in src/restore.c to deal with your
  *	    struct during a restore.
  *	 9. Adjust buffer_to_mon() in src/restore.c to properly
+ *	    unpackage the mextra fields during revival.
  *	10. Adjust savemonchn() in src/save.c to deal with your
  *	    struct during a save.
  *	11. Adjust mon_to_buffer() in src/save.c to properly package
