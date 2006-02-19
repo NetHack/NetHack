@@ -4166,7 +4166,9 @@ lava_effects()
 	u.uhp = -1;
 	killer.format = KILLED_BY;
 	Strcpy(killer.name, lava_killer);
-	You("burn to a crisp...");
+	You("%s...",
+		(u.umonnum == PM_WATER_ELEMENTAL) ?
+		"boil away" : "burn to a crisp");
 	done(BURNING);
 	while (!safe_teleds(TRUE)) {
 		pline("You're still burning.");
