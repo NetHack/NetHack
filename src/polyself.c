@@ -1229,6 +1229,10 @@ int part;
 		"large scale tip", "rear region", "scale gap", "scale gapped",
 		"head", "rear region", "light headed", "neck", "length",
 		"rear scale", "scales", "blood", "lung", "forked tongue", "stomach" },
+	*worm_parts[] = { "anterior segment", "light sensitive cell", "clitellum", "setae",
+		"setae", "posterior segment", "segment", "segmented",
+		"anterior segment", "posterior", "over stretched", "clitellum", "length",
+		"posterior setae", "setae", "blood", "skin", "prostomium", "stomach" },
 	*fish_parts[] = { "fin", "eye", "premaxillary", "pelvic axillary",
 		"pelvic fin", "anal fin", "pectoral fin", "finned", "head", "peduncle",
 		"played out", "gills", "dorsal fin", "caudal fin",
@@ -1258,8 +1262,9 @@ int part;
 	    return "trunk";
 	if (mptr == &mons[PM_SHARK] && part == HAIR)
 	    return "skin";	/* sharks don't have scales */
-	if (mptr == &mons[PM_JELLYFISH] && (part == ARM || part == FINGER ||
-	    part == HAND || part == FOOT || part == TOE))
+	if ((mptr == &mons[PM_JELLYFISH] || mptr == &mons[PM_KRAKEN]) &&
+		(part == ARM || part == FINGER ||
+	    	    part == HAND || part == FOOT || part == TOE))
 	    return "tentacle";
 	if (mptr == &mons[PM_FLOATING_EYE] && part == EYE)
 	    return "cornea";
@@ -1278,8 +1283,12 @@ int part;
 				part == FINGERTIP || part == HAND) return "ray";
 		else return "beam";
 	}
+	if (mptr == &mons[PM_STALKER] && part == HEAD)
+		return "head";
 	if (mptr->mlet == S_EEL && mptr != &mons[PM_JELLYFISH])
 	    return fish_parts[part];
+	if (mptr->mlet == S_WORM)
+	    return worm_parts[part];
 	if (slithy(mptr) || (mptr->mlet == S_DRAGON && part == HAIR))
 	    return snake_parts[part];
 	if (mptr->mlet == S_EYE)
