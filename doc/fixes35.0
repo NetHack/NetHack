@@ -182,6 +182,7 @@ number_pad:3 run-time option to use inverted phone keypad layout for movement
 number_pad:-1 to swap function of y and z keys; z to move NW, y to zap wands
 display spell retention information in the spell menu
 tame ghouls can eat old eggs
+new effect for reading a scroll of light while confused
 
 
 Platform- and/or Interface-Specific New Features

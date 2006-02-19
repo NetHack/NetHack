@@ -1010,7 +1010,7 @@ struct obj *sobj;
 	case SPE_CREATE_MONSTER:
 	    if (create_critters(1 + ((confused || scursed) ? 12 : 0) +
 				((sblessed || rn2(73)) ? 0 : rnd(4)),
-			confused ? &mons[PM_ACID_BLOB] : (struct permonst *)0))
+			confused ? &mons[PM_ACID_BLOB] : (struct permonst *)0,FALSE))
 		known = TRUE;
 	    /* no need to flush monsters; we ask for identification only if the
 	     * monsters are not visible
@@ -1074,8 +1074,15 @@ struct obj *sobj;
 		else do_genocide(!scursed | (2 * !!Confusion));
 		break;
 	case SCR_LIGHT:
-		if(!Blind) known = TRUE;
-		litroom(!confused && !scursed, sobj);
+		if (!confused || rn2(5)) {
+			if(!Blind) known = TRUE;
+			litroom(!confused && !sobj->cursed, sobj);
+		} else {
+		   /* could be scroll of create monster, don't set known ...*/
+		    (void) create_critters(1, !sobj->cursed ?
+				&mons[PM_YELLOW_LIGHT] :
+			        &mons[PM_BLACK_LIGHT], TRUE);
+		}
 		break;
 	case SCR_TELEPORTATION:
 		if (confused || scursed) {

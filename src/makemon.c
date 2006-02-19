@@ -1160,16 +1160,17 @@ int mndx;
 /* used for wand/scroll/spell of create monster */
 /* returns TRUE iff you know monsters have been created */
 boolean
-create_critters(cnt, mptr)
+create_critters(cnt, mptr, neverask)
 int cnt;
 struct permonst *mptr;		/* usually null; used for confused reading */
+boolean neverask;
 {
 	coord c;
 	int x, y;
 	struct monst *mon;
 	boolean known = FALSE;
 #ifdef WIZARD
-	boolean ask = wizard;
+	boolean ask = (wizard && !neverask);
 #endif
 
 	while (cnt--) {

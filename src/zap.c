@@ -1876,7 +1876,7 @@ register struct obj *obj;
 			break;
 		case WAN_CREATE_MONSTER:
 			known = create_critters(rn2(23) ? 1 : rn1(7,2),
-					(struct permonst *)0);
+					(struct permonst *)0, FALSE);
 			break;
 		case WAN_WISHING:
 			known = TRUE;

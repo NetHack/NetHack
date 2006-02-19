@@ -974,7 +974,7 @@ E int FDECL(monhp_per_lvl, (struct monst *));
 E void FDECL(newmonhp, (struct monst *,int));
 E struct mextra *NDECL(newmextra);
 E struct monst *FDECL(makemon, (struct permonst *,int,int,int));
-E boolean FDECL(create_critters, (int,struct permonst *));
+E boolean FDECL(create_critters, (int,struct permonst *,BOOLEAN_P));
 E struct permonst *NDECL(rndmonst);
 E void FDECL(reset_rndmonst, (int));
 E struct permonst *FDECL(mkclass, (CHAR_P,int));
