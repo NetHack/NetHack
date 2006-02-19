@@ -161,6 +161,8 @@ hero-created and monster-created ice will eventually melt away
 extend Warning to include ice danger
 wishing for particular variety of tin contents (deep fried, broiled, etc.)
 debug-mode wishing for random monster(s) via '*'
+debug-mode viewing of fully identified object descriptions without 
+	actually identifying the objects
 health-food store that stocks monk-appropriate foods in mine town when monk
 give more information about your attributes in debug mode
 polywarn to give intrinsic monster detection of limited species while polymorphed
