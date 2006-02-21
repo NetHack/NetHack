@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pline.c	3.5	2005/10/01	*/
+/*	SCCS Id: @(#)pline.c	3.5	2006/02/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -357,11 +357,12 @@ register struct monst *mtmp;
 	if (mtmp->mundetected)	  Strcat(info, ", concealed");
 	if (mtmp->minvis)	  Strcat(info, ", invisible");
 	if (mtmp == u.ustuck)	  Strcat(info,
-			(sticks(youmonst.data)) ? ", held by you" :
-				u.uswallow ? (is_animal(u.ustuck->data) ?
-				", swallowed you" :
-				", engulfed you") :
-				", holding you");
+		       sticks(youmonst.data) ? ", held by you" :
+				 !u.uswallow ? ", holding you" :
+		      attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_DGST) ?
+					       ", digesting you" :
+		   is_animal(u.ustuck->data) ? ", swallowing you" :
+					       ", engulfing you");
 #ifdef STEED
 	if (mtmp == u.usteed)	  Strcat(info, ", carrying you");
 #endif
