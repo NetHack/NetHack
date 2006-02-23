@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2006/01/11	*/
+/*	SCCS Id: @(#)eat.c	3.5	2006/02/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,7 +45,6 @@ STATIC_DCL void FDECL(eataccessory, (struct obj *));
 STATIC_DCL const char *FDECL(foodword, (struct obj *));
 STATIC_DCL int FDECL(tin_variety, (struct obj *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(maybe_cannibal, (int,BOOLEAN_P));
-STATIC_DCL boolean FDECL(leather_cover, (struct obj *));
 
 char msgbuf[BUFSZ];
 
@@ -2023,17 +2022,25 @@ register struct obj *otmp;
 	return;
 }
 
+#if 0
+/* intended for eating a spellbook while polymorphed, but not used;
+   "leather" applied to appearance, not composition, and has been
+   changed to "leathery" to reflect that */
+STATIC_DCL boolean FDECL(leather_cover, (struct obj *));
+
 STATIC_OVL boolean
 leather_cover(otmp)
 struct obj *otmp;
 {
 	const char *odesc = OBJ_DESCR(objects[otmp->otyp]);
+
 	if (odesc && (otmp->oclass == SPBOOK_CLASS)) {
 		if (!strcmp(odesc, "leather"))
 			return TRUE;
 	}
 	return FALSE;
 }
+#endif
 
 /*
  * return 0 if the food was not dangerous.
@@ -2141,7 +2148,6 @@ struct obj *otmp;
 	if (!u.uconduct.unvegan &&
 	    ((material == LEATHER || material == BONE ||
 	      material == DRAGON_HIDE || material == WAX) ||
-	     (leather_cover(otmp)) ||
 	     (cadaver && !vegan(&mons[mnum])))) {
 		Sprintf(buf, "%s foul and unfamiliar to you. %s",
 			foodsmell, eat_it_anyway);
@@ -2151,7 +2157,6 @@ struct obj *otmp;
 	if (!u.uconduct.unvegetarian &&
 	    ((material == LEATHER || material == BONE ||
 	      material == DRAGON_HIDE) ||
-	     (leather_cover(otmp)) ||
 	     (cadaver && !vegetarian(&mons[mnum])))) {
 		Sprintf(buf, "%s unfamiliar to you. %s",
 			foodsmell, eat_it_anyway);
@@ -2263,8 +2268,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 
 	    material = objects[otmp->otyp].oc_material;
 	    if (material == LEATHER ||
-		material == BONE || material == DRAGON_HIDE ||
-		leather_cover(otmp)) {
+		material == BONE || material == DRAGON_HIDE) {
 		u.uconduct.unvegan++;
 		violated_vegetarian();
 	    } else if (material == WAX)
