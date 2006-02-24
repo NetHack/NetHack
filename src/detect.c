@@ -1282,7 +1282,9 @@ register int aflag;
 					map_invisible(x, y);
 				    }
 				} else if (!sensemon(mtmp))
-				    You("find %s.", a_monnam(mtmp));
+				    You("find %s.", mtmp->mtame ?
+						y_monnam(mtmp) :
+						a_monnam(mtmp));
 				return(1);
 			    }
 			    if(!canspotmon(mtmp)) {
