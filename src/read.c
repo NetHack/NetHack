@@ -1154,10 +1154,13 @@ struct obj *sobj;
 		known = TRUE;
 		if (!already_known)
 		    pline("This is a charging scroll.");
+		/* use it up now to prevent if from showing in the
+		   getobj picklist because the "disappears" message
+		   was already delivered */
+		useup(sobj);
 		otmp = getobj(all_count, "charge");
-		if (!otmp) break;
-		recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
-		break;
+		if (otmp) recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
+		return(1);
 	case SCR_MAGIC_MAPPING:
 		if (level.flags.nommap) {
 		    Your("mind is filled with crazy lines!");
