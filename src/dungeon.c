@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dungeon.c	3.5	1999/10/30	*/
+/*	SCCS Id: @(#)dungeon.c	3.5	2006/02/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1093,11 +1093,14 @@ int x, y;
 	/* ridden steed always shares hero's location */
 	if (u.usteed) u.usteed->mx = u.ux, u.usteed->my = u.uy;
 #endif
+	/* when changing levels, don't leave old position set with
+	   stale values from previous level */
+	if (!on_level(&u.uz, &u.uz0)) u.ux0 = u.ux, u.uy0 = u.uy;
 }
 
 void
-u_on_sstairs() {	/* place you on the special staircase */
-
+u_on_sstairs()		/* place you on the special staircase */
+{
 	if (sstairs.sx) {
 	    u_on_newpos(sstairs.sx, sstairs.sy);
 	} else {
