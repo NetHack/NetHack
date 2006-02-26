@@ -1154,7 +1154,7 @@ struct obj *sobj;
 		known = TRUE;
 		if (!already_known)
 		    pline("This is a charging scroll.");
-		/* use it up now to prevent if from showing in the
+		/* use it up now to prevent it from showing in the
 		   getobj picklist because the "disappears" message
 		   was already delivered */
 		useup(sobj);
