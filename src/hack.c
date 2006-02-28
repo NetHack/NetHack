@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2005/12/16	*/
+/*	SCCS Id: @(#)hack.c	3.5	2006/02/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,7 +14,7 @@ STATIC_DCL void NDECL(dosinkfall);
 #endif
 STATIC_DCL boolean FDECL(findtravelpath, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(monstinroom, (struct permonst *,int));
-
+STATIC_DCL boolean FDECL(doorless_door, (int,int));
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
 
 #define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
@@ -88,21 +88,18 @@ moverock()
 	}
 	if (isok(rx,ry) && !IS_ROCK(levl[rx][ry].typ) &&
 	    levl[rx][ry].typ != IRONBARS &&
-	    (!IS_DOOR(levl[rx][ry].typ) || !(u.dx && u.dy) || (
-#ifdef REINCARNATION
-		!Is_rogue_level(&u.uz) &&
-#endif
-		(levl[rx][ry].doormask & ~D_BROKEN) == D_NODOOR)) &&
+	    (!IS_DOOR(levl[rx][ry].typ) || !(u.dx && u.dy) ||
+		doorless_door(rx, ry)) &&
 	    !sobj_at(BOULDER, rx, ry)) {
 	    ttmp = t_at(rx, ry);
 	    mtmp = m_at(rx, ry);
 
 		/* KMH -- Sokoban doesn't let you push boulders diagonally */
 	    if (In_sokoban(&u.uz) && u.dx && u.dy) {
-	    	if (Blind) feel_location(sx,sy);
-	    	pline("%s won't roll diagonally on this %s.",
-	        		The(xname(otmp)), surface(sx, sy));
-	    	goto cannot_push;
+		if (Blind) feel_location(sx,sy);
+		pline("%s won't roll diagonally on this %s.",
+		      The(xname(otmp)), surface(sx, sy));
+		goto cannot_push;
 	    }
 
 	    if (revive_nasty(rx, ry, "You sense movement on the other side."))
@@ -635,11 +632,7 @@ int mode;
 	} else {
 	testdiag:
 	    if (dx && dy && !Passes_walls
-		&& ((tmpr->doormask & ~D_BROKEN)
-#ifdef REINCARNATION
-		    || Is_rogue_level(&u.uz)
-#endif
-		    || block_door(x,y))) {
+		&& (!doorless_door(x, y) || block_door(x, y))) {
 		/* Diagonal moves into a door are not allowed. */
 		if (Blind && mode == DO_MOVE)
 		    feel_location(x,y);
@@ -680,13 +673,8 @@ int mode;
     ust = &levl[ux][uy];
 
     /* Now see if other things block our way . . */
-    if (dx && dy && !Passes_walls
-		     && (IS_DOOR(ust->typ) && ((ust->doormask & ~D_BROKEN)
-#ifdef REINCARNATION
-			     || Is_rogue_level(&u.uz)
-#endif
-			     || block_entry(x, y))
-			 )) {
+    if (dx && dy && !Passes_walls && IS_DOOR(ust->typ) &&
+	    (!doorless_door(ux, uy) || block_entry(x, y))) {
 	/* Can't move at a diagonal out of a doorway with door. */
 	return FALSE;
     }
@@ -2108,6 +2096,22 @@ stop:
 	    u.dy = y0-u.uy;
 	}
     }
+}
+
+/* check for a doorway which lacks its door (NODOOR or BROKEN) */
+STATIC_OVL boolean
+doorless_door(x, y)
+int x, y;
+{
+    struct rm *lev_p = &levl[x][y];
+
+    if (!IS_DOOR(lev_p->typ)) return FALSE;
+#ifdef REINCARNATION
+    /* all rogue level doors are doorless but disallow diagonal access, so
+       we treat them as if their non-existant doors were actually present */
+    if (Is_rogue_level(&u.uz)) return FALSE;
+#endif
+    return !(lev_p->doormask & ~(D_NODOOR|D_BROKEN));
 }
 
 /* something like lookaround, but we are not running */
