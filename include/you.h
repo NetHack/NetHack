@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)you.h	3.5	2005/09/12	*/
+/*	SCCS Id: @(#)you.h	3.5	2006/03/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -323,7 +323,7 @@ struct you {
 	schar uluck, moreluck;		/* luck and luck bonus */
 #define Luck	(u.uluck + u.moreluck)
 #define LUCKADD		3	/* added value when carrying luck stone */
-#define LUCKMAX		10	/* on moonlit nights 11 */
+#define LUCKMAX		10
 #define LUCKMIN		(-10)
 	schar	uhitinc;
 	schar	udaminc;

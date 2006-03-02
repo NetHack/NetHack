@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2005/12/26	*/
+/*	SCCS Id: @(#)pray.c	3.5	2006/03/01	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1018,7 +1018,6 @@ pleased(g_align)
 	}
 	case 7:
 	case 8:
-	case 9:		/* KMH -- can occur during full moons */
 #ifdef ELBERETH
 	    if (u.ualign.record >= PIOUS && !u.uevent.uhand_of_elbereth) {
 		gcrownu();
