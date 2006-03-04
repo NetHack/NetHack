@@ -17,6 +17,7 @@ static NEARDATA const char readable[] =
 		   { ALL_CLASSES, SCROLL_CLASS, SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
+STATIC_DCL void FDECL(learnscroll, (struct obj *));
 STATIC_DCL void NDECL(do_class_genocide);
 STATIC_DCL void FDECL(stripspe,(struct obj *));
 STATIC_DCL void FDECL(p_glow1,(struct obj *));
@@ -27,6 +28,16 @@ STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL void FDECL(maybe_tame, (struct monst *,struct obj *));
 
 STATIC_PTR void FDECL(set_lit, (int,int,genericptr_t));
+
+STATIC_OVL void
+learnscroll(sobj)
+struct obj *sobj;
+{
+    if (sobj->oclass != SPBOOK_CLASS && !objects[sobj->otyp].oc_name_known) {
+	makeknown(sobj->otyp); 
+	more_experienced(0, 10);
+    }
+}
 
 int
 doread()
@@ -139,10 +150,9 @@ doread()
 	}
 	if(!seffects(scroll))  {
 		if(!objects[scroll->otyp].oc_name_known) {
-		    if(known) {
-			makeknown(scroll->otyp);
-			more_experienced(0,10);
-		    } else if(!objects[scroll->otyp].oc_uname)
+		    if (known)
+			learnscroll(scroll);
+		    else if (!objects[scroll->otyp].oc_uname)
 			docall(scroll);
 		}
 		if(scroll->otyp != SCR_BLANK_PAPER)
@@ -649,9 +659,11 @@ struct obj *sobj;
 	}
 }
 
+/* scroll effects; return 1 if we use up the scroll and possibly make it
+   become discovered, 0 if caller should take care of those side-effects */
 int
 seffects(sobj)
-struct obj *sobj;
+struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 {
 	int cval, otyp = sobj->otyp;
 	boolean confused = (Confusion != 0),
@@ -688,9 +700,10 @@ struct obj *sobj;
 			strange_feeling(sobj,
 					!Blind ? "Your skin glows then fades." :
 					"Your skin feels warm for a moment.");
+			sobj = 0;	/* useup() in strange_feeling() */
 			exercise(A_CON, !scursed);
 			exercise(A_STR, !scursed);
-			return(1);
+			break;
 		}
 		if(confused) {
 			old_erodeproof = (otmp->oerodeproof != 0);
@@ -812,12 +825,13 @@ struct obj *sobj;
 	case SCR_DESTROY_ARMOR:
 	    {
 		otmp = some_armor(&youmonst);
-		if(confused) {
-			if(!otmp) {
-				strange_feeling(sobj,"Your bones itch.");
-				exercise(A_STR, FALSE);
-				exercise(A_CON, FALSE);
-				return(1);
+		if (confused) {
+			if (!otmp) {
+			    strange_feeling(sobj,"Your bones itch.");
+			    sobj = 0;	/* useup() in strange_feeling() */
+			    exercise(A_STR, FALSE);
+			    exercise(A_CON, FALSE);
+			    break;
 			}
 			old_erodeproof = (otmp->oerodeproof != 0);
 			new_erodeproof = scursed;
@@ -834,9 +848,10 @@ struct obj *sobj;
 		if (!scursed || !otmp || !otmp->cursed) {
 		    if (!destroy_arm(otmp)) {
 			strange_feeling(sobj,"Your skin itches.");
+			sobj = 0;	/* useup() in strange_feeling() */
 			exercise(A_STR, FALSE);
 			exercise(A_CON, FALSE);
-			return(1);
+			break;
 		    } else
 			known = TRUE;
 		} else {	/* armor and scroll both cursed */
@@ -1046,11 +1061,12 @@ struct obj *sobj;
 			uwep->oerodeproof = new_erodeproof ? 1 : 0;
 			break;
 		}
-		return !chwepon(sobj,
-				scursed ? -1 :
-				!uwep ? 1 :
-				uwep->spe >= 9 ? (rn2(uwep->spe) == 0) :
-				sblessed ? rnd(3 - uwep->spe / 3) : 1);
+		if (chwepon(sobj,
+			    scursed ? -1 : !uwep ? 1 :
+			    (uwep->spe >= 9) ? !rn2(uwep->spe) :
+			    sblessed ? rnd(3 - uwep->spe / 3) : 1))
+		    sobj = 0; /* nothing enchanted: strange_feeling -> useup */
+		break;
 	case SCR_TAMING:
 	case SPE_CHARM_MONSTER:
 		if (u.uswallow) {
@@ -1086,39 +1102,42 @@ struct obj *sobj;
 		break;
 	case SCR_TELEPORTATION:
 		if (confused || scursed) {
-			level_tele();
+		    level_tele();
 		} else {
-			if (sblessed && !Teleport_control) {
-				known = TRUE;
-				if (yn("Do you wish to teleport?")=='n')
-					break;
-			}
-			tele();
-			if(Teleport_control || !couldsee(u.ux0, u.uy0) ||
-			   (distu(u.ux0, u.uy0) >= 16))
-				known = TRUE;
+		    if (sblessed && !Teleport_control) {
+			known = TRUE;
+			if (yn("Do you wish to teleport?") == 'n')
+			    break;
+		    }
+		    tele();
+		    if (Teleport_control || !couldsee(u.ux0, u.uy0) ||
+			    distu(u.ux0, u.uy0) >= 16)
+			known = TRUE;
 		}
 		break;
 	case SCR_GOLD_DETECTION:
-		if (confused || scursed) return(trap_detect(sobj));
-		else return(gold_detect(sobj));
+		if ((confused || scursed) ? trap_detect(sobj) :
+			gold_detect(sobj))
+		    sobj = 0;	/* failure: strange_feeling() -> useup() */
+		break;
 	case SCR_FOOD_DETECTION:
 	case SPE_DETECT_FOOD:
 		if (food_detect(sobj))
-			return(1);	/* nothing detected */
+		    sobj = 0; /* nothing detected: strange_feeling -> useup */
 		break;
 	case SCR_IDENTIFY:
-		/* known = TRUE; */
+		/* known = TRUE; -- handled inline here */
+		/* use up the scroll first, before makeknown() performs a
+		   perm_invent update; also simplifies empty invent check */
+		useup(sobj);
+		sobj = 0;	/* it's gone */
 		if (confused)
 		    You("identify this as an identify scroll.");
-		else if (!already_known ||
-			/* force feedback now if invent will become
+		else if (!already_known || !invent)
+			/* force feedback now if invent became
 			   empty after using up this scroll */
-			    (sobj->quan == 1L && inv_cnt() == 1))
 		    pline("This is an identify scroll.");
-		if (!already_known) more_experienced(0, 10);
-		useup(sobj);
-		makeknown(SCR_IDENTIFY);
+		if (!already_known) learnscroll(sobj);
 		/*FALLTHRU*/
 	case SPE_IDENTIFY:
 		cval = 1;
@@ -1135,7 +1154,7 @@ struct obj *sobj;
 		       already been given above if reading a scroll) */
 		    pline("You're not carrying anything to be identified.");
 		}
-		return(1);
+		break;
 	case SCR_CHARGING:
 		if (confused) {
 		    if (scursed) {
@@ -1151,16 +1170,19 @@ struct obj *sobj;
 		    context.botl = 1;
 		    break;
 		}
-		known = TRUE;
-		if (!already_known)
-		    pline("This is a charging scroll.");
+		/* known = TRUE; -- handled inline here */
 		/* use it up now to prevent it from showing in the
 		   getobj picklist because the "disappears" message
 		   was already delivered */
 		useup(sobj);
+		sobj = 0;	/* it's gone */
+		if (!already_known) {
+		    pline("This is a charging scroll.");
+		    learnscroll(sobj);
+		}
 		otmp = getobj(all_count, "charge");
 		if (otmp) recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
-		return(1);
+		break;
 	case SCR_MAGIC_MAPPING:
 		if (level.flags.nommap) {
 		    Your("mind is filled with crazy lines!");
@@ -1212,9 +1234,9 @@ struct obj *sobj;
 		break;
 	case SCR_FIRE:
 		cval = bcsign(sobj);
-		if (!already_known) more_experienced(0,10);
 		useup(sobj);
-		makeknown(SCR_FIRE);
+		sobj = 0;	/* it's gone */
+		if (!already_known) learnscroll(sobj);
 		if(confused) {
 		    if(Fire_resistance) {
 			shieldeff(u.ux, u.uy);
@@ -1228,7 +1250,7 @@ struct obj *sobj;
 				makeplural(body_part(HAND)));
 			losehp(1, "scroll of fire", KILLED_BY_AN);
 		    }
-		    return(1);
+		    break;
 		}
 		if (Underwater) {
 		    pline_The("water around you vaporizes violently!");
@@ -1238,7 +1260,7 @@ struct obj *sobj;
 		}
 		explode(u.ux, u.uy, 11, (2*(rn1(3, 3) + 2 * cval) + 1)/3,
 							SCROLL_CLASS, EXPL_FIERY);
-		return(1);
+		break;
 	case SCR_EARTH:
 	    /* TODO: handle steeds */
 	    if (
@@ -1377,11 +1399,11 @@ struct obj *sobj;
 		cc.y = u.uy;
 		if (getpos(&cc, TRUE, "the desired position") < 0) {
 		    pline(Never_mind);
-		    return 0;
+		    break;
 		}
 		if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 32) {
 		    You("smell rotten eggs.");
-		    return 0;
+		    break;
 		}
 		(void) create_gas_cloud(cc.x, cc.y, 3+bcsign(sobj),
 						8+4*bcsign(sobj));
@@ -1390,7 +1412,7 @@ struct obj *sobj;
 	default:
 		impossible("What weird effect is this? (%u)", otyp);
 	}
-	return(0);
+	return sobj ? 0 : 1;
 }
 
 /* overcharging any wand or zapping/engraving cursed wand */
