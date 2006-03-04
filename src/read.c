@@ -1092,12 +1092,14 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 	case SCR_LIGHT:
 		if (!confused || rn2(5)) {
 			if(!Blind) known = TRUE;
-			litroom(!confused && !sobj->cursed, sobj);
+			litroom(!confused && !scursed, sobj);
 		} else {
 		   /* could be scroll of create monster, don't set known ...*/
-		    (void) create_critters(1, !sobj->cursed ?
+		    (void) create_critters(1, !scursed ?
 				&mons[PM_YELLOW_LIGHT] :
 			        &mons[PM_BLACK_LIGHT], TRUE);
+		    if(!objects[sobj->otyp].oc_uname)
+			docall(sobj);
 		}
 		break;
 	case SCR_TELEPORTATION:
