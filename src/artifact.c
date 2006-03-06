@@ -787,6 +787,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
     boolean youattack = (magr == &youmonst),
 	    youdefend = (mdef == &youmonst),
 	    resisted = FALSE, do_stun, do_confuse, result;
+    boolean hitteename = (has_name(mdef) && !strcmpi(hittee, MNAME(mdef)));
     int attack_indx, scare_dieroll = MB_MAX_DIEROLL / 2;
 
     result = FALSE;		/* no message given yet */
@@ -936,7 +937,8 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 	    if (do_stun) Strcat(buf, "stunned");
 	    if (do_stun && do_confuse) Strcat(buf, " and ");
 	    if (do_confuse) Strcat(buf, "confused");
-	    pline("%s %s %s%c", hittee, vtense(hittee, "are"),
+	    pline("%s %s %s%c", hittee,
+		  hitteename ? "is" : vtense(hittee, "are"),
 		  buf, (do_stun && do_confuse) ? '!' : '.');
 	}
     }
