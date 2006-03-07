@@ -29,7 +29,7 @@ static int explosion[3][3] = {
 void
 explode(x, y, type, dam, olet, expltype)
 int x, y;
-int type; /* the same as in zap.c */
+int type; /* the same as in zap.c; passes -(wand typ) for some WAND_CLASS */
 int dam;
 char olet;
 int expltype;
@@ -47,8 +47,14 @@ int expltype;
 	boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
 		do_hallu = FALSE;
 	char hallu_buf[BUFSZ];
+	short exploding_wand_typ = 0;
 
-	if (olet == WAND_CLASS)		/* retributive strike */
+	if (olet == WAND_CLASS)	{	/* retributive strike */
+		/*  If 'type' < 0 it indicates (wand type * -1) */
+		if (type < 0) {
+			exploding_wand_typ = (short)(type * -1);
+			type = 0;
+		}
 		switch (Role_switch) {
 			case PM_PRIEST:
 			case PM_MONK:
@@ -59,6 +65,7 @@ int expltype;
 				  break;
 			default:  break;
 		}
+	}
 
 	if (olet == MON_EXPLODE) {
 	    str = killer.name;
@@ -241,7 +248,7 @@ int expltype;
 		idamres = idamnonres = 0;
 		if (type >= 0)
 		    (void)zap_over_floor((xchar)(i+x-1), (xchar)(j+y-1),
-		    		type, &shopdamage);
+		    		type, &shopdamage, exploding_wand_typ);
 
 		mtmp = m_at(i+x-1, j+y-1);
 #ifdef STEED

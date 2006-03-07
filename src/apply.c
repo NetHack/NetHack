@@ -2821,7 +2821,7 @@ do_break_wand(obj)
     }
 
     /* magical explosion and its visual effect occur before specific effects */
-    explode(obj->ox, obj->oy, 0, rnd(dmg), WAND_CLASS, EXPL_MAGICAL);
+    explode(obj->ox, obj->oy, -(obj->otyp), rnd(dmg), WAND_CLASS, EXPL_MAGICAL);
 
     /* this makes it hit us last, so that we can see the action first */
     for (i = 0; i <= 8; i++) {

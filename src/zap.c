@@ -3506,7 +3506,7 @@ register int dx,dy;
 	bhitpos.x = sx,  bhitpos.y = sy;
 	/* Fireballs only damage when they explode */
 	if (type != ZT_SPELL(ZT_FIRE))
-	    range += zap_over_floor(sx, sy, type, &shopdamage);
+	    range += zap_over_floor(sx, sy, type, &shopdamage, 0);
 
 	if (mon) {
 	    if (type == ZT_SPELL(ZT_FIRE)) break;
@@ -3771,10 +3771,11 @@ long timeout;	/* unused */
  * amount by which range is reduced (the latter is just ignored by fireballs)
  */
 int
-zap_over_floor(x, y, type, shopdamage)
+zap_over_floor(x, y, type, shopdamage, exploding_wand_typ)
 xchar x, y;
 int type;
 boolean *shopdamage;
+short exploding_wand_typ;
 {
 	struct monst *mon;
 	int abstype = abs(type) % 10;
@@ -3917,6 +3918,15 @@ boolean *shopdamage;
 		    break;
 		default:
 		def_case:
+		    if (exploding_wand_typ > 0) {
+			/* Magical explosion from misc exploding wand */
+			if (exploding_wand_typ == WAN_STRIKING) {
+			    new_doormask = D_BROKEN;
+			    see_txt = "The door crashes open!";
+			    sense_txt = "feel a burst of cool air.";
+			    break;
+			}
+		    }
 		    if(cansee(x,y)) {
 			pline_The("door absorbs %s %s!",
 			      (type < 0) ? "the" : "your",
