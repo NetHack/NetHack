@@ -16,7 +16,7 @@ STATIC_VAR NEARDATA struct xlock_s {
 } xlock;
 
 STATIC_DCL const char *NDECL(lock_action);
-STATIC_DCL boolean FDECL(obstructed,(int,int));
+STATIC_DCL boolean FDECL(obstructed,(int,int,BOOLEAN_P));
 STATIC_DCL void FDECL(chest_shatter_msg, (struct obj *));
 
 boolean
@@ -578,21 +578,22 @@ doopen()		/* try to open a door */
 
 STATIC_OVL
 boolean
-obstructed(x,y)
+obstructed(x,y,quietly)
 register int x, y;
+boolean quietly;
 {
 	register struct monst *mtmp = m_at(x, y);
 
 	if(mtmp && mtmp->m_ap_type != M_AP_FURNITURE) {
 		if (mtmp->m_ap_type == M_AP_OBJECT) goto objhere;
-		pline("%s stands in the way!", !canspotmon(mtmp) ?
+		if (!quietly) pline("%s stands in the way!", !canspotmon(mtmp) ?
 			"Some creature" : Monnam(mtmp));
 		if (!canspotmon(mtmp))
 		    map_invisible(mtmp->mx, mtmp->my);
 		return(TRUE);
 	}
 	if (OBJ_AT(x, y)) {
-objhere:	pline("%s's in the way.", Something);
+objhere:	if (!quietly) pline("%s's in the way.", Something);
 		return(TRUE);
 	}
 	return(FALSE);
@@ -650,7 +651,7 @@ doclose()		/* try to close a door */
 	    return(0);
 	}
 
-	if(obstructed(x, y)) return(0);
+	if(obstructed(x, y, FALSE)) return(0);
 
 	if(door->doormask == D_BROKEN) {
 	    pline("This door is broken.");
@@ -748,7 +749,8 @@ int x, y;
 	const char *msg = (const char *)0;
 	const char *dustcloud = "A cloud of dust";
 	const char *quickly_dissipates = "quickly dissipates";
-	
+	boolean mysterywand = (otmp->oclass == WAND_CLASS && !otmp->dknown);
+
 	if (door->typ == SDOOR) {
 	    switch (otmp->otyp) {
 	    case WAN_OPENING:
@@ -780,7 +782,7 @@ int x, y;
 			dustcloud);
 		else
 			You_hear("a swoosh.");
-		if (obstructed(x,y)) {
+		if (obstructed(x,y,mysterywand)) {
 			if (vis) pline_The("cloud %s.",quickly_dissipates);
 			return FALSE;
 		}
@@ -791,7 +793,7 @@ int x, y;
 		return TRUE;
 	    }
 #endif
-	    if (obstructed(x,y)) return FALSE;
+	    if (obstructed(x,y,mysterywand)) return FALSE;
 	    /* Don't allow doors to close over traps.  This is for pits */
 	    /* & trap doors, but is it ever OK for anything else? */
 	    if (t_at(x,y)) {

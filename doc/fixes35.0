@@ -127,6 +127,7 @@ custom arrival message for special levels could be delivered too soon
 prevent scroll of charging that has already disappeared from showing in the
 	picklist of things to charge
 doors break instead of absorbing the blast of a broken wand of striking
+avoid "Something's in the way" message with unidentified wand of locking
 
 
 Platform- and/or Interface-Specific Fixes
