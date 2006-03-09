@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkroom.c	3.5	2006/01/28	*/
+/*	SCCS Id: @(#)mkroom.c	3.5	2006/03/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,7 +21,6 @@ STATIC_DCL void NDECL(mkshop), FDECL(mkzoo,(int)), NDECL(mkswamp);
 STATIC_DCL void NDECL(mktemple);
 STATIC_DCL coord * FDECL(shrine_pos, (int));
 STATIC_DCL struct permonst * NDECL(morguemon);
-STATIC_DCL struct permonst * NDECL(antholemon);
 STATIC_DCL struct permonst * NDECL(squadmon);
 STATIC_DCL void FDECL(save_room, (int,struct mkroom *));
 STATIC_DCL void FDECL(rest_room, (int,struct mkroom *));
@@ -426,17 +425,23 @@ morguemon()
 			: (i < 40) ? &mons[PM_WRAITH] : mkclass(S_ZOMBIE,0));
 }
 
-STATIC_OVL struct permonst *
+struct permonst *
 antholemon()
 {
-	int mtyp;
+	int mtyp, indx, trycnt = 0;
 
+	/* casts are for dealing with time_t */
+	indx = (int)((long)u.ubirthday % 3L);
+	indx += level_difficulty();
 	/* Same monsters within a level, different ones between levels */
-	switch ((level_difficulty() + ((long)u.ubirthday)) % 3) {
-	default:	mtyp = PM_GIANT_ANT; break;
-	case 0:		mtyp = PM_SOLDIER_ANT; break;
-	case 1:		mtyp = PM_FIRE_ANT; break;
-	}
+	do {
+	    switch ((indx + trycnt) % 3) {
+	    case 0:  mtyp = PM_SOLDIER_ANT; break;
+	    case 1:  mtyp = PM_FIRE_ANT; break;
+	    default: mtyp = PM_GIANT_ANT; break;
+	    }
+	    /* try again if chosen type has been genocided or used up */
+	} while (++trycnt < 3 && (mvitals[mtyp].mvflags & G_GONE));
 	return ((mvitals[mtyp].mvflags & G_GONE) ?
 			(struct permonst *)0 : &mons[mtyp]);
 }

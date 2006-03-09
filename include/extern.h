@@ -1150,6 +1150,7 @@ E void NDECL(obj_sanity_check);
 
 E void FDECL(mkroom, (int));
 E void FDECL(fill_zoo, (struct mkroom *));
+E struct permonst *NDECL(antholemon);
 E boolean FDECL(nexttodoor, (int,int));
 E boolean FDECL(has_dnstairs, (struct mkroom *));
 E boolean FDECL(has_upstairs, (struct mkroom *));
