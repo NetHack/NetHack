@@ -43,7 +43,6 @@ struct monst {
 	unsigned m_id;
 	short mnum;		/* permanent monster index number */
 	short cham;		/* if shapeshifter, orig mons[] idx goes here */
-#define CHAM_ORDINARY	0	/* not a shapechanger */
 	short movement;		/* movement points (derived from permonst definition and added effects */
 	uchar m_lev;		/* adjusted difficulty level of monster */
 	aligntyp malign;	/* alignment of this monster, relative to the

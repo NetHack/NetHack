@@ -1506,11 +1506,11 @@ struct monst *mon;
 struct permonst *ptr;
 {
 	int reslt = 0;
-	if (mon->cham != CHAM_ORDINARY) {
+	if (mon->cham >= LOW_PM) {
 		if (ptr == &mons[mon->cham])
-			mon->cham = CHAM_ORDINARY;
+			mon->cham = NON_PM;
 		reslt = newcham(mon, ptr, FALSE, FALSE);
-	} else if (mon->cham == CHAM_ORDINARY && ptr != mon->data) {
+	} else if (mon->cham == NON_PM && ptr != mon->data) {
 		mon->cham = monsndx(mon->data);
 		reslt = newcham(mon, ptr, FALSE, FALSE);
 	}

@@ -1237,7 +1237,7 @@ mdamagem(magr, mdef, mattk)
 	    if (mattk->adtyp == AD_DGST) {
 		/* various checks similar to dog_eat and meatobj.
 		 * after monkilled() to provide better message ordering */
-		if (mdef->cham != CHAM_ORDINARY) {
+		if (mdef->cham >= LOW_PM) {
 		    (void) newcham(magr, (struct permonst *)0, FALSE, TRUE);
 		} else if (mdef->data == &mons[PM_GREEN_SLIME]) {
 		    (void) newcham(magr, &mons[PM_GREEN_SLIME], FALSE, TRUE);

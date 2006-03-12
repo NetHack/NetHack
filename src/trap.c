@@ -449,8 +449,8 @@ int *fail_reason;
 		mon = makemon(&mons[PM_DOPPELGANGER], x, y,
 			      NO_MINVENT | MM_NOCOUNTBIRTH | MM_ADJACENTOK);
 		/* if hero has protection from shape changers, cham field will
-		   be CHAM_ORDINARY; otherwise, set form to match the statue */
-		if (mon && mon->cham != CHAM_ORDINARY)
+		   be NON_PM; otherwise, set form to match the statue */
+		if (mon && mon->cham >= LOW_PM)
 		    (void) newcham(mon, mptr, FALSE, FALSE);
 	    } else
 		mon = makemon(mptr, x, y, (cause == ANIMATE_SPELL) ?

@@ -2068,7 +2068,7 @@ create_particular()
 		}
 		if (mtmp) {
 		    madeany = TRUE;
-		    if (mtmp->cham != CHAM_ORDINARY && firstchoice != NON_PM)
+		    if (mtmp->cham >= LOW_PM && firstchoice != NON_PM)
 			(void)newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
 		}
 	    }

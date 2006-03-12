@@ -90,7 +90,6 @@ NEARDATA struct permonst mons[] = {
 /*
  * ants
  */
-    /* Never use M2_SHAPESHIFTER for mons[0] as long as CHAM_ORDINARY==0 */
     MON("giant ant", S_ANT,
 	LVL(2, 18, 3, 0, 0), (G_GENO|G_SGROUP|3),
 	A(ATTK(AT_BITE, AD_PHYS, 1, 4),

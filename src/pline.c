@@ -317,7 +317,7 @@ register struct monst *mtmp;
 	}
 	else if (mtmp->mpeaceful) Strcat(info, ", peaceful");
 	if (mtmp->meating)	  Strcat(info, ", eating");
-	if (mtmp->meating && (mtmp->cham == CHAM_ORDINARY) &&
+	if (mtmp->meating && (mtmp->cham == NON_PM) &&
 	    mtmp->mappearance && mtmp->m_ap_type) {
 	    	Sprintf(eos(info), ", mimicing %s",
 		    (mtmp->m_ap_type == M_AP_FURNITURE) ?

@@ -469,14 +469,14 @@ mattacku(mtmp)
 	}
 
 /*	Special demon handling code */
-	if((mtmp->cham == CHAM_ORDINARY) && is_demon(mdat) && !range2
+	if((mtmp->cham == NON_PM) && is_demon(mdat) && !range2
 	   && mtmp->data != &mons[PM_BALROG]
 	   && mtmp->data != &mons[PM_SUCCUBUS]
 	   && mtmp->data != &mons[PM_INCUBUS])
 	    if (!mtmp->mcan && !rn2(13)) (void)msummon(mtmp);
 
 /*	Special lycanthrope handling code */
-	if((mtmp->cham == CHAM_ORDINARY) && is_were(mdat) && !range2) {
+	if((mtmp->cham == NON_PM) && is_were(mdat) && !range2) {
 
 	    if(is_human(mdat)) {
 		if(!rn2(5 - (night() * 2)) && !mtmp->mcan) new_were(mtmp);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.5	2005/11/02	*/
+/*	SCCS Id: @(#)makemon.c	3.5	2006/03/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1030,11 +1030,11 @@ register int	mmflags;
 
 	if (mndx == PM_VLAD_THE_IMPALER)
 		mitem = CANDELABRUM_OF_INVOCATION;
-	mtmp->cham = CHAM_ORDINARY;	/* default is "not a shapechanger" */
-	if ((mcham = pm_to_cham(mndx)) != CHAM_ORDINARY) {
+	mtmp->cham = NON_PM;	/* default is "not a shapechanger" */
+	if ((mcham = pm_to_cham(mndx)) != NON_PM) {
 		/* this is a shapechanger after all */
 		if (Protection_from_shape_changers) {
-			;	/* stuck in its natural form (CHAM_ORDINARY) */
+			;	/* stuck in its natural form (NON_PM) */
 		} else {
 			/* General shapechangers start out with random form
 			   (this explicitly picks something from the normal

@@ -229,7 +229,7 @@ struct obj *otmp;
 		    /* natural shapechangers aren't affected by system shock
 		       (unless protection from shapechangers is interfering
 		       with their metabolism...) */
-		    if (mtmp->cham == CHAM_ORDINARY && !rn2(25)) {
+		    if (mtmp->cham == NON_PM && !rn2(25)) {
 			if (canseemon(mtmp)) {
 			    pline("%s shudders!", Monnam(mtmp));
 			    learn_it = TRUE;

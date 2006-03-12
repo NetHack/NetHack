@@ -169,7 +169,7 @@ boolean talk;
     }
 }
 
-#define Athome	(Inhell && (mtmp->cham == CHAM_ORDINARY))
+#define Athome	(Inhell && (mtmp->cham == NON_PM))
 
 int
 demon_talk(mtmp)		/* returns 1 if it won't attack. */

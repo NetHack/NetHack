@@ -210,8 +210,7 @@ struct obj {
 #define MAX_EGG_HATCH_TIME 200	/* longest an egg can remain unhatched */
 #define stale_egg(egg)	((monstermoves - (egg)->age) > (2*MAX_EGG_HATCH_TIME))
 #define ofood(o) ((o)->otyp == CORPSE || (o)->otyp == EGG || (o)->otyp == TIN)
-#define polyfodder(obj) (ofood(obj) && \
-			 pm_to_cham((obj)->corpsenm) != CHAM_ORDINARY)
+#define polyfodder(obj) (ofood(obj) && pm_to_cham((obj)->corpsenm) != NON_PM)
 #define mlevelgain(obj) (ofood(obj) && (obj)->corpsenm == PM_WRAITH)
 #define mhealup(obj)	(ofood(obj) && (obj)->corpsenm == PM_NURSE)
 
