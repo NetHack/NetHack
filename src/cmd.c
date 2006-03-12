@@ -509,7 +509,8 @@ wiz_wish()	/* Unlimited wishes for debug mode by Paul Polderman */
 	    flags.verbose = save_verbose;
 	    (void) encumber_msg();
 	} else
-	    pline("Unavailable command '^W'.");
+	    pline("Unavailable command '%s'.",
+			visctrl((int)cmd_from_func(wiz_wish)));
 	return 0;
 }
 
@@ -522,7 +523,8 @@ wiz_identify()
 		if (display_inventory((char *)0, TRUE) == -1)
 			identify_pack(0, FALSE);
 		iflags.override_ID = 0;
-	} else pline("Unavailable command '^I'.");
+	} else pline("Unavailable command '%s'.",
+			visctrl((int)cmd_from_func(wiz_identify)));
   	return 0;
 }
 
@@ -544,7 +546,8 @@ wiz_map()
 	    HConfusion = save_Hconf;
 	    HHallucination = save_Hhallu;
 	} else
-	    pline("Unavailable command '^F'.");
+	    pline("Unavailable command '%s'.",
+			visctrl((int)cmd_from_func(wiz_map)));
 	return 0;
 }
 
@@ -553,7 +556,8 @@ STATIC_PTR int
 wiz_genesis()
 {
 	if (wizard)	(void) create_particular();
-	else		pline("Unavailable command '^G'.");
+	else		pline("Unavailable command '%s'.",
+				visctrl((int)cmd_from_func(wiz_genesis)));
 	return 0;
 }
 
@@ -562,7 +566,8 @@ STATIC_PTR int
 wiz_where()
 {
 	if (wizard) (void) print_dungeon(FALSE, (schar *)0, (xchar *)0);
-	else	    pline("Unavailable command '^O'.");
+	else	    pline("Unavailable command '%s'.",
+				visctrl((int)cmd_from_func(wiz_where)));
 	return 0;
 }
 
@@ -571,7 +576,8 @@ STATIC_PTR int
 wiz_detect()
 {
 	if(wizard)  (void) findit();
-	else	    pline("Unavailable command '^E'.");
+	else	    pline("Unavailable command '%s'.",
+				visctrl((int)cmd_from_func(wiz_detect)));
 	return 0;
 }
 
@@ -580,7 +586,8 @@ STATIC_PTR int
 wiz_level_tele()
 {
 	if (wizard)	level_tele();
-	else		pline("Unavailable command '^V'.");
+	else		pline("Unavailable command '%s'.",
+				visctrl((int)cmd_from_func(wiz_level_tele)));
 	return 0;
 }
 
