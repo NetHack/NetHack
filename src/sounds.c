@@ -420,7 +420,8 @@ domonnoise(mtmp)
 register struct monst *mtmp;
 {
     register const char *pline_msg = 0,	/* Monnam(mtmp) will be prepended */
-			*verbl_msg = 0;	/* verbalize() */
+			*verbl_msg = 0,	/* verbalize() */
+			*verbl_msg_mcan = 0;	/* verbalize() if cancelled */
     struct permonst *ptr = mtmp->data;
     char verbuf[BUFSZ];
 
@@ -765,6 +766,7 @@ register struct monst *mtmp;
 	    pline_msg = "seems to mutter a cantrip.";
 	    break;
 	case MS_NURSE:
+	    verbl_msg_mcan = "I hate this job!";
 	    if (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
 		verbl_msg = "Put that weapon away before you hurt someone!";
 	    else if (uarmc || uarm || uarmh || uarms || uarmg || uarmf)
@@ -810,6 +812,7 @@ register struct monst *mtmp;
     }
 
     if (pline_msg) pline("%s %s", Monnam(mtmp), pline_msg);
+    else if (mtmp->mcan && verbl_msg_mcan) verbalize(verbl_msg_mcan);
     else if (verbl_msg) verbalize(verbl_msg);
     return(1);
 }
