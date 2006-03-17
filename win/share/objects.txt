@@ -6284,7 +6284,7 @@ P = (108, 145, 182)
   MMMMMMMPPPAAMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 330 (leather / detect monsters)
+# tile 330 (leathery / detect monsters)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
