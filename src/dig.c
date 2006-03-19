@@ -488,7 +488,7 @@ int ttyp;
 	boolean at_u = (x == u.ux) && (y == u.uy);
 	boolean wont_fall = Levitation || Flying;
 
-	if (u.utrap) {
+	if (at_u && u.utrap) {
 	    if (u.utraptype == TT_BURIEDBALL) buried_ball_to_punishment();
 	    else if (u.utraptype == TT_INFLOOR) u.utrap = 0;
 	}
