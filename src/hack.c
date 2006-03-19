@@ -915,7 +915,7 @@ domove()
 	register xchar x,y;
 	struct trap *trap;
 	int wtcap;
-	boolean on_ice;
+	boolean on_ice, adj_pit = FALSE;
 	xchar chainx, chainy, ballx, bally;	/* ball&chain new positions */
 	int bc_control;				/* control for ball&chain */
 	boolean cause_delay = FALSE;	/* dragging ball will skip a move */
@@ -1184,7 +1184,10 @@ domove()
 	}
 	if(u.utrap) {
 		if(u.utraptype == TT_PIT) {
-		    climb_pit();
+		    if (trap && trap->tseen &&
+			(trap->ttyp == PIT || trap->ttyp == SPIKED_PIT))
+			adj_pit = TRUE;
+		    if (!adj_pit) climb_pit();
 		} else if (u.utraptype == TT_LAVA) {
 		    if(flags.verbose) {
 			predicament = "stuck in the lava";
@@ -1281,7 +1284,7 @@ domove()
 		    }
 		    if((u.dx && u.dy) || !rn2(5)) u.utrap--;
 		}
-		return;
+		if (!adj_pit) return;
 	}
 
 	if (!test_move(u.ux, u.uy, x-u.ux, y-u.uy, DO_MOVE)) {

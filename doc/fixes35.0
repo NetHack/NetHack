@@ -187,6 +187,7 @@ number_pad:-1 to swap function of y and z keys; z to move NW, y to zap wands
 display spell retention information in the spell menu
 tame ghouls can eat old eggs
 new effect for reading a scroll of light while confused
+allow digging an adjacent pit with wand of digging while trapped in a pit
 
 
 Platform- and/or Interface-Specific New Features

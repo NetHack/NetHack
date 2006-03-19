@@ -2843,7 +2843,7 @@ do_break_wand(obj)
 		 * Adjust corresponding code in music.c for
 		 * drum of earthquake if you alter this sequence.
 		 */
-		typ = fillholetyp(x,y); 
+		typ = fillholetyp(x,y,FALSE); 
 		if (typ != ROOM) {
 			levl[x][y].typ = typ;
 			liquid_flow(x, y, typ, t_at(x,y),

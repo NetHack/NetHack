@@ -10,6 +10,7 @@
 union vlaunchinfo {
 	short v_launch_otyp;	/* type of object to be triggered */
 	coord v_launch2;	/* secondary launch point (for boulders) */
+	boolean v_conjoined[8];	/* conjoined pit locations */
 };
 
 struct trap {
@@ -30,6 +31,7 @@ struct trap {
 	union vlaunchinfo vl;
 #define launch_otyp	vl.v_launch_otyp
 #define launch2		vl.v_launch2
+#define conjoined       vl.v_conjoined
 };
 
 extern struct trap *ftrap;

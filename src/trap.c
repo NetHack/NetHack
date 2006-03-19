@@ -25,6 +25,10 @@ STATIC_DCL void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
 STATIC_DCL int FDECL(mkroll_launch,
 			(struct trap *,XCHAR_P,XCHAR_P,SHORT_P,long));
 STATIC_DCL boolean FDECL(isclearpath,(coord *, int, SCHAR_P, SCHAR_P));
+#if 0
+STATIC_DCL void FDECL(join_adjacent_pits, (struct trap *));
+#endif
+STATIC_DCL void FDECL(clear_conjoined_pits, (struct trap *));
 #ifdef STEED
 STATIC_OVL int FDECL(steedintrap, (struct trap *, struct obj *));
 STATIC_OVL boolean FDECL(keep_saddle_with_steedcorpse,
@@ -223,6 +227,7 @@ register int x, y, typ;
 	register struct trap *ttmp;
 	register struct rm *lev;
 	register boolean oldplace;
+	int idx;
 
 	if ((ttmp = t_at(x,y)) != 0) {
 	    if (ttmp->ttyp == MAGIC_PORTAL) return (struct trap *)0;
@@ -267,6 +272,8 @@ register int x, y, typ;
 	    case PIT:
 	    case SPIKED_PIT:
 	    case TRAPDOOR:
+	        for (idx = 0; idx < 8; ++idx)
+	    	    ttmp->conjoined[idx] = FALSE;
 		lev = &levl[x][y];
 		if (*in_rooms(x, y, SHOPBASE) &&
 			((typ == HOLE || typ == TRAPDOOR) ||
@@ -629,6 +636,7 @@ unsigned trflags;
 	boolean webmsgok = (!(trflags & NOWEBMSG));
 	boolean forcebungle = (trflags & FORCEBUNGLE);
 	boolean plunged = (trflags & TOOKPLUNGE);
+	boolean adj_pit = conjoined_pits(trap, t_at(u.ux0,u.uy0), TRUE);
 #ifdef STEED
 	int steed_article = ARTICLE_THE;
 #endif
@@ -659,9 +667,9 @@ unsigned trflags;
 		return;
 	    }
 	    if(!Fumbling && ttype != MAGIC_PORTAL &&
-		ttype != ANTI_MAGIC && !forcebungle && !plunged &&
+		ttype != ANTI_MAGIC && !forcebungle && !plunged && !adj_pit &&
 		(!rn2(5) ||
-	    ((ttype == PIT || ttype == SPIKED_PIT) && is_clinger(youmonst.data)))) {
+    ((ttype == PIT || ttype == SPIKED_PIT) && is_clinger(youmonst.data)))) {
 		You("escape %s %s.",
 		    (ttype == ARROW_TRAP && !trap->madeby_u) ? "an" :
 			a_your[trap->madeby_u],
@@ -938,8 +946,12 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 					   "poor", SUPPRESS_SADDLE, FALSE));
 		    } else
 #endif
-		    Strcpy(verbbuf, plunged ? "plunge" : "fall");
-		    You("%s into %s pit!", verbbuf, a_your[trap->madeby_u]);
+		    if (adj_pit) {
+		    	You("move into an adjacent pit.");
+		    } else {
+			Strcpy(verbbuf, plunged ? "plunge" : "fall");
+			You("%s into %s pit!", verbbuf, a_your[trap->madeby_u]);
+		    }
 		}
 		/* wumpus reference */
 		if (Role_if(PM_RANGER) && !trap->madeby_u && !trap->once &&
@@ -953,13 +965,14 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		    const char *predicament = "on a set of sharp iron spikes";
 #ifdef STEED
 		    if (u.usteed) {
-			pline("%s lands %s!",
+			pline("%s %s %s!",
 			      upstart(x_monnam(u.usteed, steed_article,
 					       "poor", SUPPRESS_SADDLE, FALSE)),
+			      adj_pit ? "steps" : "lands",
 			      predicament);
 		    } else
 #endif
-		    You("land %s!", predicament);
+		    You("%s %s!", adj_pit ? "step" : "land", predicament);
 		}
 		u.utrap = rn1(6,2);
 		u.utraptype = TT_PIT;
@@ -967,24 +980,29 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		if (!steedintrap(trap, (struct obj *)0)) {
 #endif
 		if (ttype == SPIKED_PIT) {
-		    losehp(Maybe_Half_Phys(rnd(10)),
+		    losehp(Maybe_Half_Phys(rnd(adj_pit ? 6 : 10)),
 			plunged ? "deliberately plunged into a pit of iron spikes" :
+			adj_pit ? "stepped into a pit of iron spikes" :
 				  "fell into a pit of iron spikes",
 			NO_KILLER_PREFIX);
 		    if (!rn2(6))
-			poisoned("spikes", A_STR, "fall onto poison spikes",
+			poisoned("spikes", A_STR,
+				adj_pit ? "stepping on poison spikes" :
+					  "fall onto poison spikes",
 				 8, FALSE);
-		} else
-		    losehp(Maybe_Half_Phys(rnd(6)),
-			plunged ? "deliberately plunged into a pit" :
-				  "fell into a pit",
-			NO_KILLER_PREFIX);
+		} else {
+		    if (!adj_pit)
+			losehp(Maybe_Half_Phys(rnd(6)),
+				plunged ? "deliberately plunged into a pit" :
+				  	  "fell into a pit",
+				NO_KILLER_PREFIX);
+		}
 		if (Punished && !carried(uball)) {
 		    unplacebc();
 		    ballfall();
 		    placebc();
 		}
-		selftouch("Falling, you");
+		if (!adj_pit) selftouch("Falling, you");
 		vision_full_recalc = 1;	/* vision limits change */
 		exercise(A_STR, FALSE);
 		exercise(A_DEX, FALSE);
@@ -3956,6 +3974,7 @@ register struct trap *trap;
 {
 	register struct trap *ttmp;
 
+	clear_conjoined_pits(trap);
 	if(trap == ftrap)
 		ftrap = ftrap->ntrap;
 	else {
@@ -3964,6 +3983,81 @@ register struct trap *trap;
 	}
 	dealloc_trap(trap);
 }
+
+boolean
+conjoined_pits(trap2, trap1, u_entering_trap2)
+struct trap *trap2, *trap1;
+boolean u_entering_trap2;
+{
+	int dx, dy, diridx, adjidx;
+	if (!trap1 || !trap2) return FALSE;
+	if (!isok(trap2->tx,trap2->ty) || !isok(trap1->tx,trap1->ty) ||
+	    !(trap2->ttyp == PIT || trap2->ttyp == SPIKED_PIT) ||
+	    !(trap1->ttyp == PIT || trap1->ttyp == SPIKED_PIT) ||
+	    (u_entering_trap2 && !(u.utrap && u.utraptype == TT_PIT)))
+	    	return FALSE;
+	dx = sgn(trap2->tx - trap1->tx);
+	dy = sgn(trap2->ty - trap1->ty);
+	for (diridx = 0; diridx < 8; diridx++)
+		if (xdir[diridx] == dx && ydir[diridx] == dy)
+			break;
+	/* diridx is valid if < 8 */
+	if (diridx < 8) {
+		adjidx = (diridx + 4) % 8;
+		if (trap1->conjoined[diridx] && trap2->conjoined[adjidx])
+			return TRUE;
+	}
+	return FALSE;
+}
+
+void
+clear_conjoined_pits(trap)
+struct trap *trap;
+{
+	int tmp, adj, x, y;
+	struct trap *t;
+	if (trap && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)) {
+		for(tmp = 0; tmp < 8; ++tmp) {
+		    if (trap->conjoined[tmp]) {
+			x = trap->tx + xdir[tmp];
+			y = trap->ty + ydir[tmp];
+			t = t_at(x,y);
+			if (isok(x,y) && t &&
+			    (t->ttyp == PIT || t->ttyp == SPIKED_PIT)) {
+				adj = (tmp + 4) % 8;
+				t->conjoined[adj] = FALSE;
+			}
+			trap->conjoined[tmp] = FALSE;
+		    }
+		}
+	}	
+}
+
+#if 0
+/*
+ * Mark all neighboring pits as conjoined pits.
+ * (currently not called from anywhere)
+ */
+STATIC_OVL void
+join_adjacent_pits(trap)
+struct trap *trap;
+{
+	struct trap *t;
+	int tmp, x, y;
+	if (!trap) return;
+	for(tmp = 0; tmp < 8; ++tmp) {
+		x = trap->tx + xdir[tmp];
+		y = trap->ty + ydir[tmp];
+		if (isok(x,y)) {
+		    if (((t = t_at(x,y)) != 0) &&
+			  (t->ttyp == PIT || t->ttyp == SPIKED_PIT)) {
+			trap->conjoined[tmp] = TRUE;
+			join_adjacent_pits(t);
+		    } else trap->conjoined[tmp] = FALSE;
+		}
+	}
+}
+#endif
 
 /*
  * Returns TRUE if you escaped a pit and are standing on the precipice.

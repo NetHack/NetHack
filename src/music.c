@@ -284,7 +284,7 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 		     * Adjust corresponding code in apply.c for
 		     * exploding wand of digging if you alter this sequence.
 		     */
-		    filltype = fillholetyp(x,y);
+		    filltype = fillholetyp(x,y,FALSE);
 		    if (filltype != ROOM) {
 			levl[x][y].typ = filltype;
 			liquid_flow(x, y, filltype, chasm, (char *)0);
