@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for utility programs.
-#	SCCS Id: @(#)Makefile.utl	3.5	2002/03/02
+#	SCCS Id: @(#)Makefile.utl	3.5	2006/03/15
 
 #  Copy this file to [.util]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -145,7 +145,7 @@ dgn_comp : $(DGNCOMP)
 recover  : $(RECOVER)
       @ $(ECHO) "recover is up to date."
 dlb	 : $(DLB)
-      @ $(ECHO) "recover is up to date."
+      @ $(ECHO) "dlb is up to date."
 
 $(LIBOPT) : $(SRC)Makefile.;		# linker options file
 	$(CD) $(SRC)
