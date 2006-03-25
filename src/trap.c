@@ -227,7 +227,6 @@ register int x, y, typ;
 	register struct trap *ttmp;
 	register struct rm *lev;
 	register boolean oldplace;
-	int idx;
 
 	if ((ttmp = t_at(x,y)) != 0) {
 	    if (ttmp->ttyp == MAGIC_PORTAL) return (struct trap *)0;
@@ -268,12 +267,12 @@ register int x, y, typ;
 	    case ROLLING_BOULDER_TRAP:	/* boulder will roll towards trigger */
 		(void) mkroll_launch(ttmp, x, y, BOULDER, 1L);
 		break;
-	    case HOLE:
 	    case PIT:
 	    case SPIKED_PIT:
+		ttmp->conjoined = 0;
+		/* fall through */
+	    case HOLE:
 	    case TRAPDOOR:
-	        for (idx = 0; idx < 8; ++idx)
-	    	    ttmp->conjoined[idx] = FALSE;
 		lev = &levl[x][y];
 		if (*in_rooms(x, y, SHOPBASE) &&
 			((typ == HOLE || typ == TRAPDOOR) ||
@@ -4004,7 +4003,8 @@ boolean u_entering_trap2;
 	/* diridx is valid if < 8 */
 	if (diridx < 8) {
 		adjidx = (diridx + 4) % 8;
-		if (trap1->conjoined[diridx] && trap2->conjoined[adjidx])
+		if ((trap1->conjoined & (1 << diridx)) &&
+		    (trap2->conjoined & (1 << adjidx)))
 			return TRUE;
 	}
 	return FALSE;
@@ -4014,20 +4014,20 @@ void
 clear_conjoined_pits(trap)
 struct trap *trap;
 {
-	int tmp, adj, x, y;
+	int diridx, adjidx, x, y;
 	struct trap *t;
 	if (trap && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)) {
-		for(tmp = 0; tmp < 8; ++tmp) {
-		    if (trap->conjoined[tmp]) {
-			x = trap->tx + xdir[tmp];
-			y = trap->ty + ydir[tmp];
+		for(diridx = 0; diridx < 8; ++diridx) {
+		    if (trap->conjoined & (1 << diridx)) {
+			x = trap->tx + xdir[diridx];
+			y = trap->ty + ydir[diridx];
 			t = t_at(x,y);
 			if (isok(x,y) && t &&
 			    (t->ttyp == PIT || t->ttyp == SPIKED_PIT)) {
-				adj = (tmp + 4) % 8;
-				t->conjoined[adj] = FALSE;
+				adjidx = (diridx + 4) % 8;
+				t->conjoined &= ~(1 << adjidx);
 			}
-			trap->conjoined[tmp] = FALSE;
+			trap->conjoined &= ~(1 << diridx);
 		    }
 		}
 	}	
@@ -4043,17 +4043,17 @@ join_adjacent_pits(trap)
 struct trap *trap;
 {
 	struct trap *t;
-	int tmp, x, y;
+	int diridx, x, y;
 	if (!trap) return;
-	for(tmp = 0; tmp < 8; ++tmp) {
-		x = trap->tx + xdir[tmp];
-		y = trap->ty + ydir[tmp];
+	for(diridx = 0; diridx < 8; ++diridx) {
+		x = trap->tx + xdir[diridx];
+		y = trap->ty + ydir[diridx];
 		if (isok(x,y)) {
 		    if (((t = t_at(x,y)) != 0) &&
 			  (t->ttyp == PIT || t->ttyp == SPIKED_PIT)) {
-			trap->conjoined[tmp] = TRUE;
+			trap->conjoined |= (1 << diridx);
 			join_adjacent_pits(t);
-		    } else trap->conjoined[tmp] = FALSE;
+		    } else trap->conjoined &= ~(1 << diridx);
 		}
 	}
 }

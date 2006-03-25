@@ -999,8 +999,8 @@ struct obj *obj;
 				/* idx is valid if < 8 */
 				if (idx < 8) {
 					int adjidx = (idx + 4) % 8;
-					trap_with_u->conjoined[idx] = TRUE;
-					trap->conjoined[adjidx] = TRUE;
+					trap_with_u->conjoined |= (1 << idx);
+					trap->conjoined |= (1 << adjidx);
 		          		pline(
 				  "You clear some debris from between the pits.");
 				}
@@ -1319,8 +1319,8 @@ zap_dig()
 		    if (adjpit && (adjpit->ttyp == PIT ||
 				   adjpit->ttyp == SPIKED_PIT)) {
 				int adjidx = (diridx + 4) % 8;
-				trap_with_u->conjoined[diridx] = TRUE;
-				adjpit->conjoined[adjidx] = TRUE;
+				trap_with_u->conjoined |= (1 << diridx);
+				adjpit->conjoined |= (1 << adjidx);
 				flow_x = zx;
 				flow_y = zy;
 				pitflow = TRUE;
@@ -1524,7 +1524,7 @@ schar filltyp;
 			    "Suddenly %s flows in from the adjacent pit!":
 			    (char *)0);
 		for(idx = 0; idx < 8; ++idx) {
-			if (t.conjoined[idx]) {
+			if (t.conjoined & (1 << idx)) {
 				int x, y;
 				struct trap *t2;
 				x = t.tx + xdir[idx];
@@ -1535,7 +1535,8 @@ schar filltyp;
 				 * called deltrap() which cleaned up the
 				 * conjoined fields on both pits.
 				 */
-				if (t2 && t2->conjoined[(idx + 4) % 8])
+				 
+				if (t2 && (t2->conjoined & (1 << ((idx + 4) % 8))))
 #endif
 				/* recursion */
 				pit_flow(t2, filltyp);
