@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)teleport.c	3.5	2003/12/12	*/
+/*	SCCS Id: @(#)teleport.c	3.5	2006/03/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -621,17 +621,16 @@ level_tele()
 		    newlevel.dnum = destdnum;
 		    newlevel.dlevel = destlev;
 		    if (In_endgame(&newlevel) && !In_endgame(&u.uz)) {
-			Sprintf(buf, "Destination is earth level");
-			if (!u.uhave.amulet) {
-			    struct obj *obj = mksobj(AMULET_OF_YENDOR,
-						     TRUE, FALSE);
-			    if (obj) {
-				obj = addinv(obj);
-				Strcat(buf, " with the amulet");
-			    }
+			struct obj *amu;
+
+			if (!u.uhave.amulet &&
+			  (amu = mksobj(AMULET_OF_YENDOR, TRUE, FALSE)) != 0) {
+			    /* ordinarily we'd use hold_another_object()
+			       for something like this, but we don't want
+			       fumbling or already full pack to interfere */
+			    amu = addinv(amu);
+			    prinv("Endgame prerequisite:", amu, 0L);
 			}
-			assign_level(&newlevel, &earth_level);
-			pline("%s.", buf);
 		    }
 		    force_dest = TRUE;
 		} else
@@ -664,7 +663,7 @@ level_tele()
 	    /* if in Knox and the requested level > 0, stay put.
 	     * we let negative values requests fall into the "heaven" loop.
 	     */
-	    if (Is_knox(&u.uz) && newlev > 0) {
+	    if (Is_knox(&u.uz) && newlev > 0 && !force_dest) {
 		You(shudder_for_moment);
 		return;
 	    }
@@ -690,7 +689,7 @@ level_tele()
 	if (u.utrap && u.utraptype == TT_BURIEDBALL)
 		buried_ball_to_punishment();
 
-	if (!next_to_u()) {
+	if (!next_to_u() && !force_dest) {
 		You(shudder_for_moment);
 		return;
 	}

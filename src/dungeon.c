@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dungeon.c	3.5	2006/02/24	*/
+/*	SCCS Id: @(#)dungeon.c	3.5	2006/03/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,6 +49,10 @@ STATIC_DCL int FDECL(possible_places, (int, boolean *, struct proto_dungeon *));
 STATIC_DCL xchar FDECL(pick_level, (boolean *, int));
 STATIC_DCL boolean FDECL(place_level, (int, struct proto_dungeon *));
 #ifdef WIZARD
+STATIC_DCL boolean FDECL(unplaced_floater, (struct dungeon *));
+STATIC_DCL boolean FDECL(unreachable_level, (d_level *,BOOLEAN_P));
+STATIC_DCL void FDECL(tport_menu, (winid,char *,struct lchoice *,
+				   d_level *,BOOLEAN_P));
 STATIC_DCL const char *FDECL(br_string, (int));
 STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P, struct lchoice *));
 #endif
@@ -1510,6 +1514,68 @@ const char *nam;
 
 #ifdef WIZARD
 
+STATIC_OVL boolean
+unplaced_floater(dptr)
+struct dungeon *dptr;
+{
+    branch *br;
+    int idx = (int)(dptr - dungeons);
+
+    /* if other floating branches are added, this will need to change */
+    if (idx != knox_level.dnum) return FALSE;
+    for (br = branches; br; br = br->next)
+	if (br->end1.dnum == n_dgns && br->end2.dnum == idx) return TRUE;
+    return FALSE;
+}
+
+STATIC_OVL boolean
+unreachable_level(lvl_p, unplaced)
+d_level *lvl_p;
+boolean unplaced;
+{
+    s_level *dummy;
+
+    if (unplaced) return TRUE;
+    if (In_endgame(&u.uz) && !In_endgame(lvl_p)) return TRUE;
+    if ((dummy = find_level("dummy")) != 0 && on_level(lvl_p, &dummy->dlevel))
+	return TRUE;
+    return FALSE;
+}
+
+static void
+tport_menu(win, entry, lchoices, lvl_p, unreachable)
+winid win;
+char *entry;
+struct lchoice *lchoices;
+d_level *lvl_p;
+boolean unreachable;
+{
+    char tmpbuf[BUFSZ];
+    anything any;
+
+    lchoices->lev[lchoices->idx] = lvl_p->dlevel;
+    lchoices->dgn[lchoices->idx] = lvl_p->dnum;
+    lchoices->playerlev[lchoices->idx] = depth(lvl_p);
+    any.a_void = 0;
+    if (unreachable) {
+	/* not selectable, but still consumes next menuletter;
+	   prepend padding in place of missing menu selector */
+	Sprintf(tmpbuf, "    %s", entry);
+	entry = tmpbuf;
+    } else {
+	any.a_int = lchoices->idx + 1;
+    }
+    add_menu(win, NO_GLYPH, &any, lchoices->menuletter,
+	     0, ATR_NONE, entry, MENU_UNSELECTED);
+    /* this assumes there are at most 52 interesting levels */
+    if (lchoices->menuletter == 'z')
+	lchoices->menuletter = 'A';
+    else
+	lchoices->menuletter++;
+    lchoices->idx++;
+    return;
+}
+
 /* Convert a branch type to a string usable by print_dungeon(). */
 STATIC_OVL const char *
 br_string(type)
@@ -1526,17 +1592,16 @@ br_string(type)
 
 /* Print all child branches between the lower and upper bounds. */
 STATIC_OVL void
-print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices)
+print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices_p)
     winid win;
     int   dnum;
     int   lower_bound;
     int   upper_bound;
     boolean bymenu;
-    struct lchoice *lchoices;
+    struct lchoice *lchoices_p;
 {
     branch *br;
     char buf[BUFSZ];
-    anything any;
 
     /* This assumes that end1 is the "parent". */
     for (br = branches; br; br = br->next) {
@@ -1546,18 +1611,10 @@ print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices)
 		    br_string(br->type),
 		    dungeons[br->end2.dnum].dname,
 		    depth(&br->end1));
-	    if (bymenu) {
-		lchoices->lev[lchoices->idx] = br->end1.dlevel;
-		lchoices->dgn[lchoices->idx] = br->end1.dnum;
-		lchoices->playerlev[lchoices->idx] = depth(&br->end1);
-		any.a_void = 0;
-		any.a_int = lchoices->idx + 1;
-		add_menu(win, NO_GLYPH, &any, lchoices->menuletter,
-				0, ATR_NONE, buf, MENU_UNSELECTED);
-		if (lchoices->menuletter == 'z') lchoices->menuletter = 'A';
-		else lchoices->menuletter++;
-		lchoices->idx++;
-	    } else
+	    if (bymenu)
+		tport_menu(win, buf, lchoices_p, &br->end1,
+			   unreachable_level(&br->end1, FALSE));
+	    else
 		putstr(win, 0, buf);
 	}
     }
@@ -1572,7 +1629,8 @@ xchar *rdgn;
 {
     int     i, last_level, nlev;
     char    buf[BUFSZ];
-    boolean first;
+    const char *descr;
+    boolean first, unplaced;
     s_level *slev;
     dungeon *dptr;
     branch  *br;
@@ -1587,12 +1645,16 @@ xchar *rdgn;
     }
 
     for (i = 0, dptr = dungeons; i < n_dgns; i++, dptr++) {
+	if (bymenu && In_endgame(&u.uz) && i != astral_level.dnum) continue;
+	unplaced = unplaced_floater(dptr);
+	descr = unplaced ? "depth" : "level";
 	nlev = dptr->num_dunlevs;
 	if (nlev > 1)
-	    Sprintf(buf, "%s: levels %d to %d", dptr->dname, dptr->depth_start,
-						dptr->depth_start + nlev - 1);
+	    Sprintf(buf, "%s: %s %d to %d", dptr->dname, makeplural(descr),
+		    dptr->depth_start, dptr->depth_start + nlev - 1);
 	else
-	    Sprintf(buf, "%s: level %d", dptr->dname, dptr->depth_start);
+	    Sprintf(buf, "%s: %s %d", dptr->dname, descr,
+		    dptr->depth_start);
 
 	/* Most entrances are uninteresting. */
 	if (dptr->entry_lev != 1) {
@@ -1621,24 +1683,10 @@ xchar *rdgn;
 	    Sprintf(buf, "   %s: %d", slev->proto, depth(&slev->dlevel));
 	    if (Is_stronghold(&slev->dlevel))
 		Sprintf(eos(buf), " (tune %s)", tune);
-	    if (bymenu) {
-	    	/* If other floating branches are added, this will need to change */
-	    	if (i != knox_level.dnum) {
-			lchoices.lev[lchoices.idx] = slev->dlevel.dlevel;
-			lchoices.dgn[lchoices.idx] = i;
-		} else {
-			lchoices.lev[lchoices.idx] = depth(&slev->dlevel);
-			lchoices.dgn[lchoices.idx] = 0;
-		}
-		lchoices.playerlev[lchoices.idx] = depth(&slev->dlevel);
-		any.a_void = 0;
-		any.a_int = lchoices.idx + 1;
-		add_menu(win, NO_GLYPH, &any, lchoices.menuletter,
-				0, ATR_NONE, buf, MENU_UNSELECTED);
-		if (lchoices.menuletter == 'z') lchoices.menuletter = 'A';
-		else lchoices.menuletter++;
-		lchoices.idx++;
-	    } else
+	    if (bymenu)
+		tport_menu(win, buf, &lchoices, &slev->dlevel,
+			   unreachable_level(&slev->dlevel, unplaced));
+	    else
 		putstr(win, 0, buf);
 
 	    last_level = slev->dlevel.dlevel;
@@ -1647,24 +1695,8 @@ xchar *rdgn;
 	print_branch(win, i, last_level, MAXLEVEL, bymenu, &lchoices);
     }
 
-    /* Print out floating branches (if any). */
-    for (first = TRUE, br = branches; br; br = br->next) {
-	if (br->end1.dnum == n_dgns) {
-	    if (first) {
-	    	if (!bymenu) {
-		    putstr(win, 0, "");
-		    putstr(win, 0, "Floating branches");
-		}
-		first = FALSE;
-	    }
-	    Sprintf(buf, "   %s to %s",
-			br_string(br->type), dungeons[br->end2.dnum].dname);
-	    if (!bymenu)
-		putstr(win, 0, buf);
-	}
-    }
     if (bymenu) {
-    	int n;
+	int n;
 	menu_item *selected;
 	int idx;
 
@@ -1681,6 +1713,20 @@ xchar *rdgn;
 		}
 	}
 	return 0;
+    }
+
+    /* Print out floating branches (if any). */
+    for (first = TRUE, br = branches; br; br = br->next) {
+	if (br->end1.dnum == n_dgns) {
+	    if (first) {
+		putstr(win, 0, "");
+		putstr(win, 0, "Floating branches");
+		first = FALSE;
+	    }
+	    Sprintf(buf, "   %s to %s",
+		    br_string(br->type), dungeons[br->end2.dnum].dname);
+	    putstr(win, 0, buf);
+	}
     }
 
     /* I hate searching for the invocation pos while debugging. -dean */
