@@ -129,6 +129,7 @@ prevent scroll of charging that has already disappeared from showing in the
 doors break instead of absorbing the blast of a broken wand of striking
 avoid "Something's in the way" message with unidentified wand of locking
 better handling for Fort Ludios and endgame in wizard mode's `^V ?' menu
+no free lunch for gelatinous cubes including scrolls of mail
 
 
 Platform- and/or Interface-Specific Fixes

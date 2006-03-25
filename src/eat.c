@@ -1902,6 +1902,12 @@ eatspecial() /* called after eating non-food */
 		    useupf(otmp, otmp->quan);
 		return;
 	}
+#ifdef MAIL
+	if (otmp->otyp == SCR_MAIL) {
+		/* no nutrition */
+		pline("This junk mail is less than satisfying.");
+	}
+#endif
 	if (otmp->oclass == POTION_CLASS) {
 		otmp->quan++; /* dopotion() does a useup() */
 		(void)dopotion(otmp);
@@ -2179,7 +2185,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 {
 	register struct obj *otmp;
 	int basenutrit;			/* nutrition of full item */
-	boolean dont_start = FALSE;
+	boolean dont_start = FALSE, nodelicious = FALSE;
 	
 	if (Strangled) {
 		pline("If you can't breathe air, how can you consume solids?");
@@ -2263,6 +2269,12 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		basenutrit = weight(otmp);
 	    /* oc_nutrition is usually weight anyway */
 	    else basenutrit = objects[otmp->otyp].oc_nutrition;
+#ifdef MAIL
+	    if (otmp->otyp == SCR_MAIL) {
+		basenutrit = 0;
+		nodelicious = TRUE;
+	    }
+#endif
 	    context.victual.nmod = basenutrit;
 	    context.victual.eating = TRUE; /* needed for lesshungry() */
 
@@ -2285,7 +2297,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		    losehp(rnd(15), xname(otmp), KILLED_BY_AN);
 		} else
 		    You("seem unaffected by the poison.");
-	    } else if (!otmp->cursed)
+	    } else if (!otmp->cursed && !nodelicious)
 		pline("%s%s is delicious!",
 		      (obj_is_pname(otmp) &&
 		       (otmp->oartifact < ART_ORB_OF_DETECTION)) ? "" : "This ",
