@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2005/07/13	*/
+/*	SCCS Id: @(#)mon.c	3.5	2006/03/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2764,17 +2764,17 @@ kill_genocided_monsters()
 	 *	2) otherwise, force every chameleon which is imitating
 	 *	   any genocided species to take on a new form.
 	 */
-	for (mtmp = fmon; mtmp; mtmp = mtmp2, kill_cham = FALSE) {
+	for (mtmp = fmon; mtmp; mtmp = mtmp2) {
 	    mtmp2 = mtmp->nmon;
 	    if (DEADMONSTER(mtmp)) continue;
 	    mndx = monsndx(mtmp->data);
-	    if (mtmp->cham >= LOW_PM && (mvitals[mtmp->cham].mvflags & G_GENOD))
-		kill_cham = TRUE;
+	    kill_cham = (mtmp->cham >= LOW_PM &&
+			  (mvitals[mtmp->cham].mvflags & G_GENOD));
 	    if ((mvitals[mndx].mvflags & G_GENOD) || kill_cham) {
-	    	if (mtmp->cham >= LOW_PM && !kill_cham)
-			(void) newcham(mtmp, (struct permonst *)0, FALSE, FALSE);
+		if (mtmp->cham >= LOW_PM && !kill_cham)
+		    (void) newcham(mtmp, (struct permonst *)0, FALSE, FALSE);
 		else
-			mondead(mtmp);
+		    mondead(mtmp);
 	    }
 	    if (mtmp->minvent) kill_eggs(mtmp->minvent);
 	}
