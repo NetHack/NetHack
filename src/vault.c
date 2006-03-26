@@ -46,6 +46,7 @@ boolean forceshow;
 	struct monst *mtmp;
 	boolean sawcorridor = FALSE;
 	struct egd *egrd = EGD(grd);
+	struct trap *trap = (struct trap *)0;
 
 	if (!on_level(&egrd->gdlevel, &u.uz)) return TRUE;
 
@@ -67,6 +68,13 @@ boolean forceshow;
 			    if(mtmp->mtame) yelp(mtmp);
 			    (void) rloc(mtmp, FALSE);
 			}
+		}
+		if ((trap = t_at(fcx,fcy)) != 0 &&
+		     trap->ttyp == PIT && trap->madeby_u &&
+		     IS_STWALL(egrd->fakecorr[fcbeg].ftyp)) {
+		     /* you dug a pit while following the guard out,
+			so fill it in when the location reverts to stone */
+			deltrap(trap);
 		}
 		if (levl[fcx][fcy].typ == CORR && cansee(fcx, fcy))
 		    sawcorridor = TRUE;
