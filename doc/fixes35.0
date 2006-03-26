@@ -130,6 +130,7 @@ doors break instead of absorbing the blast of a broken wand of striking
 avoid "Something's in the way" message with unidentified wand of locking
 better handling for Fort Ludios and endgame in wizard mode's `^V ?' menu
 no free lunch for gelatinous cubes eating scrolls of mail
+eating gold in front of the vault guard will make the guard angry
 
 
 Platform- and/or Interface-Specific Fixes

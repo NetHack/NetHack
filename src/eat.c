@@ -1900,6 +1900,7 @@ eatspecial() /* called after eating non-food */
 #endif
 		else
 		    useupf(otmp, otmp->quan);
+		vault_gd_watching(GD_EATGOLD);
 		return;
 	}
 #ifdef MAIL

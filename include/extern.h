@@ -2236,6 +2236,7 @@ E int FDECL(gd_move, (struct monst *));
 E void NDECL(paygd);
 E long NDECL(hidden_gold);
 E boolean NDECL(gd_sound);
+E void FDECL(vault_gd_watching, (unsigned int));
 
 /* ### version.c ### */
 

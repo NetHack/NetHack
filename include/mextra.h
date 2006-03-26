@@ -62,6 +62,8 @@
  **	formerly vault.h -- vault guard extension
  */
 #define FCSIZ	(ROWNO+COLNO)
+#define GD_EATGOLD	0x01
+#define GD_DESTROYGOLD	0x02
 
 struct fakecorridor {
 	xchar fx, fy, ftyp;
@@ -75,7 +77,8 @@ struct egd {
 	d_level gdlevel;	/* level (& dungeon) guard was created in */
 	xchar warncnt;		/* number of warnings to follow */
 	Bitfield(gddone,1);	/* true iff guard has released player */
-	Bitfield(unused,7);
+	Bitfield(witness,2);	/* the guard saw you do something */
+	Bitfield(unused,5);
 	struct fakecorridor fakecorr[FCSIZ];
 };
 

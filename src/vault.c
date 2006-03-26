@@ -510,6 +510,14 @@ register struct monst *grd;
 	if(abs(egrd->ogx - grd->mx) > 1 ||
 			abs(egrd->ogy - grd->my) > 1)
 		return(-1);	/* teleported guard - treat as monster */
+
+	if(egrd->witness) {
+		verbalize("How dare you %s that gold, scoundrel!",
+			(egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
+		egrd->witness = 0;
+		grd->mpeaceful = 0;
+		return(-1);
+	}
 	if(egrd->fcend == 1) {
 	    if(u_in_vault &&
 			(u_carry_gold || um_dist(grd->mx, grd->my, 1))) {
@@ -864,4 +872,15 @@ gd_sound()  /* prevent "You hear footsteps.." when inappropriate */
 	else return((boolean)(grd == (struct monst *)0));
 }
 
+void
+vault_gd_watching(activity)
+unsigned int activity;
+{
+	struct monst *guard = findgd();
+	if (guard && guard->mcansee && m_canseeu(guard)) {
+		if (activity == GD_EATGOLD ||
+		    activity == GD_DESTROYGOLD)
+			EGD(guard)->witness = activity;
+	}
+}
 /*vault.c*/
