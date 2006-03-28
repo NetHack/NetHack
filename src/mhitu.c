@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2006/02/01	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2006/03/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1662,11 +1662,22 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		display_nhwindow(WIN_MESSAGE, FALSE);
 		vision_recalc(2);	/* hero can't see anything */
 		u.uswallow = 1;
+		/* for digestion, shorter time is more dangerous;
+		   for other swallowings, longer time means more
+		   chances for the swallower to attack */
+		if (mattk->adtyp == AD_DGST) {
+		    tim_tmp = 25 - (int)mtmp->m_lev;
+		    if (tim_tmp > 0) tim_tmp = rnd(tim_tmp) / 2;
+		    else if (tim_tmp < 0) tim_tmp = -(rnd(-tim_tmp) / 2);
+		    /* having good armor & high constitution makes
+		       it take longer for you to be digested, but
+		       you'll end up trapped inside for longer too */
+		    tim_tmp += -u.uac + 10 + (ACURR(A_CON) / 3 - 1);
+		} else {
+		    /* higher level attacker takes longer to eject hero */
+		    tim_tmp = rnd((int)mtmp->m_lev + 10 / 2);
+		}
 		/* u.uswldtim always set > 1 */
-		tim_tmp = 25 - (int)mtmp->m_lev;
-		if (tim_tmp > 0) tim_tmp = rnd(tim_tmp) / 2;
-		else if (tim_tmp < 0) tim_tmp = -(rnd(-tim_tmp) / 2);
-		tim_tmp += -u.uac + 10;
 		u.uswldtim = (unsigned)((tim_tmp < 2) ? 2 : tim_tmp);
 		swallowed(1);
 		for (otmp2 = invent; otmp2; otmp2 = otmp2->nobj)
