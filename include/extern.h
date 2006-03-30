@@ -1358,6 +1358,7 @@ E int FDECL(breamu, (struct monst *,struct attack *));
 E boolean FDECL(linedup, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P));
 E boolean FDECL(lined_up, (struct monst *));
 E struct obj *FDECL(m_carrying, (struct monst *,int));
+E void FDECL(m_useupall, (struct monst *,struct obj *));
 E void FDECL(m_useup, (struct monst *,struct obj *));
 E void FDECL(m_throw, (struct monst *,int,int,int,int,int,struct obj *));
 E boolean FDECL(hits_bars, (struct obj **,int,int,int,int));

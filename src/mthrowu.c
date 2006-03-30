@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.5	2005/06/21	*/
+/*	SCCS Id: @(#)mthrowu.c	3.5	2006/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -445,23 +445,32 @@ struct obj *obj;		/* missile (or stack providing it) */
 	}
 }
 
-/* Remove an item from the monster's inventory and destroy it. */
+/* remove an entire item from a monster's inventory; destroy that item */
+void
+m_useupall(mon, obj)
+struct monst *mon;
+struct obj *obj;
+{
+	obj_extract_self(obj);
+	possibly_unwield(mon, FALSE);
+	if (obj->owornmask) {
+	    mon->misc_worn_check &= ~obj->owornmask;
+	    update_mon_intrinsics(mon, obj, FALSE, FALSE);
+	}
+	obfree(obj, (struct obj*) 0);
+}
+
+/* remove one instance of an item from a monster's inventory */
 void
 m_useup(mon, obj)
 struct monst *mon;
 struct obj *obj;
 {
 	if (obj->quan > 1L) {
-		obj->quan--;
-		obj->owt = weight(obj);
+	    obj->quan--;
+	    obj->owt = weight(obj);
 	} else {
-		obj_extract_self(obj);
-		possibly_unwield(mon, FALSE);
-		if (obj->owornmask) {
-		    mon->misc_worn_check &= ~obj->owornmask;
-		    update_mon_intrinsics(mon, obj, FALSE, FALSE);
-		}
-		obfree(obj, (struct obj*) 0);
+	    m_useupall(mon, obj);
 	}
 }
 

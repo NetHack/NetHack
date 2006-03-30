@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2005/11/30	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2006/03/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -662,7 +662,7 @@ int thrown;
 			mon->weapon_check = NEED_WEAPON;
 			pline("%s from the force of your blow!",
 			      Yobjnam2(monwep, "shatter"));
-			m_useup(mon, monwep);
+			m_useupall(mon, monwep);
 			/* If someone just shattered MY weapon, I'd flee! */
 			if (rn2(4)) {
 			    monflee(mon, d(2,3), TRUE, TRUE);
