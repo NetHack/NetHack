@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2006/02/15	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2006/03/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -128,6 +128,7 @@ STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_smell);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
 STATIC_PTR int NDECL(wiz_show_wmodes);
+STATIC_PTR int NDECL(wiz_map_terrain);
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern void FDECL(show_borlandc_stats, (winid));
 #endif
@@ -745,8 +746,10 @@ wiz_show_wmodes()
 	int x,y;
 	char row[COLNO+1];
 	struct rm *lev;
+	boolean istty = !strcmp(windowprocs.name, "tty");
 
 	win = create_nhwindow(NHW_TEXT);
+	if (istty) putstr(win, 0, "");	/* tty only: blank top line */
 	for (y = 0; y < ROWNO; y++) {
 	    for (x = 0; x < COLNO; x++) {
 		lev = &levl[x][y];
@@ -762,9 +765,116 @@ wiz_show_wmodes()
 		    row[x] = 'x';
 	    }
 	    row[COLNO] = '\0';
-	    putstr(win, 0, row);
+	    /* map column 0, levl[0][], is off the left edge of the screen */
+	    putstr(win, 0, &row[1]);
 	}
 	display_nhwindow(win, TRUE);
+	destroy_nhwindow(win);
+	return 0;
+}
+
+/* #terrain command */
+STATIC_PTR int
+wiz_map_terrain()
+{
+	winid win;
+	int x, y, terrain;
+	char row[COLNO+1];
+	boolean istty = !strcmp(windowprocs.name, "tty");
+
+	win = create_nhwindow(NHW_TEXT);
+	/* map row 0, levl[][0], is drawn on the second line of tty screen */
+	if (istty) putstr(win, 0, "");	/* tty only: blank top line */
+	for (y = 0; y < ROWNO; y++) {
+	    /* map column 0, levl[0][], is off the left edge of the screen;
+	       it should always have terrain type "undiggable stone" */
+	    for (x = 1; x < COLNO; x++) {
+		terrain = levl[x][y].typ;
+		/* assumes there aren't more than 10+26+26 terrain types */
+		row[x-1] = (char)((terrain == 0 && !may_dig(x, y)) ? '*' :
+				  (terrain < 10) ? '0' + terrain :
+				  (terrain < 36) ? 'a' + terrain - 10 :
+						   'A' + terrain - 36);
+	    }
+	    if (levl[0][y].typ != 0 || may_dig(0, y)) row[x++] = '!';
+	    row[x] = '\0';
+	    putstr(win, 0, row);
+	}
+
+    {
+	char dsc[BUFSZ];
+	s_level *slev = Is_special(&u.uz);
+
+	Sprintf(dsc, "D:%d,L:%d", u.uz.dnum, u.uz.dlevel);
+	/* [dungeon branch features currently omitted] */
+	/* special level features */
+	if (slev) {
+	    Sprintf(eos(dsc), " \"%s\"", slev->proto);
+	    /* special level flags (note: dungeon.def doesn't set `maze'
+	       or `hell' for any specific levels so those never show up) */
+	    if (slev->flags.maze_like) Strcat(dsc, " mazelike");
+	    if (slev->flags.hellish) Strcat(dsc, " hellish");
+	    if (slev->flags.town) Strcat(dsc, " town");
+	    if (slev->flags.rogue_like) Strcat(dsc, " roguelike");
+	    /* alignment currently omitted to save space */
+	}
+	/* level features */
+	if (level.flags.nfountains) Sprintf(eos(dsc), " %c:%d",
+					    defsyms[S_fountain].sym,
+					    (int)level.flags.nfountains);
+#ifdef SINKS
+	if (level.flags.nsinks) Sprintf(eos(dsc), " %c:%d",
+					defsyms[S_sink].sym,
+					(int)level.flags.nsinks);
+#endif
+	if (level.flags.has_vault)	Strcat(dsc, " vault");
+	if (level.flags.has_shop)	Strcat(dsc, " shop");
+	if (level.flags.has_temple)	Strcat(dsc, " temple");
+	if (level.flags.has_court)	Strcat(dsc, " throne");
+	if (level.flags.has_zoo)	Strcat(dsc, " zoo");
+	if (level.flags.has_morgue)	Strcat(dsc, " morgue");
+	if (level.flags.has_barracks)	Strcat(dsc, " barracks");
+	if (level.flags.has_beehive)	Strcat(dsc, " hive");
+	if (level.flags.has_swamp)	Strcat(dsc, " swamp");
+	/* level flags */
+	if (level.flags.noteleport)	Strcat(dsc, " noTport");
+	if (level.flags.hardfloor)	Strcat(dsc, " noDig");
+	if (level.flags.nommap)		Strcat(dsc, " noMMap");
+	if (!level.flags.hero_memory)	Strcat(dsc, " noMem");
+	if (level.flags.shortsighted)	Strcat(dsc, " shortsight");
+	if (level.flags.graveyard)	Strcat(dsc, " graveyard");
+	if (level.flags.is_maze_lev)	Strcat(dsc, " maze");
+	if (level.flags.is_cavernous_lev) Strcat(dsc, " cave");
+	if (level.flags.arboreal)	Strcat(dsc, " tree");
+	/* non-flag info; probably should include dungeon branching
+	   checks (extra stairs and magic portals) here */
+	if (Invocation_lev(&u.uz)) Strcat(dsc, " invoke");
+	if (On_W_tower_level(&u.uz)) Strcat(dsc, " tower");
+	/* append a branch identifier for completeness' sake */
+	if (u.uz.dnum == 0)		  Strcat(dsc, " dungeon");
+	else if (u.uz.dnum == mines_dnum) Strcat(dsc, " mines");
+	else if (In_sokoban(&u.uz))	  Strcat(dsc, " sokoban");
+	else if (u.uz.dnum == quest_dnum) Strcat(dsc, " quest");
+	else if (Is_knox(&u.uz))	  Strcat(dsc, " ludios");
+	else if (u.uz.dnum == 1)	  Strcat(dsc, " gehennom");
+	else if (u.uz.dnum == tower_dnum) Strcat(dsc, " vlad");
+	else if (In_endgame(&u.uz))	  Strcat(dsc, " endgame");
+	else {
+	    /* somebody's added a dungeon branch we're not expecting */
+	    const char *brname = dungeons[u.uz.dnum].dname;
+
+	    if (!brname || !*brname) brname = "unknown";
+	    if (!strncmpi(brname, "the ", 4)) brname += 4;
+	    Sprintf(eos(dsc), " %s", brname);
+	}
+	/* limit the line length to map width */
+	if (strlen(dsc) >= COLNO) dsc[COLNO-1] = '\0';	/* truncate */
+	putstr(win, 0, dsc);
+    }
+
+	display_nhwindow(win, TRUE);
+	/* TODO? create legend of levl[][].typ codes and allow switching
+	   back and forth between it and coded map display */
 	destroy_nhwindow(win);
 	return 0;
 }
@@ -1607,7 +1717,8 @@ struct ext_func_tab extcmdlist[] = {
 	{(char *)0, (char *)0, donull, TRUE},
 #endif
 	{(char *)0, (char *)0, donull, TRUE},
-        {(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
 	{(char *)0, (char *)0, donull, TRUE},
@@ -1634,6 +1745,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 #endif
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
+	{"terrain", "show map topology", wiz_map_terrain, TRUE},
 	{"timeout", "look at timeout queue", wiz_timeout_queue, TRUE},
 	{"vision", "show vision array", wiz_show_vision, TRUE},
 	{"wizsmell", "smell monster", wiz_smell, TRUE},
