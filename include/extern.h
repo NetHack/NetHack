@@ -20,7 +20,7 @@ E char *FDECL(fmt_ptr, (const genericptr,char *));
 
 /* ### allmain.c ### */
 
-E void NDECL(moveloop);
+E void FDECL(moveloop, (BOOLEAN_P));
 E void NDECL(stop_occupation);
 E void NDECL(display_gamewindows);
 E void NDECL(newgame);

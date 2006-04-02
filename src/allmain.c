@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)allmain.c	3.5	2003/04/02	*/
+/*	SCCS Id: @(#)allmain.c	3.5	2006/04/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,7 +15,8 @@ STATIC_DCL void NDECL(do_positionbar);
 #endif
 
 void
-moveloop()
+moveloop(resuming)
+boolean resuming;
 {
 #if defined(MICRO) || defined(WIN32)
     char ch;
@@ -23,22 +24,6 @@ moveloop()
 #endif
     int moveamt = 0, wtcap = 0, change = 0;
     boolean didmove = FALSE, monscanmove = FALSE;
-
-    flags.moonphase = phase_of_the_moon();
-    if(flags.moonphase == FULL_MOON) {
-	You("are lucky!  Full moon tonight.");
-	change_luck(1);
-    } else if(flags.moonphase == NEW_MOON) {
-	pline("Be careful!  New moon tonight.");
-    }
-    flags.friday13 = friday_13th();
-    if (flags.friday13) {
-	pline("Watch out!  Bad things can happen on Friday the 13th.");
-	change_luck(-1);
-    }
-
-    initrack();
-
 
     /* Note:  these initializers don't do anything except guarantee that
 	    we're linked properly.
@@ -52,14 +37,38 @@ moveloop()
     if (wizard) add_debug_extended_commands();
 #endif
 
+    /* side-effects from the real world */
+    flags.moonphase = phase_of_the_moon();
+    if(flags.moonphase == FULL_MOON) {
+	You("are lucky!  Full moon tonight.");
+	change_luck(1);
+    } else if(flags.moonphase == NEW_MOON) {
+	pline("Be careful!  New moon tonight.");
+    }
+    flags.friday13 = friday_13th();
+    if (flags.friday13) {
+	pline("Watch out!  Bad things can happen on Friday the 13th.");
+	change_luck(-1);
+    }
+
+    if (!resuming) {	/* new game */
+	set_wear();		/* handle side-effects of worn starting gear */
+	(void) pickup(1);	/* autopickup at initial location */
+    } else {
+	update_inventory();		/* for perm_invent */
+	read_engr_at(u.ux, u.uy);	/* subset of pickup() */
+    }
+
     (void) encumber_msg(); /* in case they auto-picked up something */
     if (defer_see_monsters) {
 	defer_see_monsters = FALSE;
 	see_monsters();
     }
+    initrack();
 
     u.uz0.dlevel = u.uz.dlevel;
     youmonst.movement = NORMAL_SPEED;	/* give the hero some movement points */
+    context.move = 0;
 
     for(;;) {
 	get_nh_event();

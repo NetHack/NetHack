@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bemain.c	3.5	1998/07/15	*/
+/*	SCCS Id: @(#)bemain.c	3.5	2006/04/01	*/
 /* Copyright (c) Dean Luick, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,7 +22,8 @@ static void getlock(void);
 int MAIN(int argc, char **argv)
 {
 	int fd;
-	char *dir;	
+	char *dir;
+	boolean resuming = FALSE;	/* assume new game */
 
 	dir = nh_getenv("NETHACKDIR");
 	if (!dir) dir = nh_getenv("HACKDIR");
@@ -93,37 +94,32 @@ int MAIN(int argc, char **argv)
 #endif
 		pline("Restoring save file...");
 		mark_synch();	/* flush output */
-		if(!dorecover(fd))
-			goto not_recovered;
+		if (dorecover(fd)) {
+		    resuming = TRUE;	/* not starting new game */
 #ifdef WIZARD
-		if(!wizard && remember_wiz_mode) wizard = TRUE;
+		    if (!wizard && remember_wiz_mode) wizard = TRUE;
 #endif
-		check_special_room(FALSE);
-		if (discover)
+		    if (discover)
 			You("are in non-scoring discovery mode.");
 
-		if (discover || wizard) {
+		    if (discover || wizard) {
 			if(yn("Do you want to keep the save file?") == 'n')
 			    (void) delete_savefile();
 			else {
 			    nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
 			}
+		    }
 		}
+	}
 
-		flags.move = 0;
-	} else {
-not_recovered:
+	if (!resuming) {
 		player_selection();
 		newgame();
 		if (discover)
 			You("are in non-scoring discovery mode.");
-
-		flags.move = 0;
-		set_wear();
-		(void) pickup(1);
 	}
 
-	moveloop();
+	moveloop(resuming);
 	return 0;
 }
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pcmain.c	3.5	2002/08/22	*/
+/*	SCCS Id: @(#)pcmain.c	3.5	2006/04/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -66,7 +66,7 @@ STATIC_DCL char *FDECL(exepath,(char *));
 
 int FDECL(main, (int,char **));
 
-extern void FDECL(pcmain, (int,char **));
+extern boolean FDECL(pcmain, (int,char **));
 
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
@@ -84,18 +84,20 @@ main(argc,argv)
 int argc;
 char *argv[];
 {
-     pcmain(argc,argv);
+     boolean resuming;
+
+     resuming = pcmain(argc,argv);
 #ifdef LAN_FEATURES
      init_lan_features();
 #endif
-     moveloop();
+     moveloop(resuming);
      nethack_exit(EXIT_SUCCESS);
      /*NOTREACHED*/
      return 0;
 }
 #endif /*MSWIN_GRAPHICS*/
 
-void
+boolean
 pcmain(argc,argv)
 int argc;
 char *argv[];
@@ -110,6 +112,7 @@ char *argv[];
 #ifdef NOCWD_ASSUMPTIONS
 	char failbuf[BUFSZ];
 #endif
+	boolean resuming = FALSE;	/* assume new game */
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
 	startup();
@@ -411,39 +414,29 @@ char *argv[];
 		pline("Restoring save file...");
 		mark_synch();	/* flush output */
 
-		if(!dorecover(fd))
-			goto not_recovered;
+		if (dorecover(fd)) {
+		    resuming = TRUE;	/* not starting new game */
 #ifdef WIZARD
-		if(!wizard && remember_wiz_mode) wizard = TRUE;
+		    if (!wizard && remember_wiz_mode) wizard = TRUE;
 #endif
-		check_special_room(FALSE);
-		if (discover)
+		    if (discover)
 			You("are in non-scoring discovery mode.");
 
-		update_inventory();
-
-		if (discover || wizard) {
+		    if (discover || wizard) {
 			if(yn("Do you want to keep the save file?") == 'n')
 				(void) delete_savefile();
 			else {
 			    nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
 			}
-
+		    }
 		}
+	}
 
-		context.move = 0;
-	} else {
-not_recovered:
+	if (!resuming) {
 		player_selection();
 		newgame();
 		if (discover)
 			You("are in non-scoring discovery mode.");
-
-		context.move = 0;
-		set_wear();
-		(void) pickup(1);
-		read_engr_at(u.ux,u.uy);
-		update_inventory();
 	}
 
 #ifndef NO_SIGNAL
@@ -452,7 +445,7 @@ not_recovered:
 #ifdef OS2
 	gettty(); /* somehow ctrl-P gets turned back on during startup ... */
 #endif
-	return;
+	return resuming;
 }
 
 STATIC_OVL void

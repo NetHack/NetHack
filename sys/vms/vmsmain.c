@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsmain.c	3.5	2003/10/16	*/
+/*	SCCS Id: @(#)vmsmain.c	3.5	2006/04/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* main.c - VMS NetHack */
@@ -36,6 +36,7 @@ char *argv[];
 #ifdef CHDIR
 	register char *dir;
 #endif
+	boolean resuming = FALSE;	/* assume new game */
 
 #ifdef SECURE	/* this should be the very first code executed */
 	privoff();
@@ -195,34 +196,28 @@ char *argv[];
 #endif
 		pline("Restoring save file...");
 		mark_synch();	/* flush output */
-		if(!dorecover(fd))
-			goto not_recovered;
+		if (dorecover(fd)) {
+		    resuming = TRUE;	/* not starting new game */
 #ifdef WIZARD
-		if(!wizard && remember_wiz_mode) wizard = TRUE;
+		    if (!wizard && remember_wiz_mode) wizard = TRUE;
 #endif
-		check_special_room(FALSE);
-		wd_message();
-
-		if (discover || wizard) {
+		    wd_message();
+		    if (discover || wizard) {
 			if (yn("Do you want to keep the save file?") == 'n')
 			    (void) delete_savefile();
 			else
 			    (void) chmod(fq_save,FCMASK); /* back to readable */
+		    }
 		}
+	}
 
-		context.move = 0;
-	} else {
-not_recovered:
+	if (!resuming) {
 		player_selection();
 		newgame();
 		wd_message();
-
-		context.move = 0;
-		set_wear();
-		(void) pickup(1);
 	}
 
-	moveloop();
+	moveloop(resuming);
 	exit(EXIT_SUCCESS);
 	/*NOTREACHED*/
 	return(0);

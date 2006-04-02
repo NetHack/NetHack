@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)macmain.c	3.5	1997/01/22	*/
+/*	SCCS Id: @(#)macmain.c	3.5	2006/04/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,6 +37,7 @@ main (void)
 {
 	register int fd = -1;
 	int argc = 1;
+	boolean resuming = FALSE;	/* assume new game */
 
 	windowprocs = mac_procs;
 	InitMac ();
@@ -108,11 +109,10 @@ main (void)
 		mark_synch();	/* flush output */
 		game_active = 1;
 		if (dorecover(fd)) {
+			resuming = TRUE;	/* not starting new game */
 #ifdef WIZARD
 			if(!wizard && remember_wiz_mode) wizard = TRUE;
 #endif
-			check_special_room(FALSE);
-
 			if (discover || wizard) {
 				if(yn("Do you want to keep the save file?") == 'n')
 					(void) delete_savefile();
@@ -121,25 +121,20 @@ main (void)
 				}
 			}
 		}
-		else {
-			fd = -1; /* set bad status */
-		}
 	}
-	if (fd < 0) {
+
+	if (!resuming) {
 		player_selection();
 		game_active = 1;	/* done with selection, draw active game window */
 		newgame();
-		set_wear();
-		(void) pickup(1);
 	}
 
 	if (discover)
 		You("are in non-scoring discovery mode.");
-	flags.move = 0;
 
 	UndimMenuBar (); /* Yes, this is the place for it (!) */
-	
-	moveloop();
+
+	moveloop(resuming);
 
 	exit(EXIT_SUCCESS);
 	/*NOTREACHED*/

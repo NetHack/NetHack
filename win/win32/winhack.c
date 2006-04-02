@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)winhack.c	3.5	2005/01/23	*/
+/*	SCCS Id: @(#)winhack.c	3.5	2006/04/01	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -62,7 +62,7 @@ NHWinApp _nethack_app;
 #endif
 
 // Foward declarations of functions included in this code module:
-extern void FDECL(pcmain, (int,char **));
+extern boolean FDECL(pcmain, (int,char **));
 static void __cdecl mswin_moveloop(void *);
 
 #define MAX_CMDLINE_PARAM 255
@@ -80,6 +80,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	TCHAR wbuf[BUFSZ];
 	char buf[BUFSZ];
     DWORD major, minor;
+	boolean resuming;
 
 
 	/* ensure that we don't access violate on a panic() */
@@ -174,9 +175,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
         }
         free(savefile);
     }
-	pcmain(argc,argv);
+	resuming = pcmain(argc,argv);
 
-	moveloop();
+	moveloop(resuming);
 
 	return 0;
 }
