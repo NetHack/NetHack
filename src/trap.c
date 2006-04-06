@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2005/12/05	*/
+/*	SCCS Id: @(#)trap.c	3.5	2006/04/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3235,8 +3235,8 @@ struct trap *ttmp;
 	boolean unused;
 
 	/* we know there's no monster in the way, and we're not trapped */
-	if (!Punished || drag_ball(x, y, &bc, &bx, &by, &cx, &cy, &unused,
-		TRUE)) {
+	if (!Punished ||
+		drag_ball(x, y, &bc, &bx, &by, &cx, &cy, &unused, TRUE)) {
 	    u.ux0 = u.ux,  u.uy0 = u.uy;
 	    u.ux = x,  u.uy = y;
 	    u.umoved = TRUE;
@@ -3244,7 +3244,13 @@ struct trap *ttmp;
 	    vision_recalc(1);
 	    check_leash(u.ux0, u.uy0);
 	    if (Punished) move_bc(0, bc, bx, by, cx, cy);
-	    spoteffects(FALSE);	/* dotrap() */
+	    /* marking the trap unseen forces dotrap() to treat it like a new
+	       discovery and prevents pickup() -> look_here() -> check_here()
+	       from giving a redudant "there is a <trap> here" message when
+	       there are objects covering this trap */
+	    ttmp->tseen = 0;	/* hack for check_here() */
+	    /* trigger the trap */
+	    spoteffects(TRUE);	/* pickup() + dotrap() */
 	    exercise(A_WIS, FALSE);
 	}
 }

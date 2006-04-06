@@ -132,6 +132,8 @@ better handling for Fort Ludios and endgame in wizard mode's `^V ?' menu
 no free lunch for gelatinous cubes eating scrolls of mail
 eating gold in front of the vault guard will make the guard angry
 calculate engulf time differently for non-digestion attacks than for digestion
+preform autopickup and/or report on objects at the spot when a failed #untrap
+	attempt causes the hero to move onto a trap's location
 
 
 Platform- and/or Interface-Specific Fixes
