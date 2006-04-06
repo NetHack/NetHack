@@ -940,6 +940,9 @@ hitmu(mtmp, mattk)
 				artifact_hit(mtmp, &youmonst, otmp, &dmg,dieroll)))
 			     hitmsg(mtmp, mattk);
 			if (!dmg) break;
+			if (objects[otmp->otyp].oc_material == SILVER &&
+				hates_silver(youmonst.data))
+			    pline_The("silver sears your flesh!");
 			if (u.mh > 1 && u.mh > ((u.uac>0) ? dmg : dmg+u.uac) &&
 				   objects[otmp->otyp].oc_material == IRON &&
 					(u.umonnum==PM_BLACK_PUDDING

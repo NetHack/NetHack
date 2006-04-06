@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2006/01/30	*/
+/*	SCCS Id: @(#)zap.c	3.5	2006/04/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3010,7 +3010,8 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 }
 
 struct monst *
-boomhit(dx, dy)
+boomhit(obj, dx, dy)
+struct obj *obj;
 int dx, dy;
 {
 	register int i, ct;
@@ -3045,8 +3046,9 @@ int dx, dy;
 		if(bhitpos.x == u.ux && bhitpos.y == u.uy) { /* ct == 9 */
 			if(Fumbling || rn2(20) >= ACURR(A_DEX)) {
 				/* we hit ourselves */
-				(void) thitu(10, rnd(10), (struct obj *)0,
-					"boomerang");
+				(void) thitu(10 + obj->spe,
+					     dmgval(obj, &youmonst),
+					     obj, "boomerang");
 				break;
 			} else {	/* we catch it */
 				tmp_at(DISP_END, 0);

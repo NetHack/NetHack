@@ -134,6 +134,8 @@ eating gold in front of the vault guard will make the guard angry
 calculate engulf time differently for non-digestion attacks than for digestion
 preform autopickup and/or report on objects at the spot when a failed #untrap
 	attempt causes the hero to move onto a trap's location
+thrown silver weapon hitting silver-hating poly'd hero got double silver damage
+wielded silver weapon hitting silver-hating poly'd hero lacked silver message
 
 
 Platform- and/or Interface-Specific Fixes

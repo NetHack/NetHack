@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2005/12/02	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2006/04/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -949,7 +949,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 	} else if(obj->otyp == BOOMERANG && !Underwater) {
 		if(Is_airlevel(&u.uz) || Levitation)
 		    hurtle(-u.dx, -u.dy, 1, TRUE);
-		mon = boomhit(u.dx, u.dy);
+		mon = boomhit(obj, u.dx, u.dy);
 		if(mon == &youmonst) {		/* the thing was caught */
 			exercise(A_DEX, TRUE);
 			obj = addinv(obj);

@@ -65,7 +65,7 @@ const char *name;	/* if null, then format `obj' */
 
 		if (obj && objects[obj->otyp].oc_material == SILVER
 				&& hates_silver(youmonst.data)) {
-			dam += rnd(20);
+			/* extra damage already applied by dmgval() */
 			pline_The("silver sears your flesh!");
 			exercise(A_CON, FALSE);
 		}
