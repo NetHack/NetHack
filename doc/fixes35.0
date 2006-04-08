@@ -197,6 +197,7 @@ tame ghouls can eat old eggs
 new effect for reading a scroll of light while confused
 allow digging an adjacent pit with wand of digging while trapped in a pit
 #terrain command for debug mode
+digging can activate or disarm some types of traps
 
 
 Platform- and/or Interface-Specific New Features

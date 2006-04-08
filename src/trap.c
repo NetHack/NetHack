@@ -10,7 +10,6 @@ STATIC_DCL void FDECL(dofiretrap, (struct obj *));
 STATIC_DCL void NDECL(domagictrap);
 STATIC_DCL boolean FDECL(emergency_disrobe,(boolean *));
 STATIC_DCL int FDECL(untrap_prob, (struct trap *ttmp));
-STATIC_DCL void FDECL(cnv_trap_obj, (int, int, struct trap *));
 STATIC_DCL void FDECL(move_into_trap, (struct trap *));
 STATIC_DCL int FDECL(try_disarm, (struct trap *,BOOLEAN_P));
 STATIC_DCL void FDECL(reward_untrap, (struct trap *, struct monst *));
@@ -631,11 +630,12 @@ unsigned trflags;
 {
 	register int ttype = trap->ttyp;
 	register struct obj *otmp;
-	boolean already_seen = trap->tseen;
-	boolean webmsgok = (!(trflags & NOWEBMSG));
-	boolean forcebungle = (trflags & FORCEBUNGLE);
-	boolean plunged = (trflags & TOOKPLUNGE);
-	boolean adj_pit = conjoined_pits(trap, t_at(u.ux0,u.uy0), TRUE);
+	boolean already_seen = trap->tseen,
+		forcetrap = (trflags & FORCETRAP) != 0,
+		webmsgok = (trflags & NOWEBMSG) == 0,
+		forcebungle = (trflags & FORCEBUNGLE) != 0,
+		plunged = (trflags & TOOKPLUNGE) != 0,
+		adj_pit = conjoined_pits(trap, t_at(u.ux0,u.uy0), TRUE);
 #ifdef STEED
 	int steed_article = ARTICLE_THE;
 #endif
@@ -655,7 +655,7 @@ unsigned trflags;
 	    	a_your[trap->madeby_u],
 	    	defsyms[trap_to_defsym(ttype)].explanation);
 	    /* then proceed to normal trap effect */
-	} else if (already_seen) {
+	} else if (already_seen && !forcetrap) {
 	    if ((Levitation || Flying) &&
 		    (ttype == PIT || ttype == SPIKED_PIT || ttype == HOLE ||
 		    ttype == BEAR_TRAP)) {
@@ -783,7 +783,7 @@ unsigned trflags;
 		break;
 
 	    case SQKY_BOARD:	    /* stepped on a squeaky board */
-		if (Levitation || Flying) {
+		if ((Levitation || Flying) && !forcetrap) {
 		    if (!Blind) {
 			seetrap(trap);
 			if (Hallucination)
@@ -799,7 +799,7 @@ unsigned trflags;
 		break;
 
 	    case BEAR_TRAP:
-		if(Levitation || Flying) break;
+		if ((Levitation || Flying) && !forcetrap) break;
 		feeltrap(trap);
 		if(amorphous(youmonst.data) || is_whirly(youmonst.data) ||
 						    unsolid(youmonst.data)) {
@@ -1179,7 +1179,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		unsigned steed_mid = 0;
 		struct obj *saddle = 0;
 #endif
-		if (Levitation || Flying) {
+		if ((Levitation || Flying) && !forcetrap) {
 		    if (!already_seen && rn2(3)) break;
 		    feeltrap(trap);
 		    pline("%s %s in a pile of soil below you.",
@@ -3205,23 +3205,31 @@ struct trap *ttmp;
 }
 
 /* Replace trap with object(s).  Helge Hafting */
-STATIC_OVL void
-cnv_trap_obj(otyp, cnt, ttmp)
+void
+cnv_trap_obj(otyp, cnt, ttmp, bury_it)
 int otyp;
 int cnt;
 struct trap *ttmp;
+boolean bury_it;
 {
 	struct obj *otmp = mksobj(otyp, TRUE, FALSE);
-	otmp->quan=cnt;
+
+	otmp->quan = cnt;
 	otmp->owt = weight(otmp);
 	/* Only dart traps are capable of being poisonous */
 	if (otyp != DART)
 	    otmp->opoisoned = 0;
 	place_object(otmp, ttmp->tx, ttmp->ty);
-	/* Sell your own traps only... */
-	if (ttmp->madeby_u) sellobj(otmp, ttmp->tx, ttmp->ty);
-	stackobj(otmp);
+	if (bury_it) {
+	    /* magical digging first disarms this trap, then will unearth it */
+	    (void) bury_an_obj(otmp);
+	} else {
+	    /* Sell your own traps only... */
+	    if (ttmp->madeby_u) sellobj(otmp, ttmp->tx, ttmp->ty);
+	    stackobj(otmp);
+	}
 	newsym(ttmp->tx, ttmp->ty);
+	if (u.utrap && ttmp->tx == u.ux && ttmp->ty == u.uy) u.utrap = 0;
 	deltrap(ttmp);
 }
 
@@ -3389,7 +3397,7 @@ struct trap *ttmp;
 	} else {
 		if (ttmp->ttyp == BEAR_TRAP) {
 			You("disarm %s bear trap.", the_your[ttmp->madeby_u]);
-			cnv_trap_obj(BEARTRAP, 1, ttmp);
+			cnv_trap_obj(BEARTRAP, 1, ttmp, FALSE);
 		} else /* if (ttmp->ttyp == WEB) */ {
 			You("succeed in removing %s web.", the_your[ttmp->madeby_u]);
 			deltrap(ttmp);
@@ -3407,7 +3415,7 @@ struct trap *ttmp;
 
 	if (fails < 2) return fails;
 	You("disarm %s land mine.", the_your[ttmp->madeby_u]);
-	cnv_trap_obj(LAND_MINE, 1, ttmp);
+	cnv_trap_obj(LAND_MINE, 1, ttmp, FALSE);
 	return 1;
 }
 
@@ -3458,7 +3466,7 @@ int otyp;
 
 	if (fails < 2) return fails;
 	You("disarm %s trap.", the_your[ttmp->madeby_u]);
-	cnv_trap_obj(otyp, 50-rnl(50), ttmp);
+	cnv_trap_obj(otyp, 50-rnl(50), ttmp, FALSE);
 	return 1;
 }
 

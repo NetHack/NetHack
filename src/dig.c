@@ -276,23 +276,54 @@ dig()
 
 		if (context.digging.effort > 250 ||
 			(ttmp && ttmp->ttyp == HOLE)) {
-		    (void) dighole(FALSE, (coord *)0);
+		    (void) dighole(FALSE, FALSE, (coord *)0);
 		    (void) memset((genericptr_t)&context.digging, 0,
-					sizeof (struct dig_info));
+				  sizeof context.digging);
 		    return(0);	/* done with digging */
 		}
 
 		if (context.digging.effort <= 50 ||
 			(ttmp && (ttmp->ttyp == TRAPDOOR ||
-			    ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT)))
+			    ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT))) {
 		    return(1);
+		} else if (ttmp && (ttmp->ttyp == LANDMINE ||
+			(ttmp->ttyp == BEAR_TRAP && !u.utrap))) {
+		    /* digging onto a set object trap triggers it;
+		       hero should have used #untrap first */
+		    dotrap(ttmp, FORCETRAP);
+		    /* restart completely from scratch if we resume digging */
+		    (void) memset((genericptr_t)&context.digging, 0,
+				  sizeof context.digging);
+		    return 0;
+		} else if (ttmp && ttmp->ttyp == BEAR_TRAP && u.utrap) {
+		    if (rnl(7) > (Fumbling ? 1 : 4)) {
+			char kbuf[BUFSZ];
+			int dmg = dmgval(uwep, &youmonst) + dbon();
+
+			if (dmg < 1) dmg = 1;
+			else if (uarmf) dmg = (dmg + 1) / 2;
+			You("hit yourself in the %s.", body_part(FOOT));
+			Sprintf(kbuf, "chopping off %s own %s",
+				uhis(), body_part(FOOT));
+			losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
+		    } else {
+			You("destroy the bear trap with %s.",
+			    yobjnam(uwep, (const char *)0));
+			u.utrap = 0;	/* release from trap */
+			deltrap(ttmp);
+		    }
+		    /* we haven't made any progress toward a pit yet */
+		    context.digging.effort = 0;
+		    return 0;
+		}
 
 		if (IS_ALTAR(lev->typ)) {
 		    altar_wrath(dpx, dpy);
 		    angry_priest();
 		}
 
-		if (dighole(TRUE, (coord *)0)) {	/* make pit at <u.ux,u.uy> */
+		/* make pit at <u.ux,u.uy> */
+		if (dighole(TRUE, FALSE, (coord *)0)) {
 		    context.digging.level.dnum = 0;
 		    context.digging.level.dlevel = -1;
 		}
@@ -679,8 +710,8 @@ const char *fillmsg;
 
 /* return TRUE if digging succeeded, FALSE otherwise */
 boolean
-dighole(pit_only, cc)
-boolean pit_only;
+dighole(pit_only, by_magic, cc)
+boolean pit_only, by_magic;
 coord *cc;
 {
 	register struct trap *ttmp;
@@ -790,6 +821,15 @@ coord *cc;
 			liquid_flow(dig_x, dig_y, typ, ttmp,
 				"As you dig, the hole fills with %s!");
 			return TRUE;
+		}
+
+		/* magical digging disarms settable traps */
+		if (by_magic && ttmp &&
+			(ttmp->ttyp == LANDMINE || ttmp->ttyp == BEAR_TRAP)) {
+		    int otyp = (ttmp->ttyp == LANDMINE) ? LAND_MINE : BEARTRAP;
+
+		    /* convert trap into buried object (deletes trap) */
+		    cnv_trap_obj(otyp, 1, ttmp, TRUE);
 		}
 
 		/* finally we get to make a hole */
@@ -1067,13 +1107,17 @@ struct obj *obj;
 		dotrap(trap, FORCEBUNGLE);
 		/* might escape trap and still be teetering at brink */
 		if (!u.utrap) cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
-	} else if (!ispick) {
+	} else if (!ispick &&
+		    /* can only dig down with an axe if stuck in a bear trap */
+		    (!trap || !u.utrap || u.utraptype != TT_BEARTRAP)) {
 		pline("%s merely scratches the %s.",
 				Yobjnam2(obj, (char *)0), surface(u.ux,u.uy));
 		u_wipe_engr(3);
 	} else {
-		if (context.digging.pos.x != u.ux || context.digging.pos.y != u.uy ||
-		    !on_level(&context.digging.level, &u.uz) || !context.digging.down) {
+		if (context.digging.pos.x != u.ux ||
+			context.digging.pos.y != u.uy ||
+			!on_level(&context.digging.level, &u.uz) ||
+			!context.digging.down) {
 		    context.digging.chew = FALSE;
 		    context.digging.down = TRUE;
 		    context.digging.warned = FALSE;
@@ -1271,7 +1315,7 @@ zap_dig()
 		    newsym(u.ux, u.uy);
 		} else {
 		    watch_dig((struct monst *)0, u.ux, u.uy, TRUE);
-		    (void) dighole(FALSE, (coord *)0);
+		    (void) dighole(FALSE, TRUE, (coord *)0);
 		}
 	    }
 	    return;
@@ -1312,7 +1356,7 @@ zap_dig()
 				if (buf[0]) pline("%s", buf);
 			} else {
 				/* this can also result in a pool at zx,zy */
-				dighole(TRUE, &cc);
+				dighole(TRUE, TRUE, &cc);
 				adjpit = t_at(zx,zy);
 			}
 		    }
@@ -1900,7 +1944,7 @@ escape_tomb()
 			 "ooze" : "phase", surface(u.ux, u.uy));
 
 		    if(tunnels(youmonst.data) && !needspick(youmonst.data))
-			good = dighole(TRUE, (coord *)0);
+			good = dighole(TRUE, FALSE, (coord *)0);
 		    else good = TRUE;
 		    if(good) unearth_you();
 		}

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2006/02/03	*/
+/*	SCCS Id: @(#)hack.h	3.5	2006/04/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -231,10 +231,11 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define PICK_RIGID	1
 
 /* Flags to control dotrap() in trap.c */
-#define NOWEBMSG	0x01	/* suppress stumble into web message */
-#define FORCEBUNGLE	0x02	/* adjustments appropriate for bungling */
-#define RECURSIVETRAP	0x04	/* trap changed into another type this same turn */
-#define TOOKPLUNGE	0x08	/* used '>' to enter pit below you */
+#define FORCETRAP	0x01	/* triggering not left to chance */
+#define NOWEBMSG	0x02	/* suppress stumble into web message */
+#define FORCEBUNGLE	0x04	/* adjustments appropriate for bungling */
+#define RECURSIVETRAP	0x08	/* trap changed into another type this same turn */
+#define TOOKPLUNGE	0x10	/* used '>' to enter pit below you */
 
 /* Flags to control test_move in hack.c */
 #define DO_MOVE		0	/* really doing the move */
