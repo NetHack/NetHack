@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2006/02/22	*/
+/*	SCCS Id: @(#)hack.c	3.5	2006/04/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1967,6 +1967,8 @@ dopickup()
 	    else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
 		rider_cant_reach();
 #endif
+	    else if (Blind && !can_reach_floor(TRUE))
+	        You("cannot reach anything here.");
 	    else
 		You("cannot reach the %s.", surface(u.ux,u.uy));
 	    return 0;

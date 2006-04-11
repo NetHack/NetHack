@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2006/02/15	*/
+/*	SCCS Id: @(#)invent.c	3.5	2006/04/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2269,9 +2269,13 @@ boolean picked_some;
 		    /* don't say "altar" twice, dfeature has more info */
 		    You("try to feel what is here.");
 		} else {
+		    const char *where = (Blind && !can_reach_floor(TRUE)) ?
+		    		      "lying beneath you" : "lying here on the ",
+		    	      *onwhat = (Blind && !can_reach_floor(TRUE)) ?
+		    	 		"" : surface(u.ux,u.uy);
 		    You("try to feel what is %s%s.",
-			drift ? "floating here" : "lying here on the ",
-			drift ? ""		: surface(u.ux, u.uy));
+			drift ? "floating here" : where,
+			drift ? ""		: onwhat);
 		}
 		if (dfeature && !drift && !strcmp(dfeature, surface(u.ux,u.uy)))
 			dfeature = 0;		/* ice already identifed */
