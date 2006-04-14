@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)obj.h	3.5	2002/01/07	*/
+/*	SCCS Id: @(#)obj.h	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,6 +12,17 @@ union vptrs {
 	    struct obj *v_nexthere;	/* floor location lists */
 	    struct obj *v_ocontainer;	/* point back to container */
 	    struct monst *v_ocarry;	/* point back to carrying monst */
+};
+
+/***
+ **	oextra -- collection of all object extensions
+ */
+struct oextra {
+	char *oname;			/* ptr to name of object */
+	struct monst *omonst;		/* ptr to attached monst struct */
+	unsigned *omid;			/* ptr to m_id */
+	long *olong;			/* ptr to misc long (temporary gold object) */
+	char *omailcmd;			/* response_cmd for mail deliver */
 };
 
 struct obj {
@@ -84,11 +95,7 @@ struct obj {
 	Bitfield(oinvis,1);	/* invisible */
 #endif
 	Bitfield(greased,1);	/* covered with grease */
-	Bitfield(oattached,2);	/* obj struct has special attachment */
-#define OATTACHED_NOTHING 0
-#define OATTACHED_MONST   1	/* monst struct in oextra */
-#define OATTACHED_M_ID    2	/* monst id in oextra */
-#define OATTACHED_UNUSED3 3
+	/* 2 free bits */
 
 	Bitfield(in_use,1);	/* for magic items before useup items */
 	Bitfield(bypass,1);	/* mark this as an object to be skipped by bhito() */
@@ -102,18 +109,23 @@ struct obj {
 #define fromsink  corpsenm	/* a potion from a sink */
 	unsigned oeaten;	/* nutrition left in food, if partly eaten */
 	long age;		/* creation date */
-
-	uchar onamelth;		/* length of name (following oxlth) */
-	short oxlth;		/* length of following data */
-	/* in order to prevent alignment problems oextra should
-	   be (or follow) a long int */
 	long owornmask;
-	long oextra[1];		/* used for name of ordinary objects - length
-				   is flexible; amount for tmp gold objects */
+	struct oextra *oextra;	/* pointer to oextra struct */
 };
 
-#define newobj(xl)	(struct obj *)alloc((unsigned)(xl) + sizeof(struct obj))
-#define ONAME(otmp)	(((char *)(otmp)->oextra) + (otmp)->oxlth)
+#define ONAME(o)	((o)->oextra->oname)
+#define OMID(o)		((o)->oextra->omid)
+#define OMONST(o)	((o)->oextra->omonst)
+#define OLONG(o)	((o)->oextra->olong)
+#define OMAILCMD(o)	((o)->oextra->omailcmd)
+
+#define has_oname(o)	((o)->oextra && ONAME(o))
+#define has_omid(o)	((o)->oextra && OMID(o))
+#define has_omonst(o)	((o)->oextra && OMONST(o))
+#define has_olong(o)	((o)->oextra && OLONG(o))
+#define has_omailcmd(o)	((o)->oextra && OMAILCMD(o))
+
+#define newobj()	(struct obj *)alloc(sizeof(struct obj))
 
 /* Weapons and weapon-tools */
 /* KMH -- now based on skill categories.  Formerly:

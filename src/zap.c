@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2006/04/05	*/
+/*	SCCS Id: @(#)zap.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -510,7 +510,7 @@ coord *cc;
 	struct monst *mtmp = (struct monst *)0;
 	struct monst *mtmp2 = (struct monst *)0;
 
-	if (obj->oxlth && (obj->oattached == OATTACHED_MONST))
+	if (has_omonst(obj))
 		mtmp2 = get_mtraits(obj, TRUE);
 	if (mtmp2) {
 		/* save_mtraits() validated mtmp2->mnum */
@@ -694,7 +694,9 @@ boolean by_hero;
 	/* note: montype has changed; mptr keeps old value for newcham() */
 	mtmp = makemon(&mons[montype], x, y, NO_MINVENT|MM_NOWAIT);
 	if (mtmp) {
-	    corpse->oattached = OATTACHED_NOTHING;  /* skip ghost handling */
+	    /* skip ghost handling */
+	    if (has_omid(corpse)) free_omid(corpse);
+	    if (has_omonst(corpse)) free_omonst(corpse);
 	    if (mtmp->cham == PM_DOPPELGANGER) {
 		/* change shape to match the corpse */
 		(void) newcham(mtmp, mptr, FALSE, FALSE);
@@ -703,7 +705,7 @@ boolean by_hero;
 		mon_adjust_speed(mtmp, 2, (struct obj *)0); /* MFAST */
 	    }
 	}
-    } else if (corpse->oxlth && corpse->oattached == OATTACHED_MONST) {
+    } else if (has_omonst(corpse)) {
 	/* use saved traits */
 	xy.x = x,  xy.y = y;
 	mtmp = montraits(corpse, &xy);
@@ -739,13 +741,13 @@ boolean by_hero;
     }
 
     /* handle recorporealization of an active ghost */
-    if (corpse->oxlth && corpse->oattached == OATTACHED_M_ID) {
+    if (has_omid(corpse)) {
 	unsigned m_id;
 	struct monst *ghost;
 	struct obj *otmp;
 
 	(void) memcpy((genericptr_t)&m_id,
-		      (genericptr_t)corpse->oextra, sizeof m_id);
+		      (genericptr_t)OMID(corpse), sizeof m_id);
 	ghost = find_mid(m_id, FM_FMON);
 	if (ghost && ghost->data == &mons[PM_GHOST]) {
 	    if (canseemon(ghost))
@@ -768,11 +770,11 @@ boolean by_hero;
 	    /* separate ghost monster no longer exists */
 	    mongone(ghost);
 	}
-	corpse->oattached = OATTACHED_NOTHING;
+	free_omid(corpse);
     }
 
     /* monster retains its name */
-    if (corpse->onamelth)
+    if (has_oname(corpse))
 	mtmp = christen_monst(mtmp, ONAME(corpse));
     /* partially eaten corpse yields wounded monster */
     if (corpse->oeaten)
@@ -4013,9 +4015,8 @@ register struct obj *obj;		   /* no texts here! */
 	obj->owt = weight(obj);
 	obj->dknown = obj->bknown = obj->rknown = 0;
 	obj->known = objects[obj->otyp].oc_uses_known ? 0 : 1;
-	obj->onamelth = 0;		/* no names */
-	obj->oxlth = 0;			/* no extra data */
-	obj->oattached = OATTACHED_NOTHING;
+	if (obj->oextra) dealloc_oextra(obj->oextra);
+	obj->oextra = (struct oextra *)0;
 	if (obj->where == OBJ_FLOOR) {
 		obj_extract_self(obj);		/* move rocks back on top */
 		place_object(obj, obj->ox, obj->oy);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)music.c	3.5	2003/05/25	*/
+/*	SCCS Id: @(#)music.c	3.5	2006/04/14	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -330,7 +330,7 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 				    else {
 					You("destroy %s!", mtmp->mtame ?
 					    x_monnam(mtmp, ARTICLE_THE, "poor",
-				(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE):
+				(has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE):
 					    mon_nam(mtmp));
 				    }
 				    xkilled(mtmp,0);

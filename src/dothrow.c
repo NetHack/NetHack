@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2006/04/05	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1473,7 +1473,7 @@ register struct obj *obj;
 			goto nopick;
 		}
 	/* making guesses */
-	} else if(obj->onamelth || objects[obj->otyp].oc_uname) {
+	} else if(has_oname(obj) || objects[obj->otyp].oc_uname) {
 		if(is_gem) {
 			if(is_buddy) {
 				Strcat(buf,addluck);

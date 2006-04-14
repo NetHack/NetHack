@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2006/03/24	*/
+/*	SCCS Id: @(#)mon.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -298,7 +298,7 @@ unsigned corpseflags;
 	   prevent the same attack beam from hitting its corpse */
 	if (context.bypasses) bypass_obj(obj);
 
-	if (has_name(mtmp))
+	if (has_mname(mtmp))
 	    obj = oname(obj, MNAME(mtmp));
 
 	/* Avoid "It was hidden under a green mold corpse!" 
@@ -1347,6 +1347,52 @@ register struct monst *mon;
 	}
 }
 
+void
+copy_mextra(mtmp2, mtmp1)
+struct monst *mtmp2, *mtmp1;
+{
+	if(!mtmp2 || !mtmp1 || !mtmp1->mextra) return;
+
+	if (!mtmp2->mextra) mtmp2->mextra = newmextra();
+	if (MNAME(mtmp1)) {
+		int lth = strlen(MNAME(mtmp1)) + 1;
+		if (lth) {
+			new_mname(mtmp2, lth);
+			Strcpy(MNAME(mtmp2), MNAME(mtmp1));
+		}
+	}
+	if (EGD(mtmp1)) {
+		if (!EGD(mtmp2)) newegd(mtmp2);
+		(void)memcpy((genericptr_t)EGD(mtmp2),
+				(genericptr_t)EGD(mtmp1),
+				sizeof(struct egd));
+	}
+	if (EPRI(mtmp1)) {
+		if (!EPRI(mtmp2)) newepri(mtmp2);
+		(void)memcpy((genericptr_t)EPRI(mtmp2),
+				(genericptr_t)EPRI(mtmp1),
+				sizeof(struct epri));
+	}
+	if (ESHK(mtmp1)) {
+		if (!ESHK(mtmp2)) neweshk(mtmp2);
+		(void)memcpy((genericptr_t)ESHK(mtmp2),
+				(genericptr_t)ESHK(mtmp1),
+				sizeof(struct eshk));
+	}
+	if (EMIN(mtmp1)) {
+		if (!EMIN(mtmp2)) newemin(mtmp2);
+		(void)memcpy((genericptr_t)EMIN(mtmp2),
+				(genericptr_t)EMIN(mtmp1),
+				sizeof(struct emin));
+	}
+	if (EDOG(mtmp1)) {
+		if (!EDOG(mtmp2)) newedog(mtmp2);
+		(void)memcpy((genericptr_t)EDOG(mtmp2),
+				(genericptr_t)EDOG(mtmp1),
+				sizeof(struct edog));
+	}
+}
+
 STATIC_OVL void
 dealloc_mextra(x)
 struct mextra *x;
@@ -1727,7 +1773,7 @@ register struct monst *mdef;
 		   so that saved monster traits won't retain any stale
 		   item-conferred attributes */
 		otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, CORPSTAT_NONE);
-		if (has_name(mdef)) otmp = oname(otmp, MNAME(mdef));
+		if (has_mname(mdef)) otmp = oname(otmp, MNAME(mdef));
 		while ((obj = oldminvent) != 0) {
 		    oldminvent = obj->nobj;
 		    (void) add_to_container(otmp, obj);
@@ -1848,9 +1894,9 @@ int dest;
 		You("%s %s!", verb,
 		    !mtmp->mtame ? mon_nam(mtmp) :
 			x_monnam(mtmp,
-				 (has_name(mtmp)) ? ARTICLE_NONE : ARTICLE_THE,
+				 (has_mname(mtmp)) ? ARTICLE_NONE : ARTICLE_THE,
 				 "poor",
-				 (has_name(mtmp)) ? SUPPRESS_SADDLE : 0,
+				 (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0,
 				 FALSE));
 	    }
 	}
@@ -2509,7 +2555,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 		if(!rn2(10)) mtmp->female = !mtmp->female;
 	}
 
-	if (In_endgame(&u.uz) && is_mplayer(olddata) && has_name(mtmp)) {
+	if (In_endgame(&u.uz) && is_mplayer(olddata) && has_mname(mtmp)) {
 		/* mplayers start out as "Foo the Bar", but some of the
 		 * titles are inappropriate when polymorphed, particularly
 		 * into the opposite sex.  players don't use ranks when
@@ -2604,7 +2650,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	if (msg) {
 	    char *save_mname = 0;
 
-	    if (has_name(mtmp)) {
+	    if (has_mname(mtmp)) {
 		save_mname = MNAME(mtmp);
 		MNAME(mtmp) = (char *)0; 
 	    }

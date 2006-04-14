@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2005/12/07	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -168,7 +168,7 @@ obj_is_pname(obj)
 register struct obj *obj;
 {
     return((boolean)(
-	((obj->dknown && obj->known) || iflags.override_ID) && obj->onamelth &&
+	((obj->dknown && obj->known) || iflags.override_ID) && has_oname(obj) &&
 		/* Since there aren't any objects which are both
 		   artifacts and unique, the last check is redundant. */
 		obj->oartifact && !objects[obj->otyp].oc_unique));
@@ -468,7 +468,7 @@ register struct obj *obj;
 	}
 	if (pluralize) Strcpy(buf, makeplural(buf));
 
-	if (obj->onamelth && dknown) {
+	if (has_oname(obj) && dknown) {
 		Strcat(buf, " named ");
 nameit:
 		Strcat(buf, ONAME(obj));
@@ -978,12 +978,14 @@ struct obj *obj;
 {
     struct obj save_obj;
     unsigned save_ocknown;
-    char *buf, *save_ocuname;
+    char *buf, *save_ocuname, *save_oname = (char *)0;
 
     /* remember original settings for core of the object;
-       oname and oattached extensions don't matter here--since they
+       oextra structs other than oname don't matter here--since they
        aren't modified they don't need to be saved and restored */
     save_obj = *obj;
+    if (has_oname(obj)) save_oname = ONAME(obj);
+
     /* killer name should be more specific than general xname; however, exact
        info like blessed/cursed and rustproof makes things be too verbose */
     obj->known = obj->dknown = 1;
@@ -996,7 +998,7 @@ struct obj *obj;
        be redundant when it is, so suppress "poisoned" prefix */
     obj->opoisoned = 0;
     /* strip user-supplied name; artifacts keep theirs */
-    if (!obj->oartifact) obj->onamelth = 0;
+    if (!obj->oartifact && save_oname) ONAME(obj) = (char *)0;
     /* temporarily identify the type of object */
     save_ocknown = objects[obj->otyp].oc_name_known;
     objects[obj->otyp].oc_name_known = 1;
@@ -1023,6 +1025,7 @@ struct obj *obj;
     objects[obj->otyp].oc_name_known = save_ocknown;
     objects[obj->otyp].oc_uname = save_ocuname;
     *obj = save_obj;	/* restore object's core settings */
+    if (!obj->oartifact && save_oname) ONAME(obj) = save_oname;
 
     return buf;
 }
@@ -2939,7 +2942,10 @@ typfnd:
 	    && !wizard
 #endif
 	    ) {
-	    artifact_exists(otmp, ONAME(otmp), FALSE);
+	    char *tnam = "";
+	    if (has_oname(otmp))
+	    	tnam = ONAME(otmp);
+	    artifact_exists(otmp, tnam, FALSE);
 	    obfree(otmp, (struct obj *) 0);
 	    otmp = &zeroobj;
 	    pline("For a moment, you feel %s in your %s, but it disappears!",

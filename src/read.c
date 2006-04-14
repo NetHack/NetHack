@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2006/02/15	*/
+/*	SCCS Id: @(#)read.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1966,7 +1966,7 @@ struct obj *from_obj;
 		*mtype = PM_LONG_WORM;
 		return TRUE;
 	} else if (unique_corpstat(&mons[*mtype]) &&
-		    (!from_obj || from_obj->oattached != OATTACHED_MONST)) {
+		    (!from_obj || !has_omonst(from_obj))) {
 		/* unique corpses (from bones or wizard mode wish) or
 		   statues (bones or any wish) end up as shapechangers */
 		*mtype = PM_DOPPELGANGER;

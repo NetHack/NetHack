@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mextra.h	3.5	2006/02/19	*/
+/*	SCCS Id: @(#)mextra.h	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -47,15 +47,12 @@
  *	 6. Adjust size_monst() in src/cmd.c appropriately.
  *	 7. Adjust dealloc_mextra() in src/mon.c to clean up
  *	    properly during monst deallocation.
- *	 8. Adjust restmonchn() in src/restore.c to deal with your
- *	    struct during a restore.
- *	 9. Adjust buffer_to_mon() in src/restore.c to properly
- *	    unpackage the mextra fields during revival.
- *	10. Adjust savemonchn() in src/save.c to deal with your
- *	    struct during a save.
- *	11. Adjust mon_to_buffer() in src/save.c to properly package
- *	    up your struct when the rest of the monst struct is
- *	    packaged up.
+ *	 8. Adjust copy_mextra() in src/mon.c to make duplicate
+ *	    copies of your struct or data on another monst struct.
+ *	 9. Adjust restmon() in src/restore.c to deal with your
+ *	    struct or data during a restore.
+ *	10. Adjust savemon() in src/save.c to deal with your
+ *	    struct or data during a save.
  */
  
 /***
@@ -184,6 +181,6 @@ struct mextra {
 #define ESHK(mon)	((mon)->mextra->eshk)
 #define EMIN(mon)	((mon)->mextra->emin)
 #define EDOG(mon)	((mon)->mextra->edog)
-#define has_name(mon)	((mon)->mextra && MNAME(mon))
+#define has_mname(mon)	((mon)->mextra && MNAME(mon))
 
 #endif /* MEXTRA_H */

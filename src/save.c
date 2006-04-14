@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)save.c	3.5	2005/12/14	*/
+/*	SCCS Id: @(#)save.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,7 +23,9 @@ int dotcnt, dotrow;	/* also used in restore */
 
 STATIC_DCL void FDECL(savelevchn, (int,int));
 STATIC_DCL void FDECL(savedamage, (int,int));
+STATIC_DCL void FDECL(saveobj, (int,struct obj *));
 STATIC_DCL void FDECL(saveobjchn, (int,struct obj *,int));
+STATIC_DCL void FDECL(savemon, (int,struct monst *));
 STATIC_DCL void FDECL(savemonchn, (int,struct monst *,int));
 STATIC_DCL void FDECL(savetrapchn, (int,struct trap *,int));
 STATIC_DCL void FDECL(savegamestate, (int,int));
@@ -946,20 +948,65 @@ register int fd, mode;
 }
 
 STATIC_OVL void
+saveobj(fd, otmp)
+int fd;
+struct obj *otmp;
+{
+	int buflen, zerobuf = 0;
+
+	buflen = sizeof(struct obj);
+	bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+	bwrite(fd, (genericptr_t) otmp, buflen);
+	if (!otmp->oextra) {
+		/* for oname, omonst, omid, olong, omailcmd */
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+	} else {
+		if (ONAME(otmp)) buflen = strlen(ONAME(otmp)) + 1;
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) ONAME(otmp), buflen);
+
+		/* defer to savemon() for this one */
+		if (OMONST(otmp)) savemon(fd, OMONST(otmp));
+		else bwrite(fd, (genericptr_t) &zerobuf, sizeof zerobuf);
+
+		if (OMID(otmp)) buflen = sizeof(unsigned);
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) OMID(otmp), buflen);
+
+		if (OLONG(otmp)) buflen = sizeof(long);
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) OLONG(otmp), buflen);
+
+		if (OMAILCMD(otmp)) buflen = strlen(OMAILCMD(otmp)) + 1;
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) OMAILCMD(otmp), buflen);
+	}
+}
+
+STATIC_OVL void
 saveobjchn(fd, otmp, mode)
 register int fd, mode;
 register struct obj *otmp;
 {
 	register struct obj *otmp2;
-	unsigned int xl;
 	int minusone = -1;
 
 	while(otmp) {
 	    otmp2 = otmp->nobj;
 	    if (perform_bwrite(mode)) {
-		xl = otmp->oxlth + otmp->onamelth;
-		bwrite(fd, (genericptr_t) &xl, sizeof(int));
-		bwrite(fd, (genericptr_t) otmp, xl + sizeof(struct obj));
+		saveobj(fd, otmp);
 	    }
 	    if (Has_contents(otmp))
 		saveobjchn(fd,otmp->cobj,mode);
@@ -1004,81 +1051,60 @@ register struct obj *otmp;
 	    bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 }
 
-/*
- * Used by save_mtraits() in mkobj.c to ensure
- * that all the monst related information is stored in
- * an OATTACHED_MONST structure.
- */
-genericptr_t
-mon_to_buffer(mtmp,isize)
+STATIC_OVL void
+savemon(fd, mtmp)
+int fd;
 struct monst *mtmp;
-int *isize;
 {
-	char *spot;
-	int lth, k, xlth[6];
-	genericptr_t buffer, xptr[6];
-	struct monst *mbuf;
+	int buflen, zerobuf = 0;
 
-     /* assert((sizeof (*mbuf->mextra) / sizeof (char *)) == 6); */
-	lth = (int)sizeof (struct monst);
+	buflen = sizeof(struct monst);
+	bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+	bwrite(fd, (genericptr_t) mtmp, buflen);
+	if (!mtmp->mextra) {
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
+	} else {
+		if (MNAME(mtmp)) buflen = strlen(MNAME(mtmp)) + 1;
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) MNAME(mtmp), buflen);
 
-	/* there is always one sizeof(int) for each mextra field */
-	for (k = 0; k < SIZE(xlth); ++k) {
-		xlth[k] = 0;
-		xptr[k] = (genericptr_t)0;
+		if (EGD(mtmp)) buflen = sizeof(struct egd);
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) EGD(mtmp), buflen);
+
+		if (EPRI(mtmp)) buflen = sizeof(struct epri);
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) EPRI(mtmp), buflen);
+
+		if (ESHK(mtmp)) buflen = sizeof(struct eshk);
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) ESHK(mtmp), buflen);
+
+		if (EMIN(mtmp)) buflen = sizeof(struct emin);
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) EMIN(mtmp), buflen);
+
+		if (EDOG(mtmp)) buflen = sizeof(struct edog);
+		else buflen = 0;
+		bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+		if (buflen > 0)
+			bwrite(fd, (genericptr_t) EDOG(mtmp), buflen);
 	}
-	if (mtmp->mextra) {
-		if (MNAME(mtmp)) {
-			xlth[0] = (int)strlen(MNAME(mtmp)) + 1;
-			xptr[0] = (genericptr_t)MNAME(mtmp);
-		}
-		if (EGD(mtmp)) {
-			xlth[1] = (int)sizeof (struct egd);
-			xptr[1] = (genericptr_t)EGD(mtmp);
-		}
-		if (EPRI(mtmp)) {
-			xlth[2] = (int)sizeof (struct epri);
-			xptr[2] = (genericptr_t)EPRI(mtmp);
-		}
-		if (ESHK(mtmp)) {
-			xlth[3] = (int)sizeof (struct eshk);
-			xptr[3] = (genericptr_t)ESHK(mtmp);
-		}
-		if (EMIN(mtmp)) {
-			xlth[4] = (int)sizeof (struct emin);
-			xptr[4] = (genericptr_t)EMIN(mtmp);
-		}
-		if (EDOG(mtmp)) {
-			xlth[5] = (int)sizeof (struct edog);
-			xptr[5] = (genericptr_t)EDOG(mtmp);
-		}
-	}
-	for (k = 0; k < SIZE(xlth); ++k) {
-		lth += (int)sizeof (int) + xlth[k];
-	}
-	if (isize) *isize = lth;
-
-	buffer = alloc((unsigned) lth);
-
-	spot = (char *)buffer;
-	(void) memcpy((genericptr_t)spot, (genericptr_t)mtmp,
-			sizeof(struct monst));
-	spot += sizeof(struct monst);
-
-	mbuf = (struct monst *)buffer;
-	mbuf->mextra = (struct mextra *)0;
-
-	for (k = 0; k < SIZE(xlth); ++k) {
-		lth = xlth[k];
-		(void) memcpy((genericptr_t)spot,
-				(genericptr_t)&lth, sizeof(lth));
-		spot += sizeof(lth);
-		if (lth > 0 && xptr[k] != 0) {
-			(void) memcpy((genericptr_t)spot, xptr[k], lth);
-			spot += lth;
-		}
-	}
-	return (genericptr_t)buffer;
 }
 
 STATIC_OVL void
@@ -1087,7 +1113,7 @@ register int fd, mode;
 register struct monst *mtmp;
 {
 	register struct monst *mtmp2;
-	int buflen, minusone = -1, zerobuf = 0;
+	int minusone = -1;
 
 	while (mtmp) {
 	    mtmp2 = mtmp->nmon;
@@ -1105,60 +1131,7 @@ register struct monst *mtmp;
 			mtmp->minvent = goldobj;
 		}
 #endif
-		buflen = sizeof(struct monst);
-		bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-#if 0
-		{
-		    genericptr_t buffer = mon_to_buffer(mtmp, &buflen);
-		    bwrite(fd, buffer, buflen);
-		}
-#else
-		bwrite(fd, (genericptr_t) mtmp, buflen);
-		if (!mtmp->mextra) {
-			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-			bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		} else {
-			if (MNAME(mtmp)) buflen = strlen(MNAME(mtmp)) + 1;
-			else buflen = 0;
-			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-			if (buflen > 0)
-				bwrite(fd, (genericptr_t) MNAME(mtmp), buflen);
-
-			if (EGD(mtmp)) buflen = sizeof(struct egd);
-			else buflen = 0;
-			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-			if (buflen > 0)
-				bwrite(fd, (genericptr_t) EGD(mtmp), buflen);
-
-			if (EPRI(mtmp)) buflen = sizeof(struct epri);
-			else buflen = 0;
-			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-			if (buflen > 0)
-				bwrite(fd, (genericptr_t) EPRI(mtmp), buflen);
-
-			if (ESHK(mtmp)) buflen = sizeof(struct eshk);
-			else buflen = 0;
-			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-			if (buflen > 0)
-				bwrite(fd, (genericptr_t) ESHK(mtmp), buflen);
-
-			if (EMIN(mtmp)) buflen = sizeof(struct emin);
-			else buflen = 0;
-			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-			if (buflen > 0)
-				bwrite(fd, (genericptr_t) EMIN(mtmp), buflen);
-
-			if (EDOG(mtmp)) buflen = sizeof(struct edog);
-			else buflen = 0;
-			bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-			if (buflen > 0)
-				bwrite(fd, (genericptr_t) EDOG(mtmp), buflen);
-		}
-#endif
+		savemon(fd, mtmp);
 	    }
 	    if (mtmp->minvent)
 		saveobjchn(fd,mtmp->minvent,mode);

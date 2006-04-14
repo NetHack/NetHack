@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -679,7 +679,7 @@ slip_or_trip()
 	    pline("%s %s%s on the ice.",
 #ifdef STEED
 		u.usteed ? upstart(x_monnam(u.usteed,
-				(has_name(u.usteed)) ? ARTICLE_NONE : ARTICLE_THE,
+				(has_mname(u.usteed)) ? ARTICLE_NONE : ARTICLE_THE,
 				(char *)0, SUPPRESS_SADDLE, FALSE)) :
 #endif
 		"You", rn2(2) ? "slip" : "slide", on_foot ? "" : "s");

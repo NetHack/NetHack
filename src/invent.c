@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2006/04/10	*/
+/*	SCCS Id: @(#)invent.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -172,7 +172,7 @@ struct obj **potmp, **pobj;
 #endif
 		if (otmp->oclass == COIN_CLASS) otmp->owt = weight(otmp);
 		else otmp->owt += obj->owt;
-		if(!otmp->onamelth && obj->onamelth)
+		if(!has_oname(otmp) && has_oname(obj))
 			otmp = *potmp = oname(otmp, ONAME(obj));
 		obj_extract_self(obj);
 
@@ -2393,6 +2393,7 @@ STATIC_OVL boolean
 mergable(otmp, obj)	/* returns TRUE if obj  & otmp can be merged */
 	register struct obj *otmp, *obj;
 {
+	int objnamelth = 0, otmpnamelth = 0;
 	if (obj->otyp != otmp->otyp) return FALSE;
 #ifdef GOLDOBJ
 	/* coins of the same kind will always merge */
@@ -2448,15 +2449,19 @@ mergable(otmp, obj)	/* returns TRUE if obj  & otmp can be merged */
 	    return FALSE;
 
 	/* if they have names, make sure they're the same */
-	if ( (obj->onamelth != otmp->onamelth &&
-		((obj->onamelth && otmp->onamelth) || obj->otyp == CORPSE)
+	if (has_oname(obj)) objnamelth = strlen(ONAME(obj));
+	if (has_oname(otmp)) otmpnamelth = strlen(ONAME(otmp));
+	if ( (objnamelth != otmpnamelth &&
+		((objnamelth && otmpnamelth) || obj->otyp == CORPSE)
 	     ) ||
-	    (obj->onamelth && otmp->onamelth &&
-		    strncmp(ONAME(obj), ONAME(otmp), (int)obj->onamelth)))
+	    (objnamelth && otmpnamelth &&
+		    strncmp(ONAME(obj), ONAME(otmp), objnamelth)))
 		return FALSE;
 
 	/* for the moment, any additional information is incompatible */
-	if (obj->oxlth || otmp->oxlth) return FALSE;
+	if (has_omonst(obj) || has_omid(obj) || has_olong(obj) ||
+	    has_omonst(otmp) || has_omid(otmp) || has_olong(otmp))
+		return FALSE;
 
 	if(obj->oartifact != otmp->oartifact) return FALSE;
 
@@ -2835,15 +2840,20 @@ doorganize()	/* inventory organizer by Del Lamb */
 		   if destination is compatible, do merge with it,
 		   otherwise bump whatever is there to an open slot */
 		if (otmp->invlet == let) {
-		    int olth = obj->onamelth;
+		    int olth = 0;
 
+		    if (has_oname(obj)) olth = strlen(ONAME(obj));
 		    /* ugly hack:  if these objects aren't going to merge
 		       solely because they have conflicting user-assigned
 		       names, strip off the name of the one being moved */
 		    if (olth && !obj->oartifact && !mergable(otmp, obj)) {
-			obj->onamelth = 0;
+			char *holdname = ONAME(obj);
+			ONAME(obj) = (char *)0;
 			/* restore name iff merging is still not possible */
-			if (!mergable(otmp, obj)) obj->onamelth = olth;
+			if (!mergable(otmp, obj)) {
+				ONAME(obj) = holdname;
+				holdname = (char *)0;
+			} else free((genericptr_t)holdname);
 		    }
 
 		    if (merged(&otmp, &obj)) {

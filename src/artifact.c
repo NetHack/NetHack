@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.5	2005/11/11	*/
+/*	SCCS Id: @(#)artifact.c 3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -787,7 +787,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
     boolean youattack = (magr == &youmonst),
 	    youdefend = (mdef == &youmonst),
 	    resisted = FALSE, do_stun, do_confuse, result;
-    boolean hitteename = (has_name(mdef) && !strcmpi(hittee, MNAME(mdef)));
+    boolean hitteename = (has_mname(mdef) && !strcmpi(hittee, MNAME(mdef)));
     int attack_indx, scare_dieroll = MB_MAX_DIEROLL / 2;
 
     result = FALSE;		/* no message given yet */

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.5	2006/03/11	*/
+/*	SCCS Id: @(#)makemon.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -717,7 +717,7 @@ xchar x, y;	/* clone's preferred location or 0 (near mon) */
 	if (emits_light(m2->data))
 	    new_light_source(m2->mx, m2->my, emits_light(m2->data),
 			     LS_MONSTER, (genericptr_t)m2);
-	if (has_name(mon)) {
+	if (has_mname(mon)) {
 		m2 = christen_monst(m2, MNAME(mon));
 	} else if (mon->isshk) {
 		m2 = christen_monst(m2, shkname(mon));

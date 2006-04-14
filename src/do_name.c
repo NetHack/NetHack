@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.5	2006/02/08	*/
+/*	SCCS Id: @(#)do_name.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -225,7 +225,7 @@ int lth;	/* desired length (caller handles adding 1 for terminator) */
 	MNAME(mon) = (char *) alloc((unsigned) lth);
     } else {
 	/* zero length: the new name is empty; get rid of the old name */
-	if (has_name(mon)) free_mname(mon);
+	if (has_mname(mon)) free_mname(mon);
     }
 }
 
@@ -234,9 +234,37 @@ void
 free_mname(mon)
 struct monst *mon;
 {
-    if (has_name(mon)) {
+    if (has_mname(mon)) {
 	free((genericptr_t)MNAME(mon));
 	MNAME(mon) = (char *)0;
+    }
+}
+
+/* allocate space for an object's name; removes old name if there is one */
+void
+new_oname(obj, lth)
+struct obj *obj;
+int lth;	/* desired length (caller handles adding 1 for terminator) */
+{
+    if (lth) {
+	/* allocate oextra if necessary; otherwise get rid of old name */
+	if (!obj->oextra) obj->oextra = newoextra();
+	else free_oname(obj);	/* already has oextra, might also have name */
+	ONAME(obj) = (char *) alloc((unsigned) lth);
+    } else {
+	/* zero length: the new name is empty; get rid of the old name */
+	if (has_oname(obj)) free_oname(obj);
+    }
+}
+
+/* release an object's name; retains oextra even if all fields are now null */
+void
+free_oname(obj)
+struct obj *obj;
+{
+    if (has_oname(obj)) {
+	free((genericptr_t)ONAME(obj));
+	ONAME(obj) = (char *)0;
     }
 }
 
@@ -368,79 +396,6 @@ register struct obj *obj;
 	obj = oname(obj, buf);
 }
 
-/*
- * Allocate a new and possibly larger storage space for an obj.
- */
-struct obj *
-realloc_obj(obj, oextra_size, oextra_src, oname_size, name)
-struct obj *obj;
-int oextra_size;		/* storage to allocate for oextra            */
-genericptr_t oextra_src;
-int oname_size;			/* size of name string + 1 (null terminator) */
-const char *name;
-{
-	struct obj *otmp;
-
-	otmp = newobj(oextra_size + oname_size);
-	*otmp = *obj;	/* the cobj pointer is copied to otmp */
-	if (oextra_size) {
-	    if (oextra_src)
-		(void) memcpy((genericptr_t)otmp->oextra, oextra_src,
-							oextra_size);
-	} else {
-	    otmp->oattached = OATTACHED_NOTHING;
-	}
-	otmp->oxlth = oextra_size;
-
-	otmp->onamelth = oname_size;
-	otmp->timed = 0;	/* not timed, yet */
-	otmp->lamplit = 0;	/* ditto */
-	/* __GNUC__ note:  if the assignment of otmp->onamelth immediately
-	   precedes this `if' statement, a gcc bug will miscompile the
-	   test on vax (`insv' instruction used to store bitfield does
-	   not set condition codes, but optimizer behaves as if it did).
-	   gcc-2.7.2.1 finally fixed this. */
-	if (oname_size) {
-	    if (name)
-		Strcpy(ONAME(otmp), name);
-	}
-
-	if (obj->owornmask) {
-		boolean save_twoweap = u.twoweap;
-		/* unwearing the old instance will clear dual-wield mode
-		   if this object is either of the two weapons */
-		setworn((struct obj *)0, obj->owornmask);
-		setworn(otmp, otmp->owornmask);
-		u.twoweap = save_twoweap;
-	}
-
-	/* replace obj with otmp */
-	replace_object(obj, otmp);
-
-	/* fix ocontainer pointers */
-	if (Has_contents(obj)) {
-		struct obj *inside;
-
-		for(inside = obj->cobj; inside; inside = inside->nobj)
-			inside->ocontainer = otmp;
-	}
-
-	/* move timers and light sources from obj to otmp */
-	if (obj->timed) obj_move_timers(obj, otmp);
-	if (obj->lamplit) obj_move_light_source(obj, otmp);
-
-	/* objects possibly being manipulated by multi-turn occupations
-	   which have been interrupted but might be subsequently resumed */
-	if (obj->oclass == FOOD_CLASS)
-	    food_substitution(obj, otmp);	/* eat food or open tin */
-	else if (obj->oclass == SPBOOK_CLASS)
-	    book_substitution(obj, otmp);	/* read spellbook */
-
-	/* obfree(obj, otmp);	now unnecessary: no pointers on bill */
-	dealloc_obj(obj);	/* let us hope nobody else saved a pointer */
-	return otmp;
-}
-
 struct obj *
 oname(obj, name)
 struct obj *obj;
@@ -462,13 +417,9 @@ const char *name;
 	if (obj->oartifact || (lth && exist_artifact(obj->otyp, name)))
 		return obj;
 
-	if (lth == obj->onamelth) {
-		/* no need to replace entire object */
-		if (lth) Strcpy(ONAME(obj), name);
-	} else {
-		obj = realloc_obj(obj, obj->oxlth,
-			      (genericptr_t)obj->oextra, lth, name);
-	}
+	new_oname(obj, lth);	/* removes old name if one is present */
+	if (lth) Strcpy(ONAME(obj), name);
+
 	if (lth) artifact_exists(obj, name, TRUE);
 	if (obj->oartifact) {
 	    /* can't dual-wield with artifact as secondary weapon */
@@ -543,8 +494,8 @@ register struct obj *obj;
 	if (!obj->dknown) return; /* probably blind */
 	otemp = *obj;
 	otemp.quan = 1L;
-	otemp.onamelth = 0;
-	otemp.oxlth = 0;
+	otemp.oextra = (struct oextra *)0;
+
 	if (objects[otemp.otyp].oc_class == POTION_CLASS && otemp.fromsink)
 	    /* kludge, meaning it's sink water */
 	    Sprintf(qbuf,"Call a stream of %s fluid:",
@@ -722,7 +673,7 @@ boolean called;
 
 	    Strcat(buf, rname);
 	    name_at_start = bogon_is_pname(rname);
-	} else if (has_name(mtmp)) {
+	} else if (has_mname(mtmp)) {
 	    char *name = MNAME(mtmp);
 
 	    if (mdat == &mons[PM_GHOST]) {
@@ -796,7 +747,7 @@ l_monnam(mtmp)
 register struct monst *mtmp;
 {
 	return(x_monnam(mtmp, ARTICLE_NONE, (char *)0, 
-		(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE));
+		(has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE));
 }
 
 char *
@@ -804,7 +755,7 @@ mon_nam(mtmp)
 register struct monst *mtmp;
 {
 	return(x_monnam(mtmp, ARTICLE_THE, (char *)0,
-		(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE));
+		(has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE));
 }
 
 /* print the name as if mon_nam() was called, but assume that the player
@@ -816,7 +767,7 @@ noit_mon_nam(mtmp)
 register struct monst *mtmp;
 {
 	return(x_monnam(mtmp, ARTICLE_THE, (char *)0,
-		(has_name(mtmp)) ? (SUPPRESS_SADDLE|SUPPRESS_IT) :
+		(has_mname(mtmp)) ? (SUPPRESS_SADDLE|SUPPRESS_IT) :
 		    SUPPRESS_IT, FALSE));
 }
 
@@ -856,7 +807,7 @@ struct monst *mtmp;
 	int prefix, suppression_flag;
 
 	prefix = mtmp->mtame ? ARTICLE_YOUR : ARTICLE_THE;
-	suppression_flag = (has_name(mtmp)
+	suppression_flag = (has_mname(mtmp)
 #ifdef STEED
 			    /* "saddled" is redundant when mounted */
 			    || mtmp == u.usteed
@@ -872,7 +823,7 @@ register struct monst *mtmp;
 register const char *adj;
 {
 	register char *bp = x_monnam(mtmp, ARTICLE_THE, adj,
-		(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
+		(has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
 
 	*bp = highc(*bp);
 	return(bp);
@@ -883,7 +834,7 @@ a_monnam(mtmp)
 register struct monst *mtmp;
 {
 	return x_monnam(mtmp, ARTICLE_A, (char *)0,
-		(has_name(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
+		(has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 char *

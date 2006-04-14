@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2006/02/22	*/
+/*	SCCS Id: @(#)eat.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -297,9 +297,9 @@ register struct obj *otmp;
 		dropy(otmp);
 		sellobj_state(SELL_NORMAL);
 	    } else {
-		otmp->oxlth++;		/* hack to prevent merge */
+		newolong(otmp);		/* hack to prevent merge */
 		otmp = addinv(otmp);
-		otmp->oxlth--;
+		free_olong(otmp);
 	    }
 	}
 	return(otmp);

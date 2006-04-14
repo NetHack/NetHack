@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.5	2005/12/26	*/
+/*	SCCS Id: @(#)wield.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -707,7 +707,7 @@ register struct obj *otmp;
 register int amount;
 {
 	const char *color = hcolor((amount < 0) ? NH_BLACK : NH_BLUE);
-	const char *xtime;
+	const char *xtime, *wepname = "";
 	int otyp = STRANGE_OBJECT;
 
 	if(!uwep || (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))) {
@@ -742,7 +742,9 @@ register int amount;
 		return 1;
 	}
 
-	if (amount < 0 && uwep->oartifact && restrict_name(uwep, ONAME(uwep))) {
+	if (has_oname(uwep))
+		wepname = ONAME(uwep);
+	if (amount < 0 && uwep->oartifact && restrict_name(uwep, wepname)) {
 	    if (!Blind)
 		pline("%s %s.", Yobjnam2(uwep, "faintly glow"), color);
 	    return(1);

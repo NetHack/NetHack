@@ -351,6 +351,8 @@ E void NDECL(heal_legs);
 E int FDECL(getpos, (coord *,BOOLEAN_P,const char *));
 E void FDECL(new_mname, (struct monst *,int));
 E void FDECL(free_mname, (struct monst *));
+E void FDECL(new_oname, (struct obj *,int));
+E void FDECL(free_oname, (struct obj *));
 E struct monst *FDECL(christen_monst, (struct monst *,const char *));
 E int NDECL(do_mname);
 E struct obj *FDECL(oname, (struct obj *,const char *));
@@ -974,6 +976,7 @@ E struct monst *FDECL(clone_mon, (struct monst *,XCHAR_P,XCHAR_P));
 E int FDECL(monhp_per_lvl, (struct monst *));
 E void FDECL(newmonhp, (struct monst *,int));
 E struct mextra *NDECL(newmextra);
+E void FDECL(copy_mextra, (struct monst *,struct monst *));
 E struct monst *FDECL(makemon, (struct permonst *,int,int,int));
 E boolean FDECL(create_critters, (int,struct permonst *,BOOLEAN_P));
 E struct permonst *NDECL(rndmonst);
@@ -1100,6 +1103,17 @@ E const char *FDECL(waterbody_name, (XCHAR_P,XCHAR_P));
 
 /* ### mkobj.c ### */
 
+E struct oextra *NDECL(newoextra);
+E void FDECL(copy_oextra, (struct obj *,struct obj *));
+E void FDECL(dealloc_oextra, (struct oextra *));
+E void FDECL(newomonst, (struct obj *));
+E void FDECL(free_omonst, (struct obj *));
+E void FDECL(newomid, (struct obj *));
+E void FDECL(free_omid, (struct obj *));
+E void FDECL(newolong, (struct obj *));
+E void FDECL(free_olong, (struct obj *));
+E void FDECL(new_omailcmd, (struct obj *,char *));
+E void FDECL(free_omailcmd, (struct obj *));
 E struct obj *FDECL(mkobj_at, (CHAR_P,int,int,BOOLEAN_P));
 E struct obj *FDECL(mksobj_at, (int,int,int,BOOLEAN_P,BOOLEAN_P));
 E struct obj *FDECL(mkobj, (CHAR_P,BOOLEAN_P));

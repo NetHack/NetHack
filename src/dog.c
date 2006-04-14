@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.5	2006/02/13	*/
+/*	SCCS Id: @(#)dog.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -129,7 +129,7 @@ boolean quietly;
 		}
 	    }
 	    /* if figurine has been named, give same name to the monster */
-	    if (otmp->onamelth)
+	    if (has_oname(otmp))
 		mtmp = christen_monst(mtmp, ONAME(otmp));
 	}
 	set_malign(mtmp); /* more alignment changes */

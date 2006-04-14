@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2006/03/01	*/
+/*	SCCS Id: @(#)pray.c	3.5	2006/04/14	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1265,7 +1265,7 @@ dosacrifice()
 	    if (carried(otmp)) useup(otmp);
 	    else useupf(otmp, 1L);
 	    return(1);
-	} else if (otmp->oxlth && otmp->oattached == OATTACHED_MONST
+	} else if (has_omonst(otmp)
 		    && ((mtmp = get_mtraits(otmp, FALSE)) != (struct monst *)0)
 		    && mtmp->mtame) {
 	    /* mtmp is a temporary pointer to a tame monster's attributes,

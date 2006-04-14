@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bones.c	3.5	2005/10/07	*/
+/*	SCCS Id: @(#)bones.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -68,14 +68,16 @@ boolean restore;
 			/* artifact bookeeping needs to be done during
 			   restore; other fixups are done while saving */
 			if (otmp->oartifact) {
-			    if (exist_artifact(otmp->otyp, ONAME(otmp)) ||
+			    char *tmponame = "";
+			    if (has_oname(otmp)) tmponame = ONAME(otmp);
+			    if (exist_artifact(otmp->otyp, tmponame) ||
 				    is_quest_artifact(otmp)) {
 				/* prevent duplicate--revert to ordinary obj */
 				otmp->oartifact = 0;
-				otmp->onamelth = 0;
-				*ONAME(otmp) = '\0';
+				if (has_oname(otmp))
+					free_oname(otmp);
 			    } else {
-				artifact_exists(otmp, ONAME(otmp), TRUE);
+				artifact_exists(otmp, tmponame, TRUE);
 			    }
 			}
 		} else {	/* saving */
@@ -98,12 +100,11 @@ boolean restore;
 			   some manner; then we could just check the flag
 			   here and keep "real" names (dead pets, &c) while
 			   discarding player notes attached to statues.] */
-			if (otmp->onamelth &&
+			if (has_oname(otmp) &&
 				!(otmp->oartifact || otmp->otyp == STATUE ||
 				    (otmp->otyp == CORPSE &&
 					 otmp->corpsenm >= SPECIAL_PM))) {
-			    otmp->onamelth = 0;
-			    *ONAME(otmp) = '\0';
+			    free_oname(otmp);
 			}
 
 			if (otmp->otyp == SLIME_MOLD) goodfruit(otmp->spe);
@@ -126,9 +127,9 @@ boolean restore;
 			       for revival flag), temple priests, and
 			       vault guards in order to prevent corpse
 			       revival or statue reanimation. */
-			    if (otmp->oattached == OATTACHED_MONST &&
+			    if (has_omonst(otmp) &&
 				  cant_revive(&mnum, FALSE, (struct obj *)0)) {
-				otmp->oattached = OATTACHED_NOTHING;
+				free_omonst(otmp);
 				/* mnum is now either human_zombie or
 				   doppelganger; for corpses of uniques,
 				   we need to force the transformation

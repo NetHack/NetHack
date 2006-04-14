@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mail.c	3.5	2002/01/13	*/
+/*	SCCS Id: @(#)mail.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -355,6 +355,7 @@ md_rush(md,tx,ty)
     return TRUE;
 }
 
+
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
 STATIC_OVL void
@@ -382,14 +383,19 @@ struct mail_info *info;
 	    verbalize("Catch!");
 	display_nhwindow(WIN_MESSAGE, FALSE);
 	if (info->object_nam) {
-	    obj = oname(obj, info->object_nam);
+	    char *buf[BUFSZ];
+	    Strncpy(buf, info->object_nam, BUFSZ - 1);
+	    buf[BUFSZ - 1] = '\0';
 	    if (info->response_cmd) {	/*(hide extension of the obj name)*/
 		int namelth = info->response_cmd - info->object_nam - 1;
-		if ( namelth <= 0 || namelth >= (int) obj->onamelth )
+		if ( namelth <= 0 )
 		    impossible("mail delivery screwed up");
-		else
-		    *(ONAME(obj) + namelth) = '\0';
-		/* Note: renaming object will discard the hidden command. */
+		else {
+		    *(buf + namelth) = '\0';
+		    obj = oname(obj, buf);
+		    new_omailcmd(obj, info->response_cmd);
+		}
+		/* Note: renaming object won't discard the hidden cmd anymore. */
 	    }
 	}
 	obj = hold_another_object(obj, "Oops!",
@@ -548,10 +554,12 @@ struct obj *otmp;
     char *p, buf[BUFSZ], qbuf[BUFSZ];
     int len;
 
-    /* there should be a command hidden beyond the object name */
-    txt = otmp->onamelth ? ONAME(otmp) : "";
+    /* there should be a command in OMAILCMD */
+    if (has_oname(otmp)) txt = ONAME(otmp);
+    else txt = "";
     len = strlen(txt);
-    cmd = (len + 1 < otmp->onamelth) ? txt + len + 1 : (char *) 0;
+    if (has_omailcmd(otmp))
+    	cmd = OMAILCMD(otmp);
     if (!cmd || !*cmd) cmd = "SPAWN";
 
     Sprintf(qbuf, "System command (%s)", cmd);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2006/04/05	*/
+/*	SCCS Id: @(#)trap.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -432,8 +432,7 @@ int *fail_reason;
 	    mptr = &mons[PM_FLESH_GOLEM];
 	    use_saved_traits = FALSE;
 	} else {
-	    use_saved_traits = (statue->oxlth &&
-				statue->oattached == OATTACHED_MONST);
+	    use_saved_traits = has_omonst(statue);
 	}
 
 	if (use_saved_traits) {
@@ -475,7 +474,7 @@ int *fail_reason;
 	else if (statue->spe & STATUE_FEMALE)
 	    mon->female = TRUE;
 	/* if statue has been named, give same name to the monster */
-	if (statue->onamelth)
+	if (has_oname(statue))
 	    mon = christen_monst(mon, ONAME(statue));
 	/* mimic statue becomes seen mimic; other hiders won't be hidden */
 	if (mon->m_ap_type) seemimic(mon);
@@ -600,9 +599,8 @@ struct obj *objchn, *saddle;
 {
 	if (!saddle) return FALSE;
 	while(objchn) {
-		if(objchn->otyp == CORPSE &&
-		   objchn->oattached == OATTACHED_MONST && objchn->oxlth) {
-			struct monst *mtmp = (struct monst *)objchn->oextra;
+		if(objchn->otyp == CORPSE && has_omonst(objchn)) {
+			struct monst *mtmp = OMONST(objchn);
 			if (mtmp->m_id == steed_mid) {
 				/* move saddle */
 				xchar x,y;
@@ -682,7 +680,7 @@ unsigned trflags;
 	    u.usteed->mtrapseen |= (1 << (ttype - 1));
 	    /* suppress article in various steed messages when using its
 	       name (which won't occur when hallucinating) */
-	    if (has_name(u.usteed) && !Hallucination)
+	    if (has_mname(u.usteed) && !Hallucination)
 		steed_article = ARTICLE_NONE;
 	}
 #endif

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2006/01/07	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -72,6 +72,119 @@ const struct icp hellprobs[] = {
 { 8, RING_CLASS},
 { 4, AMULET_CLASS}
 };
+
+struct oextra *
+newoextra()
+{
+	struct oextra *oextra;
+	oextra = (struct oextra *)alloc(sizeof(struct oextra));
+	if (oextra)
+	    (void) memset((genericptr_t)oextra, 0, sizeof(struct oextra));
+	return oextra;
+}
+
+void
+dealloc_oextra(x)
+struct oextra *x;
+{
+	if (x) {
+		if (x->oname) free((genericptr_t)x->oname);
+		if (x->omonst) free((genericptr_t)x->omonst);
+		if (x->omid) free((genericptr_t)x->omid);
+		if (x->olong) free((genericptr_t)x->olong);
+		if (x->omailcmd) free((genericptr_t)x->omailcmd);
+		free((genericptr_t)x);
+	}
+}
+
+void
+newomonst(otmp)
+struct obj *otmp;
+{
+	if (!otmp->oextra) otmp->oextra = newoextra();
+	if (!OMONST(otmp)) {
+	    OMONST(otmp) = (struct monst *)alloc(sizeof(struct monst));
+	    (void) memset((genericptr_t) OMONST(otmp), 0, sizeof(struct monst));
+	}
+}
+
+void
+free_omonst(otmp)
+struct obj *otmp;
+{
+	if (otmp->oextra && OMONST(otmp)) {
+		free((genericptr_t) OMONST(otmp));
+		OMONST(otmp) = (struct monst *)0;
+	}
+}
+
+void
+newomid(otmp)
+struct obj *otmp;
+{
+	if (!otmp->oextra) otmp->oextra = newoextra();
+	if (!OMID(otmp)) {
+	    OMID(otmp) = (unsigned *)alloc(sizeof(unsigned));
+	    (void) memset((genericptr_t) OMID(otmp), 0, sizeof(unsigned));
+	}
+}
+
+void
+free_omid(otmp)
+struct obj *otmp;
+{
+	if (otmp->oextra && OMID(otmp)) {
+		free((genericptr_t) OMID(otmp));
+		OMID(otmp) = (unsigned *)0;
+	}
+}
+
+void
+newolong(otmp)
+struct obj *otmp;
+{
+	if (!otmp->oextra) otmp->oextra = newoextra();
+	if (!OLONG(otmp)) {
+	    OLONG(otmp) = (long *)alloc(sizeof(long));
+	    (void) memset((genericptr_t) OLONG(otmp), 0, sizeof(long));
+	}
+}
+
+void
+free_olong(otmp)
+struct obj *otmp;
+{
+	if (otmp->oextra && OLONG(otmp)) {
+		free((genericptr_t) OLONG(otmp));
+		OLONG(otmp) = (long *)0;
+	}
+}
+
+void
+new_omailcmd(otmp,response_cmd)
+struct obj *otmp;
+char *response_cmd;
+{
+	if (!otmp->oextra) otmp->oextra = newoextra();
+	if (!OMAILCMD(otmp)) {
+	    unsigned lth = strlen(response_cmd) + 1;
+	    OMAILCMD(otmp) = (char *)alloc(lth);
+	    if (OMAILCMD(otmp)) {
+		(void) memset((genericptr_t)OMAILCMD(otmp), 0, lth);
+	    	Strcpy(OMAILCMD(otmp), response_cmd);
+	    }
+	}
+}
+
+void
+free_omailcmd(otmp)
+struct obj *otmp;
+{
+	if (otmp->oextra && OMAILCMD(otmp)) {
+		free((genericptr_t) OMAILCMD(otmp));
+		OMAILCMD(otmp) = (char *)0;
+	}
+}
 
 struct obj *
 mkobj_at(let, x, y, artif)
@@ -212,6 +325,47 @@ rndmonnum()	/* select a random, common monster type */
 	return(i);
 }
 
+void
+copy_oextra(obj2, obj1)
+struct obj *obj2, *obj1;
+{
+	if(!obj2 || !obj1 || !obj1->oextra) return;
+
+	if (!obj2->oextra) obj2->oextra = newoextra();
+	if (has_oname(obj1)) oname(obj2, ONAME(obj1));
+	if (has_omonst(obj1)) {
+		if (!OMONST(obj2)) newomonst(obj2);
+		(void)memcpy((genericptr_t)OMONST(obj2),
+				(genericptr_t)OMONST(obj1),
+				sizeof(struct monst));
+		OMONST(obj2)->mextra = (struct mextra *)0;
+		OMONST(obj2)->nmon = (struct monst *)0;
+#if 0
+		OMONST(obj2)->m_id = context.ident++;
+		if (OMONST(obj2)->m_id) /* ident overflowed */
+			OMONST(obj2)->m_id = context.ident++;
+#endif
+		if (OMONST(obj1)->mextra)
+			copy_mextra(OMONST(obj2),OMONST(obj1));
+	}
+	if (has_omid(obj1)) {
+		if (!OMID(obj2)) newomid(obj2);
+		(void)memcpy((genericptr_t)OMID(obj2),
+				(genericptr_t)OMID(obj1),
+				sizeof(unsigned));
+	}
+	if (has_olong(obj1)) {
+		if (!OLONG(obj2)) newolong(obj2);
+		(void)memcpy((genericptr_t)OLONG(obj2),
+				(genericptr_t)OLONG(obj1),
+				sizeof(long));
+	}
+
+	if (has_omailcmd(obj1)) {
+		if (!OMAILCMD(obj2)) new_omailcmd(obj2, OMAILCMD(obj1));
+	}
+}
+
 /*
  * Split obj so that it gets size gets reduced by num. The quantity num is
  * put in the object structure delivered by this call.  The returned object
@@ -227,8 +381,9 @@ long num;
 
 	if (obj->cobj || num <= 0L || obj->quan <= num)
 	    panic("splitobj");	/* can't split containers */
-	otmp = newobj(obj->oxlth + obj->onamelth);
+	otmp = newobj();
 	*otmp = *obj;		/* copies whole structure */
+	otmp->oextra = (struct oextra *)0;
 	otmp->o_id = context.ident++;
 	if (!otmp->o_id) otmp->o_id = context.ident++;	/* ident overflowed */
 	otmp->timed = 0;	/* not timed, yet */
@@ -243,11 +398,8 @@ long num;
 	/* as a back pointer to the container object when contained. */
 	if (obj->where == OBJ_FLOOR)
 	    obj->nexthere = otmp;
-	if (obj->oxlth)
-	    (void)memcpy((genericptr_t)otmp->oextra, (genericptr_t)obj->oextra,
-			obj->oxlth);
-	if (obj->onamelth)
-	    (void)strncpy(ONAME(otmp), ONAME(obj), (int)obj->onamelth);
+	copy_oextra(otmp, obj);
+	if (has_omid(otmp)) free_omid(otmp);	/* only one association with m_id*/
 	if (obj->unpaid) splitbill(obj,otmp);
 	if (obj->timed) obj_split_timers(obj, otmp);
 	if (obj_sheds_light(obj)) obj_split_light_source(obj, otmp);
@@ -333,17 +485,15 @@ register struct obj *otmp;
 
 	if (otmp->unpaid)
 	    subfrombill(otmp, shop_keeper(*u.ushops));
-	dummy = newobj(otmp->oxlth + otmp->onamelth);
+	dummy = newobj();
 	*dummy = *otmp;
+	dummy->oextra = (struct oextra *)0;
 	dummy->where = OBJ_FREE;
 	dummy->o_id = context.ident++;
 	if (!dummy->o_id) dummy->o_id = context.ident++;	/* ident overflowed */
 	dummy->timed = 0;
-	if (otmp->oxlth)
-	    (void)memcpy((genericptr_t)dummy->oextra,
-			(genericptr_t)otmp->oextra, otmp->oxlth);
-	if (otmp->onamelth)
-	    (void)strncpy(ONAME(dummy), ONAME(otmp), (int)otmp->onamelth);
+	copy_oextra(dummy, otmp);
+	if (has_omid(dummy)) free_omid(dummy);	/* only one association with m_id*/
 	if (Is_candle(dummy)) dummy->lamplit = 0;
 	addtobill(dummy, FALSE, TRUE, TRUE);
 	/* no_charge is only valid for some locations */
@@ -445,7 +595,7 @@ boolean artif;
 	struct obj *otmp;
 	char let = objects[otyp].oc_class;
 
-	otmp = newobj(0);
+	otmp = newobj();
 	*otmp = zeroobj;
 	otmp->age = monstermoves;
 	otmp->o_id = context.ident++;
@@ -1027,7 +1177,7 @@ struct obj *obj;
 {
 	int revivetype;
 	struct monst *mtmp;
-	if (obj->oxlth && obj->oattached == OATTACHED_MONST &&
+	if (has_omonst(obj) &&
 		((mtmp = get_mtraits(obj, FALSE)) != (struct monst *)0)) {
 	    /* mtmp is a temporary pointer to a monster's stored
 		attributes, not a real monster */
@@ -1046,22 +1196,10 @@ obj_attach_mid(obj, mid)
 struct obj *obj;
 unsigned mid;
 {
-    struct obj *otmp;
-    int lth, namelth;
-
     if (!mid || !obj) return (struct obj *)0;
-    lth = sizeof(mid);
-    namelth = obj->onamelth ? strlen(ONAME(obj)) + 1 : 0;
-    if (namelth) 
-	otmp = realloc_obj(obj, lth, (genericptr_t) &mid, namelth, ONAME(obj));
-    else {
-	otmp = obj;
-	otmp->oxlth = sizeof(mid);
-	(void) memcpy((genericptr_t)otmp->oextra, (genericptr_t)&mid,
-								sizeof(mid));
-    }
-    if (otmp && otmp->oxlth) otmp->oattached = OATTACHED_M_ID;	/* mark it */
-    return otmp;
+    newomid(obj);
+    *OMID(obj) = mid;
+    return obj;
 }
 
 static struct obj *
@@ -1069,17 +1207,12 @@ save_mtraits(obj, mtmp)
 struct obj *obj;
 struct monst *mtmp;
 {
-	struct obj *otmp;
-	genericptr_t buffer;
-	int lth, namelth;
-
-	namelth = obj->onamelth ? strlen(ONAME(obj)) + 1 : 0;
 	if (mtmp->ispriest) forget_temple_entry(mtmp);	/* EPRI() */
-	buffer = mon_to_buffer(mtmp, &lth);
-	otmp = realloc_obj(obj, lth, buffer, namelth, ONAME(obj));
-	free(buffer);
-	if (otmp && otmp->oxlth) {
-		struct monst *mtmp2 = (struct monst *)otmp->oextra;
+	if (!has_omonst(obj)) newomonst(obj);
+	if (has_omonst(obj)) {
+		struct monst *mtmp2 = OMONST(obj);
+		*mtmp2 = *mtmp;
+		mtmp2->mextra = (struct mextra *)0;
 		if (mtmp->data) mtmp2->mnum = monsndx(mtmp->data);
 		/* invalidate pointers */
 		/* m_id is needed to know if this is a revived quest leader */
@@ -1087,14 +1220,13 @@ struct monst *mtmp;
 		mtmp2->nmon     = (struct monst *)0;
 		mtmp2->data     = (struct permonst *)0;
 		mtmp2->minvent  = (struct obj *)0;
-		/* mon_to_buffer() took care of mextra */
+		if (mtmp->mextra) copy_mextra(mtmp2, mtmp);
 #ifndef GOLDOBJ
 		/* not a pointer but is discarded along with minvent */
 		mtmp2->mgold	= 0L;
 #endif
-		otmp->oattached = OATTACHED_MONST;	/* mark it */
 	}
-	return otmp;
+	return obj;
 }
 
 /* returns a pointer to a new monst structure based on
@@ -1108,11 +1240,13 @@ boolean copyof;
 	struct monst *mtmp = (struct monst *)0;
 	struct monst *mnew = (struct monst *)0;
 
-	if (obj->oxlth && obj->oattached == OATTACHED_MONST)
-		mtmp = (struct monst *)obj->oextra;
+	if (has_omonst(obj)) mtmp = OMONST(obj);
 	if (mtmp) {
 	    if (copyof) {
-		mnew = buffer_to_mon((genericptr_t)mtmp);
+		mnew = newmonst();
+		*mnew = *mtmp;
+		mnew->mextra = (struct mextra *)0;
+		if (mtmp->mextra) copy_mextra(mnew, mtmp);
 	    } else {
 	      /* Never insert this returned pointer into mon chains! */
 	    	mnew = mtmp;
@@ -1597,6 +1731,7 @@ dealloc_obj(obj)
 
     if (obj == thrownobj) thrownobj = (struct obj*)0;
 
+    if (obj->oextra) dealloc_oextra(obj->oextra);
     free((genericptr_t) obj);
 }
 

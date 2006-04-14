@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.5	2006/01/09	*/
+/*	SCCS Id: @(#)shk.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2333,15 +2333,13 @@ register struct monst *shkp;
 
 		obj->unpaid = 0;
 		if(bp->bquan > obj->quan){
-			otmp = newobj(0);
+			otmp = newobj();
 			*otmp = *obj;
+			otmp->oextra = (struct oextra *)0;
 			bp->bo_id = otmp->o_id = context.ident++;
 			otmp->where = OBJ_FREE;
 			otmp->quan = (bp->bquan -= obj->quan);
 			otmp->owt = 0;	/* superfluous */
-			otmp->onamelth = 0;
-			otmp->oxlth = 0;
-			otmp->oattached = OATTACHED_NOTHING;
 			bp->useup = 1;
 			add_to_billobjs(otmp);
 			return;

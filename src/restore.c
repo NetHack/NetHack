@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.5	2006/04/01	*/
+/*	SCCS Id: @(#)restore.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,7 +27,9 @@ STATIC_DCL void FDECL(def_mread, (int,genericptr_t,unsigned int));
 STATIC_DCL void NDECL(find_lev_obj);
 STATIC_DCL void FDECL(restlevchn, (int));
 STATIC_DCL void FDECL(restdamage, (int,BOOLEAN_P));
+STATIC_DCL void FDECL(restobj, (int, struct obj *));
 STATIC_DCL struct obj *FDECL(restobjchn, (int,BOOLEAN_P,BOOLEAN_P));
+STATIC_OVL void FDECL(restmon, (int, struct monst *));
 STATIC_DCL struct monst *FDECL(restmonchn, (int,BOOLEAN_P));
 STATIC_DCL struct fruit *FDECL(loadfruitchn, (int));
 STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
@@ -219,6 +221,59 @@ boolean ghostly;
 	free((genericptr_t)tmp_dam);
 }
 
+STATIC_OVL void
+restobj(fd, otmp)
+int fd;
+struct obj *otmp;
+{
+	int buflen;
+	
+	mread(fd, (genericptr_t) otmp, sizeof(struct obj));
+
+	/* any saved pointers are mostly invalid */
+	otmp->nobj = (struct obj *)0;
+	otmp->oextra = (struct oextra *)0;
+
+	/* read the length of the name and the name */
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
+		new_oname(otmp, buflen);
+		mread(fd, (genericptr_t) ONAME(otmp), buflen);
+	}
+
+	/* omonst */
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
+		newomonst(otmp);
+		/* this is actually a monst struct, so we
+		   can just defer to restmon() here */
+		restmon(fd, OMONST(otmp));
+	}
+
+	/* omid */
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
+		newomid(otmp);
+		mread(fd, (genericptr_t) OMID(otmp), buflen);
+	}
+
+	/* olong */
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
+		newolong(otmp);
+		mread(fd, (genericptr_t) OLONG(otmp), buflen);
+	}
+
+	/* omailcmd */
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
+		char *omailcmd = (char *)alloc(buflen);
+		mread(fd, (genericptr_t) omailcmd, buflen);
+		new_omailcmd(otmp, omailcmd);
+		free((genericptr_t)omailcmd);
+	}
+}
+
 STATIC_OVL struct obj *
 restobjchn(fd, ghostly, frozen)
 register int fd;
@@ -226,16 +281,17 @@ boolean ghostly, frozen;
 {
 	register struct obj *otmp, *otmp2 = 0;
 	register struct obj *first = (struct obj *)0;
-	int xl;
+	int buflen;
 
 	while(1) {
-		mread(fd, (genericptr_t) &xl, sizeof(xl));
-		if(xl == -1) break;
-		otmp = newobj(xl);
+		mread(fd, (genericptr_t) &buflen, sizeof buflen);
+		if(buflen == -1) break;
+
+		otmp = newobj();
+		restobj(fd, otmp);
 		if(!first) first = otmp;
 		else otmp2->nobj = otmp;
-		mread(fd, (genericptr_t) otmp,
-					(unsigned) xl + sizeof(struct obj));
+
 		if (ghostly) {
 		    unsigned nid = context.ident++;
 		    add_id_mapping(otmp->o_id, nid);
@@ -277,77 +333,65 @@ boolean ghostly, frozen;
 	return(first);
 }
 
-/*
- * used by get_mtraits() in mkobj.c
- * to retrieve the bundled up OATTACHED_MONST info.
- */
-struct monst *
-buffer_to_mon(buffer)
-genericptr_t buffer;
+STATIC_OVL void
+restmon(fd, mtmp)
+int fd;
+struct monst *mtmp;
 {
-	int lth;
-	struct monst *mtmp;
-	char *spot = (char *)buffer;
+	int buflen;
 
-	mtmp = newmonst();
-	(void) memcpy((genericptr_t)mtmp, (genericptr_t)spot, sizeof(struct monst));
-	spot += sizeof(struct monst);
-	
-	/* obtain the stored length of the monster name */
-	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
-	spot += sizeof(int);
-	if (lth) {
-		new_mname(mtmp, lth);
-		(void) memcpy((genericptr_t)MNAME(mtmp),
-				(genericptr_t)spot, lth);
-		spot += lth;
+	mread(fd, (genericptr_t) mtmp, sizeof(struct monst));
+
+	/* any saved pointers are mostly invalid */
+	mtmp->nmon = (struct monst *)0;
+	mtmp->mextra = (struct mextra *)0;
+
+	/* read the length of the name and the name */
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
+		new_mname(mtmp, buflen);
+		mread(fd, (genericptr_t) MNAME(mtmp), buflen);
 	}
-	/* obtain the length of the egd (vault guard) structure */
-	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
-	spot += sizeof(int);
-	if (lth) {
+
+	/* egd */		
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
 		newegd(mtmp);
-		(void) memcpy((genericptr_t)EGD(mtmp),
-				(genericptr_t)spot, lth);
-		spot += lth;
+		mread(fd, (genericptr_t) EGD(mtmp),
+				sizeof(struct egd));
 	}
-	/* obtain the length of the epri (priest) structure */
-	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
-	spot += sizeof(int);
-	if (lth) {
+
+	/* epri */
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
 		newepri(mtmp);
-		(void) memcpy((genericptr_t)EPRI(mtmp),
-				(genericptr_t)spot, lth);
-		spot += lth;
+		mread(fd, (genericptr_t) EPRI(mtmp),
+				sizeof(struct epri));
 	}
-	/* obtain the length of the eshk (shopkeeper) structure */
-	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
-	spot += sizeof(int);
-	if (lth) {
+
+	/* eshk */
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
 		neweshk(mtmp);
-		(void) memcpy((genericptr_t)ESHK(mtmp),
-				(genericptr_t)spot, lth);
-		spot += lth;
+		mread(fd, (genericptr_t) ESHK(mtmp),
+				sizeof(struct eshk));
 	}
-	/* obtain the length of the emin (minion) structure */
-	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
-	spot += sizeof(int);
-	if (lth) {
+
+	/* emin */
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
 		newemin(mtmp);
-		(void) memcpy((genericptr_t)EMIN(mtmp),
-				(genericptr_t)spot, lth);
-		spot += lth;
+		mread(fd, (genericptr_t) EMIN(mtmp),
+				sizeof(struct emin));
 	}
-	/* obtain the length of the edog (mtame) structure */
-	(void) memcpy((genericptr_t)&lth, (genericptr_t)spot, sizeof(int));
-	spot += sizeof(int);
-	if (lth) {
+
+	/* edog */		
+	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	if (buflen > 0) {
 		newedog(mtmp);
-		(void) memcpy((genericptr_t)EDOG(mtmp),
-				(genericptr_t)spot, lth);
-		spot += lth;	/* actually not necessary */
+		mread(fd, (genericptr_t) EDOG(mtmp),
+				sizeof(struct edog));
 	}
-	return mtmp;
 }
 
 STATIC_OVL struct monst *
@@ -362,60 +406,12 @@ boolean ghostly;
 	while(1) {
 		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
 		if(buflen == -1) break;
+
 		mtmp = newmonst();
-		mread(fd, (genericptr_t) mtmp, sizeof(struct monst));
-		/* any saved mextra pointer is invalid */
-		mtmp->mextra = (struct mextra *)0;
-
-		/* read the length of the name and the name */
-		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-		if (buflen > 0) {
-			new_mname(mtmp, buflen);
-			mread(fd, (genericptr_t) MNAME(mtmp), buflen);
-		}
-
-		/* egd */		
-		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-		if (buflen > 0) {
-			newegd(mtmp);
-			mread(fd, (genericptr_t) EGD(mtmp),
-					sizeof(struct egd));
-		}
-
-		/* epri */
-		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-		if (buflen > 0) {
-			newepri(mtmp);
-			mread(fd, (genericptr_t) EPRI(mtmp),
-					sizeof(struct epri));
-		}
-
-		/* eshk */
-		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-		if (buflen > 0) {
-			neweshk(mtmp);
-			mread(fd, (genericptr_t) ESHK(mtmp),
-					sizeof(struct eshk));
-		}
-
-		/* emin */
-		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-		if (buflen > 0) {
-			newemin(mtmp);
-			mread(fd, (genericptr_t) EMIN(mtmp),
-					sizeof(struct emin));
-		}
-
-		/* edog */		
-		mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-		if (buflen > 0) {
-			newedog(mtmp);
-			mread(fd, (genericptr_t) EDOG(mtmp),
-					sizeof(struct edog));
-		}
-
+		restmon(fd, mtmp);
 		if(!first) first = mtmp;
 		else mtmp2->nmon = mtmp;
+
 		if (ghostly) {
 			unsigned nid = context.ident++;
 			add_id_mapping(mtmp->m_id, nid);
@@ -1190,20 +1186,21 @@ boolean ghostly;
     struct obj *otmp;
     unsigned oldid, nid;
     for (otmp = fobj; otmp; otmp = otmp->nobj) {
-	if (ghostly && otmp->oattached == OATTACHED_MONST && otmp->oxlth) {
-	    struct monst *mtmp = (struct monst *)otmp->oextra;
+	if (ghostly && has_omonst(otmp)) {
+	    struct monst *mtmp = OMONST(otmp);
 
 	    mtmp->m_id = 0;
 	    mtmp->mpeaceful = mtmp->mtame = 0;	/* pet's owner died! */
 	}
-	if (ghostly && otmp->oattached == OATTACHED_M_ID) {
-	    (void) memcpy((genericptr_t)&oldid, (genericptr_t)otmp->oextra,
+	if (ghostly && has_omid(otmp)) {
+	    (void) memcpy((genericptr_t)&oldid, (genericptr_t)OMID(otmp),
 								sizeof(oldid));
 	    if (lookup_id_mapping(oldid, &nid))
-		(void) memcpy((genericptr_t)otmp->oextra, (genericptr_t)&nid,
+		(void) memcpy((genericptr_t)OMID(otmp), (genericptr_t)&nid,
 								sizeof(nid));
 	    else
-		otmp->oattached = OATTACHED_NOTHING;
+		free_omid(otmp);
+
 	}
     }
 }

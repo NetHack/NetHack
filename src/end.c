@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.5	2005/11/02	*/
+/*	SCCS Id: @(#)end.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -204,7 +204,7 @@ register struct monst *mtmp;
 	    killer.format = KILLED_BY;
 	}
 	/* _the_ <invisible> <distorted> ghost of Dudley */
-	if (mtmp->data == &mons[PM_GHOST] && has_name(mtmp)) {
+	if (mtmp->data == &mons[PM_GHOST] && has_mname(mtmp)) {
 		Strcat(buf, "the ");
 		killer.format = KILLED_BY;
 	}
@@ -215,7 +215,7 @@ register struct monst *mtmp;
 
 	if(mtmp->data == &mons[PM_GHOST]) {
 		Strcat(buf, "ghost");
-		if (has_name(mtmp)) Sprintf(eos(buf), " of %s", MNAME(mtmp));
+		if (has_mname(mtmp)) Sprintf(eos(buf), " of %s", MNAME(mtmp));
 	} else if(mtmp->isshk) {
 		const char *shknm = shkname(mtmp),
 			   *honorific = shkname_is_pname(mtmp) ? "" :
@@ -229,7 +229,7 @@ register struct monst *mtmp;
 		Strcat(buf, m_monnam(mtmp));
 	} else {
 		Strcat(buf, mtmp->data->mname);
-		if (has_name(mtmp))
+		if (has_mname(mtmp))
 		    Sprintf(eos(buf), " called %s", MNAME(mtmp));
 	}
 
@@ -888,7 +888,7 @@ die:
 			makeknown(otmp->otyp);
 			otmp->known = 1;	/* for fake amulets */
 			otmp->dknown = 1;	/* seen it (blindness fix) */
-			otmp->onamelth = 0;
+			if (has_oname(otmp)) free_oname(otmp);
 			otmp->quan = count;
 			Sprintf(pbuf, "%8ld %s (worth %ld %s),",
 				count, xname(otmp),

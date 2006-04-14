@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.5	2003/01/10	*/
+/*	SCCS Id: @(#)steed.c	3.5	2006/04/14	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -512,7 +512,7 @@ dismount_steed(reason)
 		    You("can't. There isn't anywhere for you to stand.");
 		    return;
 		}
-		if (!has_name(mtmp)) {
+		if (!has_mname(mtmp)) {
 			pline("You've been through the dungeon on %s with no name.",
 				an(mtmp->data->mname));
 			if (Hallucination)

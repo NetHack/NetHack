@@ -233,3 +233,6 @@ change region player_flags to more appropriate unsigned int instead of boolean
 remove remains of sync_hunger, which has been ifdef'd out for years
 new mextra structure housing pointers to mname, egd, epri, eshk, emin, edog
 consolidate vault.h, epri.h, eshk.h, emin.h and edog.h into new mextra.h
+new oextra structure housing pointers to oname, omonst, omid, olong, and omailcmd
+
+

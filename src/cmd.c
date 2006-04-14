@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2006/03/31	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2006/04/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -136,6 +136,7 @@ extern void FDECL(show_borlandc_stats, (winid));
 STATIC_PTR int NDECL(wiz_migrate_mons);
 #endif
 STATIC_DCL int FDECL(size_monst, (struct monst *));
+STATIC_DCL int FDECL(size_obj, (struct obj *));
 STATIC_DCL void FDECL(count_obj, (struct obj *, long *, long *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(obj_chain, (winid, const char *, struct obj *, long *, long *));
 STATIC_DCL void FDECL(mon_invent_chain, (winid, const char *, struct monst *, long *, long *));
@@ -1896,6 +1897,23 @@ static const char template[] = "%-18s %4ld  %6ld";
 static const char count_str[] = "                   count  bytes";
 static const char separator[] = "------------------ -----  ------";
 
+STATIC_OVL int
+size_obj(otmp)
+struct obj *otmp;
+{
+	int sz = (int)sizeof (struct obj);
+
+	if (otmp->oextra) {
+		if (ONAME(otmp))  sz += (int)strlen(ONAME(otmp)) + 1;
+		if (OMONST(otmp)) sz += (int)sizeof (struct monst);
+		if (OMID(otmp))   sz += (int)sizeof (unsigned);
+		if (OLONG(otmp))  sz += (int)sizeof (long);
+		if (OMAILCMD(otmp))  sz += (int)strlen(OMAILCMD(otmp)) + 1;
+	}
+	return sz;
+}
+
+
 STATIC_OVL void
 count_obj(chain, total_count, total_size, top, recurse)
 	struct obj *chain;
@@ -1910,7 +1928,7 @@ count_obj(chain, total_count, total_size, top, recurse)
 	for (count = size = 0, obj = chain; obj; obj = obj->nobj) {
 	    if (top) {
 		count++;
-		size += sizeof(struct obj) + obj->oxlth + obj->onamelth;
+		size += size_obj(obj);
 	    }
 	    if (recurse && obj->cobj)
 		count_obj(obj->cobj, total_count, total_size, TRUE, TRUE);

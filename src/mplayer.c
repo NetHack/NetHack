@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mplayer.c	3.5	1997/02/04	*/
+/*	SCCS Id: @(#)mplayer.c	3.5	2006/04/14	*/
 /*	Copyright (c) Izchak Miller, 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -51,7 +51,7 @@ dev_name()
 	    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 		if(!is_mplayer(mtmp->data)) continue;
 		if(!strncmp(developers[i],
-		             (has_name(mtmp)) ? MNAME(mtmp) : "",
+		             (has_mname(mtmp)) ? MNAME(mtmp) : "",
 		              strlen(developers[i]))) {
 		    match = TRUE;
 		    break;
