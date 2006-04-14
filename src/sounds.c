@@ -643,7 +643,14 @@ register struct monst *mtmp;
 		    pline_msg = "gurgles.";
 		else
 		    verbl_msg = "I'm free!";
-	    } else verbl_msg = "This will teach you not to disturb me!";
+	    } else {
+		if (ptr != &mons[PM_PRISONER])
+		    verbl_msg = "This will teach you not to disturb me!";
+#if 0
+		else
+		    verbl_msg = "??????????";
+#endif
+	    }
 	    break;
 	case MS_BOAST:	/* giants */
 	    if (!mtmp->mpeaceful) {
