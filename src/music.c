@@ -313,7 +313,7 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 			if(!is_flyer(mtmp->data) && !is_clinger(mtmp->data)) {
 			    boolean m_already_trapped = mtmp->mtrapped;
 			    mtmp->mtrapped = 1;
-			    if (m_already_trapped) { /* suppress messages */
+			    if (!m_already_trapped) { /* suppress messages */
 			    	if(cansee(x,y))
 				    pline("%s falls into a chasm!", Monnam(mtmp));
 				else if (!Deaf && humanoid(mtmp->data))
