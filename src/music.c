@@ -219,10 +219,13 @@ int force;
 	register int x,y;
 	struct monst *mtmp;
 	struct obj *otmp;
-	struct trap *chasm;
+	struct trap *chasm, *trap_at_u = t_at(u.ux, u.uy);
 	int start_x, start_y, end_x, end_y;
 	schar filltype;
+	unsigned tu_pit = 0;
 
+	if (trap_at_u)
+	    tu_pit = (trap_at_u->ttyp == PIT || trap_at_u->ttyp ==SPIKED_PIT);
 	start_x = u.ux - (force * 2);
 	start_y = u.uy - (force * 2);
 	end_x = u.ux + (force * 2);
@@ -330,9 +333,14 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 		    } else if (x == u.ux && y == u.uy) {
 			    if (Levitation || Flying ||
 						is_clinger(youmonst.data)) {
-				    pline("A chasm opens up under you!");
-				    You("don't fall in!");
-			    } else {
+				    if (!tu_pit) { /* no pit here previously */
+					pline("A chasm opens up under you!");
+					You("don't fall in!");
+				    }
+			    } else if (!tu_pit || !u.utrap ||
+					(u.utrap && u.utraptype != TT_PIT)) {
+				    /* no pit here previously, or you were
+				       not in it even it there was */
 				    You("fall into a chasm!");
 				    u.utrap = rn1(6,2);
 				    u.utraptype = TT_PIT;
@@ -340,6 +348,25 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 					"fell into a chasm",
 					NO_KILLER_PREFIX);
 				    selftouch("Falling, you");
+			    } else if (u.utrap && u.utraptype == TT_PIT) {
+				    boolean keepfooting = (
+				    	(Fumbling && !rn2(5)) ||
+				    	(!rnl(Role_if(PM_ARCHEOLOGIST) ? 3 : 9)) ||
+					((ACURR(A_DEX) > 7) && rn2(5)));
+				    You("are jostled around violently!");
+				    u.utrap = rn1(6,2);
+				    u.utraptype = TT_PIT;  /* superfluous */
+				    losehp(Maybe_Half_Phys(
+						rnd(keepfooting ? 2 : 4)),
+				    	"hurt in a chasm",
+				    	NO_KILLER_PREFIX);
+				    if (keepfooting)
+					exercise(A_DEX, TRUE);
+				    else
+					selftouch((Upolyd &&
+						slithy(youmonst.data) ||
+						nolimbs(youmonst.data)) ?
+					    "Shaken, you" : "Falling down, you");
 			    }
 		    } else newsym(x,y);
 		    break;
