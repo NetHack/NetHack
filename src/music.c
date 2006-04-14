@@ -311,14 +311,20 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 
 		    if (mtmp) {
 			if(!is_flyer(mtmp->data) && !is_clinger(mtmp->data)) {
+			    boolean m_already_trapped = mtmp->mtrapped;
 			    mtmp->mtrapped = 1;
-			    if(cansee(x,y))
-				pline("%s falls into a chasm!", Monnam(mtmp));
-			    else if (!Deaf && humanoid(mtmp->data))
-				You_hear("a scream!");
+			    if (m_already_trapped) { /* suppress messages */
+			    	if(cansee(x,y))
+				    pline("%s falls into a chasm!", Monnam(mtmp));
+				else if (!Deaf && humanoid(mtmp->data))
+				    You_hear("a scream!");
+			    }
+			    /* Falling is okay for falling down
+				within a pit from jostling too */
 			    mselftouch(mtmp, "Falling, ", TRUE);
 			    if (mtmp->mhp > 0)
-				if ((mtmp->mhp -= rnd(6)) <= 0) {
+				if ((mtmp->mhp -=
+					rnd(m_already_trapped ? 4 : 6)) <= 0) {
 				    if(!cansee(x,y))
 					pline("It is destroyed!");
 				    else {
