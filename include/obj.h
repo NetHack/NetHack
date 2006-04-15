@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)obj.h	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)obj.h	3.5	2006/04/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,8 +14,9 @@ union vptrs {
 	    struct monst *v_ocarry;	/* point back to carrying monst */
 };
 
-/***
- **	oextra -- collection of all object extensions
+/****
+ ***	oextra -- collection of all object extensions
+ **	(see the note at the bottom of this file before adding oextra fields)
  */
 struct oextra {
 	char *oname;			/* ptr to name of object */
@@ -113,6 +114,12 @@ struct obj {
 	struct oextra *oextra;	/* pointer to oextra struct */
 };
 
+#define newobj()	(struct obj *)alloc(sizeof(struct obj))
+
+/***
+ **	oextra referencing and testing macros
+ */
+
 #define ONAME(o)	((o)->oextra->oname)
 #define OMID(o)		((o)->oextra->omid)
 #define OMONST(o)	((o)->oextra->omonst)
@@ -124,8 +131,6 @@ struct obj {
 #define has_omonst(o)	((o)->oextra && OMONST(o))
 #define has_olong(o)	((o)->oextra && OLONG(o))
 #define has_omailcmd(o)	((o)->oextra && OMAILCMD(o))
-
-#define newobj()	(struct obj *)alloc(sizeof(struct obj))
 
 /* Weapons and weapon-tools */
 /* KMH -- now based on skill categories.  Formerly:
@@ -316,5 +321,47 @@ struct obj {
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO	0x1
 #define BURIED_TOO	0x2
+
+/*
+ *  Notes for adding new oextra structures:
+ *
+ *	 1. Add the structure definition and any required macros in an appropriate
+ *	    header file that precedes this one.
+ *	 2. Add a pointer to your new struct to the oextra struct in this file.
+ *	 3. Add a referencing macro at the bottom of this file after the mextra
+ *	    struct (see ONAME, OMONST, OMIN, OLONG, or OMAILCMD for examples).
+ *	 4. Add a testing macro after the set of referencing macros
+ *	    (see has_oname(), has_omonst(), has_omin(), has_olong(),
+ *	    has_omailcmd() for examples).
+ *	 5. Create a newXX(otmp) function and possibly a free_XX(otmp) function
+ *	    in an appropriate new or existing source file and add a prototype
+ *	    for it to include/extern.h.  The majority of these are currently
+ *	    located in mkobj.c for convenience.
+ *
+ *		void FDECL(newXX, (struct obj *));
+ *	        void FDECL(free_XX, (struct obj *));
+ *	
+ *	          void
+ *	          newxx(otmp)
+ *	          struct obj *otmp;
+ *	          {
+ *	              if (!otmp->mextra) otmp->oextra = newoextra();
+ *	              if (!XX(otmp)) {
+ *	                  XX(otmp) = (struct XX *)alloc(sizeof(struct xx));
+ *	                  (void) memset((genericptr_t) XX(otmp),
+ *	                             0, sizeof(struct xx));
+ *	              }
+ *	          }
+ *	
+ *	 6. Adjust size_obj() in src/cmd.c appropriately.
+ *	 7. Adjust dealloc_oextra() in src/mkobj.c to clean up
+ *	    properly during obj deallocation.
+ *	 8. Adjust copy_oextra() in src/mkobj.c to make duplicate
+ *	    copies of your struct or data onto another obj struct.
+ *	 9. Adjust restobj() in src/restore.c to deal with your
+ *	    struct or data during a restore.
+ *	10. Adjust saveobj() in src/save.c to deal with your
+ *	    struct or data during a save.
+ */
 
 #endif /* OBJ_H */
