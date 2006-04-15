@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)invent.c	3.5	2006/04/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2452,8 +2452,8 @@ mergable(otmp, obj)	/* returns TRUE if obj  & otmp can be merged */
 	    return FALSE;
 
 	/* if they have names, make sure they're the same */
-	if (has_oname(obj)) objnamelth = strlen(ONAME(obj));
-	if (has_oname(otmp)) otmpnamelth = strlen(ONAME(otmp));
+	objnamelth = strlen(safe_oname(obj));
+	otmpnamelth = strlen(safe_oname(otmp));
 	if ( (objnamelth != otmpnamelth &&
 		((objnamelth && otmpnamelth) || obj->otyp == CORPSE)
 	     ) ||
