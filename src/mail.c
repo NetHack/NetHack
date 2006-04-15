@@ -379,25 +379,15 @@ struct mail_info *info;
 
     if (info->message_typ) {
 	struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);
+
+	if (info->object_nam)
+	    obj = oname(obj, info->object_nam);
+	if (info->response_cmd)
+	    new_omailcmd(obj, info->response_cmd);
+
 	if (distu(md->mx,md->my) > 2)
 	    verbalize("Catch!");
 	display_nhwindow(WIN_MESSAGE, FALSE);
-	if (info->object_nam) {
-	    char *buf[BUFSZ];
-	    Strncpy(buf, info->object_nam, BUFSZ - 1);
-	    buf[BUFSZ - 1] = '\0';
-	    if (info->response_cmd) {	/*(hide extension of the obj name)*/
-		int namelth = info->response_cmd - info->object_nam - 1;
-		if ( namelth <= 0 )
-		    impossible("mail delivery screwed up");
-		else {
-		    *(buf + namelth) = '\0';
-		    obj = oname(obj, buf);
-		    new_omailcmd(obj, info->response_cmd);
-		}
-		/* Note: renaming object won't discard the hidden cmd anymore. */
-	    }
-	}
 	obj = hold_another_object(obj, "Oops!",
 				  (const char *)0, (const char *)0);
     }

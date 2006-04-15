@@ -1112,7 +1112,7 @@ E void FDECL(newomid, (struct obj *));
 E void FDECL(free_omid, (struct obj *));
 E void FDECL(newolong, (struct obj *));
 E void FDECL(free_olong, (struct obj *));
-E void FDECL(new_omailcmd, (struct obj *,char *));
+E void FDECL(new_omailcmd, (struct obj *,const char *));
 E void FDECL(free_omailcmd, (struct obj *));
 E struct obj *FDECL(mkobj_at, (CHAR_P,int,int,BOOLEAN_P));
 E struct obj *FDECL(mksobj_at, (int,int,int,BOOLEAN_P,BOOLEAN_P));

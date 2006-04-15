@@ -161,19 +161,16 @@ struct obj *otmp;
 }
 
 void
-new_omailcmd(otmp,response_cmd)
+new_omailcmd(otmp, response_cmd)
 struct obj *otmp;
-char *response_cmd;
+const char *response_cmd;
 {
+	unsigned lth = strlen(response_cmd) + 1;
+
 	if (!otmp->oextra) otmp->oextra = newoextra();
-	if (!OMAILCMD(otmp)) {
-	    unsigned lth = strlen(response_cmd) + 1;
-	    OMAILCMD(otmp) = (char *)alloc(lth);
-	    if (OMAILCMD(otmp)) {
-		(void) memset((genericptr_t)OMAILCMD(otmp), 0, lth);
-	    	Strcpy(OMAILCMD(otmp), response_cmd);
-	    }
-	}
+	if (OMAILCMD(otmp)) free_omailcmd(otmp);
+	OMAILCMD(otmp) = (char *)alloc(lth);
+	Strcpy(OMAILCMD(otmp), response_cmd);
 }
 
 void
@@ -360,9 +357,8 @@ struct obj *obj2, *obj1;
 				(genericptr_t)OLONG(obj1),
 				sizeof(long));
 	}
-
 	if (has_omailcmd(obj1)) {
-		if (!OMAILCMD(obj2)) new_omailcmd(obj2, OMAILCMD(obj1));
+		new_omailcmd(obj2, OMAILCMD(obj1));
 	}
 }
 

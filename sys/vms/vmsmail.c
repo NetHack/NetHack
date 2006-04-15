@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsmail.c	3.5	1995/06/01	*/
+/*	SCCS Id: @(#)vmsmail.c	3.5	2006/04/14	*/
 /* Copyright (c) Robert Patrick Rankin, 1991.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -59,16 +59,14 @@ static long pasteboard_id = 0;		/* SMG's magic cookie */
  * passed to newmail().  Routine newmail() generates a mail-daemon monster
  * who approaches the character, "speaks" the display text, and delivers
  * a scroll of mail pre-named to the object name; the response command is
- * initially appended to the name, so that the object is tagged with both
- * of them; a NUL is inserted to terminate the ordinary name and hide the
- * command.  (If the player renames such a scroll, the hidden command will
- * be lost; who cares?)  Unrecognized broadcasts result in the mail-daemon
+ * also attached to the scroll's oextra->omailcmd field.
+ * Unrecognized broadcasts result in the mail-daemon
  * arriving and announcing the display text, but no scroll being created.
  * If SHELL is undefined, then all broadcasts are treated as 'other'; since
  * no subproceses are allowed, there'd be no way to respond to the scroll.
  *
  *	When a scroll of mail is read by the character, readmail() extracts
- * the hidden command string and uses it for the default when prompting the
+ * the command string and uses it for the default when prompting the
  * player for a system command to spawn.  The player may enter any command
  * he or she chooses, or just <return> to accept the default or <escape> to
  * avoid executing any command.  If the command is "SPAWN", a regular shell
@@ -105,7 +103,8 @@ static long pasteboard_id = 0;		/* SMG's magic cookie */
  */
 
 static struct mail_info msg;	/* parse_*()'s return buffer */
-static char nam_cmd_buf[63],	/* maximum onamelth, size of ONAME(object) */
+static char nam_buf[63],	/* maximum onamelth, size of ONAME(object) */
+	    cmd_buf[99],	/* arbitrary */
 	    txt_buf[255+1];	/* same size as used for message buf[] */
 
 /* try to decipher and categorize broadcast message text
@@ -120,7 +119,7 @@ char *buf;			/* input: filtered broadcast text */
 # ifdef SHELL		/* only parse if spawned commands are enabled */
     register char *p, *q;
     boolean is_jnet_send;
-    char cmd_buf[127+1], user[127+1], node[127+1], sentinel;
+    char user[127+1], node[127+1], sentinel;
 
     /* Check these first; otherwise, their arbitrary text would enable
 	easy spoofing of some other message patterns.  Unfortunately,
@@ -253,16 +252,15 @@ other:
     /* Daemon in newmail() will append period when the text is displayed */
     if ((p = eos(txt)) > txt && *--p == '.') *p = '\0';
 
-    /* newmail() and readmail() assume that nam and cmd are concatenated */
-    if (nam) {		/* object name to attach to scroll of mail */
-	char *join = strcpy(nam_cmd_buf, nam);
-	if (cmd) {	/* append command to name; readmail() requires it */
-	    int len = sizeof nam_cmd_buf - sizeof "" - (strlen(join) + 1);
-	    cmd_buf[len] = '\0';	/* possibly truncate */
-	    (void) strcat(join, " ");
-	    cmd = strcpy(eos(join), cmd);
-	}
-	nam = join;
+    /* newmail() and readmail() used to assume that nam and cmd are
+       concatenated but that is no longer the case */
+    if (nam && nam != nam_buf) {
+	(void) strncpy(nam_buf, nam, sizeof nam_buf - 1);
+	nam_buf[sizeof nam_buf - 1] = '\0';
+    }
+    if (cmd && cmd != cmd_buf) { 
+	(void) strncpy(cmd_buf, cmd, sizeof cmd_buf - 1);
+	cmd_buf[sizeof cmd_buf - 1] = '\0';
     }
 # endif /* SHELL */
     /* truncate really long messages to prevent verbalize() from blowing up */
