@@ -2416,6 +2416,9 @@ mergable(otmp, obj)	/* returns TRUE if obj  & otmp can be merged */
 	    obj->bypass != otmp->bypass)
 	    return(FALSE);
 
+	if (obj->nomerge)	/* explicitly marked to prevent merge */
+	    return FALSE;
+
 	if ((obj->oclass==WEAPON_CLASS || obj->oclass==ARMOR_CLASS) &&
 	    (obj->oerodeproof!=otmp->oerodeproof || obj->rknown!=otmp->rknown))
 	    return FALSE;

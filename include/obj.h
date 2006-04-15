@@ -94,9 +94,12 @@ struct obj {
 	Bitfield(lamplit,1);	/* a light-source -- can be lit */
 #ifdef INVISIBLE_OBJECTS
 	Bitfield(oinvis,1);	/* invisible */
+#else
+	Bitfield(oreserved1,1);	
 #endif
 	Bitfield(greased,1);	/* covered with grease */
-	/* 2 free bits */
+	Bitfield(nomerge,1);	/* set temporarily to prevent merging */
+	/* 1 free bit */
 
 	Bitfield(in_use,1);	/* for magic items before useup items */
 	Bitfield(bypass,1);	/* mark this as an object to be skipped by bhito() */

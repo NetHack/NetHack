@@ -297,9 +297,9 @@ register struct obj *otmp;
 		dropy(otmp);
 		sellobj_state(SELL_NORMAL);
 	    } else {
-		newolong(otmp);		/* hack to prevent merge */
+		otmp->nomerge = 1;	/* used to prevent merge */
 		otmp = addinv(otmp);
-		free_olong(otmp);
+		otmp->nomerge = 0;
 	    }
 	}
 	return(otmp);
