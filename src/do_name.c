@@ -268,6 +268,21 @@ struct obj *obj;
     }
 }
 
+/*  safe_oname() always returns a valid pointer to
+ *  a string, either the pointer to an object's name
+ *  if it has one, or a pointer to an empty string
+ *  if it doesn't.
+ */
+const char *
+safe_oname(obj)
+struct obj *obj;
+{
+    if (has_oname(obj))
+    	return ONAME(obj);
+    else
+    	return "";
+}
+
 /* historical note: this returns a monster pointer because it used to
    allocate a new bigger block of memory to hold the monster and its name */
 struct monst *

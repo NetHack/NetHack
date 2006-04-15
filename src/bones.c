@@ -68,16 +68,14 @@ boolean restore;
 			/* artifact bookeeping needs to be done during
 			   restore; other fixups are done while saving */
 			if (otmp->oartifact) {
-			    char *tmponame = "";
-			    if (has_oname(otmp)) tmponame = ONAME(otmp);
-			    if (exist_artifact(otmp->otyp, tmponame) ||
+			    if (exist_artifact(otmp->otyp, safe_oname(otmp)) ||
 				    is_quest_artifact(otmp)) {
 				/* prevent duplicate--revert to ordinary obj */
 				otmp->oartifact = 0;
 				if (has_oname(otmp))
 					free_oname(otmp);
 			    } else {
-				artifact_exists(otmp, tmponame, TRUE);
+				artifact_exists(otmp, safe_oname(otmp), TRUE);
 			    }
 			}
 		} else {	/* saving */

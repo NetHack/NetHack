@@ -2942,10 +2942,7 @@ typfnd:
 	    && !wizard
 #endif
 	    ) {
-	    char *tnam = "";
-	    if (has_oname(otmp))
-	    	tnam = ONAME(otmp);
-	    artifact_exists(otmp, tnam, FALSE);
+	    artifact_exists(otmp, safe_oname(otmp), FALSE);
 	    obfree(otmp, (struct obj *) 0);
 	    otmp = &zeroobj;
 	    pline("For a moment, you feel %s in your %s, but it disappears!",

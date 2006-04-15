@@ -353,6 +353,7 @@ E void FDECL(new_mname, (struct monst *,int));
 E void FDECL(free_mname, (struct monst *));
 E void FDECL(new_oname, (struct obj *,int));
 E void FDECL(free_oname, (struct obj *));
+E const char *FDECL(safe_oname, (struct obj *));
 E struct monst *FDECL(christen_monst, (struct monst *,const char *));
 E int NDECL(do_mname);
 E struct obj *FDECL(oname, (struct obj *,const char *));
