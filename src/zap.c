@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)zap.c	3.5	2006/04/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,6 +32,7 @@ STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
 STATIC_DCL void FDECL(skiprange, (int,int *,int *));
 
 STATIC_DCL int FDECL(zap_hit, (int,int));
+STATIC_OVL void FDECL(disintegrate_mon, (struct monst *,int,const char *));
 STATIC_DCL void FDECL(backfire, (struct obj *));
 STATIC_DCL int FDECL(spell_hit_bonus, (int));
 
@@ -3438,6 +3439,53 @@ int type;	/* either hero cast spell type or 0 */
     return (3 - chance) < ac+spell_bonus;
 }
 
+STATIC_OVL void
+disintegrate_mon(mon, type, fltxt)
+struct monst *mon;
+int type;	/* hero vs other */
+const char *fltxt;
+{
+    struct obj *otmp, *otmp2, *m_amulet = mlifesaver(mon);
+
+    if (canseemon(mon)) {
+	if (!m_amulet)
+	    pline("%s is disintegrated!", Monnam(mon));
+	else
+	    hit(fltxt, mon, "!");
+    }
+
+/* note: worn amulet of life saving must be preserved in order to operate */
+#define oresist_disintegration(obj) \
+		(objects[obj->otyp].oc_oprop == DISINT_RES || \
+		 obj_resists(obj, 5, 50) || is_quest_artifact(obj) || \
+		 obj == m_amulet)
+
+    for (otmp = mon->minvent; otmp; otmp = otmp2) {
+	otmp2 = otmp->nobj;
+	if (!oresist_disintegration(otmp)) {
+	    if (otmp->owornmask) {
+		/* in case monster's life gets saved */
+		mon->misc_worn_check &= ~otmp->owornmask;
+		/* also dismounts hero if this object is steed's saddle */
+		update_mon_intrinsics(mon, otmp, FALSE, TRUE);
+		otmp->owornmask = 0L;
+	    }
+	    obj_extract_self(otmp);
+	    obfree(otmp, (struct obj *)0);
+	}
+    }
+#ifndef GOLDOBJ
+    mon->mgold = 0L;
+#endif
+
+#undef oresist_disintegration
+
+    if (type < 0)
+	monkilled(mon, (char *)0, -AD_RBRE);
+    else
+	xkilled(mon, 2);
+}
+
 /* type ==   0 to   9 : you shooting a wand */
 /* type ==  10 to  19 : you casting a spell */
 /* type ==  20 to  29 : you breathing as a monster */
@@ -3556,36 +3604,7 @@ register int dx,dy;
 		    }
 
 		    if (tmp == MAGIC_COOKIE) { /* disintegration */
-			struct obj *otmp2, *m_amulet = mlifesaver(mon);
-
-			if (canseemon(mon)) {
-			    if (!m_amulet)
-				pline("%s is disintegrated!", Monnam(mon));
-			    else
-				hit(fltxt, mon, "!");
-			}
-#ifndef GOLDOBJ
-			mon->mgold = 0L;
-#endif
-
-/* note: worn amulet of life saving must be preserved in order to operate */
-#define oresist_disintegration(obj) \
-		(objects[obj->otyp].oc_oprop == DISINT_RES || \
-		 obj_resists(obj, 5, 50) || is_quest_artifact(obj) || \
-		 obj == m_amulet)
-
-			for (otmp = mon->minvent; otmp; otmp = otmp2) {
-			    otmp2 = otmp->nobj;
-			    if (!oresist_disintegration(otmp)) {
-				obj_extract_self(otmp);
-				obfree(otmp, (struct obj *)0);
-			    }
-			}
-
-			if (type < 0)
-			    monkilled(mon, (char *)0, -AD_RBRE);
-			else
-			    xkilled(mon, 2);
+			disintegrate_mon(mon, type, fltxt);
 		    } else if(mon->mhp < 1) {
 			if(type < 0)
 			    monkilled(mon, fltxt, AD_RBRE);
