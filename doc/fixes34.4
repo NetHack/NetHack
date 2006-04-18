@@ -207,6 +207,10 @@ shattering a monster's weapon didn't work as intended for stack of N>1
 don't reveal surface information that you can neither feel or see
 if the hero or a monster is already in a pit don't have them "fall into a chasm" 
 	from drum of earthquake
+monsters who ate lizard corpses to cure confusion would lose intrinsic speed
+monsters couldn't eat lizard corpses to cure being stunned
+code handling a monster's use of potion or food to cure stoning or confusion
+	was accessing freed memory after the object had been used up
 
 
 Platform- and/or Interface-Specific Fixes

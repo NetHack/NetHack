@@ -136,10 +136,6 @@ preform autopickup and/or report on objects at the spot when a failed #untrap
 	attempt causes the hero to move onto a trap's location
 thrown silver weapon hitting silver-hating poly'd hero got double silver damage
 wielded silver weapon hitting silver-hating poly'd hero lacked silver message
-monsters who ate lizard corpses to cure confusion would lose intrinsic speed
-monsters couldn't eat lizard corpses to cure being stunned
-code handling a monster's use of potion or food to cure stoning or confusion
-	was accessing freed memory after the object had been used up
 
 
 Platform- and/or Interface-Specific Fixes

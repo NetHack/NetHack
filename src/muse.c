@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.5	2006/04/11	*/
+/*	SCCS Id: @(#)muse.c	3.5	2006/04/17	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -2168,9 +2168,10 @@ boolean stoning;
 	      distant_name(obj, doname));
 	obj->quan = save_quan;
     } else if (!Deaf)
-	You_hear("%s.", (obj->otyp == POT_ACID) ? "drinking" : "chewing");
+	You_hear("%s.", (obj->oclass == POTION_CLASS) ? "drinking" : "chewing");
 
     m_useup(mon, obj);
+    /* obj is now gone */
 
     if (acid && !tinned && !resists_acid(mon)) {
 	mon->mhp -= rnd(15);
