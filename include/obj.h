@@ -331,8 +331,8 @@ struct obj {
  *	 1. Add the structure definition and any required macros in an appropriate
  *	    header file that precedes this one.
  *	 2. Add a pointer to your new struct to the oextra struct in this file.
- *	 3. Add a referencing macro at the bottom of this file after the mextra
- *	    struct (see ONAME, OMONST, OMIN, OLONG, or OMAILCMD for examples).
+ *	 3. Add a referencing macro to this file after the newobj macro above
+ *	    (see ONAME, OMONST, OMIN, OLONG, or OMAILCMD for examples).
  *	 4. Add a testing macro after the set of referencing macros
  *	    (see has_oname(), has_omonst(), has_omin(), has_olong(),
  *	    has_omailcmd() for examples).
