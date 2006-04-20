@@ -1070,6 +1070,9 @@ boolean at_stairs, falling, portal;
 	keepdogs(FALSE);
 	if (u.uswallow)				/* idem */
 		u.uswldtim = u.uswallow = 0;
+#ifdef DUNGEON_OVERVIEW
+	recalc_mapseen(); /* recalculate map overview before we leave the level */
+#endif /* DUNGEON_OVERVIEW */
 	/*
 	 *  We no longer see anything on the level.  Make sure that this
 	 *  follows u.uswallow set to null since uswallow overrides all
@@ -1105,6 +1108,13 @@ boolean at_stairs, falling, portal;
 #ifdef USE_TILES
 	substitute_tiles(newlevel);
 #endif
+#ifdef DUNGEON_OVERVIEW
+	/* record this level transition as a potential seen branch unless using
+	 * some non-standard means of transportation (level teleport).
+	 */
+	if ((at_stairs || falling || portal) && (u.uz.dnum != newlevel->dnum))
+		recbranch_mapseen(&u.uz, newlevel);
+#endif /* DUNGEON_OVERVIEW */
 	assign_level(&u.uz0, &u.uz);
 	assign_level(&u.uz, newlevel);
 	assign_level(&u.utolev, newlevel);

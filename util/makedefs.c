@@ -677,6 +677,9 @@ static const char *build_opts[] = {
 #ifdef WIZARD
 		"debug mode",
 #endif
+#ifdef DUNGEON_OVERVIEW
+		"dungeon map overview patch",
+#endif
 #ifdef ELBERETH
 		"Elbereth",
 #endif

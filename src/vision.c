@@ -808,6 +808,10 @@ skip:
     /* Set the new min and max pointers. */
     viz_rmin  = next_rmin;
     viz_rmax = next_rmax;
+
+#ifdef DUNGEON_OVERVIEW
+    recalc_mapseen();
+#endif
 }
 
 

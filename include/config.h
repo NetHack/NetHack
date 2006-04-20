@@ -372,7 +372,8 @@ typedef unsigned char	uchar;
 #if !defined(MAC)
 # define CLIPPING	/* allow smaller screens -- ERS */
 #endif
-#define BARGETHROUGH	/* allow some monster to move others out of their way */
+#define AUTOPICKUP_EXCEPTIONS	/* exceptions to autopickup */
+#define BARGETHROUGH	/* allow some monsters to move others out of their way */
 
 #ifdef REDO
 # define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
@@ -390,10 +391,9 @@ typedef unsigned char	uchar;
  */
 
 /*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
-#define AUTOPICKUP_EXCEPTIONS	/* exceptions to autopickup */
 #define STATUS_VIA_WINDOWPORT	/* re-work of the status line updating process */
 #define STATUS_HILITES		/* support hilites of status fields */
-
+#define DUNGEON_OVERVIEW	/* dungeon overview by Hojita Discordia */
 /* End of Section 5 */
 
 #include "global.h"	/* Define everything else according to choices above */
