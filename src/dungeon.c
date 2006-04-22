@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dungeon.c	3.5	2006/03/20	*/
+/*	SCCS Id: @(#)dungeon.c	3.5	2006/04/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -66,9 +66,9 @@ STATIC_DCL void FDECL(free_mapseen, (mapseen *));
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
-STATIC_DCL void FDECL(print_mapseen, (winid,mapseen *,boolean));
+STATIC_DCL void FDECL(print_mapseen, (winid,mapseen *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
-STATIC_DCL char *FDECL(seen_string, (xchar x, const char *));
+STATIC_DCL char *FDECL(seen_string, (XCHAR_P,const char *));
 STATIC_DCL const char *FDECL(br_string2, (branch *));
 #endif /* DUNGEON_OVERVIEW */
 
@@ -2398,7 +2398,7 @@ boolean printdun;
 
 		/* capitalize afterwards */
 		i = strlen(PREFIX);
-		buf[i] = toupper(buf[i]);
+		buf[i] = highc(buf[i]);
 
 		putstr(win, 0, buf);
 	}
