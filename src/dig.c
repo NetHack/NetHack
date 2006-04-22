@@ -1108,8 +1108,10 @@ struct obj *obj;
 		/* might escape trap and still be teetering at brink */
 		if (!u.utrap) cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
 	} else if (!ispick &&
-		    /* can only dig down with an axe if stuck in a bear trap */
-		    (!trap || !u.utrap || u.utraptype != TT_BEARTRAP)) {
+		    /* can only dig down with an axe when doing so will
+		       trigger or disarm a trap here */
+		    (!trap || (trap->ttyp != LANDMINE &&
+			       trap->ttyp != BEAR_TRAP))) {
 		pline("%s merely scratches the %s.",
 				Yobjnam2(obj, (char *)0), surface(u.ux,u.uy));
 		u_wipe_engr(3);
