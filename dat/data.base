@@ -28,12 +28,47 @@ abbot
 	manner, "What is God?"  The answer is not recorded but it is
 	probable that the asker went on worrying out answers for himself.
 		[ The Runaway Abbot, by G. K. Chesterton ]
+# takes "suit or piece of armor" when specifying '['
+ac
+armor*
+armour*
+suit or piece of armor
+	"The last spot on the school jousting team came down to another 
+	boy and me.  He was poor, and his only armor was a blanket his 
+	mother had made him from her hair.  I, on the other hand, had 
+	a brand new suit of chain mail.  Just before our joust, I asked 
+	him what he'd do if he made the team.  (I was hoping to be more 
+	popular with the ladies.)  He said he would be able to save the 
+	town from dragons and be able to afford some water for his 20 
+	brothers and sisters.
+
+	Well, a sense of compassion came over me.  I insisted we swap 
+	armor.  He was forced to accept, as it would have been an 
+	insult not to do so.
+
+	On the battlefield, we charged at each other and we both connected 
+	with our lances.
+
+	Lying there on the mud mortally wounded, I learned what true armor 
+	class was that day."
+		[ When Help Collides, by J. D. Berry ]
 aclys
 aklys
 	A short studded or spiked club attached to a cord allowing
 	it to be drawn back to the wielder after having been thrown.
 	It should not be confused with the atlatl, which is a device
 	used to throw spears for longer distances.
+~agate ring
+agate*
+	Translucent, cryptocrystalline variety of quartz and a subvariety
+	of chalcedony.  Agates are identical in chemical structure to
+	jasper, flint, chert, petrified wood, and tiger's-eye, and are
+	often found in association with opal.  The colorful, banded rocks
+	are used as a semiprecious gemstone and in the manufacture of
+	grinding equipment.  An agate's banding forms as silica from
+	solution is slowly deposited into cavities and veins in older
+	rock.
+		[ The Columbia Encyclopedia, Sixth Edition ]
 aleax
 	Said to be a doppelganger sent to inflict divine punishment
 	for alignment violations.
@@ -168,7 +203,9 @@ anu
 	the father of all gods, and the ruler of heaven and destiny.
 	Anu features strongly in the _atiku_ festival in
 	Babylon, Uruk and other cities.
+# takes "apelike creature" when specifying 'Y'
 ape
+apelike creature
 * ape
 	The most highly evolved of all the primates, as shown by
 	all their anatomical characters and particularly the
@@ -242,6 +279,18 @@ asmodeus
 	His appearance, unlike many other demons and devils, is
 	human apart from his horns and tail.  He can freeze flesh
 	with a touch.
+		[]
+
+	The evil demon who appears in the Apocryphal book of _Tobit_
+	and is derived from the Persian _Aeshma_.  In _Tobit_ Asmodeus
+	falls in love with Sara, daughter of Raguel, and causes the
+	death of seven husbands in succession, each on his bridal night.
+	He was finally driven from Egypt through a charm made by Tobias
+	of the heart and liver of a fish burned on perfumed ashes, as
+	described by Milton in _Paradise Lost_ (IV, 167-71).  Hence
+	Asmodeus often figures as the spirit of matrimonial jealousy
+	or unhappiness.
+		[ Brewer's Concise Dictionary of Phrase and Fable ]
 athame
 	The consecrated ritual knife of a Wiccan initiate (one of
 	four basic tools, together with the wand, chalice and
@@ -253,6 +302,22 @@ athen*
 	sprang forth from his head completely armed.  Her favourite
 	bird was the owl, and the plant sacred to her is the olive.
 	    [ Bulfinch's Mythology, by Thomas Bulfinch ]
+axe
+	"For ev'ry silver ringing blow,
+	Cities and palaces shall grow!"
+
+	"Bite deep and wide, O Axe, the tree,
+	Tell wider prophecies to me."
+
+	"When rust hath gnaw'd me deep and red,
+	A nation strong shall lift his head.
+
+	"His crown the very Heav'ns shall smite,
+	Aeons shall build him in his might."
+
+	"Bite deep and wide, O Axe, the tree;
+	Bright Seer, help on thy prophecy!"
+		[ Malcolm's Katie, by Isabella Valancey Crawford ]
 axolotl
 	A mundane salamander, harmless.
 bag
@@ -322,6 +387,13 @@ banana
 	"You'll tell," he whispered.  "Oh yes indeed you will."
 	And Dayna knew he was right.
 		[ The Stand, by Stephen King ]
+banshee
+	In Irish folklore and that of the Western Highlands of Scotland,
+	a female fairy who announces her presence by shrieking and
+	wailing under the windows of a house when one of its occupants
+	is awaiting death.  The word is a phonetic spelling of the
+	Irish _beansidhe_, a woman of the fairies.
+		[ Brewer's Concise Dictionary of Phrase and Fable ]
 barbarian
 * barbarian
 	They dressed alike -- in buckskin boots, leathern breeks and
@@ -339,7 +411,9 @@ barbarian
 barbed devil
 	Barbed devils lack any real special abilities, though they
 	are quite difficult to kill.
+# takes "bat or bird" when specifying 'B'
 *bat
+bat or bird
 	A bat, flitting in the darkness outside, took the wrong turn
 	as it made its nightly rounds and came in through the window
 	which had been left healthfully open.  It then proceeded to
@@ -563,7 +637,9 @@ s*d*g*r* cat
 	would have collapsed much earlier, and the outside observer's
 	linear combination has no relevance.
 		[ The Emperor's New Mind, by Roger Penrose ]
+# takes "cat or other feline" when specifying 'f'
 *cat
+*feline
 kitten
 	Well-known quadruped domestic animal from the family of
 	predatory felines (_Felis ochreata domestica_), with a thick,
@@ -895,7 +971,9 @@ demogorgon
 	spread a quickly fatal illness to his victims while rending
 	them.  He is a mighty spellcaster, and he can drain the life
 	of mortals with a touch of his tail.
+# takes "major demon" when specifying '&'
 demon
+major demon
 	It is often very hard to discover what any given Demon looks
 	like, apart from a general impression of large size, huge
 	fangs, staring eyes, many limbs, and an odd color; but all
@@ -924,18 +1002,22 @@ djinn*
 	in a flask or lamp.  Once in a while, such a tool is found by
 	a lucky rogue, and some djinn are known to be so grateful
 	when released that they might grant their rescuer a wish.
+# takes "dog or other canine" when specifying 'd'
 ~hachi
 ~slasher
 ~sirius
 *dog
 pup*
+*canine
 	A domestic animal, the _tame dog_ (_Canis familiaris_), of
 	which numerous breeds exist.  The male is called a dog,
 	while the female is called a bitch.  Because of its known
 	loyalty to man and gentleness with children, it is the
 	world's most popular domestic animal.  It can easily be
 	trained to perform various tasks.
+# typing "spellbook or a closed door" shouldn't yield this entry
 ~trap*door
+~*spellbook*
 *door
 doorway
 	Through me you pass into the city of woe:
@@ -1859,7 +1941,9 @@ ice devil
 	equally at home in the fires of Hell and the cold of Limbo,
 	and who can cause the traveller to feel the latter with just
 	a touch of their tail.
+# takes "imp or minor demon" when specifying 'i'
 imp
+imp or minor demon
 	 ... imps ... little creatures of two feet high that could
 	gambol and jump prodigiously; ...
 		[ The Charwoman's Shadow, by Lord Dunsany ]
@@ -4052,7 +4136,9 @@ trap*door
 	With his trap-doors the monster was responsible for endless
 	tragedies of all kinds.
 		[ The Phantom of the Opera, by Gaston Leroux ]
+# takes "trapper or lurker above" when specifying 't'
 trapper
+trapper or lurker above
 	The trapper is a creature which has evolved a chameleon-like
 	ability to blend into the dungeon surroundings.  It captures
 	its prey by remaining very still and blending into the
