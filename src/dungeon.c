@@ -62,7 +62,6 @@ STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P, struct lch
 
 #ifdef DUNGEON_OVERVIEW
 mapseen *mapseenchn = (struct mapseen *)0;
-STATIC_DCL void FDECL(free_mapseen, (mapseen *));
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
@@ -1841,7 +1840,7 @@ recbranch_mapseen(source, dest)
 	/* branch not found, so not a real branch. */
 	if (!br) return;
   
-	if (mptr = find_mapseen(source)) {
+	if ((mptr = find_mapseen(source)) != 0) {
 		if (mptr->br && br != mptr->br)
 			impossible("Two branches on the same level?");
 		mptr->br = br;
@@ -2038,13 +2037,13 @@ d_level *lev;
 }
 
 #define INTEREST(feat) \
-	((feat).nfount) || \
-	((feat).nsink) || \
-	((feat).nthrone) || \
-	((feat).naltar) || \
-	((feat).nshop) || \
-	((feat).ntemple) || \
-	((feat).ntree)
+	((feat).nfount || \
+	 (feat).nsink || \
+	 (feat).nthrone || \
+	 (feat).naltar || \
+	 (feat).nshop || \
+	 (feat).ntemple || \
+	 (feat).ntree)
 	/*
 	|| ((feat).water) || \
 	((feat).ice) || \
@@ -2056,11 +2055,12 @@ STATIC_OVL boolean
 interest_mapseen(mptr)
 mapseen *mptr;
 {
-	return (on_level(&u.uz, &mptr->lev) || (!mptr->feat.forgot) && (
+	return on_level(&u.uz, &mptr->lev) ||
+	    (!mptr->feat.forgot && (
 		INTEREST(mptr->feat) ||
 		(mptr->custom) || 
 		(mptr->br)
-	));
+		));
 }
 
 /* recalculate mapseen for the current level */
@@ -2347,7 +2347,7 @@ boolean printdun;
 	/* wizmode prints out proto dungeon names for clarity */
 	if (wizard) {
 		s_level *slev;
-		if (slev = Is_special(&mptr->lev))
+		if ((slev = Is_special(&mptr->lev)) != 0)
 			Sprintf(eos(buf), " [%s]", slev->proto);
 	}
 #endif

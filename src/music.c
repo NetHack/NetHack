@@ -370,9 +370,9 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 					exercise(A_DEX, TRUE);
 				    else
 					selftouch((Upolyd &&
-						slithy(youmonst.data) ||
-						nolimbs(youmonst.data)) ?
-					    "Shaken, you" : "Falling down, you");
+						   (slithy(youmonst.data) ||
+						    nolimbs(youmonst.data))) ?
+					  "Shaken, you" : "Falling down, you");
 			    }
 		    } else newsym(x,y);
 		    break;

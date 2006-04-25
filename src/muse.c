@@ -2129,9 +2129,9 @@ boolean by_you;
 	    /* monsters can also use potions of acid */
 	    if (obj->otyp == POT_ACID ||
 		((obj->otyp == CORPSE || (obj->otyp == TIN && tinok)) &&
-		    obj->corpsenm == PM_LIZARD ||
-		    (acidic(&mons[obj->corpsenm]) &&
-			obj->corpsenm != PM_GREEN_SLIME))) {
+		    (obj->corpsenm == PM_LIZARD ||
+		     (acidic(&mons[obj->corpsenm]) &&
+			obj->corpsenm != PM_GREEN_SLIME)))) {
 		mon_consume_unstone(mon, obj, by_you, TRUE);
 		return TRUE;
 	    }
