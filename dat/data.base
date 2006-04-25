@@ -33,23 +33,23 @@ ac
 armor*
 armour*
 suit or piece of armor
-	"The last spot on the school jousting team came down to another 
-	boy and me.  He was poor, and his only armor was a blanket his 
-	mother had made him from her hair.  I, on the other hand, had 
-	a brand new suit of chain mail.  Just before our joust, I asked 
-	him what he'd do if he made the team.  (I was hoping to be more 
-	popular with the ladies.)  He said he would be able to save the 
-	town from dragons and be able to afford some water for his 20 
+	"The last spot on the school jousting team came down to another
+	boy and me.  He was poor, and his only armor was a blanket his
+	mother had made him from her hair.  I, on the other hand, had
+	a brand new suit of chain mail.  Just before our joust, I asked
+	him what he'd do if he made the team.  (I was hoping to be more
+	popular with the ladies.)  He said he would be able to save the
+	town from dragons and be able to afford some water for his 20
 	brothers and sisters.
 
-	Well, a sense of compassion came over me.  I insisted we swap 
-	armor.  He was forced to accept, as it would have been an 
+	Well, a sense of compassion came over me.  I insisted we swap
+	armor.  He was forced to accept, as it would have been an
 	insult not to do so.
 
-	On the battlefield, we charged at each other and we both connected 
+	On the battlefield, we charged at each other and we both connected
 	with our lances.
 
-	Lying there on the mud mortally wounded, I learned what true armor 
+	Lying there on the mud mortally wounded, I learned what true armor
 	class was that day."
 		[ When Help Collides, by J. D. Berry ]
 aclys
@@ -231,9 +231,9 @@ apple
 		[ The Devil's Dictionary, by Ambrose Bierce ]
 archeologist
 * archeologist
-	Archeology is the search for fact, not truth. [...] 
-	So forget any ideas you've got about lost cities, exotic travel, 
-	and digging up the world. We do not follow maps to buried 
+	Archeology is the search for fact, not truth. [...]
+	So forget any ideas you've got about lost cities, exotic travel,
+	and digging up the world. We do not follow maps to buried
 	treasure, and X never, ever, marks the spot.
 		[ Indiana Jones and the Last Crusade ]
 archon
@@ -555,7 +555,7 @@ potion of sleeping
 	woe-begone party at ninepins -- the flagon -- "Oh! that flagon!
 	that wicked flagon!" thought Rip -- "what excuse shall I make
 	to Dame Van Winkle!"
-		[ Rip Van Winkle, a Posthumous Writing 
+		[ Rip Van Winkle, a Posthumous Writing
 		  of Diedrich Knickerbocker, by Washington Irving ]
 boulder
 	I worked the lever well under, and stretched my back; the end
@@ -727,19 +727,19 @@ human cave*man
 		[ 2001: A Space Odyssey, by Arthur C. Clarke ]
 dwar* cave*man
 gnom* cave*man
-	'Twas in a land unkempt of life's red dawn; 
-	Where in his sanded cave he dwelt alone; 
-	Sleeping by day, or sometimes worked upon 
-	His flint-head arrows and his knives of stone; 
-	By night stole forth and slew the savage boar, 
-	So that he loomed a hunter of loud fame, 
-	And many a skin of wolf and wild-cat wore, 
-	And counted many a flint-head to his name; 
-	Wherefore he walked the envy of the band, 
-	Hated and feared, but matchless in his skill. 
-	Till lo! one night deep in that shaggy land, 
-	He tracked a yearling bear and made his kill; 
-	Then over-worn he rested by a stream, 
+	'Twas in a land unkempt of life's red dawn;
+	Where in his sanded cave he dwelt alone;
+	Sleeping by day, or sometimes worked upon
+	His flint-head arrows and his knives of stone;
+	By night stole forth and slew the savage boar,
+	So that he loomed a hunter of loud fame,
+	And many a skin of wolf and wild-cat wore,
+	And counted many a flint-head to his name;
+	Wherefore he walked the envy of the band,
+	Hated and feared, but matchless in his skill.
+	Till lo! one night deep in that shaggy land,
+	He tracked a yearling bear and made his kill;
+	Then over-worn he rested by a stream,
 	And sank into a sleep too deep for dream.
 		[ The Dreamer, by Robert Service ]
 *centaur
@@ -906,9 +906,9 @@ c*ckatrice
 ~creeping coins
 *coins
 zorkmid*
-	The coin bears the likeness of Belwit the Flat, along with the 
-	inscriptions, "One Zorkmid," and "699 GUE [ Great Underground 
-	Empire ]."  On the other side, the coin depicts Egreth Castle, 
+	The coin bears the likeness of Belwit the Flat, along with the
+	inscriptions, "One Zorkmid," and "699 GUE [ Great Underground
+	Empire ]."  On the other side, the coin depicts Egreth Castle,
 	and says "In Frobs We Trust" in several languages.
 		[ Zork Zero, by Infocom ]
 # not "stethoscope"
@@ -957,6 +957,18 @@ cram*
 	crocodile is a large, dangerous predator native to tropical
 	and subtropical climes.  It spends most of its time in large
 	bodies of water.
+		[]
+
+	How doth the little crocodile
+	    Improve his shining tail,
+	And pour the waters of the Nile
+	    On every golden scale!
+
+	How cheerfully he seems to grin
+	    How neatly spreads his claws,
+	And welcomes little fishes in,
+	    With gently smiling jaws!
+		[ How Doth The Little Crocodile, by Lewis Carroll ]
 croesus
 kroisos
 creosote
@@ -1067,7 +1079,29 @@ dark one
 	and the Orcs were at his command and multiplied like flies.
 	Thus the Black Years began ...
 		[ The Silmarillion, by J.R.R. Tolkien ]
+# includes "dart trap"
+dart*
+	Darts are missile weapons, designed to fly such that a sharp,
+	often weighted point will strike first.  They can be
+	distinguished from javelins by fletching (i.e., feathers on
+	the tail) and a shaft that is shorter and/or more flexible,
+	and from arrows by the fact that they are not of the right
+	length to use with a normal bow.
+		[ Wikipedia, the free encyclopedia ]
+
+	Against my foe I hurled a murderous dart.
+	He caught it in his hand -- I heard him laugh --
+	I saw the thing that should have pierced his heart
+	Turn to a golden staff.
+		[ Gifts, by Mary Coleridge ]
 demogorgon
+	A terrible deity, whose very name was capable of producing the
+	most horrible effects.  He is first mentioned by the 4th-century
+	Christian writer, Lactantius, who in doing so broke with the
+	superstition that the very reference to Demogorgon by name
+	brought death and disaster.
+		[ Brewer's Concise Dictionary of Phrase and Fable ]
+
 	Demogorgon, the prince of demons, wallows in filth and can
 	spread a quickly fatal illness to his victims while rending
 	them.  He is a mighty spellcaster, and he can drain the life
@@ -1084,16 +1118,66 @@ major demon
 	them difficult to deal with, even on the rare occasions when
 	they are friendly.
 	[ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+diamond
+	The hardest known mineral (with a hardness of 10 on Mohs' scale).
+	It is an allotropic form of pure carbon that has crystallized in
+	the cubic system, usually as octahedra or cubes, under great
+	pressure.
+		[ A Concise Dictionary of Physics ]
+
+	The diamond, _adamas_ or _dyamas_, is a transparent stone, like
+	crystal, but having the colour of polished iron, but it cannot
+	be destroyed by iron, fire or any other means, unless it is
+	placed in the hot blood of a goat; with sharp pieces of diamond
+	other stones are engraved and polished.  It is no greater than
+	a small nut.  There are six kinds, however Adamant attracts
+	metal; it expels venom; it produces amber (and is efficacious
+	against empty fears and for those resisting spells).  It is
+	found in India, in Greece and in Cyprus, where magicians make
+	use of it.  It gives you courage; it averts apparitions; it
+	removes anger and quarrels; it heals the mad; it defends you
+	from your enemies.  It should be set in gold or silver and worn
+	on the left arm.  It is likewise found in Arabia.
+	  	[ The Aberdeen Bestiary, translated by Colin McLaren ]
+dilithium*
+	The most famous and the first to be named of the imaginary
+	"minerals" of Star Trek is dilithium. ... Because of this
+	mineral's central role in the storyline, a whole mythology
+	surrounds it.  It is, however, a naturally occurring substance
+	within the mythology, as there are various episodes that
+	make reference to the mining of dilithium deposits. ...
+	This name itself is imaginary and gives no real information on
+	the structure or make-up of this substance other than that this
+	version of the name implies a lithium and iron-bearing
+	aluminosilicate of some sort.  That said, the real mineral that
+	most closely matches the descriptive elements of this name is
+	ferroholmquistite which is a dilithium triferrodiallosilicate.
+	If one goes on the premise that nature follows certain general
+	norms, then one could extrapolate that dilithium might have a
+	similar number of silicon atoms in its structure.
+	Keeping seven (i.e. hepto) ferrous irons and balancing the
+	oxygens would give a theoretical formula of Li2Fe7Al2Si8O27.
+	A mineral with this composition could theoretically exist,
+	although it is doubtful that it would possess the more fantastic
+	properties ascribed to dilithium.
+		[ The Mineralogy of Star Trek, by Jeffrey de Fourestier ]
 dingo
 	A wolflike wild dog, Canis dingo, of Australia, having a
 	reddish- or yellowish-brown coat, believed to have been
 	introduced by the aborigines.
 	[Webster's Encyclopedic Unabridged Dictionary of the English Language]
 disenchanter
-	Ask not, what your magic can do to it. Ask what it can do to your magic.
+	Ask not, what your magic can do to it.  Ask what it can do
+	to your magic.
 dispater
-	Dispater is an arch-devil who rules the city of Dis.  He is
-	a powerful mage.
+	The Roman ruler of the underworld and fortune, similar to the
+	Greek Hades.  Every hundred years, the Ludi Tarentini were
+	celebrated in his honor.  The Gauls regarded Dis Pater as
+	their ancestor.  The name is a contraction of the Latin Dives,
+	"the wealthy", Dives Pater, "the wealthy father", or "Fater
+	Wealth".  It refers to the wealth of precious stone below the
+	earth.
+		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
 djinn*
 	The djinn are genies from the elemental plane of Air.  There,
 	among their kind, they have their own societies.  They are
@@ -1198,6 +1282,33 @@ doppelganger
 	being who ever joined in the fierce, mad, intoxicating revel
 	of the Dum-Dum.
 		[ Tarzan of the Apes, by Edgar Rice Burroughs ]
+dunce*
+	A dunce cap, also variously known as a dunce hat, dunce's
+	cap, or dunce's hat, is a tall conical hat.  In popular
+	culture, it is typically made of paper and often marked with
+	a D, and given to schoolchildren to wear as punishment for
+	being stupid or lazy.  While this is now a rare practice,
+	it is frequently depicted in popular culture such as
+	children's cartoons.
+		[ Wikipedia, the free encyclopedia ]
+dungeon*
+	At once as far as Angels kenn he views
+	The dismal Situation waste and wilde,
+	A Dungeon horrible, on all sides round
+	As one great Furnace flam'd, yet from those flames
+	No light, but rather darkness visible
+	Serv'd only to discover sights of woe,
+	Regions of sorrow, doleful shades, where peace
+	And rest can never dwell, hope never comes
+	That comes to all; but torture without end
+	Still urges, and a fiery Deluge, fed
+	With ever-burning Sulphur unconsum'd:
+	Such place Eternal Justice had prepar'd
+	For those rebellious, here their Prison ordain'd
+	In utter darkness, and their portion set
+	As far remov'd from God and light of Heav'n
+	As from the Center thrice to th' utmost Pole.
+		[ Paradise Lost, by John Milton ]
 ~dwarf ??m*
 #~dwar* cave*man
 dwarf*
@@ -1343,6 +1454,39 @@ emerald
 	What matter, so there is but fire
 	In you, in me?'
 		[ The Mask, by W.B. Yeats ]
+engrav*
+A.S*
+	Presently we reached a place where the beach narrowed; the sea
+	almost came up to the foot of the cliffs, leaving a passage no
+	wider than a couple of yards.  Between two projecting rocks we
+	caught sight of the entrance to a dark tunnel.
+	There, on a slab of granite, appeared two mysterious letters,
+	half eaten away by time -- the two initials of the bold,
+	adventurous traveller:
+
+			A.S.
+
+	'A.S.,' cried my uncle. 'Arne Saknussemm! Arne Saknussemm again!'
+
+	[...] at the sight of those two letters, carved there three
+	hundred years before, I stood in utter stupefaction.  Not
+	only was the signature of the learned alchemist legible on
+	the rock, but I held in my hand the dagger which had traced it.
+	Without showing the most appalling bad faith, I could no longer
+	doubt the existence of the traveller and the reality of his
+	journey.
+		[ Journey to the Centre of the Earth, by Jules Verne,
+		  translated by Robert Baldick ]
+*epidaurus
+	The asclepieion at Epidaurus was the most celebrated healing
+	center of the Classical world, the place where ill people went
+	in the hope of being cured.  To find out the right cure for
+	their ailments, they spent a night in the enkoimitiria, a big
+	sleeping hall.  In their dreams, the god himself (Asclepius)
+	would advise them what they had to do to regain their health.
+	There are also mineral springs in the vicinity which may have
+	been used in healing.
+		[ Wikipedia, the free encyclopedia ]
 erinys
 erinyes
 	These female-seeming devils named after the Furies of mythology
@@ -2385,7 +2529,7 @@ offler
 	"Fetch me something to eat!"
 		[ Aladdin, from The Arabian Nights, by Andrew Lang ]
 lance
-	With this the wind increased, and the mill sails began to turn 
+	With this the wind increased, and the mill sails began to turn
 	about; which Don Quixote espying, said, 'Although thou movest
 	more arms than the giant Briareus thou shalt stoop to me.'
 	And, after saying this, and commending himself most devoutly
@@ -2395,7 +2539,7 @@ lance
 	first mill that was before him, and, striking his lance into
 	the sail, the wind swung it about with such fury, that it broke
 	his lance into shivers, carrying him and his horse after it,
-	and finally tumbled him a good way off from it on the field in 
+	and finally tumbled him a good way off from it on the field in
 	evil plight.
 		[ Don Quixote of La Mancha, by Miquel de
 		  Cervantes Saavedra ]
@@ -3288,13 +3432,13 @@ pick*ax*
 	but exceeding slow.
 		[ the Bestiary of Xygag ]
 piranha
-	They live in "schools." Many times they will wait for prey 
-	to come to the shallow water of the river. Then the large 
-	group of piranhas will attack. These large groups are able 
-	to kill large animals... Their lower teeth fit perfectly 
-	into the spaces of their upper teeth, creating a tremendous 
-	vice-like bite... Piranhas are attracted to any disturbance 
-	in the water. 
+	They live in "schools." Many times they will wait for prey
+	to come to the shallow water of the river. Then the large
+	group of piranhas will attack. These large groups are able
+	to kill large animals... Their lower teeth fit perfectly
+	into the spaces of their upper teeth, creating a tremendous
+	vice-like bite... Piranhas are attracted to any disturbance
+	in the water.
 		[ http://www.animalsoftherainforest.com ]
 pit
 spiked pit
@@ -3407,7 +3551,7 @@ prisoner
 		The new Number 2.
 	Who is Number 1?
 		You are Number 6.
-	I am not a number!  I am a free man! 
+	I am not a number!  I am a free man!
 		[ The Prisoner, by Patrick McGoohan ]
 ptah
 	Known under various names (Nu, Neph, Cenubis, Amen-Kneph,
@@ -3427,18 +3571,18 @@ ptah
 	to the most minute vibrations in the earth, but may also
 	be awakened by a remote shriek.
 pyrolisk
-	At first glance around the corner, I thought it was another 
+	At first glance around the corner, I thought it was another
 	cockatrice. I had encountered the wretched creatures two or
-	three times since leaving the open area. I quickly ducked my 
+	three times since leaving the open area. I quickly ducked my
 	head back and considered what to do next. My heart had begun
-	to thump audibly as I patted my pack to make sure I still had 
+	to thump audibly as I patted my pack to make sure I still had
 	the dead lizards at close reach. A check of my attire showed
 	no obvious holes or damage. I had to keep moving. One deep
-	breath, and a count of three, two, one, and around the corner 
-	I bolted. But it was no cockatrice! I felt a sudden intense 
+	breath, and a count of three, two, one, and around the corner
+	I bolted. But it was no cockatrice! I felt a sudden intense
 	searing of the skin around my face, and flames began to leap
 	from my pack. I tossed it to the ground, and quickly retreated
-	back, around that corner, desperately striving to get out of 
+	back, around that corner, desperately striving to get out of
 	its sight.
 quadruped
 	The woodlands and other regions are inhabited by multitudes
@@ -3786,7 +3930,7 @@ shark
 	As the shark moved, its dark top reflected virtually no
 	light.  The denticles on its skin muted the whoosh of its
 	movements as the shark rose, driven by the power of the
-	great tail sweeping from side to side, like a scythe.  
+	great tail sweeping from side to side, like a scythe.
 	The fish exploded upward.
 	Charles Bruder felt a slight vacuum tug in the motion of
 	the sea, noted it as a passing current, the pull of a wave,
@@ -3801,12 +3945,12 @@ shark
 shito
 	A Japanese stabbing knife.
 shrieker
-	With a single, savage thrust of her spear, the warrior-woman 
-	impaled the fungus, silencing it.  However, it was too late:  
+	With a single, savage thrust of her spear, the warrior-woman
+	impaled the fungus, silencing it.  However, it was too late:
 	the alarm had been raised[...]
-	Suddenly, a large, dark shape rose from the abyss before them, 
-	its fetid bulk looming overhead...The monster was some kind of
-	great dark worm, but that was about all they were sure of.  
+	Suddenly, a large, dark shape rose from the abyss before them,
+	its fetid bulk looming overhead... The monster was some kind of
+	great dark worm, but that was about all they were sure of.
 		[ The Adventurers, Epic IV, by Thomas A. Miller ]
 skeleton
 	A skeleton is a magically animated undead creature.  Unlike
