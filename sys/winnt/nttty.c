@@ -56,6 +56,7 @@ INPUT_RECORD ir;
  * from the command line. 
  */
 int GUILaunched;
+extern int redirect_stdout;
 static BOOL FDECL(CtrlHandler, (DWORD));
 
 #ifdef PORT_DEBUG
@@ -941,8 +942,12 @@ msmsg VA_DECL(const char *, fmt)
 	VA_INIT(fmt, const char *);
 	Vsprintf(buf, fmt, VA_ARGS);
 	VA_END();
-	xputs(buf);
-	if (ttyDisplay) curs(BASE_WINDOW, cursor.X+1, cursor.Y);
+	if (redirect_stdout)
+		fprintf(stdout,"%s",buf);
+	else {
+		xputs(buf);
+		if (ttyDisplay) curs(BASE_WINDOW, cursor.X+1, cursor.Y);
+	}
 	return;
 }
 

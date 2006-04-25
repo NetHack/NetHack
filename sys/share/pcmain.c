@@ -54,6 +54,7 @@ extern void FDECL(nethack_exit,(int));
 
 #ifdef WIN32
 extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
+extern int redirect_stdout;		/* from sys/share/pcsys.c */
 #endif
 
 #if defined(MSWIN_GRAPHICS)
@@ -227,14 +228,22 @@ char *argv[];
 		 * may do a prscore().
 		 */
 		if (!strncmp(argv[1], "-s", 2)) {
-#if !defined(MSWIN_GRAPHICS)
-# if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-			chdirx(hackdir,0);
+#if defined(MSWIN_GRAPHICS) || defined(WIN32CON)
+			int sfd = _fileno(stdout);
+			redirect_stdout = (sfd >= 0) ? !isatty(sfd) : 0;
+
+# ifdef MSWIN_GRAPHICS
+			if (!redirect_stdout) {
+			   raw_printf("-s is not supported for the Graphical Interface\n");
+			   nethack_exit(EXIT_SUCCESS);
+			}
 # endif
+#endif
+
+#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+			chdirx(hackdir,0);
+#endif
 			prscore(argc, argv);
-#else
-			raw_printf("-s is not supported for the Graphical Interface\n");
-#endif /*MSWIN_GRAPHICS*/
 			nethack_exit(EXIT_SUCCESS);
 		}
 

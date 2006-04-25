@@ -390,6 +390,7 @@ char *name;
 
 #ifdef WIN32
 boolean getreturn_enabled;
+int redirect_stdout;
 #endif
 
 void
