@@ -2086,7 +2086,7 @@ or overLoaded), you will be asked if you want to continue.
 .lp pickup_types
 Specify the object types to be picked up when
 .op autopickup
-is on.  Default is all types.  If your copy of the game has the experimental
+is on.  Default is all types.  If your copy of the game has the 
 compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use 
 .op autopickup_exception
 configuration file lines to further refine
