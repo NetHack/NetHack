@@ -134,6 +134,66 @@ boolean exclude_cookie;
 	return rumor_buf;
 }
 
+#ifdef WIZARD
+/*
+ * test that the true/false rumor boundaries are valid.
+ */
+void
+rumor_check()
+{
+	dlb *rumors;
+	winid tmpwin;
+	char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
+
+	if (true_rumor_size < 0L)	/* we couldn't open RUMORFILE */
+		return;
+
+	rumors = dlb_fopen(RUMORFILE, "r");
+
+	if (rumors) {
+		long rumor_start = 0L;
+		rumor_buf[0] = '\0';
+		if (true_rumor_size == 0L) {	/* if this is 1st outrumor() */
+		    init_rumors(rumors);
+		    if (true_rumor_size < 0L) 	/* init failed */
+			return;
+		}
+		tmpwin = create_nhwindow(NHW_TEXT);
+		/*
+		 * check the first rumor (start of true rumors) by
+		 * skipping the first two lines.
+		 *
+		 * Then seek to the start of the false rumors (based on
+		 * the value read in rumors, and display it.
+		 */
+		rumor_buf[0] = '\0';
+		(void) dlb_fseek(rumors, true_rumor_start, SEEK_SET);
+		rumor_start = dlb_ftell(rumors);
+		(void) dlb_fgets(line, sizeof line, rumors);
+		if ((endp = index(line, '\n')) != 0) *endp = 0;
+		Sprintf(rumor_buf, "T %06ld %s", rumor_start,
+			xcrypt(line, xbuf));
+		putstr(tmpwin, 0, rumor_buf);
+
+		rumor_buf[0] = '\0';
+		(void) dlb_fseek(rumors, false_rumor_start, SEEK_SET);
+		rumor_start = dlb_ftell(rumors);
+		(void) dlb_fgets(line, sizeof line, rumors);
+		if ((endp = index(line, '\n')) != 0) *endp = 0;
+		Sprintf(rumor_buf, "F %06ld %s", rumor_start,
+			xcrypt(line, xbuf));
+		putstr(tmpwin, 0, rumor_buf);
+
+		(void) dlb_fclose(rumors);
+		display_nhwindow(tmpwin, TRUE);
+		destroy_nhwindow(tmpwin);
+	} else {
+		impossible("Can't open rumors file!");
+		true_rumor_size = -1;	/* don't try to open it again */
+	}
+}
+#endif
+
 void
 outrumor(truth, mechanism)
 int truth; /* 1=true, -1=false, 0=either */

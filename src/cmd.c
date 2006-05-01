@@ -149,6 +149,7 @@ STATIC_PTR int NDECL(wiz_show_stats);
 #  ifdef PORT_DEBUG
 STATIC_DCL int NDECL(wiz_port_debug);
 #  endif
+STATIC_PTR int NDECL(wiz_rumor_check);
 # endif
 STATIC_PTR int NDECL(enter_explore_mode);
 STATIC_PTR int NDECL(doattributes);
@@ -940,6 +941,14 @@ wiz_smell()
 				pline("That monster seems to give off no smell.");
 		} else pline("That is not a monster.");
 	} while (TRUE);
+	return 0;
+}
+
+/* #wizrumorcheck command - verify each rumor access */
+STATIC_PTR int
+wiz_rumor_check()
+{
+	rumor_check();
 	return 0;
 }
 #endif /* WIZARD */
@@ -1754,6 +1763,7 @@ struct ext_func_tab extcmdlist[] = {
 	{(char *)0, (char *)0, donull, TRUE},
 #endif
 	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},
 #endif
 	{(char *)0, (char *)0, donull, TRUE}	/* sentinel */
 };
@@ -1780,6 +1790,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 #ifdef DEBUG
 	{"wizdebug", "wizard debug command", wiz_debug_cmd, TRUE},
 #endif
+	{"wizrumorcheck", "verify rumor boundaries", wiz_rumor_check, TRUE},
 	{"wmode", "show wall modes", wiz_show_wmodes, TRUE},
 	{(char *)0, (char *)0, donull, TRUE}
 };

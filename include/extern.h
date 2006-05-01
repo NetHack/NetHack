@@ -1877,6 +1877,9 @@ E void FDECL(outoracle, (BOOLEAN_P, BOOLEAN_P));
 E void FDECL(save_oracles, (int,int));
 E void FDECL(restore_oracles, (int));
 E int FDECL(doconsult, (struct monst *));
+#ifdef WIZARD
+E void NDECL(rumor_check);
+#endif
 
 /* ### save.c ### */
 
