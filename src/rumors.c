@@ -151,7 +151,7 @@ rumor_check()
 	rumors = dlb_fopen(RUMORFILE, "r");
 
 	if (rumors) {
-		long rumor_start = 0L;
+		long ftell_rumor_start = 0L;
 		rumor_buf[0] = '\0';
 		if (true_rumor_size == 0L) {	/* if this is 1st outrumor() */
 		    init_rumors(rumors);
@@ -159,6 +159,25 @@ rumor_check()
 			return;
 		}
 		tmpwin = create_nhwindow(NHW_TEXT);
+
+		/*
+		 * reveal the values.
+		 */
+
+		Sprintf(rumor_buf,
+		"T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+			true_rumor_start, true_rumor_start,
+			true_rumor_end, true_rumor_end,
+			true_rumor_size, true_rumor_size);
+		putstr(tmpwin, 0, rumor_buf);
+		
+		Sprintf(rumor_buf,
+		"F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+			false_rumor_start, false_rumor_start,
+			false_rumor_end, false_rumor_end,
+			false_rumor_size, false_rumor_size);
+		putstr(tmpwin, 0, rumor_buf);
+		
 		/*
 		 * check the first rumor (start of true rumors) by
 		 * skipping the first two lines.
@@ -168,19 +187,19 @@ rumor_check()
 		 */
 		rumor_buf[0] = '\0';
 		(void) dlb_fseek(rumors, true_rumor_start, SEEK_SET);
-		rumor_start = dlb_ftell(rumors);
+		ftell_rumor_start = dlb_ftell(rumors);
 		(void) dlb_fgets(line, sizeof line, rumors);
 		if ((endp = index(line, '\n')) != 0) *endp = 0;
-		Sprintf(rumor_buf, "T %06ld %s", rumor_start,
+		Sprintf(rumor_buf, "T %06ld %s", ftell_rumor_start,
 			xcrypt(line, xbuf));
 		putstr(tmpwin, 0, rumor_buf);
 
 		rumor_buf[0] = '\0';
 		(void) dlb_fseek(rumors, false_rumor_start, SEEK_SET);
-		rumor_start = dlb_ftell(rumors);
+		ftell_rumor_start = dlb_ftell(rumors);
 		(void) dlb_fgets(line, sizeof line, rumors);
 		if ((endp = index(line, '\n')) != 0) *endp = 0;
-		Sprintf(rumor_buf, "F %06ld %s", rumor_start,
+		Sprintf(rumor_buf, "F %06ld %s", ftell_rumor_start,
 			xcrypt(line, xbuf));
 		putstr(tmpwin, 0, rumor_buf);
 
