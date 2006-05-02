@@ -355,7 +355,13 @@ do_rumors()
 	Strcat(filename,file_prefix);
 #endif
 	Sprintf(eos(filename), DATA_TEMPLATE, RUMOR_FILE);
-	if (!(ofp = fopen(filename, WRTMODE))) {
+	if (!(ofp = fopen(filename,
+#ifdef WIN32
+				    WRBMODE
+#else
+				    WRTMODE
+#endif
+					   ))) {
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
@@ -363,7 +369,13 @@ do_rumors()
 
 	Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
 	Strcat(infile, ".tru");
-	if (!(ifp = fopen(infile, RDTMODE))) {
+	if (!(ifp = fopen(infile,
+#ifdef WIN32
+				    RDBMODE
+#else
+				    RDTMODE
+#endif
+					   ))) {
 		perror(infile);
 		Fclose(ofp);
 		Unlink(filename);	/* kill empty output file */
@@ -393,7 +405,13 @@ do_rumors()
 
 	Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
 	Strcat(infile, ".fal");
-	if (!(ifp = fopen(infile, RDTMODE))) {
+	if (!(ifp = fopen(infile,
+#ifdef WIN32
+				  RDBMODE
+#else
+				  RDTMODE
+#endif
+					 ))) {
 		perror(infile);
 		Fclose(ofp);
 		Unlink(filename);	/* kill incomplete output file */
