@@ -4140,6 +4140,12 @@ rock mole
 	eat anything they come across in their diggings, although it
 	is still unknown how they convert some of these things into
 	something of nutritional value.
+rodent*
+	A gnawing mammal (order _Rodentia_) having in each jaw two
+	(rarely four) incisors, growing continually from persistent
+	pulps, and no canine teeth, as a squirrel, beaver, or rat.
+		[ Webster's Comprehensive International Dictionary
+		  of the English Language ]
 rogue
 * rogue
 	I understand the business, I hear it: to have an open ear, a
@@ -4153,6 +4159,14 @@ rogue
 	conceal it; and therein am I constant to my profession.
 		[ Autolycus the Rogue, from The Winter's Tale by
 			William Shakespeare ]
+roshi
+	Roshi is a Japanese word, common in Zen Buddhism, meaning "old"
+	(ro) and "teacher" (shi).  Roshi can be used as a term of
+	respect, as in the Rinzai school; as a simple reference to
+	actual age, as in the Soto school; or it can mean a teacher who
+	has transmitted knowledge to, and thus "given birth" to, a new
+	teacher.
+		[ Wikipedia, the free encyclopedia ]
 rothe
 	The rothe (pronounced roth-AY) is a musk ox-like creature with
 	an aversion to light.  It prefers to live underground near
@@ -4172,10 +4186,23 @@ rothe
 	seven and a half pounds to start off with would increase in
 	weight to five tons!"
 		[ Royal Jelly, by Roald Dahl ]
+ruby
+sapphire
+	_Corundum._  Mineral, aluminum oxide, Al2O3.  The clear
+	varieties are used as gems and the opaque as abrasive materials.
+	Corundum occurs in crystals of the hexagonal system and in
+	masses.  It is transparent to opaque and has a vitreous to
+	adamantine luster. ... The chief corundum gems are the ruby
+	(red) and the sapphire (blue).
+		[ The Columbia Encyclopedia, Sixth Edition ]
 rust monster
 	These strange creatures live on a diet of metals.  They can
 	turn a suit of armour into so much useless rusted scrap in no
 	time at all.
+# takes "rust monster or disenchanter" when specifying 'R'
+rust monster or disenchanter
+	These ground-dwelling monsters are known to make short
+	work out of degrading adventurers' combat equipment.
 *saber
 *sabre
 	Flashed all their sabres bare,
@@ -4276,6 +4303,12 @@ sasquatch
 	a Sasquatch -- not Burns's giant Indian, but the hairy apelike
 	creature that we have all come to know.
 		[ The Encyclopedia of Monsters, by Daniel Cohen ]
+scalpel
+	A scalpel is a very sharp knife used for surgery ... Merely
+	touching a medical scalpel with bare hands to test it will
+	cut through the skin. ... Medical scalpel blades are gradually
+	curved for greater precision when cutting through tissue.
+		[ Wikipedia, the free encyclopedia ]
 *sceptre of might
 	This mace was created aeons ago in some unknown cave,
 	and has been passed down from generation to generation of
@@ -4322,6 +4355,21 @@ scroll *
 	I read these words, and read again, and tried
 	My eyes against the heavens, and read again.
 		[ Endymion, by John Keats ]
+set
+seth
+	The ancient Egyptian god of chaos (Set), the embodiment of
+	hostility and even of outright evil.  He is also a god of war,
+	deserts, storms, and foreign lands. ... In the Book of the
+	Dead, Seth is called "Lord of the Northern Sky" and is held
+	responsible for storms and cloudy weather. ... Seth was
+	portrayed as a man with the head of undeterminable origin,
+	although some see in it the head of an aardvark.  He had a
+	curved snout, erect square-tipped ears and a long forked tail.
+	He was sometimes entirely in animal form with the body similar
+	to that of a greyhound.  Animals sacred to this god were the
+	dog, the jackal, the gazelle, the donkey, the crocodile, the
+	hippopotamus, and the pig.
+		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
 shad*
 	Shades are undead creatures.  They differ from zombies in
 	that a zombie is an undead animation of a corpse, while a
@@ -4355,6 +4403,31 @@ shark
 		[ Close to Shore, by Michael Capuzzo ]
 shito
 	A Japanese stabbing knife.
+shopkeeper
+	There have been three general theories put forward to explain
+	the phenomenon of the wandering shops or, as they are
+	generically known, _tabernae vagantes._
+	The first postulates that many thousands of years ago there
+	evolved somewhere in the multiverse a race whose single talent
+	was to buy cheap and sell dear.  Soon they controlled a vast
+	galactic empire or, as they put it, Emporium, and the more
+	advanced members of the species found a way to equip their very
+	shops with unique propulsion units that could break the dark
+	walls of space itself and open up vast new markets.  And long
+	after the worlds of the Emporium perished in the heat death of
+	their particular universe, after one last defiant fire sale,
+	the wandering starshops still ply their trade, eating their way
+	through the pages of spacetime like a worm through a three-
+	volume novel.
+	The second is that they are the creation of a sympathetic Fate,
+	charged with the role of supplying exactly the right thing
+	at the right time.
+	The third is that they are simply a very clever way of getting
+	around the various Sunday Closing acts.
+	All these theories, diverse as they are, have two things in
+	common.  They explain the observed facts, and they are
+	completely and utterly wrong.
+		[ The Light Fantastic, by Terry Pratchett ]
 shrieker
 	With a single, savage thrust of her spear, the warrior-woman
 	impaled the fungus, silencing it.  However, it was too late:
@@ -4386,6 +4459,12 @@ slasher
 	shall pay for this, and seven heads for the dog, who was a
 	better warrior than many a man."
 		[ Conan The Warrior, by Robert E Howard ]
+*sleep
+	Sleep is a death; oh, make me try
+	By sleeping, what it is to die,
+	And as gently lay my head
+	On my grave, as now my bed.
+		[ Religio Medici, by Sir Thomas Browne ]
 slime mold
 	Slime mold or slime fungus, organism usually classified with
 	the fungi, but showing equal affinity to the protozoa.  Slime
@@ -4412,7 +4491,6 @@ sling
 *snake
 serpent
 water moccasin
-python
 pit viper
 	Now the serpent was more subtle than any beast of the field
 	which the Lord God had made.  And he said unto the woman, Yea,
@@ -4446,11 +4524,18 @@ snickersnee
 	--Koko, Lord high executioner of Titipu
 		[ The Mikado, by Sir W.S. Gilbert ]
 sokoban
-	Sokoban (Japanese for "warehouse person") is a puzzle-type
-	game where the player must push around treasure to a goal
-	area.  It apparently won first prize in a Japanese programming
-	contest.
-		[ Xsokoban web site ]
+	Sokoban (Japanese for "warehouse keeper") is a transport puzzle
+	in which the player pushes boxes around a maze, viewed from
+	above, and tries to put them in designated locations.  Only one
+	box may be pushed at a time, not two, and boxes cannot be pulled.
+	As the puzzle would be extremely difficult to create physically,
+	it is usually implemented as a video game.
+
+	Sokoban was created in 1982 by Hiroyuki Imabayashi, and was
+	published by Thinking Rabbit, a software house based in
+	Takarazuka, Japan.  Thinking Rabbit also released three sequels:
+	Boxxle, Sokoban Perfect and Sokoban Revenge.
+		[ Wikipedia, the free encyclopedia ]
 *soldier
 sergeant
 lieutenant
@@ -4518,6 +4603,15 @@ javelin
 	against which you cannot prepare a perfect defense.
 					--Human aphorism
 		[ The Dosadi Experiment, by Frank Herbert ]
+squeaky board
+	A floorboard creaked.  Galder had spent many hours tuning them,
+	always a wise precaution with an ambitious assistant who walked
+	like a cat.
+	D flat.  That meant he was just to the right of the door.
+	"Ah, Trymon," he said, without turning, and noted with some
+	satisfaction the faint indrawing of breath behind him.  "Good
+	of you to come.  Shut the door, will you?"
+		[ The Light Fantastic, by Terry Pratchett ]
 ~*aesculapius
 *staff
 	So they stood, each in his place, neither moving a finger's
