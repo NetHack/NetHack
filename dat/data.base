@@ -124,8 +124,10 @@ maud
 	Than ever I have been yet!
 		[ Maud, And Other Poems by Alfred, Lord Tennyson ]
 ~amulet of yendor
+~amulet of restful sleep
 *amulet
 amulet of *
+amulet versus *
 	"The complete Amulet can keep off all the things that make
 	people unhappy -- jealousy, bad temper, pride, disagreeableness,
 	greediness, selfishness, laziness.  Evil spirits, people called
@@ -1138,7 +1140,7 @@ diamond
 	removes anger and quarrels; it heals the mad; it defends you
 	from your enemies.  It should be set in gold or silver and worn
 	on the left arm.  It is likewise found in Arabia.
-	  	[ The Aberdeen Bestiary, translated by Colin McLaren ]
+	 	[ The Aberdeen Bestiary, translated by Colin McLaren ]
 dilithium*
 	The most famous and the first to be named of the imaginary
 	"minerals" of Star Trek is dilithium. ... Because of this
@@ -1402,6 +1404,7 @@ electric eel
 	water, and earth.  Some mystics have postulated the necessity
 	for a fifth type, the spirit elemental, but none have ever
 	been encountered, at least on this plane of existence.
+~human or elf*
 ~elf ??m*
 *elf*
 elvenking
@@ -1893,8 +1896,10 @@ gold golem
 	strength, and they know cunning handiwork by gift of the immortal
 	gods.
 		[ The Iliad, by Homer ]
-~gold golem
 ~flesh golem
+~gold golem
+~straw golem
+~wood golem
 *golem
 	"The original story harks back, so they say, to the sixteenth
 	century.  Using long-lost formulas from the Kabbala, a rabbi is
@@ -2271,19 +2276,18 @@ humanoid
 	tribal nature, and will fiercely defend their lairs.  Usually
 	hostile, they may even band together to raid and pillage
 	human settlements.
+# takes "human or elf or you" when specifying '@' as a dwarf, gnome, or orc
 human
 chieftain
 guard
 ninja
 nurse
-page
 ronin
-shopkeeper
 student
-thug
 warrior
 *watch*
 player
+human or elf*
 	These strange creatures live mostly on the surface of the
 	earth, gathering together in societies of various forms, but
 	occasionally a stray will descend into the depths and commit
@@ -2860,8 +2864,10 @@ lichen
 	moss was in abundant life, some feathering, and some
 	gobleted, and some with fringe of red to it.
 		[ Lorna Doone, by R.D. Blackmore ]
+# takes "light" when specifying 'y'
 ~* of light
 * light
+light
 	Strange creatures formed from energy rather than matter,
 	lights are given to self-destructive behavior when battling
 	foes.
@@ -4708,6 +4714,25 @@ stormbringer
 	heard men cry so when his salvation and his nemesis, his
 	great black battle-blade Stormbringer, drank their souls.
 		[ The Lands Beyond the World, by Michael Moorcock ]
+*strange object
+	He walked for some time through a long narrow corridor
+	without finding any one and was just going to call out,
+	when suddenly in a dark corner between an old cupboard
+	and the door he caught sight of a strange object which
+	seemed to be alive.
+		[ Crime and Punishment, by Fyodor Dostoevsky ]
+straw golem
+	Dorothy leaned her chin upon her hand and gazed thoughtfully
+	at the Scarecrow.  Its head was a small sack stuffed with
+	straw, with eyes, nose, and mouth painted on it to represent
+	a face.  An old, pointed blue hat, that had belonged to some
+	Munchkin, was perched on his head, and the rest of the figure
+	was a blue suit of clothes, worn and faded, which had also
+	been stuffed with straw.  On the feet were some old boots with
+	blue tops, such as every man wore in this country, and the
+	figure was raised above the stalks of corn by means of the
+	pole stuck up its back.
+		[ The Wonderful Wizard of Oz, by L. Frank Baum ]
 susano*o
 	The Shinto chthonic and weather god and brother of the sun
 	goddess Amaterasu, he was born from the nose of the
@@ -4768,6 +4793,16 @@ thoth*amon
 	Pleasing remembrance of a thought foregone;
 	A lovely Beauty in a summer grave!
 		[ Sonnet, by William Wordsworth ]
+thug
+	A worshipper of Kali, who practised _thuggee_, the strangling
+	of human victims in the name of the religion.  Robbery of the
+	victim provided the means of livelihood.  They were also
+	called _Phansigars_ (Noose operators) from the method employed.
+	Vigorous suppression was begun by Lord William Bentinck in
+	1828, but the fraternity did not become completely extinct
+	for another 50 years or so.
+	In common parlance the word is used for any violent "tough".
+		[ Brewer's Concise Dictionary of Phrase and Fable ]
 tiger
 	1.  A well-known tropical predator (_Felis tigris_): a
 	feline.  It has a yellowish skin with darker spots or
@@ -4825,6 +4860,17 @@ titan
 	son, Zeus, and he and his fellow titans were ousted from
 	Mount Olympus.
 		[ Greek Mythology, by Richard Patrick ]
+topaz
+	Aluminum silicate mineral with either hydroxyl radicals or
+	fluorine, Al2SiO4(F,OH)2, used as a gem.  It is commonly
+	colorless or some shade of pale yellow to wine-yellow;
+	... The stone is transparent with a vitreous luster.  It has
+	perfect cleavage on the basal pinacoid, but it is nevertheless
+	hard and durable.  The brilliant cut is commonly used.  Topaz
+	crystals, which are of the orthorhombic system, occur in highly
+	acid igneous rocks, e.g., granites and rhyolites, and in
+	metamorphic rocks, e.g., gneisses and schists.
+		[ The Columbia Encyclopedia, Sixth Edition ]
 touch*stone
 	"Gold is tried by a touchstone, men by gold."
 		[ Chilon (c. 560 BC) ]
@@ -4870,6 +4916,7 @@ towel
 		[ The Hitchhiker's Guide to the Galaxy,
 		  by Douglas Adams ]
 *tower
+*tower of darkness
 	Towers (_brooding_, _dark_) stand alone in Waste Areas and
 	almost always belong to Wizards.  All are several stories high,
 	round, doorless, virtually windowless, and composed of smooth
@@ -4950,6 +4997,18 @@ tsurugi
 	special process, causing it to never rust.  The tsurugi is
 	rumored to be so sharp that it can occasionally cut
 	opponents in half!
+~*spellbook
+turquoise*
+	TUBAL:  There came divers of Antonio's creditors in my company
+	to Venice that swear he cannot choose but break.
+	SHYLOCK:  I am very glad of it; I'll plague him, I'll torture
+	him; I am glad of it.
+	TUBAL:  One of them showed me a ring that he had of your
+	daughter for a monkey.
+	SHYLOCK:  Out upon her!  Thou torturest me, Tubal.  It was my
+	turquoise; I had it of Leah when I was a bachelor; I would
+	not have given it for a wilderness of monkeys.
+		[ The Merchant of Venice, by William Shakespeare ]
 twoflower
 guide
 	"Rincewind!"
@@ -5083,9 +5142,19 @@ vrock
 	damage by biting and by using the claws on both its arms and
 	feet.
 wakizashi
-	The samurai warrior traditionally wears two swords; the
-	wakizashi is the shorter of the two.  See also katana.
-wand of *
+	A wakizashi was used as a samurai's weapon when the katana
+	was unavailable.  When entering a building, a samurai would
+	leave his katana on a rack near the entrance.  However, the
+	wakizashi would be worn at all times, and therefore, it made
+	a sidearm for the samurai (similar to a soldier's use of a
+	pistol).  The samurai would have worn it from the time they
+	awoke to the time they went to sleep.  In earlier periods,
+	and especially during times of civil wars, a tanto was worn
+	in place of a wakizashi.
+		[ Wikipedia, the free encyclopedia ]
+# takes "wand or a wall" when specifying '/'
+~*sleep
+wand *
 *wand
 	'Saruman!' he cried, and his voice grew in power and authority.
 	'Behold, I am not Gandalf the Grey, whom you betrayed.  I am
@@ -5142,6 +5211,32 @@ water
 	Nor any drop to drink.
 		[ The Rime of the Ancient Mariner, by Samuel Taylor
 		  Coleridge ]
+water demon
+	[ The monkey king ] walked along the bank, around the pond.
+	He examined the footprints of the animals that had gone into
+	the water, and saw that none came out again!  So he realized
+	this pond must be possessed by a water demon.  He said to the
+	80,000 monkeys, "This pond is possessed by a water demon.  Do
+	not let anybody go into it."
+
+	After a little while, the water demon saw that none of the
+	monkeys went into the water to drink.  So he rose out of the
+	middle of the pond, taking the shape of a frightening monster.
+	He had a big blue belly, a white face with bulging green eyes,
+	and red claws and feet.  He said, "Why are you just sitting
+	around?  Come into the pond and drink at once!"
+
+	The monkey king said to the horrible monster, "Are you the
+	water demon who owns this pond?"  "Yes, I am," said he.  "Do
+	you eat whoever goes into the water?" asked the king.  "Yes,
+	I do," he answered, "including even birds.  I eat them all.
+	And when you are forced by your thirst to come into the pond
+	and drink, I will enjoy eating you, the biggest monkey, most
+	of all!"  He grinned, and saliva dripped down his hairy chin.
+		[ Buddhist Tales for Young and Old, Vol. 1 ]
+weapon
+	A weapon is a device for making your enemy change his mind.
+		[ The Vor Game, by Lois McMaster Bujold ]
 web
 	Oh what a tangled web we weave,
 	When first we practise to deceive!
@@ -5190,6 +5285,36 @@ wolf
 	social animals, wolves live in family groups or packs made
 	up of multiple family units.  These packs cooperate in hunting
 	down prey.
+*wolfsbane
+	1.  Any of various, usually poisonous perennial herbs of the
+	genus Aconitum, having tuberous roots, palmately lobed leaves,
+	blue or white flowers with large hoodlike upper sepals, and an
+	aggregate of follicles.  2.  The dried leaves and roots of
+	some of these plants, which yield a poisonous alkaloid that
+	was formerly used medicinally.  In both senses also called
+	monkshood.
+	[ The American Heritage Dictionary of the English Language,
+	  Fourth Edition. ]
+wood golem
+	Come, old broomstick, you are needed,
+	Take these rags and wrap them round you!
+	Long my orders you have heeded,
+	By my wishes now I've bound you.
+	Have two legs and stand,
+	And a head for you.
+	Run, and in your hand
+	Hold a bucket too.
+	...
+	See him, toward the shore he's racing
+	There, he's at the stream already,
+	Back like lightning he is chasing,
+	Pouring water fast and steady.
+	Once again he hastens!
+	How the water spills,
+	How the water basins
+	Brimming full he fills!
+	[ The Sorcerer's Apprentice, by Johann Wolfgang von Goethe,
+	  translation by Edwin Zeydel ]
 woodchuck
 	The Usenet Oracle requires an answer to this question!
 
@@ -5233,13 +5358,18 @@ nazgul
 	glowed with a pale light.  He sprang forward and bore down
 	on Frodo.
 		[ The Fellowship of the Ring, by J.R.R. Tolkien ]
-wumpus
+*wumpus
 	The Wumpus, by the way, is not bothered by the hazards since
 	he has sucker feet and is too big for a bat to lift.  If you
 	try to shoot him and miss, there's also a chance that he'll
 	up and move himself into another cave, though by nature the
 	Wumpus is a sedentary creature.
 		[ wump (6) -- "Hunt the Wumpus" ]
+
+	_Wumpus yobgregorii_, in the flesh...
+	Later, all you will be able to remember are its eyes.  They
+	are rich mud-brown, and they hold your own without effort.
+		[ Hunter, In Darkness, by Andrew Plotkin ]
 xan
 	They sent their friend the mosquito [xan] ahead of them to
 	find out what lay ahead.  "Since you are the one who sucks
