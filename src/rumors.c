@@ -138,11 +138,12 @@ boolean exclude_cookie;
 		}
 		if ((endp = index(line, '\n')) != 0) *endp = 0;
 		Strcat(rumor_buf, xcrypt(line, xbuf));
-	    } while(count++ < 50 && exclude_cookie && (strstri(rumor_buf, "fortune") || strstri(rumor_buf, "pity")));
+	    } while (count++ < 50 && exclude_cookie &&
+		(strstri(rumor_buf, "fortune") || strstri(rumor_buf, "pity")));
 	    (void) dlb_fclose(rumors);
 	    if (count >= 50)
 		impossible("Can't find non-cookie rumor?");
-	    else
+	    else if (!in_mklev)	/* avoid exercizing wisdom for graffiti */
 		exercise(A_WIS, (adjtruth > 0));
 	} else {
 		pline("Can't open rumors file!");
