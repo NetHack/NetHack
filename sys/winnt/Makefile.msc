@@ -202,7 +202,7 @@ LFLAGSBASEG = $(linkdebug) $(guiflags) $(guilibsmt) comctl32.lib
 # Util builds
 #==========================================
 
-CFLAGSU = $(CFLAGSBASE) $(WINPFLAG)
+CFLAGSU = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
 LFLAGSU	= $(LFLAGSBASEC)
 
 #==========================================
@@ -1078,7 +1078,7 @@ spotless: clean
 	if exist $(DAT)\asmodeus.lev	del $(DAT)\asmodeus.lev
 	if exist $(DAT)\astral.lev	del $(DAT)\astral.lev
 	if exist $(DAT)\baalz.lev	del $(DAT)\baalz.lev
-	if exist $(DAT)\bigroom.lev	del $(DAT)\bigroom.lev
+	if exist $(DAT)\bigrm-*.lev	del $(DAT)\bigrm-*.lev
 	if exist $(DAT)\castle.lev	del $(DAT)\castle.lev
 	if exist $(DAT)\data		del $(DAT)\data
 	if exist $(DAT)\dungeon		del $(DAT)\dungeon
@@ -1104,6 +1104,7 @@ spotless: clean
 	if exist $(DAT)\valley.lev	del $(DAT)\valley.lev
 	if exist $(DAT)\water.lev	del $(DAT)\water.lev
 	if exist $(DAT)\wizard?.lev	del $(DAT)\wizard?.lev
+	if exist $(DAT)\dlb.lst		del $(DAT)\dlb.lst
 	if exist $(O)sp_lev.tag	        del $(O)sp_lev.tag
 	if exist $(SRC)\monstr.c        del $(SRC)\monstr.c
 	if exist $(SRC)\vis_tab.c       del $(SRC)\vis_tab.c
@@ -1113,7 +1114,6 @@ spotless: clean
 	if exist $(O)gamedir.tag        del $(O)gamedir.tag
 	if exist $(O)nh*key.lib         del $(O)nh*key.lib
 	if exist $(O)nh*key.exp         del $(O)nh*key.exp
-
 clean:
 	if exist $(O)*.o del $(O)*.o
 	if exist $(O)utility.tag   del $(O)utility.tag

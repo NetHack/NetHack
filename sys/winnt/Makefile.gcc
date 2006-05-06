@@ -215,7 +215,7 @@ LFLAGSBASEG = $(linkdebug) -mwindows
 # Util builds
 #==========================================
 
-CFLAGSU = $(CFLAGSBASE) $(WINPFLAG)
+CFLAGSU = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
 LFLAGSU = $(LFLAGSBASEC)
 
 #==========================================
