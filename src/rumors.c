@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)rumors.c	3.5	1996/04/20	*/
+/*	SCCS Id: @(#)rumors.c	3.5	2006/05/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,7 +15,19 @@
  * this also happens with real fortune cookies.  -dgk
  */
 
-/*	3.1
+/*	3.5
+ * The rumors file consists of a "do not edit" line, then a line containing
+ * three sets of three counts (first two in decimal, third in hexadecimal).
+ * The first set has the number of true rumors, the count in bytes for all
+ * true rumors, and the file offset to the first one.  The second set has
+ * the same group of numbers for the false rumors.  The third set has 0 for
+ * count, 0 for size, and the file offset for end-of-file.  The offset of
+ * the first true rumor plus the size of the true rumors matches the offset
+ * of the first false rumor.  Likewise, the offset of the first false rumor
+ * plus the size of the false rumors matches the offset for end-of-file.
+ */
+
+/*	3.1	[now obsolete for rumors but still accurate for oracles]
  * The rumors file consists of a "do not edit" line, a hexadecimal number
  * giving the number of bytes of useful/true rumors, followed by those
  * true rumors (one per line), followed by the useless/false/misleading/cute
@@ -41,21 +53,26 @@ STATIC_OVL void
 init_rumors(fp)
 dlb *fp;
 {
+	static const char rumors_header[] = "%d,%ld,%lx;%d,%ld,%lx;0,0,%lx\n";
+	int true_count, false_count;	/* in file but not used here */
+	long eof_offset;
 	char line[BUFSZ];
 
 	(void) dlb_fgets(line, sizeof line, fp); /* skip "don't edit" comment */
 	(void) dlb_fgets(line, sizeof line, fp);
-	if (sscanf(line, "%6lx\n", &true_rumor_size) == 1 &&
-	    true_rumor_size > 0L) {
-	    (void) dlb_fseek(fp, 0L, SEEK_CUR);
-	    true_rumor_start  = dlb_ftell(fp);
-	    true_rumor_end    = true_rumor_start + true_rumor_size;
-	    (void) dlb_fseek(fp, 0L, SEEK_END);
-	    false_rumor_end   = dlb_ftell(fp);
-	    false_rumor_start = true_rumor_end;	/* ok, so it's redundant... */
-	    false_rumor_size  = false_rumor_end - false_rumor_start;
-	} else
+	if (sscanf(line, rumors_header,
+	           &true_count, &true_rumor_size, &true_rumor_start,
+	           &false_count, &false_rumor_size, &false_rumor_start,
+	           &eof_offset) == 7 &&
+	    true_rumor_size > 0L && false_rumor_size > 0L) {
+	    true_rumor_end  = true_rumor_start + true_rumor_size;
+	 /* assert( true_rumor_end == false_rumor_start ); */
+	    false_rumor_end = false_rumor_start + false_rumor_size;
+	 /* assert( false_rumor_end == eof_offset ); */
+	} else {
 	    true_rumor_size = -1L;	/* init failed */
+	    (void) dlb_fclose(fp);
+	}
 }
 
 /* exclude_cookie is a hack used because we sometimes want to get rumors in a
@@ -145,8 +162,11 @@ rumor_check()
 	winid tmpwin;
 	char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
 
-	if (true_rumor_size < 0L)	/* we couldn't open RUMORFILE */
+	if (true_rumor_size < 0L) {	/* we couldn't open RUMORFILE */
+ no_rumors:
+		pline("rumors not accessible.");
 		return;
+	}
 
 	rumors = dlb_fopen(RUMORFILE, "r");
 
@@ -155,8 +175,7 @@ rumor_check()
 		rumor_buf[0] = '\0';
 		if (true_rumor_size == 0L) {	/* if this is 1st outrumor() */
 		    init_rumors(rumors);
-		    if (true_rumor_size < 0L) 	/* init failed */
-			return;
+		    if (true_rumor_size < 0L) goto no_rumors; /* init failed */
 		}
 		tmpwin = create_nhwindow(NHW_TEXT);
 
@@ -193,6 +212,13 @@ rumor_check()
 		Sprintf(rumor_buf, "T %06ld %s", ftell_rumor_start,
 			xcrypt(line, xbuf));
 		putstr(tmpwin, 0, rumor_buf);
+		/* find last true rumor */
+		while (dlb_fgets(line, sizeof line, rumors) &&
+			dlb_ftell(rumors) < true_rumor_end)
+		    continue;
+		if ((endp = index(line, '\n')) != 0) *endp = 0;
+		Sprintf(rumor_buf, "  %6s %s", "", xcrypt(line, xbuf));
+		putstr(tmpwin, 0, rumor_buf);
 
 		rumor_buf[0] = '\0';
 		(void) dlb_fseek(rumors, false_rumor_start, SEEK_SET);
@@ -201,6 +227,13 @@ rumor_check()
 		if ((endp = index(line, '\n')) != 0) *endp = 0;
 		Sprintf(rumor_buf, "F %06ld %s", ftell_rumor_start,
 			xcrypt(line, xbuf));
+		putstr(tmpwin, 0, rumor_buf);
+		/* find last false rumor */
+		while (dlb_fgets(line, sizeof line, rumors) &&
+			dlb_ftell(rumors) < false_rumor_end)
+		    continue;
+		if ((endp = index(line, '\n')) != 0) *endp = 0;
+		Sprintf(rumor_buf, "  %6s %s", "", xcrypt(line, xbuf));
 		putstr(tmpwin, 0, rumor_buf);
 
 		(void) dlb_fclose(rumors);

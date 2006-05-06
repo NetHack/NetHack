@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makedefs.c	3.5	2005/01/04	*/
+/*	SCCS Id: @(#)makedefs.c	3.5	2006/05/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -347,84 +347,110 @@ const char *str;
 void
 do_rumors()
 {
-	char	infile[60];
-	long	true_rumor_size;
+	static const char rumors_header[] =
+			"%s%04d,%06ld,%06lx;%04d,%06ld,%06lx;0,0,%06lx\n";
+	char	infile[60], tempfile[60];
+	int	true_rumor_count, false_rumor_count;
+	long	true_rumor_size, false_rumor_size,
+		true_rumor_offset, false_rumor_offset, eof_offset;
 
+	Sprintf(tempfile, DATA_TEMPLATE, "rumors.tmp");
 	filename[0]='\0';
 #ifdef FILE_PREFIX
-	Strcat(filename,file_prefix);
+	Strcat(filename, file_prefix);
 #endif
 	Sprintf(eos(filename), DATA_TEMPLATE, RUMOR_FILE);
-	if (!(ofp = fopen(filename,
-#ifdef WIN32
-				    WRBMODE
-#else
-				    WRTMODE
-#endif
-					   ))) {
+	if (!(ofp = fopen(filename, WRTMODE))) {
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,Dont_Edit_Data);
+	if (!(tfp = fopen(tempfile, WRTMODE))) {
+		perror(tempfile);
+		Fclose(ofp);
+		exit(EXIT_FAILURE);
+	}
+
+	true_rumor_count = false_rumor_count = 0;
+	true_rumor_size = false_rumor_size = 0L;
+	true_rumor_offset = false_rumor_offset = eof_offset = 0L;
+
+	/* output a dummy header record; we'll replace it in final output */
+	Fprintf(tfp, rumors_header, Dont_Edit_Data, 
+		true_rumor_count, true_rumor_size, true_rumor_offset,
+		false_rumor_count, false_rumor_size, false_rumor_offset,
+		eof_offset);
+	/* record the current position; true rumors will start here */
+	true_rumor_offset = ftell(tfp);
 
 	Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
 	Strcat(infile, ".tru");
-	if (!(ifp = fopen(infile,
-#ifdef WIN32
-				    RDBMODE
-#else
-				    RDTMODE
-#endif
-					   ))) {
+	if (!(ifp = fopen(infile, RDTMODE))) {
 		perror(infile);
-		Fclose(ofp);
-		Unlink(filename);	/* kill empty output file */
-		exit(EXIT_FAILURE);
+		goto rumors_failure;
 	}
 
-	/* get size of true rumors file */
-#ifndef VMS
-	(void) fseek(ifp, 0L, SEEK_END);
-	true_rumor_size = ftell(ifp);
-#else
-	/* seek+tell is only valid for stream format files; since rumors.%%%
-	   might be in record format, count the actual data bytes instead.
-	 */
-	true_rumor_size = 0;
-	while (fgets(in_line, sizeof in_line, ifp) != 0)
+	/* copy the true rumors */
+	while (fgets(in_line, sizeof in_line, ifp) != 0) {
+		true_rumor_count++;
 		true_rumor_size += strlen(in_line);	/* includes newline */
-#endif /* VMS */
-	Fprintf(ofp,"%06lx\n", true_rumor_size);
-	(void) fseek(ifp, 0L, SEEK_SET);
+		(void) fputs(xcrypt(in_line), tfp);
+	}
+	/* record the current position; false rumors will start here */
+	false_rumor_offset = ftell(tfp);
+	Fclose(ifp);		/* all done with rumors.tru */
 
-	/* copy true rumors */
-	while (fgets(in_line, sizeof in_line, ifp) != 0)
-		(void) fputs(xcrypt(in_line), ofp);
-
-	Fclose(ifp);
-
+	/* process rumors.fal */
 	Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
 	Strcat(infile, ".fal");
-	if (!(ifp = fopen(infile,
-#ifdef WIN32
-				  RDBMODE
-#else
-				  RDTMODE
-#endif
-					 ))) {
+	if (!(ifp = fopen(infile, RDTMODE))) {
 		perror(infile);
-		Fclose(ofp);
-		Unlink(filename);	/* kill incomplete output file */
-		exit(EXIT_FAILURE);
+		goto rumors_failure;
 	}
 
 	/* copy false rumors */
-	while (fgets(in_line, sizeof in_line, ifp) != 0)
-		(void) fputs(xcrypt(in_line), ofp);
+	while (fgets(in_line, sizeof in_line, ifp) != 0) {
+		false_rumor_count++;
+		false_rumor_size += strlen(in_line);	/* includes newline */
+		(void) fputs(xcrypt(in_line), tfp);
+	}
+	/* record the current position; EOF available for sanity check */
+	eof_offset = ftell(tfp);
+	Fclose(ifp);		/* all done with rumors.fal */
 
-	Fclose(ifp);
+	/* get ready to transfer the contents of temp file to output file */
+	Sprintf(in_line, "rewind of \"%s\"", tempfile);
+	if (rewind(tfp) != 0) {
+		perror(in_line);
+		goto rumors_failure;
+	}
+
+	/* output the header record */
+	Fprintf(ofp, rumors_header, Dont_Edit_Data, 
+		true_rumor_count, true_rumor_size, true_rumor_offset,
+		false_rumor_count, false_rumor_size, false_rumor_offset,
+		eof_offset);
+	/* skip the temp file's dummy header */
+	if (!fgets(in_line, sizeof in_line, tfp) ||	/* "Don't Edit" */
+	    !fgets(in_line, sizeof in_line, tfp)) {	/* count,size,offset */
+		perror(tempfile);
+		goto rumors_failure;
+	}
+	/* copy the rest of the temp file into the final output file */
+	while (fgets(in_line, sizeof in_line, tfp) != 0) {
+		(void) fputs(in_line, ofp);
+	}
+	/* all done; delete temp file */
+	Fclose(tfp);
+	Unlink(tempfile);
 	Fclose(ofp);
 	return;
+
+ rumors_failure:
+	Fclose(ofp);
+	Unlink(filename);	/* kill empty or incomplete output file */
+	Fclose(tfp);
+	Unlink(tempfile);	/* and temporary file */
+	exit(EXIT_FAILURE);
 }
 
 /*
