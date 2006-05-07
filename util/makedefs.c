@@ -392,12 +392,20 @@ do_rumors()
 	/* copy the true rumors */
 	while (fgets(in_line, sizeof in_line, ifp) != 0) {
 		true_rumor_count++;
+		/*[if we forced binary output, this would be sufficient]*/
 		true_rumor_size += strlen(in_line);	/* includes newline */
 		(void) fputs(xcrypt(in_line), tfp);
 	}
 	/* record the current position; false rumors will start here */
 	false_rumor_offset = ftell(tfp);
 	Fclose(ifp);		/* all done with rumors.tru */
+
+	/* the calculated value for true_rumor_count assumes that
+	   a single-byte line terminator is in use; for platforms
+	   which use two byte CR+LF, we need to override that value
+	   [it's much simpler to do so unconditionally, rendering
+	   the loop's accumulation above obsolete] */
+	true_rumor_size = false_rumor_offset - true_rumor_offset;
 
 	/* process rumors.fal */
 	Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
@@ -416,6 +424,10 @@ do_rumors()
 	/* record the current position; EOF available for sanity check */
 	eof_offset = ftell(tfp);
 	Fclose(ifp);		/* all done with rumors.fal */
+
+	/* as with true_rumor_count, override the accumulated value in
+	   case stdio converts \n into two byte CR+LF during output */
+	false_rumor_size = eof_offset - false_rumor_offset;
 
 	/* get ready to transfer the contents of temp file to output file */
 	Sprintf(in_line, "rewind of \"%s\"", tempfile);
