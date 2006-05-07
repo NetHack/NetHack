@@ -203,6 +203,7 @@ some monsters can eat tins in addition to corpses to cure some ailments
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------
+pcmain: check for dlb_init failure rather than relying on dungeon open failure
 win32gui: support perm_invent
 win32gui: menu option to add/remove windows captions
 win32gui: support for saving/restoring message history

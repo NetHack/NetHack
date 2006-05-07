@@ -6,6 +6,7 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include "patchlevel.h"
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -271,6 +272,18 @@ char *argv[];
 	if (comp_times((long)time(&clock_time)))
 		error("Your clock is incorrectly set!");
 #endif
+	if (!dlb_init()) {
+	    pline("%s\n%s\n%s\n\nNetHack was unable to open the required file \"%s\".%s",
+		COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B,
+		COPYRIGHT_BANNER_C, DLBFILE,
+#ifdef WIN32
+			"\nAre you perhaps trying to run NetHack within a zip utility?");
+#else
+			"");
+#endif
+		error("dlb_init failure.");
+	}
+
 	u.uhp = 1;	/* prevent RIP on early quits */
 	u.ux = 0;	/* prevent flush_screen() */
 
@@ -396,8 +409,6 @@ char *argv[];
 	 *  new game or before a level restore on a saved game.
 	 */
 	vision_init();
-
-	dlb_init();
 
 	display_gamewindows();
 #ifdef WIN32
