@@ -981,8 +981,22 @@ struct mkroom	*croom;
 
 	/*	corpsenm is "empty" if -1, random if -2, otherwise specific */
 	if (o->corpsenm != NON_PM) {
+
+	    /* Corpse was already created above, so the timers are
+	     * appropriate for otmp->corpsenm at the time of creation.
+	     * Since the next section is about to alter the type of
+	     * corpse directly, the timers must be removed, then re-added
+	     * afterwards.
+	     *
+	     * Failure to do so leads to inappropriate corpse types
+	     * behaving like a lizard or lichen corpse (no timer), or
+	     * behaving like a troll (revive timer).
+	     */
+
+	    if (otmp->otyp == CORPSE && otmp->timed) obj_stop_timers(otmp);
 	    if (o->corpsenm == NON_PM - 1) otmp->corpsenm = rndmonnum();
 	    else otmp->corpsenm = o->corpsenm;
+	    if (otmp->otyp == CORPSE) start_corpse_timeout(otmp);
 	    otmp->owt = weight(otmp);
 	}
 
