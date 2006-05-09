@@ -1146,6 +1146,7 @@ E struct obj *FDECL(mk_tt_object, (int,int,int));
 E struct obj *FDECL(mk_named_object,
 			(int,struct permonst *,int,int,const char *));
 E struct obj *FDECL(rnd_treefruit_at, (int, int));
+E void FDECL(set_corpsenm, (struct obj *, int));
 E void FDECL(start_corpse_timeout, (struct obj *));
 E void FDECL(bless, (struct obj *));
 E void FDECL(unbless, (struct obj *));

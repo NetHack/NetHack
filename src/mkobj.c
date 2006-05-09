@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2006/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -855,6 +855,43 @@ boolean artif;
 	    otmp = mk_artifact(otmp, (aligntyp)A_NONE);
 	otmp->owt = weight(otmp);
 	return(otmp);
+}
+
+/*
+ * Several areas of the code made direct reassignments
+ * to obj->corpsenm. Because some special handling is
+ * required in certain cases, place that handling here
+ * and call this routine in place of the direct assignment.
+ * 
+ * If the object was a lizard or lichen corpse:
+ *     - ensure that you don't end up with some
+ *       other corpse type which has no rot-away timer.
+ *
+ * If the object was a troll corpse:
+ *     - ensure that you don't end up with some other
+ *       corpse type which resurrects from the dead.
+ *
+ * Re-calculate the weight of the object to suit the
+ * new species.
+ *
+ */
+void
+set_corpsenm(obj, id)
+struct obj *obj;
+int id;
+{
+	
+	if (obj->timed) obj_stop_timers(obj);	/* corpse or figurine */
+	obj->corpsenm = id;
+	if (obj->otyp == CORPSE) {
+		start_corpse_timeout(obj);
+	} else if (obj->otyp == FIGURINE) {
+		if (obj->corpsenm != NON_PM
+		    && !dead_species(obj->corpsenm,TRUE)
+		    && (carried(obj) || mcarried(obj)))
+			attach_fig_transform_timeout(obj);
+	}
+	obj->owt = weight(obj);
 }
 
 /*

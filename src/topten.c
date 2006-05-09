@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)topten.c	3.5	2000/01/21	*/
+/*	SCCS Id: @(#)topten.c	3.5	2006/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -943,12 +943,9 @@ pickentry:
 		}
 		otmp = (struct obj *) 0;
 	} else {
-		/* reset timer in case corpse started out as lizard or troll */
-		if (otmp->otyp == CORPSE) obj_stop_timers(otmp);
-		otmp->corpsenm = classmon(tt->plrole, (tt->plgend[0] == 'F'));
-		otmp->owt = weight(otmp);
+		set_corpsenm(otmp,
+			classmon(tt->plrole, (tt->plgend[0] == 'F')));
 		otmp = oname(otmp, tt->name);
-		if (otmp->otyp == CORPSE) start_corpse_timeout(otmp);
 	}
 
 	(void) fclose(rfile);

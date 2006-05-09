@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2006/04/17	*/
+/*	SCCS Id: @(#)zap.c	3.5	2006/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1283,7 +1283,7 @@ poly_obj(obj, id)
 	/* Actually more things use corpsenm but they polymorph differently */
 #define USES_CORPSENM(typ) ((typ)==CORPSE || (typ)==STATUE || (typ)==FIGURINE)
 	    if (USES_CORPSENM(obj->otyp) && USES_CORPSENM(id))
-		otmp->corpsenm = obj->corpsenm;
+		set_corpsenm(otmp, obj->corpsenm);
 #undef USES_CORPSENM
 	}
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkmaze.c	3.5	2002/04/04	*/
+/*	SCCS Id: @(#)mkmaze.c	3.5	2006/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -421,8 +421,8 @@ fixup_special()
 		otmp = mk_tt_object(STATUE, x, y);
 		while (otmp && (poly_when_stoned(&mons[otmp->corpsenm]) ||
 				pm_resistance(&mons[otmp->corpsenm],MR_STONE))) {
-		    otmp->corpsenm = rndmonnum();
-		    otmp->owt = weight(otmp);
+		    /* set_corpsenm() handles weight too */
+		    set_corpsenm(otmp, rndmonnum());
 		}
 	    }
 	}
@@ -435,8 +435,8 @@ fixup_special()
 	if (otmp) {
 	    while (pm_resistance(&mons[otmp->corpsenm],MR_STONE)
 		   || poly_when_stoned(&mons[otmp->corpsenm])) {
-		otmp->corpsenm = rndmonnum();
-		otmp->owt = weight(otmp);
+		/* set_corpsenm() handles weight too */
+		set_corpsenm(otmp, rndmonnum());
 	    }
 	}
     } else if(Is_wiz1_level(&u.uz)) {

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sp_lev.c	3.5	2006/01/28	*/
+/*	SCCS Id: @(#)sp_lev.c	3.5	2006/05/09	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -981,23 +981,9 @@ struct mkroom	*croom;
 
 	/*	corpsenm is "empty" if -1, random if -2, otherwise specific */
 	if (o->corpsenm != NON_PM) {
-
-	    /* Corpse was already created above, so the timers are
-	     * appropriate for otmp->corpsenm at the time of creation.
-	     * Since the next section is about to alter the type of
-	     * corpse directly, the timers must be removed, then re-added
-	     * afterwards.
-	     *
-	     * Failure to do so leads to inappropriate corpse types
-	     * behaving like a lizard or lichen corpse (no timer), or
-	     * behaving like a troll (revive timer).
-	     */
-
-	    if (otmp->otyp == CORPSE && otmp->timed) obj_stop_timers(otmp);
-	    if (o->corpsenm == NON_PM - 1) otmp->corpsenm = rndmonnum();
-	    else otmp->corpsenm = o->corpsenm;
-	    if (otmp->otyp == CORPSE) start_corpse_timeout(otmp);
-	    otmp->owt = weight(otmp);
+	    if (o->corpsenm == NON_PM - 1)
+		set_corpsenm(otmp, rndmonnum());
+	    else set_corpsenm(otmp, o->corpsenm);
 	}
 
 	/* assume we wouldn't be given an egg corpsenm unless it was
@@ -1058,7 +1044,7 @@ struct mkroom	*croom;
 		}
 		mongone(was);
 	    }
-	    otmp->corpsenm = wastyp;
+	    set_corpsenm(otmp, wastyp);
 	    while(was->minvent) {
 		obj = was->minvent;
 		obj->owornmask = 0;

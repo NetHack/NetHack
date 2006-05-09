@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.5	2005/12/02	*/
+/*	SCCS Id: @(#)mhitm.c	3.5	2006/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -761,8 +761,7 @@ mdamagem(magr, mdef, mattk)
 		    struct obj *virtualcorpse = mksobj(CORPSE, FALSE, FALSE);
 		    int nutrit;
 
-		    virtualcorpse->corpsenm = num;
-		    virtualcorpse->owt = weight(virtualcorpse);
+		    set_corpsenm(virtualcorpse, num);
 		    nutrit = dog_nutrition(magr, virtualcorpse);
 		    dealloc_obj(virtualcorpse);
 
