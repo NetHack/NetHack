@@ -65,6 +65,7 @@ STATIC_DCL void FDECL(add_to_billobjs, (struct obj *));
 STATIC_DCL void FDECL(bill_box_content, (struct obj *, BOOLEAN_P, BOOLEAN_P,
 				     struct monst *));
 STATIC_DCL boolean FDECL(rob_shop, (struct monst *));
+STATIC_DCL boolean FDECL(special_stock, (struct obj *, struct monst *, BOOLEAN_P));
 
 /*
 	invariants: obj->unpaid iff onbill(obj) [unless bp->useup]
@@ -1971,6 +1972,27 @@ register struct obj *obj;
 	}
 }
 
+STATIC_OVL boolean
+special_stock(obj, shkp, quietly)
+struct obj *obj;
+struct monst *shkp;
+boolean quietly;
+{
+	/* for unique situations */
+	if ((strcmp(shkname(shkp), "Izchak") == 0) &&
+	     obj->otyp == CANDELABRUM_OF_INVOCATION) {
+		if (!quietly) {
+		    if (!u.uevent.invoked)
+			verbalize(
+			    "No thanks, I'd hang onto that if I were you.");
+		    else
+			verbalize("Take that out of here!");
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
 /* calculate how much the shk will pay when buying [all of] an object */
 STATIC_OVL long
 set_cost(obj, shkp)
@@ -2558,7 +2580,8 @@ xchar x, y;
 			    subfrombill(obj, shkp);
 		} else obj->no_charge = 1;
 
-		if(!unpaid && (sell_how != SELL_DONTSELL))
+		if(!unpaid && (sell_how != SELL_DONTSELL) &&
+		   !special_stock(obj, shkp, FALSE))
 		    pline("%s seems uninterested.", Monnam(shkp));
 		return;
 	}
