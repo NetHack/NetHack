@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)trap.c	3.5	2006/05/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2860,11 +2860,21 @@ xchar x, y;
 }
 
 void
-water_damage(obj, force, here)
-register struct obj *obj;
-register boolean force, here;
+water_damage(objp, force, here)
+struct obj **objp;
+boolean force, here;
 {
-	struct obj *otmp;
+	register struct obj *obj = *objp, *otmp;
+	boolean loose_obj = (obj && obj->where == OBJ_FREE);
+
+	if (loose_obj && (obj->nobj || obj->nexthere)) {
+		/* [this should actually be a panic()] */
+		impossible("water_damage: loose object has%s%s%s list%s?",
+			   obj->nobj ? " nobj" : "",
+			   (obj->nobj && obj->nexthere) ? " and" : "",
+			   obj->nexthere ? " nexthere" : "",
+			   (obj->nobj && obj->nexthere) ? "s" : "");
+	}
 
 	/* Scrolls, spellbooks, potions, weapons and
 	   pieces of armor may get affected by the water */
@@ -2879,7 +2889,7 @@ register boolean force, here;
 			if (force || !rn2(2)) obj->greased = 0;
 		} else if(Is_container(obj) && !Is_box(obj) &&
 			(obj->otyp != OILSKIN_SACK || (obj->cursed && !rn2(3)))) {
-			water_damage(obj->cobj, force, FALSE);
+			water_damage(&obj->cobj, force, FALSE);
 		} else if (!force && (Luck + 5) > rn2(20)) {
 			/*  chance per item of sustaining damage:
 			 *	max luck (full moon):	 5%
@@ -2902,8 +2912,14 @@ register boolean force, here;
 			else obj->otyp = SPE_BLANK_PAPER;
 		} else if (obj->oclass == POTION_CLASS) {
 			if (obj->otyp == POT_ACID) {
-				/* damage player/monster? */
+				/* [should we damage player/monster?] */
 				pline("A potion explodes!");
+				/* let caller know that obj has gone away
+				   [when obj is part of a list, delobj()'s
+				   obj_extract_self() takes care of this;
+				   for loose_obj, obj should always equal
+				   *objp and otmp should always be null] */
+				if (loose_obj && obj == *objp) *objp = otmp;
 				delobj(obj);
 				continue;
 			} else if (obj->odiluted) {
@@ -3024,7 +3040,7 @@ drown()
 			Hallucination ? "the Titanic" : "a rock");
 	}
 
-	water_damage(invent, FALSE, FALSE);
+	water_damage(&invent, FALSE, FALSE);
 
 	if (u.umonnum == PM_GREMLIN && rn2(3))
 	    (void)split_mon(&youmonst, (struct monst *)0);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.5	2004/06/12	*/
+/*	SCCS Id: @(#)extern.h	3.5	2006/05/08	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2173,7 +2173,7 @@ E void FDECL(fill_pit, (int,int));
 E int FDECL(float_down, (long, long));
 E void NDECL(climb_pit);
 E int FDECL(fire_damage, (struct obj *,BOOLEAN_P,BOOLEAN_P,XCHAR_P,XCHAR_P));
-E void FDECL(water_damage, (struct obj *,BOOLEAN_P,BOOLEAN_P));
+E void FDECL(water_damage, (struct obj **,BOOLEAN_P,BOOLEAN_P));
 E boolean NDECL(drown);
 E void FDECL(drain_en, (int));
 E int NDECL(dountrap);

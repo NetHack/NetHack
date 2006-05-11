@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)fountain.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)fountain.c	3.5	2006/05/08	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -125,7 +125,7 @@ genericptr_t poolcnt;
 	levl[x][y].typ = POOL;
 	/* No kelp! */
 	del_engr_at(x, y);
-	water_damage(level.objects[x][y], FALSE, TRUE);
+	water_damage(&level.objects[x][y], FALSE, TRUE);
 
 	if ((mtmp = m_at(x, y)) != 0)
 		(void) minliquid(mtmp);

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2006/03/20	*/
+/*	SCCS Id: @(#)do.c	3.5	2006/05/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -129,9 +129,9 @@ boolean pushing;
  * away.
  */
 boolean
-flooreffects(obj,x,y,verb)
+flooreffects(obj, x, y, verb)
 struct obj *obj;
-int x,y;
+int x, y;
 const char *verb;
 {
 	struct trap *t;
@@ -192,8 +192,8 @@ const char *verb;
 		return fire_damage(obj, FALSE, FALSE, x, y);
 	} else if (is_pool(x, y)) {
 		/* Reasonably bulky objects (arbitrary) splash when dropped.
-		 * If you're floating above the water even small things make noise.
-		 * Stuff dropped near fountains always misses */
+		 * If you're floating above the water even small things make
+		 * noise.  Stuff dropped near fountains always misses */
 		if ((Blind || (Levitation || Flying)) && !Deaf &&
 		    ((x == u.ux) && (y == u.uy))) {
 		    if (!Underwater) {
@@ -206,7 +206,8 @@ const char *verb;
 		    map_background(x, y, 0);
 		    newsym(x, y);
 		}
-		water_damage(obj, FALSE, FALSE);
+		water_damage(&obj, FALSE, FALSE);
+		if (!obj) return TRUE;
 	} else if (u.ux == x && u.uy == y &&
 		(t = t_at(x,y)) != 0 && uteetering_at_seen_pit(t)) {
 		if (Blind && !Deaf)

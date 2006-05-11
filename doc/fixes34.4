@@ -217,6 +217,8 @@ properly handle destruction of equipment carried by monsters hit by
 don't exercize or abuse wisdom when rumors get used for random graffiti
 create_object() created lizard corpses without timers and troll corpses with
 	their revive timers, then changed the corpsenm field
+when a potion of acid was dropped into water and exploded, nethack would
+	continue to use already freed memory and later might panic or crash
 
 
 Platform- and/or Interface-Specific Fixes

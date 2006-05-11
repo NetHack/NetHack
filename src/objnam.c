@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2006/05/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2583,7 +2583,7 @@ srch:
 			del_engr_at(u.ux, u.uy);
 			pline("A pool.");
 			/* Must manually make kelp! */
-			water_damage(level.objects[u.ux][u.uy], FALSE, TRUE);
+			water_damage(&level.objects[u.ux][u.uy], FALSE, TRUE);
 			newsym(u.ux, u.uy);
 			return &zeroobj;
 		}
