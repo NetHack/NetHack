@@ -13,7 +13,7 @@ STATIC_DCL int FDECL(still_chewing,(XCHAR_P,XCHAR_P));
 STATIC_DCL void NDECL(dosinkfall);
 #endif
 STATIC_DCL boolean FDECL(findtravelpath, (BOOLEAN_P));
-STATIC_DCL boolean FDECL(monstinroom, (struct permonst *,int,struct monst **));
+STATIC_DCL struct monst *FDECL(monstinroom, (struct permonst *,int));
 STATIC_DCL boolean FDECL(doorless_door, (int,int));
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
 
@@ -1648,25 +1648,19 @@ stillinwater:;
 	}
 }
 
-STATIC_OVL boolean
-monstinroom(mdat,roomno,mon)
+/* returns first matching monster */
+STATIC_OVL struct monst *
+monstinroom(mdat,roomno)
 struct permonst *mdat;
-struct monst **mon;
 int roomno;
 {
 	register struct monst *mtmp;
 
-	if (mon) *mon = (struct monst *)0;
 	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 		if(!DEADMONSTER(mtmp) && mtmp->data == mdat &&
-		   index(in_rooms(mtmp->mx, mtmp->my, 0), roomno + ROOMOFFSET)) {
-			/*  If the monster is one-of-a-kind then update mon
-			 *  with a pointer to that monster.
-			 */
-			if (mon && (mdat->geno & G_UNIQ)) *mon = mtmp;
-			return(TRUE);
-		}
-	return(FALSE);
+		   index(in_rooms(mtmp->mx, mtmp->my, 0), roomno + ROOMOFFSET))
+			return mtmp;
+	return (struct monst *)0;
 }
 
 char *
@@ -1808,7 +1802,7 @@ void
 check_special_room(newlev)
 register boolean newlev;
 {
-	struct monst *mtmp, *uniquemon = (struct monst *)0;
+	register struct monst *mtmp;
 	char *ptr;
 
 	move_update(newlev);
@@ -1862,24 +1856,26 @@ register boolean newlev;
 		    You("enter an anthole!");
 		    break;
 		case BARRACKS:
-		    if(monstinroom(&mons[PM_SOLDIER], roomno, &uniquemon) ||
-			monstinroom(&mons[PM_SERGEANT], roomno, &uniquemon) ||
-			monstinroom(&mons[PM_LIEUTENANT], roomno, &uniquemon) ||
-			monstinroom(&mons[PM_CAPTAIN], roomno, &uniquemon))
+		    if(monstinroom(&mons[PM_SOLDIER], roomno) ||
+			monstinroom(&mons[PM_SERGEANT], roomno) ||
+			monstinroom(&mons[PM_LIEUTENANT], roomno) ||
+			monstinroom(&mons[PM_CAPTAIN], roomno))
 			You("enter a military barracks!");
 		    else
 			You("enter an abandoned barracks.");
 		    break;
 		case DELPHI:
-		    if(monstinroom(&mons[PM_ORACLE], roomno, &uniquemon)) {
-		        if (uniquemon && !uniquemon->mpeaceful)
+		    {
+			struct monst *oracle = monstinroom(&mons[PM_ORACLE],
+								roomno);
+			if (oracle && !oracle->mpeaceful)
 		            verbalize("You're in Delphi, %s.",
 		            		plname);
-		        else
+			else
 			    verbalize("%s, %s, welcome to Delphi!",
 					Hello((struct monst *) 0), plname);
+		        break;
 		    }
-		    break;
 		case TEMPLE:
 		    intemple(roomno + ROOMOFFSET);
 		    /* fall through */
