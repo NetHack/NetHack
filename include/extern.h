@@ -1986,6 +1986,7 @@ E boolean FDECL(saleable, (struct monst *,struct obj *));
 E int FDECL(get_shop_item, (int));
 E const char *FDECL(shkname, (struct monst *));
 E boolean FDECL(shkname_is_pname, (struct monst *));
+E boolean FDECL(is_izchak, (struct monst *,BOOLEAN_P));
 
 /* ### sit.c ### */
 

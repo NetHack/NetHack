@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)shk.c	3.5	2006/05/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1979,16 +1979,24 @@ struct monst *shkp;
 boolean quietly;
 {
 	/* for unique situations */
-	if ((strcmp(shkname(shkp), "Izchak") == 0) &&
-	     obj->otyp == CANDELABRUM_OF_INVOCATION) {
-		if (!quietly) {
-		    if (!u.uevent.invoked)
+	if (ESHK(shkp)->shoptype == CANDLESHOP &&
+		obj->otyp == CANDELABRUM_OF_INVOCATION) {
+	    if (!quietly) {
+		if (is_izchak(shkp, TRUE) && !u.uevent.invoked) {
+		    verbalize("No thanks, I'd hang onto that if I were you.");
+		    if (obj->spe < 7)
 			verbalize(
-			    "No thanks, I'd hang onto that if I were you.");
-		    else
-			verbalize("Take that out of here!");
+			    "You'll need %d%s candle%s to go along with it.",
+				  (7 - obj->spe),
+				  (obj->spe > 0) ? " more" : "",
+				  plur(7 - obj->spe));
+		    /* [what if hero is already carrying enough candles?
+		       should Izchak explain how to attach them instead] */
+		} else {
+		    verbalize("I won't stock that.  Take it out of here!");
 		}
-		return TRUE;
+	    }
+	    return TRUE;
 	}
 	return FALSE;
 }
@@ -3802,7 +3810,7 @@ struct monst *shkp;
 	else if (shkmoney > 4000)
 #endif
 		pline("%s says that business is good.", shkname(shkp));
-	else if (strcmp(shkname(shkp), "Izchak") == 0)
+	else if (is_izchak(shkp, FALSE))
 		pline(Izchak_speaks[rn2(SIZE(Izchak_speaks))],shkname(shkp));
 	else
 		pline("%s talks about the problem of shoplifters.",shkname(shkp));

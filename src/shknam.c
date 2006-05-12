@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shknam.c	3.5	2006/01/03	*/
+/*	SCCS Id: @(#)shknam.c	3.5	2006/05/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -702,6 +702,23 @@ struct monst *mtmp;
     const char *shknm = ESHK(mtmp)->shknam;
 
     return (*shknm == '-' || *shknm == '+' || *shknm == '=');
+}
+
+boolean
+is_izchak(shkp, override_hallucination)
+struct monst *shkp;
+boolean override_hallucination;
+{
+    const char *shknm;
+
+    if (Hallucination && !override_hallucination) return FALSE;
+    if (!shkp->isshk) return FALSE;
+    /* outside of town, Izchak becomes just an ordinary shopkeeper */
+    if (!in_town(shkp->mx, shkp->my)) return FALSE;
+    shknm = ESHK(shkp)->shknam;
+    /* skip "+" prefix */
+    if (!letter(*shknm)) ++shknm;
+    return !strcmp(shknm, "Izchak");
 }
 
 /*shknam.c*/
