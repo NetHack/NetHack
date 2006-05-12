@@ -1868,12 +1868,14 @@ register boolean newlev;
 		    {
 			struct monst *oracle = monstinroom(&mons[PM_ORACLE],
 								roomno);
-			if (oracle && !oracle->mpeaceful)
-		            verbalize("You're in Delphi, %s.",
-		            		plname);
-			else
-			    verbalize("%s, %s, welcome to Delphi!",
+			if (oracle) {
+			    if (!oracle->mpeaceful)
+				verbalize("You're in Delphi, %s.",
+		            			plname);
+			    else
+				verbalize("%s, %s, welcome to Delphi!",
 					Hello((struct monst *) 0), plname);
+			}
 		        break;
 		    }
 		case TEMPLE:
