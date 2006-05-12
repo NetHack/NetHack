@@ -1338,7 +1338,8 @@ register struct monst *mtmp;
 	notseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data)));
 	/* add cases as required.  eg. Displacement ... */
 	if (notseen || Underwater) {
-	    /* Xorns can smell valuable metal like gold, treat as seen */
+	    /* Xorns can smell quantities of valuable metal
+		like that in solid gold coins, treat as seen */
 	    if ((mtmp->data == &mons[PM_XORN]) &&
 #ifndef GOLDOBJ
 			u.ugold
