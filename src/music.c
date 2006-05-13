@@ -403,6 +403,10 @@ struct obj *instr;
 	struct obj itmp;
 
 	itmp = *instr;
+	itmp.oextra = (struct oextra *)0;  /* ok on this copy as instr maintains
+					      the ptr to free at some point if
+					      there is one */
+
 	/* if won't yield special effect, make sound of mundane counterpart */
 	if (!do_spec || instr->spe <= 0)
 	    while (objects[itmp.otyp].oc_magic) itmp.otyp -= 1;

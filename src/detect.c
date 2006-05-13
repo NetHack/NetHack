@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)detect.c	3.5	2005/11/09	*/
+/*	SCCS Id: @(#)detect.c	3.5	2006/05/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -259,7 +259,7 @@ outgoldmap:
 	if (findgold(mtmp->minvent) || monsndx(mtmp->data) == PM_GOLD_GOLEM) {
 #endif
 	    struct obj gold;
-
+	    gold = zeroobj;		/* ensure oextra is cleared too */
 	    gold.otyp = GOLD_PIECE;
 	    gold.ox = mtmp->mx;
 	    gold.oy = mtmp->my;
@@ -540,6 +540,7 @@ int		class;		/* an object class, 0 for all */
 		(!class || class == objects[mtmp->mappearance].oc_class)) {
 	    struct obj temp;
 
+	    temp.oextra = (struct oextra *)0;
 	    temp.otyp = mtmp->mappearance;	/* needed for obj_to_glyph() */
 	    temp.ox = mtmp->mx;
 	    temp.oy = mtmp->my;
@@ -551,7 +552,7 @@ int		class;		/* an object class, 0 for all */
 	} else if (findgold(mtmp->minvent) && (!class || class == COIN_CLASS)) {
 #endif
 	    struct obj gold;
-
+	    gold = zeroobj;		/* ensure oextra is cleared too */
 	    gold.otyp = GOLD_PIECE;
 	    gold.ox = mtmp->mx;
 	    gold.oy = mtmp->my;
@@ -649,7 +650,9 @@ xchar x, y;
 int src_cursed;
 {
     if (Hallucination || src_cursed) {
-	struct obj obj;			/* fake object */
+	struct obj obj;		/* fake object */
+
+	obj.oextra = (struct oextra *)0;
 	if (trap) {
 	    obj.ox = trap->tx;
 	    obj.oy = trap->ty;

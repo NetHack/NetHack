@@ -403,6 +403,7 @@ display_monster(x, y, mon, sightflags, worm_tail)
 	    case M_AP_OBJECT: {
 		struct obj obj;	/* Make a fake object to send	*/
 				/* to map_object().		*/
+		obj.oextra = (struct oextra *)0;
 		obj.ox = x;
 		obj.oy = y;
 		obj.otyp = mon->mappearance;

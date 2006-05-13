@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2005/12/05	*/
+/*	SCCS Id: @(#)apply.c	3.5	2006/05/13 	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1997,6 +1997,9 @@ struct obj *tstone;
     if (obj->oclass == COIN_CLASS) {
 	u.ugold += obj->quan;	/* keep botl up to date */
 	goldobj = *obj;
+	goldobj.oextra = (struct oextra *)0; /* dealloc_obj(obj) will invalidate
+					        the target of this copied ptr
+						here, so clear it out */
 	dealloc_obj(obj);
 	obj = &goldobj;
     }

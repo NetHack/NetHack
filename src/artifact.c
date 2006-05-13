@@ -1233,7 +1233,7 @@ arti_invoke(obj)
 	case TAMING: {
 	    struct obj pseudo;
 
-	    pseudo = zeroobj;	/* neither cursed nor blessed */
+	    pseudo = zeroobj;	/* neither cursed nor blessed, zero oextra too */
 	    pseudo.otyp = SCR_TAMING;
 	    (void) seffects(&pseudo);
 	    break;
