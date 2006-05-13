@@ -923,6 +923,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 	}
 
 	thrownobj = obj;
+	thrownobj->was_thrown = 1;
 
 	if(u.uswallow) {
 		mon = u.ustuck;

@@ -99,7 +99,7 @@ struct obj {
 #endif
 	Bitfield(greased,1);	/* covered with grease */
 	Bitfield(nomerge,1);	/* set temporarily to prevent merging */
-	/* 1 free bit */
+	Bitfield(was_thrown,1);	/* thrown by hero since last picked up */
 
 	Bitfield(in_use,1);	/* for magic items before useup items */
 	Bitfield(bypass,1);	/* mark this as an object to be skipped by bhito() */

@@ -155,6 +155,7 @@ static struct Bool_Opt
 	{"page_wait", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"perm_invent", &flags.perm_invent, FALSE, SET_IN_GAME},
+	{"pickup_thrown", &flags.pickup_thrown, TRUE, SET_IN_GAME},
 	{"popup_dialog",  &iflags.wc_popup_dialog, FALSE, SET_IN_GAME},	/*WC*/
 	{"prayconfirm", &flags.prayconfirm, TRUE, SET_IN_GAME},
 	{"preload_tiles", &iflags.wc_preload_tiles, TRUE, DISP_IN_GAME},	/*WC*/

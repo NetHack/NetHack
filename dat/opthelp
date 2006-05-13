@@ -24,6 +24,7 @@ null           allow nulls to be sent to your terminal            [TRUE]
                try turning this option off (forcing NetHack to use its own
                delay code) if moving objects seem to teleport across rooms
 perm_invent    keep inventory in a permanent window               [FALSE]
+pickup_thrown  override pickup_types for thrown objects           [TRUE]
 prayconfirm    use confirmation prompt when #pray command issued  [TRUE]
 pushweapon     when wielding a new weapon, put your previously
                wielded weapon into the secondary weapon slot      [FALSE]

@@ -200,6 +200,7 @@ allow digging an adjacent pit with wand of digging while trapped in a pit
 #terrain command for debug mode
 digging can activate or disarm some types of traps
 some monsters can eat tins in addition to corpses to cure some ailments
+add Roderick Schertler's pickup_thrown patch
 
 
 Platform- and/or Interface-Specific New Features
