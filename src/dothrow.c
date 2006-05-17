@@ -561,9 +561,8 @@ hurtle_step(arg, x, y)
 		return TRUE;
     	} else {
 		if (ttmp->tseen)
-		    You("pass right over %s %s.",
-		    	(ttmp->ttyp == ARROW_TRAP) ? "an" : "a",
-		    	defsyms[trap_to_defsym(ttmp->ttyp)].explanation);
+		    You("pass right over %s.",
+		    	an(defsyms[trap_to_defsym(ttmp->ttyp)].explanation));
     	}
     }
     if (--*range < 0)		/* make sure our range never goes negative */
