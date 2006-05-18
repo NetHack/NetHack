@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2006/04/15	*/
+/*	SCCS Id: @(#)invent.c	3.5	2006/05/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -259,7 +259,7 @@ struct obj *obj;
 		    if (u.uhave.questart)
 			impossible("already have quest artifact?");
 		    u.uhave.questart = 1;
-		    artitouch();
+		    artitouch(obj);
 		}
 		set_artifact_intrinsic(obj, 1, W_ART);
 	}

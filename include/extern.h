@@ -1733,7 +1733,7 @@ E void FDECL(free_epri, (struct monst *));
 
 E void NDECL(onquest);
 E void NDECL(nemdead);
-E void NDECL(artitouch);
+E void FDECL(artitouch, (struct obj *));
 E boolean NDECL(ok_to_quest);
 E void FDECL(leader_speaks, (struct monst *));
 E void NDECL(nemesis_speaks);

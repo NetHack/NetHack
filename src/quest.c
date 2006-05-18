@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)quest.c	3.5	2000/05/05	*/
+/*	SCCS Id: @(#)quest.c	3.5	2006/05/17	*/
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -82,9 +82,14 @@ nemdead()
 }
 
 void
-artitouch()
+artitouch(obj)
+struct obj *obj;
 {
 	if(!Qstat(touched_artifact)) {
+	    /* in case we haven't seen the item yet (ie, currently blinded),
+	       this quest message describes it by name so mark it as seen */
+	    obj->dknown = 1;
+	    /* only give this message once */
 	    Qstat(touched_artifact) = TRUE;
 	    qt_pager(QT_GOTIT);
 	    exercise(A_WIS, TRUE);
