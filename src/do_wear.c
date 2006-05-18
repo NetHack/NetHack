@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.5	2005/12/07	*/
+/*	SCCS Id: @(#)do_wear.c	3.5	2006/05/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -51,25 +51,28 @@ STATIC_DCL void FDECL(already_wearing2, (const char*, const char*));
 
 void
 off_msg(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
-	if(flags.verbose)
+	if (flags.verbose)
 	    You("were wearing %s.", doname(otmp));
 }
 
 /* for items that involve no delay */
 STATIC_OVL void
 on_msg(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
 	if (flags.verbose) {
 	    char how[BUFSZ];
+	    /* call xname() before obj_is_pname(); formatting obj's name
+	       might set obj->dknown and that affects the pname test */
+	    const char *otmp_name = xname(otmp);
 
 	    how[0] = '\0';
 	    if (otmp->otyp == TOWEL)
 		Sprintf(how, " around your %s", body_part(HEAD));
 	    You("are now wearing %s%s.",
-		obj_is_pname(otmp) ? the(xname(otmp)) : an(xname(otmp)),
+		obj_is_pname(otmp) ? the(otmp_name) : an(otmp_name),
 		how);
 	}
 }
