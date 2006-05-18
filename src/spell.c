@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.5	2006/02/10	*/
+/*	SCCS Id: @(#)spell.c	3.5	2006/05/17	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,6 +7,7 @@
 /* spellmenu arguments; 0 thru n-1 used as spl_book[] index when swapping */
 #define SPELLMENU_CAST (-2)
 #define SPELLMENU_VIEW (-1)
+#define SPELLMENU_SORT (MAXSPELL)	/* special menu entry */
 
 /* spell retention period, in turns; at 10% of this value, player becomes
    eligible to reread the spellbook and regain 100% retention (the threshold
@@ -30,6 +31,9 @@ STATIC_DCL boolean FDECL(confused_book, (struct obj *));
 STATIC_DCL void FDECL(deadbook, (struct obj *));
 STATIC_PTR int NDECL(learn);
 STATIC_DCL boolean FDECL(getspell, (int *));
+STATIC_PTR int FDECL(CFDECLSPEC spell_cmp,(const genericptr,const genericptr));
+STATIC_DCL void NDECL(sortspells);
+STATIC_DCL boolean NDECL(spellsortmenu);
 STATIC_DCL boolean FDECL(dospellmenu, (const char *,int,int *));
 STATIC_DCL int FDECL(percent_success, (int));
 STATIC_DCL char *FDECL(spellretention, (int,char *));
@@ -1069,6 +1073,181 @@ losespells()
 	}
 }
 
+/*
+ * Allow player to sort the list of known spells.  Manually swapping
+ * pairs of them becomes very tedious once the list reaches two pages.
+ *
+ * Possible extensions:
+ *	provide means for player to control ordering of skill classes;
+ *	provide means to supply value N such that first N entries stick
+ *	while rest of list is being sorted;
+ *	make chosen sort order be persistent such that when new spells
+ *	are learned, they get inserted into sorted order rather than be
+ *	appended to the end of the list?
+ */
+static const char *spl_sortchoices[] = {
+	"by casting letter",
+#define SORTBY_LETTER	0
+	"alphabetically",
+#define SORTBY_ALPHA	1
+	"by level, low to high",
+#define SORTBY_LVL_LO	2
+	"by level, high to low",
+#define SORTBY_LVL_HI	3
+	"by skill group, alphabetized within each group",
+#define SORTBY_SKL_AL	4
+	"by skill group, low to high level within group",
+#define SORTBY_SKL_LO	5
+	"by skill group, high to low level within group",
+#define SORTBY_SKL_HI	6
+	"maintain current ordering",
+#define SORTBY_CURRENT	7
+	/* a menu choice rather than a sort choice */
+	"reassign casting letters to retain current order",
+#define SORTRETAINORDER	8
+};
+static int spl_sortmode = 0;	/* index into spl_sortchoices[] */
+static int *spl_orderindx = 0;	/* array of spl_book[] indices */
+
+/* qsort callback routine */
+STATIC_PTR int CFDECLSPEC
+spell_cmp(vptr1, vptr2)
+const genericptr vptr1;
+const genericptr vptr2;
+{
+    /*
+     * gather up all of the possible parameters except spell name
+     * in advance, even though some might not be needed:
+     *	indx? = spl_orderindx[] index into spl_book[];
+     *	otyp? = spl_book[] index into objects[];
+     *	levl? = spell level;
+     *	skil? = skill group aka spell class;
+     */
+    int indx1 = *(int *)vptr1, indx2 = *(int *)vptr2,
+	otyp1 = spl_book[indx1].sp_id, otyp2 = spl_book[indx2].sp_id,
+	levl1 = objects[otyp1].oc_level, levl2 = objects[otyp2].oc_level,
+	skil1 = objects[otyp1].oc_skill, skil2 = objects[otyp2].oc_skill;
+
+    switch (spl_sortmode) {
+    case SORTBY_LETTER:
+	return indx1 - indx2;
+    case SORTBY_ALPHA:
+	break;
+    case SORTBY_LVL_LO:
+	if (levl1 != levl2) return levl1 - levl2;
+	break;
+    case SORTBY_LVL_HI:
+	if (levl1 != levl2) return levl2 - levl1;
+	break;
+    case SORTBY_SKL_AL:
+	if (skil1 != skil2) return skil1 - skil2;
+	break;
+    case SORTBY_SKL_LO:
+	if (skil1 != skil2) return skil1 - skil2;
+	if (levl1 != levl2) return levl1 - levl2;
+	break;
+    case SORTBY_SKL_HI:
+	if (skil1 != skil2) return skil1 - skil2;
+	if (levl1 != levl2) return levl2 - levl1;
+	break;
+    case SORTBY_CURRENT:
+    default:
+	return (vptr1 < vptr2) ? -1 : (vptr1 > vptr2); /* keep current order */
+    }
+    /* tie-breaker for most sorts--alphabetical by spell name */
+    return strcmpi(OBJ_NAME(objects[otyp1]),
+		   OBJ_NAME(objects[otyp2]));
+}
+
+/* sort the index used for display order of the "view known spells"
+   list (sortmode == SORTBY_xxx), or sort the spellbook itself to make
+   the current display order stick (sortmode == SORTRETAINORDER) */
+STATIC_OVL void
+sortspells()
+{
+    int i;
+#if defined(SYSV) || defined(DGUX)
+    unsigned n;
+#else
+    int n;
+#endif
+
+    if (spl_sortmode == SORTBY_CURRENT) return;
+    for (n = 0; n < MAXSPELL && spellid(n) != NO_SPELL; ++n) continue;
+    if (n < 2) return;	/* not enough entries to need sorting */
+
+    if (!spl_orderindx) {
+	/* we haven't done any sorting yet; list is in casting order */
+	if (spl_sortmode == SORTBY_LETTER ||		/* default */
+	    spl_sortmode == SORTRETAINORDER) return;
+	/* allocate enough for full spellbook rather than just N spells */
+	spl_orderindx = (int *)alloc(MAXSPELL * sizeof (int));
+	for (i = 0; i < MAXSPELL; i++) spl_orderindx[i] = i;
+    }
+
+    if (spl_sortmode == SORTRETAINORDER) {
+	struct spell tmp_book[MAXSPELL];
+
+	/* sort spl_book[] rather than spl_orderindx[];
+	   this also updates the index to reflect the new ordering (we
+	   could just free it since that ordering becomes the default) */
+	for (i = 0; i < MAXSPELL; i++)
+	    tmp_book[i] = spl_book[spl_orderindx[i]];
+	for (i = 0; i < MAXSPELL; i++)
+	    spl_book[i] = tmp_book[i],  spl_orderindx[i] = i;
+	spl_sortmode = SORTBY_LETTER;		/* reset */
+	return;
+    }
+
+    /* usual case, sort the index rather than the spells themselves */
+    qsort((genericptr_t)spl_orderindx, n, sizeof *spl_orderindx, spell_cmp);
+    return;
+}
+
+/* called if the [sort spells] entry in the view spells menu gets chosen */
+STATIC_OVL boolean
+spellsortmenu()
+{
+    winid tmpwin;
+    menu_item *selected;
+    anything any;
+    char let;
+    int i, n, choice;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    any.a_void = 0;		/* zero out all bits */
+
+    for (i = 0; i < SIZE(spl_sortchoices); i++) {
+	if (i == SORTRETAINORDER) {
+	    let = 'z';	/* assumes fewer than 26 sort choices... */
+	    /* separate final choice from others with a blank line */
+	    any.a_int = 0;
+	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
+		     MENU_UNSELECTED);
+	} else {
+	    let = 'a' + i;
+	}
+	any.a_int = i + 1;
+	add_menu(tmpwin, NO_GLYPH, &any, let, 0, ATR_NONE, spl_sortchoices[i],
+		 (i == spl_sortmode) ? MENU_SELECTED : MENU_UNSELECTED);
+    }
+    end_menu(tmpwin, "View known spells list sorted");
+
+    n = select_menu(tmpwin, PICK_ONE, &selected);
+    destroy_nhwindow(tmpwin);
+    if (n > 0) {
+	choice = selected[0].item.a_int - 1;
+	/* skip preselected entry if we have more than one item chosen */
+	if (n > 1 && choice == spl_sortmode)
+	    choice = selected[1].item.a_int - 1;
+	free((genericptr_t)selected);
+	spl_sortmode = choice;
+	return TRUE;
+    }
+    return FALSE;
+}
+
 /* the '+' command -- view known spells */
 int
 dovspell()
@@ -1077,20 +1256,29 @@ dovspell()
 	int splnum, othnum;
 	struct spell spl_tmp;
 
-	if (spellid(0) == NO_SPELL)
+	if (spellid(0) == NO_SPELL) {
 	    You("don't know any spells right now.");
-	else {
+	} else {
 	    while (dospellmenu("Currently known spells",
 			       SPELLMENU_VIEW, &splnum)) {
-		Sprintf(qbuf, "Reordering spells; swap '%c' with",
-			spellet(splnum));
-		if (!dospellmenu(qbuf, splnum, &othnum)) break;
+		if (splnum == SPELLMENU_SORT) {
+		    if (spellsortmenu()) sortspells();
+		} else {
+		    Sprintf(qbuf, "Reordering spells; swap '%c' with",
+			    spellet(splnum));
+		    if (!dospellmenu(qbuf, splnum, &othnum)) break;
 
-		spl_tmp = spl_book[splnum];
-		spl_book[splnum] = spl_book[othnum];
-		spl_book[othnum] = spl_tmp;
+		    spl_tmp = spl_book[splnum];
+		    spl_book[splnum] = spl_book[othnum];
+		    spl_book[othnum] = spl_tmp;
+		}
 	    }
 	}
+	if (spl_orderindx) {
+	    free((genericptr_t)spl_orderindx);
+	    spl_orderindx = 0;
+	}
+	spl_sortmode = SORTBY_LETTER;	/* 0 */
 	return 0;
 }
 
@@ -1101,7 +1289,7 @@ int splaction;	/* SPELLMENU_CAST, SPELLMENU_VIEW, or spl_book[] index */
 int *spell_no;
 {
 	winid tmpwin;
-	int i, n, how;
+	int i, n, how, splnum;
 	char buf[BUFSZ], retentionbuf[24];
 	const char *fmt;
 	menu_item *selected;
@@ -1128,22 +1316,32 @@ int *spell_no;
 	}
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_BOLD, buf, MENU_UNSELECTED);
 	for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
+		splnum = !spl_orderindx ? i : spl_orderindx[i];
 		Sprintf(buf, fmt,
-			spellname(i), spellev(i),
-			spelltypemnemonic(spell_skilltype(spellid(i))),
-			100 - percent_success(i),
-			spellretention(i, retentionbuf));
+			spellname(splnum), spellev(splnum),
+			spelltypemnemonic(spell_skilltype(spellid(splnum))),
+			100 - percent_success(splnum),
+			spellretention(splnum, retentionbuf));
 
-		any.a_int = i+1;	/* must be non-zero */
+		any.a_int = splnum + 1;	/* must be non-zero */
 		add_menu(tmpwin, NO_GLYPH, &any,
-			 spellet(i), 0, ATR_NONE, buf,
-			 (i == splaction) ? MENU_SELECTED : MENU_UNSELECTED);
-	      }
+			 spellet(splnum), 0, ATR_NONE, buf,
+		     (splnum == splaction) ? MENU_SELECTED : MENU_UNSELECTED);
+	}
+	how = PICK_ONE;
+	if (splaction == SPELLMENU_VIEW) {
+		if (spellid(1) == NO_SPELL) {
+			/* only one spell => nothing to swap with */
+			how = PICK_NONE;
+		} else {
+			/* more than 1 spell, add an extra menu entry */
+			any.a_int = SPELLMENU_SORT + 1;
+			add_menu(tmpwin, NO_GLYPH, &any, '+', 0, ATR_NONE,
+				 "[sort spells]", MENU_UNSELECTED);
+		}
+	}
 	end_menu(tmpwin, prompt);
 
-	how = PICK_ONE;
-	if (splaction == SPELLMENU_VIEW && spellid(1) == NO_SPELL)
-	    how = PICK_NONE;	/* only one spell => nothing to swap with */
 	n = select_menu(tmpwin, how, &selected);
 	destroy_nhwindow(tmpwin);
 	if (n > 0) {
@@ -1167,13 +1365,13 @@ int *spell_no;
 }
 
 /* Integer square root function without using floating point.
- * This could be replaced by a faster algorithm, but has not because:
+ * This could be replaced by a faster algorithm, but has not been because:
  * + the simple algorithm is easy to read
  * + this algorithm does not require 64-bit support
  * + in current usage, the values passed to isqrt() are not really that
  *   large, so the performance difference is negligible
  * + isqrt() is used in only one place
- * + that one place is not the bottle-neck
+ * + that one place is not a bottle-neck
  */
 STATIC_OVL int
 isqrt(val)

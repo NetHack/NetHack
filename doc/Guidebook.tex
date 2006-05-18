@@ -27,7 +27,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.98 $ $Date: 2006/04/30 17:55:09 $
+% $Revision: 1.99 $ $Date: 2006/05/13 04:57:35 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -872,10 +872,15 @@ Count your gold pieces.
 %.lp
 \item[\tb{+}]
 List the spells you know.  Using this command, you can also rearrange
-the order in which your spells are listed.  They are shown via a menu,
-and if you select a spell in that menu, you'll be re-prompted for
-another spell to swap places with it, and then have opportunity to
-make further exchanges.
+the order in which your spells are listed, either by sorting the entire
+list or by picking one spell from the menu then picking another to swap
+places with it.  Swapping pairs of spells changes their casting letters,
+so the change lasts after the current `{\tt +}' command finishes.  Sorting
+the whole list is temporary.  To make the most recent sort order persist
+beyond the current `{\tt +}' command, choose the sort option again and then
+pick ``reassign casting letters''.  (Any spells learned after that will
+be added to the end of the list rather than be inserted into the sorted
+ordering.)
 %.lp
 \item[\tb{$\backslash$}]
 Show what types of objects have been discovered.
@@ -1806,8 +1811,12 @@ nondirectional---they don't require a direction.
 %.pg
 Just as weapons are divided into groups in which a character can become
 proficient (to varying degrees), spells are similarly grouped.
-Successfully casting a spell exercises the skill group; sufficient skill
-may increase the potency of the spell and reduce the risk of spell failure.
+Successfully casting a spell exercises its skill group; using the
+`{\tt \#enhance}' command to advance a sufficiently exercised skill
+will affect all spells within the group.  Advanced skill may increase the
+potency of spells, reduce their risk of failure during casting attempts,
+and improve the accuracy of the estimate for how much longer they will
+be retained in your memory.
 Skill slots are shared with weapons skills.  (See also the section on
 ``Weapon proficiency''.)
 
@@ -1816,9 +1825,10 @@ Casting a spell also requires flexible movement, and wearing various types
 of armor may interfere with that.
 
 %.pg
-The command to read a spellbook is the same as for scrolls, `{\tt r}'
-(read).  The `{\tt +}' command lists your current spells, their levels,
-categories, and chances for failure.
+The command to read a spellbook is the same as for scrolls, `{\tt r}' (read).
+The `{\tt +}' command lists each spell you know along with its level, skill
+category, chance of failure when casting, and an estimate of how strongly
+it is remembered.
 The `{\tt Z}' (cast) command casts a spell.
 
 %.hn 2
