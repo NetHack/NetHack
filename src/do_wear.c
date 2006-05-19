@@ -113,7 +113,10 @@ Boots_on()
 	case ELVEN_BOOTS:
 		if (!oldprop && !HStealth && !BStealth) {
 			makeknown(uarmf->otyp);
-			You("walk very quietly.");
+			if (Levitation || Flying)
+				You("float imperceptibly.");
+			else
+				You("walk very quietly.");
 		}
 		break;
 	case FUMBLE_BOOTS:
