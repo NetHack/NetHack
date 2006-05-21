@@ -137,6 +137,7 @@ preform autopickup and/or report on objects at the spot when a failed #untrap
 thrown silver weapon hitting silver-hating poly'd hero got double silver damage
 wielded silver weapon hitting silver-hating poly'd hero lacked silver message
 don't welcome the hero to Delphi if the Oracle was angered before first entry
+shopkeeper polymorphed into animal form can no longer speak
 
 
 Platform- and/or Interface-Specific Fixes

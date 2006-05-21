@@ -22,6 +22,9 @@ STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
 #define ANGRY(mon)	(!NOTANGRY(mon))
 #define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
 
+#define muteshk(shkp)	((shkp)->msleeping || !(shkp)->mcanmove || \
+			 (shkp)->data->msound <= MS_ANIMAL)
+
 extern const struct shclass shtypes[];	/* defined in shknam.c */
 extern struct obj *thrownobj;		/* defined in dothrow.c */
 
@@ -399,7 +402,7 @@ boolean newlev;
 	if (!eshkp->billct && !eshkp->debit)	/* bill is settled */
 	    return;
 
-	if (!*leavestring && shkp->mcanmove && !shkp->msleeping) {
+	if (!*leavestring && !muteshk(shkp)) {
 	    /*
 	     * Player just stepped onto shop-boundary (known from above logic).
 	     * Try to intimidate him into paying his bill
@@ -527,7 +530,7 @@ register char *enterstring;
 	    pacify_shk(shkp);
 	}
 
-	if (shkp->msleeping || !shkp->mcanmove || eshkp->following)
+	if (muteshk(shkp) || eshkp->following)
 	    return;	/* no dialog */
 
 	if (Invis) {
@@ -1436,10 +1439,10 @@ proceed:
 	    if (!itemize)
 	        update_inventory(); /* Done in dopayobj() if itemize. */
 	}
-	if(!ANGRY(shkp) && paid)
+	if (!ANGRY(shkp) && paid && !muteshk(shkp))
 	    verbalize("Thank you for shopping in %s %s!",
-		s_suffix(shkname(shkp)),
-		shtypes[eshkp->shoptype - SHOPBASE].name);
+		      s_suffix(shkname(shkp)),
+		      shtypes[eshkp->shoptype - SHOPBASE].name);
 	return(1);
 }
 
@@ -1606,19 +1609,24 @@ int croaked;
 #endif
 	struct eshk *eshkp = ESHK(shkp);
 	boolean take = FALSE, taken = FALSE;
+	unsigned save_minvis = shkp->minvis;
 	int roomno = *u.ushops;
 	char takes[BUFSZ];
 
+	shkp->minvis = 0;
 	/* the simplifying principle is that first-come */
 	/* already took everything you had.		*/
 	if (numsk > 1) {
-	    if (cansee(shkp->mx, shkp->my) && croaked)
+	    if (cansee(shkp->mx, shkp->my) && croaked) {
+		takes[0] = '\0';
+		if (has_head(shkp->data) && !rn2(2))
+		    Sprintf(takes, ", shakes %s %s,",
+			    mhis(shkp), mbodypart(shkp, HEAD));
 		pline("%s %slooks at your corpse%s and %s.",
-		      Monnam(shkp),
-		      (!shkp->mcanmove || shkp->msleeping) ? "wakes up, " : "",
-		      !rn2(2) ? (shkp->female ? ", shakes her head," :
-			   ", shakes his head,") : "",
-		      !inhishop(shkp) ? "disappears" : "sighs");
+		      Monnam(shkp), (!shkp->mcanmove || shkp->msleeping) ?
+					"wakes up, " : "",
+		      takes, !inhishop(shkp) ? "disappears" : "sighs");
+	    }
 	    rouse_shk(shkp, FALSE);	/* wake shk for bones */    
 	    taken = (roomno == eshkp->shoproom);
 	    goto skip;
@@ -1701,6 +1709,7 @@ skip:
 			home_shk(shkp, FALSE);
 	}
 clear:
+	shkp->minvis = save_minvis;
 	setpaid(shkp);
 	return(taken);
 }
@@ -2268,7 +2277,7 @@ boolean ininv, dummy, silent;
 	} else /* i.e., !container */
 	    add_one_tobill(obj, dummy, shkp);
 
-	if (shkp->mcanmove && !shkp->msleeping && !silent) {
+	if (!muteshk(shkp) && !silent) {
 	    char buf[BUFSZ];
 
 	    if(!ltmp) {
@@ -2599,7 +2608,8 @@ xchar x, y;
 	eshkp = ESHK(shkp);
 
 	if (ANGRY(shkp)) { /* they become shop-objects, no pay */
-		pline("Thank you, scum!");
+		if (!muteshk(shkp))
+		    pline("Thank you, scum!");
 		subfrombill(obj, shkp);
 		return;
 	}
@@ -2608,8 +2618,9 @@ xchar x, y;
 		if(isgold) offer = obj->quan;
 		else if(cgold) offer += cgold;
 		if((eshkp->robbed -= offer < 0L))
-			eshkp->robbed = 0L;
-		if(offer) verbalize(
+		    eshkp->robbed = 0L;
+		if (offer && !muteshk(shkp))
+		    verbalize(
   "Thank you for your contribution to restock this recently plundered shop.");
 		subfrombill(obj, shkp);
 		return;
@@ -2899,7 +2910,7 @@ register xchar x, y;
 	    dist2(shkp->mx, shkp->my, x, y) < 3 &&
 	    /* if it is the shk's pos, you hit and anger him */
 	    (shkp->mx != x || shkp->my != y)) {
-		if (mnearto(shkp, x, y, TRUE))
+		if (mnearto(shkp, x, y, TRUE) && !muteshk(shkp))
 		    verbalize("Out of my way, scum!");
 		if (cansee(x, y)) {
 		    pline("%s nimbly%s catches %s.",
@@ -3169,7 +3180,8 @@ boolean catchup;	/* restoring a level */
 		 *
 		 * Take the easy way out and put ball&chain under hero.
 		 */
-		verbalize("Get your junk out of my wall!");
+		if (!muteshk(shkp))
+		    verbalize("Get your junk out of my wall!");
 		unplacebc();	/* pick 'em up */
 		placebc();	/* put 'em down */
 	    }
@@ -3246,14 +3258,16 @@ register struct monst *shkp;
 		}
 		if(eshkp->following) {
 			if(strncmp(eshkp->customer, plname, PL_NSIZ)) {
-			    verbalize("%s, %s!  I was looking for %s.",
-				    Hello(shkp), plname, eshkp->customer);
-				    eshkp->following = 0;
+			    if (!muteshk(shkp))
+				verbalize("%s, %s!  I was looking for %s.",
+					  Hello(shkp), plname, eshkp->customer);
+			    eshkp->following = 0;
 			    return(0);
 			}
 			if(moves > followmsg+4) {
-			    verbalize("%s, %s!  Didn't you forget to pay?",
-				    Hello(shkp), plname);
+			    if (!muteshk(shkp))
+				verbalize("%s, %s!  Didn't you forget to pay?",
+					  Hello(shkp), plname);
 			    followmsg = moves;
 			    if (!rn2(9)) {
 			      pline("%s doesn't like customers who don't pay.",
@@ -3415,6 +3429,8 @@ register int fall;
 		    if (lang == 2)
 			pline("%s curses you in anger and frustration!",
 			      shkname(shkp));
+		    else if (lang == 1)
+			growl(shkp);
 		    rile_shk(shkp);
 		    return;
 		} else
@@ -3477,6 +3493,7 @@ boolean cant_mollify;
 	register xchar x, y;
 	boolean dugwall = !strcmp(dmgstr, "dig into") ||	/* wand */
 			  !strcmp(dmgstr, "damage");		/* pick-axe */
+	boolean animal, pursue;
 	struct damage *tmp_dam, *appear_here = 0;
 	/* any number >= (80*80)+(24*24) would do, actually */
 	long cost_of_damage = 0L;
@@ -3529,6 +3546,8 @@ boolean cant_mollify;
 	if (!cost_of_damage || !shkp)
 	    return;
 
+	animal = (shkp->data->msound <= MS_ANIMAL);
+	pursue = FALSE;
 	x = appear_here->place.x;
 	y = appear_here->place.y;
 
@@ -3545,6 +3564,7 @@ boolean cant_mollify;
 	if(!*in_rooms(shkp->mx,shkp->my,SHOPBASE)) {
 		if(!cansee(shkp->mx, shkp->my))
 			return;
+		pursue = TRUE;
 		goto getcad;
 	}
 
@@ -3554,7 +3574,8 @@ boolean cant_mollify;
 		    pline("%s leaps towards you!", shkname(shkp));
 		    mnexto(shkp);
 		}
-		if(um_dist(shkp->mx, shkp->my, 1)) goto getcad;
+		pursue = um_dist(shkp->mx, shkp->my, 1);
+		if (pursue) goto getcad;
 	} else {
 	    /*
 	     * Make shkp show up at the door.  Effect:  If there is a monster
@@ -3563,7 +3584,7 @@ boolean cant_mollify;
 	     * yanked the hapless critter out of the way.
 	     */
 	    if (MON_AT(x, y)) {
-		if(!Deaf) {
+		if (!Deaf && !animal) {
 		    You_hear("an angry voice:");
 		    verbalize("Out of my way, scum!");
 		    wait_synch();
@@ -3573,6 +3594,8 @@ boolean cant_mollify;
 # endif
 			sleep(1);
 #endif
+		} else {
+		    growl(shkp);
 		}
 	    }
 	    (void) mnearto(shkp, x, y, TRUE);
@@ -3585,22 +3608,26 @@ boolean cant_mollify;
 	   (money_cnt(invent) + ESHK(shkp)->credit) < cost_of_damage
 #endif
 				|| !rn2(50)) {
-		if(um_dist(x, y, 1) && !uinshp) {
+ getcad:
+		if (muteshk(shkp)) {
+		    if (animal && shkp->mcanmove && !shkp->msleeping)
+			yelp(shkp);
+		} else if (pursue || uinshp || !um_dist(x, y, 1)) {
+		    verbalize("How dare you %s my %s?", dmgstr,
+			      dugwall ? "shop" : "door");
+		} else {
 		    pline("%s shouts:", shkname(shkp));
 		    verbalize("Who dared %s my %s?", dmgstr,
-					 dugwall ? "shop" : "door");
-		} else {
-getcad:
-		    verbalize("How dare you %s my %s?", dmgstr,
-					 dugwall ? "shop" : "door");
+			      dugwall ? "shop" : "door");
 		}
 		hot_pursuit(shkp);
 		return;
 	}
 
 	if (Invis) Your("invisibility does not fool %s!", shkname(shkp));
-	Sprintf(qbuf,"\"Cad!  You did %ld %s worth of damage!\"  Pay? ",
-		 cost_of_damage, currency(cost_of_damage));
+	Sprintf(qbuf,"%sYou did %ld %s worth of damage!%s  Pay?",
+		!animal ? "\"Cad!  " : "", cost_of_damage,
+		currency(cost_of_damage), !animal ? "\"" : "");
 	if(yn(qbuf) != 'n') {
 		cost_of_damage = check_credit(cost_of_damage, shkp);
 #ifndef GOLDOBJ
@@ -3616,7 +3643,10 @@ getcad:
 		home_shk(shkp, FALSE);
 		pacify_shk(shkp);
 	} else {
-		verbalize("Oh, yes!  You'll pay!");
+		if (!animal)
+		    verbalize("Oh, yes!  You'll pay!");
+		else
+		    growl(shkp);
 		hot_pursuit(shkp);
 		adjalign(-sgn(u.ualign.type));
 	}
