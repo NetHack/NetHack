@@ -138,6 +138,8 @@ thrown silver weapon hitting silver-hating poly'd hero got double silver damage
 wielded silver weapon hitting silver-hating poly'd hero lacked silver message
 don't welcome the hero to Delphi if the Oracle was angered before first entry
 shopkeeper polymorphed into animal form can no longer speak
+don't give attribute adjustment messages ("you feel wise") unless the current
+	value actually changes
 
 
 Platform- and/or Interface-Specific Fixes

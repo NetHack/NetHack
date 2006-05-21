@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)attrib.c	3.5	2005/09/19	*/
+/*	SCCS Id: @(#)attrib.c	3.5	2006/05/20	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -106,6 +106,10 @@ adjattrib(ndx, incr, msgflg)
 	int	ndx, incr;
 	int	msgflg;	    /* positive => no message, zero => message, and */
 {			    /* negative => conditional (msg if change made) */
+	int old_acurr;
+	boolean abonflg;
+	const char *attrstr;
+
 	if (Fixed_abil || !incr) return FALSE;
 
 	if ((ndx == A_INT || ndx == A_WIS)
@@ -115,45 +119,40 @@ adjattrib(ndx, incr, msgflg)
 		return FALSE;
 	}
 
+	old_acurr = ACURR(ndx);
 	if (incr > 0) {
-	    if ((AMAX(ndx) >= ATTRMAX(ndx)) && (ACURR(ndx) >= AMAX(ndx))) {
-		if (msgflg == 0 && flags.verbose)
-		    pline("You're already as %s as you can get.",
-			  plusattr[ndx]);
-		ABASE(ndx) = AMAX(ndx) = ATTRMAX(ndx); /* just in case */
-		return FALSE;
-	    }
-
 	    ABASE(ndx) += incr;
-	    if(ABASE(ndx) > AMAX(ndx)) {
+	    if (ABASE(ndx) > AMAX(ndx)) {
 		incr = ABASE(ndx) - AMAX(ndx);
 		AMAX(ndx) += incr;
-		if(AMAX(ndx) > ATTRMAX(ndx))
+		if (AMAX(ndx) > ATTRMAX(ndx))
 		    AMAX(ndx) = ATTRMAX(ndx);
 		ABASE(ndx) = AMAX(ndx);
 	    }
+	    attrstr = plusattr[ndx];
+	    abonflg = (ABON(ndx) < 0);
 	} else {
-	    if (ABASE(ndx) <= ATTRMIN(ndx)) {
-		if (msgflg == 0 && flags.verbose)
-		    pline("You're already as %s as you can get.",
-			  minusattr[ndx]);
-		ABASE(ndx) = ATTRMIN(ndx); /* just in case */
-		return FALSE;
-	    }
-
 	    ABASE(ndx) += incr;
-	    if(ABASE(ndx) < ATTRMIN(ndx)) {
+	    if (ABASE(ndx) < ATTRMIN(ndx)) {
 		incr = ABASE(ndx) - ATTRMIN(ndx);
 		ABASE(ndx) = ATTRMIN(ndx);
 		AMAX(ndx) += incr;
-		if(AMAX(ndx) < ATTRMIN(ndx))
+		if (AMAX(ndx) < ATTRMIN(ndx))
 		    AMAX(ndx) = ATTRMIN(ndx);
 	    }
+	    attrstr = minusattr[ndx];
+	    abonflg = (ABON(ndx) > 0);
 	}
+	if (ACURR(ndx) == old_acurr) {
+	    if (msgflg == 0 && flags.verbose)
+		pline("You're %s as %s as you can get.",
+		      abonflg ? "currently" : "already", attrstr);
+	    return FALSE;
+	}
+
 	if (msgflg <= 0)
 	    You_feel("%s%s!",
-		  (incr > 1 || incr < -1) ? "very ": "",
-		  (incr > 0) ? plusattr[ndx] : minusattr[ndx]);
+		     (incr > 1 || incr < -1) ? "very ": "", attrstr);
 	context.botl = 1;
 	if (moves > 1 && (ndx == A_STR || ndx == A_CON))
 		(void)encumber_msg();
