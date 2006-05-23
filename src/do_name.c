@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)do_name.c	3.5	2006/05/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -359,8 +359,17 @@ do_mname()
 	/* strip leading and trailing spaces; unnames monster if all spaces */
 	(void)mungspaces(buf);
 
+	/* unique monsters have their own specific names or titles;
+	   shopkeepers, temple priests and other minions use alternate
+	   name formatting routines which ignore any user-supplied name */
 	if (mtmp->data->geno & G_UNIQ)
 	    pline("%s doesn't like being called names!", upstart(monnambuf));
+	else if (mtmp->isshk &&
+			!(Deaf || mtmp->msleeping ||
+			  !mtmp->mcanmove || mtmp->data->msound <= MS_ANIMAL))
+	    verbalize("I'm %s, not %s.", monnambuf, buf);
+	else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk)
+	    pline("%s will not accept the name %s.", upstart(monnambuf), buf);
 	else
 	    (void) christen_monst(mtmp, buf);
 	return(0);
