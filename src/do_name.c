@@ -367,7 +367,7 @@ do_mname()
 	else if (mtmp->isshk &&
 			!(Deaf || mtmp->msleeping ||
 			  !mtmp->mcanmove || mtmp->data->msound <= MS_ANIMAL))
-	    verbalize("I'm %s, not %s.", monnambuf, buf);
+	    verbalize("I'm %s, not %s.", shkname(mtmp), buf);
 	else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk)
 	    pline("%s will not accept the name %s.", upstart(monnambuf), buf);
 	else
@@ -604,6 +604,7 @@ boolean called;
 {
 	char *buf = nextmbuf();
 	struct permonst *mdat = mtmp->data;
+	const char *pm_name = mdat->mname;
 	boolean do_hallu, do_invis, do_it, do_saddle;
 	boolean name_at_start, has_adjectives;
 	char *bp;
@@ -650,6 +651,12 @@ boolean called;
 		name += 4;
 	    return strcpy(buf, name);
 	}
+	/* an "aligned priest" not flagged as a priest or minion should be
+	   "priest" or "priestess" (normally handled by priestname()) */
+	if (mdat == &mons[PM_ALIGNED_PRIEST])
+	    pm_name = mtmp->female ? "priestess" : "priest";
+	else if (mdat == &mons[PM_HIGH_PRIEST] && mtmp->female)
+	    pm_name = "high priestess";
 
 	/* Shopkeepers: use shopkeeper name.  For normal shopkeepers, just
 	 * "Asidonhopo"; for unusual ones, "Asidonhopo the invisible
@@ -671,7 +678,7 @@ boolean called;
 	    Strcat(buf, " the ");
 	    if (do_invis)
 		Strcat(buf, "invisible ");
-	    Strcat(buf, mdat->mname);
+	    Strcat(buf, pm_name);
 	    return buf;
 	}
 
@@ -704,7 +711,7 @@ boolean called;
 		Sprintf(eos(buf), "%s ghost", s_suffix(name));
 		name_at_start = TRUE;
 	    } else if (called) {
-		Sprintf(eos(buf), "%s called %s", mdat->mname, name);
+		Sprintf(eos(buf), "%s called %s", pm_name, name);
 		name_at_start = (boolean)type_is_pname(mdat);
 	    } else if (is_mplayer(mdat) && (bp = strstri(name, " the ")) != 0) {
 		/* <name> the <adjective> <invisible> <saddled> <rank> */
@@ -730,7 +737,7 @@ boolean called;
 	    Strcat(buf, lcase(pbuf));
 	    name_at_start = FALSE;
 	} else {
-	    Strcat(buf, mdat->mname);
+	    Strcat(buf, pm_name);
 	    name_at_start = (boolean)type_is_pname(mdat);
 	}
 
