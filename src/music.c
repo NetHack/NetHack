@@ -61,23 +61,22 @@ STATIC_OVL void
 awaken_monsters(distance)
 int distance;
 {
-	register struct monst *mtmp = fmon;
+	register struct monst *mtmp;
 	register int distm;
 
-	while(mtmp) {
-	    if (!DEADMONSTER(mtmp)) {
-		distm = distu(mtmp->mx, mtmp->my);
-		if (distm < distance) {
-		    mtmp->msleeping = 0;
-		    mtmp->mcanmove = 1;
-		    mtmp->mfrozen = 0;
-		    /* May scare some monsters */
-		    if (distm < distance/3 &&
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    if ((distm = distu(mtmp->mx, mtmp->my)) < distance) {
+		mtmp->msleeping = 0;
+		mtmp->mcanmove = 1;
+		mtmp->mfrozen = 0;
+		/* may scare some monsters -- waiting monsters excluded */
+		if ((mtmp->mstrategy & STRAT_WAITMASK) != 0)
+		    mtmp->mstrategy &= ~STRAT_WAITMASK;
+		else if (distm < distance/3 &&
 			    !resist(mtmp, TOOL_CLASS, 0, NOTELL))
-			monflee(mtmp, 0, FALSE, TRUE);
-		}
+		    monflee(mtmp, 0, FALSE, TRUE);
 	    }
-	    mtmp = mtmp->nmon;
 	}
 }
 
@@ -89,15 +88,15 @@ STATIC_OVL void
 put_monsters_to_sleep(distance)
 int distance;
 {
-	register struct monst *mtmp = fmon;
+	register struct monst *mtmp;
 
-	while(mtmp) {
-		if (!DEADMONSTER(mtmp) && distu(mtmp->mx, mtmp->my) < distance &&
-			sleep_monst(mtmp, d(10,10), TOOL_CLASS)) {
-		    mtmp->msleeping = 1; /* 10d10 turns + wake_nearby to rouse */
-		    slept_monst(mtmp);
-		}
-		mtmp = mtmp->nmon;
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    if (distu(mtmp->mx, mtmp->my) < distance &&
+		    sleep_monst(mtmp, d(10,10), TOOL_CLASS)) {
+		mtmp->msleeping = 1; /* 10d10 turns + wake_nearby to rouse */
+		slept_monst(mtmp);
+	    }
 	}
 }
 
@@ -109,15 +108,17 @@ STATIC_OVL void
 charm_snakes(distance)
 int distance;
 {
-	register struct monst *mtmp = fmon;
+	register struct monst *mtmp;
 	int could_see_mon, was_peaceful;
 
-	while (mtmp) {
-	    if (!DEADMONSTER(mtmp) && mtmp->data->mlet == S_SNAKE && mtmp->mcanmove &&
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    if (mtmp->data->mlet == S_SNAKE && mtmp->mcanmove &&
 		    distu(mtmp->mx, mtmp->my) < distance) {
 		was_peaceful = mtmp->mpeaceful;
 		mtmp->mpeaceful = 1;
 		mtmp->mavenge = 0;
+		mtmp->mstrategy &= ~STRAT_WAITMASK;
 		could_see_mon = canseemon(mtmp);
 		mtmp->mundetected = 0;
 		newsym(mtmp->mx, mtmp->my);
@@ -131,7 +132,6 @@ int distance;
 			      was_peaceful ? "" : ", and now seems quieter");
 		}
 	    }
-	    mtmp = mtmp->nmon;
 	}
 }
 
@@ -143,20 +143,21 @@ STATIC_OVL void
 calm_nymphs(distance)
 int distance;
 {
-	register struct monst *mtmp = fmon;
+	register struct monst *mtmp;
 
-	while (mtmp) {
-	    if (!DEADMONSTER(mtmp) && mtmp->data->mlet == S_NYMPH && mtmp->mcanmove &&
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    if (mtmp->data->mlet == S_NYMPH && mtmp->mcanmove &&
 		    distu(mtmp->mx, mtmp->my) < distance) {
 		mtmp->msleeping = 0;
 		mtmp->mpeaceful = 1;
 		mtmp->mavenge = 0;
+		mtmp->mstrategy &= ~STRAT_WAITMASK;
 		if (canseemon(mtmp))
 		    pline(
 		     "%s listens cheerfully to the music, then seems quieter.",
 			  Monnam(mtmp));
 	    }
-	    mtmp = mtmp->nmon;
 	}
 }
 
@@ -165,19 +166,19 @@ int distance;
 void
 awaken_soldiers()
 {
-	register struct monst *mtmp = fmon;
+	register struct monst *mtmp;
 
-	while(mtmp) {
-	    if (!DEADMONSTER(mtmp) &&
-			is_mercenary(mtmp->data) && mtmp->data != &mons[PM_GUARD]) {
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    if (is_mercenary(mtmp->data) && mtmp->data != &mons[PM_GUARD]) {
 		mtmp->mpeaceful = mtmp->msleeping = mtmp->mfrozen = 0;
 		mtmp->mcanmove = 1;
+		mtmp->mstrategy &= ~STRAT_WAITMASK;
 		if (canseemon(mtmp))
 		    pline("%s is now ready for battle!", Monnam(mtmp));
 		else
 		    Norep("You hear the rattle of battle gear being readied.");
 	    }
-	    mtmp = mtmp->nmon;
 	}
 }
 

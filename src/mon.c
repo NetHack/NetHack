@@ -580,10 +580,9 @@ movemon()
 
     for(mtmp = fmon; mtmp; mtmp = nmtmp) {
 	nmtmp = mtmp->nmon;
+	if (DEADMONSTER(mtmp)) continue;
 
 	/* Find a monster that we have not treated yet.	 */
-	if(DEADMONSTER(mtmp))
-	    continue;
 	if(mtmp->movement < NORMAL_SPEED)
 	    continue;
 
@@ -2188,11 +2187,13 @@ register struct monst *mtmp;
 	    int got_mad = 0;
 
 	    /* guardians will sense this attack even if they can't see it */
-	    for (mon = fmon; mon; mon = mon->nmon)
-		if (!DEADMONSTER(mon) && mon->data == q_guardian && mon->mpeaceful) {
+	    for (mon = fmon; mon; mon = mon->nmon) {
+		if (DEADMONSTER(mon)) continue;
+		if (mon->data == q_guardian && mon->mpeaceful) {
 		    mon->mpeaceful = 0;
 		    if (canseemon(mon)) ++got_mad;
 		}
+	    }
 	    if (got_mad && !Hallucination)
 		pline_The("%s appear%s to be angry too...",
 		      got_mad == 1 ? q_guardian->mname :
@@ -2208,22 +2209,26 @@ register struct monst *mtmp;
 	mtmp->msleeping = 0;
 	finish_meating(mtmp);
 	setmangry(mtmp);
-	if(mtmp->m_ap_type) seemimic(mtmp);
-	else if (context.forcefight && !context.mon_moving && mtmp->mundetected) {
+	if (mtmp->m_ap_type) {
+	    seemimic(mtmp);
+	} else if (context.forcefight && !context.mon_moving &&
+		mtmp->mundetected) {
 	    mtmp->mundetected = 0;
 	    newsym(mtmp->mx, mtmp->my);
 	}
 }
 
-/* Wake up nearby monsters. */
+/* Wake up nearby monsters without angering them. */
 void
 wake_nearby()
 {
 	register struct monst *mtmp;
 
-	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-	    if (!DEADMONSTER(mtmp) && distu(mtmp->mx,mtmp->my) < u.ulevel*20) {
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    if (distu(mtmp->mx,mtmp->my) < u.ulevel * 20) {
 		mtmp->msleeping = 0;
+		mtmp->mstrategy &= ~STRAT_WAITMASK;
 		if (mtmp->mtame && !mtmp->isminion)
 		    EDOG(mtmp)->whistletime = moves;
 	    }
@@ -2238,9 +2243,11 @@ register int x, y, distance;
 	register struct monst *mtmp;
 
 	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-	    if (!DEADMONSTER(mtmp) && mtmp->msleeping && (distance == 0 ||
-				 dist2(mtmp->mx, mtmp->my, x, y) < distance))
+	    if (DEADMONSTER(mtmp)) continue;
+	    if (distance == 0 || dist2(mtmp->mx, mtmp->my, x, y) < distance) {
 		mtmp->msleeping = 0;
+		mtmp->mstrategy &= ~STRAT_WAITMASK;
+	    }
 	}
 }
 

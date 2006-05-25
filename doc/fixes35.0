@@ -140,6 +140,8 @@ don't welcome the hero to Delphi if the Oracle was angered before first entry
 shopkeeper polymorphed into animal form can no longer speak
 don't give attribute adjustment messages ("you feel wise") unless the current
 	value actually changes
+meditating monsters stop meditating when affected by something which wakes
+	sleeping mosnters
 
 
 Platform- and/or Interface-Specific Fixes
