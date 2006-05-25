@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)role.c	3.5	2003/01/08	*/
+/*	SCCS Id: @(#)role.c	3.5	2006/05/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -982,7 +982,7 @@ int rolenum, racenum, gendnum, alignnum;
 	return TRUE;
     } else {
 	for (i = 0; i < ROLE_ALIGNS; i++) {
-	    allow = races[i].allow;
+	    allow = aligns[i].allow;
 	    if (rolenum >= 0 && rolenum < SIZE(roles)-1 &&
 		    !(allow & roles[rolenum].allow & ROLE_ALIGNMASK))
 		continue;
@@ -1150,7 +1150,8 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 	if (racenum != ROLE_NONE && racenum != ROLE_RANDOM)
 		aligncount = race_alignmentcount(racenum);
 
-	if (alignnum != ROLE_NONE && alignnum != ROLE_RANDOM) {
+	if (alignnum != ROLE_NONE && alignnum != ROLE_RANDOM &&
+	    ok_align(rolenum, racenum, gendnum, alignnum)) {
 		/* if race specified, and multiple choice of alignments for it */
 		if ((racenum >= 0) && (aligncount > 1)) {
 			if (donefirst) Strcat(buf, " ");
@@ -1162,6 +1163,8 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 			donefirst = TRUE;
 		}
 	} else {
+		/* in case we got here by failing the ok_align() test */
+		if (alignnum != ROLE_RANDOM) alignnum = ROLE_NONE;
 		/* if alignment not specified, but race is specified
 			and only one choice of alignment for that race then
 			don't include it in the later list */
