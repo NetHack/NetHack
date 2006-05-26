@@ -985,7 +985,7 @@ char *ps;
 	putstr(en_win, 0, buf);
 }
 
-/* format increased damage or chance to hit */
+/* format increased chance to hit or damage or defense (Protection) */
 static char *
 enlght_combatinc(inctyp, incamt, final, outbuf)
 const char *inctyp;
@@ -994,31 +994,30 @@ char *outbuf;
 {
 	char numbuf[24];
 	const char *modif, *bonus;
+	boolean invrt;
+	int absamt;
 
-	if (final
-#ifdef WIZARD
-		|| wizard
-#endif
-	  ) {
-	    Sprintf(numbuf, "%s%d",
-		    (incamt > 0) ? "+" : "", incamt);
-	    modif = (const char *) numbuf;
-	} else {
-	    int absamt = abs(incamt);
+	absamt = abs(incamt);
+	/* Protection amount is typically larger than damage or to-hit;
+	   reduce magnitude by a third in order to stretch modifier ranges
+	   (small:1..5, moderate:6..10, large:11..19, huge:20+) */
+	if (!strcmp(inctyp, "defense")) absamt = (absamt * 2) / 3;
 
-	    if (absamt <= 3) modif = "small";
-	    else if (absamt <= 6) modif = "moderate";
-	    else if (absamt <= 12) modif = "large";
-	    else modif = "huge";
-	}
+	if (absamt <= 3) modif = "small";
+	else if (absamt <= 6) modif = "moderate";
+	else if (absamt <= 12) modif = "large";
+	else modif = "huge";
+
 	bonus = (incamt > 0) ? "bonus" : "penalty";
-	/* "bonus to hit" vs "damage bonus" */
-	if (!strcmp(inctyp, "damage")) {
-	    const char *ctmp = inctyp;
-	    inctyp = bonus;
-	    bonus = ctmp;
-	}
-	Sprintf(outbuf, "%s %s %s", an(modif), bonus, inctyp);
+	/* "bonus <foo>" (to hit) vs "<bar> bonus" (damage, defense) */
+	invrt = strcmp(inctyp, "to hit") ? TRUE : FALSE;
+
+	Sprintf(outbuf, "%s %s %s", an(modif),
+		invrt ? inctyp : bonus, invrt ? bonus : inctyp);
+	if (final || wizard)
+	    Sprintf(eos(outbuf), " (%s%d)",
+		    (incamt > 0) ? "+" : "", incamt);
+
 	return outbuf;
 }
 
@@ -1026,7 +1025,7 @@ void
 enlightenment(final)
 int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 {
-	int ltmp;
+	int ltmp, armpro;
 	char buf[BUFSZ];
 
 	en_win = create_nhwindow(NHW_MENU);
@@ -1221,12 +1220,14 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	}
 
 	/*** Physical attributes ***/
+	if (Regeneration)
+	    enl_msg("You regenerate", "", "d", "",from_what(REGENERATION));
+	if (Slow_digestion)
+	    you_have("slower digestion",from_what(SLOW_DIGESTION));
 	if (u.uhitinc)
 	    you_have(enlght_combatinc("to hit", u.uhitinc, final, buf),"");
 	if (u.udaminc)
 	    you_have(enlght_combatinc("damage", u.udaminc, final, buf),"");
-	if (Slow_digestion) you_have("slower digestion",from_what(SLOW_DIGESTION));
-	if (Regeneration) enl_msg("You regenerate", "", "d", "",from_what(REGENERATION));
 	if (u.uspellprot || Protection) {
 	    int prot = 0;
 
@@ -1234,11 +1235,16 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	    if(uright && uright->otyp == RIN_PROTECTION) prot += uright->spe;
 	    if (HProtection & INTRINSIC) prot += u.ublessed;
 	    prot += u.uspellprot;
-
-	    if (prot < 0)
-		you_are("ineffectively protected","");
-	    else
-		you_are("protected","");
+	    you_have(enlght_combatinc("defense", prot, final, buf), "");
+	}
+	if ((armpro = magic_negation(&youmonst)) > 0) {
+	    /* magic cancellation factor, conferred by worn armor */
+	    static const char * const mc_types[] = {
+		"" /*ordinary*/, "warded", "guarded", "protected",
+	    };
+	    /* sanity check */
+	    if (armpro >= SIZE(mc_types)) armpro = SIZE(mc_types) - 1;
+	    you_are(mc_types[armpro],"");
 	}
 	if (Protection_from_shape_changers)
 		you_are("protected from shape changers","");

@@ -207,6 +207,7 @@ digging can activate or disarm some types of traps
 some monsters can eat tins in addition to corpses to cure some ailments
 add Roderick Schertler's pickup_thrown patch
 add ability to sort the list when viewing known spells with '+' command
+describe magic cancellation from worn armor in enlightment/end-of-game feedback
 
 
 Platform- and/or Interface-Specific New Features
