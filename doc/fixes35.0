@@ -142,6 +142,7 @@ don't give attribute adjustment messages ("you feel wise") unless the current
 	value actually changes
 meditating monsters stop meditating when affected by something which wakes
 	sleeping mosnters
+monsters capable of hiding can't do so when trapped or while holding you
 
 
 Platform- and/or Interface-Specific Fixes

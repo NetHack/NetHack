@@ -2366,11 +2366,19 @@ boolean
 hideunder(mtmp)
 struct monst *mtmp;
 {
-	boolean undetected = FALSE;
-	xchar x = (mtmp == &youmonst) ? u.ux : mtmp->mx;
-	xchar y = (mtmp == &youmonst) ? u.uy : mtmp->my;
+	struct trap *t;
+	boolean undetected = FALSE,
+		is_u = (mtmp == &youmonst);
+	xchar x = is_u ? u.ux : mtmp->mx,
+	      y = is_u ? u.uy : mtmp->my;
 
-	if (mtmp->data->mlet == S_EEL) {
+	if (mtmp == u.ustuck) {
+	    ;	/* can't hide if holding you or held by you */
+	} else if (is_u ? (u.utrap && u.utraptype != TT_PIT) :
+			  (mtmp->mtrapped && (t = t_at(x, y)) != 0 &&
+				!(t->ttyp == PIT || t->ttyp == SPIKED_PIT))) {
+	    ;	/* can't hide while stuck in a non-pit trap */
+	} else if (mtmp->data->mlet == S_EEL) {
 	    undetected = (is_pool(x, y) && !Is_waterlevel(&u.uz));
 	} else if (hides_under(mtmp->data) && OBJ_AT(x, y)) {
 	    struct obj *otmp = level.objects[x][y];
@@ -2382,7 +2390,7 @@ struct monst *mtmp;
 		undetected = TRUE;
 	}
 
-	if (mtmp == &youmonst) u.uundetected = undetected;
+	if (is_u) u.uundetected = undetected;
 	else mtmp->mundetected = undetected;
 	return undetected;
 }

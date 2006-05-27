@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.5	2005/09/19	*/
+/*	SCCS Id: @(#)polyself.c	3.5	2006/05/26	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1096,6 +1096,20 @@ dohide()
 {
 	boolean ismimic = youmonst.data->mlet == S_MIMIC;
 
+	if ((u.utrap && u.utraptype != TT_PIT) || u.ustuck) {
+		You_cant("hide while you're %s.",
+			 !u.ustuck ? "trapped" :
+			   !sticks(youmonst.data) ? "being held" :
+			     humanoid(u.ustuck->data) ? "holding someone" :
+			       "holding that creature");
+		if (u.uundetected ||
+			    (ismimic && youmonst.m_ap_type != M_AP_NOTHING)) {
+			u.uundetected = 0;
+			youmonst.m_ap_type = M_AP_NOTHING;
+			newsym(u.ux, u.uy);
+		}
+		return 0;
+	}
 	if (u.uundetected || (ismimic && youmonst.m_ap_type != M_AP_NOTHING)) {
 		You("are already hiding.");
 		return(0);
