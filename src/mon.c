@@ -2344,8 +2344,13 @@ STATIC_OVL boolean
 restrap(mtmp)
 register struct monst *mtmp;
 {
+	struct trap *t;
+
 	if((mtmp->cham >= LOW_PM) || mtmp->mcan || mtmp->m_ap_type ||
 	   cansee(mtmp->mx, mtmp->my) || rn2(3) || (mtmp == u.ustuck) ||
+	   /* can't hide while trapped except in pits */
+	   (mtmp->mtrapped && (t = t_at(mtmp->mx, mtmp->my)) != 0 &&
+		!(t->ttyp == PIT || t->ttyp == SPIKED_PIT)) ||
 	   (sensemon(mtmp) && distu(mtmp->mx, mtmp->my) <= 2))
 		return(FALSE);
 
