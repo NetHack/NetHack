@@ -343,6 +343,7 @@ mattacku(mtmp)
 #endif
 
 	if (u.uundetected && !range2 && foundyou && !u.uswallow) {
+		if (!canspotmon(mtmp)) map_invisible(mtmp->mx, mtmp->my);
 		u.uundetected = 0;
 		if (is_hider(youmonst.data) && u.umonnum != PM_TRAPPER) {
 		    coord cc; /* maybe we need a unexto() function? */
@@ -420,8 +421,10 @@ mattacku(mtmp)
 		}
 		return(0);
 	}
+
 	if (youmonst.data->mlet == S_MIMIC && youmonst.m_ap_type &&
 		    !range2 && foundyou && !u.uswallow) {
+		if (!canspotmon(mtmp)) map_invisible(mtmp->mx, mtmp->my);
 		if (!youseeit) pline("It gets stuck on you.");
 		else pline("Wait, %s!  That's a %s named %s!",
 			   m_monnam(mtmp), youmonst.data->mname, plname);
@@ -434,6 +437,7 @@ mattacku(mtmp)
 
 	/* player might be mimicking an object */
 	if (youmonst.m_ap_type == M_AP_OBJECT && !range2 && foundyou && !u.uswallow) {
+	    if (!canspotmon(mtmp)) map_invisible(mtmp->mx, mtmp->my);
 	    if (!youseeit)
 		 pline("%s %s!", Something,
 			(likes_gold(mtmp->data) && youmonst.mappearance == GOLD_PIECE) ?
