@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)priest.c	3.5	2006/01/03	*/
+/*	SCCS Id: @(#)priest.c	3.5	2006/05/26	*/
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -582,8 +582,13 @@ register struct monst *priest;
 		    incr_itimeout(&HClairvoyant, rn1(500,500));
 		}
 	    } else if(offer < (u.ulevel * 600) &&
-		      u.ublessed < 20 &&
-		      (u.ublessed < 9 || !rn2(u.ublessed))) {
+		      /* u.ublessed is only active when Protection is
+		         enabled via something other than worn gear
+		         (theft by gremlin clears the intrinsic but not
+		         its former magnitude, making it recoverable) */
+		      (!(HProtection & INTRINSIC) ||
+		       (u.ublessed < 20 &&
+			(u.ublessed < 9 || !rn2(u.ublessed))))) {
 		verbalize("Thy devotion has been rewarded.");
 		if (!(HProtection & INTRINSIC))  {
 			HProtection |= FROMOUTSIDE;
