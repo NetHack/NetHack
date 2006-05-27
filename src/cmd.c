@@ -1008,11 +1008,12 @@ char *outbuf;
 	else if (absamt <= 12) modif = "large";
 	else modif = "huge";
 
-	bonus = (incamt > 0) ? "bonus" : "penalty";
+	modif = !incamt ? "no" : an(modif); /* ("no" case shouldn't happen) */
+	bonus = (incamt >= 0) ? "bonus" : "penalty";
 	/* "bonus <foo>" (to hit) vs "<bar> bonus" (damage, defense) */
 	invrt = strcmp(inctyp, "to hit") ? TRUE : FALSE;
 
-	Sprintf(outbuf, "%s %s %s", an(modif),
+	Sprintf(outbuf, "%s %s %s", modif,
 		invrt ? inctyp : bonus, invrt ? bonus : inctyp);
 	if (final || wizard)
 	    Sprintf(eos(outbuf), " (%s%d)",
@@ -1235,7 +1236,8 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	    if(uright && uright->otyp == RIN_PROTECTION) prot += uright->spe;
 	    if (HProtection & INTRINSIC) prot += u.ublessed;
 	    prot += u.uspellprot;
-	    you_have(enlght_combatinc("defense", prot, final, buf), "");
+	    if (prot)
+		you_have(enlght_combatinc("defense", prot, final, buf), "");
 	}
 	if ((armpro = magic_negation(&youmonst)) > 0) {
 	    /* magic cancellation factor, conferred by worn armor */
