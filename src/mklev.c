@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mklev.c	3.5	2006/03/06	*/
+/*	SCCS Id: @(#)mklev.c	3.5	2006/05/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1437,6 +1437,11 @@ mkinvokearea()
     pline_The("walls around you begin to bend and crumble!");
     display_nhwindow(WIN_MESSAGE, TRUE);
 
+    /* any trap hero is stuck in will be going away now */
+    if (u.utrap) {
+	u.utrap = 0;
+	if (u.utraptype == TT_BURIEDBALL) buried_ball_to_punishment();
+    }
     mkinvpos(xmin, ymin, 0);		/* middle, before placing stairs */
 
     for(dist = 1; dist < 7; dist++) {
