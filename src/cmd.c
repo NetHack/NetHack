@@ -992,7 +992,6 @@ const char *inctyp;
 int incamt, final;
 char *outbuf;
 {
-	char numbuf[24];
 	const char *modif, *bonus;
 	boolean invrt;
 	int absamt;
