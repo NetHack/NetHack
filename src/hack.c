@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2006/04/10	*/
+/*	SCCS Id: @(#)hack.c	3.5	2006/05/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1504,10 +1504,28 @@ void
 spoteffects(pick)
 boolean pick;
 {
+	static int inspoteffects = 0;
+	static coord spotloc;
+	static int spotterrain;
 	static struct trap *spottrap = (struct trap *)0;
 	static unsigned spottraptyp = NO_TRAP;
+	struct trap *trap = t_at(u.ux, u.uy);
 	register struct monst *mtmp;
-	
+
+	/* prevent recursion from affecting the hero all over again
+	   [hero poly'd to iron golem enters water here, drown() inflicts
+	   damage that triggers rehumanize() which calls spoteffects()...] */
+	if (inspoteffects && u.ux == spotloc.x && u.uy == spotloc.y &&
+		/* except when reason is transformed terrain (ice -> water) */
+		spotterrain == levl[u.ux][u.uy].typ &&
+		/* or transformed trap (land mine -> pit) */
+		(!spottrap || !trap || trap->ttyp == spottraptyp))
+	    return;
+
+	++inspoteffects;
+	spotterrain = levl[u.ux][u.uy].typ;
+	spotloc.x = u.ux, spotloc.y = u.uy;
+
 	if(u.uinwater) {
 		int was_underwater;
 
@@ -1552,10 +1570,13 @@ stillinwater:;
 			pick = FALSE;
 		} else
 #endif
+		/* drown(),lava_effects() return true if hero changes
+		   location while surviving the problem */
 		if (is_lava(u.ux, u.uy)) {
-		    if (lava_effects()) return;
-		} else if (!Wwalking && drown())
-		    return;
+		    if (lava_effects()) goto spotdone;
+		} else if (!Wwalking) {
+		    if (drown()) goto spotdone;
+		}
 	    }
 	}
 	check_special_room(FALSE);
@@ -1564,7 +1585,6 @@ stillinwater:;
 		dosinkfall();
 #endif
 	if (!in_steed_dismounting) { /* if dismounting, we'll check again later */
-		struct trap *trap = t_at(u.ux, u.uy);
 		boolean pit;
 
 	       /*
@@ -1646,6 +1666,12 @@ stillinwater:;
 		}
 		mnexto(mtmp); /* have to move the monster */
 	}
+ spotdone:
+	if (!--inspoteffects) {
+	    spotterrain = STONE;	/* 0 */
+	    spotloc.x = spotloc.y = 0;
+	}
+	return;
 }
 
 /* returns first matching monster */

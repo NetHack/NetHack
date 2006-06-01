@@ -143,6 +143,8 @@ don't give attribute adjustment messages ("you feel wise") unless the current
 meditating monsters stop meditating when affected by something which wakes
 	sleeping mosnters
 monsters capable of hiding can't do so when trapped or while holding you
+limit recursive calls to spoteffects (poly'd hero fell into water, reverted
+	to human because of it, fell into same water, then crawled out twice)
 
 
 Platform- and/or Interface-Specific Fixes
