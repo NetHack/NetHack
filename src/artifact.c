@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.5	2006/04/14	*/
+/*	SCCS Id: @(#)artifact.c 3.5	2006/05/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1142,16 +1142,21 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 	    }
 	}
 	if (spec_ability(otmp, SPFX_DRLI)) {
+		/* some non-living creatures (golems, vortices) are
+		   vulnerable to life drain effects */
+		const char *life = nonliving(mdef->data) ?
+					"animating force" : "life";
+
 		if (!youdefend) {
 			if (vis) {
 			    if(otmp->oartifact == ART_STORMBRINGER)
-				pline_The("%s blade draws the life from %s!",
+				pline_The("%s blade draws the %s from %s!",
 				      hcolor(NH_BLACK),
-				      mon_nam(mdef));
+				      life, mon_nam(mdef));
 			    else
-				pline("%s draws the life from %s!",
+				pline("%s draws the %s from %s!",
 				      The(distant_name(otmp, xname)),
-				      mon_nam(mdef));
+				      life, mon_nam(mdef));
 			}
 			if (mdef->m_lev == 0) {
 			    *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
@@ -1168,15 +1173,15 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 			int oldhpmax = u.uhpmax;
 
 			if (Blind)
-				You_feel("an %s drain your life!",
+				You_feel("an %s drain your %s!",
 				    otmp->oartifact == ART_STORMBRINGER ?
-				    "unholy blade" : "object");
+				    "unholy blade" : "object", life);
 			else if (otmp->oartifact == ART_STORMBRINGER)
-				pline_The("%s blade drains your life!",
-				      hcolor(NH_BLACK));
+				pline_The("%s blade drains your %s!",
+				      hcolor(NH_BLACK), life);
 			else
-				pline("%s drains your life!",
-				      The(distant_name(otmp, xname)));
+				pline("%s drains your %s!",
+				      The(distant_name(otmp, xname)), life);
 			losexp("life drainage");
 			if (magr && magr->mhp < magr->mhpmax) {
 			    magr->mhp += (oldhpmax - u.uhpmax)/2;
