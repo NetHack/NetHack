@@ -511,7 +511,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 {
 	/* discover is actually flags.explore */
 	boolean remember_discover = discover;
-	struct obj *otmp;
+	struct obj *otmp, *tmp_bc;
 	int uid;
 
 	mread(fd, (genericptr_t) &uid, sizeof uid);
@@ -563,6 +563,19 @@ unsigned int *stuckid, *steedid;	/* STEED */
 #ifndef GOLDOBJ
 	put_gold_back(&invent, &u.ugold);
 #endif
+	/* tmp_bc only gets set here if the ball & chain were orphaned
+	   because you were swallowed; otherwise they will be on the floor
+	   or in your inventory */
+	tmp_bc = restobjchn(fd, FALSE, FALSE);
+	if (tmp_bc) {
+	    for(otmp = tmp_bc; otmp; otmp = otmp->nobj) {
+		if(otmp->owornmask)
+			setworn(otmp, otmp->owornmask);
+	    }
+	    if (!uball || !uchain)
+		impossible("restgamestate: lost ball & chain");
+	}
+
 	migrating_objs = restobjchn(fd, FALSE, FALSE);
 	migrating_mons = restmonchn(fd, FALSE);
 	mread(fd, (genericptr_t) mvitals, sizeof(mvitals));

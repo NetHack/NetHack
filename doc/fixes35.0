@@ -145,6 +145,8 @@ meditating monsters stop meditating when affected by something which wakes
 monsters capable of hiding can't do so when trapped or while holding you
 limit recursive calls to spoteffects (poly'd hero fell into water, reverted
 	to human because of it, fell into same water, then crawled out twice)
+ensure that the punishment ball and chain make it into the save file after being
+	temporarily orphaned from the normal chains in the swallowing code
 
 
 Platform- and/or Interface-Specific Fixes

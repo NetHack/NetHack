@@ -347,6 +347,13 @@ register int fd, mode;
 	if (!release_data(mode))
 		put_gold_back(&invent, &u.ugold);
 #endif
+	if (BALL_IN_MON) {
+		/* prevent loss of ball & chain when swallowed */
+		uball->nobj = uchain;
+		uchain->nobj = (struct obj *)0;
+		saveobjchn(fd, uball, mode);
+	}
+
 	saveobjchn(fd, migrating_objs, mode);
 	savemonchn(fd, migrating_mons, mode);
 	if (release_data(mode)) {
