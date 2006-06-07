@@ -353,9 +353,7 @@ register int fd, mode;
 		uchain->nobj = (struct obj *)0;
 		saveobjchn(fd, uball, mode);
 	} else {
-		int minusone = -1;
-		if (perform_bwrite(mode))
-		    bwrite(fd, (genericptr_t) &minusone, sizeof(int));
+		saveobjchn(fd, (struct obj *)0, mode);
 	}
 
 	saveobjchn(fd, migrating_objs, mode);
