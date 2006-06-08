@@ -1179,15 +1179,15 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		    break;
 		}
 		/* known = TRUE; -- handled inline here */
+		if (!already_known) {
+		    pline("This is a charging scroll.");
+		    learnscroll(sobj);
+		}
 		/* use it up now to prevent it from showing in the
 		   getobj picklist because the "disappears" message
 		   was already delivered */
 		useup(sobj);
 		sobj = 0;	/* it's gone */
-		if (!already_known) {
-		    pline("This is a charging scroll.");
-		    learnscroll(sobj);
-		}
 		otmp = getobj(all_count, "charge");
 		if (otmp) recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
 		break;
