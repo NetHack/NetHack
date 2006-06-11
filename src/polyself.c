@@ -235,19 +235,19 @@ polyself(psflags)
 int psflags;     
 {
 	char buf[BUFSZ];
-	int old_light, new_light;
-	int mntmp = NON_PM;
-	int tries=0;
-	boolean forcecontrol = (psflags == 1);
-	boolean monsterpoly = (psflags == 2);
-	boolean draconian = (uarm &&
-				uarm->otyp >= GRAY_DRAGON_SCALE_MAIL &&
-				uarm->otyp <= YELLOW_DRAGON_SCALES);
-	boolean iswere = (u.ulycn >= LOW_PM || is_were(youmonst.data));
-	boolean isvamp = (youmonst.data->mlet == S_VAMPIRE);
-	boolean was_floating = (Levitation || Flying);
+	int old_light, new_light, mntmp, tries;
+	boolean forcecontrol = (psflags == 1),
+		monsterpoly = (psflags == 2),
+		draconian = (uarm && Is_dragon_armor(uarm)),
+		iswere = (u.ulycn >= LOW_PM || is_were(youmonst.data)),
+		isvamp = (youmonst.data->mlet == S_VAMPIRE);
 
-        if(!Polymorph_control && !forcecontrol && !draconian && !iswere && !isvamp) {
+	if (Unchanging) {
+	    pline("You fail to transform!");
+	    return;
+	}
+	if (!Polymorph_control && !forcecontrol &&
+		!draconian && !iswere && !isvamp) {
 	    if (rn2(20) > ACURR(A_CON)) {
 		You(shudder_for_moment);
 		losehp(rnd(30), "system shock", KILLED_BY_AN);
@@ -256,18 +256,27 @@ int psflags;
 	    }
 	}
 	old_light = Upolyd ? emits_light(youmonst.data) : 0;
+	mntmp = NON_PM;
 
 	if ((Polymorph_control || forcecontrol) && !monsterpoly) {
+		tries = 0;
 		do {
 			getlin("Become what kind of monster? [type the name]",
 				buf);
 			mntmp = name_to_mon(buf);
 			if (mntmp < LOW_PM)
 				pline("I've never heard of such monsters.");
+			else if (u.ulycn && (mntmp == u.ulycn ||
+				    mntmp == counter_were(u.ulycn)))
+				goto do_shift;
 			/* Note:  humans are illegal as monsters, but an
 			 * illegal monster forces newman(), which is what we
 			 * want if they specified a human.... */
-			else if (!polyok(&mons[mntmp]) && !your_race(&mons[mntmp]))
+			else if (!polyok(&mons[mntmp]) &&
+				    !(mntmp == PM_HUMAN ||
+				      your_race(&mons[mntmp]) ||
+				      mntmp == urole.malenum ||
+				      mntmp == urole.femalenum))
 				You("cannot polymorph into that.");
 			else break;
 		} while(++tries < 5);
@@ -279,7 +288,7 @@ int psflags;
 	} else if (draconian || iswere || isvamp) {
 		/* special changes that don't require polyok() */
 		if (draconian) {
-		    do_merge:
+ do_merge:
 			mntmp = armor_to_dragon(uarm->otyp);
 			if (!(mvitals[mntmp].mvflags & G_GENOD)) {
 				/* allow G_EXTINCT */
@@ -290,6 +299,7 @@ int psflags;
 				uskin->owornmask |= I_SPECIAL;
 			}
 		} else if (iswere) {
+ do_shift:
 			if (is_were(youmonst.data))
 				mntmp = PM_HUMAN; /* Illegal; force newman() */
 			else
@@ -323,33 +333,32 @@ int psflags;
 		do {
 			/* randomly pick an "ordinary" monster */
 			mntmp = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
-		} while((!polyok(&mons[mntmp]) || is_placeholder(&mons[mntmp]))
-				&& tries++ < 200);
+			if (polyok(&mons[mntmp]) &&
+			    !is_placeholder(&mons[mntmp])) break;
+		} while (++tries < 200);
 	}
 
 	/* The below polyok() fails either if everything is genocided, or if
 	 * we deliberately chose something illegal to force newman().
 	 */
-	if (!polyok(&mons[mntmp]) || !rn2(5) || your_race(&mons[mntmp]))
+	if (!polyok(&mons[mntmp]) ||
+		    (!forcecontrol && !rn2(5)) || your_race(&mons[mntmp])) {
 		newman();
-	else if(!polymon(mntmp)) return;
-
-	if (!uarmg) selftouch("No longer petrify-resistant, you");
+	} else if (!polymon(mntmp)) {
+		return;		/* failed to change */
+	}
 
  made_change:
+	if (!uarmg) selftouch("No longer petrify-resistant, you");
 	new_light = Upolyd ? emits_light(youmonst.data) : 0;
+	if (new_light == 1) ++new_light;    /* otherwise it's undetectable */
 	if (old_light != new_light) {
 	    if (old_light)
 		del_light_source(LS_MONSTER, (genericptr_t)&youmonst);
-	    if (new_light == 1) ++new_light;  /* otherwise it's undetectable */
 	    if (new_light)
 		new_light_source(u.ux, u.uy, new_light,
 				 LS_MONSTER, (genericptr_t)&youmonst);
 	}
-	if (is_pool(u.ux,u.uy) && was_floating && !(Levitation || Flying) &&
-		!breathless(youmonst.data) && !amphibious(youmonst.data) &&
-		!Swimming)
-	    (void) drown();
 }
 
 /* (try to) make a mntmp monster out of the player */

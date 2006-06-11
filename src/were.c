@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)were.c	3.5	2002/11/07	*/
+/*	SCCS Id: @(#)were.c	3.5	2006/05/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,9 +33,7 @@ register struct monst *mon;
 	}
 }
 
-STATIC_DCL int FDECL(counter_were,(int));
-
-STATIC_OVL int
+int
 counter_were(pm)
 int pm;
 {
@@ -46,7 +44,7 @@ int pm;
 	    case PM_HUMAN_WEREJACKAL: return(PM_WEREJACKAL);
 	    case PM_WERERAT:	      return(PM_HUMAN_WERERAT);
 	    case PM_HUMAN_WERERAT:    return(PM_WERERAT);
-	    default:		      return(0);
+	    default:		      return NON_PM;
 	}
 }
 
@@ -57,7 +55,7 @@ register struct monst *mon;
 	register int pm;
 
 	pm = counter_were(monsndx(mon->data));
-	if(!pm) {
+	if (pm < LOW_PM) {
 	    impossible("unknown lycanthrope %s.", mon->data->mname);
 	    return;
 	}
