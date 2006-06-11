@@ -75,8 +75,9 @@ amulet()
 	if (!context.no_of_wizards)
 		return;
 	/* find Wizard, and wake him if necessary */
-	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-	    if (!DEADMONSTER(mtmp) && mtmp->iswiz && mtmp->msleeping && !rn2(40)) {
+	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue; 
+	    if (mtmp->iswiz && mtmp->msleeping && !rn2(40)) {
 		mtmp->msleeping = 0;
 		if (distu(mtmp->mx,mtmp->my) > 2)
 		    You(
@@ -84,6 +85,7 @@ amulet()
 		    );
 		return;
 	    }
+	}
 }
 
 int

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)dog.c	3.5	2006/06/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -207,8 +207,10 @@ update_mlstmv()
 
 	/* monst->mlstmv used to be updated every time `monst' actually moved,
 	   but that is no longer the case so we just do a blanket assignment */
-	for (mon = fmon; mon; mon = mon->nmon)
-	    if (!DEADMONSTER(mon)) mon->mlstmv = monstermoves;
+	for (mon = fmon; mon; mon = mon->nmon) {
+	    if (DEADMONSTER(mon)) continue;
+	    mon->mlstmv = monstermoves;
+	}
 }
 
 void

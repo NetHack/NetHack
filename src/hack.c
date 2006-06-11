@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2006/05/31	*/
+/*	SCCS Id: @(#)hack.c	3.5	2006/06/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1682,10 +1682,12 @@ int roomno;
 {
 	register struct monst *mtmp;
 
-	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-		if(!DEADMONSTER(mtmp) && mtmp->data == mdat &&
-		   index(in_rooms(mtmp->mx, mtmp->my, 0), roomno + ROOMOFFSET))
+	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+		if (DEADMONSTER(mtmp)) continue;
+		if (mtmp->data == mdat &&
+		    index(in_rooms(mtmp->mx, mtmp->my, 0), roomno + ROOMOFFSET))
 			return mtmp;
+	}
 	return (struct monst *)0;
 }
 
@@ -1940,8 +1942,11 @@ register boolean newlev;
 			}
 		}
 		if (rt == COURT || rt == SWAMP || rt == MORGUE || rt == ZOO)
-		    for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-			if (!DEADMONSTER(mtmp) && !Stealth && !rn2(3)) mtmp->msleeping = 0;
+		    for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+			if (DEADMONSTER(mtmp)) continue;
+			if (!Stealth && !rn2(3))
+				mtmp->msleeping = 0;
+		    }
 	    }
 	}
 

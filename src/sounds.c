@@ -261,7 +261,7 @@ dosounds()
 		"*a strident plea for donations.",
 	    };
 	    const char *msg;
-	    int idx, trycount = 0,
+	    int trycount = 0,
 		ax = EPRI(mtmp)->shrpos.x, ay = EPRI(mtmp)->shrpos.y;
 	    boolean speechless = (mtmp->data->msound <= MS_ANIMAL),
 		    in_sight = canseemon(mtmp) || cansee(ax, ay);

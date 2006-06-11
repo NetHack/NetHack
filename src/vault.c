@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vault.c	3.5	2006/01/03	*/
+/*	SCCS Id: @(#)vault.c	3.5	2006/06/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -136,9 +136,11 @@ findgd()
 {
 	register struct monst *mtmp;
 
-	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-	    if(mtmp->isgd && !DEADMONSTER(mtmp) && on_level(&(EGD(mtmp)->gdlevel), &u.uz))
+	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    if (mtmp->isgd && on_level(&(EGD(mtmp)->gdlevel), &u.uz))
 		return(mtmp);
+	}
 	return((struct monst *)0);
 }
 
