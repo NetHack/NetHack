@@ -1709,6 +1709,7 @@ E void FDECL(altar_wrath, (int,int));
 E int FDECL(move_special, (struct monst *,BOOLEAN_P,SCHAR_P,BOOLEAN_P,BOOLEAN_P,
 			   XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P));
 E char FDECL(temple_occupied, (char *));
+E boolean FDECL(inhistemple, (struct monst *));
 E int FDECL(pri_move, (struct monst *));
 E void FDECL(priestini, (d_level *,struct mkroom *,int,int,BOOLEAN_P));
 E aligntyp FDECL(mon_aligntyp, (struct monst *));

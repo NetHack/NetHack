@@ -148,6 +148,18 @@ register xchar x, y;
 	       on_level(&(EPRI(priest)->shrlevel), &u.uz)));
 }
 
+boolean
+inhistemple(priest)
+struct monst *priest;
+{
+	/* make sure we have a priest */
+	if (!priest || !priest->ispriest) return FALSE;
+	/* priest must be on right level and in right room */
+	if (!histemple_at(priest, priest->mx, priest->my)) return FALSE;
+	/* temple room must still contain properly aligned altar */
+	return has_shrine(priest);
+}
+
 /*
  * pri_move: return 1: moved  0: didn't  -1: let m_move do it  -2: died
  */
@@ -322,7 +334,7 @@ struct monst *pri;
 	struct rm *lev;
 	struct epri *epri_p;
 
-	if (!pri) return FALSE;
+	if (!pri || !pri->ispriest) return FALSE;
 	epri_p = EPRI(pri);
 	lev = &levl[epri_p->shrpos.x][epri_p->shrpos.y];
 	if (!IS_ALTAR(lev->typ) || !(lev->altarmask & AM_SHRINE)) return FALSE;

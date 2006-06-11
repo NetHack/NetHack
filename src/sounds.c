@@ -234,11 +234,59 @@ dosounds()
 	}
 	return;
     }
+    if (level.flags.has_temple && !rn2(200) &&
+		!(Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) {
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    if (mtmp->ispriest && inhistemple(mtmp) &&
+		    /* priest must be active */
+		    mtmp->mcanmove && !mtmp->msleeping &&
+		    /* hero must be outside this temple */
+		    temple_occupied(u.urooms) != EPRI(mtmp)->shroom)
+		break;
+	}
+	if (mtmp) {
+	    /* Generic temple messages; no attempt to match topic or tone
+	       to the pantheon involved, let alone to the specific deity.
+	       These are assumed to be coming from the attending priest;
+	       asterisk means that the priest must be capable of speech;
+	       pound sign (octathorpe,&c--don't go there) means that the
+	       priest and the altar must not be directly visible (we don't
+	       care if telepathy or extended detection reveals that the
+	       priest is not currently standing on the altar; he's mobile). */
+	    static const char * const temple_msg[] = {
+		"*someone praising %s.",
+		"*someone beseeching %s.",
+		"#an animal carcass being offered in sacrifice.",
+		"*a strident plea for donations.",
+	    };
+	    const char *msg;
+	    int idx, trycount = 0,
+		ax = EPRI(mtmp)->shrpos.x, ay = EPRI(mtmp)->shrpos.y;
+	    boolean speechless = (mtmp->data->msound <= MS_ANIMAL),
+		    in_sight = canseemon(mtmp) || cansee(ax, ay);
+
+	    do {
+		msg = temple_msg[rn2(SIZE(temple_msg) - 1 + hallu)];
+		if (index(msg, '*') && speechless) continue;
+		if (index(msg, '#') && in_sight) continue;
+		break;	/* msg is acceptable */
+	    } while (++trycount < 50);
+	    while (!letter(*msg)) ++msg;	/* skip control flags */
+	    if (index(msg, '%'))
+		You_hear(msg, halu_gname(EPRI(mtmp)->shralign));
+	    else
+		You_hear(msg);
+	    return;
+	}
+    }
     if (Is_oracle_level(&u.uz) && !rn2(400)) {
 	/* make sure the Oracle is still here */
-	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-	    if (!DEADMONSTER(mtmp) && mtmp->data == &mons[PM_ORACLE])
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (DEADMONSTER(mtmp)) continue;
+	    if (mtmp->data == &mons[PM_ORACLE])
 		break;
+	}
 	/* and don't produce silly effects when she's clearly visible */
 	if (mtmp && (hallu || !canseemon(mtmp))) {
 	    static const char * const ora_msg[5] = {
