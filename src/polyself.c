@@ -255,7 +255,7 @@ int psflags;
 		return;
 	    }
 	}
-	old_light = Upolyd ? emits_light(youmonst.data) : 0;
+	old_light = emits_light(youmonst.data);
 	mntmp = NON_PM;
 
 	if ((Polymorph_control || forcecontrol) && !monsterpoly) {
@@ -350,11 +350,11 @@ int psflags;
 
  made_change:
 	if (!uarmg) selftouch("No longer petrify-resistant, you");
-	new_light = Upolyd ? emits_light(youmonst.data) : 0;
-	if (new_light == 1) ++new_light;    /* otherwise it's undetectable */
+	new_light = emits_light(youmonst.data);
 	if (old_light != new_light) {
 	    if (old_light)
 		del_light_source(LS_MONSTER, (genericptr_t)&youmonst);
+	    if (new_light == 1) ++new_light;  /* otherwise it's undetectable */
 	    if (new_light)
 		new_light_source(u.ux, u.uy, new_light,
 				 LS_MONSTER, (genericptr_t)&youmonst);
