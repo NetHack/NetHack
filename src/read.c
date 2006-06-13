@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)read.c	3.5	2006/06/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,6 +17,7 @@ static NEARDATA const char readable[] =
 		   { ALL_CLASSES, SCROLL_CLASS, SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
+STATIC_DCL boolean FDECL(learnscrolltyp, (SHORT_P));
 STATIC_DCL void FDECL(learnscroll, (struct obj *));
 STATIC_DCL void NDECL(do_class_genocide);
 STATIC_DCL void FDECL(stripspe,(struct obj *));
@@ -29,14 +30,23 @@ STATIC_DCL void FDECL(maybe_tame, (struct monst *,struct obj *));
 
 STATIC_PTR void FDECL(set_lit, (int,int,genericptr_t));
 
+STATIC_OVL boolean
+learnscrolltyp(scrolltyp)
+short scrolltyp;
+{
+    if (!objects[scrolltyp].oc_name_known) {
+    	makeknown(scrolltyp);
+    	return TRUE;
+    } else
+	return FALSE;
+}
+
 STATIC_OVL void
 learnscroll(sobj)
 struct obj *sobj;
 {
-    if (sobj->oclass != SPBOOK_CLASS && !objects[sobj->otyp].oc_name_known) {
-	makeknown(sobj->otyp); 
+    if ((sobj->oclass != SPBOOK_CLASS) && learnscrolltyp(sobj->otyp))
 	more_experienced(0, 10);
-    }
 }
 
 int
@@ -1145,7 +1155,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 			/* force feedback now if invent became
 			   empty after using up this scroll */
 		    pline("This is an identify scroll.");
-		if (!already_known) learnscroll(sobj);
+		if (!already_known && learnscrolltyp(SCR_IDENTIFY))
+			more_experienced(0, 10);
 		/*FALLTHRU*/
 	case SPE_IDENTIFY:
 		cval = 1;
