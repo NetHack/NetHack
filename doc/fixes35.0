@@ -147,6 +147,7 @@ limit recursive calls to spoteffects (poly'd hero fell into water, reverted
 	to human because of it, fell into same water, then crawled out twice)
 ensure that the punishment ball and chain make it into the save file after being
 	temporarily orphaned from the normal chains in the swallowing code
+charge for thrown wand that shatters into a thousand pieces in a shop
 
 
 Platform- and/or Interface-Specific Fixes

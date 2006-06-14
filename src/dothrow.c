@@ -703,6 +703,10 @@ register boolean broken;
 		if (obj->unpaid) {
 		    (void)stolen_value(obj, u.ux, u.uy,
 				       (boolean)shkp->mpeaceful, FALSE);
+		    costly_alteration(obj, COST_DSTROY);
+		    /* costly_alteration() probably already called
+		       subfrombill() for the object, but just in case it
+		       didn't, call it again. If it did, this is a NOOP. */
 		    subfrombill(obj, shkp);
 		}
 		obj->no_charge = 1;
