@@ -1255,7 +1255,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		cval = bcsign(sobj);
 		useup(sobj);
 		sobj = 0;	/* it's gone */
-		if (!already_known) learnscroll(sobj);
+		if (!already_known) learnscrolltyp(SCR_FIRE);
 		if(confused) {
 		    if(Fire_resistance) {
 			shieldeff(u.ux, u.uy);
