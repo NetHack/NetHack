@@ -36,6 +36,7 @@ short scrolltyp;
 {
     if (!objects[scrolltyp].oc_name_known) {
     	makeknown(scrolltyp);
+	more_experienced(0, 10);
     	return TRUE;
     } else
 	return FALSE;
@@ -45,8 +46,8 @@ STATIC_OVL void
 learnscroll(sobj)
 struct obj *sobj;
 {
-    if ((sobj->oclass != SPBOOK_CLASS) && learnscrolltyp(sobj->otyp))
-	more_experienced(0, 10);
+    if (sobj->oclass != SPBOOK_CLASS)
+	(void) learnscrolltyp(sobj->otyp);
 }
 
 int
@@ -1155,8 +1156,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 			/* force feedback now if invent became
 			   empty after using up this scroll */
 		    pline("This is an identify scroll.");
-		if (!already_known && learnscrolltyp(SCR_IDENTIFY))
-			more_experienced(0, 10);
+		if (!already_known)
+		    (void) learnscrolltyp(SCR_IDENTIFY);
 		/*FALLTHRU*/
 	case SPE_IDENTIFY:
 		cval = 1;
@@ -1255,7 +1256,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		cval = bcsign(sobj);
 		useup(sobj);
 		sobj = 0;	/* it's gone */
-		if (!already_known) learnscrolltyp(SCR_FIRE);
+		if (!already_known)
+		    (void) learnscrolltyp(SCR_FIRE);
 		if(confused) {
 		    if(Fire_resistance) {
 			shieldeff(u.ux, u.uy);
