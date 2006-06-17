@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2006/05/08	*/
+/*	SCCS Id: @(#)trap.c	3.5	2006/06/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -892,8 +892,10 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 			goto glovecheck;
 		    default:
 			pline("%s you!", A_gush_of_water_hits);
-			for (otmp=invent; otmp; otmp = otmp->nobj)
-				    (void) snuff_lit(otmp);
+			for (otmp = invent; otmp; otmp = otmp->nobj)
+			    if (otmp->lamplit && otmp != uwep &&
+				    (otmp != uswapwep || !u.twoweap))
+				(void) snuff_lit(otmp);
 			if (uarmc)
 			    (void) rust_dmg(uarmc, cloak_simple_name(uarmc),
 						1, TRUE, &youmonst);
@@ -1980,24 +1982,22 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    if (in_sight)
 				pline("%s %s!", A_gush_of_water_hits,
 				    mon_nam(mtmp));
-			    for (otmp=mtmp->minvent; otmp; otmp = otmp->nobj)
-				(void) snuff_lit(otmp);
-			    target = which_armor(mtmp, W_ARMC);
-			    if (target)
-				(void) rust_dmg(target, cloak_simple_name(target),
-						 1, TRUE, mtmp);
-			    else {
-				target = which_armor(mtmp, W_ARM);
-				if (target)
-				    (void) rust_dmg(target, "armor", 1, TRUE, mtmp);
+			    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+				if (otmp->lamplit &&
+					(otmp->owornmask & (W_WEP|W_SWAPWEP)) == 0)
+				    (void) snuff_lit(otmp);
+			    if ((target = which_armor(mtmp, W_ARMC)) != 0)
+				(void) rust_dmg(target,
+						cloak_simple_name(target),
+						1, TRUE, mtmp);
+			    else if ((target = which_armor(mtmp, W_ARM)) != 0)
+				(void) rust_dmg(target, "armor", 1, TRUE, mtmp);
 #ifdef TOURIST
-				else {
-				    target = which_armor(mtmp, W_ARMU);
-				    (void) rust_dmg(target, "shirt", 1, TRUE, mtmp);
-				}
+			    else if ((target = which_armor(mtmp, W_ARMU)) != 0)
+				(void) rust_dmg(target, "shirt", 1, TRUE, mtmp);
 #endif
-			    }
 			}
+
 			if (mptr == &mons[PM_IRON_GOLEM]) {
 				if (in_sight)
 				    pline("%s falls to pieces!", Monnam(mtmp));

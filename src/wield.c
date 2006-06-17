@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)wield.c	3.5	2006/06/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -619,6 +619,7 @@ boolean for_dip;
 	struct monst *victim;
 	boolean vismon, visobj, chill;
 	boolean ret = FALSE;
+	boolean already_affected = FALSE;
 
 	if (!target)
 	    return FALSE;
@@ -627,6 +628,10 @@ boolean for_dip;
 	vismon = victim && (victim != &youmonst) && canseemon(victim);
 	visobj = !victim && cansee(bhitpos.x, bhitpos.y); /* assume thrown */
 
+	if (!acid_dmg && target->lamplit) {
+	    already_affected = snuff_lit(target);
+	    if (already_affected) ret = TRUE;
+	}
 	erosion = acid_dmg ? target->oeroded2 : target->oeroded;
 
 	if (target->greased) {
@@ -671,7 +676,8 @@ boolean for_dip;
 		(acid_dmg ? !is_corrodeable(target) : !is_rustprone(target))) {
 	    if (flags.verbose || !(target->oerodeproof && target->rknown)) {
 		if (((victim == &youmonst) || vismon) && !for_dip)
-		    pline("%s not affected.", Yobjnam2(target, "are"));
+		    pline("%s not %s.", Yobjnam2(target, "are"),
+			  already_affected ? "harmed" : "affected");
 		/* no message if not carried or dipping */
 	    }
 	    if (target->oerodeproof) target->rknown = !for_dip;
