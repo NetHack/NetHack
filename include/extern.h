@@ -1004,7 +1004,7 @@ E void FDECL(mimic_hit_msg, (struct monst *, SHORT_P));
 #ifdef GOLDOBJ
 E void FDECL(mkmonmoney, (struct monst *, long));
 #endif
-E void FDECL(bagotricks, (struct obj *));
+E int FDECL(bagotricks, (struct obj *,BOOLEAN_P));
 E boolean FDECL(propagate, (int, BOOLEAN_P,BOOLEAN_P));
 E boolean FDECL(usmellmon, (struct permonst *));
 
@@ -1168,6 +1168,7 @@ E void FDECL(add_to_buried, (struct obj *));
 E void FDECL(dealloc_obj, (struct obj *));
 E void FDECL(obj_ice_effects, (int, int, BOOLEAN_P));
 E long FDECL(peek_at_iced_corpse_age, (struct obj *));
+E int FDECL(hornoplenty, (struct obj *,BOOLEAN_P));
 #ifdef WIZARD
 E void NDECL(obj_sanity_check);
 #endif

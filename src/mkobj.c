@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2006/05/09	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2006/06/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1766,6 +1766,67 @@ dealloc_obj(obj)
 
     if (obj->oextra) dealloc_oextra(obj->oextra);
     free((genericptr_t) obj);
+}
+
+/* create an object from a horn of plenty; mirrors bagotricks(makemon.c) */
+int
+hornoplenty(horn, tipping)
+struct obj *horn;
+boolean tipping;  /* caller emptying entire contents; affects shop handling */
+{
+    int objcount = 0;
+
+    if (!horn || horn->otyp != HORN_OF_PLENTY) {
+	impossible("bad horn o' plenty");
+    } else if (horn->spe < 1) {
+	pline(nothing_happens);
+    } else {
+	struct obj *obj;
+	const char *what;
+
+	consume_obj_charge(horn, !tipping);
+	if (!rn2(13)) {
+	    obj = mkobj(POTION_CLASS, FALSE);
+	    if (objects[obj->otyp].oc_magic) do {
+		obj->otyp = rnd_class(POT_BOOZE, POT_WATER);
+	    } while (obj->otyp == POT_SICKNESS);
+	    what = (obj->quan > 1L) ? "Some potions" : "A potion";
+	} else {
+	    obj = mkobj(FOOD_CLASS, FALSE);
+	    if (obj->otyp == FOOD_RATION && !rn2(7))
+		obj->otyp = LUMP_OF_ROYAL_JELLY;
+	    what = "Some food";
+	}
+	++objcount;
+	pline("%s %s out.", what, vtense(what, "spill"));
+	obj->blessed = horn->blessed;
+	obj->cursed = horn->cursed;
+	obj->owt = weight(obj);
+	if (!tipping) {
+	    obj = hold_another_object(obj, u.uswallow ?
+				      "Oops!  %s out of your reach!" :
+					(Is_airlevel(&u.uz) ||
+					 Is_waterlevel(&u.uz) ||
+					 levl[u.ux][u.uy].typ < IRONBARS ||
+					 levl[u.ux][u.uy].typ >= ICE) ?
+					  "Oops!  %s away from you!" :
+					    "Oops!  %s to the floor!",
+				      The(aobjnam(obj, "slip")),
+				      (const char *)0);
+	} else {
+	    /* assumes this is taking place at hero's location */
+	    if (!can_reach_floor(TRUE))
+		hitfloor(obj);
+	    else if (IS_ALTAR(levl[u.ux][u.uy].typ))
+		doaltarobj(obj);
+	    else
+		pline("%s %s to the %s.", Doname2(obj),
+		      otense(obj, "drop"), surface(u.ux, u.uy));
+	    dropy(obj);
+	}
+	if (horn->dknown) makeknown(HORN_OF_PLENTY);
+    }
+    return objcount;
 }
 
 #ifdef WIZARD

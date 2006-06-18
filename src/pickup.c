@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2006/02/03	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2006/06/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2502,7 +2502,7 @@ dotip()
     if (!cobj) return 0;
 
     /* normal case */
-    if (Is_container(cobj)) {
+    if (Is_container(cobj) || cobj->otyp == HORN_OF_PLENTY) {
 	tipcontainer(cobj);
 	return 1;
     }
@@ -2555,6 +2555,9 @@ struct obj *box;	/* or bag */
 {
     boolean empty_it = FALSE;
 
+    /* caveat: this assumes that cknown, lknown, olocked, and otrapped
+       fields haven't been overloaded to mean something special for the
+       non-standard "container" horn of plenty */
     box->lknown = 1;
     if (box->olocked) {
 	pline("It's locked.");
@@ -2566,10 +2569,24 @@ struct obj *box;	/* or bag */
 	    nomul(-1);
 	    nomovemsg = "";
 	}
-    } else if (box->otyp == BAG_OF_TRICKS && box->spe > 0) {
-	/* apply (not loot) this bag; uses up one charge */
-	bagotricks(box);
-	box->cknown = 1;
+    } else if (box->otyp == BAG_OF_TRICKS || box->otyp == HORN_OF_PLENTY) {
+	boolean bag = box->otyp == BAG_OF_TRICKS;
+	int old_spe = box->spe;
+
+	/* apply this bag/horn until empty or monster/object creation fails
+	   (if the latter occurs, force the former...) */
+	do {
+	    if (!(bag ? bagotricks(box, TRUE) : hornoplenty(box, TRUE)))
+		break;
+	} while (box->spe > 0);
+
+	if (box->spe < old_spe) {
+	    /* check_unpaid wants to see a non-zero charge count */
+	    box->spe = old_spe;
+	    check_unpaid_usage(box, TRUE);
+	    box->spe = 0;	/* empty */
+	    box->cknown = 1;
+	}
     } else if (box->spe) {
 	char yourbuf[BUFSZ];
 

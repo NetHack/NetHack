@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.5	2006/05/20	*/
+/*	SCCS Id: @(#)shk.c	3.5	2006/06/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3897,7 +3897,8 @@ boolean altusage; /* some items have an "alternate" use with different cost */
 		tmp /= 2L;
 	} else if(otmp->otyp == BAG_OF_TRICKS ||	 /* 1 - 20 */
 		  otmp->otyp == HORN_OF_PLENTY) {
-		tmp /= 5L;
+		/* altusage: emptying of all the contents at once */
+		if (!altusage) tmp /= 5L;
 	} else if(otmp->otyp == CRYSTAL_BALL ||		 /* 1 - 5 */
 		  otmp->otyp == OIL_LAMP ||		 /* 1 - 10 */
 		  otmp->otyp == BRASS_LANTERN ||
@@ -3949,16 +3950,22 @@ boolean altusage;
 	    arg2 = ESHK(shkp)->debit > 0L ? " an additional" : "";
 	} else if (otmp->otyp == POT_OIL) {
 	    fmt = "%s%sThat will cost you %ld %s (Yendorian Fuel Tax).";
+	} else if (altusage &&
+	      (otmp->otyp == BAG_OF_TRICKS || otmp->otyp == HORN_OF_PLENTY)) {
+	    fmt = "%s%sEmptying that will cost you %ld %s.";
+	    if (!rn2(3)) arg1 = "Whoa!  ";
+	    if (!rn2(3)) arg1 = "Watch it!  ";
 	} else {
 	    fmt = "%s%sUsage fee, %ld %s.";
 	    if (!rn2(3)) arg1 = "Hey!  ";
 	    if (!rn2(3)) arg2 = "Ahem.  ";
 	}
 
-	if (shkp->mcanmove || !shkp->msleeping)
+	if (!muteshk(shkp)) {
 	    verbalize(fmt, arg1, arg2, tmp, currency(tmp));
+	    exercise(A_WIS, TRUE);	/* you just got info */
+	}
 	ESHK(shkp)->debit += tmp;
-	exercise(A_WIS, TRUE);		/* you just got info */
 }
 
 /* for using charges of unpaid objects "used in the normal manner" */

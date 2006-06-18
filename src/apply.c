@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2006/05/13 	*/
+/*	SCCS Id: @(#)apply.c	3.5	2006/06/17 	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2985,7 +2985,7 @@ doapply()
 		res = use_container(&obj, 1);
 		break;
 	case BAG_OF_TRICKS:
-		bagotricks(obj);
+		(void) bagotricks(obj, FALSE);
 		break;
 	case CAN_OF_GREASE:
 		use_grease(obj);
@@ -3107,40 +3107,7 @@ doapply()
 		res = do_play_instrument(obj);
 		break;
 	case HORN_OF_PLENTY:	/* not a musical instrument */
-		if (obj->spe > 0) {
-		    struct obj *otmp;
-		    const char *what;
-
-		    consume_obj_charge(obj, TRUE);
-		    if (!rn2(13)) {
-			otmp = mkobj(POTION_CLASS, FALSE);
-			if (objects[otmp->otyp].oc_magic) do {
-			    otmp->otyp = rnd_class(POT_BOOZE, POT_WATER);
-			} while (otmp->otyp == POT_SICKNESS);
-			what = "A potion";
-		    } else {
-			otmp = mkobj(FOOD_CLASS, FALSE);
-			if (otmp->otyp == FOOD_RATION && !rn2(7))
-			    otmp->otyp = LUMP_OF_ROYAL_JELLY;
-			what = "Some food";
-		    }
-		    pline("%s spills out.", what);
-		    otmp->blessed = obj->blessed;
-		    otmp->cursed = obj->cursed;
-		    otmp->owt = weight(otmp);
-		    otmp = hold_another_object(otmp, u.uswallow ?
-				       "Oops!  %s out of your reach!" :
-					(Is_airlevel(&u.uz) ||
-					 Is_waterlevel(&u.uz) ||
-					 levl[u.ux][u.uy].typ < IRONBARS ||
-					 levl[u.ux][u.uy].typ >= ICE) ?
-					       "Oops!  %s away from you!" :
-					       "Oops!  %s to the floor!",
-					       The(aobjnam(otmp, "slip")),
-					       (const char *)0);
-		    makeknown(HORN_OF_PLENTY);
-		} else
-		    pline(nothing_happens);
+		(void) hornoplenty(obj, FALSE);
 		break;
 	case LAND_MINE:
 	case BEARTRAP:

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)makemon.c	3.5	2006/06/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1805,28 +1805,47 @@ assign_sym:
 	mtmp->mappearance = appear;
 }
 
-/* release a monster from a bag of tricks */
-void
-bagotricks(bag)
+/* release a monster from a bag of tricks; return number of monsters created */
+int
+bagotricks(bag, tipping)
 struct obj *bag;
+boolean tipping;  /* caller emptying entire contents; affects shop handling */
 {
+    int moncount = 0;
+
     if (!bag || bag->otyp != BAG_OF_TRICKS) {
 	impossible("bad bag o' tricks");
     } else if (bag->spe < 1) {
 	pline(nothing_happens);
+	/* now known to be empty if sufficiently discovered */
+	if (bag->dknown && objects[bag->otyp].oc_name_known) bag->cknown = 1;
     } else {
-	boolean gotone = FALSE;
-	int cnt = 1;
+	struct monst *mtmp;
+	boolean sawone = FALSE;
+	int creatcnt = 1;
 
-	consume_obj_charge(bag, TRUE);
+	consume_obj_charge(bag, !tipping);
 
-	if (!rn2(23)) cnt += rn1(7, 1);
-	while (cnt-- > 0) {
-	    if (makemon((struct permonst *)0, u.ux, u.uy, NO_MM_FLAGS))
-		gotone = TRUE;
+	if (!rn2(23)) creatcnt += rnd(7);
+	do {
+	    mtmp = makemon((struct permonst *)0, u.ux, u.uy, NO_MM_FLAGS);
+	    if (mtmp) {
+		++moncount;
+		if (canspotmon(mtmp)) sawone = TRUE;
+	    }
+	} while (--creatcnt > 0);
+	if (sawone) {
+	    /* don't set contents-known flag if we just used last charge 
+	       (such suppression doesn't actually gain us much since
+	       player can now deduce that the bag has become empty) */
+	    if (bag->spe > 0) bag->cknown = 1;
+	    if (bag->dknown) makeknown(BAG_OF_TRICKS);
+	} else {
+	    /* #tip while blind can trigger this successive times */
+	    Norep("Nothing seems to happen.");
 	}
-	if (gotone) makeknown(BAG_OF_TRICKS);
     }
+    return moncount;
 }
 
 /*makemon.c*/
