@@ -1815,14 +1815,16 @@ boolean tipping;  /* caller emptying entire contents; affects shop handling */
 				      (const char *)0);
 	} else {
 	    /* assumes this is taking place at hero's location */
-	    if (!can_reach_floor(TRUE))
-		hitfloor(obj);
-	    else if (IS_ALTAR(levl[u.ux][u.uy].typ))
-		doaltarobj(obj);
-	    else
-		pline("%s %s to the %s.", Doname2(obj),
-		      otense(obj, "drop"), surface(u.ux, u.uy));
-	    dropy(obj);
+	    if (!can_reach_floor(TRUE)) {
+		hitfloor(obj);		/* does altar check, message, drop */
+	    } else {
+		if (IS_ALTAR(levl[u.ux][u.uy].typ))
+		    doaltarobj(obj);	/* does its own drop message */
+		else
+		    pline("%s %s to the %s.", Doname2(obj),
+			  otense(obj, "drop"), surface(u.ux, u.uy));
+		dropy(obj);
+	    }
 	}
 	if (horn->dknown) makeknown(HORN_OF_PLENTY);
     }
