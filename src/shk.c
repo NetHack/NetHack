@@ -2445,7 +2445,7 @@ boolean ininv;
 		   (or by a recursive call to self on behalf of it) where
 		   the cost of this object is about to be added to shop
 		   debt in place of having it remain on the current bill */
-		subfrombill(obj, shkp);	/* avoid doubling billing */
+		subfrombill(obj, shkp);	/* avoid double billing */
 	    }
 
 	    if (!Has_contents(otmp)) {
