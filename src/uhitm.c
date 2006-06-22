@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2006/03/29	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2006/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -172,7 +172,8 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 		seemimic(mtmp);
 		return(FALSE);
 	    }
-	    if (!(Blind ? Blind_telepat : Unblind_telepat)) {
+	    if (!((Blind ? Blind_telepat : Unblind_telepat) ||
+		    Detect_monsters)) {
 		struct obj *obj;
 
 		if (Blind || (is_pool(mtmp->mx,mtmp->my) && !Underwater))
