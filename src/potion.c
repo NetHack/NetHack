@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2005/12/05	*/
+/*	SCCS Id: @(#)potion.c	3.5	2006/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1317,16 +1317,14 @@ boolean your_fault;
 		   !objects[obj->otyp].oc_uname && cansee(mon->mx,mon->my))
 		docall(obj);
 	if(*u.ushops && obj->unpaid) {
-	        register struct monst *shkp =
-			shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+		struct monst *shkp =
+				shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
 
-		if(!shkp)
-		    obj->unpaid = 0;
-		else {
+		if (shkp)
 		    (void)stolen_value(obj, u.ux, u.uy,
 				 (boolean)shkp->mpeaceful, FALSE);
-		    subfrombill(obj, shkp);
-		}
+		else
+		    obj->unpaid = 0;
 	}
 	obfree(obj, (struct obj *)0);
 }

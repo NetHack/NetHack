@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2006/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -700,31 +700,24 @@ register boolean broken;
 	if(!shkp) return;
 
 	if(broken) {
-		if (obj->unpaid) {
+		if (obj->unpaid)
 		    (void)stolen_value(obj, u.ux, u.uy,
 				       (boolean)shkp->mpeaceful, FALSE);
-		    costly_alteration(obj, COST_DSTROY);
-		    /* costly_alteration() probably already called
-		       subfrombill() for the object, but just in case it
-		       didn't, call it again. If it did, this is a NOOP. */
-		    subfrombill(obj, shkp);
-		}
 		obj->no_charge = 1;
 		return;
 	}
 
 	if (!costly_spot(x, y) || *in_rooms(x, y, SHOPBASE) != *u.ushops) {
 		/* thrown out of a shop or into a different shop */
-		if (obj->unpaid) {
+		if (obj->unpaid)
 		    (void)stolen_value(obj, u.ux, u.uy,
 				       (boolean)shkp->mpeaceful, FALSE);
-		    subfrombill(obj, shkp);
-		}
 	} else {
 		if (costly_spot(u.ux, u.uy) && costly_spot(x, y)) {
-		    if(obj->unpaid) subfrombill(obj, shkp);
-		    else if(!(x == shkp->mx && y == shkp->my))
-			    sellobj(obj, x, y);
+		    if (obj->unpaid)
+			subfrombill(obj, shkp);
+		    else if (x != shkp->mx || y != shkp->my)
+			sellobj(obj, x, y);
 		}
 	}
 }

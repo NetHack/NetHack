@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.5	2006/06/17	*/
+/*	SCCS Id: @(#)shk.c	3.5	2006/06/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2438,7 +2438,15 @@ boolean ininv;
 	/* the price of contained objects, if any */
 	for(otmp = obj->cobj; otmp; otmp = otmp->nobj) {
 	    if (otmp->oclass == COIN_CLASS) continue;
-	    if (!billable(&shkp, otmp, ESHK(shkp)->shoproom, TRUE)) continue;
+	    if (!billable(&shkp, otmp, ESHK(shkp)->shoproom, TRUE)) {
+		/* billable() returns false for objects already on bill */
+		if (!onbill(obj, shkp, FALSE)) continue;
+		/* this assumes that we're being called by stolen_value()
+		   (or by a recursive call to self on behalf of it) where
+		   the cost of this object is about to be added to shop
+		   debt in place of having it remain on the current bill */
+		subfrombill(obj, shkp);	/* avoid doubling billing */
+	    }
 
 	    if (!Has_contents(otmp)) {
 		if (otmp->unpaid || !ininv)
@@ -2460,8 +2468,13 @@ boolean peaceful, silent;
 	char roomno = *in_rooms(x, y, SHOPBASE);
 	struct monst *shkp = 0;
 
-	if (!billable(&shkp, obj, roomno, FALSE))
-	    return 0L;
+	if (!billable(&shkp, obj, roomno, FALSE)) {
+	    /* things already on the bill yield a not-billable result, so
+	       we need to check bill before deciding that shk doesn't care */
+	    if (!onbill(obj, shkp, FALSE)) return 0L;
+	    /* shk does care; take obj off bill to avoid double billing */
+	    subfrombill(obj, shkp);
+	}
 
 	if(obj->oclass == COIN_CLASS) {
 	    gvalue += obj->quan;

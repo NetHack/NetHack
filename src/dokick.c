@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.5	2005/12/02	*/
+/*	SCCS Id: @(#)dokick.c	3.5	2006/06/21	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1337,7 +1337,6 @@ boolean shop_floor_obj;
 
 	if(unpaid || shop_floor_obj) {
 	    if(unpaid) {
-		subfrombill(otmp, shop_keeper(*u.ushops));
 		(void)stolen_value(otmp, u.ux, u.uy, TRUE, FALSE);
 	    } else {
 		ox = otmp->ox;
