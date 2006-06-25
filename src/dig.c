@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.5	2005/11/19	*/
+/*	SCCS Id: @(#)dig.c	3.5	2006/06/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -207,7 +207,7 @@ dig_check(madeby, verbose, x, y)
 }
 
 STATIC_OVL int
-dig()
+dig(VOID_ARGS)
 {
 	register struct rm *lev;
 	register xchar dpx = context.digging.pos.x, dpy = context.digging.pos.y;

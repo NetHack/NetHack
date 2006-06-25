@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2006/05/08	*/
+/*	SCCS Id: @(#)do.c	3.5	2006/06/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1606,7 +1606,7 @@ donull()
 }
 
 STATIC_PTR int
-wipeoff()
+wipeoff(VOID_ARGS)
 {
 	if(u.ucreamed < 4)	u.ucreamed = 0;
 	else			u.ucreamed -= 4;

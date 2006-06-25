@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.5	2006/05/17	*/
+/*	SCCS Id: @(#)spell.c	3.5	2006/06/25	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -325,7 +325,7 @@ raise_dead:
 }
 
 STATIC_PTR int
-learn()
+learn(VOID_ARGS)
 {
 	int i;
 	short booktype;

@@ -120,6 +120,24 @@ typedef xchar	boolean;		/* 0 or 1 */
 #define MONST_P struct monst*
 #endif
 
+#if defined(WIN32) && defined(_MSC_VER)
+/* Microsoft Visual C 2005 (_MSC_VER > 1000) complains if a
+ * function pointer prototype is
+ *     int x(void);
+ * via the NDECL macro, but the actual function assigned has a definition
+ *     int x()
+ *     {
+ *     }
+ * We can quiet this by changing the function definition like so
+ *     int x(VOID_ARGS)
+ *     {
+ *     }
+ */
+#define VOID_ARGS void
+#else
+#define VOID_ARGS
+#endif
+
 #define SIZE(x) (int)(sizeof(x) / sizeof(x[0]))
 
 

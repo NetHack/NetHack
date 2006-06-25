@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)eat.c	3.5	2006/06/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -148,7 +148,7 @@ static char *eatmbuf = 0;	/* set by cpostfx() */
 
 STATIC_PTR
 int
-eatmdone()		/* called after mimicing is over */
+eatmdone(VOID_ARGS)		/* called after mimicing is over */
 {
 	/* release `eatmbuf' */
 	if (eatmbuf) {
@@ -363,7 +363,7 @@ do_reset_eat()
 
 STATIC_PTR
 int
-eatfood()		/* called each move during eating process */
+eatfood(VOID_ARGS)		/* called each move during eating process */
 {
 	if(!context.victual.piece ||
 	   (!carried(context.victual.piece) &&
@@ -1255,7 +1255,7 @@ boolean disp;		/* we're just displaying so leave things alone */
 
 STATIC_PTR
 int
-opentin()		/* called during each move whilst opening a tin */
+opentin(VOID_ARGS)		/* called during each move whilst opening a tin */
 {
 	register int r;
 	const char *what;
@@ -1437,7 +1437,7 @@ no_opener:
 }
 
 int
-Hear_again()		/* called when waking up after fainting */
+Hear_again(VOID_ARGS)		/* called when waking up after fainting */
 {
 	/* Chance of deafness going away while fainted/sleepeing/etc. */
 	if (!rn2(2))
@@ -2550,7 +2550,7 @@ register int num;
 
 STATIC_PTR
 int
-unfaint()
+unfaint(VOID_ARGS)
 {
 	(void) Hear_again();
 	if(u.uhs > FAINTING)

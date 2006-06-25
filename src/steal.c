@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.5	2005/12/14	*/
+/*	SCCS Id: @(#)steal.c	3.5	2006/06/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -179,7 +179,7 @@ unsigned int stealoid;		/* object to be stolen */
 unsigned int stealmid;		/* monster doing the stealing */
 
 STATIC_PTR int
-stealarm()
+stealarm(VOID_ARGS)
 {
 	register struct monst *mtmp;
 	register struct obj *otmp;

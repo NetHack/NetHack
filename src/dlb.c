@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dlb.c	3.5	1997/07/29	*/
+/*	SCCS Id: @(#)dlb.c	3.5	2006/06/25	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -237,7 +237,7 @@ close_library(lp)
  * keep track of the file position.
  */
 STATIC_OVL boolean
-lib_dlb_init()
+lib_dlb_init(VOID_ARGS)
 {
     /* zero out array */
     (void) memset((char *)&dlb_libs[0], 0, sizeof(dlb_libs));
@@ -254,7 +254,7 @@ lib_dlb_init()
 }
 
 STATIC_OVL void
-lib_dlb_cleanup()
+lib_dlb_cleanup(VOID_ARGS)
 {
     int i;
 

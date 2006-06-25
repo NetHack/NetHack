@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lock.c	3.5	2006/01/02	*/
+/*	SCCS Id: @(#)lock.c	3.5	2006/06/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -72,7 +72,7 @@ lock_action()
 
 STATIC_PTR
 int
-picklock()	/* try to open/close a lock */
+picklock(VOID_ARGS)	/* try to open/close a lock */
 {
 
 	if (xlock.box) {
@@ -128,7 +128,7 @@ picklock()	/* try to open/close a lock */
 
 STATIC_PTR
 int
-forcelock()	/* try to force a locked chest */
+forcelock(VOID_ARGS)	/* try to force a locked chest */
 {
 
 	register struct obj *otmp;
