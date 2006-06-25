@@ -99,6 +99,7 @@ void
 getlock()
 {
 	register int fd, c, ci, ct, ern;
+	int fcmask = FCMASK;
 	char tbuf[BUFSZ];
 	const char *fq_lock;
 # if defined(MSDOS) && defined(NO_TERMS)
@@ -223,7 +224,7 @@ getlock()
 	}
 
 gotlock:
-	fd = creat(fq_lock, FCMASK);
+	fd = creat(fq_lock, fcmask);
 	if (fd == -1) ern = errno;
 	unlock_file(HLOCK);
 	if(fd == -1) {

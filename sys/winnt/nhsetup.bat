@@ -1,5 +1,5 @@
 @REM  SCCS Id: @(#)nhsetup.bat  3.5     $Date$
-@REM  Copyright (c) NetHack PC Development Team 1993, 1996, 2002
+@REM  Copyright (c) NetHack PC Development Team 1993-2006
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.nt for details
 @REM
@@ -54,30 +54,68 @@ echo MinGW Makefile copied ok.
 
 :do_win
 if not exist ..\..\win\win32\nethack.dsw goto :err_win
+if not exist ..\..\win\win32\nethack.sln goto :err_win
+
 echo.
-echo Copying Visual C project files to ..\..\build directory
+if exist ..\..\build\*.* goto projectcopy
+
+echo Creating ..\..\build directory
+mkdir ..\..\build
+
+:projectcopy
+echo Copying Visual C solution files to top level directory
+@REM Visual Studio 6 workspace
 echo Copying ..\..\win\win32\nethack.dsw  ..\..\nethack.dsw
 copy ..\..\win\win32\nethack.dsw  ..\.. >nul
+
+@REM Visual Studio 2005 Express solution file
+if NOT exist ..\..\win\win32\nethack.sln goto skipsoln
+echo Copying ..\..\win\win32\nethack.sln  ..\..\nethack.sln
+copy ..\..\win\win32\nethack.sln  ..\.. >nul
+:skipsoln
+
 if NOT exist ..\..\binary\*.* echo Creating ..\..\binary directory
 if NOT exist ..\..\binary\*.* mkdir ..\..\binary
 if NOT exist ..\..\binary\license copy ..\..\dat\license ..\..\binary\license >nul
-if NOT exist ..\..\build\*.* echo Creating ..\..\build directory
-if NOT exist ..\..\build\*.* mkdir ..\..\build
+
+echo Copying Visual C project files to ..\..\build directory
+
+copy ..\..\win\win32\dgnstuff.mak  ..\..\build >nul
+copy ..\..\win\win32\levstuff.mak  ..\..\build >nul
+copy ..\..\win\win32\tiles.mak     ..\..\build >nul
+
+@REM Visual C++ 6 project files
 copy ..\..\win\win32\dgncomp.dsp   ..\..\build >nul
 copy ..\..\win\win32\dgnstuff.dsp  ..\..\build >nul
-copy ..\..\win\win32\dgnstuff.mak  ..\..\build >nul
 copy ..\..\win\win32\dlb_main.dsp  ..\..\build >nul
 copy ..\..\win\win32\levcomp.dsp   ..\..\build >nul
 copy ..\..\win\win32\levstuff.dsp  ..\..\build >nul
-copy ..\..\win\win32\levstuff.mak  ..\..\build >nul
 copy ..\..\win\win32\makedefs.dsp  ..\..\build >nul
 copy ..\..\win\win32\recover.dsp   ..\..\build >nul
 copy ..\..\win\win32\tile2bmp.dsp  ..\..\build >nul
 copy ..\..\win\win32\tiles.dsp     ..\..\build >nul
-copy ..\..\win\win32\tiles.mak     ..\..\build >nul
 copy ..\..\win\win32\tilemap.dsp   ..\..\build >nul
 copy ..\..\win\win32\uudecode.dsp   ..\..\build >nul
 copy ..\..\win\win32\nethackw.dsp   ..\..\build >nul
+
+@REM Visual C++ 2005 Express project files
+if NOT exist ..\..\win\win32\makedefs.vcproj goto skipVC2005
+if NOT exist ..\..\win\win32\dgncomp.vcproj goto skipVC2005
+if NOT exist ..\..\win\win32\dlb_main.vcproj goto skipVC2005
+if NOT exist ..\..\win\win32\nethackw.vcproj goto skipVC2005
+copy ..\..\win\win32\dgncomp.vcproj   ..\..\build >nul
+copy ..\..\win\win32\dgnstuff.vcproj  ..\..\build >nul
+copy ..\..\win\win32\dlb_main.vcproj  ..\..\build >nul
+copy ..\..\win\win32\levcomp.vcproj   ..\..\build >nul
+copy ..\..\win\win32\levstuff.vcproj  ..\..\build >nul
+copy ..\..\win\win32\makedefs.vcproj  ..\..\build >nul
+copy ..\..\win\win32\recover.vcproj   ..\..\build >nul
+copy ..\..\win\win32\tile2bmp.vcproj  ..\..\build >nul
+copy ..\..\win\win32\tiles.vcproj     ..\..\build >nul
+copy ..\..\win\win32\tilemap.vcproj   ..\..\build >nul
+copy ..\..\win\win32\uudecode.vcproj   ..\..\build >nul
+copy ..\..\win\win32\nethackw.vcproj   ..\..\build >nul
+:skipVC2005
 
 goto :done
 

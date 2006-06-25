@@ -115,6 +115,10 @@
 # endif
 #endif
 
+#if defined(_WIN32) && !defined(WIN32)
+#define WIN32
+#endif
+
 #ifdef WIN32
 # undef UNIX
 # undef MSDOS

@@ -619,7 +619,11 @@ const char *build_date;
 void
 do_date()
 {
+#ifdef KR1ED
 	long clocktim = 0;
+#else
+	time_t clocktim = 0;
+#endif
 	char *c, cbuf[60], buf[BUFSZ];
 	const char *ul_sfx;
 
@@ -635,17 +639,13 @@ do_date()
 	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.5\t2004/02/01 */\n\n");
 	Fprintf(ofp,Dont_Edit_Code);
 
-#ifdef KR1ED
 	(void) time(&clocktim);
 	Strcpy(cbuf, ctime(&clocktim));
-#else
-	(void) time((time_t *)&clocktim);
-	Strcpy(cbuf, ctime((time_t *)&clocktim));
-#endif
+
 	for (c = cbuf; *c; c++) if (*c == '\n') break;
 	*c = '\0';	/* strip off the '\n' */
 	Fprintf(ofp,"#define BUILD_DATE \"%s\"\n", cbuf);
-	Fprintf(ofp,"#define BUILD_TIME (%ldL)\n", clocktim);
+	Fprintf(ofp,"#define BUILD_TIME (%ldL)\n", (long)clocktim);
 	Fprintf(ofp,"\n");
 #ifdef NHSTDC
 	ul_sfx = "UL";

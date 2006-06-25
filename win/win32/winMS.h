@@ -5,6 +5,24 @@
 #ifndef WINMS_H
 #define WINMS_H
 
+#ifdef _MSC_VER
+# if _MSC_VER >= 1400
+/* Visual C 8 warning elimination */
+#  ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#  endif
+#  ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#  endif
+#  ifndef _SCL_SECURE_NO_DEPRECATE
+#define _SCL_SECURE_NO_DEPRECATE
+#  endif
+#  ifndef _CRT_NONSTDC_NO_DEPRECATE
+#define _CRT_NONSTDC_NO_DEPRECATE
+#  endif
+# endif
+#endif
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <commctrl.h>

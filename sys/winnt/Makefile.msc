@@ -1,9 +1,10 @@
 #       SCCS Id: @(#)Makefile.msc       3.5     $Date$
 #       Copyright (c) NetHack PC Development Team 1993-2006
 #
-#       NetHack 3.5.x Makefile for MS Visual C++ V6.x and above and MS NMAKE
+#       NetHack 3.5.x Makefile for MS Visual C++
 #  
 #       Win32 Compilers Tested:
+#                              - Microsoft Visual C++ 2005 Express, with the Platform SDK
 #                              - Microsoft 32 bit Visual C++ V4.x
 #                              - Microsoft 32 bit Visual C++ V6.0 SP3, SP4
 #
@@ -114,12 +115,12 @@ RANDOM	= $(OBJ)\random.o
 #RANDOM	=
 
 #
-#  Leave the next two lines uncommented _ONLY_ if you do NOT want any
+#  Uncomment the next 2 lines _ONLY_ if you DO NOT want any
 #  debug capability in the object files, or in the NetHack executable.
 #  Comment them if you want debug capability.
 
+#ldebug =
 #cdebug =
-#linkdebug =
 
 #
 # Compiler and Linker flags
@@ -190,32 +191,54 @@ DLBFLG =
 ! ENDIF
 
 #==========================================
+#==========================================
 # Setting up the compiler and linker
-# macros. All builds include the base ones.
+#==========================================
 #==========================================
 
-CFLAGSBASE  = -c $(cflags) $(cvarsmt) -I$(INCL) -nologo $(cdebug) $(WINPINC)
-LFLAGSBASEC = $(linkdebug) /NODEFAULTLIB /INCREMENTAL:NO /RELEASE /NOLOGO -subsystem:console,4.0 $(conlibsmt)
-LFLAGSBASEG = $(linkdebug) $(guiflags) $(guilibsmt) comctl32.lib
+PDBFILE= /PDB:"$(O)$(GAME).PDB"
+MAPFILE= /MAP:"$(O)$(GAME).MAP"
+INCLDIR= /I..\include
+
+!IF ("$(ldebug)" != "")
+!IF ("$(ldebug)" != "/RELEASE")
+ldebug = /DEBUG
+!ENDIF
+!ENDIF
+
+!IF ("$(cdebug)" != "")
+!IF ("$(cdebug)" != "-Ox -DNDEBUG")
+cdebug = -Zi -Od
+!ENDIF
+!ENDIF
 
 #==========================================
 # Util builds
 #==========================================
 
-CFLAGSU = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
-LFLAGSU	= $(LFLAGSBASEC)
+cflagsUtil = $(cdebug) $(cflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
+lflagsUtil = $(ldebug) $(lflags) $(conlibs)
 
 #==========================================
 # - Game build
 #==========================================
-LFLAGSBASE = $(linkdebug) /NODEFAULTLIB /INCREMENTAL:NO /RELEASE /NOLOGO -subsystem:console,4.0 $(conlibsmt)
-CFLAGS	 = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
-NHLFLAGS1 = /NODEFAULTLIB /INCREMENTAL:NO /PDB:"$(O)$(GAME).PDB" /RELEASE /NOLOGO
-NHLFLAGS2 = /MAP:"$(O)$(GAME).MAP" /MACHINE:$(CPU) -IGNORE:505 
+
+GAMEPDBFILE= /PDB:"$(O)$(GAME).PDB"
+GAMEMAPFILE= /MAP:"$(O)$(GAME).MAP"
+LIBS= user32.lib winmm.lib $(ZLIB)
+
 !IF ("$(GRAPHICAL)"=="Y")
-LFLAGS	= $(LFLAGSBASEG) $(NHLFLAGS1) $(NHLFLAGS2)
+
+cflagsGame = $(cdebug) $(cflags) $(guiflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG) \
+	     $(GAMEPDBFILE) $(GAMEMAPFILE)
+lflagsGame = $(ldebug) $(lflags) $(guilibs)
+
 !ELSE
-LFLAGS	= $(LFLAGSBASEC) $(NHLFLAGS1) $(NHLFLAGS2)
+
+cflagsGame = $(cdebug) $(cflags) $(conflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG) \
+	     $(GAMEPDBFILE) $(GAMEMAPFILE)
+lflagsGame = $(ldebug) $(lflags) $(conlibs)
+
 !ENDIF
 
 GAMEFILE = $(GAMEDIR)\$(GAME).exe # whole thing
@@ -237,24 +260,24 @@ DLB =
 #==========================================
 
 .c{$(OBJ)}.o:
-	@$(cc) $(CFLAGS)  -Fo$@ $<
+	 @$(cc) $(cflagsUtil)  -Fo$@ $<
 
 {$(SRC)}.c{$(OBJ)}.o:
-	@$(CC) $(CFLAGS)   -Fo$@  $<
+	 @$(CC) $(cflagsUtil)   -Fo$@  $<
 
 #==========================================
 # Rules for files in sys\share
 #==========================================
 
 {$(SSYS)}.c{$(OBJ)}.o:
-	@$(CC) $(CFLAGS)  -Fo$@  $<
+	@$(CC) $(cflagsUtil)  -Fo$@  $<
 
 #==========================================
 # Rules for files in sys\winnt
 #==========================================
 
 {$(NTSYS)}.c{$(OBJ)}.o:
-	@$(CC) $(CFLAGS)  -Fo$@  $<
+	@$(CC) $(cflagsUtil)  -Fo$@  $<
 
 {$(NTSYS)}.h{$(INCL)}.h:
 	@copy $< $@
@@ -264,14 +287,14 @@ DLB =
 #==========================================
 
 {$(UTIL)}.c{$(OBJ)}.o:
-	@$(CC) $(CFLAGSU) -Fo$@ $<
+	@$(CC) $(cflagsUtil) -Fo$@ $<
 
 #==========================================
 # Rules for files in win\share
 #==========================================
 
 {$(WSHR)}.c{$(OBJ)}.o:
-	@$(CC) $(CFLAGS)  -Fo$@ $<
+	@$(CC) $(cflagsUtil)  -Fo$@ $<
 
 {$(WSHR)}.h{$(INCL)}.h:
 	@copy $< $@
@@ -284,7 +307,7 @@ DLB =
 #==========================================
 
 {$(TTY)}.c{$(OBJ)}.o:
-	@$(CC) $(CFLAGS)  -Fo$@  $<
+	@$(CC) $(cflagsUtil)  -Fo$@  $<
 
 
 #==========================================
@@ -292,7 +315,7 @@ DLB =
 #==========================================
 
 {$(WIN32)}.c{$(OBJ)}.o:
-	@$(cc) $(CFLAGS)  -Fo$@  $<
+	@$(cc) $(cflagsUtil)  -Fo$@  $<
 
 #==========================================
 #================ MACROS ==================
@@ -587,7 +610,7 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag $(WINDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
-	$(link) $(LFLAGS) $(ZLIB) user32.lib winmm.lib -out:$@ @<<$(GAME).lnk
+	$(link) $(lflagsGame) /STACK:2048 $(LIBS) -out:$@ @<<$(GAME).lnk
 		$(ALLOBJ:^	=^
 		) $(NHRES)
 <<
@@ -610,7 +633,7 @@ $(O)nhdefkey.def:
 
 $(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
-	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
+	@$(link) $(ldebug) /RELEASE /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
@@ -625,7 +648,7 @@ $(O)nh340key.def:
 
 $(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
-	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
+	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
@@ -640,7 +663,7 @@ $(O)nhraykey.def:
 
 $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
-	@$(link) -debug:full -debugtype:cv /RELEASE /NOLOGO /DLL user32.lib \
+	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
@@ -653,14 +676,14 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 #==========================================
 
 $(U)makedefs.exe:	$(MAKEOBJS)
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
+	$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
 		 $(INCL)\monsym.h    $(INCL)\qtext.h	$(INCL)\patchlevel.h \
 		 $(U)makedefs.c
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	@$(CC) $(CFLAGSU) -Fo$@ $(U)makedefs.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)makedefs.c
 
 #
 #  date.h should be remade every time any of the source or include
@@ -693,9 +716,10 @@ $(SRC)\vis_tab.c: $(U)makedefs.exe
 #==========================================
 
 $(U)uudecode.exe: $(O)uudecode.o
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)\uudecode.c
+	@$(CC) $(cflagsUtil) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
 
 $(NTSYS)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu 
 	chdir $(NTSYS)
@@ -746,7 +770,7 @@ LEVCFLAGS=-c -nologo -DWINVER=0x0400 -DWIN32 -D_WIN32 \
 
 $(U)lev_comp.exe: $(SPLEVOBJS)
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
  		$(SPLEVOBJS:^	=^
 		)
 <<
@@ -805,7 +829,7 @@ $(U)lev_$(LEX).c: $(U)lev_comp.l
 
 $(U)dgn_comp.exe: $(DGNCOMPOBJS)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(DGNCOMPOBJS:^	=^
 		)
 <<
@@ -900,7 +924,7 @@ $(INCL)\win32api.h: $(NTSYS)\win32api.h
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)dlb_main.o
 		$(O)dlb.o
 		$(O)alloc.o
@@ -908,10 +932,10 @@ $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
 <<
 
 $(O)dlb.o:	$(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
-	@$(CC) $(CFLAGS) /Fo$@ $(SRC)\dlb.c
+	@$(CC) $(cflagsUtil) /Fo$@ $(SRC)\dlb.c
 	
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
-	@$(CC) $(CFLAGS) /Fo$@ $(UTIL)\dlb_main.c
+	@$(CC) $(cflagsUtil) /Fo$@ $(UTIL)\dlb_main.c
 
 $(DAT)\porthelp: $(NTSYS)\porthelp
 	@copy $(NTSYS)\porthelp $@ >nul
@@ -946,10 +970,10 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 #==========================================
 
 $(U)recover.exe: $(RECOVOBJS)
-	$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
+	$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)\win32api.h
-	$(CC) $(CFLAGSU) -Fo$@ $(U)recover.c
+	$(CC) $(cflagsUtil) -Fo$@ $(U)recover.c
 
 #==========================================
 #  Tile Mapping
@@ -960,31 +984,31 @@ $(SRC)\tile.c: $(U)tilemap.exe
 	@$(U)tilemap
 
 $(U)tilemap.exe: $(O)tilemap.o
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
 $(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
-	@$(CC) $(CFLAGSU) -Fo$@ $(WSHR)\tilemap.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(WSHR)\tilemap.c
 
 $(O)tiletx32.o: $(WSHR)\tilemap.c $(HACK_H)
-	@$(CC) $(CFLAGS) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
+	@$(CC) $(cflagsUtil) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
 
 $(O)tiletxt.o: $(WSHR)\tilemap.c $(HACK_H)
-	@$(CC) $(CFLAGS) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
+	@$(CC) $(cflagsUtil) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
 
 $(O)gifread.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
-	@$(CC) $(CFLAGS) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
 
 $(O)gifrd32.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
-	@$(CC) $(CFLAGS) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
 
 $(O)ppmwrite.o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
-	@$(CC) $(CFLAGS) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
 
 $(O)tiletext.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
-	@$(CC) $(CFLAGS) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
 
 $(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
-	@$(CC) $(CFLAGS) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
 
 #==========================================
 # Optional Tile Utilities
@@ -992,7 +1016,7 @@ $(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 
 $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS:^	=^
 		)
 		$(TEXT_IO:^	=^
@@ -1001,7 +1025,7 @@ $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
 
 $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS32:^	=^
 		)
 		$(TEXT_IO32:^	=^
@@ -1010,7 +1034,7 @@ $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
 
 $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(PPMWRITERS:^	=^
 		)
 		$(TEXT_IO:^	=^
@@ -1032,7 +1056,7 @@ $(TILEBMP32):
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)tile2bmp.o
 		$(TEXT_IO:^  =^
 		)
@@ -1040,17 +1064,17 @@ $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 
 $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
     @echo Linking $@...
-	@$(link) $(LFLAGSU) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)til2bm32.o
 		$(TEXT_IO32:^  =^
 		)
 <<
 
 $(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
-	@$(CC) $(CFLAGS) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
 
 $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
-	@$(CC) $(CFLAGS) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
 #==========================================
 # Housekeeping
@@ -1159,22 +1183,22 @@ $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 #
 
 $(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(NTSYS)\nttty.c
-	@$(CC) $(CFLAGS) -I$(WSHR) -Fo$@  $(NTSYS)\nttty.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(NTSYS)\nttty.c
 $(O)nhkeys.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(NTSYS)\nhkeys.c
-	@$(CC) $(CFLAGS) -I$(WSHR) -Fo$@  $(NTSYS)\nhkeys.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(NTSYS)\nhkeys.c
 $(O)winnt.o: $(HACK_H) $(INCL)\win32api.h $(NTSYS)\winnt.c
-	@$(CC) $(CFLAGS) -Fo$@  $(NTSYS)\winnt.c
+	@$(CC) $(cflagsUtil) -Fo$@  $(NTSYS)\winnt.c
 $(O)ntsound.o: $(HACK_H) $(NTSYS)\ntsound.c
-	@$(CC) $(CFLAGS)  -Fo$@ $(NTSYS)\ntsound.c
+	@$(CC) $(cflagsUtil)  -Fo$@ $(NTSYS)\ntsound.c
 $(O)mapimail.o: $(HACK_H) $(INCL)\nhlan.h $(NTSYS)\mapimail.c
-	@$(CC) $(CFLAGS) -DMAPI_VERBOSE  -Fo$@ $(NTSYS)\mapimail.c
+	@$(CC) $(cflagsUtil) -DMAPI_VERBOSE  -Fo$@ $(NTSYS)\mapimail.c
 
 # 
 # util dependencies
 #
 
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
-	@$(CC) $(CFLAGS) -Fo$@ $(U)panic.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)panic.c
 
 #
 # The rest are stolen from sys/unix/Makefile.src, 
@@ -1188,116 +1212,116 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 # in here, but maintenance should be easier.
 #
 $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\atari\tos.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\atari\tos.c
 $(O)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\win32api.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\share\pcmain.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\share\pcmain.c
 $(O)pcsys.o: ..\sys\share\pcsys.c $(HACK_H)
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\share\pcsys.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\share\pcsys.c
 $(O)pctty.o: ..\sys\share\pctty.c $(HACK_H)
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\share\pctty.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\share\pctty.c
 $(O)pcunix.o: ..\sys\share\pcunix.c $(HACK_H)
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\share\pcunix.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\share\pcunix.c
 $(O)random.o: ..\sys\share\random.c $(HACK_H)
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\share\random.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\share\random.c
 $(O)ioctl.o: ..\sys\share\ioctl.c $(HACK_H) $(INCL)\tcap.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\share\ioctl.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\share\ioctl.c
 $(O)unixtty.o: ..\sys\share\unixtty.c $(HACK_H)
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\share\unixtty.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\share\unixtty.c
 $(O)unixmain.o: ..\sys\unix\unixmain.c $(HACK_H) $(INCL)\dlb.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\unix\unixmain.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\unix\unixmain.c
 $(O)unixunix.o: ..\sys\unix\unixunix.c $(HACK_H)
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\unix\unixunix.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\unix\unixunix.c
 $(O)unixres.o: ..\sys\unix\unixres.c $(CONFIG_H)
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\unix\unixres.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\unix\unixres.c
 $(O)bemain.o: ..\sys\be\bemain.c $(HACK_H) $(INCL)\dlb.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\sys\be\bemain.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\be\bemain.c
 $(O)getline.o: ..\win\tty\getline.c $(HACK_H) $(INCL)\func_tab.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\tty\getline.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\tty\getline.c
 $(O)termcap.o: ..\win\tty\termcap.c $(HACK_H) $(INCL)\tcap.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\tty\termcap.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\tty\termcap.c
 $(O)topl.o: ..\win\tty\topl.c $(HACK_H) $(INCL)\tcap.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\tty\topl.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\tty\topl.c
 $(O)wintty.o: ..\win\tty\wintty.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\patchlevel.h $(INCL)\tcap.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\tty\wintty.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\tty\wintty.c
 $(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
 		$(CONFIG_H)
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\Window.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\Window.c
 $(O)dialogs.o: ..\win\X11\dialogs.c $(CONFIG_H)
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\dialogs.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\dialogs.c
 $(O)winX.o: ..\win\X11\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
 		$(INCL)\patchlevel.h ..\win\X11\nh72icon \
 		..\win\X11\nh56icon ..\win\X11\nh32icon
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winX.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winX.c
 $(O)winmap.o: ..\win\X11\winmap.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\winX.h $(INCL)\tile2x11.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winmap.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winmap.c
 $(O)winmenu.o: ..\win\X11\winmenu.c $(HACK_H) $(INCL)\winX.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winmenu.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winmenu.c
 $(O)winmesg.o: ..\win\X11\winmesg.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\winX.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winmesg.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winmesg.c
 $(O)winmisc.o: ..\win\X11\winmisc.c $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\winX.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winmisc.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winmisc.c
 $(O)winstat.o: ..\win\X11\winstat.c $(HACK_H) $(INCL)\winX.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winstat.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winstat.c
 $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\wintext.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\wintext.c
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\X11\winval.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winval.c
 $(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnmain.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnaskstr.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnaskstr.c
 $(O)gnbind.o: ..\win\gnome\gnbind.c ..\win\gnome\gnbind.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gnaskstr.h ..\win\gnome\gnyesno.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnbind.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnbind.c
 $(O)gnglyph.o: ..\win\gnome\gnglyph.c ..\win\gnome\gnglyph.h $(INCL)\tile2x11.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnglyph.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnglyph.c
 $(O)gnmain.o: ..\win\gnome\gnmain.c ..\win\gnome\gnmain.h ..\win\gnome\gnsignal.h \
 		..\win\gnome\gnbind.h ..\win\gnome\gnopts.h $(HACK_H) \
 		$(INCL)\date.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmain.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmain.c
 $(O)gnmap.o: ..\win\gnome\gnmap.c ..\win\gnome\gnmap.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnsignal.h $(HACK_H)
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmap.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmap.c
 $(O)gnmenu.o: ..\win\gnome\gnmenu.c ..\win\gnome\gnmenu.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gnbind.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmenu.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmenu.c
 $(O)gnmesg.o: ..\win\gnome\gnmesg.c ..\win\gnome\gnmesg.h ..\win\gnome\gnsignal.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmesg.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmesg.c
 $(O)gnopts.o: ..\win\gnome\gnopts.c ..\win\gnome\gnopts.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnmain.h ..\win\gnome\gnmap.h $(HACK_H)
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnopts.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnopts.c
 $(O)gnplayer.o: ..\win\gnome\gnplayer.c ..\win\gnome\gnplayer.h \
 		..\win\gnome\gnmain.h $(HACK_H)
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnplayer.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnplayer.c
 $(O)gnsignal.o: ..\win\gnome\gnsignal.c ..\win\gnome\gnsignal.h \
 		..\win\gnome\gnmain.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnsignal.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnsignal.c
 $(O)gnstatus.o: ..\win\gnome\gnstatus.c ..\win\gnome\gnstatus.h \
 		..\win\gnome\gnsignal.h ..\win\gnome\gn_xpms.h \
 		..\win\gnome\gnomeprv.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnstatus.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnstatus.c
 $(O)gntext.o: ..\win\gnome\gntext.c ..\win\gnome\gntext.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gn_rip.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gntext.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gntext.c
 $(O)gnworn.o: ..\win\gnome\gnworn.c ..\win\gnome\gnworn.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnsignal.h ..\win\gnome\gnomeprv.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnworn.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnworn.c
 $(O)gnyesno.o: ..\win\gnome\gnyesno.c ..\win\gnome\gnbind.h ..\win\gnome\gnyesno.h
-	@$(CC) $(CFLAGS) $(GNOMEINC) -Fo$@ ..\win\gnome\gnyesno.c
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnyesno.c
 $(O)wingem.o: ..\win\gem\wingem.c $(HACK_H) $(INCL)\func_tab.h $(INCL)\dlb.h \
 		$(INCL)\patchlevel.h $(INCL)\wingem.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\gem\wingem.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\gem\wingem.c
 $(O)wingem1.o: ..\win\gem\wingem1.c $(INCL)\gem_rsc.h $(INCL)\load_img.h \
 		$(INCL)\gr_rect.h $(INCL)\wintype.h $(INCL)\wingem.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\gem\wingem1.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\gem\wingem1.c
 $(O)load_img.o: ..\win\gem\load_img.c $(INCL)\load_img.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\gem\load_img.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\gem\load_img.c
 $(O)gr_rect.o: ..\win\gem\gr_rect.c $(INCL)\gr_rect.h
-	@$(CC) $(CFLAGS) -Fo$@ ..\win\gem\gr_rect.c
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\gem\gr_rect.c
 $(O)tile.o: tile.c $(HACK_H)
 $(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\dlb.h $(INCL)\patchlevel.h $(INCL)\tile2x11.h \
