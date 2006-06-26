@@ -21,11 +21,14 @@ You can build either the TTY version of NetHack or the Windows Graphical
 version.  In either case you can use one of the following build
 environments:
 
-  o A copy of Microsoft Visual C V6.0 SP3 or later, which includes
-    Visual C++ 2005 Express Edition plus the MS Platform SDK.  
-    The current code has not been tested with earlier versions.
+  o A copy of Microsoft Visual C V6.0 SP3 or later. An acceptable
+    later version is the C compiler that can be downloaded as
+    Visual Studio 2005 Express Edition, but you must also download
+    the MS Platform SDK in order to build native win32 applications
+    such as NetHack. The current NetHack code has not been tested 
+    with earlier versions of the compiler.		
 		
-	OR
+    OR
 
   o A copy of Borland C 5.5.1 command line tools.  Borland has made a
     version of its command line tools available for download after
@@ -126,15 +129,27 @@ Setting Up
 1.  It almost goes without saying that you should make sure that your 
     tools are set up and running correctly.  That includes ensuring that
     all the necessary environment variables for the compiler environment
-    are set correctly. For Visual C++ 6.x, you need to execute 
-    vcvars32.bat which is probably in the bin directory of your compilers 
-    directory tree. If you are using the Visual C++ 2005 Express Edition,
-    you will need to download and install the MS Platform SDK as well. 
-    The Platform SDK is required for building native WIN32 applications, 
-    such as this. The two must be integrated to work together. At the
-    time of this writing, there were instructions available from the
-    manufacturer at the following URL:
+    are set correctly. 
+
+    For Visual C++ 6.x, you need to execute 
+	vcvars32.bat 
+    which is probably in the bin directory of your compilers directory tree.
+  
+    For Visual Studio 2005 Express Edition, you will need to download 
+    and install the MS Platform SDK as well.  The Platform SDK is 
+    required for building native WIN32 applications, such as NetHack. 
+    The two must be integrated to work together once. 
+    At the time of this writing, there were instructions available from 
+    the manufacturer at the following URL:
       http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/
+
+    Once you have Visual Studio 2005 Express and the Platform SDK 
+    properly integrated with each other, you need to execute
+        vcvarsall.bat
+    which is probably in the bin directory of your VSINSTALLDIR.
+    Then for the Platform SDK, you need to execute
+        SetEnv.cmd
+    from the Platform SDK install directory.
 
     For the GCC Makefile, add <mingw>\bin to your path, where <mingw> 
     is your MinGW root directory.).
