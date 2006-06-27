@@ -86,9 +86,6 @@ extern void FDECL(interject, (int));
 # ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE
 # endif
-# ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE
-# endif
 # ifndef _SCL_SECURE_NO_DEPRECATE
 #define _SCL_SECURE_NO_DEPRECATE
 # endif
