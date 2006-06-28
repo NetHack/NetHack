@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)region.h	3.5	2004/12/29	*/
+/*	SCCS Id: @(#)region.h	3.5	2006/06/27	*/
 /* Copyright (c) 1996 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -38,7 +38,7 @@ typedef struct {
   /*struct obj *attach_2_o;*/	/* Region attached to object ? UNUSED YET */
   const char* enter_msg;	/* Message when entering */
   const char* leave_msg;	/* Message when leaving */
-  short  ttl;			/* Time to live. -1 is forever */
+  long  ttl;			/* Time to live. -1 is forever */
   short expire_f;		/* Function to call when region's ttl expire */
   short can_enter_f;		/* Function to call to check wether the player
 				   can, or can not, enter the region */

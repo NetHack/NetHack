@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)region.c	3.5	2004/11/30	*/
+/*	SCCS Id: @(#)region.c	3.5	2006/06/27	*/
 /* Copyright (c) 1996 by Jean-Christophe Collet	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -40,7 +40,7 @@ void FDECL(remove_mon_from_regions, (struct monst *));
 NhRegion *FDECL(create_msg_region, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,
 				    const char *,const char *));
 boolean FDECL(enter_force_field, (genericptr,genericptr));
-NhRegion *FDECL(create_force_field, (XCHAR_P,XCHAR_P,int,int));
+NhRegion *FDECL(create_force_field, (XCHAR_P,XCHAR_P,int,long));
 #endif
 
 STATIC_DCL void FDECL(reset_region_mids, (NhRegion *));
@@ -114,7 +114,7 @@ int nrect;
 	    reg->bounding_box.hy = rects[i].hy;
 	reg->rects[i] = rects[i];
     }
-    reg->ttl = -1;		/* Defaults */
+    reg->ttl = -1L;		/* Defaults */
     reg->attach_2_u = FALSE;
     reg->attach_2_m = 0;
     /* reg->attach_2_o = NULL; */
@@ -379,7 +379,7 @@ run_regions()
     /* End of life ? */
     /* Do it backward because the array will be modified */
     for (i = n_regions - 1; i >= 0; i--) {
-	if (regions[i]->ttl == 0) {
+	if (regions[i]->ttl == 0L) {
 	    if ((f_indx = regions[i]->expire_f) == NO_CALLBACK ||
 		(*callbacks[f_indx])(regions[i], (genericptr_t) 0))
 		remove_region(regions[i]);
@@ -389,7 +389,7 @@ run_regions()
     /* Process remaining regions */
     for (i = 0; i < n_regions; i++) {
 	/* Make the region age */
-	if (regions[i]->ttl > 0)
+	if (regions[i]->ttl > 0L)
 	    regions[i]->ttl--;
 	/* Check if player is inside region */
 	f_indx = regions[i]->inside_f;
@@ -596,7 +596,7 @@ xchar x, y;
 
     for (i = 0; i < n_regions; i++)
 	if (inside_region(regions[i], x, y) && regions[i]->visible &&
-		regions[i]->ttl != 0)
+		regions[i]->ttl != 0L)
 	    return regions[i];
     return (NhRegion *) 0;
 }
@@ -642,7 +642,7 @@ int mode;
 	bwrite(fd, (genericptr_t) &n, sizeof n);
 	if (n > 0)
 	    bwrite(fd, (genericptr_t) regions[i]->leave_msg, n);
-	bwrite(fd, (genericptr_t) &regions[i]->ttl, sizeof (short));
+	bwrite(fd, (genericptr_t) &regions[i]->ttl, sizeof (long));
 	bwrite(fd, (genericptr_t) &regions[i]->expire_f, sizeof (short));
 	bwrite(fd, (genericptr_t) &regions[i]->can_enter_f, sizeof (short));
 	bwrite(fd, (genericptr_t) &regions[i]->enter_f, sizeof (short));
@@ -713,11 +713,11 @@ boolean ghostly; /* If a bones file restore */
 	} else
 	    regions[i]->leave_msg = (const char *)0;
 
-	mread(fd, (genericptr_t) &regions[i]->ttl, sizeof (short));
+	mread(fd, (genericptr_t) &regions[i]->ttl, sizeof (long));
 	/* check for expired region */
-	if (regions[i]->ttl >= 0)
+	if (regions[i]->ttl >= 0L)
 	    regions[i]->ttl =
-		(regions[i]->ttl > tmstamp) ? regions[i]->ttl - tmstamp : 0;
+		(regions[i]->ttl > tmstamp) ? regions[i]->ttl - tmstamp : 0L;
 	mread(fd, (genericptr_t) &regions[i]->expire_f, sizeof (short));
 	mread(fd, (genericptr_t) &regions[i]->can_enter_f, sizeof (short));
 	mread(fd, (genericptr_t) &regions[i]->enter_f, sizeof (short));
@@ -746,7 +746,7 @@ boolean ghostly; /* If a bones file restore */
     /* remove expired regions, do not trigger the expire_f callback (yet!);
        also update monster lists if this data is coming from a bones file */
     for (i = n_regions - 1; i >= 0; i--)
-	if (regions[i]->ttl == 0)
+	if (regions[i]->ttl == 0L)
 	    remove_region(regions[i]);
 	else if (ghostly && regions[i]->n_monst > 0)
 	    reset_region_mids(regions[i]);
@@ -798,7 +798,7 @@ const char *msg_leave;
     tmprect.hx = x + w;
     tmprect.hy = y + h;
     add_rect_to_reg(reg, &tmprect);
-    reg->ttl = -1;
+    reg->ttl = -1L;
     return reg;
 }
 
@@ -834,7 +834,8 @@ genericptr_t p2;
 NhRegion *
 create_force_field(x, y, radius, ttl)
 xchar x, y;
-int radius, ttl;
+int radius;
+long ttl;
 {
     int i;
     NhRegion *ff;
@@ -890,7 +891,7 @@ genericptr_t p2;
     if (damage >= 5) {
 	damage /= 2;		/* It dissipates, let's do less damage */
 	reg->arg = (genericptr_t) damage;
-	reg->ttl = 2;		/* Here's the trick : reset ttl */
+	reg->ttl = 2L;		/* Here's the trick : reset ttl */
 	return FALSE;		/* THEN return FALSE, means "still there" */
     }
     return TRUE;		/* OK, it's gone, you can free it! */
