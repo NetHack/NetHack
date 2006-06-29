@@ -876,10 +876,11 @@ long ttl;
  * Here is an example of an expire function that may prolong
  * region life after some mods...
  */
+/*ARGSUSED*/
 boolean
 expire_gas_cloud(p1, p2)
 genericptr_t p1;
-genericptr_t p2;
+genericptr_t p2;	/* unused here */
 {
     NhRegion *reg;
     int damage;
