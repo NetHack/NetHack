@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)global.h	3.5	2003/12/13	*/
+/*	SCCS Id: @(#)global.h	3.5	2006/06/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -82,60 +82,6 @@ typedef xchar	boolean;		/* 0 or 1 */
 #define Bitfield(x,n)	unsigned x:n
 #else
 #define Bitfield(x,n)	uchar x
-#endif
-
-#ifdef UNWIDENED_PROTOTYPES
-# define CHAR_P char
-# define SCHAR_P schar
-# define UCHAR_P uchar
-# define XCHAR_P xchar
-# define SHORT_P short
-#ifndef SKIP_BOOLEAN
-# define BOOLEAN_P boolean
-#endif
-# define ALIGNTYP_P aligntyp
-#else
-# ifdef WIDENED_PROTOTYPES
-#  define CHAR_P int
-#  define SCHAR_P int
-#  define UCHAR_P int
-#  define XCHAR_P int
-#  define SHORT_P int
-#  define BOOLEAN_P int
-#  define ALIGNTYP_P int
-# endif
-#endif
-#if defined(ULTRIX_PROTO) && !defined(__STDC__)
-/* The ultrix 2.0 and 2.1 compilers (on Ultrix 4.0 and 4.2 respectively) can't
- * handle "struct obj *" constructs in prototypes.  Their bugs are different,
- * but both seem to work if we put "void*" in the prototype instead.  This
- * gives us minimal prototype checking but avoids the compiler bugs.
- *
- * OBJ_P and MONST_P should _only_ be used for declaring function pointers.
- */
-#define OBJ_P void*
-#define MONST_P void*
-#else
-#define OBJ_P struct obj*
-#define MONST_P struct monst*
-#endif
-
-#if defined(WIN32) && defined(_MSC_VER)
-/* Microsoft Visual C 2005 (_MSC_VER > 1000) complains if a
- * function pointer prototype is
- *     int x(void);
- * via the NDECL macro, but the actual function assigned has a definition
- *     int x()
- *     {
- *     }
- * We can quiet this by changing the function definition like so
- *     int x(VOID_ARGS)
- *     {
- *     }
- */
-#define VOID_ARGS void
-#else
-#define VOID_ARGS
 #endif
 
 #define SIZE(x) (int)(sizeof(x) / sizeof(x[0]))

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)tradstdc.h 3.5	1993/05/30	*/
+/*	SCCS Id: @(#)tradstdc.h 3.5	2006/06/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,14 +27,12 @@
 /* Ultrix seems to be in a constant state of flux.  This check attempts to
  * set up ansi compatibility if it wasn't set up correctly by the compiler.
  */
-#ifdef mips
-#define __mips mips
-#endif
-
-#ifdef LANGUAGE_C
-#define __LANGUAGE_C LANGUAGE_C
-#endif
-
+# ifdef mips
+#  define __mips mips
+# endif
+# ifdef LANGUAGE_C
+#  define __LANGUAGE_C LANGUAGE_C
+# endif
 #endif
 
 /*
@@ -129,6 +127,13 @@
 #  define VDECL(f,p)	f()
 # endif
 
+/*
+ * Used for definitions of functions which take no arguments to force
+ * an explicit match with the NDECL prototype.  Needed in some cases
+ * (MS Visual C 2005) for functions called through pointers.
+ */
+#define VOID_ARGS void
+
 /* generic pointer, always a macro; genericptr_t is usually a typedef */
 # define genericptr	void *
 
@@ -166,6 +171,8 @@
 # define NDECL(f)	f()
 # define FDECL(f,p)	f()
 # define VDECL(f,p)	f()
+
+#define VOID_ARGS /*empty*/
 
 # if defined(AMIGA) || defined(HPUX) || defined(POSIX_TYPES) || defined(__DECC) || defined(__BORLANDC__)
 #  define genericptr	void *
@@ -226,6 +233,48 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
 # endif
 #endif
 
+/* These are used for arguments within FDECL/VDECL prototype declarations.
+ */
+#ifdef UNWIDENED_PROTOTYPES
+# define CHAR_P char
+# define SCHAR_P schar
+# define UCHAR_P uchar
+# define XCHAR_P xchar
+# define SHORT_P short
+# ifndef SKIP_BOOLEAN
+#  define BOOLEAN_P boolean
+# endif
+# define ALIGNTYP_P aligntyp
+#else
+# ifdef WIDENED_PROTOTYPES
+#  define CHAR_P int
+#  define SCHAR_P int
+#  define UCHAR_P int
+#  define XCHAR_P int
+#  define SHORT_P int
+#  define BOOLEAN_P int
+#  define ALIGNTYP_P int
+# else
+   /* Neither widened nor unwidened prototypes.  Argument list expansion
+    * by FDECL/VDECL always empty; all xxx_P vanish so defs aren't needed. */
+# endif
+#endif
+
+/* OBJ_P and MONST_P should _only_ be used for declaring function pointers.
+ */
+#if defined(ULTRIX_PROTO) && !defined(__STDC__)
+/* The ultrix 2.0 and 2.1 compilers (on Ultrix 4.0 and 4.2 respectively) can't
+ * handle "struct obj *" constructs in prototypes.  Their bugs are different,
+ * but both seem to work if we put "void*" in the prototype instead.  This
+ * gives us minimal prototype checking but avoids the compiler bugs.
+ */
+# define OBJ_P void*
+# define MONST_P void*
+#else
+# define OBJ_P struct obj *
+# define MONST_P struct monst *
+#endif
+
 #if 0
 /* The problem below is still the case through 4.0.5F, but the suggested
  * compiler flags in the Makefiles suppress the nasty messages, so we don't
@@ -246,6 +295,8 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
 # define NDECL(f)	f()
 # define FDECL(f,p)	f()
 # define VDECL(f,p)	f()
+# undef VOID_ARGS
+# define VOID_ARGS /*empty*/
 #endif
 #endif
 
