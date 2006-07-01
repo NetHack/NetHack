@@ -611,9 +611,13 @@ bot()
 	boolean valset[MAXBLSTATS];
 
 	if (!blinit) panic("bot before init.");
-	if (!youmonst.data) return;
+	if (!youmonst.data) {
+		context.botl = context.botlx = 0;
+		update_all = FALSE;
+		return;
+	}
+
 	cap = near_capacity();
-	
 	idx_p = idx;
 	idx   = 1 - idx;	/* 0 -> 1, 1 -> 0 */
 
