@@ -238,6 +238,8 @@ use alternate phrasing when life drain attack affects non-living creature
 bypass "wait! there's a creature hidden there" when attacking a hidden monster
 	sensed by ongoing monster detection
 remove makedefs.c dependency that time_t and long are the same size
+terminal window set to 21 lines can cause a crash during player selection 
+	menus; have bot() check for valid youmonst.data
 
 
 Platform- and/or Interface-Specific Fixes

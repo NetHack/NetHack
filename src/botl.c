@@ -308,8 +308,10 @@ bot2()
 void
 bot()
 {
-	bot1();
-	bot2();
+	if (youmonst.data) {
+		bot1();
+		bot2();
+	}
 	context.botl = context.botlx = 0;
 }
 
@@ -604,11 +606,13 @@ bot()
 	static int idx = 0, idx_p, idxmax;
 	boolean updated = FALSE;
 	unsigned anytype;
-	int i, pc, chg, cap = near_capacity();
+	int i, pc, chg, cap;
 	struct istat_s *curr, *prev;
 	boolean valset[MAXBLSTATS];
 
 	if (!blinit) panic("bot before init.");
+	if (!youmonst.data) return;
+	cap = near_capacity();
 	
 	idx_p = idx;
 	idx   = 1 - idx;	/* 0 -> 1, 1 -> 0 */
