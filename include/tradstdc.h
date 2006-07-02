@@ -190,11 +190,21 @@
 
 #endif /* NHSTDC */
 
-
 #ifndef genericptr_t
 typedef genericptr genericptr_t;	/* (void *) or (char *) */
 #endif
 
+#if defined(MICRO) || defined(WIN32)
+/* we actually want to know which systems have an ANSI run-time library
+ * to know which support the new %p format for printing pointers.
+ * due to the presence of things like gcc, NHSTDC is not a good test.
+ * so we assume microcomputers have all converted to ANSI and bigger
+ * computers which may have older libraries give reasonable results with
+ * the cast.
+ */
+# define HAS_PTR_FMT
+#endif
+#define FMT_PTR_BUFSIZ	20	/* buffer size for ptr address as text */
 
 /*
  * According to ANSI, prototypes for old-style declarations must widen the

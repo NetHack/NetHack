@@ -582,7 +582,7 @@ int
 wiz_light_sources()
 {
     winid win;
-    char buf[BUFSZ], arg_address[20];
+    char buf[BUFSZ], arg_address[FMT_PTR_BUFSIZ];
     light_source *ls;
 
     win = create_nhwindow(NHW_MENU);	/* corner text window */

@@ -482,9 +482,9 @@ monsndx(ptr)		/* return an index into the mons array */
 
 	i = (int)(ptr - &mons[0]);
 	if (i < LOW_PM || i >= NUMMONS) {
-		/* ought to switch this to use `fmt_ptr' */
-	    panic("monsndx - could not index monster (%lx)",
-		  (unsigned long)ptr);
+	    char ptr_address[FMT_PTR_BUFSIZ];
+	    panic("monsndx - could not index monster (%s)",
+		  fmt_ptr((genericptr_t)ptr, ptr_address));
 	    return NON_PM;		/* will not get here */
 	}
 

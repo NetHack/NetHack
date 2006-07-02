@@ -1840,7 +1840,8 @@ obj_sanity_check()
     struct obj *obj;
     struct monst *mon;
     const char *mesg;
-    char obj_address[20], mon_address[20];  /* room for formatted pointers */
+    char obj_address[FMT_PTR_BUFSIZ],
+	 mon_address[FMT_PTR_BUFSIZ];  /* room for formatted pointers */
 
     mesg = "fobj sanity";
     for (obj = fobj; obj; obj = obj->nobj) {
@@ -1948,7 +1949,7 @@ check_contained(container, mesg)
     const char *mesg;
 {
     struct obj *obj;
-    char obj1_address[20], obj2_address[20];
+    char obj1_address[FMT_PTR_BUFSIZ], obj2_address[FMT_PTR_BUFSIZ];
 
     for (obj = container->cobj; obj; obj = obj->nobj) {
 	if (obj->where != OBJ_CONTAINED)

@@ -1368,7 +1368,7 @@ print_queue(win, base)
     timer_element *base;
 {
     timer_element *curr;
-    char buf[BUFSZ], arg_address[20];
+    char buf[BUFSZ], arg_address[FMT_PTR_BUFSIZ];
 
     if (!base) {
 	putstr(win, 0, "<empty>");
@@ -1417,7 +1417,7 @@ void
 timer_sanity_check()
 {
     timer_element *curr;
-    char obj_address[20];
+    char obj_address[FMT_PTR_BUFSIZ];
 
     /* this should be much more complete */
     for (curr = timer_base; curr; curr = curr->next)

@@ -53,21 +53,7 @@ register unsigned int lth;
 #endif
 }
 
-
-#if defined(MONITOR_HEAP) || defined(WIZARD)
-
-# if defined(MICRO) || defined(WIN32)
-/* we actually want to know which systems have an ANSI run-time library
- * to know which support the new %p format for printing pointers.
- * due to the presence of things like gcc, NHSTDC is not a good test.
- * so we assume microcomputers have all converted to ANSI and bigger
- * computers which may have older libraries give reasonable results with
- * the cast.
- */
-#  define MONITOR_PTR_FMT
-# endif
-
-# ifdef MONITOR_PTR_FMT
+# ifdef HAS_PTR_FMT
 #  define PTR_FMT "%p"
 #  define PTR_TYP genericptr_t
 # else
@@ -84,8 +70,6 @@ char *buf;
 	Sprintf(buf, PTR_FMT, (PTR_TYP)ptr);
 	return buf;
 }
-
-#endif
 
 #ifdef MONITOR_HEAP
 
@@ -108,7 +92,7 @@ const char *file;
 int line;
 {
 	long *ptr = alloc(lth);
-	char ptr_address[20];
+	char ptr_address[FMT_PTR_BUFSIZ];
 
 	if (!tried_heaplog) heapmon_init();
 	if (heaplog)
@@ -128,7 +112,7 @@ genericptr_t ptr;
 const char *file;
 int line;
 {
-	char ptr_address[20];
+	char ptr_address[FMT_PTR_BUFSIZ];
 
 	if (!tried_heaplog) heapmon_init();
 	if (heaplog)
