@@ -479,17 +479,22 @@ compare_blstats(bl1, bl2)
 struct istat_s *bl1, *bl2;
 {
 	int anytype, result = 0;
+	char bl1_address[FMT_PTR_BUFSIZ], bl2_address[FMT_PTR_BUFSIZ];
+
 	if (!bl1 || !bl2) {
-		panic("compare_blstat: bad istat pointer %ld, %ld",
-			(long)bl1, (long)bl2);
+		char bl1_address[FMT_PTR_BUFSIZ], bl2_address[FMT_PTR_BUFSIZ];
+		panic("compare_blstat: bad istat pointer %s, %s",
+			fmt_ptr((genericptr_t)bl1, bl1_address),
+			fmt_ptr((genericptr_t)bl2, bl2_address));
 	}
 
 	anytype = bl1->anytype;
 	if ((!bl1->a.a_void || !bl2->a.a_void) &&
 	    (anytype == ANY_IPTR || anytype == ANY_UPTR ||
 	     anytype == ANY_LPTR || anytype == ANY_ULPTR)) {
-		panic("compare_blstat: invalid pointer %ld, %ld",
-			(long)bl1->a.a_void, (long)bl2->a.a_void);
+		panic("compare_blstat: invalid pointer %s, %s",
+			fmt_ptr((genericptr_t)bl1->a.a_void, bl1_address),
+			fmt_ptr((genericptr_t)bl2->a.a_void, bl2_address));
 	}
 
 	switch(anytype) {
@@ -554,8 +559,10 @@ struct istat_s *bl, *maxbl;
 	int result = 0;
 	int anytype;
 	if (!bl || !maxbl) {
-		impossible("percentage: bad istat pointer %ld, %ld",
-			(long)bl, (long)maxbl);
+		char bl_address[FMT_PTR_BUFSIZ], maxbl_address[FMT_PTR_BUFSIZ];
+		impossible("percentage: bad istat pointer %s, %s",
+			fmt_ptr((genericptr_t)bl, bl_address),
+			fmt_ptr((genericptr_t)maxbl, maxbl_address));
 		return 0;
 	}
 

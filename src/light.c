@@ -91,6 +91,7 @@ del_light_source(type, id)
 {
     light_source *curr, *prev;
     genericptr_t tmp_id;
+    char id_address[FMT_PTR_BUFSIZ];
 
     /* need to be prepared for dealing a with light source which
        has only been partially restored during a level change
@@ -117,7 +118,8 @@ del_light_source(type, id)
 	    return;
 	}
     }
-    impossible("del_light_source: not found type=%d, id=0x%lx", type, (long)id);
+    impossible("del_light_source: not found type=%d, id=%s",
+		type, fmt_ptr((genericptr_t)id, id_address));
 }
 
 /* Mark locations that are temporarily lit via mobile light sources. */
