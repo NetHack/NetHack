@@ -274,6 +274,10 @@ NhRegion *reg;
 	    free((genericptr_t) reg->rects);
 	if (reg->monsters)
 	    free((genericptr_t) reg->monsters);
+	if (reg->enter_msg)
+	    free((genericptr_t) reg->enter_msg);
+	if (reg->leave_msg)
+	    free((genericptr_t) reg->leave_msg);
 	free((genericptr_t) reg);
     }
 }
@@ -791,8 +795,14 @@ const char *msg_leave;
     NhRect tmprect;
     NhRegion *reg = create_region((NhRect *) 0, 0);
 
-    reg->enter_msg = msg_enter;
-    reg->leave_msg = msg_leave;
+    if (msg_enter) {
+	reg->enter_msg = (const char *) alloc(strlen(msg_enter) + 1);
+	Strcpy(reg->enter_msg, msg_enter);
+    }
+    if (msg_leave) {
+	reg->leave_msg = (const char *) alloc(strlen(msg_leave) + 1);
+	Strcpy(reg->leave_msg, msg_leave);
+    }
     tmprect.lx = x;
     tmprect.ly = y;
     tmprect.hx = x + w;
