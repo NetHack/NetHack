@@ -675,9 +675,6 @@ char *
 from_what(propidx)
 int propidx;
 {
-	struct obj *obj = (struct obj *)0;
-	int innate = is_innate(propidx);
-
 	static char buf[BUFSZ];
 
 	buf[0] = '\0';
@@ -686,6 +683,9 @@ int propidx;
 	 */
 #ifdef WIZARD
 	if (wizard) {
+	    struct obj *obj = (struct obj *)0;
+	    int innate = is_innate(propidx);
+
 	    if (innate == 2)
 		Strcpy(buf, " because of your experience");
 	    else if (innate == 1)

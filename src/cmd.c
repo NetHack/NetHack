@@ -150,13 +150,13 @@ STATIC_PTR int NDECL(wiz_show_stats);
 STATIC_DCL int NDECL(wiz_port_debug);
 #  endif
 STATIC_PTR int NDECL(wiz_rumor_check);
-# endif
+STATIC_DCL char FDECL(cmd_from_func, (int NDECL((*))));
+# endif /* WIZARD */
 STATIC_PTR int NDECL(enter_explore_mode);
 STATIC_PTR int NDECL(doattributes);
 STATIC_PTR int NDECL(doconduct); /**/
 STATIC_PTR boolean NDECL(minimal_enlightenment);
 
-STATIC_DCL char FDECL(cmd_from_func, (int NDECL((*))));
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *,char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
 #if defined(UNIX) || defined(SAFERHANGUP)
@@ -1830,95 +1830,6 @@ add_debug_extended_commands()
 	}
 }
 
-/* called at startup and after number_pad is twiddled */
-void
-reset_commands(initial)
-boolean initial;
-{
-    static const char
-	sdir[] = "hykulnjb><", sdir_swap_yz[] = "hzkulnjb><",
-	ndir[] = "47896321><", ndir_phone_layout[] = "41236987><";
-    static const int ylist[] = { 'y', 'Y', C('y'), M('y'), M('Y'), M(C('y')) };
-    const struct func_tab *cmdtmp;
-    boolean flagtemp;
-    int c, i, updated = 0;
-
-    if (initial) {
-	updated = 1;
-	for (i = 0; i < SIZE(cmdlist); i++) {
-	    c = cmdlist[i].f_char & 0xff;
-	    Cmd.commands[c] = &cmdlist[i];
-	}
-	Cmd.num_pad = FALSE;
-	Cmd.pcHack_compat = Cmd.phone_layout = Cmd.swap_yz = FALSE;
-    } else {
-	/* basic num_pad */
-	flagtemp = iflags.num_pad;
-	if (flagtemp != Cmd.num_pad) {
-	    Cmd.num_pad = flagtemp;
-	    ++updated;
-	}
-	/* swap_yz mode (only applicable for !num_pad) */
-	flagtemp = (iflags.num_pad_mode & 1) ? !Cmd.num_pad : FALSE;
-	if (flagtemp != Cmd.swap_yz) {
-	    Cmd.swap_yz = flagtemp;
-	    ++updated;
-	    /* Cmd.swap_yz has been toggled;
-	       perform the swap (or reverse previous one) */
-	    for (i = 0; i < SIZE(ylist); i++) {
-		c = ylist[i] & 0xff;
-		cmdtmp = Cmd.commands[c];		/* tmp = [y] */
-		Cmd.commands[c] = Cmd.commands[c + 1];	/* [y] = [z] */
-		Cmd.commands[c + 1] = cmdtmp;		/* [z] = tmp */
-	    }
-	}
-	/* MSDOS compatibility mode (only applicable for num_pad) */
-	flagtemp = (iflags.num_pad_mode & 1) ? Cmd.num_pad : FALSE;
-	if (flagtemp != Cmd.pcHack_compat) {
-	    Cmd.pcHack_compat = flagtemp;
-	    ++updated;
-	    /* pcHack_compat has been toggled */
-	    c = M('5') & 0xff;
-	    cmdtmp = Cmd.commands['5'];
-	    Cmd.commands['5'] = Cmd.commands[c];
-	    Cmd.commands[c] = cmdtmp;
-	    c = M('0') & 0xff;
-	    Cmd.commands[c] = Cmd.pcHack_compat ? Cmd.commands['I'] : 0;
-	}
-	/* phone keypad layout (only applicable for num_pad) */
-	flagtemp = (iflags.num_pad_mode & 2) ? Cmd.num_pad : FALSE;
-	if (flagtemp != Cmd.phone_layout) {
-	    Cmd.phone_layout = flagtemp;
-	    ++updated;
-	    /* phone_layout has been toggled */
-	    for (i = 0; i < 3; i++) {
-		c = '1' + i;		/* 1,2,3 <-> 7,8,9 */
-		cmdtmp = Cmd.commands[c];		/* tmp = [1] */
-		Cmd.commands[c] = Cmd.commands[c + 6];	/* [1] = [7] */
-		Cmd.commands[c + 6] = cmdtmp;		/* [7] = tmp */
-		c = (M('1') & 0xff) + i;    /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
-		cmdtmp = Cmd.commands[c];		/* tmp = [M-1] */
-		Cmd.commands[c] = Cmd.commands[c + 6];	/* [M-1] = [M-7] */
-		Cmd.commands[c + 6] = cmdtmp;		/* [M-7] = tmp */
-	    }
-	}
-    } /*?initial*/
-
-    if (updated) Cmd.serialno++;
-    Cmd.dirchars = !Cmd.num_pad ? (!Cmd.swap_yz ? sdir : sdir_swap_yz) :
-			(!Cmd.phone_layout ? ndir : ndir_phone_layout);
-    Cmd.alphadirchars = !Cmd.num_pad ? Cmd.dirchars : sdir;
-
-    Cmd.move_W  = Cmd.dirchars[0];
-    Cmd.move_NW = Cmd.dirchars[1];
-    Cmd.move_N  = Cmd.dirchars[2];
-    Cmd.move_NE = Cmd.dirchars[3];
-    Cmd.move_E  = Cmd.dirchars[4];
-    Cmd.move_SE = Cmd.dirchars[5];
-    Cmd.move_S  = Cmd.dirchars[6];
-    Cmd.move_SW = Cmd.dirchars[7];
-}
-
 STATIC_OVL char
 cmd_from_func(fn)
 int NDECL((*fn));
@@ -1928,14 +1839,6 @@ int NDECL((*fn));
 		if (cmdlist[i].f_funct == fn)
 			return cmdlist[i].f_char;
 	return 0;
-}
-
-/* decide whether a character (user input keystroke) requests screen repaint */
-boolean
-redraw_cmd(c)
-char c;
-{
-    return (c == C('r') || (Cmd.num_pad && c == C('l')));
 }
 
 static const char template[] = "%-18s %4ld  %6ld";
@@ -2189,6 +2092,94 @@ wiz_migrate_mons()
 #define unctrl(c)	((c) <= C('z') ? (0x60 | (c)) : (c))
 #define unmeta(c)	(0x7f & (c))
 
+/* called at startup and after number_pad is twiddled */
+void
+reset_commands(initial)
+boolean initial;
+{
+    static const char
+	sdir[] = "hykulnjb><", sdir_swap_yz[] = "hzkulnjb><",
+	ndir[] = "47896321><", ndir_phone_layout[] = "41236987><";
+    static const int ylist[] = { 'y', 'Y', C('y'), M('y'), M('Y'), M(C('y')) };
+    const struct func_tab *cmdtmp;
+    boolean flagtemp;
+    int c, i, updated = 0;
+
+    if (initial) {
+	updated = 1;
+	for (i = 0; i < SIZE(cmdlist); i++) {
+	    c = cmdlist[i].f_char & 0xff;
+	    Cmd.commands[c] = &cmdlist[i];
+	}
+	Cmd.num_pad = FALSE;
+	Cmd.pcHack_compat = Cmd.phone_layout = Cmd.swap_yz = FALSE;
+    } else {
+	/* basic num_pad */
+	flagtemp = iflags.num_pad;
+	if (flagtemp != Cmd.num_pad) {
+	    Cmd.num_pad = flagtemp;
+	    ++updated;
+	}
+	/* swap_yz mode (only applicable for !num_pad) */
+	flagtemp = (iflags.num_pad_mode & 1) ? !Cmd.num_pad : FALSE;
+	if (flagtemp != Cmd.swap_yz) {
+	    Cmd.swap_yz = flagtemp;
+	    ++updated;
+	    /* Cmd.swap_yz has been toggled;
+	       perform the swap (or reverse previous one) */
+	    for (i = 0; i < SIZE(ylist); i++) {
+		c = ylist[i] & 0xff;
+		cmdtmp = Cmd.commands[c];		/* tmp = [y] */
+		Cmd.commands[c] = Cmd.commands[c + 1];	/* [y] = [z] */
+		Cmd.commands[c + 1] = cmdtmp;		/* [z] = tmp */
+	    }
+	}
+	/* MSDOS compatibility mode (only applicable for num_pad) */
+	flagtemp = (iflags.num_pad_mode & 1) ? Cmd.num_pad : FALSE;
+	if (flagtemp != Cmd.pcHack_compat) {
+	    Cmd.pcHack_compat = flagtemp;
+	    ++updated;
+	    /* pcHack_compat has been toggled */
+	    c = M('5') & 0xff;
+	    cmdtmp = Cmd.commands['5'];
+	    Cmd.commands['5'] = Cmd.commands[c];
+	    Cmd.commands[c] = cmdtmp;
+	    c = M('0') & 0xff;
+	    Cmd.commands[c] = Cmd.pcHack_compat ? Cmd.commands['I'] : 0;
+	}
+	/* phone keypad layout (only applicable for num_pad) */
+	flagtemp = (iflags.num_pad_mode & 2) ? Cmd.num_pad : FALSE;
+	if (flagtemp != Cmd.phone_layout) {
+	    Cmd.phone_layout = flagtemp;
+	    ++updated;
+	    /* phone_layout has been toggled */
+	    for (i = 0; i < 3; i++) {
+		c = '1' + i;		/* 1,2,3 <-> 7,8,9 */
+		cmdtmp = Cmd.commands[c];		/* tmp = [1] */
+		Cmd.commands[c] = Cmd.commands[c + 6];	/* [1] = [7] */
+		Cmd.commands[c + 6] = cmdtmp;		/* [7] = tmp */
+		c = (M('1') & 0xff) + i;    /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
+		cmdtmp = Cmd.commands[c];		/* tmp = [M-1] */
+		Cmd.commands[c] = Cmd.commands[c + 6];	/* [M-1] = [M-7] */
+		Cmd.commands[c + 6] = cmdtmp;		/* [M-7] = tmp */
+	    }
+	}
+    } /*?initial*/
+
+    if (updated) Cmd.serialno++;
+    Cmd.dirchars = !Cmd.num_pad ? (!Cmd.swap_yz ? sdir : sdir_swap_yz) :
+			(!Cmd.phone_layout ? ndir : ndir_phone_layout);
+    Cmd.alphadirchars = !Cmd.num_pad ? Cmd.dirchars : sdir;
+
+    Cmd.move_W  = Cmd.dirchars[0];
+    Cmd.move_NW = Cmd.dirchars[1];
+    Cmd.move_N  = Cmd.dirchars[2];
+    Cmd.move_NE = Cmd.dirchars[3];
+    Cmd.move_E  = Cmd.dirchars[4];
+    Cmd.move_SE = Cmd.dirchars[5];
+    Cmd.move_S  = Cmd.dirchars[6];
+    Cmd.move_SW = Cmd.dirchars[7];
+}
 
 void
 rhack(cmd)
@@ -2444,6 +2435,14 @@ char sym;
 		return 0;
 	}
 	return !u.dz;
+}
+
+/* decide whether a character (user input keystroke) requests screen repaint */
+boolean
+redraw_cmd(c)
+char c;
+{
+    return (c == C('r') || (Cmd.num_pad && c == C('l')));
 }
 
 /*
