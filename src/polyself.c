@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.5	2006/05/26	*/
+/*	SCCS Id: @(#)polyself.c	3.5	2006/07/08	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -353,11 +353,11 @@ int psflags;
 	new_light = emits_light(youmonst.data);
 	if (old_light != new_light) {
 	    if (old_light)
-		del_light_source(LS_MONSTER, (genericptr_t)&youmonst);
+		del_light_source(LS_MONSTER, monst_to_any(&youmonst));
 	    if (new_light == 1) ++new_light;  /* otherwise it's undetectable */
 	    if (new_light)
 		new_light_source(u.ux, u.uy, new_light,
-				 LS_MONSTER, (genericptr_t)&youmonst);
+				 LS_MONSTER, monst_to_any(&youmonst));
 	}
 }
 
@@ -750,7 +750,7 @@ rehumanize()
 	}
 
 	if (emits_light(youmonst.data))
-	    del_light_source(LS_MONSTER, (genericptr_t)&youmonst);
+	    del_light_source(LS_MONSTER, monst_to_any(&youmonst));
 	polyman("return to %s form!", urace.adj);
 
 	if (u.uhp < 1) {

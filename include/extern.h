@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.5	2006/05/08	*/
+/*	SCCS Id: @(#)extern.h	3.5	2006/07/08	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -737,6 +737,11 @@ E void NDECL(drinksink);
 
 /* ### hack.c ### */
 
+E anything *FDECL(uint_to_any, (unsigned));
+E anything *FDECL(long_to_any, (long));
+E anything *FDECL(monst_to_any, (struct monst *));
+E anything *FDECL(obj_to_any, (struct obj *));
+E void FDECL(zero_anything, (ANY_P *));
 E boolean FDECL(revive_nasty, (int,int,const char*));
 E void FDECL(movobj, (struct obj *,XCHAR_P,XCHAR_P));
 E boolean FDECL(may_dig, (XCHAR_P,XCHAR_P));
@@ -893,8 +898,8 @@ E int NDECL(dosuspend);
 
 /* ### light.c ### */
 
-E void FDECL(new_light_source, (XCHAR_P, XCHAR_P, int, int, genericptr_t));
-E void FDECL(del_light_source, (int, genericptr_t));
+E void FDECL(new_light_source, (XCHAR_P, XCHAR_P, int, int, ANY_P *));
+E void FDECL(del_light_source, (int, ANY_P *));
 E void FDECL(do_light_sources, (char **));
 E struct monst *FDECL(find_mid, (unsigned, unsigned));
 E void FDECL(save_light_sources, (int, int, int));
@@ -1818,7 +1823,6 @@ E void FDECL(getlev, (int,int,XCHAR_P,BOOLEAN_P));
 E void FDECL(get_plname_from_file, (int, char *));
 E void NDECL(minit);
 E boolean FDECL(lookup_id_mapping, (unsigned, unsigned *));
-E struct monst *FDECL(buffer_to_mon, (genericptr_t));
 E void FDECL(mread, (int,genericptr_t,unsigned int));
 #ifndef GOLDOBJ
 E void FDECL(put_gold_back, (struct obj **,long *));

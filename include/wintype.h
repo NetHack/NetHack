@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wintype.h	3.5	1996/02/18	*/
+/*	SCCS Id: @(#)wintype.h	3.5	2006/07/08	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,6 +11,7 @@ typedef int winid;		/* a window identifier */
 typedef union any {
     genericptr_t a_void;
     struct obj *a_obj;
+    struct monst *a_monst;
     int  a_int;
     char a_char;
     schar a_schar;

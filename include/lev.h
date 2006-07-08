@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lev.h	3.5	1994/03/18	*/
+/*	SCCS Id: @(#)lev.h	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -43,7 +43,7 @@ typedef struct ls_t {
     short range;	/* source's current range */
     short flags;
     short type;		/* type of light source */
-    genericptr_t id;	/* source's identifier */
+    anything id;	/* source's identifier */
 } light_source;
 
 #endif /* LEV_H */

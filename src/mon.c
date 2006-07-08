@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2006/05/08	*/
+/*	SCCS Id: @(#)mon.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1311,9 +1311,9 @@ register struct monst *mtmp, *mtmp2;
 	/* since this is so rare, we don't have any `mon_move_light_source' */
 	new_light_source(mtmp2->mx, mtmp2->my,
 			 emits_light(mtmp2->data),
-			 LS_MONSTER, (genericptr_t)mtmp2);
+			 LS_MONSTER, monst_to_any(mtmp2));
 	/* here we rely on the fact that `mtmp' hasn't actually been deleted */
-	del_light_source(LS_MONSTER, (genericptr_t)mtmp);
+	del_light_source(LS_MONSTER, monst_to_any(mtmp));
     }
     mtmp2->nmon = fmon;
     fmon = mtmp2;
@@ -1428,7 +1428,7 @@ struct permonst *mptr;	/* reflects mtmp->data _prior_ to mtmp's death */
 	relobj(mtmp, 0, FALSE);
 	remove_monster(mtmp->mx, mtmp->my);
 	if (emits_light(mptr))
-	    del_light_source(LS_MONSTER, (genericptr_t)mtmp);
+	    del_light_source(LS_MONSTER, monst_to_any(mtmp));
 	newsym(mtmp->mx,mtmp->my);
 	unstuck(mtmp);
 	fill_pit(mtmp->mx, mtmp->my);
@@ -2620,10 +2620,10 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	    /* used to give light, now doesn't, or vice versa,
 	       or light's range has changed */
 	    if (emits_light(olddata))
-		del_light_source(LS_MONSTER, (genericptr_t)mtmp);
+		del_light_source(LS_MONSTER, monst_to_any(mtmp));
 	    if (emits_light(mtmp->data))
 		new_light_source(mtmp->mx, mtmp->my, emits_light(mtmp->data),
-				 LS_MONSTER, (genericptr_t)mtmp);
+				 LS_MONSTER, monst_to_any(mtmp));
 	}
 	if (!mtmp->perminvis || pm_invisible(olddata))
 	    mtmp->perminvis = pm_invisible(mdat);

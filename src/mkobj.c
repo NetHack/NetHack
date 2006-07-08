@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2006/07/07	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1760,7 +1760,7 @@ dealloc_obj(obj)
      * attached to it (and also requires lamplit to be set).
      */
     if (obj_sheds_light(obj))
-	del_light_source(LS_OBJECT, (genericptr_t) obj);
+	del_light_source(LS_OBJECT, obj_to_any(obj));
 
     if (obj == thrownobj) thrownobj = (struct obj*)0;
 

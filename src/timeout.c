@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.5	2006/07/07	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1145,7 +1145,7 @@ begin_burn(obj, already_lit)
 	    xchar x, y;
 
 	    if (get_obj_location(obj, &x, &y, CONTAINED_TOO|BURIED_TOO))
-		new_light_source(x, y, radius, LS_OBJECT, (genericptr_t) obj);
+		new_light_source(x, y, radius, LS_OBJECT, obj_to_any(obj));
 	    else
 		impossible("begin_burn: can't get obj position");
 	}
@@ -1170,7 +1170,7 @@ end_burn(obj, timer_attached)
 
 	if (!timer_attached) {
 	    /* [DS] Cleanup explicitly, since timer cleanup won't happen */
-	    del_light_source(LS_OBJECT, (genericptr_t)obj);
+	    del_light_source(LS_OBJECT, obj_to_any(obj));
 	    obj->lamplit = 0;
 	    if (obj->where == OBJ_INVENT)
 		update_inventory();
@@ -1192,7 +1192,7 @@ cleanup_burn(arg, expire_time)
 	return;
     }
 
-    del_light_source(LS_OBJECT, arg);
+    del_light_source(LS_OBJECT, obj_to_any(obj));
 
     /* restore unused time */
     obj->age += expire_time - monstermoves;
