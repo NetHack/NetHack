@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2006/07/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1368,7 +1368,7 @@ print_queue(win, base)
     timer_element *base;
 {
     timer_element *curr;
-    char buf[BUFSZ], arg_address[FMT_PTR_BUFSIZ];
+    char buf[BUFSZ];
 
     if (!base) {
 	putstr(win, 0, "<empty>");
@@ -1377,14 +1377,14 @@ print_queue(win, base)
 	for (curr = base; curr; curr = curr->next) {
 #ifdef VERBOSE_TIMER
 	    Sprintf(buf, " %4ld   %4ld  %-6s %s(%s)",
-		curr->timeout, curr->tid, kind_name(curr->kind),
-		timeout_funcs[curr->func_index].name,
-		fmt_ptr((genericptr_t)curr->arg, arg_address));
+		    curr->timeout, curr->tid, kind_name(curr->kind),
+		    timeout_funcs[curr->func_index].name,
+		    fmt_ptr((genericptr_t)curr->arg));
 #else
 	    Sprintf(buf, " %4ld   %4ld  %-6s #%d(%s)",
-		curr->timeout, curr->tid, kind_name(curr->kind),
-		curr->func_index,
-		fmt_ptr((genericptr_t)curr->arg, arg_address));
+		    curr->timeout, curr->tid, kind_name(curr->kind),
+		    curr->func_index,
+		    fmt_ptr((genericptr_t)curr->arg));
 #endif
 	    putstr(win, 0, buf);
 	}
@@ -1417,7 +1417,6 @@ void
 timer_sanity_check()
 {
     timer_element *curr;
-    char obj_address[FMT_PTR_BUFSIZ];
 
     /* this should be much more complete */
     for (curr = timer_base; curr; curr = curr->next)
@@ -1425,7 +1424,7 @@ timer_sanity_check()
 	    struct obj *obj = (struct obj *) curr->arg;
 	    if (obj->timed == 0) {
 		pline("timer sanity: untimed obj %s, timer %ld",
-		      fmt_ptr((genericptr_t)obj, obj_address), curr->tid);
+		      fmt_ptr((genericptr_t)obj), curr->tid);
 	    }
 	}
 }

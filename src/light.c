@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)light.c	3.5	1997/04/10	*/
+/*	SCCS Id: @(#)light.c	3.5	2006/07/07	*/
 /* Copyright (c) Dean Luick, 1994					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 
@@ -91,7 +91,6 @@ del_light_source(type, id)
 {
     light_source *curr, *prev;
     genericptr_t tmp_id;
-    char id_address[FMT_PTR_BUFSIZ];
 
     /* need to be prepared for dealing a with light source which
        has only been partially restored during a level change
@@ -119,7 +118,7 @@ del_light_source(type, id)
 	}
     }
     impossible("del_light_source: not found type=%d, id=%s",
-		type, fmt_ptr((genericptr_t)id, id_address));
+	      type, fmt_ptr((genericptr_t)id));
 }
 
 /* Mark locations that are temporarily lit via mobile light sources. */
@@ -583,7 +582,7 @@ int
 wiz_light_sources()
 {
     winid win;
-    char buf[BUFSZ], arg_address[FMT_PTR_BUFSIZ];
+    char buf[BUFSZ];
     light_source *ls;
 
     win = create_nhwindow(NHW_MENU);	/* corner text window */
@@ -598,14 +597,14 @@ wiz_light_sources()
 	putstr(win, 0, "-------- ----- ------ ----  -------");
 	for (ls = light_base; ls; ls = ls->next) {
 	    Sprintf(buf, "  %2d,%2d   %2d   0x%04x  %s  %s",
-		ls->x, ls->y, ls->range, ls->flags,
-		(ls->type == LS_OBJECT ? "obj" :
-		 ls->type == LS_MONSTER ?
-		    (mon_is_local((struct monst *)ls->id) ? "mon" :
-		     ((struct monst *)ls->id == &youmonst) ? "you" :
-		     "<m>") :		/* migrating monster */
-		 "???"),
-		fmt_ptr(ls->id, arg_address));
+		    ls->x, ls->y, ls->range, ls->flags,
+		    (ls->type == LS_OBJECT ? "obj" :
+		     ls->type == LS_MONSTER ?
+		        (mon_is_local((struct monst *)ls->id) ? "mon" :
+		         ((struct monst *)ls->id == &youmonst) ? "you" :
+		         "<m>") :		/* migrating monster */
+		     "???"),
+		    fmt_ptr(ls->id));
 	    putstr(win, 0, buf);
 	}
     } else

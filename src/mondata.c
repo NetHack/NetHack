@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.5	2005/10/05	*/
+/*	SCCS Id: @(#)mondata.c	3.5	2006/07/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -482,9 +482,8 @@ monsndx(ptr)		/* return an index into the mons array */
 
 	i = (int)(ptr - &mons[0]);
 	if (i < LOW_PM || i >= NUMMONS) {
-	    char ptr_address[FMT_PTR_BUFSIZ];
 	    panic("monsndx - could not index monster (%s)",
-		  fmt_ptr((genericptr_t)ptr, ptr_address));
+		  fmt_ptr((genericptr_t)ptr));
 	    return NON_PM;		/* will not get here */
 	}
 

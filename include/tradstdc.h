@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)tradstdc.h 3.5	2006/06/28	*/
+/*	SCCS Id: @(#)tradstdc.h 3.5	2006/07/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -195,16 +195,15 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
 #endif
 
 #if defined(MICRO) || defined(WIN32)
-/* we actually want to know which systems have an ANSI run-time library
- * to know which support the new %p format for printing pointers.
- * due to the presence of things like gcc, NHSTDC is not a good test.
- * so we assume microcomputers have all converted to ANSI and bigger
+/* We actually want to know which systems have an ANSI run-time library
+ * to know which support the %p format for printing pointers.
+ * Due to the presence of things like gcc, NHSTDC is not a good test.
+ * So we assume microcomputers have all converted to ANSI and bigger
  * computers which may have older libraries give reasonable results with
- * the cast.
+ * casting pointers to unsigned long int (fmt_ptr() in alloc.c).
  */
 # define HAS_PTR_FMT
 #endif
-#define FMT_PTR_BUFSIZ	20	/* buffer size for ptr address as text */
 
 /*
  * According to ANSI, prototypes for old-style declarations must widen the

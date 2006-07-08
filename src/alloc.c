@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)alloc.c	3.5	1995/10/04	*/
+/*	SCCS Id: @(#)alloc.c	3.5	2006/07/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,9 +10,7 @@
 #define EXTERN_H	/* comment line for pre-compiled headers */
 #include "config.h"
 
-#if defined(MONITOR_HEAP) || defined(WIZARD)
-char *FDECL(fmt_ptr, (const genericptr,char *));
-#endif
+char *FDECL(fmt_ptr, (const genericptr));
 
 #ifdef MONITOR_HEAP
 #undef alloc
@@ -61,12 +59,30 @@ register unsigned int lth;
 #  define PTR_TYP unsigned long
 # endif
 
-/* format a pointer for display purposes; caller supplies the result buffer */
+/* A small pool of static formatting buffers.
+ * PTRBUFSIZ:  We assume that pointers will be formatted as integers in
+ * hexadecimal, requring at least 16+1 characters for each buffer to handle
+ * 64-bit systems, but the standard doesn't mandate that encoding and an
+ * implementation could do something different for %p, so we make some
+ * extra room.
+ * PTRBUFCNT:  Number of formatted values which can be in use at the same
+ * time.  To have more, callers need to make copies of them as they go.
+ */
+#define PTRBUFCNT 4
+#define PTRBUFSIZ 32
+static char ptrbuf[PTRBUFCNT][PTRBUFSIZ];
+static int ptrbufidx = 0;
+
+/* format a pointer for display purposes; returns a static buffer */
 char *
-fmt_ptr(ptr, buf)
+fmt_ptr(ptr)
 const genericptr ptr;
-char *buf;
 {
+	char *buf;
+
+	buf = ptrbuf[ptrbufidx];
+	if (++ptrbufidx >= PTRBUFCNT) ptrbufidx = 0;
+
 	Sprintf(buf, PTR_FMT, (PTR_TYP)ptr);
 	return buf;
 }
@@ -92,13 +108,11 @@ const char *file;
 int line;
 {
 	long *ptr = alloc(lth);
-	char ptr_address[FMT_PTR_BUFSIZ];
 
 	if (!tried_heaplog) heapmon_init();
 	if (heaplog)
 		(void) fprintf(heaplog, "+%5u %s %4d %s\n", lth,
-				fmt_ptr((genericptr_t)ptr, ptr_address),
-				line, file);
+			       fmt_ptr((genericptr_t)ptr), line, file);
 	/* potential panic in alloc() was deferred til here */
 	if (!ptr) panic("Cannot get %u bytes, line %d of %s",
 			lth, line, file);
@@ -112,13 +126,10 @@ genericptr_t ptr;
 const char *file;
 int line;
 {
-	char ptr_address[FMT_PTR_BUFSIZ];
-
 	if (!tried_heaplog) heapmon_init();
 	if (heaplog)
 		(void) fprintf(heaplog, "-      %s %4d %s\n",
-				fmt_ptr((genericptr_t)ptr, ptr_address),
-				line, file);
+			       fmt_ptr((genericptr_t)ptr), line, file);
 
 	free(ptr);
 }

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2006/06/17	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2006/07/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1840,16 +1840,14 @@ obj_sanity_check()
     struct obj *obj;
     struct monst *mon;
     const char *mesg;
-    char obj_address[FMT_PTR_BUFSIZ],
-	 mon_address[FMT_PTR_BUFSIZ];  /* room for formatted pointers */
 
     mesg = "fobj sanity";
     for (obj = fobj; obj; obj = obj->nobj) {
 	if (obj->where != OBJ_FLOOR) {
 	    pline("%s obj %s %s@(%d,%d): %s\n", mesg,
-		fmt_ptr((genericptr_t)obj, obj_address),
-		where_name(obj->where),
-		obj->ox, obj->oy, doname(obj));
+		  fmt_ptr((genericptr_t)obj),
+		  where_name(obj->where),
+		  obj->ox, obj->oy, doname(obj));
 	}
 	check_contained(obj, mesg);
     }
@@ -1860,17 +1858,17 @@ obj_sanity_check()
 	    for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
 		if (obj->where != OBJ_FLOOR) {
 		    pline("%s obj %s %s@(%d,%d): %s\n", mesg,
-			fmt_ptr((genericptr_t)obj, obj_address),
-			where_name(obj->where),
-			obj->ox, obj->oy, doname(obj));
+			  fmt_ptr((genericptr_t)obj),
+			  where_name(obj->where),
+			  obj->ox, obj->oy, doname(obj));
 		}
 
     mesg = "invent sanity";
     for (obj = invent; obj; obj = obj->nobj) {
 	if (obj->where != OBJ_INVENT) {
 	    pline("%s obj %s %s: %s\n", mesg,
-		fmt_ptr((genericptr_t)obj, obj_address),
-		where_name(obj->where), doname(obj));
+		  fmt_ptr((genericptr_t)obj),
+		  where_name(obj->where), doname(obj));
 	}
 	check_contained(obj, mesg);
     }
@@ -1879,8 +1877,8 @@ obj_sanity_check()
     for (obj = migrating_objs; obj; obj = obj->nobj) {
 	if (obj->where != OBJ_MIGRATING) {
 	    pline("%s obj %s %s: %s\n", mesg,
-		fmt_ptr((genericptr_t)obj, obj_address),
-		where_name(obj->where), doname(obj));
+		  fmt_ptr((genericptr_t)obj),
+		  where_name(obj->where), doname(obj));
 	}
 	check_contained(obj, mesg);
     }
@@ -1889,8 +1887,8 @@ obj_sanity_check()
     for (obj = level.buriedobjlist; obj; obj = obj->nobj) {
 	if (obj->where != OBJ_BURIED) {
 	    pline("%s obj %s %s: %s\n", mesg,
-		fmt_ptr((genericptr_t)obj, obj_address),
-		where_name(obj->where), doname(obj));
+		  fmt_ptr((genericptr_t)obj),
+		  where_name(obj->where), doname(obj));
 	}
 	check_contained(obj, mesg);
     }
@@ -1899,14 +1897,14 @@ obj_sanity_check()
     for (obj = billobjs; obj; obj = obj->nobj) {
 	if (obj->where != OBJ_ONBILL) {
 	    pline("%s obj %s %s: %s\n", mesg,
-		fmt_ptr((genericptr_t)obj, obj_address),
-		where_name(obj->where), doname(obj));
+		  fmt_ptr((genericptr_t)obj),
+		  where_name(obj->where), doname(obj));
 	}
 	/* shouldn't be a full container on the bill */
 	if (obj->cobj) {
 	    pline("%s obj %s contains %s! %s\n", mesg,
-		fmt_ptr((genericptr_t)obj, obj_address),
-		something, doname(obj));
+		  fmt_ptr((genericptr_t)obj),
+		  something, doname(obj));
 	}
     }
 
@@ -1915,15 +1913,13 @@ obj_sanity_check()
 	for (obj = mon->minvent; obj; obj = obj->nobj) {
 	    if (obj->where != OBJ_MINVENT) {
 		pline("%s obj %s %s: %s\n", mesg,
-			fmt_ptr((genericptr_t)obj, obj_address),
-			where_name(obj->where), doname(obj));
+		      fmt_ptr((genericptr_t)obj),
+		      where_name(obj->where), doname(obj));
 	    }
 	    if (obj->ocarry != mon) {
 		pline("%s obj %s (%s) not held by mon %s (%s)\n", mesg,
-			fmt_ptr((genericptr_t)obj, obj_address),
-			doname(obj),
-			fmt_ptr((genericptr_t)mon, mon_address),
-			mon_nam(mon));
+		      fmt_ptr((genericptr_t)obj), doname(obj),
+		      fmt_ptr((genericptr_t)mon), mon_nam(mon));
 	    }
 	    check_contained(obj, mesg);
 	}
@@ -1949,17 +1945,16 @@ check_contained(container, mesg)
     const char *mesg;
 {
     struct obj *obj;
-    char obj1_address[FMT_PTR_BUFSIZ], obj2_address[FMT_PTR_BUFSIZ];
 
     for (obj = container->cobj; obj; obj = obj->nobj) {
 	if (obj->where != OBJ_CONTAINED)
 	    pline("contained %s obj %s: %s\n", mesg,
-		fmt_ptr((genericptr_t)obj, obj1_address),
-		where_name(obj->where));
+		  fmt_ptr((genericptr_t)obj),
+		  where_name(obj->where));
 	else if (obj->ocontainer != container)
 	    pline("%s obj %s not in container %s\n", mesg,
-		fmt_ptr((genericptr_t)obj, obj1_address),
-		fmt_ptr((genericptr_t)container, obj2_address));
+		  fmt_ptr((genericptr_t)obj),
+		  fmt_ptr((genericptr_t)container));
     }
 }
 #endif /* WIZARD */

@@ -12,7 +12,7 @@
 #if 0
 E long *FDECL(alloc, (unsigned int));
 #endif
-E char *FDECL(fmt_ptr, (const genericptr,char *));
+E char *FDECL(fmt_ptr, (const genericptr));
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */
