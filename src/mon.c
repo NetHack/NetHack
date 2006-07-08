@@ -1311,7 +1311,7 @@ register struct monst *mtmp, *mtmp2;
 	/* since this is so rare, we don't have any `mon_move_light_source' */
 	new_light_source(mtmp2->mx, mtmp2->my,
 			 emits_light(mtmp2->data),
-			 LS_MONSTER, (genericptr_t)mtmp2);
+			 LS_MONSTER, monst_to_any(mtmp2));
 	/* here we rely on the fact that `mtmp' hasn't actually been deleted */
 	del_light_source(LS_MONSTER, (genericptr_t)mtmp);
     }
@@ -2623,7 +2623,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 		del_light_source(LS_MONSTER, (genericptr_t)mtmp);
 	    if (emits_light(mtmp->data))
 		new_light_source(mtmp->mx, mtmp->my, emits_light(mtmp->data),
-				 LS_MONSTER, (genericptr_t)mtmp);
+				 LS_MONSTER, monst_to_any(mtmp));
 	}
 	if (!mtmp->perminvis || pm_invisible(olddata))
 	    mtmp->perminvis = pm_invisible(mdat);

@@ -716,7 +716,7 @@ xchar x, y;	/* clone's preferred location or 0 (near mon) */
 	place_monster(m2, m2->mx, m2->my);
 	if (emits_light(m2->data))
 	    new_light_source(m2->mx, m2->my, emits_light(m2->data),
-			     LS_MONSTER, (genericptr_t)m2);
+			     LS_MONSTER, monst_to_any(m2));
 	if (has_mname(mon)) {
 		m2 = christen_monst(m2, MNAME(mon));
 	} else if (mon->isshk) {
@@ -1025,7 +1025,7 @@ register int	mmflags;
 	}
 	if ((ct = emits_light(mtmp->data)) > 0)
 		new_light_source(mtmp->mx, mtmp->my, ct,
-				 LS_MONSTER, (genericptr_t)mtmp);
+				 LS_MONSTER, monst_to_any(mtmp));
 	mitem = 0;	/* extra inventory item for this monster */
 
 	if (mndx == PM_VLAD_THE_IMPALER)
