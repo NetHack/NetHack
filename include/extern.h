@@ -737,11 +737,6 @@ E void NDECL(drinksink);
 
 /* ### hack.c ### */
 
-E anything *FDECL(uint_to_any, (unsigned));
-E anything *FDECL(long_to_any, (long));
-E anything *FDECL(monst_to_any, (struct monst *));
-E anything *FDECL(obj_to_any, (struct obj *));
-E void FDECL(zero_anything, (ANY_P *));
 E boolean FDECL(revive_nasty, (int,int,const char*));
 E void FDECL(movobj, (struct obj *,XCHAR_P,XCHAR_P));
 E boolean FDECL(may_dig, (XCHAR_P,XCHAR_P));
@@ -898,8 +893,8 @@ E int NDECL(dosuspend);
 
 /* ### light.c ### */
 
-E void FDECL(new_light_source, (XCHAR_P, XCHAR_P, int, int, ANY_P *));
-E void FDECL(del_light_source, (int, ANY_P *));
+E void FDECL(new_light_source, (XCHAR_P, XCHAR_P, int, int, genericptr_t));
+E void FDECL(del_light_source, (int, genericptr_t));
 E void FDECL(do_light_sources, (char **));
 E struct monst *FDECL(find_mid, (unsigned, unsigned));
 E void FDECL(save_light_sources, (int, int, int));

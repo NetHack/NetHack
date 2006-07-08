@@ -357,7 +357,7 @@ int psflags;
 	    if (new_light == 1) ++new_light;  /* otherwise it's undetectable */
 	    if (new_light)
 		new_light_source(u.ux, u.uy, new_light,
-				 LS_MONSTER, monst_to_any(&youmonst));
+				 LS_MONSTER, (genericptr_t)&youmonst);
 	}
 }
 

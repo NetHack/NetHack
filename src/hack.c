@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)hack.c	3.5	2006/06/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,51 +18,6 @@ STATIC_DCL boolean FDECL(doorless_door, (int,int));
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
 
 #define IS_SHOP(x)	(rooms[x].rtype >= SHOPBASE)
-
-static anything tmp_anything;
-
-anything *
-uint_to_any(ui)
-unsigned ui;
-{
-    zero_anything(&tmp_anything);
-    tmp_anything.a_uint = ui;
-    return &tmp_anything;
-}
-
-anything *
-long_to_any(lng)
-unsigned lng;
-{
-    zero_anything(&tmp_anything);
-    tmp_anything.a_long = lng;
-    return &tmp_anything;
-}
-
-anything *
-monst_to_any(mtmp)
-struct monst *mtmp;
-{
-    zero_anything(&tmp_anything);
-    tmp_anything.a_monst = mtmp;
-    return &tmp_anything;
-}
-
-anything *
-obj_to_any(obj)
-struct obj *obj;
-{
-    zero_anything(&tmp_anything);
-    tmp_anything.a_obj = obj;
-    return &tmp_anything;
-}
-
-void
-zero_anything(any)
-anything *any;
-{
-    (void) memset((genericptr_t)any, 0, sizeof(anything));
-}
 
 boolean
 revive_nasty(x, y, msg)

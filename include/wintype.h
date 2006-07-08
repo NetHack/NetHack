@@ -11,7 +11,6 @@ typedef int winid;		/* a window identifier */
 typedef union any {
     genericptr_t a_void;
     struct obj *a_obj;
-    struct monst *a_monst;
     int  a_int;
     char a_char;
     schar a_schar;
