@@ -1,4 +1,4 @@
-/*   SCCS Id: @(#)vidvga.c   3.5     1996/02/16			  */
+/*   SCCS Id: @(#)vidvga.c   3.5     2006/07/08			  */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*
@@ -1153,7 +1153,7 @@ int chr,col,color;
 	egawriteplane(15);
 }
 
-#  endif POSITIONBAR
+#  endif /*POSITIONBAR*/
 
 #  ifdef SIMULATE_CURSOR
 

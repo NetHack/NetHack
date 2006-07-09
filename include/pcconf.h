@@ -314,7 +314,7 @@
 #define FILENAME_CMP  stricmp		      /* case insensitive */
 #endif
 
-#ifdef MSC7_WARN	/* define with cl /DMSC7_WARN	*/
+#if defined(_MSC_VER) && (_MSC_VER >= 7)
 #pragma warning(disable:4131)
 #endif
 

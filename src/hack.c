@@ -32,7 +32,7 @@ unsigned ui;
 
 anything *
 long_to_any(lng)
-unsigned lng;
+long lng;
 {
     tmp_anything = zeroany;
     tmp_anything.a_long = lng;

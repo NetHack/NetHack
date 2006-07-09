@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pcmain.c	3.5	2006/04/01	*/
+/*	SCCS Id: @(#)pcmain.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,7 +6,11 @@
 
 #include "hack.h"
 #include "dlb.h"
+#ifdef SHORT_FILENAMES
+#include "patchlev.h"
+#else
 #include "patchlevel.h"
+#endif
 
 #ifndef NO_SIGNAL
 #include <signal.h>
