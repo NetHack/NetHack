@@ -517,7 +517,7 @@ struct obj *obj;
 		set_moreluck();
 		context.botl = 1;
 	} else if (obj->otyp == FIGURINE && obj->timed) {
-		(void) stop_timer(FIG_TRANSFORM, (genericptr_t) obj);
+		(void) stop_timer(FIG_TRANSFORM, obj_to_any(obj));
 	}
 }
 

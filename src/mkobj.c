@@ -269,8 +269,8 @@ struct obj *box;
 		 */
 		otmp->age = 0L;
 		if (otmp->timed) {
-		    (void) stop_timer(ROT_CORPSE, (genericptr_t)otmp);
-		    (void) stop_timer(REVIVE_MON, (genericptr_t)otmp);
+		    (void) stop_timer(ROT_CORPSE, obj_to_any(otmp));
+		    (void) stop_timer(REVIVE_MON, obj_to_any(otmp));
 		}
 	    } else {
 		register int tprob;
@@ -943,7 +943,7 @@ start_corpse_timeout(body)
 	}
 	
 	if (body->norevive) body->norevive = 0;
-	(void) start_timer(when, TIMER_OBJECT, action, (genericptr_t)body);
+	(void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
 }
 
 void
@@ -960,7 +960,7 @@ register struct obj *otmp;
 	else if (otmp->otyp == BAG_OF_HOLDING)
 	    otmp->owt = weight(otmp);
 	else if (otmp->otyp == FIGURINE && otmp->timed)
-		(void) stop_timer(FIG_TRANSFORM, (genericptr_t) otmp);
+		(void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
 	return;
 }
 
@@ -1014,7 +1014,7 @@ register struct obj *otmp;
 	else if (otmp->otyp == BAG_OF_HOLDING)
 	    otmp->owt = weight(otmp);
 	else if (otmp->otyp == FIGURINE && otmp->timed)
-	    (void) stop_timer(FIG_TRANSFORM, (genericptr_t) otmp);
+	    (void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
 	return;
 }
 
@@ -1461,10 +1461,10 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 
     /* Check for corpses just placed on or in ice */
     if (otmp->otyp == CORPSE && (on_floor || buried) && is_ice(x,y)) {
-	tleft = stop_timer(action, (genericptr_t)otmp);
+	tleft = stop_timer(action, obj_to_any(otmp));
 	if (tleft == 0L) {
 		action = REVIVE_MON;
-		tleft = stop_timer(action, (genericptr_t)otmp);
+		tleft = stop_timer(action, obj_to_any(otmp));
 	} 
 	if (tleft != 0L) {
 	    long age;
@@ -1487,10 +1487,10 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
     else if ((force < 0) ||
 	     (otmp->otyp == CORPSE && otmp->on_ice &&
 	     ((on_floor && !is_ice(x,y)) || !on_floor))) {
-	tleft = stop_timer(action, (genericptr_t)otmp);
+	tleft = stop_timer(action, obj_to_any(otmp));
 	if (tleft == 0L) {
 		action = REVIVE_MON;
-		tleft = stop_timer(action, (genericptr_t)otmp);
+		tleft = stop_timer(action, obj_to_any(otmp));
 	}
 	if (tleft != 0L) {
 		long age;
@@ -1510,7 +1510,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
     }
     /* now re-start the timer with the appropriate modifications */ 
     if (restart_timer)
-	(void) start_timer(tleft, TIMER_OBJECT, action, (genericptr_t)otmp);
+	(void) start_timer(tleft, TIMER_OBJECT, action, obj_to_any(otmp));
 }
 
 #undef ROT_ICE_ADJUSTMENT

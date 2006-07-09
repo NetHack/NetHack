@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2006/06/25	*/
+/*	SCCS Id: @(#)do.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1585,10 +1585,10 @@ struct obj *corpse;
 /*ARGSUSED*/
 void
 revive_mon(arg, timeout)
-genericptr_t arg;
+anything *arg;
 long timeout;
 {
-    struct obj *body = (struct obj *) arg;
+    struct obj *body = arg->a_obj;
 
     /* if we succeed, the corpse is gone, otherwise, rot it away */
     if (!revive_corpse(body)) {

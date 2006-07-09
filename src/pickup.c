@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2006/06/17	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1885,8 +1885,8 @@ register struct obj *obj;
 		obj->age = monstermoves - obj->age; /* actual age */
 		/* stop any corpse timeouts when frozen */
 		if (obj->otyp == CORPSE && obj->timed) {
-			long rot_alarm = stop_timer(ROT_CORPSE, (genericptr_t)obj);
-			(void) stop_timer(REVIVE_MON, (genericptr_t)obj);
+			long rot_alarm = stop_timer(ROT_CORPSE, obj_to_any(obj));
+			(void) stop_timer(REVIVE_MON, obj_to_any(obj));
 			/* mark a non-reviving corpse as such */
 			if (rot_alarm) obj->norevive = 1;
 		}

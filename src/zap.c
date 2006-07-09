@@ -3766,7 +3766,7 @@ xchar x,y;
 	for (when = MIN_ICE_TIME; when < (MAX_ICE_TIME + MIN_ICE_TIME); when++)
 		if (!rn2((MAX_ICE_TIME - when) + MIN_ICE_TIME)) break;
 	where = (((long)x << 16) | ((long)y));
-	(void) start_timer((long)when, TIMER_LEVEL, action, (genericptr_t)where);
+	(void) start_timer((long)when, TIMER_LEVEL, action, long_to_any(where));
 }
 #undef MIN_ICE_TIME
 #undef MAX_ICE_TIME
@@ -3776,11 +3776,11 @@ xchar x,y;
  */
 void
 melt_ice_away(arg, timeout)
-genericptr_t arg;
+anything *arg;
 long timeout;	/* unused */
 {
 	xchar x,y;
-	long where = (long)arg;
+	long where = arg->a_long;
 
 	y = (xchar)(where & 0xFFFF);
 	x = (xchar)((where >> 16) & 0xFFFF);

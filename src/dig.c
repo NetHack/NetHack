@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.5	2006/06/25	*/
+/*	SCCS Id: @(#)dig.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1636,7 +1636,7 @@ buried_ball_to_punishment()
 #if 0
 		/* rusting buried metallic objects is not implemented yet */
 		if (ball->timed)
-			(void) stop_timer(RUST_METAL, (genericptr_t)ball);
+			(void) stop_timer(RUST_METAL, obj_to_any(ball));
 #endif
 		punish(ball);	/* use ball as flag for unearthed buried ball */
 		u.utrap = 0;
@@ -1658,7 +1658,7 @@ buried_ball_to_freedom()
 #if 0
 		/* rusting buried metallic objects is not implemented yet */
 		if (ball->timed)
-			(void) stop_timer(RUST_METAL, (genericptr_t)ball);
+			(void) stop_timer(RUST_METAL, obj_to_any(ball));
 #endif
 		place_object(ball, cc.x, cc.y);
 		stackobj(ball);
@@ -1723,13 +1723,13 @@ bury_an_obj(otmp)
 	} else if ((under_ice ? otmp->oclass == POTION_CLASS : is_organic(otmp))
 		&& !obj_resists(otmp, 5, 95)) {
 	    (void) start_timer((under_ice ? 0L : 250L) + (long)rnd(250),
-			       TIMER_OBJECT, ROT_ORGANIC, (genericptr_t)otmp);
+			       TIMER_OBJECT, ROT_ORGANIC, obj_to_any(otmp));
 	}
 #if 0
 	/* rusting of buried metal not yet implemented */
 	else if (is_rustprone(otmp)) {
 	    (void) start_timer((long)rnd(otmp->otyp == HEAVY_IRON_BALL ? 1500 : 250),
-			       TIMER_OBJECT, RUST_METAL, (genericptr_t)otmp);
+			       TIMER_OBJECT, RUST_METAL, obj_to_any(otmp));
 	}
 #endif
 	add_to_buried(otmp);
@@ -1775,7 +1775,7 @@ int x, y;
 		    else {
 			obj_extract_self(otmp);
 			if (otmp->timed)
-			    (void) stop_timer(ROT_ORGANIC, (genericptr_t)otmp);
+			    (void) stop_timer(ROT_ORGANIC, obj_to_any(otmp));
 			place_object(otmp, x, y);
 			stackobj(otmp);
 		    }
@@ -1797,10 +1797,10 @@ int x, y;
 /* ARGSUSED */
 void
 rot_organic(arg, timeout)
-genericptr_t arg;
+anything *arg;
 long timeout;	/* unused */
 {
-	struct obj *obj = (struct obj *) arg;
+	struct obj *obj = arg->a_obj;
 
 	while (Has_contents(obj)) {
 	    /* We don't need to place contained object on the floor
@@ -1820,11 +1820,11 @@ long timeout;	/* unused */
  */
 void
 rot_corpse(arg, timeout)
-genericptr_t arg;
+anything *arg;
 long timeout;	/* unused */
 {
 	xchar x = 0, y = 0;
-	struct obj *obj = (struct obj *) arg;
+	struct obj *obj = arg->a_obj;
 	boolean on_floor = obj->where == OBJ_FLOOR,
 		in_invent = obj->where == OBJ_INVENT;
 
