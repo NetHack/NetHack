@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)region.c	3.5	2006/07/02	*/
+/*	SCCS Id: @(#)region.c	3.5	2007/07/08	*/
 /* Copyright (c) 1996 by Jean-Christophe Collet	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -131,7 +131,7 @@ int nrect;
     reg->n_monst = 0;
     reg->max_monst = 0;
     reg->monsters = (unsigned int *)0;
-    reg->arg = (genericptr_t)0;
+    zero_anything(&reg->arg);
     return reg;
 }
 
@@ -660,7 +660,7 @@ int mode;
 	     sizeof (unsigned));
 	bwrite(fd, (genericptr_t) &regions[i]->visible, sizeof (boolean));
 	bwrite(fd, (genericptr_t) &regions[i]->glyph, sizeof (int));
-	bwrite(fd, (genericptr_t) &regions[i]->arg, sizeof (genericptr_t));
+	bwrite(fd, (genericptr_t) &regions[i]->arg, sizeof (anything));
     }
 
 skip_lots:
@@ -745,7 +745,7 @@ boolean ghostly; /* If a bones file restore */
 		  sizeof (unsigned));
 	mread(fd, (genericptr_t) &regions[i]->visible, sizeof (boolean));
 	mread(fd, (genericptr_t) &regions[i]->glyph, sizeof (int));
-	mread(fd, (genericptr_t) &regions[i]->arg, sizeof (genericptr_t));
+	mread(fd, (genericptr_t) &regions[i]->arg, sizeof (anything));
     }
     /* remove expired regions, do not trigger the expire_f callback (yet!);
        also update monster lists if this data is coming from a bones file */
@@ -896,12 +896,13 @@ genericptr_t p2;	/* unused here */
     int damage;
 
     reg = (NhRegion *) p1;
-    damage = (int) reg->arg;
+    damage = reg->arg.a_int;
 
     /* If it was a thick cloud, it dissipates a little first */
     if (damage >= 5) {
 	damage /= 2;		/* It dissipates, let's do less damage */
-	reg->arg = (genericptr_t) damage;
+	zero_anything(&reg->arg);
+	reg->arg.a_int = damage;
 	reg->ttl = 2L;		/* Here's the trick : reset ttl */
 	return FALSE;		/* THEN return FALSE, means "still there" */
     }
@@ -918,7 +919,7 @@ genericptr_t p2;
     int dam;
 
     reg = (NhRegion *) p1;
-    dam = (int) reg->arg;
+    dam = reg->arg.a_int;
     if (p2 == (genericptr_t)0) {		/* This means *YOU* Bozo! */
 	if (nonliving(youmonst.data) || Breathless)
 	    return FALSE;
@@ -994,7 +995,8 @@ int damage;
 	set_heros_fault(cloud);		/* assume player has created it */
     cloud->inside_f = INSIDE_GAS_CLOUD;
     cloud->expire_f = EXPIRE_GAS_CLOUD;
-    cloud->arg = (genericptr_t) damage;
+    zero_anything(&cloud->arg);
+    cloud->arg.a_int = damage;
     cloud->visible = TRUE;
     cloud->glyph = cmap_to_glyph(S_cloud);
     add_region(cloud);

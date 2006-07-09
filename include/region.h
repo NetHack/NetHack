@@ -59,7 +59,7 @@ typedef struct {
 
   boolean visible;		/* Is the region visible ? */
   int glyph;			/* Which glyph to use if visible */
-  genericptr_t arg;		/* Optional user argument (Ex: strength of
+  anything arg;			/* Optional user argument (Ex: strength of
 				   force field, damage of a fire zone, ...*/
 } NhRegion;
 
