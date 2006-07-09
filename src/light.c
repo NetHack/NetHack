@@ -92,8 +92,7 @@ del_light_source(type, id)
     light_source *curr, *prev;
     anything tmp_id;
 
-    zero_anything(&tmp_id);
-
+    tmp_id = zeroany;
     /* need to be prepared for dealing a with light source which
        has only been partially restored during a level change
        (in particular: chameleon vs prot. from shape changers) */
@@ -390,7 +389,7 @@ write_ls(fd, ls)
 	    arg_save = ls->id;
 	    if (ls->type == LS_OBJECT) {
 		otmp = ls->id.a_obj;
-		zero_anything(&ls->id);
+		ls->id = zeroany;
 		ls->id.a_uint = otmp->o_id;
 #ifdef DEBUG
 		if (find_oid((unsigned)ls->id) != otmp)
@@ -398,7 +397,7 @@ write_ls(fd, ls)
 #endif
 	    } else { /* ls->type == LS_MONSTER */
 		mtmp = (struct monst *)ls->id.a_monst;
-		zero_anything(&ls->id);
+		ls->id = zeroany;
 		ls->id.a_uint = mtmp->m_id;
 #ifdef DEBUG
 		if (find_mid((unsigned)ls->id, FM_EVERYWHERE) != mtmp)

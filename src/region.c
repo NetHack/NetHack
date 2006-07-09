@@ -131,7 +131,7 @@ int nrect;
     reg->n_monst = 0;
     reg->max_monst = 0;
     reg->monsters = (unsigned int *)0;
-    zero_anything(&reg->arg);
+    reg->arg = zeroany;
     return reg;
 }
 
@@ -901,7 +901,7 @@ genericptr_t p2;	/* unused here */
     /* If it was a thick cloud, it dissipates a little first */
     if (damage >= 5) {
 	damage /= 2;		/* It dissipates, let's do less damage */
-	zero_anything(&reg->arg);
+	reg->arg = zeroany;
 	reg->arg.a_int = damage;
 	reg->ttl = 2L;		/* Here's the trick : reset ttl */
 	return FALSE;		/* THEN return FALSE, means "still there" */
@@ -995,7 +995,7 @@ int damage;
 	set_heros_fault(cloud);		/* assume player has created it */
     cloud->inside_f = INSIDE_GAS_CLOUD;
     cloud->expire_f = EXPIRE_GAS_CLOUD;
-    zero_anything(&cloud->arg);
+    cloud->arg = zeroany;
     cloud->arg.a_int = damage;
     cloud->visible = TRUE;
     cloud->glyph = cmap_to_glyph(S_cloud);

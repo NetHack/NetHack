@@ -250,6 +250,7 @@ E NEARDATA struct obj *uball;
 E NEARDATA struct obj *migrating_objs;
 E NEARDATA struct obj *billobjs;
 E NEARDATA struct obj zeroobj;		/* init'd and defined in decl.c */
+E NEARDATA anything zeroany;		/* init'd and defined in decl.c */
 
 #include "you.h"
 E NEARDATA struct you u;

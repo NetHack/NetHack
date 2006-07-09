@@ -1723,8 +1723,7 @@ write_timer(fd, timer)
 {
     anything arg_save;
 
-    zero_anything(&arg_save);
-
+    arg_save = zeroany;
     switch (timer->kind) {
 	case TIMER_GLOBAL:
 	case TIMER_LEVEL:
@@ -1738,7 +1737,7 @@ write_timer(fd, timer)
 	    else {
 		/* replace object pointer with id */
 		arg_save.a_obj = timer->arg.a_obj;
-		zero_anything(&timer->arg);
+		timer->arg = zeroany;
 		timer->arg.a_uint = (arg_save.a_obj)->o_id;
 		timer->needs_fixup = 1;
 		bwrite(fd, (genericptr_t)timer, sizeof(timer_element));
@@ -1753,7 +1752,7 @@ write_timer(fd, timer)
 	    else {
 		/* replace monster pointer with id */
 		arg_save.a_monst = timer->arg.a_monst;
-		zero_anything(&timer->arg);
+		timer->arg = zeroany;
 		timer->arg.a_uint = (arg_save.a_monst)->m_id;
 		timer->needs_fixup = 1;
 		bwrite(fd, (genericptr_t)timer, sizeof(timer_element));
