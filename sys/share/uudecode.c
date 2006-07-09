@@ -37,6 +37,10 @@
  * appear to be stripping trailing blanks.
  *
  * Modified 28 February 2002 for use on WIN32 systems with Microsoft C.
+ *
+ * Modified 08 July 2006 to cast strlen() result to int to suppress a
+ * warning on platforms where size_t > sizeof(int).
+ *
  */
 
 #ifndef lint
@@ -192,7 +196,7 @@ FILE *out;
 
 		/* Calculate expected # of chars and pad if necessary */
 		expected = ((n+2)/3)<<2;
-		for (i = strlen(buf)-1; i <= expected; i++) buf[i] = ' ';
+		for (i = (int)strlen(buf)-1; i <= expected; i++) buf[i] = ' ';
 
 		bp = &buf[1];
 		while (n > 0) {

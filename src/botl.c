@@ -410,8 +410,8 @@ init_blstats()
 		/* ensure initial field values set on blstats[1][i] too */
 		blstats[1][i] = blstats[0][i];
 
-		blstats[0][i].a.a_ulong = 0UL;
-		blstats[1][i].a.a_ulong = 0UL;
+		blstats[0][i].a = zeroany;
+		blstats[1][i].a = zeroany;
 		if (blstats[0][i].valwidth) {
 		    blstats[0][i].val = (char *)alloc(blstats[0][i].valwidth);
 		    blstats[1][i].val = (char *)alloc(blstats[0][i].valwidth);
@@ -815,8 +815,8 @@ bot()
 				status_update(i, (genericptr_t)curr->val, chg, pc);
 			} else {
 				status_update(i,
-				    /* send actual mask, not a pointer to it */
-				    (genericptr_t) curr->a.a_ulong, chg, 0);
+				    /* send pointer to mask */
+				    (genericptr_t) &curr->a.a_ulong, chg, 0);
 			}
 			updated = TRUE;
 		}
@@ -1197,30 +1197,30 @@ status_hilite_menu()
 	        tmpwin = create_nhwindow(NHW_MENU);
 		start_menu(tmpwin);
 		if (i == BL_CONDITION) {
-			any.a_void = 0;
+			any = zeroany;
 			any.a_int = BL_TH_CONDITION + 1;
 			add_menu(tmpwin, NO_GLYPH, &any, 'c', 0,
 				ATR_NONE, "Condition bitmask threshold.",
 				MENU_UNSELECTED);
 		}
-		any.a_void = 0;
+		any = zeroany;
 		any.a_int = BL_TH_NONE + 1;
 		add_menu(tmpwin, NO_GLYPH, &any, 'n', 0,
 			ATR_NONE,"None", MENU_UNSELECTED);
  	    	if (i != BL_CONDITION) {
 			if (blstats[0][i].idxmax > 0) {
-				any.a_void = 0;
+				any = zeroany;
 				any.a_int = BL_TH_VAL_PERCENTAGE + 1;
 				add_menu(tmpwin, NO_GLYPH, &any, 'p', 0,
 					ATR_NONE, "Percentage threshold.",
 					MENU_UNSELECTED);
 			}
-			any.a_void = 0;
+			any = zeroany;
 			any.a_int = BL_TH_UPDOWN + 1;
 			add_menu(tmpwin, NO_GLYPH, &any, 'u', 0,
 				ATR_NONE, "UpDown threshold.",
 				MENU_UNSELECTED);
-			any.a_void = 0;
+			any = zeroany;
 			any.a_int = BL_TH_VAL_ABSOLUTE + 1;
 			add_menu(tmpwin, NO_GLYPH, &any, 'v', 0,
 				ATR_NONE,"Value threshold.",
@@ -1275,7 +1275,7 @@ status_hilite_menu()
 		    start_menu(tmpwin);
 		    for (k = -3; k < CLR_MAX; ++k) {
 /*		    	if (k == -1) continue; */
-			any.a_void = 0;
+			any = zeroany;
 			any.a_int = (k >= 0) ? k + 1 : k;
 			if (k > 0) add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
 						ATR_NONE, c_obj_colors[k],
@@ -1389,7 +1389,7 @@ int idx, chg, percent;
 genericptr_t ptr;
 {
 	char newbot1[MAXCO], newbot2[MAXCO];
-	long cond;
+	long cond, *condptr = (long *)ptr;
 	register int i;
 	char *text = (char *)ptr;
 	int fieldorder1[] = {
@@ -1406,7 +1406,7 @@ genericptr_t ptr;
 	    if (!activefields[idx]) return;
 	    switch(idx) {
 		case BL_CONDITION:
-	    		cond = (long)ptr;
+	    		cond = *condptr;
 	    		*vals[idx] = '\0';
 	    		if (cond & BL_MASK_BLIND) Strcat(vals[idx], " Blind");
 	    		if (cond & BL_MASK_CONF) Strcat(vals[idx], " Conf");
