@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.5	2006/06/25	*/
+/*	SCCS Id: @(#)spell.c	3.5	2006/07/08	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1216,7 +1216,7 @@ spellsortmenu()
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
-    any.a_void = 0;		/* zero out all bits */
+    any = zeroany;		/* zero out all bits */
 
     for (i = 0; i < SIZE(spl_sortchoices); i++) {
 	if (i == SORTRETAINORDER) {
@@ -1297,7 +1297,7 @@ int *spell_no;
 
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
-	any.a_void = 0;		/* zero out all bits */
+	any = zeroany;		/* zero out all bits */
 
 	/*
 	 * The correct spacing of the columns when not using

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.5	2005/06/21	*/
+/*	SCCS Id: @(#)pager.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -909,7 +909,7 @@ help_menu(sel)
 	menu_item *selected;
 	anything any;
 
-	any.a_void = 0;		/* zero all bits */
+	any = zeroany;		/* zero all bits */
 	start_menu(tmpwin);
 #ifdef WIZARD
 	if (!wizard) help_menu_items[WIZHLP_SLOT] = "",

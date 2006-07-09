@@ -753,7 +753,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 
 	win = create_nhwindow(NHW_MENU);
 	start_menu(win);
-	any.a_obj = (struct obj *) 0;
+	any = zeroany;
 
 	/*
 	 * Run through the list and add the objects to the menu.  If
@@ -776,7 +776,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 
 		    /* if sorting, print type name (once only) */
 		    if (qflags & INVORDER_SORT && !printed_type_name) {
-			any.a_obj = (struct obj *) 0;
+			any = zeroany;
 			add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 					let_to_name(*pack, FALSE), MENU_UNSELECTED);
 			printed_type_name = TRUE;
@@ -881,7 +881,7 @@ int how;			/* type of query */
 	pack = flags.inv_order;
 	if ((qflags & ALL_TYPES) && (ccount > 1)) {
 		invlet = 'a';
-		any.a_void = 0;
+		any = zeroany;
 		any.a_int = ALL_TYPES_SELECTED;
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
 		       (qflags & WORN_TYPES) ? "All worn types" : "All types",
@@ -898,7 +898,7 @@ int how;			/* type of query */
 		    	W_WEP | W_SWAPWEP | W_QUIVER)))
 			 continue;
 		   if (!collected_type_name) {
-			any.a_void = 0;
+			any = zeroany;
 			any.a_int = curr->oclass;
 			add_menu(win, NO_GLYPH, &any, invlet++,
 				def_oc_syms[(int)objects[curr->otyp].oc_class],
@@ -917,7 +917,7 @@ int how;			/* type of query */
 	/* unpaid items if there are any */
 	if (do_unpaid) {
 		invlet = 'u';
-		any.a_void = 0;
+		any = zeroany;
 		any.a_int = 'u';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
 			"Unpaid items", MENU_UNSELECTED);
@@ -925,14 +925,14 @@ int how;			/* type of query */
 	/* billed items: checked by caller, so always include if BILLED_TYPES */
 	if (qflags & BILLED_TYPES) {
 		invlet = 'x';
-		any.a_void = 0;
+		any = zeroany;
 		any.a_int = 'x';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
 			 "Unpaid items already used up", MENU_UNSELECTED);
 	}
 	if (qflags & CHOOSE_ALL) {
 		invlet = 'A';
-		any.a_void = 0;
+		any = zeroany;
 		any.a_int = 'A';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
 			(qflags & WORN_TYPES) ?
@@ -942,28 +942,28 @@ int how;			/* type of query */
 	/* items with b/u/c/unknown if there are any */
 	if (do_blessed) {
 		invlet = 'B';
-		any.a_void = 0;
+		any = zeroany;
 		any.a_int = 'B';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
 			"Items known to be Blessed", MENU_UNSELECTED);
 	}
 	if (do_cursed) {
 		invlet = 'C';
-		any.a_void = 0;
+		any = zeroany;
 		any.a_int = 'C';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
 			"Items known to be Cursed", MENU_UNSELECTED);
 	}
 	if (do_uncursed) {
 		invlet = 'U';
-		any.a_void = 0;
+		any = zeroany;
 		any.a_int = 'U';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
 			"Items known to be Uncursed", MENU_UNSELECTED);
 	}
 	if (do_buc_unknown) {
 		invlet = 'X';
-		any.a_void = 0;
+		any = zeroany;
 		any.a_int = 'X';
 		add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
 			"Items of unknown B/C/U status",
@@ -2423,7 +2423,7 @@ boolean outokay, inokay;
     int n;
     const char *menuselector = flags.lootabc ? "abc" : "oib";
 
-    any.a_void = 0;
+    any = zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     if (outokay) {

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2006/06/17 	*/
+/*	SCCS Id: @(#)apply.c	3.5	2006/07/08 	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2657,7 +2657,7 @@ use_grapple (obj)
 	    char buf[BUFSZ];
 	    menu_item *selected;
 
-	    any.a_void = 0;	/* set all bits to zero */
+	    any = zeroany;	/* set all bits to zero */
 	    any.a_int = 1;	/* use index+1 (cant use 0) as identifier */
 	    start_menu(tmpwin);
 	    any.a_int++;

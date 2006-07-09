@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dungeon.c	3.5	2006/04/21	*/
+/*	SCCS Id: @(#)dungeon.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1608,7 +1608,7 @@ boolean unreachable;
     lchoices->lev[lchoices->idx] = lvl_p->dlevel;
     lchoices->dgn[lchoices->idx] = lvl_p->dnum;
     lchoices->playerlev[lchoices->idx] = depth(lvl_p);
-    any.a_void = 0;
+    any = zeroany;
     if (unreachable) {
 	/* not selectable, but still consumes next menuletter;
 	   prepend padding in place of missing menu selector */
@@ -1717,7 +1717,7 @@ xchar *rdgn;
 			dptr->depth_start + dptr->entry_lev - 1);
 	}
 	if (bymenu) {
-	    any.a_void = 0;
+	    any = zeroany;
 	    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf, MENU_UNSELECTED);
 	} else
 	    putstr(win, 0, buf);

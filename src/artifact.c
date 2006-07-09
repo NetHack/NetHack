@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.5	2006/05/31	*/
+/*	SCCS Id: @(#)artifact.c 3.5	2006/06/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1305,7 +1305,7 @@ arti_invoke(obj)
 	    winid tmpwin = create_nhwindow(NHW_MENU);
 	    anything any;
 
-	    any.a_void = 0;	/* set all bits to zero */
+	    any = zeroany;	/* set all bits to zero */
 	    start_menu(tmpwin);
 	    /* use index+1 (cant use 0) as identifier */
 	    for (i = num_ok_dungeons = 0; i < n_dgns; i++) {

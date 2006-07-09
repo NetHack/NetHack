@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2006/06/25	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -356,7 +356,7 @@ extcmd_via_menu()	/* here after # - now show pick-list of possible commands */
     while (!ret) {
 	    i = n = 0;
 	    accelerator = 0;
-	    any.a_void = 0;
+	    any = zeroany;
 	    /* populate choices */
 	    for(efp = extcmdlist; efp->ef_txt; efp++) {
 		if (!matchlevel || !strncmp(efp->ef_txt, cbuf, matchlevel)) {
@@ -1380,7 +1380,7 @@ minimal_enlightenment()
 	fmtstr = iflags.menu_tab_sep ? tabbed_fmtstr : untabbed_fmtstr;
 	deity_fmtstr = iflags.menu_tab_sep ?
 			tabbed_deity_fmtstr : untabbed_deity_fmtstr; 
-	any.a_void = 0;
+	any = zeroany;
 	buf[0] = buf2[0] = '\0';
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);

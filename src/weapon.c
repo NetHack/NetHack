@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.5	2004/10/29	*/
+/*	SCCS Id: @(#)weapon.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -902,7 +902,7 @@ enhance_weapon_skill()
 	    /* start with a legend if any entries will be annotated
 	       with "*" or "#" below */
 	    if (eventually_advance > 0 || maxxed_cnt > 0) {
-		any.a_void = 0;
+		any = zeroany;
 		if (eventually_advance > 0) {
 		    Sprintf(buf,
 			    "(Skill%s flagged by \"*\" may be enhanced %s.)",
@@ -932,7 +932,7 @@ enhance_weapon_skill()
 	    for (i = skill_ranges[pass].first;
 		 i <= skill_ranges[pass].last; i++) {
 		/* Print headings for skill types */
-		any.a_void = 0;
+		any = zeroany;
 		if (i == skill_ranges[pass].first)
 		    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 			     skill_ranges[pass].name, MENU_UNSELECTED);

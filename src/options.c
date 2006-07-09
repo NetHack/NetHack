@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2005/11/19	*/
+/*	SCCS Id: @(#)options.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2566,7 +2566,7 @@ doset_add_menu(win, option, indexoffset)
     anything any;
     int i;
 
-    any.a_void = 0;
+    any = zeroany;
     if (indexoffset == 0) {
 	any.a_int = 0;
 	value = get_compopt_value(option, buf2);
@@ -2609,7 +2609,7 @@ doset()
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
 
-	any.a_void = 0;
+	any = zeroany;
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 		 "Booleans (selecting will toggle value):", MENU_UNSELECTED);
 	any.a_int = 0;
@@ -2642,7 +2642,7 @@ doset()
 
 	boolcount = i;
 	indexoffset = boolcount;
-	any.a_void = 0;
+	any = zeroany;
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 		 "Compounds (selecting will prompt for new value):",
@@ -2705,7 +2705,7 @@ doset()
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 #endif /* AUTOPICKUP_EXCEPTIONS */
 #ifdef PREFIXES_IN_USE
-	any.a_void = 0;
+	any = zeroany;
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 		 "Variable playground locations:", MENU_UNSELECTED);
@@ -2818,6 +2818,7 @@ boolean setinitial,setfromfile;
 	menu_item *burden_pick = (menu_item *)0;
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	for (i = 0; i < SIZE(burdentype); i++) {
 		burden_name = burdentype[i];
 		any.a_int = i + 1;
@@ -2848,6 +2849,7 @@ boolean setinitial,setfromfile;
 
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
 		disclosure_name = disclosure_names[i];
 		any.a_int = i + 1;
@@ -2877,15 +2879,15 @@ boolean setinitial,setfromfile;
 		any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
 		add_menu(tmpwin, NO_GLYPH, &any, 'a', 0,
 			ATR_NONE,"Never disclose and don't prompt", MENU_UNSELECTED);
-		any.a_void = 0;
+		any = zeroany;
 		any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
 		add_menu(tmpwin, NO_GLYPH, &any, 'b', 0,
 			ATR_NONE,"Always disclose and don't prompt", MENU_UNSELECTED);
-		any.a_void = 0;
+		any = zeroany;
 		any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
 		add_menu(tmpwin, NO_GLYPH, &any, 'c', 0,
 			ATR_NONE,"Prompt and default answer to \"No\"", MENU_UNSELECTED);
-		any.a_void = 0;
+		any = zeroany;
 		any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
 		add_menu(tmpwin, NO_GLYPH, &any, 'd', 0,
 			ATR_NONE,"Prompt and default answer to \"Yes\"", MENU_UNSELECTED);
@@ -2902,6 +2904,7 @@ boolean setinitial,setfromfile;
 	menu_item *mode_pick = (menu_item *)0;
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	for (i = 0; i < SIZE(runmodes); i++) {
 		mode_name = runmodes[i];
 		any.a_int = i + 1;
@@ -2920,6 +2923,7 @@ boolean setinitial,setfromfile;
 	menu_item *window_pick = (menu_item *)0;
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	any.a_char = 's';
 	add_menu(tmpwin, NO_GLYPH, &any, 's', 0,
 		ATR_NONE, "single", MENU_UNSELECTED);
@@ -2947,6 +2951,7 @@ boolean setinitial,setfromfile;
 
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	any.a_int = ALIGN_TOP;
 	add_menu(tmpwin, NO_GLYPH, &any, 't', 0,
 		ATR_NONE, "top", MENU_UNSELECTED);
@@ -2979,6 +2984,7 @@ boolean setinitial,setfromfile;
 
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	for (i = 0; i < SIZE(npchoices); i++) {
 		any.a_int = i + 1;
 		add_menu(tmpwin, NO_GLYPH, &any, 'a' + i, 0,
@@ -3007,6 +3013,7 @@ boolean setinitial,setfromfile;
 
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	for (i = 0; i < SIZE(mhchoices); i++) {
 		any.a_int = i + 1;
 		add_menu(tmpwin, NO_GLYPH, &any, npletters[i], 0,
@@ -3052,7 +3059,7 @@ boolean setinitial,setfromfile;
 	totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
-	any.a_int = 0;
+	any = zeroany;
 	for (i = 0; i < SIZE(action_titles); i++) {
 		any.a_int++;
 		/* omit list and remove if there aren't any yet */
@@ -3099,7 +3106,7 @@ boolean setinitial,setfromfile;
 		for (pass = AP_LEAVE; pass <= AP_GRAB; ++pass) {
 		    if (numapes[pass] == 0) continue;
 		    ape = iflags.autopickup_exceptions[pass];
-		    any.a_void = 0;
+		    any = zeroany;
 		    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 				(pass == 0) ? "Never pickup" : "Always pickup",
 				MENU_UNSELECTED);
@@ -3761,7 +3768,7 @@ char *class_select;
     if (class_list == (char *)0 || class_select == (char *)0) return 0;
     accelerator = 0;
     next_accelerator = 'a';
-    any.a_void = 0;
+    any = zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     while (*class_list) {

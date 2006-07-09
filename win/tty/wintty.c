@@ -403,7 +403,7 @@ give_up:	/* Quit */
 		/* Prompt for a role */
 		win = create_nhwindow(NHW_MENU);
 		start_menu(win);
-		any.a_void = 0;         /* zero out all bits */
+		any = zeroany;         /* zero out all bits */
 		for (i = 0; roles[i].name.m; i++) {
 		    if (ok_role(i, flags.initrace, flags.initgend,
 							flags.initalign)) {
@@ -491,7 +491,7 @@ give_up:	/* Quit */
 		    tty_putstr(BASE_WINDOW, 0, "Choosing Race");
 		    win = create_nhwindow(NHW_MENU);
 		    start_menu(win);
-		    any.a_void = 0;         /* zero out all bits */
+		    any = zeroany;         /* zero out all bits */
 		    for (i = 0; races[i].noun; i++)
 			if (ok_race(flags.initrole, i, flags.initgend,
 							flags.initalign)) {
@@ -563,7 +563,7 @@ give_up:	/* Quit */
 		    tty_putstr(BASE_WINDOW, 0, "Choosing Gender");
 		    win = create_nhwindow(NHW_MENU);
 		    start_menu(win);
-		    any.a_void = 0;         /* zero out all bits */
+		    any = zeroany;         /* zero out all bits */
 		    for (i = 0; i < ROLE_GENDERS; i++)
 			if (ok_gend(flags.initrole, flags.initrace, i,
 							    flags.initalign)) {
@@ -634,7 +634,7 @@ give_up:	/* Quit */
 		    tty_putstr(BASE_WINDOW, 0, "Choosing Alignment");
 		    win = create_nhwindow(NHW_MENU);
 		    start_menu(win);
-		    any.a_void = 0;         /* zero out all bits */
+		    any = zeroany;         /* zero out all bits */
 		    for (i = 0; i < ROLE_ALIGNS; i++)
 			if (ok_align(flags.initrole, flags.initrace,
 							flags.initgend, i)) {
@@ -696,7 +696,7 @@ tty_askname()
 	tty_clear_nhwindow(BASE_WINDOW);
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
-	any.a_int = 0;	/* no selection */
+	any = zeroany;	/* no selection */
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
 		 ATR_NONE, COPYRIGHT_BANNER_A, MENU_UNSELECTED);
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
@@ -2152,7 +2152,7 @@ tty_end_menu(window, prompt)
     if (prompt) {
 	anything any;
 
-	any.a_void = 0;	/* not selectable */
+	any = zeroany;	/* not selectable */
 	tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
 	tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt, MENU_UNSELECTED);
     }

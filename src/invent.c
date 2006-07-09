@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2006/06/17	*/
+/*	SCCS Id: @(#)invent.c	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1770,13 +1770,13 @@ long* out_cnt;
 #endif
 nextclass:
 	classcount = 0;
-	any.a_void = 0;		/* set all bits to zero */
+	any = zeroany;		/* set all bits to zero */
 	for(otmp = invent; otmp; otmp = otmp->nobj) {
 		ilet = otmp->invlet;
 		if(!lets || !*lets || index(lets, ilet)) {
+			any = zeroany;		/* zero */
 			if (!flags.sortpack || otmp->oclass == *invlet) {
 			    if (flags.sortpack && !classcount) {
-				any.a_void = 0;		/* zero */
 				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
 				classcount++;
@@ -1845,14 +1845,14 @@ char avoidlet;
 	    win = create_nhwindow(NHW_MENU);
 	    start_menu(win);
 	    while (!done) {
-		any.a_void = 0;		/* set all bits to zero */
+		any = zeroany;		/* set all bits to zero */
 		classcount = 0;
 		for(otmp = invent; otmp; otmp = otmp->nobj) {
 		    ilet = otmp->invlet;
 		    if (ilet == avoidlet) continue;
 		    if (!flags.sortpack || otmp->oclass == *invlet) {
 			if (flags.sortpack && !classcount) {
-				any.a_void = 0;		/* zero */
+				any = zeroany;		/* zero */
 				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
 				classcount++;
@@ -2914,7 +2914,7 @@ const char *hdr, *txt;
 	anything any;
 	menu_item *selected;
 
-	any.a_void = 0;
+	any = zeroany;
 	win = create_nhwindow(NHW_MENU);
 	start_menu(win);
 	add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, hdr, MENU_UNSELECTED);
