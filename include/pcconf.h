@@ -105,6 +105,23 @@
 #include <process.h>	/* Provides prototypes of exit(), spawn()      */
 #endif
 
+#if defined(_MSC_VER) && (_MSC_VER >= 7)
+#include <sys/types.h>
+#include <stdlib.h>
+#ifdef strcmpi
+#undef strcmpi
+#endif
+#include <string.h>	/* Provides prototypes of strncmpi(), etc.     */
+#include <conio.h>
+#include <io.h>
+#include <direct.h>
+# define SIG_RET_TYPE void (__cdecl *)(int)
+#define M(c)		((char) (0x80 | (c)))
+#define vprintf		printf
+#define vfprintf	fprintf
+#define vsprintf	sprintf
+#endif
+
 #if defined(__BORLANDC__) && defined(STRNCMPI)
 #include <string.h>	/* Provides prototypes of strncmpi(), etc.     */
 #endif
@@ -156,7 +173,9 @@
  */
 
 #ifndef SYSTEM_H
+# if !defined(_MSC_VER)
 #include "system.h"
+# endif
 #endif
 
 #ifdef __DJGPP__
@@ -316,6 +335,10 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 7)
 #pragma warning(disable:4131)
+#pragma warning(disable:4135)
+#pragma warning(disable:4309)
+#pragma warning(disable:4746)
+#pragma warning(disable:4761)
 #endif
 
 #ifdef TIMED_DELAY

@@ -455,19 +455,19 @@ envchk:
 !	ENDIF
 !	IF ("$(CL)"=="")
 	   @echo CL Environment variable is defined as follows:
-	   SET CL=/AL $(MC) /Oo /Gy /Gs /Gt10 /Gf /Zp1 /W0 /I$(INCL) /I$(MSYS) /I$(WSHR) /nologo /c
+	   SET CL=/AL $(MC) /Oo /Gy /Gs /Gt10 /Gf /Zp1 /W2 /I$(INCL) /I$(MSYS) /I$(WSHR) /nologo /c
 !	ELSE
 	   @echo Warning CL Environment variable is defined:
 	   @echo CL=$(CL)
 	   @echo Overriding that definition as follows:
-	   SET CL=/AL $(MC) /Oo /Gy /Gs /Gt10 /Gf /Zp1 /W0 /I$(INCL) /I$(MSYS) /I$(WSHR) /nologo /c
+	   SET CL=/AL $(MC) /Oo /Gy /Gs /Gt10 /Gf /Zp1 /W2 /I$(INCL) /I$(MSYS) /I$(WSHR) /nologo /c
 !	ENDIF
 
 #  The main target.
 
 $(GAMEFILE) :  $(LNKOPT) $(ALLOBJ)
 	@echo Linking....
-	$(LINK) $(LFLAGS) /SE:1000 /DYNAMIC:2160 /NOE /ST:6000 @<<$(GAME).lnk
+	$(LINK) $(LFLAGS) /SE:1000 /DYNAMIC:2550 /NOE /ST:6000 @<<$(GAME).lnk
 		$(ALLOBJ:^	=+^
 		)
 		$(GAMEFILE)
