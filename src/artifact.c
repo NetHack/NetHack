@@ -212,7 +212,7 @@ register boolean mod;
 	if (otmp && *name)
 	    for (a = artilist+1; a->otyp; a++)
 		if (a->otyp == otmp->otyp && !strcmp(a->name, name)) {
-		    register int m = a - artilist;
+		    register int m = (int)(a - artilist);
 		    otmp->oartifact = (char)(mod ? m : 0);
 		    otmp->age = 0;
 		    if(otmp->otyp == RIN_INCREASE_DAMAGE)

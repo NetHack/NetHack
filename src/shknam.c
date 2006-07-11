@@ -370,7 +370,7 @@ int sx, sy;
 		mtmp->mappearance = STRANGE_OBJECT;
 	    }
 	} else {
-	    atype = get_shop_item(shp - shtypes);
+	    atype = get_shop_item((int)(shp - shtypes));
 	    if (atype == VEGETARIAN_CLASS)
 		mkveggy_at(sx, sy);
 	    else if (atype < 0)
@@ -486,7 +486,7 @@ struct mkroom	*sroom;
 
 	/* check that the shopkeeper placement is sane */
 	if(sroom->irregular) {
-	    int rmno = (sroom - rooms) + ROOMOFFSET;
+	    int rmno = (int)((sroom - rooms) + ROOMOFFSET);
 	    if (isok(sx-1,sy) && !levl[sx-1][sy].edge &&
 		(int) levl[sx-1][sy].roomno == rmno) sx--;
 	    else if (isok(sx+1,sy) && !levl[sx+1][sy].edge &&
@@ -534,7 +534,7 @@ struct mkroom	*sroom;
 	set_malign(shk);
 	shk->msleeping = 0;
 	shk->mtrapseen = ~0;	/* we know all the traps already */
-	ESHK(shk)->shoproom = (sroom - rooms) + ROOMOFFSET;
+	ESHK(shk)->shoproom = (schar)((sroom - rooms) + ROOMOFFSET);
 	sroom->resident = shk;
 	ESHK(shk)->shoptype = sroom->rtype;
 	assign_level(&(ESHK(shk)->shoplevel), &u.uz);
@@ -574,7 +574,7 @@ register struct mkroom *sroom;
      */
     register int sx, sy, sh;
     char buf[BUFSZ];
-    int rmno = (sroom - rooms) + ROOMOFFSET;
+    int rmno = (int)((sroom - rooms) + ROOMOFFSET);
     const struct shclass *shp = &shtypes[shp_indx];
 
     /* first, try to place a shopkeeper in the room */

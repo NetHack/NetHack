@@ -223,7 +223,7 @@ boolean sanctum;   /* is it the seat of the high priest? */
 	priest = makemon(&mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST],
 			 sx + 1, sy, MM_EPRI);
 	if (priest) {
-		EPRI(priest)->shroom = (sroom - rooms) + ROOMOFFSET;
+		EPRI(priest)->shroom = (schar)((sroom - rooms) + ROOMOFFSET);
 		EPRI(priest)->shralign = Amask2align(levl[sx][sy].altarmask);
 		EPRI(priest)->shrpos.x = sx;
 		EPRI(priest)->shrpos.y = sy;

@@ -702,7 +702,7 @@ char *tp;
 	    cp++;
 	    if (*cp == 'x' || *cp == 'X')
 		for (++cp; (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
-		    cval = (cval * 16) + (dp - hex) / 2;
+		    cval = (int)((cval * 16) + (dp - hex) / 2);
 	    else if (*cp == 'o' || *cp == 'O')
 		for (++cp; (index("01234567",*cp)) && (dcount++ < 3); cp++)
 		    cval = (cval * 8) + (*cp - '0');
@@ -1933,7 +1933,7 @@ goodfruit:
 			if (c == 'k') c = 'v';	/* killed -> vanquished */
 			dop = index(disclosure_options, c);
 			if (dop) {
-				idx = dop - disclosure_options;
+				idx = (int)(dop - disclosure_options);
 				if (idx < 0 || idx > NUM_DISCLOSURE_OPTIONS - 1) {
 				    impossible("bad disclosure index %d %c",
 							idx, c);
@@ -2538,7 +2538,7 @@ map_menu_cmd(ch)
 {
     char *found = index(mapped_menu_cmds, ch);
     if (found) {
-	int idx = found - mapped_menu_cmds;
+	int idx = (int)(found - mapped_menu_cmds);
 	ch = mapped_menu_op[idx];
     }
     return ch;

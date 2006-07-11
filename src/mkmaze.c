@@ -534,7 +534,7 @@ register const char *s;
 	    char *ep = getenv("SPLEVTYPE");	/* not nh_getenv */
 	    if (ep) {
 		/* rindex always succeeds due to code in prior block */
-		int len = (rindex(protofile, '-') - protofile) + 1;
+		int len = (int)((rindex(protofile, '-') - protofile) + 1);
 
 		while (ep && *ep) {
 		    if (!strncmp(ep, protofile, len)) {

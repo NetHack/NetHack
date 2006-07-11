@@ -227,7 +227,7 @@ nh_timeout()
 
 	for(upp = u.uprops; upp < u.uprops+SIZE(u.uprops); upp++)
 	    if((upp->intrinsic & TIMEOUT) && !(--upp->intrinsic & TIMEOUT)) {
-		kptr = find_delayed_killer(upp - u.uprops);
+		kptr = find_delayed_killer((int)(upp - u.uprops));
 		switch(upp - u.uprops){
 		case STONED:
 			if (kptr && kptr->name[0]) {

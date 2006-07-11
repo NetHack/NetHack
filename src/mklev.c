@@ -957,7 +957,7 @@ topologize(croom)
 register struct mkroom *croom;
 #endif
 {
-	register int x, y, roomno = (croom - rooms) + ROOMOFFSET;
+	register int x, y, roomno = (int)((croom - rooms) + ROOMOFFSET);
 	register int lowx = croom->lx, lowy = croom->ly;
 	register int hix = croom->hx, hiy = croom->hy;
 #ifdef SPECIALIZATION

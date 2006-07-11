@@ -227,7 +227,7 @@ struct mkroom *sroom;
 	struct monst *mon;
 	register int sx,sy,i;
 	int sh, tx, ty, goldlim, type = sroom->rtype;
-	int rmno = (sroom - rooms) + ROOMOFFSET;
+	int rmno = (int)((sroom - rooms) + ROOMOFFSET);
 	coord mm;
 
 #ifdef GCC_WARN
@@ -518,7 +518,7 @@ mktemple()
 	 * In temples, shrines are blessed altars
 	 * located in the center of the room
 	 */
-	shrine_spot = shrine_pos((sroom - rooms) + ROOMOFFSET);
+	shrine_spot = shrine_pos((int)((sroom - rooms) + ROOMOFFSET));
 	lev = &levl[shrine_spot->x][shrine_spot->y];
 	lev->typ = ALTAR;
 	lev->altarmask = induced_align(80);
@@ -596,7 +596,7 @@ coord *c;
 	int i;
 
 	if (croom->irregular) {
-	    i = (croom - rooms) + ROOMOFFSET;
+	    i = (int)((croom - rooms) + ROOMOFFSET);
 
 	    while(try_cnt++ < 100) {
 		c->x = somex(croom);

@@ -327,7 +327,7 @@ char *defquery;
     char *dop = index(disclosure_options, category);
 
     if (dop && defquery) {
-	idx = dop - disclosure_options;
+	idx = (int)(dop - disclosure_options);
 	if (idx < 0 || idx > (NUM_DISCLOSURE_OPTIONS - 1)) {
 	    impossible(
 		   "should_query_disclose_option: bad disclosure index %d %c",

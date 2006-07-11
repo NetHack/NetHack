@@ -224,7 +224,7 @@ dosounds()
 	    return;
 	}
 	if (tended_shop(sroom) &&
-		!index(u.ushops, ROOM_INDEX(sroom) + ROOMOFFSET)) {
+		!index(u.ushops, (int)(ROOM_INDEX(sroom) + ROOMOFFSET))) {
 	    static const char * const shop_msg[3] = {
 		    "someone cursing shoplifters.",
 		    "the chime of a cash register.",
