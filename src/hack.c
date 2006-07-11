@@ -57,13 +57,6 @@ struct obj *obj;
     return &tmp_anything;
 }
 
-void
-zero_anything(any)
-anything *any;
-{
-    *any = zeroany;
-}
-
 boolean
 revive_nasty(x, y, msg)
 int x,y;
