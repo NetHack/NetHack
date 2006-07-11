@@ -61,7 +61,7 @@ void
 zero_anything(any)
 anything *any;
 {
-    (void) memset((genericptr_t)any, 0, sizeof(anything));
+    *any = zeroany;
 }
 
 boolean

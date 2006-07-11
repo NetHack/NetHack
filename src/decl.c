@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)decl.c	3.5	2005/11/19	*/
+/*	SCCS Id: @(#)decl.c	3.5	2006/07/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -194,8 +194,8 @@ NEARDATA struct obj *billobjs = (struct obj *)0;
 
 /* used to zero all elements of a struct obj */
 NEARDATA struct obj zeroobj = DUMMY;
-/* used to zero out union any*/
-NEARDATA anything zeroany = DUMMY;
+/* used to zero out union any; initializer deliberately omitted */
+NEARDATA anything zeroany;
 
 /* originally from dog.c */
 NEARDATA char dogname[PL_PSIZ] = DUMMY;
