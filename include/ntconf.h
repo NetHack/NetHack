@@ -82,22 +82,25 @@ extern void FDECL(interject, (int));
  *===============================================
  */
 #ifdef _MSC_VER
+# if (_MSC_VER > 1000)
 /* Visual C 8 warning elimination */
-# ifndef _CRT_SECURE_NO_DEPRECATE
+#  ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE
 # endif
-# ifndef _SCL_SECURE_NO_DEPRECATE
+#  ifndef _SCL_SECURE_NO_DEPRECATE
 #define _SCL_SECURE_NO_DEPRECATE
 # endif
-# ifndef _CRT_NONSTDC_NO_DEPRECATE
+#  ifndef _CRT_NONSTDC_NO_DEPRECATE
 #define _CRT_NONSTDC_NO_DEPRECATE
-# endif
-#pragma warning(disable:4761)	/* integral size mismatch in arg; conv supp*/
-# ifdef YYPREFIX
-#pragma warning(disable:4102)	/* unreferenced label */
 # endif
 #pragma warning(disable:4996)	/* VC8 deprecation warnings */
 #pragma warning(disable:4142)	/* benign redefinition */
+#pragma warning(disable:4267)	/* conversion from 'size_t' to XX */
+# endif /* _MSC_VER > 1000 */
+#pragma warning(disable:4761)	/* integral size mismatch in arg; conv supp*/
+# ifdef YYPREFIX
+#pragma warning(disable:4102)	/* unreferenced label */
+#  endif
 # if 0
 #pragma warning(disable:4018)	/* signed/unsigned mismatch */
 #pragma warning(disable:4305)	/* init, conv from 'const int' to 'char' */
