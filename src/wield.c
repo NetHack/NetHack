@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.5	2006/06/16	*/
+/*	SCCS Id: @(#)wield.c	3.5	2006/07/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -465,14 +465,19 @@ const char *verb;	/* "rub",&c */
 	    verb, (obj->oclass == WEAPON_CLASS) ? "weapon" : "tool");
 	return FALSE;
     }
+
     if (uquiver == obj) setuqwep((struct obj *)0);
     if (uswapwep == obj) {
 	(void) doswapweapon();
 	/* doswapweapon might fail */
 	if (uswapwep == obj) return FALSE;
     } else {
+	struct obj *oldwep = uwep;
+
 	You("now wield %s.", doname(obj));
 	setuwep(obj);
+	if (flags.pushweapon && oldwep && uwep != oldwep)
+	    setuswapwep(oldwep);
     }
     if (uwep != obj) return FALSE;	/* rewielded old object after dying */
     /* applying weapon or tool that gets wielded ends two-weapon combat */

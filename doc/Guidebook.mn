@@ -2113,6 +2113,8 @@ Prompt for confirmation before praying (default on).
 .lp pushweapon
 Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
+Likewise for the `a' (apply) command if it causes the applied item to
+become wielded.
 .lp "race    "
 Selects your race (for example, ``race:human'').  Default is random.
 If you prefix a `!' or ``no'' to the value, you can 
