@@ -21,12 +21,12 @@ You can build either the TTY version of NetHack or the Windows Graphical
 version.  In either case you can use one of the following build
 environments:
 
-  o A copy of Microsoft Visual C V6.0 SP3 or later. An acceptable
-    later version is the C compiler that can be downloaded as
-    Visual Studio 2005 Express Edition, but you must also download
-    the MS Platform SDK in order to build native win32 applications
-    such as NetHack. The current NetHack code has not been tested 
-    with earlier versions of the compiler.		
+  o A copy of Microsoft Visual C V6.0 (SP3, SP4, SP5, or SP6). 
+    The C compiler that can be downloaded as part of the 
+    Visual Studio 2005 Express Edition also works, but you must 
+    also download the MS Platform SDK in order to build native win32 
+    applications such as NetHack. The current NetHack code has not 
+    been tested with other versions of the Microsoft compiler.		
 		
     OR
 
@@ -102,14 +102,15 @@ I. Dispelling the Myths:
 
     We have provided a Makefile for each of the following compilers:
 
-        o Microsoft Visual C++ V6.0 SP3, Visual C++ 2005 w/Platform SDK
+        o Microsoft Visual C++ V6.0 (SP3 - SP6) and 
+          Microsoft Visual C++ 2005 Express Edition with the Platform SDK
         o Borland C 5.5.1
         o MinGW 2.0 (with GCC 3.2)
 
     The Microsoft Visual C Makefile was created for use with MS NMAKE 
     which is provided with the Microsoft compiler. The supplied Makefile
-    may work with earlier versions of the Microsoft 32-bit compiler, but 
-    that has not been tested. 
+    has not been tested with any other versions of the Microsoft 32-bit
+    compiler.
 
     The Borland C Makefile was created for use with Borland MAKE which
     is provided with the Borland compiler.
@@ -147,9 +148,12 @@ Setting Up
     properly integrated with each other, you need to execute
         vcvarsall.bat
     which is probably in the bin directory of your VSINSTALLDIR.
-    Then for the Platform SDK, you need to execute
+    Then for the Platform SDK, you may also need to execute
         SetEnv.cmd
-    from the Platform SDK install directory.
+    from the Platform SDK install directory, especially if you installed
+    Visual Studio 2005 Express Edition to a non-default location. You can 
+    put the execution of those into a single .CMD file to make it easier 
+    if you like.
 
     For the GCC Makefile, add <mingw>\bin to your path, where <mingw> 
     is your MinGW root directory.).
