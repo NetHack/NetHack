@@ -159,6 +159,7 @@ WINDLLS =
 WINPFLAG= -DTILES -DMSWIN_GRAPHICS
 NHRES	= $(O)winhack.res
 WINPINC	= -I$(WIN32)
+COMCTRL = comctl32.lib
 !ELSE
 WINPORT	= $(O)nttty.o    
 WINPHDR	=
@@ -166,6 +167,7 @@ WINDLLS	= $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll $(GAMEDIR)\nhraykey.dl
 WINPFLAG= -DWIN32CON
 NHRES	= $(O)console.res
 WINPINC	=
+COMCTRL = 
 !ENDIF
 
 TILEUTIL16  = $(UTIL)\tile2bmp.exe
@@ -610,7 +612,7 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag $(WINDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking....
-	$(link) $(lflagsGame) /STACK:2048 $(LIBS) -out:$@ @<<$(GAME).lnk
+	$(link) $(lflagsGame) /STACK:2048 $(LIBS) $(COMCTRL) -out:$@ @<<$(GAME).lnk
 		$(ALLOBJ:^	=^
 		) $(NHRES)
 <<
