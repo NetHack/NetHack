@@ -820,7 +820,7 @@ struct obj *obj;
 	 */
 	if (obj->otyp != EGG) return;
 	if (obj->corpsenm != NON_PM && !dead_species(obj->corpsenm, TRUE))
-	    attach_egg_hatch_timeout(obj);
+	    attach_egg_hatch_timeout(obj, 0L);
 }
 
 /* try to revive all corpses and eggs carried by `mon' */
@@ -1323,8 +1323,7 @@ poly_obj(obj, id)
 		    mnum = can_be_hatched(random_monster());
 		    if (mnum != NON_PM && !dead_species(mnum, TRUE)) {
 			otmp->spe = 1;	/* layed by hero */
-			otmp->corpsenm = mnum;
-			attach_egg_hatch_timeout(otmp);
+			set_corpsenm(otmp, mnum);	/* also sets hatch timer */
 			break;
 		    }
 		}

@@ -397,10 +397,14 @@ boolean wakeup_msg;
 	nomovemsg = wakeup_msg ? "You wake up." : You_can_move_again;
 }
 
-/* Attach an egg hatch timeout to the given egg. */
+/* Attach an egg hatch timeout to the given egg.
+ *	when = Time to hatch, usually only passed if re-creating an
+ *	       existing hatch timer. Pass 0L for random hatch time.
+ */
 void
-attach_egg_hatch_timeout(egg)
+attach_egg_hatch_timeout(egg, when)
 struct obj *egg;
+long when;
 {
 	int i;
 
@@ -413,13 +417,18 @@ struct obj *egg;
 	 * a number x, 1<=x<=age, where x>150.  This yields a chance of
 	 * hatching > 99.9993%.  Mimic that here.
 	 */
-	for (i = (MAX_EGG_HATCH_TIME-50)+1; i <= MAX_EGG_HATCH_TIME; i++)
-	    if (rnd(i) > 150) {
-		/* egg will hatch */
-		(void) start_timer((long)i, TIMER_OBJECT,
-						HATCH_EGG, obj_to_any(egg));
-		break;
-	    }
+	if (!when) {
+	    for (i = (MAX_EGG_HATCH_TIME-50)+1; i <= MAX_EGG_HATCH_TIME; i++)
+		if (rnd(i) > 150) {
+			/* egg will hatch */
+			when = (long)i;
+			break;
+	        }
+	}
+	if (when) {
+	    (void) start_timer(when, TIMER_OBJECT,
+				HATCH_EGG, obj_to_any(egg));
+	}
 }
 
 /* prevent an egg from ever hatching */
@@ -584,13 +593,8 @@ long timeout;
 
 	    if (egg->quan > 0) {
 		/* still some eggs left */
-		attach_egg_hatch_timeout(egg);
-		if (egg->timed) {
-		    /* replace ordinary egg timeout with a short one */
-		    (void) stop_timer(HATCH_EGG, obj_to_any(egg));
-		    (void) start_timer((long)rnd(12), TIMER_OBJECT,
-					HATCH_EGG, obj_to_any(egg));
-		}
+		/* Instead of ordinary egg timeout use a short one */
+		attach_egg_hatch_timeout(egg, (long)rnd(12));
 	    } else if (carried(egg)) {
 		useup(egg);
 	    } else {
@@ -1492,7 +1496,7 @@ anything *arg;
 
 /*
  * Remove the timer from the current list and free it up.  Return the time
- * it would have gone off, 0 if not found.
+ * remaining until it would have gone off, 0 if not found.
  */
 long
 stop_timer(func_index, arg)
@@ -1511,7 +1515,7 @@ anything *arg;
 	if (timeout_funcs[doomed->func_index].cleanup)
 	    (*timeout_funcs[doomed->func_index].cleanup)(arg, timeout);
 	free((genericptr_t) doomed);
-	return timeout;
+	return (timeout - monstermoves);
     }
     return 0L;
 }

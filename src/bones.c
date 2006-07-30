@@ -137,7 +137,7 @@ boolean restore;
 				   would behave as if it remains unique */
 				if (mnum == PM_DOPPELGANGER &&
 					otmp->otyp == CORPSE)
-				    otmp->corpsenm = mnum;
+				    set_corpsenm(otmp, mnum);
 			    }
 			} else if (otmp->otyp == AMULET_OF_YENDOR) {
 			    /* no longer the real Amulet */

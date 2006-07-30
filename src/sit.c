@@ -303,9 +303,9 @@ dosit()
 		uegg->spe = 1;
 		uegg->quan = 1L;
 		uegg->owt = weight(uegg);
-		uegg->corpsenm = egg_type_from_parent(u.umonnum, FALSE);
+		/* this sets hatch timers if appropriate */
+		set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
 		uegg->known = uegg->dknown = 1;
-		attach_egg_hatch_timeout(uegg);
 		You("lay an egg.");
 		dropy(uegg);
 		stackobj(uegg);

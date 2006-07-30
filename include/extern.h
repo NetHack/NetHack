@@ -2115,7 +2115,7 @@ E void FDECL(substitute_tiles, (d_level *));
 E void NDECL(burn_away_slime);
 E void NDECL(nh_timeout);
 E void FDECL(fall_asleep, (int, BOOLEAN_P));
-E void FDECL(attach_egg_hatch_timeout, (struct obj *));
+E void FDECL(attach_egg_hatch_timeout, (struct obj *, long));
 E void FDECL(attach_fig_transform_timeout, (struct obj *));
 E void FDECL(kill_egg, (struct obj *));
 E void FDECL(hatch_egg, (ANY_P *, long));

@@ -2787,14 +2787,9 @@ typfnd:
 		case CORPSE:
 			if (!(mons[mntmp].geno & G_UNIQ) &&
 				   !(mvitals[mntmp].mvflags & G_NOCORPSE)) {
-			    /* beware of random troll or lizard corpse,
-			       or of ordinary one being forced to such */
-			    if (otmp->timed) obj_stop_timers(otmp);
 			    if (mons[mntmp].msound == MS_GUARDIAN)
-			    	otmp->corpsenm = genus(mntmp,1);
-			    else
-				otmp->corpsenm = mntmp;
-			    start_corpse_timeout(otmp);
+			    	mntmp = genus(mntmp,1);
+			    set_corpsenm(otmp, mntmp);
 			}
 			break;
 		case FIGURINE:
@@ -2808,13 +2803,8 @@ typfnd:
 			break;
 		case EGG:
 			mntmp = can_be_hatched(mntmp);
-			if (mntmp != NON_PM) {
-			    otmp->corpsenm = mntmp;
-			    if (!dead_species(mntmp, TRUE))
-				attach_egg_hatch_timeout(otmp);
-			    else
-				kill_egg(otmp);
-			}
+			/* this also sets hatch timer if appropriate */
+			set_corpsenm(otmp, mntmp);
 			break;
 		case STATUE: otmp->corpsenm = mntmp;
 			if (Has_contents(otmp) && verysmall(&mons[mntmp]))

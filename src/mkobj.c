@@ -648,10 +648,10 @@ boolean artif;
 		    mndx = can_be_hatched(rndmonnum());
 		    if (mndx != NON_PM && !dead_species(mndx, TRUE)) {
 			otmp->corpsenm = mndx;		/* typed egg */
-			attach_egg_hatch_timeout(otmp);
 			break;
 		    }
 		}
+		/* timer set below */
 		break;
 	    case TIN:
 		otmp->corpsenm = NON_PM;	/* empty (so far) */
@@ -846,7 +846,9 @@ boolean artif;
 	/* Some things must get done (timers) even if init = 0 */
 	switch (otmp->otyp) {
 	    case CORPSE:
-		start_corpse_timeout(otmp);
+	    case EGG:
+	    case FIGURINE:
+	        set_corpsenm(otmp, otmp->corpsenm);
 		break;
 	}
 
@@ -871,8 +873,10 @@ boolean artif;
  *     - ensure that you don't end up with some other
  *       corpse type which resurrects from the dead.
  *
- * Re-calculate the weight of the object to suit the
+ * Re-calculates the weight of figurines and corpses to suit the
  * new species.
+ *
+ * Existing timeout value for egg hatch is preserved.
  *
  */
 void
@@ -880,18 +884,38 @@ set_corpsenm(obj, id)
 struct obj *obj;
 int id;
 {
-	
-	if (obj->timed) obj_stop_timers(obj);	/* corpse or figurine */
+	long when = 0L;
+
+	if (obj->timed) {
+	    if (obj->otyp == EGG)
+		when = stop_timer(HATCH_EGG, obj_to_any(obj));
+	    else {
+	    	when = 0L;
+		obj_stop_timers(obj);	/* corpse or figurine */
+	    }
+	}
 	obj->corpsenm = id;
-	if (obj->otyp == CORPSE) {
+	switch(obj->otyp) {
+	    case CORPSE:
 		start_corpse_timeout(obj);
-	} else if (obj->otyp == FIGURINE) {
+		obj->owt = weight(obj);
+		break;
+	    case FIGURINE:
 		if (obj->corpsenm != NON_PM
 		    && !dead_species(obj->corpsenm,TRUE)
 		    && (carried(obj) || mcarried(obj)))
 			attach_fig_transform_timeout(obj);
+		obj->owt = weight(obj);
+		break;
+	    case EGG:
+		if (obj->corpsenm != NON_PM
+		    && !dead_species(obj->corpsenm,TRUE))
+			attach_egg_hatch_timeout(obj, when);
+		break;
+	    default:	/* tin, etc. */
+		obj->owt = weight(obj);
+		break;
 	}
-	obj->owt = weight(obj);
 }
 
 /*
@@ -1469,7 +1493,6 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 	if (tleft != 0L) {
 	    long age;
 	    
-	    tleft = tleft - monstermoves;
 	    /* mark the corpse as being on ice */
 	    otmp->on_ice = 1;
 #ifdef DEBUG_EFFECTS
@@ -1495,7 +1518,6 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 	if (tleft != 0L) {
 		long age;
 
-		tleft = tleft - monstermoves;
 		otmp->on_ice = 0;
 #ifdef DEBUG_EFFECTS
 	    	pline("%s is no longer on ice at %d,%d.", The(xname(otmp)),x,y);

@@ -983,17 +983,9 @@ struct mkroom	*croom;
 	if (o->corpsenm != NON_PM) {
 	    if (o->corpsenm == NON_PM - 1)
 		set_corpsenm(otmp, rndmonnum());
-	    else set_corpsenm(otmp, o->corpsenm);
+	    else set_corpsenm(otmp, o->corpsenm); 
 	}
-
-	/* assume we wouldn't be given an egg corpsenm unless it was
-	   hatchable */
-	if (otmp->otyp == EGG && otmp->corpsenm != NON_PM) {
-	    if (dead_species(otmp->otyp, TRUE))
-		kill_egg(otmp);	/* make sure nothing hatches */
-	    else
-		attach_egg_hatch_timeout(otmp);	/* attach new hatch timeout */
-	}
+	/* set_corpsenm() took care of egg hatch and corpse timers */
 
 	if (named)
 	    otmp = oname(otmp, o->name.str);
