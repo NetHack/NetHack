@@ -2527,11 +2527,13 @@ boolean
 recover_savefile()
 {
 	int gfd, lfd, sfd;
-	int lev, savelev, hpid;
+	int lev, savelev, hpid, pltmpsiz;
 	xchar levc;
 	struct version_info version_data;
 	int processed[256];
 	char savename[SAVESIZE], errbuf[BUFSZ];
+	struct savefile_info sfi;
+	char tmpplbuf[PL_NSIZ];
 
 	for (lev = 0; lev < 256; lev++)
 		processed[lev] = 0;
@@ -2540,6 +2542,8 @@ recover_savefile()
 	 *	pid of creating process (ignored here)
 	 *	level number for current level of save file
 	 *	name of save file nethack would have created
+	 *	savefile info
+	 *	player name
 	 *	and game state
 	 */
 	gfd = open_levelfile(0, errbuf);
@@ -2563,7 +2567,13 @@ recover_savefile()
 	if ((read(gfd, (genericptr_t) savename, sizeof savename)
 		!= sizeof savename) ||
 	    (read(gfd, (genericptr_t) &version_data, sizeof version_data)
-		!= sizeof version_data)) {
+		!= sizeof version_data) ||
+	    (read(gfd, (genericptr_t) &sfi, sizeof sfi)
+		!= sizeof sfi) ||
+	    (read(gfd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
+		!= sizeof pltmpsiz) || (pltmpsiz > PL_NSIZ) || 
+	    (read(gfd, (genericptr_t) &tmpplbuf, pltmpsiz)
+		!= pltmpsiz)) {
 	    raw_printf("\nError reading %s -- can't recover.\n", lock);
 	    (void)close(gfd);
 	    return FALSE;
@@ -2571,6 +2581,8 @@ recover_savefile()
 
 	/* save file should contain:
 	 *	version info
+	 *	savefile info
+	 *	player name
 	 *	current level (including pets)
 	 *	(non-level-based) game state
 	 *	other levels
@@ -2595,6 +2607,39 @@ recover_savefile()
 	if (write(sfd, (genericptr_t) &version_data, sizeof version_data)
 		!= sizeof version_data) {
 	    raw_printf("\nError writing %s; recovery failed.", SAVEF);
+	    (void)close(gfd);
+	    (void)close(sfd);
+	    delete_savefile();
+	    return FALSE;
+	}
+
+	if (write(sfd, (genericptr_t) &sfi, sizeof sfi)
+		!= sizeof sfi) {
+	    raw_printf(
+		    "\nError writing %s; recovery failed (savefile_info).\n",
+		    SAVEF);
+	    (void)close(gfd);
+	    (void)close(sfd);
+	    delete_savefile();
+	    return FALSE;
+	}
+
+	if (write(sfd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
+		!= sizeof pltmpsiz) {
+	    raw_printf(
+		    "Error writing %s; recovery failed (player name size).\n",
+		    SAVEF);
+	    (void)close(gfd);
+	    (void)close(sfd);
+	    delete_savefile();
+	    return FALSE;
+	}
+
+	if (write(sfd, (genericptr_t) &tmpplbuf, pltmpsiz)
+		!= pltmpsiz) {
+	    raw_printf(
+		    "Error writing %s; recovery failed (player name).\n",
+		    SAVEF);
 	    (void)close(gfd);
 	    (void)close(sfd);
 	    delete_savefile();

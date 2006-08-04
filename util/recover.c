@@ -208,14 +208,18 @@ restore_savefile(basename)
 char *basename;
 {
 	int gfd, lfd, sfd;
-	int lev, savelev, hpid;
+	int lev, savelev, hpid, pltmpsiz;
 	xchar levc;
 	struct version_info version_data;
+	struct savefile_info sfi;
+	char plbuf[PL_NSIZ];
 
 	/* level 0 file contains:
 	 *	pid of creating process (ignored here)
 	 *	level number for current level of save file
 	 *	name of save file nethack would have created
+	 *	savefile info
+	 *	player name
 	 *	and game state
 	 */
 	(void) strcpy(lock, basename);
@@ -252,7 +256,13 @@ char *basename;
 	if ((read(gfd, (genericptr_t) savename, sizeof savename)
 		!= sizeof savename) ||
 	    (read(gfd, (genericptr_t) &version_data, sizeof version_data)
-		!= sizeof version_data)) {
+		!= sizeof version_data) ||
+	    (read(gfd, (genericptr_t) &sfi, sizeof sfi)
+		!= sizeof sfi) ||
+	    (read(gfd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
+		!= sizeof pltmpsiz) || (pltmpsiz > PL_NSIZ) || 
+	    (read(gfd, (genericptr_t) &plbuf, pltmpsiz)
+		!= pltmpsiz)) {
 	    Fprintf(stderr, "Error reading %s -- can't recover.\n", lock);
 	    Close(gfd);
 	    return(-1);
@@ -260,6 +270,8 @@ char *basename;
 
 	/* save file should contain:
 	 *	version info
+	 *	savefile info
+	 *	player name
 	 *	current level (including pets)
 	 *	(non-level-based) game state
 	 *	other levels
@@ -282,6 +294,36 @@ char *basename;
 	if (write(sfd, (genericptr_t) &version_data, sizeof version_data)
 		!= sizeof version_data) {
 	    Fprintf(stderr, "Error writing %s; recovery failed.\n", savename);
+	    Close(gfd);
+	    Close(sfd);
+	    return(-1);
+	}
+
+	if (write(sfd, (genericptr_t) &sfi, sizeof sfi)
+		!= sizeof sfi) {
+	    Fprintf(stderr,
+		    "Error writing %s; recovery failed (savefile_info).\n",
+		    savename);
+	    Close(gfd);
+	    Close(sfd);
+	    return(-1);
+	}
+
+	if (write(sfd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
+		!= sizeof pltmpsiz) {
+	    Fprintf(stderr,
+		    "Error writing %s; recovery failed (player name size).\n",
+		    savename);
+	    Close(gfd);
+	    Close(sfd);
+	    return(-1);
+	}
+
+	if (write(sfd, (genericptr_t) &plbuf, pltmpsiz)
+		!= pltmpsiz) {
+	    Fprintf(stderr,
+		    "Error writing %s; recovery failed (player name).\n",
+		    savename);
 	    Close(gfd);
 	    Close(sfd);
 	    return(-1);
