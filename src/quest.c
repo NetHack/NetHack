@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)quest.c	3.5	2006/05/17	*/
+/*	SCCS Id: @(#)quest.c	3.5	2006/08/05	*/
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,11 +39,21 @@ on_start()
 STATIC_OVL void
 on_locate()
 {
-  if(!Qstat(first_locate)) {
-    qt_pager(QT_FIRSTLOCATE);
+  /* the locate messages are phrased in a manner such that they only
+     make sense when arriving on the level from above */
+  boolean from_above = (u.uz0.dlevel < u.uz.dlevel);
+
+  if (Qstat(killed_nemesis)) {
+    return;
+  } else if (!Qstat(first_locate)) {
+    if (from_above) qt_pager(QT_FIRSTLOCATE);
+    /* if we've arrived from below this will be a lie, but there won't
+       be any point in delivering the message upon a return visit from
+       above later since the level has now been seen */
     Qstat(first_locate) = TRUE;
-  } else if(u.uz0.dlevel < u.uz.dlevel && !Qstat(killed_nemesis))
-	qt_pager(QT_NEXTLOCATE);
+  } else {
+    if (from_above) qt_pager(QT_NEXTLOCATE);
+  }
 }
 
 STATIC_OVL void
@@ -67,7 +77,7 @@ onquest()
 	if(!Is_special(&u.uz)) return;
 
 	if(Is_qstart(&u.uz)) on_start();
-	else if(Is_qlocate(&u.uz) && u.uz.dlevel > u.uz0.dlevel) on_locate();
+	else if(Is_qlocate(&u.uz)) on_locate();
 	else if(Is_nemesis(&u.uz)) on_goal();
 	return;
 }
