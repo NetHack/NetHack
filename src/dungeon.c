@@ -991,9 +991,9 @@ boolean noquest;
 	register schar ret = 0;
 
 	for(i = 0; i < n_dgns; i++) {
-	    if((tmp.dlevel = dungeons[i].dunlev_ureached) == 0) continue;
-	    if(!strcmp(dungeons[i].dname, "The Quest") && noquest) continue;
-
+	    if (noquest && i == quest_dnum) continue;
+	    tmp.dlevel = dungeons[i].dunlev_ureached;
+	    if (tmp.dlevel == 0) continue;
 	    tmp.dnum = i;
 	    if(depth(&tmp) > ret) ret = depth(&tmp);
 	}

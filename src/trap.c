@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2006/06/16	*/
+/*	SCCS Id: @(#)trap.c	3.5	2006/08/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -316,14 +316,25 @@ boolean td;	/* td == TRUE : trap door or hole */
 	d_level dtmp;
 	char msgbuf[BUFSZ];
 	const char *dont_fall = 0;
-	register int newlevel = dunlev(&u.uz);
+	int newlevel, bottom;
 
 	/* KMH -- You can't escape the Sokoban level traps */
 	if(Blind && Levitation && !In_sokoban(&u.uz)) return;
 
+	bottom = dunlevs_in_dungeon(&u.uz);
+	/* when in the upper half of the quest, don't fall past the
+	   middle "quest locate" level if hero hasn't been there yet */
+	if (In_quest(&u.uz)) {
+	    int qlocate_depth = qlocate_level.dlevel;
+
+	    /* deepest reached < qlocate implies current < qlocate */
+	    if (dunlev_reached(&u.uz) < qlocate_depth)
+		bottom = qlocate_depth;	/* early cut-off */
+	}
+	newlevel = dunlev(&u.uz);	/* current level */
 	do {
 	    newlevel++;
-	} while(!rn2(4) && newlevel < dunlevs_in_dungeon(&u.uz));
+	} while (!rn2(4) && newlevel < bottom);
 
 	if(td) {
 	    struct trap *t = t_at(u.ux,u.uy);
@@ -341,8 +352,7 @@ boolean td;	/* td == TRUE : trap door or hole */
 	else if(Levitation || u.ustuck
 	   || (!Can_fall_thru(&u.uz) && !levl[u.ux][u.uy].candig)
 	   || Flying || is_clinger(youmonst.data)
-	   || (Inhell && !u.uevent.invoked &&
-					newlevel == dunlevs_in_dungeon(&u.uz))
+	   || (Inhell && !u.uevent.invoked && newlevel == bottom)
 		) {
 	    dont_fall = "don't fall in.";
 	} else if (youmonst.data->msize >= MZ_HUGE) {
