@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2006/03/27	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2006/08/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -97,15 +97,15 @@ register struct attack *mattk;
 
 STATIC_OVL void
 mswings(mtmp, otemp)		/* monster swings obj */
-register struct monst *mtmp;
-register struct obj *otemp;
+struct monst *mtmp;
+struct obj *otemp;
 {
-	if (!flags.verbose || Blind || !mon_visible(mtmp))
-		return;
+    if (flags.verbose && !Blind && mon_visible(mtmp)) {
 	pline("%s %s %s%s %s.", Monnam(mtmp),
 	      (objects[otemp->otyp].oc_dir & PIERCE) ? "thrusts" : "swings",
 	      (otemp->quan > 1L) ? "one of " : "",
 	      mhis(mtmp), xname(otemp));
+    }
 }
 
 /* return how a poison attack was delivered */

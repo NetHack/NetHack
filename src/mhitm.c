@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.5	2006/05/09	*/
+/*	SCCS Id: @(#)mhitm.c	3.5	2006/08/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1321,15 +1321,15 @@ register struct obj *obj;
 
 STATIC_OVL void
 mswingsm(magr, mdef, otemp)
-register struct monst *magr, *mdef;
-register struct obj *otemp;
+struct monst *magr, *mdef;
+struct obj *otemp;
 {
-	char buf[BUFSZ];
-	if (!flags.verbose || Blind || !mon_visible(magr)) return;
-	Strcpy(buf, mon_nam(mdef));
-	pline("%s %s %s %s at %s.", Monnam(magr),
+    if (flags.verbose && !Blind && mon_visible(magr)) {
+	pline("%s %s %s%s %s at %s.", Monnam(magr),
 	      (objects[otemp->otyp].oc_dir & PIERCE) ? "thrusts" : "swings",
-	      mhis(magr), singular(otemp, xname), buf);
+	      (otemp->quan > 1L) ? "one of " : "",
+	      mhis(magr), xname(otemp), mon_nam(mdef));
+    }
 }
 
 /*
