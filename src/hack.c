@@ -220,7 +220,7 @@ moverock()
 		case LEVEL_TELEP:
 		case TELEP_TRAP:
 		  {
-		    int newlev = 0;	/* lint suppresion */
+		    int newlev = 0;	/* lint suppression */
 		    d_level dest;
 
 		    if (ttmp->ttyp == LEVEL_TELEP) {
