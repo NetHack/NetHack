@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)hack.c	3.5	2006/08/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -163,7 +163,11 @@ moverock()
 		goto cannot_push;
 	    }
 
-	    if (ttmp)
+	    if (ttmp) {
+		/* if a trap operates on the boulder, don't attempt
+		   to move any others at this location; return -1
+		   if another boulder is in hero's way, or 0 if he
+		   should advance to the vacated boulder position */
 		switch(ttmp->ttyp) {
 		case LANDMINE:
 		    if (rn2(10)) {
@@ -178,7 +182,7 @@ moverock()
 			/* if the boulder remains, it should fill the pit */
 			fill_pit(u.ux, u.uy);
 			if (cansee(rx,ry)) newsym(rx,ry);
-			continue;
+			return sobj_at(BOULDER, sx, sy) ? -1 : 0;
 		    }
 		    break;
 		case SPIKED_PIT:
@@ -192,7 +196,7 @@ moverock()
 			place_object(otmp, rx, ry);
 		    }
 		    if (mtmp && !Blind) newsym(rx, ry);
-		    continue;
+		    return sobj_at(BOULDER, sx, sy) ? -1 : 0;
 		case HOLE:
 		case TRAPDOOR:
 		    if (Blind)
@@ -212,9 +216,19 @@ moverock()
 		    levl[rx][ry].wall_info &= ~W_NONDIGGABLE;
 		    levl[rx][ry].candig = 1;
 		    if (cansee(rx,ry)) newsym(rx,ry);
-		    continue;
+		    return sobj_at(BOULDER, sx, sy) ? -1 : 0;
 		case LEVEL_TELEP:
 		case TELEP_TRAP:
+		  {
+		    int newlev = 0;	/* lint suppresion */
+		    d_level dest;
+
+		    if (ttmp->ttyp == LEVEL_TELEP) {
+			newlev = random_teleport_level();
+			if (newlev == depth(&u.uz) || In_endgame(&u.uz))
+			    /* trap didn't work; skip "disappears" message */
+			    goto dopush;
+		    }
 #ifdef STEED
 		    if (u.usteed)
 			pline("%s pushes %s and suddenly it disappears!",
@@ -223,14 +237,9 @@ moverock()
 #endif
 		    You("push %s and suddenly it disappears!",
 			the(xname(otmp)));
-		    if (ttmp->ttyp == TELEP_TRAP)
+		    if (ttmp->ttyp == TELEP_TRAP) {
 			(void)rloco(otmp);
-		    else {
-			int newlev = random_teleport_level();
-			d_level dest;
-
-			if (newlev == depth(&u.uz) || In_endgame(&u.uz))
-			    continue;
+		    } else {
 			obj_extract_self(otmp);
 			add_to_migration(otmp);
 			get_level(&dest, newlev);
@@ -239,8 +248,13 @@ moverock()
 			otmp->owornmask = (long)MIGR_RANDOM;
 		    }
 		    seetrap(ttmp);
-		    continue;
+		    return sobj_at(BOULDER, sx, sy) ? -1 : 0;
+		  }
+		default:
+		    break;	/* boulder not affected by this trap */
 		}
+	    }
+
 	    if (closed_door(rx, ry))
 		goto nopushmsg;
 	    if (boulder_hits_pool(otmp, rx, ry, TRUE))
@@ -262,6 +276,7 @@ moverock()
 		/* note: reset to zero after save/restore cycle */
 		static NEARDATA long lastmovetime;
 #endif
+ dopush:
 #ifdef STEED
 		if (!u.usteed) {
 #endif
@@ -289,7 +304,7 @@ moverock()
 		newsym(sx, sy);
 	    }
 	} else {
-	nopushmsg:
+ nopushmsg:
 #ifdef STEED
 	  if (u.usteed)
 	    pline("%s tries to move %s, but cannot.",
@@ -298,7 +313,7 @@ moverock()
 #endif
 	    You("try to move %s, but in vain.", the(xname(otmp)));
 	    if (Blind) feel_location(sx, sy);
-	cannot_push:
+ cannot_push:
 	    if (throws_rocks(youmonst.data)) {
 #ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {

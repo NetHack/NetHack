@@ -152,6 +152,7 @@ wielded light source susceptible to water gets extinguished when weapon rusts
 don't discover unknown bag of tricks when monster it releases is undetected
 make region ttl field a long instead of short to get rid of lint warnings
 	about a possible loss of data
+pushing a boulder onto a level teleporter trap could issue repeat messages
 
 
 Platform- and/or Interface-Specific Fixes
