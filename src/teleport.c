@@ -921,6 +921,14 @@ struct monst *mtmp;
 			!within_bounded_area(x, y, dndest.nlx, dndest.nly,
 						   dndest.nhx, dndest.nhy)));
 	} else {
+	    /* [try to] prevent a shopkeeper or temple priest from being
+	       sent out of his room (caller might resort to goodpos() if
+	       we report failure here, so this isn't full prevention) */
+	    if (mtmp->isshk && inhishop(mtmp)) {
+		if (levl[x][y].roomno != ESHK(mtmp)->shoproom) return FALSE;
+	    } else if (mtmp->ispriest && inhistemple(mtmp)) {
+		if (levl[x][y].roomno != EPRI(mtmp)->shroom) return FALSE;
+	    }
 	    /* current location is <xx,yy> */
 	    if (!tele_jump_ok(xx, yy, x, y)) return FALSE;
 	}
