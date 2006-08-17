@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.5	2005/10/14	*/
+/*	SCCS Id: @(#)dogmove.c	3.5	2006/08/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -635,11 +635,13 @@ register int after;	/* this is extra fast monster movement */
 		return 2;	/* current monster is gone */
 	    }
 	}
+#if 0	/* [this is now handled in dochug()] */
 	if (!Conflict && !mtmp->mconf &&
 	    mtmp == u.ustuck && !sticks(youmonst.data)) {
 	    unstuck(mtmp);	/* swallowed case handled above */
 	    You("get released!");
 	}
+#endif
 	if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
 	    allowflags |= OPENDOOR;
 	    if (monhaskey(mtmp, TRUE)) allowflags |= UNLOCKDOOR;

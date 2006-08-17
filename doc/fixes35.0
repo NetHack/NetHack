@@ -155,6 +155,7 @@ make region ttl field a long instead of short to get rid of lint warnings
 pushing a boulder onto a level teleporter trap could issue repeat messages
 if shopkeeper or priest gets teleported while inside his shop or temple,
 	give locations inside that room preference when choosing destination
+tame/peaceful grabber/engulfer will release hero after conflict ends
 
 
 Platform- and/or Interface-Specific Fixes

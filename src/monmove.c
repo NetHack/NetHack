@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monmove.c	3.5	2005/10/14	*/
+/*	SCCS Id: @(#)monmove.c	3.5	2006/08/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,13 +8,13 @@
 
 extern boolean notonhead;
 
+STATIC_DCL void FDECL(watch_on_duty,(struct monst *));
 STATIC_DCL int FDECL(disturb,(struct monst *));
+STATIC_DCL void FDECL(release_hero, (struct monst *));
 STATIC_DCL void FDECL(distfleeck,(struct monst *,int *,int *,int *));
 STATIC_DCL int FDECL(m_arrival, (struct monst *));
-STATIC_DCL void FDECL(watch_on_duty,(struct monst *));
 STATIC_DCL boolean FDECL(stuff_prevents_passage, (struct monst *));
-STATIC_OVL int FDECL(vamp_shift, (struct monst *,struct permonst *));
-
+STATIC_DCL int FDECL(vamp_shift, (struct monst *,struct permonst *));
 
 boolean /* TRUE : mtmp died */
 mb_trapped(mtmp)
@@ -203,6 +203,21 @@ disturb(mtmp)
 	return(0);
 }
 
+/* ungrab/expel held/swallowed hero */
+STATIC_OVL void
+release_hero(mon)
+struct monst *mon;
+{
+	if (mon == u.ustuck) {
+	    if (u.uswallow) {
+		expels(mon, mon->data, TRUE);
+	    } else if (!sticks(youmonst.data)) {
+		unstuck(mon);	/* let go */
+		You("get released!");
+	    }
+	}
+}
+
 /* monster begins fleeing for the specified time, 0 means untimed flee
  * if first, only adds fleetime if monster isn't already fleeing
  * if fleemsg, prints a message about new flight, otherwise, caller should */
@@ -213,14 +228,7 @@ int fleetime;
 boolean first;
 boolean fleemsg;
 {
-	if (u.ustuck == mtmp) {
-	    if (u.uswallow)
-		expels(mtmp, mtmp->data, TRUE);
-	    else if (!sticks(youmonst.data)) {
-		unstuck(mtmp);	/* monster lets go when fleeing */
-		You("get released!");
-	    }
-	}
+	if (mtmp == u.ustuck) release_hero(mtmp);	/* expels/unstuck */
 
 	if (!first || !mtmp->mflee) {
 	    /* don't lose untimed scare */
@@ -359,6 +367,12 @@ register struct monst *mtmp;
 	/* fleeing monsters might regain courage */
 	if (mtmp->mflee && !mtmp->mfleetim
 	   && mtmp->mhp == mtmp->mhpmax && !rn2(25)) mtmp->mflee = 0;
+
+	/* cease conflict-induced swallow/grab if conflict has ended */
+	if (mtmp == u.ustuck && mtmp->mpeaceful && !mtmp->mconf && !Conflict) {
+	    release_hero(mtmp);
+	    return 0;	/* uses up monster's turn */
+	}
 
 	set_apparxy(mtmp);
 	/* Must be done after you move and before the monster does.  The
@@ -1517,4 +1531,5 @@ struct permonst *ptr;
 	}
 	return reslt;
 }
+
 /*monmove.c*/
