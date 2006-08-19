@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2006/06/21	*/
+/*	SCCS Id: @(#)potion.c	3.5	2006/08/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -315,6 +315,10 @@ long mask;	/* nonzero if resistance status should change by mask */
 	}
 
 	if (changed) {
+	    /* in case we're mimicking an orange (hallucinatory form
+	       of mimicking gold) update the mimicking's-over message */
+	    if (!Hallucination) eatmupdate();
+
 	    if (u.uswallow) {
 		swallowed(0);	/* redraw swallow display */
 	    } else {

@@ -156,6 +156,7 @@ pushing a boulder onto a level teleporter trap could issue repeat messages
 if shopkeeper or priest gets teleported while inside his shop or temple,
 	give locations inside that room preference when choosing destination
 tame/peaceful grabber/engulfer will release hero after conflict ends
+make changes in hallucination be reflected by changes in mimickery feedback
 
 
 Platform- and/or Interface-Specific Fixes

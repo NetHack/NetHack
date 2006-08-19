@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2006/06/25	*/
+/*	SCCS Id: @(#)eat.c	3.5	2006/08/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -161,6 +161,44 @@ eatmdone(VOID_ARGS)		/* called after mimicing is over */
 	    newsym(u.ux,u.uy);
 	}
 	return 0;
+}
+
+/* called when hallucination is toggled */
+void
+eatmupdate()
+{
+	const char *altmsg = 0;
+	int altapp = 0;	/* lint suppression */
+
+	if (!eatmbuf || nomovemsg != eatmbuf) return;
+
+	if (youmonst.m_ap_type == M_AP_OBJECT &&
+		youmonst.mappearance == ORANGE &&
+		!Hallucination) {
+	    /* revert from hallucinatory to "normal" mimicking */
+	    altmsg = "You now prefer mimicking yourself.";
+	    altapp = GOLD_PIECE;
+	} else if (youmonst.m_ap_type == M_AP_OBJECT &&
+		youmonst.mappearance == GOLD_PIECE &&
+		Hallucination) {
+	    /* won't happen; anything which might make immobilized
+	       hero begin hallucinating (black light attack, theft
+	       of Grayswandir) will terminate the mimickery first */
+	    altmsg = "Your rind escaped intact.";
+	    altapp = ORANGE;
+	}
+
+	if (altmsg) {
+	    /* replace end-of-mimicking message */
+	    if (strlen(altmsg) > strlen(eatmbuf)) {
+		free((genericptr_t) eatmbuf);
+		eatmbuf = (char *) alloc(strlen(altmsg) + 1);
+	    }
+	    nomovemsg = strcpy(eatmbuf, altmsg);
+	    /* update current image */
+	    youmonst.mappearance = altapp;
+	    newsym(u.ux, u.uy);
+	}
 }
 
 /* ``[the(] singular(food, xname) [)]'' */
