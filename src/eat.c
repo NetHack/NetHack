@@ -183,7 +183,7 @@ eatmupdate()
 		Hallucination) {
 	    /* won't happen; anything which might make immobilized
 	       hero begin hallucinating (black light attack, theft
-	       of Grayswandir) will terminate the mimickery first */
+	       of Grayswandir) will terminate the mimicry first */
 	    altmsg = "Your rind escaped intact.";
 	    altapp = ORANGE;
 	}
