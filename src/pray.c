@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)pray.c	3.5	2006/08/21	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1526,7 +1526,11 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		    exercise(A_WIS, TRUE);
 		    /* make sure we can use this weapon */
 		    unrestrict_weapon_skill(weapon_type(otmp));
-		    discover_artifact(otmp->oartifact);
+		    if (!Hallucination && !Blind) {
+			otmp->dknown = 1;
+			makeknown(otmp->otyp);
+			discover_artifact(otmp->oartifact);
+		    }
 		    return(1);
 		}
 	    }
