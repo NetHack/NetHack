@@ -886,10 +886,7 @@ mpickstuff(mtmp, str)
 			pline("%s picks up %s.", Monnam(mtmp),
 			      (distu(mtmp->mx, mtmp->my) <= 5) ?
 				doname(otmp) : distant_name(otmp, doname));
-		obj_extract_self(otmp);
-		/* unblock point after extract, before pickup */
-		if (otmp->otyp == BOULDER)
-		    unblock_point(otmp->ox,otmp->oy);	/* vision */
+		obj_extract_self(otmp);		/* remove from floor */
 		(void) mpickobj(mtmp, otmp);	/* may merge and free otmp */
 		m_dowear(mtmp, FALSE);
 		newsym(mtmp->mx, mtmp->my);

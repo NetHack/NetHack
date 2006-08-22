@@ -1455,13 +1455,6 @@ poly_obj(obj, id)
 	otmp->owornmask = obj->owornmask;
 no_unwear:
 
-	if (obj_location == OBJ_FLOOR && obj->otyp == BOULDER &&
-		otmp->otyp != BOULDER)
-	    unblock_point(obj->ox, obj->oy);
-	else if (obj_location == OBJ_FLOOR && obj->otyp != BOULDER &&
-		otmp->otyp == BOULDER)
-	    block_point(obj->ox, obj->oy);
-
 	/* ** we are now done adjusting the object ** */
 
 
@@ -1477,6 +1470,14 @@ no_unwear:
 	    freeinv_core(obj);
 	    addinv_core1(otmp);
 	    addinv_core2(otmp);
+	} else if (obj_location == OBJ_FLOOR) {
+	    ox = otmp->ox,  oy = otmp->oy;	/* set by replace_object() */
+	    if (obj->otyp == BOULDER && otmp->otyp != BOULDER &&
+		    !does_block(ox, oy, &levl[ox][oy]))
+		unblock_point(ox, oy);
+	    else if (obj->otyp != BOULDER && otmp->otyp == BOULDER)
+		    /* (checking does_block() here would be redundant) */
+		block_point(ox, oy);
 	}
 
 	if ((!carried(otmp) || obj->unpaid) &&

@@ -173,7 +173,6 @@ moverock()
 		    if (rn2(10)) {
 			obj_extract_self(otmp);
 			place_object(otmp, rx, ry);
-			unblock_point(sx, sy);
 			newsym(sx, sy);
 			pline("KAABLAMM!!!  %s %s land mine.",
 			      Tobjnam(otmp, "trigger"),
