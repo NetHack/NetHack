@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2006/08/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -308,16 +308,18 @@ rndmonnum()	/* select a random, common monster type */
 {
 	register struct permonst *ptr;
 	register int	i;
+	unsigned short excludeflags;
 
 	/* Plan A: get a level-appropriate common monster */
 	ptr = rndmonst();
 	if (ptr) return(monsndx(ptr));
 
 	/* Plan B: get any common monster */
+	excludeflags = G_UNIQ | G_NOGEN | (Inhell ? G_NOHELL : G_HELL);
 	do {
 	    i = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
 	    ptr = &mons[i];
-	} while((ptr->geno & G_NOGEN) || (!Inhell && (ptr->geno & G_HELL)));
+	} while ((ptr->geno & excludeflags) != 0);
 
 	return(i);
 }
