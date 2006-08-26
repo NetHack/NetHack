@@ -196,7 +196,11 @@ extern NEARDATA struct window_procs windowprocs;
 #define WC_MAP_MODE	 0x10000000L	/* 29 map_mode option                        */
 #define WC_WINDOWCOLORS  0x20000000L	/* 30 background color for message window    */
 #define WC_PLAYER_SELECTION  0x40000000L /* 31 background color for message window    */
+#ifdef NHSTDC
+#define WC_MOUSE_SUPPORT 0x80000000UL	/* 32 mouse support                          */
+#else
 #define WC_MOUSE_SUPPORT 0x80000000L	/* 32 mouse support                          */
+#endif
 					/* no free bits */
 
 #define WC2_FULLSCREEN		0x01L	/* 01 display full screen                    */

@@ -4350,17 +4350,61 @@ int damage, tell;
 	return(resisted);
 }
 
+#define MAXWISHTRY 5
+
+STATIC_OVL void
+wishcmdassist(tries)
+int tries;
+{
+	winid win;
+	char buf[BUFSZ];
+
+	win = create_nhwindow(NHW_TEXT);
+	if (!win) return;
+	Sprintf(buf, "cmdassist: wish mechanics");
+	putstr(win, 0, buf);
+	putstr(win, 0, "");
+	buf[0] = 0;
+	Sprintf(buf,
+	    "You can enter 'nothing' explicitly to scratch this wish.");
+	putstr(win, 0, buf);
+	if (!u.uconduct.wishes) {
+	    Sprintf(buf,"Entering 'nothing' will not alter your wishless status.");
+	    putstr(win, 0, buf);
+	}
+	Sprintf(buf,
+	    "You will by granted something random after %d more failed attempts.",
+	    MAXWISHTRY - tries);
+	putstr(win, 0, buf);
+	putstr(win, 0, "");
+	putstr(win, 0,
+		   "(Suppress this assistance with !cmdassist in config file.)");
+	display_nhwindow(win, FALSE);
+	destroy_nhwindow(win);
+}
+
 void
 makewish()
 {
-	char buf[BUFSZ];
+	char buf[BUFSZ], promptbuf[BUFSZ];
 	struct obj *otmp, nothing;
 	int tries = 0;
 
+	promptbuf[0] = '\0';
 	nothing = zeroobj;  /* lint suppression; only its address matters */
 	if (flags.verbose) You("may wish for an object.");
 retry:
-	getlin("For what do you wish?", buf);
+	Strcpy(promptbuf,"For what do you wish");
+	if (iflags.cmdassist && tries > 0) {
+		Sprintf(eos(promptbuf),
+			" (enter 'help' for assistance)");
+	}
+	Strcat(promptbuf,"?");
+	getlin(promptbuf, buf);
+	if(iflags.cmdassist && !strcmpi(buf,"help")) {
+		wishcmdassist(tries);
+		goto retry;
+	}
 	if(buf[0] == '\033') buf[0] = 0;
 	/*
 	 *  Note: if they wished for and got a non-object successfully,
@@ -4371,7 +4415,7 @@ retry:
 	otmp = readobjnam(buf, &nothing);
 	if (!otmp) {
 	    pline("Nothing fitting that description exists in the game.");
-	    if (++tries < 5) goto retry;
+	    if (++tries < MAXWISHTRY) goto retry;
 	    pline(thats_enough_tries);
 	    otmp = readobjnam((char *)0, (struct obj *)0);
 	    if (!otmp) return;	/* for safety; should never happen */
