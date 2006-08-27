@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.5	2006/07/07	*/
+/*	SCCS Id: @(#)mondata.c	3.5	2006/08/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -119,7 +119,7 @@ struct monst *mon;
 	boolean is_you = (mon == &youmonst);
 	struct obj *o;
 
-	if (is_you ? (Blind || u.usleep) :
+	if (is_you ? (Blind || u.usleep || is_fainted()) :
 		(mon->mblinded || !mon->mcansee || !haseyes(ptr) ||
 		    /* BUG: temporary sleep sets mfrozen, but since
 			    paralysis does too, we can't check it */
