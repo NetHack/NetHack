@@ -2286,7 +2286,6 @@ ronin
 student
 warrior
 *watch*
-player
 human or elf*
 	These strange creatures live mostly on the surface of the
 	earth, gathering together in societies of various forms, but
@@ -3330,7 +3329,8 @@ master kaen
 	base by your soldiers until I wear this ceremonial robe.
 	You do not invite me for a dinner.  You invite my robe.
 	Therefore, my robe is eating the food, not me."
-		[ Dining with a General - a Zen Buddhism Koan ]
+		[ Dining with a General - a Zen Buddhism Koan,
+		  translation by Yiu-man Chan ]
 monkey
 	"Listen, man-cub," said the Bear, and his voice rumbled like
 	thunder on a hot night.  "I have taught thee all the Law of
@@ -3820,6 +3820,23 @@ platinum yendorian express card
 	the carrier by half.  It also protects from magic missile
 	attacks.  Finally, its power is such that when invoked, it
 	can charge other objects.
+# playing style, rather vague topic but these quotes are too apt to pass up
+player
+play* style
+user
+	Be bold,
+	be bold,
+	but not too bold.
+	Or else your life's blood,
+	shall run cold.
+		[ The White Road, by Neil Gaiman ]
+
+	People think I'm crazy to worry all the time;
+	If you paid attention, you'd be worried too.
+	You better pay attention, or this world we love so much
+	Might just kill you.
+		[ It's a Jungle Out There, by Randy Newman ]
+#			[ theme song from "Monk" ]
 pony
 		Hey! now! Come hoy now! Whither do you wander?
 		Up, down, near or far, here, there or yonder?
