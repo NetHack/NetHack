@@ -442,12 +442,10 @@ decurse:
 		    break;
 	    case TROUBLE_BLIND:
 		{
-		    int num_eyes = eyecount(youmonst.data);
-		    const char *eye = body_part(EYE);
+		    const char *eyes = body_part(EYE);
 
-		    Your("%s feel%s better.",
-			 (num_eyes == 1) ? eye : makeplural(eye),
-			 (num_eyes == 1) ? "s" : "");
+		    if (eyecount(youmonst.data) != 1) eyes = makeplural(eyes);
+		    Your("%s %s better.", eyes, vtense(eyes, "feel"));
 		    u.ucreamed = 0;
 		    make_blinded(0L,FALSE);
 		    break;

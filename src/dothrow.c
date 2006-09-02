@@ -1595,16 +1595,17 @@ boolean from_invent;
 			} else if (distu(x,y) <= 2) {
 			    if (!breathless(youmonst.data) || haseyes(youmonst.data)) {
 				if (obj->otyp != POT_WATER) {
-					if (!breathless(youmonst.data))
-			    		     /* [what about "familiar odor" when known?] */
-					    You("smell a peculiar odor...");
-					else {
-					    int numeyes = eyecount(youmonst.data);
-					    Your("%s water%s.",
-						 (numeyes == 1) ? body_part(EYE) :
-							makeplural(body_part(EYE)),
-						 (numeyes == 1) ? "s" : "");
-					}
+				    if (!breathless(youmonst.data)) {
+					/* [what about "familiar odor" when known?] */
+					You("smell a peculiar odor...");
+				    } else {
+					const char *eyes = body_part(EYE);
+
+					if (eyecount(youmonst.data) != 1)
+					    eyes = makeplural(eyes);
+					Your("%s %s.", eyes,
+					     vtense(eyes, "water"));
+				    }
 				}
 				potionbreathe(obj);
 			    }

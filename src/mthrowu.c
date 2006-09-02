@@ -391,13 +391,13 @@ struct obj *obj;		/* missile (or stack providing it) */
 				       something,
 				       body_part(FACE));
 			} else if(singleobj->otyp == BLINDING_VENOM) {
-			    int num_eyes = eyecount(youmonst.data);
+			    const char *eyes = body_part(EYE);
+
+			    if (eyecount(youmonst.data) != 1)
+				eyes = makeplural(eyes);
 			    /* venom in the eyes */
 			    if(!Blind) pline_The("venom blinds you.");
-			    else Your("%s sting%s.",
-				      (num_eyes == 1) ? body_part(EYE) :
-						makeplural(body_part(EYE)),
-				      (num_eyes == 1) ? "s" : "");
+			    else Your("%s %s.", eyes, vtense(eyes, "sting"));
 			}
 		    }
 		    if (hitu && singleobj->otyp == EGG) {

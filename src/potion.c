@@ -213,8 +213,7 @@ boolean talk;
 {
 	long old = Blinded;
 	boolean u_could_see, can_see_now;
-	int eyecnt;
-	char buf[BUFSZ];
+	const char *eyes;
 
 	/* we need to probe ahead in case the Eyes of the Overworld
 	   are or will be overriding blindness */
@@ -238,10 +237,9 @@ boolean talk;
 		if (!haseyes(youmonst.data)) {
 		    strange_feeling((struct obj *)0, (char *)0);
 		} else if (Blindfolded) {
-		    Strcpy(buf, body_part(EYE));
-		    eyecnt = eyecount(youmonst.data);
-		    Your(eyemsg, (eyecnt == 1) ? buf : makeplural(buf),
-			 (eyecnt == 1) ? "itches" : "itch");
+		    eyes = body_part(EYE);
+		    if (eyecount(youmonst.data) != 1) eyes = makeplural(eyes);
+		    Your(eyemsg, eyes, vtense(eyes, "itch"));
 		} else {	/* Eyes of the Overworld */
 		    Your(vismsg, "brighten",
 			 Hallucination ? "sadder" : "normal");
@@ -264,10 +262,9 @@ boolean talk;
 		if (!haseyes(youmonst.data)) {
 		    strange_feeling((struct obj *)0, (char *)0);
 		} else if (Blindfolded) {
-		    Strcpy(buf, body_part(EYE));
-		    eyecnt = eyecount(youmonst.data);
-		    Your(eyemsg, (eyecnt == 1) ? buf : makeplural(buf),
-			 (eyecnt == 1) ? "twitches" : "twitch");
+		    eyes = body_part(EYE);
+		    if (eyecount(youmonst.data) != 1) eyes = makeplural(eyes);
+		    Your(eyemsg, eyes, vtense(eyes, "twitch"));
 		} else {	/* Eyes of the Overworld */
 		    Your(vismsg, "dim",
 			 Hallucination ? "happier" : "normal");
@@ -322,12 +319,10 @@ long mask;	/* nonzero if resistance status should change by mask */
 		if (!haseyes(youmonst.data)) {
 		    strange_feeling((struct obj *)0, (char *)0);
 		} else if (Blind) {
-		    char buf[BUFSZ];
-		    int eyecnt = eyecount(youmonst.data);
+		    const char *eyes = body_part(EYE);
 
-		    Strcpy(buf, body_part(EYE));
-		    Your(eyemsg, (eyecnt == 1) ? buf : makeplural(buf),
-			 (eyecnt == 1) ? "itches" : "itch");
+		    if (eyecount(youmonst.data) != 1) eyes = makeplural(eyes);
+		    Your(eyemsg, eyes, vtense(eyes, "itch"));
 		} else {	/* Grayswandir */
 		    Your(vismsg, "flatten", "normal");
 		}
@@ -1367,10 +1362,11 @@ register struct obj *obj;
 		    if (!breathless(youmonst.data))
 			pline("Ulch!  That potion smells terrible!");
 		    else if (haseyes(youmonst.data)) {
-			int numeyes = eyecount(youmonst.data);
-			Your("%s sting%s!",
-			     (numeyes == 1) ? body_part(EYE) : makeplural(body_part(EYE)),
-			     (numeyes == 1) ? "s" : "");
+			const char *eyes = body_part(EYE);
+
+			if (eyecount(youmonst.data) != 1)
+			    eyes = makeplural(eyes);
+			Your("%s %s!", eyes, vtense(eyes, "sting"));
 		    }
 		    break;
 		} else {
