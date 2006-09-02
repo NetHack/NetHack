@@ -59,6 +59,8 @@ boolean talk;
 {
 	long old = HConfusion;
 
+	if (Unaware) talk = FALSE;
+
 	if (!xtime && old) {
 		if (talk)
 		    You_feel("less %s now.",
@@ -75,6 +77,8 @@ long xtime;
 boolean talk;
 {
 	long old = HStun;
+
+	if (Unaware) talk = FALSE;
 
 	if (!xtime && old) {
 		if (talk)
@@ -105,6 +109,10 @@ int type;
 {
 	long old = Sick;
 
+#if 0
+	if (Unaware) talk = FALSE;
+#endif
+
 	if (xtime > 0L) {
 	    if (Sick_resistance) return;
 	    if (!old) {
@@ -125,7 +133,7 @@ int type;
 		if (talk) You_feel("somewhat better.");
 		set_itimeout(&Sick, Sick * 2); /* approximation */
 	    } else {
-		if (talk) pline("What a relief!");
+		if (talk) You_feel("cured.  What a relief!");
 		Sick = 0L;		/* set_itimeout(&Sick, 0L) */
 	    }
 	    context.botl = TRUE;
@@ -145,6 +153,10 @@ const char *msg;
 {
 	long old = Slimed;
 
+#if 0
+	if (Unaware) msg = 0;
+#endif
+
 	if ((!xtime && old) || (xtime && !old)) {
 	    if (msg) pline("%s", msg);
 	    context.botl = 1;
@@ -163,6 +175,10 @@ const char *killername;
 {
 	long old = Stoned;
 
+#if 0
+	if (Unaware) msg = 0;
+#endif
+
 	if ((!xtime && old) || (xtime && !old)) {
 	    if (msg) pline("%s", msg);
 	 /* context.botl = 1;   --- Stoned is not a status line item */
@@ -178,6 +194,8 @@ long xtime;
 boolean talk;
 {
 	long old = Vomiting;
+
+	if (Unaware) talk = FALSE;
 
 	if(!xtime && old)
 	    if(talk) You_feel("much less nauseated now.");
@@ -205,7 +223,7 @@ boolean talk;
 	can_see_now = !Blind;
 	Blinded = old;		/* restore */
 
-	if (u.usleep) talk = FALSE;
+	if (Unaware) talk = FALSE;
 
 	if (can_see_now && !u_could_see) {	/* regaining sight */
 	    if (talk) {
@@ -282,6 +300,8 @@ long mask;	/* nonzero if resistance status should change by mask */
 	long old = HHallucination;
 	boolean changed = 0;
 	const char *message, *verb;
+
+	if (Unaware) talk = FALSE;
 
 	message = (!xtime) ? "Everything %s SO boring now." :
 			     "Oh wow!  Everything %s so cosmic!";
@@ -1431,12 +1451,12 @@ register struct obj *obj;
 		exercise(A_DEX, TRUE);
 		break;
 	case POT_BLINDNESS:
-		if (!Blind && !u.usleep) {
+		if (!Blind && !Unaware) {
 		    kn++;
 		    pline("It suddenly gets dark.");
 		}
 		make_blinded(itimeout_incr(Blinded, rnd(5)), FALSE);
-		if (!Blind && !u.usleep) Your(vision_clears);
+		if (!Blind && !Unaware) Your(vision_clears);
 		break;
 	case POT_WATER:
 		if(u.umonnum == PM_GREMLIN) {

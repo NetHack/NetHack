@@ -157,6 +157,7 @@ if shopkeeper or priest gets teleported while inside his shop or temple,
 	give locations inside that room preference when choosing destination
 tame/peaceful grabber/engulfer will release hero after conflict ends
 make changes in hallucination be reflected by changes in mimickery feedback
+add Unaware pseudo-property to suppress various messages while unconscious
 
 
 Platform- and/or Interface-Specific Fixes

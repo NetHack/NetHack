@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pline.c	3.5	2006/02/20	*/
+/*	SCCS Id: @(#)pline.c	3.5	2006/08/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -134,7 +134,11 @@ You_feel VA_DECL(const char *,line)
 	char *tmp;
 	VA_START(line);
 	VA_INIT(line, const char *);
-	vpline(YouMessage(tmp, "You feel ", line), VA_ARGS);
+	if (Unaware)
+		YouPrefix(tmp, "You dream that you feel ", line);
+	else
+		YouPrefix(tmp, "You feel ", line);
+	vpline(strcat(tmp, line), VA_ARGS);
 	VA_END();
 }
 
@@ -179,7 +183,7 @@ You_hear VA_DECL(const char *,line)
 	VA_INIT(line, const char *);
 	if (Underwater)
 		YouPrefix(tmp, "You barely hear ", line);
-	else if (u.usleep)
+	else if (Unaware)
 		YouPrefix(tmp, "You dream that you hear ", line);
 	else
 		YouPrefix(tmp, "You hear ", line);
@@ -194,7 +198,7 @@ You_see VA_DECL(const char *,line)
 
 	VA_START(line);
 	VA_INIT(line, const char *);
-	if (u.usleep)
+	if (Unaware)
 		YouPrefix(tmp, "You dream that you see ", line);
 	else if (Blind)	/* caller should have caught this... */
 		YouPrefix(tmp, "You sense ", line);

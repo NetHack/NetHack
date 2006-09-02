@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)youprop.h	3.5	1999/07/02	*/
+/*	SCCS Id: @(#)youprop.h	3.5	2006/09/01	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -359,5 +359,8 @@
 
 #define Lifesaved		u.uprops[LIFESAVED].extrinsic
 
+/* unconscious() includes u.usleep but not is_fainted(); the multi test is
+   redundant but allows the function calls to be skipped most of the time */
+#define Unaware		(multi < 0 && (unconscious() || is_fainted()))
 
 #endif /* YOUPROP_H */

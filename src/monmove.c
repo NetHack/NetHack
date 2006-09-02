@@ -21,7 +21,7 @@ mb_trapped(mtmp)
 register struct monst *mtmp;
 {
 	if (flags.verbose) {
-	    if (cansee(mtmp->mx, mtmp->my) && !u.usleep)
+	    if (cansee(mtmp->mx, mtmp->my) && !Unaware)
 		pline("KABOOM!!  You see a door explode.");
 	    else if (!Deaf)
 		You_hear("a distant explosion.");

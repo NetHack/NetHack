@@ -119,7 +119,7 @@ struct monst *mon;
 	boolean is_you = (mon == &youmonst);
 	struct obj *o;
 
-	if (is_you ? (Blind || u.usleep || is_fainted()) :
+	if (is_you ? (Blind || Unaware) :
 		(mon->mblinded || !mon->mcansee || !haseyes(ptr) ||
 		    /* BUG: temporary sleep sets mfrozen, but since
 			    paralysis does too, we can't check it */
@@ -185,7 +185,7 @@ struct obj *obj;		/* aatyp == AT_WEAP, AT_SPIT */
 	    break;
 
 	case AT_ENGL:
-	    if (is_you && (Blindfolded || u.usleep || u.ucreamed))
+	    if (is_you && (Blindfolded || Unaware || u.ucreamed))
 		return FALSE;
 	    if (!is_you && mdef->msleeping)
 		return FALSE;

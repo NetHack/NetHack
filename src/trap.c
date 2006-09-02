@@ -3092,7 +3092,7 @@ drown()
 		return(FALSE);
 	}
 	if ((Teleportation || can_teleport(youmonst.data)) &&
-		    !u.usleep && (Teleport_control || rn2(3) < Luck+2)) {
+		    !Unaware && (Teleport_control || rn2(3) < Luck+2)) {
 		You("attempt a teleport spell.");	/* utcsri!carroll */
 		if (!level.flags.noteleport) {
 			(void) dotele();
@@ -3113,6 +3113,8 @@ drown()
 	   while still asleep; we can't do that the same way that waking
 	   due to combat is handled; note unmul() clears u.usleep */
 	if (u.usleep) unmul("Suddenly you wake up!");
+	/* being doused will revive from fainting */
+	if (is_fainted()) reset_faint();
 	/* can't crawl if unable to move (crawl_ok flag stays false) */
 	if (multi < 0 || (Upolyd && !youmonst.data->mmove)) goto crawl;
 	/* look around for a place to crawl to */
