@@ -26,6 +26,7 @@
 #define USER_SOUNDS
 
 #ifdef WIN32CON
+#define CHANGE_COLOR		/* allow palette changes in win32 console */
 #define SELECTSAVED		/* Provide menu of saved games to choose from at start */
 #endif
 
@@ -231,6 +232,9 @@ extern int FDECL(set_win32_option, (const char *, const char *));
 #define RIGHTBUTTON RIGHTMOST_BUTTON_PRESSED
 #define MIDBUTTON   FROM_LEFT_2ND_BUTTON_PRESSED
 #define MOUSEMASK (LEFTBUTTON | RIGHTBUTTON | MIDBUTTON)
+#ifdef CHANGE_COLOR
+extern int FDECL(alternative_palette, (char *));
+#endif
 #endif /* WIN32CON */
 
 #endif /* NTCONF_H */

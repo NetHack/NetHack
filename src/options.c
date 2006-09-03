@@ -311,8 +311,14 @@ static struct Comp_Opt
 	{ "packorder", "the inventory order of the items in your pack",
 						MAXOCLASSES, SET_IN_GAME },
 #ifdef CHANGE_COLOR
-	{ "palette",  "palette (00c/880/-fff is blue/yellow/reverse white)",
+	{ "palette",
+# ifndef WIN32CON
+			"palette (00c/880/-fff is blue/yellow/reverse white)",
 						15 , SET_IN_GAME },
+# else
+			"palette (adjust an RGB color in palette (color-R-G-B)",
+						15 , SET_IN_FILE },
+# endif
 # if defined(MAC)
 	{ "hicolor",  "same as palette, only order is reversed",
 						15, SET_IN_FILE },
@@ -1445,7 +1451,9 @@ boolean tinitial, tfrom_file;
 							) {
 	    int color_number, color_incr;
 
+#ifndef WIN32CON
 	    if (duplicate) complain_about_duplicate(opts,1);
+#endif
 # ifdef MAC
 	    if (match_optname(opts, "hicolor", 3, TRUE)) {
 		if (negated) {
@@ -1466,6 +1474,10 @@ boolean tinitial, tfrom_file;
 	    }
 # endif
 	    if ((op = string_for_opt(opts, FALSE)) != (char *)0) {
+# ifdef WIN32CON
+		if (!alternative_palette(op))
+			badoption(opts);
+# else
 		char *pt = op;
 		int cnt, tmp, reverse;
 		long rgb;
@@ -1481,21 +1493,21 @@ boolean tinitial, tfrom_file;
 		    }
 		    while (cnt-- > 0) {
 			if (*pt && *pt != '/') {
-# ifdef AMIGA
+#  ifdef AMIGA
 			    rgb <<= 4;
-# else
+#  else
 			    rgb <<= 8;
-# endif
+#  endif
 			    tmp = *(pt++);
 			    if (isalpha(tmp)) {
 				tmp = (tmp + 9) & 0xf;	/* Assumes ASCII... */
 			    } else {
 				tmp &= 0xf;	/* Digits in ASCII too... */
 			    }
-# ifndef AMIGA
+#  ifndef AMIGA
 			    /* Add an extra so we fill f -> ff and 0 -> 00 */
 			    rgb += tmp << 4;
-# endif
+#  endif
 			    rgb += tmp;
 			}
 		    }
@@ -1505,6 +1517,7 @@ boolean tinitial, tfrom_file;
 		    change_color(color_number, rgb, reverse);
 		    color_number += color_incr;
 		}
+# endif	/* !WIN32CON */
 	    }
 	    if (!initial) {
 		need_redraw = TRUE;

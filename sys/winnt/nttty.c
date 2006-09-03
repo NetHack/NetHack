@@ -37,6 +37,7 @@ int FDECL(process_keystroke, (INPUT_RECORD *, boolean *,
  * ReadConsoleInput
  * WriteConsoleOutputCharacter
  * FillConsoleOutputAttribute
+ * GetConsoleOutputCP
  */
 
 /* Win32 Console handles for input and output */
@@ -73,6 +74,26 @@ typedef int (__stdcall * PROCESS_KEYSTROKE)(
     BOOLEAN_P,
     int
 );
+
+#ifdef CHANGE_COLOR
+static void NDECL(adjust_palette);
+static int FDECL(match_color_name, (const char *));
+static boolean altered_palette;
+static COLORREF UserDefinedColors[CLR_MAX];
+static COLORREF NetHackColors[CLR_MAX] = {
+    	0x00000000,0x00c80000,0x0000c850,0x00b4b432,
+	0x000000d2,0x00800080,0x000064b4,0x00c0c0c0,
+	0x00646464,0x00f06464,0x0000ff00,0x00ffff00,
+	0x000000ff,0x00ff00ff,0x0000ffff,0x00ffffff
+    };
+static COLORREF DefaultColors[CLR_MAX] = {
+	 0x00000000, 0x00800000, 0x00008000, 0x00808000,
+	 0x00000080, 0x00800080, 0x00008080, 0x00c0c0c0,
+	 0x00808080, 0x00ff0000, 0x0000ff00, 0x00ffff00,
+	 0x000000ff, 0x00ff00ff, 0x0000ffff, 0x00ffffff
+    };
+
+#endif
 
 typedef int (__stdcall * NHKBHIT)(
     HANDLE,
@@ -166,6 +187,9 @@ const char *s;
 void
 setftty()
 {
+#ifdef CHANGE_COLOR
+	if (altered_palette) adjust_palette();
+#endif
 	start_screen();
 }
 
@@ -973,4 +997,346 @@ synch_cursor()
 {
 	really_move_cursor();
 }
+
+# ifdef CHANGE_COLOR
+void tty_change_color(color_number, rgb, reverse)
+int color_number, reverse;
+long rgb;
+{
+	/* Map NetHack color index to NT Console palette index */
+	int idx, win32_color_number[] = {
+		 0, /* CLR_BLACK           0 */
+		 4, /* CLR_RED             1 */
+		 2, /* CLR_GREEN           2 */
+		 6, /* CLR_BROWN           3 */
+		 1, /* CLR_BLUE            4 */
+		 5, /* CLR_MAGENTA         5 */
+		 3, /* CLR_CYAN            6 */
+		 7, /* CLR_GRAY            7 */
+		 8, /* NO_COLOR            8 */
+		12, /* CLR_ORANGE          9 */
+		10, /* CLR_BRIGHT_GREEN   10 */
+		14, /* CLR_YELLOW         11 */
+		 9, /* CLR_BRIGHT_BLUE    12 */
+		13, /* CLR_BRIGHT_MAGENTA 13 */
+		11, /* CLR_BRIGHT_CYAN    14 */
+		15  /* CLR_WHITE          15 */
+	};
+	int k;
+	if (color_number < 0) { /* indicates OPTIONS=palette with no value */
+		/* copy the NetHack palette into UserDefinedColors */
+		for (k=0; k < CLR_MAX; k++)
+			UserDefinedColors[k] = NetHackColors[k];
+		return;
+	} else if (color_number >= 0 && color_number < CLR_MAX) {
+		idx = win32_color_number[color_number];
+		UserDefinedColors[idx] = rgb;
+	}
+	altered_palette = TRUE;
+}
+
+char *tty_get_color_string()
+{
+	return "";
+}
+
+int
+match_color_name(c)
+const char *c;
+{
+	const struct others {
+		int idx;
+		const char *colorname;
+	} othernames[] = {
+		{CLR_MAGENTA, "purple"},
+		{CLR_BRIGHT_MAGENTA, "bright purple"},
+		{NO_COLOR, "dark gray"},
+		{NO_COLOR, "dark grey"},
+		{CLR_GRAY, "grey"},
+	};
+
+	int cnt;
+	for (cnt = 0; cnt < CLR_MAX; ++cnt) {
+		if (!strcmpi(c, c_obj_colors[cnt]))
+			return cnt;
+	}
+	for (cnt = 0; cnt < SIZE(othernames); ++cnt) {
+		if (!strcmpi(c, othernames[cnt].colorname))
+			return othernames[cnt].idx;
+	}
+	return -1;
+}
+
+/*
+ * Returns 0 if badoption syntax
+ */
+int
+alternative_palette(op)
+char *op;
+{	
+	/*
+	 *	palette:color-R-G-B
+	 *	OPTIONS=palette:green-4-3-1, palette:0-0-0-0
+	 */
+	int fieldcnt, color_number, rgb, red, green, blue;
+	char *fields[4], *cp;
+
+	if (!op) {
+		change_color(-1,0,0);	/* indicates palette option with
+					   no value meaning "load an entire
+					   hard-coded NetHack palette." */
+		return 1;
+	}
+
+	cp = fields[0] = op;
+	for (fieldcnt = 1; fieldcnt < 4; ++fieldcnt) {
+		cp = index(cp, '-');
+		if (!cp) return 0;
+		fields[fieldcnt] = cp;
+		cp++;
+	}
+	for (fieldcnt = 1; fieldcnt < 4; ++fieldcnt) {
+		*(fields[fieldcnt]) = '\0';
+		++fields[fieldcnt];
+	}
+	rgb = 0;
+	for (fieldcnt = 0; fieldcnt < 4; ++fieldcnt) {
+	    if (fieldcnt == 0 && isalpha(*(fields[0]))) {
+		    color_number = match_color_name(fields[0]);
+		    if (color_number == -1) return 0;
+	    } else {
+	    	int dcount = 0, cval = 0;
+		cp = fields[fieldcnt];
+		if (*cp == '\\' && index("0123456789xXoO", cp[1])) {
+		    const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
+
+		    cp++;
+		    if (*cp == 'x' || *cp == 'X')
+			for (++cp; (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
+				cval = (int)((cval * 16) + (dp - hex) / 2);
+	    	    else if (*cp == 'o' || *cp == 'O')
+			for (++cp; (index("01234567",*cp)) && (dcount++ < 3); cp++)
+				cval = (cval * 8) + (*cp - '0');
+		    else
+		    	return 0;
+		} else {
+		    for (; *cp && (index("0123456789",*cp)) && (dcount++ < 3); cp++)
+				cval = (cval * 10) + (*cp - '0');
+		}
+		switch(fieldcnt) {
+		    case 0:
+		    		color_number = cval;
+				break;
+		    case 1:
+		    		red = cval;
+				break;
+		    case 2:
+		    		green = cval;
+				break;
+		    case 3:
+		    		blue = cval;
+				break;
+		}
+	    }
+	}
+	rgb = RGB(red,green,blue);
+	if (color_number >= 0 && color_number < CLR_MAX)
+		change_color(color_number, rgb, 0);
+	return 1;
+}
+
+/* 
+ *  This uses an undocumented method to set console attributes
+ *  at runtime including console palette
+ * 
+ * 	VOID WINAPI SetConsolePalette(COLORREF palette[16])
+ * 
+ *  Author: James Brown at www.catch22.net
+ * 
+ *  Set palette of current console.
+ *  Palette should be of the form:
+ *
+ * 	COLORREF DefaultColors[CLR_MAX] = 
+ * 	{
+ *		0x00000000, 0x00800000, 0x00008000, 0x00808000,
+ *		0x00000080, 0x00800080, 0x00008080, 0x00c0c0c0, 
+ *		0x00808080, 0x00ff0000, 0x0000ff00, 0x00ffff00,
+ *		0x000000ff, 0x00ff00ff,	0x0000ffff, 0x00ffffff
+ *	 };
+ */
+
+#pragma pack(push, 1)
+
+/*
+ *	Structure to send console via WM_SETCONSOLEINFO
+ */ 
+typedef struct _CONSOLE_INFO
+{
+	ULONG		Length;
+	COORD		ScreenBufferSize;
+	COORD		WindowSize;
+	ULONG		WindowPosX;
+	ULONG		WindowPosY;
+
+	COORD		FontSize;
+	ULONG		FontFamily;
+	ULONG		FontWeight;
+	WCHAR		FaceName[32];
+
+	ULONG		CursorSize;
+	ULONG		FullScreen;
+	ULONG		QuickEdit;
+	ULONG		AutoPosition;
+	ULONG		InsertMode;
+	
+	USHORT		ScreenColors;
+	USHORT		PopupColors;
+	ULONG		HistoryNoDup;
+	ULONG		HistoryBufferSize;
+	ULONG		NumberOfHistoryBuffers;
+	
+	COLORREF	ColorTable[16];
+
+	ULONG		CodePage;
+	HWND		Hwnd;
+
+	WCHAR		ConsoleTitle[0x100];
+} CONSOLE_INFO;
+
+#pragma pack(pop)
+
+BOOL SetConsoleInfo(HWND hwndConsole, CONSOLE_INFO *pci);
+static void GetConsoleSizeInfo(CONSOLE_INFO *pci);
+VOID WINAPI SetConsolePalette(COLORREF crPalette[16]);
+
+void
+adjust_palette(VOID_ARGS)
+{ 
+    SetConsolePalette(UserDefinedColors); 
+    altered_palette = 0;
+}
+
+/*
+/* only in Win2k+  (use FindWindow for NT4) */
+HWND WINAPI GetConsoleWindow();
+
+/*  Undocumented console message */
+#define WM_SETCONSOLEINFO			(WM_USER+201)
+
+
+VOID WINAPI SetConsolePalette(COLORREF palette[16])
+{
+	CONSOLE_INFO ci = { sizeof(ci) };
+	int i;
+        HWND hwndConsole = GetConsoleWindow();
+
+	/* get current size/position settings rather than using defaults.. */
+	GetConsoleSizeInfo(&ci);
+
+	/* set these to zero to keep current settings */
+	ci.FontSize.X				= 0; /* def = 8  */
+	ci.FontSize.Y				= 0; /* def = 12 */
+	ci.FontFamily				= 0; /* def = 0x30 = FF_MODERN|FIXED_PITCH */
+	ci.FontWeight				= 0; /* 0x400;   */
+	/* lstrcpyW(ci.FaceName, L"Terminal"); */
+	ci.FaceName[0]				= L'\0';
+
+	ci.CursorSize				= 25;
+	ci.FullScreen				= FALSE;
+	ci.QuickEdit				= TRUE;
+	ci.AutoPosition				= 0x10000;
+	ci.InsertMode				= TRUE;
+	ci.ScreenColors				= MAKEWORD(0x7, 0x0);
+	ci.PopupColors				= MAKEWORD(0x5, 0xf);
+	
+	ci.HistoryNoDup				= FALSE;
+	ci.HistoryBufferSize		= 50;
+	ci.NumberOfHistoryBuffers	= 4;
+
+	// colour table
+	for(i = 0; i < 16; i++)
+		ci.ColorTable[i] = palette[i];
+
+	ci.CodePage	= GetConsoleOutputCP();
+	ci.Hwnd		= hwndConsole;
+
+	lstrcpyW(ci.ConsoleTitle, L"");
+
+	SetConsoleInfo(hwndConsole, &ci);
+}
+
+/*
+ *  Wrapper around WM_SETCONSOLEINFO. We need to create the
+ *  necessary section (file-mapping) object in the context of the
+ *  process which owns the console, before posting the message
+ */
+BOOL SetConsoleInfo(HWND hwndConsole, CONSOLE_INFO *pci)
+{
+	DWORD   dwConsoleOwnerPid;
+	HANDLE  hProcess;
+	HANDLE	hSection, hDupSection;
+	PVOID   ptrView = 0;
+	HANDLE  hThread;
+	
+	/*
+	 *	Open the process which "owns" the console
+	 */	
+	GetWindowThreadProcessId(hwndConsole, &dwConsoleOwnerPid);
+	hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwConsoleOwnerPid);
+
+	/*
+	 * Create a SECTION object backed by page-file, then map a view of
+	 * this section into the owner process so we can write the contents 
+	 * of the CONSOLE_INFO buffer into it
+	 */
+	hSection = CreateFileMapping(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, pci->Length, 0);
+
+	/*
+	 *	Copy our console structure into the section-object
+	 */
+	ptrView = MapViewOfFile(hSection, FILE_MAP_WRITE|FILE_MAP_READ, 0, 0, pci->Length);
+	memcpy(ptrView, pci, pci->Length);
+	UnmapViewOfFile(ptrView);
+
+	/*
+	 *	Map the memory into owner process
+	 */
+	DuplicateHandle(GetCurrentProcess(), hSection, hProcess, &hDupSection,
+			0, FALSE, DUPLICATE_SAME_ACCESS);
+
+	/*  Send console window the "update" message */
+	SendMessage(hwndConsole, WM_SETCONSOLEINFO, (WPARAM)hDupSection, 0);
+
+	/*
+	 * clean up
+	 */
+	hThread = CreateRemoteThread(hProcess, 0, 0, (LPTHREAD_START_ROUTINE)CloseHandle,
+					hDupSection, 0, 0);
+
+	CloseHandle(hThread);
+	CloseHandle(hSection);
+	CloseHandle(hProcess);
+
+	return TRUE;
+}
+
+/*
+ *  Fill the CONSOLE_INFO structure with information
+ *  about the current console window
+ */
+static void GetConsoleSizeInfo(CONSOLE_INFO *pci)
+{
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+
+	HANDLE hConsoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	GetConsoleScreenBufferInfo(hConsoleOut, &csbi);
+
+	pci->ScreenBufferSize = csbi.dwSize;
+	pci->WindowSize.X     = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	pci->WindowSize.Y     = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+	pci->WindowPosX	      = csbi.srWindow.Left;
+	pci->WindowPosY	      = csbi.srWindow.Top;
+}
+# endif /*CHANGE_COLOR*/
 #endif /* WIN32CON */

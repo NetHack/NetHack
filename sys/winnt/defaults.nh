@@ -126,6 +126,27 @@ OPTIONS=hilite_pet,!toptenwin
 #OPTIONS=subkeyvalue:188/124
 
 #
+# Some versions of Windows allow you to adjust the win32 console port 
+# colors using R-G-B settings.
+#
+#OPTIONS=palette:black-0-0-0
+#OPTIONS=palette:red-210-0-0
+#OPTIONS=palette:green-80-200-0
+#OPTIONS=palette:brown-180-100-0
+#OPTIONS=palette:blue-0-0-200
+#OPTIONS=palette:magenta-128-0-128
+#OPTIONS=palette:cyan-50-180-180
+#OPTIONS=palette:gray-192-192-192
+#OPTIONS=palette:dark gray-100-100-100
+#OPTIONS=palette:orange-255-128-0
+#OPTIONS=palette:bright green-0-255-0
+#OPTIONS=palette:yellow-255-255-0
+#OPTIONS=palette:bright blue-100-100-240
+#OPTIONS=palette:bright magenta-255-0-255
+#OPTIONS=palette:bright cyan-0-255-255
+#OPTIONS=palette:white-255-255-255
+
+#
 # *** CHARACTER GRAPHICS ***
 #
 # See the on-line help or the Guidebook for which symbols are in which
