@@ -75,26 +75,6 @@ typedef int (__stdcall * PROCESS_KEYSTROKE)(
     int
 );
 
-#ifdef CHANGE_COLOR
-static void NDECL(adjust_palette);
-static int FDECL(match_color_name, (const char *));
-static boolean altered_palette;
-static COLORREF UserDefinedColors[CLR_MAX];
-static COLORREF NetHackColors[CLR_MAX] = {
-    	0x00000000,0x00c80000,0x0000c850,0x00b4b432,
-	0x000000d2,0x00800080,0x000064b4,0x00c0c0c0,
-	0x00646464,0x00f06464,0x0000ff00,0x00ffff00,
-	0x000000ff,0x00ff00ff,0x0000ffff,0x00ffffff
-    };
-static COLORREF DefaultColors[CLR_MAX] = {
-	 0x00000000, 0x00800000, 0x00008000, 0x00808000,
-	 0x00000080, 0x00800080, 0x00008080, 0x00c0c0c0,
-	 0x00808080, 0x00ff0000, 0x0000ff00, 0x00ffff00,
-	 0x000000ff, 0x00ff00ff, 0x0000ffff, 0x00ffffff
-    };
-
-#endif
-
 typedef int (__stdcall * NHKBHIT)(
     HANDLE,
     INPUT_RECORD *
@@ -130,6 +110,28 @@ CHECKINPUT pCheckInput;
 SOURCEWHERE pSourceWhere;
 SOURCEAUTHOR pSourceAuthor;
 KEYHANDLERNAME pKeyHandlerName;
+
+#ifdef CHANGE_COLOR
+static void NDECL(adjust_palette);
+static int FDECL(match_color_name, (const char *));
+typedef HWND (WINAPI *GETCONSOLEWINDOW)();
+static HWND GetConsoleHandle(void);
+static HWND GetConsoleHwnd(void);
+static boolean altered_palette;
+static COLORREF UserDefinedColors[CLR_MAX];
+static COLORREF NetHackColors[CLR_MAX] = {
+    	0x00000000,0x00c80000,0x0000c850,0x00b4b432,
+	0x000000d2,0x00800080,0x000064b4,0x00c0c0c0,
+	0x00646464,0x00f06464,0x0000ff00,0x00ffff00,
+	0x000000ff,0x00ff00ff,0x0000ffff,0x00ffffff
+    };
+static COLORREF DefaultColors[CLR_MAX] = {
+	 0x00000000, 0x00800000, 0x00008000, 0x00808000,
+	 0x00000080, 0x00800080, 0x00008080, 0x00c0c0c0,
+	 0x00808080, 0x00ff0000, 0x0000ff00, 0x00ffff00,
+	 0x000000ff, 0x00ff00ff, 0x0000ffff, 0x00ffffff
+    };
+#endif
 
 #ifndef CLR_MAX
 #define CLR_MAX 16
@@ -1228,7 +1230,7 @@ VOID WINAPI SetConsolePalette(COLORREF palette[16])
 {
 	CONSOLE_INFO ci = { sizeof(ci) };
 	int i;
-        HWND hwndConsole = GetConsoleWindow();
+        HWND hwndConsole = GetConsoleHandle();
 
 	/* get current size/position settings rather than using defaults.. */
 	GetConsoleSizeInfo(&ci);
@@ -1337,6 +1339,45 @@ static void GetConsoleSizeInfo(CONSOLE_INFO *pci)
 	pci->WindowSize.Y     = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 	pci->WindowPosX	      = csbi.srWindow.Left;
 	pci->WindowPosY	      = csbi.srWindow.Top;
+}
+
+static HWND
+GetConsoleHandle(void)
+{
+	HMODULE hMod = GetModuleHandle("kernel32.dll");
+	GETCONSOLEWINDOW pfnGetConsoleWindow =
+  		(GETCONSOLEWINDOW) GetProcAddress(hMod, "GetConsoleWindow");
+	if (pfnGetConsoleWindow)
+		return pfnGetConsoleWindow();
+	else
+		return GetConsoleHwnd();
+}
+
+static HWND
+GetConsoleHwnd(void)
+{
+       int iterations = 0;
+       HWND hwndFound = 0;
+       char OldTitle[1024],NewTitle[1024], TestTitle[1024];
+
+       /* Get current window title */
+       GetConsoleTitle(OldTitle, sizeof OldTitle);
+
+       (void)sprintf(NewTitle,"NETHACK%d/%d",
+                   GetTickCount(),
+                   GetCurrentProcessId());
+       SetConsoleTitle(NewTitle);
+
+       GetConsoleTitle(TestTitle, sizeof TestTitle);
+       while(strcmp(TestTitle,NewTitle) != 0) {
+		iterations++;
+		/* sleep(0); */
+		GetConsoleTitle(TestTitle, sizeof TestTitle);
+       }
+       hwndFound=FindWindow(NULL, NewTitle);
+       SetConsoleTitle(OldTitle);
+/*       printf("%d iterations\n", iterations); */
+       return hwndFound;
 }
 # endif /*CHANGE_COLOR*/
 #endif /* WIN32CON */
