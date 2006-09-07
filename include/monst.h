@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monst.h	3.5	2006/01/02	*/
+/*	SCCS Id: @(#)monst.h	3.5	2006/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -108,11 +108,16 @@ struct monst {
 
 #define MAX_NUM_WORMS	32	/* should be 2^(wormno bitfield size) */
 
-	long mstrategy;		/* for monsters with mflag3: current strategy */
+	unsigned long mstrategy; /* for monsters with mflag3: current strategy */
+#ifdef NHSTDC
+#define STRAT_APPEARMSG	0x80000000UL
+#else
+#define STRAT_APPEARMSG	0x80000000L
+#endif
 #define STRAT_ARRIVE	0x40000000L	/* just arrived on current level */
 #define STRAT_WAITFORU	0x20000000L
 #define STRAT_CLOSE	0x10000000L
-#define STRAT_WAITMASK	0x30000000L
+#define STRAT_WAITMASK	(STRAT_CLOSE | STRAT_WAITFORU)
 #define STRAT_HEAL	0x08000000L
 #define STRAT_GROUND	0x04000000L
 #define STRAT_MONSTR	0x02000000L

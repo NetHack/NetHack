@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)minion.c	3.5	2006/01/03	*/
+/*	SCCS Id: @(#)minion.c	3.5	2006/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -163,6 +163,7 @@ boolean talk;
 	    verbalize("Thou shalt pay for thine indiscretion!");
 	    if (!Blind)
 		pline("%s appears before you.", Amonnam(mon));
+	    mon->mstrategy &= ~STRAT_APPEARMSG;
 	}
 	mon->mpeaceful = FALSE;
 	/* don't call set_malign(); player was naughty */
@@ -194,8 +195,13 @@ register struct monst *mtmp;
 
 	/* Slight advantage given. */
 	if (is_dprince(mtmp->data) && mtmp->minvis) {
+	    boolean wasunseen = !canspotmon(mtmp);
+
 	    mtmp->minvis = mtmp->perminvis = 0;
-	    if (!Blind) pline("%s appears before you.", Amonnam(mtmp));
+	    if (wasunseen && canspotmon(mtmp)) {
+		pline("%s appears before you.", Amonnam(mtmp));
+		mtmp->mstrategy &= ~STRAT_APPEARMSG;
+	    }
 	    newsym(mtmp->mx,mtmp->my);
 	}
 	if (youmonst.data->mlet == S_DEMON) {	/* Won't blackmail their own. */
@@ -411,6 +417,7 @@ gain_guardian_angel()
 	if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL]) &&
 		(mtmp = mk_roamer(&mons[PM_ANGEL], u.ualign.type,
 				  mm.x, mm.y, TRUE)) != 0) {
+	    mtmp->mstrategy &= ~STRAT_APPEARMSG;
 	    if (!Blind)
 		pline("An angel appears near you.");
 	    else

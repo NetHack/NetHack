@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wizard.c	3.5	2005/10/05	*/
+/*	SCCS Id: @(#)wizard.c	3.5	2006/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,8 +17,8 @@ STATIC_DCL boolean FDECL(mon_has_arti, (struct monst *,SHORT_P));
 STATIC_DCL struct monst *FDECL(other_mon_has_arti, (struct monst *,SHORT_P));
 STATIC_DCL struct obj *FDECL(on_ground, (SHORT_P));
 STATIC_DCL boolean FDECL(you_have, (int));
-STATIC_DCL long FDECL(target_on, (int,struct monst *));
-STATIC_DCL long FDECL(strategy, (struct monst *));
+STATIC_DCL unsigned long FDECL(target_on, (int,struct monst *));
+STATIC_DCL unsigned long FDECL(strategy, (struct monst *));
 
 static NEARDATA const int nasties[] = {
 	PM_COCKATRICE, PM_ETTIN, PM_STALKER, PM_MINOTAUR, PM_RED_DRAGON,
@@ -121,7 +121,8 @@ register struct monst *mtmp;
  *	The strategy section decides *what* the monster is going
  *	to attempt, the tactics section implements the decision.
  */
-#define STRAT(w, x, y, typ) (w | ((long)(x)<<16) | ((long)(y)<<8) | (long)typ)
+#define STRAT(w,x,y,typ) ((unsigned long)(w) | ((unsigned long)(x) << 16) | \
+			  ((unsigned long)(y) << 8) | (unsigned long)(typ))
 
 #define M_Wants(mask)	(mtmp->data->mflags3 & (mask))
 
@@ -207,7 +208,7 @@ you_have(mask)
 	return(0);
 }
 
-STATIC_OVL long
+STATIC_OVL unsigned long
 target_on(mask, mtmp)
 	register int mask;
 	register struct monst *mtmp;
@@ -216,7 +217,7 @@ target_on(mask, mtmp)
 	register struct obj *otmp;
 	register struct monst *mtmp2;
 
-	if(!M_Wants(mask))	return(STRAT_NONE);
+	if (!M_Wants(mask)) return (unsigned long)STRAT_NONE;
 
 	otyp = which_arti(mask);
 	if(!mon_has_arti(mtmp, otyp)) {
@@ -227,31 +228,33 @@ target_on(mask, mtmp)
 	    else if((mtmp2 = other_mon_has_arti(mtmp, otyp)))
 		return(STRAT(STRAT_MONSTR, mtmp2->mx, mtmp2->my, mask));
 	}
-	return(STRAT_NONE);
+	return (unsigned long)STRAT_NONE;
 }
 
-STATIC_OVL long
+STATIC_OVL unsigned long
 strategy(mtmp)
 	register struct monst *mtmp;
 {
-	long strat, dstrat;
+	unsigned long strat, dstrat;
 
 	if (!is_covetous(mtmp->data) ||
 		/* perhaps a shopkeeper has been polymorphed into a master
 		   lich; we don't want it teleporting to the stairs to heal
 		   because that will leave its shop untended */
-		(mtmp->isshk && inhishop(mtmp)))
-	    return STRAT_NONE;
+		(mtmp->isshk && inhishop(mtmp)) ||
+		/* likewise for temple priests */
+		(mtmp->ispriest && inhistemple(mtmp)))
+	    return (unsigned long)STRAT_NONE;
 
 	switch((mtmp->mhp*3)/mtmp->mhpmax) {	/* 0-3 */
 
 	   default:
 	    case 0:	/* panic time - mtmp is almost snuffed */
-			return(STRAT_HEAL);
+			return (unsigned long)(STRAT_HEAL);
 
 	    case 1:	/* the wiz is less cautious */
 			if(mtmp->data != &mons[PM_WIZARD_OF_YENDOR])
-			    return(STRAT_HEAL);
+			    return (unsigned long)(STRAT_HEAL);
 			/* else fall through */
 
 	    case 2:	dstrat = STRAT_HEAL;
@@ -293,9 +296,9 @@ int
 tactics(mtmp)
 	register struct monst *mtmp;
 {
-	long strat = strategy(mtmp);
+	unsigned long strat = strategy(mtmp);
 
-	mtmp->mstrategy = (mtmp->mstrategy & STRAT_WAITMASK) | strat;
+	mtmp->mstrategy = (mtmp->mstrategy & (STRAT_WAITMASK|STRAT_APPEARMSG)) | strat;
 
 	switch (strat) {
 	    case STRAT_HEAL:	/* hide and recover */
@@ -326,7 +329,7 @@ tactics(mtmp)
 		long  where = (strat & STRAT_STRATMASK);
 		xchar tx = STRAT_GOALX(strat),
 		      ty = STRAT_GOALY(strat);
-		int   targ = strat & STRAT_GOAL;
+		int   targ = (int)(strat & STRAT_GOAL);
 		struct obj *otmp;
 
 		if(!targ) { /* simply wants you to close */
@@ -374,7 +377,7 @@ aggravate()
 
 	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 	    if (DEADMONSTER(mtmp)) continue;
-	    mtmp->mstrategy &= ~STRAT_WAITFORU;
+	    mtmp->mstrategy &= ~(STRAT_WAITFORU|STRAT_APPEARMSG);
 	    mtmp->msleeping = 0;
 	    if (!mtmp->mcanmove && !rn2(5)) {
 		mtmp->mfrozen = 0;

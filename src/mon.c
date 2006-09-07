@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)mon.c	3.5	2006/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2063,6 +2063,7 @@ mnexto(mtmp)	/* Make monster mtmp next to you (if possible) */
 	struct monst *mtmp;
 {
 	coord mm;
+	boolean couldspot = canspotmon(mtmp);
 
 #ifdef STEED
 	if (mtmp == u.usteed) {
@@ -2075,6 +2076,12 @@ mnexto(mtmp)	/* Make monster mtmp next to you (if possible) */
 
 	if(!enexto(&mm, u.ux, u.uy, mtmp->data)) return;
 	rloc_to(mtmp, mm.x, mm.y);
+	if (!in_mklev && (mtmp->mstrategy & STRAT_APPEARMSG)) {
+	    mtmp->mstrategy &= ~STRAT_APPEARMSG;	/* one chance only */
+	    if (!couldspot && canspotmon(mtmp))
+		pline("%s suddenly %s!", Amonnam(mtmp),
+		      !Blind ? "appears" : "arrives");
+	}
 	return;
 }
 

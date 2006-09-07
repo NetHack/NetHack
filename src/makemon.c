@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)makemon.c	3.5	2006/09/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1136,11 +1136,13 @@ register int	mmflags;
 	    if (mtmp->minvent) discard_minvent(mtmp);
 	    mtmp->minvent = (struct obj *)0;    /* caller expects this */
 	}
-	if ((ptr->mflags3 & M3_WAITMASK) && !(mmflags & MM_NOWAIT)) {
-		if (ptr->mflags3 & M3_WAITFORU)
-			mtmp->mstrategy |= STRAT_WAITFORU;
-		if (ptr->mflags3 & M3_CLOSE)
-			mtmp->mstrategy |= STRAT_CLOSE;
+	if (ptr->mflags3 && !(mmflags & MM_NOWAIT)) {
+	    if (ptr->mflags3 & M3_WAITFORU)
+		mtmp->mstrategy |= STRAT_WAITFORU;
+	    if (ptr->mflags3 & M3_CLOSE)
+		mtmp->mstrategy |= STRAT_CLOSE;
+	    if (ptr->mflags3 & (M3_WAITMASK|M3_COVETOUS))
+		mtmp->mstrategy |= STRAT_APPEARMSG;
 	}
 
 	if (!in_mklev)
