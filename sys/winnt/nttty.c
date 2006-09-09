@@ -1031,6 +1031,11 @@ long rgb;
 			UserDefinedColors[k] = NetHackColors[k];
 		return;
 	} else if (color_number >= 0 && color_number < CLR_MAX) {
+		if (!altered_palette) {
+			/* make sure a full suite is available */
+			for (k=0; k < CLR_MAX; k++)
+				UserDefinedColors[k] = DefaultColors[k];
+		}
 		idx = win32_color_number[color_number];
 		UserDefinedColors[idx] = rgb;
 	}
