@@ -490,10 +490,10 @@ doengrave()
 		} else
 			jello = TRUE;
 	} else if (is_lava(u.ux, u.uy)) {
-		You_cant("write on the lava!");
+		You_cant("write on the %s!", surface(u.ux, u.uy));
 		return(0);
 	} else if (is_pool(u.ux,u.uy) || IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
-		You_cant("write on the water!");
+		You_cant("write on the %s!", surface(u.ux, u.uy));
 		return(0);
 	}
 	if(Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)/* in bubble */) {
