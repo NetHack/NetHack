@@ -225,6 +225,7 @@ add Roderick Schertler's pickup_thrown patch
 add ability to sort the list when viewing known spells with '+' command
 describe magic cancellation from worn armor in enlightment/end-of-game feedback
 add atmospheric sound messages for temples
+sometimes give announcement message when monsters teleport to hero's vicinity
 
 
 Platform- and/or Interface-Specific New Features
