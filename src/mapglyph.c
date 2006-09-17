@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mapglyph.c	3.5	2003/01/08	*/
+/*	SCCS Id: @(#)mapglyph.c	3.5	2006/09/17	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -70,6 +70,8 @@ unsigned *ospecial;
 #endif
 	uchar ch;
 	unsigned special = 0;
+	/* condense multiple tests in macro version down to single */
+	boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS;
 
     /*
      *  Map the glyph back to a character and color.
@@ -80,7 +82,7 @@ unsigned *ospecial;
     if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) {	/* a warning flash */
     	ch = warnsyms[offset];
 # ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS)
+	if (has_rogue_ibm_graphics)
 	    color = NO_COLOR;
 	else
 # endif
@@ -89,7 +91,7 @@ unsigned *ospecial;
 	/* see swallow_to_glyph() in display.c */
 	ch = (uchar) showsyms[S_sw_tl + (offset & 0x7)];
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color)
+	if (has_rogue_ibm_graphics && iflags.use_color)
 	    color = NO_COLOR;
 	else
 #endif
@@ -98,7 +100,7 @@ unsigned *ospecial;
 	/* see zapdir_to_glyph() in display.c */
 	ch = showsyms[S_vbeam + (offset & 0x3)];
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color)
+	if (has_rogue_ibm_graphics && iflags.use_color)
 	    color = NO_COLOR;
 	else
 #endif
@@ -109,7 +111,7 @@ unsigned *ospecial;
     } else if ((offset = (glyph - GLYPH_CMAP_OFF)) >= 0) {	/* cmap */
 	ch = showsyms[offset];
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color) {
+	if (has_rogue_ibm_graphics && iflags.use_color) {
 	    if (offset >= S_vwall && offset <= S_hcdoor)
 		color = CLR_BROWN;
 	    else if (offset >= S_arrow_trap && offset <= S_polymorph_trap)
@@ -135,7 +137,7 @@ unsigned *ospecial;
 	if (offset == BOULDER && iflags.bouldersym) ch = iflags.bouldersym;
 	else ch = oc_syms[(int)objects[offset].oc_class];
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color) {
+	if (has_rogue_ibm_graphics && iflags.use_color) {
 	    switch(objects[offset].oc_class) {
 		case COIN_CLASS: color = CLR_YELLOW; break;
 		case FOOD_CLASS: color = CLR_RED; break;
@@ -147,7 +149,7 @@ unsigned *ospecial;
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) {	/* mon ridden */
 	ch = monsyms[(int)mons[offset].mlet];
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS)
+	if (has_rogue_ibm_graphics)
 	    /* This currently implies that the hero is here -- monsters */
 	    /* don't ride (yet...).  Should we set it to yellow like in */
 	    /* the monster case below?  There is no equivalent in rogue. */
@@ -159,7 +161,7 @@ unsigned *ospecial;
     } else if ((offset = (glyph - GLYPH_BODY_OFF)) >= 0) {	/* a corpse */
 	ch = oc_syms[(int)objects[CORPSE].oc_class];
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color)
+	if (has_rogue_ibm_graphics && iflags.use_color)
 	    color = CLR_RED;
 	else
 #endif
@@ -168,7 +170,7 @@ unsigned *ospecial;
     } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) {	/* mon detect */
 	ch = monsyms[(int)mons[offset].mlet];
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS)
+	if (has_rogue_ibm_graphics)
 	    color = NO_COLOR;	/* no need to check iflags.use_color */
 	else
 #endif
@@ -179,7 +181,7 @@ unsigned *ospecial;
     } else if ((offset = (glyph - GLYPH_INVIS_OFF)) >= 0) {	/* invisible */
 	ch = DEF_INVISIBLE;
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS)
+	if (has_rogue_ibm_graphics)
 	    color = NO_COLOR;	/* no need to check iflags.use_color */
 	else
 #endif
@@ -188,7 +190,7 @@ unsigned *ospecial;
     } else if ((offset = (glyph - GLYPH_PET_OFF)) >= 0) {	/* a pet */
 	ch = monsyms[(int)mons[offset].mlet];
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS)
+	if (has_rogue_ibm_graphics)
 	    color = NO_COLOR;	/* no need to check iflags.use_color */
 	else
 #endif
@@ -197,7 +199,7 @@ unsigned *ospecial;
     } else {							/* a monster */
 	ch = monsyms[(int)mons[glyph].mlet];
 #ifdef ROGUE_COLOR
-	if (HAS_ROGUE_IBM_GRAPHICS && iflags.use_color) {
+	if (has_rogue_ibm_graphics && iflags.use_color) {
 	    if (x == u.ux && y == u.uy)
 		/* actually player should be yellow-on-gray if in a corridor */
 		color = CLR_YELLOW;
@@ -220,7 +222,7 @@ unsigned *ospecial;
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
 # ifdef REINCARNATION
 #  ifdef ASCIIGRAPH
-    if (!has_color(color) || (Is_rogue_level(&u.uz) && !HAS_ROGUE_IBM_GRAPHICS))
+    if (!has_color(color) || (Is_rogue_level(&u.uz) && !has_rogue_ibm_graphics))
 #  else
     if (!has_color(color) || Is_rogue_level(&u.uz))
 #  endif
