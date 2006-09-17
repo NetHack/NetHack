@@ -1740,10 +1740,15 @@ register struct monst *mtmp;
 			 levl[mx-1][my].typ == TDWALL   ||
 			 levl[mx-1][my].typ == CROSSWALL||
 			 levl[mx-1][my].typ == TUWALL    ))
+#ifdef REINCARNATION
 		    appear = Is_rogue_level(&u.uz) ? S_hwall : S_hcdoor;
 		else
 		    appear = Is_rogue_level(&u.uz) ? S_vwall : S_vcdoor;
-
+#else
+		    appear = S_hcdoor;
+		else
+		    appear = S_vcdoor;
+#endif
 		if(!mtmp->minvis || See_invisible)
 		    block_point(mx,my);	/* vision */
 	} else if (level.flags.is_maze_lev && !In_sokoban(&u.uz) && rn2(2)) {
