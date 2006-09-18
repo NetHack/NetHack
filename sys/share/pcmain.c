@@ -167,7 +167,7 @@ char *argv[];
 			fqn_prefix[prefcnt] = fqn_prefix[0];
 		}
 #endif
-#ifdef CHDIR
+#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 		chdirx (dir, 1);
 #endif
 	}
