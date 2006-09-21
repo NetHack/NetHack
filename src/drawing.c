@@ -372,15 +372,22 @@ int nondefault;
 
 		for (i = 0; i < MAXOCLASSES; i++)
 		    oc_syms[i] = l_oc_syms[i];
+		/*
+		 * We can't use the SYMHANDLING or ROGUEHANDLING
+		 * macros in this file (drawing.c) because doing
+		 * so would cause link errors during some util
+		 * program builds because of the presence of
+		 * the Is_Roguelevel checks in those macros.
+		 */
 #ifdef PC9800
-		if (symset && !strncmpi(symset,"IBM",3)
+		if (symhandling && !strcmpi(symhandling,"IBM")
 		    && ibmgraphics_mode_callback)
 			(*ibmgraphics_mode_callback)();
 	        else if (!symset && ascgraphics_mode_callback)
 			(*ascgraphics_mode_callback)();
 #endif
 #ifdef TERMLIB
-	    	if (symset && !strncmpi(symset,"DEC",3)
+	    	if (symhandling && !strcmpi(symhandling,"DEC")
 		    && decgraphics_mode_callback)
 			(*decgraphics_mode_callback)();
 #endif
