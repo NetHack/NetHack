@@ -339,6 +339,7 @@ NhRegion *reg;
 	return;
 
     /* Update screen if necessary */
+    reg->ttl = -2L;			/* for visible_region_at */
     if (reg->visible)
 	for (x = reg->bounding_box.lx; x <= reg->bounding_box.hx; x++)
 	    for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++)
@@ -600,7 +601,7 @@ xchar x, y;
 
     for (i = 0; i < n_regions; i++)
 	if (inside_region(regions[i], x, y) && regions[i]->visible &&
-		regions[i]->ttl != 0L)
+		regions[i]->ttl != -2L)
 	    return regions[i];
     return (NhRegion *) 0;
 }
