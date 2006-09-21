@@ -312,7 +312,7 @@ char *argv[];
 	}
 # ifdef REINCARNATION
 	if (!roguesymset) {
-		load_symset("IBMepyx", TRUE);
+		load_symset("RogueEpyx", TRUE);
 	}
 # endif
 #endif
