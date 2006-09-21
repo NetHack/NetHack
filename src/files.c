@@ -187,7 +187,6 @@ STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,con
 int FDECL(parse_config_line, (FILE *,char *,char *,char *));
 #ifdef ASCIIGRAPH
 STATIC_DCL FILE *NDECL(fopen_sym_file);
-STATIC_DCL void FDECL(free_symhandling, (BOOLEAN_P));
 STATIC_DCL void FDECL(set_symhandling, (char *,BOOLEAN_P));
 #endif
 #ifdef NOCWD_ASSUMPTIONS
