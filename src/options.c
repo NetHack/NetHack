@@ -334,7 +334,7 @@ static struct Comp_Opt
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
 	{ "symset", "load a set of display symbols from the symbols file", 70, SET_IN_GAME },
-	{ "roguesymset", "load a set of rogue display symbols from the roguesym file", 70,
+	{ "roguesymset", "load a set of rogue display symbols from the symbols file", 70,
 #ifdef REINCARNATION
 				 SET_IN_GAME },
 #else
@@ -612,7 +612,7 @@ initoptions()
 #ifdef ASCIIGRAPH
 		if (!symset) load_symset("IBMGraphics", FALSE);
 
-		if (!roguesymset) load_symset("IBMGraphics", TRUE);
+		if (!roguesymset) load_symset("RogueIBM", TRUE);
 
 		switch_graphics(TRUE);
 #endif
