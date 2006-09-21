@@ -550,7 +550,7 @@ char *argv[];
 			if (!strncmpi(argv[0]+1, "IBM", 3)) {
 # ifdef ASCIIGRAPH
 				load_symset("IBMGraphics", FALSE);
-				load_symset("IBMGraphics", TRUE);
+				load_symset("RogueIBM", TRUE);
 				switch_graphics(TRUE);
 # endif
 			}

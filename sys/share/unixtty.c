@@ -367,7 +367,7 @@ init_sco_cons()
 		sco_mapoff();
 #  ifdef ASCIIGRAPH
 		load_symset("IBMGraphics", FALSE);
-		load_symset("IBMGraphics", TRUE);
+		load_symset("RogueIBM", TRUE);
 		switch_graphics(TRUE);
 #  endif
 #  ifdef TEXTCOLOR
