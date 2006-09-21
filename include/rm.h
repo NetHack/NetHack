@@ -251,9 +251,12 @@ struct textlist {
 #define H_DEC	2
 
 #ifdef REINCARNATION
-#define ROGUEHANDLING(ht) (Is_rogue_level(&u.uz) && roguehandling == (ht))
-#define SYMHANDLING(ht)   (ROGUEHANDLING(ht) || \
-			     (!Is_rogue_level(&u.uz) && symhandling == (ht)))
+#define ROGUEHANDLING(ht) (Is_rogue_level(&u.uz) && \
+			   rogue_level.dlevel != 0 && roguehandling == (ht))
+#define SYMHANDLING(ht) \
+	(ROGUEHANDLING(ht) || \
+	 ((!Is_rogue_level(&u.uz) || rogue_level.dlevel == 0) && \
+			      symhandling == (ht)))
 #else
 #define SYMHANDLING(ht)   (symhandling == (ht))
 #endif
