@@ -386,7 +386,7 @@ tty_decgraphics_termcap_fixup()
 	 * Do not select NA ASCII as the primary font since people may
 	 * reasonably be using the UK character set.
 	 */
-	if (SYMHANDLING("DEC")) xputs("\033)0");
+	if (SYMHANDLING(H_DEC)) xputs("\033)0");
 #ifdef PC9800
 	init_hilite();
 #endif
@@ -449,19 +449,19 @@ tty_start_screen()
 	xputs(TI);
 	xputs(VS);
 #ifdef PC9800
-    if (!SYMHANDLING("IBM"))
+    if (!SYMHANDLING(H_IBM))
 	    tty_ascgraphics_hilite_fixup();
     /* set up callback in case option is not set yet but toggled later */
     ascgraphics_mode_callback = tty_ascgraphics_hilite_fixup;
 # ifdef ASCIIGRAPH
-    if (SYMHANDLING("IBM")) init_hilite();
+    if (SYMHANDLING(H_IBM)) init_hilite();
     /* set up callback in case option is not set yet but toggled later */
     ibmgraphics_mode_callback = init_hilite;
 # endif
 #endif /* PC9800 */
 
 #ifdef TERMLIB
-	if (SYMHANDLING("DEC")) tty_decgraphics_termcap_fixup();
+	if (SYMHANDLING(H_DEC)) tty_decgraphics_termcap_fixup();
 	/* set up callback in case option is not set yet but toggled later */
 	decgraphics_mode_callback = tty_decgraphics_termcap_fixup;
 #endif

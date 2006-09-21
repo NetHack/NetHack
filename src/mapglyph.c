@@ -50,9 +50,9 @@ int explcolors[] = {
 
 #ifdef ROGUE_COLOR
 # if defined(USE_TILES) && defined(MSDOS)
-#define HAS_ROGUE_IBM_GRAPHICS (ROGUEHANDLING("IBM") && !iflags.grmode)
+#define HAS_ROGUE_IBM_GRAPHICS (ROGUEHANDLING(H_IBM) && !iflags.grmode)
 # else
-#define HAS_ROGUE_IBM_GRAPHICS (ROGUEHANDLING("IBM"))
+#define HAS_ROGUE_IBM_GRAPHICS (ROGUEHANDLING(H_IBM))
 # endif
 #endif
 

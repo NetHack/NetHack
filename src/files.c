@@ -2422,8 +2422,9 @@ read_wizkit()
 #endif /*WIZARD*/
 
 #ifdef ASCIIGRAPH
-extern struct symparse loadsyms[];	/* drawing.c */
 extern struct textlist *symset_list;	/* options.c */
+extern struct symparse loadsyms[];	/* drawing.c */
+extern const char *known_handling[];	/* drawing.c */
 static int symset_count = 0;	 	/* for pick-list building only */
 static boolean chosen_symset_start = FALSE, chosen_symset_end = FALSE;
 
@@ -2560,12 +2561,15 @@ boolean rogueflag;
 			    if (!strcmpi(bufp, symsetname)) { /* desired one? */
 				chosen_symset_start = TRUE;
 #ifdef REINCARNATION
-				if (rogueflag)
+				if (rogueflag) {
 				    init_r_symbols();
-				else
+				    roguehandling = H_UNK;
+				}
 #endif
+				if (!rogueflag) {
 				    init_l_symbols();
-				free_symhandling(rogueflag);
+				    symhandling = H_UNK;
+				}
 			    }
 			    break;
 		    case 1:
@@ -2595,41 +2599,31 @@ boolean rogueflag;
 }
 
 STATIC_OVL void
-free_symhandling(rogueflag)
-boolean rogueflag;
-{
-	if (rogueflag) {
-#ifdef REINCARNATION
-		if (roguehandling) {
-			free((genericptr_t)roguehandling);
-			roguehandling = (char *)0;
-		}
-#endif
-	} else {
-		if (symhandling) {
-			free((genericptr_t)symhandling);
-			symhandling = (char *)0;
-		}
-	}
-}
-
-STATIC_OVL void
 set_symhandling(handling, rogueflag)
 char *handling;
 boolean rogueflag;
 {
-	char *new_handling;
+	int i = 0;
 
-	free_symhandling(rogueflag);
-	if (!handling) return;
-	new_handling = (char *)alloc(strlen(handling)+1);
-	Strcpy(new_handling, handling);
 #ifdef REINCARNATION
-	if (rogueflag)
-		roguehandling = new_handling;
+	if (rogueflag) roguehandling = H_UNK;
 #endif
-	if (!rogueflag)
-		symhandling = new_handling;
+	if (!rogueflag) symhandling = H_UNK;
+	while (known_handling[i]) {
+	    if (!strcmpi(known_handling[i], handling)) {
+#ifdef REINCARNATION
+		if (rogueflag) {
+			roguehandling = i;
+			return;
+		}
+#endif
+		if (!rogueflag) {
+			symhandling = i;
+			return;
+		}
+	    }
+	    i++;
+	}
 }
 #endif /*ASCIIGRAPH*/
 

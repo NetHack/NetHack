@@ -183,7 +183,7 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 UINT mswin_charset()
 {
 	CHARSETINFO cis;
-	if( SYMHANDLING("IBM") )
+	if( SYMHANDLING(H_IBM) )
 		if( TranslateCharsetInfo((DWORD*)GetOEMCP(), &cis, TCI_SRCCODEPAGE) ) 
 			return cis.ciCharset;
 		else

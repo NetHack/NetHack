@@ -241,21 +241,28 @@ struct textlist {
 	struct textlist *next;	/* next in list   */
 };
 
+/*
+ * special symbol set handling types (callbacks, etc.)
+ * Must match the order of the known_handlers strings
+ * in drawing.c
+ */
+#define H_UNK	0
+#define H_IBM	1
+#define H_DEC	2
+
 #ifdef REINCARNATION
-#define ROGUEHANDLING(H) ((Is_rogue_level(&u.uz) && roguehandling && \
-			   !strcmpi(roguehandling,H)))
-#define SYMHANDLING(H)	(ROGUEHANDLING(H) || \
-			 (!Is_rogue_level(&u.uz) && symhandling && \
-			  !strcmpi(symhandling,H)))
+#define ROGUEHANDLING(ht) (Is_rogue_level(&u.uz) && roguehandling == (ht))
+#define SYMHANDLING(ht)   (ROGUEHANDLING(ht) || \
+			     (!Is_rogue_level(&u.uz) && symhandling == (ht)))
 #else
-#define SYMHANDLING(H)	(symhandling && !strcmpi(symhandling,H))
+#define SYMHANDLING(ht)   (symhandling == (ht))
 #endif
 
 extern const struct symdef defsyms[MAXPCHARS];	/* defaults */
 extern uchar showsyms[MAXPCHARS];
 extern const struct symdef def_warnsyms[WARNCOUNT];
-extern char *symset, *symhandling;		/* from drawing.c */
-extern char *roguesymset, *roguehandling;	/* from drawing.c */
+extern char *symset, *roguesymset;		/* from drawing.c */
+extern int symhandling, roguehandling;		/* from drawing.c */
 
 /*
  * Graphics sets for display symbols

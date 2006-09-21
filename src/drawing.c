@@ -17,8 +17,8 @@
 #define C(n)
 #endif
 
-char *symset = 0, *symhandling = 0;		/* from drawing.c */
-char *roguesymset = 0, *roguehandling = 0;	/* from drawing.c */
+char *symset = 0, *roguesymset = 0;
+int symhandling = 0, roguehandling = 0;
 
 uchar oc_syms[MAXOCLASSES] = DUMMY; /* the current object  display symbols */
 uchar showsyms[MAXPCHARS]  = DUMMY; /* the current feature display symbols */
@@ -380,14 +380,14 @@ int nondefault;
 		 * the Is_Roguelevel checks in those macros.
 		 */
 #ifdef PC9800
-		if (symhandling && !strcmpi(symhandling,"IBM")
+		if (symhandling == H_IBM
 		    && ibmgraphics_mode_callback)
 			(*ibmgraphics_mode_callback)();
 	        else if (!symset && ascgraphics_mode_callback)
 			(*ascgraphics_mode_callback)();
 #endif
 #ifdef TERMLIB
-	    	if (symhandling && !strcmp(symhandling,"DEC")
+	    	if (symhandling == H_DEC
 		    && decgraphics_mode_callback)
 			(*decgraphics_mode_callback)();
 #endif
@@ -537,6 +537,20 @@ int val;
 			break;
 	 }
 }
+
+/*
+ * If you are adding code somewhere to be able to recognize
+ * particular types of symset "handling", define a 
+ * H_XXX macro in include/rm.h and add the name
+ * to this array at the matching offset.
+ */
+const char *known_handling[] = {
+	"UNKNOWN",	/* H_UNK */
+	"IBM", 		/* H_IBM */
+	"DEC", 		/* H_DEC */
+	(const char *)0,
+};
+ 
 
 struct symparse loadsyms[] = {
 	{SYM_CONTROL, 0, "start"},
