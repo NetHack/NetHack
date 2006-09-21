@@ -515,8 +515,8 @@ winid WIN_MESSAGE, WIN_MAP, WIN_INVEN
 			There is also a window called WIN_STATUS that is used
 			only for backward compatibility in the genl_status_*
 			set of generic status display functions.
-char *AE, *AS;		Checked in options.c to see if we should switch
-			to DEC_GRAPHICS.  It is #ifdefed VMS and UNIX.
+char *AE, *AS;		Checked in options.c to see if we should load and 
+			switch to DECGraphics symset.  It is #ifdefed VMS and UNIX.
 int LI, CO;		Set in sys/unix/ioctl.c.
 
 The following appears to be Unix specific.  Other ports using the tty

@@ -114,7 +114,7 @@ mkshop()
 				return;
 			}
 			for(i=0; shtypes[i].name; i++)
-				if(*ep == def_oc_syms[(int)shtypes[i].symb])
+				if(*ep == def_oc_syms[(int)shtypes[i].symb].sym)
 				    goto gottype;
 			if(*ep == 'g' || *ep == 'G')
 				i = 0;

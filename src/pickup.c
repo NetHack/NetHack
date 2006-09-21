@@ -119,11 +119,11 @@ int *itemcount;
 	*itemcount = 0;
 #ifndef GOLDOBJ
 	if (incl_gold)
-	    ilets[iletct++] = def_oc_syms[COIN_CLASS];
+	    ilets[iletct++] = def_oc_syms[COIN_CLASS].sym;
 #endif
 	ilets[iletct] = '\0'; /* terminate ilets so that index() will work */
 	while (otmp) {
-	    c = def_oc_syms[(int)otmp->oclass];
+	    c = def_oc_syms[(int)otmp->oclass].sym;
 	    if (!index(ilets, c) && (!filter || (*filter)(otmp)))
 		ilets[iletct++] = c,  ilets[iletct] = '\0';
 	    *itemcount += 1;
@@ -785,7 +785,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		    any.a_obj = curr;
 		    add_menu(win, obj_to_glyph(curr), &any,
 			    qflags & USE_INVLET ? curr->invlet : 0,
-			    def_oc_syms[(int)objects[curr->otyp].oc_class],
+			    def_oc_syms[(int)objects[curr->otyp].oc_class].sym,
 			    ATR_NONE, doname(curr), MENU_UNSELECTED);
 		}
 	    }
@@ -901,7 +901,7 @@ int how;			/* type of query */
 			any = zeroany;
 			any.a_int = curr->oclass;
 			add_menu(win, NO_GLYPH, &any, invlet++,
-				def_oc_syms[(int)objects[curr->otyp].oc_class],
+				def_oc_syms[(int)objects[curr->otyp].oc_class].sym,
 				ATR_NONE, let_to_name(*pack, FALSE),
 				MENU_UNSELECTED);
 			collected_type_name = TRUE;

@@ -19,7 +19,7 @@
 # The three options on this line should be used for most setups.  
 # If your machine isn't very IBM-compatible, and NetHack doesn't work, 
 # try commenting out this line.
-OPTIONS=rawio,BIOS,IBMgraphics
+OPTIONS=rawio,BIOS,symset:IBMGraphics_2,roguesymset:RogueEpyx
 
 # To use VGA graphical tiles on an MS-DOS PC with VGA or better,uncomment 
 # this:

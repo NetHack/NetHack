@@ -1,4 +1,8 @@
-\documentstyle[titlepage]{article}
+\documentclass{article}
+% \documentstyle[titlepage]{article}
+
+\usepackage{hyperref}
+\usepackage{longtable}
 
 \textheight 220mm
 \textwidth 160mm
@@ -27,7 +31,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.100 $ $Date: 2006/05/18 04:18:23 $
+% $Revision: 1.101 $ $Date: 2006/07/15 03:25:04 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -40,7 +44,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.5)}
-\date{November 19, 2005}
+\date{September 20, 2006}
 
 \maketitle
 
@@ -2092,17 +2096,11 @@ and the {\it fruit\/} is set to ``papaya'', you would enter the command
 Any line in the configuration file starting with `{\tt \#}' is treated as a comment.
 Any line in the configuration file starting with ``{\tt OPTIONS=}'' may be
 filled out with options in the same syntax as in NETHACKOPTIONS.
-Any line starting with ``{\tt DUNGEON=}'', ``{\tt EFFECTS=}'',
-``{\tt MONSTERS=}'', ``{\tt OBJECTS=}'', ``{\tt TRAPS=}'', 
-or ``{\tt BOULDER=}''
-is taken as defining the corresponding {\it dungeon},
-{\it effects}, {\it monsters}, {\it objects}, {\it traps\/} or
-{\it boulder\/} option in a different syntax,
-a sequence of decimal numbers giving the character position
-in the current font to be used in displaying each entry.
-A zero in any entry in such a sequence leaves the display of that
-entry unchanged; this feature is not available using the option syntax.
-Such a sequence can be continued to multiple lines by putting a
+Any line starting with ``{\tt SYMBOLS=}''
+is taken as defining the corresponding {\it symbol}
+in a different syntax, a sequence of decimal numbers giving 
+the character position in the current font to be used in displaying 
+each entry. Such a sequence can be continued to multiple lines by putting a
 `{\tt \verb+\+}' at the end of each line to be continued.
 
 %.pg
@@ -2190,14 +2188,6 @@ players if it detects some anticipated mistakes (default on).
 Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).
 %.lp
-\item[\ib{DECgraphics}]
-Use a predefined selection of characters from the DEC VT-xxx/DEC
-Rainbow/ANSI line-drawing character set to display the dungeon/effects/traps
-instead of having to define a full graphics set yourself (default off).
-This option also sets up proper handling of graphics
-characters for such terminals, so you should specify it when appropriate
-even if you override the selections with your own graphics strings.
-%.lp
 \item[\ib{disclose}]
 Controls options for disclosing various information when the game ends (defaults
 to all possibilities being disclosed).
@@ -2236,64 +2226,6 @@ traps and each other as well as by you.
 %.lp
 \item[\ib{dogname}]
 Name your starting dog (ex.\ ``{\tt dogname:Fang}'').
-Cannot be set with the `{\tt O}' command.
-%.lp
-\item[\ib{dungeon}]
-Set the graphics symbols for displaying the dungeon (default
-``\verb& |--------||.-|++##& \verb&.##<><>_|\\#{}.}..## #}&'').
-The {\it dungeon\/} option should be
-followed by a string of 1--41
-characters to be used instead of the default map-drawing characters.
-The dungeon map will use the characters you specify instead of the
-default symbols, and default symbols for any you do not specify.
-Remember that you may need to escape some of these characters
-on a command line if they are special to your shell.
-
-Note that {\it NetHack\/} escape-processes this option string in conventional C
-fashion.  This means that `\verb+\+' is a prefix to take the following
-character literally.  Thus `\verb+\+' needs to be represented as `\verb+\\+'.
-The special escape form
-`\verb+\m+' switches on the meta bit in the following character, and the
-`{\tt \^{}}' prefix causes the following character to be treated as a control
-character.
-
-The order of the symbols is:  solid rock, vertical wall, horizontal
-wall, upper left corner, upper right corner, lower left corner, lower
-right corner, cross wall, upward T wall, downward T wall, leftward T
-wall, rightward T wall, no door, vertical open door, horizontal open
-door, vertical closed door, horizontal closed door, iron bars, tree,
-floor of a room, dark corridor, lit corridor, stairs up, stairs down,
-ladder up, ladder down, altar, grave, throne, kitchen sink, fountain, pool or moat,
-ice, lava, vertical lowered drawbridge, horizontal lowered drawbridge,
-vertical raised drawbridge, horizontal raised drawbridge, air, cloud,
-under water.
-
-You might want to use `{\tt +}' for the corners and T walls for a more
-aesthetic, boxier display.  Note that in the next release, new symbols
-may be added, or the present ones rearranged.
-
-Cannot be set with the `{\tt O}' command.
-%.lp
-\item[\ib{effects}]
-Set the graphics symbols for displaying special effects (default
-``\verb&|-\\/*!)(0#@*/-\\& \verb&||\\-//-\\| |\\-/&'').
-The {\it effects\/} option should be
-followed by a string of 1--29
-characters to be used instead of the default special-effects characters.
-This string is subjected to the same processing as the {\it dungeon\/} option.
-
-The order of the symbols is:  vertical beam, horizontal beam, left slant,
-right slant, digging beam, camera flash beam, left boomerang, right boomerang,
-four glyphs giving the sequence for magic resistance displays,
-the eight surrounding glyphs for swallowed display,
-nine glyphs for explosions.
-An explosion consists of three rows (top, middle, and bottom) of three
-characters.  The explosion is centered in the center of this $3 \times 3$
-array.
-
-Note that in the next release, new symbols may be added,
-or the present ones rearranged.
-
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{extmenu}]
@@ -2337,14 +2269,6 @@ might miss some interesting and/or important information.
 \item[\ib{horsename}]
 Name your starting horse (ex.\ ``{\tt horsename:Trigger}'').
 Cannot be set with the `{\tt O}' command.
-%.lp
-\item[\ib{IBMgraphics}]
-Use a predefined selection of IBM extended ASCII characters to display the
-dungeon/effects/traps instead of having to define a full graphics set
-yourself (default off).
-This option also sets up proper handling of graphics
-characters for such terminals, so you should specify it when appropriate
-even if you override the selections with your own graphics strings.
 %.lp
 \item[\ib{ignintr}]
 Ignore interrupt signals, including breaks (default off).
@@ -2429,35 +2353,6 @@ Menu character accelerator to select all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `,'.
 %.lp
-\item[\ib{monsters}]
-Set the characters used to display monster classes (default
-``\verb+abcdefghijklmnopqrstuv+
-\verb+wxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@ '&;:~]+'').
-This string is subjected to the same processing as the {\it dungeon\/} option.
-The order of the symbols is
-ant or other insect, blob, cockatrice,
-dog or other canine, eye or sphere, feline,
-gremlin, humanoid, imp or minor demon,
-jelly, kobold, leprechaun,
-mimic, nymph, orc,
-piercer, quadruped, rodent,
-arachnid or centipede, trapper or lurker above, horse or unicorn,
-vortex, worm, xan or other mythical/fantastic insect,
-light, zruty,
-angelic being, bat or bird, centaur,
-dragon, elemental, fungus or mold,
-gnome, giant humanoid, invisible monster,
-jabberwock, Keystone Kop, lich,
-mummy, naga, ogre,
-pudding or ooze, quantum mechanic, rust monster,
-snake, troll, umber hulk,
-vampire, wraith, xorn,
-apelike creature, zombie,
-human, ghost, golem,
-demon, sea monster, lizard,
-long worm tail, and mimic.
-Cannot be set with the `{\tt O}' command.
-%.lp
 \item[\ib{msghistory}]
 The number of top line messages to save (and recall with `{\tt \^{}P}')
 (default 20). Cannot be set with the `{\tt O}' command.
@@ -2524,16 +2419,6 @@ When moving by numbers, to enter a count prefix for those commands
 which accept one (such as ``{\tt 12s}'' to search twelve times), precede it
 with the letter `{\tt n}' (``{\tt n12s}'').
 %.lp
-\item[\ib{objects}]
-Set the characters used to display object classes (default
-``\verb&])[="(%!?+/$*`0_.&'').
-This string is subjected to the same processing as the {\it dungeon\/} option.
-The order of the symbols is
-illegal-object (should never be seen), weapon, armor, ring, amulet, tool,
-food, potion, scroll, spellbook, wand, gold, gem or rock, boulder or statue,
-iron ball, chain, and venom.
-Cannot be set with the `{\tt O}' command.
-%.lp
 \item[\ib{packorder}]
 Specify the order to list object types in (default
 ``\verb&")[%?+!=/(*`0_&''). The value of this option should be a string
@@ -2598,6 +2483,11 @@ value is examined; `r' is an exception with ``{\tt Rogue}'', {\tt Ranger}'',
 and ``{\tt random}'' values. If you prefix `{\tt !}' or ``{\tt no}'' to the 
 value, you can exclude that role from being picked randomly.
 %.lp
+\item[\ib{roguesymset}]
+This option may be used to select one of the named symbol sets found within
+{\tt symbols} to alter the symbols displayed on the screen on the
+rogue level.
+%.lp
 \item[\ib{rlecomp}]
 When writing out a save file, perform run length compression of the map.
 Not all ports support run length compression. It has no
@@ -2661,6 +2551,10 @@ This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that 
 and prior versions (ex.\ ``{\tt suppress\_alert:3.3.1}'')
 %.lp
+\item[\ib{symset}]
+This option may be used to select one of the named symbol sets found within
+{\tt symbols} to alter the symbols displayed on the screen.
+%.lp
 \item[\ib{time}]
 Show the elapsed game time in turns on bottom line (default off).
 %.lp
@@ -2679,21 +2573,6 @@ Put the ending display in a NetHack window instead of on stdout (default off).
 Setting this option makes the score list visible when a windowing version
 of NetHack is started without a parent window, but it no longer leaves
 the score list around after game end on a terminal or emulating window.
-%.lp
-\item[\ib{traps}]
-Set the graphics symbols for displaying traps (default
-``\verb&^^^^^^^^^^^^^^^^^"^^^^&'').
-The {\it traps\/} option should be followed by a string of 1--22
-characters to be used instead of the default traps characters.
-This string is subjected to the same processing as the {\it dungeon\/} option.
-
-The order of the symbols is:
-arrow trap, dart trap, falling rock trap, squeaky board, bear trap,
-land mine, rolling boulder trap, sleeping gas trap, rust trap, fire trap,
-pit, spiked pit, hole, trap door, teleportation trap, level teleporter,
-magic portal, web, statue trap, magic trap, anti-magic field, polymorph trap.
-
-Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{travel}]
 Allow the travel command (default on).  Turning this option off will
@@ -3056,6 +2935,218 @@ SOUND entries in your config file.
 
 %.lp
 %.hn 2
+\subsection*{Modifying NetHack Symbols}
+
+%.pg
+NetHack can load entire symbol sets from the symbol file.
+
+%.pg
+The options that are used to select a particular symbol set from the 
+symbol file are:
+
+\blist{}
+%.lp
+\item[\ib{symset}]
+Set the name of the symbol set that you want to load.
+{\it symbols\/}.
+
+%.lp
+\item[\ib{roguesymset}]
+Set the name of the symbol set that you want to load for display 
+on the rogue level.
+\elist
+
+You can also override one or more symbols using the {\it SYMBOLS\/} config 
+file option. Symbols are specified as {\it name:value\/} pairs. Note that 
+{\it NetHack\/} escape-processes the {\it value\/} string in conventional C
+fashion.  This means that `\verb+\+' is a prefix to take the following
+character literally.  Thus `\verb+\+' needs to be represented as `\verb+\\+'.
+The special escape form
+`\verb+\m+' switches on the meta bit in the symbol value, and the
+`{\tt \^{}}' prefix causes the following character to be treated as a control
+character.
+
+{
+\small
+\begin{longtable}{lll}
+\caption[]{NetHack Symbols}\\
+Default  & Symbol Name                & Description\\
+\hline \hline
+\endhead
+\verb@ @ & S\_air                     &	(air)\\
+\verb@_@ & S\_altar                   &	(altar)\\
+\verb@"@ & S\_amulet                  &	(amulet)\\
+\verb@A@ & S\_angel                   &	(angelic being)\\
+\verb@a@ & S\_ant                     &	(ant or other insect)\\
+\verb@^@ & S\_anti\_magic\_trap       &	(anti-magic field)\\
+\verb@[@ & S\_armor                   &	(suit or piece of armor)\\
+\verb@[@ & S\_armour                  &	(suit or piece of armor)\\
+\verb@^@ & S\_arrow\_trap             &	(arrow trap)\\
+\verb@0@ & S\_ball                    &	(iron ball)\\
+\verb@#@ & S\_bars                    &	(iron bars)\\
+\verb@B@ & S\_bat                     &	(bat or bird)\\
+\verb@^@ & S\_bear\_trap              &	(bear trap)\\
+\verb@-@ & S\_blcorn                  &	(bottom left corner)\\
+\verb@b@ & S\_blob                    &	(blob)\\
+\verb@+@ & S\_book                    &	(spellbook)\\
+\verb@)@ & S\_boomleft                &	(boomerang open left)\\
+\verb@(@ & S\_boomright               &	(boomerang open right)\\
+\verb@`@ & S\_boulder                 &	(boulder)\\
+\verb@-@ & S\_brcorn                  &	(bottom right corner)\\
+\verb@C@ & S\_centaur                 &	(centaur)\\
+\verb@_@ & S\_chain                   &	(iron chain)\\
+\verb@#@ & S\_cloud                   &	(cloud)\\
+\verb@c@ & S\_cockatrice              &	(cockatrice)\\
+\verb@$@ & S\_coin                    &	(pile of coins)\\
+\verb@#@ & S\_corr                    &	(corridor)\\
+\verb@-@ & S\_crwall                  &	(wall)\\
+\verb@^@ & S\_dart\_trap              &	(dart trap)\\
+\verb@&@ & S\_demon                   &	(major demon)\\
+\verb@*@ & S\_digbeam                 &	(dig beam)\\
+\verb@>@ & S\_dnladder                &	(ladder down)\\
+\verb@>@ & S\_dnstair                 &	(staircase down)\\
+\verb@d@ & S\_dog                     &	(dog or other canine)\\
+\verb@D@ & S\_dragon                  &	(dragon)\\
+\verb@;@ & S\_eel                     &	(sea monster)\\
+\verb@E@ & S\_elemental               &	(elemental)\\
+\verb@/@ & S\_explode1                &	(explosion top left)\\
+\verb@-@ & S\_explode2                &	(explosion top center)\\
+\verb@\@ & S\_explode3                &	(explosion top right)\\
+\verb@|@ & S\_explode4                &	(explosion middle left)\\
+\verb@ @ & S\_explode5                &	(explosion middle center)\\
+\verb@|@ & S\_explode6                &	(explosion middle right)\\
+\verb@\@ & S\_explode7                &	(explosion bottom left)\\
+\verb@-@ & S\_explode8                &	(explosion bottom center)\\
+\verb@/@ & S\_explode9                &	(explosion bottom right)\\
+\verb@e@ & S\_eye                     &	(eye or sphere)\\
+\verb@^@ & S\_falling\_rock\_trap     &	(falling rock trap)\\
+\verb@f@ & S\_feline                  &	(cat or other feline)\\
+\verb@^@ & S\_fire\_trap              &	(fire trap)\\
+\verb@!@ & S\_flashbeam               &	(flash beam)\\
+\verb@%@ & S\_food                    &	(piece of food)\\
+\verb@{@ & S\_fountain                &	(fountain)\\
+\verb@F@ & S\_fungus                  &	(fungus or mold)\\
+\verb@*@ & S\_gem                     &	(gem or rock)\\
+\verb@ @ & S\_ghost                   &	(ghost)\\
+\verb@H@ & S\_giant                   &	(giant humanoid)\\
+\verb@G@ & S\_gnome                   &	(gnome)\\
+\verb@'@ & S\_golem                   &	(golem)\\
+\verb@|@ & S\_grave                   &	(grave)\\
+\verb@g@ & S\_gremlin                 &	(gremlin)\\
+\verb@-@ & S\_hbeam                   &	(wall)\\
+\verb@#@ & S\_hcdbridge               &	(horizontal raised drawbridge)\\
+\verb@+@ & S\_hcdoor                  &	(closed door)\\
+\verb@.@ & S\_hodbridge               &	(horizontal lowered drawbridge)\\
+\verb@|@ & S\_hodoor                  &	(open door)\\
+\verb@^@ & S\_hole                    &	(hole)\\
+\verb~@~ & S\_human                   &	(human or elf)\\
+\verb@h@ & S\_humanoid                &	(humanoid)\\
+\verb@-@ & S\_hwall                   &	(horizontal wall)\\
+\verb@.@ & S\_ice                     &	(ice)\\
+\verb@i@ & S\_imp                     &	(imp or minor demon)\\
+\verb@J@ & S\_jabberwock              &	(jabberwock)\\
+\verb@j@ & S\_jelly                   &	(jelly)\\
+\verb@k@ & S\_kobold                  &	(kobold)\\
+\verb@K@ & S\_kop                     &	(Keystone Kop)\\
+\verb@^@ & S\_land\_mine              &	(land mine)\\
+\verb@}@ & S\_lava                    &	(molten lava)\\
+\verb@l@ & S\_leprechaun              &	(leprechaun)\\
+\verb@^@ & S\_level\_teleporter       &	(level teleporter)\\
+\verb@L@ & S\_lich                    &	(lich)\\
+\verb@y@ & S\_light                   &	(light)\\
+\verb@#@ & S\_litcorr                 &	(lit corridor)\\
+\verb@:@ & S\_lizard                  &	(lizard)\\
+\verb@\@ & S\_lslant                  &	(wall)\\
+\verb@^@ & S\_magic\_portal           &	(magic portal)\\
+\verb@^@ & S\_magic\_trap             &	(magic trap)\\
+\verb@m@ & S\_mimic                   &	(mimic)\\
+\verb@]@ & S\_mimic\_def              &	(mimic)\\
+\verb@M@ & S\_mummy                   &	(mummy)\\
+\verb@N@ & S\_naga                    &	(naga)\\
+\verb@.@ & S\_ndoor                   &	(doorway)\\
+\verb@n@ & S\_nymph                   &	(nymph)\\
+\verb@O@ & S\_ogre                    &	(ogre)\\
+\verb@o@ & S\_orc                     &	(orc)\\
+\verb@p@ & S\_piercer                 &	(piercer)\\
+\verb@^@ & S\_pit                     &	(pit)\\
+\verb@^@ & S\_polymorph\_trap         &	(polymorph trap)\\
+\verb@}@ & S\_pool                    &	(water)\\
+\verb@!@ & S\_potion                  &	(potion)\\
+\verb@P@ & S\_pudding                 &	(pudding or ooze)\\
+\verb@q@ & S\_quadruped               &	(quadruped)\\
+\verb@Q@ & S\_quantmech               &	(quantum mechanic)\\
+\verb@=@ & S\_ring                    &	(ring)\\
+\verb@`@ & S\_rock                    &	(boulder or statue)\\
+\verb@r@ & S\_rodent                  &	(rodent)\\
+\verb@^@ & S\_rolling\_boulder\_trap  &	(rolling boulder trap)\\
+\verb@.@ & S\_room                    &	(floor of a room)\\
+\verb@/@ & S\_rslant                  &	(wall)\\
+\verb@^@ & S\_rust\_trap              &	(rust trap)\\
+\verb@R@ & S\_rustmonst               &	(rust monster or disenchanter)\\
+\verb@?@ & S\_scroll                  &	(scroll)\\
+\verb@#@ & S\_sink                    &	(sink)\\
+\verb@^@ & S\_sleeping\_gas\_trap     &	(sleeping gas trap)\\
+\verb@S@ & S\_snake                   &	(snake)\\
+\verb@s@ & S\_spider                  &	(arachnid or centipede)\\
+\verb@^@ & S\_spiked\_pit             &	(spiked pit)\\
+\verb@^@ & S\_squeaky\_board          &	(squeaky board)\\
+\verb@0@ & S\_ss1                     &	(magic shield 1 of 4)\\
+\verb@#@ & S\_ss2                     &	(magic shield 2 of 4)\\
+\verb@@@ & S\_ss3                     &	(magic shield 3 of 4)\\
+\verb@*@ & S\_ss4                     &	(magic shield 4 of 4)\\
+\verb@^@ & S\_statue\_trap            &	(statue trap)\\
+\verb@ @ & S\_stone                   &	(dark part of a room)\\
+\verb@-@ & S\_sw\_bc                  &	(swallow bottom center)\\
+\verb@\@ & S\_sw\_bl                  &	(swallow bottom left)\\
+\verb@/@ & S\_sw\_br                  &	(swallow bottom right	)\\
+\verb@|@ & S\_sw\_ml                  &	(swallow middle left)\\
+\verb@|@ & S\_sw\_mr                  &	(swallow middle right)\\
+\verb@-@ & S\_sw\_tc                  &	(swallow top center)\\
+\verb@/@ & S\_sw\_tl                  &	(swallow top left)\\
+\verb@\@ & S\_sw\_tr                  &	(swallow top right)\\
+\verb@-@ & S\_tdwall                  &	(wall)\\
+\verb@^@ & S\_teleportation\_trap     &	(teleportation trap)\\
+\verb@\@ & S\_throne                  &	(opulent throne)\\
+\verb@-@ & S\_tlcorn                  &	(top left corner)\\
+\verb@|@ & S\_tlwall                  &	(wall)\\
+\verb@(@ & S\_tool                    &	(useful item (pick-axe\, key\, lamp...))\\
+\verb@^@ & S\_trap\_door              &	(trap door)\\
+\verb@t@ & S\_trapper                 &	(trapper or lurker above)\\
+\verb@-@ & S\_trcorn                  &	(top right corner)\\
+\verb@#@ & S\_tree                    &	(tree)\\
+\verb@T@ & S\_troll                   &	(troll)\\
+\verb@|@ & S\_trwall                  &	(wall)\\
+\verb@-@ & S\_tuwall                  &	(wall)\\
+\verb@U@ & S\_umber                   &	(umber hulk)\\
+\verb@u@ & S\_unicorn                 &	(unicorn or horse)\\
+\verb@<@ & S\_upladder                &	(ladder up)\\
+\verb@<@ & S\_upstair                 &	(staircase up)\\
+\verb@V@ & S\_vampire                 &	(vampire)\\
+\verb@|@ & S\_vbeam                   &	(wall)\\
+\verb@#@ & S\_vcdbridge               &	(vertical raised drawbridge)\\
+\verb@+@ & S\_vcdoor                  &	(closed door)\\
+\verb@.@ & S\_venom                   &	(splash of venom)\\
+\verb@.@ & S\_vodbridge               &	(vertical lowered drawbridge)\\
+\verb@-@ & S\_vodoor                  &	(open door)\\
+\verb@v@ & S\_vortex                  &	(vortex)\\
+\verb@|@ & S\_vwall                   &	(vertical wall)\\
+\verb@/@ & S\_wand                    &	(wand)\\
+\verb@}@ & S\_water                   &	(water)\\
+\verb@)@ & S\_weapon                  &	(weapon)\\
+\verb@"@ & S\_web                     &	(web)\\
+\verb@w@ & S\_worm                    &	(worm)\\
+\verb@~@ & S\_worm\_tail              &	(long worm tail)\\
+\verb@W@ & S\_wraith                  &	(wraith)\\
+\verb@x@ & S\_xan                     &	(xan or other mythical/fantastic insect)\\
+\verb@X@ & S\_xorn                    &	(xorn)\\
+\verb@Y@ & S\_yeti                    &	(apelike creature)\\
+\verb@Z@ & S\_zombie                  &	(zombie)\\
+\verb@z@ & S\_zruty                   &	(zruty)
+\end{longtable}%
+}
+
+%.lp
+%.hn 2
 \subsection*{Configuring NetHack for Play by the Blind}
 
 %.pg
@@ -3077,18 +3168,22 @@ overall location of items on the screen.
 %.pg
 While it is not difficult for experienced users to edit the {\it defaults.nh\/}
 file to accomplish this, novices may find this task somewhat daunting.
-Included in all official distributions of NetHack is a file called
-{\it NHAccess.nh\/}.  Replacing {\it defaults.nh\/} with this file will cause
-the game to run in a manner accessible to the blind. After you have gained
-some experience with the game and with editing files, you may want to alter
-settings to better suit your preferences. Instructions on how to do this
-are included in the {\it NHAccess.nh\/} file itself. The most crucial
-settings to make the game accessible are:
+Included within the symbol file of all official distributions of NetHack 
+is a symset called {\it NHAccess\/}.  Selecting that symset in your
+configuration file will cause the game to run in a manner accessible 
+to the blind. After you have gained some experience with the game 
+and with editing files, you may want to alter settings via {\it SYMBOLS=\/} 
+in your configuration file to better suit your preferences. 
+The most crucial settings to make the game accessible are:
 %.pg
 \blist{}
 %.lp
-\item[\ib{IBMgraphics}]
-Disable IBMgraphics by commenting out this option.
+\item[\ib{symset:NHAccess}]
+Load a symbol set appropriate for use by blind players.
+%.lp
+\item[\ib{roguesymset:NHAccess}]
+Load a symbol set for the rogue level that is appropriate for 
+use by blind players.
 %.lp
 \item[\ib{menustyle:traditional}]
 This will assist in the interface to speech synthesizers.
@@ -3097,13 +3192,6 @@ This will assist in the interface to speech synthesizers.
 A lot of speech access programs use the number-pad to review the screen.
 If this is the case, disable the number\_pad option and use the traditional
 Rogue-like commands.
-%.lp
-\item[\ib{Character graphics}]
-Comment out all character graphics sets found near the bottom of the
-{\it defaults.nh\/} file.  Most of these replace {\it NetHack\/}'s
-default representation of the dungeon using standard ASCII characters
-with fancier characters from extended character sets, and these fancier
-characters can annoy screen-readers.
 \elist
 
 %.hn 1
@@ -3402,9 +3490,14 @@ resurrected it for 3.3.1.
 %.pg
 \medskip
 \nd There is a NetHack web site maintained by {\it Ken Lorber} at 
+{\catcode`\#=11
+\special{html:<a href="http://www.nethack.org/">}}
 http:{\tt /}{\tt /}www.nethack.org{\tt /}.
+{\catcode`\#=11
+\special{html:</a>}}
 
-%.pg
+%.hn 3
+\subsection*{Dungeoneers}
 \bigskip
 \nd From time to time, some depraved individual out there in netland sends a
 particularly intriguing modification to help out with the game.  The Gods of

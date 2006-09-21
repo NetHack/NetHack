@@ -50,10 +50,9 @@ int explcolors[] = {
 
 #ifdef ROGUE_COLOR
 # if defined(USE_TILES) && defined(MSDOS)
-#define HAS_ROGUE_IBM_GRAPHICS (iflags.IBMgraphics && !iflags.grmode && \
-	Is_rogue_level(&u.uz))
+#define HAS_ROGUE_IBM_GRAPHICS (ROGUEHANDLING("IBM") && !iflags.grmode)
 # else
-#define HAS_ROGUE_IBM_GRAPHICS (iflags.IBMgraphics && Is_rogue_level(&u.uz))
+#define HAS_ROGUE_IBM_GRAPHICS (ROGUEHANDLING("IBM"))
 # endif
 #endif
 
@@ -221,11 +220,7 @@ unsigned *ospecial;
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
 # ifdef REINCARNATION
-#  ifdef ASCIIGRAPH
     if (!has_color(color) || (Is_rogue_level(&u.uz) && !has_rogue_ibm_graphics))
-#  else
-    if (!has_color(color) || Is_rogue_level(&u.uz))
-#  endif
 # else
     if (!has_color(color))
 # endif

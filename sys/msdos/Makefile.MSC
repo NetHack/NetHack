@@ -396,6 +396,7 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	copy $(DAT)\*.lev         $(GAMEDIR)
 	if exist $(GAMEDIR)\makefile del $(GAMEDIR)\makefile
 ! ENDIF
+	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
 	copy $(SSHR)\termcap	  $(GAMEDIR)
 	copy *.tib                $(GAMEDIR)
 	copy $(SSHR)\NetHack.cnf  $(GAMEDIR)\defaults.nh

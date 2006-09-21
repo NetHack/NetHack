@@ -425,14 +425,14 @@ int		class;		/* an object class, 0 for all */
      * detect. Rather than trump anything, show both possibilities.
      * We can exclude checking the buried obj chain for boulders below.
      */
-    sym = class ? def_oc_syms[class] : 0;
+    sym = class ? def_oc_syms[class].sym : 0;
     if (sym && iflags.bouldersym && sym == iflags.bouldersym)
     	boulder = ROCK_CLASS;
 
     if (Hallucination || (Confusion && class == SCROLL_CLASS))
 	Strcpy(stuff, something);
     else
-    	Strcpy(stuff, class ? oclass_names[class] : "objects");
+    	Strcpy(stuff, class ? def_oc_syms[class].name : "objects");
     if (boulder && class != ROCK_CLASS) Strcat(stuff, " and/or large stones");
 
     if (do_dknown) for(obj = invent; obj; obj = obj->nobj) do_dknown_of(obj);
@@ -616,7 +616,7 @@ int mclass;			/* monster class, 0 for all */
 	    if (!mclass || mtmp->data->mlet == mclass ||
 		(mtmp->data == &mons[PM_LONG_WORM] && mclass == S_WORM_TAIL))
 		    if (mtmp->mx > 0) {
-		    	if (mclass && def_monsyms[mclass] == ' ')
+		    	if (mclass && def_monsyms[mclass].sym == ' ')
 				show_glyph(mtmp->mx,mtmp->my,
 					detected_mon_to_glyph(mtmp));
 			else
@@ -917,7 +917,7 @@ struct obj *obj;
     if (flags.verbose) You("may look for an object or monster symbol.");
     ch = yn_function("What do you look for?", (char *)0, '\0');
     /* Don't filter out ' ' here; it has a use */
-    if ((ch != def_monsyms[S_GHOST]) && index(quitchars,ch)) { 
+    if ((ch != def_monsyms[S_GHOST].sym) && index(quitchars,ch)) { 
 	if (flags.verbose) pline(Never_mind);
 	return;
     }

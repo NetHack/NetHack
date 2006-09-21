@@ -365,7 +365,11 @@ init_sco_cons()
 	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
 		atexit(sco_mapon);
 		sco_mapoff();
-		switch_graphics(IBM_GRAPHICS);
+#  ifdef ASCIIGRAPH
+		load_symset("IBMGraphics", FALSE);
+		load_symset("IBMGraphics", TRUE);
+		switch_graphics(TRUE);
+#  endif
 #  ifdef TEXTCOLOR
 		if (has_colors())
 			iflags.use_color = TRUE;

@@ -26,7 +26,7 @@
 #define LICENSE       "license" /* file with license information */
 #define OPTIONFILE    "opthelp" /* file explaining runtime options */
 #define OPTIONS_USED  "options" /* compile-time options, for #version */
-
+#define SYMBOLS       "symbols" /* replacement symbol sets */
 #define LEV_EXT ".lev"		/* extension for special level files */
 
 

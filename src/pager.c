@@ -573,15 +573,15 @@ do_look(mode, click_cc)
 
 	/* Check for monsters */
 	for (i = 0; i < MAXMCLASSES; i++) {
-	    if (sym == ((from_screen || clicklook) ? monsyms[i] : def_monsyms[i]) &&
-		monexplain[i]) {
+	    if (sym == ((from_screen || clicklook) ? monsyms[i] : def_monsyms[i].sym) &&
+		def_monsyms[i].explain) {
 		need_to_look = TRUE;
 		if (!found) {
-		    Sprintf(out_str, "%c       %s", sym, an(monexplain[i]));
-		    firstmatch = monexplain[i];
+		    Sprintf(out_str, "%c       %s", sym, an(def_monsyms[i].explain));
+		    firstmatch = def_monsyms[i].explain;
 		    found++;
 		} else {
-		    found += append_str(out_str, an(monexplain[i]));
+		    found += append_str(out_str, an(def_monsyms[i].explain));
 		}
 	    }
 	}
@@ -590,7 +590,7 @@ do_look(mode, click_cc)
 	   symbol; firstmatch is assumed to already be set for '@' */
 	if (((from_screen || clicklook) ?
 		(sym == monsyms[S_HUMAN] && cc.x == u.ux && cc.y == u.uy) :
-		(sym == def_monsyms[S_HUMAN] && !flags.showrace)) &&
+		(sym == def_monsyms[S_HUMAN].sym && !flags.showrace)) &&
 	    !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
 	    found += append_str(out_str, "you");	/* tack on "or you" */
 
@@ -611,18 +611,18 @@ do_look(mode, click_cc)
 
 	/* Now check for objects */
 	for (i = 1; i < MAXOCLASSES; i++) {
-	    if (sym == ((from_screen || clicklook) ? oc_syms[i] : def_oc_syms[i])) {
+	    if (sym == ((from_screen || clicklook) ? oc_syms[i] : def_oc_syms[i].sym)) {
 		need_to_look = TRUE;
 		if ((from_screen || clicklook) && i == VENOM_CLASS) {
 		    skipped_venom++;
 		    continue;
 		}
 		if (!found) {
-		    Sprintf(out_str, "%c       %s", sym, an(objexplain[i]));
-		    firstmatch = objexplain[i];
+		    Sprintf(out_str, "%c       %s", sym, an(def_oc_syms[i].explain));
+		    firstmatch = def_oc_syms[i].explain;
 		    found++;
 		} else {
-		    found += append_str(out_str, an(objexplain[i]));
+		    found += append_str(out_str, an(def_oc_syms[i].explain));
 		}
 	    }
 	}
@@ -697,7 +697,7 @@ do_look(mode, click_cc)
     
 	/* if we ignored venom and list turned out to be short, put it back */
 	if (skipped_venom && found < 2) {
-	    x_str = objexplain[VENOM_CLASS];
+	    x_str = def_oc_syms[VENOM_CLASS].explain;
 	    if (!found) {
 		Sprintf(out_str, "%c       %s", sym, an(x_str));
 		firstmatch = x_str;

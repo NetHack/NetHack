@@ -231,9 +231,9 @@ E NEARDATA struct spell spl_book[];	/* sized in decl.c */
 E const int zapcolors[];
 #endif
 
-E const char def_oc_syms[MAXOCLASSES];	/* default class symbols */
+E const struct class_sym def_oc_syms[MAXOCLASSES];	/* default class symbols */
 E uchar oc_syms[MAXOCLASSES];		/* current class symbols */
-E const char def_monsyms[MAXMCLASSES];	/* default class symbols */
+E const struct class_sym def_monsyms[MAXMCLASSES];	/* default class symbols */
 E uchar monsyms[MAXMCLASSES];		/* current class symbols */
 
 #include "obj.h"
@@ -268,6 +268,8 @@ E NEARDATA struct mvitals {
 	uchar	died;
 	uchar	mvflags;
 } mvitals[NUMMONS];
+
+E struct symparse loadsyms[];
 
 E NEARDATA struct c_color_names {
     const char	*const c_black, *const c_amber, *const c_golden,
@@ -347,7 +349,7 @@ E struct tc_gbl_data {	/* also declared in tcap.h */
 #endif
 
 /* xxxexplain[] is in drawing.c */
-E const char * const monexplain[], invisexplain[], * const objexplain[], * const oclass_names[];
+E const char * const monexplain[], invisexplain[], * const oclass_names[];
 
 /* Some systems want to use full pathnames for some subsets of file names,
  * rather than assuming that they're all in the current directory.  This

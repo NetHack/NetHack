@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)drawing.c	3.5	2005/09/23	*/
+/*	SCCS Id: @(#)drawing.c	3.5	2006/09/16	*/
 /* Copyright (c) NetHack Development Team 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,175 +17,117 @@
 #define C(n)
 #endif
 
-#define g_FILLER(symbol) 0
+char *symset = 0, *symhandling = 0;		/* from drawing.c */
+char *roguesymset = 0, *roguehandling = 0;	/* from drawing.c */
 
 uchar oc_syms[MAXOCLASSES] = DUMMY; /* the current object  display symbols */
 uchar showsyms[MAXPCHARS]  = DUMMY; /* the current feature display symbols */
 uchar monsyms[MAXMCLASSES] = DUMMY; /* the current monster display symbols */
+
+/* loaded primary syms */
+uchar l_oc_syms[MAXOCLASSES] = DUMMY;
+uchar l_showsyms[MAXPCHARS]  = DUMMY;
+uchar l_monsyms[MAXMCLASSES] = DUMMY;
+
+#ifdef REINCARNATION
+/* rogue syms */
+uchar r_oc_syms[MAXOCLASSES] = DUMMY;
+uchar r_showsyms[MAXPCHARS]  = DUMMY;
+uchar r_monsyms[MAXMCLASSES] = DUMMY;
+#endif
+
 uchar warnsyms[WARNCOUNT]  = DUMMY;  /* the current warning display symbols */
-
-/* Default object class symbols.  See objclass.h. */
-const char def_oc_syms[MAXOCLASSES] = {
-/* 0*/	'\0',		/* placeholder for the "random class" */
-	ILLOBJ_SYM,
-	WEAPON_SYM,
-	ARMOR_SYM,
-	RING_SYM,
-/* 5*/	AMULET_SYM,
-	TOOL_SYM,
-	FOOD_SYM,
-	POTION_SYM,
-	SCROLL_SYM,
-/*10*/	SPBOOK_SYM,
-	WAND_SYM,
-	GOLD_SYM,
-	GEM_SYM,
-	ROCK_SYM,
-/*15*/	BALL_SYM,
-	CHAIN_SYM,
-	VENOM_SYM
-};
-
 const char invisexplain[] = "remembered, unseen, creature";
 
-/* Object descriptions.  Used in do_look(). */
-const char * const objexplain[] = {	/* these match def_oc_syms, above */
-/* 0*/	0,
-	"strange object",
-	"weapon",
-	"suit or piece of armor",
-	"ring",
-/* 5*/	"amulet",
-	"useful item (pick-axe, key, lamp...)",
-	"piece of food",
-	"potion",
-	"scroll",
-/*10*/	"spellbook",
-	"wand",
-	"pile of coins",
-	"gem or rock",
-	"boulder or statue",
-/*15*/	"iron ball",
-	"iron chain",
-	"splash of venom"
-};
-
-/* Object class names.  Used in object_detect(). */
-const char * const oclass_names[] = {
-/* 0*/	0,
-	"illegal objects",
-	"weapons",
-	"armor",
-	"rings",
-/* 5*/	"amulets",
-	"tools",
-	"food",
-	"potions",
-	"scrolls",
-/*10*/	"spellbooks",
-	"wands",
-	"coins",
-	"rocks",
-	"large stones",
-/*15*/	"iron balls",
-	"chains",
-	"venoms"
+/* Default object class symbols.  See objclass.h.
+ * {symbol, name explain}
+ *     name:    used in object_detect().
+ *     explain: used in do_look().
+ */
+const struct class_sym def_oc_syms[MAXOCLASSES] = {
+{ '\0',       "", ""}, /* placeholder for the "random class" */
+{ ILLOBJ_SYM, "illegal objects", "strange object"},
+{ WEAPON_SYM, "weapons", "weapon"},
+{ ARMOR_SYM,  "armor", "suit or piece of armor"},
+{ RING_SYM,   "rings", "ring"},
+{ AMULET_SYM, "amulets", "amulet"},
+{ TOOL_SYM,   "tools", "useful item (pick-axe, key, lamp...)"},
+{ FOOD_SYM,   "food", "piece of food"},
+{ POTION_SYM, "potions", "potion"},
+{ SCROLL_SYM, "scrolls", "scroll"},
+{ SPBOOK_SYM, "spellbooks", "spellbook"},
+{ WAND_SYM,   "wands", "wand"},
+{ GOLD_SYM,   "coins", "pile of coins"},
+{ GEM_SYM,    "rocks", "gem or rock"},
+{ ROCK_SYM,   "large stones", "boulder or statue"},
+{ BALL_SYM,   "iron balls", "iron ball"},
+{ CHAIN_SYM,  "chains", "iron chain"},
+{ VENOM_SYM,  "venoms", "splash of venom"}
 };
 
 /* Default monster class symbols.  See monsym.h. */
-const char def_monsyms[MAXMCLASSES] = {
-	'\0',		/* holder */
-	DEF_ANT,
-	DEF_BLOB,
-	DEF_COCKATRICE,
-	DEF_DOG,
-	DEF_EYE,
-	DEF_FELINE,
-	DEF_GREMLIN,
-	DEF_HUMANOID,
-	DEF_IMP,
-	DEF_JELLY,		/* 10 */
-	DEF_KOBOLD,
-	DEF_LEPRECHAUN,
-	DEF_MIMIC,
-	DEF_NYMPH,
-	DEF_ORC,
-	DEF_PIERCER,
-	DEF_QUADRUPED,
-	DEF_RODENT,
-	DEF_SPIDER,
-	DEF_TRAPPER,		/* 20 */
-	DEF_UNICORN,
-	DEF_VORTEX,
-	DEF_WORM,
-	DEF_XAN,
-	DEF_LIGHT,
-	DEF_ZRUTY,
-	DEF_ANGEL,
-	DEF_BAT,
-	DEF_CENTAUR,
-	DEF_DRAGON,		/* 30 */
-	DEF_ELEMENTAL,
-	DEF_FUNGUS,
-	DEF_GNOME,
-	DEF_GIANT,
-	'\0',
-	DEF_JABBERWOCK,
-	DEF_KOP,
-	DEF_LICH,
-	DEF_MUMMY,
-	DEF_NAGA,		/* 40 */
-	DEF_OGRE,
-	DEF_PUDDING,
-	DEF_QUANTMECH,
-	DEF_RUSTMONST,
-	DEF_SNAKE,
-	DEF_TROLL,
-	DEF_UMBER,
-	DEF_VAMPIRE,
-	DEF_WRAITH,
-	DEF_XORN,		/* 50 */
-	DEF_YETI,
-	DEF_ZOMBIE,
-	DEF_HUMAN,
-	DEF_GHOST,
-	DEF_GOLEM,
-	DEF_DEMON,
-	DEF_EEL,
-	DEF_LIZARD,
-	DEF_WORM_TAIL,
-	DEF_MIMIC_DEF,		/* 60 */
-};
-
-/* The explanations below are also used when the user gives a string
- * for blessed genocide, so no text should wholly contain any later
- * text.  They should also always contain obvious names (eg. cat/feline).
- */
-const char * const monexplain[MAXMCLASSES] = {
-    0,
-    "ant or other insect",	"blob",			"cockatrice",
-    "dog or other canine",	"eye or sphere",	"cat or other feline",
-    "gremlin",			"humanoid",		"imp or minor demon",
-    "jelly",			"kobold",		"leprechaun",
-    "mimic",			"nymph",		"orc",
-    "piercer",			"quadruped",		"rodent",
-    "arachnid or centipede",	"trapper or lurker above", "unicorn or horse",
-    "vortex",		"worm", "xan or other mythical/fantastic insect",
-    "light",			"zruty",
-
-    "angelic being",		"bat or bird",		"centaur",
-    "dragon",			"elemental",		"fungus or mold",
-    "gnome",			"giant humanoid",	0,
-    "jabberwock",		"Keystone Kop",		"lich",
-    "mummy",			"naga",			"ogre",
-    "pudding or ooze",		"quantum mechanic",	"rust monster or disenchanter",
-    "snake",			"troll",		"umber hulk",
-    "vampire",			"wraith",		"xorn",
-    "apelike creature",		"zombie",
-
-    "human or elf",		"ghost",		"golem",
-    "major demon",		"sea monster",		"lizard",
-    "long worm tail",		"mimic"
+const struct class_sym def_monsyms[MAXMCLASSES] = {
+ { '\0',            "", ""},
+ { DEF_ANT,         "", "ant or other insect"},
+ { DEF_BLOB,        "", "blob"},
+ { DEF_COCKATRICE,  "", "cockatrice"},
+ { DEF_DOG,         "", "dog or other canine"},
+ { DEF_EYE,         "", "eye or sphere"},
+ { DEF_FELINE,      "", "cat or other feline"},
+ { DEF_GREMLIN,     "", "gremlin"},
+ { DEF_HUMANOID,    "", "humanoid"},
+ { DEF_IMP,         "", "imp or minor demon"},
+ { DEF_JELLY,       "", "jelly"},
+ { DEF_KOBOLD,      "", "kobold"},
+ { DEF_LEPRECHAUN,  "", "leprechaun"},
+ { DEF_MIMIC,       "", "mimic"},
+ { DEF_NYMPH,       "", "nymph"},
+ { DEF_ORC,         "", "orc"},
+ { DEF_PIERCER,     "", "piercer"},
+ { DEF_QUADRUPED,   "", "quadruped"},
+ { DEF_RODENT,      "", "rodent"},
+ { DEF_SPIDER,      "", "arachnid or centipede"},
+ { DEF_TRAPPER,     "", "trapper or lurker above"},
+ { DEF_UNICORN,     "", "unicorn or horse"},
+ { DEF_VORTEX,      "", "vortex"},
+ { DEF_WORM,        "", "worm"},
+ { DEF_XAN,         "", "xan or other mythical/fantastic insect"},
+ { DEF_LIGHT,       "", "light"},
+ { DEF_ZRUTY,       "", "zruty"},
+ { DEF_ANGEL,       "", "angelic being"},
+ { DEF_BAT,         "", "bat or bird"},
+ { DEF_CENTAUR,     "", "centaur"},
+ { DEF_DRAGON,      "", "dragon"},
+ { DEF_ELEMENTAL,   "", "elemental"},
+ { DEF_FUNGUS,      "", "fungus or mold"},
+ { DEF_GNOME,       "", "gnome"},
+ { DEF_GIANT,       "", "giant humanoid"},
+ { '\0',            "", ""},
+ { DEF_JABBERWOCK,  "", "jabberwock"},
+ { DEF_KOP,         "", "Keystone Kop"},
+ { DEF_LICH,        "", "lich"},
+ { DEF_MUMMY,       "", "mummy"},
+ { DEF_NAGA,        "", "naga"},
+ { DEF_OGRE,        "", "ogre"},
+ { DEF_PUDDING,     "", "pudding or ooze"},
+ { DEF_QUANTMECH,   "", "quantum mechanic"},
+ { DEF_RUSTMONST,   "", "rust monster or disenchanter"},
+ { DEF_SNAKE,       "", "snake"},
+ { DEF_TROLL,       "", "troll"},
+ { DEF_UMBER,       "", "umber hulk"},
+ { DEF_VAMPIRE,     "", "vampire"},
+ { DEF_WRAITH,      "", "wraith"},
+ { DEF_XORN,        "", "xorn"},
+ { DEF_YETI,        "", "apelike creature"},
+ { DEF_ZOMBIE,      "", "zombie"},
+ { DEF_HUMAN,       "", "human or elf"},
+ { DEF_GHOST,       "", "ghost"},
+ { DEF_GOLEM,       "", "golem"},
+ { DEF_DEMON,       "", "major demon"},
+ { DEF_EEL,         "", "sea monster"},
+ { DEF_LIZARD,      "", "lizard"},
+ { DEF_WORM_TAIL,   "", "long worm tail"},
+ { DEF_MIMIC_DEF,   "", "mimic"},
 };
 
 const struct symdef def_warnsyms[WARNCOUNT] = {
@@ -201,7 +143,6 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
 
 /*
  *  Default screen symbols with explanations and colors.
- *  Note:  {ibm|dec|mac}_graphics[] arrays also depend on this symbol order.
  */
 const struct symdef defsyms[MAXPCHARS] = {
 /* 0*/	{' ', "dark part of a room",C(NO_COLOR)},	/* stone */
@@ -231,7 +172,7 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'<', "ladder up",	C(CLR_BROWN)},	/* upladder */
 	{'>', "ladder down",	C(CLR_BROWN)},	/* dnladder */
 	{'_', "altar",		C(CLR_GRAY)},	/* altar */
-	{'|', "grave",      C(CLR_GRAY)},   /* grave */
+	{'|', "grave",      C(CLR_GRAY)},   	/* grave */
 	{'\\', "opulent throne",C(HI_GOLD)},	/* throne */
 #ifdef SINKS
 	{'#', "sink",		C(CLR_GRAY)},	/* sink */
@@ -244,8 +185,8 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'}', "molten lava",	C(CLR_RED)},	/* lava */
 	{'.', "lowered drawbridge",C(CLR_BROWN)},	/* vodbridge */
 	{'.', "lowered drawbridge",C(CLR_BROWN)},	/* hodbridge */
-	{'#', "raised drawbridge",C(CLR_BROWN)},/* vcdbridge */
-	{'#', "raised drawbridge",C(CLR_BROWN)},/* hcdbridge */
+	{'#', "raised drawbridge",C(CLR_BROWN)},	/* vcdbridge */
+	{'#', "raised drawbridge",C(CLR_BROWN)},	/* hcdbridge */
 	{' ', "air",		C(CLR_CYAN)},	/* open air */
 	{'#', "cloud",		C(CLR_GRAY)},	/* [part of] a cloud */
 /*40*/	{'}', "water",		C(CLR_BLUE)},	/* under water */
@@ -261,7 +202,7 @@ const struct symdef defsyms[MAXPCHARS] = {
 /*50*/	{'^', "fire trap",	C(CLR_ORANGE)},	/* trap */
 	{'^', "pit",		C(CLR_BLACK)},	/* trap */
 	{'^', "spiked pit",	C(CLR_BLACK)},	/* trap */
-	{'^', "hole",	C(CLR_BROWN)},	/* trap */
+	{'^', "hole",		C(CLR_BROWN)},	/* trap */
 	{'^', "trap door",	C(CLR_BROWN)},	/* trap */
 	{'^', "teleportation trap", C(CLR_MAGENTA)},	/* trap */
 	{'^', "level teleporter", C(CLR_MAGENTA)},	/* trap */
@@ -300,426 +241,11 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'\\', "",		C(CLR_ORANGE)},	/* explosion bottom left  */
 /*90*/	{'-', "",		C(CLR_ORANGE)},	/* explosion bottom center*/
 	{'/', "",		C(CLR_ORANGE)},	/* explosion bottom right */
-/*
- *  Note: Additions to this array should be reflected in the
- *	  {ibm,dec,mac}_graphics[] arrays below.
- */
 };
-
-#undef C
-
-#ifdef ASCIIGRAPH
-
-#ifdef PC9800
-void NDECL((*ibmgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
-#endif /* PC9800 */
-
-static uchar ibm_graphics[MAXPCHARS] = {
-/* 0*/	g_FILLER(S_stone),
-	0xb3,	/* S_vwall:	meta-3, vertical rule */
-	0xc4,	/* S_hwall:	meta-D, horizontal rule */
-	0xda,	/* S_tlcorn:	meta-Z, top left corner */
-	0xbf,	/* S_trcorn:	meta-?, top right corner */
-	0xc0,	/* S_blcorn:	meta-@, bottom left */
-	0xd9,	/* S_brcorn:	meta-Y, bottom right */
-	0xc5,	/* S_crwall:	meta-E, cross */
-	0xc1,	/* S_tuwall:	meta-A, T up */
-	0xc2,	/* S_tdwall:	meta-B, T down */
-/*10*/	0xb4,	/* S_tlwall:	meta-4, T left */
-	0xc3,	/* S_trwall:	meta-C, T right */
-	0xfa,	/* S_ndoor:	meta-z, centered dot */
-	0xfe,	/* S_vodoor:	meta-~, small centered square */
-	0xfe,	/* S_hodoor:	meta-~, small centered square */
-	g_FILLER(S_vcdoor),
-	g_FILLER(S_hcdoor),
-	240,	/* S_bars:	equivalence symbol */
-	241,	/* S_tree:	plus or minus symbol */
-	0xfa,	/* S_room:	meta-z, centered dot */
-/*20*/	0xb0,	/* S_corr:	meta-0, light shading */
-	0xb1,	/* S_litcorr:	meta-1, medium shading */
-	g_FILLER(S_upstair),
-	g_FILLER(S_dnstair),
-	g_FILLER(S_upladder),
-	g_FILLER(S_dnladder),
-	g_FILLER(S_altar),
-	g_FILLER(S_grave),
-	g_FILLER(S_throne),
-	g_FILLER(S_sink),
-/*30*/	0xf4,	/* S_fountain:	meta-t, integral top half */
-	0xf7,	/* S_pool:	meta-w, approx. equals */
-	0xfa,	/* S_ice:	meta-z, centered dot */
-	0xf7,	/* S_lava:	meta-w, approx. equals */
-	0xfa,	/* S_vodbridge:	meta-z, centered dot */
-	0xfa,	/* S_hodbridge:	meta-z, centered dot */
-	g_FILLER(S_vcdbridge),
-	g_FILLER(S_hcdbridge),
-	g_FILLER(S_air),
-	g_FILLER(S_cloud),
-/*40*/	0xf7,	/* S_water:	meta-w, approx. equals */
-	g_FILLER(S_arrow_trap),
-	g_FILLER(S_dart_trap),
-	g_FILLER(S_falling_rock_trap),
-	g_FILLER(S_squeaky_board),
-	g_FILLER(S_bear_trap),
-	g_FILLER(S_land_mine),
-	g_FILLER(S_rolling_boulder_trap),
-	g_FILLER(S_sleeping_gas_trap),
-	g_FILLER(S_rust_trap),
-/*50*/	g_FILLER(S_fire_trap),
-	g_FILLER(S_pit),
-	g_FILLER(S_spiked_pit),
-	g_FILLER(S_hole),
-	g_FILLER(S_trap_door),
-	g_FILLER(S_teleportation_trap),
-	g_FILLER(S_level_teleporter),
-	g_FILLER(S_magic_portal),
-	g_FILLER(S_web),
-	g_FILLER(S_statue_trap),
-/*60*/	g_FILLER(S_magic_trap),
-	g_FILLER(S_anti_magic_trap),
-	g_FILLER(S_polymorph_trap),
-	0xb3,	/* S_vbeam:	meta-3, vertical rule */
-	0xc4,	/* S_hbeam:	meta-D, horizontal rule */
-	g_FILLER(S_lslant),
-	g_FILLER(S_rslant),
-	g_FILLER(S_digbeam),
-	g_FILLER(S_flashbeam),
-	g_FILLER(S_boomleft),
-/*70*/	g_FILLER(S_boomright),
-	g_FILLER(S_ss1),
-	g_FILLER(S_ss2),
-	g_FILLER(S_ss3),
-	g_FILLER(S_ss4),
-	g_FILLER(S_sw_tl),
-	g_FILLER(S_sw_tc),
-	g_FILLER(S_sw_tr),
-	0xb3,	/* S_sw_ml:	meta-3, vertical rule */
-	0xb3,	/* S_sw_mr:	meta-3, vertical rule */
-/*80*/	g_FILLER(S_sw_bl),
-	g_FILLER(S_sw_bc),
-	g_FILLER(S_sw_br),
-	g_FILLER(S_explode1),
-	g_FILLER(S_explode2),
-	g_FILLER(S_explode3),
-	0xb3,	/* S_explode4:	meta-3, vertical rule */
-	g_FILLER(S_explode5),
-	0xb3,	/* S_explode6:	meta-3, vertical rule */
-	g_FILLER(S_explode7),
-/*90*/	g_FILLER(S_explode8),
-	g_FILLER(S_explode9)
-};
-#endif  /* ASCIIGRAPH */
-
-#ifdef TERMLIB
-void NDECL((*decgraphics_mode_callback)) = 0;  /* set in tty_start_screen() */
-
-static uchar dec_graphics[MAXPCHARS] = {
-/* 0*/	g_FILLER(S_stone),
-	0xf8,	/* S_vwall:	meta-x, vertical rule */
-	0xf1,	/* S_hwall:	meta-q, horizontal rule */
-	0xec,	/* S_tlcorn:	meta-l, top left corner */
-	0xeb,	/* S_trcorn:	meta-k, top right corner */
-	0xed,	/* S_blcorn:	meta-m, bottom left */
-	0xea,	/* S_brcorn:	meta-j, bottom right */
-	0xee,	/* S_crwall:	meta-n, cross */
-	0xf6,	/* S_tuwall:	meta-v, T up */
-	0xf7,	/* S_tdwall:	meta-w, T down */
-/*10*/	0xf5,	/* S_tlwall:	meta-u, T left */
-	0xf4,	/* S_trwall:	meta-t, T right */
-	0xfe,	/* S_ndoor:	meta-~, centered dot */
-	0xe1,	/* S_vodoor:	meta-a, solid block */
-	0xe1,	/* S_hodoor:	meta-a, solid block */
-	g_FILLER(S_vcdoor),
-	g_FILLER(S_hcdoor),
-	0xfb,	/* S_bars:	meta-{, small pi */
-	0xe7,	/* S_tree:	meta-g, plus-or-minus */
-	0xfe,	/* S_room:	meta-~, centered dot */
-/*20*/	g_FILLER(S_corr),
-	g_FILLER(S_litcorr),
-	g_FILLER(S_upstair),
-	g_FILLER(S_dnstair),
-	0xf9,	/* S_upladder:	meta-y, greater-than-or-equals */
-	0xfa,	/* S_dnladder:	meta-z, less-than-or-equals */
-	g_FILLER(S_altar),	/* 0xc3, \E)3: meta-C, dagger */
-	g_FILLER(S_grave),
-	g_FILLER(S_throne),
-	g_FILLER(S_sink),
-/*30*/	g_FILLER(S_fountain),	/* 0xdb, \E)3: meta-[, integral top half */
-	0xe0,	/* S_pool:	meta-\, diamond */
-	0xfe,	/* S_ice:	meta-~, centered dot */
-	0xe0,	/* S_lava:	meta-\, diamond */
-	0xfe,	/* S_vodbridge:	meta-~, centered dot */
-	0xfe,	/* S_hodbridge:	meta-~, centered dot */
-	g_FILLER(S_vcdbridge),
-	g_FILLER(S_hcdbridge),
-	g_FILLER(S_air),
-	g_FILLER(S_cloud),
-/*40*/	0xe0,	/* S_water:	meta-\, diamond */
-	g_FILLER(S_arrow_trap),
-	g_FILLER(S_dart_trap),
-	g_FILLER(S_falling_rock_trap),
-	g_FILLER(S_squeaky_board),
-	g_FILLER(S_bear_trap),
-	g_FILLER(S_land_mine),
-	g_FILLER(S_rolling_boulder_trap),
-	g_FILLER(S_sleeping_gas_trap),
-	g_FILLER(S_rust_trap),
-/*50*/	g_FILLER(S_fire_trap),
-	g_FILLER(S_pit),
-	g_FILLER(S_spiked_pit),
-	g_FILLER(S_hole),
-	g_FILLER(S_trap_door),
-	g_FILLER(S_teleportation_trap),
-	g_FILLER(S_level_teleporter),
-	g_FILLER(S_magic_portal),
-	g_FILLER(S_web),	/* 0xbd, \E)3: meta-=, int'l currency */
-	g_FILLER(S_statue_trap),
-/*60*/	g_FILLER(S_magic_trap),
-	g_FILLER(S_anti_magic_trap),
-	g_FILLER(S_polymorph_trap),
-	0xf8,	/* S_vbeam:	meta-x, vertical rule */
-	0xf1,	/* S_hbeam:	meta-q, horizontal rule */
-	g_FILLER(S_lslant),
-	g_FILLER(S_rslant),
-	g_FILLER(S_digbeam),
-	g_FILLER(S_flashbeam),
-	g_FILLER(S_boomleft),
-/*70*/	g_FILLER(S_boomright),
-	g_FILLER(S_ss1),
-	g_FILLER(S_ss2),
-	g_FILLER(S_ss3),
-	g_FILLER(S_ss4),
-	g_FILLER(S_sw_tl),
-	0xef,	/* S_sw_tc:	meta-o, high horizontal line */
-	g_FILLER(S_sw_tr),
-	0xf8,	/* S_sw_ml:	meta-x, vertical rule */
-	0xf8,	/* S_sw_mr:	meta-x, vertical rule */
-/*80*/	g_FILLER(S_sw_bl),
-	0xf3,	/* S_sw_bc:	meta-s, low horizontal line */
-	g_FILLER(S_sw_br),
-	g_FILLER(S_explode1),
-	0xef,	/* S_explode2:	meta-o, high horizontal line */
-	g_FILLER(S_explode3),
-	0xf8,	/* S_explode4:	meta-x, vertical rule */
-	g_FILLER(S_explode5),
-	0xf8,	/* S_explode6:	meta-x, vertical rule */
-	g_FILLER(S_explode7),
-/*90*/	0xf3,	/* S_explode8:	meta-s, low horizontal line */
-	g_FILLER(S_explode9)
-};
-#endif  /* TERMLIB */
-
-#ifdef MAC_GRAPHICS_ENV
-static uchar mac_graphics[MAXPCHARS] = {
-/* 0*/	g_FILLER(S_stone),
-	0xba,	/* S_vwall */
-	0xcd,	/* S_hwall */
-	0xc9,	/* S_tlcorn */
-	0xbb,	/* S_trcorn */
-	0xc8,	/* S_blcorn */
-	0xbc,	/* S_brcorn */
-	0xce,	/* S_crwall */
-	0xca,	/* S_tuwall */
-	0xcb,	/* S_tdwall */
-/*10*/	0xb9,	/* S_tlwall */
-	0xcc,	/* S_trwall */
-	0xb0,	/* S_ndoor */
-	0xee,	/* S_vodoor */
-	0xee,	/* S_hodoor */
-	0xef,	/* S_vcdoor */
-	0xef,	/* S_hcdoor */
-	0xf0,	/* S_bars:	equivalency symbol */
-	0xf1,	/* S_tree:	plus-or-minus */
-	g_FILLER(S_Room),
-/*20*/	0xB0,	/* S_corr */
-	g_FILLER(S_litcorr),
-	g_FILLER(S_upstair),
-	g_FILLER(S_dnstair),
-	g_FILLER(S_upladder),
-	g_FILLER(S_dnladder),
-	g_FILLER(S_altar),
-	0xef,	/* S_grave:	same as open door */
-	g_FILLER(S_throne),
-	g_FILLER(S_sink),
-/*30*/	g_FILLER(S_fountain),
-	0xe0,	/* S_pool */
-	g_FILLER(S_ice),
-	g_FILLER(S_lava),
-	g_FILLER(S_vodbridge),
-	g_FILLER(S_hodbridge),
-	g_FILLER(S_vcdbridge),
-	g_FILLER(S_hcdbridge),
-	g_FILLER(S_air),
-	g_FILLER(S_cloud),
-/*40*/	g_FILLER(S_water),
-	g_FILLER(S_arrow_trap),
-	g_FILLER(S_dart_trap),
-	g_FILLER(S_falling_rock_trap),
-	g_FILLER(S_squeaky_board),
-	g_FILLER(S_bear_trap),
-	g_FILLER(S_land_mine),
-	g_FILLER(S_rolling_boulder_trap),
-	g_FILLER(S_sleeping_gas_trap),
-	g_FILLER(S_rust_trap),
-/*50*/	g_FILLER(S_fire_trap),
-	g_FILLER(S_pit),
-	g_FILLER(S_spiked_pit),
-	g_FILLER(S_hole),
-	g_FILLER(S_trap_door),
-	g_FILLER(S_teleportation_trap),
-	g_FILLER(S_level_teleporter),
-	g_FILLER(S_magic_portal),
-	g_FILLER(S_web),
-	g_FILLER(S_statue_trap),
-/*60*/	g_FILLER(S_magic_trap),
-	g_FILLER(S_anti_magic_trap),
-	g_FILLER(S_polymorph_trap),
-	g_FILLER(S_vbeam),
-	g_FILLER(S_hbeam),
-	g_FILLER(S_lslant),
-	g_FILLER(S_rslant),
-	g_FILLER(S_digbeam),
-	g_FILLER(S_flashbeam),
-	g_FILLER(S_boomleft),
-/*70*/	g_FILLER(S_boomright),
-	g_FILLER(S_ss1),
-	g_FILLER(S_ss2),
-	g_FILLER(S_ss3),
-	g_FILLER(S_ss4),
-	g_FILLER(S_sw_tl),
-	g_FILLER(S_sw_tc),
-	g_FILLER(S_sw_tr),
-	g_FILLER(S_sw_ml),
-	g_FILLER(S_sw_mr),
-/*80*/	g_FILLER(S_sw_bl),
-	g_FILLER(S_sw_bc),
-	g_FILLER(S_sw_br),
-	g_FILLER(S_explode1),
-	g_FILLER(S_explode2),
-	g_FILLER(S_explode3),
-	g_FILLER(S_explode4),
-	g_FILLER(S_explode5),
-	g_FILLER(S_explode6),
-	g_FILLER(S_explode7),
-/*90*/	g_FILLER(S_explode8),
-	g_FILLER(S_explode9)
-};
-#endif	/* MAC_GRAPHICS_ENV */
-
-#ifdef PC9800
-void NDECL((*ascgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
-#endif
-
-/*
- * Convert the given character to an object class.  If the character is not
- * recognized, then MAXOCLASSES is returned.  Used in detect.c invent.c,
- * options.c, pickup.c, sp_lev.c, and lev_main.c.
- */
-int
-def_char_to_objclass(ch)
-    char ch;
-{
-    int i;
-    for (i = 1; i < MAXOCLASSES; i++)
-	if (ch == def_oc_syms[i]) break;
-    return i;
-}
-
-/*
- * Convert a character into a monster class.  This returns the _first_
- * match made.  If there are are no matches, return MAXMCLASSES.
- */
-int
-def_char_to_monclass(ch)
-    char ch;
-{
-    int i;
-    for (i = 1; i < MAXMCLASSES; i++)
-	if (def_monsyms[i] == ch) break;
-    return i;
-}
-
-void
-assign_graphics(graph_chars, glth, maxlen, offset)
-register uchar *graph_chars;
-int glth, maxlen, offset;
-{
-    register int i;
-
-    for (i = 0; i < maxlen; i++)
-	showsyms[i+offset] = (((i < glth) && graph_chars[i]) ?
-		       graph_chars[i] : defsyms[i+offset].sym);
-}
-
-void
-switch_graphics(gr_set_flag)
-int gr_set_flag;
-{
-    /* We're either toggling back to ASCII, in which case it is
-       appropriate to negate all the other alternatives, or we're in
-       the process of toggling one of those other ones on, in which
-       case it will be set accurately below. */
-    iflags.IBMgraphics = FALSE;
-    iflags.DECgraphics = FALSE;
-#ifdef MAC_GRAPHICS_ENV
-    iflags.MACgraphics = FALSE;
-#endif
-
-    switch (gr_set_flag) {
-	default:
-	case ASCII_GRAPHICS:
-	    assign_graphics((uchar *)0, 0, MAXPCHARS, 0);
-#ifdef PC9800
-	    if (ascgraphics_mode_callback) (*ascgraphics_mode_callback)();
-#endif
-	    break;
-#ifdef ASCIIGRAPH
-	case IBM_GRAPHICS:
-/*
- * Use the nice IBM Extended ASCII line-drawing characters (codepage 437).
- *
- * OS/2 defaults to a multilingual character set (codepage 850, corresponding
- * to the ISO 8859 character set.  We should probably do a VioSetCp() call to
- * set the codepage to 437.
- */
-	    iflags.IBMgraphics = TRUE;
-	    assign_graphics(ibm_graphics, SIZE(ibm_graphics), MAXPCHARS, 0);
-#ifdef PC9800
-	    if (ibmgraphics_mode_callback) (*ibmgraphics_mode_callback)();
-#endif
-	    break;
-#endif /* ASCIIGRAPH */
-#ifdef TERMLIB
-	case DEC_GRAPHICS:
-/*
- * Use the VT100 line drawing character set.
- */
-	    iflags.DECgraphics = TRUE;
-	    assign_graphics(dec_graphics, SIZE(dec_graphics), MAXPCHARS, 0);
-	    if (decgraphics_mode_callback) (*decgraphics_mode_callback)();
-	    break;
-#endif /* TERMLIB */
-#ifdef MAC_GRAPHICS_ENV
-	case MAC_GRAPHICS:
-	    iflags.MACgraphics = TRUE;
-	    assign_graphics(mac_graphics, SIZE(mac_graphics), MAXPCHARS, 0);
-	    break;
-#endif
-	}
-    return;
-}
-
 
 #ifdef REINCARNATION
-
-/*
- * saved display symbols for objects & features.
- */
-static uchar save_oc_syms[MAXOCLASSES] = DUMMY;
-static uchar save_showsyms[MAXPCHARS]  = DUMMY;
-static uchar save_monsyms[MAXPCHARS]   = DUMMY;
-
-static const uchar r_oc_syms[MAXOCLASSES] = {
+/* default rogue level symbols */
+static const uchar def_r_oc_syms[MAXOCLASSES] = {
 /* 0*/	'\0',
 	ILLOBJ_SYM,
 	WEAPON_SYM,
@@ -739,172 +265,472 @@ static const uchar r_oc_syms[MAXOCLASSES] = {
 	CHAIN_SYM,
 	VENOM_SYM
 };
+#endif
 
-# ifdef ASCIIGRAPH
-/* Rogue level graphics.  Under IBM graphics mode, use the symbols that were
- * used for Rogue on the IBM PC.  Unfortunately, this can't be completely
- * done because some of these are control characters--armor and rings under
- * DOS, and a whole bunch of them under Linux.  Use the TTY Rogue characters
- * for those cases.
+#undef C
+
+#ifdef TERMLIB
+void NDECL((*decgraphics_mode_callback)) = 0;  /* set in tty_start_screen() */
+#endif  /* TERMLIB */
+
+#ifdef PC9800
+void NDECL((*ibmgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
+void NDECL((*ascgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
+#endif
+
+/*
+ * Convert the given character to an object class.  If the character is not
+ * recognized, then MAXOCLASSES is returned.  Used in detect.c invent.c,
+ * options.c, pickup.c, sp_lev.c, and lev_main.c.
  */
-static const uchar IBM_r_oc_syms[MAXOCLASSES] = {	/* a la EPYX Rogue */
-/* 0*/	'\0',
-	ILLOBJ_SYM,
-#  if defined(MSDOS) || defined(OS2) || ( defined(WIN32) && !defined(MSWIN_GRAPHICS) )
-	0x18,			/* weapon: up arrow */
-/*	0x0a, */ ARMOR_SYM,	/* armor:  Vert rect with o */
-/*	0x09, */ RING_SYM,	/* ring:   circle with arrow */
-/* 5*/	0x0c,			/* amulet: "female" symbol */
-	TOOL_SYM,
-	0x05,			/* food:   club (as in cards) */
-	0xad,			/* potion: upside down '!' */
-	0x0e,			/* scroll: musical note */
-/*10*/	SPBOOK_SYM,
-	0xe7,			/* wand:   greek tau */
-	0x0f,			/* gold:   yes it's the same as gems */
-	0x0f,			/* gems:   fancy '*' */
-#  else
-	')',			/* weapon  */
-	ARMOR_SYM,		/* armor */
-	RING_SYM,		/* ring */
-/* 5*/	',',			/* amulet  */
-	TOOL_SYM,
-	':',			/* food    */
-	0xad,			/* potion: upside down '!' */
-	SCROLL_SYM,		/* scroll  */
-/*10*/	SPBOOK_SYM,
-	0xe7,			/* wand:   greek tau */
-	GEM_SYM,		/* gold:   yes it's the same as gems */
-	GEM_SYM,		/* gems    */
-#  endif
-	ROCK_SYM,
-/*15*/	BALL_SYM,
-	CHAIN_SYM,
-	VENOM_SYM
-};
-# endif /* ASCIIGRAPH */
+int
+def_char_to_objclass(ch)
+    char ch;
+{
+    int i;
+    for (i = 1; i < MAXOCLASSES; i++)
+	if (ch == def_oc_syms[i].sym) break;
+    return i;
+}
+
+/*
+ * Convert a character into a monster class.  This returns the _first_
+ * match made.  If there are are no matches, return MAXMCLASSES.
+ */
+int
+def_char_to_monclass(ch)
+    char ch;
+{
+    int i;
+    for (i = 1; i < MAXMCLASSES; i++)
+	if (def_monsyms[i].sym == ch) break;
+    return i;
+}
+
+/*
+ * Explanations of the functions found below:
+ *
+ * switch_graphics(arg)
+ *                     Called to swap the current display symbols
+ *                     (monsyms, showsyms, oc_syms).
+ *
+ *                     If !arg then the display symbols are
+ *                     taken from def_monsyms, defsyms, def_oc_syms 
+ *                     default NetHack symbols.
+ *
+ *                     If arg then the display symbols are
+ *                     taken from the adjustable display symbols
+ *                     found in l_monsyms, l_showsyms, l_oc_syms.
+ *                     Those symbols may have been loaded from an
+ *                     external symfile by config file options or
+ *                     interactively in the options menu.
+ *
+ * init_symbols()
+ *                     Sets the current display symbols, the
+ *                     loadable symbols to the default NetHack
+ *                     symbols, including the r_* rogue level
+ *                     symbols if REINCARNATION is defined.
+ *                     This would typically be done immediately
+ *                     after execution begins. Any previously
+ *                     loaded external symbol sets are discarded.
+ *
+ * assign_rogue_graphics(arg)
+ *
+ *                     This is used in the game core to toggle in and
+ *                     out of rogue level display mode.
+ *
+ *                     If arg is TRUE, this places the rogue level
+ *                     symbols from r_monsyms, r_showsyms, and r_oc_syms
+ *                     into the current display symbols: monsyms, showsyms,
+ *                     and oc_syms. 
+ *
+ *                     If arg is FALSE, this places the symbols from
+ *                     l_monsyms, l_showsyms, l_oc_syms into the current
+ *                     display symbols: monsyms, showsyms, oc_syms.
+ *
+ * update_l_symset()
+ *                     Update a member of the loadable (l_*) symbol set.  
+ *
+ * update_r_symset()
+ *                     Update a member of the rogue (r_*) symbol set.  
+ *
+ */
+
+void
+switch_graphics(nondefault)
+int nondefault;
+{
+#ifdef ASCIIGRAPH
+	register int i;
+
+	if (nondefault) {
+		for (i = 0; i < MAXMCLASSES; i++)
+		    monsyms[i] = l_monsyms[i];
+
+		for (i = 0; i < MAXPCHARS; i++)
+		    showsyms[i] = l_showsyms[i];
+
+		for (i = 0; i < MAXOCLASSES; i++)
+		    oc_syms[i] = l_oc_syms[i];
+#ifdef PC9800
+		if (symset && !strncmpi(symset,"IBM",3)
+		    && ibmgraphics_mode_callback)
+			(*ibmgraphics_mode_callback)();
+	        else if (!symset && ascgraphics_mode_callback)
+			(*ascgraphics_mode_callback)();
+#endif
+#ifdef TERMLIB
+	    	if (symset && !strncmpi(symset,"DEC",3)
+		    && decgraphics_mode_callback)
+			(*decgraphics_mode_callback)();
+#endif
+	} else
+#endif
+	init_symbols();
+}
+
+void
+init_symbols()
+{
+	init_l_symbols();
+	init_disp_symbols();
+#ifdef REINCARNATION
+	init_r_symbols();
+#endif
+}
+
+void
+init_disp_symbols()
+{
+	register int i;
+	for (i = 0; i < MAXMCLASSES; i++)
+	    monsyms[i] = def_monsyms[i].sym;
+
+	for (i = 0; i < MAXPCHARS; i++)
+	    showsyms[i] = defsyms[i].sym;
+
+	for (i = 0; i < MAXOCLASSES; i++)
+	    oc_syms[i] = def_oc_syms[i].sym;	
+}
+
+/* initialize defaults for the loadable symset */
+void
+init_l_symbols()
+{
+	register int i;
+	for (i = 0; i < MAXMCLASSES; i++)
+	    l_monsyms[i] = def_monsyms[i].sym;
+
+	for (i = 0; i < MAXPCHARS; i++)
+	    l_showsyms[i] = defsyms[i].sym;
+
+	for (i = 0; i < MAXOCLASSES; i++)
+	    l_oc_syms[i] = def_oc_syms[i].sym;
+}
+
+#ifdef REINCARNATION
+void
+init_r_symbols()
+{
+	register int i;
+	/* These are defaults that can get overwritten
+	   later by the roguesymbols option */
+
+	for (i = 0; i < MAXMCLASSES; i++)
+	    r_monsyms[i] = def_monsyms[i].sym;
+
+	for (i = 0; i < MAXPCHARS; i++)
+	    r_showsyms[i] = defsyms[i].sym;
+	r_showsyms[S_vodoor]  = r_showsyms[S_hodoor]  = r_showsyms[S_ndoor] = '+';
+	r_showsyms[S_upstair] = r_showsyms[S_dnstair] = '%';
+
+	for (i = 0; i < MAXOCLASSES; i++)
+	    r_oc_syms[i] = def_r_oc_syms[i];
+}
 
 void
 assign_rogue_graphics(is_rlevel)
 boolean is_rlevel;
 {
     /* Adjust graphics display characters on Rogue levels */
+    register int i;
 
     if (is_rlevel) {
 	register int i;
 
-	(void) memcpy((genericptr_t)save_showsyms,
-		      (genericptr_t)showsyms, sizeof showsyms);
-	(void) memcpy((genericptr_t)save_oc_syms,
-		      (genericptr_t)oc_syms, sizeof oc_syms);
-	(void) memcpy((genericptr_t)save_monsyms,
-		      (genericptr_t)monsyms, sizeof monsyms);
-
-	/* Use a loop: char != uchar on some machines. */
 	for (i = 0; i < MAXMCLASSES; i++)
-	    monsyms[i] = def_monsyms[i];
-# if defined(ASCIIGRAPH) && !defined(MSWIN_GRAPHICS)
-	if (iflags.IBMgraphics
-#  if defined(USE_TILES) && defined(MSDOS)
-		&& !iflags.grmode
-#  endif
-		)
-	    monsyms[S_HUMAN] = 0x01; /* smiley face */
-# endif
+	    monsyms[i] = r_monsyms[i];
+
 	for (i = 0; i < MAXPCHARS; i++)
-	    showsyms[i] = defsyms[i].sym;
+	    showsyms[i] = r_showsyms[i];
 
-/*
- * Some day if these rogue showsyms get much more extensive than this,
- * we may want to create r_showsyms, and IBM_r_showsyms arrays to hold
- * all of this info and to simply initialize it via a for() loop like r_oc_syms.
- */
+	for (i = 0; i < MAXOCLASSES; i++)
+	    oc_syms[i] = r_oc_syms[i];
 
-# ifdef ASCIIGRAPH
-	if (!iflags.IBMgraphics
-#  if defined(USE_TILES) && defined(MSDOS)
-		|| iflags.grmode
-#  endif
-				) {
-# endif
-	    showsyms[S_vodoor]  = showsyms[S_hodoor]  = showsyms[S_ndoor] = '+';
-	    showsyms[S_upstair] = showsyms[S_dnstair] = '%';
-# ifdef ASCIIGRAPH
-	} else {
-	    /* a la EPYX Rogue */
-	    showsyms[S_vwall]   = 0xba; /* all walls now use	*/
-	    showsyms[S_hwall]   = 0xcd; /* double line graphics	*/
-	    showsyms[S_tlcorn]  = 0xc9;
-	    showsyms[S_trcorn]  = 0xbb;
-	    showsyms[S_blcorn]  = 0xc8;
-	    showsyms[S_brcorn]  = 0xbc;
-	    showsyms[S_crwall]  = 0xce;
-	    showsyms[S_tuwall]  = 0xca;
-	    showsyms[S_tdwall]  = 0xcb;
-	    showsyms[S_tlwall]  = 0xb9;
-	    showsyms[S_trwall]  = 0xcc;
-	    showsyms[S_ndoor]   = 0xce;
-	    showsyms[S_vodoor]  = 0xce;
-	    showsyms[S_hodoor]  = 0xce;
-	    showsyms[S_room]    = 0xfa; /* centered dot */
-	    showsyms[S_corr]    = 0xb1;
-	    showsyms[S_litcorr] = 0xb2;
-	    showsyms[S_upstair] = 0xf0; /* Greek Xi */
-	    showsyms[S_dnstair] = 0xf0;
-#ifndef MSWIN_GRAPHICS
-	    showsyms[S_arrow_trap] = 0x04; /* diamond (cards) */
-	    showsyms[S_dart_trap] = 0x04;
-	    showsyms[S_falling_rock_trap] = 0x04;
-	    showsyms[S_squeaky_board] = 0x04;
-	    showsyms[S_bear_trap] = 0x04;
-	    showsyms[S_land_mine] = 0x04;
-	    showsyms[S_rolling_boulder_trap] = 0x04;
-	    showsyms[S_sleeping_gas_trap] = 0x04;
-	    showsyms[S_rust_trap] = 0x04;
-	    showsyms[S_fire_trap] = 0x04;
-	    showsyms[S_pit] = 0x04;
-	    showsyms[S_spiked_pit] = 0x04;
-	    showsyms[S_hole] = 0x04;
-	    showsyms[S_trap_door] = 0x04;
-	    showsyms[S_teleportation_trap] = 0x04;
-	    showsyms[S_level_teleporter] = 0x04;
-	    showsyms[S_magic_portal] = 0x04;
-	    showsyms[S_web] = 0x04;
-	    showsyms[S_statue_trap] = 0x04;
-	    showsyms[S_magic_trap] = 0x04;
-	    showsyms[S_anti_magic_trap] = 0x04;
-	    showsyms[S_polymorph_trap] = 0x04;
-#endif
-	}
-#endif /* ASCIIGRAPH */
-
-	for (i = 0; i < MAXOCLASSES; i++) {
-#ifdef ASCIIGRAPH
-	    if (iflags.IBMgraphics
-# if defined(USE_TILES) && defined(MSDOS)
-		&& !iflags.grmode
-# endif
-		)
-		oc_syms[i] = IBM_r_oc_syms[i];
-	    else
-#endif /* ASCIIGRAPH */
-		oc_syms[i] = r_oc_syms[i];
-	}
-#if defined(MSDOS) && defined(USE_TILES)
+# if defined(MSDOS) && defined(USE_TILES)
 	if (iflags.grmode) tileview(FALSE);
-#endif
+# endif
     } else {
-	(void) memcpy((genericptr_t)showsyms,
-		      (genericptr_t)save_showsyms, sizeof showsyms);
-	(void) memcpy((genericptr_t)oc_syms,
-		      (genericptr_t)save_oc_syms, sizeof oc_syms);
-	(void) memcpy((genericptr_t)monsyms,
-		      (genericptr_t)save_monsyms, sizeof monsyms);
-#if defined(MSDOS) && defined(USE_TILES)
+	for (i = 0; i < MAXMCLASSES; i++)
+	    monsyms[i] = l_monsyms[i];
+
+	for (i = 0; i < MAXPCHARS; i++)
+	    showsyms[i] = l_showsyms[i];
+
+	for (i = 0; i < MAXOCLASSES; i++)
+	    oc_syms[i] = l_oc_syms[i];
+# if defined(MSDOS) && defined(USE_TILES)
 	if (iflags.grmode) tileview(TRUE);
-#endif
+# endif
     }
+}
+
+void
+update_r_symset(symp, val)
+struct symparse *symp;
+int val;
+{
+	switch (symp->range) {
+	    case SYM_PCHAR:			/* index into r_showsyms */
+			r_showsyms[symp->idx] = val;
+			break;
+	    case SYM_MON:			/* index into r_monsyms  */
+			r_monsyms[symp->idx] = val;
+			break;
+	    case SYM_OC:			/* index into r_oc_syms  */
+			r_oc_syms[symp->idx] = val;
+			break;
+	    case SYM_OBJ:			/* index into objects  */
+			if (symp->idx == BOULDER)
+				iflags.bouldersym = val;
+			break;
+	 }
 }
 #endif /* REINCARNATION */
 
+#ifdef ASCIIGRAPH
+void
+update_l_symset(symp, val)
+struct symparse *symp;
+int val;
+{
+	switch (symp->range) {
+	    case SYM_PCHAR:			/* index into l_showsyms */
+			l_showsyms[symp->idx] = val;
+			break;
+	    case SYM_MON:			/* index into l_monsyms  */
+			l_monsyms[symp->idx] = val;
+			break;
+	    case SYM_OC:			/* index into l_oc_syms  */
+			l_oc_syms[symp->idx] = val;
+			break;
+	    case SYM_OBJ:			/* index into objects  */
+			if (symp->idx == BOULDER)
+				iflags.bouldersym = val;
+			break;
+	 }
+}
+
+struct symparse loadsyms[] = {
+	{SYM_CONTROL, 0, "start"},
+	{SYM_CONTROL, 0, "begin"},
+	{SYM_CONTROL, 1, "finish"},
+	{SYM_CONTROL, 2, "handling"},
+	{SYM_PCHAR, S_stone, "S_stone"},
+	{SYM_PCHAR, S_vwall, "S_vwall"},
+	{SYM_PCHAR, S_hwall, "S_hwall"},
+	{SYM_PCHAR, S_tlcorn, "S_tlcorn"},
+	{SYM_PCHAR, S_trcorn, "S_trcorn"},
+	{SYM_PCHAR, S_blcorn, "S_blcorn"},
+	{SYM_PCHAR, S_brcorn, "S_brcorn"},
+	{SYM_PCHAR, S_crwall, "S_crwall"},
+	{SYM_PCHAR, S_tuwall, "S_tuwall"},
+	{SYM_PCHAR, S_tdwall, "S_tdwall"},
+	{SYM_PCHAR, S_tlwall, "S_tlwall"},
+	{SYM_PCHAR, S_trwall, "S_trwall"},
+	{SYM_PCHAR, S_ndoor, "S_ndoor"},
+	{SYM_PCHAR, S_vodoor, "S_vodoor"},
+	{SYM_PCHAR, S_hodoor, "S_hodoor"},
+	{SYM_PCHAR, S_vcdoor, "S_vcdoor"},
+	{SYM_PCHAR, S_hcdoor, "S_hcdoor"},
+	{SYM_PCHAR, S_bars, "S_bars"},
+	{SYM_PCHAR, S_tree, "S_tree"},
+	{SYM_PCHAR, S_room, "S_room"},
+	{SYM_PCHAR, S_corr, "S_corr"},
+	{SYM_PCHAR, S_litcorr, "S_litcorr"},
+	{SYM_PCHAR, S_upstair, "S_upstair"},
+	{SYM_PCHAR, S_dnstair, "S_dnstair"},
+	{SYM_PCHAR, S_upladder, "S_upladder"},
+	{SYM_PCHAR, S_dnladder, "S_dnladder"},
+	{SYM_PCHAR, S_altar, "S_altar"},
+	{SYM_PCHAR, S_grave, "S_grave"},
+	{SYM_PCHAR, S_throne, "S_throne"},
+	{SYM_PCHAR, S_sink, "S_sink"},
+	{SYM_PCHAR, S_fountain, "S_fountain"},
+	{SYM_PCHAR, S_pool, "S_pool"},
+	{SYM_PCHAR, S_ice, "S_ice"},
+	{SYM_PCHAR, S_lava, "S_lava"},
+	{SYM_PCHAR, S_vodbridge, "S_vodbridge"},
+	{SYM_PCHAR, S_hodbridge, "S_hodbridge"},
+	{SYM_PCHAR, S_vcdbridge, "S_vcdbridge"},
+	{SYM_PCHAR, S_hcdbridge, "S_hcdbridge"},
+	{SYM_PCHAR, S_air, "S_air"},
+	{SYM_PCHAR, S_cloud, "S_cloud"},
+	{SYM_PCHAR, S_water, "S_water"},
+	{SYM_PCHAR, S_arrow_trap, "S_arrow_trap"},
+	{SYM_PCHAR, S_dart_trap, "S_dart_trap"},
+	{SYM_PCHAR, S_falling_rock_trap, "S_falling_rock_trap"},
+	{SYM_PCHAR, S_squeaky_board, "S_squeaky_board"},
+	{SYM_PCHAR, S_bear_trap, "S_bear_trap"},
+	{SYM_PCHAR, S_land_mine, "S_land_mine"},
+	{SYM_PCHAR, S_rolling_boulder_trap, "S_rolling_boulder_trap"},
+	{SYM_PCHAR, S_sleeping_gas_trap, "S_sleeping_gas_trap"},
+	{SYM_PCHAR, S_rust_trap, "S_rust_trap"},
+	{SYM_PCHAR, S_fire_trap, "S_fire_trap"},
+	{SYM_PCHAR, S_pit, "S_pit"},
+	{SYM_PCHAR, S_spiked_pit, "S_spiked_pit"},
+	{SYM_PCHAR, S_hole, "S_hole"},
+	{SYM_PCHAR, S_trap_door, "S_trap_door"},
+	{SYM_PCHAR, S_teleportation_trap, "S_teleportation_trap"},
+	{SYM_PCHAR, S_level_teleporter, "S_level_teleporter"},
+	{SYM_PCHAR, S_magic_portal, "S_magic_portal"},
+	{SYM_PCHAR, S_web, "S_web"},
+	{SYM_PCHAR, S_statue_trap, "S_statue_trap"},
+	{SYM_PCHAR, S_magic_trap, "S_magic_trap"},
+	{SYM_PCHAR, S_anti_magic_trap, "S_anti_magic_trap"},
+	{SYM_PCHAR, S_polymorph_trap, "S_polymorph_trap"},
+	{SYM_PCHAR, S_vbeam, "S_vbeam"},
+	{SYM_PCHAR, S_hbeam, "S_hbeam"},
+	{SYM_PCHAR, S_lslant, "S_lslant"},
+	{SYM_PCHAR, S_rslant, "S_rslant"},
+	{SYM_PCHAR, S_digbeam, "S_digbeam"},
+	{SYM_PCHAR, S_flashbeam, "S_flashbeam"},
+	{SYM_PCHAR, S_boomleft, "S_boomleft"},
+	{SYM_PCHAR, S_boomright, "S_boomright"},
+	{SYM_PCHAR, S_ss1, "S_ss1"},
+	{SYM_PCHAR, S_ss2, "S_ss2"},
+	{SYM_PCHAR, S_ss3, "S_ss3"},
+	{SYM_PCHAR, S_ss4, "S_ss4"},
+	{SYM_PCHAR, S_sw_tl, "S_sw_tl"},
+	{SYM_PCHAR, S_sw_tc, "S_sw_tc"},
+	{SYM_PCHAR, S_sw_tr, "S_sw_tr"},
+	{SYM_PCHAR, S_sw_ml, "S_sw_ml"},
+	{SYM_PCHAR, S_sw_mr, "S_sw_mr"},
+	{SYM_PCHAR, S_sw_bl, "S_sw_bl"},
+	{SYM_PCHAR, S_sw_bc, "S_sw_bc"},
+	{SYM_PCHAR, S_sw_br, "S_sw_br"},
+	{SYM_PCHAR, S_explode1, "S_explode1"},
+	{SYM_PCHAR, S_explode2, "S_explode2"},
+	{SYM_PCHAR, S_explode3, "S_explode3"},
+	{SYM_PCHAR, S_explode4, "S_explode4"},
+	{SYM_PCHAR, S_explode5, "S_explode5"},
+	{SYM_PCHAR, S_explode6, "S_explode6"},
+	{SYM_PCHAR, S_explode7, "S_explode7"},
+	{SYM_PCHAR, S_explode8, "S_explode8"},
+	{SYM_PCHAR, S_explode9, "S_explode9"},
+	{SYM_MON, S_ANT, "S_ant"},
+	{SYM_MON, S_BLOB, "S_blob"},
+	{SYM_MON, S_COCKATRICE, "S_cockatrice"},
+	{SYM_MON, S_DOG, "S_dog"},
+	{SYM_MON, S_EYE, "S_eye"},
+	{SYM_MON, S_FELINE, "S_feline"},
+	{SYM_MON, S_GREMLIN, "S_gremlin"},
+	{SYM_MON, S_HUMANOID, "S_humanoid"},
+	{SYM_MON, S_IMP, "S_imp"},
+	{SYM_MON, S_JELLY, "S_jelly"},
+	{SYM_MON, S_KOBOLD, "S_kobold"},
+	{SYM_MON, S_LEPRECHAUN, "S_leprechaun"},
+	{SYM_MON, S_MIMIC, "S_mimic"},
+	{SYM_MON, S_NYMPH, "S_nymph"},
+	{SYM_MON, S_ORC, "S_orc"},
+	{SYM_MON, S_PIERCER, "S_piercer"},
+	{SYM_MON, S_QUADRUPED, "S_quadruped"},
+	{SYM_MON, S_RODENT, "S_rodent"},
+	{SYM_MON, S_SPIDER, "S_spider"},
+	{SYM_MON, S_TRAPPER, "S_trapper"},
+	{SYM_MON, S_UNICORN, "S_unicorn"},
+	{SYM_MON, S_VORTEX, "S_vortex"},
+	{SYM_MON, S_WORM, "S_worm"},
+	{SYM_MON, S_XAN, "S_xan"},
+	{SYM_MON, S_LIGHT, "S_light"},
+	{SYM_MON, S_ZRUTY, "S_zruty"},
+	{SYM_MON, S_ANGEL, "S_angel"},
+	{SYM_MON, S_BAT, "S_bat"},
+	{SYM_MON, S_CENTAUR, "S_centaur"},
+	{SYM_MON, S_DRAGON, "S_dragon"},
+	{SYM_MON, S_ELEMENTAL, "S_elemental"},
+	{SYM_MON, S_FUNGUS, "S_fungus"},
+	{SYM_MON, S_GNOME, "S_gnome"},
+	{SYM_MON, S_GIANT, "S_giant"},
+	{SYM_MON, S_JABBERWOCK, "S_jabberwock"},
+	{SYM_MON, S_KOP, "S_kop"},
+	{SYM_MON, S_LICH, "S_lich"},
+	{SYM_MON, S_MUMMY, "S_mummy"},
+	{SYM_MON, S_NAGA, "S_naga"},
+	{SYM_MON, S_OGRE, "S_ogre"},
+	{SYM_MON, S_PUDDING, "S_pudding"},
+	{SYM_MON, S_QUANTMECH, "S_quantmech"},
+	{SYM_MON, S_RUSTMONST, "S_rustmonst"},
+	{SYM_MON, S_SNAKE, "S_snake"},
+	{SYM_MON, S_TROLL, "S_troll"},
+	{SYM_MON, S_UMBER, "S_umber"},
+	{SYM_MON, S_VAMPIRE, "S_vampire"},
+	{SYM_MON, S_WRAITH, "S_wraith"},
+	{SYM_MON, S_XORN, "S_xorn"},
+	{SYM_MON, S_YETI, "S_yeti"},
+	{SYM_MON, S_ZOMBIE, "S_zombie"},
+	{SYM_MON, S_HUMAN, "S_human"},
+	{SYM_MON, S_GHOST, "S_ghost"},
+	{SYM_MON, S_GOLEM, "S_golem"},
+	{SYM_MON, S_DEMON, "S_demon"},
+	{SYM_MON, S_EEL, "S_eel"},
+	{SYM_MON, S_LIZARD, "S_lizard"},
+	{SYM_MON, S_WORM_TAIL, "S_worm_tail"},
+	{SYM_MON, S_MIMIC_DEF, "S_mimic_def"},
+	{SYM_OC, WEAPON_CLASS, "S_weapon"},
+	{SYM_OC, ARMOR_CLASS, "S_armor"},
+	{SYM_OC, ARMOR_CLASS, "S_armour"},
+	{SYM_OC, RING_CLASS, "S_ring"},
+	{SYM_OC, AMULET_CLASS, "S_amulet"},
+	{SYM_OC, TOOL_CLASS, "S_tool"},
+	{SYM_OC, FOOD_CLASS, "S_food"},
+	{SYM_OC, POTION_CLASS, "S_potion"},
+	{SYM_OC, SCROLL_CLASS, "S_scroll"},
+	{SYM_OC, SPBOOK_CLASS, "S_book"},
+	{SYM_OC, WAND_CLASS, "S_wand"},
+	{SYM_OC, COIN_CLASS, "S_coin"},
+	{SYM_OC, GEM_CLASS, "S_gem"},
+	{SYM_OC, ROCK_CLASS,"S_rock"},
+	{SYM_OC, BALL_CLASS, "S_ball"},
+	{SYM_OC, CHAIN_CLASS, "S_chain"},
+	{SYM_OC, VENOM_CLASS, "S_venom"},
+	{SYM_OBJ, BOULDER, "S_boulder"},
+	{0,0,(const char *)0}	/* fence post */
+};
+#endif /*ASCIIGRAPH*/
+
+/* OBSOLETE */
+#if 0
+STATIC_OVL void
+graphics_opts(opts, optype, maxlen, offset)
+register char *opts;
+const char *optype;
+int maxlen, offset;
+{
+	uchar translate[MAXPCHARS+1];
+	int length, i;
+
+	if (!(opts = string_for_env_opt(optype, opts, FALSE)))
+		return;
+	escapes(opts, opts);
+
+	length = strlen(opts);
+	if (length > maxlen) length = maxlen;
+	/* match the form obtained from PC configuration files */
+	for (i = 0; i < length; i++)
+		translate[i] = (uchar) opts[i];
+	assign_graphics(translate, length, maxlen, offset);
+}
+#endif
 /*drawing.c*/
+

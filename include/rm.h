@@ -223,17 +223,49 @@ struct symdef {
 #endif
 };
 
+struct symparse {
+	unsigned range;
+#define SYM_CONTROL	1	/* start/finish markers */
+#define SYM_PCHAR	2	/* index into showsyms  */
+#define SYM_MON		3	/* index into monsyms   */
+#define SYM_OC		4	/* index into oc_syms   */
+#define SYM_OBJ		5	/* index into objects   */
+	int idx;
+	const char *name;
+};
+
+/* general linked list of text pointers */
+struct textlist {
+	char *text;		/* the text       */
+	int idx;		/* an index value */
+	struct textlist *next;	/* next in list   */
+};
+
+#ifdef REINCARNATION
+#define ROGUEHANDLING(H) ((Is_rogue_level(&u.uz) && roguehandling && \
+			   !strcmpi(roguehandling,H)))
+#define SYMHANDLING(H)	(ROGUEHANDLING(H) || \
+			 (!Is_rogue_level(&u.uz) && symhandling && \
+			  !strcmpi(symhandling,H)))
+#else
+#define SYMHANDLING(H)	(symhandling && !strcmpi(symhandling,H))
+#endif
+
 extern const struct symdef defsyms[MAXPCHARS];	/* defaults */
 extern uchar showsyms[MAXPCHARS];
 extern const struct symdef def_warnsyms[WARNCOUNT];
+extern char *symset, *symhandling;		/* from drawing.c */
+extern char *roguesymset, *roguehandling;	/* from drawing.c */
 
 /*
  * Graphics sets for display symbols
  */
-#define ASCII_GRAPHICS	0	/* regular characters: '-', '+', &c */
+#define DEFAULT_GRAPHICS 0	/* regular characters: '-', '+', &c */
+#if 0
 #define IBM_GRAPHICS	1	/* PC graphic characters */
 #define DEC_GRAPHICS	2	/* VT100 line drawing characters */
 #define MAC_GRAPHICS	3	/* Macintosh drawing characters */
+#endif
 
 /*
  * The 5 possible states of doors

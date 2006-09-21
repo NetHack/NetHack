@@ -268,13 +268,22 @@ char *argv[];
 			break;
 		case 'I':
 		case 'i':
-			if (!strncmpi(argv[0]+1, "IBM", 3))
-				switch_graphics(IBM_GRAPHICS);
+			if (!strncmpi(argv[0]+1, "IBM", 3)) {
+#ifdef ASCIIGRAPH
+				load_symset("IBMGraphics", FALSE);
+				load_symset("IBMGraphics", TRUE);
+				switch_graphics(TRUE);
+#endif
+			}
 			break;
 	    /*  case 'D': */
 		case 'd':
-			if (!strncmpi(argv[0]+1, "DEC", 3))
-				switch_graphics(DEC_GRAPHICS);
+			if (!strncmpi(argv[0]+1, "DEC", 3)) {
+#ifdef ASCIIGRAPH
+				load_symset("DECGraphics", FALSE);
+				switch_graphics(TRUE);
+#endif
+			}
 			break;
 		case 'p': /* profession (role) */
 			if (argv[0][2]) {

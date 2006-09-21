@@ -109,6 +109,12 @@ struct objclass {
 	unsigned short	oc_nutrition;	/* food value */
 };
 
+struct class_sym {
+	char sym;
+	char *name;
+	char *explain;
+};
+
 struct objdescr {
 	const char *oc_name;		/* actual name */
 	const char *oc_descr;		/* description when name unknown */
@@ -149,7 +155,7 @@ extern NEARDATA struct objdescr obj_descr[];
 #define MON_EXPLODE	(MAXOCLASSES+2) /* Exploding monster (e.g. gas spore) */
 
 #if 0	/* moved to decl.h so that makedefs.c won't see them */
-extern const char def_oc_syms[MAXOCLASSES];	/* default class symbols */
+extern const struct class_sym def_oc_syms[MAXOCLASSES];	/* default class symbols */
 extern uchar oc_syms[MAXOCLASSES];		/* current class symbols */
 #endif
 

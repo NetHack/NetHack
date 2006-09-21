@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)options.c	3.5	2006/09/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,6 +18,7 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 #include <ctype.h>
 #endif
 
+#define BACKWARD_COMPAT
 #define WINTYPELEN 16
 
 #ifdef DEFAULT_WC_TILED_MAP
@@ -86,11 +87,6 @@ static struct Bool_Opt
 	{"color",	  &iflags.wc_color, FALSE, SET_IN_GAME},	/*WC*/
 # endif
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},
-#if defined(TERMLIB) && !defined(MAC_GRAPHICS_ENV)
-	{"DECgraphics", &iflags.DECgraphics, FALSE, SET_IN_GAME},
-#else
-	{"DECgraphics", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_GAME},	/*WC*/
 #ifdef TTY_GRAPHICS
 	{"extmenu", &iflags.extmenu, FALSE, SET_IN_GAME},
@@ -112,11 +108,6 @@ static struct Bool_Opt
 	{"fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE},
 	{"help", &flags.help, TRUE, SET_IN_GAME},
 	{"hilite_pet",    &iflags.wc_hilite_pet, FALSE, SET_IN_GAME},	/*WC*/
-#ifdef ASCIIGRAPH
-	{"IBMgraphics", &iflags.IBMgraphics, FALSE, SET_IN_GAME},
-#else
-	{"IBMgraphics", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 #ifndef MAC
 	{"ignintr", &flags.ignintr, FALSE, SET_IN_GAME},
 #else
@@ -126,11 +117,6 @@ static struct Bool_Opt
 	{"legacy", &flags.legacy, TRUE, DISP_IN_GAME},
 	{"lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME},
 	{"lootabc", &flags.lootabc, FALSE, SET_IN_GAME},
-#ifdef MAC_GRAPHICS_ENV
-	{"Macgraphics", &iflags.MACgraphics, TRUE, SET_IN_GAME},
-#else
-	{"Macgraphics", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 #ifdef MAIL
 	{"mail", &flags.biff, TRUE, SET_IN_GAME},
 #else
@@ -245,8 +231,10 @@ static struct Comp_Opt
 	{ "align_message", "message window alignment", 20, DISP_IN_GAME }, /*WC*/
 	{ "align_status", "status window alignment", 20, DISP_IN_GAME },   /*WC*/
 	{ "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
-	{ "boulder",  "the symbol to use for displaying boulders",
-						1, SET_IN_GAME },
+#ifdef BACKWARD_COMPAT
+	{ "boulder",  "deprecated (use S_boulder in sym file instead)",
+						1, SET_IN_FILE },
+#endif
 	{ "catname",  "the name of your (first) cat (e.g., catname:Tabby)",
 						PL_PSIZ, DISP_IN_GAME },
 	{ "disclose", "the kinds of information to disclose at end of game",
@@ -345,6 +333,13 @@ static struct Comp_Opt
 #ifdef MSDOS
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
+	{ "symset", "load a set of display symbols from the symbols file", 70, SET_IN_GAME },
+	{ "roguesymset", "load a set of rogue display symbols from the roguesym file", 70,
+#ifdef REINCARNATION
+				 SET_IN_GAME },
+#else
+				 SET_IN_FILE },
+#endif
 	{ "suppress_alert", "suppress alerts about version-specific features",
 						8, SET_IN_GAME },
 	{ "tile_width", "width of tiles", 20, DISP_IN_GAME},	/*WC*/
@@ -368,6 +363,13 @@ static struct Comp_Opt
 	{ "windowcolors",  "the foreground/background colors of windows",	/*WC*/
 						80, DISP_IN_GAME },
 	{ "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
+#ifdef BACKWARD_COMPAT
+	{"DECgraphics", "deprecated", 70, SET_IN_FILE},
+	{"IBMgraphics", "deprecated", 70, SET_IN_FILE},
+# ifdef MAC_GRAPHICS_ENV
+	{"Macgraphics", "deprecated", 70, SET_IN_FILE},
+# endif
+#endif
 	{ (char *)0, (char *)0, 0, 0 }
 };
 
@@ -580,15 +582,12 @@ initoptions()
 	flags.initgend = -1;
 	flags.initalign = -1;
 
-	/* Set the default monster and object class symbols.  Don't use */
-	/* memcpy() --- sizeof char != sizeof uchar on some machines.	*/
-	for (i = 0; i < MAXOCLASSES; i++)
-		oc_syms[i] = (uchar) def_oc_syms[i];
-	for (i = 0; i < MAXMCLASSES; i++)
-		monsyms[i] = (uchar) def_monsyms[i];
+	/* Set the default monster and object class symbols. */
+	init_symbols();
 	for (i = 0; i < WARNCOUNT; i++)
 		warnsyms[i] = def_warnsyms[i].sym;
 	iflags.bouldersym = 0;
+
 	iflags.travelcc.x = iflags.travelcc.y = -1;
 
      /* assert( sizeof flags.inv_order == sizeof def_inv_order ); */
@@ -599,7 +598,7 @@ initoptions()
 
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
 		flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
-	switch_graphics(ASCII_GRAPHICS);	/* set default characters */
+	switch_graphics(DEFAULT_GRAPHICS);	/* set default characters */
 #if defined(UNIX) && defined(TTY_GRAPHICS)
 	/*
 	 * Set defaults for some options depending on what we can
@@ -610,7 +609,13 @@ initoptions()
 	 */
 	/* this detects the IBM-compatible console on most 386 boxes */
 	if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
-		switch_graphics(IBM_GRAPHICS);
+#ifdef ASCIIGRAPH
+		if (!symset) load_symset("IBMGraphics", FALSE);
+
+		if (!roguesymset) load_symset("IBMGraphics", TRUE);
+
+		switch_graphics(TRUE);
+#endif
 # ifdef TEXTCOLOR
 		iflags.use_color = TRUE;
 # endif
@@ -622,13 +627,20 @@ initoptions()
 	if ((opts = nh_getenv("TERM")) &&
 	    !strncmpi(opts, "vt", 2) && AS && AE &&
 	    index(AS, '\016') && index(AE, '\017')) {
-		switch_graphics(DEC_GRAPHICS);
+#  ifdef ASCIIGRAPH
+		if (!symset) load_symset("DECGraphics", FALSE);
+
+
+
+		switch_graphics(TRUE);
+#  endif /*ASCIIGRAPH*/
 	}
 # endif
 #endif /* UNIX || VMS */
 
 #ifdef MAC_GRAPHICS_ENV
-	switch_graphics(MAC_GRAPHICS);
+	if (!symset) load_symset("MACGraphics", FALSE);
+	switch_graphics(TRUE);
 #endif /* MAC_GRAPHICS_ENV */
 	flags.menu_style = MENU_FULL;
 
@@ -864,27 +876,6 @@ char *op;
 
     Strcpy(flags.inv_order, buf);
     return 1;
-}
-
-STATIC_OVL void
-graphics_opts(opts, optype, maxlen, offset)
-register char *opts;
-const char *optype;
-int maxlen, offset;
-{
-	uchar translate[MAXPCHARS+1];
-	int length, i;
-
-	if (!(opts = string_for_env_opt(optype, opts, FALSE)))
-		return;
-	escapes(opts, opts);
-
-	length = strlen(opts);
-	if (length > maxlen) length = maxlen;
-	/* match the form obtained from PC configuration files */
-	for (i = 0; i < length; i++)
-		translate[i] = (uchar) opts[i];
-	assign_graphics(translate, length, maxlen, offset);
 }
 
 STATIC_OVL void
@@ -1305,6 +1296,49 @@ boolean tinitial, tfrom_file;
 		return;
 	}
 
+	fullname = "roguesymset";
+	if (match_optname(opts, fullname, 7, TRUE)) {
+#if defined(REINCARNATION) && defined(ASCIIGRAPH)
+		if (duplicate) complain_about_duplicate(opts,1);
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_opt(opts, FALSE)) != 0) {
+		    roguesymset = (char *)alloc(strlen(op) + 1);
+		    Strcpy(roguesymset, op);
+		    if (!read_sym_file(TRUE)) {
+			badoption(opts);
+			free((char *)roguesymset);
+			roguesymset = (char *)0;
+		    } else {
+			if (!initial && Is_rogue_level(&u.uz))
+				assign_rogue_graphics(TRUE);
+				need_redraw = TRUE;
+		    }
+		}
+#endif
+		return;
+	}
+
+	fullname = "symset";
+	if (match_optname(opts, fullname, 6, TRUE)) {
+#ifdef ASCIIGRAPH
+		if (duplicate) complain_about_duplicate(opts,1);
+		if (negated) bad_negation(fullname, FALSE);
+		else if ((op = string_for_opt(opts, FALSE)) != 0) {
+		    symset = (char *)alloc(strlen(op) + 1);
+		    Strcpy(symset, op);
+		    if (!read_sym_file(FALSE)) {
+			badoption(opts);
+			free((char *)symset);
+			symset = (char *)0;
+		    } else {
+		    	switch_graphics(TRUE);
+			need_redraw = TRUE;
+		    }
+		}
+#endif
+		return;
+	}
+
 	fullname = "runmode";
 	if (match_optname(opts, fullname, 4, TRUE)) {
 		if (duplicate) complain_about_duplicate(opts,1);
@@ -1566,93 +1600,6 @@ goodfruit:
 		 */
 		return;
 	}
-
-	/* graphics:string */
-	fullname = "graphics";
-	if (match_optname(opts, fullname, 2, TRUE)) {
-		if (duplicate) complain_about_duplicate(opts,1);
-		if (negated) bad_negation(fullname, FALSE);
-		else graphics_opts(opts, fullname, MAXPCHARS, 0);
-		return;
-	}
-	fullname = "dungeon";
-	if (match_optname(opts, fullname, 2, TRUE)) {
-		if (duplicate) complain_about_duplicate(opts,1);
-		if (negated) bad_negation(fullname, FALSE);
-		else graphics_opts(opts, fullname, MAXDCHARS, 0);
-		return;
-	}
-	fullname = "traps";
-	if (match_optname(opts, fullname, 2, TRUE)) {
-		if (duplicate) complain_about_duplicate(opts,1);
-		if (negated) bad_negation(fullname, FALSE);
-		else graphics_opts(opts, fullname, MAXTCHARS, MAXDCHARS);
-		return;
-	}
-	fullname = "effects";
-	if (match_optname(opts, fullname, 2, TRUE)) {
-		if (duplicate) complain_about_duplicate(opts,1);
-		if (negated) bad_negation(fullname, FALSE);
-		else
-		 graphics_opts(opts, fullname, MAXECHARS, MAXDCHARS+MAXTCHARS);
-		return;
-	}
-
-	/* objects:string */
-	fullname = "objects";
-	if (match_optname(opts, fullname, 7, TRUE)) {
-		int length;
-
-		if (duplicate) complain_about_duplicate(opts,1);
-		if (negated) {
-		    bad_negation(fullname, FALSE);
-		    return;
-		}
-		if (!(opts = string_for_env_opt(fullname, opts, FALSE)))
-			return;
-		escapes(opts, opts);
-
-		/*
-		 * Override the default object class symbols.  The first
-		 * object in the object class is the "random object".  I
-		 * don't want to use 0 as an object class, so the "random
-		 * object" is basically a place holder.
-		 *
-		 * The object class symbols have already been initialized in
-		 * initoptions().
-		 */
-		length = strlen(opts);
-		if (length >= MAXOCLASSES)
-		    length = MAXOCLASSES-1;	/* don't count RANDOM_OBJECT */
-
-		for (i = 0; i < length; i++)
-		    oc_syms[i+1] = (uchar) opts[i];
-		return;
-	}
-
-	/* monsters:string */
-	fullname = "monsters";
-	if (match_optname(opts, fullname, 8, TRUE)) {
-		int length;
-
-		if (duplicate) complain_about_duplicate(opts,1);
-		if (negated) {
-		    bad_negation(fullname, FALSE);
-		    return;
-		}
-		if (!(opts = string_for_env_opt(fullname, opts, FALSE)))
-			return;
-		escapes(opts, opts);
-
-		/* Override default mon class symbols set in initoptions(). */
-		length = strlen(opts);
-		if (length >= MAXMCLASSES)
-		    length = MAXMCLASSES-1;	/* mon class 0 unused */
-
-		for (i = 0; i < length; i++)
-		    monsyms[i+1] = (uchar) opts[i];
-		return;
-	}
 	fullname = "warnings";
 	if (match_optname(opts, fullname, 5, TRUE)) {
 		if (duplicate) complain_about_duplicate(opts,1);
@@ -1660,6 +1607,7 @@ goodfruit:
 		else warning_opts(opts, fullname);
 		return;
 	}
+#ifdef BACKWARD_COMPAT
 	/* boulder:symbol */
 	fullname = "boulder";
 	if (match_optname(opts, fullname, 7, TRUE)) {
@@ -1692,6 +1640,7 @@ goodfruit:
 		if (!initial) need_redraw = TRUE;
 		return;
 	}
+#endif
 
 	/* name:string */
 	fullname = "name";
@@ -2301,7 +2250,7 @@ goodfruit:
 			isbad = TRUE;
 		    else	/* reject default object class symbols */
 			for (j = 1; j < MAXOCLASSES; j++)
-			    if (c == def_oc_syms[i]) {
+			    if (c == def_oc_syms[i].sym) {
 				isbad = TRUE;
 				break;
 			    }
@@ -2332,19 +2281,101 @@ goodfruit:
 		return;
 	}
 #endif
+
+#ifdef ASCIIGRAPH
+# if defined(BACKWARD_COMPAT)
+	fullname = "DECgraphics";
+	if (match_optname(opts, fullname, 10, TRUE)) {
+		boolean badflag = FALSE;
+		if (duplicate) complain_about_duplicate(opts,1);
+		if (!negated) {
+		    if (symset) badflag = TRUE;
+		    else {
+			symset = (char *)alloc(strlen(fullname) + 1);
+			Strcpy(symset, fullname);
+			if (!read_sym_file(FALSE)) {
+				badflag = TRUE;
+				free((char *)symset);
+				symset = (char *)0;
+		        } else switch_graphics(TRUE);
+		    }
+		    if (badflag) {
+		    	pline("Failure to load symbol set %s.",
+		    		fullname);
+			wait_synch();
+		    }
+		}
+		return;
+	}
+	fullname = "IBMgraphics";
+	if (match_optname(opts, fullname, 10, TRUE)) {
+		boolean badflag = FALSE;
+		if (duplicate) complain_about_duplicate(opts,1);
+		if (!negated) {
+		    if (symset) badflag = TRUE;
+		    else {
+			symset = (char *)alloc(strlen(fullname) + 1);
+			Strcpy(symset, fullname);
+			if (!read_sym_file(FALSE)) {
+				badflag = TRUE;
+				free((char *)symset);
+				symset = (char *)0;
+		        } else switch_graphics(TRUE);
+		    }
+#ifdef REINCARNATION
+		    if (roguesymset) badflag = TRUE;
+		    else {
+			roguesymset = (char *)alloc(strlen(fullname) + 1);
+			Strcpy(roguesymset, fullname);
+			if (!read_sym_file(TRUE)) {
+				badflag = TRUE;
+				free((char *)roguesymset);
+				roguesymset = (char *)0;
+		        }
+			if (!initial && Is_rogue_level(&u.uz))
+				assign_rogue_graphics(TRUE);
+		    }
+#endif
+		    if (badflag) {
+		    	pline("Failure to load symbol set %s.",
+		    		fullname);
+			wait_synch();
+		    }
+		}
+		return;
+	}
+#  ifdef MAC_GRAPHICS_ENV
+	fullname = "MACgraphics";
+	if (match_optname(opts, fullname, 11, TRUE)) {
+		boolean badflag = FALSE;
+		if (duplicate) complain_about_duplicate(opts,1);
+		if (!negated) {
+		    if (symset) badflag = TRUE;
+		    else {
+			symset = (char *)alloc(strlen(fullname) + 1);
+			Strcpy(symset, fullname);
+			if (!read_sym_file(FALSE)) {
+				badflag = TRUE;
+				free((char *)symset);
+				symset = (char *)0;
+		        } else switch_graphics(TRUE);
+		    }
+		    if (badflag) {
+		    	pline("Failure to load symbol set %s.",
+		    		fullname);
+			wait_synch();
+		    }
+		}
+		return;
+	}
+#  endif
+# endif
+#endif
 	/* OK, if we still haven't recognized the option, check the boolean
 	 * options list
 	 */
 	for (i = 0; boolopt[i].name; i++) {
 		if (match_optname(opts, boolopt[i].name, 3, FALSE)) {
-#if defined(TERMLIB) || defined(ASCIIGRAPH) || defined(MAC_GRAPHICS_ENV)
-			/* need to remember previous XXXgraphics setting
-			   in order to prevent explicit "noXXXgraphics" from
-			   overriding a preceding "YYYgraphics" request;
-			   noXXXgraphics will reset to ordinary ASCII only
-			   if/when XXXgraphics is currently in effect */
-			boolean old_gfx = boolopt[i].addr && *boolopt[i].addr;
-#endif
 
 			/* options that don't exist */
 			if (!boolopt[i].addr) {
@@ -2365,50 +2396,6 @@ goodfruit:
 			if (duplicate_opt_detection(boolopt[i].name, 0))
 			    complain_about_duplicate(boolopt[i].name,0);
 
-#if defined(TERMLIB) || defined(ASCIIGRAPH) || defined(MAC_GRAPHICS_ENV)
-			if (FALSE
-# ifdef TERMLIB
-				 || (boolopt[i].addr) == &iflags.DECgraphics
-# endif
-# ifdef ASCIIGRAPH
-				 || (boolopt[i].addr) == &iflags.IBMgraphics
-# endif
-# ifdef MAC_GRAPHICS_ENV
-				 || (boolopt[i].addr) == &iflags.MACgraphics
-# endif
-				) {
-# ifdef REINCARNATION
-			    if (!initial && Is_rogue_level(&u.uz))
-				assign_rogue_graphics(FALSE);
-# endif
-			    need_redraw = TRUE;
-# ifdef TERMLIB
-			    if ((boolopt[i].addr) == &iflags.DECgraphics) {
-				if (iflags.DECgraphics != old_gfx)
-				    switch_graphics(iflags.DECgraphics ?
-						DEC_GRAPHICS : ASCII_GRAPHICS);
-			    }
-# endif
-# ifdef ASCIIGRAPH
-			    if ((boolopt[i].addr) == &iflags.IBMgraphics) {
-				if (iflags.IBMgraphics != old_gfx)
-				    switch_graphics(!negated ?
-						IBM_GRAPHICS : ASCII_GRAPHICS);
-			    }
-# endif
-# ifdef MAC_GRAPHICS_ENV
-			    if ((boolopt[i].addr) == &iflags.MACgraphics) {
-				if (iflags.MACgraphics != old_gfx)
-				    switch_graphics(iflags.MACgraphics ?
-						MAC_GRAPHICS : ASCII_GRAPHICS);
-			    }
-# endif
-# ifdef REINCARNATION
-			    if (!initial && Is_rogue_level(&u.uz))
-				assign_rogue_graphics(TRUE);
-# endif
-			}
-#endif /* TERMLIB || ASCIIGRAPH || MAC_GRAPHICS_ENV */
 #ifdef RLECOMP
 			if ((boolopt[i].addr) == &iflags.rlecomp) {
 				if (*boolopt[i].addr)
@@ -2517,7 +2504,7 @@ oc_to_str(src,dest)
 	if (i < 0 || i >= MAXOCLASSES)
 	    impossible("oc_to_str:  illegal object class %d", i);
 	else
-	    *dest++ = def_oc_syms[i];
+	    *dest++ = def_oc_syms[i].sym;
     }
     *dest = '\0';
 }
@@ -2790,6 +2777,8 @@ doset()
 	    (void) doredraw();
 	return 0;
 }
+
+struct textlist *symset_list;	/* files.c will populate this wil list of available sets */
 
 STATIC_OVL boolean
 special_handling(optname, setinitial, setfromfile)
@@ -3148,6 +3137,102 @@ boolean setinitial,setfromfile;
 		if (pick_cnt >= 0) goto ape_again;
 	}
 #endif /* AUTOPICKUP_EXCEPTIONS */
+#ifdef ASCIIGRAPH
+    } else if (!strcmp("symset", optname) ||
+	       !strcmp("roguesymset", optname)) {
+	menu_item *symset_pick = (menu_item *)0;
+	boolean rogueflag = (*optname == 'r');
+	char *symset_name;
+	int chosen = -2;
+
+	/* clear symset/roguesymset as a flag to read_sym_file() to build list */
+	if (!rogueflag) {
+		symset_name = symset;
+		symset = (char *)0;
+	}
+#ifdef REINCARNATION
+	if (rogueflag) {
+		symset_name = roguesymset;
+		roguesymset = (char *)0;
+	}
+#endif
+
+	if (read_sym_file(rogueflag) && symset_list) {
+		int let = 'a';
+		struct textlist *sl;
+		tmpwin = create_nhwindow(NHW_MENU);
+		start_menu(tmpwin);
+		any.a_int = 1;
+		add_menu(tmpwin, NO_GLYPH, &any, let++, 0,
+			 ATR_NONE, "NetHack default", MENU_UNSELECTED);
+		sl = symset_list;
+		while (sl) {
+		    if (sl->text) {
+			any.a_int = sl->idx + 2;
+			add_menu(tmpwin, NO_GLYPH, &any, let, 0,
+			 ATR_NONE, sl->text, MENU_UNSELECTED);
+			sl = sl->next;
+			if (let == 'z') let = 'A';
+			else let++;
+		    }
+		}
+		end_menu(tmpwin, "Select symbol set:");
+		if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
+			chosen = symset_pick->item.a_int - 2;
+			free((genericptr_t)symset_pick);
+		}
+		destroy_nhwindow(tmpwin);
+		if (chosen > -1) {
+			sl = symset_list;
+			while (sl) {
+			    if (sl->idx == chosen) {
+				if (symset_name)
+					free((genericptr_t)symset_name);
+				symset_name = (char *)alloc(strlen(sl->text)+1);
+				Strcpy(symset_name, sl->text);
+			    }
+			    sl = sl->next;
+			}
+		}
+		/* clean up */
+		while (symset_list) {
+			sl = symset_list;
+			if (sl->text) free((genericptr_t)sl->text);
+			symset_list = sl->next;
+			free((genericptr_t)sl);
+		}
+		symset_list = (struct textlist *)0;
+	}
+	if(!rogueflag) {
+	    init_l_symbols();
+	    if (chosen >= 0) {
+		symset = symset_name;
+	    	if (!read_sym_file(FALSE)) {
+			free((genericptr_t)symset);
+			symset = (char *)0;
+		}
+	    }
+	}
+# ifdef REINCARNATION
+	if (rogueflag) {
+	    init_r_symbols();
+	    if (chosen >= 0) {
+		roguesymset = symset_name;
+	    	if (!read_sym_file(TRUE)) {
+			free((genericptr_t)roguesymset);
+			roguesymset = (char *)0;
+		}
+	    }
+	}
+	if (Is_rogue_level(&u.uz))
+		assign_rogue_graphics(TRUE);
+	else
+		assign_rogue_graphics(FALSE);
+#else
+	switch_graphics(TRUE);
+# endif
+	need_redraw = TRUE;
+#endif /*ASCIIGRAPH*/
     } else {
 	/* didn't match any of the special options */
 	return FALSE;
@@ -3192,9 +3277,11 @@ char *buf;
 		Sprintf(buf, "%s", iflags.altkeyhandler[0] ?
 			iflags.altkeyhandler : "default");
 #endif
+#ifdef BACKWARD_COMPAT
 	else if (!strcmp(optname, "boulder"))
 		Sprintf(buf, "%c", iflags.bouldersym ?
 			iflags.bouldersym : oc_syms[(int)objects[BOULDER].oc_class]);
+#endif
 	else if (!strcmp(optname, "catname"))
 		Sprintf(buf, "%s", catname[0] ? catname : none );
 	else if (!strcmp(optname, "disclose")) {
@@ -3343,6 +3430,10 @@ char *buf;
 	     }
 	else if (!strcmp(optname, "race"))
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
+#ifdef REINCARNATION
+	else if (!strcmp(optname, "roguesymset"))
+		Sprintf(buf, "%s", roguesymset ? roguesymset : "default");
+#endif
 	else if (!strcmp(optname, "role"))
 		Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
 	else if (!strcmp(optname, "runmode"))
@@ -3374,6 +3465,8 @@ char *buf;
 			FEATURE_NOTICE_VER_MIN,
 			FEATURE_NOTICE_VER_PATCH);
 	}
+	else if (!strcmp(optname, "symset"))
+		Sprintf(buf, "%s", symset ? symset : "default");
 	else if (!strcmp(optname, "tile_file"))
 		Sprintf(buf, "%s", iflags.wc_tile_file ? iflags.wc_tile_file : defopt);
 	else if (!strcmp(optname, "tile_height")) {
@@ -3548,6 +3641,110 @@ free_autopickup_exceptions()
 	}
 }
 #endif /* AUTOPICKUP_EXCEPTIONS */
+#ifdef ASCIIGRAPH
+/* bundle some common usage into one easy-to-use routine */
+int
+load_symset(s, rogueflag)
+const char *s;
+boolean rogueflag;
+{
+#ifdef REINCARNATION
+	if (rogueflag) {
+		if (roguesymset) free((genericptr_t)roguesymset);
+		roguesymset = (char *)alloc(strlen(s)+1);
+		Strcpy(roguesymset,s);
+		if (read_sym_file(TRUE))
+			switch_graphics(TRUE);
+		else {
+			free((genericptr_t)roguesymset);
+			roguesymset = (char *)0;
+			return 0;
+		}
+	}
+#endif
+	if (!rogueflag) {
+		if (symset) free((genericptr_t)symset);
+		symset = (char *)alloc(strlen(s)+1);
+		Strcpy(symset,s);
+		if (read_sym_file(FALSE))
+			switch_graphics(TRUE);
+		else {
+			free((genericptr_t)symset);
+			symset = (char *)0;
+			return 0;
+		}
+	}
+	return 1;
+}
+
+/* Parse the value of a SYMBOLS line from a config file */
+void
+parsesymbols(opts)
+register char *opts;
+{
+	int val;
+	char *op, *symname, *strval, *p;
+	struct symparse *symp;
+
+	if ((op = index(opts, ',')) != 0) {
+		*op++ = 0;
+		parsesymbols(op);
+	}
+
+	/* S_sample:string */
+	symname = opts;
+	strval = index(opts, ':');
+	if (!symname || !strval) return;
+	*strval++ = 0;
+
+	/* strip leading and trailing white space from symname */
+	while (isspace(*symname)) symname++;
+	p = eos(symname);
+	while (--p >= symname && isspace(*p)) *p = '\0';
+
+	/* strip leading and trailing white space from strval */
+	while (isspace(*strval)) strval++;
+	p = eos(strval);
+	while (--p >= strval && isspace(*p)) *p = '\0';
+
+	symp = match_sym(symname);
+	if (!symp) return;
+
+	if (symp->range && symp->range != SYM_CONTROL) {
+		val = sym_val(strval);
+		update_l_symset(symp, val);
+	}
+}
+
+struct symparse *
+match_sym(buf)
+char *buf;
+{
+	size_t len = strlen(buf);
+	const char *p = index(buf, ':'),
+		   *q = index(buf, '=');
+	struct symparse *sp = loadsyms;
+
+	if (!p || (q && q < p)) p = q;
+	while(p && p > buf && isspace(*(p-1))) p--;
+	if (p) len = (int)(p - buf);
+	while(sp->range) {
+	    if ((len >= strlen(sp->name)) && !strncmpi(buf, sp->name, len))
+		return sp;
+	    sp++;
+	}
+	return (struct symparse *)0;
+}
+
+int sym_val(strval)
+char *strval;
+{
+	char buf[QBUFSZ];
+	buf[0] = '\0';
+	escapes(strval, buf);
+	return (int)*buf;
+}
+#endif
 
 /* data for option_help() */
 static const char *opt_intro[] = {
@@ -3792,12 +3989,12 @@ char *class_select;
 	selected = FALSE;
 	switch (category) {
 		case 0:
-			text = monexplain[def_char_to_monclass(*class_list)];
+			text = def_monsyms[def_char_to_monclass(*class_list)].explain;
 			accelerator = *class_list;
 			Sprintf(buf, "%s", text);
 			break;
 		case 1:
-			text = objexplain[def_char_to_objclass(*class_list)];
+			text = def_oc_syms[def_char_to_objclass(*class_list)].explain;
 			accelerator = next_accelerator;
 			Sprintf(buf, "%c  %s", *class_list, text);
 			break;

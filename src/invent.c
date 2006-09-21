@@ -806,7 +806,7 @@ register const char *let,*word;
 
 	if(allownone) *bp++ = '-';
 #ifndef GOLDOBJ
-	if(allowgold) *bp++ = def_oc_syms[COIN_CLASS];
+	if(allowgold) *bp++ = def_oc_syms[COIN_CLASS].sym;
 #endif
 	if(bp > buf && bp[-1] == '-') *bp++ = ' ';
 	ap = altlets;
@@ -981,7 +981,7 @@ register const char *let,*word;
 		if(ilet == '-') {
 			return(allownone ? &zeroobj : (struct obj *) 0);
 		}
-		if(ilet == def_oc_syms[COIN_CLASS]) {
+		if(ilet == def_oc_syms[COIN_CLASS].sym) {
 			if (!usegold) {
 			    You("cannot %s gold.", word);
 			    return(struct obj *)0;
@@ -1035,7 +1035,7 @@ register const char *let,*word;
 		     * counts for other things since the throw code will
 		     * split off a single item anyway */
 #ifdef GOLDOBJ
-		    if (ilet != def_oc_syms[COIN_CLASS])
+		    if (ilet != def_oc_syms[COIN_CLASS].sym)
 #endif
 			allowcnt = 1;
 		    if(cnt == 0 && prezero) return((struct obj *)0);
@@ -2101,8 +2101,8 @@ dotypeinv()
 	    if (!billx) *extra_types++ = 'x';
 	    *extra_types = '\0';	/* for index() */
 	    for (i = 0; i < MAXOCLASSES; i++)
-		if (!index(types, def_oc_syms[i])) {
-		    *extra_types++ = def_oc_syms[i];
+		if (!index(types, def_oc_syms[i].sym)) {
+		    *extra_types++ = def_oc_syms[i].sym;
 		    *extra_types = '\0';
 		}
 

@@ -16,8 +16,8 @@ Tourist.des     Valkyrie.des    Wizard.des      bigroom.des     castle.des
 cmdhelp         data.base       dungeon.def     endgame.des     gehennom.des
 help            hh              history         knox.des        license
 medusa.des      mines.des       opthelp         oracle.des      oracles.txt
-quest.txt       rumors.fal      rumors.tru      sokoban.des     tower.des
-wizhelp         yendor.des
+quest.txt       roguesym        rumors.fal      rumors.tru      sokoban.des
+symbols         tower.des       wizhelp         yendor.des
 
 doc:
 (files for all versions)

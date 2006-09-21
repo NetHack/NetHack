@@ -185,6 +185,11 @@ STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
 STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
 int FDECL(parse_config_line, (FILE *,char *,char *,char *));
+#ifdef ASCIIGRAPH
+STATIC_DCL FILE *NDECL(fopen_sym_file);
+STATIC_DCL void FDECL(free_symhandling, (BOOLEAN_P));
+STATIC_DCL void FDECL(set_symhandling, (char *,BOOLEAN_P));
+#endif
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
@@ -2047,35 +2052,46 @@ char		*tmp_levels;
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
 			      1, "BOULDER");
-	} else if (match_varname(buf, "GRAPHICS", 4)) {
-	    len = get_uchars(fp, buf, bufp, translate, FALSE,
-			     MAXPCHARS, "GRAPHICS");
-	    assign_graphics(translate, len, MAXPCHARS, 0);
-	} else if (match_varname(buf, "DUNGEON", 4)) {
-	    len = get_uchars(fp, buf, bufp, translate, FALSE,
-			     MAXDCHARS, "DUNGEON");
-	    assign_graphics(translate, len, MAXDCHARS, 0);
-	} else if (match_varname(buf, "TRAPS", 4)) {
-	    len = get_uchars(fp, buf, bufp, translate, FALSE,
-			     MAXTCHARS, "TRAPS");
-	    assign_graphics(translate, len, MAXTCHARS, MAXDCHARS);
-	} else if (match_varname(buf, "EFFECTS", 4)) {
-	    len = get_uchars(fp, buf, bufp, translate, FALSE,
-			     MAXECHARS, "EFFECTS");
-	    assign_graphics(translate, len, MAXECHARS, MAXDCHARS+MAXTCHARS);
-
-	} else if (match_varname(buf, "OBJECTS", 3)) {
-	    /* oc_syms[0] is the RANDOM object, unused */
-	    (void) get_uchars(fp, buf, bufp, &(oc_syms[1]), TRUE,
-					MAXOCLASSES-1, "OBJECTS");
-	} else if (match_varname(buf, "MONSTERS", 3)) {
-	    /* monsyms[0] is unused */
-	    (void) get_uchars(fp, buf, bufp, &(monsyms[1]), TRUE,
-					MAXMCLASSES-1, "MONSTERS");
 	} else if (match_varname(buf, "WARNINGS", 5)) {
 	    (void) get_uchars(fp, buf, bufp, translate, FALSE,
 					WARNCOUNT, "WARNINGS");
 	    assign_warnings(translate);
+	} else if (match_varname(buf, "SYMBOLS", 4)) {
+#ifdef ASCIIGRAPH
+		char *op, symbuf[BUFSZ];
+		boolean morelines;
+		do {
+			morelines = FALSE;
+
+			/* strip leading and trailing white space */
+			while (isspace(*bufp)) bufp++;
+			op = eos(bufp);
+			while (--op >= bufp && isspace(*op)) *op = '\0';
+
+			/* check for line continuation (trailing '\') */
+			op = eos(bufp);
+			if (--op >= bufp && *op == '\\') {
+			    *op = '\0';
+			    morelines = TRUE;
+			    /* strip trailing space now that '\' is gone */
+			    while (--op >= bufp && isspace(*op)) *op = '\0';
+			}
+
+			/* parse here */
+			parsesymbols(bufp);
+	
+			if (morelines)
+			  do  {
+			    *symbuf = '\0';
+			    if (!fgets(symbuf, BUFSZ, fp)) {
+					morelines = FALSE;
+					break;
+			    }
+			    bufp = symbuf;
+			} while (*bufp == '#');
+		} while (morelines);
+		switch_graphics(TRUE);
+#endif /*ASCIIGRAPH*/
 #ifdef WIZARD
 	} else if (match_varname(buf, "WIZKIT", 6)) {
 	    (void) strncpy(wizkit, bufp, WIZKIT_MAX-1);
@@ -2404,6 +2420,218 @@ read_wizkit()
 }
 
 #endif /*WIZARD*/
+
+#ifdef ASCIIGRAPH
+extern struct symparse loadsyms[];	/* drawing.c */
+extern struct textlist *symset_list;	/* options.c */
+static int symset_count = 0;	 	/* for pick-list building only */
+static boolean chosen_symset_start = FALSE, chosen_symset_end = FALSE;
+
+STATIC_OVL
+FILE *
+fopen_sym_file()
+{
+	FILE *fp;
+
+	fp = fopen_datafile(SYMBOLS, "r", HACKPREFIX);
+	return fp;
+}
+
+/*
+ * Returns 1 if the chose symset was found and loaded.
+ *         0 if it wasn't found in the sym file or other problem.
+ */
+int
+read_sym_file(rogueflag)
+boolean rogueflag;
+{
+	char buf[4*BUFSZ];
+	FILE *fp;
+
+	if (!(fp = fopen_sym_file())) return 0;
+
+	symset_count = 0;
+	chosen_symset_start = chosen_symset_end = FALSE;
+	while (fgets(buf, 4*BUFSZ, fp)) {
+		if (!parse_sym_line(buf, rogueflag)) {
+			raw_printf("Bad symbol line:  \"%.50s\"", buf);
+			wait_synch();
+		}
+	}
+	(void) fclose(fp);
+	if (!chosen_symset_end && !chosen_symset_start) return 0;
+	if (!chosen_symset_end) {
+		raw_printf("Missing finish for symset \"%s\"",
+#ifdef REINCARNATION
+				rogueflag ? roguesymset :
+#endif
+				symset);
+		wait_synch();
+	}
+	return 1;
+}
+
+/* returns 0 on error */
+int
+parse_sym_line(buf, rogueflag)
+char *buf;
+boolean rogueflag;
+{
+	int val;
+	struct symparse *symp = (struct symparse *)0;
+	char *bufp, *commentp, *altp;
+	char *symsetname =
+#ifdef REINCARNATION
+			    rogueflag ? roguesymset :
+#endif
+			    symset;
+
+	if (*buf == '#')
+		return 1;
+
+	/* remove trailing comment(s) */
+	commentp = eos(buf);
+	while (--commentp > buf) {
+		if (*commentp != '#') continue;
+		*commentp = '\0';
+	}
+
+	/* remove trailing whitespace */
+	bufp = eos(buf);
+	while (--bufp > buf && isspace(*bufp))
+		continue;
+
+	if (bufp <= buf)
+		return 1;		/* skip all-blank lines */
+	else
+		*(bufp + 1) = '\0';	/* terminate line */
+
+	/* skip leading whitespace on option name */
+	while (isspace(*buf)) ++buf;
+	
+	/* find the '=' or ':' */
+	bufp = index(buf, '=');
+	altp = index(buf, ':');
+	if (!bufp || (altp && altp < bufp)) bufp = altp;
+	if (!bufp) {
+	    if (strncmpi(buf, "finish", 6) == 0) {
+		/* end current graphics set */
+		chosen_symset_start = FALSE;
+		chosen_symset_end = TRUE;
+		return 1;
+	    }
+	    return 0;
+	}
+
+	/* skip  whitespace between '=' and value */
+	do { ++bufp; } while (isspace(*bufp));
+
+	symp = match_sym(buf);
+	if (!symp)
+		return 0;
+
+	if (!symsetname) {
+	    /* A null symsetname indicates that we're just
+	       building a pick-list of possible symset
+	       values from the file, so only do that */
+	    if (symp->range == SYM_CONTROL && symp->idx == 0) {
+		struct textlist *tmpsp;
+		tmpsp = (struct textlist *)alloc(sizeof(struct textlist));
+		tmpsp->next = (struct textlist *)0;
+		if (!symset_list) {
+		    	symset_list = tmpsp;
+		    	symset_count = 0;
+		} else {
+		    	symset_count++;
+		    	tmpsp->next = symset_list;
+		    	symset_list = tmpsp;
+		}
+		tmpsp->idx = symset_count;
+		tmpsp->text = (char *)alloc(strlen(bufp)+1);
+		Strcpy(tmpsp->text, bufp);
+	    }
+	    return 1;
+	}
+	if (symp->range) {
+	    if (symp->range == SYM_CONTROL) {
+		switch(symp->idx) {
+		    case 0:
+			    /* start of symset */
+			    if (!strcmpi(bufp, symsetname)) { /* desired one? */
+				chosen_symset_start = TRUE;
+#ifdef REINCARNATION
+				if (rogueflag)
+				    init_r_symbols();
+				else
+#endif
+				    init_l_symbols();
+				free_symhandling(rogueflag);
+			    }
+			    break;
+		    case 1:
+			    /* finish symset */
+			    chosen_symset_start = FALSE;
+			    chosen_symset_end = TRUE;
+			    break;
+		    case 2:
+			    /* handler type identified */
+			    if (chosen_symset_start)
+			        set_symhandling(bufp, rogueflag);
+			    break;
+		}
+	    } else {		/* !SYM_CONTROL */
+		val = sym_val(bufp);
+		if (chosen_symset_start) {
+#ifdef REINCARNATION
+			if (rogueflag)
+			    update_r_symset(symp, val);
+			else
+#endif
+			    update_l_symset(symp, val);
+		}
+	    }
+	}
+	return 1;
+}
+
+STATIC_OVL void
+free_symhandling(rogueflag)
+boolean rogueflag;
+{
+	if (rogueflag) {
+#ifdef REINCARNATION
+		if (roguehandling) {
+			free((genericptr_t)roguehandling);
+			roguehandling = (char *)0;
+		}
+#endif
+	} else {
+		if (symhandling) {
+			free((genericptr_t)symhandling);
+			symhandling = (char *)0;
+		}
+	}
+}
+
+STATIC_OVL void
+set_symhandling(handling, rogueflag)
+char *handling;
+boolean rogueflag;
+{
+	char *new_handling;
+
+	free_symhandling(rogueflag);
+	if (!handling) return;
+	new_handling = (char *)alloc(strlen(handling)+1);
+	Strcpy(new_handling, handling);
+#ifdef REINCARNATION
+	if (rogueflag)
+		roguehandling = new_handling;
+#endif
+	if (!rogueflag)
+		symhandling = new_handling;
+}
+#endif /*ASCIIGRAPH*/
 
 /* ----------  END CONFIG FILE HANDLING ----------- */
 

@@ -299,7 +299,25 @@ char *argv[];
 #endif
 
 #ifdef MSDOS
+	/* We do this early for MSDOS because there are several
+	 * display/tile related options that affect init_nhwindows()
+	 */
 	process_options(argc, argv);
+#endif
+
+#if defined(MSDOS) || defined(WIN32)
+	/* Player didn't specify any symbol set so use IBM defaults */
+	if (!symset) {
+		load_symset("IBMGraphics_2", FALSE);
+	}
+# ifdef REINCARNATION
+	if (!roguesymset) {
+		load_symset("IBMepyx", TRUE);
+	}
+# endif
+#endif
+
+#ifdef MSDOS
 	init_nhwindows(&argc,argv);
 #else
 	init_nhwindows(&argc,argv);
@@ -529,13 +547,22 @@ char *argv[];
 #ifndef AMIGA
 		case 'I':
 		case 'i':
-			if (!strncmpi(argv[0]+1, "IBM", 3))
-				switch_graphics(IBM_GRAPHICS);
+			if (!strncmpi(argv[0]+1, "IBM", 3)) {
+# ifdef ASCIIGRAPH
+				load_symset("IBMGraphics", FALSE);
+				load_symset("IBMGraphics", TRUE);
+				switch_graphics(TRUE);
+# endif
+			}
 			break;
 	    /*	case 'D': */
 		case 'd':
-			if (!strncmpi(argv[0]+1, "DEC", 3))
-				switch_graphics(DEC_GRAPHICS);
+			if (!strncmpi(argv[0]+1, "DEC", 3)) {
+# ifdef ASCIIGRAPH
+				load_symset("DECGraphics", FALSE);
+				switch_graphics(TRUE);
+# endif
+			}
 			break;
 #endif
 		case 'g':

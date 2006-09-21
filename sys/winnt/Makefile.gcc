@@ -505,6 +505,7 @@ else
 	$(subst /,\,copy $(DAT)/*.lev         $(GAMEDIR))
 	$(subst /,\,if exist $(GAMEDIR)/makefile del $(GAMEDIR)/makefile)
 endif
+	$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR))
 	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
 	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
 	$(subst /,\,copy $(NTSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)

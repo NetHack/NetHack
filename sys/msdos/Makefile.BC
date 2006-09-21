@@ -949,6 +949,7 @@ install.tag: 	$(DAT)\data	$(DAT)\rumors	$(DAT)\dungeon \
 	if exist $(GAMEDIR)\makefile del $(GAMEDIR)\makefile
 ! ENDIF
 	copy $(SYS)\termcap       $(GAMEDIR)
+	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
 	if exist $(DOC)\guideb*.txt copy $(DOC)\guideb*.txt  $(GAMEDIR)
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt  $(GAMEDIR)\NetHack.txt
 	if exist $(DOC)\recover.txt copy $(DOC)\recover.txt  $(GAMEDIR)

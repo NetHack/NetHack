@@ -113,7 +113,7 @@ struct obj *obj;
     case P_NONE:
 	/* not a weapon: use item class name; override "food" for corpses */
 	descr = (obj->otyp == CORPSE) ? "corpse" :
-		oclass_names[(int)obj->oclass];
+		def_oc_syms[(int)obj->oclass].name;
 	break;
     case P_SLING:
 	if (is_ammo(obj))
@@ -121,7 +121,7 @@ struct obj *obj;
 		    /* avoid "rock"; what about known glass? */
 		    (obj->oclass == GEM_CLASS) ? "gem" :
 		    /* in case somebody adds odd sling ammo */
-		    oclass_names[(int)obj->oclass];
+		    def_oc_syms[(int)obj->oclass].name;
 	break;
     case P_BOW:
 	if (is_ammo(obj)) descr = "arrow";

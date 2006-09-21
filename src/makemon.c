@@ -1295,7 +1295,7 @@ rndmonst()
 		if (tooweak(mndx, minmlev) || toostrong(mndx, maxmlev))
 		    continue;
 #ifdef REINCARNATION
-		if (upper && !isupper(def_monsyms[(int)(ptr->mlet)])) continue;
+		if (upper && !isupper(def_monsyms[(int)(ptr->mlet)].sym)) continue;
 #endif
 		if (elemlevel && wrong_elem_type(ptr)) continue;
 		if (uncommon(mndx)) continue;

@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.4
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "January 15, 2005
+.ds f2 "September 20, 2006
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1662,22 +1662,11 @@ Using a configuration file
 Any line in the configuration file starting with `#' is treated as a comment.
 Any line in the configuration file starting with ``OPTIONS='' may be
 filled out with options in the same syntax as in NETHACKOPTIONS.
-Any line starting with ``DUNGEON='', ``EFFECTS='', ``MONSTERS='',
-``OBJECTS='', ``TRAPS='', or ``BOULDER=''
-is taken as defining the corresponding
-.op dungeon,
-.op effects,
-.op monsters,
-.op objects
-.op traps
-or
-.op boulder
-option in a different syntax,
-a sequence of decimal numbers giving the character position
-in the current font to be used in displaying each entry.
-A zero in any entry in such a sequence leaves the display of that
-entry unchanged; this feature is not available using the option syntax.
-Such a sequence can be continued to multiple lines by putting a `\e'
+Any line starting with ``SYMBOLS=''
+is taken as defining the corresponding symbol
+in a different syntax, a sequence of decimal numbers giving 
+the character position in the current font to be used in displaying 
+each entry. Such a sequence can be continued to multiple lines by putting a `\e'
 at the end of each line to be continued.
 .pg
 If your copy of the game included the compile time AUTOPICKUP_EXCEPTIONS
@@ -1749,13 +1738,6 @@ new players if it detects some anticipated mistakes (default on).
 .lp "confirm "
 Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).
-.lp DECgraphics
-Use a predefined selection of characters from the DEC VT-xxx/DEC
-Rainbow/ANSI line-drawing character set to display the dungeon/effects/traps
-instead of having to define a full graphics set yourself (default off).
-This option also sets up proper handling of graphics
-characters for such terminals, so you should specify it when appropriate
-even if you override the selections with your own graphics strings.
 .lp disclose
 Controls options for disclosing various information when the game ends (defaults
 to all possibilities being disclosed).
@@ -1796,66 +1778,6 @@ traps and each other as well as by you.
 .lp dogname
 Name your starting dog (ex. ``dogname:Fang'').
 Cannot be set with the `O' command.
-.lp dungeon
-Set the graphics symbols for displaying the dungeon
-(default \&``\ |--------||.-|++##.##<><>_|\e\e#{}.}..##\ #}'').
-The
-.op dungeon
-option should be followed by a string of 1-41
-characters to be used instead of the default map-drawing characters.
-The dungeon map will use the characters you specify instead of the
-default symbols, and default symbols for any you do not specify.
-Remember that you may need to escape some of these characters
-on a command line if they are special to your shell.
-
-Note that NetHack escape-processes this option string in conventional C
-fashion.  This means that `\e' is a prefix to take the following
-character literally.  Thus `\e' needs to be represented as `\e\e'.
-The special escape
-form `\em' switches on the meta bit in the following character, and the `^'
-prefix causes the following character to be treated as a control
-character.
-
-The order of the symbols is:  solid rock, vertical wall, horizontal
-wall, upper left corner, upper right corner, lower left corner, lower
-right corner, cross wall, upward T wall, downward T wall, leftward T
-wall, rightward T wall, no door, vertical open door, horizontal open
-door, vertical closed door, horizontal closed door, iron bars, tree,
-floor of a room, dark corridor, lit corridor, stairs up, stairs down,
-ladder up, ladder down, altar, grave, throne, kitchen sink, fountain, pool or moat,
-ice, lava, vertical lowered drawbridge, horizontal lowered drawbridge,
-vertical raised drawbridge, horizontal raised drawbridge, air, cloud,
-under water.
-
-You might want to use `+' for the corners and T walls for a more
-aesthetic, boxier display.  Note that in the next release, new symbols
-may be added, or the present ones rearranged.
-
-Cannot be set with the `O' command.
-.lp effects
-Set the graphics symbols for displaying special effects
-(default \&``|-\e\e/*!)(0#@*/-\e\e||\e\e-//-\e\e|\ |\e\e-/'').
-The
-.op effects
-option should be followed by a string of 1-29
-characters to be used instead of the default special-effects characters.
-This string is subjected to the same processing as the
-.op dungeon
-option.
-
-The order of the symbols is:  vertical beam, horizontal beam, left slant,
-right slant, digging beam, camera flash beam, left boomerang, right boomerang,
-four glyphs giving the sequence for magic resistance displays,
-the eight surrounding glyphs for swallowed display,
-nine glyphs for explosions.
-An explosion consists of three rows (top, middle, and bottom) of three
-characters.  The explosion is centered in the center of this 3 by 3
-array.
-
-Note that in the next release, new symbols may be added,
-or the present ones rearranged.
-
-Cannot be set with the `O' command.
 .lp extmenu
 Changes the extended commands interface to pop-up a menu of available commands.  
 It is keystroke compatible with the traditional interface except that it does
@@ -1891,13 +1813,6 @@ interesting and/or important information.
 .lp horsename
 Name your starting horse (ex. ``horsename:Trigger'').
 Cannot be set with the `O' command.
-.lp IBMgraphics
-Use a predefined selection of IBM extended ASCII characters to display the
-dungeon/effects/traps instead of having to define a full graphics set
-yourself (default off).
-This option also sets up proper handling of graphics
-characters for such terminals, so you should specify it when appropriate
-even if you override the selections with your own graphics strings.
 .lp ignintr
 Ignore interrupt signals, including breaks (default off).
 .lp legacy
@@ -1974,35 +1889,6 @@ Default '.'.
 Menu character accelerator to select all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default ','.
-.lp monsters
-Set the characters used to display monster classes (default
-``abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@\ \'&;:~]'').
-This string is subjected to the same processing as the
-.op dungeon
-option.
-The order of the symbols is
-ant or other insect, blob, cockatrice,
-dog or other canine, eye or sphere, feline,
-gremlin, humanoid, imp or minor demon,
-jelly, kobold, leprechaun,
-mimic, nymph, orc,
-piercer, quadruped, rodent,
-arachnid or centipede, trapper or lurker above, horse or unicorn,
-vortex, worm, xan or other mythical/fantastic insect,
-light, zruty,
-angelic being, bat or bird, centaur,
-dragon, elemental, fungus or mold,
-gnome, giant humanoid, invisible monster,
-jabberwock, Keystone Kop, lich,
-mummy, naga, ogre,
-pudding or ooze, quantum mechanic, rust monster,
-snake, troll, umber hulk,
-vampire, wraith, xorn,
-apelike creature, zombie,
-human, ghost, golem,
-demon, sea monster, lizard,
-long worm tail, and mimic.
-Cannot be set with the `O' command.
 .lp msghistory
 The number of top line messages to save (and recall with ^P) (default 20).
 Cannot be set with the `O' command.
@@ -2060,17 +1946,6 @@ location of the `y' and `z' keys swapped.)
 When moving by numbers, to enter a count prefix for those commands
 which accept one (such as ``12s'' to search twelve times), precede it
 with the letter `n' (``n12s'').
-.lp objects
-Set the characters used to display object classes
-(default ``])[="(%!?+/$*`0_.'').
-This string is subjected to the same processing as the
-.op dungeon
-option.
-The order of the symbols is
-illegal-object (should never be seen), weapon, armor, ring, amulet, tool,
-food, potion, scroll, spellbook, wand, gold, gem or rock, boulder or statue,
-iron ball, chain, and venom.
-Cannot be set with the `O' command.
 .lp packorder
 Specify the order to list object types in (default ``")[%?+!=/(*`0_'').
 The value of this option should be a string containing the
@@ -2129,6 +2004,9 @@ of specifying your role.  Normally only the first letter of the
 value is examined; `r' is an exception with ``Rogue'', ``Ranger'',
 and ``random'' values. If you prefix a `!' or ``no'' to the value, you can 
 exclude that role from being picked randomly.
+.lp roguesymset
+This option may be used to select one of the named symbol sets found within
+``symbols'' to alter the symbols displayed on the screen on the rogue level.
 .lp rlecomp
 When writing out a save file, perform run length compression of the map. 
 Not all ports support run length compression. It has no
@@ -2177,6 +2055,9 @@ Boldface monsters and ``\fB--More--\fP'' (default off).
 This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that 
 and prior versions (ex. ``suppress_alert:3.3.1'').
+.lp symset
+This option may be used to select one of the named symbol sets found within
+``symbols'' to alter the symbols displayed on the screen.
 .lp "time    "
 Show the elapsed game time in turns on bottom line (default off).
 .lp timed_delay
@@ -2192,24 +2073,6 @@ Put the ending display in a NetHack window instead of on stdout (default off).
 Setting this option makes the score list visible when a windowing version
 of NetHack is started without a parent window, but it no longer leaves
 the score list around after game end on a terminal or emulating window.
-.lp traps
-Set the graphics symbols for displaying traps
-(default \&``^^^^^^^^^^^^^^^^^"^^^^'').
-The
-.op traps
-option should be followed by a string of 1-22
-characters to be used instead of the default traps characters.
-This string is subjected to the same processing as the
-.op dungeon
-option.
-
-The order of the symbols is: 
-arrow trap, dart trap, falling rock trap, squeaky board, bear trap,
-land mine, rolling boulder trap, sleeping gas trap, rust trap, fire trap,
-pit, spiked pit, hole, trap door, teleportation trap, level teleporter,
-magic portal, web, statue trap, magic trap, anti-magic field, polymorph trap.
-
-Cannot be set with the `O' command.
 .lp travel
 Allow the travel command (default on).  Turning this option off will
 prevent the game from attempting unintended moves if you make inadvertent
@@ -2496,6 +2359,208 @@ in it will trigger the playing of "gong.wav".  You can have multiple
 SOUND entries in your config file.
 .pg
 .hn 2
+Modifying NetHack Symbols 
+.pg
+NetHack can load entire symbol sets from the symbol file.
+.pg
+The options that are used to select a particular symbol set from the
+symbol file are:
+.lp symset
+Set the name of the symbol set that you want to load.
+.lp roguesymset
+Set the name of the symbol set that you want to load for display
+on the rogue level.
+.pg
+You can also override one or more symbols using the SYMBOLS config
+file option. Symbols are specified as name:value pairs. Note that
+NetHack escape-processes the value string in conventional C fashion.
+This means that \ is a prefix to take the following character literally. Thus
+\ needs to be represented as \\.
+The special escape form
+\m switches on the meta bit in the symbol value, and the \^ prefix causes the
+following character to be treated as a control
+character.
+.pg
+.sd
+.TS S
+center;
+c c c.
+.\"TABLE_START
+Default	Symbol Name	Description
+	S_air	(air)
+_	S_altar	(altar)
+"	S_amulet	(amulet)
+A	S_angel	(angelic being)
+a	S_ant	(ant or other insect)
+^	S_anti_magic_trap	(anti-magic field)
+[	S_armor	(suit or piece of armor)
+[	S_armour	(suit or piece of armor)
+^	S_arrow_trap	(arrow trap)
+0	S_ball	(iron ball)
+#	S_bars	(iron bars)
+B	S_bat	(bat or bird)
+^	S_bear_trap	(bear trap)
+-	S_blcorn	(bottom left corner)
+b	S_blob	(blob)
++	S_book	(spellbook)
+)	S_boomleft	(boomerang open left)
+(	S_boomright	(boomerang open right)
+`	S_boulder	(boulder)
+-	S_brcorn	(bottom right corner)
+C	S_centaur	(centaur)
+_	S_chain	(iron chain)
+#	S_cloud	(cloud)
+c	S_cockatrice	(cockatrice)
+$	S_coin	(pile of coins)
+#	S_corr	(corridor)
+-	S_crwall	(wall)
+^	S_dart_trap	(dart trap)
+&	S_demon	(major demon)
+*	S_digbeam	(dig beam)
+>	S_dnladder	(ladder down)
+>	S_dnstair	(staircase down)
+d	S_dog	(dog or other canine)
+D	S_dragon	(dragon)
+;	S_eel	(sea monster)
+E	S_elemental	(elemental)
+/	S_explode1	(explosion top left)
+-	S_explode2	(explosion top center)
+`\e'	S_explode3	(explosion top right)
+|	S_explode4	(explosion middle left)
+	S_explode5	(explosion middle center)
+|	S_explode6	(explosion middle right)
+`\e'	S_explode7	(explosion bottom left)
+-	S_explode8	(explosion bottom center)
+/	S_explode9	(explosion bottom right)
+e	S_eye	(eye or sphere)
+^	S_falling_rock_trap	(falling rock trap)
+f	S_feline	(cat or other feline)
+^	S_fire_trap	(fire trap)
+!	S_flashbeam	(flash beam)
+%	S_food	(piece of food)
+{	S_fountain	(fountain)
+F	S_fungus	(fungus or mold)
+*	S_gem	(gem or rock)
+	S_ghost	(ghost)
+H	S_giant	(giant humanoid)
+G	S_gnome	(gnome)
+'	S_golem	(golem)
+|	S_grave	(grave)
+g	S_gremlin	(gremlin)
+-	S_hbeam	(wall)
+#	S_hcdbridge	(horizontal raised drawbridge)
++	S_hcdoor	(closed door)
+.	S_hodbridge	(horizontal lowered drawbridge)
+|	S_hodoor	(open door)
+^	S_hole	(hole)
+@	S_human	(human or elf)
+h	S_humanoid	(humanoid)
+-	S_hwall	(horizontal wall)
+.	S_ice	(ice)
+i	S_imp	(imp or minor demon)
+J	S_jabberwock	(jabberwock)
+j	S_jelly	(jelly)
+k	S_kobold	(kobold)
+K	S_kop	(Keystone Kop)
+^	S_land_mine	(land mine)
+}	S_lava	(molten lava)
+l	S_leprechaun	(leprechaun)
+^	S_level_teleporter	(level teleporter)
+L	S_lich	(lich)
+y	S_light	(light)
+#	S_litcorr	(lit corridor)
+:	S_lizard	(lizard)
+`\e'	S_lslant	(wall)
+^	S_magic_portal	(magic portal)
+^	S_magic_trap	(magic trap)
+m	S_mimic	(mimic)
+]	S_mimic_def	(mimic)
+M	S_mummy	(mummy)
+N	S_naga	(naga)
+.	S_ndoor	(doorway)
+n	S_nymph	(nymph)
+O	S_ogre	(ogre)
+o	S_orc	(orc)
+p	S_piercer	(piercer)
+^	S_pit	(pit)
+^	S_polymorph_trap	(polymorph trap)
+}	S_pool	(water)
+!	S_potion	(potion)
+P	S_pudding	(pudding or ooze)
+q	S_quadruped	(quadruped)
+Q	S_quantmech	(quantum mechanic)
+=	S_ring	(ring)
+`	S_rock	(boulder or statue)
+r	S_rodent	(rodent)
+^	S_rolling_boulder_trap	(rolling boulder trap)
+.	S_room	(floor of a room)
+/	S_rslant	(wall)
+^	S_rust_trap	(rust trap)
+R	S_rustmonst	(rust monster or disenchanter)
+?	S_scroll	(scroll)
+#	S_sink	(sink)
+^	S_sleeping_gas_trap	(sleeping gas trap)
+S	S_snake	(snake)
+s	S_spider	(arachnid or centipede)
+^	S_spiked_pit	(spiked pit)
+^	S_squeaky_board	(squeaky board)
+0	S_ss1	(magic shield 1 of 4)
+#	S_ss2	(magic shield 2 of 4)
+@	S_ss3	(magic shield 3 of 4)
+*	S_ss4	(magic shield 4 of 4)
+^	S_statue_trap	(statue trap)
+	S_stone	(dark part of a room)
+-	S_sw_bc	(swallow bottom center)
+`\e'	S_sw_bl	(swallow bottom left)
+/	S_sw_br	(swallow bottom right	)
+|	S_sw_ml	(swallow middle left)
+|	S_sw_mr	(swallow middle right)
+-	S_sw_tc	(swallow top center)
+/	S_sw_tl	(swallow top left)
+`\e'	S_sw_tr	(swallow top right)
+-	S_tdwall	(wall)
+^	S_teleportation_trap	(teleportation trap)
+\	S_throne	(opulent throne)
+-	S_tlcorn	(top left corner)
+|	S_tlwall	(wall)
+(	S_tool	(useful item (pick-axe\, key\, lamp...))
+^	S_trap_door	(trap door)
+t	S_trapper	(trapper or lurker above)
+-	S_trcorn	(top right corner)
+#	S_tree	(tree)
+T	S_troll	(troll)
+|	S_trwall	(wall)
+-	S_tuwall	(wall)
+U	S_umber	(umber hulk)
+u	S_unicorn	(unicorn or horse)
+<	S_upladder	(ladder up)
+<	S_upstair	(staircase up)
+V	S_vampire	(vampire)
+|	S_vbeam	(wall)
+#	S_vcdbridge	(vertical raised drawbridge)
++	S_vcdoor	(closed door)
+.	S_venom	(splash of venom)
+.	S_vodbridge	(vertical lowered drawbridge)
+-	S_vodoor	(open door)
+v	S_vortex	(vortex)
+|	S_vwall	(vertical wall)
+/	S_wand	(wand)
+}	S_water	(water)
+)	S_weapon	(weapon)
+"	S_web	(web)
+w	S_worm	(worm)
+~	S_worm_tail	(long worm tail)
+W	S_wraith	(wraith)
+x	S_xan	(xan or other mythical/fantastic insect)
+X	S_xorn	(xorn)
+Y	S_yeti	(apelike creature)
+Z	S_zombie	(zombie)
+z	S_zruty	(zruty)
+.\"TABLE_END  Do not delete this line.
+.TE
+.ed
+.pg
+.hn 2
 Configuring NetHack for Play by the Blind
 .pg
 NetHack can be set up to use only standard ASCII characters for making
@@ -2516,28 +2581,25 @@ overall location of items on the screen.
 .pg
 While it is not difficult for experienced users to edit the \fBdefaults.nh\fP
 file to accomplish this, novices may find this task somewhat daunting.
-Included in all official distributions of NetHack is a file called
-\fBNHAccess.nh\fP.  Replacing \fBdefaults.nh\fP with this file will cause
-the game to run in a manner accessible to the blind. After you have gained
-some experience with the game and with editing files, you may want to alter
-settings to better suit your preferences. Instructions on how to do this
-are included in the \fBNHAccess.nh\fP file itself. The most crucial settings to
-make the game accessible are:
+Included within the ``symbols'' file of all official distributions of NetHack 
+is a symset called \fBNHAccess\fP.  Selecting that symset in your
+configuration file will cause the game to run in a manner accessible 
+to the blind. After you have gained some experience with the game 
+and with editing files, you may want to alter settings via \fBSYMBOLS=\fP 
+in your configuration file to better suit your preferences. 
+The most crucial settings to make the game accessible are:
 .pg
-.lp IBMgraphics
-Disable IBMgraphics by commenting out this option.
+.lp symset:NHAccess
+Load a symbol set appropriate for use by blind players.
+.lp roguesymset:NHAccess
+Load a symbol set for the rogue level that is appropriate for 
+use by blind players.
 .lp menustyle:traditional
 This will assist in the interface to speech synthesizers.
 .lp number_pad
 A lot of speech access programs use the number-pad to review the screen.
 If this is the case, disable the number_pad option and use the traditional
 Rogue-like commands.
-.lp "Character graphics"
-Comment out all character graphics sets found near the bottom of the
-\fBdefaults.nh\fP file.  Most of these replace \fBNetHack\fP's
-default representation of the dungeon using standard ASCII characters
-with fancier characters from extended character sets, and these fancier
-characters can annoy screen-readers.
 .hn 1
 Scoring
 .pg

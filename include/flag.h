@@ -181,9 +181,15 @@ struct instance_flags {
 	boolean  zerocomp;	/* write zero-compressed save files */
 	boolean  rlecomp;	/* run-length comp of levels when writing savefile */
 	uchar	 num_pad_mode;
-	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  echo;		/* 1 to echo characters */
+#if 0
+	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  IBMgraphics;	/* use IBM extended character set */
+#ifdef MAC_GRAPHICS_ENV
+	boolean  MACgraphics;	/* use Macintosh extended character set, as
+				   as defined in the special font HackFont */
+#endif
+#endif
 	uchar	bouldersym;	/* symbol for boulder display */
 #ifdef TTY_GRAPHICS
 	char prevmsg_window;	/* type of old message window to use */

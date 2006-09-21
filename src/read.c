@@ -1612,7 +1612,7 @@ do_class_genocide()
 
 		if (strlen(buf) == 1) {
 		    if (buf[0] == ILLOBJ_SYM)
-			buf[0] = def_monsyms[S_MIMIC];
+			buf[0] = def_monsyms[S_MIMIC].sym;
 		    class = def_char_to_monclass(buf[0]);
 		} else {
 		    char buf2[BUFSZ];
@@ -1624,7 +1624,7 @@ do_class_genocide()
 		immunecnt = gonecnt = goodcnt = 0;
 		for (i = LOW_PM; i < NUMMONS; i++) {
 		    if (class == 0 &&
-			    strstri(monexplain[(int)mons[i].mlet], buf) != 0)
+			    strstri(def_monsyms[(int)mons[i].mlet].explain, buf) != 0)
 			class = mons[i].mlet;
 		    if (mons[i].mlet == class) {
 			if (!(mons[i].geno & G_GENO)) immunecnt++;
