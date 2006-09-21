@@ -183,6 +183,7 @@ dofiles:
 		-e '}' 					\
 	  	-e '$$s/.*/nodlb/p' < dat/options` ;	\
 	$(MAKE) dofiles-$${target-nodlb}
+	(cd dat ; cp symbols $(GAMEDIR) )
 	cp src/$(GAME) $(GAMEDIR)
 	cp util/recover $(GAMEDIR)
 	-rm -f $(SHELLDIR)/$(GAME)
@@ -198,6 +199,9 @@ dofiles:
 	-$(CHOWN) $(GAMEUID) $(SHELLDIR)/$(GAME)
 	$(CHGRP) $(GAMEGRP) $(SHELLDIR)/$(GAME)
 	chmod $(EXEPERM) $(SHELLDIR)/$(GAME)
+	-( cd $(GAMEDIR) ; $(CHOWN) $(GAMEUID) symbols ; \
+			$(CHGRP) $(GAMEGRP) symbols ; \
+			chmod $(FILEPERM) symbols )
 
 dofiles-dlb: check-dlb
 	( cd dat ; cp nhdat $(DATNODLB) $(GAMEDIR) )

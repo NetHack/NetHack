@@ -387,7 +387,7 @@ int nondefault;
 			(*ascgraphics_mode_callback)();
 #endif
 #ifdef TERMLIB
-	    	if (symhandling && !strcmpi(symhandling,"DEC")
+	    	if (symhandling && !strcmp(symhandling,"DEC")
 		    && decgraphics_mode_callback)
 			(*decgraphics_mode_callback)();
 #endif

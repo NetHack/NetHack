@@ -56,6 +56,7 @@
 #define TEXTCOLOR	/* Use System V r3.2 terminfo color support */
 			/* and/or ANSI color support on termcap systems */
 			/* and/or X11 color */
+#define ASCIIGRAPH	/* ASCII graphics support on terminals */
 #define POSIX_JOB_CONTROL /* use System V / Solaris 2.x / POSIX job control */
 			/* (e.g., VSUSP) */
 #define POSIX_TYPES	/* use POSIX types for system calls and termios */

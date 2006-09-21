@@ -463,7 +463,6 @@ STATIC_DCL char *FDECL(string_for_env_opt, (const char *, char *,BOOLEAN_P));
 STATIC_DCL void FDECL(bad_negation, (const char *,BOOLEAN_P));
 STATIC_DCL int FDECL(change_inv_order, (char *));
 STATIC_DCL void FDECL(oc_to_str, (char *, char *));
-STATIC_DCL void FDECL(graphics_opts, (char *,const char *,int,int));
 STATIC_DCL int FDECL(feature_alert_opts, (char *, const char *));
 STATIC_DCL const char *FDECL(get_compopt_value, (const char *, char *));
 STATIC_DCL boolean FDECL(special_handling, (const char *, BOOLEAN_P, BOOLEAN_P));
