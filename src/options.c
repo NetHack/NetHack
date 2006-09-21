@@ -610,9 +610,9 @@ initoptions()
 	/* this detects the IBM-compatible console on most 386 boxes */
 	if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
 #ifdef ASCIIGRAPH
-		if (!symset) load_symset("IBMGraphics", FALSE);
+		if (!symset) load_symset("IBMGraphics", PRIMARY);
 
-		if (!roguesymset) load_symset("RogueIBM", TRUE);
+		if (!roguesymset) load_symset("RogueIBM", ROGUESET);
 
 		switch_graphics(TRUE);
 #endif
@@ -628,7 +628,7 @@ initoptions()
 	    !strncmpi(opts, "vt", 2) && AS && AE &&
 	    index(AS, '\016') && index(AE, '\017')) {
 #  ifdef ASCIIGRAPH
-		if (!symset) load_symset("DECGraphics", FALSE);
+		if (!symset) load_symset("DECGraphics", PRIMARY);
 
 
 
@@ -639,7 +639,7 @@ initoptions()
 #endif /* UNIX || VMS */
 
 #ifdef MAC_GRAPHICS_ENV
-	if (!symset) load_symset("MACGraphics", FALSE);
+	if (!symset) load_symset("MACGraphics", PRIMARY);
 	switch_graphics(TRUE);
 #endif /* MAC_GRAPHICS_ENV */
 	flags.menu_style = MENU_FULL;

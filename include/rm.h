@@ -261,11 +261,8 @@ extern char *roguesymset, *roguehandling;	/* from drawing.c */
  * Graphics sets for display symbols
  */
 #define DEFAULT_GRAPHICS 0	/* regular characters: '-', '+', &c */
-#if 0
-#define IBM_GRAPHICS	1	/* PC graphic characters */
-#define DEC_GRAPHICS	2	/* VT100 line drawing characters */
-#define MAC_GRAPHICS	3	/* Macintosh drawing characters */
-#endif
+#define ROGUESET	1	/* useful for load_symset() */
+#define PRIMARY		0
 
 /*
  * The 5 possible states of doors

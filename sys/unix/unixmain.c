@@ -371,8 +371,8 @@ char *argv[];
 		case 'i':
 			if (!strncmpi(argv[0]+1, "IBM", 3)) {
 #ifdef ASCIIGRAPH
-				load_symset("IBMGraphics", FALSE);
-				load_symset("IBMGraphics", TRUE);
+				load_symset("IBMGraphics", PRIMARY);
+				load_symset("RogueIBM", ROGUESET);
 				switch_graphics(TRUE);
 #endif
 			}
@@ -381,7 +381,7 @@ char *argv[];
 		case 'd':
 			if (!strncmpi(argv[0]+1, "DEC", 3)) {
 #ifdef ASCIIGRAPH
-				load_symset("DECGraphics", FALSE);
+				load_symset("DECGraphics", PRIMARY);
 				switch_graphics(TRUE);
 #endif
 			}
