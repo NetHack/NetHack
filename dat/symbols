@@ -1,0 +1,282 @@
+start: DECgraphics
+	Handling: DEC
+	S_vwall: \xf8			# meta-x, vertical rule
+	S_hwall: \xf1			# meta-q, horizontal rule
+	S_tlcorn: \xec			# meta-l, top left corner
+	S_trcorn: \xeb			# meta-k, top right corner
+	S_blcorn: \xed			# meta-m, bottom left
+	S_brcorn: \xea			# meta-j, bottom right
+	S_crwall: \xee			# meta-n, cross
+	S_tuwall: \xf6			# meta-v, T up
+	S_tdwall: \xf7			# meta-w, T down
+	S_tlwall: \xf5			# meta-u, T left
+	S_trwall: \xf4			# meta-t, T right
+	S_ndoor: \xfe			# meta-~, centered dot
+	S_vodoor: \xe1			# meta-a, solid block
+	S_hodoor: \xe1			# meta-a, solid block
+	S_bars: \xfb			# meta-{, small pi
+	S_tree: \xe7			# meta-g, plus-or-minus
+	S_room: \xfe			# meta-~, centered dot
+	S_upladder: \xf9		# meta-y, greater-than-or-equals
+	S_dnladder: \xfa		# meta-z, less-than-or-equals
+	S_pool: \xe0			# meta-\, diamond
+	S_ice: \xfe			# meta-~, centered dot
+	S_lava: \xe0			# meta-\, diamond
+	S_vodbridge: \xfe		# meta-~, centered dot
+	S_hodbridge: \xfe		# meta-~, centered dot
+	S_water: \xe0			# meta-\, diamond
+	S_vbeam: \xf8			# meta-x, vertical rule
+	S_hbeam: \xf1			# meta-q, horizontal rule
+	S_sw_tc: \xef			# meta-o, high horizontal line
+	S_sw_ml: \xf8			# meta-x, vertical rule
+	S_sw_mr: \xf8			# meta-x, vertical rule
+	S_sw_bc: \xf3			# meta-s, low horizontal line
+	S_explode2: \xef		# meta-o, high horizontal line
+	S_explode4: \xf8		# meta-x, vertical rule
+	S_explode6: \xf8		# meta-x, vertical rule
+	S_explode8: \xf3		# meta-s, low horizontal line
+finish
+
+start: IBMgraphics
+	Handling: IBM
+	S_vwall: \xb3			# meta-3, vertical rule
+	S_hwall: \xc4			# meta-D, horizontal rule
+	S_tlcorn: \xda			# meta-Z, top left corner
+	S_trcorn: \xbf			# meta-?, top right corner
+	S_blcorn: \xc0			# meta-@, bottom left
+	S_brcorn: \xd9			# meta-Y, bottom right
+	S_crwall: \xc5			# meta-E, cross
+	S_tuwall: \xc1			# meta-A, T up
+	S_tdwall: \xc2			# meta-B, T down
+	S_tlwall: \xb4			# meta-4, T left
+	S_trwall: \xc3			# meta-C, T right
+	S_ndoor: \xfa			# meta-z, centered dot
+	S_vodoor: \xfe			# meta-~, small centered square
+	S_hodoor: \xfe			# meta-~, small centered square
+	S_bars: \xf0			# equivalence symbol
+	S_tree: \xf1			# plus or minus symbol
+	S_room: \xfa			# meta-z, centered dot
+	S_corr: \xb0			# meta-0, light shading
+	S_litcorr: \xb1			# meta-1, medium shading
+	S_fountain: \xf4		# meta-t, integral top half
+	S_pool: \xf7			# meta-w, approx. equals
+	S_ice: \xfa			# meta-z, centered dot
+	S_lava: \xf7			# meta-w, approx. equals
+	S_vodbridge: \xfa 		# meta-z, centered dot
+	S_hodbridge: \xfa		# meta-z, centered dot
+	S_water: \xf7			# meta-w, approx. equals
+	S_vbeam: \xb3			# meta-3, vertical rule
+	S_hbeam: \xc4			# meta-D, horizontal rule
+	S_sw_ml: \xb3			# meta-3, vertical rule
+	S_sw_mr: \xb3			# meta-3, vertical rule
+	S_explode4: \xb3		# meta-3, vertical rule
+	S_explode6: \xb3		# meta-3, vertical rule
+finish
+
+start: IBMGraphics_1
+	Handling: IBM
+	S_vwall: \xb3			# meta-3, vertical rule
+	S_hwall: \xc4			# meta-D, horizontal rule
+	S_tlcorn: \xda			# meta-Z, top left corner
+	S_trcorn: \xbf			# meta-?, top right corner
+	S_blcorn: \xc0			# meta-@, bottom left
+	S_brcorn: \xd9			# meta-Y, bottom right
+	S_crwall: \xc5			# meta-E, cross
+	S_tuwall: \xc1			# meta-A, T up
+	S_tdwall: \xc2			# meta-B, T down
+	S_tlwall: \xb4			# meta-4, T left
+	S_trwall: \xc3			# meta-C, T right
+	S_vbeam: \xb3			# meta-3, vertical rule
+	S_hbeam: \xc4			# meta-D, horizontal rule
+	S_sw_ml: \xb3			# meta-3, vertical rule
+	S_sw_mr: \xb3			# meta-3, vertical rule
+	S_explode4: \xb3		# meta-3, vertical rule
+	S_explode6: \xb3		# meta-3, vertical rule
+finish
+
+start: IBMGraphics_2
+	Handling: IBM
+	S_vwall: \xb3			# meta-3, vertical rule
+	S_hwall: \xc4			# meta-D, horizontal rule
+	S_tlcorn: \xda			# meta-Z, top left corner
+	S_trcorn: \xbf			# meta-?, top right corner
+	S_blcorn: \xc0			# meta-@, bottom left
+	S_brcorn: \xd9			# meta-Y, bottom right
+	S_crwall: \xc5			# meta-E, cross
+	S_tuwall: \xc1			# meta-A, T up
+	S_tdwall: \xc2			# meta-B, T down
+	S_tlwall: \xb4			# meta-4, T left
+	S_trwall: \xc3			# meta-C, T right
+	S_vodoor: \xfe			# meta-~, small centered square
+	S_hodoor: \xfe			# meta-~, small centered square
+	S_corr: \xb0			# meta-0, light shading
+	S_litcorr: \xb1			# meta-1, medium shading
+	S_vbeam: \xb3			# meta-3, vertical rule
+	S_hbeam: \xc4			# meta-D, horizontal rule
+	S_sw_ml: \xb3			# meta-3, vertical rule
+	S_sw_mr: \xb3			# meta-3, vertical rule
+	S_explode4: \xb3		# meta-3, vertical rule
+	S_explode6: \xb3		# meta-3, vertical rule
+finish
+
+start: MACgraphics
+	Handling: MAC
+	S_vwall: \xba
+	S_hwall: \xcd
+	S_tlcorn: \xc9
+	S_trcorn: \xbb
+	S_blcorn: \xc8
+	S_brcorn: \xbc
+	S_crwall: \xce
+	S_tuwall: \xca
+	S_tdwall: \xcb
+	S_tlwall: \xb9
+	S_trwall: \xcc
+	S_ndoor: \xb0
+	S_vodoor: \xee
+	S_hodoor: \xee
+	S_vcdoor: \xef
+	S_hcdoor: \xef
+	S_bars: \xf0			# equivalency symbol
+	S_tree: \xf1			# plus-or-minus
+	S_corr: \xb0
+	S_grave: \xef			# same as open door
+	S_pool: \xe0
+finish
+
+start: RogueIBM
+	Handling: IBM
+	S_weapon: \x29
+	S_amulet: \x2c
+	S_food: \x3a
+	S_potion: \xad
+	S_scroll: \x3f
+	S_book: \x2b
+	S_wand: \xe7
+	S_vwall: \xba			# all walls now use
+	S_hwall: \xcd			# double line graphics
+	S_tlcorn: \xc9 
+	S_trcorn: \xbb 
+	S_blcorn: \xc8 
+	S_brcorn: \xbc 
+	S_crwall: \xce 
+	S_tuwall: \xca 
+	S_tdwall: \xcb 
+	S_tlwall: \xb9 
+	S_trwall: \xcc 
+	S_ndoor: \xce 
+	S_vodoor: \xce 
+	S_hodoor: \xce 
+	S_room: \xfa			# centered dot 
+	S_corr: \xb1 
+	S_litcorr: \xb2 
+	S_upstair: \xf0			# Greek Xi 
+	S_dnstair: \xf0 
+finish
+
+start: RogueEpyx
+	Handling: IBM
+	S_weapon: \x18			# up arrow
+	S_armor: \x0a			# Vert rect with o
+	S_ring: \x09			# circle with arrow
+	S_amulet: \x0c			# "female" symbol
+	S_food: \x05			# club (as in cards)			
+	S_potion: \xad			# upside down '!'
+	S_scroll: \x0e			# musical note
+	S_wand: \xe7			# greek tau
+	S_coin: \x0f			# yes it's the same as gems
+	S_gem: \x0f			# fancy '*'
+	S_rock: \x60
+	S_ball: \x30
+	S_chain: \x5f
+	S_venom: \x2e
+	S_vwall: \xba			# all walls now use
+	S_hwall: \xcd			# double line graphics
+	S_tlcorn: \xc9 
+	S_trcorn: \xbb 
+	S_blcorn: \xc8 
+	S_brcorn: \xbc 
+	S_crwall: \xce 
+	S_tuwall: \xca 
+	S_tdwall: \xcb 
+	S_tlwall: \xb9 
+	S_trwall: \xcc 
+	S_ndoor: \xce 
+	S_vodoor: \xce 
+	S_hodoor: \xce 
+	S_room: \xfa			# centered dot 
+	S_corr: \xb1 
+	S_litcorr: \xb2 
+	S_upstair: \xf0			# Greek Xi 
+	S_dnstair: \xf0 
+	S_arrow_trap: \x04		# diamond (cards) 
+	S_dart_trap: \x04 
+	S_falling_rock_trap: \x04 
+	S_squeaky_board: \x04 
+	S_bear_trap: \x04 
+	S_land_mine: \x04 
+	S_rolling_boulder_trap: \x04 
+	S_sleeping_gas_trap: \x04 
+	S_rust_trap: \x04 
+	S_fire_trap: \x04 
+	S_pit: \x04 
+	S_spiked_pit: \x04 
+	S_hole: \x04 
+	S_trap_door: \x04 
+	S_teleportation_trap: \x04 
+	S_level_teleporter: \x04 
+	S_magic_portal: \x04 
+	S_web: \x04 
+	S_statue_trap: \x04 
+	S_magic_trap: \x04 
+	S_anti_magic_trap: \x04 
+	S_polymorph_trap: \x04 
+	S_weapon: \x18
+	S_armor: \x5b
+	S_ring: \x3d
+	S_amulet: \xc
+	S_tool: \x28
+	S_food: \x5
+	S_potion: \xad
+	S_scroll: \xe
+	S_book: \x2b
+	S_wand: \xe7
+	S_coin: \xf
+	S_gem: \xf
+	S_rock: \x60
+	S_ball: \x30
+	S_chain: \x5f
+	S_venom: \x2e
+	S_human: \x01
+finish
+
+start: RogueWindows
+	Handling: IBM
+	S_weapon: \x29
+	S_amulet: \x2c
+	S_food: \x3a
+	S_potion: \xad
+	S_scroll: \x3f
+	S_book: \x2b
+	S_wand: \xe7
+	S_vwall: \xba			# all walls now use
+	S_hwall: \xcd			# double line graphics
+	S_tlcorn: \xc9 
+	S_trcorn: \xbb 
+	S_blcorn: \xc8 
+	S_brcorn: \xbc 
+	S_crwall: \xce 
+	S_tuwall: \xca 
+	S_tdwall: \xcb 
+	S_tlwall: \xb9 
+	S_trwall: \xcc 
+	S_ndoor: \xce 
+	S_vodoor: \xce 
+	S_hodoor: \xce 
+	S_room: \xfa			# centered dot 
+	S_corr: \xb1 
+	S_litcorr: \xb2 
+	S_upstair: \xf0			# Greek Xi 
+	S_dnstair: \xf0 
+finish
+
