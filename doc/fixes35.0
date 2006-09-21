@@ -174,6 +174,11 @@ win32gui: made auto-arrange windows on/off option (it was reset automatically
 win32gui: fix a possible crash with AltGr-4 WM_KEYDOWN handling
 win32gui: use whatever alternate tile set is loaded in the menus
 win32tty: prevent early error messages from flashing by too fast and not seen
+win32tty: work around problem where display symbols were wrong or unrecognizable
+	on systems where the default language for non-Unicode programs was not 
+	set to "US English" - courtesy Ray Chason
+win32tty: work around problem where some characters did not show up if the
+	console code page was other than 437
 platforms that support hangup: SAFERHANGUP to avoid losing objects in transit
 	between lists when hangup occurs, and also avoid cheats due to
 	well-timed hangups to stop a long melee
@@ -226,6 +231,10 @@ add ability to sort the list when viewing known spells with '+' command
 describe magic cancellation from worn armor in enlightment/end-of-game feedback
 add atmospheric sound messages for temples
 sometimes give announcement message when monsters teleport to hero's vicinity
+obsolete config file keywords: GRAPHICS, OBJECTS, TRAPS, EFFECTS
+deprecated options: IBMGraphics, DECGraphics, boulder
+new options: symset, roguesymset for choosing a symbol set from the symbols file
+new config file keyword: SYMBOLS for overriding character symbol values by name
 
 
 Platform- and/or Interface-Specific New Features
@@ -258,5 +267,6 @@ remove remains of sync_hunger, which has been ifdef'd out for years
 new mextra structure housing pointers to mname, egd, epri, eshk, emin, edog
 consolidate vault.h, epri.h, eshk.h, emin.h and edog.h into new mextra.h
 new oextra structure housing pointers to oname, omonst, omid, olong, and omailcmd
-
+drawing symbols for DECGraphics, IBMGraphics, MACgraphics are now stored in an
+	external symbol file that can be changed without rebuilding
 
