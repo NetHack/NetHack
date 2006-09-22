@@ -187,7 +187,7 @@ STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,con
 int FDECL(parse_config_line, (FILE *,char *,char *,char *));
 #ifdef ASCIIGRAPH
 STATIC_DCL FILE *NDECL(fopen_sym_file);
-STATIC_DCL void FDECL(set_symhandling, (char *,BOOLEAN_P));
+STATIC_DCL void FDECL(set_symhandling, (char *,int));
 #endif
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
@@ -2089,7 +2089,7 @@ char		*tmp_levels;
 			    bufp = symbuf;
 			} while (*bufp == '#');
 		} while (morelines);
-		switch_graphics(TRUE);
+		switch_symbols(TRUE);
 #endif /*ASCIIGRAPH*/
 #ifdef WIZARD
 	} else if (match_varname(buf, "WIZKIT", 6)) {
@@ -2442,8 +2442,8 @@ fopen_sym_file()
  *         0 if it wasn't found in the sym file or other problem.
  */
 int
-read_sym_file(rogueflag)
-boolean rogueflag;
+read_sym_file(which_set)
+int which_set;
 {
 	char buf[4*BUFSZ];
 	FILE *fp;
@@ -2453,19 +2453,17 @@ boolean rogueflag;
 	symset_count = 0;
 	chosen_symset_start = chosen_symset_end = FALSE;
 	while (fgets(buf, 4*BUFSZ, fp)) {
-		if (!parse_sym_line(buf, rogueflag)) {
+		if (!parse_sym_line(buf, which_set)) {
 			raw_printf("Bad symbol line:  \"%.50s\"", buf);
 			wait_synch();
 		}
 	}
 	(void) fclose(fp);
-	if (!chosen_symset_end && !chosen_symset_start) return 0;
+	if (!chosen_symset_end && !chosen_symset_start)
+		return (symset[which_set] == 0) ? 1 : 0;
 	if (!chosen_symset_end) {
 		raw_printf("Missing finish for symset \"%s\"",
-#ifdef REINCARNATION
-				rogueflag ? roguesymset :
-#endif
-				symset);
+			symset[which_set] ? symset[which_set] : "unknown");
 		wait_synch();
 	}
 	return 1;
@@ -2473,18 +2471,13 @@ boolean rogueflag;
 
 /* returns 0 on error */
 int
-parse_sym_line(buf, rogueflag)
+parse_sym_line(buf, which_set)
 char *buf;
-boolean rogueflag;
+int which_set;
 {
 	int val;
 	struct symparse *symp = (struct symparse *)0;
 	char *bufp, *commentp, *altp;
-	char *symsetname =
-#ifdef REINCARNATION
-			    rogueflag ? roguesymset :
-#endif
-			    symset;
 
 	if (*buf == '#')
 		return 1;
@@ -2516,8 +2509,9 @@ boolean rogueflag;
 	if (!bufp) {
 	    if (strncmpi(buf, "finish", 6) == 0) {
 		/* end current graphics set */
+		if (chosen_symset_start)
+			chosen_symset_end = TRUE;
 		chosen_symset_start = FALSE;
-		chosen_symset_end = TRUE;
 		return 1;
 	    }
 	    return 0;
@@ -2530,8 +2524,8 @@ boolean rogueflag;
 	if (!symp)
 		return 0;
 
-	if (!symsetname) {
-	    /* A null symsetname indicates that we're just
+	if (!symset[which_set]) {
+	    /* A null symset name indicates that we're just
 	       building a pick-list of possible symset
 	       values from the file, so only do that */
 	    if (symp->range == SYM_CONTROL && symp->idx == 0) {
@@ -2557,36 +2551,31 @@ boolean rogueflag;
 		switch(symp->idx) {
 		    case 0:
 			    /* start of symset */
-			    if (!strcmpi(bufp, symsetname)) { /* desired one? */
+			    if (!strcmpi(bufp, symset[which_set])) { /* desired one? */
 				chosen_symset_start = TRUE;
 #ifdef REINCARNATION
-				if (rogueflag) {
-				    init_r_symbols();
-				    roguehandling = H_UNK;
-				}
+				if (which_set == ROGUESET) init_r_symbols();
 #endif
-				if (!rogueflag) {
-				    init_l_symbols();
-				    symhandling = H_UNK;
-				}
+				if (which_set == PRIMARY)  init_l_symbols();
 			    }
 			    break;
 		    case 1:
 			    /* finish symset */
+			    if (chosen_symset_start)
+				chosen_symset_end = TRUE;
 			    chosen_symset_start = FALSE;
-			    chosen_symset_end = TRUE;
 			    break;
 		    case 2:
 			    /* handler type identified */
 			    if (chosen_symset_start)
-			        set_symhandling(bufp, rogueflag);
+			        set_symhandling(bufp, which_set);
 			    break;
 		}
 	    } else {		/* !SYM_CONTROL */
 		val = sym_val(bufp);
 		if (chosen_symset_start) {
 #ifdef REINCARNATION
-			if (rogueflag)
+			if (which_set == ROGUESET)
 			    update_r_symset(symp, val);
 			else
 #endif
@@ -2598,28 +2587,17 @@ boolean rogueflag;
 }
 
 STATIC_OVL void
-set_symhandling(handling, rogueflag)
+set_symhandling(handling, which_set)
 char *handling;
-boolean rogueflag;
+int which_set;
 {
 	int i = 0;
 
-#ifdef REINCARNATION
-	if (rogueflag) roguehandling = H_UNK;
-#endif
-	if (!rogueflag) symhandling = H_UNK;
+	symhandling[which_set] = H_UNK;
 	while (known_handling[i]) {
 	    if (!strcmpi(known_handling[i], handling)) {
-#ifdef REINCARNATION
-		if (rogueflag) {
-			roguehandling = i;
-			return;
-		}
-#endif
-		if (!rogueflag) {
-			symhandling = i;
-			return;
-		}
+		symhandling[which_set] = i;
+		return;
 	    }
 	    i++;
 	}

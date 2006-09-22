@@ -547,7 +547,7 @@ boolean on;
 {
 /*	vga_HideCursor(); */
 	if (on) {
-/*		switch_graphics(DEFAULT_GRAPHICS); */
+/*		switch_symbols(FALSE); */
 		iflags.traditional_view = TRUE;
 		clipx = 0;
 		clipxmax = CO - 1;

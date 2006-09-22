@@ -373,7 +373,7 @@ char *argv[];
 #ifdef ASCIIGRAPH
 				load_symset("IBMGraphics", PRIMARY);
 				load_symset("RogueIBM", ROGUESET);
-				switch_graphics(TRUE);
+				switch_symbols(TRUE);
 #endif
 			}
 			break;
@@ -382,7 +382,7 @@ char *argv[];
 			if (!strncmpi(argv[0]+1, "DEC", 3)) {
 #ifdef ASCIIGRAPH
 				load_symset("DECGraphics", PRIMARY);
-				switch_graphics(TRUE);
+				switch_symbols(TRUE);
 #endif
 			}
 			break;

@@ -491,9 +491,9 @@ E boolean FDECL(hurtle_step, (genericptr_t, int, int));
 E int FDECL(def_char_to_objclass, (CHAR_P));
 E int FDECL(def_char_to_monclass, (CHAR_P));
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
-E void FDECL(switch_graphics, (int));
+E void FDECL(switch_symbols, (int));
+E void FDECL(assign_graphics, (int));
 #ifdef REINCARNATION
-E void FDECL(assign_rogue_graphics, (BOOLEAN_P));
 E void NDECL(init_r_symbols);
 #endif
 E void NDECL(init_symbols);
@@ -502,7 +502,6 @@ E void NDECL(init_l_symbols);
 #ifdef ASCIIGRAPH
 E void FDECL(update_l_symset, (struct symparse *,int));
 E void FDECL(update_r_symset, (struct symparse *,int));
-E void FDECL(switch_graphics, (int));
 #endif
 #ifdef BARGETHROUGH
 E boolean FDECL(cursed_object_at, (int, int));
@@ -719,8 +718,8 @@ E void FDECL(check_recordfile, (const char *));
 E void NDECL(read_wizkit);
 #endif
 #ifdef ASCIIGRAPH
-E int FDECL(read_sym_file, (BOOLEAN_P));
-E int FDECL(parse_sym_line, (char *,BOOLEAN_P));
+E int FDECL(read_sym_file, (int));
+E int FDECL(parse_sym_line, (char *,int));
 #endif
 E void FDECL(paniclog, (const char *, const char *));
 E int FDECL(validate_prefix_locations, (char *));
@@ -1537,7 +1536,7 @@ E int FDECL(add_autopickup_exception, (const char *));
 E void NDECL(free_autopickup_exceptions);
 #endif /* AUTOPICKUP_EXCEPTIONS */
 #ifdef ASCIIGRAPH
-E int FDECL(load_symset, (const char *,BOOLEAN_P));
+E int FDECL(load_symset, (const char *,int));
 E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 E int FDECL(sym_val, (char *));

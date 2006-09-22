@@ -242,7 +242,15 @@ struct textlist {
 };
 
 /*
- * special symbol set handling types (callbacks, etc.)
+ * Graphics sets for display symbols
+ */
+#define DEFAULT_GRAPHICS 0	/* regular characters: '-', '+', &c */
+#define PRIMARY		0	/* primary graphics         */
+#define ROGUESET	1	/* rogue graphics           */
+#define NUM_GRAPHICS	2
+
+/*
+ * special symbol set handling types ( for invoking callbacks, etc.)
  * Must match the order of the known_handlers strings
  * in drawing.c
  */
@@ -250,29 +258,13 @@ struct textlist {
 #define H_IBM	1
 #define H_DEC	2
 
-#ifdef REINCARNATION
-#define ROGUEHANDLING(ht) (Is_rogue_level(&u.uz) && \
-			   rogue_level.dlevel != 0 && roguehandling == (ht))
-#define SYMHANDLING(ht) \
-	(ROGUEHANDLING(ht) || \
-	 ((!Is_rogue_level(&u.uz) || rogue_level.dlevel == 0) && \
-			      symhandling == (ht)))
-#else
-#define SYMHANDLING(ht)   (symhandling == (ht))
-#endif
-
 extern const struct symdef defsyms[MAXPCHARS];	/* defaults */
 extern uchar showsyms[MAXPCHARS];
 extern const struct symdef def_warnsyms[WARNCOUNT];
-extern char *symset, *roguesymset;		/* from drawing.c */
-extern int symhandling, roguehandling;		/* from drawing.c */
+extern char *symset[NUM_GRAPHICS];			  /* from drawing.c */
+extern int symhandling[NUM_GRAPHICS], currentgraphics;	  /* from drawing.c */
 
-/*
- * Graphics sets for display symbols
- */
-#define DEFAULT_GRAPHICS 0	/* regular characters: '-', '+', &c */
-#define ROGUESET	1	/* useful for load_symset() */
-#define PRIMARY		0
+#define SYMHANDLING(ht) (symhandling[currentgraphics] == (ht))
 
 /*
  * The 5 possible states of doors

@@ -17,8 +17,8 @@
 #define C(n)
 #endif
 
-char *symset = 0, *roguesymset = 0;
-int symhandling = 0, roguehandling = 0;
+char *symset[NUM_GRAPHICS] = {0,0};
+int symhandling[NUM_GRAPHICS] = {0,0}, currentgraphics = 0;
 
 uchar oc_syms[MAXOCLASSES] = DUMMY; /* the current object  display symbols */
 uchar showsyms[MAXPCHARS]  = DUMMY; /* the current feature display symbols */
@@ -310,21 +310,6 @@ def_char_to_monclass(ch)
 /*
  * Explanations of the functions found below:
  *
- * switch_graphics(arg)
- *                     Called to swap the current display symbols
- *                     (monsyms, showsyms, oc_syms).
- *
- *                     If !arg then the display symbols are
- *                     taken from def_monsyms, defsyms, def_oc_syms 
- *                     default NetHack symbols.
- *
- *                     If arg then the display symbols are
- *                     taken from the adjustable display symbols
- *                     found in l_monsyms, l_showsyms, l_oc_syms.
- *                     Those symbols may have been loaded from an
- *                     external symfile by config file options or
- *                     interactively in the options menu.
- *
  * init_symbols()
  *                     Sets the current display symbols, the
  *                     loadable symbols to the default NetHack
@@ -334,18 +319,36 @@ def_char_to_monclass(ch)
  *                     after execution begins. Any previously
  *                     loaded external symbol sets are discarded.
  *
- * assign_rogue_graphics(arg)
+ * switch_symbols(arg)
+ *                     Called to swap in new current display symbols
+ *                     (monsyms, showsyms, oc_syms) from either
+ *                     the default symbols, or from the loadable
+ *                     symbols.
+ *
+ *                     If (arg == 0) then the display symbols are
+ *                     taken from def_monsyms, defsyms, def_oc_syms 
+ *                     default NetHack symbols.
+ *
+ *                     If (arg != 0), which is the expected usage,
+ *                     then the display symbols are taken from the
+ *                     adjustable display symbols found in l_monsyms,
+ *                     l_showsyms, l_oc_syms. Those symbols may have
+ *                     been loaded from an external symbol file by
+ *                     config file options or interactively in the
+ *                     options menu.
+ *
+ * assign_graphics(arg)
  *
  *                     This is used in the game core to toggle in and
  *                     out of rogue level display mode.
  *
- *                     If arg is TRUE, this places the rogue level
+ *                     If arg is ROGUESET, this places the rogue level
  *                     symbols from r_monsyms, r_showsyms, and r_oc_syms
  *                     into the current display symbols: monsyms, showsyms,
  *                     and oc_syms. 
  *
- *                     If arg is FALSE, this places the symbols from
- *                     l_monsyms, l_showsyms, l_oc_syms into the current
+ *                     If arg is PRIMARY, this places the symbols
+ *		       from l_monsyms, l_showsyms, l_oc_syms into the current
  *                     display symbols: monsyms, showsyms, oc_syms.
  *
  * update_l_symset()
@@ -357,7 +360,7 @@ def_char_to_monclass(ch)
  */
 
 void
-switch_graphics(nondefault)
+switch_symbols(nondefault)
 int nondefault;
 {
 #ifdef ASCIIGRAPH
@@ -372,22 +375,15 @@ int nondefault;
 
 		for (i = 0; i < MAXOCLASSES; i++)
 		    oc_syms[i] = l_oc_syms[i];
-		/*
-		 * We can't use the SYMHANDLING or ROGUEHANDLING
-		 * macros in this file (drawing.c) because doing
-		 * so would cause link errors during some util
-		 * program builds because of the presence of
-		 * the Is_Roguelevel checks in those macros.
-		 */
 #ifdef PC9800
-		if (symhandling == H_IBM
+		if (SYMHANDLING(H_IBM)
 		    && ibmgraphics_mode_callback)
 			(*ibmgraphics_mode_callback)();
-	        else if (!symset && ascgraphics_mode_callback)
+	        else if (!symset[currentgraphics] && ascgraphics_mode_callback)
 			(*ascgraphics_mode_callback)();
 #endif
 #ifdef TERMLIB
-	    	if (symhandling == H_DEC
+	    	if (SYMHANDLING(H_DEC)
 		    && decgraphics_mode_callback)
 			(*decgraphics_mode_callback)();
 #endif
@@ -433,6 +429,49 @@ init_l_symbols()
 
 	for (i = 0; i < MAXOCLASSES; i++)
 	    l_oc_syms[i] = def_oc_syms[i].sym;
+	symhandling[PRIMARY] = H_UNK;
+}
+
+void
+assign_graphics(whichset)
+int whichset;
+{
+    /* Adjust graphics display characters on Rogue levels */
+    register int i;
+
+    switch(whichset) {
+    case ROGUESET:
+
+	for (i = 0; i < MAXMCLASSES; i++)
+	    monsyms[i] = r_monsyms[i];
+
+	for (i = 0; i < MAXPCHARS; i++)
+	    showsyms[i] = r_showsyms[i];
+
+	for (i = 0; i < MAXOCLASSES; i++)
+	    oc_syms[i] = r_oc_syms[i];
+
+# if defined(MSDOS) && defined(USE_TILES)
+	if (iflags.grmode) tileview(FALSE);
+# endif
+	currentgraphics = ROGUESET;
+	break;
+    case PRIMARY:
+    default:
+	for (i = 0; i < MAXMCLASSES; i++)
+	    monsyms[i] = l_monsyms[i];
+
+	for (i = 0; i < MAXPCHARS; i++)
+	    showsyms[i] = l_showsyms[i];
+
+	for (i = 0; i < MAXOCLASSES; i++)
+	    oc_syms[i] = l_oc_syms[i];
+# if defined(MSDOS) && defined(USE_TILES)
+	if (iflags.grmode) tileview(TRUE);
+# endif
+	currentgraphics = PRIMARY;
+	break;
+    }
 }
 
 #ifdef REINCARNATION
@@ -453,43 +492,8 @@ init_r_symbols()
 
 	for (i = 0; i < MAXOCLASSES; i++)
 	    r_oc_syms[i] = def_r_oc_syms[i];
-}
 
-void
-assign_rogue_graphics(is_rlevel)
-boolean is_rlevel;
-{
-    /* Adjust graphics display characters on Rogue levels */
-    register int i;
-
-    if (is_rlevel) {
-	register int i;
-
-	for (i = 0; i < MAXMCLASSES; i++)
-	    monsyms[i] = r_monsyms[i];
-
-	for (i = 0; i < MAXPCHARS; i++)
-	    showsyms[i] = r_showsyms[i];
-
-	for (i = 0; i < MAXOCLASSES; i++)
-	    oc_syms[i] = r_oc_syms[i];
-
-# if defined(MSDOS) && defined(USE_TILES)
-	if (iflags.grmode) tileview(FALSE);
-# endif
-    } else {
-	for (i = 0; i < MAXMCLASSES; i++)
-	    monsyms[i] = l_monsyms[i];
-
-	for (i = 0; i < MAXPCHARS; i++)
-	    showsyms[i] = l_showsyms[i];
-
-	for (i = 0; i < MAXOCLASSES; i++)
-	    oc_syms[i] = l_oc_syms[i];
-# if defined(MSDOS) && defined(USE_TILES)
-	if (iflags.grmode) tileview(TRUE);
-# endif
-    }
+	symhandling[ROGUESET] = H_UNK;
 }
 
 void
@@ -730,28 +734,5 @@ struct symparse loadsyms[] = {
 };
 #endif /*ASCIIGRAPH*/
 
-/* OBSOLETE */
-#if 0
-STATIC_OVL void
-graphics_opts(opts, optype, maxlen, offset)
-register char *opts;
-const char *optype;
-int maxlen, offset;
-{
-	uchar translate[MAXPCHARS+1];
-	int length, i;
-
-	if (!(opts = string_for_env_opt(optype, opts, FALSE)))
-		return;
-	escapes(opts, opts);
-
-	length = strlen(opts);
-	if (length > maxlen) length = maxlen;
-	/* match the form obtained from PC configuration files */
-	for (i = 0; i < length; i++)
-		translate[i] = (uchar) opts[i];
-	assign_graphics(translate, length, maxlen, offset);
-}
-#endif
 /*drawing.c*/
 

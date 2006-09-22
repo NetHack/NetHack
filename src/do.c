@@ -1104,7 +1104,7 @@ boolean at_stairs, falling, portal;
 
 #ifdef REINCARNATION
 	if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
-		assign_rogue_graphics(Is_rogue_level(newlevel));
+		assign_graphics(Is_rogue_level(newlevel) ? ROGUESET : PRIMARY);
 #endif
 #ifdef USE_TILES
 	substitute_tiles(newlevel);

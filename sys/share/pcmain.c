@@ -307,11 +307,11 @@ char *argv[];
 
 #if defined(MSDOS) || defined(WIN32)
 	/* Player didn't specify any symbol set so use IBM defaults */
-	if (!symset) {
+	if (!symset[PRIMARY]) {
 		load_symset("IBMGraphics_2", PRIMARY);
 	}
 # ifdef REINCARNATION
-	if (!roguesymset) {
+	if (!symset[ROGUESET]) {
 		load_symset("RogueEpyx", ROGUESET);
 	}
 # endif
@@ -551,7 +551,7 @@ char *argv[];
 # ifdef ASCIIGRAPH
 				load_symset("IBMGraphics", PRIMARY);
 				load_symset("RogueIBM", ROGUESET);
-				switch_graphics(TRUE);
+				switch_symbols(TRUE);
 # endif
 			}
 			break;
@@ -560,7 +560,7 @@ char *argv[];
 			if (!strncmpi(argv[0]+1, "DEC", 3)) {
 # ifdef ASCIIGRAPH
 				load_symset("DECGraphics", PRIMARY);
-				switch_graphics(TRUE);
+				switch_symbols(TRUE);
 # endif
 			}
 			break;

@@ -37,7 +37,7 @@ functions:11 _align_gname
 functions:12 _altar_wrath _Amonnam _amulet _Amulet_off _Amulet_on _An _an _angry_guards
 functions:13 _angry_priest _angry_shk_exists _any_light_source _aobjnam _append_slash _append_str _Armor_gone _Armor_off
 functions:14 _Armor_on _armor_to_dragon _armoroff _arti_invoke _artifact_exists _artifact_hit _artifact_name _artiname
-functions:15 _artitouch _askchain _assign_graphics _assign_level _assign_rnd_level _assign_rogue_graphics _assign_soundcard _assign_video
+functions:15 _artitouch _askchain _assign_level _assign_rnd_level _assign_graphics _assign_soundcard _assign_video
 functions:16 _assign_videocolors _assign_videoshades _assigninvlet _at_dgn_entrance _attach_egg_hatch_timeout _attack _attack_checks _attacks
 functions:17 _awaken_monsters _awaken_soldiers
 functions:18 _backfire _backsp _bad_location _bad_negation _bad_rock _badoption _bail _ballfall
@@ -246,7 +246,7 @@ functions:220 _spoteffects _squadmon _srandom _stackobj _standoutbeg _standouten
 functions:221 _start_engulf _start_timer _start_tin _steal _steal_it _stealamulet _stealarm _stealgold
 functions:223 _stop_timer _store_version _strange_feeling _strategy _string_for_env_opt _string_for_opt _strncmpi _strprepend
 functions:224 _strstri _study_book _stumble_onto_mimic _sub_one_frombill _subfrombill _substitute_tiles _summon_minion _surface
-functions:225 _swallow_to_glyph _swapin_file _swapout_oldest _switch_graphics _switchar _t_warn
+functions:225 _swallow_to_glyph _swapin_file _swapout_oldest _switch_symbols _switchar _t_warn
 functions:226 _tabexpand _tactics _take_gold _take_off _tamedog _target_on _tele _tele_jump_ok
 functions:227 _tele_restrict _tele_trap _teleds _teleok _teleport_pet _temple_occupied _tended_shop _term_end_attr
 functions:228 _term_end_color

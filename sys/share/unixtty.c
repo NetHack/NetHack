@@ -368,7 +368,7 @@ init_sco_cons()
 #  ifdef ASCIIGRAPH
 		load_symset("IBMGraphics", PRIMARY);
 		load_symset("RogueIBM", ROGUESET);
-		switch_graphics(TRUE);
+		switch_symbols(TRUE);
 #  endif
 #  ifdef TEXTCOLOR
 		if (has_colors())
