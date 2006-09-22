@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)drawing.c	3.5	2006/09/16	*/
+/*	SCCS Id: @(#)drawing.c	3.5	2006/09/22	*/
 /* Copyright (c) NetHack Development Team 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -40,7 +40,7 @@ uchar warnsyms[WARNCOUNT]  = DUMMY;  /* the current warning display symbols */
 const char invisexplain[] = "remembered, unseen, creature";
 
 /* Default object class symbols.  See objclass.h.
- * {symbol, name explain}
+ * {symbol, name, explain}
  *     name:    used in object_detect().
  *     explain: used in do_look().
  */
@@ -281,7 +281,7 @@ void NDECL((*ascgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
 /*
  * Convert the given character to an object class.  If the character is not
  * recognized, then MAXOCLASSES is returned.  Used in detect.c invent.c,
- * options.c, pickup.c, sp_lev.c, and lev_main.c.
+ * objnam.c, options.c, pickup.c, sp_lev.c, lev_main.c, and tilemap.c.
  */
 int
 def_char_to_objclass(ch)
@@ -296,6 +296,7 @@ def_char_to_objclass(ch)
 /*
  * Convert a character into a monster class.  This returns the _first_
  * match made.  If there are are no matches, return MAXMCLASSES.
+ * Used in detect.c, options.c, read.c, sp_lev.c, and lev_main.c
  */
 int
 def_char_to_monclass(ch)
