@@ -71,8 +71,10 @@ unsigned *ospecial;
 #endif
 	uchar ch;
 	unsigned special = 0;
+#ifdef ROGUE_COLOR
 	/* condense multiple tests in macro version down to single */
 	boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS;
+#endif
 
     /*
      *  Map the glyph back to a character and color.
@@ -222,7 +224,11 @@ unsigned *ospecial;
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
 # ifdef REINCARNATION
+#  ifdef ROGUE_COLOR
     if (!has_color(color) || (Is_rogue_level(&u.uz) && !has_rogue_ibm_graphics))
+#  else
+    if (!has_color(color) || Is_rogue_level(&u.uz))
+#  endif
 # else
     if (!has_color(color))
 # endif
