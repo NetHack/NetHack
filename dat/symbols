@@ -1,3 +1,17 @@
+# Symbol sets for use in NetHack's text-based display.
+#
+# IBMgraphics works by specifying special characters which reside
+# outside the range of normal printable characters.  It has subsets
+# for use where the internal code page is different than the one
+# used by US ASCII (437) and has some different special characters.
+#
+# DECgraphics works by switching back and forth between two fonts,
+# where the alternate one substitutes special characters in place
+# of ordinary printable characters in the lowercase letter range.
+# NetHack encodes the request to use the alternate font here by
+# having the high bit set (in hexadecimal, \x80 is combined with
+# a character code between \x60 and \x7f).
+
 start: DECgraphics
 	Handling: DEC
 	S_vwall: \xf8			# meta-x, vertical rule
