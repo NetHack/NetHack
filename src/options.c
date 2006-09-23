@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2006/09/17	*/
+/*	SCCS Id: @(#)options.c	3.5	2006/09/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -718,13 +718,13 @@ char *tp;
 
 	    cp++;
 	    if (*cp == 'x' || *cp == 'X')
-		for (++cp; (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
+		for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
 		    cval = (int)((cval * 16) + (dp - hex) / 2);
 	    else if (*cp == 'o' || *cp == 'O')
-		for (++cp; (index("01234567",*cp)) && (dcount++ < 3); cp++)
+		for (++cp; *cp && (index("01234567",*cp)) && (dcount++ < 3); cp++)
 		    cval = (cval * 8) + (*cp - '0');
 	    else
-		for (; (index("0123456789",*cp)) && (dcount++ < 3); cp++)
+		for (; *cp && (index("0123456789",*cp)) && (dcount++ < 3); cp++)
 		    cval = (cval * 10) + (*cp - '0');
 	}
 	else if (*cp == '\\')		/* C-style character escapes */
