@@ -41,7 +41,7 @@ $	dngn_input = "dungeon.pdf"
 $	dlb_files  = help_files + "," + data_files + "," -
 		   + spec_files + "," + qstl_files + "," + dngn_files
 $	data_libry = "nh-data.dlb"
-$	xtrn_files = "LICENSE.,HISTORY.,OPTIONS."
+$	xtrn_files = "LICENSE.,HISTORY.,OPTIONS.,SYMBOLS."
 $ makedefs := $sys$disk:[-.util]makedefs
 $ lev_comp := $sys$disk:[-.util]lev_comp
 $ dgn_comp := $sys$disk:[-.util]dgn_comp
