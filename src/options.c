@@ -2335,8 +2335,10 @@ goodfruit:
 			wait_synch();
 		    } else {
 			switch_symbols(TRUE);
+#  ifdef REINCARNATION
 			if (!initial && Is_rogue_level(&u.uz))
 				assign_graphics(ROGUESET);
+#  endif
 		    }
 		}
 		return;
@@ -3149,6 +3151,9 @@ boolean setinitial,setfromfile;
 					rogueflag ? ROGUESET :
 #endif
 					PRIMARY;
+#ifndef REINCARNATION
+	if (rogueflag) return TRUE;
+#endif
 #ifdef ASCIIGRAPH
 	/* clear symset as a flag to read_sym_file() to build list */
 	symset_name = symset[which_set];
@@ -3208,8 +3213,11 @@ boolean setinitial,setfromfile;
 	}
 
 	/* these set default symbols and clear the handling value */
+# ifdef REINCARNATION
 	if(rogueflag) init_r_symbols();
-	else init_l_symbols();
+	else
+# endif
+	    init_l_symbols();
 
 	if (!symset[which_set] && symset_name)
 		symset[which_set] = symset_name;
@@ -3225,9 +3233,11 @@ boolean setinitial,setfromfile;
 	}
 
 	switch_symbols(TRUE);
+# ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz))
 		assign_graphics(ROGUESET);
 	else
+#endif
 		assign_graphics(PRIMARY);
 	need_redraw = TRUE;
 #endif /*ASCIIGRAPH*/

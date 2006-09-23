@@ -441,6 +441,7 @@ int whichset;
     register int i;
 
     switch(whichset) {
+# ifdef REINCARNATION
     case ROGUESET:
 
 	for (i = 0; i < MAXMCLASSES; i++)
@@ -452,11 +453,12 @@ int whichset;
 	for (i = 0; i < MAXOCLASSES; i++)
 	    oc_syms[i] = r_oc_syms[i];
 
-# if defined(MSDOS) && defined(USE_TILES)
+#  if defined(MSDOS) && defined(USE_TILES)
 	if (iflags.grmode) tileview(FALSE);
-# endif
+#  endif
 	currentgraphics = ROGUESET;
 	break;
+# endif
     case PRIMARY:
     default:
 	for (i = 0; i < MAXMCLASSES; i++)
