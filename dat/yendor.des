@@ -30,6 +30,8 @@ TELEPORT_REGION:levregion(01,00,79,20),(0,0,27,12)
 # Make it a morgue for rm id in mkmaze.c
 # for the purpose of random sdoor placement
 REGION:(12,01,20,09),unlit,"morgue",unfilled
+# another region to constrain monster arrival
+REGION:(01,01,10,11),unlit,"ordinary",unfilled
 MAZEWALK:(28,05),east
 LADDER:(06,05),down
 # Non diggable walls
@@ -111,6 +113,8 @@ STAIR:levregion(01,00,79,20),(0,0,28,12),up
 STAIR:levregion(01,00,79,20),(0,0,28,12),down
 BRANCH:levregion(01,00,79,20),(0,0,28,12)
 TELEPORT_REGION:levregion(01,00,79,20),(0,0,27,12)
+# entire tower in a region, constrains monster migration
+REGION:(01,01,26,11),unlit,"ordinary",unfilled
 REGION:(09,03,17,09),unlit,"zoo"
 DOOR:closed,(15,02)
 DOOR:closed,(11,10)
