@@ -2,7 +2,7 @@
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
-.ds vr "NetHack 3.4
+.ds vr "NetHack 3.5
 .ds f0 "\*(vr
 .ds f1
 .ds f2 "September 20, 2006
@@ -2374,21 +2374,23 @@ on the rogue level.
 You can also override one or more symbols using the SYMBOLS config
 file option. Symbols are specified as name:value pairs. Note that
 NetHack escape-processes the value string in conventional C fashion.
-This means that \ is a prefix to take the following character literally. Thus
-\ needs to be represented as \\.
+This means that \e is a prefix to take the following character literally. Thus
+\e needs to be represented as \e\e.
 The special escape form
-\m switches on the meta bit in the symbol value, and the \^ prefix causes the
+\em switches on the meta bit in the symbol value, and the \e^ prefix causes the
 following character to be treated as a control
 character.
 .pg
-.sd
 .TS S
 center;
-c c c.
+c s s
+c1 l1 l.
 .\"TABLE_START
+NetHack Symbols
 Default	Symbol Name	Description
+\_	\_	\_
 	S_air	(air)
-_	S_altar	(altar)
+\&_	S_altar	(altar)
 "	S_amulet	(amulet)
 A	S_angel	(angelic being)
 a	S_ant	(ant or other insect)
@@ -2408,7 +2410,7 @@ b	S_blob	(blob)
 `	S_boulder	(boulder)
 -	S_brcorn	(bottom right corner)
 C	S_centaur	(centaur)
-_	S_chain	(iron chain)
+\&_	S_chain	(iron chain)
 #	S_cloud	(cloud)
 c	S_cockatrice	(cockatrice)
 $	S_coin	(pile of coins)
@@ -2489,7 +2491,7 @@ p	S_piercer	(piercer)
 P	S_pudding	(pudding or ooze)
 q	S_quadruped	(quadruped)
 Q	S_quantmech	(quantum mechanic)
-=	S_ring	(ring)
+\&=	S_ring	(ring)
 `	S_rock	(boulder or statue)
 r	S_rodent	(rodent)
 ^	S_rolling_boulder_trap	(rolling boulder trap)
@@ -2512,7 +2514,7 @@ s	S_spider	(arachnid or centipede)
 	S_stone	(dark part of a room)
 -	S_sw_bc	(swallow bottom center)
 `\e'	S_sw_bl	(swallow bottom left)
-/	S_sw_br	(swallow bottom right	)
+/	S_sw_br	(swallow bottom right)
 |	S_sw_ml	(swallow middle left)
 |	S_sw_mr	(swallow middle right)
 -	S_sw_tc	(swallow top center)
@@ -2558,7 +2560,6 @@ Z	S_zombie	(zombie)
 z	S_zruty	(zruty)
 .\"TABLE_END  Do not delete this line.
 .TE
-.ed
 .pg
 .hn 2
 Configuring NetHack for Play by the Blind
@@ -2827,7 +2828,6 @@ particularly intriguing modification to help out with the game.  The Gods of
 the Dungeon sometimes make note of the names of the worst of these miscreants
 in this, the list of Dungeoneers:
 
-.sd
 .TS S
 center;
 c c c.
@@ -2871,7 +2871,6 @@ Helge Hafting	Mike Engber	Yitzhak Sapir
 Irina Rempt-Drijfhout	Mike Gallop
 .\"TABLE_END  Do not delete this line.
 .TE
-.ed
 
 .\"Microsoft and MS-DOS are registered trademarks of Microsoft Corporation.
 .\"Lattice is a trademark of Lattice, Inc.
