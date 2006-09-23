@@ -1304,9 +1304,11 @@ boolean tinitial, tfrom_file;
 		    symset[ROGUESET] = (char *)alloc(strlen(op) + 1);
 		    Strcpy(symset[ROGUESET], op);
 		    if (!read_sym_file(ROGUESET)) {
-			badoption(opts);
 			free((char *)symset[ROGUESET]);
 			symset[ROGUESET] = (char *)0;
+	    		raw_printf("Unable to load symbol set \"%s\" from \"%s\".",
+					op, SYMBOLS);
+			wait_synch();
 		    } else {
 			if (!initial && Is_rogue_level(&u.uz))
 				assign_graphics(ROGUESET);
@@ -1326,9 +1328,11 @@ boolean tinitial, tfrom_file;
 		    symset[PRIMARY] = (char *)alloc(strlen(op) + 1);
 		    Strcpy(symset[PRIMARY], op);
 		    if (!read_sym_file(PRIMARY)) {
-			badoption(opts);
 			free((char *)symset[PRIMARY]);
 			symset[PRIMARY] = (char *)0;
+	    		raw_printf("Unable to load symbol set \"%s\" from \"%s\".",
+					op, SYMBOLS);
+			wait_synch();
 		    } else {
 		    	switch_symbols(TRUE);
 			need_redraw = TRUE;
@@ -3146,7 +3150,7 @@ boolean setinitial,setfromfile;
 	menu_item *symset_pick = (menu_item *)0;
 	boolean rogueflag = (*optname == 'r');
 	char *symset_name;
-	int chosen = -2, which_set =
+	int chosen = -2, res, which_set =
 #ifdef REINCARNATION
 					rogueflag ? ROGUESET :
 #endif
@@ -3159,7 +3163,8 @@ boolean setinitial,setfromfile;
 	symset_name = symset[which_set];
 	symset[which_set] = (char *)0;
 
-	if (read_sym_file(which_set) && symset_list) {
+	res = read_sym_file(which_set);
+	if (res && symset_list) {
 		int let = 'a';
 		struct textlist *sl;
 		tmpwin = create_nhwindow(NHW_MENU);
@@ -3210,8 +3215,16 @@ boolean setinitial,setfromfile;
 			symset_list = sl->next;
 		}
 		symset_list = (struct textlist *)0;
+	} else if (!res) {
+		/* The symbols file could not be accessed */
+		pline("Unable to access \"%s\" file.", SYMBOLS);
+		return TRUE;
+	} else if (!symset_list) {
+		/* The symbols file was empty */
+		pline("There were no symbol sets found in \"%s\".",
+			SYMBOLS);
+		return TRUE;
 	}
-
 	/* these set default symbols and clear the handling value */
 # ifdef REINCARNATION
 	if(rogueflag) init_r_symbols();
@@ -3228,7 +3241,7 @@ boolean setinitial,setfromfile;
 	    else {
 		free((genericptr_t)symset[which_set]);
 		symset[which_set] = (char *)0;
-		return 0;
+		return TRUE;
 	    }
 	}
 

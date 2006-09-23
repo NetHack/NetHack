@@ -376,18 +376,18 @@ int nondefault;
 
 		for (i = 0; i < MAXOCLASSES; i++)
 		    oc_syms[i] = l_oc_syms[i];
-#ifdef PC9800
+# ifdef PC9800
 		if (SYMHANDLING(H_IBM)
 		    && ibmgraphics_mode_callback)
 			(*ibmgraphics_mode_callback)();
 	        else if (!symset[currentgraphics] && ascgraphics_mode_callback)
 			(*ascgraphics_mode_callback)();
-#endif
-#ifdef TERMLIB
+# endif
+# ifdef TERMLIB
 	    	if (SYMHANDLING(H_DEC)
 		    && decgraphics_mode_callback)
 			(*decgraphics_mode_callback)();
-#endif
+# endif
 	} else
 #endif
 	init_symbols();
