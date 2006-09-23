@@ -280,3 +280,97 @@ start: RogueWindows
 	S_dnstair: \xf0 
 finish
 
+# Recommended symset for blind players 
+# courtesy Michael Feir
+start: NHAccess
+	S_stone: \032
+	S_vwall: \124
+	S_hwall: \045
+	S_tlcorn: \124
+	S_trcorn: \124
+	S_blcorn: \124
+	S_brcorn: \124
+	S_crwall: \045
+	S_tuwall: \045
+	S_tdwall: \045 
+	S_tlwall: \124
+	S_trwall: \124
+	S_ndoor: \046
+	S_vodoor: \045
+	S_hodoor: \124
+	S_vcdoor: \043
+	S_hcdoor: \043
+	S_bars: \046
+	S_tree: \035
+	S_room: \035
+	S_corr: \060
+	S_litcorr: \062 
+	S_upstair: \060
+	S_dnstair: \062
+	S_upladder: \095
+	S_dnladder: \092
+	S_altar: \035
+	S_grave: \126
+	S_throne: \126
+	S_sink: \126
+	S_fountain: \126 
+	S_pool: \042
+	S_ice: \042
+	S_lava: \035
+	S_vodbridge: \035
+	S_hodbridge: \032 
+	S_vcdbridge: \035
+	S_hcdbridge: \126
+	S_arrow_trap: \094
+	S_dart_trap: \094
+	S_falling_rock_trap: \094 
+	S_squeaky_board: \094
+	S_bear_trap: \094
+	S_land_mine: \094
+	S_rolling_boulder_trap: \094 
+	S_sleeping_gas_trap: \094
+	S_rust_trap: \094
+	S_fire_trap: \094
+	S_pit: \094
+	S_spiked_pit: \094
+	S_hole: \094
+	S_trap_door: \094 
+	S_teleportation_trap: \094
+	S_level_teleporter: \094
+	S_magic_portal: \094
+	S_web: \094
+	S_statue_trap: \094 
+	S_magic_trap: \094
+	S_anti_magic_trap: \094 
+	S_polymorph_trap: \094
+	S_vbeam: \124
+	S_hbeam: \095
+	S_lslant: \092
+	S_rslant: \047
+	S_digbeam: \042
+	S_flashbeam: \033
+	S_boomleft: \041
+	S_boomright: \040
+	S_ss1: \048
+	S_ss2: \035
+	S_ss3: \064
+	S_ss4: \042
+	S_sw_tl: \047
+	S_sw_tc: \045
+	S_sw_tr: \092
+	S_sw_ml: \058
+	S_sw_mr: \058
+	S_sw_bl: \092
+	S_sw_bc: \045
+	S_sw_br: \047
+	S_explode1: \047 
+	S_explode2: \045
+	S_explode3: \092
+	S_explode4: \058
+	S_explode5: \032
+	S_explode6: \058
+	S_explode7: \092
+	S_explode8: \045
+	S_explode9: \047
+finish
+
