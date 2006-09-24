@@ -395,9 +395,9 @@ boolean allow_drag;
 		return TRUE;
 	    }
 #define CHAIN_IN_MIDDLE(chx, chy) \
-(distmin(x, y, chx, chy) <= 1 && distmin(chx, chy, uball->ox, uball->oy) <= 1)
+ (distmin(x, y, chx, chy) <= 1 && distmin(chx, chy, uball->ox, uball->oy) <= 1)
 #define IS_CHAIN_ROCK(x,y) \
-(IS_ROCK(levl[x][y].typ) || (IS_DOOR(levl[x][y].typ) && \
+ (IS_ROCK(levl[x][y].typ) || (IS_DOOR(levl[x][y].typ) && \
       (levl[x][y].doormask & (D_CLOSED|D_LOCKED))))
 /* Don't ever move the chain into solid rock.  If we have to, then instead
  * undo the move_bc() and jump to the drag ball code.  Note that this also
@@ -548,7 +548,6 @@ boolean allow_drag;
 		    break;
 	    }
 #undef SKIP_TO_DRAG
-#undef IS_CHAIN_ROCK
 #undef CHAIN_IN_MIDDLE
 	    return TRUE;
 	}
@@ -622,11 +621,32 @@ drag:
 	    *ballx = *chainx = x;
 	    *bally = *chainy = y;
 	} else {
+	    xchar newchainx = u.ux, newchainy = u.uy;
+
+	    /*
+	     * Generally, chain moves to hero's previous location and ball
+	     * moves to chain's previous location, except that we try to
+	     * keep the chain directly between the hero and the ball.  But,
+	     * take the simple approach if the hero's previous location or
+	     * the potential between location is inaccessible.
+	     */
+	    if (dist2(x, y, uchain->ox, uchain->oy) == 4 &&
+		!IS_CHAIN_ROCK(newchainx, newchainy)) {
+		newchainx = (x + uchain->ox)/2;
+		newchainy = (y + uchain->oy)/2;
+		if (IS_CHAIN_ROCK(newchainx, newchainy)) {
+		    /* don't let chain move to inaccessible location */
+		    newchainx = u.ux;
+		    newchainy = u.uy;
+		}
+	    }
+
 	    *ballx  = uchain->ox;
 	    *bally  = uchain->oy;
-	    *chainx = u.ux;
-	    *chainy = u.uy;
+	    *chainx = newchainx;
+	    *chainy = newchainy;
 	}
+#undef IS_CHAIN_ROCK
 	*cause_delay = TRUE;
 	return TRUE;
 }
