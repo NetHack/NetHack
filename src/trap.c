@@ -2811,7 +2811,8 @@ xchar x, y;
 		chance = 20;
 		break;
 	    }
-	    if (!force && (Luck + 5) > rn2(chance))
+	    if ((!force && (Luck + 5) > rn2(chance)) ||
+		(is_flammable(obj) && obj->oerodeproof))
 		continue;
 	    /* Container is burnt up - dump contents out */
 	    if (in_sight) pline("%s catches fire and burns.", Yname2(obj));
