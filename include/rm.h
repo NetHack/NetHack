@@ -234,11 +234,15 @@ struct symparse {
 	const char *name;
 };
 
-/* general linked list of text pointers */
-struct textlist {
-	char *text;		/* the text       */
-	int idx;		/* an index value */
-	struct textlist *next;	/* next in list   */
+/* linked list of symsets and their characteristics */
+struct symsetentry {
+	struct symsetentry *next;	/* next in list            */
+	char *name;			/* ptr to symset name      */
+	char *desc;			/* ptr to description      */
+	int idx;			/* an index value          */
+	int handling;			/* known handlers value    */
+	Bitfield(nocolor,1);		/* don't use color if set  */
+	/* 7 free bits */
 };
 
 /*
@@ -261,10 +265,10 @@ struct textlist {
 extern const struct symdef defsyms[MAXPCHARS];	/* defaults */
 extern uchar showsyms[MAXPCHARS];
 extern const struct symdef def_warnsyms[WARNCOUNT];
-extern char *symset[NUM_GRAPHICS];			  /* from drawing.c */
-extern int symhandling[NUM_GRAPHICS], currentgraphics;	  /* from drawing.c */
+extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
+extern int currentgraphics;				  /* from drawing.c */
 
-#define SYMHANDLING(ht) (symhandling[currentgraphics] == (ht))
+#define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))
 
 /*
  * The 5 possible states of doors

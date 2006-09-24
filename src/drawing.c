@@ -17,8 +17,8 @@
 #define C(n)
 #endif
 
-char *symset[NUM_GRAPHICS] = {0,0};
-int symhandling[NUM_GRAPHICS] = {0,0}, currentgraphics = 0;
+struct symsetentry symset[NUM_GRAPHICS];
+int currentgraphics = 0;
 
 uchar oc_syms[MAXOCLASSES] = DUMMY; /* the current object  display symbols */
 uchar showsyms[MAXPCHARS]  = DUMMY; /* the current feature display symbols */
@@ -380,7 +380,7 @@ int nondefault;
 		if (SYMHANDLING(H_IBM)
 		    && ibmgraphics_mode_callback)
 			(*ibmgraphics_mode_callback)();
-	        else if (!symset[currentgraphics] && ascgraphics_mode_callback)
+	        else if (!symset[currentgraphics].name && ascgraphics_mode_callback)
 			(*ascgraphics_mode_callback)();
 # endif
 # ifdef TERMLIB
@@ -430,19 +430,19 @@ init_l_symbols()
 
 	for (i = 0; i < MAXOCLASSES; i++)
 	    l_oc_syms[i] = def_oc_syms[i].sym;
-	symhandling[PRIMARY] = H_UNK;
+	clear_symsetentry(PRIMARY, FALSE);
 }
 
 void
 assign_graphics(whichset)
 int whichset;
 {
-    /* Adjust graphics display characters on Rogue levels */
     register int i;
 
     switch(whichset) {
 # ifdef REINCARNATION
     case ROGUESET:
+	/* Adjust graphics display characters on Rogue levels */
 
 	for (i = 0; i < MAXMCLASSES; i++)
 	    monsyms[i] = r_monsyms[i];
@@ -496,7 +496,11 @@ init_r_symbols()
 	for (i = 0; i < MAXOCLASSES; i++)
 	    r_oc_syms[i] = def_r_oc_syms[i];
 
-	symhandling[ROGUESET] = H_UNK;
+	clear_symsetentry(ROGUESET, FALSE);
+	symset[ROGUESET].nocolor = 1;	 /* default on Rogue level is no color
+					  * but some symbol sets can
+					  * override that
+					  */
 }
 
 void
@@ -545,6 +549,25 @@ int val;
 	 }
 }
 
+void
+clear_symsetentry(which_set, name_too)
+int which_set;
+boolean name_too;
+{
+	if (symset[which_set].desc)
+		free((genericptr_t)symset[which_set].desc);
+	symset[which_set].desc = (char *)0;
+
+	symset[which_set].nocolor = 0;
+	symset[which_set].handling = H_UNK;
+
+	if (name_too) {
+	    if (symset[which_set].name)
+		free((genericptr_t *)symset[which_set].name);
+	    symset[which_set].name = (char *)0;
+	}
+}
+
 /*
  * If you are adding code somewhere to be able to recognize
  * particular types of symset "handling", define a 
@@ -564,6 +587,9 @@ struct symparse loadsyms[] = {
 	{SYM_CONTROL, 0, "begin"},
 	{SYM_CONTROL, 1, "finish"},
 	{SYM_CONTROL, 2, "handling"},
+	{SYM_CONTROL, 3, "description"},
+	{SYM_CONTROL, 4, "color"},
+	{SYM_CONTROL, 4, "colour"},
 	{SYM_PCHAR, S_stone, "S_stone"},
 	{SYM_PCHAR, S_vwall, "S_vwall"},
 	{SYM_PCHAR, S_hwall, "S_hwall"},

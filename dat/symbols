@@ -189,7 +189,9 @@ start: RogueIBM
 finish
 
 start: RogueEpyx
+	Description: Rogue level color symbol set like Epyx Rogue
 	Handling: IBM
+	Color: Yes
 	S_weapon: \x18			# up arrow
 	S_armor: \x0a			# Vert rect with o
 	S_ring: \x09			# circle with arrow

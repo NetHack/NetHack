@@ -2421,7 +2421,7 @@ read_wizkit()
 #endif /*WIZARD*/
 
 #ifdef ASCIIGRAPH
-extern struct textlist *symset_list;	/* options.c */
+extern struct symsetentry *symset_list;	/* options.c */
 extern struct symparse loadsyms[];	/* drawing.c */
 extern const char *known_handling[];	/* drawing.c */
 static int symset_count = 0;	 	/* for pick-list building only */
@@ -2460,10 +2460,11 @@ int which_set;
 	}
 	(void) fclose(fp);
 	if (!chosen_symset_end && !chosen_symset_start)
-		return (symset[which_set] == 0) ? 1 : 0;
+		return (symset[which_set].name == 0) ? 1 : 0;
 	if (!chosen_symset_end) {
 		raw_printf("Missing finish for symset \"%s\"",
-			symset[which_set] ? symset[which_set] : "unknown");
+			symset[which_set].name ?
+			symset[which_set].name : "unknown");
 		wait_synch();
 	}
 	return 1;
@@ -2524,25 +2525,38 @@ int which_set;
 	if (!symp)
 		return 0;
 
-	if (!symset[which_set]) {
+	if (!symset[which_set].name) {
 	    /* A null symset name indicates that we're just
 	       building a pick-list of possible symset
 	       values from the file, so only do that */
-	    if (symp->range == SYM_CONTROL && symp->idx == 0) {
-		struct textlist *tmpsp;
-		tmpsp = (struct textlist *)alloc(sizeof(struct textlist));
-		tmpsp->next = (struct textlist *)0;
-		if (!symset_list) {
+	    if (symp->range == SYM_CONTROL) {
+		struct symsetentry *tmpsp;
+                switch (symp->idx) {
+                 case 0:
+		    tmpsp = (struct symsetentry *)alloc(sizeof(struct symsetentry));
+		    tmpsp->next = (struct symsetentry *)0;
+		    if (!symset_list) {
 		    	symset_list = tmpsp;
 		    	symset_count = 0;
-		} else {
+		    } else {
 		    	symset_count++;
 		    	tmpsp->next = symset_list;
 		    	symset_list = tmpsp;
-		}
-		tmpsp->idx = symset_count;
-		tmpsp->text = (char *)alloc(strlen(bufp)+1);
-		Strcpy(tmpsp->text, bufp);
+		    }
+		    tmpsp->idx = symset_count;
+		    tmpsp->name = (char *)alloc(strlen(bufp)+1);
+		    Strcpy(tmpsp->name, bufp);
+		    tmpsp->desc = (char *)0;
+		    tmpsp->nocolor = 0;
+		    break;
+		 case 3: /* description:something */
+		    tmpsp = symset_list; /* most recent symset */
+		    if (tmpsp && !tmpsp->desc) {
+			tmpsp->desc = (char *)alloc(strlen(bufp)+1);
+			Strcpy(tmpsp->desc, bufp);
+		    }
+		    break;
+	        }
 	    }
 	    return 1;
 	}
@@ -2551,7 +2565,8 @@ int which_set;
 		switch(symp->idx) {
 		    case 0:
 			    /* start of symset */
-			    if (!strcmpi(bufp, symset[which_set])) { /* desired one? */
+			    if (!strcmpi(bufp, symset[which_set].name)) {
+				/* matches desired one */
 				chosen_symset_start = TRUE;
 #ifdef REINCARNATION
 				if (which_set == ROGUESET) init_r_symbols();
@@ -2569,6 +2584,21 @@ int which_set;
 			    /* handler type identified */
 			    if (chosen_symset_start)
 			        set_symhandling(bufp, which_set);
+			    break;
+		 /* case 3: (description) is ignored here */
+		    case 4:  /* color:off */
+			    if (chosen_symset_start) {
+				    if (bufp) {
+					if (!strcmpi(bufp, "true") ||
+					    !strcmpi(bufp, "yes")  ||
+					    !strcmpi(bufp, "on"))
+						symset[which_set].nocolor = 0;
+				        else if (!strcmpi(bufp, "false") ||
+						 !strcmpi(bufp, "no")    ||
+						 !strcmpi(bufp, "off"))
+						symset[which_set].nocolor = 1;
+				    }
+			    }
 			    break;
 		}
 	    } else {		/* !SYM_CONTROL */
@@ -2593,10 +2623,10 @@ int which_set;
 {
 	int i = 0;
 
-	symhandling[which_set] = H_UNK;
+	symset[which_set].handling = H_UNK;
 	while (known_handling[i]) {
 	    if (!strcmpi(known_handling[i], handling)) {
-		symhandling[which_set] = i;
+		symset[which_set].handling = i;
 		return;
 	    }
 	    i++;

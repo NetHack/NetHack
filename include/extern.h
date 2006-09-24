@@ -499,6 +499,7 @@ E void NDECL(init_r_symbols);
 E void NDECL(init_symbols);
 E void NDECL(init_disp_symbols);
 E void NDECL(init_l_symbols);
+E void FDECL(clear_symsetentry, (int,BOOLEAN_P));
 #ifdef ASCIIGRAPH
 E void FDECL(update_l_symset, (struct symparse *,int));
 E void FDECL(update_r_symset, (struct symparse *,int));

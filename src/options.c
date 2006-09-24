@@ -609,9 +609,9 @@ initoptions()
 	/* this detects the IBM-compatible console on most 386 boxes */
 	if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
 #ifdef ASCIIGRAPH
-		if (!symset[PRIMARY]) load_symset("IBMGraphics", PRIMARY);
+		if (!symset[PRIMARY].name) load_symset("IBMGraphics", PRIMARY);
 
-		if (!symset[ROGUESET]) load_symset("RogueIBM", ROGUESET);
+		if (!symset[ROGUESET].name) load_symset("RogueIBM", ROGUESET);
 
 		switch_symbols(TRUE);
 #endif
@@ -627,10 +627,7 @@ initoptions()
 	    !strncmpi(opts, "vt", 2) && AS && AE &&
 	    index(AS, '\016') && index(AE, '\017')) {
 #  ifdef ASCIIGRAPH
-		if (!symset[PRIMARY]) load_symset("DECGraphics", PRIMARY);
-
-
-
+		if (!symset[PRIMARY].name) load_symset("DECGraphics", PRIMARY);
 		switch_symbols(TRUE);
 #  endif /*ASCIIGRAPH*/
 	}
@@ -638,7 +635,7 @@ initoptions()
 #endif /* UNIX || VMS */
 
 #ifdef MAC_GRAPHICS_ENV
-	if (!symset[PRIMARY]) load_symset("MACGraphics", PRIMARY);
+	if (!symset[PRIMARY].name) load_symset("MACGraphics", PRIMARY);
 	switch_symbols(TRUE);
 #endif /* MAC_GRAPHICS_ENV */
 	flags.menu_style = MENU_FULL;
@@ -1301,11 +1298,10 @@ boolean tinitial, tfrom_file;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, FALSE)) != 0) {
-		    symset[ROGUESET] = (char *)alloc(strlen(op) + 1);
-		    Strcpy(symset[ROGUESET], op);
+		    symset[ROGUESET].name = (char *)alloc(strlen(op) + 1);
+		    Strcpy(symset[ROGUESET].name, op);
 		    if (!read_sym_file(ROGUESET)) {
-			free((char *)symset[ROGUESET]);
-			symset[ROGUESET] = (char *)0;
+		    	clear_symsetentry(ROGUESET, TRUE);
 	    		raw_printf("Unable to load symbol set \"%s\" from \"%s\".",
 					op, SYMBOLS);
 			wait_synch();
@@ -1325,11 +1321,10 @@ boolean tinitial, tfrom_file;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, FALSE)) != 0) {
-		    symset[PRIMARY] = (char *)alloc(strlen(op) + 1);
-		    Strcpy(symset[PRIMARY], op);
+		    symset[PRIMARY].name = (char *)alloc(strlen(op) + 1);
+		    Strcpy(symset[PRIMARY].name, op);
 		    if (!read_sym_file(PRIMARY)) {
-			free((char *)symset[PRIMARY]);
-			symset[PRIMARY] = (char *)0;
+		    	clear_symsetentry(PRIMARY, TRUE);
 	    		raw_printf("Unable to load symbol set \"%s\" from \"%s\".",
 					op, SYMBOLS);
 			wait_synch();
@@ -2293,15 +2288,14 @@ goodfruit:
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    /* There is no rogue level DECgraphics-specific set */
-		    if (symset[PRIMARY])
+		    if (symset[PRIMARY].name)
 			badflag = TRUE;
 		    else {
-			symset[PRIMARY] = (char *)alloc(strlen(fullname) + 1);
-			Strcpy(symset[PRIMARY], fullname);
+			symset[PRIMARY].name = (char *)alloc(strlen(fullname) + 1);
+			Strcpy(symset[PRIMARY].name, fullname);
 			if (!read_sym_file(PRIMARY)) {
 				badflag = TRUE;
-				free((char *)symset[PRIMARY]);
-				symset[PRIMARY] = (char *)0;
+				clear_symsetentry(PRIMARY, TRUE);
 		        } else switch_symbols(TRUE);
 		    }
 		    if (badflag) {
@@ -2319,16 +2313,15 @@ goodfruit:
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    for (i = 0; i < NUM_GRAPHICS; ++i) { 
-			if (symset[i])
+			if (symset[i].name)
 			    badflag = TRUE;
 			else {
 			    if (i == ROGUESET) sym_name = "RogueIBM";
-			    symset[i] = (char *)alloc(strlen(sym_name) + 1);
-			    Strcpy(symset[i], sym_name);
+			    symset[i].name = (char *)alloc(strlen(sym_name) + 1);
+			    Strcpy(symset[i].name, sym_name);
 			    if (!read_sym_file(i)) {
 				badflag = TRUE;
-				free((char *)symset[i]);
-				symset[i] = (char *)0;
+				clear_symsetentry(i, TRUE);
 				break;
 			    }
 			}
@@ -2353,14 +2346,13 @@ goodfruit:
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
-		    if (symset[PRIMARY]) badflag = TRUE;
+		    if (symset[PRIMARY]).name badflag = TRUE;
 		    else {
-			symset[PRIMARY] = (char *)alloc(strlen(fullname) + 1);
-			Strcpy(symset[PRIMARY], fullname);
+			symset[PRIMARY].name = (char *)alloc(strlen(fullname) + 1);
+			Strcpy(symset[PRIMARY].name, fullname);
 			if (!read_sym_file(PRIMARY)) {
 				badflag = TRUE;
-				free((char *)symset[PRIMARY]);
-				symset[PRIMARY] = (char *)0;
+				clear_symsetentry(PRIMARY, TRUE);
 		        }
 		    }
 		    if (badflag) {
@@ -2482,7 +2474,6 @@ goodfruit:
 	/* out of valid options */
 	badoption(opts);
 }
-
 
 static NEARDATA const char *menutype[] = {
 	"traditional", "combination", "partial", "full"
@@ -2785,7 +2776,7 @@ doset()
 	return 0;
 }
 
-struct textlist *symset_list = 0;	/* files.c will populate this with
+struct symsetentry *symset_list = 0;	/* files.c will populate this with
 						 list of available sets */
 
 STATIC_OVL boolean
@@ -3149,7 +3140,8 @@ boolean setinitial,setfromfile;
  	       !strcmp("roguesymset", optname)) {
 	menu_item *symset_pick = (menu_item *)0;
 	boolean rogueflag = (*optname == 'r');
-	char *symset_name;
+	struct symsetentry *sl;
+	char *symset_name, fmtstr[20];
 	int chosen = -2, res, which_set =
 #ifdef REINCARNATION
 					rogueflag ? ROGUESET :
@@ -3159,14 +3151,15 @@ boolean setinitial,setfromfile;
 	if (rogueflag) return TRUE;
 #endif
 #ifdef ASCIIGRAPH
-	/* clear symset as a flag to read_sym_file() to build list */
-	symset_name = symset[which_set];
-	symset[which_set] = (char *)0;
+	/* clear symset[].name as a flag to read_sym_file() to build list */
+	symset_name = symset[which_set].name;
+	symset[which_set].name = (char *)0;
+	symset_list = (struct symsetentry *)0;
 
 	res = read_sym_file(which_set);
 	if (res && symset_list) {
-		int let = 'a';
-		struct textlist *sl;
+		char symsetchoice[BUFSZ];
+		int let = 'a', biggest = 0, thissize = 0;
 		tmpwin = create_nhwindow(NHW_MENU);
 		start_menu(tmpwin);
 		any.a_int = 1;
@@ -3174,10 +3167,21 @@ boolean setinitial,setfromfile;
 			 ATR_NONE, "Default Symbols", MENU_UNSELECTED);
 		sl = symset_list;
 		while (sl) {
-		    if (sl->text) {
+		    /* find biggest name */
+		    if (sl->name) thissize = strlen(sl->name);
+		    if (thissize > biggest) biggest = thissize;
+		    sl = sl->next;
+		}
+		Sprintf(fmtstr,"%%-%ds %%s", biggest + 5);
+		
+		sl = symset_list;
+		while (sl) {
+		    if (sl->name) {
 			any.a_int = sl->idx + 2;
+			Sprintf(symsetchoice, fmtstr, sl->name,
+				sl->desc ? sl->desc : "");
 			add_menu(tmpwin, NO_GLYPH, &any, let, 0,
-			 ATR_NONE, sl->text, MENU_UNSELECTED);
+			 ATR_NONE, symsetchoice, MENU_UNSELECTED);
 			sl = sl->next;
 			if (let == 'z') let = 'A';
 			else let++;
@@ -3189,32 +3193,37 @@ boolean setinitial,setfromfile;
 			free((genericptr_t)symset_pick);
 		}
 		destroy_nhwindow(tmpwin);
+
 		if (chosen > -1) {
-			/* chose an actual symset name from file */
-			sl = symset_list;
-			while (sl) {
-			    if (sl->idx == chosen) {
-				if (symset_name) {
+		    /* chose an actual symset name from file */
+		    sl = symset_list;
+		    while (sl) {
+			if (sl->idx == chosen) {
+			    if (symset_name) {
 					free((genericptr_t)symset_name);
 					symset_name = (char *)0;
-				}
-				symset[which_set] = (char *)alloc(strlen(sl->text)+1);
-				Strcpy(symset[which_set], sl->text);
 			    }
-			    sl = sl->next;
+			    /* free the now stale attributes */
+			    clear_symsetentry(which_set, TRUE);
+
+			    /* transfer only the name of the symbol set */
+			    symset[which_set].name =
+					(char *)alloc(strlen(sl->name)+1);
+			    Strcpy(symset[which_set].name, sl->name);
+
+			    break;
 			}
-		} else if (chosen == -1) {
+			sl = sl->next;
+		    }
+		}
+
+		else if (chosen == -1) {
 			/* explicit selection of defaults */
+			/* free the now stale symset attributes */
 			if (symset_name) free ((genericptr_t)symset_name);
 			symset_name = (char *)0;
+			clear_symsetentry(which_set, TRUE);
 		}
-		/* clean up */
-		while (symset_list) {
-			sl = symset_list;
-			if (sl->text) free((genericptr_t)sl->text);
-			symset_list = sl->next;
-		}
-		symset_list = (struct textlist *)0;
 	} else if (!res) {
 		/* The symbols file could not be accessed */
 		pline("Unable to access \"%s\" file.", SYMBOLS);
@@ -3225,32 +3234,45 @@ boolean setinitial,setfromfile;
 			SYMBOLS);
 		return TRUE;
 	}
-	/* these set default symbols and clear the handling value */
+
+	/* clean up */
+	while (symset_list) {
+		sl = symset_list;
+		if (sl->name) free((genericptr_t)sl->name);
+		sl->name = (char *)0;
+
+		if (sl->desc) free((genericptr_t)sl->desc);
+		sl->desc = (char *)0;
+
+		symset_list = sl->next;
+		free((genericptr_t)sl);
+	}
+
+	/* Set default symbols and clear the handling value */
 # ifdef REINCARNATION
 	if(rogueflag) init_r_symbols();
 	else
 # endif
 	    init_l_symbols();
 
-	if (!symset[which_set] && symset_name)
-		symset[which_set] = symset_name;
+	if (!symset[which_set].name && symset_name)
+		symset[which_set].name = symset_name;
 
-	if (symset[which_set]) {
+	if (symset[which_set].name) {
 	    if (read_sym_file(which_set))
 		switch_symbols(TRUE);
 	    else {
-		free((genericptr_t)symset[which_set]);
-		symset[which_set] = (char *)0;
+		clear_symsetentry(which_set, TRUE);
 		return TRUE;
 	    }
 	}
-
+	
 	switch_symbols(TRUE);
 # ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz))
 		assign_graphics(ROGUESET);
 	else
-#endif
+# endif
 		assign_graphics(PRIMARY);
 	need_redraw = TRUE;
 #endif /*ASCIIGRAPH*/
@@ -3454,7 +3476,8 @@ char *buf;
 #ifdef REINCARNATION
 	else if (!strcmp(optname, "roguesymset"))
 		Sprintf(buf, "%s",
-			symset[ROGUESET] ? symset[ROGUESET] : "default");
+			symset[ROGUESET].name ?
+			symset[ROGUESET].name : "default");
 #endif
 	else if (!strcmp(optname, "role"))
 		Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
@@ -3489,7 +3512,8 @@ char *buf;
 	}
 	else if (!strcmp(optname, "symset"))
 		Sprintf(buf, "%s",
-			symset[PRIMARY] ? symset[PRIMARY] : "default");
+			symset[PRIMARY].name ?
+			symset[PRIMARY].name : "default");
 	else if (!strcmp(optname, "tile_file"))
 		Sprintf(buf, "%s", iflags.wc_tile_file ? iflags.wc_tile_file : defopt);
 	else if (!strcmp(optname, "tile_height")) {
@@ -3671,14 +3695,14 @@ load_symset(s, which_set)
 const char *s;
 int which_set;
 {
-	if (symset[which_set]) free((genericptr_t)symset[which_set]);
-	symset[which_set] = (char *)alloc(strlen(s)+1);
-	Strcpy(symset[which_set],s);
+	clear_symsetentry(which_set, TRUE);
+
+	symset[which_set].name = (char *)alloc(strlen(s)+1);
+	Strcpy(symset[which_set].name,s);
 	if (read_sym_file(which_set))
 		switch_symbols(TRUE);
 	else {
-		free((genericptr_t)symset[which_set]);
-		symset[which_set] = (char *)0;
+		clear_symsetentry(which_set, TRUE);
 		return 0;
 	}
 	return 1;

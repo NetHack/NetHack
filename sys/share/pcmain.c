@@ -307,11 +307,11 @@ char *argv[];
 
 #if defined(MSDOS) || defined(WIN32)
 	/* Player didn't specify any symbol set so use IBM defaults */
-	if (!symset[PRIMARY]) {
+	if (!symset[PRIMARY].name) {
 		load_symset("IBMGraphics_2", PRIMARY);
 	}
 # ifdef REINCARNATION
-	if (!symset[ROGUESET]) {
+	if (!symset[ROGUESET].name) {
 		load_symset("RogueEpyx", ROGUESET);
 	}
 # endif
