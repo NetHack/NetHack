@@ -563,7 +563,7 @@ boolean name_too;
 
 	if (name_too) {
 	    if (symset[which_set].name)
-		free((genericptr_t *)symset[which_set].name);
+		free((genericptr_t)symset[which_set].name);
 	    symset[which_set].name = (char *)0;
 	}
 }
