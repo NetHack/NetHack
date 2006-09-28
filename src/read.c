@@ -2066,30 +2066,27 @@ create_particular()
 		whichpm = &mons[which];
 	    }
 	    for (i = 0; i <= multi; i++) {
-		if (randmonst)
-		    whichpm = rndmonst();
 		if (monclass != MAXMCLASSES)
 		    whichpm = mkclass(monclass, 0);
+		else if (randmonst)
+		    whichpm = rndmonst();
+		mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);
+		if (!mtmp) {
+		    /* quit trying if creation failed and is going to repeat */
+		    if (monclass == MAXMCLASSES && !randmonst) break;
+		    /* otherwise try again */
+		    continue;
+		}
 		if (maketame) {
-		    mtmp = makemon(whichpm, u.ux, u.uy, MM_EDOG);
-		    if (mtmp) {
-			initedog(mtmp);
-			set_malign(mtmp);
-			newsym(mtmp->mx, mtmp->my);
-		    }
-		} else {
-		    mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);
-		    if ((makepeaceful || makehostile) && mtmp) {
-			mtmp->mtame = 0;	/* sanity precaution */
-			mtmp->mpeaceful = makepeaceful ? 1 : 0;
-			set_malign(mtmp);
-		    }
+		    (void) tamedog(mtmp, (struct obj *) 0);
+		} else if (makepeaceful || makehostile) {
+		    mtmp->mtame = 0;	/* sanity precaution */
+		    mtmp->mpeaceful = makepeaceful ? 1 : 0;
+		    set_malign(mtmp);
 		}
-		if (mtmp) {
-		    madeany = TRUE;
-		    if (mtmp->cham >= LOW_PM && firstchoice != NON_PM)
-			(void)newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
-		}
+		madeany = TRUE;
+		if (mtmp->cham >= LOW_PM && firstchoice != NON_PM)
+		    (void)newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
 	    }
 	}
 	return madeany;
