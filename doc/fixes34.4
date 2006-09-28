@@ -272,11 +272,6 @@ unix: remove use of parentheses in nethack man page usage that confused a
 	man page conversion tool
 winCE: disable processing of double-click messages if the first click
 	causes map to scroll
-win32tty: work around problem where display symbols were wrong or unrecognizable
-	on systems where the default language for non-Unicode programs was not 
-	set to "US English" - courtesy Ray Chason
-win32tty: work around problem where some characters did not show up if the
-	console code page was other than 437
 Windows, probably MSDOS and OS/2: attempting to use very first false rumor
 	for cookie fortune or random engraving could produce garbled text
 	when rumors.tru had CR+LF line ends instead of Unix-style LF lines
@@ -300,18 +295,8 @@ support ^R (and ^L in numpad mode) to request display repaint during direction
 	choosing and location choosing prompting modes
 intelligent pets will use keys to unlock doors
 destroyed drawbridge leaves some iron chains
-obsolete config file keywords: GRAPHICS, OBJECTS, TRAPS, EFFECTS
-deprecated options: IBMGraphics, DECGraphics, boulder
-new options: symset, roguesymset for choosing a symbol set from the symbols file
-new config file keyword: SYMBOLS for overriding character symbol values by name
 
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------
 
-
-Code Cleanup and Reorganization
--------------------------------
-drawing symbols for DECGraphics, IBMGraphics, MACgraphics are now stored in an
-	external symbol file that can be changed without rebuilding
-  
