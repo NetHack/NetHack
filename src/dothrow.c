@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2006/06/21	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2006/09/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1032,10 +1032,12 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 			 !index(in_rooms(mon->mx, mon->my, SHOPBASE), *u.ushops)))
 		    hot_pursuit(mon);
 
-		if (obj_gone) return;
+		if (obj_gone) thrownobj = 0;
 	}
 
-	if (u.uswallow) {
+	if (!thrownobj) {
+		;	/* missile has already been handled */
+	} else if (u.uswallow) {
 		/* ball is not picked up by monster */
 		if (obj != uball) (void) mpickobj(u.ustuck,obj);
 	} else {

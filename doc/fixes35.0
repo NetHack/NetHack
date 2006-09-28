@@ -158,6 +158,7 @@ if shopkeeper or priest gets teleported while inside his shop or temple,
 tame/peaceful grabber/engulfer will release hero after conflict ends
 make changes in hallucination be reflected by changes in mimickery feedback
 add Unaware pseudo-property to suppress various messages while unconscious
+missile which kills engulfer will now be placed prior to hero's return to map
 
 
 Platform- and/or Interface-Specific Fixes

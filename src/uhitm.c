@@ -1074,6 +1074,8 @@ int thrown;
 		pline(fmt, whom);
 	}
 
+	/* [note: thrown obj might go away during killed/xkilled call] */
+
 	if (needpoismsg)
 		pline_The("poison doesn't seem to affect %s.", mon_nam(mon));
 	if (poiskilled) {

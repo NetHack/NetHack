@@ -11,6 +11,8 @@
 #include "mfndpos.h"
 #include <ctype.h>
 
+extern struct obj *thrownobj;	/* dothrow.c */
+
 STATIC_DCL boolean FDECL(restrap,(struct monst *));
 STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));
 #ifdef BARGETHROUGH
@@ -1913,6 +1915,17 @@ int dest;
 
 	/* your pet knows who just killed it...watch out */
 	if (mtmp->mtame && !mtmp->isminion) EDOG(mtmp)->killed_by_u = 1;
+
+	if (wasinside && thrownobj && thrownobj != uball) {
+		/* thrown object has killed hero's engulfer; add it to mon's 
+		   inventory now so that it will be placed with mon's other
+		   stuff prior to lookhere/autopickup when hero is expelled
+		   below (as a side-effect, this missile has immunity from
+		   being consumed [for this shot/throw only]) */
+		mpickobj(mtmp, thrownobj);
+		/* let throwing code know that missile has been disposed of */
+		thrownobj = 0;
+	}
 
 	/* dispose of monster and make cadaver */
 	if(stoned) monstone(mtmp);
