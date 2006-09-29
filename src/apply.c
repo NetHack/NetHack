@@ -2599,6 +2599,8 @@ struct obj *obj;
 			You_cant("see through all the sticky goop on your %s.",
 				body_part(FACE));
 	}
+
+	setnotworn(obj);
 	/* useup() is appropriate, but we want costly_alteration()'s message */
 	costly_alteration(obj, COST_SPLAT);
 	obj_extract_self(obj);
