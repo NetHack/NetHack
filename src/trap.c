@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2006/08/05	*/
+/*	SCCS Id: @(#)trap.c	3.5	2006/09/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3032,7 +3032,7 @@ boolean *lostsome;
 boolean
 drown()
 {
-	boolean inpool_ok = FALSE, crawl_ok;
+	boolean inpool_ok = FALSE, crawl_ok, pool_of_water;
 	int i, x, y;
 
 	/* happily wading in the same contiguous pool */
@@ -3154,15 +3154,17 @@ drown()
 	}
 	u.uinwater = 1;
 	You("drown.");
-	killer.format = KILLED_BY_AN;
-	Strcpy(killer.name,
-	       (levl[u.ux][u.uy].typ == POOL || Is_medusa_level(&u.uz)) ?
-	       "pool of water" : "moat");
-	done(DROWNING);
-	/* oops, we're still alive.  better get out of the water. */
-	while (!safe_teleds(TRUE)) {
-		pline("You're still drowning.");
-		done(DROWNING);
+	pool_of_water = levl[u.ux][u.uy].typ == POOL || Is_medusa_level(&u.uz);
+	for (;;) {
+	    /* killer format and name are reconstructed every iteration
+	       because lifesaving resets them */
+	    killer.format = KILLED_BY_AN;
+	    Strcpy(killer.name, pool_of_water ? "pool of water" : "moat");
+	    done(DROWNING);
+	    /* oops, we're still alive.  better get out of the water. */
+	    if (safe_teleds(TRUE)) break;	/* successful life-save */
+	    /* nowhere safe to land; repeat drowning loop... */
+	    pline("You're still drowning.");
 	}
 	if (u.uinwater) {
 	    u.uinwater = 0;
@@ -4235,7 +4237,7 @@ lava_effects()
 {
     register struct obj *obj, *obj2;
     int dmg = d(6, 6);	/* only applicable for water walking */
-    boolean usurvive;
+    boolean usurvive, boil_away;
 
     usurvive = Fire_resistance || (Wwalking && dmg < u.uhp);
     /* a timely interrupt might manage to salvage your life
@@ -4299,16 +4301,20 @@ lava_effects()
 	iflags.in_lava_effects--;
 
 	/* s/he died... */
-	u.uhp = -1;
-	killer.format = KILLED_BY;
-	Strcpy(killer.name, lava_killer);
-	You("%s...",
-		(u.umonnum == PM_WATER_ELEMENTAL) ?
-		"boil away" : "burn to a crisp");
-	done(BURNING);
-	while (!safe_teleds(TRUE)) {
-		pline("You're still burning.");
-		done(BURNING);
+	boil_away = (u.umonnum == PM_WATER_ELEMENTAL ||
+		     u.umonnum == PM_STEAM_VORTEX ||
+		     u.umonnum == PM_FOG_CLOUD);
+	for (;;) {
+	    u.uhp = -1;
+	    /* killer format and name are reconstructed every iteration
+	       because lifesaving resets them */
+	    killer.format = KILLED_BY;
+	    Strcpy(killer.name, lava_killer);
+	    You("%s...", boil_away ? "boil away" : "burn to a crisp");
+	    done(BURNING);
+	    if (safe_teleds(TRUE)) break;	/* successful life-save */
+	    /* nowhere safe to land; repeat burning loop */
+	    pline("You're still burning.");
 	}
 	You("find yourself back on solid %s.", surface(u.ux, u.uy));
 	return(TRUE);
