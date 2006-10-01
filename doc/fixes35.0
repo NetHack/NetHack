@@ -239,6 +239,7 @@ new config file keyword: SYMBOLS for overriding character symbol values by name
 opening magic frees from bear traps and webs, activates trap doors
 closing magic activates bear traps and webs
 locking converts a hole into a trap door; striking does the opposite
+add Malcolm Ryan's Statue Glyphs patch
 
 
 Platform- and/or Interface-Specific New Features
