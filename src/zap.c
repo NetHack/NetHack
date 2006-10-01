@@ -270,10 +270,9 @@ struct obj *otmp;
 		}
 		break;
 	    }
-	case WAN_NOTHING:
 	case WAN_LOCKING:
 	case SPE_WIZARD_LOCK:
-		wake = FALSE;
+		wake = closeholdingtrap(mtmp, &learn_it);
 		break;
 	case WAN_PROBING:
 		wake = FALSE;
@@ -290,8 +289,16 @@ struct obj *otmp;
 				else pline("%s opens its mouth!", Monnam(mtmp));
 			}
 			expels(mtmp, mtmp->data, TRUE);
+		/* zap which hits steed will only release saddle if it
+		   doesn't hit a holding or falling trap; playability
+		   here overrides the more logical target ordering */
+		} else if (openholdingtrap(mtmp, &learn_it)) {
+			break;
+		} else if (openfallingtrap(mtmp, TRUE, &learn_it)) {
+			/* mtmp might now be on the migrating monsters list */
+			break;
 #ifdef STEED
-		} else if (!!(obj = which_armor(mtmp, W_SADDLE))) {
+		} else if ((obj = which_armor(mtmp, W_SADDLE)) != 0) {
 			mtmp->misc_worn_check &= ~obj->owornmask;
 			update_mon_intrinsics(mtmp, obj, FALSE, FALSE);
 			obj->owornmask = 0L;
@@ -383,6 +390,9 @@ struct obj *otmp;
 			    pline("%s suddenly seems weaker!", Monnam(mtmp));
 		    }
 		}
+		break;
+	case WAN_NOTHING:
+		wake = FALSE;
 		break;
 	default:
 		impossible("What an interesting effect (%d)", otyp);
@@ -2198,13 +2208,22 @@ boolean ordinary;
 			learn_it = TRUE;
 			unpunish();
 		    }
+		    if (u.utrap) {	/* escape web or bear trap */
+			(void) openholdingtrap(&youmonst, &learn_it);
+		    } else {	/* trigger previously escaped trapdoor */
+			(void) openfallingtrap(&youmonst, TRUE, &learn_it);
+		    }
+		    break;
+		case WAN_LOCKING:
+		case SPE_WIZARD_LOCK:
+		    if (!u.utrap) {
+			(void) closeholdingtrap(&youmonst, &learn_it);
+		    }
 		    break;
 		case WAN_DIGGING:
 		case SPE_DIG:
 		case SPE_DETECT_UNSEEN:
 		case WAN_NOTHING:
-		case WAN_LOCKING:
-		case SPE_WIZARD_LOCK:
 		    break;
 		case WAN_PROBING:
 		  {
@@ -2445,6 +2464,13 @@ struct obj *obj;	/* wand or spell */
 		pline_The("stairs seem to ripple momentarily.");
 		disclose = TRUE;
 	    }
+	    /* down will release you from bear trap or web */
+	    if (u.dz > 0 && u.utrap) {
+		(void) openholdingtrap(&youmonst, &disclose);
+	    /* down will trigger trapdoor, hole, or [spiked-] pit */
+	    } else if (u.dz > 0 && !u.utrap) {
+		(void) openfallingtrap(&youmonst, FALSE, &disclose);
+	    }
 	    break;
 	case WAN_STRIKING:
 	case SPE_FORCE_BOLT:
@@ -2453,8 +2479,8 @@ struct obj *obj;	/* wand or spell */
 	case WAN_LOCKING:
 	case SPE_WIZARD_LOCK:
 	    /* down at open bridge or up or down at open portcullis */
-	    if ((levl[x][y].typ == DRAWBRIDGE_DOWN) ? (u.dz > 0) :
-			(is_drawbridge_wall(x,y) && !is_db_wall(x,y)) &&
+	    if (((levl[x][y].typ == DRAWBRIDGE_DOWN) ? (u.dz > 0) :
+			(is_drawbridge_wall(x,y) && !is_db_wall(x,y))) &&
 		    find_drawbridge(&xx, &yy)) {
 		if (!striking)
 		    close_drawbridge(xx, yy);
@@ -2476,21 +2502,38 @@ struct obj *obj;	/* wand or spell */
 		    stackobj(otmp);
 		}
 		newsym(x, y);
-	    } else if (!striking && ttmp && ttmp->ttyp == TRAPDOOR && u.dz > 0) {
-		if (!Blind) {
-			if (ttmp->tseen) {
-				pline("A trap door beneath you closes up then vanishes.");
-				disclose = TRUE;
-			} else {
-				You_see("a swirl of %s beneath you.",
-					is_ice(x,y) ? "frost" : "dust");
-			}
-		} else {
-			You_hear("a twang followed by a thud.");
+	    } else if (u.dz > 0 && ttmp) {
+		if (!striking && closeholdingtrap(&youmonst, &disclose)) {
+		    ;	/* now stuck in web or bear trap */
+		} else if (striking && ttmp->ttyp == TRAPDOOR) {
+		    /* striking transforms trapdoor into hole */
+		    if (Blind && !ttmp->tseen) {
+			pline("%s beneath you shatters.", Something);
+		    } else if (!ttmp->tseen) {	/* => !Blind */
+			pline("There's a trapdoor beneath you; it shatters.");
+		    } else {
+			pline("The trapdoor beneath you shatters.");
+			disclose = TRUE;
+		    }
+		    ttmp->ttyp = HOLE;
+		    ttmp->tseen = 1;
+		    newsym(x, y);
+		    /* might fall down hole */
+		    dotrap(ttmp, 0);
+		} else if (!striking && ttmp->ttyp == HOLE) {
+		    /* locking transforms hole into trapdoor */
+		    ttmp->ttyp = TRAPDOOR;
+		    if (Blind || !ttmp->tseen) {
+			pline("Some %s swirls beneath you.",
+			      is_ice(x,y) ? "frost" : "dust");
+		    } else {
+			ttmp->tseen = 1;
+			newsym(x, y);
+			pline("A trapdoor appears beneath you.");
+			disclose = TRUE;
+		    }
+		    /* hadn't fallen down hole; won't fall now */
 		}
-		deltrap(ttmp);
-		ttmp = (struct trap *)0;
-		newsym(x, y);
 	    }
 	    break;
 	case SPE_STONE_TO_FLESH:

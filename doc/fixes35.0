@@ -236,6 +236,9 @@ obsolete config file keywords: GRAPHICS, OBJECTS, TRAPS, EFFECTS
 deprecated options: IBMGraphics, DECGraphics, boulder
 new options: symset, roguesymset for choosing a symbol set from the symbols file
 new config file keyword: SYMBOLS for overriding character symbol values by name
+opening magic frees from bear traps and webs, activates trap doors
+closing magic activates bear traps and webs
+locking converts a hole into a trap door; striking does the opposite
 
 
 Platform- and/or Interface-Specific New Features

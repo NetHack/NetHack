@@ -34,6 +34,9 @@ STATIC_OVL boolean FDECL(keep_saddle_with_steedcorpse,
 			(unsigned, struct obj *, struct obj *));
 #endif
 
+/* mintrap() should take a flags argument, but for time being we use this */
+STATIC_VAR int force_mintrap = 0;
+
 STATIC_VAR const char * const a_your[2] = { "a", "your" };
 STATIC_VAR const char * const A_Your[2] = { "A", "Your" };
 STATIC_VAR const char tower_of_flame[] = "tower of flame";
@@ -1066,18 +1069,20 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		if (webmsgok) {
 		    char verbbuf[BUFSZ];
 
+		    if (forcetrap) {
+			Strcpy(verbbuf, "are caught by");
 #ifdef STEED
-		    if (u.usteed)
-			Sprintf(verbbuf, "lead %s",
+		    } else if (u.usteed) {
+			Sprintf(verbbuf, "lead %s into",
 				x_monnam(u.usteed, steed_article,
 					 "poor", SUPPRESS_SADDLE, FALSE));
-		    else
 #endif
-			
-		    Sprintf(verbbuf, "%s", Levitation ? (const char *)"float" :
-				locomotion(youmonst.data, "stumble"));
-		    You("%s into %s spider web!",
-			verbbuf, a_your[trap->madeby_u]);
+		    } else {
+			Sprintf(verbbuf, "%s into",
+				Levitation ? (const char *)"float" :
+				  locomotion(youmonst.data, "stumble"));
+		    }
+		    You("%s %s spider web!", verbbuf, a_your[trap->madeby_u]);
 		}
 		u.utraptype = TT_WEB;
 
@@ -1833,7 +1838,8 @@ register struct monst *mtmp;
 	} else {
 	    register int tt = trap->ttyp;
 	    boolean in_sight, tear_web, see_it,
-		    inescapable = ((tt == HOLE || tt == PIT) &&
+		    inescapable = force_mintrap ||
+				((tt == HOLE || tt == PIT) &&
 				   In_sokoban(&u.uz) && !trap->madeby_u);
 	    const char *fallverb;
 
@@ -1939,6 +1945,12 @@ register struct monst *mtmp;
 				    || mptr == &mons[PM_BUGBEAR])
 				   && !Deaf)
 				    You_hear("the roaring of an angry bear!");
+			    }
+			} else if (force_mintrap) {
+			    if (in_sight) {
+				pline("%s evades %s bear trap!",
+				      Monnam(mtmp), a_your[trap->madeby_u]);
+				seetrap(trap);
 			    }
 			}
 			break;
@@ -2079,6 +2091,15 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			if (is_flyer(mptr) || is_floater(mptr) ||
 				(mtmp->wormno && count_wsegs(mtmp) > 5) ||
 				is_clinger(mptr)) {
+			    if (force_mintrap && !In_sokoban(&u.uz)) {
+				/* openfallingtrap; not inescapable here */
+				if (in_sight) {
+				    seetrap(trap);
+				    pline("%s doesn't fall into the pit.",
+					  Monnam(mtmp));
+				}
+				break;	/* inescapable = FALSE; */
+			    }
 			    if (!inescapable) break;	/* avoids trap */
 			    fallverb = "is dragged";	/* sokoban pit */
 			}
@@ -2109,6 +2130,21 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				mptr == &mons[PM_WUMPUS] ||
 				(mtmp->wormno && count_wsegs(mtmp) > 5) ||
 				mptr->msize >= MZ_HUGE) {
+			    if (force_mintrap && !In_sokoban(&u.uz)) {
+				/* openfallingtrap; not inescapable here */
+				if (in_sight) {
+				    seetrap(trap);
+				    if (tt == TRAPDOOR)
+					pline(
+			    "A trap door opens, but %s doesn't fall through.",
+					      mon_nam(mtmp));
+				    else /* (tt == HOLE) */
+					pline(
+					  "%s doesn't fall through the hole.",
+					      Monnam(mtmp));
+				}
+				break;	/* inescapable = FALSE; */
+			    }
 			    if (inescapable) {	/* sokoban hole */
 				if (in_sight) {
 				    pline("%s seems to be yanked down!",
@@ -2207,6 +2243,12 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				      Monnam(mtmp), a_your[trap->madeby_u]);
 			    deltrap(trap);
 			    newsym(mtmp->mx, mtmp->my);
+			} else if (force_mintrap && !mtmp->mtrapped) {
+			    if (in_sight) {
+				pline("%s avoids %s spider web!",
+				      Monnam(mtmp), a_your[trap->madeby_u]);
+				seetrap(trap);
+			    }
 			}
 			break;
 
@@ -3815,6 +3857,148 @@ boolean force;
 		You("find no traps on the door.");
 		return(1);
 	}
+}
+
+/* for magic unlocking; returns true if targetted monster (which might
+   be hero) gets untrapped; the trap remains intact */
+boolean
+openholdingtrap(mon, noticed)
+struct monst *mon;
+boolean *noticed;	/* set to true iff hero notices the effect; */
+{			/* otherwise left with its previous value intact */
+    struct trap *t;
+    char buf[BUFSZ];
+    const char *trapdescr, *which;
+    boolean ishero = (mon == &youmonst);
+
+#ifdef STEED
+    if (mon == u.usteed) ishero = TRUE;
+#endif
+    t = t_at(ishero ? u.ux : mon->mx, ishero ? u.uy : mon->my);
+    /* if no trap here or it's not a holding trap, we're done */
+    if (!t || (t->ttyp != BEAR_TRAP && t->ttyp != WEB)) return FALSE;
+
+    trapdescr = defsyms[trap_to_defsym(t->ttyp)].explanation;
+    which = t->tseen ? the_your[t->madeby_u] :
+		index(vowels, *trapdescr) ? "an" : "a";
+
+    if (ishero) {
+	if (!u.utrap) return FALSE;
+	u.utrap = 0;	/* released regardless of type */
+	*noticed = TRUE;
+	/* give message only if trap was the expected type */
+	if (u.utraptype == TT_BEARTRAP || u.utraptype == TT_WEB) {
+#ifdef STEED
+	    if (u.usteed)
+		Sprintf(buf, "%s is", noit_Monnam(u.usteed));
+	    else
+#endif
+		Strcpy(buf, "You are");
+	    pline("%s released from %s %s.", buf, which, trapdescr);
+	}
+    } else {
+	if (!mon->mtrapped) return FALSE;
+	mon->mtrapped = 0;
+	if (canspotmon(mon)) {
+	    *noticed = TRUE;
+	    pline("%s is released from %s %s.",
+		  Monnam(mon), which, trapdescr);
+	} else if (cansee(t->tx, t->ty) && t->tseen) {
+	    *noticed = TRUE;
+	    if (t->ttyp == WEB)
+		pline("%s is released from %s %s.",
+		      Something, which, trapdescr);
+	    else /* BEAR_TRAP */
+		pline("%s %s opens.", upstart(strcpy(buf, which)), trapdescr);
+	}
+	/* might pacify monster if adjacent */
+	if (rn2(2) && distu(mon->mx, mon->my) <= 2) reward_untrap(t, mon);
+    }
+    return TRUE;
+}
+
+/* for magic locking; returns true if targetted monster (which might
+   be hero) gets hit by a trap (might avoid actually becoming trapped) */
+boolean
+closeholdingtrap(mon, noticed)
+struct monst *mon;
+boolean *noticed;	/* set to true iff hero notices the effect; */
+{			/* otherwise left with its previous value intact */
+    struct trap *t;
+    unsigned dotrapflags;
+    boolean ishero = (mon == &youmonst), result;
+
+#ifdef STEED
+    if (mon == u.usteed) ishero = TRUE;
+#endif
+    t = t_at(ishero ? u.ux : mon->mx, ishero ? u.uy : mon->my);
+    /* if no trap here or it's not a holding trap, we're done */
+    if (!t || (t->ttyp != BEAR_TRAP && t->ttyp != WEB)) return FALSE;
+
+    if (ishero) {
+	if (u.utrap) return FALSE;	/* already trapped */
+	*noticed = TRUE;
+	dotrapflags = FORCETRAP;
+#ifdef STEED
+	/* dotrap calls mintrap when mounted hero encounters a web */
+	if (u.usteed) dotrapflags |= NOWEBMSG;
+#endif
+	++force_mintrap;
+	dotrap(t, dotrapflags);
+	--force_mintrap;
+	result = (u.utrap != 0);
+    } else {
+	if (mon->mtrapped) return FALSE;	/* already trapped */
+	/* you notice it if you see the trap close/tremble/whatever
+	   or if you sense the monster who becomes trapped */
+	*noticed = cansee(t->tx, t->ty) || canspotmon(mon);
+	++force_mintrap;
+	result = (mintrap(mon) != 0);
+	--force_mintrap;
+    }
+    return result;
+}
+
+/* for magic unlocking; returns true if targetted monster (which might
+   be hero) gets hit by a trap (target might avoid its effect) */
+boolean
+openfallingtrap(mon, trapdoor_only, noticed)
+struct monst *mon;
+boolean trapdoor_only;
+boolean *noticed;	/* set to true iff hero notices the effect; */
+{			/* otherwise left with its previous value intact */
+    struct trap *t;
+    boolean ishero = (mon == &youmonst), result;
+
+#ifdef STEED
+    if (mon == u.usteed) ishero = TRUE;
+#endif
+    t = t_at(ishero ? u.ux : mon->mx, ishero ? u.uy : mon->my);
+    /* if no trap here or it's not a falling trap, we're done
+       (note: falling rock traps have a trapdoor in the ceiling) */
+    if (!t || ((t->ttyp != TRAPDOOR && t->ttyp != ROCKTRAP) &&
+	    (trapdoor_only ||
+		(t->ttyp != HOLE && t->ttyp != PIT && t->ttyp != SPIKED_PIT))))
+	return FALSE;
+
+    if (ishero) {
+	if (u.utrap) return FALSE;	/* already trapped */
+	*noticed = TRUE;
+	dotrap(t, FORCETRAP);
+	result = (u.utrap != 0);
+    } else {
+	if (mon->mtrapped) return FALSE;	/* already trapped */
+	/* you notice it if you see the trap close/tremble/whatever
+	   or if you sense the monster who becomes trapped */
+	*noticed = cansee(t->tx, t->ty) || canspotmon(mon);
+	/* monster will be angered; mintrap doesn't handle that */
+	wakeup(mon);
+	++force_mintrap;
+	result = (mintrap(mon) != 0);
+	--force_mintrap;
+	/* mon might now be on the migrating monsters list */
+    }
+    return TRUE;
 }
 
 /* only called when the player is doing something to the chest directly */

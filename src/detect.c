@@ -1112,13 +1112,14 @@ genericptr_t num;
 {
 	register struct trap *ttmp;
 	register struct obj *otmp;
+	int *num_p = (int *)num;
 
 	if(OBJ_AT(zx, zy)) {
 		for(otmp = level.objects[zx][zy];
 				otmp; otmp = otmp->nexthere) {
 		    if(Is_box(otmp) && otmp->olocked) {
 			otmp->olocked = 0;
-			(*(int*)num)++;
+			(*num_p)++;
 		    }
 		}
 		/* let it fall to the next cases. could be on trap. */
@@ -1139,22 +1140,29 @@ genericptr_t num;
 		    levl[zx][zy].doormask = D_ISOPEN;
 		unblock_point(zx, zy);
 		newsym(zx, zy);
-		(*(int*)num)++;
+		(*num_p)++;
 	} else if(levl[zx][zy].typ == SCORR) {
 		levl[zx][zy].typ = CORR;
 		unblock_point(zx, zy);
 		newsym(zx, zy);
-		(*(int*)num)++;
+		(*num_p)++;
 	} else if ((ttmp = t_at(zx, zy)) != 0) {
+		struct monst *mon;
+		boolean dummy;	/* unneeded "you notice it arg" */
+
 		if (!ttmp->tseen && ttmp->ttyp != STATUE_TRAP) {
 		    ttmp->tseen = 1;
 		    newsym(zx,zy);
-		    (*(int*)num)++;
+		    (*num_p)++;
 		}
+		mon = (zx == u.ux && zy == u.uy) ? &youmonst : m_at(zx, zy);
+		if (openholdingtrap(mon, &dummy) ||
+			openfallingtrap(mon, TRUE, &dummy))
+		    (*num_p)++;
 	} else if (find_drawbridge(&zx, &zy)) {
 		/* make sure it isn't an open drawbridge */
 		open_drawbridge(zx, zy);
-		(*(int*)num)++;
+		(*num_p)++;
 	}
 }
 
