@@ -57,13 +57,13 @@ int explcolors[] = {
 # endif
 
 /*ARGSUSED*/
-void
+int
 mapglyph(glyph, ochar, ocolor, ospecial, x, y)
 int glyph, *ocolor, x, y;
 int *ochar;
 unsigned *ospecial;
 {
-	register int offset;
+	register int offset, idx;
 #if defined(TEXTCOLOR) || defined(ROGUE_COLOR)
 	int color = NO_COLOR;
 #endif
@@ -83,7 +83,7 @@ unsigned *ospecial;
      *		  offsets.  The order is set in display.h.
      */
     if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) {	/* a warning flash */
-    	ch = warnsyms[offset];
+	idx = offset + SYM_OFF_W;
 # ifdef ROGUE_COLOR
 	if (has_rogue_color)
 	    color = NO_COLOR;
@@ -92,7 +92,7 @@ unsigned *ospecial;
 	    warn_color(offset);
     } else if ((offset = (glyph - GLYPH_SWALLOW_OFF)) >= 0) {	/* swallow */
 	/* see swallow_to_glyph() in display.c */
-	ch = (uchar) showsyms[S_sw_tl + (offset & 0x7)];
+	idx = (S_sw_tl + (offset & 0x7)) + SYM_OFF_P;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color && iflags.use_color)
 	    color = NO_COLOR;
@@ -101,7 +101,7 @@ unsigned *ospecial;
 	    mon_color(offset >> 3);
     } else if ((offset = (glyph - GLYPH_ZAP_OFF)) >= 0) {	/* zap beam */
 	/* see zapdir_to_glyph() in display.c */
-	ch = showsyms[S_vbeam + (offset & 0x3)];
+	idx = (S_vbeam + (offset & 0x3)) + SYM_OFF_P;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color && iflags.use_color)
 	    color = NO_COLOR;
@@ -109,10 +109,10 @@ unsigned *ospecial;
 #endif
 	    zap_color((offset >> 2));
     } else if ((offset = (glyph - GLYPH_EXPLODE_OFF)) >= 0) {	/* explosion */
-	ch = showsyms[(offset % MAXEXPCHARS) + S_explode1];
+	idx = ((offset % MAXEXPCHARS) + S_explode1) + SYM_OFF_P;
 	explode_color(offset / MAXEXPCHARS);
     } else if ((offset = (glyph - GLYPH_CMAP_OFF)) >= 0) {	/* cmap */
-	ch = showsyms[offset];
+	idx = offset + SYM_OFF_P;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color && iflags.use_color) {
 	    if (offset >= S_vwall && offset <= S_hcdoor)
@@ -130,15 +130,16 @@ unsigned *ospecial;
 #ifdef TEXTCOLOR
 	    /* provide a visible difference if normal and lit corridor
 	     * use the same symbol */
-	    if (iflags.use_color &&
-		offset == S_litcorr && ch == showsyms[S_corr])
+	    if (iflags.use_color && offset == S_litcorr &&
+		showsyms[idx] == showsyms[S_corr + SYM_OFF_P])
 		color = CLR_WHITE;
 	    else
 #endif
 	    cmap_color(offset);
     } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) {	/* object */
-	if (offset == BOULDER && iflags.bouldersym) ch = iflags.bouldersym;
-	else ch = oc_syms[(int)objects[offset].oc_class];
+	idx = objects[offset].oc_class + SYM_OFF_O;
+	if (offset == BOULDER && iflags.bouldersym)
+		idx = SYM_BOULDER + SYM_OFF_X;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color && iflags.use_color) {
 	    switch(objects[offset].oc_class) {
@@ -150,7 +151,7 @@ unsigned *ospecial;
 #endif
 	    obj_color(offset);
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) {	/* mon ridden */
-	ch = monsyms[(int)mons[offset].mlet];
+	idx = mons[offset].mlet + SYM_OFF_M;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color)
 	    /* This currently implies that the hero is here -- monsters */
@@ -162,7 +163,7 @@ unsigned *ospecial;
 	    mon_color(offset);
 	    special |= MG_RIDDEN;
     } else if ((offset = (glyph - GLYPH_BODY_OFF)) >= 0) {	/* a corpse */
-	ch = oc_syms[(int)objects[CORPSE].oc_class];
+	idx = objects[CORPSE].oc_class + SYM_OFF_O;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color && iflags.use_color)
 	    color = CLR_RED;
@@ -171,7 +172,7 @@ unsigned *ospecial;
 	    mon_color(offset);
 	    special |= MG_CORPSE;
     } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) {	/* mon detect */
-	ch = monsyms[(int)mons[offset].mlet];
+	idx = mons[offset].mlet + SYM_OFF_M;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color)
 	    color = NO_COLOR;	/* no need to check iflags.use_color */
@@ -182,7 +183,7 @@ unsigned *ospecial;
 	/* is_reverse = TRUE; */
 	    special |= MG_DETECT;
     } else if ((offset = (glyph - GLYPH_INVIS_OFF)) >= 0) {	/* invisible */
-	ch = DEF_INVISIBLE;
+	idx = SYM_INVISIBLE + SYM_OFF_X;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color)
 	    color = NO_COLOR;	/* no need to check iflags.use_color */
@@ -191,7 +192,7 @@ unsigned *ospecial;
 	    invis_color(offset);
 	    special |= MG_INVIS;
     } else if ((offset = (glyph - GLYPH_PET_OFF)) >= 0) {	/* a pet */
-	ch = monsyms[(int)mons[offset].mlet];
+	idx = mons[offset].mlet + SYM_OFF_M;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color)
 	    color = NO_COLOR;	/* no need to check iflags.use_color */
@@ -200,7 +201,7 @@ unsigned *ospecial;
 	    pet_color(offset);
 	    special |= MG_PET;
     } else {							/* a monster */
-	ch = monsyms[(int)mons[glyph].mlet];
+	idx = mons[glyph].mlet + SYM_OFF_M;
 #ifdef ROGUE_COLOR
 	if (has_rogue_color && iflags.use_color) {
 	    if (x == u.ux && y == u.uy)
@@ -221,6 +222,7 @@ unsigned *ospecial;
 	}
     }
 
+    ch = showsyms[idx];
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
 # ifdef REINCARNATION
@@ -240,7 +242,7 @@ unsigned *ospecial;
 #ifdef TEXTCOLOR
     *ocolor = color;
 #endif
-    return;
+    return idx;
 }
 
 /*mapglyph.c*/

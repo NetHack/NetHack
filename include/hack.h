@@ -144,6 +144,14 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #include "rect.h"
 #include "region.h"
 
+/* Symbol offsets */
+#define SYM_OFF_P	(0)
+#define SYM_OFF_O	(SYM_OFF_P + MAXPCHARS) 
+#define SYM_OFF_M	(SYM_OFF_O + MAXOCLASSES)
+#define SYM_OFF_W	(SYM_OFF_M + MAXMCLASSES)
+#define SYM_OFF_X	(SYM_OFF_W + WARNCOUNT)
+#define SYM_MAX         (SYM_OFF_X + MAXOTHER)
+
 #ifdef USE_TRAMPOLI /* This doesn't belong here, but we have little choice */
 #undef NDECL
 #define NDECL(f) f()

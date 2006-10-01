@@ -230,7 +230,7 @@ void FormatStatusString(char* text, int format)
 	if(hp < 0) hp = 0;
 	(void) describe_level(nb=eos(nb));
 	Sprintf(nb = eos(nb),
-		"%c:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d", oc_syms[COIN_CLASS],
+		"%c:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d", showsyms[COIN_CLASS + SYM_OFF_O],
 #ifndef GOLDOBJ
 		u.ugold,
 #else

@@ -2497,7 +2497,7 @@ tty_print_glyph(window, x, y, glyph)
     }
 #endif
     /* map glyph to character and color */
-    mapglyph(glyph, &ch, &color, &special, x, y);
+    (void)mapglyph(glyph, &ch, &color, &special, x, y);
 
     /* Move the cursor. */
     tty_curs(window, x,y);

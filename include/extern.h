@@ -497,7 +497,7 @@ E void FDECL(assign_graphics, (int));
 E void NDECL(init_r_symbols);
 #endif
 E void NDECL(init_symbols);
-E void NDECL(init_disp_symbols);
+E void NDECL(init_showsyms);
 E void NDECL(init_l_symbols);
 E void FDECL(clear_symsetentry, (int,BOOLEAN_P));
 #ifdef ASCIIGRAPH
@@ -1027,7 +1027,7 @@ E boolean FDECL(usmellmon, (struct permonst *));
 
 /* ### mapglyph.c ### */
 
-E void FDECL(mapglyph, (int, int *, int *, unsigned *, int, int));
+E int FDECL(mapglyph, (int, int *, int *, unsigned *, int, int));
 
 /* ### mcastu.c ### */
 

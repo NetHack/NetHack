@@ -2056,7 +2056,6 @@ char		*tmp_levels;
 					WARNCOUNT, "WARNINGS");
 	    assign_warnings(translate);
 	} else if (match_varname(buf, "SYMBOLS", 4)) {
-#ifdef ASCIIGRAPH
 		char *op, symbuf[BUFSZ];
 		boolean morelines;
 		do {
@@ -2076,9 +2075,10 @@ char		*tmp_levels;
 			    while (--op >= bufp && isspace(*op)) *op = '\0';
 			}
 
+#ifdef ASCIIGRAPH
 			/* parse here */
-			parsesymbols(bufp);
-	
+			parsesymbols(bufp);	
+#endif /*ASCIIGRAPH*/
 			if (morelines)
 			  do  {
 			    *symbuf = '\0';
@@ -2089,6 +2089,7 @@ char		*tmp_levels;
 			    bufp = symbuf;
 			} while (*bufp == '#');
 		} while (morelines);
+#ifdef ASCIIGRAPH
 		switch_symbols(TRUE);
 #endif /*ASCIIGRAPH*/
 #ifdef WIZARD

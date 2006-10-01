@@ -265,7 +265,8 @@ bot2()
 	if(hp < 0) hp = 0;
 	(void) describe_level(newbot2);
 	Sprintf(nb = eos(newbot2),
-		"%c:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d", oc_syms[COIN_CLASS],
+		"%c:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d",
+		showsyms[COIN_CLASS + SYM_OFF_O],
 #ifndef GOLDOBJ
 		u.ugold,
 #else
@@ -613,7 +614,7 @@ bot()
 	unsigned anytype;
 	int i, pc, chg, cap;
 	struct istat_s *curr, *prev;
-	boolean valset[MAXBLSTATS];
+	boolean valset[MAXBLSTATS], chgval = FALSE;
 
 	if (!blinit) panic("bot before init.");
 	if (!youmonst.data) {
@@ -720,10 +721,17 @@ bot()
 	 * gold amount without the leading "$:" the port will have to
 	 * add 2 to the value pointer it was passed in status_update()
 	 * for the BL_GOLD case.
+	 *
+	 * Another quirk of BL_GOLD is that the field display may have
+	 * changed if a new symbol set was loaded, or we entered or left
+	 * the rogue level.
 	 */
+
 	Sprintf(blstats[idx][BL_GOLD].val, "%c:%ld",
-			oc_syms[COIN_CLASS], blstats[idx][BL_GOLD].a.a_long);
+			showsyms[COIN_CLASS + SYM_OFF_O],
+			blstats[idx][BL_GOLD].a.a_long);
 	valset[BL_GOLD] = TRUE;		/* indicate val already set */
+
 
 	/* Power (magical energy) */
 
@@ -805,14 +813,17 @@ bot()
 		curr = &blstats[idx][i];
 		prev = &blstats[idx_p][i];
 		chg = 0;
-		if (update_all || (chg = compare_blstats(prev, curr)) != 0) {
+		if (update_all || ((chg = compare_blstats(prev, curr)) != 0) ||
+		    ((chgval = (valset[i] &&
+		      strcmp(blstats[idx][i].val,blstats[idx_p][i].val))) != 0)) {
 			idxmax = blstats[idx][i].idxmax;
 			pc = (idxmax) ?
 				percentage(curr, &blstats[idx][idxmax]) : 0;
 			if (!valset[i]) (void) anything_to_s(curr->val,
 							&curr->a, anytype);
 			if (anytype != ANY_MASK32) {
-				status_update(i, (genericptr_t)curr->val, chg, pc);
+				status_update(i, (genericptr_t)curr->val,
+						valset[i] ? chgval : chg, pc);
 			} else {
 				status_update(i,
 				    /* send pointer to mask */

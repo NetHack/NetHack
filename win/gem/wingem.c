@@ -953,7 +953,7 @@ void mar_print_gl_char(window, x, y, glyph)
     unsigned special;
 
     /* map glyph to character and color */
-    mapglyph(glyph, &ch, &color, &special, x, y);
+    (void)mapglyph(glyph, &ch, &color, &special, x, y);
 
 #ifdef TEXTCOLOR
     /* Turn off color if rogue level. */

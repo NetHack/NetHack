@@ -2087,7 +2087,7 @@ if(u.uz.dlevel != x){
     else		/* AMII, or Rogue level in either version */
     {
 	/* map glyph to character and color */
-    	mapglyph(glyph, &och, &color, &special, x, y);
+    	(void) mapglyph(glyph, &och, &color, &special, x, y);
 				/* XXX next if should be ifdef REINCARNATION */
 	ch = (uchar)och;
 	if( WINVERS_AMIV ){			/* implies Rogue level here */

@@ -1,11 +1,11 @@
-/*	SCCS Id: @(#)drawing.c	3.5	2006/09/22	*/
+/*	SCCS Id: @(#)drawing.c	3.5	2006/10/01	*/
 /* Copyright (c) NetHack Development Team 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "tcap.h"
 
-/* Relevent header information in rm.h and objclass.h. */
+/* Relevent header information in rm.h, objclass.h, and monsym.h. */
 
 #ifdef C
 #undef C
@@ -20,20 +20,10 @@
 struct symsetentry symset[NUM_GRAPHICS];
 int currentgraphics = 0;
 
-uchar oc_syms[MAXOCLASSES] = DUMMY; /* the current object  display symbols */
-uchar showsyms[MAXPCHARS]  = DUMMY; /* the current feature display symbols */
-uchar monsyms[MAXMCLASSES] = DUMMY; /* the current monster display symbols */
-
-/* loaded primary syms */
-uchar l_oc_syms[MAXOCLASSES] = DUMMY;
-uchar l_showsyms[MAXPCHARS]  = DUMMY;
-uchar l_monsyms[MAXMCLASSES] = DUMMY;
-
+uchar showsyms[SYM_MAX] = DUMMY;		/* symbols to be displayed */
+uchar l_syms[SYM_MAX] = DUMMY;		/* loaded symbols          */
 #ifdef REINCARNATION
-/* rogue syms */
-uchar r_oc_syms[MAXOCLASSES] = DUMMY;
-uchar r_showsyms[MAXPCHARS]  = DUMMY;
-uchar r_monsyms[MAXMCLASSES] = DUMMY;
+uchar r_syms[SYM_MAX] = DUMMY;		/* rogue symbols           */
 #endif
 
 uchar warnsyms[WARNCOUNT]  = DUMMY;  /* the current warning display symbols */
@@ -102,7 +92,7 @@ const struct class_sym def_monsyms[MAXMCLASSES] = {
  { DEF_FUNGUS,      "", "fungus or mold"},
  { DEF_GNOME,       "", "gnome"},
  { DEF_GIANT,       "", "giant humanoid"},
- { '\0',            "", ""},
+ { '\0',            "", "invisible monster"},
  { DEF_JABBERWOCK,  "", "jabberwock"},
  { DEF_KOP,         "", "Keystone Kop"},
  { DEF_LICH,        "", "lich"},
@@ -280,7 +270,7 @@ void NDECL((*ascgraphics_mode_callback)) = 0;	/* set in tty_start_screen() */
 
 /*
  * Convert the given character to an object class.  If the character is not
- * recognized, then MAXOCLASSES is returned.  Used in detect.c invent.c,
+ * recognized, then MAXOCLASSES is returned.  Used in detect.c, invent.c,
  * objnam.c, options.c, pickup.c, sp_lev.c, lev_main.c, and tilemap.c.
  */
 int
@@ -304,7 +294,7 @@ def_char_to_monclass(ch)
 {
     int i;
     for (i = 1; i < MAXMCLASSES; i++)
-	if (def_monsyms[i].sym == ch) break;
+	if (ch == def_monsyms[i].sym) break;
     return i;
 }
 
@@ -314,7 +304,7 @@ def_char_to_monclass(ch)
  * init_symbols()
  *                     Sets the current display symbols, the
  *                     loadable symbols to the default NetHack
- *                     symbols, including the r_* rogue level
+ *                     symbols, including the r_syms rogue level
  *                     symbols if REINCARNATION is defined.
  *                     This would typically be done immediately
  *                     after execution begins. Any previously
@@ -322,35 +312,29 @@ def_char_to_monclass(ch)
  *
  * switch_symbols(arg)
  *                     Called to swap in new current display symbols
- *                     (monsyms, showsyms, oc_syms) from either
- *                     the default symbols, or from the loadable
- *                     symbols.
+ *                     (showsyms) from either the default symbols,
+ *                     or from the loaded symbols.
  *
- *                     If (arg == 0) then the display symbols are
- *                     taken from def_monsyms, defsyms, def_oc_syms 
- *                     default NetHack symbols.
+ *                     If (arg == 0) then showsyms are taken from
+ *                     defsyms, def_oc_syms, and def_monsyms. 
  *
- *                     If (arg != 0), which is the expected usage,
- *                     then the display symbols are taken from the
- *                     adjustable display symbols found in l_monsyms,
- *                     l_showsyms, l_oc_syms. Those symbols may have
- *                     been loaded from an external symbol file by
- *                     config file options or interactively in the
- *                     options menu.
+ *                     If (arg != 0), which is the normal expected
+ *                     usage, then showsyms are taken from the
+ *                     adjustable display symbols found in l_syms.
+ *                     l_syms may have been loaded from an external
+ *                     symbol file by config file options or interactively
+ *                     in the Options menu.
  *
  * assign_graphics(arg)
  *
  *                     This is used in the game core to toggle in and
- *                     out of rogue level display mode.
+ *                     out of other {rogue} level display modes.
  *
  *                     If arg is ROGUESET, this places the rogue level
- *                     symbols from r_monsyms, r_showsyms, and r_oc_syms
- *                     into the current display symbols: monsyms, showsyms,
- *                     and oc_syms. 
+ *                     symbols from r_syms into showsyms.
  *
  *                     If arg is PRIMARY, this places the symbols
- *		       from l_monsyms, l_showsyms, l_oc_syms into the current
- *                     display symbols: monsyms, showsyms, oc_syms.
+ *		       from l_monsyms into showsyms.
  *
  * update_l_symset()
  *                     Update a member of the loadable (l_*) symbol set.  
@@ -368,14 +352,8 @@ int nondefault;
 	register int i;
 
 	if (nondefault) {
-		for (i = 0; i < MAXMCLASSES; i++)
-		    monsyms[i] = l_monsyms[i];
-
-		for (i = 0; i < MAXPCHARS; i++)
-		    showsyms[i] = l_showsyms[i];
-
-		for (i = 0; i < MAXOCLASSES; i++)
-		    oc_syms[i] = l_oc_syms[i];
+		for (i = 0; i < SYM_MAX; i++)
+		    showsyms[i] = l_syms[i];
 # ifdef PC9800
 		if (SYMHANDLING(H_IBM)
 		    && ibmgraphics_mode_callback)
@@ -397,24 +375,35 @@ void
 init_symbols()
 {
 	init_l_symbols();
-	init_disp_symbols();
+	init_showsyms();
 #ifdef REINCARNATION
 	init_r_symbols();
 #endif
 }
 
 void
-init_disp_symbols()
+init_showsyms()
 {
 	register int i;
-	for (i = 0; i < MAXMCLASSES; i++)
-	    monsyms[i] = def_monsyms[i].sym;
 
 	for (i = 0; i < MAXPCHARS; i++)
-	    showsyms[i] = defsyms[i].sym;
+	    showsyms[i + SYM_OFF_P] = defsyms[i].sym;
 
 	for (i = 0; i < MAXOCLASSES; i++)
-	    oc_syms[i] = def_oc_syms[i].sym;	
+	    showsyms[i + SYM_OFF_O] = def_oc_syms[i].sym;
+
+	for (i = 0; i < MAXMCLASSES; i++)
+	    showsyms[i + SYM_OFF_M] = def_monsyms[i].sym;
+
+	for (i = 0; i < WARNCOUNT; i++)
+	    showsyms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+
+	for (i = 0; i < MAXOTHER; i++) {
+	    if (i == SYM_BOULDER)
+	    	showsyms[i + SYM_OFF_X] = iflags.bouldersym;
+	    else if (i == SYM_INVISIBLE)
+	    	showsyms[i + SYM_OFF_X] = DEF_INVISIBLE;
+	}
 }
 
 /* initialize defaults for the loadable symset */
@@ -422,16 +411,66 @@ void
 init_l_symbols()
 {
 	register int i;
-	for (i = 0; i < MAXMCLASSES; i++)
-	    l_monsyms[i] = def_monsyms[i].sym;
 
 	for (i = 0; i < MAXPCHARS; i++)
-	    l_showsyms[i] = defsyms[i].sym;
+	    l_syms[i + SYM_OFF_P] = defsyms[i].sym;
 
 	for (i = 0; i < MAXOCLASSES; i++)
-	    l_oc_syms[i] = def_oc_syms[i].sym;
+	    l_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
+
+	for (i = 0; i < MAXMCLASSES; i++)
+	    l_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
+
+	for (i = 0; i < WARNCOUNT; i++)
+	    l_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+
+	for (i = 0; i < MAXOTHER; i++) {
+	    if (i == SYM_BOULDER)
+	    	l_syms[i + SYM_OFF_X] = iflags.bouldersym;
+	    else if (i == SYM_INVISIBLE)
+	    	l_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
+	}
+
 	clear_symsetentry(PRIMARY, FALSE);
 }
+
+#ifdef REINCARNATION
+void
+init_r_symbols()
+{
+	register int i;
+
+	/* These are defaults that can get overwritten
+	   later by the roguesymbols option */
+
+	for (i = 0; i < MAXPCHARS; i++)
+	    r_syms[i + SYM_OFF_P] = defsyms[i].sym;
+	r_syms[S_vodoor]  = r_syms[S_hodoor]  = r_syms[S_ndoor] = '+';
+	r_syms[S_upstair] = r_syms[S_dnstair] = '%';
+
+	for (i = 0; i < MAXOCLASSES; i++)
+	    r_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
+
+	for (i = 0; i < MAXMCLASSES; i++)
+	    r_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
+
+	for (i = 0; i < WARNCOUNT; i++)
+	    r_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+
+	for (i = 0; i < MAXOTHER; i++) {
+	    if (i == SYM_BOULDER)
+	    	r_syms[i + SYM_OFF_X] = iflags.bouldersym;
+	    else if (i == SYM_INVISIBLE)
+	    	r_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
+	}
+
+	clear_symsetentry(ROGUESET, FALSE);
+	symset[ROGUESET].nocolor = 1;	 /* default on Rogue level is no color
+					  * but some symbol sets can
+					  * override that
+					  */
+}
+#endif /*REINCARNATION*/
 
 void
 assign_graphics(whichset)
@@ -444,14 +483,8 @@ int whichset;
     case ROGUESET:
 	/* Adjust graphics display characters on Rogue levels */
 
-	for (i = 0; i < MAXMCLASSES; i++)
-	    monsyms[i] = r_monsyms[i];
-
-	for (i = 0; i < MAXPCHARS; i++)
-	    showsyms[i] = r_showsyms[i];
-
-	for (i = 0; i < MAXOCLASSES; i++)
-	    oc_syms[i] = r_oc_syms[i];
+	for (i = 0; i < SYM_MAX; i++)
+	    showsyms[i] = r_syms[i];
 
 #  if defined(MSDOS) && defined(USE_TILES)
 	if (iflags.grmode) tileview(FALSE);
@@ -459,16 +492,12 @@ int whichset;
 	currentgraphics = ROGUESET;
 	break;
 # endif
+
     case PRIMARY:
     default:
-	for (i = 0; i < MAXMCLASSES; i++)
-	    monsyms[i] = l_monsyms[i];
+	for (i = 0; i < SYM_MAX; i++)
+	    showsyms[i] = l_syms[i];
 
-	for (i = 0; i < MAXPCHARS; i++)
-	    showsyms[i] = l_showsyms[i];
-
-	for (i = 0; i < MAXOCLASSES; i++)
-	    oc_syms[i] = l_oc_syms[i];
 # if defined(MSDOS) && defined(USE_TILES)
 	if (iflags.grmode) tileview(TRUE);
 # endif
@@ -477,77 +506,24 @@ int whichset;
     }
 }
 
-#ifdef REINCARNATION
-void
-init_r_symbols()
-{
-	register int i;
-	/* These are defaults that can get overwritten
-	   later by the roguesymbols option */
-
-	for (i = 0; i < MAXMCLASSES; i++)
-	    r_monsyms[i] = def_monsyms[i].sym;
-
-	for (i = 0; i < MAXPCHARS; i++)
-	    r_showsyms[i] = defsyms[i].sym;
-	r_showsyms[S_vodoor]  = r_showsyms[S_hodoor]  = r_showsyms[S_ndoor] = '+';
-	r_showsyms[S_upstair] = r_showsyms[S_dnstair] = '%';
-
-	for (i = 0; i < MAXOCLASSES; i++)
-	    r_oc_syms[i] = def_r_oc_syms[i];
-
-	clear_symsetentry(ROGUESET, FALSE);
-	symset[ROGUESET].nocolor = 1;	 /* default on Rogue level is no color
-					  * but some symbol sets can
-					  * override that
-					  */
-}
-
-void
-update_r_symset(symp, val)
-struct symparse *symp;
-int val;
-{
-	switch (symp->range) {
-	    case SYM_PCHAR:			/* index into r_showsyms */
-			r_showsyms[symp->idx] = val;
-			break;
-	    case SYM_MON:			/* index into r_monsyms  */
-			r_monsyms[symp->idx] = val;
-			break;
-	    case SYM_OC:			/* index into r_oc_syms  */
-			r_oc_syms[symp->idx] = val;
-			break;
-	    case SYM_OBJ:			/* index into objects  */
-			if (symp->idx == BOULDER)
-				iflags.bouldersym = val;
-			break;
-	 }
-}
-#endif /* REINCARNATION */
-
 #ifdef ASCIIGRAPH
 void
 update_l_symset(symp, val)
 struct symparse *symp;
 int val;
 {
-	switch (symp->range) {
-	    case SYM_PCHAR:			/* index into l_showsyms */
-			l_showsyms[symp->idx] = val;
-			break;
-	    case SYM_MON:			/* index into l_monsyms  */
-			l_monsyms[symp->idx] = val;
-			break;
-	    case SYM_OC:			/* index into l_oc_syms  */
-			l_oc_syms[symp->idx] = val;
-			break;
-	    case SYM_OBJ:			/* index into objects  */
-			if (symp->idx == BOULDER)
-				iflags.bouldersym = val;
-			break;
-	 }
+	l_syms[symp->idx] = val;
 }
+
+# ifdef REINCARNATION
+void
+update_r_symset(symp, val)
+struct symparse *symp;
+int val;
+{
+	r_syms[symp->idx] = val;
+}
+# endif /* REINCARNATION */
 
 void
 clear_symsetentry(which_set, name_too)
@@ -580,7 +556,6 @@ const char *known_handling[] = {
 	"DEC", 		/* H_DEC */
 	(const char *)0,
 };
- 
 
 struct symparse loadsyms[] = {
 	{SYM_CONTROL, 0, "start"},
@@ -682,83 +657,84 @@ struct symparse loadsyms[] = {
 	{SYM_PCHAR, S_explode7, "S_explode7"},
 	{SYM_PCHAR, S_explode8, "S_explode8"},
 	{SYM_PCHAR, S_explode9, "S_explode9"},
-	{SYM_MON, S_ANT, "S_ant"},
-	{SYM_MON, S_BLOB, "S_blob"},
-	{SYM_MON, S_COCKATRICE, "S_cockatrice"},
-	{SYM_MON, S_DOG, "S_dog"},
-	{SYM_MON, S_EYE, "S_eye"},
-	{SYM_MON, S_FELINE, "S_feline"},
-	{SYM_MON, S_GREMLIN, "S_gremlin"},
-	{SYM_MON, S_HUMANOID, "S_humanoid"},
-	{SYM_MON, S_IMP, "S_imp"},
-	{SYM_MON, S_JELLY, "S_jelly"},
-	{SYM_MON, S_KOBOLD, "S_kobold"},
-	{SYM_MON, S_LEPRECHAUN, "S_leprechaun"},
-	{SYM_MON, S_MIMIC, "S_mimic"},
-	{SYM_MON, S_NYMPH, "S_nymph"},
-	{SYM_MON, S_ORC, "S_orc"},
-	{SYM_MON, S_PIERCER, "S_piercer"},
-	{SYM_MON, S_QUADRUPED, "S_quadruped"},
-	{SYM_MON, S_RODENT, "S_rodent"},
-	{SYM_MON, S_SPIDER, "S_spider"},
-	{SYM_MON, S_TRAPPER, "S_trapper"},
-	{SYM_MON, S_UNICORN, "S_unicorn"},
-	{SYM_MON, S_VORTEX, "S_vortex"},
-	{SYM_MON, S_WORM, "S_worm"},
-	{SYM_MON, S_XAN, "S_xan"},
-	{SYM_MON, S_LIGHT, "S_light"},
-	{SYM_MON, S_ZRUTY, "S_zruty"},
-	{SYM_MON, S_ANGEL, "S_angel"},
-	{SYM_MON, S_BAT, "S_bat"},
-	{SYM_MON, S_CENTAUR, "S_centaur"},
-	{SYM_MON, S_DRAGON, "S_dragon"},
-	{SYM_MON, S_ELEMENTAL, "S_elemental"},
-	{SYM_MON, S_FUNGUS, "S_fungus"},
-	{SYM_MON, S_GNOME, "S_gnome"},
-	{SYM_MON, S_GIANT, "S_giant"},
-	{SYM_MON, S_JABBERWOCK, "S_jabberwock"},
-	{SYM_MON, S_KOP, "S_kop"},
-	{SYM_MON, S_LICH, "S_lich"},
-	{SYM_MON, S_MUMMY, "S_mummy"},
-	{SYM_MON, S_NAGA, "S_naga"},
-	{SYM_MON, S_OGRE, "S_ogre"},
-	{SYM_MON, S_PUDDING, "S_pudding"},
-	{SYM_MON, S_QUANTMECH, "S_quantmech"},
-	{SYM_MON, S_RUSTMONST, "S_rustmonst"},
-	{SYM_MON, S_SNAKE, "S_snake"},
-	{SYM_MON, S_TROLL, "S_troll"},
-	{SYM_MON, S_UMBER, "S_umber"},
-	{SYM_MON, S_VAMPIRE, "S_vampire"},
-	{SYM_MON, S_WRAITH, "S_wraith"},
-	{SYM_MON, S_XORN, "S_xorn"},
-	{SYM_MON, S_YETI, "S_yeti"},
-	{SYM_MON, S_ZOMBIE, "S_zombie"},
-	{SYM_MON, S_HUMAN, "S_human"},
-	{SYM_MON, S_GHOST, "S_ghost"},
-	{SYM_MON, S_GOLEM, "S_golem"},
-	{SYM_MON, S_DEMON, "S_demon"},
-	{SYM_MON, S_EEL, "S_eel"},
-	{SYM_MON, S_LIZARD, "S_lizard"},
-	{SYM_MON, S_WORM_TAIL, "S_worm_tail"},
-	{SYM_MON, S_MIMIC_DEF, "S_mimic_def"},
-	{SYM_OC, WEAPON_CLASS, "S_weapon"},
-	{SYM_OC, ARMOR_CLASS, "S_armor"},
-	{SYM_OC, ARMOR_CLASS, "S_armour"},
-	{SYM_OC, RING_CLASS, "S_ring"},
-	{SYM_OC, AMULET_CLASS, "S_amulet"},
-	{SYM_OC, TOOL_CLASS, "S_tool"},
-	{SYM_OC, FOOD_CLASS, "S_food"},
-	{SYM_OC, POTION_CLASS, "S_potion"},
-	{SYM_OC, SCROLL_CLASS, "S_scroll"},
-	{SYM_OC, SPBOOK_CLASS, "S_book"},
-	{SYM_OC, WAND_CLASS, "S_wand"},
-	{SYM_OC, COIN_CLASS, "S_coin"},
-	{SYM_OC, GEM_CLASS, "S_gem"},
-	{SYM_OC, ROCK_CLASS,"S_rock"},
-	{SYM_OC, BALL_CLASS, "S_ball"},
-	{SYM_OC, CHAIN_CLASS, "S_chain"},
-	{SYM_OC, VENOM_CLASS, "S_venom"},
-	{SYM_OBJ, BOULDER, "S_boulder"},
+	{SYM_OC, WEAPON_CLASS   + SYM_OFF_O, "S_weapon"},
+	{SYM_OC, ARMOR_CLASS    + SYM_OFF_O, "S_armor"},
+	{SYM_OC, ARMOR_CLASS    + SYM_OFF_O, "S_armour"},
+	{SYM_OC, RING_CLASS     + SYM_OFF_O, "S_ring"},
+	{SYM_OC, AMULET_CLASS   + SYM_OFF_O, "S_amulet"},
+	{SYM_OC, TOOL_CLASS     + SYM_OFF_O, "S_tool"},
+	{SYM_OC, FOOD_CLASS     + SYM_OFF_O, "S_food"},
+	{SYM_OC, POTION_CLASS   + SYM_OFF_O, "S_potion"},
+	{SYM_OC, SCROLL_CLASS   + SYM_OFF_O, "S_scroll"},
+	{SYM_OC, SPBOOK_CLASS   + SYM_OFF_O, "S_book"},
+	{SYM_OC, WAND_CLASS     + SYM_OFF_O, "S_wand"},
+	{SYM_OC, COIN_CLASS     + SYM_OFF_O, "S_coin"},
+	{SYM_OC, GEM_CLASS      + SYM_OFF_O, "S_gem"},
+	{SYM_OC, ROCK_CLASS     + SYM_OFF_O, "S_rock"},
+	{SYM_OC, BALL_CLASS     + SYM_OFF_O, "S_ball"},
+	{SYM_OC, CHAIN_CLASS    + SYM_OFF_O, "S_chain"},
+	{SYM_OC, VENOM_CLASS    + SYM_OFF_O, "S_venom"},
+	{SYM_MON, S_ANT         + SYM_OFF_M, "S_ant"},
+	{SYM_MON, S_BLOB        + SYM_OFF_M, "S_blob"},
+	{SYM_MON, S_COCKATRICE  + SYM_OFF_M, "S_cockatrice"},
+	{SYM_MON, S_DOG         + SYM_OFF_M, "S_dog"},
+	{SYM_MON, S_EYE         + SYM_OFF_M, "S_eye"},
+	{SYM_MON, S_FELINE      + SYM_OFF_M, "S_feline"},
+	{SYM_MON, S_GREMLIN     + SYM_OFF_M, "S_gremlin"},
+	{SYM_MON, S_HUMANOID    + SYM_OFF_M, "S_humanoid"},
+	{SYM_MON, S_IMP         + SYM_OFF_M, "S_imp"},
+	{SYM_MON, S_JELLY       + SYM_OFF_M, "S_jelly"},
+	{SYM_MON, S_KOBOLD      + SYM_OFF_M, "S_kobold"},
+	{SYM_MON, S_LEPRECHAUN  + SYM_OFF_M, "S_leprechaun"},
+	{SYM_MON, S_MIMIC       + SYM_OFF_M, "S_mimic"},
+	{SYM_MON, S_NYMPH       + SYM_OFF_M, "S_nymph"},
+	{SYM_MON, S_ORC         + SYM_OFF_M, "S_orc"},
+	{SYM_MON, S_PIERCER     + SYM_OFF_M, "S_piercer"},
+	{SYM_MON, S_QUADRUPED   + SYM_OFF_M, "S_quadruped"},
+	{SYM_MON, S_RODENT      + SYM_OFF_M, "S_rodent"},
+	{SYM_MON, S_SPIDER      + SYM_OFF_M, "S_spider"},
+	{SYM_MON, S_TRAPPER     + SYM_OFF_M, "S_trapper"},
+	{SYM_MON, S_UNICORN     + SYM_OFF_M, "S_unicorn"},
+	{SYM_MON, S_VORTEX      + SYM_OFF_M, "S_vortex"},
+	{SYM_MON, S_WORM        + SYM_OFF_M, "S_worm"},
+	{SYM_MON, S_XAN         + SYM_OFF_M, "S_xan"},
+	{SYM_MON, S_LIGHT       + SYM_OFF_M, "S_light"},
+	{SYM_MON, S_ZRUTY       + SYM_OFF_M, "S_zruty"},
+	{SYM_MON, S_ANGEL       + SYM_OFF_M, "S_angel"},
+	{SYM_MON, S_BAT         + SYM_OFF_M, "S_bat"},
+	{SYM_MON, S_CENTAUR     + SYM_OFF_M, "S_centaur"},
+	{SYM_MON, S_DRAGON      + SYM_OFF_M, "S_dragon"},
+	{SYM_MON, S_ELEMENTAL   + SYM_OFF_M, "S_elemental"},
+	{SYM_MON, S_FUNGUS      + SYM_OFF_M, "S_fungus"},
+	{SYM_MON, S_GNOME       + SYM_OFF_M, "S_gnome"},
+	{SYM_MON, S_GIANT       + SYM_OFF_M, "S_giant"},
+	{SYM_MON, S_JABBERWOCK  + SYM_OFF_M, "S_jabberwock"},
+	{SYM_MON, S_KOP         + SYM_OFF_M, "S_kop"},
+	{SYM_MON, S_LICH        + SYM_OFF_M, "S_lich"},
+	{SYM_MON, S_MUMMY       + SYM_OFF_M, "S_mummy"},
+	{SYM_MON, S_NAGA        + SYM_OFF_M, "S_naga"},
+	{SYM_MON, S_OGRE        + SYM_OFF_M, "S_ogre"},
+	{SYM_MON, S_PUDDING     + SYM_OFF_M, "S_pudding"},
+	{SYM_MON, S_QUANTMECH   + SYM_OFF_M, "S_quantmech"},
+	{SYM_MON, S_RUSTMONST   + SYM_OFF_M, "S_rustmonst"},
+	{SYM_MON, S_SNAKE       + SYM_OFF_M, "S_snake"},
+	{SYM_MON, S_TROLL       + SYM_OFF_M, "S_troll"},
+	{SYM_MON, S_UMBER       + SYM_OFF_M, "S_umber"},
+	{SYM_MON, S_VAMPIRE     + SYM_OFF_M, "S_vampire"},
+	{SYM_MON, S_WRAITH      + SYM_OFF_M, "S_wraith"},
+	{SYM_MON, S_XORN        + SYM_OFF_M, "S_xorn"},
+	{SYM_MON, S_YETI        + SYM_OFF_M, "S_yeti"},
+	{SYM_MON, S_ZOMBIE      + SYM_OFF_M, "S_zombie"},
+	{SYM_MON, S_HUMAN       + SYM_OFF_M, "S_human"},
+	{SYM_MON, S_GHOST       + SYM_OFF_M, "S_ghost"},
+	{SYM_MON, S_GOLEM       + SYM_OFF_M, "S_golem"},
+	{SYM_MON, S_DEMON       + SYM_OFF_M, "S_demon"},
+	{SYM_MON, S_EEL         + SYM_OFF_M, "S_eel"},
+	{SYM_MON, S_LIZARD      + SYM_OFF_M, "S_lizard"},
+	{SYM_MON, S_WORM_TAIL   + SYM_OFF_M, "S_worm_tail"},
+	{SYM_MON, S_MIMIC_DEF   + SYM_OFF_M, "S_mimic_def"},
+	{SYM_OTH, SYM_BOULDER   + SYM_OFF_X, "S_boulder"},
+	{SYM_OTH, SYM_INVISIBLE + SYM_OFF_X, "S_invisible"},
 	{0,0,(const char *)0}	/* fence post */
 };
 #endif /*ASCIIGRAPH*/

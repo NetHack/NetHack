@@ -105,7 +105,7 @@ X11_print_glyph(window, x, y, glyph)
 	register unsigned char *co_ptr;
 #endif
 	/* map glyph to character and color */
-        mapglyph(glyph, &och, &color, &special, x, y);
+        (void)mapglyph(glyph, &och, &color, &special, x, y);
 	ch = (uchar)och;
 	
 	/* Only update if we need to. */

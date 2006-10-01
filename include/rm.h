@@ -227,12 +227,17 @@ struct symparse {
 	unsigned range;
 #define SYM_CONTROL	1	/* start/finish markers */
 #define SYM_PCHAR	2	/* index into showsyms  */
-#define SYM_MON		3	/* index into monsyms   */
-#define SYM_OC		4	/* index into oc_syms   */
-#define SYM_OBJ		5	/* index into objects   */
+#define SYM_OC		3	/* index into oc_syms   */
+#define SYM_MON		4	/* index into monsyms   */
+#define SYM_OTH		5	/* misc                 */
 	int idx;
 	const char *name;
 };
+
+/* misc symbol definitions */
+#define SYM_BOULDER	0
+#define SYM_INVISIBLE	1
+#define MAXOTHER	2
 
 /* linked list of symsets and their characteristics */
 struct symsetentry {
@@ -263,10 +268,10 @@ struct symsetentry {
 #define H_DEC	2
 
 extern const struct symdef defsyms[MAXPCHARS];	/* defaults */
-extern uchar showsyms[MAXPCHARS];
 extern const struct symdef def_warnsyms[WARNCOUNT];
 extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
 extern int currentgraphics;				  /* from drawing.c */
+extern uchar showsyms[];
 
 #define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))
 

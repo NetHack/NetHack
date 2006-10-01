@@ -546,19 +546,19 @@ do_look(mode, click_cc)
 	    } else if (glyph_is_trap(glyph)) {
 		sym = showsyms[trap_to_defsym(glyph_to_trap(glyph))];
 	    } else if (glyph_is_object(glyph)) {
-		sym = oc_syms[(int)objects[glyph_to_obj(glyph)].oc_class];
+		sym = showsyms[(int)objects[glyph_to_obj(glyph)].oc_class + SYM_OFF_O];
 		if (sym == '`' && iflags.bouldersym && (int)glyph_to_obj(glyph) == BOULDER)
 			sym = iflags.bouldersym;
 	    } else if (glyph_is_monster(glyph)) {
 		/* takes care of pets, detected, ridden, and regular mons */
-		sym = monsyms[(int)mons[glyph_to_mon(glyph)].mlet];
+		sym = showsyms[(int)mons[glyph_to_mon(glyph)].mlet + SYM_OFF_M];
 	    } else if (glyph_is_swallow(glyph)) {
 		sym = showsyms[glyph_to_swallow(glyph)+S_sw_tl];
 	    } else if (glyph_is_invisible(glyph)) {
 		sym = DEF_INVISIBLE;
 	    } else if (glyph_is_warning(glyph)) {
 		sym = glyph_to_warning(glyph);
-	    	sym = warnsyms[sym];
+	    	sym = showsyms[sym + SYM_OFF_W];
 	    } else {
 		impossible("do_look:  bad glyph %d at (%d,%d)",
 						glyph, (int)cc.x, (int)cc.y);
@@ -573,7 +573,8 @@ do_look(mode, click_cc)
 
 	/* Check for monsters */
 	for (i = 0; i < MAXMCLASSES; i++) {
-	    if (sym == ((from_screen || clicklook) ? monsyms[i] : def_monsyms[i].sym) &&
+	    if (sym == ((from_screen || clicklook) ?
+			showsyms[i + SYM_OFF_M] : def_monsyms[i].sym) &&
 		def_monsyms[i].explain) {
 		need_to_look = TRUE;
 		if (!found) {
@@ -589,7 +590,7 @@ do_look(mode, click_cc)
 	   playing a character which isn't normally displayed by that
 	   symbol; firstmatch is assumed to already be set for '@' */
 	if (((from_screen || clicklook) ?
-		(sym == monsyms[S_HUMAN] && cc.x == u.ux && cc.y == u.uy) :
+		(sym == showsyms[S_HUMAN + SYM_OFF_M] && cc.x == u.ux && cc.y == u.uy) :
 		(sym == def_monsyms[S_HUMAN].sym && !flags.showrace)) &&
 	    !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
 	    found += append_str(out_str, "you");	/* tack on "or you" */
@@ -611,7 +612,8 @@ do_look(mode, click_cc)
 
 	/* Now check for objects */
 	for (i = 1; i < MAXOCLASSES; i++) {
-	    if (sym == ((from_screen || clicklook) ? oc_syms[i] : def_oc_syms[i].sym)) {
+	    if (sym == ((from_screen || clicklook) ?
+			showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym)) {
 		need_to_look = TRUE;
 		if ((from_screen || clicklook) && i == VENOM_CLASS) {
 		    skipped_venom++;

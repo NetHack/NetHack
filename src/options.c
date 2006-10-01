@@ -3323,7 +3323,8 @@ char *buf;
 #ifdef BACKWARD_COMPAT
 	else if (!strcmp(optname, "boulder"))
 		Sprintf(buf, "%c", iflags.bouldersym ?
-			iflags.bouldersym : oc_syms[(int)objects[BOULDER].oc_class]);
+			iflags.bouldersym :
+			showsyms[(int)objects[BOULDER].oc_class + SYM_OFF_O]);
 #endif
 	else if (!strcmp(optname, "catname"))
 		Sprintf(buf, "%s", catname[0] ? catname : none );
