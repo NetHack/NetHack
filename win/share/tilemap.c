@@ -395,6 +395,12 @@ init_tilemap()
 		tilenum++;
 	}
 
+	/* statue patch: statues still use the same glyph as in vanilla */
+        
+	for ( i = 0; i < NUMMONS; i++) {
+	        tilemap[GLYPH_STATUE_OFF+i] = tilemap[GLYPH_OBJ_OFF+STATUE];
+        }        
+
 	lastothtile = tilenum - 1;
 }
 

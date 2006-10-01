@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mapglyph.c	3.5	2006/09/17	*/
+/*	SCCS Id: @(#)mapglyph.c	3.5	2006/10/01	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -82,7 +82,16 @@ unsigned *ospecial;
      *  Warning:  For speed, this makes an assumption on the order of
      *		  offsets.  The order is set in display.h.
      */
-    if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) {	/* a warning flash */
+    if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) {   /* a statue */
+	idx = mons[offset].mlet + SYM_OFF_M;
+# ifdef ROGUE_COLOR
+	if (has_rogue_color)
+		color = CLR_RED;
+	else
+# endif
+	obj_color(STATUE);
+	special |= MG_STATUE;
+    } else if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) {	/* a warning flash */
 	idx = offset + SYM_OFF_W;
 # ifdef ROGUE_COLOR
 	if (has_rogue_color)

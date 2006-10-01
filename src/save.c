@@ -85,6 +85,23 @@ static long nulls[10];
 #define HUP
 #endif
 
+
+/* compute object glyphs for vanilla nethack -- statue patch */
+void
+make_glyphs_vanilla(lev)
+xchar lev;
+{
+  int x,y;
+      
+  for (x = 0; x < COLNO; x++)         
+    for (y = 0; y < ROWNO; y++)
+      if ( level.objects[x][y] != 0 &&
+           level.objects[x][y]->otyp == STATUE &&
+           glyph_is_statue(levl[x][y].glyph))  
+             levl[x][y].glyph = obj_to_glyph_vanilla(level.objects[x][y]);
+}
+
+
 /* need to preserve these during save to avoid accessing freed memory */
 static unsigned ustuck_id = 0, usteed_id = 0;
 
@@ -510,6 +527,9 @@ int mode;
 #ifdef TOS
 	short tlev;
 #endif
+
+        /* make remembered glyphs correct fo rloading into vanilla nh */
+        make_glyphs_vanilla(lev);  
 
 	/* if we're tearing down the current level without saving anything
 	   (which happens upon entrance to the endgame or after an aborted

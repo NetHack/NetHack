@@ -1633,9 +1633,23 @@ struct obj *obj, *otmp;
 		   (the sound could be implicit) */
 		maybelearnit = cansee(obj->ox, obj->oy) || !Deaf;
 		if (obj->otyp == BOULDER) {
-		    fracture_rock(obj);
-		} else if (obj->otyp == STATUE) {
-		    (void) break_statue(obj);
+			if (cansee(obj->ox, obj->oy))
+				pline_The("boulder falls apart.");
+			else if (!Deaf)
+				You_hear("a crumbling sound.");
+  			fracture_rock(obj);
+		}
+		else if (obj->otyp == STATUE) {
+		    if (break_statue(obj)) {
+			if (cansee(obj->ox, obj->oy)) {
+			    if (Hallucination)
+				pline_The("%s shatters.", rndmonnam());
+			    else 
+				pline_The("statue shatters.");
+			} else if (!Deaf) {
+			    You_hear("a crumbling sound.");
+			}
+		    }
 		} else {
 		    if (context.mon_moving ?
 			    !breaks(obj, obj->ox, obj->oy) :

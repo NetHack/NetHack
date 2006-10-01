@@ -276,7 +276,8 @@
 #define GLYPH_ZAP_OFF		((MAXEXPCHARS * EXPL_MAX) + GLYPH_EXPLODE_OFF)
 #define GLYPH_SWALLOW_OFF	((NUM_ZAP << 2) + GLYPH_ZAP_OFF)
 #define GLYPH_WARNING_OFF	((NUMMONS << 3) + GLYPH_SWALLOW_OFF)
-#define MAX_GLYPH		(WARNCOUNT      + GLYPH_WARNING_OFF)
+#define GLYPH_STATUE_OFF       (WARNCOUNT	+ GLYPH_WARNING_OFF)
+#define MAX_GLYPH		(NUMMONS      + GLYPH_STATUE_OFF)
 
 #define NO_GLYPH MAX_GLYPH
 
@@ -290,7 +291,22 @@
 
 /* This has the unfortunate side effect of needing a global variable	*/
 /* to store a result. 'otg_temp' is defined and declared in decl.{ch}.	*/
+#define random_obj_to_glyph() 					    	      \
+	((otg_temp = random_object()) == CORPSE ?			      \
+	    random_monster() + GLYPH_BODY_OFF :				      \
+	        otg_temp + GLYPH_OBJ_OFF)			      
+
 #define obj_to_glyph(obj)						      \
+    ((obj)->otyp == STATUE ?						      \
+        statue_to_glyph(obj) :				       	      	      \
+     Hallucination ?	  				       	      	      \
+	random_obj_to_glyph() :			       	      	      	      \
+     (obj)->otyp == CORPSE ?					      	      \
+	    (int) (obj)->corpsenm + GLYPH_BODY_OFF :			      \
+	(int) (obj)->otyp + GLYPH_OBJ_OFF)
+
+
+#define obj_to_glyph_vanilla(obj)                    \
     (Hallucination ?							      \
 	((otg_temp = random_object()) == CORPSE ?			      \
 	    random_monster() + GLYPH_BODY_OFF :				      \
@@ -298,6 +314,15 @@
 	((obj)->otyp == CORPSE ?					      \
 	    (int) (obj)->corpsenm + GLYPH_BODY_OFF :			      \
 	    (int) (obj)->otyp + GLYPH_OBJ_OFF))
+
+
+/* MRKR: Statues now have glyphs corresponding to the monster they    */
+/*       brepresent and look like monsters when you are hallucinating. */
+
+#define statue_to_glyph(obj)						      \
+    (Hallucination ?							      \
+	random_monster() + GLYPH_MON_OFF :				      \
+	(int) (obj)->corpsenm + GLYPH_STATUE_OFF)
 
 #define cmap_to_glyph(cmap_idx) ((int) (cmap_idx)   + GLYPH_CMAP_OFF)
 #define explosion_to_glyph(expltype,idx)	\
@@ -307,6 +332,7 @@
 			cmap_to_glyph(trap_to_defsym(what_trap((trap)->ttyp)))
 
 /* Not affected by hallucination.  Gives a generic body for CORPSE */
+/* MRKR: ...and the generic statue */
 #define objnum_to_glyph(onum)	((int) (onum) + GLYPH_OBJ_OFF)
 #define monnum_to_glyph(mnum)	((int) (mnum) + GLYPH_MON_OFF)
 #define detected_monnum_to_glyph(mnum)	((int) (mnum) + GLYPH_DETECT_OFF)
@@ -338,9 +364,11 @@
 	glyph_is_pet(glyph) ? ((glyph)-GLYPH_PET_OFF) :			\
 	glyph_is_detected_monster(glyph) ? ((glyph)-GLYPH_DETECT_OFF) :	\
 	glyph_is_ridden_monster(glyph) ? ((glyph)-GLYPH_RIDDEN_OFF) :	\
+	glyph_is_statue(glyph) ? ((glyph)-GLYPH_STATUE_OFF) :		\
 	NO_GLYPH)
 #define glyph_to_obj(glyph)						\
 	(glyph_is_body(glyph) ? CORPSE :				\
+	glyph_is_statue(glyph) ? STATUE :				\
 	glyph_is_normal_object(glyph) ? ((glyph)-GLYPH_OBJ_OFF) :	\
 	NO_GLYPH)
 #define glyph_to_trap(glyph)						\
@@ -372,6 +400,12 @@
     ((glyph) >= GLYPH_PET_OFF && (glyph) < (GLYPH_PET_OFF+NUMMONS))
 #define glyph_is_body(glyph)						\
     ((glyph) >= GLYPH_BODY_OFF && (glyph) < (GLYPH_BODY_OFF+NUMMONS))
+
+#define glyph_is_statue(glyph)						\
+    ((glyph) >= GLYPH_STATUE_OFF && (glyph) < (GLYPH_STATUE_OFF+NUMMONS))
+#define GLYPH_STATUE_VANILLA  ((int) GLYPH_OBJ_OFF + STATUE)
+#define glyph_is_statue_vanilla(glyph) ( glyph == GLYPH_STATUE_VANILLA)
+
 #define glyph_is_ridden_monster(glyph)					\
     ((glyph) >= GLYPH_RIDDEN_OFF && (glyph) < (GLYPH_RIDDEN_OFF+NUMMONS))
 #define glyph_is_detected_monster(glyph)				\
@@ -381,6 +415,7 @@
     ((glyph) >= GLYPH_OBJ_OFF && (glyph) < (GLYPH_OBJ_OFF+NUM_OBJECTS))
 #define glyph_is_object(glyph)						\
 		(glyph_is_normal_object(glyph)				\
+		|| glyph_is_statue(glyph)				\
 		|| glyph_is_body(glyph))
 #define glyph_is_trap(glyph)						\
     ((glyph) >= (GLYPH_CMAP_OFF+trap_to_defsym(1)) &&			\

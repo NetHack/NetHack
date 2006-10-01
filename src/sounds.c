@@ -959,6 +959,23 @@ dochat()
     tx = u.ux+u.dx; ty = u.uy+u.dy;
     mtmp = m_at(tx, ty);
 
+    if ((!mtmp || mtmp->mundetected) && 
+	(otmp = vobj_at(tx, ty)) && otmp->otyp == STATUE) {
+      
+      /* Talking to a statue */
+
+      if (!Blind) {
+	if (Hallucination) {
+	  /* if you're hallucinating, you can't tell it's a statue */
+	  pline_The("%s seems not to notice you.", rndmonnam());
+	}
+	else {
+	  pline_The("statue seems not to notice you.");
+	}
+      }
+      return(0);
+    }
+
     if (!mtmp || mtmp->mundetected ||
 		mtmp->m_ap_type == M_AP_FURNITURE ||
 		mtmp->m_ap_type == M_AP_OBJECT)

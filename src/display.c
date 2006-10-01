@@ -256,8 +256,18 @@ map_object(obj, show)
     register int x = obj->ox, y = obj->oy;
     register int glyph = obj_to_glyph(obj);
 
-    if (level.flags.hero_memory)
+    if (level.flags.hero_memory) {
+
+      /* MRKR: While hallucinating, statues are seen as random monsters */
+      /*       but remembered as random objects.                        */
+
+      if (Hallucination && obj->otyp == STATUE) {
+	levl[x][y].glyph = random_obj_to_glyph();
+      }
+      else {
 	levl[x][y].glyph = glyph;
+      }
+    }
     if (show) show_glyph(x, y, glyph);
 }
 
@@ -1250,7 +1260,8 @@ show_glyph(x,y,glyph)
 	 *  the definition.
 	 */
 
-	if (glyph >= GLYPH_WARNING_OFF) {	/* a warning */
+	if (glyph >= GLYPH_WARNING_OFF
+            && glyph < GLYPH_STATUE_OFF) {	/* a warning */
 	    text = "warning";		offset = glyph - GLYPH_WARNING_OFF;
 	} else if (glyph >= GLYPH_SWALLOW_OFF) {	/* swallow border */
 	    text = "swallow border";	offset = glyph - GLYPH_SWALLOW_OFF;

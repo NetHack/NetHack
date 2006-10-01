@@ -53,6 +53,7 @@
 #define MG_DETECT	0x04
 #define MG_PET		0x08
 #define MG_RIDDEN	0x10
+#define MG_STATUE	0x20
 
 /* sellobj_state() states */
 #define SELL_NORMAL	(0)
