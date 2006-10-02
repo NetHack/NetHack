@@ -273,7 +273,11 @@ extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
 extern int currentgraphics;				  /* from drawing.c */
 extern uchar showsyms[];
 
+#ifdef LOADSYMSETS
 #define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))
+#else
+#define SYMHANDLING(ht) ((ht) == H_UNK)
+#endif
 
 /*
  * The 5 possible states of doors

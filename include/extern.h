@@ -499,8 +499,8 @@ E void NDECL(init_r_symbols);
 E void NDECL(init_symbols);
 E void NDECL(init_showsyms);
 E void NDECL(init_l_symbols);
+#ifdef LOADSYMSETS
 E void FDECL(clear_symsetentry, (int,BOOLEAN_P));
-#ifdef ASCIIGRAPH
 E void FDECL(update_l_symset, (struct symparse *,int));
 E void FDECL(update_r_symset, (struct symparse *,int));
 #endif
@@ -718,7 +718,7 @@ E void FDECL(check_recordfile, (const char *));
 #if defined(WIZARD)
 E void NDECL(read_wizkit);
 #endif
-#ifdef ASCIIGRAPH
+#ifdef LOADSYMSETS
 E int FDECL(read_sym_file, (int));
 E int FDECL(parse_sym_line, (char *,int));
 #endif
@@ -1536,7 +1536,7 @@ E void FDECL(set_option_mod_status, (const char *,int));
 E int FDECL(add_autopickup_exception, (const char *));
 E void NDECL(free_autopickup_exceptions);
 #endif /* AUTOPICKUP_EXCEPTIONS */
-#ifdef ASCIIGRAPH
+#ifdef LOADSYMSETS
 E int FDECL(load_symset, (const char *,int));
 E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));

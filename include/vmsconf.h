@@ -75,11 +75,6 @@
 #define DLB	/* use data librarian code */
 
 /*
- * Needed to support DECgraphics and/or IBMgraphics display styles.
- */
-#define ASCIIGRAPH	/* ASCII graphics support on terminals */
-
-/*
  * You may define TEXTCOLOR if your system has any terminals that recognize
  * ANSI color sequences of the form ``<ESCAPE>[#;#m'', where the first # is
  * a number between 40 and 47 represented background color, and the second

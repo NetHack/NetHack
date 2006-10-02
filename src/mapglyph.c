@@ -32,7 +32,7 @@ int explcolors[] = {
 #define pet_color(n)  color = iflags.use_color ? mons[n].mcolor : NO_COLOR
 #define warn_color(n) color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
 #define explode_color(n) color = iflags.use_color ? explcolors[n] : NO_COLOR
-# if defined(REINCARNATION) && defined(ASCIIGRAPH)
+# if defined(REINCARNATION) && defined(LOADSYMSETS)
 #  define ROGUE_COLOR
 # endif
 

@@ -355,6 +355,8 @@ typedef unsigned char	uchar;
  * complexity of the game but also to the size of the load module.
  */
 
+/* display features */
+#define LOADSYMSETS	/* loadable symbol sets; only default symbols w/o this */
 /* dungeon features */
 #define SINKS		/* Kitchen sinks - Janet Walz */
 /* dungeon levels */

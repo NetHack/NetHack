@@ -185,7 +185,7 @@ STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
 STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
 int FDECL(parse_config_line, (FILE *,char *,char *,char *));
-#ifdef ASCIIGRAPH
+#ifdef LOADSYMSETS
 STATIC_DCL FILE *NDECL(fopen_sym_file);
 STATIC_DCL void FDECL(set_symhandling, (char *,int));
 #endif
@@ -2057,6 +2057,10 @@ char		*tmp_levels;
 					WARNCOUNT, "WARNINGS");
 	    assign_warnings(translate);
 	} else if (match_varname(buf, "SYMBOLS", 4)) {
+	/* This part is not ifdef LOADSYMSETS because we want to be able
+	 * to silently ignore its presence in a config file if that is
+	 * not defined.
+	 */
 		char *op, symbuf[BUFSZ];
 		boolean morelines;
 		do {
@@ -2075,11 +2079,10 @@ char		*tmp_levels;
 			    /* strip trailing space now that '\' is gone */
 			    while (--op >= bufp && isspace(*op)) *op = '\0';
 			}
-
-#ifdef ASCIIGRAPH
+#ifdef LOADSYMSETS
 			/* parse here */
 			parsesymbols(bufp);	
-#endif /*ASCIIGRAPH*/
+#endif
 			if (morelines)
 			  do  {
 			    *symbuf = '\0';
@@ -2090,9 +2093,9 @@ char		*tmp_levels;
 			    bufp = symbuf;
 			} while (*bufp == '#');
 		} while (morelines);
-#ifdef ASCIIGRAPH
+#ifdef LOADSYMSETS
 		switch_symbols(TRUE);
-#endif /*ASCIIGRAPH*/
+#endif
 #ifdef WIZARD
 	} else if (match_varname(buf, "WIZKIT", 6)) {
 	    (void) strncpy(wizkit, bufp, WIZKIT_MAX-1);
@@ -2422,7 +2425,7 @@ read_wizkit()
 
 #endif /*WIZARD*/
 
-#ifdef ASCIIGRAPH
+#ifdef LOADSYMSETS
 extern struct symsetentry *symset_list;	/* options.c */
 extern struct symparse loadsyms[];	/* drawing.c */
 extern const char *known_handling[];	/* drawing.c */
@@ -2570,9 +2573,9 @@ int which_set;
 			    if (!strcmpi(bufp, symset[which_set].name)) {
 				/* matches desired one */
 				chosen_symset_start = TRUE;
-#ifdef REINCARNATION
+# ifdef REINCARNATION
 				if (which_set == ROGUESET) init_r_symbols();
-#endif
+# endif
 				if (which_set == PRIMARY)  init_l_symbols();
 			    }
 			    break;
@@ -2606,11 +2609,11 @@ int which_set;
 	    } else {		/* !SYM_CONTROL */
 		val = sym_val(bufp);
 		if (chosen_symset_start) {
-#ifdef REINCARNATION
+# ifdef REINCARNATION
 			if (which_set == ROGUESET)
 			    update_r_symset(symp, val);
 			else
-#endif
+# endif
 			    update_l_symset(symp, val);
 		}
 	    }
@@ -2634,7 +2637,7 @@ int which_set;
 	    i++;
 	}
 }
-#endif /*ASCIIGRAPH*/
+#endif /*LOADSYMSETS*/
 
 /* ----------  END CONFIG FILE HANDLING ----------- */
 

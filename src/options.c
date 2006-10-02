@@ -333,10 +333,19 @@ static struct Comp_Opt
 #ifdef MSDOS
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
-	{ "symset", "load a set of display symbols from the symbols file", 70, SET_IN_GAME },
+	{ "symset", "load a set of display symbols from the symbols file", 70,
+#ifdef LOADSYMSETS
+				SET_IN_GAME },
+#else
+				DISP_IN_GAME},
+#endif
 	{ "roguesymset", "load a set of rogue display symbols from the symbols file", 70,
 #ifdef REINCARNATION
+# ifdef LOADSYMSETS
 				 SET_IN_GAME },
+# else
+				 DISP_IN_GAME},
+# endif
 #else
 				 SET_IN_FILE },
 #endif
@@ -608,7 +617,7 @@ initoptions()
 	 */
 	/* this detects the IBM-compatible console on most 386 boxes */
 	if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
-#ifdef ASCIIGRAPH
+#ifdef LOADSYMSETS
 		if (!symset[PRIMARY].name) load_symset("IBMGraphics", PRIMARY);
 
 		if (!symset[ROGUESET].name) load_symset("RogueIBM", ROGUESET);
@@ -626,10 +635,10 @@ initoptions()
 	if ((opts = nh_getenv("TERM")) &&
 	    !strncmpi(opts, "vt", 2) && AS && AE &&
 	    index(AS, '\016') && index(AE, '\017')) {
-#  ifdef ASCIIGRAPH
+#  ifdef LOADSYMSETS
 		if (!symset[PRIMARY].name) load_symset("DECGraphics", PRIMARY);
 		switch_symbols(TRUE);
-#  endif /*ASCIIGRAPH*/
+#  endif /*LOADSYMSETS*/
 	}
 # endif
 #endif /* UNIX || VMS */
@@ -1294,7 +1303,7 @@ boolean tinitial, tfrom_file;
 
 	fullname = "roguesymset";
 	if (match_optname(opts, fullname, 7, TRUE)) {
-#if defined(REINCARNATION) && defined(ASCIIGRAPH)
+#if defined(REINCARNATION) && defined(LOADSYMSETS)
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, FALSE)) != 0) {
@@ -1317,7 +1326,7 @@ boolean tinitial, tfrom_file;
 
 	fullname = "symset";
 	if (match_optname(opts, fullname, 6, TRUE)) {
-#ifdef ASCIIGRAPH
+#ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, FALSE)) != 0) {
@@ -1483,9 +1492,9 @@ boolean tinitial, tfrom_file;
 							) {
 	    int color_number, color_incr;
 
-#ifndef WIN32CON
+# ifndef WIN32CON
 	    if (duplicate) complain_about_duplicate(opts,1);
-#endif
+# endif
 # ifdef MAC
 	    if (match_optname(opts, "hicolor", 3, TRUE)) {
 		if (negated) {
@@ -1605,6 +1614,7 @@ goodfruit:
 		else warning_opts(opts, fullname);
 		return;
 	}
+
 #ifdef BACKWARD_COMPAT
 	/* boulder:symbol */
 	fullname = "boulder";
@@ -2280,11 +2290,11 @@ goodfruit:
 	}
 #endif
 
-#ifdef ASCIIGRAPH
-# if defined(BACKWARD_COMPAT)
+#if defined(BACKWARD_COMPAT)
 	fullname = "DECgraphics";
 	if (match_optname(opts, fullname, 10, TRUE)) {
 		boolean badflag = FALSE;
+# ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    /* There is no rogue level DECgraphics-specific set */
@@ -2304,12 +2314,14 @@ goodfruit:
 			wait_synch();
 		    }
 		}
+# endif	/*LOADSYMSETS*/
 		return;
 	}
 	fullname = "IBMgraphics";
 	if (match_optname(opts, fullname, 10, TRUE)) {
 		const char *sym_name = fullname;
 		boolean badflag = FALSE;
+# ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    for (i = 0; i < NUM_GRAPHICS; ++i) { 
@@ -2338,12 +2350,15 @@ goodfruit:
 #  endif
 		    }
 		}
+# endif /*LOADSYMSETS*/
 		return;
 	}
-#  ifdef MAC_GRAPHICS_ENV
+#endif
+#ifdef MAC_GRAPHICS_ENV
 	fullname = "MACgraphics";
 	if (match_optname(opts, fullname, 11, TRUE)) {
 		boolean badflag = FALSE;
+# ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    if (symset[PRIMARY]).name badflag = TRUE;
@@ -2365,10 +2380,9 @@ goodfruit:
 				assign_graphics(ROGUESET);
 		    }
 		}
+# endif /*LOADSYMSETS*/
 		return;
 	}
-#  endif
-# endif
 #endif
 	/* OK, if we still haven't recognized the option, check the boolean
 	 * options list
@@ -2776,8 +2790,10 @@ doset()
 	return 0;
 }
 
+#ifdef LOADSYMSETS
 struct symsetentry *symset_list = 0;	/* files.c will populate this with
 						 list of available sets */
+#endif
 
 STATIC_OVL boolean
 special_handling(optname, setinitial, setfromfile)
@@ -3140,9 +3156,12 @@ boolean setinitial,setfromfile;
  	       !strcmp("roguesymset", optname)) {
 	menu_item *symset_pick = (menu_item *)0;
 	boolean rogueflag = (*optname == 'r');
-	struct symsetentry *sl;
+#ifdef LOADSYMSETS
+	int res;
 	char *symset_name, fmtstr[20];
-	int chosen = -2, res, which_set =
+	struct symsetentry *sl;
+#endif
+	int chosen = -2, which_set =
 #ifdef REINCARNATION
 					rogueflag ? ROGUESET :
 #endif
@@ -3150,7 +3169,7 @@ boolean setinitial,setfromfile;
 #ifndef REINCARNATION
 	if (rogueflag) return TRUE;
 #endif
-#ifdef ASCIIGRAPH
+#ifdef LOADSYMSETS
 	/* clear symset[].name as a flag to read_sym_file() to build list */
 	symset_name = symset[which_set].name;
 	symset[which_set].name = (char *)0;
@@ -3275,7 +3294,7 @@ boolean setinitial,setfromfile;
 # endif
 		assign_graphics(PRIMARY);
 	need_redraw = TRUE;
-#endif /*ASCIIGRAPH*/
+#endif /*LOADSYMSETS*/
     } else {
 	/* didn't match any of the special options */
 	return FALSE;
@@ -3477,8 +3496,11 @@ char *buf;
 #ifdef REINCARNATION
 	else if (!strcmp(optname, "roguesymset"))
 		Sprintf(buf, "%s",
+# ifdef LOADSYMSETS
 			symset[ROGUESET].name ?
-			symset[ROGUESET].name : "default");
+			symset[ROGUESET].name :
+# endif
+			"default");
 #endif
 	else if (!strcmp(optname, "role"))
 		Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
@@ -3513,8 +3535,11 @@ char *buf;
 	}
 	else if (!strcmp(optname, "symset"))
 		Sprintf(buf, "%s",
+#ifdef LOADSYMSETS
 			symset[PRIMARY].name ?
-			symset[PRIMARY].name : "default");
+			symset[PRIMARY].name :
+#endif
+			"default");
 	else if (!strcmp(optname, "tile_file"))
 		Sprintf(buf, "%s", iflags.wc_tile_file ? iflags.wc_tile_file : defopt);
 	else if (!strcmp(optname, "tile_height")) {
@@ -3689,7 +3714,8 @@ free_autopickup_exceptions()
 	}
 }
 #endif /* AUTOPICKUP_EXCEPTIONS */
-#ifdef ASCIIGRAPH
+
+#ifdef LOADSYMSETS
 /* bundle some common usage into one easy-to-use routine */
 int
 load_symset(s, which_set)
@@ -3776,7 +3802,7 @@ char *strval;
 	escapes(strval, buf);
 	return (int)*buf;
 }
-#endif
+#endif /*LOADSYMSETS*/
 
 /* data for option_help() */
 static const char *opt_intro[] = {

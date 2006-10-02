@@ -17,7 +17,10 @@
 #define C(n)
 #endif
 
+#ifdef LOADSYMSETS
 struct symsetentry symset[NUM_GRAPHICS];
+#endif
+
 int currentgraphics = 0;
 
 uchar showsyms[SYM_MAX] = DUMMY;		/* symbols to be displayed */
@@ -345,33 +348,6 @@ def_char_to_monclass(ch)
  */
 
 void
-switch_symbols(nondefault)
-int nondefault;
-{
-#ifdef ASCIIGRAPH
-	register int i;
-
-	if (nondefault) {
-		for (i = 0; i < SYM_MAX; i++)
-		    showsyms[i] = l_syms[i];
-# ifdef PC9800
-		if (SYMHANDLING(H_IBM)
-		    && ibmgraphics_mode_callback)
-			(*ibmgraphics_mode_callback)();
-	        else if (!symset[currentgraphics].name && ascgraphics_mode_callback)
-			(*ascgraphics_mode_callback)();
-# endif
-# ifdef TERMLIB
-	    	if (SYMHANDLING(H_DEC)
-		    && decgraphics_mode_callback)
-			(*decgraphics_mode_callback)();
-# endif
-	} else
-#endif
-	init_symbols();
-}
-
-void
 init_symbols()
 {
 	init_l_symbols();
@@ -431,7 +407,9 @@ init_l_symbols()
 	    	l_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
 	}
 
+#ifdef LOADSYMSETS
 	clear_symsetentry(PRIMARY, FALSE);
+#endif
 }
 
 #ifdef REINCARNATION
@@ -464,11 +442,13 @@ init_r_symbols()
 	    	r_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
 	}
 
+# ifdef LOADSYMSETS
 	clear_symsetentry(ROGUESET, FALSE);
 	symset[ROGUESET].nocolor = 1;	 /* default on Rogue level is no color
 					  * but some symbol sets can
 					  * override that
 					  */
+# endif
 }
 #endif /*REINCARNATION*/
 
@@ -506,7 +486,32 @@ int whichset;
     }
 }
 
-#ifdef ASCIIGRAPH
+void
+switch_symbols(nondefault)
+int nondefault;
+{
+	register int i;
+
+	if (nondefault) {
+		for (i = 0; i < SYM_MAX; i++)
+		    showsyms[i] = l_syms[i];
+# ifdef PC9800
+		if (SYMHANDLING(H_IBM)
+		    && ibmgraphics_mode_callback)
+			(*ibmgraphics_mode_callback)();
+	        else if (!symset[currentgraphics].name && ascgraphics_mode_callback)
+			(*ascgraphics_mode_callback)();
+# endif
+# ifdef TERMLIB
+	    	if (SYMHANDLING(H_DEC)
+		    && decgraphics_mode_callback)
+			(*decgraphics_mode_callback)();
+# endif
+	} else
+	init_symbols();
+}
+
+#ifdef LOADSYMSETS
 void
 update_l_symset(symp, val)
 struct symparse *symp;
@@ -737,7 +742,7 @@ struct symparse loadsyms[] = {
 	{SYM_OTH, SYM_INVISIBLE + SYM_OFF_X, "S_invisible"},
 	{0,0,(const char *)0}	/* fence post */
 };
-#endif /*ASCIIGRAPH*/
+#endif /*LOADSYMSETS*/
 
 /*drawing.c*/
 
