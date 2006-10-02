@@ -629,7 +629,8 @@ really_close()
 	lftrack.nethack_thinks_it_is_open = FALSE;
 	lftrack.fd = -1;
 	lftrack.oflag = 0;
-	(void)_close(fd);
+	if (fd != -1)
+		(void)_close(fd);
 	return;
 }
 
