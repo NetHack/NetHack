@@ -2426,9 +2426,10 @@ read_wizkit()
 #endif /*WIZARD*/
 
 #ifdef LOADSYMSETS
-extern struct symsetentry *symset_list;	/* options.c */
-extern struct symparse loadsyms[];	/* drawing.c */
-extern const char *known_handling[];	/* drawing.c */
+extern struct symsetentry *symset_list;		/* options.c */
+extern struct symparse loadsyms[];		/* drawing.c */
+extern const char *known_handling[];		/* drawing.c */
+extern const char *known_restrictions[];	/* drawing.c */
 static int symset_count = 0;	 	/* for pick-list building only */
 static boolean chosen_symset_start = FALSE, chosen_symset_end = FALSE;
 
@@ -2481,7 +2482,7 @@ parse_sym_line(buf, which_set)
 char *buf;
 int which_set;
 {
-	int val;
+	int i, val;
 	struct symparse *symp = (struct symparse *)0;
 	char *bufp, *commentp, *altp;
 
@@ -2553,12 +2554,30 @@ int which_set;
 		    Strcpy(tmpsp->name, bufp);
 		    tmpsp->desc = (char *)0;
 		    tmpsp->nocolor = 0;
+		    /* initialize restriction bits */
+		    tmpsp->primary = 0;
+		    tmpsp->rogue   = 0;
 		    break;
 		 case 3: /* description:something */
 		    tmpsp = symset_list; /* most recent symset */
 		    if (tmpsp && !tmpsp->desc) {
 			tmpsp->desc = (char *)alloc(strlen(bufp)+1);
 			Strcpy(tmpsp->desc, bufp);
+		    }
+		    break;
+		 case 5:
+		    /* restrictions: xxxx*/
+		    tmpsp = symset_list; /* most recent symset */
+		    i = 0;
+		    while (known_restrictions[i]) {
+			if (!strcmpi(known_restrictions[i], bufp)) {
+			    switch(i) {
+			    	case  0: tmpsp->primary = 1; break;
+				case  1: tmpsp->rogue   = 1; break;
+			    }
+			    break;	/* while loop */
+	    	        }
+			i++;
 		    }
 		    break;
 	        }
@@ -2573,6 +2592,7 @@ int which_set;
 			    if (!strcmpi(bufp, symset[which_set].name)) {
 				/* matches desired one */
 				chosen_symset_start = TRUE;
+				/* these init_*() functions clear symset fields too */
 # ifdef REINCARNATION
 				if (which_set == ROGUESET) init_r_symbols();
 # endif
@@ -2605,6 +2625,21 @@ int which_set;
 				    }
 			    }
 			    break;
+		   case 5:  /* restrictions: xxxx*/
+			    i = 0;
+			    while (known_restrictions[i]) {
+				if (!strcmpi(known_restrictions[i], bufp)) {
+				    switch(i) {
+				    	case  0: symset[which_set].primary = 1;
+						 break;
+					case  1: symset[which_set].rogue   = 1;
+						 break;
+				    }
+				    break;	/* while loop */
+	    	        	}
+				i++;
+		    	    }
+		   	    break;
 		}
 	    } else {		/* !SYM_CONTROL */
 		val = sym_val(bufp);

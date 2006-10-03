@@ -241,21 +241,23 @@ struct symparse {
 
 /* linked list of symsets and their characteristics */
 struct symsetentry {
-	struct symsetentry *next;	/* next in list            */
-	char *name;			/* ptr to symset name      */
-	char *desc;			/* ptr to description      */
-	int idx;			/* an index value          */
-	int handling;			/* known handlers value    */
-	Bitfield(nocolor,1);		/* don't use color if set  */
-	/* 7 free bits */
+	struct symsetentry *next;    /* next in list                         */
+	char *name;		     /* ptr to symset name                   */
+	char *desc;		     /* ptr to description                   */
+	int idx;		     /* an index value                       */
+	int handling;		     /* known handlers value                 */
+	Bitfield(nocolor,1);	     /* don't use color if set               */
+	Bitfield(primary,1);	     /* restricted for use as primary set    */
+	Bitfield(rogue,1);	     /* restricted for use as rogue lev set  */
+	/* 5 free bits */
 };
 
 /*
  * Graphics sets for display symbols
  */
 #define DEFAULT_GRAPHICS 0	/* regular characters: '-', '+', &c */
-#define PRIMARY		0	/* primary graphics         */
-#define ROGUESET	1	/* rogue graphics           */
+#define PRIMARY		0	/* primary graphics set        */
+#define ROGUESET	1	/* rogue graphics set          */
 #define NUM_GRAPHICS	2
 
 /*
@@ -269,11 +271,11 @@ struct symsetentry {
 
 extern const struct symdef defsyms[MAXPCHARS];	/* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];
-extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
 extern int currentgraphics;				  /* from drawing.c */
 extern uchar showsyms[];
 
 #ifdef LOADSYMSETS
+extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
 #define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))
 #else
 #define SYMHANDLING(ht) ((ht) == H_UNK)

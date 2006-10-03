@@ -541,6 +541,11 @@ boolean name_too;
 
 	symset[which_set].nocolor = 0;
 	symset[which_set].handling = H_UNK;
+	symset[which_set].desc = (char *)0;
+	symset[which_set].nocolor = 0;
+	/* initialize restriction bits */
+	symset[which_set].primary = 0;
+	symset[which_set].rogue   = 0;
 
 	if (name_too) {
 	    if (symset[which_set].name)
@@ -562,6 +567,25 @@ const char *known_handling[] = {
 	(const char *)0,
 };
 
+/*
+ * Accepted keywords for symset restrictions.
+ * These can be virtually anything that you want to
+ * be able to test in the code someplace.
+ * Be sure to:
+ *    - add a corresponding Bitfield to the symsetentry struct in rm.h
+ *    - initialize the field to zero in parse_sym_line in the SYM_CONTROL
+ *      case 0 section of the idx switch. The location is prefaced with
+ *      with a comment stating "initialize restriction bits".
+ *    - set the value appropriately based on the index of your keyword
+ *      under the case 5 sections of the same SYM_CONTROL idx switches.
+ *    - add the field to clear_symsetentry()
+ */
+const char *known_restrictions[] = {
+	"primary",
+	"rogue",
+	(const char *)0,
+};
+
 struct symparse loadsyms[] = {
 	{SYM_CONTROL, 0, "start"},
 	{SYM_CONTROL, 0, "begin"},
@@ -570,6 +594,7 @@ struct symparse loadsyms[] = {
 	{SYM_CONTROL, 3, "description"},
 	{SYM_CONTROL, 4, "color"},
 	{SYM_CONTROL, 4, "colour"},
+	{SYM_CONTROL, 5, "restrictions"},
 	{SYM_PCHAR, S_stone, "S_stone"},
 	{SYM_PCHAR, S_vwall, "S_vwall"},
 	{SYM_PCHAR, S_hwall, "S_hwall"},

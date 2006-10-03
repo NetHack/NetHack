@@ -3155,11 +3155,15 @@ boolean setinitial,setfromfile;
     } else if (!strcmp("symset", optname) ||
  	       !strcmp("roguesymset", optname)) {
 	menu_item *symset_pick = (menu_item *)0;
-	boolean rogueflag = (*optname == 'r');
+	boolean primaryflag = (*optname == 's'),
+		rogueflag = (*optname == 'r'),
+		ready_to_switch = FALSE,
+		nothing_to_do = FALSE;
 #ifdef LOADSYMSETS
 	int res;
 	char *symset_name, fmtstr[20];
 	struct symsetentry *sl;
+	int setcount = 0;
 #endif
 	int chosen = -2, which_set =
 #ifdef REINCARNATION
@@ -3179,22 +3183,43 @@ boolean setinitial,setfromfile;
 	if (res && symset_list) {
 		char symsetchoice[BUFSZ];
 		int let = 'a', biggest = 0, thissize = 0;
-		tmpwin = create_nhwindow(NHW_MENU);
-		start_menu(tmpwin);
-		any.a_int = 1;
-		add_menu(tmpwin, NO_GLYPH, &any, let++, 0,
-			 ATR_NONE, "Default Symbols", MENU_UNSELECTED);
 		sl = symset_list;
 		while (sl) {
+		    /* check restrictions */
+		    if ((!rogueflag && sl->rogue)  ||
+			(!primaryflag && sl->primary)) {
+		    	sl = sl->next;
+		    	continue;
+		    }
+		    setcount++;
 		    /* find biggest name */
 		    if (sl->name) thissize = strlen(sl->name);
 		    if (thissize > biggest) biggest = thissize;
 		    sl = sl->next;
 		}
+		if (!setcount) {
+			pline("There are no appropriate %ssymbol sets available.",
+				(rogueflag)   ? "rogue level " :
+				(primaryflag) ? "primary " :
+				"");
+			return TRUE;
+		}
+
 		Sprintf(fmtstr,"%%-%ds %%s", biggest + 5);
-		
+		tmpwin = create_nhwindow(NHW_MENU);
+		start_menu(tmpwin);
+		any.a_int = 1;
+		add_menu(tmpwin, NO_GLYPH, &any, let++, 0,
+			 ATR_NONE, "Default Symbols", MENU_UNSELECTED);
+
 		sl = symset_list;
 		while (sl) {
+		    /* check restrictions */
+		    if ((!rogueflag && sl->rogue) ||
+			(!primaryflag && sl->primary)) {
+		    	sl = sl->next;
+		    	continue;
+		    }
 		    if (sl->name) {
 			any.a_int = sl->idx + 2;
 			Sprintf(symsetchoice, fmtstr, sl->name,

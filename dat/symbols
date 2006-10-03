@@ -160,6 +160,7 @@ finish
 
 start: RogueIBM
 	Handling: IBM
+	Restrictions: rogue
 	S_weapon: \x29
 	S_amulet: \x2c
 	S_food: \x3a
@@ -190,6 +191,7 @@ finish
 
 start: RogueEpyx
 	Description: Rogue level color symbol set like Epyx Rogue
+	Restrictions: rogue
 	Handling: IBM
 	Color: Yes
 	S_weapon: \x18			# up arrow
@@ -267,6 +269,7 @@ start: RogueEpyx
 finish
 
 start: RogueWindows
+	Restrictions: rogue
 	Handling: IBM
 	S_weapon: \x29
 	S_amulet: \x2c
