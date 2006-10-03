@@ -1507,6 +1507,10 @@ struct monst *mtmp, *victim;
 		set_mon_data(mtmp, ptr, -1);	/* keep mvitals[] accurate */
 		mondied(mtmp);
 		return (struct permonst *)0;
+	    } else if (canspotmon(mtmp)) {
+		pline("%s %s %s.", Monnam(mtmp),
+		      humanoid(ptr) ? "becomes" : "grows up into",
+		      an(ptr->mname));
 	    }
 	    set_mon_data(mtmp, ptr, 1);		/* preserve intrinsics */
 	    newsym(mtmp->mx, mtmp->my);		/* color may change */
