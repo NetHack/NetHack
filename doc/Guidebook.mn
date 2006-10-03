@@ -691,7 +691,7 @@ Talk to someone.
 .lp #conduct
 List voluntary challenges you have maintained.  See the section below entitled
 ``Conduct'' for details.
-.lp #dip
+.lp "#dip "
 Dip an object into something.
 .lp #enhance
 Advance or check weapon and spell skills.
@@ -716,11 +716,11 @@ Pray to the gods for help.
 Quit the program without saving your game.
 .lp #ride
 Ride (or stop riding) a monster.
-.lp #rub
+.lp "#rub "
 Rub a lamp or a stone.
-.lp #sit
+.lp "#sit "
 Sit down.
-.lp #tip
+.lp "#tip "
 Tip over a container to pour out its contents.
 .lp #turn
 Turn undead.
@@ -734,7 +734,7 @@ Untrap something (trap, door, or chest).
 Print compile time options for this version of NetHack.
 .lp #wipe
 Wipe off your face.
-.lp #?
+.lp "#?   "
 Help menu:  get the list of available extended commands.
 .pg
 If your keyboard has a meta key (which, when pressed in combination
