@@ -161,12 +161,17 @@ int distance;
 	}
 }
 
-/* Awake only soldiers of the level. */
-
+/* Awake soldiers anywhere the level (and any nearby monster). */
 void
-awaken_soldiers()
+awaken_soldiers(bugler)
+	struct monst *bugler;		/* monster that played instrument */
 {
 	register struct monst *mtmp;
+	int distance, distm;
+
+	/* distance of affected non-soldier monsters to bugler */
+	distance = ((bugler == &youmonst) ?
+		    u.ulevel : bugler->data->mlevel) * 30;
 
 	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 	    if (DEADMONSTER(mtmp)) continue;
@@ -178,6 +183,19 @@ awaken_soldiers()
 		    pline("%s is now ready for battle!", Monnam(mtmp));
 		else
 		    Norep("You hear the rattle of battle gear being readied.");
+	    } else if ((distm = ((bugler == &youmonst) ?
+			distu(mtmp->mx, mtmp->my) :
+			dist2(bugler->mx, bugler->my, mtmp->mx, mtmp->my)))
+		       < distance) {
+		mtmp->msleeping = 0;
+		mtmp->mcanmove = 1;
+		mtmp->mfrozen = 0;
+		/* may scare some monsters -- waiting monsters excluded */
+		if ((mtmp->mstrategy & STRAT_WAITMASK) != 0)
+		    mtmp->mstrategy &= ~STRAT_WAITMASK;
+		else if (distm < distance/3 &&
+			    !resist(mtmp, TOOL_CLASS, 0, NOTELL))
+		    monflee(mtmp, 0, FALSE, TRUE);
 	    }
 	}
 }
@@ -476,7 +494,7 @@ struct obj *instr;
 	    break;
 	case BUGLE:			/* Awaken & attract soldiers */
 	    You("extract a loud noise from %s.", the(xname(instr)));
-	    awaken_soldiers();
+	    awaken_soldiers(&youmonst);
 	    exercise(A_WIS, FALSE);
 	    break;
 	case MAGIC_HARP:		/* Charm monsters */
