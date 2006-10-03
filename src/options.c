@@ -3156,9 +3156,7 @@ boolean setinitial,setfromfile;
  	       !strcmp("roguesymset", optname)) {
 	menu_item *symset_pick = (menu_item *)0;
 	boolean primaryflag = (*optname == 's'),
-		rogueflag = (*optname == 'r'),
-		ready_to_switch = FALSE,
-		nothing_to_do = FALSE;
+		rogueflag = (*optname == 'r');
 #ifdef LOADSYMSETS
 	int res;
 	char *symset_name, fmtstr[20];
