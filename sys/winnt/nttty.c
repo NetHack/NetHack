@@ -1087,7 +1087,6 @@ long rgb;
 		/* copy the NetHack palette into UserDefinedColors */
 		for (k=0; k < CLR_MAX; k++)
 			UserDefinedColors[k] = NetHackColors[k];
-		return;
 	} else if (color_number >= 0 && color_number < CLR_MAX) {
 		if (!altered_palette) {
 			/* make sure a full suite is available */

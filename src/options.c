@@ -1514,11 +1514,12 @@ boolean tinitial, tfrom_file;
 # ifdef MAC
 	    }
 # endif
+#ifdef WIN32CON
+	    op = string_for_opt(opts, TRUE);
+	    if (!alternative_palette(op))
+		badoption(opts);
+#else
 	    if ((op = string_for_opt(opts, FALSE)) != (char *)0) {
-# ifdef WIN32CON
-		if (!alternative_palette(op))
-			badoption(opts);
-# else
 		char *pt = op;
 		int cnt, tmp, reverse;
 		long rgb;
@@ -1558,8 +1559,8 @@ boolean tinitial, tfrom_file;
 		    change_color(color_number, rgb, reverse);
 		    color_number += color_incr;
 		}
-# endif	/* !WIN32CON */
 	    }
+# endif	/* !WIN32CON */
 	    if (!initial) {
 		need_redraw = TRUE;
 	    }
