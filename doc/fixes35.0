@@ -160,6 +160,7 @@ make changes in hallucination be reflected by changes in mimickery feedback
 add Unaware pseudo-property to suppress various messages while unconscious
 missile which kills engulfer will now be placed prior to hero's return to map
 bugles affect all monsters to some extent
+nurses are affected if player is polymorphed as a cockatrice
 
 
 Platform- and/or Interface-Specific Fixes

@@ -1335,8 +1335,9 @@ dopois:
 		hurtarmor(AD_DCAY);
 		break;
 	    case AD_HEAL:
-		/* a cancelled nurse is just an ordinary monster */
-		if (mtmp->mcan) {
+		/* a cancelled nurse is just an ordinary monster,
+		 * nurses don't heal those that cause petrification */
+		if (mtmp->mcan || (Upolyd && touch_petrifies(youmonst.data))) {
 		    hitmsg(mtmp, mattk);
 		    break;
 		}
