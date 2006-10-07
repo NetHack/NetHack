@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2006/08/18	*/
+/*	SCCS Id: @(#)eat.c	3.5	2006/10/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -62,6 +62,16 @@ char msgbuf[BUFSZ];
 
 /* monster types that cause hero to be turned into stone if eaten */
 #define flesh_petrifies(pm) (touch_petrifies(pm) || (pm) == &mons[PM_MEDUSA])
+
+/* Rider corpses are treated as non-rotting so that attempting to eat one
+   will be sure to reach the stage of eating where that meal is fatal */
+#define nonrotting_corpse(mnum) ((mnum) == PM_LIZARD || \
+				 (mnum) == PM_LICHEN || \
+				 is_rider(&mons[mnum]))
+
+/* non-rotting non-corpses; unlike lizard corpses, these items will behave
+   as if rotten if they are cursed (fortune cookies handled elsewhere) */
+#define nonrotting_food(otyp) ((otyp) == LEMBAS_WAFER || (otyp) == CRAM_RATION)
 
 STATIC_OVL NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
 
@@ -1257,8 +1267,7 @@ int forcetype;
 		r = forcetype;
 	} else {	/* RANDOM_TIN */
 		r = rn2(TTSZ-1);		/* take your pick */
-		if (r == ROTTEN_TIN && (obj->corpsenm == PM_LIZARD ||
-			 		obj->corpsenm == PM_LICHEN))
+		if (r == ROTTEN_TIN && nonrotting_corpse(obj->corpsenm))
 			r = HOMEMADE_TIN;	/* lizards don't rot */
 	}
 	obj->spe = -(r+1);	/* offset by 1 to allow index 0 */
@@ -1285,8 +1294,7 @@ boolean disp;		/* we're just displaying so leave things alone */
 		 !obj->blessed && !rn2(7))
 		r = ROTTEN_TIN;			/* some homemade tins go bad */	
 
-	if (r == ROTTEN_TIN && (obj->corpsenm == PM_LIZARD ||
-				obj->corpsenm == PM_LICHEN))
+	if (r == ROTTEN_TIN && nonrotting_corpse(obj->corpsenm))
 		r = HOMEMADE_TIN;		/* lizards don't rot */
 	return r;
 }
@@ -1537,7 +1545,7 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	if (!vegan(&mons[mnum])) u.uconduct.unvegan++;
 	if (!vegetarian(&mons[mnum])) violated_vegetarian();
 
-	if (mnum != PM_LIZARD && mnum != PM_LICHEN) {
+	if (!nonrotting_corpse(mnum)) {
 		long age = peek_at_iced_corpse_age(otmp);
 
 		rotted = (monstermoves - age)/(10L + rn2(20));
@@ -1589,8 +1597,7 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	/* delay is weight dependent */
 	context.victual.reqtime = 3 + (mons[mnum].cwt >> 6);
 
-	if (!tp && mnum != PM_LIZARD && mnum != PM_LICHEN &&
-			(otmp->orotten || !rn2(7))) {
+	if (!tp && !nonrotting_corpse(mnum) && (otmp->orotten || !rn2(7))) {
 	    if (rottenfood(otmp)) {
 		otmp->orotten = TRUE;
 		(void)touchfood(otmp);
@@ -2123,7 +2130,7 @@ struct obj *otmp;
 		    stoneorslime = (!Unchanging && !flaming(youmonst.data) &&
 			youmonst.data != &mons[PM_GREEN_SLIME]);
 
-		if (cadaver && mnum != PM_LIZARD && mnum != PM_LICHEN) {
+		if (cadaver && !nonrotting_corpse(mnum)) {
 			long age = peek_at_iced_corpse_age(otmp);
 			/* worst case rather than random
 			   in this calculation to force prompt */
@@ -2419,16 +2426,17 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 
 	    context.victual.reqtime = objects[otmp->otyp].oc_delay;
 	    if (otmp->otyp != FORTUNE_COOKIE &&
-		(otmp->cursed ||
-		 (((monstermoves - otmp->age) > (int) otmp->blessed ? 50:30) &&
-		(otmp->orotten || !rn2(7))))) {
+		(otmp->cursed || (!nonrotting_food(otmp->otyp) &&
+		    (monstermoves - otmp->age) > (otmp->blessed ? 50L : 30L) &&
+		    (otmp->orotten || !rn2(7))))) {
 
 		if (rottenfood(otmp)) {
 		    otmp->orotten = TRUE;
 		    dont_start = TRUE;
 		}
 		consume_oeaten(otmp, 1);	/* oeaten >>= 1 */
-	    } else fprefx(otmp);
+	    } else
+		fprefx(otmp);
 	}
 
 	/* re-calc the nutrition */
@@ -2943,7 +2951,9 @@ int threat;
     if (occupation != opentin) return FALSE;
     otin = context.tin.tin;
     /* make sure hero still has access to tin */
-    if (!carried(otin) && !obj_here(otin, u.ux, u.uy)) return FALSE;
+    if (!carried(otin) &&
+	    (!obj_here(otin, u.ux, u.uy) || !can_reach_floor(TRUE)))
+	return FALSE;
     /* unknown tin is assumed to be helpful */
     if (!otin->known) return TRUE;
     /* known tin is helpful if it will stop life-threatening problem */

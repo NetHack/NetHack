@@ -161,6 +161,8 @@ add Unaware pseudo-property to suppress various messages while unconscious
 missile which kills engulfer will now be placed prior to hero's return to map
 bugles affect all monsters to some extent
 nurses are affected if player is polymorphed as a cockatrice
+getting a particular rotten food result can't make attempting to eat a
+	corpse of one of the Riders be survivable
 
 
 Platform- and/or Interface-Specific Fixes
@@ -242,6 +244,7 @@ opening magic frees from bear traps and webs, activates trap doors
 closing magic activates bear traps and webs
 locking converts a hole into a trap door; striking does the opposite
 add Malcolm Ryan's Statue Glyphs patch
+lembas and cram never rot unless cursed
 
 
 Platform- and/or Interface-Specific New Features
