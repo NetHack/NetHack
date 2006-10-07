@@ -387,6 +387,7 @@ static struct Comp_Opt
 
 #else	/* use rest of file */
 
+extern struct symparse loadsyms[];
 static boolean need_redraw; /* for doset() */
 
 #if defined(TOS) && defined(TEXTCOLOR)

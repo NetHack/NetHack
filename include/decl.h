@@ -269,8 +269,6 @@ E NEARDATA struct mvitals {
 	uchar	mvflags;
 } mvitals[NUMMONS];
 
-E struct symparse loadsyms[];
-
 E NEARDATA struct c_color_names {
     const char	*const c_black, *const c_amber, *const c_golden,
 		*const c_light_blue,*const c_red, *const c_green,
