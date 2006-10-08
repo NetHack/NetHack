@@ -24,6 +24,7 @@ STATIC_DCL void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
 STATIC_DCL int FDECL(mkroll_launch,
 			(struct trap *,XCHAR_P,XCHAR_P,SHORT_P,long));
 STATIC_DCL boolean FDECL(isclearpath,(coord *, int, SCHAR_P, SCHAR_P));
+STATIC_DCL char *FDECL(trapnote, (struct trap *,BOOLEAN_P));
 #if 0
 STATIC_DCL void FDECL(join_adjacent_pits, (struct trap *));
 #endif
@@ -248,6 +249,28 @@ register int x, y, typ;
 	}
 	ttmp->ttyp = typ;
 	switch(typ) {
+	    case SQKY_BOARD:
+	      {
+	      	int tavail[12], tpick[12], tcnt = 0, k;
+		struct trap *t;
+
+		for (k = 0; k < 12; ++k)
+		    tavail[k] = 0;
+		for (t = ftrap; t; t = t->ntrap)
+		    if (t->ttyp == SQKY_BOARD)
+				tavail[t->tnote] = 1;
+
+		/* Now populate tpick with the available indexes */
+		for (k = 0; k < 12; ++k) {
+		    if (tavail[k] == 0)
+				tpick[tcnt++] = k;
+		}
+		if (tcnt > 0)
+		    ttmp->tnote = (short)tpick[rn2(tcnt)];
+		else
+		    ttmp->tnote = (short)rn2(12); /* all in use anyway */
+		break;
+	      }
 	    case STATUE_TRAP:	    /* create a "living" statue */
 	      { struct monst *mtmp;
 		struct obj *otmp, *statue;
@@ -806,7 +829,10 @@ unsigned trflags;
 		    }
 		} else {
 		    seetrap(trap);
-		    pline("A board beneath you squeaks loudly.");
+		    pline("A board beneath you %s%s%s.",
+			Deaf ? "vibrates" : "squeaks ",
+			Deaf ? "" : trapnote(trap,0),
+			Deaf ? "" : " loudly");
 		    wake_nearby();
 		}
 		break;
@@ -1267,6 +1293,27 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		feeltrap(trap);
 		impossible("You hit a trap of type %u", trap->ttyp);
 	}
+}
+
+STATIC_OVL char *
+trapnote(trap, noprefix)
+struct trap *trap;
+boolean noprefix;
+{
+	static char tnbuf[12];
+	const char *tn, *tnnames[12] = {
+		"C note" , "D flat",  "D note",
+		"E flat" , "E note",  "F note",
+		"F sharp", "G note",  "G sharp",
+		"A note" , "B flat",  "B note"
+	};
+	tnbuf[0] = '\0';
+	tn = tnnames[trap->tnote];
+	if (!noprefix)
+	    Sprintf(tnbuf, "%s ", 
+		(*tn == 'A' || *tn == 'E' || *tn == 'F') ? "an" : "a");
+	Sprintf(eos(tnbuf), "%s", tn);
+	return tnbuf;
 }
 
 #ifdef STEED
@@ -1925,10 +1972,18 @@ register struct monst *mtmp;
 			if(is_flyer(mptr)) break;
 			/* stepped on a squeaky board */
 			if (in_sight) {
-			    pline("A board beneath %s squeaks loudly.", mon_nam(mtmp));
-			    seetrap(trap);
-			} else
-			   You_hear("a distant squeak.");
+			    if (!Deaf) {
+				pline("A board beneath %s squeaks %s loudly.",
+					mon_nam(mtmp), trapnote(trap,0));
+				seetrap(trap);
+			    } else {
+				pline("%s stops momentarily and appears to cringe.",
+					Monnam(mtmp));
+			    }
+			} else if (!Deaf) {
+			   You_hear("a distant %s squeak.",
+				trapnote(trap,1));
+			}
 			/* wake up nearby monsters */
 			wake_nearto(mtmp->mx, mtmp->my, 40);
 			break;

@@ -80,6 +80,7 @@ struct context_info {
 				/* 8: travel */
 	unsigned startingpet_mid;
 	int	 warnlevel;
+	int	 rndencode;	/* randomized escape sequence introducer */
 	long next_attrib_check;	/* next attribute check */
 	long stethoscope_move;
 	short stethoscope_movement;
