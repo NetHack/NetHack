@@ -246,6 +246,7 @@ locking converts a hole into a trap door; striking does the opposite
 add Malcolm Ryan's Statue Glyphs patch
 lembas and cram never rot unless cursed
 multiple squeaks for squeaky boards
+include time, user ID, and play mode in paniclog entries
 
 
 Platform- and/or Interface-Specific New Features

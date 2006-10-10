@@ -37,9 +37,11 @@ NetHack, except that rounddiv may call panic().
 	char *		strstri		(const char *, const char *)
 	boolean		fuzzymatch	(const char *,const char *,const char *,boolean)
 	void		setrandom	(void)
+	time_t		getnow		(void)
 	int		getyear		(void)
 	char *		yymmdd		(time_t)
 	long		yyyymmdd	(time_t)
+	long		hhmmss		(time_t)
 	int		phase_of_the_moon	(void)
 	boolean		friday_13th	(void)
 	int		night		(void)
@@ -444,6 +446,19 @@ fuzzymatch(s1, s2, ignore_chars, caseblind)
  *	- determination of what files are "very old"
  */
 
+/* TIME_type: type of the argument to time(); we actually use &(time_t) */
+#if defined(BSD) && !defined(POSIX_TYPES)
+# define TIME_type long *
+#else
+# define TIME_type time_t *
+#endif
+/* LOCALTIME_type: type of the argument to localtime() */
+#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
+# define LOCALTIME_type long *
+#else
+# define LOCALTIME_type time_t *
+#endif
+
 #if defined(AMIGA) && !defined(AZTEC_C) && !defined(__SASC_60) && !defined(_DCC) && !defined(__GNUC__)
 extern struct tm *FDECL(localtime,(time_t *));
 #endif
@@ -452,46 +467,44 @@ STATIC_DCL struct tm *NDECL(getlt);
 void
 setrandom()
 {
+	time_t now = getnow();		/* time((TYPE_type) 0) */
+
 	/* the types are different enough here that sweeping the different
 	 * routine names into one via #defines is even more confusing
 	 */
 #ifdef RANDOM	/* srandom() from sys/share/random.c */
-	srandom((unsigned int) time((time_t *)0));
+	srandom((unsigned int) now);
 #else
 # if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) /* system srandom() */
-#  if defined(BSD) && !defined(POSIX_TYPES)
-#   if defined(SUNOS4)
+#  if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
 	(void)
-#   endif
-		srandom((int) time((long *)0));
-#  else
-		srandom((int) time((time_t *)0));
 #  endif
+		srandom((int) now);
 # else
 #  ifdef UNIX	/* system srand48() */
-	srand48((long) time((time_t *)0));
+	srand48((long) now);
 #  else		/* poor quality system routine */
-	srand((int) time((time_t *)0));
+	srand((int) now);
 #  endif
 # endif
 #endif
 }
 
+time_t
+getnow()
+{
+	time_t datetime = 0;
+
+	(void) time((TIME_type) &datetime);
+	return datetime;
+}
+
 STATIC_OVL struct tm *
 getlt()
 {
-	time_t date;
+	time_t date = getnow();
 
-#if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)(&date));
-#else
-	(void) time(&date);
-#endif
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
-	return(localtime((long *)(&date)));
-#else
-	return(localtime(&date));
-#endif
+	return localtime((LOCALTIME_type) &date);
 }
 
 int
@@ -501,7 +514,7 @@ getyear()
 }
 
 #if 0
-/* This routine is no longer used since in 2000 it will yield "100mmdd". */
+/* This routine is no longer used since in 20YY it yields "1YYmmdd". */
 char *
 yymmdd(date)
 time_t date;
@@ -512,11 +525,7 @@ time_t date;
 	if (date == 0)
 		lt = getlt();
 	else
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || defined(BSD)
-		lt = localtime((long *)(&date));
-#else
-		lt = localtime(&date);
-#endif
+		lt = localtime((LOCALTIME_type) &date);
 
 	Sprintf(datestr, "%02d%02d%02d",
 		lt->tm_year, lt->tm_mon + 1, lt->tm_mday);
@@ -534,11 +543,7 @@ time_t date;
 	if (date == 0)
 		lt = getlt();
 	else
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
-		lt = localtime((long *)(&date));
-#else
-		lt = localtime(&date);
-#endif
+		lt = localtime((LOCALTIME_type) &date);
 
 	/* just in case somebody's localtime supplies (year % 100)
 	   rather than the expected (year - 1900) */
@@ -551,6 +556,22 @@ time_t date;
 	/* yyyymm --> yyyymmdd */
 	datenum = datenum * 100L + (long)lt->tm_mday;
 	return datenum;
+}
+
+long
+hhmmss(date)
+time_t date;
+{
+	long timenum;
+	struct tm *lt;
+
+	if (date == 0)
+		lt = getlt();
+	else
+		lt = localtime((LOCALTIME_type) &date);
+
+	timenum = lt->tm_hour * 10000L + lt->tm_min * 100L + lt->tm_sec;
+	return timenum;
 }
 
 /*

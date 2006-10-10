@@ -927,10 +927,9 @@ create_savefile()
 	   the default for non-privileged users, but for priv'd users the
 	   file will be owned by the directory's owner instead of the user.
 	 */
-#  ifdef getuid	/*(see vmsunix.c)*/
-#   undef getuid
-#  endif
+#  undef getuid
 	(void) chown(fq_save, getuid(), getgid());
+#  define getuid() vms_getuid()
 # endif /* VMS && !SECURE */
 #endif	/* MICRO */
 
@@ -2776,8 +2775,14 @@ const char *reason;	/* explanation */
 		program_state.in_paniclog = 1;
 		lfile = fopen_datafile(PANICLOG, "a", TROUBLEPREFIX);
 		if (lfile) {
-		    (void) fprintf(lfile, "%s %08ld: %s %s\n",
-				   version_string(buf), yyyymmdd((time_t)0L),
+		    time_t now = getnow();
+		    int uid = getuid();
+		    char playmode = wizard ? 'D' : discover ? 'X' : '-';
+
+		    (void) fprintf(lfile, "%s %08ld %06ld %d %c: %s %s\n",
+				   version_string(buf),
+				   yyyymmdd(now), hhmmss(now),
+				   uid, playmode,
 				   type, reason);
 		    (void) fclose(lfile);
 		}
