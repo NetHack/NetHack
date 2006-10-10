@@ -467,7 +467,7 @@ STATIC_DCL struct tm *NDECL(getlt);
 void
 setrandom()
 {
-	time_t now = getnow();		/* time((TYPE_type) 0) */
+	time_t now = getnow();		/* time((TIME_type) 0) */
 
 	/* the types are different enough here that sweeping the different
 	 * routine names into one via #defines is even more confusing
