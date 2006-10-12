@@ -149,6 +149,19 @@ boolean exclude_cookie;
 		pline("Can't open rumors file!");
 		true_rumor_size = -1;	/* don't try to open it again */
 	}
+/* this is safe either way, so do it always since we can't get the definition
+ * out of makedefs.c
+ */
+#define PAD_RUMORS_TO
+#ifdef PAD_RUMORS_TO
+	/* remove padding */
+	{
+	    char *x = eos(rumor_buf) - 1;
+	    while(x > rumor_buf && *x=='_') x--;
+	    *++x = '\n';
+	    *x = '\0';
+	}
+#endif
 	return rumor_buf;
 }
 

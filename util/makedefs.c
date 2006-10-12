@@ -132,7 +132,7 @@ static char xclear[MAX_ROW][MAX_COL];
 #endif
 /*-end of vision defs-*/
 
-static char	in_line[256], filename[60];
+static char	in_line[256], filename[600];
 
 #ifdef FILE_PREFIX
 		/* if defined, a first argument not starting with - is
@@ -344,12 +344,65 @@ const char *str;
 	return buf;
 }
 
+#define PAD_RUMORS_TO 60
+/* common code for do_rumors().  Return 0 on error. */
+static long
+read_rumors_file(
+    const char *file_ext,
+    int *rumor_count,
+    long *rumor_size,
+    long old_rumor_offset
+){
+    char infile[600];
+    long rumor_offset;
+    Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
+    Strcat(infile, file_ext);
+    if (!(ifp = fopen(infile, RDTMODE))) {
+	perror(infile);
+	return 0;
+    }
+
+    /* copy the rumors */
+    while (fgets(in_line, sizeof in_line, ifp) != 0) {
+#ifdef PAD_RUMORS_TO
+	int len = strlen(in_line);
+	if(len <= PAD_RUMORS_TO){	/* XXX enforce min len? */
+	    char *base = index(in_line, '\n');
+	    while(len++<PAD_RUMORS_TO){
+		*base++ = '_';	/* XXX */
+	    }
+	    *base++ = '\n';
+	    *base = '\0';
+	}
+#endif
+		
+		(*rumor_count)++;
+#if 0
+	/*[if we forced binary output, this would be sufficient]*/
+	*rumor_size += strlen(in_line);	/* includes newline */
+#endif
+	(void) fputs(xcrypt(in_line), tfp);
+    }
+    /* record the current position; next rumors section will start here */
+    rumor_offset = ftell(tfp);
+    Fclose(ifp);		/* all done with rumors.file_ext */
+
+    /* the calculated value for *_rumor_count assumes that
+       a single-byte line terminator is in use; for platforms
+       which use two byte CR+LF, we need to override that value
+       [it's much simpler to do so unconditionally, rendering
+       the loop's accumulation above obsolete] */
+
+    *rumor_size = rumor_offset - old_rumor_offset;
+    return rumor_offset;
+}
+
 void
 do_rumors()
 {
 	static const char rumors_header[] =
 			"%s%04d,%06ld,%06lx;%04d,%06ld,%06lx;0,0,%06lx\n";
-	char	infile[60], tempfile[60];
+	char	tempfile[600];
 	int	true_rumor_count, false_rumor_count;
 	long	true_rumor_size, false_rumor_size,
 		true_rumor_offset, false_rumor_offset, eof_offset;
@@ -382,52 +435,15 @@ do_rumors()
 	/* record the current position; true rumors will start here */
 	true_rumor_offset = ftell(tfp);
 
-	Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
-	Strcat(infile, ".tru");
-	if (!(ifp = fopen(infile, RDTMODE))) {
-		perror(infile);
-		goto rumors_failure;
-	}
+	false_rumor_offset = read_rumors_file(
+		".tru", &true_rumor_count,
+		&true_rumor_size, true_rumor_offset);
+	if(!false_rumor_offset) goto rumors_failure;
 
-	/* copy the true rumors */
-	while (fgets(in_line, sizeof in_line, ifp) != 0) {
-		true_rumor_count++;
-		/*[if we forced binary output, this would be sufficient]*/
-		true_rumor_size += strlen(in_line);	/* includes newline */
-		(void) fputs(xcrypt(in_line), tfp);
-	}
-	/* record the current position; false rumors will start here */
-	false_rumor_offset = ftell(tfp);
-	Fclose(ifp);		/* all done with rumors.tru */
-
-	/* the calculated value for true_rumor_count assumes that
-	   a single-byte line terminator is in use; for platforms
-	   which use two byte CR+LF, we need to override that value
-	   [it's much simpler to do so unconditionally, rendering
-	   the loop's accumulation above obsolete] */
-	true_rumor_size = false_rumor_offset - true_rumor_offset;
-
-	/* process rumors.fal */
-	Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
-	Strcat(infile, ".fal");
-	if (!(ifp = fopen(infile, RDTMODE))) {
-		perror(infile);
-		goto rumors_failure;
-	}
-
-	/* copy false rumors */
-	while (fgets(in_line, sizeof in_line, ifp) != 0) {
-		false_rumor_count++;
-		false_rumor_size += strlen(in_line);	/* includes newline */
-		(void) fputs(xcrypt(in_line), tfp);
-	}
-	/* record the current position; EOF available for sanity check */
-	eof_offset = ftell(tfp);
-	Fclose(ifp);		/* all done with rumors.fal */
-
-	/* as with true_rumor_count, override the accumulated value in
-	   case stdio converts \n into two byte CR+LF during output */
-	false_rumor_size = eof_offset - false_rumor_offset;
+	eof_offset = read_rumors_file(
+		".fal", &false_rumor_count,
+		&false_rumor_size, false_rumor_offset);
+	if(!eof_offset) goto rumors_failure;
 
 	/* get ready to transfer the contents of temp file to output file */
 	Sprintf(in_line, "rewind of \"%s\"", tempfile);
