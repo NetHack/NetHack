@@ -2448,14 +2448,19 @@ const char *arg;
 		        mons[uwep->corpsenm].mname);
 		Sprintf(kbuf, "%s corpse", an(mons[uwep->corpsenm].mname));
 		instapetrify(kbuf);
+		/* life-saved; unwield the corpse if we can't handle it */
+		if (!uarmg && !Stone_resistance) uwepgone();
 	}
-	/* Or your secondary weapon, if wielded */
+	/* Or your secondary weapon, if wielded [hypothetical; we don't
+	   allow two-weapon combat when either weapon is a corpse] */
 	if(u.twoweap && uswapwep && uswapwep->otyp == CORPSE &&
 			touch_petrifies(&mons[uswapwep->corpsenm]) && !Stone_resistance){
 		pline("%s touch the %s corpse.", arg,
 		        mons[uswapwep->corpsenm].mname);
 		Sprintf(kbuf, "%s corpse", an(mons[uswapwep->corpsenm].mname));
 		instapetrify(kbuf);
+		/* life-saved; unwield the corpse */
+		if (!uarmg && !Stone_resistance) uswapwepgone();
 	}
 }
 
@@ -2467,13 +2472,19 @@ boolean byplayer;
 {
 	struct obj *mwep = MON_WEP(mon);
 
-	if (mwep && mwep->otyp == CORPSE && touch_petrifies(&mons[mwep->corpsenm])) {
+	if (mwep && mwep->otyp == CORPSE &&
+		    touch_petrifies(&mons[mwep->corpsenm]) &&
+		    !resists_ston(mon)) {
 		if (cansee(mon->mx, mon->my)) {
-			pline("%s%s touches the %s corpse.",
+			pline("%s%s touches %s.",
 			    arg ? arg : "", arg ? mon_nam(mon) : Monnam(mon),
-			    mons[mwep->corpsenm].mname);
+			    corpse_xname(mwep, (const char *)0, CXN_PFX_THE));
 		}
 		minstapetrify(mon, byplayer);
+		/* if life-saved, might not be able to continue wielding */
+		if (mon->mhp > 0 && !which_armor(mon, W_ARMG) &&
+			!resists_ston(mon))
+		    mwepgone(mon);
 	}
 }
 

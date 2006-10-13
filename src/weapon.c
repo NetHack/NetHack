@@ -706,6 +706,20 @@ register struct monst *mon;
 	return 0;
 }
 
+/* force monster to stop wielding current weapon, if any */
+void
+mwepgone(mon)
+struct monst *mon;
+{
+    struct obj *mwep = MON_WEP(mon);
+
+    if (mwep) {
+	setmnotwielded(mon, mwep);
+	MON_NOWEP(mon);
+	mon->weapon_check = NEED_WEAPON;
+    }
+}
+
 int
 abon()		/* attack bonus for strength & dexterity */
 {

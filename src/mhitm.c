@@ -1130,8 +1130,7 @@ mdamagem(magr, mdef, mattk)
 			obj_extract_self(otmp);
 			if (otmp->owornmask) {
 				mdef->misc_worn_check &= ~otmp->owornmask;
-				if (otmp->owornmask & W_WEP)
-				    setmnotwielded(mdef,otmp);
+				if (otmp->owornmask & W_WEP) mwepgone(mdef);
 				otmp->owornmask = 0L;
 				update_mon_intrinsics(mdef, otmp, FALSE, FALSE);
 			}
