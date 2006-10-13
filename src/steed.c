@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)steed.c	3.5	2006/10/11	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,7 @@ static NEARDATA const char steeds[] = {
 };
 
 STATIC_DCL boolean FDECL(landing_spot, (coord *, int, int));
+STATIC_DCL void FDECL(maybewakesteed, (struct monst *));
 
 /* caller has decided that hero can't reach something while mounted */
 void
@@ -136,6 +137,9 @@ use_saddle(otmp)
 	if (otmp->cursed)
 	    chance -= 50;
 
+	/* [intended] steed becomes alert if possible */
+	maybewakesteed(mtmp);
+
 	/* Make the attempt */
 	if (rn2(100) < chance) {
 	    You("put the saddle on %s.", mon_nam(mtmp));
@@ -172,16 +176,17 @@ doride()
 {
 	boolean forcemount = FALSE;
 
-	if (u.usteed)
+	if (u.usteed) {
 	    dismount_steed(DISMOUNT_BYCHOICE);
-	else if (getdir((char *)0) && isok(u.ux+u.dx, u.uy+u.dy)) {
+	} else if (getdir((char *)0) && isok(u.ux+u.dx, u.uy+u.dy)) {
 #ifdef WIZARD
-	if (wizard && yn("Force the mount to succeed?") == 'y')
+	    if (wizard && yn("Force the mount to succeed?") == 'y')
 		forcemount = TRUE;
 #endif
 	    return (mount_steed(m_at(u.ux+u.dx, u.uy+u.dy), forcemount));
-	} else
+	} else {
 	    return 0;
+	}
 	return 1;
 }
 
@@ -329,10 +334,11 @@ mount_steed(mtmp, force)
 	}
 
 	/* Success */
+	maybewakesteed(mtmp);
 	if (!force) {
 	    if (Levitation && !is_floater(ptr) && !is_flyer(ptr))
-	    	/* Must have Lev_at_will at this point */
-	    	pline("%s magically floats up!", Monnam(mtmp));
+		/* Must have Lev_at_will at this point */
+		pline("%s magically floats up!", Monnam(mtmp));
 	    You("mount %s.", mon_nam(mtmp));
 	}
 	/* setuwep handles polearms differently when you're mounted */
@@ -618,6 +624,56 @@ dismount_steed(reason)
 	/* polearms behave differently when not mounted */
 	if (uwep && is_pole(uwep)) unweapon = TRUE;
 	return;
+}
+
+/* when attempting to saddle or mount a sleeping steed, try to wake it up
+   (for the saddling case, it won't be u.usteed yet) */
+STATIC_OVL void
+maybewakesteed(steed)
+struct monst *steed;
+{
+    int frozen = (int) steed->mfrozen;
+    boolean wasimmobile = steed->msleeping || !steed->mcanmove;
+
+    steed->msleeping = 0;
+    if (frozen) {
+	frozen = (frozen + 1) / 2;		/* half */
+	/* might break out of timed sleep or paralysis */
+	if (!rn2(frozen)) {
+	    steed->mfrozen = 0;
+	    steed->mcanmove = 1;
+	} else {
+	    /* didn't awake, but remaining duration is halved */
+	    steed->mfrozen = frozen;
+	}
+    }
+    if (wasimmobile && !steed->msleeping && steed->mcanmove)
+	pline("%s wakes up.", Monnam(steed));
+    /* regardless of waking, terminate any meal in progress */
+    finish_meating(steed);
+}
+
+/* decide whether hero's steed is able to move;
+   doesn't check for holding traps--those affect the hero directly */
+boolean
+stucksteed(checkfeeding)
+boolean checkfeeding;
+{
+    struct monst *steed = u.usteed;
+
+    if (steed) {
+	/* check whether steed can move */
+	if (steed->msleeping || !steed->mcanmove) {
+	    pline("%s won't move!", upstart(y_monnam(steed)));
+	    return TRUE;
+	}
+	/* optionally check whether steed is in the midst of a meal */
+	if (checkfeeding && steed->meating) {
+	    pline("%s is still eating.", upstart(y_monnam(steed)));
+	    return TRUE;
+	}
+    }
+    return FALSE;
 }
 
 void

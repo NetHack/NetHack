@@ -1277,7 +1277,7 @@ int amt, how;
 		(how >= 0 && resist(mon, (char)how, 0, NOTELL))) {
 	    shieldeff(mon->mx, mon->my);
 	} else if (mon->mcanmove) {
-	    mon->meating = 0;	/* terminate any meal-in-progress */
+	    finish_meating(mon);	/* terminate any meal-in-progress */
 	    amt += (int) mon->mfrozen;
 	    if (amt > 0) {	/* sleep for N turns */
 		mon->mcanmove = 0;

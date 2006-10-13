@@ -1221,11 +1221,10 @@ domove()
 	}
 	/* not attacking an animal, so we try to move */
 #ifdef STEED
-	if (u.usteed && !u.usteed->mcanmove && (u.dx || u.dy)) {
-		pline("%s won't move!", upstart(y_monnam(u.usteed)));
+	if ((u.dx || u.dy) && stucksteed(FALSE)) {
 		nomul(0);
 		return;
-	} else
+	}
 #endif
 	if(!youmonst.data->mmove) {
 		You("are rooted %s.",

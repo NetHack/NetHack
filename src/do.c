@@ -755,13 +755,9 @@ dodown()
 	}
 
 #ifdef STEED
-	if (u.usteed && !u.usteed->mcanmove) {
-		pline("%s won't move!", Monnam(u.usteed));
-		return(0);
-	} else if (u.usteed && u.usteed->meating) {
-		pline("%s is still eating.", Monnam(u.usteed));
-		return(0);
-	} else
+	if (stucksteed(TRUE)) {
+	    return 0;
+	}
 #endif
 	if (Levitation) {
 	    if ((HLevitation & I_SPECIAL) || (ELevitation & W_ARTI)) {
@@ -875,13 +871,9 @@ doup()
 		return(0);
 	}
 #ifdef STEED
-	if (u.usteed && !u.usteed->mcanmove) {
-		pline("%s won't move!", Monnam(u.usteed));
+	if (stucksteed(TRUE)) {
 		return(0);
-	} else if (u.usteed && u.usteed->meating) {
-		pline("%s is still eating.", Monnam(u.usteed));
-		return(0);
-	} else
+	}
 #endif
 	if(u.ustuck) {
 		You("are %s, and cannot go up.",

@@ -31,7 +31,6 @@ internals: use Is_box rather than explicitly checking what it checks
 fix some unreachable messages (either make then reachable or remove them)
 can quiver coins when GOLDOBJ is defined
 grammar, spelling and other typos
-oracle and rumor regarding priestly donations
 keep various delayed killers separate to avoid mixed up messages
 don't place randomly-placed aquatic monsters in lava on special levels
 hiding monsters don't hide under cockatrice/chickatrice corpses
@@ -163,7 +162,8 @@ bugles affect all monsters to some extent
 nurses are affected if player is polymorphed as a cockatrice
 getting a particular rotten food result can't make attempting to eat a
 	corpse of one of the Riders be survivable
-pad rumors to improve distribution of delivered rumors
+pad shortest rumors to improve distribution of delivered rumors
+wake up sleeping steed when putting on saddle or mounting
 
 
 Platform- and/or Interface-Specific Fixes
@@ -248,6 +248,7 @@ add Malcolm Ryan's Statue Glyphs patch
 lembas and cram never rot unless cursed
 multiple squeaks for squeaky boards
 include time, user ID, and play mode in paniclog entries
+add oracle and rumor regarding priestly donations
 
 
 Platform- and/or Interface-Specific New Features
