@@ -2625,9 +2625,10 @@ int which_set;
 			    }
 			    break;
 		   case 5:  /* restrictions: xxxx*/
-			    i = 0;
-			    while (known_restrictions[i]) {
-				if (!strcmpi(known_restrictions[i], bufp)) {
+			    if (chosen_symset_start) {
+			        i = 0;
+			        while (known_restrictions[i]) {
+				    if (!strcmpi(known_restrictions[i], bufp)) {
 				    switch(i) {
 				    	case  0: symset[which_set].primary = 1;
 						 break;
@@ -2635,9 +2636,10 @@ int which_set;
 						 break;
 				    }
 				    break;	/* while loop */
-	    	        	}
-				i++;
-		    	    }
+	    	        	    }
+				    i++;
+		    	        }
+			    }
 		   	    break;
 		}
 	    } else {		/* !SYM_CONTROL */
