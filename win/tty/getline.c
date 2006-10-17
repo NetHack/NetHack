@@ -23,6 +23,12 @@ extern int NDECL(extcmd_via_menu);	/* cmd.c */
 
 extern char erase_char, kill_char;	/* from appropriate tty.c file */
 
+#ifdef UNICODE_WIDEWINPORT
+#define T(x) L##x
+#else
+#define T(x) x
+#endif
+
 /*
  * Read a line closed with '\n' into the array char bufp[BUFSZ].
  * (The '\n' is not stored. The string is closed with a '\0'.)
@@ -47,6 +53,9 @@ getlin_hook_proc hook;
 	register int c;
 	struct WinDesc *cw = wins[WIN_MESSAGE];
 	boolean doprev = 0;
+#ifdef UNICODE_WIDEWINPORT
+	nhwchar wbuf[BUFSZ];
+#endif
 
 	if(ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP)) more();
 	cw->flags &= ~WIN_STOP;
@@ -55,9 +64,18 @@ getlin_hook_proc hook;
 	pline("%s ", query);
 	*obufp = 0;
 	for(;;) {
+#ifdef UNICODE_WIDEWINPORT
+		char buf[BUFSZ];
+		(void) fflush(stdout);
+		Sprintf(buf, "%s ", query);
+		Strcat(buf, obufp);
+		nhwstrcpy(wbuf, buf);
+		(void)nhwcpy(toplines, wbuf);
+#else
 		(void) fflush(stdout);
 		Sprintf(toplines, "%s ", query);
 		Strcat(toplines, obufp);
+#endif
 		if((c = Getchar()) == EOF) c = '\033';
 		if(c == '\033') {
 			*obufp = c;
@@ -76,10 +94,19 @@ getlin_hook_proc hook;
 			ttyDisplay->inread = sav;
 			tty_clear_nhwindow(WIN_MESSAGE);
 			cw->maxcol = cw->maxrow;
+#ifdef UNICODE_WIDEWINPORT
+			nhwstrcpy(wbuf, query);
+			addtopl(wbuf);
+			addtopl(L" ");
+			*bufp = 0;
+			nhwstrcpy(wbuf, obufp);
+			addtopl(wbuf);
+#else
 			addtopl(query);
 			addtopl(" ");
 			*bufp = 0;
 			addtopl(obufp);
+#endif
 		    } else {
 			if (!doprev)
 			    (void) tty_doprev_message();/* need two initially */
@@ -91,10 +118,22 @@ getlin_hook_proc hook;
 		    tty_clear_nhwindow(WIN_MESSAGE);
 		    cw->maxcol = cw->maxrow;
 		    doprev = 0;
+#ifdef UNICODE_WIDEWINPORT
+		    nhwstrcpy(wbuf, query);
+		    addtopl(wbuf);
+		    addtopl(L" ");
+#else
 		    addtopl(query);
 		    addtopl(" ");
+#endif
+
 		    *bufp = 0;
+#ifdef UNICODE_WIDEWINPORT
+		    nhwstrcpy(wbuf, obufp);
+		    addtopl(wbuf);
+#else
 		    addtopl(obufp);
+#endif
 		}
 		if(c == erase_char || c == '\b') {
 			if(bufp != obufp) {
@@ -104,11 +143,11 @@ getlin_hook_proc hook;
 #endif /* NEWAUTOCOMP */
 				bufp--;
 #ifndef NEWAUTOCOMP
-				putsyms("\b \b");/* putsym converts \b */
+				putsyms(T("\b \b"));/* putsym converts \b */
 #else /* NEWAUTOCOMP */
-				putsyms("\b");
-				for (i = bufp; *i; ++i) putsyms(" ");
-				for (; i > bufp; --i) putsyms("\b");
+				putsyms(T("\b"));
+				for (i = bufp; *i; ++i) putsyms(T(" "));
+				for (; i > bufp; --i) putsyms(T("\b"));
 				*bufp = 0;
 #endif /* NEWAUTOCOMP */
 			} else	tty_nhbell();
@@ -131,21 +170,31 @@ getlin_hook_proc hook;
 #endif /* NEWAUTOCOMP */
 			*bufp = c;
 			bufp[1] = 0;
+#ifdef UNICODE_WIDEWINPORT
+			nhwstrcpy(wbuf, bufp);
+			putsyms(wbuf);
+#else
 			putsyms(bufp);
+#endif
 			bufp++;
 			if (hook && (*hook)(obufp)) {
+#ifdef UNICODE_WIDEWINPORT
+			    nhwstrcpy(wbuf, bufp);
+			    putsyms(wbuf);
+#else
 			    putsyms(bufp);
+#endif
 #ifndef NEWAUTOCOMP
 			    bufp = eos(bufp);
 #else /* NEWAUTOCOMP */
 			    /* pointer and cursor left where they were */
-			    for (i = bufp; *i; ++i) putsyms("\b");
+			    for (i = bufp; *i; ++i) putsyms(T("\b"));
 			} else if (i > bufp) {
 			    char *s = i;
 
 			    /* erase rest of prior guess */
-			    for (; i > bufp; --i) putsyms(" ");
-			    for (; s > bufp; --s) putsyms("\b");
+			    for (; i > bufp; --i) putsyms(T(" "));
+			    for (; s > bufp; --s) putsyms(T("\b"));
 #endif /* NEWAUTOCOMP */
 			}
 		} else if(c == kill_char || c == '\177') { /* Robert Viduya */
@@ -153,11 +202,11 @@ getlin_hook_proc hook;
 #ifndef NEWAUTOCOMP
 			while(bufp != obufp) {
 				bufp--;
-				putsyms("\b \b");
+				putsyms(T("\b \b"));
 			}
 #else /* NEWAUTOCOMP */
-			for (; *bufp; ++bufp) putsyms(" ");
-			for (; bufp != obufp; --bufp) putsyms("\b \b");
+			for (; *bufp; ++bufp) putsyms(T(" "));
+			for (; bufp != obufp; --bufp) putsyms(T("\b \b"));
 			*bufp = 0;
 #endif /* NEWAUTOCOMP */
 		} else
@@ -167,6 +216,8 @@ getlin_hook_proc hook;
 	ttyDisplay->inread--;
 	clear_nhwindow(WIN_MESSAGE);	/* clean up after ourselves */
 }
+
+#undef T
 
 void
 xwaitforspace(s)

@@ -263,6 +263,10 @@
  */
 #endif /* CHDIR */
 
+/*
+ * Enable some UNICODE support.
+ */
+/*#define UNICODE_SUPPORT */		/* master on/off for any unicode support    */
 
 
 /*
@@ -356,7 +360,7 @@ typedef unsigned char	uchar;
  */
 
 /* display features */
-#define LOADSYMSETS	/* loadable symbol sets; only default symbols w/o this */
+#define LOADSYMSETS	/* loadable symbol sets; only default symbols w/o this  */
 /* dungeon features */
 #define SINKS		/* Kitchen sinks - Janet Walz */
 /* dungeon levels */

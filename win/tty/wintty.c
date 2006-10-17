@@ -43,6 +43,11 @@ extern char mapped_menu_cmds[]; /* from options.c */
 /* this is only needed until tty_status_* routines are written */
 extern NEARDATA winid WIN_STATUS;
 
+#ifdef UNICODE_WIDEWINPORT
+void FDECL(tty_putmixed,(winid,int,const char *));
+void FDECL(tty_putstr_core,(winid,int,const nhwchar *));
+#endif
+
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
     "tty",
@@ -70,7 +75,11 @@ struct window_procs tty_procs = {
     tty_destroy_nhwindow,
     tty_curs,
     tty_putstr,
+#ifdef UNICODE_WIDEWINPORT
+    tty_putmixed,
+#else
     genl_putmixed,
+#endif
     tty_display_file,
     tty_start_menu,
     tty_add_menu,
@@ -141,7 +150,12 @@ static char obuf[BUFSIZ];	/* BUFSIZ is defined in stdio.h */
 #endif
 
 static char winpanicstr[] = "Bad window id %d";
-char defmorestr[] = "--More--";
+#ifdef UNICODE_WIDEWINPORT
+nhwchar defmorestr[] = L"--More--";
+#else
+nhwchar defmorestr[] = "--More--";
+#endif
+nhwchar emptysym[1] = {0};
 
 #ifdef CLIPPING
 # if defined(USE_TILES) && defined(MSDOS)
@@ -181,8 +195,9 @@ STATIC_DCL void FDECL(process_menu_window, (winid,struct WinDesc *));
 STATIC_DCL void FDECL(process_text_window, (winid,struct WinDesc *));
 STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
 STATIC_DCL const char * FDECL(compress_str, (const char *));
-STATIC_DCL void FDECL(tty_putsym, (winid, int, int, CHAR_P));
+STATIC_DCL void FDECL(tty_putsym, (winid, int, int, NHWCHAR_P));
 static char *FDECL(copy_of, (const char *));
+static nhwchar *FDECL(nhwchar_copy_of, (const nhwchar *));
 STATIC_DCL void FDECL(bail, (const char *));	/* __attribute__((noreturn)) */
 
 /*
@@ -260,7 +275,11 @@ winch()
 		    for(i=WIN_INVEN; i < MAXWIN; i++)
 			if(wins[i] && wins[i]->active) {
 			    /* cop-out */
+#ifdef UNICODE_WIDEWINPORT
+			    addtopl(L"Press Return to continue: ");
+#else
 			    addtopl("Press Return to continue: ");
+#endif
 			    break;
 			}
 		(void) fflush(stdout);
@@ -953,24 +972,24 @@ tty_create_nhwindow(type)
 
     if(newwin->maxrow) {
 	newwin->data =
-		(char **) alloc(sizeof(char *) * (unsigned)newwin->maxrow);
+		(nhwchar **) alloc(sizeof(nhwchar *) * (unsigned)newwin->maxrow);
 	newwin->datlen =
 		(short *) alloc(sizeof(short) * (unsigned)newwin->maxrow);
 	if(newwin->maxcol) {
 	    for (i = 0; i < newwin->maxrow; i++) {
-		newwin->data[i] = (char *) alloc((unsigned)newwin->maxcol);
+		newwin->data[i] = (nhwchar *) alloc(sizeof(nhwchar) * (unsigned)newwin->maxcol);
 		newwin->datlen[i] = newwin->maxcol;
 	    }
 	} else {
 	    for (i = 0; i < newwin->maxrow; i++) {
-		newwin->data[i] = (char *) 0;
+		newwin->data[i] = (nhwchar *) 0;
 		newwin->datlen[i] = 0;
 	    }
 	}
 	if(newwin->type == NHW_MESSAGE)
 	    newwin->maxrow = 0;
     } else {
-	newwin->data = (char **)0;
+	newwin->data = (nhwchar **)0;
 	newwin->datlen = (short *)0;
     }
 
@@ -1008,12 +1027,12 @@ free_window_info(cw, free_data)
 	for(i=0; i<cw->maxrow; i++)
 	    if(cw->data[i]) {
 		free((genericptr_t)cw->data[i]);
-		cw->data[i] = (char *)0;
+		cw->data[i] = (nhwchar *)0;
 		if (cw->datlen) cw->datlen[i] = 0;
 	    }
 	if (free_data) {
 	    free((genericptr_t)cw->data);
-	    cw->data = (char **)0;
+	    cw->data = (nhwchar **)0;
 	    if (cw->datlen) free((genericptr_t)cw->datlen);
 	    cw->datlen = (short *)0;
 	    cw->rows = 0;
@@ -1087,15 +1106,25 @@ dmore(cw, s)
     register struct WinDesc *cw;
     const char *s;			/* valid responses */
 {
-    const char *prompt = cw->morestr ? cw->morestr : defmorestr;
+#ifdef UNICODE_WIDEWINPORT
+    char buf[BUFSZ];
+#endif
+    const nhwchar *prompt = cw->morestr ? cw->morestr : defmorestr;
+
     int offset = (cw->type == NHW_TEXT) ? 1 : 2;
 
     tty_curs(BASE_WINDOW,
 	     (int)ttyDisplay->curx + offset, (int)ttyDisplay->cury);
     if(flags.standout)
 	standoutbeg();
+#ifdef UNICODE_WIDEWINPORT
+    strnhwcpy(buf, prompt);
+    xputs(buf);
+    ttyDisplay->curx += strlen(buf);    
+#else
     xputs(prompt);
     ttyDisplay->curx += strlen(prompt);
+#endif
     if(flags.standout)
 	standoutend();
 
@@ -1210,13 +1239,13 @@ struct WinDesc *cw;
     long count;
     int n, curr_page, page_lines;
     boolean finished, counting, reset_count;
-    char *cp, *rp, resp[QBUFSZ], gacc[QBUFSZ],
-	 *msave, *morestr;
+    char *cp, *rp, resp[QBUFSZ], gacc[QBUFSZ];
+    nhwchar *msave, *morestr;
 
     curr_page = page_lines = 0;
     page_start = page_end = 0;
     msave = cw->morestr;	/* save the morestr */
-    cw->morestr = morestr = (char*) alloc((unsigned) QBUFSZ);
+    cw->morestr = morestr = (nhwchar*) alloc(sizeof(nhwchar) * (unsigned) QBUFSZ);
     counting = FALSE;
     count = 0L;
     reset_count = TRUE;
@@ -1332,20 +1361,41 @@ struct WinDesc *cw;
 	    Strcat(resp, gacc);			/* group accelerators */
 	    Strcat(resp, mapped_menu_cmds);
 
-	    if (cw->npages > 1)
+	    if (cw->npages > 1) {
+#ifdef UNICODE_WIDEWINPORT
+	    	char buf[BUFSZ];
+	    	Sprintf(buf, "(%d of %d)",
+	    		curr_page + 1, (int) cw->npages);
+		(void)nhwstrcpy(cw->morestr, buf);
+#else
 		Sprintf(cw->morestr, "(%d of %d)",
 			curr_page + 1, (int) cw->npages);
-	    else if (msave)
+#endif
+	    } else if (msave) {
+#ifdef UNICODE_WIDEWINPORT
+		(void)nhwcpy(cw->morestr, msave);
+#else
 		Strcpy(cw->morestr, msave);
-	    else
+#endif
+	    } else {
+#ifdef UNICODE_WIDEWINPORT
+		(void)nhwcpy(cw->morestr, defmorestr);
+#else
 		Strcpy(cw->morestr, defmorestr);
-
+#endif
+	    }
 	    tty_curs(window, 1, page_lines);
 	    cl_end();
 	    dmore(cw, resp);
 	} else {
 	    /* just put the cursor back... */
-	    tty_curs(window, (int) strlen(cw->morestr) + 2, page_lines);
+	    tty_curs(window, 
+#ifdef UNICODE_WIDEWINPORT
+			(int) nhwlen(cw->morestr) + 2,
+#else
+			(int) strlen(cw->morestr) + 2, 
+#endif
+			page_lines);
 	    xwaitforspace(resp);
 	}
 
@@ -1509,7 +1559,7 @@ winid window;
 struct WinDesc *cw;
 {
     int i, n, attr;
-    register char *cp;
+    register nhwchar *cp;
 
     for (n = 0, i = 0; i < cw->maxrow; i++) {
 	if (!cw->offx && (n + cw->offy == ttyDisplay->rows - 1)) {
@@ -1543,7 +1593,11 @@ struct WinDesc *cw;
 		    *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
 		    cp++, ttyDisplay->curx++)
 #endif
+#ifdef UNICODE_WIDEWINPORT
+		u_putch(*cp);
+#else
 		(void) putchar(*cp);
+#endif
 	    term_end_attr(attr);
 	}
     }
@@ -1772,7 +1826,7 @@ STATIC_OVL void
 tty_putsym(window, x, y, ch)
     winid window;
     int x, y;
-    char ch;
+    nhwchar ch;
 {
     register struct WinDesc *cw = 0;
 
@@ -1784,7 +1838,11 @@ tty_putsym(window, x, y, ch)
     case NHW_MAP:
     case NHW_BASE:
 	tty_curs(window, x, y);
+#ifdef UNICODE_WIDEWINPORT
+	u_putch(ch);
+#else
 	(void) putchar(ch);
+#endif
 	ttyDisplay->curx++;
 	cw->curx++;
 	break;
@@ -1827,9 +1885,14 @@ tty_putstr(window, attr, str)
     const char *str;
 {
     register struct WinDesc *cw = 0;
-    register char *ob;
-    register const char *nb;
+#ifdef UNICODE_WIDEWINPORT
+    nhwchar symbuf[BUFSZ];
+    register const nhwchar *symstr = symbuf;
+#else
+    register const nhwchar *nb;
+    register nhwchar *ob;
     register int i, j, n0;
+#endif
 
     /* Assume there's a real problem if the window is missing --
      * probably a panic message
@@ -1844,21 +1907,52 @@ tty_putstr(window, attr, str)
 	return;
     if(cw->type != NHW_MESSAGE)
 	str = compress_str(str);
+#if defined(USER_SOUNDS) && defined(WIN32CON)
+    else 
+	play_sound_for_message(str);
+#endif
+
+#ifdef UNICODE_WIDEWINPORT
+    nhwstrcpy(symbuf, str);
+    tty_putstr_core(window, attr, symstr);
+}
+
+void
+tty_putstr_core(window, attr, symstr)
+    winid window;
+    int attr;
+    const nhwchar *symstr;
+{
+    register struct WinDesc *cw = wins[window];
+    register const nhwchar *nb;
+    register nhwchar *ob;
+    register int i, j, n0;
+#endif
 
     ttyDisplay->lastwin = window;
 
     switch(cw->type) {
     case NHW_MESSAGE:
 	/* really do this later */
-#if defined(USER_SOUNDS) && defined(WIN32CON)
-	play_sound_for_message(str);
-#endif
+#ifdef UNICODE_WIDEWINPORT
+	update_topl(symstr);
+#else
 	update_topl(str);
+#endif
 	break;
 
     case NHW_STATUS:
 	ob = &cw->data[cw->cury][j = cw->curx];
 	if(context.botlx) *ob = 0;
+#ifdef UNICODE_WIDEWINPORT
+	if(!cw->cury && (int)nhwlen(symstr) >= CO) {
+	    /* the characters before "St:" are unnecessary */
+	    nb = nhwindex(symstr, L':');
+	    if(nb && nb > symstr+2)
+		symstr = nb - 2;
+	}
+	nb = symstr;
+#else
 	if(!cw->cury && (int)strlen(str) >= CO) {
 	    /* the characters before "St:" are unnecessary */
 	    nb = index(str, ':');
@@ -1866,6 +1960,8 @@ tty_putstr(window, attr, str)
 		str = nb - 2;
 	}
 	nb = str;
+#endif
+
 	for(i = cw->curx+1, n0 = cw->cols; i < n0; i++, nb++) {
 	    if(!*nb) {
 		if(*ob || context.botlx) {
@@ -1880,19 +1976,31 @@ tty_putstr(window, attr, str)
 	    if(*ob) ob++;
 	}
 
+#ifdef UNICODE_WIDEWINPORT
+	(void) nhwncpy(&cw->data[cw->cury][j], symstr, cw->cols - j - 1);
+#else
 	(void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
-	cw->data[cw->cury][cw->cols-1] = '\0'; /* null terminate */
+#endif
+	cw->data[cw->cury][cw->cols-1] = (nhwchar)0; /* null terminate */
 	cw->cury = (cw->cury+1) % 2;
 	cw->curx = 0;
 	break;
     case NHW_MAP:
 	tty_curs(window, cw->curx+1, cw->cury);
 	term_start_attr(attr);
+#ifdef UNICODE_WIDEWINPORT
+	while(*symstr && (int) ttyDisplay->curx < (int) ttyDisplay->cols-1) {
+	    u_putch(*symstr);
+	    symstr++;
+	    ttyDisplay->curx++;
+	}
+#else
 	while(*str && (int) ttyDisplay->curx < (int) ttyDisplay->cols-1) {
 	    (void) putchar(*str);
 	    str++;
 	    ttyDisplay->curx++;
 	}
+#endif
 	cw->curx = 0;
 	cw->cury++;
 	term_end_attr(attr);
@@ -1900,14 +2008,23 @@ tty_putstr(window, attr, str)
     case NHW_BASE:
 	tty_curs(window, cw->curx+1, cw->cury);
 	term_start_attr(attr);
+#ifdef UNICODE_WIDEWINPORT
+	while (*symstr) {
+#else
 	while (*str) {
+#endif
 	    if ((int) ttyDisplay->curx >= (int) ttyDisplay->cols-1) {
 		cw->curx = 0;
 		cw->cury++;
 		tty_curs(window, cw->curx+1, cw->cury);
 	    }
+#ifdef UNICODE_WIDEWINPORT
+	    u_putch(*symstr);
+	    symstr++;
+#else
 	    (void) putchar(*str);
 	    str++;
+#endif
 	    ttyDisplay->curx++;
 	}
 	cw->curx = 0;
@@ -1929,10 +2046,10 @@ tty_putstr(window, attr, str)
 	}
 	/* always grows one at a time, but alloc 12 at a time */
 	if(cw->cury >= cw->rows) {
-	    char **tmp;
+	    nhwchar **tmp;
 
 	    cw->rows += 12;
-	    tmp = (char **) alloc(sizeof(char *) * (unsigned)cw->rows);
+	    tmp = (nhwchar **) alloc(sizeof(nhwchar *) * (unsigned)cw->rows);
 	    for(i=0; i<cw->maxrow; i++)
 		tmp[i] = cw->data[i];
 	    if(cw->data)
@@ -1944,10 +2061,19 @@ tty_putstr(window, attr, str)
 	}
 	if(cw->data[cw->cury])
 	    free((genericptr_t)cw->data[cw->cury]);
+#ifdef UNICODE_WIDEWINPORT
+	n0 = nhwlen(symstr) + 1;
+#else
 	n0 = strlen(str) + 1;
-	ob = cw->data[cw->cury] = (char *)alloc((unsigned)n0 + 1);
-	*ob++ = (char)(attr + 1);	/* avoid nuls, for convenience */
+#endif
+
+	ob = cw->data[cw->cury] = (nhwchar *)alloc(sizeof(nhwchar) * (unsigned)n0 + 1);
+	*ob++ = (nhwchar)(attr + 1);	/* avoid nuls, for convenience */
+#ifdef UNICODE_WIDEWINPORT
+	(void)nhwcpy(ob, symstr);
+#else
 	Strcpy(ob, str);
+#endif
 
 	if(n0 > cw->maxcol)
 	    cw->maxcol = n0;
@@ -1955,17 +2081,79 @@ tty_putstr(window, attr, str)
 	    cw->maxrow = cw->cury;
 	if(n0 > CO) {
 	    /* attempt to break the line */
+#ifdef UNICODE_WIDEWINPORT
+	    for(i = CO-1; i && symstr[i] != L' ' && symstr[i] != L'\n';)
+#else
 	    for(i = CO-1; i && str[i] != ' ' && str[i] != '\n';)
+#endif
 		i--;
 	    if(i) {
-		cw->data[cw->cury-1][++i] = '\0';
+		cw->data[cw->cury-1][++i] = (nhwchar)0;
+#ifdef UNICODE_WIDEWINPORT
+		tty_putstr_core(window, attr, &symstr[i]);
+#else
 		tty_putstr(window, attr, &str[i]);
+#endif
 	    }
 
 	}
 	break;
     }
 }
+
+#ifdef UNICODE_WIDEWINPORT
+/*
+ * This differs from putstr() because the str parameter can
+ * contain a sequence of characters representing:
+ *        \GXXXXNNNN	a glyph value, encoded by encglyph().
+ *
+ */
+void
+tty_putmixed(window, attr, str)
+    winid window;
+    int attr;
+    const char *str;
+{
+	nhwchar wbuf[BUFSZ];
+	const char *cp = str;
+	nhwchar *put = wbuf;
+	while (*cp) {
+	    if (*cp == '\\') {
+		int rndchk = 0, so = 0, gv = 0, ch, oc, dcount;
+		unsigned os;
+		const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
+		const char *save_cp = cp;
+		
+		cp++;
+		switch(*cp) {
+		case 'G':	/* glyph value \GXXXXNNNN*/
+		    dcount = 0;
+		    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
+			rndchk = (int)((rndchk * 16) + ((int)(dp - hex) / 2));
+
+		    if (rndchk == context.rndencode) {
+			dcount = 0;
+		        for (; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
+			    gv = (int)((gv * 16) + ((int)(dp - hex) / 2));
+			so = mapglyph(gv, &ch, &oc, &os, 0, 0);
+			*put++ = (nhwchar)showsyms[so];
+			continue;
+		    } else {
+			/* possible forgery - leave it the way it is */
+			cp = save_cp;
+		    }
+		    break;
+		case '\\':
+		    break;
+	        }
+	    }
+	    *put++ = (nhwchar)*cp++;
+	}
+	*put = (nhwchar)0;
+	/* now send it to tty_putstr_core() */
+	tty_putstr_core(window, attr, wbuf);
+}
+#endif /*UNICODE_WIDEWINPORT*/
 
 void
 tty_display_file(fname, complain)
@@ -2149,7 +2337,7 @@ tty_end_menu(window, prompt)
     /* Reverse the list so that items are in correct order. */
     cw->mlist = reverse(cw->mlist);
 
-    /* Put the promt at the beginning of the menu. */
+    /* Put the prompt at the beginning of the menu. */
     if (prompt) {
 	anything any;
 
@@ -2200,10 +2388,19 @@ tty_end_menu(window, prompt)
 	/* produce the largest demo string */
 	Sprintf(buf, "(%d of %d) ", cw->npages, cw->npages);
 	len = strlen(buf);
+#ifdef UNICODE_WIDEWINPORT
+	cw->morestr = nhwchar_copy_of(emptysym);
+#else
 	cw->morestr = copy_of("");
+#endif
     } else {
+#ifdef UNICODE_WIDEWINPORT
+	cw->morestr = nhwchar_copy_of(L"(end) ");
+	len = nhwlen(cw->morestr);
+#else
 	cw->morestr = copy_of("(end) ");
 	len = strlen(cw->morestr);
+#endif
     }
 
     if (len > (int)ttyDisplay->cols) {
@@ -2323,7 +2520,11 @@ tty_wait_synch()
     } else {
 	tty_display_nhwindow(WIN_MAP, FALSE);
 	if(ttyDisplay->inmore) {
+#ifdef UNICODE_WIDEWINPORT
+	    addtopl(L"--More--");
+#else
 	    addtopl("--More--");
+#endif
 	    (void) fflush(stdout);
 	} else if(ttyDisplay->inread > program_state.gameover) {
 	    /* this can only happen if we were reading and got interrupted */
@@ -2395,6 +2596,58 @@ end_glyphout()
 #endif
 }
 
+#ifdef UNICODE_WIDEWINPORT
+/*
+ * Parts of u_putch() were contributed by Adam Wozniak, 2005.
+ */
+void
+u_putch(sym)
+nhwchar sym;
+{
+    unsigned long unicode = sym;
+    if (!iflags.unicodedisp)
+	putchar((char)sym);
+    else {
+#if defined(UNIX) || defined(VMS)
+	/* send utf8 to display */
+	if (unicode < 0x80) {
+		(void) putchar(unicode);
+	} else if (unicode < 0x00000800) {
+		(void) putchar(0xC0 | (unicode >> 6));
+		(void) putchar(0x80 | (unicode & 0x3F));
+	} else if (unicode < 0x00010000) {
+		(void) putchar(0xE0 | (unicode >> 12));
+		(void) putchar(0x80 | ((unicode >> 6) & 0x3F));
+		(void) putchar(0x80 | (unicode & 0x3F));
+	} else if (unicode < 0x00200000) {
+		(void) putchar(0xF0 | (unicode >> 18));
+		(void) putchar(0x80 | ((unicode >> 12) & 0x3F));
+		(void) putchar(0x80 | ((unicode >> 6) & 0x3F));
+		(void) putchar(0x80 | (unicode & 0x3F));
+	} else if (unicode < 0x04000000) {
+		(void) putchar(0xF8 | (unicode >> 24));
+		(void) putchar(0x80 | ((unicode >> 18) & 0x3F));
+		(void) putchar(0x80 | ((unicode >> 12) & 0x3F));
+		(void) putchar(0x80 | ((unicode >> 6) & 0x3F));
+		(void) putchar(0x80 | (unicode & 0x3F));
+	} else {
+		(void) putchar(0xFC | (unicode >> 30));
+		(void) putchar(0x80 | ((unicode >> 24) & 0x3F));
+		(void) putchar(0x80 | ((unicode >> 18) & 0x3F));
+		(void) putchar(0x80 | ((unicode >> 12) & 0x3F));
+		(void) putchar(0x80 | ((unicode >> 6) & 0x3F));
+		(void) putchar(0x80 | (unicode & 0x3F));
+	}
+#else
+	/* it is assumed that whatever is being substituted for
+	   putchar() can handle unicode characters directly at
+	   this point (nttty's xputc() for example) */
+	(void) putchar(sym);
+#endif
+    }
+}
+#endif /*UNICODE_WIDEWINPORT*/
+
 #ifndef WIN32
 void
 g_putch(in_ch)
@@ -2403,6 +2656,11 @@ int in_ch;
     register char ch = (char)in_ch;
 
 # if defined(ASCIIGRAPH) && !defined(NO_TERMS)
+#  if defined(UNICODE_WIDEWINPORT) && defined(UNICODE_DRAWING)
+    if (iflags.unicodedisp && symset[currentgraphics].name) {
+    	u_putch(in_ch);
+    } else
+#  endif
     if (SYMHANDLING(H_IBM) || iflags.eight_bit_tty) {
 	/* IBM-compatible displays don't need other stuff */
 	(void) putchar(ch);
@@ -2486,9 +2744,9 @@ tty_print_glyph(window, x, y, glyph)
     xchar x, y;
     int glyph;
 {
-    int ch;
+    int ch, idx;
     boolean reverse_on = FALSE;
-    int	    color;
+    int	color;
     unsigned special;
     
 #ifdef CLIPPING
@@ -2498,7 +2756,7 @@ tty_print_glyph(window, x, y, glyph)
     }
 #endif
     /* map glyph to character and color */
-    (void)mapglyph(glyph, &ch, &color, &special, x, y);
+    idx = mapglyph(glyph, &ch, &color, &special, x, y);
 
     /* Move the cursor. */
     tty_curs(window, x,y);
@@ -2530,6 +2788,11 @@ tty_print_glyph(window, x, y, glyph)
 #if defined(USE_TILES) && defined(MSDOS)
     if (iflags.grmode && iflags.tile_view)
       xputg(glyph,ch,special);
+    else
+#endif
+#if defined(UNICODE_WIDEWINPORT) && defined(UNICODE_DRAWING)
+    if (iflags.unicodedisp && symset[currentgraphics].name)
+	g_putch(showsyms[idx]); /* use the unicode symset */
     else
 #endif
 	g_putch(ch);		/* print the character */
@@ -2683,6 +2946,15 @@ copy_of(s)
     return strcpy((char *) alloc((unsigned) (strlen(s) + 1)), s);
 }
 
+# ifdef UNICODE_WIDEWINPORT
+static nhwchar *
+nhwchar_copy_of(s)
+    const nhwchar *s;
+{
+    if (!s) s = emptysym;
+    return nhwcpy((nhwchar *) alloc(sizeof(nhwchar) * (unsigned) (nhwlen(s) + 1)), s);
+}
+# endif /*UNICODE_WIDEWINPORT*/
 #endif /* TTY_GRAPHICS */
 
 /*wintty.c*/

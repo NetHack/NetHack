@@ -67,7 +67,7 @@ unsigned *ospecial;
 #if defined(TEXTCOLOR) || defined(ROGUE_COLOR)
 	int color = NO_COLOR;
 #endif
-	uchar ch;
+	nhsym ch;
 	unsigned special = 0;
 	/* condense multiple tests in macro version down to single */
 	boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS;
@@ -263,6 +263,7 @@ int glyph;
 	return encbuf;
 }
 
+#ifndef UNICODE_WIDEWINPORT
 /*
  * This differs from putstr() because the str parameter can
  * contain a sequence of characters representing:
@@ -304,25 +305,12 @@ genl_putmixed(window, attr, str)
 			    gv = (int)((gv * 16) + ((int)(dp - hex) / 2));
 			so = mapglyph(gv, &ch, &oc, &os, 0, 0);
 			*put++ = showsyms[so];
+		        continue;
 		    } else {
 			/* possible forgery - leave it the way it is */
 			cp = save_cp;
 		    }
 		    break;
-# if 0
-		case 'S':	/* symbol offset */
-		    dcount = 0;
-		    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
-			rndchk = (int)((rndchk * 16) + ((int)(dp - hex) / 2));
-
-		    if (rndchk == context.rndencode) {
-			dcount = 0;
-		        for (; *cp && (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
-			    so = (int)((so * 16) + ((int)(dp - hex) / 2));
-		    }
-		    *put++ = showsyms[so];
-		    break;
-# endif
 		case '\\':
 		    break;
 	        }
@@ -333,4 +321,5 @@ genl_putmixed(window, attr, str)
 	/* now send it to the normal putstr */
 	putstr(window, attr, buf);
 }
+#endif /*!UNICODE_WIDEWINPORT*/
 /*mapglyph.c*/

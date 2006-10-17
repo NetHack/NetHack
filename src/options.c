@@ -195,6 +195,9 @@ static struct Bool_Opt
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&flags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &flags.travelcmd, TRUE, SET_IN_GAME},
+#ifdef UNICODE_SUPPORT
+	{"unicode", &iflags.unicodedisp, FALSE, SET_IN_GAME},
+#endif
 #ifdef WIN32CON
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
 #else
@@ -347,7 +350,7 @@ static struct Comp_Opt
 				 DISP_IN_GAME},
 # endif
 #else
-				 SET_IN_FILE },
+				 SET_IN_FILE},
 #endif
 	{ "suppress_alert", "suppress alerts about version-specific features",
 						8, SET_IN_GAME },
@@ -582,6 +585,9 @@ initoptions()
 	iflags.msg_history = 20;
 #ifdef TTY_GRAPHICS
 	iflags.prevmsg_window = 's';
+#  if defined(UNIX) && defined(UNICODE_WIDEWINPORT)
+	iflags.unicodecapable = TRUE;
+#  endif
 #endif
 	iflags.menu_headings = ATR_INVERSE;
 
@@ -2326,7 +2332,7 @@ goodfruit:
 # ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
-		    for (i = 0; i < NUM_GRAPHICS; ++i) { 
+		    for (i = PRIMARY; i <= ROGUESET; ++i) { 
 			if (symset[i].name)
 			    badflag = TRUE;
 			else {
@@ -3154,25 +3160,31 @@ boolean setinitial,setfromfile;
 		if (pick_cnt >= 0) goto ape_again;
 	}
 #endif /* AUTOPICKUP_EXCEPTIONS */
-    } else if (!strcmp("symset", optname) ||
- 	       !strcmp("roguesymset", optname)) {
+    } else if (!strcmp("symset", optname)
+ 	    || !strcmp("roguesymset", optname)) {
 	menu_item *symset_pick = (menu_item *)0;
 	boolean primaryflag = (*optname == 's'),
-		rogueflag = (*optname == 'r');
+		  rogueflag = (*optname == 'r'),
+		ready_to_switch = FALSE,
+		nothing_to_do = FALSE;
 #ifdef LOADSYMSETS
 	int res;
 	char *symset_name, fmtstr[20];
 	struct symsetentry *sl;
 	int setcount = 0;
 #endif
-	int chosen = -2, which_set =
+	int chosen = -2, which_set;
+ 
 #ifdef REINCARNATION
-					rogueflag ? ROGUESET :
+	if (rogueflag) which_set = ROGUESET;
+	else
 #endif
-					PRIMARY;
+	which_set = PRIMARY;
+
 #ifndef REINCARNATION
 	if (rogueflag) return TRUE;
 #endif
+
 #ifdef LOADSYMSETS
 	/* clear symset[].name as a flag to read_sym_file() to build list */
 	symset_name = symset[which_set].name;
@@ -3186,7 +3198,8 @@ boolean setinitial,setfromfile;
 		sl = symset_list;
 		while (sl) {
 		    /* check restrictions */
-		    if ((!rogueflag && sl->rogue)  ||
+		    if ((!rogueflag && sl->rogue)     ||
+		        (!iflags.unicodedisp && sl->unicode) ||
 			(!primaryflag && sl->primary)) {
 		    	sl = sl->next;
 		    	continue;
@@ -3199,8 +3212,8 @@ boolean setinitial,setfromfile;
 		}
 		if (!setcount) {
 			pline("There are no appropriate %ssymbol sets available.",
-				(rogueflag)   ? "rogue level " :
-				(primaryflag) ? "primary " :
+				  (rogueflag) ? "rogue level " :
+				(primaryflag) ? "primary "     :
 				"");
 			return TRUE;
 		}
@@ -3216,6 +3229,7 @@ boolean setinitial,setfromfile;
 		while (sl) {
 		    /* check restrictions */
 		    if ((!rogueflag && sl->rogue) ||
+		        (!iflags.unicodedisp && sl->unicode) ||
 			(!primaryflag && sl->primary)) {
 		    	sl = sl->next;
 		    	continue;
@@ -3226,10 +3240,10 @@ boolean setinitial,setfromfile;
 				sl->desc ? sl->desc : "");
 			add_menu(tmpwin, NO_GLYPH, &any, let, 0,
 			 ATR_NONE, symsetchoice, MENU_UNSELECTED);
-			sl = sl->next;
 			if (let == 'z') let = 'A';
 			else let++;
 		    }
+		    sl = sl->next;
 		}
 		end_menu(tmpwin, "Select symbol set:");
 		if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
@@ -3254,7 +3268,7 @@ boolean setinitial,setfromfile;
 			    symset[which_set].name =
 					(char *)alloc(strlen(sl->name)+1);
 			    Strcpy(symset[which_set].name, sl->name);
-
+			    ready_to_switch = TRUE;
 			    break;
 			}
 			sl = sl->next;
@@ -3268,6 +3282,7 @@ boolean setinitial,setfromfile;
 			symset_name = (char *)0;
 			clear_symsetentry(which_set, TRUE);
 		}
+		else nothing_to_do = TRUE;
 	} else if (!res) {
 		/* The symbols file could not be accessed */
 		pline("Unable to access \"%s\" file.", SYMBOLS);
@@ -3292,34 +3307,41 @@ boolean setinitial,setfromfile;
 		free((genericptr_t)sl);
 	}
 
-	/* Set default symbols and clear the handling value */
-# ifdef REINCARNATION
-	if(rogueflag) init_r_symbols();
-	else
-# endif
-	    init_l_symbols();
+	if (nothing_to_do) return TRUE;
 
 	if (!symset[which_set].name && symset_name)
-		symset[which_set].name = symset_name;
+	    symset[which_set].name = symset_name;
+
+	/* Set default symbols and clear the handling value */
+# ifdef REINCARNATION
+	if(rogueflag)
+	    init_r_symbols();
+	else
+# endif
+	init_l_symbols();
 
 	if (symset[which_set].name) {
 	    if (read_sym_file(which_set))
-		switch_symbols(TRUE);
+		ready_to_switch = TRUE;
 	    else {
 		clear_symsetentry(which_set, TRUE);
 		return TRUE;
 	    }
 	}
-	
-	switch_symbols(TRUE);
+
+	if (ready_to_switch) switch_symbols(TRUE);
+
 # ifdef REINCARNATION
-	if (Is_rogue_level(&u.uz))
-		assign_graphics(ROGUESET);
-	else
+	if (Is_rogue_level(&u.uz)) {
+		if (rogueflag)
+		    assign_graphics(ROGUESET);
+	} else
 # endif
-		assign_graphics(PRIMARY);
+	if (!rogueflag) assign_graphics(PRIMARY);
 	need_redraw = TRUE;
 #endif /*LOADSYMSETS*/
+	return TRUE;
+
     } else {
 	/* didn't match any of the special options */
 	return FALSE;
@@ -3366,7 +3388,11 @@ char *buf;
 #endif
 #ifdef BACKWARD_COMPAT
 	else if (!strcmp(optname, "boulder"))
+# ifdef UNICODE_DRAWING
+		Sprintf(buf, "\\x%04X", iflags.bouldersym ?
+# else
 		Sprintf(buf, "%c", iflags.bouldersym ?
+# endif
 			iflags.bouldersym :
 			showsyms[(int)objects[BOULDER].oc_class + SYM_OFF_O]);
 #endif
@@ -3519,14 +3545,17 @@ char *buf;
 	else if (!strcmp(optname, "race"))
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
 #ifdef REINCARNATION
-	else if (!strcmp(optname, "roguesymset"))
+	else if (!strcmp(optname, "roguesymset")) {
 		Sprintf(buf, "%s",
 # ifdef LOADSYMSETS
 			symset[ROGUESET].name ?
 			symset[ROGUESET].name :
 # endif
 			"default");
+		if (currentgraphics == ROGUESET && symset[ROGUESET].name)
+			Strcat(buf, ", active");
 #endif
+	}
 	else if (!strcmp(optname, "role"))
 		Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
 	else if (!strcmp(optname, "runmode"))
@@ -3558,13 +3587,16 @@ char *buf;
 			FEATURE_NOTICE_VER_MIN,
 			FEATURE_NOTICE_VER_PATCH);
 	}
-	else if (!strcmp(optname, "symset"))
+	else if (!strcmp(optname, "symset")) {
 		Sprintf(buf, "%s",
 #ifdef LOADSYMSETS
 			symset[PRIMARY].name ?
 			symset[PRIMARY].name :
 #endif
 			"default");
+		if (currentgraphics == PRIMARY && symset[PRIMARY].name)
+			Strcat(buf, ", active");
+	}
 	else if (!strcmp(optname, "tile_file"))
 		Sprintf(buf, "%s", iflags.wc_tile_file ? iflags.wc_tile_file : defopt);
 	else if (!strcmp(optname, "tile_height")) {
@@ -3817,15 +3849,6 @@ char *buf;
 	    sp++;
 	}
 	return (struct symparse *)0;
-}
-
-int sym_val(strval)
-char *strval;
-{
-	char buf[QBUFSZ];
-	buf[0] = '\0';
-	escapes(strval, buf);
-	return (int)*buf;
 }
 #endif /*LOADSYMSETS*/
 

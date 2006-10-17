@@ -2531,6 +2531,7 @@ int which_set;
 		return 0;
 
 	if (!symset[which_set].name) {
+	    int i;
 	    /* A null symset name indicates that we're just
 	       building a pick-list of possible symset
 	       values from the file, so only do that */
@@ -2556,6 +2557,20 @@ int which_set;
 		    /* initialize restriction bits */
 		    tmpsp->primary = 0;
 		    tmpsp->rogue   = 0;
+		    tmpsp->unicode = 0;
+		    break;
+		 case 2:
+		    /* handler type identified */
+		    tmpsp = symset_list; /* most recent symset */
+		    tmpsp->handling = H_UNK;
+		    i = 0;
+		    while (known_handling[i]) {
+			if (!strcmpi(known_handling[i], bufp)) {
+				tmpsp->handling = i;
+				break;	/* while loop */
+	    	        }
+			i++;
+		    }
 		    break;
 		 case 3: /* description:something */
 		    tmpsp = symset_list; /* most recent symset */
@@ -2573,6 +2588,7 @@ int which_set;
 			    switch(i) {
 			    	case  0: tmpsp->primary = 1; break;
 				case  1: tmpsp->rogue   = 1; break;
+				case  2: tmpsp->unicode = 1; break;
 			    }
 			    break;	/* while loop */
 	    	        }
@@ -2594,6 +2610,7 @@ int which_set;
 				/* these init_*() functions clear symset fields too */
 # ifdef REINCARNATION
 				if (which_set == ROGUESET) init_r_symbols();
+				else
 # endif
 				if (which_set == PRIMARY)  init_l_symbols();
 			    }
@@ -2639,18 +2656,32 @@ int which_set;
 	    	        	    }
 				    i++;
 		    	        }
-			    }
+			        /* Don't allow unicode set if code can't handle it */
+			        if (symset[which_set].unicode &&
+						!iflags.unicodedisp) {
+				    if (chosen_symset_start)
+					chosen_symset_end = FALSE;
+				    chosen_symset_start = FALSE;
+# ifdef REINCARNATION
+				    if (which_set == ROGUESET) init_r_symbols();
+				    else
+# endif
+				    if (which_set == PRIMARY)  init_l_symbols();
+			        }
+		    	    }
 		   	    break;
 		}
 	    } else {		/* !SYM_CONTROL */
 		val = sym_val(bufp);
 		if (chosen_symset_start) {
+			if (which_set == PRIMARY) {
+				update_l_symset(symp, val);
+			}
 # ifdef REINCARNATION
-			if (which_set == ROGUESET)
-			    update_r_symset(symp, val);
-			else
+			else if (which_set == ROGUESET) {
+				update_r_symset(symp, val);
+			}
 # endif
-			    update_l_symset(symp, val);
 		}
 	    }
 	}
@@ -2672,6 +2703,72 @@ int which_set;
 	    }
 	    i++;
 	}
+}
+
+/*
+ *  Produces a single integer value.
+ */
+int
+sym_val(cp)
+const char *cp;
+{
+    unsigned int cval = 0;
+    int	meta = 0, dcount = 0;
+    const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
+
+    while (*cp)
+    {
+	if (*cp == '\\' && index("mM", cp[1])) {
+		meta = 1;
+		cp += 2;
+	}
+	if ((*cp == 'U' || *cp == 'u') && cp[1] == '+' && index(hex, cp[2]))
+	{
+	    dcount = 0;
+	    cp++;
+	    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
+		cval = (unsigned int)((cval * 16) +
+			((unsigned int)(dp - hex) / 2));
+	}
+	else if (*cp == '\\' && index("0123456789xXoO", cp[1]))
+	{
+	    dcount = 0;
+	    cp++;
+	    if (*cp == 'x' || *cp == 'X')
+		for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
+		    cval = (unsigned int)((cval * 16) +
+			    ((unsigned int)(dp - hex) / 2));
+	    else if (*cp == 'o' || *cp == 'O')
+		for (++cp; *cp && (index("01234567",*cp)) && (dcount++ < 5); cp++)
+		    cval = (cval * 8) + (unsigned int)(*cp - '0');
+	    else
+		for (; *cp && (index("0123456789",*cp)) && (dcount++ < 5); cp++)
+		    cval = (cval * 10) + (unsigned int)(*cp - '0');
+	}
+	else if (*cp == '\\')		/* C-style character escapes */
+	{
+	    switch (*++cp)
+	    {
+	    case '\\': cval = '\\'; break;
+	    case 'n': cval = '\n'; break;
+	    case 't': cval = '\t'; break;
+	    case 'b': cval = '\b'; break;
+	    case 'r': cval = '\r'; break;
+	    default: cval = (unsigned int)*cp;
+	    }
+	    cp++;
+	}
+	else if (*cp == '^')		/* expand control-character syntax */
+	{
+	    cval = (unsigned int)(*++cp & 0x1f);
+	    cp++;
+	}
+	else
+	    cval = (unsigned int)*cp++;
+	if (meta)
+	    cval |= 0x80;
+    }
+    return cval;
 }
 #endif /*LOADSYMSETS*/
 

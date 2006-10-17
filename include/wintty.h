@@ -34,8 +34,8 @@ struct WinDesc {
 				/* maxcol is also used by WIN_MESSAGE for */
 				/* tracking the ^P command */
     short *datlen;		/* allocation size for *data */
-    char **data;		/* window data [row][column] */
-    char *morestr;		/* string to display instead of default */
+    nhwchar **data;		/* window data [row][column] */
+    nhwchar *morestr;		/* string to display instead of default */
     tty_menu_item *mlist;	/* menu information (MENU) */
     tty_menu_item **plist;	/* menu page pointers (MENU) */
     short plist_size;		/* size of allocated plist (MENU) */
@@ -86,7 +86,7 @@ extern struct WinDesc *wins[MAXWIN];
 extern struct DisplayDesc *ttyDisplay;	/* the tty display descriptor */
 
 extern char morc;		/* last character typed to xwaitforspace */
-extern char defmorestr[];	/* default --more-- prompt */
+extern nhwchar defmorestr[];	/* default --more-- prompt */
 
 /* port specific external function references */
 
@@ -107,7 +107,9 @@ E void NDECL(tty_shutdown);
  * actually would be expanded.	So here, we have to make an exception. */
 E void FDECL(xputc, (int));
 #else
+# ifndef WIN32CON
 E void FDECL(xputc, (CHAR_P));
+# endif
 #endif
 E void FDECL(xputs, (const char *));
 #if defined(SCREEN_VGA) || defined(SCREEN_8514)
@@ -150,10 +152,10 @@ E int FDECL(has_color,(int color));
 
 /* ### topl.c ### */
 
-E void FDECL(addtopl, (const char *));
+E void FDECL(addtopl, (const nhwchar *));
 E void NDECL(more);
-E void FDECL(update_topl, (const char *));
-E void FDECL(putsyms, (const char*));
+E void FDECL(update_topl, (const nhwchar *));
+E void FDECL(putsyms, (const nhwchar *));
 
 /* ### wintty.c ### */
 #ifdef CLIPPING
@@ -163,6 +165,9 @@ E void FDECL(docorner, (int, int));
 E void NDECL(end_glyphout);
 E void FDECL(g_putch, (int));
 E void NDECL(win_tty_init);
+#ifdef UNICODE_WIDEWINPORT
+E void FDECL(u_putch, (nhwchar));
+#endif
 
 /* external declarations */
 E void FDECL(tty_init_nhwindows, (int *, char **));

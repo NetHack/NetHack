@@ -14,10 +14,12 @@
 #define C(c)	(0x1f & (c))
 #endif
 
-STATIC_DCL void FDECL(redotoplin, (const char*));
-STATIC_DCL void FDECL(topl_putsym, (CHAR_P));
+STATIC_DCL void FDECL(redotoplin, (const nhwchar*));
+STATIC_DCL void FDECL(topl_putsym, (NHWCHAR_P));
 STATIC_DCL void NDECL(remember_topl);
 STATIC_DCL void FDECL(removetopl, (int));
+
+extern nhwchar emptysym[];
 
 int
 tty_doprev_message()
@@ -26,6 +28,9 @@ tty_doprev_message()
 
     winid prevmsg_win;
     int i;
+#ifdef UNICODE_WIDEWINPORT
+    char buf[BUFSZ];
+#endif
     if ((iflags.prevmsg_window != 's') && !ttyDisplay->inread) { /* not single */
         if(iflags.prevmsg_window == 'f') { /* full */
             prevmsg_win = create_nhwindow(NHW_MENU);
@@ -34,11 +39,23 @@ tty_doprev_message()
             cw->maxcol = cw->maxrow;
             i = cw->maxcol;
             do {
-                if(cw->data[i] && strcmp(cw->data[i], "") )
+#ifdef UNICODE_WIDEWINPORT
+                if(cw->data[i] && nhwstrcmp(cw->data[i], "") ) {
+		    strnhwcpy(buf, cw->data[i]);
+                    putstr(prevmsg_win, 0, buf);
+#else
+                if(cw->data[i] && strcmp(cw->data[i], "") ) {
                     putstr(prevmsg_win, 0, cw->data[i]);
+#endif
+                }
                 i = (i + 1) % cw->rows;
             } while (i != cw->maxcol);
+#ifdef UNICODE_WIDEWINPORT
+	    strnhwcpy(buf, toplines);
+            putstr(prevmsg_win, 0, buf);
+#else
             putstr(prevmsg_win, 0, toplines);
+#endif
             display_nhwindow(prevmsg_win, TRUE);
             destroy_nhwindow(prevmsg_win);
         } else if (iflags.prevmsg_window == 'c') {		/* combination */
@@ -65,11 +82,24 @@ tty_doprev_message()
                     cw->maxcol = cw->maxrow;
                     i = cw->maxcol;
                     do {
-                        if(cw->data[i] && strcmp(cw->data[i], "") )
+#ifdef UNICODE_WIDEWINPORT
+                        if(cw->data[i] && nhwstrcmp(cw->data[i], "") ) {
+			    strnhwcpy(buf, cw->data[i]);
+                            putstr(prevmsg_win, 0, buf);
+#else
+                        if(cw->data[i] && strcmp(cw->data[i], "") ) {
                             putstr(prevmsg_win, 0, cw->data[i]);
+#endif
+			}
                         i = (i + 1) % cw->rows;
                     } while (i != cw->maxcol);
+
+#ifdef UNICODE_WIDEWINPORT
+		    strnhwcpy(buf, toplines);
+                    putstr(prevmsg_win, 0, buf);
+#else
                     putstr(prevmsg_win, 0, toplines);
+#endif
                     display_nhwindow(prevmsg_win, TRUE);
                     destroy_nhwindow(prevmsg_win);
                 }
@@ -81,11 +111,22 @@ tty_doprev_message()
             prevmsg_win = create_nhwindow(NHW_MENU);
             putstr(prevmsg_win, 0, "Message History");
             putstr(prevmsg_win, 0, "");
+#ifdef UNICODE_WIDEWINPORT
+            strnhwcpy(buf, toplines);
+            putstr(prevmsg_win, 0, buf);
+#else
             putstr(prevmsg_win, 0, toplines);
+#endif
             cw->maxcol=cw->maxrow-1;
             if(cw->maxcol < 0) cw->maxcol = cw->rows-1;
             do {
-                putstr(prevmsg_win, 0, cw->data[cw->maxcol]);
+#ifdef UNICODE_WIDEWINPORT
+            	strnhwcpy(buf, cw->data[cw->maxcol]);
+                putstr(prevmsg_win, 0, buf);
+#else
+		putstr(prevmsg_win, 0, cw->data[cw->maxcol]);
+
+#endif
                 cw->maxcol--;
                 if (cw->maxcol < 0) cw->maxcol = cw->rows-1;
                 if (!cw->data[cw->maxcol])
@@ -116,19 +157,23 @@ tty_doprev_message()
 }
 
 STATIC_OVL void
-redotoplin(str)
-    const char *str;
+redotoplin(symstr)
+    const nhwchar *symstr;
 {
 	int otoplin = ttyDisplay->toplin;
 	home();
-	if(*str & 0x80) {
+#ifdef UNICODE_WIDEWINPORT
+	if(*symstr >= 0x80) {
+#else
+	if(*symstr & 0x80) {
+#endif
 		/* kludge for the / command, the only time we ever want a */
 		/* graphics character on the top line */
-		g_putch((int)*str++);
+		g_putch((int)*symstr++);
 		ttyDisplay->curx++;
 	}
 	end_glyphout();	/* in case message printed during graphics output */
-	putsyms(str);
+	putsyms(symstr);
 	cl_end();
 	ttyDisplay->toplin = 1;
 	if(ttyDisplay->cury && otoplin != 3)
@@ -140,21 +185,29 @@ remember_topl()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
     int idx = cw->maxrow;
+#ifdef UNICODE_WIDEWINPORT
+    unsigned len = nhwlen(toplines) + 1;
+#else
     unsigned len = strlen(toplines) + 1;
+#endif
 
     if (len > (unsigned)cw->datlen[idx]) {
 	if (cw->data[idx]) free(cw->data[idx]);
 	len += (8 - (len & 7));		/* pad up to next multiple of 8 */
-	cw->data[idx] = (char *)alloc(len);
+	cw->data[idx] = (nhwchar *)alloc(sizeof(nhwchar) * len);
 	cw->datlen[idx] = (short)len;
     }
+#ifdef UNICODE_WIDEWINPORT
+    (void)nhwcpy(cw->data[idx], toplines);
+#else
     Strcpy(cw->data[idx], toplines);
+#endif
     cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
 }
 
 void
 addtopl(s)
-const char *s;
+const nhwchar *s;
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -175,7 +228,12 @@ more()
 
     if(ttyDisplay->toplin) {
 	tty_curs(BASE_WINDOW, cw->curx+1, cw->cury);
-	if(cw->curx >= CO - 8) topl_putsym('\n');
+	if(cw->curx >= CO - 8)
+#ifdef UNICODE_WIDEWINPORT
+		topl_putsym(L'\n');
+#else
+		topl_putsym('\n');
+#endif
     }
 
     if(flags.standout)
@@ -204,22 +262,33 @@ more()
 
 void
 update_topl(bp)
-	register const char *bp;
+	register const nhwchar *bp;
 {
-	register char *tl, *otl;
+	register nhwchar *tl, *otl;
 	register int n0;
 	int notdied = 1;
 	struct WinDesc *cw = wins[WIN_MESSAGE];
 
 	/* If there is room on the line, print message on same line */
 	/* But messages like "You die..." deserve their own line */
+#ifdef UNICODE_WIDEWINPORT
+	n0 = nhwlen(bp);
+#else
 	n0 = strlen(bp);
+#endif
 	if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP)) &&
 	    cw->cury == 0 &&
+#ifdef UNICODE_WIDEWINPORT
+	    n0 + (int)nhwlen(toplines) + 3 < CO-8 &&  /* room for --More-- */
+	    (notdied = nhwncmp(bp, L"You die", 7))) {
+		(void)nhwcat(toplines, L"  ");
+		(void)nhwcat(toplines, bp);
+#else
 	    n0 + (int)strlen(toplines) + 3 < CO-8 &&  /* room for --More-- */
 	    (notdied = strncmp(bp, "You die", 7))) {
 		Strcat(toplines, "  ");
 		Strcat(toplines, bp);
+#endif
 		cw->curx += 2;
 		if(!(cw->flags & WIN_STOP))
 		    addtopl(bp);
@@ -232,7 +301,11 @@ update_topl(bp)
 	    }
 	}
 	remember_topl();
+#ifdef UNICODE_WIDEWINPORT
+	(void) nhwncpy(toplines, bp, TBUFSZ);
+#else
 	(void) strncpy(toplines, bp, TBUFSZ);
+#endif
 	toplines[TBUFSZ - 1] = 0;
 
 	for(tl = toplines; n0 >= CO; ){
@@ -240,34 +313,49 @@ update_topl(bp)
 	    for(tl+=CO-1; tl != otl && !isspace(*tl); --tl) ;
 	    if(tl == otl) {
 		/* Eek!  A huge token.  Try splitting after it. */
+#ifdef UNICODE_WIDEWINPORT
+		tl = nhwindex(otl, ' ');
+#else
 		tl = index(otl, ' ');
+#endif
 		if (!tl) break;    /* No choice but to spit it out whole. */
 	    }
+#ifdef UNICODE_WIDEWINPORT
+	    *tl++ = (nhwchar)'\n';
+	    n0 = nhwlen(tl);
+#else
 	    *tl++ = '\n';
 	    n0 = strlen(tl);
+#endif
 	}
 	if(!notdied) cw->flags &= ~WIN_STOP;
 	if(!(cw->flags & WIN_STOP)) redotoplin(toplines);
 }
 
+#ifdef UNICODE_WIDEWINPORT
+#define T(x) L##x
+#else
+#define T(x) x
+#endif
+
 STATIC_OVL
 void
 topl_putsym(c)
-    char c;
+    nhwchar c;
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
     if(cw == (struct WinDesc *) 0) panic("Putsym window MESSAGE nonexistant");
 	
     switch(c) {
-    case '\b':
+    case T('\b'):
 	if(ttyDisplay->curx == 0 && ttyDisplay->cury > 0)
 	    tty_curs(BASE_WINDOW, CO, (int)ttyDisplay->cury-1);
 	backsp();
 	ttyDisplay->curx--;
 	cw->curx = ttyDisplay->curx;
 	return;
-    case '\n':
+    case T('\n'):
 	cl_end();
 	ttyDisplay->curx = 0;
 	ttyDisplay->cury++;
@@ -278,7 +366,7 @@ topl_putsym(c)
 	break;
     default:
 	if(ttyDisplay->curx == CO-1)
-	    topl_putsym('\n'); /* 1 <= curx <= CO; avoid CO */
+	    topl_putsym(T('\n')); /* 1 <= curx <= CO; avoid CO */
 #ifdef WIN32CON
     (void) putchar(c);
 #endif
@@ -291,12 +379,14 @@ topl_putsym(c)
 #endif
 }
 
+#undef T
+
 void
-putsyms(str)
-    const char *str;
+putsyms(symstr)
+    const nhwchar *symstr;
 {
-    while(*str)
-	topl_putsym(*str++);
+    while(*symstr)
+	topl_putsym(*symstr++);
 }
 
 STATIC_OVL void
@@ -304,7 +394,12 @@ removetopl(n)
 register int n;
 {
     /* assume addtopl() has been done, so ttyDisplay->toplin is already set */
-    while (n-- > 0) putsyms("\b \b");
+    while (n-- > 0)
+#ifdef UNICODE_WIDEWINPORT
+	putsyms(L"\b \b");
+#else
+	putsyms("\b \b");
+#endif
 }
 
 extern char erase_char;		/* from xxxtty.c; don't need kill_char */
@@ -331,6 +426,9 @@ char def;
 	struct WinDesc *cw = wins[WIN_MESSAGE];
 	boolean doprev = 0;
 	char prompt[QBUFSZ];
+#ifdef UNICODE_WIDEWINPORT
+	nhwchar wprompt[QBUFSZ];
+#endif
 
 	if(ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP)) more();
 	cw->flags &= ~WIN_STOP;
@@ -362,7 +460,12 @@ char def;
 		    ttyDisplay->inread = sav;
 		    tty_clear_nhwindow(WIN_MESSAGE);
 		    cw->maxcol = cw->maxrow;
+#ifdef UNICODE_WIDEWINPORT
+		    nhwstrcpy(wprompt, prompt);
+		    addtopl(wprompt);
+#else
 		    addtopl(prompt);
+#endif
 		} else {
 		    if(!doprev)
 			(void) tty_doprev_message(); /* need two initially */
@@ -378,7 +481,12 @@ char def;
 		tty_clear_nhwindow(WIN_MESSAGE);
 		cw->maxcol = cw->maxrow;
 		doprev = 0;
+#ifdef UNICODE_WIDEWINPORT
+		nhwstrcpy(wprompt, prompt);
+		addtopl(wprompt);
+#else
 		addtopl(prompt);
+#endif
 		q = '\0';	/* force another loop iteration */
 		continue;
 	    }
@@ -399,13 +507,18 @@ char def;
 		tty_nhbell();
 		q = (char)0;
 	    } else if (q == '#' || digit_ok) {
-		char z, digit_string[2];
+		char z;
+		nhwchar digit_string[2];
 		int n_len = 0;
 		long value = 0;
+#ifdef UNICODE_WIDEWINPORT
+		addtopl(L"#"),  n_len++;
+#else
 		addtopl("#"),  n_len++;
-		digit_string[1] = '\0';
+#endif
+		digit_string[1] = (nhwchar)0;
 		if (q != '#') {
-		    digit_string[0] = q;
+		    digit_string[0] = (nhwchar)q;
 		    addtopl(digit_string),  n_len++;
 		    value = q - '0';
 		    q = '#';
@@ -415,7 +528,7 @@ char def;
 		    if (digit(z)) {
 			value = (10 * value) + (z - '0');
 			if (value < 0) break;	/* overflow: try again */
-			digit_string[0] = z;
+			digit_string[0] = (nhwchar)z;
 			addtopl(digit_string),  n_len++;
 		    } else if (z == 'y' || index(quitchars, z)) {
 			if (z == '\033')  value = -1;	/* abort */
@@ -440,7 +553,12 @@ char def;
 
 	if (q != '#') {
 		Sprintf(rtmp, "%c", q);
+#ifdef UNICODE_WIDEWINPORT
+		nhwstrcpy(wprompt, rtmp);   /* rtmp[40] -> wprompt[128] ok */
+		addtopl(wprompt);
+#else
 		addtopl(rtmp);
+#endif
 	}
     clean_up:
 	ttyDisplay->inread--;
@@ -468,6 +586,7 @@ boolean init;
 	static boolean doneinit = FALSE;
 	register struct WinDesc *cw = wins[WIN_MESSAGE];
 	char *retstr = (char *)0;
+	static char buf[BUFSZ];
 
 	if (!cw) return (char *)0;	/* bail */
 	/*
@@ -483,11 +602,24 @@ boolean init;
 	if (doneinit && state < 2) {
 		if (state == 1) {
 			++state;
+#ifdef UNICODE_WIDEWINPORT
+			strnhwcpy(buf,toplines);
+			return buf;
+#else
 			return toplines;
+#endif
 		}
 		do {
+#ifdef UNICODE_WIDEWINPORT
+			if(cw->data[idx] && nhwcmp(cw->data[idx], emptysym) ) {
+				strnhwcpy(buf, cw->data[idx]);
+				retstr = buf;
+			}
+#else
 			if(cw->data[idx] && strcmp(cw->data[idx], "") )
 				retstr = cw->data[idx];
+
+#endif
 			idx = (idx + 1) % cw->rows;
 		} while (idx != cw->maxrow && !retstr);
 		if (idx == cw->maxrow) ++state;
@@ -513,10 +645,14 @@ const char *msg;
 	if (len > (unsigned)cw->datlen[idx]) {
 		if (cw->data[idx]) free(cw->data[idx]);
 		len += (8 - (len & 7));		/* pad up to next multiple of 8 */
-		cw->data[idx] = (char *)alloc(len);
+		cw->data[idx] = (nhwchar *)alloc(sizeof(nhwchar) * len);
 		cw->datlen[idx] = (short)len;
         }
+#ifdef UNICODE_WIDEWINPORT
+	(void)nhwstrcpy(cw->data[idx], msg);
+#else
 	Strcpy(cw->data[idx], msg);
+#endif
 	cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
 }
 #endif /* TTY_GRAPHICS */

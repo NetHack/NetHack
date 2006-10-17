@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)global.h	3.5	2006/06/28	*/
+/*	SCCS Id: @(#)global.h	3.5	2006/10/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -59,6 +59,41 @@ typedef xchar	boolean;		/* 0 or 1 */
 #ifndef TRUE		/* defined in some systems' native include files */
 #define TRUE	((boolean)1)
 #define FALSE	((boolean)0)
+#endif
+
+/*
+ * UNICODE_SUPPORT
+ * Unicode/wide character related support.
+ */
+#ifdef UNICODE_SUPPORT
+# define UNICODE_DRAWING	/* store drawing symbols in wchar_t data type     */
+# define UNICODE_WIDEWINPORT	/* store and render wide chars in window port     */
+/*# define UNICODE_PLAYERTEXT*/	/* not implemented - player input in wide chars */
+#else
+# undef UNICODE_DRAWING
+# undef UNICODE_WIDEWINPORT
+# undef UNICODE_PLAYERTEXT	
+#endif
+
+#if defined(UNICODE_DRAWING)
+typedef wchar_t nhsym;		/* nhsym is wide char */
+#else
+typedef char nhsym;
+#endif
+
+#if defined(UNICODE_WIDEWINPORT)
+typedef wchar_t nhwchar;	/* nhwchar (window port char) is wide char */
+#else
+typedef char nhwchar;
+#endif
+
+#if 0
+/* Not Implemented presently */
+#if defined(UNICODE_PLAYERTEXT)
+typedef wchar_t nhptext;	/* player input is wide char */
+#else
+typedef char nhptext;
+#endif
 #endif
 
 #ifndef STRNCMPI

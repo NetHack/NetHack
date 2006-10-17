@@ -35,7 +35,7 @@ E NEARDATA int nsubroom;
 E NEARDATA int occtime;
 
 #define WARNCOUNT 6			/* number of different warning levels */
-E uchar warnsyms[WARNCOUNT];
+E nhsym warnsyms[WARNCOUNT];
 E NEARDATA int warn_obj_cnt;		/* count of monsters meeting criteria */
 
 E int x_maze_max, y_maze_max;
@@ -334,7 +334,8 @@ E NEARDATA winid WIN_MESSAGE;
 E NEARDATA winid WIN_STATUS;
 #endif
 E NEARDATA winid WIN_MAP, WIN_INVEN;
-E char toplines[];
+E nhwchar toplines[];
+
 #ifndef TCAP_H
 E struct tc_gbl_data {	/* also declared in tcap.h */
     char *tc_AS, *tc_AE;	/* graphics start and end (tty font swapping) */

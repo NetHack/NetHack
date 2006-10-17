@@ -1,4 +1,4 @@
- /*	SCCS Id: @(#)nttty.c	3.5	$Date$   */
+/*	SCCS Id: @(#)nttty.c	3.5	$Date$   */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -60,9 +60,6 @@ INPUT_RECORD ir;
 int GUILaunched;
 extern int redirect_stdout;
 static BOOL FDECL(CtrlHandler, (DWORD));
-
-/* Flag for whether unicode is supported */
-static boolean has_unicode;
 
 #ifdef PORT_DEBUG
 static boolean display_cursor_info = FALSE;
@@ -146,6 +143,12 @@ static void NDECL(init_ttycolor);
 # endif
 static void NDECL(really_move_cursor);
 
+#ifdef UNICODE_WIDEWINPORT
+void FDECL(xputc_core,(NHWCHAR_P));
+#else
+void FDECL(xputc_core,(int));
+#endif
+
 #define MAX_OVERRIDES	256
 unsigned char key_overrides[MAX_OVERRIDES];
 
@@ -193,11 +196,14 @@ const char *s;
 void
 setftty()
 {
+	static int cp = 0;
+	if (!cp) cp = GetConsoleOutputCP();
+	/* SetConsoleOutputCP(1250); */
 #ifdef CHANGE_COLOR
 	if (altered_palette) adjust_palette();
 #endif
 	start_screen();
-	has_unicode = ((GetVersion() & 0x80000000) == 0);
+	iflags.unicodecapable = ((GetVersion() & 0x80000000) == 0);
 }
 
 void
@@ -448,24 +454,61 @@ int x,y;
 	ttyDisplay->cury = y;
 }
 
+#ifdef UNICODE_WIDEWINPORT
+#define T(x) L##x
+#else
+#define T(x) x
+#endif
+
 void
-xputc_core(ch)
-char ch;
+xputc_core(ich)
+#ifdef UNICODE_WIDEWINPORT
+nhwchar ich;
+#else
+int ich;
+#endif
 {
+	static uchar c[2] = {0,0};
+	char ch = (char)ich;
+
+#if 0
+	/*EURO symbol*/
+	if (ich == 0x20AC) {
+		if (!c[0]) {
+			wchar_t t[2]={0x20ac, 0x0000};
+			int cp = GetConsoleOutputCP();
+			(void) WideCharToMultiByte(cp,
+				       0,
+				       t, 1,
+				       c, 2,
+					(LPCSTR)0,
+					(LPBOOL)0);
+		}
+		ich = (nhwchar)c[0];
+	}
+#endif
+#ifdef UNICODE_WIDEWINPORT
+	switch(ich) {
+#else
 	switch(ch) {
-	    case '\n':
+#endif
+	    case T('\n'):
 	    		cursor.Y++;
 	    		/* fall through */
-	    case '\r':
+	    case T('\r'):
 	    		cursor.X = 1;
 			break;
-	    case '\b':
+	    case T('\b'):
 	    		cursor.X--;
 			break;
 	    default:
 			WriteConsoleOutputAttribute(hConOut,&attr,1,
 							cursor,&acount);
-			if (has_unicode) {
+			if (iflags.unicodedisp) {
+#ifdef UNICODE_WIDEWINPORT
+				WriteConsoleOutputCharacterW(hConOut,&ich,1,
+						cursor,&ccount);
+#else
 				/* Avoid bug in ANSI API on WinNT */
 				WCHAR c2[2];
 				int rc;
@@ -476,6 +519,7 @@ char ch;
 				       c2, 2);
 				WriteConsoleOutputCharacterW(hConOut,c2,rc,
 						cursor,&ccount);
+#endif
 			}
 			else {
 				WriteConsoleOutputCharacterA(hConOut,&ch,1,
@@ -487,7 +531,11 @@ char ch;
 
 void
 xputc(ch)
-char ch;
+#ifdef UNICODE_WIDEWINPORT
+nhwchar ch;
+#else
+int ch;
+#endif
 {
 	cursor.X = ttyDisplay->curx;
 	cursor.Y = ttyDisplay->cury;
@@ -518,8 +566,8 @@ const char *s;
  * for win32. It is used for glyphs only, not text.
  */
 void
-g_putch(in_ch)
-int in_ch;
+g_putch(in_sym)
+int in_sym;
 {
 	/* CP437 to Unicode mapping according to the Unicode Consortium */
 	static const WCHAR cp437[] =
@@ -557,12 +605,17 @@ int in_ch;
 		0x2261, 0x00b1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00f7, 0x2248,
 		0x00b0, 0x2219, 0x00b7, 0x221a, 0x207f, 0x00b2, 0x25a0, 0x00a0
 	};
-	unsigned char ch = (unsigned char)in_ch;
+	uchar ch = (uchar)in_sym;
 
 	cursor.X = ttyDisplay->curx;
 	cursor.Y = ttyDisplay->cury;
 	WriteConsoleOutputAttribute(hConOut,&attr,1,cursor,&acount);
-	if (has_unicode)
+#ifdef UNICODE_DRAWING
+	if (symset[currentgraphics].name && iflags.unicodedisp)
+	    WriteConsoleOutputCharacterW(hConOut,(LPCWSTR)&in_sym,1,cursor,&ccount);
+	else
+#endif
+	if (SYMHANDLING(H_IBM))
 	    WriteConsoleOutputCharacterW(hConOut,&cp437[ch],1,cursor,&ccount);
 	else
 	    WriteConsoleOutputCharacterA(hConOut,&ch,1,cursor,&ccount);
