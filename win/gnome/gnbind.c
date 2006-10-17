@@ -41,6 +41,7 @@ struct window_procs Gnome_procs = {
     gnome_destroy_nhwindow,
     gnome_curs,
     gnome_putstr,
+    genl_putmixed,
     gnome_display_file,
     gnome_start_menu,
     gnome_add_menu,

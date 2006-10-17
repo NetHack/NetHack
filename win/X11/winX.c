@@ -120,6 +120,7 @@ struct window_procs X11_procs = {
     X11_destroy_nhwindow,
     X11_curs,
     X11_putstr,
+    genl_putmixed,
     X11_display_file,
     X11_start_menu,
     X11_add_menu,

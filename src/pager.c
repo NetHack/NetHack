@@ -466,6 +466,7 @@ do_look(mode, click_cc)
     char    out_str[BUFSZ], look_buf[BUFSZ];
     const char *x_str, *firstmatch = 0;
     struct permonst *pm = 0;
+    int glyph;			/* glyph at selected position */
     int     i, ans = 0;
     int     sym;		/* typed symbol or converted glyph */
     int	    found;		/* count of matching syms found */
@@ -522,8 +523,8 @@ do_look(mode, click_cc)
 	out_str[0] = '\0';
 
 	if (from_screen || clicklook) {
-	    int glyph;	/* glyph at selected position */
-
+	    int oc, so;
+	    unsigned os;
 	    if (from_screen) {
 		if (flags.verbose)
 			pline("Please move the cursor to %s.",
@@ -538,9 +539,10 @@ do_look(mode, click_cc)
 	        }
 		flags.verbose = FALSE;	/* only print long question once */
 	    }
+	    glyph = glyph_at(cc.x,cc.y);
 
 	    /* Convert the glyph at the selected position to a symbol. */
-	    glyph = glyph_at(cc.x,cc.y);
+#if 0
 	    if (glyph_is_cmap(glyph)) {
 		sym = showsyms[glyph_to_cmap(glyph)];
 	    } else if (glyph_is_trap(glyph)) {
@@ -566,6 +568,8 @@ do_look(mode, click_cc)
 						glyph, (int)cc.x, (int)cc.y);
 		sym = ' ';
 	    }
+#endif
+	    so = mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
 	}
 
 	/*
@@ -580,7 +584,9 @@ do_look(mode, click_cc)
 		def_monsyms[i].explain) {
 		need_to_look = TRUE;
 		if (!found) {
-		    Sprintf(out_str, "%c       %s", sym, an(def_monsyms[i].explain));
+		    Sprintf(out_str, "%s        %s",
+				encglyph(glyph),
+		    		an(def_monsyms[i].explain));
 		    firstmatch = def_monsyms[i].explain;
 		    found++;
 		} else {
@@ -604,7 +610,8 @@ do_look(mode, click_cc)
 	 */
 	if (u.uswallow && (from_screen || clicklook) && is_swallow_sym(sym)) {
 	    if (!found) {
-		Sprintf(out_str, "%c       %s", sym, mon_interior);
+		Sprintf(out_str, "%s        %s",
+			encglyph(glyph), mon_interior);
 		firstmatch = mon_interior;
 	    } else {
 		found += append_str(out_str, mon_interior);
@@ -622,7 +629,9 @@ do_look(mode, click_cc)
 		    continue;
 		}
 		if (!found) {
-		    Sprintf(out_str, "%c       %s", sym, an(def_oc_syms[i].explain));
+		    Sprintf(out_str, "%s        %s",
+				encglyph(glyph),
+		    		an(def_oc_syms[i].explain));
 		    firstmatch = def_oc_syms[i].explain;
 		    found++;
 		} else {
@@ -633,7 +642,9 @@ do_look(mode, click_cc)
 
 	if (sym == DEF_INVISIBLE) {
 	    if (!found) {
-		Sprintf(out_str, "%c       %s", sym, an(invisexplain));
+		Sprintf(out_str, "%s        %s",
+			encglyph(glyph),
+			an(invisexplain));
 		firstmatch = invisexplain;
 		found++;
 	    } else {
@@ -656,10 +667,12 @@ do_look(mode, click_cc)
 
 		if (!found) {
 		    if (is_cmap_trap(i)) {
-			Sprintf(out_str, "%c       a trap", sym);
+			Sprintf(out_str, "%s        a trap",
+				encglyph(glyph));
 			hit_trap = TRUE;
 		    } else {
-			Sprintf(out_str, "%c       %s", sym,
+			Sprintf(out_str, "%s        %s",
+				encglyph(glyph),
 				article == 2 ? the(x_str) :
 				article == 1 ? an(x_str) : x_str);
 		    }
@@ -684,8 +697,8 @@ do_look(mode, click_cc)
 	    if (sym == ((from_screen || clicklook) ?
 		warnsyms[i] : def_warnsyms[i].sym)) {
 		if (!found) {
-			Sprintf(out_str, "%c       %s",
-				sym, def_warnsyms[i].explanation);
+			Sprintf(out_str, "%s        %s",
+				encglyph(glyph), def_warnsyms[i].explanation);
 			firstmatch = def_warnsyms[i].explanation;
 			found++;
 		} else {
@@ -703,7 +716,8 @@ do_look(mode, click_cc)
 	if (skipped_venom && found < 2) {
 	    x_str = def_oc_syms[VENOM_CLASS].explain;
 	    if (!found) {
-		Sprintf(out_str, "%c       %s", sym, an(x_str));
+		Sprintf(out_str, "%s        %s",
+			encglyph(glyph), an(x_str));
 		firstmatch = x_str;
 		found++;
 	    } else {
@@ -715,7 +729,8 @@ do_look(mode, click_cc)
 	if (iflags.bouldersym && sym == iflags.bouldersym) {
 	    if (!found) {
 		firstmatch = "boulder";
-		Sprintf(out_str, "%c       %s", sym, an(firstmatch));
+		Sprintf(out_str, "%s        %s",
+			encglyph(glyph), an(firstmatch));
 		found++;
 	    } else {
 		found += append_str(out_str, "boulder");
@@ -747,7 +762,10 @@ do_look(mode, click_cc)
 
 	/* Finally, print out our explanation. */
 	if (found) {
-	    pline("%s", out_str);
+
+	    /* Used putmixed() because there may be an encoded glyph present */
+	    putmixed(WIN_MESSAGE, 0, out_str);
+
 	    /* check the data file for information about this thing */
 	    if (found == 1 && ans != LOOK_QUICK && ans != LOOK_ONCE &&
 			(ans == LOOK_VERBOSE || (flags.help && !quick)) && !clicklook) {
@@ -764,7 +782,6 @@ do_look(mode, click_cc)
     flags.verbose = save_verbose;
     return 0;
 }
-
 
 int
 dowhatis()

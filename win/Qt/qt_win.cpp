@@ -5241,6 +5241,7 @@ struct window_procs Qt_procs = {
     NetHackQtBind::qt_destroy_nhwindow,
     NetHackQtBind::qt_curs,
     NetHackQtBind::qt_putstr,
+    genl_putmixed,
     NetHackQtBind::qt_display_file,
     NetHackQtBind::qt_start_menu,
     NetHackQtBind::qt_add_menu,

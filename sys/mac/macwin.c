@@ -3253,6 +3253,7 @@ struct window_procs mac_procs = {
 	mac_destroy_nhwindow,
 	mac_curs,
 	mac_putstr,
+	genl_putmixed,
 	mac_display_file,
 	mac_start_menu,
 	mac_add_menu,

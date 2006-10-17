@@ -70,6 +70,7 @@ struct window_procs tty_procs = {
     tty_destroy_nhwindow,
     tty_curs,
     tty_putstr,
+    genl_putmixed,
     tty_display_file,
     tty_start_menu,
     tty_add_menu,

@@ -1030,6 +1030,8 @@ E boolean FDECL(usmellmon, (struct permonst *));
 /* ### mapglyph.c ### */
 
 E int FDECL(mapglyph, (int, int *, int *, unsigned *, int, int));
+E char *FDECL(encglyph, (int));
+E void FDECL(genl_putmixed, (winid, int, const char *));
 
 /* ### mcastu.c ### */
 

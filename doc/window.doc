@@ -123,6 +123,39 @@ putstr(window, attr, str)
 		   are done consecutively the user will see the first and
 		   then the second.  In the tty port, pline() achieves this
 		   by calling more() or displaying both on the same line.
+putmixed(window, attr, str)
+		-- Print str on the window with the given attribute.  In
+		   addition to printable ASCII characters (040-0126), 
+		   sequences of encoded glyph values are supported.
+		   The glyph encoding sequence is \GXXXXNNNN, where:
+			XXXX is a hexadecimal value. The value must match
+			     the randomly generated value for the current 
+			     game in progress in order to be decoded. 
+			     The value for the game in progress is stored in 
+			     context.rndencode. This field minimizes 
+			     unintentional decoding of player-supplied strings 
+			     such as pet names, etc.
+			NNNN is a hexadecimal value representing the glyph.
+		   If a window port does not yet support special handling of
+		   the glyph value, it can use genl_putmixed (mapglyph.c)
+		   which converts the encoded glyph into a character symbol.
+
+		   Multiple putmixed()s are output on separate lines.  Attributes
+		   can be one of
+			ATR_NONE (or 0)
+			ATR_ULINE
+			ATR_BOLD
+			ATR_BLINK
+			ATR_INVERSE
+		   If a window-port does not support all of these, it may map
+		   unsupported attributes to a supported one (e.g. map them
+		   all to ATR_INVERSE).  putmixed() may compress spaces out of
+		   str, break str, or truncate str, if necessary for the
+		   display.  Where putmixed() breaks a line, it has to clear
+		   to end-of-line.
+		-- putstr should be implemented such that if two putmixed()s
+		   are done consecutively the user will see the first and
+		   then the second.
 get_nh_event()	-- Does window event processing (e.g. exposure events).
 		   A noop for the tty and X window-ports.
 int nhgetch()	-- Returns a single character input from the user.

@@ -254,4 +254,83 @@ unsigned *ospecial;
     return idx;
 }
 
+char *
+encglyph(glyph)
+int glyph;
+{
+	static char encbuf[20];
+	Sprintf(encbuf, "\\G%04X%04X", context.rndencode, glyph);
+	return encbuf;
+}
+
+/*
+ * This differs from putstr() because the str parameter can
+ * contain a sequence of characters representing:
+ *        \GXXXXNNNN	a glyph value, encoded by encglyph().
+ *
+ * For window ports that haven't yet written their own 
+ * XXX_putmixed() routine, this general one can be used.
+ * It replaces the encoded glyph sequence with a single
+ * showsyms[] char, then just passes that string onto
+ * putstr().
+ */
+
+void
+genl_putmixed(window, attr, str)
+    winid window;
+    int attr;
+    const char *str;
+{
+	char buf[BUFSZ];
+	const char *cp = str;
+	char *put = buf;
+	while (*cp) {
+	    if (*cp == '\\') {
+		int rndchk = 0, so = 0, gv = 0, ch, oc, dcount;
+		unsigned os;
+		const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
+		const char *save_cp = cp;
+		
+		cp++;
+		switch(*cp) {
+		case 'G':	/* glyph value \GXXXXNNNN*/
+		    dcount = 0;
+		    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
+			rndchk = (int)((rndchk * 16) + ((int)(dp - hex) / 2));
+
+		    if (rndchk == context.rndencode) {
+			dcount = 0;
+		        for (; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
+			    gv = (int)((gv * 16) + ((int)(dp - hex) / 2));
+			so = mapglyph(gv, &ch, &oc, &os, 0, 0);
+			*put++ = showsyms[so];
+		    } else {
+			/* possible forgery - leave it the way it is */
+			cp = save_cp;
+		    }
+		    break;
+# if 0
+		case 'S':	/* symbol offset */
+		    dcount = 0;
+		    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
+			rndchk = (int)((rndchk * 16) + ((int)(dp - hex) / 2));
+
+		    if (rndchk == context.rndencode) {
+			dcount = 0;
+		        for (; *cp && (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
+			    so = (int)((so * 16) + ((int)(dp - hex) / 2));
+		    }
+		    *put++ = showsyms[so];
+		    break;
+# endif
+		case '\\':
+		    break;
+	        }
+	    }
+	    *put++ = *cp++;
+	}
+	*put = '\0';
+	/* now send it to the normal putstr */
+	putstr(window, attr, buf);
+}
 /*mapglyph.c*/

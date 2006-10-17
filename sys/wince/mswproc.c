@@ -60,6 +60,7 @@ struct window_procs mswin_procs = {
     mswin_destroy_nhwindow,
     mswin_curs,
     mswin_putstr,
+    genl_putmixed,
     mswin_display_file,
     mswin_start_menu,
     mswin_add_menu,

@@ -331,7 +331,7 @@ struct istat_s blstats[2][MAXBLSTATS] = {
     { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 40,  0},	/*  7 BL_ALIGN */
     { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0},	/*  8 BL_SCORE */
     { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0},	/*  9 BL_CAP */
-    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 10,  0},	/* 10 BL_GOLD */
+    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 30,  0},	/* 10 BL_GOLD */
     { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
     { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
     { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 10,  0},	/* 13 BL_XP */
@@ -727,8 +727,9 @@ bot()
 	 * the rogue level.
 	 */
 
-	Sprintf(blstats[idx][BL_GOLD].val, "%c:%ld",
-			showsyms[COIN_CLASS + SYM_OFF_O],
+	Sprintf(blstats[idx][BL_GOLD].val,
+			"%s:%ld",
+			encglyph(objnum_to_glyph(GOLD_PIECE)),
 			blstats[idx][BL_GOLD].a.a_long);
 	valset[BL_GOLD] = TRUE;		/* indicate val already set */
 
@@ -1451,7 +1452,7 @@ genericptr_t ptr;
 	curs(WIN_STATUS, 1, 0);
 	putstr(WIN_STATUS, 0, newbot1);
 	curs(WIN_STATUS, 1, 1);
-	putstr(WIN_STATUS, 0, newbot2);
+	putmixed(WIN_STATUS, 0, newbot2);   /* putmixed() due to GOLD glyph */
 }
 
 #endif /*STATUS_VIA_WINDOWPORT*/

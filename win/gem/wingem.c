@@ -57,6 +57,7 @@ struct window_procs Gem_procs = {
     Gem_destroy_nhwindow,
     Gem_curs,
     Gem_putstr,
+    genl_putmixed,
     Gem_display_file,
     Gem_start_menu,
     Gem_add_menu,
