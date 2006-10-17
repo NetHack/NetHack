@@ -265,8 +265,8 @@ bot2()
 	if(hp < 0) hp = 0;
 	(void) describe_level(newbot2);
 	Sprintf(nb = eos(newbot2),
-		"%c:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d",
-		showsyms[COIN_CLASS + SYM_OFF_O],
+		"%s:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d",
+		encglyph(objnum_to_glyph(GOLD_PIECE)),
 #ifndef GOLDOBJ
 		u.ugold,
 #else
