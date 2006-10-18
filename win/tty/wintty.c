@@ -2067,7 +2067,7 @@ tty_putstr_core(window, attr, symstr)
 	n0 = strlen(str) + 1;
 #endif
 
-	ob = cw->data[cw->cury] = (nhwchar *)alloc(sizeof(nhwchar) * (unsigned)n0 + 1);
+	ob = cw->data[cw->cury] = (nhwchar *)alloc(sizeof(nhwchar) * ((unsigned)n0 + 1));
 	*ob++ = (nhwchar)(attr + 1);	/* avoid nuls, for convenience */
 #ifdef UNICODE_WIDEWINPORT
 	(void)nhwcpy(ob, symstr);
