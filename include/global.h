@@ -78,7 +78,7 @@ typedef xchar	boolean;		/* 0 or 1 */
 #if defined(UNICODE_DRAWING)
 typedef wchar_t nhsym;		/* nhsym is wide char */
 #else
-typedef char nhsym;
+typedef uchar nhsym;
 #endif
 
 #if defined(UNICODE_WIDEWINPORT)
