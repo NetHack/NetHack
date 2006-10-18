@@ -2651,6 +2651,8 @@ int which_set;
 						 break;
 					case  1: symset[which_set].rogue   = 1;
 						 break;
+					case  2: symset[which_set].unicode = 1;
+						 break;
 				    }
 				    break;	/* while loop */
 	    	        	    }

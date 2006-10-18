@@ -611,7 +611,8 @@ int in_sym;
 	cursor.Y = ttyDisplay->cury;
 	WriteConsoleOutputAttribute(hConOut,&attr,1,cursor,&acount);
 #ifdef UNICODE_DRAWING
-	if (symset[currentgraphics].name && iflags.unicodedisp)
+	if (symset[currentgraphics].name && 
+		symset[currentgraphics].unicode && iflags.unicodedisp)
 	    WriteConsoleOutputCharacterW(hConOut,(LPCWSTR)&in_sym,1,cursor,&ccount);
 	else
 #endif
