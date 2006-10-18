@@ -303,7 +303,7 @@ bot2()
 	if(cap > UNENCUMBERED)
 		Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
 	curs(WIN_STATUS, 1, 1);
-	putstr(WIN_STATUS, 0, newbot2);
+	putmixed(WIN_STATUS, 0, newbot2);
 }
 
 void
