@@ -186,7 +186,7 @@ CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h \
 		$(INCL)\system.h $(INCL)\unixconf.h $(INCL)\os2conf.h \
 		$(INCL)\micro.h $(INCL)\pcconf.h $(INCL)\tosconf.h \
 		$(INCL)\amiconf.h $(INCL)\macconf.h $(INCL)\beconf.h \
-		$(INCL)\ntconf.h $(INCL)\nhlan.h $(INCL)\wceconf.h
+		$(INCL)\ntconf.h $(INCL)\wceconf.h
 
 HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h \
 		$(INCL)\dungeon.h $(INCL)\monsym.h $(INCL)\mkroom.h \
@@ -632,8 +632,6 @@ $(DAT)\dungeon: $(UTIL)\makedefs.exe  $(DAT)\dungeon.def
 #	$(CC) $(CFLAGSU) -Fo$@  $(NTSYS)\winnt.c
 #$(O)ntsound.o: $(HACK_H) $(NTSYS)\ntsound.c
 #	$(CC) $(CFLAGSU)  -Fo$@ $(NTSYS)\ntsound.c
-#$(O)mapimail.o: $(HACK_H) $(INCL)\nhlan.h $(NTSYS)\mapimail.c
-#	$(CC) $(CFLAGSU) -DMAPI_VERBOSE  -Fo$@ $(NTSYS)\mapimail.c
 
 # 
 # util dependencies

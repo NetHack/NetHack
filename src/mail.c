@@ -38,7 +38,7 @@ STATIC_DCL void FDECL(newmail, (struct mail_info *));
 
 extern char *viz_rmin, *viz_rmax;	/* line-of-sight limits (vision.c) */
 
-# if !defined(UNIX) && !defined(VMS) && !defined(LAN_MAIL)
+# if !defined(UNIX) && !defined(VMS)
 int mustgetmail = -1;
 # endif
 
@@ -402,7 +402,7 @@ give_up:
 	pline("Hark!  \"%s.\"", info->display_txt);
 }
 
-# if !defined(UNIX) && !defined(VMS) && !defined(LAN_MAIL)
+# if !defined(UNIX) && !defined(VMS)
 
 void
 ckmailstatus()
@@ -445,7 +445,7 @@ struct obj *otmp;
 
 }
 
-# endif /* !UNIX && !VMS && !LAN_MAIL */
+# endif /* !UNIX && !VMS */
 
 # ifdef UNIX
 
@@ -568,46 +568,6 @@ struct obj *otmp;
 }
 
 # endif /* VMS */
-
-# ifdef LAN_MAIL
-
-void
-ckmailstatus()
-{
-	static int laststattime = 0;
-	
-	if(u.uswallow || !flags.biff
-#  ifdef MAILCKFREQ
-		    || moves < laststattime + MAILCKFREQ
-#  endif
-							)
-		return;
-
-	laststattime = moves;
-	if (lan_mail_check()) {
-		    static struct mail_info deliver = {
-#  ifndef NO_MAILREADER
-			MSG_MAIL, "I have some mail for you",
-#  else
-			/* suppress creation and delivery of scroll of mail */
-			MSG_OTHER, "You have some mail in the outside world",
-#  endif
-			0, 0
-		    };
-		    newmail(&deliver);
-	}
-}
-
-/*ARGSUSED*/
-void
-readmail(otmp)
-struct obj *otmp;
-{
-	lan_mail_read(otmp);
-}
-
-# endif /* LAN_MAIL */
-
 #endif /* MAIL */
 
 /*mail.c*/

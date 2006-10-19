@@ -410,7 +410,7 @@ DLBOBJ = $(O)dlb.o
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
 SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
-	   $(SOUND) 	$(O)mapimail.o $(O)nhlan.o
+	   $(SOUND) 	$(O)nhlan.o
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
@@ -439,7 +439,7 @@ CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h \
 		$(INCL)\system.h $(INCL)\unixconf.h $(INCL)\os2conf.h \
 		$(INCL)\micro.h $(INCL)\pcconf.h $(INCL)\tosconf.h \
 		$(INCL)\amiconf.h $(INCL)\macconf.h $(INCL)\beconf.h \
-		$(INCL)\ntconf.h $(INCL)\nhlan.h
+		$(INCL)\ntconf.h
 
 HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h $(INCL)\context.h \
 		$(INCL)\dungeon.h $(INCL)\monsym.h $(INCL)\mkroom.h \
@@ -1193,8 +1193,6 @@ $(O)winnt.o: $(HACK_H) $(INCL)\win32api.h $(NTSYS)\winnt.c
 	@$(CC) $(cflagsUtil) -Fo$@  $(NTSYS)\winnt.c
 $(O)ntsound.o: $(HACK_H) $(NTSYS)\ntsound.c
 	@$(CC) $(cflagsUtil)  -Fo$@ $(NTSYS)\ntsound.c
-$(O)mapimail.o: $(HACK_H) $(INCL)\nhlan.h $(NTSYS)\mapimail.c
-	@$(CC) $(cflagsUtil) -DMAPI_VERBOSE  -Fo$@ $(NTSYS)\mapimail.c
 
 # 
 # util dependencies

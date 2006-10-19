@@ -294,7 +294,7 @@ $(CONFIG_H) : $(INC)config.h $(INC)config1.h $(INC)tradstdc.h $(INC)global.h \
 		$(INC)unixconf.h $(INC)os2conf.h $(INC)micro.h \
 		$(INC)pcconf.h $(INC)tosconf.h $(INC)amiconf.h \
 		$(INC)macconf.h $(INC)beconf.h $(INC)wceconf.h \
-		$(INC)ntconf.h $(INC)nhlan.h
+		$(INC)ntconf.h
 	$(TOUCH) $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \

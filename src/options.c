@@ -2452,12 +2452,6 @@ goodfruit:
 			else if ((boolopt[i].addr) == &flags.invlet_constant) {
 			    if (flags.invlet_constant) reassign();
 			}
-#ifdef LAN_MAIL
-			else if ((boolopt[i].addr) == &flags.biff) {
-			    if (flags.biff) lan_mail_init();
-			    else lan_mail_finish();
-			}
-#endif
 			else if ((boolopt[i].addr) == &flags.lit_corridor) {
 			    /*
 			     * All corridor squares seen via night vision or

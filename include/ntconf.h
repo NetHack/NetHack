@@ -217,9 +217,6 @@ int  _RTLENTRY _EXPFUNC read  (int __handle, void _FAR *__buf, unsigned __len);
 
 #ifdef LAN_FEATURES
 #define MAX_LAN_USERNAME 20
-#define LAN_RO_PLAYGROUND	/* not implemented in 3.3.0 */
-#define LAN_SHARED_BONES	/* not implemented in 3.3.0 */
-#include "nhlan.h"
 #endif
 
 #ifndef alloca

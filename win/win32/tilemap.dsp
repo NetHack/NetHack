@@ -182,10 +182,6 @@ SOURCE=..\include\monsym.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\nhlan.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\ntconf.h
 # End Source File
 # Begin Source File

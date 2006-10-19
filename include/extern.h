@@ -1453,13 +1453,6 @@ E int FDECL(do_play_instrument, (struct obj *));
 #ifdef LAN_FEATURES
 E void NDECL(init_lan_features);
 E char *NDECL(lan_username);
-# ifdef LAN_MAIL
-E boolean NDECL(lan_mail_check);
-E void FDECL(lan_mail_read, (struct obj *));
-E void NDECL(lan_mail_init);
-E void NDECL(lan_mail_finish);
-E void NDECL(lan_mail_terminate);
-# endif
 #endif
 
 /* ### nttty.c ### */

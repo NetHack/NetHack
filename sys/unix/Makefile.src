@@ -556,7 +556,7 @@ $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/system.h ../include/unixconf.h ../include/os2conf.h \
 		../include/micro.h ../include/pcconf.h ../include/tosconf.h \
 		../include/amiconf.h ../include/macconf.h ../include/beconf.h \
-		../include/wceconf.h ../include/ntconf.h ../include/nhlan.h
+		../include/wceconf.h ../include/ntconf.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
