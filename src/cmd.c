@@ -2947,22 +2947,20 @@ wiz_port_debug()
  *   window port causing a buffer overflow there.
  */
 char
-yn_function(query,resp, def)
-const char *query,*resp;
+yn_function(query, resp, def)
+const char *query, *resp;
 char def;
 {
 	char qbuf[QBUFSZ];
-	unsigned truncspot, reduction = sizeof(" [N]  ?") + 1;
 
-	if (resp) reduction += strlen(resp) + sizeof(" () ");
-	if (strlen(query) < (QBUFSZ - reduction))
+	/* maximum acceptable length is QBUFSZ-1 */
+	if (strlen(query) < QBUFSZ)
 		return (*windowprocs.win_yn_function)(query, resp, def);
+
+	/* caller shouldn't have passed anything this long */
 	paniclog("Query truncated: ", query);
-	reduction += sizeof("...");
-	truncspot = QBUFSZ - reduction;
-	(void) strncpy(qbuf, query, (int)truncspot);
-	qbuf[truncspot] = '\0';
-	Strcat(qbuf,"...");
+	(void) strncpy(qbuf, query, QBUFSZ-1 - 3);
+	Strcpy(&qbuf[QBUFSZ-1 - 3], "...");
 	return (*windowprocs.win_yn_function)(qbuf, resp, def);
 }
 

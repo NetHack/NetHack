@@ -215,6 +215,7 @@ char yn_function(const char *ques, const char *choices, char default)
 		   returned, preserving case (upper or lower.) This means that
 		   if the calling function needs an exact match, it must handle
 		   user input correctness itself.
+		-- ques should not be more than QBUFSZ-1 characters long.
 getlin(const char *ques, char *input)
 		-- Prints ques as a prompt and reads a single line of text,
 		   up to a newline.  The string entered is returned without the
