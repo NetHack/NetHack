@@ -1669,7 +1669,7 @@ X11_yn_function(ques, choices, def)
     char def;
 {
     static Boolean need_to_init = True;
-    char buf[QBUFSZ];
+    char buf[BUFSZ];
     Arg args[4];
     Cardinal num_args;
 
@@ -1692,19 +1692,23 @@ X11_yn_function(ques, choices, def)
 	Strcpy(choicebuf, choices);	/* anything beyond <esc> is hidden */
 	if ((cb = index(choicebuf, '\033')) != 0) *cb = '\0';
 	/* ques [choices] (def) */
-	if ((int)(1 + strlen(ques) + 2 + strlen(choicebuf) + 4) >= QBUFSZ)
-	    panic("yn_function:  question too long");
-	Sprintf(buf, "%s [%s] ", ques, choicebuf);
-	if (def) Sprintf(eos(buf), "(%c) ", def);
+	if ((int)(1 + strlen(ques) + 2 + strlen(choicebuf) + 4) >= BUFSZ)
+	    panic("X11_yn_function:  question too long");
+	(void)strncpy(buf, ques, QBUFSZ-1);
+	buf[QBUFSZ-1] = '\0';
+	Sprintf(eos(buf), " [%s]", choicebuf);
+	if (def) Sprintf(eos(buf), " (%c)", def);
+	Strcat(buf, " ");
 
 	/* escape maps to 'q' or 'n' or default, in that order */
 	yn_esc_map = (index(choices, 'q') ? 'q' :
 		     (index(choices, 'n') ? 'n' :
 					    def));
     } else {
-	if ((int)(1 + strlen(ques)) >= QBUFSZ)
-	    panic("yn_function:  question too long");
+	if ((int)(1 + strlen(ques) + 1) >= BUFSZ)
+	    panic("X11_yn_function:  question too long");
 	Strcpy(buf, ques);
+	Strcat(buf, " ");
     }
 
     if (!appResources.slow && need_to_init) {

@@ -425,9 +425,9 @@ char def;
 	boolean digit_ok, allow_num;
 	struct WinDesc *cw = wins[WIN_MESSAGE];
 	boolean doprev = 0;
-	char prompt[QBUFSZ];
+	char prompt[BUFSZ];
 #ifdef UNICODE_WIDEWINPORT
-	nhwchar wprompt[QBUFSZ];
+	nhwchar wprompt[BUFSZ];
 #endif
 
 	if(ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP)) more();
@@ -441,8 +441,13 @@ char def;
 	    Strcpy(respbuf, resp);
 	    /* any acceptable responses that follow <esc> aren't displayed */
 	    if ((rb = index(respbuf, '\033')) != 0) *rb = '\0';
-	    Sprintf(prompt, "%s [%s] ", query, respbuf);
-	    if (def) Sprintf(eos(prompt), "(%c) ", def);
+	    (void)strncpy(prompt, query, QBUFSZ-1);
+	    prompt[QBUFSZ-1] = '\0';
+	    Sprintf(eos(prompt), " [%s]", respbuf);
+	    if (def) Sprintf(eos(prompt), " (%c)", def);
+	    /* not pline("%s ", prompt);
+	       trailing space is wanted here in case of reprompt */
+	    Strcat(prompt, " ");
 	    pline("%s", prompt);
 	} else {
 	    pline("%s ", query);

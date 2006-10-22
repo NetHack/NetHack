@@ -1094,7 +1094,7 @@ char def;
 	register char q;
 	char rtmp[40];
 	boolean digit_ok, allow_num;
-	char prompt[QBUFSZ];
+	char prompt[BUFSZ];
 	register struct amii_WinDesc *cw;
 
 	if( cw = amii_wins[ WIN_MESSAGE ] )
@@ -1102,13 +1102,16 @@ char def;
 	if (resp) {
 	    char *rb, respbuf[QBUFSZ];
 
-  	    allow_num = (index(resp, '#') != 0);
+	    allow_num = (index(resp, '#') != 0);
 	    Strcpy(respbuf, resp);
 	    /* any acceptable responses that follow <esc> aren't displayed */
 	    if ((rb = index(respbuf, '\033')) != 0) *rb = '\0';
-	    Sprintf(prompt, "%s [%s] ", query, respbuf);
-	    if (def) Sprintf(eos(prompt), "(%c) ", def);
-  	    pline("%s", prompt);
+	    (void)strncpy(prompt, query, QBUFSZ-1);
+	    prompt[QBUFSZ-1] = '\0';
+	    Sprintf(eos(prompt), " [%s]", respbuf);
+	    if (def) Sprintf(eos(prompt), " (%c)", def);
+	    Strcat(prompt, " ");
+	    pline("%s", prompt);
 	} else {
 	    amii_putstr(WIN_MESSAGE, 0, query);
 	    cursor_on(WIN_MESSAGE);

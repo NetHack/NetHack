@@ -1392,8 +1392,11 @@ char mswin_yn_function(const char *question, const char *choices,
 			/* anything beyond <esc> is hidden */
 			*cb = '\0';
 		}
-		sprintf(message, "%s [%s] ", question, choicebuf);
-		if (def) sprintf(eos(message), "(%c) ", def);
+		(void)strncpy(message, question, QBUFSZ-1);
+		message[QBUFSZ-1] = '\0';
+		sprintf(eos(message), " [%s]", choicebuf);
+		if (def) sprintf(eos(message), " (%c)", def);
+		Strcat(message, " ");
 		/* escape maps to 'q' or 'n' or default, in that order */
 		yn_esc_map = (index(choices, 'q') ? 'q' :
 			 (index(choices, 'n') ? 'n' : def));
