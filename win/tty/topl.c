@@ -559,7 +559,7 @@ char def;
 	if (q != '#') {
 		Sprintf(rtmp, "%c", q);
 #ifdef UNICODE_WIDEWINPORT
-		nhwstrcpy(wprompt, rtmp);   /* rtmp[40] -> wprompt[128] ok */
+		nhwstrcpy(wprompt, rtmp);   /* rtmp[40] -> wprompt[256] ok */
 		addtopl(wprompt);
 #else
 		addtopl(rtmp);
