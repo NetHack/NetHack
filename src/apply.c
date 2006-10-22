@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2006/07/08 	*/
+/*	SCCS Id: @(#)apply.c	3.5	2006/10/21 	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -409,7 +409,8 @@ struct obj *obj;
 		    Underwater ? "very " : "");
 		wake_nearby();
 	} else {
-		int pet_cnt = 0;
+		int pet_cnt = 0, omx, omy;
+
 		/* it's magic!  it works underwater too (at a higher pitch) */
 		You(whistle_str, Hallucination ? "normal" :
 		    Underwater ? "strange, high-pitched" : "strange");
@@ -422,9 +423,16 @@ struct obj *obj;
 			    mtmp->mtrapped = 0;
 			    fill_pit(mtmp->mx, mtmp->my);
 			}
+			/* mimic must be revealed before we know whether it
+			   actually moves because line-of-sight may change */
+			if (mtmp->m_ap_type) seemimic(mtmp);
+			omx = mtmp->mx, omy = mtmp->my;
 			mnexto(mtmp);
-			if (canspotmon(mtmp)) ++pet_cnt;
-			if (mintrap(mtmp) == 2) change_luck(-1);
+			if (mtmp->mx != omx || mtmp->my != omy) {
+			    mtmp->mundetected = 0; /* reveal non-mimic hider */
+			    if (canspotmon(mtmp)) ++pet_cnt;
+			    if (mintrap(mtmp) == 2) change_luck(-1);
+			}
 		    }
 		}
 		if (pet_cnt > 0) makeknown(obj->otyp);
