@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2006/09/06	*/
+/*	SCCS Id: @(#)mon.c	3.5	2006/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1297,7 +1297,7 @@ register struct monst *mtmp, *mtmp2;
     mtmp->minvent = 0;
 
     /* remove the old monster from the map and from `fmon' list */
-    relmon(mtmp);
+    relmon(mtmp, (struct monst **)0);
 
     /* finish adding its replacement */
 #ifdef STEED
@@ -1326,22 +1326,48 @@ register struct monst *mtmp, *mtmp2;
     dealloc_monst(mtmp);
 }
 
-/* release mon from display and monster list */
+/* release mon from the display and the map's monster list,
+   maybe transfer it to one of the other monster lists */
 void
-relmon(mon)
+relmon(mon, monst_list)
 register struct monst *mon;
+struct monst **monst_list;	/* &migrating_mons or &mydogs or null */
 {
 	register struct monst *mtmp;
+	boolean unhide = (monst_list != 0);
+	int mx = mon->mx, my = mon->my;
 
-	if (fmon == (struct monst *)0)  panic ("relmon: no fmon available.");
+	if (!fmon) panic("relmon: no fmon available.");
 
-	remove_monster(mon->mx, mon->my);
+	if (unhide) {
+	    /* can't remain hidden across level changes (exception: wizard
+	       clone can continue imitating some other monster form); also,
+	       might be imitating a boulder so need line-of-sight unblocking */
+	    mon->mundetected = 0;
+	    if (mon->m_ap_type && mon->m_ap_type != M_AP_MONSTER)
+		seemimic(mon);
+	}
 
-	if(mon == fmon) fmon = fmon->nmon;
-	else {
-		for(mtmp = fmon; mtmp && mtmp->nmon != mon; mtmp = mtmp->nmon) ;
-		if(mtmp)    mtmp->nmon = mon->nmon;
-		else	    panic("relmon: mon not in list.");
+	remove_monster(mx, my);
+
+	if (mon == fmon) {
+	    fmon = fmon->nmon;
+	} else {
+	    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+		if (mtmp->nmon == mon) break;
+
+	    if (mtmp) mtmp->nmon = mon->nmon;
+	    else panic("relmon: mon not in list.");
+	}
+
+	if (unhide) {
+	    newsym(mx, my);
+	    /* insert into mydogs or migrating_mons */
+	    mon->nmon = *monst_list;
+	    *monst_list = mon;
+	} else {
+	    /* orphan has no next monster */
+	    mon->nmon = 0;
 	}
 }
 

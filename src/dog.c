@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.5	2006/06/11	*/
+/*	SCCS Id: @(#)dog.c	3.5	2006/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -604,13 +604,10 @@ boolean pets_only;	/* true for ascension or final escape */
 		    obj->no_charge = 0;
 		}
 
-		relmon(mtmp);
-		newsym(mtmp->mx,mtmp->my);
+		relmon(mtmp, &mydogs);	/* move it from map to mydogs */
 		mtmp->mx = mtmp->my = 0; /* avoid mnexto()/MON_AT() problem */
 		mtmp->wormno = num_segs;
 		mtmp->mlstmv = monstermoves;
-		mtmp->nmon = mydogs;
-		mydogs = mtmp;
 	    } else if (mtmp->iswiz) {
 		/* we want to be able to find him when his next resurrection
 		   chance comes up, but have him resume his present location
@@ -660,10 +657,7 @@ migrate_to_level(mtmp, tolev, xyloc, cc)
 		mtmp->mtame--;
 		m_unleash(mtmp, TRUE);
 	}
-	relmon(mtmp);
-	mtmp->nmon = migrating_mons;
-	migrating_mons = mtmp;
-	newsym(mtmp->mx,mtmp->my);
+	relmon(mtmp, &migrating_mons); /* move it from map to migrating_mons */
 
 	new_lev.dnum = ledger_to_dnum((xchar)tolev);
 	new_lev.dlevel = ledger_to_dlev((xchar)tolev);
