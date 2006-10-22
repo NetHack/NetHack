@@ -763,9 +763,9 @@ const nhwchar *src;
 }
 
 int
-nhwcmp(s1, s2)	/* case insensitive counted string comparison */
+nhwcmp(s1, s2)	/* case sensitive counted comparison */
 register const nhwchar *s1, *s2;
-{					/*{ aka strncasecmp }*/
+{
     register nhwchar t1, t2;
 
     for (;;) {
@@ -799,7 +799,7 @@ int
 nhwstrcmp(s1, s2)
 register const nhwchar *s1;
 const char *s2;
-{					/*{ aka strncasecmp }*/
+{
     register nhwchar t1, t2;
 
     for (;;) {
