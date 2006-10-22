@@ -763,7 +763,7 @@ const nhwchar *src;
 }
 
 int
-nhwcmp(s1, s2)	/* case sensitive counted comparison */
+nhwcmp(s1, s2)	/* case sensitive comparison */
 register const nhwchar *s1, *s2;
 {
     register nhwchar t1, t2;
