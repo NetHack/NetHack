@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2006/10/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -580,9 +580,9 @@ menu_pickup:
 
 		if (!all_of_a_type) {
 		    char qbuf[BUFSZ];
-		    Sprintf(qbuf, "Pick up %s?",
-			safe_qbuf("", sizeof("Pick up ?"), doname(obj),
-					an(simple_typename(obj->otyp)), "something"));
+
+		    (void)safe_qbuf(qbuf, "Pick up ", "?",
+				    obj, doname, ansimpleoname, something);
 		    switch ((obj->quan < 2L) ? ynaq(qbuf) : ynNaq(qbuf)) {
 		    case 'q': goto end_query;	/* out 2 levels */
 		    case 'n': continue;
@@ -1219,9 +1219,9 @@ boolean telekinesis;
 			(next_encumbr > MOD_ENCUMBER) ? nearloadmsg :
 			moderateloadmsg);
 		if (container) (void) strsubst(qbuf,"lifting","removing");
-		Sprintf(eos(qbuf), " %s. Continue?",
-			safe_qbuf(qbuf, sizeof(" . Continue?"),
-				doname(obj), an(simple_typename(obj->otyp)), "something"));
+		Strcat(qbuf, " ");
+		(void)safe_qbuf(qbuf, qbuf, ".  Continue?",
+				obj, doname, ansimpleoname, something);
 		obj->quan = savequan;
 		switch (ynq(qbuf)) {
 		case 'q':  result = -1; break;
@@ -1236,32 +1236,6 @@ boolean telekinesis;
     if (obj->otyp == SCR_SCARE_MONSTER && result <= 0 && !container)
 	obj->spe = 0;
     return result;
-}
-
-/* To prevent qbuf overflow in prompts use planA only
- * if it fits, or planB if PlanA doesn't fit,
- * finally using the fallback as a last resort.
- * last_restort is expected to be very short.
- */
-const char *
-safe_qbuf(qbuf, padlength, planA, planB, last_resort)
-const char *qbuf, *planA, *planB, *last_resort;
-unsigned padlength;
-{
-	/* convert size_t (or int for ancient systems) to ordinary unsigned */
-	unsigned len_qbuf = (unsigned)strlen(qbuf),
-	         len_planA = (unsigned)strlen(planA),
-	         len_planB = (unsigned)strlen(planB),
-	         len_lastR = (unsigned)strlen(last_resort);
-	unsigned textleft = QBUFSZ - (len_qbuf + padlength);
-
-	if (len_lastR >= textleft) {
-	    impossible("safe_qbuf: last_resort too large at %u characters.",
-		       len_lastR);
-	    return "";
-	}
-	return (len_planA < textleft) ? planA :
-		    (len_planB < textleft) ? planB : last_resort;
 }
 
 /*
@@ -1566,11 +1540,8 @@ lootcont:
 	    nobj = cobj->nexthere;
 
 	    if (Is_container(cobj)) {
-		Sprintf(qbuf, "There is %s here, loot it?",
-			safe_qbuf("", sizeof("There is  here, loot it?"),
-			     doname(cobj), an(simple_typename(cobj->otyp)),
-			     "a container"));
-		c = ynq(qbuf);
+		c = ynq(safe_qbuf(qbuf, "There is ", " here, loot it?",
+				  cobj, doname, ansimpleoname, "a container"));
 		if (c == 'q') return (timepassed);
 		if (c == 'n') continue;
 		any = TRUE;
@@ -2155,9 +2126,8 @@ int held;
 	}
 
 	if (cnt || flags.menu_style == MENU_FULL) {
-	    Strcpy(qbuf, "Do you want to take something out of ");
-	    Sprintf(eos(qbuf), "%s?",
-		    safe_qbuf(qbuf, 1, yname(obj), ysimple_name(obj), "it"));
+	    (void)safe_qbuf(qbuf, "Do you want to take something out of ", "?",
+			    obj, yname, ysimple_name, "it");
 	    if (flags.menu_style != MENU_TRADITIONAL) {
 		if (flags.menu_style == MENU_FULL) {
 		    int t;

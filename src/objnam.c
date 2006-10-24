@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2006/05/08	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2006/10/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,6 +12,7 @@
 STATIC_DCL char *FDECL(strprepend,(char *,const char *));
 STATIC_DCL boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
 STATIC_DCL char *NDECL(nextobuf);
+STATIC_DCL void FDECL(releaseobuf, (char *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
 
 struct Jitem {
@@ -62,14 +63,25 @@ register const char *pref;
 }
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
+static char NEARDATA obufs[NUMOBUF][BUFSZ];
+static int obufidx = 0;
+
 STATIC_OVL char *
 nextobuf()
 {
-	static char NEARDATA bufs[NUMOBUF][BUFSZ];
-	static int bufidx = 0;
+	obufidx = (obufidx + 1) % NUMOBUF;
+	return obufs[obufidx];
+}
 
-	bufidx = (bufidx + 1) % NUMOBUF;
-	return bufs[bufidx];
+/* put the most recently allocated buffer back if possible */
+STATIC_OVL void
+releaseobuf(bufp)
+char *bufp;
+{
+	/* caller may not know whether bufp is the most recently allocated
+	   buffer; if it isn't, do nothing */
+	if (bufp == obufs[obufidx])
+	    obufidx = (obufidx - 1 + NUMOBUF) % NUMOBUF;
 }
 
 char *
@@ -1030,6 +1042,82 @@ struct obj *obj;
     return buf;
 }
 
+/* xname,doname,&c with long results reformatted to omit some stuff */
+char *
+short_oname(obj, func, altfunc, lenlimit)
+struct obj *obj;
+char *FDECL((*func), (OBJ_P)),		/* main formatting routine */
+     *FDECL((*altfunc), (OBJ_P));	/* alternate for shortest result */
+unsigned lenlimit;
+{
+    struct obj save_obj;
+    char unamebuf[12], onamebuf[12],
+	 *save_oname, *save_uname, *outbuf;
+
+    outbuf = (*func)(obj);
+    if ((unsigned)strlen(outbuf) <= lenlimit) return outbuf;
+
+    /* shorten called string to fairly small amount */
+    save_uname = objects[obj->otyp].oc_uname;
+    if (save_uname && strlen(save_uname) >= sizeof unamebuf) {
+	(void) strncpy(unamebuf, save_uname, sizeof unamebuf - 4);
+	Strcpy(unamebuf + sizeof unamebuf - 4, "...");
+	objects[obj->otyp].oc_uname = unamebuf;
+	releaseobuf(outbuf);
+	outbuf = (*func)(obj);
+	objects[obj->otyp].oc_uname = save_uname;   /* restore called string */
+	if ((unsigned)strlen(outbuf) <= lenlimit) return outbuf;
+    }
+
+    /* shorten named string to fairly small amount */
+    save_oname = has_oname(obj) ? ONAME(obj) : 0;
+    if (save_oname && strlen(save_oname) >= sizeof onamebuf) {
+	(void) strncpy(onamebuf, save_oname, sizeof onamebuf - 4);
+	Strcpy(onamebuf + sizeof onamebuf - 4, "...");
+	ONAME(obj) = onamebuf;
+	releaseobuf(outbuf);
+	outbuf = (*func)(obj);
+	ONAME(obj) = save_oname;		    /* restore named string */
+	if ((unsigned)strlen(outbuf) <= lenlimit) return outbuf;
+    }
+
+    /* shorten both called and named strings;
+       unamebuf and onamebuf have both already been populated */
+    if (save_uname && strlen(save_uname) >= sizeof unamebuf &&
+	    save_oname && strlen(save_oname) >= sizeof onamebuf) {
+	objects[obj->otyp].oc_uname = unamebuf;
+	ONAME(obj) = onamebuf;
+	releaseobuf(outbuf);
+	outbuf = (*func)(obj);
+	if ((unsigned)strlen(outbuf) <= lenlimit) {
+	    objects[obj->otyp].oc_uname = save_uname;
+	    ONAME(obj) = save_oname;
+	    return outbuf;
+	}
+    }
+
+    /* still long; strip several name-lengthening attributes;
+       called and named strings are still in truncated form */
+    save_obj = *obj;
+    obj->bknown = obj->rknown = obj->greased = 0;
+    obj->oeroded = obj->oeroded2 = 0;
+    releaseobuf(outbuf);
+    outbuf = (*func)(obj);
+    if (altfunc && (unsigned)strlen(outbuf) > lenlimit) {
+	/* still long; use the alternate function (usually one of
+	   the jackets around simple_typename()) */
+	releaseobuf(outbuf);
+	outbuf = (*altfunc)(obj);
+    }
+    /* restore the object */
+    *obj = save_obj;
+    if (save_oname) ONAME(obj) = save_oname;
+    if (save_uname) objects[obj->otyp].oc_uname = save_uname;
+
+    /* use whatever we've got, whether it's too long or not */
+    return outbuf;
+}
+
 /*
  * Used if only one of a collection of objects is named (e.g. in eat.c).
  */
@@ -1411,6 +1499,48 @@ struct obj *obj;
 
 	*s = highc(*s);
 	return s;
+}
+
+/* "scroll" or "scrolls" */
+char *
+simpleonames(obj)
+struct obj *obj;
+{
+	char *simpleoname = simple_typename(obj->otyp);
+
+	if (obj->quan != 1L) simpleoname = makeplural(simpleoname);
+	return simpleoname;
+}
+
+/* "a scroll" or "scrolls"; "a silver bell" or "the Bell of Opening" */
+char *
+ansimpleoname(obj)
+struct obj *obj;
+{
+	char *simpleoname = simpleonames(obj);
+	int otyp = obj->otyp;
+
+	/* prefix with "the" if a unique item, or a fake one imitating same,
+	   has been formatted with its actual name (we let typename() handle
+	   any `known' and `dknown' checking necessary) */
+	if (otyp == FAKE_AMULET_OF_YENDOR) otyp = AMULET_OF_YENDOR;
+	if (objects[otyp].oc_unique &&
+		!strcmp(simpleoname, OBJ_NAME(objects[otyp])))
+	    return the(simpleoname);
+
+	/* simpleoname is singular if quan==1, plural otherwise */
+	if (obj->quan == 1L) simpleoname = an(simpleoname);
+	return simpleoname;
+}
+
+/* "the scroll" or "the scrolls" */
+char *
+thesimpleoname(obj)
+struct obj *obj;
+{
+	char *simpleoname = simpleonames(obj);
+
+	return the(simpleoname);
 }
 
 char *
@@ -3036,6 +3166,86 @@ struct monst *mtmp;
 		return obj_descr[idx].oc_name;
 	}
 	return "whatcha-may-callit";
+}
+
+/*
+ * Construct a query prompt string, based around an object name, which is
+ * guaranteed to fit within [QBUFSZ].  Takes an optional prefix, three
+ * choices for filling in the middle (two object formatting functions and a
+ * last resort literal which should be very short), and an optional suffix.
+ */
+char *
+safe_qbuf(qbuf, qprefix, qsuffix, obj, func, altfunc, lastR)
+char *qbuf;		/* output buffer */
+const char *qprefix, *qsuffix;
+struct obj *obj;
+char *FDECL((*func), (OBJ_P)), *FDECL((*altfunc), (OBJ_P));
+const char *lastR;
+{
+    char *bufp, *endp;
+    /* convert size_t (or int for ancient systems) to ordinary unsigned */
+    unsigned len, lenlimit,
+	     len_qpfx = (unsigned)(qprefix ? strlen(qprefix) : 0),
+	     len_qsfx = (unsigned)(qsuffix ? strlen(qsuffix) : 0),
+	     len_lastR = (unsigned)strlen(lastR);
+
+    lenlimit = QBUFSZ - 1;
+    endp = qbuf + lenlimit;
+    /* sanity check, aimed mainly at paniclog (it's conceivable for
+       the result of short_oname() to be shorter than the length of
+       the last resort string, but we ignore that possibility here) */
+    if (len_qpfx > lenlimit)
+	impossible("safe_qbuf: prefix too long (%u characters).",
+		   len_qpfx);
+    else if (len_qpfx + len_qsfx > lenlimit)
+	impossible("safe_qbuf: suffix too long (%u + %u characters).",
+		   len_qpfx, len_qsfx);
+    else if (len_qpfx + len_lastR + len_qsfx > lenlimit)
+	impossible("safe_qbuf: filler too long (%u + %u + %u characters).",
+		   len_qpfx, len_lastR, len_qsfx);
+
+    /* the output buffer might be the same as the prefix if caller
+       has already partially filled it */
+    if (qbuf == qprefix) {
+	/* prefix is already in the buffer */
+	*endp = '\0';
+    } else if (qprefix) {
+	/* put prefix into the buffer */
+	(void)strncpy(qbuf, qprefix, lenlimit);
+	*endp = '\0';
+    } else {
+	/* no prefix; output buffer starts out empty */
+	qbuf[0] = '\0';
+    }
+    len = (unsigned)strlen(qbuf);
+
+    if (len + len_lastR + len_qsfx > lenlimit) {
+	/* too long; skip formatting, last resort output is truncated */
+	if (len < lenlimit) {
+	    (void)strncpy(&qbuf[len], lastR, lenlimit - len);
+	    *endp = '\0';
+	    len = (unsigned)strlen(qbuf);
+	    if (qsuffix && len < lenlimit) {
+		(void)strncpy(&qbuf[len], qsuffix, lenlimit - len);
+		*endp = '\0';
+	     /* len = (unsigned)strlen(qbuf); */
+	    }
+	}
+    } else {
+	/* suffix and last resort are guaranteed to fit */
+	len += len_qsfx;	/* include the pending suffix */
+	/* format the object */
+	bufp = short_oname(obj, func, altfunc, lenlimit - len);
+	if (len + strlen(bufp) <= lenlimit)
+	    Strcat(qbuf, bufp);		/* formatted name fits */
+	else
+	    Strcat(qbuf, lastR);	/* use last resort */
+	releaseobuf(bufp);
+
+	if (qsuffix) Strcat(qbuf, qsuffix);
+    }
+ /* assert( strlen(qbuf) < QBUFSZ ); */
+    return qbuf;
 }
 
 /*objnam.c*/

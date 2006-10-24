@@ -3818,9 +3818,9 @@ boolean force;
 	if(!u.dx && !u.dy) {
 	    for(otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
 		if(Is_box(otmp)) {
-		    Sprintf(qbuf, "There is %s here. Check it for traps?",
-			safe_qbuf("", sizeof("There is  here. Check it for traps?"),
-				doname(otmp), an(simple_typename(otmp->otyp)), "a box"));
+		    (void)safe_qbuf(qbuf, "There is ",
+				    " here.  Check it for traps?",
+				    otmp, doname, ansimpleoname, "a box");
 		    switch (ynq(qbuf)) {
 			case 'q': return(0);
 			case 'n': continue;

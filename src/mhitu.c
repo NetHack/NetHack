@@ -2170,9 +2170,9 @@ register struct monst *mon;
 		    if (uarmg) continue;    /* next ring might not be worn */
 		}
 		if (rn2(20) < ACURR(A_CHA)) {
-		    Sprintf(qbuf, "\"That %s looks pretty.  May I have it?\"",
-			safe_qbuf("",sizeof("\"That  looks pretty.  May I have it?\""),
-			xname(ring), simple_typename(ring->otyp), "ring"));
+		    (void)safe_qbuf(qbuf, "\"That ",
+				    " looks pretty.  May I have it?\"",
+				    ring, xname, simpleonames, "ring");
 		    makeknown(RIN_ADORNMENT);
 		    if (yn(qbuf) == 'n') continue;
 		} else pline("%s decides she'd like %s, and takes it.",
@@ -2195,10 +2195,9 @@ register struct monst *mon;
 		    if (uarmg) break;	/* no point trying further rings */
 		}
 		if (rn2(20) < ACURR(A_CHA)) {
-		    Sprintf(qbuf,"\"That %s looks pretty.  Would you wear it for me?\"",
-			safe_qbuf("",
-			    sizeof("\"That  looks pretty.  Would you wear it for me?\""),
-			    xname(ring), simple_typename(ring->otyp), "ring"));
+		    (void)safe_qbuf(qbuf, "\"That ",
+				 " looks pretty.  Would you wear it for me?\"",
+				    ring, xname, simpleonames, "ring");
 		    makeknown(RIN_ADORNMENT);
 		    if (yn(qbuf) == 'n') continue;
 		} else {

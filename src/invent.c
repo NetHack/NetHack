@@ -17,6 +17,8 @@ STATIC_DCL boolean FDECL(taking_off, (const char *));
 STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
 STATIC_PTR int FDECL(ckvalidcat,(struct obj *));
+STATIC_PTR char *FDECL(safeq_xprname, (struct obj *));
+STATIC_PTR char *FDECL(safeq_shortxprname, (struct obj *));
 STATIC_DCL char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
 STATIC_DCL char FDECL(display_used_invlets, (CHAR_P));
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
@@ -1162,6 +1164,32 @@ register struct obj *otmp;
 			W_WEP | W_SWAPWEP | W_QUIVER))));
 }
 
+/* extra xprname() input that askchain() can't pass through safe_qbuf() */
+STATIC_VAR struct xprnctx {
+    char let;
+    boolean dot;
+} safeq_xprn_ctx;
+
+/* safe_qbuf() -> short_oname() callback */
+STATIC_PTR char *
+safeq_xprname(obj)
+struct obj *obj;
+{
+    return xprname(obj, (char *)0,
+		   safeq_xprn_ctx.let, safeq_xprn_ctx.dot,
+		   0L, 0L);
+}
+
+/* alternate safe_qbuf() -> short_oname() callback */
+STATIC_PTR char *
+safeq_shortxprname(obj)
+struct obj *obj;
+{
+    return xprname(obj, ansimpleoname(obj),
+		   safeq_xprn_ctx.let, safeq_xprn_ctx.dot,
+		   0L, 0L);
+}
+
 static NEARDATA const char removeables[] =
 	{ ARMOR_CLASS, WEAPON_CLASS, RING_CLASS, AMULET_CLASS, TOOL_CLASS, 0 };
 
@@ -1396,20 +1424,16 @@ nextclass:
 		if (ident && !not_fully_identified(otmp)) continue;
 		if (ckfn && !(*ckfn)(otmp)) continue;
 		if (!allflag) {
-		    Strcpy(qbuf, !ininv ? doname(otmp) :
-			   xprname(otmp, (char *)0, ilet, !nodot, 0L, 0L));
-		    /* this code seemed too complex to use safe_qbuf */
-		    if (strlen(qbuf) > QBUFSZ - 20) {
-			Strcpy(qbuf,
-			       !ininv ? an(simple_typename(otmp->otyp)) :
-			       xprname(otmp, simple_typename(otmp->otyp),
-				       ilet, !nodot, 0L, 0L));
-		    }
-		    Strcat(qbuf, "?");
+		    safeq_xprn_ctx.let = ilet;
+		    safeq_xprn_ctx.dot = !nodot;
+		    (void)safe_qbuf(qbuf, (char *)0, "?",
+				    otmp, ininv ? safeq_xprname : doname,
+				    ininv ? safeq_shortxprname : ansimpleoname,
+				    "item");
 		    sym = (takeoff || ident || otmp->quan < 2L) ?
 				nyaq(qbuf) : nyNaq(qbuf);
-		}
-		else	sym = 'y';
+		} else
+		    sym = 'y';
 
 		otmpo = otmp;
 		if (sym == '#') {
@@ -3045,9 +3069,8 @@ register struct obj *obj;
 	int n;
 	menu_item *selected = 0;
 
-	Sprintf(qbuf,"Contents of %s:",
-		safe_qbuf("", sizeof("Contents of :"),
-			  doname(obj), simple_typename(obj->otyp), ""));
+	(void)safe_qbuf(qbuf, "Contents of ", ":",
+			obj, doname, ansimpleoname, "that");
 
 	if (obj->cobj) {
 	    n = query_objlist(qbuf, obj->cobj, INVORDER_SORT, &selected,

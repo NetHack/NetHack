@@ -271,6 +271,7 @@ pick_lock(pick) /* pick a lock with a given object */
 	if(!get_adjacent_loc((char *)0, "Invalid location!", u.ux, u.uy, &cc)) return 0;
 	if (cc.x == u.ux && cc.y == u.uy) {	/* pick lock on a container */
 	    const char *verb;
+	    char qsfx[QBUFSZ];
 	    boolean it;
 	    int count;
 
@@ -300,10 +301,12 @@ pick_lock(pick) /* pick a lock with a given object */
 		    else if (!otmp->olocked) verb = "lock", it = 1;
 		    else if (picktyp != LOCK_PICK) verb = "unlock", it = 1;
 		    else verb = "pick";
-		    Sprintf(qbuf, "There is %s here, %s %s?",
-		    	    safe_qbuf("", sizeof("There is  here, unlock its lock?"),
-			    	doname(otmp), an(simple_typename(otmp->otyp)), "a box"),
+
+		    /* "There is <a box> here; <verb> <it|its lock>?" */
+		    Sprintf(qsfx, " here; %s %s?",
 			    verb, it ? "it" : "its lock");
+		    (void)safe_qbuf(qbuf, "There is ", qsfx,
+				    otmp, doname, ansimpleoname, "a box");
 		    otmp->lknown = 1;
 
 		    c = ynq(qbuf);
@@ -397,8 +400,8 @@ pick_lock(pick) /* pick a lock with a given object */
 		    }
 #endif
 
-		    Sprintf(qbuf,"%sock it?",
-			(door->doormask & D_LOCKED) ? "Unl" : "L" );
+		    Sprintf(qbuf,"%s it?",
+			    (door->doormask & D_LOCKED) ? "Unlock" : "Lock");
 
 		    c = yn(qbuf);
 		    if(c == 'n') return(0);
@@ -466,10 +469,8 @@ doforce()		/* try to force a chest with your weapon */
 		    otmp->lknown = 1;
 		    continue;
 		}
-		Sprintf(qbuf,"There is %s here, force its lock?",
-			safe_qbuf("", sizeof("There is  here, force its lock?"),
-				doname(otmp), an(simple_typename(otmp->otyp)),
-				"a box"));
+		(void)safe_qbuf(qbuf, "There is ", " here; force its lock?",
+				otmp, doname, ansimpleoname, "a box");
 		otmp->lknown = 1;
 
 		c = ynq(qbuf);

@@ -2813,12 +2813,16 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 		(otmp->otyp==CORPSE && (corpsecheck == 1 || tinnable(otmp))) :
 		    feeding ? (otmp->oclass != COIN_CLASS && is_edible(otmp)) :
 						otmp->oclass==FOOD_CLASS) {
+		char qsfx[QBUFSZ];
+		boolean one = (otmp->quan == 1L);
+
+		/* "There is <an object> here; <verb> it?" or
+		   "There are <N objects> here; <verb> one?" */
 		Sprintf(qbuf, "There %s ", otense(otmp, "are"));
-		Sprintf(eos(qbuf), "%s here; %s %s?",
-			safe_qbuf(qbuf, sizeof(" here;  ...?") + strlen(verb),
-				  doname(otmp), simple_typename(otmp->otyp),
-				  "something"),
-			verb, (otmp->quan == 1L) ? "it" : "one");
+		Sprintf(qsfx, " here; %s %s?", verb, one ? "it" : "one");
+		(void)safe_qbuf(qbuf, qbuf, qsfx,
+				otmp, doname, ansimpleoname,
+				one ? something : (const char *)"things");
 		if ((c = yn_function(qbuf,ynqchars,'n')) == 'y')
 		    return(otmp);
 		else if (c == 'q')

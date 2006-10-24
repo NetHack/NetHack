@@ -1014,7 +1014,7 @@ struct obj **optr;
 	register struct obj *obj = *optr;
 	register struct obj *otmp;
 	const char *s = (obj->quan != 1) ? "candles" : "candle";
-	char qbuf[QBUFSZ];
+	char qbuf[QBUFSZ], qsfx[QBUFSZ], *q;
 
 	if(u.uswallow) {
 		You(no_elbow_room);
@@ -1031,13 +1031,16 @@ struct obj **optr;
 		return;
 	}
 
-	Sprintf(qbuf, "Attach %s", the(xname(obj)));
-	Sprintf(eos(qbuf), " to %s?",
-		safe_qbuf(qbuf, sizeof(" to ?"), the(xname(otmp)),
-			the(simple_typename(otmp->otyp)), "it"));
-	if(yn(qbuf) == 'n') {
-		if (!obj->lamplit)
-		    You("try to light %s...", the(xname(obj)));
+	/* first, minimal candelabrum suffix for formatting candles */
+	Sprintf(qsfx, " to\033%s?", thesimpleoname(otmp));
+	/* next, format the candles as a prefix for the candelabrum */
+	(void)safe_qbuf(qbuf, "Attach ", qsfx,
+			obj, yname, thesimpleoname, s);
+	/* strip temporary candelabrum suffix */
+	if ((q = strstri(qbuf, " to\033")) != 0) Strcpy(q, " to ");
+	/* last, format final "attach candles to candelabrum?" query */
+	if (yn(safe_qbuf(qbuf, qbuf, "?",
+			 otmp, yname, thesimpleoname, "it")) == 'n') {
 		use_lamp(obj);
 		return;
 	} else {
@@ -2755,23 +2758,21 @@ do_break_wand(obj)
     boolean shop_damage = FALSE;
     boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
-    char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
+    char confirm[QBUFSZ], buf[BUFSZ];
 
-    Strcpy(the_wand, yname(obj));
-    Sprintf(confirm, "Are you really sure you want to break %s?",
-	safe_qbuf("", sizeof("Are you really sure you want to break ?"),
-				the_wand, ysimple_name(obj), "the wand"));
-    if (yn(confirm) == 'n' ) return 0;
+    if (yn(safe_qbuf(confirm, "Are you really sure you want to break ", "?",
+		     obj, yname, ysimple_name, "the wand")) == 'n')
+	return 0;
 
     if (nohands(youmonst.data)) {
-	You_cant("break %s without hands!", the_wand);
+	You_cant("break %s without hands!", yname(obj));
 	return 0;
     } else if (ACURR(A_STR) < 10) {
-	You("don't have the strength to break %s!", the_wand);
+	You("don't have the strength to break %s!", yname(obj));
 	return 0;
     }
     pline("Raising %s high above your %s, you break it in two!",
-	  the_wand, body_part(HEAD));
+	  yname(obj), body_part(HEAD));
 
     /* [ALI] Do this first so that wand is removed from bill. Otherwise,
      * the freeinv() below also hides it from setpaid() which causes problems.

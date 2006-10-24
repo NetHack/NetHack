@@ -1500,6 +1500,8 @@ E boolean FDECL(not_fully_identified, (struct obj *));
 E char *FDECL(corpse_xname, (struct obj *,const char *,unsigned));
 E char *FDECL(cxname, (struct obj *));
 E char *FDECL(killer_xname, (struct obj *));
+E char *FDECL(short_oname, (struct obj *,char *(*)(OBJ_P),char *(*)(OBJ_P),
+			    unsigned));
 E const char *FDECL(singular, (struct obj *,char *(*)(OBJ_P)));
 E char *FDECL(an, (const char *));
 E char *FDECL(An, (const char *));
@@ -1516,6 +1518,9 @@ E char *FDECL(yname, (struct obj *));
 E char *FDECL(Yname2, (struct obj *));
 E char *FDECL(ysimple_name, (struct obj *));
 E char *FDECL(Ysimple_name2, (struct obj *));
+E char *FDECL(simpleonames, (struct obj *));
+E char *FDECL(ansimpleoname, (struct obj *));
+E char *FDECL(thesimpleoname, (struct obj *));
 E char *FDECL(bare_artifactname, (struct obj *));
 E char *FDECL(makeplural, (const char *));
 E char *FDECL(makesingular, (const char *));
@@ -1524,6 +1529,8 @@ E int FDECL(rnd_class, (int,int));
 E const char *FDECL(cloak_simple_name, (struct obj *));
 E const char *FDECL(helm_simple_name, (struct obj *));
 E const char *FDECL(mimic_obj_name, (struct monst *));
+E char *FDECL(safe_qbuf, (char *,const char *,const char *,struct obj *,
+			  char *(*)(OBJ_P),char *(*)(OBJ_P),const char *));
 
 /* ### options.c ### */
 
@@ -1645,8 +1652,6 @@ E boolean FDECL(container_gone, (int (*)(OBJ_P)));
 E int FDECL(use_container, (struct obj **,int));
 E int FDECL(loot_mon, (struct monst *,int *,boolean *));
 E int NDECL(dotip);
-E const char *FDECL(safe_qbuf, (const char *,unsigned,
-				const char *,const char *,const char *));
 #ifdef AUTOPICKUP_EXCEPTIONS
 E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
 #endif /* AUTOPICKUP_EXCEPTIONS */
