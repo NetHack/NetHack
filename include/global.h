@@ -69,6 +69,8 @@ typedef xchar	boolean;		/* 0 or 1 */
 # define UNICODE_DRAWING	/* store drawing symbols in wchar_t data type     */
 # define UNICODE_WIDEWINPORT	/* store and render wide chars in window port     */
 /*# define UNICODE_PLAYERTEXT*/	/* not implemented - player input in wide chars */
+#include <limits.h>
+#include <wchar.h>
 #else
 # undef UNICODE_DRAWING
 # undef UNICODE_WIDEWINPORT

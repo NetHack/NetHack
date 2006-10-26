@@ -264,7 +264,14 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
 #  define SHORT_P int
 #  define BOOLEAN_P int
 #  define ALIGNTYP_P int
-#  define NHWCHAR_P int
+#  if defined(UNICODE_WIDEWINPORT) && defined(WCHAR_MAX)
+#   if WCHAR_MAX >= INT_MAX
+#    define NHWCHAR_P nhwchar
+#   endif
+#  endif
+#  ifndef NHWCHAR_P
+#   define NHWCHAR_P int
+#  endif
 # else
    /* Neither widened nor unwidened prototypes.  Argument list expansion
     * by FDECL/VDECL always empty; all xxx_P vanish so defs aren't needed. */
