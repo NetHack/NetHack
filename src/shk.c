@@ -1066,9 +1066,7 @@ dopay()
 	register struct monst *shkp;
 	struct monst *nxtm, *resident;
 	long ltmp;
-#ifdef GOLDOBJ
 	long umoney;
-#endif
 	int pass, tmp, sk = 0, seensk = 0;
 	boolean paid = FALSE, stashed_gold = (hidden_gold() > 0L);
 
@@ -1177,43 +1175,28 @@ proceed:
 
 	if(shkp != resident && NOTANGRY(shkp)) {
 #ifdef GOLDOBJ
-                umoney = money_cnt(invent);
+		umoney = money_cnt(invent);
+#else
+		umoney = u.ugold;
 #endif
 		if(!ltmp)
 		    You("do not owe %s anything.", mon_nam(shkp));
-#ifndef GOLDOBJ
-		else if(!u.ugold) {
-#else
 		else if(!umoney) {
-#endif
 		    You("%shave no money.", stashed_gold ? "seem to " : "");
 		    if(stashed_gold)
 			pline("But you have some gold stashed away.");
 		} else {
-#ifndef GOLDOBJ
-		    long ugold = u.ugold;
-		    if(ugold > ltmp) {
-#else
 		    if(umoney > ltmp) {
-#endif
 			You("give %s the %ld gold piece%s %s asked for.",
-			    mon_nam(shkp), ltmp, plur(ltmp), mhe(shkp));
+			    shkname(shkp), ltmp, plur(ltmp), mhe(shkp));
 			pay(ltmp, shkp);
 		    } else {
-			You("give %s all your%s gold.", mon_nam(shkp),
-					stashed_gold ? " openly kept" : "");
-#ifndef GOLDOBJ
-			pay(u.ugold, shkp);
-#else
+			You("give %s all your%s gold.", shkname(shkp),
+			    stashed_gold ? " openly kept" : "");
 			pay(umoney, shkp);
-#endif
 			if (stashed_gold) pline("But you have hidden gold!");
 		    }
-#ifndef GOLDOBJ
-		    if((ugold < ltmp/2L) || (ugold < ltmp && stashed_gold))
-#else
 		    if((umoney < ltmp/2L) || (umoney < ltmp && stashed_gold))
-#endif
 			pline("Unfortunately, %s doesn't look satisfied.",
 			      mhe(shkp));
 		    else
@@ -1225,27 +1208,19 @@ proceed:
 	/* ltmp is still eshkp->robbed here */
 	if (!eshkp->billct && !eshkp->debit) {
 #ifdef GOLDOBJ
-                umoney = money_cnt(invent);
+		umoney = money_cnt(invent);
+#else
+		umoney = u.ugold;
 #endif
 		if(!ltmp && NOTANGRY(shkp)) {
-		    You("do not owe %s anything.", mon_nam(shkp));
-#ifndef GOLDOBJ
-		    if (!u.ugold)
-#else
+		    You("do not owe %s anything.", shkname(shkp));
 		    if (!umoney)
-#endif
 			pline(no_money, stashed_gold ? " seem to" : "");
 		} else if(ltmp) {
-		    pline("%s is after blood, not money!", Monnam(shkp));
-#ifndef GOLDOBJ
-		    if(u.ugold < ltmp/2L ||
-				(u.ugold < ltmp && stashed_gold)) {
-			if (!u.ugold)
-#else
+		    pline("%s is after blood, not money!", shkname(shkp));
 		    if(umoney < ltmp/2L ||
 				(umoney < ltmp && stashed_gold)) {
 			if (!umoney)
-#endif
 			    pline(no_money, stashed_gold ? " seem to" : "");
 			else pline(not_enough_money, mhim(shkp));
 			return(1);
@@ -1253,31 +1228,17 @@ proceed:
 		    pline("But since %s shop has been robbed recently,",
 			  mhis(shkp));
 		    pline("you %scompensate %s for %s losses.",
-#ifndef GOLDOBJ
-			  (u.ugold < ltmp) ? 
-#else
-			  (umoney < ltmp) ? 
-#endif
-			  "partially " : "",
-			  mon_nam(shkp), mhis(shkp));
-#ifndef GOLDOBJ
-		    pay(u.ugold < ltmp ? u.ugold : ltmp, shkp);
-#else
+			  (umoney < ltmp) ? "partially " : "",
+			  shkname(shkp), mhis(shkp));
 		    pay(umoney < ltmp ? umoney : ltmp, shkp);
-#endif
 		    make_happy_shk(shkp, FALSE);
 		} else {
 		    /* shopkeeper is angry, but has not been robbed --
 		     * door broken, attacked, etc. */
 		    pline("%s is after your hide, not your money!",
 			  Monnam(shkp));
-#ifndef GOLDOBJ
-		    if(u.ugold < 1000L) {
-			if (!u.ugold)
-#else
 		    if(umoney < 1000L) {
 			if (!umoney)
-#endif
 			    pline(no_money, stashed_gold ? " seem to" : "");
 			else pline(not_enough_money, mhim(shkp));
 			return(1);
@@ -1289,7 +1250,7 @@ proceed:
 		    if (strncmp(eshkp->customer, plname, PL_NSIZ) || rn2(3))
 			make_happy_shk(shkp, FALSE);
 		    else
-			pline("But %s is as angry as ever.", mon_nam(shkp));
+			pline("But %s is as angry as ever.", shkname(shkp));
 		}
 		return(1);
 	}
@@ -1463,6 +1424,8 @@ boolean itemize;
 	long ltmp, quan, save_quan;
 #ifdef GOLDOBJ
 	long umoney = money_cnt(invent);
+#else
+	long umoney = u.ugold;
 #endif
 	int buy;
 	boolean stashed_gold = (hidden_gold() > 0L),
@@ -1472,11 +1435,7 @@ boolean itemize;
 		impossible("Paid object on bill??");
 		return PAY_BUY;
 	}
-#ifndef GOLDOBJ
-	if(itemize && u.ugold + ESHK(shkp)->credit == 0L){
-#else
 	if(itemize && umoney + ESHK(shkp)->credit == 0L){
-#endif
 		You("%shave no money or credit left.",
 			     stashed_gold ? "seem to " : "");
 		return PAY_BROKE;
@@ -1499,28 +1458,28 @@ boolean itemize;
 	buy = PAY_BUY;		/* flag; if changed then return early */
 
 	if (itemize) {
-	    char qbuf[BUFSZ];
-	    Sprintf(qbuf,"%s for %ld %s.  Pay?", quan == 1L ?
-		    Doname2(obj) : doname(obj), ltmp, currency(ltmp));
+	    char qbuf[BUFSZ], qsfx[BUFSZ];
+
+	    Sprintf(qsfx, " for %ld %s.  Pay?", ltmp, currency(ltmp));
+	    (void)safe_qbuf(qbuf, (char *)0, qsfx,
+			    obj, (quan == 1L) ? Doname2 : doname,
+			    ansimpleoname, (quan == 1L) ? "that" : "those");
 	    if (yn(qbuf) == 'n') {
 		buy = PAY_SKIP;		/* don't want to buy */
 	    } else if (quan < bp->bquan && !consumed) { /* partly used goods */
 		obj->quan = bp->bquan - save_quan;	/* used up amount */
 		verbalize("%s for the other %s before buying %s.",
-			  ANGRY(shkp) ? "Pay" : "Please pay", xname(obj),
+			  ANGRY(shkp) ? "Pay" : "Please pay",
+			  simpleonames(obj),	/* short name suffices */
 			  save_quan > 1L ? "these" : "this one");
 		buy = PAY_SKIP;		/* shk won't sell */
 	    }
 	}
-#ifndef GOLDOBJ
-	if (buy == PAY_BUY && u.ugold + ESHK(shkp)->credit < ltmp) {
-#else
 	if (buy == PAY_BUY && umoney + ESHK(shkp)->credit < ltmp) {
-#endif
 	    You("don't%s have gold%s enough to pay for %s.",
 		stashed_gold ? " seem to" : "",
 		(ESHK(shkp)->credit > 0L) ? " or credit" : "",
-		doname(obj));
+		thesimpleoname(obj));
 	    buy = itemize ? PAY_SKIP : PAY_CANT;
 	}
 
@@ -2568,7 +2527,7 @@ xchar x, y;
 {
 	register struct monst *shkp;
 	register struct eshk *eshkp;
-	long ltmp = 0L, cltmp = 0L, gltmp = 0L, offer;
+	long ltmp = 0L, cltmp = 0L, gltmp = 0L, offer, shkmoney;
 	boolean saleitem, cgold = FALSE, container = Has_contents(obj);
 	boolean isgold = (obj->oclass == COIN_CLASS);
 	boolean only_partially_your_contents = FALSE;
@@ -2597,9 +2556,8 @@ xchar x, y;
 	offer = ltmp + cltmp;
 
 	/* get one case out of the way: nothing to sell, and no gold */
-	if(!isgold &&
-	   ((offer + gltmp) == 0L || sell_how == SELL_DONTSELL)) {
-		register boolean unpaid = (obj->unpaid ||
+	if (!isgold && ((offer + gltmp) == 0L || sell_how == SELL_DONTSELL)) {
+		boolean unpaid = (obj->unpaid ||
 				  (container && count_unpaid(obj->cobj)));
 
 		if(container) {
@@ -2691,24 +2649,23 @@ move_on:
 	}
         
 #ifndef GOLDOBJ
-	if(!shkp->mgold) {
+	shkmoney = shkp->mgold;
 #else
-	if(!money_cnt(shkp->minvent)) {
+	shkmoney = money_cnt(shkp->minvent);
 #endif
+	if (!shkmoney) {
 		char c, qbuf[BUFSZ];
 		long tmpcr = ((offer * 9L) / 10L) + (offer <= 1L);
 
 		if (sell_how == SELL_NORMAL || auto_credit) {
 		    c = sell_response = 'y';
 		} else if (sell_response != 'n') {
-		    pline("%s cannot pay you at present.", Monnam(shkp));
-		    Sprintf(qbuf,
-			    "Will you accept %ld %s in credit for %s?",
-			    tmpcr, currency(tmpcr), doname(obj));
-		    /* won't accept 'a' response here */
-		    /* KLY - 3/2000 yes, we will, it's a damn nuisance
-                       to have to constantly hit 'y' to sell for credit */
-		    c = ynaq(qbuf);
+		    pline("%s cannot pay you at present.", shkname(shkp));
+		    Sprintf(qbuf, "Will you accept %ld %s in credit for ",
+			    tmpcr, currency(tmpcr));
+		    c = ynaq(safe_qbuf(qbuf, qbuf, "?",
+				       obj, doname, thesimpleoname,
+				       (obj->quan == 1L) ? "that" : "those"));
 		    if (c == 'a') {
 			c = 'y';
 			auto_credit = TRUE;
@@ -2732,29 +2689,50 @@ move_on:
 		    subfrombill(obj, shkp);
 		}
 	} else {
-		char qbuf[BUFSZ];
-#ifndef GOLDOBJ
-		boolean short_funds = (offer > shkp->mgold);
-		if (short_funds) offer = shkp->mgold;
-#else
-                long shkmoney = money_cnt(shkp->minvent);
-		boolean short_funds = (offer > shkmoney);
+		char qbuf[BUFSZ], qsfx[BUFSZ];
+		boolean short_funds = (offer > shkmoney), one;
+
 		if (short_funds) offer = shkmoney;
-#endif
 		if (!sell_response) {
-		    only_partially_your_contents =
-			(contained_cost(obj, shkp, 0L, FALSE, FALSE) !=
-			 contained_cost(obj, shkp, 0L, FALSE, TRUE));
-		    Sprintf(qbuf,
-			 "%s offers%s %ld gold piece%s for%s %s %s.  Sell %s?",
-			    Monnam(shkp), short_funds ? " only" : "",
+		    only_partially_your_contents = (container &&
+				contained_cost(obj, shkp, 0L, FALSE, FALSE) !=
+				contained_cost(obj, shkp, 0L, FALSE, TRUE));
+		    /*
+		       "<shk> offers * for ..." query formatting.
+		       Normal item(s):
+			"... your <object>.  Sell it?"
+			"... your <objects>.  Sell them?"
+		       A container is either owned by the hero, or already
+		       owned by the shk (!ltmp), or the shk isn't interested
+		       in buying it (also !ltmp).  It's either empty (!cltmp)
+		       or it has contents owned by the hero or it has some
+		       contents owned by the hero and others by the shk.
+		       (The case where it has contents already entirely owned
+		       by the shk is treated the same was if it were empty
+		       since the hero isn't selling any of those contents.)
+		       Your container:
+			"... your <empty bag>.  Sell it?"
+			"... your <bag> and its contents.  Sell them?"
+			"... your <bag> and items inside.  Sell them?"
+		       Shk's container:
+		       (empty case won't happen--nothing to sell)
+			"... the contents of the <bag>.  Sell them?"
+			"... your items in the <bag>.  Sell them?"
+		     */
+		    Sprintf(qbuf, "%s offers%s %ld gold piece%s for%s %s ",
+			    shkname(shkp), short_funds ? " only" : "",
 			    offer, plur(offer),
-			    (!ltmp && cltmp && only_partially_your_contents) ?
-			     " your items in" : (!ltmp && cltmp) ? " the contents of" : "",
-			    obj->unpaid ? "the" : "your", cxname(obj),
-			    (obj->quan == 1L &&
-			    !(!ltmp && cltmp && only_partially_your_contents)) ?
-			    "it" : "them");
+			    (cltmp && !ltmp) ? (only_partially_your_contents ?
+			      " your items in" : " the contents of") : "",
+			    obj->unpaid ? "the" : "your");
+		    one = (obj->quan == 1L && !cltmp);
+		    Sprintf(qsfx, "%s.  Sell %s?",
+			    (cltmp && ltmp) ? (only_partially_your_contents ?
+			      " and items inside" : " and its contents") : "",
+			    one ? "it" : "them");
+		    (void)safe_qbuf(qbuf, qbuf, qsfx,
+				    obj, xname, simpleonames,
+				    one ? "that" : "those");
 		} else  qbuf[0] = '\0';		/* just to pacify lint */
 
 		switch (sell_response ? sell_response : ynaq(qbuf)) {

@@ -165,6 +165,7 @@ getting a particular rotten food result can't make attempting to eat a
 pad shortest rumors to improve distribution of delivered rumors
 wake up sleeping steed when putting on saddle or mounting
 stop wielding cockatrice corpse which triggered own death followed by life-save
+format various prompts to avoid "Query truncated" entries in paniclog
 
 
 Platform- and/or Interface-Specific Fixes
