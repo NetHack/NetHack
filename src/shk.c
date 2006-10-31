@@ -1856,18 +1856,18 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
  */
 long
 contained_cost(obj, shkp, price, usell, unpaid_only)
-register struct obj *obj;
-register struct monst *shkp;
+struct obj *obj;
+struct monst *shkp;
 long price;
-register boolean usell;
-register boolean unpaid_only;
+boolean usell;
+boolean unpaid_only;
 {
 	register struct obj *otmp;
 
-	/* the price of contained objects */
+	/* price of contained objects; "top" container handled by caller */
 	for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
 	    if (otmp->oclass == COIN_CLASS) continue;
-	    /* the "top" container is evaluated by caller */
+
 	    if (usell) {
 		if (saleable(shkp, otmp) &&
 			!otmp->unpaid && otmp->oclass != BALL_CLASS &&
@@ -1875,13 +1875,12 @@ register boolean unpaid_only;
 			!(Is_candle(otmp) && otmp->age <
 				20L * (long)objects[otmp->otyp].oc_cost))
 		    price += set_cost(otmp, shkp);
-	    } else if (!otmp->no_charge &&
-		      (!unpaid_only || (unpaid_only && otmp->unpaid))) {
-		    price += get_cost(otmp, shkp) * otmp->quan;
+	    } else if (!otmp->no_charge && (otmp->unpaid || !unpaid_only)) {
+		price += get_cost(otmp, shkp) * otmp->quan;
 	    }
 
 	    if (Has_contents(otmp))
-		    price += contained_cost(otmp, shkp, price, usell, unpaid_only);
+		price = contained_cost(otmp, shkp, price, usell, unpaid_only);
 	}
 
 	return(price);
@@ -2178,10 +2177,12 @@ boolean reset_nocharge;
     if (obj->no_charge) {
 	if (!Has_contents(obj) ||
 		(contained_gold(obj) == 0L &&
-		    contained_cost(obj, shkp, 0L, FALSE, TRUE) == 0L))
+		 contained_cost(obj, shkp, 0L, FALSE, !reset_nocharge) == 0L))
 	    shkp = 0;		/* not billable */
-	if (reset_nocharge && !shkp && obj->oclass != COIN_CLASS)
+	if (reset_nocharge && !shkp && obj->oclass != COIN_CLASS) {
 	    obj->no_charge = 0;
+	    if (Has_contents(obj)) picked_container(obj); /* clear no_charge */
+	}
     }
     return shkp ? TRUE : FALSE;
 }
@@ -2402,30 +2403,31 @@ long price;
 boolean ininv;
 {
 	struct obj *otmp;
+	struct bill_x *bp;
+	long billamt;   
 
-	if (ininv ? obj->unpaid : !obj->no_charge)
-	    price += get_cost(obj, shkp);	/* container itself (quan 1) */
-	else
-	    obj->no_charge = 0;
-
-	/* the price of contained objects, if any */
+	/* the price of contained objects; caller handles top container */
 	for(otmp = obj->cobj; otmp; otmp = otmp->nobj) {
 	    if (otmp->oclass == COIN_CLASS) continue;
+	    billamt = 0L;
 	    if (!billable(&shkp, otmp, ESHK(shkp)->shoproom, TRUE)) {
 		/* billable() returns false for objects already on bill */
-		if (!onbill(obj, shkp, FALSE)) continue;
+		if ((bp = onbill(otmp, shkp, FALSE)) == 0) continue;
 		/* this assumes that we're being called by stolen_value()
 		   (or by a recursive call to self on behalf of it) where
 		   the cost of this object is about to be added to shop
 		   debt in place of having it remain on the current bill */
-		subfrombill(obj, shkp);	/* avoid double billing */
+		billamt = bp->bquan * bp->price;
+		sub_one_frombill(otmp, shkp);	/* avoid double billing */
 	    }
 
-	    if (!Has_contents(otmp)) {
-		if (otmp->unpaid || !ininv)
-		    price += otmp->quan * get_cost(otmp, shkp);
-	    } else
-		price += stolen_container(otmp, shkp, price, ininv);
+	    if (billamt)
+		price += billamt;
+	    else if (ininv ? otmp->unpaid : !otmp->no_charge)
+		price += otmp->quan * get_cost(otmp, shkp);
+
+	    if (Has_contents(otmp))
+		price = stolen_container(otmp, shkp, price, ininv);
 	}
 
 	return(price);
@@ -2437,27 +2439,35 @@ struct obj *obj;
 xchar x, y;
 boolean peaceful, silent;
 {
-	long value = 0L, gvalue = 0L;
+	long value = 0L, gvalue = 0L, billamt = 0L;
 	char roomno = *in_rooms(x, y, SHOPBASE);
+	struct bill_x *bp;
 	struct monst *shkp = 0;
 
 	if (!billable(&shkp, obj, roomno, FALSE)) {
 	    /* things already on the bill yield a not-billable result, so
 	       we need to check bill before deciding that shk doesn't care */
-	    if (!onbill(obj, shkp, FALSE)) return 0L;
+	    if ((bp = onbill(obj, shkp, FALSE)) == 0) return 0L;
 	    /* shk does care; take obj off bill to avoid double billing */
-	    subfrombill(obj, shkp);
+	    billamt = bp->bquan * bp->price;
+	    sub_one_frombill(obj, shkp);
 	}
 
 	if(obj->oclass == COIN_CLASS) {
 	    gvalue += obj->quan;
-	} else if (Has_contents(obj)) {
-	    boolean ininv = !!count_unpaid(obj->cobj);
+	} else {
+	    if (billamt)
+		value += billamt;
+	    else if (!obj->no_charge)
+		value += obj->quan * get_cost(obj, shkp);
 
-	    value += stolen_container(obj, shkp, value, ininv);
-	    if(!ininv) gvalue += contained_gold(obj);
-	} else if (!obj->no_charge) {
-	    value += obj->quan * get_cost(obj, shkp);
+	    if (Has_contents(obj)) {
+		boolean ininv = (obj->where == OBJ_INVENT ||
+				 obj->where == OBJ_FREE);
+
+		value += stolen_container(obj, shkp, 0L, ininv);
+		if(!ininv) gvalue += contained_gold(obj);
+	    }
 	}
 
 	if(gvalue + value == 0L) return(0L);
@@ -2557,7 +2567,7 @@ xchar x, y;
 	}
 	if(container) {
 		/* find the price of content before subfrombill */
-		cltmp += contained_cost(obj, shkp, cltmp, TRUE, FALSE);
+		cltmp = contained_cost(obj, shkp, cltmp, TRUE, FALSE);
 		/* find the value of contained gold */
 		gltmp += contained_gold(obj);
 		cgold = (gltmp > 0L);
