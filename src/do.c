@@ -573,7 +573,7 @@ register struct obj *obj;
 	    place_object(obj, u.ux, u.uy);
 	    if (obj == uball)
 		drop_ball(u.ux,u.uy);
-	    else
+	    else if (level.flags.has_shop)
 		sellobj(obj, u.ux, u.uy);
 	    stackobj(obj);
 	    if(Blind && Levitation)
