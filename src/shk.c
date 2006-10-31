@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.5	2006/06/21	*/
+/*	SCCS Id: @(#)shk.c	3.5	2006/10/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -29,6 +29,8 @@ extern const struct shclass shtypes[];	/* defined in shknam.c */
 extern struct obj *thrownobj;		/* defined in dothrow.c */
 
 STATIC_VAR NEARDATA long int followmsg;	/* last time of follow message */
+STATIC_VAR const char and_its_contents[] = " and its contents";
+STATIC_VAR const char the_contents_of[] = "the contents of ";
 
 STATIC_DCL void FDECL(setpaid, (struct monst *));
 STATIC_DCL long FDECL(addupbill, (struct monst *));
@@ -2191,6 +2193,7 @@ boolean ininv, dummy, silent;
 {
 	struct monst *shkp = 0;
 	long ltmp, cltmp, gltmp;
+	int contentscount;
 	boolean container;
 
 	if (!billable(&shkp, obj, *u.ushops, TRUE))
@@ -2232,9 +2235,11 @@ boolean ininv, dummy, silent;
 
 	    if(obj->no_charge)
 		obj->no_charge = 0;
-
-	} else /* i.e., !container */
+	    contentscount = count_unpaid(obj->cobj);
+	} else {	/* !container */
 	    add_one_tobill(obj, dummy, shkp);
+	    contentscount = 0;
+	}
 
 	if (!muteshk(shkp) && !silent) {
 	    char buf[BUFSZ];
@@ -2269,14 +2274,23 @@ boolean ininv, dummy, silent;
 		    Strcat(buf, "; only");
 		}
 		obj->quan = 1L; /* fool xname() into giving singular */
-		pline("%s %ld %s %s %s.\"", buf, ltmp, currency(ltmp),
-		      (save_quan > 1L) ? "per" : "for this", xname(obj));
+		pline("%s %ld %s %s %s%s.\"", buf, ltmp, currency(ltmp),
+		      (save_quan > 1L) ? "per" :
+			(contentscount && !obj->unpaid) ?
+			  "for the contents of this" : "for this",
+		      xname(obj), (contentscount && obj->unpaid) ?
+			and_its_contents : "");
 		obj->quan = save_quan;
 	    }
 	} else if(!silent) {
-	    if(ltmp) pline_The("list price of %s is %ld %s%s.",
-				   the(xname(obj)), ltmp, currency(ltmp),
-				   (obj->quan > 1L) ? " each" : "");
+	    if (ltmp) pline_The("list price of %s%s%s is %ld %s%s.",
+				(contentscount && !obj->unpaid) ?
+				  the_contents_of : "",
+				the(xname(obj)),
+				(contentscount && obj->unpaid) ?
+				  and_its_contents : "",
+				ltmp, currency(ltmp),
+				(obj->quan > 1L) ? " each" : "");
 	    else pline("%s does not notice.", Monnam(shkp));
 	}
 }
@@ -2719,16 +2733,16 @@ move_on:
 			"... the contents of the <bag>.  Sell them?"
 			"... your items in the <bag>.  Sell them?"
 		     */
-		    Sprintf(qbuf, "%s offers%s %ld gold piece%s for%s %s ",
+		    Sprintf(qbuf, "%s offers%s %ld gold piece%s for %s%s ",
 			    shkname(shkp), short_funds ? " only" : "",
 			    offer, plur(offer),
 			    (cltmp && !ltmp) ? (only_partially_your_contents ?
-			      " your items in" : " the contents of") : "",
+			      "your items in " : the_contents_of) : "",
 			    obj->unpaid ? "the" : "your");
 		    one = (obj->quan == 1L && !cltmp);
 		    Sprintf(qsfx, "%s.  Sell %s?",
 			    (cltmp && ltmp) ? (only_partially_your_contents ?
-			      " and items inside" : " and its contents") : "",
+			      " and items inside" : and_its_contents) : "",
 			    one ? "it" : "them");
 		    (void)safe_qbuf(qbuf, qbuf, qsfx,
 				    obj, xname, simpleonames,
@@ -3687,8 +3701,9 @@ register struct obj *first_obj;
 {
     register struct obj *otmp;
     char buf[BUFSZ], price[40];
-    long cost;
+    long cost = 0L;
     int cnt = 0;
+    boolean contentsonly = FALSE;
     winid tmpwin;
     struct monst *shkp = shop_keeper(inside_shop(u.ux, u.uy));
 
@@ -3699,30 +3714,34 @@ register struct obj *first_obj;
 	if (otmp->oclass == COIN_CLASS) continue;
 	cost = (otmp->no_charge || otmp == uball || otmp == uchain) ? 0L :
 		get_cost(otmp, (struct monst *)0);
+	contentsonly = !cost;
 	if (Has_contents(otmp))
 	    cost += contained_cost(otmp, shkp, 0L, FALSE, FALSE);
 	if (!cost) {
 	    Strcpy(price, "no charge");
+	    contentsonly = FALSE;
 	} else {
 	    Sprintf(price, "%ld %s%s", cost, currency(cost),
-		    otmp->quan > 1L ? " each" : "");
+		    (otmp->quan) > 1L ? " each" : "");
 	}
-	Sprintf(buf, "%s, %s", doname(otmp), price);
+	Sprintf(buf, "%s%s, %s",
+		contentsonly ? the_contents_of : "", doname(otmp), price);
 	putstr(tmpwin, 0, buf),  cnt++;
     }
     if (cnt > 1) {
 	display_nhwindow(tmpwin, TRUE);
     } else if (cnt == 1) {
-	if (first_obj->no_charge || first_obj == uball || first_obj == uchain){
-	    pline("%s!", buf);	/* buf still contains the string */
+	if (!cost) {
+	    /* "<doname(obj)>, no charge" */
+	    pline("%s!", upstart(buf));	/* buf still contains the string */
 	} else {
-	    /* print cost in slightly different format, so can't reuse buf */
-	    cost = get_cost(first_obj, (struct monst *)0);
-	    if (Has_contents(first_obj))
-		cost += contained_cost(first_obj, shkp, 0L, FALSE, FALSE);
-	    pline("%s, price %ld %s%s%s", doname(first_obj),
-		cost, currency(cost), first_obj->quan > 1L ? " each" : "",
-		shk_embellish(first_obj, cost));
+	    /* print cost in slightly different format, so can't reuse buf;
+	       cost and contentsonly are already set up */
+	    Sprintf(buf, "%s%s",
+		    contentsonly ? the_contents_of : "", doname(first_obj));
+	    pline("%s, price %ld %s%s%s", upstart(buf),
+		  cost, currency(cost), (first_obj->quan > 1L) ? " each" : "",
+		  contentsonly ? "." : shk_embellish(first_obj, cost));
 	}
     }
     destroy_nhwindow(tmpwin);
