@@ -716,6 +716,15 @@ register char *buf;
 				ilet = buf[i1];
 				continue;
 			}
+		} else if (ilet == NOINVSYM) {
+			/* compact three or more consecutive '#'
+			   characters into "#-#" */
+			if (i2 >= 2 && buf[i2 - 2] == NOINVSYM &&
+			    buf[i2 - 1] == NOINVSYM)
+				buf[i2 - 1] = '-';
+			else if (i2 >= 3 && buf[i2 - 3] == NOINVSYM &&
+			    buf[i2 - 2] == '-' && buf[i2 - 1] == NOINVSYM)
+				--i2;
 		}
 		ilet2 = ilet1;
 		ilet1 = ilet;
