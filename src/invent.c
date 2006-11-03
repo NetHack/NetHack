@@ -2790,8 +2790,8 @@ int
 doorganize()	/* inventory organizer by Del Lamb */
 {
 	struct obj *obj, *otmp, *splitting, *bumped;
-	register int ix, cur;
-	register char let;
+	int ix, cur, trycnt;
+	char let;
 	char alphabet[52+1], buf[52+1];
 	char qbuf[QBUFSZ];
 	char allowall[3];	/* { ALLOW_COUNT, ALL_CLASSES, 0 } */
@@ -2838,6 +2838,7 @@ doorganize()	/* inventory organizer by Del Lamb */
 	/* compact the list by removing all the blanks */
 	for (ix = cur = 0; alphabet[ix]; ix++)
 		if (alphabet[ix] != ' ') buf[cur++] = alphabet[ix];
+	if (!cur && obj->invlet == NOINVSYM) buf[cur++] = NOINVSYM;
 	buf[cur] = '\0';
 	/* and by dashing runs of letters */
 	if(cur > 5) compactify(buf);
@@ -2845,27 +2846,26 @@ doorganize()	/* inventory organizer by Del Lamb */
 	/* get 'to' slot to use as destination */
 	Sprintf(qbuf, "Adjust letter to what [%s]%s?", buf,
 		invent ? " (? see used letters)" : "");
-	for (;;) {
+	for (trycnt = 1; ; ++trycnt) {
 	    let = yn_function(qbuf, (char *)0, '\0');
 	    if(let == '?' || let == '*') {
-		char ilet = display_used_invlets(splitting ? obj->invlet : 0);
-		if(!ilet) continue;
-		if(ilet == '\033') {
-			pline(Never_mind);
-			return 0;
-		}
-		let = ilet;
+		let = display_used_invlets(splitting ? obj->invlet : 0);
+		if (!let) continue;
+		if (let == '\033') goto noadjust;
 	    }
 	    if (index(quitchars, let) ||
 		    /* adjusting to same slot is meaningful since all
 		       compatible stacks get collected along the way,
 		       but splitting to same slot is not */
 		    (splitting && let == obj->invlet)) {
+ noadjust:
 		if (splitting) (void) merged(&splitting, &obj);
 		pline(Never_mind);
 		return 0;
 	    }
-	    if (letter(let) && let != '@') break;	/* got one */
+	    if ((letter(let) && let != '@') || index(buf, let))
+		break;	/* got one */
+	    if (trycnt == 5) goto noadjust;
 	    pline("Select an inventory slot letter.");	/* else try again */
 	}
 
