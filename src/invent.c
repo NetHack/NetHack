@@ -822,13 +822,16 @@ register const char *let,*word;
 	if(bp > buf && bp[-1] == '-') *bp++ = ' ';
 	ap = altlets;
 
-	ilet = 'a';
+	if (!flags.invlet_constant) reassign();
+
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
-	    if (!flags.invlet_constant)
-#ifdef GOLDOBJ
-		if (otmp->invlet != GOLD_SYM) /* don't reassign this */
-#endif
-		otmp->invlet = ilet;	/* reassign() */
+	    if (&bp[foo] == &buf[sizeof buf - 1] ||
+		    ap == &altlets[sizeof altlets - 1]) {
+		/* we must have a huge number of NOINVSYM items somehow */
+		impossible("getobj: inventory overflow");
+		break;
+	    }
+
 	    if (!*let || index(let, otmp->oclass)
 #ifdef GOLDOBJ
 		|| (usegold && otmp->invlet == GOLD_SYM)
@@ -937,8 +940,6 @@ register const char *let,*word;
 		    )))
 			allowall = TRUE;
 	    }
-
-	    if(ilet == 'z') ilet = 'A'; else ilet++;
 	}
 	bp[foo] = 0;
 	if(foo == 0 && bp > buf && bp[-1] == ' ') *--bp = 0;
@@ -2742,8 +2743,22 @@ reassign()
 	register int i;
 	register struct obj *obj;
 
-	for(obj = invent, i = 0; obj; obj = obj->nobj, i++)
+	for(obj = invent, i = 0; obj; obj = obj->nobj, i++) {
+#ifdef GOLDOBJ
+	    if (obj->oclass == COIN_CLASS && obj->invlet == GOLD_SYM)
+		--i;	/* keep $ instead of using up i'th letter */
+	    else
+#endif
+	    if (i < 52)
 		obj->invlet = (i < 26) ? ('a'+i) : ('A'+i-26);
+#ifdef GOLDOBJ
+	    else if (obj->oclass == COIN_CLASS)
+		obj->invlet = GOLD_SYM;
+#endif
+	    else
+		obj->invlet = NOINVSYM;
+	}
+	if (i >= 52) i = 52 - 1;
 	lastinvnr = i;
 }
 
