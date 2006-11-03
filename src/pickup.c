@@ -1185,19 +1185,28 @@ boolean telekinesis;
 			body_part(HAND), xname(obj));
 	return -1;
     }
+    /* override weight consideration for loadstone picked up by anybody
+       and for boulder picked up by hero poly'd into a giant; override
+       availability of open inventory slot iff not already carrying one */
     if (obj->otyp == LOADSTONE ||
-	    (obj->otyp == BOULDER && throws_rocks(youmonst.data)))
-	return 1;		/* lift regardless of current situation */
+	    (obj->otyp == BOULDER && throws_rocks(youmonst.data))) {
+	if (inv_cnt() < 52 || !carrying(obj->otyp) || merge_choice(invent, obj))
+	    return 1;	/* lift regardless of current situation */
+	/* if we reach here, we're out of slots and already have at least
+	   one of these, so treat this one more like a normal item */
+	You("are carrying too much stuff to pick up %s %s.",
+	    (obj->quan == 1L) ? "another" : "more", simpleonames(obj));
+	return -1;
+    }
 
     *cnt_p = carry_count(obj, container, *cnt_p, telekinesis, &old_wt, &new_wt);
     if (*cnt_p < 1L) {
 	result = -1;	/* nothing lifted */
+    } else if (
 #ifndef GOLDOBJ
-    } else if (obj->oclass != COIN_CLASS && inv_cnt() >= 52 &&
-		!merge_choice(invent, obj)) {
-#else
-    } else if (inv_cnt() >= 52 && !merge_choice(invent, obj)) {
+		obj->oclass != COIN_CLASS &&
 #endif
+		inv_cnt() >= 52 && !merge_choice(invent, obj)) {
 	Your("knapsack cannot accommodate any more items.");
 	result = -1;	/* nothing lifted */
     } else {
