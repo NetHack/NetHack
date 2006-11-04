@@ -1988,7 +1988,7 @@ E long FDECL(contained_cost, (struct obj *,struct monst *,long,BOOLEAN_P, BOOLEA
 E long FDECL(contained_gold, (struct obj *));
 E void FDECL(picked_container, (struct obj *));
 E void FDECL(alter_cost, (struct obj *,long));
-E long FDECL(unpaid_cost, (struct obj *));
+E long FDECL(unpaid_cost, (struct obj *,BOOLEAN_P));
 E boolean FDECL(billable, (struct monst **,struct obj *,CHAR_P,BOOLEAN_P));
 E void FDECL(addtobill, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(splitbill, (struct obj *,struct obj *));

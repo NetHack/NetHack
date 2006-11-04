@@ -166,6 +166,8 @@ pad shortest rumors to improve distribution of delivered rumors
 wake up sleeping steed when putting on saddle or mounting
 stop wielding cockatrice corpse which triggered own death followed by life-save
 format various prompts to avoid "Query truncated" entries in paniclog
+for inventory display, include cost info on hero-owned containers holding
+	shop goods
 
 
 Platform- and/or Interface-Specific Fixes

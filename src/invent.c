@@ -1986,12 +1986,12 @@ dounpaid()
     if (count == 1) {
 	marker = (struct obj *) 0;
 	otmp = find_unpaid(invent, &marker);
-	cost = unpaid_cost(otmp);
-	otmp->unpaid = 0;	/* suppress "(unpaid)" suffix */
+	cost = unpaid_cost(otmp, FALSE);
+	iflags.suppress_price++;	/* suppress "(unpaid)" suffix */
 	pline("%s", xprname(otmp, distant_name(otmp, doname),
 			    carried(otmp) ? otmp->invlet : CONTAINED_SYM,
 			    TRUE, cost, 0L));
-	otmp->unpaid = 1;	/*(wouldn't be here if this wasn't true)*/
+	iflags.suppress_price--;
 	return;
     }
 
@@ -2011,11 +2011,11 @@ dounpaid()
 			classcount++;
 		    }
 
-		    totcost += cost = unpaid_cost(otmp);
-		    otmp->unpaid = 0;	/* suppress "(unpaid)" suffix */
+		    totcost += cost = unpaid_cost(otmp, FALSE);
+		    iflags.suppress_price++; /* suppress "(unpaid)" suffix */
 		    putstr(win, 0, xprname(otmp, distant_name(otmp, doname),
 					   ilet, TRUE, cost, 0L));
-		    otmp->unpaid = 1;
+		    iflags.suppress_price--;
 		    num_so_far++;
 		}
 	    }
@@ -2037,14 +2037,14 @@ dounpaid()
 
 		marker = (struct obj *) 0;	/* haven't found any */
 		while (find_unpaid(otmp->cobj, &marker)) {
-		    totcost += cost = unpaid_cost(marker);
+		    totcost += cost = unpaid_cost(marker, FALSE);
 		    contcost += cost;
 		    if (otmp->cknown) {
-			marker->unpaid = 0; /* suppress "(unpaid)" suffix */
+			iflags.suppress_price++; /* suppress "(unpaid)" sfx */
 			putstr(win, 0,
 			       xprname(marker, distant_name(marker, doname),
 				       CONTAINED_SYM, TRUE, cost, 0L));
-			marker->unpaid = 1;
+			iflags.suppress_price--;
 		    }
 		}
 		if (!otmp->cknown) {

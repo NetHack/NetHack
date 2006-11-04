@@ -1456,6 +1456,7 @@ boolean itemize;
 	}
 	obj->quan = quan;	/* to be used by doname() */
 	obj->unpaid = 0;	/* ditto */
+	iflags.suppress_price++;	/* affects containers */
 	ltmp = bp->price * quan;
 	buy = PAY_BUY;		/* flag; if changed then return early */
 
@@ -1489,6 +1490,7 @@ boolean itemize;
 	    /* restore unpaid object to original state */
 	    obj->quan = save_quan;
 	    obj->unpaid = 1;
+	    iflags.suppress_price--;
 	    return buy;
 	}
 
@@ -1513,6 +1515,7 @@ boolean itemize;
 	    }
 	} else if (itemize)
 	    update_inventory();	/* Done just once in dopay() if !itemize. */
+	iflags.suppress_price--;
 	return buy;
 }
 
@@ -2032,20 +2035,35 @@ long amt;	/* if 0, use regular shop pricing, otherwise force amount;
 
 /* called from doinv(invent.c) for inventory of unpaid objects */
 long
-unpaid_cost(unp_obj)
-register struct obj *unp_obj;	/* known to be unpaid */
+unpaid_cost(unp_obj, include_contents)
+struct obj *unp_obj;	/* known to be unpaid or contain unpaid */
+boolean include_contents;
 {
-	register struct bill_x *bp = (struct bill_x *)0;
-	register struct monst *shkp;
+	struct bill_x *bp = (struct bill_x *)0;
+	struct monst *shkp;
+	long amt = 0L;
+	xchar ox, oy;
 
-	for(shkp = next_shkp(fmon, TRUE); shkp;
+	if (!get_obj_location(unp_obj, &ox, &oy, BURIED_TOO|CONTAINED_TOO))
+	    ox = u.ux, oy = u.uy; 	/* (shouldn't happen) */
+	if ((shkp = shop_keeper(*in_rooms(ox, oy, SHOPBASE))) != 0) {
+	    bp = onbill(unp_obj, shkp, TRUE);
+	} else {
+	    /* didn't find shk?  try searching bills */
+	    for (shkp = next_shkp(fmon, TRUE); shkp;
 					shkp = next_shkp(shkp->nmon, TRUE))
-	    if ((bp = onbill(unp_obj, shkp, TRUE)) != 0) break;
+		if ((bp = onbill(unp_obj, shkp, TRUE)) != 0) break;
+	}
 
 	/* onbill() gave no message if unexpected problem occurred */
-	if(!bp) impossible("unpaid_cost: object wasn't on any bill!");
-
-	return bp ? unp_obj->quan * bp->price : 0L;
+	if (!shkp || (unp_obj->unpaid && !bp)) {
+	    impossible("unpaid_cost: object wasn't on any bill.");
+	} else {
+	    if (bp) amt = unp_obj->quan * bp->price;
+	    if (include_contents && Has_contents(unp_obj))
+		amt = contained_cost(unp_obj, shkp, amt, FALSE, TRUE);
+	}
+	return amt;
 }
 
 STATIC_OVL void
@@ -2833,22 +2851,15 @@ int mode;		/* 0: deliver count 1: paged */
 	    }
 	    if(bp->useup || bp->bquan > obj->quan) {
 		long oquan, uquan, thisused;
-		unsigned save_unpaid;
 
-		save_unpaid = obj->unpaid;
 		oquan = obj->quan;
 		uquan = (bp->useup ? bp->bquan : bp->bquan - oquan);
 		thisused = bp->price * uquan;
 		totused += thisused;
-		obj->unpaid = 0;		/* ditto */
+		iflags.suppress_price++;  /* suppress "(unpaid)" suffix */
 		/* Why 'x'?  To match `I x', more or less. */
 		buf_p = xprname(obj, (char *)0, 'x', FALSE, thisused, uquan);
-#ifdef __SASC
-				/* SAS/C 6.2 can't cope for some reason */
-		sasc_bug(obj,save_unpaid);
-#else
-		obj->unpaid = save_unpaid;
-#endif
+		iflags.suppress_price--;
 		putstr(datawin, 0, buf_p);
 	    }
 	}

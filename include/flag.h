@@ -160,6 +160,7 @@ struct instance_flags {
 	int	 in_lava_effects;	/* hack for Boots_off() */
 	int	 purge_monsters;	/* # of dead monsters still on fmon list */
 	int	 override_ID;	/* true to force full identification of objects */
+	int	 suppress_price; /* controls doname() for unpaid objects */
 	coord	travelcc;	/* coordinates for travel_cache */
 	boolean  window_inited; /* true if init_nhwindows() completed */
 	boolean  vision_inited; /* true if vision is ready */
