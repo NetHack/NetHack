@@ -168,6 +168,7 @@ stop wielding cockatrice corpse which triggered own death followed by life-save
 format various prompts to avoid "Query truncated" entries in paniclog
 for inventory display, include cost info on hero-owned containers holding
 	shop goods
+shops now claim ownership of items created by using an unpaid horn of plenty
 
 
 Platform- and/or Interface-Specific Fixes
