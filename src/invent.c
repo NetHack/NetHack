@@ -299,8 +299,11 @@ struct obj *obj;
 
 	if (obj->where != OBJ_FREE)
 	    panic("addinv: obj not free");
-	obj->no_charge = 0;	/* not meaningful for invent */
-	obj->was_thrown = 0;	/* ditto */
+	/* normally addtobill() clears no_charge when items in a shop are
+	   picked up, but won't do so if the shop has become untended */
+	obj->no_charge = 0;	/* should not be set in hero's invent */
+	if (Has_contents(obj)) picked_container(obj);	/* clear no_charge */
+	obj->was_thrown = 0;	/* not meaningful for invent */
 
 	addinv_core1(obj);
 #ifndef GOLDOBJ
