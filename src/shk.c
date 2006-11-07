@@ -603,6 +603,26 @@ register char *enterstring;
 	return;
 }
 
+/* called when removing a pick-axe or mattock from a container */
+void
+pick_pick(obj)
+struct obj *obj;
+{
+	struct monst *shkp;
+
+	if (obj->unpaid || !is_pick(obj)) return;
+	shkp = shop_keeper(*u.ushops);
+	if (shkp && inhishop(shkp) && !muteshk(shkp)) {
+	    static NEARDATA long pickmovetime = 0L;
+
+	    /* if you bring a sack of N picks into a shop to sell,
+	       don't repeat this N times when they're taken out */
+	    if (moves != pickmovetime)
+		verbalize("You sneaky cad!  Get out of here with that pick!");
+	    pickmovetime = moves;
+	}
+}
+
 /*
    Decide whether two unpaid items are mergable; caller is responsible for
    making sure they're unpaid and the same type of object; we check the price
@@ -2222,7 +2242,7 @@ boolean ininv, dummy, silent;
 	    costly_gold(obj->ox, obj->oy, obj->quan);
 	    return;
 	} else if (ESHK(shkp)->billct == BILLSZ) {
-	    You("got that for free!");
+	    if (!silent) You("got that for free!");
 	    return;
 	}
 
@@ -2622,7 +2642,7 @@ xchar x, y;
 
 	if (ANGRY(shkp)) { /* they become shop-objects, no pay */
 		if (!muteshk(shkp))
-		    pline("Thank you, scum!");
+		    verbalize("Thank you, scum!");
 		subfrombill(obj, shkp);
 		return;
 	}

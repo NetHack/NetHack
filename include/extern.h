@@ -1969,6 +1969,7 @@ E char FDECL(inside_shop, (XCHAR_P,XCHAR_P));
 E void FDECL(u_left_shop, (char *,BOOLEAN_P));
 E void FDECL(remote_burglary, (XCHAR_P,XCHAR_P));
 E void FDECL(u_entered_shop, (char *));
+E void FDECL(pick_pick, (struct obj *));
 E boolean FDECL(same_price, (struct obj *,struct obj *));
 E void NDECL(shopper_financial_report);
 E int FDECL(inhishop, (struct monst *));

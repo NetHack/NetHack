@@ -1959,8 +1959,7 @@ register struct obj *obj;
 		obj->oy = current_container->oy;
 		addtobill(obj, FALSE, FALSE, FALSE);
 	}
-	if (is_pick(obj) && !obj->unpaid && *u.ushops && shop_keeper(*u.ushops))
-		verbalize("You sneaky cad! Get out of here with that pick!");
+	if (is_pick(obj)) pick_pick(obj);	/* shopkeeper feedback */
 
 	otmp = addinv(obj);
 	loadlev = near_capacity();
@@ -2440,7 +2439,7 @@ dotip()
     struct obj *cobj, *nobj;
     coord cc;
     int boxes;
-    char c, buf[BUFSZ];
+    char c, buf[BUFSZ], qbuf[BUFSZ];
     const char *spillage = 0;
 
     /*
@@ -2463,8 +2462,8 @@ dotip()
 		nobj = cobj->nexthere;
 		if (!Is_container(cobj)) continue;
 
-		Sprintf(buf, "There is %s here, tip it?", doname(cobj));
-		c = ynq(buf);
+		c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?",
+				  cobj, doname, ansimpleoname, "container"));
 		if (c == 'q') return 0;
 		if (c == 'n') continue;
 		
