@@ -71,6 +71,7 @@ STATIC_DCL void FDECL(bill_box_content, (struct obj *, BOOLEAN_P, BOOLEAN_P,
 				     struct monst *));
 STATIC_DCL boolean FDECL(rob_shop, (struct monst *));
 STATIC_DCL boolean FDECL(special_stock, (struct obj *, struct monst *, BOOLEAN_P));
+STATIC_DCL const char *FDECL(cad, (BOOLEAN_P));
 
 /*
 	invariants: obj->unpaid iff onbill(obj) [unless bp->useup]
@@ -618,7 +619,8 @@ struct obj *obj;
 	    /* if you bring a sack of N picks into a shop to sell,
 	       don't repeat this N times when they're taken out */
 	    if (moves != pickmovetime)
-		verbalize("You sneaky cad!  Get out of here with that pick!");
+		verbalize("You sneaky %s!  Get out of here with that pick!",
+			  cad(FALSE));
 	    pickmovetime = moves;
 	}
 }
@@ -3672,7 +3674,7 @@ boolean cant_mollify;
 
 	if (Invis) Your("invisibility does not fool %s!", shkname(shkp));
 	Sprintf(qbuf,"%sYou did %ld %s worth of damage!%s  Pay?",
-		!animal ? "\"Cad!  " : "", cost_of_damage,
+		!animal ? cad(TRUE) : "", cost_of_damage,
 		currency(cost_of_damage), !animal ? "\"" : "");
 	if(yn(qbuf) != 'n') {
 		cost_of_damage = check_credit(cost_of_damage, shkp);
@@ -3984,6 +3986,7 @@ boolean altusage;
 {
 	struct monst *shkp;
 	const char *fmt, *arg1, *arg2;
+	char buf[BUFSZ];
 	long tmp;
 
 	if (!otmp->unpaid || !*u.ushops ||
@@ -3997,7 +4000,8 @@ boolean altusage;
 	arg1 = arg2 = "";
 	if (otmp->oclass == SPBOOK_CLASS) {
 	    fmt = "%sYou owe%s %ld %s.";
-	    arg1 = rn2(2) ? "This is no free library, cad!  " : "";
+	    Sprintf(buf, "This is no free library, %s!  ", cad(FALSE));
+	    arg1 = rn2(2) ? buf : "";
 	    arg2 = ESHK(shkp)->debit > 0L ? " an additional" : "";
 	} else if (otmp->otyp == POT_OIL) {
 	    fmt = "%s%sThat will cost you %ld %s (Yendorian Fuel Tax).";
@@ -4179,6 +4183,32 @@ struct obj *obj;
 	if (obj->where == OBJ_MINVENT)
 	    return strcpy(buf, s_suffix(y_monnam(obj->ocarry)));
 	return (char *)0;
+}
+
+STATIC_OVL const char *
+cad(altusage)
+boolean altusage;	/* used as a verbalized exclamation:  \"Cad! ...\" */
+{
+    const char *res = 0;
+
+    switch (is_demon(youmonst.data) ? 3 : poly_gender()) {
+    case 0: res = "cad"; break;
+    case 1: res = "minx"; break;
+    case 2: res = "beast"; break;
+    case 3: res = "fiend"; break;
+    default: impossible("cad: unknown gender");
+	    res = "thing"; break;
+    }
+    if (altusage) {
+	char *cadbuf = mon_nam(&youmonst);	/* snag an output buffer */
+
+	/* alternate usage adds a leading double quote and trailing
+	   exclamation point plus sentence separating spaces */
+	Sprintf(cadbuf, "\"%s!  ", res);
+	cadbuf[1] = highc(cadbuf[1]);
+	res = cadbuf;
+    }
+    return res;
 }
 
 #ifdef __SASC
