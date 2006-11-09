@@ -769,6 +769,14 @@ register boolean silent;
 	return (struct bill_x *)0;
 }
 
+/* check whether an object or any of its contents belongs to a shop */
+boolean
+is_unpaid(obj)
+struct obj *obj;
+{
+	return (obj->unpaid || (Has_contents(obj) && count_unpaid(obj->cobj)));
+}
+
 /* Delete the contents of the given object. */
 void
 delete_contents(obj)
@@ -2621,14 +2629,13 @@ xchar x, y;
 
 	/* get one case out of the way: nothing to sell, and no gold */
 	if (!isgold && ((offer + gltmp) == 0L || sell_how == SELL_DONTSELL)) {
-		boolean unpaid = (obj->unpaid ||
-				  (container && count_unpaid(obj->cobj)));
+		boolean unpaid = is_unpaid(obj);
 
 		if(container) {
 			dropped_container(obj, shkp, FALSE);
 			if(!obj->unpaid && !saleitem)
 			    obj->no_charge = 1;
-			if(obj->unpaid || count_unpaid(obj->cobj))
+			if (unpaid)
 			    subfrombill(obj, shkp);
 		} else obj->no_charge = 1;
 

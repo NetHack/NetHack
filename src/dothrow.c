@@ -702,13 +702,13 @@ boolean broken;
 	if (broken ||
 	    !costly_spot(x, y) || *in_rooms(x, y, SHOPBASE) != *u.ushops) {
 		/* thrown out of a shop or into a different shop */
-		if (count_unpaid(obj))
+		if (is_unpaid(obj))
 		    (void)stolen_value(obj, u.ux, u.uy,
 				       (boolean)shkp->mpeaceful, FALSE);
 		if (broken) obj->no_charge = 1;
 	} else {
 		if (costly_spot(u.ux, u.uy) && costly_spot(x, y)) {
-		    if (count_unpaid(obj))
+		    if (is_unpaid(obj))
 			subfrombill(obj, shkp);
 		    else if (x != shkp->mx || y != shkp->my)
 			sellobj(obj, x, y);

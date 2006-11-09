@@ -1311,7 +1311,7 @@ boolean shop_floor_obj;
 		(toloc != MIGR_LADDER_UP && rn2(3));
 
 	container = Has_contents(otmp);
-	unpaid = (otmp->unpaid || (container && count_unpaid(otmp->cobj)));
+	unpaid = is_unpaid(otmp);
 
 	if(OBJ_AT(x, y)) {
 	    for(obj = level.objects[x][y]; obj; obj = obj->nexthere)

@@ -1975,6 +1975,7 @@ E void NDECL(shopper_financial_report);
 E int FDECL(inhishop, (struct monst *));
 E struct monst *FDECL(shop_keeper, (CHAR_P));
 E boolean FDECL(tended_shop, (struct mkroom *));
+E boolean FDECL(is_unpaid, (struct obj *));
 E void FDECL(delete_contents, (struct obj *));
 E void FDECL(obfree, (struct obj *,struct obj *));
 E void FDECL(home_shk, (struct monst *,BOOLEAN_P));

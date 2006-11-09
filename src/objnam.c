@@ -827,7 +827,7 @@ ring:
 			Strcat(bp, " (alternate weapon; not wielded)");
 	}
 	if(obj->owornmask & W_QUIVER) Strcat(bp, " (in quiver)");
-	if (!iflags.suppress_price && count_unpaid(obj)) {
+	if (!iflags.suppress_price && is_unpaid(obj)) {
 		long quotedprice = unpaid_cost(obj, TRUE);
 
 		Sprintf(eos(bp), " (%s, %ld %s)",
