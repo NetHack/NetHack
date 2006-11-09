@@ -1828,8 +1828,7 @@ boolean tipping;  /* caller emptying entire contents; affects shop handling */
 	obj->owt = weight(obj);
 	/* using a shop's horn of plenty entails a usage fee and also
 	   confers ownership of the created item to the shopkeeper */
-	if (carried(horn) ? horn->unpaid :
-		(costly_spot(u.ux, u.uy) && !horn->no_charge))
+	if (horn->unpaid)
 	    addtobill(obj, FALSE, FALSE, tipping);
 	/* if it ended up on bill, we don't want "(unpaid, N zorkids)"
 	   being included in its formatted name during next message */

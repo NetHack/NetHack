@@ -1818,9 +1818,10 @@ assign_sym:
 
 /* release a monster from a bag of tricks; return number of monsters created */
 int
-bagotricks(bag, tipping)
+bagotricks(bag, tipping, seencount)
 struct obj *bag;
 boolean tipping;  /* caller emptying entire contents; affects shop handling */
+int *seencount;   /* secondary output */
 {
     int moncount = 0;
 
@@ -1832,8 +1833,7 @@ boolean tipping;  /* caller emptying entire contents; affects shop handling */
 	if (bag->dknown && objects[bag->otyp].oc_name_known) bag->cknown = 1;
     } else {
 	struct monst *mtmp;
-	boolean sawone = FALSE;
-	int creatcnt = 1;
+	int creatcnt = 1, seecount = 0;
 
 	consume_obj_charge(bag, !tipping);
 
@@ -1842,18 +1842,18 @@ boolean tipping;  /* caller emptying entire contents; affects shop handling */
 	    mtmp = makemon((struct permonst *)0, u.ux, u.uy, NO_MM_FLAGS);
 	    if (mtmp) {
 		++moncount;
-		if (canspotmon(mtmp)) sawone = TRUE;
+		if (canspotmon(mtmp)) ++seecount;
 	    }
 	} while (--creatcnt > 0);
-	if (sawone) {
+	if (seecount) {
+	    if (seencount) *seencount += seecount;
 	    /* don't set contents-known flag if we just used last charge 
 	       (such suppression doesn't actually gain us much since
 	       player can now deduce that the bag has become empty) */
 	    if (bag->spe > 0) bag->cknown = 1;
 	    if (bag->dknown) makeknown(BAG_OF_TRICKS);
-	} else {
-	    /* #tip while blind can trigger this successive times */
-	    Norep("Nothing seems to happen.");
+	} else if (!tipping) {
+	    pline(!moncount ? nothing_happens : "Nothing seems to happen.");
 	}
     }
     return moncount;

@@ -2529,7 +2529,21 @@ STATIC_OVL void
 tipcontainer(box)
 struct obj *box;	/* or bag */
 {
-    boolean empty_it = FALSE;
+    xchar ox = u.ux, oy = u.uy; /* #tip only works at hero's location */
+    boolean empty_it = FALSE,
+	  /* Shop handling:  can't rely on the container's own unpaid
+	     or no_charge status because contents might differ with it.
+	     A carried container's contents will be flagged as unpaid
+	     or not, as appropriate, and need no special handling here.
+	     Items owned by the hero get sold to the shop without
+	     confirmation as with other uncontrolled drops.  A floor
+	     container's contents will be marked no_charge if owned by
+	     hero, otherwise they're owned by the shop.  By passing
+	     the contents through shop billing, they end up getting
+	     treated the same as in the carried case.   We do so one
+	     item at a time instead of doing whole container at once
+	     to reduce the chance of exhausting shk's billing capacity. */
+	    maybeshopgoods = !carried(box) && costly_spot(ox, oy);
 
     /* caveat: this assumes that cknown, lknown, olocked, and otrapped
        fields haven't been overloaded to mean something special for the
@@ -2547,22 +2561,29 @@ struct obj *box;	/* or bag */
 	}
     } else if (box->otyp == BAG_OF_TRICKS || box->otyp == HORN_OF_PLENTY) {
 	boolean bag = box->otyp == BAG_OF_TRICKS;
-	int old_spe = box->spe;
+	int old_spe = box->spe, seen = 0;
 
+	if (maybeshopgoods && !box->no_charge)
+	    addtobill(box, FALSE, FALSE, TRUE);
 	/* apply this bag/horn until empty or monster/object creation fails
 	   (if the latter occurs, force the former...) */
 	do {
-	    if (!(bag ? bagotricks(box, TRUE) : hornoplenty(box, TRUE)))
+	    if (!(bag ? bagotricks(box, TRUE, &seen) : hornoplenty(box, TRUE)))
 		break;
 	} while (box->spe > 0);
 
 	if (box->spe < old_spe) {
+	    if (bag) pline((seen == 0) ? "Nothing seems to happen." :
+			   (seen == 1) ? "A monster appears." :
+			   "Monsters appear!");
 	    /* check_unpaid wants to see a non-zero charge count */
 	    box->spe = old_spe;
 	    check_unpaid_usage(box, TRUE);
 	    box->spe = 0;	/* empty */
 	    box->cknown = 1;
 	}
+	if (maybeshopgoods && !box->no_charge)
+	    subfrombill(box, shop_keeper(*in_rooms(ox, oy, SHOPBASE)));
     } else if (box->spe) {
 	char yourbuf[BUFSZ];
 
@@ -2584,7 +2605,7 @@ struct obj *box;	/* or bag */
 	struct obj *otmp, *nobj;
 	boolean verbose = FALSE,
 		highdrop = !can_reach_floor(TRUE),
-		altarizing = IS_ALTAR(levl[u.ux][u.uy].typ),
+		altarizing = IS_ALTAR(levl[ox][oy].typ),
 		cursed_mbag = (Is_mbag(box) && box->cursed);
 	int held = carried(box);
 	long loss = 0L;
@@ -2600,7 +2621,15 @@ struct obj *box;	/* or bag */
 		loss += mbag_item_gone(held, otmp);
 		/* abbreviated drop format is no longer appropriate */
 		verbose = TRUE;
-	    } else if (highdrop) {
+		continue;
+	    }
+
+	    if (maybeshopgoods) {
+		addtobill(otmp, FALSE, FALSE, TRUE);
+		iflags.suppress_price++;	/* doname formatting */
+	    }
+
+	    if (highdrop) {
 		/* might break or fall down stairs; handles altars itself */
 		hitfloor(otmp);
 	    } else {
@@ -2608,11 +2637,12 @@ struct obj *box;	/* or bag */
 		    doaltarobj(otmp);
 		else if (verbose)
 		    pline("%s %s to the %s.", Doname2(otmp),
-		          otense(otmp, "drop"), surface(u.ux, u.uy));
+			  otense(otmp, "drop"), surface(ox, oy));
 		else
 		    pline("%s%c", doname(otmp), nobj ? ',' : '.');
 		dropy(otmp);
 	    }
+	    if (maybeshopgoods) iflags.suppress_price--;	/* reset */
 	}
 	if (loss)	/* magic bag lost some shop goods */
 	    You("owe %ld %s for lost merchandise.", loss, currency(loss));
