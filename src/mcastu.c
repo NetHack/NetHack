@@ -403,7 +403,7 @@ int spellnum;
 	    if (Half_spell_damage) dmg = (dmg + 1) / 2;
 	    losestr(rnd(dmg));
 	    if (u.uhp < 1)
-		done_in_by(mtmp);
+		done_in_by(mtmp, DIED);
 	}
 	dmg = 0;
 	break;

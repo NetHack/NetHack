@@ -2239,8 +2239,7 @@ boolean wep_was_destroyed;
 		    if (!Stone_resistance &&
 			    !(poly_when_stoned(youmonst.data) &&
 				polymon(PM_STONE_GOLEM))) {
-			You("turn to stone...");
-			done_in_by(mon);
+			done_in_by(mon, STONING); /* "You turn to stone..." */
 			return 2;
 		    }
 		}

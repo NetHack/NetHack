@@ -186,13 +186,14 @@ int sig;
 #endif /* NO_SIGNAL */
 
 void
-done_in_by(mtmp)
-register struct monst *mtmp;
+done_in_by(mtmp, how)
+struct monst *mtmp;
+int how;
 {
 	char buf[BUFSZ];
 	boolean distorted = (boolean)(Hallucination && canspotmon(mtmp));
 
-	You("die...");
+	You((how == STONING) ? "turn to stone..." : "die...");
 	mark_synch();	/* flush buffered screen output */
 	buf[0] = '\0';
 	killer.format = KILLED_BY_AN;
@@ -246,10 +247,8 @@ register struct monst *mtmp;
 	if (u.ugrave_arise >= LOW_PM &&
 				(mvitals[u.ugrave_arise].mvflags & G_GENOD))
 		u.ugrave_arise = NON_PM;
-	if (touch_petrifies(mtmp->data))
-		done(STONING);
-	else
-		done(DIED);
+
+	done(how);
 	return;
 }
 

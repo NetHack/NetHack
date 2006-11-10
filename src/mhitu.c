@@ -1169,8 +1169,7 @@ dopois:
 				}
 				make_stoned(5L, (char *)0, kformat, kname);
 				return(1);
-				/* You("turn to stone..."); */
-				/* done_in_by(mtmp); */
+				/* done_in_by(mtmp, STONING); */
 			    }
 			}
 		    }
@@ -1518,7 +1517,7 @@ dopois:
 	    default:	dmg = 0;
 			break;
 	}
-	if(u.uhp < 1) done_in_by(mtmp);
+	if (u.uhp < 1) done_in_by(mtmp, DIED);
 
 /*	Negative armor class reduces damage done instead of fully protecting
  *	against hits.
@@ -2059,7 +2058,7 @@ register int n;
 		if (u.mh < 1) rehumanize();
 	} else {
 		u.uhp -= n;
-		if(u.uhp < 1) done_in_by(mtmp);
+		if (u.uhp < 1) done_in_by(mtmp, DIED);
 	}
 }
 
