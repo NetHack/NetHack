@@ -440,12 +440,10 @@ xchar x, y;
 	    if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
 		;	/* hero has been transformed but kick continues */
 	    } else {
-		You("turn to stone...");
-		killer.format = KILLED_BY;
 		/* normalize body shape here; foot, not body_part(FOOT) */
 		Sprintf(killer.name, "kicking %s barefoot",
 			killer_xname(kickobj));
-		done(STONING);
+		instapetrify(killer.name);
 	    }
 	}
 
