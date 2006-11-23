@@ -171,6 +171,7 @@ for inventory display, include cost info on hero-owned containers holding
 shops now claim ownership of items created by using an unpaid horn of plenty
 shopkeepers shouldn't refer to non-male character as "cad"
 tweak levitation timeout if trap is being triggered on same turn it is to end
+if Rider corpse revival fails, usually try again later instead of rotting away
 
 
 Platform- and/or Interface-Specific Fixes

@@ -1589,13 +1589,43 @@ anything *arg;
 long timeout;
 {
     struct obj *body = arg->a_obj;
+    struct permonst *mptr = &mons[body->corpsenm];
+    struct monst *mtmp;
+    xchar x, y;
 
-    /* if we succeed, the corpse is gone, otherwise, rot it away */
+    /* corpse will revive somewhere else if there is a monster in the way;
+       Riders get a chance to try to bump the obstacle out of their way */
+    if ((mptr->mflags3 & M3_DISPLACES) != 0 && body->where == OBJ_FLOOR &&
+	    get_obj_location(body, &x, &y, 0) && (mtmp = m_at(x, y)) != 0) {
+	boolean notice_it = canseemon(mtmp);	/* before rloc() */
+	char *monname = Monnam(mtmp);
+
+	if (rloc(mtmp, TRUE)) {
+	    if (notice_it && !canseemon(mtmp))
+		pline("%s vanishes.", monname);
+	    else if (!notice_it && canseemon(mtmp))
+		pline("%s appears.", Monnam(mtmp)); /* not pre-rloc monname */
+	    else if (notice_it && dist2(mtmp->mx, mtmp->my, x, y) > 2)
+		pline("%s teleports.", monname); /* saw it and still see it */
+	}
+    }
+
+    /* if we succeed, the corpse is gone */
     if (!revive_corpse(body)) {
-	if (is_rider(&mons[body->corpsenm]))
-	    You_feel("less hassled.");
-	(void) start_timer(250L - (monstermoves-body->age),
-					TIMER_OBJECT, ROT_CORPSE, arg);
+	long when;
+	int action;
+
+	if (is_rider(mptr) && rn2(99)) {	/* Rider usually tries again */
+	    action = REVIVE_MON;
+	    for (when = 3L; when < 67L; when++)
+		if (!rn2(3)) break;
+	} else {				/* rot this corpse away */
+	    You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
+	    action = ROT_CORPSE;
+	    when = 250L - (monstermoves - body->age);
+	    if (when < 1L) when = 1L;
+	}
+	(void) start_timer(when, TIMER_OBJECT, action, arg);
     }
 }
 
