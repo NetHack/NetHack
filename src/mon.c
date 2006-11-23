@@ -2584,6 +2584,9 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	struct permonst *olddata = mtmp->data;
 	char oldname[BUFSZ], newname[BUFSZ];
 
+	/* Riders are immune to polymorph and green slime */
+	if (is_rider(mtmp->data)) return 0;
+
 	if (msg) {
 	    /* like Monnam() but never mention saddle */
 	    Strcpy(oldname, x_monnam(mtmp, ARTICLE_THE, (char *)0,
