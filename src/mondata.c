@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.5	2006/08/26	*/
+/*	SCCS Id: @(#)mondata.c	3.5	2006/11/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -91,6 +91,8 @@ resists_magm(mon)	/* TRUE if monster is magic-missile resistant */
 struct monst *mon;
 {
 	struct permonst *ptr = mon->data;
+	boolean is_you = (mon == &youmonst);
+	long slotmask;
 	struct obj *o;
 
 	/* as of 3.2.0:  gray dragons, Angels, Oracle, Yeenoghu */
@@ -98,13 +100,19 @@ struct monst *mon;
 		dmgtype(ptr, AD_RBRE))	/* Chromatic Dragon */
 	    return TRUE;
 	/* check for magic resistance granted by wielded weapon */
-	o = (mon == &youmonst) ? uwep : MON_WEP(mon);
+	o = is_you ? uwep : MON_WEP(mon);
 	if (o && o->oartifact && defends(AD_MAGM, o))
 	    return TRUE;
 	/* check for magic resistance granted by worn or carried items */
-	o = (mon == &youmonst) ? invent : mon->minvent;
+	o = is_you ? invent : mon->minvent;
+	slotmask = W_ARMOR | W_RING | W_AMUL | W_TOOL;
+	if (!is_you ||	/* assumes monsters don't wield non-weapons */
+		uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+	    slotmask |= W_WEP;
+	if (is_you && u.twoweap) slotmask |= W_SWAPWEP;
 	for ( ; o; o = o->nobj)
-	    if ((o->owornmask && objects[o->otyp].oc_oprop == ANTIMAGIC) ||
+	    if (((o->owornmask & slotmask) != 0L &&
+			objects[o->otyp].oc_oprop == ANTIMAGIC) ||
 		    (o->oartifact && protects(AD_MAGM, o)))
 		return TRUE;
 	return FALSE;
@@ -117,6 +125,7 @@ struct monst *mon;
 {
 	struct permonst *ptr = mon->data;
 	boolean is_you = (mon == &youmonst);
+	long slotmask;
 	struct obj *o;
 
 	if (is_you ? (Blind || Unaware) :
@@ -133,8 +142,14 @@ struct monst *mon;
 	if (o && o->oartifact && defends(AD_BLND, o))
 	    return TRUE;
 	o = is_you ? invent : mon->minvent;
+	slotmask = W_ARMOR | W_RING | W_AMUL | W_TOOL;
+	if (!is_you ||	/* assumes monsters don't wield non-weapons */
+		uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+	    slotmask |= W_WEP;
+	if (is_you && u.twoweap) slotmask |= W_SWAPWEP;
 	for ( ; o; o = o->nobj)
-	    if ((o->owornmask && objects[o->otyp].oc_oprop == BLINDED) ||
+	    if (((o->owornmask & slotmask) != 0L &&
+			objects[o->otyp].oc_oprop == BLINDED) ||
 		    (o->oartifact && protects(AD_BLND, o)))
 		return TRUE;
 	return FALSE;
