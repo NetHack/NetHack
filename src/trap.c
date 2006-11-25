@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2006/09/28	*/
+/*	SCCS Id: @(#)trap.c	3.5	2006/11/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1182,10 +1182,36 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 
 	    case ANTI_MAGIC:
 		seetrap(trap);
-		if(Antimagic) {
-		    shieldeff(u.ux, u.uy);
-		    You_feel("momentarily lethargic.");
-		} else drain_en(rnd(u.ulevel) + 1);
+		/* hero without magic resistance loses spell energy,
+		   hero with magic resistance takes damage instead;
+		   possibly non-intuitive but useful for play balance */
+		if (!Antimagic) {
+		    drain_en(rnd(u.ulevel) + 1);
+		} else {
+		    int dmgval = rnd(4), hp = Upolyd ? u.mh : u.uhp;
+
+		    /* Half_XXX_damage has opposite its usual effect (approx)
+		       but isn't cumulative if hero has more than one */
+		    if (Half_physical_damage || Half_spell_damage)
+			dmgval += rnd(4);
+		    /* give Magicbane wielder dose of own medicine */
+		    if (uwep && uwep->oartifact == ART_MAGICBANE)
+			dmgval += rnd(4);
+		    /* having an artifact--other than own quest one--which
+		       confers magic resistance simply by being carried
+		       also increases the effect */
+		    for (otmp = invent; otmp; otmp = otmp->nobj)
+			if (otmp->oartifact && !is_quest_artifact(otmp) &&
+			    protects(AD_MAGM, otmp)) break;
+		    if (otmp) dmgval += rnd(4);
+		    if (Passes_walls) dmgval = (dmgval + 3) / 4;
+
+		    You_feel((dmgval >= hp) ? "unbearably torpid!" :
+			     (dmgval >= hp / 4) ? "very lethargic." :
+			     "sluggish.");
+		    /* opposite of magical explosion */
+		    losehp(dmgval, "anti-magic implosion", KILLED_BY_AN);
+		}
 		break;
 
 	    case POLY_TRAP: {
@@ -1898,7 +1924,7 @@ register struct monst *mtmp;
 #endif
 	    if (!inescapable &&
 		    ((mtmp->mtrapseen & (1 << (tt-1))) != 0 ||
-			(tt == HOLE && !mindless(mtmp->data)))) {
+			(tt == HOLE && !mindless(mptr)))) {
 		/* it has been in such a trap - perhaps it escapes */
 		if(rn2(4)) return(0);
 	    } else {
@@ -2112,7 +2138,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 
 			    /* paper burns very fast, assume straw is tightly
 			     * packed and burns a bit slower */
-			    switch (monsndx(mtmp->data)) {
+			    switch (monsndx(mptr)) {
 			    case PM_PAPER_GOLEM:   immolate = TRUE;
 						   alt = mtmp->mhpmax; break;
 			    case PM_STRAW_GOLEM:   alt = mtmp->mhpmax / 2; break;
@@ -2166,7 +2192,8 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    pline("%s %s into %s pit!",
 				  Monnam(mtmp), fallverb,
 				  a_your[trap->madeby_u]);
-			    if (mptr == &mons[PM_PIT_VIPER] || mptr == &mons[PM_PIT_FIEND])
+			    if (mptr == &mons[PM_PIT_VIPER] ||
+				    mptr == &mons[PM_PIT_FIEND])
 				pline("How pitiful.  Isn't that the pits?");
 			    seetrap(trap);
 			}
@@ -2317,6 +2344,36 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			if (!rn2(21)) goto mfiretrap;
 			break;
 		case ANTI_MAGIC:
+			/* similar to hero's case, more or less */
+			if (!resists_magm(mtmp)) {	/* lose spell energy */
+			    if (attacktype(mptr, AT_MAGC) ||
+				    attacktype(mptr, AT_BREA)) {
+				mtmp->mspec_used += d(2, 2);
+				if (in_sight) {
+				    seetrap(trap);
+				    pline("%s seems lethargic.", Monnam(mtmp));
+				}
+			    }
+			} else {			/* take some damage */
+			    int dmgval = rnd(4);
+
+			    if ((otmp = MON_WEP(mtmp)) != 0 &&
+				    otmp->oartifact == ART_MAGICBANE)
+				dmgval += rnd(4);
+			    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) 
+				if (otmp->oartifact && protects(AD_MAGM, otmp))
+				    break;
+			    if (otmp) dmgval += rnd(4);
+			    if (passes_walls(mptr)) dmgval = (dmgval + 3) / 4;
+
+			    if (in_sight) seetrap(trap);
+			    if ((mtmp->mhp -= dmgval) <= 0)
+				monkilled(mtmp, in_sight ?
+				    "compression from an anti-magic field" : 0,
+					  -AD_MAGM);
+			    if (mtmp->mhp <= 0) trapkilled = TRUE;
+			    if (see_it) newsym(trap->tx, trap->ty);
+			}
 			break;
 
 		case LANDMINE:
@@ -2364,8 +2421,9 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 		    if (resists_magm(mtmp)) {
 			shieldeff(mtmp->mx, mtmp->my);
 		    } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-			(void) newcham(mtmp, (struct permonst *)0,
-				       FALSE, FALSE);
+			if (newcham(mtmp, (struct permonst *)0, FALSE, FALSE))
+			    /* we're done with mptr but keep it up to date */
+			    mptr = mtmp->data;
 			if (in_sight) seetrap(trap);
 		    }
 		    break;
@@ -3288,15 +3346,18 @@ void
 drain_en(n)
 register int n;
 {
-	if (!u.uenmax) return;
+    if (!u.uenmax) {
+	You_feel("momentarily lethargic.");
+    } else {
 	You_feel("your magical energy drain away!");
 	u.uen -= n;
 	if(u.uen < 0)  {
-		u.uenmax += u.uen;
+		u.uenmax -= rnd(-u.uen);
 		if(u.uenmax < 0) u.uenmax = 0;
 		u.uen = 0;
 	}
 	context.botl = 1;
+    }
 }
 
 int
