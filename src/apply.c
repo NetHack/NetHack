@@ -697,7 +697,7 @@ struct obj *obj;
 	boolean vis;
 
 	if(!getdir((char *)0)) return 0;
-	mirror = simple_typename(obj->otyp); /* "mirror" or "looking glass" */
+	mirror = simpleonames(obj); /* "mirror" or "looking glass" */
 	if(obj->cursed && !rn2(2)) {
 		if (!Blind)
 		    pline_The("%s fogs up and doesn't reflect!", mirror);

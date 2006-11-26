@@ -498,7 +498,7 @@ outer_break:
 		      buf, distant_name(best,doname));
 		if (autocurse)
 		    pline("%s %s %s %s for a moment.",
-			  s_suffix(Monnam(mon)), simple_typename(best->otyp),
+			  s_suffix(Monnam(mon)), simpleonames(best),
 			  otense(best, "glow"), hcolor(NH_BLACK));
 	    } /* can see it */
 	    m_delay += objects[best->otyp].oc_delay;

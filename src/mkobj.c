@@ -517,7 +517,7 @@ int alter_type;
     xchar ox, oy;
     char objroom;
     boolean set_bknown;
-    const char *those, *them, *what;
+    const char *those, *them;
     struct monst *shkp = 0;
 
     if (alter_type < 0 || alter_type >= SIZE(alteration_verbs)) {
@@ -559,10 +559,9 @@ int alter_type;
     case OBJ_FREE:	/* obj_no_longer_held() */
     case OBJ_INVENT:
 	if (set_bknown) obj->bknown = 1;
-	what = simple_typename(obj->otyp);
-	if (obj->quan != 1L) what = makeplural(what);
 	verbalize("You %s %s %s, you pay for %s!",
-		  alteration_verbs[alter_type], those, what, them);
+		  alteration_verbs[alter_type], those,
+		  simpleonames(obj), them);
 	bill_dummy_object(obj);
 	break;
     case OBJ_FLOOR:

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2006/10/16	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2006/11/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,7 @@ STATIC_DCL char *FDECL(strprepend,(char *,const char *));
 STATIC_DCL boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
 STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
+STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
 
 struct Jitem {
@@ -488,6 +489,47 @@ nameit:
 
 	if (!strncmpi(buf, "the ", 4)) buf += 4;
 	return(buf);
+}
+
+/* similar to simple_typename but minimal_xname operates on a particular
+   object rather than its general type; it formats the most basic info:
+	potion				-- if description not known
+	brown potion			-- if oc_name_known not set
+	potion of object detection	-- if discovered
+ */
+static char *
+minimal_xname(obj)
+struct obj *obj;
+{
+    char *bufp;
+    struct obj bareobj;
+    struct objclass saveobcls;
+    int otyp = obj->otyp;
+
+    /* suppress user-supplied name */
+    saveobcls.oc_uname = objects[otyp].oc_uname;
+    objects[otyp].oc_uname = 0;
+    /* suppress actual name if object's description is unknown */
+    saveobcls.oc_name_known = objects[otyp].oc_name_known;
+    if (!obj->dknown) objects[otyp].oc_name_known = 0;
+
+    /* caveat: this makes a lot of assumptions about which fields
+       are required in order for xname() to yield a sensible result */
+    bareobj = zeroobj;
+    bareobj.otyp = otyp;
+    bareobj.oclass = obj->oclass;
+    bareobj.dknown = obj->dknown;
+    /* suppress known except for amulets (needed for fakes and real A-of-Y) */
+    bareobj.known = (obj->oclass == AMULET_CLASS) ? obj->known :
+			/* default is "on" for types which don't use it */
+			!objects[otyp].oc_uses_known;
+    bareobj.quan = 1L;		/* don't want plural */
+    bufp = distant_name(&bareobj, xname);	/* xname(&bareobj) */
+    if (!strncmp(bufp, "uncursed ", 9)) bufp += 9;  /* Role_if(PM_PRIEST) */
+
+    objects[otyp].oc_uname = saveobcls.oc_uname;
+    objects[otyp].oc_name_known = saveobcls.oc_name_known;
+    return bufp;
 }
 
 /* xname() output augmented for multishot missile feedback */
@@ -1099,7 +1141,7 @@ unsigned lenlimit;
     outbuf = (*func)(obj);
     if (altfunc && (unsigned)strlen(outbuf) > lenlimit) {
 	/* still long; use the alternate function (usually one of
-	   the jackets around simple_typename()) */
+	   the jackets around minimal_xname()) */
 	releaseobuf(outbuf);
 	outbuf = (*altfunc)(obj);
     }
@@ -1469,9 +1511,9 @@ struct obj *obj;
 	return s;
 }
 
-/* returns "your simple_typename(obj->otyp)"
- * or "Foobar's simple_typename(obj->otyp)"
- * or "the simple_typename(obj-otyp)"
+/* returns "your minimal_xname(obj)"
+ * or "Foobar's minimal_xname(obj)"
+ * or "the minimal_xname(obj)"
  */
 char *
 ysimple_name(obj)
@@ -1481,7 +1523,7 @@ struct obj *obj;
 	char *s = shk_your(outbuf, obj);	/* assert( s == outbuf ); */
 	int space_left = BUFSZ - 1 - strlen(s);
 
-	return strncat(s, simple_typename(obj->otyp), space_left);
+	return strncat(s, minimal_xname(obj), space_left);
 }
 
 /* capitalized variant of ysimple_name() */
@@ -1500,7 +1542,7 @@ char *
 simpleonames(obj)
 struct obj *obj;
 {
-	char *simpleoname = simple_typename(obj->otyp);
+	char *simpleoname = minimal_xname(obj);
 
 	if (obj->quan != 1L) simpleoname = makeplural(simpleoname);
 	return simpleoname;
