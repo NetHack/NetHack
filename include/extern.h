@@ -393,7 +393,7 @@ E int FDECL(select_off, (struct obj *));
 E int NDECL(take_off);
 #endif
 E void FDECL(off_msg, (struct obj *));
-E void NDECL(set_wear);
+E void FDECL(set_wear, (struct obj *));
 E boolean FDECL(donning, (struct obj *));
 E void NDECL(cancel_don);
 E int NDECL(Armor_off);
@@ -2538,6 +2538,7 @@ E boolean FDECL(worm_known, (struct monst *));
 
 E void FDECL(setworn, (struct obj *,long));
 E void FDECL(setnotworn, (struct obj *));
+E long FDECL(wearslot, (struct obj *));
 E void FDECL(mon_set_minvis, (struct monst *));
 E void FDECL(mon_adjust_speed, (struct monst *,int,struct obj *));
 E void FDECL(update_mon_intrinsics,

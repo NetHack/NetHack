@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2006/05/09	*/
+/*	SCCS Id: @(#)zap.c	3.5	2006/11/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1434,36 +1434,37 @@ poly_obj(obj, id)
 	/* update the weight */
 	otmp->owt = weight(otmp);
 
-	/* for now, take off worn items being polymorphed */
-	if (obj_location == OBJ_INVENT) {
-	    if (id == STRANGE_OBJECT)
-		remove_worn_item(obj, TRUE);
-	    else {
-		/* This is called only for stone to flesh.  It's a lot simpler
-		 * than it otherwise might be.  We don't need to check for
-		 * special effects when putting them on (no meat objects have
-		 * any) and only three worn masks are possible.
-		 */
-		otmp->owornmask = obj->owornmask;
-		remove_worn_item(obj, TRUE);
-		setworn(otmp, otmp->owornmask);
-		if (otmp->owornmask & LEFT_RING)
-		    uleft = otmp;
-		if (otmp->owornmask & RIGHT_RING)
-		    uright = otmp;
-		if (otmp->owornmask & W_WEP)
-		    uwep = otmp;
-		if (otmp->owornmask & W_SWAPWEP)
-		    uswapwep = otmp;
-		if (otmp->owornmask & W_QUIVER)
-		    uquiver = otmp;
-		goto no_unwear;
+	/* handle polymorph of worn item: stone-to-flesh cast on self can
+	   affect multiple objects at once, but their new forms won't
+	   produce any side-effects; a single worn item dipped into potion
+	   of polymorph can produce side-effects but those won't yield out
+	   of sequence messages because current polymorph is finished */
+	if (obj_location == OBJ_INVENT && obj->owornmask) {
+	    long old_wornmask = obj->owornmask & ~(W_ART|W_ARTI),
+		 new_wornmask = wearslot(otmp);
+	    boolean was_twohanded = bimanual(obj),
+		    was_twoweap = u.twoweap;
+
+	    remove_worn_item(obj, TRUE);
+	    /* if the new form can be worn in the same slot, make it so
+	       [possible extension:  if it could be worn in some other
+	       slot which is currently unfilled, wear it there instead] */
+	    if ((old_wornmask & W_QUIVER) != 0L) {
+		setuqwep(otmp);
+	    } else if ((old_wornmask & W_SWAPWEP) != 0L) {
+		if (was_twohanded || !bimanual(otmp))
+		    setuswapwep(otmp);
+		if (was_twoweap && uswapwep) u.twoweap = TRUE;
+	    } else if ((old_wornmask & W_WEP) != 0L) {
+		if (was_twohanded || !bimanual(otmp) || !uarms)
+		    setuwep(otmp);
+		if (was_twoweap && uwep && !bimanual(uwep)) u.twoweap = TRUE;
+	    } else if ((old_wornmask & new_wornmask) != 0L) {
+		new_wornmask &= old_wornmask;
+		setworn(otmp, new_wornmask);
+		set_wear(otmp);		/* Armor_on() for side-effects */
 	    }
 	}
-
-	/* preserve the mask in case being used by something else */
-	otmp->owornmask = obj->owornmask;
-no_unwear:
 
 	/* ** we are now done adjusting the object ** */
 

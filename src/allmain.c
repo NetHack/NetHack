@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)allmain.c	3.5	2006/04/01	*/
+/*	SCCS Id: @(#)allmain.c	3.5	2006/11/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -53,9 +53,9 @@ boolean resuming;
 
     if (!resuming) {	/* new game */
 	context.rndencode = rnd(9000);
-	set_wear();		/* handle side-effects of worn starting gear */
+	set_wear((struct obj *)0); /* for side-effects of worn starting gear */
 	(void) pickup(1);	/* autopickup at initial location */
-    } else {
+    } else {		/* restore old game */
 	update_inventory();		/* for perm_invent */
 	read_engr_at(u.ux, u.uy);	/* subset of pickup() */
     }

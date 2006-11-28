@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.5	2006/06/25	*/
+/*	SCCS Id: @(#)do_wear.c	3.5	2006/11/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -982,19 +982,26 @@ register struct obj *otmp;
 	}
 }
 
-/* called in main to set intrinsics of worn start-up items */
+/* called in moveloop()'s prologue to set side-effects of worn start-up items;
+   also used by poly_obj() when a worn item gets transformed */
 void
-set_wear()
+set_wear(obj)
+struct obj *obj;  /* if null, do all worn items; otherwise just obj itself */
 {
+	if (!obj ? ublindf != 0 : (obj == ublindf)) (void) Blindf_on(ublindf);
+	if (!obj ? uright != 0 : (obj == uright)) (void) Ring_on(uright);
+	if (!obj ? uleft != 0 : (obj == uleft)) (void) Ring_on(uleft);
+	if (!obj ? uamul != 0 : (obj == uamul)) (void) Amulet_on();
+
 #ifdef TOURIST
-	if (uarmu) (void) Shirt_on();
+	if (!obj ? uarmu != 0 : (obj == uarmu)) (void) Shirt_on();
 #endif
-	if (uarm)  (void) Armor_on();
-	if (uarmc) (void) Cloak_on();
-	if (uarmf) (void) Boots_on();
-	if (uarmg) (void) Gloves_on();
-	if (uarmh) (void) Helmet_on();
-	if (uarms) (void) Shield_on();
+	if (!obj ? uarm != 0 : (obj == uarm)) (void) Armor_on();
+	if (!obj ? uarmc != 0 : (obj == uarmc)) (void) Cloak_on();
+	if (!obj ? uarmf != 0 : (obj == uarmf)) (void) Boots_on();
+	if (!obj ? uarmg != 0 : (obj == uarmg)) (void) Gloves_on();
+	if (!obj ? uarmh != 0 : (obj == uarmh)) (void) Helmet_on();
+	if (!obj ? uarms != 0 : (obj == uarms)) (void) Shield_on();
 }
 
 /* check whether the target object is currently being put on (or taken off) */
