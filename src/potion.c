@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2006/08/18	*/
+/*	SCCS Id: @(#)potion.c	3.5	2006/11/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1693,6 +1693,7 @@ dodip()
 	allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 	if(!(obj = getobj(allowall, "dip")))
 		return(0);
+	if (inaccessible_equipment(obj, "dip", FALSE)) return 0;
 
 	here = levl[u.ux][u.uy].typ;
 	/* Is there a fountain to dip into here? */

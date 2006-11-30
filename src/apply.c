@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2006/10/21 	*/
+/*	SCCS Id: @(#)apply.c	3.5	2006/11/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1897,15 +1897,12 @@ struct obj **optr;
 }
 
 static NEARDATA const char lubricables[] = { ALL_CLASSES, ALLOW_NONE, 0 };
-static NEARDATA const char need_to_remove_outer_armor[] =
-			"need to remove %s to grease %s.";
 
 STATIC_OVL void
 use_grease(obj)
 struct obj *obj;
 {
 	struct obj *otmp;
-	char buf[BUFSZ];
 
 	if (Glib) {
 	    pline("%s from your %s.", Tobjnam(obj, "slip"),
@@ -1925,21 +1922,7 @@ struct obj *obj;
 		}
 		otmp = getobj(lubricables, "grease");
 		if (!otmp) return;
-		if ((otmp->owornmask & WORN_ARMOR) && uarmc) {
-			Strcpy(buf, yname(uarmc));
-			You(need_to_remove_outer_armor, buf, yname(otmp));
-			return;
-		}
-#ifdef TOURIST
-		if ((otmp->owornmask & WORN_SHIRT) && (uarmc || uarm)) {
-			Strcpy(buf, uarmc ? yname(uarmc) : "");
-			if (uarmc && uarm)
-			    Strcat(strcat(buf, " and "), xname(uarm));
-			else Strcat(buf, uarm ? yname(uarm) : "");
-			You(need_to_remove_outer_armor, buf, yname(otmp));
-			return;
-		}
-#endif
+		if (inaccessible_equipment(otmp, "grease", FALSE)) return;
 		consume_obj_charge(obj, TRUE);
 
 		if (otmp != &zeroobj) {

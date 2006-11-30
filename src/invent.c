@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)invent.c	3.5	2006/11/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -847,11 +847,7 @@ register const char *let,*word;
 		/* ugly check: remove inappropriate things */
 		if ((taking_off(word) &&
 		    (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))
-		     || (otmp==uarm && uarmc)
-#ifdef TOURIST
-		     || (otmp==uarmu && (uarm || uarmc))
-#endif
-		    ))
+		     || inaccessible_equipment(otmp, (const char *)0, FALSE)))
 		|| (putting_on(word) &&
 		     (otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)))
 							/* already worn */
@@ -861,6 +857,8 @@ register const char *let,*word;
 #endif
 		|| (!strcmp(word, "ready") &&
 		    (otmp == uwep || (otmp == uswapwep && u.twoweap)))
+		|| ((!strcmp(word, "dip") || !strcmp(word, "grease")) &&
+		    inaccessible_equipment(otmp, (const char *)0 , FALSE))
 		    ) {
 			foo--;
 			foox++;

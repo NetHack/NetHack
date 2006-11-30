@@ -2227,4 +2227,62 @@ register schar delta;
 	}
 }
 
+/* decide whether a worn item is covered up by some other worn item,
+   used for dipping into liquid and applying grease;
+   some criteria are different than select_off()'s */
+boolean
+inaccessible_equipment(obj, verb, only_if_cursed)
+struct obj *obj;
+const char *verb;	/* "dip" or "grease", or null to avoid messages */
+boolean only_if_cursed;	/* true => ignore non-cursed covering gear */
+{
+    static NEARDATA const char need_to_take_off_outer_armor[] =
+					"need to take off %s to %s %s.";
+    char buf[BUFSZ];
+
+    if (!obj || !obj->owornmask) return FALSE;	/* not inaccessible */
+
+    /* check for suit covered by cloak */
+    if (obj == uarm && uarmc && (uarmc->cursed || !only_if_cursed)) {
+	if (verb) {
+	    Strcpy(buf, yname(uarmc));
+	    You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+	}
+	return TRUE;
+    }
+#ifdef TOURIST
+    /* check for shirt covered by suit and/or cloak */
+    if (obj == uarmu && ((uarm && (uarm->cursed || !only_if_cursed)) ||
+	    (uarmc && (uarmc->cursed || !only_if_cursed)))) {
+	if (verb) {
+	    char cloaktmp[QBUFSZ], suittmp[QBUFSZ];
+	    /* if sameprefix, use yname and xname to get "your cloak and suit"
+	       or "Manlobbi's cloak and suit"; otherwise, use yname and yname
+	       to get "your cloak and Manlobbi's suit" or vice versa */
+	    boolean sameprefix = (uarm && uarmc &&
+				  !strcmp(shk_your(cloaktmp, uarmc),
+					  shk_your(suittmp, uarm)));
+
+	    *buf = '\0';
+	    if (uarmc) Strcat(buf, yname(uarmc));
+	    if (uarm && uarmc) Strcat(buf, " and ");
+	    if (uarm) Strcat(buf, sameprefix ? xname(uarm) : yname(uarm));
+	    You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+	}
+	return TRUE;
+    }
+#endif
+    /* check for ring covered by gloves */
+    if ((obj == uleft || obj == uright) &&
+	    uarmg && (uarmg->cursed || !only_if_cursed)) {
+	if (verb) {
+	    Strcpy(buf, yname(uarmg));
+	    You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+	}
+	return TRUE;
+    }
+    /* item is not inaccessible */
+    return FALSE;
+}
+
 /*do_wear.c*/

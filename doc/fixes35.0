@@ -173,6 +173,7 @@ shopkeepers shouldn't refer to non-male character as "cad"
 tweak levitation timeout if trap is being triggered on same turn it is to end
 if Rider corpse revival fails, usually try again later instead of rotting away
 worn item transformed by polymorph remains worn if feasible
+can't dip or apply grease to a worn item that's covered by another worn item
 
 
 Platform- and/or Interface-Specific Fixes
