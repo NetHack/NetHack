@@ -668,17 +668,16 @@ die:
 
 	bones_ok = (how < GENOCIDED) && can_make_bones();
 
-	if (how == TURNED_SLIME)
-	    u.ugrave_arise = PM_GREEN_SLIME;
-
 	if (bones_ok && launch_in_progress()) force_launch_placement();
 
 	if (bones_ok && u.ugrave_arise < LOW_PM) {
 	    /* corpse gets burnt up too */
-	    if (how == BURNING)
+	    if (how == BURNING || how == DISSOLVED)
 		u.ugrave_arise = (NON_PM - 2);	/* leave no corpse */
 	    else if (how == STONING)
 		u.ugrave_arise = (NON_PM - 1);	/* statue instead of corpse */
+	    else if (how == TURNED_SLIME)
+		u.ugrave_arise = PM_GREEN_SLIME;
 	    else if (u.ugrave_arise == NON_PM &&
 		     !(mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
 		int mnum = u.umonnum;

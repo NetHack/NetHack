@@ -4660,6 +4660,8 @@ burn_stuff:
 void
 sink_into_lava()
 {
+    static const char sink_deeper[] = "You sink deeper into the lava.";
+
     if (!u.utrap || u.utraptype != TT_LAVA) {
 	;		/* do nothing; this shouldn't happen */
     } else if (!is_lava(u.ux, u.uy)) {
@@ -4670,9 +4672,17 @@ sink_into_lava()
 	    killer.format = KILLED_BY;
 	    Strcpy(killer.name, "molten lava");
 	    You("sink below the surface and die.");
+	    burn_away_slime();	/* add insult to injury? */
 	    done(DISSOLVED);
 	} else if (!u.umoved) {
-	    Norep("You sink deeper into the lava.");
+	    /* can't fully turn into slime while in lava, but might not
+	       have it be burned away until you've come awfully close */
+	    if (Slimed && rnd(10 - 1) >= (int)(Slimed & TIMEOUT)) {
+		pline(sink_deeper);
+		burn_away_slime();
+	    } else {
+		Norep(sink_deeper);
+	    }
 	    u.utrap += rnd(4);
 	}
     }

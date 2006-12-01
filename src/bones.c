@@ -326,8 +326,11 @@ struct obj *corpse;
 		}
 		mtmp = christen_monst(mtmp, plname);
 		newsym(u.ux, u.uy);
-		Your("body rises from the dead as %s...",
-			an(mons[u.ugrave_arise].mname));
+		/* turning into slime isn't rising from the dead
+		   and has already given its own message */
+		if (u.ugrave_arise != PM_GREEN_SLIME)
+		    Your("body rises from the dead as %s...",
+			 an(mons[u.ugrave_arise].mname));
 		display_nhwindow(WIN_MESSAGE, FALSE);
 		drop_upon_death(mtmp, (struct obj *)0);
 		m_dowear(mtmp, TRUE);

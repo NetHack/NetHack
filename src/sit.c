@@ -95,6 +95,7 @@ dosit()
 		} else if (u.utraptype == TT_LAVA) {
 		    /* Must have fire resistance or they'd be dead already */
 		    You("sit in the lava!");
+		    if (Slimed) burn_away_slime();
 		    u.utrap += rnd(4);
 		    losehp(d(2,10), "sitting in lava", KILLED_BY); /* lava damage */
 		} else if (u.utraptype == TT_INFLOOR ||
