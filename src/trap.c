@@ -4656,4 +4656,26 @@ burn_stuff:
     return(FALSE);
 }
 
+/* called each turn when trapped in lava */
+void
+sink_into_lava()
+{
+    if (!u.utrap || u.utraptype != TT_LAVA) {
+	;		/* do nothing; this shouldn't happen */
+    } else if (!is_lava(u.ux, u.uy)) {
+	u.utrap = 0;	/* this shouldn't happen either */
+    } else if (!u.uinvulnerable) {
+	u.utrap -= (1 << 8);
+	if (u.utrap < (1 << 8)) {
+	    killer.format = KILLED_BY;
+	    Strcpy(killer.name, "molten lava");
+	    You("sink below the surface and die.");
+	    done(DISSOLVED);
+	} else if (!u.umoved) {
+	    Norep("You sink deeper into the lava.");
+	    u.utrap += rnd(4);
+	}
+    }
+}
+
 /*trap.c*/

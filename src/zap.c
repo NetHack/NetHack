@@ -3939,6 +3939,7 @@ short exploding_wand_typ;
 			    vision_full_recalc = 1;
 			} else if (u.utrap && u.utraptype == TT_LAVA) {
 			    if (Passes_walls) {
+				u.utrap = 0;
 				You("pass through the now-solid rock.");
 			    } else {
 				u.utrap = rn1(50,20);

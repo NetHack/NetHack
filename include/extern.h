@@ -2233,12 +2233,13 @@ E boolean FDECL(delfloortrap, (struct trap *));
 E struct trap *FDECL(t_at, (int,int));
 E void FDECL(b_trapped, (const char *,int));
 E boolean NDECL(unconscious);
-E boolean NDECL(lava_effects);
 E void FDECL(blow_up_landmine, (struct trap *));
 E int FDECL(launch_obj,(SHORT_P,int,int,int,int,int));
 E boolean NDECL(launch_in_progress);
 E void NDECL(force_launch_placement);
 E boolean FDECL(uteetering_at_seen_pit, (struct trap *));
+E boolean NDECL(lava_effects);
+E void NDECL(sink_into_lava);
 
 /* ### u_init.c ### */
 

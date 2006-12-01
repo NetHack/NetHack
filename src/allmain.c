@@ -23,7 +23,7 @@ boolean resuming;
     int abort_lev;
 #endif
     int moveamt = 0, wtcap = 0, change = 0;
-    boolean didmove = FALSE, monscanmove = FALSE;
+    boolean monscanmove = FALSE;
 
     /* Note:  these initializers don't do anything except guarantee that
 	    we're linked properly.
@@ -77,8 +77,7 @@ boolean resuming;
 	do_positionbar();
 #endif
 
-	didmove = context.move;
-	if(didmove) {
+	if (context.move) {
 	    /* actual time passed */
 	    youmonst.movement -= NORMAL_SPEED;
 
@@ -309,6 +308,10 @@ boolean resuming;
 	    /* once-per-hero-took-time things go here */
 	    /******************************************/
 
+	    if ((u.uhave.amulet || Clairvoyant) &&
+		!In_endgame(&u.uz) && !BClairvoyant &&
+		!(moves % 15) && !rn2(2)) do_vicinity_map();
+	    if (u.utrap && u.utraptype == TT_LAVA) sink_into_lava();
 
 	} /* actual time passed */
 
@@ -331,7 +334,10 @@ boolean resuming;
 
 	    if (vision_full_recalc) vision_recalc(0);	/* vision! */
 	}
-	if(context.botl || context.botlx) bot();
+	if (context.botl || context.botlx) {
+	    bot();
+	    curs_on_u();
+	}
 
 	context.move = 1;
 
@@ -364,28 +370,6 @@ boolean resuming;
 		display_nhwindow(WIN_MAP, FALSE);
 #endif
 	    continue;
-	}
-
-	if ((u.uhave.amulet || Clairvoyant) &&
-	    !In_endgame(&u.uz) && !BClairvoyant &&
-	    !(moves % 15) && !rn2(2))
-		do_vicinity_map();
-
-	if(u.utrap && u.utraptype == TT_LAVA) {
-	    if(!is_lava(u.ux,u.uy))
-		u.utrap = 0;
-	    else if (!u.uinvulnerable) {
-		u.utrap -= 1<<8;
-		if(u.utrap < 1<<8) {
-		    killer.format = KILLED_BY;
-		    Strcpy(killer.name, "molten lava");
-		    You("sink below the surface and die.");
-		    done(DISSOLVED);
-		} else if(didmove && !u.umoved) {
-		    Norep("You sink deeper into the lava.");
-		    u.utrap += rnd(4);
-		}
-	    }
 	}
 
 #ifdef WIZARD
