@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)polyself.c	3.5	2006/12/01	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -19,6 +19,9 @@ STATIC_DCL void NDECL(uunstick);
 STATIC_DCL int FDECL(armor_to_dragon,(int));
 STATIC_DCL void NDECL(newman);
 STATIC_DCL boolean FDECL(polysense,(struct permonst *));
+
+STATIC_VAR const char no_longer_petrify_resistant[] =
+					"No longer petrify-resistant, you";
 
 /* update the youmonst.data structure pointer */
 void
@@ -349,7 +352,7 @@ int psflags;
 	}
 
  made_change:
-	if (!uarmg) selftouch("No longer petrify-resistant, you");
+	if (!uarmg) selftouch(no_longer_petrify_resistant);
 	new_light = emits_light(youmonst.data);
 	if (old_light != new_light) {
 	    if (old_light)
@@ -378,6 +381,11 @@ int	mntmp;
 
 	/* KMH, conduct */
 	u.uconduct.polyselfs++;
+
+	/* exercise used to be at the very end but only Wis was affected
+	   there since the polymorph was always in effect by then */
+	exercise(A_CON, FALSE);
+	exercise(A_WIS, TRUE);
 
 	if (!Upolyd) {
 		/* Human to monster; save human stats */
@@ -502,14 +510,14 @@ int	mntmp;
 #ifdef STEED
 	if (u.usteed) {
 	    if (touch_petrifies(u.usteed->data) &&
-	    		!Stone_resistance && rnl(3)) {
-	    	char buf[BUFSZ];
+		    !Stone_resistance && rnl(3)) {
+		char buf[BUFSZ];
 
-	    	pline("No longer petrifying-resistant, you touch %s.",
-	    			mon_nam(u.usteed));
-	    	Sprintf(buf, "riding %s", an(u.usteed->data->mname));
-	    	instapetrify(buf);
- 	    }
+		pline("%s touch %s.", no_longer_petrify_resistant,
+		      mon_nam(u.usteed));
+		Sprintf(buf, "riding %s", an(u.usteed->data->mname));
+		instapetrify(buf);
+	    }
 	    if (!can_ride(u.usteed)) dismount_steed(DISMOUNT_POLY);
 	}
 #endif
@@ -592,9 +600,12 @@ int	mntmp;
 	context.botl = 1;
 	vision_full_recalc = 1;
 	see_monsters();
-	exercise(A_CON, FALSE);
-	exercise(A_WIS, TRUE);
 	(void) encumber_msg();
+
+	/* this might trigger a recursize call to polymon() [stone golem
+	   wielding cockatrice corpse and hit by stone-to-flesh, becomes
+	   flesh golem above, now gets transformed back into stone golem] */
+	if (!uarmg) selftouch(no_longer_petrify_resistant);
 	return(1);
 }
 
@@ -758,7 +769,7 @@ rehumanize()
 	    killer.format = KILLED_BY;
 	    done(DIED);
 	}
-	if (!uarmg) selftouch("No longer petrify-resistant, you");
+	if (!uarmg) selftouch(no_longer_petrify_resistant);
 	nomul(0);
 
 	context.botl = 1;
@@ -1448,4 +1459,5 @@ struct permonst *mptr;
 	HWarn_of_mon &= ~FROMRACE;
 	return FALSE;
 }
+
 /*polyself.c*/
