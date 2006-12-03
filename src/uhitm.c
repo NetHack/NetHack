@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2006/06/21	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2006/12/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1476,7 +1476,8 @@ register struct attack *mattk;
 		    /* record the name before losing sight of monster */
 		    Strcpy(nambuf, Monnam(mdef));
 		    if (u_teleport_mon(mdef, FALSE) &&
-			    u_saw_mon && !canseemon(mdef))
+			    u_saw_mon && !(canseemon(mdef) ||
+					   (u.uswallow && u.ustuck == mdef)))
 			pline("%s suddenly disappears!", nambuf);
 		}
 		break;
