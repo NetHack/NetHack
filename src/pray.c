@@ -1156,17 +1156,21 @@ register struct obj *otmp;
 int
 dosacrifice()
 {
+    static NEARDATA const char cloud_of_smoke[] =
+				    "A cloud of %s smoke surrounds you...";
     register struct obj *otmp;
-    int value = 0;
-    int pm;
+    int value = 0, pm;
+    boolean highaltar;
     aligntyp altaralign = a_align(u.ux,u.uy);
 
     if (!on_altar() || u.uswallow) {
 	You("are not standing on an altar.");
 	return 0;
     }
+    highaltar = ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) &&
+		 (levl[u.ux][u.uy].altarmask & AM_SHRINE));
 
-    if (In_endgame(&u.uz)) {
+    if (highaltar) {
 	if (!(otmp = getobj(sacrifice_types, "sacrifice"))) return 0;
     } else {
 	if (!(otmp = floorfood("sacrifice", 1))) return 0;
@@ -1210,11 +1214,13 @@ dosacrifice()
 		    exercise(A_WIS, FALSE);
 	    }
 
-	    if (altaralign != A_CHAOTIC && altaralign != A_NONE) {
+	    if (highaltar &&
+		    (altaralign != A_CHAOTIC || u.ualign.type != A_CHAOTIC)) {
+		goto desecrate_high_altar;
+	    } else if (altaralign != A_CHAOTIC && altaralign != A_NONE) {
 		/* curse the lawful/neutral altar */
 		pline_The("altar is stained with %s blood.", urace.adj);
-		if(!Is_astralevel(&u.uz))
-		    levl[u.ux][u.uy].altarmask = AM_CHAOTIC;
+		levl[u.ux][u.uy].altarmask = AM_CHAOTIC;
 		angry_priest();
 	    } else {
 		struct monst *dmon;
@@ -1306,7 +1312,7 @@ dosacrifice()
     } /* corpse */
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
-	if (!Is_astralevel(&u.uz)) {
+	if (!highaltar) {
 	    if (Hallucination)
 		    You_feel("homesick.");
 	    else
@@ -1319,7 +1325,23 @@ dosacrifice()
 	    if(carried(otmp)) useup(otmp); /* well, it's gone now */
 	    else useupf(otmp, 1L);
 	    You("offer the Amulet of Yendor to %s...", a_gname());
-	    if (u.ualign.type != altaralign) {
+	    if (altaralign == A_NONE) {
+		/* Moloch's high altar */
+		if (u.ualign.record > -99) u.ualign.record = -99;
+		/*[apparently shrug/snarl can be sensed without being seen]*/
+		pline("%s shrugs and retains dominion over %s,",
+		      Moloch, u_gname());
+		pline("then mercilessly snuffs out your life.");
+		Sprintf(killer.name, "%s indifference", s_suffix(Moloch));
+		killer.format = KILLED_BY;
+		done(DIED);
+		/* life-saved (or declined to die in wizard/explore mode) */
+		pline("%s snarls and tries again...", Moloch);
+		fry_by_god(A_NONE);	/* wrath of Moloch */
+		/* declined to die in wizard or explore mode */
+		pline(cloud_of_smoke, hcolor(NH_BLACK));
+		done(ESCAPED);
+	    } else if (u.ualign.type != altaralign) {
 		/* And the opposing team picks you up and
 		   carries you off on their shoulders */
 		adjalign(-99);
@@ -1327,8 +1349,7 @@ dosacrifice()
 		      a_gname(), u_gname());
 		pline("%s is enraged...", u_gname());
 		pline("Fortunately, %s permits you to live...", a_gname());
-		pline("A cloud of %s smoke surrounds you...",
-		      hcolor((const char *)"orange"));
+		pline(cloud_of_smoke, hcolor("orange"));
 		done(ESCAPED);
 	    } else { /* super big win */
 		adjalign(10);
@@ -1366,8 +1387,8 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 	return (1);
     }
 
-    if (altaralign != u.ualign.type &&
-	(Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) {
+    if (altaralign != u.ualign.type && highaltar) {
+ desecrate_high_altar:
 	/*
 	 * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
 	 * gets the god who owns it truely pissed off.

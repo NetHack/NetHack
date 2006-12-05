@@ -925,6 +925,8 @@ register const char *let,*word;
 		|| (!strncmp(word, "rub on the stone", 16) &&
 		    *let == GEM_CLASS &&
 		    otmp->dknown && objects[otyp].oc_name_known)
+		|| (!strcmp(word, "sacrifice") && Is_sanctum(&u.uz) &&
+		    (otyp == AMULET_OF_YENDOR || otyp == FAKE_AMULET_OF_YENDOR))
 		    ) {
 			foo--;
 			allowall = TRUE;
@@ -2228,7 +2230,11 @@ char *buf;
 	    cmap = S_sink;				/* "sink" */
 #endif
 	else if (IS_ALTAR(ltyp)) {
-	    Sprintf(altbuf, "altar to %s (%s)", a_gname(),
+	    Sprintf(altbuf, "%saltar to %s (%s)",
+		    ((lev->altarmask & AM_SHRINE) &&
+		     (Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) ?
+		      "high " : "",
+		    a_gname(),
 		    align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
 	    dfeature = altbuf;
 	} else if ((x == xupstair && y == yupstair) ||

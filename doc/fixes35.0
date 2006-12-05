@@ -176,6 +176,8 @@ worn item transformed by polymorph remains worn if feasible
 can't dip or apply grease to a worn item that's covered by another worn item
 hero poly'd into stone golem and wielding cockatrice corpse casts stone-to-
 	flesh at self to become flesh golem will revert to stone if no gloves
+demon lords/princes can't be summoned to the elemental or Astral planes
+same-race sacrifice can't damage high altars
 
 
 Platform- and/or Interface-Specific Fixes
@@ -262,6 +264,7 @@ multiple squeaks for squeaky boards
 include time, user ID, and play mode in paniclog entries
 add oracle and rumor regarding priestly donations
 anti-magic traps have alternate effect on targets who have magic resistance
+the Amulet can be offered to Moloch
 
 
 Platform- and/or Interface-Specific New Features

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)minion.c	3.5	2006/09/06	*/
+/*	SCCS Id: @(#)minion.c	3.5	2006/12/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -299,7 +299,7 @@ aligntyp atyp;
 {
 	int tryct, pm;
 
-	for (tryct = 0; tryct < 20; tryct++) {
+	for (tryct = !In_endgame(&u.uz) ? 20 : 0; tryct > 0; --tryct) {
 	    pm = rn1(PM_DEMOGORGON + 1 - PM_ORCUS, PM_ORCUS);
 	    if (!(mvitals[pm].mvflags & G_GONE) &&
 		    (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))
@@ -314,7 +314,7 @@ aligntyp atyp;
 {
 	int tryct, pm;
 
-	for (tryct = 0; tryct < 20; tryct++) {
+	for (tryct = !In_endgame(&u.uz) ? 20 : 0; tryct > 0; --tryct) {
 	    pm = rn1(PM_YEENOGHU + 1 - PM_JUIBLEX, PM_JUIBLEX);
 	    if (!(mvitals[pm].mvflags & G_GONE) &&
 		    (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))

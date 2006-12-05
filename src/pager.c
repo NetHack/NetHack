@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)pager.c	3.5	2006/12/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -266,10 +266,13 @@ lookat(x, y, buf, monbuf)
 	Strcpy(buf,"dark part of a room");
     } else switch(glyph_to_cmap(glyph)) {
     case S_altar:
-	if(!In_endgame(&u.uz))
-	    Sprintf(buf, "%s altar",
-		align_str(Amask2align(levl[x][y].altarmask & ~AM_SHRINE)));
-	else Sprintf(buf, "aligned altar");
+	Sprintf(buf, "%s %saltar",
+		/* like endgame high priests, endgame high altars
+		   are only recognizable when immediately adjacent */
+		(Is_astralevel(&u.uz) && distu(x, y) > 2) ? "aligned" :
+		align_str(Amask2align(levl[x][y].altarmask & ~AM_SHRINE)),
+		((levl[x][y].altarmask & AM_SHRINE) &&
+		 (Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) ? "high " : "");
 	break;
     case S_ndoor:
 	if (is_drawbridge_wall(x, y) >= 0)
