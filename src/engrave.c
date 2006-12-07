@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)engrave.c	3.5	2005/06/22	*/
+/*	SCCS Id: @(#)engrave.c	3.5	2006/12/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -499,6 +499,10 @@ doengrave()
 	if(Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)/* in bubble */) {
 		You_cant("write in thin air!");
 		return(0);
+	} else if (closed_door(u.ux, u.uy) || !accessible(u.ux, u.uy)) {
+		/* stone, tree, wall, secret corridor, pool, lava, bars */
+		You_cant("write here.");
+		return 0;
 	}
 	if (cantwield(youmonst.data)) {
 		You_cant("even hold anything!");
