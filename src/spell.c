@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)spell.c	3.5	2006/12/06	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -704,16 +704,25 @@ cast_protection()
 
 	if (gain > 0) {
 	    if (!Blind) {
-		const char *hgolden = hcolor(NH_GOLDEN);
+		int rmtyp;
+		const char *hgolden = hcolor(NH_GOLDEN), *atmosphere;
 
-		if (u.uspellprot)
+		if (u.uspellprot) {
 		    pline_The("%s haze around you becomes more dense.",
 			      hgolden);
-		else
+		} else {
+		    rmtyp = levl[u.ux][u.uy].typ;
+		    atmosphere = u.uswallow ?
+			((u.ustuck->data == &mons[PM_FOG_CLOUD]) ? "mist" :
+			  is_whirly(u.ustuck->data) ? "maelstrom" :
+			    is_animal(u.ustuck->data) ? "maw" : "ooze") :
+			u.uinwater ? "water" :
+			  (rmtyp == CLOUD) ? "cloud" :
+			    IS_TREE(rmtyp) ? "vegitation" :
+			      IS_STWALL(rmtyp) ? "stone" : "air";
 		    pline_The("%s around you begins to shimmer with %s haze.",
-			/*[ what about being inside solid rock while polyd? ]*/
-			(Underwater || Is_waterlevel(&u.uz)) ? "water" : "air",
-			      an(hgolden));
+			      atmosphere, an(hgolden));
+		}
 	    }
 	    u.uspellprot += gain;
 	    u.uspmtime =
