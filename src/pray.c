@@ -1126,8 +1126,6 @@ gods_upset(g_align)
 	angrygods(g_align);
 }
 
-static NEARDATA const char sacrifice_types[] = { FOOD_CLASS, AMULET_CLASS, 0 };
-
 STATIC_OVL void
 consume_offering(otmp)
 register struct obj *otmp;
@@ -1170,11 +1168,8 @@ dosacrifice()
     highaltar = ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) &&
 		 (levl[u.ux][u.uy].altarmask & AM_SHRINE));
 
-    if (highaltar) {
-	if (!(otmp = getobj(sacrifice_types, "sacrifice"))) return 0;
-    } else {
-	if (!(otmp = floorfood("sacrifice", 1))) return 0;
-    }
+    otmp = floorfood("sacrifice", 1);
+    if (!otmp) return 0;
     /*
       Was based on nutritional value and aging behavior (< 50 moves).
       Sacrificing a food ration got you max luck instantly, making the
@@ -1313,10 +1308,17 @@ dosacrifice()
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
 	if (!highaltar) {
-	    if (Hallucination)
-		    You_feel("homesick.");
+ too_soon:
+	    if (altaralign == A_NONE)
+		/* hero has left Moloch's Sanctum so is in the process
+		   of getting away with the Amulet */
+		gods_upset(A_NONE);
 	    else
-		    You_feel("an urge to return to the surface.");
+		You_feel("%s.", Hallucination ? "homesick" :
+			 /* headed towards celestial disgrace */
+			 (altaralign != u.ualign.type) ? "ashamed" :
+			 /* on track; give a big hint */
+			 "an urge to return to the surface");
 	    return 1;
 	} else {
 	    /* The final Test.	Did you win? */
@@ -1365,6 +1367,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
     } /* real Amulet */
 
     if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
+	    if (!highaltar && !otmp->known) goto too_soon;
 	    if (!Deaf)
 		You_hear("a nearby thunderclap.");
 	    if (!otmp->known) {
@@ -1375,6 +1378,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		return 1;
 	    } else {
 		/* don't you dare try to fool the gods */
+		if (Deaf) pline("Oh, no.");	/* didn't hear thunderclap */
 		change_luck(-3);
 		adjalign(-1);
 		u.ugangr += 3;

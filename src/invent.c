@@ -925,9 +925,12 @@ register const char *let,*word;
 		|| (!strncmp(word, "rub on the stone", 16) &&
 		    *let == GEM_CLASS &&
 		    otmp->dknown && objects[otyp].oc_name_known)
-		|| (!strcmp(word, "sacrifice") && Is_sanctum(&u.uz) &&
-		    (otyp == AMULET_OF_YENDOR || otyp == FAKE_AMULET_OF_YENDOR))
+		/* suppress corpses on astral, amulets elsewhere */
+		|| (!strcmp(word, "sacrifice") &&
+		    /* (!astral && amulet) || (astral && !amulet) */
+		    (!Is_astralevel(&u.uz) ^ otmp->oclass != AMULET_CLASS))
 		    ) {
+			/* acceptable but not listed as likely candidate */
 			foo--;
 			allowall = TRUE;
 			*ap++ = otmp->invlet;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2006/10/06	*/
+/*	SCCS Id: @(#)eat.c	3.5	2006/12/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -74,6 +74,7 @@ char msgbuf[BUFSZ];
 #define nonrotting_food(otyp) ((otyp) == LEMBAS_WAFER || (otyp) == CRAM_RATION)
 
 STATIC_OVL NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
+STATIC_OVL NEARDATA const char offerfodder[] = { FOOD_CLASS, AMULET_CLASS, 0 };
 
 /* Gold must come first for getobj(). */
 STATIC_OVL NEARDATA const char allobj[] = {
@@ -2760,7 +2761,8 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 	register struct obj *otmp;
 	char qbuf[QBUFSZ];
 	char c;
-	boolean feeding = (!strcmp(verb, "eat"));
+	boolean feeding = !strcmp(verb, "eat"),		/* corpsecheck==0 */
+		offering = !strcmp(verb, "sacrifice");	/* corpsecheck==1 */
 
 	/* if we can't touch floor objects then use invent food only */
 	if (!can_reach_floor(TRUE) ||
@@ -2834,9 +2836,9 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 	/* We cannot use ALL_CLASSES since that causes getobj() to skip its
 	 * "ugly checks" and we need to check for inedible items.
 	 */
-	otmp = getobj(feeding ? (const char *)allobj :
-				(const char *)comestibles, verb);
-	if (corpsecheck && otmp)
+	otmp = getobj(feeding ? allobj : offering ? offerfodder : comestibles,
+		      verb);
+	if (corpsecheck && otmp && !(offering && otmp->oclass == AMULET_CLASS))
 	    if (otmp->otyp != CORPSE || (corpsecheck == 2 && !tinnable(otmp))) {
 		You_cant("%s that!", verb);
 		return (struct obj *)0;
