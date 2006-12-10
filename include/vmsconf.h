@@ -75,6 +75,12 @@
 #define DLB	/* use data librarian code */
 
 /*
+ * Provide menu of saved games to choose from at start.
+ * [Player needs to use ``nethack "-ugames"'' for this to work.]
+ */
+#define SELECTSAVED
+
+/*
  * You may define TEXTCOLOR if your system has any terminals that recognize
  * ANSI color sequences of the form ``<ESCAPE>[#;#m'', where the first # is
  * a number between 40 and 47 represented background color, and the second

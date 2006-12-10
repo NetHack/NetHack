@@ -696,7 +696,7 @@ E void FDECL(commit_bonesfile, (d_level *));
 E int FDECL(open_bonesfile, (d_level*,char **));
 E int FDECL(delete_bonesfile, (d_level*));
 E void NDECL(compress_bonesfile);
-E void NDECL(set_savefile_name);
+E void FDECL(set_savefile_name, (BOOLEAN_P));
 #ifdef INSURANCE
 E void FDECL(save_savefile_name, (int));
 #endif
@@ -726,6 +726,9 @@ E int FDECL(sym_val, (const char *));
 #endif
 E void FDECL(paniclog, (const char *, const char *));
 E int FDECL(validate_prefix_locations, (char *));
+#ifdef SELECTSAVED
+E void FDECL(get_plname_from_file, (int, char *));
+#endif
 E char** NDECL(get_saved_games);
 E void FDECL(free_saved_games, (char**));
 #ifdef SELF_RECOVER
@@ -2436,6 +2439,9 @@ E int FDECL(vms_doshell, (const char *,BOOLEAN_P));
 # endif
 # ifdef SUSPEND
 E int NDECL(dosuspend);
+# endif
+# ifdef SELECTSAVED
+E int FDECL(vms_get_saved_games, (const char *,char ***));
 # endif
 
 #endif /* VMS */

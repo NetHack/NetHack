@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.5	2005/01/04	*/
+/*	SCCS Id: @(#)files.c	3.5	2006/12/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -831,14 +831,12 @@ compress_bonesfile()
 /* set savefile name in OS-dependent manner from pre-existing plname,
  * avoiding troublesome characters */
 void
-set_savefile_name()
+set_savefile_name(regularize_it)
+boolean regularize_it;
 {
-#if defined(WIN32)
-	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
-#endif
 #ifdef VMS
 	Sprintf(SAVEF, "[.save]%d%s", getuid(), plname);
-	regularize(SAVEF+7);
+	if (regularize_it) regularize(SAVEF+7);
 	Strcat(SAVEF, ";1");
 #else
 # if defined(MICRO)
@@ -854,20 +852,27 @@ set_savefile_name()
 #  else
 		(void)strncat(SAVEF, plname, 8);
 #  endif
-		regularize(SAVEF+i);
+		if (regularize_it) regularize(SAVEF+i);
 	}
 	Strcat(SAVEF, SAVE_EXTENSION);
 # else
 #  if defined(WIN32)
+    {
+	static const char okchars[] =
+		"*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.";
+	const char *legal = okchars;
+	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
+
 	/* Obtain the name of the logged on user and incorporate
 	 * it into the name. */
 	Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
-	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
-				'%', fnamebuf, encodedfnamebuf, BUFSZ);
+	if (regularize_it) ++legal;	/* skip '*' wildcard character */
+	(void)fname_encode(legal, '%', fnamebuf, encodedfnamebuf, BUFSZ);
 	Sprintf(SAVEF, "%s%s", encodedfnamebuf,SAVE_EXTENSION);
-#  else
+    }
+#  else	/* not VMS or MICRO or WIN32 */
 	Sprintf(SAVEF, "save/%d%s", (int)getuid(), plname);
-	regularize(SAVEF+5);	/* avoid . or / in name */
+	if (regularize_it) regularize(SAVEF+5);  /* avoid . or / in name */
 #  endif /* WIN32 */
 # endif	/* MICRO */
 #endif /* VMS   */
@@ -971,7 +976,7 @@ restore_saved_game()
 	int fd;
 
 	reset_restpref();
-	set_savefile_name();
+	set_savefile_name(TRUE);
 #ifdef MFLOPPY
 	if (!saveDiskPrompt(1))
 	    return -1;
@@ -989,8 +994,7 @@ restore_saved_game()
 }
 
 #if defined(SELECTSAVED)
-/*ARGSUSED*/
-static char*
+char *
 plname_from_file(filename)
 const char* filename;
 {
@@ -1048,17 +1052,15 @@ char**
 get_saved_games()
 {
 #if defined(SELECTSAVED)
-	int n, j;
-	char **result;
+    int n, j = 0;
+    char **result = 0;
 # ifdef WIN32CON
-	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
+    {
 	char *foundfile;
 	const char *fq_save;
 
-	Sprintf(fnamebuf, "%s-", get_username(0));
-	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
-				'%', fnamebuf, encodedfnamebuf, BUFSZ);
-	Sprintf(SAVEF, "%s*%s", encodedfnamebuf, SAVE_EXTENSION);
+	Strcpy(plname, "*");
+	set_savefile_name(FALSE);
 #if defined(ZLIB_COMP)
 	Strcat(SAVEF, COMPRESS_EXTENSION);
 #endif
@@ -1082,11 +1084,15 @@ get_saved_games()
 		    result[j++] = r;
 		++n;
 	    } while (findnext());
+	    }
+	}
+    }
 # endif
 # if defined(UNIX) && defined(QT_GRAPHICS)
 	/* posixly correct version */
     int myuid=getuid();
     DIR *dir;
+
     if((dir=opendir(fqname("save", SAVEPREFIX, 0)))) {
 	for(n=0; readdir(dir); n++)
 		;
@@ -1114,11 +1120,21 @@ get_saved_games()
 		    }
 		}
 		closedir(dir);
-# endif
-		qsort(result, j, sizeof(char *), strcmp_wrap);
-		result[j++] = 0;
-		return result;
 	}
+    }
+# endif
+# ifdef VMS
+    Strcpy(plname, "*");
+    set_savefile_name(FALSE);
+    j = vms_get_saved_games(SAVEF, &result);
+# endif	/* VMS */
+
+    if (j > 0) {
+	if (j > 1) qsort(result, j, sizeof (char *), strcmp_wrap);
+	result[j] = 0;
+	return result;
+    } else if (result) { /* could happen if save files are obsolete */
+	free_saved_games(result);
     }
 #endif /* SELECTSAVED */
     return 0;
@@ -2962,7 +2978,7 @@ recover_savefile()
 	 *	(non-level-based) game state
 	 *	other levels
 	 */
-	set_savefile_name();
+	set_savefile_name(TRUE);
 	sfd = create_savefile();
 	if (sfd < 0) {
 	    raw_printf("\nCannot recover savefile %s.\n", SAVEF);
