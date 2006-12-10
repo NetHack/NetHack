@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makedefs.c	3.5	2006/05/05	*/
+/*	SCCS Id: @(#)makedefs.c	3.5	2006/12/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -801,6 +801,9 @@ static const char *build_opts[] = {
 #endif
 #ifdef REDO
 		"redo command",
+#endif
+#ifdef SELECTSAVED
+		"restore saved games via menu",
 #endif
 #ifdef REINCARNATION
 		"rogue level",
