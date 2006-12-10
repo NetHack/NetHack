@@ -476,7 +476,6 @@ dosuspend()
    with the utility programs and we don't want this code there */
 
 static void FDECL(savefile, (const char *,int,int *,char ***));
-char *FDECL(plname_from_file, (const char *));
 
 static void
 savefile(name, indx, asize, array)

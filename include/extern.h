@@ -727,7 +727,7 @@ E int FDECL(sym_val, (const char *));
 E void FDECL(paniclog, (const char *, const char *));
 E int FDECL(validate_prefix_locations, (char *));
 #ifdef SELECTSAVED
-E void FDECL(get_plname_from_file, (int, char *));
+E char *FDECL(plname_from_file, (const char *));
 #endif
 E char** NDECL(get_saved_games);
 E void FDECL(free_saved_games, (char**));
