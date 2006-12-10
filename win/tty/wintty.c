@@ -58,7 +58,7 @@ struct window_procs tty_procs = {
     WC_MOUSE_SUPPORT|
 #endif
     WC_COLOR|WC_HILITE_PET|WC_INVERSE|WC_EIGHT_BIT_IN,
-#if defined(SELECTSAVED) && defined(WIN32CON)
+#if defined(SELECTSAVED)
     WC2_SELECTSAVED|
 #endif
     0L,
@@ -700,7 +700,7 @@ tty_askname()
     static char who_are_you[] = "Who are you? ";
     register int c, ct, tryct = 0;
 #ifdef SELECTSAVED
-# if defined(WIN32CON)
+# if defined(WIN32CON) || defined(VMS)
     int ch = -2;
     char** saved = (char **)0;
 

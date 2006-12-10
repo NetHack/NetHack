@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsunix.c	3.5	2001/07/27	*/
+/*	SCCS Id: @(#)vmsunix.c	3.5	2006/12/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -470,5 +470,76 @@ dosuspend()
 	return 0;
 }
 #endif	/* SUSPEND */
+
+#ifdef SELECTSAVED
+/* this would fit better in vmsfiles.c except that that gets linked
+   with the utility programs and we don't want this code there */
+
+static void FDECL(savefile, (const char *,int,int *,char ***));
+char *FDECL(plname_from_file, (const char *));
+
+static void
+savefile(name, indx, asize, array)
+const char *name;
+int indx, *asize;
+char ***array;
+{
+    char **newarray;
+    int i, oldsize;
+
+    /* (asize - 1) guarantees that [indx + 1] will exist and be set to null */
+    while (indx >= *asize - 1) {
+	oldsize = *asize;
+	*asize += 5;
+	newarray = (char **)alloc(*asize * sizeof (char *));
+	/* poor man's realloc() */
+	for (i = 0; i < *asize; ++i)
+	    newarray[i] = (i < oldsize) ? (*array)[i] : 0;
+	if (*array) free((genericptr_t)*array);
+	*array = newarray;
+    }
+    (*array)[indx] = strcpy((char *)alloc(strlen(name) + 1), name);
+}
+
+struct dsc { unsigned short len, mbz; char *adr; }; /* descriptor */
+typedef unsigned long vmscond;  /* vms condition value */
+vmscond FDECL(lib$find_file, (const struct dsc *,struct dsc *,genericptr *));
+vmscond FDECL(lib$find_file_end, (void **));
+
+/* collect a list of character names from all save files for this player */
+int
+vms_get_saved_games(savetemplate, outarray)
+const char *savetemplate; /* wildcarded save file name in native VMS format */
+char ***outarray;
+{
+    struct dsc in, out;
+    unsigned short l;
+    int count, asize;
+    char *charname, wildcard[255+1], filename[255+1];
+    genericptr_t context = 0;
+
+    Strcpy(wildcard, savetemplate);	/* plname_from_file overwrites SAVEF */
+    in.mbz = 0;	/* class and type; leave them unspecified */
+    in.len = (unsigned short)strlen(wildcard);
+    in.adr = wildcard;
+    out.mbz = 0;
+    out.len = (unsigned short)(sizeof filename - 1);
+    out.adr = filename;
+
+    *outarray = 0;
+    count = asize = 0;
+    /* note: only works as intended if savetemplate is a wildcard filespec */
+    while (lib$find_file(&in, &out, &context) & 1) {
+	/* strip trailing blanks */
+	for (l = out.len; l > 0; --l) if (filename[l - 1] != ' ') break;
+	filename[l] = '\0';
+	if ((charname = plname_from_file(filename)) != 0)
+	    savefile(charname, count++, &asize, outarray);
+    }
+    (void)lib$find_file_end(&context);
+
+    return count;
+}
+#endif  /* SELECTSAVED */
 
 /*vmsunix.c*/

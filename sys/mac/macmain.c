@@ -228,7 +228,7 @@ process_openfile (short src_vol, long src_dir, Str255 fName, OSType ftype)
 			if (name) {
 				Str255 save_f_p;
 				P2C(*(StringHandle)name, plname);
-				set_savefile_name();
+				set_savefile_name(TRUE);
 				C2P(fqname(SAVEF, SAVEPREFIX, 0), save_f_p);
 				force_hdelete(theDirs.dataRefNum, theDirs.dataDirID, save_f_p);
 
