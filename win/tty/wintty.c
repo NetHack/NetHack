@@ -754,7 +754,11 @@ tty_askname()
 		}
 #if defined(UNIX) || defined(VMS)
 		if(c != '-' && c != '@')
-		if(c < 'A' || (c > 'Z' && c < 'a') || c > 'z') c = '_';
+		if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') &&
+		    /* reject leading digit but allow digits elsewhere
+		       (avoids ambiguity when character name gets
+		       appended to uid to construct save file name) */
+		    !(c >= '0' && c <= '9' && ct > 0)) c = '_';
 #endif
 		if (ct < (int)(sizeof plname) - 1) {
 #if defined(MICRO)
