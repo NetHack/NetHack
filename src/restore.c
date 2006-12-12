@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)restore.c	3.5	2006/12/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1229,6 +1229,82 @@ boolean ghostly;
     }
 }
 
+#ifdef SELECTSAVED
+/* put up a menu listing each character from this player's saved games */
+int
+restore_menu(bannerwin)	/* returns 1: use plname[], 0: new game, -1: quit */
+winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
+{
+    winid tmpwin;
+    anything any;
+    char **saved;
+    menu_item *chosen_game = (menu_item *)0;
+    int k, clet, ch = 0;	/* ch: 0 => new game */
+
+    *plname = '\0';
+    saved = get_saved_games();	/* array of character names */
+    if (saved && *saved) {
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	any = zeroany;	/* no selection */
+	if (bannerwin != WIN_ERR) {
+	    /* for tty; erase copyright notice and redo it in the menu */
+	    clear_nhwindow(bannerwin);
+	    /* COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B, COPYRIGHT_BANNER_C */
+	    for (k = 1; k <= 3; ++k)
+		add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+			 ATR_NONE, copyright_banner_line(k), MENU_UNSELECTED);
+	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		     ATR_NONE, "", MENU_UNSELECTED);
+	}
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		 ATR_NONE, "Select one of your saved games", MENU_UNSELECTED);
+	/* limited to 52 character entries, a-zA-Z, plus new game (as '#'
+	   if necessary) and quit (omitted if new game ended up as '#') */
+	for (k = 0, clet = 'a'; saved[k] && k < 52; ++k) {
+	    any.a_int = k + 1;
+	    add_menu(tmpwin, NO_GLYPH, &any, clet, 0,
+		     ATR_NONE, saved[k], MENU_UNSELECTED);
+	    if (clet == 'z') clet = 'A';
+	    else if (clet == 'Z') clet = '#';	/* use NOINVSYM for overflow */
+	    else ++clet;
+	}
+	if (clet >= 'a' && clet < 'n') clet = 'n';	/* new game */
+	any.a_int = -1;	/* not >= 0 */
+	add_menu(tmpwin, NO_GLYPH, &any, clet, 0,
+		 ATR_NONE, "Start a new character", MENU_UNSELECTED);
+	/* quit entry is preselected, but omitted if there's no room */
+	if (clet != '#') {
+	    if (clet >= 'a' && clet < 'q') clet = 'q';	/* quit */
+	    else if (clet == 'z') clet = 'A';
+	    else if (clet == 'Z') clet = '#';
+	    else ++clet;
+	    any.a_int = -2;
+	    add_menu(tmpwin, NO_GLYPH, &any, clet, 0,
+		     ATR_NONE, "Never mind (quit)", MENU_SELECTED);
+	}
+	/* no prompt on end_menu, as we've done our own at the top */
+	end_menu(tmpwin, (char *)0);
+	if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {
+	    ch = chosen_game->item.a_int;
+	    if (ch > 0)  Strcpy(plname, saved[ch - 1]);
+	    else if (ch < 0) ++ch;  /* -1 -> 0 (new game), -2 -> -1 (quit) */
+	    free((genericptr_t)chosen_game);
+	} else {
+	    ch = -1;	/* quit menu without making a selection => quit */
+	}
+	destroy_nhwindow(tmpwin);
+	if (bannerwin != WIN_ERR) {
+	    /* for tty; clear the menu away and put subset of copyright back */
+	    clear_nhwindow(bannerwin);
+	    /* COPYRIGHT_BANNER_A, preceding "Who are you?" prompt */
+	    if (ch == 0) putstr(bannerwin, 0, copyright_banner_line(1));
+	}
+    }
+    free_saved_games(saved);
+    return (ch > 0) ? 1 : ch;
+}
+#endif /* SELECTSAVED */
 
 void
 minit()

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)version.c	3.5	2003/11/22	*/
+/*	SCCS Id: @(#)version.c	3.5	2006/12/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -181,6 +181,26 @@ unsigned long
 get_current_feature_ver()
 {
 	return FEATURE_NOTICE_VER(VERSION_MAJOR,VERSION_MINOR,PATCHLEVEL);
+}
+
+/*ARGUSED*/
+const char *
+copyright_banner_line(indx)
+int indx;
+{
+#ifdef COPYRIGHT_BANNER_A
+    if (indx == 1) return COPYRIGHT_BANNER_A;
+#endif
+#ifdef COPYRIGHT_BANNER_B
+    if (indx == 2) return COPYRIGHT_BANNER_B;
+#endif
+#ifdef COPYRIGHT_BANNER_C
+    if (indx == 3) return COPYRIGHT_BANNER_C;
+#endif
+#ifdef COPYRIGHT_BANNER_D
+    if (indx == 4) return COPYRIGHT_BANNER_D;
+#endif
+    return "";
 }
 
 /*version.c*/

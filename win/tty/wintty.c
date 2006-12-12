@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wintty.c	3.5	2005/01/09	*/
+/*	SCCS Id: @(#)wintty.c	3.5	2006/12/11	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -697,62 +697,17 @@ give_up:	/* Quit */
 void
 tty_askname()
 {
-    static char who_are_you[] = "Who are you? ";
+    static const char who_are_you[] = "Who are you? ";
     register int c, ct, tryct = 0;
+
 #ifdef SELECTSAVED
-# if defined(WIN32CON) || defined(VMS)
-    int ch = -2;
-    char** saved = (char **)0;
-
     if (iflags.wc2_selectsaved)
-	saved = get_saved_games();
-    if (saved && *saved) {
-	int k, clet = 'a';
-	winid tmpwin;
-	anything any;
-	menu_item *chosen_game = (menu_item *)0;
-
-    	ch = -1;
-	tty_clear_nhwindow(BASE_WINDOW);
-	tmpwin = create_nhwindow(NHW_MENU);
-	start_menu(tmpwin);
-	any = zeroany;	/* no selection */
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
-		 ATR_NONE, COPYRIGHT_BANNER_A, MENU_UNSELECTED);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
-		 ATR_NONE, COPYRIGHT_BANNER_B, MENU_UNSELECTED);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
-		 ATR_NONE, COPYRIGHT_BANNER_C, MENU_UNSELECTED);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
-		 ATR_NONE, "", MENU_UNSELECTED);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
-		 ATR_NONE, "Select one of your saved games", MENU_UNSELECTED);
-	for (k = 0; saved[k]; ++k) {
-		if (clet == 'z' + 1) clet = 'A';
-		if (clet == 'Z') break;
-		any.a_int = k + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, clet++, 0,
-			 ATR_NONE, saved[k], MENU_UNSELECTED);
-        }
-	any.a_int = -2;
-	add_menu(tmpwin, NO_GLYPH, &any, clet, 0,
-		 ATR_NONE, "Start a new character", MENU_UNSELECTED);
-	/* no prompt on end_menu, as we've done our own at the top */
-	end_menu(tmpwin, (char *)0);
-	if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {
-		ch = chosen_game->item.a_int;
-		if (ch > 0)  {
-			ch--;
-			strcpy(plname,saved[ch]);
-		}
-		free((genericptr_t)chosen_game);
-        }
-	destroy_nhwindow(tmpwin);
-    }
-    free_saved_games(saved);
-    if (ch >= 0) return;
-    if (ch == -1) bail("Until next time then...");
-# endif /* WIN32CON */
+	switch (restore_menu(BASE_WINDOW)) {
+	case -1: bail("Until next time then...");	/* quit */
+		 /*NOTREACHED*/
+	case  0: break;		/* no game chosen; start new game */
+	case  1: return;	/* plname[] has been set */
+	}
 #endif /* SELECTSAVED */
 
     tty_putstr(BASE_WINDOW, 0, "");

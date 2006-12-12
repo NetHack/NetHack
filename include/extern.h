@@ -679,7 +679,6 @@ E char *FDECL(fname_encode, (const char *, CHAR_P, char *, char *, int));
 E char *FDECL(fname_decode, (CHAR_P, char *, char *, int));
 E const char *FDECL(fqname, (const char *, int, int));
 E FILE *FDECL(fopen_datafile, (const char *,const char *,int));
-E void FDECL(store_version, (int));
 #ifdef MFLOPPY
 E void NDECL(set_lock_and_bones);
 #endif
@@ -1859,6 +1858,9 @@ E int FDECL(dorecover, (int));
 E void FDECL(trickery, (char *));
 E void FDECL(getlev, (int,int,XCHAR_P,BOOLEAN_P));
 E void FDECL(get_plname_from_file, (int, char *));
+#ifdef SELECTSAVED
+E int FDECL(restore_menu, (winid));
+#endif
 E void NDECL(minit);
 E boolean FDECL(lookup_id_mapping, (unsigned, unsigned *));
 E void FDECL(mread, (int,genericptr_t,unsigned int));
@@ -2331,12 +2333,11 @@ E boolean FDECL(comp_times, (long));
 #endif
 E boolean FDECL(check_version, (struct version_info *,
 				const char *,BOOLEAN_P));
+E boolean FDECL(uptodate, (int,const char *));
+E void FDECL(store_version, (int));
 E unsigned long FDECL(get_feature_notice_ver, (char *));
 E unsigned long NDECL(get_current_feature_ver);
-#ifdef RUNTIME_PORT_ID
-E void FDECL(append_port_id, (char *));
-#endif
-E boolean FDECL(uptodate, (int,const char *));
+E const char *FDECL(copyright_banner_line, (int));
 
 /* ### video.c ### */
 
