@@ -1259,30 +1259,19 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
 	}
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
 		 ATR_NONE, "Select one of your saved games", MENU_UNSELECTED);
-	/* limited to 52 character entries, a-zA-Z, plus new game (as '#'
-	   if necessary) and quit (omitted if new game ended up as '#') */
-	for (k = 0, clet = 'a'; saved[k] && k < 52; ++k) {
+	for (k = 0; saved[k]; ++k) {
 	    any.a_int = k + 1;
-	    add_menu(tmpwin, NO_GLYPH, &any, clet, 0,
+	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
 		     ATR_NONE, saved[k], MENU_UNSELECTED);
-	    if (clet == 'z') clet = 'A';
-	    else if (clet == 'Z') clet = '#';	/* use NOINVSYM for overflow */
-	    else ++clet;
 	}
-	if (clet >= 'a' && clet < 'n') clet = 'n';	/* new game */
+	clet = (k <= 'n' - 'a') ? 'n' : 0;	/* new game */
 	any.a_int = -1;	/* not >= 0 */
 	add_menu(tmpwin, NO_GLYPH, &any, clet, 0,
 		 ATR_NONE, "Start a new character", MENU_UNSELECTED);
-	/* quit entry is preselected, but omitted if there's no room */
-	if (clet != '#') {
-	    if (clet >= 'a' && clet < 'q') clet = 'q';	/* quit */
-	    else if (clet == 'z') clet = 'A';
-	    else if (clet == 'Z') clet = '#';
-	    else ++clet;
-	    any.a_int = -2;
-	    add_menu(tmpwin, NO_GLYPH, &any, clet, 0,
-		     ATR_NONE, "Never mind (quit)", MENU_SELECTED);
-	}
+	clet = (k + 1 <= 'q' - 'a') ? 'q' : 0;	/* quit */
+	any.a_int = -2;
+	add_menu(tmpwin, NO_GLYPH, &any, clet, 0,
+		 ATR_NONE, "Never mind (quit)", MENU_SELECTED);
 	/* no prompt on end_menu, as we've done our own at the top */
 	end_menu(tmpwin, (char *)0);
 	if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {
