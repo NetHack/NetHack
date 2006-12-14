@@ -928,7 +928,7 @@ register const char *let,*word;
 		/* suppress corpses on astral, amulets elsewhere */
 		|| (!strcmp(word, "sacrifice") &&
 		    /* (!astral && amulet) || (astral && !amulet) */
-		    (!Is_astralevel(&u.uz) ^ otmp->oclass != AMULET_CLASS))
+		    (!Is_astralevel(&u.uz) ^ (otmp->oclass != AMULET_CLASS)))
 		    ) {
 			/* acceptable but not listed as likely candidate */
 			foo--;
