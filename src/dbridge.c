@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dbridge.c	3.5	2005/12/05	*/
+/*	SCCS Id: @(#)dbridge.c	3.5	2006/12/13	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,6 +8,13 @@
  *
  * Added comprehensive monster-handling, and the "entity" structure to
  * deal with players as well. - 11/89
+ *
+ * Any traps and/or engravings at either the portcullis or span location
+ * are destroyed whenever the bridge is lowered, raised, or destroyed.
+ * (Engraving handling could be extended to flag whether an engraving on
+ * the DB_UNDER surface is hidden by the lowered bridge, or one on the
+ * bridge itself is hidden because the bridge has been raised, but that
+ * seems like an awful lot of effort for very little gain.)
  */
 
 #include "hack.h"
@@ -778,6 +785,8 @@ int x,y;
 	delallobj(x2, y2);
 	if ((t = t_at(x, y)) != 0) deltrap(t);
 	if ((t = t_at(x2, y2)) != 0) deltrap(t);
+	del_engr_at(x, y);
+	del_engr_at(x2, y2);
 	newsym(x, y);
 	newsym(x2, y2);
 	block_point(x2,y2);	/* vision */
@@ -817,6 +826,8 @@ int x,y;
 	delallobj(x, y);
 	if ((t = t_at(x, y)) != 0) deltrap(t);
 	if ((t = t_at(x2, y2)) != 0) deltrap(t);
+	del_engr_at(x, y);
+	del_engr_at(x2, y2);
 	newsym(x, y);
 	newsym(x2, y2);
 	unblock_point(x2,y2);	/* vision */
@@ -882,6 +893,8 @@ int x,y;
 	lev2->doormask = D_NODOOR;
 	if ((t = t_at(x, y)) != 0) deltrap(t);
 	if ((t = t_at(x2, y2)) != 0) deltrap(t);
+	del_engr_at(x, y);
+	del_engr_at(x2, y2);
 	for (i = rn2(6); i > 0; --i) {	/* scatter some debris */
 	    /* doesn't matter if we happen to pick <x,y2> or <x2,y>;
 	       since drawbridges are never placed diagonally, those
