@@ -1309,9 +1309,10 @@ dosacrifice()
     if (otmp->otyp == AMULET_OF_YENDOR) {
 	if (!highaltar) {
  too_soon:
-	    if (altaralign == A_NONE)
+	    if (altaralign == A_NONE && Inhell) 
 		/* hero has left Moloch's Sanctum so is in the process
-		   of getting away with the Amulet */
+		   of getting away with the Amulet (outside of Gehennom,
+		   fall through to the "ashamed" feedback) */
 		gods_upset(A_NONE);
 	    else
 		You_feel("%s.", Hallucination ? "homesick" :
