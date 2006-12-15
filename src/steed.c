@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steed.c	3.5	2006/10/11	*/
+/*	SCCS Id: @(#)steed.c	3.5	2006/12/13	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -437,8 +437,7 @@ int forceit;
 	    for (y = u.uy-1; y <= u.uy+1; y++) {
 		if (!isok(x, y) || (x == u.ux && y == u.uy)) continue;
 
-		if (ACCESSIBLE(levl[x][y].typ) &&
-			    !MON_AT(x,y) && !closed_door(x,y)) {
+		if (accessible(x, y) && !MON_AT(x,y)) {
 		    distance = distu(x,y);
 		    if (min_distance < 0 || distance < min_distance ||
 			    (distance == min_distance && rn2(2))) {

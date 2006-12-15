@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monmove.c	3.5	2006/08/16	*/
+/*	SCCS Id: @(#)monmove.c	3.5	2006/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1324,7 +1324,18 @@ boolean
 accessible(x, y)
 register int x, y;
 {
-	return((boolean)(ACCESSIBLE(levl[x][y].typ) && !closed_door(x, y)));
+	int levtyp = levl[x][y].typ;
+
+	if (levtyp == DRAWBRIDGE_UP) {
+	    /* use underlying terrain in front of closed drawbridge */
+	    switch (levl[x][y].drawbridgemask & DB_UNDER) {
+	    case DB_MOAT:  levtyp = MOAT; break;
+	    case DB_LAVA:  levtyp = LAVAPOOL; break;
+	    case DB_ICE:   levtyp = ICE; break;
+	    case DB_FLOOR: levtyp = ROOM; break;
+	    }
+	}
+	return (boolean)(ACCESSIBLE(levtyp) && !closed_door(x, y));
 }
 
 /* decide where the monster thinks you are standing */
@@ -1388,9 +1399,9 @@ register struct monst *mtmp;
 		  || (disp != 2 && mx == mtmp->mx && my == mtmp->my)
 		  || ((mx != u.ux || my != u.uy) &&
 		      !passes_walls(mtmp->data) &&
-		      (!ACCESSIBLE(levl[mx][my].typ) ||
-		       (closed_door(mx, my) &&
-			!(can_ooze(mtmp) || can_fog(mtmp)))))
+		      !(accessible(mx, my) ||
+			(closed_door(mx, my) &&
+			 (can_ooze(mtmp) || can_fog(mtmp)))))
 		  || !couldsee(mx, my));
 	} else {
 found_you:

@@ -499,7 +499,7 @@ doengrave()
 	if(Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)/* in bubble */) {
 		You_cant("write in thin air!");
 		return(0);
-	} else if (closed_door(u.ux, u.uy) || !accessible(u.ux, u.uy)) {
+	} else if (!accessible(u.ux, u.uy)) {
 		/* stone, tree, wall, secret corridor, pool, lava, bars */
 		You_cant("write here.");
 		return 0;

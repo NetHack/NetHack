@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mail.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)mail.c	3.5	2006/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -228,7 +228,7 @@ md_stop(stopp, startp)
 	for (y = u.uy-1; y <= u.uy+1; y++) {
 	    if (!isok(x, y) || (x == u.ux && y == u.uy)) continue;
 
-	    if (ACCESSIBLE(levl[x][y].typ) && !MON_AT(x,y)) {
+	    if (accessible(x, y) && !MON_AT(x,y)) {
 		distance = dist2(x,y,startp->x,startp->y);
 		if (min_distance < 0 || distance < min_distance ||
 			(distance == min_distance && rn2(2))) {

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)teleport.c	3.5	2006/08/05	*/
+/*	SCCS Id: @(#)teleport.c	3.5	2006/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -73,13 +73,12 @@ unsigned gpflags;
 		    return (is_flyer(mdat) || likes_lava(mdat));
 	    }
 	    if (passes_walls(mdat) && may_passwall(x,y)) return TRUE;
+	    if (amorphous(mdat) && closed_door(x,y)) return TRUE;
 	}
-	if (!ACCESSIBLE(levl[x][y].typ)) {
+	if (!accessible(x, y)) {
 		if (!(is_pool(x,y) && ignorewater)) return FALSE;
 	}
 
-	if (closed_door(x, y) && (!mdat || !amorphous(mdat)))
-		return FALSE;
 	if (sobj_at(BOULDER, x, y) && (!mdat || !throws_rocks(mdat)))
 		return FALSE;
 	return TRUE;
