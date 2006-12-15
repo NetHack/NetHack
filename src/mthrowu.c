@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.5	2006/03/29	*/
+/*	SCCS Id: @(#)mthrowu.c	3.5	2006/12/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -747,7 +747,7 @@ int whodidit;	/* 1==hero, 0=other, -1==just check whether it'll pass thru */
 
 		hits = (oskill != -P_BOW  && oskill != -P_CROSSBOW &&
 			oskill != -P_DART && oskill != -P_SHURIKEN &&
-			oskill != P_SPEAR && oskill != P_JAVELIN &&
+			oskill != P_SPEAR &&
 			oskill != P_KNIFE);	/* but not dagger */
 		break;
 	    }

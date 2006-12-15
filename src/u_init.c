@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)u_init.c	3.5	2005/11/05	*/
+/*	SCCS Id: @(#)u_init.c	3.5	2006/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -295,7 +295,7 @@ static const struct def_skill Skill_C[] = {
     { P_MORNING_STAR, P_BASIC },	{ P_FLAIL, P_SKILLED },
     { P_HAMMER, P_SKILLED },		{ P_QUARTERSTAFF, P_EXPERT },
     { P_POLEARMS, P_SKILLED },		{ P_SPEAR, P_EXPERT },
-    { P_JAVELIN, P_SKILLED },		{ P_TRIDENT, P_SKILLED },
+    { P_TRIDENT, P_SKILLED },
     { P_BOW, P_SKILLED },		{ P_SLING, P_EXPERT },
     { P_ATTACK_SPELL, P_BASIC },	{ P_MATTER_SPELL, P_SKILLED },
     { P_BOOMERANG, P_EXPERT },		{ P_UNICORN_HORN, P_BASIC },
@@ -309,7 +309,7 @@ static const struct def_skill Skill_H[] = {
     { P_SABER, P_BASIC },		{ P_CLUB, P_SKILLED },
     { P_MACE, P_BASIC },		{ P_QUARTERSTAFF, P_EXPERT },
     { P_POLEARMS, P_BASIC },		{ P_SPEAR, P_BASIC },
-    { P_JAVELIN, P_BASIC },		{ P_TRIDENT, P_BASIC },
+    { P_TRIDENT, P_BASIC },
     { P_SLING, P_SKILLED },		{ P_DART, P_EXPERT },
     { P_SHURIKEN, P_SKILLED },		{ P_UNICORN_HORN, P_EXPERT },
     { P_HEALING_SPELL, P_EXPERT },
@@ -326,7 +326,7 @@ static const struct def_skill Skill_K[] = {
     { P_CLUB, P_BASIC },		{ P_MACE, P_SKILLED },
     { P_MORNING_STAR, P_SKILLED },	{ P_FLAIL, P_BASIC },
     { P_HAMMER, P_BASIC },		{ P_POLEARMS, P_SKILLED },
-    { P_SPEAR, P_SKILLED },		{ P_JAVELIN, P_SKILLED },
+    { P_SPEAR, P_SKILLED },
     { P_TRIDENT, P_BASIC },		{ P_LANCE, P_EXPERT },
     { P_BOW, P_BASIC },			{ P_CROSSBOW, P_SKILLED },
     { P_ATTACK_SPELL, P_SKILLED },	{ P_HEALING_SPELL, P_SKILLED },
@@ -341,11 +341,10 @@ static const struct def_skill Skill_K[] = {
 
 static const struct def_skill Skill_Mon[] = {
     { P_QUARTERSTAFF, P_BASIC },    { P_SPEAR, P_BASIC },
-    { P_JAVELIN, P_BASIC },		    { P_CROSSBOW, P_BASIC },
-    { P_SHURIKEN, P_BASIC },
+    { P_CROSSBOW, P_BASIC },        { P_SHURIKEN, P_BASIC },
     { P_ATTACK_SPELL, P_BASIC },    { P_HEALING_SPELL, P_EXPERT },
     { P_DIVINATION_SPELL, P_BASIC },{ P_ENCHANTMENT_SPELL, P_BASIC },
-    { P_CLERIC_SPELL, P_SKILLED },  { P_ESCAPE_SPELL, P_BASIC },
+    { P_CLERIC_SPELL, P_SKILLED },  { P_ESCAPE_SPELL, P_SKILLED },
     { P_MATTER_SPELL, P_BASIC },
     { P_MARTIAL_ARTS, P_GRAND_MASTER },
     { P_NONE, 0 }
@@ -356,7 +355,7 @@ static const struct def_skill Skill_P[] = {
     { P_MORNING_STAR, P_EXPERT },	{ P_FLAIL, P_EXPERT },
     { P_HAMMER, P_EXPERT },		{ P_QUARTERSTAFF, P_EXPERT },
     { P_POLEARMS, P_SKILLED },		{ P_SPEAR, P_SKILLED },
-    { P_JAVELIN, P_SKILLED },		{ P_TRIDENT, P_SKILLED },
+    { P_TRIDENT, P_SKILLED },
     { P_LANCE, P_BASIC },		{ P_BOW, P_BASIC },
     { P_SLING, P_BASIC },		{ P_CROSSBOW, P_BASIC },
     { P_DART, P_BASIC },		{ P_SHURIKEN, P_BASIC },
@@ -393,7 +392,7 @@ static const struct def_skill Skill_Ran[] = {
     { P_SHORT_SWORD, P_BASIC },	 { P_MORNING_STAR, P_BASIC },
     { P_FLAIL, P_SKILLED },	 { P_HAMMER, P_BASIC },
     { P_QUARTERSTAFF, P_BASIC }, { P_POLEARMS, P_SKILLED },
-    { P_SPEAR, P_SKILLED },	 { P_JAVELIN, P_EXPERT },
+    { P_SPEAR, P_EXPERT },
     { P_TRIDENT, P_BASIC },	 { P_BOW, P_EXPERT },
     { P_SLING, P_EXPERT },	 { P_CROSSBOW, P_EXPERT },
     { P_DART, P_EXPERT },	 { P_SHURIKEN, P_SKILLED },
@@ -414,8 +413,8 @@ static const struct def_skill Skill_S[] = {
     { P_LONG_SWORD, P_EXPERT },		{ P_TWO_HANDED_SWORD, P_EXPERT },
     { P_SCIMITAR, P_BASIC },		{ P_SABER, P_BASIC },
     { P_FLAIL, P_SKILLED },		{ P_QUARTERSTAFF, P_BASIC },
-    { P_POLEARMS, P_SKILLED },		{ P_SPEAR, P_BASIC },
-    { P_JAVELIN, P_BASIC },		{ P_LANCE, P_SKILLED },
+    { P_POLEARMS, P_SKILLED },		{ P_SPEAR, P_SKILLED },
+    { P_LANCE, P_SKILLED },
     { P_BOW, P_EXPERT },		{ P_SHURIKEN, P_EXPERT },
     { P_ATTACK_SPELL, P_SKILLED },	{ P_CLERIC_SPELL, P_SKILLED },
 #ifdef STEED
@@ -436,7 +435,7 @@ static const struct def_skill Skill_T[] = {
     { P_MACE, P_BASIC },		{ P_MORNING_STAR, P_BASIC },
     { P_FLAIL, P_BASIC },		{ P_HAMMER, P_BASIC },
     { P_QUARTERSTAFF, P_BASIC },	{ P_POLEARMS, P_BASIC },
-    { P_SPEAR, P_BASIC },		{ P_JAVELIN, P_BASIC },
+    { P_SPEAR, P_BASIC },
     { P_TRIDENT, P_BASIC },		{ P_LANCE, P_BASIC },
     { P_BOW, P_BASIC },			{ P_SLING, P_BASIC },
     { P_CROSSBOW, P_BASIC },		{ P_DART, P_EXPERT },
@@ -460,7 +459,7 @@ static const struct def_skill Skill_V[] = {
     { P_TWO_HANDED_SWORD, P_EXPERT },	{ P_SCIMITAR, P_BASIC },
     { P_SABER, P_BASIC },		{ P_HAMMER, P_EXPERT },
     { P_QUARTERSTAFF, P_BASIC },	{ P_POLEARMS, P_SKILLED },
-    { P_SPEAR, P_SKILLED },		{ P_JAVELIN, P_BASIC },
+    { P_SPEAR, P_SKILLED },
     { P_TRIDENT, P_BASIC },		{ P_LANCE, P_SKILLED },
     { P_SLING, P_BASIC },
     { P_ATTACK_SPELL, P_BASIC },	{ P_ESCAPE_SPELL, P_BASIC },
@@ -477,7 +476,7 @@ static const struct def_skill Skill_W[] = {
     { P_AXE, P_SKILLED },		{ P_SHORT_SWORD, P_BASIC },
     { P_CLUB, P_SKILLED },		{ P_MACE, P_BASIC },
     { P_QUARTERSTAFF, P_EXPERT },	{ P_POLEARMS, P_SKILLED },
-    { P_SPEAR, P_BASIC },		{ P_JAVELIN, P_BASIC },
+    { P_SPEAR, P_BASIC },
     { P_TRIDENT, P_BASIC },		{ P_SLING, P_SKILLED },
     { P_DART, P_EXPERT },		{ P_SHURIKEN, P_BASIC },
     { P_ATTACK_SPELL, P_EXPERT },	{ P_HEALING_SPELL, P_SKILLED },

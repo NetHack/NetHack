@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objects.c	3.5	2006/02/22	*/
+/*	SCCS Id: @(#)objects.c	3.5	2006/12/14	*/
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -101,7 +101,10 @@ WEAPON("shuriken", "throwing star",
 WEAPON("boomerang", (char *)0,
 	1, 1, 0, 15,  5, 20,  9,  9, 0, 0,   -P_BOOMERANG, WOOD, HI_WOOD),
 
-/* spears */
+/* spears [note: javelin used to have a separate skill from spears,
+   because the latter are primarily stabbing weapons rather than
+   throwing ones; but for playability, they've been merged together
+   under spear skill and spears can now be thrown like javelins] */
 WEAPON("spear", (char *)0,
 	1, 1, 0, 50, 30,  3,  6,  8, 0, P,   P_SPEAR, IRON, HI_METAL),
 WEAPON("elven spear", "runed spear",
@@ -113,7 +116,7 @@ WEAPON("dwarvish spear", "stout spear",
 WEAPON("silver spear", (char *)0,
 	1, 1, 0,  2, 36, 40,  6,  8, 0, P,   P_SPEAR, SILVER, HI_SILVER),
 WEAPON("javelin", "throwing spear",
-	0, 1, 0, 10, 20,  3,  6,  6, 0, P,   P_JAVELIN, IRON, HI_METAL),
+	0, 1, 0, 10, 20,  3,  6,  6, 0, P,   P_SPEAR, IRON, HI_METAL),
 
 WEAPON("trident", (char *)0,
 	1, 0, 0,  8, 25,  5,  6,  4, 0, P,   P_TRIDENT, IRON, HI_METAL),

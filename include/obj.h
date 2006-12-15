@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)obj.h	3.5	2006/04/15	*/
+/*	SCCS Id: @(#)obj.h	3.5	2006/12/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -164,8 +164,7 @@ struct obj {
 			 (objects[otmp->otyp].oc_skill == P_POLEARMS || \
 			 objects[otmp->otyp].oc_skill == P_LANCE))
 #define is_spear(otmp)	(otmp->oclass == WEAPON_CLASS && \
-			 objects[otmp->otyp].oc_skill >= P_SPEAR && \
-			 objects[otmp->otyp].oc_skill <= P_JAVELIN)
+			 objects[otmp->otyp].oc_skill == P_SPEAR)
 #define is_launcher(otmp)	(otmp->oclass == WEAPON_CLASS && \
 			 objects[otmp->otyp].oc_skill >= P_BOW && \
 			 objects[otmp->otyp].oc_skill <= P_CROSSBOW)
@@ -173,9 +172,9 @@ struct obj {
 			 otmp->oclass == GEM_CLASS) && \
 			 objects[otmp->otyp].oc_skill >= -P_CROSSBOW && \
 			 objects[otmp->otyp].oc_skill <= -P_BOW)
-#define ammo_and_launcher(otmp,ltmp) \
-			 (is_ammo(otmp) && (ltmp) && \
-			 objects[(otmp)->otyp].oc_skill == -objects[(ltmp)->otyp].oc_skill)
+#define matching_launcher(a,l) ((l) && objects[(a)->otyp].oc_skill == \
+				       -objects[(l)->otyp].oc_skill)
+#define ammo_and_launcher(a,l) (is_ammo(a) && matching_launcher(a,l))
 #define is_missile(otmp)	((otmp->oclass == WEAPON_CLASS || \
 			 otmp->oclass == TOOL_CLASS) && \
 			 objects[otmp->otyp].oc_skill >= -P_BOOMERANG && \

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)weapon.c	3.5	2006/12/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,7 +34,7 @@ STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 	TWO_HANDED_SWORD, SCIMITAR,       PN_SABER,     CLUB,
 	MACE,             MORNING_STAR,   FLAIL,
 	PN_HAMMER,        QUARTERSTAFF,   PN_POLEARMS,  SPEAR,
-	JAVELIN,          TRIDENT,        LANCE,        BOW,
+	TRIDENT,          LANCE,          BOW,
 	SLING,            CROSSBOW,       DART,
 	SHURIKEN,         BOOMERANG,      PN_WHIP,      UNICORN_HORN,
 	PN_ATTACK_SPELL,     PN_HEALING_SPELL,

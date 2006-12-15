@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)skills.h	3.5	1999/10/27	*/
+/*	SCCS Id: @(#)skills.h	3.5	2006/12/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,38 +37,37 @@
 #define P_HAMMER            15	/* Heavy head on the end */
 #define P_QUARTERSTAFF      16	/* Long-shafted bludgeon */
 #define P_POLEARMS          17
-#define P_SPEAR             18
-#define P_JAVELIN           19
-#define P_TRIDENT           20
-#define P_LANCE             21
-#define P_BOW               22
-#define P_SLING             23
-#define P_CROSSBOW          24
-#define P_DART              25
-#define P_SHURIKEN          26
-#define P_BOOMERANG         27
-#define P_WHIP              28
-#define P_UNICORN_HORN      29	/* last weapon */
+#define P_SPEAR		    18	/* includes javelin */
+#define P_TRIDENT	    19
+#define P_LANCE		    20
+#define P_BOW		    21
+#define P_SLING		    22
+#define P_CROSSBOW	    23
+#define P_DART		    24
+#define P_SHURIKEN	    25
+#define P_BOOMERANG	    26
+#define P_WHIP		    27
+#define P_UNICORN_HORN	    28	/* last weapon */
 #define P_FIRST_WEAPON      P_DAGGER
 #define P_LAST_WEAPON       P_UNICORN_HORN
 
 /* Spell Skills added by Larry Stewart-Zerba */
-#define P_ATTACK_SPELL      30
-#define P_HEALING_SPELL     31
-#define P_DIVINATION_SPELL  32
-#define P_ENCHANTMENT_SPELL 33
-#define P_CLERIC_SPELL      34
-#define P_ESCAPE_SPELL      35
-#define P_MATTER_SPELL      36
+#define P_ATTACK_SPELL	    29
+#define P_HEALING_SPELL	    30
+#define P_DIVINATION_SPELL  31
+#define P_ENCHANTMENT_SPELL 32
+#define P_CLERIC_SPELL	    33
+#define P_ESCAPE_SPELL	    34
+#define P_MATTER_SPELL	    35
 #define P_FIRST_SPELL		P_ATTACK_SPELL
 #define P_LAST_SPELL		P_MATTER_SPELL
 
 /* Other types of combat */
-#define P_BARE_HANDED_COMBAT	37
+#define P_BARE_HANDED_COMBAT	36  /* actually weaponless; gloves are ok */
 #define P_MARTIAL_ARTS		P_BARE_HANDED_COMBAT	/* Role distinguishes */
-#define P_TWO_WEAPON_COMBAT	38	/* Finally implemented */
+#define P_TWO_WEAPON_COMBAT	37	/* Finally implemented */
 #ifdef STEED
-#define P_RIDING		39	/* How well you control your steed */
+#define P_RIDING		38	/* How well you control your steed */
 #define P_LAST_H_TO_H		P_RIDING
 #else
 #define P_LAST_H_TO_H		P_TWO_WEAPON_COMBAT
