@@ -1,10 +1,10 @@
-/*	SCCS Id: @(#)trap.c	3.5	2006/11/22	*/
+/*	SCCS Id: @(#)trap.c	3.5	2006/12/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-extern const char * const destroy_strings[];	/* from zap.c */
+extern const char * const destroy_strings[][3];	/* from zap.c */
 
 STATIC_DCL void FDECL(dofiretrap, (struct obj *));
 STATIC_DCL void NDECL(domagictrap);
@@ -3010,17 +3010,17 @@ xchar x, y;
 		if (in_sight) pline("Smoke rises from %s.", the(xname(obj)));
 		continue;
 	    }
-	    dindx = (obj->oclass == SCROLL_CLASS) ? 2 : 3;
+	    dindx = (obj->oclass == SCROLL_CLASS) ? 3 : 4;
 	    if (in_sight)
-		pline("%s %s.", Yname2(obj), (obj->quan > 1L) ?
-		      destroy_strings[dindx*3 + 1] : destroy_strings[dindx*3]);
+		pline("%s %s.", Yname2(obj),
+		      destroy_strings[dindx][(obj->quan > 1L)]);
 	    delobj(obj);
 	    retval++;
 	} else if (obj->oclass == POTION_CLASS) {
-	    dindx = 1;
+	    dindx = (obj->otyp != POT_OIL) ? 1 : 2;
 	    if (in_sight)
-		pline("%s %s.", Yname2(obj), (obj->quan > 1L) ?
-		      destroy_strings[dindx*3 + 1] : destroy_strings[dindx*3]);
+		pline("%s %s.", Yname2(obj),
+		      destroy_strings[dindx][(obj->quan > 1L)]);
 	    delobj(obj);
 	    retval++;
 	} else if (is_flammable(obj) && obj->oeroded < MAX_ERODE &&

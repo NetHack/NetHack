@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2006/11/27	*/
+/*	SCCS Id: @(#)zap.c	3.5	2006/12/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4132,13 +4132,26 @@ register struct obj *obj;
 	return TRUE;
 }
 
-const char * const destroy_strings[] = {	/* also used in trap.c */
-	"freezes and shatters", "freeze and shatter", "shattered potion",
-	"boils and explodes", "boil and explode", "boiling potion",
-	"catches fire and burns", "catch fire and burn", "burning scroll",
-	"catches fire and burns", "catch fire and burn", "burning book",
-	"turns to dust and vanishes", "turn to dust and vanish", "",
-	"breaks apart and explodes", "break apart and explode", "exploding wand"
+/*
+ * destroy_strings[dindx][0:singular,1:plural,2:killer_reason]
+ *	[0] freezing potion
+ *	[1] boiling potion other than oil
+ *	[2] boiling potion of oil
+ *	[3] burning scroll
+ *	[4] burning spellbook
+ *	[5] shocked ring
+ *	[6] shocked wand
+ * (books, rings, and wands don't stack so don't need plural form;
+ *  crumbling ring doesn't do damage so doesn't need killer reason)
+ */
+const char * const destroy_strings[][3] = {	/* also used in trap.c */
+    { "freezes and shatters", "freeze and shatter", "shattered potion" },
+    { "boils and explodes", "boil and explode", "boiling potion" },
+    { "ignites and explodes", "ignite and explode", "exploding potion" },
+    { "catches fire and burns", "catch fire and burn", "burning scroll" },
+    { "catches fire and burns", "", "burning book" },
+    { "turns to dust and vanishes", "", "" },
+    { "breaks apart and explodes", "", "exploding wand" },
 };
 
 void
@@ -4159,10 +4172,10 @@ register int osym, dmgtyp;
 	    if(obj->oartifact) continue; /* don't destroy artifacts */
 	    if(obj->in_use && obj->quan == 1L) continue; /* not available */
 	    xresist = skip = 0;
-#ifdef GCC_WARN
+	    /* lint suppression */
 	    dmg = dindx = 0;
 	    quan = 0L;
-#endif
+
 	    switch(dmgtyp) {
 		case AD_COLD:
 		    if(osym == POTION_CLASS && obj->otyp != POT_OIL) {
@@ -4185,15 +4198,15 @@ register int osym, dmgtyp;
 		    quan = obj->quan;
 		    switch(osym) {
 			case POTION_CLASS:
-			    dindx = 1;
+			    dindx = (obj->otyp != POT_OIL) ? 1 : 2;
 			    dmg = rnd(6);
 			    break;
 			case SCROLL_CLASS:
-			    dindx = 2;
+			    dindx = 3;
 			    dmg = 1;
 			    break;
 			case SPBOOK_CLASS:
-			    dindx = 3;
+			    dindx = 4;
 			    dmg = 1;
 			    break;
 			default:
@@ -4208,7 +4221,7 @@ register int osym, dmgtyp;
 			case RING_CLASS:
 			    if(obj->otyp == RIN_SHOCK_RESISTANCE)
 				    { skip++; break; }
-			    dindx = 4;
+			    dindx = 5;
 			    dmg = 0;
 			    break;
 			case WAND_CLASS:
@@ -4216,7 +4229,7 @@ register int osym, dmgtyp;
 #if 0
 			    if (obj == current_wand) { skip++; break; }
 #endif
-			    dindx = 5;
+			    dindx = 6;
 			    dmg = rnd(10);
 			    break;
 			default:
@@ -4234,11 +4247,10 @@ register int osym, dmgtyp;
 		    if(!rn2(3)) cnt++;
 
 		if(!cnt) continue;
-		if(cnt == quan)	mult = "Your";
-		else	mult = (cnt == 1L) ? "One of your" : "Some of your";
+		mult = (cnt == quan) ? "Your" :
+		       (cnt == 1L) ? "One of your" : "Some of your";
 		pline("%s %s %s!", mult, xname(obj),
-			(cnt > 1L) ? destroy_strings[dindx*3 + 1]
-				  : destroy_strings[dindx*3]);
+		      destroy_strings[dindx][(cnt > 1L)]);
 		if(osym == POTION_CLASS && dmgtyp != AD_COLD) {
 		    if (!breathless(youmonst.data) || haseyes(youmonst.data))
 		    	potionbreathe(obj);
@@ -4255,7 +4267,7 @@ register int osym, dmgtyp;
 		if(dmg) {
 		    if(xresist)	You("aren't hurt!");
 		    else {
-			const char *how = destroy_strings[dindx * 3 + 2];
+			const char *how = destroy_strings[dindx][2];
 			boolean one = (cnt == 1L);
 
 			if (physical_damage) dmg = Maybe_Half_Phys(dmg);
@@ -4314,15 +4326,15 @@ int osym, dmgtyp;
 		    quan = obj->quan;
 		    switch(osym) {
 			case POTION_CLASS:
-			    dindx = 1;
+			    dindx = (obj->otyp != POT_OIL) ? 1 : 2;
 			    tmp++;
 			    break;
 			case SCROLL_CLASS:
-			    dindx = 2;
+			    dindx = 3;
 			    tmp++;
 			    break;
 			case SPBOOK_CLASS:
-			    dindx = 3;
+			    dindx = 4;
 			    tmp++;
 			    break;
 			default:
@@ -4336,11 +4348,11 @@ int osym, dmgtyp;
 			case RING_CLASS:
 			    if(obj->otyp == RIN_SHOCK_RESISTANCE)
 				    { skip++; break; }
-			    dindx = 4;
+			    dindx = 5;
 			    break;
 			case WAND_CLASS:
 			    if(obj->otyp == WAN_LIGHTNING) { skip++; break; }
-			    dindx = 5;
+			    dindx = 6;
 			    tmp++;
 			    break;
 			default:
@@ -4358,8 +4370,7 @@ int osym, dmgtyp;
 
 		if(!cnt) continue;
 		if (vis) pline("%s %s!", yname(obj),
-			(cnt > 1L) ? destroy_strings[dindx*3 + 1]
-				  : destroy_strings[dindx*3]);
+			       destroy_strings[dindx][(cnt > 1L)]);
 		for(i = 0; i < cnt; i++) m_useup(mtmp, obj);
 	    }
 	}
