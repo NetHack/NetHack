@@ -607,12 +607,17 @@ struct monst *mtmp;
 
 	m_shot.n = multishot;
 	for (m_shot.i = 1; m_shot.i <= m_shot.n; m_shot.i++) {
-	    /* this continues even if mtmp gets killed (shot kills
-	       adjacent gas spore and triggers explosion, perhaps)
-	       because they're supposed to have been shot in a rapid
-	       fire volley and conceptually all be in flight at once */
 	    m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
 		    distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
+	    /* conceptually all N missiles are in flight at once, but
+	       if mtmp gets killed (shot kills adjacent gas spore and
+	       triggers explosion, perhaps), inventory will be dropped
+	       and otmp might go away via merging into another stack */
+	    if (mtmp->mhp <= 0 && m_shot.i < m_shot.n) {
+		/* cancel pending shots (ought to give a message here since
+		   we gave one above about throwing/shooting N missiles) */
+		break;	/* endmultishot(FALSE); */
+	    }
 	}
 	m_shot.n = m_shot.i = 0;
 	m_shot.o = STRANGE_OBJECT;
