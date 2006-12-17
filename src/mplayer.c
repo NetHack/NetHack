@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mplayer.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)mplayer.c	3.5	2006/12/15	*/
 /*	Copyright (c) Izchak Miller, 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -179,7 +179,7 @@ register boolean special;
 		    if (rn2(2)) armor = rnd_class(PLATE_MAIL, CHAIN_MAIL);
 		    break;
 		case PM_MONK:
-		    weapon = STRANGE_OBJECT;
+		    weapon = !rn2(3) ? SHURIKEN : STRANGE_OBJECT;
 		    armor = STRANGE_OBJECT;
 		    cloak = ROBE;
 		    if (rn2(2)) shield = STRANGE_OBJECT;
@@ -196,7 +196,7 @@ register boolean special;
 		    if (rn2(2)) weapon = ELVEN_DAGGER;
 		    break;
 		case PM_ROGUE:
-		    if (rn2(2)) weapon = SHORT_SWORD;
+		    if (rn2(2)) weapon = rn2(2) ? SHORT_SWORD : ORCISH_DAGGER;
 		    break;
 		case PM_SAMURAI:
 		    if (rn2(2)) weapon = KATANA;
@@ -232,6 +232,9 @@ register boolean special;
 		else if (!rn2(2)) otmp->greased = 1;
 		if (special && rn2(2))
 		    otmp = mk_artifact(otmp, A_NONE);
+		/* usually increase stack size if stackable weapon */
+		if (objects[otmp->otyp].oc_merge && !otmp->oartifact)
+		    otmp->quan += (long) rn2(is_spear(otmp) ? 4 : 8);
 		/* mplayers knew better than to overenchant Magicbane */
 		if (otmp->oartifact == ART_MAGICBANE)
 		    otmp->spe = rnd(4);

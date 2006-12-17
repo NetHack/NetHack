@@ -37,7 +37,7 @@ struct obj *obj;
 int shotlimit;
 {
 	struct obj *otmp;
-	int multishot = 1;
+	int multishot;
 	schar skill;
 	long wep_mask;
 	boolean twoweap;
@@ -109,18 +109,30 @@ int shotlimit;
 
 	/* Multishot calculations
 	 */
+	multishot = 1;
 	skill = objects[obj->otyp].oc_skill;
-	if ((ammo_and_launcher(obj, uwep) || skill == P_DAGGER ||
-			skill == -P_DART || skill == -P_SHURIKEN) &&
+	if (obj->quan > 1L &&	/* no point checking if there's only 1 */
+		/* ammo requires corresponding launcher be wielded */
+		(is_ammo(obj) ? matching_launcher(obj, uwep) :
+		/* otherwise any stackable (non-ammo) weapon */
+			obj->oclass == WEAPON_CLASS) &&
 		!(Confusion || Stunned)) {
 	    /* Bonus if the player is proficient in this weapon... */
 	    switch (P_SKILL(weapon_type(obj))) {
-	    default:	break; /* No bonus */
-	    case P_SKILLED:	multishot++; break;
-	    case P_EXPERT:	multishot += 2; break;
+	    case P_EXPERT:
+		if (!Role_if(PM_WIZARD)) multishot++;
+		/*FALLTHRU*/
+	    case P_SKILLED:
+		multishot++;
+		break;
+	    default:		/* No bonus */
+		break;
 	    }
 	    /* ...or is using a special weapon for their role... */
 	    switch (Role_switch) {
+	    case PM_MONK:
+		if (skill == -P_SHURIKEN) multishot++;
+		break;
 	    case PM_RANGER:
 		multishot++;
 		break;
@@ -146,17 +158,20 @@ int shotlimit;
 	    default:
 		break;	/* No bonus */
 	    }
-	}
-	/* crossbows are slow to load and probably shouldn't allow multiple
-	   shots at all, but that would result in players never using them;
-	   instead, we require high strength to load and shoot quickly */
-	if (multishot > 1 && (int)ACURRSTR < (Race_if(PM_GNOME) ? 16 : 18) &&
-		ammo_and_launcher(obj, uwep) && weapon_type(uwep) == P_CROSSBOW)
-	    multishot = rnd(multishot);
 
-	if ((long)multishot > obj->quan) multishot = (int)obj->quan;
-	multishot = rnd(multishot);
-	if (shotlimit > 0 && multishot > shotlimit) multishot = shotlimit;
+	    /* crossbows are slow to load and probably shouldn't allow multiple
+	       shots at all, but that would result in players never using them;
+	       instead, we require high strength to load and shoot quickly */
+	    if (multishot > 1 &&
+		    (int)ACURRSTR < (Race_if(PM_GNOME) ? 16 : 18) &&
+		    ammo_and_launcher(obj, uwep) &&
+		    weapon_type(uwep) == P_CROSSBOW)
+		multishot = rnd(multishot);
+
+	    multishot = rnd(multishot);
+	    if ((long)multishot > obj->quan) multishot = (int)obj->quan;
+	    if (shotlimit > 0 && multishot > shotlimit) multishot = shotlimit;
+	}
 
 	m_shot.s = ammo_and_launcher(obj,uwep) ? TRUE : FALSE;
 	/* give a message if shooting more than one, or if player
@@ -191,7 +206,6 @@ int shotlimit;
 
 	return 1;
 }
-
 
 int
 dothrow()
@@ -338,6 +352,19 @@ dofire()
 	return throw_obj(uquiver, shotlimit);
 }
 
+/* if in midst of multishot shooting/throwing, stop early */
+void
+endmultishot(verbose)
+boolean verbose;
+{
+    if (m_shot.i < m_shot.n) {
+	if (verbose && !context.mon_moving) {
+	    You("stop %s after the %d%s %s.", m_shot.s ? "firing" : "throwing",
+		m_shot.i, ordin(m_shot.i), m_shot.s ? "shot" : "toss");
+	}
+	m_shot.n = m_shot.i;	/* make current shot be the last */
+    }
+}
 
 /*
  * Object hits floor at hero's feet.  Called from drop() and throwit().
@@ -646,12 +673,7 @@ hurtle(dx, dy, range, verbose)
     if (verbose)
 	You("%s in the opposite direction.", range > 1 ? "hurtle" : "float");
     /* if we're in the midst of shooting multiple projectiles, stop */
-    if (m_shot.i < m_shot.n) {
-	/* last message before hurtling was "you shoot N arrows" */
-	You("stop %sing after the first %s.",
-	    m_shot.s ? "shoot" : "throw", m_shot.s ? "shot" : "toss");
-	m_shot.n = m_shot.i;	/* make current shot be the last */
-    }
+    endmultishot(TRUE);
     if (In_sokoban(&u.uz))
 	change_luck(-1);	/* Sokoban guilt */
     uc.x = u.ux;

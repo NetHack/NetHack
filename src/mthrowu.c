@@ -481,7 +481,6 @@ struct monst *mtmp;
 {
 	struct obj *otmp, *mwep;
 	xchar x, y;
-	schar skill;
 	int multishot;
 	const char *onm;
 
@@ -533,18 +532,29 @@ struct monst *mtmp;
 			rn2(BOLT_LIM - distmin(x,y,mtmp->mux,mtmp->muy))))
 	    return;
 
-	skill = objects[otmp->otyp].oc_skill;
 	mwep = MON_WEP(mtmp);		/* wielded weapon */
 
 	/* Multishot calculations */
 	multishot = 1;
-	if ((ammo_and_launcher(otmp, mwep) || skill == P_DAGGER ||
-		skill == -P_DART || skill == -P_SHURIKEN) && !mtmp->mconf) {
+	if (otmp->quan > 1L &&	/* no point checking if there's only 1 */
+		/* ammo requires corresponding launcher be wielded */
+		(is_ammo(otmp) ? matching_launcher(otmp, mwep) :
+		/* otherwise any stackable (non-ammo) weapon */
+			otmp->oclass == WEAPON_CLASS) &&
+		!mtmp->mconf) {
+	    int skill = (int)objects[otmp->otyp].oc_skill;
+
 	    /* Assumes lords are skilled, princes are expert */
 	    if (is_prince(mtmp->data)) multishot += 2;
 	    else if (is_lord(mtmp->data)) multishot++;
+	    /* fake players treated as skilled (regardless of role limits) */
+	    else if (is_mplayer(mtmp->data)) multishot++;
 
+	    /* class bonus */
 	    switch (monsndx(mtmp->data)) {
+	    case PM_MONK:
+		    if (skill == -P_SHURIKEN) multishot++;
+		    break;
 	    case PM_RANGER:
 		    multishot++;
 		    break;
@@ -552,6 +562,8 @@ struct monst *mtmp;
 		    if (skill == P_DAGGER) multishot++;
 		    break;
 	    case PM_NINJA:
+		    if (skill == -P_SHURIKEN || skill == -P_DART) multishot++;
+		    /*FALLTHRU*/
 	    case PM_SAMURAI:
 		    if (otmp->otyp == YA && mwep &&
 			mwep->otyp == YUMI) multishot++;
@@ -568,9 +580,8 @@ struct monst *mtmp;
 		    mwep && mwep->otyp == ORCISH_BOW))
 		multishot++;
 
+	    multishot = rnd(multishot);
 	    if ((long)multishot > otmp->quan) multishot = (int)otmp->quan;
-	    if (multishot < 1) multishot = 1;
-	    else multishot = rnd(multishot);
 	}
 
 	if (canseemon(mtmp)) {
@@ -595,9 +606,14 @@ struct monst *mtmp;
 	}
 
 	m_shot.n = multishot;
-	for (m_shot.i = 1; m_shot.i <= m_shot.n; m_shot.i++)
+	for (m_shot.i = 1; m_shot.i <= m_shot.n; m_shot.i++) {
+	    /* this continues even if mtmp gets killed (shot kills
+	       adjacent gas spore and triggers explosion, perhaps)
+	       because they're supposed to have been shot in a rapid
+	       fire volley and conceptually all be in flight at once */
 	    m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
 		    distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
+	}
 	m_shot.n = m_shot.i = 0;
 	m_shot.o = STRANGE_OBJECT;
 	m_shot.s = FALSE;

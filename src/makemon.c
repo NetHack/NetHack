@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.5	2006/09/06	*/
+/*	SCCS Id: @(#)makemon.c	3.5	2006/12/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -244,6 +244,9 @@ register struct monst *mtmp;
 			if(!rn2(2)) curse(otmp);
 			(void) mpickobj(mtmp, otmp);
 		    }
+		} else if (mm == PM_NINJA) {	/* extra quest villains */
+		    (void)mongets(mtmp, rn2(4) ? SHURIKEN : DART);
+		    (void)mongets(mtmp, rn2(4) ? SHORT_SWORD : AXE);
 		}
 		break;
 
