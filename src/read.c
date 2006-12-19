@@ -166,9 +166,9 @@ doread()
 		    else if (!objects[scroll->otyp].oc_uname)
 			docall(scroll);
 		}
+		scroll->in_use = FALSE;
 		if(scroll->otyp != SCR_BLANK_PAPER)
 			useup(scroll);
-		else scroll->in_use = FALSE;
 	}
 	return(1);
 }
@@ -1078,10 +1078,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 			uwep->oerodeproof = new_erodeproof ? 1 : 0;
 			break;
 		}
-		if (chwepon(sobj,
-			    scursed ? -1 : !uwep ? 1 :
-			    (uwep->spe >= 9) ? !rn2(uwep->spe) :
-			    sblessed ? rnd(3 - uwep->spe / 3) : 1))
+		if (!chwepon(sobj,
+			     scursed ? -1 : !uwep ? 1 :
+			     (uwep->spe >= 9) ? !rn2(uwep->spe) :
+			     sblessed ? rnd(3 - uwep->spe / 3) : 1))
 		    sobj = 0; /* nothing enchanted: strange_feeling -> useup */
 		break;
 	case SCR_TAMING:
