@@ -719,6 +719,7 @@ register int amount;
 {
 	const char *color = hcolor((amount < 0) ? NH_BLACK : NH_BLUE);
 	const char *xtime, *wepname = "";
+	boolean multiple;
 	int otyp = STRANGE_OBJECT;
 
 	if(!uwep || (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))) {
@@ -734,22 +735,36 @@ register int amount;
 	if (otmp && otmp->oclass == SCROLL_CLASS) otyp = otmp->otyp;
 
 	if (uwep->otyp == WORM_TOOTH && amount >= 0) {
+		multiple = (uwep->quan > 1L);
 		/* order: message, transformation, shop handling */
-		Your("%s is much sharper now.", simple_typename(WORM_TOOTH));
+		Your("%s %s much sharper now.", simpleonames(uwep), 
+		     multiple ? "fuse, and become" : "is");
 		uwep->otyp = CRYSKNIFE;
 		uwep->oerodeproof = 0;
+		if (multiple) {
+		    uwep->quan = 1L;
+		    uwep->owt = weight(uwep);
+		}
 		if (uwep->cursed) uncurse(uwep);
 		/* update shop bill to reflect new higher value */
 		if (uwep->unpaid) alter_cost(uwep, 0L);
 		if (otyp != STRANGE_OBJECT) makeknown(otyp);
+		if (multiple) encumber_msg();
 		return 1;
 	} else if (uwep->otyp == CRYSKNIFE && amount < 0) {
+		multiple = (uwep->quan > 1L);
 		/* order matters: message, shop handling, transformation */
-		Your("%s is much duller now.", simple_typename(CRYSKNIFE));
+		Your("%s %s much duller now.", simpleonames(uwep),
+		     multiple ? "fuse, and become" : "is");
 		costly_alteration(uwep, COST_DEGRD);	/* DECHNT? other? */
 		uwep->otyp = WORM_TOOTH;
 		uwep->oerodeproof = 0;
+		if (multiple) {
+		    uwep->quan = 1L;
+		    uwep->owt = weight(uwep);
+		}
 		if (otyp != STRANGE_OBJECT && otmp->bknown) makeknown(otyp);
+		if (multiple) encumber_msg();
 		return 1;
 	}
 

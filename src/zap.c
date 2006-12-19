@@ -3070,6 +3070,12 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 	return (struct monst *)0;
 }
 
+/* process thrown boomerang, which travels a curving path...       
+ * A multi-shot volley ought to have all missiles in flight at once,
+ * but we're called separately for each one.  We terminate the volley
+ * early on a failed catch since continuing to throw after being hit
+ * is too obviously silly.
+ */
 struct monst *
 boomhit(obj, dx, dy)
 struct obj *obj;
@@ -3110,6 +3116,7 @@ int dx, dy;
 				(void) thitu(10 + obj->spe,
 					     dmgval(obj, &youmonst),
 					     obj, "boomerang");
+				endmultishot(TRUE);
 				break;
 			} else {	/* we catch it */
 				tmp_at(DISP_END, 0);

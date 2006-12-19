@@ -598,8 +598,12 @@ struct obj *obj;
 	}
 	switch (obj->otyp) {
 	case CRYSKNIFE:
-	    /* KMH -- Fixed crysknives have only 10% chance of reverting */
-	    /* only changes when not held by player or monster */
+	    /* Normal crysknife reverts to worm tooth when not held by hero
+	     * or monster; fixed crysknife has only 10% chance of reverting.
+	     * When a stack of the latter is involved, it could be worthwhile
+	     * to give each individual crysknife its own separate 10% chance,
+	     * but we aren't in any position to handle stack splitting here.
+	     */
 	    if (!obj->oerodeproof || !rn2(10)) {
 		/* if monsters aren't moving, assume player is responsible */
 		if (!context.mon_moving && !program_state.gameover)
