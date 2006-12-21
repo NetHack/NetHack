@@ -3082,17 +3082,31 @@ struct obj *obj;
 int dx, dy;
 {
 	register int i, ct;
-	int boom = S_boomleft;	/* showsym[] index  */
+	int boom;	/* showsym[] index  */
 	struct monst *mtmp;
+	boolean counterclockwise = TRUE;	/* right-handed throw */
+
+/* counterclockwise traversal patterns:
+ *  ..........................54.................................
+ *  ..................43.....6..3....765.........................
+ *  ..........32.....5..2...7...2...8...4....87..................
+ *  .........4..1....6..1...8..1....9...3...9..6.....98..........
+ *  ..21@....5...@...7..@....9@......@12....@...5...@..7.....@9..
+ *  .3...9....6..9....89.....................1..4...1..6....1..8.
+ *  .4...8.....78.............................23....2..5...2...7.
+ *  ..567............................................34....3..6..
+ *  ........................................................45...
+ * (invert rows for corresponding clockwise patterns)
+ */
 
 	bhitpos.x = u.ux;
 	bhitpos.y = u.uy;
-
+	boom = counterclockwise ? S_boomleft : S_boomright;
 	for (i = 0; i < 8; i++) if (xdir[i] == dx && ydir[i] == dy) break;
 	tmp_at(DISP_FLASH, cmap_to_glyph(boom));
 	for (ct = 0; ct < 10; ct++) {
-		if(i == 8) i = 0;
-		boom = (boom == S_boomleft) ? S_boomright : S_boomleft;
+		i = (i + 8) % 8;	/* 0..7 (8 -> 0, -1 -> 7) */
+		boom = (S_boomleft + S_boomright - boom);	/* toggle */
 		tmp_at(DISP_CHANGE, cmap_to_glyph(boom));/* change glyph */
 		dx = xdir[i];
 		dy = ydir[i];
@@ -3126,11 +3140,13 @@ int dx, dy;
 		}
 		tmp_at(bhitpos.x, bhitpos.y);
 		delay_output();
-		if(ct % 5 != 0) i++;
 #ifdef SINKS
 		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ))
 			break;	/* boomerang falls on sink */
 #endif
+		/* ct==0, initial position, we want next delta to be same;
+		   ct==5, opposite position, repeat delta undoes first one */
+		if (ct % 5 != 0) i += (counterclockwise ? -1 : 1);
 	}
 	tmp_at(DISP_END, 0);	/* do not leave last symbol */
 	return (struct monst *)0;
