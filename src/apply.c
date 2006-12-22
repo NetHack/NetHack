@@ -2112,6 +2112,7 @@ struct obj *otmp;
 	int ttyp, tmp;
 	const char *what = (char *)0;
 	char buf[BUFSZ];
+	int levtyp = levl[u.ux][u.uy].typ;
 	const char *occutext = "setting the trap";
 
 	if (nohands(youmonst.data))
@@ -2132,10 +2133,13 @@ struct obj *otmp;
 	else if (On_stairs(u.ux, u.uy))
 	    what = (u.ux == xdnladder || u.ux == xupladder) ?
 			"on the ladder" : "on the stairs";
-	else if (IS_FURNITURE(levl[u.ux][u.uy].typ) ||
-		IS_ROCK(levl[u.ux][u.uy].typ) ||
+	else if (IS_FURNITURE(levtyp) || IS_ROCK(levtyp) ||
 		closed_door(u.ux, u.uy) || t_at(u.ux, u.uy))
 	    what = "here";
+	else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))
+	    what = (levtyp == AIR) ? "in midair" :
+		     (levtyp == CLOUD) ? "in a cloud" :
+		       "in this place";		/* Air/Water Plane catch-all */
 	if (what) {
 	    You_cant("set a trap %s!",what);
 	    reset_trapset();

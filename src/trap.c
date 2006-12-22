@@ -1446,9 +1446,14 @@ struct trap *trap;
     }
     /* convert landmine into pit */
     if (trap) {
-	trap->ttyp = PIT;		/* explosion creates a pit */
-	trap->madeby_u = FALSE;		/* resulting pit isn't yours */
-	seetrap(trap);			/* and it isn't concealed */
+	if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
+	    /* no pits here */
+	    deltrap(trap);
+	} else {
+	    trap->ttyp = PIT;		/* explosion creates a pit */
+	    trap->madeby_u = FALSE;	/* resulting pit isn't yours */
+	    seetrap(trap);		/* and it isn't concealed */
+	}
     }
 }
 
