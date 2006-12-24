@@ -515,6 +515,13 @@ int *fail_reason;
 	/* mimic statue becomes seen mimic; other hiders won't be hidden */
 	if (mon->m_ap_type) seemimic(mon);
 	else mon->mundetected = FALSE;
+	mon->msleeping = 0;
+	if (cause == ANIMATE_NORMAL || cause == ANIMATE_SHATTER) {
+	    /* trap always releases hostile monster */
+	    mon->mtame = 0;	/* (might be petrified pet tossed onto trap) */
+	    mon->mpeaceful = 0;
+	    set_malign(mon);
+	}
 
 	comes_to_life = !canspotmon(mon) ? "disappears" :
 			(nonliving(mon->data) || is_vampshifter(mon)) ?
