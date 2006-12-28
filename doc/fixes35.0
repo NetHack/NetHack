@@ -182,6 +182,7 @@ allow corpses on floor to be offered at high altars
 allow hero to attempt to offer the Amulet at ordinary altars
 shooting range for crossbow isn't affected by strength; multi-shot volley is
 right-handed boomerang throw travels counterclockwise
+monsters can use ranged attacks over/around boulders, same as hero
 
 
 Platform- and/or Interface-Specific Fixes

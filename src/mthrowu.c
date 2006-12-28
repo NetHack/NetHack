@@ -708,9 +708,12 @@ breamu(mtmp, mattk)			/* monster breathes at you (ranged) */
 }
 
 boolean
-linedup(ax, ay, bx, by)
+linedup(ax, ay, bx, by, boulderhandling)
 register xchar ax, ay, bx, by;
+int boulderhandling;	/* 0=block, 1=ignore, 2=conditionally block */
 {
+	int dx, dy, boulderspots;
+
 	tbx = ax - bx;	/* These two values are set for use */
 	tby = ay - by;	/* after successful return.	    */
 
@@ -720,8 +723,22 @@ register xchar ax, ay, bx, by;
 
 	if((!tbx || !tby || abs(tbx) == abs(tby)) /* straight line or diagonal */
 	   && distmin(tbx, tby, 0, 0) < BOLT_LIM) {
-	    if(ax == u.ux && ay == u.uy) return((boolean)(couldsee(bx,by)));
-	    else if(clear_path(ax,ay,bx,by)) return TRUE;
+	    if ((ax == u.ux && ay == u.uy) ? (boolean)couldsee(bx, by) :
+		clear_path(ax, ay, bx, by)) return TRUE;
+	    /* don't have line of sight, but might still be lined up
+	       if that lack of sight is due solely to boulders */
+	    if (boulderhandling == 0) return FALSE;
+	    dx = sgn(ax - bx), dy = sgn(ay - by);
+	    boulderspots = 0;
+	    do {
+		/* <bx,by> is guaranteed to eventually converge with <ax,ay> */
+		bx += dx, by += dy;
+		if (IS_ROCK(levl[bx][by].typ) || closed_door(bx, by))
+		    return FALSE;
+		if (sobj_at(BOULDER, bx, by)) ++boulderspots;
+	    } while (bx != ax && by != ay);
+	    /* reached target position without encountering obstacle */
+	    if (boulderhandling == 1 || rn2(2 + boulderspots) < 2) return TRUE;
 	}
 	return FALSE;
 }
@@ -730,7 +747,11 @@ boolean
 lined_up(mtmp)		/* is mtmp in position to use ranged attack? */
 	register struct monst *mtmp;
 {
-	return(linedup(mtmp->mux,mtmp->muy,mtmp->mx,mtmp->my));
+	boolean ignore_boulders = (throws_rocks(mtmp->data) ||
+				   m_carrying(mtmp, WAN_STRIKING));
+
+	return linedup(mtmp->mux, mtmp->muy, mtmp->mx, mtmp->my,
+		       ignore_boulders ? 1 : 2);
 }
 
 /* Check if a monster is carrying a particular item.

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)priest.c	3.5	2006/05/26	*/
+/*	SCCS Id: @(#)priest.c	3.5	2006/12/27	*/
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -710,9 +710,8 @@ struct monst *priest;
 	ay = y = EPRI(priest)->shrpos.y;
 	troom = &rooms[roomno - ROOMOFFSET];
 
-	if((u.ux == x && u.uy == y) || !linedup(u.ux, u.uy, x, y)) {
+	if ((u.ux == x && u.uy == y) || !linedup(u.ux, u.uy, x, y, 1)) {
 	    if(IS_DOOR(levl[u.ux][u.uy].typ)) {
-
 		if(u.ux == troom->lx - 1) {
 		    x = troom->hx;
 		    y = u.uy;
@@ -734,7 +733,7 @@ struct monst *priest;
 		default: x = troom->hx; y = u.uy; break;
 		}
 	    }
-	    if(!linedup(u.ux, u.uy, x, y)) return;
+	    if (!linedup(u.ux, u.uy, x, y, 1)) return;
 	}
 
 	switch(rn2(3)) {
