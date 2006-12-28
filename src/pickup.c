@@ -1554,7 +1554,8 @@ lootcont:
 		any = TRUE;
 
 		if (cobj->olocked) {
-		    pline("Hmmm, it seems to be locked.");
+		    pline("%s locked.", cobj->lknown ? "It is" :
+			  "Hmmm, it turns out to be");
 		    cobj->lknown = 1;
 		    continue;
 		}
@@ -2079,7 +2080,7 @@ int held;
 		return 0;
 	}
 	if (obj->olocked) {
-	    pline("%s to be locked.", Tobjnam(obj, "seem"));
+	    pline("%s locked.", Tobjnam(obj, "are"));
 	    if (held) You("must put it down to unlock.");
 	    obj->lknown = 1;
 	    return 0;
@@ -2122,13 +2123,8 @@ int held;
 	obj->owt = weight(obj);	/* in case any items were lost */
 
 	if (!cnt) {
-	    unsigned save_cknown = obj->cknown;
-
-	    /* avoid redundant "Your empty chest is empty." */
-	    obj->cknown = 0;
-	    Sprintf(emptymsg, "%s is %sempty.", Yname2(obj),
+	    Sprintf(emptymsg, "%s is %sempty.", Ysimple_name2(obj),
 		    quantum_cat ? "now " : "");
-	    obj->cknown = save_cknown;	/* will be set to 1 */
 	}
 
 	if (cnt || flags.menu_style == MENU_FULL) {
