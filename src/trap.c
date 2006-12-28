@@ -274,10 +274,16 @@ register int x, y, typ;
 	    case STATUE_TRAP:	    /* create a "living" statue */
 	      { struct monst *mtmp;
 		struct obj *otmp, *statue;
+		struct permonst *mptr;
+		int trycount = 10;
 
+		do {	/* avoid ultimately hostile co-aligned unicorn */
+		    mptr = &mons[rndmonnum()];
+		} while (--trycount > 0 && is_unicorn(mptr) &&
+			sgn(u.ualign.type) == sgn(mptr->maligntyp));
 		statue = mkcorpstat(STATUE, (struct monst *)0,
-					&mons[rndmonnum()], x, y, CORPSTAT_NONE);
-		mtmp = makemon(&mons[statue->corpsenm], 0, 0, NO_MM_FLAGS);
+				    mptr, x, y, CORPSTAT_NONE);
+		mtmp = makemon(&mons[statue->corpsenm], 0, 0, MM_NOCOUNTBIRTH);
 		if (!mtmp) break; /* should never happen */
 		while(mtmp->minvent) {
 		    otmp = mtmp->minvent;
@@ -627,8 +633,7 @@ boolean shatter;
 		    shatter ? ANIMATE_SHATTER : ANIMATE_NORMAL, &fail_reason);
 	    if (mtmp || fail_reason != AS_MON_IS_UNIQUE) break;
 
-	    while ((otmp = otmp->nexthere) != 0)
-		if (otmp->otyp == STATUE) break;
+	    otmp = nxtobj(otmp, STATUE, TRUE);
 	}
 
 	if (Blind) feel_location(x, y);
