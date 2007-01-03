@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.5	2006/06/21	*/
+/*	SCCS Id: @(#)dokick.c	3.5	2007/01/02	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -516,9 +516,7 @@ xchar x, y;
 		if (kickobj->olocked) {
 		    if (!rn2(5) || (martial() && !rn2(2))) {
 			You("break open the lock!");
-			kickobj->olocked = 0;
-			kickobj->obroken = 1;
-			kickobj->lknown = 1;
+			breakchestlock(kickobj, FALSE);
 			if (otrp) (void) chest_trap(kickobj, LEG, FALSE);
 			return(1);
 		    }

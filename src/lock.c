@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lock.c	3.5	2006/06/25	*/
+/*	SCCS Id: @(#)lock.c	3.5	2007/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -126,11 +126,61 @@ picklock(VOID_ARGS)	/* try to open/close a lock */
 	return((xlock.usedtime = 0));
 }
 
+void
+breakchestlock(box, destroyit)
+struct obj *box;
+boolean destroyit;
+{   
+    box->olocked = 0;
+    box->obroken = 1;
+    box->lknown = 1;
+    if (!destroyit) {	/* bill for the box but not for its contents */
+	struct obj *hide_contents = box->cobj;
+
+	box->cobj = 0;
+	costly_alteration(box, COST_BRKLCK);
+	box->cobj = hide_contents;
+    } else {		/* #force has destroyed this box (at <u.ux,u.uy>) */
+	struct obj *otmp;
+	struct monst *shkp = (*u.ushops && costly_spot(u.ux, u.uy)) ?
+				shop_keeper(*u.ushops) : 0;
+	boolean costly = (boolean)(shkp != 0),
+	        peaceful_shk = costly && (boolean)shkp->mpeaceful;
+	long loss = 0L;
+
+	pline("In fact, you've totally destroyed %s.", the(xname(box)));
+	/* Put the contents on ground at the hero's feet. */
+	while ((otmp = box->cobj) != 0) {
+	    obj_extract_self(otmp);
+	    if (!rn2(3) || otmp->oclass == POTION_CLASS) {
+		chest_shatter_msg(otmp);
+		if (costly)
+		    loss += stolen_value(otmp, u.ux, u.uy, peaceful_shk, TRUE);
+		if (otmp->quan == 1L) {
+		    obfree(otmp, (struct obj *) 0);
+		    continue;
+		}
+		useup(otmp);
+	    }
+	    if (box->otyp == ICE_BOX && otmp->otyp == CORPSE) {
+		otmp->age = monstermoves - otmp->age; /* actual age */
+		start_corpse_timeout(otmp);
+	    }
+	    place_object(otmp, u.ux, u.uy);
+	    stackobj(otmp);
+	}
+	if (costly)
+	    loss += stolen_value(box, u.ux, u.uy, peaceful_shk, TRUE);
+	if (loss)
+	    You("owe %ld %s for objects destroyed.", loss, currency(loss));
+	delobj(box);
+    }
+}
+
 STATIC_PTR
 int
 forcelock(VOID_ARGS)	/* try to force a locked chest */
 {
-
 	register struct obj *otmp;
 
 	if((xlock.box->ox != u.ux) || (xlock.box->oy != u.uy))
@@ -163,48 +213,8 @@ forcelock(VOID_ARGS)	/* try to force a locked chest */
 	if(rn2(100) >= xlock.chance) return(1);		/* still busy */
 
 	You("succeed in forcing the lock.");
-	xlock.box->olocked = 0;
-	xlock.box->obroken = 1;
-	xlock.box->lknown = 1;
-	if(!xlock.picktyp && !rn2(3)) {
-	    struct monst *shkp;
-	    boolean costly;
-	    long loss = 0L;
+	breakchestlock(xlock.box, (boolean)(!xlock.picktyp && !rn2(3)));
 
-	    costly = (*u.ushops && costly_spot(u.ux, u.uy));
-	    shkp = costly ? shop_keeper(*u.ushops) : 0;
-
-	    pline("In fact, you've totally destroyed %s.",
-		  the(xname(xlock.box)));
-
-	    /* Put the contents on ground at the hero's feet. */
-	    while ((otmp = xlock.box->cobj) != 0) {
-		obj_extract_self(otmp);
-		if(!rn2(3) || otmp->oclass == POTION_CLASS) {
-		    chest_shatter_msg(otmp);
-		    if (costly)
-		        loss += stolen_value(otmp, u.ux, u.uy,
-					     (boolean)shkp->mpeaceful, TRUE);
-		    if (otmp->quan == 1L) {
-			obfree(otmp, (struct obj *) 0);
-			continue;
-		    }
-		    useup(otmp);
-		}
-		if (xlock.box->otyp == ICE_BOX && otmp->otyp == CORPSE) {
-		    otmp->age = monstermoves - otmp->age; /* actual age */
-		    start_corpse_timeout(otmp);
-		}
-		place_object(otmp, u.ux, u.uy);
-		stackobj(otmp);
-	    }
-
-	    if (costly)
-		loss += stolen_value(xlock.box, u.ux, u.uy,
-					     (boolean)shkp->mpeaceful, TRUE);
-	    if(loss) You("owe %ld %s for objects destroyed.", loss, currency(loss));
-	    delobj(xlock.box);
-	}
 	exercise((xlock.picktyp) ? A_DEX : A_STR, TRUE);
 	return((xlock.usedtime = 0));
 }

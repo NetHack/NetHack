@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2006/08/23	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2007/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -506,6 +506,7 @@ static const char * const alteration_verbs[] = {
 			"cancel", "drain", "uncharge", "unbless", "uncurse",
 			"disenchant", "degrade", "dilute", "erase", "burn",
 			"neutralize", "destroy", "splatter", "bite", "open",
+			"break the lock on",
 };
 
 /* possibly bill for an object which the player has just modified */

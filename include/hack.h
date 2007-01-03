@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2006/04/07	*/
+/*	SCCS Id: @(#)hack.h	3.5	2007/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -76,6 +76,7 @@
 #define COST_SPLAT  12	/* cream pie to own face (ditto) */
 #define COST_BITE   13	/* start eating food */
 #define COST_OPEN   14	/* open tin */
+#define COST_BRKLCK 15	/* break box/chest's lock */
 
 /* bitmask flags for corpse_xname();
    PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */
