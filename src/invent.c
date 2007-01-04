@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2006/11/29	*/
+/*	SCCS Id: @(#)invent.c	3.5	2007/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,7 @@ STATIC_DCL void FDECL(invdisp_nothing, (const char *,const char *));
 STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
 STATIC_DCL boolean FDECL(only_here, (struct obj *));
 STATIC_DCL void FDECL(compactify,(char *));
+STATIC_DCL boolean FDECL(splittable, (struct obj *));
 STATIC_DCL boolean FDECL(taking_off, (const char *));
 STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid,(struct obj *));
@@ -49,13 +50,11 @@ register struct obj *otmp;
 	register int i;
 	register struct obj *obj;
 
-#ifdef GOLDOBJ
-        /* There is only one of these in inventory... */        
-        if (otmp->oclass == COIN_CLASS) {
+	/* there should be at most one of these in inventory... */        
+	if (otmp->oclass == COIN_CLASS) {
 	    otmp->invlet = GOLD_SYM;
 	    return;
 	}
-#endif
 
 	for(i = 0; i < 52; i++) inuse[i] = FALSE;
 	for(obj = invent; obj; obj = obj->nobj) if(obj != otmp) {
@@ -736,6 +735,15 @@ register char *buf;
 	}
 }
 
+/* some objects shouldn't be split when count given to getobj or askchain */
+STATIC_OVL boolean
+splittable(obj)
+struct obj *obj;
+{
+    return !((obj->otyp == LOADSTONE && obj->cursed) ||
+	     (obj == uwep && welded(uwep)));
+}
+
 /* match the prompt for either 'T' or 'R' command */
 STATIC_OVL boolean
 taking_off(action)
@@ -1098,11 +1106,11 @@ register const char *let,*word;
 	    if(cnt == 0) return (struct obj *)0;
 	    if(cnt != otmp->quan) {
 		/* don't split a stack of cursed loadstones */
-		if (otmp->otyp == LOADSTONE && otmp->cursed)
+		if (splittable(otmp))
+		    otmp = splitobj(otmp, cnt);
+		else if (otmp->otyp == LOADSTONE && otmp->cursed)
 		    /* kludge for canletgo()'s can't-drop-this message */
 		    otmp->corpsenm = (int) cnt;
-		else
-		    otmp = splitobj(otmp, cnt);
 	    }
 	}
 	return(otmp);
@@ -1463,10 +1471,8 @@ nextclass:
 			sym = 'n';
 		    else {
 			sym = 'y';
-			if (yn_number < otmp->quan && !welded(otmp) &&
-			    (!otmp->cursed || otmp->otyp != LOADSTONE)) {
+			if (yn_number < otmp->quan && splittable(otmp))
 			    otmp = splitobj(otmp, yn_number);
-			}
 		    }
 		}
 		switch(sym){

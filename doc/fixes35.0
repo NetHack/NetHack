@@ -183,6 +183,7 @@ allow hero to attempt to offer the Amulet at ordinary altars
 shooting range for crossbow isn't affected by strength; multi-shot volley is
 right-handed boomerang throw travels counterclockwise
 monsters can use ranged attacks over/around boulders, same as hero
+can't drop part of a stack of N weapons welded to hero's hand
 
 
 Platform- and/or Interface-Specific Fixes

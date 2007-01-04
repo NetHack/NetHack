@@ -30,7 +30,6 @@ STATIC_DCL long FDECL(carry_count,
 STATIC_DCL int FDECL(lift_object, (struct obj *,struct obj *,long *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(mbag_explodes, (struct obj *,int));
 STATIC_PTR int FDECL(in_container,(struct obj *));
-STATIC_PTR int FDECL(ck_bag,(struct obj *));
 STATIC_PTR int FDECL(out_container,(struct obj *));
 STATIC_DCL long FDECL(mbag_item_gone, (int,struct obj *));
 STATIC_DCL void FDECL(observe_quantum_cat, (struct obj *));
@@ -1908,7 +1907,7 @@ register struct obj *obj;
 	return(current_container ? 1 : -1);
 }
 
-STATIC_PTR int
+int
 ck_bag(obj)
 struct obj *obj;
 {
@@ -2174,7 +2173,7 @@ ask_again2:
 		if (cnt) Strcat(pbuf, "m");
 		switch (yn_function(qbuf, pbuf, 'n')) {
 		case ':':
-		    container_contents(current_container, FALSE, FALSE);
+		    container_contents(current_container, FALSE, FALSE, TRUE);
 		    goto ask_again2;
 		case 'y':
 		    if (query_classes(selection, &one_by_one, &allflag,
@@ -2257,6 +2256,7 @@ ask_again2:
 		assigninvlet(u_gold);		/* might end up as NOINVSYM */
 		u_gold->nobj = invent;
 		invent = u_gold;
+		u_gold->where = OBJ_INVENT;
 	    }
 #endif
 	    add_valid_menu_class(0);	  /* reset */
@@ -2287,6 +2287,7 @@ ask_again2:
 	    u_gold = invent;
 	    invent = u_gold->nobj;
 	    u_gold->in_use = FALSE;
+	    u_gold->where = OBJ_FREE;
 	    dealloc_obj(u_gold);
 	}
 #endif

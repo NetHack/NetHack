@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)do.c	3.5	2007/01/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -657,6 +657,7 @@ int retry;
 	assigninvlet(u_gold);		/* might end up as NOINVSYM */
 	u_gold->nobj = invent;
 	invent = u_gold;
+	u_gold->where = OBJ_INVENT;
     }
 #endif
     if (retry) {
@@ -732,6 +733,7 @@ int retry;
 	u_gold = invent;
 	invent = u_gold->nobj;
 	u_gold->in_use = FALSE;
+	u_gold->where = OBJ_FREE;
 	dealloc_obj(u_gold);
 	update_inventory();
     }
