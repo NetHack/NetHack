@@ -781,7 +781,9 @@ register const char *let,*word;
 	register int foo = 0;
 	register char *bp = buf;
 	xchar allowcnt = 0;	/* 0, 1 or 2 */
+	struct obj *firstobj = invent;
 #ifndef GOLDOBJ
+	struct obj *u_gold = 0;
 	boolean allowgold = FALSE;	/* can't use gold because they don't have any */
 #endif
 	boolean usegold = FALSE;	/* can't use gold because its illegal */
@@ -797,6 +799,13 @@ register const char *let,*word;
 #ifndef GOLDOBJ
 	if(*let == COIN_CLASS) let++,
 		usegold = TRUE, allowgold = (u.ugold ? TRUE : FALSE);
+	if (firstobj && firstobj->oclass == COIN_CLASS) {
+	    /* gold has been inserted into inventory; skip it during
+	       inventory letter collection */
+	    u_gold = firstobj;
+	    firstobj = u_gold->nobj;
+	    allowgold = usegold;
+	}
 #else
 	if(*let == COIN_CLASS) let++, usegold = TRUE;
 #endif
@@ -835,7 +844,7 @@ register const char *let,*word;
 
 	if (!flags.invlet_constant) reassign();
 
-	for (otmp = invent; otmp; otmp = otmp->nobj) {
+	for (otmp = firstobj; otmp; otmp = otmp->nobj) {
 	    if (&bp[foo] == &buf[sizeof buf - 1] ||
 		    ap == &altlets[sizeof altlets - 1]) {
 		/* we must have a huge number of NOINVSYM items somehow */
@@ -937,6 +946,7 @@ register const char *let,*word;
 		|| (!strcmp(word, "sacrifice") &&
 		    /* (!astral && amulet) || (astral && !amulet) */
 		    (!Is_astralevel(&u.uz) ^ (otmp->oclass != AMULET_CLASS)))
+		|| (!strcmp(word, "stash") && !ck_bag(otmp))
 		    ) {
 			/* acceptable but not listed as likely candidate */
 			foo--;
@@ -1032,7 +1042,11 @@ register const char *let,*word;
 #ifndef GOLDOBJ
 			if(!(allowcnt == 2 && cnt < u.ugold))
 				cnt = u.ugold;
-			return(mkgoldobj(cnt));
+			if (!u_gold)
+			    u_gold = mkgoldobj(cnt);
+			else if (cnt < u_gold->quan)
+			    u_gold = splitobj(u_gold, cnt);
+			return u_gold;
 #endif
 		}
 		if(ilet == '?' || ilet == '*') {
@@ -1424,14 +1438,17 @@ register int FDECL((*fn),(OBJ_P)), FDECL((*ckfn),(OBJ_P));
 	struct obj *otmp, *otmp2, *otmpo;
 	register char sym, ilet;
 	register int cnt = 0, dud = 0, tmp;
-	boolean takeoff, nodot, ident, ininv;
-	char qbuf[BUFSZ];
+	boolean takeoff, nodot, ident, take_out, put_in, first, ininv;
+	char qbuf[QBUFSZ], qpfx[QBUFSZ];
 
 	takeoff = taking_off(word);
 	ident = !strcmp(word, "identify");
+	take_out = !strcmp(word, "take out");
+	put_in = !strcmp(word, "put in");
 	nodot = (!strcmp(word, "nodot") || !strcmp(word, "drop") ||
-		 ident || takeoff);
+		 ident || takeoff || take_out || put_in);
 	ininv = (*objchn == invent);
+	first = TRUE;
 	/* Changed so the askchain is interrogated in the order specified.
 	 * For example, if a person specifies =/ then first all rings will be
 	 * asked about followed by all wands -dgk
@@ -1450,7 +1467,16 @@ nextclass:
 		if (!allflag) {
 		    safeq_xprn_ctx.let = ilet;
 		    safeq_xprn_ctx.dot = !nodot;
-		    (void)safe_qbuf(qbuf, (char *)0, "?",
+		    *qpfx = '\0';
+		    if (first) {
+			/* traditional_loot() skips prompting when only one
+			   class of objects is involved, so prefix the first
+			   object being queried here with an explanation why */
+			if (take_out || put_in)
+			    Sprintf(qpfx, "%s: ", word), *qpfx = highc(*qpfx);
+			first = FALSE;
+		    }
+		    (void)safe_qbuf(qbuf, qpfx, "?",
 				    otmp, ininv ? safeq_xprname : doname,
 				    ininv ? safeq_shortxprname : ansimpleoname,
 				    "item");
