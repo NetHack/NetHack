@@ -181,8 +181,6 @@ STATIC_PTR
 int
 forcelock(VOID_ARGS)	/* try to force a locked chest */
 {
-	register struct obj *otmp;
-
 	if((xlock.box->ox != u.ux) || (xlock.box->oy != u.uy))
 		return((xlock.usedtime = 0));		/* you or it moved */
 
