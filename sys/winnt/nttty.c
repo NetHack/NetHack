@@ -1336,7 +1336,7 @@ adjust_palette(VOID_ARGS)
 
 /*
 /* only in Win2k+  (use FindWindow for NT4) */
-HWND WINAPI GetConsoleWindow();
+/* HWND WINAPI GetConsoleWindow(); */
 
 /*  Undocumented console message */
 #define WM_SETCONSOLEINFO			(WM_USER+201)
