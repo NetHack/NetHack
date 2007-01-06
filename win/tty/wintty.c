@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wintty.c	3.5	2006/12/11	*/
+/*	SCCS Id: @(#)wintty.c	3.5	2007/01/05	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1227,7 +1227,8 @@ struct WinDesc *cw;
 
 	if (n > 0)	/* at least one group accelerator found */
 	    for (rp = gacc, curr = cw->mlist; curr; curr = curr->next)
-		if (curr->gselector && !index(gacc, curr->gselector) &&
+		if (curr->gselector && curr->gselector != curr->selector &&
+			!index(gacc, curr->gselector) &&
 			(cw->how == PICK_ANY ||
 			    gcnt[GSELIDX(curr->gselector)] == 1)) {
 		    *rp++ = curr->gselector;
