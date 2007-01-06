@@ -37,7 +37,7 @@ STATIC_DCL void NDECL(explain_container_prompt);
 STATIC_DCL int FDECL(traditional_loot, (BOOLEAN_P));
 STATIC_DCL int FDECL(menu_loot, (int,BOOLEAN_P));
 STATIC_DCL char FDECL(in_or_out_menu, (const char *,struct obj *,
-				       BOOLEAN_P,BOOLEAN_P));
+				       BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int,int,BOOLEAN_P));
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
@@ -1574,7 +1574,9 @@ lootcont:
 		    continue;
 		}
 
-		You("carefully open %s...", the(xname(cobj)));
+		You("%sopen %s...",
+		    (!cobj->cknown || !cobj->lknown) ? "carefully " : "",
+		    the(xname(cobj)));
 		timepassed |= use_container(&cobj, 0);
 		/* might have triggered chest trap or magic bag explosion */
 		if (multi < 0 || !cobj) return 1;
@@ -2100,8 +2102,7 @@ int held;
 		inokay, outokay, outmaybe;
 	char c, emptymsg[BUFSZ],
 	     qbuf[QBUFSZ], pbuf[QBUFSZ], xbuf[QBUFSZ];
-	long loss;
-	int cnt, used = 0;
+	int used = 0;
 
 	emptymsg[0] = '\0';
 	if (nohands(youmonst.data)) {
@@ -2138,21 +2139,21 @@ int held;
 	    observe_quantum_cat(current_container);
 	    used = 1;
 	}
-	/* count the number of contained objects;
-	   sometimes toss objects if a cursed magic bag */
-	cursed_mbag = Is_mbag(current_container) && current_container->cursed;
-	cnt = 0, loss = 0L;
-	for (curr = current_container->cobj; curr; curr = otmp) {
-	    otmp = curr->nobj;
-	    if (cursed_mbag && !rn2(13)) {
-		obj_extract_self(curr);
-		loss += mbag_item_gone(held, curr);
-		used = 1;
-	    } else {
-		cnt++;
+	/* sometimes toss objects if a cursed magic bag */
+	cursed_mbag = (Is_mbag(current_container) &&
+		       current_container->cursed &&
+		       Has_contents(current_container));
+	if (cursed_mbag) {
+	    long loss = 0L;
+
+	    for (curr = current_container->cobj; curr; curr = otmp) {
+		otmp = curr->nobj;
+		if (!rn2(13)) {
+		    obj_extract_self(curr);
+		    loss += mbag_item_gone(held, curr);
+		    used = 1;
+		}
 	    }
-	}
-	if (cursed_mbag) {	/* magic bag might have lost some contents */
 	    if (loss)
 		You("owe %ld %s for lost merchandise.", loss, currency(loss));
 	    current_container->owt = weight(current_container);
@@ -2162,11 +2163,11 @@ int held;
 #ifndef GOLDOBJ
 	if (u.ugold) inokay = TRUE;
 #endif
-	outokay = (cnt > 0);
+	outokay = Has_contents(current_container);
 	if (!outokay)	/* preformat the empty-container message */
 	    Sprintf(emptymsg, "%s is %sempty.",
 		    Ysimple_name2(current_container),
-		    quantum_cat ? "now " : "");
+		    (quantum_cat || cursed_mbag) ? "now " : "");
 
 	/*
 	 * What-to-do prompt's list of possible actions:
@@ -2209,7 +2210,7 @@ int held;
 		    c = 'b';
 		} else {
 		    c = in_or_out_menu(qbuf, current_container,
-				       outmaybe, inokay);
+				       outmaybe, inokay, (used != 0));
 		}
 	    } else {	/* TRADITIONAL, COMBINATION, or PARTIAL */
 		xbuf[0] = '\0';	/* list of extra acceptable responses */
@@ -2464,10 +2465,10 @@ boolean put_in;
 }
 
 STATIC_OVL char
-in_or_out_menu(prompt, obj, outokay, inokay)
+in_or_out_menu(prompt, obj, outokay, inokay, alreadyused)
 const char *prompt;
 struct obj *obj;
-boolean outokay, inokay;
+boolean outokay, inokay, alreadyused;
 {
     /* underscore is not a choice; it's used to skip element [0] */
     static const char lootchars[] = "_:oibrsq",
@@ -2517,7 +2518,7 @@ boolean outokay, inokay;
 		 buf, MENU_UNSELECTED);
     }
     any.a_int = 7;	/* 'q' */
-    Strcpy(buf, "do nothing");
+    Strcpy(buf, alreadyused ? "done" : "do nothing");
     add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
 	     buf, MENU_SELECTED);
 
