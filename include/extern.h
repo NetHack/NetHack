@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)extern.h	3.5	2007/01/05	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -878,7 +878,11 @@ E boolean FDECL(obj_here, (struct obj *,int,int));
 E boolean NDECL(wearing_armor);
 E boolean FDECL(is_worn, (struct obj *));
 E struct obj *FDECL(g_at, (int,int));
+#ifndef GOLDOBJ
 E struct obj *FDECL(mkgoldobj, (long));
+E struct obj *NDECL(insert_gold_into_invent);
+E void NDECL(remove_gold_from_invent);
+#endif
 E struct obj *FDECL(getobj, (const char *,const char *));
 E int FDECL(ggetobj, (const char *,int (*)(OBJ_P),int,BOOLEAN_P,unsigned *));
 E void FDECL(fully_identify_obj, (struct obj *));

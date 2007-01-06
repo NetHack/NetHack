@@ -694,7 +694,44 @@ register long q;
 	context.botl = 1;
 	return(otmp);
 }
+
+/* used for container apply/#loot and multi-item Drop */
+struct obj *
+insert_gold_into_invent()
+{
+	struct obj *u_gold = 0;
+
+	if (u.ugold) {
+	    u_gold = mkgoldobj(u.ugold);
+	    u_gold->in_use = 1;
+	    u.ugold = u_gold->quan;	/* put the gold back on status line */
+	    assigninvlet(u_gold);	/* should yield '$' */
+	    u_gold->where = OBJ_INVENT;
+	    u_gold->nobj = invent;
+	    invent = u_gold;
+	}
+	return u_gold;
+}
+
+/* undo insert_gold_into_invent; gold might have been used up though */
+void
+remove_gold_from_invent()
+{
+	struct obj *u_gold = invent;	/* we expect gold to be first */
+
+	if (u_gold && u_gold->otyp == GOLD_PIECE) {
+	    invent = u_gold->nobj;
+	    u_gold->where = OBJ_FREE;
+	    dealloc_obj(u_gold);
+#if 0
+	} else if ((u_gold = carrying(GOLD_PIECE)) != 0) {
+	    u.ugold += u_gold->quan;	/* freeinv will subtract it back out */
+	    freeinv(u_gold);
+	    dealloc_obj(u_gold);
 #endif
+	}
+}
+#endif	/* !GOLDOBJ */
 
 STATIC_OVL void
 compactify(buf)
@@ -799,13 +836,6 @@ register const char *let,*word;
 #ifndef GOLDOBJ
 	if(*let == COIN_CLASS) let++,
 		usegold = TRUE, allowgold = (u.ugold ? TRUE : FALSE);
-	if (firstobj && firstobj->oclass == COIN_CLASS) {
-	    /* gold has been inserted into inventory; skip it during
-	       inventory letter collection */
-	    u_gold = firstobj;
-	    firstobj = u_gold->nobj;
-	    allowgold = usegold;
-	}
 #else
 	if(*let == COIN_CLASS) let++, usegold = TRUE;
 #endif
@@ -837,7 +867,15 @@ register const char *let,*word;
 
 	if(allownone) *bp++ = '-';
 #ifndef GOLDOBJ
-	if(allowgold) *bp++ = def_oc_syms[COIN_CLASS].sym;
+	if(allowgold) {
+	    *bp++ = def_oc_syms[COIN_CLASS].sym;
+	    if (firstobj && firstobj->otyp == GOLD_PIECE) {
+		/* gold has been inserted into inventory; skip it during
+		   inventory letter collection */
+		u_gold = firstobj;
+		firstobj = u_gold->nobj;
+	    }
+	}
 #endif
 	if(bp > buf && bp[-1] == '-') *bp++ = ' ';
 	ap = altlets;

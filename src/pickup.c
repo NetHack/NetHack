@@ -2258,19 +2258,9 @@ int held;
 	}
 
 #ifndef GOLDOBJ
-	if ((loot_in ||stash_one) && u.ugold) {
-	    /*
-	     * Hack: gold is not in the inventory, so make a gold object
-	     * and put it at the head of the inventory list.
-	     */
-	    u_gold = mkgoldobj(u.ugold);	/* removes from u.ugold */
-	    u_gold->in_use = TRUE;
-	    u.ugold = u_gold->quan;		/* put the gold back */
-	    assigninvlet(u_gold);		/* might end up as NOINVSYM */
-	    u_gold->nobj = invent;
-	    invent = u_gold;
-	    u_gold->where = OBJ_INVENT;
-	}
+	/* if putting in, place gold where inventory traversal will see it */
+	if ((loot_in || stash_one) && u.ugold)
+	    u_gold = insert_gold_into_invent();
 #endif
 	if ((loot_in || stash_one) &&
 		(!invent || (invent == current_container && !invent->nobj))) {
@@ -2308,14 +2298,8 @@ int held;
 	if (!current_container) loot_out = FALSE;
 
 #ifndef GOLDOBJ
-	if (u_gold && invent && invent->oclass == COIN_CLASS) {
-	    /* didn't stash [all of] it */
-	    u_gold = invent;
-	    invent = u_gold->nobj;
-	    u_gold->in_use = FALSE;
-	    u_gold->where = OBJ_FREE;
-	    dealloc_obj(u_gold);
-	}
+	/* if we put gold into inventory above, take it back out now */
+	if (u_gold) remove_gold_from_invent();
 #endif
 
 	/* out after in */
@@ -2334,11 +2318,14 @@ int held;
 	}
 
  containerdone:
-	/* Not completely correct; if we put something in without knowing
-	   whatever was already inside, now we suddenly do.  That can't be
-	   helped unless we want to track things item by item and then deal
-	   with containers whose contents are "partly known". */
-	if (used && current_container) current_container->cknown = 1;
+	if (used) {
+	    /* Not completely correct; if we put something in without knowing
+	       whatever was already inside, now we suddenly do.  That can't
+	       be helped unless we want to track things item by item and then
+	       deal with containers whose contents are "partly known". */
+	    if (current_container) current_container->cknown = 1;
+	    update_inventory();
+	}
 
 	*objp = current_container;	/* might have become null */
 	current_container = 0;		/* avoid hanging on to stale pointer */

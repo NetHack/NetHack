@@ -648,17 +648,8 @@ int retry;
     boolean drop_everything = FALSE;
 
 #ifndef GOLDOBJ
-    if (u.ugold) {
-	/* Hack: gold is not in the inventory, so make a gold object
-	   and put it at the head of the inventory list. */
-	u_gold = mkgoldobj(u.ugold);	/* removes from u.ugold */
-	u_gold->in_use = TRUE;
-	u.ugold = u_gold->quan;		/* put the gold back */
-	assigninvlet(u_gold);		/* might end up as NOINVSYM */
-	u_gold->nobj = invent;
-	invent = u_gold;
-	u_gold->where = OBJ_INVENT;
-    }
+    /* put gold where inventory traversal will see it */
+    if (u.ugold) u_gold = insert_gold_into_invent();
 #endif
     if (retry) {
 	all_categories = (retry == -2);
@@ -728,15 +719,8 @@ int retry;
 
  drop_done:
 #ifndef GOLDOBJ
-    if (u_gold && invent && invent->oclass == COIN_CLASS) {
-	/* didn't drop [all of] it */
-	u_gold = invent;
-	invent = u_gold->nobj;
-	u_gold->in_use = FALSE;
-	u_gold->where = OBJ_FREE;
-	dealloc_obj(u_gold);
-	update_inventory();
-    }
+    /* if we put gold into inventory above, take it back out now */
+    if (u_gold) remove_gold_from_invent();
 #endif
     return n_dropped;
 }
