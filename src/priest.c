@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)priest.c	3.5	2006/12/27	*/
+/*	SCCS Id: @(#)priest.c	3.5	2007/01/06	*/
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -87,9 +87,7 @@ pick_move:
 	for(i=0; i<cnt; i++) {
 		nx = poss[i].x;
 		ny = poss[i].y;
-		if(levl[nx][ny].typ == ROOM ||
-			(mtmp->ispriest &&
-			    levl[nx][ny].typ == ALTAR) ||
+		if (IS_ROOM(levl[nx][ny].typ) ||
 			(mtmp->isshk &&
 			    (!in_his_shop || ESHK(mtmp)->following))) {
 		    if(avoid && (info[i] & NOTONL))
