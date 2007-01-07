@@ -725,8 +725,7 @@ remove_gold_from_invent()
 	    dealloc_obj(u_gold);
 #if 0
 	} else if ((u_gold = carrying(GOLD_PIECE)) != 0) {
-	    u.ugold += u_gold->quan;	/* freeinv will subtract it back out */
-	    freeinv(u_gold);
+	    extract_nobj(u_gold, &invent);
 	    dealloc_obj(u_gold);
 #endif
 	}
