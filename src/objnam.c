@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2006/11/25	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2007/01/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2784,7 +2784,8 @@ srch:
 
 		if(!BSTRCMP(bp, p-5, "grave") || !BSTRCMP(bp, p-9, "headstone")) {
 		    make_grave(u.ux, u.uy, (char *) 0);
-		    pline("A grave.");
+		    pline("%s.", IS_GRAVE(levl[u.ux][u.uy].typ) ? "A grave" :
+				 "Can't place a grave here");
 		    newsym(u.ux, u.uy);
 		    return(&zeroobj);
 		}
