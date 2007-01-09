@@ -122,7 +122,7 @@ char *argv[];
 	/* used to clear hangup stuff while still giving standard traceback */
 	VAXC$ESTABLISH(vms_handler);
 #endif
-	(void) signal(SIGHUP, (SIG_RET_TYPE) hangup);
+	sethanguphandler(hangup);
 
 	process_options(argc, argv);	/* command line options */
 
@@ -389,8 +389,8 @@ byebye()
     extern unsigned long FDECL(sys$delprc,(unsigned long *,const genericptr_t));
 
     /* clean up any subprocess we've spawned that may still be hanging around */
-    if (dosh_pid) (void) sys$delprc(&dosh_pid, 0), dosh_pid = 0;
-    if (mail_pid) (void) sys$delprc(&mail_pid, 0), mail_pid = 0;
+    if (dosh_pid) (void) sys$delprc(&dosh_pid, (genericptr_t)0), dosh_pid = 0;
+    if (mail_pid) (void) sys$delprc(&mail_pid, (genericptr_t)0), mail_pid = 0;
 #endif
 
     /* SIGHUP doesn't seem to do anything on VMS, so we fudge it here... */
@@ -428,6 +428,13 @@ genericptr_t sigargs, mechargs;	/* [0] is argc, [1..argc] are the real args */
     return SS$_RESIGNAL;
 }
 #endif
+
+void
+sethanguphandler(handler)
+void FDECL((*handler), (int));
+{
+    (void)signal(SIGHUP, (SIG_RET_TYPE)handler);
+}
 
 #ifdef PORT_HELP
 void

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmstty.c	3.5	2005/11/19	*/
+/*	SCCS Id: @(#)vmstty.c	3.5	2007/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* tty.c - (VMS) version */
@@ -478,14 +478,15 @@ void
 error VA_DECL(const char *,s)
 	VA_START(s);
 	VA_INIT(s, const char *);
-	if(settty_needed)
+
+	if (settty_needed)
 		settty((char *)0);
 	Vprintf(s,VA_ARGS);
 	(void) putchar('\n');
 	VA_END();
 #ifndef SAVE_ON_FATAL_ERROR
 	/* prevent vmsmain's exit handler byebye() from calling hangup() */
-	(void)signal(SIGHUP, SIG_DFL);
+	sethanguphandler((void FDECL((*),(int)))SIG_DFL);
 #endif
 	exit(EXIT_FAILURE);
 }

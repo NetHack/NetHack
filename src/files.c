@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.5	2006/12/09	*/
+/*	SCCS Id: @(#)files.c	3.5	2007/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -564,7 +564,7 @@ clearlocks()
 	register int x;
 
 # if defined(UNIX) || defined(VMS)
-	(void) signal(SIGHUP, SIG_IGN);
+	sethanguphandler((void FDECL((*),(int)))SIG_IGN);
 # endif
 	/* can't access maxledgerno() before dungeons are created -dlc */
 	for (x = (n_dgns ? maxledgerno() : 0); x >= 0; x--)

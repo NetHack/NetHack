@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)os2conf.h	3.5	1996/10/29	*/
+/*	SCCS Id: @(#)os2conf.h	3.5	2007/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Timo Hakulinen, 1990, 1991, 1992, 1993, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -95,6 +95,7 @@
 
 #ifdef __EMX__
 #include <unistd.h>
+#define sethanguphandler(foo) (void)signal(SIGHUP, (SIG_RET_TYPE)foo)
 #endif
 
 #ifndef REDO

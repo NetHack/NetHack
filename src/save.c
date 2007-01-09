@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)save.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)save.c	3.5	2007/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -140,9 +140,7 @@ int sig_unused;
 # ifdef NOSAVEONHANGUP
 	(void) signal(SIGINT, SIG_IGN);
 	clearlocks();
-#  ifndef VMS
 	terminate(EXIT_FAILURE);
-#  endif
 # else	/* SAVEONHANGUP */
 	if (!program_state.done_hup++) {
 #  ifndef SAFERHANGUP
@@ -152,18 +150,12 @@ int sig_unused;
 	     * against losing objects in the process of being thrown. */
 	    if (program_state.something_worth_saving)
 		(void) dosave0();
-#  ifdef VMS
-	    /* don't call exit when already within an exit handler;
-	       that would cancel any other pending user-mode handlers */
-	    if (!program_state.exiting)
-#  endif
-	    {
-		clearlocks();
-		terminate(EXIT_FAILURE);
-	    }
+
+	    clearlocks();
+	    terminate(EXIT_FAILURE);
 #  endif /* !SAFERHANGUP */
 	}
-# endif
+# endif	/* !NOSAVEONHANGUP */
 }
 #endif
 
@@ -182,7 +174,7 @@ dosave0()
 	fq_save = fqname(SAVEF, SAVEPREFIX, 1);	/* level files take 0 */
 
 #if defined(UNIX) || defined(VMS)
-	(void) signal(SIGHUP, SIG_IGN);
+	sethanguphandler((void FDECL((*),(int)))SIG_IGN);
 #endif
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT, SIG_IGN);

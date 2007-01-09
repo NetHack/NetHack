@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)unixmain.c	3.5	2006/04/01	*/
+/*	SCCS Id: @(#)unixmain.c	3.5	2007/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -157,29 +157,7 @@ char *argv[];
 	 * It seems you really want to play.
 	 */
 	u.uhp = 1;	/* prevent RIP on early quits */
-#ifdef SA_RESTART
-	/* don't want reads to restart.  If SA_RESTART is defined, we know
-	 * sigaction exists and can be used to ensure reads won't restart.
-	 * If it's not defined, assume reads do not restart.  If reads restart
-	 * and a signal occurs, the game won't do anything until the read
-	 * succeeds (or the stream returns EOF, which might not happen if
-	 * reading from, say, a window manager). */
-	{
-	    struct sigaction sact;
-
-	    (void) memset((char*) &sact, 0, sizeof(struct sigaction));
-	    sact.sa_handler = (SIG_RET_TYPE)hangup;
-	    (void) sigaction(SIGHUP, &sact, (struct sigaction*)0);
-#ifdef SIGXCPU
-	    (void) sigaction(SIGXCPU, &sact, (struct sigaction*)0);
-#endif
-	}
-#else
-	(void) signal(SIGHUP, (SIG_RET_TYPE) hangup);
-#ifdef SIGXCPU
-	(void) signal(SIGXCPU, (SIG_RET_TYPE) hangup);
-#endif
-#endif
+	sethanguphandler((SIG_RET_TYPE)hangup);
 
 	process_options(argc, argv);	/* command line options */
 	init_nhwindows(&argc, argv);	/* now we can set up window system */
@@ -517,6 +495,33 @@ whoami() {
 		(void) strncpy(plname, s, sizeof(plname)-1);
 #endif
 	return TRUE;
+}
+
+void
+sethanguphandler(handler)
+void FDECL((*handler), (int));
+{
+#ifdef SA_RESTART
+	/* don't want reads to restart.  If SA_RESTART is defined, we know
+	 * sigaction exists and can be used to ensure reads won't restart.
+	 * If it's not defined, assume reads do not restart.  If reads restart
+	 * and a signal occurs, the game won't do anything until the read
+	 * succeeds (or the stream returns EOF, which might not happen if
+	 * reading from, say, a window manager). */
+	struct sigaction sact;
+
+	(void) memset((genericptr_t)&sact, 0, sizeof sact);
+	sact.sa_handler = (SIG_RET_TYPE)handler;
+	(void) sigaction(SIGHUP, &sact, (struct sigaction *)0);
+# ifdef SIGXCPU
+	(void) sigaction(SIGXCPU, &sact, (struct sigaction *)0);
+# endif
+#else /* !SA_RESTART */
+	(void) signal(SIGHUP, (SIG_RET_TYPE)handler);
+# ifdef SIGXCPU
+	(void) signal(SIGXCPU, (SIG_RET_TYPE)handler);
+# endif
+#endif /* ?SA_RESTART */
 }
 
 #ifdef PORT_HELP
