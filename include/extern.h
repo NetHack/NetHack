@@ -2277,6 +2277,7 @@ E int FDECL(flash_hits_mon, (struct monst *,struct obj *));
 # ifdef PORT_HELP
 E void NDECL(port_help);
 # endif
+E void FDECL(sethanguphandler, (void (*)(int)));
 #endif /* UNIX */
 
 
@@ -2405,6 +2406,7 @@ E int FDECL(main, (int, char **));
 # ifdef CHDIR
 E void FDECL(chdirx, (const char *,BOOLEAN_P));
 # endif /* CHDIR */
+E void FDECL(sethanguphandler, (void (*)(int)));
 
 /* ### vmsmisc.c ### */
 
