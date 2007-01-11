@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2006/12/08	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2007/01/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -229,6 +229,10 @@ dothrow()
 	if (notake(youmonst.data)) {
 	    You("are physically incapable of throwing anything.");
 	    return 0;
+	} else if (nohands(youmonst.data)) {
+	    You_cant("throw without hands.");	/* not `body_part(HAND)' */
+	    return 0;
+	    /*[what about !freehand(), aside from cursed missile launcher?]*/
 	}
 
 	if(check_capacity((char *)0)) return(0);
