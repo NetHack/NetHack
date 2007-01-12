@@ -649,7 +649,7 @@ int retry;
 
 #ifndef GOLDOBJ
     /* put gold where inventory traversal will see it */
-    if (u.ugold) u_gold = insert_gold_into_invent();
+    if (u.ugold) u_gold = insert_gold_into_invent(TRUE);
 #endif
     if (retry) {
 	all_categories = (retry == -2);

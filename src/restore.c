@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.5	2006/12/11	*/
+/*	SCCS Id: @(#)restore.c	3.5	2007/01/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,9 +39,6 @@ STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
 STATIC_DCL int FDECL(restlevelfile, (int,XCHAR_P));
 STATIC_OVL void FDECL(restore_msghistory, (int));
 STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
-#ifndef GOLDOBJ
-STATIC_DCL struct obj *FDECL(gold_in, (struct obj *));
-#endif
 STATIC_DCL void FDECL(rest_levl, (int,BOOLEAN_P));
 
 static struct restore_procs {
@@ -443,8 +440,8 @@ boolean ghostly;
 			/* restore monster back pointer */
 			for (obj = mtmp->minvent; obj; obj = obj->nobj)
 				obj->ocarry = mtmp;
-#ifndef GOLDOBJ
-			put_gold_back(&mtmp->minvent, &mtmp->mgold);
+#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
+			put_gold_back(mtmp);
 #endif
 		}
 		if (mtmp->mw) {
@@ -571,8 +568,8 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	restore_timers(fd, RANGE_GLOBAL, FALSE, 0L);
 	restore_light_sources(fd);
 	invent = restobjchn(fd, FALSE, FALSE);
-#ifndef GOLDOBJ
-	put_gold_back(&invent, &u.ugold);
+#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
+	put_gold_back(&youmonst);
 #endif
 	/* tmp_bc only gets set here if the ball & chain were orphaned
 	   because you were swallowed; otherwise they will be on the floor
@@ -1534,38 +1531,28 @@ register unsigned int len;
 	}
 }
 
-#ifndef GOLDOBJ
-/*
- * Takes all of the gold objects out of the invent or
- * mtmp->minvent chain and puts it into either
- * u.ugold or mtmp->mgold.
- */
+#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
+/* used to make save & bones files be compatible with GOLDOBJ config;
+   takes all of the gold objects out of the invent or mtmp->minvent
+   chain and puts it into either u.ugold or mtmp->mgold */
 void
-put_gold_back(head_ptr, goldptr)
-struct obj **head_ptr;
-long *goldptr;
+put_gold_back(mon)
+struct monst *mon;
 {
 	struct obj *goldobj;
-	long gld = 0L;
+	boolean is_hero = (mon == &youmonst);
 
-	while ((goldobj = gold_in(*head_ptr))) {
-		gld += goldobj->quan;
-		extract_nobj(goldobj, head_ptr);
-		dealloc_obj(goldobj);
+	/* there could be two gold objects in invent if a hangup save was
+	   performed while gold was in invent for Drop or container access */
+	while ((goldobj = (is_hero ? carrying(GOLD_PIECE) :
+				     m_carrying(mon, GOLD_PIECE))) != 0) {
+	    extract_nobj(goldobj, is_hero ? &invent : &mon->minvent);
+	    if (!goldobj->in_use) {
+		if (is_hero) u.ugold += goldobj->quan;
+		else mon->mgold += goldobj->quan;
+	    }
+	    dealloc_obj(goldobj);
 	}
-	if (gld) *goldptr += gld;
-}
-
-STATIC_OVL struct obj *
-gold_in(chn)
-struct obj *chn;
-{
-	struct obj *otmp;
-
-	for(otmp = chn; otmp; otmp = otmp->nobj)
-		if(otmp->otyp == GOLD_PIECE)
-			return(otmp);
-	return((struct obj *) 0);
 }
 #endif /*GOLDOBJ*/
 

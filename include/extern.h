@@ -880,7 +880,7 @@ E boolean FDECL(is_worn, (struct obj *));
 E struct obj *FDECL(g_at, (int,int));
 #ifndef GOLDOBJ
 E struct obj *FDECL(mkgoldobj, (long));
-E struct obj *NDECL(insert_gold_into_invent);
+E struct obj *FDECL(insert_gold_into_invent, (BOOLEAN_P));
 E void NDECL(remove_gold_from_invent);
 #endif
 E struct obj *FDECL(getobj, (const char *,const char *));
@@ -1870,13 +1870,13 @@ E int FDECL(restore_menu, (winid));
 E void NDECL(minit);
 E boolean FDECL(lookup_id_mapping, (unsigned, unsigned *));
 E void FDECL(mread, (int,genericptr_t,unsigned int));
-#ifndef GOLDOBJ
-E void FDECL(put_gold_back, (struct obj **,long *));
-#endif
 E int FDECL(validate, (int,const char *));
 E void NDECL(reset_restpref);
 E void FDECL(set_restpref, (const char *));
 E void FDECL(set_savepref, (const char *));
+#ifndef GOLDOBJ
+E void FDECL(put_gold_back, (struct monst *));
+#endif
 
 /* ### rip.c ### */
 

@@ -2260,7 +2260,7 @@ int held;
 #ifndef GOLDOBJ
 	/* if putting in, place gold where inventory traversal will see it */
 	if ((loot_in || stash_one) && u.ugold)
-	    u_gold = insert_gold_into_invent();
+	    u_gold = insert_gold_into_invent(TRUE);
 #endif
 	if ((loot_in || stash_one) &&
 		(!invent || (invent == current_container && !invent->nobj))) {

@@ -697,14 +697,17 @@ register long q;
 
 /* used for container apply/#loot and multi-item Drop */
 struct obj *
-insert_gold_into_invent()
+insert_gold_into_invent(keep_on_status_line)
+boolean keep_on_status_line;
 {
 	struct obj *u_gold = 0;
 
 	if (u.ugold) {
 	    u_gold = mkgoldobj(u.ugold);
-	    u_gold->in_use = 1;
-	    u.ugold = u_gold->quan;	/* put the gold back on status line */
+	    if (keep_on_status_line) {
+		u_gold->in_use = 1;	/* in case of panic/hangup save */
+		u.ugold = u_gold->quan;	/* put back on status line */
+	    } /* else mkgoldobj() left status $:0 */
 	    assigninvlet(u_gold);	/* should yield '$' */
 	    u_gold->where = OBJ_INVENT;
 	    u_gold->nobj = invent;
@@ -719,15 +722,13 @@ remove_gold_from_invent()
 {
 	struct obj *u_gold = invent;	/* we expect gold to be first */
 
-	if (u_gold && u_gold->otyp == GOLD_PIECE) {
-	    invent = u_gold->nobj;
-	    u_gold->where = OBJ_FREE;
-	    dealloc_obj(u_gold);
-#if 0
-	} else if ((u_gold = carrying(GOLD_PIECE)) != 0) {
+	if (u_gold && u_gold->otyp != GOLD_PIECE)
+	    u_gold = carrying(GOLD_PIECE);
+
+	if (u_gold) {
 	    extract_nobj(u_gold, &invent);
+	    if (!u_gold->in_use) u.ugold += u_gold->quan;
 	    dealloc_obj(u_gold);
-#endif
 	}
 }
 #endif	/* !GOLDOBJ */
