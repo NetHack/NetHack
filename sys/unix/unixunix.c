@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)unixunix.c	3.5	1994/11/07	*/
+/*	SCCS Id: @(#)unixunix.c	3.5	2007/01/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -71,6 +71,7 @@ eraseoldlocks()
 {
 	register int i;
 
+	program_state.preserve_locks = 0; /* not required but shows intent */
 	/* cannot use maxledgerno() here, because we need to find a lock name
 	 * before starting everything (including the dungeon initialization
 	 * that sets astral_level, needed for maxledgerno()) up

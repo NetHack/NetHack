@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)decl.h	3.5	2005/11/19	*/
+/*	SCCS Id: @(#)decl.h	3.5	2007/01/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -145,9 +145,10 @@ E struct linfo level_info[MAXLINFO];
 E NEARDATA struct sinfo {
 	int gameover;		/* self explanatory? */
 	int stopprint;		/* inhibit further end of game disclosure */
-#if defined(UNIX) || defined(VMS) || defined (__EMX__) || defined(WIN32)
+#ifdef HANGUPHANDLING
 	volatile int done_hup;	/* SIGHUP or moral equivalent received
 				 * -- no more screen output */
+	int preserve_locks;	/* don't remove level files prior to exit */
 #endif
 	int something_worth_saving;	/* in case of panic */
 	int panicking;		/* `panic' is in progress */

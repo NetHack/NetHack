@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)allmain.c	3.5	2006/11/27	*/
+/*	SCCS Id: @(#)allmain.c	3.5	2007/01/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -72,6 +72,9 @@ boolean resuming;
     context.move = 0;
 
     for(;;) {
+#ifdef SAFERHANGUP
+	if (program_state.done_hup) end_of_input();
+#endif
 	get_nh_event();
 #ifdef POSITIONBAR
 	do_positionbar();

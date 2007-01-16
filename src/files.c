@@ -556,20 +556,28 @@ int lev;
 void
 clearlocks()
 {
+#ifdef HANGUPHANDLING
+	if (program_state.preserve_locks) return;
+#endif
 #if !defined(PC_LOCKING) && defined(MFLOPPY) && !defined(AMIGA)
 	eraseall(levels, alllevels);
 	if (ramdisk)
 		eraseall(permbones, alllevels);
 #else
+    {
 	register int x;
 
+# ifndef NO_SIGNAL
+	(void) signal(SIGINT, SIG_IGN);
+# endif
 # if defined(UNIX) || defined(VMS)
 	sethanguphandler((void FDECL((*),(int)))SIG_IGN);
 # endif
 	/* can't access maxledgerno() before dungeons are created -dlc */
 	for (x = (n_dgns ? maxledgerno() : 0); x >= 0; x--)
 		delete_levelfile(x);	/* not all levels need be present */
-#endif
+    }
+#endif /* ?PC_LOCKING,&c */
 }
 
 #if defined(SELECTSAVED)

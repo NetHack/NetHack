@@ -157,6 +157,7 @@ char *argv[];
 	 * It seems you really want to play.
 	 */
 	u.uhp = 1;	/* prevent RIP on early quits */
+	program_state.preserve_locks = 1;
 	sethanguphandler((SIG_RET_TYPE)hangup);
 
 	process_options(argc, argv);	/* command line options */
@@ -212,6 +213,7 @@ char *argv[];
 		getlock();
 	}
 #endif /* WIZARD */
+	program_state.preserve_locks = 0;	/* after getlock() */
 
 	dlb_init();	/* must be before newgame() */
 

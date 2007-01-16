@@ -197,6 +197,10 @@ E void NDECL(confdir);
 E int FDECL(isok, (int,int));
 E int FDECL(get_adjacent_loc, (const char *, const char *, XCHAR_P, XCHAR_P, coord *));
 E const char *FDECL(click_to_cmd, (int,int,int));
+#ifdef HANGUPHANDLING
+E void FDECL(hangup, (int));
+E void NDECL(end_of_input);
+#endif
 E char NDECL(readchar);
 #ifdef WIZARD
 E void NDECL(sanity_check);
@@ -1937,9 +1941,6 @@ E void NDECL(rumor_check);
 /* ### save.c ### */
 
 E int NDECL(dosave);
-#if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
-E void FDECL(hangup, (int));
-#endif
 E int NDECL(dosave0);
 #ifdef INSURANCE
 E void NDECL(savestateinlock);

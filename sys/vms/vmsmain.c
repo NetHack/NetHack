@@ -379,11 +379,7 @@ whoami()
 static void
 byebye()
 {
-    /*	Different versions of both VAX C and GNU C use different return types
-	for signal functions.  Return type 'int' along with the explicit casts
-	below satisfy the most combinations of compiler vs <signal.h>.
-     */
-    int (*hup)();
+    void FDECL((*hup), (int));
 #ifdef SHELL
     extern unsigned long dosh_pid, mail_pid;
     extern unsigned long FDECL(sys$delprc,(unsigned long *,const genericptr_t));
@@ -394,10 +390,15 @@ byebye()
 #endif
 
     /* SIGHUP doesn't seem to do anything on VMS, so we fudge it here... */
-    hup = (int(*)()) signal(SIGHUP, SIG_IGN);
+    hup = (void FDECL((*),(int))) signal(SIGHUP, SIG_IGN);
     if (!program_state.exiting++ &&
-	hup != (int(*)()) SIG_DFL && hup != (int(*)()) SIG_IGN)
-	(void) (*hup)();
+	    hup != (void FDECL((*),(int))) SIG_DFL &&
+	    hup != (void FDECL((*),(int))) SIG_IGN) {
+	(*hup)(SIGHUP);
+#ifdef SAFERHANGUP
+	end_of_input();
+#endif
+    }
 
 #ifdef CHDIR
     (void) chdir(getenv("PATH"));

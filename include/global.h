@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)global.h	3.5	2006/10/17	*/
+/*	SCCS Id: @(#)global.h	3.5	2007/01/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -267,6 +267,13 @@ typedef char nhptext;
 # ifndef USE_TILES
 #  define USE_TILES
 # endif
+#endif
+
+#if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
+# define HANGUPHANDLING
+#endif
+#if defined(SAFERHANGUP) && !defined(HANGUPHANDLING)
+# undef SAFERHANGUP
 #endif
 
 

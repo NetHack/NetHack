@@ -119,7 +119,6 @@ dosave()
 		program_state.done_hup = 0;
 #endif
 		if(dosave0()) {
-			program_state.something_worth_saving = 0;
 			u.uhp = -1;		/* universal game's over indicator */
 			/* make sure they see the Saving message */
 			display_nhwindow(WIN_MESSAGE, TRUE);
@@ -129,35 +128,6 @@ dosave()
 	}
 	return 0;
 }
-
-
-#if defined(UNIX) || defined(VMS) || defined (__EMX__) || defined(WIN32)
-/*ARGSUSED*/
-void
-hangup(sig_unused)  /* called as signal() handler, so sent at least one arg */
-int sig_unused;
-{
-# ifdef NOSAVEONHANGUP
-	(void) signal(SIGINT, SIG_IGN);
-	clearlocks();
-	terminate(EXIT_FAILURE);
-# else	/* SAVEONHANGUP */
-	if (!program_state.done_hup++) {
-#  ifndef SAFERHANGUP
-	    /* When using SAFERHANGUP, the done_hup flag it tested in rhack
-	     * and actual hangup behavior occurs then.  This is 'safer'
-	     * because it disallows certain cheats and also protects
-	     * against losing objects in the process of being thrown. */
-	    if (program_state.something_worth_saving)
-		(void) dosave0();
-
-	    clearlocks();
-	    terminate(EXIT_FAILURE);
-#  endif /* !SAFERHANGUP */
-	}
-# endif	/* !NOSAVEONHANGUP */
-}
-#endif
 
 /* returns 1 if save successful */
 int
@@ -169,7 +139,7 @@ dosave0()
 	d_level uz_save;
 	char whynot[BUFSZ];
 
-	if (!SAVEF[0])
+	if (!program_state.something_worth_saving || !SAVEF[0])
 		return 0;
 	fq_save = fqname(SAVEF, SAVEPREFIX, 1);	/* level files take 0 */
 
@@ -316,6 +286,8 @@ dosave0()
 	delete_levelfile(ledger_no(&u.uz));
 	delete_levelfile(0);
 	nh_compress(fq_save);
+	/* this should probably come sooner... */
+	program_state.something_worth_saving = 0;
 	return(1);
 }
 

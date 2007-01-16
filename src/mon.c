@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2006/10/20	*/
+/*	SCCS Id: @(#)mon.c	3.5	2007/01/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -581,6 +581,12 @@ movemon()
     */
 
     for(mtmp = fmon; mtmp; mtmp = nmtmp) {
+#ifdef SAFERHANGUP
+	if (program_state.done_hup) {
+	     somebody_can_move = FALSE;
+	     break;
+	}
+#endif
 	nmtmp = mtmp->nmon;
 	if (DEADMONSTER(mtmp)) continue;
 
