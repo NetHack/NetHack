@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2007/01/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,12 +8,14 @@
 
 struct cmd Cmd = { 0 };		/* flag.h */
 
+#ifdef UNIX
 /*
  * Some systems may have getchar() return EOF for various reasons, and
  * we should not quit before seeing at least NR_OF_EOFS consecutive EOFs.
  */
 #if defined(SYSV) || defined(DGUX) || defined(HPUX)
 #define NR_OF_EOFS	20
+#endif
 #endif
 
 #define CMD_TRAVEL	(char)0x90
@@ -159,9 +161,6 @@ STATIC_PTR boolean NDECL(minimal_enlightenment);
 
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *,char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
-#if defined(UNIX) || defined(SAFERHANGUP)
-static void NDECL(end_of_input);
-#endif
 
 static const char* readchar_queue="";
 static coord clicklook_cc;
@@ -2798,22 +2797,42 @@ parse()
 	return(in_line);
 }
 
-#if defined(UNIX) || defined(SAFERHANGUP)
-static
+#ifdef HANGUPHANDLING
+/*ARGUSED*/
+void
+hangup(sig_unused) /* called as signal() handler, so sent at least one arg */
+int sig_unused;
+{
+# ifdef SAFERHANGUP
+	/* When using SAFERHANGUP, the done_hup flag it tested in rhack
+	   and a couple of other places; actual hangup handling occurs then.
+	   This is 'safer' because it disallows certain cheats and also
+	   protects against losing objects in the process of being thrown,
+	   but also potentially riskier because the disconnected program
+	   must continue running longer before attempting a hangup save. */
+	program_state.done_hup++;
+# else
+	end_of_input();
+# endif /* ?SAFERHANGUP */
+}
+
 void
 end_of_input()
 {
-#ifndef NOSAVEONHANGUP
+# ifdef NOSAVEONHANGUP
+	program_state_something_worth_saving = 0;
+# endif
 # ifndef SAFERHANGUP
 	if (!program_state.done_hup++)
-#endif
+# endif
 	    if (program_state.something_worth_saving) (void) dosave0();
-#endif
 	exit_nhwindows((char *)0);
 	clearlocks();
 	terminate(EXIT_SUCCESS);
+	/*NOTREACHED*/	/* not necessarily true for vms... */
+	return;
 }
-#endif
+#endif /* HANGUPHANDLING */
 
 char
 readchar()
@@ -2830,8 +2849,7 @@ readchar()
 	    sym = Getchar();
 #endif
 
-#ifdef UNIX
-# ifdef NR_OF_EOFS
+#ifdef NR_OF_EOFS
 	if (sym == EOF) {
 	    register int cnt = NR_OF_EOFS;
 	  /*
@@ -2844,18 +2862,14 @@ readchar()
 		sym = Getchar();
 	    } while (--cnt && sym == EOF);
 	}
-# endif /* NR_OF_EOFS */
-	if (sym == EOF) {
-# ifndef SAFERHANGUP
-	    end_of_input();
-# else
-	    program_state.done_hup++;
-	    sym = '\033';
-# endif
-	}
-#endif /* UNIX */
+#endif /* NR_OF_EOFS */
 
-	if(sym == 0) {
+	if (sym == EOF) {
+#ifdef HANGUPHANDLING
+	    hangup(0); /* call end_of_input() or set program_state.done_hup */
+#endif
+	    sym = '\033';
+	} else if (sym == 0) {
 	    /* click event */
 	    readchar_queue = click_to_cmd(x, y, mod);
 	    sym = *readchar_queue++;
