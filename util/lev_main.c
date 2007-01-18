@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lev_main.c	3.5	2005/03/12	*/
+/*	SCCS Id: @(#)lev_main.c	3.5	2007/01/17	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1571,6 +1571,9 @@ char NEARDATA *hilites[CLR_MAX];
 /* trap.c */
 const char *traps[TRAPNUM];
 /* window.c */
+# ifdef HANGUPHANDLING
+volatile
+# endif
 struct window_procs windowprocs;
 /* xxxtty.c */
 # ifdef DEFINE_OSPEED
