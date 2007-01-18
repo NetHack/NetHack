@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)display.c	3.5	2005/06/21	*/
+/*	SCCS Id: @(#)display.c	3.5	2007/01/17	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -648,6 +648,9 @@ newsym(x,y)
     register xchar worm_tail;
 
     if (in_mklev) return;
+#ifdef HANGUPHANDLING
+    if (program_state.done_hup) return;
+#endif
 
     /* only permit updating the hero when swallowed */
     if (u.uswallow) {
@@ -1383,6 +1386,9 @@ flush_screen(cursor_on_u)
     if (delay_flushing) return;
     if (flushing) return;	/* if already flushing then return */
     flushing = 1;
+#ifdef HANGUPHANDLING
+    if (program_state.done_hup) return;
+#endif
 
     for (y = 0; y < ROWNO; y++) {
 	register gbuf_entry *gptr = &gbuf[y][x = gbuf_start[y]];

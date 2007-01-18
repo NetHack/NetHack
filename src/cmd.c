@@ -2803,6 +2803,7 @@ void
 hangup(sig_unused) /* called as signal() handler, so sent at least one arg */
 int sig_unused;
 {
+	nhwindows_hangup();
 # ifdef SAFERHANGUP
 	/* When using SAFERHANGUP, the done_hup flag it tested in rhack
 	   and a couple of other places; actual hangup handling occurs then.

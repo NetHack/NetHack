@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)winprocs.h 3.5	2003/01/08	*/
+/*	SCCS Id: @(#)winprocs.h 3.5	2007/01/17	*/
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -81,7 +81,11 @@ struct window_procs {
 #endif
 };
 
-extern NEARDATA struct window_procs windowprocs;
+extern
+#ifdef HANGUPHANDLING
+volatile
+#endif
+NEARDATA struct window_procs windowprocs;
 
 /*
  * If you wish to only support one window system and not use procedure

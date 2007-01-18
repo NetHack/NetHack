@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)windows.c	3.5	1996/05/19	*/
+/*	SCCS Id: @(#)windows.c	3.5	2007/01/17	*/
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -43,6 +43,9 @@ extern struct window_procs mswin_procs;
 
 STATIC_DCL void FDECL(def_raw_print, (const char *s));
 
+#ifdef HANGUPHANDLING
+volatile
+#endif
 NEARDATA struct window_procs windowprocs;
 
 static
@@ -142,6 +145,7 @@ const char *pref;
 	   for the preference capabilities that
 	   they support.
 	   Just return in this genl one. */
+	return;
 }
 
 char *
@@ -184,6 +188,365 @@ const char *msg;
 	   so it should keep all pointers/indexes
 	   intact at the end of each call.
 	 */
+	return;
 }
+
+#ifdef HANGUPHANDLING
+    /*
+     * Dummy windowing scheme used to replace current one with no-ops
+     * in order to avoid all terminal I/O after hangup/disconnect.
+     */
+
+static int NDECL(hup_nhgetch);
+static char FDECL(hup_yn_function, (const char *,const char *,CHAR_P));
+static int FDECL(hup_nh_poskey, (int *,int *,int *));
+static void FDECL(hup_getlin, (const char *,char *));
+static void FDECL(hup_init_nhwindows, (int *,char **));
+static void FDECL(hup_exit_nhwindows, (const char *));
+static winid FDECL(hup_create_nhwindow, (int));
+static int FDECL(hup_select_menu, (winid,int,MENU_ITEM_P **));
+static void FDECL(hup_add_menu, (winid,int,const anything *,CHAR_P,CHAR_P,
+				 int,const char *,BOOLEAN_P));
+static void FDECL(hup_end_menu, (winid,const char *));
+static void FDECL(hup_putstr, (winid,int,const char *));
+static void FDECL(hup_print_glyph, (winid,XCHAR_P,XCHAR_P,int));
+static void FDECL(hup_outrip, (winid,int));
+static void FDECL(hup_curs, (winid,int,int));
+static void FDECL(hup_display_nhwindow, (winid,BOOLEAN_P));
+static void FDECL(hup_display_file, (const char *,BOOLEAN_P));
+# ifdef CLIPPING
+static void FDECL(hup_cliparound, (int,int));
+# endif
+# ifdef CHANGE_COLOR
+static void FDECL(hup_change_color, (int,long,int));
+#  ifdef MAC
+static short FDECL(hup_set_font_name, (winid,char *));
+#  endif
+static char *NDECL(hup_get_color_string);
+# endif /* CHANGE_COLOR */
+# ifdef STATUS_VIA_WINDOWPORT
+static void FDECL(hup_status_update, (int,genericptr_t,int,int));
+# endif
+
+static int NDECL(hup_int_ndecl);
+static void NDECL(hup_void_ndecl);
+static void FDECL(hup_void_fdecl_int, (int));
+static void FDECL(hup_void_fdecl_winid, (winid));
+static void FDECL(hup_void_fdecl_constchar_p, (const char *));
+
+static struct window_procs hup_procs = {
+    "hup",
+    0L,
+    0L,
+    hup_init_nhwindows,
+    hup_void_ndecl,		/* player_selection */
+    hup_void_ndecl,		/* askname */
+    hup_void_ndecl,		/* get_nh_event */
+    hup_exit_nhwindows,
+    hup_void_fdecl_constchar_p, /* suspend_nhwindows */
+    hup_void_ndecl,		/* resume_nhwindows */
+    hup_create_nhwindow,
+    hup_void_fdecl_winid,	/* clear_nhwindow */
+    hup_display_nhwindow,
+    hup_void_fdecl_winid,	/* destroy_nhwindow */
+    hup_curs,
+    hup_putstr,
+    hup_putstr,			/* putmixed */
+    hup_display_file,
+    hup_void_fdecl_winid,	/* start_menu */
+    hup_add_menu,
+    hup_end_menu,
+    hup_select_menu,
+    genl_message_menu,
+    hup_void_ndecl,		/* update_inventory */
+    hup_void_ndecl,		/* mark_synch */
+    hup_void_ndecl,		/* wait_synch */
+# ifdef CLIPPING
+    hup_cliparound,
+# endif
+# ifdef POSITIONBAR
+    (void FDECL((*),(char *)))hup_void_fdecl_constchar_p, /* update_positionbar */
+# endif
+    hup_print_glyph,
+    hup_void_fdecl_constchar_p,	/* raw_print */
+    hup_void_fdecl_constchar_p,	/* raw_print_bold */
+    hup_nhgetch,
+    hup_nh_poskey,
+    hup_void_ndecl,		/* nhbell  */
+    hup_int_ndecl,		/* doprev_message */
+    hup_yn_function,
+    hup_getlin,
+    hup_int_ndecl,		/* get_ext_cmd */
+    hup_void_fdecl_int,		/* number_pad */
+    hup_void_ndecl,		/* delay_output  */
+# ifdef CHANGE_COLOR
+    hup_change_color,
+#  ifdef MAC
+    hup_void_fdecl_int,		/* change_background */
+    hup_set_font_name,
+#  endif
+    hup_get_color_string,
+# endif /* CHANGE_COLOR */
+    hup_void_ndecl,		/* start_screen */
+    hup_void_ndecl,		/* end_screen */
+    hup_outrip,
+    genl_preference_update,
+    genl_getmsghistory,
+    genl_putmsghistory,
+# ifdef STATUS_VIA_WINDOWPORT
+    hup_void_ndecl,		/* status_init */
+    hup_void_ndecl,		/* status_finish */
+    genl_status_enablefield,
+    hup_status_update,
+#  ifdef STATUS_HILITES
+    genl_status_threshold,
+#  endif
+# endif /* STATUS_VIA_WINDOWPORT */
+};
+
+void
+nhwindows_hangup()
+{
+    if (iflags.window_inited) exit_nhwindows((char *)0);
+    windowprocs = hup_procs;
+ /* hup_init_nhwindows((int *)0, (char **)0); */
+}
+
+static int
+hup_nhgetch( VOID_ARGS )
+{
+    return '\033';	/* ESC */
+}
+
+/*ARGSUSED*/
+static char
+hup_yn_function(prompt, resp, deflt)
+const char *prompt, *resp;
+char deflt;
+{
+    if (!deflt) deflt = '\033';
+    return deflt;
+}
+
+/*ARGSUSED*/
+static int
+hup_nh_poskey(x, y, mod)
+int *x, *y, *mod;
+{
+    return '\033';
+}
+
+/*ARGSUSED*/
+static void
+hup_getlin(prompt, outbuf)
+const char *prompt;
+char *outbuf;
+{
+    Strcpy(outbuf, "\033");
+}
+
+/*ARGUSED*/
+static void
+hup_init_nhwindows(argc_p, argv)
+int *argc_p;
+char **argv;
+{
+    iflags.window_inited = 1;
+}
+
+/*ARGUSED*/
+static void
+hup_exit_nhwindows(dummy)
+const char *dummy;
+{
+    iflags.window_inited = 0;
+}
+
+/*ARGSUSED*/
+static winid
+hup_create_nhwindow(type)
+int type;
+{
+    return WIN_ERR;
+}
+
+/*ARGSUSED*/
+static int
+hup_select_menu(window, how, menu_list)
+winid window;
+int how;
+struct mi **menu_list;
+{
+    return -1;
+}
+
+/*ARGSUSED*/
+static void
+hup_add_menu(window, glyph, identifier, sel, grpsel, attr, txt, preselected)
+winid window;
+int glyph, attr;
+const anything *identifier;
+char sel, grpsel;
+const char *txt;
+boolean preselected;
+{
+    return;
+}
+
+/*ARGSUSED*/
+static void
+hup_end_menu(window, prompt)
+winid window;
+const char *prompt;
+{
+    return;
+}
+
+/*ARGSUSED*/
+static void
+hup_putstr(window, attr, text)
+winid window;
+int attr;
+const char *text;
+{
+    return;
+}
+
+/*ARGSUSED*/
+static void
+hup_print_glyph(window, x, y, glyph)
+winid window;
+xchar x, y;
+int glyph;
+{
+    return;
+}
+
+/*ARGSUSED*/
+static void
+hup_outrip(tmpwin, how)
+winid tmpwin;
+int how;
+{
+    return;
+}
+
+/*ARGSUSED*/
+static void
+hup_curs(window, x, y)
+winid window;
+int x, y;
+{
+    return;
+}
+
+/*ARGSUSED*/
+static void
+hup_display_nhwindow(window, blocking)
+winid window;
+boolean blocking;
+{
+    return;
+}
+
+/*ARGSUSED*/
+static void
+hup_display_file(fname, complain)
+const char *fname;
+boolean complain;
+{
+    return;
+}
+
+# ifdef CLIPPING
+/*ARGSUSED*/
+static void
+hup_cliparound(x, y)
+int x, y;
+{
+    return;
+}
+# endif
+
+# ifdef CHANGE_COLOR
+/*ARGSUSED*/
+static void
+hup_change_color(color, rgb, reverse)
+int color, reverse;
+long rgb;
+{
+    return;
+}
+
+#  ifdef MAC
+/*ARGSUSED*/
+static short
+hup_set_font_name(window, fontname)
+winid window;
+char *fontname;
+{
+    return 0;
+}
+#  endif /* MAC */
+
+static char *
+hup_get_color_string(VOID_ARGS)
+{
+    return (char *)0;
+}
+# endif /* CHANGE_COLOR */
+
+# ifdef STATUS_VIA_WINDOWPORT
+/*ARGSUSED*/
+static void
+hup_status_update(idx, ptr, chg, percent)
+int idx, chg, percent;
+genericptr_t ptr;
+{
+    return;
+}
+# endif /* STATUS_VIA_WINDOWPORT */
+
+    /*
+     * Non-specific stubs.
+     */
+
+static int
+hup_int_ndecl(VOID_ARGS)
+{
+    return -1;
+}
+
+static void
+hup_void_ndecl(VOID_ARGS)
+{
+    return;
+}
+
+/*ARGUSED*/
+static void
+hup_void_fdecl_int(arg)
+int arg;
+{
+    return;
+}
+
+/*ARGUSED*/
+static void
+hup_void_fdecl_winid(window)
+winid window;
+{
+    return;
+}
+
+/*ARGUSED*/
+static void
+hup_void_fdecl_constchar_p(string)
+const char *string;
+{
+    return;
+}
+
+#endif /* HANGUPHANDLING */
 
 /*windows.c*/

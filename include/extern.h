@@ -2517,6 +2517,9 @@ E char FDECL(genl_message_menu, (CHAR_P,int,const char *));
 E void FDECL(genl_preference_update, (const char *));
 E char *FDECL(genl_getmsghistory, (BOOLEAN_P));
 E void FDECL(genl_putmsghistory, (const char *));
+#ifdef HANGUPHANDLING
+E void NDECL(nhwindows_hangup);
+#endif
 
 /* ### wizard.c ### */
 
