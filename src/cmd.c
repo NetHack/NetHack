@@ -2798,6 +2798,9 @@ parse()
 }
 
 #ifdef HANGUPHANDLING
+/* some very old systems, or descendents of such systems, expect signal
+   handlers to have return type `int', but they don't actually inspect
+   the return value so we should be safe using `void' unconditionally */
 /*ARGUSED*/
 void
 hangup(sig_unused) /* called as signal() handler, so sent at least one arg */
@@ -2812,16 +2815,17 @@ int sig_unused;
 	   but also potentially riskier because the disconnected program
 	   must continue running longer before attempting a hangup save. */
 	program_state.done_hup++;
-# else
+	/* defer hangup iff game appears to be in progress */
+	if (program_state.something_worth_saving) return;
+# endif /* SAFERHANGUP */
 	end_of_input();
-# endif /* ?SAFERHANGUP */
 }
 
 void
 end_of_input()
 {
 # ifdef NOSAVEONHANGUP
-	program_state_something_worth_saving = 0;
+	program_state.something_worth_saving = 0;
 # endif
 # ifndef SAFERHANGUP
 	if (!program_state.done_hup++)

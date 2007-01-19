@@ -272,7 +272,7 @@ typedef char nhptext;
 #if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
 # define HANGUPHANDLING
 #endif
-#if defined(SAFERHANGUP) && !defined(HANGUPHANDLING)
+#if defined(SAFERHANGUP) && (defined(NOSAVEONHANGUP) || !defined(HANGUPHANDLING))
 # undef SAFERHANGUP
 #endif
 
