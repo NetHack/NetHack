@@ -40,6 +40,7 @@ STATIC_DCL char FDECL(in_or_out_menu, (const char *,struct obj *,
 				       BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int,int,BOOLEAN_P));
+STATIC_DCL boolean NDECL(reverse_loot);
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
 STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 
@@ -1537,6 +1538,13 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
 	You("have no hands!");	/* not `body_part(HAND)' */
 	return 0;
     }
+    if (Confusion) {
+	if (rn2(6) && reverse_loot()) return 1;
+	if (rn2(2)) {
+	    pline("Being confused, you find nothing to loot.");
+	    return 1;	/* costs a turn */
+	} /* else fallthrough to normal looting */
+    }
     cc.x = u.ux; cc.y = u.uy;
 
 lootcont:
@@ -1583,63 +1591,6 @@ lootcont:
 	    }
 	}
 	if (any) c = 'y';
-    } else if (Confusion) {
-#ifndef GOLDOBJ
-	if (u.ugold){
-	    long contribution = rnd((int)min(LARGEST_INT,u.ugold));
-	    struct obj *goldob = mkgoldobj(contribution);
-#else
-	struct obj *goldob;
-	/* Find a money object to mess with */
-	for (goldob = invent; goldob; goldob = goldob->nobj) {
-	    if (goldob->oclass == COIN_CLASS) break;
-	}
-	if (goldob){
-	    long contribution = rnd((int)min(LARGEST_INT, goldob->quan));
-	    if (contribution < goldob->quan)
-		goldob = splitobj(goldob, contribution);
-	    freeinv(goldob);
-#endif
-	    if (IS_THRONE(levl[u.ux][u.uy].typ)){
-		struct obj *coffers;
-		int pass;
-		/* find the original coffers chest, or any chest */
-		for (pass = 2; pass > -1; pass -= 2)
-		    for (coffers = fobj; coffers; coffers = coffers->nobj)
-			if (coffers->otyp == CHEST && coffers->spe == pass)
-			    goto gotit;	/* two level break */
-gotit:
-		if (coffers) {
-	    verbalize("Thank you for your contribution to reduce the debt.");
-		    (void) add_to_container(coffers, goldob);
-		    coffers->owt = weight(coffers);
-		} else {
-		    struct monst *mon = makemon(courtmon(),
-					    u.ux, u.uy, NO_MM_FLAGS);
-		    if (mon) {
-#ifndef GOLDOBJ
-			mon->mgold += goldob->quan;
-			delobj(goldob);
-			pline("The exchequer accepts your contribution.");
-		    } else {
-			dropx(goldob);
-		    }
-		}
-	    } else {
-		dropx(goldob);
-#else
-			add_to_minv(mon, goldob);
-			pline("The exchequer accepts your contribution.");
-		    } else {
-			dropy(goldob);
-		    }
-		}
-	    } else {
-		dropy(goldob);
-#endif
-		pline("Ok, now there is loot here.");
-	    }
-	}
     } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
 	You("need to dig up the grave to effectively loot it...");
     }
@@ -1688,6 +1639,87 @@ gotit:
 		    underfoot ? "here" : "there");
     }
     return (timepassed);
+}
+
+/* called when attempting to #loot while confused */
+STATIC_OVL boolean
+reverse_loot()
+{
+    struct obj *goldob = 0, *coffers, *otmp, boxdummy;
+    struct monst *mon;
+    long contribution;
+    int n, x = u.ux, y = u.uy;
+
+    if (!rn2(3)) {
+	/* n objects: 1/(n+1) chance per object plus 1/(n+1) to fall off end */
+	for (n = inv_cnt(), otmp = invent; otmp; --n, otmp = otmp->nobj)
+	    if (!rn2(n + 1)) {
+		prinv("You find old loot:", otmp, 0L);
+		return TRUE;
+	    }
+	return FALSE;
+    }
+
+#ifndef GOLDOBJ
+    if (u.ugold) {
+	contribution = ((long)rnd(5) * u.ugold + 4L) / 5L;
+	goldob = mkgoldobj(contribution);
+    }
+#else
+    /* find a money object to mess with */
+    for (goldob = invent; goldob; goldob = goldob->nobj)
+	if (goldob->oclass == COIN_CLASS) {
+	    contribution = ((long)rnd(5) * goldob->quan + 4L) / 5L;
+	    if (contribution < goldob->quan)
+		goldob = splitobj(goldob, contribution);
+	    break;
+	}
+#endif
+    if (!goldob) return FALSE;
+
+    if (!IS_THRONE(levl[x][y].typ)) {
+	dropx(goldob);
+	/* the dropped gold might have fallen to lower level */
+	if (g_at(x, y)) pline("Ok, now there is loot here.");
+    } else {
+	/* find original coffers chest if present, otherwise use nearest one */
+	otmp = 0;
+	for (coffers = fobj; coffers; coffers = coffers->nobj)
+	    if (coffers->otyp == CHEST) {
+		if (coffers->spe == 2) break;	/* a throne room chest */
+		if (!otmp ||
+		  distu(coffers->ox, coffers->oy) < distu(otmp->ox, otmp->oy))
+		    otmp = coffers;	/* remember closest ordinary chest */
+	    }
+	if (!coffers) coffers = otmp;
+
+	if (coffers) {
+	    verbalize("Thank you for your contribution to reduce the debt.");
+#ifdef GOLDOBJ
+	    freeinv(goldob);
+#endif
+	    (void)add_to_container(coffers, goldob);
+	    coffers->owt = weight(coffers);
+	    coffers->cknown = 0;
+	    if (!coffers->olocked) {
+		boxdummy = zeroobj, boxdummy.otyp = SPE_WIZARD_LOCK;
+		(void)boxlock(coffers, &boxdummy);
+	    }
+	} else if ((mon = makemon(courtmon(), x, y, NO_MM_FLAGS)) != 0) {
+#ifndef GOLDOBJ
+	    mon->mgold += goldob->quan;
+	    delobj(goldob);
+#else
+	    freeinv(goldob);
+	    add_to_minv(mon, goldob);
+#endif
+	    pline("The exchequer accepts your contribution.");
+	} else {
+	    You("drop %s.", doname(goldob));
+	    dropx(goldob);
+	}
+    }
+    return TRUE;
 }
 
 /* loot_mon() returns amount of time passed.

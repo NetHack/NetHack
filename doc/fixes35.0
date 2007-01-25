@@ -30,6 +30,7 @@ class genocide recognizes species name as an example of the class to
 internals: use Is_box rather than explicitly checking what it checks
 fix some unreachable messages (either make then reachable or remove them)
 can quiver coins when GOLDOBJ is defined
+make #loot behave same for GOLDOBJ as for !GOLDOBJ
 grammar, spelling and other typos
 keep various delayed killers separate to avoid mixed up messages
 don't place randomly-placed aquatic monsters in lava on special levels
