@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2006/12/07	*/
+/*	SCCS Id: @(#)eat.c	3.5	2007/01/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2256,7 +2256,9 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	 * mails, players who polymorph back to human in the middle of their
 	 * metallic meal, etc....
 	 */
-	if (!is_edible(otmp)) {
+	if (otmp->oartifact && !touch_artifact(otmp, &youmonst)) {
+	    return 1;
+	} else if (!is_edible(otmp)) {
 	    You("cannot eat that!");
 	    return 0;
 	} else if ((otmp->owornmask & (W_ARMOR|W_TOOL|W_AMUL
