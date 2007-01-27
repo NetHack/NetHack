@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)display.c	3.5	2007/01/17	*/
+/*	SCCS Id: @(#)display.c	3.5	2007/01/26	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -502,16 +502,18 @@ void
 feel_location(x, y)
     xchar x, y;
 {
-    struct rm *lev = &(levl[x][y]);
+    struct rm *lev;
     struct obj *boulder;
     register struct monst *mon;
 
+    if (!isok(x, y)) return;
+    lev = &(levl[x][y]);
     /* If the hero's memory of an invisible monster is accurate, we want to keep
      * him from detecting the same monster over and over again on each turn.
      * We must return (so we don't erase the monster).  (We must also, in the
      * search function, be sure to skip over previously detected 'I's.)
      */
-    if (glyph_is_invisible(levl[x][y].glyph) && m_at(x,y)) return;
+    if (glyph_is_invisible(lev->glyph) && m_at(x,y)) return;
 
     /* The hero can't feel non pool locations while under water. */
     if (Underwater && !Is_waterlevel(&u.uz) && ! is_pool(x,y))
