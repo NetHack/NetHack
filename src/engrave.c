@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)engrave.c	3.5	2006/12/06	*/
+/*	SCCS Id: @(#)engrave.c	3.5	2007/01/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -618,7 +618,7 @@ doengrave()
 			return 1;
 		    }
 		    zapwand = TRUE;
-		    if (Levitation) ptext = FALSE;
+		    if (!can_reach_floor(TRUE)) ptext = FALSE;
 
 		    switch (otmp->otyp) {
 		    /* DUST wands */
@@ -771,11 +771,12 @@ doengrave()
 		    /* type = MARK wands */
 		    /* type = ENGR_BLOOD wands */
 		    }
-		} else /* end if zappable */
-		    if (!can_reach_floor(TRUE)) {
-			cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
-			return(0);
-		    }
+		} else { /* end if zappable */
+		    /* failing to wrest one last charge takes time */
+		    ptext = FALSE;	/* use "early exit" below, return 1 */
+		    /* cancelled wand turns to dust unless hero can't write */
+		    if (otmp->spe < 0 && can_reach_floor(TRUE)) zapwand = TRUE;
+		}
 		break;
 
 	    case WEAPON_CLASS:
@@ -855,8 +856,8 @@ doengrave()
 
 	/* Identify stylus */
 	if (doknown) {
-	    makeknown(otmp->otyp);
-	    more_experienced(0,10);
+	    learnwand(otmp);
+	    if (objects[otmp->otyp].oc_name_known) more_experienced(0, 10);
 	}
 
 	if (teleengr) {
@@ -884,11 +885,12 @@ doengrave()
      "are not going to get anywhere trying to write in the %s with your dust.",
 		    is_ice(u.ux,u.uy) ? "frost" : "dust");
 	    useup(otmp);
+	    otmp = 0;	/* wand is now gone */
 	    ptext = FALSE;
 	}
 
 	if (!ptext) {		/* Early exit for some implements. */
-	    if (otmp->oclass == WAND_CLASS && !can_reach_floor(TRUE))
+	    if (otmp && otmp->oclass == WAND_CLASS && !can_reach_floor(TRUE))
 		cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
 	    return(1);
 	}
