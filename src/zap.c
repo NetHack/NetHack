@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2006/12/16	*/
+/*	SCCS Id: @(#)zap.c	3.5	2007/01/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3787,6 +3787,8 @@ register int dx,dy;
     if (shopdamage)
 	pay_for_damage(abstype == ZT_FIRE ?  "burn away" :
 		       abstype == ZT_COLD ?  "shatter" :
+		       /* "damage" indicates wall rather than door */
+		       abstype == ZT_ACID ?  "damage" :
 		       abstype == ZT_DEATH ? "disintegrate" : "destroy", FALSE);
     bhitpos = save_bhitpos;
 }
@@ -3881,50 +3883,51 @@ boolean *shopdamage;
 short exploding_wand_typ;
 {
 	struct monst *mon;
-	int abstype = abs(type) % 10;
+	struct trap *t;
 	struct rm *lev = &levl[x][y];
-	int rangemod = 0;
+	boolean see_it = cansee(x, y);
+	int rangemod = 0, abstype = abs(type) % 10;
 
-	if(abstype == ZT_FIRE) {
-	    struct trap *t = t_at(x, y);
-
+	switch (abstype) {
+	case ZT_FIRE:
+	    t = t_at(x, y);
 	    if (t && t->ttyp == WEB) {
 		/* a burning web is too flimsy to notice if you can't see it */
-		if (cansee(x,y)) Norep("A web bursts into flames!");
+		if (see_it) Norep("A web bursts into flames!");
 		(void) delfloortrap(t);
-		if (cansee(x,y)) newsym(x,y);
+		if (see_it) newsym(x,y);
 	    }
 	    if(is_ice(x, y)) {
 		melt_ice(x, y, (char *)0);
 	    } else if(is_pool(x,y)) {
 		const char *msgtxt = "You hear hissing gas.";
 		if(lev->typ != POOL) {	/* MOAT or DRAWBRIDGE_UP */
-		    if (cansee(x,y)) msgtxt = "Some water evaporates.";
+		    if (see_it) msgtxt = "Some water evaporates.";
 		} else {
-		    register struct trap *ttmp;
-
 		    rangemod -= 3;
 		    lev->typ = ROOM;
-		    ttmp = maketrap(x, y, PIT);
-		    if (ttmp) ttmp->tseen = 1;
-		    if (cansee(x,y)) msgtxt = "The water evaporates.";
+		    t = maketrap(x, y, PIT);
+		    if (t) t->tseen = 1;
+		    if (see_it) msgtxt = "The water evaporates.";
 		}
 		Norep(msgtxt);
 		if (lev->typ == ROOM) newsym(x,y);
 	    } else if(IS_FOUNTAIN(lev->typ)) {
-		    if (cansee(x,y))
+		    if (see_it)
 			pline("Steam billows from the fountain.");
 		    rangemod -= 1;
 		    dryup(x, y, type > 0);
 	    }
-	}
-	else if(abstype == ZT_COLD && (is_pool(x,y) || is_lava(x,y))) {
+	    break;	/* ZT_FIRE */
+
+	case ZT_COLD:
+	    if (is_pool(x,y) || is_lava(x,y)) {
 		boolean lava = is_lava(x,y);
 		const char *moat = waterbody_name(x, y);
 
 		if (lev->typ == WATER) {
 		    /* For now, don't let WATER freeze. */
-		    if (cansee(x,y))
+		    if (see_it)
 			pline_The("water freezes for a moment.");
 		    else
 			You_hear("a soft crackling.");
@@ -3941,7 +3944,7 @@ short exploding_wand_typ;
 			lev->typ = (lava ? ROOM : ICE);
 		    }
 		    bury_objs(x,y);
-		    if(cansee(x,y)) {
+		    if (see_it) {
 			if(lava)
 			    Norep("The lava cools and solidifies.");
 			else if(strcmp(moat, "moat") == 0)
@@ -3982,16 +3985,48 @@ short exploding_wand_typ;
 			start_melt_ice_timeout(x,y);
 			obj_ice_effects(x,y,TRUE);
 		    }
-		}
-	}
-	else if(abstype == ZT_COLD && is_ice(x,y)) {
+		} /* ?WATER */
+
+	    } else if (is_ice(x, y)) {
 		/* Already ice here, so just firm it up. */
 		/* Now ensure that only ice that is already timed is affected */
 		if (spot_time_left(x,y,MELT_ICE_AWAY)) { 
 		    spot_stop_timers(x, y, MELT_ICE_AWAY); /* stop existing timer */
 		    start_melt_ice_timeout(x,y);	   /* start new timer */
 		}
+	    }
+	    break;	/* ZT_COLD */
+
+	case ZT_ACID:
+	    if (lev->typ == IRONBARS) {
+		if ((lev->wall_info & W_NONDIGGABLE) != 0) {
+		    if (see_it)
+			Norep("The %s corrode somewhat but remain intact.",
+			      defsyms[S_bars].explanation);
+		    /* but nothing actually happens... */
+		} else {
+		    rangemod -= 3;
+		    if (see_it)
+			Norep("The %s melt.", defsyms[S_bars].explanation);
+		    if (*in_rooms(x, y, SHOPBASE)) {
+			/* in case we ever have a shop bounded by bars */
+			lev->typ = ROOM;
+			if (see_it) newsym(x, y);
+			add_damage(x, y, (type >= 0) ? 300L : 0L);
+			if (type >= 0) *shopdamage = TRUE;
+		    } else {
+			lev->typ = DOOR;
+			lev->doormask = D_NODOOR;
+			if (see_it) newsym(x, y);
+		    }
+		}
+	    }
+	    break;	/* ZT_ACID */
+
+	default:
+	    break;
 	}
+
 	if(closed_door(x, y)) {
 		int new_doormask = -1;
 		const char *see_txt = 0, *sense_txt = 0, *hear_txt = 0;
@@ -4031,7 +4066,7 @@ short exploding_wand_typ;
 			    break;
 			}
 		    }
-		    if(cansee(x,y)) {
+		    if (see_it) {
 			pline_The("door absorbs %s %s!",
 			      (type < 0) ? "the" : "your",
 			      abs(type) < ZT_SPELL(0) ? "bolt" :
@@ -4050,7 +4085,7 @@ short exploding_wand_typ;
 		    }
 		    lev->doormask = new_doormask;
 		    unblock_point(x, y);	/* vision */
-		    if (cansee(x, y)) {
+		    if (see_it) {
 			pline(see_txt);
 			newsym(x, y);
 		    } else if (sense_txt) {
