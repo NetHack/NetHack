@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.5	2006/12/14	*/
+/*	SCCS Id: @(#)mthrowu.c	3.5	2007/01/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -736,7 +736,7 @@ int boulderhandling;	/* 0=block, 1=ignore, 2=conditionally block */
 		if (IS_ROCK(levl[bx][by].typ) || closed_door(bx, by))
 		    return FALSE;
 		if (sobj_at(BOULDER, bx, by)) ++boulderspots;
-	    } while (bx != ax && by != ay);
+	    } while (bx != ax || by != ay);
 	    /* reached target position without encountering obstacle */
 	    if (boulderhandling == 1 || rn2(2 + boulderspots) < 2) return TRUE;
 	}
