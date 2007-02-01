@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmstty.c	3.5	2007/01/08	*/
+/*	SCCS Id: @(#)vmstty.c	3.5	2007/01/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* tty.c - (VMS) version */
@@ -375,8 +375,9 @@ void
 settty(s)
 const char *s;
 {
-	if (!bombing) end_screen();
-	if (s) raw_print(s);
+    if (!bombing) end_screen();
+    if (s) raw_print(s);
+    if (settty_needed) {
 	disable_broadcast_trapping();
 #if 0		/* let SMG's exit handler do the cleanup (as per doc) */
 /* #ifndef USE_QIO_INPUT */
@@ -392,6 +393,7 @@ const char *s;
 	setctty();
 
 	settty_needed = FALSE;
+    }
 }
 
 /* same as settty, with no clearing of the screen */

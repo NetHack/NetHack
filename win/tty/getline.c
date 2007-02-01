@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)getline.c	3.5	2002/10/06	*/
+/*	SCCS Id: @(#)getline.c	3.5	2007/01/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -226,6 +226,9 @@ register const char *s;	/* chars allowed besides return */
     register int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
 
     morc = 0;
+#ifdef HANGUPHANDLING
+    if (program_state.done_hup) return;
+#endif
 
     while((c = tty_nhgetch()) != '\n') {
 	if(iflags.cbreak) {

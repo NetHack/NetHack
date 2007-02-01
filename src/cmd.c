@@ -2825,13 +2825,18 @@ void
 end_of_input()
 {
 # ifdef NOSAVEONHANGUP
-	program_state.something_worth_saving = 0;
+#  ifdef INSURANCE
+	if (flags.ins_chkpt && program_state.something_worth_saving)
+	    program_statue.preserve_locks = 1;	/* keep files for recovery */
+#  endif
+	program_state.something_worth_saving = 0;	/* don't save */
 # endif
+
 # ifndef SAFERHANGUP
 	if (!program_state.done_hup++)
 # endif
 	    if (program_state.something_worth_saving) (void) dosave0();
-	exit_nhwindows((char *)0);
+	if (iflags.window_inited) exit_nhwindows((char *)0);
 	clearlocks();
 	terminate(EXIT_SUCCESS);
 	/*NOTREACHED*/	/* not necessarily true for vms... */
