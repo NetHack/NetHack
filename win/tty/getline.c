@@ -226,14 +226,16 @@ register const char *s;	/* chars allowed besides return */
     register int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
 
     morc = 0;
+    while (
 #ifdef HANGUPHANDLING
-    if (program_state.done_hup) return;
+	   !program_state.done_hup &&
 #endif
+	   (c = tty_nhgetch()) != EOF) {
+	if (c == '\n') break;
 
-    while((c = tty_nhgetch()) != '\n') {
 	if(iflags.cbreak) {
-	    if (c == EOF || c == '\033') {
-		ttyDisplay->dismiss_more = 1;
+	    if (c == '\033') {
+		if (ttyDisplay) ttyDisplay->dismiss_more = 1;
 		morc = '\033';
 		break;
 	    }
@@ -244,7 +246,6 @@ register const char *s;	/* chars allowed besides return */
 	    tty_nhbell();
 	}
     }
-
 }
 
 /*
