@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)windows.c	3.5	2007/01/17	*/
+/*	SCCS Id: @(#)windows.c	3.5	2007/02/01	*/
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -304,12 +304,33 @@ static struct window_procs hup_procs = {
 # endif /* STATUS_VIA_WINDOWPORT */
 };
 
+static void FDECL((*previnterface_exit_nhwindows), (const char *)) = 0;
+
+/* hangup has occurred; switch to no-op user interface */
 void
 nhwindows_hangup()
 {
-    if (iflags.window_inited) exit_nhwindows((char *)0);
+    /* don't call exit_nhwindows() directly here; if a hangup occurs
+       while interface code is executing, exit_nhwindows could knock
+       the interface's active data structures out from under itself */
+    if (iflags.window_inited)
+	previnterface_exit_nhwindows = exit_nhwindows;
     windowprocs = hup_procs;
- /* hup_init_nhwindows((int *)0, (char **)0); */
+}
+
+static void
+hup_exit_nhwindows(lastgasp)
+const char *lastgasp;
+{
+    /* core has called exit_nhwindows(); call the previous interface's
+       shutdown routine now; xxx_exit_nhwindows() needs to call other
+       xxx_ routines directly rather than through windowprocs pointers */
+    if (previnterface_exit_nhwindows) {
+	lastgasp = 0;	/* don't want exit routine to attempt extra output */
+	(*previnterface_exit_nhwindows)(lastgasp);
+	previnterface_exit_nhwindows = 0;
+    }
+    iflags.window_inited = 0;
 }
 
 static int
@@ -352,14 +373,6 @@ int *argc_p;
 char **argv;
 {
     iflags.window_inited = 1;
-}
-
-/*ARGUSED*/
-static void
-hup_exit_nhwindows(dummy)
-const char *dummy;
-{
-    iflags.window_inited = 0;
 }
 
 /*ARGSUSED*/
