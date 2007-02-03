@@ -148,6 +148,7 @@ STATIC_DCL void FDECL(mon_invent_chain, (winid, const char *, struct monst *, lo
 STATIC_DCL void FDECL(mon_chain, (winid, const char *, struct monst *, long *, long *));
 STATIC_DCL void FDECL(contained, (winid, const char *, long *, long *));
 STATIC_PTR int NDECL(wiz_show_stats);
+STATIC_DCL boolean FDECL(accept_menu_prefix, (int NDECL((*))));
 #  ifdef PORT_DEBUG
 STATIC_DCL int NDECL(wiz_port_debug);
 #  endif
@@ -293,14 +294,20 @@ STATIC_PTR int
 doextcmd(VOID_ARGS)	/* here after # - now read a full-word command */
 {
 	int idx, retval;
+	int NDECL((*func));
 
 	/* keep repeating until we don't run help or quit */
 	do {
 	    idx = get_ext_cmd();
 	    if (idx < 0) return 0;	/* quit */
 
-	    retval = (*extcmdlist[idx].ef_funct)();
-	} while (extcmdlist[idx].ef_funct == doextlist);
+	    func = extcmdlist[idx].ef_funct;
+	    if (iflags.menu_requested && !accept_menu_prefix(func)) {
+		pline("'m' prefix has no effect for this command.");
+		iflags.menu_requested = FALSE;
+	    }
+	    retval = (*func)();
+	} while (func == doextlist);
 
 	return retval;
 }
@@ -2180,6 +2187,16 @@ boolean initial;
     Cmd.move_SW = Cmd.dirchars[7];
 }
 
+STATIC_OVL boolean
+accept_menu_prefix(cmd_func)
+int NDECL((*cmd_func));
+{
+    if (cmd_func == dopickup ||
+	    cmd_func == doextcmd || cmd_func == doextlist)
+	return TRUE;
+    return FALSE;
+}
+
 void
 rhack(cmd)
 register char *cmd;
@@ -2310,10 +2327,16 @@ register char *cmd;
 	}
 
 	/* some special prefix handling */
-	/* overload 'm' prefix for ',' to mean "request a menu" */
-	if (prefix_seen && cmd[1] == ',') {
+	/* overload 'm' prefix to mean "request a menu" */
+	if (prefix_seen && cmd[0] == 'm') {
+	    /* (for func_tab cast, see below) */
+	    const struct func_tab *ft = Cmd.commands[cmd[1] & 0xff];
+	    int NDECL((*func)) = ft ? ((struct func_tab *)ft)->f_funct : 0;
+
+	    if (func && accept_menu_prefix(func)) {
 		iflags.menu_requested = TRUE;
 		++cmd;
+	    }
 	}
 
 	if (do_walk) {

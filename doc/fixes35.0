@@ -185,6 +185,7 @@ shooting range for crossbow isn't affected by strength; multi-shot volley is
 right-handed boomerang throw travels counterclockwise
 monsters can use ranged attacks over/around boulders, same as hero
 can't drop part of a stack of N weapons welded to hero's hand
+pickup still accepts m as command prefix, but now rejects F,g,G,M,numpad 5
 
 
 Platform- and/or Interface-Specific Fixes
