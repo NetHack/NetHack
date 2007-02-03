@@ -313,8 +313,9 @@ nhwindows_hangup()
     /* don't call exit_nhwindows() directly here; if a hangup occurs
        while interface code is executing, exit_nhwindows could knock
        the interface's active data structures out from under itself */
-    if (iflags.window_inited)
-	previnterface_exit_nhwindows = exit_nhwindows;
+    if (iflags.window_inited &&
+	    windowprocs.win_exit_nhwindows != hup_exit_nhwindows)
+	previnterface_exit_nhwindows = windowprocs.win_exit_nhwindows;
     windowprocs = hup_procs;
 }
 
