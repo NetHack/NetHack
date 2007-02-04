@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.5	2007/01/11	*/
+/*	SCCS Id: @(#)restore.c	3.5	2007/02/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -562,6 +562,8 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	    u.uz.dlevel = 1;
 	    return(FALSE);
 	}
+	/* in case hangup save occurred in midst of level change */
+	assign_level(&u.uz0, &u.uz);
 
 	/* this stuff comes after potential aborted restore attempts */
 	restore_killers(fd);
