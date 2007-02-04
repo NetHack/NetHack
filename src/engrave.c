@@ -774,8 +774,14 @@ doengrave()
 		} else { /* end if zappable */
 		    /* failing to wrest one last charge takes time */
 		    ptext = FALSE;	/* use "early exit" below, return 1 */
-		    /* cancelled wand turns to dust unless hero can't write */
-		    if (otmp->spe < 0 && can_reach_floor(TRUE)) zapwand = TRUE;
+		    /* give feedback here if we won't be getting the
+		      "can't reach floor" message below */
+		    if (can_reach_floor(TRUE)) {
+			/* cancelled wand turns to dust */
+			if (otmp->spe < 0) zapwand = TRUE;
+			/* empty wand just doesn't write */
+			else pline_The("wand is too worn out to engrave.");
+		    }
 		}
 		break;
 
