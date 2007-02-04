@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2006/11/29	*/
+/*	SCCS Id: @(#)apply.c	3.5	2007/02/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -962,10 +962,6 @@ register struct obj *obj;
 {
 	const char *s = (obj->spe != 1) ? "candles" : "candle";
 
-	if(Underwater) {
-		You("cannot make fire under water.");
-		return;
-	}
 	if(obj->lamplit) {
 		You("snuff the %s.", s);
 		end_burn(obj, TRUE);
@@ -973,6 +969,10 @@ register struct obj *obj;
 	}
 	if(obj->spe <= 0) {
 		pline("This %s has no %s.", xname(obj), s);
+		return;
+	}
+	if (Underwater) {
+		You("cannot make fire under water.");
 		return;
 	}
 	if(u.uswallow || obj->cursed) {
@@ -1018,10 +1018,6 @@ struct obj **optr;
 
 	if(u.uswallow) {
 		You(no_elbow_room);
-		return;
-	}
-	if(Underwater) {
-		pline("Sorry, fire and water don't mix.");
 		return;
 	}
 
@@ -1168,10 +1164,6 @@ struct obj *obj;
 {
 	char buf[BUFSZ];
 
-	if(Underwater) {
-		pline("This is not a diving lamp.");
-		return;
-	}
 	if(obj->lamplit) {
 		if(obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
 				obj->otyp == BRASS_LANTERN)
@@ -1179,6 +1171,11 @@ struct obj *obj;
 		else
 		    You("snuff out %s.", yname(obj));
 		end_burn(obj, TRUE);
+		return;
+	}
+	if (Underwater) {
+		pline(!Is_candle(obj) ? "This is not a diving lamp" :
+		      "Sorry, fire and water don't mix.");
 		return;
 	}
 	/* magic lamps with an spe == 0 (wished for) cannot be lit */
