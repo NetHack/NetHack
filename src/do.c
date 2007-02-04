@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2007/01/02	*/
+/*	SCCS Id: @(#)do.c	3.5	2007/02/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1362,42 +1362,46 @@ boolean at_stairs, falling, portal;
 	    if (mesg) pline(mesg);
 	}
 
-#ifdef REINCARNATION
-	if (new && Is_rogue_level(&u.uz))
-	    You("enter what seems to be an older, more primitive world.");
-#endif
-	/* Final confrontation */
-	if (In_endgame(&u.uz) && newdungeon && u.uhave.amulet)
-		resurrect();
-	if (newdungeon && In_V_tower(&u.uz) && In_hell(&u.uz0))
+	/* special location arrival messages/events */
+	if (In_endgame(&u.uz)) {
+	    if (new && on_level(&u.uz, &astral_level))
+		final_level();	/* guardian angel,&c */
+	    else if (newdungeon && u.uhave.amulet)
+		resurrect();	/* force confrontation with Wizard */
+	} else if (In_quest(&u.uz)) {
+	    onquest();		/* might be reaching locate|goal level */
+	} else if (In_V_tower(&u.uz)) {
+	    if (newdungeon && In_hell(&u.uz0))
 		pline_The("heat and smoke are gone.");
-
-	/* the message from your quest leader */
-	if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest") &&
-		!(u.uevent.qexpelled || u.uevent.qcompleted || quest_status.leader_is_dead)) {
-
-		if (u.uevent.qcalled) {
-			com_pager(Role_if(PM_ROGUE) ? 4 : 3);
-		} else {
-			com_pager(2);
-			u.uevent.qcalled = TRUE;
-		}
-	}
-
-	/* once Croesus is dead, his alarm doesn't work any more */
-	if (Is_knox(&u.uz) && (new || !mvitals[PM_CROESUS].died)) {
-		You("penetrated a high security area!");
+	} else if (Is_knox(&u.uz)) {
+	    /* alarm stops working once Croesus has died */
+	    if (new || !mvitals[PM_CROESUS].died) {
+		You("have penetrated a high security area!");
 		pline("An alarm sounds!");
-		for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-		    if (!DEADMONSTER(mtmp) && mtmp->msleeping) mtmp->msleeping = 0;
+		for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+		    if (DEADMONSTER(mtmp)) continue;
+		    mtmp->msleeping = 0;
+		}
+	    }
+	} else {
+#ifdef REINCARNATION
+	    if (new && Is_rogue_level(&u.uz))
+		You("enter what seems to be an older, more primitive world.");
+#endif
+	    /* main dungeon message from your quest leader */
+	    if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest") &&
+		    !(u.uevent.qcompleted || u.uevent.qexpelled ||
+		      quest_status.leader_is_dead)) {
+		if (!u.uevent.qcalled) {
+		    u.uevent.qcalled = 1;
+		    com_pager(2);   /* main "leader needs help" message */
+		} else {	    /* reminder message */
+		    com_pager(Role_if(PM_ROGUE) ? 4 : 3);
+		}
+	    }
 	}
 
-	if (on_level(&u.uz, &astral_level))
-	    final_level();
-	else
-	    onquest();
 	assign_level(&u.uz0, &u.uz); /* reset u.uz0 */
-
 #ifdef INSURANCE
 	save_currentstate();
 #endif
