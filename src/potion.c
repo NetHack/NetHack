@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2006/11/29	*/
+/*	SCCS Id: @(#)potion.c	3.5	2007/02/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -988,8 +988,11 @@ healup(nhp, nxtra, curesick, cureblind)
 			if(u.uhp > u.uhpmax) u.uhp = (u.uhpmax += nxtra);
 		}
 	}
-	if(cureblind)	make_blinded(0L,TRUE);
-	if(curesick)	make_sick(0L, (char *) 0, TRUE, SICK_ALL);
+	if (cureblind) make_blinded(0L, TRUE);
+	if (curesick) {
+	    make_vomiting(0L, TRUE);
+	    make_sick(0L, (char *)0, TRUE, SICK_ALL);
+	}
 	context.botl = 1;
 	return;
 }

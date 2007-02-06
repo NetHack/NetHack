@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2007/02/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,27 +64,35 @@ static NEARDATA const char * const vomiting_texts[] = {
 STATIC_OVL void
 vomiting_dialogue()
 {
-	register long i = (Vomiting & TIMEOUT) / 3L;
+	const char *txt = 0;
+	long v = (Vomiting & TIMEOUT);
 
-	if ((((Vomiting & TIMEOUT) % 3L) == 2) && (i >= 0)
-	    && (i < SIZE(vomiting_texts)))
-		You(vomiting_texts[SIZE(vomiting_texts) - i - 1]);
-
-	switch ((int) i) {
-	case 0:
-		stop_occupation();
-		morehungry(20);
-		vomit();
-		break;
-	case 2:
+	/* note: nhtimeout() hasn't decremented timed properties for the
+	   current turn yet, so we use Vomiting-1 here */
+	switch ((int)(v - 1L)) {
+	case 14: txt = vomiting_texts[0]; break;
+	case 11: txt = vomiting_texts[1]; break;
+	case 6:
 		make_stunned(HStun + d(2,4), FALSE);
 		if (!Popeye(VOMITING)) stop_occupation();
-		/* fall through */
-	case 3:
+		/*FALLTHRU*/
+	case 9:
 		make_confused(HConfusion + d(2,4), FALSE);
 		if (multi > 0) nomul(0);
 		break;
+	case 8: txt = vomiting_texts[2]; break;
+	case 5: txt = vomiting_texts[3]; break;
+	case 2: txt = vomiting_texts[4];
+		if (cantvomit(youmonst.data)) txt = "gag uncontrolably.";
+		break;
+	case 0:
+		stop_occupation();
+		if (!cantvomit(youmonst.data)) morehungry(20);
+		vomit();
+		break;
+	default: break; 
 	}
+	if (txt) You("%s", txt);
 	exercise(A_CON, FALSE);
 }
 

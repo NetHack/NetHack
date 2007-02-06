@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2007/01/24	*/
+/*	SCCS Id: @(#)eat.c	3.5	2007/02/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2853,7 +2853,12 @@ floorfood(verb,corpsecheck)	/* get food from floor or pack */
 void
 vomit()		/* A good idea from David Neves */
 {
-	make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
+	if (cantvomit(youmonst.data))
+	    /* doesn't cure food poisoning; message assumes that we aren't
+	       dealing with some esoteric body_part() */
+	    Your("jaw gapes convulsively.");
+	else
+	    make_sick(0L, (char *)0, TRUE, SICK_VOMITABLE);
 	nomul(-2);
 	nomovemsg = You_can_move_again;
 }

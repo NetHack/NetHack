@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.5	2006/11/24	*/
+/*	SCCS Id: @(#)mondata.c	3.5	2007/02/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -333,6 +333,19 @@ sticks(ptr)	/* creature sticks other creatures it hits */
 {
 	return((boolean)(dmgtype(ptr,AD_STCK) || dmgtype(ptr,AD_WRAP) ||
 		attacktype(ptr,AT_HUGS)));
+}
+
+boolean
+cantvomit(ptr)
+struct permonst *ptr;
+{
+    /* rats and mice are incapable of vomitting;
+       which other creatures have the same limitation? */
+    if (ptr->mlet == S_RODENT &&
+	    ptr != &mons[PM_ROCK_MOLE] &&
+	    ptr != &mons[PM_WOODCHUCK])
+	return TRUE;
+    return FALSE;
 }
 
 /* number of horns this type of monster has on its head */

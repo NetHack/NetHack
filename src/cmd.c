@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2007/01/12	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2007/02/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1105,6 +1105,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	if (Stoned) you_are("turning to stone","");
 	if (Slimed) you_are("turning into slime","");
 	if (Strangled) you_are((u.uburied) ? "buried" : "being strangled","");
+	if (Vomiting) you_are("nauseated","");
 	if (Glib) {
 		Sprintf(buf, "slippery %s", makeplural(body_part(FINGER)));
 		you_have(buf,"");
