@@ -1635,6 +1635,8 @@ STATIC_OVL void
 start_eating(otmp)		/* called as you start to eat */
 	register struct obj *otmp;
 {
+	const char *old_nomovemsg, *save_nomovemsg;
+
 #ifdef DEBUG
 	debugpline("start_eating: %lx (victual = %lx)", otmp, context.victual.piece);
 	debugpline("reqtime = %d", context.victual.reqtime);
@@ -1653,7 +1655,20 @@ start_eating(otmp)		/* called as you start to eat */
 	    }
 	}
 
-	if (bite()) return;
+	old_nomovemsg = nomovemsg;
+	if (bite()) {
+	    /* survived choking, finish off food that's nearly done;
+	       need this to handle cockatrice eggs, fortune cookies, etc */
+	    if (++context.victual.usedtime >= context.victual.reqtime) {
+		/* don't want done_eating() to issue nomovemsg if it
+		   is due to vomit() called by bite() */
+		save_nomovemsg = nomovemsg;
+		if (!old_nomovemsg) nomovemsg = 0;
+		done_eating(FALSE);
+		if (!old_nomovemsg) nomovemsg = save_nomovemsg;
+	    }
+	    return;
+	}
 
 	if (++context.victual.usedtime >= context.victual.reqtime) {
 	    /* print "finish eating" message if they just resumed -dlc */
