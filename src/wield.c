@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.5	2006/07/14	*/
+/*	SCCS Id: @(#)wield.c	3.5	2007/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -622,7 +622,7 @@ boolean for_dip;
 {
 	int erosion;
 	struct monst *victim;
-	boolean vismon, visobj, chill;
+	boolean vismon, visobj, chill, erodible;
 	boolean ret = FALSE;
 	boolean already_affected = FALSE;
 
@@ -638,6 +638,7 @@ boolean for_dip;
 	    if (already_affected) ret = TRUE;
 	}
 	erosion = acid_dmg ? target->oeroded2 : target->oeroded;
+	erodible = acid_dmg ? is_corrodeable(target) : is_rustprone(target);
 
 	if (target->greased) {
 	    grease_protect(target,(char *)0,victim);
@@ -677,20 +678,24 @@ boolean for_dip;
 			  Yobjnam2(target, chill ? "freeze" : "boil"));
 	    }
 	    /* no damage to object */
-	} else if (target->oerodeproof ||
-		(acid_dmg ? !is_corrodeable(target) : !is_rustprone(target))) {
-	    if (flags.verbose || !(target->oerodeproof && target->rknown)) {
-		if (((victim == &youmonst) || vismon) && !for_dip)
+	} else if (target->oerodeproof || !erodible) {
+	    /* no message if dipping or not carried */
+	    if (for_dip) {
+		/* assumes that for_dip implies player action */
+		if (!Blind) target->rknown = 0;
+	    } else if (victim == &youmonst || vismon) {
+		if (flags.verbose || (erodible && !target->rknown))
 		    pline("%s not %s.", Yobjnam2(target, "are"),
 			  already_affected ? "harmed" : "affected");
-		/* no message if not carried or dipping */
+		if (erodible) target->rknown = 1;
 	    }
-	    if (target->oerodeproof) target->rknown = !for_dip;
 	} else if (erosion < MAX_ERODE) {
-	    if ((victim == &youmonst) || vismon || visobj)
+	    if (victim == &youmonst || vismon || visobj) {
 		pline("%s%s!", Yobjnam2(target, acid_dmg ? "corrode" : "rust"),
 		    erosion+1 == MAX_ERODE ? " completely" :
 		    erosion ? " further" : "");
+		target->rknown = 1;	/* it's obviously not erode-proof */
+	    }
 	    if (acid_dmg)
 		target->oeroded2++;
 	    else
