@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wizard.c	3.5	2006/09/06	*/
+/*	SCCS Id: @(#)wizard.c	3.5	2007/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -507,7 +507,7 @@ resurrect()
 	}
 
 	if (mtmp) {
-		mtmp->msleeping = mtmp->mtame = mtmp->mpeaceful = 0;
+		mtmp->mtame = mtmp->mpeaceful = 0;	/* paranoia */
 		set_malign(mtmp);
 		if (!Deaf) {
 		    pline("A voice booms out...");

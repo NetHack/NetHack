@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.5	2006/08/07	*/
+/*	SCCS Id: @(#)mhitm.c	3.5	2007/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -419,7 +419,7 @@ mattackm(magr, mdef)
 		break;
 
 	    case AT_GAZE:
-		strike = 0;	/* will not wake up a sleeper */
+		strike = 0;
 		res[i] = gazemm(magr, mdef, mattk);
 		break;
 
@@ -462,13 +462,6 @@ mattackm(magr, mdef)
 	    res[i] = passivemm(magr, mdef, strike, res[i] & MM_DEF_DIED);
 
 	if (res[i] & MM_DEF_DIED) return res[i];
-
-	/*
-	 *  Wake up the defender.  NOTE:  this must follow the check
-	 *  to see if the defender died.  We don't want to modify
-	 *  unallocated monsters!
-	 */
-	if (strike) mdef->msleeping = 0;
 
 	if (res[i] & MM_AGR_DIED)  return res[i];
 	/* return if aggressor can no longer attack */

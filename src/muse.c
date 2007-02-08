@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.5	2006/04/17	*/
+/*	SCCS Id: @(#)muse.c	3.5	2007/02/07	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1156,8 +1156,6 @@ register struct obj *otmp;
 				*in_rooms(mtmp->mx, mtmp->my, TEMPLE)) {
 			    if (cansee(mtmp->mx, mtmp->my))
 				pline("%s resists the magic!", Monnam(mtmp));
-			    mtmp->msleeping = 0;
-			    if(mtmp->m_ap_type) seemimic(mtmp);
 			} else if (!tele_restrict(mtmp))
 			    (void) rloc(mtmp, FALSE);
 		}
