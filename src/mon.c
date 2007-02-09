@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2007/01/12	*/
+/*	SCCS Id: @(#)mon.c	3.5	2007/02/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2395,7 +2395,7 @@ register struct monst *mtmp;
 {
 	struct trap *t;
 
-	if((mtmp->cham >= LOW_PM) || mtmp->mcan || mtmp->m_ap_type ||
+	if (mtmp->mcan || mtmp->m_ap_type ||
 	   cansee(mtmp->mx, mtmp->my) || rn2(3) || (mtmp == u.ustuck) ||
 	   /* can't hide while trapped except in pits */
 	   (mtmp->mtrapped && (t = t_at(mtmp->mx, mtmp->my)) != 0 &&
@@ -2646,6 +2646,8 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 		wormgone(mtmp);
 		place_monster(mtmp, mtmp->mx, mtmp->my);
 	}
+	if (mtmp->m_ap_type && mdat->mlet != S_MIMIC)
+	    seemimic(mtmp);	/* revert to normal monster */
 
 	/* (this code used to try to adjust the monster's health based on
 	   a normal one of its type but there are too many special cases
