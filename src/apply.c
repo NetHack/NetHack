@@ -1522,9 +1522,11 @@ register struct obj *obj;
 	    instapetrify(kbuf);
 	}
 	if (is_rider(&mons[corpse->corpsenm])) {
-		(void) revive_corpse(corpse);
+	    if (revive_corpse(corpse))
 		verbalize("Yes...  But War does not preserve its enemies...");
-		return;
+	    else
+		pline_The("corpse evades your grasp.");
+	    return;
 	}
 	if (mons[corpse->corpsenm].cnutrit == 0) {
 		pline("That's too insubstantial to tin.");
