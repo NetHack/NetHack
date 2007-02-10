@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkmap.c	3.5	1996/05/23	*/
+/*	SCCS Id: @(#)mkmap.c	3.5	2007/02/09	*/
 /* Copyright (c) J. C. Collet, M. Stephenson and D. Cohrs, 1992   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,7 +16,7 @@ STATIC_DCL void FDECL(pass_two,(SCHAR_P,SCHAR_P));
 STATIC_DCL void FDECL(pass_three,(SCHAR_P,SCHAR_P));
 STATIC_DCL void NDECL(wallify_map);
 STATIC_DCL void FDECL(join_map,(SCHAR_P,SCHAR_P));
-STATIC_DCL void FDECL(finish_map,(SCHAR_P,SCHAR_P,XCHAR_P,XCHAR_P));
+STATIC_DCL void FDECL(finish_map,(SCHAR_P,SCHAR_P,BOOLEAN,BOOLEAN_P));
 STATIC_DCL void FDECL(remove_room,(unsigned));
 void FDECL(mkmap, (lev_init *));
 
