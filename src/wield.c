@@ -855,4 +855,14 @@ register struct obj *obj;
 	obj->owornmask = savewornmask;
 }
 
+/* test whether monster's wielded weapon is stuck to hand/paw/whatever */
+boolean
+mwelded(obj)
+struct obj *obj;
+{
+    /* caller is responsible for making sure this is a monster's item */
+    if (obj && (obj->owornmask & W_WEP) && will_weld(obj)) return TRUE;
+    return FALSE;
+}
+
 /*wield.c*/

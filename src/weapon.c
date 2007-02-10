@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.5	2006/12/14	*/
+/*	SCCS Id: @(#)weapon.c	3.5	2007/02/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -458,7 +458,7 @@ register struct monst *mtmp;
 		case P_CROSSBOW:
 		  propellor = (oselect(mtmp, CROSSBOW));
 		}
-		if ((otmp = MON_WEP(mtmp)) && otmp->cursed && otmp != propellor
+		if ((otmp = MON_WEP(mtmp)) && mwelded(otmp) && otmp != propellor
 				&& mtmp->weapon_check == NO_WEAPON_WANTED)
 			propellor = 0;
 	    }
@@ -474,7 +474,7 @@ register struct monst *mtmp;
 		if (rwep[i] != LOADSTONE) {
 			/* Don't throw a cursed weapon-in-hand or an artifact */
 			if ((otmp = oselect(mtmp, rwep[i])) && !otmp->oartifact
-			    && (!otmp->cursed || otmp != MON_WEP(mtmp)))
+			    && !(otmp == MON_WEP(mtmp) && mwelded(otmp)))
 				return(otmp);
 		} else for(otmp=mtmp->minvent; otmp; otmp=otmp->nobj) {
 		    if (otmp->otyp == LOADSTONE && !otmp->cursed)
@@ -592,7 +592,7 @@ boolean polyspot;
 	 * polymorphed into little monster.  But it's not quite clear how to
 	 * handle this anyway....
 	 */
-	if (!(mw_tmp->cursed && mon->weapon_check == NO_WEAPON_WANTED))
+	if (!(mwelded(mw_tmp) && mon->weapon_check == NO_WEAPON_WANTED))
 	    mon->weapon_check = NEED_WEAPON;
 	return;
 }
@@ -653,7 +653,7 @@ register struct monst *mon;
 		 * can know it's cursed and needn't even bother trying.
 		 * Still....
 		 */
-		if (mw_tmp && mw_tmp->cursed && mw_tmp->otyp != CORPSE) {
+		if (mw_tmp && mwelded(mw_tmp)) {
 		    if (canseemon(mon)) {
 			char welded_buf[BUFSZ];
 			const char *mon_hand = mbodypart(mon, HAND);
@@ -684,7 +684,7 @@ register struct monst *mon;
 		mon->weapon_check = NEED_WEAPON;
 		if (canseemon(mon)) {
 		    pline("%s wields %s!", Monnam(mon), doname(obj));
-		    if (obj->cursed && obj->otyp != CORPSE) {
+		    if (mwelded(mw_tmp)) {
 			pline("%s %s to %s %s!",
 			    Tobjnam(obj, "weld"),
 			    is_plural(obj) ? "themselves" : "itself",

@@ -2210,19 +2210,21 @@ mcould_eat_tin(mon)
 struct monst *mon;
 {
 	struct obj *obj, *mwep;
+	boolean welded_wep;
 
 	/* monkeys who manage to steal tins can't open and eat them
 	   even if they happen to also have the appropriate tool */
 	if (is_animal(mon->data)) return FALSE;
 
 	mwep = MON_WEP(mon);
+	welded_wep = mwep && mwelded(mwep);
 	/* this is different from the player; tin opener or dagger doesn't
 	   have to be wielded, and knife can be used instead of dagger
 	   (even so, non-nymphs don't pick up tins, so only nymphs might
 	   end up being able to benefit from them) */
 	for (obj = mon->minvent; obj; obj = obj->nobj) {
 	    /* if stuck with a cursed weapon, don't check rest of inventory */
-	    if (mwep && mwep->cursed && obj != mwep) continue;
+	    if (welded_wep && obj != mwep) continue;
 
 	    if (obj->otyp == TIN_OPENER ||
 		(obj->oclass == WEAPON_CLASS &&
