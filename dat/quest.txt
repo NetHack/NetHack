@@ -2382,7 +2382,7 @@ to figure out what I need from a samurai?"
 "You are no longer my samurai, %p.
 
 "Hara-kiri is denied.  You are ordered to shave your head and then to
-become a monk.  Your fief and family are forfeit.  Wakarimasu?"
+become a monk.  Your fief and family are forfeit.  Wakarimasu ka?"
 %E
 %Cc Sam 00019
 "%p-san, you have learned well and honored your family.
@@ -2413,7 +2413,7 @@ request that I commit seppuku.
 emperor's property.  Be quick!  The emperor will be here for the
 cha-no-you in 5 sticks.
 
-"Wakarimasu?"
+"Wakarimasu ka?"
 %E
 %Cp Sam 00025
 "To defeat %n you must overcome the seven emotions:
