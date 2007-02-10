@@ -539,12 +539,33 @@ xchar x, y;
 	 * player, so range == 2 means the object may move up to one square
 	 * from its current position
 	 */
-	if(range < 2 || (isgold && kickobj->quan > 300L)) {
+	if(range < 2) {
 	    if(!Is_box(kickobj)) pline("Thump!");
 	    return(!rn2(3) || martial());
 	}
 
-	if (kickobj->quan > 1L && !isgold) kickobj = splitobj(kickobj, 1L);
+	if (kickobj->quan > 1L) {
+	    if (!isgold) {
+		kickobj = splitobj(kickobj, 1L);
+	    } else {
+		if (rn2(20)) {
+	    		const char *flyingcoinmsg[] = {
+		    		"scatter the coins",
+		    		"knock coins all over the place",
+	    			"send coins flying in all directions",
+			};
+			pline("Thwwpingg!");
+			You("%s!", flyingcoinmsg[rn2(SIZE(flyingcoinmsg))]);
+		    	(void) scatter(x, y, rn2(3)+1, VIS_EFFECTS|MAY_HIT, kickobj);
+			newsym(x, y);
+			return 1;
+	        }
+		if (kickobj->quan > 300L) {
+			pline("Thump!");
+	    		return(!rn2(3) || martial());
+	    	}
+	    }
+	}
 
 	if (slide && !Blind)
 	    pline("Whee!  %s %s across the %s.", Doname2(kickobj),
