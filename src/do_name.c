@@ -931,7 +931,7 @@ static const char * const bogusmons[] = {
 	"Ent",					/* Lord of the Rings */
 	"tangle tree", "nickelpede", "wiggle",	/* Xanth */
 	"white rabbit", "snark",		/* Lewis Carroll */
-	"pushmi-pullyu",			/* Dr. Doolittle */
+	"pushmi-pullyu",			/* Dr. Dolittle */
 	"smurf",				/* The Smurfs */
 	"tribble", "Klingon", "Borg",		/* Star Trek */
 	"Ewok",					/* Star Wars */
