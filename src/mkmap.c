@@ -16,7 +16,7 @@ STATIC_DCL void FDECL(pass_two,(SCHAR_P,SCHAR_P));
 STATIC_DCL void FDECL(pass_three,(SCHAR_P,SCHAR_P));
 STATIC_DCL void NDECL(wallify_map);
 STATIC_DCL void FDECL(join_map,(SCHAR_P,SCHAR_P));
-STATIC_DCL void FDECL(finish_map,(SCHAR_P,SCHAR_P,BOOLEAN,BOOLEAN_P));
+STATIC_DCL void FDECL(finish_map,(SCHAR_P,SCHAR_P,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void FDECL(remove_room,(unsigned));
 void FDECL(mkmap, (lev_init *));
 
