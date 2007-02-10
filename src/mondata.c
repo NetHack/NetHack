@@ -107,7 +107,7 @@ struct monst *mon;
 	o = is_you ? invent : mon->minvent;
 	slotmask = W_ARMOR | W_RING | W_AMUL | W_TOOL;
 	if (!is_you ||	/* assumes monsters don't wield non-weapons */
-		uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+	    (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
 	    slotmask |= W_WEP;
 	if (is_you && u.twoweap) slotmask |= W_SWAPWEP;
 	for ( ; o; o = o->nobj)
@@ -144,7 +144,7 @@ struct monst *mon;
 	o = is_you ? invent : mon->minvent;
 	slotmask = W_ARMOR | W_RING | W_AMUL | W_TOOL;
 	if (!is_you ||	/* assumes monsters don't wield non-weapons */
-		uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+	    (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
 	    slotmask |= W_WEP;
 	if (is_you && u.twoweap) slotmask |= W_SWAPWEP;
 	for ( ; o; o = o->nobj)

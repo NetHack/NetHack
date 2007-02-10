@@ -591,7 +591,9 @@ boolean init;
 	static boolean doneinit = FALSE;
 	register struct WinDesc *cw = wins[WIN_MESSAGE];
 	char *retstr = (char *)0;
+#ifdef UNICODE_WIDEWINPORT
 	static char buf[BUFSZ];
+#endif
 
 	if (!cw) return (char *)0;	/* bail */
 	/*

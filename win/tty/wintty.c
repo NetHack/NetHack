@@ -197,7 +197,9 @@ STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
 STATIC_DCL const char * FDECL(compress_str, (const char *));
 STATIC_DCL void FDECL(tty_putsym, (winid, int, int, NHWCHAR_P));
 static char *FDECL(copy_of, (const char *));
+#ifdef UNICODE_WIDEWINPORT
 static nhwchar *FDECL(nhwchar_copy_of, (const nhwchar *));
+#endif
 STATIC_DCL void FDECL(bail, (const char *));	/* __attribute__((noreturn)) */
 
 /*
