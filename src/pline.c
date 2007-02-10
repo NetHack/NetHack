@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pline.c	3.5	2007/01/17	*/
+/*	SCCS Id: @(#)pline.c	3.5	2007/02/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,7 +41,8 @@ void
 pline VA_DECL(const char *, line)
 #endif	/* USE_STDARG | USE_VARARG */
 
-	char pbuf[BUFSZ];
+	char pbuf[3*BUFSZ];
+	int ln;
 /* Do NOT use VA_START and VA_END in here... see above */
 
 	if (!line || !*line) return;
@@ -54,6 +55,20 @@ pline VA_DECL(const char *, line)
 
 	if (index(line, '%')) {
 	    Vsprintf(pbuf,line,VA_ARGS);
+	    line = pbuf;
+	}
+	if ((ln = (int)strlen(line)) > BUFSZ-1) {
+	    if (line != pbuf)	/* no '%' was present */
+		(void)strncpy(pbuf, line, BUFSZ-1); /* caveat: unterminated */
+	    /* truncate, preserving the final 3 characters:
+	       "___ extremely long text" -> "___ extremely l...ext"
+	       (this may be suboptimal if overflow is less than 3) */
+	    (void)strncpy(pbuf + BUFSZ-1 - 6, "...", 3);
+	    /* avoid strncpy; buffers could overlap if excess is small */
+	    pbuf[BUFSZ-1 - 3] = line[ln - 3];
+	    pbuf[BUFSZ-1 - 2] = line[ln - 2];
+	    pbuf[BUFSZ-1 - 1] = line[ln - 1];
+	    pbuf[BUFSZ-1] = '\0';
 	    line = pbuf;
 	}
 	if (!iflags.window_inited) {
@@ -263,15 +278,21 @@ vraw_printf(line, the_args) const char *line; va_list the_args; {
 void
 raw_printf VA_DECL(const char *, line)
 #endif
+
+	char pbuf[3*BUFSZ];
+	int ln;
 /* Do NOT use VA_START and VA_END in here... see above */
 
-	if(!index(line, '%'))
-	    raw_print(line);
-	else {
-	    char pbuf[BUFSZ];
+	if (index(line, '%')) {
 	    Vsprintf(pbuf,line,VA_ARGS);
-	    raw_print(pbuf);
+	    line = pbuf;
 	}
+	if ((ln = (int)strlen(line)) > BUFSZ-1) {
+	    if (line != pbuf) line = strncpy(pbuf, line, BUFSZ-1);
+	    /* unlike pline, we don't futz around to keep last few chars */
+	    pbuf[BUFSZ-1] = '\0'; /* terminate strncpy or truncate vsprintf */
+	}
+	raw_print(line);
 }
 
 
