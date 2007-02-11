@@ -187,6 +187,7 @@ monsters can use ranged attacks over/around boulders, same as hero
 can't drop part of a stack of N weapons welded to hero's hand
 pickup still accepts m as command prefix, but now rejects F,g,G,M,numpad 5
 scatter piles of kicked gold rather than move the entire pile at once
+#jump attempt fails if mounted on sleeping steed; jumping spell still works
 
 
 Platform- and/or Interface-Specific Fixes

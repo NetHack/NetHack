@@ -1332,6 +1332,12 @@ int magic; /* 0=Physical, otherwise skill level */
 	} else if (!magic && !Jumping) {
 		You_cant("jump very far.");
 		return 0;
+#ifdef STEED
+	/* if steed is immobile, can't do physical jump but can do spell one */
+	} else if (!magic && u.usteed && stucksteed(FALSE)) {
+		/* stucksteed gave "<steed> won't move" message */
+		return 0;
+#endif
 	} else if (u.uswallow) {
 		if (magic) {
 			You("bounce around a little.");

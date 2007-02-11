@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2006/08/09	*/
+/*	SCCS Id: @(#)hack.c	3.5	2007/02/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1221,7 +1221,7 @@ domove()
 	}
 	/* not attacking an animal, so we try to move */
 #ifdef STEED
-	if ((u.dx || u.dy) && stucksteed(FALSE)) {
+	if ((u.dx || u.dy) && u.usteed && stucksteed(FALSE)) {
 		nomul(0);
 		return;
 	}
