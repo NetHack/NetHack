@@ -829,6 +829,9 @@ register int fd;
 	 */
 	reset_restpref();
 
+	restlevelstate(stuckid, steedid);
+	program_state.something_worth_saving = 1; /* useful data now exists */
+
 	if (!wizard && !discover)
 		(void) delete_savefile();
 #ifdef REINCARNATION
@@ -837,7 +840,6 @@ register int fd;
 #ifdef USE_TILES
 	substitute_tiles(&u.uz);
 #endif
-	restlevelstate(stuckid, steedid);
 #ifdef MFLOPPY
 	gameDiskPrompt();
 #endif
@@ -864,7 +866,6 @@ register int fd;
 	docrt();
 	restoring = FALSE;
 	clear_nhwindow(WIN_MESSAGE);
-	program_state.something_worth_saving++;	/* useful data now exists */
 
 	/* Success! */
 	welcome(FALSE);
