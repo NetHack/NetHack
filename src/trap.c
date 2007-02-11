@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2006/12/16	*/
+/*	SCCS Id: @(#)trap.c	3.5	2007/02/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -889,10 +889,10 @@ unsigned trflags;
 		seetrap(trap);
 		if(Sleep_resistance || breathless(youmonst.data)) {
 		    You("are enveloped in a cloud of gas!");
-		    break;
+		} else {
+		    pline("A cloud of gas puts you to sleep!");
+		    fall_asleep(-rnd(25), TRUE);
 		}
-		pline("A cloud of gas puts you to sleep!");
-		fall_asleep(-rnd(25), TRUE);
 #ifdef STEED
 		(void) steedintrap(trap, (struct obj *)0);
 #endif
