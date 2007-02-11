@@ -1377,7 +1377,7 @@ int magic; /* 0=Physical, otherwise skill level */
 	} else if (!magic && (u.uhunger <= 100 || ACURR(A_STR) < 6)) {
 		You("lack the strength to jump!");
 		return 0;
-	} else if (Wounded_legs) {
+	} else if (!magic && Wounded_legs) {
 		long wl = (Wounded_legs & BOTH_SIDES);
 		const char *bp = body_part(LEG);
 
