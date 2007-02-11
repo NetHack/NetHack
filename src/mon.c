@@ -814,6 +814,12 @@ meatobj(mtmp)		/* for gelatinous cubes */
 		/* in case it polymorphed or died */
 		if (ptr != &mons[PM_GELATINOUS_CUBE])
 		    return !ptr ? 2 : 1;
+	    } else if (otmp->otyp == CORPSE &&
+			is_rider(&mons[otmp->corpsenm])) {
+		/* Rider corpse will always pass the obj_resists() test above
+		   and not be eaten; we don't want it to be engulfed either */
+		(void)revive_corpse(otmp);
+	     /* continue; -- regardless of whether it revived */
 	    } else if (otmp->oclass != ROCK_CLASS &&
 				    otmp != uball && otmp != uchain) {
 		++ecount;
