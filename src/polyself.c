@@ -736,7 +736,8 @@ int alone;
 			   	u.twoweap ? "s" : "");
 	    otmp2 = u.twoweap ? uswapwep : 0;
 	    uwepgone();
-	    if (!wep->cursed || wep->otyp != LOADSTONE)
+	    if ((!wep->cursed || wep->otyp != LOADSTONE) &&
+		(wep->otyp != LEASH && wep->leashmon != 0))
 		dropx(otmp);
 	    if (otmp2 != 0) {
 		uswapwepgone();
