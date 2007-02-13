@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.5	2006/12/01	*/
+/*	SCCS Id: @(#)polyself.c	3.5	2007/02/12	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -722,30 +722,24 @@ drop_weapon(alone)
 int alone;
 {
     struct obj *otmp;
-    struct obj *otmp2;
 
-    if ((otmp = uwep) != 0) {
+    if (uwep) {
 	/* !alone check below is currently superfluous but in the
 	 * future it might not be so if there are monsters which cannot
 	 * wear gloves but can wield weapons
 	 */
 	if (!alone || cantwield(youmonst.data)) {
-	    struct obj *wep = uwep;
-
 	    if (alone) You("find you must drop your weapon%s!",
-			   	u.twoweap ? "s" : "");
-	    otmp2 = u.twoweap ? uswapwep : 0;
-	    uwepgone();
-	    if ((!wep->cursed || wep->otyp != LOADSTONE) &&
-		(wep->otyp != LEASH || wep->leashmon == 0))
-		dropx(otmp);
-	    if (otmp2 != 0) {
+			   u.twoweap ? "s" : "");
+	    if (u.twoweap) {
+		otmp = uswapwep;
 		uswapwepgone();
-		if ((!otmp2->cursed || otmp2->otyp != LOADSTONE) &&
-		    (otmp2->otyp != LEASH || otmp2->leashmon == 0))
-		    dropx(otmp2);
+		if (canletgo(otmp, "")) dropx(otmp);
 	    }
-	    untwoweapon();
+	    otmp = uwep;
+	    uwepgone();
+	    if (canletgo(otmp, "")) dropx(otmp);
+	    update_inventory();
 	} else if (!could_twoweap(youmonst.data)) {
 	    untwoweapon();
 	}

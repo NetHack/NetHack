@@ -1629,8 +1629,17 @@ struct monst *mtmp;
 			m.has_misc = MUSE_POT_GAIN_LEVEL;
 		}
 		nomore(MUSE_BULLWHIP);
-		if(obj->otyp == BULLWHIP && (MON_WEP(mtmp) == obj) &&
-		   distu(mtmp->mx,mtmp->my)==1 && uwep && !mtmp->mpeaceful) {
+		if (obj->otyp == BULLWHIP && !mtmp->mpeaceful &&
+		    /* the random test prevents whip-wielding
+		       monster from attempting disarm every turn */
+		    uwep && !rn2(5) && obj == MON_WEP(mtmp) &&
+		    /* hero's location must be known and adjacent */
+		    mtmp->mux == u.ux && mtmp->muy == u.uy &&
+		    distu(mtmp->mx, mtmp->my) <= 2 &&
+		    /* don't bother if it can't work (this doesn't
+		       prevent cursed weapons from being targetted) */
+		    (canletgo(uwep, "") ||
+			    (u.twoweap && canletgo(uswapwep, "")))) {
 			m.misc = obj;
 			m.has_misc = MUSE_BULLWHIP;
 		}
@@ -1824,12 +1833,17 @@ skipmsg:
 		return 2;
 	case MUSE_BULLWHIP:
 		/* attempt to disarm hero */
-		if (uwep && !rn2(5)) {
+		{
 		    const char *The_whip = vismon ? "The bullwhip" : "A whip";
 		    int where_to = rn2(4);
 		    struct obj *obj = uwep;
 		    const char *hand;
 		    char the_weapon[BUFSZ];
+
+		    if (!obj || !canletgo(obj, "") ||
+			    (u.twoweap && canletgo(uswapwep, "") && rn2(2)))
+			obj = uswapwep;
+		    if (!obj) break; /* shouldn't happen after find_misc() */
 
 		    Strcpy(the_weapon, the(xname(obj)));
 		    hand = body_part(HAND);
@@ -1861,8 +1875,8 @@ skipmsg:
 			   weapon; drop it at hero's feet instead */
 			where_to = 2;
 		    }
+		    remove_worn_item(obj, FALSE);
 		    freeinv(obj);
-		    uwepgone();
 		    switch (where_to) {
 			case 1:		/* onto floor beneath mon */
 			    pline("%s yanks %s from your %s!", Monnam(mtmp),
