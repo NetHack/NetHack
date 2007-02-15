@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2006/09/23	*/
+/*	SCCS Id: @(#)options.c	3.5	2007/02/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -320,6 +320,13 @@ static struct Comp_Opt
 						20, SET_IN_GAME },
 	{ "pickup_types", "types of objects to pick up automatically",
 						MAXOCLASSES, SET_IN_GAME },
+	{ "playmode",
+#ifdef WIZARD
+		      "normal play, non-scoring explore mode, or debug mode",
+#else
+		      "normal play or non-scoring explore mode",
+#endif
+						 8, DISP_IN_GAME },
 	{ "player_selection", "choose character via dialog or prompts",
 						12, DISP_IN_GAME },
 	{ "race",     "your starting race (e.g., Human, Elf)",
@@ -1837,6 +1844,33 @@ goodfruit:
 		}
 		return;
 	}
+
+	/* play mode: normal, explore/discovery, or debug/wizard */
+	fullname = "playmode";
+	if (match_optname(opts, fullname, 4, TRUE)) {
+	    if (duplicate) complain_about_duplicate(opts, 1);
+	    if (negated) bad_negation(fullname, FALSE);
+	    if (duplicate || negated) return;
+	    op = string_for_opt(opts, TRUE);
+	    if (!strncmpi(op, "normal", 6) || !strcmpi(op, "play")) {
+		wizard = discover = FALSE;
+	    } else if (!strncmpi(op, "explore", 6) ||
+		    !strncmpi(op, "discovery", 6)) {
+		wizard = FALSE, discover = TRUE;
+	    } else if (!strncmpi(op, "debug", 5) ||
+		    !strncmpi(op, "wizard", 6)) {
+#ifdef WIZARD
+		wizard = TRUE, discover = FALSE;
+#else
+		raw_printf("\"%s\":%s -- debug mode not available.",
+			   fullname, op);
+#endif
+	    } else {
+		raw_printf("Invalid value for \"%s\":%s.", fullname, op);
+	    }
+	    return;
+	}
+
 	/* WINCAP
 	 * player_selection: dialog | prompts */
 	fullname = "player_selection";
@@ -1844,9 +1878,9 @@ goodfruit:
 		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
 		if (op && !negated) {
-		    if (!strncmpi (op, "dialog", sizeof("dialog")-1))
+		    if (!strncmpi(op, "dialog", sizeof("dialog")-1))
 			iflags.wc_player_selection = VIA_DIALOG;
-		    else if (!strncmpi (op, "prompt", sizeof("prompt")-1))
+		    else if (!strncmpi(op, "prompt", sizeof("prompt")-1))
 			iflags.wc_player_selection = VIA_PROMPTS;
 		    else
 			badoption(opts);
@@ -2676,7 +2710,9 @@ doset()
 	if (!iflags.menu_tab_sep)
 		Sprintf(fmtstr_doset_add_menu, "%%s%%-%ds [%%s]", biggest_name);
 
-	/* deliberately put `name', `role', `race', `gender' first */
+	/* deliberately put `playmode', `name', `role', `race', `gender' first
+	   (also alignment if anything ever comes before it in compopt[]) */
+	doset_add_menu(tmpwin, "playmode", 0);
 	doset_add_menu(tmpwin, "name", 0);
 	doset_add_menu(tmpwin, "role", 0);
 	doset_add_menu(tmpwin, "race", 0);
@@ -2685,7 +2721,8 @@ doset()
 	for (pass = startpass; pass <= endpass; pass++)
 	    for (i = 0; compopt[i].name; i++)
 		if (compopt[i].optflags == pass) {
-			if (!strcmp(compopt[i].name, "name") ||
+			if (!strcmp(compopt[i].name, "playmode") ||
+			    !strcmp(compopt[i].name, "name") ||
 			    !strcmp(compopt[i].name, "role") ||
 			    !strcmp(compopt[i].name, "race") ||
 			    !strcmp(compopt[i].name, "gender"))
@@ -3535,7 +3572,11 @@ char *buf;
 	else if (!strcmp(optname, "pickup_types")) {
 		oc_to_str(flags.pickup_types, ocl);
 		Sprintf(buf, "%s", ocl[0] ? ocl : "all" );
-	     }
+	}
+	else if (!strcmp(optname, "playmode")) {
+		Strcpy(buf,
+		       wizard ? "debug" : discover ? "explore" : "normal");
+	}
 	else if (!strcmp(optname, "race"))
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
 #ifdef REINCARNATION
