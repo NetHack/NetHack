@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)unixmain.c	3.5	2007/01/08	*/
+/*	SCCS Id: @(#)unixmain.c	3.5	2007/02/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,10 +39,9 @@ extern void NDECL(check_linux_console);
 extern void NDECL(init_linux_cons);
 #endif
 
+static void NDECL(set_playmode);
 static void NDECL(wd_message);
-#ifdef WIZARD
 static boolean wiz_error_flag = FALSE;
-#endif
 
 int
 main(argc,argv)
@@ -176,11 +175,9 @@ char *argv[];
 #ifdef MAIL
 	getmailstatus();
 #endif
-#ifdef WIZARD
-	if (wizard)
-		Strcpy(plname, "wizard");
-	else
-#endif
+
+	/* wizard mode access is deferred until here */
+	set_playmode();	/* sets plname to "wizard" for wizard mode */
 	if(!*plname || !strncmp(plname, "player", 4)
 		    || !strncmp(plname, "games", 4)) {
 		askname();
@@ -299,38 +296,10 @@ char *argv[];
 		argc--;
 		switch(argv[0][1]){
 		case 'D':
-#ifdef WIZARD
-			{
-			  char *user;
-			  int uid;
-			  struct passwd *pw = (struct passwd *)0;
-
-			  uid = getuid();
-			  user = getlogin();
-			  if (user) {
-			      pw = getpwnam(user);
-			      if (pw && (pw->pw_uid != uid)) pw = 0;
-			  }
-			  if (pw == 0) {
-			      user = nh_getenv("USER");
-			      if (user) {
-				  pw = getpwnam(user);
-				  if (pw && (pw->pw_uid != uid)) pw = 0;
-			      }
-			      if (pw == 0) {
-				  pw = getpwuid(uid);
-			      }
-			  }
-			  if (pw && !strcmp(pw->pw_name,WIZARD)) {
-			      wizard = TRUE;
-			      break;
-			  }
-			}
-			/* otherwise fall thru to discover */
-			wiz_error_flag = TRUE;
-#endif
+			wizard = TRUE, discover = FALSE;
+			break;
 		case 'X':
-			discover = TRUE;
+			discover = TRUE, wizard = FALSE;
 			break;
 #ifdef NEWS
 		case 'n':
@@ -538,22 +507,71 @@ port_help()
 }
 #endif
 
+/* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
+   for usual config, WIZARD is the string; forcing WIZARD_NAME to match it
+   eliminates conditional testing for which one to use in string ops */
+#ifndef KR1ED
+# undef WIZARD_NAME
+# define WIZARD_NAME WIZARD
+#endif
+
+/* validate wizard mode if player has requested access to it */
+static void
+set_playmode()
+{
+    if (wizard) {
+#ifdef WIZARD
+	char *user;
+	int uid;
+	struct passwd *pw = (struct passwd *)0;
+
+	uid = getuid();
+	user = getlogin();
+	if (user) {
+	    pw = getpwnam(user);
+	    if (pw && (pw->pw_uid != uid)) pw = 0;
+	}
+	if (pw == 0) {
+	    user = nh_getenv("USER");
+	    if (user) {
+		pw = getpwnam(user);
+		if (pw && (pw->pw_uid != uid)) pw = 0;
+	    }
+	    if (pw == 0) {
+		pw = getpwuid(uid);
+	    }
+	}
+	if (!pw || strcmp(pw->pw_name, WIZARD_NAME)) wizard = FALSE;
+#else	/* !WIZARD */
+	wizard = FALSE;
+#endif	/* ?WIZARD */
+
+	if (!wizard) {
+	    discover = wiz_error_flag = TRUE; 
+#ifdef WIZARD
+	} else {
+	    discover = FALSE;	/* paranoia */
+	    Strcpy(plname, "wizard");
+#endif
+	}
+    }
+    /* don't need to do anything special for explore mode or normal play */
+}
+
 static void
 wd_message()
 {
-#ifdef WIZARD
 	if (wiz_error_flag) {
+#ifdef WIZARD
 		pline("Only user \"%s\" may access debug (wizard) mode.",
-# ifndef KR1ED
-			WIZARD);
-# else
-			WIZARD_NAME);
-# endif
-		pline("Entering discovery mode instead.");
-	} else
+		      WIZARD_NAME);
+#else
+		pline("Debug mode is not available.");
 #endif
-	if (discover)
-		You("are in non-scoring discovery mode.");
+		pline("Entering explore/discovery mode instead.");
+		wizard = 0, discover = 1;		/* (paranoia) */
+	} else if (discover)
+		You("are in non-scoring explore/discovery mode.");
 }
 
 /*

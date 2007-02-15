@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pcmain.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)pcmain.c	3.5	2007/02/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -65,6 +65,8 @@ extern int redirect_stdout;		/* from sys/share/pcsys.c */
 #if defined(MSWIN_GRAPHICS)
 extern void NDECL(mswin_destroy_reg);
 #endif
+
+STATIC_DCL void NDECL(set_playmode);
 
 #ifdef EXEPATH
 STATIC_DCL char *FDECL(exepath,(char *));
@@ -342,20 +344,7 @@ char *argv[];
 	plnamesuffix(); 	/* strip suffix from name; calls askname() */
 				/* again if suffix was whole name */
 				/* accepts any suffix */
-#ifdef WIZARD
-	if (wizard) {
-# ifdef KR1ED
-		if(!strcmp(plname, WIZARD_NAME))
-# else
-		if(!strcmp(plname, WIZARD))
-# endif
-			Strcpy(plname, "wizard");
-		else {
-			wizard = FALSE;
-			discover = TRUE;
-		}
-	}
-#endif /* WIZARD */
+	set_playmode();	/* sets plname to "wizard" for wizard mode */
 #if defined(PC_LOCKING)
 	/* 3.3.0 added this to support detection of multiple games
 	 * under the same plname on the same machine in a windowed
@@ -519,17 +508,10 @@ char *argv[];
 			}
 			break;
 		case 'D':
-#ifdef WIZARD
-			/* If they don't have a valid wizard name, it'll be
-			 * changed to discover later.  Cannot check for
-			 * validity of the name right now--it might have a
-			 * character class suffix, for instance.
-			 */
-			wizard = TRUE;
+			wizard = TRUE, discover = FALSE;
 			break;
-#endif
 		case 'X':
-			discover = TRUE;
+			discover = TRUE, wizard = FALSE;
 			break;
 #ifdef NEWS
 		case 'n':
@@ -715,6 +697,37 @@ port_help()
 }
 # endif /* MSDOS || WIN32 */
 #endif /* PORT_HELP */
+
+/* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
+   for usual config, WIZARD is the string; forcing WIZARD_NAME to match it
+   eliminates conditional testing for which one to use in string ops */
+#ifndef KR1ED
+# undef WIZARD_NAME
+# define WIZARD_NAME WIZARD
+#endif
+
+/* validate wizard mode if player has requested access to it */
+STATIC_OVL void
+set_playmode()
+{
+    if (wizard) {
+#ifdef WIZARD
+	if (strcmp(plname, WIZARD_NAME)) wizard = FALSE;
+#else
+	wizard = FALSE;
+#endif
+
+	if (!wizard) {
+	    discover = TRUE; 
+#ifdef WIZARD
+	} else {
+	    discover = FALSE;	/* paranoia */
+	    Strcpy(plname, "wizard");
+#endif
+	}
+    }
+    /* don't need to do anything special for explore mode or normal play */
+}
 
 #ifdef EXEPATH
 # ifdef __DJGPP__

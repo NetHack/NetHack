@@ -282,6 +282,7 @@ all stackable weapons are capable of being thrown/shot for multi-shot volleys
 worm teeth and crysknives have become stackable
 improved container interface
 acid can destroy iron bars
+OPTIONS=playmode:normal|explore|debug to choose mode without command-line
 
 
 Platform- and/or Interface-Specific New Features

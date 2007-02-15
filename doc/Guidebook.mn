@@ -1983,6 +1983,15 @@ compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use
 configuration file lines to further refine
 .op autopickup
 behavior.
+.lp playmode
+Values are `normal', `explore', or `debug'.
+Allows selection of explore mode (also known as discovery mode) or debug
+mode (also known as wizard mode) instead of normal play.
+Debug mode might only be allowed for someone logged in under a particular
+user name (on multi-user systems) or specifying a particular character
+name (on single-user systems) or it might be disabled entirely.  Requesting
+it when not allowed or not possible results in explore mode instead.
+Default is normal play.
 .lp prayconfirm
 Prompt for confirmation before praying (default on).
 .lp pushweapon

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsmain.c	3.5	2006/04/01	*/
+/*	SCCS Id: @(#)vmsmain.c	3.5	2007/02/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* main.c - VMS NetHack */
@@ -22,10 +22,9 @@ static vms_handler_type FDECL(vms_handler, (genericptr_t,genericptr_t));
 #include <ssdef.h>	/* system service status codes */
 #endif
 
+static void NDECL(set_playmode);
 static void NDECL(wd_message);
-#ifdef WIZARD
 static boolean wiz_error_flag = FALSE;
-#endif
 
 int
 main(argc,argv)
@@ -126,11 +125,8 @@ char *argv[];
 
 	process_options(argc, argv);	/* command line options */
 
-#ifdef WIZARD
-	if (wizard)
-		Strcpy(plname, "wizard");
-	else
-#endif
+	/* wizard mode access is deferred until here */
+	set_playmode();	/* sets plname to "wizard" for wizard mode */
 	if (!*plname || !strncmpi(plname, "games", 4) ||
 	    !strcmpi(plname, "nethack"))
 		askname();
@@ -239,17 +235,11 @@ char *argv[];
 		argc--;
 		switch(argv[0][1]){
 		case 'D':
-#ifdef WIZARD
-			if(!strcmpi(nh_getenv("USER"), WIZARD_NAME)) {
-				wizard = TRUE;
-				break;
-			}
-			/* otherwise fall thru to discover */
-			wiz_error_flag = TRUE;
-#endif /* WIZARD */
+			wizard = TRUE, discover = FALSE;
+			break;
 		case 'X':
 		case 'x':
-			discover = TRUE;
+			discover = TRUE, wizard = FALSE;
 			break;
 #ifdef NEWS
 		case 'n':
@@ -449,18 +439,47 @@ port_help()
 }
 #endif /* PORT_HELP */
 
+/* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
+   for usual config, WIZARD is the string and vmsconf.h forces WIZARD_NAME
+   to match it, avoiding need to test which one to use in string ops */
+
+/* validate wizard mode if player has requested access to it */
+static void
+set_playmode()
+{
+    if (wizard) {
+#ifdef WIZARD
+	if (strcmpi(nh_getenv("USER"), WIZARD_NAME)) wizard = FALSE;
+#else
+	wizard = FALSE;
+#endif
+
+	if (!wizard) {
+	    discover = wiz_error_flag = TRUE; 
+#ifdef WIZARD
+	} else {
+	    discover = FALSE;	/* paranoia */
+	    Strcpy(plname, "wizard");
+#endif
+	}
+    }
+    /* don't need to do anything special for explore mode or normal play */
+}
+
 static void
 wd_message()
 {
-#ifdef WIZARD
 	if (wiz_error_flag) {
+#ifdef WIZARD
 		pline("Only user \"%s\" may access debug (wizard) mode.",
-			WIZARD_NAME);
-		pline("Entering discovery mode instead.");
-	} else
+		      WIZARD_NAME);
+#else
+		pline("Debug mode is not available.");
 #endif
-	if (discover)
-		You("are in non-scoring discovery mode.");
+		pline("Entering explore/discovery mode instead.");
+		wizard = 0, discover = 1;		/* (paranoia) */
+	} else if (discover)
+		You("are in non-scoring explore/discovery mode.");
 }
 
 /*vmsmain.c*/
