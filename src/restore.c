@@ -517,8 +517,10 @@ restgamestate(fd, stuckid, steedid)
 register int fd;
 unsigned int *stuckid, *steedid;	/* STEED */
 {
-	/* discover is actually flags.explore */
-	boolean remember_discover = discover;
+	struct flag newgameflags;
+#ifdef SYSFLAGS
+	struct sysflag newgamesysflags;
+#endif
 	struct obj *otmp, *tmp_bc;
 	int uid;
 
@@ -536,9 +538,24 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	if (context.warntype.speciesidx)
 		context.warntype.species = &mons[context.warntype.speciesidx];
 
+	/* we want to be able to revert to command line/environment/config
+	   file option values instead of keeping old save file option values
+	   if partial restore fails and we resort to starting a new game */
+	newgameflags = flags;
 	mread(fd, (genericptr_t) &flags, sizeof(struct flag));
-	if (remember_discover) discover = remember_discover;
+	/* wizard and discover are actually flags.debug and flags.explore;
+	   player might be overriding the save file values for them */
+	if (newgameflags.explore) discover = TRUE;
+	if (newgameflags.debug) wizard = TRUE;
+	if (wizard) {
+#ifdef WIZARD
+	    discover = FALSE;
+#else
+	    discover = TRUE, wizard = FALSE;
+#endif
+	}
 #ifdef SYSFLAGS
+	newgamesysflags = sysflags;
 	mread(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
 #endif
 
@@ -560,6 +577,11 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	    wiz1_level.dlevel = 0;
 	    u.uz.dnum = 0;
 	    u.uz.dlevel = 1;
+	    /* revert to pre-restore option settings */
+	    flags = newgameflags;
+#ifdef SYSFLAGS
+	    sysflags = newgamesysflags;
+#endif
 	    return(FALSE);
 	}
 	/* in case hangup save occurred in midst of level change */

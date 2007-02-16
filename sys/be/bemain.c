@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bemain.c	3.5	2006/04/01	*/
+/*	SCCS Id: @(#)bemain.c	3.5	2007/02/15	*/
 /* Copyright (c) Dean Luick, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,6 +10,8 @@ static void whoami(void);
 static void process_options(int argc, char **argv);
 static void chdirx(const char *dir);
 static void getlock(void);
+
+static void NDECL(set_playmode);
 
 #ifdef __begui__
 	#define MAIN nhmain
@@ -41,12 +43,7 @@ int MAIN(int argc, char **argv)
 	u.uhp = 1;	/* prevent RIP on early quits */
 	process_options(argc, argv);	/* command line options */
 
-
-#ifdef WIZARD
-	if (wizard)
-		Strcpy(plname, "wizard");
-	else
-#endif
+	set_playmode();	/* sets plname to "wizard" for wizard mode */
 	if(!*plname || !strncmp(plname, "player", 4)
 		    || !strncmp(plname, "games", 4))
 		askname();
@@ -56,7 +53,6 @@ int MAIN(int argc, char **argv)
 
 	Sprintf(lock,"%d%s", getuid(), plname);
 	getlock();
-
 
 	dlb_init();			/* must be before newgame() */
 
@@ -80,12 +76,6 @@ int MAIN(int argc, char **argv)
 	display_gamewindows();
 
 	if ((fd = restore_saved_game()) >= 0) {
-#ifdef WIZARD
-		/* Since wizard is actually flags.debug, restoring might
-		 * overwrite it.
-		 */
-		boolean remember_wiz_mode = wizard;
-#endif
 #ifdef NEWS
 		if(iflags.news) {
 			display_file(NEWS, FALSE);
@@ -96,12 +86,8 @@ int MAIN(int argc, char **argv)
 		mark_synch();	/* flush output */
 		if (dorecover(fd)) {
 		    resuming = TRUE;	/* not starting new game */
-#ifdef WIZARD
-		    if (!wizard && remember_wiz_mode) wizard = TRUE;
-#endif
 		    if (discover)
 			You("are in non-scoring discovery mode.");
-
 		    if (discover || wizard) {
 			if(yn("Do you want to keep the save file?") == 'n')
 			    (void) delete_savefile();
@@ -165,12 +151,12 @@ static void process_options(int argc, char **argv)
 		switch (argv[0][1]) {
 		case 'D':
 #ifdef WIZARD
-			wizard = TRUE;
+			wizard = TRUE, discover = FALSE;
 			break;
 #endif
 			/* otherwise fall thru to discover */
 		case 'X':
-			discover = TRUE;
+			discover = TRUE, wizard = FALSE;
 			break;
 #ifdef NEWS
 		case 'n':
@@ -251,6 +237,29 @@ void getlock(void)
 	}
 }
 
+/* validate wizard mode if player has requested access to it */
+static void
+set_playmode()
+{
+    if (wizard) {
+#ifdef WIZARD
+	/* other ports validate user name or character name here */
+#else
+	wizard = FALSE;
+#endif
+
+	if (!wizard) {
+	    discover = TRUE; 
+#ifdef WIZARD
+	} else {
+	    discover = FALSE;	/* paranoia */
+	    Strcpy(plname, "wizard");
+#endif
+	}
+    }
+    /* don't need to do anything special for explore mode or normal play */
+}
+
 #ifndef __begui__
 /*
  * If we are not using the Be GUI, then just exit -- we don't need to
@@ -262,3 +271,5 @@ void nethack_exit(int status)
 	exit(status);
 }
 #endif /* !__begui__ */
+
+/*bemain.c*/

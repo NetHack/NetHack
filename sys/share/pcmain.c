@@ -429,12 +429,6 @@ char *argv[];
 #endif
 
 	if ((fd = restore_saved_game()) >= 0) {
-#ifdef WIZARD
-		/* Since wizard is actually flags.debug, restoring might
-		 * overwrite it.
-		 */
-		boolean remember_wiz_mode = wizard;
-#endif
 #ifndef NO_SIGNAL
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
@@ -449,12 +443,8 @@ char *argv[];
 
 		if (dorecover(fd)) {
 		    resuming = TRUE;	/* not starting new game */
-#ifdef WIZARD
-		    if (!wizard && remember_wiz_mode) wizard = TRUE;
-#endif
 		    if (discover)
 			You("are in non-scoring discovery mode.");
-
 		    if (discover || wizard) {
 			if(yn("Do you want to keep the save file?") == 'n')
 				(void) delete_savefile();

@@ -174,12 +174,6 @@ char *argv[];
 	display_gamewindows();
 
 	if ((fd = restore_saved_game()) >= 0) {
-#ifdef WIZARD
-		/* Since wizard is actually flags.debug, restoring might
-		 * overwrite it.
-		 */
-		boolean remember_wiz_mode = wizard;
-#endif
 		const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
 
 		(void) chmod(fq_save,0);	/* disallow parallel restores */
@@ -194,9 +188,6 @@ char *argv[];
 		mark_synch();	/* flush output */
 		if (dorecover(fd)) {
 		    resuming = TRUE;	/* not starting new game */
-#ifdef WIZARD
-		    if (!wizard && remember_wiz_mode) wizard = TRUE;
-#endif
 		    wd_message();
 		    if (discover || wizard) {
 			if (yn("Do you want to keep the save file?") == 'n')

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)macmain.c	3.5	2006/04/01	*/
+/*	SCCS Id: @(#)macmain.c	3.5	2007/02/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,6 +23,8 @@
 #ifndef O_RDONLY
 #include <fcntl.h>
 #endif
+
+static void NDECL(set_playmode);
 
 static void finder_file_request(void);
 int main(void);
@@ -78,12 +80,9 @@ main (void)
 
 	display_gamewindows();
 
-#ifdef WIZARD
-	if (wizard)
-		Strcpy(plname, "wizard");
-	else
-#endif
-	if(!*plname || !strncmp(plname, "player", 4) || !strncmp(plname, "games", 4))
+	set_playmode();	/* sets plname to "wizard" for wizard mode */
+	if (!*plname || !strncmp(plname, "player", 4) ||
+	    !strncmp(plname, "games", 4))
 		askname();
 	plnamesuffix();		/* strip suffix from name; calls askname() */
 				/* again if suffix was whole name */
@@ -93,12 +92,6 @@ main (void)
 	getlock ();
 
 	if ((fd = restore_saved_game()) >= 0) {
-#ifdef WIZARD
-		/* Since wizard is actually flags.debug, restoring might
-		 * overwrite it.
-		 */
-		boolean remember_wiz_mode = wizard;
-#endif
 #ifdef NEWS
 		if(iflags.news) {
 			display_file(NEWS, FALSE);
@@ -110,9 +103,6 @@ main (void)
 		game_active = 1;
 		if (dorecover(fd)) {
 			resuming = TRUE;	/* not starting new game */
-#ifdef WIZARD
-			if(!wizard && remember_wiz_mode) wizard = TRUE;
-#endif
 			if (discover || wizard) {
 				if(yn("Do you want to keep the save file?") == 'n')
 					(void) delete_savefile();
@@ -278,6 +268,29 @@ finder_file_request(void)
 	}
 #endif /* MAC68K */
 #endif /* 0 */
+}
+
+/* validate wizard mode if player has requested access to it */
+static void
+set_playmode()
+{
+    if (wizard) {
+#ifdef WIZARD
+	/* other ports validate user name or character name here */
+#else
+	wizard = FALSE;
+#endif
+
+	if (!wizard) {
+	    discover = TRUE; 
+#ifdef WIZARD
+	} else {
+	    discover = FALSE;	/* paranoia */
+	    Strcpy(plname, "wizard");
+#endif
+	}
+    }
+    /* don't need to do anything special for explore mode or normal play */
 }
 
 /*macmain.c*/
