@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)allmain.c	3.5	2007/01/12	*/
+/*	SCCS Id: @(#)allmain.c	3.5	2007/02/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -36,6 +36,11 @@ boolean resuming;
 #ifdef WIZARD
     if (wizard) add_debug_extended_commands();
 #endif
+
+    /* if a save file created in normal mode is now being restored in
+       explore mode, treat it as normal restore followed by 'X' command
+       to use up the save file and require confirmation for explore mode */
+    if (resuming && iflags.deferred_X) (void)enter_explore_mode();
 
     /* side-effects from the real world */
     flags.moonphase = phase_of_the_moon();

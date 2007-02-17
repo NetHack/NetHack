@@ -37,6 +37,7 @@ extern int NDECL(doapply); /**/
 extern int NDECL(dorub); /**/
 extern int NDECL(dojump); /**/
 extern int NDECL(doextlist); /**/
+extern int NDECL(enter_explore_mode); /**/
 extern int NDECL(dodrop); /**/
 extern int NDECL(doddrop); /**/
 extern int NDECL(dodown); /**/
@@ -155,7 +156,6 @@ STATIC_DCL int NDECL(wiz_port_debug);
 STATIC_PTR int NDECL(wiz_rumor_check);
 STATIC_DCL char FDECL(cmd_from_func, (int NDECL((*))));
 # endif /* WIZARD */
-STATIC_PTR int NDECL(enter_explore_mode);
 STATIC_PTR int NDECL(doattributes);
 STATIC_PTR int NDECL(doconduct); /**/
 STATIC_PTR boolean NDECL(minimal_enlightenment);
@@ -489,7 +489,7 @@ domonability(VOID_ARGS)
 	return 0;
 }
 
-STATIC_PTR int
+int
 enter_explore_mode(VOID_ARGS)
 {
 	if(!discover && !wizard) {

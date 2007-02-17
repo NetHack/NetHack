@@ -188,6 +188,9 @@ can't drop part of a stack of N weapons welded to hero's hand
 pickup still accepts m as command prefix, but now rejects F,g,G,M,numpad 5
 scatter piles of kicked gold rather than move the entire pile at once
 #jump attempt fails if mounted on sleeping steed; jumping spell still works
+if normal game save file is restored via `nethack -X', restore in normal
+	mode--with save file deletion--and require confirmation ala 'X'
+	command to make deferred switch into explore mode
 
 
 Platform- and/or Interface-Specific Fixes

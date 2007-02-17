@@ -162,7 +162,6 @@ E int NDECL(domonability);
 E int NDECL(doprev_message);
 E int NDECL(timed_occupation);
 E int NDECL(doattributes);
-E int NDECL(enter_explore_mode);
 # ifdef WIZARD
 E int NDECL(wiz_detect);
 E int NDECL(wiz_genesis);
@@ -187,6 +186,7 @@ E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
 E int NDECL(extcmd_via_menu);
+E int NDECL(enter_explore_mode);
 E void FDECL(enlightenment, (int));
 E void FDECL(show_conduct, (int));
 E int FDECL(xytod, (SCHAR_P,SCHAR_P));

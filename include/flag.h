@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)flag.h	3.5	2005/11/19	*/
+/*	SCCS Id: @(#)flag.h	3.5	2007/02/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -174,6 +174,7 @@ struct instance_flags {
 	int *opt_booldup;	/* for duplication of boolean opts in config file */
 	int *opt_compdup;	/* for duplication of compound opts in config file */
 	boolean  cbreak;	/* in cbreak mode, rogue format */
+	boolean  deferred_X;	/* deferred entry into explore mode */
 	boolean  num_pad;	/* use numbers for movement commands */
 	boolean  news;		/* print news */
 	boolean  menu_tab_sep;	/* Use tabs to separate option menu fields */

@@ -544,11 +544,13 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	newgameflags = flags;
 	mread(fd, (genericptr_t) &flags, sizeof(struct flag));
 	/* wizard and discover are actually flags.debug and flags.explore;
-	   player might be overriding the save file values for them */
-	if (newgameflags.explore) discover = TRUE;
+	   player might be overriding the save file values for them;
+	   in the discover case, we don't want to set that for a normal
+	   game until after the save file has been removed */
+	iflags.deferred_X = (newgameflags.explore && !discover);
 	if (newgameflags.debug) {
 	    /* authorized by startup code; wizard mode exists and is allowed */
-	    wizard = TRUE, discover = FALSE;
+	    wizard = TRUE, discover = iflags.deferred_X = FALSE;
 	} else if (wizard) {
 	    /* specified by save file; check authorization now */
 	    set_playmode();
@@ -577,6 +579,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	    u.uz.dnum = 0;
 	    u.uz.dlevel = 1;
 	    /* revert to pre-restore option settings */
+	    iflags.deferred_X = FALSE;
 	    flags = newgameflags;
 #ifdef SYSFLAGS
 	    sysflags = newgamesysflags;
