@@ -4485,6 +4485,26 @@ char *op;
 	return 1;
 }
 
+/* set up for wizard mode if player or save file has requested to it;
+   called from port-specific startup code to handle `nethack -D' or
+   OPTIONS=playmode:debug, or from dorecover()'s restgamestate() if
+   restoring a game which was saved in wizard mode */
+void
+set_playmode()
+{
+    if (wizard) {
+#ifdef WIZARD
+	if (authorize_wizard_mode())
+	    Strcpy(plname, "wizard");
+	else
+#endif
+	    wizard = FALSE;	/* not allowed or not available */
+	/* force explore mode if we didn't make it into wizard mode */
+	discover = !wizard;
+    }
+    /* don't need to do anything special for explore mode or normal play */
+}
+
 #endif	/* OPTION_LISTS_ONLY */
 
 /*options.c*/

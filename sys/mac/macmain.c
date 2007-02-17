@@ -24,8 +24,6 @@
 #include <fcntl.h>
 #endif
 
-static void NDECL(set_playmode);
-
 static void finder_file_request(void);
 int main(void);
 
@@ -271,26 +269,15 @@ finder_file_request(void)
 }
 
 /* validate wizard mode if player has requested access to it */
-static void
-set_playmode()
+boolean
+authorize_wizard_mode()
 {
-    if (wizard) {
 #ifdef WIZARD
 	/* other ports validate user name or character name here */
+	return TRUE;
 #else
-	wizard = FALSE;
+	return FALSE;
 #endif
-
-	if (!wizard) {
-	    discover = TRUE; 
-#ifdef WIZARD
-	} else {
-	    discover = FALSE;	/* paranoia */
-	    Strcpy(plname, "wizard");
-#endif
-	}
-    }
-    /* don't need to do anything special for explore mode or normal play */
 }
 
 /*macmain.c*/

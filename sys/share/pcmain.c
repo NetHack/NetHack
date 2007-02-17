@@ -66,8 +66,6 @@ extern int redirect_stdout;		/* from sys/share/pcsys.c */
 extern void NDECL(mswin_destroy_reg);
 #endif
 
-STATIC_DCL void NDECL(set_playmode);
-
 #ifdef EXEPATH
 STATIC_DCL char *FDECL(exepath,(char *));
 #endif
@@ -697,26 +695,13 @@ port_help()
 #endif
 
 /* validate wizard mode if player has requested access to it */
-STATIC_OVL void
-set_playmode()
+boolean
+authorize_wizard_mode()
 {
-    if (wizard) {
 #ifdef WIZARD
-	if (strcmp(plname, WIZARD_NAME)) wizard = FALSE;
-#else
-	wizard = FALSE;
+	if (!strcmp(plname, WIZARD_NAME)) return TRUE;
 #endif
-
-	if (!wizard) {
-	    discover = TRUE; 
-#ifdef WIZARD
-	} else {
-	    discover = FALSE;	/* paranoia */
-	    Strcpy(plname, "wizard");
-#endif
-	}
-    }
-    /* don't need to do anything special for explore mode or normal play */
+	return FALSE;
 }
 
 #ifdef EXEPATH

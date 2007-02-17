@@ -11,8 +11,6 @@ static void process_options(int argc, char **argv);
 static void chdirx(const char *dir);
 static void getlock(void);
 
-static void NDECL(set_playmode);
-
 #ifdef __begui__
 	#define MAIN nhmain
 	int nhmain(int argc, char **argv);
@@ -238,26 +236,15 @@ void getlock(void)
 }
 
 /* validate wizard mode if player has requested access to it */
-static void
-set_playmode()
+boolean
+authorize_wizard_mode()
 {
-    if (wizard) {
 #ifdef WIZARD
 	/* other ports validate user name or character name here */
+	return TRUE;
 #else
-	wizard = FALSE;
+	return FALSE;
 #endif
-
-	if (!wizard) {
-	    discover = TRUE; 
-#ifdef WIZARD
-	} else {
-	    discover = FALSE;	/* paranoia */
-	    Strcpy(plname, "wizard");
-#endif
-	}
-    }
-    /* don't need to do anything special for explore mode or normal play */
 }
 
 #ifndef __begui__

@@ -39,7 +39,6 @@ extern void NDECL(check_linux_console);
 extern void NDECL(init_linux_cons);
 #endif
 
-static void NDECL(set_playmode);
 static void NDECL(wd_message);
 static boolean wiz_error_flag = FALSE;
 
@@ -507,10 +506,9 @@ port_help()
 #endif
 
 /* validate wizard mode if player has requested access to it */
-static void
-set_playmode()
+boolean
+authorize_wizard_mode()
 {
-    if (wizard) {
 #ifdef WIZARD
 	char *user;
 	int uid;
@@ -532,21 +530,9 @@ set_playmode()
 		pw = getpwuid(uid);
 	    }
 	}
-	if (!pw || strcmp(pw->pw_name, WIZARD_NAME)) wizard = FALSE;
-#else	/* !WIZARD */
-	wizard = FALSE;
-#endif	/* ?WIZARD */
-
-	if (!wizard) {
-	    discover = wiz_error_flag = TRUE; 
-#ifdef WIZARD
-	} else {
-	    discover = FALSE;	/* paranoia */
-	    Strcpy(plname, "wizard");
-#endif
-	}
-    }
-    /* don't need to do anything special for explore mode or normal play */
+	if (pw && !strcmp(pw->pw_name, WIZARD_NAME)) return TRUE;
+#endif	/* WIZARD */
+	return FALSE;
 }
 
 static void

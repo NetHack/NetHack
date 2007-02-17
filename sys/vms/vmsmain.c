@@ -22,7 +22,6 @@ static vms_handler_type FDECL(vms_handler, (genericptr_t,genericptr_t));
 #include <ssdef.h>	/* system service status codes */
 #endif
 
-static void NDECL(set_playmode);
 static void NDECL(wd_message);
 static boolean wiz_error_flag = FALSE;
 
@@ -435,26 +434,13 @@ port_help()
    to match it, avoiding need to test which one to use in string ops */
 
 /* validate wizard mode if player has requested access to it */
-static void
-set_playmode()
+boolean
+authorize_wizard_mode()
 {
-    if (wizard) {
 #ifdef WIZARD
-	if (strcmpi(nh_getenv("USER"), WIZARD_NAME)) wizard = FALSE;
-#else
-	wizard = FALSE;
+	if (!strcmpi(nh_getenv("USER"), WIZARD_NAME)) return TRUE;
 #endif
-
-	if (!wizard) {
-	    discover = wiz_error_flag = TRUE; 
-#ifdef WIZARD
-	} else {
-	    discover = FALSE;	/* paranoia */
-	    Strcpy(plname, "wizard");
-#endif
-	}
-    }
-    /* don't need to do anything special for explore mode or normal play */
+	return FALSE;
 }
 
 static void

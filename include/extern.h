@@ -988,6 +988,10 @@ E int FDECL(macwrite, (int,void *,unsigned));
 E long FDECL(macseek, (int,long,short));
 E int FDECL(macunlink, (const char *));
 
+/* ### macmain.c ### */
+
+E boolean NDECL(authorize_wizard_mode);
+
 /* ### macsnd.c ### */
 
 E void FDECL(mac_speaker, (struct obj *,char *));
@@ -1574,6 +1578,7 @@ E int FDECL(load_symset, (const char *,int));
 E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 #endif
+E void NDECL(set_playmode);
 
 /* ### pager.c ### */
 
@@ -1592,6 +1597,7 @@ E int FDECL(do_look, (int, coord *));
 # ifdef CHDIR
 E void FDECL(chdirx, (char *,BOOLEAN_P));
 # endif /* CHDIR */
+E boolean NDECL(authorize_wizard_mode);
 #endif /* MICRO || WIN32 */
 
 /* ### pcsys.c ### */
@@ -2280,8 +2286,8 @@ E int FDECL(flash_hits_mon, (struct monst *,struct obj *));
 E void NDECL(port_help);
 # endif
 E void FDECL(sethanguphandler, (void (*)(int)));
+E boolean NDECL(authorize_wizard_mode);
 #endif /* UNIX */
-
 
 /* ### unixtty.c ### */
 
@@ -2409,6 +2415,7 @@ E int FDECL(main, (int, char **));
 E void FDECL(chdirx, (const char *,BOOLEAN_P));
 # endif /* CHDIR */
 E void FDECL(sethanguphandler, (void (*)(int)));
+E boolean NDECL(authorize_wizard_mode);
 
 /* ### vmsmisc.c ### */
 

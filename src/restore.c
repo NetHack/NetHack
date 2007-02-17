@@ -546,13 +546,12 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	/* wizard and discover are actually flags.debug and flags.explore;
 	   player might be overriding the save file values for them */
 	if (newgameflags.explore) discover = TRUE;
-	if (newgameflags.debug) wizard = TRUE;
-	if (wizard) {
-#ifdef WIZARD
-	    discover = FALSE;
-#else
-	    discover = TRUE, wizard = FALSE;
-#endif
+	if (newgameflags.debug) {
+	    /* authorized by startup code; wizard mode exists and is allowed */
+	    wizard = TRUE, discover = FALSE;
+	} else if (wizard) {
+	    /* specified by save file; check authorization now */
+	    set_playmode();
 	}
 #ifdef SYSFLAGS
 	newgamesysflags = sysflags;
