@@ -131,15 +131,15 @@ breakchestlock(box, destroyit)
 struct obj *box;
 boolean destroyit;
 {   
-    box->olocked = 0;
-    box->obroken = 1;
-    box->lknown = 1;
     if (!destroyit) {	/* bill for the box but not for its contents */
 	struct obj *hide_contents = box->cobj;
 
 	box->cobj = 0;
 	costly_alteration(box, COST_BRKLCK);
 	box->cobj = hide_contents;
+	box->olocked = 0;
+	box->obroken = 1;
+	box->lknown = 1;
     } else {		/* #force has destroyed this box (at <u.ux,u.uy>) */
 	struct obj *otmp;
 	struct monst *shkp = (*u.ushops && costly_spot(u.ux, u.uy)) ?
@@ -447,6 +447,10 @@ doforce()		/* try to force a chest with your weapon */
 	register int c, picktyp;
 	char qbuf[QBUFSZ];
 
+	if (u.uswallow) {
+	    You_cant("force anything from inside here.");
+	    return 0;
+	}
 	if (!uwep ||	/* proper type test */
 		((uwep->oclass == WEAPON_CLASS || is_weptool(uwep)) ?
 		    (objects[uwep->otyp].oc_skill < P_DAGGER ||
@@ -458,6 +462,10 @@ doforce()		/* try to force a chest with your weapon */
 		       (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep)) ?
 			 "without a proper" : "with that");
 	    return(0);
+	}
+	if (!can_reach_floor(TRUE)) {
+	    cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
+	    return 0;
 	}
 
 	picktyp = is_blade(uwep) && !is_pick(uwep);
