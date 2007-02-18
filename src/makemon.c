@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.5	2006/12/15	*/
+/*	SCCS Id: @(#)makemon.c	3.5	2007/01/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1831,7 +1831,8 @@ int *seencount;   /* secondary output */
     if (!bag || bag->otyp != BAG_OF_TRICKS) {
 	impossible("bad bag o' tricks");
     } else if (bag->spe < 1) {
-	pline(nothing_happens);
+	/* if tipping known empty bag, give normal empty container message */
+	pline((tipping && bag->cknown) ? "It's empty." : nothing_happens);
 	/* now known to be empty if sufficiently discovered */
 	if (bag->dknown && objects[bag->otyp].oc_name_known) bag->cknown = 1;
     } else {
