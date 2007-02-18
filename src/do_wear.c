@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.5	2006/11/27	*/
+/*	SCCS Id: @(#)do_wear.c	3.5	2007/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1687,7 +1687,7 @@ glibr()
 		xfl++;
 		wastwoweap = TRUE;
 		setuswapwep((struct obj *)0);	/* clears u.twoweap */
-		if (otmp->otyp != LOADSTONE || !otmp->cursed)
+		if (canletgo(otmp, ""))
 			dropx(otmp);
 	}
 	otmp = uwep;
@@ -1720,7 +1720,7 @@ glibr()
 	     /* xfl++; */
 		otmp->quan = savequan;
 		setuwep((struct obj *)0);
-		if (otmp->otyp != LOADSTONE || !otmp->cursed)
+		if (canletgo(otmp, ""))
 			dropx(otmp);
 	}
 }
