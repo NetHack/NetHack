@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2007/01/02	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2007/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2166,7 +2166,7 @@ int held;
 	/* from here on out, all early returns go through containerdone */
 
 	/* check for Schroedinger's Cat */
-	quantum_cat = (current_container->spe == 1); /* "it's _now_ empty" */
+	quantum_cat = SchroedingersBox(current_container);
 	if (quantum_cat) {
 	    observe_quantum_cat(current_container);
 	    used = 1;
@@ -2706,7 +2706,7 @@ struct obj *box;	/* or bag */
 	}
 	if (maybeshopgoods && !box->no_charge)
 	    subfrombill(box, shop_keeper(*in_rooms(ox, oy, SHOPBASE)));
-    } else if (box->spe) {
+    } else if (SchroedingersBox(box)) {
 	char yourbuf[BUFSZ];
 
 	observe_quantum_cat(box);

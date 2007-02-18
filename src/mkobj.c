@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2007/01/02	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2007/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1082,7 +1082,7 @@ register struct obj *obj;
 {
 	int wt = objects[obj->otyp].oc_weight;
 
-	if (obj->otyp == LARGE_BOX && obj->spe == 1) /* Schroedinger's Cat */
+	if (SchroedingersBox(obj))
 		wt += mons[PM_HOUSECAT].cwt;
 	if (Is_container(obj) || obj->otyp == STATUE) {
 		struct obj *contents;

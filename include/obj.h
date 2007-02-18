@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)obj.h	3.5	2006/12/14	*/
+/*	SCCS Id: @(#)obj.h	3.5	2007/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -242,6 +242,7 @@ struct obj {
 #define Is_box(otmp)	(otmp->otyp == LARGE_BOX || otmp->otyp == CHEST)
 #define Is_mbag(otmp)	(otmp->otyp == BAG_OF_HOLDING || \
 			 otmp->otyp == BAG_OF_TRICKS)
+#define SchroedingersBox(o)	((o)->otyp == LARGE_BOX && (o)->spe == 1)
 
 /* dragon gear */
 #define Is_dragon_scales(obj)	((obj)->otyp >= GRAY_DRAGON_SCALES && \

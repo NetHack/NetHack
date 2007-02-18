@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2007/01/27	*/
+/*	SCCS Id: @(#)zap.c	3.5	2007/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -434,9 +434,14 @@ struct monst *mtmp;
 #else
 	if (mtmp->minvent) {
 #endif
-	    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+	    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
 		otmp->dknown = 1;	/* treat as "seen" */
-	    (void) display_minventory(mtmp, MINV_ALL, (char *)0);
+		if (Is_container(otmp) || otmp->otyp == STATUE) {
+		    otmp->lknown = 1;
+		    if (!SchroedingersBox(otmp)) otmp->cknown = 1;
+		}
+	    }
+	    (void) display_minventory(mtmp, MINV_ALL|MINV_NOLET, (char *)0);
 	} else {
 	    pline("%s is not carrying anything.", noit_Monnam(mtmp));
 	}
@@ -1614,9 +1619,16 @@ struct obj *obj, *otmp;
 		obj->dknown = 1;
 		if (Is_container(obj) || obj->otyp == STATUE) {
 		    obj->cknown = obj->lknown = 1;
-		    if (!obj->cobj)
-			pline("%s empty.", Tobjnam(obj, "are"));
-		    else {
+		    if (!obj->cobj) {
+			boolean catbox = SchroedingersBox(obj);
+
+			/* we don't want to force alive vs dead
+			   determination for Schroedinger's Cat here,
+			   so just make probing be inconclusive for it */
+			if (catbox) obj->cknown = 0;
+			pline("%s empty.",
+			      Tobjnam(obj, catbox ? "seem" : "are"));
+		    } else {
 			struct obj *o;
 			/* view contents (not recursively) */
 			for (o = obj->cobj; o; o = o->nobj)
@@ -2243,8 +2255,13 @@ boolean ordinary;
 		  {
 		    struct obj *otmp;
 
-		    for (otmp = invent; otmp; otmp = otmp->nobj)
+		    for (otmp = invent; otmp; otmp = otmp->nobj) {
 			otmp->dknown = 1;
+			if (Is_container(otmp) || otmp->otyp == STATUE) {
+			    otmp->lknown = 1;
+			    if (!SchroedingersBox(otmp)) otmp->cknown = 1;
+			}
+		    }
 		    learn_it = TRUE;
 		    ustatusline();
 		    break;

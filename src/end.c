@@ -515,7 +515,7 @@ int what;
 	switch(what) {
 		case CAT_CHECK:			 /* Schroedinger's Cat */
 			/* Ascending is deterministic */
-			if (otmp->otyp == LARGE_BOX && otmp->spe == 1)
+			if (SchroedingersBox(otmp))
 				return rn2(2);
 			break;
 	}
@@ -972,8 +972,7 @@ boolean identified, all_containers, reportempty;
 		box->cknown = 1;	/* we're looking at the contents now */
 		if (identified) box->lknown = 1;
 		cat = deadcat = FALSE;
-		if (box->otyp == LARGE_BOX &&
-		    box->spe == 1 && !Schroedingers_cat) {
+		if (SchroedingersBox(box) && !Schroedingers_cat) {
 			/* Schroedinger's Cat? */
 			cat = odds_and_ends(box, CAT_CHECK);
 			if (cat) Schroedingers_cat = TRUE;
