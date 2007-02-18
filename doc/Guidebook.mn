@@ -2639,16 +2639,41 @@ Explore mode
 .pg
 NetHack is an intricate and difficult game.  Novices might falter
 in fear, aware of their ignorance of the means to survive.  Well, fear
-not.  Your dungeon may come equipped with an ``explore'' or ``discovery''
+not.  Your dungeon comes equipped with an ``explore'' or ``discovery''
 mode that enables you to keep old save files and cheat death, at the
 paltry cost of not getting on the high score list.
 .pg
 There are two ways of enabling explore mode.  One is to start the game
 with the
 .op -X
-switch.  The other is to issue the `X' command while already playing
-the game.  The other benefits of explore mode are left for the trepid
-reader to discover.
+command-line switch or with the
+.op playmode:explore
+option.  The other is to issue the `X' command while already
+playing the game.  Starting a new game in explore mode provides your
+character with a wand of wishing in initial inventory; switching via `X'
+during play does not.  The other benefits of explore mode are left for
+the trepid reader to discover.
+.pg
+.hn 2
+Debug mode
+.pg
+Debug mode, also known as wizard mode, is undocumented aside from this
+brief description.  It is intended for tracking down problems within the
+program rather than to provide god-like powers to your character, and
+players who attempt debugging are expected to figure out how to use it
+themselves.  It is initiated by starting the game with the
+.op -D
+command-line switch or with the
+.op playmode:debug
+option.
+.pg
+For some systems, the player must be logged in
+under a particular user name to be allowed to use debug mode; for others,
+the hero must be given a particular character name (but may be any role;
+there's no connection between ``wizard mode'' and the Wizard role).
+And on any system, the program might have been configured to omit debug
+mode entirely.  Attempting to start a game in debug mode when not allowed
+or not available will result in falling back to explore mode instead.
 
 .hn
 Credits

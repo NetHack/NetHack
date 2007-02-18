@@ -31,7 +31,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.102 $ $Date: 2007/02/14 01:44:46 $
+% $Revision: 1.103 $ $Date: 2007/02/15 05:22:32 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -3241,16 +3241,44 @@ on most versions.
 %.pg
 {\it NetHack\/} is an intricate and difficult game.  Novices might falter
 in fear, aware of their ignorance of the means to survive.  Well, fear
-not.  Your dungeon may come equipped with an ``explore'' or ``discovery''
+not.  Your dungeon comes equipped with an ``explore'' or ``discovery''
 mode that enables you to keep old save files and cheat death, at the
 paltry cost of not getting on the high score list.
 
 %.pg
 There are two ways of enabling explore mode.  One is to start the game
 with the {\tt -X}
-switch.  The other is to issue the `{\tt X}' command while already playing
-the game.  The other benefits of explore mode are left for the trepid
-reader to discover.
+command-line switch or with the
+{\it playmode:explore\/}
+option.  The other is to issue the `{\tt X}' command while already
+playing the game.  Starting a new game in explore mode provides your
+character with a wand of wishing in initial inventory; switching via `X'
+during play does not.  The other benefits of explore mode are left for
+the trepid reader to discover.
+
+%.pg
+%.hn 2
+\subsection*{Debug mode}
+
+%.pg
+Debug mode, also known as wizard mode, is undocumented aside from this
+brief description.  It is intended for tracking down problems within the
+program rather than to provide god-like powers to your character, and
+players who attempt debugging are expected to figure out how to use it
+themselves.  It is initiated by starting the game with the
+{\tt -D}
+command-line switch or with the
+{\it playmode:debug\/}
+option.
+
+%.pg
+For some systems, the player must be logged in
+under a particular user name to be allowed to use debug mode; for others,
+the hero must be given a particular character name (but may be any role;
+there's no connection between ``wizard mode'' and the {\it Wizard\/} role).
+And on any system, the program might have been configured to omit debug
+mode entirely.  Attempting to start a game in debug mode when not allowed
+or not available will result in falling back to explore mode instead.
 
 %.hn
 \section{Credits}
