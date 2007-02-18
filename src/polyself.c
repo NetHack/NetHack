@@ -722,6 +722,8 @@ drop_weapon(alone)
 int alone;
 {
     struct obj *otmp;
+    const char *what, *which, *whichtoo;
+    boolean candropwep, candropswapwep;
 
     if (uwep) {
 	/* !alone check below is currently superfluous but in the
@@ -729,16 +731,29 @@ int alone;
 	 * wear gloves but can wield weapons
 	 */
 	if (!alone || cantwield(youmonst.data)) {
-	    if (alone) You("find you must drop your weapon%s!",
-			   u.twoweap ? "s" : "");
+	    candropwep = canletgo(uwep, "");
+	    candropswapwep = !u.twoweap || canletgo(uswapwep, "");
+	    if (alone) {
+		what = (candropwep && candropswapwep) ? "drop" : "release";
+		which = is_sword(uwep) ? "sword" : weapon_descr(uwep);
+		if (u.twoweap) {
+		    whichtoo = is_sword(uswapwep) ? "sword" :
+				weapon_descr(uswapwep);
+		    if (strcmp(which, whichtoo)) which = "weapon";
+		}
+		if (uwep->quan != 1L || u.twoweap) which = makeplural(which);
+
+		You("find you must %s %s %s!", what,
+		    the_your[!!strncmp(which, "corpse", 6)], which);
+	    }
 	    if (u.twoweap) {
 		otmp = uswapwep;
 		uswapwepgone();
-		if (canletgo(otmp, "")) dropx(otmp);
+		if (candropswapwep) dropx(otmp);
 	    }
 	    otmp = uwep;
 	    uwepgone();
-	    if (canletgo(otmp, "")) dropx(otmp);
+	    if (candropwep) dropx(otmp);
 	    update_inventory();
 	} else if (!could_twoweap(youmonst.data)) {
 	    untwoweapon();

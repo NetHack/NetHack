@@ -102,7 +102,8 @@ static NEARDATA const char kebabable[] = {
 };
 
 /* weapon's skill category name for use as generalized description of weapon */
-const char *weapon_descr(obj)
+const char *
+weapon_descr(obj)
 struct obj *obj;
 {
     int skill = weapon_type(obj);
@@ -112,7 +113,8 @@ struct obj *obj;
     switch (skill) {
     case P_NONE:
 	/* not a weapon: use item class name; override "food" for corpses */
-	descr = (obj->otyp == CORPSE) ? "corpse" :
+	descr = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG) ?
+		OBJ_NAME(objects[obj->otyp]) :
 		def_oc_syms[(int)obj->oclass].name;
 	break;
     case P_SLING:
