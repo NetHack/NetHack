@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lock.c	3.5	2007/01/02	*/
+/*	SCCS Id: @(#)lock.c	3.5	2007/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -249,7 +249,7 @@ pick_lock(pick) /* pick a lock with a given object */
 		pline(no_longer, "hold the", what);
 		reset_pick();
 		return 0;
-	    } else if (xlock.box && !can_reach_floor(TRUE)) {
+	    } else if (u.uswallow || (xlock.box && !can_reach_floor(TRUE))) {
 		pline(no_longer, "reach the", "lock");
 		reset_pick();
 		return 0;
@@ -264,6 +264,13 @@ pick_lock(pick) /* pick a lock with a given object */
 	if(nohands(youmonst.data)) {
 		You_cant("hold %s -- you have no hands!", doname(pick));
 		return(0);
+	} else if (u.uswallow) {
+		You_cant("%sunlock %s.",
+#ifdef TOURIST
+			  (picktyp == CREDIT_CARD) ? "" :
+#endif
+			  "lock or ", mon_nam(u.ustuck));
+		return 0;
 	}
 
 	if((picktyp != LOCK_PICK &&
