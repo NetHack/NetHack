@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dbridge.c	3.5	2006/12/13	*/
+/*	SCCS Id: @(#)dbridge.c	3.5	2007/02/19	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -930,6 +930,11 @@ int x,y;
 #ifdef D_DEBUG
 			pline("%s spared!", E_phrase(etmp1, "are"));
 #endif
+			/* if there is water or lava here, fall in now */
+			if (is_u(etmp1))
+			    spoteffects(FALSE);
+			else
+			    (void)minliquid(etmp1->emon);
 		} else {
 			if (e_inview) {
 			    if (!is_u(etmp1) && Hallucination)
