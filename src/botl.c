@@ -1343,7 +1343,6 @@ const char *fieldnm[MAXBLSTATS];
 const char *fieldfmt[MAXBLSTATS];
 char *vals[MAXBLSTATS];
 boolean activefields[MAXBLSTATS];
-struct hilite_s hilites[MAXBLSTATS];
 NEARDATA winid WIN_STATUS;
 
 void
@@ -1386,6 +1385,7 @@ boolean enable;
 	activefields[fieldidx] = enable;
 }
 
+# ifdef STATUS_HILITES
 void
 genl_status_threshold(fldidx, thresholdtype, threshold, behavior, under, over)
 int fldidx,thresholdtype;
@@ -1394,6 +1394,7 @@ anything threshold;
 {
 	
 }
+# endif /* STATUS_HILITES */
 
 void
 genl_status_update(idx, ptr, chg, percent)
