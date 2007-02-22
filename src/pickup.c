@@ -2642,6 +2642,8 @@ dotip()
     /* anything not covered yet */
     if (cobj->oclass == POTION_CLASS)	/* can't pour potions... */
 	pline_The("%s %s securely sealed.", xname(cobj), otense(cobj, "are"));
+    else if (cobj->otyp == STATUE)
+	pline("Nothing interesting happens.");
     else
 	pline(nothing_happens);
     return 0;
@@ -2732,6 +2734,7 @@ struct obj *box;	/* or bag */
 	int held = carried(box);
 	long loss = 0L;
 
+	if (u.uswallow) highdrop = altarizing = FALSE;
 	box->cknown = 1;
 	pline("%s out%c",
 	      box->cobj->nobj ? "Objects spill" : "An object spills",
