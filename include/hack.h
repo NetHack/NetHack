@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2007/01/02	*/
+/*	SCCS Id: @(#)hack.h	3.5	2007/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -316,6 +316,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define POTION_OCCUPANT_CHANCE(n) (13 + 2*(n))
 #define WAND_BACKFIRE_CHANCE 100
 #define BALL_IN_MON	(u.uswallow && uball && uball->where == OBJ_FREE)
+#define NODIAG(monnum) ((monnum) == PM_GRID_BUG)
 
 /* Flags to control menus */
 #define MENUTYPELEN sizeof("traditional ")

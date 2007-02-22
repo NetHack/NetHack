@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2007/02/05	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2007/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,8 +20,6 @@ struct cmd Cmd = { 0 };		/* flag.h */
 
 #define CMD_TRAVEL	(char)0x90
 #define CMD_CLICKLOOK	(char)0x8F
-
-#define NODIAG(monnum) ((monnum) == PM_GRID_BUG)
 
 #ifdef DEBUG
 /*
@@ -2632,6 +2630,20 @@ confdir()
 	u.dx = xdir[x];
 	u.dy = ydir[x];
 	return;
+}
+
+const char *
+directionname(dir)
+int dir;
+{
+	static NEARDATA const char * const dirnames[] = {
+		"west", "northwest", "north", "northeast",
+		"east", "southeast", "south", "southwest",
+		"down", "up",
+	};
+
+	if (dir < 0 || dir >= SIZE(dirnames)) return "invalid";
+	return dirnames[dir];
 }
 
 int
