@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.5	2005/11/27	*/
+/*	SCCS Id: @(#)worn.c	3.5	2007/02/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -246,7 +246,10 @@ struct obj *obj;	/* item to make known if effect can be seen */
     else
 	mon->mspeed = mon->permspeed;
 
-    if (give_msg && (mon->mspeed != oldspeed || petrify) && canseemon(mon)) {
+    /* no message if monster is immobile (temp or perm) or unseen */
+    if (give_msg && (mon->mspeed != oldspeed || petrify) &&
+	    mon->data->mmove && !(mon->mfrozen || mon->msleeping) &&
+	    canseemon(mon)) {
 	/* fast to slow (skipping intermediate state) or vice versa */
 	const char *howmuch = (mon->mspeed + oldspeed == MFAST + MSLOW) ?
 				"much " : "";
@@ -260,11 +263,8 @@ struct obj *obj;	/* item to make known if effect can be seen */
 	else
 	    pline("%s seems to be moving %sslower.", Monnam(mon), howmuch);
 
-	/* might discover an object if we see the speed change happen, but
-	   avoid making possibly forgotten book known when casting its spell */
-	if (obj != 0 && obj->dknown &&
-		objects[obj->otyp].oc_class != SPBOOK_CLASS)
-	    makeknown(obj->otyp);
+	/* might discover an object if we see the speed change happen */
+	if (obj != 0) learnwand(obj);
     }
 }
 
