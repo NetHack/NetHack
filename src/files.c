@@ -1083,6 +1083,7 @@ get_saved_games()
 	}
 	if (n > 0) {
 	    result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
+	    (void) memset((genericptr_t) result, 0, (n+1)*sizeof(char*));
 	    if (findfirst((char *)fq_save)) {
 	    j = n = 0;
 	    do {
@@ -1110,6 +1111,7 @@ get_saved_games()
 		if(!(dir=opendir(fqname("save", SAVEPREFIX, 0))))
 			return 0;
 	        result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
+		(void) memset((genericptr_t) result, 0, (n+1)*sizeof(char*));
 		for (i=0, j=0; i<n; i++) {
 		    int uid;
 		    char name[64]; /* more than PL_NSIZ */
