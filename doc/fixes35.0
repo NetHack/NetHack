@@ -88,6 +88,7 @@ prevent polymorphing into "new man" at low level from magnifying HP and Pw
 losing a level while polymorphed affects hero's current monster HP as well as
 	underlying normal HP
 mind flayer brain eating is subject to certain fatal targets and to cannibalism
+mind flayer can't eat brains of ghost or shade
 corpses of unique monsters in bones behaved incorrectly if revived or eaten
 fix pluralization for "this tin smells like mother-in-laws" when hallucinating
 try harder to keep pluralization straight when user assigns an already plural

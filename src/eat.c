@@ -468,7 +468,12 @@ int *dmg_p;	/* for dishing out extra damage in lieu of Int loss */
     boolean give_nutrit = FALSE;
     int result = MM_HIT, xtra_dmg = rnd(10);
 
-    if (magr == &youmonst) {
+    if (noncorporeal(pd)) {
+	if (visflag)
+	    pline("%s brain is unharmed.",
+		  (mdef == &youmonst) ? "Your" : s_suffix(mon_nam(mdef)));
+	return MM_MISS;	/* side-effects can't occur */
+    } else if (magr == &youmonst) {
 	You("eat %s brain!", s_suffix(mon_nam(mdef)));
     } else if (mdef == &youmonst) {
 	Your("brain is eaten!");

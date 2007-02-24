@@ -1073,8 +1073,15 @@ dopois:
 		if (Half_physical_damage) dmg = (dmg+1) / 2;
 		mdamageu(mtmp, dmg);
 
-		if (!uarmh || uarmh->otyp != DUNCE_CAP)
-		    (void) eat_brains(mtmp, &youmonst, TRUE, (int *)0);
+		if (!uarmh || uarmh->otyp != DUNCE_CAP) {
+		    /* eat_brains() will miss if target is mindless (won't
+		       happen here; hero is considered to retain his mind
+		       regardless of current shape) or is noncorporeal
+		       (can't happen here; no one can poly into a ghost
+		       or shade) so this check for missing is academic */
+		    if (eat_brains(mtmp, &youmonst, TRUE, (int *)0) == MM_MISS)
+			break;
+		}
 		/* adjattrib gives dunce cap message when appropriate */
 		(void) adjattrib(A_INT, -rnd(2), FALSE);
 		forget_levels(25);	/* lose memory of 25% of levels */
