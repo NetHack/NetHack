@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2007/01/06	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2007/02/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2701,71 +2701,77 @@ srch:
 	 * Disallow such topology tweaks for WIZKIT startup wishes.
 	 */
 	if (wizard && !program_state.wizkit_wishing) {
-		int trap;
+		struct rm *lev;
+		int trap, x = u.ux, y = u.uy;
 
 		for (trap = NO_TRAP+1; trap < TRAPNUM; trap++) {
+			struct trap *t;
 			const char *tname;
 
 			tname = defsyms[trap_to_defsym(trap)].explanation;
-			if (!strncmpi(tname, bp, strlen(tname))) {
-				/* avoid stupid mistakes */
-				if((trap == TRAPDOOR || trap == HOLE)
-				      && !Can_fall_thru(&u.uz)) trap = ROCKTRAP;
-				(void) maketrap(u.ux, u.uy, trap);
-				pline("%s.", An(tname));
-				return(&zeroobj);
-			}
+			if (strncmpi(tname, bp, strlen(tname))) continue;
+			/* found it; avoid stupid mistakes */
+			if ((trap == TRAPDOOR || trap == HOLE) &&
+				!Can_fall_thru(&u.uz)) trap = ROCKTRAP;
+			if ((t = maketrap(x, y, trap)) != 0) {
+			    trap = t->ttyp;
+			    tname = defsyms[trap_to_defsym(trap)].explanation;
+			    pline("%s%s.", An(tname),
+				  (trap != MAGIC_PORTAL) ? "" : " to nowhere");
+			} else
+			    pline("Creation of %s failed.", An(tname));
+			return(&zeroobj);
 		}
 
 		/* furniture and terrain */
+		lev = &levl[x][y];
 		p = eos(bp);
 		if(!BSTRCMP(bp, p-8, "fountain")) {
-			levl[u.ux][u.uy].typ = FOUNTAIN;
+			lev->typ = FOUNTAIN;
 			level.flags.nfountains++;
-			if(!strncmpi(bp, "magic ", 6))
-				levl[u.ux][u.uy].blessedftn = 1;
-			pline("A %sfountain.",
-			      levl[u.ux][u.uy].blessedftn ? "magic " : "");
-			newsym(u.ux, u.uy);
+			if(!strncmpi(bp, "magic ", 6)) lev->blessedftn = 1;
+			pline("A %sfountain.", lev->blessedftn ? "magic " : "");
+			newsym(x, y);
 			return(&zeroobj);
 		}
 		if(!BSTRCMP(bp, p-6, "throne")) {
-			levl[u.ux][u.uy].typ = THRONE;
+			lev->typ = THRONE;
 			pline("A throne.");
-			newsym(u.ux, u.uy);
+			newsym(x, y);
 			return(&zeroobj);
 		}
 # ifdef SINKS
 		if(!BSTRCMP(bp, p-4, "sink")) {
-			levl[u.ux][u.uy].typ = SINK;
+			lev->typ = SINK;
 			level.flags.nsinks++;
 			pline("A sink.");
-			newsym(u.ux, u.uy);
+			newsym(x, y);
 			return &zeroobj;
 		}
 # endif
-		if(!BSTRCMP(bp, p-4, "pool")) {
-			levl[u.ux][u.uy].typ = POOL;
-			del_engr_at(u.ux, u.uy);
-			pline("A pool.");
+		/* ("water" matches "potion of water" rather than terrain) */
+		if (!BSTRCMP(bp, p-4, "pool") || !BSTRCMP(bp, p-4, "moat")) {
+			lev->typ = !BSTRCMP(bp, p-4, "pool") ? POOL : MOAT;
+			del_engr_at(x, y);
+			pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
 			/* Must manually make kelp! */
-			water_damage(&level.objects[u.ux][u.uy], FALSE, TRUE);
-			newsym(u.ux, u.uy);
+			water_damage(&level.objects[x][y], FALSE, TRUE);
+			newsym(x, y);
 			return &zeroobj;
 		}
 		if (!BSTRCMP(bp, p-4, "lava")) {  /* also matches "molten lava" */
-			levl[u.ux][u.uy].typ = LAVAPOOL;
-			del_engr_at(u.ux, u.uy);
+			lev->typ = LAVAPOOL;
+			del_engr_at(x, y);
 			pline("A pool of molten lava.");
 			if (!(Levitation || Flying)) (void) lava_effects();
-			newsym(u.ux, u.uy);
+			newsym(x, y);
 			return &zeroobj;
 		}
 
 		if(!BSTRCMP(bp, p-5, "altar")) {
 		    aligntyp al;
 
-		    levl[u.ux][u.uy].typ = ALTAR;
+		    lev->typ = ALTAR;
 		    if(!strncmpi(bp, "chaotic ", 8))
 			al = A_CHAOTIC;
 		    else if(!strncmpi(bp, "neutral ", 8))
@@ -2776,36 +2782,37 @@ srch:
 			al = A_NONE;
 		    else /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
 			al = (!rn2(6)) ? A_NONE : rn2((int)A_LAWFUL+2) - 1;
-		    levl[u.ux][u.uy].altarmask = Align2amask( al );
+		    lev->altarmask = Align2amask(al);
 		    pline("%s altar.", An(align_str(al)));
-		    newsym(u.ux, u.uy);
+		    newsym(x, y);
 		    return(&zeroobj);
 		}
 
 		if(!BSTRCMP(bp, p-5, "grave") || !BSTRCMP(bp, p-9, "headstone")) {
-		    make_grave(u.ux, u.uy, (char *) 0);
-		    pline("%s.", IS_GRAVE(levl[u.ux][u.uy].typ) ? "A grave" :
+		    make_grave(x, y, (char *)0);
+		    pline("%s.", IS_GRAVE(lev->typ) ? "A grave" :
 				 "Can't place a grave here");
-		    newsym(u.ux, u.uy);
+		    newsym(x, y);
 		    return(&zeroobj);
 		}
 
 		if(!BSTRCMP(bp, p-4, "tree")) {
-		    levl[u.ux][u.uy].typ = TREE;
+		    lev->typ = TREE;
 		    pline("A tree.");
-		    newsym(u.ux, u.uy);
-		    block_point(u.ux, u.uy);
+		    newsym(x, y);
+		    block_point(x, y);
 		    return &zeroobj;
 		}
 
 		if(!BSTRCMP(bp, p-4, "bars")) {
-		    levl[u.ux][u.uy].typ = IRONBARS;
+		    lev->typ = IRONBARS;
 		    pline("Iron bars.");
-		    newsym(u.ux, u.uy);
+		    newsym(x, y);
 		    return &zeroobj;
 		}
 	}
-#endif
+#endif 	/* WIZARD */
+
 	if(!oclass) return((struct obj *)0);
 any:
 	if(!oclass) oclass = wrpsym[rn2((int)sizeof(wrpsym))];
