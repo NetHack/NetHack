@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.5	2007/01/02	*/
+/*	SCCS Id: @(#)end.c	3.5	2007/02/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1023,6 +1023,7 @@ void
 terminate(status)
 int status;
 {
+	program_state.in_moveloop = 0;	/* won't be returning to normal play */
 #ifdef MAC
 	getreturn("to exit");
 #endif
@@ -1038,6 +1039,7 @@ int status;
 	   that would cancel any other pending user-mode handlers */
 	if (program_state.exiting) return;
 #endif
+	program_state.exiting = 1;
 	nethack_exit(status);
 }
 

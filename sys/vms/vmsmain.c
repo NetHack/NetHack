@@ -375,9 +375,6 @@ byebye()
 	    hup != (void FDECL((*),(int))) SIG_DFL &&
 	    hup != (void FDECL((*),(int))) SIG_IGN) {
 	(*hup)(SIGHUP);
-#ifdef SAFERHANGUP
-	end_of_input();
-#endif
     }
 
 #ifdef CHDIR

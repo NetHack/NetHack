@@ -2842,6 +2842,7 @@ void
 hangup(sig_unused) /* called as signal() handler, so sent at least one arg */
 int sig_unused;
 {
+	if (program_state.exiting) program_state.in_moveloop = 0;
 	nhwindows_hangup();
 # ifdef SAFERHANGUP
 	/* When using SAFERHANGUP, the done_hup flag it tested in rhack
@@ -2852,7 +2853,8 @@ int sig_unused;
 	   must continue running longer before attempting a hangup save. */
 	program_state.done_hup++;
 	/* defer hangup iff game appears to be in progress */
-	if (program_state.something_worth_saving) return;
+	if (program_state.in_moveloop && program_state.something_worth_saving)
+	    return;
 # endif /* SAFERHANGUP */
 	end_of_input();
 }

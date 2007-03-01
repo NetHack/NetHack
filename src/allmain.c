@@ -76,6 +76,7 @@ boolean resuming;
     youmonst.movement = NORMAL_SPEED;	/* give the hero some movement points */
     context.move = 0;
 
+    program_state.in_moveloop = 1;
     for(;;) {
 #ifdef SAFERHANGUP
 	if (program_state.done_hup) end_of_input();
