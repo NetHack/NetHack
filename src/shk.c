@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shk.c	3.5	2006/10/30	*/
+/*	SCCS Id: @(#)shk.c	3.5	2007/03/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -57,7 +57,7 @@ STATIC_DCL void FDECL(shk_names_obj,
 		 (struct monst *,struct obj *,const char *,long,const char *));
 STATIC_DCL struct obj *FDECL(bp_to_obj, (struct bill_x *));
 STATIC_DCL boolean FDECL(inherits, (struct monst *,int,int));
-STATIC_DCL void FDECL(set_repo_loc, (struct eshk *));
+STATIC_DCL void FDECL(set_repo_loc, (struct monst *));
 STATIC_DCL boolean NDECL(angry_shk_exists);
 STATIC_DCL void FDECL(rile_shk, (struct monst *));
 STATIC_DCL void FDECL(rouse_shk, (struct monst *,BOOLEAN_P));
@@ -1549,7 +1549,10 @@ boolean itemize;
 	return buy;
 }
 
-static coord repo_location;	/* repossession context */
+static struct repo {	/* repossession context */
+    struct monst *shopkeeper;
+    coord location;
+} repo;
 
 /* routine called after dying (or quitting) */
 boolean
@@ -1564,9 +1567,13 @@ int croaked;	/* -1: escaped dungeon; 0: quit; 1: died */
 	   shops don't occur on level 1, but this could happen if hero
 	   level teleports out of the dungeon and manages not to die */
 	if (croaked < 0) return FALSE;
+	/* [should probably also return false when dead hero has been
+	    petrified since shk shouldn't be able to grab inventory
+	    which has been shut inside a statue] */
 
 	/* this is where inventory will end up if any shk takes it */
-	repo_location.x = repo_location.y = 0;
+	repo.location.x = repo.location.y = 0;
+	repo.shopkeeper = 0;
 
 	/* give shopkeeper first crack */
 	if ((mtmp = shop_keeper(*u.ushops)) && inhishop(mtmp)) {
@@ -1631,10 +1638,11 @@ int croaked;
 	if(roomno == eshkp->shoproom && inhishop(shkp) &&
 	    !eshkp->billct && !eshkp->robbed && !eshkp->debit &&
 	     NOTANGRY(shkp) && !eshkp->following) {
-		if (invent)
+		taken = (invent != 0);
+		if (taken)
 			pline("%s gratefully inherits all your possessions.",
 				shkname(shkp));
-		set_repo_loc(eshkp);
+		set_repo_loc(shkp);
 		goto clear;
 	}
 
@@ -1676,7 +1684,7 @@ int croaked;
 			      shkname(shkp), takes);
 			taken = TRUE;
 			/* where to put player's invent (after disclosure) */
-			set_repo_loc(eshkp);
+			set_repo_loc(shkp);
 		} else {
 #ifndef GOLDOBJ
 			shkp->mgold += loss;
@@ -1709,10 +1717,11 @@ clear:
 }
 
 STATIC_OVL void
-set_repo_loc(eshkp)
-struct eshk *eshkp;
+set_repo_loc(shkp)
+struct monst *shkp;
 {
 	register xchar ox, oy;
+	struct eshk *eshkp = ESHK(shkp);
 
 	/* if you're not in this shk's shop room, or if you're in its doorway
 	    or entry spot, then your gear gets dumped all the way inside */
@@ -1731,31 +1740,37 @@ struct eshk *eshkp;
 	    oy = u.uy;
 	}
 	/* finish_paybill will deposit invent here */
-	repo_location.x = ox;
-	repo_location.y = oy;
+	repo.location.x = ox;
+	repo.location.y = oy;
+	repo.shopkeeper = shkp;
 }
 
 /* called at game exit, after inventory disclosure but before making bones */
 void
 finish_paybill()
 {
-	register struct obj *otmp;
-	int ox = repo_location.x,
-	    oy = repo_location.y;
+	struct monst *shkp = repo.shopkeeper;
+	int ox = repo.location.x,
+	    oy = repo.location.y;
 
 #if 0		/* don't bother */
 	if (ox == 0 && oy == 0) impossible("finish_paybill: no location");
 #endif
 	/* normally done by savebones(), but that's too late in this case */
 	unleash_all();
-	/* transfer all of the character's inventory to the shop floor */
-	while ((otmp = invent) != 0) {
-	    otmp->owornmask = 0L;	/* perhaps we should call setnotworn? */
-	    otmp->lamplit = 0;		/* avoid "goes out" msg from freeinv */
-	    if (rn2(5)) curse(otmp);	/* normal bones treatment for invent */
-	    obj_extract_self(otmp);
-	    place_object(otmp, ox, oy);
+	/* if hero has any gold left, take it into shopkeeper's possession */
+	if (shkp) {
+#ifdef GOLDOBJ
+	    long umoney = money_cnt(invent);
+
+	    if (umoney) money2mon(shkp, umoney);
+#else
+	    shkp->mgold += u.ugold;
+	    u.ugold = 0L;
+#endif
 	}
+	/* transfer rest of the character's inventory to the shop floor */
+	drop_upon_death((struct monst *)0, (struct obj *)0, ox, oy);
 }
 
 /* find obj on one of the lists */

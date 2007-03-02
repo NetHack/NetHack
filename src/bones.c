@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bones.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)bones.c	3.5	2007/03/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,7 +13,6 @@ extern long bytes_counted;
 STATIC_DCL boolean FDECL(no_bones_level, (d_level *));
 STATIC_DCL void FDECL(goodfruit, (int));
 STATIC_DCL void FDECL(resetobjs,(struct obj *,BOOLEAN_P));
-STATIC_DCL void FDECL(drop_upon_death, (struct monst *, struct obj *));
 
 STATIC_OVL boolean
 no_bones_level(lev)
@@ -164,14 +163,16 @@ boolean restore;
 	}
 }
 
-STATIC_OVL void
-drop_upon_death(mtmp, cont)
+/* called by savebones(); also by finish_paybill(shk.c) */
+void
+drop_upon_death(mtmp, cont, x, y)
 struct monst *mtmp;
 struct obj *cont;
+int x, y;
 {
 	struct obj *otmp;
 
-	uswapwep = 0; /* ensure curse() won't cause swapwep to drop twice */
+	u.twoweap = 0; /* ensure curse() won't cause swapwep to drop twice */
 	while ((otmp = invent) != 0) {
 		obj_extract_self(otmp);
 		obj_no_longer_held(otmp);
@@ -189,14 +190,15 @@ struct obj *cont;
 		else if (cont)
 			(void) add_to_container(cont, otmp);
 		else
-			place_object(otmp, u.ux, u.uy);
+			place_object(otmp, x, y);
 	}
 #ifndef GOLDOBJ
 	if(u.ugold) {
 		long ugold = u.ugold;
+
 		if (mtmp) mtmp->mgold = ugold;
 		else if (cont) (void) add_to_container(cont, mkgoldobj(ugold));
-		else (void)mkgold(ugold, u.ux, u.uy);
+		else (void)mkgold(ugold, x, y);
 		u.ugold = ugold;	/* undo mkgoldobj()'s removal */
 	}
 #endif
@@ -299,12 +301,12 @@ struct obj *corpse;
 		otmp = mk_named_object(STATUE, &mons[u.umonnum],
 				       u.ux, u.uy, plname);
 
-		drop_upon_death((struct monst *)0, otmp);
+		drop_upon_death((struct monst *)0, otmp, u.ux, u.uy);
 		if (!otmp) return;	/* couldn't make statue */
 		mtmp = (struct monst *)0;
 	} else if (u.ugrave_arise < LOW_PM) {
 		/* drop everything */
-		drop_upon_death((struct monst *)0, (struct obj *)0);
+		drop_upon_death((struct monst *)0, (struct obj *)0, u.ux, u.uy);
 		/* trick makemon() into allowing monster creation
 		 * on your location
 		 */
@@ -321,7 +323,8 @@ struct obj *corpse;
 		mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MM_FLAGS);
 		in_mklev = FALSE;
 		if (!mtmp) {
-			drop_upon_death((struct monst *)0, (struct obj *)0);
+			drop_upon_death((struct monst *)0, (struct obj *)0,
+					u.ux, u.uy);
 			return;
 		}
 		mtmp = christen_monst(mtmp, plname);
@@ -332,7 +335,7 @@ struct obj *corpse;
 		    Your("body rises from the dead as %s...",
 			 an(mons[u.ugrave_arise].mname));
 		display_nhwindow(WIN_MESSAGE, FALSE);
-		drop_upon_death(mtmp, (struct obj *)0);
+		drop_upon_death(mtmp, (struct obj *)0, u.ux, u.uy);
 		m_dowear(mtmp, TRUE);
 	}
 	if (mtmp) {
