@@ -216,7 +216,6 @@ E NEARDATA boolean in_mklev;
 E NEARDATA boolean stoned;
 E NEARDATA boolean unweapon;
 E NEARDATA boolean mrg_to_wielded;
-E NEARDATA struct obj *current_wand;
 E NEARDATA boolean defer_see_monsters;
 
 E NEARDATA boolean in_steed_dismounting;
@@ -249,6 +248,7 @@ E NEARDATA struct obj *uchain;		/* defined only when punished */
 E NEARDATA struct obj *uball;
 E NEARDATA struct obj *migrating_objs;
 E NEARDATA struct obj *billobjs;
+E NEARDATA struct obj *current_wand;
 E NEARDATA struct obj zeroobj;		/* init'd and defined in decl.c */
 E NEARDATA anything zeroany;		/* init'd and defined in decl.c */
 

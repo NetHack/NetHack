@@ -120,7 +120,6 @@ NEARDATA boolean stoned = FALSE;	/* done to monsters hit by 'c' */
 NEARDATA boolean unweapon = FALSE;
 NEARDATA boolean mrg_to_wielded = FALSE;
 			 /* weapon picked is merged with wielded one */
-NEARDATA struct obj *current_wand = 0;	/* wand currently zapped/applied */
 
 NEARDATA boolean in_steed_dismounting = FALSE;
 
@@ -158,6 +157,7 @@ NEARDATA struct obj *invent = (struct obj *)0,
 	*ublindf = (struct obj *)0,
 	*uchain = (struct obj *)0,
 	*uball = (struct obj *)0;
+NEARDATA struct obj *current_wand = 0;	/* wand currently zapped/applied */
 
 #ifdef TEXTCOLOR
 /*
