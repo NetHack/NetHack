@@ -700,6 +700,9 @@ die:
 		make_grave(u.ux, u.uy, pbuf);
 	    }
 	}
+	/* if pets will contribute to score, populate mydogs list now
+	   (bones creation isn't a factor, but pline() messaging is) */
+	if (how == ESCAPED || how == ASCENDED) keepdogs(TRUE);
 
 	if (how == QUIT) {
 	    killer.format = NO_KILLER_PREFIX;
@@ -836,7 +839,6 @@ die:
 	    /* count the points for artifacts */
 	    artifact_score(invent, TRUE, endwin);
 
-	    keepdogs(TRUE);
 	    viz_array[0][0] |= IN_SIGHT; /* need visibility for naming */
 	    mtmp = mydogs;
 	    if (!done_stopprint) Strcpy(pbuf, "You");

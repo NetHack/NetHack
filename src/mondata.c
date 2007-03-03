@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.5	2007/02/05	*/
+/*	SCCS Id: @(#)mondata.c	3.5	2007/03/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -662,8 +662,12 @@ boolean
 levl_follower(mtmp)
 struct monst *mtmp;
 {
-	/* monsters with the Amulet--even pets--won't follow across levels */
-	if (mon_has_amulet(mtmp)) return FALSE;
+#ifdef STEED
+	if (mtmp == u.usteed) return TRUE;
+#endif
+
+	/* Wizard with Amulet won't bother trying to follow across levels */
+	if (mtmp->iswiz && mon_has_amulet(mtmp)) return FALSE;
 
 	/* some monsters will follow even while intending to flee from you */
 	if (mtmp->mtame || mtmp->iswiz || is_fshk(mtmp)) return TRUE;
