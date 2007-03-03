@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)questpgr.c	3.5	2004/11/22	*/
+/*	SCCS Id: @(#)questpgr.c	3.5	2007/03/02	*/
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,6 +12,9 @@
 #define QTEXT_FILE	"quest.dat"
 
 /* #define DEBUG */	/* uncomment for debugging */
+
+/* from sp_lev.c, for deliver_splev_message() */
+extern char *lev_message;
 
 static void FDECL(Fread, (genericptr_t,int,int,dlb *));
 STATIC_DCL struct qtmsg * FDECL(construct_qtlist, (long));
@@ -365,7 +368,7 @@ struct qtmsg *qt_msg;
 	for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
 	    (void) dlb_fgets(in_line, 80, msg_file);
 	    convert_line();
-	    pline(out_line);
+	    pline("%s", out_line);
 	}
 
 }
@@ -460,6 +463,35 @@ qt_montype()
 	if (qpm != NON_PM && rn2(5) && !(mvitals[qpm].mvflags & G_GENOD))
 	    return (&mons[qpm]);
 	return (mkclass(urole.enemy2sym, 0));
+}
+
+/* special levels can include a custom arrival message; display it */
+void
+deliver_splev_message()
+{
+    char *str, *nl;
+
+    /* there's no provision for delivering via window instead of pline */
+    if (lev_message) {
+	/* lev_message can span multiple lines using embedded newline chars;
+	   any segments too long to fit within in_line[] will be truncated */
+	for (str = lev_message; *str; str = nl + 1) {
+	    (void)strncpy(in_line, str, sizeof in_line - 1);
+	    in_line[sizeof in_line - 1] = '\0';
+	    if ((nl = index(in_line, '\n')) != 0) *nl = '\0';
+
+	    /* convert_line() expects encrypted input;
+	       it reads from in_line[] and writes to out_line[] */
+	    (void)xcrypt(in_line, in_line);
+	    convert_line();
+	    pline("%s", out_line);
+
+	    if ((nl = index(str, '\n')) == 0) break; /* done if no newline */
+	}
+
+	free((genericptr_t)lev_message);
+	lev_message = 0;
+    }
 }
 
 /*questpgr.c*/

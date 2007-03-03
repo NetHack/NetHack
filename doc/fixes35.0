@@ -125,6 +125,7 @@ recognize most instances where hallucinatory monster name should be treated
 	as a personal name (to avoid "the Barney") instead of a description
 avoid giving misleading or redundant feedback when reading scrolls
 custom arrival message for special levels could be delivered too soon
+custom arrival message for special levels now supports quest text substitution
 prevent scroll of charging that has already disappeared from showing in the
 	picklist of things to charge
 doors break instead of absorbing the blast of a broken wand of striking

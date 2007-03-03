@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkmaze.c	3.5	2006/05/09	*/
+/*	SCCS Id: @(#)mkmaze.c	3.5	2007/03/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,7 +7,6 @@
 #include "lev.h"	/* save & restore info */
 
 /* from sp_lev.c, for fixup_special() */
-extern char *lev_message;
 extern lev_region *lregions;
 extern int num_lregions;
 
@@ -478,26 +477,6 @@ fixup_special()
     if (lregions)
 	free((genericptr_t) lregions),  lregions = 0;
     num_lregions = 0;
-}
-
-/* special levels can include a custom arrival message; display it */
-void
-deliver_splev_message()
-{
-    char *str, *nl;
-
-    /* this used to be inline within fixup_special(),
-       but then the message ended up being given too soon */
-    if (lev_message) {
-	for (str = lev_message; (nl = index(str, '\n')) != 0; str = nl + 1) {
-	    *nl = '\0';
-	    pline("%s", str);
-	}
-	if (*str)
-	    pline("%s", str);
-	free((genericptr_t)lev_message);
-	lev_message = 0;
-    }
 }
 
 void
