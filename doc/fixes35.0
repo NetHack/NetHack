@@ -288,6 +288,7 @@ worm teeth and crysknives have become stackable
 improved container interface
 acid can destroy iron bars
 OPTIONS=playmode:normal|explore|debug to choose mode without command-line
+score bonus for ascending is reduced or denied for changing alignment
 
 
 Platform- and/or Interface-Specific New Features

@@ -753,7 +753,15 @@ die:
 	    if (deepest > 20)
 		tmp += 1000L * (long)((deepest > 30) ? 10 : deepest - 20);
 	    nowrap_add(u.urexp, tmp);
-	    if (how == ASCENDED) nowrap_add(u.urexp, u.urexp);
+
+	    /* ascension gives a score bonus iff offering to original deity */
+	    if (how == ASCENDED && u.ualign.type == u.ualignbase[A_ORIGINAL]) {
+		/* retaining original alignment: score *= 2;
+		   converting, then using helm-of-OA to switch back: *= 1.5 */
+		tmp = (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL]) ?
+			u.urexp : (u.urexp / 2L);
+		nowrap_add(u.urexp, tmp);
+	    }
 	}
 
 	if (bones_ok) {
