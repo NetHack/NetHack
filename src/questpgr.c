@@ -476,9 +476,8 @@ deliver_splev_message()
 	/* lev_message can span multiple lines using embedded newline chars;
 	   any segments too long to fit within in_line[] will be truncated */
 	for (str = lev_message; *str; str = nl + 1) {
-	    (void)strncpy(in_line, str, sizeof in_line - 1);
-	    in_line[sizeof in_line - 1] = '\0';
-	    if ((nl = index(in_line, '\n')) != 0) *nl = '\0';
+	    /* copying will stop at newline if one is present */
+	    copynchars(in_line, str, (int)(sizeof in_line) - 1);
 
 	    /* convert_line() expects encrypted input;
 	       it reads from in_line[] and writes to out_line[] */

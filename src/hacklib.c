@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hacklib.c	3.5	2004/04/11	*/
+/*	SCCS Id: @(#)hacklib.c	3.5	2007/03/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,6 +19,7 @@ NetHack, except that rounddiv may call panic().
 	char *		mungspaces	(char *)
 	char *		eos		(char *)
 	char *		strkitten	(char *,char)
+	void		copynchars	(char *,const char *,int)
 	char *		s_suffix	(const char *)
 	char *		xcrypt		(const char *, char *)
 	boolean		onlyspace	(const char *)
@@ -137,6 +138,22 @@ strkitten(s, c)		/* append a character to a string (in place) */
     *p++ = c;
     *p = '\0';
     return s;
+}
+
+void
+copynchars(dst, src, n)		/* truncating string copy */
+    char *dst;
+    const char *src;
+    int n;
+{
+    /* copies at most n characters, stopping sooner if terminator reached;
+       treats newline as input terminator; unlike strncpy, always supplies
+       '\0' terminator so dst must be able to hold at least n+1 characters */
+    while (n > 0 && *src != '\0' && *src != '\n') {
+	*dst++ = *src++;
+	--n;
+    }
+    *dst = '\0';
 }
 
 char *
