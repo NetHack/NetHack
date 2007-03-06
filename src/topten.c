@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)topten.c	3.5	2006/05/09	*/
+/*	SCCS Id: @(#)topten.c	3.5	2007/03/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,6 +64,7 @@ STATIC_DCL void FDECL(topten_print_bold, (const char *));
 STATIC_DCL xchar FDECL(observable_depth, (d_level *));
 STATIC_DCL void NDECL(outheader);
 STATIC_DCL void FDECL(outentry, (int,struct toptenentry *,BOOLEAN_P));
+STATIC_DCL void FDECL(discardexcess, (FILE *));
 STATIC_DCL void FDECL(readentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(writeentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
@@ -122,11 +123,26 @@ d_level *lev;
 	    return depth(lev);
 }
 
+/* throw away characters until current record has been entirely consumed */
+STATIC_OVL void
+discardexcess(rfile)
+FILE *rfile;
+{
+	int c;
+
+	do {
+	    c = fgetc(rfile);
+	} while (c != '\n' && c != EOF);
+}
+
 STATIC_OVL void
 readentry(rfile,tt)
 FILE *rfile;
 struct toptenentry *tt;
 {
+	char inbuf[BUFSZ],
+	     s1[BUFSZ], s2[BUFSZ], s3[BUFSZ], s4[BUFSZ], s5[BUFSZ], s6[BUFSZ];
+
 #ifdef NO_SCAN_BRACK /* Version_ Pts DgnLevs_ Hp___ Died__Born id */
 	static const char fmt[] = "%d %d %d %ld %d %d %d %d %d %d %ld %ld %d%*c";
 	static const char fmt32[] = "%c%c %s %s%*c";
@@ -138,7 +154,7 @@ struct toptenentry *tt;
 #endif
 
 #ifdef UPDATE_RECORD_IN_PLACE
-	/* note: fscanf() below must read the record's terminating newline */
+	/* note: input below must read the record's terminating newline */
 	final_fpos = tt->fpos = ftell(rfile);
 #endif
 #define TTFIELDS 13
@@ -147,18 +163,32 @@ struct toptenentry *tt;
 			&tt->points, &tt->deathdnum, &tt->deathlev,
 			&tt->maxlvl, &tt->hp, &tt->maxhp, &tt->deaths,
 			&tt->deathdate, &tt->birthdate,
-			&tt->uid) != TTFIELDS)
+			&tt->uid) != TTFIELDS) {
 #undef TTFIELDS
 		tt->points = 0;
-	else {
+		discardexcess(rfile);
+	} else {
+		/* load remainder of record into a local buffer;
+		   this imposes an implicit length limit of BUFSZ
+		   on every string field extracted from the buffer */
+		if (!fgets(inbuf, sizeof inbuf, rfile)) {
+		    /* sscanf will fail and tt->points will be set to 0 */
+		    *inbuf = '\0';
+		} else if (!index(inbuf, '\n')) {
+		    Strcpy(&inbuf[sizeof inbuf - 2], "\n");
+		    discardexcess(rfile);
+		}
 		/* Check for backwards compatibility */
 		if (tt->ver_major < 3 ||
 				(tt->ver_major == 3 && tt->ver_minor < 3)) {
-			int i;
+		    int i;
 
-		    if (fscanf(rfile, fmt32,
-				tt->plrole, tt->plgend,
-				tt->name, tt->death) != 4)
+		    if (sscanf(inbuf, fmt32,
+			       tt->plrole, tt->plgend, s1, s2) == 4) {
+			tt->plrole[1] = tt->plgend[1] = '\0'; /* read via %c */
+			copynchars(tt->name, s1, (int)(sizeof tt->name) - 1);
+			copynchars(tt->death, s2, (int)(sizeof tt->death) - 1);
+		    } else
 			tt->points = 0;
 		    tt->plrole[1] = '\0';
 		    if ((i = str2role(tt->plrole)) >= 0)
@@ -166,9 +196,14 @@ struct toptenentry *tt;
 		    Strcpy(tt->plrace, "?");
 		    Strcpy(tt->plgend, (tt->plgend[0] == 'M') ? "Mal" : "Fem");
 		    Strcpy(tt->plalign, "?");
-		} else if (fscanf(rfile, fmt33,
-				tt->plrole, tt->plrace, tt->plgend,
-				tt->plalign, tt->name, tt->death) != 6)
+		} else if (sscanf(inbuf, fmt33, s1, s2, s3, s4, s5, s6) == 6) {
+		    copynchars(tt->plrole, s1, (int)(sizeof tt->plrole) - 1);
+		    copynchars(tt->plrace, s2, (int)(sizeof tt->plrace) - 1);
+		    copynchars(tt->plgend, s3, (int)(sizeof tt->plgend) - 1);
+		    copynchars(tt->plalign, s4, (int)(sizeof tt->plalign) - 1);
+		    copynchars(tt->name, s5, (int)(sizeof tt->name) - 1);
+		    copynchars(tt->death, s6, (int)(sizeof tt->death) - 1);
+		} else
 			tt->points = 0;
 #ifdef NO_SCAN_BRACK
 		if(tt->points > 0) {
@@ -304,16 +339,11 @@ int how;
 	t0->maxhp = u.uhpmax;
 	t0->deaths = u.umortality;
 	t0->uid = uid;
-	(void) strncpy(t0->plrole, urole.filecode, ROLESZ);
-	t0->plrole[ROLESZ] = '\0';
-	(void) strncpy(t0->plrace, urace.filecode, ROLESZ);
-	t0->plrace[ROLESZ] = '\0';
-	(void) strncpy(t0->plgend, genders[flags.female].filecode, ROLESZ);
-	t0->plgend[ROLESZ] = '\0';
-	(void) strncpy(t0->plalign, aligns[1-u.ualign.type].filecode, ROLESZ);
-	t0->plalign[ROLESZ] = '\0';
-	(void) strncpy(t0->name, plname, NAMSZ);
-	t0->name[NAMSZ] = '\0';
+	copynchars(t0->plrole, urole.filecode, ROLESZ);
+	copynchars(t0->plrace, urace.filecode, ROLESZ);
+	copynchars(t0->plgend, genders[flags.female].filecode, ROLESZ);
+	copynchars(t0->plalign, aligns[1 - u.ualign.type].filecode, ROLESZ);
+	copynchars(t0->name, plname, NAMSZ);
 	t0->death[0] = '\0';
 	switch (killer.format) {
 		default: impossible("bad killer format?");
