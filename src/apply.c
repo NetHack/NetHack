@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2007/02/03	*/
+/*	SCCS Id: @(#)apply.c	3.5	2007/03/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -344,11 +344,34 @@ use_stethoscope(obj)
 		return 0;
 	}
 	if ((mtmp = m_at(rx,ry)) != 0) {
-		mstatusline(mtmp);
+		const char *mnm = x_monnam(mtmp, ARTICLE_A, (const char *)0,
+					SUPPRESS_IT|SUPPRESS_INVISIBLE, FALSE);
+
 		if (mtmp->mundetected) {
-			mtmp->mundetected = 0;
-			if (cansee(rx,ry)) newsym(mtmp->mx,mtmp->my);
+		    if (!canspotmon(mtmp))
+			There("is %s hidden there.", mnm);
+		    mtmp->mundetected = 0;
+		    newsym(mtmp->mx, mtmp->my);
+		} else if (mtmp->mappearance) {
+		    const char *what = "thing";
+
+		    switch (mtmp->m_ap_type) {
+		    case M_AP_OBJECT:
+			what = simple_typename(mtmp->mappearance);
+			break;
+		    case M_AP_MONSTER:	/* ignore Hallucination here */
+			what = mons[mtmp->mappearance].mname;
+			break;
+		    case M_AP_FURNITURE:
+			what = defsyms[mtmp->mappearance].explanation;
+			break;
+		    }
+		    seemimic(mtmp);
+		    pline("That %s is really %s", what, mnm);
+		} else if (flags.verbose && !canspotmon(mtmp)) {
+		    There("is %s there.", mnm);
 		}
+		mstatusline(mtmp);
 		if (!canspotmon(mtmp))
 			map_invisible(rx,ry);
 		return res;

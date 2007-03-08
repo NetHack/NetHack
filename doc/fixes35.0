@@ -193,6 +193,7 @@ scatter piles of kicked gold rather than move the entire pile at once
 if normal game save file is restored via `nethack -X', restore in normal
 	mode--with save file deletion--and require confirmation ala 'X'
 	command to make deferred switch into explore mode
+stethoscope applied to hiding mimic will bring it out of hiding
 
 
 Platform- and/or Interface-Specific Fixes
