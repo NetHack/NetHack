@@ -58,6 +58,9 @@ struct toptenentry {
 	char name[NAMSZ+1];
 	char death[DTHSZ+1];
 } *tt_head;
+/* size big enough to read in all the string fields at once; includes
+   room for separating space or trailing newline plus string terminator */
+#define SCANBUFSZ (4*(ROLESZ+1)+(NAMSZ+1)+(DTHSZ+1)+1)
 
 STATIC_DCL void FDECL(topten_print, (const char *));
 STATIC_DCL void FDECL(topten_print_bold, (const char *));
@@ -140,8 +143,9 @@ readentry(rfile,tt)
 FILE *rfile;
 struct toptenentry *tt;
 {
-	char inbuf[BUFSZ],
-	     s1[BUFSZ], s2[BUFSZ], s3[BUFSZ], s4[BUFSZ], s5[BUFSZ], s6[BUFSZ];
+	char inbuf[SCANBUFSZ],
+	     s1[SCANBUFSZ], s2[SCANBUFSZ], s3[SCANBUFSZ],
+	     s4[SCANBUFSZ], s5[SCANBUFSZ], s6[SCANBUFSZ];
 
 #ifdef NO_SCAN_BRACK /* Version_ Pts DgnLevs_ Hp___ Died__Born id */
 	static const char fmt[] = "%d %d %d %ld %d %d %d %d %d %d %ld %ld %d%*c";
@@ -169,7 +173,7 @@ struct toptenentry *tt;
 		discardexcess(rfile);
 	} else {
 		/* load remainder of record into a local buffer;
-		   this imposes an implicit length limit of BUFSZ
+		   this imposes an implicit length limit of SCANBUFSZ
 		   on every string field extracted from the buffer */
 		if (!fgets(inbuf, sizeof inbuf, rfile)) {
 		    /* sscanf will fail and tt->points will be set to 0 */
@@ -225,35 +229,32 @@ writeentry(rfile,tt)
 FILE *rfile;
 struct toptenentry *tt;
 {
-#ifdef NO_SCAN_BRACK
+	static const char fmt32[] = "%c%c ";	    /* role,gender */
+	static const char fmt33[] = "%s %s %s %s "; /* role,race,gndr,algn */
+#ifndef NO_SCAN_BRACK
+	static const char fmt0[] = "%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ";
+	static const char fmtX[] = "%s,%s\n";
+#else	/* NO_SCAN_BRACK */
+	static const char fmt0[] = "%d %d %d %ld %d %d %d %d %d %d %ld %ld %d ";
+	static const char fmtX[] = "%s %s\n";
+
 	nsb_mung_line(tt->name);
 	nsb_mung_line(tt->death);
-	                   /* Version_ Pts DgnLevs_ Hp___ Died__Born id */
-	(void) fprintf(rfile,"%d %d %d %ld %d %d %d %d %d %d %ld %ld %d ",
-#else
-	(void) fprintf(rfile,"%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ",
 #endif
+
+	(void)fprintf(rfile, fmt0,
 		tt->ver_major, tt->ver_minor, tt->patchlevel,
 		tt->points, tt->deathdnum, tt->deathlev,
 		tt->maxlvl, tt->hp, tt->maxhp, tt->deaths,
 		tt->deathdate, tt->birthdate, tt->uid);
 	if (tt->ver_major < 3 ||
 			(tt->ver_major == 3 && tt->ver_minor < 3))
-#ifdef NO_SCAN_BRACK
-		(void) fprintf(rfile,"%c%c %s %s\n",
-#else
-		(void) fprintf(rfile,"%c%c %s,%s\n",
-#endif
-			tt->plrole[0], tt->plgend[0],
-			onlyspace(tt->name) ? "_" : tt->name, tt->death);
+	    (void)fprintf(rfile, fmt32, tt->plrole[0], tt->plgend[0]);
 	else
-#ifdef NO_SCAN_BRACK
-		(void) fprintf(rfile,"%s %s %s %s %s %s\n",
-#else
-		(void) fprintf(rfile,"%s %s %s %s %s,%s\n",
-#endif
-			tt->plrole, tt->plrace, tt->plgend, tt->plalign,
-			onlyspace(tt->name) ? "_" : tt->name, tt->death);
+	    (void)fprintf(rfile, fmt33,
+			  tt->plrole, tt->plrace, tt->plgend, tt->plalign);
+	(void)fprintf(rfile, fmtX,
+		      onlyspace(tt->name) ? "_" : tt->name, tt->death);
 
 #ifdef NO_SCAN_BRACK
 	nsb_unmung_line(tt->name);
