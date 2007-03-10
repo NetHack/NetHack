@@ -194,6 +194,9 @@ if normal game save file is restored via `nethack -X', restore in normal
 	mode--with save file deletion--and require confirmation ala 'X'
 	command to make deferred switch into explore mode
 stethoscope applied to hiding mimic will bring it out of hiding
+rephrase "<artifact> evades your grasp" message if artifact is already held
+artifacts which subsequently evade your grasp/control after already being
+	worn or wielded become unworn/unwielded
 
 
 Platform- and/or Interface-Specific Fixes

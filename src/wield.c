@@ -150,11 +150,11 @@ struct obj *wep;
 	} else if (wep->otyp == CORPSE && cant_wield_corpse(wep)) {
 	    /* hero must have been life-saved to get here; use a turn */
 	    res++;	/* corpse won't be wielded */
-	} else if (uarms && bimanual(wep))
+	} else if (uarms && bimanual(wep)) {
 	    You("cannot wield a two-handed %s while wearing a shield.",
 		is_sword(wep) ? "sword" :
 		    wep->otyp == BATTLE_AXE ? "axe" : "weapon");
-	else if (wep->oartifact && !touch_artifact(wep, &youmonst)) {
+	} else if (!retouch_object(&wep, FALSE)) {
 	    res++;	/* takes a turn even though it doesn't get wielded */
 	} else {
 	    /* Weapon WILL be wielded after this point */

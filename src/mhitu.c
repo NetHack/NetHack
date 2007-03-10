@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2006/08/07	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2007/03/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1230,6 +1230,8 @@ dopois:
 		    You_feel("feverish.");
 		    exercise(A_CON, FALSE);
 		    u.ulycn = monsndx(mdat);
+		    if (u.twoweap) (void)retouch_object(&uswapwep, TRUE);
+		    if (uwep) (void)retouch_object(&uwep, TRUE);
 		}
 		break;
 	    case AD_SGLD:

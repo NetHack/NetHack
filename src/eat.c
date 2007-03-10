@@ -1152,11 +1152,9 @@ register int pm;
 	    break;
 	}
 
-	if (catch_lycanthropy && defends(AD_WERE, uwep)) {
-	    if (!touch_artifact(uwep, &youmonst)) {
-		dropx(uwep);
-		uwepgone();
-	    }
+	if (catch_lycanthropy) {
+	    if (u.twoweap) (void)retouch_object(&uswapwep, TRUE);
+	    if (uwep) (void)retouch_object(&uwep, TRUE);
 	}
 
 	return;
@@ -2250,7 +2248,7 @@ struct obj *otmp;
 int
 doeat()		/* generic "eat" command funtion (see cmd.c) */
 {
-	register struct obj *otmp;
+	struct obj *otmp;
 	int basenutrit;			/* nutrition of full item */
 	boolean dont_start = FALSE, nodelicious = FALSE;
 	
@@ -2276,7 +2274,8 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	 * mails, players who polymorph back to human in the middle of their
 	 * metallic meal, etc....
 	 */
-	if (otmp->oartifact && !touch_artifact(otmp, &youmonst)) {
+	if (!(carried(otmp) ? retouch_object(&otmp, FALSE) :
+			      touch_artifact(otmp, &youmonst))) {
 	    return 1;
 	} else if (!is_edible(otmp)) {
 	    You("cannot eat that!");

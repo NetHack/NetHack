@@ -2974,7 +2974,7 @@ doapply()
 	obj = getobj(class_list, "use or apply");
 	if(!obj) return 0;
 
-	if (obj->oartifact && !touch_artifact(obj, &youmonst))
+	if (!retouch_object(&obj, FALSE))
 	    return 1;	/* evading your grasp costs a turn; just be
 			   grateful that you don't drop it as well */
 
