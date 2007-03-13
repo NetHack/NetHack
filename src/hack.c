@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2007/02/10	*/
+/*	SCCS Id: @(#)hack.c	3.5	2007/03/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1739,6 +1739,27 @@ stillinwater:;
 	    spotloc.x = spotloc.y = 0;
 	}
 	return;
+}
+
+/* called if hero stays in the same spot while time passes */
+void
+stayeffects()
+{
+    /* leave the trickier cases to spoteffects()... */
+    if (u.uinwater) {
+	if (!is_pool(u.ux, u.uy)) spoteffects(FALSE);
+    } else if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) &&
+	    !(u.ustuck || Levitation || Flying)) {
+#ifdef STEED
+	if (u.usteed)
+	    spoteffects(FALSE);
+	else
+#endif
+	  if (is_lava(u.ux, u.uy))
+	    (void)lava_effects();
+	else if (!Wwalking)
+	    (void)drown();
+    }
 }
 
 /* returns first matching monster */

@@ -777,6 +777,7 @@ E boolean FDECL(test_move, (int, int, int, int, int));
 E void NDECL(domove);
 E void NDECL(invocation_message);
 E void FDECL(spoteffects, (BOOLEAN_P));
+E void NDECL(stayeffects);
 E char *FDECL(in_rooms, (XCHAR_P,XCHAR_P,int));
 E boolean FDECL(in_town, (int,int));
 E void FDECL(check_special_room, (BOOLEAN_P));

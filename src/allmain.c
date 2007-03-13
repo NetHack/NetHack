@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)allmain.c	3.5	2007/02/16	*/
+/*	SCCS Id: @(#)allmain.c	3.5	2007/03/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -321,6 +321,8 @@ boolean resuming;
 		!In_endgame(&u.uz) && !BClairvoyant &&
 		!(moves % 15) && !rn2(2)) do_vicinity_map();
 	    if (u.utrap && u.utraptype == TT_LAVA) sink_into_lava();
+	    /* when/if hero escapes from lava, he can't just stay there */
+	    else if (!u.umoved) stayeffects();
 
 	} /* actual time passed */
 
