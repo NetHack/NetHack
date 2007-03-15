@@ -92,7 +92,7 @@ use_towel(obj)
 	if(!freehand()) {
 		You("have no free %s!", body_part(HAND));
 		return 0;
-	} else if (obj->owornmask) {
+	} else if (obj == ublindf) {
 		You("cannot use it while you're wearing it!");
 		return 0;
 	} else if (obj->cursed) {
@@ -112,8 +112,11 @@ use_towel(obj)
 			      (old ? "has more" : "now has"));
 			make_blinded(Blinded + (long)u.ucreamed - old, TRUE);
 		    } else {
-			const char *what = (ublindf->otyp == LENSES) ?
-					    "lenses" : "blindfold";
+			const char *what;
+
+			what = (ublindf->otyp == LENSES) ? "lenses" :
+				(obj->otyp == ublindf->otyp) ? "other towel" :
+				 "blindfold";
 			if (ublindf->cursed) {
 			    You("push your %s %s.", what,
 				rn2(2) ? "cock-eyed" : "crooked");
