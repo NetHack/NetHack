@@ -1551,6 +1551,80 @@ invocation_message()
 	}
 }
 
+/* extracted from spoteffects; called by spoteffects to check for entering or
+   leaving a pool of water/lava, and by moveloop to check for staying on one */
+boolean
+pooleffects(newspot)	/* returns true to skip rest of spoteffects */
+boolean newspot;	/* true if called by spoteffects */
+{
+    /* check for leaving water */
+    if (u.uinwater) {
+	boolean still_inwater = FALSE;	/* assume we're getting out */
+
+	if (!is_pool(u.ux,u.uy)) {
+	    if (Is_waterlevel(&u.uz))
+		You("pop into an air bubble.");
+	    else if (is_lava(u.ux, u.uy))
+		You("leave the water...");	/* oops! */
+	    else
+		You("are on solid %s again.",
+		    is_ice(u.ux, u.uy) ? "ice" : "land");
+	} else if (Is_waterlevel(&u.uz)) {
+	    still_inwater = TRUE;
+	} else if (Levitation) {
+	    You("pop out of the water like a cork!");
+	} else if (Flying) {
+	    You("fly out of the water.");
+	} else if (Wwalking) {
+	    You("slowly rise above the surface.");
+	} else {
+	    still_inwater = TRUE;
+	}
+	if (!still_inwater) {
+	    boolean was_underwater = (Underwater && !Is_waterlevel(&u.uz));
+
+	    u.uinwater = 0;		/* leave the water */
+	    if (was_underwater) {	/* restore vision */
+		docrt();
+		vision_full_recalc = 1;
+	    }
+	}
+    }
+
+    /* check for entering water or lava */
+    if (!u.ustuck && !Levitation && !Flying &&
+	    (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy))) {
+#ifdef STEED
+	if (u.usteed && (is_flyer(u.usteed->data) ||
+		is_floater(u.usteed->data) || is_clinger(u.usteed->data))) {
+	    /* floating or clinging steed keeps hero safe (is_flyer() test
+	       is redundant; it can't be true since Flying yielded false) */
+	    return FALSE;
+	} else if (u.usteed) {
+	    /* steed enters pool */
+	    dismount_steed(Underwater ? DISMOUNT_FELL : DISMOUNT_GENERIC);
+	    /* dismount_steed() -> float_down() -> pickup()
+	       (float_down doesn't do autopickup on Air or Water) */
+	    if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) return FALSE;
+	    /* even if we actually end up at same location, float_down()
+	       has already done spoteffect()'s trap and pickup actions */
+	    if (newspot) check_special_room(FALSE);	/* spoteffects */
+	    return TRUE;
+	}
+	/* not mounted */
+#endif	/* STEED */
+
+	/* drown(),lava_effects() return true if hero changes
+	   location while surviving the problem */
+	if (is_lava(u.ux, u.uy)) {
+	    if (lava_effects()) return TRUE;
+	} else if (!Wwalking) {
+	    if (drown()) return TRUE;
+	}
+    }
+    return FALSE;
+}
+
 void
 spoteffects(pick)
 boolean pick;
@@ -1577,59 +1651,8 @@ boolean pick;
 	spotterrain = levl[u.ux][u.uy].typ;
 	spotloc.x = u.ux, spotloc.y = u.uy;
 
-	if(u.uinwater) {
-		int was_underwater;
+	if (pooleffects(TRUE)) goto spotdone;
 
-		if (!is_pool(u.ux,u.uy)) {
-			if (Is_waterlevel(&u.uz))
-				You("pop into an air bubble.");
-			else if (is_lava(u.ux, u.uy))
-				You("leave the water...");	/* oops! */
-			else
-				You("are on solid %s again.",
-				    is_ice(u.ux, u.uy) ? "ice" : "land");
-		}
-		else if (Is_waterlevel(&u.uz))
-			goto stillinwater;
-		else if (Levitation)
-			You("pop out of the water like a cork!");
-		else if (Flying)
-			You("fly out of the water.");
-		else if (Wwalking)
-			You("slowly rise above the surface.");
-		else
-			goto stillinwater;
-		was_underwater = Underwater && !Is_waterlevel(&u.uz);
-		u.uinwater = 0;		/* leave the water */
-		if (was_underwater) {	/* restore vision */
-			docrt();
-			vision_full_recalc = 1;
-		}
-	}
-stillinwater:;
-	if (!Levitation && !u.ustuck && !Flying) {
-	    /* limit recursive calls through teleds() */
-	    if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) {
-#ifdef STEED
-		if (u.usteed && !is_flyer(u.usteed->data) &&
-			!is_floater(u.usteed->data) &&
-			!is_clinger(u.usteed->data)) {
-		    dismount_steed(Underwater ?
-			    DISMOUNT_FELL : DISMOUNT_GENERIC);
-		    /* dismount_steed() -> float_down() -> pickup() */
-		    if (!Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz))
-			pick = FALSE;
-		} else
-#endif
-		/* drown(),lava_effects() return true if hero changes
-		   location while surviving the problem */
-		if (is_lava(u.ux, u.uy)) {
-		    if (lava_effects()) goto spotdone;
-		} else if (!Wwalking) {
-		    if (drown()) goto spotdone;
-		}
-	    }
-	}
 	check_special_room(FALSE);
 #ifdef SINKS
 	if(IS_SINK(levl[u.ux][u.uy].typ) && Levitation)
@@ -1739,27 +1762,6 @@ stillinwater:;
 	    spotloc.x = spotloc.y = 0;
 	}
 	return;
-}
-
-/* called if hero stays in the same spot while time passes */
-void
-stayeffects()
-{
-    /* leave the trickier cases to spoteffects()... */
-    if (u.uinwater) {
-	if (!is_pool(u.ux, u.uy)) spoteffects(FALSE);
-    } else if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) &&
-	    !(u.ustuck || Levitation || Flying)) {
-#ifdef STEED
-	if (u.usteed)
-	    spoteffects(FALSE);
-	else
-#endif
-	  if (is_lava(u.ux, u.uy))
-	    (void)lava_effects();
-	else if (!Wwalking)
-	    (void)drown();
-    }
 }
 
 /* returns first matching monster */

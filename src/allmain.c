@@ -322,7 +322,7 @@ boolean resuming;
 		!(moves % 15) && !rn2(2)) do_vicinity_map();
 	    if (u.utrap && u.utraptype == TT_LAVA) sink_into_lava();
 	    /* when/if hero escapes from lava, he can't just stay there */
-	    else if (!u.umoved) stayeffects();
+	    else if (!u.umoved) (void)pooleffects(FALSE);
 
 	} /* actual time passed */
 
