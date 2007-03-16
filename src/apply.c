@@ -1852,8 +1852,12 @@ long timeout;
 	    }
 	}
 	/* free figurine now */
-	obj_extract_self(figurine);
-	obfree(figurine, (struct obj *)0);
+	if (carried(figurine)) {
+	    useup(figurine);
+	} else {
+	    obj_extract_self(figurine);
+	    obfree(figurine, (struct obj *)0);
+	}
 	if (redraw) newsym(cc.x, cc.y);
 }
 
