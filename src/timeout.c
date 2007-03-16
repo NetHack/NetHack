@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.5	2007/02/05	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2007/03/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -803,7 +803,8 @@ long timeout;
 		if (menorah) {
 		    obj->spe = 0;	/* no more candles */
 		} else if (Is_candle(obj) || obj->otyp == POT_OIL) {
-		    /* get rid of candles and burning oil potions */
+		    /* get rid of candles and burning oil potions;
+		       we know this object isn't carried by hero */
 		    obj_extract_self(obj);
 		    obfree(obj, (struct obj *)0);
 		    obj = (struct obj *) 0;
@@ -844,8 +845,12 @@ long timeout;
 			}
 		    }
 		    end_burn(obj, FALSE);	/* turn off light source */
-		    obj_extract_self(obj);
-		    obfree(obj, (struct obj *)0);
+		    if (carried(obj)) {
+			useupall(obj);
+		    } else {
+			obj_extract_self(obj);
+			obfree(obj, (struct obj *)0);
+		    }
 		    obj = (struct obj *) 0;
 		    break;
 
@@ -1016,8 +1021,12 @@ long timeout;
 			if (menorah) {
 			    obj->spe = 0;
 			} else {
-			    obj_extract_self(obj);
-			    obfree(obj, (struct obj *)0);
+			    if (carried(obj)) {
+				useupall(obj);
+			    } else {
+				obj_extract_self(obj);
+				obfree(obj, (struct obj *)0);
+			    }
 			    obj = (struct obj *) 0;
 			}
 			break;
