@@ -180,11 +180,11 @@ boolean
 obj_is_pname(obj)
 register struct obj *obj;
 {
-    return((boolean)(
-	((obj->dknown && obj->known) || iflags.override_ID) && has_oname(obj) &&
-		/* Since there aren't any objects which are both
-		   artifacts and unique, the last check is redundant. */
-		obj->oartifact && !objects[obj->otyp].oc_unique));
+    if (!obj->oartifact || !has_oname(obj)) return FALSE;
+    if (!program_state.gameover && !iflags.override_ID) {
+	if (not_fully_identified(obj)) return FALSE;
+    }
+    return TRUE;
 }
 
 
@@ -905,7 +905,7 @@ register struct obj *otmp;
 #else
 	    !otmp->bknown ||
 #endif
-	    !objects[otmp->otyp].oc_name_known)	/* ?redundant? */
+	    !objects[otmp->otyp].oc_name_known)
 	return TRUE;
     if ((!otmp->cknown && (Is_container(otmp) || otmp->otyp == STATUE)) ||
 	    (!otmp->lknown && Is_box(otmp)))
