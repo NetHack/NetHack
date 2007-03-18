@@ -560,7 +560,7 @@ touch_artifact(obj,mon)
     /* can pick it up unless you're totally non-synch'd with the artifact */
     if (badclass && badalign && self_willed) {
 	if (yours) {
-	    if (obj->where != OBJ_INVENT)
+	    if (!carried(obj))
 		pline("%s your grasp!", Tobjnam(obj, "evade"));
 	    else
 		pline("%s beyond your control!", Tobjnam(obj, "are"));
@@ -1613,8 +1613,7 @@ boolean loseit;		/* whether to drop it if hero can longer touch it */
 
     if (touch_artifact(obj, &youmonst)) {
 	/* nothing to do if hero can successfully handle this object */
-	if (!(objects[obj->otyp].oc_material == SILVER &&
-		(u.ulycn >= LOW_PM || hates_silver(youmonst.data))))
+	if (!(objects[obj->otyp].oc_material == SILVER && Hate_silver))
 	    return 1;
 	/* we didn't get "<obj> evades your grasp" message; give alt message */
 	You_cant("handle %s anymore!", thesimpleoname(obj));

@@ -1127,6 +1127,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 #endif
 	if (Sleeping) enl_msg("You ", "fall", "fell", " asleep", "");
 	if (Hunger) enl_msg("You hunger", "", "ed", " rapidly", "");
+	if (Hate_silver) you_are("harmed by silver","");
 
 	/*** Vision and senses ***/
 	if (See_invisible) enl_msg(You_, "see", "saw", " invisible",

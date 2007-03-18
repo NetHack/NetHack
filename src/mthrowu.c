@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.5	2007/01/27	*/
+/*	SCCS Id: @(#)mthrowu.c	3.5	2007/03/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -60,11 +60,11 @@ const char *name;	/* if null, then format `obj' */
 		else You("are almost hit by %s.", onm);
 		return(0);
 	} else {
-		if(Blind || !flags.verbose) You("are hit!");
+		if (Blind || !flags.verbose) You("are hit%s", exclam(dam));
 		else You("are hit by %s%s", onm, exclam(dam));
 
-		if (obj && objects[obj->otyp].oc_material == SILVER
-				&& hates_silver(youmonst.data)) {
+		if (obj && objects[obj->otyp].oc_material == SILVER &&
+			    Hate_silver) {
 			/* extra damage already applied by dmgval() */
 			pline_The("silver sears your flesh!");
 			exercise(A_CON, FALSE);
