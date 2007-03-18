@@ -1028,6 +1028,9 @@ struct obj *obj;
     unsigned save_ocknown;
     char *buf, *save_ocuname, *save_oname = (char *)0;
 
+    /* bypass object twiddling for artifacts */
+    if (obj->oartifact) return bare_artifactname(obj);
+
     /* remember original settings for core of the object;
        oextra structs other than oname don't matter here--since they
        aren't modified they don't need to be saved and restored */
@@ -1579,13 +1582,20 @@ struct obj *obj;
 	return the(simpleoname);
 }
 
+/* artifact's name without any object type or known/dknown/&c feedback */
 char *
 bare_artifactname(obj)
 struct obj *obj;
 {
-	char *outbuf = nextobuf();
-	if (obj->oartifact) Strcpy(outbuf, artiname(obj->oartifact));
-	else Strcpy(outbuf, xname(obj));
+	char *outbuf;
+
+	if (obj->oartifact) {
+	    outbuf = nextobuf();
+	    Strcpy(outbuf, artiname(obj->oartifact));
+	    if (!strncmp(outbuf, "The ", 4)) outbuf[0] = lowc(outbuf[0]);
+	} else {
+	    outbuf = xname(obj);
+	}
 	return outbuf;
 }
 
