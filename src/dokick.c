@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.5	2007/01/26	*/
+/*	SCCS Id: @(#)dokick.c	3.5	2007/03/17	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -624,7 +624,7 @@ char *buf;
 	const char *what;
 
 	if (kickobj) what = killer_xname(kickobj);
-	if (maploc == &nowhere) what = "nothing";
+	else if (maploc == &nowhere) what = "nothing";
 	else if (IS_DOOR(maploc->typ)) what = "a door";
 	else if (IS_TREE(maploc->typ)) what = "a tree";
 	else if (IS_STWALL(maploc->typ)) what = "a wall";
