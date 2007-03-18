@@ -18,6 +18,7 @@ extern boolean notonhead;	/* for long worms */
 #define get_artifact(o) \
 		(((o)&&(o)->oartifact) ? &artilist[(int) (o)->oartifact] : 0)
 
+STATIC_DCL boolean FDECL(bane_applies, (const struct artifact *,struct monst *));
 STATIC_DCL int FDECL(spec_applies, (const struct artifact *,struct monst *));
 STATIC_DCL int FDECL(arti_invoke, (struct obj*));
 STATIC_DCL boolean FDECL(Mb_hit, (struct monst *magr,struct monst *mdef,
@@ -497,6 +498,11 @@ long wp_mask;
 	}
 }
 
+/* touch_artifact()'s return value isn't sufficient to tell whether it
+   dished out damage, and tracking changes to u.uhp, u.mh, Lifesaved
+   when trying to avoid second wounding is too cumbersome */
+STATIC_VAR touch_blasted;	/* for retouch_object() */
+
 /*
  * creature (usually player) tries to touch (pick up or wield) an artifact obj.
  * Returns 0 if the object refuses to be touched.
@@ -512,6 +518,7 @@ touch_artifact(obj,mon)
     register const struct artifact *oart = get_artifact(obj);
     boolean badclass, badalign, self_willed, yours;
 
+    touch_blasted = FALSE;
     if(!oart) return 1;
 
     yours = (mon == &youmonst);
@@ -536,22 +543,20 @@ touch_artifact(obj,mon)
     }
     /* weapons which attack specific categories of monsters are
        bad for them even if their alignments happen to match */
-    if (!badalign && (oart->spfx & SPFX_DBONUS) != 0) {
-	struct artifact tmp;
-
-	tmp = *oart;
-	tmp.spfx &= SPFX_DBONUS;
-	badalign = !!spec_applies(&tmp, mon);
-    }
+    if (!badalign) badalign = bane_applies(oart, mon);
 
     if (((badclass || badalign) && self_willed) ||
        (badalign && (!yours || !rn2(4))))  {
-	int dmg;
+	int dmg, tmp;
 	char buf[BUFSZ];
 
 	if (!yours) return 0;
 	You("are blasted by %s power!", s_suffix(the(xname(obj))));
+	touch_blasted = TRUE;
 	dmg = d((Antimagic ? 2 : 4), (self_willed ? 10 : 4));
+	/* add half (maybe quarter) of the usual silver damage bonus */
+	if (objects[obj->otyp].oc_material == SILVER && Hate_silver)
+	    tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
 	Sprintf(buf, "touching %s", oart->name);
 	losehp(dmg, buf, KILLED_BY); /* magic damage, not physical */
 	exercise(A_WIS, FALSE);
@@ -585,6 +590,21 @@ int dtyp;
     return (weap->attk.adtyp == dtyp ||
 	    weap->defn.adtyp == dtyp ||
 	    weap->cary.adtyp == dtyp);
+}
+
+STATIC_OVL boolean
+bane_applies(oart, mon)
+const struct artifact *oart;
+struct monst *mon;
+{
+    struct artifact atmp;
+
+    if (oart && (oart->spfx & SPFX_DBONUS) != 0) {
+	atmp = *oart;
+	atmp.spfx &= SPFX_DBONUS;		/* clear other spfx fields */
+	if (spec_applies(&atmp, mon)) return TRUE;
+    }
+    return FALSE;
 }
 
 /* decide whether an artifact's special attacks apply against mtmp */
@@ -1612,11 +1632,29 @@ boolean loseit;		/* whether to drop it if hero can longer touch it */
     struct obj *obj = *objp;
 
     if (touch_artifact(obj, &youmonst)) {
-	/* nothing to do if hero can successfully handle this object */
-	if (!(objects[obj->otyp].oc_material == SILVER && Hate_silver))
+	char buf[BUFSZ];
+	int dmg = 0, tmp;
+	boolean ag = (objects[obj->otyp].oc_material == SILVER && Hate_silver),
+		bane = bane_applies(get_artifact(obj), &youmonst);
+
+	/* nothing else to do if hero can successfully handle this object */
+	if (!ag && !bane)
 	    return 1;
-	/* we didn't get "<obj> evades your grasp" message; give alt message */
-	You_cant("handle %s anymore!", thesimpleoname(obj));
+
+	/* hero can't handle this object, but didn't get touch_artifact()'s
+	   "<obj> evades your grasp|control" message; give an alternate one */
+	You_cant("handle %s%s!",
+		 yname(obj), obj->owornmask ? " anymore" : "");
+	/* also inflict damage unless touch_artifact() already did so */
+	if (!touch_blasted) {
+	    /* damage is somewhat arbitrary; half the usual 1d20 physical
+	       for silver, 1d10 magical for <foo>bane, potentially both */
+	    if (ag) tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
+	    if (bane) dmg += rnd(10);
+	    Sprintf(buf, "handling %s", killer_xname(obj));
+	    losehp(dmg, buf, KILLED_BY);
+	    exercise(A_CON, FALSE);
+	}
     }
 
     /* removing a worn item might result in loss of levitation,
