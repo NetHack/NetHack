@@ -197,6 +197,7 @@ stethoscope applied to hiding mimic will bring it out of hiding
 rephrase "<artifact> evades your grasp" message if artifact is already held
 artifacts which subsequently evade your grasp/control after already being
 	worn or wielded become unworn/unwielded
+hero with lycanthropy is vulnerable to silver in human form as well as beast
 
 
 Platform- and/or Interface-Specific Fixes
