@@ -502,7 +502,7 @@ long wp_mask;
 /* touch_artifact()'s return value isn't sufficient to tell whether it
    dished out damage, and tracking changes to u.uhp, u.mh, Lifesaved
    when trying to avoid second wounding is too cumbersome */
-STATIC_VAR touch_blasted;	/* for retouch_object() */
+STATIC_VAR boolean touch_blasted;	/* for retouch_object() */
 
 /*
  * creature (usually player) tries to touch (pick up or wield) an artifact obj.
