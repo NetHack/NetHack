@@ -638,7 +638,8 @@ clear_bypasses()
 #endif	/*0*/
 	    }
 	}
-	/* invent and mydogs chains shouldn't matter here */
+	for (otmp = invent; otmp; otmp = otmp->nobj)
+	    otmp->bypass = 0;
 	for (otmp = migrating_objs; otmp; otmp = otmp->nobj)
 	    otmp->bypass = 0;
 	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -650,6 +651,7 @@ clear_bypasses()
 	    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
 		otmp->bypass = 0;
 	}
+	/* billobjs and mydogs chains don't matter here */
 	context.bypasses = FALSE;
 }
 

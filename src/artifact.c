@@ -25,6 +25,7 @@ STATIC_DCL boolean FDECL(Mb_hit, (struct monst *magr,struct monst *mdef,
 				  struct obj *,int *,int,BOOLEAN_P,char *));
 STATIC_DCL unsigned long FDECL(abil_to_spfx, (long *));
 STATIC_DCL uchar FDECL(abil_to_adtyp,(long *));
+STATIC_DCL boolean FDECL(untouchable, (struct obj *,BOOLEAN_P));
 
 
 /* The amount added to the victim's total hit points to insure that the
@@ -1678,7 +1679,7 @@ boolean loseit;		/* whether to drop it if hero can longer touch it */
 	    /* dropx gives a message iff item lands on an altar */
 	    if (!IS_ALTAR(levl[u.ux][u.uy].typ))
 		pline("%s to the %s.",
-		      Tobjnam(obj, "drop"), surface(u.ux, u.uy));
+		      Tobjnam(obj, "fall"), surface(u.ux, u.uy));
 	    dropx(obj);
 	}
 	*objp = obj = 0;	/* no longer in inventory */
@@ -1686,17 +1687,109 @@ boolean loseit;		/* whether to drop it if hero can longer touch it */
     return 0;
 }
 
+/* an item which is worn/wielded or an artifact which conveys
+   something via being carried or which has an #invoke effect
+   currently in operation undergoes a touch test; if it fails,
+   it will be unworn/unwielded and revoked but not dropped */
+STATIC_OVL boolean
+untouchable(obj, drop_untouchable)
+struct obj *obj;
+boolean drop_untouchable;
+{
+    struct artifact *art;
+    boolean beingworn, carryeffect, invoked;
+    long wearmask = ~(W_QUIVER | (u.twoweap ? 0L : W_SWAPWEP) | W_BALL);
+
+    if (obj->bypass) return FALSE;	/* already handled */
+    bypass_obj(obj);	/* mark it as handled now */
+
+    beingworn = (obj->owornmask & wearmask) != 0L ||
+		/* some items in use don't have any wornmask setting */
+		(obj->oclass == TOOL_CLASS &&
+		    (obj->lamplit ||
+		     (obj->otyp == LEASH && obj->leashmon) ||
+		     (Is_container(obj) && Has_contents(obj))));
+
+    if ((art = get_artifact(obj)) != 0) {
+	carryeffect = (art->cary.adtyp || art->cspfx);
+	invoked = (art->inv_prop > 0 && art->inv_prop <= LAST_PROP &&
+			(u.uprops[art->inv_prop].extrinsic & W_ARTI) != 0L);
+    } else {
+	carryeffect = invoked = FALSE;
+    }
+
+    if (beingworn || carryeffect || invoked) {
+	if (!retouch_object(&obj, drop_untouchable)) {
+	    /* "<artifact> is beyond your control" or "you can't handle
+	       <object>" has been given and it is now unworn/unwielded
+	       and possibly dropped (depending upon caller); if dropped,
+	       carried effect was turned off, else we leave that alone;
+	       we turn off invocation property here if still carried */
+	    if (invoked && obj) arti_invoke(obj);	/* reverse #invoke */
+	    return TRUE;
+	}
+    }
+    return FALSE;
+}
+
+/* check items currently in use (mostly worn) for touchability */
 void
 retouch_equipment(dropflag)
 int dropflag;	/* 0==don't drop, 1==drop all, 2==drop weapon */
 {
-    boolean dropit;
+    static int nesting = 0;	/* recursion control */
+    struct obj *obj;
+    boolean scanagain, dropit, had_gloves = (uarmg != 0);
+    int had_rings = (!!uleft + !!uright);
+
+    if (!nesting++) clear_bypasses();	/* init upon initial entry */
 
     dropit = (dropflag > 0);	/* drop all or drop weapon */
     /* check secondary weapon first, before possibly unwielding primary */
-    if (u.twoweap) (void)retouch_object(&uswapwep, dropit);
+    if (u.twoweap) (void)untouchable(uswapwep, dropit);
     /* check primary weapon next so that they're handled together */
-    if (uwep) (void)retouch_object(&uwep, dropit);
+    if (uwep) (void)untouchable(uwep, dropit);
+
+#ifdef STEED
+    /* in case someone is daft enough to add artifact or silver saddle */
+    if (u.usteed && (obj = which_armor(u.usteed, W_SADDLE)) != 0) {
+	/* untouchable() calls retouch_object() which expects an object in
+	   hero's inventory, but remove_worn_item() will be harmless for
+	   saddle and we're suppressing drop, so this works as intended */
+	if (untouchable(obj, FALSE)) dismount_steed(DISMOUNT_THROWN);
+    }
+#endif
+    /*
+     * TODO?  Force off gloves if either or both rings are going to
+     * become unworn; force off cloak [suit] before suit [shirt].
+     * The torso handling is hyphothetical; the case for gloves is
+     * not due the possibility of unwearing silver rings.
+     */
+
+    dropit = (dropflag == 1);	/* all untouchable items */
+    do {
+	scanagain = FALSE;  
+
+	for (obj = invent; obj; obj = obj->nobj) {
+	    if (obj->bypass) continue;
+
+	    if (untouchable(obj, dropit)) {	/* always sets obj->bypass */
+		/* can't directly continue inventory traversal;
+		   hero might have lost levitation, causing items to
+		   be dropped or destroyed (poly trap, water, lava);
+		   might even have lost helm of opposite alignment
+		   and caused us to be called recursively... */
+		scanagain = TRUE;
+		break;	/* use outer loop to restart inner one */
+	    }
+	}
+    } while (scanagain);
+
+    if (had_rings != (!!uleft + !!uright) && uarmg && uarmg->cursed)
+	uncurse(uarmg); /* temporary? hack for ring removal plausibility */
+    if (had_gloves && !uarmg) selftouch("After losing your gloves, you");
+
+    if (!--nesting) clear_bypasses();	/* reset upon final exit */
 }
 
 /*artifact.c*/

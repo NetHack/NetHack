@@ -1446,7 +1446,7 @@ dowear()
 
 	if (!canwearobj(otmp,&mask,TRUE)) return(0);
 
-	if (otmp->oartifact && !touch_artifact(otmp, &youmonst))
+	if (!retouch_object(&otmp, FALSE))
 	    return 1;	/* costs a turn even though it didn't get worn */
 
 	if (otmp->otyp == HELM_OF_OPPOSITE_ALIGNMENT &&
@@ -1492,7 +1492,7 @@ dowear()
 int
 doputon()
 {
-	register struct obj *otmp;
+	struct obj *otmp;
 	long mask = 0L;
 
 	if(uleft && uright && uamul && ublindf) {
@@ -1566,7 +1566,7 @@ doputon()
 	    You("cannot free your weapon hand to put on the ring.");
 			return(0);
 		}
-		if (otmp->oartifact && !touch_artifact(otmp, &youmonst))
+		if (!retouch_object(&otmp, FALSE))
 		    return 1; /* costs a turn even though it didn't get worn */
 		setworn(otmp, mask);
 		Ring_on(otmp);
@@ -1575,7 +1575,7 @@ doputon()
 			already_wearing("an amulet");
 			return(0);
 		}
-		if (otmp->oartifact && !touch_artifact(otmp, &youmonst))
+		if (!retouch_object(&otmp, FALSE))
 		    return 1;
 		setworn(otmp, W_AMUL);
 		if (otmp->otyp == AMULET_OF_CHANGE) {
@@ -1607,7 +1607,7 @@ doputon()
 			You_cant("wear that!");
 			return(0);
 		}
-		if (otmp->oartifact && !touch_artifact(otmp, &youmonst))
+		if (!retouch_object(&otmp, FALSE))
 		    return 1;
 		Blindf_on(otmp);
 		return(1);
