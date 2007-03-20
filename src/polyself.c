@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.5	2007/02/12	*/
+/*	SCCS Id: @(#)polyself.c	3.5	2007/03/19	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,6 +8,15 @@
  * Note:  the light source handling code assumes that both youmonst.m_id
  * and youmonst.mx will always remain 0 when it handles the case of the
  * player polymorphed into a light-emitting monster.
+ *
+ * Transformation sequences:
+ *		/-> polymon		    poly into monster form
+ *    polyself =
+ *		\-> newman -> polyman	    fail to poly, get human form
+ *
+ *    rehumanize -> polyman		    return to original form
+ *
+ *    polymon (called directly)		    usually golem petrification
  */
 
 #include "hack.h"
@@ -227,10 +236,14 @@ dead: /* we come directly here if their experience level went to 0 or less */
 		Your("body transforms, but there is still slime on you.");
 		make_slimed(10L, (const char*) 0);
 	}
+
 	(void) polysense(youmonst.data);
 	context.botl = 1;
 	see_monsters();
 	(void) encumber_msg();
+
+	retouch_equipment(2);
+	if (!uarmg) selftouch(no_longer_petrify_resistant);
 }
 
 void
@@ -352,7 +365,6 @@ int psflags;
 	}
 
  made_change:
-	if (!uarmg) selftouch(no_longer_petrify_resistant);
 	new_light = emits_light(youmonst.data);
 	if (old_light != new_light) {
 	    if (old_light)
@@ -602,6 +614,7 @@ int	mntmp;
 	see_monsters();
 	(void) encumber_msg();
 
+	retouch_equipment(2);
 	/* this might trigger a recursize call to polymon() [stone golem
 	   wielding cockatrice corpse and hit by stone-to-flesh, becomes
 	   flesh golem above, now gets transformed back into stone golem] */
@@ -780,12 +793,14 @@ rehumanize()
 	    killer.format = KILLED_BY;
 	    done(DIED);
 	}
-	if (!uarmg) selftouch(no_longer_petrify_resistant);
 	nomul(0);
 
 	context.botl = 1;
 	vision_full_recalc = 1;
 	(void) encumber_msg();
+
+	retouch_equipment(2);
+	if (!uarmg) selftouch(no_longer_petrify_resistant);
 }
 
 int

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2006/08/21	*/
+/*	SCCS Id: @(#)pray.c	3.5	2007/03/19	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1421,15 +1421,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		    consume_offering(otmp);
 		    pline("%s accepts your allegiance.", a_gname());
 
-		    /* The player wears a helm of opposite alignment? */
-		    if (uarmh && uarmh->otyp == HELM_OF_OPPOSITE_ALIGNMENT)
-			u.ualignbase[A_CURRENT] = altaralign;
-		    else
-			u.ualign.type = u.ualignbase[A_CURRENT] = altaralign;
-		    u.ublessed = 0;
-		    context.botl = 1;
-
-		    You("have a sudden sense of a new direction.");
+		    uchangealign(altaralign, 0);
 		    /* Beware, Conversion is costly */
 		    change_luck(-3);
 		    u.ublesscnt += 300;

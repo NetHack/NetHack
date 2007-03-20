@@ -85,6 +85,7 @@ E long FDECL(arti_cost, (struct obj *));
 E struct obj *FDECL(what_gives, (long *));
 E void FDECL(Sting_effects, (int));
 E int FDECL(retouch_object, (struct obj **,BOOLEAN_P));
+E void FDECL(retouch_equipment, (int));
 
 /* ### attrib.c ### */
 
@@ -108,6 +109,7 @@ E schar NDECL(acurrstr);
 E void FDECL(adjalign, (int));
 E int FDECL(is_innate, (int));
 E char *FDECL(from_what, (int));
+E void FDECL(uchangealign, (int,int));
 
 /* ### ball.c ### */
 

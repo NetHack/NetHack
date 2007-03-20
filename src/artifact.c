@@ -1622,8 +1622,8 @@ int orc_count;
 }
 
 /* called when hero is wielding/applying/invoking a carried item, or
-   after undergoing a transformation (alignment change, lycanthropy)
-   which might affect item access */
+   after undergoing a transformation (alignment change, lycanthropy,
+   polymorph) which might affect item access */
 int
 retouch_object(objp, loseit)
 struct obj **objp;	/* might be destroyed or unintentionally dropped */
@@ -1684,6 +1684,19 @@ boolean loseit;		/* whether to drop it if hero can longer touch it */
 	*objp = obj = 0;	/* no longer in inventory */
     }
     return 0;
+}
+
+void
+retouch_equipment(dropflag)
+int dropflag;	/* 0==don't drop, 1==drop all, 2==drop weapon */
+{
+    boolean dropit;
+
+    dropit = (dropflag > 0);	/* drop all or drop weapon */
+    /* check secondary weapon first, before possibly unwielding primary */
+    if (u.twoweap) (void)retouch_object(&uswapwep, dropit);
+    /* check primary weapon next so that they're handled together */
+    if (uwep) (void)retouch_object(&uwep, dropit);
 }
 
 /*artifact.c*/

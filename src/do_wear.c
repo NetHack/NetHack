@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.5	2007/02/17	*/
+/*	SCCS Id: @(#)do_wear.c	3.5	2007/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -316,14 +316,15 @@ Helmet_on(VOID_ARGS)
 		makeknown(uarmh->otyp);
 		break;
 	case HELM_OF_OPPOSITE_ALIGNMENT:
-		if (u.ualign.type == A_NEUTRAL)
-		    u.ualign.type = rn2(2) ? A_CHAOTIC : A_LAWFUL;
-		else u.ualign.type = -(u.ualign.type);
-		u.ublessed = 0; /* lose your god's protection */
+		/* changing alignment can toggle off active artifact
+		   properties, including levitation; uarmh could get
+		   dropped or destroyed here */
+		uchangealign((u.ualign.type != A_NEUTRAL) ? -u.ualign.type :
+				rn2(2) ? A_CHAOTIC : A_LAWFUL, 1);
 	     /* makeknown(uarmh->otyp);   -- moved below, after xname() */
 		/*FALLTHRU*/
 	case DUNCE_CAP:
-		if (!uarmh->cursed) {
+		if (uarmh && !uarmh->cursed) {
 		    if (Blind)
 			pline("%s for a moment.", Tobjnam(uarmh, "vibrate"));
 		    else
@@ -334,12 +335,12 @@ Helmet_on(VOID_ARGS)
 		context.botl = 1;		/* reveal new alignment or INT & WIS */
 		if (Hallucination) {
 		    pline("My brain hurts!"); /* Monty Python's Flying Circus */
-		} else if (uarmh->otyp == DUNCE_CAP) {
+		} else if (uarmh && uarmh->otyp == DUNCE_CAP) {
 		    You_feel("%s.",	/* track INT change; ignore WIS */
 		  ACURR(A_INT) <= (ABASE(A_INT) + ABON(A_INT) + ATEMP(A_INT)) ?
 			     "like sitting in a corner" : "giddy");
 		} else {
-		    Your("mind oscillates briefly.");
+		    /* [message moved to uchangealign()] */
 		    makeknown(HELM_OF_OPPOSITE_ALIGNMENT);
 		}
 		break;
@@ -379,9 +380,10 @@ Helmet_off(VOID_ARGS)
 	    if (!context.takeoff.cancelled_don) adj_abon(uarmh, -uarmh->spe);
 	    break;
 	case HELM_OF_OPPOSITE_ALIGNMENT:
-	    u.ualign.type = u.ualignbase[A_CURRENT];
-	    u.ublessed = 0; /* lose the other god's protection */
-	    context.botl = 1;
+	    /* changing alignment can toggle off active artifact
+	       properties, including levitation; uarmh could get
+	       dropped or destroyed here */
+	    uchangealign(u.ualignbase[A_CURRENT], 2);
 	    break;
 	default: impossible(unknown_type, c_helmet, uarmh->otyp);
     }

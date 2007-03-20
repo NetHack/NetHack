@@ -198,6 +198,7 @@ rephrase "<artifact> evades your grasp" message if artifact is already held
 artifacts which subsequently evade your grasp/control after already being
 	worn or wielded become unworn/unwielded
 hero with lycanthropy is vulnerable to silver in human form as well as beast
+changing alignment or shape triggers a check for equipment evading hero's grasp
 
 
 Platform- and/or Interface-Specific Fixes

@@ -1232,8 +1232,7 @@ dopois:
 		    You_feel("feverish.");
 		    exercise(A_CON, FALSE);
 		    u.ulycn = monsndx(mdat);
-		    if (u.twoweap) (void)retouch_object(&uswapwep, TRUE);
-		    if (uwep) (void)retouch_object(&uwep, TRUE);
+		    retouch_equipment(2);
 		}
 		break;
 	    case AD_SGLD:

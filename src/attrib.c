@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)attrib.c	3.5	2006/05/20	*/
+/*	SCCS Id: @(#)attrib.c	3.5	2007/03/19	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -883,6 +883,37 @@ register int n;
 			if(u.ualign.record > ALIGNLIM)
 				u.ualign.record = ALIGNLIM;
 		}
+}
+
+/* change hero's alignment type, possibly losing use of artifacts */
+void
+uchangealign(newalign, reason)
+int newalign;
+int reason;	/* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
+{
+    aligntyp oldalign = u.ualign.type;
+
+    u.ublessed = 0;		/* lose divine protection */
+    context.botl = 1;		/* status line needs updating */
+    if (reason == 0) {
+	/* conversion via altar */
+	u.ualignbase[A_CURRENT] = (aligntyp)newalign;
+	/* worn helm of opposite alignment might block change */
+	if (!uarmh || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)
+	    u.ualign.type = u.ualignbase[A_CURRENT];
+	You("have a %ssense of a new direction.",
+	    (u.ualign.type != oldalign) ? "sudden " : "");
+    } else {
+	/* putting on or taking off a helm of opposite alignment */
+	u.ualign.type = (aligntyp)newalign;
+	if (reason == 1)
+	    Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
+	else if (reason == 2)
+	    Your("mind is %s.", Hallucination ? "much of a muchness" :
+		 "back in sync with your body");
+    }
+
+    if (u.ualign.type != oldalign) retouch_equipment(0);
 }
 
 /*attrib.c*/
