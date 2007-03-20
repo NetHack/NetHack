@@ -2204,6 +2204,17 @@ boolean wep_was_destroyed;
 
 	switch(ptr->mattk[i].adtyp) {
 
+	  case AD_FIRE:
+	    if(mhit && !mon->mcan) {
+		if (aatyp == AT_KICK) {
+		    if (uarmf && !rn2(6))
+			(void)rust_dmg(uarmf, xname(uarmf), 0, TRUE, &youmonst);
+		} else if (aatyp == AT_WEAP || aatyp == AT_CLAW ||
+			   aatyp == AT_MAGC || aatyp == AT_TUCH)
+		    passive_obj(mon, (struct obj*)0, &(ptr->mattk[i]));
+	    }
+	    break;
+
 	  case AD_ACID:
 	    if(mhit && rn2(2)) {
 		if (Blind || !flags.verbose) You("are splashed!");
@@ -2415,19 +2426,24 @@ struct attack *mattk;		/* null means we find one internally */
 
 	switch(mattk->adtyp) {
 
+	case AD_FIRE:
+	    if(!rn2(6) && !mon->mcan) {
+		(void) erode_obj(obj, 0, FALSE, FALSE);
+	    }
+	    break;
 	case AD_ACID:
 	    if(!rn2(6)) {
-		(void) erode_obj(obj, TRUE, FALSE, FALSE);
+		(void) erode_obj(obj, 3, FALSE, FALSE);
 	    }
 	    break;
 	case AD_RUST:
 	    if(!mon->mcan) {
-		(void) erode_obj(obj, FALSE, FALSE, FALSE);
+		(void) erode_obj(obj, 1, FALSE, FALSE);
 	    }
 	    break;
 	case AD_CORR:
 	    if(!mon->mcan) {
-		(void) erode_obj(obj, TRUE, FALSE, FALSE);
+		(void) erode_obj(obj, 3, FALSE, FALSE);
 	    }
 	    break;
 	case AD_ENCH:

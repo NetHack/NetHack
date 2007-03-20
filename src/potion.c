@@ -1934,7 +1934,7 @@ dodip()
 	}
 
 	if (potion->otyp == POT_ACID) {
-	    if (erode_obj(obj, TRUE, FALSE, TRUE))
+	    if (erode_obj(obj, 3, FALSE, TRUE))
 		goto poof;
 	}
 

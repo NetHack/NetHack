@@ -611,18 +611,24 @@ untwoweapon()
 	return;
 }
 
-/* Maybe rust object, or corrode it if acid damage is called for.
+/* Maybe rust (or corrode, burn, rot) object.
  * Returns TRUE if something happened. */
 boolean
-erode_obj(target, acid_dmg, fade_scrolls, for_dip)
+erode_obj(target, type, fade_scrolls, for_dip)
 struct obj *target;		/* object (e.g. weapon or armor) to erode */
-boolean acid_dmg;
+int type;
 boolean fade_scrolls;
 boolean for_dip;
 {
+	static NEARDATA const char * const action[] = { "smoulder", "rust", "rot", "corrode" };
+	static NEARDATA const char * const msg[] =  { "burnt", "rusty", "rotten", "corroded" };
+	boolean vulnerable = FALSE;
+	boolean grprot = FALSE;
+	boolean is_primary = TRUE;
 	int erosion;
+	int dmgtyp = AD_ACID;
 	struct monst *victim;
-	boolean vismon, visobj, chill, erodible;
+	boolean vismon, visobj, chill;
 	boolean ret = FALSE;
 	boolean already_affected = FALSE;
 
@@ -633,17 +639,34 @@ boolean for_dip;
 	vismon = victim && (victim != &youmonst) && canseemon(victim);
 	visobj = !victim && cansee(bhitpos.x, bhitpos.y); /* assume thrown */
 
-	if (!acid_dmg && target->lamplit) {
-	    already_affected = snuff_lit(target);
-	    if (already_affected) ret = TRUE;
+	switch(type) {
+	case 0: vulnerable = is_flammable(target);
+	    dmgtyp = AD_FIRE;
+	    break;
+	case 1: vulnerable = is_rustprone(target);
+	    dmgtyp = AD_RUST;
+	    grprot = TRUE;
+	    if (target->lamplit) {
+		already_affected = snuff_lit(target);
+		if (already_affected) ret = TRUE;
+	    }
+	    break;
+	case 2: vulnerable = is_rottable(target);
+	    dmgtyp = AD_DCAY;
+	    is_primary = FALSE;
+	    break;
+	case 3: vulnerable = is_corrodeable(target);
+	    dmgtyp = AD_ACID;
+	    grprot = TRUE;
+	    is_primary = FALSE;
+	    break;
 	}
-	erosion = acid_dmg ? target->oeroded2 : target->oeroded;
-	erodible = acid_dmg ? is_corrodeable(target) : is_rustprone(target);
+	erosion = is_primary ? target->oeroded : target->oeroded2;
 
-	if (target->greased) {
+	if (target->greased && grprot) {
 	    grease_protect(target,(char *)0,victim);
 	    ret = TRUE;
-	} else if (target->oclass == SCROLL_CLASS) {
+	} else if (target->oclass == SCROLL_CLASS && (type == 1 || type == 3)) {
 	    if(fade_scrolls && target->otyp != SCR_BLANK_PAPER
 #ifdef MAIL
 	    && target->otyp != SCR_MAIL
@@ -658,15 +681,13 @@ boolean for_dip;
 		target->spe = 0;
 		ret = TRUE;
 	    }
-	} else if (target->oartifact &&
-		/* (no artifacts currently meet either of these criteria) */
-		arti_immune(target, acid_dmg ? AD_ACID : AD_RUST)) {
-	    if (flags.verbose) {
+	} else if (target->oartifact && arti_immune(target, dmgtyp)) {
+	    if (flags.verbose && (dmgtyp != AD_FIRE)) {
 		if (victim == &youmonst)
 		    pline("%s.", Yobjnam2(target, "sizzle"));
 	    }
 	    /* no damage to object */
-	} else if (target->oartifact && !acid_dmg &&
+	} else if (target->oartifact && (type == 1) &&
 		/* cold and fire provide partial protection against rust */
 		((chill = arti_immune(target, AD_COLD)) != 0 ||
 		 arti_immune(target, AD_FIRE)) &&
@@ -678,39 +699,37 @@ boolean for_dip;
 			  Yobjnam2(target, chill ? "freeze" : "boil"));
 	    }
 	    /* no damage to object */
-	} else if (target->oerodeproof || !erodible) {
+	} else if (target->oerodeproof || !vulnerable) {
 	    /* no message if dipping or not carried */
 	    if (for_dip) {
 		/* assumes that for_dip implies player action */
 		if (!Blind) target->rknown = 0;
 	    } else if (victim == &youmonst || vismon) {
-		if (flags.verbose || (erodible && !target->rknown))
+		if (flags.verbose || (vulnerable && !target->rknown))
 		    pline("%s not %s.", Yobjnam2(target, "are"),
 			  already_affected ? "harmed" : "affected");
-		if (erodible) target->rknown = 1;
+		if (vulnerable) target->rknown = 1;
 	    }
 	} else if (erosion < MAX_ERODE) {
 	    if (victim == &youmonst || vismon || visobj) {
-		pline("%s%s!", Yobjnam2(target, acid_dmg ? "corrode" : "rust"),
+		pline("%s%s!", Yobjnam2(target, action[type]),
 		    erosion+1 == MAX_ERODE ? " completely" :
 		    erosion ? " further" : "");
 		target->rknown = 1;	/* it's obviously not erode-proof */
 	    }
-	    if (acid_dmg)
-		target->oeroded2++;
-	    else
+	    if (is_primary)
 		target->oeroded++;
+	    else
+		target->oeroded2++;
 	    ret = TRUE;
 	} else {
 	    if (flags.verbose && !for_dip) {
 		if (victim == &youmonst)
 		    pline("%s completely %s.",
-			Yobjnam2(target, Blind ? "feel" : "look"),
-			acid_dmg ? "corroded" : "rusty");
+			Yobjnam2(target, Blind ? "feel" : "look"), msg[type]);
 		else if (vismon || visobj)
 		    pline("%s completely %s.",
-			Yobjnam2(target, "look"),
-			acid_dmg ? "corroded" : "rusty");
+			Yobjnam2(target, "look"), msg[type]);
 	    }
 	}
 

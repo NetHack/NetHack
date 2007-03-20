@@ -2077,16 +2077,19 @@ urustm(mon, obj)
 register struct monst *mon;
 register struct obj *obj;
 {
-	boolean is_acid;
+	int dmgtyp;
 
 	if (!mon || !obj) return; /* just in case */
+	/* AD_ACID is handled in passiveum */
 	if (dmgtype(youmonst.data, AD_CORR))
-	    is_acid = TRUE;
+	    dmgtyp = 3;
 	else if (dmgtype(youmonst.data, AD_RUST))
-	    is_acid = FALSE;
+	    dmgtyp = 1;
+	else if (dmgtype(youmonst.data, AD_FIRE))
+	    dmgtyp = 0;
 	else
 	    return;
-	(void) erode_obj(obj, is_acid, FALSE, FALSE);
+	(void) erode_obj(obj, dmgtyp, FALSE, FALSE);
 }
 
 int
@@ -2466,7 +2469,7 @@ register struct attack *mattk;
 		    }
 		} else tmp = 0;
 		if (!rn2(30)) erode_armor(mtmp, TRUE);
-		if (!rn2(6)) (void)erode_obj(MON_WEP(mtmp), TRUE, TRUE, FALSE);
+		if (!rn2(6)) (void)erode_obj(MON_WEP(mtmp), 3, TRUE, FALSE);
 		goto assess_dmg;
 	    case AD_STON: /* cockatrice */
 	    {
