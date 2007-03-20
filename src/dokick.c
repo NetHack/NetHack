@@ -549,14 +549,16 @@ xchar x, y;
 		kickobj = splitobj(kickobj, 1L);
 	    } else {
 		if (rn2(20)) {
-	    		const char *flyingcoinmsg[] = {
-		    		"scatter the coins",
-		    		"knock coins all over the place",
-	    			"send coins flying in all directions",
+			static NEARDATA const char * const flyingcoinmsg[] = {
+				"scatter the coins",
+				"knock coins all over the place",
+				"send coins flying in all directions",
 			};
+
 			pline("Thwwpingg!");
 			You("%s!", flyingcoinmsg[rn2(SIZE(flyingcoinmsg))]);
-		    	(void) scatter(x, y, rn2(3)+1, VIS_EFFECTS|MAY_HIT, kickobj);
+			(void)scatter(x, y, rn2(3)+1,
+				      VIS_EFFECTS|MAY_HIT, kickobj);
 			newsym(x, y);
 			return 1;
 	        }
