@@ -11,6 +11,8 @@
 static NEARDATA struct rm *maploc, nowhere;
 static NEARDATA const char *gate_str;
 
+struct obj *kickobj;		/* also used by obfree(shk.c) */
+
 extern boolean notonhead;	/* for long worms */
 
 STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
@@ -19,8 +21,6 @@ STATIC_DCL int FDECL(kick_object, (XCHAR_P, XCHAR_P));
 STATIC_DCL char *FDECL(kickstr, (char *));
 STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
 STATIC_DCL void FDECL(drop_to, (coord *,SCHAR_P));
-
-static NEARDATA struct obj *kickobj;
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 

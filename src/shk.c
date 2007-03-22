@@ -27,6 +27,7 @@ STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
 
 extern const struct shclass shtypes[];	/* defined in shknam.c */
 extern struct obj *thrownobj;		/* defined in dothrow.c */
+extern struct obj *kickobj;		/* dokick.c */
 
 STATIC_VAR NEARDATA long int followmsg;	/* last time of follow message */
 STATIC_VAR const char and_its_contents[] = " and its contents";
@@ -279,6 +280,7 @@ register struct monst *shkp;
 	clear_unpaid(fobj);
 	clear_unpaid(level.buriedobjlist);
 	if (thrownobj) thrownobj->unpaid = 0;
+	if (kickobj) kickobj->unpaid = 0;
 	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 		clear_unpaid(mtmp->minvent);
 	for(mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon)
@@ -847,6 +849,16 @@ register struct obj *obj, *merge;
 #endif
 		}
 	}
+	if (obj->owornmask) {
+	    impossible("obfree: deleting worn obj (%d: %ld)",
+		       obj->otyp, obj->owornmask);
+	    /* unfortunately at this point we don't know whether worn mask
+	       applied to hero or a monster or perhaps something bogus, so
+	       can't call remove_worn_item() to get <X>_off() side-effects */
+	    setnotworn(obj);
+	}
+	if (obj == thrownobj) thrownobj = 0;
+	if (obj == kickobj) kickobj = 0;
 	dealloc_obj(obj);
 }
 
