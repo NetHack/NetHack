@@ -456,6 +456,7 @@ struct obj *obj;
 	if (obj->owornmask) {
 	    mon->misc_worn_check &= ~obj->owornmask;
 	    update_mon_intrinsics(mon, obj, FALSE, FALSE);
+	    obj->owornmask = 0L;
 	}
 	obfree(obj, (struct obj*) 0);
 }
