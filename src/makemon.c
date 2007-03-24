@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.5	2007/01/19	*/
+/*	SCCS Id: @(#)makemon.c	3.5	2007/03/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -964,8 +964,7 @@ register int	mmflags;
 	mtmp->m_id = context.ident++;
 	if (!mtmp->m_id) mtmp->m_id = context.ident++;	/* ident overflowed */
 	set_mon_data(mtmp, ptr, 0);
-	if (mtmp->data->msound == MS_LEADER &&
-		quest_info(MS_LEADER) == mndx)
+	if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
 	    quest_status.leader_m_id = mtmp->m_id;
 	mtmp->mnum = mndx;
 
@@ -978,8 +977,9 @@ register int	mmflags;
 
 	if (In_sokoban(&u.uz) && !mindless(ptr))  /* know about traps here */
 	    mtmp->mtrapseen = (1L << (PIT - 1)) | (1L << (HOLE - 1));
-	if (ptr->msound == MS_LEADER)		/* leader knows about portal */
-	    mtmp->mtrapseen |= (1L << (MAGIC_PORTAL-1));
+	/* quest leader and nemesis both know about all trap types */
+	if (ptr->msound == MS_LEADER || ptr->msound == MS_NEMESIS)
+	    mtmp->mtrapseen = ~0;
 
 	place_monster(mtmp, x, y);
 	mtmp->mcansee = mtmp->mcanmove = TRUE;

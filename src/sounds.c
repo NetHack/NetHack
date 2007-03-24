@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sounds.c	3.5	2005/08/29	*/
+/*	SCCS Id: @(#)sounds.c	3.5	2007/03/23	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -467,21 +467,23 @@ STATIC_OVL int
 domonnoise(mtmp)
 register struct monst *mtmp;
 {
+    char verbuf[BUFSZ];
     register const char *pline_msg = 0,	/* Monnam(mtmp) will be prepended */
 			*verbl_msg = 0,	/* verbalize() */
 			*verbl_msg_mcan = 0;	/* verbalize() if cancelled */
     struct permonst *ptr = mtmp->data;
-    char verbuf[BUFSZ];
+    int msound = ptr->msound;
 
     /* presumably nearness and sleep checks have already been made */
     if (Deaf) return(0);
     if (is_silent(ptr)) return(0);
 
-    /* Make sure its your role's quest quardian; adjust if not */
-    if (ptr->msound == MS_GUARDIAN && ptr != &mons[urole.guardnum]) {
-    	int mndx = monsndx(ptr);
-    	ptr = &mons[genus(mndx,1)];
-    }
+    /* leader might be poly'd; if he can still speak, give leader speach */
+    if (mtmp->m_id == quest_status.leader_m_id && msound > MS_ANIMAL)
+	msound = MS_LEADER;
+    /* make sure its your role's quest quardian; adjust if not */
+    else if (msound == MS_GUARDIAN && ptr != &mons[urole.guardnum])
+	msound = mons[genus(monsndx(ptr), 1)].msound;
 
     /* be sure to do this before talking; the monster might teleport away, in
      * which case we want to check its pre-teleport position
@@ -489,7 +491,7 @@ register struct monst *mtmp;
     if (!canspotmon(mtmp))
 	map_invisible(mtmp->mx, mtmp->my);
 
-    switch (ptr->msound) {
+    switch (msound) {
 	case MS_ORACLE:
 	    return doconsult(mtmp);
 	case MS_PRIEST:
