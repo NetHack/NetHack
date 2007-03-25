@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2007/02/21	*/
+/*	SCCS Id: @(#)hack.h	3.5	2007/03/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -128,6 +128,13 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define KICKED_WEAPON	2
 #define FLASHED_LIGHT	3
 #define INVIS_BEAM	4
+
+/* attack mode for hmon() */
+#define HMON_MELEE	0	/* hand-to-hand */
+#define HMON_THROWN	1	/* normal ranged (or spitting while poly'd) */
+#define HMON_KICKED	2	/* alternate ranged */
+#define HMON_APPLIED	3	/* polearm, treated as ranged */
+#define HMON_DRAGGED	4	/* attached iron ball, pulled into mon */
 
 #define MATCH_WARN_OF_MON(mon)	 (Warn_of_mon && \
 				 ((context.warntype.obj && \

@@ -200,6 +200,8 @@ artifacts which subsequently evade your grasp/control after already being
 hero with lycanthropy is vulnerable to silver in human form as well as beast
 changing alignment or shape triggers a check for equipment evading hero's grasp
 passive fire effects can damage attackers weapons
+wielded bow shouldn't affect outcome of kicked arrows
+ranged polearm hit can divide puddings and can use confuse monster effect
 
 
 Platform- and/or Interface-Specific Fixes

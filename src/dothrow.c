@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2007/01/10	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2007/03/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,6 +27,7 @@ static NEARDATA const char bullets[] =
 
 struct obj *thrownobj = 0;	/* tracks an object until it lands */
 
+extern struct obj *kickobj;	/* from dokick.c */
 extern boolean notonhead;	/* for long worms */
 
 
@@ -1225,22 +1226,27 @@ boolean maybe_wakeup;
 }
 
 #define quest_arti_hits_leader(obj,mon)	\
-  (obj->oartifact && is_quest_artifact(obj) && (mon->data->msound == MS_LEADER))
+		(obj->oartifact && is_quest_artifact(obj) && \
+		 mon->m_id == quest_status.leader_m_id)
 
 /*
  * Object thrown by player arrives at monster's location.
  * Return 1 if obj has disappeared or otherwise been taken care of,
  * 0 if caller must take care of it.
+ * Also used for kicked objects and for polearms/grapnel applied at range.
  */
 int
 thitmonst(mon, obj)
 register struct monst *mon;
-register struct obj   *obj;
+register struct obj *obj;	/* thrownobj or kickobj or uwep */
 {
 	register int	tmp; /* Base chance to hit */
 	register int	disttmp; /* distance modifier */
-	int otyp = obj->otyp;
+	int otyp = obj->otyp, hmode;
 	boolean guaranteed_hit = (u.uswallow && mon == u.ustuck);
+
+	hmode = (obj == uwep) ? HMON_APPLIED :
+		(obj == kickobj) ? HMON_KICKED : HMON_THROWN;
 
 	/* Differences from melee weapons:
 	 *
@@ -1287,8 +1293,8 @@ register struct obj   *obj;
 	}
 
 	tmp += omon_adj(mon, obj, TRUE);
-	if (is_orc(mon->data) && maybe_polyd(is_elf(youmonst.data),
-			Race_if(PM_ELF)))
+	if (is_orc(mon->data) &&
+		maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF)))
 	    tmp++;
 	if (guaranteed_hit) {
 	    tmp += 1000; /* Guaranteed hit */
@@ -1308,8 +1314,9 @@ register struct obj   *obj;
 	}
 
 	/* don't make game unwinnable if naive player throws artifact
-	   at leader.... */
-	if (quest_arti_hits_leader(obj, mon)) {
+	   at leader... (kicked artifact is ok too; HMON_APPLIED could
+	   occur if quest artifact polearm or grapnel ever gets added) */
+	if (hmode != HMON_APPLIED && quest_arti_hits_leader(obj, mon)) {
 	    /* not wakeup(), which angers non-tame monsters */
 	    mon->msleeping = 0;
 	    mon->mstrategy &= ~STRAT_WAITMASK;
@@ -1336,7 +1343,10 @@ register struct obj   *obj;
 
 	if (obj->oclass == WEAPON_CLASS || is_weptool(obj) ||
 		obj->oclass == GEM_CLASS) {
-	    if (is_ammo(obj)) {
+	    if (hmode == HMON_KICKED) {
+		/* throwing adjustments and weapon skill bonus don't apply */
+		tmp -= (is_ammo(obj) ? 5 : 3);
+	    } else if (is_ammo(obj)) {
 		if (!ammo_and_launcher(obj, uwep)) {
 		    tmp -= 4;
 		} else {
@@ -1358,12 +1368,12 @@ register struct obj   *obj;
 			    tmp++;
 		    }
 		}
-	    } else {
+	    } else {	/* thrown non-ammo or applied polearm/grapnel */
 		if (otyp == BOOMERANG)		/* arbitrary */
 		    tmp += 4;
 		else if (throwing_weapon(obj))	/* meant to be thrown */
 		    tmp += 2;
-		else				/* not meant to be thrown */
+		else if (obj == thrownobj)	/* not meant to be thrown */
 		    tmp -= 2;
 		/* we know we're dealing with a weapon or weptool handled
 		   by WEAPON_SKILLS once ammo objects have been excluded */
@@ -1371,7 +1381,7 @@ register struct obj   *obj;
 	    }
 
 	    if (tmp >= rnd(20)) {
-		if (hmon(mon,obj,1)) {	/* mon still alive */
+		if (hmon(mon, obj, hmode)) {	/* mon still alive */
 		    cutworm(mon, bhitpos.x, bhitpos.y, obj);
 		}
 		exercise(A_DEX, TRUE);
@@ -1411,7 +1421,7 @@ register struct obj   *obj;
 		int was_swallowed = guaranteed_hit;
 
 		exercise(A_DEX, TRUE);
-		if (!hmon(mon,obj,1)) {		/* mon killed */
+		if (!hmon(mon, obj, hmode)) {		/* mon killed */
 		    if (was_swallowed && !u.uswallow && obj == uball)
 			return 1;	/* already did placebc() */
 		}
@@ -1423,7 +1433,7 @@ register struct obj   *obj;
 	    exercise(A_STR, TRUE);
 	    if (tmp >= rnd(20)) {
 		exercise(A_DEX, TRUE);
-		(void) hmon(mon,obj,1);
+		(void) hmon(mon, obj, hmode);
 	    } else {
 		tmiss(obj, mon, TRUE);
 	    }
@@ -1431,7 +1441,7 @@ register struct obj   *obj;
 	} else if ((otyp == EGG || otyp == CREAM_PIE ||
 		    otyp == BLINDING_VENOM || otyp == ACID_VENOM) &&
 		(guaranteed_hit || ACURR(A_DEX) > rnd(25))) {
-	    (void) hmon(mon, obj, 1);
+	    (void) hmon(mon, obj, hmode);
 	    return 1;	/* hmon used it up */
 
 	} else if (obj->oclass == POTION_CLASS &&

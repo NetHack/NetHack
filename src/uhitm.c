@@ -453,7 +453,7 @@ struct attack *uattk;
 	    /* we hit the monster; be careful: it might die or
 	       be knocked into a different location */
 	    notonhead = (mon->mx != x || mon->my != y);
-	    malive = hmon(mon, weapon, 0);
+	    malive = hmon(mon, weapon, HMON_MELEE);
 	    if (malive) {
 		/* monster still alive */
 		if(!rn2(25) && mon->mhp < mon->mhpmax/2
@@ -514,7 +514,7 @@ boolean			/* general "damage monster" routine */
 hmon(mon, obj, thrown)		/* return TRUE if mon still alive */
 struct monst *mon;
 struct obj *obj;
-int thrown;
+int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 {
 	boolean result, anger_guards;
 
@@ -533,7 +533,7 @@ STATIC_OVL boolean
 hmon_hitmon(mon, obj, thrown)
 struct monst *mon;
 struct obj *obj;
-int thrown;
+int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 {
 	int tmp;
 	struct permonst *mdat = mon->data;
@@ -605,7 +605,8 @@ int thrown;
 #endif
 		     is_pole(obj)) ||
 		    /* or throw a missile without the proper bow... */
-		    (is_ammo(obj) && !ammo_and_launcher(obj, uwep))) {
+		    (is_ammo(obj) && (thrown != HMON_THROWN ||
+				      !ammo_and_launcher(obj, uwep)))) {
 		    /* then do only 1-2 points of damage */
 		    if (mdat == &mons[PM_SHADE] && obj->otyp != SILVER_ARROW)
 			tmp = 0;
@@ -690,7 +691,8 @@ int thrown;
 			if (jousting) valid_weapon_attack = TRUE;
 		    }
 #endif
-		    if (thrown && (is_ammo(obj) || is_missile(obj))) {
+		    if (thrown == HMON_THROWN &&
+			    (is_ammo(obj) || is_missile(obj))) {
 			if (ammo_and_launcher(obj, uwep)) {
 			    /* Elves and Samurai do extra damage using
 			     * their bows&arrows; they're highly trained.
@@ -924,7 +926,8 @@ int thrown;
 		/* If you throw using a propellor, you don't get a strength
 		 * bonus but you do get an increase-damage bonus.
 		 */
-		if(!thrown || !obj || !uwep || !ammo_and_launcher(obj, uwep))
+		if (thrown != HMON_THROWN || !obj || !uwep ||
+			!ammo_and_launcher(obj, uwep))
 		    tmp += dbon();
 	}
 
@@ -1027,11 +1030,15 @@ int thrown;
 		abuse_dog(mon);
 		monflee(mon, 10 * rnd(tmp), FALSE, FALSE);
 	}
-	if((mdat == &mons[PM_BLACK_PUDDING] || mdat == &mons[PM_BROWN_PUDDING])
-		   && obj && obj == uwep
-		   && objects[obj->otyp].oc_material == IRON
-		   && mon->mhp > 1 && !thrown && !mon->mcan
-		   /* && !destroyed  -- guaranteed by mhp > 1 */ ) {
+	if ((mdat == &mons[PM_BLACK_PUDDING] ||
+			mdat == &mons[PM_BROWN_PUDDING]) &&
+		    /* pudding is alive and healthy enough to split */
+		    mon->mhp > 1 && !mon->mcan &&
+		    /* iron weapon using melee or polearm hit */
+		    obj && obj == uwep &&
+		    objects[obj->otyp].oc_material == IRON &&
+		    (thrown == HMON_MELEE ||
+			(thrown == HMON_APPLIED && is_pole(obj)))) {
 		if (clone_mon(mon, 0, 0)) {
 			pline("%s divides as you hit it!", Monnam(mon));
 			hittxt = TRUE;
@@ -1085,7 +1092,8 @@ int thrown;
 	} else if (destroyed) {
 		if (!already_killed)
 		    killed(mon);	/* takes care of most messages */
-	} else if(u.umconf && !thrown) {
+	} else if (u.umconf &&
+		    (thrown == HMON_MELEE || thrown == HMON_APPLIED)) {
 		nohandglow(mon);
 		if (!mon->mconf && !resist(mon, SPBOOK_CLASS, 0, NOTELL)) {
 			mon->mconf = 1;

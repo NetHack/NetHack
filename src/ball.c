@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)ball.c	3.5	2003/02/03	*/
+/*	SCCS Id: @(#)ball.c	3.5	2007/03/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -585,7 +585,7 @@ drag:
 		    tmp = -2 + Luck + find_mac(victim);
 		    tmp += omon_adj(victim, uball, TRUE);
 		    if (tmp >= rnd(20))
-			(void) hmon(victim,uball,1);
+			(void) hmon(victim, uball, HMON_DRAGGED);
 		    else
 			miss(xname(uball), victim);
 
