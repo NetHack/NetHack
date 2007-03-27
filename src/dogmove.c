@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.5	2006/08/16	*/
+/*	SCCS Id: @(#)dogmove.c	3.5	2007/03/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -195,15 +195,17 @@ struct obj *obj;
 int
 dog_eat(mtmp, obj, x, y, devour)
 register struct monst *mtmp;
-register struct obj * obj;
+register struct obj *obj;	/* if unpaid, then thrown or kicked by hero */
 int x, y;
 boolean devour;
 {
 	register struct edog *edog = EDOG(mtmp);
-	boolean poly = FALSE, grow = FALSE, heal = FALSE;
+	boolean poly = FALSE, grow = FALSE, heal = FALSE, deadmimic;
 	int nutrit;
-	boolean deadmimic = FALSE;
+	long oprice;
+	char objnambuf[BUFSZ];
 
+	objnambuf[0] = '\0';
 	if(edog->hungrytime < monstermoves)
 	    edog->hungrytime = monstermoves;
 	nutrit = dog_nutrition(mtmp, obj);
@@ -233,6 +235,11 @@ boolean devour;
 	    newsym(x, y);
 	    newsym(mtmp->mx, mtmp->my);
 	}
+
+	/* food items are eaten one at a time; entire stack for other stuff */
+	if (obj->quan > 1L && obj->oclass == FOOD_CLASS)
+	    obj = splitobj(obj, 1L);
+	if (obj->unpaid) iflags.suppress_price++;
 	if (is_pool(x, y) && !Underwater) {
 	    /* Don't print obj */
 	    /* TODO: Reveal presence of sea monster (especially sharks) */
@@ -242,9 +249,11 @@ boolean devour;
 	   sight locations should not. */
 	if (cansee(x, y) || cansee(mtmp->mx, mtmp->my))
 	    pline("%s %s %s.", mon_visible(mtmp) ? noit_Monnam(mtmp) : "It",
-		  devour ? "devours" : "eats",
-		  (obj->oclass == FOOD_CLASS) ?
-			singular(obj, doname) : doname(obj));
+		  devour ? "devours" : "eats", doname(obj));
+	if (obj->unpaid) {
+	    Strcpy(objnambuf, xname(obj));
+	    iflags.suppress_price--;
+	}
 	/* It's a reward if it's DOGFOOD and the player dropped/threw it. */
 	/* We know the player had it if invlet is set -dlc */
 	if(dogfood(mtmp,obj) == DOGFOOD && obj->invlet)
@@ -256,6 +265,7 @@ boolean devour;
 #endif
 	if (mtmp->data == &mons[PM_RUST_MONSTER] && obj->oerodeproof) {
 	    /* The object's rustproofing is gone now */
+	    if (obj->unpaid) costly_alteration(obj, COST_DEGRD);
 	    obj->oerodeproof = 0;
 	    mtmp->mstun = 1;
 	    if (canseemon(mtmp) && flags.verbose) {
@@ -264,14 +274,20 @@ boolean devour;
 	    }
 	} else if (obj == uball) {
 	    unpunish();
-	    delobj(obj);
-	} else if (obj == uchain)
+	    delobj(obj);		/* we assume this can't be unpaid */
+	} else if (obj == uchain) {
 	    unpunish();
-	else if (obj->quan > 1L && obj->oclass == FOOD_CLASS) {
-	    obj->quan--;
-	    obj->owt = weight(obj);
-	} else
+	} else {
+	    if (obj->unpaid) {
+		/* edible item owned by shop has been thrown or kicked
+		   by hero and caught by tame or food-tameable monst */
+		oprice = unpaid_cost(obj, TRUE);
+		pline("That %s will cost you %ld %s.",
+		      objnambuf, oprice, currency(oprice));
+		/* delobj->obfree will handle actual shop billing update */
+	    }
 	    delobj(obj);
+	}
 
 	if (poly) {
 	    (void) newcham(mtmp, (struct permonst *)0, FALSE,

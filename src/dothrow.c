@@ -1134,7 +1134,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		    if (cansee(bhitpos.x, bhitpos.y))
 			pline("%s snatches up %s.",
 			      Monnam(mon), the(xname(obj)));
-		    if(*u.ushops)
+		    if (*u.ushops || obj->unpaid)
 			check_shop_obj(obj, bhitpos.x, bhitpos.y, FALSE);
 		    (void) mpickobj(mon, obj);	/* may merge and free obj */
 		    thrownobj = (struct obj*)0;
@@ -1147,7 +1147,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		}
 		thrownobj = (struct obj*)0;
 		place_object(obj, bhitpos.x, bhitpos.y);
-		if(*u.ushops && obj != uball)
+		if ((*u.ushops || obj->unpaid) && obj != uball)
 		    check_shop_obj(obj, bhitpos.x, bhitpos.y, FALSE);
 
 		stackobj(obj);
@@ -1334,6 +1334,8 @@ register struct obj *obj;	/* thrownobj or kickobj or uwep */
 		    (void) encumber_msg();
 		} else {
 		    /* angry leader caught it and isn't returning it */
+		    if (*u.ushops || obj->unpaid) /* not very likely... */
+			check_shop_obj(obj, mon->mx, mon->my, FALSE);
 		    (void) mpickobj(mon, obj);
 		}
 		return 1;		/* caller doesn't need to place it */
@@ -1404,7 +1406,7 @@ register struct obj *obj;	/* thrownobj or kickobj or uwep */
 			broken = 0;
 
 		    if (broken) {
-			if (*u.ushops)
+			if (*u.ushops || obj->unpaid)
 			    check_shop_obj(obj, bhitpos.x,bhitpos.y, TRUE);
 			obfree(obj, (struct obj *)0);
 			return 1;
@@ -1543,7 +1545,8 @@ register struct obj *obj;
 		}
 	}
 	Strcat(buf,acceptgift);
-	if(*u.ushops) check_shop_obj(obj, mon->mx, mon->my, TRUE);
+	if (*u.ushops || obj->unpaid)
+	    check_shop_obj(obj, mon->mx, mon->my, TRUE);
 	(void) mpickobj(mon, obj);	/* may merge and free obj */
 	ret = 1;
 
@@ -1681,9 +1684,9 @@ boolean from_invent;
 	}
 
 	if (hero_caused) {
-	    if (from_invent) {
-		if (*u.ushops)
-			check_shop_obj(obj, x, y, TRUE);
+	    if (from_invent || obj->unpaid) {
+		if (*u.ushops || obj->unpaid)
+		    check_shop_obj(obj, x, y, TRUE);
 	    } else if (!obj->no_charge && costly_spot(x, y)) {
 		/* it is assumed that the obj is a floor-object */
 		char *o_shop = in_rooms(x, y, SHOPBASE);

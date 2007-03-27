@@ -402,7 +402,7 @@ kick_object(x, y)
 xchar x, y;
 {
 	int range;
-	register struct monst *mon, *shkp;
+	struct monst *mon, *shkp = 0;
 	struct trap *trap;
 	char bhitroom;
 	boolean costly, isgold, slide = FALSE;
@@ -471,8 +471,9 @@ xchar x, y;
 	if(!ZAP_POS(levl[x+u.dx][y+u.dy].typ) || closed_door(x+u.dx, y+u.dy))
 		range = 1;
 
-	costly = ((shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) &&
-				    costly_spot(x, y));
+	costly = (!(kickobj->no_charge && !Has_contents(kickobj)) &&
+		  (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0 &&
+		  costly_spot(x, y));
 	isgold = (kickobj->oclass == COIN_CLASS);
 
 	if (IS_ROCK(levl[x][y].typ) || closed_door(x, y)) {
@@ -573,6 +574,7 @@ xchar x, y;
 	    pline("Whee!  %s %s across the %s.", Doname2(kickobj),
 		  otense(kickobj, "slide"), surface(x,y));
 
+	if (costly && !isgold) addtobill(kickobj, FALSE, FALSE, TRUE);
 	obj_extract_self(kickobj);
 	(void) snuff_candle(kickobj);
 	newsym(x, y);
@@ -592,16 +594,9 @@ xchar x, y;
 		return(1);
 	}
 
-	/* the object might have fallen down a hole */
-	if (kickobj->where == OBJ_MIGRATING) {
-	    if (costly) {
-		if(isgold)
-		    costly_gold(x, y, kickobj->quan);
-		else (void)stolen_value(kickobj, x, y,
-					(boolean)shkp->mpeaceful, FALSE);
-	    }
-	    return 1;
-	}
+	/* the object might have fallen down a hole;  
+	   ship_object() will have taken care of shop billing */
+	if (kickobj->where == OBJ_MIGRATING) return 1;
 
 	bhitroom = *in_rooms(bhitpos.x, bhitpos.y, SHOPBASE);
 	if (costly && (!costly_spot(bhitpos.x, bhitpos.y) ||
@@ -613,12 +608,14 @@ xchar x, y;
 	}
 
 	if(flooreffects(kickobj,bhitpos.x,bhitpos.y,"fall")) return(1);
+	if (kickobj->unpaid) subfrombill(kickobj, shkp);
 	place_object(kickobj, bhitpos.x, bhitpos.y);
 	stackobj(kickobj);
 	newsym(kickobj->ox, kickobj->oy);
 	return(1);
 }
 
+/* cause of death if kicking kills kicker */
 STATIC_OVL char *
 kickstr(buf)
 char *buf;
@@ -1379,9 +1376,7 @@ boolean shop_floor_obj;
 		otmp->no_charge = 0;
 	}
 
-	if (otmp == uwep) setuwep((struct obj *)0);
-	if (otmp == uquiver) setuqwep((struct obj *)0);
-	if (otmp == uswapwep) setuswapwep((struct obj *)0);
+	if (otmp->owornmask) remove_worn_item(otmp, TRUE);
 
 	/* some things break rather than ship */
 	if (breaktest(otmp)) {

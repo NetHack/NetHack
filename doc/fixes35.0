@@ -202,6 +202,8 @@ changing alignment or shape triggers a check for equipment evading hero's grasp
 passive fire effects can damage attackers weapons
 wielded bow shouldn't affect outcome of kicked arrows
 ranged polearm hit can divide puddings and can use confuse monster effect
+charge for kicked shop-owned food if it gets used up taming a monster
+give better feedback when thrown shop-owned food gets used up taming a monster
 
 
 Platform- and/or Interface-Specific Fixes
