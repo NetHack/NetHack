@@ -204,6 +204,8 @@ wielded bow shouldn't affect outcome of kicked arrows
 ranged polearm hit can divide puddings and can use confuse monster effect
 charge for kicked shop-owned food if it gets used up taming a monster
 give better feedback when thrown shop-owned food gets used up taming a monster
+effect of negative AC on damage received was calculated differently than
+	normal when deciding whether hero poly'd into pudding would split
 
 
 Platform- and/or Interface-Specific Fixes

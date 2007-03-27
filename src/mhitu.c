@@ -930,6 +930,8 @@ hitmu(mtmp, mattk)
 		    }
 		} else {			  /* hand to hand weapon */
 		    if(mattk->aatyp == AT_WEAP && otmp) {
+			int tmp;
+
 			if (otmp->otyp == CORPSE
 				&& touch_petrifies(&mons[otmp->corpsenm])) {
 			    dmg = 1;
@@ -949,21 +951,23 @@ hitmu(mtmp, mattk)
 			    pline_The("silver sears your flesh!");
 			    exercise(A_CON, FALSE);
 			}
-			if (u.mh > 1 && u.mh > ((u.uac>0) ? dmg : dmg+u.uac) &&
-				   objects[otmp->otyp].oc_material == IRON &&
-					(u.umonnum==PM_BLACK_PUDDING
-					|| u.umonnum==PM_BROWN_PUDDING)) {
-			    /* This redundancy necessary because you have to
-			     * take the damage _before_ being cloned.
-			     */
-			    if (u.uac < 0) dmg += u.uac;
-			    if (dmg < 1) dmg = 1;
-			    if (dmg > 1) exercise(A_STR, FALSE);
-			    u.mh -= dmg;
+			/* this redundancy necessary because you have
+			   to take the damage _before_ being cloned;
+			   need to have at least 2 hp left to split */
+			tmp = dmg;
+			if (u.uac < 0) tmp -= rnd(-u.uac);
+			if (tmp < 1) tmp = 1;
+			if (u.mh - tmp > 1 &&
+				objects[otmp->otyp].oc_material == IRON &&
+				(u.umonnum == PM_BLACK_PUDDING ||
+				 u.umonnum == PM_BROWN_PUDDING)) {
+			    if (tmp > 1) exercise(A_STR, FALSE);
+			    /* inflict damage now; we know it can't be fatal */
+			    u.mh -= tmp;
 			    context.botl = 1;
-			    dmg = 0;
-			    if(cloneu())
-			    You("divide as %s hits you!",mon_nam(mtmp));
+			    dmg = 0;	/* don't inflict more damage below */
+			    if (cloneu())
+				You("divide as %s hits you!", mon_nam(mtmp));
 			}
 			urustm(mtmp, otmp);
 		    } else if (mattk->aatyp != AT_TUCH || dmg != 0 ||
