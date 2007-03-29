@@ -433,10 +433,10 @@ walk_path(src_cc, dest_cc, check_proc, arg)
 	    prev_x = x;
 	    prev_y = y;
 	    y += y_change;
-	    err += dx;
-	    if (err >= dy) {
+	    err += dx << 1;
+	    if (err > dy) {
 		x += x_change;
-		err -= dy;
+		err -= dy << 1;
 	    }
 	/* check for early exit condition */
 	if (!(keep_going = (*check_proc)(arg, x, y)))
@@ -447,10 +447,10 @@ walk_path(src_cc, dest_cc, check_proc, arg)
 	    prev_x = x;
 	    prev_y = y;
 	    x += x_change;
-	    err += dy;
-	    if (err >= dx) {
+	    err += dy << 1;
+	    if (err > dx) {
 		y += y_change;
-		err -= dx;
+		err -= dx << 1;
 	    }
 	/* check for early exit condition */
 	if (!(keep_going = (*check_proc)(arg, x, y)))
