@@ -1570,10 +1570,9 @@ struct monst *mtmp;
 }
 
 /*
- * Free obj from whatever list it is on in preperation of deleting it or
- * moving it elsewhere.  This will perform all high-level consequences
- * involved with removing the item.  E.g. if the object is in the hero's
- * inventory and confers heat resistance, the hero will lose it.
+ * Free obj from whatever list it is on in preparation for deleting it
+ * or moving it elsewhere; obj->where will end up set to OBJ_FREE.
+ * Doesn't handle unwearing of objects in hero's or monsters' inventories.
  *
  * Object positions:
  *	OBJ_FREE	not on any list

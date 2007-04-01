@@ -407,7 +407,7 @@ register struct monst *mtmp;
 			(void)mongets(mtmp, FLAIL);
 			break;
 		}
-		/* prevent djinnis and mail daemons from leaving objects when
+		/* prevent djinn and mail daemons from leaving objects when
 		 * they vanish
 		 */
 		if (!is_demon(ptr)) break;
