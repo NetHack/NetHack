@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2007/02/08	*/
+/*	SCCS Id: @(#)mon.c	3.5	2007/03/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -191,12 +191,14 @@ unsigned corpseflags;
 	    case PM_WHITE_UNICORN:
 	    case PM_GRAY_UNICORN:
 	    case PM_BLACK_UNICORN:
-		if (mtmp->mrevived && rn2(20)) {
-			if (canseemon(mtmp))
-			   pline("%s recently regrown horn crumbles to dust.",
-				s_suffix(Monnam(mtmp)));
-		} else
-			(void) mksobj_at(UNICORN_HORN, x, y, TRUE, FALSE);
+		if (mtmp->mrevived && rn2(2)) {
+		    if (canseemon(mtmp))
+			pline("%s recently regrown horn crumbles to dust.",
+			      s_suffix(Monnam(mtmp)));
+		} else {
+		    obj = mksobj_at(UNICORN_HORN, x, y, TRUE, FALSE);
+		    if (obj && mtmp->mrevived) obj->degraded_horn = 1;
+		}
 		goto default_1;
 	    case PM_LONG_WORM:
 		(void) mksobj_at(WORM_TOOTH, x, y, TRUE, FALSE);

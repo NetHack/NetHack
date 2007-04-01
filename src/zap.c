@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2007/02/17	*/
+/*	SCCS Id: @(#)zap.c	3.5	2007/03/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1283,6 +1283,9 @@ poly_obj(obj, id)
 	    change_luck(-1);	/* Sokoban guilt */
 	if (id == STRANGE_OBJECT) { /* preserve symbol */
 	    int try_limit = 3;
+	    unsigned magic_obj = objects[obj->otyp].oc_magic;
+
+	    if (obj->otyp == UNICORN_HORN && obj->degraded_horn) magic_obj = 0;
 	    /* Try up to 3 times to make the magic-or-not status of
 	       the new item be the same as it was for the old one. */
 	    otmp = (struct obj *)0;
@@ -1290,7 +1293,7 @@ poly_obj(obj, id)
 		if (otmp) delobj(otmp);
 		otmp = mkobj(obj->oclass, FALSE);
 	    } while (--try_limit > 0 &&
-		  objects[obj->otyp].oc_magic != objects[otmp->otyp].oc_magic);
+			objects[otmp->otyp].oc_magic != magic_obj);
 	} else {
 	    /* literally replace obj with this new thing */
 	    otmp = mksobj(id, FALSE, FALSE);

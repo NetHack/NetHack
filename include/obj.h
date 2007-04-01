@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)obj.h	3.5	2007/02/17	*/
+/*	SCCS Id: @(#)obj.h	3.5	2007/03/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -85,6 +85,7 @@ struct obj {
 	Bitfield(oerodeproof,1); /* erodeproof weapon/armor */
 	Bitfield(olocked,1);	/* object is locked */
 	Bitfield(obroken,1);	/* lock has been broken */
+#define degraded_horn obroken	/* unicorn horn will poly to non-magic */
 	Bitfield(otrapped,1);	/* container is trapped */
 				/* or accidental tripped rolling boulder trap */
 #define opoisoned otrapped	/* object (weapon) is coated with poison */
