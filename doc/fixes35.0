@@ -207,6 +207,8 @@ give better feedback when thrown shop-owned food gets used up taming a monster
 effect of negative AC on damage received was calculated differently than
 	normal when deciding whether hero poly'd into pudding would split
 unicorn horn produced by revived monster will polymorph as if non-magic
+stone-to-flesh on any golem statue or golem figurine creates flesh golem
+stone-to-flesh which activates shop-owned figurine entails shop charges
 
 
 Platform- and/or Interface-Specific Fixes

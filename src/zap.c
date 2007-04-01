@@ -21,6 +21,7 @@ extern boolean m_using;
 
 STATIC_DCL void FDECL(polyuse, (struct obj *,int,int));
 STATIC_DCL void FDECL(create_polymon, (struct obj *,int));
+STATIC_DCL int FDECL(stone_to_flesh_obj, (struct obj *));
 STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
 STATIC_DCL int FDECL(zhitm, (struct monst *,int,int,struct obj **));
 STATIC_DCL void FDECL(zhitu, (int,int,const char *,XCHAR_P,XCHAR_P));
@@ -1475,7 +1476,6 @@ poly_obj(obj, id)
 
 	/* ** we are now done adjusting the object ** */
 
-
 	/* swap otmp for obj */
 	replace_object(obj, otmp);
 	if (obj_location == OBJ_INVENT) {
@@ -1524,6 +1524,121 @@ poly_obj(obj, id)
 	return otmp;
 }
 
+/* stone-to-flesh spell hits and maybe transforms or animates obj */
+STATIC_OVL int
+stone_to_flesh_obj(obj)
+struct obj *obj;
+{
+    int res = 1;	/* affected object by default */
+    struct permonst *ptr;
+    struct monst *mon;
+    struct obj *item;
+    xchar oox, ooy;
+    boolean smell = FALSE, golem_xform = FALSE;
+
+    if (objects[obj->otyp].oc_material != MINERAL &&
+	    objects[obj->otyp].oc_material != GEMSTONE) return 0;
+
+    (void) get_obj_location(obj, &oox, &ooy, 0);
+    /* add more if stone objects are added.. */
+    switch (objects[obj->otyp].oc_class) {
+    case ROCK_CLASS:	/* boulders and statues */
+    case TOOL_CLASS:	/* figurines */
+	if (obj->otyp == BOULDER) {
+	    obj = poly_obj(obj, HUGE_CHUNK_OF_MEAT);
+	    smell = TRUE;
+	} else if (obj->otyp == STATUE || obj->otyp == FIGURINE) {
+	    ptr = &mons[obj->corpsenm];
+	    if (is_golem(ptr)) {
+		golem_xform = (ptr != &mons[PM_FLESH_GOLEM]);
+	    } else if (vegetarian(ptr)) {
+		/* Don't animate monsters that aren't flesh */
+		obj = poly_obj(obj, MEATBALL);
+		smell = TRUE;
+		break;
+	    }
+	    if (obj->otyp == STATUE) {
+		/* animate_statue() forces all golems to become flesh golems */
+		mon = animate_statue(obj, oox, ooy, ANIMATE_SPELL, (int *)0);
+	    } else { /* (obj->otyp == FIGURINE) */
+		if (golem_xform) ptr = &mons[PM_FLESH_GOLEM];
+		mon = makemon(ptr, oox, ooy, NO_MINVENT);
+		if (mon) {
+		    if (costly_spot(oox, ooy) && !obj->no_charge) {
+			if (costly_spot(u.ux, u.uy))
+			    addtobill(obj, carried(obj), FALSE, FALSE);
+			else
+			    stolen_value(obj, oox, ooy, TRUE, FALSE);
+		    }
+		    if (obj->timed) obj_stop_timers(obj);
+		    if (carried(obj))
+			useup(obj);
+		    else
+			delobj(obj);
+		    if (cansee(mon->mx, mon->my))
+			pline_The("figurine %sanimates!",
+				  golem_xform ? "turns to flesh and " : "");
+		}
+	    }
+	    if (mon) {
+		ptr = mon->data;
+		/* this golem handling is redundant... */
+		if (is_golem(ptr) && ptr != &mons[PM_FLESH_GOLEM])
+		    (void)newcham(mon, &mons[PM_FLESH_GOLEM], TRUE, FALSE);
+	    } else if ((ptr->geno & (G_NOCORPSE|G_UNIQ)) != 0) {
+		/* didn't revive but can't leave corpse either */
+		res = 0;
+	    } else {
+		/* unlikely to get here since genociding monsters also
+		   sets the G_NOCORPSE flag; drop statue's contents */
+		while ((item = obj->cobj) != 0) {
+		    bypass_obj(item);	/* make stone-to-flesh miss it */
+		    obj_extract_self(item);
+		    place_object(item, oox, ooy);
+		}
+		obj = poly_obj(obj, CORPSE);
+	    }
+	} else { /* miscellaneous tool or unexpected rock... */
+	    res = 0;
+	}
+	break;
+    /* maybe add weird things to become? */
+    case RING_CLASS:	/* some of the rings are stone */
+	obj = poly_obj(obj, MEAT_RING);
+	smell = TRUE;
+	break;
+    case WAND_CLASS:	/* marble wand */
+	obj = poly_obj(obj, MEAT_STICK);
+	smell = TRUE;
+	break;
+    case GEM_CLASS:	/* stones & gems */
+	obj = poly_obj(obj, MEATBALL);
+	smell = TRUE;
+	break;
+    case WEAPON_CLASS:	/* crysknife */
+	/* fall through */
+    default:
+	res = 0;
+	break;
+    }
+
+    if (smell) {
+	/* non-meat eaters smell meat, meat eaters smell its flavor;
+	   monks are considered non-meat eaters regardless of behavior;
+	   other roles are non-meat eaters if they haven't broken
+	   vegetarian conduct yet (or if poly'd into non-carnivorous/
+	   non-omnivorous form, regardless of whether it's herbivorous,
+	   non-eating, or something stranger) */
+	if (Role_if(PM_MONK) || !u.uconduct.unvegetarian ||
+		!carnivorous(youmonst.data))
+	    Norep("You smell the odor of meat.");
+	else
+	    Norep("You smell a delicious smell.");
+    }
+    newsym(oox, ooy);
+    return res;
+}
+
 /*
  * Object obj was hit by the effect of the wand/spell otmp.  Return
  * non-zero if the wand/spell had any effect.
@@ -1534,7 +1649,6 @@ struct obj *obj, *otmp;
 {
 	int res = 1;	/* affected object by default */
 	boolean learn_it = FALSE, maybelearnit;
-	xchar refresh_x, refresh_y;
 
 	/* fundamental: a wand effect hitting itself doesn't do anything;
 	   otherwise we need to guard against accessing otmp after something
@@ -1558,6 +1672,11 @@ struct obj *obj, *otmp;
 		 * UNDEAD_TURNING - When an undead creature gets killed via
 		 *	       undead turning, prevent its corpse from being
 		 *	       immediately revived by the same effect.
+		 * STONE_TO_FLESH - If a statue can't be revived, its
+		 *	       contents get dropped before turning it into
+		 *	       meat; prevent those contents from being hit.
+		 * retouch_equipment() - bypass flag is used to track which
+		 *	       items have been handled (bhito isn't involved).
 		 *
 		 * The bypass bit on all objects is reset each turn, whenever
 		 * context.bypasses is set.
@@ -1736,102 +1855,7 @@ struct obj *obj, *otmp;
 		res = 0;
 		break;
 	case SPE_STONE_TO_FLESH:
-		refresh_x = obj->ox; refresh_y = obj->oy;
-		if (objects[obj->otyp].oc_material != MINERAL &&
-			objects[obj->otyp].oc_material != GEMSTONE) {
-		    res = 0;
-		    break;
-		}
-		/* add more if stone objects are added.. */
-		switch (objects[obj->otyp].oc_class) {
-		    case ROCK_CLASS:	/* boulders and statues */
-			if (obj->otyp == BOULDER) {
-			    obj = poly_obj(obj, HUGE_CHUNK_OF_MEAT);
-			    goto smell;
-			} else if (obj->otyp == STATUE) {
-			    xchar oox, ooy;
-
-			    (void) get_obj_location(obj, &oox, &ooy, 0);
-			    refresh_x = oox; refresh_y = ooy;
-			    if (vegetarian(&mons[obj->corpsenm])) {
-				/* Don't animate monsters that aren't flesh */
-				obj = poly_obj(obj, MEATBALL);
-			    	goto smell;
-			    }
-			    if (!animate_statue(obj, oox, ooy,
-						ANIMATE_SPELL, (int *)0)) {
-				struct obj *item;
-makecorpse:			if (mons[obj->corpsenm].geno &
-							(G_NOCORPSE|G_UNIQ)) {
-				    res = 0;
-				    break;
-				}
-				/* Unlikely to get here since genociding
-				 * monsters also sets the G_NOCORPSE flag.
-				 * Drop the contents, poly_obj looses them.
-				 */
-				while ((item = obj->cobj) != 0) {
-				    obj_extract_self(item);
-				    place_object(item, oox, ooy);
-				}
-				obj = poly_obj(obj, CORPSE);
-				break;
-			    }
-			} else { /* new rock class object... */
-			    /* impossible? */
-			    res = 0;
-			}
-			break;
-		    case TOOL_CLASS:	/* figurine */
-		    {
-			struct monst *mon;
-			xchar oox, ooy;
-
-			if (obj->otyp != FIGURINE) {
-			    res = 0;
-			    break;
-			}
-			if (vegetarian(&mons[obj->corpsenm])) {
-			    /* Don't animate monsters that aren't flesh */
-			    obj = poly_obj(obj, MEATBALL);
-			    goto smell;
-			}
-			(void) get_obj_location(obj, &oox, &ooy, 0);
-			refresh_x = oox; refresh_y = ooy;
-			mon = makemon(&mons[obj->corpsenm],
-				      oox, ooy, NO_MM_FLAGS);
-			if (mon) {
-			    delobj(obj);
-			    if (cansee(mon->mx, mon->my))
-				pline_The("figurine animates!");
-			    break;
-			}
-			goto makecorpse;
-		    }
-		    /* maybe add weird things to become? */
-		    case RING_CLASS:	/* some of the rings are stone */
-			obj = poly_obj(obj, MEAT_RING);
-			goto smell;
-		    case WAND_CLASS:	/* marble wand */
-			obj = poly_obj(obj, MEAT_STICK);
-			goto smell;
-		    case GEM_CLASS:	/* rocks & gems */
-			obj = poly_obj(obj, MEATBALL);
-smell:
-			if (herbivorous(youmonst.data) &&
-			    (!carnivorous(youmonst.data) ||
-			     Role_if(PM_MONK) || !u.uconduct.unvegetarian))
-			    Norep("You smell the odor of meat.");
-			else
-			    Norep("You smell a delicious smell.");
-			break;
-		    case WEAPON_CLASS:	/* crysknife */
-		    	/* fall through */
-		    default:
-			res = 0;
-			break;
-		}
-		newsym(refresh_x, refresh_y);
+		res = stone_to_flesh_obj(obj);
 		break;
 	default:
 		impossible("What an interesting effect (%d)", otmp->otyp);

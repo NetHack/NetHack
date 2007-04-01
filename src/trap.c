@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2007/02/10	*/
+/*	SCCS Id: @(#)trap.c	3.5	2007/03/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -458,7 +458,7 @@ int *fail_reason;
 	coord cc;
 	boolean historic = (Role_if(PM_ARCHEOLOGIST) &&
 				(statue->spe & STATUE_HISTORIC) != 0),
-		use_saved_traits;
+		golem_xform = FALSE, use_saved_traits;
 	const char *comes_to_life;
 	char statuename[BUFSZ], tmpbuf[BUFSZ];
 	static const char historic_statue_is_gone[] =
@@ -470,9 +470,10 @@ int *fail_reason;
 	    use_saved_traits = FALSE;
 	} else if (is_golem(mptr) && cause == ANIMATE_SPELL) {
 	    /* statue of any golem hit by stone-to-flesh becomes flesh golem */
+	    golem_xform = (mptr != &mons[PM_FLESH_GOLEM]);
 	    mnum = PM_FLESH_GOLEM;
 	    mptr = &mons[PM_FLESH_GOLEM];
-	    use_saved_traits = FALSE;
+	    use_saved_traits = (has_omonst(statue) && !golem_xform);
 	} else {
 	    use_saved_traits = has_omonst(statue);
 	}
@@ -530,6 +531,7 @@ int *fail_reason;
 	}
 
 	comes_to_life = !canspotmon(mon) ? "disappears" :
+			golem_xform ? "turns into flesh" :
 			(nonliving(mon->data) || is_vampshifter(mon)) ?
 				"moves" : "comes to life";
 	if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
