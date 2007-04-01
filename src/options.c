@@ -183,8 +183,8 @@ static struct Bool_Opt
 	{"softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE},
 	{"sortpack", &flags.sortpack, TRUE, SET_IN_GAME},
 	{"sparkle", &flags.sparkle, TRUE, SET_IN_GAME},
+	{"splash_screen", &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/
 	{"standout", &flags.standout, FALSE, SET_IN_GAME},
-	{"splash_screen",     &iflags.wc_splash_screen, TRUE, DISP_IN_GAME},	/*WC*/
 	{"tiled_map",     &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME},	/*WC*/
 	{"time", &flags.time, FALSE, SET_IN_GAME},
 #ifdef TIMED_DELAY
