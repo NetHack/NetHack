@@ -938,6 +938,7 @@ register int	mmflags;
 		 */
 		int tryct = 0;	/* maybe there are no good choices */
 		struct monst fakemon;
+
 		do {
 			if(!(ptr = rndmonst())) {
 #ifdef DEBUG
@@ -946,7 +947,11 @@ register int	mmflags;
 			    return((struct monst *) 0);	/* no more monsters! */
 			}
 			fakemon.data = ptr;	/* set up for goodpos */
-		} while(!goodpos(x, y, &fakemon, gpflags) && tryct++ < 50);
+		} while (++tryct <= 50 &&
+		    /* in Sokoban, don't accept a giant on first try;
+		       after that, boulder carriers are fair game */
+		    ((tryct == 1 && throws_rocks(ptr) && In_sokoban(&u.uz)) ||
+			!goodpos(x, y, &fakemon, gpflags)));
 		mndx = monsndx(ptr);
 	}
 	(void) propagate(mndx, countbirth, FALSE);
