@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)dig.c	3.5	2007/04/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1937,7 +1937,9 @@ escape_tomb()
 		boolean good;
 
 		if(amorphous(youmonst.data) || Passes_walls ||
-		   noncorporeal(youmonst.data) || unsolid(youmonst.data) ||
+		   noncorporeal(youmonst.data) ||
+		   (unsolid(youmonst.data) &&
+			youmonst.data != &mons[PM_WATER_ELEMENTAL]) ||
 		   (tunnels(youmonst.data) && !needspick(youmonst.data))) {
 
 		    You("%s up through the %s.",

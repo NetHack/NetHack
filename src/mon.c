@@ -1192,12 +1192,15 @@ impossible("A monster looked at a very strange trap of type %d.", ttmp->ttyp);
 				    !resists_sleep(mon))
 				&& (ttmp->ttyp != BEAR_TRAP ||
 				    (mdat->msize > MZ_SMALL &&
-				     !amorphous(mdat) && !is_flyer(mdat)))
+				     !amorphous(mdat) && !is_flyer(mdat) &&
+				     !is_whirly(mdat) && !unsolid(mdat)))
 				&& (ttmp->ttyp != FIRE_TRAP ||
 				    !resists_fire(mon))
 				&& (ttmp->ttyp != SQKY_BOARD || !is_flyer(mdat))
 				&& (ttmp->ttyp != WEB || (!amorphous(mdat) &&
 				    !webmaker(mdat)))
+				&& (ttmp->ttyp != ANTI_MAGIC ||
+				    !resists_magm(mon))
 			) {
 			    if (!(flag & ALLOW_TRAPS)) {
 				if (mon->mtrapseen & (1L << (ttmp->ttyp - 1)))

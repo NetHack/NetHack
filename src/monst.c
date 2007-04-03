@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monst.c	3.5	2006/02/13	*/
+/*	SCCS Id: @(#)monst.c	3.5	2007/04/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1389,7 +1389,8 @@ NEARDATA struct permonst mons[] = {
 	A(ATTK(AT_CLAW, AD_PHYS, 5, 6),
 	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
 	SIZ(2500, 0, MS_SILENT, MZ_HUGE), MR_POISON|MR_STONE, 0,
-	M1_NOEYES|M1_NOLIMBS|M1_NOHEAD|M1_MINDLESS|M1_AMPHIBIOUS|M1_SWIM,
+	M1_NOEYES|M1_NOLIMBS|M1_NOHEAD|M1_MINDLESS|M1_UNSOLID|
+	  M1_AMPHIBIOUS|M1_SWIM,
 	M2_STRONG|M2_NEUTER, 0, CLR_BLUE),
 /*
  * Fungi

@@ -852,6 +852,9 @@ unsigned trflags;
 		break;
 
 	    case BEAR_TRAP:
+	    {
+		int dmg = d(2, 4);
+
 		if ((Levitation || Flying) && !forcetrap) break;
 		feeltrap(trap);
 		if(amorphous(youmonst.data) || is_whirly(youmonst.data) ||
@@ -876,6 +879,8 @@ unsigned trflags;
 		    pline("%s bear trap closes on %s %s!",
 			A_Your[trap->madeby_u], s_suffix(mon_nam(u.usteed)),
 			mbodypart(u.usteed, FOOT));
+		    if (thitm(0, u.usteed, (struct obj *)0, dmg, FALSE))
+			u.utrap = 0;	/* steed died, hero not trapped */
 		} else
 #endif
 		{
@@ -883,9 +888,11 @@ unsigned trflags;
 			    A_Your[trap->madeby_u], body_part(FOOT));
 		    if(u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
 			You("howl in anger!");
+		    losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
 		}
 		exercise(A_DEX, FALSE);
 		break;
+	    }
 
 	    case SLP_GAS_TRAP:
 		seetrap(trap);
@@ -2055,6 +2062,9 @@ register struct monst *mtmp;
 				seetrap(trap);
 			    }
 			}
+			if (mtmp->mtrapped)
+			    trapkilled = thitm(0, mtmp, (struct obj *)0,
+					       d(2, 4), FALSE);
 			break;
 
 		case SLP_GAS_TRAP:
@@ -2365,8 +2375,9 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 		case ANTI_MAGIC:
 			/* similar to hero's case, more or less */
 			if (!resists_magm(mtmp)) {	/* lose spell energy */
-			    if (attacktype(mptr, AT_MAGC) ||
-				    attacktype(mptr, AT_BREA)) {
+			    if (!mtmp->mcan &&
+				    (attacktype(mptr, AT_MAGC) ||
+				     attacktype(mptr, AT_BREA))) {
 				mtmp->mspec_used += d(2, 2);
 				if (in_sight) {
 				    seetrap(trap);
