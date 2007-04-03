@@ -1247,13 +1247,19 @@ mm_displacement(magr, mdef)
 struct monst *magr,	/* monster that is currently deciding where to move */
 	     *mdef;	/* another monster which is next to it */
 {
-	struct permonst *pa = magr->data;
-	struct permonst *pd = mdef->data;
-	if ((pa->mflags3 & M3_DISPLACES) &&
-	    !is_longworm(pd)		 &&		/* no displacing longworms  */
-	    !mdef->mtrapped		 &&		/* complex to do right      */
-	    (is_rider(pa) ||				/* riders can move anything */
-	      pa->msize >= pd->msize))			/* same or smaller only     */
+	struct permonst *pa = magr->data,
+			*pd = mdef->data;
+
+	/* if attacker can't barge through, there's nothing to do;
+	   or if defender can barge through too, don't let attacker
+	   do so, otherwise they might just end up swapping places
+	   again when defender gets its chance to move */
+	if ((pa->mflags3 & M3_DISPLACES) != 0 &&
+	    (pd->mflags3 & M3_DISPLACES) == 0 &&
+	    /* no displacing trapped monsters or multi-location longworms */
+	    !mdef->mtrapped && (!mdef->wormno || !count_wsegs(mdef)) &&
+	    /* riders can move anything; others, same size or smaller only */
+	    (is_rider(pa) || pa->msize >= pd->msize))
 		return ALLOW_MDISP;
 	return 0L;
 }
@@ -1266,6 +1272,7 @@ register int x,y;
 /* Is the square close enough for the monster to move or attack into? */
 {
 	register int distance = dist2(mon->mx, mon->my, x, y);
+
 	if (distance==2 && mon->data==&mons[PM_GRID_BUG]) return 0;
 	return((boolean)(distance < 3));
 }

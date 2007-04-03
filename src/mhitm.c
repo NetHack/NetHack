@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.5	2007/02/07	*/
+/*	SCCS Id: @(#)mhitm.c	3.5	2007/04/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -169,23 +169,8 @@ fightm(mtmp)		/* have monsters fight each other */
 
 #ifdef BARGETHROUGH
 /*
- * mattackm() and mdisplacem() below both return a result bitfield:
- *
- *	    --------- aggressor died
- *	   /  ------- defender died
- *	  /  /  ----- defender was hit
- *	 /  /  /
- *	x  x  x
- *
- *	0x4	MM_AGR_DIED
- *	0x2	MM_DEF_DIED
- *	0x1	MM_HIT
- *	0x0	MM_MISS
- *
- */
-
-/*
- * mdisplacem() -- a monster moves another monster out of the way.
+ * mdisplacem() -- attacker moves defender out of the way;
+ *		   returns same results as mattackm().
  */
 int
 mdisplacem(magr, mdef, quietly)
@@ -193,12 +178,14 @@ register struct monst *magr,*mdef;
 boolean quietly;
 {
 	struct permonst *pa, *pd;
-	struct monst *mon;			/* displaced monster */
-	int tx = mdef->mx, ty = mdef->my;	/* destination */
-	int fx = magr->mx, fy = magr->my; 	/* current location */
-	boolean struck = FALSE;
-	
-	pa = magr->data;  pd = mdef->data;
+	int tx, ty, fx, fy;
+
+	/* sanity checks; could matter if we unexpectedly get a long worm */
+	if (!magr || !mdef || magr == mdef) return MM_MISS;
+	pa = magr->data, pd =mdef->data;
+	tx = mdef->mx, ty = mdef->my;	/* destination */
+	fx = magr->mx, fy = magr->my;	/* current location */
+	if (m_at(fx, fy) != magr || m_at(tx, ty) != mdef) return MM_MISS;
 
 	/* The 1 in 7 failure below matches the chance in attack()
 	 * for pet displacement.
@@ -210,10 +197,13 @@ boolean quietly;
 						&& magr->my != mdef->my)
 		return(MM_MISS);
 
-
-	/* undetected monsters become un-hidden if they are displaced */
-	if (mdef->mundetected)
-		mdef->mundetected = 0;
+	/* undetected monster becomes un-hidden if it is displaced */
+	if (mdef->mundetected) mdef->mundetected = 0;
+	if (mdef->m_ap_type && mdef->m_ap_type != M_AP_MONSTER) seemimic(mdef);
+	/* wake up the displaced defender */
+	mdef->msleeping = 0;
+	mdef->mstrategy &= ~STRAT_WAITMASK;
+	finish_meating(mdef);
 
 	/*
 	 * Set up the visibility of action.
@@ -221,7 +211,6 @@ boolean quietly;
 	 * the monsters involved.
 	 */
 	vis = (canspotmon(magr) && canspotmon(mdef));
-
 
 	if (touch_petrifies(pd) && !resists_ston(magr)) {
 		if (which_armor(magr, W_ARMG) != 0) {
@@ -232,49 +221,32 @@ boolean quietly;
 			if (!quietly && canspotmon(magr))
 				pline("%s turns to stone!", Monnam(magr));
 			monstone(magr);
-			if (magr->mhp > 0) return 0;
+			if (magr->mhp > 0)
+			    return MM_HIT;	/* lifesaved */
 			else if (magr->mtame && !vis)
 			    You(brief_feeling, "peculiarly sad");
 			return MM_AGR_DIED;
 	        }
 	}
 
-	if (m_at(fx, fy) == magr)
-		remove_monster(fx, fy);		/* pick up from orig position */
-	if ((mon = m_at(tx, ty)) == mdef) {
-		if (!quietly && (vis))
-			pline("%s moves %s out of %s way!",
-				Monnam(magr), mon_nam(mdef),
-				is_rider(pa) ? "the" : mhis(magr));
-		remove_monster(tx, ty);
-	}
-	place_monster(magr,tx,ty);	/* put magr down */
-
-	/* Restore original mon */
-	if (mon) {
-	    if ((mon->mx != tx) || (mon->my != ty))
-		place_worm_seg(mon, fx, fy);
-	    else
-		place_monster(mon, fx, fy);
-	    struck = TRUE;
-	} else 
-	    remove_monster(fx, fy);	/* shouldn't happen */
-	newsym(fx,fy);			/* see it */
-	newsym(tx,ty);			/*   all happen */
+	remove_monster(fx, fy);		/* pick up from orig position */
+	remove_monster(tx, ty);
+	place_monster(magr, tx, ty);	/* put down at target spot */
+	place_monster(mdef, fx, fy);
+	if (vis && !quietly)
+		pline("%s moves %s out of %s way!",
+		      Monnam(magr), mon_nam(mdef),
+		      is_rider(pa) ? "the" : mhis(magr));
+	newsym(fx, fy);			/* see it */
+	newsym(tx, ty);			/*   all happen */
 	flush_screen(0);		/* make sure it shows up */
 
-	/*
-	 *  Wake up the displaced defender.
-	 */
-	mdef->msleeping = 0;
-	
-	return(struck ? MM_HIT : MM_MISS);
+	return MM_HIT;
 }
 #endif /* BARGETHROUGH */
 
 /*
  * mattackm() -- a monster attacks another monster.
-#ifndef BARGETHROUGH
  *
  *	    --------- aggressor died
  *	   /  ------- defender died
@@ -287,7 +259,6 @@ boolean quietly;
  *	0x1	MM_HIT
  *	0x0	MM_MISS
  *
-#endif
  * Each successive attack has a lower probability of hitting.  Some rely on the
  * success of previous attacks.  ** this doen't seem to be implemented -dl **
  *
@@ -707,7 +678,8 @@ mdamagem(magr, mdef, mattk)
 		}
 		if (vis) pline("%s turns to stone!", Monnam(magr));
 		monstone(magr);
-		if (magr->mhp > 0) return 0;
+		if (magr->mhp > 0)
+		    return MM_HIT;	/* lifesaved */
 		else if (magr->mtame && !vis)
 		    You(brief_feeling, "peculiarly sad");
 		return MM_AGR_DIED;
