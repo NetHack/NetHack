@@ -3880,19 +3880,31 @@ const char *msg;
 #define MIN_ICE_TIME 50
 #define MAX_ICE_TIME 2000
 /*
- * Start a melt_ice timer.
+ * Uusally start a melt_ice timer; sometimes the ice will become
+ * permanent instead.
  */
 void
-start_melt_ice_timeout(x,y)
-xchar x,y;
+start_melt_ice_timeout(x, y, min_time)
+xchar x, y;
+long min_time;	/* <x,y>'s old melt timeout (deleted by time we get here) */
 {
 	int when;
 	long where;
-	short action = MELT_ICE_AWAY;
-	for (when = MIN_ICE_TIME; when < (MAX_ICE_TIME + MIN_ICE_TIME); when++)
+
+	when = (int)min_time;
+	if (when < MIN_ICE_TIME - 1) when = MIN_ICE_TIME - 1;
+
+	/* random timeout; surrounding ice locations ought to be a factor... */
+	while (++when <= MAX_ICE_TIME)
 		if (!rn2((MAX_ICE_TIME - when) + MIN_ICE_TIME)) break;
-	where = (((long)x << 16) | ((long)y));
-	(void) start_timer((long)when, TIMER_LEVEL, action, long_to_any(where));
+
+	/* if we're within MAX_ICE_TIME, install a melt timer;
+	   otherwise, omit it to leave this ice permanent */
+	if (when <= MAX_ICE_TIME) {
+	    where = ((long)x << 16) | (long)y;
+	    (void) start_timer((long)when, TIMER_LEVEL,
+			       MELT_ICE_AWAY, long_to_any(where));
+	}
 }
 #undef MIN_ICE_TIME
 #undef MAX_ICE_TIME
@@ -4026,17 +4038,19 @@ short exploding_wand_typ;
 			}
 		    }
 		    if (!lava) {
-			start_melt_ice_timeout(x,y);
+			start_melt_ice_timeout(x, y, 0L);
 			obj_ice_effects(x,y,TRUE);
 		    }
 		} /* ?WATER */
 
 	    } else if (is_ice(x, y)) {
+		long melt_time;
+
 		/* Already ice here, so just firm it up. */
 		/* Now ensure that only ice that is already timed is affected */
-		if (spot_time_left(x,y,MELT_ICE_AWAY)) { 
-		    spot_stop_timers(x, y, MELT_ICE_AWAY); /* stop existing timer */
-		    start_melt_ice_timeout(x,y);	   /* start new timer */
+		if ((melt_time = spot_time_left(x, y, MELT_ICE_AWAY)) != 0L) {
+		    spot_stop_timers(x, y, MELT_ICE_AWAY);
+		    start_melt_ice_timeout(x, y, melt_time);
 		}
 	    }
 	    break;	/* ZT_COLD */

@@ -2628,7 +2628,7 @@ E struct monst *FDECL(boomhit, (struct obj *,int,int));
 E int FDECL(burn_floor_paper, (int,int,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(buzz, (int,int,XCHAR_P,XCHAR_P,int,int));
 E void FDECL(melt_ice, (XCHAR_P,XCHAR_P,const char *));
-E void FDECL(start_melt_ice_timeout, (XCHAR_P,XCHAR_P));
+E void FDECL(start_melt_ice_timeout, (XCHAR_P,XCHAR_P,long));
 E void FDECL(melt_ice_away, (ANY_P *, long));
 E int FDECL(zap_over_floor, (XCHAR_P,XCHAR_P,int,boolean *,SHORT_P));
 E void FDECL(fracture_rock, (struct obj *));
