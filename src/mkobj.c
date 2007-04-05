@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2007/02/17	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2007/04/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1462,7 +1462,7 @@ struct obj *otmp;
     if (otmp->otyp == CORPSE && otmp->on_ice) {
 	/* Adjust the age; must be same as obj_timer_checks() for off ice*/
 	age = monstermoves - otmp->age;
-	retval = otmp->age + (age / ROT_ICE_ADJUSTMENT);
+	retval += age * (ROT_ICE_ADJUSTMENT-1) / ROT_ICE_ADJUSTMENT;
 #ifdef DEBUG_EFFECTS
 	pline_The("%s age has ice modifications:otmp->age = %ld, returning %ld.",
 		s_suffix(doname(otmp)),otmp->age, retval);
@@ -1503,7 +1503,11 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 	    /* Adjust the time remaining */
 	    tleft *= ROT_ICE_ADJUSTMENT;
 	    restart_timer = TRUE;
-	    /* Adjust the age; must be same as in obj_ice_age() */
+	    /* Adjust the age; time spent off ice needs to be multiplied
+	       by the ice adjustment and subtracted from the age so that
+	       later calculations behave as if it had been on ice during
+	       that time (longwinded way of saying this is the inverse
+	       of removing it from the ice and of peeking at its age). */
 	    age = monstermoves - otmp->age;
 	    otmp->age = monstermoves - (age * ROT_ICE_ADJUSTMENT);
 	}
@@ -1511,7 +1515,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
     /* Check for corpses coming off ice */
     else if ((force < 0) ||
 	     (otmp->otyp == CORPSE && otmp->on_ice &&
-	     ((on_floor && !is_ice(x,y)) || !on_floor))) {
+	     !((on_floor || buried) && is_ice(x,y)))) {
 	tleft = stop_timer(action, obj_to_any(otmp));
 	if (tleft == 0L) {
 		action = REVIVE_MON;
@@ -1529,7 +1533,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 		restart_timer = TRUE;
 		/* Adjust the age */
 		age = monstermoves - otmp->age;
-		otmp->age = otmp->age + (age / ROT_ICE_ADJUSTMENT);
+		otmp->age += age * (ROT_ICE_ADJUSTMENT-1) / ROT_ICE_ADJUSTMENT;
 	}
     }
     /* now re-start the timer with the appropriate modifications */ 
