@@ -518,6 +518,13 @@ monsndx(ptr)		/* return an index into the mons array */
 	return(i);
 }
 
+/* for handling alternate spellings */
+struct alt_spl {
+    const char *name;
+    short pm_val;
+};
+
+/* figure out what type of monster a user-supplied string is specifying */
 int
 name_to_mon(in_str)
 const char *in_str;
@@ -562,8 +569,7 @@ const char *in_str;
 	slen = strlen(str); /* length possibly needs recomputing */
 
     {
-	static const struct alt_spl { const char* name; short pm_val; }
-	    names[] = {
+	static const struct alt_spl names[] = {
 	    /* Alternate spellings */
 		{ "grey dragon",	PM_GRAY_DRAGON },
 		{ "baby grey dragon",	PM_BABY_GRAY_DRAGON },
@@ -578,6 +584,8 @@ const char *in_str;
 	       to the rank title prefix (input has been singularized) */
 		{ "master thief",	PM_MASTER_OF_THIEVES },
 		{ "master of assassin",	PM_MASTER_ASSASSIN },
+	    /* Outdated names */
+		{ "invisible stalker",	PM_STALKER },
 	    /* Hyphenated names */
 		{ "ki rin",		PM_KI_RIN },
 		{ "uruk hai",		PM_URUK_HAI },
@@ -605,7 +613,7 @@ const char *in_str;
 		{ "mumakil",		PM_MUMAK },
 		{ "erinyes",		PM_ERINYS },
 	    /* end of list */
-		{ 0, 0 }
+		{ 0, NON_PM }
 	};
 	register const struct alt_spl *namep;
 
@@ -635,6 +643,81 @@ const char *in_str;
 	}
 	if (mntmp == NON_PM) mntmp = title_to_mon(str, (int *)0, (int *)0);
 	return mntmp;
+}
+
+/* monster class from user input; used for genocide and controlled polymorph;
+   returns 0 rather than MAXMCLASSES if no match is found */
+int
+name_to_monclass(in_str, mndx_p)
+const char *in_str;
+int *mndx_p;
+{
+    /* Single letters are matched against def_monsyms[].sym; words
+       or phrases are first matched against def_monsyms[].explain
+       to check class description; if not found there, then against
+       mons[].mname to test individual monster types.  Input can be a
+       substring of the full description or mname, but to be accepted,
+       such partial matches must start at beginning of a word.  Some
+       class descriptions include "foo or bar" and "foo or other foo"
+       so we don't want to accept "or", "other", "or other" there. */
+    static NEARDATA const char * const falsematch[] = {
+	/* multiple-letter input which matches any of these gets rejected */
+	"an", "the", "or", "other", "or other", 0
+    };
+    static NEARDATA const struct alt_spl truematch[] = {
+	/* "long worm" won't match "worm" class but would accidentally match
+	   "long worm tail" class before the comparison with monster types */
+	{ "long worm",		PM_LONG_WORM },
+	/* some plausible guesses which need help */
+	{ "bug",		-S_XAN },	/* would match bugbear... */
+	{ "fish",		-S_EEL },	/* wouldn't match anything */
+	/* end of list */
+	{ 0, NON_PM }
+    };
+    const char *p, *x;
+    int i;
+
+    if (mndx_p) *mndx_p = NON_PM; /* haven't [yet] matched a specific type */
+
+    if (!in_str || !in_str[0]) {
+	/* empty input */
+	return 0;
+    } else if (!in_str[1]) {
+	/* single character */
+	i = def_char_to_monclass(*in_str);
+	if (i == MAXMCLASSES)
+	    i = (*in_str == DEF_INVISIBLE) ? S_invisible : 0;
+	return i;
+    } else {
+	/* multiple characters */
+	in_str = makesingular(in_str);
+	/* check for special cases */
+	for (i = 0; falsematch[i]; i++)
+	    if (!strcmpi(in_str, falsematch[i])) return 0;
+	for (i = 0; truematch[i].name; i++)
+	    if (!strcmpi(in_str, truematch[i].name)) {
+		i = truematch[i].pm_val;
+		if (i < 0) return -i;		/* class */
+		if (mndx_p) *mndx_p = i;	/* monster */
+		return mons[i].mlet;
+	    }
+	/* check monster class descriptions */
+	for (i = 1; i < MAXMCLASSES; i++) {
+	    x = def_monsyms[i].explain;
+	    if ((p = strstri(x, in_str)) != 0 && (p == x || *(p - 1) == ' '))
+		return i;
+	}
+	/* check individual species names; not as thorough as mon_to_name()
+	   but our caller can call that directly if desired */
+	for (i = LOW_PM; i < NUMMONS; i++) {
+	    x = mons[i].mname;
+	    if ((p = strstri(x, in_str)) != 0 && (p == x || *(p - 1) == ' ')) {
+		if (mndx_p) *mndx_p = i;
+		return mons[i].mlet;
+	    }
+	}
+    }
+    return 0;
 }
 
 /* returns 3 values (0=male, 1=female, 2=none) */

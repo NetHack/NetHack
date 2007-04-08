@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monsym.h	3.5	1992/10/18	*/
+/*	SCCS Id: @(#)monsym.h	3.5	2007/04/07	*/
 /*	Monster symbols and creation information rev 1.0	  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,6 +44,7 @@
 #define S_FUNGUS	32
 #define S_GNOME		33
 #define S_GIANT		34
+#define S_invisible	35	/* non-class present in def_monsyms[] */
 #define S_JABBERWOCK	36
 #define S_KOP		37
 #define S_LICH		38
@@ -72,11 +73,6 @@
 #define S_MIMIC_DEF	60
 
 #define MAXMCLASSES 61	/* number of monster classes */
-
-#if 0	/* moved to decl.h so that makedefs.c won't see them */
-extern const char def_monsyms[MAXMCLASSES];	/* default class symbols */
-extern uchar monsyms[MAXMCLASSES];		/* current class symbols */
-#endif
 
 /*
  * Default characters for monsters.  These correspond to the monster classes

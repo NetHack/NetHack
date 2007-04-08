@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2006/06/13	*/
+/*	SCCS Id: @(#)read.c	3.5	2007/04/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1605,61 +1605,28 @@ do_class_genocide()
 		    getlin("What class of monsters do you wish to genocide?",
 			buf);
 		    (void)mungspaces(buf);
-		} while (buf[0]=='\033' || !buf[0]);
+		    if (*buf == '\033') Strcpy(buf, "none");	/* hangup? */
+		} while (!*buf);
 		/* choosing "none" preserves genocideless conduct */
 		if (!strcmpi(buf, "none") ||
 		    !strcmpi(buf, "nothing")) return;
 
-		if (strlen(buf) == 1) {
-		    if (buf[0] == ILLOBJ_SYM)
-			buf[0] = def_monsyms[S_MIMIC].sym;
-		    class = def_char_to_monclass(buf[0]);
-		} else {
-		    char buf2[BUFSZ];
-
-		    class = 0;
-		    Strcpy(buf2, makesingular(buf));
-		    Strcpy(buf, buf2);
-		}
+		class = name_to_monclass(buf, (int *)0);
+		if (class == 0 && (i = name_to_mon(buf)) != NON_PM)
+		    class = mons[i].mlet;
 		immunecnt = gonecnt = goodcnt = 0;
 		for (i = LOW_PM; i < NUMMONS; i++) {
-		    if (class == 0 &&
-			    strstri(def_monsyms[(int)mons[i].mlet].explain, buf) != 0)
-			class = mons[i].mlet;
 		    if (mons[i].mlet == class) {
 			if (!(mons[i].geno & G_GENO)) immunecnt++;
 			else if(mvitals[i].mvflags & G_GENOD) gonecnt++;
 			else goodcnt++;
 		    }
 		}
-		/*
-		 * If user's input doesn't match any class
-		 * description, check individual species names.
-		 */
-		if (class == 0) {
-		    for (i = LOW_PM; i < NUMMONS; i++) {
-			if (strstri(mons[i].mname, buf) != 0) {
-			    class = mons[i].mlet;
-			    break;
-			}
-		    }
-
-		    if (class != 0) {
-		        for (i = LOW_PM; i < NUMMONS; i++) {
-		            if (mons[i].mlet == class) {
-				if (!(mons[i].geno & G_GENO)) immunecnt++;
-				else if(mvitals[i].mvflags & G_GENOD) gonecnt++;
-				else goodcnt++;
-		            }
-			}
-		    }
-		}
 		if (!goodcnt && class != mons[urole.malenum].mlet &&
 				class != mons[urace.malenum].mlet) {
 			if (gonecnt)
 	pline("All such monsters are already nonexistent.");
-			else if (immunecnt ||
-				(buf[0] == DEF_INVISIBLE && buf[1] == '\0'))
+			else if (immunecnt || class == S_invisible)
 	You("aren't permitted to genocide such monsters.");
 			else
 #ifdef WIZARD	/* to aid in topology testing; remove pesky monsters */
