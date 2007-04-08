@@ -2508,6 +2508,8 @@ decide_to_shapeshift(mon, shiftflags)
 struct monst *mon;
 int shiftflags;
 {
+	struct permonst *ptr;
+	unsigned was_female = mon->female;
 	boolean msg = FALSE;
 
 	if ((shiftflags & SHIFT_MSG) ||
@@ -2527,6 +2529,10 @@ int shiftflags;
 		   !rn2(6) && (mon->mhp > mon->mhpmax - ((mon->mhpmax / 10) + 1))) {
 			(void) newcham(mon, (struct permonst *)0, FALSE, msg);
 	}
+	/* override the 10% chance for sex change */
+	ptr = mon->data;
+	if (!is_male(ptr) && !is_female(ptr) && !is_neuter(ptr))
+	    mon->female = was_female;
 }
 
 int
@@ -3042,6 +3048,7 @@ struct permonst *mdat;
 	    if (!olfaction(youmonst.data)) return FALSE;
 	    mndx = monsndx(mdat);
 	    switch (mndx) {
+		case PM_ROTHE:
 		case PM_MINOTAUR:
 			You("notice a bovine smell.");
 			msg_given = TRUE;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)polyself.c	3.5	2007/03/19	*/
+/*	SCCS Id: @(#)polyself.c	3.5	2007/04/07	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,6 +31,10 @@ STATIC_DCL boolean FDECL(polysense,(struct permonst *));
 
 STATIC_VAR const char no_longer_petrify_resistant[] =
 					"No longer petrify-resistant, you";
+
+/* controls whether taking on new form or becoming new man can also
+   change sex (ought to be an arg to polymon() and newman() instead) */
+STATIC_VAR int sex_change_ok = 0;
 
 /* update the youmonst.data structure pointer */
 void
@@ -166,7 +170,7 @@ newman()
 	if (u.ulevelmax < newlvl) u.ulevelmax = newlvl;
 	u.ulevel = newlvl;
 
-	if (!rn2(10)) change_sex();
+	if (sex_change_ok && !rn2(10)) change_sex();
 
 	adjabil(oldlvl, (int)u.ulevel);
 	reset_rndmonst(NON_PM);	/* new monster generation criteria */
@@ -251,11 +255,11 @@ polyself(psflags)
 int psflags;     
 {
 	char buf[BUFSZ];
-	int old_light, new_light, mntmp, tries;
+	int old_light, new_light, mntmp, tryct;
 	boolean forcecontrol = (psflags == 1),
 		monsterpoly = (psflags == 2),
 		draconian = (uarm && Is_dragon_armor(uarm)),
-		iswere = (u.ulycn >= LOW_PM || is_were(youmonst.data)),
+		iswere = (u.ulycn >= LOW_PM),
 		isvamp = (youmonst.data->mlet == S_VAMPIRE);
 
 	if (Unchanging) {
@@ -274,16 +278,20 @@ int psflags;
 	old_light = emits_light(youmonst.data);
 	mntmp = NON_PM;
 
-	if ((Polymorph_control || forcecontrol) && !monsterpoly) {
-		tries = 0;
+	if (monsterpoly && isvamp)
+	    goto do_vampyr;
+
+	if (Polymorph_control || forcecontrol) {
+		tryct = 5;
 		do {
 			getlin("Become what kind of monster? [type the name]",
 				buf);
 			mntmp = name_to_mon(buf);
 			if (mntmp < LOW_PM)
 				pline("I've never heard of such monsters.");
-			else if (u.ulycn && (mntmp == u.ulycn ||
-				    mntmp == counter_were(u.ulycn)))
+			else if (iswere && (were_beastie(mntmp) == u.ulycn ||
+				    mntmp == counter_were(u.ulycn) ||
+				    (Upolyd && mntmp == PM_HUMAN)))
 				goto do_shift;
 			/* Note:  humans are illegal as monsters, but an
 			 * illegal monster forces newman(), which is what we
@@ -295,12 +303,15 @@ int psflags;
 				      mntmp == urole.femalenum))
 				You("cannot polymorph into that.");
 			else break;
-		} while(++tries < 5);
-		if (tries==5) pline(thats_enough_tries);
+		} while (--tryct > 0);
+		if (!tryct) pline(thats_enough_tries);
 		/* allow skin merging, even when polymorph is controlled */
-		if (draconian &&
-		    (mntmp == armor_to_dragon(uarm->otyp) || tries == 5))
+		if (draconian && (!tryct ||
+				  mntmp == armor_to_dragon(uarm->otyp)))
 		    goto do_merge;
+		if (isvamp && (!tryct || mntmp == PM_WOLF ||
+			       mntmp == PM_FOG_CLOUD || is_bat(&mons[mntmp])))
+		    goto do_vampyr;
 	} else if (draconian || iswere || isvamp) {
 		/* special changes that don't require polyok() */
 		if (draconian) {
@@ -316,53 +327,53 @@ int psflags;
 			}
 		} else if (iswere) {
  do_shift:
-			if (is_were(youmonst.data))
+			if (Upolyd && were_beastie(mntmp) != u.ulycn)
 				mntmp = PM_HUMAN; /* Illegal; force newman() */
 			else
 				mntmp = u.ulycn;
-		} else {
-			if (youmonst.data->mlet == S_VAMPIRE) {
+		} else if (isvamp) {
+ do_vampyr:
+			if (mntmp < LOW_PM || (mons[mntmp].geno & G_UNIQ))
 				mntmp = (youmonst.data != &mons[PM_VAMPIRE] &&
 					 !rn2(10)) ? PM_WOLF :
 					!rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
-				if (Polymorph_control) {
-					char buf[BUFSZ];
-					Sprintf(buf, "Become %s?",
-						an(mons[mntmp].mname));
-					if (yn(buf) != 'y') return;
-				}
-				if (Unchanging) {
-					pline("You fail to transform!");
-					return;
-				}
+			if (Polymorph_control) {
+				Sprintf(buf, "Become %s?",
+					an(mons[mntmp].mname));
+				if (yn(buf) != 'y') return;
 			}
 		}
 		/* if polymon fails, "you feel" message has been given
-		   so don't follow up with another polymon or newman */
-		if (mntmp == PM_HUMAN) newman();	/* werecritter */
-		else (void) polymon(mntmp);
+		   so don't follow up with another polymon or newman;
+		   sex_change_ok left disabled here */
+		if (mntmp == PM_HUMAN)
+		     newman();	/* werecritter */
+		else
+		    (void)polymon(mntmp);
 		goto made_change;    /* maybe not, but this is right anyway */
 	}
 
 	if (mntmp < LOW_PM) {
-		tries = 0;
+		tryct = 200;
 		do {
 			/* randomly pick an "ordinary" monster */
 			mntmp = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
 			if (polyok(&mons[mntmp]) &&
 			    !is_placeholder(&mons[mntmp])) break;
-		} while (++tries < 200);
+		} while (--tryct > 0);
 	}
 
 	/* The below polyok() fails either if everything is genocided, or if
 	 * we deliberately chose something illegal to force newman().
 	 */
+	sex_change_ok++;
 	if (!polyok(&mons[mntmp]) ||
 		    (!forcecontrol && !rn2(5)) || your_race(&mons[mntmp])) {
-		newman();
-	} else if (!polymon(mntmp)) {
-		return;		/* failed to change */
+	    newman();
+	} else {
+	    (void)polymon(mntmp);
 	}
+	sex_change_ok--;	/* reset */
 
  made_change:
 	new_light = emits_light(youmonst.data);
@@ -425,7 +436,7 @@ int	mntmp;
 	} else if (is_female(&mons[mntmp])) {
 		if(!flags.female) dochange = TRUE;
 	} else if (!is_neuter(&mons[mntmp]) && mntmp != u.ulycn) {
-		if(!rn2(10)) dochange = TRUE;
+		if (sex_change_ok && !rn2(10)) dochange = TRUE;
 	}
 	if (dochange) {
 		flags.female = !flags.female;
@@ -537,6 +548,7 @@ int	mntmp;
 	if (flags.verbose) {
 	    static const char use_thec[] = "Use the command #%s to %s.";
 	    static const char monsterc[] = "monster";
+
 	    if (can_breathe(youmonst.data))
 		pline(use_thec,monsterc,"use your breath weapon");
 	    if (attacktype(youmonst.data, AT_SPIT))
@@ -559,6 +571,9 @@ int	mntmp;
 		pline(use_thec,monsterc,"emit a mental blast");
 	    if (youmonst.data->msound == MS_SHRIEK) /* worthless, actually */
 		pline(use_thec,monsterc,"shriek");
+	    if (youmonst.data->mlet == S_VAMPIRE)
+		pline(use_thec,monsterc,"change shape");
+
 	    if (lays_eggs(youmonst.data) && flags.female)
 		pline(use_thec,"sit","lay an egg");
 	}

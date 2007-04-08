@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)were.c	3.5	2006/05/27	*/
+/*	SCCS Id: @(#)were.c	3.5	2007/04/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -46,6 +46,33 @@ int pm;
 	    case PM_HUMAN_WERERAT:    return(PM_WERERAT);
 	    default:		      return NON_PM;
 	}
+}
+
+/* convert monsters similar to werecritters into appropriate werebeast */
+int
+were_beastie(pm)
+int pm;
+{
+    switch (pm) {
+    case PM_WERERAT:
+    case PM_SEWER_RAT:
+    case PM_GIANT_RAT:
+    case PM_RABID_RAT:
+	return PM_WERERAT;
+    case PM_WEREJACKAL:
+    case PM_JACKAL:
+    case PM_FOX:
+    case PM_COYOTE:
+	return PM_WEREJACKAL;
+    case PM_WEREWOLF:
+    case PM_WOLF:
+    case PM_WARG:
+    case PM_WINTER_WOLF:
+	return PM_WEREWOLF;
+    default:
+	break;
+    }
+    return NON_PM;
 }
 
 void
