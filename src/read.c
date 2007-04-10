@@ -1971,16 +1971,17 @@ struct obj *from_obj;
 boolean
 create_particular()
 {
-	char buf[BUFSZ], *bufp, monclass = MAXMCLASSES;
-	int which, tries, i, firstchoice = NON_PM;
+	char buf[BUFSZ], *bufp, monclass;
+	int which, tryct, i, firstchoice = NON_PM;
 	struct permonst *whichpm;
 	struct monst *mtmp;
 	boolean madeany = FALSE;
 	boolean maketame, makepeaceful, makehostile;
 	boolean randmonst = FALSE;
 
-	tries = 0;
+	tryct = 5;
 	do {
+	    monclass = MAXMCLASSES;
 	    which = urole.malenum;	/* an arbitrary index into mons[] */
 	    maketame = makepeaceful = makehostile = FALSE;
 	    getlin("Create what kind of monster? [type the name or symbol]",
@@ -1999,24 +2000,27 @@ create_particular()
 		makehostile = TRUE;
 	    }
 	    /* decide whether a valid monster was chosen */
-	    if (strlen(bufp) == 1) {
 #ifdef WIZARD
-		if (wizard && *bufp == '*') {
-			randmonst = TRUE;
-			break;
-		}
+	    if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "random"))) {
+		randmonst = TRUE;
+		break;
+	    }
 #endif
-		monclass = def_char_to_monclass(*bufp);
-		if (monclass != MAXMCLASSES) break;	/* got one */
-	    } else {
-		which = name_to_mon(bufp);
-		if (which >= LOW_PM) break;		/* got one */
+	    which = name_to_mon(bufp);
+	    if (which >= LOW_PM) break;		/* got one */
+	    monclass = name_to_monclass(bufp, &which);
+	    if (which >= LOW_PM) {
+		monclass = MAXMCLASSES;	/* matters below */
+		break;
+	    } else if (monclass > 0) {
+		which = urole.malenum;	/* reset from NON_PM */
+		break;
 	    }
 	    /* no good; try again... */
 	    pline("I've never heard of such monsters.");
-	} while (++tries < 5);
+	} while (--tryct > 0);
 
-	if (tries == 5) {
+	if (!tryct) {
 	    pline(thats_enough_tries);
 	} else {
 	    if (!randmonst) {
