@@ -311,6 +311,7 @@ improved container interface
 acid can destroy iron bars
 OPTIONS=playmode:normal|explore|debug to choose mode without command-line
 score bonus for ascending is reduced or denied for changing alignment
+player can give a monster class when asked for type of monster to poly into
 
 
 Platform- and/or Interface-Specific New Features

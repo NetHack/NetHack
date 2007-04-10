@@ -664,10 +664,15 @@ int *mndx_p;
 	/* multiple-letter input which matches any of these gets rejected */
 	"an", "the", "or", "other", "or other", 0
     };
+    /* positive pm_val => specific monster; negative => class */
     static NEARDATA const struct alt_spl truematch[] = {
 	/* "long worm" won't match "worm" class but would accidentally match
 	   "long worm tail" class before the comparison with monster types */
 	{ "long worm",		PM_LONG_WORM },
+	/* matches wrong--or at least suboptimal--class */
+	{ "demon",		-S_DEMON },	/* hits "imp or minor demon" */
+	/* matches specific monster (overly restrictive) */
+	{ "devil",		-S_DEMON },	/* always "horned devil" */
 	/* some plausible guesses which need help */
 	{ "bug",		-S_XAN },	/* would match bugbear... */
 	{ "fish",		-S_EEL },	/* wouldn't match anything */
@@ -685,7 +690,12 @@ int *mndx_p;
     } else if (!in_str[1]) {
 	/* single character */
 	i = def_char_to_monclass(*in_str);
-	if (i == MAXMCLASSES)
+	if (i == S_MIMIC_DEF) {		/* ']' -> 'm' */
+	    i = S_MIMIC;
+	} else if (i == S_WORM_TAIL) {	/* '~' -> 'w' */
+	    i = S_WORM;
+	    if (mndx_p) *mndx_p = PM_LONG_WORM;
+	} else if (i == MAXMCLASSES)	/* maybe 'I' */
 	    i = (*in_str == DEF_INVISIBLE) ? S_invisible : 0;
 	return i;
     } else {

@@ -255,7 +255,7 @@ polyself(psflags)
 int psflags;     
 {
 	char buf[BUFSZ];
-	int old_light, new_light, mntmp, tryct;
+	int old_light, new_light, mntmp, class, tryct;
 	boolean forcecontrol = (psflags == 1),
 		monsterpoly = (psflags == 2),
 		draconian = (uarm && Is_dragon_armor(uarm)),
@@ -286,9 +286,18 @@ int psflags;
 		do {
 			getlin("Become what kind of monster? [type the name]",
 				buf);
+			class = 0;
 			mntmp = name_to_mon(buf);
+			if (mntmp < LOW_PM) {
+			    class = name_to_monclass(buf, &mntmp);
+			    if (class && mntmp == NON_PM)
+				mntmp = mkclass_poly(class);
+			}
 			if (mntmp < LOW_PM)
+			    if (!class)
 				pline("I've never heard of such monsters.");
+			    else
+				You_cant("polymorph into any of those.");
 			else if (iswere && (were_beastie(mntmp) == u.ulycn ||
 				    mntmp == counter_were(u.ulycn) ||
 				    (Upolyd && mntmp == PM_HUMAN)))
@@ -301,7 +310,7 @@ int psflags;
 				      your_race(&mons[mntmp]) ||
 				      mntmp == urole.malenum ||
 				      mntmp == urole.femalenum))
-				You("cannot polymorph into that.");
+				You_cant("polymorph into that.");
 			else break;
 		} while (--tryct > 0);
 		if (!tryct) pline(thats_enough_tries);

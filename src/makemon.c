@@ -1415,6 +1415,37 @@ int	spc;
 	return(&mons[first]);
 }
 
+/* like mkclass(), but excludes difficulty considerations; used when
+   player with polycontrol picks a class instead of a specific type;
+   genocided types are avoided but extinct ones are acceptable */
+int
+mkclass_poly(class)
+int class;
+{
+	register int first, last, num = 0;
+
+	for (first = LOW_PM; first < SPECIAL_PM; first++)
+	    if (mons[first].mlet == class) break;
+	if (first == SPECIAL_PM) return NON_PM;
+
+	for (last = first;
+		last < SPECIAL_PM && mons[last].mlet == class; last++)
+	    if (!(mvitals[last].mvflags & G_GENOD) &&
+		    !(mons[last].geno & (G_NOGEN|G_UNIQ)) &&
+		    !is_placeholder(&mons[last]))
+		num += mons[last].geno & G_FREQ;
+	if (!num) return NON_PM;
+
+	for (num = rnd(num); num > 0; first++)
+	    if (!(mvitals[first].mvflags & G_GENOD) &&
+		    !(mons[first].geno & (G_NOGEN|G_UNIQ)) &&
+		    !is_placeholder(&mons[first]))
+		num -= mons[first].geno & G_FREQ;
+	first--; /* correct an off-by-one error */
+
+	return first;
+}
+
 int
 adj_lev(ptr)	/* adjust strength of monsters based on u.uz and u.ulevel */
 register struct permonst *ptr;
