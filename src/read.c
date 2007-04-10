@@ -1605,10 +1605,9 @@ do_class_genocide()
 		    getlin("What class of monsters do you wish to genocide?",
 			buf);
 		    (void)mungspaces(buf);
-		    if (*buf == '\033') Strcpy(buf, "none");	/* hangup? */
 		} while (!*buf);
 		/* choosing "none" preserves genocideless conduct */
-		if (!strcmpi(buf, "none") ||
+		if (*buf == '\033' || !strcmpi(buf, "none") ||
 		    !strcmpi(buf, "nothing")) return;
 
 		class = name_to_monclass(buf, (int *)0);
