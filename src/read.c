@@ -26,7 +26,7 @@ STATIC_DCL void FDECL(p_glow2,(struct obj *,const char *));
 STATIC_DCL void FDECL(randomize,(int *, int));
 STATIC_DCL void FDECL(forget_single_object, (int));
 STATIC_DCL void FDECL(forget, (int));
-STATIC_DCL void FDECL(maybe_tame, (struct monst *,struct obj *));
+STATIC_DCL int FDECL(maybe_tame, (struct monst *,struct obj *));
 
 STATIC_PTR void FDECL(set_lit, (int,int,genericptr_t));
 
@@ -661,19 +661,26 @@ int howmuch;
 }
 
 /* monster is hit by scroll of taming's effect */
-STATIC_OVL void
+STATIC_OVL int
 maybe_tame(mtmp, sobj)
 struct monst *mtmp;
 struct obj *sobj;
 {
+	int was_tame = mtmp->mtame;
+	unsigned was_peaceful = mtmp->mpeaceful;
+
 	if (sobj->cursed) {
 	    setmangry(mtmp);
+	    if (was_peaceful && !mtmp->mpeaceful) return -1;
 	} else {
 	    if (mtmp->isshk)
 		make_happy_shk(mtmp, FALSE);
 	    else if (!resist(mtmp, sobj->oclass, 0, NOTELL))
 		(void) tamedog(mtmp, (struct obj *) 0);
+	    if ((!was_peaceful && mtmp->mpeaceful) ||
+		(!was_tame && mtmp->mtame)) return 1;
 	}
+	return 0;
 }
 
 /* scroll effects; return 1 if we use up the scroll and possibly make it
@@ -1086,18 +1093,43 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		break;
 	case SCR_TAMING:
 	case SPE_CHARM_MONSTER:
+	    {
+		int candidates, res, results, vis_results;
+
 		if (u.uswallow) {
-		    maybe_tame(u.ustuck, sobj);
+		    candidates = 1;
+		    results = vis_results = maybe_tame(u.ustuck, sobj);
 		} else {
 		    int i, j, bd = confused ? 5 : 1;
 		    struct monst *mtmp;
 
+		    /* note: maybe_tame() can return either positive or
+		       negative values, but not both for the same scroll */
+		    candidates = results = vis_results = 0;
 		    for (i = -bd; i <= bd; i++) for(j = -bd; j <= bd; j++) {
 			if (!isok(u.ux + i, u.uy + j)) continue;
-			if ((mtmp = m_at(u.ux + i, u.uy + j)) != 0)
-			    maybe_tame(mtmp, sobj);
+			if ((mtmp = m_at(u.ux + i, u.uy + j)) != 0
+#ifdef STEED
+			    || (!i && !j && (mtmp = u.usteed) != 0)
+#endif
+			   ) {
+			    ++candidates;
+			    res = maybe_tame(mtmp, sobj);
+			    results += res;
+			    if (canspotmon(mtmp)) vis_results += res;
+			}
 		    }
 		}
+		if (!results) {
+		    pline("Nothing interesting %s.",
+			  !candidates ? "happens" : "seems to happen");
+		} else {
+		    pline_The("neighborhood %s %sfriendlier.",
+			  vis_results ? "is" : "seems",
+			  (results < 0) ? "un" : "");
+		    if (vis_results > 0) known = TRUE;
+		}
+	    }
 		break;
 	case SCR_GENOCIDE:
 		if (!already_known)
