@@ -2539,33 +2539,49 @@ int
 select_newcham_form(mon)
 struct monst *mon;
 {
-	int mndx = NON_PM;
+	int mndx = NON_PM, tryct;
 
 	switch (mon->cham) {
 	    case PM_SANDESTIN:
 		if (rn2(7)) mndx = pick_nasty();
 		break;
 	    case PM_DOPPELGANGER:
-		if (!rn2(7)) mndx = pick_nasty();
-		else if (rn2(3)) mndx = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1,
-					    PM_ARCHEOLOGIST);
+		if (!rn2(7)) {
+		    mndx = pick_nasty();
+		} else if (rn2(3)) {	/* role monsters */
+		    mndx = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1,
+			       PM_ARCHEOLOGIST);
+		} else if (!rn2(3)) {	/* quest guardians */
+		    mndx = rn1(PM_APPRENTICE - PM_STUDENT + 1,
+			       PM_STUDENT);
+		    /* avoid own role's guardian */
+		    if (mndx == urole.guardnum) mndx = NON_PM;
+		} else {		/* general humanoids */
+		    tryct = 5;
+		    do {
+			mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
+			if (humanoid(&mons[mndx]) && polyok(&mons[mndx])) break;
+		    } while (--tryct > 0);
+		    if (!tryct) mndx = NON_PM;
+		}
 		break;
 	    case PM_CHAMELEON:
 		if (!rn2(3)) mndx = pick_animal();
 		break;
 	    case PM_VLAD_THE_IMPALER:
+		if (mon_has_special(mon)) { /* ensure Vlad can carry it still */
+		    mndx = PM_VLAD_THE_IMPALER;
+		    break;
+		}
+		/*FALLTHRU*/
 	    case PM_VAMPIRE_LORD:
+		if (!rn2(10)) {
+		    /* VAMPIRE_LORD || VLAD */
+		    mndx = PM_WOLF;
+		    break;
+		}
+		/*FALLTHRU*/
 	    case PM_VAMPIRE:
-		if (mon_has_special(mon) &&  /* ensure Vlad can carry it still */
-		    mon->cham == PM_VLAD_THE_IMPALER) {
-			mndx = PM_VLAD_THE_IMPALER;
-			break;
-		}
-		if (!rn2(10) && mon->cham != PM_VAMPIRE) {
-			/* VAMPIRE_LORD || VLAD */
-			mndx = PM_WOLF;
-			break;
-		}
 		mndx = !rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
 		break;
 	    case NON_PM:	/* ordinary */
@@ -2580,21 +2596,28 @@ struct monst *mon;
 		break;
 	}
 #ifdef WIZARD
-	/* For debugging: allow control of polymorphed monster; not saved */
+	/* for debugging: allow control of polymorphed monster */
 	if (wizard && iflags.mon_polycontrol) {
 	    char pprompt[BUFSZ], buf[BUFSZ];
-	    int tries = 0;
+	    int monclass;
+
+	    Sprintf(pprompt,
+		    "Change %s into what kind of monster? [type the name]",
+		    mon_nam(mon));
+	    tryct = 5;
 	    do {
-		Sprintf(pprompt,
-			"Change %s into what kind of monster? [type the name]",
-			mon_nam(mon));
-		getlin(pprompt,buf);
+		getlin(pprompt, buf);
+		if (*buf == '\033') break;
 		mndx = name_to_mon(buf);
-		if (mndx < LOW_PM)
-		    You("cannot polymorph %s into that.", mon_nam(mon));
-		else break;
-	    } while(++tries < 5);
-	    if (tries==5) pline(thats_enough_tries);
+		if (mndx >= LOW_PM) break;
+		monclass = name_to_monclass(buf, &mndx);
+		if (monclass && mndx == NON_PM)
+		    mndx = mkclass_poly(monclass);
+		if (mndx >= LOW_PM) break;
+
+		You("cannot polymorph %s into that.", mon_nam(mon));
+	    } while (--tryct > 0);
+	    if (!tryct) pline(thats_enough_tries);
 	}
 #endif /*WIZARD*/
 	if (mndx == NON_PM) mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);

@@ -215,6 +215,8 @@ bear traps and webs are harmless to water elementals
 hero with polymorph control and inflicted with lycanthropy can specify own
 	werecritter or human werecritter monster types as polymorph target
 hero undergoing semi-controlled polymorph won't also undergo sex change
+when doppelgangers taking on new shape don't specifically pick nasty monster
+	or role monster, bias the random form towards humanoid
 
 
 Platform- and/or Interface-Specific Fixes
@@ -312,7 +314,9 @@ acid can destroy iron bars
 OPTIONS=playmode:normal|explore|debug to choose mode without command-line
 score bonus for ascending is reduced or denied for changing alignment
 player can give a monster class when asked for type of monster to poly into
+likewise when asked about type for #monpolycontrol
 scroll of taming/spell of charm monster now gives some feedback
+doppelgangers can take on the shape of alternate roles' quest guardians
 
 
 Platform- and/or Interface-Specific New Features
