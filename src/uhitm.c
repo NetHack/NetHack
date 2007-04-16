@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2006/12/02	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2007/04/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1368,6 +1368,16 @@ register struct attack *mattk;
 			    tmp = 0;
 			} else
 			    tmp = rnd(4); /* bless damage */
+		    }
+		    /* add ring(s) of increase damage */
+		    if (u.udaminc > 0) {
+			/* applies even if damage was 0 */
+			tmp += u.udaminc;
+		    } else if (tmp > 0) {
+			/* ring(s) might be negative; avoid converting
+			   0 to non-0 or positive to non-positive */
+			tmp += u.udaminc;
+			if (tmp < 1) tmp = 1;
 		    }
 		}
 		break;
