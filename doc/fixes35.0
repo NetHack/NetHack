@@ -217,6 +217,7 @@ hero with polymorph control and inflicted with lycanthropy can specify own
 hero undergoing semi-controlled polymorph won't also undergo sex change
 when doppelgangers taking on new shape don't specifically pick nasty monster
 	or role monster, bias the random form towards humanoid
+salamanders can use green slime corpses to cure themselves of petrification
 
 
 Platform- and/or Interface-Specific Fixes

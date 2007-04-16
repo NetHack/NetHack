@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)muse.c	3.5	2007/02/07	*/
+/*	SCCS Id: @(#)muse.c	3.5	2007/04/14	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -28,9 +28,10 @@ STATIC_DCL void FDECL(mbhit,
 	(struct monst *,int,int FDECL((*),(MONST_P,OBJ_P)),
 	int FDECL((*),(OBJ_P,OBJ_P)),struct obj *));
 STATIC_DCL void FDECL(you_aggravate, (struct monst *));
-STATIC_DCL boolean FDECL(mcould_eat_tin, (struct monst *));
 STATIC_DCL void FDECL(mon_consume_unstone, (struct monst *,struct obj *,
 	BOOLEAN_P,BOOLEAN_P));
+STATIC_DCL boolean FDECL(cures_stoning, (struct monst *,struct obj *,BOOLEAN_P));
+STATIC_DCL boolean FDECL(mcould_eat_tin, (struct monst *));
 
 static struct musable {
 	struct obj *offensive;
@@ -2036,9 +2037,11 @@ struct obj *obj;
 		return (boolean)(((mon->misc_worn_check & W_ARMG) &&
 				    touch_petrifies(&mons[obj->corpsenm])) ||
 				(!resists_ston(mon) &&
-				    (obj->corpsenm == PM_LIZARD ||
-					(acidic(&mons[obj->corpsenm]) &&
-					 obj->corpsenm != PM_GREEN_SLIME))));
+				    cures_stoning(mon, obj, FALSE)));
+	    if (typ == TIN)
+		return (boolean)(mcould_eat_tin(mon) &&
+				(!resists_ston(mon) &&
+				    cures_stoning(mon, obj, TRUE)));
 	    if (typ == EGG)
 		return (boolean)(touch_petrifies(&mons[obj->corpsenm]));
 	    break;
@@ -2138,12 +2141,7 @@ boolean by_you;
 
 	tinok = mcould_eat_tin(mon);
 	for (obj = mon->minvent; obj; obj = obj->nobj) {
-	    /* monsters can also use potions of acid */
-	    if (obj->otyp == POT_ACID ||
-		((obj->otyp == CORPSE || (obj->otyp == TIN && tinok)) &&
-		    (obj->corpsenm == PM_LIZARD ||
-		     (acidic(&mons[obj->corpsenm]) &&
-			obj->corpsenm != PM_GREEN_SLIME)))) {
+	    if (cures_stoning(mon, obj, tinok)) {
 		mon_consume_unstone(mon, obj, by_you, TRUE);
 		return TRUE;
 	    }
@@ -2219,6 +2217,23 @@ boolean stoning;
     mon->mlstmv = monstermoves; /* it takes a turn */
 }
 
+/* decide whether obj can cure petrification; also used when picking up */
+STATIC_OVL boolean
+cures_stoning(mon, obj, tinok)
+struct monst *mon;
+struct obj *obj;
+boolean tinok;
+{
+    if (obj->otyp == POT_ACID) return TRUE;
+    if (obj->otyp != CORPSE && (obj->otyp != TIN || !tinok)) return FALSE;
+    /* corpse, or tin that mon can open */
+    return (boolean)(obj->corpsenm == PM_LIZARD ||
+		(acidic(&mons[obj->corpsenm]) &&
+		  /* flaming() can use green slime to unstone;
+		     noncorporeal() could too but doesn't need to */
+		  (obj->corpsenm != PM_GREEN_SLIME || flaming(mon->data))));
+}
+
 STATIC_OVL boolean
 mcould_eat_tin(mon)
 struct monst *mon;
@@ -2233,9 +2248,7 @@ struct monst *mon;
 	mwep = MON_WEP(mon);
 	welded_wep = mwep && mwelded(mwep);
 	/* this is different from the player; tin opener or dagger doesn't
-	   have to be wielded, and knife can be used instead of dagger
-	   (even so, non-nymphs don't pick up tins, so only nymphs might
-	   end up being able to benefit from them) */
+	   have to be wielded, and knife can be used instead of dagger */
 	for (obj = mon->minvent; obj; obj = obj->nobj) {
 	    /* if stuck with a cursed weapon, don't check rest of inventory */
 	    if (welded_wep && obj != mwep) continue;
