@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.5	2006/06/25	*/
+/*	SCCS Id: @(#)steal.c	3.5	2007/04/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,7 +7,6 @@
 STATIC_PTR int NDECL(stealarm);
 
 STATIC_DCL const char *FDECL(equipname, (struct obj *));
-STATIC_DCL void FDECL(mdrop_obj, (struct monst *,struct obj *,BOOLEAN_P));
 
 STATIC_OVL const char *
 equipname(otmp)
@@ -554,19 +553,20 @@ struct monst *mtmp;
 }
 
 /* drop one object taken from a (possibly dead) monster's inventory */
-STATIC_OVL void
+void
 mdrop_obj(mon, obj, verbosely)
 struct monst *mon;
 struct obj *obj;
 boolean verbosely;
 {
     int omx = mon->mx, omy = mon->my;
+    boolean update_mon = FALSE;
 
     if (obj->owornmask) {
 	/* perform worn item handling if the monster is still alive */
 	if (mon->mhp > 0) {
 	    mon->misc_worn_check &= ~obj->owornmask;
-	    update_mon_intrinsics(mon, obj, FALSE, TRUE);
+	    update_mon = TRUE;
 #ifdef STEED
 	/* don't charge for an owned saddle on dead steed */
 	} else if (mon->mtame && (obj->owornmask & W_SADDLE) && 
@@ -585,6 +585,9 @@ boolean verbosely;
 	place_object(obj, omx, omy);
 	stackobj(obj);
     }
+    /* do this last, after placing obj on floor; removing steed's saddle
+       throws rider, possibly inflicting fatal damage and producing bones */
+    if (update_mon) update_mon_intrinsics(mon, obj, FALSE, TRUE);
 }
 
 /* some monsters bypass the normal rules for moving between levels or

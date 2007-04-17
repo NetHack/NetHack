@@ -299,14 +299,21 @@ struct obj *otmp;
 			break;
 #ifdef STEED
 		} else if ((obj = which_armor(mtmp, W_SADDLE)) != 0) {
-			mtmp->misc_worn_check &= ~obj->owornmask;
-			update_mon_intrinsics(mtmp, obj, FALSE, FALSE);
-			obj->owornmask = 0L;
+			char buf[BUFSZ];
+
+			Sprintf(buf, "%s %s", s_suffix(Monnam(mtmp)),
+				distant_name(obj, xname));
+			if (cansee(mtmp->mx, mtmp->my)) {
+			    if (!canspotmon(mtmp))
+				Strcpy(buf, An(distant_name(obj, xname)));
+			    pline("%s falls to the %s.",
+				  buf, surface(mtmp->mx, mtmp->my));
+			} else if (canspotmon(mtmp)) {
+			    pline("%s falls off.", buf);
+			}
 			obj_extract_self(obj);
-			place_object(obj, mtmp->mx, mtmp->my);
-			/* call stackobj() if we ever drop anything that can merge */
-			newsym(mtmp->mx, mtmp->my);
-#endif
+			mdrop_obj(mtmp, obj, FALSE);
+#endif /* STEED */
 		}
 		break;
 	case SPE_HEALING:
