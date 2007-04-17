@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2007/03/12	*/
+/*	SCCS Id: @(#)hack.c	3.5	2007/04/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1618,7 +1618,8 @@ boolean newspot;	/* true if called by spoteffects */
 	   location while surviving the problem */
 	if (is_lava(u.ux, u.uy)) {
 	    if (lava_effects()) return TRUE;
-	} else if (!Wwalking) {
+	} else if (!Wwalking &&
+		(newspot || !u.uinwater || !(Swimming || Amphibious))) {
 	    if (drown()) return TRUE;
 	}
     }
