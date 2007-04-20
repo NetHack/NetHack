@@ -471,7 +471,7 @@ int *dmg_p;	/* for dishing out extra damage in lieu of Int loss */
     if (noncorporeal(pd)) {
 	if (visflag)
 	    pline("%s brain is unharmed.",
-		  (mdef == &youmonst) ? "Your" : s_suffix(mon_nam(mdef)));
+		  (mdef == &youmonst) ? "Your" : s_suffix(Monnam(mdef)));
 	return MM_MISS;	/* side-effects can't occur */
     } else if (magr == &youmonst) {
 	You("eat %s brain!", s_suffix(mon_nam(mdef)));
@@ -555,6 +555,9 @@ int *dmg_p;	/* for dishing out extra damage in lieu of Int loss */
 		done(DIED);
 		/* amulet of life saving has now been used up */
 		pline("Unfortunately your brain is still gone.");
+		/* sanity check against adding other forms of life-saving */
+		u.uprops[LIFESAVED].extrinsic =
+			u.uprops[LIFESAVED].intrinsic = 0L;
 	    } else {
 		Your("last thought fades away.");
 	    }

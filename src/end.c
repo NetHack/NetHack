@@ -422,8 +422,11 @@ STATIC_OVL void
 savelife(how)
 int how;
 {
-	u.uswldtim = 0;
+	int uhpmin = max(2 * u.ulevel, 10);
+
+	if (u.uhpmax < uhpmin) u.uhpmax = uhpmin;
 	u.uhp = u.uhpmax;
+	u.uswldtim = 0;
 	if (u.uhunger < 500) {
 	    u.uhunger = 500;
 	    newuhs(FALSE);
@@ -611,7 +614,6 @@ int how;
 		if (uamul) useup(uamul);
 
 		(void) adjattrib(A_CON, -1, TRUE);
-		if(u.uhpmax <= 0) u.uhpmax = 10;	/* arbitrary */
 		savelife(how);
 		if (how == GENOCIDED)
 			pline("Unfortunately you are still genocided...");
@@ -629,7 +631,6 @@ int how;
 		if(yn("Die?") == 'y') goto die;
 		pline("OK, so you don't %s.",
 			(how == CHOKING) ? "choke" : "die");
-		if(u.uhpmax <= 0) u.uhpmax = u.ulevel * 8;	/* arbitrary */
 		savelife(how);
 		killer.name[0] = 0;
 		killer.format = 0;
