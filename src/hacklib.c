@@ -163,11 +163,13 @@ s_suffix(s)		/* return a name converted to possessive */
     Static char buf[BUFSZ];
 
     Strcpy(buf, s);
-    if(!strcmpi(buf, "it"))
+    if (!strcmpi(buf, "it"))		/* it -> its */
 	Strcat(buf, "s");
-    else if(*(eos(buf)-1) == 's')
+    else if (!strcmpi(buf, "you"))	/* you -> your */
+	Strcat(buf, "r");
+    else if (*(eos(buf)-1) == 's')	/* Xs -> Xs' */
 	Strcat(buf, "'");
-    else
+    else				/* X -> X's */
 	Strcat(buf, "'s");
     return buf;
 }
