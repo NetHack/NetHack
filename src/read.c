@@ -214,10 +214,11 @@ is_chargeable(obj)
 struct obj *obj;
 {
 	if (obj->oclass == WAND_CLASS) return TRUE;
-	/* known && !uname is possible after amnesia/mind flayer */
+	/* known && !oc_name_known is possible after amnesia/mind flayer */
 	if (obj->oclass == RING_CLASS)
 	    return (boolean)(objects[obj->otyp].oc_charged &&
-			(obj->known || objects[obj->otyp].oc_uname));
+			(obj->known ||
+			 (obj->dknown && objects[obj->otyp].oc_name_known)));
 	if (is_weptool(obj))	/* specific check before general tools */
 	    return FALSE;
 	if (obj->oclass == TOOL_CLASS)
