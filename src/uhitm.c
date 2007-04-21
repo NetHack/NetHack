@@ -550,6 +550,9 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 	boolean silvermsg = FALSE, silverobj = FALSE;
 	boolean valid_weapon_attack = FALSE;
 	boolean unarmed = !uwep && !uarm && !uarms;
+	boolean hand_to_hand = (thrown == HMON_MELEE ||
+				/* not grapnels; applied implies uwep */
+				(thrown == HMON_APPLIED && is_pole(uwep)));
 #ifdef STEED
 	int jousting = 0;
 #endif
@@ -638,7 +641,9 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 		    valid_weapon_attack = (tmp > 1);
 		    if (!valid_weapon_attack || mon == u.ustuck || u.twoweap) {
 			;	/* no special bonuses */
-		    } else if (mon->mflee && Role_if(PM_ROGUE) && !Upolyd) {
+		    } else if (mon->mflee && Role_if(PM_ROGUE) && !Upolyd &&
+			    /* multi-shot throwing is too powerful here */
+			    hand_to_hand) {
 			You("strike %s from behind!", mon_nam(mon));
 			tmp += rnd(u.ulevel);
 			hittxt = TRUE;
@@ -1037,8 +1042,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 		    /* iron weapon using melee or polearm hit */
 		    obj && obj == uwep &&
 		    objects[obj->otyp].oc_material == IRON &&
-		    (thrown == HMON_MELEE ||
-			(thrown == HMON_APPLIED && is_pole(obj)))) {
+		    hand_to_hand) {
 		if (clone_mon(mon, 0, 0)) {
 			pline("%s divides as you hit it!", Monnam(mon));
 			hittxt = TRUE;
@@ -1092,8 +1096,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 	} else if (destroyed) {
 		if (!already_killed)
 		    killed(mon);	/* takes care of most messages */
-	} else if (u.umconf &&
-		    (thrown == HMON_MELEE || thrown == HMON_APPLIED)) {
+	} else if (u.umconf && hand_to_hand) {
 		nohandglow(mon);
 		if (!mon->mconf && !resist(mon, SPBOOK_CLASS, 0, NOTELL)) {
 			mon->mconf = 1;

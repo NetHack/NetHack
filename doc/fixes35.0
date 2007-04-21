@@ -219,6 +219,7 @@ when doppelgangers taking on new shape don't specifically pick nasty monster
 	or role monster, bias the random form towards humanoid
 salamanders can use green slime corpses to cure themselves of petrification
 feedback about summoned monsters may use singular when it should use plural
+rogue's backstab bonus doesn't apply for throwing attacks
 
 
 Platform- and/or Interface-Specific Fixes
