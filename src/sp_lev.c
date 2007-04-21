@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sp_lev.c	3.5	2006/05/09	*/
+/*	SCCS Id: @(#)sp_lev.c	3.5	2007/04/20	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2405,7 +2405,9 @@ dlb *fd;
 		x = tmpdb.x;  y = tmpdb.y;
 		get_location(&x, &y, DRY|WET);
 
-		if (!create_drawbridge(x, y, tmpdb.dir, tmpdb.db_open))
+		typ = tmpdb.db_open;
+		if (typ == 127) typ = rn2(2);	/* 0 => closed, 1 => open */
+		if (!create_drawbridge(x, y, tmpdb.dir, typ))
 		    impossible("Cannot create drawbridge.");
 	}
 

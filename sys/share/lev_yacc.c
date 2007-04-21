@@ -8,7 +8,7 @@ static char yysccsid[] = "@(#)yaccpar	1.9 (Berkeley) 02/21/93";
 #define yyerrok (yyerrflag=0)
 #define YYRECOVERING (yyerrflag!=0)
 #define YYPREFIX "yy"
-/*	SCCS Id: @(#)lev_yacc.c	3.5	2000/01/17	*/
+/*	SCCS Id: @(#)lev_yacc.c	3.5	2007/04/20	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1812,8 +1812,10 @@ case 151:
 			    tmpdb[ndb]->db_open = 1;
 			else if ( yyvsp[0].i == D_CLOSED )
 			    tmpdb[ndb]->db_open = 0;
+			else if (yyvsp[0].i == -1)	/* RANDOM_TYPE */
+			    tmpdb[ndb]->db_open = 127;	/* random */
 			else
-			    yyerror("A drawbridge can only be open or closed!");
+			    yyerror("A drawbridge can only be open, closed, or random!");
 			ndb++;
 			if (ndb >= MAX_OF_TYPE) {
 				yyerror("Too many drawbridges in mazepart!");
