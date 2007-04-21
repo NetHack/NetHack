@@ -7,6 +7,7 @@
 #include "hack.h"
 
 STATIC_DCL int FDECL(throw_obj, (struct obj *,int));
+STATIC_DCL boolean FDECL(ok_to_throw, (int *));
 STATIC_DCL void NDECL(autoquiver);
 STATIC_DCL int FDECL(gem_accept, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(tmiss, (struct obj *, struct monst *,BOOLEAN_P));
@@ -208,6 +209,28 @@ int shotlimit;
 	return 1;
 }
 
+/* common to dothrow() and dofire() */
+STATIC_OVL boolean
+ok_to_throw(shotlimit_p)
+int *shotlimit_p;	/* (see dothrow()) */
+{
+	/* kludge to work around parse()'s pre-decrement of `multi' */
+	*shotlimit_p = (multi || save_cm) ? multi + 1 : 0;
+	multi = 0;		/* reset; it's been used up */
+
+	if (notake(youmonst.data)) {
+	    You("are physically incapable of throwing or shooting anything.");
+	    return FALSE;
+	} else if (nohands(youmonst.data)) {
+	    You_cant("throw or shoot without hands."); /* not body_part(HAND) */
+	    return FALSE;
+	    /*[what about !freehand(), aside from cursed missile launcher?]*/
+	}
+	if (check_capacity((char *)0)) return FALSE;
+	return TRUE;
+}
+
+/* t command - throw */
 int
 dothrow()
 {
@@ -222,27 +245,16 @@ dothrow()
 	 *
 	 * Prior to 3.3.0, command ``3t'' meant ``t(shoot) t(shoot) t(shoot)''
 	 * and took 3 turns.  Now it means ``t(shoot at most 3 missiles)''.
+	 *
+	 * [3.5.0:  shot count setup has been moved into ok_to_throw().]
 	 */
-	/* kludge to work around parse()'s pre-decrement of `multi' */
-	shotlimit = (multi || save_cm) ? multi + 1 : 0;
-	multi = 0;		/* reset; it's been used up */
+	if (!ok_to_throw(&shotlimit)) return 0;
 
-	if (notake(youmonst.data)) {
-	    You("are physically incapable of throwing anything.");
-	    return 0;
-	} else if (nohands(youmonst.data)) {
-	    You_cant("throw without hands.");	/* not `body_part(HAND)' */
-	    return 0;
-	    /*[what about !freehand(), aside from cursed missile launcher?]*/
-	}
-
-	if(check_capacity((char *)0)) return(0);
 	obj = getobj(uslinging() ? bullets : toss_objs, "throw");
 	/* it is also possible to throw food */
 	/* (or jewels, or iron balls... ) */
 
-	if (!obj) return(0);
-	return throw_obj(obj, shotlimit);
+	return obj ? throw_obj(obj, shotlimit) : 0;
 }
 
 
@@ -311,50 +323,47 @@ autoquiver()
 	return;
 }
 
-
-/* Throw from the quiver */
+/* f command -- fire: throw from the quiver */
 int
 dofire()
 {
 	int shotlimit;
-
-	if (notake(youmonst.data)) {
-	    You("are physically incapable of doing that.");
-	    return 0;
-	}
-
-	if(check_capacity((char *)0)) return(0);
-	if (!uquiver) {
-		if (!flags.autoquiver) {
-			/* Don't automatically fill the quiver */
-			You("have no ammunition readied!");
-			return(dothrow());
-		}
-		autoquiver();
-		if (!uquiver) {
-			You("have nothing appropriate for your quiver!");
-			return(dothrow());
-		} else {
-			You("fill your quiver:");
-			prinv((char *)0, uquiver, 0L);
-		}
-	}
+	struct obj *obj;
 
 	/*
-	 * Since some characters shoot multiple missiles at one time,
-	 * allow user to specify a count prefix for 'f' or 't' to limit
-	 * number of items thrown (to avoid possibly hitting something
-	 * behind target after killing it, or perhaps to conserve ammo).
+	 * Same as dothrow(), except we use quivered missile instead
+	 * of asking what to throw/shoot.
 	 *
-	 * The number specified can never increase the number of missiles.
-	 * Using ``5f'' when the shooting skill (plus RNG) dictates launch
-	 * of 3 projectiles will result in 3 being shot, not 5.
+	 * If quiver is empty, we use autoquiver to fill it when the
+	 * corresponding option is on.  If the option is off or if
+	 * autoquiver doesn't select anything, we ask what to throw.
+	 * For the last, if player's response is a stack, we put
+	 * that stack into quiver slot provided it's not wielded.
 	 */
-	/* kludge to work around parse()'s pre-decrement of `multi' */
-	shotlimit = (multi || save_cm) ? multi + 1 : 0;
-	multi = 0;		/* reset; it's been used up */
+	if (!ok_to_throw(&shotlimit)) return 0;
 
-	return throw_obj(uquiver, shotlimit);
+	if ((obj = uquiver) == 0) {
+	    if (!flags.autoquiver) {
+		You("have no ammunition readied.");
+	    } else {
+		autoquiver();
+		if ((obj = uquiver) == 0)
+		    You("have nothing appropriate for your quiver.");
+	    }
+	    /* if autoquiver is disabled or has failed, prompt for missile;
+	       fill quiver with it if it's a stack that's not wielded */
+	    if (!obj) {
+		obj = getobj(uslinging() ? bullets : toss_objs, "throw");
+		if (obj && obj->quan > 1L && !obj->owornmask &&
+			/* Q command doesn't allow gold in quiver */
+			obj->oclass != COIN_CLASS)
+		    setuqwep(obj);	/* demi-autoquiver */
+	    }
+	    /* give feedback if quiver has now been filled */
+	    if (uquiver) prinv("You ready:", uquiver, 0L);
+	}
+
+	return obj ? throw_obj(obj, shotlimit) : 0;
 }
 
 /* if in midst of multishot shooting/throwing, stop early */
