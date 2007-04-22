@@ -452,8 +452,8 @@ struct monst *mon;
 struct obj *obj;
 {
 	obj_extract_self(obj);
-	possibly_unwield(mon, FALSE);
 	if (obj->owornmask) {
+	    if (obj == MON_WEP(mon)) mwepgone(mon);
 	    mon->misc_worn_check &= ~obj->owornmask;
 	    update_mon_intrinsics(mon, obj, FALSE, FALSE);
 	    obj->owornmask = 0L;
