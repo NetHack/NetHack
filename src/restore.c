@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.5	2007/02/03	*/
+/*	SCCS Id: @(#)restore.c	3.5	2007/04/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -951,6 +951,7 @@ boolean ghostly;
 {
 	register struct trap *trap;
 	register struct monst *mtmp;
+	long elapsed;
 	branch *br;
 	int hpid;
 	xchar dlvl;
@@ -994,6 +995,7 @@ boolean ghostly;
 	}
 	rest_levl(fd, (boolean)((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
 	mread(fd, (genericptr_t)&omoves, sizeof(omoves));
+	elapsed = monstermoves - omoves;
 	mread(fd, (genericptr_t)&upstair, sizeof(stairway));
 	mread(fd, (genericptr_t)&dnstair, sizeof(stairway));
 	mread(fd, (genericptr_t)&upladder, sizeof(stairway));
@@ -1009,35 +1011,9 @@ boolean ghostly;
 	else
 	    doorindex = 0;
 
-	restore_timers(fd, RANGE_LEVEL, ghostly, monstermoves - omoves);
+	restore_timers(fd, RANGE_LEVEL, ghostly, elapsed);
 	restore_light_sources(fd);
 	fmon = restmonchn(fd, ghostly);
-
-	/* regenerate animals while on another level */
-	if (u.uz.dlevel) {
-	    register struct monst *mtmp2;
-
-	    for (mtmp = fmon; mtmp; mtmp = mtmp2) {
-		mtmp2 = mtmp->nmon;
-		if (ghostly) {
-			/* reset peaceful/malign relative to new character */
-			/* shopkeepers will reset based on name */
-			if(!mtmp->isshk) {
-			    if (is_unicorn(mtmp->data) &&
-			       sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))
-				mtmp->mpeaceful = TRUE;
-			    else
-				mtmp->mpeaceful = peace_minded(mtmp->data);
-			}
-			set_malign(mtmp);
-		} else if (monstermoves > omoves)
-			mon_catchup_elapsed_time(mtmp, monstermoves - omoves);
-
-		/* update shape-changers in case protection against
-		   them is different now than when the level was saved */
-		restore_cham(mtmp);
-	    }
-	}
 
 	rest_worm(fd);	/* restore worm information */
 	ftrap = 0;
@@ -1060,14 +1036,32 @@ boolean ghostly;
 	for (x = 0; x < COLNO; x++)
 	    for (y = 0; y < ROWNO; y++)
 		level.monsters[x][y] = (struct monst *) 0;
-	for (mtmp = level.monlist; mtmp; mtmp = mtmp->nmon) {
-	    if (mtmp->isshk)
-		set_residency(mtmp, FALSE);
+	for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	    if (mtmp->isshk) set_residency(mtmp, FALSE);
 	    place_monster(mtmp, mtmp->mx, mtmp->my);
 	    if (mtmp->wormno) place_wsegs(mtmp);
-	}
-	restdamage(fd, ghostly);
 
+	    /* regenerate monsters while on another level */
+	    if (!u.uz.dlevel) continue;
+	    if (ghostly) {
+		/* reset peaceful/malign relative to new character;
+		   shopkeepers will reset based on name */
+		if (!mtmp->isshk)
+		    mtmp->mpeaceful = (is_unicorn(mtmp->data) &&
+			    sgn(u.ualign.type) == sgn(mtmp->data->maligntyp)) ?
+				      TRUE : peace_minded(mtmp->data);
+		set_malign(mtmp);
+	    } else if (elapsed > 0L) {
+		mon_catchup_elapsed_time(mtmp, elapsed);
+	    }
+	    /* update shape-changers in case protection against
+	       them is different now than when the level was saved */
+	    restore_cham(mtmp);
+	    /* give hiders a chance to hide before their next move */
+	    if (ghostly || elapsed > (long)rnd(10)) hide_monst(mtmp);
+	}
+
+	restdamage(fd, ghostly);
 	rest_regions(fd, ghostly);
 	if (ghostly) {
 	    /* Now get rid of all the temp fruits... */

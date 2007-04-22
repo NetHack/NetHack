@@ -220,6 +220,7 @@ when doppelgangers taking on new shape don't specifically pick nasty monster
 salamanders can use green slime corpses to cure themselves of petrification
 feedback about summoned monsters may use singular when it should use plural
 rogue's backstab bonus doesn't apply for throwing attacks
+hiding monsters who are unhidden when hero leaves a level can hide upon return
 
 
 Platform- and/or Interface-Specific Fixes
