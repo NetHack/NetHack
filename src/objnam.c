@@ -999,7 +999,10 @@ unsigned cxn_flags;	/* bitmask of CXN_xxx values */
 	if (!omit_corpse) {
 	    Strcat(nambuf, " corpse");
 	    /* makeplural(nambuf) => append "s" to "corpse" */
-	    if (otmp->quan > 1L && !ignore_quan) Strcat(nambuf, "s");
+	    if (otmp->quan > 1L && !ignore_quan) {
+		Strcat(nambuf, "s");
+		any_prefix = FALSE;	/* avoid "a newt corpses" */
+	    }
 	}
 
 	/* it's safe to overwrite our nambuf after an() has copied
