@@ -2383,14 +2383,16 @@ boolean picked_some;
 
 	if (Blind) {
 		boolean drift = Is_airlevel(&u.uz) || Is_waterlevel(&u.uz);
+
 		if (dfeature && !strncmp(dfeature, "altar ", 6)) {
 		    /* don't say "altar" twice, dfeature has more info */
 		    You("try to feel what is here.");
 		} else {
 		    const char *where = (Blind && !can_reach_floor(TRUE)) ?
-		    		      "lying beneath you" : "lying here on the ",
-		    	      *onwhat = (Blind && !can_reach_floor(TRUE)) ?
-		    	 		"" : surface(u.ux,u.uy);
+				    "lying beneath you" : "lying here on the ",
+			      *onwhat = (Blind && !can_reach_floor(TRUE)) ?
+					"" : surface(u.ux,u.uy);
+
 		    You("try to feel what is %s%s.",
 			drift ? "floating here" : where,
 			drift ? ""		: onwhat);
@@ -2421,6 +2423,15 @@ boolean picked_some;
 	    There("are %s%s objects here.",
 		  (obj_cnt <= 10) ? "several" : "many",
 		  picked_some ? " more" : "");
+	    for ( ; otmp; otmp = otmp->nexthere)
+		if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
+		    pline("Including %s%s.",
+			  corpse_xname(otmp, (const char *)0, CXN_ARTICLE),
+			  poly_when_stoned(youmonst.data) ? "" :
+			    ", unfortunately");
+		    feel_cockatrice(otmp, FALSE);
+		    break;
+		}
 	} else if (!otmp->nexthere) {
 	    /* only one object */
 	    if (dfeature) pline(fbuf);
@@ -2471,8 +2482,9 @@ struct obj *otmp;
 boolean force_touch;
 {
 	if ((Blind || force_touch) && !uarmg && !Stone_resistance &&
-		(otmp->otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])))
-			return TRUE;
+		(otmp->otyp == CORPSE &&
+		 touch_petrifies(&mons[otmp->corpsenm])))
+	    return TRUE;
 	return FALSE;
 }
 
@@ -2484,14 +2496,18 @@ boolean force_touch;
 	char kbuf[BUFSZ];
 
 	if (will_feel_cockatrice(otmp, force_touch)) {
-	    if(poly_when_stoned(youmonst.data))
-			You("touched the %s corpse with your bare %s.",
-				mons[otmp->corpsenm].mname, makeplural(body_part(HAND)));
+	    /* "the <cockatrice> corpse" */
+	    Strcpy(kbuf, corpse_xname(otmp, (const char *)0, CXN_PFX_THE));
+
+	    if (poly_when_stoned(youmonst.data))
+		You("touched %s with your bare %s.",
+		    kbuf, makeplural(body_part(HAND)));
 	    else
-			pline("Touching the %s corpse is a fatal mistake...",
-				mons[otmp->corpsenm].mname);
-		Sprintf(kbuf, "%s corpse", an(mons[otmp->corpsenm].mname));
-		instapetrify(kbuf);
+		pline("Touching %s is a fatal mistake...", kbuf);
+	    /* normalize body shape here; hand, not body_part(HAND) */
+	    Sprintf(kbuf, "touching %s bare-handed", killer_xname(otmp));
+	    /* will call polymon() for the poly_when_stoned() case */
+	    instapetrify(kbuf);
 	}
 }
 

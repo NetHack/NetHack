@@ -221,6 +221,8 @@ salamanders can use green slime corpses to cure themselves of petrification
 feedback about summoned monsters may use singular when it should use plural
 rogue's backstab bonus doesn't apply for throwing attacks
 hiding monsters who are unhidden when hero leaves a level can hide upon return
+touching a pile of objects while blind affects hero even when the pile is
+	big enough to give "there are many objects here" and not list them
 
 
 Platform- and/or Interface-Specific Fixes
