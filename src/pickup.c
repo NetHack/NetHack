@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2007/02/17	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2007/04/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1021,17 +1021,18 @@ int *wt_before, *wt_after;
     boolean adjust_wt = container && carried(container),
 	    is_gold = obj->oclass == COIN_CLASS;
     int wt, iw, ow, oow;
-    long qq, savequan;
-#ifdef GOLDOBJ
-    long umoney = money_cnt(invent);
-#endif
+    long qq, savequan, umoney;
     unsigned saveowt;
     const char *verb, *prefx1, *prefx2, *suffx;
     char obj_nambuf[BUFSZ], where[BUFSZ];
 
     savequan = obj->quan;
     saveowt = obj->owt;
-
+#ifndef GOLDOBJ
+    umoney = u.ugold;
+#else
+    umoney = money_cnt(invent);
+#endif
     iw = max_capacity();
 
     if (count != savequan) {
@@ -1042,14 +1043,9 @@ int *wt_before, *wt_after;
     if (adjust_wt)
 	wt -= (container->otyp == BAG_OF_HOLDING) ?
 		(int)DELTA_CWT(container, obj) : (int)obj->owt;
-#ifndef GOLDOBJ
-    if (is_gold)	/* merged gold might affect cumulative weight */
-	wt -= (GOLD_WT(u.ugold) + GOLD_WT(count) - GOLD_WT(u.ugold + count));
-#else
     /* This will go with silver+copper & new gold weight */
     if (is_gold)	/* merged gold might affect cumulative weight */
 	wt -= (GOLD_WT(umoney) + GOLD_WT(count) - GOLD_WT(umoney + count));
-#endif
     if (count != savequan) {
 	obj->quan = savequan;
 	obj->owt = saveowt;
@@ -1062,30 +1058,17 @@ int *wt_before, *wt_after;
 
     /* see how many we can lift */
     if (is_gold) {
-#ifndef GOLDOBJ
-	iw -= (int)GOLD_WT(u.ugold);
-	if (!adjust_wt) {
-	    qq = GOLD_CAPACITY((long)iw, u.ugold);
-	} else {
-	    oow = 0;
-	    qq = 50L - (u.ugold % 100L) - 1L;
-#else
 	iw -= (int)GOLD_WT(umoney);
 	if (!adjust_wt) {
 	    qq = GOLD_CAPACITY((long)iw, umoney);
 	} else {
 	    oow = 0;
 	    qq = 50L - (umoney % 100L) - 1L;
-#endif
 	    if (qq < 0L) qq += 100L;
 	    for ( ; qq <= count; qq += 100L) {
 		obj->quan = qq;
 		obj->owt = (unsigned)GOLD_WT(qq);
-#ifndef GOLDOBJ
-		ow = (int)GOLD_WT(u.ugold + qq);
-#else
 		ow = (int)GOLD_WT(umoney + qq);
-#endif
 		ow -= (container->otyp == BAG_OF_HOLDING) ?
 			(int)DELTA_CWT(container, obj) : (int)obj->owt;
 		if (iw + ow >= 0) break;
@@ -1096,11 +1079,7 @@ int *wt_before, *wt_after;
 	}
 	if (qq < 0L) qq = 0L;
 	else if (qq > count) qq = count;
-#ifndef GOLDOBJ
-	wt = iw + (int)GOLD_WT(u.ugold + qq);
-#else
 	wt = iw + (int)GOLD_WT(umoney + qq);
-#endif
     } else if (count > 1 || count < obj->quan) {
 	/*
 	 * Ugh. Calc num to lift by changing the quan of of the
@@ -1152,11 +1131,7 @@ int *wt_before, *wt_after;
     }
 
     if (!container) Strcpy(where, "here");  /* slightly shorter form */
-#ifndef GOLDOBJ
-    if (invent || u.ugold) {
-#else
     if (invent || umoney) {
-#endif
 	prefx1 = "you cannot ";
 	prefx2 = "";
 	suffx  = " any more";
@@ -1262,10 +1237,6 @@ long count;
 boolean telekinesis;	/* not picking it up directly by hand */
 {
 	int res, nearload;
-#ifndef GOLDOBJ
-	const char *where = (obj->ox == u.ux && obj->oy == u.uy) ?
-			    "here" : "there";
-#endif
 
 	if (obj->quan < count) {
 	    impossible("pickup_object: count %ld > quan %ld?",
@@ -1290,6 +1261,8 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    /* Special consideration for gold pieces... */
 	    long iw = (long)max_capacity() - GOLD_WT(u.ugold);
 	    long gold_capacity = GOLD_CAPACITY(iw, u.ugold);
+	    const char *where = (obj->ox == u.ux && obj->oy == u.uy) ?
+				"here" : "there";
 
 	    if (gold_capacity <= 0L) {
 		pline(
