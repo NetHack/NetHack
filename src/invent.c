@@ -2336,7 +2336,7 @@ char *buf;
 	return dfeature;
 }
 
-/* look at what is here; if there are many objects (5 or more),
+/* look at what is here; if there are many objects (pile_limit or more),
    don't show them unless obj_cnt is 0 */
 int
 look_here(obj_cnt, picked_some)
@@ -2349,8 +2349,11 @@ boolean picked_some;
 	const char *dfeature = (char *)0;
 	char fbuf[BUFSZ], fbuf2[BUFSZ];
 	winid tmpwin;
-	boolean skip_objects = (obj_cnt >= 5), felt_cockatrice = FALSE;
+	boolean skip_objects, felt_cockatrice = FALSE;
 
+	/* default pile_limit is 5; a value of 0 means "never skip"
+	   (and 1 effectively forces "always skip") */
+	skip_objects = (flags.pile_limit > 0 && obj_cnt >= flags.pile_limit);
 	if (u.uswallow && u.ustuck) {
 	    struct monst *mtmp = u.ustuck;
 	    Sprintf(fbuf, "Contents of %s %s",
@@ -2420,12 +2423,18 @@ boolean picked_some;
 	if (skip_objects) {
 	    if (dfeature) pline(fbuf);
 	    read_engr_at(u.ux, u.uy); /* Eric Backus */
-	    There("are %s%s objects here.",
-		  (obj_cnt <= 10) ? "several" : "many",
-		  picked_some ? " more" : "");
+	    if (obj_cnt == 1 && otmp->quan == 1L)
+		There("is %s object here.", picked_some ? "another" : "an");
+	    else
+		There("are %s%s objects here.",
+		      (obj_cnt < 5) ? "a few" :
+			(obj_cnt < 10) ? "several" : "many",
+		      picked_some ? " more" : "");
 	    for ( ; otmp; otmp = otmp->nexthere)
 		if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
-		    pline("Including %s%s.",
+		    pline("%s %s%s.",
+			  (obj_cnt > 1) ? "Including" :
+			    (otmp->quan > 1L) ? "They're" : "It's",
 			  corpse_xname(otmp, (const char *)0, CXN_ARTICLE),
 			  poly_when_stoned(youmonst.data) ? "" :
 			    ", unfortunately");
@@ -2442,20 +2451,22 @@ boolean picked_some;
 	    You("%s here %s.", verb, doname(otmp));
 	    if (otmp->otyp == CORPSE) feel_cockatrice(otmp, FALSE);
 	} else {
+	    char buf[BUFSZ];
+
 	    display_nhwindow(WIN_MESSAGE, FALSE);
 	    tmpwin = create_nhwindow(NHW_MENU);
 	    if(dfeature) {
 		putstr(tmpwin, 0, fbuf);
 		putstr(tmpwin, 0, "");
 	    }
-	    putstr(tmpwin, 0, Blind ? "Things that you feel here:" :
-				      "Things that are here:");
+	    Sprintf(buf, "%s that %s here:",
+		    picked_some ? "Other things" : "Things",
+		    Blind ? "you feel" : "are");
+	    putstr(tmpwin, 0, buf);
 	    for ( ; otmp; otmp = otmp->nexthere) {
 		if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
-			char buf[BUFSZ];
 			felt_cockatrice = TRUE;
-			Strcpy(buf, doname(otmp));
-			Strcat(buf, "...");
+			Sprintf(buf, "%s...", doname(otmp));
 			putstr(tmpwin, 0, buf);
 			break;
 		}

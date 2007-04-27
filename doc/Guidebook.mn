@@ -1983,6 +1983,13 @@ compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use
 configuration file lines to further refine
 .op autopickup
 behavior.
+.lp pile_limit
+When walking across a pile of objects on the floor, threshold at which
+the message "there are few/several/many objects here" is given instead
+of showing a popup list of those objects.  A value of 0 means "no limit"
+(always list the objects); a value of 1 effectively means "never show
+the objects" since the pile size will always be at least that big;
+default value is 5.
 .lp playmode
 Values are `normal', `explore', or `debug'.
 Allows selection of explore mode (also known as discovery mode) or debug

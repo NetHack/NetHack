@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2007/02/14	*/
+/*	SCCS Id: @(#)options.c	3.5	2007/04/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,6 +32,8 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 #define MAP_OPTION	3
 #define MENU_OPTION	4
 #define TEXT_OPTION	5
+
+#define PILE_LIMIT_DFLT 5
 
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
@@ -320,6 +322,8 @@ static struct Comp_Opt
 						20, SET_IN_GAME },
 	{ "pickup_types", "types of objects to pick up automatically",
 						MAXOCLASSES, SET_IN_GAME },
+	{ "pile_limit", "threshold for \"there are many objects here\"",
+						24, SET_IN_GAME },
 	{ "playmode",
 #ifdef WIZARD
 		      "normal play, non-scoring explore mode, or debug mode",
@@ -588,6 +592,7 @@ initoptions()
 	flags.end_own = FALSE;
 	flags.end_top = 3;
 	flags.end_around = 2;
+	flags.pile_limit = PILE_LIMIT_DFLT;	/* 5 */
 	flags.runmode = RUN_LEAP;
 	iflags.msg_history = 20;
 #ifdef TTY_GRAPHICS
@@ -1843,6 +1848,23 @@ goodfruit:
 		    if (badopt) badoption(opts);
 		}
 		return;
+	}
+
+	/* pile limit: when walking over objects, number which triggers
+	   "there are several/many objects here" instead of listing them */
+	fullname = "pile_limit";
+	if (match_optname(opts, fullname, 4, TRUE)) {
+	    if (duplicate) complain_about_duplicate(opts, 1);
+	    op = string_for_opt(opts, negated);
+	    if ((negated && !op) || (!negated && op))
+		flags.pile_limit = negated ? 0 : atoi(op);
+	    else if (negated)
+		bad_negation(fullname, TRUE);
+	    else /* !op */
+		flags.pile_limit = PILE_LIMIT_DFLT;
+	    /* sanity check */
+	    if (flags.pile_limit < 0) flags.pile_limit = PILE_LIMIT_DFLT;
+	    return;
 	}
 
 	/* play mode: normal, explore/discovery, or debug/wizard */
@@ -3573,6 +3595,8 @@ char *buf;
 		oc_to_str(flags.pickup_types, ocl);
 		Sprintf(buf, "%s", ocl[0] ? ocl : "all" );
 	}
+	else if (!strcmp(optname, "pile_limit"))
+		Sprintf(buf, "%d", flags.pile_limit);
 	else if (!strcmp(optname, "playmode")) {
 		Strcpy(buf,
 		       wizard ? "debug" : discover ? "explore" : "normal");

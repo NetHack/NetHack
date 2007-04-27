@@ -323,6 +323,8 @@ player can give a monster class when asked for type of monster to poly into
 likewise when asked about type for #monpolycontrol
 scroll of taming/spell of charm monster now gives some feedback
 doppelgangers can take on the shape of alternate roles' quest guardians
+pile_limit option to control when to switch to "there are objects here"
+	vs listing objects on floor when hero goes over objects while moving
 
 
 Platform- and/or Interface-Specific New Features

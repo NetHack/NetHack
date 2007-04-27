@@ -118,6 +118,9 @@ pickup_burden when you pick up an item that exceeds this encumberance
               or overLoaded), you will be asked if you want to continue. [S]
 pickup_types  a list of default symbols for kinds of objects to autopickup
               when that option is on  [all]
+pile_limit    for feedback when walking across floor objects, threshold at
+              which "there are many objects here" is displayed instead of
+              listing the objects.  (0 means "always list objects.")  [5]
 runmode       controls how often the map window is updated when performing
               multi-step movement (various running modes or travel command):
               teleport -- don't update map until movement stops;

@@ -31,7 +31,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.103 $ $Date: 2007/02/15 05:22:32 $
+% $Revision: 1.104 $ $Date: 2007/02/18 04:49:19 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2456,6 +2456,14 @@ is on.  Default is all types.  If your copy of the game has the
 compile time option AUTOPICKUP\_EXCEPTIONS included,
 you may be able to use ``{\it autopickup\_exception\/}'' configuration
 file lines to further refine ``{\it autopickup\/}'' behavior.
+%.lp
+\item[\ib{pile\_limit}]
+When walking across a pile of objects on the floor, threshold at which
+the message ``there are few/several/many objects here'' is given instead
+of showing a popup list of those objects.  A value of 0 means ``no limit''
+(always list the objects); a value of 1 effectively means ``never show
+the objects'' since the pile size will always be at least that big;
+default value is 5.
 %.lp
 \item[\ib{playmode}]
 Values are {\it normal\/}, {\it explore\/}, or {\it debug\/}.

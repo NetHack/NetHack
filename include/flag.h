@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)flag.h	3.5	2007/02/16	*/
+/*	SCCS Id: @(#)flag.h	3.5	2007/04/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -59,6 +59,7 @@ struct flag {
 #define NEW_MOON	0
 #define FULL_MOON	4
 	int	 pickup_burden;		/* maximum burden before prompt */
+	int	 pile_limit; /* controls feedback when walking over objects */
 	char	 inv_order[MAXOCLASSES];
 	char	 pickup_types[MAXOCLASSES];
 #define NUM_DISCLOSURE_OPTIONS		5
