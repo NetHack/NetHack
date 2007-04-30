@@ -1652,9 +1652,15 @@ register struct attack *mattk;
 	    case AD_SLIM:
 		if (negated) break;	/* physical damage only */
 		if (!rn2(4) && !slimeproof(pd)) {
-		    You("turn %s into slime.", mon_nam(mdef));
-		    if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE))
-			pd = mdef->data;
+		    if (!munslime(mdef, TRUE) && mdef->mhp > 0) {
+			/* this assumes newcham() won't fail; since hero has
+			   a slime attack, green slimes haven't been geno'd */
+			You("turn %s into slime.", mon_nam(mdef));
+			if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE))
+			    pd = mdef->data;
+		    }
+		    /* munslime attempt could have been fatal */
+		    if (mdef->mhp < 1) return 2; /* skip death message */
 		    tmp = 0;
 		}
 		break;

@@ -236,6 +236,10 @@ struct obj *obj;	/* item to make known if effect can be seen */
 	if (mon->permspeed == MFAST) mon->permspeed = 0;
 	petrify = TRUE;
 	break;
+     case -4:			/* green slime */
+	if (mon->permspeed == MFAST) mon->permspeed = 0;
+	give_msg = FALSE;
+	break;
     }
 
     for (otmp = mon->minvent; otmp; otmp = otmp->nobj)

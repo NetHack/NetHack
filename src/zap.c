@@ -23,7 +23,6 @@ STATIC_DCL void FDECL(polyuse, (struct obj *,int,int));
 STATIC_DCL void FDECL(create_polymon, (struct obj *,int));
 STATIC_DCL int FDECL(stone_to_flesh_obj, (struct obj *));
 STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
-STATIC_DCL int FDECL(zhitm, (struct monst *,int,int,struct obj **));
 STATIC_DCL void FDECL(zhitu, (int,int,const char *,XCHAR_P,XCHAR_P));
 STATIC_DCL void FDECL(revive_egg, (struct obj *));
 #ifdef STEED
@@ -3202,7 +3201,8 @@ int dx, dy;
 	return (struct monst *)0;
 }
 
-STATIC_OVL int
+/* used by buzz(); also used by munslime(muse.c) */
+int
 zhitm(mon, type, nd, ootmp)			/* returns damage to mon */
 register struct monst *mon;
 register int type, nd;

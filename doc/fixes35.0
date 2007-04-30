@@ -325,6 +325,7 @@ scroll of taming/spell of charm monster now gives some feedback
 doppelgangers can take on the shape of alternate roles' quest guardians
 pile_limit option to control when to switch to "there are objects here"
 	vs listing objects on floor when hero goes over objects while moving
+some monsters will use fire to prevent selves being turned into green slime
 
 
 Platform- and/or Interface-Specific New Features

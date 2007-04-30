@@ -32,6 +32,9 @@ STATIC_DCL void FDECL(mon_consume_unstone, (struct monst *,struct obj *,
 	BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL boolean FDECL(cures_stoning, (struct monst *,struct obj *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(mcould_eat_tin, (struct monst *));
+STATIC_DCL boolean FDECL(muse_unslime, (struct monst *,struct obj *,BOOLEAN_P));
+STATIC_DCL int FDECL(cures_sliming, (struct monst *,struct obj *));
+STATIC_DCL boolean FDECL(green_mon, (struct monst *));
 
 static struct musable {
 	struct obj *offensive;
@@ -2014,8 +2017,8 @@ struct obj *obj;
 		return TRUE;
 	    break;
 	case SCROLL_CLASS:
-	    if (typ == SCR_TELEPORTATION || typ == SCR_CREATE_MONSTER
-		    || typ == SCR_EARTH)
+	    if (typ == SCR_TELEPORTATION || typ == SCR_CREATE_MONSTER ||
+		    typ == SCR_EARTH || typ == SCR_FIRE)
 		return TRUE;
 	    break;
 	case AMULET_CLASS:
@@ -2093,7 +2096,7 @@ const char *str;
 }
 
 boolean
-ureflects (fmt, str)
+ureflects(fmt, str)
 const char *fmt, *str;
 {
 	/* Check from outermost to innermost objects */
@@ -2126,7 +2129,6 @@ const char *fmt, *str;
 	return FALSE;
 }
 
-
 /* TRUE if the monster ate something */
 boolean
 munstone(mon, by_you)
@@ -2138,6 +2140,7 @@ boolean by_you;
 
 	if (resists_ston(mon)) return FALSE;
 	if (mon->meating || !mon->mcanmove || mon->msleeping) return FALSE;
+	mon->mstrategy &= ~STRAT_WAITFORU;
 
 	tinok = mcould_eat_tin(mon);
 	for (obj = mon->minvent; obj; obj = obj->nobj) {
@@ -2214,7 +2217,9 @@ boolean stoning;
 	edog->hungrytime += nutrit;
 	mon->mconf = 0;
     }
-    mon->mlstmv = monstermoves; /* it takes a turn */
+    /* use up monster's next move */
+    mon->movement -= NORMAL_SPEED;
+    mon->mlstmv = monstermoves;
 }
 
 /* decide whether obj can cure petrification; also used when picking up */
@@ -2229,9 +2234,7 @@ boolean tinok;
     /* corpse, or tin that mon can open */
     return (boolean)(obj->corpsenm == PM_LIZARD ||
 		(acidic(&mons[obj->corpsenm]) &&
-		  /* flaming() can use green slime to unstone;
-		     noncorporeal() could too but doesn't need to */
-		  (obj->corpsenm != PM_GREEN_SLIME || flaming(mon->data))));
+		  (obj->corpsenm != PM_GREEN_SLIME || slimeproof(mon->data))));
 }
 
 STATIC_OVL boolean
@@ -2259,6 +2262,137 @@ struct monst *mon;
 		     objects[obj->otyp].oc_skill == P_KNIFE))) return TRUE;
 	}
 	return FALSE;
+}
+
+/* TRUE if monster does something to avoid turning into green slime */
+boolean
+munslime(mon, by_you)
+struct monst *mon;
+boolean by_you;
+{
+    struct obj *obj;
+
+    /*
+     * muse_unslime() gives "mon starts turning green", "mon zaps
+     * itself with a wand of fire", and "mon's slime burns away"
+     * messages.  Monsters who don't get any chance at that just have
+     * (via our caller) newcham()'s "mon turns into slime" feedback.
+     */
+
+    if (slimeproof(mon->data)) return FALSE;
+    if (mon->meating || !mon->mcanmove || mon->msleeping) return FALSE;
+    mon->mstrategy &= ~STRAT_WAITFORU;
+
+    for (obj = mon->minvent; obj; obj = obj->nobj)
+	if (cures_sliming(mon, obj))
+	    return muse_unslime(mon, obj, by_you);
+
+    /* TODO: check for and move onto an adjacent fire trap */
+    /* TODO: monster with flame attack should use it on self */
+
+    return FALSE;
+}
+
+/* mon uses an item--selected by caller--to burn away incipient slime */
+STATIC_OVL boolean
+muse_unslime(mon, obj, by_you)
+struct monst *mon;
+struct obj *obj;
+boolean by_you;	/* true: if mon kills itself, hero gets credit/blame */
+{
+    struct obj *odummyp;
+    int otyp = obj->otyp, dmg;
+    boolean vis = canseemon(mon), res = TRUE;
+
+    if (vis)
+	pline("%s starts turning %s.", Monnam(mon),
+	      green_mon(mon) ? "into ooze" : hcolor(NH_GREEN));
+    /* -4 => sliming, causes quiet loss of enhanced speed */
+    mon_adjust_speed(mon, -4, (struct obj *)0);
+
+    if (otyp == SCR_FIRE) {
+	mreadmsg(mon, obj);
+	if (mon->mconf) {
+	    if (cansee(mon->mx, mon->my))
+		pline("Oh, what a pretty fire!");
+	    if (vis && !objects[otyp].oc_name_known && !objects[otyp].oc_uname)
+		docall(obj);
+	    m_useup(mon, obj);	/* after docall() */
+	    vis = FALSE;	/* skip makeknown() below */
+	    res = FALSE;	/* failed to cure sliming */
+	} else {
+	    m_useup(mon, obj);	/* before explode() */
+	    dmg = (2 * (rn1(3, 3) + 2 * bcsign(obj)) + 1) / 3;
+	    /* -11 => monster's fireball */
+	    explode(mon->mx, mon->my, -11, dmg, SCROLL_CLASS,
+		    /* by_you: override -11 for mon but not others */
+		    by_you ? -EXPL_FIERY : EXPL_FIERY);
+	}
+    } else {	/* wand/horn of fire w/ positive charge count */
+	mzapmsg(mon, obj, TRUE);
+	obj->spe--;
+	/* -1 => monster's wand of fire; 2 => # of damage dice */
+	(void)zhitm(mon, by_you ? 1 : -1, 2, &odummyp);
+    }
+
+    if (vis) {
+	if (res && mon->mhp > 0)
+	    pline("%s slime is burned away!", s_suffix(Monnam(mon)));
+	makeknown(otyp);
+    }
+    /* use up monster's next move */
+    mon->movement -= NORMAL_SPEED;
+    mon->mlstmv = monstermoves;
+    return res;
+}
+
+/* decide whether obj can be used to cure green slime */
+STATIC_OVL int
+cures_sliming(mon, obj)
+struct monst *mon;
+struct obj *obj;
+{
+    /* scroll of fire, non-empty wand or horn of fire */
+    if (obj->otyp == SCR_FIRE)
+	return (haseyes(mon->data) && mon->mcansee);
+    /* hero doesn't need hands or even limbs to zap, so mon doesn't either */
+    return ((obj->otyp == WAN_FIRE || obj->otyp == FIRE_HORN) && obj->spe > 0);
+}
+
+/* TRUE if monster appears to be green; for active TEXTCOLOR, we go by
+   the display color, otherwise we just pick things that seem plausibly
+   green (which doesn't necessarily match the TEXTCOLOR categorization) */
+STATIC_OVL boolean
+green_mon(mon)
+struct monst *mon;
+{
+    struct permonst *ptr = mon->data;
+
+    if (Hallucination) return FALSE;
+#ifdef TEXTCOLOR
+    if (iflags.use_color)
+	return (ptr->mcolor == CLR_GREEN || ptr->mcolor == CLR_BRIGHT_GREEN);
+#endif
+    /* approximation */
+    if (strstri(ptr->mname, "green")) return TRUE;
+    switch (monsndx(ptr)) {
+    case PM_FOREST_CENTAUR:
+    case PM_GARTER_SNAKE:
+    case PM_GECKO:
+    case PM_GREMLIN:
+    case PM_HOMUNCULUS:
+    case PM_JUIBLEX:
+    case PM_LEPRECHAUN:
+    case PM_LICHEN:
+    case PM_LIZARD:
+    case PM_WOOD_NYMPH:
+	return TRUE;
+    default:
+	if (is_elf(ptr) && !is_prince(ptr) && !is_lord(ptr) &&
+	    ptr != &mons[PM_GREY_ELF]) return TRUE;
+	break;
+    }
+    return FALSE;
 }
 
 /*muse.c*/

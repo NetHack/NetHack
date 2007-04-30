@@ -1162,10 +1162,16 @@ mdamagem(magr, mdef, mattk)
 	    case AD_SLIM:
 		if (cancelled) break;	/* physical damage only */
 		if (!rn2(4) && !slimeproof(pd)) {
-		    if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, vis))
-			pd = mdef->data;
-		    mdef->mstrategy &= ~STRAT_WAITFORU;
-		    res = MM_HIT;
+		    if (!munslime(mdef, FALSE) && mdef->mhp > 0) {
+			if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, vis))
+			    pd = mdef->data;
+			mdef->mstrategy &= ~STRAT_WAITFORU;
+			res = MM_HIT;
+		    }
+		    /* munslime attempt could have been fatal,
+		       potentially to multiple monsters (SCR_FIRE) */
+		    if (magr->mhp < 1) res |= MM_AGR_DIED;
+		    if (mdef->mhp < 1) res |= MM_DEF_DIED;
 		    tmp = 0;
 		}
 		break;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)explode.c	3.5	2005/11/12	*/
+/*	SCCS Id: @(#)explode.c	3.5	2007/04/27	*/
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -40,7 +40,7 @@ int expltype;
 	int uhurt = 0; /* 0=unhurt, 1=items damaged, 2=you and items damaged */
 	const char *str = (const char *) 0;
 	int idamres, idamnonres;
-	struct monst *mtmp;
+	struct monst *mtmp, *mdef = 0;
 	uchar adtyp;
 	int explmask[3][3];
 		/* 0=normal explosion, 1=do shieldeff, 2=do nothing */
@@ -65,6 +65,12 @@ int expltype;
 				  break;
 			default:  break;
 		}
+	}
+	/* muse_unslime: SCR_FIRE */
+	if (expltype < 0) {
+	    /* hero gets credit/blame for killing this monster, not others */
+	    mdef = m_at(x, y);
+	    expltype = -expltype;
 	}
 
 	if (olet == MON_EXPLODE) {
@@ -326,16 +332,21 @@ int expltype;
 			mtmp->mhp -= (idamres + idamnonres);
 		}
 		if (mtmp->mhp <= 0) {
-			/* KMH -- Don't blame the player for pets killing gas spores */
-			if (!context.mon_moving) killed(mtmp);
-			else monkilled(mtmp, "", (int)adtyp);
-		} else if (!context.mon_moving) setmangry(mtmp);
+		    if (mdef ? (mtmp == mdef) : !context.mon_moving)
+			killed(mtmp);
+		    else
+			monkilled(mtmp, "", (int)adtyp);
+		} else if (!context.mon_moving) {
+		    /* all affected monsters, even if mdef is set */
+		    setmangry(mtmp);
+		}
 	}
 
 	/* Do your injury last */
 	if (uhurt) {
-		if ((type >= 0 || adtyp == AD_PHYS) &&	/* gas spores */
-				flags.verbose && olet != SCROLL_CLASS) {
+		/* give message for any monster-induced explosion
+		   or player-induced one other than scroll of fire */
+		if (flags.verbose && (type < 0 || olet != SCROLL_CLASS)) {
 		    if (do_hallu) {	/* (see explanation above) */
 			do {
 			    Sprintf(hallu_buf, "%s explosion",
