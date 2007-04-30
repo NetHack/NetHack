@@ -693,12 +693,12 @@ mdamagem(magr, mdef, mattk)
 	switch(mattk->adtyp) {
 	    case AD_DGST:
 		/* eating a Rider or its corpse is fatal */
-		if (is_rider(mdef->data)) {
+		if (is_rider(pd)) {
 		    if (vis)
 			pline("%s %s!", Monnam(magr),
-			      mdef->data == &mons[PM_FAMINE] ?
+			      pd == &mons[PM_FAMINE] ?
 				"belches feebly, shrivels up and dies" :
-			      mdef->data == &mons[PM_PESTILENCE] ?
+			      pd == &mons[PM_PESTILENCE] ?
 				"coughs spasmodically and collapses" :
 				"vomits violently and drops dead");
 		    mondied(magr);
@@ -720,7 +720,7 @@ mdamagem(magr, mdef, mattk)
 		 * No nutrition from G_NOCORPSE monster, eg, undead.
 		 * DGST monsters don't die from undead corpses
 		 */
-		num = monsndx(mdef->data);
+		num = monsndx(pd);
 		if (magr->mtame && !magr->isminion &&
 		    !(mvitals[num].mvflags & G_NOCORPSE)) {
 		    struct obj *virtualcorpse = mksobj(CORPSE, FALSE, FALSE);
@@ -740,7 +740,7 @@ mdamagem(magr, mdef, mattk)
 		if (magr->mcan) break;
 		if (canseemon(mdef))
 		    pline("%s %s for a moment.", Monnam(mdef),
-			  makeplural(stagger(mdef->data, "stagger")));
+			  makeplural(stagger(pd, "stagger")));
 		mdef->mstun = 1;
 		goto physical;
 	    case AD_LEGS:
@@ -770,8 +770,8 @@ mdamagem(magr, mdef, mattk)
 			if (tmp)
 				mrustm(magr, mdef, otmp);
 		    }
-		} else if (magr->data == &mons[PM_PURPLE_WORM] &&
-			    mdef->data == &mons[PM_SHRIEKER]) {
+		} else if (pa == &mons[PM_PURPLE_WORM] &&
+			    pd == &mons[PM_SHRIEKER]) {
 		    /* hack to enhance mm_aggression(); we don't want purple
 		       worm's bite attack to kill a shrieker because then it
 		       won't swallow the corpse; but if the target survives,
@@ -785,8 +785,7 @@ mdamagem(magr, mdef, mattk)
 		    break;
 		}
 		if (vis)
-		    pline("%s is %s!", Monnam(mdef),
-			  on_fire(mdef->data, mattk));
+		    pline("%s is %s!", Monnam(mdef), on_fire(pd, mattk));
 		if (pd == &mons[PM_STRAW_GOLEM] ||
 		    pd == &mons[PM_PAPER_GOLEM]) {
 			if (vis) pline("%s burns completely!", Monnam(mdef));
@@ -1114,8 +1113,7 @@ mdamagem(magr, mdef, mattk)
 			if (mdef->mhp <= 0)
 				return (MM_DEF_DIED | (grow_up(magr,mdef) ?
 							0 : MM_AGR_DIED));
-			if (magr->data->mlet == S_NYMPH &&
-			    !tele_restrict(magr)) {
+			if (pa->mlet == S_NYMPH && !tele_restrict(magr)) {
 			    (void) rloc(magr, FALSE);
 			    if (vis && !canspotmon(magr))
 				pline("%s suddenly disappears!", buf);
@@ -1163,11 +1161,11 @@ mdamagem(magr, mdef, mattk)
 		break;
 	    case AD_SLIM:
 		if (cancelled) break;	/* physical damage only */
-		if (!rn2(4) && !flaming(mdef->data) &&
-				!noncorporeal(mdef->data) &&
-				mdef->data != &mons[PM_GREEN_SLIME]) {
-		    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, vis);
+		if (!rn2(4) && !slimeproof(pd)) {
+		    if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, vis))
+			pd = mdef->data;
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
+		    res = MM_HIT;
 		    tmp = 0;
 		}
 		break;
@@ -1202,16 +1200,17 @@ mdamagem(magr, mdef, mattk)
 		 * after monkilled() to provide better message ordering */
 		if (mdef->cham >= LOW_PM) {
 		    (void) newcham(magr, (struct permonst *)0, FALSE, TRUE);
-		} else if (mdef->data == &mons[PM_GREEN_SLIME]) {
+		} else if (pd == &mons[PM_GREEN_SLIME] && !slimeproof(pa)) {
 		    (void) newcham(magr, &mons[PM_GREEN_SLIME], FALSE, TRUE);
-		} else if (mdef->data == &mons[PM_WRAITH]) {
+		} else if (pd == &mons[PM_WRAITH]) {
 		    (void) grow_up(magr, (struct monst *)0);
 		    /* don't grow up twice */
 		    return (MM_DEF_DIED | (magr->mhp > 0 ? 0 : MM_AGR_DIED));
-		} else if (mdef->data == &mons[PM_NURSE]) {
+		} else if (pd == &mons[PM_NURSE]) {
 		    magr->mhp = magr->mhpmax;
 		}
 	    }
+	    /* caveat: above digestion handling doesn't keep `pa' up to date */
 
 	    return (MM_DEF_DIED | (grow_up(magr,mdef) ? 0 : MM_AGR_DIED));
 	}

@@ -1348,7 +1348,7 @@ register struct attack *mattk;
 	    case AD_STUN:
 		if(!Blind)
 		    pline("%s %s for a moment.", Monnam(mdef),
-			  makeplural(stagger(mdef->data, "stagger")));
+			  makeplural(stagger(pd, "stagger")));
 		mdef->mstun = 1;
 		goto physical;
 	    case AD_LEGS:
@@ -1364,8 +1364,8 @@ register struct attack *mattk;
 		if(mattk->aatyp == AT_WEAP) {
 		    if(uwep) tmp = 0;
 		} else if(mattk->aatyp == AT_KICK) {
-		    if(thick_skinned(mdef->data)) tmp = 0;
-		    if(mdef->data == &mons[PM_SHADE]) {
+		    if (thick_skinned(pd)) tmp = 0;
+		    if (pd == &mons[PM_SHADE]) {
 			if (!(uarmf && uarmf->blessed)) {
 			    impossible("bad shade attack function flow?");
 			    tmp = 0;
@@ -1390,8 +1390,7 @@ register struct attack *mattk;
 		    break;
 		}
 		if (!Blind)
-		    pline("%s is %s!", Monnam(mdef),
-			  on_fire(mdef->data, mattk));
+		    pline("%s is %s!", Monnam(mdef), on_fire(pd, mattk));
 		if (pd == &mons[PM_STRAW_GOLEM] ||
 		    pd == &mons[PM_PAPER_GOLEM]) {
 		    if (!Blind)
@@ -1515,7 +1514,7 @@ register struct attack *mattk;
 		break;
 	    case AD_CURS:
 		if (night() && !rn2(10) && !mdef->mcan) {
-		    if (mdef->data == &mons[PM_CLAY_GOLEM]) {
+		    if (pd == &mons[PM_CLAY_GOLEM]) {
 			if (!Blind)
 			    pline("Some writing vanishes from %s head!",
 				s_suffix(mon_nam(mdef)));
@@ -1582,10 +1581,10 @@ register struct attack *mattk;
 	      {
 		struct obj *helmet;
 
-		if (notonhead || !has_head(mdef->data)) {
+		if (notonhead || !has_head(pd)) {
 		    pline("%s doesn't seem harmed.", Monnam(mdef));
 		    tmp = 0;
-		    if (!Unchanging && mdef->data == &mons[PM_GREEN_SLIME]) {
+		    if (!Unchanging && pd == &mons[PM_GREEN_SLIME]) {
 			if (!Slimed) {
 			    You("suck in some slime and don't feel very well.");
 			    make_slimed(10L, (char*) 0);
@@ -1606,11 +1605,11 @@ register struct attack *mattk;
 		break;
 	      }
 	    case AD_STCK:
-		if (!negated && !sticks(mdef->data))
+		if (!negated && !sticks(pd))
 		    u.ustuck = mdef; /* it's now stuck to you */
 		break;
 	    case AD_WRAP:
-		if (!sticks(mdef->data)) {
+		if (!sticks(pd)) {
 		    if (!u.ustuck && !rn2(10)) {
 			if (m_slips_free(mdef, mattk)) {
 			    tmp = 0;
@@ -1621,8 +1620,8 @@ register struct attack *mattk;
 			}
 		    } else if(u.ustuck == mdef) {
 			/* Monsters don't wear amulets of magical breathing */
-			if (is_pool(u.ux,u.uy) && !is_swimmer(mdef->data) &&
-			    !amphibious(mdef->data)) {
+			if (is_pool(u.ux,u.uy) && !is_swimmer(pd) &&
+				!amphibious(pd)) {
 			    You("drown %s...", mon_nam(mdef));
 			    tmp = mdef->mhp;
 			} else if(mattk->aatyp == AT_HUGS)
@@ -1652,11 +1651,10 @@ register struct attack *mattk;
 		break;
 	    case AD_SLIM:
 		if (negated) break;	/* physical damage only */
-		if (!rn2(4) && !flaming(mdef->data) &&
-				!noncorporeal(mdef->data) &&
-				mdef->data != &mons[PM_GREEN_SLIME]) {
+		if (!rn2(4) && !slimeproof(pd)) {
 		    You("turn %s into slime.", mon_nam(mdef));
-		    (void) newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE);
+		    if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE))
+			pd = mdef->data;
 		    tmp = 0;
 		}
 		break;

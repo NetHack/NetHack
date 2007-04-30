@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.h	3.5	2005/10/05	*/
+/*	SCCS Id: @(#)mondata.h	3.5	2007/04/27	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -57,6 +57,8 @@
 #define slithy(ptr)		(((ptr)->mflags1 & M1_SLITHY) != 0L)
 #define is_wooden(ptr)		((ptr) == &mons[PM_WOOD_GOLEM])
 #define thick_skinned(ptr)	(((ptr)->mflags1 & M1_THICK_HIDE) != 0L)
+#define slimeproof(ptr)		((ptr) == &mons[PM_GREEN_SLIME] || \
+				 flaming(ptr) || noncorporeal(ptr))
 #define lays_eggs(ptr)		(((ptr)->mflags1 & M1_OVIPAROUS) != 0L)
 #define regenerates(ptr)	(((ptr)->mflags1 & M1_REGEN) != 0L)
 #define perceives(ptr)		(((ptr)->mflags1 & M1_SEE_INVIS) != 0L)

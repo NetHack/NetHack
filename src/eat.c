@@ -687,8 +687,7 @@ register int pm;
 		    return;
 		}
 	    case PM_GREEN_SLIME:
-		if (!Slimed && !Unchanging && !flaming(youmonst.data) &&
-			youmonst.data != &mons[PM_GREEN_SLIME]) {
+		if (!Slimed && !Unchanging && !slimeproof(youmonst.data)) {
 		    You("don't feel very well.");
 		    make_slimed(10L, (char*) 0);
 		    delayed_killer(SLIMED, KILLED_BY_AN, nul);
@@ -2146,8 +2145,7 @@ struct obj *otmp;
 				!poly_when_stoned(youmonst.data));
 
 		if (mnum == PM_GREEN_SLIME)
-		    stoneorslime = (!Unchanging && !flaming(youmonst.data) &&
-			youmonst.data != &mons[PM_GREEN_SLIME]);
+		    stoneorslime = (!Unchanging && !slimeproof(youmonst.data));
 
 		if (cadaver && !nonrotting_corpse(mnum)) {
 			long age = peek_at_iced_corpse_age(otmp);
