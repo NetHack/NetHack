@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)data.base	3.5	2007/02/08
+#	SCCS Id: @(#)data.base	3.5	2007/04/29
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -231,13 +231,27 @@ apple
 	and disciples have advanced so far as to be able to say
 	when.
 		[ The Devil's Dictionary, by Ambrose Bierce ]
-archeologist
+archeolog*
 * archeologist
 	Archeology is the search for fact, not truth. [...]
 	So forget any ideas you've got about lost cities, exotic travel,
 	and digging up the world. We do not follow maps to buried
 	treasure, and X never, ever, marks the spot.
 		[ Indiana Jones and the Last Crusade ]
+
+	"I cannot be having with archeological excavations, myself,"
+	I said.  "The fellows who dig them only ever find tiny walls
+	and a few bits of broken pottery, and then they get all
+	excited and swear that they have just made the most
+	important discovery of the century, the ruins of a mile-high
+	gold-covered temple to Frogmore the God of Bike-Saddle
+	Fixtures or some such."
+	"I think you will find," said Mr Rune, "that they do this
+	in order to secure further government funding for their
+	diggings and so remain in employment."
+	"That is a rather cynical view," I said.
+		[ the brightonomicon, by Robert Rankin ]
+#		[title & author: same situation as with "bad luck" entry]
 archon
 	Archons are the predominant inhabitants of the heavens.
 	However unusual their appearance, they are not generally
@@ -914,6 +928,21 @@ zorkmid*
 	and says "In Frobs We Trust" in several languages.
 		[ Zork Zero, by Infocom ]
 # not "stethoscope"
+combat
+fight
+fracas
+melee
+spat
+squabble
+tiff
+	[Scene: Mr. Moon and Gilbert enter tavern and discover many
+	corpses strewn about the place; Blind Pew is sole survivor.]
+	Blind Pew:  Evening.  Sounded as though there has been a bit
+	            of a squabble.
+	 Mr. Moon:  Squabble?  They're all dead.
+	Blind Pew:  Oh.  Must have been more of a tiff then.
+		[ Yellowbeard, directed by Mel Damski, screenplay
+		  by Graham Chapman, Peter Cook, Bernard McKenna ]
 cope
 * cope
 	The cope is a liturgical vestment which may be worn by any
@@ -3892,6 +3921,19 @@ poseido*n
 	preservative instinct of the race is to be unscientific --
 	and without science we are as the snakes and toads.
 		[ The Devil's Dictionary, by Ambrose Bierce ]
+
+	Jack Burton:  What's in the flask, Egg?  Magic potion?
+	   Egg Shen:  Yeah.
+	       Jack:  I thought so, good.  What do we do?  Drink it?
+	        Egg:  Yeah.
+	       Jack:  Good, I thought so.
+	     [later]
+	       Jack:  This does what again, exactly?
+	        Egg:  Huge buzz!  [drinks]  Oh good!  See things no
+	              one else can see, do things no one else can do.
+		[ Big in Trouble in Little China, directed by
+		  John Carpenter, written by Gary Goldman &
+		  David Z. Weinstein, adaptation by W. D. Richter ]
 pray*
 	Whatever a man prays for, he prays for a miracle.  Every
 	prayer reduces itself to this:  Great God, grant that twice
