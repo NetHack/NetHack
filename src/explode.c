@@ -45,7 +45,7 @@ int expltype;
 	int explmask[3][3];
 		/* 0=normal explosion, 1=do shieldeff, 2=do nothing */
 	boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
-		do_hallu = FALSE;
+		do_hallu = FALSE, inside_engulfer;
 	char hallu_buf[BUFSZ];
 	short exploding_wand_typ = 0;
 
@@ -72,6 +72,9 @@ int expltype;
 	    mdef = m_at(x, y);
 	    expltype = -expltype;
 	}
+	/* if hero is engulfed and caused the explosion, only hero and
+	   engulfer will be affected */
+	inside_engulfer = (u.uswallow && type >= 0);
 
 	if (olet == MON_EXPLODE) {
 	    str = killer.name;
@@ -243,7 +246,7 @@ int expltype;
 		str = "explosion";
 		generic = TRUE;
 	    }
-	    if (!Deaf) You_hear("a blast.");
+	    if (!Deaf && olet != SCROLL_CLASS) You_hear("a blast.");
 	}
 
     if (dam)
@@ -251,10 +254,12 @@ int expltype;
 		if (explmask[i][j] == 2) continue;
 		if (i+x-1 == u.ux && j+y-1 == u.uy)
 			uhurt = (explmask[i][j] == 1) ? 1 : 2;
+		/* for inside_engulfer, only <u.ux,u.uy> is affected */
+		else if (inside_engulfer) continue;
 		idamres = idamnonres = 0;
-		if (type >= 0)
+		if (type >= 0 && !u.uswallow)
 		    (void)zap_over_floor((xchar)(i+x-1), (xchar)(j+y-1),
-		    		type, &shopdamage, exploding_wand_typ);
+				type, &shopdamage, exploding_wand_typ);
 
 		mtmp = m_at(i+x-1, j+y-1);
 #ifdef STEED
@@ -318,9 +323,10 @@ int expltype;
 			int mdam = dam;
 
 			if (resist(mtmp, olet, 0, FALSE)) {
-			    if (cansee(i+x-1,j+y-1))
+			    /* inside_engulfer: <i+x-1,j+y-1> == <u.ux,u.uy> */
+			    if (cansee(i+x-1,j+y-1) || inside_engulfer)
 				pline("%s resists the %s!", Monnam(mtmp), str);
-			    mdam = dam/2;
+			    mdam = (dam + 1) / 2;
 			}
 			if (mtmp == u.ustuck)
 				mdam *= 2;
@@ -420,6 +426,7 @@ int expltype;
 	/* explosions are noisy */
 	i = dam * dam;
 	if (i < 50) i = 50;	/* in case random damage is very small */
+	if (inside_engulfer) i = (i + 3) / 4;
 	wake_nearto(x, y, i);
 }
 
