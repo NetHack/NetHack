@@ -224,6 +224,8 @@ hiding monsters who are unhidden when hero leaves a level can hide upon return
 touching a pile of objects while blind affects hero even when the pile is
 	big enough to give "there are many objects here" and not list them
 explosion while engulfed only affects engulfer and hero, not adjacent monsters
+eliminate case-sensitivity when converting words from singular to plural and
+	vice versa, so some failing wishes like "Gauntlets of Power" now work
 
 
 Platform- and/or Interface-Specific Fixes

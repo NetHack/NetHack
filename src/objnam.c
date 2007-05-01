@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2007/02/26	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2007/04/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1620,18 +1620,22 @@ static const char wrpsym[] = {
  * can still break the code.  However, it's still a lot more accurate than
  * "just add an s at the end", which Rogue uses...
  *
- * Also used for plural monster names ("Wiped out all homunculi.")
- * and body parts.
+ * Also used for plural monster names ("Wiped out all homunculi." or the
+ * vanquished monsters list) and body parts.  A lot of unique monsters have
+ * names which get mangled by makeplural and/or makesingular.  They're not
+ * genocidable, and vanquished-mon handling does its own special casing
+ * (for uniques who've been revived and re-killed), so we don't bother
+ * trying to get those right here.
  *
  * Also misused by muse.c to convert 1st person present verbs to 2nd person.
+ * 3.5.0: made case-insensitive.
  */
 char *
 makeplural(oldstr)
 const char *oldstr;
 {
-	/* Note: cannot use strcmpi here -- it'd give MATZot, CAVEMeN,... */
 	register char *spot;
-	char *str = nextobuf();
+	char lo_c, *str = nextobuf();
 	const char *excess = (char *)0;
 	int len;
 
@@ -1649,27 +1653,27 @@ const char *oldstr;
 	 * and pair for objects and non-humans, e.g. 3 pair of boots.  We don't
 	 * refer to pairs of humans in this game so just skip to the bottom.
 	 */
-	if (!strncmp(str, "pair of ", 8))
+	if (!strncmpi(str, "pair of ", 8))
 		goto bottom;
 
 	/* Search for common compounds, ex. lump of royal jelly */
-	for(spot=str; *spot; spot++) {
-		if (!strncmp(spot, " of ", 4)
-				|| !strncmp(spot, " labeled ", 9)
-				|| !strncmp(spot, " called ", 8)
-				|| !strncmp(spot, " named ", 7)
-				|| !strcmp(spot, " above") /* lurkers above */
-				|| !strncmp(spot, " versus ", 8)
-				|| !strncmp(spot, " from ", 6)
-				|| !strncmp(spot, " in ", 4)
-				|| !strncmp(spot, " on ", 4)
-				|| !strncmp(spot, " a la ", 6)
-				|| !strncmp(spot, " with", 5)	/* " with "? */
-				|| !strncmp(spot, " de ", 4)
-				|| !strncmp(spot, " d'", 3)
-				|| !strncmp(spot, " du ", 4)
-				|| !strncmp(spot, "-in-", 4)
-				|| !strncmp(spot, "-at-", 4)) {
+	for (spot = str; *spot; spot++) {
+		if (!strncmpi(spot, " of ", 4) ||
+		    !strncmpi(spot, " labeled ", 9) ||
+		    !strncmpi(spot, " called ", 8) ||
+		    !strncmpi(spot, " named ", 7) ||
+		    !strcmpi(spot, " above") || /* lurkers above */
+		    !strncmpi(spot, " versus ", 8) ||
+		    !strncmpi(spot, " from ", 6) ||
+		    !strncmpi(spot, " in ", 4) ||
+		    !strncmpi(spot, " on ", 4) ||
+		    !strncmpi(spot, " a la ", 6) ||
+		    !strncmpi(spot, " with", 5) ||	/* " with "? */
+		    !strncmpi(spot, " de ", 4) ||
+		    !strncmpi(spot, " d'", 3) ||
+		    !strncmpi(spot, " du ", 4) ||
+		    !strncmpi(spot, "-in-", 4) ||
+		    !strncmpi(spot, "-at-", 4)) {
 			excess = oldstr + (int) (spot - str);
 			*spot = 0;
 			break;
@@ -1688,160 +1692,172 @@ const char *oldstr;
 		goto bottom;
 	}
 
-	/* Same singular and plural; mostly Japanese words except for "manes" */
-	if ((len == 2 && !strcmp(str, "ya")) ||
-	    (len >= 2 && !strcmp(spot-1, "ai")) || /* samurai, Uruk-hai */
-	    (len >= 3 && !strcmp(spot-2, " ya")) ||
-	    (len >= 4 &&
-	     (!strcmp(spot-3, "fish") || !strcmp(spot-3, "tuna") ||
-	      !strcmp(spot-3, "deer") || !strcmp(spot-3, "yaki"))) ||
-	    (len >= 5 && (!strcmp(spot-4, "sheep") ||
-			!strcmp(spot-4, "ninja") ||
-			!strcmp(spot-4, "ronin") ||
-			!strcmp(spot-4, "shito") ||
-			!strcmp(spot-7, "shuriken") ||
-			!strcmp(spot-4, "tengu") ||
-			!strcmp(spot-4, "manes"))) ||
-	    (len >= 6 && (!strcmp(spot-5, "ki-rin") ||
-			!strcmp(spot-5, "Nazgul"))) ||
-	    (len >= 7 && !strcmp(spot-6, "gunyoki")))
+    {
+	static const char *const as_is[] = {
+	    /* already plural and/or makesingular() leaves untouched */
+	    "men",	/* also catches women, watchmen */
+	    "cubi", "culi", "feet",	/* in-/suc-cubi, homun-culi */
+	    "algae", "boots", "djinn", "fungi", "shoes", "teeth",
+	    "gloves", "lenses", "matzot", "rtices", "scales",
+	    "erinyes", "mumakil", "nemeses",
+	    "children",
+	    "gauntlets",
+#ifdef WIZARD
+	    "iron bars",
+#endif
+	    /* both singular and plural are spelled the same */
+	    "deer", "fish", "tuna", "yaki",
+	    "manes", "ninja", "sheep", "ronin", "roshi", "shito", "tengu",
+	    "ki-rin", "Nazgul",
+	    "gunyoki",
+	    "shuriken",
+	    0,
+	};
+	const char *const *as;
+	int al;
+
+	for (as = as_is; *as; ++as) {
+	    al = (int)strlen(*as);
+	    if (len >= al && !strcmpi(spot - (al - 1), *as))
 		goto bottom;
+	}
+
+	/* more of same, but not suitable for blanket loop checking */
+	if ((len == 2 && !strcmpi(str, "ya")) ||
+	    (len >= 2 && !strcmpi(spot-1, "ai")) || /* samurai, Uruk-hai */
+	    (len >= 3 && !strcmpi(spot-2, " ya")))
+		goto bottom;
+    }
 
 	/* man/men ("Wiped out all cavemen.") */
-	if (len >= 3 && !strcmp(spot-2, "man") &&
-			(len<6 || strcmp(spot-5, "shaman")) &&
-			(len<5 || strcmp(spot-4, "human"))) {
-		*(spot-1) = 'e';
+	if (len >= 3 && !strcmpi(spot-2, "man") &&
+			/* exclude shamans and humans */
+			(len < 6 || strcmpi(spot-5, "shaman")) &&
+			(len < 5 || strcmpi(spot-4, "human"))) {
+		Strcasecpy(spot-1, "en");
 		goto bottom;
 	}
-
 	/* tooth/teeth */
-	if (len >= 5 && !strcmp(spot-4, "tooth")) {
-		Strcpy(spot-3, "eeth");
+	if (len >= 5 && !strcmpi(spot-4, "tooth")) {
+		Strcasecpy(spot-3, "eeth");
 		goto bottom;
 	}
-
-	/* knife/knives, etc... */
-	if (!strcmp(spot-1, "fe")) {
-		Strcpy(spot-1, "ves");
+	/* knife/knives, etc..., staff/staves */
+	if (!strcmpi(spot-1, "fe") ||
+	    (!strcmpi(spot-1, "ff") &&
+		(len >= 5 && !strncmpi(spot-4, "staf", 4)))) {
+		/* fe or ff to ves */
+		Strcasecpy(spot-1, "ves");
 		goto bottom;
-	} else if (*spot == 'f') {
-		if (index("lr", *(spot-1)) || index(vowels, *(spot-1))) {
-			Strcpy(spot, "ves");
-			goto bottom;
-		} else if (len >= 5 && !strncmp(spot-4, "staf", 4)) {
-			Strcpy(spot-1, "ves");
+	} else if (lowc(*spot) == 'f') {
+		lo_c = lowc(*(spot-1));
+		if (len >= 3 && !strcmpi(spot-2, "erf")) {
+			/* avoid "nerf" -> "nerves", "serf" -> "serves" */
+			;	/* fall through to default (append 's') */
+		} else if (index("lr", lo_c) || index(vowels, lo_c)) {
+			/* [aeioulr]f to [aeioulr]ves */
+			Strcasecpy(spot, "ves");
 			goto bottom;
 		}
 	}
-
 	/* foot/feet (body part) */
-	if (len >= 4 && !strcmp(spot-3, "foot")) {
-		Strcpy(spot-2, "eet");
+	if (len >= 4 && !strcmpi(spot-3, "foot")) {
+		Strcasecpy(spot-2, "eet");
 		goto bottom;
 	}
-
 	/* ium/ia (mycelia, baluchitheria) */
-	if (len >= 3 && !strcmp(spot-2, "ium")) {
-		*(spot--) = (char)0;
-		*spot = 'a';
+	if (len >= 3 && !strcmpi(spot-2, "ium")) {
+		Strcasecpy(spot-2, "ia");
 		goto bottom;
 	}
-
 	/* algae, larvae, hyphae (another fungus part) */
-	if ((len >= 4 && !strcmp(spot-3, "alga")) ||
-	    (len >= 5 &&
-	     (!strcmp(spot-4, "hypha") || !strcmp(spot-4, "larva")))) {
-		Strcpy(spot, "ae");
+	if ((len >= 4 && !strcmpi(spot-3, "alga")) ||
+	    (len >= 5 && (!strcmpi(spot-4, "hypha") ||
+			  !strcmpi(spot-4, "larva")))) {
+		/* a to ae */
+		Strcasecpy(spot+1, "e");
 		goto bottom;
 	}
-
 	/* fungus/fungi, homunculus/homunculi, but buses, lotuses, wumpuses */
-	if (len > 3 && !strcmp(spot-1, "us") &&
-	    (len < 5 || (strcmp(spot-4, "lotus") &&
-			 (len < 6 || strcmp(spot-5, "wumpus"))))) {
-		*(spot--) = (char)0;
-		*spot = 'i';
+	if (len > 3 && !strcmpi(spot-1, "us") &&
+		!((len >= 5 && !strcmpi(spot-4, "lotus")) ||
+		  (len >= 6 && !strcmpi(spot-5, "wumpus")))) {
+		Strcasecpy(spot-1, "i");
 		goto bottom;
 	}
-
 	/* vortex/vortices */
-	if (len >= 6 && !strcmp(spot-3, "rtex")) {
-		Strcpy(spot-1, "ices");
+	if (len >= 6 && !strcmpi(spot-3, "rtex")) {
+		Strcasecpy(spot-1, "ices");	/* ex -> ices */
 		goto bottom;
 	}
-
 	/* djinni/djinn (note: also efreeti/efreet) */
-	if (len >= 6 && !strcmp(spot-5, "djinni")) {
-		*spot = (char)0;
+	if (len >= 6 && !strcmpi(spot-5, "djinni")) {
+		*spot = '\0';	/* drop 'i' */
 		goto bottom;
 	}
-
 	/* mumak/mumakil */
-	if (len >= 5 && !strcmp(spot-4, "mumak")) {
-		Strcpy(spot+1, "il");
+	if (len >= 5 && !strcmpi(spot-4, "mumak")) {
+		Strcasecpy(spot+1, "il");
 		goto bottom;
 	}
-
 	/* sis/ses (nemesis) */
-	if (len >= 3 && !strcmp(spot-2, "sis")) {
-		*(spot-1) = 'e';
+	if (len >= 3 && !strcmpi(spot-2, "sis")) {
+		Strcasecpy(spot-1, "es");
 		goto bottom;
 	}
-
 	/* erinys/erinyes */
-	if (len >= 6 && !strcmp(spot-5, "erinys")) {
-		Strcpy(spot, "es");
+	if (len >= 6 && !strcmpi(spot-5, "erinys")) {
+		Strcasecpy(spot, "es");	/* s -> es */
 		goto bottom;
 	}
-
 	/* mouse/mice,louse/lice (not a monster, but possible in food names) */
-	if (len >= 5 && !strcmp(spot-3, "ouse") && index("MmLl", *(spot-4))) {
-		Strcpy(spot-3, "ice");
+	if (len >= 5 && !strcmpi(spot-3, "ouse") &&
+	    index("ml", lowc(*(spot-4)))) {
+		Strcasecpy(spot-3, "ice");
 		goto bottom;
 	}
-
 	/* matzoh/matzot, possible food name */
-	if (len >= 6 && (!strcmp(spot-5, "matzoh")
-					|| !strcmp(spot-5, "matzah"))) {
-		Strcpy(spot-1, "ot");
+	if (len >= 6 && (!strcmpi(spot-5, "matzoh") ||
+			 !strcmpi(spot-5, "matzah"))) {
+		Strcasecpy(spot-1, "ot");	/* oh/ah -> ot */
 		goto bottom;
 	}
-	if (len >= 5 && (!strcmp(spot-4, "matzo")
-					|| !strcmp(spot-4, "matza"))) {
-		Strcpy(spot, "ot");
+	if (len >= 5 && (!strcmpi(spot-4, "matzo") ||
+			 !strcmpi(spot-4, "matza"))) {
+		Strcasecpy(spot, "ot");	/* o/a -> ot */
 		goto bottom;
 	}
-
 	/* child/children (for wise guys who give their food funny names) */
-	if (len >= 5 && !strcmp(spot-4, "child")) {
-		Strcpy(spot, "dren");
+	if (len >= 5 && !strcmpi(spot-4, "child")) {
+		Strcasecpy(spot+1, "ren");
 		goto bottom;
 	}
 
 	/* note: -eau/-eaux (gateau, bordeau...) */
 	/* note: ox/oxen, VAX/VAXen, goose/geese */
 
+	lo_c = lowc(*spot);
+
 	/* Ends in z, x, s, ch, sh; add an "es" */
-	if (index("zxs", *spot)
-			|| (len >= 2 && *spot=='h' && index("cs", *(spot-1)))
+	if (index("zxs", lo_c) ||
+	    (len >= 2 && lo_c == 'h' && index("cs", lowc(*(spot-1)))) ||
 	/* Kludge to get "tomatoes" and "potatoes" right */
-			|| (len >= 4 && !strcmp(spot-2, "ato"))) {
-		Strcpy(spot+1, "es");
+	    (len >= 4 && !strcmpi(spot-2, "ato")) ||
+	    (len >= 5 && !strcmpi(spot-4, "dingo"))) {
+		Strcasecpy(spot+1, "es");	/* append es */
 		goto bottom;
 	}
-
 	/* Ends in y preceded by consonant (note: also "qu") change to "ies" */
-	if (*spot == 'y' &&
-	    (!index(vowels, *(spot-1)))) {
-		Strcpy(spot, "ies");
+	if (lo_c == 'y' &&
+	    !index(vowels, lowc(*(spot-1)))) {
+		Strcasecpy(spot, "ies");	/* y -> ies */
 		goto bottom;
 	}
-
 	/* Default: append an 's' */
-	Strcpy(spot+1, "s");
+	Strcasecpy(spot+1, "s");
 
-bottom:	if (excess) Strcpy(eos(str), excess);
+ bottom:
+	if (excess) Strcat(str, excess);
 	return str;
 }
 
@@ -1888,6 +1904,13 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
  * Singularize a string the user typed in; this helps reduce the complexity
  * of readobjnam, and is also used in pager.c to singularize the string
  * for which help is sought.
+ *
+ * "Manes" is ambiguous: monster type (keep s), or horse body part (drop s)?
+ * We assume the latter since it doesn't require any extra handling.
+ *
+ * A lot of unique monsters have names ending in s; plural, or singular
+ * from plural, doesn't make much sense for them so we don't bother trying.
+ * 3.5.0: made case-insensitive.
  */
 char *
 makesingular(oldstr)
@@ -1913,94 +1936,158 @@ const char *oldstr;
 		(p = strstri(bp, "-in-")) != 0 ||
 		(p = strstri(bp, "-at-")) != 0) {
 	    /* [wo]men-at-arms -> [wo]man-at-arms; takes "not end in s" exit */
-	    if (!BSTRNCMP(bp, p-3, "men", 3)) *(p-2) = 'a';
-	    if (BSTRNCMP(bp, p-1, "s", 1)) return bp;	/* wasn't plural */
+	    if (!BSTRNCMPI(bp, p-3, "men", 3)) {
+		char c = *p;	/* Strcasecpy will clobber *p with '\0' */
+		Strcasecpy(p-2, "an");
+		*p = c;
+	    }
+	    if (BSTRNCMPI(bp, p-1, "s", 1)) return bp;	/* wasn't plural */
+
 	    --p;		/* back up to the 's' */
 	    /* but don't singularize "gauntlets", "boots", "Eyes of the.." */
 	    if (BSTRNCMPI(bp, p-3, "Eye", 3) &&
-		BSTRNCMP(bp, p-4, "boot", 4) &&
-		BSTRNCMP(bp, p-8, "gauntlet", 8))
+		BSTRNCMPI(bp, p-4, "boot", 4) &&
+		BSTRNCMPI(bp, p-8, "gauntlet", 8))
 		while ((*p = *(p+1)) != 0) p++;
 	    return bp;
 	}
 
 	/* remove -s or -es (boxes) or -ies (rubies) */
 	p = eos(bp);
-	if (p >= bp+1 && p[-1] == 's') {
-		if (p >= bp+2 && p[-2] == 'e') {
-			if (p >= bp+3 && p[-3] == 'i') {
-				if(!BSTRCMP(bp, p-7, "cookies") ||
-				   !BSTRCMP(bp, p-4, "pies"))
+	if (p >= bp+1 && lowc(p[-1]) == 's') {
+		if (p >= bp+2 && lowc(p[-2]) == 'e') {
+			if (p >= bp+3 && lowc(p[-3]) == 'i') {	/* "ies" */
+				if (!BSTRCMPI(bp, p-7, "cookies") ||
+				    !BSTRCMPI(bp, p-4, "pies") ||
+				    !BSTRCMPI(bp, p-5, "yries")) /* valkyrie */
 					goto mins;
-				Strcpy(p-3, "y");
+				Strcasecpy(p-3, "y");	/* ies -> y */
 				return bp;
 			}
-
+			/* keep as-is */
+			if (!BSTRCMPI(bp, p-6, "gloves") ||
+			    !BSTRCMPI(bp, p-6, "lenses") ||
+			    !BSTRCMPI(bp, p-6, "scales") ||
+			    !BSTRCMPI(bp, p-5, "shoes"))
+				return bp;
 			/* note: cloves / knives from clove / knife */
-			if(!BSTRCMP(bp, p-6, "knives")) {
-				Strcpy(p-3, "fe");
+			if (!BSTRCMPI(bp, p-6, "knives")) {
+				Strcasecpy(p-3, "fe");	/* ves -> fe */
 				return bp;
 			}
-			if(!BSTRCMP(bp, p-6, "staves")) {
-				Strcpy(p-3, "ff");
+			if (!BSTRCMPI(bp, p-6, "staves")) {
+				Strcasecpy(p-3, "ff");	/* ves -> ff */
 				return bp;
 			}
-			if (!BSTRCMPI(bp, p-6, "leaves")) {
-				Strcpy(p-3, "f");
+			/* wolves, but f to ves isn't fully reversible */
+			if (p-4 >= bp && (index("lr", lowc(*(p-4))) ||
+					  index(vowels, lowc(*(p-4)))) &&
+			    !BSTRCMPI(bp, p-3, "ves")) {
+				if (!BSTRCMPI(bp, p-6, "cloves") ||
+				    !BSTRCMPI(bp, p-6, "nerves")) goto mins;
+				Strcasecpy(p-3, "f");	/* ves -> f */
 				return bp;
 			}
-			if (!BSTRCMP(bp, p-8, "vortices")) {
-				Strcpy(p-4, "ex");
+			if (!BSTRCMPI(bp, p-8, "vortices")) {
+				Strcasecpy(p-4, "ex");	/* ices -> ex */
+				return bp;
+			}
+			/* note: nurses, axes but boxes, wumpuses */
+			if (!BSTRCMPI(bp, p-4, "oxes") || /* boxes, foxes */
+			    !BSTRCMPI(bp, p-4, "nxes") || /* lynxes */
+			    !BSTRCMPI(bp, p-4, "ches") ||
+			    !BSTRCMPI(bp, p-4, "uses") || /* lotuses */
+			    !BSTRCMPI(bp, p-4, "sses") || /* priestesses */
+			    !BSTRCMPI(bp, p-5, "atoes") || /* tomatoes */
+			    !BSTRCMPI(bp, p-7, "dingoes") ||
+			    !BSTRCMPI(bp, p-7, "Aleaxes")) {
+				*(p-2) = '\0';	/* drop es */
+				return bp;
+			}
+			if (!BSTRCMPI(bp, p-7, "nemeses")) {
+				Strcasecpy(p-2, "is");	/* es -> is */
+				return bp;
+			}
+			if (!BSTRCMPI(bp, p-7, "erinyes")) {
+				Strcasecpy(p-2, "s");	/* es -> s */
 				return bp;
 			}
 
-			/* note: nurses, axes but boxes */
-			if (!BSTRCMP(bp, p-5, "boxes") ||
-			    !BSTRCMP(bp, p-4, "ches")) {
-				p[-2] = '\0';
+		/* ends in 's' but not 'es' */
+		} else if (!BSTRCMPI(bp, p-2, "us")) { /* lotus, fungus... */
+			if (BSTRCMPI(bp, p-6, "tengus") && /* but not these... */
+			    BSTRCMPI(bp, p-7, "hezrous"))
 				return bp;
-			}
-
-			if (!BSTRCMP(bp, p-6, "gloves") ||
-			    !BSTRCMP(bp, p-6, "lenses") ||
-			    !BSTRCMP(bp, p-5, "shoes") ||
-			    !BSTRCMP(bp, p-6, "scales"))
-				return bp;
-
-		} else if (!BSTRCMP(bp, p-2, "us")) { /* lotus, fungus... */
-			if (BSTRCMP(bp, p-6, "tengus") && /* but not these... */
-			    BSTRCMP(bp, p-7, "hezrous"))
-				return bp;
-			
-		} else if (!BSTRCMP(bp, p-5, "boots") ||
-			   !BSTRCMP(bp, p-9, "gauntlets") ||
-			   !BSTRCMP(bp, p-6, "tricks") ||
-			   !BSTRCMP(bp, p-9, "paralysis") ||
-			   !BSTRCMP(bp, p-5, "glass") ||
-			   !BSTRCMP(bp, p-4, "ness") ||
-			   !BSTRCMP(bp, p-14, "shape changers") ||
-			   !BSTRCMP(bp, p-15, "detect monsters") ||
+		} else if (!BSTRCMPI(bp, p-5, "boots") ||
+			   !BSTRCMPI(bp, p-9, "gauntlets") ||
+			   !BSTRCMPI(bp, p-6, "tricks") ||
+			   !BSTRCMPI(bp, p-6, "erinys") ||
+			   !BSTRCMPI(bp, p-7, "nemesis") ||
+			   !BSTRCMPI(bp, p-9, "paralysis") ||
+			   !BSTRCMPI(bp, p-5, "glass") ||
+			   !BSTRCMPI(bp, p-5, " lens") ||
+			   (p-4 == bp && !strcmpi(p-4, "lens")) ||
+			   !BSTRCMPI(bp, p-3, "ess") ||
+			   !BSTRCMPI(bp, p-14, "shape changers") ||
+			   !BSTRCMPI(bp, p-15, "detect monsters") ||
 #ifdef WIZARD
-			   !BSTRCMP(bp, p-9, "iron bars") ||
+			   !BSTRCMPI(bp, p-9, "iron bars") ||
 #endif
-			   !BSTRCMP(bp, p-5, "aklys"))
+			   !BSTRCMPI(bp, p-5, "aklys"))
 				return bp;
 	mins:
-		p[-1] = '\0';
+		*(p-1) = '\0';	/* drop s */
 
-	} else {
+	} else {	/* input doesn't end in 's' */
 
-		if(!BSTRCMP(bp, p-5, "teeth")) {
-			Strcpy(p-5, "tooth");
+		/* inverse of some things that makeplural() can produce */
+		if (!BSTRCMPI(bp, p-5, "teeth")) {
+			Strcasecpy(p-4, "ooth");
 			return bp;
 		}
-		if (!BSTRCMP(bp, p-5, "fungi")) {
-			Strcpy(p-5, "fungus");
+		if (!BSTRCMPI(bp, p-4, "feet")) {
+			Strcasecpy(p-3, "oot");
 			return bp;
 		}
-		if (!BSTRCMP(bp, p-3, "men")) {
-			Strcpy(p-3, "man");
+		if (!BSTRCMPI(bp, p-3, "men")) {
+			Strcasecpy(p-2, "an");
 			return bp;
+		}
+		if (!BSTRCMPI(bp, p-4, "cubi") ||
+		    !BSTRCMPI(bp, p-5, "fungi") ||
+		    !BSTRCMPI(bp, p-9, "homunculi")) {
+			Strcasecpy(p-1, "us");	/* i -> us */
+			return bp;
+		}
+		if (!BSTRCMPI(bp, p-5, "djinn")) {
+			Strcasecpy(p, "i");	/* append i */
+			return bp;
+		}
+		if (!BSTRCMPI(bp, p-7, "mumakil")) {
+			*(p-2) = '\0';	/* drop il */
+			return bp;
+		}
+		if (p-4 >= bp && index("ml", lowc(*(p-4))) &&
+		    !BSTRCMPI(bp, p-3, "ice")) {
+			Strcasecpy(p-3, "ouse");
+			return bp;
+		}
+		if (!BSTRCMPI(bp, p-8, "children")) {
+			*(p-3) = '\0';	/* drop ren */
+			return bp;
+		}
+		/* matzot -> matzo, algae -> alga */
+		if (!BSTRCMPI(bp, p-6, "matzot") ||
+		    !BSTRCMPI(bp, p-5, "algae") ||
+		    (p-6 >= bp && (!strcmpi(p-6, "hyphae") ||
+		                   !strcmpi(p-6, "larvae")))) {
+			*(p-1) = '\0';	/* drop t/e */    
+			return bp;
+		}
+		/* balactheria -> balactherium */
+		if (p-4 >= bp && !strcmpi(p-2, "ia") &&
+		    index("lr", lowc(*(p-3))) && lowc(*(p-4)) == 'e') {
+			Strcasecpy(p-1, "um");	/* a -> um */
 		}
 
 		/* here we cannot find the plural suffix */

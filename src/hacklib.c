@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hacklib.c	3.5	2007/03/05	*/
+/*	SCCS Id: @(#)hacklib.c	3.5	2007/04/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -20,6 +20,7 @@ NetHack, except that rounddiv may call panic().
 	char *		eos		(char *)
 	char *		strkitten	(char *,char)
 	void		copynchars	(char *,const char *,int)
+	void		Strcasecpy	(char *,const char *)
 	char *		s_suffix	(const char *)
 	char *		xcrypt		(const char *, char *)
 	boolean		onlyspace	(const char *)
@@ -155,6 +156,47 @@ copynchars(dst, src, n)		/* truncating string copy */
     }
     *dst = '\0';
 }
+
+/* this assumes ASCII; someday we'll have to switch over to <ctype.h> */
+#define nh_islower(c) ((c) >= 'a' && (c) <= 'z')
+#define nh_isupper(c) ((c) >= 'A' && (c) <= 'Z')
+#define nh_tolower(c) lowc(c)
+#define nh_toupper(c) highc(c)
+
+/* for case-insensitive editions of makeplural() and makesingular();
+   src might be shorter, same length, or longer than dst */
+void
+Strcasecpy(dst, src)	/* overwrite string, preserving old chars' case */
+    char *dst;
+    const char *src;
+{
+    int ic, oc, dst_exhausted = 0;
+
+    /* while dst has characters, replace each one with corresponding
+       character from src, converting case in the process if they differ;
+       once dst runs out, propagate the case of its last character to any
+       remaining src; if dst starts empty, it must be a pointer to the
+       tail of some other string because we examine the char at dst[-1] */
+    while ((ic = (int)(unsigned char)*src++) != '\0') {
+	if (!dst_exhausted && !*dst) dst_exhausted = 1;
+	/* fetch old character */
+	oc = (int)(unsigned char)*(dst - dst_exhausted);
+	/* possibly convert new character */
+	if (nh_islower(oc)) {	/* the usual case... */
+	    if (nh_isupper(ic)) ic = nh_tolower(ic);
+	} else if (nh_isupper(oc)) {
+	    if (nh_islower(ic)) ic = nh_toupper(ic);
+	}
+	/* store new character */
+	*dst++ = (char)ic;
+    }
+    *dst = '\0';
+}
+
+#undef nh_islower
+#undef nh_isupper
+#undef nh_tolower
+#undef nh_toupper
 
 char *
 s_suffix(s)		/* return a name converted to possessive */
