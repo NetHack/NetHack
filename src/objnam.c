@@ -21,6 +21,10 @@ struct Jitem {
 	const char *name;
 };
 
+#define BSTRCMPI(base,ptr,str)	    ((ptr) < base || strcmpi((ptr),str))
+#define BSTRNCMPI(base,ptr,str,num) ((ptr) < base || strncmpi((ptr),str,num))
+#define Strcasecpy(dst,src)	    (void)strcasecpy(dst,src)
+
 /* true for gems/rocks that should have " stone" appended to their names */
 #define GemStone(typ)	(typ == FLINT ||				\
 			 (objects[typ].oc_material == GEMSTONE &&	\
@@ -1386,7 +1390,7 @@ vtense(subj, verb)
 register const char *subj;
 register const char *verb;
 {
-	char *buf = nextobuf();
+	char *buf = nextobuf(), *bspot;
 	int len, ltmp;
 	const char *sp, *spot;
 	const char * const *spec;
@@ -1406,11 +1410,11 @@ register const char *verb;
 		goto sing;
 	    spot = (const char *)0;
 	    for (sp = subj; (sp = index(sp, ' ')) != 0; ++sp) {
-		if (!strncmp(sp, " of ", 4) ||
-		    !strncmp(sp, " from ", 6) ||
-		    !strncmp(sp, " called ", 8) ||
-		    !strncmp(sp, " named ", 7) ||
-		    !strncmp(sp, " labeled ", 9)) {
+		if (!strncmpi(sp, " of ", 4) ||
+		    !strncmpi(sp, " from ", 6) ||
+		    !strncmpi(sp, " called ", 8) ||
+		    !strncmpi(sp, " named ", 7) ||
+		    !strncmpi(sp, " labeled ", 9)) {
 		    if (sp != subj) spot = sp - 1;
 		    break;
 		}
@@ -1422,12 +1426,12 @@ register const char *verb;
 	     * plural: anything that ends in 's', but not '*us' or '*ss'.
 	     * Guess at a few other special cases that makeplural creates.
 	     */
-	    if ((*spot == 's' && spot != subj &&
-			(*(spot-1) != 'u' && *(spot-1) != 's')) ||
-		((spot - subj) >= 4 && !strncmp(spot-3, "eeth", 4)) ||
-		((spot - subj) >= 3 && !strncmp(spot-3, "feet", 4)) ||
-		((spot - subj) >= 2 && !strncmp(spot-1, "ia", 2)) ||
-		((spot - subj) >= 2 && !strncmp(spot-1, "ae", 2))) {
+	    if ((lowc(*spot) == 's' && spot != subj &&
+			!index("us", lowc(*(spot-1)))) ||
+		BSTRNCMPI(subj, spot-3, "eeth", 4) ||
+		BSTRNCMPI(subj, spot-3, "feet", 4) ||
+		BSTRNCMPI(subj, spot-1, "ia", 2) ||
+		BSTRNCMPI(subj, spot-1, "ae", 2)) {
 		/* check for special cases to avoid false matches */
 		len = (int)(spot - subj) + 1;
 		for (spec = special_subjs; *spec; spec++) {
@@ -1450,26 +1454,25 @@ register const char *verb;
 	}
 
  sing:
-	len = strlen(verb);
-	spot = verb + len - 1;
+	Strcpy(buf, verb);
+	len = (int)strlen(buf);
+	bspot = buf + len - 1;
 
-	if (!strcmp(verb, "are"))
-	    Strcpy(buf, "is");
-	else if (!strcmp(verb, "have"))
-	    Strcpy(buf, "has");
-	else if (index("zxs", *spot) ||
-		 (len >= 2 && *spot=='h' && index("cs", *(spot-1))) ||
-		 (len == 2 && *spot == 'o')) {
+	if (!strcmpi(buf, "are")) {
+	    Strcasecpy(buf, "is");
+	} else if (!strcmpi(buf, "have")) {
+	    Strcasecpy(bspot-1, "s");
+	} else if (index("zxs", lowc(*bspot)) ||
+		 (len >= 2 && lowc(*bspot) == 'h' &&
+			index("cs", lowc(*(bspot-1)))) ||
+		 (len == 2 && lowc(*bspot) == 'o')) {
 	    /* Ends in z, x, s, ch, sh; add an "es" */
-	    Strcpy(buf, verb);
-	    Strcat(buf, "es");
-	} else if (*spot == 'y' && (!index(vowels, *(spot-1)))) {
+	    Strcasecpy(bspot+1, "es");
+	} else if (lowc(*bspot) == 'y' && !index(vowels, lowc(*(bspot-1)))) {
 	    /* like "y" case in makeplural */
-	    Strcpy(buf, verb);
-	    Strcpy(buf + len - 1, "ies");
+	    Strcasecpy(bspot, "ies");
 	} else {
-	    Strcpy(buf, verb);
-	    Strcat(buf, "s");
+	    Strcasecpy(bspot+1, "s");
 	}
 
 	return buf;
@@ -1895,11 +1898,6 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
 	{ "grey stone",	GEM_CLASS,    LUCKSTONE,      FLINT },
 };
 
-#define BSTRCMP(base,ptr,string) ((ptr) < base || strcmp((ptr),string))
-#define BSTRCMPI(base,ptr,string) ((ptr) < base || strcmpi((ptr),string))
-#define BSTRNCMP(base,ptr,string,num) ((ptr)<base || strncmp((ptr),string,num))
-#define BSTRNCMPI(base,ptr,string,num) ((ptr)<base||strncmpi((ptr),string,num))
-
 /*
  * Singularize a string the user typed in; this helps reduce the complexity
  * of readobjnam, and is also used in pager.c to singularize the string
@@ -1936,11 +1934,7 @@ const char *oldstr;
 		(p = strstri(bp, "-in-")) != 0 ||
 		(p = strstri(bp, "-at-")) != 0) {
 	    /* [wo]men-at-arms -> [wo]man-at-arms; takes "not end in s" exit */
-	    if (!BSTRNCMPI(bp, p-3, "men", 3)) {
-		char c = *p;	/* Strcasecpy will clobber *p with '\0' */
-		Strcasecpy(p-2, "an");
-		*p = c;
-	    }
+	    if (!BSTRNCMPI(bp, p-3, "men", 3)) p[-2] = chrcasecpy(p[-2], 'a');
 	    if (BSTRNCMPI(bp, p-1, "s", 1)) return bp;	/* wasn't plural */
 
 	    --p;		/* back up to the 's' */
@@ -1959,6 +1953,7 @@ const char *oldstr;
 			if (p >= bp+3 && lowc(p[-3]) == 'i') {	/* "ies" */
 				if (!BSTRCMPI(bp, p-7, "cookies") ||
 				    !BSTRCMPI(bp, p-4, "pies") ||
+				    !BSTRCMPI(bp, p-5, "mbies") || /* zombie */
 				    !BSTRCMPI(bp, p-5, "yries")) /* valkyrie */
 					goto mins;
 				Strcasecpy(p-3, "y");	/* ies -> y */
@@ -2826,7 +2821,7 @@ srch:
 		/* furniture and terrain */
 		lev = &levl[x][y];
 		p = eos(bp);
-		if(!BSTRCMP(bp, p-8, "fountain")) {
+		if (!BSTRCMPI(bp, p-8, "fountain")) {
 			lev->typ = FOUNTAIN;
 			level.flags.nfountains++;
 			if(!strncmpi(bp, "magic ", 6)) lev->blessedftn = 1;
@@ -2834,14 +2829,14 @@ srch:
 			newsym(x, y);
 			return(&zeroobj);
 		}
-		if(!BSTRCMP(bp, p-6, "throne")) {
+		if (!BSTRCMPI(bp, p-6, "throne")) {
 			lev->typ = THRONE;
 			pline("A throne.");
 			newsym(x, y);
 			return(&zeroobj);
 		}
 # ifdef SINKS
-		if(!BSTRCMP(bp, p-4, "sink")) {
+		if (!BSTRCMPI(bp, p-4, "sink")) {
 			lev->typ = SINK;
 			level.flags.nsinks++;
 			pline("A sink.");
@@ -2850,8 +2845,8 @@ srch:
 		}
 # endif
 		/* ("water" matches "potion of water" rather than terrain) */
-		if (!BSTRCMP(bp, p-4, "pool") || !BSTRCMP(bp, p-4, "moat")) {
-			lev->typ = !BSTRCMP(bp, p-4, "pool") ? POOL : MOAT;
+		if (!BSTRCMPI(bp, p-4, "pool") || !BSTRCMPI(bp, p-4, "moat")) {
+			lev->typ = !BSTRCMPI(bp, p-4, "pool") ? POOL : MOAT;
 			del_engr_at(x, y);
 			pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
 			/* Must manually make kelp! */
@@ -2859,7 +2854,7 @@ srch:
 			newsym(x, y);
 			return &zeroobj;
 		}
-		if (!BSTRCMP(bp, p-4, "lava")) {  /* also matches "molten lava" */
+		if (!BSTRCMPI(bp, p-4, "lava")) { /* also matches "molten lava" */
 			lev->typ = LAVAPOOL;
 			del_engr_at(x, y);
 			pline("A pool of molten lava.");
@@ -2868,7 +2863,7 @@ srch:
 			return &zeroobj;
 		}
 
-		if(!BSTRCMP(bp, p-5, "altar")) {
+		if (!BSTRCMPI(bp, p-5, "altar")) {
 		    aligntyp al;
 
 		    lev->typ = ALTAR;
@@ -2888,7 +2883,8 @@ srch:
 		    return(&zeroobj);
 		}
 
-		if(!BSTRCMP(bp, p-5, "grave") || !BSTRCMP(bp, p-9, "headstone")) {
+		if (!BSTRCMPI(bp, p-5, "grave") ||
+			!BSTRCMPI(bp, p-9, "headstone")) {
 		    make_grave(x, y, (char *)0);
 		    pline("%s.", IS_GRAVE(lev->typ) ? "A grave" :
 				 "Can't place a grave here");
@@ -2896,7 +2892,7 @@ srch:
 		    return(&zeroobj);
 		}
 
-		if(!BSTRCMP(bp, p-4, "tree")) {
+		if (!BSTRCMPI(bp, p-4, "tree")) {
 		    lev->typ = TREE;
 		    pline("A tree.");
 		    newsym(x, y);
@@ -2904,7 +2900,7 @@ srch:
 		    return &zeroobj;
 		}
 
-		if(!BSTRCMP(bp, p-4, "bars")) {
+		if (!BSTRCMPI(bp, p-4, "bars")) {
 		    lev->typ = IRONBARS;
 		    pline("Iron bars.");
 		    newsym(x, y);
