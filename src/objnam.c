@@ -1664,12 +1664,12 @@ static const char *const as_is[] = {
 	"deer", "fish", "tuna", "yaki",
 	"krill", "manes", "ninja", "sheep", "ronin", "roshi", "shito", "tengu",
 	"ki-rin", "Nazgul",
-	"gunyoki", "pirahna",
+	"gunyoki", "piranha",
 	"shuriken",
 	0,
-	/* Note:  "fish" and "pirahna" are collective plurals, suitable
+	/* Note:  "fish" and "piranha" are collective plurals, suitable
 	   for "wiped out all <foo>".  For "3 <foo>", they should be
-	   "fishes" and "pirahnas" instead.  We settle for collective
+	   "fishes" and "piranhas" instead.  We settle for collective
 	   variant instead of attempting to support both. */
 };
 
