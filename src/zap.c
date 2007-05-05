@@ -3504,8 +3504,10 @@ xchar sx, sy;
 	    break;
 	}
 
-	if (dam && Half_spell_damage && abstyp >= 20 && abstyp <= 29)
-	    dam = (dam + 1) / 2;	/* half-damage for breath attack */
+	/* Half_spell_damage protection yields half-damage for wands & spells,
+	   including hero's own ricochets; breath attacks do full damage */
+	if (dam && Half_spell_damage && !(abstyp >= 20 && abstyp <= 29))
+	    dam = (dam + 1) / 2;
 	losehp(dam, fltxt, KILLED_BY_AN);
 	return;
 }
