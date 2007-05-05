@@ -2624,6 +2624,7 @@ E int FDECL(zappable, (struct obj *));
 E void FDECL(zapnodir, (struct obj *));
 E int NDECL(dozap);
 E int FDECL(zapyourself, (struct obj *,BOOLEAN_P));
+E void FDECL(ubreatheu, (struct attack *));
 E boolean FDECL(cancel_monst, (struct monst *,struct obj *,
 			       BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(weffects, (struct obj *));

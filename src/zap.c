@@ -2343,6 +2343,17 @@ boolean ordinary;
 	return(damage);
 }
 
+/* called when poly'd hero uses breath attack against self */
+void
+ubreatheu(mattk)
+struct attack *mattk;
+{
+	int dtyp = 20 + mattk->adtyp - 1;	/* breath by hero */
+	const char *fltxt = flash_types[dtyp];	/* blast of <something> */
+
+	zhitu(dtyp, mattk->damn, fltxt, u.ux, u.uy);
+}
+
 boolean
 flashburn(duration)
 long duration;
@@ -3379,9 +3390,9 @@ int type, nd;
 const char *fltxt;
 xchar sx, sy;
 {
-	int dam = 0;
+	int dam = 0, abstyp = abs(type);
 
-	switch (abs(type) % 10) {
+	switch (abstyp % 10) {
 	case ZT_MAGIC_MISSILE:
 	    if (Antimagic) {
 		shieldeff(sx, sy);
@@ -3425,7 +3436,7 @@ xchar sx, sy;
 	    }
 	    break;
 	case ZT_DEATH:
-	    if (abs(type) == ZT_BREATH(ZT_DEATH)) {
+	    if (abstyp == ZT_BREATH(ZT_DEATH)) {
 		if (Disint_resistance) {
 		    You("are not disintegrated.");
 		    break;
@@ -3477,6 +3488,7 @@ xchar sx, sy;
 	    break;
 	case ZT_ACID:
 	    if (Acid_resistance) {
+		pline_The("acid doesn't hurt.");
 		dam = 0;
 	    } else {
 		pline_The("acid burns!");
@@ -3492,9 +3504,8 @@ xchar sx, sy;
 	    break;
 	}
 
-	if (Half_spell_damage && dam &&
-	   type < 0 && (type > -20 || type < -29)) /* !Breath */
-	    dam = (dam + 1) / 2;
+	if (dam && Half_spell_damage && abstyp >= 20 && abstyp <= 29)
+	    dam = (dam + 1) / 2;	/* half-damage for breath attack */
 	losehp(dam, fltxt, KILLED_BY_AN);
 	return;
 }
