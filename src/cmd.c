@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2007/02/21	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2007/05/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -160,6 +160,7 @@ STATIC_PTR boolean NDECL(minimal_enlightenment);
 
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *,char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
+STATIC_DCL void FDECL(enlght_halfdmg, (int,int));
 
 static const char* readchar_queue="";
 static coord clicklook_cc;
@@ -1025,6 +1026,25 @@ char *outbuf;
 	return outbuf;
 }
 
+/* report half physical or half spell damage */
+STATIC_OVL void
+enlght_halfdmg(category, final)
+int category;
+int final;
+{
+	const char *category_name;
+	char buf[BUFSZ];
+
+	switch (category) {
+	case HALF_PHDAM: category_name = "physical"; break;
+	case HALF_SPDAM: category_name = "spell"; break;
+	default: category_name = "unknown"; break;
+	}
+	Sprintf(buf, " %s %s damage",
+		(final || wizard) ? "half" : "reduced", category_name);
+	enl_msg(You_, "take", "took", buf, from_what(category));
+}
+
 void
 enlightenment(final)
 int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
@@ -1253,6 +1273,8 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	    if (armpro >= SIZE(mc_types)) armpro = SIZE(mc_types) - 1;
 	    you_are(mc_types[armpro],"");
 	}
+	if (Half_physical_damage) enlght_halfdmg(HALF_PHDAM, final);
+	if (Half_spell_damage) enlght_halfdmg(HALF_SPDAM, final);
 	if (Protection_from_shape_changers)
 		you_are("protected from shape changers","");
 	if (Polymorph) you_are("polymorphing","");
