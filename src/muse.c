@@ -2270,7 +2270,7 @@ munslime(mon, by_you)
 struct monst *mon;
 boolean by_you;
 {
-    struct obj *obj;
+    struct obj *obj, odummy;
 
     /*
      * muse_unslime() gives "mon starts turning green", "mon zaps
@@ -2283,12 +2283,22 @@ boolean by_you;
     if (mon->meating || !mon->mcanmove || mon->msleeping) return FALSE;
     mon->mstrategy &= ~STRAT_WAITFORU;
 
+    /* if monster can breathe fire, do so upon self; a monster who deals
+       fire damage by biting, clawing, gazing, and especially exploding
+       isn't able to cure itself of green slime with its own attack
+       [possible extension: monst capable of casting high level clerical
+       spells could toss pillar of fire at self--probably too suicidal] */
+    if (!mon->mcan && !mon->mspec_used &&
+	    attacktype_fordmg(mon->data, AT_BREA, AD_FIRE)) {
+	odummy = zeroobj; /* otyp == STRANGE_OBJECT */
+	return muse_unslime(mon, &odummy, by_you);
+    }
+
     for (obj = mon->minvent; obj; obj = obj->nobj)
 	if (cures_sliming(mon, obj))
 	    return muse_unslime(mon, obj, by_you);
 
     /* TODO: check for and move onto an adjacent fire trap */
-    /* TODO: monster with flame attack should use it on self */
 
     return FALSE;
 }
@@ -2310,7 +2320,14 @@ boolean by_you;	/* true: if mon kills itself, hero gets credit/blame */
     /* -4 => sliming, causes quiet loss of enhanced speed */
     mon_adjust_speed(mon, -4, (struct obj *)0);
 
-    if (otyp == SCR_FIRE) {
+    if (otyp == STRANGE_OBJECT) {
+	/* monster is using fire breath on self */
+	if (vis)
+	    pline("%s breathes fire on %sself.", Monnam(mon), mhim(mon));
+	if (!rn2(3)) mon->mspec_used = rn1(10, 5);
+	/* -21 => monster's fire breath; 1 => # of damage dice */
+	(void)zhitm(mon, by_you ? 21 : -21, 1, &odummyp);
+    } else if (otyp == SCR_FIRE) {
 	mreadmsg(mon, obj);
 	if (mon->mconf) {
 	    if (cansee(mon->mx, mon->my))
@@ -2338,7 +2355,7 @@ boolean by_you;	/* true: if mon kills itself, hero gets credit/blame */
     if (vis) {
 	if (res && mon->mhp > 0)
 	    pline("%s slime is burned away!", s_suffix(Monnam(mon)));
-	makeknown(otyp);
+	if (otyp != STRANGE_OBJECT) makeknown(otyp);
     }
     /* use up monster's next move */
     mon->movement -= NORMAL_SPEED;
