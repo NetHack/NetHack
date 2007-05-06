@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sounds.c	3.5	2007/03/23	*/
+/*	SCCS Id: @(#)sounds.c	3.5	2007/05/05	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -484,6 +484,11 @@ register struct monst *mtmp;
     /* make sure its your role's quest quardian; adjust if not */
     else if (msound == MS_GUARDIAN && ptr != &mons[urole.guardnum])
 	msound = mons[genus(monsndx(ptr), 1)].msound;
+    /* some normally non-speaking types can/will speak if hero is similar */
+    else if (msound == MS_ORC &&	/* note: MS_ORC is same as MS_GRUNT */
+	    (same_race(ptr, youmonst.data) ||		/* current form, */
+	     same_race(ptr, &mons[Race_switch])))	/* unpoly'd form */
+	msound = MS_HUMANOID;
 
     /* be sure to do this before talking; the monster might teleport away, in
      * which case we want to check its pre-teleport position
@@ -719,10 +724,11 @@ register struct monst *mtmp;
 	    /* else FALLTHRU */
 	case MS_HUMANOID:
 	    if (!mtmp->mpeaceful) {
-		if (In_endgame(&u.uz) && is_mplayer(ptr)) {
+		if (In_endgame(&u.uz) && is_mplayer(ptr))
 		    mplayer_talk(mtmp);
-		    break;
-		} else return 0;	/* no sound */
+		else
+		    pline_msg = "threatens you.";
+		break;
 	    }
 	    /* Generic peaceful humanoid behaviour. */
 	    if (mtmp->mflee)
@@ -817,6 +823,10 @@ register struct monst *mtmp;
 	case MS_CUSS:
 	    if (!mtmp->mpeaceful)
 		cuss(mtmp);
+	    else if (is_lminion(mtmp))
+		verbl_msg = "It's not too late.";
+	    else
+		verbl_msg = "We're all doomed.";
 	    break;
 	case MS_SPELL:
 	    /* deliberately vague, since it's not actually casting any spell */
