@@ -15,6 +15,8 @@ STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
 STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
+STATIC_DCL boolean FDECL(singplur_lookup, (char *,char *,BOOLEAN_P,
+					   const char *const *));
 
 struct Jitem {
 	int item;
@@ -1642,6 +1644,7 @@ static struct sing_plur one_off[] = {
 	{ "foot", "feet" },
 	{ "fungus", "fungi" },
 	{ "knife", "knives" },
+	{ "labrum", "labra" },	/* candelabrum */
 	{ "louse", "lice" },
 	{ "mouse", "mice" },
 	{ "mumak", "mumakil" },
@@ -1672,6 +1675,47 @@ static const char *const as_is[] = {
 	   "fishes" and "piranhas" instead.  We settle for collective
 	   variant instead of attempting to support both. */
 };
+
+/* singularize/pluralize decisiions common to both makesingular & makeplural */
+STATIC_OVL boolean
+singplur_lookup(basestr, endstring, to_plural, alt_as_is)
+char *basestr, *endstring;	/* base string, pointer to eos(string) */
+boolean to_plural;	/* true => makeplural, false => makesingular */
+const char *const *alt_as_is;	/* another set like as_is[] */
+{
+	const struct sing_plur *sp;
+	const char *same, *other, *const *as;
+	int al;
+
+	for (as = as_is; *as; ++as) {
+	    al = (int)strlen(*as);
+	    if (!BSTRCMPI(basestr, endstring - al, *as))
+		return TRUE;
+	}
+	if (alt_as_is) {
+	    for (as = alt_as_is; *as; ++as) {
+		al = (int)strlen(*as);
+		if (!BSTRCMPI(basestr, endstring - al, *as))
+		    return TRUE;
+	    }
+	}
+
+	for (sp = one_off; sp->sing; sp++) {
+	    /* check whether endstring already matches */
+	    same = to_plural ? sp->plur : sp->sing;
+	    al = (int)strlen(same);
+	    if (!BSTRCMPI(basestr, endstring - al, same))
+		return TRUE;	/* use as-is */
+	    /* check whether it matches the inverse; if so, transform it */
+	    other = to_plural ? sp->sing : sp->plur;
+	    al = (int)strlen(other);
+	    if (!BSTRCMPI(basestr, endstring - al, other)) {
+		Strcasecpy(endstring - al, same);
+		return TRUE;	/* one_off[] transformation */
+	    }
+	}
+	return FALSE;
+}
 
 /* Plural routine; chiefly used for user-defined fruits.  We have to try to
  * account for everything reasonable the player has; something unreasonable
@@ -1759,37 +1803,16 @@ const char *oldstr;
 	    "matzot",
 	    0,
 	};
-	const struct sing_plur *sp;
-	const char *const *as;
-	int al;
 
-	for (as = as_is; *as; ++as) {
-	    al = (int)strlen(*as);
-	    if (len >= al && !strcmpi(spot - (al - 1), *as))
+	/* spot+1: synch up with makesingular's usage */
+	if (singplur_lookup(str, spot + 1, TRUE, already_plural))
 		goto bottom;
-	}
-	for (as = already_plural; *as; ++as) {
-	    al = (int)strlen(*as);
-	    if (len >= al && !strcmpi(spot - (al - 1), *as))
-		goto bottom;
-	}
 
 	/* more of same, but not suitable for blanket loop checking */
 	if ((len == 2 && !strcmpi(str, "ya")) ||
 	    (len >= 2 && !strcmpi(spot-1, "ai")) || /* samurai, Uruk-hai */
 	    (len >= 3 && !strcmpi(spot-2, " ya")))
 		goto bottom;
-
-	for (sp = one_off; sp->plur; sp++) {
-	    al = (int)strlen(sp->plur);
-	    if (len >= al && !strcmpi(spot - (al - 1), sp->plur))
-		goto bottom;	/* already plural */
-	    al = (int)strlen(sp->sing);
-	    if (len >= al && !strcmpi(spot - (al - 1), sp->sing)) {
-		Strcasecpy(spot - (al - 1), sp->plur);
-		goto bottom;	/* one_off[] plural */
-	    }
-	}
     }
 
 	/* man/men ("Wiped out all cavemen.") */
@@ -1883,7 +1906,7 @@ const char *oldstr;
  * for which help is sought.
  *
  * "Manes" is ambiguous: monster type (keep s), or horse body part (drop s)?
- * Its inclusion in special_subj[] makes it get treated as the former.
+ * Its inclusion in as_is[]/special_subj[] makes it get treated as the former.
  *
  * A lot of unique monsters have names ending in s; plural, or singular
  * from plural, doesn't make much sense for them so we don't bother trying.
@@ -1928,33 +1951,8 @@ const char *oldstr;
 
 	p = eos(bp);
 	/* dispense with some words which don't need singularization */
-    {
-	const struct sing_plur *sp;
-	const char *const *as;
-	int al;
-
-	for (as = as_is; *as; ++as) {
-	    al = (int)strlen(*as);
-	    if (!BSTRCMPI(bp, p - al, *as))
+	if (singplur_lookup(bp, p, FALSE, special_subjs))
 		return bp;
-	}
-	for (as = special_subjs; *as; ++as) {
-	    al = (int)strlen(*as);
-	    if (!BSTRCMPI(bp, p - al, *as))
-		return bp;
-	}
-
-	for (sp = one_off; sp->sing; sp++) {
-	    al = (int)strlen(sp->sing);
-	    if (!BSTRCMPI(bp, p - al, sp->sing))
-		return bp;	/* already singular */
-	    al = (int)strlen(sp->plur);
-	    if (!BSTRCMPI(bp, p - al, sp->plur)) {
-		Strcasecpy(p - al, sp->sing);
-		return bp;	/* one_off[] singular */
-	    }
-	}
-    }
 
 	/* remove -s or -es (boxes) or -ies (rubies) */
 	if (p >= bp+1 && lowc(p[-1]) == 's') {
