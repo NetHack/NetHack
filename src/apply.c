@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2007/03/07	*/
+/*	SCCS Id: @(#)apply.c	3.5	2007/05/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2808,10 +2808,19 @@ do_break_wand(obj)
     freeinv(obj);		/* hide it from destroy_item instead... */
     setnotworn(obj);		/* so we need to do this ourselves */
 
-    if (obj->spe <= 0) {
+    if (!zappable(obj)) {
 	pline(nothing_else_happens);
 	goto discard_broken_wand;
     }
+    /* successful call to zappable() consumes a charge; put it back */
+    obj->spe++;
+    /* might have "wrested" a final charge, taking it from 0 to -1;
+       if so, we just brought it back up to 0, which wouldn't do much
+       below so give it 1..3 charges now, usually making it stronger
+       than an ordinary last charge (the wand is already gone from
+       inventory, so perm_invent can't accidentally reveal this) */
+    if (!obj->spe) obj->spe = rnd(3);
+
     obj->ox = u.ux;
     obj->oy = u.uy;
     dmg = obj->spe * 4;
