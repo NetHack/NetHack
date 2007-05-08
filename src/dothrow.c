@@ -351,16 +351,19 @@ dofire()
 		    You("have nothing appropriate for your quiver.");
 	    }
 	    /* if autoquiver is disabled or has failed, prompt for missile;
-	       fill quiver with it if it's a stack that's not wielded */
+	       fill quiver with it if it's not wielded */
 	    if (!obj) {
 		obj = getobj(uslinging() ? bullets : toss_objs, "throw");
-		if (obj && obj->quan > 1L && !obj->owornmask &&
-			/* Q command doesn't allow gold in quiver */
-			obj->oclass != COIN_CLASS)
+		/* Q command doesn't allow gold in quiver */
+		if (obj && !obj->owornmask && obj->oclass != COIN_CLASS)
 		    setuqwep(obj);	/* demi-autoquiver */
 	    }
 	    /* give feedback if quiver has now been filled */
-	    if (uquiver) prinv("You ready:", uquiver, 0L);
+	    if (uquiver) {
+		uquiver->owornmask &= ~W_QUIVER; /* less verbose */
+		prinv("You ready:", uquiver, 0L);
+		uquiver->owornmask |= W_QUIVER;
+	    }
 	}
 
 	return obj ? throw_obj(obj, shotlimit) : 0;
