@@ -64,6 +64,7 @@ E boolean FDECL(arti_immune, (struct obj *,int));
 E boolean FDECL(spec_ability, (struct obj *,unsigned long));
 E boolean FDECL(confers_luck, (struct obj *));
 E boolean FDECL(arti_reflects, (struct obj *));
+E boolean FDECL(shade_glare, (struct obj *));
 E boolean FDECL(restrict_name, (struct obj *,const char *));
 E boolean FDECL(defends, (int,struct obj *));
 E boolean FDECL(protects, (int,struct obj *));

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.5	2007/03/05	*/
+/*	SCCS Id: @(#)artifact.c 3.5	2007/05/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -272,6 +272,26 @@ struct obj *obj;
 	/* just being carried */
 	if (arti->cspfx & SPFX_REFLECT) return TRUE;
     }
+    return FALSE;
+}
+
+/* decide whether this obj is effective when attacking against shades;
+   does not consider the bonus for blessed objects versus undead */
+boolean
+shade_glare(obj)
+struct obj *obj;
+{
+    const struct artifact *arti;
+
+    /* any silver object is effective */
+    if (objects[obj->otyp].oc_material == SILVER) return TRUE;
+    /* non-silver artifacts with bonus against undead also are effective */
+    arti = get_artifact(obj);
+    if (arti && (arti->spfx & SPFX_DFLAG2) && arti->mtype == M2_UNDEAD)
+	return TRUE;
+    /* [if there was anything with special bonus against noncorporeals,
+       it would be effective too] */
+    /* otherwise, harmless to shades */
     return FALSE;
 }
 
