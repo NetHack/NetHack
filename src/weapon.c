@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.5	2007/05/09	*/
+/*	SCCS Id: @(#)weapon.c	3.5	2007/02/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -291,16 +291,11 @@ struct monst *mon;
 		if (tmp < 0) tmp = 0;
 	}
 
-	/* don't need hard material or silver if using an artifact which
-	   gets a special bonus against this target (Sunsword vs shades) */
-	if (tmp && (thick_skinned(ptr) || ptr == &mons[PM_SHADE]) &&
-		(!otmp->oartifact || !spec_dbon(otmp, mon, tmp))) {
-	    if (objects[otyp].oc_material <= LEATHER && thick_skinned(ptr))
+	if (objects[otyp].oc_material <= LEATHER && thick_skinned(ptr))
 		/* thick skinned/scaled creatures don't feel it */
 		tmp = 0;
-	    if (ptr == &mons[PM_SHADE] && objects[otyp].oc_material != SILVER)
+	if (ptr == &mons[PM_SHADE] && objects[otyp].oc_material != SILVER)
 		tmp = 0;
-	}
 
 	/* "very heavy iron ball"; weight increase is in increments of 160 */
 	if (otyp == HEAVY_IRON_BALL && tmp > 0) {
