@@ -20,6 +20,9 @@
 #define FIRST_AMULET AMULET_OF_ESP
 #define LAST_AMULET  AMULET_OF_YENDOR
  
+extern struct obj *thrownobj;		/* dothrow.c */
+extern struct obj *kickobj;		/* dokick.c */
+
 struct valuable_data { long count; int typ; };
 
 static struct valuable_data
@@ -650,6 +653,10 @@ die:
 	/* might have been killed while using a disposable item, so make sure
 	   it's gone prior to inventory disclosure and creation of bones data */
 	inven_inuse(TRUE);
+	/* not on object lists; if an active light source, would cause big
+	   trouble (`obj_is_local' panic) for savebones() -> savelev() */
+	if (thrownobj) dealloc_obj(thrownobj);
+	if (kickobj) dealloc_obj(kickobj);
 
 	/* Sometimes you die on the first move.  Life's not fair.
 	 * On those rare occasions you get hosed immediately, go out

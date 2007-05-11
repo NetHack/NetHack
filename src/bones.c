@@ -57,11 +57,17 @@ resetobjs(ochain,restore)
 struct obj *ochain;
 boolean restore;
 {
-	struct obj *otmp;
+	struct obj *otmp, *nobj;
 
-	for (otmp = ochain; otmp; otmp = otmp->nobj) {
+	for (otmp = ochain; otmp; otmp = nobj) {
+		nobj = otmp->nobj;
 		if (otmp->cobj)
 		    resetobjs(otmp->cobj,restore);
+		if (otmp->in_use) {
+		    obj_extract_self(otmp);
+		    dealloc_obj(otmp);
+		    continue;
+		}
 
 		if (restore) {
 			/* artifact bookeeping needs to be done during

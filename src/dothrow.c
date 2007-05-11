@@ -1650,15 +1650,8 @@ boolean from_invent;
 			    change_luck(-2);
 			break;
 		case POT_WATER:		/* really, all potions */
+			obj->in_use = 1;	/* in case it's fatal */
 			if (obj->otyp == POT_OIL && obj->lamplit) {
-			    /* splatter_burning_oil() could kill hero,
-			       and a timed obj with obj->where==0
-			       causes a problem during savebones() so
-			       get rid of the timer/lightsources on it now */
-			    if (obj->timed)
-				obj_stop_timers(obj);
-			    if (obj_sheds_light(obj))
-				del_light_source(LS_OBJECT, obj_to_any(obj));
 			    splatter_burning_oil(x,y);
 			} else if (distu(x,y) <= 2) {
 			    if (!breathless(youmonst.data) || haseyes(youmonst.data)) {
