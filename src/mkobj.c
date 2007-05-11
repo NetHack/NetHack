@@ -14,6 +14,7 @@ STATIC_DCL void FDECL(check_contained, (struct obj *,const char *));
 #endif
 
 extern struct obj *thrownobj;		/* defined in dothrow.c */
+extern struct obj *kickobj;		/* dokick.c */
 
 /*#define DEBUG_EFFECTS*/	/* show some messages for debugging */
 
@@ -1799,7 +1800,8 @@ dealloc_obj(obj)
     if (obj_sheds_light(obj))
 	del_light_source(LS_OBJECT, obj_to_any(obj));
 
-    if (obj == thrownobj) thrownobj = (struct obj*)0;
+    if (obj == thrownobj) thrownobj = 0;
+    if (obj == kickobj) kickobj = 0;
 
     if (obj->oextra) dealloc_oextra(obj->oextra);
     free((genericptr_t) obj);

@@ -857,8 +857,6 @@ register struct obj *obj, *merge;
 	       can't call remove_worn_item() to get <X>_off() side-effects */
 	    setnotworn(obj);
 	}
-	if (obj == thrownobj) thrownobj = 0;
-	if (obj == kickobj) kickobj = 0;
 	dealloc_obj(obj);
 }
 
