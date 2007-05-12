@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vision.c	3.5	2005/06/15	*/
+/*	SCCS Id: @(#)vision.c	3.5	2007/05/11	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990.	*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 
@@ -2623,6 +2623,44 @@ do_clear_area(scol,srow,range,func,arg)
 			(*func)(x, y, arg);
 	    }
 	}
+}
+
+/* bitmask indicating ways mon is seen; extracted from lookat(pager.c) */
+unsigned
+howmonseen(mon)
+struct monst *mon;
+{
+    boolean useemon = (boolean)canseemon(mon);
+    int xraydist = (u.xray_range < 0) ? -1 : (u.xray_range * u.xray_range);
+    unsigned how_seen = 0;		/* result */
+
+    /* normal vision;
+       cansee is true for both normal and astral vision,
+       but couldsee it not true for astral vision */
+    if ((mon->wormno ? worm_known(mon) :
+	     (cansee(mon->mx, mon->my) && couldsee(mon->mx, mon->my))) &&
+		mon_visible(mon) && !mon->minvis)
+	how_seen |= MONSEEN_NORMAL;
+    /* see invisible */
+    if (useemon && mon->minvis)
+	how_seen |= MONSEEN_SEEINVIS;
+    /* infravision */
+    if ((!mon->minvis || See_invisible) && see_with_infrared(mon))
+	how_seen |= MONSEEN_INFRAVIS;
+    /* telepathy */
+    if (tp_sensemon(mon))
+	how_seen |= MONSEEN_TELEPAT;
+    /* xray */
+    if (useemon && xraydist > 0 && distu(mon->mx, mon->my) <= xraydist)
+	how_seen |= MONSEEN_XRAYVIS;
+    /* extended detection */
+    if (Detect_monsters)
+	how_seen |= MONSEEN_DETECT;
+    /* class-/type-specific warning */
+    if (MATCH_WARN_OF_MON(mon))
+	how_seen |= MONSEEN_WARNMON;
+
+    return how_seen;
 }
 
 /*vision.c*/

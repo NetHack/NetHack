@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vision.h	3.5	1995/01/26	*/
+/*	SCCS Id: @(#)vision.h	3.5	2007/05/11	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.	*/
 
@@ -54,5 +54,14 @@ extern char *viz_rmax;			/* max could see indices */
 
 /* Use this macro to get a list of distances of the edges (see vision.c). */
 #define circle_ptr(z) (&circle_data[(int)circle_start[z]])
+
+/* howmonseen() bitmask values */
+#define MONSEEN_NORMAL		0x0001	/* normal vision */
+#define MONSEEN_SEEINVIS	0x0002	/* seeing invisible */
+#define MONSEEN_INFRAVIS	0x0004	/* via infravision */
+#define MONSEEN_TELEPAT		0x0008	/* via telepathy */
+#define MONSEEN_XRAYVIS		0x0010	/* via Xray vision */
+#define MONSEEN_DETECT		0x0020	/* via extended monster detection */
+#define MONSEEN_WARNMON		0x0040	/* via type-specific warning */
 
 #endif /* VISION_H */

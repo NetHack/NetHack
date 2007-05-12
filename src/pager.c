@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.5	2006/12/02	*/
+/*	SCCS Id: @(#)pager.c	3.5	2007/05/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -123,8 +123,9 @@ lookat(x, y, buf, monbuf)
 	bhitpos.x = x;
 	bhitpos.y = y;
 	mtmp = m_at(x,y);
-	if (mtmp != (struct monst *) 0) {
+	if (mtmp) {
 	    char *name, monnambuf[BUFSZ];
+	    unsigned how_seen;
 	    boolean accurate = !Hallucination;
 
 	    if (mtmp->data == &mons[PM_COYOTE] && accurate)
@@ -157,83 +158,58 @@ lookat(x, y, buf, monbuf)
 			    an(defsyms[trap_to_defsym(tt)].explanation));
 	    }
 
-	    {
-		int ways_seen = 0, normal = 0, xraydist;
-		boolean useemon = (boolean) canseemon(mtmp);
-
-		xraydist = (u.xray_range<0) ? -1 : u.xray_range * u.xray_range;
-		/* normal vision
-		 * cansee is true for both normal and astral vision,
-		 * but couldsee it not true for astral vision */
-		if ((mtmp->wormno ? worm_known(mtmp) :
-		     (cansee(mtmp->mx, mtmp->my) && couldsee(mtmp->mx, mtmp->my))) &&
-			mon_visible(mtmp) && !mtmp->minvis) {
-		    ways_seen++;
-		    normal++;
+	    how_seen = howmonseen(mtmp);
+	    if (how_seen && how_seen != MONSEEN_NORMAL) {
+		if (how_seen & MONSEEN_NORMAL) {
+		    Strcat(monbuf, "normal vision");
+		    how_seen &= ~MONSEEN_NORMAL;
+		    /* how_seen can't be 0 yet... */
+		    if (how_seen) Strcat(monbuf, ", ");
 		}
-		/* see invisible */
-		if (useemon && mtmp->minvis)
-		    ways_seen++;
-		/* infravision */
-		if ((!mtmp->minvis || See_invisible) && see_with_infrared(mtmp))
-		    ways_seen++;
-		/* telepathy */
-		if (tp_sensemon(mtmp))
-		    ways_seen++;
-		/* xray */
-		if (useemon && xraydist > 0 &&
-			distu(mtmp->mx, mtmp->my) <= xraydist)
-		    ways_seen++;
-		if (Detect_monsters)
-		    ways_seen++;
-		if (MATCH_WARN_OF_MON(mtmp))
-		    ways_seen++;
-
-		if (ways_seen > 1 || !normal) {
-		    if (normal) {
-			Strcat(monbuf, "normal vision");
-			/* can't actually be 1 yet here */
-			if (ways_seen-- > 1) Strcat(monbuf, ", ");
-		    }
-		    if (useemon && mtmp->minvis) {
-			Strcat(monbuf, "see invisible");
-			if (ways_seen-- > 1) Strcat(monbuf, ", ");
-		    }
-		    if ((!mtmp->minvis || See_invisible) &&
-			    see_with_infrared(mtmp)) {
-			Strcat(monbuf, "infravision");
-			if (ways_seen-- > 1) Strcat(monbuf, ", ");
-		    }
-		    if (tp_sensemon(mtmp)) {
-			Strcat(monbuf, "telepathy");
-			if (ways_seen-- > 1) Strcat(monbuf, ", ");
-		    }
-		    if (useemon && xraydist > 0 &&
-			    distu(mtmp->mx, mtmp->my) <= xraydist) {
-			/* Eyes of the Overworld */
-			Strcat(monbuf, "astral vision");
-			if (ways_seen-- > 1) Strcat(monbuf, ", ");
-		    }
-		    if (Detect_monsters) {
-			Strcat(monbuf, "monster detection");
-			if (ways_seen-- > 1) Strcat(monbuf, ", ");
-		    }
-		    if (MATCH_WARN_OF_MON(mtmp)) {
-		    	char wbuf[BUFSZ];
-			if (Hallucination)
-				Strcat(monbuf, "paranoid delusion");
-			else {
-				Sprintf(wbuf, "warned of %s",
-					makeplural(mtmp->data->mname));
-		    		Strcat(monbuf, wbuf);
-		    	}
-		    	if (ways_seen-- > 1) Strcat(monbuf, ", ");
-		    }
+		if (how_seen & MONSEEN_SEEINVIS) {
+		    Strcat(monbuf, "see invisible");
+		    how_seen &= ~MONSEEN_SEEINVIS;
+		    if (how_seen) Strcat(monbuf, ", ");
 		}
-	    }
-	}
-    }
-    else if (glyph_is_object(glyph)) {
+		if (how_seen & MONSEEN_INFRAVIS) {
+		    Strcat(monbuf, "infravision");
+		    how_seen &= ~MONSEEN_INFRAVIS;
+		    if (how_seen) Strcat(monbuf, ", ");
+		}
+		if (how_seen & MONSEEN_TELEPAT) {
+		    Strcat(monbuf, "telepathy");
+		    how_seen &= ~MONSEEN_TELEPAT;
+		    if (how_seen) Strcat(monbuf, ", ");
+		}
+		if (how_seen & MONSEEN_XRAYVIS) {
+		    /* Eyes of the Overworld */
+		    Strcat(monbuf, "astral vision");
+		    how_seen &= ~MONSEEN_XRAYVIS;
+		    if (how_seen) Strcat(monbuf, ", ");
+		}
+		if (how_seen & MONSEEN_DETECT) {
+		    Strcat(monbuf, "monster detection");
+		    how_seen &= ~MONSEEN_DETECT;
+		    if (how_seen) Strcat(monbuf, ", ");
+		}
+		if (how_seen & MONSEEN_WARNMON) {
+		    if (Hallucination)
+			Strcat(monbuf, "paranoid delusion");
+		    else
+			Sprintf(eos(monbuf), "warned of %s",
+				makeplural(mtmp->data->mname));
+		    how_seen &= ~MONSEEN_WARNMON;
+		    if (how_seen) Strcat(monbuf, ", ");
+		}
+		/* should have used up all the how_seen bits by now */
+		if (how_seen) {
+		    impossible("lookat: unknown method of seeing monster");
+		    Sprintf(eos(monbuf), "(%u)", how_seen);
+		}
+	    } /* seen by something other than normal vision */
+	} /* mtmp */
+
+    } else if (glyph_is_object(glyph)) {
 	struct obj *otmp = vobj_at(x,y);
 
 	if (!otmp || otmp->otyp != glyph_to_obj(glyph)) {
