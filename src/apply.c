@@ -4,6 +4,8 @@
 
 #include "hack.h"
 
+extern boolean notonhead;	/* for long worms */
+
 static const char tools[] = { TOOL_CLASS, WEAPON_CLASS, WAND_CLASS, 0 };
 static const char tools_too[] = { ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
 				  WEAPON_CLASS, WAND_CLASS, GEM_CLASS, 0 };
@@ -717,12 +719,20 @@ STATIC_OVL int
 use_mirror(obj)
 struct obj *obj;
 {
-	const char *mirror;
+	const char *mirror, *uvisage;
 	struct monst *mtmp;
+	unsigned how_seen;
 	char mlet;
-	boolean vis;
+	boolean vis, invis_mirror, useeit, monable;
 
 	if(!getdir((char *)0)) return 0;
+	invis_mirror = Invis;
+#ifdef INVISIBLE_OBJECTS
+	if (obj->oinvis) invis_mirror = TRUE;
+#endif
+	useeit = !Blind && (!invis_mirror || See_invisible);
+	uvisage = (ACURR(A_CHA) > 14) ?
+		    (poly_gender() == 1 ? "beautiful" : "handsome") : "ugly";
 	mirror = simpleonames(obj); /* "mirror" or "looking glass" */
 	if(obj->cursed && !rn2(2)) {
 		if (!Blind)
@@ -730,7 +740,9 @@ struct obj *obj;
 		return 1;
 	}
 	if(!u.dx && !u.dy && !u.dz) {
-		if(!Blind && !Invisible) {
+		if (!useeit) {
+		    You_cant("see your %s %s.", uvisage, body_part(FACE));
+		} else {
 		    if (u.umonnum == PM_FLOATING_EYE) {
 			if (Free_action) {
 			    You("stiffen momentarily under your gaze.");
@@ -753,32 +765,26 @@ struct obj *obj;
 			You(look_str, "peaked");
 		    else if (u.uhs >= WEAK)
 			You(look_str, "undernourished");
-		    else You("look as %s as ever.",
-				ACURR(A_CHA) > 14 ?
-				(poly_gender()==1 ? "beautiful" : "handsome") :
-				"ugly");
-		} else {
-			You_cant("see your %s %s.",
-				ACURR(A_CHA) > 14 ?
-				(poly_gender()==1 ? "beautiful" : "handsome") :
-				"ugly",
-				body_part(FACE));
+		    else
+			You("look as %s as ever.", uvisage);
 		}
 		return 1;
 	}
 	if(u.uswallow) {
-		if (!Blind) You("reflect %s %s.", s_suffix(mon_nam(u.ustuck)),
-		    mbodypart(u.ustuck, STOMACH));
+		if (useeit)
+		    You("reflect %s %s.", s_suffix(mon_nam(u.ustuck)),
+			mbodypart(u.ustuck, STOMACH));
 		return 1;
 	}
 	if(Underwater) {
-		You(Hallucination ?
-		    "give the fish a chance to fix their makeup." :
-		    "reflect the murky water.");
+		if (useeit)
+		    You(Hallucination ?
+			"give the fish a chance to fix their makeup." :
+			"reflect the murky water.");
 		return 1;
 	}
 	if(u.dz) {
-		if (!Blind)
+		if (useeit)
 		    You("reflect the %s.",
 			(u.dz > 0) ? surface(u.ux,u.uy) : ceiling(u.ux,u.uy));
 		return 1;
@@ -787,10 +793,18 @@ struct obj *obj;
 		    (int FDECL((*),(MONST_P,OBJ_P)))0,
 		    (int FDECL((*),(OBJ_P,OBJ_P)))0,
 		    &obj);
-	if (!mtmp || !haseyes(mtmp->data))
+	if (!mtmp || !haseyes(mtmp->data) || notonhead)
 		return 1;
 
+	/* couldsee(mtmp->mx, mtmp->my) is implied by the fact that bhit()
+	   targetted it, so we can ignore possibility of X-ray vision */
 	vis = canseemon(mtmp);
+	/* ways to directly see monster (excludes X-ray vision, telepathy,
+	   extended detection, type-specific warning) */
+#define SEENMON (MONSEEN_NORMAL | MONSEEN_SEEINVIS | MONSEEN_INFRAVIS)
+	how_seen = vis ? howmonseen(mtmp) : 0;
+	/* whether monster is able to use its vision-based capabilities */
+	monable = !mtmp->mcan && (!mtmp->minvis || perceives(mtmp->data));
 	mlet = mtmp->data->mlet;
 	if (mtmp->msleeping) {
 	    if (vis)
@@ -799,20 +813,27 @@ struct obj *obj;
 	} else if (!mtmp->mcansee) {
 	    if (vis)
 		pline("%s can't see anything right now.", Monnam(mtmp));
+	} else if (invis_mirror && !perceives(mtmp->data)) {
+	    if (vis)
+		pline("%s fails to notice your %s.", Monnam(mtmp), mirror);
+	/* infravision doesn't produce an image in the mirror */
+	} else if ((how_seen & SEENMON) == MONSEEN_INFRAVIS) {
+	    if (vis) /* (redundant) */
+		pline("%s is too far away to see %sself in the dark.",
+		      Monnam(mtmp), mhim(mtmp));
 	/* some monsters do special things */
-	} else if (mlet == S_VAMPIRE || mlet == S_GHOST || is_vampshifter(mtmp)) {
+	} else if (mlet == S_VAMPIRE || mlet == S_GHOST ||
+		    is_vampshifter(mtmp)) {
 	    if (vis)
 		pline("%s doesn't have a reflection.", Monnam(mtmp));
-	} else if(!mtmp->mcan && !mtmp->minvis &&
-					mtmp->data == &mons[PM_MEDUSA]) {
+	} else if (monable && mtmp->data == &mons[PM_MEDUSA]) {
 		if (mon_reflects(mtmp, "The gaze is reflected away by %s %s!"))
 			return 1;
 		if (vis)
 			pline("%s is turned to stone!", Monnam(mtmp));
 		stoned = TRUE;
 		killed(mtmp);
-	} else if(!mtmp->mcan && !mtmp->minvis &&
-					mtmp->data == &mons[PM_FLOATING_EYE]) {
+	} else if (monable && mtmp->data == &mons[PM_FLOATING_EYE]) {
 		int tmp = d((int)mtmp->m_lev, (int)mtmp->data->mattk[0].damd);
 		if (!rn2(4)) tmp = 120;
 		if (vis)
@@ -820,12 +841,11 @@ struct obj *obj;
 		else
 		    You_hear("%s stop moving.", something);
 		paralyze_monst(mtmp, (int)mtmp->mfrozen + tmp);
-	} else if(!mtmp->mcan && !mtmp->minvis &&
-					mtmp->data == &mons[PM_UMBER_HULK]) {
+	} else if (monable && mtmp->data == &mons[PM_UMBER_HULK]) {
 		if (vis)
 		    pline("%s confuses itself!", Monnam(mtmp));
 		mtmp->mconf = 1;
-	} else if (!mtmp->mcan && !mtmp->minvis &&
+	} else if (monable &&
 		    (mlet == S_NYMPH ||
 		     mtmp->data == &mons[PM_SUCCUBUS] ||
 		     mtmp->data == &mons[PM_INCUBUS])) {
@@ -849,10 +869,11 @@ struct obj *obj;
 	} else if (!Blind) {
 		if (mtmp->minvis && !See_invisible)
 		    ;
-		else if ((mtmp->minvis && !perceives(mtmp->data))
-			 || !haseyes(mtmp->data))
-		    pline("%s doesn't seem to notice its reflection.",
-			Monnam(mtmp));
+		else if ((mtmp->minvis && !perceives(mtmp->data)) ||
+			/* redundant: can't get here if these are true */
+			!haseyes(mtmp->data) || notonhead || !mtmp->mcansee)
+		    pline("%s doesn't seem to notice %s reflection.",
+			  Monnam(mtmp), mhis(mtmp));
 		else
 		    pline("%s ignores %s reflection.",
 			  Monnam(mtmp), mhis(mtmp));

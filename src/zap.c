@@ -2994,37 +2994,39 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 	    if (mtmp && !(in_skip && M_IN_WATER(mtmp->data))) {
 		notonhead = (bhitpos.x != mtmp->mx ||
 			     bhitpos.y != mtmp->my);
-		if (weapon != FLASHED_LIGHT) {
-			if(weapon != ZAPPED_WAND) {
-			    if(weapon != INVIS_BEAM) tmp_at(DISP_END, 0);
-			    if (cansee(bhitpos.x,bhitpos.y) && !canspotmon(mtmp)) {
-				if (weapon != INVIS_BEAM) {
-				    map_invisible(bhitpos.x, bhitpos.y);
-				    return(mtmp);
-				}
-			    } else
-				return(mtmp);
-			}
-			if (weapon != INVIS_BEAM) {
-			    (*fhitm)(mtmp, obj);
-			    range -= 3;
-			}
-		} else {
-		    /* FLASHED_LIGHT hitting invisible monster
-		       should pass through instead of stop so
-		       we call flash_hits_mon() directly rather
-		       than returning mtmp back to caller. That
-		       allows the flash to keep on going. Note
-		       that we use mtmp->minvis not canspotmon()
-		       because it makes no difference whether
-		       the hero can see the monster or not.*/
+		if (weapon == FLASHED_LIGHT) {
+		    /* FLASHED_LIGHT hitting invisible monster should
+		       pass through instead of stop so we call
+		       flash_hits_mon() directly rather than returning
+		       mtmp back to caller.  That allows the flash to
+		       keep on going.  Note that we use mtmp->minvis
+		       not canspotmon() because it makes no difference
+		       whether the hero can see the monster or not. */
 		    if (mtmp->minvis) {
 			obj->ox = u.ux,  obj->oy = u.uy;
 			(void) flash_hits_mon(mtmp, obj);
 		    } else {
 			tmp_at(DISP_END, 0);
-		    	return(mtmp); 	/* caller will call flash_hits_mon */
+			return mtmp;	/* caller will call flash_hits_mon */
 		    }
+		} else if (weapon == INVIS_BEAM) {
+		    /* Like FLASHED_LIGHT, INVIS_BEAM should continue
+		       through invisible targets; unlike it, we aren't
+		       prepared for multiple hits so just get first one
+		       that's either visible or could see its invisible
+		       self.  [No tmp_at() cleanup is needed here.] */
+		    if (!mtmp->minvis || perceives(mtmp->data))
+			return mtmp;
+		} else if (weapon != ZAPPED_WAND) {
+		    /* THROWN_WEAPON, KICKED_WEAPON */
+		    tmp_at(DISP_END, 0);
+		    if (cansee(bhitpos.x, bhitpos.y) && !canspotmon(mtmp))
+			map_invisible(bhitpos.x, bhitpos.y);
+		    return mtmp;
+		} else {
+		    /* ZAPPED_WAND */
+		    (*fhitm)(mtmp, obj);
+		    range -= 3;
 		}
 	    } else {
 		if (weapon == ZAPPED_WAND && obj->otyp == WAN_PROBING &&
