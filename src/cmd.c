@@ -54,6 +54,7 @@ extern int NDECL(dofire); /**/
 extern int NDECL(dothrow); /**/
 extern int NDECL(doeat); /**/
 extern int NDECL(done2); /**/
+extern int NDECL(vanquished); /**/
 extern int NDECL(doengrave); /**/
 extern int NDECL(dopickup); /**/
 extern int NDECL(ddoinv); /**/
@@ -1777,33 +1778,35 @@ struct ext_func_tab extcmdlist[] = {
 	 * There must be a blank entry here for every entry in the table
 	 * below.
 	 */
-	{(char *)0, (char *)0, donull, TRUE},
-	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},	/* levelchange */
+	{(char *)0, (char *)0, donull, TRUE},	/* lightsources */
 #ifdef DEBUG_MIGRATING_MONS
-	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},	/* migratemons */
 #endif
-	{(char *)0, (char *)0, donull, TRUE},
-	{(char *)0, (char *)0, donull, TRUE},
-	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},	/* monpolycontrol */
+	{(char *)0, (char *)0, donull, TRUE},	/* panic */
+	{(char *)0, (char *)0, donull, TRUE},	/* polyself */
 #ifdef PORT_DEBUG
-	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},	/* portdebug */
 #endif
-	{(char *)0, (char *)0, donull, TRUE},
-	{(char *)0, (char *)0, donull, TRUE},
-	{(char *)0, (char *)0, donull, TRUE},
-	{(char *)0, (char *)0, donull, TRUE},
-	{(char *)0, (char *)0, donull, TRUE},
-	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},	/* seenv */
+	{(char *)0, (char *)0, donull, TRUE},	/* stats */
+	{(char *)0, (char *)0, donull, TRUE},	/* terrain */
+	{(char *)0, (char *)0, donull, TRUE},	/* timeout */
+	{(char *)0, (char *)0, donull, TRUE},	/* vanquished */
+	{(char *)0, (char *)0, donull, TRUE},	/* vision */
+	{(char *)0, (char *)0, donull, TRUE},	/* wizsmell */
 #ifdef DEBUG
-	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},	/* wizdebug */
 #endif
-	{(char *)0, (char *)0, donull, TRUE},
-	{(char *)0, (char *)0, donull, TRUE},
+	{(char *)0, (char *)0, donull, TRUE},	/* wizrumorcheck */
+	{(char *)0, (char *)0, donull, TRUE},	/* wmode */
 #endif
 	{(char *)0, (char *)0, donull, TRUE}	/* sentinel */
 };
 
-#if defined(WIZARD)
+#ifdef WIZARD
+/* there must be a placeholder in the table above for every entry here */
 static const struct ext_func_tab debug_extcmdlist[] = {
 	{"levelchange", "change experience level", wiz_level_change, TRUE},
 	{"lightsources", "show mobile light sources", wiz_light_sources, TRUE},
@@ -1820,6 +1823,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
 	{"terrain", "show map topology", wiz_map_terrain, TRUE},
 	{"timeout", "look at timeout queue", wiz_timeout_queue, TRUE},
+	{"vanquished", "list vanquished monsters", dovanquished, TRUE},
 	{"vision", "show vision array", wiz_show_vision, TRUE},
 	{"wizsmell", "smell monster", wiz_smell, TRUE},
 #ifdef DEBUG
@@ -1847,6 +1851,9 @@ add_debug_extended_commands()
 	    ;
 
 	for (i = 0; debug_extcmdlist[i].ef_txt; i++) {
+	    /* need enough room for "?" entry plus terminator */
+	    if (n + 2 >= SIZE(extcmdlist))
+	panic("Too many debugging commands!");
 	    for (j = 0; j < n; j++)
 		if (strcmp(debug_extcmdlist[i].ef_txt, extcmdlist[j].ef_txt) < 0) break;
 

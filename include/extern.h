@@ -628,6 +628,7 @@ E void VDECL(panic, (const char *,...)) PRINTF_F(1,2);
 E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(terminate, (int));
+E int NDECL(dovanquished);
 E int NDECL(num_genocides);
 E void FDECL(delayed_killer, (int, int, const char*));
 E struct kinfo *FDECL(find_delayed_killer, (int));

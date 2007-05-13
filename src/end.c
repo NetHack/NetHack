@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.5	2007/02/28	*/
+/*	SCCS Id: @(#)end.c	3.5	2007/05/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1061,6 +1061,14 @@ int status;
 	nethack_exit(status);
 }
 
+/* #vanquished command */
+int
+dovanquished()
+{
+    list_vanquished('a', FALSE);
+    return 0;
+}
+
 STATIC_OVL void
 list_vanquished(defquery, ask)
 char defquery;
@@ -1087,7 +1095,7 @@ boolean ask;
 	c = ask ? yn_function("Do you want an account of creatures vanquished?",
 			      ynqchars, defquery) : defquery;
 	if (c == 'q') done_stopprint++;
-	if (c == 'y') {
+	if (c == 'y' || c == 'a') {
 	    klwin = create_nhwindow(NHW_MENU);
 	    putstr(klwin, 0, "Vanquished creatures:");
 	    putstr(klwin, 0, "");
@@ -1132,6 +1140,9 @@ boolean ask;
 	    display_nhwindow(klwin, TRUE);
 	    destroy_nhwindow(klwin);
 	}
+    } else if (defquery == 'a') {
+	/* #dovanquished rather than final disclosure, so pline() is ok */
+	pline("No monsters have been vanquished.");
     }
 }
 
