@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.5	2007/03/17	*/
+/*	SCCS Id: @(#)dokick.c	3.5	2007/05/16	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1070,11 +1070,9 @@ dumb:
 			exercise(A_STR, FALSE);
 			set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
 		}
-		if ((Is_airlevel(&u.uz) || Levitation) && rn2(2)) {
+		if ((Is_airlevel(&u.uz) || Levitation) && rn2(2))
 		    hurtle(-u.dx, -u.dy, 1, TRUE);
-		    return 1;		/* you moved, so use up a turn */
-		}
-		return(0);
+		return 1;	/* uses a turn */
 	}
 
 	/* not enough leverage to kick open doors while levitating */
