@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monmove.c	3.5	2006/12/13	*/
+/*	SCCS Id: @(#)monmove.c	3.5	2007/05/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -228,6 +228,9 @@ int fleetime;
 boolean first;
 boolean fleemsg;
 {
+	/* shouldn't happen; maybe warrants impossible()? */
+	if (DEADMONSTER(mtmp)) return;
+
 	if (mtmp == u.ustuck) release_hero(mtmp);	/* expels/unstuck */
 
 	if (!first || !mtmp->mflee) {

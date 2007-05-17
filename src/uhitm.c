@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2007/04/13	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2007/05/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1031,8 +1031,12 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 	if (mon->mhp > mon->mhpmax) mon->mhp = mon->mhpmax;
 	if (mon->mhp < 1)
 		destroyed = TRUE;
-	if (mon->mtame && (!mon->mflee || mon->mfleetim) && tmp > 0) {
-		abuse_dog(mon);
+	if (mon->mtame && tmp > 0) {
+	    /* do this even if the pet is being killed (affects revival) */
+	    abuse_dog(mon);	/* reduces tameness */
+	    /* flee if still alive and still tame; if already suffering from
+	       untimed fleeing, no effect, otherwise increases timed fleeing */
+	    if (mon->mtame && !destroyed)
 		monflee(mon, 10 * rnd(tmp), FALSE, FALSE);
 	}
 	if ((mdat == &mons[PM_BLACK_PUDDING] ||
