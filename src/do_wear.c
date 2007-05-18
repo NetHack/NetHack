@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.5	2007/03/19	*/
+/*	SCCS Id: @(#)do_wear.c	3.5	2007/05/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -626,9 +626,11 @@ Amulet_on()
 		break;
 	    }
 	case AMULET_OF_STRANGULATION:
-		makeknown(AMULET_OF_STRANGULATION);
-		pline("It constricts your throat!");
-		Strangled = 6;
+		if (can_be_strangled(&youmonst)) {
+		    makeknown(AMULET_OF_STRANGULATION);
+		    pline("It constricts your throat!");
+		    Strangled = 6L;
+		}
 		break;
 	case AMULET_OF_RESTFUL_SLEEP:
 		HSleeping = rnd(100);
@@ -671,8 +673,11 @@ Amulet_off()
 		break;
 	case AMULET_OF_STRANGULATION:
 		if (Strangled) {
+		    if (Breathless)
+			Your("%s is no longer constricted!", body_part(NECK));
+		    else
 			You("can breathe more easily!");
-			Strangled = 0;
+		    Strangled = 0L;
 		}
 		break;
 	case AMULET_OF_RESTFUL_SLEEP:

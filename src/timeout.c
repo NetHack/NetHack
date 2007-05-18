@@ -354,6 +354,12 @@ nh_timeout()
 			Strcpy(killer.name,
 			       (u.uburied) ? "suffocation" : "strangulation");
 			done(DIED);
+			/* must be declining to die in explore|wizard mode;
+			   treat like being cured of strangulation by prayer */
+			if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
+			    Your("amulet vanishes!");
+			    useup(uamul);
+			}
 			break;
 		case FUMBLING:
 			/* call this only when a move took place.  */

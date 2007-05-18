@@ -229,6 +229,7 @@ eliminate case-sensitivity when converting words from singular to plural and
 breath attack directed at self by poly'd hero always hits
 override non-silver vs shades for artifacts which deal extra damage to undead
 assorted mirror fixes--mainly visibility issues
+some monsters can't be strangled; self-polymorph can stop/restart strangulation
 
 
 Platform- and/or Interface-Specific Fixes

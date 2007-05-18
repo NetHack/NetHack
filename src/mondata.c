@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mondata.c	3.5	2007/03/02	*/
+/*	SCCS Id: @(#)mondata.c	3.5	2007/05/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -297,6 +297,37 @@ register struct monst *mtmp;
 	    return FALSE;
 	if ((mtmp == &youmonst) && Strangled) return FALSE;
 	return TRUE;
+}
+
+boolean
+can_be_strangled(mon)	/* TRUE if mon is vulnerable to strangulation */
+struct monst *mon;
+{
+    struct obj *mamul;
+    boolean nonbreathing, nobrainer;
+
+    /* For amulet of strangulation support:  here we're considering
+       strangulation to be loss of blood flow to the brain due to
+       constriction of the arteries in the neck, so all headless
+       creatures are immune (no neck) as are mindless creatures
+       who don't need to breathe (brain, if any, doesn't care).
+       Mindless creatures who do need to breath are vulnerable, as
+       are non-breathing creatures which have higher brain function. */
+    if (!has_head(mon->data)) return FALSE;
+    if (mon == &youmonst) {
+	/* hero can't be mindless but poly'ing into mindless form can
+	   confer strangulation protection */
+	nobrainer = mindless(youmonst.data);
+	nonbreathing = Breathless;
+    } else {
+	nobrainer = mindless(mon->data);
+	/* monsters don't wear amulets of magical breathing,
+	   so second part doesn't achieve anything useful... */
+	nonbreathing = (breathless(mon->data) ||
+			((mamul = which_armor(mon, W_AMUL)) != 0 &&
+			 (mamul->otyp == AMULET_OF_MAGICAL_BREATHING)));
+    }
+    return (boolean)(!nobrainer || !nonbreathing);
 }
 
 boolean

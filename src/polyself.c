@@ -21,6 +21,7 @@
 
 #include "hack.h"
 
+STATIC_DCL void FDECL(check_strangling, (BOOLEAN_P));
 STATIC_DCL void FDECL(polyman, (const char *,const char *));
 STATIC_DCL void NDECL(break_armor);
 STATIC_DCL void FDECL(drop_weapon,(int));
@@ -44,6 +45,30 @@ set_uasmon()
 #ifdef STATUS_VIA_WINDOWPORT
 	status_initialize(REASSESS_ONLY);
 #endif
+}
+
+/* for changing into form that's immune to strangulation */
+STATIC_OVL void
+check_strangling(on)
+boolean on;
+{
+    if (on) {	/* on -- maybe resume strangling */
+	/* when Strangled is already set, polymorphing from one
+	   vulnerable form into another causes the counter to be reset */
+	if (uamul && uamul->otyp == AMULET_OF_STRANGULATION &&
+		can_be_strangled(&youmonst)) {
+	    Your("%s %s your %s!", simpleonames(uamul),
+		Strangled ? "still constricts" : "begins constricting",
+		body_part(NECK)); /* "throat" */
+	    Strangled = 6L;
+	    makeknown(AMULET_OF_STRANGULATION);
+	}
+    } else {	/* off -- maybe block strangling */
+	if (Strangled && !can_be_strangled(&youmonst)) {
+	    Strangled = 0L;
+	    You("are no longer being strangled.");
+	}
+    }
 }
 
 /* make a (new) human out of the player */
@@ -109,6 +134,7 @@ const char *fmt, *arg;
 	    Blinded = 1L;
 	    make_blinded(0L, TRUE);	/* remove blindness */
 	}
+	check_strangling(TRUE);
 
 	if(!Levitation && !u.ustuck &&
 	   (is_pool(u.ux,u.uy) || is_lava(u.ux,u.uy)))
@@ -491,6 +517,7 @@ int	mntmp;
 		make_slimed(0L, (char*) 0);
 	    }
 	}
+	check_strangling(FALSE); /* maybe stop strangling */
 	if (nohands(youmonst.data)) Glib = 0;
 
 	/*
@@ -631,6 +658,7 @@ int	mntmp;
 	    You("orient yourself on the web.");
 	    u.utrap = 0;
 	}
+	check_strangling(TRUE); /* maybe start strangling */
 	(void) polysense(youmonst.data);
 
 	context.botl = 1;
