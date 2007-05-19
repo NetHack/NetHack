@@ -270,7 +270,7 @@ struct monst *mtmp;
 char *objnambuf;
 {
 	struct obj *otmp;
-	int tmp, could_petrify, named = 0, armordelay;
+	int tmp, could_petrify, named = 0, armordelay, retrycnt = 0;
 	boolean monkey_business; /* true iff an animal is doing the thievery */
 
 	if (objnambuf) *objnambuf = '\0';
@@ -304,6 +304,7 @@ nothing_to_steal:
 	    goto gotobj;
 	}
 
+ retry:
 	tmp = 0;
 	for(otmp = invent; otmp; otmp = otmp->nobj)
 	    if ((!uarm || otmp != uarmc) && otmp != uskin
@@ -343,6 +344,10 @@ nothing_to_steal:
 gotobj:
 	if(otmp->o_id == stealoid) return(0);
 
+	if (otmp->otyp == BOULDER && !throws_rocks(mtmp->data)) {
+	    if (!retrycnt++) goto retry;
+	    goto cant_take;
+	}
 	/* animals can't overcome curse stickiness nor unlock chains */
 	if (monkey_business) {
 	    boolean ostuck;
