@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2007/02/03	*/
+/*	SCCS Id: @(#)do.c	3.5	2007/05/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1133,6 +1133,7 @@ boolean at_stairs, falling, portal;
 		minit();	/* ZEROCOMP */
 		getlev(fd, hackpid, new_ledger, FALSE);
 		(void) close(fd);
+		oinit(); /* reassign level dependent obj probabilities */
 	}
 	/* do this prior to level-change pline messages */
 	vision_reset();		/* clear old level's line-of-sight */
