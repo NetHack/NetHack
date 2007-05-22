@@ -526,7 +526,7 @@ forget_objects(percent)
 	randomize(indices, count);
 
 	/* forget first % of randomized indices */
-	count = ((count * percent) + 50) / 100;
+	count = ((count * percent) + rn2(100)) / 100;
 	for (i = 0; i < count; i++)
 	    forget_single_object(indices[i]);
 }
