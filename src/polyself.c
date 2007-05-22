@@ -841,6 +841,9 @@ rehumanize()
 	polyman("return to %s form!", urace.adj);
 
 	if (u.uhp < 1) {
+	    /* can only happen if some bit of code reduces u.uhp
+	       instead of u.mh while poly'd */
+	    Your("old form was not healthy enough to survive.");
 	    Sprintf(killer.name, "reverting to unhealthy %s form", urace.adj);
 	    killer.format = KILLED_BY;
 	    done(DIED);
