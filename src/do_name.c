@@ -493,15 +493,15 @@ docallcmd()
 		     "a particular object in inventory", MENU_UNSELECTED);
 	    any.a_char = 'o';	/* entry 'c', group accelator 'n' */
 	    add_menu(win, NO_GLYPH, &any, 0, 'n', ATR_NONE,
-		     "a type of object in inventory", MENU_UNSELECTED);
+		     "the type of an object in inventory", MENU_UNSELECTED);
 	}
 	any.a_char = 'd';	/* entry 'd' (or 'b'), group accelator 'd' */
 	add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
-		 "a type of object on discoveries list", MENU_UNSELECTED);
+		 "the type of an object on discoveries list", MENU_UNSELECTED);
 #if 0
 	any.a_char = 'f';	/* entry 'e' (or 'c'), group accelator 'f' */
 	add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
-		 "a type of object upon the floor", MENU_UNSELECTED);
+		 "the type of an object upon the floor", MENU_UNSELECTED);
 #endif
 	end_menu(win, "What do you want to name?");
 	if (select_menu(win, PICK_ONE, &pick_list) > 0) {
