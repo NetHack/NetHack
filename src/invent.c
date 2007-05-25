@@ -971,6 +971,7 @@ register const char *let,*word;
 		    (otmp->otyp != HORN_OF_PLENTY || !otmp->dknown ||
 			!objects[HORN_OF_PLENTY].oc_name_known))
 		|| (!strcmp(word, "charge") && !is_chargeable(otmp))
+		|| (!strcmp(word, "call") && !objtyp_is_callable(otyp))
 		    )
 			foo--;
 		/* ugly check for unworn armor that can't be worn */

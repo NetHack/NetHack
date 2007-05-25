@@ -42,8 +42,7 @@ extern int NDECL(dodown); /**/
 extern int NDECL(doup); /**/
 extern int NDECL(donull); /**/
 extern int NDECL(dowipe); /**/
-extern int NDECL(do_mname); /**/
-extern int NDECL(ddocall); /**/
+extern int NDECL(docallcnd); /**/
 extern int NDECL(dotakeoff); /**/
 extern int NDECL(doremring); /**/
 extern int NDECL(dowear); /**/
@@ -1646,7 +1645,7 @@ static const struct func_tab cmdlist[] = {
 	{M('a'), TRUE, doorganize},
 /*	'b', 'B' : go sw */
 	{'c', FALSE, doclose},
-	{'C', TRUE, do_mname},
+	{'C', TRUE, docallcmd},
 	{M('c'), TRUE, dotalk},
 	{'d', FALSE, dodrop},
 	{'D', FALSE, doddrop},
@@ -1671,9 +1670,9 @@ static const struct func_tab cmdlist[] = {
 	{M('l'), FALSE, doloot},
 /*	'n' prefixes a count if number_pad is on */
 	{M('m'), TRUE, domonability},
-	{'N', TRUE, ddocall}, /* if number_pad is on */
-	{M('n'), TRUE, ddocall},
-	{M('N'), TRUE, ddocall},
+	{'N', TRUE, docallcmd}, /* if number_pad is on */
+	{M('n'), TRUE, docallcmd},
+	{M('N'), TRUE, docallcmd},
 	{'o', FALSE, doopen},
 	{'O', TRUE, doset},
 	{M('o'), FALSE, dosacrifice},
@@ -1753,7 +1752,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"jump", "jump to a location", dojump, FALSE},
 	{"loot", "loot a box on the floor", doloot, FALSE},
 	{"monster", "use a monster's special ability", domonability, TRUE},
-	{"name", "name an item or type of object", ddocall, TRUE},
+	{"name", "name an item or type of object", docallcmd, TRUE},
 	{"offer", "offer a sacrifice to the gods", dosacrifice, FALSE},
 #ifdef DUNGEON_OVERVIEW
 	{"overview", "show an overview of the dungeon", dooverview, TRUE},

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)o_init.c	3.5	2005/11/14	*/
+/*	SCCS Id: @(#)o_init.c	3.5	2007/05/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -407,10 +407,9 @@ int
 dodiscovered()				/* free after Robert Viduya */
 {
     register int i, dis;
-    int	ct = 0;
-    char *s, oclass, prev_class, classes[MAXOCLASSES];
+    int ct = 0;
+    char *s, oclass, prev_class, classes[MAXOCLASSES], buf[BUFSZ];
     winid tmpwin;
-	char buf[BUFSZ];
 
     tmpwin = create_nhwindow(NHW_MENU);
     putstr(tmpwin, 0, "Discoveries");
@@ -442,7 +441,7 @@ dodiscovered()				/* free after Robert Viduya */
 	prev_class = oclass + 1;	/* forced different from oclass */
 	for (i = bases[(int)oclass];
 	     i < NUM_OBJECTS && objects[i].oc_class == oclass; i++) {
-	    if ((dis = disco[i]) && interesting_to_discover(dis)) {
+	    if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
 		ct++;
 		if (oclass != prev_class) {
 		    putstr(tmpwin, iflags.menu_headings, let_to_name(oclass, FALSE));
@@ -461,6 +460,79 @@ dodiscovered()				/* free after Robert Viduya */
     destroy_nhwindow(tmpwin);
 
     return 0;
+}
+
+/* put up nameable subset of discoveries list as a menu */
+void
+rename_disco()
+{
+    register int i, dis;
+    int ct = 0, mn = 0, sl;
+    char *s, oclass, prev_class;
+    winid tmpwin;
+    anything any;
+    menu_item *selected = 0;
+
+    any = zeroany;
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+
+    /*
+     * Skip the "unique objects" section (each will appear within its
+     * regular class if it is nameable) and the artifacts section.
+     * We assume that classes omitted from packorder aren't nameable
+     * so we skip venom too.
+     */
+
+    /* for each class, show discoveries in that class */
+    for (s = flags.inv_order; *s; s++) {
+	oclass = *s;
+	prev_class = oclass + 1;	/* forced different from oclass */
+	for (i = bases[(int)oclass];
+	     i < NUM_OBJECTS && objects[i].oc_class == oclass; i++) {
+	    dis = disco[i];
+	    if (!dis || !interesting_to_discover(dis)) continue;
+	    ct++;
+	    if (!objtyp_is_callable(dis)) continue;
+	    mn++;
+
+	    if (oclass != prev_class) {
+		any.a_int = 0;
+		add_menu(tmpwin, NO_GLYPH, &any, ' ', iflags.menu_headings,
+			ATR_NONE, let_to_name(oclass, FALSE), MENU_UNSELECTED);
+		prev_class = oclass;
+	    }
+	    any.a_int = dis;
+	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+		    obj_typename(dis), MENU_UNSELECTED);
+	}
+    }
+    if (ct == 0) {
+	You("haven't discovered anything yet...");
+    } else if (mn == 0) {
+	pline("None of your discoveries can be assigned names...");
+    } else {
+	end_menu(tmpwin, "Pick an object type to name");
+	dis = STRANGE_OBJECT;
+	sl = select_menu(tmpwin, PICK_ONE, &selected);
+	if (sl > 0) {
+	    dis = selected[0].item.a_int;
+	    free((genericptr_t)selected);
+	}
+	if (dis != STRANGE_OBJECT) {
+	    struct obj odummy;
+
+	    odummy = zeroobj;
+	    odummy.otyp = dis;
+	    odummy.oclass = objects[dis].oc_class;
+	    odummy.quan = 1L;
+	    odummy.known = !objects[dis].oc_uses_known;
+	    odummy.dknown = 1;
+	    docall(&odummy);
+	}
+    }
+    destroy_nhwindow(tmpwin);
+    return;
 }
 
 /*o_init.c*/

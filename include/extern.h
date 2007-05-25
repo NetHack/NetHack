@@ -365,9 +365,9 @@ E void FDECL(new_oname, (struct obj *,int));
 E void FDECL(free_oname, (struct obj *));
 E const char *FDECL(safe_oname, (struct obj *));
 E struct monst *FDECL(christen_monst, (struct monst *,const char *));
-E int NDECL(do_mname);
 E struct obj *FDECL(oname, (struct obj *,const char *));
-E int NDECL(ddocall);
+E boolean FDECL(objtyp_is_callable, (int));
+E int NDECL(docallcmd);
 E void FDECL(docall, (struct obj *));
 E const char *NDECL(rndghostname);
 E char *FDECL(x_monnam, (struct monst *,int,const char *,int,BOOLEAN_P));
@@ -1513,6 +1513,7 @@ E void FDECL(restnames, (int));
 E void FDECL(discover_object, (int,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(undiscover_object, (int));
 E int NDECL(dodiscovered);
+E void NDECL(rename_disco);
 
 /* ### objects.c ### */
 

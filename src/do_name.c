@@ -1,12 +1,13 @@
-/*	SCCS Id: @(#)do_name.c	3.5	2006/05/22	*/
+/*	SCCS Id: @(#)do_name.c	3.5	2007/05/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(do_oname, (struct obj *));
-STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P,const char *));
 STATIC_DCL char *NDECL(nextmbuf);
+STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P,const char *));
+STATIC_DCL void NDECL(do_mname);
+STATIC_DCL void FDECL(do_oname, (struct obj *));
 
 extern const char what_is_an_unknown_object[];		/* from pager.c */
 
@@ -305,7 +306,8 @@ const char *name;
 	return mtmp;
 }
 
-int
+/* allow player to assign a name to some chosen monster */
+STATIC_OVL void
 do_mname()
 {
 	char buf[BUFSZ], monnambuf[BUFSZ];
@@ -316,13 +318,13 @@ do_mname()
 
 	if (Hallucination) {
 		You("would never recognize it anyway.");
-		return 0;
+		return;
 	}
 	cc.x = u.ux;
 	cc.y = u.uy;
 	if (getpos(&cc, FALSE, "the monster you want to name") < 0 ||
 			(cx = cc.x) < 0)
-		return 0;
+		return;
 	cy = cc.y;
 
 	if (cx == u.ux && cy == u.uy) {
@@ -336,7 +338,7 @@ do_mname()
 		(flags.female ? "beautiful" : "handsome") :
 		"ugly",
 		plname);
-		return(0);
+		return;
 #ifdef STEED
 	    }
 #endif
@@ -349,13 +351,13 @@ do_mname()
 			|| mtmp->m_ap_type == M_AP_OBJECT
 			|| (mtmp->minvis && !See_invisible)))) {
 		pline("I see no monster there.");
-		return(0);
+		return;
 	}
 	/* special case similar to the one in lookat() */
 	Sprintf(qbuf, "What do you want to call %s?",
 		distant_monnam(mtmp, ARTICLE_THE, monnambuf));
 	getlin(qbuf,buf);
-	if(!*buf || *buf == '\033') return(0);
+	if (!*buf || *buf == '\033') return;
 	/* strip leading and trailing spaces; unnames monster if all spaces */
 	(void)mungspaces(buf);
 
@@ -372,7 +374,6 @@ do_mname()
 	    pline("%s will not accept the name %s.", upstart(monnambuf), buf);
 	else
 	    (void) christen_monst(mtmp, buf);
-	return(0);
 }
 
 /*
@@ -459,34 +460,70 @@ static NEARDATA const char callable[] = {
 	SCROLL_CLASS, POTION_CLASS, WAND_CLASS, RING_CLASS, AMULET_CLASS,
 	GEM_CLASS, SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0 };
 
-int
-ddocall()
+boolean
+objtyp_is_callable(i)
+int i;
 {
-	register struct obj *obj;
-#ifdef REDO
-	char	ch;
-#endif
-	char allowall[2];
+    return (boolean)(objects[i].oc_uname ||
+		     (OBJ_DESCR(objects[i]) &&
+			index(callable, objects[i].oc_class)));
+}
 
-	switch(
-#ifdef REDO
-		ch =
+/* C and #name commands - player can name monster or object or type of obj */
+int
+docallcmd()
+{
+	struct obj *obj;
+	winid win;
+	anything any;
+	menu_item *pick_list = 0;
+	char ch, allowall[2];
+
+	win = create_nhwindow(NHW_MENU);
+	start_menu(win);
+	any = zeroany;
+	any.a_char = 'm';	/* entry 'a', group accelator 'C' */
+	add_menu(win, NO_GLYPH, &any, 0, 'C', ATR_NONE,
+		"a monster", MENU_UNSELECTED);
+	if (invent) {
+	    /* we use y and n as accelerators so that we can accept user's
+	       response keyed to old "name an individual object?" prompt */
+	    any.a_char = 'i';	/* entry 'b', group accelator 'y' */
+	    add_menu(win, NO_GLYPH, &any, 0, 'y', ATR_NONE,
+		     "a particular object in inventory", MENU_UNSELECTED);
+	    any.a_char = 'o';	/* entry 'c', group accelator 'n' */
+	    add_menu(win, NO_GLYPH, &any, 0, 'n', ATR_NONE,
+		     "a type of object in inventory", MENU_UNSELECTED);
+	}
+	any.a_char = 'd';	/* entry 'd' (or 'b'), group accelator 'd' */
+	add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+		 "a type of object on discoveries list", MENU_UNSELECTED);
+#if 0
+	any.a_char = 'f';	/* entry 'e' (or 'c'), group accelator 'f' */
+	add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+		 "a type of object upon the floor", MENU_UNSELECTED);
 #endif
-		ynq("Name an individual object?")) {
+	end_menu(win, "What do you want to name?");
+	if (select_menu(win, PICK_ONE, &pick_list) > 0) {
+	    ch = pick_list[0].item.a_char;
+	    free((genericptr_t)pick_list);
+	} else
+	    ch = 'q';
+	destroy_nhwindow(win);
+
+	switch (ch) {
+	default:
 	case 'q':
 		break;
-	case 'y':
-#ifdef REDO
-		savech(ch);
-#endif
+	case 'm':	/* name a visible monster */
+		do_mname();
+		break;
+	case 'i':	/* name an individual object in inventory */
 		allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 		obj = getobj(allowall, "name");
 		if(obj) do_oname(obj);
 		break;
-	default :
-#ifdef REDO
-		savech(ch);
-#endif
+	case 'o':	/* name a type of object in inventory */
 		obj = getobj(callable, "call");
 		if (obj) {
 			/* behave as if examining it in inventory;
@@ -495,12 +532,24 @@ ddocall()
 			(void) xname(obj);
 
 			if (!obj->dknown) {
-				You("would never recognize another one.");
-				return 0;
+			    You("would never recognize another one.");
+#if 0
+			} else if (!objtyp_is_callable(obj->otyp)) {
+			    You("know those as well as you ever will.");
+#endif
+			} else {
+			    docall(obj);
 			}
-			docall(obj);
 		}
 		break;
+	case 'd':	/* name a type of object on the discoveries list */
+		rename_disco();
+		break;
+#if 0
+	case 'f':	/* name a type of object visible on the floor */
+		/* [not implemented] */
+		break;
+#endif
 	}
 	return 0;
 }
