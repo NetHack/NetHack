@@ -1752,7 +1752,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"jump", "jump to a location", dojump, FALSE},
 	{"loot", "loot a box on the floor", doloot, FALSE},
 	{"monster", "use a monster's special ability", domonability, TRUE},
-	{"name", "name an item or type of object", docallcmd, TRUE},
+	{"name", "name a monster or an object", docallcmd, TRUE},
 	{"offer", "offer a sacrifice to the gods", dosacrifice, FALSE},
 #ifdef DUNGEON_OVERVIEW
 	{"overview", "show an overview of the dungeon", dooverview, TRUE},
