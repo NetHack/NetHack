@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.5
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "September 20, 2006
+.ds f2 "May 24, 2007
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -497,7 +497,8 @@ Redo the previous command.
 .lp c
 Close a door.
 .lp C
-Call (name) an individual monster.
+Call (name) a monster, an individual object, or a type of object.
+Same as extended command ``#name''.
 .lp ^C
 Panic button.  Quit the game.
 .lp d
@@ -707,7 +708,7 @@ from a horse standing next to you.
 .lp #monster
 Use a monster's special ability (when polymorphed into monster form).
 .lp #name
-Name an item or type of object.
+Name a monster, an individual object, or a type of object.  Same as `C'.
 .lp #offer
 Offer a sacrifice to the gods.
 .lp #pray
@@ -802,7 +803,9 @@ Kick something (usually a door).  Same as `^D'.
 Loot a box or bag on the floor beneath you, or the saddle 
 from a horse standing next to you.  Same as ``#loot'' or ``M-l''.
 .lp N
-Name an item or type of object.  Same as ``#name'' or ``M-n''.
+Name a monster, an individual object, or a type of object.  Same
+as ``#name'' (or ``M-n'') which is the same as the `C'
+command.
 .lp u
 Untrap a trap, door, or chest.  Same as ``#untrap'' or ``M-u''.
 
@@ -949,7 +952,8 @@ help you locate them before they locate you (which some monsters can do
 very well).
 .pg
 The commands `/' and `;' may be used to obtain information about those
-monsters who are displayed on the screen.  The command `C' allows you
+monsters who are displayed on the screen.  The command ``#name'', or
+its synonym `C', allows you
 to assign a name to a monster, which may be useful to help distinguish
 one from another when multiple monsters are present.  Assigning a name
 which is just a space will remove any prior name.
@@ -1066,8 +1070,8 @@ When you use one of these objects, if its effect is obvious, NetHack
 will remember what it is for you.  If its effect isn't extremely
 obvious, you will be asked what you want to call this type of object
 so you will recognize it later.  You can also use the ``#name''
-command for the same purpose at any time, to name all objects of a
-particular type or just an individual object.
+command, or its synonym `C', for the same purpose at any time, to name
+all objects of a particular type or just an individual object.
 When you use ``#name'' on an object which has already been named,
 specifying a space as the value will remove the prior name instead
 of assigning a new one.

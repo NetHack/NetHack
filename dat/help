@@ -83,12 +83,12 @@ Commands:
         <       Go up a staircase (if you are standing on it).
         >       Go down a staircase (if you are standing on it).
         .       Rest, do nothing for one turn.
-        _       Travel via a shortest-path algorithm to a point on the map 
-        a       Apply (use) a tool (pick-axe, key, lamp...)
+        _       Travel via a shortest-path algorithm to a point on the map.
+        a       Apply (use) a tool (pick-axe, key, lamp...).
         A       Remove all armor.
-        ^A      Redo the previous command
+        ^A      Redo the previous command.
         c       Close a door.
-        C       Call (name) an individual monster.
+        C       Call (name) monster, individual object, or type of object.
         d       Drop something.  d7a:  drop seven items of object a.
         D       Drop multiple items.  This command is implemented in two
                 different ways.  One way is:
@@ -184,8 +184,8 @@ Commands:
         j       Jump to another location.
         k       Kick (for doors, usually).
         l       Loot a box on the floor.
-        n       followed by number of times to repeat the next command
-        N       Name an object or type of object.
+        n       followed by number of times to repeat the next command.
+        N       Name a monster, an individual object, or a type of object.
         u       Untrap a trapped object or door.
 
         You can put a number before a command to repeat it that many times,

@@ -21,7 +21,7 @@ b       Go southwest 1 space
 B       Go southwest until you are on top of something
 ^B      Go southwest until you are near something
 c       Close a door
-C       Call (name) a particular monster
+C       Call (name) a monster, an individual object, or a type of object
 d       Drop an item
 D       Drop specific item types
 e       Eat something
@@ -47,7 +47,7 @@ L       Go east until you are on top of something
 m       Followed by direction, move without picking anything up or fighting
 M       Followed by direction, move a distance without picking anything up
 n       Go southeast 1 space
-N       Go southeast until you are on something (if number_pad, name an object)
+N       Go southeast until you are on something (if number_pad is on, name)
 ^N      Go southeast until you are near something
 o       Open a door
 O       Show option settings, possibly change them
@@ -109,7 +109,7 @@ M-i     Invoke an object's special powers
 M-j     Jump to another location
 M-l     Loot a box on the floor
 M-m     Use a monster's special ability
-M-n     Name an item or type of object
+M-n     Name a monster, an individual object, or a type of object
 M-o     Offer a sacrifice to the gods
 M-p     Pray to the gods for help
 M-q     Quit

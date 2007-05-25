@@ -45,7 +45,7 @@ Game commands:
 a       apply   apply or use a tool (pick-axe, key, camera, etc.)
 A       armor   take off all armor
 c       close   close a door
-C       call    name an individual monster (ex. baptize your dog)
+C       call    name a monster, an individual object, or a type of object
 d       drop    drop an object.  d7a:  drop seven items of object 'a'
 D       Drop    drop selected types of objects
 e       eat     eat something
@@ -100,7 +100,7 @@ M-i     invoke  invoke an object's special powers
 M-j     jump    jump to another location
 M-l     loot    loot a box on the floor
 M-m     monster use a monster's special ability
-M-n     name    name an item or type of object
+M-n     name    name a monster, an individual object, or a type of object
 M-o     offer   offer a sacrifice to the gods
 M-p     pray    pray to the gods for help
 M-q     quit    stop playing

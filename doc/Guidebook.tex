@@ -31,7 +31,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.104 $ $Date: 2007/02/18 04:49:19 $
+% $Revision: 1.105 $ $Date: 2007/04/27 02:05:28 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -44,7 +44,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.5)}
-\date{September 20, 2006}
+\date{May 24, 2007}
 
 \maketitle
 
@@ -669,7 +669,8 @@ Redo the previous command.
 Close a door.
 %.lp
 \item[\tb{C}]
-Call (name) an individual monster.
+Call (name) a monster, an individual object, or an object type.
+Same as extended command ``{\tt \#name}''.
 %.lp
 \item[\tb{\^{}C}]
 Panic button.  Quit the game.
@@ -940,7 +941,7 @@ from a horse standing next to you.
 Use a monster's special ability (when polymorphed into monster form).
 %.lp
 \item[\tb{\#name}]
-Name an item or type of object.
+Name a monster, an individual object, or a type of object.  Same as `{\tt C}'.
 %.lp
 \item[\tb{\#offer}]
 Offer a sacrifice to the gods.
@@ -1080,6 +1081,9 @@ from a horse standing next to you.  Same as ``{\tt \#loot}'' or ``{\tt M-l}''.
 %.lp
 \item[\tb{N}]
 Name an object or type of object.  Same as ``{\tt \#name}'' or ``{\tt M-n}''.
+Name a monster, an individual object, or a type of object.  Same
+as ``{\tt \#name}'' (or ``{\tt M-n}'') which is the same as the `{\tt C}'
+command.
 %.lp
 \item[\tb{u}]
 Untrap a trap, door, or chest.  Same as ``{\tt \#untrap}'' or ``{\tt M-u}''.
@@ -1263,7 +1267,8 @@ very well).
 %.pg
 The commands `{\tt /}' and `{\tt ;}' may be used to obtain information
 about those
-monsters who are displayed on the screen.  The command `{\tt C}' allows you
+monsters who are displayed on the screen.  The command ``{\tt \#name}'', or
+its synonym `{\tt C}', allows you
 to assign a name to a monster, which may be useful to help distinguish
 one from another when multiple monsters are present.  Assigning a name
 which is just a space will remove any prior name.
@@ -1396,8 +1401,8 @@ When you use one of these objects, if its effect is obvious, {\it NetHack\/}
 will remember what it is for you.  If its effect isn't extremely
 obvious, you will be asked what you want to call this type of object
 so you will recognize it later.  You can also use the ``{\tt \#name}''
-command for the same purpose at any time, to name all objects of a
-particular type or just an individual object.
+command, or its synonym `{\tt C}', for the same purpose at any time, to name
+all objects of a particular type or just an individual object.
 When you use ``{\tt \#name}'' on an object which has already been named,
 specifying a space as the value will remove the prior name instead
 of assigning a new one.
