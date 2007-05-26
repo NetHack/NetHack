@@ -724,6 +724,8 @@ mhurtle(mon, dx, dy, range)
     dx = sgn(dx);
     dy = sgn(dy);
     if(!range || (!dx && !dy)) return; /* paranoia */
+    /* don't let grid bugs be hurtled diagonally */
+    if (dx && dy && NODIAG(monsndx(mon->data))) return;
 
 	/* Send the monster along the path */
 	mc.x = mon->mx;

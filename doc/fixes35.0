@@ -231,6 +231,8 @@ override non-silver vs shades for artifacts which deal extra damage to undead
 assorted mirror fixes--mainly visibility issues
 some monsters can't be strangled; self-polymorph can stop/restart strangulation
 re-adjust gem generation probabilities when revisiting existing dungeon levels
+kick evasion shouldn't move monsters through walls
+kick evasion and jousting/staggering blows shouldn't move grid bugs diagonally
 
 
 Platform- and/or Interface-Specific Fixes

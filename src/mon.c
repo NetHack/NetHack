@@ -2121,6 +2121,7 @@ mon_to_stone(mtmp)
 	impossible("Can't polystone %s!", a_monnam(mtmp));
 }
 
+/* might place monst on far side of a wall or boulder */
 void
 mnexto(mtmp)	/* Make monster mtmp next to you (if possible) */
 	struct monst *mtmp;
@@ -2146,6 +2147,27 @@ mnexto(mtmp)	/* Make monster mtmp next to you (if possible) */
 		      !Blind ? "appears" : "arrives");
 	}
 	return;
+}
+
+/* like mnexto() but requires destination to be directly accessible */
+void
+maybe_mnexto(mtmp)
+struct monst *mtmp;
+{
+	coord mm;
+	struct permonst *ptr = mtmp->data;
+	boolean diagok = !NODIAG(ptr - mons);
+	int tryct = 20;
+
+	do {
+	    if (!enexto(&mm, u.ux, u.uy, ptr)) return;
+	    if (couldsee(mm.x, mm.y) &&
+		    /* don't move grid bugs diagonally */
+		    (diagok || mm.x == mtmp->mx || mm.y == mtmp->my)) {
+		rloc_to(mtmp, mm.x, mm.y);
+		return;
+	    }
+	} while (--tryct > 0);
 }
 
 /* mnearto()

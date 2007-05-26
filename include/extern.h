@@ -1289,6 +1289,7 @@ E void FDECL(killed, (struct monst *));
 E void FDECL(xkilled, (struct monst *,int));
 E void FDECL(mon_to_stone, (struct monst*));
 E void FDECL(mnexto, (struct monst *));
+E void FDECL(maybe_mnexto, (struct monst *));
 E boolean FDECL(mnearto, (struct monst *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void FDECL(m_respond, (struct monst *));
 E void FDECL(setmangry, (struct monst *));

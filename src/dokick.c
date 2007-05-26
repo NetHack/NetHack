@@ -206,7 +206,7 @@ doit:
 		(void) passive(mon, FALSE, 1, AT_KICK, FALSE);
 		return;
 	    } else {
-		mnexto(mon);
+		maybe_mnexto(mon);
 		if(mon->mx != x || mon->my != y) {
 		    if(glyph_is_invisible(levl[x][y].glyph)) {
 			unmap_object(x, y);
