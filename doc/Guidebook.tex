@@ -1,8 +1,10 @@
-\documentclass{article}
-% \documentstyle[titlepage]{article}
-
-\usepackage{hyperref}
-\usepackage{longtable}
+\documentstyle[titlepage,longtable]{article}
+%+% we're still limping along in LaTeX 2.09 compatability mode
+%-%\documentclass{article}
+%-%\usepackage{hyperref} % before longtable
+%-%% if hyperref isn't available, we can get by with this instead
+%-%%\RequirePackage[errorshow]{tracefnt} \DeclareSymbolFont{typewriter}{OT1}{cmtt}{m}{n}
+%-%\usepackage{longtable}
 
 \textheight 220mm
 \textwidth 160mm
@@ -31,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.105 $ $Date: 2007/04/27 02:05:28 $
+% $Revision: 1.106 $ $Date: 2007/05/25 02:02:43 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
