@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.doc	3.5	1996/03/23
+#	SCCS Id: @(#)Makefile.doc	3.5	2007/05/25
 
 # for Atari
 # SHELL=E:/GEMINI2/MUPFEL.TTP
@@ -36,7 +36,9 @@ Guidebook.ps:	Guidebook.mn
 # Guidebook.tex is the same as Guidebook.mn but formatted with LaTeX.
 # - The invocation command for LaTeX may vary in different installations.
 # - To print Guidebook.dvi you need to use a suitable dvi-driver.
+# - LaTeX needs to be run twice; second pass uses Guidebook.aux made by first.
 Guidebook.dvi:	Guidebook.tex
+	latex Guidebook.tex
 	latex Guidebook.tex
 
 
