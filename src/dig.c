@@ -234,7 +234,8 @@ dig(VOID_ARGS)
 	    }
 	    if (IS_ROCK(lev->typ) && !may_dig(dpx,dpy) &&
 			dig_typ(uwep, dpx, dpy) == DIGTYP_ROCK) {
-		pline("This wall is too hard to %s.", verb);
+		pline("This %s is too hard to %s.",
+		      is_db_wall(dpx, dpy) ? "drawbridge" : "wall", verb);
 		return(0);
 	    }
 	}
