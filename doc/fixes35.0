@@ -233,6 +233,7 @@ some monsters can't be strangled; self-polymorph can stop/restart strangulation
 re-adjust gem generation probabilities when revisiting existing dungeon levels
 kick evasion shouldn't move monsters through walls
 kick evasion and jousting/staggering blows shouldn't move grid bugs diagonally
+#untrap didn't check whether hero could reach the ground
 
 
 Platform- and/or Interface-Specific Fixes

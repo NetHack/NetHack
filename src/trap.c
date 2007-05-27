@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2007/03/30	*/
+/*	SCCS Id: @(#)trap.c	3.5	2007/05/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3823,33 +3823,60 @@ untrap(force)
 boolean force;
 {
 	register struct obj *otmp;
-	register boolean confused = (Confusion > 0 || Hallucination > 0);
 	register int x,y;
 	int ch;
 	struct trap *ttmp;
 	struct monst *mtmp;
-	boolean trap_skipped = FALSE;
-	boolean box_here = FALSE;
-	boolean deal_with_floor_trap = FALSE;
+	const char *trapdescr;
+	boolean here, useplural,
+		confused = (Confusion || Hallucination),
+		trap_skipped = FALSE,
+		deal_with_floor_trap;
+	int boxcnt = 0;
 	char the_trap[BUFSZ], qbuf[QBUFSZ];
-	int containercnt = 0;
 
 	if(!getdir((char *)0)) return(0);
 	x = u.ux + u.dx;
 	y = u.uy + u.dy;
-
-	for(otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere) {
-		if(Is_box(otmp) && !u.dx && !u.dy) {
-			box_here = TRUE;
-			containercnt++;
-			if (containercnt > 1) break;
-		}
+	if (!isok(x, y)) {
+	    pline_The("perils lurking there are beyond your grasp.");
+	    return 0;
 	}
+	ttmp = t_at(x, y);
+	if (ttmp && !ttmp->tseen) ttmp = 0;
+	trapdescr = ttmp ? defsyms[trap_to_defsym(ttmp->ttyp)].explanation : 0;
+	here = (x == u.ux && y == u.uy);	/* !u.dx && !u.dy */
 
-	if ((ttmp = t_at(x,y)) && ttmp->tseen) {
-		deal_with_floor_trap = TRUE;
-		Strcpy(the_trap, the(defsyms[trap_to_defsym(ttmp->ttyp)].explanation));
-		if (box_here) {
+	if (here)   /* are there are one or more containers here? */
+	    for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
+		if (Is_box(otmp)) {
+		    if (++boxcnt > 1) break;
+		}
+
+	deal_with_floor_trap = can_reach_floor(FALSE);
+	if (!deal_with_floor_trap) {
+	    *the_trap = '\0';
+	    if (ttmp) Strcat(the_trap, an(trapdescr));
+	    if (ttmp && boxcnt) Strcat(the_trap, " and ");
+	    if (boxcnt) Strcat(the_trap,
+			       (boxcnt == 1) ? "a container" : "containers");
+	    useplural = ((ttmp && boxcnt > 0) || boxcnt > 1);
+	    /* note: boxcnt and useplural will always be 0 for !here case */
+	    if (ttmp || boxcnt)
+		There("%s %s %s but you can't reach %s%s.",
+		      useplural ? "are" : "is",
+		      the_trap, here ? "here" : "there",
+		      useplural ? "them" : "it",
+#ifdef STEED
+		      u.usteed ? " while mounted" :
+#endif
+		      "");
+	    trap_skipped = (ttmp != 0);
+	} else { /* deal_with_floor_trap */
+
+	if (ttmp) {
+		Strcpy(the_trap, the(trapdescr));
+		if (boxcnt) {
 			if (ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT) {
 			    You_cant("do much about %s%s.",
 					the_trap, u.utrap ?
@@ -3859,9 +3886,11 @@ boolean force;
 			    deal_with_floor_trap = FALSE;
 			} else {
 			    Sprintf(qbuf, "There %s and %s here. %s %s?",
-				(containercnt == 1) ? "is a container" : "are containers",
-				an(defsyms[trap_to_defsym(ttmp->ttyp)].explanation),
-				ttmp->ttyp == WEB ? "Remove" : "Disarm", the_trap);
+				    (boxcnt == 1) ? "is a container" :
+					"are containers",
+				    an(trapdescr),
+				    (ttmp->ttyp == WEB) ? "Remove" : "Disarm",
+				    the_trap);
 			    switch (ynq(qbuf)) {
 				case 'q': return(0);
 				case 'n': trap_skipped = TRUE;
@@ -3890,7 +3919,7 @@ boolean force;
 				return disarm_shooting_trap(ttmp, ARROW);
 			case PIT:
 			case SPIKED_PIT:
-				if (!u.dx && !u.dy) {
+				if (here) {
 				    You("are already on the edge of the pit.");
 				    return 0;
 				}
@@ -3900,13 +3929,14 @@ boolean force;
 				}
 				return help_monster_out(mtmp, ttmp);
 			default:
-				You("cannot disable %s trap.", (u.dx || u.dy) ? "that" : "this");
+				You("cannot disable %s trap.",
+				    !here ? "that" : "this");
 				return 0;
 		    }
 		}
 	} /* end if */
 
-	if(!u.dx && !u.dy) {
+	if (boxcnt) {
 	    for(otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
 		if(Is_box(otmp)) {
 		    (void)safe_qbuf(qbuf, "There is ",
@@ -3916,12 +3946,7 @@ boolean force;
 			case 'q': return(0);
 			case 'n': continue;
 		    }
-#ifdef STEED
-		    if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
-			rider_cant_reach();
-			return(0);
-		    }
-#endif
+
 		    if((otmp->otrapped && (force || (!confused
 				&& rn2(MAXULEV + 1 - u.ulevel) < 10)))
 		       || (!force && confused && !rn2(3))) {
@@ -3962,15 +3987,15 @@ boolean force;
 		(mtmp->mappearance == S_hcdoor ||
 			mtmp->mappearance == S_vcdoor)	&&
 		!Protection_from_shape_changers)	 {
-
 	    stumble_onto_mimic(mtmp);
 	    return(1);
 	}
 
+	} /* deal_with_floor_trap */
+	/* doors can be manipulated even while levitating/unskilled riding */
+
 	if (!IS_DOOR(levl[x][y].typ)) {
-	    if ((ttmp = t_at(x,y)) && ttmp->tseen)
-		You("cannot disable that trap.");
-	    else
+	    if (!trap_skipped)
 		You("know of no traps there.");
 	    return(0);
 	}
