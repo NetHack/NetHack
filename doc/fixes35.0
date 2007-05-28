@@ -236,6 +236,8 @@ kick evasion and jousting/staggering blows shouldn't move grid bugs diagonally
 #untrap didn't check whether hero could reach the ground
 digging/chopping a closed drawbridge message mentioned digging a "wall"
 attacking via applied polearm now honors the "confirm" option
+engulfer under influence of conflict or confusion could swallow monster at
+	water/lava/trap spot and not be affected by destination til next move
 
 
 Platform- and/or Interface-Specific Fixes

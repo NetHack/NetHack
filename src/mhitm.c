@@ -589,10 +589,9 @@ gulpmm(magr, mdef, mattk)
 
 	status = mdamagem(magr, mdef, mattk);
 
-	if ((status & MM_AGR_DIED) && (status & MM_DEF_DIED)) {
+	if ((status & (MM_AGR_DIED|MM_DEF_DIED)) == (MM_AGR_DIED|MM_DEF_DIED)) {
 	    ;					/* both died -- do nothing  */
-	}
-	else if (status & MM_DEF_DIED) {	/* defender died */
+	} else if (status & MM_DEF_DIED) {	/* defender died */
 	    /*
 	     *  Note:  remove_monster() was called in relmon(), wiping out
 	     *  magr from level.monsters[mdef->mx][mdef->my].  We need to
@@ -600,12 +599,13 @@ gulpmm(magr, mdef, mattk)
 	     */
 	    place_monster(magr, dx, dy);
 	    newsym(dx, dy);
-	}
-	else if (status & MM_AGR_DIED) {	/* agressor died */
+	    /* aggressor moves to <dx,dy> and might encounter trouble there */
+	    if (minliquid(magr) || (t_at(dx, dy) && mintrap(magr) == 2))
+		status |= MM_AGR_DIED;
+	} else if (status & MM_AGR_DIED) {	/* aggressor died */
 	    place_monster(mdef, dx, dy);
 	    newsym(dx, dy);
-	}
-	else {					/* both alive, put them back */
+	} else {					/* both alive, put them back */
 	    if (cansee(dx, dy))
 		pline("%s is regurgitated!", Monnam(mdef));
 
