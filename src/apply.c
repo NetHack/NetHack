@@ -2606,17 +2606,10 @@ use_pole(obj)
 
 	/* Attack the monster there */
 	if ((mtmp = m_at(cc.x, cc.y)) != (struct monst *)0) {
-	    int oldhp = mtmp->mhp;
-
 	    bhitpos = cc;
+	    if (attack_checks(mtmp, uwep)) return res;
 	    check_caitiff(mtmp);
 	    (void) thitmonst(mtmp, uwep);
-	    /* check the monster's HP because thitmonst() doesn't return
-	     * an indication of whether it hit.  Not perfect (what if it's a
-	     * non-silver weapon on a shade?)
-	     */
-	    if (mtmp->mhp < oldhp)
-		u.uconduct.weaphit++;
 	} else
 	    /* Now you know that nothing is there... */
 	    pline(nothing_happens);
@@ -2667,6 +2660,7 @@ use_grapple (obj)
 	struct obj *obj;
 {
 	int res = 0, typ, max_range = 4, tohit;
+	boolean save_confirm;
 	coord cc;
 	struct monst *mtmp;
 	struct obj *otmp;
@@ -2751,15 +2745,25 @@ use_grapple (obj)
 	    }
 	    break;
 	case 2:	/* Monster */
+	    bhitpos = cc;
 	    if ((mtmp = m_at(cc.x, cc.y)) == (struct monst *)0) break;
+	    save_confirm = flags.confirm;
 	    if (verysmall(mtmp->data) && !rn2(4) &&
 			enexto(&cc, u.ux, u.uy, (struct permonst *)0)) {
+		flags.confirm = FALSE;
+		(void) attack_checks(mtmp, uwep);
+		flags.confirm = save_confirm;
+		check_caitiff(mtmp);	/* despite fact there's no damage */
 		You("pull in %s!", mon_nam(mtmp));
 		mtmp->mundetected = 0;
 		rloc_to(mtmp, cc.x, cc.y);
 		return (1);
 	    } else if ((!bigmonst(mtmp->data) && !strongmonst(mtmp->data)) ||
 		       rn2(4)) {
+		flags.confirm = FALSE;
+		(void) attack_checks(mtmp, uwep);
+		flags.confirm = save_confirm;
+		check_caitiff(mtmp);
 		(void) thitmonst(mtmp, uwep);
 		return (1);
 	    }

@@ -1397,6 +1397,7 @@ register struct obj *obj;	/* thrownobj or kickobj or uwep */
 	    }
 
 	    if (tmp >= rnd(20)) {
+		if (hmode == HMON_APPLIED) u.uconduct.weaphit++;
 		if (hmon(mon, obj, hmode)) {	/* mon still alive */
 		    cutworm(mon, bhitpos.x, bhitpos.y, obj);
 		}
@@ -1429,6 +1430,7 @@ register struct obj *obj;	/* thrownobj or kickobj or uwep */
 		passive_obj(mon, obj, (struct attack *)0);
 	    } else {
 		tmiss(obj, mon, TRUE);
+		if (hmode == HMON_APPLIED) wakeup(mon);
 	    }
 
 	} else if (otyp == HEAVY_IRON_BALL) {

@@ -234,7 +234,8 @@ re-adjust gem generation probabilities when revisiting existing dungeon levels
 kick evasion shouldn't move monsters through walls
 kick evasion and jousting/staggering blows shouldn't move grid bugs diagonally
 #untrap didn't check whether hero could reach the ground
-digging/chopping a closed drawbridge message mentioned diggin a "wall"
+digging/chopping a closed drawbridge message mentioned digging a "wall"
+attacking via applied polearm now honors the "confirm" option
 
 
 Platform- and/or Interface-Specific Fixes

@@ -140,7 +140,9 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 		/* if it was an invisible mimic, treat it as if we stumbled
 		 * onto a visible mimic
 		 */
-		if(mtmp->m_ap_type && !Protection_from_shape_changers) {
+		if (mtmp->m_ap_type && !Protection_from_shape_changers &&
+			/* applied pole-arm attack is too far to get stuck */
+			distu(mtmp->mx, mtmp->my) <= 2) {
 		    if(!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data,AD_STCK))
 			u.ustuck = mtmp;
 		}
@@ -220,11 +222,16 @@ void
 check_caitiff(mtmp)
 struct monst *mtmp;
 {
+	if (u.ualign.record <= -10) return;
+
 	if (Role_if(PM_KNIGHT) && u.ualign.type == A_LAWFUL &&
 	    (!mtmp->mcanmove || mtmp->msleeping ||
-	     (mtmp->mflee && !mtmp->mavenge)) &&
-	    u.ualign.record > -10) {
+	     (mtmp->mflee && !mtmp->mavenge))) {
 	    You("caitiff!");
+	    adjalign(-1);
+	} else if (Role_if(PM_SAMURAI) && mtmp->mpeaceful) {
+	    /* attacking peaceful creatures is bad for the samurai's giri */
+	    You("dishonorably attack the innocent!");
 	    adjalign(-1);
 	}
 }
@@ -245,15 +252,8 @@ int *attk_count, *role_roll_penalty;
 
 	/* some actions should occur only once during multiple attacks */
 	if (!(*attk_count)++) {
-	    /* knight's chivalry */
+	    /* knight's chivalry or samurai's giri */
 	    check_caitiff(mtmp);
-
-	    /* attacking peaceful creatures is bad for the samurai's giri */
-	    if (Role_if(PM_SAMURAI) && mtmp->mpeaceful &&
-		    u.ualign.record > -10) {
-		You("dishonorably attack the innocent!");
-		adjalign(-1);
-	    }
 	}
 
 	/* adjust vs. (and possibly modify) monster state */
