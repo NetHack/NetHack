@@ -1578,10 +1578,10 @@ register const char *verb;
 	 */
 	if ((lowc(*spot) == 's' && spot != subj &&
 		    !index("us", lowc(*(spot-1)))) ||
-		BSTRNCMPI(subj, spot-3, "eeth", 4) ||
-		BSTRNCMPI(subj, spot-3, "feet", 4) ||
-		BSTRNCMPI(subj, spot-1, "ia", 2) ||
-		BSTRNCMPI(subj, spot-1, "ae", 2)) {
+		!BSTRNCMPI(subj, spot-3, "eeth", 4) ||
+		!BSTRNCMPI(subj, spot-3, "feet", 4) ||
+		!BSTRNCMPI(subj, spot-1, "ia", 2) ||
+		!BSTRNCMPI(subj, spot-1, "ae", 2)) {
 	    /* check for special cases to avoid false matches */
 	    len = (int)(spot - subj) + 1;
 	    for (spec = special_subjs; *spec; spec++) {
