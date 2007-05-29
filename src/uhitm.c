@@ -2352,6 +2352,10 @@ boolean wep_was_destroyed;
 			else if (Free_action)
 			    You("momentarily stiffen under %s gaze!",
 				    s_suffix(mon_nam(mon)));
+			else if (Hallucination && rn2(4))
+			    pline("%s looks %s%s.", Monnam(mon),
+				  !rn2(2) ? "" : "rather ",
+				  !rn2(2) ? "numb" : "stupified");
 			else {
 			    You("are frozen by %s gaze!",
 				  s_suffix(mon_nam(mon)));

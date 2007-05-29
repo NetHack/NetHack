@@ -1921,17 +1921,38 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 	register struct monst *mtmp;
 	register struct attack  *mattk;
 {
+	static const char * const reactions[] = {
+	    "confused",			/* [0] */
+	    "stunned",			/* [1] */
+	    "puzzled", "dazzled",	/* [2,3] */
+	    "irritated", "inflamed",	/* [4,5] */
+	    "tired",			/* [6] */
+	    "dulled",			/* [7] */
+	};
+	int react = -1;
+	boolean cancelled = (mtmp->mcan != 0), already = FALSE;
+
+	/* assumes that hero has to see monster's gaze in order to be
+	   affected, rather than monster just having to look at hero;
+	   when hallucinating, hero's brain doesn't register what
+	   it's seeing correctly so the gaze is usually ineffective
+	   [this could be taken a lot farther and select a gaze effect
+	   appropriate to what's currently being displayed, giving
+	   ordinary monsters a gaze attack when hero thinks he or she
+	   is facing a gazing creature, but let's not go that far...] */
+	if (Hallucination && rn2(4)) cancelled = TRUE;
+
 	switch(mattk->adtyp) {
-	    case AD_STON:
-		if (mtmp->mcan || !mtmp->mcansee) {
+	case AD_STON:
+	    if (cancelled || !mtmp->mcansee) {
 		    if (!canseemon(mtmp)) break;	/* silently */
 		    pline("%s %s.", Monnam(mtmp),
 			  (mtmp->data == &mons[PM_MEDUSA] && mtmp->mcan) ?
 				"doesn't look all that ugly" :
 				"gazes ineffectually");
 		    break;
-		}
-		if (Reflecting && couldsee(mtmp->mx, mtmp->my) &&
+	    }
+	    if (Reflecting && couldsee(mtmp->mx, mtmp->my) &&
 			mtmp->data == &mons[PM_MEDUSA]) {
 		    /* hero has line of sight to Medusa and she's not blind */
 		    boolean useeit = canseemon(mtmp);
@@ -1956,8 +1977,8 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 
 		    if (mtmp->mhp > 0) break;
 		    return 2;
-		}
-		if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) &&
+	    }
+	    if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) &&
 		    !Stone_resistance) {
 		    You("meet %s gaze.", s_suffix(mon_nam(mtmp)));
 		    stop_occupation();
@@ -1967,12 +1988,15 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    killer.format = KILLED_BY;
 		    Strcpy(killer.name, mtmp->data->mname);
 		    done(STONING);
-		}
-		break;
-	    case AD_CONF:
-		if(!mtmp->mcan && canseemon(mtmp) &&
-		   couldsee(mtmp->mx, mtmp->my) &&
+	    }
+	    break;
+	case AD_CONF:
+	    if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) &&
 		   mtmp->mcansee && !mtmp->mspec_used && rn2(5)) {
+		if (cancelled) {
+		    react = 0;	/* "confused" */
+		    already = (mtmp->mconf != 0);
+		} else {
 		    int conf = d(3,4);
 
 		    mtmp->mspec_used = mtmp->mspec_used + (conf + rn2(6));
@@ -1984,11 +2008,15 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    make_confused(HConfusion + conf, FALSE);
 		    stop_occupation();
 		}
-		break;
-	    case AD_STUN:
-		if(!mtmp->mcan && canseemon(mtmp) &&
-		   couldsee(mtmp->mx, mtmp->my) &&
+	    }
+	    break;
+	case AD_STUN:
+	    if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) &&
 		   mtmp->mcansee && !mtmp->mspec_used && rn2(5)) {
+		if (cancelled) {
+		    react = 1;	/* "stunned" */
+		    already = (mtmp->mstun != 0);
+		} else {
 		    int stun = d(2,6);
 
 		    mtmp->mspec_used = mtmp->mspec_used + (stun + rn2(6));
@@ -1996,10 +2024,19 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    make_stunned(HStun + stun, TRUE);
 		    stop_occupation();
 		}
-		break;
-	    case AD_BLND:
-		if (!mtmp->mcan && canseemon(mtmp) && !resists_blnd(&youmonst)
-			&& distu(mtmp->mx,mtmp->my) <= BOLT_LIM*BOLT_LIM) {
+	    }
+	    break;
+	case AD_BLND:
+	    if (canseemon(mtmp) && !resists_blnd(&youmonst) &&
+		    distu(mtmp->mx,mtmp->my) <= BOLT_LIM*BOLT_LIM) {
+		if (cancelled) {
+		    react = rn1(2,2);	/* "puzzled" || "dazzled" */
+		    already = (mtmp->mcansee == 0);
+		    /* Archons gaze every round; we don't want cancelled ones
+		       giving the "seems puzzled/dazzled" message that often */
+		    if (mtmp->mcan && mtmp->data == &mons[PM_ARCHON] && rn2(5))
+			react = -1;
+		} else {
 		    int blnd = d((int)mattk->damn, (int)mattk->damd);
 
 		    You("are blinded by %s radiance!",
@@ -2012,12 +2049,15 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    if (!Blind) Your(vision_clears);
 		    else make_stunned((long)d(1,3),TRUE);
 		}
-		break;
-	    case AD_FIRE:
-		if (!mtmp->mcan && canseemon(mtmp) &&
-			couldsee(mtmp->mx, mtmp->my) &&
+	    }
+	    break;
+	case AD_FIRE:
+	    if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) &&
 			mtmp->mcansee && !mtmp->mspec_used && rn2(5)) {
-		    int dmg = d(2,6);
+		if (cancelled) {
+		    react = rn1(2,4);	/* "irritated" || "inflamed" */
+		} else {
+		    int dmg = d(2,6), lev = (int)mtmp->m_lev;
 
 		    pline("%s attacks you with a fiery gaze!", Monnam(mtmp));
 		    stop_occupation();
@@ -2026,37 +2066,53 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 			dmg = 0;
 		    }
 		    burn_away_slime();
-		    if ((int) mtmp->m_lev > rn2(20))
-			destroy_item(SCROLL_CLASS, AD_FIRE);
-		    if ((int) mtmp->m_lev > rn2(20))
-			destroy_item(POTION_CLASS, AD_FIRE);
-		    if ((int) mtmp->m_lev > rn2(25))
-			destroy_item(SPBOOK_CLASS, AD_FIRE);
+		    if (lev > rn2(20)) destroy_item(SCROLL_CLASS, AD_FIRE);
+		    if (lev > rn2(20)) destroy_item(POTION_CLASS, AD_FIRE);
+		    if (lev > rn2(25)) destroy_item(SPBOOK_CLASS, AD_FIRE);
 		    if (dmg) mdamageu(mtmp, dmg);
 		}
-		break;
+	    }
+	    break;
 #ifdef PM_BEHOLDER /* work in progress */
-	    case AD_SLEE:
-		if(!mtmp->mcan && canseemon(mtmp) &&
-		   couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee &&
-		   multi >= 0 && !rn2(5) && !Sleep_resistance) {
-
+	case AD_SLEE:
+	    if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) &&
+		mtmp->mcansee && multi >= 0 && !rn2(5) && !Sleep_resistance) {
+		if (cancelled) {
+		    react = 6;	/* "tired" */
+		    already = (mtmp->mfrozen != 0);	/* can't happen... */
+		} else {
 		    fall_asleep(-rnd(10), TRUE);
 		    pline("%s gaze makes you very sleepy...",
 			  s_suffix(Monnam(mtmp)));
 		}
-		break;
-	    case AD_SLOW:
-		if(!mtmp->mcan && canseemon(mtmp) && mtmp->mcansee &&
-		   (HFast & (INTRINSIC|TIMEOUT)) &&
-		   !defends(AD_SLOW, uwep) && !rn2(4))
-
+	    }
+	    break;
+	case AD_SLOW:
+	    if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) &&
+		    mtmp->mcansee && (HFast & (INTRINSIC|TIMEOUT)) &&
+		    !defends(AD_SLOW, uwep) && !rn2(4)) {
+		if (cancelled) {
+		    react = 7;	/* "dulled" */
+		    already = (mtmp->mspeed == MSLOW);
+		} else {
 		    u_slow_down();
 		    stop_occupation();
-		break;
-#endif
-	    default: impossible("Gaze attack %d?", mattk->adtyp);
-		break;
+		}
+	    }
+	    break;
+#endif /* BEHOLDER */
+	default:
+	    impossible("Gaze attack %d?", mattk->adtyp);
+	    break;
+	}
+	if (react >= 0) {
+	    if (Hallucination && rn2(3)) react = rn2(SIZE(reactions));
+	    /* cancelled/hallucinatory feedback; monster might look "confused",
+	       "stunned",&c but we don't actually set corresponding attribute */
+	    pline("%s looks %s%s.", Monnam(mtmp),
+		  !rn2(3) ? "" : already ? "quite " :
+			(!rn2(2) ? "a bit " : "somewhat "),
+		  reactions[react]);
 	}
 	return(0);
 }

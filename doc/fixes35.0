@@ -344,6 +344,7 @@ pile_limit option to control when to switch to "there are objects here"
 some monsters will use fire to prevent selves being turned into green slime
 add `#vanquished' debug mode command
 C and #name commands are now same and use menu to choose monster vs object
+hallucination provides partial protection against gaze attacks
 
 
 Platform- and/or Interface-Specific New Features

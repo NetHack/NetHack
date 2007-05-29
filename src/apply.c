@@ -751,7 +751,8 @@ struct obj *obj;
 				pline("Yow!  The %s stares back!", mirror);
 			    else
 				pline("Yikes!  You've frozen yourself!");
-			    nomul(-rnd((MAXULEV+6) - u.ulevel));
+			    if (!Hallucination || !rn2(4))
+				nomul(-rnd(MAXULEV + 6 - u.ulevel));
 			    nomovemsg = 0;  /* default, "you can move again" */
 			}
 		    } else if (youmonst.data->mlet == S_VAMPIRE)

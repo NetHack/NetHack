@@ -1085,9 +1085,11 @@ dogaze()
 	    return 0;
 	}
 
-
 	if (Blind) {
 	    You_cant("see anything to gaze at.");
+	    return 0;
+	} else if (Hallucination) {
+	    You_cant("gaze at anything you can see.");
 	    return 0;
 	}
 	if (u.uen < 15) {
@@ -1109,12 +1111,10 @@ dogaze()
 			|| mtmp->m_ap_type == M_AP_OBJECT) {
 		    looked--;
 		    continue;
-		} else if (flags.safe_dog && !Confusion && !Hallucination
-		  && mtmp->mtame) {
+		} else if (flags.safe_dog && mtmp->mtame && !Confusion) {
 		    You("avoid gazing at %s.", y_monnam(mtmp));
 		} else {
-		    if (flags.confirm && mtmp->mpeaceful && !Confusion
-							&& !Hallucination) {
+		    if (flags.confirm && mtmp->mpeaceful && !Confusion) {
 			Sprintf(qbuf, "Really %s %s?",
 			    (adtyp == AD_CONF) ? "confuse" : "attack",
 			    mon_nam(mtmp));
@@ -1137,26 +1137,28 @@ dogaze()
 							Monnam(mtmp));
 			mtmp->mconf = 1;
 		    } else if (adtyp == AD_FIRE) {
-			int dmg = d(2,6);
+			int dmg = d(2,6), lev = (int)u.ulevel;
+
 			You("attack %s with a fiery gaze!", mon_nam(mtmp));
 			if (resists_fire(mtmp)) {
 			    pline_The("fire doesn't burn %s!", mon_nam(mtmp));
 			    dmg = 0;
 			}
-			if((int) u.ulevel > rn2(20))
+			if (lev > rn2(20))
 			    (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
-			if((int) u.ulevel > rn2(20))
+			if (lev > rn2(20))
 			    (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
-			if((int) u.ulevel > rn2(25))
+			if (lev > rn2(25))
 			    (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
-			if (dmg && !DEADMONSTER(mtmp)) mtmp->mhp -= dmg;
+			if (dmg) mtmp->mhp -= dmg;
 			if (mtmp->mhp <= 0) killed(mtmp);
 		    }
 		    /* For consistency with passive() in uhitm.c, this only
 		     * affects you if the monster is still alive.
 		     */
-		    if (!DEADMONSTER(mtmp) &&
-			  (mtmp->data==&mons[PM_FLOATING_EYE]) && !mtmp->mcan) {
+		    if (DEADMONSTER(mtmp)) continue;
+
+		    if (mtmp->data == &mons[PM_FLOATING_EYE] && !mtmp->mcan) {
 			if (!Free_action) {
 			    You("are frozen by %s gaze!",
 					     s_suffix(mon_nam(mtmp)));
@@ -1175,8 +1177,7 @@ dogaze()
 		     * works on the monster's turn, but for it to *not* have an
 		     * effect would be too weird.
 		     */
-		    if (!DEADMONSTER(mtmp) &&
-			    (mtmp->data == &mons[PM_MEDUSA]) && !mtmp->mcan) {
+		    if (mtmp->data == &mons[PM_MEDUSA] && !mtmp->mcan) {
 			pline(
 			 "Gazing at the awake %s is not a very good idea.",
 			    l_monnam(mtmp));
