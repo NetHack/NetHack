@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2007/03/19	*/
+/*	SCCS Id: @(#)pray.c	3.5	2007/05/29	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -352,8 +352,21 @@ register int trouble;
 		    context.botl = 1;
 		    break;
 	    case TROUBLE_COLLAPSING:
+		    /* override Fixed_abil; uncurse that if feasible */
+		    You_feel("%sstronger.",
+			     (AMAX(A_STR) - ABASE(A_STR) > 6) ? "much " : "");
 		    ABASE(A_STR) = AMAX(A_STR);
 		    context.botl = 1;
+		    if (Fixed_abil) {
+			if ((otmp = stuck_ring(uleft,
+					       RIN_SUSTAIN_ABILITY)) != 0) {
+			    if (otmp == uleft) what = leftglow;
+			} else if ((otmp = stuck_ring(uright,
+					       RIN_SUSTAIN_ABILITY)) != 0) {
+			    if (otmp == uright) what = rightglow;
+			}
+			if (otmp) goto decurse;
+		    }
 		    break;
 	    case TROUBLE_STUCK_IN_WALL:
 		    Your("surroundings change.");
@@ -428,11 +441,12 @@ decurse:
 		    update_inventory();
 		    break;
 	    case TROUBLE_POISONED:
+		    /* override Fixed_abil; ignore items which confer that */
 		    if (Hallucination)
 			pline("There's a tiger in your tank.");
 		    else
 			You_feel("in good health again.");
-		    for(i=0; i<A_MAX; i++) {
+		    for (i = 0; i < A_MAX; i++) {
 			if(ABASE(i) < AMAX(i)) {
 				ABASE(i) = AMAX(i);
 				context.botl = 1;

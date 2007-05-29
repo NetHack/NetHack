@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2007/02/05	*/
+/*	SCCS Id: @(#)potion.c	3.5	2007/05/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -478,6 +478,7 @@ peffects(otmp)
 		    pline("Ulch!  This makes you feel mediocre!");
 		    break;
 		} else {
+		    /* unlike unicorn horn, overrides Fixed_abil */
 		    pline("Wow!  This makes you feel %s!",
 			  (otmp->blessed) ?
 				(unfixable_trouble_count(FALSE) ? "better" : "great")

@@ -1671,9 +1671,16 @@ struct obj *obj;
 
 	/* collect attribute troubles */
 	for (idx = 0; idx < A_MAX; idx++) {
+	    if (ABASE(idx) >= AMAX(idx)) continue;
 	    val_limit = AMAX(idx);
 	    /* don't recover strength lost from hunger */
 	    if (idx == A_STR && u.uhs >= WEAK) val_limit--;
+	    if (Fixed_abil) {
+		/* potion/spell of restore ability override sustain ability
+		   intrinsic but unicorn horn usage doesn't */
+		unfixable_trbl += val_limit - ABASE(idx);
+		continue;
+	    }
 	    /* don't recover more than 3 points worth of any attribute */
 	    if (val_limit > ABASE(idx) + 3) val_limit = ABASE(idx) + 3;
 
