@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)spell.c	3.5	2006/12/06	*/
+/*	SCCS Id: @(#)spell.c	3.5	2007/05/29	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -426,6 +426,27 @@ register struct obj *spellbook;
 	register int	 booktype = spellbook->otyp;
 	register boolean confused = (Confusion != 0);
 	boolean too_hard = FALSE;
+
+	/* attempting to read dull book may make hero fall asleep */
+	if (!confused && booktype != SPE_BLANK_PAPER &&
+		!strcmp(OBJ_DESCR(objects[booktype]), "dull")) {
+	    const char *eyes;
+	    int dullbook = rnd(25) - ACURR(A_WIS);
+
+	    /* adjust chance if hero stayed awake, got interrupted, retries */
+	    if (context.spbook.delay && spellbook == context.spbook.book)
+		dullbook -= rnd(objects[booktype].oc_level);
+
+	    if (dullbook > 0) {
+		eyes = body_part(EYE);
+		if (eyecount(youmonst.data) > 1) eyes = makeplural(eyes);
+		pline("This book is so dull that you can't keep your %s open.",
+		      eyes);
+		dullbook += rnd(2 * objects[booktype].oc_level);
+		fall_asleep(-dullbook, TRUE);
+		return 1;
+	    }
+	}
 
 	if (context.spbook.delay && !confused && spellbook == context.spbook.book &&
 		    /* handle the sequence: start reading, get interrupted,
