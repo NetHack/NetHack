@@ -239,6 +239,8 @@ attacking via applied polearm now honors the "confirm" option
 engulfer under influence of conflict or confusion could swallow monster at
 	water/lava/trap spot and not be affected by destination til next move
 unicorn horn restoration no longer overrides sustain ability characteristic
+hider monster revived from corpse would start out hidden (even if own corpse
+	was only object around to hide under)
 
 
 Platform- and/or Interface-Specific Fixes

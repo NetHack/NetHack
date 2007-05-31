@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2007/03/30	*/
+/*	SCCS Id: @(#)zap.c	3.5	2007/05/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -738,6 +738,13 @@ boolean by_hero;
 	mtmp = makemon(mptr, x, y, NO_MINVENT|MM_NOWAIT|MM_NOCOUNTBIRTH);
     }
     if (!mtmp) return (struct monst *)0;
+
+    /* hiders shouldn't already be re-hidden when they revive */
+    if (mtmp->mundetected) {
+	mtmp->mundetected = 0;
+	newsym(mtmp->mx, mtmp->my);
+    }
+    if (mtmp->m_ap_type) seemimic(mtmp);
 
     /* if this is caused by the hero there might be a shop charge */
     if (by_hero) {
