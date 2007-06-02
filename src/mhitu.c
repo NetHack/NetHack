@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2007/03/09	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2007/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -334,7 +334,9 @@ mattacku(mtmp)
 			i = mattackm(mtmp, u.usteed);
 			if ((i & MM_AGR_DIED))
 				return (1);
-			if (i & MM_DEF_DIED || u.umoved)
+			/* make sure steed is still alive and within range */
+			if ((i & MM_DEF_DIED) || !u.usteed ||
+				    distu(mtmp->mx, mtmp->my) > 2)
 				return (0);
 			/* Let your steed retaliate */
 			return (!!(mattackm(u.usteed, mtmp) & MM_DEF_DIED));
