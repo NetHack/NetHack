@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)were.c	3.5	2007/04/07	*/
+/*	SCCS Id: @(#)were.c	3.5	2007/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -160,7 +160,7 @@ you_were()
 	if (Unchanging || (u.umonnum == u.ulycn)) return;
 	if (Polymorph_control) {
 	    /* `+4' => skip "were" prefix to get name of beast */
-	    Sprintf(qbuf, "Do you want to change into %s? ",
+	    Sprintf(qbuf, "Do you want to change into %s?",
 		    an(mons[u.ulycn].mname+4));
 	    if(yn(qbuf) == 'n') return;
 	}
