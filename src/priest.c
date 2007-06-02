@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)priest.c	3.5	2007/01/06	*/
+/*	SCCS Id: @(#)priest.c	3.5	2007/06/02	*/
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -313,8 +313,12 @@ char *pname;		/* caller-supplied output buffer */
     }
 
     Strcat(pname, what);
-    Strcat(pname, " of ");
-    Strcat(pname, halu_gname(mon_aligntyp(mon)));
+    /* same as distant_monnam(), more or less... */
+    if (do_hallu || !high_priest || !Is_astralevel(&u.uz) ||
+	    distu(mon->mx, mon->my) <= 2 || program_state.gameover) {
+	Strcat(pname, " of ");
+	Strcat(pname, halu_gname(mon_aligntyp(mon)));
+    }
     return pname;
 }
 
