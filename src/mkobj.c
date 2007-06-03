@@ -465,11 +465,6 @@ struct obj *otmp;
  * an object which is different from what it started out as; the "I x"
  * command needs to display the original object.
  *
- * [BUG:  The cost might end up being different if item originally had a
- * surcharge but doesn't get one now or vice versa.  Having the dummy keep
- * the same o_id value as the original would avoid this; is that viable?
- * (Mustn't give the original itself a new o_id, so can't just swap them.)]
- *
  * The caller is responsible for checking otmp->unpaid and
  * costly_spot(u.ux, u.uy).  This function will make otmp no charge.
  *
@@ -481,9 +476,12 @@ bill_dummy_object(otmp)
 register struct obj *otmp;
 {
 	register struct obj *dummy;
+	long cost = 0L;
 
-	if (otmp->unpaid)
+	if (otmp->unpaid) {
+	    cost = unpaid_cost(otmp, FALSE);
 	    subfrombill(otmp, shop_keeper(*u.ushops));
+	}
 	dummy = newobj();
 	*dummy = *otmp;
 	dummy->oextra = (struct oextra *)0;
@@ -495,6 +493,7 @@ register struct obj *otmp;
 	if (has_omid(dummy)) free_omid(dummy);	/* only one association with m_id*/
 	if (Is_candle(dummy)) dummy->lamplit = 0;
 	addtobill(dummy, FALSE, TRUE, TRUE);
+	if (cost) alter_cost(dummy, -cost);
 	/* no_charge is only valid for some locations */
 	otmp->no_charge = (otmp->where == OBJ_FLOOR ||
 			   otmp->where == OBJ_CONTAINED) ? 1 : 0;

@@ -242,6 +242,9 @@ unicorn horn restoration no longer overrides sustain ability characteristic
 hider monster revived from corpse would start out hidden (even if own corpse
 	was only object around to hide under)
 fix sequencing issues with dropping #invoked Heart of Ahriman
+applying an unpaid stack of potions of oil forced hero to buy all of them
+	instead of just the one which got split off and lit
+sometimes when hero is forced to buy an unpaid shop item its price changed
 
 
 Platform- and/or Interface-Specific Fixes

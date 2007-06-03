@@ -1265,6 +1265,7 @@ light_cocktail(obj)
 	struct obj *obj;	/* obj is a potion of oil */
 {
 	char buf[BUFSZ];
+	boolean split1off;
 
 	if (u.uswallow) {
 	    You(no_elbow_room);
@@ -1287,8 +1288,12 @@ light_cocktail(obj)
 	    return;
 	}
 
+	split1off = (obj->quan > 1L);
+	if (split1off) obj = splitobj(obj, 1L);
+
 	You("light %spotion.%s", shk_your(buf, obj),
 	    Blind ? "" : "  It gives off a dim light.");
+
 	if (obj->unpaid && costly_spot(u.ux, u.uy)) {
 	    /* Normally, we shouldn't both partially and fully charge
 	     * for an item, but (Yendorian Fuel) Taxes are inevitable...
@@ -1299,16 +1304,14 @@ light_cocktail(obj)
 	}
 	makeknown(obj->otyp);
 
-	if (obj->quan > 1L) {
-	    obj = splitobj(obj, 1L);
-	    begin_burn(obj, FALSE);	/* burn before free to get position */
+	begin_burn(obj, FALSE);	/* after shop billing */
+	if (split1off) {
 	    obj_extract_self(obj);	/* free from inv */
-
-	    /* shouldn't merge */
+	    obj->nomerge = 1;
 	    obj = hold_another_object(obj, "You drop %s!",
 				      doname(obj), (const char *)0);
-	} else
-	    begin_burn(obj, FALSE);
+	    if (obj) obj->nomerge = 0;
+	}
 }
 
 static NEARDATA const char cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 };
