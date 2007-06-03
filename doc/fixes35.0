@@ -241,6 +241,7 @@ engulfer under influence of conflict or confusion could swallow monster at
 unicorn horn restoration no longer overrides sustain ability characteristic
 hider monster revived from corpse would start out hidden (even if own corpse
 	was only object around to hide under)
+fix sequencing issues with dropping #invoked Heart of Ahriman
 
 
 Platform- and/or Interface-Specific Fixes

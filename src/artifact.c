@@ -1475,6 +1475,33 @@ nothing_special:
     return 1;
 }
 
+/* will freeing this object from inventory cause levitation to end? */
+boolean
+finesse_ahriman(obj)
+struct obj *obj;
+{
+    const struct artifact *oart;
+    struct prop save_Lev;
+    boolean result;
+
+    /* if we aren't levitating or this isn't an artifact which confers
+       levitation via #invoke then freeinv() won't toggle levitation */
+    if (!Levitation || (oart = get_artifact(obj)) == 0 ||
+	    oart->inv_prop != LEVITATION || !(ELevitation & W_ARTI))
+	return FALSE;
+
+    /* arti_invoke(off) -> float_down() clears I_SPECIAL|TIMEOUT & W_ARTI;
+       probe ahead to see whether that actually results in floating down;
+       (this assumes that there aren't two simultaneously invoked artifacts
+       both conferring levitation--safe, since if there were two of them,
+       invoking the 2nd would negate the 1st rather than stack with it) */
+    save_Lev = u.uprops[LEVITATION];
+    HLevitation &= ~(I_SPECIAL|TIMEOUT);
+    ELevitation &= ~W_ARTI;
+    result = (boolean)!Levitation;
+    u.uprops[LEVITATION] = save_Lev;
+    return result;
+}
 
 /* WAC return TRUE if artifact is always lit */
 boolean

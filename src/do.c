@@ -484,6 +484,12 @@ register struct obj *obj;
 	    }
 #endif
 	    if (!can_reach_floor(TRUE)) {
+		/* we might be levitating due to #invoke Heart of Ahriman;
+		   if so, levitation would end during call to freeinv()
+		   and we want hitfloor() to happen before float_down() */
+		boolean levhack = finesse_ahriman(obj);
+
+		if (levhack) ELevitation = W_ART; /* other than W_ARTI */
 		if(flags.verbose) You("drop %s.", doname(obj));
 #ifndef GOLDOBJ
 		if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
@@ -493,6 +499,7 @@ register struct obj *obj;
 		freeinv(obj);
 #endif
 		hitfloor(obj);
+		if (levhack) float_down(I_SPECIAL|TIMEOUT, W_ARTI|W_ART);
 		return(1);
 	    }
 	    if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
