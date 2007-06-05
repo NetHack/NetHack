@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2007/01/02	*/
+/*	SCCS Id: @(#)invent.c	3.5	2007/06/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2937,11 +2937,13 @@ doorganize()	/* inventory organizer by Del Lamb */
 	/* blank out all the letters currently in use in the inventory */
 	/* except those that will be merged with the selected object   */
 	for (otmp = invent; otmp; otmp = otmp->nobj)
-		if (otmp != obj && !mergable(otmp,obj)) {
-			if (otmp->invlet <= 'Z')
-				alphabet[(otmp->invlet) - 'A' + 26] = ' ';
-			else	alphabet[(otmp->invlet) - 'a']	    = ' ';
-		}
+	    if (otmp != obj && !mergable(otmp, obj)) {
+		let = otmp->invlet;
+		if (let >= 'a' && let <= 'z')
+		    alphabet[let - 'a'] = ' ';
+		else if (let >= 'A' && let <= 'Z')
+		    alphabet[let - 'A' + 26] = ' ';
+	    }
 
 	/* compact the list by removing all the blanks */
 	for (ix = cur = 0; alphabet[ix]; ix++)
