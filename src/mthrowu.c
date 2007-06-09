@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.5	2007/03/17	*/
+/*	SCCS Id: @(#)mthrowu.c	3.5	2007/06/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -499,6 +499,7 @@ struct monst *mtmp;
 	if (is_pole(otmp)) {
 	    int dam, hitv;
 
+	    if (otmp != MON_WEP(mtmp)) return;	/* polearm must be wielded */
 	    if (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) > POLE_LIM ||
 		    !couldsee(mtmp->mx, mtmp->my))
 		return;	/* Out of range, or intervening wall */

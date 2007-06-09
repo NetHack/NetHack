@@ -384,6 +384,8 @@ select_rwep(mtmp)	/* select a ranged weapon for the monster */
 register struct monst *mtmp;
 {
 	register struct obj *otmp;
+	struct obj *mwep; 
+	boolean mweponly;
 	int i;
 
 #ifdef KOPS
@@ -399,13 +401,19 @@ register struct monst *mtmp;
 	if(throws_rocks(mtmp->data))	/* ...boulders for giants */
 	    Oselect(BOULDER);
 
-	/* Select polearms first; they do more damage and aren't expendable */
+	/* Select polearms first; they do more damage and aren't expendable.
+	   But don't pick one if monster's weapon is welded, because then
+	   we'd never have a chance to throw non-wielding missiles. */
 	/* The limit of 13 here is based on the monster polearm range limit
 	 * (defined as 5 in mthrowu.c).  5 corresponds to a distance of 2 in
 	 * one direction and 1 in another; one space beyond that would be 3 in
 	 * one direction and 2 in another; 3^2+2^2=13.
 	 */
-	if (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 13 && couldsee(mtmp->mx, mtmp->my)) {
+	mwep = MON_WEP(mtmp);
+	/* NO_WEAPON_WANTED means we already tried to wield and failed */
+	mweponly = (mwelded(mwep) && mtmp->weapon_check == NO_WEAPON_WANTED);
+	if (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 13 &&
+		couldsee(mtmp->mx, mtmp->my)) {
 	    for (i = 0; i < SIZE(pwep); i++) {
 		/* Only strong monsters can wield big (esp. long) weapons.
 		 * Big weapon is basically the same as bimanual.
@@ -415,7 +423,8 @@ register struct monst *mtmp;
 			|| !objects[pwep[i]].oc_bimanual) &&
 		    (objects[pwep[i]].oc_material != SILVER
 			|| !mon_hates_silver(mtmp))) {
-		    if ((otmp = oselect(mtmp, pwep[i])) != 0) {
+		    if ((otmp = oselect(mtmp, pwep[i])) != 0 &&
+			    (otmp == mwep || !mweponly)) {
 			propellor = otmp; /* force the monster to wield it */
 			return otmp;
 		    }
@@ -674,7 +683,7 @@ register struct monst *mon;
 			} else {
 			    pline("%s tries to wield %s.", Monnam(mon),
 				doname(obj));
-			    pline("%s %s!", yname(mw_tmp), welded_buf);
+			    pline("%s %s!", Yname2(mw_tmp), welded_buf);
 			}
 			mw_tmp->bknown = 1;
 		    }

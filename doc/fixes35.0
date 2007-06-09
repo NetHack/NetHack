@@ -245,6 +245,7 @@ fix sequencing issues with dropping #invoked Heart of Ahriman
 applying an unpaid stack of potions of oil forced hero to buy all of them
 	instead of just the one which got split off and lit
 sometimes when hero is forced to buy an unpaid shop item its price changed
+monster could attack with a polearm even after attempt to wield that failed
 
 
 Platform- and/or Interface-Specific Fixes
