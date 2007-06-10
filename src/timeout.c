@@ -656,7 +656,7 @@ STATIC_OVL void
 slip_or_trip()
 {
 	struct obj *otmp = vobj_at(u.ux, u.uy);
-	const char *what, *pronoun;
+	const char *what;
 	char buf[BUFSZ];
 	boolean on_foot = TRUE;
 #ifdef STEED
@@ -673,8 +673,8 @@ slip_or_trip()
 		name; if not, look for rocks to trip over; trip over
 		anonymous "something" if there aren't any rocks.
 	     */
-	    pronoun = otmp->quan == 1L ? "it" : Hallucination ? "they" : "them";
-	    what = !otmp->nexthere ? pronoun :
+	    what = (iflags.last_msg == PLNMSG_ONE_ITEM_HERE) ?
+		((otmp->quan == 1L) ? "it" : Hallucination ? "they" : "them") :
 		  (otmp->dknown || !Blind) ? doname(otmp) :
 		  ((otmp = sobj_at(ROCK, u.ux, u.uy)) == 0 ? something :
 		  (otmp->quan == 1L ? "a rock" : "some rocks"));

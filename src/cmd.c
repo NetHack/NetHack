@@ -3044,6 +3044,8 @@ char def;
 {
 	char qbuf[QBUFSZ];
 
+	iflags.last_msg = PLNMSG_UNKNOWN; /* most recent pline is clobbered */
+
 	/* maximum acceptable length is QBUFSZ-1 */
 	if (strlen(query) < QBUFSZ)
 		return (*windowprocs.win_yn_function)(query, resp, def);

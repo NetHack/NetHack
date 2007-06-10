@@ -73,6 +73,7 @@ pline VA_DECL(const char *, line)
 	}
 	if (!iflags.window_inited) {
 	    raw_print(line);
+	    iflags.last_msg = PLNMSG_UNKNOWN;
 	    return;
 	}
 #ifndef MAC
@@ -86,6 +87,8 @@ pline VA_DECL(const char *, line)
 	if (vision_full_recalc) vision_recalc(0);
 	if (u.ux) flush_screen(1);		/* %% */
 	putstr(WIN_MESSAGE, 0, line);
+	/* this gets cleared after every pline message */
+	iflags.last_msg = PLNMSG_UNKNOWN;
 }
 
 /*VARARGS1*/

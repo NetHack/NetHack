@@ -2450,6 +2450,7 @@ boolean picked_some;
 	    if (otmp->oinvis && !See_invisible) verb = "feel";
 #endif
 	    You("%s here %s.", verb, doname(otmp));
+	    iflags.last_msg = PLNMSG_ONE_ITEM_HERE;
 	    if (otmp->otyp == CORPSE) feel_cockatrice(otmp, FALSE);
 	} else {
 	    char buf[BUFSZ];

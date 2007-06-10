@@ -159,6 +159,7 @@ struct instance_flags {
 	 * a structure of their own elsewhere some day.
 	 */
 	int	 in_lava_effects;	/* hack for Boots_off() */
+	int	 last_msg;		/* indicator of last message player saw */
 	int	 purge_monsters;	/* # of dead monsters still on fmon list */
 	int	 override_ID;	/* true to force full identification of objects */
 	int	 suppress_price; /* controls doname() for unpaid objects */
@@ -319,6 +320,10 @@ extern NEARDATA struct flag flags;
 extern NEARDATA struct sysflag sysflags;
 #endif
 extern NEARDATA struct instance_flags iflags;
+
+/* last_msg values */
+#define PLNMSG_UNKNOWN		0	/* arbitrary */
+#define PLNMSG_ONE_ITEM_HERE	1	/* "you see <single item> here" */
 
 /* runmode options */
 #define RUN_TPORT	0	/* don't update display until movement stops */
