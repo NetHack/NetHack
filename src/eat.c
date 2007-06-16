@@ -341,7 +341,7 @@ register struct obj *otmp;
 
 	if (carried(otmp)) {
 	    freeinv(otmp);
-	    if (inv_cnt() >= 52) {
+	    if (inv_cnt(FALSE) >= 52) {
 		sellobj_state(SELL_DONTSELL);
 		dropy(otmp);
 		sellobj_state(SELL_NORMAL);

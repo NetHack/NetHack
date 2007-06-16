@@ -146,7 +146,7 @@ long amount;
     if (mongold->quan > amount) mongold = splitobj(mongold, amount);
     obj_extract_self(mongold);
 
-    if (!merge_choice(invent, mongold) && inv_cnt() >= 52) {
+    if (!merge_choice(invent, mongold) && inv_cnt(FALSE) >= 52) {
 	You("have no room for the money!");
 	dropy(mongold);
     } else {

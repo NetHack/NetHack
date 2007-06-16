@@ -3160,7 +3160,7 @@ STATIC_OVL boolean
 emergency_disrobe(lostsome)
 boolean *lostsome;
 {
-	int invc = inv_cnt();
+	int invc = inv_cnt(TRUE);
 
 	while (near_capacity() > (Punished ? UNENCUMBERED : SLT_ENCUMBER)) {
 	    register struct obj *obj, *otmp = (struct obj *)0;

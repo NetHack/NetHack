@@ -1168,7 +1168,8 @@ boolean telekinesis;
        availability of open inventory slot iff not already carrying one */
     if (obj->otyp == LOADSTONE ||
 	    (obj->otyp == BOULDER && throws_rocks(youmonst.data))) {
-	if (inv_cnt() < 52 || !carrying(obj->otyp) || merge_choice(invent, obj))
+	if (inv_cnt(FALSE) < 52 || !carrying(obj->otyp) ||
+		merge_choice(invent, obj))
 	    return 1;	/* lift regardless of current situation */
 	/* if we reach here, we're out of slots and already have at least
 	   one of these, so treat this one more like a normal item */
@@ -1180,11 +1181,10 @@ boolean telekinesis;
     *cnt_p = carry_count(obj, container, *cnt_p, telekinesis, &old_wt, &new_wt);
     if (*cnt_p < 1L) {
 	result = -1;	/* nothing lifted */
-    } else if (
-#ifndef GOLDOBJ
-		obj->oclass != COIN_CLASS &&
-#endif
-		inv_cnt() >= 52 && !merge_choice(invent, obj)) {
+    } else if (obj->oclass != COIN_CLASS &&
+		/* [exception for gold coins will have to change
+		    if silver/copper ones ever get implemented] */
+		inv_cnt(FALSE) >= 52 && !merge_choice(invent, obj)) {
 	Your("knapsack cannot accommodate any more items.");
 	result = -1;	/* nothing lifted */
     } else {
@@ -1625,7 +1625,7 @@ reverse_loot()
 
     if (!rn2(3)) {
 	/* n objects: 1/(n+1) chance per object plus 1/(n+1) to fall off end */
-	for (n = inv_cnt(), otmp = invent; otmp; --n, otmp = otmp->nobj)
+	for (n = inv_cnt(TRUE), otmp = invent; otmp; --n, otmp = otmp->nobj)
 	    if (!rn2(n + 1)) {
 		prinv("You find old loot:", otmp, 0L);
 		return TRUE;

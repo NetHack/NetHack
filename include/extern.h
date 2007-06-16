@@ -798,7 +798,7 @@ E int NDECL(near_capacity);
 E int FDECL(calc_capacity, (int));
 E int NDECL(max_capacity);
 E boolean FDECL(check_capacity, (const char *));
-E int NDECL(inv_cnt);
+E int FDECL(inv_cnt, (BOOLEAN_P));
 #ifdef GOLDOBJ
 E long FDECL(money_cnt, (struct obj *));
 #endif

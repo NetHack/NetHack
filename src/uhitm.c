@@ -1478,7 +1478,8 @@ register struct attack *mattk;
 		    struct obj *mongold = findgold(mdef->minvent);
 	            if (mongold) {
 		        obj_extract_self(mongold);  
-		        if (merge_choice(invent, mongold) || inv_cnt() < 52) {
+			if (merge_choice(invent, mongold) ||
+				inv_cnt(FALSE) < 52) {
 			    addinv(mongold);
 			    Your("purse feels heavier.");
 			} else {

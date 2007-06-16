@@ -263,6 +263,7 @@ boolean unchain_ball;	/* whether to unpunish or just unwield */
 /* Returns 1 when something was stolen (or at least, when N should flee now)
  * Returns -1 if the monster died in the attempt
  * Avoid stealing the object stealoid
+ * GOLDOBJ: nymphs and monkeys won't steal coins
  */
 int
 steal(mtmp, objnambuf)
@@ -282,7 +283,7 @@ char *objnambuf;
 	   so this will cause it to be removed now */
 	if (occupation) (void) maybe_finished_meal(FALSE);
 
-	if (!invent || (inv_cnt() == 1 && uskin)) {
+	if (!invent || (inv_cnt(FALSE) == 1 && uskin)) {
 nothing_to_steal:
 	    /* Not even a thousand men in armor can strip a naked man. */
 	    if(Blind)
@@ -308,6 +309,9 @@ nothing_to_steal:
 	tmp = 0;
 	for(otmp = invent; otmp; otmp = otmp->nobj)
 	    if ((!uarm || otmp != uarmc) && otmp != uskin
+#ifdef GOLDOBJ
+				&& otmp->oclass != COIN_CLASS
+#endif
 #ifdef INVISIBLE_OBJECTS
 				&& (!otmp->oinvis || perceives(mtmp->data))
 #endif
@@ -318,6 +322,9 @@ nothing_to_steal:
 	tmp = rn2(tmp);
 	for(otmp = invent; otmp; otmp = otmp->nobj)
 	    if ((!uarm || otmp != uarmc) && otmp != uskin
+#ifdef GOLDOBJ
+				&& otmp->oclass != COIN_CLASS
+#endif
 #ifdef INVISIBLE_OBJECTS
 				&& (!otmp->oinvis || perceives(mtmp->data))
 #endif
@@ -375,7 +382,7 @@ gotobj:
 		/* the fewer items you have, the less likely the thief
 		   is going to stick around to try again (0) instead of
 		   running away (1) */
-		return !rn2(inv_cnt() / 5 + 2);
+		return !rn2(inv_cnt(FALSE) / 5 + 2);
 	    }
 	}
 

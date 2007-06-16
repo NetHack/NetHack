@@ -2479,13 +2479,14 @@ const char *str;
 }
 
 int
-inv_cnt()
+inv_cnt(incl_gold)
+boolean incl_gold;	/* only meaningful for GOLDOBJ config */
 {
 	register struct obj *otmp = invent;
 	register int ct = 0;
 
 	while(otmp){
-		ct++;
+		if (incl_gold || otmp->invlet != GOLD_SYM) ct++;
 		otmp = otmp->nobj;
 	}
 	return(ct);
@@ -2500,13 +2501,13 @@ long
 money_cnt(otmp)
 struct obj *otmp;
 {
-        while(otmp) {
-	        /* Must change when silver & copper is implemented: */
- 	        if (otmp->oclass == COIN_CLASS) return otmp->quan;
-  	        otmp = otmp->nobj;
-	}
-	return 0;
+    while (otmp) {
+	/* Must change when silver & copper is implemented: */
+	if (otmp->oclass == COIN_CLASS) return otmp->quan;
+	otmp = otmp->nobj;
+    }
+    return 0L;
 }
-#endif
+#endif /* GOLDOBJ */
 
 /*hack.c*/

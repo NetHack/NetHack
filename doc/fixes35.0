@@ -31,6 +31,8 @@ internals: use Is_box rather than explicitly checking what it checks
 fix some unreachable messages (either make then reachable or remove them)
 can quiver coins when GOLDOBJ is defined
 make #loot behave same for GOLDOBJ as for !GOLDOBJ
+for GOLDOBJ, can pick gold up into $ when all 52 letters are in use, and
+	can pick non-gold up into unused letter when gold uses one of 52 slots
 grammar, spelling and other typos
 keep various delayed killers separate to avoid mixed up messages
 don't place randomly-placed aquatic monsters in lava on special levels

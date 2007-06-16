@@ -420,7 +420,7 @@ const char *drop_fmt, *drop_arg, *hold_msg;
 	    if (drop_arg) drop_arg = strcpy(buf, drop_arg);
 
 	    obj = addinv(obj);
-	    if (inv_cnt() > 52
+	    if (inv_cnt(FALSE) > 52
 		    || ((obj->otyp != LOADSTONE || !obj->cursed)
 			&& near_capacity() > prev_encumbr)) {
 		if (drop_fmt) pline(drop_fmt, drop_arg);
@@ -2932,7 +2932,7 @@ doorganize()	/* inventory organizer by Del Lamb */
 	for (let = 'A'; let <= 'Z'; ) alphabet[ix++] = let++;
 	alphabet[ix] = '\0';
 	/* for floating inv letters, truncate list after the first open slot */
-	if (!flags.invlet_constant && (ix = inv_cnt()) < 52)
+	if (!flags.invlet_constant && (ix = inv_cnt(FALSE)) < 52)
 	    alphabet[ix + (splitting ? 0 : 1)] = '\0';
 
 	/* blank out all the letters currently in use in the inventory */
@@ -3025,7 +3025,7 @@ doorganize()	/* inventory organizer by Del Lamb */
 		    if (merged(&otmp, &obj)) {
 			obj = otmp;
 			extract_nobj(obj, &invent);
-		    } else if (inv_cnt() >= 52) {
+		    } else if (inv_cnt(FALSE) >= 52) {
 			(void) merged(&splitting, &obj);    /* undo split */
 			/* "knapsack cannot accommodate any more items" */
 			Your("pack is too full.");
