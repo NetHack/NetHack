@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dungeon.h	3.5	1999/07/02	*/
+/*	SCCS Id: @(#)dungeon.h	3.5	2007/06/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -142,6 +142,7 @@ typedef struct branch {
 #define MIGR_SSTAIRS		7	/* dungeon branch */
 #define MIGR_PORTAL		8	/* magic portal */
 #define MIGR_NEAR_PLAYER	9	/* mon: followers; obj: trap door */
+#define MIGR_AT_HERO	       10	/* wizkit overflow */
 #define MIGR_NOBREAK	     1024	/* bitmask: don't break on delivery */
 
 /* level information (saved via ledger number) */

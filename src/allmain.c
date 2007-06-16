@@ -524,14 +524,12 @@ newgame()
 
 	mklev();
 	u_on_upstairs();
+#ifdef WIZARD
+	if (wizard) obj_delivery(FALSE);	/* finish wizkit */
+#endif
 	vision_reset();		/* set up internals for level (after mklev) */
 	check_special_room(FALSE);
 
-
-	/* Move the monster from under you or else
-	 * makedog() will fail when it calls makemon().
-	 *			- ucsfcgl!kneller
-	 */
 	if(MON_AT(u.ux, u.uy)) mnexto(m_at(u.ux, u.uy));
 	(void) makedog();
 	docrt();

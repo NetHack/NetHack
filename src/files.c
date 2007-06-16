@@ -127,6 +127,7 @@ boolean nethack_thinks_it_is_open;	/* Does NetHack think it's open?       */
 #define WIZKIT_MAX 128
 static char wizkit[WIZKIT_MAX];
 STATIC_DCL FILE *NDECL(fopen_wizkit_file);
+STATIC_DCL void FDECL(wizkit_addinv, (struct obj *));
 #endif
 
 #ifdef AMIGA
@@ -2409,6 +2410,30 @@ fopen_wizkit_file()
 	return (FILE *)0;
 }
 
+/* add to hero's inventory if there's room, otherwise put item on floor */
+STATIC_DCL void
+wizkit_addinv(obj)
+struct obj *obj;
+{
+    if (!obj || obj == &zeroobj) return;
+
+    /* subset of starting inventory pre-ID */
+    obj->dknown = 1;
+    if (Role_if(PM_PRIEST)) obj->bknown = 1;
+    /* same criteria as lift_object()'s check for available inventory slot */
+    if (obj->oclass != COIN_CLASS &&
+	    inv_cnt(FALSE) >= 52 && !merge_choice(invent, obj)) {
+	/* inventory overflow; can't just place & stack object since
+	   hero isn't in position yet, so schedule for arrival later */
+	add_to_migration(obj);
+	obj->ox = 0;	/* index of main dungeon */
+	obj->oy = 1;	/* starting level number */
+	obj->owornmask = (long)(MIGR_AT_HERO|MIGR_NOBREAK);
+    } else {
+	(void)addinv(obj);
+    }
+}
+
 void
 read_wizkit()
 {
@@ -2432,7 +2457,7 @@ read_wizkit()
 			otmp = readobjnam(buf, (struct obj *)0);
 			if (otmp) {
 			    if (otmp != &zeroobj)
-				otmp = addinv(otmp);
+				wizkit_addinv(otmp);
 			} else {
 			    /* .60 limits output line width to 79 chars */
 			    raw_printf("Bad wizkit item: \"%.60s\"", buf);

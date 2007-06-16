@@ -1430,7 +1430,7 @@ boolean near_hero;
 	register struct obj *otmp, *otmp2;
 	register int nx, ny;
 	long where;
-	boolean nobreak;
+	boolean nobreak, noscatter = FALSE;
 
 	for (otmp = migrating_objs; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
@@ -1453,6 +1453,7 @@ boolean near_hero;
 				break;
 	     case MIGR_SSTAIRS:	    nx = sstairs.sx,  ny = sstairs.sy;
 				break;
+	     case MIGR_AT_HERO:	    noscatter = TRUE; /*FALLTHRU*/
 	     case MIGR_NEAR_PLAYER: nx = u.ux,  ny = u.uy;
 				break;
 	     default:
@@ -1471,7 +1472,7 @@ boolean near_hero;
 		    }
 		}
 		stackobj(otmp);
-		(void)scatter(nx, ny, rnd(2), 0, otmp);
+		if (!noscatter) (void)scatter(nx, ny, rnd(2), 0, otmp);
 	    } else {		/* random location */
 		/* set dummy coordinates because there's no
 		   current position for rloco() to update */

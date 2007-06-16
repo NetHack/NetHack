@@ -250,6 +250,7 @@ sometimes when hero is forced to buy an unpaid shop item its price changed
 monster could attack with a polearm even after attempt to wield that failed
 sometimes got "you trip over it" after intervening messages following the
 	one which described "it"
+wizard mode: WIZKIT wishes could overflow inventory's 52 slots
 
 
 Platform- and/or Interface-Specific Fixes
