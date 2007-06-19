@@ -317,7 +317,7 @@ boolean with_you;
 		break;
 	 case MIGR_EXACT_XY:	wander = 0;
 		break;
-	 case MIGR_NEAR_PLAYER:	xlocale = u.ux,  ylocale = u.uy;
+	 case MIGR_WITH_HERO:	xlocale = u.ux,  ylocale = u.uy;
 		break;
 	 case MIGR_STAIRS_UP:	xlocale = xupstair,  ylocale = yupstair;
 		break;

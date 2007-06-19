@@ -141,9 +141,9 @@ typedef struct branch {
 #define MIGR_LADDER_DOWN	6
 #define MIGR_SSTAIRS		7	/* dungeon branch */
 #define MIGR_PORTAL		8	/* magic portal */
-#define MIGR_NEAR_PLAYER	9	/* mon: followers; obj: trap door */
-#define MIGR_AT_HERO	       10	/* wizkit overflow */
+#define MIGR_WITH_HERO	9	/* mon: followers; obj: trap door */
 #define MIGR_NOBREAK	     1024	/* bitmask: don't break on delivery */
+#define MIGR_NOSCATTER	   2048	/* don't scatter on delivery */
 
 /* level information (saved via ledger number) */
 

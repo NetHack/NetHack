@@ -1207,7 +1207,7 @@ xchar dlev;				/* if !0 send to dlev near player */
 		/* send objects next to player falling through trap door.
 		 * checked in obj_delivery().
 		 */
-		toloc = MIGR_NEAR_PLAYER;
+		toloc = MIGR_WITH_HERO;
 		cc.y = dlev;
 	}
 
@@ -1429,32 +1429,31 @@ boolean near_hero;
 {
 	register struct obj *otmp, *otmp2;
 	register int nx, ny;
-	long where;
-	boolean nobreak, noscatter = FALSE;
+	int where;
+	boolean nobreak, noscatter;
 
 	for (otmp = migrating_objs; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
 	    if (otmp->ox != u.uz.dnum || otmp->oy != u.uz.dlevel) continue;
 
-	    where = otmp->owornmask;		/* destination code */
+	    where = (int)(otmp->owornmask & 0x7fffL);	/* destination code */
 	    nobreak = (where & MIGR_NOBREAK) != 0;
-	    where &= ~MIGR_NOBREAK;
+	    noscatter = (where & MIGR_WITH_HERO) != 0;
+	    where &= ~(MIGR_NOBREAK | MIGR_NOSCATTER);
 
-	    if ((!near_hero && where == MIGR_NEAR_PLAYER) ||
-		(near_hero && where != MIGR_NEAR_PLAYER)) continue;
+	    if (!near_hero ^ (where == MIGR_WITH_HERO)) continue;
 
 	    obj_extract_self(otmp);
 	    otmp->owornmask = 0L;
 
-	    switch ((int)where) {
+	    switch (where) {
 	     case MIGR_STAIRS_UP:   nx = xupstair,  ny = yupstair;
 				break;
 	     case MIGR_LADDER_UP:   nx = xupladder,  ny = yupladder;
 				break;
 	     case MIGR_SSTAIRS:	    nx = sstairs.sx,  ny = sstairs.sy;
 				break;
-	     case MIGR_AT_HERO:	    noscatter = TRUE; /*FALLTHRU*/
-	     case MIGR_NEAR_PLAYER: nx = u.ux,  ny = u.uy;
+	     case MIGR_WITH_HERO:    nx = u.ux,  ny = u.uy;
 				break;
 	     default:
 	     case MIGR_RANDOM:	    nx = ny = 0;
@@ -1463,7 +1462,7 @@ boolean near_hero;
 	    if (nx > 0) {
 		place_object(otmp, nx, ny);
 		if (!nobreak && !IS_SOFT(levl[nx][ny].typ)) {
-		    if (where == MIGR_NEAR_PLAYER) {
+		    if (where == MIGR_WITH_HERO) {
 			if (breaks(otmp, nx, ny)) continue;
 		    } else if (breaktest(otmp)) {
 			/* assume it broke before player arrived, no messages */

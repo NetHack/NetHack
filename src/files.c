@@ -2428,7 +2428,7 @@ struct obj *obj;
 	add_to_migration(obj);
 	obj->ox = 0;	/* index of main dungeon */
 	obj->oy = 1;	/* starting level number */
-	obj->owornmask = (long)(MIGR_AT_HERO|MIGR_NOBREAK);
+	obj->owornmask = (long)(MIGR_WITH_HERO | MIGR_NOBREAK|MIGR_NOSCATTER);
     } else {
 	(void)addinv(obj);
     }
