@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkmaze.c	3.5	2007/03/02	*/
+/*	SCCS Id: @(#)mkmaze.c	3.5	2007/06/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1131,7 +1131,8 @@ register int fd;
 	was_waterlevel = TRUE;
 }
 
-const char *waterbody_name(x, y)
+const char *
+waterbody_name(x, y)
 xchar x,y;
 {
 	register struct rm *lev;
@@ -1141,22 +1142,28 @@ xchar x,y;
 		return "drink";		/* should never happen */
 	lev = &levl[x][y];
 	ltyp = lev->typ;
+	if (ltyp == DRAWBRIDGE_UP)
+	    switch (lev->drawbridgemask & DB_UNDER) {
+	    case DB_ICE:  ltyp = ICE; break;
+	    case DB_LAVA: ltyp = LAVAPOOL; break;
+	    case DB_MOAT: ltyp = MOAT; break;
+	    default:      ltyp = STONE; break;
+	    }
 
-	if (is_lava(x,y))
+	if (ltyp == LAVAPOOL)
 		return "lava";
-	else if (ltyp == ICE ||
-		 (ltyp == DRAWBRIDGE_UP &&
-		  (levl[x][y].drawbridgemask & DB_UNDER) == DB_ICE))
+	else if (ltyp == ICE)
 		return "ice";
-	else if (((ltyp != POOL) && (ltyp != WATER) &&
-	  !Is_medusa_level(&u.uz) && !Is_waterlevel(&u.uz) && !Is_juiblex_level(&u.uz)) ||
-	   (ltyp == DRAWBRIDGE_UP && (levl[x][y].drawbridgemask & DB_UNDER) == DB_MOAT))
-		return "moat";
-	else if ((ltyp != POOL) && (ltyp != WATER) && Is_juiblex_level(&u.uz))
-		return "swamp";
 	else if (ltyp == POOL)
 		return "pool of water";
-	else return "water";
+	else if (ltyp == WATER || Is_waterlevel(&u.uz))
+		;	/* fall through to default return value */
+	else if (Is_juiblex_level(&u.uz))
+		return "swamp";
+	else if (ltyp == MOAT && !Is_medusa_level(&u.uz))
+		return "moat";
+
+	return "water";
 }
 
 STATIC_OVL void

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2007/05/26	*/
+/*	SCCS Id: @(#)trap.c	3.5	2007/06/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3230,7 +3230,8 @@ boolean *lostsome;
 boolean
 drown()
 {
-	boolean inpool_ok = FALSE, crawl_ok, pool_of_water;
+	const char *pool_of_water;
+	boolean inpool_ok = FALSE, crawl_ok;
 	int i, x, y;
 
 	/* happily wading in the same contiguous pool */
@@ -3352,12 +3353,15 @@ drown()
 	}
 	u.uinwater = 1;
 	You("drown.");
-	pool_of_water = levl[u.ux][u.uy].typ == POOL || Is_medusa_level(&u.uz);
 	for (;;) {
 	    /* killer format and name are reconstructed every iteration
 	       because lifesaving resets them */
+	    pool_of_water = waterbody_name(u.ux, u.uy);
 	    killer.format = KILLED_BY_AN;
-	    Strcpy(killer.name, pool_of_water ? "pool of water" : "moat");
+	    /* avoid "drowned in [a] water" */
+	    if (!strcmp(pool_of_water, "water"))
+		pool_of_water = "deep water", killer.format = KILLED_BY;
+	    Strcpy(killer.name, pool_of_water);
 	    done(DROWNING);
 	    /* oops, we're still alive.  better get out of the water. */
 	    if (safe_teleds(TRUE)) break;	/* successful life-save */
