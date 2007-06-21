@@ -1699,17 +1699,19 @@ dodip()
 		return(0);
 	if (inaccessible_equipment(obj, "dip", FALSE)) return 0;
 
+	Sprintf(qbuf, "dip %s into", thesimpleoname(obj));
 	here = levl[u.ux][u.uy].typ;
 	/* Is there a fountain to dip into here? */
 	if (IS_FOUNTAIN(here)) {
-		if(yn("Dip it into the fountain?") == 'y') {
+		Strcat(qbuf, " the fountain?");
+		if (yn(upstart(qbuf)) == 'y') {
 			dipfountain(obj);
 			return(1);
 		}
 	} else if (is_pool(u.ux,u.uy)) {
 		tmp = waterbody_name(u.ux,u.uy);
-		Sprintf(qbuf, "Dip it into the %s?", tmp);
-		if (yn(qbuf) == 'y') {
+		Sprintf(eos(qbuf), " the %s?", tmp);
+		if (yn(upstart(qbuf)) == 'y') {
 		    if (Levitation) {
 			floating_above(tmp);
 #ifdef STEED
@@ -1726,8 +1728,8 @@ dodip()
 		}
 	}
 
-	if(!(potion = getobj(beverages, "dip into")))
-		return(0);
+	potion = getobj(beverages, qbuf);	/* "dip into" */
+	if (!potion) return 0;
 	if (potion == obj && potion->quan == 1L) {
 		pline("That is a potion bottle, not a Klein bottle!");
 		return 0;
