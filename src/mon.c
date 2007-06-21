@@ -2027,7 +2027,7 @@ int dest;
 		otyp = otmp->otyp;
 		if (mdat->msize < MZ_HUMAN && otyp != FOOD_RATION &&
 			otyp != LEASH && otyp != FIGURINE &&
-			(otmp->owt > 3 ||
+			(otmp->owt > 30 ||
 			 objects[otyp].oc_big /*oc_bimanual/oc_bulky*/ ||
 			 is_spear(otmp) || is_pole(otmp) ||
 			 otyp == MORNING_STAR)) {
