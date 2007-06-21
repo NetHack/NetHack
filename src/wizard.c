@@ -225,7 +225,9 @@ target_on(mask, mtmp)
 		return(STRAT(STRAT_PLAYER, u.ux, u.uy, mask));
 	    else if((otmp = on_ground(otyp)))
 		return(STRAT(STRAT_GROUND, otmp->ox, otmp->oy, mask));
-	    else if((mtmp2 = other_mon_has_arti(mtmp, otyp)))
+	    else if ((mtmp2 = other_mon_has_arti(mtmp, otyp)) != 0 &&
+		    /* avoid targetting the Wizard for the Amulet */
+		    (!mtmp2->iswiz || otyp != AMULET_OF_YENDOR))
 		return(STRAT(STRAT_MONSTR, mtmp2->mx, mtmp2->my, mask));
 	}
 	return (unsigned long)STRAT_NONE;
