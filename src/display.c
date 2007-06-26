@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)display.c	3.5	2007/01/26	*/
+/*	SCCS Id: @(#)display.c	3.5	2007/06/25	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -133,6 +133,12 @@ STATIC_DCL void FDECL(set_seenv, (struct rm *, int, int, int, int));
 STATIC_DCL void FDECL(t_warn, (struct rm *));
 STATIC_DCL int FDECL(wall_angle, (struct rm *));
 
+#ifdef DUNGEON_OVERVIEW
+# define remember_topology(levp)	((levp)->styp = (levp)->typ)
+#else
+# define remember_topology(levp)	/*empty*/
+#endif
+
 #ifdef INVISIBLE_OBJECTS
 /*
  * vobj_at()
@@ -185,9 +191,8 @@ magic_map_background(x, y, show)
     if (level.flags.hero_memory)
 	lev->glyph = glyph;
     if (show) show_glyph(x,y, glyph);
-#ifdef DUNGEON_OVERVIEW
-    lev->styp = lev->typ;
-#endif /* DUNGEON_OVERVIEW */
+
+    remember_topology(lev);	/* DUNGEON_OVERVIEW */
 }
 
 /*
@@ -343,6 +348,8 @@ unmap_object(x, y)
 	map_trap(trap,show);						\
     else								\
 	map_background(x,y,show);					\
+									\
+    remember_topology(&levl[x][y]);	/* DUNGEON_OVERVIEW */		\
 }
 
 void
@@ -523,7 +530,7 @@ feel_location(x, y)
     /* if the hero is levitating or not.				  */
     set_seenv(lev, u.ux, u.uy, x, y);
 
-    if (Levitation && !Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz)) {
+    if (!can_reach_floor(FALSE)) {
 	/*
 	 * Levitation Rules.  It is assumed that the hero can feel the state
 	 * of the walls around herself and can tell if she is in a corridor,

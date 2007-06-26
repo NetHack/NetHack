@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bones.c	3.5	2007/03/01	*/
+/*	SCCS Id: @(#)bones.c	3.5	2007/06/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -371,6 +371,9 @@ struct obj *corpse;
 	    levl[x][y].seenv = 0;
 	    levl[x][y].waslit = 0;
 	    levl[x][y].glyph = cmap_to_glyph(S_stone);
+#ifdef DUNGEON_OVERVIEW
+	    levl[x][y].styp = 0;
+#endif
 	}
 
 	fd = create_bonesfile(&u.uz, &bonesid, whynot);
