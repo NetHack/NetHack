@@ -1133,6 +1133,18 @@ doengrave()
 	return(1);
 }
 
+/* while loading bones, clean up text which might accidentally
+   or maliciously disrupt player's terminal when displayed */
+void
+sanitize_engravings()
+{
+	struct engr *ep;
+
+	for (ep = head_engr; ep; ep = ep->nxt_engr) {
+	    sanitize_name(ep->engr_txt);
+	}
+}
+
 void
 save_engravings(fd, mode)
 int fd, mode;

@@ -82,6 +82,8 @@ boolean restore;
 			    } else {
 				artifact_exists(otmp, safe_oname(otmp), TRUE);
 			    }
+			} else if (has_oname(otmp)) {
+			    sanitize_name(ONAME(otmp));
 			}
 		} else {	/* saving */
 			/* do not zero out o_ids for ghost levels anymore */
@@ -166,6 +168,33 @@ boolean restore;
 			    curse(otmp);
 			}
 		}
+	}
+}
+
+/* while loading bones, strip out text possibly supplied by old player
+   that might accidentally or maliciously disrupt new player's display */
+void
+sanitize_name(namebuf)
+char *namebuf;
+{
+	int c;
+	boolean strip_8th_bit = !strcmp(windowprocs.name, "tty") &&
+				!iflags.wc_eight_bit_input;
+
+	/* it's tempting to skip this for single-user platforms, since
+	   only the current player could have left these bones--except
+	   things like "hearse" and other bones exchange schemes make
+	   that assumption false */
+	while (*namebuf) {
+	    c = *namebuf & 0177;
+	    if (c < ' ' || c == '\177') {
+		/* non-printable or undesireable */
+		*namebuf = '.';
+	    } else if (c != *namebuf) {
+		/* expected to be printable if user wants such things */
+		if (strip_8th_bit) *namebuf = '_';
+	    }
+	    ++namebuf;
 	}
 }
 
@@ -498,6 +527,7 @@ getbones()
 			 * set to the magic DEFUNCT_MONSTER cookie value.
 			 */
 			for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+			    if (has_mname(mtmp)) sanitize_name(MNAME(mtmp));
 			    if (mtmp->mhpmax == DEFUNCT_MONSTER) {
 #if defined(DEBUG) && defined(WIZARD)
 				if (wizard)
@@ -514,6 +544,7 @@ getbones()
 		}
 	}
 	(void) close(fd);
+	sanitize_engravings();
 
 #ifdef WIZARD
 	if(wizard) {

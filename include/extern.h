@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.5	2007/01/05	*/
+/*	SCCS Id: @(#)extern.h	3.5	2007/06/27	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -127,6 +127,7 @@ E void NDECL(drag_down);
 
 /* ### bones.c ### */
 
+E void FDECL(sanitize_name, (char *));
 E void FDECL(drop_upon_death, (struct monst *,struct obj *,int,int));
 E boolean NDECL(can_make_bones);
 E void FDECL(savebones, (struct obj *));
@@ -656,6 +657,7 @@ E void FDECL(make_engr_at, (int,int,const char *,long,XCHAR_P));
 E void FDECL(del_engr_at, (int,int));
 E int NDECL(freehand);
 E int NDECL(doengrave);
+E void NDECL(sanitize_engravings);
 E void FDECL(save_engravings, (int,int));
 E void FDECL(rest_engravings, (int));
 E void FDECL(del_engr, (struct engr *));

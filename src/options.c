@@ -4030,7 +4030,7 @@ char *str;
 	register struct fruit *f;
 	struct fruit *lastf = 0;
 	int highest_fruit_id = 0;
-	char buf[PL_FSIZ];
+	char buf[PL_FSIZ], altname[PL_FSIZ];
 	boolean user_specified = (str == pl_fruit);
 	/* if not user-specified, then it's a fruit name for a fruit on
 	 * a bones level...
@@ -4079,11 +4079,17 @@ char *str;
 				Strcpy(pl_fruit, "candied ");
 				nmcpy(pl_fruit+8, buf, PL_FSIZ-8);
 		}
+		*altname = '\0';
+	} else {
+		/* not user_supplied, so assumed to be from bones */
+		copynchars(altname, str, PL_FSIZ-1);
+		sanitize_name(altname);
 	}
 	for(f=ffruit; f; f = f->nextf) {
 		lastf = f;
 		if(f->fid > highest_fruit_id) highest_fruit_id = f->fid;
-		if(!strncmp(str, f->fname, PL_FSIZ))
+		if (!strncmp(str, f->fname, PL_FSIZ-1) ||
+			    (*altname && !strcmp(altname, f->fname)))
 			goto nonew;
 	}
 	/* if adding another fruit would overflow spe, use a random
@@ -4093,7 +4099,7 @@ char *str;
 	f = newfruit();
 	if (ffruit) lastf->nextf = f;
 	else ffruit = f;
-	Strcpy(f->fname, str);
+	copynchars(f->fname, *altname ? altname : str, PL_FSIZ-1);
 	f->fid = highest_fruit_id;
 	f->nextf = 0;
 nonew:
