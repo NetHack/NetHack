@@ -1446,7 +1446,7 @@ domove()
 
 		    u.uconduct.killer++;
 		    mndx = monsndx(mtmp->data);
-		    tmp = experience(mtmp, (int)mvitals[mndx].died + 1);
+		    tmp = experience(mtmp, (int)mvitals[mndx].died);
 		    more_experienced(tmp, 0);
 		    newexplevel();	/* will decide if you go up */
 		  }

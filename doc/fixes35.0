@@ -315,6 +315,7 @@ introduce support for negation of role, race, align, gender values to eliminate
 	them from random selection and the pick list of startup choices
 some intelligent pets will avoid cannibalism
 keep track of which monsters were cloned from other monsters
+cloned and revived monsters become worth fewer points than ordinary ones
 number_pad:3 run-time option to use inverted phone keypad layout for movement
 number_pad:-1 to swap function of y and z keys; z to move NW, y to zap wands
 display spell retention information in the spell menu

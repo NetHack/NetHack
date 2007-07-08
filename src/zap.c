@@ -576,6 +576,7 @@ coord *cc;
 		mtmp2->mlstmv = mtmp->mlstmv;
 		mtmp2->m_ap_type = mtmp->m_ap_type;
 		/* set these ones explicitly */
+		mtmp2->mrevived = 1;
 		mtmp2->mavenge = 0;
 		mtmp2->meating = 0;
 		mtmp2->mleashed = 0;
@@ -755,7 +756,8 @@ boolean by_hero;
 	    shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
 
 	if (cansee(x, y))
-	    pline_The("%s glows iridescently.", cxname(corpse));
+	    pline("%s glows iridescently.",
+		  upstart(corpse_xname(corpse, (const char *)0, CXN_PFX_THE)));
 	else if (shkp)
 	    /* need some prior description of the corpse since
 	       stolen_value() will refer to the object as "it" */

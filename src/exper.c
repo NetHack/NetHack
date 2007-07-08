@@ -66,9 +66,6 @@ int
 experience(mtmp, nk)	/* return # of exp points for mtmp after nk killed */
 	register struct	monst *mtmp;
 	register int	nk;
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
-# pragma unused(nk)
-#endif
 {
 	register struct permonst *ptr = mtmp->data;
 	int	i, tmp, tmp2;
@@ -118,6 +115,27 @@ experience(mtmp, nk)	/* return # of exp points for mtmp after nk killed */
 	/* Mail daemons put up no fight. */
 	if(mtmp->data == &mons[PM_MAIL_DAEMON]) tmp = 1;
 #endif
+
+	if (mtmp->mrevived || mtmp->mcloned) {
+	    /*
+	     *	Reduce experience awarded for repeated killings of
+	     *	"the same monster".  Kill count includes all of this
+	     *	monster's type which have been killed--including the
+	     *	current monster--regardless of how they were created.
+	     *	  1.. 20	full experience
+	     *	 21.. 40	xp / 2
+	     *	 41.. 80	xp / 4
+	     *	 81..120	xp / 8
+	     *	121..180	xp / 16
+	     *	181..240	xp / 32
+	     *	241..255+	xp / 64
+	     */
+	    for (i = 0, tmp2 = 20; nk > tmp2 && tmp > 1; ++i) {
+		tmp = (tmp + 1) / 2;
+		nk -= tmp2;
+		if (i & 1) tmp2 += 20;
+	    }
+	}
 
 	return(tmp);
 }
