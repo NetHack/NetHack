@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)music.c	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)music.c	3.5	2007/07/08	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -626,7 +626,7 @@ struct obj *instr;
 				close_drawbridge(x,y);
 			    else
 				open_drawbridge(x,y);
-			    return 0;
+			    return 1;
 			}
 	    } else if(!Deaf) {
 		if (u.uevent.uheard_tune < 1) u.uevent.uheard_tune = 1;
