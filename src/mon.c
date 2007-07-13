@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2007/03/30	*/
+/*	SCCS Id: @(#)mon.c	3.5	2007/07/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1259,6 +1259,9 @@ struct monst *magr,	/* monster that is currently deciding where to move */
 	   again when defender gets its chance to move */
 	if ((pa->mflags3 & M3_DISPLACES) != 0 &&
 	    (pd->mflags3 & M3_DISPLACES) == 0 &&
+	    /* no displacing grid bugs diagonally */
+	    !(magr->mx != mdef->mx && magr->my != mdef->my &&
+		NODIAG(monsndx(pd))) &&
 	    /* no displacing trapped monsters or multi-location longworms */
 	    !mdef->mtrapped && (!mdef->wormno || !count_wsegs(mdef)) &&
 	    /* riders can move anything; others, same size or smaller only */

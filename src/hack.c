@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2007/04/16	*/
+/*	SCCS Id: @(#)hack.c	3.5	2007/07/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1401,6 +1401,11 @@ domove()
 		    sobj_at(BOULDER, trap->tx, trap->ty)) {
 		/* can't swap places with pet pinned in a pit by a boulder */
 		u.ux = u.ux0,  u.uy = u.uy0;	/* didn't move after all */
+	    } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
+		/* can't swap places when pet can't move to your spot */
+		u.ux = u.ux0,  u.uy = u.uy0;
+		You("stop.  %s can't move diagonally.",
+		    upstart(y_monnam(mtmp)));
 	    } else if (u.ux0 != x && u.uy0 != y &&
 		       bad_rock(mtmp->data, x, u.uy0) &&
 		       bad_rock(mtmp->data, u.ux0, y) &&
