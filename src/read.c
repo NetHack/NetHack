@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2007/04/07	*/
+/*	SCCS Id: @(#)read.c	3.5	2007/07/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -124,16 +124,31 @@ doread()
 	    }
 	}
 
+	confused = (Confusion != 0);
+#ifdef MAIL
+	if (scroll->otyp == SCR_MAIL) {
+	    confused = FALSE;	/* override */
+	    /* reading mail is a convenience for the player and takes
+	       place outside the game, so shouldn't affect gameplay;
+	       on the other hand, it starts by explicitly making the
+	       hero actively read something, which is pretty hard
+	       to simply ignore; as a compromise, if the player has
+	       maintained illiterate conduct so far, and this mail
+	       scroll didn't come from bones, ask for confirmation */
+	    if (!u.uconduct.literate) {
+		if (!scroll->spe &&
+	  yn("Reading mail will violate \"illiterate\" conduct.  Read anyway?")
+		    != 'y') return 0;
+	    }
+	}
+#endif
+
 	/* Actions required to win the game aren't counted towards conduct */
 	if (scroll->otyp != SPE_BOOK_OF_THE_DEAD &&
 		scroll->otyp != SPE_BLANK_PAPER &&
 		scroll->otyp != SCR_BLANK_PAPER)
 	    u.uconduct.literate++;
 
-	confused = (Confusion != 0);
-#ifdef MAIL
-	if (scroll->otyp == SCR_MAIL) confused = FALSE;
-#endif
 	if(scroll->oclass == SPBOOK_CLASS) {
 	    return(study_book(scroll));
 	}
