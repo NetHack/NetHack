@@ -1776,12 +1776,12 @@ skipmsg:
 		} else
 		    mquaffmsg(mtmp, otmp);
 		/* format monster's name before altering its visibility */
-		Strcpy(nambuf, See_invisible ? Monnam(mtmp) : mon_nam(mtmp));
+		Strcpy(nambuf, mon_nam(mtmp));
 		mon_set_minvis(mtmp);
 		if (vismon && mtmp->minvis) {	/* was seen, now invisible */
-		    if (See_invisible)
+		    if (canspotmon(mtmp))
 			pline("%s body takes on a %s transparency.",
-			      s_suffix(nambuf),
+			      upstart(s_suffix(nambuf)),
 			      Hallucination ? "normal" : "strange");
 		    else
 			pline("Suddenly you cannot see %s.", nambuf);
