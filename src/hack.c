@@ -1205,7 +1205,22 @@ domove()
 	    (glyph_is_invisible(levl[x][y].glyph) && !context.nopick)) {
 		struct obj *boulder = sobj_at(BOULDER, x, y);
 		boolean explo = (Upolyd && attacktype(youmonst.data, AT_EXPL));
+		int glyph = glyph_at(x, y);	/* might be monster */
 		char buf[BUFSZ];
+
+		/* if a statue is displayed at the target location,
+		   player is attempting to attack it [and boulder
+		   handlng below is suitable for handling that] */
+		if (glyph_is_statue(glyph) ||
+			(Hallucination && glyph_is_monster(glyph)))
+		    boulder = sobj_at(STATUE, x, y);
+
+		/* force fight at boulder (or statue) while wielding pick:
+		   start digging to break the boulder (or statue) */
+		if (boulder && context.forcefight && uwep && is_pick(uwep)) {
+		    (void)use_pick_axe2(uwep);
+		    return;
+		}
 
 		if (boulder)
 		    Strcpy(buf, ansimpleoname(boulder));

@@ -369,6 +369,7 @@ C and #name commands are now same and use menu to choose monster vs object
 hallucination provides partial protection against gaze attacks
 attempting to read "dull" spellbook might cause hero to fall asleep
 dipping prompt is more precise
+using F to attack boulder or statue while wielding pick digs/breaks target
 
 
 Platform- and/or Interface-Specific New Features
