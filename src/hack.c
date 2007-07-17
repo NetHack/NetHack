@@ -1203,17 +1203,28 @@ domove()
 	if (context.forcefight ||
 	    /* remembered an 'I' && didn't use a move command */
 	    (glyph_is_invisible(levl[x][y].glyph) && !context.nopick)) {
+		struct obj *boulder = sobj_at(BOULDER, x, y);
 		boolean explo = (Upolyd && attacktype(youmonst.data, AT_EXPL));
-	    	char buf[BUFSZ];
-		Sprintf(buf,"a vacant spot on the %s", surface(x,y));
-		You("%s %s.",
+		char buf[BUFSZ];
+
+		if (boulder)
+		    Strcpy(buf, ansimpleoname(boulder));
+		else if (!Underwater)
+		    Strcpy(buf, "thin air");
+		else if (is_pool(x, y))
+		    Strcpy(buf, "empty water");
+		else	/* Underwater, targetting non-water */
+		    Sprintf(buf, "a vacant spot on the %s", surface(x,y));
+		You("%s%s %s.",
+		    !boulder ? "" : !explo ? "harmlessly " : "futilely ",
 		    explo ? "explode at" : "attack",
-		    !Underwater ? "thin air" :
-		    is_pool(x,y) ? "empty water" : buf);
+		    buf);
 		unmap_object(x, y); /* known empty -- remove 'I' if present */
+		if (boulder) map_object(boulder, TRUE);
 		newsym(x, y);
 		nomul(0);
 		if (explo) {
+		    wake_nearby();
 		    u.mh = -1;		/* dead in the current form */
 		    rehumanize();
 		}

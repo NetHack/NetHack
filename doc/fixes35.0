@@ -258,6 +258,7 @@ can't swap places with tame grid bug when moving diagonally
 can't move diagonally through a long worm's body (can still fight that way)
 require confirmation to read a scroll of mail if doing so will be the first
 	violation of illiteracy conduct
+using F to force an attack towards a boulder gave "you attack thin air"
 
 
 Platform- and/or Interface-Specific Fixes
