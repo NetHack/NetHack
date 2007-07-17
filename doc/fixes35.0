@@ -255,6 +255,7 @@ wizard mode: WIZKIT wishes could overflow inventory's 52 slots
 when loading bones files, censor suspect characters from player-supplied
 	strings such as pet and fruit names
 can't swap places with tame grid bug when moving diagonally
+can't move diagonally through a long worm's body (can still fight that way)
 require confirmation to read a scroll of mail if doing so will be the first
 	violation of illiteracy conduct
 

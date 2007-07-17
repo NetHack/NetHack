@@ -1018,7 +1018,7 @@ mfndpos(mon, poss, info, flag)
 	y = mon->my;
 	nowtyp = levl[x][y].typ;
 
-	nodiag = (mdat == &mons[PM_GRID_BUG]);
+	nodiag = NODIAG(mdat - mons);
 	wantpool = mdat->mlet == S_EEL;
 	poolok = is_flyer(mdat) || is_clinger(mdat) ||
 		 (is_swimmer(mdat) && !wantpool);
@@ -1063,21 +1063,23 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 	       !((IS_TREE(ntyp) ? treeok : rockok) && may_dig(nx,ny))) continue;
 	    /* KMH -- Added iron bars */
 	    if (ntyp == IRONBARS && !(flag & ALLOW_BARS)) continue;
-	    if(IS_DOOR(ntyp) && !(amorphous(mdat) || can_fog(mon)) &&
-	       ((levl[nx][ny].doormask & D_CLOSED && !(flag & OPENDOOR)) ||
-		(levl[nx][ny].doormask & D_LOCKED && !(flag & UNLOCKDOOR))) &&
-	       !thrudoor) continue;
-	    if(nx != x && ny != y && (nodiag ||
+	    if (IS_DOOR(ntyp) && !(amorphous(mdat) || can_fog(mon)) &&
+		(((levl[nx][ny].doormask & D_CLOSED) &&
+			!(flag & OPENDOOR)) ||
+		 ((levl[nx][ny].doormask & D_LOCKED) &&
+			!(flag & UNLOCKDOOR))) &&
+		!thrudoor) continue;
+	    /* first diagonal checks (tight squeezes handled below) */
+	    if (nx != x && ny != y && (nodiag ||
+		(IS_DOOR(nowtyp) && (levl[x][y].doormask & ~D_BROKEN)) ||
+		(IS_DOOR(ntyp) && (levl[nx][ny].doormask & ~D_BROKEN)) ||
 #ifdef REINCARNATION
-	       ((IS_DOOR(nowtyp) &&
-		 ((levl[x][y].doormask & ~D_BROKEN) || Is_rogue_level(&u.uz))) ||
-		(IS_DOOR(ntyp) &&
-		 ((levl[nx][ny].doormask & ~D_BROKEN) || Is_rogue_level(&u.uz))))
-#else
-	       ((IS_DOOR(nowtyp) && (levl[x][y].doormask & ~D_BROKEN)) ||
-		(IS_DOOR(ntyp) && (levl[nx][ny].doormask & ~D_BROKEN)))
+		((IS_DOOR(nowtyp) || IS_DOOR(ntyp)) && Is_rogue_level(&u.uz)) ||
 #endif
-	       ))
+		/* mustn't pass between adjacent long worm segments,
+		   but can attack that way */
+		(m_at(x, ny) && m_at(nx, y) && worm_cross(x, y, nx, ny) &&
+		 !m_at(nx, ny) && (nx != u.ux || ny != u.uy))))
 		continue;
 	    if((is_pool(nx,ny) == wantpool || poolok) &&
 	       (lavaok || !is_lava(nx,ny))) {
@@ -1279,7 +1281,7 @@ register int x,y;
 {
 	register int distance = dist2(mon->mx, mon->my, x, y);
 
-	if (distance==2 && mon->data==&mons[PM_GRID_BUG]) return 0;
+	if (distance == 2 && NODIAG(mon->data - mons)) return 0;
 	return((boolean)(distance < 3));
 }
 

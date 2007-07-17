@@ -708,6 +708,10 @@ int mode;
 	default:
 	    break;      /* can squeeze through */
 	}
+    } else if (dx && dy && worm_cross(ux, uy, x, y)) {
+	/* consecutive long worm segments are at <ux,y> and <x,uy> */
+	if (mode == DO_MOVE) pline("%s is in your way.", Monnam(m_at(ux, y)));
+	return FALSE;
     }
     /* Pick travel path that does not require crossing a trap.
      * Avoid water and lava using the usual running rules.
@@ -828,7 +832,7 @@ boolean guess;
 		int y = travelstepy[set][i];
 		static int ordered[] = { 0, 2, 4, 6, 1, 3, 5, 7 };
 		/* no diagonal movement for grid bugs */
-		int dirmax = u.umonnum == PM_GRID_BUG ? 4 : 8;
+		int dirmax = NODIAG(u.umonnum) ? 4 : 8;
 
 		for (dir = 0; dir < dirmax; ++dir) {
 		    int nx = x+xdir[ordered[dir]];

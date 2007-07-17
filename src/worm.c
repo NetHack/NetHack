@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worm.c	3.5	2005/07/13	*/
+/*	SCCS Id: @(#)worm.c	3.5	2007/07/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -743,6 +743,53 @@ struct monst *worm;
 	if(cansee(curr->wx,curr->wy)) return TRUE;
 	curr = curr->nseg;
     }
+    return FALSE;
+}
+
+/* would moving from <x1,y1> to <x2,y2> involve passing between two
+   consecutive segments of the same worm? */
+boolean
+worm_cross(x1, y1, x2, y2)
+int x1, y1, x2, y2;
+{
+    struct monst *worm;
+    struct wseg *curr, *wnxt;
+
+    /*
+     * With digits representing relative sequence number of the segments,
+     * returns true when testing between @ and ? (passes through worm's
+     * body), false between @ and ! (stays on same side of worm).
+     *	.w1?..
+     *	..@2..
+     *	.65!3.
+     *	...4..
+     */
+
+    if (distmin(x1, y1, x2, y2) != 1) {
+	impossible("worm_cross checking for non-adjacent location?");
+	return FALSE;
+    }
+    /* attempting to pass between worm segs is only relevant for diagonal */
+    if (x1 == x2 || y1 == y2) return FALSE;
+
+    /* is the same monster at <x1,y2> and at <x2,y1>? */
+    worm = m_at(x1, y2);
+    if (!worm || m_at(x2, y1) != worm) return FALSE;
+
+    /* same monster is at both adjacent spots, so must be a worm; we need
+       to figure out if the two spots are occupied by consecutive segments */
+    for (curr = wtails[worm->wormno]; curr; curr = wnxt) {
+	wnxt = curr->nseg;
+	if (!wnxt) break;	/* no next segment; can't continue */
+
+	/* we don't know which of <x1,y2> or <x2,y1> we'll hit first, but
+	   whichever it is, they're consecutive iff next seg is the other */
+	if (curr->wx == x1 && curr->wy == y2)
+	    return (boolean)(wnxt->wx == x2 && wnxt->wy == y1);
+	if (curr->wx == x2 && curr->wy == y1)
+	    return (boolean)(wnxt->wx == x1 && wnxt->wy == y2);
+    }
+    /* should never reach here... */
     return FALSE;
 }
 

@@ -2588,6 +2588,7 @@ E void FDECL(remove_worm, (struct monst *));
 E void FDECL(place_worm_tail_randomly, (struct monst *,XCHAR_P,XCHAR_P));
 E int FDECL(count_wsegs, (struct monst *));
 E boolean FDECL(worm_known, (struct monst *));
+E boolean FDECL(worm_cross, (int,int,int,int));
 
 /* ### worn.c ### */
 
