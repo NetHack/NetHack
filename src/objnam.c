@@ -308,7 +308,7 @@ register struct obj *obj;
 			Strcat(buf, dn ? dn : actualn);
 		/* If we use an() here we'd have to remember never to use */
 		/* it whenever calling doname() or xname(). */
-		if (typ == FIGURINE)
+		if (typ == FIGURINE && omndx != NON_PM)
 		    Sprintf(eos(buf), " of a%s %s",
 			    index(vowels, *mons[omndx].mname) ? "n" : "",
 			    mons[omndx].mname);
@@ -381,7 +381,7 @@ register struct obj *obj;
 		Strcpy(buf, actualn);
 		break;
 	    case ROCK_CLASS:
-		if (typ == STATUE)
+		if (typ == STATUE && omndx != NON_PM)
 		    Sprintf(buf, "%s%s of %s%s",
 			(Role_if(PM_ARCHEOLOGIST) &&
 			    (obj->spe & STATUE_HISTORIC)) ? "historic " : "",
@@ -530,6 +530,7 @@ struct obj *obj;
 			/* default is "on" for types which don't use it */
 			!objects[otyp].oc_uses_known;
     bareobj.quan = 1L;		/* don't want plural */
+    bareobj.corpsenm = NON_PM;	/* suppress statue and figurine details */
     bufp = distant_name(&bareobj, xname);	/* xname(&bareobj) */
     if (!strncmp(bufp, "uncursed ", 9)) bufp += 9;  /* Role_if(PM_PRIEST) */
 
