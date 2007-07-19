@@ -2027,16 +2027,17 @@ int dest;
 #endif
 		    /* reduced chance of item from cloned monster */
 		    (!mtmp->mcloned || !rn2(mvitals[mndx].died / 5 + 1))) {
-		otmp = mkobj_at(RANDOM_CLASS, x, y, TRUE);
+		otmp = mkobj(RANDOM_CLASS, TRUE);
 		/* don't create large objects from small monsters */
 		otyp = otmp->otyp;
-		if (mdat->msize < MZ_HUMAN && otyp != FOOD_RATION &&
-			otyp != LEASH && otyp != FIGURINE &&
-			(otmp->owt > 30 ||
-			 objects[otyp].oc_big /*oc_bimanual/oc_bulky*/ ||
-			 is_spear(otmp) || is_pole(otmp) ||
-			 otyp == MORNING_STAR)) {
+		if (mdat->msize < MZ_HUMAN && otyp != FIGURINE &&
+			/* oc_big is also oc_bimanual and oc_bulky */
+			(otmp->owt > 30 || objects[otyp].oc_big)) {
 		    delobj(otmp);
+		} else if (!flooreffects(otmp, x, y,
+					 (dest & 1) ? "fall" : "")) {
+		    place_object(otmp, x, y);
+		    stackobj(otmp);
 		}
 	    }
 	    /* corpse--none if hero was inside the monster */

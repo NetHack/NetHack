@@ -259,6 +259,7 @@ can't move diagonally through a long worm's body (can still fight that way)
 require confirmation to read a scroll of mail if doing so will be the first
 	violation of illiteracy conduct
 using F to force an attack towards a boulder gave "you attack thin air"
+random "treasure drop" upon monster's death bypassed dropping side-effects
 
 
 Platform- and/or Interface-Specific Fixes
