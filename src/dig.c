@@ -11,7 +11,6 @@ static NEARDATA boolean did_dig_msg;
 STATIC_DCL boolean NDECL(rm_waslit);
 STATIC_DCL void FDECL(mkcavepos, (XCHAR_P,XCHAR_P,int,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void FDECL(mkcavearea, (BOOLEAN_P));
-STATIC_DCL int FDECL(dig_typ, (struct obj *,XCHAR_P,XCHAR_P));
 STATIC_DCL int NDECL(dig);
 STATIC_DCL void FDECL(dig_up_grave, (coord *));
 STATIC_DCL int FDECL(adj_pit_checks, (coord *,char *));
@@ -129,12 +128,16 @@ register boolean rockit;
 }
 
 /* When digging into location <x,y>, what are you actually digging into? */
-STATIC_OVL int
+int
 dig_typ(otmp, x, y)
 struct obj *otmp;
 xchar x, y;
 {
-	boolean ispick = is_pick(otmp);
+	boolean ispick;
+
+	if (!otmp) return DIGTYP_UNDIGGABLE;
+	ispick = is_pick(otmp);
+	if (!ispick && !is_axe(otmp)) return DIGTYP_UNDIGGABLE;
 
 	return (ispick && sobj_at(STATUE, x, y) ? DIGTYP_STATUE :
 		ispick && sobj_at(BOULDER, x, y) ? DIGTYP_BOULDER :

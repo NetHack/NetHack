@@ -259,6 +259,7 @@ E void NDECL(sokoban_detect);
 
 /* ### dig.c ### */
 
+E int FDECL(dig_typ, (struct obj *,XCHAR_P,XCHAR_P));
 E boolean NDECL(is_digging);
 #ifdef USE_TRAMPOLI
 E int NDECL(dig);

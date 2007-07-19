@@ -1204,7 +1204,8 @@ domove()
 	    /* remembered an 'I' && didn't use a move command */
 	    (glyph_is_invisible(levl[x][y].glyph) && !context.nopick)) {
 		struct obj *boulder = sobj_at(BOULDER, x, y);
-		boolean explo = (Upolyd && attacktype(youmonst.data, AT_EXPL));
+		boolean explo = (Upolyd && attacktype(youmonst.data, AT_EXPL)),
+			solid = !accessible(x, y);
 		int glyph = glyph_at(x, y);	/* might be monster */
 		char buf[BUFSZ];
 
@@ -1215,15 +1216,22 @@ domove()
 			(Hallucination && glyph_is_monster(glyph)))
 		    boulder = sobj_at(STATUE, x, y);
 
-		/* force fight at boulder (or statue) while wielding pick:
-		   start digging to break the boulder (or statue) */
-		if (boulder && context.forcefight && uwep && is_pick(uwep)) {
+		/* force fight at boulder/statue or wall/door while wielding
+		   pick:  start digging to break the boulder or wall */
+		if (context.forcefight &&
+			/* can we dig? */
+			uwep && dig_typ(uwep, x, y) &&
+			/* should we dig? */
+			!glyph_is_invisible(glyph) &&
+			!glyph_is_monster(glyph)) {
 		    (void)use_pick_axe2(uwep);
 		    return;
 		}
 
 		if (boulder)
 		    Strcpy(buf, ansimpleoname(boulder));
+		else if (solid)
+		    Strcpy(buf, the(defsyms[glyph_to_cmap(glyph)].explanation));
 		else if (!Underwater)
 		    Strcpy(buf, "thin air");
 		else if (is_pool(x, y))
@@ -1231,7 +1239,8 @@ domove()
 		else	/* Underwater, targetting non-water */
 		    Sprintf(buf, "a vacant spot on the %s", surface(x,y));
 		You("%s%s %s.",
-		    !boulder ? "" : !explo ? "harmlessly " : "futilely ",
+		    !(boulder || solid) ? "" :
+			!explo ? "harmlessly " : "futilely ",
 		    explo ? "explode at" : "attack",
 		    buf);
 		unmap_object(x, y); /* known empty -- remove 'I' if present */
