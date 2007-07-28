@@ -366,19 +366,29 @@ cutworm(worm, x, y, weap)
      *  it's head at "curr" and its tail at "new_tail".
      */
 
+    new_worm = 0;
+    new_wnum = rn2(3) ? 0 : get_wormno();
+    if (new_wnum) {
+	remove_monster(x, y);	/* clone_mon puts new head here */
+	/* clone_mon() will fail if enough long worms have been
+	   created to have them be marked as extinct or if the hit
+	   that cut the current one has dropped it down to 1 HP */
+	new_worm = clone_mon(worm, x, y);
+    }
+
     /* Sometimes the tail end dies. */
-    if (rn2(3) || !(new_wnum = get_wormno())) {
-	if (context.mon_moving)
-	    pline("Part of the tail of %s is cut off.", mon_nam(worm));
-	else
+    if (!new_worm) {
+	if (context.mon_moving) {
+	    if (canspotmon(worm))
+		pline("Part of %s tail has been cut off.",
+		      s_suffix(mon_nam(worm)));
+	} else
 	    You("cut part of the tail off of %s.", mon_nam(worm));
 	toss_wsegs(new_tail, TRUE);
 	if (worm->mhp > 1) worm->mhp /= 2;
 	return;
     }
 
-    remove_monster(x, y);		/* clone_mon puts new head here */
-    new_worm = clone_mon(worm, x, y);
     new_worm->wormno = new_wnum;	/* affix new worm number */
     new_worm->mcloned = 0;	/* treat second worm as a normal monster */
 
