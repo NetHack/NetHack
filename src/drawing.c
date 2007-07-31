@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)drawing.c	3.5	2006/10/01	*/
+/*	SCCS Id: @(#)drawing.c	3.5	2007/07/30	*/
 /* Copyright (c) NetHack Development Team 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -427,7 +427,7 @@ init_r_symbols()
 	r_syms[S_upstair] = r_syms[S_dnstair] = '%';
 
 	for (i = 0; i < MAXOCLASSES; i++)
-	    r_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
+	    r_syms[i + SYM_OFF_O] = def_r_oc_syms[i];
 
 	for (i = 0; i < MAXMCLASSES; i++)
 	    r_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
