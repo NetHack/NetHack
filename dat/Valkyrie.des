@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)Valkyrie.des	3.5	2002/05/02
+#	SCCS Id: @(#)Valkyrie.des	3.5	2007/08/01
 #	Copyright (c) 1989 by Jean-Christophe Collet
 #	Copyright (c) 1991-2 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
@@ -10,6 +10,7 @@
 #
 MAZE: "Val-strt",' '
 FLAGS: noteleport,hardfloor
+INIT_MAP: '.', 'I', true, true, lit, false, true
 GEOMETRY:center,center
 MAP
 IIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
@@ -89,7 +90,7 @@ MONSTER: 'H',"fire giant",(10,16),hostile
 
 MAZE: "Val-loca",' '
 FLAGS: hardfloor
-INIT_MAP: '.' , 'I' , true , true , lit , false
+INIT_MAP: '.', 'I', true, true, lit, false, true
 GEOMETRY:center,center
 MAP
 PPPP....                      ....PPPPP.
@@ -174,7 +175,7 @@ MONSTER:'H',random,random,hostile
 #
 
 MAZE: "Val-goal", 'L'
-INIT_MAP: '.' , 'L' , true , true , lit , false
+INIT_MAP: '.', 'L', true, true, lit, false, true
 GEOMETRY:center,center
 MAP
 .L............................LLLLL
@@ -203,7 +204,7 @@ STAIR:(45,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,34,16)
 # Drawbridges
-DRAWBRIDGE:(17,02),south,open
+DRAWBRIDGE:(17,02),south,random
 DRAWBRIDGE:(17,14),north,open
 # Objects
 OBJECT:'(',"crystal ball",(17,08),blessed,5,"The Orb of Fate"
@@ -264,7 +265,7 @@ MONSTER:'H',random,random,hostile
 #
 
 MAZE: "Val-fila" , 'I'
-INIT_MAP: '.' , 'I' , true , true , lit, false
+INIT_MAP: '.', 'I', true, true, lit, false, true
 NOMAP
 #
 STAIR: random, up
@@ -297,7 +298,7 @@ TRAP: random, random
 TRAP: random, random
 
 MAZE: "Val-filb" , 'L'
-INIT_MAP: '.' , 'L' , true , true , lit, false
+INIT_MAP: '.', 'L', true, true, lit, false, true
 NOMAP
 #
 STAIR: random, up

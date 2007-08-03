@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sp_lev.c	3.5	2007/04/20	*/
+/*	SCCS Id: @(#)sp_lev.c	3.5	2007/08/01	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2220,6 +2220,9 @@ dlb *fd;
 			levl[x][y].horizontal = 1;
 		    else if(levl[x][y].typ == LAVAPOOL)
 			levl[x][y].lit = 1;
+		    else if (init_lev.init_present && levl[x][y].typ == ICE)
+			levl[x][y].icedpool = init_lev.icedpools ? ICED_POOL :
+								   ICED_MOAT;
 		    else if(levl[x][y].typ == CROSSWALL)
 			has_bounds = TRUE;
 		    Map[x][y] = 1;

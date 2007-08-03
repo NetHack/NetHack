@@ -260,6 +260,7 @@ require confirmation to read a scroll of mail if doing so will be the first
 	violation of illiteracy conduct
 using F to force an attack towards a boulder gave "you attack thin air"
 random "treasure drop" upon monster's death bypassed dropping side-effects
+melted ice on Valkyrie quest should be pool, not moat
 
 
 Platform- and/or Interface-Specific Fixes

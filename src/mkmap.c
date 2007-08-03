@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkmap.c	3.5	2007/02/09	*/
+/*	SCCS Id: @(#)mkmap.c	3.5	2007/08/01	*/
 /* Copyright (c) J. C. Collet, M. Stephenson and D. Cohrs, 1992   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,7 +16,7 @@ STATIC_DCL void FDECL(pass_two,(SCHAR_P,SCHAR_P));
 STATIC_DCL void FDECL(pass_three,(SCHAR_P,SCHAR_P));
 STATIC_DCL void NDECL(wallify_map);
 STATIC_DCL void FDECL(join_map,(SCHAR_P,SCHAR_P));
-STATIC_DCL void FDECL(finish_map,(SCHAR_P,SCHAR_P,BOOLEAN_P,BOOLEAN_P));
+STATIC_DCL void FDECL(finish_map,(SCHAR_P,SCHAR_P,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void FDECL(remove_room,(unsigned));
 void FDECL(mkmap, (lev_init *));
 
@@ -336,9 +336,9 @@ joinm:
 }
 
 STATIC_OVL void
-finish_map(fg_typ, bg_typ, lit, walled)
+finish_map(fg_typ, bg_typ, lit, walled, icedpools)
 	schar	fg_typ, bg_typ;
-	boolean	lit, walled;
+	boolean	lit, walled, icedpools;
 {
 	int	i, j;
 
@@ -355,11 +355,15 @@ finish_map(fg_typ, bg_typ, lit, walled)
 	    for(i = 0; i < nroom; i++)
 		rooms[i].rlit = 1;
 	}
-	/* light lava even if everything's otherwise unlit */
+	/* light lava even if everything's otherwise unlit;
+	   ice might be frozen pool rather than frozen moat */
 	for(i=1; i<COLNO; i++)
-	    for(j=0; j<ROWNO; j++)
+	    for(j=0; j<ROWNO; j++) {
 		if (levl[i][j].typ == LAVAPOOL)
 		    levl[i][j].lit = TRUE;
+		else if (levl[i][j].typ == ICE)
+		    levl[i][j].icedpool = icedpools ? ICED_POOL : ICED_MOAT;
+	    }
 }
 
 /*
@@ -467,7 +471,8 @@ mkmap(init_lev)
 	if(join)
 	    join_map(bg_typ, fg_typ);
 
-	finish_map(fg_typ, bg_typ, (boolean)lit, (boolean)walled);
+	finish_map(fg_typ, bg_typ, (boolean)lit, (boolean)walled,
+		   init_lev->icedpools);
 	/* a walled, joined level is cavernous, not mazelike -dlc */
 	if (walled && join) {
 	    level.flags.is_maze_lev = FALSE;

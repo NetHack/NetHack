@@ -1,5 +1,5 @@
 %{
-/*	SCCS Id: @(#)lev_yacc.c	3.5	2007/04/20	*/
+/*	SCCS Id: @(#)lev_yacc.c	3.5	2007/08/01	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -279,6 +279,26 @@ lev_init	: /* nothing */
 			    yyerror("Invalid foreground type for joined map.");
 			init_lev.lit = $11;
 			init_lev.walled = $13;
+			init_lev.icedpools = FALSE;
+			$$ = 1;
+		  }
+		| LEV_INIT_ID ':' CHAR ',' CHAR ',' BOOLEAN ',' BOOLEAN ',' light_state ',' walled ',' BOOLEAN
+		  {
+			init_lev.init_present = TRUE;
+			init_lev.fg = what_map_char((char) $3);
+			if (init_lev.fg == INVALID_TYPE)
+			    yyerror("Invalid foreground type.");
+			init_lev.bg = what_map_char((char) $5);
+			if (init_lev.bg == INVALID_TYPE)
+			    yyerror("Invalid background type.");
+			init_lev.smoothed = $7;
+			init_lev.joined = $9;
+			if (init_lev.joined &&
+			    init_lev.fg != CORR && init_lev.fg != ROOM)
+			    yyerror("Invalid foreground type for joined map.");
+			init_lev.lit = $11;
+			init_lev.walled = $13;
+			init_lev.icedpools = $15;
 			$$ = 1;
 		  }
 		;

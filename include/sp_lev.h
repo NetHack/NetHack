@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)sp_lev.h	3.5	1996/05/08	*/
+/*	SCCS Id: @(#)sp_lev.h	3.5	2007/08/01	*/
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,6 +41,7 @@ typedef struct {
 	char	fg, bg;
 	boolean smoothed, joined;
 	xchar	lit, walled;
+	boolean icedpools;	/* for ice locations: ICED_POOL vs ICED_MOAT */
 } lev_init;
 
 typedef struct {
