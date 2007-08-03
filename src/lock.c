@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lock.c	3.5	2007/02/17	*/
+/*	SCCS Id: @(#)lock.c	3.5	2007/08/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -522,6 +522,7 @@ doopen()		/* try to open a door */
 	coord cc;
 	register struct rm *door;
 	struct monst *mtmp;
+	boolean portcullis;
 
 	if (nohands(youmonst.data)) {
 	    You_cant("open anything -- you have no hands!");
@@ -548,14 +549,16 @@ doopen()		/* try to open a door */
 	}
 
 	door = &levl[cc.x][cc.y];
+	portcullis = (is_drawbridge_wall(cc.x, cc.y) >= 0);
 
-	if(!IS_DOOR(door->typ)) {
-		if (is_db_wall(cc.x,cc.y)) {
+	if (portcullis || !IS_DOOR(door->typ)) {
+		/* closed portcullis or spot that opened bridge would span */
+		if (is_db_wall(cc.x, cc.y) || door->typ == DRAWBRIDGE_UP)
 		    There("is no obvious way to open the drawbridge.");
-		    return(0);
-		}
-		You("%s no door there.",
-				Blind ? "feel" : "see");
+		else if (portcullis || door->typ == DRAWBRIDGE_DOWN)
+		    pline_The("drawbridge is already open.");
+		else
+		    You("%s no door there.", Blind ? "feel" : "see");
 		return(0);
 	}
 
@@ -629,6 +632,7 @@ doclose()		/* try to close a door */
 	register int x, y;
 	register struct rm *door;
 	struct monst *mtmp;
+	boolean portcullis;
 
 	if (nohands(youmonst.data)) {
 	    You_cant("close anything -- you have no hands!");
@@ -660,13 +664,16 @@ doclose()		/* try to close a door */
 	}
 
 	door = &levl[x][y];
+	portcullis = (is_drawbridge_wall(x, y) >= 0);
 
-	if(!IS_DOOR(door->typ)) {
-		if (door->typ == DRAWBRIDGE_DOWN)
+	if (portcullis || !IS_DOOR(door->typ)) {
+		/* is_db_wall: closed porcullis */
+		if (is_db_wall(x, y) || door->typ == DRAWBRIDGE_UP)
+		    pline_The("drawbridge is already closed.");
+		else if (portcullis || door->typ == DRAWBRIDGE_DOWN)
 		    There("is no obvious way to close the drawbridge.");
 		else
-		    You("%s no door there.",
-				Blind ? "feel" : "see");
+		    You("%s no door there.", Blind ? "feel" : "see");
 		return(0);
 	}
 
