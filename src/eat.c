@@ -30,6 +30,7 @@ STATIC_DCL void FDECL(cprefx, (int));
 STATIC_DCL int FDECL(intrinsic_possible, (int,struct permonst *));
 STATIC_DCL void FDECL(givit, (int,struct permonst *));
 STATIC_DCL void FDECL(cpostfx, (int));
+STATIC_DCL void FDECL(consume_tin, (const char *));
 STATIC_DCL void FDECL(start_tin, (struct obj *));
 STATIC_DCL int FDECL(eatcorpse, (struct obj *));
 STATIC_DCL void FDECL(start_eating, (struct obj *));
@@ -129,7 +130,7 @@ init_uhunger()
 	u.uhs = NOT_HUNGRY;
 }
 
-/* tin types */
+/* tin types [SPINACH_TIN = -1, overrides corpsenm, nut==600] */
 static const struct {
     const char *txt;			/* description */
     int nut;				/* nutrition */
@@ -1076,8 +1077,10 @@ register int pm;
 		break;
 	    case PM_CHAMELEON:
 	    case PM_DOPPELGANGER:
-	 /* case PM_SANDESTIN: */
-		if (!Unchanging) {
+	    case PM_SANDESTIN:	/* moot--they don't leave corpses */
+		if (Unchanging) {
+		    You_feel("momentarily different."); /* same as poly trap */
+		} else {
 		    You_feel("a change coming over you.");
 		    polyself(0);
 		}
@@ -1221,14 +1224,15 @@ int mnum;
 char *buf;
 {
 	char buf2[BUFSZ];
+	int r = tin_variety(obj, TRUE);
+
 	if (obj && buf) {
-	    if(obj->spe > 0)
+	    if (r == SPINACH_TIN)
 		Strcat(buf, " of spinach");
 	    else if (mnum == NON_PM)
 		Strcpy(buf, "empty tin");
 	    else {
 		if ((obj->cknown || iflags.override_ID) && obj->spe < 0) {
-		    int r = tin_variety(obj, TRUE);
 		    if (r == ROTTEN_TIN || r == HOMEMADE_TIN) {
 			/* put these before the word tin */
 			Sprintf(buf2,"%s %s of ", tintxts[r].txt, buf);
@@ -1302,16 +1306,139 @@ boolean disp;		/* we're just displaying so leave things alone */
 	return r;
 }
 
+STATIC_OVL
+void
+consume_tin(mesg)
+const char *mesg;
+{
+    const char *what;
+    int which, mnum, r;
+    struct obj *tin = context.tin.tin;
+
+    r = tin_variety(tin, FALSE);
+    if (tin->otrapped || (tin->cursed && r != HOMEMADE_TIN && !rn2(8))) {
+	b_trapped("tin", 0);
+	costly_tin(COST_DSTROY);
+	goto use_up_tin;
+    }
+
+    pline(mesg);	/* "You succeed in opening the tin." */
+
+    if (r != SPINACH_TIN) {
+	mnum = tin->corpsenm;
+	if (mnum == NON_PM) {
+	    pline("It turns out to be empty.");
+	    tin->dknown = tin->known = 1;
+	    costly_tin(COST_OPEN);
+	    goto use_up_tin;
+	}
+
+	which = 0;	/* 0=>plural, 1=>as-is, 2=>"the" prefix */
+	if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE) &&
+		(Stone_resistance || Hallucination)) {
+	    what = "chicken";
+	    which = 1;	/* suppress pluralization */
+	} else if (Hallucination) {
+	    what = rndmonnam();
+	} else {
+	    what = mons[mnum].mname;
+	    if (the_unique_pm(&mons[mnum])) which = 2;
+	    else if (type_is_pname(&mons[mnum])) which = 1;
+	}
+	if (which == 0) what = makeplural(what);
+	else if (which == 2) what = the(what);
+
+	pline("It smells like %s.", what);
+	if (yn("Eat it?") == 'n') {
+	    if (flags.verbose) You("discard the open tin.");
+	    if (!Hallucination) tin->dknown = tin->known = 1;
+	    costly_tin(COST_OPEN);
+	    goto use_up_tin;
+	}
+
+	/* in case stop_occupation() was called on previous meal */
+	context.victual.piece = (struct obj *)0;
+	context.victual.o_id = 0;
+	context.victual.fullwarn = context.victual.eating =
+		context.victual.doreset = FALSE;
+
+	You("consume %s %s.", tintxts[r].txt, mons[mnum].mname);
+
+	/* KMH, conduct */
+	u.uconduct.food++;
+	if (!vegan(&mons[mnum]))
+	    u.uconduct.unvegan++;
+	if (!vegetarian(&mons[mnum]))
+	    violated_vegetarian();
+
+	tin->dknown = tin->known = 1;
+	cprefx(mnum);
+	cpostfx(mnum);
+
+	/* charge for one at pre-eating cost */
+	costly_tin(COST_OPEN);
+
+	if (tintxts[r].nut < 0)	/* rotten */
+	    make_vomiting((long)rn1(15, 10), FALSE);
+	else
+	    lesshungry(tintxts[r].nut);
+
+	if (tintxts[r].greasy) {
+	    /* Assume !Glib, because you can't open tins when Glib. */
+	    incr_itimeout(&Glib, rnd(15));
+	    pline("Eating %s food made your %s very slippery.",
+		  tintxts[r].txt, makeplural(body_part(FINGER)));
+	}
+
+    } else {		/* spinach... */
+	if (tin->cursed) {
+	    pline("It contains some decaying%s%s substance.",
+		  Blind ? "" : " ", Blind ? "" : hcolor(NH_GREEN));
+	} else {
+	    pline("It contains spinach.");
+	    tin->dknown = tin->known = 1;
+	}
+
+	if (yn("Eat it?") == 'n') {
+	    if (flags.verbose) You("discard the open tin.");
+	    costly_tin(COST_OPEN);
+	    goto use_up_tin;
+	}
+
+	/*
+	 * Same order as with non-spinach above:
+	 * conduct update, side-effects, shop handling, and nutrition.
+	 */
+	u.uconduct.food++; /* don't need vegan/vegetarian checks for spinach */
+	if (!tin->cursed)
+	    pline("This makes you feel like %s!",
+		  Hallucination ? "Swee'pea" : "Popeye");
+	gainstr(tin, 0);
+
+	costly_tin(COST_OPEN);
+
+	lesshungry(tin->blessed ? 600 :			/* blessed */
+		   !tin->cursed ? (400 + rnd(200)) :	/* uncursed */
+				  (200 + rnd(400)));	/* cursed */
+    }
+
+ use_up_tin:
+    if (carried(tin))
+	useup(tin);
+    else
+	useupf(tin, 1L);
+    context.tin.tin = (struct obj *)0;
+    context.tin.o_id = 0;
+}
+
 STATIC_PTR
 int
 opentin(VOID_ARGS)		/* called during each move whilst opening a tin */
 {
-	register int r;
-	const char *what;
-	int which, mnum;
-
-	if(!carried(context.tin.tin) && !obj_here(context.tin.tin, u.ux, u.uy))
-					/* perhaps it was stolen? */
+	/* perhaps it was stolen (although that should cause interruption) */
+	if (!carried(context.tin.tin) &&
+		(!obj_here(context.tin.tin, u.ux, u.uy) ||
+			!can_reach_floor(TRUE)))
 		return(0);		/* %% probably we should use tinoid */
 	if(context.tin.usedtime++ >= 50) {
 		You("give up your attempt to open the tin.");
@@ -1319,108 +1446,8 @@ opentin(VOID_ARGS)		/* called during each move whilst opening a tin */
 	}
 	if(context.tin.usedtime < context.tin.reqtime)
 		return(1);		/* still busy */
-	if(context.tin.tin->otrapped ||
-	   (context.tin.tin->cursed && context.tin.tin->spe != -1 && !rn2(8))) {
-		b_trapped("tin", 0);
-		costly_tin(COST_DSTROY);
-		goto use_me;
-	}
 
-	You("succeed in opening the tin.");
-	if(context.tin.tin->spe != 1) {
-	    mnum = context.tin.tin->corpsenm;
-	    if (mnum == NON_PM) {
-		pline("It turns out to be empty.");
-		context.tin.tin->dknown = context.tin.tin->known = TRUE;
-		costly_tin(COST_OPEN);
-		goto use_me;
-	    }
-	    r = tin_variety(context.tin.tin, FALSE);
-	    which = 0;	/* 0=>plural, 1=>as-is, 2=>"the" prefix */
-	    if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE) &&
-		    (Stone_resistance || Hallucination)) {
-		what = "chicken";
-		which = 1;	/* suppress pluralization */
-	    } else if (Hallucination) {
-		what = rndmonnam();
-	    } else {
-		what = mons[mnum].mname;
-		if (the_unique_pm(&mons[mnum])) which = 2;
-		else if (type_is_pname(&mons[mnum])) which = 1;
-	    }
-	    if (which == 0) what = makeplural(what);
-
-	    pline("It smells like %s%s.", (which == 2) ? "the " : "", what);
-	    if (yn("Eat it?") == 'n') {
-		if (!Hallucination)
-		    context.tin.tin->dknown = context.tin.tin->known = TRUE;
-		if (flags.verbose) You("discard the open tin.");
-		costly_tin(COST_OPEN);
-		goto use_me;
-	    }
-	    /* in case stop_occupation() was called on previous meal */
-	    context.victual.piece = (struct obj *)0;
-	    context.victual.o_id = 0;
-	    context.victual.fullwarn = context.victual.eating =
-		    context.victual.doreset = FALSE;
-
-	    You("consume %s %s.", tintxts[r].txt, mons[mnum].mname);
-
-	    /* KMH, conduct */
-	    u.uconduct.food++;
-	    if (!vegan(&mons[mnum]))
-		u.uconduct.unvegan++;
-	    if (!vegetarian(&mons[mnum]))
-		violated_vegetarian();
-
-	    context.tin.tin->dknown = context.tin.tin->known = TRUE;
-	    cprefx(mnum);
-	    cpostfx(mnum);
-
-	    /* charge for one at pre-eating cost */
-	    costly_tin(COST_OPEN);
-
-	    /* check for vomiting added by GAN 01/16/87 */
-	    if(tintxts[r].nut < 0) make_vomiting((long)rn1(15,10), FALSE);
-	    else lesshungry(tintxts[r].nut);
-
-	    if (tintxts[r].greasy) {
-		/* Assume !Glib, because you can't open tins when Glib. */
-		incr_itimeout(&Glib, rnd(15));
-		pline("Eating %s food made your %s very slippery.",
-		      tintxts[r].txt, makeplural(body_part(FINGER)));
-	    }
-	} else {
-	    if (context.tin.tin->cursed)
-		pline("It contains some decaying%s%s substance.",
-			Blind ? "" : " ", Blind ? "" : hcolor(NH_GREEN));
-	    else
-		pline("It contains spinach.");
-
-	    if (yn("Eat it?") == 'n') {
-		if (!Hallucination && !context.tin.tin->cursed)
-		    context.tin.tin->dknown = context.tin.tin->known = TRUE;
-		if (flags.verbose)
-		    You("discard the open tin.");
-		costly_tin(COST_OPEN);
-		goto use_me;
-	    }
-
-	    context.tin.tin->dknown = context.tin.tin->known = TRUE;
-	    costly_tin(COST_OPEN);
-
-	    if (!context.tin.tin->cursed)
-		pline("This makes you feel like %s!",
-		      Hallucination ? "Swee'pea" : "Popeye");
-	    lesshungry(600);
-	    gainstr(context.tin.tin, 0);
-	    u.uconduct.food++;
-	}
-use_me:
-	if (carried(context.tin.tin)) useup(context.tin.tin);
-	else useupf(context.tin.tin, 1L);
-	context.tin.tin = (struct obj *) 0;
-	context.tin.o_id = 0;
+	consume_tin("You succeed in opening the tin.");
 	return(0);
 }
 
@@ -1428,21 +1455,32 @@ STATIC_OVL void
 start_tin(otmp)		/* called when starting to open a tin */
 	register struct obj *otmp;
 {
+	const char *mesg = 0;
 	register int tmp;
 
 	if (metallivorous(youmonst.data)) {
-		You("bite right into the metal tin...");
-		tmp = 1;
+		mesg = "You bite right into the metal tin...";
+		tmp = 0;
 	} else if (nolimbs(youmonst.data)) {
 		You("cannot handle the tin properly to open it.");
 		return;
 	} else if (otmp->blessed) {
-		pline_The("tin opens like magic!");
-		tmp = 1;
+		/* 50/50 chance for immediate access vs 1 turn delay (unless
+		   wielding blessed tin opener which always yields immediate
+		   access); 1 turn delay case is non-deterministic:  getting
+		   interrupted and retrying might yield another 1 turn delay
+		   or might open immediately on 2nd (or 3rd, 4th, ...) try */
+		tmp = (uwep && uwep->blessed && uwep->otyp == TIN_OPENER) ? 0 :
+			rn2(2);
+		if (!tmp)
+		    mesg = "The tin opens like magic!";
+		else
+		    pline_The("tin seems easy to open.");
 	} else if(uwep) {
 		switch(uwep->otyp) {
 		case TIN_OPENER:
-			tmp = 1;
+			mesg = "You easily open the tin."; /* iff tmp==0 */
+			tmp = rn2(uwep->cursed ? 3 : !uwep->blessed ? 2 : 1);
 			break;
 		case DAGGER:
 		case SILVER_DAGGER:
@@ -1476,12 +1514,16 @@ no_opener:
 		}
 		tmp = rn1(1 + 500/((int)(ACURR(A_DEX) + ACURRSTR)), 10);
 	}
-	context.tin.reqtime = tmp;
-	context.tin.usedtime = 0;
+
 	context.tin.tin = otmp;
-	if (context.tin.tin)
-		context.tin.o_id = context.tin.tin->o_id;
-	set_occupation(opentin, "opening the tin", 0);
+	context.tin.o_id = otmp->o_id;
+	if (!tmp) {
+	    consume_tin(mesg);	/* begin immediately */
+	} else {
+	    context.tin.reqtime = tmp;
+	    context.tin.usedtime = 0;
+	    set_occupation(opentin, "opening the tin", 0);
+	}
 	return;
 }
 
