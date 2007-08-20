@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monmove.c	3.5	2007/05/16	*/
+/*	SCCS Id: @(#)monmove.c	3.5	2007/08/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -252,7 +252,7 @@ boolean fleemsg;
 }
 
 STATIC_OVL void
-distfleeck(mtmp,inrange,nearby,scared)
+distfleeck(mtmp, inrange, nearby, scared)
 register struct monst *mtmp;
 int *inrange, *nearby, *scared;
 {
@@ -531,7 +531,8 @@ toofar:
 		}
 
 		tmp = m_move(mtmp, 0);
-		distfleeck(mtmp,&inrange,&nearby,&scared);	/* recalc */
+		if (tmp != 2)
+		    distfleeck(mtmp, &inrange, &nearby, &scared); /* recalc */
 
 		switch (tmp) {
 		    case 0:	/* no movement, but it can still attack you */
