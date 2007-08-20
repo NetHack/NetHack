@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.5	2007/03/26	*/
+/*	SCCS Id: @(#)dogmove.c	3.5	2007/08/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -196,7 +196,7 @@ int
 dog_eat(mtmp, obj, x, y, devour)
 register struct monst *mtmp;
 register struct obj *obj;	/* if unpaid, then thrown or kicked by hero */
-int x, y;
+int x, y;	/* dog's starting location, might be different from current */
 boolean devour;
 {
 	register struct edog *edog = EDOG(mtmp);
@@ -243,13 +243,24 @@ boolean devour;
 	if (is_pool(x, y) && !Underwater) {
 	    /* Don't print obj */
 	    /* TODO: Reveal presence of sea monster (especially sharks) */
-	} else
-	/* hack: observe the action if either new or old location is in view */
-	/* However, invisible monsters should still be "it" even though out of
-	   sight locations should not. */
-	if (cansee(x, y) || cansee(mtmp->mx, mtmp->my))
-	    pline("%s %s %s.", mon_visible(mtmp) ? noit_Monnam(mtmp) : "It",
-		  devour ? "devours" : "eats", doname(obj));
+	} else {
+	    /* food is at monster's current location, <mx,my>;
+	       <x,y> was monster's location at start of this turn;
+	       they might be the same but will be different when
+	       the monster is moving+eating on same turn */
+	    boolean seeobj = cansee(mtmp->mx, mtmp->my),
+		    sawpet = cansee(x, y) && mon_visible(mtmp);
+
+	    /* Observe the action if either the food location or the pet
+	       itself is in view.  When pet which was in view moves to an
+	       unseen spot to eat the food there, avoid referring to that
+	       pet as "it".  However, we want "it" if invisible/unsensed
+	       pet eats visible food. */
+	    if (seeobj || sawpet)
+		pline("%s %s %s.",
+		      (sawpet || canspotmon(mtmp)) ? noit_Monnam(mtmp) : "It",
+		      devour ? "devours" : "eats", distant_name(obj, doname));
+	}
 	if (obj->unpaid) {
 	    Strcpy(objnambuf, xname(obj));
 	    iflags.suppress_price--;
@@ -366,7 +377,7 @@ int udist;
 	omx = mtmp->mx;
 	omy = mtmp->my;
 
-	/* if we are carrying sth then we drop it (perhaps near @) */
+	/* if we are carrying something then we drop it (perhaps near @) */
 	/* Note: if apport == 1 then our behaviour is independent of udist */
 	/* Use udist+1 so steed won't cause divide by zero */
 	if (droppables(mtmp)) {
