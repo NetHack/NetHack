@@ -3027,8 +3027,7 @@ xchar x, y;
 	    retval++;
 	} else if (!force && (Luck + 5) > rn2(20)) {
 	    /*  chance per item of sustaining damage:
-	     *	max luck (full moon):	 5%
-	     *	max luck (elsewhen):	10%
+	     *	max luck (Luck==13):	10%
 	     *	avg luck (Luck==0):	75%
 	     *	awful luck (Luck<-4):  100%
 	     */
