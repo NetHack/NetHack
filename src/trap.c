@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2007/06/18	*/
+/*	SCCS Id: @(#)trap.c	3.5	2007/08/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3074,7 +3074,7 @@ struct obj **objp;
 boolean force, here;
 {
 	register struct obj *obj = *objp, *otmp;
-	boolean loose_obj = (obj && obj->where == OBJ_FREE);
+	boolean loose_obj = (obj && obj->where == OBJ_FREE), exploded = FALSE;
 
 	if (loose_obj && (obj->nobj || obj->nexthere)) {
 		/* [this should actually be a panic()] */
@@ -3121,8 +3121,17 @@ boolean force, here;
 			else obj->otyp = SPE_BLANK_PAPER;
 		} else if (obj->oclass == POTION_CLASS) {
 			if (obj->otyp == POT_ACID) {
+				char *bufp, buf[BUFSZ];
+				boolean one = (obj->quan == 1L);
+
+				bufp = strcpy(buf, "potion");
+				if (!one) bufp = makeplural(bufp);
 				/* [should we damage player/monster?] */
-				pline("A potion explodes!");
+				pline("%s %s %s!",  /* "A potion explodes!" */
+				      !exploded ? (one ? "A" : "Some") :
+						  (one ? "Another" : "More"),
+				      bufp, vtense(bufp, "explode"));
+				exploded = TRUE;
 				/* let caller know that obj has gone away
 				   [when obj is part of a list, delobj()'s
 				   obj_extract_self() takes care of this;
