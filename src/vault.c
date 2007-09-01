@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vault.c	3.5	2006/06/11	*/
+/*	SCCS Id: @(#)vault.c	3.5	2007/08/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -163,6 +163,7 @@ invault()
     int dummy;		/* hack to avoid schain botch */
 #endif
     struct monst *guard;
+    boolean gsensed;
     int trycount, vaultroom = (int)vault_occupied(u.urooms);
 
     if(!vaultroom) {
@@ -265,16 +266,25 @@ fnd:
 	EGD(guard)->warncnt = 0;
 
 	reset_faint();			/* if fainted - wake up */
-	if (canspotmon(guard))
+	gsensed = !canspotmon(guard);
+	if (!gsensed)
 	    pline("Suddenly one of the Vault's %s enters!",
 		  makeplural(g_monnam(guard)));
 	else
 	    pline("Someone else has entered the Vault.");
 	newsym(guard->mx,guard->my);
+	if (u.uswallow) {
+	    /* can't interrogate hero, don't interrogate engulfer */
+	    verbalize("What's going on here?");
+	    if (gsensed) pline_The("other presence vanishes.");
+	    mongone(guard);
+	    return;
+	}
 	if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
 	    if (youmonst.m_ap_type == M_AP_OBJECT &&
 			youmonst.mappearance != GOLD_PIECE)
-	    	verbalize("Hey! Who left that %s in here?", mimic_obj_name(&youmonst));
+		verbalize("Hey! Who left that %s in here?",
+			  mimic_obj_name(&youmonst));
 	    /* You're mimicking some object or you're hidden. */
 	    pline("Puzzled, %s turns around and leaves.", mhe(guard));
 	    mongone(guard);
@@ -651,14 +661,13 @@ letknow:
 		    place_monster(grd, x, y);
 		    newsym(x, y);
 		}
-		if(!grd->mpeaceful) return(-1);
-		else {
-		    egrd->warncnt = 5;
-		    return(0);
-		}
+		if (!grd->mpeaceful) return -1;
+		egrd->warncnt = 5;
+		return 0;
 	}
 	if(um_dist(grd->mx, grd->my, 1) || egrd->gddone) {
-		if(!egrd->gddone && !rn2(10) && !Deaf)
+		if (!egrd->gddone && !rn2(10) && !Deaf && !u.uswallow &&
+			!(u.ustuck && !sticks(youmonst.data)))
 		    verbalize("Move along!");
 		restfakecorr(grd);
 		return(0);	/* didn't move */
