@@ -266,6 +266,7 @@ some variations of attempting to use open or close commands on a drawbridge
 tin contents can now sometimes be accessed on the same turn that the tin
 	starts being opened; when not, the opening feedback is more accurate
 Nth adjustment of feedback when observing a pet eating
+monsters who want the Amulet won't attack temple priests to try to get it
 
 
 Platform- and/or Interface-Specific Fixes

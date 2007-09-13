@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wizard.c	3.5	2007/04/15	*/
+/*	SCCS Id: @(#)wizard.c	3.5	2007/08/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -226,8 +226,10 @@ target_on(mask, mtmp)
 	    else if((otmp = on_ground(otyp)))
 		return(STRAT(STRAT_GROUND, otmp->ox, otmp->oy, mask));
 	    else if ((mtmp2 = other_mon_has_arti(mtmp, otyp)) != 0 &&
-		    /* avoid targetting the Wizard for the Amulet */
-		    (!mtmp2->iswiz || otyp != AMULET_OF_YENDOR))
+		    /* when seeking the Amulet, avoid targetting the Wizard
+		       or temple priests (to protect Moloch's high priest) */
+		    (otyp != AMULET_OF_YENDOR ||
+			(!mtmp2->iswiz && !inhistemple(mtmp2))))
 		return(STRAT(STRAT_MONSTR, mtmp2->mx, mtmp2->my, mask));
 	}
 	return (unsigned long)STRAT_NONE;
