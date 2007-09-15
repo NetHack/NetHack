@@ -948,7 +948,7 @@ char *outbuf;
 
 /*
  *  Name prefix codes (same as shknam.c):
- *	dash          _  female, personal name
+ *	dash          -  female, personal name
  *	underscore    _  female, general name
  *	plus          +  male, personal name
  *	vertical bar  |  male, general name
