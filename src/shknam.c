@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)shknam.c	3.5	2006/05/10	*/
+/*	SCCS Id: @(#)shknam.c	3.5	2007/09/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,7 +17,7 @@ STATIC_DCL int  FDECL(shkinit, (const struct shclass *,struct mkroom *));
 
 /*
  *  Name prefix codes:
- *	dash          _  female, personal name
+ *	dash          -  female, personal name
  *	underscore    _  female, general name
  *	plus          +  male, personal name
  *	vertical bar  |  male, general name (implied for most of shktools)
@@ -120,28 +120,32 @@ static const char * const shktools[] = {
     "Ymla", "Eed-morra", "Cubask", "Nieb", "Bnowr Falr", "Telloc Cyaj",
     "Sperc", "Noskcirdneh", "Yawolloh", "Hyeghu", "Niskal", "Trahnil",
     "Htargcm", "Enrobwem", "Kachzi Rellim", "Regien", "Donmyar",
-    "Yelpur", "Nosnehpets", "Stewe", "Renrut", "_Zlaw", "Nosalnef",
+    "Yelpur", "Nosnehpets", "Stewe", "Renrut", "-Zlaw", "Nosalnef",
     "Rewuorb", "Rellenk", "Yad", "Cire Htims", "Y-crad", "Nenilukah",
-    "Corsh", "Aned",
+    "Corsh", "Aned", "Niknar", "Lapu", "Lechaim", "Rebrol-nek",
+    "AlliWar Wickson", "Oguhmk",
 #ifdef OVERLAY
-    "Erreip", "Nehpets", "Mron", "Snivek", "Lapu", "Kahztiy",
+    "Erreip", "Nehpets", "Mron", "Snivek", "Kahztiy",
 #endif
 #ifdef WIN32
-    "Lechaim", "Lexa", "Niod",
+    "Lexa", "Niod",
 #endif
 #ifdef MAC
     "Nhoj-lee", "Evad\'kh", "Ettaw-noj", "Tsew-mot", "Ydna-s",
-    "Yao-hang", "Tonbar", "Kivenhoug",
+    "Yao-hang", "Tonbar", "Kivenhoug", "Llardom",
 #endif
 #ifdef AMIGA
-    "Falo", "Nosid-da\'r", "Ekim-p", "Rebrol-nek", "Noslo", "Yl-rednow",
+    "Falo", "Nosid-da\'r", "Ekim-p", "Noslo", "Yl-rednow",
     "Mured-oog", "Ivrajimsal",
 #endif
 #ifdef TOS
     "Nivram",
 #endif
+#ifdef OS2
+    "Nedraawi-nav",
+#endif
 #ifdef VMS
-    "Lez-tneg", "Ytnu-haled", "Niknar",
+    "Lez-tneg", "Ytnu-haled",
 #endif
     0
 };
