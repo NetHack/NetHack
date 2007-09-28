@@ -2784,7 +2784,7 @@ srch:
 			    pline("%s%s.", An(tname),
 				  (trap != MAGIC_PORTAL) ? "" : " to nowhere");
 			} else
-			    pline("Creation of %s failed.", An(tname));
+			    pline("Creation of %s failed.", an(tname));
 			return(&zeroobj);
 		}
 
