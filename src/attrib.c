@@ -668,21 +668,25 @@ int
 is_innate(propidx)
 int propidx;
 {
+	if (propidx == BLINDED && !haseyes(youmonst.data)) return 1;
 	return innately(&u.uprops[propidx].intrinsic);
 }
 
 char *
 from_what(propidx)
-int propidx;
+int propidx;	/* special cases can have negative values */
 {
-	static char buf[BUFSZ];
+    static char buf[BUFSZ];
 
-	buf[0] = '\0';
-	/*
-	 * Restrict the source of the attributes just to debug mode for now
-	 */
+    buf[0] = '\0';
+    /*
+     * Restrict the source of the attributes just to debug mode for now
+     */
 #ifdef WIZARD
-	if (wizard) {
+    if (wizard) {
+	static NEARDATA const char because_of[] = " because of %s";
+
+	if (propidx >= 0) {
 	    struct obj *obj = (struct obj *)0;
 	    int innate = is_innate(propidx);
 
@@ -691,11 +695,33 @@ int propidx;
 	    else if (innate == 1)
 		Strcpy(buf, " innately");
 	    else if (wizard && (obj = what_gives(&u.uprops[propidx].extrinsic)))
-		Sprintf(buf, " because of %s",
+		Sprintf(buf, because_of,
 			(obj->oartifact) ? bare_artifactname(obj) : yname(obj));
+	    else if (propidx == BLINDED && Blindfolded_only)
+		Sprintf(buf, because_of, yname(ublindf));
+
+	} else {	/* negative property index */
+	    /* if more blocking capabilities get implemented we'll need to
+	       replace this with what_blocks() comparable to what_gives() */
+	    switch (-propidx) {
+	    case BLINDED:
+		if (ublindf && ublindf->oartifact == ART_EYES_OF_THE_OVERWORLD)
+		    Sprintf(buf, because_of, bare_artifactname(ublindf));
+		break;
+	    case INVIS:
+		if (u.uprops[INVIS].blocked & W_ARMC)
+		    Sprintf(buf, because_of, yname(uarmc)); /* mummy wrapping */
+		break;
+	    case CLAIRVOYANT:
+		if (wizard && (u.uprops[CLAIRVOYANT].blocked & W_ARMH))
+		    Sprintf(buf, because_of, yname(uarmh)); /* cornuthaum */
+		break;
+	    }
 	}
+
+    } /*wizard*/
 #endif
-	return buf;
+    return buf;
 }
 
 void

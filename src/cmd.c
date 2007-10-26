@@ -1111,7 +1111,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 		if (Hallucination) you_are("hallucinating","");
 		if (Stunned) you_are("stunned","");
 		if (Confusion) you_are("confused","");
-		if (Blinded) you_are("blinded",from_what(BLINDED));
+		if (Blind) you_are("blind",from_what(BLINDED));
 		if (Deaf) you_are("deaf",from_what(DEAF));
 		if (Sick) {
 			if (u.usick_type & SICK_VOMITABLE)
@@ -1150,8 +1150,15 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	if (Hate_silver) you_are("harmed by silver","");
 
 	/*** Vision and senses ***/
-	if (See_invisible) enl_msg(You_, "see", "saw", " invisible",
-					from_what(SEE_INVIS));
+	if (!Blind && (Blinded || !haseyes(youmonst.data)))
+	    you_can("see", from_what(-BLINDED)); /* Eyes of the Overworld */
+	if (See_invisible) {
+	    if (!Blind)
+		enl_msg(You_, "see", "saw", " invisible", from_what(SEE_INVIS));
+	    else
+		enl_msg(You_, "will see", "would have seen",
+			" invisible when not blind", from_what(SEE_INVIS));
+	} 
 	if (Blind_telepat) you_are("telepathic",from_what(TELEPAT));
 	if (Warning) you_are("warned", from_what(WARNING));
 	if (Warn_of_mon && context.warntype.obj) {
@@ -1163,8 +1170,8 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	}
 	if (Warn_of_mon && context.warntype.polyd) {
 		Sprintf(buf, "aware of the presence of %s",
-		    ((context.warntype.polyd &
-		      (M2_HUMAN|M2_ELF))==(M2_HUMAN|M2_ELF)) ? "humans and elves" :
+		    ((context.warntype.polyd & (M2_HUMAN|M2_ELF))
+			== (M2_HUMAN|M2_ELF)) ? "humans and elves" :
 		    (context.warntype.polyd & M2_HUMAN) ? "humans" :
 		    (context.warntype.polyd & M2_ELF) ? "elves" :
 		    (context.warntype.polyd & M2_ORC) ? "orcs" :
@@ -1180,9 +1187,17 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	if (Undead_warning) you_are("warned of undead",from_what(WARN_UNDEAD));
 	if (Searching) you_have("automatic searching",from_what(SEARCHING));
 	if (Clairvoyant) you_are("clairvoyant",from_what(CLAIRVOYANT));
+	else if ((HClairvoyant || EClairvoyant) && BClairvoyant) {
+	    Strcpy(buf, from_what(-CLAIRVOYANT));
+	    if (!strncmp(buf, " because of ", 12))
+		/* overwrite substring; strncpy doesn't add terminator */
+		(void) strncpy(buf, " if not for ", 12);
+	    enl_msg(You_, "could be", "could have been",
+		    " clairvoyant", buf);
+	}
 	if (Infravision) you_have("infravision",from_what(INFRAVISION));
 	if (Detect_monsters)
-	   you_are("sensing the presence of monsters", "");
+	    you_are("sensing the presence of monsters", "");
 	if (u.umconf) you_are("going to confuse monsters","");
 
 	/*** Appearance and behavior ***/
@@ -1201,7 +1216,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 	/* ordinarily "visible" is redundant; this is a special case for
 	   the situation when invisibility would be an expected attribute */
 	else if ((HInvis || EInvis || pm_invisible(youmonst.data)) && BInvis)
-	    you_are("visible","");
+	    you_are("visible", from_what(-INVIS));
 	if (Displaced) you_are("displaced",from_what(DISPLACED));
 	if (Stealth) you_are("stealthy",from_what(STEALTH));
 	if (Aggravate_monster)
