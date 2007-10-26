@@ -74,7 +74,8 @@ lookat(x, y, buf, monbuf)
 	}
 
 	Sprintf(buf, "%s%s%s called %s",
-		Invis ? "invisible " : "",
+		/* being blinded may hide invisibility from self */
+		(Invis && (senseself() || !Blind)) ? "invisible " : "",
 		race,
 		mons[u.umonnum].mname,
 		plname);
