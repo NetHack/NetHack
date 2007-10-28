@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsconf.h	3.5	2006/09/22	*/
+/*	SCCS Id: @(#)vmsconf.h	3.5	2007/10/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -247,6 +247,7 @@ typedef __mode_t mode_t;
 #define getuid()	vms_getuid()		/* vmsunix.c */
 #define link(f1,f2)	vms_link(f1,f2)		/* vmsfiles.c */
 #define open(f,k,m)	vms_open(f,k,m)		/* vmsfiles.c */
+#define fopen(f,m)	vms_fopen(f,m)		/* vmsfiles.c */
 /* #define unlink(f0)	vms_unlink(f0)		/* vmsfiles.c */
 #ifdef VERYOLD_VMS
 #define unlink(f0)	delete(f0)		/* vaxcrtl */
@@ -266,6 +267,8 @@ typedef __mode_t mode_t;
 /* used in several files which don't #include "extern.h" */
 extern void FDECL(vms_exit, (int));
 extern int FDECL(vms_open, (const char *,int,unsigned));
+extern FILE *FDECL(vms_fopen, (const char *,const char *));
+char *FDECL(vms_basename, (const char *));	/* vmsfiles.c */
 
 #endif	/* VMSCONF_H */
 #endif	/* VMS */

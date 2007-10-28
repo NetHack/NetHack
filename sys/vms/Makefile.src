@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	SCCS Id: @(#)Makefile.src	3.5	2006/01/07
+#	SCCS Id: @(#)Makefile.src	3.5	2007/10/27
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -49,7 +49,7 @@ MORELIBS =
 # Specific VMS object files
 SYSSRC = $(VMS)vmsmain.c,$(VMS)vmstty.c,$(VMS)vmsunix.c,\
 	$(VMS)vmsmisc.c,$(VMS)vmsfiles.c,$(VMS)vmsmail.c
-SYSOBJ = vmsmain.obj,vmstty.obj,vmsunix.obj,vmsfiles.obj,vmsmail.obj #,vmsmisc.obj
+SYSOBJ = vmsmain.obj,vmstty.obj,vmsunix.obj,vmsmail.obj #,vmsmisc.obj,vmsfiles.obj
 LIBOPT = $(SRC)crtl.opt;
 
 # termcap library
@@ -139,7 +139,7 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 #		lev_comp.h dgn_comp.h dgn_file.h
 
 # the following .obj's should be made before any others (for makedefs)
-FIRSTOBJ = vmsmisc.obj,monst.obj,objects.obj
+FIRSTOBJ = vmsmisc.obj,vmsfiles.obj,monst.obj,objects.obj
 
 # split up long list so that we can write pieces of it into nethack.opt
 HOBJ1 = allmain.obj,alloc.obj,apply.obj,artifact.obj,attrib.obj, \

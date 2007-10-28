@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for utility programs.
-#	SCCS Id: @(#)Makefile.utl	3.5	2006/03/15
+#	SCCS Id: @(#)Makefile.utl	3.5	2007/10/27
 
 #  Copy this file to [.util]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -91,6 +91,8 @@ RECOVSRC   = recover.c
 DLBSRC	   = dlb_main.c
 UTILSRCS   = $(MAKESRC) $(SPLEVSRC) $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC) panic.c
 
+VMSOBJS = $(SRC)vmsmisc.obj,$(SRC)vmsfiles.obj
+
 # object files that provide access to NetHack's names
 NAMEOBJ1 = $(SRC)monst.obj,$(SRC)objects.obj
 NAMEOBJ2 = $(SRC)drawing.obj,$(SRC)decl.obj
@@ -98,24 +100,19 @@ NAMEOBJS = $(NAMEOBJ1),$(NAMEOBJ2)
 
 # object files for makedefs
 MAKEOBJS = makedefs.obj,$(NAMEOBJ1)
-VMSMAKEOBJS = $(SRC)vmsmisc.obj
 
 # object files for special levels compiler
 SPLEVOBJS = lev_main.obj,lev_yacc.obj,lev_lex.obj,panic.obj,\
 	    $(SRC)alloc.obj,$(NAMEOBJS)
-VMSSPLEVOBJS = $(SRC)vmsmisc.obj,$(SRC)vmsfiles.obj
 
 # object files for dungeon compiler
 DGNCOMPOBJS = dgn_main.obj,dgn_yacc.obj,dgn_lex.obj,panic.obj,$(SRC)alloc.obj
-VMSDGNCOBJS = $(SRC)vmsmisc.obj
 
 # object files for recovery utility
 RECOVOBJS = recover.obj
-VMSRECOBJS = $(SRC)vmsmisc.obj,$(SRC)vmsfiles.obj
 
 # object files for dlb utility
 DLBOBJS = dlb_main.obj,panic.obj,$(SRC)alloc.obj,$(SRC)dlb.obj
-VMSDLBOBJS = $(SRC)vmsmisc.obj,$(SRC)vmsfiles.obj
 
 
 #	fake target
@@ -154,8 +151,8 @@ $(LIBOPT) : $(SRC)Makefile.;		# linker options file
 
 #	dependencies for makedefs
 #
-$(MAKEDEFS) :	$(MAKEOBJS) $(VMSMAKEOBJS) $(LIBOPT)
-	$(LINK) $(LFLAGS) $(MAKEOBJS),$(VMSMAKEOBJS),$(LIBS)
+$(MAKEDEFS) :	$(MAKEOBJS) $(VMSOBJS) $(LIBOPT)
+	$(LINK) $(LFLAGS) $(MAKEOBJS),$(VMSOBJS),$(LIBS)
       @ $(TOUCH) $(MARKER)
 
 makedefs.obj :	makedefs.c \
@@ -184,8 +181,8 @@ $(INC)date.h :	$(MAKEDEFS)
 
 #	dependencies for lev_comp
 #
-$(LEVCOMP) : $(SPLEVOBJS) $(VMSSPLEVOBJS)	# $(LIBOPT)
-	$(LINK)/Exe=$(LEVCOMP) $(LFLAGS) $(SPLEVOBJS),$(VMSSPLEVOBJS),$(LIBS)
+$(LEVCOMP) : $(SPLEVOBJS) $(VMSOBJS)	# $(LIBOPT)
+	$(LINK)/Exe=$(LEVCOMP) $(LFLAGS) $(SPLEVOBJS),$(VMSOBJS),$(LIBS)
 
 lev_yacc.obj : $(HACK_H) $(INC)sp_lev.h lev_yacc.c
 	$(CC) $(CFLAGS) lev_yacc.c
@@ -217,8 +214,8 @@ lev_lex.c : lev_comp.l
 
 #	dependencies for dgn_comp
 #
-$(DGNCOMP) : $(DGNCOMPOBJS) $(VMSDGNCOBJS)	# $(LIBOPT)
-	$(LINK)/Exe=$(DGNCOMP) $(LFLAGS) $(DGNCOMPOBJS),$(VMSDGNCOBJS),$(LIBS)
+$(DGNCOMP) : $(DGNCOMPOBJS) $(VMSOBJS)	# $(LIBOPT)
+	$(LINK)/Exe=$(DGNCOMP) $(LFLAGS) $(DGNCOMPOBJS),$(VMSOBJS),$(LIBS)
 
 dgn_yacc.obj : $(CONFIG_H) $(INC)dgn_file.h $(INC)date.h dgn_yacc.c
 	$(CC) $(CFLAGS) dgn_yacc.c
@@ -248,15 +245,15 @@ dgn_lex.c : dgn_comp.l
 
 #	dependencies for recover
 #
-$(RECOVER) : $(RECOVOBJS) $(VMSRECOBJS)		# $(LIBOPT)
-	$(LINK) $(LFLAGS) $(RECOVOBJS),$(VMSRECOBJS),$(LIBS)
+$(RECOVER) : $(RECOVOBJS) $(VMSOBJS)		# $(LIBOPT)
+	$(LINK) $(LFLAGS) $(RECOVOBJS),$(VMSOBJS),$(LIBS)
 
 recover.obj : $(CONFIG_H) recover.c
 
 #	dependencies for dlb
 #
-$(DLB) : $(DLBOBJS) $(VMSDLBOBJS)		# $(LIBOPT)
-	$(LINK)/Exe=$(DLB) $(LFLAGS) $(DLBOBJS),$(VMSDLBOBJS),$(LIBS)
+$(DLB) : $(DLBOBJS) $(VMSOBJS)		# $(LIBOPT)
+	$(LINK)/Exe=$(DLB) $(LFLAGS) $(DLBOBJS),$(VMSOBJS),$(LIBS)
 
 dlb_main.obj : $(CONFIG_H) $(INC)dlb.h dlb_main.c
 

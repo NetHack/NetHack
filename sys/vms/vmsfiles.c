@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsfiles.c 3.5	1999/08/29	*/
+/*	SCCS Id: @(#)vmsfiles.c 3.5	2007/10/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,10 +13,8 @@
 int FDECL(vms_link, (const char *,const char *));
 int FDECL(vms_unlink, (const char *));
 int FDECL(vms_creat, (const char *,unsigned int));
-int FDECL(vms_open, (const char *,int,unsigned int));
 boolean FDECL(same_dir, (const char *,const char *));
 int FDECL(c__translate, (int));
-char *FDECL(vms_basename, (const char *));
 
 #include <rms.h>
 #if 0
@@ -113,16 +111,22 @@ const char *file;
    and use 32 block buffer for faster throughput; ~30% speedup measured.)
  */
 #undef creat
-int vms_creat(file, mode)
+int
+vms_creat(file, mode)
 const char *file;
 unsigned int mode;
 {
+    char filnambuf[BUFSIZ];	/*(not BUFSZ)*/
+
     if (index(file, ';')) {
 	/* assumes remove or delete, not vms_unlink */
 	if (!unlink(file)) {
 	    (void)sleep(1);
 	    (void)unlink(file);
 	}
+    } else if (!index(file, '.')) {
+	/* force some punctuation to be present */
+	file = strcat(strcpy(filnambuf, file), ".");
     }
     return creat(file, mode, "shr=nil", "mbc=32", "mbf=2", "rop=wbh");
 }
@@ -133,18 +137,48 @@ unsigned int mode;
    at least one NFS implementation).
  */
 #undef open
-int vms_open(file, flags, mode)
+int
+vms_open(file, flags, mode)
 const char *file;
 int flags;
 unsigned int mode;
 {
-    int fd = open(file, flags, mode, "mbc=32", "mbf=2", "rop=rah");
+    char filnambuf[BUFSIZ];	/*(not BUFSZ)*/
+    int fd;
 
+    if (!index(file, '.') && !index(file, ';')) {
+	/* force some punctuation to be present to make sure that
+	   the file name can't accidentally match a logical name */
+	file = strcat(strcpy(filnambuf, file), ";0");
+    }
+    fd = open(file, flags, mode, "mbc=32", "mbf=2", "rop=rah");
     if (fd < 0 && errno == EVMSERR && lib$match_cond(vaxc$errno, RMS$_FLK)) {
 	(void)sleep(1);
 	fd = open(file, flags, mode, "mbc=32", "mbf=2", "rop=rah");
     }
     return fd;
+}
+
+/* do likewise for fopen() */
+#undef fopen
+FILE *
+vms_fopen(file, mode)
+const char *file, *mode;
+{
+    char filnambuf[BUFSIZ];	/*(not BUFSZ)*/
+    FILE *fp;
+
+    if (!index(file, '.') && !index(file, ';')) {
+	/* force some punctuation to be present to make sure that
+	   the file name can't accidentally match a logical name */
+	file = strcat(strcpy(filnambuf, file), ";0");
+    }
+    fp = fopen(file, mode, "mbc=32", "mbf=2", "rop=rah");
+    if (!fp && errno == EVMSERR && lib$match_cond(vaxc$errno, RMS$_FLK)) {
+	(void)sleep(1);
+	fp = fopen(file, mode, "mbc=32", "mbf=2", "rop=rah");
+    }
+    return fp;
 }
 
 /*

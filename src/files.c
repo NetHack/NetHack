@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.5	2007/01/08	*/
+/*	SCCS Id: @(#)files.c	3.5	2007/10/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -391,17 +391,7 @@ int prefix;
 	FILE *fp;
 
 	filename = fqname(filename, prefix, prefix == TROUBLEPREFIX ? 3 : 0);
-#ifdef VMS	/* essential to have punctuation, to avoid logical names */
-    {
-	char tmp[BUFSIZ];
-
-	if (!index(filename, '.') && !index(filename, ';'))
-		filename = strcat(strcpy(tmp, filename), ";0");
-	fp = fopen(filename, mode, "mbc=16");
-    }
-#else
 	fp = fopen(filename, mode);
-#endif
 	return fp;
 }
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dlb_main.c 3.5	1998/08/16	*/
+/*	SCCS Id: @(#)dlb_main.c 3.5	2007/10/27	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,11 +27,6 @@ extern void FDECL(close_library,(library *));
 
 char *FDECL(eos, (char *));	/* also used by dlb.c */
 FILE *FDECL(fopen_datafile, (const char *,const char *));
-
-#ifdef VMS
-extern char *FDECL(vms_basename, (const char *));
-extern int FDECL(vms_open, (const char *,int,unsigned int));
-#endif
 
 static void FDECL(Write, (int,char *,long));
 static void NDECL(usage);
@@ -149,20 +144,6 @@ eos(s)
     return s;
 }
 
-
-#ifdef VMS	/* essential to have punctuation, to avoid logical names */
-static FILE *
-vms_fopen(filename, mode)
-const char *filename, *mode;
-{
-    char tmp[BUFSIZ];
-
-    if (!index(filename, '.') && !index(filename, ';'))
-	filename = strcat(strcpy(tmp, filename), ";0");
-    return fopen(filename, mode, "mbc=16");
-}
-#define fopen vms_fopen
-#endif	/* VMS */
 
 /* open_library(dlb.c) needs this (which normally comes from src/files.c) */
 FILE *
