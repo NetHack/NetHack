@@ -379,6 +379,7 @@ hallucination provides partial protection against gaze attacks
 attempting to read "dull" spellbook might cause hero to fall asleep
 dipping prompt is more precise
 using F to attack wall/boulder/statue while wielding pick digs/breaks target
+shapechangers shouldn't receive starting inventory of their initial shape
 
 
 Platform- and/or Interface-Specific New Features

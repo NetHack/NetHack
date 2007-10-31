@@ -1042,22 +1042,22 @@ register int	mmflags;
 	if ((mcham = pm_to_cham(mndx)) != NON_PM) {
 		/* this is a shapechanger after all */
 		if (Protection_from_shape_changers) {
-			;	/* stuck in its natural form (NON_PM) */
-		} else {
-			/* General shapechangers start out with random form
-			   (this explicitly picks something from the normal
-			   selection for current difficulty level rather
-			   than from among shapechanger's preferred forms).
-			   Vampires are the exception. */
-			struct permonst *tmpcham = rndmonst();
-			mtmp->cham = mcham;
-			if (is_vampshifter(mtmp)){
-			    int chamidx = select_newcham_form(mtmp);
-			    if (chamidx != NON_PM)
-				tmpcham = &mons[chamidx];
-			}
-			if (mtmp->cham != PM_VLAD_THE_IMPALER)
-			    (void) newcham(mtmp,tmpcham,FALSE, FALSE);
+		    ;	/* stuck in its natural form (NON_PM) */
+		} else { 
+		    /* Note: shapechanger's initial form used to be
+		       chosen with rndmonst(), yielding a monster
+		       which was approriate to the level's difficulty
+		       but ignored the changer's usual type selection
+		       so would be inppropriate for vampshifters. */
+		    mtmp->cham = mcham;	/* remember base form */
+		    if (mcham != PM_VLAD_THE_IMPALER &&
+			/* select initial shape */
+			    (mcham = select_newcham_form(mtmp)) != NON_PM) {
+			/* take on initial shape; if successful,
+			   avoid giving that shape's usual inventory */
+			if (newcham(mtmp, &mons[mcham], FALSE, FALSE))
+			    allow_minvent = FALSE;
+		    }
 		}
 	} else if (mndx == PM_WIZARD_OF_YENDOR) {
 		mtmp->iswiz = TRUE;
