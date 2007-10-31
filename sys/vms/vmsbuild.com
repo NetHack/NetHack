@@ -227,7 +227,7 @@ $!
 $! compile and link makedefs, then nethack, finally lev_comp & dgn_comp.
 $!
 $ milestone "<compiling...>"
-$ c_list = "[-.sys.vms]vmsmisc,[]alloc,dlb,monst,objects"
+$ c_list = "[-.sys.vms]vmsmisc,[-.sys.vms]vmsfiles,[]alloc,dlb,monst,objects"
 $     if c_opt.eq.o_SPCL then  c_list = c_list + ",decl,drawing"
 $ gosub compile_list
 $     if c_opt.eq.o_SPCL then  goto special !"SPECIAL" requested, skip main build
@@ -247,7 +247,7 @@ $ milestone " (*.c)"
 $ set default [-.src]
 $! compile most of the source files:
 $ c_list = "decl,version,[-.sys.vms]vmsmain,[-.sys.vms]vmsunix" -
-	+ ",[-.sys.vms]vmstty,[-.sys.vms]vmsmail,[-.sys.vms]vmsfiles" -
+	+ ",[-.sys.vms]vmstty,[-.sys.vms]vmsmail" -
 	+ ",[]random,[]tclib"	!copied from [-.sys.share]
 $ gosub compile_list
 $ c_list = "[-.win.tty]getline,[-.win.tty]termcap" -
