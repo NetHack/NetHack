@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2007/04/04	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2007/11/10	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,11 @@ STATIC_DCL void FDECL(obj_timer_checks,(struct obj *, XCHAR_P, XCHAR_P, int));
 STATIC_DCL void FDECL(container_weight, (struct obj *));
 STATIC_DCL struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
 #ifdef WIZARD
-STATIC_DCL const char *FDECL(where_name, (int));
+STATIC_DCL void FDECL(objlist_sanity, (struct obj *,int,const char *));
+STATIC_DCL void FDECL(mon_obj_sanity, (struct monst *,const char *));
+STATIC_DCL const char *FDECL(where_name, (struct obj *));
+STATIC_DCL void FDECL(insane_object,
+		      (struct obj *,const char *,const char *,struct monst *));
 STATIC_DCL void FDECL(check_contained, (struct obj *,const char *));
 #endif
 
@@ -1878,95 +1882,103 @@ boolean tipping;  /* caller emptying entire contents; affects shop handling */
 }
 
 #ifdef WIZARD
+extern struct obj *thrownobj;		/* dothrow.c */
+extern struct obj *kickobj;		/* dokick.c */
+
+static const char NEARDATA	/* pline formats for insane_object() */
+	ofmt0[] = "%s obj %s %s: %s",
+	ofmt3[] = "%s [not null] %s %s: %s",
+	/* " held by mon %p (%s)" will be appended, filled by M,mon_nam(M) */
+	mfmt1[] = "%s obj %s %s (%s)",
+	mfmt2[] = "%s obj %s %s (%s) *not*";
+
 /* Check all object lists for consistency. */
 void
 obj_sanity_check()
 {
     int x, y;
     struct obj *obj;
-    struct monst *mon;
-    const char *mesg;
 
-    mesg = "fobj sanity";
-    for (obj = fobj; obj; obj = obj->nobj) {
-	if (obj->where != OBJ_FLOOR) {
-	    pline("%s obj %s %s@(%d,%d): %s\n", mesg,
-		  fmt_ptr((genericptr_t)obj),
-		  where_name(obj->where),
-		  obj->ox, obj->oy, doname(obj));
-	}
-	check_contained(obj, mesg);
-    }
+    objlist_sanity(fobj, OBJ_FLOOR, "floor sanity");
 
-    mesg = "location sanity";
+    /* check that the map's record of floor objects is consistent;
+       those objects should have already been sanity checked via
+       the floor list so container contents are skipped here */
     for (x = 0; x < COLNO; x++)
 	for (y = 0; y < ROWNO; y++)
-	    for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
-		if (obj->where != OBJ_FLOOR) {
-		    pline("%s obj %s %s@(%d,%d): %s\n", mesg,
-			  fmt_ptr((genericptr_t)obj),
-			  where_name(obj->where),
-			  obj->ox, obj->oy, doname(obj));
+	    for (obj = level.objects[x][y]; obj; obj = obj->nexthere) {
+		/* <ox,oy> should match <x,y>; <0,*> should always be empty */
+		if (obj->where != OBJ_FLOOR || x == 0 ||
+			obj->ox != x || obj->oy != y) {
+		    char at_fmt[BUFSZ];
+
+		    Sprintf(at_fmt, "%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>",
+			    x, y, obj->ox, obj->oy);
+		    insane_object(obj, at_fmt, "location sanity",
+				 (struct monst *)0);
 		}
+	    }
 
-    mesg = "invent sanity";
-    for (obj = invent; obj; obj = obj->nobj) {
-	if (obj->where != OBJ_INVENT) {
-	    pline("%s obj %s %s: %s\n", mesg,
-		  fmt_ptr((genericptr_t)obj),
-		  where_name(obj->where), doname(obj));
-	}
-	check_contained(obj, mesg);
+    objlist_sanity(invent, OBJ_INVENT, "invent sanity");
+    objlist_sanity(migrating_objs, OBJ_MIGRATING, "migrating sanity");
+    objlist_sanity(level.buriedobjlist, OBJ_BURIED, "buried sanity");
+    objlist_sanity(billobjs, OBJ_ONBILL, "bill sanity");
+
+    mon_obj_sanity(fmon, "minvent sanity");
+    mon_obj_sanity(migrating_mons, "migrating minvent sanity");
+    /* monsters temporarily in transit;
+       they should have arrived with hero by the time we get called */
+    if (mydogs) {
+	pline("mydogs sanity [not empty]");
+	mon_obj_sanity(mydogs, "mydogs minvent sanity");
     }
 
-    mesg = "migrating sanity";
-    for (obj = migrating_objs; obj; obj = obj->nobj) {
-	if (obj->where != OBJ_MIGRATING) {
-	    pline("%s obj %s %s: %s\n", mesg,
-		  fmt_ptr((genericptr_t)obj),
-		  where_name(obj->where), doname(obj));
-	}
-	check_contained(obj, mesg);
-    }
+    /* objects temporarily freed from invent/floor lists;
+       they should have arrived somewhere by the time we get called */
+    if (thrownobj)
+	insane_object(thrownobj, ofmt3, "thrownobj sanity", (struct monst *)0);
+    if (kickobj)
+	insane_object(kickobj, ofmt3, "kickobj sanity", (struct monst *)0);
+    /* [how about current_wand too?] */
+}
 
-    mesg = "buried sanity";
-    for (obj = level.buriedobjlist; obj; obj = obj->nobj) {
-	if (obj->where != OBJ_BURIED) {
-	    pline("%s obj %s %s: %s\n", mesg,
-		  fmt_ptr((genericptr_t)obj),
-		  where_name(obj->where), doname(obj));
-	}
-	check_contained(obj, mesg);
-    }
+/* sanity check for objects on specified list (fobj, &c) */
+STATIC_OVL void
+objlist_sanity(objlist, wheretype, mesg)
+struct obj *objlist;
+int wheretype;
+const char *mesg;
+{
+    struct obj *obj;
 
-    mesg = "bill sanity";
-    for (obj = billobjs; obj; obj = obj->nobj) {
-	if (obj->where != OBJ_ONBILL) {
-	    pline("%s obj %s %s: %s\n", mesg,
-		  fmt_ptr((genericptr_t)obj),
-		  where_name(obj->where), doname(obj));
-	}
-	/* shouldn't be a full container on the bill */
-	if (obj->cobj) {
-	    pline("%s obj %s contains %s! %s\n", mesg,
-		  fmt_ptr((genericptr_t)obj),
-		  something, doname(obj));
+    for (obj = objlist; obj; obj = obj->nobj) {
+	if (obj->where != wheretype)
+	    insane_object(obj, ofmt0, mesg, (struct monst *)0);
+	if (Has_contents(obj)) {
+	    if (wheretype == OBJ_ONBILL)
+		/* containers on shop bill should always be empty */
+		insane_object(obj, "%s obj contains something! %s %s: %s",
+			      mesg, (struct monst *)0);
+	    check_contained(obj, mesg);
 	}
     }
+}
 
-    mesg = "minvent sanity";
-    for (mon = fmon; mon; mon = mon->nmon)
+/* sanity check for objects carried by all monsters in specified list */
+STATIC_OVL void
+mon_obj_sanity(monlist, mesg)
+struct monst *monlist;
+const char *mesg;
+{
+    struct monst *mon;
+    struct obj *obj;
+
+    for (mon = monlist; mon; mon = mon->nmon)
 	for (obj = mon->minvent; obj; obj = obj->nobj) {
-	    if (obj->where != OBJ_MINVENT) {
-		pline("%s obj %s %s: %s\n", mesg,
-		      fmt_ptr((genericptr_t)obj),
-		      where_name(obj->where), doname(obj));
-	    }
-	    if (obj->ocarry != mon) {
-		pline("%s obj %s (%s) not held by mon %s (%s)\n", mesg,
-		      fmt_ptr((genericptr_t)obj), doname(obj),
-		      fmt_ptr((genericptr_t)mon), mon_nam(mon));
-	    }
+	    if (obj->where != OBJ_MINVENT)
+		insane_object(obj, mfmt1, mesg, mon);
+	    if (obj->ocarry != mon)
+		insane_object(obj, mfmt2, mesg, mon);
 	    check_contained(obj, mesg);
 	}
 }
@@ -1978,29 +1990,90 @@ static const char *obj_state_names[NOBJ_STATES] = {
 };
 
 STATIC_OVL const char *
-where_name(where)
-    int where;
+where_name(obj)
+struct obj *obj;
 {
-    return (where<0 || where>=NOBJ_STATES) ? "unknown" : obj_state_names[where];
+    static char unknown[32];	/* big enough to handle rogue 64-bit int */
+    int where;
+
+    if (!obj) return "nowhere";
+    where = obj->where;
+    if (where < 0 || where >= NOBJ_STATES || !obj_state_names[where]) {
+	Sprintf(unknown, "unknown[%d]", where);
+	return unknown;
+    }
+    return obj_state_names[where];
 }
 
-/* obj sanity check: check objs contained by container */
+STATIC_OVL void
+insane_object(obj, fmt, mesg, mon)
+struct obj *obj;
+const char *fmt, *mesg;
+struct monst *mon;
+{
+    const char *objnm, *monnm;
+    char altfmt[BUFSZ];
+
+    objnm = monnm = "null!";
+    if (obj) {
+	iflags.override_ID++;
+	objnm = doname(obj);
+	iflags.override_ID--;
+    }
+    if (mon || (strstri(mesg, "minvent") && !strstri(mesg, "contained"))) {
+	Strcat(strcpy(altfmt, fmt), " held by mon %s (%s)");
+	if (mon)
+	    monnm = x_monnam(mon, ARTICLE_A, (char *)0, EXACT_NAME, TRUE);
+	pline(altfmt, mesg,
+	      fmt_ptr((genericptr_t)obj), where_name(obj), objnm,
+	      fmt_ptr((genericptr_t)mon), monnm);
+    } else {
+	pline(fmt, mesg, fmt_ptr((genericptr_t)obj), where_name(obj), objnm);
+    }
+}
+
+/* obj sanity check: check objects inside container */
 STATIC_OVL void
 check_contained(container, mesg)
     struct obj *container;
     const char *mesg;
 {
     struct obj *obj;
+    /* big enough to work with, not too big to blow out stack in recursion */
+    char mesgbuf[40], nestedmesg[120];
+
+    if (!Has_contents(container)) return;
+    /* change "invent sanity" to "contained invent sanity"
+       but leave "nested contained invent sanity" as is */
+    if (!strstri(mesg, "contained"))
+	mesg = strcat(strcpy(mesgbuf, "contained "), mesg);
 
     for (obj = container->cobj; obj; obj = obj->nobj) {
+	/* catch direct cycle to avoid unbounded recursion */
+	if (obj == container)
+	    panic("failed sanity check: container holds itself");
 	if (obj->where != OBJ_CONTAINED)
-	    pline("contained %s obj %s: %s\n", mesg,
-		  fmt_ptr((genericptr_t)obj),
-		  where_name(obj->where));
+	    insane_object(obj, "%s obj %s %s: %s", mesg, (struct monst *)0);
 	else if (obj->ocontainer != container)
-	    pline("%s obj %s not in container %s\n", mesg,
+	    pline("%s obj %s in container %s, not %s", mesg,
 		  fmt_ptr((genericptr_t)obj),
+		  fmt_ptr((genericptr_t)obj->ocontainer),
 		  fmt_ptr((genericptr_t)container));
+
+	if (Has_contents(obj)) {
+	    /* catch most likely indirect cycle; we won't notice if
+	       parent is present when something comes before it, or
+	       notice more deeply embedded cycles (grandparent, &c) */
+	    if (obj->cobj == container)
+		panic("failed sanity check: container holds its parent");
+	    /* change "contained... sanity" to "nested contained... sanity"
+	       and "nested contained..." to "nested nested contained..." */
+	    Strcpy(nestedmesg, "nested ");
+	    copynchars(eos(nestedmesg), mesg,
+		       (int)sizeof nestedmesg - (int)strlen(nestedmesg) - 1);
+	    /* recursively check contents */
+	    check_contained(obj, nestedmesg);
+	}
     }
 }
 #endif /* WIZARD */

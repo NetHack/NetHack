@@ -268,6 +268,7 @@ tin contents can now sometimes be accessed on the same turn that the tin
 Nth adjustment of feedback when observing a pet eating
 monsters who want the Amulet won't attack temple priests to try to get it
 it was possible to generate an object of 0 gold pieces by dropping 2**32 gold
+wizard mode's sanity_check option missed nested containers and migrating mons
 
 
 Platform- and/or Interface-Specific Fixes
