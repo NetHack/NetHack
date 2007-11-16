@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lock.c	3.5	2007/08/02	*/
+/*	SCCS Id: @(#)lock.c	3.5	2007/11/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -523,6 +523,7 @@ doopen()		/* try to open a door */
 	register struct rm *door;
 	struct monst *mtmp;
 	boolean portcullis;
+	int res = 0;
 
 	if (nohands(youmonst.data)) {
 	    You_cant("open anything -- you have no hands!");
@@ -550,6 +551,19 @@ doopen()		/* try to open a door */
 
 	door = &levl[cc.x][cc.y];
 	portcullis = (is_drawbridge_wall(cc.x, cc.y) >= 0);
+	if (Blind) {
+	    int oldglyph = door->glyph;
+#ifdef DUNGEON_OVERVIEW
+	    schar oldstyp = door->styp;
+#endif
+
+	    feel_location(cc.x, cc.y);
+	    if (door->glyph != oldglyph
+#ifdef DUNGEON_OVERVIEW
+		|| door->styp != oldstyp
+#endif
+	    ) res = 1;		/* learned something */
+	}
 
 	if (portcullis || !IS_DOOR(door->typ)) {
 		/* closed portcullis or spot that opened bridge would span */
@@ -559,7 +573,7 @@ doopen()		/* try to open a door */
 		    pline_The("drawbridge is already open.");
 		else
 		    You("%s no door there.", Blind ? "feel" : "see");
-		return(0);
+		return res;
 	}
 
 	if (!(door->doormask & D_CLOSED)) {
@@ -572,13 +586,12 @@ doopen()		/* try to open a door */
 	    default:	   mesg = " is locked"; break;
 	    }
 	    pline("This door%s.", mesg);
-	    if (Blind) feel_location(cc.x,cc.y);
-	    return(0);
+	    return res;
 	}
 
 	if(verysmall(youmonst.data)) {
 	    pline("You're too small to pull the door open.");
-	    return(0);
+	    return res;
 	}
 
 	/* door is known to be CLOSED */
@@ -633,6 +646,7 @@ doclose()		/* try to close a door */
 	register struct rm *door;
 	struct monst *mtmp;
 	boolean portcullis;
+	int res = 0;
 
 	if (nohands(youmonst.data)) {
 	    You_cant("close anything -- you have no hands!");
@@ -665,6 +679,19 @@ doclose()		/* try to close a door */
 
 	door = &levl[x][y];
 	portcullis = (is_drawbridge_wall(x, y) >= 0);
+	if (Blind) {
+	    int oldglyph = door->glyph;
+#ifdef DUNGEON_OVERVIEW
+	    schar oldstyp = door->styp;
+#endif
+
+	    feel_location(x, y);
+	    if (door->glyph != oldglyph
+#ifdef DUNGEON_OVERVIEW
+		|| door->styp != oldstyp
+#endif
+	    ) res = 1;		/* learned something */
+	}
 
 	if (portcullis || !IS_DOOR(door->typ)) {
 		/* is_db_wall: closed porcullis */
@@ -674,24 +701,20 @@ doclose()		/* try to close a door */
 		    There("is no obvious way to close the drawbridge.");
 		else
 		    You("%s no door there.", Blind ? "feel" : "see");
-		return(0);
+		return res;
 	}
 
-	if(door->doormask == D_NODOOR) {
+	if (door->doormask == D_NODOOR) {
 	    pline("This doorway has no door.");
-	    return(0);
-	}
-
-	if(obstructed(x, y, FALSE)) return(0);
-
-	if(door->doormask == D_BROKEN) {
+	    return res;
+	} else if (obstructed(x, y, FALSE)) {
+	    return res;
+	} else if (door->doormask == D_BROKEN) {
 	    pline("This door is broken.");
-	    return(0);
-	}
-
-	if(door->doormask & (D_CLOSED | D_LOCKED)) {
+	    return res;
+	} else if (door->doormask & (D_CLOSED | D_LOCKED)) {
 	    pline("This door is already closed.");
-	    return(0);
+	    return res;
 	}
 
 	if(door->doormask == D_ISOPEN) {
@@ -701,7 +724,7 @@ doclose()		/* try to close a door */
 #endif
 		) {
 		 pline("You're too small to push the door closed.");
-		 return(0);
+		 return res;
 	    }
 	    if (
 #ifdef STEED
@@ -715,10 +738,9 @@ doclose()		/* try to close a door */
 		else
 		    newsym(x,y);
 		block_point(x,y);	/* vision:  no longer see there */
-	    }
-	    else {
-	        exercise(A_STR, TRUE);
-	        pline_The("door resists!");
+	    } else {
+		exercise(A_STR, TRUE);
+		pline_The("door resists!");
 	    }
 	}
 

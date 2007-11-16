@@ -269,6 +269,8 @@ Nth adjustment of feedback when observing a pet eating
 monsters who want the Amulet won't attack temple priests to try to get it
 it was possible to generate an object of 0 gold pieces by dropping 2**32 gold
 wizard mode's sanity_check option missed nested containers and migrating mons
+always update map display and use up turn if open or close command attempted
+	while blind reveals change in door state or discloses non-door spot
 
 
 Platform- and/or Interface-Specific Fixes
