@@ -252,6 +252,7 @@ E void FDECL(openone, (int,int,genericptr_t));
 #endif
 E int NDECL(findit);
 E int NDECL(openit);
+E boolean FDECL(detecting, (void (*)(int,int,genericptr)));
 E void FDECL(find_trap, (struct trap *));
 E int FDECL(dosearch0, (int));
 E int NDECL(dosearch);

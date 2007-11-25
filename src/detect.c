@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)detect.c	3.5	2006/05/13	*/
+/*	SCCS Id: @(#)detect.c	3.5	2007/11/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1192,6 +1192,14 @@ openit()	/* returns number of things found and opened */
 
 	do_clear_area(u.ux, u.uy, BOLT_LIM, openone, (genericptr_t) &num);
 	return(num);
+}
+
+/* callback hack for overriding vision in do_clear_area() */
+boolean
+detecting(func)
+    void FDECL((*func), (int,int,genericptr_t));
+{
+    return (func == findone || func == openone);
 }
 
 void

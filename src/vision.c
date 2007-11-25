@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vision.c	3.5	2007/05/11	*/
+/*	SCCS Id: @(#)vision.c	3.5	2007/11/05	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990.	*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 
@@ -2606,6 +2606,12 @@ do_clear_area(scol,srow,range,func,arg)
 	    register int x;
 	    int y, min_x, max_x, max_y, offset;
 	    char *limits;
+	    boolean override_vision;
+
+	    /* vision doesn't pass through water or clouds, detection should
+	       [this probably ought to be an arg supplied by our caller...] */
+	    override_vision = (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) &&
+			      detecting(func);
 
 	    if (range > MAX_RADIUS || range < 1)
 		panic("do_clear_area:  illegal range %d", range);
@@ -2619,7 +2625,7 @@ do_clear_area(scol,srow,range,func,arg)
 		if((min_x = (scol - offset)) < 0) min_x = 0;
 		if((max_x = (scol + offset)) >= COLNO) max_x = COLNO-1;
 		for (x = min_x; x <= max_x; x++)
-		    if (couldsee(x, y))
+		    if (couldsee(x, y) || override_vision)
 			(*func)(x, y, arg);
 	    }
 	}
