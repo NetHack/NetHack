@@ -1083,7 +1083,7 @@ register const char *let,*word;
 			 * to your money supply.  The LRS is the tax bureau
 			 * from Larn.
 			 */
-			if (cnt <= 0) {
+			if (allowcnt == 2 && cnt <= 0) {
 			    if (cnt < 0 || !prezero)
 				pline_The(
 		  "LRS would be very interested to know you have that much.");
