@@ -1282,7 +1282,10 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    } else {
 		u.ugold += count;
 		if (count == obj->quan)
-		    delobj(obj);
+		    /* costly_gold() can trigger --More-- prompt, so
+		       take gold off map before messages in order to
+		       prevent hangup save there from duplicating it */
+		    obj_extract_self(obj);	/* remove from floor */
 		else
 		    obj->quan -= count;
 		if ((nearload = near_capacity()) != 0)
@@ -1293,6 +1296,8 @@ boolean telekinesis;	/* not picking it up directly by hand */
 		else
 		    prinv((char *) 0, obj, count);
 		costly_gold(obj->ox, obj->oy, count);
+		if (obj->where == OBJ_FREE)
+		    delobj(obj);
 	    }
 	    context.botl = 1;
 	    if (context.run) nomul(0);
