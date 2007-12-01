@@ -33,15 +33,8 @@ STATIC_DCL void FDECL(dealloc_mextra, (struct mextra *));
 
 #if 0
 /* part of the original warning code which was replaced in 3.3.1 */
-#define warnDelay 10
-long lastwarntime;
-int lastwarnlev;
-
 const char *warnings[] = {
 	"white", "pink", "red", "ruby", "purple", "black"
-};
-
-STATIC_DCL void NDECL(warn_effects);
 #endif /* 0 */
 
 STATIC_DCL struct obj *FDECL(make_corpse,(struct monst *, unsigned));
@@ -325,56 +318,6 @@ unsigned corpseflags;
 	return obj;
 }
 
-#if 0
-/* part of the original warning code which was replaced in 3.3.1 */
-STATIC_OVL void
-warn_effects()
-{
-    if (warnlevel == 100) {
-	if(!Blind && uwep &&
-	    (warnlevel > lastwarnlev || moves > lastwarntime + warnDelay)) {
-	    pline("%s %s!", Yobjnam2(uwep, "glow"), hcolor(NH_LIGHT_BLUE));
-	    lastwarnlev = warnlevel;
-	    lastwarntime = moves;
-	}
-	warnlevel = 0;
-	return;
-    }
-
-    if (warnlevel >= SIZE(warnings))
-	warnlevel = SIZE(warnings)-1;
-    if (!Blind &&
-	    (warnlevel > lastwarnlev || moves > lastwarntime + warnDelay)) {
-	const char *which, *what, *how;
-	long rings = (EWarning & (LEFT_RING|RIGHT_RING));
-
-	if (rings) {
-	    what = Hallucination ? "mood ring" : "ring";
-	    how = "glows";	/* singular verb */
-	    if (rings == LEFT_RING) {
-		which = "left ";
-	    } else if (rings == RIGHT_RING) {
-		which = "right ";
-	    } else {		/* both */
-		which = "";
-		what = (const char *) makeplural(what);
-		how = "glow";	/* plural verb */
-	    }
-	    Your("%s%s %s %s!", which, what, how, hcolor(warnings[warnlevel]));
-	} else {
-	    if (Hallucination)
-		Your("spider-sense is tingling...");
-	    else
-		You_feel("apprehensive as you sense a %s flash.",
-		    warnings[warnlevel]);
-	}
-
-	lastwarntime = moves;
-	lastwarnlev = warnlevel;
-    }
-}
-#endif /* 0 */
-
 /* check mtmp and water/lava for compatibility, 0 (survived), 1 (died) */
 int
 minliquid(mtmp)
@@ -558,10 +501,6 @@ movemon()
 {
     register struct monst *mtmp, *nmtmp;
     register boolean somebody_can_move = FALSE;
-#if 0
-    /* part of the original warning code which was replaced in 3.3.1 */
-    warnlevel = 0;
-#endif
 
     /*
     Some of you may remember the former assertion here that
@@ -631,11 +570,6 @@ movemon()
 	if(dochugw(mtmp))		/* otherwise just move the monster */
 	    continue;
     }
-#if 0
-    /* part of the original warning code which was replaced in 3.3.1 */
-    if(warnlevel > 0)
-	warn_effects();
-#endif
 
     if (any_light_source())
 	vision_full_recalc = 1;	/* in case a mon moved with a light source */

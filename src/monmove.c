@@ -89,23 +89,6 @@ dochugw(mtmp)
 	register int x = mtmp->mx, y = mtmp->my;
 	boolean already_saw_mon = !occupation ? 0 : canspotmon(mtmp);
 	int rd = dochug(mtmp);
-#if 0
-	/* part of the original warning code which was replaced in 3.3.1 */
-	int dd;
-
-	if(Warning && !rd && !mtmp->mpeaceful &&
-			(dd = distu(mtmp->mx,mtmp->my)) < distu(x,y) &&
-			dd < 100 && !canseemon(mtmp)) {
-	    /* Note: this assumes we only want to warn against the monster to
-	     * which the weapon does extra damage, as there is no "monster
-	     * which the weapon warns against" field.
-	     */
-	    if (spec_ability(uwep, SPFX_WARN) && spec_dbon(uwep, mtmp, 1))
-		warnlevel = 100;
-	    else if ((int) (mtmp->m_lev / 4) > warnlevel)
-		warnlevel = (mtmp->m_lev / 4);
-	}
-#endif /* 0 */
 
 	/* a similar check is in monster_nearby() in hack.c */
 	/* check whether hero notices monster and stops current activity */
