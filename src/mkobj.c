@@ -1882,8 +1882,7 @@ boolean tipping;  /* caller emptying entire contents; affects shop handling */
 }
 
 #ifdef WIZARD
-extern struct obj *thrownobj;		/* dothrow.c */
-extern struct obj *kickobj;		/* dokick.c */
+/* support for wizard-mode's `sanity_check' option */
 
 static const char NEARDATA	/* pline formats for insane_object() */
 	ofmt0[] = "%s obj %s %s: %s",
