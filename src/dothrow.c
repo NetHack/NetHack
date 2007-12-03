@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2007/03/23	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2007/12/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -873,10 +873,12 @@ boolean hitsroof;
 	    Strcpy(killer.name, "elementary physics"); /* "what goes up..." */
 	    You("turn to stone.");
 	    if (obj) dropy(obj);	/* bypass most of hitfloor() */
+	    thrownobj = 0;		/* now either gone or on floor */
 	    done(STONING);
 	    return obj ? TRUE : FALSE;
 	}
 	hitfloor(obj);
+	thrownobj = 0;
 	losehp(Maybe_Half_Phys(dmg), "falling object", KILLED_BY_AN);
     }
     return TRUE;
