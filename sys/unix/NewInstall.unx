@@ -1,0 +1,38 @@
+
+                Instructions for installing NetHack 3.5
+			using the new hints system
+                =======================================
+
+For the moment, we are maintaining two ways to configure NetHack.  The
+traditional system, in which Makefiles and includes are edited, and the
+new hints system which should be easier for most users to configure.
+
+If you are using the traditional configuration system, see Install.unx.
+
+1. Look in the sys/unix/hints directory for a file that matches your system.
+   If there isn't one, build one from the other files; if you need more help
+   see the traditional instructions (in Install.unx) for hints.  When you
+   get it right please submit it to us.
+
+2. Check the hints file for anything that may need to be changed for your
+   installation.  Most of the time little or nothing will need to be changed.
+
+3. Configure and build:
+   "$Top" is the top level source directory (the one with README in it).
+
+	cd $Top/sys/unix
+	sh setup.sh hints/NAME_OF_HINTS_FILE
+	cd ../..
+	make all
+
+   If the build fails, remove all the generated files before retrying the
+   build with: cd $Top; make spotless
+
+4. Install:
+   Depending on your configuration, this step may or may not need to be done
+   as root; check the hints file.
+	cd $Top
+	make install
+
+5. If it all worked, you're done.  If something went wrong, see Install.unx
+   for information about the settings the hints file tried to automate.

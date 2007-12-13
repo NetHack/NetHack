@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)config.h	3.5	2003/11/23	*/
+/*	SCCS Id: @(#)config.h	3.5	2003/12/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,7 +42,9 @@
  * Define all of those you want supported in your binary.
  * Some combinations make no sense.  See the installation document.
  */
-#define TTY_GRAPHICS	/* good old tty based graphics */
+#if !defined(NOTTYGRAPHICS)
+# define TTY_GRAPHICS	/* good old tty based graphics */
+#endif
 /* #define X11_GRAPHICS */	/* X11 interface */
 /* #define QT_GRAPHICS */	/* Qt interface */
 /* #define GNOME_GRAPHICS */	/* Gnome interface */
@@ -376,7 +378,9 @@ typedef unsigned char	uchar;
 /* I/O */
 #define REDO		/* support for redoing last command - DGK */
 #if !defined(MAC)
+# if !defined(NOCLIPPING)
 # define CLIPPING	/* allow smaller screens -- ERS */
+# endif
 #endif
 #define AUTOPICKUP_EXCEPTIONS	/* exceptions to autopickup */
 #define BARGETHROUGH	/* allow some monsters to move others out of their way */

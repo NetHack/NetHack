@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.top	3.5	1995/01/05
+#	SCCS Id: @(#)Makefile.top	3.5	2007/12/12
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used
@@ -14,7 +14,7 @@
 # MAKE = make
 
 # make NetHack
-PREFIX	 = /usr
+#PREFIX	 = /usr
 GAME     = nethack
 # GAME     = nethack.prg
 GAMEUID  = games
@@ -27,20 +27,19 @@ FILEPERM = 0644
 EXEPERM  = 0755
 DIRPERM  = 0755
 
-# GAMEDIR also appears in config.h as "HACKDIR".
-# VARDIR may also appear in unixconf.h as "VAR_PLAYGROUND" else GAMEDIR
+# VARDIR may also appear in unixconf.h as "VAR_PLAYGROUND" else HACKDIR
 #
-# note that 'make install' believes in creating a nice tidy GAMEDIR for
+# note that 'make install' believes in creating a nice tidy HACKDIR for
 # installation, free of debris from previous NetHack versions --
-# therefore there should not be anything in GAMEDIR that you want to keep
+# therefore there should not be anything in HACKDIR that you want to keep
 # (if there is, you'll have to do the installation by hand or modify the
 # instructions)
-GAMEDIR  = $(PREFIX)/games/lib/$(GAME)dir
-VARDIR  = $(GAMEDIR)
+#HACKDIR  = $(PREFIX)/games/lib/$(GAME)dir
+VARDIR  = $(HACKDIR)
 SHELLDIR = $(PREFIX)/games
 
 # per discussion in Install.X11 and Install.Qt
-VARDATND = 
+#VARDATND = 
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm rip.xpm
 # for Atari/Gem
@@ -64,8 +63,8 @@ VARDAT = $(VARDATD) $(VARDATND)
 # other permission-related reasons.  If that happens, you may want to set the
 # command to "true", which is a no-op. Note that disabling chown or chgrp
 # will only work if setuid (or setgid) behavior is not desired or required.
-CHOWN = chown
-CHGRP = chgrp
+#CHOWN = chown
+#CHGRP = chgrp
 
 #
 # end of configuration
@@ -183,48 +182,48 @@ dofiles:
 		-e '}' 					\
 	  	-e '$$s/.*/nodlb/p' < dat/options` ;	\
 	$(MAKE) dofiles-$${target-nodlb}
-	(cd dat ; cp symbols $(GAMEDIR) )
-	cp src/$(GAME) $(GAMEDIR)
-	cp util/recover $(GAMEDIR)
+	(cd dat ; cp symbols $(HACKDIR) )
+	cp src/$(GAME) $(HACKDIR)
+	cp util/recover $(HACKDIR)
 	-rm -f $(SHELLDIR)/$(GAME)
-	sed -e 's;/usr/games/lib/nethackdir;$(GAMEDIR);' \
+	sed -e 's;/usr/games/lib/nethackdir;$(HACKDIR);' \
 		-e 's;HACKDIR/nethack;HACKDIR/$(GAME);' \
 		< sys/unix/nethack.sh \
 		> $(SHELLDIR)/$(GAME)
 # set up their permissions
-	-( cd $(GAMEDIR) ; $(CHOWN) $(GAMEUID) $(GAME) recover ; \
+	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) $(GAME) recover ; \
 			$(CHGRP) $(GAMEGRP) $(GAME) recover )
-	chmod $(GAMEPERM) $(GAMEDIR)/$(GAME)
-	chmod $(EXEPERM) $(GAMEDIR)/recover
+	chmod $(GAMEPERM) $(HACKDIR)/$(GAME)
+	chmod $(EXEPERM) $(HACKDIR)/recover
 	-$(CHOWN) $(GAMEUID) $(SHELLDIR)/$(GAME)
 	$(CHGRP) $(GAMEGRP) $(SHELLDIR)/$(GAME)
 	chmod $(EXEPERM) $(SHELLDIR)/$(GAME)
-	-( cd $(GAMEDIR) ; $(CHOWN) $(GAMEUID) symbols ; \
+	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) symbols ; \
 			$(CHGRP) $(GAMEGRP) symbols ; \
 			chmod $(FILEPERM) symbols )
 
 dofiles-dlb: check-dlb
-	( cd dat ; cp nhdat $(DATNODLB) $(GAMEDIR) )
+	( cd dat ; cp nhdat $(DATNODLB) $(HACKDIR) )
 # set up their permissions
-	-( cd $(GAMEDIR) ; $(CHOWN) $(GAMEUID) nhdat $(DATNODLB) ; \
+	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) nhdat $(DATNODLB) ; \
 			$(CHGRP) $(GAMEGRP) nhdat $(DATNODLB) ; \
 			chmod $(FILEPERM) nhdat $(DATNODLB) )
 
 dofiles-nodlb:
 # copy over the game files
-	( cd dat ; cp $(DAT) $(GAMEDIR) )
+	( cd dat ; cp $(DAT) $(HACKDIR) )
 # set up their permissions
-	-( cd $(GAMEDIR) ; $(CHOWN) $(GAMEUID) $(DAT) ; \
+	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) $(DAT) ; \
 			$(CHGRP) $(GAMEGRP) $(DAT) ; \
 			chmod $(FILEPERM) $(DAT) )
 
 update: $(GAME) recover $(VARDAT) dungeon spec_levs
 #	(don't yank the old version out from under people who're playing it)
-	-mv $(GAMEDIR)/$(GAME) $(GAMEDIR)/$(GAME).old
+	-mv $(HACKDIR)/$(GAME) $(HACKDIR)/$(GAME).old
 #	quest.dat is also kept open and has the same problems over NFS
 #	(quest.dat may be inside nhdat if dlb is in use)
-	-mv $(GAMEDIR)/quest.dat $(GAMEDIR)/quest.dat.old
-	-mv $(GAMEDIR)/nhdat $(GAMEDIR)/nhdat.old
+	-mv $(HACKDIR)/quest.dat $(HACKDIR)/quest.dat.old
+	-mv $(HACKDIR)/nhdat $(HACKDIR)/nhdat.old
 # set up new versions of the game files
 	( $(MAKE) dofiles )
 # touch time-sensitive files
@@ -238,12 +237,12 @@ install: $(GAME) recover $(VARDAT) dungeon spec_levs
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory
 	-mkdir -p $(SHELLDIR)
-	-rm -rf $(GAMEDIR) $(VARDIR)
-	-mkdir -p $(GAMEDIR) $(VARDIR) $(VARDIR)/save
+	-rm -rf $(HACKDIR) $(VARDIR)
+	-mkdir -p $(HACKDIR) $(VARDIR) $(VARDIR)/save
 	-rmdir ./-p
-	-$(CHOWN) $(GAMEUID) $(GAMEDIR) $(VARDIR) $(VARDIR)/save
-	$(CHGRP) $(GAMEGRP) $(GAMEDIR) $(VARDIR) $(VARDIR)/save
-	chmod $(DIRPERM) $(GAMEDIR) $(VARDIR) $(VARDIR)/save
+	-$(CHOWN) $(GAMEUID) $(HACKDIR) $(VARDIR) $(VARDIR)/save
+	$(CHGRP) $(GAMEGRP) $(HACKDIR) $(VARDIR) $(VARDIR)/save
+	chmod $(DIRPERM) $(HACKDIR) $(VARDIR) $(VARDIR)/save
 # set up the game files
 	( $(MAKE) dofiles )
 # set up some additional files
@@ -251,6 +250,7 @@ install: $(GAME) recover $(VARDAT) dungeon spec_levs
 	-( cd $(VARDIR) ; $(CHOWN) $(GAMEUID) perm record logfile ; \
 			$(CHGRP) $(GAMEGRP) perm record logfile ; \
 			chmod $(FILEPERM) perm record logfile )
+	true; $(POSTINSTALL)
 # and a reminder
 	@echo You may also want to reinstall the man pages via the doc Makefile.
 

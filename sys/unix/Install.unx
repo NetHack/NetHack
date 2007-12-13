@@ -25,10 +25,10 @@
     in Files, which should be in the top directory.)
 
 2.  Your Makefiles may still be in sys/unix with tags on the end of them.
-    If so, run "sh setup.sh" in that directory to distribute the Makefiles
-    to places they can do their work.  (If later official patches change
-    these Makefiles, setup.sh should be rerun to make sure you use the
-    current copies.)
+    If so, run "sh setup.sh hints/unix" in that directory to
+    distribute the Makefiles to places they can do their work.  (If
+    later official patches change these Makefiles, setup.sh should
+    be rerun to make sure you use the current copies.)
 
 3.  Go to the include subdirectory and edit config.h according to the
     comments to match your system and desired set of features.  Similarly
@@ -56,7 +56,7 @@
 7.  Go back to the top directory and edit that Makefile, explaining where
     you want everything to be installed.
 
-    Make sure that you follow the comments about setting GAMEDIR -- the
+    Make sure that you follow the comments about setting HACKDIR -- the
     installation process will wipe out the contents of the directory you
     point it at, under the assumption that it's debris from an old version
     of NetHack.  If this is not the case, you'll want to install somewhere
@@ -80,7 +80,7 @@
 8.  Read doc/recover.man or doc/recover.txt to learn how to use the recover
     program.  The recover program can be used in case of a crash to recover
     a game that was in progress.  The recover command is installed in the
-    GAMEDIR by default.
+    HACKDIR by default.
 
 Notes:
 

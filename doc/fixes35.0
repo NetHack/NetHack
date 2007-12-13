@@ -420,4 +420,4 @@ consolidate vault.h, epri.h, eshk.h, emin.h and edog.h into new mextra.h
 new oextra structure housing pointers to oname, omonst, omid, olong, and omailcmd
 drawing symbols for DECGraphics, IBMGraphics, MACgraphics are now stored in an
 	external symbol file that can be changed without rebuilding
-
+new hints-based configuration system

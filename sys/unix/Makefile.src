@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.src	3.5	2006/01/07
+#	SCCS Id: @(#)Makefile.src	3.5	2007/12/12
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used
@@ -151,8 +151,8 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 # flags for debugging:
 # CFLAGS = -g -I../include
 
-CFLAGS = -O -I../include
-LFLAGS = 
+#CFLAGS = -O -I../include
+#LFLAGS = 
 
 # The Qt and Be window systems are written in C++, while the rest of
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
@@ -214,8 +214,8 @@ WINBEOBJ =
 
 #
 #
-WINSRC = $(WINTTYSRC)
-WINOBJ = $(WINTTYOBJ)
+#WINSRC = $(WINTTYSRC)
+#WINOBJ = $(WINTTYOBJ)
 
 # on some systems the termcap library is in -ltermcap or -lcurses
 # on 386 Xenix, the -ltermlib tputs() seems not to work; use -lcurses instead
@@ -231,7 +231,7 @@ WINOBJ = $(WINTTYOBJ)
 # WINTTYLIB = -lcurses
 # WINTTYLIB = -lcurses16
 # WINTTYLIB = -lncurses
-WINTTYLIB = -ltermlib
+#WINTTYLIB = -ltermlib
 #
 # libraries for X11
 # If USE_XPM is defined in config.h, you will also need -lXpm here.
@@ -255,7 +255,7 @@ WINGEMLIB = -le_gem -lgem
 # libraries for BeOS 
 WINBELIB = -lbe
 
-WINLIB = $(WINTTYLIB)
+#WINLIB = $(WINTTYLIB)
 
 # any other strange libraries your system needs (for Sysunix only -- the more
 # specialized targets should already be right)

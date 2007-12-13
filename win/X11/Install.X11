@@ -87,19 +87,17 @@ and then use the symbol mappings found in nethack.rc.  The fonts are found
 in nh10.bdf and ibm.bdf.  You first need to convert the bdf files to whatever
 form your X11 server recognizes (usually using a command called bdftosnf
 for R4 servers or bdftopcf for R5 servers).  Then run mkfontdir on the
-directory containing your font files (you might want to copy them to GAMEDIR,
+directory containing your font files (you might want to copy them to HACKDIR,
 from the top Makefile, after you've done "make install").  If these commands
 aren't familiar, talk to your local X11 guru and read the man pages.
-Finally, add that directory to your font search path (e.g. xset fp+ GAMEDIR,
-setting GAMEDIR to the value of GAMEDIR in the top Makefile).  Alternatively,
+
+nethack.sh automatically adds HACKDIR to your font search path.  If
 you (assuming you are a system administrator) can install the fonts in your
-standard X11 font directory.  If you do not install the fonts in the standard
-X11 font directory, all persons playing nethack must add that "xset fp+"
+standard X11 font directory the relevent lines in nethack.sh can be removed.
+Alternatively, all persons playing nethack must add that "xset fp+"
 command to their .xinitrc file, or whatever file they execute when starting
-X11.  Adding the "xset" command to the nethack.sh is also an alternative,
-though it may clutter your X11 font search path after playing several games,
-so this method is not recommended.  See the note below for the alternative
-installation procedure for Sun's OpenWindows.
+X11.  See the note below for the alternative installation procedure
+for Sun's OpenWindows.
 
 
 If your X11 include files and libraries are not installed in a standard

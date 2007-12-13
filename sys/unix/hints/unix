@@ -1,0 +1,24 @@
+#      
+#      SCCS Id: @(#)unix 3.5     2007/12/12
+# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
+# NetHack may be freely redistributed.  See license for details. 
+#
+# unix hints file
+# This hints file provides the legacy configuration that NetHack has shipped
+# with historically - this means you will most likely need to hand edit .h
+# and Makefiles.
+
+
+HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+PREFIX=/usr
+
+CFLAGS=-O -I../include
+
+WINSRC = $(WINTTYSRC)
+WINOBJ = $(WINTTYOBJ)
+WINLIB = $(WINTTYLIB)
+
+WINTTYLIB=-ltermlib
+
+CHOWN=chown
+CHGRP=chgrp

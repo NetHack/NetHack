@@ -13,29 +13,32 @@ OPTIONS=verbose,news,fruit:pineapple
 OPTIONS=dogname:Dhairrhuwyth
 OPTIONS=catname:Ghisteslwchlohm
 #
+# The graphics symbols mappings below are for NetHack 3.4.  NetHack 3.5
+# uses a new scheme, but this file has not been updated.
+#
 # There are 17 object symbols and various graphics symbols.
 # The descriptions of these symbols can be found in dat/opthelp.
 #
 #
 # Font: nh10 (10x20)
 #
-OBJECTS= 180 183 188 192 181 184 182 189 190 196 \
-	 191 194 193 187 185 186 195
+#OBJECTS= 180 183 188 192 181 184 182 189 190 196 \
+#	 191 194 193 187 185 186 195
 #
-DUNGEON= 032 025 018 013 012 014 011 015 023 024 \
-	 022 021 128 129 130 131 132 035 035 133 \
-	 134 135 136 137 145 146 144 124 143 142 \
-	 141 140 149 150 031 031 147 148 031 161 \
-	 140
+#DUNGEON= 032 025 018 013 012 014 011 015 023 024 \
+#	 022 021 128 129 130 131 132 035 035 133 \
+#	 134 135 136 137 145 146 144 124 143 142 \
+#	 141 140 149 150 031 031 147 148 031 161 \
+#	 140
 #
-TRAPS=	 138 138 138 138 138 138 138 138 138 138 \
-	 138 138 138 138 138 139 138 138 138 138 \
-	 138 138
+#TRAPS=	 138 138 138 138 138 138 138 138 138 138 \
+#	 138 138 138 138 138 139 138 138 138 138 \
+#	 138 138
 #
-EFFECTS= 151 152 153 154 155 156 157 158	 \
-	 159 160 161 162			 \
-	 163 164 165 166 167 168 169 170	 \
-	 171 172 173 174 175 176 177 178 179
+#EFFECTS= 151 152 153 154 155 156 157 158	 \
+#	 159 160 161 162			 \
+#	 163 164 165 166 167 168 169 170	 \
+#	 171 172 173 174 175 176 177 178 179
 #
 #
 # Font: ibm (8x14)

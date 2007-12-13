@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)unixconf.h 3.5	1999/07/02	*/
+/*	SCCS Id: @(#)unixconf.h 3.5	2007/12/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -142,8 +142,9 @@
  * variable MAILREADER; otherwise an internal pager will be used.
  * A stat system call is done on the mailbox every MAILCKFREQ moves.
  */
-
+#if !defined(NOMAIL)
 #define MAIL			/* Deliver mail during the game */
+#endif
 
 /* The Andrew Message System does mail a little differently from normal
  * UNIX.  Mail is deposited in the user's own directory in ~/Mailbox

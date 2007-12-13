@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)termcap.c	3.5	2005/11/19	*/
+/*	SCCS Id: @(#)termcap.c	3.5	2007/12/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -803,7 +803,7 @@ cl_eos()			/* free after Robert Viduya */
 
 #include <curses.h>
 
-#if !defined(LINUX) && !defined(__FreeBSD__)
+#if !defined(LINUX) && !defined(__FreeBSD__)  && !defined(NOTPARMDECL)
 extern char *tparm();
 #endif
 

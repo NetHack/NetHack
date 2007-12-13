@@ -1,5 +1,5 @@
 #!/bin/sh
-#	SCCS Id: @(#)nethack.sh	3.5	1990/02/26
+#	SCCS Id: @(#)nethack.sh	3.5	2007/12/12
 
 HACKDIR=/usr/games/lib/nethackdir
 export HACKDIR
@@ -14,6 +14,12 @@ x)	XUSERFILESEARCHPATH="$HACKDIR/%N.ad"
 	;;
 esac
 export XUSERFILESEARCHPATH
+
+# Get font dir added, but only once (and only if there's an xset to be found).
+xset p >/dev/null 2>&1 && (
+	xset fp- $HACKDIR >/dev/null 2>&1;
+	xset fp+ $HACKDIR
+)
 
 # see if we can find the full path name of PAGER, so help files work properly
 # assume that if someone sets up a special variable (HACKPAGER) for NetHack,
