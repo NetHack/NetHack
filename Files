@@ -115,11 +115,11 @@ mttymain.c
 
 sys/msdos:
 (files for MSDOS version)
-Install.dos     Makefile.BC     Makefile.GCC    Makefile.MSC    NHAccess.nh
-moveinit.pat    msdos.c         msdoshlp.txt    ovlinit.c       pckeys.c
-pctiles.c       pctiles.h       pcvideo.h       portio.h        schema1.BC
-schema2.BC      schema3.MSC     setup.bat       sound.c         tile2bin.c
-video.c         vidtxt.c        vidvga.c
+Install.dos     Makefile.BC     Makefile.GCC    Makefile.MSC    moveinit.pat
+msdos.c         msdoshlp.txt    ovlinit.c       pckeys.c        pctiles.c
+pctiles.h       pcvideo.h       portio.h        schema1.BC      schema2.BC
+schema3.MSC     setup.bat       sound.c         tile2bin.c      video.c
+vidtxt.c        vidvga.c
 (files for running MSDOS binary under Windows)
 nhico.uu        nhpif.uu
 
