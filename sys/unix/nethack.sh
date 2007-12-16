@@ -16,7 +16,7 @@ esac
 export XUSERFILESEARCHPATH
 
 # Get font dir added, but only once (and only if there's an xset to be found).
-test -e $HACKDIR/fonts.dir && xset p >/dev/null 2>&1 && (
+test -n "$DISPLAY" -a -e $HACKDIR/fonts.dir && xset p >/dev/null 2>&1 && (
 	xset fp- $HACKDIR >/dev/null 2>&1;
 	xset fp+ $HACKDIR
 )

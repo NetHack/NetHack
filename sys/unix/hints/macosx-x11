@@ -37,4 +37,4 @@ VARDATND = x11tiles NetHack.ad pet_mark.xbm
 
 # XXX install nethack.rc as .nethackrc
 
-POSTINSTALL= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcd; (cd $(HACKDIR); mkfontdir)
+POSTINSTALL= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir)
