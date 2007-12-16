@@ -1,0 +1,26 @@
+#      
+#      SCCS Id: @(#)linux 3.5     2007/12/15
+# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
+# NetHack may be freely redistributed.  See license for details. 
+#
+# Linux hints file
+# This hints file provides a single-user tty build for Linux, specifically
+# for Ubuntu dapper.
+
+
+HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+#PREFIX=/usr
+PREFIX=$(wildcard ~)/nh/install
+
+CFLAGS=-O -I../include -DNOTPARMDECL $(CFLAGS1)
+CFLAGS1=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+
+
+WINSRC = $(WINTTYSRC)
+WINOBJ = $(WINTTYOBJ)
+WINLIB = $(WINTTYLIB)
+
+WINTTYLIB=-lcurses
+
+CHOWN=true
+CHGRP=true
