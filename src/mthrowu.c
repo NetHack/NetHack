@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.5	2007/06/07	*/
+/*	SCCS Id: @(#)mthrowu.c	3.5	2007/12/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,6 +25,8 @@ STATIC_OVL NEARDATA const char *breathwep[] = {
 				"strange breath #8",
 				"strange breath #9"
 };
+
+extern boolean notonhead;	/* for long worms */
 
 /* hero is hit by something other than a monster */
 int
@@ -129,7 +131,7 @@ int x,y;
    return 1 if the object has stopped moving (hit or its range used up) */
 int
 ohitmon(mtmp, otmp, range, verbose)
-struct monst *mtmp;	/* accidental target */
+struct monst *mtmp;	/* accidental target, located at <bhitpos.x,.y> */
 struct obj *otmp;	/* missile; might be destroyed by drop_throw */
 int range;		/* how much farther will object travel if it misses */
 			/* Use -1 to signify to keep going even after hit, */
@@ -140,6 +142,7 @@ boolean verbose;  /* give message(s) even when you can't see what happened */
 	boolean vis, ismimic;
 	int objgone = 1;
 
+	notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
 	ismimic = mtmp->m_ap_type && mtmp->m_ap_type != M_AP_MONSTER;
 	vis = cansee(bhitpos.x, bhitpos.y);
 
@@ -245,6 +248,7 @@ struct obj *obj;		/* missile (or stack providing it) */
 
 	bhitpos.x = x;
 	bhitpos.y = y;
+	notonhead = FALSE;	/* reset potentially stale value */
 
 	if (obj->quan == 1L) {
 	    /*

@@ -273,6 +273,8 @@ always update map display and use up turn if open or close command attempted
 	while blind reveals change in door state or discloses non-door spot
 secret door detection's trap finding is no longer blocked by water or clouds
 	on the Planes of Water and Air
+potion thrown by monster which hit a long worm's tail gave feedback about
+	hitting its head
 
 
 Platform- and/or Interface-Specific Fixes
