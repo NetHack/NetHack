@@ -11,9 +11,9 @@
 
 # This is a tty build for a single user.
 
-# XXX temp testing:
-HACKDIR=/tmp/nhdir5
-PREFIX=/tmp
+PREFIX:=$(wildcard ~)
+SHELLDIR=$(PREFIX)/bin
+HACKDIR=$(PREFIX)/nethackdir
 
 CC=gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
 

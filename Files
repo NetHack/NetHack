@@ -161,12 +161,16 @@ wdnflute.uu     wdnharp.uu
 sys/unix:
 (files for UNIX versions)
 Install.unx     Makefile.dat    Makefile.doc    Makefile.src    Makefile.top
-Makefile.utl    README.linux    depend.awk      nethack.sh      setup.sh
-unixmain.c      unixres.c       unixunix.c
+Makefile.utl    README.linux    depend.awk      mkmkfile.sh     nethack.sh
+setup.sh        unixmain.c      unixres.c       unixunix.c
 (files for replacement cpp, apparently only needed by some UNIX systems)
 cpp1.shr        cpp2.shr        cpp3.shr
 (file for sound driver for 386 UNIX)
 snd86unx.shr
+
+sys/unix/hints:
+(files for configuring UNIX NetHack versions)
+linux           linux-x11       macosx          macos-x11       unix
 
 sys/vms:
 (files for VMS version)

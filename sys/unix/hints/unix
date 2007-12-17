@@ -9,8 +9,9 @@
 # and Makefiles.
 
 
-HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
 PREFIX=/usr
+HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+SHELLDIR=$(PREFIX)/games
 
 CFLAGS=-O -I../include
 
