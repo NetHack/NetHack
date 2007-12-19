@@ -567,6 +567,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 #endif
 	mread(fd, (genericptr_t) &u, sizeof(struct you));
 	mread(fd, (genericptr_t) timebuf, 14);
+	timebuf[14] = '\0';
 	ubirthday = time_from_yyyymmddhhmmss(timebuf);
 
 	set_uasmon();
