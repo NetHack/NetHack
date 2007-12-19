@@ -1847,7 +1847,7 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
 		    /* get a value that's 'random' from game to game, but the
 		       same within the same game */
 		    boolean pseudorand =
-			(((int)u.ubirthday % obj->otyp) >= obj->otyp/2);
+			(((int)ubirthday % obj->otyp) >= obj->otyp/2);
 
 		    /* all gems are priced high - real or not */
 		    switch(obj->otyp - LAST_GEM) {

@@ -104,7 +104,7 @@ doread()
 	    if (erosion)
 		wipeout_text(buf,
 			(int)(strlen(buf) * erosion / (2*MAX_ERODE)),
-			     scroll->o_id ^ (unsigned)u.ubirthday);
+			     scroll->o_id ^ (unsigned)ubirthday);
 	    pline("\"%s\"", buf);
 	    return 1;
 #endif	/* TOURIST */

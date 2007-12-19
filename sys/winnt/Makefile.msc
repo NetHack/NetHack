@@ -218,7 +218,7 @@ cdebug = -Zi -Od
 # Util builds
 #==========================================
 
-cflagsUtil = $(cdebug) $(cflags) /D_USE_32BIT_TIME_T $(INCLDIR) \
+cflagsUtil = $(cdebug) $(cflags) $(INCLDIR) \
 	     $(WINPFLAG) $(DLBFLG)
 lflagsUtil = $(ldebug) $(lflags) $(conlibs)
 
@@ -232,13 +232,13 @@ LIBS= user32.lib winmm.lib $(ZLIB)
 
 !IF ("$(GRAPHICAL)"=="Y")
 
-cflagsGame = $(cdebug) $(cflags) /D_USE_32BIT_TIME_T $(guiflags) $(INCLDIR) \
+cflagsGame = $(cdebug) $(cflags) $(guiflags) $(INCLDIR) \
 	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
 lflagsGame = $(ldebug) $(lflags) $(guilibs)
 
 !ELSE
 
-cflagsGame = $(cdebug) $(cflags) /D_USE_32BIT_TIME_T $(conflags) $(INCLDIR) \
+cflagsGame = $(cdebug) $(cflags) $(conflags) $(INCLDIR) \
 	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
 lflagsGame = $(ldebug) $(lflags) $(conlibs)
 

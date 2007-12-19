@@ -45,6 +45,8 @@ NetHack, except that rounddiv may call panic().
 	char *		yymmdd		(time_t)
 	long		yyyymmdd	(time_t)
 	long		hhmmss		(time_t)
+	char *		yyyymmddhhmmss	(time_t)
+	time_t		time_from_yyyymmddhhmmss (char *)
 	int		phase_of_the_moon	(void)
 	boolean		friday_13th	(void)
 	int		night		(void)
@@ -636,6 +638,82 @@ time_t date;
 
 	timenum = lt->tm_hour * 10000L + lt->tm_min * 100L + lt->tm_sec;
 	return timenum;
+}
+
+char *
+yyyymmddhhmmss(date)
+time_t date;
+{
+	long datenum;
+	static char datestr[15];
+	struct tm *lt;
+
+	if (date == 0)
+		lt = getlt();
+	else
+#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || defined(BSD)
+		lt = localtime((long *)(&date));
+#else
+		lt = localtime(&date);
+#endif
+	/* just in case somebody's localtime supplies (year % 100)
+	   rather than the expected (year - 1900) */
+	if (lt->tm_year < 70)
+	    datenum = (long)lt->tm_year + 2000L;
+	else
+	    datenum = (long)lt->tm_year + 1900L;
+	Sprintf(datestr, "%04d%02d%02d%02d%02d%02d",
+		datenum, lt->tm_mon + 1, lt->tm_mday,
+		lt->tm_hour, lt->tm_min, lt->tm_sec);
+	return(datestr);
+}
+
+time_t
+time_from_yyyymmddhhmmss(buf)
+char *buf;
+{
+	int k;
+	struct tm t, *lt;
+	char *g, *p, y[5],mo[3],d[3],h[3],mi[3],s[3];
+	if (buf && strlen(buf) == 14) {
+		g = buf;
+		p = y;      /* year */
+		for (k = 0; k < 4; ++k)
+			*p++ = *g++;
+		*p = '\0';
+		p = mo;     /* month */
+		for (k = 0; k < 2; ++k)
+			*p++ = *g++;
+		*p = '\0';
+		p = d;      /* day */
+		for (k = 0; k < 2; ++k)
+			*p++ = *g++;
+		*p = '\0';
+		p = h;      /* hour */
+		for (k = 0; k < 2; ++k)
+			*p++ = *g++;
+		*p = '\0';
+		p = mi;     /* minutes */
+		for (k = 0; k < 2; ++k)
+			*p++ = *g++;
+		*p = '\0';
+		p = s;	    /* seconds */
+		for (k = 0; k < 2; ++k)
+			*p++ = *g++;
+		*p = '\0';
+		lt = getlt();
+		if (lt) {
+			t = *lt;
+			t.tm_year = atoi(y) - 1900;
+			t.tm_mon  = atoi(mo) - 1;
+			t.tm_mday = atoi(d);
+			t.tm_hour = atoi(h);
+			t.tm_min  = atoi(mi);
+			t.tm_sec  = atoi(s);
+			return mktime(&t);
+		}
+	}
+	return (time_t)0;
 }
 
 /*

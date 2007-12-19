@@ -850,6 +850,8 @@ E char *FDECL(yymmdd, (time_t));
 #endif
 E long FDECL(yyyymmdd, (time_t));
 E long FDECL(hhmmss, (time_t));
+E char *FDECL(yyyymmddhhmmss,(time_t));
+E time_t FDECL(time_from_yyyymmddhhmmss, (char *));
 E int NDECL(phase_of_the_moon);
 E boolean NDECL(friday_13th);
 E int NDECL(night);

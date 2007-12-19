@@ -137,6 +137,7 @@ NEARDATA struct sysflag sysflags = DUMMY;
 #endif
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
+NEARDATA time_t ubirthday = DUMMY;
 
 NEARDATA struct obj *invent = (struct obj *)0,
 	*uwep = (struct obj *)0, *uarm = (struct obj *)0,

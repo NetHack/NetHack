@@ -310,6 +310,7 @@ register int fd, mode;
 	if (u.ugold) (void)insert_gold_into_invent(FALSE);
 #endif
 	bwrite(fd, (genericptr_t) &u, sizeof(struct you));
+	bwrite(fd, yyyymmddhhmmss(ubirthday), 14);
 	save_killers(fd, mode);
 
 	/* must come before migrating_objs and migrating_mons are freed */

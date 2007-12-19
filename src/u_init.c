@@ -524,6 +524,7 @@ u_init()
 	 * necessary when aborting from a failed restore */
 	(void) memset((genericptr_t)&u, 0, sizeof(u));
 	u.ustuck = (struct monst *)0;
+	(void) memset((genericptr_t)&ubirthday, 0, sizeof(ubirthday));
 
 #if 0	/* documentation of more zero values as desirable */
 	u.usick_cause[0] = 0;
@@ -578,9 +579,9 @@ u_init()
 	u.ulycn = NON_PM;
 
 #if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)&u.ubirthday);
+	(void) time((long *)&ubirthday);
 #else
-	(void) time(&u.ubirthday);
+	(void) time(&ubirthday);
 #endif
 
 	/*

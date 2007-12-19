@@ -522,6 +522,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	struct sysflag newgamesysflags;
 #endif
 	struct obj *otmp, *tmp_bc;
+	char timebuf[15];
 	int uid;
 
 	mread(fd, (genericptr_t) &uid, sizeof uid);
@@ -565,6 +566,9 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	amii_setpens(amii_numcolors);	/* use colors from save file */
 #endif
 	mread(fd, (genericptr_t) &u, sizeof(struct you));
+	mread(fd, (genericptr_t) timebuf, 14);
+	ubirthday = time_from_yyyymmddhhmmss(timebuf);
+
 	set_uasmon();
 #ifdef CLIPPING
 	cliparound(u.ux, u.uy);

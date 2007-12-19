@@ -362,7 +362,7 @@ int how;
 			(void) strncat(t0->death, killer.name, DTHSZ);
 			break;
 	}
-	t0->birthdate = yyyymmdd(u.ubirthday);
+	t0->birthdate = yyyymmdd(ubirthday);
 	t0->deathdate = yyyymmdd((time_t)0L);
 	t0->tt_next = 0;
 #ifdef UPDATE_RECORD_IN_PLACE
