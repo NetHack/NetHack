@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2007/05/16	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2007/12/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1566,6 +1566,11 @@ register struct attack *mattk;
 		hurtmarmor(mdef, AD_DCAY);
 		tmp = 0;
 		break;
+	    case AD_DREN:
+		if (!negated && !rn2(4))
+		    xdrainenergym(mdef, TRUE);
+		tmp = 0;
+		break;
 	    case AD_DRST:
 	    case AD_DRDX:
 	    case AD_DRCO:
@@ -1957,6 +1962,11 @@ register struct attack *mattk;
 				pline("%s is burning to a crisp!",Monnam(mdef));
 			    golemeffects(mdef,(int)mattk->adtyp,dam);
 			} else dam = 0;
+			break;
+		    case AD_DREN:
+			if (!rn2(4))
+			    xdrainenergym(mdef, TRUE);
+			dam = 0;
 			break;
 		}
 		end_engulf();

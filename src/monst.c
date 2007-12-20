@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)monst.c	3.5	2007/04/02	*/
+/*	SCCS Id: @(#)monst.c	3.5	2007/12/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -955,7 +955,7 @@ NEARDATA struct permonst mons[] = {
 	M2_HOSTILE|M2_NEUTER, M3_INFRAVISIBLE, CLR_CYAN),
     MON("energy vortex", S_VORTEX,
 	LVL(6, 20, 2, 30, 0), (G_GENO|G_NOCORPSE|1),
-	A(ATTK(AT_ENGL, AD_ELEC, 1, 6), ATTK(AT_ENGL, AD_DREN, 0, 0),
+	A(ATTK(AT_ENGL, AD_ELEC, 1, 6), ATTK(AT_ENGL, AD_DREN, 4, 6),
 	  ATTK(AT_NONE, AD_ELEC, 0, 4), NO_ATTK, NO_ATTK, NO_ATTK),
 	SIZ(0, 0, MS_SILENT, MZ_HUGE),
 	MR_ELEC|MR_SLEEP|MR_DISINT|MR_POISON|MR_STONE, 0,

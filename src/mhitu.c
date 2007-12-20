@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2007/06/02	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2007/12/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1801,6 +1801,12 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		    break;
 		case AD_DISE:
 		    if (!diseasemu(mtmp->data)) tmp = 0;
+		    break;
+		case AD_DREN:
+		    /* AC magic cancellation doesn't help when engulfed */
+		    if (!mtmp->mcan && rn2(4))
+			drain_en(tmp);
+		    tmp = 0;
 		    break;
 		default:
 		    physical_damage = TRUE;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)trap.c	3.5	2007/08/24	*/
+/*	SCCS Id: @(#)trap.c	3.5	2007/12/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3389,9 +3389,14 @@ drain_en(n)
 register int n;
 {
     if (!u.uenmax) {
+	/* energy is completely gone */
 	You_feel("momentarily lethargic.");
     } else {
-	You_feel("your magical energy drain away!");
+	/* throttle further loss a bit when there's not much left to lose */
+	if (n > u.uenmax || n > u.ulevel) n = rnd(n);
+
+	You_feel("your magical energy drain away%c",
+		 (n > u.uen) ? '!' : '.');
 	u.uen -= n;
 	if(u.uen < 0)  {
 		u.uenmax -= rnd(-u.uen);

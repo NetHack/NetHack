@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitm.c	3.5	2007/04/02	*/
+/*	SCCS Id: @(#)mhitm.c	3.5	2007/12/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1121,6 +1121,11 @@ mdamagem(magr, mdef, mattk)
 		}
 		tmp = 0;
 		break;
+	    case AD_DREN:
+		if (!cancelled && !rn2(4))
+		    xdrainenergym(mdef, vis && mattk->aatyp != AT_ENGL);
+		tmp = 0;
+		break;
 	    case AD_DRST:
 	    case AD_DRDX:
 	    case AD_DRCO:
@@ -1447,6 +1452,19 @@ int mdead;
 		return (mdead | mhit | MM_AGR_DIED);
 	}
 	return (mdead | mhit);
+}
+
+/* hero or monster has successfully hit target mon with drain energy attack */
+void
+xdrainenergym(mon, givemsg)
+struct monst *mon;
+boolean givemsg;
+{
+    if (mon->mspec_used < 20 &&		/* limit draining */
+	  (attacktype(mon->data, AT_MAGC) || attacktype(mon->data, AT_BREA))) {
+	mon->mspec_used += d(2, 2);
+	if (givemsg) pline("%s seems lethargic.", Monnam(mon));
+    }
 }
 
 /* "aggressive defense"; what type of armor prevents specified attack

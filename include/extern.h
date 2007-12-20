@@ -1099,6 +1099,7 @@ E int FDECL(mdisplacem, (struct monst *,struct monst *,BOOLEAN_P));
 E void FDECL(paralyze_monst, (struct monst *,int));
 E int FDECL(sleep_monst, (struct monst *,int,int));
 E void FDECL(slept_monst, (struct monst *));
+E void FDECL(xdrainenergym, (struct monst *,BOOLEAN_P));
 E long FDECL(attk_protection, (int));
 
 /* ### mhitu.c ### */
