@@ -30,6 +30,8 @@
  *	means the defined()s would be ok again...
  *	- change fprintf(stderr, "x(%d)y\n", z) to impossible("x(%d)y", z)
  *	- remove useless variable `j' from srandom()
+ *	- cast result of pointer subtraction to long since ptrdiff_t could
+ *	be bigger than that and trigger warnings when assigning to long
  */
 
 #include "hack.h"
@@ -250,7 +252,7 @@ initstate( seed, arg_state, n )
 	register  char		*ostate		= (char *)( &state[ -1 ] );
 
 	if(  rand_type  ==  TYPE_0  )  state[ -1 ] = rand_type;
-	else  state[ -1 ] = MAX_TYPES*(rptr - state) + rand_type;
+	else  state[ -1 ] = (long)(MAX_TYPES*(rptr - state) + rand_type);
 	if(  n  <  BREAK_1  )  {
 	    if(  n  <  BREAK_0  )  {
 		impossible(
@@ -291,7 +293,7 @@ initstate( seed, arg_state, n )
 	end_ptr = &state[ rand_deg ];	/* must set end_ptr before srandom */
 	srandom( seed );
 	if(  rand_type  ==  TYPE_0  )  state[ -1 ] = rand_type;
-	else  state[ -1 ] = MAX_TYPES*(rptr - state) + rand_type;
+	else  state[ -1 ] = (long)(MAX_TYPES*(rptr - state) + rand_type);
 	return( ostate );
 }
 
@@ -320,7 +322,7 @@ setstate( arg_state )
 	char			*ostate		= (char *)( &state[ -1 ] );
 
 	if(  rand_type  ==  TYPE_0  )  state[ -1 ] = rand_type;
-	else  state[ -1 ] = MAX_TYPES*(rptr - state) + rand_type;
+	else  state[ -1 ] = (long)(MAX_TYPES*(rptr - state) + rand_type);
 	switch(  type  )  {
 	    case  TYPE_0:
 	    case  TYPE_1:
