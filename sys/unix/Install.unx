@@ -82,6 +82,16 @@
     a game that was in progress.  The recover command is installed in the
     HACKDIR by default.
 
+9.  If you specified SYSCF (and SYSCF_FILE) in config.h, create the file
+    defined as SYSCF_FILE and fill in any of the following values if you
+    wish to override the compiled-in defaults:
+	WIZARDS= a space-separated list of usernames who can use -D
+		If the first character is '*' then any user can use -D.
+    This is a standards config file, so blank lines and lines starting with
+    pound signs are ignored; while other, standard options (such as catname)
+    can be specified in this file, this is considered a bug and may be changed
+    in the future.
+
 Notes:
 
 1.  Save files and bones files from previous versions will not work with

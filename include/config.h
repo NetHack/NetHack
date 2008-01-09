@@ -144,11 +144,21 @@
  *		feature from the game; otherwise set the appropriate wizard
  *		name.  LOGFILE, NEWS and PANICLOG refer to files in the
  *		playground.
+ *
+ *		If SYSCF is defined, the following configuration info is
+ *		available in a global config space, with the compiled-in
+ *		entries as defaults:
+ *		WIZARD		( a value of * allows anyone to be wizard)
+ *
+ *		The following options select how the config space is stored:
+ *		SYSCF_FILE	in the named file
  */
 
 #ifndef WIZARD		/* allow for compile-time or Makefile changes */
 # ifndef KR1ED
 #  define WIZARD  "wizard" /* the person allowed to use the -D option */
+/* #define SYSCF */	/* use a global configuration */
+/* #define SYSCF_FILE "sysconf" */ /* global configuration is in a file */
 # else
 #  define WIZARD
 #  define WIZARD_NAME "wizard"

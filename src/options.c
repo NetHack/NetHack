@@ -386,6 +386,9 @@ static struct Comp_Opt
 	{ "windowcolors",  "the foreground/background colors of windows",	/*WC*/
 						80, DISP_IN_GAME },
 	{ "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
+#ifdef SYSCF
+	{ "wizards", "users with access to wizard mode (etc)", PL_PSIZ, SET_IN_SYS},
+#endif
 #ifdef BACKWARD_COMPAT
 	{"DECgraphics", "load DECGraphics display symbols", 70, SET_IN_FILE},
 	{"IBMgraphics", "load IBMGraphics display symbols", 70, SET_IN_FILE},
@@ -547,8 +550,16 @@ const char *ev;
 		return (char *)0;
 }
 
+/* Split initoptions into 2 parts for SYSCF but don't break anything not
+ * using SYSCF. */
 void
-initoptions()
+initoptions(){
+	initoptions_init();
+	initoptions_finish();
+}
+
+void
+initoptions_init()
 {
 #ifndef MAC
 	char *opts;
@@ -671,17 +682,20 @@ initoptions()
 	/* since this is done before init_objects(), do partial init here */
 	objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
 	nmcpy(pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
+}
+void
+initoptions_finish(){
 #ifndef MAC
-	opts = getenv("NETHACKOPTIONS");
+	char *opts = getenv("NETHACKOPTIONS");
 	if (!opts) opts = getenv("HACKOPTIONS");
 	if (opts) {
 		if (*opts == '/' || *opts == '\\' || *opts == '@') {
 			if (*opts == '@') opts++;	/* @filename */
 			/* looks like a filename */
 			if (strlen(opts) < BUFSZ/2)
-			    read_config_file(opts);
+			    read_config_file(opts, SET_IN_FILE);
 		} else {
-			read_config_file((char *)0);
+			read_config_file((char *)0, SET_IN_FILE);
 			/* let the total length of options be long;
 			 * parseoptions() will check each individually
 			 */
@@ -689,7 +703,7 @@ initoptions()
 		}
 	} else
 #endif
-		read_config_file((char *)0);
+		read_config_file((char *)0, SET_IN_FILE);
 
 	(void)fruitadd(pl_fruit);
 	/* Remove "slime mold" from list of object names; this will	*/
@@ -2249,6 +2263,23 @@ goodfruit:
 		return;
 	}
 
+#ifdef SYSCF
+	fullname = "wizards";
+	if (wizard && match_optname(opts, fullname, 6, TRUE)) {
+	    if (duplicate) {
+		complain_about_duplicate(opts,1);
+		return;
+	    }
+	    if (negated) {
+		bad_negation(fullname, FALSE);
+		return;
+	    } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+		nmcpy(wizards, op, PL_PSIZ);
+	    }
+	    return;
+	}
+#endif
+
 	/* menustyle:traditional or combo or full or partial */
 	if (match_optname(opts, "menustyle", 4, TRUE)) {
 		int tmp;
@@ -2718,6 +2749,13 @@ doset()
 		 "Compounds (selecting will prompt for new value):",
 		 MENU_UNSELECTED);
 
+#ifdef notyet /* SYSCF */
+/* XXX I think this is still fragile.  Fixing initial/from_file and/or changing
+ the SET_* etc to bitmaps will let me make this better. */
+	if(wizard)
+	    startpass = SET_IN_SYS;
+	else
+#endif
 	startpass = DISP_IN_GAME;
 	endpass = SET_IN_GAME;
 
@@ -3451,6 +3489,14 @@ char *buf;
 #endif
 	else if (!strcmp(optname, "catname"))
 		Sprintf(buf, "%s", catname[0] ? catname : none );
+#ifdef SYSCF
+	else if (!strcmp(optname, "wizards"))
+# ifdef KR1ED
+		Sprintf(buf, "%s", wizards[0] ? wizards : WIZARD_NAME);
+# else
+		Sprintf(buf, "%s", wizards[0] ? wizards : WIZARD);
+# endif
+#endif
 	else if (!strcmp(optname, "disclose")) {
 		for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
 			char topt[2];
@@ -4254,13 +4300,12 @@ struct wc_Opt wc2_options[] = {
 	{(char *)0, 0L}
 };
 
-
 /*
- * If a port wants to change or ensure that the
+ * If a port wants to change or ensure that the SET_IN_SYS,
  * SET_IN_FILE, DISP_IN_GAME, or SET_IN_GAME status of an option is
  * correct (for controlling its display in the option menu) call
  * set_option_mod_status()
- * with the second argument of 0,2, or 3 respectively.
+ * with the appropriate second argument.
  */
 void
 set_option_mod_status(optnam, status)
@@ -4268,7 +4313,7 @@ const char *optnam;
 int status;
 {
 	int k;
-	if (status < SET_IN_FILE || status > SET_IN_GAME) {
+	if ( SET__IS_VALUE_VALID(status) ) {
 		impossible("set_option_mod_status: status out of range %d.",
 			   status);
 		return;
@@ -4301,7 +4346,7 @@ unsigned long optmask;
 int status;
 {
 	int k = 0;
-	if (status < SET_IN_FILE || status > SET_IN_GAME) {
+	if ( SET__IS_VALUE_VALID(status) ) {
 		impossible("set_wc_option_mod_status: status out of range %d.",
 			   status);
 		return;
@@ -4357,7 +4402,7 @@ unsigned long optmask;
 int status;
 {
 	int k = 0;
-	if (status < SET_IN_FILE || status > SET_IN_GAME) {
+	if ( SET__IS_VALUE_VALID(status) ) {
 		impossible("set_wc2_option_mod_status: status out of range %d.",
 			   status);
 		return;

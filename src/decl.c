@@ -70,6 +70,9 @@ const char ynNaqchars[] = "yn#aq";
 NEARDATA long yn_number = 0L;
 
 const char disclosure_options[] = "iavgc";
+#ifdef SYSCF
+char wizards[PL_PSIZ] = DUMMY;
+#endif
 
 #if defined(MICRO) || defined(WIN32)
 char hackdir[PATHLEN];		/* where rumors, help, record are */

@@ -199,6 +199,9 @@ E const char *occtxt;			/* defined when occupation != NULL */
 E const char *nomovemsg;
 E const char nul[];
 E char lock[];
+#ifdef SYSCF
+E char wizards[];
+#endif
 
 E const schar xdir[], ydir[], zdir[];
 

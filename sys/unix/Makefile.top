@@ -17,15 +17,17 @@
 #PREFIX	 = /usr
 GAME     = nethack
 # GAME     = nethack.prg
-GAMEUID  = games
-GAMEGRP  = bin
+#GAMEUID  = games
+#GAMEGRP  = bin
 
 # Permissions - some places use setgid instead of setuid, for instance
 # See also the option "SECURE" in include/config.h
-GAMEPERM = 04755
+#GAMEPERM = 04755
 FILEPERM = 0644
+# VARFILEPERM = 0644
 EXEPERM  = 0755
 DIRPERM  = 0755
+# VARDIRPERM = 0755
 
 # VARDIR may also appear in unixconf.h as "VAR_PLAYGROUND" else HACKDIR
 #
@@ -234,6 +236,7 @@ update: $(GAME) recover $(VARDAT) dungeon spec_levs
 	@echo You may also want to install the man pages via the doc Makefile.
 
 install: $(GAME) recover $(VARDAT) dungeon spec_levs
+	true; $(PREINSTALL)
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory
 	-mkdir -p $(SHELLDIR)
@@ -242,14 +245,16 @@ install: $(GAME) recover $(VARDAT) dungeon spec_levs
 	-rmdir ./-p
 	-$(CHOWN) $(GAMEUID) $(HACKDIR) $(VARDIR) $(VARDIR)/save
 	$(CHGRP) $(GAMEGRP) $(HACKDIR) $(VARDIR) $(VARDIR)/save
-	chmod $(DIRPERM) $(HACKDIR) $(VARDIR) $(VARDIR)/save
+# order counts here:
+	chmod $(DIRPERM) $(HACKDIR)
+	chmod $(VARDIRPERM) $(VARDIR) $(VARDIR)/save
 # set up the game files
 	( $(MAKE) dofiles )
 # set up some additional files
 	touch $(VARDIR)/perm $(VARDIR)/record $(VARDIR)/logfile
 	-( cd $(VARDIR) ; $(CHOWN) $(GAMEUID) perm record logfile ; \
 			$(CHGRP) $(GAMEGRP) perm record logfile ; \
-			chmod $(FILEPERM) perm record logfile )
+			chmod $(VARFILEPERM) perm record logfile )
 	true; $(POSTINSTALL)
 # and a reminder
 	@echo You may also want to reinstall the man pages via the doc Makefile.

@@ -32,6 +32,7 @@ CHGRP=true
 WINSRC = $(WINX11SRC)
 WINOBJ = $(WINX11OBJ)
 WINLIB = $(WINX11LIB)
+VARDIRPERM = 0755
 
 VARDATND = x11tiles NetHack.ad pet_mark.xbm
 

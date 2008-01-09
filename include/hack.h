@@ -340,10 +340,13 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
  * Each higher number includes the characteristics of the numbers
  * below it.
  */
-#define SET_IN_FILE	0 /* config file option only */
-#define SET_VIA_PROG	1 /* may be set via extern program, not seen in game */
-#define DISP_IN_GAME	2 /* may be set via extern program, displayed in game */
-#define SET_IN_GAME	3 /* may be set via extern program or set in the game */
+/* XXX This should be replaced with a bitmap. */
+#define SET_IN_SYS	0 /* system config file option only */
+#define SET_IN_FILE	1 /* config file option only */
+#define SET_VIA_PROG	2 /* may be set via extern program, not seen in game */
+#define DISP_IN_GAME	3 /* may be set via extern program, displayed in game */
+#define SET_IN_GAME	4 /* may be set via extern program or set in the game */
+#define SET__IS_VALUE_VALID(s) ( (s < SET_IN_SYS) || (s > SET_IN_GAME) )
 
 #define FEATURE_NOTICE_VER(major,minor,patch) (((unsigned long)major << 24) | \
 	((unsigned long)minor << 16) | \

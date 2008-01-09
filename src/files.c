@@ -185,7 +185,7 @@ STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
 STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
 STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
-int FDECL(parse_config_line, (FILE *,char *,char *,char *));
+int FDECL(parse_config_line, (FILE *,char *,char *,char *,int));
 #ifdef LOADSYMSETS
 STATIC_DCL FILE *NDECL(fopen_sym_file);
 STATIC_DCL void FDECL(set_symhandling, (char *,int));
@@ -1947,11 +1947,12 @@ int prefixid;
 
 /*ARGSUSED*/
 int
-parse_config_line(fp, buf, tmp_ramdisk, tmp_levels)
+parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, src)
 FILE		*fp;
 char		*buf;
 char		*tmp_ramdisk;
 char		*tmp_levels;
+int		src;
 {
 #if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
 # pragma unused(tmp_ramdisk,tmp_levels)
@@ -2064,6 +2065,10 @@ char		*tmp_levels;
 	    (void) strncpy(dogname, bufp, PL_PSIZ-1);
 	} else if (match_varname(buf, "CATNAME", 3)) {
 	    (void) strncpy(catname, bufp, PL_PSIZ-1);
+#ifdef SYSCF
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "WIZARDS", 6)) {
+	    (void) strncpy(wizards, bufp, PL_PSIZ-1);
+#endif
 
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
@@ -2267,8 +2272,9 @@ const char *filename;
 #endif /* USER_SOUNDS */
 
 void
-read_config_file(filename)
+read_config_file(filename, src)
 const char *filename;
+int src;
 {
 #define tmp_levels	(char *)0
 #define tmp_ramdisk	(char *)0
@@ -2300,7 +2306,14 @@ const char *filename;
 	set_duplicate_opt_detection(1);
 
 	while (fgets(buf, 4*BUFSZ, fp)) {
-		if (!parse_config_line(fp, buf, tmp_ramdisk, tmp_levels)) {
+#ifdef notyet
+/*
+XXX Don't call read() in parse_config_line, read as callback or reassemble line
+at this level.
+OR: Forbid multiline stuff for alternate config sources.
+*/
+#endif
+		if (!parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, src)) {
 			raw_printf("Bad option line:  \"%.50s\"", buf);
 			wait_synch();
 		}

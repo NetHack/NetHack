@@ -129,6 +129,11 @@ char *argv[];
 #ifdef CHDIR
 		chdirx(dir,0);
 #endif
+#ifdef SYSCF
+		initoptions_init();
+		read_config_file(SYSCF_FILE, SET_IN_SYS);
+		initoptions_finish();
+#endif
 		prscore(argc, argv);
 		exit(EXIT_SUCCESS);
 	    }
@@ -148,7 +153,11 @@ char *argv[];
 #ifdef __linux__
 	check_linux_console();
 #endif
-	initoptions();
+	initoptions_init();
+#ifdef SYSCF
+	read_config_file(SYSCF_FILE, SET_IN_SYS);
+#endif
+	initoptions_finish();
 	exact_username = whoami();
 
 	/*
@@ -530,6 +539,22 @@ authorize_wizard_mode()
 		pw = getpwuid(uid);
 	    }
 	}
+#ifdef SYSCF
+	if (pw && wizards[0]) {
+	    if(wizards[0] == '*') return TRUE;	/*allow any user to be wizard*/
+	    int pwlen = strlen(pw->pw_name);
+	    char *eop = eos(wizards);
+	    char *w = wizards;
+	    while( w+pwlen <= eop ){
+		if( ! *w ) break;
+		if( isspace(*w) ){ w++; continue;}
+		if( !strncmp(w, pw->pw_name, pwlen) ){
+		    if( !w[pwlen] || isspace(w[pwlen]) ) return TRUE;
+		}
+		while( *w && !isspace(*w) ) w++;
+	    }
+	} else
+#endif
 	if (pw && !strcmp(pw->pw_name, WIZARD_NAME)) return TRUE;
 #endif	/* WIZARD */
 	return FALSE;

@@ -26,6 +26,7 @@ VARDATND = x11tiles NetHack.ad pet_mark.xbm
 
 CHOWN=true
 CHGRP=true
+VARDIRPERM = 0755
 
 POSTINSTALL= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir)
 

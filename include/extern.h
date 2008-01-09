@@ -730,7 +730,7 @@ E void FDECL(unlock_file, (const char *));
 #ifdef USER_SOUNDS
 E boolean FDECL(can_read_file, (const char *));
 #endif
-E void FDECL(read_config_file, (const char *));
+E void FDECL(read_config_file, (const char *, int));
 E void FDECL(check_recordfile, (const char *));
 #if defined(WIZARD)
 E void NDECL(read_wizkit);
@@ -1580,6 +1580,8 @@ E char *FDECL(safe_qbuf, (char *,const char *,const char *,struct obj *,
 
 E boolean FDECL(match_optname, (const char *,const char *,int,BOOLEAN_P));
 E void NDECL(initoptions);
+E void NDECL(initoptions_init);
+E void NDECL(initoptions_finish);
 E void FDECL(parseoptions, (char *,BOOLEAN_P,BOOLEAN_P));
 E int NDECL(doset);
 E int NDECL(dotogglepickup);

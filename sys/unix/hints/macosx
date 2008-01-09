@@ -29,3 +29,4 @@ WINTTYLIB=-lncurses
 
 CHOWN=true
 CHGRP=true
+VARDIRPERM = 0755
