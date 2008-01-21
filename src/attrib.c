@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)attrib.c	3.5	2007/03/19	*/
+/*	SCCS Id: @(#)attrib.c	3.5	2008/01/21	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -687,6 +687,7 @@ int propidx;	/* special cases can have negative values */
 	static NEARDATA const char because_of[] = " because of %s";
 
 	if (propidx >= 0) {
+	    char *p;
 	    struct obj *obj = (struct obj *)0;
 	    int innate = is_innate(propidx);
 
@@ -696,9 +697,17 @@ int propidx;	/* special cases can have negative values */
 		Strcpy(buf, " innately");
 	    else if (wizard && (obj = what_gives(&u.uprops[propidx].extrinsic)))
 		Sprintf(buf, because_of,
-			(obj->oartifact) ? bare_artifactname(obj) : yname(obj));
+			obj->oartifact ? bare_artifactname(obj) :
+				ysimple_name(obj));
 	    else if (propidx == BLINDED && Blindfolded_only)
-		Sprintf(buf, because_of, yname(ublindf));
+		Sprintf(buf, because_of, ysimple_name(ublindf));
+
+	    /* remove some verbosity and/or redundancy */
+	    if ((p = strstri(buf, " pair of ")) != 0)
+		do ++p; while ((*p = *(p + 8)) != '\0');
+	    else if (propidx == STRANGLED &&
+		    (p = strstri(buf, " of strangulation")) != 0)
+		*p = '\0';
 
 	} else {	/* negative property index */
 	    /* if more blocking capabilities get implemented we'll need to
@@ -710,11 +719,11 @@ int propidx;	/* special cases can have negative values */
 		break;
 	    case INVIS:
 		if (u.uprops[INVIS].blocked & W_ARMC)
-		    Sprintf(buf, because_of, yname(uarmc)); /* mummy wrapping */
+		    Sprintf(buf, because_of, ysimple_name(uarmc)); /* mummy wrapping */
 		break;
 	    case CLAIRVOYANT:
 		if (wizard && (u.uprops[CLAIRVOYANT].blocked & W_ARMH))
-		    Sprintf(buf, because_of, yname(uarmh)); /* cornuthaum */
+		    Sprintf(buf, because_of, ysimple_name(uarmh)); /* cornuthaum */
 		break;
 	    }
 	}

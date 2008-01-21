@@ -8,6 +8,9 @@
 
 struct cmd Cmd = { 0 };		/* flag.h */
 
+extern const char *hu_stat[];	/* hunger status from eat.c */
+extern const char *enc_stat[];	/* encumbrance status from botl.c */
+
 #ifdef UNIX
 /*
  * Some systems may have getchar() return EOF for various reasons, and
@@ -161,6 +164,8 @@ STATIC_PTR boolean NDECL(minimal_enlightenment);
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *,char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
 STATIC_DCL void FDECL(enlght_halfdmg, (int,int));
+STATIC_DCL boolean NDECL(walking_on_water);
+STATIC_DCL boolean FDECL(cause_known, (int));
 
 static const char* readchar_queue="";
 static coord clicklook_cc;
@@ -1045,17 +1050,262 @@ int final;
 	enl_msg(You_, "take", "took", buf, from_what(category));
 }
 
+/* is hero actively using water walking capability on water (or lava)? */
+STATIC_OVL boolean
+walking_on_water()
+{
+	if (u.uinwater || Levitation || Flying) return FALSE;
+	return (Wwalking && (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)));
+}
+
+/* check whether hero is wearing something that player definitely knows
+   confers the target property; item must have been seen and its type
+   discovered but it doesn't necessarily have to be fully identified */
+STATIC_OVL boolean
+cause_known(propindx)
+int propindx;	/* index of a property which can be conveyed by worn item */
+{
+	register struct obj *o;
+	long mask = W_ARMOR | W_AMUL | W_RING | W_TOOL;
+
+	/* simpler than from_what()/what_gives(); we don't attempt to
+	   handle artifacts and we deliberately ignore wielded items */
+	for (o = invent; o; o = o->nobj) {
+	    if (!(o->owornmask & mask)) continue;
+	    if ((int)objects[o->otyp].oc_oprop == propindx &&
+		    objects[o->otyp].oc_name_known && o->dknown)
+		return TRUE;
+	}
+	return FALSE;
+}
+
 void
 enlightenment(mode, final)
 int mode;	/* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
 int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 {
-	int ltmp, armpro;
-	char buf[BUFSZ];
+	boolean magic = (mode & MAGICENLIGHTENMENT) ? TRUE : FALSE;
+	int cap, armpro, ltmp;
+	char buf[BUFSZ], youtoo[BUFSZ];
+#ifdef STEED
+	boolean Riding = (u.usteed &&
+			/* if hero dies while dismounting, u.usteed will still
+			   be set; we want to ignore steed in that situation */
+			!(final == ENL_GAMEOVERDEAD &&
+				!strcmp(killer.name, "riding accident")));
+	const char *steedname = !Riding ? (char *)0 :
+			x_monnam(u.usteed,
+				u.usteed->mtame ? ARTICLE_YOUR : ARTICLE_THE,
+				(char *)0, 
+				(SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION),
+				FALSE);
+#endif
 
 	en_win = create_nhwindow(NHW_MENU);
-	putstr(en_win, 0, final ? "Final Attributes:" : "Current Attributes:");
+
+	/*\
+	 * Status (many are abbreviated on bottom line; others are or   
+	 *	   should be discernible to the hero hence to the player)
+	\*/
+	putstr(en_win, 0, final ? "Final Status:" : "Current Status:");
+
+	Strcpy(youtoo, You_);
+	/* not a traditional status but inherently obvious to player;
+	   more detail provided below for magic enlightenment */
+	if (Upolyd) you_are("transformed", "");
+#ifdef STEED
+	/* not a trouble, but we want to display riding status before maybe
+	   reporting steed as trapped or hero stuck to cursed saddle */
+	if (Riding) {
+	    Sprintf(buf, "riding %s", steedname);
+	    you_are(buf, "");
+	    Sprintf(eos(youtoo), "and %s ", steedname);
+	}
+#endif	/*STEED*/
+	/* other movement situations that hero should always know */
+	if (Levitation) {
+	    if (Lev_at_will && magic)
+		you_are("levitating, at will", "");
+	    else
+		enl_msg(youtoo, are, were, "levitating", from_what(LEVITATION));
+	}
+	if (Flying) {
+	    if (Levitation)
+		you_can("also fly", from_what(FLYING));
+	    else
+		enl_msg(youtoo, are, were, "flying", from_what(FLYING));
+	}
+	if (Underwater) {
+	    you_are("underwater", "");
+	} else if (u.uinwater) {
+	    you_are(Swimming ? "swimming" : "in water", from_what(SWIMMING));
+	} else if (walking_on_water()) {
+	    /* show active Wwalking here, potential Wwalking elsewhere */
+	    Sprintf(buf, "walking on %s",
+		    is_pool(u.ux, u.uy) ? "water" :
+		    is_lava(u.ux, u.uy) ? "lava" :
+		    surface(u.ux, u.uy));	/* catchall; shouldn't happen */
+	    you_are(buf, from_what(WWALKING));
+	}
+	/* internal troubles, mostly in the order that prayer ranks them */
+	if (Stoned) you_are("turning to stone", "");
+	if (Slimed) you_are("turning into slime", "");
+	if (Strangled) {
+	    if (u.uburied) {
+		you_are("buried", "");
+	    } else {
+		Strcpy(buf, "being strangled");
+#ifdef WIZARD
+		if (wizard) Sprintf(eos(buf), " (%ld)", (Strangled & TIMEOUT));
+#endif
+		you_are(buf, from_what(STRANGLED));
+	    }
+	}
+	if (Sick) {
+	    /* prayer lumps these together; botl puts Ill before FoodPois */
+	    if (u.usick_type & SICK_NONVOMITABLE)
+		you_are("terminally sick from illness", "");
+	    if (u.usick_type & SICK_VOMITABLE)
+		you_are("terminally sick from food poisoning", "");
+	}
+	if (Vomiting) you_are("nauseated", "");
+	if (Stunned) you_are("stunned", "");
+	if (Confusion) you_are("confused", "");
+	if (Hallucination) you_are("hallucinating", "");
+	if (Blind) you_are("blind", from_what(BLINDED));
+	if (Deaf) you_are("deaf", from_what(DEAF));
+	/* external troubles, more or less */
+	if (Punished) {
+	    if (uball) {
+		Sprintf(buf, "chained to %s", ansimpleoname(uball));
+	    } else {
+		impossible("Punished without uball?");
+		Strcpy(buf, "punished");
+	    }
+	    you_are(buf, "");
+	}
+	if (u.utrap) {
+	    char predicament[BUFSZ];
+	    struct trap *t;
+	    boolean anchored = (u.utraptype == TT_BURIEDBALL);
+
+	    if (anchored) {
+		Strcpy(predicament, "tethered to something buried");
+	    } else if (u.utraptype == TT_INFLOOR || u.utraptype == TT_LAVA) {
+		Sprintf(predicament, "stuck in %s", the(surface(u.ux, u.uy)));
+	    } else {
+		Strcpy(predicament, "trapped");
+		if ((t = t_at(u.ux, u.uy)) != 0)
+		    Sprintf(eos(predicament), " in %s",
+			    an(defsyms[trap_to_defsym(t->ttyp)].explanation));
+	    }
+#ifdef STEED
+	    if (u.usteed) { /* not `Riding' here */
+		Sprintf(buf, "%s%s ", anchored ? "you and " : "", steedname);
+		*buf = highc(*buf);
+		enl_msg(buf, (anchored ? "are " : "is "),
+			(anchored ? "were " : "was "), predicament, "");
+	    } else
+#endif	/*STEED*/
+		you_are(predicament, "");
+	} /* (u.utrap) */
+	if (u.uswallow) {
+	    Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
+#ifdef WIZARD
+	    if (wizard) Sprintf(eos(buf), " (%u)", u.uswldtim);
+#endif
+	    you_are(buf, "");
+	} else if (u.ustuck) {
+	    Sprintf(buf, "%s %s",
+		    (Upolyd && sticks(youmonst.data)) ? "holding" : "held by",
+		    a_monnam(u.ustuck));
+	    you_are(buf, "");
+	}
+#ifdef STEED
+	if (Riding) {
+	    struct obj *saddle = which_armor(u.usteed, W_SADDLE);
+
+	    if (saddle && saddle->cursed) {
+		Sprintf(buf, "stuck to %s %s",
+			s_suffix(steedname), simpleonames(saddle));
+		you_are(buf, "");
+	    }
+	}
+#endif	/*STEED*/
+	if (Wounded_legs) {
+#ifdef STEED
+	    /* when mounted, Wounded_legs applies to steed rather than to
+	       hero; we only report steed's wounded legs in wizard mode */
+	    if (u.usteed) { /* not `Riding' here */
+# ifdef WIZARD
+		if (wizard) {
+		    Strcpy(buf, steedname);
+		    *buf = highc(*buf);
+		    enl_msg(buf, " has", " had", " wounded legs", "");
+		}
+# endif
+	    } else
+#endif	/*STEED*/
+	    {
+		Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
+		you_have(buf, "");
+	    }
+	}
+	if (Glib) {
+	    Sprintf(buf, "slippery %s", makeplural(body_part(FINGER)));
+	    you_have(buf, "");
+	}
+	if (Fumbling) {
+	    if (magic || cause_known(FUMBLING))
+		enl_msg(You_, "fumble", "fumbled", "", from_what(FUMBLING));
+	}
+	if (Sleeping) {
+	    if (magic || cause_known(SLEEPING))
+		enl_msg("You ", "fall", "fell", " asleep uncontrollably",
+			from_what(SLEEPING));
+	}
+	/* hunger/nutrition */
+	if (Hunger) {
+	    if (magic || cause_known(HUNGER))
+		enl_msg(You_, "hunger", "hungered", " rapidly",
+			from_what(HUNGER));
+	}
+	Strcpy(buf, hu_stat[u.uhs]); /* hunger status; omitted if "normal" */
+	mungspaces(buf);	/* strip trailing spaces */
+	if (*buf) {
+	    *buf = lowc(*buf);	/* override capitalization */
+	    if (!strcmp(buf, "weak"))
+		Strcat(buf, " from severe hunger");
+	    else if (!strncmp(buf, "faint", 5)) /* fainting, fainted */
+		Strcat(buf, " due to starvation");
+	    you_are(buf, "");
+	}
+	/* encumbrance */
+	if ((cap = near_capacity()) > UNENCUMBERED) {
+	    const char *adj = "?_?"; /* (should always get overridden) */
+
+	    Strcpy(buf, enc_stat[cap]);
+	    *buf = lowc(*buf);
+	    switch (cap) {
+	    case SLT_ENCUMBER: adj = "slightly"; break;		/* burdened */
+	    case MOD_ENCUMBER: adj = "moderately"; break;	/* stressed */
+	    case HVY_ENCUMBER: adj = "very"; break;		/* strained */
+	    case EXT_ENCUMBER: adj = "extremely"; break;	/* overtaxed */
+	    case OVERLOADED:   adj = "not possible"; break;
+	    }
+	    Sprintf(eos(buf), "; movement %s %s%s", !final ? "is" : "was",
+		    adj, (cap < OVERLOADED) ? " slowed" : "");
+	    you_are(buf, "");
+	} else {
+	    /* last resort entry, guarantees Status section is non-empty */
+	    you_are("unencumbered", "");
+	}
+
+	/*\
+	 *	Attributes
+	\*/
 	putstr(en_win, 0, "");
+	putstr(en_win, 0, final ? "Final Attributes:" : "Current Attributes:");
 
 #ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) {
@@ -1087,6 +1337,8 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 #endif
 
 	/*** Resistances to troubles ***/
+	if (Invulnerable) you_are("invulnerable",from_what(INVULNERABLE));
+	if (Antimagic) you_are("magic-protected",from_what(ANTIMAGIC));
 	if (Fire_resistance) you_are("fire resistant",from_what(FIRE_RES));
 	if (Cold_resistance) you_are("cold resistant",from_what(COLD_RES));
 	if (Sleep_resistance) you_are("sleep resistant",from_what(SLEEP_RES));
@@ -1094,61 +1346,16 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 		you_are("disintegration-resistant",from_what(DISINT_RES));
 	if (Shock_resistance) you_are("shock resistant",from_what(SHOCK_RES));
 	if (Poison_resistance) you_are("poison resistant",from_what(POISON_RES));
+	if (Acid_resistance) you_are("acid resistant",from_what(ACID_RES));
 	if (Drain_resistance)
 		you_are("level-drain resistant",from_what(DRAIN_RES));
 	if (Sick_resistance) you_are("immune to sickness",from_what(SICK_RES));
-	if (Antimagic) you_are("magic-protected",from_what(ANTIMAGIC));
-	if (Acid_resistance) you_are("acid resistant",from_what(ACID_RES));
 	if (Stone_resistance)
 		you_are("petrification resistant",from_what(STONE_RES));
-	if (Invulnerable) you_are("invulnerable",from_what(INVULNERABLE));
-	if (u.uedibility) you_can("recognize detrimental food","");
-
-	/*** Troubles ***/
 	if (Halluc_resistance)
-		enl_msg("You resist", "", "ed", " hallucinations",
+		enl_msg(You_, "resist", "resisted", " hallucinations",
 			from_what(HALLUC_RES));
-	if (final) {
-		if (Hallucination) you_are("hallucinating","");
-		if (Stunned) you_are("stunned","");
-		if (Confusion) you_are("confused","");
-		if (Blind) you_are("blind",from_what(BLINDED));
-		if (Deaf) you_are("deaf",from_what(DEAF));
-		if (Sick) {
-			if (u.usick_type & SICK_VOMITABLE)
-				you_are("sick from food poisoning","");
-			if (u.usick_type & SICK_NONVOMITABLE)
-				you_are("sick from illness","");
-		}
-	}
-	if (Stoned) you_are("turning to stone","");
-	if (Slimed) you_are("turning into slime","");
-	if (Strangled) you_are((u.uburied) ? "buried" : "being strangled","");
-	if (Vomiting) you_are("nauseated","");
-	if (Glib) {
-		Sprintf(buf, "slippery %s", makeplural(body_part(FINGER)));
-		you_have(buf,"");
-	}
-	if (Fumbling) enl_msg("You fumble", "", "d", "",from_what(FUMBLING));
-	if (Wounded_legs
-#ifdef STEED
-	    && !u.usteed
-#endif
-			  ) {
-		Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
-		you_have(buf,"");
-	}
-#if defined(WIZARD) && defined(STEED)
-	if (Wounded_legs && u.usteed && wizard) {
-	    Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0, 
-		    SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
-	    *buf = highc(*buf);
-	    enl_msg(buf, " has", " had", " wounded legs", "");
-	}
-#endif
-	if (Sleeping) enl_msg("You ", "fall", "fell", " asleep", "");
-	if (Hunger) enl_msg("You hunger", "", "ed", " rapidly", "");
-	if (Hate_silver) you_are("harmed by silver","");
+	if (u.uedibility) you_can("recognize detrimental food","");
 
 	/*** Vision and senses ***/
 	if (!Blind && (Blinded || !haseyes(youmonst.data)))
@@ -1230,36 +1437,15 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 	if (Teleportation) you_can("teleport",from_what(TELEPORT));
 	if (Teleport_control)
 		you_have("teleport control",from_what(TELEPORT_CONTROL));
-	if (Lev_at_will) you_are("levitating, at will", "");
-	else if (Levitation)
-		you_are("levitating",from_what(LEVITATION));	/* without control */
-	else if (Flying) you_can("fly",from_what(FLYING));
-	if (Wwalking) you_can("walk on water",from_what(WWALKING));
-	if (Swimming) you_can("swim",from_what(SWIMMING));
+	/* actively walking on water handled earlier as a status condition */
+	if (Wwalking && !walking_on_water())
+	    you_can("walk on water",from_what(WWALKING));
+	/* actively swimming (in water but not under it) handled earlier */
+	if (Swimming && (Underwater || !u.uinwater))
+	    you_can("swim",from_what(SWIMMING));
 	if (Breathless) you_can("survive without air",from_what(MAGICAL_BREATHING));
 	else if (Amphibious) you_can("breathe water",from_what(MAGICAL_BREATHING));
 	if (Passes_walls) you_can("walk through walls",from_what(PASSES_WALLS));
-#ifdef STEED
-	/* If you die while dismounting, u.usteed is still set.  Since several
-	 * places in the done() sequence depend on u.usteed, just detect this
-	 * special case. */
-	if (u.usteed && (final < 2 || strcmp(killer.name, "riding accident"))) {
-	    Sprintf(buf, "riding %s", y_monnam(u.usteed));
-	    you_are(buf,"");
-	}
-#endif
-	if (u.uswallow) {
-	    Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
-#ifdef WIZARD
-	    if (wizard) Sprintf(eos(buf), " (%u)", u.uswldtim);
-#endif
-	    you_are(buf,"");
-	} else if (u.ustuck) {
-	    Sprintf(buf, "%s %s",
-		    (Upolyd && sticks(youmonst.data)) ? "holding" : "held by",
-		    a_monnam(u.ustuck));
-	    you_are(buf,"");
-	}
 
 	/*** Physical attributes ***/
 	if (Regeneration)
@@ -1309,6 +1495,7 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 	    you_are(buf,"");
 	}
 	if (Unchanging) you_can("not change from your current form","");
+	if (Hate_silver) you_are("harmed by silver","");
 	if (Fast) you_are(Very_fast ? "very fast" : "fast",from_what(FAST));
 	if (Reflecting) you_have("reflection",from_what(REFLECTING));
 	if (Free_action) you_have("free action",from_what(FREE_ACTION));
@@ -1316,7 +1503,6 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 	if (Lifesaved)
 		enl_msg("Your life ", "will be", "would have been", " saved","");
 	if (u.twoweap) you_are("wielding two weapons at once","");
-	if (u.utraptype == TT_BURIEDBALL) you_are("fastened to a buried ball","");
 
 	/*** Miscellany ***/
 	if (Luck) {
