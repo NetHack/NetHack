@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2007/03/24	*/
+/*	SCCS Id: @(#)hack.h	3.5	2008/01/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -290,6 +290,13 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define EXPL_FIERY	5
 #define EXPL_FROSTY	6
 #define EXPL_MAX	7
+
+/* enlightenment control flags */
+#define BASICENLIGHTENMENT	1	/* show mundane stuff */
+#define MAGICENLIGHTENMENT	2	/* show intrinsics and such */
+#define ENL_GAMEINPROGRESS	0
+#define ENL_GAMEOVERALIVE	1	/* ascension, escape, quit, trickery */
+#define ENL_GAMEOVERDEAD	2
 
 /* Macros for messages referring to hands, eyes, feet, etc... */
 #define ARM 0

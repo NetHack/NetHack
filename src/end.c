@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.5	2007/05/12	*/
+/*	SCCS Id: @(#)end.c	3.5	2008/01/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -398,7 +398,8 @@ boolean taken;
 	    c = ask ? yn_function("Do you want to see your attributes?",
 				  ynqchars, defquery) : defquery;
 	    if (c == 'y')
-		enlightenment(how >= PANICKED ? 1 : 2); /* final */
+		enlightenment((BASICENLIGHTENMENT|MAGICENLIGHTENMENT),
+		    (how >= PANICKED) ? ENL_GAMEOVERALIVE : ENL_GAMEOVERDEAD);
 	    if (c == 'q') done_stopprint++;
 	}
 

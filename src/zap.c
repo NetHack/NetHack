@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2007/05/30	*/
+/*	SCCS Id: @(#)zap.c	3.5	2008/01/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1971,7 +1971,7 @@ register struct obj *obj;
 			known = TRUE;
 			You_feel("self-knowledgeable...");
 			display_nhwindow(WIN_MESSAGE, FALSE);
-			enlightenment(FALSE);
+			enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
 			pline_The("feeling subsides.");
 			exercise(A_WIS, TRUE);
 			break;

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2007/05/05	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2008/01/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -960,7 +960,7 @@ wiz_rumor_check(VOID_ARGS)
 
 
 /* -enlightenment and conduct- */
-static winid en_win;
+static winid en_win = WIN_ERR;
 static const char
 	You_[] = "You ",
 	are[]  = "are ",  were[]  = "were ",
@@ -1046,8 +1046,9 @@ int final;
 }
 
 void
-enlightenment(final)
-int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
+enlightenment(mode, final)
+int mode;	/* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
+int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 {
 	int ltmp, armpro;
 	char buf[BUFSZ];
@@ -1397,6 +1398,7 @@ int final;	/* 0 => still in progress; 1 => over, survived; 2 => dead */
 
 	display_nhwindow(en_win, TRUE);
 	destroy_nhwindow(en_win);
+	en_win = WIN_ERR;
 	return;
 }
 
@@ -1511,7 +1513,7 @@ doattributes(VOID_ARGS)
 	if (!minimal_enlightenment())
 		return 0;
 	if (wizard || discover)
-		enlightenment(0);
+		enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
 	return 0;
 }
 
@@ -1614,6 +1616,7 @@ int final;
 	/* Pop up the window and wait for a key */
 	display_nhwindow(en_win, TRUE);
 	destroy_nhwindow(en_win);
+	en_win = WIN_ERR;
 }
 
 #ifndef M

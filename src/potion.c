@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2007/05/29	*/
+/*	SCCS Id: @(#)potion.c	3.5	2008/01/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -583,7 +583,7 @@ peffects(otmp)
 			}
 			You_feel("self-knowledgeable...");
 			display_nhwindow(WIN_MESSAGE, FALSE);
-			enlightenment(0);
+			enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
 			pline_The("feeling subsides.");
 			exercise(A_WIS, TRUE);
 		}

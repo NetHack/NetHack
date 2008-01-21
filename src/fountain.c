@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)fountain.c	3.5	2006/05/08	*/
+/*	SCCS Id: @(#)fountain.c	3.5	2008/01/19	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -239,7 +239,7 @@ drinkfountain()
 
 			You_feel("self-knowledgeable...");
 			display_nhwindow(WIN_MESSAGE, FALSE);
-			enlightenment(0);
+			enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
 			exercise(A_WIS, TRUE);
 			pline_The("feeling subsides.");
 			break;

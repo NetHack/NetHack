@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.5	2007/06/27	*/
+/*	SCCS Id: @(#)extern.h	3.5	2008/01/19	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -194,7 +194,7 @@ E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
 E int NDECL(extcmd_via_menu);
 E int NDECL(enter_explore_mode);
-E void FDECL(enlightenment, (int));
+E void FDECL(enlightenment, (int,int));
 E void FDECL(show_conduct, (int));
 E int FDECL(xytod, (SCHAR_P,SCHAR_P));
 E void FDECL(dtoxy, (coord *,int));
