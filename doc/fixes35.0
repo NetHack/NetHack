@@ -389,6 +389,8 @@ attempting to read "dull" spellbook might cause hero to fall asleep
 dipping prompt is more precise
 using F to attack wall/boulder/statue while wielding pick digs/breaks target
 shapechangers shouldn't receive starting inventory of their initial shape
+streamline old ^X output and integrate it with enlightenment feedback;
+	new ^X output includes expanded form of abbreviated bottom line info
 
 
 Platform- and/or Interface-Specific New Features

@@ -159,13 +159,18 @@ STATIC_DCL char FDECL(cmd_from_func, (int NDECL((*))));
 # endif /* WIZARD */
 STATIC_PTR int NDECL(doattributes);
 STATIC_PTR int NDECL(doconduct); /**/
-STATIC_PTR boolean NDECL(minimal_enlightenment);
 
 STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *,char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
 STATIC_DCL void FDECL(enlght_halfdmg, (int,int));
 STATIC_DCL boolean NDECL(walking_on_water);
 STATIC_DCL boolean FDECL(cause_known, (int));
+STATIC_DCL char *FDECL(attrval, (int,int,char *));
+STATIC_DCL void FDECL(background_enlightenment, (int,int));
+STATIC_DCL void FDECL(characteristics_enlightenment, (int,int));
+STATIC_DCL void FDECL(one_characteristic, (int,int,int));
+STATIC_DCL void FDECL(status_enlightenment, (int,int));
+STATIC_DCL void FDECL(attributes_enlightenment, (int,int));
 
 static const char* readchar_queue="";
 static coord clicklook_cc;
@@ -1079,13 +1084,249 @@ int propindx;	/* index of a property which can be conveyed by worn item */
 	return FALSE;
 }
 
+/* format a characteristic value, accommodating Strength's strangeness */
+STATIC_OVL char *
+attrval(attrindx, attrval, resultbuf)
+int attrindx, attrval;
+char resultbuf[];	/* should be at least [7] to hold "18/100\0" */
+{
+	if (attrindx != A_STR || attrval <= 18)
+	    Sprintf(resultbuf, "%d", attrval);
+	else if (attrval > STR18(100))	/* 19 to 25 */
+	    Sprintf(resultbuf, "%d", attrval - 100);
+	else	/* simplify "18/**" to be "18/100" */
+	    Sprintf(resultbuf, "18/%02d", attrval - 18);
+	return resultbuf;
+}
+
 void
 enlightenment(mode, final)
 int mode;	/* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
 int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 {
+    char buf[BUFSZ], tmpbuf[BUFSZ];
+
+    Strcpy(tmpbuf, plname);
+    *tmpbuf = highc(*tmpbuf);	/* same adjustment as bottom line */
+    Sprintf(buf, "__ %s the %s __", tmpbuf,
+	    (flags.female && urole.name.f) ? urole.name.f : urole.name.m);
+
+    en_win = create_nhwindow(NHW_MENU);
+    /* title */
+    putstr(en_win, 0, buf);	/* "__ Conan the Archeologist __" */
+    /* background and characteristics; ^X or end-of-game disclosure */
+    if (mode & BASICENLIGHTENMENT) {
+	/* role, race, alignment, deities */
+	background_enlightenment(mode, final);
+	/* strength, dexterity, &c */
+	characteristics_enlightenment(mode, final);
+    }
+    /* expanded status line information, including things which aren't
+       included there due to space considerations--such as obvious
+       alternative movement indicators (riding, levitation, &c), and
+       various troubles (turning to stone, trapped, confusion, &c);
+       shown for both basic and magic enlightenment */
+    status_enlightenment(mode, final);
+    /* remaining attributes; shown for potion,&c or wizard mode and
+       explore mode ^X or end of game disclosure */
+    if (mode & MAGICENLIGHTENMENT) {
+	/* intrinsics and other traditional enlightenment feedback */
+	attributes_enlightenment(mode, final);
+    }
+    display_nhwindow(en_win, TRUE);
+    destroy_nhwindow(en_win);
+    en_win = WIN_ERR;
+}
+
+/*ARGSUSED*/
+/* display role, race, alignment and such to en_win */
+STATIC_OVL void
+background_enlightenment(unused_mode, final)
+int unused_mode;	/* not used */
+int final;
+{
+    const char *role_titl, *rank_titl;
+    int difgend, difalgn;
+    char buf[BUFSZ], tmpbuf[BUFSZ];
+
+    role_titl = (flags.female && urole.name.f) ? urole.name.f : urole.name.m;
+    rank_titl = rank_of(u.ulevel, Role_switch, flags.female);
+
+    putstr(en_win, 0, "");	/* separator after title */
+    putstr(en_win, 0, "Background:");
+
+    /* if polymorphed, report current shape before underlying role;
+       will be repeated as first status: "you are transformed" and also
+       among various attributes: "you are in beast form" (after being
+       told about lycanthropy) or "you are polymorphed into <a foo>"
+       (with countdown timer appended for wizard mode); we really want
+       the player to know he's not a samurai at the moment... */
+    if (Upolyd) {
+	struct permonst *uasmon = youmonst.data;
+
+	tmpbuf[0] = '\0';
+	if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon))
+	    Sprintf(tmpbuf, "%s ", genders[u.mfemale ? 1 : 0].adj);
+	Sprintf(buf, "%sin %s%s form",
+		!final ? "currently " : "", tmpbuf, uasmon->mname);
+	you_are(buf, "");
+    }
+
+    /* report role; omit gender if it's redundant (eg, "female priestess") */
+    tmpbuf[0] = '\0';
+    if (!urole.name.f &&
+	    ((urole.allow & ROLE_GENDMASK) == (ROLE_MALE|ROLE_FEMALE) ||
+		flags.female != flags.initgend))
+	Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
+    buf[0] = '\0';
+    if (Upolyd) Strcpy(buf, "actually ");	/* "You are actually a ..." */
+    if (!strcmpi(rank_titl, role_titl)) {
+	/* omit role when rank title matches it */
+	Sprintf(eos(buf), "%s, level %d %s%s",
+		an(rank_titl), u.ulevel, tmpbuf, urace.noun);
+    } else {
+	Sprintf(eos(buf), "%s, a level %d %s%s %s",
+		an(rank_titl), u.ulevel, tmpbuf, urace.adj, role_titl);
+    }
+    you_are(buf, "");
+
+    /* report alignment (bypass you_are() in order to omit ending period) */
+    Sprintf(buf, "You %s%s, %son a mission for %s",
+	    !final ? are : were, align_str(u.ualign.type),
+	    /* helm of opposite alignment (might hide conversion) */
+	    (u.ualign.type != u.ualignbase[A_CURRENT]) ? "temporarily " :
+	      /* permanent conversion */
+	      (u.ualign.type != u.ualignbase[A_ORIGINAL]) ? "now " :
+		/* athiest (ignored in very early game); lastly, normal case */
+		(!u.uconduct.gnostic && moves > 1000L) ? "nominally " : "",
+	    u_gname());
+    putstr(en_win, 0, buf);
+    /* show the rest of this game's pantheon (finishes previous sentence)
+       [appending "also Moloch" at the end would allow for straightforward
+       trailing "and" on all three aligned entries but looks too verbose] */
+    Sprintf(buf, "who %s opposed by", !final ? "is" : "was");
+    if (u.ualign.type != A_LAWFUL)
+	Sprintf(eos(buf), " %s (%s) and",
+		align_gname(A_LAWFUL), align_str(A_LAWFUL));
+    if (u.ualign.type != A_NEUTRAL)
+	Sprintf(eos(buf), " %s (%s)%s",
+		align_gname(A_NEUTRAL), align_str(A_NEUTRAL),
+		(u.ualign.type != A_CHAOTIC) ? " and" : "");
+    if (u.ualign.type != A_CHAOTIC)
+	Sprintf(eos(buf), " %s (%s)",
+		align_gname(A_CHAOTIC), align_str(A_CHAOTIC));
+    Strcat(buf, ".");		/* terminate sentence */
+    putstr(en_win, 0, buf);
+
+    /* show original alignment,gender,race,role if any have been changed;
+       giving separate message for temporary alignment change bypasses need
+       for tricky phrasing otherwise necessitated by possibility of having
+       helm of opposite alignment mask a permanent alignment conversion */
+    difgend = (flags.female != flags.initgend);
+    difalgn = ((u.ualign.type != u.ualignbase[A_CURRENT]) ? 1 : 0)
+	    + ((u.ualignbase[A_CURRENT] != u.ualignbase[A_ORIGINAL]) ? 2 : 0);
+    if (difalgn & 1) {	/* have temporary alignment so report permanent one */
+	Sprintf(buf, "actually %s", align_str(u.ualignbase[A_CURRENT]));
+	you_are(buf, "");
+	difalgn &= ~1;	/* suppress helm from "started out <foo>" message */
+    }
+    if (difgend || difalgn) {	/* sex change or perm align change or both */
+	Sprintf(buf, "You started out %s%s%s.",
+		difgend ? genders[flags.initgend].adj : "",
+		(difgend && difalgn) ? " and " : "",
+		difalgn ? align_str(u.ualignbase[A_ORIGINAL]) : "");
+	putstr(en_win, 0, buf);
+    }
+}
+
+/* characteristics: expanded version of bottom line strength, dexterity, &c */
+STATIC_OVL void
+characteristics_enlightenment(mode, final)
+int mode;
+int final;
+{
+    putstr(en_win, 0, "");	/* separator after background */
+    putstr(en_win, 0,
+	   final ? "Final Characteristics:" : "Current Characteristics:");
+
+    /* bottom line order */
+    one_characteristic(mode, final, A_STR);	/* strength */
+    one_characteristic(mode, final, A_DEX);	/* dexterity */
+    one_characteristic(mode, final, A_CON);	/* constitution */
+    one_characteristic(mode, final, A_INT);	/* intelligence */
+    one_characteristic(mode, final, A_WIS);	/* wisdom */
+    one_characteristic(mode, final, A_CHA);	/* charisma */
+}
+
+/* display one attribute value for characteristics_enlightenment() */
+STATIC_OVL void
+one_characteristic(mode, final, attrindx) 
+int mode, final, attrindx;
+{
+    boolean hide_innate_value;
+    int acurrent, abase, apeak, alimit;
+    const char *attrname;
+    char buf[BUFSZ], valstring[32];
+
+    hide_innate_value = Upolyd || Fixed_abil;
+    switch (attrindx) {
+    case A_STR: attrname = "Strength";
+		if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER &&
+		    uarmg->cursed) hide_innate_value = TRUE;
+		break;
+    case A_DEX: attrname = "Dexterity";
+		break;
+    case A_CON: attrname = "Constitution";
+		break;
+    case A_INT: attrname = "Intelligence";
+		if (uarmh && uarmh->otyp == DUNCE_CAP && uarmh->cursed)
+		    hide_innate_value = TRUE;
+		break;
+    case A_WIS: attrname = "Wisdom";
+		if (uarmh && uarmh->otyp == DUNCE_CAP && uarmh->cursed)
+		    hide_innate_value = TRUE;
+		break;
+    case A_CHA: attrname = "Charisma";
+		break;
+    default: return;		/* impossible */
+    };
+    if (mode & MAGICENLIGHTENMENT) hide_innate_value = FALSE;
+
+    acurrent = ACURR(attrindx);
+    Sprintf(buf, "%s = %s", attrname,
+	    attrval(attrindx, acurrent, valstring));
+
+    if (!hide_innate_value) {
+	/* show abase, amax, and attrmax if acurr doesn't match abase
+	   (magic bonus or penalty) or abase doesn't match amax (poison
+	   or exercised abuse) or attrmax is different from normal human */
+	abase = ABASE(attrindx);
+	apeak = AMAX(attrindx);
+	alimit = ATTRMAX(attrindx);
+	if (acurrent != abase || abase != apeak ||
+		/* show if limit is not standard value for a human hero */
+		alimit != (attrindx != A_STR ? 18 : STR18(100))) {
+	    /* separate attrval() calls; we overwrite valstring[] each time */
+	    Sprintf(eos(buf), " (%s; base:%s",
+		    final ? "final" : "current",
+		    attrval(attrindx, abase, valstring));
+	    Sprintf(eos(buf), ", peak:%s",
+		    attrval(attrindx, apeak, valstring));
+	    Sprintf(eos(buf), ", maximum:%s)",
+		    attrval(attrindx, alimit, valstring));
+	}
+    }
+    putstr(en_win, 0, buf);
+}
+
+/* status: selected obvious capabilities, assorted troubles */
+STATIC_OVL void
+status_enlightenment(mode, final)
+int mode;
+int final;
+{
 	boolean magic = (mode & MAGICENLIGHTENMENT) ? TRUE : FALSE;
-	int cap, armpro, ltmp;
+	int cap;
 	char buf[BUFSZ], youtoo[BUFSZ];
 #ifdef STEED
 	boolean Riding = (u.usteed &&
@@ -1101,17 +1342,16 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 				FALSE);
 #endif
 
-	en_win = create_nhwindow(NHW_MENU);
-
 	/*\
 	 * Status (many are abbreviated on bottom line; others are or   
 	 *	   should be discernible to the hero hence to the player)
 	\*/
+	putstr(en_win, 0, "");	/* separator after title or characteristics */
 	putstr(en_win, 0, final ? "Final Status:" : "Current Status:");
 
 	Strcpy(youtoo, You_);
-	/* not a traditional status but inherently obvious to player;
-	   more detail provided below for magic enlightenment */
+	/* not a traditional status but inherently obvious to player; more
+	   detail given below (attributes section) for magic enlightenment */
 	if (Upolyd) you_are("transformed", "");
 #ifdef STEED
 	/* not a trouble, but we want to display riding status before maybe
@@ -1300,6 +1540,16 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 	    /* last resort entry, guarantees Status section is non-empty */
 	    you_are("unencumbered", "");
 	}
+}
+
+/* attributes: intrinsics and the like, other non-obvious capabilities */
+void
+attributes_enlightenment(mode, final)
+int mode;
+int final;
+{
+	int ltmp, armpro;
+	char buf[BUFSZ];
 
 	/*\
 	 *	Attributes
@@ -1443,8 +1693,10 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 	/* actively swimming (in water but not under it) handled earlier */
 	if (Swimming && (Underwater || !u.uinwater))
 	    you_can("swim",from_what(SWIMMING));
-	if (Breathless) you_can("survive without air",from_what(MAGICAL_BREATHING));
-	else if (Amphibious) you_can("breathe water",from_what(MAGICAL_BREATHING));
+	if (Breathless)
+	    you_can("survive without air",from_what(MAGICAL_BREATHING));
+	else if (Amphibious)
+	    you_can("breathe water",from_what(MAGICAL_BREATHING));
 	if (Passes_walls) you_can("walk through walls",from_what(PASSES_WALLS));
 
 	/*** Physical attributes ***/
@@ -1581,12 +1833,10 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 	}
 	if (p) enl_msg(You_, "have been killed ", p, buf, "");
     }
-
-	display_nhwindow(en_win, TRUE);
-	destroy_nhwindow(en_win);
-	en_win = WIN_ERR;
-	return;
 }
+
+#if 0	/* no longer used */
+STATIC_DCL boolean NDECL(minimal_enlightenment);
 
 /*
  * Courtesy function for non-debug, non-explorer mode players
@@ -1691,15 +1941,18 @@ minimal_enlightenment()
 	destroy_nhwindow(tmpwin);
 	return (n != -1);
 }
+#endif	/*0*/
 
 /* ^X command */
 STATIC_PTR int
 doattributes(VOID_ARGS)
 {
-	if (!minimal_enlightenment())
-		return 0;
-	if (wizard || discover)
-		enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
+	int mode = BASICENLIGHTENMENT;
+
+	/* show more--as if final disclosure--for wizard and explore modes */
+	if (wizard || discover) mode |= MAGICENLIGHTENMENT;
+
+	enlightenment(mode, ENL_GAMEINPROGRESS);
 	return 0;
 }
 
