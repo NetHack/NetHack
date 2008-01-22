@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2007/05/29	*/
+/*	SCCS Id: @(#)pray.c	3.5	2008/01/21	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1439,7 +1439,6 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 		    /* Beware, Conversion is costly */
 		    change_luck(-3);
 		    u.ublesscnt += 300;
-		    adjalign((int)(u.ualignbase[A_ORIGINAL] * (ALIGNLIM / 2)));
 		} else {
 		    u.ugangr += 3;
 		    adjalign(-5);

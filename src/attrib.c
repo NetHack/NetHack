@@ -704,7 +704,7 @@ int propidx;	/* special cases can have negative values */
 
 	    /* remove some verbosity and/or redundancy */
 	    if ((p = strstri(buf, " pair of ")) != 0)
-		do ++p; while ((*p = *(p + 8)) != '\0');
+		copynchars(p + 1, p + 9, BUFSZ); /* overlapping buffers ok */
 	    else if (propidx == STRANGLED &&
 		    (p = strstri(buf, " of strangulation")) != 0)
 		*p = '\0';
@@ -948,7 +948,10 @@ int reason;	/* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
 		 "back in sync with your body");
     }
 
-    if (u.ualign.type != oldalign) retouch_equipment(0);
+    if (u.ualign.type != oldalign) {
+	u.ualign.record = 0;	/* slate is wiped clean */
+	retouch_equipment(0);
+    }
 }
 
 /*attrib.c*/
