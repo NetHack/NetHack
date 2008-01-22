@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.c	3.5	2007/07/13	*/
+/*	SCCS Id: @(#)hack.c	3.5	2008/01/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,7 @@ STATIC_DCL int FDECL(still_chewing,(XCHAR_P,XCHAR_P));
 STATIC_DCL void NDECL(dosinkfall);
 #endif
 STATIC_DCL boolean FDECL(findtravelpath, (BOOLEAN_P));
+STATIC_DCL boolean FDECL(trapmove, (int,int,struct trap *));
 STATIC_DCL struct monst *FDECL(monstinroom, (struct permonst *,int));
 STATIC_DCL boolean FDECL(doorless_door, (int,int));
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
@@ -782,7 +783,7 @@ wiz_debug_cmd() /* in this case, toggle display of travel debug info */
  * inaccessible locations as valid intermediate path points.
  * Returns TRUE if a path was found.
  */
-static boolean
+STATIC_OVL boolean
 findtravelpath(guess)
 boolean guess;
 {
@@ -963,6 +964,136 @@ found:
     return FALSE;
 }
 
+/* try to escape being stuck in a trapped state by walking out of it;
+   return true iff moving should continue to intended destination
+   (all failures and most successful escapes leave hero at original spot) */
+STATIC_OVL boolean
+trapmove(x, y, desttrap)
+int x, y;	/* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
+struct trap *desttrap;	/* nonnull if another trap at <x,y> */
+{
+    boolean anchored;
+    const char *predicament, *culprit;
+#ifdef STEED
+    char *steedname = !u.usteed ? (char *)0 : y_monnam(u.usteed);
+#endif
+
+    if (!u.utrap) return TRUE;	/* sanity check */
+
+    switch (u.utraptype) {
+    case TT_BEARTRAP:
+	    if (flags.verbose) {
+		predicament = "caught in a bear trap";
+#ifdef STEED
+		if (u.usteed)
+		    Norep("%s is %s.", upstart(steedname), predicament);
+		else
+#endif
+		    Norep("You are %s.", predicament);
+	    }
+	    /* [why does diagonal movement give quickest escape?] */
+	    if ((u.dx && u.dy) || !rn2(5)) u.utrap--;
+	    break;
+    case TT_PIT:
+	    if (desttrap && desttrap->tseen &&
+		    (desttrap->ttyp == PIT || desttrap->ttyp == SPIKED_PIT))
+		return TRUE;		/* move into adjacent pit */
+	    /* try to escape; position stays same regardless of success */
+	    climb_pit();
+	    break;
+    case TT_WEB:
+	    if (uwep && uwep->oartifact == ART_STING) {
+		u.utrap = 0;
+		pline("Sting cuts through the web!");
+		break;		/* escape trap but don't move */
+	    }
+	    if (--u.utrap) {
+		if (flags.verbose) {
+		    predicament = "stuck to the web";
+#ifdef STEED
+		    if (u.usteed)
+			Norep("%s is %s.", upstart(steedname), predicament);
+		    else
+#endif
+			Norep("You are %s.", predicament);
+		}
+	    } else {
+#ifdef STEED
+		if (u.usteed)
+		    pline("%s breaks out of the web.", upstart(steedname));
+		else
+#endif
+		    You("disentangle yourself.");
+	    }
+	    break;
+    case TT_LAVA:
+	    if (flags.verbose) {
+		predicament = "stuck in the lava";
+#ifdef STEED
+		if (u.usteed)
+		    Norep("%s is %s.", upstart(steedname), predicament);
+		else
+#endif
+		    Norep("You are %s.", predicament);
+	    }
+	    if (!is_lava(x, y)) {
+		u.utrap--;
+		if ((u.utrap & 0xff) == 0) {
+		    u.utrap = 0;
+#ifdef STEED
+		    if (u.usteed)
+			You("lead %s to the edge of the lava.", steedname);
+		    else
+#endif
+			You("pull yourself to the edge of the lava.");
+		}
+	    }
+	    u.umoved = TRUE;
+	    break;
+    case TT_INFLOOR:
+    case TT_BURIEDBALL:
+	    anchored = (u.utraptype == TT_BURIEDBALL);
+	    if (--u.utrap) {
+		if (flags.verbose) {
+		    if (anchored) {
+			predicament = "chained to the";
+			culprit = "buried ball";
+		    } else {
+			predicament = "stuck in the";
+			culprit = surface(u.ux, u.uy);
+		    }
+#ifdef STEED
+		    if (u.usteed) {
+			if (anchored)
+			    Norep("You and %s are %s %s.", steedname,
+				  predicament, culprit);
+			else
+			    Norep("%s is %s %s.", upstart(steedname),
+				  predicament, culprit);
+		    } else
+#endif
+			Norep("You are %s %s.", predicament, culprit);
+		}
+	    } else {
+#ifdef STEED
+		if (u.usteed)
+		    pline("%s finally %s free.", upstart(steedname),
+			  !anchored ? "lurches" : "wrenches the ball");
+		else
+#endif
+		    You("finally %s free.",
+			!anchored ? "wriggle" : "wrench the ball");
+		if (anchored)
+		    buried_ball_to_punishment();
+	    }
+	    break;
+    default:
+	    impossible("trapmove: stuck in unknown trap? (%s)", u.utraptype);
+	    break;
+    }
+    return FALSE;
+}
+
 void
 domove()
 {
@@ -971,11 +1102,10 @@ domove()
 	register xchar x,y;
 	struct trap *trap;
 	int wtcap;
-	boolean on_ice, adj_pit = FALSE;
+	boolean on_ice;
 	xchar chainx, chainy, ballx, bally;	/* ball&chain new positions */
 	int bc_control;				/* control for ball&chain */
 	boolean cause_delay = FALSE;	/* dragging ball will skip a move */
-	const char *predicament;
 
 	u_wipe_engr(rnd(5));
 
@@ -1273,108 +1403,7 @@ domove()
 		return;
 	}
 	if(u.utrap) {
-		if(u.utraptype == TT_PIT) {
-		    if (trap && trap->tseen &&
-			(trap->ttyp == PIT || trap->ttyp == SPIKED_PIT))
-			adj_pit = TRUE;
-		    if (!adj_pit) climb_pit();
-		} else if (u.utraptype == TT_LAVA) {
-		    if(flags.verbose) {
-			predicament = "stuck in the lava";
-#ifdef STEED
-			if (u.usteed)
-			    Norep("%s is %s.", upstart(y_monnam(u.usteed)),
-				  predicament);
-			else
-#endif
-			Norep("You are %s.", predicament);
-		    }
-		    if(!is_lava(x,y)) {
-			u.utrap--;
-			if((u.utrap & 0xff) == 0) {
-#ifdef STEED
-			    if (u.usteed)
-				You("lead %s to the edge of the lava.",
-				    y_monnam(u.usteed));
-			    else
-#endif
-			     You("pull yourself to the edge of the lava.");
-			    u.utrap = 0;
-			}
-		    }
-		    u.umoved = TRUE;
-		} else if (u.utraptype == TT_WEB) {
-		    if(uwep && uwep->oartifact == ART_STING) {
-			u.utrap = 0;
-			pline("Sting cuts through the web!");
-			return;
-		    }
-		    if(--u.utrap) {
-			if(flags.verbose) {
-			    predicament = "stuck to the web";
-#ifdef STEED
-			    if (u.usteed)
-				Norep("%s is %s.", upstart(y_monnam(u.usteed)),
-				      predicament);
-			    else
-#endif
-			    Norep("You are %s.", predicament);
-			}
-		    } else {
-#ifdef STEED
-			if (u.usteed)
-			    pline("%s breaks out of the web.",
-				  upstart(y_monnam(u.usteed)));
-			else
-#endif
-			You("disentangle yourself.");
-		    }
-		} else if (u.utraptype == TT_INFLOOR ||
-			   u.utraptype == TT_BURIEDBALL) {
-		    if(--u.utrap) {
-			if(flags.verbose) {
-			    predicament = (u.utraptype == TT_INFLOOR) ?
-					"stuck in the" : "attached to the";
-#ifdef STEED
-			    if (u.usteed)
-				Norep("%s is %s %s.",
-				      upstart(y_monnam(u.usteed)),
-				      predicament,
-				      (u.utraptype == TT_INFLOOR) ?
-					surface(u.ux, u.uy) : "buried ball");
-			    else
-#endif
-			    Norep("You are %s %s.", predicament,
-			    	  (u.utraptype == TT_INFLOOR) ?
-				  surface(u.ux, u.uy) : "buried ball");
-			}
-		    } else {
-#ifdef STEED
-			if (u.usteed)
-			    pline("%s finally wiggles free.",
-				  upstart(y_monnam(u.usteed)));
-			else
-#endif
-			You("finally wiggle %s.",
-				u.utraptype == TT_INFLOOR ?
-				"free" : "the ball free");
-			if (u.utraptype == TT_BURIEDBALL)
-				buried_ball_to_punishment();
-		    }
-		} else {
-		    if(flags.verbose) {
-			predicament = "caught in a bear trap";
-#ifdef STEED
-			if (u.usteed)
-			    Norep("%s is %s.", upstart(y_monnam(u.usteed)),
-				  predicament);
-			else
-#endif
-			Norep("You are %s.", predicament);
-		    }
-		    if((u.dx && u.dy) || !rn2(5)) u.utrap--;
-		}
-		if (!adj_pit) return;
+	    if (!trapmove(x, y, trap)) return;
 	}
 
 	if (!test_move(u.ux, u.uy, x-u.ux, y-u.uy, DO_MOVE)) {
