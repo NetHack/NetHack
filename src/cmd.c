@@ -1263,12 +1263,33 @@ STATIC_OVL void
 one_characteristic(mode, final, attrindx) 
 int mode, final, attrindx;
 {
-    boolean hide_innate_value;
+    boolean hide_innate_value = FALSE;
     int acurrent, abase, apeak, alimit;
     const char *attrname;
     char buf[BUFSZ], valstring[32];
 
-    hide_innate_value = Upolyd || Fixed_abil;
+    /* being polymorphed or wearing certain cursed items prevents
+       hero from reliably tracking changes to characteristics so
+       we don't show base & peak values then; when the items aren't
+       cursed, hero could take them off to check underlying values
+       and we show those in such case so that player doesn't need
+       to actually resort to doing that */
+    if (Upolyd) {
+	hide_innate_value = TRUE;
+    } else if (Fixed_abil) {
+	struct obj *o;
+
+	if ((uleft && uleft->otyp == RIN_SUSTAIN_ABILITY && uleft->cursed) ||
+	 (uright && uright->otyp == RIN_SUSTAIN_ABILITY && uright->cursed) ||
+		/* suboptimal--won't work if someone adds a new item
+		   conferring fixed abilities and hero wears both it and
+		   non-cursed ring of same and what_gives() happens to
+		   find the ring first--but perhaps better than ignoring
+		   the possibility of adding such an item at all */
+		((o = what_gives(&Fixed_abil)) != 0 &&
+		 (o->owornmask & (W_ARMOR|W_AMUL|W_TOOL)) && o->cursed))
+	    hide_innate_value = TRUE;
+    }
     switch (attrindx) {
     case A_STR: attrname = "Strength";
 		if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER &&
@@ -1290,7 +1311,7 @@ int mode, final, attrindx;
 		break;
     default: return;		/* impossible */
     };
-    if (mode & MAGICENLIGHTENMENT) hide_innate_value = FALSE;
+    if ((mode & MAGICENLIGHTENMENT) && !Upolyd) hide_innate_value = FALSE;
 
     acurrent = ACURR(attrindx);
     Sprintf(buf, "%s = %s", attrname,
