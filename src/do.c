@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do.c	3.5	2007/05/21	*/
+/*	SCCS Id: @(#)do.c	3.5	2008/01/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1043,6 +1043,10 @@ boolean at_stairs, falling, portal;
 	}
 
 	if (on_level(newlevel, &u.uz)) return;		/* this can happen */
+
+	/* tethered movement makes level change while trapped feasible */
+	if (u.utrap && u.utraptype == TT_BURIEDBALL)
+	    buried_ball_to_punishment(); /* (before we save/leave old level) */
 
 	fd = currentlevel_rewrite();
 	if (fd < 0) return;

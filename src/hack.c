@@ -1053,6 +1053,23 @@ struct trap *desttrap;	/* nonnull if another trap at <x,y> */
     case TT_INFLOOR:
     case TT_BURIEDBALL:
 	    anchored = (u.utraptype == TT_BURIEDBALL);
+	    if (anchored) {
+		coord cc;
+
+		cc.x = u.ux, cc.y = u.uy;
+		/* can move normally within radius 1 of buried ball */
+		if (buried_ball(&cc) && dist2(x, y, cc.x, cc.y) <= 2) {
+		    /* ugly hack: we need to issue some message here
+		       in case "you are chained to the buried ball"
+		       was the most recent message given, otherwise
+		       our next attempt to move out of tether range
+		       after this successful move would have its
+		       can't-do-that message suppressed by Norep */
+		    if (flags.verbose)
+			Norep("You move within the chain's reach.");
+		    return TRUE;
+		}
+	    }
 	    if (--u.utrap) {
 		if (flags.verbose) {
 		    if (anchored) {
