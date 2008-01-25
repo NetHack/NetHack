@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2007/04/30	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2008/01/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3224,6 +3224,26 @@ int i;
 		j++;
 	}
 	return (const char *)0;
+}
+
+const char *
+suit_simple_name(suit)
+struct obj *suit;
+{
+	const char *suitnm, *esuitp;
+
+	if (Is_dragon_mail(suit))
+	    return "dragon mail";   /* <color> dragon scale mail */
+	else if (Is_dragon_scales(suit))
+	    return "dragon scales";
+	suitnm = OBJ_NAME(objects[suit->otyp]);
+	esuitp = eos((char *)suitnm);
+	if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " mail"))
+	    return "mail";	    /* most suits fall into this category */
+	else if (strlen(suitnm) > 7 && !strcmp(esuitp - 7, " jacket"))
+	    return "jacket";	    /* leather jacket */
+	/* suit is lame but armor is ambiguous and body armor is absurd */
+	return "suit";
 }
 
 const char *

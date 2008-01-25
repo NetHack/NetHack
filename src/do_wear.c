@@ -1118,7 +1118,20 @@ dotakeoff()
 			  || ((otmp == uarmu) && (uarmc || uarm))
 #endif
 		) {
-	    You_cant("take that off.");
+	    char why[BUFSZ], what[BUFSZ];
+
+	    why[0] = what[0] = '\0';
+	    if (otmp != uskin) {
+		if (uarmc) Strcat(what, cloak_simple_name(uarmc));
+#ifdef TOURIST
+		if ((otmp == uarmu) && uarm) {
+		    if (uarmc) Strcat(what, " and ");
+		    Strcat(what, suit_simple_name(uarm));
+		}
+#endif
+		Sprintf(why, " without taking off your %s first", what);
+	    }
+	    You_cant("take that off%s.", why);
 	    return 0;
 	}
 
@@ -1406,7 +1419,8 @@ boolean noisy;
 	    *mask = W_ARMC;
     } else if (is_suit(otmp)) {
 	if (uarmc) {
-	    if (noisy) You("cannot wear armor over a %s.", cloak_simple_name(uarmc));
+	    if (noisy) You("cannot wear armor over a %s.",
+			   cloak_simple_name(uarmc));
 	    err++;
 	} else if (uarm) {
 	    if (noisy) already_wearing("some armor");
