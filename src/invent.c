@@ -901,8 +901,7 @@ register const char *let,*word;
 
 		/* ugly check: remove inappropriate things */
 		if ((taking_off(word) &&
-		    (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))
-		     || inaccessible_equipment(otmp, (const char *)0, FALSE)))
+		    !(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)))
 		|| (putting_on(word) &&
 		     (otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)))
 							/* already worn */
@@ -985,7 +984,11 @@ register const char *let,*word;
 		|| (!strcmp(word, "sacrifice") &&
 		    /* (!astral && amulet) || (astral && !amulet) */
 		    (!Is_astralevel(&u.uz) ^ (otmp->oclass != AMULET_CLASS)))
+		/* suppress container being stashed into */
 		|| (!strcmp(word, "stash") && !ck_bag(otmp))
+		/* worn armor or accessory covered by cursed worn armor */
+		|| (taking_off(word) &&
+		    inaccessible_equipment(otmp, (const char *)0, TRUE))
 		    ) {
 			/* acceptable but not listed as likely candidate */
 			foo--;

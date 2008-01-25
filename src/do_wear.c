@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.5	2007/05/16	*/
+/*	SCCS Id: @(#)do_wear.c	3.5	2008/01/23	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2238,19 +2238,21 @@ register schar delta;
    used for dipping into liquid and applying grease;
    some criteria are different than select_off()'s */
 boolean
-inaccessible_equipment(obj, verb, only_if_cursed)
+inaccessible_equipment(obj, verb, only_if_known_cursed)
 struct obj *obj;
 const char *verb;	/* "dip" or "grease", or null to avoid messages */
-boolean only_if_cursed;	/* true => ignore non-cursed covering gear */
+boolean only_if_known_cursed;	/* ignore covering unless known to be cursed */
 {
     static NEARDATA const char need_to_take_off_outer_armor[] =
 					"need to take off %s to %s %s.";
     char buf[BUFSZ];
+    boolean anycovering = !only_if_known_cursed; /* more comprehensible... */
+#define BLOCKSACCESS(x)		(anycovering || ((x)->cursed && (x)->bknown))
 
     if (!obj || !obj->owornmask) return FALSE;	/* not inaccessible */
 
     /* check for suit covered by cloak */
-    if (obj == uarm && uarmc && (uarmc->cursed || !only_if_cursed)) {
+    if (obj == uarm && uarmc && BLOCKSACCESS(uarmc)) {
 	if (verb) {
 	    Strcpy(buf, yname(uarmc));
 	    You(need_to_take_off_outer_armor, buf, verb, yname(obj));
@@ -2259,8 +2261,8 @@ boolean only_if_cursed;	/* true => ignore non-cursed covering gear */
     }
 #ifdef TOURIST
     /* check for shirt covered by suit and/or cloak */
-    if (obj == uarmu && ((uarm && (uarm->cursed || !only_if_cursed)) ||
-	    (uarmc && (uarmc->cursed || !only_if_cursed)))) {
+    if (obj == uarmu && ((uarm && BLOCKSACCESS(uarm)) ||
+			 (uarmc && BLOCKSACCESS(uarmc)))) {
 	if (verb) {
 	    char cloaktmp[QBUFSZ], suittmp[QBUFSZ];
 	    /* if sameprefix, use yname and xname to get "your cloak and suit"
@@ -2280,8 +2282,7 @@ boolean only_if_cursed;	/* true => ignore non-cursed covering gear */
     }
 #endif
     /* check for ring covered by gloves */
-    if ((obj == uleft || obj == uright) &&
-	    uarmg && (uarmg->cursed || !only_if_cursed)) {
+    if ((obj == uleft || obj == uright) && uarmg && BLOCKSACCESS(uarmg)) {
 	if (verb) {
 	    Strcpy(buf, yname(uarmg));
 	    You(need_to_take_off_outer_armor, buf, verb, yname(obj));
