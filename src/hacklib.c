@@ -662,7 +662,7 @@ time_t date;
 	    datenum = (long)lt->tm_year + 2000L;
 	else
 	    datenum = (long)lt->tm_year + 1900L;
-	Sprintf(datestr, "%04d%02d%02d%02d%02d%02d",
+	Sprintf(datestr, "%04ld%02d%02d%02d%02d%02d",
 		datenum, lt->tm_mon + 1, lt->tm_mday,
 		lt->tm_hour, lt->tm_min, lt->tm_sec);
 	return(datestr);

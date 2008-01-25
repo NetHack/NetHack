@@ -1094,7 +1094,7 @@ char resultbuf[];	/* should be at least [7] to hold "18/100\0" */
 	    Sprintf(resultbuf, "%d", attrval);
 	else if (attrval > STR18(100))	/* 19 to 25 */
 	    Sprintf(resultbuf, "%d", attrval - 100);
-	else	/* simplify "18/**" to be "18/100" */
+	else	/* simplify "18/ **" to be "18/100" */
 	    Sprintf(resultbuf, "18/%02d", attrval - 18);
 	return resultbuf;
 }

@@ -1105,7 +1105,7 @@ struct trap *desttrap;	/* nonnull if another trap at <x,y> */
 	    }
 	    break;
     default:
-	    impossible("trapmove: stuck in unknown trap? (%s)", u.utraptype);
+	    impossible("trapmove: stuck in unknown trap? (%d)", (int)u.utraptype);
 	    break;
     }
     return FALSE;
