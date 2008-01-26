@@ -561,7 +561,7 @@ initoptions(){
 void
 initoptions_init()
 {
-#ifndef MAC
+#if defined(UNIX) || defined(VMS)
 	char *opts;
 #endif
 	int i;
