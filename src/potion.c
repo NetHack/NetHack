@@ -285,6 +285,9 @@ boolean talk;
 	       got the message "a door appears in the wall") */
 	    vision_recalc(0);
 	    if (Blind_telepat || Infravision) see_monsters();
+
+	    /* update dknown flag for inventory picked up while blind */
+	    if (can_see_now) learn_unseen_invent();
 	}
 }
 

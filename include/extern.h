@@ -907,11 +907,12 @@ E void NDECL(remove_gold_from_invent);
 #endif
 E struct obj *FDECL(getobj, (const char *,const char *));
 E int FDECL(ggetobj, (const char *,int (*)(OBJ_P),int,BOOLEAN_P,unsigned *));
+E int FDECL(askchain, (struct obj **,const char *,int,int (*)(OBJ_P),
+			int (*)(OBJ_P),int,const char *));
 E void FDECL(fully_identify_obj, (struct obj *));
 E int FDECL(identify, (struct obj *));
 E void FDECL(identify_pack, (int,BOOLEAN_P));
-E int FDECL(askchain, (struct obj **,const char *,int,int (*)(OBJ_P),
-			int (*)(OBJ_P),int,const char *));
+E void NDECL(learn_unseen_invent);
 E void FDECL(prinv, (const char *,struct obj *,long));
 E char *FDECL(xprname, (struct obj *,const char *,CHAR_P,BOOLEAN_P,long,long));
 E int NDECL(ddoinv);

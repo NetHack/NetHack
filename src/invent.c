@@ -1692,6 +1692,27 @@ boolean learning_id;	/* true if we just read unknown identify scroll */
     update_inventory();
 }
 
+/* called when regaining sight; mark inventory objects which were picked
+   up while blind as now having been seen */
+void
+notice_unseen_invent()
+{
+    struct obj *otmp;
+
+    if (Blind) return;	/* sanity check */
+
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+	if (otmp->dknown) continue;	/* already seen */
+	/* set dknown, perhaps bknown (for priest[ess]) */
+	(void) xname(otmp);
+	/*
+	 * If object->eknown gets implemented (see learnwand(zap.c)),
+	 * handle deferred discovery here.
+	 */
+    }
+    update_inventory();
+}
+
 STATIC_OVL char
 obj_to_let(obj)	/* should of course only be called for things in invent */
 register struct obj *obj;
