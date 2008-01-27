@@ -1695,7 +1695,7 @@ boolean learning_id;	/* true if we just read unknown identify scroll */
 /* called when regaining sight; mark inventory objects which were picked
    up while blind as now having been seen */
 void
-notice_unseen_invent()
+learn_unseen_invent()
 {
     struct obj *otmp;
 
