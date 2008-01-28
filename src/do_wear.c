@@ -80,6 +80,7 @@ struct obj *otmp;
 /*
  * The Type_on() functions should be called *after* setworn().
  * The Type_off() functions call setworn() themselves.
+ * [Blindf_on() is an exception and calls setworn() itself.]
  */
 
 STATIC_PTR
@@ -590,6 +591,12 @@ Armor_gone()
 STATIC_OVL void
 Amulet_on()
 {
+    /* make sure amulet isn't wielded; can't use remove_worn_item()
+       here because it has already been set worn in amulet slot */
+    if (uamul == uwep) setuwep((struct obj *)0);
+    else if (uamul == uswapwep) setuswapwep((struct obj *)0);
+    else if (uamul == uquiver) setuqwep((struct obj *)0);
+
     switch(uamul->otyp) {
 	case AMULET_OF_ESP:
 	case AMULET_OF_LIFE_SAVING:
@@ -699,9 +706,11 @@ register struct obj *obj;
     long oldprop = u.uprops[objects[obj->otyp].oc_oprop].extrinsic;
     int old_attrib, which;
 
-    if (obj == uwep) setuwep((struct obj *) 0);
-    if (obj == uswapwep) setuswapwep((struct obj *) 0);
-    if (obj == uquiver) setuqwep((struct obj *) 0);
+    /* make sure ring isn't wielded; can't use remove_worn_item()
+       here because it has already been set worn in a ring slot */
+    if (obj == uwep) setuwep((struct obj *)0);
+    else if (obj == uswapwep) setuswapwep((struct obj *)0);
+    else if (obj == uquiver) setuqwep((struct obj *)0);
 
     /* only mask out W_RING when we don't have both
        left and right rings of the same type */
@@ -925,12 +934,9 @@ register struct obj *otmp;
 {
 	boolean already_blind = Blind, changed = FALSE;
 
-	if (otmp == uwep)
-	    setuwep((struct obj *) 0);
-	if (otmp == uswapwep)
-	    setuswapwep((struct obj *) 0);
-	if (otmp == uquiver)
-	    setuqwep((struct obj *) 0);
+	/* blindfold might be wielded; release it for wearing */
+	if (otmp->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER))
+	    remove_worn_item(otmp, FALSE);
 	setworn(otmp, W_TOOL);
 	on_msg(otmp);
 
@@ -948,6 +954,7 @@ register struct obj *otmp;
 	    /* blindness has just been toggled */
 	    if (Blind_telepat || Infravision) see_monsters();
 	    vision_full_recalc = 1;	/* recalc vision limits */
+	    if (!Blind) learn_unseen_invent();
 	    context.botl = 1;
 	}
 }
@@ -985,6 +992,7 @@ register struct obj *otmp;
 	    /* blindness has just been toggled */
 	    if (Blind_telepat || Infravision) see_monsters();
 	    vision_full_recalc = 1;	/* recalc vision limits */
+	    if (!Blind) learn_unseen_invent();
 	    context.botl = 1;
 	}
 }
@@ -1206,9 +1214,10 @@ register struct obj *otmp;
 {
 	/* Curses, like chickens, come home to roost. */
 	if((otmp == uwep) ? welded(otmp) : (int)otmp->cursed) {
-		You("can't.  %s cursed.",
-			(is_boots(otmp) || is_gloves(otmp) || otmp->quan > 1L)
-			? "They are" : "It is");
+		boolean use_plural = (is_boots(otmp) || is_gloves(otmp) ||
+				      otmp->otyp == LENSES || otmp->quan > 1L);
+
+		You("can't.  %s cursed.", use_plural ? "They are" : "It is");
 		otmp->bknown = TRUE;
 		return(1);
 	}
@@ -1256,8 +1265,10 @@ register struct obj *otmp;
 		 * off_msg before removal anyway so there's no problem.  Take
 		 * care in adding armors granting fire resistance; this code
 		 * might need modification.
-		 * 3.2 (actually 3.1 even): this comment is obsolete since
-		 * fire resistance is not needed for Gehennom.
+		 * 3.2 (actually 3.1 even): that comment is obsolete since
+		 * fire resistance is not required for Gehennom so setworn()
+		 * doesn't force the resistance granting item to be re-worn
+		 * after being lifesaved anymore.
 		 */
 		if(is_cloak(otmp))
 			(void) Cloak_off();
@@ -1480,13 +1491,10 @@ dowear()
 		return 1;
 	}
 
-	otmp->known = TRUE;
-	if(otmp == uwep)
-		setuwep((struct obj *)0);
-	if (otmp == uswapwep)
-		setuswapwep((struct obj *) 0);
-	if (otmp == uquiver)
-		setuqwep((struct obj *) 0);
+	otmp->known = 1;	/* since AC is shown on the status line */
+	/* if the armor is wielded, release it for wearing */
+	if (otmp->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER))
+		remove_worn_item(otmp, FALSE);
 	setworn(otmp, mask);
 	delay = -objects[otmp->otyp].oc_delay;
 	if(delay){
@@ -1531,12 +1539,14 @@ doputon()
 		weldmsg(otmp);
 		return(0);
 	}
-	if(otmp == uwep)
-		setuwep((struct obj *)0);
-	if(otmp == uswapwep)
-		setuswapwep((struct obj *) 0);
-	if(otmp == uquiver)
-		setuqwep((struct obj *) 0);
+#if 0
+/* defer til Xxx_on(); various failures below now leave item wielded
+ */
+	/* accessory might be wielded; release it for wearing */
+	if (otmp->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER))
+		remove_worn_item(otmp, FALSE);
+#endif
+
 	if(otmp->oclass == RING_CLASS || otmp->otyp == MEAT_RING) {
 		if(nolimbs(youmonst.data)) {
 			You("cannot make the ring stick to your body.");
@@ -1597,12 +1607,9 @@ doputon()
 		if (!retouch_object(&otmp, FALSE))
 		    return 1;
 		setworn(otmp, W_AMUL);
-		if (otmp->otyp == AMULET_OF_CHANGE) {
-			Amulet_on();
-			/* Don't do a prinv() since the amulet is now gone */
-			return(1);
-		}
 		Amulet_on();
+		/* finished now if an amulet of change got used up */    
+		if (!uamul) return 1;
 	} else {	/* it's a blindfold, towel, or lenses */
 		if (ublindf) {
 			if (ublindf->otyp == TOWEL)
