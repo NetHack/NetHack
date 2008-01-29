@@ -108,6 +108,7 @@ E void FDECL(adjabil, (int,int));
 E int NDECL(newhp);
 E schar FDECL(acurr, (int));
 E schar NDECL(acurrstr);
+E boolean FDECL(extremeattr, (int));
 E void FDECL(adjalign, (int));
 E int FDECL(is_innate, (int));
 E char *FDECL(from_what, (int));

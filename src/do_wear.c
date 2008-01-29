@@ -41,6 +41,7 @@ STATIC_PTR int NDECL(Shield_on);
 STATIC_PTR int NDECL(Shirt_on);
 #endif
 STATIC_DCL void NDECL(Amulet_on);
+STATIC_DCL void FDECL(learnring, (struct obj *,BOOLEAN_P));
 STATIC_DCL void FDECL(Ring_off_or_gone, (struct obj *, BOOLEAN_P));
 STATIC_PTR int FDECL(select_off, (struct obj *));
 STATIC_DCL struct obj *NDECL(do_takeoff);
@@ -699,12 +700,45 @@ Amulet_off()
     return;
 }
 
+/* handle ring discovery; comparable to learnwand() */
+STATIC_OVL void
+learnring(ring, observed)
+struct obj *ring;
+boolean observed;
+{
+    int ringtype = ring->otyp;
+
+    /* if effect was observeable then we usually discover the type */
+    if (observed) {
+	/* if we already know the ring type which accomplishes this
+	   effect (assumes there is at most one type for each effect),
+	   mark this ring as having been seen (no need for makeknown);
+	   otherwise if we have seen this ring, discover its type */
+	if (objects[ringtype].oc_name_known)
+	    ring->dknown = 1;
+	else if (ring->dknown)
+	    makeknown(ringtype);
+#if 0	/* see learnwand() */
+	else
+	    ring->eknown = 1;
+#endif
+    }
+
+    /* make enchantment of charged ring known (might be +0) and update
+       perm invent window if we've seen this ring and know its type */
+    if (ring->dknown && objects[ringtype].oc_name_known) {
+	if (objects[ringtype].oc_charged) ring->known = 1;
+	update_inventory();
+    }
+}
+
 void
 Ring_on(obj)
 register struct obj *obj;
 {
     long oldprop = u.uprops[objects[obj->otyp].oc_oprop].extrinsic;
     int old_attrib, which;
+    boolean observable;
 
     /* make sure ring isn't wielded; can't use remove_worn_item()
        here because it has already been set worn in a ring slot */
@@ -751,12 +785,12 @@ register struct obj *obj;
 				!perceives(youmonst.data) && !Blind) {
 		    newsym(u.ux,u.uy);
 		    pline("Suddenly you are transparent, but there!");
-		    makeknown(RIN_SEE_INVISIBLE);
+		    learnring(obj, TRUE);
 		}
 		break;
 	case RIN_INVISIBILITY:
 		if (!oldprop && !HInvis && !BInvis && !Blind) {
-		    makeknown(RIN_INVISIBILITY);
+		    learnring(obj, TRUE);
 		    newsym(u.ux,u.uy);
 		    self_invis_message();
 		}
@@ -764,7 +798,7 @@ register struct obj *obj;
 	case RIN_LEVITATION:
 		if (!oldprop && !HLevitation) {
 		    float_up();
-		    makeknown(RIN_LEVITATION);
+		    learnring(obj, TRUE);
 		    spoteffects(FALSE);	/* for sinks */
 		}
 		break;
@@ -779,14 +813,15 @@ register struct obj *obj;
  adjust_attrib:
 		old_attrib = ACURR(which);
 		ABON(which) += obj->spe;
-		if (ACURR(which) != old_attrib ||
-			(objects[obj->otyp].oc_name_known &&
-			    old_attrib != 25 && old_attrib != 3)) {
-		    context.botl = 1;
-		    makeknown(obj->otyp);
-		    obj->known = 1;
-		    update_inventory();
-		}
+		observable = (old_attrib != ACURR(which));
+		/* if didn't change, usually means ring is +0 but might
+		   be because nonzero couldn't go below min or above max;
+		   learn +0 enchantment if attribute value is not stuck
+		   at a limit [and ring has been seen and its type is
+		   already discovered, both handled by learnring()] */
+		if (observable || !extremeattr(which))
+		    learnring(obj, observable);
+		context.botl = 1;
 		break;
 	case RIN_INCREASE_ACCURACY:	/* KMH */
 		u.uhitinc += obj->spe;
@@ -798,12 +833,12 @@ register struct obj *obj;
 		rescham();
 		break;
 	case RIN_PROTECTION:
-		if (obj->spe || objects[RIN_PROTECTION].oc_name_known) {
-		    context.botl = 1;
-		    makeknown(RIN_PROTECTION);
-		    obj->known = 1;
-		    update_inventory();
-		}
+		/* usually learn enchantment and discover type;
+		   won't happen if ring is unseen or if it's +0
+		   and the type hasn't been discovered yet */
+		observable = (obj->spe != 0);
+		learnring(obj, observable);
+		if (obj->spe) find_ac();	/* updates botl */
 		break;
     }
 }
@@ -815,6 +850,7 @@ boolean gone;
 {
     long mask = (obj->owornmask & W_RING);
     int old_attrib, which;
+    boolean observable;
 
     context.takeoff.mask &= ~mask;
     if(!(u.uprops[objects[obj->otyp].oc_oprop].extrinsic & mask))
@@ -858,7 +894,7 @@ boolean gone;
 		if (Invisible && !Blind) {
 		    newsym(u.ux,u.uy);
 		    pline("Suddenly you cannot see yourself.");
-		    makeknown(RIN_SEE_INVISIBLE);
+		    learnring(obj, TRUE);
 		}
 		break;
 	case RIN_INVISIBILITY:
@@ -866,12 +902,12 @@ boolean gone;
 		    newsym(u.ux,u.uy);
 		    Your("body seems to unfade%s.",
 			 See_invisible ? " completely" : "..");
-		    makeknown(RIN_INVISIBILITY);
+		    learnring(obj, TRUE);
 		}
 		break;
 	case RIN_LEVITATION:
 		(void) float_down(0L, 0L);
-		if (!Levitation) makeknown(RIN_LEVITATION);
+		if (!Levitation) learnring(obj, TRUE);
 		break;
 	case RIN_GAIN_STRENGTH:
 		which = A_STR;
@@ -884,12 +920,11 @@ boolean gone;
  adjust_attrib:
 		old_attrib = ACURR(which);
 		ABON(which) -= obj->spe;
-		if (ACURR(which) != old_attrib) {
-		    context.botl = 1;
-		    makeknown(obj->otyp);
-		    obj->known = 1;
-		    update_inventory();
-		}
+		observable = (old_attrib != ACURR(which));
+		/* same criteria as Ring_on() */
+		if (observable || !extremeattr(which))
+		    learnring(obj, observable);
+		context.botl = 1;
 		break;
 	case RIN_INCREASE_ACCURACY:	/* KMH */
 		u.uhitinc -= obj->spe;
@@ -898,13 +933,12 @@ boolean gone;
 		u.udaminc -= obj->spe;
 		break;
 	case RIN_PROTECTION:
-		/* might have forgotten it due to amnesia */
-		if (obj->spe) {
-		    context.botl = 1;
-		    makeknown(RIN_PROTECTION);
-		    obj->known = 1;
-		    update_inventory();
-		}
+		/* might have been put on while blind and we can now see
+		   or perhaps been forgotten due to amnesia */
+		observable = (obj->spe != 0);
+		learnring(obj, observable);
+		if (obj->spe) find_ac();	/* updates botl */
+		break;
 	case RIN_PROTECTION_FROM_SHAPE_CHAN:
 		/* If you're no longer protected, let the chameleons
 		 * change shape again -dgk

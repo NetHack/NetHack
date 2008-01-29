@@ -900,6 +900,34 @@ acurrstr()
 	else return((schar)(str - 100));
 }
 
+/* when wearing (or taking off) an unID'd item, this routine is used
+   to distinguish between observable +0 result and no-visible-effect
+   due to an attribute not being able to exceed maximum or minimun */
+boolean
+extremeattr(attrindx)	/* does attrindx's value match its max or min? */
+int attrindx;
+{
+    /* Fixed_abil and racial MINATTR/MAXATTR aren't relevant here */
+    int lolimit = 3, hilimit = 25, curval = ACURR(attrindx);
+
+    /* upper limit for Str is 25 but its value is encoded differently */
+    if (attrindx == A_STR) {
+	hilimit = STR19(25);	/* 125 */
+	/* lower limit for Str can also be 25 */
+	if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER)
+	    lolimit = hilimit;
+    }
+    /* this exception is hypothetical; the only other worn item affecting
+       Int or Wis is another helmet so can't be in use at the same time */
+    if (attrindx == A_INT || attrindx == A_WIS) {
+	if (uarmh && uarmh->otyp == DUNCE_CAP)
+	    hilimit = lolimit = 6;
+    }
+
+    /* are we currently at either limit? */
+    return (curval == lolimit || curval == hilimit) ? TRUE : FALSE;
+}
+
 /* avoid possible problems with alignment overflow, and provide a centralized
  * location for any future alignment limits
  */
