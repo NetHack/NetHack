@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)macmain.c	3.5	2007/02/15	*/
+/*	SCCS Id: @(#)macmain.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,6 +39,7 @@ main (void)
 	int argc = 1;
 	boolean resuming = FALSE;	/* assume new game */
 
+	sys_early_init();
 	windowprocs = mac_procs;
 	InitMac ();
 

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2007/04/26	*/
+/*	SCCS Id: @(#)options.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -386,9 +386,6 @@ static struct Comp_Opt
 	{ "windowcolors",  "the foreground/background colors of windows",	/*WC*/
 						80, DISP_IN_GAME },
 	{ "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
-#ifdef SYSCF
-	{ "wizards", "users with access to wizard mode (etc)", PL_PSIZ, SET_IN_SYS},
-#endif
 #ifdef BACKWARD_COMPAT
 	{"DECgraphics", "load DECGraphics display symbols", 70, SET_IN_FILE},
 	{"IBMgraphics", "load IBMGraphics display symbols", 70, SET_IN_FILE},
@@ -2263,23 +2260,6 @@ goodfruit:
 		return;
 	}
 
-#ifdef SYSCF
-	fullname = "wizards";
-	if (wizard && match_optname(opts, fullname, 6, TRUE)) {
-	    if (duplicate) {
-		complain_about_duplicate(opts,1);
-		return;
-	    }
-	    if (negated) {
-		bad_negation(fullname, FALSE);
-		return;
-	    } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-		nmcpy(wizards, op, PL_PSIZ);
-	    }
-	    return;
-	}
-#endif
-
 	/* menustyle:traditional or combo or full or partial */
 	if (match_optname(opts, "menustyle", 4, TRUE)) {
 		int tmp;
@@ -3489,14 +3469,6 @@ char *buf;
 #endif
 	else if (!strcmp(optname, "catname"))
 		Sprintf(buf, "%s", catname[0] ? catname : none );
-#ifdef SYSCF
-	else if (!strcmp(optname, "wizards"))
-# ifdef KR1ED
-		Sprintf(buf, "%s", wizards[0] ? wizards : WIZARD_NAME);
-# else
-		Sprintf(buf, "%s", wizards[0] ? wizards : WIZARD);
-# endif
-#endif
 	else if (!strcmp(optname, "disclose")) {
 		for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
 			char topt[2];

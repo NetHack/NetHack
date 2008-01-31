@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)vmsmain.c	3.5	2007/02/14	*/
+/*	SCCS Id: @(#)vmsmain.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* main.c - VMS NetHack */
@@ -41,6 +41,8 @@ char *argv[];
 	fflush((FILE *)0);	/* force stdio to init itself */
 	privon();
 #endif
+
+	sys_early_init();
 
 	atexit(byebye);
 	hname = argv[0];

@@ -87,7 +87,19 @@
     wish to override the compiled-in defaults:
 	WIZARDS= a space-separated list of usernames who can use -D
 		If the first character is '*' then any user can use -D.
-    This is a standards config file, so blank lines and lines starting with
+	SUPPORT= one line, probably starting with a verb, telling how to
+		contact your local support person/group for NetHack.  If there
+		is no local support, do not use this line.  Some sample values:
+			call Joan at +1 312 555-1234.
+			email support@example.com
+			visit http://www.example.com/game-support
+	RECOVER= instructions for running recover.  If RECOVER is not available,
+		do not use this line.  Some sample values:
+			To get your game recovered, contact support.
+			Run /usr/local/bin/nh-recover to recover your game.
+			
+		
+    This is a standard config file, so blank lines and lines starting with
     pound signs are ignored; while other, standard options (such as catname)
     can be specified in this file, this is considered a bug and may be changed
     in the future.

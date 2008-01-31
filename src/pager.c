@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.5	2007/05/11	*/
+/*	SCCS Id: @(#)pager.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -873,6 +873,36 @@ dowhatdoes()
 	return 0;
 }
 
+void
+docontact()
+{
+	winid cwin = create_nhwindow(NHW_TEXT);
+	char buf[BUFSZ];
+	if(sysopt.support){
+/*XXX overflow possibilities*/
+		Sprintf(buf, "To contact local support, %s", sysopt.support);
+		putstr(cwin, 0, buf);
+		putstr(cwin, 0, "");
+	} else if(sysopt.wizards){
+		char *tmp = build_english_list(sysopt.wizards);
+		Sprintf(buf, "To contact local support, %s", tmp);
+		free(tmp);
+		putstr(cwin, 0, buf);
+		putstr(cwin, 0, "");
+	}
+	putstr(cwin, 0, "To contact the NetHack development team directly,");
+/*XXX overflow possibilities*/
+	Sprintf(buf, " see the Contact form on our website or email %s",
+		DEVTEAM_EMAIL);
+	putstr(cwin, 0, buf);
+	putstr(cwin, 0, "");
+	putstr(cwin, 0, "For more information on NetHack, or to report a bug,");
+	Sprintf(buf, "visit our website %s", DEVTEAM_URL);
+	putstr(cwin, 0, buf);
+	display_nhwindow(cwin, FALSE);
+	destroy_nhwindow(cwin);
+}
+
 /* data for help_menu() */
 static const char *help_menu_items[] = {
 /* 0*/	"Long description of the game and commands.",
@@ -884,12 +914,13 @@ static const char *help_menu_items[] = {
 /* 6*/	"Longer explanation of game options.",
 /* 7*/	"List of extended commands.",
 /* 8*/	"The NetHack license.",
+/* 9*/	"Support information.",
 #ifdef PORT_HELP
 	"%s-specific help and commands.",
 #define PORT_HELP_ID 100
-#define WIZHLP_SLOT 10
+#define WIZHLP_SLOT 11
 #else
-#define WIZHLP_SLOT 9
+#define WIZHLP_SLOT 10
 #endif
 #ifdef WIZARD
 	"List of wizard-mode commands.",
@@ -958,13 +989,16 @@ dohelp()
 			case  6:  display_file(OPTIONFILE, TRUE);  break;
 			case  7:  (void) doextlist();  break;
 			case  8:  display_file(LICENSE, TRUE);  break;
-#ifdef WIZARD
-			/* handle slot 9 or 10 */
-			default: display_file(DEBUGHELP, TRUE);  break;
-#endif
+			case  9:  (void) docontact(); break;
 #ifdef PORT_HELP
 			case PORT_HELP_ID:  port_help();  break;
 #endif
+			default:
+#ifdef WIZARD
+			/* handle slot 10 or 11 */
+				display_file(DEBUGHELP, TRUE);
+#endif
+				break;
 		}
 	}
 	return 0;

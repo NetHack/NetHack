@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.5	2008/01/19	*/
+/*	SCCS Id: @(#)extern.h	3.5	2008/01/30	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -640,6 +640,7 @@ E struct kinfo *FDECL(find_delayed_killer, (int));
 E void FDECL(dealloc_killer, (struct kinfo*));
 E void FDECL(save_killers, (int,int));
 E void FDECL(restore_killers, (int));
+E char *FDECL(build_english_list, (char *));
 
 /* ### engrave.c ### */
 

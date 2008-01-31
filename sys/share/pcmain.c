@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pcmain.c	3.5	2007/02/14	*/
+/*	SCCS Id: @(#)pcmain.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -92,6 +92,7 @@ char *argv[];
 {
      boolean resuming;
 
+     sys_early_init();
      resuming = pcmain(argc,argv);
 #ifdef LAN_FEATURES
      init_lan_features();

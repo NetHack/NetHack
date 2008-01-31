@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mail.c	3.5	2006/12/13	*/
+/*	SCCS Id: @(#)mail.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -428,21 +428,28 @@ readmail(otmp)
 struct obj *otmp;
 {
     static char *junk[] = {
+    NULL, /* placeholder for "Report bugs to <devteam@nethack.org>.", */
     "Please disregard previous letter.",
     "Welcome to NetHack.",
 #ifdef AMIGA
     "Only Amiga makes it possible.",
     "CATS have all the answers.",
 #endif
-    "Report bugs to <devteam@nethack.org>.",
     "Invitation: Visit the NetHack web site at http://www.nethack.org!"
     };
 
+	/* XXX replace with more general substitution code and add local
+	 * contact message.  Also use DEVTEAM_URL */
+    if(junk[0]) == NULL){
+#define BUGS_FORMAT "Report bugs to %s."
+      junk[0] = (char *)alloc(strlen(BUGS_FORMAT) + strlen(DEVTEAM_EMAIL));
+      sprintf(junk[0], DEVTEAM_EMAIL);
+#undef BUGS_FORMAT
+    }
     if (Blind) {
 	pline("Unfortunately you cannot see what it says.");
     } else
 	pline("It reads:  \"%s\"", junk[rn2(SIZE(junk))]);
-
 }
 
 # endif /* !UNIX && !VMS */

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)winhack.c	3.5	2005/01/23	*/
+/*	SCCS Id: @(#)winhack.c	3.5	2008/01/30	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 // winhack.cpp : Defines the entry point for the application.
 //
@@ -41,6 +41,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	TCHAR* p;
 	TCHAR wbuf[NHSTR_BUFSIZE];
 	char buf[NHSTR_BUFSIZE];
+
+	sys_early_init();
 
 	/* ensure that we don't access violate on a panic() */
 	windowprocs.win_raw_print = mswin_raw_print;

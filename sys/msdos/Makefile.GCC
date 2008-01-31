@@ -336,9 +336,9 @@ VOBJ19 = $(O)trap.o     $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
 VOBJ20 = $(O)vis_tab.o  $(O)weapon.o  $(O)were.o     $(O)wield.o    $(O)windows.o
 VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
 VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
-VOBJ23 = $(O)region.o
+VOBJ23 = $(O)region.o $(O)sys.o
 
-SOBJ   = $(O)msdos.o    $(O)sound.o   $(O)sys.o      $(O)tty.o	    $(O)unix.o \
+SOBJ   = $(O)msdos.o    $(O)sound.o   $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
 
 VVOBJ  = $(O)version.o
@@ -384,7 +384,8 @@ HACK_H	   = $(CONFIG_H)	$(INCL)/context.h  $(DUNGEON_H)	       \
 	     $(INCL)/mkroom.h	$(INCL)/objclass.h $(INCL)/trap.h      \
 	     $(INCL)/flag.h     $(RM_H)		   $(INCL)/vision.h    \
 	     $(INCL)/wintype.h  $(INCL)/engrave.h  $(INCL)/rect.h      \
-	     $(INCL)/trampoli.h $(INCL)/hack.h     $(REGION_H)
+	     $(INCL)/trampoli.h $(INCL)/hack.h     $(REGION_H)	       \
+	     $(INCL)/sys.h
 DLB_H      = $(INCL)/dlb.h
 
 ifeq ($(SUPPRESS_GRAPHICS),Y)
@@ -990,7 +991,7 @@ $(O)tty.o:	 $(HACK_H) $(INCL)/wintty.h $(SSHR)/pctty.c
 $(O)unix.o:	 $(HACK_H) $(SSHR)/pcunix.c
 	$(CC) $(cflags) -o$@ $(SSHR)/pcunix.c
 
-$(O)sys.o : $(HACK_H) $(SSHR)/pcsys.c
+$(O)pcsys.o : $(HACK_H) $(SSHR)/pcsys.c
 	$(CC) $(cflags) -o$@ $(SSHR)/pcsys.c
 
 # sys/msdos
@@ -1249,6 +1250,7 @@ $(O)sp_lev.o: sp_lev.c $(HACK_H) $(INCL)/dlb.h $(INCL)/sp_lev.h
 $(O)spell.o: spell.c $(HACK_H)
 $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
+$(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
 $(O)timeout.o: timeout.c $(HACK_H) $(INCL)/lev.h
 $(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h $(PATCHLEV_H)

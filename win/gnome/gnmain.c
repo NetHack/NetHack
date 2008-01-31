@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)gnmain.c	3.5	2000/07/16	*/
+/*	SCCS Id: @(#)gnmain.c	3.5	2008/01/30	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -137,10 +137,29 @@ ghack_about_cb(GtkWidget *widget, gpointer data)
     }
 
     getversionstring(buf);
+#if 0
+/* XXX this needs further re-write to use DEVTEAM_EMAIL, DEVTEAM_URL,
+ * sysopt.support, etc.   I'm not doing it now because I can't test
+ * it yet. (keni)
+ */
+/* out of date first cut: */
+!     len = strlen(buf);
+!     char *str1 = _("\nSend comments and bug reports to:\n");
+!     len += strlen(str1);
+!     len += sysopt.email;
+!     char *str2 = _("\nThis game is free software. See License for details.");
+!     len += strlen(str2);
+!     str = (char*)alloc(len+1);
+!     strcat(buf, str1);
+!     strcat(buf, sysopt.email);
+!     strcat(buf, str2);
+free(str) below
+#else
     strcat( buf1, VERSION_STRING);
     strcat( buf, 
       _("\nSend comments and bug reports to: nethack-bugs@nethack.org\n"
       "This game is free software. See License for details."));
+#endif
     about = gnome_about_new(_("Nethack"), 
 	    buf1, "Copyright (C) 1985-2002 Mike Stephenson",
 	    (const char **)authors, buf,

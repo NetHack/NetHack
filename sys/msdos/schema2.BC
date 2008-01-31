@@ -1,4 +1,4 @@
-/* SCCS Id: @(#)schema2.BC	3.5	 1999/10/28 */
+/* SCCS Id: @(#)schema2.BC	3.5	 2008/01/30 */
 /* Copyright (c) Yitzhak Sapir, 1999 */
 /*  */
 /*  NetHack Overlay Schema */
@@ -190,7 +190,7 @@
 -zCsteal_1 -zAOVLY -zCOVL171
 -zCsteal_b -zAOVLY -zCOVL172
 -zCsteed_o -zAOVLY -zCOVL173
--zCsys_o -zAOVLY -zCOVL174
+-zCpcsys_o -zAOVLY -zCOVL174
 -zCteleport_o -zAOVLY -zCOVL175
 -zCtermcap_0 -zAOVLY -zCOVL176
 -zCtermcap_1 -zAOVLY -zCOVL177

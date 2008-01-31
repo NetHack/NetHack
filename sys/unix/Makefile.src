@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.src	3.5	2007/12/12
+#	SCCS Id: @(#)Makefile.src	3.5	2008/01/30
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used
@@ -327,7 +327,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c rip.c \
 	   rnd.c role.c rumors.c save.c shk.c shknam.c sit.c sounds.c sp_lev.c \
-	   spell.c steal.c steed.c teleport.c timeout.c topten.c track.c trap.c \
+	   spell.c steal.c steed.c sys.c teleport.c timeout.c topten.c track.c \
+	   trap.c \
 	   u_init.c uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
@@ -362,7 +363,7 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	macconf.h mextra.h mfndpos.h micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h rm.h \
-	sp_lev.h spell.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
+	sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
 	trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
 	winX.h winprocs.h wintype.h you.h youprop.h
 
@@ -384,6 +385,7 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
+	sys.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
 	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
 	wizard.o worm.o worn.o write.o zap.o \
@@ -572,7 +574,7 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
 		../include/flag.h ../include/rm.h ../include/vision.h \
 		../include/display.h ../include/engrave.h ../include/rect.h \
 		../include/region.h ../include/winprocs.h ../include/wintty.h \
-		../include/trampoli.h
+		../include/trampoli.h ../include/sys.h
 	touch $(HACK_H)
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
@@ -790,6 +792,7 @@ sp_lev.o: sp_lev.c $(HACK_H) ../include/dlb.h ../include/sp_lev.h
 spell.o: spell.c $(HACK_H)
 steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
+sys.o:	sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
 timeout.o: timeout.c $(HACK_H) ../include/lev.h
 topten.o: topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h

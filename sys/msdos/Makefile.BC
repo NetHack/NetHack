@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)Makefile.BC	3.5	2006/01/07
+#	SCCS Id: @(#)Makefile.BC	3.5	2008/01/30
 # Copyright (c) Yitzhak Sapir, 1999-2006.
 # NetHack may be freely distributed.  See license for details.
 #
@@ -867,7 +867,7 @@ HACK_H      = $(CONFIG_H) $(INCL)\context.h $(INCL)\dungeon.h $(INCL)\align.h \
 	      $(INCL)\monsym.h $(INCL)\mkroom.h $(INCL)\objclass.h $(DECL_H) \
 	      $(INCL)\timeout.h $(INCL)\trap.h $(INCL)\flag.h $(INCL)\rm.h \
 	      $(INCL)\vision.h $(INCL)\mondata.h $(INCL)\wintype.h \
-	      $(INCL)\engrave.h $(INCL)\rect.h $(EXTERN_H) \
+	      $(INCL)\engrave.h $(INCL)\rect.h $(EXTERN_H) $(INCL)\sys.h \
 	      $(INCL)\winprocs.h $(INCL)\trampoli.h $(INCL)\display.h
 TILE_H      = $(INCL)\tile.h $(INCL)\pctiles.h
 PCVIDEO_H   = $(INCL)\portio.h $(INCL)\pcvideo.h
@@ -1668,7 +1668,7 @@ $(O)tty.o:     $(HACK_H) $(WINTTY_H) $(SYS)\pctty.c
 	@echo $(BCOPTS2) >> $(VROOMMCFG)
 	$(CC)  $(CFLAGSN) $(COBJNAM)$@  $(SYS)\pctty.c
 
-$(O)sys.o:    $(HACK_H) $(SYS)\pcsys.c
+$(O)pcsys.o:    $(HACK_H) $(SYS)\pcsys.c
 	@type schema$(SCHEMA).bc | find "$(@B)_o" > $(VROOMMCFG)
 	@echo $(BCOPTS1) >> $(VROOMMCFG)
 	@echo $(BCOPTS2) >> $(VROOMMCFG)
@@ -1872,6 +1872,7 @@ $(O)rumors.o:	 $(PCHO) $(SRC)\rumors.c   $(HACK_H) $(DLB_H)
 $(O)save.o:      $(PCHO) $(SRC)\save.c     $(HACK_H) $(LEV_H) $(QUEST_H)
 $(O)sit.o:       $(PCHO) $(SRC)\sit.c      $(HACK_H) $(ARTIFACT_H)
 $(O)steed.o:	   $(PCHO) $(SRC)\steed.c    $(HACK_H)
+$(O)sys.o:	 $(PCHO) $(SRC)\sys.c      $(HACK_H)
 $(O)sp_lev.o:	 $(PCHO) $(SRC)\sp_lev.c   $(HACK_H) $(SP_LEV_H) $(DLB_H)
 $(O)spell.o:     $(PCHO) $(SRC)\spell.c    $(HACK_H)
 $(O)teleport.o:  $(PCHO) $(SRC)\teleport.c $(HACK_H)	# check dep

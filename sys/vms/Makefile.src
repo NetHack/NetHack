@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	SCCS Id: @(#)Makefile.src	3.5	2007/10/27
+#	SCCS Id: @(#)Makefile.src	3.5	2008/01/30
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -111,8 +111,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c rip.c rnd.c \
 	   role.c rumors.c save.c shk.c shknam.c sit.c sounds.c sp_lev.c spell.c \
-	   steal.c steed.c teleport.c timeout.c topten.c track.c trap.c u_init.c \
-	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
+	   steal.c steed.c sys.c teleport.c timeout.c topten.c track.c trap.c \
+	   u_init.c uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
@@ -131,9 +131,9 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	   hack.h lev.h macconf.h mextra.h mfndpos.h micro.h \
 	   mkroom.h monattk.h mondata.h monflag.h monst.h monsym.h obj.h \
 	   objclass.h os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
-	   region.h rm.h sp_lev.h spell.h system.h tcap.h timeout.h tosconf.h \
-	   tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h \
-	   wintty.h winX.h winprocs.h wintype.h you.h youprop.h
+	   region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
+	   tosconf.h tradstdc.h trampoli.h trap.h unixconf.h vision.h \
+	   vmsconf.h wintty.h winX.h winprocs.h wintype.h you.h youprop.h
 
 #HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
 #		lev_comp.h dgn_comp.h dgn_file.h
@@ -156,8 +156,8 @@ HOBJ4 = mplayer.obj,mthrowu.obj,muse.obj,music.obj,o_init.obj,objnam.obj, \
 	potion.obj,pray.obj,priest.obj,quest.obj,questpgr.obj,read.obj
 HOBJ5 = rect.obj,region.obj,restore.obj,rip.obj,rnd.obj,role.obj, \
 	rumors.obj,save.obj,shk.obj,shknam.obj,sit.obj,sounds.obj,sp_lev.obj, \
-	spell.obj,steal.obj,steed.obj,teleport.obj,timeout.obj,topten.obj, \
-	track.obj,trap.obj
+	spell.obj,steal.obj,steed.obj,sys.obj,teleport.obj,timeout.obj, \
+	topten.obj, track.obj,trap.obj
 HOBJ6 = u_init.obj,uhitm.obj,vault.obj,vision.obj,vis_tab.obj,weapon.obj, \
 	were.obj,wield.obj,windows.obj,wizard.obj,worm.obj,worn.obj, \
 	write.obj,zap.obj,version.obj
@@ -309,7 +309,7 @@ $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \
 		$(INC)onames.h $(INC)timeout.h $(INC)trap.h \
 		$(INC)flag.h $(INC)rm.h $(INC)vision.h \
 		$(INC)display.h $(INC)engrave.h $(INC)rect.h $(INC)region.h \
-		$(INC)winprocs.h $(INC)wintty.h $(INC)trampoli.h
+		$(INC)winprocs.h $(INC)wintty.h $(INC)trampoli.h $(INC)sys.h
 	$(TOUCH) $(HACK_H)
 #	VMS-specific code
 vmsmain.obj :	$(VMS)vmsmain.c $(HACK_H) $(INC)dlb.h
@@ -439,6 +439,7 @@ sp_lev.obj :	sp_lev.c $(HACK_H) $(INC)dlb.h $(INC)sp_lev.h
 spell.obj :	spell.c $(HACK_H)
 steal.obj :	steal.c $(HACK_H)
 steed.obj :	steed.c $(HACK_H)
+sys.obj :	sys.c $(HACK_H)
 teleport.obj :	teleport.c $(HACK_H)
 timeout.obj :	timeout.c $(HACK_H) $(INC)lev.h
 topten.obj :	topten.c $(HACK_H) $(INC)dlb.h $(INC)patchlevel.h

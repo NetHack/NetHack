@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)decl.h	3.5	2007/01/12	*/
+/*	SCCS Id: @(#)decl.h	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -199,9 +199,6 @@ E const char *occtxt;			/* defined when occupation != NULL */
 E const char *nomovemsg;
 E const char nul[];
 E char lock[];
-#ifdef SYSCF
-E char wizards[];
-#endif
 
 E const schar xdir[], ydir[], zdir[];
 

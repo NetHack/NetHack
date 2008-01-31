@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)Makefile.MSC	      3.5     2006/01/05
+#	SCCS Id: @(#)Makefile.MSC	      3.5     2008/01/30
 #	Copyright (c) NetHack PC Development Team 1997 - 2006.
 #	PC NetHack 3.4x Makefile for MSC V1.52c (16 bit compiler)
 #
@@ -220,9 +220,9 @@ VOBJ19 = trap.o     u_init.o   uhitm.o    vault.o    vision.o
 VOBJ20 = vis_tab.o  weapon.o   were.o	  wield.o    windows.o
 VOBJ21 = wintty.o   wizard.o   worm.o	  worn.o     write.o
 VOBJ22 = zap.o	    light.o    dlb.o      dig.o      teleport.o
-VOBJ23 = random.o   region.o
+VOBJ23 = random.o   region.o   sys.o
 
-SOBJ   = msdos.o    sound.o    sys.o	  tty.o	     unix.o    video.o \
+SOBJ   = msdos.o    sound.o    pcsys.o	  tty.o	     unix.o    video.o \
 	vidtxt.o    pckeys.o
 
 VVOBJ  = version.o
@@ -264,7 +264,7 @@ HACK_H	   = $(CONFIG_H)	$(INCL)\context.h   $(DUNGEON_H) $(DECL_H) \
 	       $(DISPLAY_H)	  $(INCL)\monsym.h    $(INCL)\mkroom.h	\
 	      $(INCL)\objclass.h $(INCL)\trap.h	     $(INCL)\flag.h    \
 	      $(RM_H)		 $(INCL)\vision.h    $(INCL)\wintype.h \
-	      $(INCL)\engrave.h	 $(INCL)\rect.h	  \
+	      $(INCL)\engrave.h	 $(INCL)\rect.h	     $(INCL)\sys.h \
 	       $(INCL)\trampoli.h $(INCL)\hack.h
 DLB_H      = $(INCL)\dlb.h
 TILE_H	   = $(WSHR)\tile.h $(MSYS)\pctiles.h
@@ -950,7 +950,7 @@ dlb_main.o: $(U)dlb_main.c $(INCL)\config.h $(DLB_H)
 main.o: $(SSHR)\pcmain.c $(HACK_H) $(INCL)\dlb.h \
 		#$(INCL)\win32api.h
 	@$(CC) $(CFLAGS) $(SPECOPTS) /Fo$@ $(SSHR)\pcmain.c
-sys.o: $(SSHR)\pcsys.c $(HACK_H)
+pcsys.o: $(SSHR)\pcsys.c $(HACK_H)
 	@$(CC) $(CFLAGS) $(SPECOPTS) /Fo$@ $(SSHR)\pcsys.c
 tty.o: $(SSHR)\pctty.c $(HACK_H)
 	@$(CC) $(CFLAGS) $(SPECOPTS) /Fo$@ $(SSHR)\pctty.c
@@ -1083,6 +1083,7 @@ sp_lev.o: sp_lev.c $(HACK_H) $(INCL)\dlb.h $(INCL)\sp_lev.h
 spell.o: spell.c $(HACK_H)
 steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
+sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
 timeout.o: timeout.c $(HACK_H) $(INCL)\lev.h
 topten.o: topten.c $(HACK_H) $(INCL)\dlb.h $(INCL)\patchlev.h

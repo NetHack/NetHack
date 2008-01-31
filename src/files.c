@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.5	2007/10/27	*/
+/*	SCCS Id: @(#)files.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2067,9 +2067,18 @@ int		src;
 	    (void) strncpy(catname, bufp, PL_PSIZ-1);
 #ifdef SYSCF
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "WIZARDS", 6)) {
-	    (void) strncpy(wizards, bufp, PL_PSIZ-1);
+	    if(sysopt.wizards) free(sysopt.wizards);
+	    sysopt.wizards = alloc(strlen(bufp));
+	    (void) strcpy(sysopt.wizards, bufp);
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "SUPPORT", 7)) {
+	    if(sysopt.support) free(sysopt.support);
+	    sysopt.support = alloc(strlen(bufp));
+	    (void) strcpy(sysopt.support, bufp);
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "RECOVER", 7)) {
+	    if(sysopt.recover) free(sysopt.recover);
+	    sysopt.recover = alloc(strlen(bufp));
+	    (void) strcpy(sysopt.recover, bufp);
 #endif
-
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
 			      1, "BOULDER");

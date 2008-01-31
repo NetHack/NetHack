@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.5	2008/01/19	*/
+/*	SCCS Id: @(#)end.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,6 +9,7 @@
 #ifndef NO_SIGNAL
 #include <signal.h>
 #endif
+#include <ctype.h>
 #include <limits.h>
 #include "dlb.h"
 
@@ -255,7 +256,7 @@ int how;
 	return;
 }
 
-#if defined(WIN32)
+#if defined(WIN32) && !defined(SYSCF)
 #define NOTIFY_NETHACK_BUGS
 #endif
 
@@ -283,13 +284,24 @@ panic VA_DECL(const char *, str)
 #if defined(WIZARD) && !defined(MICRO)
 # if defined(NOTIFY_NETHACK_BUGS)
 	if (!wizard)
-	    raw_printf("Report the following error to \"%s\".",
-			"nethack-bugs@nethack.org");
+	    raw_printf("Report the following error to \"%s\" or at \"%s\".",
+			DEVTEAM_EMAIL, DEVTEAM_URL);
 	else if (program_state.something_worth_saving)
 	    raw_print("\nError save file being written.\n");
 # else
-	if (!wizard)
-	    raw_printf("Report error to \"%s\"%s.",
+	if (!wizard){
+	    if(sysopt.support)
+		raw_printf("To report this error, %s%s.", sysopt.support,
+			!program_state.something_worth_saving ? "" :
+			" and it may be possible to rebuild.");
+	    else if(sysopt.wizards){
+		char *tmp = build_english_list(sysopt.wizards);
+		raw_printf("To report this error, contact %s%s", tmp,
+			!program_state.something_worth_saving ? "" :
+			" and it may be possible to rebuild.");
+		free(tmp);
+	    } else
+		raw_printf("Report error to \"%s\"%s.",
 #  ifdef WIZARD_NAME	/*(KR1ED)*/
 			WIZARD_NAME,
 #  else
@@ -297,10 +309,17 @@ panic VA_DECL(const char *, str)
 #  endif
 			!program_state.something_worth_saving ? "" :
 			" and it may be possible to rebuild.");
+	}
 # endif
+	/* XXX can we move this above the prints?  Then we'd be able to
+	 * suppress "it may be possible to rebuild" based on dosave0()
+	 * or say it's NOT possible to rebuild. */
 	if (program_state.something_worth_saving) {
 	    set_error_savefile();
-	    (void) dosave0();
+	    if(dosave0()){
+		    /* os/win port specific recover instructions */
+		if(sysopt.recover) raw_printf("%s", sysopt.recover);
+	    }
 	}
 #endif
 	{
@@ -1293,4 +1312,58 @@ restore_killers(fd)
     }
 }
 
+static int
+wordcount(p)
+    char *p;
+{
+    int words = 0;
+    while(*p){
+	while(*p && isspace(*p))p++;
+	if(*p) words++;
+	while(*p && !isspace(*p))p++;
+    }
+    return words;
+}
+
+static void
+bel_copy1(inp, out)
+    char **inp, *out;
+{
+    char *in = *inp;
+    while(*in && isspace(*in)) in++;
+    while(*in && !isspace(*in)){
+	*out = *in; out++; in++;
+    }
+    *inp = in;
+}
+
+char *
+build_english_list(in)
+    char *in;
+{
+    char *out;
+    int len = strlen(in);
+    char *p = in;
+    int words = wordcount(in);
+    switch(words){
+    case 0:
+	impossible("no words in list");
+	break;
+    case 1:
+	out = (char *)alloc(len+1);
+	strcpy(out, in);
+	break;
+    default:
+	len += 3 + (words-1);
+	bel_copy1(&p, out); words--;
+	while(words>1){
+		strcat(out, ", ");
+		bel_copy1(&p, out); words--;
+	}
+	strcat(out, " or ");
+	bel_copy1(&p, out);
+	break;
+    }
+    return out;
+}
 /*end.c*/

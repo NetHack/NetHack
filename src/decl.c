@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)decl.c	3.5	2006/07/10	*/
+/*	SCCS Id: @(#)decl.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -70,9 +70,6 @@ const char ynNaqchars[] = "yn#aq";
 NEARDATA long yn_number = 0L;
 
 const char disclosure_options[] = "iavgc";
-#ifdef SYSCF
-char wizards[PL_PSIZ] = DUMMY;
-#endif
 
 #if defined(MICRO) || defined(WIN32)
 char hackdir[PATHLEN];		/* where rumors, help, record are */

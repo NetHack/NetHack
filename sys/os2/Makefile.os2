@@ -1,4 +1,4 @@
-#	SCCS Id: @(#)Makefile.os2	3.5	2007/05/25
+#	SCCS Id: @(#)Makefile.os2	3.5	2008/01/30
 #	OS/2 NetHack 3.5 Makefile for OS/2 versions 1.x and 2.x
 #	Copyright (C) 1990, 1991, 1992, 1993, 1996 Timo Hakulinen
 #
@@ -665,6 +665,7 @@ VOBJ273 = $(OBJ)\write.o
 VOBJ274 = $(OBJ)\zap.o
 VOBJ281 = $(OBJ)\role.o
 VOBJ282 = $(OBJ)\steed.o
+VOBJ283 = $(OBJ)\sys.o
 
 VOBJ01 = $(VOBJ011) $(VOBJ012) $(VOBJ013) $(VOBJ014)
 VOBJ02 = $(VOBJ021) $(VOBJ022) $(VOBJ023) $(VOBJ024)
@@ -693,7 +694,7 @@ VOBJ24 = $(VOBJ241) $(VOBJ242) $(VOBJ243) $(VOBJ244)
 VOBJ25 = $(VOBJ251) $(VOBJ252) $(VOBJ253) $(VOBJ254)
 VOBJ26 = $(VOBJ261) $(VOBJ262) $(VOBJ263) $(VOBJ264)
 VOBJ27 = $(VOBJ271) $(VOBJ272) $(VOBJ273) $(VOBJ274)
-VOBJ28 = $(VOBJ281) $(VOBJ282)
+VOBJ28 = $(VOBJ281) $(VOBJ282) $(VOBJ283)
 VOBJ29 = $(WINOBJ) $(RANDOM)
 HHOBJ  = $(OBJ)\version.o
 
@@ -719,7 +720,7 @@ HACK_H	   = $(CONFIG_H) $(INCL)\context.h $(DECL_H) $(INCL)\monsym.h $(INCL)\mkr
 	     $(INCL)\objclass.h $(TRAP_H) $(INCL)\engrave.h $(INCL)\flag.h \
 	     $(INCL)\rm.h $(INCL)\dungeon.h $(INCL)\hack.h $(INCL)\display.h \
 	     $(INCL)\vision.h $(INCL)\wintty.h $(INCL)\wintype.h $(INCL)\align.h \
-	     $(INCL)\winprocs.h
+	     $(INCL)\winprocs.h $(INCL)\sys.h
 
 #
 #	The default target.
@@ -873,6 +874,7 @@ $(TEMP)\$(GAME).r : $(HOBJ) $(TEMP)\$(GAMEDEF)
 	$(ECHO) $(VOBJ274) >> $@
 	$(ECHO) $(VOBJ281) >> $@
 	$(ECHO) $(VOBJ282) >> $@
+	$(ECHO) $(VOBJ283) >> $@
 	$(ECHO) $(WINOBJ1) >> $@
 	$(ECHO) $(WINOBJ2) >> $@
 	$(ECHO) $(WINOBJ3) >> $@
@@ -1678,6 +1680,8 @@ $(OBJ)\spell.o    : $(SRC)\$(CB) $(HACK_H)
 $(OBJ)\steal.o    : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\steed.o    : $(SRC)\$(CB) $(HACK_H)
+	$(SRCCC)
+$(OBJ)\sys.o    : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\teleport.o : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)

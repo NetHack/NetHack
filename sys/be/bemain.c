@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)bemain.c	3.5	2007/02/15	*/
+/*	SCCS Id: @(#)bemain.c	3.5	2008/01/30	*/
 /* Copyright (c) Dean Luick, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,6 +24,8 @@ int MAIN(int argc, char **argv)
 	int fd;
 	char *dir;
 	boolean resuming = FALSE;	/* assume new game */
+
+	sys_early_init();
 
 	dir = nh_getenv("NETHACKDIR");
 	if (!dir) dir = nh_getenv("HACKDIR");

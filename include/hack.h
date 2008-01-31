@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2008/01/19	*/
+/*	SCCS Id: @(#)hack.h	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -168,6 +168,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 
 #include "extern.h"
 #include "winprocs.h"
+#include "sys.h"
 
 #ifdef USE_TRAMPOLI
 #include "wintty.h"
@@ -419,5 +420,8 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #else
 # define CFDECLSPEC
 #endif
+
+#define DEVTEAM_EMAIL "devteam@nethack.org"
+#define DEVTEAM_URL   "http://www.nethack.org"
  
 #endif /* HACK_H */

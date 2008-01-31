@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)unixmain.c	3.5	2007/02/14	*/
+/*	SCCS Id: @(#)unixmain.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -53,6 +53,8 @@ char *argv[];
 #endif
 	boolean exact_username;
 	boolean resuming = FALSE;	/* assume new game */
+
+	sys_early_init();
 
 #if defined(__APPLE__)
 	/* special hack to change working directory to a resource fork when
@@ -540,11 +542,11 @@ authorize_wizard_mode()
 	    }
 	}
 #ifdef SYSCF
-	if (pw && wizards[0]) {
-	    if(wizards[0] == '*') return TRUE;	/*allow any user to be wizard*/
+	if (pw && sysopt.wizards[0]) {
+	    if(sysopt.wizards[0] == '*') return TRUE;	/*allow any user to be wizard*/
 	    int pwlen = strlen(pw->pw_name);
-	    char *eop = eos(wizards);
-	    char *w = wizards;
+	    char *eop = eos(sysopt.wizards);
+	    char *w = sysopt.wizards;
 	    while( w+pwlen <= eop ){
 		if( ! *w ) break;
 		if( isspace(*w) ){ w++; continue;}

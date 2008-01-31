@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-#	SCCS Id: @(#)Makefile.agc	3.5	2006/01/07
+#	SCCS Id: @(#)Makefile.agc	3.5	2008/10/30
 # Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.
 # NetHack may be freely redistributed.  See license for details.
 
@@ -172,12 +172,12 @@ COMMOBJ = \
 	$(O)region.o	$(O)restore.o	$(O)rnd.o	$(O)role.o	\
 	$(O)rumors.o	$(O)save.o	$(O)shk.o	$(O)shknam.o	\
 	$(O)sit.o	$(O)sounds.o	$(O)sp_lev.o	$(O)spell.o	\
-	$(O)steal.o	$(O)steed.o	$(O)teleport.o	$(O)timeout.o	\
-	$(O)topten.o	$(O)track.o	$(O)trap.o	$(O)u_init.o	\
-	$(O)uhitm.o	$(O)vault.o	$(O)version.o	$(O)vision.o	\
-	$(O)weapon.o	$(O)were.o	$(O)wield.o	$(O)windows.o	\
-	$(O)wizard.o	$(O)worm.o	$(O)worn.o	$(O)write.o	\
-	$(O)zap.o
+	$(O)steal.o	$(O)steed.o	$(O)sys.o	$(O)teleport.o	\
+	$(O)timeout.o	$(O)topten.o	$(O)track.o	$(O)trap.o	\
+	$(O)u_init.o	$(O)uhitm.o	$(O)vault.o	$(O)version.o	\
+	$(O)vision.o	$(O)weapon.o	$(O)were.o	$(O)wield.o	\
+	$(O)windows.o	$(O)wizard.o	$(O)worm.o	$(O)worn.o	\
+	$(O)write.o	$(O)zap.o
 
 MAKEDEFOBJ = \
 	$(O)monstr.o
@@ -1194,6 +1194,8 @@ $(O)steal.o:  $(NHS)steal.c $(HDEP)
 
 $(O)steed.o:	$(NHS)steed.c $(HDEP)
 
+$(O)sys.o:	$(NHS)sys.c $(HDEP)
+
 $(O)teleport.o:	$(NHS)teleport.c $(HDEP)
 
 $(O)timeout.o:  $(NHS)timeout.c $(HDEP) $(I)lev.h
@@ -1269,7 +1271,7 @@ $(I)global.h:  $(I)coord.h $(I)pcconf.h $(I)amiconf.h
 $(I)hack.h:  $(I)config.h $(I)context.h $(I)trap.h $(I)decl.h $(I)dungeon.h 
 		$(I)monsym.h $(I)mkroom.h $(I)objclass.h $(I)flag.h $(I)rm.h 
 		$(I)vision.h $(I)display.h $(I)wintype.h $(I)engrave.h 
-		$(I)rect.h $(I)region.h $(I)trampoli.h
+		$(I)rect.h $(I)region.h $(I)trampoli.h $(I)sys.h
 	-setdate $(I)hack.h
 	-c:wait 2
 
