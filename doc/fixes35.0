@@ -278,6 +278,7 @@ potion thrown by monster which hit a long worm's tail gave feedback about
 	hitting its head
 implement energy vortex's previously unused energy drain attack
 changing alignment type resets alignment record to 0 (nomimally aligned)
+while polymorphed, suppress attribute gain/lose earned by pre-poly exercise
 
 
 Platform- and/or Interface-Specific Fixes

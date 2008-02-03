@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)attrib.c	3.5	2008/01/21	*/
+/*	SCCS Id: @(#)attrib.c	3.5	2008/02/02	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -440,10 +440,21 @@ exerper()
 	}
 }
 
+/* exercise/abuse text (must be in attribute order, not botl order);
+   phrased as "You must have been [][0]." or "You haven't been [][1]." */
+static NEARDATA const char * const exertext[A_MAX][2] = {
+    { "exercising diligently", "exercising properly" },		    /* Str */
+    { 0, 0 },							    /* Int */
+    { "very observant", "paying attention" },			    /* Wis */
+    { "working on your reflexes", "working on reflexes lately" },   /* Dex */
+    { "leading a healthy life-style", "watching your health" },	    /* Con */
+    { 0, 0 },							    /* Cha */
+};
+
 void
 exerchk()
 {
-	int	i, mod_val;
+	int i, ax, mod_val, lolim, hilim;
 
 	/*	Check out the periodic accumulations */
 	exerper();
@@ -465,15 +476,30 @@ exerchk()
 	     *	increase/decrease, you lose some of the
 	     *	accumulated effects.
 	     */
-	    for(i = 0; i < A_MAX; AEXE(i++) /= 2) {
+	    for (i = 0; i < A_MAX; ++i) {
+		ax = AEXE(i);
+		/* nothing to do here if no exercise or abuse has occurred
+		   (Int and Cha always fall into this category) */
+		if (!ax) continue;	/* ok to skip nextattrib */
 
-		if(ABASE(i) >= 18 || !AEXE(i)) continue;
-		if(i == A_INT || i == A_CHA) continue;/* can't exercise these */
+		mod_val = sgn(ax);		/* +1 or -1; used below */
+		/* no further effect for exercise if at max or abuse if at min;
+		   can't exceed 18 via exercise even if actual max is higher */
+		lolim = ATTRMIN(i);	/* usually 3; might be higher */
+		hilim = ATTRMAX(i);	/* usually 18; maybe lower or higher */
+		if (hilim > 18) hilim = 18;
+		if ((ax < 0) ? (ABASE(i) <= lolim) : (ABASE(i) >= hilim))
+		    goto nextattrib;
+		/* can't exercise non-Wisdom while polymorphed; previous
+		   exercise/abuse gradually wears off without impact then */
+		if (Upolyd && i != A_WIS) goto nextattrib;
 
 #ifdef DEBUG
 		pline("exerchk: testing %s (%d).",
-			(i == A_STR) ? "Str" : (i == A_WIS) ? "Wis" :
-			(i == A_DEX) ? "Dex" : "Con", AEXE(i));
+		      (i == A_STR) ? "Str" : (i == A_INT) ? "Int?" :
+		       (i == A_WIS) ? "Wis" : (i == A_DEX) ? "Dex" :
+			(i == A_CON) ? "Con" : (i == A_CHA) ? "Cha?" : "???",
+		      ax);
 #endif
 		/*
 		 *	Law of diminishing returns (Part III):
@@ -481,9 +507,8 @@ exerchk()
 		 *	You don't *always* gain by exercising.
 		 *	[MRS 92/10/28 - Treat Wisdom specially for balance.]
 		 */
-		if(rn2(AVAL) > ((i != A_WIS) ? abs(AEXE(i)*2/3) : abs(AEXE(i))))
-		    continue;
-		mod_val = sgn(AEXE(i));
+		if (rn2(AVAL) > ((i != A_WIS) ? (abs(ax) * 2 / 3) : abs(ax)))
+		    goto nextattrib;
 
 #ifdef DEBUG
 		pline("exerchk: changing %d.", i);
@@ -493,32 +518,21 @@ exerchk()
 		    pline("exerchk: changed %d.", i);
 #endif
 		    /* if you actually changed an attrib - zero accumulation */
-		    AEXE(i) = 0;
+		    AEXE(i) = ax = 0;
 		    /* then print an explanation */
-		    switch(i) {
-		    case A_STR: You((mod_val >0) ?
-				    "must have been exercising." :
-				    "must have been abusing your body.");
-				break;
-		    case A_WIS: You((mod_val >0) ?
-				    "must have been very observant." :
-				    "haven't been paying attention.");
-				break;
-		    case A_DEX: You((mod_val >0) ?
-				    "must have been working on your reflexes." :
-				    "haven't been working on reflexes lately.");
-				break;
-		    case A_CON: You((mod_val >0) ?
-				    "must be leading a healthy life-style." :
-				    "haven't been watching your health.");
-				break;
-		    }
+		    You("%s %s.",
+			(mod_val > 0) ? "must have been" : "haven't been",
+			exertext[i][(mod_val > 0) ? 0 : 1]);
 		}
 	    }
 	    context.next_attrib_check += rn1(200,800);
 #ifdef DEBUG
 	    pline("exerchk: next check at %ld.", context.next_attrib_check);
 #endif
+ nextattrib:
+	    /* this used to be ``AEXE(i) /= 2'' but that would produce
+	       platform-dependent rounding/truncation for negative values */
+	    AEXE(i) = (abs(ax) / 2) * mod_val;
 	}
 }
 
