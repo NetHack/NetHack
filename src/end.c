@@ -1330,10 +1330,11 @@ bel_copy1(inp, out)
     char **inp, *out;
 {
     char *in = *inp;
+
+    out += strlen(out);	/* eos() */
     while(*in && isspace(*in)) in++;
-    while(*in && !isspace(*in)){
-	*out = *in; out++; in++;
-    }
+    while(*in && !isspace(*in)) *out++ = *in++;
+    *out = '\0';
     *inp = in;
 }
 
@@ -1341,29 +1342,39 @@ char *
 build_english_list(in)
     char *in;
 {
-    char *out;
-    int len = strlen(in);
-    char *p = in;
-    int words = wordcount(in);
+    char *out, *p = in;
+    int len = (int)strlen(p), words = wordcount(p);
+
+    /* +3: " or " - " "; +(words - 1): (N-1)*(", " - " ") */
+    if (words > 1) len += 3 + (words - 1);
+    out = (char *)alloc(len + 1);
+    *out = '\0';	/* bel_copy1() appends */
+
     switch(words){
     case 0:
 	impossible("no words in list");
 	break;
     case 1:
-	out = (char *)alloc(len+1);
-	strcpy(out, in);
+	/* "single" */
+	bel_copy1(&p, out);
 	break;
     default:
-	len += 3 + (words-1);
-	bel_copy1(&p, out); words--;
-	while(words>1){
-		strcat(out, ", ");
-		bel_copy1(&p, out); words--;
+	if (words == 2) {
+	    /* "first or second" */
+	    bel_copy1(&p, out);
+	    Strcat(out, " ");
+	} else {
+	    /* "first, second, or third */
+	    do {
+		bel_copy1(&p, out);
+		Strcat(out, ", ");
+	    } while (--words > 1);
 	}
-	strcat(out, " or ");
+	Strcat(out, "or ");
 	bel_copy1(&p, out);
 	break;
     }
     return out;
 }
+
 /*end.c*/
