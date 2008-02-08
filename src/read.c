@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2007/07/13	*/
+/*	SCCS Id: @(#)read.c	3.5	2008/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2103,7 +2103,10 @@ create_particular()
 		    set_malign(mtmp);
 		}
 		madeany = TRUE;
-		if (mtmp->cham >= LOW_PM && firstchoice != NON_PM)
+		/* in case we got a doppelganger instead of what was asked
+		   for, make it start out looking like what was asked for */
+		if (mtmp->cham != NON_PM && firstchoice != NON_PM &&
+			mtmp->cham != firstchoice)
 		    (void)newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
 	    }
 	}
