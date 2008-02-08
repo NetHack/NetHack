@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2007/07/13	*/
+/*	SCCS Id: @(#)mon.c	3.5	2008/02/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,6 +21,10 @@ STATIC_DCL long FDECL(mm_displacement, (struct monst *,struct monst *));
 STATIC_DCL int NDECL(pick_animal);
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 STATIC_DCL void FDECL(dealloc_mextra, (struct mextra *));
+STATIC_DCL int FDECL(pickvampshape, (struct monst *));
+#ifdef WIZARD
+STATIC_DCL boolean FDECL(validvamp, (struct monst *,int *,int));
+#endif
 
 #ifdef REINCARNATION
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
@@ -2517,6 +2521,70 @@ int shiftflags;
 	    mon->female = was_female;
 }
 
+STATIC_OVL int
+pickvampshape(mon)
+struct monst *mon;
+{
+	int mndx = mon->cham;
+
+	switch (mndx) {
+	case PM_VLAD_THE_IMPALER:
+	    /* ensure Vlad can keep carrying the Candelabrum */
+	    if (mon_has_special(mon)) break;	/* leave mndx as is */
+	    /*FALLTHRU*/
+	case PM_VAMPIRE_LORD:	/* vampire lord or Vlad can become wolf */
+	    if (!rn2(10)) {
+		mndx = PM_WOLF;
+		break;
+	    }
+	    /*FALLTHRU*/
+	case PM_VAMPIRE:	/* any vampire can become fog or bat */
+	    mndx = !rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
+	    break;
+	}
+	return mndx;
+}
+
+#ifdef WIZARD
+/* prevent wizard mode user from specifying invalid vampshifter shape */
+static boolean
+validvamp(mon, mndx_p, monclass)
+struct monst *mon;
+int *mndx_p, monclass;
+{
+	if (!is_vampshifter(mon)) return TRUE;	/* simplify caller's usage */
+
+	if (*mndx_p == PM_VAMPIRE || *mndx_p == PM_VAMPIRE_LORD ||
+		*mndx_p == PM_VLAD_THE_IMPALER) {
+	    /* player picked some type of vampire; use mon's self */
+	    *mndx_p = mon->cham;
+	    return TRUE;
+	}
+	if (mon->cham == PM_VLAD_THE_IMPALER && mon_has_special(mon)) {
+	    /* Vlad with Candelabrum; override choice, then accept it */
+	    *mndx_p = PM_VLAD_THE_IMPALER;
+	    return TRUE;
+	}
+	/* basic vampires can't become wolves; any can become fog or bat */
+	if (*mndx_p == PM_WOLF) return (mon->cham != PM_VAMPIRE);
+	if (*mndx_p == PM_FOG_CLOUD || *mndx_p == PM_VAMPIRE_BAT) return TRUE;
+
+	/* if we get here, specific type was no good; try by class */
+	switch (monclass) {
+	case S_VAMPIRE:	*mndx_p = mon->cham; break;
+	case S_BAT:	*mndx_p = PM_VAMPIRE_BAT; break;
+	case S_VORTEX:	*mndx_p = PM_FOG_CLOUD; break;
+	case S_DOG:	if (mon->cham != PM_VAMPIRE) {
+			    *mndx_p = PM_WOLF;
+			    break;
+			}
+			/*FALLTHRU*/
+	default:	*mndx_p = NON_PM; break;
+	}
+	return (*mndx_p != NON_PM);
+}
+#endif /*WIZARD*/
+
 int
 select_newcham_form(mon)
 struct monst *mon;
@@ -2551,20 +2619,9 @@ struct monst *mon;
 		if (!rn2(3)) mndx = pick_animal();
 		break;
 	    case PM_VLAD_THE_IMPALER:
-		if (mon_has_special(mon)) { /* ensure Vlad can carry it still */
-		    mndx = PM_VLAD_THE_IMPALER;
-		    break;
-		}
-		/*FALLTHRU*/
 	    case PM_VAMPIRE_LORD:
-		if (!rn2(10)) {
-		    /* VAMPIRE_LORD || VLAD */
-		    mndx = PM_WOLF;
-		    break;
-		}
-		/*FALLTHRU*/
 	    case PM_VAMPIRE:
-		mndx = !rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
+		mndx = pickvampshape(mon);
 		break;
 	    case NON_PM:	/* ordinary */
 	      {
@@ -2584,22 +2641,27 @@ struct monst *mon;
 	    int monclass;
 
 	    Sprintf(pprompt,
-		    "Change %s into what kind of monster? [type the name]",
-		    mon_nam(mon));
+		    "Change %s @ <%d,%d> into what kind of monster?",
+		    noit_mon_nam(mon), (int)mon->mx, (int)mon->my);
 	    tryct = 5;
 	    do {
+		monclass = 0;
 		getlin(pprompt, buf);
-		if (*buf == '\033') break;
+		mungspaces(buf);
+		if (*buf == '\033' || !strcmp(buf, "*") ||
+			!strcmp(buf, "random")) break;	/* mndx == NON_PM */
 		mndx = name_to_mon(buf);
-		if (mndx >= LOW_PM) break;
+		if (mndx >= LOW_PM && validvamp(mon, &mndx, monclass)) break;
 		monclass = name_to_monclass(buf, &mndx);
 		if (monclass && mndx == NON_PM)
 		    mndx = mkclass_poly(monclass);
-		if (mndx >= LOW_PM) break;
+		if (mndx >= LOW_PM && validvamp(mon, &mndx, monclass)) break;
 
-		You("cannot polymorph %s into that.", mon_nam(mon));
+		pline("It can't become that.");
 	    } while (--tryct > 0);
 	    if (!tryct) pline(thats_enough_tries);
+	    if (is_vampshifter(mon) && !validvamp(mon, &mndx, monclass))
+		mndx = pickvampshape(mon);	/* don't resort to arbitrary */
 	}
 #endif /*WIZARD*/
 	if (mndx == NON_PM) mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
