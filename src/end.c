@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)end.c	3.5	2008/01/30	*/
+/*	SCCS Id: @(#)end.c	3.5	2008/02/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -195,21 +195,27 @@ struct monst *mtmp;
 int how;
 {
 	char buf[BUFSZ];
-	boolean distorted = (boolean)(Hallucination && canspotmon(mtmp));
+	struct permonst *mptr = mtmp->data,
+		*champtr = (mtmp->cham >= LOW_PM) ? &mons[mtmp->cham] : mptr;
+	boolean distorted = (boolean)(Hallucination && canspotmon(mtmp)),
+		mimicker = (mtmp->m_ap_type == M_AP_MONSTER),
+		immitator = (mptr != champtr || mimicker);
 
 	You((how == STONING) ? "turn to stone..." : "die...");
 	mark_synch();	/* flush buffered screen output */
 	buf[0] = '\0';
 	killer.format = KILLED_BY_AN;
-	/* "killed by the high priest of Crom" is okay, "killed by the high
-	   priest" alone isn't */
-	if ((mtmp->data->geno & G_UNIQ) != 0 && !(mtmp->data == &mons[PM_HIGH_PRIEST] && !mtmp->ispriest)) {
-	    if (!type_is_pname(mtmp->data))
+	/* "killed by the high priest of Crom" is okay,
+	   "killed by the high priest" alone isn't */
+	if ((mptr->geno & G_UNIQ) != 0 &&
+		!(immitator && !mimicker) &&
+		!(mptr == &mons[PM_HIGH_PRIEST] && !mtmp->ispriest)) {
+	    if (!type_is_pname(mptr))
 		Strcat(buf, "the ");
 	    killer.format = KILLED_BY;
 	}
 	/* _the_ <invisible> <distorted> ghost of Dudley */
-	if (mtmp->data == &mons[PM_GHOST] && has_mname(mtmp)) {
+	if (mptr == &mons[PM_GHOST] && has_mname(mtmp)) {
 		Strcat(buf, "the ");
 		killer.format = KILLED_BY;
 	}
@@ -218,7 +224,38 @@ int how;
 	if (distorted)
 		Strcat(buf, "hallucinogen-distorted ");
 
-	if(mtmp->data == &mons[PM_GHOST]) {
+	if (immitator) {
+		char shape[BUFSZ];
+		const char *realnm = champtr->mname, *fakenm = mptr->mname;
+		boolean alt = is_vampshifter(mtmp);
+
+		if (mimicker) {
+		    /* realnm is already correct because champtr==mptr;
+		       set up fake mptr for type_is_pname/the_unique_pm */
+		    mptr = &mons[mtmp->mappearance];
+		    fakenm = mptr->mname;
+		} else if (alt && strstri(realnm, "vampire") &&
+			!strcmp(fakenm, "vampire bat")) {
+		    /* special case: use "vampire in bat form" in preference
+		       to redundant looking "vampire in vampire bat form" */
+		    fakenm = "bat";
+		}
+		/* for the alternate format, always suppress any article;
+		   pname and the_unique should also have s_suffix() applied,
+		   but vampires don't take on any shapes which warrant that */
+		if (alt || type_is_pname(mptr)) /* no article */
+		    Strcpy(shape, fakenm);
+		else if (the_unique_pm(mptr)) /* "the"; don't use the() here */
+		    Sprintf(shape, "the %s", fakenm);
+		else /* "a"/"an" */
+		    Strcpy(shape, an(fakenm));
+		/* omit "called" to avoid excessive verbosity */
+		Sprintf(eos(buf),
+			alt ? "%s in %s form" :
+			  mimicker ? "%s disguised as %s" : "%s immitating %s",
+			realnm, shape);
+		mptr = mtmp->data;	/* reset for mimicker case */
+	} else if (mptr == &mons[PM_GHOST]) {
 		Strcat(buf, "ghost");
 		if (has_mname(mtmp)) Sprintf(eos(buf), " of %s", MNAME(mtmp));
 	} else if(mtmp->isshk) {
@@ -233,20 +270,20 @@ int how;
 		   it overrides the effect of Hallucination on priestname() */
 		Strcat(buf, m_monnam(mtmp));
 	} else {
-		Strcat(buf, mtmp->data->mname);
+		Strcat(buf, mptr->mname);
 		if (has_mname(mtmp))
 		    Sprintf(eos(buf), " called %s", MNAME(mtmp));
 	}
 
 	if (multi) Strcat(buf, ", while helpless");
 	Strcpy(killer.name, buf);
-	if (mtmp->data->mlet == S_WRAITH)
+	if (mptr->mlet == S_WRAITH)
 		u.ugrave_arise = PM_WRAITH;
-	else if (mtmp->data->mlet == S_MUMMY && urace.mummynum != NON_PM)
+	else if (mptr->mlet == S_MUMMY && urace.mummynum != NON_PM)
 		u.ugrave_arise = urace.mummynum;
-	else if (mtmp->data->mlet == S_VAMPIRE && Race_if(PM_HUMAN))
+	else if (mptr->mlet == S_VAMPIRE && Race_if(PM_HUMAN))
 		u.ugrave_arise = PM_VAMPIRE;
-	else if (mtmp->data == &mons[PM_GHOUL])
+	else if (mptr == &mons[PM_GHOUL])
 		u.ugrave_arise = PM_GHOUL;
 	if (u.ugrave_arise >= LOW_PM &&
 				(mvitals[u.ugrave_arise].mvflags & G_GENOD))
