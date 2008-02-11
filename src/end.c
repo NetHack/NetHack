@@ -199,7 +199,7 @@ int how;
 		*champtr = (mtmp->cham >= LOW_PM) ? &mons[mtmp->cham] : mptr;
 	boolean distorted = (boolean)(Hallucination && canspotmon(mtmp)),
 		mimicker = (mtmp->m_ap_type == M_AP_MONSTER),
-		immitator = (mptr != champtr || mimicker);
+		imitator = (mptr != champtr || mimicker);
 
 	You((how == STONING) ? "turn to stone..." : "die...");
 	mark_synch();	/* flush buffered screen output */
@@ -208,7 +208,7 @@ int how;
 	/* "killed by the high priest of Crom" is okay,
 	   "killed by the high priest" alone isn't */
 	if ((mptr->geno & G_UNIQ) != 0 &&
-		!(immitator && !mimicker) &&
+		!(imitator && !mimicker) &&
 		!(mptr == &mons[PM_HIGH_PRIEST] && !mtmp->ispriest)) {
 	    if (!type_is_pname(mptr))
 		Strcat(buf, "the ");
@@ -224,7 +224,7 @@ int how;
 	if (distorted)
 		Strcat(buf, "hallucinogen-distorted ");
 
-	if (immitator) {
+	if (imitator) {
 		char shape[BUFSZ];
 		const char *realnm = champtr->mname, *fakenm = mptr->mname;
 		boolean alt = is_vampshifter(mtmp);
@@ -252,7 +252,7 @@ int how;
 		/* omit "called" to avoid excessive verbosity */
 		Sprintf(eos(buf),
 			alt ? "%s in %s form" :
-			  mimicker ? "%s disguised as %s" : "%s immitating %s",
+			  mimicker ? "%s disguised as %s" : "%s imitating %s",
 			realnm, shape);
 		mptr = mtmp->data;	/* reset for mimicker case */
 	} else if (mptr == &mons[PM_GHOST]) {

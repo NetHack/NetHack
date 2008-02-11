@@ -395,7 +395,7 @@ using F to attack wall/boulder/statue while wielding pick digs/breaks target
 shapechangers shouldn't receive starting inventory of their initial shape
 streamline old ^X output and integrate it with enlightenment feedback;
 	new ^X output includes expanded form of abbreviated bottom line info
-"killed by X" becomes "killed by a chameleon immitating X" when appropriate
+"killed by X" becomes "killed by a chameleon imitating X" when appropriate
 
 
 Platform- and/or Interface-Specific New Features
