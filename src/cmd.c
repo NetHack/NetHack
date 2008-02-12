@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2008/01/19	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2008/02/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1263,10 +1263,10 @@ STATIC_OVL void
 one_characteristic(mode, final, attrindx) 
 int mode, final, attrindx;
 {
-    boolean hide_innate_value = FALSE;
+    boolean hide_innate_value = FALSE, interesting_alimit;
     int acurrent, abase, apeak, alimit;
-    const char *attrname;
-    char buf[BUFSZ], valstring[32];
+    const char *attrname, *paren_pfx;
+    char subjbuf[BUFSZ], valubuf[BUFSZ], valstring[32];
 
     /* being polymorphed or wearing certain cursed items prevents
        hero from reliably tracking changes to characteristics so
@@ -1291,53 +1291,66 @@ int mode, final, attrindx;
 	    hide_innate_value = TRUE;
     }
     switch (attrindx) {
-    case A_STR: attrname = "Strength";
+    case A_STR: attrname = "strength";
 		if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER &&
 		    uarmg->cursed) hide_innate_value = TRUE;
 		break;
-    case A_DEX: attrname = "Dexterity";
+    case A_DEX: attrname = "dexterity";
 		break;
-    case A_CON: attrname = "Constitution";
+    case A_CON: attrname = "constitution";
 		break;
-    case A_INT: attrname = "Intelligence";
+    case A_INT: attrname = "intelligence";
 		if (uarmh && uarmh->otyp == DUNCE_CAP && uarmh->cursed)
 		    hide_innate_value = TRUE;
 		break;
-    case A_WIS: attrname = "Wisdom";
+    case A_WIS: attrname = "wisdom";
 		if (uarmh && uarmh->otyp == DUNCE_CAP && uarmh->cursed)
 		    hide_innate_value = TRUE;
 		break;
-    case A_CHA: attrname = "Charisma";
+    case A_CHA: attrname = "charisma";
 		break;
     default: return;		/* impossible */
     };
     if ((mode & MAGICENLIGHTENMENT) && !Upolyd) hide_innate_value = FALSE;
 
     acurrent = ACURR(attrindx);
-    Sprintf(buf, "%s = %s", attrname,
-	    attrval(attrindx, acurrent, valstring));
+    (void)attrval(attrindx, acurrent, valubuf); /* Sprintf(valubuf,"%d",) */
+    Sprintf(subjbuf, "Your %s ", attrname);
 
     if (!hide_innate_value) {
-	/* show abase, amax, and attrmax if acurr doesn't match abase
-	   (magic bonus or penalty) or abase doesn't match amax (poison
-	   or exercised abuse) or attrmax is different from normal human */
+	/* show abase, amax, and/or attrmax if acurr doesn't match abase
+	   (a magic bonus or penalty is in effect) or abase doesn't match
+	   amax (some points have been lost to poison or exercise abuse
+	   and are restorable) or attrmax is different from normal human
+	   (while game is in progress; trying to reduce dependency on
+	   spoilers to keep track of such stuff) or attrmax was different
+	   from abase (at end of game; this attribute wasn't maxed out) */
 	abase = ABASE(attrindx);
 	apeak = AMAX(attrindx);
 	alimit = ATTRMAX(attrindx);
-	if (acurrent != abase || abase != apeak ||
-		/* show if limit is not standard value for a human hero */
-		alimit != (attrindx != A_STR ? 18 : STR18(100))) {
-	    /* separate attrval() calls; we overwrite valstring[] each time */
-	    Sprintf(eos(buf), " (%s; base:%s",
-		    final ? "final" : "current",
+	/* criterium for whether the limit is interesting varies */
+	interesting_alimit = final ? (abase != alimit) :
+			    (alimit != (attrindx != A_STR ? 18 : STR18(100)));
+	paren_pfx = final ? " (" : " (current; ";
+	if (acurrent != abase) {
+	    Sprintf(eos(valubuf), "%sbase:%s", paren_pfx,
 		    attrval(attrindx, abase, valstring));
-	    Sprintf(eos(buf), ", peak:%s",
-		    attrval(attrindx, apeak, valstring));
-	    Sprintf(eos(buf), ", maximum:%s)",
-		    attrval(attrindx, alimit, valstring));
+	    paren_pfx = ", ";
 	}
+	if (abase != apeak) {
+	    Sprintf(eos(valubuf), "%speak:%s", paren_pfx,
+		    attrval(attrindx, apeak, valstring));
+	    paren_pfx = ", ";
+	}
+	if (interesting_alimit) {
+	    Sprintf(eos(valubuf), "%slimit:%s", paren_pfx,
+		    attrval(attrindx, alimit, valstring));
+	 /* paren_pfx = ", "; */
+	}
+	if (acurrent != abase || abase != apeak || interesting_alimit)
+	    Strcat(valubuf, ")");
     }
-    putstr(en_win, 0, buf);
+    enl_msg(subjbuf, "is ", "was ", valubuf, "");
 }
 
 /* status: selected obvious capabilities, assorted troubles */
