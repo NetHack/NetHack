@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2008/02/14	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2008/02/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1277,17 +1277,8 @@ int mode, final, attrindx;
     if (Upolyd) {
 	hide_innate_value = TRUE;
     } else if (Fixed_abil) {
-	struct obj *o;
-
-	if ((uleft && uleft->otyp == RIN_SUSTAIN_ABILITY && uleft->cursed) ||
-	 (uright && uright->otyp == RIN_SUSTAIN_ABILITY && uright->cursed) ||
-		/* suboptimal--won't work if someone adds a new item
-		   conferring fixed abilities and hero wears both it and
-		   non-cursed ring of same and what_gives() happens to
-		   find the ring first--but perhaps better than ignoring
-		   the possibility of adding such an item at all */
-		((o = what_gives(&Fixed_abil)) != 0 &&
-		 (o->owornmask & (W_ARMOR|W_AMUL|W_TOOL)) && o->cursed))
+	if (stuck_ring(uleft, RIN_SUSTAIN_ABILITY) ||
+		stuck_ring(uright, RIN_SUSTAIN_ABILITY))
 	    hide_innate_value = TRUE;
     }
     switch (attrindx) {
@@ -1311,6 +1302,7 @@ int mode, final, attrindx;
 		break;
     default: return;		/* impossible */
     };
+    /* note: final disclosure includes MAGICENLIGHTENTMENT */
     if ((mode & MAGICENLIGHTENMENT) && !Upolyd) hide_innate_value = FALSE;
 
     acurrent = ACURR(attrindx);
