@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2007/04/25	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2008/02/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -717,6 +717,8 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
  *	USE_INVLET	  - Use object's invlet.
  *	INVORDER_SORT	  - Use hero's pack order.
  *	SIGNAL_NOMENU	  - Return -1 rather than 0 if nothing passes "allow".
+ *	SIGNAL_ESCAPE	  - Return -1 rather than 0 if player uses ESC to
+ *			    pick nothing.
  */
 int
 query_objlist(qstr, olist, qflags, pick_list, how, allow)
@@ -808,7 +810,9 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		if (mi->count == -1L || mi->count > mi->item.a_obj->quan)
 		    mi->count = mi->item.a_obj->quan;
 	} else if (n < 0) {
-	    n = 0;	/* caller's don't expect -1 */
+	    /* -1 is used for SIGNAL_NOMENU, so callers don't expect it
+	       to indicate that the player declined to make a choice */
+	    n = (qflags & SIGNAL_ESCAPE) ? -2 : 0;
 	}
 	return n;
 }

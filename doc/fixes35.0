@@ -280,6 +280,7 @@ implement energy vortex's previously unused energy drain attack
 changing alignment type resets alignment record to 0 (nomimally aligned)
 while polymorphed, suppress attribute gain/lose earned by pre-poly exercise
 wizard mode #monpolycontrol prompting asked about "it" when monster was unseen
+reprompt if player fails to make a menu choice during inventory identification
 
 
 Platform- and/or Interface-Specific Fixes

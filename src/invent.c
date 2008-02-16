@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2007/11/01	*/
+/*	SCCS Id: @(#)invent.c	3.5	2008/02/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1626,15 +1626,16 @@ menu_identify(id_limit)
 int id_limit;
 {
     menu_item *pick_list;
-    int n, i, first = 1;
+    int n, i, first = 1, tryct = 5;
     char buf[BUFSZ];
     /* assumptions:  id_limit > 0 and at least one unID'd item is present */
 
     while (id_limit) {
 	Sprintf(buf, "What would you like to identify %s?",
 		first ? "first" : "next");
-	n = query_objlist(buf, invent, SIGNAL_NOMENU|USE_INVLET|INVORDER_SORT,
-		&pick_list, PICK_ANY, not_fully_identified);
+	n = query_objlist(buf, invent,
+			  SIGNAL_NOMENU|SIGNAL_ESCAPE|USE_INVLET|INVORDER_SORT,
+			  &pick_list, PICK_ANY, not_fully_identified);
 
 	if (n > 0) {
 	    if (n > id_limit) n = id_limit;
@@ -1642,11 +1643,18 @@ int id_limit;
 		(void) identify(pick_list[i].item.a_obj);
 	    free((genericptr_t) pick_list);
 	    mark_synch(); /* Before we loop to pop open another menu */
-	} else {
-	    if (n < 0) pline("That was all.");
-	    id_limit = 0; /* Stop now */
+	    first = 0;
+	} else if (n == -2) {		/* player used ESC to quit menu */
+	    break;
+	} else if (n == -1) {		/* no eligible items found */
+	    pline("That was all.");
+	    break;
+	} else if (!--tryct) {		/* stop re-prompting */
+	    pline(thats_enough_tries);
+	    break;
+	} else {			/* try again */
+	    pline("Choose an item; use ESC to decline.");
 	}
-	first = 0;
     }
 }
 
@@ -1667,7 +1675,7 @@ boolean learning_id;	/* true if we just read unknown identify scroll */
     if (!unid_cnt) {
 	You("have already identified all %sof your possessions.",
 	    learning_id ? "the rest " : "");
-    } else if (!id_limit) {
+    } else if (!id_limit || id_limit >= unid_cnt) {
 	/* identify everything */
 	if (unid_cnt == 1) {
 	    (void) identify(the_obj);
