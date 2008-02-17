@@ -119,7 +119,15 @@ long
 freediskspace(path)
 char *path;
 {
+#ifdef UNTESTED
+	/* these changes from Patric Mueller <bhaak@gmx.net> for AROS to
+	 * handle larger disks.  Also needs limits.h and aros/oldprograms.h
+	 * for AROS.  (keni)
+	 */
+    unsigned long long freeBytes = 0;
+#else
     register long freeBytes = 0;
+#endif
     register struct InfoData *infoData; /* Remember... longword aligned */
     char fileName[32];
 
@@ -160,6 +168,9 @@ char *path;
 		freeBytes = infoData->id_NumBlocks - infoData->id_NumBlocksUsed;
 		freeBytes -= (freeBytes + EXTENSION) / (EXTENSION + 1);
 		freeBytes *= infoData->id_BytesPerBlock;
+#ifdef UNTESTED
+		if (freeBytes > LONG_MAX) { freeBytes = LONG_MAX; }
+#endif
 	    }
 	    if (freeBytes < 0)
 		freeBytes = 0;
