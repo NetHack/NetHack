@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)botl.c	3.5	2003/11/22	*/
+/*	SCCS Id: @(#)botl.c	3.5	2008/02/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1155,7 +1155,7 @@ clridx_to_s(buf, idx)
 char *buf;
 int idx;
 {
-	const char *a[] = {"bold", "inverse", "normal"};
+	static const char *a[] = { "bold", "inverse", "normal" };
 
 	if (buf) {
 		buf[0] = '\0';
@@ -1392,7 +1392,7 @@ int fldidx,thresholdtype;
 int behavior, under, over;
 anything threshold;
 {
-	
+	return;
 }
 # endif /* STATUS_HILITES */
 

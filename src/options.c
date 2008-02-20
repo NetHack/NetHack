@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2008/01/30	*/
+/*	SCCS Id: @(#)options.c	3.5	2008/02/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3137,10 +3137,9 @@ boolean setinitial,setfromfile;
 	int pick_cnt, pick_idx, opt_idx, pass;
 	int totalapes = 0, numapes[2] = {0,0};
 	menu_item *pick_list = (menu_item *)0;
-	anything apany;
 	char apebuf[1+BUFSZ];	/* so &apebuf[1] is BUFSZ long for getlin() */
 	struct autopickup_exception *ape;
-	static struct ape_action {
+	static const struct ape_action {
 	    char letr;
 	    const char *desc;
 	} action_titles[] = {
@@ -3155,12 +3154,12 @@ boolean setinitial,setfromfile;
 	totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
-	apany = zeroany;
+	any = zeroany;
 	for (i = 0; i < SIZE(action_titles); i++) {
-		apany.a_int++;
+		any.a_int++;
 		/* omit list and remove if there aren't any yet */
 		if (!totalapes && (i == 1 || i == 2)) continue;
-		add_menu(tmpwin, NO_GLYPH, &apany, action_titles[i].letr,
+		add_menu(tmpwin, NO_GLYPH, &any, action_titles[i].letr,
 			 0, ATR_NONE, action_titles[i].desc,
 #if 0		/* this ought to work but doesn't... */
 			 (action_titles[i].letr == 'x') ? MENU_SELECTED :
@@ -3202,14 +3201,14 @@ boolean setinitial,setfromfile;
 		for (pass = AP_LEAVE; pass <= AP_GRAB; ++pass) {
 		    if (numapes[pass] == 0) continue;
 		    ape = iflags.autopickup_exceptions[pass];
-		    apany = zeroany;
-		    add_menu(tmpwin, NO_GLYPH, &apany, 0, 0, iflags.menu_headings,
+		    any = zeroany;
+		    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 				(pass == 0) ? "Never pickup" : "Always pickup",
 				MENU_UNSELECTED);
 		    for (i = 0; i < numapes[pass] && ape; i++) {
-			apany.a_void = (opt_idx == 1) ? 0 : ape;
+			any.a_void = (opt_idx == 1) ? 0 : ape;
 			Sprintf(apebuf, "\"%s\"", ape->pattern);
-			add_menu(tmpwin, NO_GLYPH, &apany,
+			add_menu(tmpwin, NO_GLYPH, &any,
 				0, 0, ATR_NONE, apebuf, MENU_UNSELECTED);
 			ape = ape->next;
 		    }

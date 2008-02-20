@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)artifact.c 3.5	2008/01/19	*/
+/*	SCCS Id: @(#)artifact.c 3.5	2008/02/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1584,7 +1584,7 @@ STATIC_OVL unsigned long
 abil_to_spfx(abil)
 long *abil;
 {
-	struct abil2spfx_tag {
+	static const struct abil2spfx_tag {
 		long *abil;
 		unsigned long spfx;
 	} abil2spfx[] = {
