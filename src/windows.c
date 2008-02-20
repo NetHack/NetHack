@@ -111,9 +111,15 @@ const char *s;
     if (!windowprocs.win_raw_print)
 	windowprocs.win_raw_print = def_raw_print;
 
-    raw_printf("Window type %s not recognized.  Choices are:", s);
-    for(i=0; winchoices[i].procs; i++)
-	raw_printf("        %s", winchoices[i].procs->name);
+    if(!winchoices[0].procs) impossible("no window types?");
+    if(!winchoices[1].procs){
+	raw_printf("Window type %s not recognized.  The only choice is: %s.",
+		s, winchoices[0].procs->name);
+    } else {
+	raw_printf("Window type %s not recognized.  Choices are:", s);
+	for(i=0; winchoices[i].procs; i++)
+	    raw_printf("        %s", winchoices[i].procs->name);
+    }
 
     if (windowprocs.win_raw_print == def_raw_print)
 	terminate(EXIT_SUCCESS);
