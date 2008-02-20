@@ -533,7 +533,7 @@ randrole()
 
 int
 str2role(str)
-	char *str;
+	const char *str;
 {
 	int i, len;
 
@@ -601,7 +601,7 @@ randrace(rolenum)
 
 int
 str2race(str)
-	char *str;
+	const char *str;
 {
 	int i, len;
 

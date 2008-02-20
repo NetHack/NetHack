@@ -111,8 +111,8 @@ struct objclass {
 
 struct class_sym {
 	char sym;
-	char *name;
-	char *explain;
+	const char *name;
+	const char *explain;
 };
 
 struct objdescr {

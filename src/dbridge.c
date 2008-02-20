@@ -857,7 +857,7 @@ int x,y;
 	lev2 = &levl[x2][y2];
 	if ((lev1->drawbridgemask & DB_UNDER) == DB_MOAT ||
 	    (lev1->drawbridgemask & DB_UNDER) == DB_LAVA) {
-		struct obj *otmp;
+		struct obj *otmp2;
 		boolean lava = (lev1->drawbridgemask & DB_UNDER) == DB_LAVA;
 		if (lev1->typ == DRAWBRIDGE_UP) {
 			if (cansee(x2,y2))
@@ -874,9 +874,9 @@ int x,y;
 		}
 		lev1->typ = lava ? LAVAPOOL : MOAT;
 		lev1->drawbridgemask = 0;
-		if ((otmp = sobj_at(BOULDER,x,y)) != 0) {
-		    obj_extract_self(otmp);
-		    (void) flooreffects(otmp,x,y,"fall");
+		if ((otmp2 = sobj_at(BOULDER,x,y)) != 0) {
+		    obj_extract_self(otmp2);
+		    (void) flooreffects(otmp2,x,y,"fall");
 		}
 	} else {
 		if (cansee(x,y))

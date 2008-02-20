@@ -1209,29 +1209,29 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		if (!Antimagic) {
 		    drain_en(rnd(u.ulevel) + 1);
 		} else {
-		    int dmgval = rnd(4), hp = Upolyd ? u.mh : u.uhp;
+		    int dmgval2 = rnd(4), hp = Upolyd ? u.mh : u.uhp;
 
 		    /* Half_XXX_damage has opposite its usual effect (approx)
 		       but isn't cumulative if hero has more than one */
 		    if (Half_physical_damage || Half_spell_damage)
-			dmgval += rnd(4);
+			dmgval2 += rnd(4);
 		    /* give Magicbane wielder dose of own medicine */
 		    if (uwep && uwep->oartifact == ART_MAGICBANE)
-			dmgval += rnd(4);
+			dmgval2 += rnd(4);
 		    /* having an artifact--other than own quest one--which
 		       confers magic resistance simply by being carried
 		       also increases the effect */
 		    for (otmp = invent; otmp; otmp = otmp->nobj)
 			if (otmp->oartifact && !is_quest_artifact(otmp) &&
 			    protects(AD_MAGM, otmp)) break;
-		    if (otmp) dmgval += rnd(4);
-		    if (Passes_walls) dmgval = (dmgval + 3) / 4;
+		    if (otmp) dmgval2 += rnd(4);
+		    if (Passes_walls) dmgval2 = (dmgval2 + 3) / 4;
 
-		    You_feel((dmgval >= hp) ? "unbearably torpid!" :
-			     (dmgval >= hp / 4) ? "very lethargic." :
+		    You_feel((dmgval2 >= hp) ? "unbearably torpid!" :
+			     (dmgval2 >= hp / 4) ? "very lethargic." :
 			     "sluggish.");
 		    /* opposite of magical explosion */
-		    losehp(dmgval, "anti-magic implosion", KILLED_BY_AN);
+		    losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
 		}
 		break;
 
@@ -2385,19 +2385,19 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				}
 			    }
 			} else {			/* take some damage */
-			    int dmgval = rnd(4);
+			    int dmgval2 = rnd(4);
 
 			    if ((otmp = MON_WEP(mtmp)) != 0 &&
 				    otmp->oartifact == ART_MAGICBANE)
-				dmgval += rnd(4);
+				dmgval2 += rnd(4);
 			    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) 
 				if (otmp->oartifact && protects(AD_MAGM, otmp))
 				    break;
-			    if (otmp) dmgval += rnd(4);
-			    if (passes_walls(mptr)) dmgval = (dmgval + 3) / 4;
+			    if (otmp) dmgval2 += rnd(4);
+			    if (passes_walls(mptr)) dmgval2 = (dmgval2 + 3) / 4;
 
 			    if (in_sight) seetrap(trap);
-			    if ((mtmp->mhp -= dmgval) <= 0)
+			    if ((mtmp->mhp -= dmgval2) <= 0)
 				monkilled(mtmp, in_sight ?
 				    "compression from an anti-magic field" : 0,
 					  -AD_MAGM);

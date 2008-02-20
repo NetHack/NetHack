@@ -67,7 +67,7 @@ STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
 STATIC_DCL void FDECL(print_mapseen, (winid,mapseen *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
-STATIC_DCL char *FDECL(seen_string, (XCHAR_P,const char *));
+STATIC_DCL const char *FDECL(seen_string, (XCHAR_P,const char *));
 STATIC_DCL const char *FDECL(br_string2, (branch *));
 #endif /* DUNGEON_OVERVIEW */
 
@@ -1897,14 +1897,14 @@ d_level *lev;
 }
 
 void
-forget_mapseen(ledger_no)
-int ledger_no;
+forget_mapseen(ledger_num)
+int ledger_num;
 {
 	mapseen *mptr;
 
 	for (mptr = mapseenchn; mptr; mptr = mptr->next)
 		if (dungeons[mptr->lev.dnum].ledger_start + 
-			mptr->lev.dlevel == ledger_no) break;
+			mptr->lev.dlevel == ledger_num) break;
 
 	/* if not found, then nothing to forget */
 	if (mptr) {
@@ -2213,7 +2213,7 @@ dooverview()
 	return 0;
 }
 
-STATIC_OVL char *
+STATIC_OVL const char *
 seen_string(x, obj)
 xchar x;
 const char *obj;

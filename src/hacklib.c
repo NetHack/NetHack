@@ -674,7 +674,7 @@ char *buf;
 {
 	int k;
 	struct tm t, *lt;
-	char *g, *p, y[5],mo[3],d[3],h[3],mi[3],s[3];
+	char *g, *p, y[5],mo[3],md[3],h[3],mi[3],s[3];
 	if (buf && strlen(buf) == 14) {
 		g = buf;
 		p = y;      /* year */
@@ -685,7 +685,7 @@ char *buf;
 		for (k = 0; k < 2; ++k)
 			*p++ = *g++;
 		*p = '\0';
-		p = d;      /* day */
+		p = md;      /* day */
 		for (k = 0; k < 2; ++k)
 			*p++ = *g++;
 		*p = '\0';
@@ -706,7 +706,7 @@ char *buf;
 			t = *lt;
 			t.tm_year = atoi(y) - 1900;
 			t.tm_mon  = atoi(mo) - 1;
-			t.tm_mday = atoi(d);
+			t.tm_mday = atoi(md);
 			t.tm_hour = atoi(h);
 			t.tm_min  = atoi(mi);
 			t.tm_sec  = atoi(s);

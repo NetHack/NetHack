@@ -1991,7 +1991,7 @@ char avoidlet;
 	struct obj *otmp;
 	char ilet, ret = 0;
 	char *invlet = flags.inv_order;
-	int n, classcount, done = 0;
+	int n, classcount, invdone = 0;
 	winid win;
 	anything any;
 	menu_item *selected;
@@ -1999,7 +1999,7 @@ char avoidlet;
 	if (invent) {
 	    win = create_nhwindow(NHW_MENU);
 	    start_menu(win);
-	    while (!done) {
+	    while (!invdone) {
 		any = zeroany;		/* set all bits to zero */
 		classcount = 0;
 		for(otmp = invent; otmp; otmp = otmp->nobj) {
@@ -2019,7 +2019,7 @@ char avoidlet;
 		    }
 	        }
 		if (flags.sortpack && *++invlet) continue;
-		done = 1;
+		invdone = 1;
 	    }
 	    end_menu(win, "Inventory letters used:");
 

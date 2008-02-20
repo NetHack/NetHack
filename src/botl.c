@@ -33,7 +33,7 @@ STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
 STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
 # ifdef STATUS_HILITES
 STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *));
-STATIC_DCL char *FDECL(clridx_to_s, (char *, int));
+STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
 # endif
 #else
 STATIC_DCL void NDECL(bot1);
@@ -81,12 +81,12 @@ rank_of(lev, monnum, female)
 	short monnum;
 	boolean female;
 {
-	register struct Role *role;
+	register const struct Role *role;
 	register int i;
 
 
 	/* Find the role */
-	for (role = (struct Role *) roles; role->name.m; role++)
+	for (role = roles; role->name.m; role++)
 	    if (monnum == role->malenum || monnum == role->femalenum)
 	    	break;
 	if (!role->name.m)
@@ -937,8 +937,8 @@ clear_status_hilites()
 }
 
 STATIC_OVL boolean
-assign_hilite(a,b,c,d)
-char *a, *b, *c, *d;
+assign_hilite(sa,sb,sc,sd)
+char *sa, *sb, *sc, *sd;
 {
 	char *tmp, *how;
 	int i, dt, idx = -1;
@@ -946,7 +946,7 @@ char *a, *b, *c, *d;
 	boolean inverse[2] = {FALSE, FALSE};
 	boolean bold[2]	   = {FALSE, FALSE};
 	boolean normal[2]  = {0,0};
-	boolean percentage = FALSE, down_up = FALSE, changed = FALSE;
+	boolean percent = FALSE, down_up = FALSE, changed = FALSE;
 	anything threshold;
 
 	threshold.a_void = 0;
@@ -956,8 +956,8 @@ char *a, *b, *c, *d;
 	 */
 
 	/* field name to idx */
-	for (i = 0; a && i < MAXBLSTATS; ++i) {
-		if (strcmpi(a,status_fieldnames[i]) == 0) {
+	for (i = 0; sa && i < MAXBLSTATS; ++i) {
+		if (strcmpi(sa,status_fieldnames[i]) == 0) {
 			idx = i;
 			break;
 		}
@@ -966,43 +966,43 @@ char *a, *b, *c, *d;
 	status_hilites[idx].set = FALSE;	/* mark it "unset" */
 
 	/* threshold */
-	if (!b) return FALSE;
-	if ((strcmpi(b, "updown") == 0) || (strcmpi(b, "downup") == 0) ||
-	    (strcmpi(b, "up") == 0)     || (strcmpi(b, "down") == 0)) {
+	if (!sb) return FALSE;
+	if ((strcmpi(sb, "updown") == 0) || (strcmpi(sb, "downup") == 0) ||
+	    (strcmpi(sb, "up") == 0)     || (strcmpi(sb, "down") == 0)) {
 	    	down_up = TRUE;
-	} else if ((strcmpi(b, "changed") == 0) &&
+	} else if ((strcmpi(sb, "changed") == 0) &&
 		 (idx == BL_TITLE     || idx == BL_ALIGN ||
 		  idx == BL_LEVELDESC || idx == BL_CONDITION)) {
 		changed = TRUE;		/* changed is only thing allowed */
 	} else {
-		tmp = b;
+		tmp = sb;
 		while (*tmp) {
 			if (*tmp == '%') {
 				*tmp = '\0';
-				percentage = TRUE;
+				percent = TRUE;
 				break;
 			} else if (!index("0123456789", *tmp))
 				return FALSE;
 			tmp++;
 		}
-		if (strlen(b) > 0) {
+		if (strlen(sb) > 0) {
 			dt = blstats[0][idx].anytype;
-			if (percentage) dt = ANY_INT;
-			(void) s_to_anything(&threshold, b, dt);
+			if (percent) dt = ANY_INT;
+			(void) s_to_anything(&threshold, sb, dt);
 		} else return FALSE;
-		if (percentage &&
+		if (percent &&
 			(threshold.a_int < 1 || threshold.a_int > 100))
 				return FALSE;
-		if (!threshold.a_void && (strcmp(b, "0") != 0)) return FALSE;
+		if (!threshold.a_void && (strcmp(sb, "0") != 0)) return FALSE;
 	}
 
 	/* actions */
 	for (i = 0; i < 2; ++i) {
-	    if (!i) how = c;
-	    else how = d;
+	    if (!i) how = sc;
+	    else how = sd;
 	    if (!how) {
 	    	if (!i) return FALSE;
-	    	else break;		/* c is mandatory; d is not */
+	    	else break;		/* sc is mandatory; sd is not */
 	    }
 
 	    if (strcmpi(how, "bold") == 0) {
@@ -1038,7 +1038,7 @@ char *a, *b, *c, *d;
 	    else status_hilites[idx].coloridx[i] = BL_HILITE_NONE;
 	}
 
-	if (percentage)
+	if (percent)
 		status_hilites[idx].behavior = BL_TH_VAL_PERCENTAGE;
 	else if (down_up)
 		status_hilites[idx].behavior = BL_TH_UPDOWN;
@@ -1150,12 +1150,12 @@ int bufsiz;
 	return buf;
 }
 
-STATIC_OVL char *
+STATIC_OVL const char *
 clridx_to_s(buf, idx)
 char *buf;
 int idx;
 {
-	char *a[] = {"bold", "inverse", "normal"};
+	const char *a[] = {"bold", "inverse", "normal"};
 
 	if (buf) {
 		buf[0] = '\0';
@@ -1280,7 +1280,7 @@ status_hilite_menu()
 		for (j = 0; j < 2 && (hltemp[i].behavior != BL_TH_NONE); ++j) {
 		    char prompt[QBUFSZ];
 		    /* j == 0 below, j == 1 above */
-		    menu_item *pick = (menu_item *)0;
+		    menu_item *pick2 = (menu_item *)0;
 		    Sprintf(prompt, "Display how when %s?",
 				j ? above : below);
 	            tmpwin = create_nhwindow(NHW_MENU);
@@ -1303,11 +1303,11 @@ status_hilite_menu()
 						MENU_UNSELECTED);
 		    }
 		    end_menu(tmpwin, prompt);
-		    if ((res = select_menu(tmpwin, PICK_ONE, &pick)) > 0) {
-			hltemp[i].coloridx[j] = (pick->item.a_char > 0) ?
-						pick->item.a_int - 1 :
-						pick->item.a_int;
-			free((genericptr_t)pick);
+		    if ((res = select_menu(tmpwin, PICK_ONE, &pick2)) > 0) {
+			hltemp[i].coloridx[j] = (pick2->item.a_char > 0) ?
+						pick2->item.a_int - 1 :
+						pick2->item.a_int;
+			free((genericptr_t)pick2);
 		    }
 		    destroy_nhwindow(tmpwin);
 		    if (res < 0) return FALSE;
@@ -1437,18 +1437,18 @@ genericptr_t ptr;
 	    }
 	}
 
-	/* This genl version updates everything on the display, evertime */
+	/* This genl version updates everything on the display, everytime */
 	newbot1[0] = '\0';
 	for (i = 0; fieldorder1[i] >= 0; ++i) {
-	    int idx = fieldorder1[i];
-	    if (activefields[idx])
-	    	Strcat(newbot1, vals[idx]);
+	    int idx1 = fieldorder1[i];
+	    if (activefields[idx1])
+	    	Strcat(newbot1, vals[idx1]);
 	}
 	newbot2[0] = '\0';
 	for (i = 0; fieldorder2[i] >= 0; ++i) {
-	    int idx = fieldorder2[i];
-	    if (activefields[idx])
-	    	Strcat(newbot2, vals[idx]);
+	    int idx2 = fieldorder2[i];
+	    if (activefields[idx2])
+	    	Strcat(newbot2, vals[idx2]);
 	}
 	curs(WIN_STATUS, 1, 0);
 	putstr(WIN_STATUS, 0, newbot1);

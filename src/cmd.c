@@ -1086,16 +1086,16 @@ int propindx;	/* index of a property which can be conveyed by worn item */
 
 /* format a characteristic value, accommodating Strength's strangeness */
 STATIC_OVL char *
-attrval(attrindx, attrval, resultbuf)
-int attrindx, attrval;
+attrval(attrindx, attrvalue, resultbuf)
+int attrindx, attrvalue;
 char resultbuf[];	/* should be at least [7] to hold "18/100\0" */
 {
-	if (attrindx != A_STR || attrval <= 18)
-	    Sprintf(resultbuf, "%d", attrval);
-	else if (attrval > STR18(100))	/* 19 to 25 */
-	    Sprintf(resultbuf, "%d", attrval - 100);
+	if (attrindx != A_STR || attrvalue <= 18)
+	    Sprintf(resultbuf, "%d", attrvalue);
+	else if (attrvalue > STR18(100))	/* 19 to 25 */
+	    Sprintf(resultbuf, "%d", attrvalue - 100);
 	else	/* simplify "18/ **" to be "18/100" */
-	    Sprintf(resultbuf, "18/%02d", attrval - 18);
+	    Sprintf(resultbuf, "18/%02d", attrvalue - 18);
 	return resultbuf;
 }
 

@@ -748,7 +748,7 @@ int uid;
 	for (i = 0; i < playerct; i++) {
 	    if (players[i][0] == '-' && index("pr", players[i][1]) &&
                 players[i][2] == 0 && i + 1 < playerct) {
-		char *arg = (char *)players[i + 1];
+		const char *arg = players[i + 1];
 		if ((players[i][1] == 'p' &&
 		     str2role(arg) == str2role(t1->plrole)) ||
 		    (players[i][1] == 'r' &&
