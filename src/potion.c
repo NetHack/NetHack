@@ -1841,6 +1841,7 @@ dodip()
 		/* KMH, balance patch -- acid is particularly unstable */
 		if (obj->cursed || obj->otyp == POT_ACID || !rn2(10)) {
 			pline("BOOM!  They explode!");
+			wake_nearto(u.ux, u.uy, (BOLT_LIM+1)*(BOLT_LIM+1));
 			exercise(A_STR, FALSE);
 			if (!breathless(youmonst.data) || haseyes(youmonst.data))
 				potionbreathe(obj);
