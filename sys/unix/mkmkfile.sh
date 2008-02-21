@@ -9,4 +9,14 @@
 #  $2 install path
 #  $3 hints file
 
-cat $3 $1 > $2
+echo "#" > $2
+echo "# This file is generated automatically.  Do not edit." >> $2
+echo "# Your changes will be lost.  See sys/unix/NewInstall.unx." >> $2
+echo "###" >> $2
+echo "### Start $3" >> $2
+echo "###" >> $2
+cat $3 >> $2
+echo "### end of file" >> $2
+echo "### Start $1" >> $2
+cat $1 >> $2
+echo "### end of file" >> $2
