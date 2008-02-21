@@ -423,7 +423,8 @@ register struct monst *mtmp;
     } else {
 	/* but eels have a difficult time outside */
 	if (mtmp->data->mlet == S_EEL && !Is_waterlevel(&u.uz)) {
-	    if(mtmp->mhp > 1) mtmp->mhp--;
+	    /* as mhp gets lower, the rate of further loss slows down */
+	    if (mtmp->mhp > 1 && rn2(mtmp->mhp) > rn2(8)) mtmp->mhp--;
 	    monflee(mtmp, 2, FALSE, FALSE);
 	}
     }
@@ -554,6 +555,13 @@ movemon()
 				mtmp->m_ap_type == M_AP_OBJECT)
 		    continue;
 	    if(mtmp->mundetected) continue;
+	} else if (mtmp->data->mlet == S_EEL && !mtmp->mundetected &&
+		(mtmp->mflee || distu(mtmp->mx, mtmp->my) > 2) &&
+		!canseemon(mtmp) && !rn2(4)) {
+	    /* some eels end up stuck in isolated pools, where they
+	       can't--or at least won't--move, so they never reach
+	       their post-move chance to re-hide */
+	    if (hideunder(mtmp)) continue;
 	}
 
 	/* continue if the monster died fighting */
@@ -2438,7 +2446,9 @@ void
 hide_monst(mon)
 struct monst *mon;
 {
-    if ((is_hider(mon->data) || hides_under(mon->data)) &&
+    boolean hider_under = hides_under(mon->data) || mon->data->mlet == S_EEL;
+
+    if ((is_hider(mon->data) || hider_under) &&
 	    !(mon->mundetected || mon->m_ap_type)) {
 	xchar x = mon->mx, y = mon->my;
 	char save_viz = viz_array[y][x];
@@ -2448,7 +2458,7 @@ struct monst *mon;
 	if (is_hider(mon->data)) (void)restrap(mon);
 	/* try again if mimic missed its 1/3 chance to hide */
 	if (mon->data->mlet == S_MIMIC && !mon->m_ap_type) (void)restrap(mon);
-	if (hides_under(mon->data)) (void)hideunder(mon);
+	if (hider_under) (void)hideunder(mon);
 	viz_array[y][x] = save_viz;
     }
 }
