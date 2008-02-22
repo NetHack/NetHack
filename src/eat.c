@@ -720,7 +720,7 @@ fix_petrification()
  * be an intrinsic property.)
  * It would be very easy to make the intrinsics not try to give you one
  * that you already had by checking to see if you have it in
- * intrinsic_possible() instead of givit().
+ * intrinsic_possible() instead of givit(), but we're not that nice.
  */
 
 /* intrinsic_possible() returns TRUE iff a monster can give an intrinsic. */
@@ -729,92 +729,68 @@ intrinsic_possible(type, ptr)
 int type;
 register struct permonst *ptr;
 {
+	int res = 0;
+
 	switch (type) {
-	    case FIRE_RES:
+	case FIRE_RES:
+		res = (ptr->mconveys & MR_FIRE) != 0;
 #ifdef DEBUG
-		if (ptr->mconveys & MR_FIRE) {
-			debugpline("can get fire resistance");
-			return(TRUE);
-		} else  return(FALSE);
-#else
-		return(ptr->mconveys & MR_FIRE);
+		if (res) debugpline("can get fire resistance");
 #endif
-	    case SLEEP_RES:
+		break;
+	case SLEEP_RES:
+		res = (ptr->mconveys & MR_SLEEP) != 0;
 #ifdef DEBUG
-		if (ptr->mconveys & MR_SLEEP) {
-			debugpline("can get sleep resistance");
-			return(TRUE);
-		} else  return(FALSE);
-#else
-		return(ptr->mconveys & MR_SLEEP);
+		if (res) debugpline("can get sleep resistance");
 #endif
-	    case COLD_RES:
+		break;
+	case COLD_RES:
+		res = (ptr->mconveys & MR_COLD) != 0;
 #ifdef DEBUG
-		if (ptr->mconveys & MR_COLD) {
-			debugpline("can get cold resistance");
-			return(TRUE);
-		} else  return(FALSE);
-#else
-		return(ptr->mconveys & MR_COLD);
+		if (res) debugpline("can get cold resistance");
 #endif
-	    case DISINT_RES:
+		break;
+	case DISINT_RES:
+		res = (ptr->mconveys & MR_DISINT) != 0;
 #ifdef DEBUG
-		if (ptr->mconveys & MR_DISINT) {
-			debugpline("can get disintegration resistance");
-			return(TRUE);
-		} else  return(FALSE);
-#else
-		return(ptr->mconveys & MR_DISINT);
+		if (res) debugpline("can get disintegration resistance");
 #endif
-	    case SHOCK_RES:	/* shock (electricity) resistance */
+		break;
+	case SHOCK_RES:	/* shock (electricity) resistance */
+		res = (ptr->mconveys & MR_ELEC) != 0;
 #ifdef DEBUG
-		if (ptr->mconveys & MR_ELEC) {
-			debugpline("can get shock resistance");
-			return(TRUE);
-		} else  return(FALSE);
-#else
-		return(ptr->mconveys & MR_ELEC);
+		if (res) debugpline("can get shock resistance");
 #endif
-	    case POISON_RES:
+		break;
+	case POISON_RES:
+		res = (ptr->mconveys & MR_POISON) != 0;
 #ifdef DEBUG
-		if (ptr->mconveys & MR_POISON) {
-			debugpline("can get poison resistance");
-			return(TRUE);
-		} else  return(FALSE);
-#else
-		return(ptr->mconveys & MR_POISON);
+		if (res) debugpline("can get poison resistance");
 #endif
-	    case TELEPORT:
+		break;
+	case TELEPORT:
+		res = can_teleport(ptr);
 #ifdef DEBUG
-		if (can_teleport(ptr)) {
-			debugpline("can get teleport");
-			return(TRUE);
-		} else  return(FALSE);
-#else
-		return(can_teleport(ptr));
+		if (res) debugpline("can get teleport");
 #endif
-	    case TELEPORT_CONTROL:
+		break;
+	case TELEPORT_CONTROL:
+		res = control_teleport(ptr); 
 #ifdef DEBUG
-		if (control_teleport(ptr)) {
-			debugpline("can get teleport control");
-			return(TRUE);
-		} else  return(FALSE);
-#else
-		return(control_teleport(ptr));
+		if (res) debugpline("can get teleport control");
 #endif
-	    case TELEPAT:
+		break;
+	case TELEPAT:
+		res = telepathic(ptr);
 #ifdef DEBUG
-		if (telepathic(ptr)) {
-			debugpline("can get telepathy");
-			return(TRUE);
-		} else  return(FALSE);
-#else
-		return(telepathic(ptr));
+		if (res) debugpline("can get telepathy");
 #endif
-	    default:
-		return(FALSE);
+		break;
+	default:
+		/* res stays 0 */
+		break;
 	}
-	/*NOTREACHED*/
+	return res;
 }
 
 /* givit() tries to give you an intrinsic based on the monster's level
@@ -1085,6 +1061,14 @@ register int pm;
 		    polyself(0);
 		}
 		break;
+	    case PM_DISENCHANTER:
+		/* picks an intrinsic at random and removes it; there's
+		   no feedback if hero already lacks the chosen ability */
+#ifdef DEBUG
+		debugpline("using attrcurse to strip an intrinsic");
+#endif
+		attrcurse();
+		break;
 	    case PM_MIND_FLAYER:
 	    case PM_MASTER_MIND_FLAYER:
 		if (ABASE(A_INT) < ATTRMAX(A_INT)) {
@@ -1093,66 +1077,59 @@ register int pm;
 				(void) adjattrib(A_INT, 1, FALSE);
 				break;	/* don't give them telepathy, too */
 			}
-		}
-		else {
+		} else {
 			pline("For some reason, that tasted bland.");
 		}
-		/* fall through to default case */
-	    default: {
-		register struct permonst *ptr = &mons[pm];
+		/*FALLTHRU*/
+	    default:
+	    {
+		struct permonst *ptr = &mons[pm];
+		boolean conveys_STR = is_giant(ptr);
 		int i, count;
 
 		if (dmgtype(ptr, AD_STUN) || dmgtype(ptr, AD_HALU) ||
-		    pm == PM_VIOLET_FUNGUS) {
-			pline ("Oh wow!  Great stuff!");
-			(void) make_hallucinated(HHallucination + 200,FALSE,0L);
+			pm == PM_VIOLET_FUNGUS) {
+		    pline("Oh wow!  Great stuff!");
+		    (void)make_hallucinated(HHallucination + 200L, FALSE, 0L);
 		}
-		if(is_giant(ptr)) gainstr((struct obj *)0, 0);
 
 		/* Check the monster for all of the intrinsics.  If this
 		 * monster can give more than one, pick one to try to give
 		 * from among all it can give.
 		 *
-		 * If a monster can give 4 intrinsics then you have
-		 * a 1/1 * 1/2 * 2/3 * 3/4 = 1/4 chance of getting the first,
-		 * a 1/2 * 2/3 * 3/4 = 1/4 chance of getting the second,
-		 * a 1/3 * 3/4 = 1/4 chance of getting the third,
-		 * and a 1/4 chance of getting the fourth.
-		 *
-		 * And now a proof by induction:
-		 * it works for 1 intrinsic (1 in 1 of getting it)
-		 * for 2 you have a 1 in 2 chance of getting the second,
-		 *	otherwise you keep the first
-		 * for 3 you have a 1 in 3 chance of getting the third,
-		 *	otherwise you keep the first or the second
-		 * for n+1 you have a 1 in n+1 chance of getting the (n+1)st,
-		 *	otherwise you keep the previous one.
-		 * Elliott Kleinrock, October 5, 1990
+		 * Strength from giants is now treated like an intrinsic
+		 * rather than being given unconditionally.
 		 */
-
-		 count = 0;	/* number of possible intrinsics */
-		 tmp = 0;	/* which one we will try to give */
-		 for (i = 1; i <= LAST_PROP; i++) {
-			if (intrinsic_possible(i, ptr)) {
-				count++;
-				/* a 1 in count chance of replacing the old
-				 * one with this one, and a count-1 in count
-				 * chance of keeping the old one.  (note
-				 * that 1 in 1 and 0 in 1 are what we want
-				 * for the first one
-				 */
-				if (!rn2(count)) {
+		count = 0;	/* number of possible intrinsics */
+		tmp = 0;	/* which one we will try to give */
+		if (conveys_STR) {
+		    count = 1;
+		    tmp = -1;	/* use -1 as fake prop index for STR */
 #ifdef DEBUG
-					debugpline("Intrinsic %d replacing %d",
-								i, tmp);
+		    debugpline("\"Intrinsic\" strength, %d", tmp);
 #endif
-					tmp = i;
-				}
-			}
-		 }
-
-		 /* if any found try to give them one */
-		 if (count) givit(tmp, ptr);
+		}
+		for (i = 1; i <= LAST_PROP; i++) {
+		    if (!intrinsic_possible(i, ptr)) continue;
+		    ++count;
+		    /* a 1 in count chance of replacing the old choice
+		       with this one, and a count-1 in count chance
+		       of keeping the old choice (note that 1 in 1 and
+		       0 in 1 are what we want for the first candidate) */
+		    if (!rn2(count)) {
+#ifdef DEBUG
+			debugpline("Intrinsic %d replacing %d", i, tmp);
+#endif
+			tmp = i;
+		    }
+		}
+		/* if strength is the only candidate, give it 50% chance */
+		if (conveys_STR && count == 1 && !rn2(2)) tmp = 0;
+		/* if something was chosen, give it now (givit() might fail) */
+		if (tmp == -1)
+		    gainstr((struct obj *)0, 0, TRUE);
+		else if (tmp > 0)
+		    givit(tmp, ptr);
 	    }
 	    break;
 	}
@@ -1413,7 +1390,7 @@ const char *mesg;
 	if (!tin->cursed)
 	    pline("This makes you feel like %s!",
 		  Hallucination ? "Swee'pea" : "Popeye");
-	gainstr(tin, 0);
+	gainstr(tin, 0, FALSE);
 
 	costly_tin(COST_OPEN);
 
@@ -2087,7 +2064,7 @@ register struct obj *otmp;
 		break;
 	    case LUMP_OF_ROYAL_JELLY:
 		/* This stuff seems to be VERY healthy! */
-		gainstr(otmp, 1);
+		gainstr(otmp, 1, TRUE);
 		if (Upolyd) {
 		    u.mh += otmp->cursed ? -rnd(20) : rnd(20);
 		    if (u.mh > u.mhmax) {

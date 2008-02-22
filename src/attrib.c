@@ -160,18 +160,20 @@ adjattrib(ndx, incr, msgflg)
 }
 
 void
-gainstr(otmp, incr)
-	register struct obj *otmp;
-	register int incr;
+gainstr(otmp, incr, givemsg)
+struct obj *otmp;
+int incr;
+boolean givemsg;
 {
-	int num = 1;
+	int num = incr;
 
-	if(incr) num = incr;
-	else {
-	    if(ABASE(A_STR) < 18) num = (rn2(4) ? 1 : rnd(6) );
+	if (!num) {
+	    if (ABASE(A_STR) < 18) num = (rn2(4) ? 1 : rnd(6));
 	    else if (ABASE(A_STR) < STR18(85)) num = rnd(10);
+	    else num = 1;
 	}
-	(void) adjattrib(A_STR, (otmp && otmp->cursed) ? -num : num, TRUE);
+	(void) adjattrib(A_STR, (otmp && otmp->cursed) ? -num : num,
+			 givemsg ? -1 : 1);
 }
 
 void
@@ -191,7 +193,7 @@ losestr(num)	/* may kill you; cause may be poison or monster like 'a' */
 		u.uhpmax -= 6;
 	    }
 	}
-	(void) adjattrib(A_STR, -num, TRUE);
+	(void) adjattrib(A_STR, -num, 1);
 }
 
 static const struct poison_effect_message {

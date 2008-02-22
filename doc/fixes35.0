@@ -282,6 +282,7 @@ while polymorphed, suppress attribute gain/lose earned by pre-poly exercise
 wizard mode #monpolycontrol prompting asked about "it" when monster was unseen
 reprompt if player fails to make a menu choice during inventory identification
 seen eels who were stuck in isolated pools would never re-hide
+can no longer get both strength and resistance from eating one giant corpse
 
 
 Platform- and/or Interface-Specific Fixes
@@ -398,6 +399,7 @@ shapechangers shouldn't receive starting inventory of their initial shape
 streamline old ^X output and integrate it with enlightenment feedback;
 	new ^X output includes expanded form of abbreviated bottom line info
 "killed by X" becomes "killed by a chameleon imitating X" when appropriate
+eating disenchanter corpses is now considered risky
 
 
 Platform- and/or Interface-Specific New Features
