@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkmap.c	3.5	2007/08/01	*/
+/*	SCCS Id: @(#)mkmap.c	3.5	2008/02/29	*/
 /* Copyright (c) J. C. Collet, M. Stephenson and D. Cohrs, 1992   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -190,7 +190,8 @@ flood_fill_rm(sx, sy, rmno, lit, anyroom)
 		for(jj = sy-1; jj <= sy+1; jj++)
 		    if(isok(ii,jj) &&
 		       (IS_WALL(levl[ii][jj].typ) ||
-			IS_DOOR(levl[ii][jj].typ))) {
+			IS_DOOR(levl[ii][jj].typ) ||
+			levl[ii][jj].typ == SDOOR)) {
 			levl[ii][jj].edge = 1;
 			if(lit) levl[ii][jj].lit = lit;
 			if ((int) levl[ii][jj].roomno != rmno)
