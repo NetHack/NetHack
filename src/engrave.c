@@ -613,7 +613,7 @@ doengrave()
 	    case WAND_CLASS:
 		if (zappable(otmp)) {
 		    check_unpaid(otmp);
-		    if (otmp->cursed && !rn2(100)) { /* same as when zapping */
+		    if (otmp->cursed && !rn2(WAND_BACKFIRE_CHANCE)) {
 			wand_explode(otmp, 0);
 			return 1;
 		    }
