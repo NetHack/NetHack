@@ -283,6 +283,7 @@ wizard mode #monpolycontrol prompting asked about "it" when monster was unseen
 reprompt if player fails to make a menu choice during inventory identification
 seen eels who were stuck in isolated pools would never re-hide
 can no longer get both strength and resistance from eating one giant corpse
+aborting key/lock pick usage via ESC at direction prompt no longer use a move
 
 
 Platform- and/or Interface-Specific Fixes

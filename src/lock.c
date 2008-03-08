@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)lock.c	3.5	2007/11/14	*/
+/*	SCCS Id: @(#)lock.c	3.5	2008/03/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -225,8 +225,17 @@ reset_pick()
 	xlock.box = 0;
 }
 
+/* for doapply(); if player gives a direction or resumes an interrupted
+   previous attempt then it costs hero a move even if nothing ultimately
+   happens; when told "can't do that" before being asked for direction
+   or player cancels with ESC while giving direction, it doesn't */
+#define PICKLOCK_LEARNED_SOMETHING (-1)	/* time passes */
+#define PICKLOCK_DID_NOTHING 0		/* no time passes */
+#define PICKLOCK_DID_SOMETHING 1
+
+/* player is applying a key, lock pick, or credit card */
 int
-pick_lock(pick) /* pick a lock with a given object */
+pick_lock(pick)
 	register struct	obj	*pick;
 {
 	int picktyp, c, ch;
@@ -248,21 +257,22 @@ pick_lock(pick) /* pick a lock with a given object */
 #endif
 		pline(no_longer, "hold the", what);
 		reset_pick();
-		return 0;
+		return PICKLOCK_LEARNED_SOMETHING;
 	    } else if (u.uswallow || (xlock.box && !can_reach_floor(TRUE))) {
 		pline(no_longer, "reach the", "lock");
 		reset_pick();
-		return 0;
+		return PICKLOCK_LEARNED_SOMETHING;
 	    } else {
 		const char *action = lock_action();
 		You("resume your attempt at %s.", action);
 		set_occupation(picklock, action, 0);
-		return(1);
+		return PICKLOCK_DID_SOMETHING;
 	    }
 	}
 
 	if(nohands(youmonst.data)) {
 		You_cant("hold %s -- you have no hands!", doname(pick));
+		return PICKLOCK_DID_NOTHING;
 		return(0);
 	} else if (u.uswallow) {
 		You_cant("%sunlock %s.",
@@ -270,7 +280,7 @@ pick_lock(pick) /* pick a lock with a given object */
 			  (picktyp == CREDIT_CARD) ? "" :
 #endif
 			  "lock or ", mon_nam(u.ustuck));
-		return 0;
+		return PICKLOCK_DID_NOTHING;
 	}
 
 	if((picktyp != LOCK_PICK &&
@@ -279,11 +289,13 @@ pick_lock(pick) /* pick a lock with a given object */
 #endif
 	    picktyp != SKELETON_KEY)) {
 		impossible("picking lock with object %d?", picktyp);
-		return(0);
+		return PICKLOCK_DID_NOTHING;
 	}
 	ch = 0;		/* lint suppression */
 
-	if(!get_adjacent_loc((char *)0, "Invalid location!", u.ux, u.uy, &cc)) return 0;
+	if (!get_adjacent_loc((char *)0, "Invalid location!", u.ux, u.uy, &cc))
+	    return PICKLOCK_DID_NOTHING;
+
 	if (cc.x == u.ux && cc.y == u.uy) {	/* pick lock on a container */
 	    const char *verb;
 	    char qsfx[QBUFSZ];
@@ -293,13 +305,13 @@ pick_lock(pick) /* pick a lock with a given object */
 	    if (u.dz < 0) {
 		There("isn't any sort of lock up %s.",
 		      Levitation ? "here" : "there");
-		return 0;
+		return PICKLOCK_LEARNED_SOMETHING;
 	    } else if (is_lava(u.ux, u.uy)) {
 		pline("Doing that would probably melt %s.", yname(pick));
-		return 0;
+		return PICKLOCK_LEARNED_SOMETHING;
 	    } else if (is_pool(u.ux, u.uy) && !Underwater) {
 		pline_The("water has no lock.");
-		return 0;
+		return PICKLOCK_LEARNED_SOMETHING;
 	    }
 
 	    count = 0;
@@ -309,7 +321,7 @@ pick_lock(pick) /* pick a lock with a given object */
 		    ++count;
 		    if (!can_reach_floor(TRUE)) {
 			You_cant("reach %s from up here.", the(xname(otmp)));
-			return 0;
+			return PICKLOCK_LEARNED_SOMETHING;
 		    }
 		    it = 0;
 		    if (otmp->obroken) verb = "fix";
@@ -330,14 +342,14 @@ pick_lock(pick) /* pick a lock with a given object */
 
 		    if (otmp->obroken) {
 			You_cant("fix its broken lock with %s.", doname(pick));
-			return 0;
+			return PICKLOCK_LEARNED_SOMETHING;
 		    }
 #ifdef TOURIST
 		    else if (picktyp == CREDIT_CARD && !otmp->olocked) {
 			/* credit cards are only good for unlocking */
 			You_cant("do that with %s.",
 				 an(simple_typename(picktyp)));
-			return 0;
+			return PICKLOCK_LEARNED_SOMETHING;
 		    }
 #endif
 		    switch(picktyp) {
@@ -364,14 +376,14 @@ pick_lock(pick) /* pick a lock with a given object */
 	    if (c != 'y') {
 		if (!count)
 		    There("doesn't seem to be any sort of lock here.");
-		return(0);		/* decided against all boxes */
+		return PICKLOCK_LEARNED_SOMETHING; /* decided against all boxes */
 	    }
 	} else {			/* pick the lock in a door */
 	    struct monst *mtmp;
 
 	    if (u.utrap && u.utraptype == TT_PIT) {
 		You_cant("reach over the edge of the pit.");
-		return(0);
+		return PICKLOCK_LEARNED_SOMETHING;
 	    }
 
 	    door = &levl[cc.x][cc.y];
@@ -385,7 +397,7 @@ pick_lock(pick) /* pick a lock with a given object */
 		else
 #endif
 		    pline("I don't think %s would appreciate that.", mon_nam(mtmp));
-		return(0);
+		return PICKLOCK_LEARNED_SOMETHING;
 	    }
 	    if(!IS_DOOR(door->typ)) {
 		if (is_drawbridge_wall(cc.x,cc.y) >= 0)
@@ -394,24 +406,24 @@ pick_lock(pick) /* pick a lock with a given object */
 		else
 		    You("%s no door there.",
 				Blind ? "feel" : "see");
-		return(0);
+		return PICKLOCK_LEARNED_SOMETHING;
 	    }
 	    switch (door->doormask) {
 		case D_NODOOR:
 		    pline("This doorway has no door.");
-		    return(0);
+		    return PICKLOCK_LEARNED_SOMETHING;
 		case D_ISOPEN:
 		    You("cannot lock an open door.");
-		    return(0);
+		    return PICKLOCK_LEARNED_SOMETHING;
 		case D_BROKEN:
 		    pline("This door is broken.");
-		    return(0);
+		    return PICKLOCK_LEARNED_SOMETHING;
 		default:
 #ifdef TOURIST
 		    /* credit cards are only good for unlocking */
 		    if(picktyp == CREDIT_CARD && !(door->doormask & D_LOCKED)) {
 			You_cant("lock a door with a credit card.");
-			return(0);
+			return PICKLOCK_LEARNED_SOMETHING;
 		    }
 #endif
 
@@ -444,7 +456,7 @@ pick_lock(pick) /* pick a lock with a given object */
 	xlock.picktyp = picktyp;
 	xlock.usedtime = 0;
 	set_occupation(picklock, lock_action(), 0);
-	return(1);
+	return PICKLOCK_DID_SOMETHING;
 }
 
 int

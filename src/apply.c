@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2007/05/05	*/
+/*	SCCS Id: @(#)apply.c	3.5	2008/03/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3073,7 +3073,7 @@ doapply()
 	case CREDIT_CARD:
 #endif
 	case SKELETON_KEY:
-		(void) pick_lock(obj);
+		res = (pick_lock(obj) != 0);
 		break;
 	case PICK_AXE:
 	case DWARVISH_MATTOCK:
