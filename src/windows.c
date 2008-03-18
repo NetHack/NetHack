@@ -111,7 +111,10 @@ const char *s;
     if (!windowprocs.win_raw_print)
 	windowprocs.win_raw_print = def_raw_print;
 
-    if(!winchoices[0].procs) impossible("no window types?");
+    if(!winchoices[0].procs){
+	raw_printf("No window types?");
+	exit(EXIT_FAILURE);
+    }
     if(!winchoices[1].procs){
 	raw_printf("Window type %s not recognized.  The only choice is: %s.",
 		s, winchoices[0].procs->name);
