@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dothrow.c	3.5	2007/12/03	*/
+/*	SCCS Id: @(#)dothrow.c	3.5	2008/03/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1090,7 +1090,10 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		;	/* missile has already been handled */
 	} else if (u.uswallow) {
 		/* ball is not picked up by monster */
-		if (obj != uball) (void) mpickobj(u.ustuck,obj);
+		if (obj != uball) {
+		    (void) mpickobj(u.ustuck, obj);
+		    thrownobj = (struct obj *)0;
+		}
 	} else {
 		/* the code following might become part of dropy() */
 		if (obj->oartifact == ART_MJOLLNIR &&
