@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2008/02/15	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2008/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,6 +7,8 @@
  */
 
 #include "hack.h"
+
+#define CONTAINED_SYM	'>'	/* from invent.c */
 
 STATIC_DCL void FDECL(simple_look, (struct obj *,BOOLEAN_P));
 #ifndef GOLDOBJ
@@ -716,6 +718,7 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
  *			    use it.
  *	USE_INVLET	  - Use object's invlet.
  *	INVORDER_SORT	  - Use hero's pack order.
+ *	INCLUDE_HERO	  - Showing engulfer's invent; show hero too.
  *	SIGNAL_NOMENU	  - Return -1 rather than 0 if nothing passes "allow".
  *	SIGNAL_ESCAPE	  - Return -1 rather than 0 if player uses ESC to
  *			    pick nothing.
@@ -731,13 +734,15 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 {
 	int n;
 	winid win;
-	struct obj *curr, *last;
+	struct obj *curr, *last, fake_hero_object;
 	char *pack;
 	anything any;
-	boolean printed_type_name;
+	boolean printed_type_name,
+		sorted = (qflags & INVORDER_SORT) != 0,
+		engulfer = (qflags & INCLUDE_HERO) != 0;
 
 	*pick_list = (menu_item *) 0;
-	if (!olist) return 0;
+	if (!olist && !engulfer) return 0;
 
 	/* count the number of items allowed */
 	for (n = 0, last = 0, curr = olist; curr; curr = FOLLOW(curr, qflags))
@@ -745,6 +750,12 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		last = curr;
 		n++;
 	    }
+
+	if (engulfer) {
+	    ++n;
+	    /* don't autoselect swallowed hero if it's the only choice */
+	    qflags &= ~AUTOSELECT_SINGLE;
+	}
 
 	if (n == 0)	/* nothing to pick here */
 	    return (qflags & SIGNAL_NOMENU) ? -1 : 0;
@@ -776,11 +787,10 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 			(void) look_here(0, FALSE);
 			return 0;
 		}
-		if ((!(qflags & INVORDER_SORT) || curr->oclass == *pack)
-							&& (*allow)(curr)) {
+		if ((!sorted || curr->oclass == *pack) && (*allow)(curr)) {
 
 		    /* if sorting, print type name (once only) */
-		    if (qflags & INVORDER_SORT && !printed_type_name) {
+		    if (sorted && !printed_type_name) {
 			any = zeroany;
 			add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 					let_to_name(*pack, FALSE), MENU_UNSELECTED);
@@ -789,13 +799,32 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 
 		    any.a_obj = curr;
 		    add_menu(win, obj_to_glyph(curr), &any,
-			    qflags & USE_INVLET ? curr->invlet : 0,
+			    (qflags & USE_INVLET) ? curr->invlet : 0,
 			    def_oc_syms[(int)objects[curr->otyp].oc_class].sym,
 			    ATR_NONE, doname(curr), MENU_UNSELECTED);
 		}
 	    }
 	    pack++;
-	} while (qflags & INVORDER_SORT && *pack);
+	} while (sorted && *pack);
+
+	if (engulfer) {
+	    char buf[BUFSZ];
+
+	    any = zeroany;
+	    if (sorted && n > 1) {
+		Sprintf(buf, "%s Creature",
+			is_animal(u.ustuck->data) ? "Swallowed" : "Engulfed");
+		add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+			 buf, MENU_UNSELECTED);
+	    }
+	    fake_hero_object = zeroobj;
+	    fake_hero_object.quan = 1L;	/* not strictly necessary... */
+	    any.a_obj = &fake_hero_object;
+	    add_menu(win, mon_to_glyph(&youmonst), &any,
+		     /* fake inventory letter, no group accelerator */
+		     CONTAINED_SYM, 0,
+		     ATR_NONE, self_lookat(buf), MENU_UNSELECTED);
+	}
 
 	end_menu(win, qstr);
 	n = select_menu(win, how, pick_list);
@@ -803,12 +832,28 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 
 	if (n > 0) {
 	    menu_item *mi;
-	    int i;
+	    int i, k;
 
-	    /* fix up counts:  -1 means no count used => pick all */
-	    for (i = 0, mi = *pick_list; i < n; i++, mi++)
+	    /* fix up counts:  -1 means no count used => pick all;
+	       if fake_hero_object was picked, discard that choice */
+	    for (i = k = 0, mi = *pick_list; i < n; i++, mi++) {
+		if (mi->item.a_obj == &fake_hero_object) continue;
 		if (mi->count == -1L || mi->count > mi->item.a_obj->quan)
 		    mi->count = mi->item.a_obj->quan;
+		if (k < i) (*pick_list)[k] = *mi;
+		++k;
+	    }
+	    if (!k) {
+		/* fake_hero was only choice so discard whole list */
+		free((genericptr_t) *pick_list);
+		*pick_list = 0;
+		n = 0;
+	    } else if (k < n) {
+		/* other stuff plus fake_hero; last slot is now unused */
+		(*pick_list)[k].item = zeroany;
+		(*pick_list)[k].count = 0L;
+		n = k;
+	    }
 	} else if (n < 0) {
 	    /* -1 is used for SIGNAL_NOMENU, so callers don't expect it
 	       to indicate that the player declined to make a choice */

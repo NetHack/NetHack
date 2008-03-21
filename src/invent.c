@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2008/02/15	*/
+/*	SCCS Id: @(#)invent.c	3.5	2008/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3166,22 +3166,20 @@ char *title;
 	char tmp[QBUFSZ];
 	int n;
 	menu_item *selected = 0;
-#ifndef GOLDOBJ
 	int do_all = (dflags & MINV_ALL) != 0,
-	    do_gold = (do_all && mon->mgold);
+	    incl_hero = (do_all && u.uswallow && mon == u.ustuck),
+#ifndef GOLDOBJ
+	    do_gold = (do_all && mon->mgold),
+	    have_inv = (mon->minvent || do_gold),
 #else
-	int do_all = (dflags & MINV_ALL) != 0;
+	    have_inv = (mon->minvent != 0),
 #endif
+	    have_any = (have_inv || incl_hero);
 
 	Sprintf(tmp,"%s %s:", s_suffix(noit_Monnam(mon)),
 		do_all ? "possessions" : "armament");
 
-#ifndef GOLDOBJ
-	if (do_all ? (mon->minvent || mon->mgold)
-#else
-	if (do_all ? (mon->minvent != 0)
-#endif
-		   : (mon->misc_worn_check || MON_WEP(mon))) {
+	if (do_all ? have_any : (mon->misc_worn_check || MON_WEP(mon))) {
 	    /* Fool the 'weapon in hand' routine into
 	     * displaying 'weapon in claw', etc. properly.
 	     */
@@ -3205,9 +3203,11 @@ char *title;
 	    }
 
 #endif
-	    n = query_objlist(title ? title : tmp, mon->minvent, INVORDER_SORT, &selected,
-			(dflags & MINV_NOLET) ? PICK_NONE : PICK_ONE,
-			do_all ? allow_all : worn_wield_only);
+	    n = query_objlist(title ? title : tmp, mon->minvent,
+			      INVORDER_SORT | (incl_hero ? INCLUDE_HERO : 0),
+			      &selected,
+			      (dflags & MINV_NOLET) ? PICK_NONE : PICK_ONE,
+			      do_all ? allow_all : worn_wield_only);
 
 #ifndef GOLDOBJ
 	    if (do_gold) obj_extract_self(&m_gold);

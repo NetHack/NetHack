@@ -1614,6 +1614,7 @@ E void NDECL(set_playmode);
 
 /* ### pager.c ### */
 
+E char *FDECL(self_lookat, (char *));
 E int NDECL(dowhatis);
 E int NDECL(doquickwhatis);
 E int NDECL(doidtrap);

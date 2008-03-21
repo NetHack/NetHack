@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)hack.h	3.5	2008/02/15	*/
+/*	SCCS Id: @(#)hack.h	3.5	2008/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -223,6 +223,7 @@ NEARDATA extern coord bhitpos;	/* place where throw or zap hits or stops */
 #define SIGNAL_NOMENU	  0x10	/* return -1 rather than 0 if none allowed */
 #define SIGNAL_ESCAPE	  0x20	/* return -2 rather than 0 for ESC */
 #define FEEL_COCKATRICE   0x40  /* engage cockatrice checks and react */
+#define INCLUDE_HERO	  0x80	/* show hero among engulfer's inventory */
 
 /* Flags to control query_category() */
 /* BY_NEXTHERE used by query_category() too, so skip 0x01 */

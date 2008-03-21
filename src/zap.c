@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2008/01/19	*/
+/*	SCCS Id: @(#)zap.c	3.5	2008/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -450,7 +450,8 @@ struct monst *mtmp;
 	    }
 	    (void) display_minventory(mtmp, MINV_ALL|MINV_NOLET, (char *)0);
 	} else {
-	    pline("%s is not carrying anything.", noit_Monnam(mtmp));
+	    pline("%s is not carrying anything%s.", noit_Monnam(mtmp),
+		  (u.uswallow && mtmp == u.ustuck) ? " besides you" : "");
 	}
 }
 

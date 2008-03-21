@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.5	2008/01/30	*/
+/*	SCCS Id: @(#)pager.c	3.5	2008/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,6 +49,28 @@ append_str(buf, new_str)
     return 1;
 }
 
+/* shared by monster probing (via query_objlist!) as well as lookat() */
+char *
+self_lookat(outbuf)
+char *outbuf;
+{
+	char race[QBUFSZ];
+
+	/* include race with role unless polymorphed */
+	race[0] = '\0';
+	if (!Upolyd)
+	    Sprintf(race, "%s ", urace.adj);
+	Sprintf(outbuf, "%s%s%s called %s",
+		/* being blinded may hide invisibility from self */
+		(Invis && (senseself() || !Blind)) ? "invisible " : "",
+		race, mons[u.umonnum].mname, plname);
+#ifdef STEED
+	if (u.usteed)
+	    Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
+#endif
+	return outbuf;
+}
+
 /*
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
@@ -65,35 +87,15 @@ lookat(x, y, buf, monbuf)
     buf[0] = monbuf[0] = 0;
     glyph = glyph_at(x,y);
     if (u.ux == x && u.uy == y && canspotself()) {
-	char race[QBUFSZ];
+	/* fill in buf[] */
+	(void)self_lookat(buf);
 
-	/* if not polymorphed, show both the role and the race */
-	race[0] = 0;
-	if (!Upolyd) {
-	    Sprintf(race, "%s ", urace.adj);
-	}
-
-	Sprintf(buf, "%s%s%s called %s",
-		/* being blinded may hide invisibility from self */
-		(Invis && (senseself() || !Blind)) ? "invisible " : "",
-		race,
-		mons[u.umonnum].mname,
-		plname);
 	/* file lookup can't distinguish between "gnomish wizard" monster
 	   and correspondingly named player character, always picking the
 	   former; force it to find the general "wizard" entry instead */
 	if (Role_if(PM_WIZARD) && Race_if(PM_GNOME) && !Upolyd)
 	    pm = &mons[PM_WIZARD];
 
-#ifdef STEED
-	if (u.usteed) {
-	    char steedbuf[BUFSZ];
-
-	    Sprintf(steedbuf, ", mounted on %s", y_monnam(u.usteed));
-	    /* assert((sizeof buf >= strlen(buf)+strlen(steedbuf)+1); */
-	    Strcat(buf, steedbuf);
-	}
-#endif
 	/* When you see yourself normally, no explanation is appended
 	   (even if you could also see yourself via other means).
 	   Sensing self while blind or swallowed is treated as if it
