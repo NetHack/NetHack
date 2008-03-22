@@ -812,7 +812,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 
 	    any = zeroany;
 	    if (sorted && n > 1) {
-		Sprintf(buf, "%s Creature",
+		Sprintf(buf, "%s Creatures",
 			is_animal(u.ustuck->data) ? "Swallowed" : "Engulfed");
 		add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 			 buf, MENU_UNSELECTED);
@@ -823,7 +823,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	    add_menu(win, mon_to_glyph(&youmonst), &any,
 		     /* fake inventory letter, no group accelerator */
 		     CONTAINED_SYM, 0,
-		     ATR_NONE, self_lookat(buf), MENU_UNSELECTED);
+		     ATR_NONE, an(self_lookat(buf)), MENU_UNSELECTED);
 	}
 
 	end_menu(win, qstr);
