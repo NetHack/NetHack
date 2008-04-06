@@ -174,7 +174,7 @@ YACCDIST =
 
 #	dependencies for makedefs
 #
-makedefs:	$(MAKEOBJS)
+makedefs:	$(MAKEOBJS) mdgrep.h
 	$(CC) $(LFLAGS) -o makedefs $(MAKEOBJS)
 
 makedefs.o: makedefs.c $(CONFIG_H) ../include/permonst.h \
