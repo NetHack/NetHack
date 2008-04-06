@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makedefs.c	3.5	2006/12/09	*/
+/* NetHack 3.5  makedefs.c  $Date$  $Revision$ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -27,12 +27,12 @@
 #include "patchlevel.h"
 #endif
 
+#include <ctype.h>
 #ifdef MAC
 # if defined(__SC__) || defined(__MRC__)	/* MPW compilers */
 #  define MPWTOOL
 #include <CursorCtl.h>
 #include <string.h>
-#include <ctype.h>
 # else		/* MAC without MPWTOOL */
 #  define MACsansMPWTOOL
 # endif
@@ -173,6 +173,7 @@ static boolean FDECL(h_filter, (char *));
 static boolean FDECL(ranged_attk,(struct permonst*));
 static int FDECL(mstrength,(struct permonst *));
 static void NDECL(build_savebones_compat_string);
+static void FDECL(do_ext_makedefs,(int , char **));
 
 static boolean FDECL(qt_comment, (char *));
 static boolean FDECL(qt_control, (char *));
@@ -222,6 +223,16 @@ main(void)
     else
 	buf[len-1] = 0;			/* remove return */
 
+    if(buf[0]=='-' && buf[1]=='-'){
+#if 0
+	split up buf into words
+	do_ext_makedefs(fakeargc, fakeargv);
+#else
+	printf("extended makedefs not implemented for Mac OS9\n");
+	exit(EXIT_FAILURE);
+#endif
+    }
+
     do_makedefs(buf);
     exit(EXIT_SUCCESS);
     return 0;
@@ -238,6 +249,7 @@ char	*argv[];
 #ifdef FILE_PREFIX
 		&& (argc != 3)
 #endif
+		&& !(argv[1][0]=='-' && argv[1][1]=='-')
 	) {
 	    Fprintf(stderr, "Bad arg count (%d).\n", argc-1);
 	    (void) fflush(stderr);
@@ -250,7 +262,12 @@ char	*argv[];
 	    argc--;argv++;
 	}
 #endif
-	do_makedefs(&argv[1][1]);
+
+	if(argv[1][0]=='-' && argv[1][1]=='-'){
+		do_ext_makedefs(argc, argv);
+	} else {
+		do_makedefs(&argv[1][1]);
+	}
 	exit(EXIT_SUCCESS);
 	/*NOTREACHED*/
 	return 0;
@@ -258,21 +275,25 @@ char	*argv[];
 
 #endif
 
+static void
+link_sanity_check(){
+	/* Note:  these initializers don't do anything except guarantee that
+		we're linked properly.
+	*/
+	monst_init();
+	objects_init();
+}
+
 void
 do_makedefs(options)
 char	*options;
 {
 	boolean more_than_one;
 
-	/* Note:  these initializers don't do anything except guarantee that
-		we're linked properly.
-	*/
-	monst_init();
-	objects_init();
+	link_sanity_check();
 
 	/* construct the current version number */
 	make_version();
-
 
 	more_than_one = strlen(options) > 1;
 	while (*options) {
@@ -322,6 +343,358 @@ char	*options;
 	}
 	if (more_than_one) Fprintf(stderr, "Completed.\n");	/* feedback */
 
+}
+
+static FILE *inputfp;
+static FILE *outputfp;
+
+#define TODO_GREP 1;
+static void NDECL(do_grep);
+static void NDECL(do_grep_showvars);
+static int grep_trace = 0;
+
+static void
+do_ext_makedefs(int argc, char **argv){
+	int todo = 0;
+
+	link_sanity_check();
+
+	argc--; argv++;		/* skip program name */
+
+	while(argc){
+		if(argv[0][0] != '-') break;
+		if(argv[0][1] != '-'){
+			Fprintf(stderr, "Can't mix - and -- options.\n");
+			exit(EXIT_FAILURE);
+		}
+#define IS_OPTION(str)	if(!strcmp(&argv[0][2], str))
+#define CONTINUE argv++, argc--; continue
+#define CONSUME \
+  argv++, argc--; \
+  if(argc==0){Fprintf(stderr, "missing option\n"); exit(EXIT_FAILURE);}
+		IS_OPTION("input"){
+			CONSUME;
+			if(!strcmp(argv[0], "-")){
+				inputfp = stdin;
+			} else {
+				inputfp = fopen(argv[0], RDTMODE);
+				if(!inputfp){
+					Fprintf(stderr, "Can't open '%s'.\n", argv[0]);
+					exit(EXIT_FAILURE);
+				}
+			}
+			CONTINUE;
+		}
+		IS_OPTION("output"){
+			CONSUME;
+			if(!strcmp(argv[0], "-")){
+				outputfp = stdout;
+			} else {
+				outputfp = fopen(argv[0], WRTMODE);
+				if(!outputfp){
+					Fprintf(stderr, "Can't open '%s'.\n", argv[0]);
+					exit(EXIT_FAILURE);
+				}
+			}
+			CONTINUE;
+		}
+		IS_OPTION("grep"){
+			if(todo){
+				Fprintf(stderr, "Can't do grep and something else.\n");
+				exit(EXIT_FAILURE);
+			}
+			todo = 1;
+			CONTINUE;
+		}
+		IS_OPTION("grep-showvars"){
+			do_grep_showvars();
+			exit(EXIT_SUCCESS);
+		}
+		IS_OPTION("grep-trace"){
+			grep_trace = 1;
+			CONTINUE;
+		}
+#ifdef notyet
+		IS_OPTION("grep-define"){
+		}
+		IS_OPTION("grep-undef"){
+		}
+		IS_OPTION("help"){
+		}
+#endif
+#undef IS_OPTION
+		Fprintf(stderr, "Unknown option '%s'.\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+	if(argc){
+		Fprintf(stderr, "unexpected argument '%s'.\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	switch(todo){
+		default:
+			Fprintf(stderr, "Confused about what to do?\n");
+			exit(EXIT_FAILURE);
+		case 0:
+			Fprintf(stderr, "Nothing to do?\n");
+			exit(EXIT_FAILURE);
+		case 1:
+			do_grep(); break;
+	}
+}
+
+/*
+ Filtering syntax:
+ Any line NOT starting with a caret is either suppressed or passed through
+ unchanged depending on the current conditional state.
+
+ The default conditional state is printing on.
+
+ Conditionals may be nested.
+
+ makedefs will exit with a EXIT_FAILURE if any errors are detected; as many
+ errors as possible are detected before giving up.
+
+ Unknown identifiers are treated as TRUE and also as an error to allow
+ processing to continue past the unknown identifier (note that "#undef" is
+ different than unknown).
+
+ Any line starting with a caret is a control line; as in C, zero or more spaces
+ may be embedded in the line almost anywhere; the caret MUST be in column 1.
+
+ Control lines:
+ ^^	a line starting with a (single) literal caret
+ ^#	a comment - the line is ignored
+ ^?ID	if defined(ID)
+ ^!ID	if !defined(ID)
+ ^:	else
+ ^.	endif
+
+*/ 
+#define GREP_MAGIC '^'
+#define GREP_STACK_SIZE 100
+static int grep_rewrite = 0;	/* need to (possibly) rewrite lines */
+static int grep_writing = 1;	/* need to copy lines to output */
+static int grep_errors = 0;
+static int grep_sp = 0;
+#define ST_LD(old,opp) (!!(old) | (!!(opp)<<1))
+#define ST_OLD(v)	((v) & 1)
+#define ST_OPP(v)	!!((v) & 2)
+#define ST_ELSE 4
+static int grep_stack[GREP_STACK_SIZE] = {ST_LD(1,0)};
+static int grep_lineno = 0;
+
+struct grep_var {
+	const char *name;
+	int is_defined;		/* 0 undef; 1 defined */
+};
+/* struct grep_var grep_vars[] in include file: */
+#include "mdgrep.h"
+
+static void
+do_grep_showvars(){
+	int x;
+	for(x=0;x<SIZE(grep_vars)-1;x++){
+		printf("%d\t%s\n",grep_vars[x].is_defined,grep_vars[x].name);
+	}
+}
+
+static struct grep_var *
+grepsearch(name)
+	char *name;
+{
+	/* XXX make into binary search */
+	int x=0;
+	while(x < SIZE(grep_vars)-1){
+		if(!strcmp(grep_vars[x].name, name))
+			return &grep_vars[x];
+		x++;
+	}
+	return 0;
+}
+
+static int
+grep_check_id(id)
+	char *id;
+{
+	struct grep_var *rv;
+	while(*id && isspace(*id))id++;
+	if(! *id){
+		Fprintf(stderr, "missing identifier in line %d", grep_lineno);
+		grep_errors++;
+		return 0;
+	}
+	rv = grepsearch(id);
+	if(rv){
+		if(grep_trace){
+			Fprintf(outputfp, "ID %d %s\n", rv->is_defined, id);
+		}
+		return rv->is_defined;
+	}
+
+	if(grep_trace){
+		Fprintf(outputfp, "ID U %s\n", id);
+	}
+	Fprintf(stderr, "unknown identifier '%s' in line %d.\n", id,
+			grep_lineno);
+	grep_errors++;
+	return 2;	/* So new features can be checked before makedefs
+			 * is rebuilt. */
+}
+
+static void
+grep_show_wstack(tag)
+	char *tag;
+{
+	int x;
+
+	if(!grep_trace) return;
+
+	Fprintf(outputfp, "%s w=%d sp=%d\t",tag,grep_writing, grep_sp);
+	for(x=grep_sp; x>=0 && x>grep_sp-6;x--){
+		Fprintf(outputfp, "[%d]=%d ", x, grep_stack[x]);
+	}
+	Fprintf(outputfp, "\n");
+}
+
+static char *
+do_grep_control(buf)
+	char *buf;
+{
+	int isif = 1;
+	char *buf0 = buf;
+	while(buf[0] && isspace(buf[0])) buf++;
+	switch(buf[0]){
+	case '#':	/* comment */
+		break;
+	case '.':	/* end of if level */
+		if(grep_sp==0){
+			Fprintf(stderr, "unmatched ^. (endif) at line %d.\n",
+				grep_lineno);
+			grep_errors++;
+		} else {
+			grep_writing = ST_OLD(grep_stack[grep_sp--]);
+			grep_show_wstack("pop");
+		}
+		break;
+	case '!':	/* if not ID */
+		isif = 0;
+		/* FALLTHROUGH */
+	case '?':	/* if ID */
+		if(grep_sp == GREP_STACK_SIZE-2){
+			Fprintf(stderr, "stack overflow at line %d.",
+				grep_lineno);
+			exit(EXIT_FAILURE);
+		}
+		if(grep_writing){
+			isif = grep_check_id(&buf[1])?isif:!isif;
+			grep_stack[++grep_sp] = ST_LD(grep_writing, !isif);
+			grep_writing = isif;
+		} else {
+			grep_stack[++grep_sp] = ST_LD(0, 0);
+			/* grep_writing = 0; */
+		}
+		grep_show_wstack("push");
+		break;
+	case ':':	/* else */
+		if(ST_ELSE & grep_stack[grep_sp]){
+			Fprintf(stderr,
+"multiple : for same conditional at line %d.\n", grep_lineno);
+			grep_errors++;
+		}
+		grep_writing = ST_OPP(grep_stack[grep_sp]);
+		grep_stack[grep_sp] |= ST_ELSE;
+		break;
+#if defined(notyet)
+	case '(':	/* start of expression */
+#endif
+	case GREP_MAGIC:	/* ^^ -> ^ */
+		return buf0;
+	default:
+		{
+		char str[10];
+		if(isprint(buf[0])){
+			str[0] = buf[0]; str[1] = '\0';
+		} else {
+			sprintf(str, "0x%02x", buf[0]);
+		}
+		Fprintf(stderr, "unknown control ^%s at line %d.\n",
+			str, grep_lineno);
+		grep_errors++;
+		}
+		break;
+	}
+	return NULL;
+}
+
+static void
+do_grep_rewrite(buf)
+	char *buf;
+{
+		/* no language features use this yet */
+	return;
+}
+
+static void
+do_grep(){
+	char buf[16384];	/* looong, just in case */
+
+	if(!inputfp){
+		Fprintf(stderr,"--grep requires --input\n");
+	}
+	if(!outputfp){
+		Fprintf(stderr,"--grep requires --output\n");
+	}
+	if(!inputfp || !outputfp){
+		exit(EXIT_FAILURE);
+	}
+
+	while(!feof(inputfp) && !ferror(inputfp)){
+		char *tmp;
+		char *buf1;
+
+		if(fgets(buf, sizeof(buf), inputfp) == 0) break;
+		if(tmp=strchr(buf,'\n')) *tmp = '\0';
+		grep_lineno++;
+		if(grep_trace){
+			Fprintf(outputfp, "%04d %c >%s\n",
+				grep_lineno,
+				grep_writing?' ':'#',
+				buf
+			);
+		}
+
+		if(buf[0] == GREP_MAGIC){
+			buf1 = do_grep_control(&buf[1]);
+			if(!buf1) continue;
+		} else {
+			buf1 = buf;
+		}
+		if(grep_rewrite)
+			do_grep_rewrite(buf1);
+		if(grep_writing)
+			Fprintf(outputfp, "%s\n", buf1);
+	}
+	if(ferror(inputfp)){
+		Fprintf(stderr, "read error!\n");
+		exit(EXIT_FAILURE);
+	}
+	if(ferror(outputfp)){
+		Fprintf(stderr, "write error!\n");
+		exit(EXIT_FAILURE);
+	}
+	fclose(inputfp);
+	fclose(outputfp);
+	if(grep_sp){
+		Fprintf(stderr, "%d unterminated conditional level%s\n",
+			grep_sp, grep_sp==1?"":"s");
+		grep_errors++;
+	}
+	if(grep_errors){
+		Fprintf(stderr, "%d error%s detected.\n", grep_errors,
+			grep_errors==1?"":"s");
+		exit(EXIT_FAILURE);
+	}
 }
 
 
