@@ -13,6 +13,7 @@ struct sysopt {
 	char *support;	/* local support contact */
 	char *recover;	/* how to run recover - may be overridden by win port */
 	char *wizards;
+	int   maxplayers;
 };
 E struct sysopt sysopt;
 

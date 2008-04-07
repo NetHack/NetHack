@@ -2078,6 +2078,15 @@ int		src;
 	    if(sysopt.recover) free(sysopt.recover);
 	    sysopt.recover = alloc(strlen(bufp));
 	    (void) strcpy(sysopt.recover, bufp);
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "MAXPLAYERS", 10)) {
+	    int temp = atoi(bufp);
+		/* XXX to get more than 25, need to rewrite all lock code */
+	    if(temp > 0 && temp <= 25){
+		    sysopt.maxplayers = temp;
+	    } else {
+		raw_printf("Illegal value in MAXPLAYERS.");
+		return 0;
+	    }
 #endif
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,

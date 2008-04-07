@@ -14,5 +14,6 @@ sys_early_init(){
 	/* replace use of WIZARD vs WIZARD_NAME vs KR1ED, by filling this in */
 #endif
 	sysopt.wizards = NULL;
+	sysopt.maxplayers = 0;	/* XXX eventually replace MAX_NR_OF_PLAYERS */
 }
 

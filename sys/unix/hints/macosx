@@ -18,8 +18,9 @@ HACKDIR=$(PREFIX)/nethackdir
 CC=gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
 
 # XXX -g vs -O should go here, -I../include goes in the makefile
-CFLAGS=-g -I../include $(CFLAGS2)
+CFLAGS=-g -I../include $(CFLAGS2) $(CFLAGS3)
 CFLAGS2=-DNOCLIPPING -DNOMAIL -DNOTPARMDECL -DHACKDIR=\"$(HACKDIR)\"
+CFLAGS3=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 
 WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)

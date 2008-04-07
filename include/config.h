@@ -149,6 +149,9 @@
  *		available in a global config space, with the compiled-in
  *		entries as defaults:
  *		WIZARD		( a value of * allows anyone to be wizard)
+ *		MAXPLAYERS	(see MAX_NR_OF_PLAYERS above and nethack.sh)
+ *		SUPPORT		(how to get local support)(no default)
+ *		RECOVER		(how to recover a game at your site)(no default)
  *
  *		The following options select how the config space is stored:
  *		SYSCF_FILE	in the named file
@@ -270,7 +273,8 @@
 
 /*
  * If it is desirable to limit the number of people that can play Hack
- * simultaneously, define HACKDIR, SECURE and MAX_NR_OF_PLAYERS.
+ * simultaneously, define HACKDIR, SECURE and MAX_NR_OF_PLAYERS (or use
+ * MAXPLAYERS under SYSCF).
  * #define MAX_NR_OF_PLAYERS 6
  */
 #endif /* CHDIR */

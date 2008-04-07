@@ -7,6 +7,7 @@
 #include "hack.h"
 #include "dlb.h"
 
+#include <ctype.h>
 #include <sys/stat.h>
 #include <signal.h>
 #include <pwd.h>
@@ -373,11 +374,19 @@ char *argv[];
 		}
 	}
 
+	/* XXX This is deprecated in favor of SYSCF with MAXPLAYERS.  Make
+	 * an error in next release. */
 	if(argc > 1)
 		locknum = atoi(argv[1]);
 #ifdef MAX_NR_OF_PLAYERS
+		/* limit to compile-time limit */
 	if(!locknum || locknum > MAX_NR_OF_PLAYERS)
 		locknum = MAX_NR_OF_PLAYERS;
+#endif
+#ifdef SYSCF
+		/* let syscf override compile-time limit */
+	if(!locknum || (sysopt.maxplayers && locknum > sysopt.maxplayers))
+		locknum = sysopt.maxplayers;
 #endif
 }
 
