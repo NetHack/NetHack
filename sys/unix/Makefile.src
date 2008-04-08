@@ -36,7 +36,7 @@ SHELL=/bin/sh
 # SHELL=E:/GEMINI2/MUPFEL.TTP
 
 # Usually, the C compiler driver is used for linking:
-LINK=$(CC)
+#LINK=$(CC)
 
 # Pick the SYSSRC and SYSOBJ lines corresponding to your desired operating
 # system.

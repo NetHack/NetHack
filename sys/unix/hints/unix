@@ -14,6 +14,7 @@ HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
 SHELLDIR=$(PREFIX)/games
 
 CFLAGS=-O -I../include
+LINK=$(CC)
 
 WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)

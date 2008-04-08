@@ -15,6 +15,7 @@ PREFIX=$(wildcard ~)/nh/install
 CFLAGS=-O -I../include -DNOTPARMDECL $(CFLAGS1)
 CFLAGS1=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 
+LINK=$(CC)
 
 WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)

@@ -88,8 +88,10 @@
 # ifndef DEFAULT_WC_TILED_MAP
 #  define DEFAULT_WC_TILED_MAP	/* Default to tiles if users doesn't say wc_ascii_map */
 # endif
+#ifndef NOUSER_SOUNDS
 # define USER_SOUNDS		/* Use sounds */
 /* # define USER_SOUNDS_REGEX */    /* Use regexps for sound message matches */
+#endif
 # define USE_XPM		/* Use XPM format for images (required) */
 # define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.ppm) */
 # ifndef DEFAULT_WINDOW_SYS

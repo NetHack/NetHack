@@ -235,7 +235,10 @@ update: $(GAME) recover $(VARDAT) dungeon spec_levs
 # and a reminder
 	@echo You may also want to install the man pages via the doc Makefile.
 
-install: $(GAME) recover $(VARDAT) dungeon spec_levs
+rootcheck:
+	@true; $(ROOTCHECK)
+
+install: rootcheck $(GAME) recover $(VARDAT) dungeon spec_levs
 	true; $(PREINSTALL)
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory
