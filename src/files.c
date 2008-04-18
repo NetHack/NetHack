@@ -2553,7 +2553,7 @@ parse_sym_line(buf, which_set)
 char *buf;
 int which_set;
 {
-	int i, val;
+	int val;
 	struct symparse *symp = (struct symparse *)0;
 	char *bufp, *commentp, *altp;
 
@@ -2715,10 +2715,10 @@ int which_set;
 			    break;
 		   case 5:  /* restrictions: xxxx*/
 			    if (chosen_symset_start) {
-			        i = 0;
-			        while (known_restrictions[i]) {
-				    if (!strcmpi(known_restrictions[i], bufp)) {
-				    switch(i) {
+			        int n = 0;
+			        while (known_restrictions[n]) {
+				    if (!strcmpi(known_restrictions[n], bufp)) {
+				    switch(n) {
 				    	case  0: symset[which_set].primary = 1;
 						 break;
 					case  1: symset[which_set].rogue   = 1;
@@ -2728,7 +2728,7 @@ int which_set;
 				    }
 				    break;	/* while loop */
 	    	        	    }
-				    i++;
+				    n++;
 		    	        }
 			        /* Don't allow unicode set if code can't handle it */
 			        if (symset[which_set].unicode &&

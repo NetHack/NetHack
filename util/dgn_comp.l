@@ -73,7 +73,7 @@ void FDECL(init_yyout, (FILE *));
 
 extern YYSTYPE yylval;
 
-int line_number = 1;
+int nh_line_number = 1;
 
 %}
 %%
@@ -110,8 +110,8 @@ RNDCHLEVEL	return(RNDCHLEVEL);
 		  yylval.str = (char *) alloc(strlen(yytext+1)+1);
 		  Strcpy(yylval.str, yytext+1); /* Discard the first \" */
 		  return(STRING); }
-^#.*\n		{ line_number++; }
-\r?\n		{ line_number++; }
+^#.*\n		{ nh_line_number++; }
+\r?\n		{ nh_line_number++; }
 [ \t]+		;	/* skip trailing tabs & spaces */
 .		{ return yytext[0]; }
 %%

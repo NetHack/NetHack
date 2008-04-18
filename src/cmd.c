@@ -160,7 +160,7 @@ STATIC_DCL char FDECL(cmd_from_func, (int NDECL((*))));
 STATIC_PTR int NDECL(doattributes);
 STATIC_PTR int NDECL(doconduct); /**/
 
-STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *,char *));
+STATIC_DCL void FDECL(enlght_line, (const char *,const char *,const char *,const char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *,int,int,char *));
 STATIC_DCL void FDECL(enlght_halfdmg, (int,int));
 STATIC_DCL boolean NDECL(walking_on_water);
@@ -991,8 +991,7 @@ static const char
 
 static void
 enlght_line(start, middle, end, ps)
-const char *start, *middle, *end;
-char *ps;
+const char *start, *middle, *end, *ps;
 {
 	char buf[BUFSZ];
 

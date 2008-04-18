@@ -33,7 +33,7 @@
 #define MAX_ERRORS	25
 
 extern int  NDECL (yyparse);
-extern int line_number;
+extern int nh_line_number;
 const char *fname = "(stdin)";
 int fatal_error = 0;
 
@@ -135,7 +135,7 @@ char **argv;
 		init_yyin(fin);
 		init_yyout(fout);
 		(void) yyparse();
-		line_number = 1;
+		nh_line_number = 1;
 		if (fatal_error > 0) {
 			errors_encountered = TRUE;
 			fatal_error = 0;
@@ -161,7 +161,7 @@ char **argv;
 void yyerror(s)
 const char *s;
 {
-	(void) fprintf(stderr,"%s : line %d : %s\n",fname,line_number, s);
+	(void) fprintf(stderr,"%s : line %d : %s\n",fname,nh_line_number, s);
 	if (++fatal_error > MAX_ERRORS) {
 		(void) fprintf(stderr,"Too many errors, good bye!\n");
 		exit(EXIT_FAILURE);
@@ -175,7 +175,7 @@ const char *s;
 void yywarning(s)
 const char *s;
 {
-	(void) fprintf(stderr,"%s : line %d : WARNING : %s\n",fname,line_number,s);
+	(void) fprintf(stderr,"%s : line %d : WARNING : %s\n",fname,nh_line_number,s);
 }
 
 int yywrap()

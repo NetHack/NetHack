@@ -2069,7 +2069,7 @@ recalc_mapseen()
 {
 	mapseen *mptr;
 	struct monst *shkp;
-	int x, y, ridx;
+	unsigned int x, y, ridx;
 
 	/* Should not happen in general, but possible if in the process
 	 * of being booted from the quest.  The mapseen object gets

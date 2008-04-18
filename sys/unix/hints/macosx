@@ -44,6 +44,9 @@ GAMEUID  = games
 GAMEGRP  = $(GAMEUID)
 
 
+#CC=gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
+CC=gcc -Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
+
 #
 # You shouldn't need to change anything below here.
 #

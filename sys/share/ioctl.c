@@ -54,7 +54,7 @@ struct termios termio;
 struct termio termio;
 #  endif
 # endif
-# ifdef AMIX
+# if defined(AMIX) || defined(__APPLE__)
 #include <sys/ioctl.h>
 # endif /* AMIX */
 #endif
