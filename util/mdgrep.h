@@ -264,4 +264,7 @@ static struct grep_var grep_vars[]={
 #endif
 	{0,0}
 };
+
+/* Command ids */
+#define TODO_GREP 1
 /* End of file */

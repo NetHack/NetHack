@@ -348,9 +348,16 @@ char	*options;
 static FILE *inputfp;
 static FILE *outputfp;
 
-#define TODO_GREP 1;
+struct grep_var {
+	const char *name;
+	int is_defined;		/* 0 undef; 1 defined */
+};
+/* struct grep_var grep_vars[] and TODO_* constants in include file: */
+#include "mdgrep.h"
+
 static void NDECL(do_grep);
 static void NDECL(do_grep_showvars);
+static struct grep_var *FDECL(grepsearch, (char *));
 static int grep_trace = 0;
 
 static void
@@ -403,7 +410,7 @@ do_ext_makedefs(int argc, char **argv){
 				Fprintf(stderr, "Can't do grep and something else.\n");
 				exit(EXIT_FAILURE);
 			}
-			todo = 1;
+			todo = TODO_GREP;
 			CONTINUE;
 		}
 		IS_OPTION("grep-showvars"){
@@ -414,11 +421,29 @@ do_ext_makedefs(int argc, char **argv){
 			grep_trace = 1;
 			CONTINUE;
 		}
-#ifdef notyet
 		IS_OPTION("grep-define"){
+			CONSUME;
+			struct grep_var *p = grepsearch(argv[0]);
+			if(p){
+				p->is_defined = 1;
+			} else {
+				Fprintf(stderr, "Unknown symbol '%s'\n", argv[0]);
+				exit(EXIT_FAILURE);
+			}
+			CONTINUE;
 		}
 		IS_OPTION("grep-undef"){
+			CONSUME;
+			struct grep_var *p = grepsearch(argv[0]);
+			if(p){
+				p->is_defined = 0;
+			} else {
+				Fprintf(stderr, "Unknown symbol '%s'\n", argv[0]);
+				exit(EXIT_FAILURE);
+			}
+			CONTINUE;
 		}
+#ifdef notyet
 		IS_OPTION("help"){
 		}
 #endif
@@ -438,7 +463,7 @@ do_ext_makedefs(int argc, char **argv){
 		case 0:
 			Fprintf(stderr, "Nothing to do?\n");
 			exit(EXIT_FAILURE);
-		case 1:
+		case TODO_GREP:
 			do_grep(); break;
 	}
 }
@@ -473,7 +498,9 @@ do_ext_makedefs(int argc, char **argv){
 */ 
 #define GREP_MAGIC '^'
 #define GREP_STACK_SIZE 100
+#ifdef notyet
 static int grep_rewrite = 0;	/* need to (possibly) rewrite lines */
+#endif
 static int grep_writing = 1;	/* need to copy lines to output */
 static int grep_errors = 0;
 static int grep_sp = 0;
@@ -483,13 +510,6 @@ static int grep_sp = 0;
 #define ST_ELSE 4
 static int grep_stack[GREP_STACK_SIZE] = {ST_LD(1,0)};
 static int grep_lineno = 0;
-
-struct grep_var {
-	const char *name;
-	int is_defined;		/* 0 undef; 1 defined */
-};
-/* struct grep_var grep_vars[] in include file: */
-#include "mdgrep.h"
 
 static void
 do_grep_showvars(){
@@ -627,6 +647,7 @@ do_grep_control(buf)
 	return NULL;
 }
 
+#ifdef notyet
 static void
 do_grep_rewrite(buf)
 	char *buf;
@@ -634,6 +655,7 @@ do_grep_rewrite(buf)
 		/* no language features use this yet */
 	return;
 }
+#endif
 
 static void
 do_grep(){
@@ -670,8 +692,10 @@ do_grep(){
 		} else {
 			buf1 = buf;
 		}
+#ifdef notyet
 		if(grep_rewrite)
 			do_grep_rewrite(buf1);
+#endif
 		if(grep_writing)
 			Fprintf(outputfp, "%s\n", buf1);
 	}

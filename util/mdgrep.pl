@@ -3,6 +3,10 @@
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
 # NetHack may be freely redistributed.  See license for details.
 
+# MAKEDEFS:
+@commands = qw/grep/;
+
+# GREP:
 # Operating Systems:
 @os = qw/WIN32 MSDOS VMS UNIX TOS AMIGA MAC WINNT __BEOS__ WIN_CE OS2
 	WIN_CE_SMARTPHONE WIN_CE_POCKETPC WIN_CE_PS2xx
@@ -67,6 +71,8 @@ sub gen_magic {
 	}
 }
 
+# NB: Do NOT make grep_vars const - it needs to be writable for some debugging
+# options.
 sub gen_file {
 	print OUT "static struct grep_var grep_vars[]={\n";
 	foreach(@_){
@@ -87,8 +93,18 @@ E_O_M
 	print OUT "\t{0,0}\n};\n";
 }
 
+sub gen_commands {
+	local($x) = 1;
+	print OUT "\n/* Command ids */\n";
+	foreach(@commands){
+		print OUT "#define TODO_\U$_\E $x\n";
+	}
+	print OUT "\n";
+}
+
 &start_file;
 &gen_magic(0, @const_false);
 &gen_magic(1, @const_true);
 &gen_file(sort(@os,@win,@feature,@misc,@const_false,@const_true));
+&gen_commands;
 &end_file;

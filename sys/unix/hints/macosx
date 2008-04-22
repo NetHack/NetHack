@@ -45,7 +45,7 @@ GAMEGRP  = $(GAMEUID)
 
 
 #CC=gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
-CC=gcc -Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
+CC=gcc -Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -DGCC_WARN
 
 #
 # You shouldn't need to change anything below here.
@@ -131,10 +131,10 @@ ifdef WANT_WIN_X11
 endif
 endif
 
-CC=gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
 
 # ~/Library/Preferences/NetHack Defaults
 # OPTIONS=name:player,number_pad,menustyle:partial,!time,showexp
 # OPTIONS=hilite_pet,toptenwin,msghistory:200,windowtype:Qt
 #
-# Install.Qt mentions a patch for macos - it's not there.
+# Install.Qt mentions a patch for macos - it's not there (it seems to be in the Qt binary
+# package under the docs directory).

@@ -209,7 +209,7 @@ extern unsigned int nfountain, npool, nsink;
 
 extern unsigned int max_x_map, max_y_map;
 
-extern int line_number, colon_line_number;
+extern int nh_line_number, colon_line_number;
 
 int
 main(argc, argv)
@@ -282,7 +282,7 @@ char **argv;
 		    } else {
 			init_yyin(fin);
 			(void) yyparse();
-			line_number = 1;
+			nh_line_number = 1;
 			if (fatal_error > 0) {
 				errors_encountered = TRUE;
 				fatal_error = 0;
@@ -308,7 +308,7 @@ yyerror(s)
 const char *s;
 {
 	(void) fprintf(stderr, "%s: line %d : %s\n", fname,
-		(*s >= 'A' && *s <= 'Z') ? colon_line_number : line_number, s);
+		(*s >= 'A' && *s <= 'Z') ? colon_line_number : nh_line_number, s);
 	if (++fatal_error > MAX_ERRORS) {
 		(void) fprintf(stderr,"Too many errors, good bye!\n");
 		exit(EXIT_FAILURE);

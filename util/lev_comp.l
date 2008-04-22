@@ -70,7 +70,7 @@ void FDECL(init_yyout, (FILE *));
  */
 extern YYSTYPE yylval;
 
-int line_number = 1, colon_line_number = 1;
+int nh_line_number = 1, colon_line_number = 1;
 static char map[4096];
 static int map_cnt = 0;
 
@@ -92,14 +92,14 @@ static int map_cnt = 0;
 		  int len = yyleng;
 		  /* convert \r\n to \n */
 		  if (len >= 2 && yytext[len - 2] == '\r') len -= 1;
-		  line_number++;
+		  nh_line_number++;
 		  (void) strncpy(map + map_cnt, yytext, len);
 		  map_cnt += len;
 		  map[map_cnt - 1] = '\n';
 		  map[map_cnt] = '\0';
 		}
-^#.*\n		{ line_number++; }
-:		{ colon_line_number = line_number; return ':'; }
+^#.*\n		{ nh_line_number++; }
+:		{ colon_line_number = nh_line_number; return ':'; }
 MESSAGE		return MESSAGE_ID;
 MAZE		return MAZE_ID;
 NOMAP		return NOMAP_ID;
@@ -107,7 +107,7 @@ LEVEL		return LEVEL_ID;
 INIT_MAP	return LEV_INIT_ID;
 FLAGS		return FLAGS_ID;
 GEOMETRY	return GEOMETRY_ID;
-^MAP\r?\n		{ BEGIN(MAPC); line_number++; }
+^MAP\r?\n		{ BEGIN(MAPC); nh_line_number++; }
 OBJECT		return OBJECT_ID;
 CONTAINER	return COBJECT_ID;
 MONSTER		return MONSTER_ID;
@@ -206,7 +206,7 @@ shortsighted	{ yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
 		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
 		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
 		  return STRING; }
-\r?\n		{ line_number++; }
+\r?\n		{ nh_line_number++; }
 [ \t]+		;
 '\\.'		{ yylval.i = yytext[2]; return CHAR; }
 '.'		{ yylval.i = yytext[1]; return CHAR; }
