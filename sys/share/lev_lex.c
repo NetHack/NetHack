@@ -758,7 +758,7 @@ void FDECL(init_yyout, (FILE *));
  */
 extern YYSTYPE yylval;
 
-int line_number = 1, colon_line_number = 1;
+int nh_line_number = 1, colon_line_number = 1;
 static char map[4096];
 static int map_cnt = 0;
 
@@ -965,7 +965,7 @@ YY_RULE_SETUP
 		  int len = yyleng;
 		  /* convert \r\n to \n */
 		  if (len >= 2 && yytext[len - 2] == '\r') len -= 1;
-		  line_number++;
+		  nh_line_number++;
 		  (void) strncpy(map + map_cnt, yytext, len);
 		  map_cnt += len;
 		  map[map_cnt - 1] = '\n';
@@ -974,11 +974,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-{ line_number++; }
+{ nh_line_number++; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-{ colon_line_number = line_number; return ':'; }
+{ colon_line_number = nh_line_number; return ':'; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
@@ -1010,7 +1010,7 @@ return GEOMETRY_ID;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-{ BEGIN(MAPC); line_number++; }
+{ BEGIN(MAPC); nh_line_number++; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
@@ -1397,7 +1397,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-{ line_number++; }
+{ nh_line_number++; }
 	YY_BREAK
 case 109:
 YY_RULE_SETUP

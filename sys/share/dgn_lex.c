@@ -480,7 +480,7 @@ void FDECL(init_yyout, (FILE *));
 
 extern YYSTYPE yylval;
 
-int line_number = 1;
+int nh_line_number = 1;
 
 
 /* Macros after this point can all be overridden by user definitions in
@@ -791,11 +791,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-{ line_number++; }
+{ nh_line_number++; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-{ line_number++; }
+{ nh_line_number++; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
