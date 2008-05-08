@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.5	2007/05/09	*/
+/*	SCCS Id: @(#)weapon.c	3.5	2008/05/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1288,6 +1288,11 @@ const struct def_skill *class_skill;
 
 	/* Set skill for all weapons in inventory to be basic */
 	for (obj = invent; obj; obj = obj->nobj) {
+	    /* don't give skill just because of carried ammo, wait until
+	       we see the relevant launcher (prevents an archeologist's
+	       touchstone from inadvertently providing skill in sling) */
+	    if (is_ammo(obj)) continue;
+
 	    skill = weapon_type(obj);
 	    if (skill != P_NONE)
 		P_SKILL(skill) = P_BASIC;
