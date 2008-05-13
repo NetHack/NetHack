@@ -422,8 +422,8 @@ do_ext_makedefs(int argc, char **argv){
 			CONTINUE;
 		}
 		IS_OPTION("grep-define"){
-			CONSUME;
 			struct grep_var *p = grepsearch(argv[0]);
+			CONSUME;
 			if(p){
 				p->is_defined = 1;
 			} else {
@@ -433,8 +433,8 @@ do_ext_makedefs(int argc, char **argv){
 			CONTINUE;
 		}
 		IS_OPTION("grep-undef"){
-			CONSUME;
 			struct grep_var *p = grepsearch(argv[0]);
+			CONSUME;
 			if(p){
 				p->is_defined = 0;
 			} else {
