@@ -285,6 +285,7 @@ seen eels who were stuck in isolated pools would never re-hide
 can no longer get both strength and resistance from eating one giant corpse
 aborting key/lock pick usage via ESC at direction prompt no longer use a move
 when probing from inside an engulfer, "not carrying anything" overlooked hero
+wearing or removing an amulet of restful sleep clobbered permanent sleepiness
 
 
 Platform- and/or Interface-Specific Fixes

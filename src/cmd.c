@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2008/02/12	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2008/05/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1525,9 +1525,13 @@ int final;
 		enl_msg(You_, "fumble", "fumbled", "", from_what(FUMBLING));
 	}
 	if (Sleeping) {
-	    if (magic || cause_known(SLEEPING))
-		enl_msg("You ", "fall", "fell", " asleep uncontrollably",
-			from_what(SLEEPING));
+	    if (magic || cause_known(SLEEPING)) {
+		Strcpy(buf, from_what(SLEEPING));
+#ifdef WIZARD
+		if (wizard) Sprintf(eos(buf), " (%ld)", (HSleeping & TIMEOUT));
+#endif
+		enl_msg("You ", "fall", "fell", " asleep uncontrollably", buf);
+	    }
 	}
 	/* hunger/nutrition */
 	if (Hunger) {
@@ -1687,12 +1691,14 @@ int final;
 	if (Adornment) {
 	    int adorn = 0;
 
-	    if(uleft && uleft->otyp == RIN_ADORNMENT) adorn += uleft->spe;
-	    if(uright && uright->otyp == RIN_ADORNMENT) adorn += uright->spe;
-	    if (adorn < 0)
-		you_are("poorly adorned","");
-	    else
-		you_are("adorned","");
+	    if (uleft && uleft->otyp == RIN_ADORNMENT) adorn += uleft->spe;
+	    if (uright && uright->otyp == RIN_ADORNMENT) adorn += uright->spe;
+	    /* the sum might be 0 (+0 ring or two which negate each other);
+	       that yields "you are charismatic" (which isn't pointless
+	       because it potentially impacts seduction attacks) */
+	    Sprintf(buf, "%scharismatic",
+		    (adorn > 0) ? "more " : (adorn < 0) ? "less " : "");
+	    you_are(buf, from_what(ADORNED));
 	}
 	if (Invisible) you_are("invisible",from_what(INVIS));
 	else if (Invis) you_are("invisible to others",from_what(INVIS));

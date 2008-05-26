@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_wear.c	3.5	2008/01/23	*/
+/*	SCCS Id: @(#)do_wear.c	3.5	2008/05/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -641,7 +641,14 @@ Amulet_on()
 		}
 		break;
 	case AMULET_OF_RESTFUL_SLEEP:
-		HSleeping = rnd(100);
+	    {
+		long newnap = (long)rnd(100), oldnap = (HSleeping & TIMEOUT);
+
+		/* avoid clobbering FROMOUTSIDE bit, which might have
+		   gotten set by previously eating one of these amulets */
+		if (newnap < oldnap || oldnap == 0L)
+		    HSleeping = (HSleeping & ~TIMEOUT) | newnap;
+	    }
 		break;
 	case AMULET_OF_YENDOR:
 		break;
@@ -690,8 +697,9 @@ Amulet_off()
 		break;
 	case AMULET_OF_RESTFUL_SLEEP:
 		setworn((struct obj *)0, W_AMUL);
-		if (!ESleeping)
-			HSleeping = 0;
+		/* HSleeping = 0L; -- avoid clobbering FROMOUTSIDE bit */
+		if (!ESleeping && !(HSleeping & ~TIMEOUT))
+		    HSleeping &= ~TIMEOUT;	/* clear timeout bits */
 		return;
 	case AMULET_OF_YENDOR:
 		break;
