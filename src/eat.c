@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2007/03/19	*/
+/*	SCCS Id: @(#)eat.c	3.5	2008/05/26	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1945,9 +1945,16 @@ struct obj *otmp;
 		choke(otmp);
 		break;
 	    case AMULET_OF_RESTFUL_SLEEP: /* another bad idea! */
+	      {
+		long newnap = (long)rnd(100), oldnap = (HSleeping & TIMEOUT);
+
 		if (!(HSleeping & FROMOUTSIDE))
 		    accessory_has_effect(otmp);
-		HSleeping = FROMOUTSIDE | rnd(100);
+		HSleeping |= FROMOUTSIDE;
+		/* might also be wearing one; use shorter of two timeouts */
+		if (newnap < oldnap || oldnap == 0L)
+		    HSleeping = (HSleeping & ~TIMEOUT) | newnap;
+	      }
 		break;
 	    case RIN_SUSTAIN_ABILITY:
 	    case AMULET_OF_LIFE_SAVING:
