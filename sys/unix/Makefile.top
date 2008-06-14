@@ -38,7 +38,7 @@ DIRPERM  = 0755
 # instructions)
 #HACKDIR  = $(PREFIX)/games/lib/$(GAME)dir
 VARDIR  = $(HACKDIR)
-SHELLDIR = $(PREFIX)/games
+#SHELLDIR = $(PREFIX)/games
 
 # per discussion in Install.X11 and Install.Qt
 #VARDATND = 
@@ -245,7 +245,7 @@ install: rootcheck $(GAME) recover $(VARDAT) dungeon spec_levs
 	-mkdir -p $(SHELLDIR)
 	-rm -rf $(HACKDIR) $(VARDIR)
 	-mkdir -p $(HACKDIR) $(VARDIR) $(VARDIR)/save
-	-rmdir ./-p
+	if test -d ./-p; then rmdir ./-p; fi
 	-$(CHOWN) $(GAMEUID) $(HACKDIR) $(VARDIR) $(VARDIR)/save
 	$(CHGRP) $(GAMEGRP) $(HACKDIR) $(VARDIR) $(VARDIR)/save
 # order counts here:

@@ -244,6 +244,15 @@ int
 dosh()
 {
 	register char *str;
+# ifdef SYSCF
+	if(   !sysopt.shellers
+	   || !sysopt.shellers[0]
+	   || !check_user_string(sysopt.shellers)
+	){
+		Norep("Unknown command '!'.");
+		return 0;
+	}
+# endif
 	if(child(0)) {
 		if((str = getenv("SHELL")) != (char*)0)
 			(void) execl(str, str, (char *)0);

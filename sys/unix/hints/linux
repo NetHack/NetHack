@@ -9,6 +9,7 @@
 
 
 HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+SHELLDIR = $(PREFIX)/games
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
 

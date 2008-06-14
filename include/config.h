@@ -150,10 +150,11 @@
  *		If SYSCF is defined, the following configuration info is
  *		available in a global config space, with the compiled-in
  *		entries as defaults:
- *		WIZARD		( a value of * allows anyone to be wizard)
+ *		WIZARDS		( a value of * allows anyone to be wizard)
  *		MAXPLAYERS	(see MAX_NR_OF_PLAYERS above and nethack.sh)
  *		SUPPORT		(how to get local support)(no default)
  *		RECOVER		(how to recover a game at your site)(no default)
+ *		SHELLERS	(who can use !, syntax as WIZARDS)
  *
  *		The following options select how the config space is stored:
  *		SYSCF_FILE	in the named file

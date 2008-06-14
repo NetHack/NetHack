@@ -42,6 +42,7 @@ extern void NDECL(init_linux_cons);
 
 static void NDECL(wd_message);
 static boolean wiz_error_flag = FALSE;
+static struct passwd *NDECL(get_unix_pw);
 
 int
 main(argc,argv)
@@ -530,40 +531,10 @@ boolean
 authorize_wizard_mode()
 {
 #ifdef WIZARD
-	char *user;
-	int uid;
-	struct passwd *pw = (struct passwd *)0;
-
-	uid = getuid();
-	user = getlogin();
-	if (user) {
-	    pw = getpwnam(user);
-	    if (pw && (pw->pw_uid != uid)) pw = 0;
-	}
-	if (pw == 0) {
-	    user = nh_getenv("USER");
-	    if (user) {
-		pw = getpwnam(user);
-		if (pw && (pw->pw_uid != uid)) pw = 0;
-	    }
-	    if (pw == 0) {
-		pw = getpwuid(uid);
-	    }
-	}
+	struct passwd *pw = get_unix_pw();
 #ifdef SYSCF
 	if (pw && sysopt.wizards[0]) {
-	    if(sysopt.wizards[0] == '*') return TRUE;	/*allow any user to be wizard*/
-	    int pwlen = strlen(pw->pw_name);
-	    char *eop = eos(sysopt.wizards);
-	    char *w = sysopt.wizards;
-	    while( w+pwlen <= eop ){
-		if( ! *w ) break;
-		if( isspace(*w) ){ w++; continue;}
-		if( !strncmp(w, pw->pw_name, pwlen) ){
-		    if( !w[pwlen] || isspace(w[pwlen]) ) return TRUE;
-		}
-		while( *w && !isspace(*w) ) w++;
-	    }
+	    if(check_user_string(sysopt.wizards)) return TRUE;
 	} else
 #endif
 	if (pw && !strcmp(pw->pw_name, WIZARD_NAME)) return TRUE;
@@ -607,4 +578,50 @@ char *name;
 	return;
 }
 
+boolean
+check_user_string(optstr)
+char *optstr;
+{
+	struct passwd *pw = get_unix_pw();
+	if(optstr[0] == '*') return TRUE;	/* allow any user */
+	if(!pw) return FALSE;
+	int pwlen = strlen(pw->pw_name);
+	char *eop = eos(optstr);
+	char *w = optstr;
+	while( w+pwlen <= eop ){
+		if( ! *w ) break;
+		if( isspace(*w) ){ w++; continue;}
+		if( !strncmp(w, pw->pw_name, pwlen) ){
+			if( !w[pwlen] || isspace(w[pwlen]) ) return TRUE;
+		}
+		while( *w && !isspace(*w) ) w++;
+	}
+	return FALSE;
+}
+
+static struct passwd *
+get_unix_pw(){
+	char *user;
+	int uid;
+	static struct passwd *pw = (struct passwd *)0;
+	if(pw) return pw;	/* cache answer */
+
+	uid = getuid();
+	user = getlogin();
+	if (user) {
+	    pw = getpwnam(user);
+	    if (pw && (pw->pw_uid != uid)) pw = 0;
+	}
+	if (pw == 0) {
+	    user = nh_getenv("USER");
+	    if (user) {
+		pw = getpwnam(user);
+		if (pw && (pw->pw_uid != uid)) pw = 0;
+	    }
+	    if (pw == 0) {
+		pw = getpwuid(uid);
+	    }
+	}
+	return pw;
+}
 /*unixmain.c*/

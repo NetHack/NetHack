@@ -2066,10 +2066,14 @@ int		src;
 	} else if (match_varname(buf, "CATNAME", 3)) {
 	    (void) strncpy(catname, bufp, PL_PSIZ-1);
 #ifdef SYSCF
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "WIZARDS", 6)) {
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "WIZARDS", 7)) {
 	    if(sysopt.wizards) free(sysopt.wizards);
 	    sysopt.wizards = alloc(strlen(bufp));
 	    (void) strcpy(sysopt.wizards, bufp);
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "SHELLERS", 8)) {
+	    if(sysopt.shellers) free(sysopt.shellers);
+	    sysopt.shellers = alloc(strlen(bufp));
+	    (void) strcpy(sysopt.shellers, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "SUPPORT", 7)) {
 	    if(sysopt.support) free(sysopt.support);
 	    sysopt.support = alloc(strlen(bufp));
