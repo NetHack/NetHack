@@ -583,11 +583,13 @@ check_user_string(optstr)
 char *optstr;
 {
 	struct passwd *pw = get_unix_pw();
+	int pwlen;
+	char *eop, *w;
 	if(optstr[0] == '*') return TRUE;	/* allow any user */
 	if(!pw) return FALSE;
-	int pwlen = strlen(pw->pw_name);
-	char *eop = eos(optstr);
-	char *w = optstr;
+	pwlen = strlen(pw->pw_name);
+	*eop = eos(optstr);
+	*w = optstr;
 	while( w+pwlen <= eop ){
 		if( ! *w ) break;
 		if( isspace(*w) ){ w++; continue;}
