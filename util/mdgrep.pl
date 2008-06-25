@@ -55,13 +55,15 @@
 $outfile = "mdgrep.h";
 sub start_file {
 	($rev) = ('$Revision$') =~ m/: (.*) .$/;
+	my $date = '$Date$';
+	my $revision = '$Revision$';
 	open(OUT, ">$outfile") || die "open $outfile: $!";
 # NB: Date and Revision below will be modified when mdgrep.h is written to
 # cvs - this is correct (but it means you must commit changes to mdgrep.pl
 # before generating mdgrep.h and committing that file.
 	print OUT <<E_O_M;
 /*
- * NetHack 3.5  $outfile  $Date$  $Revision$
+ * NetHack 3.5  $outfile  $date $revision
  * Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
  * NetHack may be freely redistributed.  See license for details.
  *
