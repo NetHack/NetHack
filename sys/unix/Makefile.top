@@ -268,6 +268,7 @@ install: rootcheck $(GAME) recover $(VARDAT) dungeon spec_levs
 clean:
 	( cd src ; $(MAKE) clean )
 	( cd util ; $(MAKE) clean )
+	( cd doc ; $(MAKE) clean )
 
 # 'make spotless' returns the source tree to near-distribution condition.
 # it removes .o files, executables, and compiled data files

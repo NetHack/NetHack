@@ -4,6 +4,9 @@
 # for Atari
 # SHELL=E:/GEMINI2/MUPFEL.TTP
 
+MAKEDEFS = ../util/makedefs
+
+# Which version do we want to build?  (XXX These are not used anywhere.)
 GUIDEBOOK = Guidebook		# regular ASCII file
 #GUIDEBOOK = Guidebook.ps	# PostScript file
 #GUIDEBOOK = Guidebook.dvi	# TeX device-independent file
@@ -22,8 +25,17 @@ PSCMD = groff
 # Not appropriate for creating Guidebook.txt.
 # GUIDECMD = cat Guidebook.txt
 # The following works better with groff-1.18, eg on Linux
-# GUIDECMD = tbl tmac.n Guidebook.mn | nroff -c -Tascii | $(COLCMD)
-GUIDECMD = tbl tmac.n Guidebook.mn | nroff | $(COLCMD)
+# GUIDECMD = $(GUIDE_PREFORMAT) | nroff -c -Tascii | $(COLCMD)
+GUIDECMD = $(GUIDE_PREFORMAT) | nroff | $(COLCMD)
+
+# Only generate output for the current configuration:
+NHGREP = $(MAKEDEFS) --grep --input - --output -
+# Generate output for all configurations:
+#NHGREP = $(MAKEDEFS) --grep --input - --output - --grep-define ALLDOCS
+# Fallback:
+#NHGREP = cat
+
+GUIDE_PREFORMAT = cat Guidebook.mn | $(NHGREP) | tbl tmac.n -
 
 # the basic guidebook
 Guidebook:	Guidebook.mn
@@ -31,7 +43,7 @@ Guidebook:	Guidebook.mn
 
 # Fancier output for those with ditroff, psdit and a PostScript printer.
 Guidebook.ps:	Guidebook.mn
-	tbl tmac.n Guidebook.mn | $(PSCMD) > Guidebook.ps
+	$(GUIDE_PREFORMAT) | $(PSCMD) > Guidebook.ps
 
 # Guidebook.tex is the same as Guidebook.mn but formatted with LaTeX.
 # - The invocation command for LaTeX may vary in different installations.
@@ -47,17 +59,17 @@ MANDIR	= /usr/man/man6
 MANEXT	= 6
 
 # manual installation for most BSD-style systems
-GAMEMANCREATE = cp nethack.6
-LEVMANCREATE = cp lev_comp.6
-DGNMANCREATE = cp dgn_comp.6
-RCVRMANCREATE = cp recover.6
-DLBMANCREATE = cp dlb.6
+GAMEMANCREATE = cat nethack.6 | $(NHGREP) >
+LEVMANCREATE = cat lev_comp.6 | $(NHGREP) >
+DGNMANCREATE = cat dgn_comp.6 | $(NHGREP) >
+RCVRMANCREATE = cat recover.6 | $(NHGREP) >
+DLBMANCREATE = cat dlb.6 | $(NHGREP) >
 # manual installation for most SYSV-style systems
-# GAMEMANCREATE = nroff -man nethack.6 >
-# LEVMANCREATE = nroff -man lev_comp.6 >
-# DGNMANCREATE = nroff -man dgn_comp.6 >
-# RCVRMANCREATE = nroff -man recover.6 >
-# DLBMANCREATE = nroff -man dlb.6 >
+# GAMEMANCREATE = cat nethack.6 | $(NHGREP) | nroff -man - >
+# LEVMANCREATE = cat lev_comp.6 | $(NHGREP) | nroff -man - >
+# DGNMANCREATE = cat dgn_comp.6 | $(NHGREP) | nroff -man - >
+# RCVRMANCREATE = cat recover.6 | $(NHGREP) | nroff -man - >
+# DLBMANCREATE = cat dlb.6 | $(NHGREP) | nroff -man - >
 
 manpages:
 	-$(GAMEMANCREATE) $(MANDIR)/$(GAME).$(MANEXT)
@@ -74,17 +86,17 @@ distrib: $(DISTRIB)
 
 Guidebook.txt	: Guidebook.mn tmac.n
 	$(GUIDECMD) > Guidebook.txt
+MAN2TXT = $(NHGREP) | nroff -man - | $(COLCMD)
 nethack.txt	: nethack.6
-	nroff -man nethack.6 | $(COLCMD) > nethack.txt
+	cat nethack.6 | $(MAN2TXT) > nethack.txt
 lev_comp.txt	: lev_comp.6
-	nroff -man lev_comp.6 | $(COLCMD) > lev_comp.txt
+	cat lev_comp.6 | $(MAN2TXT) > lev_comp.txt
 dgn_comp.txt	: dgn_comp.6
-	nroff -man dgn_comp.6 | $(COLCMD) > dgn_comp.txt
+	cat dgn_comp.6 | $(MAN2TXT) > dgn_comp.txt
 recover.txt	: recover.6
-	nroff -man recover.6 | $(COLCMD) > recover.txt
+	cat recover.6 | $(MAN2TXT) > recover.txt
 dlb.txt		: dlb.6
-	nroff -man dlb.6 | $(COLCMD) > dlb.txt
-
+	cat dlb.6 | $(MAN2TXT) > dlb.txt
 
 clean:
 	-rm -f Guidebook.aux Guidebook.log

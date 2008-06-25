@@ -59,6 +59,7 @@ char *argv[];
 	sys_early_init();
 
 #if defined(__APPLE__)
+	{
 	/* special hack to change working directory to a resource fork when
 	   running from finder --sam */
 #define MAC_PATH_VALUE ".app/Contents/MacOS/"
@@ -84,6 +85,7 @@ char *argv[];
 		}
 		free(mac_tmp);
 	    }
+	}
 	}
 #endif
 
@@ -588,8 +590,8 @@ char *optstr;
 	if(optstr[0] == '*') return TRUE;	/* allow any user */
 	if(!pw) return FALSE;
 	pwlen = strlen(pw->pw_name);
-	*eop = eos(optstr);
-	*w = optstr;
+	eop = eos(optstr);
+	w = optstr;
 	while( w+pwlen <= eop ){
 		if( ! *w ) break;
 		if( isspace(*w) ){ w++; continue;}

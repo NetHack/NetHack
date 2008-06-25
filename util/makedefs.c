@@ -488,6 +488,8 @@ do_ext_makedefs(int argc, char **argv){
 
  Any line starting with a caret is a control line; as in C, zero or more spaces
  may be embedded in the line almost anywhere; the caret MUST be in column 1.
+ (XXX for the moment, no white space is allowed after the caret because
+  existing lines in the docs look like that)
 
  Control lines:
  ^^	a line starting with a (single) literal caret
@@ -585,7 +587,11 @@ do_grep_control(buf)
 {
 	int isif = 1;
 	char *buf0 = buf;
+#if 1
+	if(isspace(buf[0])) return &buf[-1];		/* XXX see docs above */
+#else
 	while(buf[0] && isspace(buf[0])) buf++;
+#endif
 	switch(buf[0]){
 	case '#':	/* comment */
 		break;
@@ -678,7 +684,7 @@ do_grep(){
 		char *buf1;
 
 		if(fgets(buf, sizeof(buf), inputfp) == 0) break;
-		if(tmp=strchr(buf,'\n')) *tmp = '\0';
+		if( (tmp=strchr(buf,'\n')) ) *tmp = '\0';
 		grep_lineno++;
 		if(grep_trace){
 			Fprintf(outputfp, "%04d %c >%s\n",

@@ -183,6 +183,10 @@ makedefs.o: makedefs.c $(CONFIG_H) ../include/permonst.h \
 		../include/monst.h ../include/you.h ../include/flag.h \
 		../include/dlb.h ../include/patchlevel.h ../include/qtext.h
 
+# Don't require perl to build, but document how to get a new mdgrep.h.
+#mdgrep.h: mdgrep.pl
+#	perl mdgrep.pl
+
 ../include/onames.h: makedefs
 	./makedefs -o
 ../include/pm.h: makedefs

@@ -45,8 +45,8 @@ endif
 #	   administered this may not be what you (or your admin) want.
 #	   Consider a non-shared install (WANT_SHARE_INSTALL=0) instead.
 #	- 'make install' must be run as "sudo make install"    
-WANT_SHARE_INSTALL=1
-GAMEUID  = root
+#WANT_SHARE_INSTALL=1
+GAMEUID  = keni
 GAMEGRP  = games
 
 #CC=gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
@@ -113,15 +113,18 @@ ifeq ($(GAMEUID),root)
 PREFIX:=/Library/NetHack
 SHELLDIR=/usr/local/bin
 HACKDIR=$(PREFIX)/nethackdir
-else
-PREFIX:=/Users/$(GAMEUID)
-SHELLDIR=$(PREFIX)/bin
-HACKDIR=$(PREFIX)/nethackdir
-endif
 CHOWN=chown
 CHGRP=chgrp
 # We run sgid so the game has access to both HACKDIR and user preferences.
 GAMEPERM = 02755
+else
+PREFIX:=/Users/$(GAMEUID)
+SHELLDIR=$(PREFIX)/bin
+HACKDIR=$(PREFIX)/nethackdir
+CHOWN=touch
+CHGRP=touch
+GAMEPERM = 0500
+endif
 VARFILEPERM = 0664
 VARDIRPERM = 0775
 ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
