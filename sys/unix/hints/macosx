@@ -54,7 +54,7 @@ CC=gcc -Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -W
 # XXX -g vs -O should go here, -I../include goes in the makefile
 CFLAGS=-g -I../include
 CFLAGS+=-DNOCLIPPING -DNOMAIL -DNOTPARMDECL -DHACKDIR=\"$(HACKDIR)\"
-CFLAGS+= -DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\"
+CFLAGS+= -DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
 
 ifdef WANT_WIN_TTY
 WINSRC = $(WINTTYSRC)

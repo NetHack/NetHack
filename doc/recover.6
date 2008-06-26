@@ -33,11 +33,26 @@ It overrides the value from NETHACKDIR, HACKDIR, or the directory
 specified by the game administrator during compilation
 (usually /usr/games/lib/nethackdir).
 .PP
+^?ALLDOCS
 For recovery to be possible,
 .I nethack
 must have been compiled with the INSURANCE option, and the run-time option
 .I checkpoint
 must also have been on.
+^:
+^?INSURANCE
+For recovery to be possible,
+.I nethack
+must have been compiled with the INSURANCE option (this configuration was),
+and the run-time option
+.I checkpoint
+must also have been on.
+^:
+This configuration of
+.I nethack
+was created without support for recovery.
+^.
+^.
 NetHack normally writes out files for levels as the player leaves them,
 so they will be ready for return visits.
 When checkpointing, NetHack also writes out the level entered and

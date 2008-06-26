@@ -438,3 +438,4 @@ new oextra structure housing pointers to oname, omonst, omid, olong, and omailcm
 drawing symbols for DECGraphics, IBMGraphics, MACgraphics are now stored in an
 	external symbol file that can be changed without rebuilding
 new hints-based configuration system
+allow documentation to be specialized to the options in the game binary

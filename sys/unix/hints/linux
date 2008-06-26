@@ -13,7 +13,7 @@ SHELLDIR = $(PREFIX)/games
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
 
-CFLAGS=-O -I../include -DNOTPARMDECL $(CFLAGS1)
+CFLAGS=-O -I../include -DNOTPARMDECL $(CFLAGS1) -DDLB
 CFLAGS1=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 
 LINK=$(CC)
