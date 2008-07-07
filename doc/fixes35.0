@@ -286,6 +286,8 @@ can no longer get both strength and resistance from eating one giant corpse
 aborting key/lock pick usage via ESC at direction prompt no longer use a move
 when probing from inside an engulfer, "not carrying anything" overlooked hero
 wearing or removing an amulet of restful sleep clobbered permanent sleepiness
+if attempt to select a co-aligned artifact for first divine gift fails because
+	none is available, choose one from among nonaligned artifacts
 
 
 Platform- and/or Interface-Specific Fixes
