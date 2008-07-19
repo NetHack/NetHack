@@ -4106,8 +4106,10 @@ char *str;
 		lastf = f;
 		if(f->fid > highest_fruit_id) highest_fruit_id = f->fid;
 		if (!strncmp(str, f->fname, PL_FSIZ-1) ||
-			    (*altname && !strcmp(altname, f->fname)))
+			    (*altname && !strcmp(altname, f->fname))) {
+			highest_fruit_id = f->fid;
 			goto nonew;
+		}
 	}
 	/* if adding another fruit would overflow spe, use a random
 	   fruit instead... we've got a lot to choose from. */
