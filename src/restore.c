@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.5	2007/04/21	*/
+/*	SCCS Id: @(#)restore.c	3.5	2008/07/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -658,7 +658,6 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	mread(fd, (genericptr_t) pl_character, sizeof pl_character);
 
 	mread(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
-	mread(fd, (genericptr_t) &current_fruit, sizeof current_fruit);
 	freefruitchn(ffruit);	/* clean up fruit(s) made by initoptions() */
 	ffruit = loadfruitchn(fd);
 

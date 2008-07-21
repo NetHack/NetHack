@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.5	2008/03/19	*/
+/*	SCCS Id: @(#)pager.c	3.5	2008/07/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -221,7 +221,7 @@ lookat(x, y, buf, monbuf)
 		if (otmp->oclass == COIN_CLASS)
 		    otmp->quan = 2L; /* to force pluralization */
 		else if (otmp->otyp == SLIME_MOLD)
-		    otmp->spe = current_fruit;	/* give the fruit a type */
+		    otmp->spe = context.current_fruit;	/* give it a type */
 		Strcpy(buf, distant_name(otmp, xname));
 		dealloc_obj(otmp);
 	    }

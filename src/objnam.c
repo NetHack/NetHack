@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2008/01/23	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2008/07/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2184,7 +2184,7 @@ struct obj *no_wish;
 	int islit, unlabeled, ishistoric, isdiluted, trapped;
 	int tmp, tinv, tvariety;
 	struct fruit *f;
-	int ftype = current_fruit;
+	int ftype = context.current_fruit;
 	char fruitbuf[BUFSZ];
 	/* Fruits may not mess up the ability to wish for real objects (since
 	 * you can leave a fruit in a bones file and it will be added to

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)decl.c	3.5	2008/01/30	*/
+/*	SCCS Id: @(#)decl.c	3.5	2008/07/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -55,7 +55,6 @@ NEARDATA char pl_character[PL_CSIZ] = DUMMY;
 NEARDATA char pl_race = '\0';
 
 NEARDATA char pl_fruit[PL_FSIZ] = DUMMY;
-NEARDATA int current_fruit = 0;
 NEARDATA struct fruit *ffruit = (struct fruit *)0;
 
 NEARDATA char tune[6] = DUMMY;

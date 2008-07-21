@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2008/02/19	*/
+/*	SCCS Id: @(#)options.c	3.5	2008/07/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4106,13 +4106,12 @@ char *str;
 		lastf = f;
 		if(f->fid > highest_fruit_id) highest_fruit_id = f->fid;
 		if (!strncmp(str, f->fname, PL_FSIZ-1) ||
-			    (*altname && !strcmp(altname, f->fname))) {
-			highest_fruit_id = f->fid;
+			    (*altname && !strcmp(altname, f->fname)))
 			goto nonew;
-		}
 	}
 	/* if adding another fruit would overflow spe, use a random
-	   fruit instead... we've got a lot to choose from. */
+	   fruit instead... we've got a lot to choose from.
+	   current_fruit remains as is. */
 	if (highest_fruit_id >= 127) return rnd(127);
 	highest_fruit_id++;
 	f = newfruit();
@@ -4121,8 +4120,8 @@ char *str;
 	copynchars(f->fname, *altname ? altname : str, PL_FSIZ-1);
 	f->fid = highest_fruit_id;
 	f->nextf = 0;
-nonew:
-	if (user_specified) current_fruit = highest_fruit_id;
+ nonew:
+	if (user_specified) context.current_fruit = f->fid;
 	return f->fid;
 }
 

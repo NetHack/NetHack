@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2007/11/10	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2008/07/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -675,7 +675,7 @@ boolean artif;
 		blessorcurse(otmp, 10);
 		break;
 	    case SLIME_MOLD:
-		otmp->spe = current_fruit;
+		otmp->spe = context.current_fruit;
 		break;
 	    case KELP_FROND:
 		otmp->quan = (long) rnd(2);

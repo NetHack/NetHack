@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)eat.c	3.5	2008/05/26	*/
+/*	SCCS Id: @(#)eat.c	3.5	2008/07/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1747,8 +1747,8 @@ struct obj *otmp;
 		}
 		/* Fall through otherwise */
 	    default:
-		if (otmp->otyp==SLIME_MOLD && !otmp->cursed
-			&& otmp->spe == current_fruit)
+		if (otmp->otyp == SLIME_MOLD && !otmp->cursed &&
+			otmp->spe == context.current_fruit)
 		    pline("My, that was a %s %s!",
 			  Hallucination ? "primo" : "yummy",
 			  singular(otmp, xname));
