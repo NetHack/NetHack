@@ -4045,7 +4045,6 @@ char *str;
 {
 	register int i;
 	register struct fruit *f;
-	struct fruit *lastf = 0;
 	int highest_fruit_id = 0;
 	char buf[PL_FSIZ], altname[PL_FSIZ];
 	boolean user_specified = (str == pl_fruit);
@@ -4103,7 +4102,6 @@ char *str;
 		sanitize_name(altname);
 	}
 	for(f=ffruit; f; f = f->nextf) {
-		lastf = f;
 		if(f->fid > highest_fruit_id) highest_fruit_id = f->fid;
 		if (!strncmp(str, f->fname, PL_FSIZ-1) ||
 			    (*altname && !strcmp(altname, f->fname)))
@@ -4113,13 +4111,14 @@ char *str;
 	   fruit instead... we've got a lot to choose from.
 	   current_fruit remains as is. */
 	if (highest_fruit_id >= 127) return rnd(127);
-	highest_fruit_id++;
+
 	f = newfruit();
-	if (ffruit) lastf->nextf = f;
-	else ffruit = f;
 	copynchars(f->fname, *altname ? altname : str, PL_FSIZ-1);
-	f->fid = highest_fruit_id;
-	f->nextf = 0;
+	f->fid = ++highest_fruit_id;
+	/* we used to go out of our way to add it at the end of the list,
+	   but the order is arbitrary so use simpler insertion at start */
+	f->nextf = ffruit;
+	ffruit = f;
  nonew:
 	if (user_specified) context.current_fruit = f->fid;
 	return f->fid;
