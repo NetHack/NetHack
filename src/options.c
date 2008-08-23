@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)options.c	3.5	2008/07/20	*/
+/*	SCCS Id: @(#)options.c	3.5	2008/08/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1629,8 +1629,10 @@ goodfruit:
 	/* OBJ_NAME(objects[SLIME_MOLD]) won't work after initialization */
 		if (!*pl_fruit)
 		    nmcpy(pl_fruit, "slime mold", PL_FSIZ);
-		if (!initial)
+		if (!initial) {
 		    (void)fruitadd(pl_fruit);
+		    pline("Fruit is now \"%s\".", pl_fruit);
+		}
 		/* If initial, then initoptions is allowed to do it instead
 		 * of here (initoptions always has to do it even if there's
 		 * no fruit option at all.  Also, we don't want people
@@ -1638,6 +1640,7 @@ goodfruit:
 		 */
 		return;
 	}
+
 	fullname = "warnings";
 	if (match_optname(opts, fullname, 5, TRUE)) {
 		if (duplicate) complain_about_duplicate(opts,1);
@@ -4052,10 +4055,16 @@ char *str;
 	 * a bones level...
 	 */
 
-	/* Note: every fruit has an id (spe for fruit objects) of at least
-	 * 1; 0 is an error.
+	/* Note: every fruit has an id (kept in obj->spe) of at least 1;
+	 * 0 is an error.
 	 */
 	if (user_specified) {
+		/* force fruit to be singular; this handling is not
+		   needed--or wanted--for fruits from bones because
+		   they already received it in their original game */
+		nmcpy(pl_fruit, makesingular(str), PL_FSIZ);
+	     /* assert( str == pl_fruit ); */
+
 		/* disallow naming after other foods (since it'd be impossible
 		 * to tell the difference)
 		 */
