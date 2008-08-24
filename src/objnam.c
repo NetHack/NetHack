@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)objnam.c	3.5	2008/07/20	*/
+/*	SCCS Id: @(#)objnam.c	3.5	2008/08/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,6 +17,7 @@ STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
 STATIC_DCL boolean FDECL(singplur_lookup, (char *,char *,BOOLEAN_P,
 					   const char *const *));
+STATIC_DCL char *FDECL(singplur_compound, (char *));
 
 struct Jitem {
 	int item;
@@ -1665,10 +1666,10 @@ static const char *const as_is[] = {
 	"iron bars",
 #endif
 	/* both singular and plural are spelled the same */
-	"deer", "fish", "tuna", "yaki",
+	"deer", "fish", "tuna", "yaki", "-hai",
 	"krill", "manes", "ninja", "sheep", "ronin", "roshi", "shito", "tengu",
 	"ki-rin", "Nazgul",
-	"gunyoki", "piranha",
+	"gunyoki", "piranha", "samurai",
 	"shuriken",
 	0,
 	/* Note:  "fish" and "piranha" are collective plurals, suitable
@@ -1718,6 +1719,49 @@ const char *const *alt_as_is;	/* another set like as_is[] */
 	return FALSE;
 }
 
+/* searches for common compounds, ex. lump of royal jelly */
+STATIC_OVL char *
+singplur_compound(str)
+char *str;
+{
+    /* if new entries are added, be sure to keep compound_start[] in sync */
+    static const char *const compounds[] = {
+	" of ",
+	" labeled ",
+	" called ",
+	" named ",
+	" above",		/* lurkers above */
+	" versus ",
+	" from ",
+	" in ",
+	" on ",
+	" a la ",
+	" with",		/* " with "? */
+	" de ",
+	" d'",
+	" du ",
+	"-in-",
+	"-at-",
+	0
+    },	    /* list of first characters for all compounds[] entries */
+	    compound_start[] = " -";
+
+    const char *const *cmpd;
+    char *p;
+
+    for (p = str; *p; ++p) {
+	/* substring starting at p can only match if *p is found
+	   within compound_start[] */
+	if (!index(compound_start, *p)) continue;
+
+	/* check current substring against all words in the compound[] list */
+	for (cmpd = compounds; *cmpd; ++cmpd)
+	    if (!strncmpi(p, *cmpd, (int)strlen(*cmpd))) return p;
+    }
+    /* wasn't recognized as a compound phrase */
+    return 0;
+}
+
 /* Plural routine; chiefly used for user-defined fruits.  We have to try to
  * account for everything reasonable the player has; something unreasonable
  * can still break the code.  However, it's still a lot more accurate than
@@ -1742,7 +1786,7 @@ const char *oldstr;
 	const char *excess = (char *)0;
 	int len;
 
-	while (*oldstr==' ') oldstr++;
+	if (oldstr) while (*oldstr == ' ') oldstr++;
 	if (!oldstr || !*oldstr) {
 		impossible("plural of null?");
 		Strcpy(str, "s");
@@ -1759,32 +1803,15 @@ const char *oldstr;
 	if (!strncmpi(str, "pair of ", 8))
 		goto bottom;
 
-	/* Search for common compounds, ex. lump of royal jelly */
-	for (spot = str; *spot; spot++) {
-		if (!index(" -", *spot)) continue;
-		if (!strncmpi(spot, " of ", 4) ||
-		    !strncmpi(spot, " labeled ", 9) ||
-		    !strncmpi(spot, " called ", 8) ||
-		    !strncmpi(spot, " named ", 7) ||
-		    !strcmpi(spot, " above") || /* lurkers above */
-		    !strncmpi(spot, " versus ", 8) ||
-		    !strncmpi(spot, " from ", 6) ||
-		    !strncmpi(spot, " in ", 4) ||
-		    !strncmpi(spot, " on ", 4) ||
-		    !strncmpi(spot, " a la ", 6) ||
-		    !strncmpi(spot, " with", 5) ||	/* " with "? */
-		    !strncmpi(spot, " de ", 4) ||
-		    !strncmpi(spot, " d'", 3) ||
-		    !strncmpi(spot, " du ", 4) ||
-		    !strncmpi(spot, "-in-", 4) ||
-		    !strncmpi(spot, "-at-", 4)) {
-			excess = oldstr + (int) (spot - str);
-			*spot = 0;
-			break;
-		}
-	}
+	/* look for "foo of bar" so that we can focus on "foo" */
+	if ((spot = singplur_compound(str)) != 0) {
+		excess = oldstr + (int)(spot - str);
+		*spot = '\0';
+	} else
+		spot = eos(str);
+
 	spot--;
-	while (*spot==' ') spot--; /* Strip blanks from end */
+	while (spot > str && *spot == ' ') spot--; /* Strip blanks from end */
 	*(spot+1) = 0;
 	/* Now spot is the last character of the string */
 
@@ -1799,8 +1826,8 @@ const char *oldstr;
 	/* dispense with some words which don't need pluralization */
     {
 	static const char *const already_plural[] = {
+	    "ae",	/* algae, larvae, &c */
 	    "men",	/* also catches women, watchmen */
-	    "algae",
 	    "matzot",
 	    0,
 	};
@@ -1811,7 +1838,6 @@ const char *oldstr;
 
 	/* more of same, but not suitable for blanket loop checking */
 	if ((len == 2 && !strcmpi(str, "ya")) ||
-	    (len >= 2 && !strcmpi(spot-1, "ai")) || /* samurai, Uruk-hai */
 	    (len >= 3 && !strcmpi(spot-2, " ya")))
 		goto bottom;
     }
@@ -1844,6 +1870,7 @@ const char *oldstr;
 	if ((len >= 4 && !strcmpi(spot-3, "alga")) ||
 	    (len >= 5 && (!strcmpi(spot-4, "hypha") ||
 			  !strcmpi(spot-4, "larva"))) ||
+	    (len >= 6 && !strcmpi(spot-5, "amoeba")) ||
 	    (len >= 8 && (!strcmpi(spot-7, "vertebra")))) {
 		/* a to ae */
 		Strcasecpy(spot+1, "e");
@@ -1918,42 +1945,28 @@ makesingular(oldstr)
 const char *oldstr;
 {
 	register char *p, *bp;
+	const char *excess = 0;
 	char *str = nextobuf();
 
+	if (oldstr) while (*oldstr == ' ') oldstr++;
 	if (!oldstr || !*oldstr) {
 		impossible("singular of null?");
-		str[0] = 0;
+		str[0] = '\0';
 		return str;
 	}
-	Strcpy(str, oldstr);
-	bp = str;
 
-	while (*bp == ' ') bp++;
-	/* find "cloves of garlic", "worthless pieces of blue glass",
-	   "mothers-in-law"; note: this should probably be implemented
-	   recursively since it can't recognize whether we should be
-	   removing "es" rather than just "s" */
-	if ((p = strstri(bp, " of ")) != 0 ||
-		(p = strstri(bp, "-in-")) != 0 ||
-		(p = strstri(bp, "-at-")) != 0 ||
-		(p = strstri(bp, " above")) != 0) { /* lurkers above */
-	    /* [wo]men-at-arms -> [wo]man-at-arms; takes "not end in s" exit */
-	    if (!BSTRNCMPI(bp, p-3, "men", 3)) *(p-2) = chrcasecpy(*(p-2), 'a');
-	    if (BSTRNCMPI(bp, p-1, "s", 1)) return bp;	/* wasn't plural */
+	bp = strcpy(str, oldstr);
 
-	    --p;		/* back up to the 's' */
-	    /* but don't singularize "gauntlets", "boots", "Eyes of the.." */
-	    if (BSTRNCMPI(bp, p-3, "Eye", 3) &&
-		BSTRNCMPI(bp, p-4, "boot", 4) &&
-		BSTRNCMPI(bp, p-8, "gauntlet", 8))
-		while ((*p = *(p+1)) != 0) p++;
-	    return bp;
-	}
+	/* check for "foo of bar" so that we can focus on "foo" */
+	if ((p = singplur_compound(bp)) != 0) {
+		excess = oldstr + (int)(p - bp);
+		*p = '\0';
+	} else
+		p = eos(bp);
 
-	p = eos(bp);
 	/* dispense with some words which don't need singularization */
 	if (singplur_lookup(bp, p, FALSE, special_subjs))
-		return bp;
+		goto bottom;
 
 	/* remove -s or -es (boxes) or -ies (rubies) */
 	if (p >= bp+1 && lowc(p[-1]) == 's') {
@@ -1965,7 +1978,7 @@ const char *oldstr;
 				    !BSTRCMPI(bp, p-5, "yries")) /* valkyrie */
 					goto mins;
 				Strcasecpy(p-3, "y");	/* ies -> y */
-				return bp;
+				goto bottom;
 			}
 			/* wolves, but f to ves isn't fully reversible */
 			if (p-4 >= bp && (index("lr", lowc(*(p-4))) ||
@@ -1974,7 +1987,7 @@ const char *oldstr;
 				if (!BSTRCMPI(bp, p-6, "cloves") ||
 				    !BSTRCMPI(bp, p-6, "nerves")) goto mins;
 				Strcasecpy(p-3, "f");	/* ves -> f */
-				return bp;
+				goto bottom;
 			}
 			/* note: nurses, axes but boxes, wumpuses */
 			if (!BSTRCMPI(bp, p-4, "eses") ||
@@ -1987,18 +2000,18 @@ const char *oldstr;
 			    !BSTRCMPI(bp, p-7, "dingoes") ||
 			    !BSTRCMPI(bp, p-7, "Aleaxes")) {
 				*(p-2) = '\0';	/* drop es */
-				return bp;
+				goto bottom;
 			} /* else fall through to mins */
 
 		/* ends in 's' but not 'es' */
 		} else if (!BSTRCMPI(bp, p-2, "us")) { /* lotus, fungus... */
 			if (BSTRCMPI(bp, p-6, "tengus") && /* but not these... */
 			    BSTRCMPI(bp, p-7, "hezrous"))
-				return bp;
+				goto bottom;
 		} else if (!BSTRCMPI(bp, p-2, "ss") ||
 			   !BSTRCMPI(bp, p-5, " lens") ||
 			   (p-4 == bp && !strcmpi(p-4, "lens"))) {
-				return bp;
+				goto bottom;
 		}
 	mins:
 		*(p-1) = '\0';	/* drop s */
@@ -2007,13 +2020,13 @@ const char *oldstr;
 
 		if (!BSTRCMPI(bp, p-3, "men")) {
 			Strcasecpy(p-2, "an");
-			return bp;
+			goto bottom;
 		}
 		/* matzot -> matzo, algae -> alga */
 		if (!BSTRCMPI(bp, p-6, "matzot") ||
 		    !BSTRCMPI(bp, p-2, "ae")) {
 			*(p-1) = '\0';	/* drop t/e */    
-			return bp;
+			goto bottom;
 		}
 		/* balactheria -> balactherium */
 		if (p-4 >= bp && !strcmpi(p-2, "ia") &&
@@ -2023,6 +2036,12 @@ const char *oldstr;
 
 		/* here we cannot find the plural suffix */
 	}
+
+ bottom:
+	/* if we stripped off a suffix (" of bar" from "foo of bar"),
+	   put it back now [strcat() isn't actually 100% safe here...] */
+	if (excess) Strcat(bp, excess);
+
 	return bp;
 }
 
