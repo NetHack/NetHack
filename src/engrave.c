@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)engrave.c	3.5	2007/01/26	*/
+/*	SCCS Id: @(#)engrave.c	3.5	2008/08/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,6 +32,7 @@ static const char *random_mesg[] = {
 	"You've got mail!", /* AOL */
 #endif
 	"As if!", /* Clueless */
+	"BAD WOLF", /* 200x incarnation of Dr.Who */
 };
 
 char *
