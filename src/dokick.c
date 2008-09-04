@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dokick.c	3.5	2007/05/16	*/
+/*	SCCS Id: @(#)dokick.c	3.5	2008/09/04	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,6 +18,7 @@ extern boolean notonhead;	/* for long worms */
 STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
 STATIC_DCL void FDECL(kick_monster, (XCHAR_P, XCHAR_P));
 STATIC_DCL int FDECL(kick_object, (XCHAR_P, XCHAR_P));
+STATIC_DCL int FDECL(really_kick_object, (XCHAR_P,XCHAR_P));
 STATIC_DCL char *FDECL(kickstr, (char *));
 STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
 STATIC_DCL void FDECL(drop_to, (coord *,SCHAR_P));
@@ -397,8 +398,26 @@ struct obj *obj;
 	}
 }
 
+/* jacket around really_kick_object */
 STATIC_OVL int
 kick_object(x, y)
+xchar x, y;
+{
+    int res = 0;
+
+    /* if a pile, the "top" object gets kicked */
+    kickobj = level.objects[x][y];
+    if (kickobj) {
+	/* kick the object; if doing is fatal, done() will clean up kickobj */
+	res = really_kick_object(x, y);
+	kickobj = (struct obj *)0;
+    }
+    return res;
+}
+
+/* guts of kick_object */
+STATIC_OVL int
+really_kick_object(x, y)
 xchar x, y;
 {
 	int range;
@@ -406,9 +425,6 @@ xchar x, y;
 	struct trap *trap;
 	char bhitroom;
 	boolean costly, isgold, slide = FALSE;
-
-	/* if a pile, the "top" object gets kicked */
-	kickobj = level.objects[x][y];
 
 	/* kickobj should always be set due to conditions of call */
 	if(!kickobj || kickobj->otyp == BOULDER
@@ -810,7 +826,6 @@ dokick()
 		return 1;
 	}
 
-	kickobj = (struct obj *)0;
 	if (OBJ_AT(x, y) &&
 	    (!Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
 	     || sobj_at(BOULDER,x,y))) {

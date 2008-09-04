@@ -710,10 +710,10 @@ die:
 	/* might have been killed while using a disposable item, so make sure
 	   it's gone prior to inventory disclosure and creation of bones data */
 	inven_inuse(TRUE);
-	/* not on object lists; if an active light source, would cause big
-	   trouble (`obj_is_local' panic) for savebones() -> savelev() */
-	if (thrownobj) dealloc_obj(thrownobj);
-	if (kickobj) dealloc_obj(kickobj);
+	/* maybe not on object lists; if an active light source, would cause
+	   big trouble (`obj_is_local' panic) for savebones() -> savelev() */
+	if (thrownobj && thrownobj->where == OBJ_FREE) dealloc_obj(thrownobj);
+	if (kickobj && kickobj->where == OBJ_FREE) dealloc_obj(kickobj);
 
 	/* Sometimes you die on the first move.  Life's not fair.
 	 * On those rare occasions you get hosed immediately, go out
