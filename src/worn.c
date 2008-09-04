@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.5	2007/02/22	*/
+/*	SCCS Id: @(#)worn.c	3.5	2008/09/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -442,7 +442,7 @@ boolean creation;
 	m_dowear_type(mon, W_AMUL, creation, FALSE);
 #ifdef TOURIST
 	/* can't put on shirt if already wearing suit */
-	if (!cantweararm(mon->data) || (mon->misc_worn_check & W_ARM))
+	if (!cantweararm(mon->data) && !(mon->misc_worn_check & W_ARM))
 	    m_dowear_type(mon, W_ARMU, creation, FALSE);
 #endif
 	/* treating small as a special case allows
