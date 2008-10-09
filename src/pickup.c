@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pickup.c	3.5	2008/03/19	*/
+/*	SCCS Id: @(#)pickup.c	3.5	2008/10/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -286,6 +286,22 @@ boolean remotely;
     pline("Touching %s is a fatal mistake.",
 	  corpse_xname(obj, (const char *)0, CXN_SINGULAR|CXN_ARTICLE));
     instapetrify(killer_xname(obj));
+    return TRUE;
+}
+
+/* attempting to manipulate a Rider's corpse triggers its revival */
+boolean
+rider_corpse_revival(obj, remotely)
+struct obj *obj;
+boolean remotely;
+{
+    if (!obj || obj->otyp != CORPSE || !is_rider(&mons[obj->corpsenm]))
+	return FALSE;
+
+    pline("At your %s, the corpse suddenly moves...",
+	  remotely ? "attempted acquisition" : "touch");
+    (void)revive_corpse(obj);
+    exercise(A_WIS, FALSE);
     return TRUE;
 }
 
@@ -1353,15 +1369,9 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    return 1;
 #endif
 	} else if (obj->otyp == CORPSE) {
-	    if (fatal_corpse_mistake(obj, telekinesis)) {
+	    if (fatal_corpse_mistake(obj, telekinesis) ||
+		    rider_corpse_revival(obj, telekinesis))
 		return -1;
-	    } else if (is_rider(&mons[obj->corpsenm])) {
-		pline("At your %s, the corpse suddenly moves...",
-			telekinesis ? "attempted acquisition" : "touch");
-		(void) revive_corpse(obj);
-		exercise(A_WIS, FALSE);
-		return -1;
-	    }
 	} else  if (obj->otyp == SCR_SCARE_MONSTER) {
 	    if (obj->blessed) obj->blessed = 0;
 	    else if (!obj->spe && !obj->cursed) obj->spe = 1;

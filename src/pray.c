@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2008/01/21	*/
+/*	SCCS Id: @(#)pray.c	3.5	2008/10/09	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1206,6 +1206,7 @@ dosacrifice()
 
 	/* you're handling this corpse, even if it was killed upon the altar */
 	feel_cockatrice(otmp, TRUE);
+	if (rider_corpse_revival(otmp, FALSE)) return 1;
 
 	if (otmp->corpsenm == PM_ACID_BLOB
 		|| (monstermoves <= peek_at_iced_corpse_age(otmp) + 50)) {
