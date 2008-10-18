@@ -4059,6 +4059,8 @@ char *str;
 	 * 0 is an error.
 	 */
 	if (user_specified) {
+		boolean found = FALSE, numeric = FALSE;
+
 		/* force fruit to be singular; this handling is not
 		   needed--or wanted--for fruits from bones because
 		   they already received it in their original game */
@@ -4068,8 +4070,6 @@ char *str;
 		/* disallow naming after other foods (since it'd be impossible
 		 * to tell the difference)
 		 */
-
-		boolean found = FALSE, numeric = FALSE;
 
 		for (i = bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS;
 						i++) {
