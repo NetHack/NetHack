@@ -2908,6 +2908,9 @@ do_break_wand(obj)
        surrounding targets (or underlying objects) got affected yet.] */
     explode(obj->ox, obj->oy, -(obj->otyp), rnd(dmg), WAND_CLASS, EXPL_MAGICAL);
 
+    /* prepare for potential feedback from polymorph... */
+    zapsetup();
+
     /* this makes it hit us last, so that we can see the action first */
     for (i = 0; i <= 8; i++) {
 	bhitpos.x = x = obj->ox + xdir[i];
@@ -2989,6 +2992,9 @@ do_break_wand(obj)
 	    if (context.botl) bot();		/* blindness */
 	}
     }
+
+    /* potentially give post zap/break feedback */
+    zapwrapup();
 
     /* Note: if player fell thru, this call is a no-op.
        Damage is handled in digactualhole in that case */

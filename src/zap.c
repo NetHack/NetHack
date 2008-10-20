@@ -2702,6 +2702,22 @@ struct obj *obj;	/* wand or spell */
 	return disclose;
 }
 
+/* used by do_break_wand() was well as by weffects() */
+void
+zapsetup()
+{
+    obj_zapped = FALSE;
+}
+
+void
+zapwrapup()
+{
+    /* if do_osshock() set obj_zapped while polying, give a message now */
+    if (obj_zapped)
+	You_feel("shuddering vibrations.");
+    obj_zapped = FALSE;
+}
+
 /* called for various wand and spell effects - M. Stephenson */
 void
 weffects(obj)
@@ -2718,8 +2734,7 @@ struct	obj	*obj;
 	} else
 #endif
 	if (objects[otyp].oc_dir == IMMEDIATE) {
-	    obj_zapped = FALSE;
-
+	    zapsetup();		/* reset obj_zapped */
 	    if (u.uswallow) {
 		(void) bhitm(u.ustuck, obj);
 		/* [how about `bhitpile(u.ustuck->minvent)' effect?] */
@@ -2728,9 +2743,7 @@ struct	obj	*obj;
 	    } else {
 		(void) bhit(u.dx,u.dy, rn1(8,6),ZAPPED_WAND, bhitm,bhito, &obj);
 	    }
-	    /* give a clue if obj_zapped */
-	    if (obj_zapped)
-		You_feel("shuddering vibrations.");
+	    zapwrapup();	/* give feedback for obj_zapped */
 
 	} else if (objects[otyp].oc_dir == NODIR) {
 	    zapnodir(obj);

@@ -2651,6 +2651,8 @@ E int FDECL(zapyourself, (struct obj *,BOOLEAN_P));
 E void FDECL(ubreatheu, (struct attack *));
 E boolean FDECL(cancel_monst, (struct monst *,struct obj *,
 			       BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
+E void NDECL(zapsetup);
+E void NDECL(zapwrapup);
 E void FDECL(weffects, (struct obj *));
 E int NDECL(spell_damage_bonus);
 E const char *FDECL(exclam, (int force));

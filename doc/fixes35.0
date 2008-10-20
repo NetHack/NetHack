@@ -288,6 +288,7 @@ wearing or removing an amulet of restful sleep clobbered permanent sleepiness
 if attempt to select a co-aligned artifact for first divine gift fails because
 	none is available, choose one from among nonaligned artifacts
 if breaking a wand of polymorph causes hero to drop items, don't transform them
+give "shuddering vibrations" feedback if breaking a poly wand uses up items
 if polymorph causes a monster to drop items, they won't be used up via
 	shuddering vibrations or as golem creation fodder
 
