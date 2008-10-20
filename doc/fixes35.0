@@ -287,6 +287,9 @@ when probing from inside an engulfer, "not carrying anything" overlooked hero
 wearing or removing an amulet of restful sleep clobbered permanent sleepiness
 if attempt to select a co-aligned artifact for first divine gift fails because
 	none is available, choose one from among nonaligned artifacts
+if breaking a wand of polymorph causes hero to drop items, don't transform them
+if polymorph causes a monster to drop items, they won't be used up via
+	shuddering vibrations or as golem creation fodder
 
 
 Platform- and/or Interface-Specific Fixes

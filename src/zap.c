@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)zap.c	3.5	2008/03/19	*/
+/*	SCCS Id: @(#)zap.c	3.5	2008/10/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1088,6 +1088,8 @@ struct obj *obj;
 {
 	int	zap_odds;
 
+	if (context.bypasses && obj->bypass) return FALSE;
+
 	if (obj->oclass == WAND_CLASS)
 		zap_odds = 3;	/* half-life = 2 zaps */
 	else if (obj->cursed)
@@ -1117,6 +1119,7 @@ polyuse(objhdr, mat, minwt)
 
     for(otmp = objhdr; minwt > 0 && otmp; otmp = otmp2) {
 	otmp2 = otmp->nexthere;
+	if (context.bypasses && otmp->bypass) continue;
 	if (otmp == uball || otmp == uchain) continue;
 	if (obj_resists(otmp, 0, 0)) continue;	/* preserve unique objects */
 #ifdef MAIL
@@ -1155,6 +1158,14 @@ create_polymon(obj, okind)
 	struct monst *mtmp;
 	const char *material;
 	int pm_index;
+
+	if (context.bypasses) {
+	    /* this is approximate because the "no golems" !obj->nexthere
+	       check below doesn't understand bypassed objects; but it
+	       should suffice since bypassed objects always end up as a
+	       consecutive group at the top of their pile */
+	    while (obj && obj->bypass) obj = obj->nexthere;
+	}
 
 	/* no golems if you zap only one object -- not enough stuff */
 	if(!obj || (!obj->nexthere && obj->quan == 1L)) return;

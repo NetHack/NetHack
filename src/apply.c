@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2008/03/07	*/
+/*	SCCS Id: @(#)apply.c	3.5	2008/10/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2891,6 +2891,7 @@ do_break_wand(obj)
 	/* we want this before the explosion instead of at the very end */
 	pline("A wall of force smashes down around you!");
 	dmg = d(1 + obj->spe,6);	/* normally 2d12 */
+	/*FALLTHRU*/
     case WAN_CANCELLATION:
     case WAN_POLYMORPH:
     case WAN_TELEPORTATION:
@@ -2902,6 +2903,9 @@ do_break_wand(obj)
     }
 
     /* magical explosion and its visual effect occur before specific effects */
+    /* [TODO?  This really ought to prevent the explosion from being
+       fatal so that we never leave a bones file where none of the
+       surrounding targets (or underlying objects) got affected yet.] */
     explode(obj->ox, obj->oy, -(obj->otyp), rnd(dmg), WAND_CLASS, EXPL_MAGICAL);
 
     /* this makes it hit us last, so that we can see the action first */
@@ -2942,23 +2946,17 @@ do_break_wand(obj)
 	    /* u.ux,u.uy creates it near you--x,y might create it in rock */
 	    (void) makemon((struct permonst *)0, u.ux, u.uy, NO_MM_FLAGS);
 	    continue;
-	} else {
-	    if (x == u.ux && y == u.uy) {
-		/* teleport objects first to avoid race with tele control and
-		   autopickup.  Other wand/object effects handled after
-		   possible wand damage is assessed */
-		if (obj->otyp == WAN_TELEPORTATION &&
-		    affects_objects && level.objects[x][y]) {
-		    (void) bhitpile(obj, bhito, x, y);
-		    if (context.botl) bot();		/* potion effects */
-		}
-		damage = zapyourself(obj, FALSE);
-		if (damage) {
-		    Sprintf(buf, "killed %sself by breaking a wand", uhim());
-		    losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
-		}
-		if (context.botl) bot();		/* blindness */
-	    } else if ((mon = m_at(x, y)) != 0) {
+	} else if (x != u.ux || y != u.uy) {
+	    /*
+	     * Wand breakage is targetting a square adjacent to the hero,
+	     * which might contain a monster or a pile of objects or both.
+	     * Handle objects last; avoids having undead turning raise an
+	     * undead's corpse and then attack resulting undead monster.
+	     * obj->bypass in bhitm() prevents the polymorphing of items
+	     * dropped due to monster's polymorph and prevents undead
+	     * turning that kills an undead from raising resulting corpse.
+	     */
+	    if ((mon = m_at(x, y)) != 0) {
 		(void) bhitm(mon, obj);
 	     /* if (context.botl) bot(); */
 	    }
@@ -2966,6 +2964,29 @@ do_break_wand(obj)
 		(void) bhitpile(obj, bhito, x, y);
 		if (context.botl) bot();		/* potion effects */
 	    }
+	} else {
+	    /*
+	     * Wand breakage is targetting the hero.  Using xdir[]+ydir[]
+	     * deltas for location selection causes this case to happen
+	     * after all the surrounding squares have been handled.
+	     * Process objects first, in case damage is fatal and leaves
+	     * bones, or teleportation sends one or more of the objects to
+	     * same destination as hero (lookhere/autopickup); also avoids
+	     * the polymorphing of gear dropped due to hero's transformation.
+	     * (Unlike with monsters being hit by zaps, we can't rely on use
+	     * of obj->bypass in the zap code to accomplish that last case
+	     * since it's also used by retouch_equipment() for polyself.)
+	     */
+	    if (affects_objects && level.objects[x][y]) {
+		(void) bhitpile(obj, bhito, x, y);
+		if (context.botl) bot();		/* potion effects */
+	    }
+	    damage = zapyourself(obj, FALSE);
+	    if (damage) {
+		Sprintf(buf, "killed %sself by breaking a wand", uhim());
+		losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
+	    }
+	    if (context.botl) bot();		/* blindness */
 	}
     }
 
