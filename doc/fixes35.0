@@ -408,6 +408,7 @@ streamline old ^X output and integrate it with enlightenment feedback;
 	new ^X output includes expanded form of abbreviated bottom line info
 "killed by X" becomes "killed by a chameleon imitating X" when appropriate
 eating disenchanter corpses is now considered risky
+make '[' command more precise when poly'd hero has embedded dragon scales/mail
 
 
 Platform- and/or Interface-Specific New Features

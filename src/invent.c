@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)invent.c	3.5	2008/03/19	*/
+/*	SCCS Id: @(#)invent.c	3.5	2008/10/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,6 +9,7 @@
 
 STATIC_DCL void NDECL(reorder_invent);
 STATIC_DCL boolean FDECL(mergable,(struct obj *,struct obj *));
+STATIC_DCL void FDECL(noarmor, (BOOLEAN_P));
 STATIC_DCL void FDECL(invdisp_nothing, (const char *,const char *));
 STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
 STATIC_DCL boolean FDECL(only_here, (struct obj *));
@@ -1388,7 +1389,7 @@ unsigned *resultflags;
 		    pline("Not applicable.");
 		    return 0;
 		} else if (oc_of_sym == ARMOR_CLASS && !wearing_armor()) {
-		    You("are not wearing any armor.");
+		    noarmor(FALSE);
 		    return 0;
 		} else if (oc_of_sym == WEAPON_CLASS &&
 			!uwep && !uswapwep && !uquiver) {
@@ -2698,12 +2699,34 @@ doprwep()
     return 0;
 }
 
+/* caller is responsible for checking !wearing_armor() */
+STATIC_OVL void
+noarmor(report_uskin)
+boolean report_uskin;
+{
+    if (!uskin || !report_uskin) {
+	You("are not wearing any armor.");
+    } else {
+	char *p, *uskinname, buf[BUFSZ];
+
+	uskinname = strcpy(buf, simpleonames(uskin));
+	/* shorten "set of <color> dragon scales" to "<color> scales"
+	   and "<color> dragon scale mail" to "<color> scale mail" */
+	if (!strncmpi(uskinname, "set of ", 7)) uskinname += 7;
+	if ((p = strstri(uskinname, " dragon ")) != 0)
+	    while ((p[1] = p[8]) != '\0') ++p;
+
+	You("are not wearing armor but have %s embedded in your skin.",
+	    uskinname);
+    }
+}
+
 int
 doprarm()
 {
-	if(!wearing_armor())
-		You("are not wearing any armor.");
-	else {
+	if (!wearing_armor()) {
+		noarmor(TRUE);
+	} else {
 #ifdef TOURIST
 		char lets[8];
 #else
