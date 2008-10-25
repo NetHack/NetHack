@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dogmove.c	3.5	2007/08/20	*/
+/*	SCCS Id: @(#)dogmove.c	3.5	2008/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -200,7 +200,7 @@ int x, y;	/* dog's starting location, might be different from current */
 boolean devour;
 {
 	register struct edog *edog = EDOG(mtmp);
-	boolean poly = FALSE, grow = FALSE, heal = FALSE, deadmimic;
+	boolean poly, grow, heal, slimer, deadmimic;
 	int nutrit;
 	long oprice;
 	char objnambuf[BUFSZ];
@@ -214,10 +214,11 @@ boolean devour;
 		     (obj->corpsenm == PM_SMALL_MIMIC ||
 		      obj->corpsenm == PM_LARGE_MIMIC ||
 		      obj->corpsenm == PM_GIANT_MIMIC));
-
+	slimer = (obj->otyp == CORPSE && obj->corpsenm == PM_GREEN_SLIME);
 	poly = polyfodder(obj);
 	grow = mlevelgain(obj);
 	heal = mhealup(obj);
+
 	if (devour) {
 	    if (mtmp->meating > 1) mtmp->meating /= 2;
 	    if (nutrit > 1) nutrit = (nutrit * 3) / 4;
@@ -300,9 +301,19 @@ boolean devour;
 	    delobj(obj);
 	}
 
-	if (poly) {
-	    (void) newcham(mtmp, (struct permonst *)0, FALSE,
-			   cansee(mtmp->mx, mtmp->my));
+#if 0	/* pet is eating, so slime recovery is not feasible... */
+	/* turning into slime might be cureable */
+	if (slimer && munslime(mtmp, FALSE)) {
+	    /* but the cure (fire directed at self) might be fatal */
+	    if (mtmp->mhp < 1) return 2;
+	    slimer = FALSE;	/* sliming is avoided, skip polymorph */
+	}
+#endif
+
+	if (poly || slimer) {
+	    struct permonst *ptr = slimer ? &mons[PM_GREEN_SLIME] : 0;
+
+	    (void) newcham(mtmp, ptr, FALSE, cansee(mtmp->mx, mtmp->my));
 	}
 
 	/* limit "instant" growth to prevent potential abuse */

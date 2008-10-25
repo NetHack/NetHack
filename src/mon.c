@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2008/02/07	*/
+/*	SCCS Id: @(#)mon.c	3.5	2008/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -697,12 +697,13 @@ meatmetal(mtmp)
 	return 0;
 }
 
+/* monster eats a pile of objects */
 int
 meatobj(mtmp)		/* for gelatinous cubes */
 	register struct monst *mtmp;
 {
 	register struct obj *otmp, *otmp2;
-	struct permonst *ptr;
+	struct permonst *ptr, *original_ptr = mtmp->data;
 	int poly, grow, heal, count = 0, ecount = 0;
 	char buf[BUFSZ];
 
@@ -710,18 +711,56 @@ meatobj(mtmp)		/* for gelatinous cubes */
 	/* If a pet, eating is handled separately, in dog.c */
 	if (mtmp->mtame) return 0;
 
-	/* Eats organic objects, including cloth and wood, if there */
-	/* Engulfs others, except huge rocks and metal attached to player */
+	/* eat organic objects, including cloth and wood, if present;
+	   engulf others, except huge rocks and metal attached to player
+	   [despite comment at top, doesn't assume that eater is a g.cube] */
 	for (otmp = level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nexthere;
-	    if (is_organic(otmp) && !obj_resists(otmp, 5, 95) &&
-		    touch_artifact(otmp,mtmp)) {
-		if (otmp->otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm]) &&
-			!resists_ston(mtmp))
-		    continue;
-		if (otmp->otyp == AMULET_OF_STRANGULATION ||
-				otmp->otyp == RIN_SLOW_DIGESTION)
-		    continue;
+
+	    /* touch senstive items */
+	    if (otmp->otyp == CORPSE &&
+		is_rider(&mons[otmp->corpsenm])) {
+		/* Rider corpse isn't just inedible; can't engulf it either */
+		(void)revive_corpse(otmp);
+
+	    /* untouchable (or inaccessible) items */
+	    } else if ((otmp->otyp == CORPSE &&
+			touch_petrifies(&mons[otmp->corpsenm]) &&
+			!resists_ston(mtmp)) ||
+		    /* don't engulf boulders and statues or ball&chain */
+		    otmp->oclass == ROCK_CLASS ||
+		    otmp == uball || otmp == uchain) {
+		/* do nothing--neither eaten nor engulfed */
+		continue;
+
+	    /* inedible items -- engulf these */
+	    } else if (!is_organic(otmp) ||
+		    obj_resists(otmp, 5, 95) ||
+		    !touch_artifact(otmp, mtmp) ||
+		    /* redundant due to non-organic composition but
+		       included for emphasis */
+		    (otmp->otyp == AMULET_OF_STRANGULATION ||
+		     otmp->otyp == RIN_SLOW_DIGESTION) ||
+		    /* cockatrice corpses handled above; this
+		       touch_petrifies() check catches eggs */
+		    ((otmp->otyp == CORPSE || otmp->otyp == EGG) &&
+			((touch_petrifies(&mons[otmp->corpsenm]) &&
+			  !resists_ston(mtmp)) ||
+			 (otmp->corpsenm == PM_GREEN_SLIME &&
+			  !slimeproof(mtmp->data))))) {
+		/* engulf */
+		++ecount;
+		if (ecount == 1)
+		    Sprintf(buf, "%s engulfs %s.", Monnam(mtmp),
+			    distant_name(otmp,doname));
+		else if (ecount == 2)
+		    Sprintf(buf, "%s engulfs several objects.", Monnam(mtmp));
+		obj_extract_self(otmp);
+		(void) mpickobj(mtmp, otmp);	/* slurp */
+
+	    /* lastly, edible items; yum! */
+	    } else {
+		/* devour */
 		++count;
 		if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
 		    pline("%s eats %s!", Monnam(mtmp),
@@ -760,33 +799,19 @@ meatobj(mtmp)		/* for gelatinous cubes */
 		    mtmp->mhp = mtmp->mhpmax;
 		}
 		/* in case it polymorphed or died */
-		if (ptr != &mons[PM_GELATINOUS_CUBE])
+		if (ptr != original_ptr)
 		    return !ptr ? 2 : 1;
-	    } else if (otmp->otyp == CORPSE &&
-			is_rider(&mons[otmp->corpsenm])) {
-		/* Rider corpse will always pass the obj_resists() test above
-		   and not be eaten; we don't want it to be engulfed either */
-		(void)revive_corpse(otmp);
-	     /* continue; -- regardless of whether it revived */
-	    } else if (otmp->oclass != ROCK_CLASS &&
-				    otmp != uball && otmp != uchain) {
-		++ecount;
-		if (ecount == 1) {
-			Sprintf(buf, "%s engulfs %s.", Monnam(mtmp),
-			    distant_name(otmp,doname));
-		} else if (ecount == 2)
-			Sprintf(buf, "%s engulfs several objects.", Monnam(mtmp));
-		obj_extract_self(otmp);
-		(void) mpickobj(mtmp, otmp);	/* slurp */
 	    }
+
 	    /* Engulf & devour is instant, so don't set meating */
 	    if (mtmp->minvis) newsym(mtmp->mx, mtmp->my);
 	}
+
 	if (ecount > 0) {
 	    if (cansee(mtmp->mx, mtmp->my) && flags.verbose && buf[0])
 		pline("%s", buf);
 	    else if (!Deaf && flags.verbose)
-	    	You_hear("%s slurping sound%s.",
+		You_hear("%s slurping sound%s.",
 			ecount == 1 ? "a" : "several",
 			ecount == 1 ? "" : "s");
 	}

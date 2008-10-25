@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dog.c	3.5	2007/03/02	*/
+/*	SCCS Id: @(#)dog.c	3.5	2008/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -727,6 +727,10 @@ register struct obj *obj;
 			(acidic(fptr) && !resists_acid(mon)) ||
 			(poisonous(fptr) && !resists_poison(mon)))
 			return POISON;
+		    /* turning into slime is preferrable to starvation */
+		    else if (fptr == &mons[PM_GREEN_SLIME] &&
+				!slimeproof(mon->data))
+			return (starving ? ACCFOOD : POISON);
 		    else if (vegan(fptr))
 			return (herbi ? CADAVER : MANFOOD);
 		    /* most humanoids will avoid cannibalism unless starving;
