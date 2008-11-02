@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)steal.c	3.5	2007/04/16	*/
+/*	SCCS Id: @(#)steal.c	3.5	2008/11/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -421,7 +421,7 @@ gotobj:
 
 			otmp->cursed = 0;
 			/* can't charm you without first waking you */
-			if (multi < 0 && is_fainted()) unmul((char *)0);
+			if (Unaware) unmul((char *)0);
 			slowly = (armordelay >= 1 || multi < 0);
 			if(flags.female)
 			    pline("%s charms you.  You gladly %s your %s.",
