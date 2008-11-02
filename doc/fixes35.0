@@ -292,6 +292,7 @@ give "shuddering vibrations" feedback if breaking a poly wand uses up items
 if polymorph causes a monster to drop items, they won't be used up via
 	shuddering vibrations or as golem creation fodder
 monsters who ate green slime corpses weren't turned into green slime
+"hand slip" while naming an object would never pick 'z' as a substitute letter
 
 
 Platform- and/or Interface-Specific Fixes

@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)do_name.c	3.5	2007/05/12	*/
+/*	SCCS Id: @(#)do_name.c	3.5	2008/11/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -386,7 +386,7 @@ void
 do_oname(obj)
 register struct obj *obj;
 {
-	char buf[BUFSZ], qbuf[QBUFSZ];
+	char buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
 	const char *aname;
 	short objtyp;
 
@@ -406,13 +406,22 @@ register struct obj *obj;
 		pline_The("artifact seems to resist the attempt.");
 		return;
 	} else if (restrict_name(obj, buf) || exist_artifact(obj->otyp, buf)) {
-		int n = rn2((int)strlen(buf));
-		register char c1, c2;
-
-		c1 = lowc(buf[n]);
-		do c2 = 'a' + rn2('z'-'a'); while (c1 == c2);
-		buf[n] = (buf[n] == c1) ? c2 : highc(c2);  /* keep same case */
-		pline("While engraving your %s slips.", body_part(HAND));
+		/* this used to change one letter, substituting a value
+		   of 'a' through 'y' (due to an off by one error, 'z'
+		   would never be selected) and then force that to
+		   upper case if such was the case of the input;
+		   now, the hand slip scuffs one or two letters as if
+		   the text had been trodden upon, sometimes picking
+		   punctuation instead of an arbitrary letter;
+		   unfortunately, we have to cover the possibility of
+		   it targetting spaces so failing to make any change
+		   (we know that it must eventually target a nonspace
+		   because buf[] matches a valid artifact name) */
+		Strcpy(bufcpy, buf);
+		do {
+		    wipeout_text(buf, rnd(2), (unsigned)0);
+		} while (!strcmp(buf, bufcpy));
+		pline("While engraving, your %s slips.", body_part(HAND));
 		display_nhwindow(WIN_MESSAGE, FALSE);
 		You("engrave: \"%s\".",buf);
 	}
