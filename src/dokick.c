@@ -125,7 +125,26 @@ register xchar x, y;
 	bhitpos.x = x;
 	bhitpos.y = y;
 	if (attack_checks(mon, (struct obj *)0)) return;
+	/* anger target even if wild miss will occur */
 	setmangry(mon);
+
+	if (Levitation && !rn2(3) && verysmall(mon->data) &&
+	   !is_flyer(mon->data)) {
+		pline("Floating in the air, you miss wildly!");
+		exercise(A_DEX, FALSE);
+		(void) passive(mon, FALSE, 1, AT_KICK, FALSE);
+		return;
+	}
+
+	/* reveal hidden target even if kick ends up missing (note: being
+	   hidden doesn't affect chance to hit so neither does this reveal) */
+	if (mon->mundetected ||
+		(mon->m_ap_type && mon->m_ap_type != M_AP_MONSTER)) {
+	    /* [revealing the monster should probably give a message...] */
+	    if (mon->m_ap_type) seemimic(mon);
+	    mon->mundetected = 0;
+	    if (!canspotmon(mon)) map_invisible(x, y);
+	}
 
 	/* Kick attacks by kicking monsters are normal attacks, not special.
 	 * This is almost always worthless, since you can either take one turn
@@ -166,14 +185,6 @@ register xchar x, y;
 		}
 	    }
 	    return;
-	}
-
-	if(Levitation && !rn2(3) && verysmall(mon->data) &&
-	   !is_flyer(mon->data)) {
-		pline("Floating in the air, you miss wildly!");
-		exercise(A_DEX, FALSE);
-		(void) passive(mon, FALSE, 1, AT_KICK, FALSE);
-		return;
 	}
 
 	i = -inv_weight();
@@ -782,9 +793,18 @@ dokick()
 	}
 	maploc = &levl[x][y];
 
-	/* The next five tests should stay in    */
-	/* their present order: monsters, pools, */
-	/* objects, non-doors, doors.		 */
+	/*
+	 * The next five tests should stay in their present order:
+	 * monsters, pools, objects, non-doors, doors.
+	 *
+	 * [FIXME:  Monsters who are hidden underneath objects or
+	 * in pools should lead to hero kicking the concealment
+	 * rather than the monster, probably exposing the hidden
+	 * monster in the process.  And monsters who are hidden on
+	 * ceiling shouldn't be kickable (unless hero is flying?);
+	 * kicking toward them should just target whatever is on
+	 * the floor at that spot.]
+	 */
 
 	if(MON_AT(x, y)) {
 		struct permonst *mdat;

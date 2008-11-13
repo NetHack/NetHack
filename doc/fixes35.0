@@ -294,6 +294,7 @@ if polymorph causes a monster to drop items, they won't be used up via
 monsters who ate green slime corpses weren't turned into green slime
 "hand slip" while naming an object would never pick 'z' as a substitute letter
 hero would "gladly take off <armor>" for nymph or succubus even while asleep
+concealed mimic wasn't revealed if kicking attmpt yielded a clumsy miss
 
 
 Platform- and/or Interface-Specific Fixes
