@@ -1169,8 +1169,8 @@ boolean ask;
 			    switch (nkilled) {
 				case 2:  Sprintf(eos(buf)," (twice)");  break;
 				case 3:  Sprintf(eos(buf)," (thrice)");  break;
-				default: Sprintf(eos(buf)," (%d time%s)",
-						 nkilled, plur(nkilled));
+				default: Sprintf(eos(buf)," (%d times)",
+						 nkilled);
 					 break;
 			    }
 			}
