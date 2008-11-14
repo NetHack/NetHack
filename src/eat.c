@@ -2723,6 +2723,7 @@ boolean incr;
 				/* stop what you're doing, then faint */
 				stop_occupation();
 				You("faint from lack of food.");
+				if (!Levitation) selftouch("Falling, you");
 				incr_itimeout(&HDeaf, duration);
 				nomul(-duration);
 				nomovemsg = "You regain consciousness.";

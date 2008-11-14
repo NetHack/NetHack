@@ -413,6 +413,7 @@ streamline old ^X output and integrate it with enlightenment feedback;
 "killed by X" becomes "killed by a chameleon imitating X" when appropriate
 eating disenchanter corpses is now considered risky
 make '[' command more precise when poly'd hero has embedded dragon scales/mail
+fainting while wielding a cockatrice corpse will be fatal
 
 
 Platform- and/or Interface-Specific New Features
