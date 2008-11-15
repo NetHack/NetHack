@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wizard.c	3.5	2007/08/26	*/
+/*	SCCS Id: @(#)wizard.c	3.5	2008/11/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -431,7 +431,7 @@ nasty(mcast)
 
     /* some candidates may be created in groups, so simple count
        of non-null makemon() return is inadequate */
-    census = monster_census();
+    census = monster_census(FALSE);
 
     if(!rn2(10) && Inhell) {
 	count = msummon((struct monst *) 0);	/* summons like WoY */
@@ -472,7 +472,7 @@ nasty(mcast)
 	    }
     }
 
-    if (count) count = monster_census() - census;
+    if (count) count = monster_census(FALSE) - census;
     return count;
 }
 

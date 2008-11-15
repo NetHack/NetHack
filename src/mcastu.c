@@ -537,46 +537,66 @@ int spellnum;
 	struct permonst *pm = mkclass(S_ANT,0);
 	struct monst *mtmp2 = (struct monst *)0;
 	char let = (pm ? S_ANT : S_SNAKE);
-	boolean success;
-	int i;
+	boolean success = FALSE, seecaster;
+	int i, quan, oldseen, newseen;
 	coord bypos;
-	int quan;
+	const char *fmt;
 
+	oldseen = monster_census(TRUE);
 	quan = (mtmp->m_lev < 2) ? 1 : rnd((int)mtmp->m_lev / 2);
 	if (quan < 3) quan = 3;
-	success = pm ? TRUE : FALSE;
 	for (i = 0; i <= quan; i++) {
 	    if (!enexto(&bypos, mtmp->mux, mtmp->muy, mtmp->data))
 		break;
 	    if ((pm = mkclass(let,0)) != 0 &&
-		    (mtmp2 = makemon(pm, bypos.x, bypos.y, NO_MM_FLAGS)) != 0) {
+		    (mtmp2 = makemon(pm, bypos.x, bypos.y, MM_ANGRY)) != 0) {
 		success = TRUE;
 		mtmp2->msleeping = mtmp2->mpeaceful = mtmp2->mtame = 0;
 		set_malign(mtmp2);
 	    }
 	}
-	/* Not quite right:
-         * -- message doesn't always make sense for unseen caster (particularly
-	 *    the first message)
-         * -- message assumes plural monsters summoned (non-plural should be
-         *    very rare, unlike in nasty())
-         * -- message assumes plural monsters seen
-         */
-	if (!success)
-	    pline("%s casts at a clump of sticks, but nothing happens.",
-		Monnam(mtmp));
+	newseen = monster_census(TRUE);
+
+	/* not canspotmon(), which includes unseen things sensed via warning */
+	seecaster = canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters;
+
+	fmt = 0;
+	if (!seecaster) {
+	    char *arg;	/* [not const: upstart(N==1 ? an() : makeplural())] */
+	    const char *what = (let == S_SNAKE) ? "snake" : "insect";
+
+	    if (newseen <= oldseen || Unaware) {
+		/* unseen caster fails or summons unseen critters,
+		   or unconscious hero ("You dream that you hear...") */
+		You_hear("someone summoning %s.", makeplural(what));
+	    } else {
+		/* unseen caster summoned seen critter(s) */
+		arg = (newseen == oldseen + 1) ? an(what) : makeplural(what);
+		if (!Deaf)
+		    You_hear("someone summoning something, and %s %s.",
+			     arg, vtense(arg, "appear"));
+		else
+		    pline("%s %s.", upstart(arg), vtense(arg, "appear"));
+	    }
+
+	/* seen caster, possibly producing unseen--or just one--critters;
+	   hero is told what the caster is doing and doesn't necessarily
+	   observe complete accuracy of that caster's results (in other
+	   words, no need to fuss with visibility or singularization;
+	   player is told what's happening even if hero is unconscious) */
+	} else if (!success)
+	    fmt = "%s casts at a clump of sticks, but nothing happens.";
 	else if (let == S_SNAKE)
-	    pline("%s transforms a clump of sticks into snakes!",
-		Monnam(mtmp));
+	    fmt = "%s transforms a clump of sticks into snakes!";
 	else if (Invisible && !perceives(mtmp->data) &&
 				(mtmp->mux != u.ux || mtmp->muy != u.uy))
-	    pline("%s summons insects around a spot near you!",
-		Monnam(mtmp));
+	    fmt = "%s summons insects around a spot near you!";
 	else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-	    pline("%s summons insects around your displaced image!",
-		Monnam(mtmp));
+	    fmt = "%s summons insects around your displaced image!";
 	else
-	    pline("%s summons insects!", Monnam(mtmp));
+	    fmt = "%s summons insects!";
+	if (fmt) pline(fmt, Monnam(mtmp));
+
 	dmg = 0;
 	break;
       }

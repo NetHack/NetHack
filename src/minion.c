@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)minion.c	3.5	2007/04/15	*/
+/*	SCCS Id: @(#)minion.c	3.5	2008/11/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -28,13 +28,15 @@ struct monst *mtmp;
 
 /* count the number of monsters on the level */
 int
-monster_census()
+monster_census(spotted)
+boolean spotted;	/* seen|sensed vs all */
 {
     struct monst *mtmp;
     int count = 0;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 	if (DEADMONSTER(mtmp)) continue;
+	if (spotted && !canspotmon(mtmp)) continue;
 	++count;
     }
     return count;
@@ -108,7 +110,7 @@ struct monst *mon;
 
 	/* some candidates can generate a group of monsters, so simple
 	   count of non-null makemon() result is not sufficient */
-	census = monster_census();
+	census = monster_census(FALSE);
 
 	while (cnt > 0) {
 	    mtmp = makemon(&mons[dtype], u.ux, u.uy, MM_EMIN);
@@ -128,7 +130,7 @@ struct monst *mon;
 	}
 
 	/* how many monsters exist now compared to before? */
-	if (result) result = monster_census() - census;
+	if (result) result = monster_census(FALSE) - census;
 
 	return result;
 }
