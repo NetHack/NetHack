@@ -1481,6 +1481,7 @@ STATIC_OVL void
 lifesaved_monster(mtmp)
 struct monst *mtmp;
 {
+	boolean surviver;
 	struct obj *lifesave = mlifesaver(mtmp);
 
 	if (lifesave) {
@@ -1504,19 +1505,21 @@ struct monst *mtmp;
 		    pline_The("medallion crumbles to dust!");
 		}
 		m_useup(mtmp, lifesave);
+
+		surviver = !(mvitals[monsndx(mtmp->data)].mvflags & G_GENOD);
 		mtmp->mcanmove = 1;
 		mtmp->mfrozen = 0;
 		if (mtmp->mtame && !mtmp->isminion) {
-			wary_dog(mtmp, FALSE);
+		    wary_dog(mtmp, !surviver);
 		}
 		if (mtmp->mhpmax <= 0) mtmp->mhpmax = 10;
 		mtmp->mhp = mtmp->mhpmax;
-		if (mvitals[monsndx(mtmp->data)].mvflags & G_GENOD) {
-			if (cansee(mtmp->mx, mtmp->my))
-			    pline("Unfortunately %s is still genocided...",
-				mon_nam(mtmp));
-		} else
-			return;
+		if (surviver) return;
+
+		/* genocided monster can't be life-saved */
+		if (cansee(mtmp->mx, mtmp->my))
+		    pline("Unfortunately, %s is still genocided...",
+			  mon_nam(mtmp));
 	}
 	mtmp->mhp = 0;
 }

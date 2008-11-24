@@ -922,19 +922,23 @@ boolean was_dead;
 	}
     } else {
 	/* chance it goes wild anyway - Pet Semetary */
-	if (!rn2(mtmp->mtame)) {
-	    mtmp->mpeaceful = mtmp->mtame = 0;
-	}
+	mtmp->mtame = rn2(mtmp->mtame + 1);
+	if (!mtmp->mtame) mtmp->mpeaceful = rn2(2);
     }
+
     if (!mtmp->mtame) {
+	if (!quietly && canspotmon(mtmp))
+	    pline("%s %s.", Monnam(mtmp),
+		  mtmp->mpeaceful ? "is no longer tame" : "has become feral");
 	newsym(mtmp->mx, mtmp->my);
 	/* a life-saved monster might be leashed;
 	   don't leave it that way if it's no longer tame */
 	if (mtmp->mleashed) m_unleash(mtmp, TRUE);
-    }
-
-    /* if its still a pet, start a clean pet-slate now */
-    if (edog && mtmp->mtame) {
+#ifdef STEED
+	if (mtmp == u.usteed) dismount_steed(DISMOUNT_THROWN);
+#endif
+    } else if (edog) {
+	/* it's still a pet; start a clean pet-slate now */
 	edog->revivals++;
 	edog->killed_by_u = 0;
 	edog->abuse = 0;
