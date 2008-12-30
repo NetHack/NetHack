@@ -526,15 +526,15 @@ exerchk()
 			(mod_val > 0) ? "must have been" : "haven't been",
 			exertext[i][(mod_val > 0) ? 0 : 1]);
 		}
+ nextattrib:
+		/* this used to be ``AEXE(i) /= 2'' but that would produce
+		   platform-dependent rounding/truncation for negative vals */
+		AEXE(i) = (abs(ax) / 2) * mod_val;
 	    }
 	    context.next_attrib_check += rn1(200,800);
 #ifdef DEBUG
 	    pline("exerchk: next check at %ld.", context.next_attrib_check);
 #endif
- nextattrib:
-	    /* this used to be ``AEXE(i) /= 2'' but that would produce
-	       platform-dependent rounding/truncation for negative values */
-	    AEXE(i) = (abs(ax) / 2) * mod_val;
 	}
 }
 
