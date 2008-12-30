@@ -1,6 +1,6 @@
 typedef unsigned char pixval;
 
-typedef struct {
+typedef struct pixel_t {
     pixval r, g, b;
 } pixel;
 

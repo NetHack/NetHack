@@ -2399,7 +2399,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    if (in_sight) seetrap(trap);
 			    if ((mtmp->mhp -= dmgval2) <= 0)
 				monkilled(mtmp, in_sight ?
-				    "compression from an anti-magic field" : 0,
+				    "compression from an anti-magic field" : (const char *)0,
 					  -AD_MAGM);
 			    if (mtmp->mhp <= 0) trapkilled = TRUE;
 			    if (see_it) newsym(trap->tx, trap->ty);

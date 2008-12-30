@@ -440,7 +440,7 @@ struct obj *otmp;
 
 	/* XXX replace with more general substitution code and add local
 	 * contact message.  Also use DEVTEAM_URL */
-    if(junk[0]) == NULL){
+    if(junk[0] == NULL){
 #define BUGS_FORMAT "Report bugs to %s."
       junk[0] = (char *)alloc(strlen(BUGS_FORMAT) + strlen(DEVTEAM_EMAIL));
       sprintf(junk[0], DEVTEAM_EMAIL);
