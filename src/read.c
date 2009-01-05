@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)read.c	3.5	2008/02/07	*/
+/*	SCCS Id: @(#)read.c	3.5	2009/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1325,6 +1325,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		    pline_The("water around you vaporizes violently!");
 		} else {
 		    pline_The("scroll erupts in a tower of flame!");
+		    iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
 		    burn_away_slime();
 		}
 		explode(u.ux, u.uy, 11, (2*(rn1(3, 3) + 2 * cval) + 1)/3,

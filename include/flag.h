@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)flag.h	3.5	2007/04/26	*/
+/*	SCCS Id: @(#)flag.h	3.5	2009/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -324,6 +324,8 @@ extern NEARDATA struct instance_flags iflags;
 /* last_msg values */
 #define PLNMSG_UNKNOWN		0	/* arbitrary */
 #define PLNMSG_ONE_ITEM_HERE	1	/* "you see <single item> here" */
+#define PLNMSG_TOWER_OF_FLAME	2	/* scroll of fire */
+#define PLNMSG_CAUGHT_IN_EXPLOSION 3	/* explode() feedback */
 
 /* runmode options */
 #define RUN_TPORT	0	/* don't update display until movement stops */

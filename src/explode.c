@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)explode.c	3.5	2007/04/27	*/
+/*	SCCS Id: @(#)explode.c	3.5	2009/01/04	*/
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -361,6 +361,7 @@ int expltype;
 			str = hallu_buf;
 		    }
 		    You("are caught in the %s!", str);
+		    iflags.last_msg = PLNMSG_CAUGHT_IN_EXPLOSION;
 		}
 		/* do property damage first, in case we end up leaving bones */
 		if (adtyp == AD_FIRE) burn_away_slime();
@@ -400,14 +401,17 @@ int expltype;
 			    killer.format = NO_KILLER_PREFIX;
 			    Sprintf(killer.name, "caught %sself in %s own %s",
 				    uhim(), uhis(), str);
-			} else if (!strncmpi(str,"tower of flame", 8) ||
-				   !strncmpi(str,"fireball", 8)) {
-			    killer.format = KILLED_BY_AN;
-			    Strcpy(killer.name, str);
 			} else {
-			    killer.format = KILLED_BY;
+			    killer.format = (!strcmpi(str, "tower of flame") ||
+					     !strcmpi(str, "fireball")) ?
+					    KILLED_BY_AN : KILLED_BY;
 			    Strcpy(killer.name, str);
 			}
+			if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION ||
+				iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
+			    pline("It is fatal.");
+			else
+			    pline_The("%s is fatal.", str);
 			/* Known BUG: BURNING suppresses corpse in bones data,
 			   but done does not handle killer reason correctly */
 			done((adtyp == AD_FIRE) ? BURNING : DIED);

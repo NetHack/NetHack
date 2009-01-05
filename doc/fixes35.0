@@ -296,6 +296,8 @@ monsters who ate green slime corpses weren't turned into green slime
 hero would "gladly take off <armor>" for nymph or succubus even while asleep
 concealed mimic wasn't revealed if kicking attmpt yielded a clumsy miss
 too accurate feedback given to a blinded hero when a monster summons insects
+message sequencing for fatal explosions was confusing if feedback was given
+	for carried items being destroyed
 
 
 Platform- and/or Interface-Specific Fixes
