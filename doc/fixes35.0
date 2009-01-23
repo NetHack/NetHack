@@ -298,6 +298,8 @@ concealed mimic wasn't revealed if kicking attmpt yielded a clumsy miss
 too accurate feedback given to a blinded hero when a monster summons insects
 message sequencing for fatal explosions was confusing if feedback was given
 	for carried items being destroyed
+when dipping something in holy/unholy water, only learn its new bless/curse
+	state if hero sees it glow
 
 
 Platform- and/or Interface-Specific Fixes

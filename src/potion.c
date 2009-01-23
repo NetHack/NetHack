@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)potion.c	3.5	2008/01/19	*/
+/*	SCCS Id: @(#)potion.c	3.5	2009/01/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,6 +12,8 @@ static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
 STATIC_DCL long FDECL(itimeout, (long));
 STATIC_DCL long FDECL(itimeout_incr, (long,int));
 STATIC_DCL void NDECL(ghost_from_bottle);
+STATIC_DCL boolean FDECL(H2Opotion_dip, (struct obj *,struct obj *,
+					 BOOLEAN_P,const char *));
 STATIC_DCL short FDECL(mixtype, (struct obj *,struct obj *));
 
 /* force `val' to be within valid range for intrinsic timeout value */
@@ -1032,6 +1034,85 @@ bottlename()
 	return bottlenames[rn2(SIZE(bottlenames))];
 }
 
+/* handle item dipped into water potion or steed saddle splashed by same */
+STATIC_OVL boolean
+H2Opotion_dip(potion, targobj, useeit, objphrase)
+struct obj *potion, *targobj;
+boolean useeit;
+const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
+{
+    void FDECL((*func), (OBJ_P)) = 0;
+    const char *how = 0, *glowcolor = 0;
+#define COST_alter (-2)
+#define COST_none  (-1)
+    int costchange = COST_none;
+    boolean altfmt = FALSE, res = FALSE;
+
+    if (!potion || potion->otyp != POT_WATER) return FALSE;
+
+    if (potion->blessed) {
+	how = "softly glow";
+	if (targobj->cursed) {
+	    func = uncurse;
+	    glowcolor = NH_AMBER;
+	    costchange = COST_UNCURS;
+	} else if (!targobj->blessed) {
+	    func = bless;
+	    glowcolor = NH_LIGHT_BLUE;
+	    costchange = COST_alter;
+	    altfmt = TRUE;	/* "with a <color> aura" */
+	}
+    } else if (potion->cursed) {
+	how = "glow";
+	if (targobj->blessed) {
+	    func = unbless;
+	    glowcolor = "brown";
+	    costchange = COST_UNBLSS;
+	} else if (!targobj->cursed) {
+	    func = curse;
+	    glowcolor = NH_BLACK;
+	    costchange = COST_alter;
+	    altfmt = TRUE;
+	}
+    } else {
+	/* dipping into uncursed water; carried() check skips steed saddle */
+	if (carried(targobj)) {
+	    if (get_wet(targobj))
+		res = TRUE;
+	}
+    }
+    if (func) {
+	/* give feedback before altering the target object;
+	   this used to set obj->bknown even when not seeing
+	   the effect; now hero has to see the glow, and bknown
+	   is cleared instead of set if perception is distorted */
+	if (useeit) {
+	    glowcolor = hcolor(glowcolor);
+	    if (altfmt)
+		pline("%s with %s aura.", objphrase, an(glowcolor));
+	    else
+		pline("%s %s.", objphrase, glowcolor);
+	    targobj->bknown = !Hallucination;
+	}
+	/* potions of water are the only shop goods whose price depends
+	   on their curse/bless state */
+	if (targobj->unpaid && targobj->otyp == POT_WATER) {
+	    if (costchange == COST_alter)
+		/* added blessing or cursing; update shop
+		   bill to reflect item's new higher price */
+		alter_cost(targobj, 0L);
+	    else if (costchange != COST_none)
+		/* removed blessing or cursing; you
+		   degraded it, now you'll have to buy it... */
+		costly_alteration(targobj, costchange);
+	}
+	/* finally, change curse/bless state */
+	(*func)(targobj);
+	res = TRUE;
+    }
+    return res;
+}
+
 void
 potionhit(mon, obj, your_fault)
 register struct monst *mon;
@@ -1124,69 +1205,25 @@ boolean your_fault;
 	}
 #ifdef STEED
     } else if (hit_saddle && saddle) {
-	const char *tmp;
-	char buf[BUFSZ];
-	char *mnam = x_monnam(mon, ARTICLE_THE, (char *)0,
-		    		(SUPPRESS_IT|SUPPRESS_SADDLE), FALSE);
+	char *mnam, buf[BUFSZ], saddle_glows[BUFSZ];
 	boolean affected = FALSE;
 	boolean useeit = !Blind && canseemon(mon) && cansee(mon->mx,mon->my);
 
+	mnam = x_monnam(mon, ARTICLE_THE, (char *)0,
+			(SUPPRESS_IT|SUPPRESS_SADDLE), FALSE);
 	Sprintf(buf, "%s", upstart(s_suffix(mnam)));
 
 	switch (obj->otyp) {
 	case POT_WATER:
-		if (obj->blessed) {
-			if (saddle->cursed) {
-				if (useeit)
-				    pline("%s %s %s.",
-					  buf,
-					  aobjnam(saddle, "softly glow"),
-					  hcolor(NH_AMBER));
-				uncurse(saddle);
-				saddle->bknown=1;
-				affected = TRUE;
-			} else if(!saddle->blessed) {
-				if (useeit) {
-				    tmp = hcolor(NH_LIGHT_BLUE);
-				    pline("%s %s with a%s %s aura.",
-					  buf,
-					  aobjnam(saddle, "softly glow"),
-					  index(vowels, *tmp) ? "n" : "", tmp);
-				}
-				bless(saddle);
-				saddle->bknown=1;
-				affected = TRUE;
-			}
-		} else if (obj->cursed) {
-			if (saddle->blessed) {
-				if (useeit)
-				    pline("%s %s %s.",
-					  buf,
-					  aobjnam(saddle, "glow"),
-					  hcolor((const char *)"brown"));
-				unbless(saddle);
-				saddle->bknown=1;
-				affected = TRUE;
-			} else if(!saddle->cursed) {
-				if (useeit) {
-				    tmp = hcolor(NH_BLACK);
-				    pline("%s %s with a%s %s aura.",
-					  buf,
-					  aobjnam(saddle, "glow"),
-					  index(vowels, *tmp) ? "n" : "", tmp);
-				}
-				curse(saddle);
-				saddle->bknown=1;
-				affected = TRUE;
-			}
-		}
+		Sprintf(saddle_glows, "%s %s", buf, aobjnam(saddle, "glow"));
+		affected = H2Opotion_dip(obj, saddle, useeit, saddle_glows);
 		break;
 	case POT_POLYMORPH:
 		/* Do we allow the saddle to polymorph? */
 		break;
 	}
-	if (useeit && !affected) pline("%s %s wet.",
-					buf, aobjnam(saddle,"get"));
+	if (useeit && !affected)
+	    pline("%s %s wet.", buf, aobjnam(saddle, "get"));
 #endif
     } else {
 	boolean angermon = TRUE;
@@ -1739,64 +1776,11 @@ dodip()
 	}
 	potion->in_use = TRUE;		/* assume it will be used up */
 	if(potion->otyp == POT_WATER) {
-		boolean useeit = !Blind || (obj == ublindf && Blindfolded_only);
+	    boolean useeit = !Blind || (obj == ublindf && Blindfolded_only);
+	    const char *obj_glows = Yobjnam2(obj, "glow");
 
-		if (potion->blessed) {
-			if (obj->cursed) {
-				if (useeit)
-				    pline("%s %s.",
-					  Yobjnam2(obj, "softly glow"),
-					  hcolor(NH_AMBER));
-				obj->bknown = 1;
-				if (obj->otyp == POT_WATER && obj->unpaid)
-				    costly_alteration(obj, COST_UNCURS);
-				uncurse(obj);
-	poof:
-				if(!(objects[potion->otyp].oc_name_known) &&
-				   !(objects[potion->otyp].oc_uname))
-					docall(potion);
-				useup(potion);
-				return(1);
-			} else if(!obj->blessed) {
-				if (useeit) {
-				    tmp = hcolor(NH_LIGHT_BLUE);
-				    pline("%s with a%s %s aura.",
-					  Yobjnam2(obj, "softly glow"),
-					  index(vowels, *tmp) ? "n" : "", tmp);
-				}
-				obj->bknown = 1;
-				bless(obj);
-				if (obj->otyp == POT_WATER && obj->unpaid)
-				    alter_cost(obj, 0L);
-				goto poof;
-			}
-		} else if (potion->cursed) {
-			if (obj->blessed) {
-				if (useeit)
-				    pline("%s %s.",
-					  Yobjnam2(obj, "glow"),
-					  hcolor((const char *)"brown"));
-				obj->bknown = 1;
-				if (obj->otyp == POT_WATER && obj->unpaid)
-				    costly_alteration(obj, COST_UNBLSS);
-				unbless(obj);
-				goto poof;
-			} else if(!obj->cursed) {
-				if (useeit) {
-				    tmp = hcolor(NH_BLACK);
-				    pline("%s with a%s %s aura.",
-					  Yobjnam2(obj, "glow"),
-					  index(vowels, *tmp) ? "n" : "", tmp);
-				}
-				obj->bknown = 1;
-				curse(obj);
-				if (obj->otyp == POT_WATER && obj->unpaid)
-				    alter_cost(obj, 0L);
-				goto poof;
-			}
-		} else
-			if (get_wet(obj))
-			    goto poof;
+	    if (H2Opotion_dip(potion, obj, useeit, obj_glows))
+		goto poof;
 	} else if (obj->otyp == POT_POLYMORPH ||
 		potion->otyp == POT_POLYMORPH) {
 	    /* some objects can't be polymorphed */
@@ -2097,6 +2081,13 @@ dodip()
 
 	pline("Interesting...");
 	return(1);
+
+ poof:
+	if (!objects[potion->otyp].oc_name_known &&
+		!objects[potion->otyp].oc_uname)
+	    docall(potion);
+	useup(potion);
+	return 1;
 }
 
 /* *monp grants a wish and then leaves the game */
