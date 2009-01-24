@@ -301,6 +301,7 @@ message sequencing for fatal explosions was confusing if feedback was given
 when dipping something in holy/unholy water, only learn its new bless/curse
 	state if hero sees it glow
 describe lit Sunsword as shining rather than glowing
+prevent poly'd shopkeepers from taking on forms that can't handle objects
 
 
 Platform- and/or Interface-Specific Fixes

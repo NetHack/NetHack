@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mon.c	3.5	2008/10/20	*/
+/*	SCCS Id: @(#)mon.c	3.5	2009/01/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,6 +22,8 @@ STATIC_DCL int NDECL(pick_animal);
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 STATIC_DCL void FDECL(dealloc_mextra, (struct mextra *));
 STATIC_DCL int FDECL(pickvampshape, (struct monst *));
+STATIC_DCL boolean FDECL(isspecmon, (struct monst *));
+STATIC_DCL boolean FDECL(validspecmon, (struct monst *,int));
 #ifdef WIZARD
 STATIC_DCL boolean FDECL(validvamp, (struct monst *,int *,int));
 #endif
@@ -2583,6 +2585,32 @@ struct monst *mon;
 	return mndx;
 }
 
+/* nonshapechangers who warrant special polymorph handling */
+STATIC_OVL boolean
+isspecmon(mon)
+struct monst *mon;
+{
+	return (mon->isshk || mon->ispriest || mon->isgd ||
+		mon->m_id == quest_status.leader_m_id);
+}
+
+/* restrict certain special monsters (shopkeepers, aligned priests,
+   vault guards) to forms that allow them to behave sensibly (catching
+   gold, speaking?) so that they don't need too much extra code */
+STATIC_OVL boolean
+validspecmon(mon, mndx)
+struct monst *mon;
+int mndx;
+{
+	if (isspecmon(mon) && mndx >= LOW_PM) {
+	    struct permonst *ptr = &mons[mndx];
+
+	    if (notake(ptr) || nohands(ptr) || !has_head(ptr)) return FALSE;
+	    /* [should we check ptr->msound here too?] */
+	}
+	return TRUE;	/* potential new form is ok (or still NON_PM) */
+}
+
 #ifdef WIZARD
 /* prevent wizard mode user from specifying invalid vampshifter shape */
 static boolean
@@ -2590,7 +2618,8 @@ validvamp(mon, mndx_p, monclass)
 struct monst *mon;
 int *mndx_p, monclass;
 {
-	if (!is_vampshifter(mon)) return TRUE;	/* simplify caller's usage */
+	/* simplify caller's usage */
+	if (!is_vampshifter(mon)) return validspecmon(mon, *mndx_p);
 
 	if (*mndx_p == PM_VAMPIRE || *mndx_p == PM_VAMPIRE_LORD ||
 		*mndx_p == PM_VLAD_THE_IMPALER) {
@@ -2696,13 +2725,20 @@ struct monst *mon;
 		if (mndx >= LOW_PM && validvamp(mon, &mndx, monclass)) break;
 
 		pline("It can't become that.");
+		mndx = NON_PM;
 	    } while (--tryct > 0);
 	    if (!tryct) pline(thats_enough_tries);
 	    if (is_vampshifter(mon) && !validvamp(mon, &mndx, monclass))
 		mndx = pickvampshape(mon);	/* don't resort to arbitrary */
 	}
 #endif /*WIZARD*/
-	if (mndx == NON_PM) mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
+
+	if (mndx == NON_PM) {
+	    tryct = 50;
+	    do {
+		mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
+	    } while (--tryct > 0 && !validspecmon(mon, mndx));
+	}
 	return mndx;
 }
 
