@@ -1,10 +1,11 @@
-/*	SCCS Id: @(#)mkobj.c	3.5	2008/07/20	*/
+/*	SCCS Id: @(#)mkobj.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
 STATIC_DCL void FDECL(mkbox_cnts,(struct obj *));
+STATIC_DCL void FDECL(maybe_adjust_light, (struct obj *,int));
 STATIC_DCL void FDECL(obj_timer_checks,(struct obj *, XCHAR_P, XCHAR_P, int));
 STATIC_DCL void FDECL(container_weight, (struct obj *));
 STATIC_DCL struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
@@ -976,13 +977,61 @@ start_corpse_timeout(body)
 	(void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
 }
 
+STATIC_OVL void
+maybe_adjust_light(obj, old_range)
+struct obj *obj;
+int old_range;
+{
+	char buf[BUFSZ];
+	xchar ox, oy;
+	int new_range = arti_light_radius(obj),
+	    delta = new_range - old_range;
+
+	/* radius of light emitting artifact varies by curse/bless state
+	   so will change after blessing or cursing */
+	if (delta) {
+	    obj_adjust_light_radius(obj, new_range);
+	    /* simplifying assumptions:  hero is wielding this object;
+	       artifacts have to be in use to emit light and monsters'
+	       gear won't change bless or curse state */
+	    if (!Blind && get_obj_location(obj, &ox, &oy, 0)) {
+		*buf = '\0';
+		if (iflags.last_msg == PLNMSG_OBJ_GLOWS)
+		    /* we just saw "The <obj> glows <color>." from dipping */
+		    Strcpy(buf, (obj->quan == 1L) ? "It" : "They");
+		else if (carried(obj) || cansee(ox, oy))
+		    Strcpy(buf, Yname2(obj));
+		if (*buf) {
+		    /* initial activation says "dimly" if cursed,
+		       "brightly" if uncursed, and "brilliantly" if blessed;
+		       when changing intensity, using "less brightly" is
+		       straightforward for dimming, but we need "brighter"
+		       rather than "more brightly" for brightening; ugh */
+		    pline("%s %s %s%s.",
+			  buf, otense(obj, "shine"),
+			  (abs(delta) > 1) ? "much " : "",
+			  (delta > 0) ? "brighter" : "less brightly");
+		}
+	    }
+	}
+}
+
+/*
+ *	bless(), curse(), unbless(), uncurse() -- any relevant message
+ *	about glowing amber/black/&c should be delivered prior to calling
+ *	these routines to make the actual curse/bless state change.
+ */
+
 void
 bless(otmp)
 register struct obj *otmp;
 {
+	int old_light = 0;
+
 #ifdef GOLDOBJ
 	if (otmp->oclass == COIN_CLASS) return;
 #endif
+	if (otmp->lamplit) old_light = arti_light_radius(otmp);
 	otmp->cursed = 0;
 	otmp->blessed = 1;
 	if (carried(otmp) && confers_luck(otmp))
@@ -991,6 +1040,7 @@ register struct obj *otmp;
 	    otmp->owt = weight(otmp);
 	else if (otmp->otyp == FIGURINE && otmp->timed)
 		(void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
+	if (otmp->lamplit) maybe_adjust_light(otmp, old_light);
 	return;
 }
 
@@ -998,20 +1048,27 @@ void
 unbless(otmp)
 register struct obj *otmp;
 {
+	int old_light = 0;
+
+	if (otmp->lamplit) old_light = arti_light_radius(otmp);
 	otmp->blessed = 0;
 	if (carried(otmp) && confers_luck(otmp))
 	    set_moreluck();
 	else if (otmp->otyp == BAG_OF_HOLDING)
 	    otmp->owt = weight(otmp);
+	if (otmp->lamplit) maybe_adjust_light(otmp, old_light);
 }
 
 void
 curse(otmp)
 register struct obj *otmp;
 {
+	int old_light = 0;
+
 #ifdef GOLDOBJ
 	if (otmp->oclass == COIN_CLASS) return;
 #endif
+	if (otmp->lamplit) old_light = arti_light_radius(otmp);
 	otmp->blessed = 0;
 	otmp->cursed = 1;
 	/* welded two-handed weapon interferes with some armor removal */
@@ -1031,6 +1088,7 @@ register struct obj *otmp;
 		    && (carried(otmp) || mcarried(otmp)))
 			attach_fig_transform_timeout(otmp);
 	}
+	if (otmp->lamplit) maybe_adjust_light(otmp, old_light);
 	return;
 }
 
@@ -1038,6 +1096,9 @@ void
 uncurse(otmp)
 register struct obj *otmp;
 {
+	int old_light = 0;
+
+	if (otmp->lamplit) old_light = arti_light_radius(otmp);
 	otmp->cursed = 0;
 	if (carried(otmp) && confers_luck(otmp))
 	    set_moreluck();
@@ -1045,6 +1106,7 @@ register struct obj *otmp;
 	    otmp->owt = weight(otmp);
 	else if (otmp->otyp == FIGURINE && otmp->timed)
 	    (void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
+	if (otmp->lamplit) maybe_adjust_light(otmp, old_light);
 	return;
 }
 

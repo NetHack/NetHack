@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)weapon.c	3.5	2008/05/07	*/
+/*	SCCS Id: @(#)weapon.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -706,9 +706,9 @@ register struct monst *mon;
 		if (artifact_light(obj) && !obj->lamplit) {
 		    begin_burn(obj, FALSE);
 		    if (canseemon(mon))
-			pline("%s brilliantly in %s %s!",
-			    Tobjnam(obj, "glow"), 
-			    s_suffix(mon_nam(mon)), mbodypart(mon,HAND));
+			pline("%s %s in %s %s!", Tobjnam(obj, "shine"),
+			      arti_light_description(obj),
+			      s_suffix(mon_nam(mon)), mbodypart(mon,HAND));
 		}
 		obj->owornmask = W_WEP;
 		return 1;
@@ -1352,7 +1352,7 @@ register struct obj *obj;
     if (artifact_light(obj) && obj->lamplit) {
 	end_burn(obj, FALSE);
 	if (canseemon(mon))
-	    pline("%s in %s %s %s glowing.", The(xname(obj)),
+	    pline("%s in %s %s %s shining.", The(xname(obj)),
 		  s_suffix(mon_nam(mon)), mbodypart(mon,HAND),
 		  otense(obj, "stop"));
     }

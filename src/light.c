@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)light.c	3.5	2006/07/08	*/
+/*	SCCS Id: @(#)light.c	3.5	2009/01/20	*/
 /* Copyright (c) Dean Luick, 1994					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 
@@ -538,6 +538,23 @@ struct obj *src, *dest;
 	}
 }
 
+/* light source `obj' is being made brighter or dimmer */
+void
+obj_adjust_light_radius(obj, new_radius)
+struct obj *obj;
+int new_radius;
+{
+    light_source *ls;
+
+    for (ls = light_base; ls; ls = ls->next)
+	if (ls->type == LS_OBJECT && ls->id.a_obj == obj) {
+	    if (new_radius != ls->range) vision_full_recalc = 1;
+	    ls->range = new_radius;
+	    return;
+	}
+    impossible("obj_adjust_light_radius: can't find %s", xname(obj));
+}
+
 /* Candlelight is proportional to the number of candles;
    minimum range is 2 rather than 1 for playability. */
 int
@@ -577,6 +594,41 @@ struct obj *obj;
 	radius = 3;		/* lamp's value */
     }
     return radius;
+}
+
+/* light emitting artifact's range depends upon its curse/bless state */
+int
+arti_light_radius(obj)
+struct obj *obj;
+{
+    /*
+     * Used by begin_burn() when setting up a new light source
+     * (obj->lamplit will already be set by this point) and
+     * also by bless()/unbless()/uncurse()/curse() to decide
+     * whether to call obj_adjust_light_radius().
+     */
+
+    /* sanity check [simplifies usage by bless()/curse()/&c] */
+    if (!obj->lamplit || !artifact_light(obj)) return 0;
+
+    /* cursed radius of 1 is not noticeable for an item that's
+       carried by the hero but is if it's carried by a monster
+       or left lit on the floor (not applicable for Sunsword) */
+    return (obj->blessed ? 3 : !obj->cursed ? 2 : 1);
+}
+
+/* adverb describing lit artifact's light; depends on curse/bless state */
+const char *
+arti_light_description(obj)
+struct obj *obj;
+{
+    switch (arti_light_radius(obj)) {
+    case 3:  return "brilliantly";	/* blessed */
+    case 2:  return "brightly";		/* uncursed */
+    case 1:  return "dimly";		/* cursed */
+    default: break;
+    }
+    return "strangely";
 }
 
 #ifdef WIZARD

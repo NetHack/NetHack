@@ -326,6 +326,7 @@ extern NEARDATA struct instance_flags iflags;
 #define PLNMSG_ONE_ITEM_HERE	1	/* "you see <single item> here" */
 #define PLNMSG_TOWER_OF_FLAME	2	/* scroll of fire */
 #define PLNMSG_CAUGHT_IN_EXPLOSION 3	/* explode() feedback */
+#define PLNMSG_OBJ_GLOWS	4	/* "the <obj> glows <color>" */
 
 /* runmode options */
 #define RUN_TPORT	0	/* don't update display until movement stops */

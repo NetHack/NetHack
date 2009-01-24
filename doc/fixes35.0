@@ -300,6 +300,7 @@ message sequencing for fatal explosions was confusing if feedback was given
 	for carried items being destroyed
 when dipping something in holy/unholy water, only learn its new bless/curse
 	state if hero sees it glow
+describe lit Sunsword as shining rather than glowing
 
 
 Platform- and/or Interface-Specific Fixes
@@ -419,6 +420,7 @@ streamline old ^X output and integrate it with enlightenment feedback;
 eating disenchanter corpses is now considered risky
 make '[' command more precise when poly'd hero has embedded dragon scales/mail
 fainting while wielding a cockatrice corpse will be fatal
+Sunsword's light radius depends on its curse/bless state
 
 
 Platform- and/or Interface-Specific New Features

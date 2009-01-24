@@ -1092,6 +1092,7 @@ const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
 		pline("%s with %s aura.", objphrase, an(glowcolor));
 	    else
 		pline("%s %s.", objphrase, glowcolor);
+	    iflags.last_msg = PLNMSG_OBJ_GLOWS;
 	    targobj->bknown = !Hallucination;
 	}
 	/* potions of water are the only shop goods whose price depends

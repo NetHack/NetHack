@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pray.c	3.5	2008/10/09	*/
+/*	SCCS Id: @(#)pray.c	3.5	2009/01/23	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -431,13 +431,14 @@ decurse:
 			impossible("fix_worst_trouble: nothing to uncurse.");
 			return;
 		    }
-		    uncurse(otmp);
 		    if (!Blind || (otmp == ublindf && Blindfolded_only)) {
 			pline("%s %s.", what ? what :
 				(const char *)Yobjnam2(otmp, "softly glow"),
 			      hcolor(NH_AMBER));
+			iflags.last_msg = PLNMSG_OBJ_GLOWS;
 			otmp->bknown = TRUE;
 		    }
+		    uncurse(otmp);
 		    update_inventory();
 		    break;
 	    case TROUBLE_POISONED:
@@ -480,12 +481,12 @@ decurse:
 #ifdef STEED
 	    case TROUBLE_SADDLE:
 		    otmp = which_armor(u.usteed, W_SADDLE);
-		    uncurse(otmp);
 		    if (!Blind) {
 			pline("%s %s.", Yobjnam2(otmp, "softly glow"),
 			      hcolor(NH_AMBER));
 			otmp->bknown = TRUE;
 		    }
+		    uncurse(otmp);
 		    break;
 #endif
 	}
@@ -908,23 +909,27 @@ pleased(g_align)
 			    otense(uwep, "are"));
 
 		if (uwep->cursed) {
-		    uncurse(uwep);
-		    uwep->bknown = TRUE;
-		    if (!Blind)
+		    if (!Blind) {
 			pline("%s %s%s.", Yobjnam2(uwep, "softly glow"),
 			      hcolor(NH_AMBER), repair_buf);
-		    else You_feel("the power of %s over %s.",
-				  u_gname(), yname(uwep));
+			iflags.last_msg = PLNMSG_OBJ_GLOWS;
+		    } else
+			You_feel("the power of %s over %s.",
+				 u_gname(), yname(uwep));
+		    uncurse(uwep);
+		    uwep->bknown = TRUE;
 		    *repair_buf = '\0';
 		} else if (!uwep->blessed) {
-		    bless(uwep);
-		    uwep->bknown = TRUE;
-		    if (!Blind)
+		    if (!Blind) {
 			pline("%s with %s aura%s.",
 			      Yobjnam2(uwep, "softly glow"),
 			      an(hcolor(NH_LIGHT_BLUE)), repair_buf);
-		    else You_feel("the blessing of %s over %s.",
-				  u_gname(), yname(uwep));
+			iflags.last_msg = PLNMSG_OBJ_GLOWS;
+		    } else
+			You_feel("the blessing of %s over %s.",
+				 u_gname(), yname(uwep));
+		    bless(uwep);
+		    uwep->bknown = TRUE;
 		    *repair_buf = '\0';
 		}
 
@@ -993,13 +998,14 @@ pleased(g_align)
 		     an(hcolor(NH_LIGHT_BLUE)));
 	    for(otmp=invent; otmp; otmp=otmp->nobj) {
 		if (otmp->cursed) {
-		    uncurse(otmp);
 		    if (!Blind) {
 			pline("%s %s.", Yobjnam2(otmp, "softly glow"),
 			      hcolor(NH_AMBER));
+			iflags.last_msg = PLNMSG_OBJ_GLOWS;
 			otmp->bknown = TRUE;
 			++any;
 		    }
+		    uncurse(otmp);
 		}
 	    }
 	    if (any) update_inventory();

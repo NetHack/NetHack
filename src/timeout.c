@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)timeout.c	3.5	2007/03/15	*/
+/*	SCCS Id: @(#)timeout.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1145,7 +1145,7 @@ begin_burn(obj, already_lit)
                 if (artifact_light(obj)) {
 		    obj->lamplit = 1;
 		    do_timer = FALSE;
-		    radius = 2;
+		    radius = arti_light_radius(obj);
 		} else {
 		    impossible("begin burn: unexpected %s", xname(obj));
 		    turns = obj->age;

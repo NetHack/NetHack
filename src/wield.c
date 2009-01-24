@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)wield.c	3.5	2007/02/07	*/
+/*	SCCS Id: @(#)wield.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -94,7 +94,7 @@ register struct obj *obj;
 	setworn(obj, W_WEP);
 	if (uwep == obj && artifact_light(olduwep) && olduwep->lamplit) {
 	    end_burn(olduwep, FALSE);
-	    if (!Blind) pline("%s glowing.", Tobjnam(olduwep, "stop"));
+	    if (!Blind) pline("%s shining.", Tobjnam(olduwep, "stop"));
 	}
 	/* Note: Explicitly wielding a pick-axe will not give a "bashing"
 	 * message.  Wielding one via 'a'pplying it will.
@@ -190,7 +190,8 @@ struct obj *wep;
 	    if (artifact_light(wep) && !wep->lamplit) {
 		begin_burn(wep, FALSE);
 		if (!Blind)
-		    pline("%s to glow brilliantly!", Tobjnam(wep, "begin"));
+		    pline("%s to shine %s!", Tobjnam(wep, "begin"),
+			  arti_light_description(wep));
 	    }
 
 #if 0
@@ -574,7 +575,7 @@ uwepgone()
 	if (uwep) {
 		if (artifact_light(uwep) && uwep->lamplit) {
 		    end_burn(uwep, FALSE);
-		    if (!Blind) pline("%s glowing.", Tobjnam(uwep, "stop"));
+		    if (!Blind) pline("%s shining.", Tobjnam(uwep, "stop"));
 		}
 		setworn((struct obj *)0, W_WEP);
 		unweapon = TRUE;

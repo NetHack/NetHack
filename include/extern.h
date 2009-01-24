@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)extern.h	3.5	2008/01/30	*/
+/*	SCCS Id: @(#)extern.h	3.5	2009/01/20	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -974,7 +974,10 @@ E boolean FDECL(obj_sheds_light, (struct obj *));
 E boolean FDECL(obj_is_burning, (struct obj *));
 E void FDECL(obj_split_light_source, (struct obj *, struct obj *));
 E void FDECL(obj_merge_light_sources, (struct obj *,struct obj *));
+E void FDECL(obj_adjust_light_radius, (struct obj *,int));
 E int FDECL(candle_light_range, (struct obj *));
+E int FDECL(arti_light_radius, (struct obj *));
+E const char *FDECL(arti_light_description, (struct obj *));
 #ifdef WIZARD
 E int NDECL(wiz_light_sources);
 #endif
