@@ -27,6 +27,7 @@ STATIC_DCL boolean FDECL(validspecmon, (struct monst *,int));
 #ifdef WIZARD
 STATIC_DCL boolean FDECL(validvamp, (struct monst *,int *,int));
 #endif
+STATIC_DCL struct permonst *FDECL(accept_newcham_form, (int));
 
 #ifdef REINCARNATION
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
@@ -2602,18 +2603,24 @@ validspecmon(mon, mndx)
 struct monst *mon;
 int mndx;
 {
-	if (isspecmon(mon) && mndx >= LOW_PM) {
+	if (mndx == NON_PM) return TRUE;	/* caller wants random */
+
+	if (!accept_newcham_form(mndx)) return FALSE;	/* geno'd or !polyok */
+
+	if (isspecmon(mon)) {
 	    struct permonst *ptr = &mons[mndx];
 
-	    if (notake(ptr) || nohands(ptr) || !has_head(ptr)) return FALSE;
+	    /* reject notake because object manipulation is expected
+	       and nohead because speech capability is expected */
+	    if (notake(ptr) || !has_head(ptr)) return FALSE;
 	    /* [should we check ptr->msound here too?] */
 	}
-	return TRUE;	/* potential new form is ok (or still NON_PM) */
+	return TRUE;	/* potential new form is ok */
 }
 
 #ifdef WIZARD
 /* prevent wizard mode user from specifying invalid vampshifter shape */
-static boolean
+STATIC_OVL boolean
 validvamp(mon, mndx_p, monclass)
 struct monst *mon;
 int *mndx_p, monclass;
@@ -2715,17 +2722,35 @@ struct monst *mon;
 		monclass = 0;
 		getlin(pprompt, buf);
 		mungspaces(buf);
-		if (*buf == '\033' || !strcmp(buf, "*") ||
-			!strcmp(buf, "random")) break;	/* mndx == NON_PM */
+		/* for ESC, take form selected above (might be NON_PM) */
+		if (*buf == '\033') break;
+		/* for "*", use NON_PM to pick an arbitrary shape below */
+		if (!strcmp(buf, "*") || !strcmp(buf, "random")) {
+		    mndx == NON_PM;
+		    break;
+		}
 		mndx = name_to_mon(buf);
-		if (mndx >= LOW_PM && validvamp(mon, &mndx, monclass)) break;
-		monclass = name_to_monclass(buf, &mndx);
-		if (monclass && mndx == NON_PM)
-		    mndx = mkclass_poly(monclass);
-		if (mndx >= LOW_PM && validvamp(mon, &mndx, monclass)) break;
+		if (mndx >= LOW_PM) {
+		    /* got a specific type of monster; use it if we can,
+		       otherwise drop down to "can"t" and try again */
+		    if (validvamp(mon, &mndx, monclass)) break;
+		    /* revert to random in case we exhaust tryct */
+		    mndx = NON_PM;
+		} else {
+		    /* didn't get a type, so check whether it's a class
+		       (single letter or text match with def_monsyms[]);
+		       text match might already force a specific type,
+		       otherwise pick something from within the class */
+		    monclass = name_to_monclass(buf, &mndx);
+		    if (monclass && mndx == NON_PM)
+			mndx = mkclass_poly(monclass);
+		    if (mndx >= LOW_PM) {
+			if (validvamp(mon, &mndx, monclass)) break;
+			mndx = NON_PM;	/* revert to random */
+		    }
+		}
 
 		pline("It can't become that.");
-		mndx = NON_PM;
 	    } while (--tryct > 0);
 	    if (!tryct) pline(thats_enough_tries);
 	    if (is_vampshifter(mon) && !validvamp(mon, &mndx, monclass))
@@ -2733,6 +2758,7 @@ struct monst *mon;
 	}
 #endif /*WIZARD*/
 
+	/* if no form was specified above, pick one at random now */
 	if (mndx == NON_PM) {
 	    tryct = 50;
 	    do {
@@ -2742,7 +2768,28 @@ struct monst *mon;
 	return mndx;
 }
 
-/* make a chameleon look like a new monster; returns 1 if it actually changed */
+/* this used to be inline within newcham() but monpolycontrol needs it too */
+STATIC_OVL struct permonst *
+accept_newcham_form(mndx)
+int mndx;
+{
+	struct permonst *mdat;
+
+	if (mndx == NON_PM) return 0;
+	mdat = &mons[mndx];
+	if ((mvitals[mndx].mvflags & G_GENOD) != 0) return 0;
+	if (is_placeholder(mdat)) return 0;
+	/* select_newcham_form() might deliberately pick a player
+	   character type (random selection never does) which
+	   polyok() rejects, so we need a special case here */
+	if (is_mplayer(mdat)) return mdat;
+	/* polyok() rules out M2_PNAME, M2_WERE, and all humans except Kops */
+	return polyok(mdat) ? mdat : 0;
+}
+
+/* make a chameleon take on another shape, or a polymorph target
+   (possibly self-infliced) become a different monster;
+   returns 1 if it actually changes form */
 int
 newcham(mtmp, mdat, polyspot, msg)
 struct monst *mtmp;
@@ -2766,21 +2813,16 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
 	}
 
 	/* mdat = 0 -> caller wants a random monster shape */
-	tryct = 0;
 	if (mdat == 0) {
-	    while (++tryct <= 100) {
+	    /* select_newcham_form() loops when resorting to random but
+	       it doesn't always pick that so we still retry here too */
+	    tryct = 20;
+	    do {
 		mndx = select_newcham_form(mtmp);
-		mdat = &mons[mndx];
-		if ((mvitals[mndx].mvflags & G_GENOD) != 0 ||
-			is_placeholder(mdat)) continue;
-		/* polyok rules out all M2_PNAME and M2_WERE's;
-		   select_newcham_form might deliberately pick a player
-		   character type, so we can't arbitrarily rule out all
-		   human forms any more */
-		if (is_mplayer(mdat) || (!is_human(mdat) && polyok(mdat)))
-		    break;
-	    }
-	    if (tryct > 100) return 0;	/* Should never happen */
+		mdat = accept_newcham_form(mndx);
+		if (mdat) break;
+	    } while (--tryct > 0);
+	    if (!tryct) return 0;
 	} else if (mvitals[monsndx(mdat)].mvflags & G_GENOD)
 	    return(0);	/* passed in mdat is genocided */
 
