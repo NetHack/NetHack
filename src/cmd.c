@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)cmd.c	3.5	2008/05/25	*/
+/*	SCCS Id: @(#)cmd.c	3.5	2009/01/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2855,6 +2855,20 @@ register char *cmd;
 	    }
 	}
 
+	if ((do_walk || do_rush) && !context.travel && !dxdy_moveok()) {
+	    /* trying to move diagonally as a grid bug;
+	       this used to be treated by movecmd() as not being
+	       a movement attempt, but that didn't provide for any
+	       feedback and led to strangeness if the key pressed
+	       ('u' in particular) was overloaded for num_pad use */
+	    You_cant("get there from here...");
+	    context.run = 0;
+	    context.nopick = context.forcefight = FALSE;
+	    context.move = context.mv = FALSE;
+	    multi = 0;
+	    return;
+	}
+
 	if (do_walk) {
 	    if (multi) context.mv = TRUE;
 	    domove();
@@ -2968,11 +2982,21 @@ char sym;
 	u.dx = xdir[dp - Cmd.dirchars];
 	u.dy = ydir[dp - Cmd.dirchars];
 	u.dz = zdir[dp - Cmd.dirchars];
+#if 0	/* now handled elsewhere */
 	if (u.dx && u.dy && NODIAG(u.umonnum)) {
 		u.dx = u.dy = 0;
 		return 0;
 	}
+#endif
 	return !u.dz;
+}
+
+/* grid bug handling which used to be in movecmd() */
+int
+dxdy_moveok()
+{
+	if (u.dx && u.dy && NODIAG(u.umonnum)) u.dx = u.dy = 0;
+	return u.dx || u.dy;
 }
 
 /* decide whether a character (user input keystroke) requests screen repaint */
@@ -3020,6 +3044,7 @@ getdir(s)
 const char *s;
 {
 	char dirsym;
+	int is_mov;
 
  retry:
 #ifdef REDO
@@ -3042,7 +3067,7 @@ const char *s;
 
 	if (dirsym == '.' || dirsym == 's') {
 	    u.dx = u.dy = u.dz = 0;
-	} else if (!movecmd(dirsym) && !u.dz) {
+	} else if (!(is_mov = movecmd(dirsym)) && !u.dz) {
 	    boolean did_help = FALSE, help_requested;
 
 	    if (!index(quitchars, dirsym)) {
@@ -3055,6 +3080,9 @@ const char *s;
 		}
 		if (!did_help) pline("What a strange direction!");
 	    }
+	    return 0;
+	} else if (is_mov && !dxdy_moveok()) {
+	    You_cant("orient yourself that direction.");
 	    return 0;
 	}
 	if (!u.dz && (Stunned || (Confusion && !rn2(5)))) confdir();

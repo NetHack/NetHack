@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)dig.c	3.5	2007/04/02	*/
+/*	SCCS Id: @(#)dig.c	3.5	2009/01/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -916,7 +916,7 @@ struct obj *obj;
 	register char *dsp = dirsyms;
 	register int rx, ry;
 	int res = 0;
-	const char *sdp = Cmd.dirchars, *verb;
+	const char *sdp, *verb;
 
 	/* Check tool */
 	if (obj != uwep) {
@@ -934,8 +934,9 @@ struct obj *obj;
 	    return res;
 	}
 
-	while(*sdp) {
+	for (sdp = Cmd.dirchars; *sdp; ++sdp) {
 		(void) movecmd(*sdp);	/* sets u.dx and u.dy and u.dz */
+		if (!u.dz && !dxdy_moveok()) continue;	/* handle NODIAG */
 		rx = u.ux + u.dx;
 		ry = u.uy + u.dy;
 		/* Include down even with axe, so we have at least one direction */
@@ -943,7 +944,6 @@ struct obj *obj;
 		    (u.dz == 0 && isok(rx, ry) &&
 		     dig_typ(obj, rx, ry) != DIGTYP_UNDIGGABLE))
 			*dsp++ = *sdp;
-		sdp++;
 	}
 	*dsp = 0;
 	Sprintf(qbuf, "In what direction do you want to %s? [%s]", verb, dirsyms);

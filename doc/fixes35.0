@@ -302,6 +302,8 @@ when dipping something in holy/unholy water, only learn its new bless/curse
 	state if hero sees it glow
 describe lit Sunsword as shining rather than glowing
 prevent poly'd shopkeepers from taking on forms that can't handle objects
+attempting to move direction 'u' as a grid bug performed #untrap command;
+	the other diagonals reported "unknown command" instead of "you can't"
 
 
 Platform- and/or Interface-Specific Fixes

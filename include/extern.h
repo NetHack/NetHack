@@ -200,6 +200,7 @@ E void FDECL(show_conduct, (int));
 E int FDECL(xytod, (SCHAR_P,SCHAR_P));
 E void FDECL(dtoxy, (coord *,int));
 E int FDECL(movecmd, (CHAR_P));
+E int NDECL(dxdy_moveok);
 E int FDECL(getdir, (const char *));
 E void NDECL(confdir);
 E const char *FDECL(directionname, (int));
