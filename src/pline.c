@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pline.c	3.5	2007/02/09	*/
+/*	SCCS Id: @(#)pline.c	3.5	2009/01/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -351,22 +351,24 @@ register struct monst *mtmp;
 #endif
 	}
 	else if (mtmp->mpeaceful) Strcat(info, ", peaceful");
+	if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham])
+	    /* don't reveal the innate form (chameleon, vampire, &c),
+	       just expose the fact that this current form isn't it */
+	    Strcat(info, ", shapechanger");
+	/* pets eating mimic corpses mimic while eating, so this comes first */
 	if (mtmp->meating)	  Strcat(info, ", eating");
-	if (mtmp->meating && (mtmp->cham == NON_PM) &&
-	    mtmp->mappearance && mtmp->m_ap_type) {
-	    	Sprintf(eos(info), ", mimicing %s",
+	/* a stethoscope exposes mimic before getting here so this
+	   won't be relevant for it, but wand of probing doesn't */
+	if (mtmp->m_ap_type)
+	    Sprintf(eos(info), ", mimicking %s",
 		    (mtmp->m_ap_type == M_AP_FURNITURE) ?
 			an(defsyms[mtmp->mappearance].explanation) :
-		    (mtmp->m_ap_type == M_AP_OBJECT &&
-				OBJ_DESCR(objects[mtmp->mappearance])) ?
-			an(OBJ_DESCR(objects[mtmp->mappearance])) :
-		    (mtmp->m_ap_type == M_AP_OBJECT &&
-				OBJ_NAME(objects[mtmp->mappearance])) ?
-			an(OBJ_NAME(objects[mtmp->mappearance])) :
+		    (mtmp->m_ap_type == M_AP_OBJECT) ?
+			((mtmp->mappearance == GOLD_PIECE) ? "gold" :
+			    an(simple_typename(mtmp->mappearance))) :
 		    (mtmp->m_ap_type == M_AP_MONSTER) ?
 			an(mons[mtmp->mappearance].mname) :
-			something);
-	}
+			something); /* impossible... */
 	if (mtmp->mcan)		  Strcat(info, ", cancelled");
 	if (mtmp->mconf)	  Strcat(info, ", confused");
 	if (mtmp->mblinded || !mtmp->mcansee)
