@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)display.c	3.5	2007/06/25	*/
+/*	SCCS Id: @(#)display.c	3.5	2009/01/30	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -420,11 +420,12 @@ display_monster(x, y, mon, sightflags, worm_tail)
 	    case M_AP_OBJECT: {
 		struct obj obj;	/* Make a fake object to send	*/
 				/* to map_object().		*/
-		obj.oextra = (struct oextra *)0;
+		obj = zeroobj;
 		obj.ox = x;
 		obj.oy = y;
 		obj.otyp = mon->mappearance;
-		obj.corpsenm = PM_TENGU;	/* if mimicing a corpse */
+		/* might be mimicing a corpse or statue */
+		obj.corpsenm = has_mcorpsenm(mon) ? MCORPSENM(mon) : PM_TENGU;
 		map_object(&obj,!sensed);
 		break;
 	    }

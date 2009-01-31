@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mextra.h	3.5	2006/04/14	*/
+/*	SCCS Id: @(#)mextra.h	3.5	2009/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -173,6 +173,7 @@ struct mextra {
 	struct eshk *eshk;
 	struct emin *emin;
 	struct edog *edog;
+	int mcorpsenm; /* obj->corpsenm for mimic posing as statue or corpse */
 };
 
 #define MNAME(mon)	((mon)->mextra->mname)
@@ -181,6 +182,9 @@ struct mextra {
 #define ESHK(mon)	((mon)->mextra->eshk)
 #define EMIN(mon)	((mon)->mextra->emin)
 #define EDOG(mon)	((mon)->mextra->edog)
+#define MCORPSENM(mon)	((mon)->mextra->mcorpsenm)
+
 #define has_mname(mon)	((mon)->mextra && MNAME(mon))
+#define has_mcorpsenm(mon) ((mon)->mextra && MCORPSENM(mon) != NON_PM)
 
 #endif /* MEXTRA_H */

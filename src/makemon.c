@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)makemon.c	3.5	2007/03/23	*/
+/*	SCCS Id: @(#)makemon.c	3.5	2009/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -859,9 +859,15 @@ struct mextra *
 newmextra()
 {
 	struct mextra *mextra;
+
 	mextra = (struct mextra *)alloc(sizeof(struct mextra));
-	if (mextra)
-	    (void) memset((genericptr_t)mextra, 0, sizeof(struct mextra));
+	mextra->mname = 0;
+	mextra->egd = 0;
+	mextra->epri = 0;
+	mextra->eshk = 0;
+	mextra->emin = 0;
+	mextra->edog = 0;
+	mextra->mcorpsenm = NON_PM;
 	return mextra;
 }
 
@@ -1732,6 +1738,23 @@ struct monst *mtmp;
 		mtmp->malign = abs(mal);
 }
 
+/* allocate a new mcorpsenm field for a monster; only need mextra itself */
+void
+newmcorpsenm(mtmp)
+struct monst *mtmp;
+{
+    if (!mtmp->mextra) mtmp->mextra = newmextra();
+    MCORPSENM(mtmp) = NON_PM;	/* not initialized yet */
+}
+
+/* release monster's mcorpsenm field; basically a no-op */
+void
+freemcorpsenm(mtmp)
+struct monst *mtmp;
+{
+    if (has_mcorpsenm(mtmp)) MCORPSENM(mtmp) = NON_PM;
+}
+
 static NEARDATA char syms[] = {
 	MAXOCLASSES, MAXOCLASSES+1, RING_CLASS, WAND_CLASS, WEAPON_CLASS,
 	FOOD_CLASS, COIN_CLASS, SCROLL_CLASS, POTION_CLASS, ARMOR_CLASS,
@@ -1836,15 +1859,14 @@ assign_sym:
 		if (s_sym >= MAXOCLASSES) {
 			ap_type = M_AP_FURNITURE;
 			appear = s_sym == MAXOCLASSES ? S_upstair : S_dnstair;
-		} else if (s_sym == COIN_CLASS) {
-			ap_type = M_AP_OBJECT;
-			appear = GOLD_PIECE;
 		} else {
 			ap_type = M_AP_OBJECT;
 			if (s_sym == S_MIMIC_DEF) {
 				appear = STRANGE_OBJECT;
+			} else if (s_sym == COIN_CLASS) {
+				appear = GOLD_PIECE;
 			} else {
-				otmp = mkobj( (char) s_sym, FALSE );
+				otmp = mkobj((char) s_sym, FALSE);
 				appear = otmp->otyp;
 				/* make sure container contents are free'ed */
 				obfree(otmp, (struct obj *) 0);
@@ -1853,6 +1875,14 @@ assign_sym:
 	}
 	mtmp->m_ap_type = ap_type;
 	mtmp->mappearance = appear;
+	if (ap_type == M_AP_OBJECT &&
+		(appear == STATUE || appear == CORPSE ||
+		 appear == FIGURINE || appear == EGG)) {
+	    newmcorpsenm(mtmp);
+	    MCORPSENM(mtmp) = rndmonnum();
+	    if (appear == EGG && !can_be_hatched(MCORPSENM(mtmp)))
+		MCORPSENM(mtmp) = NON_PM;	/* revert to generic egg */
+	}
 }
 
 /* release a monster from a bag of tricks; return number of monsters created */

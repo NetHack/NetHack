@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)save.c	3.5	2008/07/20	*/
+/*	SCCS Id: @(#)save.c	3.5	2009/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1046,14 +1046,7 @@ struct monst *mtmp;
 	buflen = sizeof(struct monst);
 	bwrite(fd, (genericptr_t) &buflen, sizeof(int));
 	bwrite(fd, (genericptr_t) mtmp, buflen);
-	if (!mtmp->mextra) {
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-	} else {
+	if (mtmp->mextra) {
 		if (MNAME(mtmp)) buflen = strlen(MNAME(mtmp)) + 1;
 		else buflen = 0;
 		bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
@@ -1089,6 +1082,11 @@ struct monst *mtmp;
 		bwrite(fd, (genericptr_t) &buflen, sizeof(int));
 		if (buflen > 0)
 			bwrite(fd, (genericptr_t) EDOG(mtmp), buflen);
+
+		/* mcorpsenm is inline int rather than pointer to something,
+		   so doesn't need to be preceded by a length field */
+		bwrite(fd, (genericptr_t) &MCORPSENM(mtmp),
+		       sizeof MCORPSENM(mtmp));
 	}
 }
 

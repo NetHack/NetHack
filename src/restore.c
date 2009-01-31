@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)restore.c	3.5	2008/07/20	*/
+/*	SCCS Id: @(#)restore.c	3.5	2009/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -350,56 +350,53 @@ struct monst *mtmp;
 
 	mread(fd, (genericptr_t) mtmp, sizeof(struct monst));
 
-	/* any saved pointers are mostly invalid */
+	/* next monster pointer is invalid */
 	mtmp->nmon = (struct monst *)0;
-	mtmp->mextra = (struct mextra *)0;
+	/* non-null mextra needs to be reconstructed */
+	if (mtmp->mextra) {
+	    mtmp->mextra = newmextra();
 
-	/* read the length of the name and the name */
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+	    /* mname - monster's name */
+	    mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	    if (buflen > 0) {	/* includes terminating '\0' */
 		new_mname(mtmp, buflen);
 		mread(fd, (genericptr_t) MNAME(mtmp), buflen);
-	}
-
-	/* egd */		
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+	    }
+	    /* egd - vault guard */
+	    mread(fd, (genericptr_t) &buflen, sizeof (buflen));
+	    if (buflen > 0) {
 		newegd(mtmp);
-		mread(fd, (genericptr_t) EGD(mtmp),
-				sizeof(struct egd));
-	}
-
-	/* epri */
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+		mread(fd, (genericptr_t) EGD(mtmp), sizeof (struct egd));
+	    }
+	    /* epri - temple priest */
+	    mread(fd, (genericptr_t) &buflen, sizeof (buflen));
+	    if (buflen > 0) {
 		newepri(mtmp);
-		mread(fd, (genericptr_t) EPRI(mtmp),
-				sizeof(struct epri));
-	}
-
-	/* eshk */
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+		mread(fd, (genericptr_t) EPRI(mtmp), sizeof (struct epri));
+	    }
+	    /* eshk - shopkeeper */
+	    mread(fd, (genericptr_t) &buflen, sizeof (buflen));
+	    if (buflen > 0) {
 		neweshk(mtmp);
-		mread(fd, (genericptr_t) ESHK(mtmp),
-				sizeof(struct eshk));
-	}
-
-	/* emin */
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+		mread(fd, (genericptr_t) ESHK(mtmp), sizeof (struct eshk));
+	    }
+	    /* emin - minion */
+	    mread(fd, (genericptr_t) &buflen, sizeof (buflen));
+	    if (buflen > 0) {
 		newemin(mtmp);
-		mread(fd, (genericptr_t) EMIN(mtmp),
-				sizeof(struct emin));
-	}
-
-	/* edog */		
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+		mread(fd, (genericptr_t) EMIN(mtmp), sizeof (struct emin));
+	    }
+	    /* edog - pet */
+	    mread(fd, (genericptr_t) &buflen, sizeof (buflen));
+	    if (buflen > 0) {
 		newedog(mtmp);
-		mread(fd, (genericptr_t) EDOG(mtmp),
-				sizeof(struct edog));
-	}
+		mread(fd, (genericptr_t) EDOG(mtmp), sizeof (struct edog));
+	    }
+	    /* mcorpsenm - obj->corpsenm for mimic posing as corpse or
+	       statue (inline int rather than pointer to something) */
+	    mread(fd, (genericptr_t) &MCORPSENM(mtmp),
+		  sizeof MCORPSENM(mtmp));
+	} /* mextra */
 }
 
 STATIC_OVL struct monst *

@@ -83,9 +83,13 @@ struct oextra *
 newoextra()
 {
 	struct oextra *oextra;
+
 	oextra = (struct oextra *)alloc(sizeof(struct oextra));
-	if (oextra)
-	    (void) memset((genericptr_t)oextra, 0, sizeof(struct oextra));
+	oextra->oname = 0;
+	oextra->omonst = 0;
+	oextra->omid = 0;
+	oextra->olong = 0;
+	oextra->omailcmd = 0;
 	return oextra;
 }
 

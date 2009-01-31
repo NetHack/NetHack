@@ -1418,6 +1418,7 @@ struct monst *mtmp2, *mtmp1;
 				(genericptr_t)EDOG(mtmp1),
 				sizeof(struct edog));
 	}
+	if (has_mcorpsenm(mtmp1)) MCORPSENM(mtmp2) = MCORPSENM(mtmp1);
 }
 
 STATIC_OVL void
@@ -1431,6 +1432,7 @@ struct mextra *x;
 		if (x->eshk) free((genericptr_t)x->eshk);
 		if (x->emin) free((genericptr_t)x->emin);
 		if (x->edog) free((genericptr_t)x->edog);
+		/* [no action needed for x->mcorpsenm] */
 		free((genericptr_t)x);
 	}
 }
@@ -2330,6 +2332,8 @@ register struct monst *mtmp;
 {
 	unsigned old_app = mtmp->mappearance;
 	uchar old_ap_type = mtmp->m_ap_type;
+
+	if (has_mcorpsenm(mtmp)) freemcorpsenm(mtmp);
 
 	mtmp->m_ap_type = M_AP_NOTHING;
 	mtmp->mappearance = 0;

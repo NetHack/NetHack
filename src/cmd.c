@@ -2374,6 +2374,7 @@ struct obj *otmp;
 	int sz = (int)sizeof (struct obj);
 
 	if (otmp->oextra) {
+		sz += (int)sizeof (struct oextra);
 		if (ONAME(otmp))  sz += (int)strlen(ONAME(otmp)) + 1;
 		if (OMONST(otmp)) sz += (int)sizeof (struct monst);
 		if (OMID(otmp))   sz += (int)sizeof (unsigned);
@@ -2479,12 +2480,14 @@ struct monst *mtmp;
 	int sz = (int)sizeof (struct monst);
 
 	if (mtmp->mextra) {
+		sz += (int)sizeof (struct mextra);
 		if (MNAME(mtmp)) sz += (int)strlen(MNAME(mtmp)) + 1;
 		if (EGD(mtmp)) sz += (int)sizeof (struct egd);
 		if (EPRI(mtmp)) sz += (int)sizeof (struct epri);
 		if (ESHK(mtmp)) sz += (int)sizeof (struct eshk);
 		if (EMIN(mtmp)) sz += (int)sizeof (struct emin);
 		if (EDOG(mtmp)) sz += (int)sizeof (struct edog);
+		/* mextra->mcorpsenm doesn't point to more memory */
 	}
 	return sz;
 }

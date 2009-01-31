@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)pager.c	3.5	2008/07/20	*/
+/*	SCCS Id: @(#)pager.c	3.5	2009/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -213,15 +213,24 @@ lookat(x, y, buf, monbuf)
 	} /* mtmp */
 
     } else if (glyph_is_object(glyph)) {
+	int glyphotyp = glyph_to_obj(glyph);
 	struct obj *otmp = vobj_at(x,y);
 
-	if (!otmp || otmp->otyp != glyph_to_obj(glyph)) {
-	    if (glyph_to_obj(glyph) != STRANGE_OBJECT) {
-		otmp = mksobj(glyph_to_obj(glyph), FALSE, FALSE);
+	/* there might be a mimic here posing as an object */
+	mtmp = m_at(x, y);
+	if (mtmp && mtmp->m_ap_type == M_AP_OBJECT &&
+	    mtmp->mappearance == glyphotyp) otmp = 0;
+	else mtmp = 0;
+
+	if (!otmp || otmp->otyp != glyphotyp) {
+	    if (glyphotyp != STRANGE_OBJECT) {
+		otmp = mksobj(glyphotyp, FALSE, FALSE);
 		if (otmp->oclass == COIN_CLASS)
 		    otmp->quan = 2L; /* to force pluralization */
 		else if (otmp->otyp == SLIME_MOLD)
 		    otmp->spe = context.current_fruit;	/* give it a type */
+		if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
+		    otmp->corpsenm = MCORPSENM(mtmp);
 		Strcpy(buf, distant_name(otmp, xname));
 		dealloc_obj(otmp);
 	    }
