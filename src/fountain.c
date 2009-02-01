@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)fountain.c	3.5	2008/01/19	*/
+/*	SCCS Id: @(#)fountain.c	3.5	2009/01/31	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,11 +12,21 @@ STATIC_DCL void NDECL(dowaternymph);
 STATIC_PTR void FDECL(gush, (int,int,genericptr_t));
 STATIC_DCL void NDECL(dofindgem);
 
+/* used when trying to dip in or drink from fountain or sink or pool while
+   levitating above it, or when trying to move downwards in that state */
 void
 floating_above(what)
 const char *what;
 {
-    You("are floating high above the %s.", what);
+    const char *umsg = "are floating high above the %s.";
+
+    if (u.utrap && (u.utraptype == TT_INFLOOR || u.utraptype == TT_LAVA)) {
+	/* when stuck in floor (not possible at fountain or sink location,
+	   so must be attempting to move down), override the usual message */
+	umsg = "are trapped in the %s.";
+	what = surface(u.ux, u.uy);	/* probably redundant */
+    }
+    You(umsg, what);
 }
 
 STATIC_OVL void

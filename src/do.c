@@ -764,11 +764,10 @@ dodown()
 
 		    for(obj = invent; obj; obj = obj->nobj) {
 			if (obj->oartifact &&
-					artifact_has_invprop(obj,LEVITATION)) {
+				artifact_has_invprop(obj, LEVITATION)) {
 			    if (obj->age < monstermoves)
-				obj->age = monstermoves + rnz(100);
-			    else
-				obj->age += rnz(100);
+				obj->age = monstermoves;
+			    obj->age += rnz(100);
 			}
 		    }
 		}
