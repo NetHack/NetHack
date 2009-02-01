@@ -942,14 +942,7 @@ struct obj *otmp;
 	buflen = sizeof(struct obj);
 	bwrite(fd, (genericptr_t) &buflen, sizeof(int));
 	bwrite(fd, (genericptr_t) otmp, buflen);
-	if (!otmp->oextra) {
-		/* for oname, omonst, omid, olong, omailcmd */
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-		bwrite(fd, (genericptr_t) &zerobuf, sizeof(int));
-	} else {
+	if (otmp->oextra) {
 		if (ONAME(otmp)) buflen = strlen(ONAME(otmp)) + 1;
 		else buflen = 0;
 		bwrite(fd, (genericptr_t) &buflen, sizeof buflen);

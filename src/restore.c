@@ -229,56 +229,58 @@ boolean ghostly;
 	free((genericptr_t)tmp_dam);
 }
 
+/* restore one object */
 STATIC_OVL void
 restobj(fd, otmp)
 int fd;
 struct obj *otmp;
 {
 	int buflen;
-	
+
 	mread(fd, (genericptr_t) otmp, sizeof(struct obj));
 
-	/* any saved pointers are mostly invalid */
-	otmp->nobj = (struct obj *)0;
-	otmp->oextra = (struct oextra *)0;
+	/* next object pointers are invalid; otmp->cobj needs to be left
+	   as is--being non-null is key to restoring container contents */
+	otmp->nobj = otmp->nexthere = (struct obj *)0;
+	/* non-null oextra needs to be reconstructed */
+	if (otmp->oextra) {
+	    otmp->oextra = newoextra();
 
-	/* read the length of the name and the name */
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+	    /* oname - object's name */
+	    mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	    if (buflen > 0) {	/* includes terminating '\0' */
 		new_oname(otmp, buflen);
 		mread(fd, (genericptr_t) ONAME(otmp), buflen);
-	}
-
-	/* omonst */
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+	    }
+	    /* omonst - corpse or statue might retain full monster details */
+	    mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	    if (buflen > 0) {
 		newomonst(otmp);
 		/* this is actually a monst struct, so we
 		   can just defer to restmon() here */
 		restmon(fd, OMONST(otmp));
-	}
-
-	/* omid */
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+	    }
+	    /* omid - monster id number, connecting corpse to ghost */
+	    mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	    if (buflen > 0) {
 		newomid(otmp);
 		mread(fd, (genericptr_t) OMID(otmp), buflen);
-	}
-
-	/* olong */
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+	    }
+	    /* olong - temporary gold */
+	    mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	    if (buflen > 0) {
 		newolong(otmp);
 		mread(fd, (genericptr_t) OLONG(otmp), buflen);
-	}
-
-	/* omailcmd */
-	mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-	if (buflen > 0) {
+	    }
+	    /* omailcmd - feedback mechanism for scroll of mail */
+	    mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+	    if (buflen > 0) {
 		char *omailcmd = (char *)alloc(buflen);
+
 		mread(fd, (genericptr_t) omailcmd, buflen);
 		new_omailcmd(otmp, omailcmd);
 		free((genericptr_t)omailcmd);
+	    }
 	}
 }
 
@@ -341,6 +343,7 @@ boolean ghostly, frozen;
 	return(first);
 }
 
+/* restore one monster */
 STATIC_OVL void
 restmon(fd, mtmp)
 int fd;
