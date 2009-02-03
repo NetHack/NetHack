@@ -2730,7 +2730,7 @@ struct monst *mon;
 		if (*buf == '\033') break;
 		/* for "*", use NON_PM to pick an arbitrary shape below */
 		if (!strcmp(buf, "*") || !strcmp(buf, "random")) {
-		    mndx == NON_PM;
+		    mndx = NON_PM;
 		    break;
 		}
 		mndx = name_to_mon(buf);
