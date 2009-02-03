@@ -2734,24 +2734,18 @@ struct monst *mon;
 		    break;
 		}
 		mndx = name_to_mon(buf);
-		if (mndx >= LOW_PM) {
-		    /* got a specific type of monster; use it if we can,
-		       otherwise drop down to "can"t" and try again */
-		    if (validvamp(mon, &mndx, monclass)) break;
-		    /* revert to random in case we exhaust tryct */
-		    mndx = NON_PM;
-		} else {
+		if (mndx == NON_PM) {
 		    /* didn't get a type, so check whether it's a class
-		       (single letter or text match with def_monsyms[]);
-		       text match might already force a specific type,
-		       otherwise pick something from within the class */
+		       (single letter or text match with def_monsyms[]) */
 		    monclass = name_to_monclass(buf, &mndx);
 		    if (monclass && mndx == NON_PM)
 			mndx = mkclass_poly(monclass);
-		    if (mndx >= LOW_PM) {
-			if (validvamp(mon, &mndx, monclass)) break;
-			mndx = NON_PM;	/* revert to random */
-		    }
+		}
+		if (mndx >= LOW_PM) {
+		    /* got a specific type of monster; use it if we can */
+		    if (validvamp(mon, &mndx, monclass)) break;
+		    /* can't; revert to random in case we exhaust tryct */
+		    mndx = NON_PM;
 		}
 
 		pline("It can't become that.");
