@@ -305,6 +305,7 @@ prevent poly'd shopkeepers from taking on forms that can't handle objects
 attempting to move direction 'u' as a grid bug performed #untrap command;
 	the other diagonals reported "unknown command" instead of "you can't"
 mimic posing as statue or corpse now picks and maintains particular monst type
+when levitating, don't show '>' as a likely direction for digging
 
 
 Platform- and/or Interface-Specific Fixes

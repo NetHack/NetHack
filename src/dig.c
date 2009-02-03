@@ -910,13 +910,10 @@ int
 use_pick_axe(obj)
 struct obj *obj;
 {
-	boolean ispick;
-	char dirsyms[12];
-	char qbuf[QBUFSZ];
-	register char *dsp = dirsyms;
-	register int rx, ry;
-	int res = 0;
 	const char *sdp, *verb;
+	char *dsp, dirsyms[12], qbuf[BUFSZ];
+	boolean ispick;
+	int rx, ry, downok, res = 0;
 
 	/* Check tool */
 	if (obj != uwep) {
@@ -934,19 +931,35 @@ struct obj *obj;
 	    return res;
 	}
 
+	/* construct list of directions to show player for likely choices */
+	downok = !!can_reach_floor(FALSE);
+	dsp = dirsyms;
 	for (sdp = Cmd.dirchars; *sdp; ++sdp) {
-		(void) movecmd(*sdp);	/* sets u.dx and u.dy and u.dz */
-		if (!u.dz && !dxdy_moveok()) continue;	/* handle NODIAG */
+	    /* filter out useless directions */
+	    if (u.uswallow) {
+		;	/* all directions are viable when swallowed */
+	    } else if (movecmd(*sdp)) {
+		/* normal direction, within plane of the level map;
+		   movecmd() sets u.dx, u.dy, u.dz and returns !u.dz */
+		if (!dxdy_moveok()) continue;	/* handle NODIAG */
 		rx = u.ux + u.dx;
 		ry = u.uy + u.dy;
-		/* Include down even with axe, so we have at least one direction */
-		if (u.dz > 0 ||
-		    (u.dz == 0 && isok(rx, ry) &&
-		     dig_typ(obj, rx, ry) != DIGTYP_UNDIGGABLE))
-			*dsp++ = *sdp;
+		if (!isok(rx, ry) || dig_typ(obj, rx, ry) == DIGTYP_UNDIGGABLE)
+		    continue;
+	    } else {
+		/* up or down; we used to always include down, so that
+		   there would always be at least one choice shown, but
+		   it shouldn't be a likely candidate when floating high
+		   above the floor; include up instead in that situation
+		   (as a silly candidate rather than a likely one...) */
+		if ((u.dz > 0) ^ downok) continue;
+	    }
+	    /* include this direction */
+	    *dsp++ = *sdp;
 	}
 	*dsp = 0;
-	Sprintf(qbuf, "In what direction do you want to %s? [%s]", verb, dirsyms);
+	Sprintf(qbuf, "In what direction do you want to %s? [%s]",
+		verb, dirsyms);
 	if(!getdir(qbuf))
 		return(res);
 
