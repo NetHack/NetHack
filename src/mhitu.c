@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mhitu.c	3.5	2007/12/19	*/
+/*	SCCS Id: @(#)mhitu.c	3.5	2009/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -424,20 +424,23 @@ mattacku(mtmp)
 		return(0);
 	}
 
+	/* hero might be a mimic, concealed via #monster */
 	if (youmonst.data->mlet == S_MIMIC && youmonst.m_ap_type &&
 		    !range2 && foundyou && !u.uswallow) {
+		boolean sticky = sticks(youmonst.data);
+
 		if (!canspotmon(mtmp)) map_invisible(mtmp->mx, mtmp->my);
-		if (!youseeit) pline("It gets stuck on you.");
+		if (sticky && !youseeit) pline("It gets stuck on you.");
 		else pline("Wait, %s!  That's a %s named %s!",
 			   m_monnam(mtmp), youmonst.data->mname, plname);
-		u.ustuck = mtmp;
+		if (sticky) u.ustuck = mtmp;
 		youmonst.m_ap_type = M_AP_NOTHING;
 		youmonst.mappearance = 0;
 		newsym(u.ux,u.uy);
 		return(0);
 	}
 
-	/* player might be mimicking an object */
+	/* non-mimic hero might be mimicking an object after eating m corpse */
 	if (youmonst.m_ap_type == M_AP_OBJECT && !range2 && foundyou && !u.uswallow) {
 	    if (!canspotmon(mtmp)) map_invisible(mtmp->mx, mtmp->my);
 	    if (!youseeit)
