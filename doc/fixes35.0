@@ -306,6 +306,8 @@ attempting to move direction 'u' as a grid bug performed #untrap command;
 	the other diagonals reported "unknown command" instead of "you can't"
 mimic posing as statue or corpse now picks and maintains particular monst type
 when levitating, don't show '>' as a likely direction for digging
+poly'd or mimicking hero who was hidden from monsters would still be treated
+	as a normal target for their ranged attacks
 
 
 Platform- and/or Interface-Specific Fixes

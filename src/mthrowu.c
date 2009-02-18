@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mthrowu.c	3.5	2007/12/17	*/
+/*	SCCS Id: @(#)mthrowu.c	3.5	2009/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -753,9 +753,16 @@ boolean
 lined_up(mtmp)		/* is mtmp in position to use ranged attack? */
 	register struct monst *mtmp;
 {
-	boolean ignore_boulders = (throws_rocks(mtmp->data) ||
-				   m_carrying(mtmp, WAN_STRIKING));
+	boolean ignore_boulders;
 
+	/* hero concealment usually trumps monst awareness of being lined up */
+	if (Upolyd && rn2(25) &&
+	    (u.uundetected || (youmonst.m_ap_type != M_AP_NOTHING &&
+			       youmonst.m_ap_type != M_AP_MONSTER)))
+	    return FALSE;
+
+	ignore_boulders = (throws_rocks(mtmp->data) ||
+			   m_carrying(mtmp, WAN_STRIKING));
 	return linedup(mtmp->mux, mtmp->muy, mtmp->mx, mtmp->my,
 		       ignore_boulders ? 1 : 2);
 }
