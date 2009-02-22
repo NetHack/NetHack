@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)mklev.c	3.5	2006/05/29	*/
+/*	SCCS Id: @(#)mklev.c	3.5	2009/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -400,6 +400,13 @@ register int type;
 #else
 		levl[x][y].doormask = (shdoor ? D_ISOPEN : D_NODOOR);
 #endif
+
+#ifdef REINCARNATION
+	    /* also done in roguecorr(); doing it here first prevents
+	       making mimics in place of trapped doors on rogue level */
+	    if (Is_rogue_level(&u.uz)) levl[x][y].doormask = D_NODOOR;
+#endif
+
 	    if(levl[x][y].doormask & D_TRAPPED) {
 		struct monst *mtmp;
 
