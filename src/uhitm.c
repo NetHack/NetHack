@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)uhitm.c	3.5	2007/12/19	*/
+/*	SCCS Id: @(#)uhitm.c	3.5	2009/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -116,8 +116,8 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 		 * not stay there, so the player will have suddenly forgotten
 		 * the square's contents for no apparent reason.
 		if (!canspotmon(mtmp) &&
-		    !glyph_is_invisible(levl[u.ux+u.dx][u.uy+u.dy].glyph))
-			map_invisible(u.ux+u.dx, u.uy+u.dy);
+		    !glyph_is_invisible(levl[bhitpos.x][bhitpos.y].glyph))
+			map_invisible(bhitpos.x, bhitpos.y);
 		 */
 		return FALSE;
 	}
@@ -131,12 +131,12 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 	 * the screen, so you know something is there.
 	 */
 	if (!canspotmon(mtmp) &&
-		    !glyph_is_warning(glyph_at(u.ux+u.dx,u.uy+u.dy)) &&
-		    !glyph_is_invisible(levl[u.ux+u.dx][u.uy+u.dy].glyph) &&
+		    !glyph_is_warning(glyph_at(bhitpos.x,bhitpos.y)) &&
+		    !glyph_is_invisible(levl[bhitpos.x][bhitpos.y].glyph) &&
 		    !(!Blind && mtmp->mundetected && hides_under(mtmp->data))) {
 		pline("Wait!  There's %s there you can't see!",
 			something);
-		map_invisible(u.ux+u.dx, u.uy+u.dy);
+		map_invisible(bhitpos.x, bhitpos.y);
 		/* if it was an invisible mimic, treat it as if we stumbled
 		 * onto a visible mimic
 		 */
@@ -152,7 +152,7 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 
 	if (mtmp->m_ap_type && !Protection_from_shape_changers &&
 	   !sensemon(mtmp) &&
-	   !glyph_is_warning(glyph_at(u.ux+u.dx,u.uy+u.dy))) {
+	   !glyph_is_warning(glyph_at(bhitpos.x,bhitpos.y))) {
 		/* If a hidden mimic was in a square where a player remembers
 		 * some (probably different) unseen monster, the player is in
 		 * luck--he attacks it even though it's hidden.
@@ -166,7 +166,7 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 	}
 
 	if (mtmp->mundetected && !canseemon(mtmp) &&
-		!glyph_is_warning(glyph_at(u.ux+u.dx,u.uy+u.dy)) &&
+		!glyph_is_warning(glyph_at(bhitpos.x,bhitpos.y)) &&
 		(hides_under(mtmp->data) || mtmp->data->mlet == S_EEL)) {
 	    mtmp->mundetected = mtmp->msleeping = 0;
 	    newsym(mtmp->mx, mtmp->my);
@@ -360,6 +360,10 @@ register struct monst *mtmp;
 	/* possibly set in attack_checks;
 	   examined in known_hitum, called via hitum or hmonas below */
 	override_confirmation = FALSE;
+	/* attack_checks() used to use <u.ux+u.dx,u.uy+u.dy> directly, now
+	   it uses bhitpos instead; it might map an invisible monster there */
+	bhitpos.x = u.ux + u.dx;
+	bhitpos.y = u.uy + u.dy;
 	if (attack_checks(mtmp, uwep)) return(TRUE);
 
 	if (Upolyd) {

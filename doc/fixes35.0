@@ -310,6 +310,10 @@ poly'd or mimicking hero who was hidden from monsters would still be treated
 	as a normal target for their ranged attacks
 hero would remain stuck to an adjacent monster after rehumanizing if he had
 	been attacked while hiding via #monster when poly'd into a small mimic
+attacking via applied polearm never scuffed engraving underneath hero
+auto-wielding a polearm took no time if ESC was used to cancel target choice
+applying a bullwhip while at very edge of map could target beyond edge when
+	hero was stunned or confused, potentially leading to a panic or crash
 
 
 Platform- and/or Interface-Specific Fixes

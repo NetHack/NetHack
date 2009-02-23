@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)apply.c	3.5	2008/10/14	*/
+/*	SCCS Id: @(#)apply.c	3.5	2009/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2328,10 +2328,20 @@ struct obj *obj;
     }
     if (!getdir((char *)0)) return res;
 
-    if (Stunned || (Confusion && !rn2(5))) confdir();
-    rx = u.ux + u.dx;
-    ry = u.uy + u.dy;
-    mtmp = m_at(rx, ry);
+    if (u.uswallow) {
+	mtmp = u.ustuck;
+	rx = mtmp->mx;
+	ry = mtmp->my;
+    } else {
+	if (Stunned || (Confusion && !rn2(5))) confdir();
+	rx = u.ux + u.dx;
+	ry = u.uy + u.dy;
+	if (!isok(rx, ry)) {
+	    You("miss.");
+	    return res;
+	}
+	mtmp = m_at(rx, ry);
+    }
 
     /* fake some proficiency checks */
     proficient = 0;
@@ -2571,10 +2581,9 @@ STATIC_OVL int
 use_pole(obj)
 	struct obj *obj;
 {
-	int res = 0, typ, max_range = 4, min_range = 4;
+	int res = 0, typ, max_range, min_range, glyph;
 	coord cc;
 	struct monst *mtmp;
-
 
 	/* Are you allowed to use the pole? */
 	if (u.uswallow) {
@@ -2592,13 +2601,29 @@ use_pole(obj)
 	cc.x = u.ux;
 	cc.y = u.uy;
 	if (getpos(&cc, TRUE, "the spot to hit") < 0)
-	    return 0;	/* user pressed ESC */
+	    return res;	/* ESC; uses turn iff polearm became wielded */
 
-	/* Calculate range */
+	glyph = glyph_at(cc.x, cc.y);
+	/*
+	 * Calculate allowable range (pole's reach is always 2 steps):
+	 *	unskilled and basic: orthogonal direction, 4..4;
+	 *	skilled: as basic, plus knight's jump position, 4..5;
+	 *	expert: as skilled, plus diagonal, 4..8.
+	 *		...9...
+	 *		.85458.
+	 *		.52125.
+	 *		9410149
+	 *		.52125.
+	 *		.85458.
+	 *		...9...
+	 *	(Note: no roles in nethack can become expert or better
+	 *	for polearm skill; Yeoman in slash'em can become expert.)
+	 */
+	min_range = 4;
 	typ = uwep_skill_type();
 	if (typ == P_NONE || P_SKILL(typ) <= P_BASIC) max_range = 4;
 	else if (P_SKILL(typ) == P_SKILLED) max_range = 5;
-	else max_range = 8;
+	else max_range = 8;	/* (P_SKILL(typ) >= P_EXPERT) */
 	if (distu(cc.x, cc.y) > max_range) {
 	    pline("Too far!");
 	    return (res);
@@ -2606,8 +2631,9 @@ use_pole(obj)
 	    pline("Too close!");
 	    return (res);
 	} else if (!cansee(cc.x, cc.y) &&
-		   ((mtmp = m_at(cc.x, cc.y)) == (struct monst *)0 ||
-		    !canseemon(mtmp))) {
+		   !glyph_is_monster(glyph) &&
+		   !glyph_is_invisible(glyph) &&
+		   !glyph_is_statue(glyph)) {
 	    You(cant_see_spot);
 	    return (res);
 	} else if (!couldsee(cc.x, cc.y)) { /* Eyes of the Overworld */
@@ -2616,14 +2642,38 @@ use_pole(obj)
 	}
 
 	/* Attack the monster there */
-	if ((mtmp = m_at(cc.x, cc.y)) != (struct monst *)0) {
-	    bhitpos = cc;
+	bhitpos = cc;
+	if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != (struct monst *)0) {
 	    if (attack_checks(mtmp, uwep)) return res;
 	    check_caitiff(mtmp);
+	    notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
 	    (void) thitmonst(mtmp, uwep);
-	} else
-	    /* Now you know that nothing is there... */
-	    pline(nothing_happens);
+	} else if (glyph_is_statue(glyph) && /* might be hallucinatory */
+		    sobj_at(STATUE, bhitpos.x, bhitpos.y)) {
+	    struct trap *t = t_at(bhitpos.x, bhitpos.y);
+
+	    if (t && t->ttyp == STATUE_TRAP &&
+		    activate_statue_trap(t, t->tx, t->ty, FALSE)) {
+		;	/* feedback has been give by animate_statue() */
+	    } else {
+		/* Since statues look like monsters now, we say something
+		   different from "you miss" or "there's nobody there".
+		   Note:  we only do this when a statue is displayed here,
+		   because the player is probably attempting to attack it;
+		   other statues obscured by anything are just ignored. */
+		pline("Thump!  Your blow bounces harmlessly off the statue.");
+		wake_nearto(bhitpos.x, bhitpos.y, 25);
+	    }
+	} else {
+	    /* no monster here and no statue seen or remembered here */
+	    if (glyph_is_invisible(glyph)) {
+		/* now you know that nothing is there... */
+		unmap_object(bhitpos.x, bhitpos.y);
+		newsym(bhitpos.x, bhitpos.y);
+	    }
+	    You("miss; there is no one there to hit.");
+	}
+	u_wipe_engr(2);		/* same as for melee or throwing */
 	return (1);
 }
 
@@ -2667,7 +2717,7 @@ struct obj *obj;
 }
 
 STATIC_OVL int
-use_grapple (obj)
+use_grapple(obj)
 	struct obj *obj;
 {
 	int res = 0, typ, max_range = 4, tohit;
@@ -2692,9 +2742,9 @@ use_grapple (obj)
 	cc.x = u.ux;
 	cc.y = u.uy;
 	if (getpos(&cc, TRUE, "the spot to hit") < 0)
-	    return 0;	/* user pressed ESC */
+	    return res;	/* ESC; uses turn iff grapnel became wielded */
 
-	/* Calculate range */
+	/* Calculate range; unlike use_pole(), there's no minimum for range */
 	typ = uwep_skill_type();
 	if (typ == P_NONE || P_SKILL(typ) <= P_BASIC) max_range = 4;
 	else if (P_SKILL(typ) == P_SKILLED) max_range = 5;
@@ -2741,6 +2791,10 @@ use_grapple (obj)
 	    destroy_nhwindow(tmpwin);
 	}
 
+	/* possibly scuff engraving at your feet;
+	   any engraving at the target location is unaffected */
+	if (tohit == 2 || !rn2(2)) u_wipe_engr(rnd(2));
+
 	/* What did you hit? */
 	switch (tohit) {
 	case 0:	/* Trap */
@@ -2758,6 +2812,7 @@ use_grapple (obj)
 	case 2:	/* Monster */
 	    bhitpos = cc;
 	    if ((mtmp = m_at(cc.x, cc.y)) == (struct monst *)0) break;
+	    notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
 	    save_confirm = flags.confirm;
 	    if (verysmall(mtmp->data) && !rn2(4) &&
 			enexto(&cc, u.ux, u.uy, (struct permonst *)0)) {
