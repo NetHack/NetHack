@@ -314,6 +314,7 @@ attacking via applied polearm never scuffed engraving underneath hero
 auto-wielding a polearm took no time if ESC was used to cancel target choice
 applying a bullwhip while at very edge of map could target beyond edge,
 	potentially leading to a panic or crash
+prevent temple priests and minions from wearing helms of opposite alignment
 
 
 Platform- and/or Interface-Specific Fixes

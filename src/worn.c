@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worn.c	3.5	2008/09/03	*/
+/*	SCCS Id: @(#)worn.c	3.5	2009/02/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -503,6 +503,11 @@ boolean racialexception;
 		    break;
 		case W_ARMH:
 		    if (!is_helmet(obj)) continue;
+		    /* changing alignment is not implemented for monsters;
+		       priests and minions could change alignment but wouldn't
+		       want to, so they reject helms of opposite alignment */
+		    if (obj->otyp == HELM_OF_OPPOSITE_ALIGNMENT &&
+			    (mon->ispriest || mon->isminion)) continue;
 		    /* (flimsy exception matches polyself handling) */
 		    if (has_horns(mon->data) && !is_flimsy(obj)) continue;
 		    break;
