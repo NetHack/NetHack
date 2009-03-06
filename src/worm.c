@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)worm.c	3.5	2007/07/15	*/
+/*	SCCS Id: @(#)worm.c	3.5	2009/03/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -363,11 +363,12 @@ cutworm(worm, x, y, weap)
 
     /*
      *  At this point, the old worm is correct.  Any new worm will have
-     *  it's head at "curr" and its tail at "new_tail".
+     *  it's head at "curr" and its tail at "new_tail".  The old worm   
+     *  must be at least level 3 in order to produce a new worm.
      */
 
     new_worm = 0;
-    new_wnum = rn2(3) ? 0 : get_wormno();
+    new_wnum = (worm->m_lev >= 3 && !rn2(3)) ? get_wormno() : 0;
     if (new_wnum) {
 	remove_monster(x, y);	/* clone_mon puts new head here */
 	/* clone_mon() will fail if enough long worms have been
@@ -392,19 +393,16 @@ cutworm(worm, x, y, weap)
     new_worm->wormno = new_wnum;	/* affix new worm number */
     new_worm->mcloned = 0;	/* treat second worm as a normal monster */
 
-    /* Devalue the monster level of both halves of the worm. */
-    worm->m_lev = ((unsigned)worm->m_lev <= 3) ?
-		   (unsigned)worm->m_lev : max((unsigned)worm->m_lev - 2, 3);
+    /* Devalue the monster level of both halves of the worm.
+       Note: m_lev is always at least 3 in order to get this far. */
+    worm->m_lev = max((unsigned)worm->m_lev - 2, 3);
     new_worm->m_lev = worm->m_lev;
 
-    /* Calculate the mhp on the new_worm for the (lower) monster level. */
+    /* Calculate the lower-level mhp; use <N>d8 for long worms.
+       Can't use newmonhp() here because it would reset m_lev. */
     new_worm->mhpmax = new_worm->mhp = d((int)new_worm->m_lev, 8);
-
-    /* Calculate the mhp on the old worm for the (lower) monster level. */
-    if (worm->m_lev > 3) {
-	worm->mhpmax = d((int)worm->m_lev, 8);
-	if (worm->mhpmax < worm->mhp) worm->mhp = worm->mhpmax;
-    }
+    worm->mhpmax = d((int)worm->m_lev, 8);	/* new maxHP for old worm */
+    if (worm->mhpmax < worm->mhp) worm->mhp = worm->mhpmax;
 
     wtails[new_wnum] = new_tail;	/* We've got all the info right now */
     wheads[new_wnum] = curr;		/* so we can do this faster than    */
