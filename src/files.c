@@ -1,4 +1,4 @@
-/*	SCCS Id: @(#)files.c	3.5	2008/01/30	*/
+/* NetHack 3.5	files.c	$Date$  $Revision$ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2068,20 +2068,20 @@ int		src;
 #ifdef SYSCF
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "WIZARDS", 7)) {
 	    if(sysopt.wizards) free(sysopt.wizards);
-	    sysopt.wizards = alloc(strlen(bufp));
-	    (void) strcpy(sysopt.wizards, bufp);
+	    sysopt.wizards = alloc(strlen(bufp)+1);
+	    Strcpy(sysopt.wizards, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "SHELLERS", 8)) {
 	    if(sysopt.shellers) free(sysopt.shellers);
-	    sysopt.shellers = alloc(strlen(bufp));
-	    (void) strcpy(sysopt.shellers, bufp);
+	    sysopt.shellers = alloc(strlen(bufp)+1);
+	    Strcpy(sysopt.shellers, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "SUPPORT", 7)) {
 	    if(sysopt.support) free(sysopt.support);
-	    sysopt.support = alloc(strlen(bufp));
-	    (void) strcpy(sysopt.support, bufp);
+	    sysopt.support = alloc(strlen(bufp)+1);
+	    Strcpy(sysopt.support, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "RECOVER", 7)) {
 	    if(sysopt.recover) free(sysopt.recover);
-	    sysopt.recover = alloc(strlen(bufp));
-	    (void) strcpy(sysopt.recover, bufp);
+	    sysopt.recover = alloc(strlen(bufp)+1);
+	    Strcpy(sysopt.recover, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "MAXPLAYERS", 10)) {
 	    int temp = atoi(bufp);
 		/* XXX to get more than 25, need to rewrite all lock code */
