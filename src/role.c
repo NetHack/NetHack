@@ -1270,10 +1270,10 @@ build_plselection_prompt(buf, buflen, rolenum, racenum, gendnum, alignnum)
 char *buf;
 int buflen, rolenum, racenum, gendnum, alignnum;
 {
-	const char *defprompt = "Shall I pick a character for you? [ynq] ";
+	const char *defprompt = "Shall I pick a character for you? [ynaq] ";
 	int num_post_attribs = 0;
 	char tmpbuf[BUFSZ];
-	
+
 	if (buflen < QBUFSZ)
 		return (char *)defprompt;
 
@@ -1315,7 +1315,7 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 			Strcat(buf, "alignment");
 		}
 	}
-	Strcat(buf, " for you? [ynq] ");
+	Strcat(buf, " for you? [ynaq] ");
 	return buf;
 }
 
@@ -1328,8 +1328,18 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 void
 plnamesuffix()
 {
-	char *sptr, *eptr;
-	int i;
+    char *sptr, *eptr;
+    int i;
+
+    /* some generic user names will be ignored in favor of prompting */
+    i = (int)strlen(plname);
+    if ((i >= 4 && !strncmpi(plname, "player", i)) ||	    /* play[er] */
+	    (i >= 4 && !strncmpi(plname, "games", i)) ||	   /* game[s] */
+	    (i >= 7 && !strncmpi(plname, "nethacker", i)))  /* nethack[er] */
+	*plname = '\0'; /* call askname() */
+
+    do {
+	if (!*plname) askname();	/* fill plname[] if necessary */
 
 	/* Look for tokens delimited by '-' */
 	if ((eptr = index(plname, '-')) != (char *) 0)
@@ -1350,17 +1360,222 @@ plnamesuffix()
 	    else if ((i = str2align(sptr)) != ROLE_NONE)
 		flags.initalign = i;
 	}
-	if(!plname[0]) {
-	    askname();
-	    plnamesuffix();
-	}
+    } while (!*plname);
 
-	/* commas in the plname confuse the record file, convert to spaces */
-	for (sptr = plname; *sptr; sptr++) {
-		if (*sptr == ',') *sptr = ' ';
-	}
+    /* commas in the plname confuse the record file, convert to spaces */
+    for (sptr = plname; *sptr; sptr++) {
+	if (*sptr == ',') *sptr = ' ';
+    }
 }
 
+void
+role_selection_prolog(which, where)
+int which;
+winid where;
+{
+    static const char NEARDATA
+	choosing[] = " choosing now",
+	not_yet[] = " not yet specified",
+	rand_choice[] = " random";
+    char buf[BUFSZ];
+    int r, c, g, a, allowmask;
+
+    switch (which) {
+    case RS_NAME:
+	if (*plname) return;
+	break;
+    case RS_ROLE:
+	if (flags.initrole != ROLE_NONE && flags.initrole != ROLE_RANDOM)
+	    return;
+	break;
+    case RS_RACE:
+	if (flags.initrace != ROLE_NONE && flags.initrace != ROLE_RANDOM)
+	    return;
+	break;
+    case RS_GENDER:
+	if (flags.initgend != ROLE_NONE && flags.initgend != ROLE_RANDOM)
+	    return;
+	break;
+    case RS_ALGNMNT:
+	if (flags.initalign != ROLE_NONE && flags.initalign != ROLE_RANDOM)
+	    return;
+	break;
+    }
+
+    r = flags.initrole;
+    c = flags.initrace;
+    g = flags.initgend;
+    a = flags.initalign;
+    if (r >= 0) {
+	allowmask = roles[r].allow;
+	if ((allowmask & ROLE_RACEMASK) == MH_HUMAN)
+	    c = 0;	/* races[human] */
+	else if (c >= 0 && !(allowmask & ROLE_RACEMASK & races[c].allow))
+	    c = ROLE_RANDOM;
+	if ((allowmask & ROLE_GENDMASK) == ROLE_MALE)
+	    g = 0;	/* role forces male (hypothetical) */
+	else if ((allowmask & ROLE_GENDMASK) == ROLE_FEMALE)
+	    g = 1;	/* role forces female (valkyrie) */
+	if ((allowmask & ROLE_ALIGNMASK) == AM_LAWFUL)
+	    a = 0;	/* aligns[lawful] */
+	else if ((allowmask & ROLE_ALIGNMASK) == AM_NEUTRAL)
+	    a = 1;	/* aligns[neutral] */
+	else if ((allowmask & ROLE_ALIGNMASK) == AM_CHAOTIC)
+	    a = 2;	/* alings[chaotic] */
+    }
+    if (c >= 0) {
+	allowmask = races[c].allow;
+	if ((allowmask & ROLE_ALIGNMASK) == AM_LAWFUL)
+	    a = 0;	/* aligns[lawful] */
+	else if ((allowmask & ROLE_ALIGNMASK) == AM_NEUTRAL)
+	    a = 1;	/* aligns[neutral] */
+	else if ((allowmask & ROLE_ALIGNMASK) == AM_CHAOTIC)
+	    a = 2;	/* alings[chaotic] */
+	/* [c never forces gender] */
+    }
+    /* [g and a don't constrain anything sufficiently
+       to narrow something done to a single choice] */
+
+    Sprintf(buf, "%12s ", "name:");
+    Strcat(buf, (which == RS_NAME) ? choosing : !*plname ? not_yet : plname);
+    putstr(where, 0, buf);
+    Sprintf(buf, "%12s ", "role:");
+    Strcat(buf, (which == RS_ROLE) ? choosing : (r == ROLE_NONE) ? not_yet :
+		(r == ROLE_RANDOM) ? rand_choice : roles[r].name.m);
+    if (r >= 0 && roles[r].name.f) {
+	/* distinct female name [caveman/cavewoman, priest/priestess] */
+	if (g == 1)
+	    /* female specified; replace male role name with female one */
+	    Sprintf(index(buf, ':'), ": %s", roles[r].name.f);
+	else if (g < 0)
+	    /* gender unspecified; append slash and female role name */
+	    Sprintf(eos(buf), "/%s", roles[r].name.f);
+    }
+    putstr(where, 0, buf);
+    Sprintf(buf, "%12s ", "race:");
+    Strcat(buf, (which == RS_RACE) ? choosing : (c == ROLE_NONE) ? not_yet :
+		(c == ROLE_RANDOM) ? rand_choice : races[c].noun);
+    putstr(where, 0, buf);
+    Sprintf(buf, "%12s ", "gender:");
+    Strcat(buf, (which == RS_GENDER) ? choosing : (g == ROLE_NONE) ? not_yet :
+		(g == ROLE_RANDOM) ? rand_choice : genders[g].adj);
+    putstr(where, 0, buf);
+    Sprintf(buf, "%12s ", "alignment:");
+    Strcat(buf, (which == RS_ALGNMNT) ? choosing : (a == ROLE_NONE) ? not_yet :
+		(a == ROLE_RANDOM) ? rand_choice : aligns[a].adj);
+    putstr(where, 0, buf);
+}
+
+void
+role_menu_extra(which, where)
+int which;
+winid where;
+{
+    static NEARDATA const char RS_menu_let[] = {
+	'=',		/* name */
+	'?',		/* role */
+	'/',		/* race */
+	'\"',		/* gender */
+	'[',		/* alignment */
+    };
+    anything any;
+    char buf[BUFSZ];
+    const char *what = 0, *constrainer = 0, *forcedvalue = 0;
+    int f = 0, r, c, g, a, allowmask;
+
+    r = flags.initrole;
+    c = flags.initrace;
+    switch (which) {
+    case RS_NAME:
+	what = "name";
+	break;
+    case RS_ROLE:
+	what = "role";
+	f = r;
+	/* nothing contrains role to a single choice */
+	break;
+    case RS_RACE:
+	what = "race";
+	f = flags.initrace;
+	c = ROLE_NONE;		/* override player's setting */
+	if (r >= 0) {
+	    allowmask = roles[r].allow & ROLE_RACEMASK;
+	    if (allowmask == MH_HUMAN)
+		c = 0;		/* races[human] */
+	    if (c >= 0) {
+		constrainer = "role";
+		forcedvalue = races[c].noun;
+	    }
+	}
+	break;
+    case RS_GENDER:
+	what = "gender";
+	f = flags.initgend;
+	g = ROLE_NONE;
+	if (r >= 0) {
+	    allowmask = roles[r].allow & ROLE_GENDMASK;
+	    if (allowmask == ROLE_MALE)
+		g = 0;		/* genders[male] */
+	    else if (allowmask == ROLE_FEMALE)
+		g = 1;		/* genders[female] */
+	    if (g >= 0) {
+		constrainer = "role";
+		forcedvalue = genders[g].adj;
+	    }
+	}
+	break;
+    case RS_ALGNMNT:
+	what = "alignment";
+	f = flags.initalign;
+	a = ROLE_NONE;
+	if (r >= 0) {
+	    allowmask = roles[r].allow & ROLE_ALIGNMASK;
+	    if (allowmask == AM_LAWFUL)
+		a = 0;		/* aligns[lawful] */
+	    else if (allowmask == AM_NEUTRAL)
+		a = 1;		/* aligns[neutral] */
+	    else if (allowmask == AM_CHAOTIC)
+		a = 2;		/* aligns[chaotic] */
+	    if (a >= 0) constrainer = "role";
+	}
+	if (c >= 0 && !constrainer) {
+	    allowmask = races[c].allow & ROLE_ALIGNMASK;
+	    if (allowmask == AM_LAWFUL)
+		a = 0;		/* aligns[lawful] */
+	    else if (allowmask == AM_NEUTRAL)
+		a = 1;		/* aligns[neutral] */
+	    else if (allowmask == AM_CHAOTIC)
+		a = 2;		/* aligns[chaotic] */
+	    if (a >= 0) constrainer = "race";
+	}
+	if (a >= 0) forcedvalue = aligns[a].adj;
+	break;
+    }
+
+    any = zeroany;	/* zero out all bits */
+    if (constrainer) {
+	any.a_int = 0;
+	/* use four spaces of padding to fake a grayed out menu choice */
+	Sprintf(buf, "%4s%s forces %s", "", constrainer, forcedvalue);
+	add_menu(where, NO_GLYPH, &any, ' ',
+		 0, ATR_NONE, buf, MENU_UNSELECTED);
+    } else if (what) {
+	any.a_int = RS_menu_arg(which);
+	Sprintf(buf, "Pick%s %s first", (f >= 0) ? " another" : "", what);
+	add_menu(where, NO_GLYPH, &any, RS_menu_let[which],
+		 0, ATR_NONE, buf, MENU_UNSELECTED);
+    } else if (which == ROLE_RANDOM) {
+	any.a_int = ROLE_RANDOM;
+	add_menu(where, NO_GLYPH, &any, '*',
+		 0, ATR_NONE, "Random", MENU_UNSELECTED);
+    } else if (which == ROLE_NONE) {
+	any.a_int = ROLE_NONE;
+	add_menu(where, NO_GLYPH, &any, 'q',
+		 0, ATR_NONE, "Quit", MENU_UNSELECTED);
+    } else {
+	impossible("role_menu_extra: bad arg (%s)", which);
+    }
+}
 
 /*
  *	Special setup modifications here:
