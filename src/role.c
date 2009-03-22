@@ -1368,6 +1368,8 @@ plnamesuffix()
     }
 }
 
+/* show current settings for name, role, race, gender, and alignment
+   in the specified window */
 void
 role_selection_prolog(which, where)
 int which;
@@ -1379,28 +1381,6 @@ winid where;
 	rand_choice[] = " random";
     char buf[BUFSZ];
     int r, c, g, a, allowmask;
-
-    switch (which) {
-    case RS_NAME:
-	if (*plname) return;
-	break;
-    case RS_ROLE:
-	if (flags.initrole != ROLE_NONE && flags.initrole != ROLE_RANDOM)
-	    return;
-	break;
-    case RS_RACE:
-	if (flags.initrace != ROLE_NONE && flags.initrace != ROLE_RANDOM)
-	    return;
-	break;
-    case RS_GENDER:
-	if (flags.initgend != ROLE_NONE && flags.initgend != ROLE_RANDOM)
-	    return;
-	break;
-    case RS_ALGNMNT:
-	if (flags.initalign != ROLE_NONE && flags.initalign != ROLE_RANDOM)
-	    return;
-	break;
-    }
 
     r = flags.initrole;
     c = flags.initrace;
@@ -1466,6 +1446,7 @@ winid where;
     putstr(where, 0, buf);
 }
 
+/* add a "pick alignment first"-type entry to the specified menu */
 void
 role_menu_extra(which, where)
 int which;
