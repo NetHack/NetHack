@@ -1034,7 +1034,7 @@ savemon(fd, mtmp)
 int fd;
 struct monst *mtmp;
 {
-	int buflen, zerobuf = 0;
+	int buflen;
 
 	buflen = sizeof(struct monst);
 	bwrite(fd, (genericptr_t) &buflen, sizeof(int));
