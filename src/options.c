@@ -611,11 +611,9 @@ initoptions_init()
 #endif
 	iflags.menu_headings = ATR_INVERSE;
 
-	/* Use negative indices to indicate not yet selected */
-	flags.initrole = -1;
-	flags.initrace = -1;
-	flags.initgend = -1;
-	flags.initalign = -1;
+	/* hero's role, race, &c haven't been chosen yet */
+	flags.initrole = flags.initrace =
+	    flags.initgend = flags.initalign = ROLE_NONE;
 
 	/* Set the default monster and object class symbols. */
 	init_symbols();
