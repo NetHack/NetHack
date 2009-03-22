@@ -254,4 +254,12 @@ struct wc_Opt {
 	unsigned long wc_bit;
 };
 
+/* role selection by player_selection(); this ought to be in the core... */
+#define RS_NAME		0
+#define RS_ROLE		1
+#define RS_RACE		2
+#define RS_GENDER	3
+#define RS_ALGNMNT	4
+#define RS_menu_arg(x)	(ROLE_RANDOM - ((x) + 1))	/* 0..4 -> -3..-7 */
+
 #endif /* WINPROCS_H */

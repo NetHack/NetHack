@@ -353,342 +353,508 @@ char** argv;
     tty_display_nhwindow(BASE_WINDOW, FALSE);
 }
 
+/* try to reduce clutter in the code below... */
+#define ROLE flags.initrole
+#define RACE flags.initrace
+#define GEND flags.initgend
+#define ALGN flags.initalign
+
 void
 tty_player_selection()
 {
-	int i, k, n;
-	char pick4u = 'n', thisch, lastch = 0;
-	char pbuf[QBUFSZ], plbuf[QBUFSZ];
-	winid win;
-	anything any;
-	menu_item *selected = 0;
+    int i, k, n, choice, nextpick;
+    boolean getconfirmation;
+    char pick4u = 'n', thisch, lastch = 0;
+    char pbuf[QBUFSZ], plbuf[QBUFSZ];
+    winid win;
+    anything any;
+    menu_item *selected = 0;
 
-	/* prevent an unnecessary prompt */
-	rigid_role_checks();
+    if (flags.randomall) {
+	if (ROLE == ROLE_NONE) ROLE = ROLE_RANDOM;
+	if (RACE == ROLE_NONE) RACE = ROLE_RANDOM;
+	if (GEND == ROLE_NONE) GEND = ROLE_RANDOM;
+	if (ALGN == ROLE_NONE) ALGN = ROLE_RANDOM;
+    }
 
-	/* Should we randomly pick for the player? */
-	if (!flags.randomall &&
-	    (flags.initrole == ROLE_NONE || flags.initrace == ROLE_NONE ||
-	     flags.initgend == ROLE_NONE || flags.initalign == ROLE_NONE)) {
-	    int echoline;
-	    char *prompt = build_plselection_prompt(pbuf, QBUFSZ, flags.initrole,
-				flags.initrace, flags.initgend, flags.initalign);
+    /* prevent an unnecessary prompt */
+    rigid_role_checks();
 
+    /* Should we randomly pick for the player? */
+    if (ROLE == ROLE_NONE || RACE == ROLE_NONE ||
+	    GEND == ROLE_NONE || ALGN == ROLE_NONE) {
+	int echoline;
+	char *prompt = build_plselection_prompt(pbuf, QBUFSZ,
+						ROLE, RACE, GEND, ALGN);
+
+	/* this prompt string ends in "[ynaq]?":
+	   y - game picks role,&c then asks player to confirm;
+	   n - player manually chooses via menu selections;
+	   a - like 'y', but skips confirmation and starts game;
+	   q - quit
+	 */
+	tty_putstr(BASE_WINDOW, 0, "");
+	echoline = wins[BASE_WINDOW]->cury;
+	tty_putstr(BASE_WINDOW, 0, prompt);
+	do {
+	    pick4u = lowc(readchar());
+	    if (index(quitchars, pick4u)) pick4u = 'y';
+	} while (!index(ynaqchars, pick4u));
+	if ((int)strlen(prompt) + 1 < CO) {
+	    /* Echo choice and move back down line */
+	    tty_putsym(BASE_WINDOW, (int)strlen(prompt)+1, echoline, pick4u);
 	    tty_putstr(BASE_WINDOW, 0, "");
-	    echoline = wins[BASE_WINDOW]->cury;
-	    tty_putstr(BASE_WINDOW, 0, prompt);
-	    do {
-		pick4u = lowc(readchar());
-		if (index(quitchars, pick4u)) pick4u = 'y';
-	    } while(!index(ynqchars, pick4u));
-	    if ((int)strlen(prompt) + 1 < CO) {
-		/* Echo choice and move back down line */
-		tty_putsym(BASE_WINDOW, (int)strlen(prompt)+1, echoline, pick4u);
-		tty_putstr(BASE_WINDOW, 0, "");
-	    } else
-		/* Otherwise it's hard to tell where to echo, and things are
-		 * wrapping a bit messily anyway, so (try to) make sure the next
-		 * question shows up well and doesn't get wrapped at the
-		 * bottom of the window.
-		 */
-		tty_clear_nhwindow(BASE_WINDOW);
-	    
-	    if (pick4u != 'y' && pick4u != 'n') {
-give_up:	/* Quit */
-		if (selected) free((genericptr_t) selected);
-		bail((char *)0);
-		/*NOTREACHED*/
-		return;
-	    }
-	}
+	} else
+	    /* Otherwise it's hard to tell where to echo, and things are
+	     * wrapping a bit messily anyway, so (try to) make sure the next
+	     * question shows up well and doesn't get wrapped at the
+	     * bottom of the window.
+	     */
+	    tty_clear_nhwindow(BASE_WINDOW);
 
-	(void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
-			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
+	if (pick4u != 'y' && pick4u != 'a' && pick4u != 'n') goto give_up;
+    }
 
-	/* Select a role, if necessary */
-	/* we'll try to be compatible with pre-selected race/gender/alignment,
-	 * but may not succeed */
-	if (flags.initrole < 0) {
-	    char rolenamebuf[QBUFSZ];
-	    /* Process the choice */
-	    if (pick4u == 'y' || flags.initrole == ROLE_RANDOM || flags.randomall) {
-		/* Pick a random role */
-		flags.initrole = pick_role(flags.initrace, flags.initgend,
-						flags.initalign, PICK_RANDOM);
-		if (flags.initrole < 0) {
-		    tty_putstr(BASE_WINDOW, 0, "Incompatible role!");
-		    flags.initrole = randrole();
-		}
- 	    } else {
-	    	tty_clear_nhwindow(BASE_WINDOW);
-		tty_putstr(BASE_WINDOW, 0, "Choosing Character's Role");
-		/* Prompt for a role */
-		win = create_nhwindow(NHW_MENU);
-		start_menu(win);
-		any = zeroany;         /* zero out all bits */
-		for (i = 0; roles[i].name.m; i++) {
-		    if (ok_role(i, flags.initrace, flags.initgend,
-							flags.initalign)) {
-			any.a_int = i+1;	/* must be non-zero */
+ makepicks:
+    nextpick = RS_ROLE;
+    do {
+       if (nextpick == RS_ROLE) {
+	    nextpick = RS_RACE;
+	    /* Select a role, if necessary;
+	       we'll try to be compatible with pre-selected
+	       race/gender/alignment, but may not succeed. */
+	    if (ROLE < 0) {
+		/* Process the choice */
+		if (pick4u == 'y' || pick4u == 'a' || ROLE == ROLE_RANDOM) {
+		    /* Pick a random role */
+		    k = pick_role(RACE, GEND, ALGN, PICK_RANDOM);
+		    if (k < 0) {
+			tty_putstr(BASE_WINDOW, 0, "Incompatible role!");
+			k = randrole();
+		    }
+		} else {
+		    /* Prompt for a role */
+		    char rolenamebuf[QBUFSZ];
+
+		    tty_clear_nhwindow(BASE_WINDOW);
+		    role_selection_prolog(RS_ROLE, BASE_WINDOW);
+		    win = create_nhwindow(NHW_MENU);
+		    start_menu(win);
+		    any = zeroany;		/* zero out all bits */
+		    for (i = 0; roles[i].name.m; i++) {
+			if (!ok_role(i, RACE, GEND, ALGN)) continue;
+			any.a_int = i + 1;		/* must be non-zero */
 			thisch = lowc(roles[i].name.m[0]);
 			if (thisch == lastch) thisch = highc(thisch);
-			if (flags.initgend != ROLE_NONE && flags.initgend != ROLE_RANDOM) {
-				if (flags.initgend == 1  && roles[i].name.f)
-					Strcpy(rolenamebuf, roles[i].name.f);
-				else
-					Strcpy(rolenamebuf, roles[i].name.m);
-			} else {
-				if (roles[i].name.f) {
-					Strcpy(rolenamebuf, roles[i].name.m);
-					Strcat(rolenamebuf, "/");
-					Strcat(rolenamebuf, roles[i].name.f);
-				} else 
-					Strcpy(rolenamebuf, roles[i].name.m);
-			}	
-			add_menu(win, NO_GLYPH, &any, thisch,
-			    0, ATR_NONE, an(rolenamebuf), MENU_UNSELECTED);
+			Strcpy(rolenamebuf, roles[i].name.m);
+			if (roles[i].name.f) {
+			    /* role has distinct name for female (C,P) */
+			    if (GEND == 1) {
+				/* female already chosen; replace male name */
+				Strcpy(rolenamebuf, roles[i].name.f);
+			    } else if (GEND < 0) {
+				/* not chosen yet; append slash+female name */
+				Strcat(rolenamebuf, "/");
+				Strcat(rolenamebuf, roles[i].name.f);
+			    }
+			}
+			add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE,
+				 an(rolenamebuf), MENU_UNSELECTED);
 			lastch = thisch;
 		    }
-		}
-		any.a_int = pick_role(flags.initrace, flags.initgend,
-				    flags.initalign, PICK_RANDOM)+1;
-		if (any.a_int == 0)	/* must be non-zero */
-		    any.a_int = randrole()+1;
-		add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
-				"Random", MENU_UNSELECTED);
-		any.a_int = i+1;	/* must be non-zero */
-		add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
-				"Quit", MENU_UNSELECTED);
-		Sprintf(pbuf, "Pick a role for your %s", plbuf);
-		end_menu(win, pbuf);
-		n = select_menu(win, PICK_ONE, &selected);
-		destroy_nhwindow(win);
+		    role_menu_extra(ROLE_RANDOM, win);
+		    any.a_int = 0;	/* separator, not a choice */
+		    add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE,
+			     "", MENU_UNSELECTED);
+		    role_menu_extra(RS_RACE, win);
+		    role_menu_extra(RS_GENDER, win);
+		    role_menu_extra(RS_ALGNMNT, win);
+		    role_menu_extra(ROLE_NONE, win);		/* quit */
+		    Strcpy(pbuf, "Pick a role or profession");
+		    end_menu(win, pbuf);
+		    n = select_menu(win, PICK_ONE, &selected);
+		    choice = (n == 1) ? selected[0].item.a_int : ROLE_NONE;
+		    if (selected) free((genericptr_t) selected), selected = 0;
+		    destroy_nhwindow(win);
 
-		/* Process the choice */
-		if (n != 1 || selected[0].item.a_int == any.a_int)
-		    goto give_up;		/* Selected quit */
-
-		flags.initrole = selected[0].item.a_int - 1;
-		free((genericptr_t) selected),	selected = 0;
-	    }
-	    (void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
-			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
-	}
-	
-	/* Select a race, if necessary */
-	/* force compatibility with role, try for compatibility with
-	 * pre-selected gender/alignment */
-	if (flags.initrace < 0 || !validrace(flags.initrole, flags.initrace)) {
-	    /* pre-selected race not valid */
-	    if (pick4u == 'y' || flags.initrace == ROLE_RANDOM || flags.randomall) {
-		flags.initrace = pick_race(flags.initrole, flags.initgend,
-							flags.initalign, PICK_RANDOM);
-		if (flags.initrace < 0) {
-		    tty_putstr(BASE_WINDOW, 0, "Incompatible race!");
-		    flags.initrace = randrace(flags.initrole);
-		}
-	    } else {	/* pick4u == 'n' */
-		/* Count the number of valid races */
-		n = 0;	/* number valid */
-		k = 0;	/* valid race */
-		for (i = 0; races[i].noun; i++) {
-		    if (ok_race(flags.initrole, i, flags.initgend,
-							flags.initalign)) {
-			n++;
-			k = i;
+		    if (choice == ROLE_NONE) {
+			goto give_up;		/* Selected quit */
+		    } else if (choice == RS_menu_arg(RS_ALGNMNT)) {
+			ALGN = k = ROLE_NONE;
+			nextpick = RS_ALGNMNT;
+		    } else if (choice == RS_menu_arg(RS_GENDER)) {
+			GEND = k = ROLE_NONE;
+			nextpick = RS_GENDER;
+		    } else if (choice == RS_menu_arg(RS_RACE)) {
+			RACE = k = ROLE_NONE;
+			nextpick = RS_RACE;
+		    } else if (choice == ROLE_RANDOM) {
+			k = pick_role(RACE, GEND, ALGN, PICK_RANDOM);
+			if (k < 0) k = randrole();
+		    } else {
+			k = choice - 1;
 		    }
 		}
-		if (n == 0) {
-		    for (i = 0; races[i].noun; i++) {
-			if (validrace(flags.initrole, i)) {
-			    n++;
-			    k = i;
-			}
-		    }
-		}
+		ROLE = k;
+	    } /* needed role */
+	} /* picking role */
 
-		/* Permit the user to pick, if there is more than one */
-		if (n > 1) {
-		    tty_clear_nhwindow(BASE_WINDOW);
-		    tty_putstr(BASE_WINDOW, 0, "Choosing Race");
-		    win = create_nhwindow(NHW_MENU);
-		    start_menu(win);
-		    any = zeroany;         /* zero out all bits */
+	if (nextpick == RS_RACE) {
+	    nextpick = (ROLE < 0) ? RS_ROLE : RS_GENDER;
+	    /* Select a race, if necessary;
+	       force compatibility with role, try for compatibility
+	       with pre-selected gender/alignment. */
+	    if (RACE < 0 || !validrace(ROLE, RACE)) {
+		/* no race yet, or pre-selected race not valid */
+		if (pick4u == 'y' || pick4u == 'a' || RACE == ROLE_RANDOM) {
+		    k = pick_race(ROLE, GEND, ALGN, PICK_RANDOM);
+		    if (k < 0) {
+			tty_putstr(BASE_WINDOW, 0, "Incompatible race!");
+			k = randrace(ROLE);
+		    }
+		} else {	/* pick4u == 'n' */
+		    /* Count the number of valid races */
+		    n = 0;	/* number valid */
+		    k = 0;	/* valid race */
 		    for (i = 0; races[i].noun; i++)
-			if (ok_race(flags.initrole, i, flags.initgend,
-							flags.initalign)) {
-			    any.a_int = i+1;	/* must be non-zero */
+			if (ok_race(ROLE, i, GEND, ALGN)) {
+			    n++;
+			    k = i;
+			}
+		    if (n == 0) {
+			for (i = 0; races[i].noun; i++)
+			    if (validrace(ROLE, i)) {
+				n++;
+				k = i;
+			    }
+		    }
+		    /* Permit the user to pick, if there is more than one */
+		    if (n > 1) {
+			tty_clear_nhwindow(BASE_WINDOW);
+			role_selection_prolog(RS_RACE, BASE_WINDOW);
+			win = create_nhwindow(NHW_MENU);
+			start_menu(win);
+			any = zeroany;		/* zero out all bits */
+			for (i = 0; races[i].noun; i++) {
+			    if (!ok_race(ROLE, i, GEND, ALGN)) continue;
+			    any.a_int = i + 1;	/* must be non-zero */
 			    add_menu(win, NO_GLYPH, &any, races[i].noun[0],
-				0, ATR_NONE, races[i].noun, MENU_UNSELECTED);
+				  0, ATR_NONE, races[i].noun, MENU_UNSELECTED);
 			}
-		    any.a_int = pick_race(flags.initrole, flags.initgend,
-					flags.initalign, PICK_RANDOM)+1;
-		    if (any.a_int == 0)	/* must be non-zero */
-			any.a_int = randrace(flags.initrole)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
-				    "Random", MENU_UNSELECTED);
-		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
-				    "Quit", MENU_UNSELECTED);
-		    Sprintf(pbuf, "Pick the race of your %s", plbuf);
-		    end_menu(win, pbuf);
-		    n = select_menu(win, PICK_ONE, &selected);
-		    destroy_nhwindow(win);
-		    if (n != 1 || selected[0].item.a_int == any.a_int)
-			goto give_up;		/* Selected quit */
+			role_menu_extra(ROLE_RANDOM, win);
+			any.a_int = 0;		/* separator, not a choice */
+			add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE,
+				 "", MENU_UNSELECTED);
+			role_menu_extra(RS_ROLE, win);
+			role_menu_extra(RS_GENDER, win);
+			role_menu_extra(RS_ALGNMNT, win);
+			role_menu_extra(ROLE_NONE, win);	/* quit */
+			Strcpy(pbuf, "Pick a race or species");
+			end_menu(win, pbuf);
+			n = select_menu(win, PICK_ONE, &selected);
+			choice = (n == 1) ? selected[0].item.a_int : ROLE_NONE;
+			if (selected) free((genericptr_t) selected), selected = 0;
+			destroy_nhwindow(win);
 
-		    k = selected[0].item.a_int - 1;
-		    free((genericptr_t) selected),	selected = 0;
-		}
-		flags.initrace = k;
-	    }
-	    (void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
-			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
-	}
-
-	/* Select a gender, if necessary */
-	/* force compatibility with role/race, try for compatibility with
-	 * pre-selected alignment */
-	if (flags.initgend < 0 || !validgend(flags.initrole, flags.initrace,
-						flags.initgend)) {
-	    /* pre-selected gender not valid */
-	    if (pick4u == 'y' || flags.initgend == ROLE_RANDOM || flags.randomall) {
-		flags.initgend = pick_gend(flags.initrole, flags.initrace,
-						flags.initalign, PICK_RANDOM);
-		if (flags.initgend < 0) {
-		    tty_putstr(BASE_WINDOW, 0, "Incompatible gender!");
-		    flags.initgend = randgend(flags.initrole, flags.initrace);
-		}
-	    } else {	/* pick4u == 'n' */
-		/* Count the number of valid genders */
-		n = 0;	/* number valid */
-		k = 0;	/* valid gender */
-		for (i = 0; i < ROLE_GENDERS; i++) {
-		    if (ok_gend(flags.initrole, flags.initrace, i,
-							flags.initalign)) {
-			n++;
-			k = i;
-		    }
-		}
-		if (n == 0) {
-		    for (i = 0; i < ROLE_GENDERS; i++) {
-			if (validgend(flags.initrole, flags.initrace, i)) {
-			    n++;
-			    k = i;
+			if (choice == ROLE_NONE) {
+			    goto give_up;		/* Selected quit */
+			} else if (choice == RS_menu_arg(RS_ALGNMNT)) {
+			    ALGN = k = ROLE_NONE;
+			    nextpick = RS_ALGNMNT;
+			} else if (choice == RS_menu_arg(RS_GENDER)) {
+			    GEND = k = ROLE_NONE;
+			    nextpick = RS_GENDER;
+			} else if (choice == RS_menu_arg(RS_ROLE)) {
+			    ROLE = k = ROLE_NONE;
+			    nextpick = RS_ROLE;
+			} else if (choice == ROLE_RANDOM) {
+			    k = pick_race(ROLE, GEND, ALGN, PICK_RANDOM);
+			    if (k < 0) k = randrace(ROLE);
+			} else {
+			    k = choice - 1;
 			}
 		    }
 		}
+		RACE = k;
+	    } /* needed race */
+	} /* picking race */
 
-		/* Permit the user to pick, if there is more than one */
-		if (n > 1) {
-		    tty_clear_nhwindow(BASE_WINDOW);
-		    tty_putstr(BASE_WINDOW, 0, "Choosing Gender");
-		    win = create_nhwindow(NHW_MENU);
-		    start_menu(win);
-		    any = zeroany;         /* zero out all bits */
+	if (nextpick == RS_GENDER) {
+	    nextpick = (ROLE < 0) ? RS_ROLE : (RACE < 0) ? RS_RACE : RS_ALGNMNT;
+	    /* Select a gender, if necessary;
+	       force compatibility with role/race, try for compatibility
+	       with pre-selected alignment. */
+	    if (GEND < 0 || !validgend(ROLE, RACE, GEND)) {
+		/* no gender yet, or pre-selected gender not valid */
+		if (pick4u == 'y' || pick4u == 'a' || GEND == ROLE_RANDOM) {
+		    k = pick_gend(ROLE, RACE, ALGN, PICK_RANDOM);
+		    if (k < 0) {
+			tty_putstr(BASE_WINDOW, 0, "Incompatible gender!");
+			k = randgend(ROLE, RACE);
+		    }
+		} else {	/* pick4u == 'n' */
+		    /* Count the number of valid genders */
+		    n = 0;	/* number valid */
+		    k = 0;	/* valid gender */
 		    for (i = 0; i < ROLE_GENDERS; i++)
-			if (ok_gend(flags.initrole, flags.initrace, i,
-							    flags.initalign)) {
-			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, genders[i].adj[0],
-				0, ATR_NONE, genders[i].adj, MENU_UNSELECTED);
-			}
-		    any.a_int = pick_gend(flags.initrole, flags.initrace,
-					    flags.initalign, PICK_RANDOM)+1;
-		    if (any.a_int == 0)	/* must be non-zero */
-			any.a_int = randgend(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
-				    "Random", MENU_UNSELECTED);
-		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
-				    "Quit", MENU_UNSELECTED);
-		    Sprintf(pbuf, "Pick the gender of your %s", plbuf);
-		    end_menu(win, pbuf);
-		    n = select_menu(win, PICK_ONE, &selected);
-		    destroy_nhwindow(win);
-		    if (n != 1 || selected[0].item.a_int == any.a_int)
-			goto give_up;		/* Selected quit */
-
-		    k = selected[0].item.a_int - 1;
-		    free((genericptr_t) selected),	selected = 0;
-		}
-		flags.initgend = k;
-	    }
-	    (void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
-			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
-	}
-
-	/* Select an alignment, if necessary */
-	/* force compatibility with role/race/gender */
-	if (flags.initalign < 0 || !validalign(flags.initrole, flags.initrace,
-							flags.initalign)) {
-	    /* pre-selected alignment not valid */
-	    if (pick4u == 'y' || flags.initalign == ROLE_RANDOM || flags.randomall) {
-		flags.initalign = pick_align(flags.initrole, flags.initrace,
-							flags.initgend, PICK_RANDOM);
-		if (flags.initalign < 0) {
-		    tty_putstr(BASE_WINDOW, 0, "Incompatible alignment!");
-		    flags.initalign = randalign(flags.initrole, flags.initrace);
-		}
-	    } else {	/* pick4u == 'n' */
-		/* Count the number of valid alignments */
-		n = 0;	/* number valid */
-		k = 0;	/* valid alignment */
-		for (i = 0; i < ROLE_ALIGNS; i++) {
-		    if (ok_align(flags.initrole, flags.initrace, flags.initgend,
-							i)) {
-			n++;
-			k = i;
-		    }
-		}
-		if (n == 0) {
-		    for (i = 0; i < ROLE_ALIGNS; i++) {
-			if (validalign(flags.initrole, flags.initrace, i)) {
+			if (ok_gend(ROLE, RACE, i, ALGN)) {
 			    n++;
 			    k = i;
 			}
+		    if (n == 0) {
+			for (i = 0; i < ROLE_GENDERS; i++)
+			    if (validgend(ROLE, RACE, i)) {
+				n++;
+				k = i;
+			    }
+		    }
+		    /* Permit the user to pick, if there is more than one */
+		    if (n > 1) {
+			tty_clear_nhwindow(BASE_WINDOW);
+			role_selection_prolog(RS_GENDER, BASE_WINDOW);
+			win = create_nhwindow(NHW_MENU);
+			start_menu(win);
+			any = zeroany;		/* zero out all bits */
+			for (i = 0; i < ROLE_GENDERS; i++) {
+			    if (!ok_gend(ROLE, RACE, i, ALGN)) continue;
+			    any.a_int = i + 1;	/* non-zero */
+			    add_menu(win, NO_GLYPH, &any, genders[i].adj[0],
+				 0, ATR_NONE, genders[i].adj, MENU_UNSELECTED);
+			}
+			role_menu_extra(ROLE_RANDOM, win);
+			any.a_int = 0;		/* separator, not a choice */
+			add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE,
+				 "", MENU_UNSELECTED);
+			role_menu_extra(RS_ROLE, win);
+			role_menu_extra(RS_RACE, win);
+			role_menu_extra(RS_ALGNMNT, win);
+			role_menu_extra(ROLE_NONE, win);	/* quit */
+			Strcpy(pbuf, "Pick a gender or sex");
+			end_menu(win, pbuf);
+			n = select_menu(win, PICK_ONE, &selected);
+			choice = (n == 1) ? selected[0].item.a_int : ROLE_NONE;
+			if (selected) free((genericptr_t) selected), selected = 0;
+			destroy_nhwindow(win);
+
+			if (choice == ROLE_NONE) {
+			    goto give_up;		/* Selected quit */
+			} else if (choice == RS_menu_arg(RS_ALGNMNT)) {
+			    ALGN = k = ROLE_NONE;
+			    nextpick = RS_ALGNMNT;
+			} else if (choice == RS_menu_arg(RS_RACE)) {
+			    RACE = k = ROLE_NONE;
+			    nextpick = RS_RACE;
+			} else if (choice == RS_menu_arg(RS_ROLE)) {
+			    ROLE = k = ROLE_NONE;
+			    nextpick = RS_ROLE;
+			} else if (choice == ROLE_RANDOM) {
+			    k = pick_gend(ROLE, RACE, ALGN, PICK_RANDOM);
+			    if (k < 0) k = randgend(ROLE, RACE);
+			} else {
+			    k = choice - 1;
+			}
 		    }
 		}
+		GEND = k;
+	    } /* needed gender */
+	} /* picking gender */
 
-		/* Permit the user to pick, if there is more than one */
-		if (n > 1) {
-		    tty_clear_nhwindow(BASE_WINDOW);
-		    tty_putstr(BASE_WINDOW, 0, "Choosing Alignment");
-		    win = create_nhwindow(NHW_MENU);
-		    start_menu(win);
-		    any = zeroany;         /* zero out all bits */
+	if (nextpick == RS_ALGNMNT) {
+	    nextpick = (ROLE < 0) ? RS_ROLE : (RACE < 0) ? RS_RACE : RS_GENDER;
+	    /* Select an alignment, if necessary;
+	       force compatibility with role/race/gender. */
+	    if (ALGN < 0 || !validalign(ROLE, RACE, ALGN)) {
+		/* no alignment yet, or pre-selected alignment not valid */
+		if (pick4u == 'y' || pick4u == 'a' || ALGN == ROLE_RANDOM) {
+		    k = pick_align(ROLE, RACE, GEND, PICK_RANDOM);
+		    if (k < 0) {
+			tty_putstr(BASE_WINDOW, 0, "Incompatible alignment!");
+			k = randalign(ROLE, RACE);
+		    }
+		} else {	/* pick4u == 'n' */
+		    /* Count the number of valid alignments */
+		    n = 0;	/* number valid */
+		    k = 0;	/* valid alignment */
 		    for (i = 0; i < ROLE_ALIGNS; i++)
-			if (ok_align(flags.initrole, flags.initrace,
-							flags.initgend, i)) {
-			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, aligns[i].adj[0],
-				 0, ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
+			if (ok_align(ROLE, RACE, GEND, i)) {
+			    n++;
+			    k = i;
 			}
-		    any.a_int = pick_align(flags.initrole, flags.initrace,
-					    flags.initgend, PICK_RANDOM)+1;
-		    if (any.a_int == 0)	/* must be non-zero */
-			any.a_int = randalign(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
-				    "Random", MENU_UNSELECTED);
-		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
-				    "Quit", MENU_UNSELECTED);
-		    Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
-		    end_menu(win, pbuf);
-		    n = select_menu(win, PICK_ONE, &selected);
-		    destroy_nhwindow(win);
-		    if (n != 1 || selected[0].item.a_int == any.a_int)
-			goto give_up;		/* Selected quit */
+		    if (n == 0) {
+			for (i = 0; i < ROLE_ALIGNS; i++)
+			    if (validalign(ROLE, RACE, i)) {
+				n++;
+				k = i;
+			    }
+		    }
+		    /* Permit the user to pick, if there is more than one */
+		    if (n > 1) {
+			tty_clear_nhwindow(BASE_WINDOW);
+			role_selection_prolog(RS_ALGNMNT, BASE_WINDOW);
+			win = create_nhwindow(NHW_MENU);
+			start_menu(win);
+			any = zeroany;		/* zero out all bits */
+			for (i = 0; i < ROLE_ALIGNS; i++) {
+			    if (!ok_align(ROLE, RACE, GEND, i)) continue;
+			    any.a_int = i + 1;	/* non-zero */
+			    add_menu(win, NO_GLYPH, &any, aligns[i].adj[0],
+				  0, ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
+			}
+			role_menu_extra(ROLE_RANDOM, win);
+			any.a_int = 0;		/* separator, not a choice */
+			add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE,
+				 "", MENU_UNSELECTED);
+			role_menu_extra(RS_ROLE, win);
+			role_menu_extra(RS_RACE, win);
+			role_menu_extra(RS_GENDER, win);
+			role_menu_extra(ROLE_NONE, win);	/* quit */
+			Strcpy(pbuf, "Pick an alignment or creed");
+			end_menu(win, pbuf);
+			n = select_menu(win, PICK_ONE, &selected);
+			choice = (n == 1) ? selected[0].item.a_int : ROLE_NONE;
+			if (selected) free((genericptr_t) selected), selected = 0;
+			destroy_nhwindow(win);
 
-		    k = selected[0].item.a_int - 1;
-		    free((genericptr_t) selected),	selected = 0;
+			if (choice == ROLE_NONE) {
+			    goto give_up;		/* Selected quit */
+			} else if (choice == RS_menu_arg(RS_GENDER)) {
+			    GEND = k = ROLE_NONE;
+			    nextpick = RS_GENDER;
+			} else if (choice == RS_menu_arg(RS_RACE)) {
+			    RACE = k = ROLE_NONE;
+			    nextpick = RS_RACE;
+			} else if (choice == RS_menu_arg(RS_ROLE)) {
+			    ROLE = k = ROLE_NONE;
+			    nextpick = RS_ROLE;
+			} else if (choice == ROLE_RANDOM) {
+			    k = pick_align(ROLE, RACE, GEND, PICK_RANDOM);
+			    if (k < 0) k = randalign(ROLE, RACE);
+			} else {
+			    k = choice - 1;
+			}
+		    }
 		}
-		flags.initalign = k;
-	    }
+		ALGN = k;
+	    } /* needed alignment */
+	} /* picking alignment */
+
+    } while (ROLE < 0 || RACE < 0 || GEND < 0 || ALGN < 0);
+
+    /*
+     *	Role, race, &c have now been determined;
+     *	ask for confirmation and maybe go back to choose all over again.
+     *
+     *	Uses ynaq for familiarity, although 'a' is usually a
+     *	superset of 'y' but here is an alternate form of 'n'.
+     *	Menu layout:
+     *	 title:  Is this ok? [ynaq]
+     *	 blank:
+     *	  text:  $name, $alignment $gender $race $role
+     *	 blank:
+     *	  menu:  y + yes; play
+     *		 n - no; pick again
+     *	 maybe:  a - no; rename hero
+     *		 q - quit
+     *		 (end)
+     */
+    getconfirmation = (pick4u != 'a' && !flags.randomall);
+    while (getconfirmation) {
+	tty_clear_nhwindow(BASE_WINDOW);
+	role_selection_prolog(ROLE_NONE, BASE_WINDOW);
+	win = create_nhwindow(NHW_MENU);
+	start_menu(win);
+	any = zeroany;		/* zero out all bits */
+	any.a_int = 0;
+	if (!roles[ROLE].name.f &&
+		(roles[ROLE].allow & ROLE_GENDMASK) == (ROLE_MALE|ROLE_FEMALE))
+	    Sprintf(plbuf, " %s", genders[GEND].adj);
+	else
+	    *plbuf = '\0';	/* omit redundant gender */
+	Sprintf(pbuf, "%s, %s%s %s %s",
+		plname, aligns[ALGN].adj, plbuf, races[FACE].adj,
+		(GEND == 1 && roles[ROLE].name.f) ?
+		    roles[ROLE].name.f : roles[ROLE].name.m);
+	add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE,
+		 pbuf, MENU_UNSELECTED);
+	/* blank separator */
+	any.a_int = 0;
+	add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE,
+		 "", MENU_UNSELECTED);
+	/* [ynaq] menu choices */
+	any.a_int = 1;
+	add_menu(win, NO_GLYPH, &any, 'y', 0, ATR_NONE,
+		 "Yes; start game", MENU_SELECTED);
+	any.a_int = 2;
+	add_menu(win, NO_GLYPH, &any, 'n', 0, ATR_NONE,
+		 "No; choose role again", MENU_UNSELECTED);
+	if (iflags.renameallowed) {
+	    any.a_int = 3;
+	    add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
+		     "Not yet; choose another name", MENU_UNSELECTED);
 	}
-	/* Success! */
-	tty_display_nhwindow(BASE_WINDOW, FALSE);
+	any.a_int = -1;
+	add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE,
+		 "Quit", MENU_UNSELECTED);
+	Sprintf(pbuf, "Is this ok? [yn%sq]", iflags.renameallowed ? "a" : "");
+	end_menu(win, pbuf);
+	n = select_menu(win, PICK_ONE, &selected);
+	/* [pick-one menus with a preselected entry behave oddly...] */
+	choice = (n > 0) ? selected[n - 1].item.a_int : (n == 0) ? 1 : -1;
+	if (selected) free((genericptr_t) selected), selected = 0;
+
+	switch (choice) {
+	default:	/* 'q' or ESC */
+	    goto give_up;	/* quit */
+	    break;
+	case 3:		/* 'a' */
+    /*
+     * TODO: what, if anything, should be done if the name is
+     * changed to or from "wizard" after port-specific startup
+     * code has set flags.debug based on the original name?
+     */
+	  {
+	    int saveROLE, saveRACE, saveGEND, saveALGN;
+
+	    iflags.renameinprogress = TRUE;
+	    /* plnamesuffix() can change any or all of ROLE, RACE,
+	       GEND, ALGN; we'll override that and honor only the name */
+	    saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND, saveALGN = ALGN;
+	    *plname = '\0';
+	    plnamesuffix();	/* calls askname() when plname[] is empty */
+	    ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND, ALGN = saveALGN;
+	  }
+	    break;	/* getconfirmation is still True */
+	case 2:		/* 'n' */
+	    /* start fresh, but bypass "shall I pick everything for you?"
+	       step; any partial role selection via config file, command
+	       line, or name suffix is discarded this time */
+	    pick4u = 'n';
+	    ROLE = RACE = GEND = ALGN = ROLE_NONE;
+	    goto makepicks;
+	    break;
+	case 1:		/* 'y' or Space or Return/Enter */
+	    /* success; drop out through end of function */
+	    getconfirmation = FALSE;
+	    break;
+	}
+    }
+
+    /* Success! */
+    tty_display_nhwindow(BASE_WINDOW, FALSE);
+    return;
+
+ give_up:
+    /* Quit */
+    if (selected) free((genericptr_t) selected);	/* [obsolete] */
+    bail((char *)0);
+    /*NOTREACHED*/
+    return;
 }
+
+#undef ROLE
+#undef RACE
+#undef GEND
+#undef ALGN
 
 /*
  * plname is filled either by an option (-u Player  or  -uPlayer) or
@@ -703,7 +869,7 @@ tty_askname()
     register int c, ct, tryct = 0;
 
 #ifdef SELECTSAVED
-    if (iflags.wc2_selectsaved)
+    if (iflags.wc2_selectsaved && !iflags.renameinprogress)
 	switch (restore_menu(BASE_WINDOW)) {
 	case -1: bail("Until next time then...");	/* quit */
 		 /*NOTREACHED*/
@@ -784,6 +950,10 @@ tty_askname()
 
     /* move to next line to simulate echo of user's <return> */
     tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury + 1);
+
+    /* since we let user pick an arbitrary name now, he/she can pick
+       another one during role selection */
+    iflags.renameallowed = TRUE;
 }
 
 void

@@ -338,12 +338,23 @@ char *argv[];
 # endif
 #endif
 
-	if (!*plname)
-		askname();
-	plnamesuffix(); 	/* strip suffix from name; calls askname() */
-				/* again if suffix was whole name */
-				/* accepts any suffix */
+	/* strip role,race,&c suffix; calls askname() if plname[] is empty
+	   or holds a generic user name like "player" or "games" */
+	plnamesuffix();
 	set_playmode();	/* sets plname to "wizard" for wizard mode */
+#if 0
+	/* unlike Unix where the game might be invoked with a script
+	   which forces a particular character name for each player
+	   using a shared account, we always allow player to rename
+	   the character during role/race/&c selection */
+	iflags.renameallowed = TRUE;
+#else
+ /* until the getlock code is resolved, override askname()'s
+    setting of renameallowed; when False, player_selection()
+    won't resent renaming as an option */
+ iflags.renameallowed = FALSE;
+#endif
+
 #if defined(PC_LOCKING)
 	/* 3.3.0 added this to support detection of multiple games
 	 * under the same plname on the same machine in a windowed
@@ -427,6 +438,11 @@ char *argv[];
 	getreturn_enabled = TRUE;
 #endif
 
+	/*
+	 * First, try to find and restore a save file for specified character.
+	 * We'll return here if new game player_selection() renames the hero.
+	 */
+ attempt_restore:
 	if ((fd = restore_saved_game()) >= 0) {
 #ifndef NO_SIGNAL
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
@@ -455,7 +471,23 @@ char *argv[];
 	}
 
 	if (!resuming) {
-		player_selection();
+		/* new game:  start by choosing role, race, etc;
+		   player might change the hero's name while doing that,
+		   in which case we try to restore under the new name
+		   and skip selection this time if that didn't succeed */
+		if (!iflags.renameinprogress) {
+		    player_selection();
+		    if (iflags.renameinprogress) {
+			/* player has renamed the hero while selecting role;
+			   discard current lock file and create another for
+			   the new character name */
+#if 0       /* this needs to be reconciled with the getlock mess above... */
+			delete_levelfile(0); /* remove empty lock file */
+			getlock();
+#endif
+			goto attempt_restore;
+		    }
+		}
 		newgame();
 		if (discover)
 			You("are in non-scoring discovery mode.");

@@ -22,7 +22,8 @@ getlock(void)
 {
 	int fd;
 	int pid = getpid(); /* Process ID */
-	
+
+	Sprintf(lock, "%d%s", getuid(), plname);
 	set_levelfile_name (lock, 0);
 
 	if ((fd = open (lock, O_RDWR | O_EXCL | O_CREAT, LEVL_TYPE)) == -1) {

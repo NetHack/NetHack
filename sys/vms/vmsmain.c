@@ -128,30 +128,33 @@ char *argv[];
 
 	/* wizard mode access is deferred until here */
 	set_playmode();	/* sets plname to "wizard" for wizard mode */
-	if (!*plname || !strncmpi(plname, "games", 4) ||
-	    !strcmpi(plname, "nethack"))
-		askname();
-	plnamesuffix();		/* strip suffix from name; calls askname() */
-				/* again if suffix was whole name */
-				/* accepts any suffix */
+	/* strip role,race,&c suffix; calls askname() if plname[] is empty
+	   or holds a generic user name like "player" or "games" */
+	plnamesuffix();
+
 #ifdef WIZARD
-	if(!wizard) {
+	if (wizard) {
+		/* use character name rather than lock letter for file names */
+		locknum = 0;
+	} else
 #endif
-		/*
-		 * check for multiple games under the same name
-		 * (if !locknum) or check max nr of players (otherwise)
-		 */
-		(void) signal(SIGQUIT,SIG_IGN);
-		(void) signal(SIGINT,SIG_IGN);
-		if(!locknum)
-			Sprintf(lock, "_%u%s", (unsigned)getuid(), plname);
-		getlock();
-#ifdef WIZARD
-	} else {
-		Sprintf(lock, "_%u%s", (unsigned)getuid(), plname);
-		getlock();
+	    {
+		/* suppress interrupts while processing lock file */
+		(void) signal(SIGQUIT, SIG_IGN);
+		(void) signal(SIGINT, SIG_IGN);
 	}
-#endif /* WIZARD */
+	/*
+	 * getlock() complains and quits if there is already a game
+	 * in progress for current character name (when locknum == 0)
+	 * or if there are too many active games (when locknum > 0).
+	 * When proceeding, it creates an empty <lockname>.0 file to
+	 * designate the current game.
+	 * getlock() constructs <lockname> based on the character
+	 * name (for !locknum) or on first available of alock, block,
+	 * clock, &c not currently in use in the playground directory
+	 * (for locknum > 0).
+	 */
+	getlock();
 
 	dlb_init();	/* must be before newgame() */
 
@@ -174,6 +177,11 @@ char *argv[];
 
 	display_gamewindows();
 
+	/*
+	 * First, try to find and restore a save file for specified character.
+	 * We'll return here if new game player_selection() renames the hero.
+	 */
+ attempt_restore:
 	if ((fd = restore_saved_game()) >= 0) {
 		const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
 
@@ -200,7 +208,24 @@ char *argv[];
 	}
 
 	if (!resuming) {
-		player_selection();
+		/* new game:  start by choosing role, race, etc;
+		   player might change the hero's name while doing that,
+		   in which case we try to restore under the new name
+		   and skip selection this time if that didn't succeed */
+		if (!iflags.renameinprogress) {
+		    player_selection();
+		    if (iflags.renameinprogress) {
+			/* player has renamed the hero while selecting role;
+			   if locking alphabetically, the existing lock file
+			   can still be used; otherwise, discard current one
+			   and create another for the new character name */
+			if (!locknum) {
+			    delete_levelfile(0); /* remove empty lock file */
+			    getlock();
+			}
+			goto attempt_restore;
+		    }
+		}
 		newgame();
 		wd_message();
 	}

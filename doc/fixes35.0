@@ -448,6 +448,7 @@ win32gui: added menu options "Copy ASCII Screenshot To Clipboard" and "Save
 win32tty: support for 'selectsaved' option for menu of existing save files
 	to choose from at game startup
 tty: add window port routines for saving/restoring message history
+tty: enhanced role, race, &c selection during at start of new game
 smartphone: added "Type Cmd" command that allows to type arbitrary commands 
 	using phone keypad
 smartphone: added Q(quiver) command to "Attack" layout

@@ -182,6 +182,8 @@ struct instance_flags {
 	boolean  menu_tab_sep;	/* Use tabs to separate option menu fields */
 	boolean  menu_requested; /* Flag for overloaded use of 'm' prefix
 				  * on some non-move commands */
+	boolean  renameallowed; /* can change hero name during role selection */
+	boolean  renameinprogress; /* we are changing hero name */
 	boolean  zerocomp;	/* write zero-compressed save files */
 	boolean  rlecomp;	/* run-length comp of levels when writing savefile */
 	uchar	 num_pad_mode;

@@ -1965,14 +1965,16 @@ E boolean FDECL(ok_gend, (int, int, int, int));
 E int FDECL(pick_gend, (int, int, int, int));
 E boolean FDECL(ok_align, (int, int, int, int));
 E int FDECL(pick_align, (int, int, int, int));
-E void NDECL(role_init);
 E void NDECL(rigid_role_checks);
+E boolean FDECL(setrolefilter, (char *));
+E char *FDECL(build_plselection_prompt, (char *,int,int,int,int,int));
+E char *FDECL(root_plselection_prompt, (char *,int,int,int,int,int));
 E void NDECL(plnamesuffix);
+E void FDECL(role_selection_prolog, (int,winid));
+E void FDECL(role_menu_extra, (int,winid));
+E void NDECL(role_init);
 E const char *FDECL(Hello, (struct monst *));
 E const char *NDECL(Goodbye);
-E char *FDECL(build_plselection_prompt, (char *, int, int, int, int, int));
-E char *FDECL(root_plselection_prompt, (char *, int, int, int, int, int));
-E boolean FDECL(setrolefilter, (char *));
 
 /* ### rumors.c ### */
 

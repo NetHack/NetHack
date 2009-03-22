@@ -94,6 +94,12 @@ getlock()
 		error("Quitting.");
 	}
 
+	/* default value of lock[] is "1lock" where '1' gets changed to
+	   'a','b',&c below; override the default and use <uid><charname>
+	   if we aren't restricting the number of simultaneous games */
+	if (!locknum)
+		Sprintf(lock, "_%u%s", (unsigned)getuid(), plname);
+
 	regularize(lock);
 	set_levelfile_name(lock, 0);
 	if(locknum > 25) locknum = 25;
