@@ -1573,7 +1573,7 @@ winid where;
 	add_menu(where, NO_GLYPH, &any, 'q',
 		 0, ATR_NONE, "Quit", MENU_UNSELECTED);
     } else {
-	impossible("role_menu_extra: bad arg (%s)", which);
+	impossible("role_menu_extra: bad arg (%d)", which);
     }
 }
 
