@@ -46,18 +46,6 @@ main (void)
 	hname = "Mac Hack";
 	hackpid = getpid();
 
-	/*
-	 * Initialisation of the boundaries of the mazes
-	 * Both boundaries have to be even.
-	 */
-
-	x_maze_max = COLNO-1;
-	if (x_maze_max % 2)
-		x_maze_max--;
-	y_maze_max = ROWNO-1;
-	if (y_maze_max % 2)
-		y_maze_max--;
-
 	setrandom();
 	initoptions();
 	init_nhwindows(&argc, (char **)&hname);

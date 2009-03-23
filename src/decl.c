@@ -24,7 +24,10 @@ NEARDATA int nroom = 0;
 NEARDATA int nsubroom = 0;
 NEARDATA int occtime = 0;
 
-int x_maze_max, y_maze_max;	/* initialized in main, used in mkmaze.c */
+/* maze limits must be even; masking off lowest bit guarantees that */
+int x_maze_max = (COLNO-1) & ~1,
+    y_maze_max = (ROWNO-1) & ~1;
+
 int otg_temp;			/* used by object_to_glyph() [otg] */
 
 #ifdef REDO

@@ -416,18 +416,6 @@ char *argv[];
 #endif
 
 	/*
-	 * Initialisation of the boundaries of the mazes
-	 * Both boundaries have to be even.
-	 */
-
-	x_maze_max = COLNO-1;
-	if (x_maze_max % 2)
-		x_maze_max--;
-	y_maze_max = ROWNO-1;
-	if (y_maze_max % 2)
-		y_maze_max--;
-
-	/*
 	 *  Initialize the vision system.  This must be before mklev() on a
 	 *  new game or before a level restore on a saved game.
 	 */
