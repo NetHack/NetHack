@@ -771,7 +771,7 @@ tty_player_selection()
 	else
 	    *plbuf = '\0';	/* omit redundant gender */
 	Sprintf(pbuf, "%s, %s%s %s %s",
-		plname, aligns[ALGN].adj, plbuf, races[FACE].adj,
+		plname, aligns[ALGN].adj, plbuf, races[RACE].adj,
 		(GEND == 1 && roles[ROLE].name.f) ?
 		    roles[ROLE].name.f : roles[ROLE].name.m);
 	add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE,
