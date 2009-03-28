@@ -1233,7 +1233,7 @@ STATIC_PTR int
 ckunpaid(otmp)
 register struct obj *otmp;
 {
-	return((int)(otmp->unpaid));
+	return (otmp->unpaid || (Has_contents(otmp) && count_unpaid(otmp)));
 }
 
 boolean

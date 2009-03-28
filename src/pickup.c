@@ -379,23 +379,25 @@ allow_category(obj)
 struct obj *obj;
 {
     if (Role_if(PM_PRIEST)) obj->bknown = TRUE;
-    if (((index(valid_menu_classes,'u') != (char *)0) && obj->unpaid) ||
-	(index(valid_menu_classes, obj->oclass) != (char *)0))
+
+    /* if obj's class is in the list, then obj is acceptable */
+    if (index(valid_menu_classes, obj->oclass))
 	return TRUE;
-    else if (((index(valid_menu_classes,'U') != (char *)0) &&
-	(obj->oclass != COIN_CLASS && obj->bknown && !obj->blessed && !obj->cursed)))
-	return TRUE;
-    else if (((index(valid_menu_classes,'B') != (char *)0) &&
-	(obj->oclass != COIN_CLASS && obj->bknown && obj->blessed)))
-	return TRUE;
-    else if (((index(valid_menu_classes,'C') != (char *)0) &&
-	(obj->oclass != COIN_CLASS && obj->bknown && obj->cursed)))
-	return TRUE;
-    else if (((index(valid_menu_classes,'X') != (char *)0) &&
-	(obj->oclass != COIN_CLASS && !obj->bknown)))
-	return TRUE;
-    else
+    /* unpaid and BUC checks don't apply to coins */
+    if (obj->oclass == COIN_CLASS)
 	return FALSE;
+    /* check for unpaid item */
+    if (index(valid_menu_classes, 'u') &&
+	    (obj->unpaid || (Has_contents(obj) && count_unpaid(obj))))
+	return TRUE;
+    /* check for particular bless/curse state */
+    if (!obj->bknown ? index(valid_menu_classes, 'X') :	/* unknown BUC state */
+	obj->blessed ? index(valid_menu_classes, 'B') :	/* known blessed */
+	!obj->cursed ? index(valid_menu_classes, 'U') :	/* known uncursed */
+		       index(valid_menu_classes, 'C'))	/* known cursed */
+	return TRUE;
+    /* obj isn't acceptable */
+    return FALSE;
 }
 
 #if 0 /* not used */

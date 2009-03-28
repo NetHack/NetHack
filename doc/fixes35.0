@@ -315,6 +315,8 @@ auto-wielding a polearm took no time if ESC was used to cancel target choice
 applying a bullwhip while at very edge of map could target beyond edge,
 	potentially leading to a panic or crash
 prevent temple priests and minions from wearing helms of opposite alignment
+'D' drop command didn't handle 'u' choice correctly if the only unpaid items
+	were inside containers
 
 
 Platform- and/or Interface-Specific Fixes
