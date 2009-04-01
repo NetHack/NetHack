@@ -318,6 +318,7 @@ prevent temple priests and minions from wearing helms of opposite alignment
 'D' drop command didn't handle 'u' choice correctly if the only unpaid items
 	were inside containers
 pearl rings shouldn't rust
+shouldn't be able to read a worn T-shirt when it's covered by a worn suit
 
 
 Platform- and/or Interface-Specific Fixes
