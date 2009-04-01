@@ -317,6 +317,7 @@ applying a bullwhip while at very edge of map could target beyond edge,
 prevent temple priests and minions from wearing helms of opposite alignment
 'D' drop command didn't handle 'u' choice correctly if the only unpaid items
 	were inside containers
+pearl rings shouldn't rust
 
 
 Platform- and/or Interface-Specific Fixes
