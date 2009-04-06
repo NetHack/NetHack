@@ -701,7 +701,11 @@ boolean init;
  * they come from a previous session and logically precede
  * anything (like "Restoring save file...") that's happened now.
  *
- * Called with a null pointer to finish up.
+ * Called with a null pointer to finish up restoration.
+ *
+ * It's also called by the quest pager code when a block message
+ * has a one-line summary specified.  We put that line directly
+ * message history for ^P recall without having displayed it.
  */
 void
 tty_putmsghistory(msg, restoring)

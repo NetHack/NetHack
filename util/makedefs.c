@@ -181,6 +181,7 @@ static int FDECL(get_hdr, (char *));
 static boolean FDECL(new_id, (char *));
 static boolean FDECL(known_msg, (int,int));
 static void FDECL(new_msg, (char *,int,int));
+static char *FDECL(valid_qt_summary, (char *,BOOLEAN_P));
 static void FDECL(do_qt_control, (char *));
 static void FDECL(do_qt_text, (char *));
 static void NDECL(adjust_qt_hdrs);
@@ -2011,10 +2012,58 @@ new_msg(s, num, id)
 		qt_msg = &(msg_hdr[num].qt_msg[msg_hdr[num].n_msg++]);
 		qt_msg->msgnum = id;
 		qt_msg->delivery = s[2];
-		qt_msg->offset = qt_msg->size = 0L;
+		qt_msg->offset = qt_msg->size = qt_msg->summary_size = 0L;
 
 		curr_msg = qt_msg;
 	}
+}
+
+/* check %E record for "[summary text]" that nethack can stuff into the
+   message history buffer when delivering text via window instead of pline */
+static char *
+valid_qt_summary(s, parsing)
+char *s;	/* end record: "%E" optionally followed by " [summary]" */
+boolean parsing;	/* curr_msg is valid iff this is True */
+{
+    static char summary[BUFSZ];
+    char *p;
+
+    if (*s != '%' || *(s + 1) != 'E') return (char *)0;
+    if ((p = index(s, '[')) == 0) return (char *)0;
+    /* note: opening '[' and closing ']' will be retained in the output;
+       anything after ']' will be discarded by putting a newline there */
+    Strcpy(summary, p);
+
+    /* have an opening bracket; summary[] holds it and all text that follows */
+    p = eos(summary);
+    /* find closing bracket */
+    while (p > summary && *(p - 1) != ']') --p; 
+
+    if (p == summary) {
+	/* we backed up all the way to the start without finding a bracket */
+	if (parsing) /* malformed summary */
+	    Fprintf(stderr, MAL_SUM, qt_line);
+    } else if (p == summary + 1) {
+	;	/* ignore empty [] */
+    } else {	/* got something */
+	/* p points one spot past ']', usually to '\n';
+	   we need to include the \n as part of the size */
+	if (parsing) {
+	    /* during the writing pass we won't be able to recheck
+	       delivery, so any useless summary for a pline mode
+	       message has to be carried along to the output file */
+	    if (curr_msg->delivery == 'p')
+		Fprintf(stderr, DUMB_SUM, qt_line);
+	    /* +1 is for terminating newline */
+	    curr_msg->summary_size = (long)(p - summary) + 1L;
+	} else {
+	    /* caller is writing rather than just parsing;
+	       force newline after the closing bracket */
+	    Strcpy(p, "\n");
+	}
+	return summary;
+    }
+    return (char *)0;
 }
 
 static void
@@ -2023,6 +2072,9 @@ do_qt_control(s)
 {
 	char code[BUFSZ];
 	int num, id = 0;
+
+	if (!index(s, '\n'))
+	    Fprintf(stderr, CTRL_TRUNC, qt_line);
 
 	switch(s[1]) {
 
@@ -2047,8 +2099,11 @@ do_qt_control(s)
 
 	    case 'E':	if(!in_msg) {
 			    Fprintf(stderr, END_NOT_IN_MSG, qt_line);
-			    break;
-			} else in_msg = FALSE;
+			} else {
+			    /* sets curr_msg->summary_size if applicable */
+			    (void) valid_qt_summary(s, TRUE);
+			    in_msg = FALSE;
+			}
 			break;
 
 	    default:	Fprintf(stderr, UNREC_CREC, qt_line);
@@ -2062,7 +2117,10 @@ do_qt_text(s)
 {
 	if (!in_msg) {
 	    Fprintf(stderr, TEXT_NOT_IN_MSG, qt_line);
+	} else if (!index(s, '\n')) {
+	    Fprintf(stderr, TEXT_TRUNC, qt_line);
 	}
+
 	curr_msg->size += strlen(s);
 	return;
 }
@@ -2083,7 +2141,8 @@ adjust_qt_hdrs()
 	    for(j = 0; j < msg_hdr[i].n_msg; j++) {
 
 		msg_hdr[i].qt_msg[j].offset = hdr_offset + count;
-		count += msg_hdr[i].qt_msg[j].size;
+		count += msg_hdr[i].qt_msg[j].size
+			+ msg_hdr[i].qt_msg[j].summary_size;
 	    }
 	return;
 }
@@ -2126,11 +2185,16 @@ put_qt_hdrs()
 			    sizeof(struct qtmsg), msg_hdr[i].n_msg, ofp);
 #ifdef DEBUG
 	    { int j;
-	      for(j = 0; j < msg_hdr[i].n_msg; j++)
-		Fprintf(stderr, "msg %d @ %ld (%ld)\n",
+	      for(j = 0; j < msg_hdr[i].n_msg; j++) {
+		Fprintf(stderr, "msg %d @ %ld (%ld)",
 			msg_hdr[i].qt_msg[j].msgnum,
 			msg_hdr[i].qt_msg[j].offset,
 			msg_hdr[i].qt_msg[j].size);
+		if (msg_hdr[i].qt_msg[j].summary_size)
+		    Fprintf(stderr, " [%ld]",
+			    msg_hdr[i].qt_msg[j].summary_size);
+		Fprintf(stderr, "\n");
+	      }
 	    }
 #endif
 	}
@@ -2160,7 +2224,7 @@ do_questtxt()
 	qt_line = 0;
 	in_msg = FALSE;
 
-	while (fgets(in_line, 80, ifp) != 0) {
+	while (fgets(in_line, QTEXT_IN_SIZ, ifp) != 0) {
 	    SpinCursor (3);
 
 	    qt_line++;
@@ -2173,11 +2237,17 @@ do_questtxt()
 	in_msg = FALSE;
 	adjust_qt_hdrs();
 	put_qt_hdrs();
-	while (fgets(in_line, 80, ifp) != 0) {
+	while (fgets(in_line, QTEXT_IN_SIZ, ifp) != 0) {
 
 		if(qt_control(in_line)) {
+		    char *summary_p = 0;
+
 		    in_msg = (in_line[1] == 'C');
-		    continue;
+		    if (!in_msg) summary_p = valid_qt_summary(in_line, FALSE);
+		    /* don't write anything unless we've got a summary */
+		    if (!summary_p) continue;
+		    /* we have summary text; replace raw %E record with it */
+		    Strcpy(in_line, summary_p);	/* (guaranteed to fit) */
 		} else if(qt_comment(in_line)) continue;
 #ifdef DEBUG
 		Fprintf(stderr, "%ld: %s", ftell(stdout), in_line);

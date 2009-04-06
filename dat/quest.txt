@@ -59,7 +59,7 @@ All of the windows are boarded up, and there are objects scattered around
 the entrance.
 
 Strange forbidding shapes seem to be moving in the distance.
-%E
+%E [You arrive at %H, but all is not well.]
 %Cp Arc 00002
 Once again, you are back at %H.
 %E
@@ -101,7 +101,7 @@ You have an odd feeling this may be the last time you ever come here.
 "Finally you have returned, %p.  You were always
 my most promising student.  Allow me to see if you are ready for the
 most difficult task of your career."
-%E
+%E [You have returned, %p, to a difficult task.]
 %Cp Arc 00016
 "Again, %p, you stand before me.
 Let me see if you have gained experience in the interim."
@@ -115,20 +115,20 @@ Are you finally ready for the task that must be accomplished?"
 vain.  Begone!  Your tenure at this college has been revoked!
 
 "You are a disgrace to the profession!"
-%E
+%E [%pC, you have failed us.  Begone!]
 %Cc Arc 00019
 "%p, you are yet too inexperienced to undertake such a demanding
 quest.  A mere %r could not possibly face the rigors demanded and
 survive.  Go forth, and come here again when your adventures have further
 taught you."
-%E
+%E [%pC, a mere %r is too inexperienced.]
 %Cc Arc 00020
 "%pC!  I've heard that you've been using sloppy techniques.  Your
 results lately can hardly be called suitable for %ra!
 
 "How could you have strayed from the %a path?  Go from here, and come
 back only when you have purified yourself."
-%E
+%E [%pC, you have strayed from the %a path.  Purify yourself!]
 %Cc Arc 00021
 "Grave times have befallen the college, for %na has
 stolen %o.  Without it, the board of directors of
@@ -144,7 +144,7 @@ to me.
 close this college.
 
 "May the wisdom of %d be your guide."
-%E
+%E [%nC has stolen %o.  Locate %i, defeat %n within, and return %o.]
 %Cp Arc 00025
 "Beware, for %n is powerful and cunning."
 %E
@@ -182,7 +182,7 @@ A plain opens before you.  Beyond the plain lies a foreboding edifice.
 
 You have the feeling that you will soon find the entrance to
 %i.
-%E
+%E [This foreboding edifice must hide the entrance to %i.]
 %Cp Arc 00036
 Once again, you are near the entrance to %i.
 %E
@@ -191,7 +191,7 @@ A strange feeling washes over you, and you think back to things you
 learned during the many lectures of %l.
 
 You realize the feeling must be the presence of %o.
-%E
+%E [This strange feeling must be the presence of %o.]
 %Cp Arc 00041
 The familiar presence of %o is in the ether.
 %E
@@ -200,14 +200,14 @@ The familiar presence of %o is in the ether.
 %o, when your teacher, %l, has already failed.
 
 "Come, try your best!  I shall destroy you, and gnaw on your bones."
-%E
+%E [Come, %p, I shall destroy you!]
 %Cc Arc 00051
 "Again you try to best me, eh %p?  Well, you shall fail again.
 
 "You shall never recover %o.
 
 "I shall bear your soul to the Plane of Origins for my master's pleasure."
-%E
+%E [Again you try to best me, %p?  You shall never recover %o.]
 %Cp Arc 00052
 "You persist yet %p!  Good.  Now, you shall die!"
 %E
@@ -250,7 +250,7 @@ falter!"
 The power of %o flows through your body!  You feel
 as if you could now take on the Wizard of Yendor himself and win, but
 you know you must return %o to %l.
-%E
+%E [The power of %o flows through your body!  You must return it to %l.]
 %Cp Arc 00080
 The body of %n dissipates in a cloud of noxious fumes.
 %E
@@ -266,18 +266,18 @@ Please take %o with you.  You, %p, can
 guard it now far better than I.
 
 May the blessings of %d follow you and guard you."
-%E
+%E [%lC instructs you to guard %o from now on.]
 # assumes Orb of Detection (glass object)
 %Cc Arc 00082
 "Careful, %p!  %oC might break, and that would be
 a tragic loss.  You are its keeper now, and the time has come to
 resume your search for the Amulet.  %Z await your
 return through the magic portal that brought you here."
-%E
+%E [Resume your search for the Amulet beyond the magic portal to %Z.]
 %Cc Arc 00090
 "Welcome back, %p.  Have you progressed with your quest to
 regain the Amulet of Yendor for %d?"
-%E
+%E [Have you progressed with your quest to regain the Amulet of Yendor for %d?]
 %Cc Arc 00091
 "Congratulations, %p.  I wondered if anyone could prevail against
 the Wizard and the minions of Moloch.  Now, you must embark on one
@@ -288,7 +288,7 @@ There you must find the altar of %d and sacrifice the
 Amulet on that altar to fulfill your destiny.
 
 "Remember, your path now should always be upwards."
-%E
+%E [Take the Amulet to the Astral Plane and sacrifice it at the altar of %d.]
 #
 #	Barbarian
 #
@@ -3338,7 +3338,7 @@ from birth as the instrument of %d.  You are destined
 to recover the Amulet for your deity, or die in the
 attempt.  Your hour of destiny has come.  For the sake
 of us all:  Go bravely with %d!
-%E
+%E [%dC has chosen you to recover the Amulet of Yendor.]
 %Cp - 00002
 You receive a faint telepathic message from %l:
 Your help is urgently needed at %H!
@@ -3468,7 +3468,7 @@ you will never be able to enter the place where he who has the Amulet
 resides.
 
 Go now!  You are banished from this place.
-%E
+%E [You are banished from %H for betraying your allegiance to %d.]
 #
 #	TEST PATTERN
 #

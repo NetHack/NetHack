@@ -9,11 +9,16 @@
 				/* (i.e., num roles + 1) */
 #define LEN_HDR 3		/* Maximum length of a category name */
 
+/* quest text message buffer sizes; used to be hardcoded as 80 and 128, but
+   have been expanded to allow some slop for block message summary lines */
+#define QTEXT_IN_SIZ	100	/* used by both nethack and makedefs */
+#define QTEXT_OUTSIZ	200	/* used only by nethack */
+
 struct qtmsg {
 	int	msgnum;
 	char	delivery;
 	long	offset,
-		size;
+		size, summary_size;
 };
 
 #ifdef MAKEDEFS_C	/***** MAKEDEFS *****/
@@ -37,6 +42,10 @@ struct	qthdr {
 #define END_NOT_IN_MSG	"End record encountered before message - line %d\n"
 #define TEXT_NOT_IN_MSG	"Text encountered outside message - line %d\n"
 #define UNREC_CREC	"Unrecognized Control record at line %d\n"
+#define MAL_SUM		"Malformed summary in End record - line %d\n"
+#define DUMB_SUM	"Summary for single line message is useless - line %d\n"
+#define CTRL_TRUNC	"Control record truncated at line %d\n"
+#define TEXT_TRUNC	"Text record truncated at line %d\n"
 #define OUT_OF_HEADERS	"Too many message types (line %d)\nAdjust N_HDR in qtext.h and recompile.\n"
 #define OUT_OF_MESSAGES "Too many messages in class (line %d)\nAdjust N_MSG in qtext.h and recompile.\n"
 

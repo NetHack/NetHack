@@ -29,7 +29,7 @@ STATIC_DCL void FDECL(deliver_by_pline, (struct qtmsg *));
 STATIC_DCL void FDECL(deliver_by_window, (struct qtmsg *,int));
 STATIC_DCL boolean FDECL(skip_pager, (BOOLEAN_P));
 
-static char	in_line[80], cvt_buf[64], out_line[128];
+static char in_line[QTEXT_IN_SIZ], out_line[QTEXT_OUTSIZ], cvt_buf[64];
 static struct	qtlists	qt_list;
 static dlb	*msg_file;
 /* used by ldrname() and neminame(), then copied into cvt_buf */
@@ -366,7 +366,7 @@ struct qtmsg *qt_msg;
 	long	size;
 
 	for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
-	    (void) dlb_fgets(in_line, 80, msg_file);
+	    (void) dlb_fgets(in_line, QTEXT_IN_SIZ, msg_file);
 	    convert_line();
 	    pline("%s", out_line);
 	}
@@ -382,12 +382,20 @@ int how;
 	winid datawin = create_nhwindow(how);
 
 	for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
-	    (void) dlb_fgets(in_line, 80, msg_file);
+	    (void) dlb_fgets(in_line, QTEXT_IN_SIZ, msg_file);
 	    convert_line();
 	    putstr(datawin, 0, out_line);
 	}
 	display_nhwindow(datawin, TRUE);
 	destroy_nhwindow(datawin);
+
+	/* block messages delivered by window aren't kept in message history
+	   but can have a one-line summary which is put there for ^P recall */
+	if (qt_msg->summary_size) {
+	    (void) dlb_fgets(in_line, QTEXT_IN_SIZ, msg_file);
+	    convert_line();
+	    putmsghistory(out_line, FALSE);
+	}
 }
 
 boolean
