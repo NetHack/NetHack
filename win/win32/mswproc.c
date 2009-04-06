@@ -1980,9 +1980,12 @@ char *mswin_getmsghistory(BOOLEAN_P init)
 	}
 }
 
-void mswin_putmsghistory(const char * msg)
+void mswin_putmsghistory(const char * msg, BOOLEAN_P restoring)
 {
-	BOOL save_sound_opt = GetNHApp()->bNoSounds;
+	BOOL save_sound_opt;
+
+	if (!msg) return;	/* end of message history restore */
+	save_sound_opt = GetNHApp()->bNoSounds;
 	GetNHApp()->bNoSounds = TRUE;	/* disable sounds while restoring message history */
 	mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, msg, 0);
 	clear_nhwindow(WIN_MESSAGE); /* it is in fact end-of-turn indication so each message will print on the new line */

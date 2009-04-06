@@ -1152,10 +1152,10 @@ register int fd;
 			panic("restore_msghistory: msg too big (%d)", msgsize);
 		mread(fd, (genericptr_t)msg, msgsize);
 		msg[msgsize] = '\0';
-		putmsghistory(msg);
+		putmsghistory(msg, TRUE);
 		++msgcount;
 	}
-	if (msgcount) putmsghistory((char *)0);
+	if (msgcount) putmsghistory((char *)0, TRUE);
 #ifdef DEBUG_MSGCOUNT
 	pline("Read %d messages from savefile.", msgcount);
 #endif

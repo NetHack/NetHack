@@ -177,8 +177,9 @@ boolean init;
 
 /*ARGSUSED*/
 void
-genl_putmsghistory(msg)
+genl_putmsghistory(msg, restoring)
 const char *msg;
+boolean restoring;
 {
 	/* window ports can provide
 	   their own putmsghistory() routine to
@@ -197,6 +198,9 @@ const char *msg;
 	   so it should keep all pointers/indexes
 	   intact at the end of each call.
 	 */
+#if 0		/* maybe... */
+	if (!restoring) pline("%s", msg);
+#endif
 	return;
 }
 
@@ -387,7 +391,7 @@ char *outbuf;
     Strcpy(outbuf, "\033");
 }
 
-/*ARGUSED*/
+/*ARGSUSED*/
 static void
 hup_init_nhwindows(argc_p, argv)
 int *argc_p;
@@ -396,7 +400,7 @@ char **argv;
     iflags.window_inited = 1;
 }
 
-/*ARGSUSED*/
+/*ARGUSED*/
 static winid
 hup_create_nhwindow(type)
 int type;

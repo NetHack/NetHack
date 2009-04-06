@@ -160,7 +160,7 @@ void mswin_end_screen(void);
 void mswin_outrip(winid wid, int how);
 void mswin_preference_update(const char *pref);
 char *mswin_getmsghistory(BOOLEAN_P init);
-void mswin_putmsghistory(const char * msg);
+void mswin_putmsghistory(const char * msg,BOOLEAN_P);
 
 /* helper function */
 HWND mswin_hwnd_from_winid(winid wid);

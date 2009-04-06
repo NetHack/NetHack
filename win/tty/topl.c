@@ -704,13 +704,14 @@ boolean init;
  * Called with a null pointer to finish up.
  */
 void
-tty_putmsghistory(msg)
+tty_putmsghistory(msg, restoring)
 const char *msg;
+boolean restoring;
 {
     static boolean initd = FALSE;
     int idx;
 
-    if (!initd) {
+    if (restoring && !initd) {
 	/* we're restoring history from the previous session, but new
 	   messages have already been issued this session ("Restoring...",
 	   for instance); collect current history (ie, those new messages),

@@ -2572,7 +2572,7 @@ E void FDECL(choose_windows, (const char *));
 E char FDECL(genl_message_menu, (CHAR_P,int,const char *));
 E void FDECL(genl_preference_update, (const char *));
 E char *FDECL(genl_getmsghistory, (BOOLEAN_P));
-E void FDECL(genl_putmsghistory, (const char *));
+E void FDECL(genl_putmsghistory, (const char *,BOOLEAN_P));
 #ifdef HANGUPHANDLING
 E void NDECL(nhwindows_hangup);
 #endif

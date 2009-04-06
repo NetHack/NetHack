@@ -69,7 +69,7 @@ struct window_procs {
     void FDECL((*win_outrip), (winid,int));
     void FDECL((*win_preference_update), (const char *));
     char * FDECL((*win_getmsghistory), (BOOLEAN_P));
-    void FDECL((*win_putmsghistory), (const char *));
+    void FDECL((*win_putmsghistory), (const char *,BOOLEAN_P));
 #ifdef STATUS_VIA_WINDOWPORT
     void NDECL((*win_status_init));
     void NDECL((*win_status_finish));
