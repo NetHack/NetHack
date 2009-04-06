@@ -48,6 +48,7 @@ struct WinDesc {
 /* window flags */
 #define WIN_CANCELLED 1
 #define WIN_STOP 1		/* for NHW_MESSAGE; stops output */
+#define WIN_LOCKHISTORY 2	/* for NHW_MESSAGE; suppress history updates */
 
 /* descriptor for tty-based displays -- all the per-display data */
 struct DisplayDesc {

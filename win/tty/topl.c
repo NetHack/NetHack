@@ -18,6 +18,8 @@ STATIC_DCL void FDECL(redotoplin, (const nhwchar*));
 STATIC_DCL void FDECL(topl_putsym, (NHWCHAR_P));
 STATIC_DCL void NDECL(remember_topl);
 STATIC_DCL void FDECL(removetopl, (int));
+STATIC_DCL void FDECL(msghistory_snapshot, (BOOLEAN_P));
+STATIC_DCL void FDECL(free_msghistory_snapshot, (BOOLEAN_P));
 
 extern nhwchar emptysym[];
 
@@ -185,12 +187,15 @@ remember_topl()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
     int idx = cw->maxrow;
-#ifdef UNICODE_WIDEWINPORT
-    unsigned len = nhwlen(toplines) + 1;
-#else
-    unsigned len = strlen(toplines) + 1;
-#endif
+    unsigned len;
 
+    if ((cw->flags & WIN_LOCKHISTORY) || !*toplines) return;
+
+#ifdef UNICODE_WIDEWINPORT
+    len = nhwlen(toplines) + 1;
+#else
+    len = strlen(toplines) + 1;
+#endif
     if (len > (unsigned)cw->datlen[idx]) {
 	if (cw->data[idx]) free(cw->data[idx]);
 	len += (8 - (len & 7));		/* pad up to next multiple of 8 */
@@ -202,6 +207,7 @@ remember_topl()
 #else
     Strcpy(cw->data[idx], toplines);
 #endif
+    *toplines = '\0';
     cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
 }
 
@@ -575,63 +581,113 @@ char def;
 	return q;
 }
 
+/* shared by tty_getmsghistory() and tty_putmsghistory() */
+static nhwchar **snapshot_mesgs = 0;
+
+/* collect currently available message history data into a sequential array;
+   optionally, purge that data from the active circular buffer set as we go */
+STATIC_OVL void
+msghistory_snapshot(purge)
+boolean purge;		/* clear message history buffer as we copy it */
+{
+    nhwchar *mesg;
+    unsigned ln;
+    int i, inidx, outidx;
+    struct WinDesc *cw;
+
+    /* paranoia (too early or too late panic save attempt?) */
+    if (WIN_MESSAGE == WIN_ERR || !wins[WIN_MESSAGE]) return;
+    cw = wins[WIN_MESSAGE];
+
+    /* flush toplines[], moving most recent message to history */
+    remember_topl();
+
+    /* for a passive snapshot, we just copy pointers, so can't allow further
+       history updating to take place because that could clobber them */
+    if (!purge) cw->flags |= WIN_LOCKHISTORY;
+
+    snapshot_mesgs = (nhwchar **)alloc((cw->rows + 1) * sizeof (nhwchar *));
+    outidx = 0;
+    inidx = cw->maxrow;
+    for (i = 0; i < cw->rows; ++i) {
+	snapshot_mesgs[i] = (nhwchar *)0;
+	mesg = cw->data[inidx];
+	if (mesg && *mesg) {
+	    snapshot_mesgs[outidx++] = mesg;
+	    if (purge) {
+		/* we're taking this pointer away; subsequest history
+		   updates will eventually allocate a new one to replace it */
+		cw->data[inidx] = (nhwchar *)0;
+		cw->datlen[inidx] = 0;
+	    }
+	}
+	inidx = (inidx + 1) % cw->rows;
+    }
+    snapshot_mesgs[cw->rows] = (nhwchar *)0;	/* sentinel */
+
+    /* for a destructive snapshot, history is now completely empty */
+    if (purge) cw->maxcol = cw->maxrow = 0;
+}
+
+/* release memory allocated to message history snapshot */
+STATIC_OVL void
+free_msghistory_snapshot(purged)
+boolean purged;	/* True: took history's pointers, False: just cloned them */
+{
+    if (snapshot_mesgs) {
+	/* snapshot pointers are no longer in use */
+	if (purged) {
+	    int i;
+
+	    for (i = 0; snapshot_mesgs[i]; ++i)
+		free((genericptr_t)snapshot_mesgs[i]);
+	}
+
+	free((genericptr_t)snapshot_mesgs), snapshot_mesgs = (nhwchar **)0;
+
+	/* history can resume being updated at will now... */
+	if (!purged) wins[WIN_MESSAGE]->flags &= ~WIN_LOCKHISTORY;
+    }
+}
+
 /*
  * This is called by the core save routines.
  * Each time we are called, we return one string from the
- * message history starting with the oldest message first. each time
- * we are called. Each time after that, we return a more recent message,
- * until there are no more messages to return. Then we return a final
- * null string.
+ * message history starting with the oldest message first.
+ * When none are left, we return a final null string.
+ *
+ * History is collected at the time of the first call.
+ * Any new messages issued after that point will not be
+ * included among the output of the subsequent calls.
  */
 char *
 tty_getmsghistory(init)
 boolean init;
 {
-	static int idx = 0, state = 0;
-	static boolean doneinit = FALSE;
-	register struct WinDesc *cw = wins[WIN_MESSAGE];
-	char *retstr = (char *)0;
-#ifdef UNICODE_WIDEWINPORT
-	static char buf[BUFSZ];
-#endif
+    static int nxtidx;
+    nhwchar *nextmesg;
+    char *result = 0;
 
-	if (!cw) return (char *)0;	/* bail */
-	/*
-	 * state 0 = normal return with string from msg history.
-	 * state 1 = finished with recall data, return toplines.
-	 * state 2 = completely finished, return null string.
-	 */
-	if (init) {
-		doneinit = TRUE;
-		state = 0;
-		idx = cw->maxrow;
-	}
-	if (doneinit && state < 2) {
-		if (state == 1) {
-			++state;
-#ifdef UNICODE_WIDEWINPORT
-			strnhwcpy(buf,toplines);
-			return buf;
-#else
-			return toplines;
-#endif
-		}
-		do {
-#ifdef UNICODE_WIDEWINPORT
-			if(cw->data[idx] && nhwcmp(cw->data[idx], emptysym) ) {
-				strnhwcpy(buf, cw->data[idx]);
-				retstr = buf;
-			}
-#else
-			if(cw->data[idx] && strcmp(cw->data[idx], "") )
-				retstr = cw->data[idx];
+    if (init) {
+	msghistory_snapshot(FALSE);
+	nxtidx = 0;
+    }
 
+    if (snapshot_mesgs) {
+	nextmesg = snapshot_mesgs[nxtidx++];
+	if (nextmesg) {
+#ifdef UNICODE_WIDEWINPORT
+	    static char histbuf[BUFSZ];
+
+	    result = strnhwcpy(histbuf, nextmesg);
+#else
+	    result = (char *)nextmesg;
 #endif
-			idx = (idx + 1) % cw->rows;
-		} while (idx != cw->maxrow && !retstr);
-		if (idx == cw->maxrow) ++state;
+	} else {
+	    free_msghistory_snapshot(FALSE);
 	}
-	return retstr;
+    }
+    return result;
 }
 
 /*
@@ -640,28 +696,54 @@ boolean init;
  * history recall buffer. The core will send the oldest message
  * first (actually it sends them in the order they exist in the
  * save file, but that is supposed to be the oldest first).
+ * These messages get pushed behind any which have been issued
+ * since this session with the program has been started, since
+ * they come from a previous session and logically precede
+ * anything (like "Restoring save file...") that's happened now.
+ *
+ * Called with a null pointer to finish up.
  */
 void
 tty_putmsghistory(msg)
 const char *msg;
 {
-	register struct WinDesc *cw = wins[WIN_MESSAGE];
-	int idx = cw->maxrow;
-	unsigned len = strlen(msg) + 1;
+    static boolean initd = FALSE;
+    int idx;
 
-	if (len > (unsigned)cw->datlen[idx]) {
-		if (cw->data[idx]) free(cw->data[idx]);
-		len += (8 - (len & 7));		/* pad up to next multiple of 8 */
-		cw->data[idx] = (nhwchar *)alloc(sizeof(nhwchar) * len);
-		cw->datlen[idx] = (short)len;
-        }
+    if (!initd) {
+	/* we're restoring history from the previous session, but new
+	   messages have already been issued this session ("Restoring...",
+	   for instance); collect current history (ie, those new messages),
+	   and also clear it out so that nothing will be present when the
+	   restored ones are being put into place */
+	msghistory_snapshot(TRUE);
+	initd = TRUE;
+    }
+
+    if (msg) {
+	/* move most recent message to history, make this become most recent */
+	remember_topl();
 #ifdef UNICODE_WIDEWINPORT
-	(void)nhwstrcpy(cw->data[idx], msg);
+	(void)nhwstrcpy(toplines, msg);
 #else
-	Strcpy(cw->data[idx], msg);
+	Strcpy(toplines, msg);
 #endif
-	cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
+    } else if (snapshot_mesgs) {
+	/* done putting arbitrary messages in; put the snapshot ones back */
+	for (idx = 0; snapshot_mesgs[idx]; ++idx) {
+	    remember_topl();
+#ifdef UNICODE_WIDEWINPORT
+	    (void)nhwcpy(toplines, snapshot_mesgs[idx]);
+#else
+	    Strcpy(toplines, snapshot_mesgs[idx]);
+#endif
+	}
+	/* now release the snapshot */
+	free_msghistory_snapshot(TRUE);
+	initd = FALSE;	/* reset */
+    }
 }
+
 #endif /* TTY_GRAPHICS */
 
 /*topl.c*/

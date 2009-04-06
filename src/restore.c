@@ -1155,6 +1155,7 @@ register int fd;
 		putmsghistory(msg);
 		++msgcount;
 	}
+	if (msgcount) putmsghistory((char *)0);
 #ifdef DEBUG_MSGCOUNT
 	pline("Read %d messages from savefile.", msgcount);
 #endif
