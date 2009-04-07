@@ -283,7 +283,7 @@ regain the Amulet of Yendor for %d?"
 the Wizard and the minions of Moloch.  Now, you must embark on one
 final adventure.
 
-"Take the Amulet, and find your way onto the astral plane.
+"Take the Amulet, and find your way onto the Astral Plane.
 There you must find the altar of %d and sacrifice the
 Amulet on that altar to fulfill your destiny.
 
@@ -1073,8 +1073,8 @@ absence, yes?  How fare you upon your quest for the Amulet?"
 %Cc Hea 00091
 "Ah, you have recovered the Amulet, %p.  Well done!
 
-"Now, you should know that you must travel through the elemental planes
-to the astral, and there return the Amulet to %d.  Go forth and
+"Now, you should know that you must travel through the Elemental Planes
+to the Astral, and there return the Amulet to %d.  Go forth and
 may our prayers be as a wind upon your back."
 %E
 #
@@ -1316,10 +1316,10 @@ return through the magic portal that brought thee here."
 %E
 %Cc Kni 00091
 "Thou hast succeeded, We see, %p!  Now thou art commanded to take
-the Amulet to be sacrificed to %d in the plane of the astral.
+the Amulet to be sacrificed to %d in the Plane of the Astral.
 
 "Merlin hath counseled Us that thou must travel always upwards through
-the planes of the elements, to achieve this goal.
+the Planes of the Elements, to achieve this goal.
 
 "Go with %d, %p."
 %E
@@ -1560,7 +1560,7 @@ that brought you here."
 %Cc Mon 00091
 "You have prevailed, %p!  %d is surely with you.  Now,
 you must take the amulet, and sacrifice it on %ds altar on
-the Astral plane.  I suspect that I shall never see you again in this
+the Astral Plane.  I suspect that I shall never see you again in this
 life, but I hope to at %ds feet."
 %E
 #
@@ -1806,7 +1806,7 @@ that brought you here."
 %Cc Pri 00091
 "You have prevailed, %p!  %d is surely with you.  Now,
 you must take the amulet, and sacrifice it on %ds altar on
-the Astral plane.  I suspect that I shall never see you again in this
+the Astral Plane.  I suspect that I shall never see you again in this
 life, but I hope to at %ds feet."
 %E
 #
@@ -2307,7 +2307,7 @@ is yours for the asking."
 "I see that with your abilities, and my brains, we could rule this world.
 
 "All that we would need to be all-powerful is for you to take that little
-trinket you've got there up to the Astral plane.  From there, %d will
+trinket you've got there up to the Astral Plane.  From there, %d will
 show you what to do with it.  Once that's done, we will be invincible!"
 %E
 #
@@ -3055,7 +3055,7 @@ your search for the Amulet as I have wished.  How do you fare?"
 "Excellent, %p.  I see you have recovered the Amulet!
 
 "You must take the Amulet to the Great Temple of %d, on the Astral
-plane.  There you must offer the Amulet to %d.
+Plane.  There you must offer the Amulet to %d.
 
 "Go now, my %S.  I cannot tell you your fate, as the power of the
 Amulet interferes with mine.  I hope for your success."
@@ -3310,9 +3310,9 @@ So, have you succeeded in your quest for the Amulet of Yendor?"
 "Congratulations, %p.  I always knew that if anyone could succeed
 in defeating the Wizard of Yendor and his minions, it would be you.
 
-"Go now, and take the Amulet to the astral plane.  Once there, present
+"Go now, and take the Amulet to the Astral Plane.  Once there, present
 the Amulet on the altar of %d.  Along the way you shall pass through the
-four elemental planes.  These planes are like nothing you have ever
+four Elemental Planes.  These planes are like nothing you have ever
 experienced before, so be prepared!
 
 "For this you were born, %s!  I am very proud of you."
