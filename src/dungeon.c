@@ -1155,47 +1155,61 @@ int x, y;
 }
 
 void
-u_on_sstairs()		/* place you on the special staircase */
+u_on_rndspot(upflag)	/* place you on a random location */
+int upflag;
 {
-	if (sstairs.sx) {
+	int up = (upflag & 1),
+	    was_in_W_tower = (upflag & 2);
+
+	/*
+	 * Place the hero at a random location within the relevant region.
+	 * place_lregion(xTELE) -> put_lregion_here(xTELE) -> u_on_newpos()
+	 * Unspecified region (.lx == 0) defaults to entire level.
+	 */
+	if (was_in_W_tower && On_W_tower_level(&u.uz))
+	    /* Stay inside the Wizard's tower when feasible.
+	       We use the W Tower's exclusion region for the
+	       destination instead of its enclosing region.
+	       Note: up vs down doesn't matter in this case
+	       because both specify the same exclusion area. */
+	    place_lregion(dndest.nlx, dndest.nly, dndest.nhx, dndest.nhy,
+			  0, 0, 0, 0, LR_DOWNTELE, (d_level *) 0);
+	else if (up)
+	    place_lregion(updest.lx, updest.ly, updest.hx, updest.hy,
+			  updest.nlx, updest.nly, updest.nhx, updest.nhy,
+			  LR_UPTELE, (d_level *)0);
+	else
+	    place_lregion(dndest.lx, dndest.ly, dndest.hx, dndest.hy,
+			  dndest.nlx, dndest.nly, dndest.nhx, dndest.nhy,
+			  LR_DOWNTELE, (d_level *)0);
+}
+
+void
+u_on_sstairs(upflag)	/* place you on the special staircase */
+int upflag;
+{
+	if (sstairs.sx)
 	    u_on_newpos(sstairs.sx, sstairs.sy);
-	} else {
-	    /* code stolen from goto_level */
-	    int trycnt = 0;
-	    xchar x, y;
-#ifdef DEBUG
-	    pline("u_on_sstairs: picking random spot");
-#endif
-#define badspot(x,y) ((levl[x][y].typ != ROOM && levl[x][y].typ != CORR) || MON_AT(x, y))
-	    do {
-		x = rnd(COLNO-1);
-		y = rn2(ROWNO);
-		if (!badspot(x, y)) {
-		    u_on_newpos(x, y);
-		    return;
-		}
-	    } while (++trycnt <= 500);
-	    panic("u_on_sstairs: could not relocate player!");
-#undef badspot
-	}
+	else
+	    u_on_rndspot(upflag);
 }
 
 void
 u_on_upstairs()	/* place you on upstairs (or special equivalent) */
 {
-	if (xupstair) {
-		u_on_newpos(xupstair, yupstair);
-	} else
-		u_on_sstairs();
+	if (xupstair)
+	    u_on_newpos(xupstair, yupstair);
+	else
+	    u_on_sstairs(0);	/* destination upstairs implies moving down */
 }
 
 void
 u_on_dnstairs()	/* place you on dnstairs (or special equivalent) */
 {
-	if (xdnstair) {
-		u_on_newpos(xdnstair, ydnstair);
-	} else
-		u_on_sstairs();
+	if (xdnstair)
+	    u_on_newpos(xdnstair, ydnstair);
+	else
+	    u_on_sstairs(1);	/* destination dnstairs implies moving up */
 }
 
 boolean

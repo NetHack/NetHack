@@ -1162,22 +1162,12 @@ boolean at_stairs, falling, portal;
 	    u_on_newpos(ttrap->tx, ttrap->ty);
 	} else if (at_stairs && !In_endgame(&u.uz)) {
 	    if (up) {
-		if (at_ladder) {
+		if (at_ladder)
 		    u_on_newpos(xdnladder, ydnladder);
-		} else {
-		    if (newdungeon) {
-			if (Is_stronghold(&u.uz)) {
-			    register xchar x, y;
-
-			    do {
-				x = (COLNO - 2 - rnd(5));
-				y = rn1(ROWNO - 4, 3);
-			    } while(occupied(x, y) ||
-				    IS_WALL(levl[x][y].typ));
-			    u_on_newpos(x, y);
-			} else u_on_sstairs();
-		    } else u_on_dnstairs();
-		}
+		else if (newdungeon)
+		    u_on_sstairs(1);
+		else
+		    u_on_dnstairs();
 		/* you climb up the {stairs|ladder};
 		   fly up the stairs; fly up along the ladder */
 		pline("%s %s up%s the %s.",
@@ -1187,12 +1177,12 @@ boolean at_stairs, falling, portal;
 		      (Flying && at_ladder) ? " along" : "",
 		      at_ladder ? "ladder" : "stairs");
 	    } else {	/* down */
-		if (at_ladder) {
+		if (at_ladder)
 		    u_on_newpos(xupladder, yupladder);
-		} else {
-		    if (newdungeon) u_on_sstairs();
-		    else u_on_upstairs();
-		}
+		else if (newdungeon)
+		    u_on_sstairs(0);
+		else
+		    u_on_upstairs();
 		if (!u.dz) {
 		    ;	/* stayed on same level? (no transit effects) */
 		} else if (Flying) {
@@ -1232,24 +1222,7 @@ boolean at_stairs, falling, portal;
 		}
 	    }
 	} else {	/* trap door or level_tele or In_endgame */
-	    if (was_in_W_tower && On_W_tower_level(&u.uz))
-		/* Stay inside the Wizard's tower when feasible.	*/
-		/* Note: up vs down doesn't really matter in this case. */
-		place_lregion(dndest.nlx, dndest.nly,
-				dndest.nhx, dndest.nhy,
-				0,0, 0,0, LR_DOWNTELE, (d_level *) 0);
-	    else if (up)
-		place_lregion(updest.lx, updest.ly,
-				updest.hx, updest.hy,
-				updest.nlx, updest.nly,
-				updest.nhx, updest.nhy,
-				LR_UPTELE, (d_level *) 0);
-	    else
-		place_lregion(dndest.lx, dndest.ly,
-				dndest.hx, dndest.hy,
-				dndest.nlx, dndest.nly,
-				dndest.nhx, dndest.nhy,
-				LR_DOWNTELE, (d_level *) 0);
+	    u_on_rndspot((up ? 1 : 0) | (was_in_W_tower ? 2 : 0));
 	    if (falling) {
 		if (Punished) ballfall();
 		selftouch("Falling, you");
