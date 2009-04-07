@@ -144,7 +144,7 @@ to me.
 close this college.
 
 "May the wisdom of %d be your guide."
-%E [%nC has stolen %o.  Locate %i, defeat %n within, and return %o.]
+%E [%nC has stolen %o.  Locate %i, defeat %ni, and return %O.]
 %Cp Arc 00025
 "Beware, for %n is powerful and cunning."
 %E
@@ -3338,7 +3338,7 @@ from birth as the instrument of %d.  You are destined
 to recover the Amulet for your deity, or die in the
 attempt.  Your hour of destiny has come.  For the sake
 of us all:  Go bravely with %d!
-%E [%dC has chosen you to recover the Amulet of Yendor.]
+%E [%dC has chosen you to recover the Amulet of Yendor for %dI.]
 %Cp - 00002
 You receive a faint telepathic message from %l:
 Your help is urgently needed at %H!
@@ -3482,6 +3482,7 @@ Go now!  You are banished from this place.
  %l:	return((char *)ldrname());
  %i:	return(intermed());
  %o:	return(artiname());
+ %O:	return(shortened(artiname()));
  %n:	return((char *)neminame());
  %g:	return((char *)guardname());
  %G:	return((char *)align_gtitle(u.ualignbase[1]));
@@ -3499,6 +3500,12 @@ Go now!  You are banished from this place.
  a suffix:	return an(root);
  A suffix:	return An(root);
  C suffix:	return capitalized(root);
+ h suffix:	return pronoun(he_or_she, mon_of(root)); /* for %l,%n,%d,%o */
+ H suffix:	return capitalized(pronoun(he_or_she, mon_of(root)));
+ i suffix:	return pronoun(him_or_her, mon_of(root));
+ I suffix:	return capitalized(pronoun(him_or_her, mon_of(root)));
+ j suffix:	return pronoun(his_or_her, mon_of(root));
+ J suffix:	return capitalized(pronoun(his_or_her, mon_of(root)));
  p suffix:	return makeplural(root);
  P suffix:	return makeplural(capitalized(root));
  s suffix:	return s_suffix(root);

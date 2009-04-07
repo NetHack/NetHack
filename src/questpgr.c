@@ -22,6 +22,7 @@ STATIC_DCL const char * NDECL(intermed);
 STATIC_DCL const char * NDECL(neminame);
 STATIC_DCL const char * NDECL(guardname);
 STATIC_DCL const char * NDECL(homebase);
+STATIC_DCL void FDECL(qtext_pronoun, (CHAR_P,CHAR_P));
 STATIC_DCL struct qtmsg * FDECL(msg_in, (struct qtmsg *,int));
 STATIC_DCL void FDECL(convert_arg, (CHAR_P));
 STATIC_DCL void NDECL(convert_line);
@@ -213,6 +214,42 @@ homebase()	/* return your role leader's location */
 	return(urole.homebase);
 }
 
+/* replace deity, leader, nemesis, or artifact name with pronoun;
+   overwrites cvt_buf[] */
+STATIC_OVL void
+qtext_pronoun(who, which)
+char who,   /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
+     which; /* 'h'|'H'|'i'|'I'|'j'|'J' */
+{
+    const char *pnoun;
+    int g;
+    char lwhich = lowc(which);	/* H,I,J -> h,i,j */
+
+    /*
+     * Invalid subject (not d,l,n,o) yields neuter, singular result.
+     *
+     * For %o, treat all artifacts as neuter; some have plural names,
+     * which genders[] doesn't handle; cvt_buf[] already contains name
+     * and makesingular() understands how to handle "the foos of bar".
+     */
+    if (who == 'o' && strcmpi(cvt_buf, makesingular(cvt_buf))) {
+	pnoun = (lwhich == 'h') ? "they" :
+		(lwhich == 'i') ? "them" :
+		(lwhich == 'j') ? "their" : "?";
+    } else {
+	g = (who == 'd') ? quest_status.godgend :
+	    (who == 'l') ? quest_status.ldrgend :
+	    (who == 'n') ? quest_status.nemgend : 2; /* default to neuter */
+	pnoun = (lwhich == 'h') ? genders[g].he :
+		(lwhich == 'i') ? genders[g].him :
+		(lwhich == 'j') ? genders[g].his : "?";
+    }
+    Strcpy(cvt_buf, pnoun);
+    /* capitalize for H,I,J */
+    if (lwhich != which) cvt_buf[0] = highc(cvt_buf[0]);
+    return;
+}
+
 STATIC_OVL struct qtmsg *
 msg_in(qtm_list, msgnum)
 struct qtmsg *qtm_list;
@@ -252,7 +289,15 @@ char c;
 			break;
 	    case 'i':	str = intermed();
 			break;
+	    case 'O':
 	    case 'o':	str = the(artiname(urole.questarti));
+			if (c == 'O') {
+			    /* shorten "the Foo of Bar" to "the Foo"
+			       (buffer returned by the() is modifiable) */
+			    char *p = strstri(str, " of ");
+
+			    if (p) *p = '\0';
+			}
 			break;
 	    case 'n':	str = neminame();
 			break;
@@ -320,6 +365,16 @@ convert_line()
 
 					/* capitalize */
 				case 'C': cvt_buf[0] = highc(cvt_buf[0]);
+				    break;
+
+					/* replace name with pronoun;
+					   valid for %d, %l, %n, and %o */
+				case 'h':	/* he/she */
+				case 'H':	/* He/She */
+				case 'i':	/* him/her */
+				case 'I':
+				case 'j':	/* his/her */
+				case 'J': qtext_pronoun(*(c - 1), *c);
 				    break;
 
 					/* pluralize */

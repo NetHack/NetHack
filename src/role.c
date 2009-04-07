@@ -1578,6 +1578,7 @@ void
 role_init()
 {
 	int alignmnt;
+	struct permonst *pm;
 
 	/* Strip the role letter out of the player name.
 	 * This is included for backwards compatibility.
@@ -1623,25 +1624,36 @@ role_init()
 
 	/* Fix up the quest leader */
 	if (urole.ldrnum != NON_PM) {
-	    mons[urole.ldrnum].msound = MS_LEADER;
-	    mons[urole.ldrnum].mflags2 |= (M2_PEACEFUL);
-	    mons[urole.ldrnum].mflags3 |= M3_CLOSE;
-	    mons[urole.ldrnum].maligntyp = alignmnt * 3;
+	    pm = &mons[urole.ldrnum];
+	    pm->msound = MS_LEADER;
+	    pm->mflags2 |= (M2_PEACEFUL);
+	    pm->mflags3 |= M3_CLOSE;
+	    pm->maligntyp = alignmnt * 3;
+	    /* if gender is random, we choose it now instead of waiting
+	       until the leader monster is created */
+	    quest_status.ldrgend = is_neuter(pm) ? 2 : is_female(pm) ? 1 :
+					is_male(pm) ? 0 : (rn2(100) < 50);
 	}
 
 	/* Fix up the quest guardians */
 	if (urole.guardnum != NON_PM) {
-	    mons[urole.guardnum].mflags2 |= (M2_PEACEFUL);
-	    mons[urole.guardnum].maligntyp = alignmnt * 3;
+	    pm = &mons[urole.guardnum];
+	    pm->mflags2 |= (M2_PEACEFUL);
+	    pm->maligntyp = alignmnt * 3;
 	}
 
 	/* Fix up the quest nemesis */
 	if (urole.neminum != NON_PM) {
-	    mons[urole.neminum].msound = MS_NEMESIS;
-	    mons[urole.neminum].mflags2 &= ~(M2_PEACEFUL);
-	    mons[urole.neminum].mflags2 |= (M2_NASTY|M2_STALK|M2_HOSTILE);
-	    mons[urole.neminum].mflags3 &= ~(M3_CLOSE);
-	    mons[urole.neminum].mflags3 |= M3_WANTSARTI | M3_WAITFORU;
+	    pm = &mons[urole.neminum];
+	    pm->msound = MS_NEMESIS;
+	    pm->mflags2 &= ~(M2_PEACEFUL);
+	    pm->mflags2 |= (M2_NASTY|M2_STALK|M2_HOSTILE);
+	    pm->mflags3 &= ~(M3_CLOSE);
+	    pm->mflags3 |= M3_WANTSARTI | M3_WAITFORU;
+	    /* if gender is random, we choose it now instead of waiting
+	       until the nemesis monster is created */
+	    quest_status.nemgend = is_neuter(pm) ? 2 : is_female(pm) ? 1 :
+					is_male(pm) ? 0 : (rn2(100) < 50);
 	}
 
 	/* Fix up the god names */
@@ -1655,6 +1667,8 @@ role_init()
 	    urole.ngod = roles[flags.pantheon].ngod;
 	    urole.cgod = roles[flags.pantheon].cgod;
 	}
+	/* 0 or 1; no gods are neuter, nor is gender randomized */
+	quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
 
 	/* Fix up infravision */
 	if (mons[urace.malenum].mflags3 & M3_INFRAVISION) {

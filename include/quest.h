@@ -26,6 +26,13 @@ struct q_score {			/* Quest "scorecard" */
 	Bitfield(offered_artifact,1);	/* offered to leader */
 	Bitfield(got_thanks,1);		/* final message from leader */
 
+	/* used by questpgr code when messages want to use pronouns
+	   (set up at game start instead of waiting until monster creation;
+	   1 bit each would suffice--nobody involved is actually neuter) */
+	Bitfield(ldrgend,2); /* leader's gender: 0=male, 1=female, 2=neuter */
+	Bitfield(nemgend,2); /* nemesis's gender */
+	Bitfield(godgend,2); /* deity's gender */
+
 	/* keep track of leader presence/absence even if leader is
 	   polymorphed, raised from dead, etc */
 	Bitfield(leader_is_dead,1);

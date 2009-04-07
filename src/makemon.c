@@ -984,6 +984,13 @@ register int	mmflags;
 
 	if (is_female(ptr)) mtmp->female = TRUE;
 	else if (is_male(ptr)) mtmp->female = FALSE;
+	/* leader and nemesis gender is usually hardcoded in mons[],
+	   but for ones which can be random, it has already been chosen
+	   (in role_init(), for possible use by the quest pager code) */
+	else if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
+	    mtmp->female = quest_status.ldrgend;
+	else if (ptr->msound == MS_NEMESIS && quest_info(MS_NEMESIS) == mndx)
+	    mtmp->female = quest_status.nemgend;
 	else mtmp->female = rn2(2);	/* ignored for neuters */
 
 	if (In_sokoban(&u.uz) && !mindless(ptr))  /* know about traps here */
