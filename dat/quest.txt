@@ -858,7 +858,7 @@ to unleash a new disease we call 'the cold' on Gehennom."
 "Paint a red caduceus on your shield and monsters won't hit you."
 %E
 %Cp Hea 00012
-"How are you feeling?  Perhaps a good bleeding will improve your sprits."
+"How are you feeling?  Perhaps a good bleeding will improve your spirits."
 %E
 %Cp Hea 00013
 "Have you heard the absurd new theory that diseases are caused by
@@ -1855,7 +1855,7 @@ distraction of leatherwings."
 "So, tell us how you entered %i, in case some new evil arises there."
 %E
 %Cp Ran 00014
-"Is that truely %o that I see you carrying?"
+"Is that truly %o that I see you carrying?"
 %E
 %Cc Ran 00015
 "%pC!  You have returned!  Thank %d.
