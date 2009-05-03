@@ -33,13 +33,7 @@ static long final_fpos;
 #define NAMSZ	10
 #define DTHSZ	100
 #define ROLESZ   3
-#define PERSMAX	 3		/* entries per name/uid per char. allowed */
-#define POINTSMIN	1	/* must be > 0 */
-#define ENTRYMAX	100	/* must be >= 10 */
 
-#if !defined(MICRO) && !defined(MAC) && !defined(WIN32)
-#define PERS_IS_UID		/* delete for PERSMAX per name; now per uid */
-#endif
 struct toptenentry {
 	struct toptenentry *tt_next;
 #ifdef UPDATE_RECORD_IN_PLACE
@@ -282,7 +276,7 @@ int how;
 {
 	int uid = getuid();
 	int rank, rank0 = -1, rank1 = 0;
-	int occ_cnt = PERSMAX;
+	int occ_cnt = sysopt.persmax;
 	register struct toptenentry *t0, *tprev;
 	struct toptenentry *t1;
 	FILE *rfile;
@@ -411,14 +405,14 @@ int how;
 	HUP topten_print("");
 
 	/* assure minimum number of points */
-	if(t0->points < POINTSMIN) t0->points = 0;
+	if(t0->points < sysopt.pointsmin) t0->points = 0;
 
 	t1 = tt_head = newttentry();
 	tprev = 0;
 	/* rank0: -1 undefined, 0 not_on_list, n n_th on list */
 	for(rank = 1; ; ) {
 	    readentry(rfile, t1);
-	    if (t1->points < POINTSMIN) t1->points = 0;
+	    if (t1->points < sysopt.pointsmin) t1->points = 0;
 	    if(rank0 < 0 && t1->points < t0->points) {
 		rank0 = rank++;
 		if(tprev == 0)
@@ -436,11 +430,10 @@ int how;
 
 	    if(t1->points == 0) break;
 	    if(
-#ifdef PERS_IS_UID
-		t1->uid == t0->uid &&
-#else
-		strncmp(t1->name, t0->name, NAMSZ) == 0 &&
-#endif
+		(sysopt.pers_is_uid
+			? t1->uid == t0->uid
+			: strncmp(t1->name, t0->name, NAMSZ) == 0
+		) &&
 		!strncmp(t1->plrole, t0->plrole, ROLESZ) &&
 		--occ_cnt <= 0) {
 		    if(rank0 < 0) {
@@ -460,12 +453,12 @@ int how;
 			continue;
 		    }
 		}
-	    if(rank <= ENTRYMAX) {
+	    if(rank <= sysopt.entrymax) {
 		t1->tt_next = newttentry();
 		t1 = t1->tt_next;
 		rank++;
 	    }
-	    if(rank > ENTRYMAX) {
+	    if(rank > sysopt.entrymax) {
 		t1->points = 0;
 		break;
 	    }
@@ -490,7 +483,7 @@ int how;
 			char pbuf[BUFSZ];
 			Sprintf(pbuf,
 			  "You reached the %d%s place on the top %d list.",
-				rank0, ordin(rank0), ENTRYMAX);
+				rank0, ordin(rank0), sysopt.entrymax);
 			topten_print(pbuf);
 		    }
 		    topten_print("");
@@ -511,11 +504,10 @@ int how;
 		    (rank < rank0 - flags.end_around ||
 		     rank > rank0 + flags.end_around) &&
 		    (!flags.end_own ||
-#ifdef PERS_IS_UID
-					t1->uid != t0->uid
-#else
-					strncmp(t1->name, t0->name, NAMSZ)
-#endif
+			(sysopt.pers_is_uid
+				? t1->uid == t0->uid
+				: strncmp(t1->name, t0->name, NAMSZ) == 0
+			)
 		)) continue;
 	    if (rank == rank0 - flags.end_around &&
 		    rank0 > flags.end_top + flags.end_around + 1 &&
@@ -597,7 +589,8 @@ boolean so;
 	if (rank) Sprintf(eos(linebuf), "%3d", rank);
 	else Strcat(linebuf, "   ");
 
-	Sprintf(eos(linebuf), " %10ld  %.10s", t1->points, t1->name);
+	Sprintf(eos(linebuf), " %10ld  %.10s", t1->points?t1->points:u.urexp,
+			t1->name);
 	Sprintf(eos(linebuf), "-%s", t1->plrole);
 	if (t1->plrace[0] != '?')
 		Sprintf(eos(linebuf), "-%s", t1->plrace);
@@ -740,10 +733,8 @@ int uid;
 			    t1->patchlevel != PATCHLEVEL))
 		return 0;
 
-#ifdef PERS_IS_UID
-	if (!playerct && t1->uid == uid)
+	if (sysopt.pers_is_uid && !playerct && t1->uid == uid)
 		return 1;
-#endif
 
 	for (i = 0; i < playerct; i++) {
 	    if (players[i][0] == '-' && index("pr", players[i][1]) &&
@@ -785,9 +776,7 @@ char **argv;
 	register int i;
 	char pbuf[BUFSZ];
 	int uid = -1;
-#ifndef PERS_IS_UID
 	const char *player0;
-#endif
 
 	if (argc < 2 || strncmp(argv[1], "-s", 2)) {
 		raw_printf("prscore: bad arguments (%d)", argc);
@@ -828,11 +817,11 @@ char **argv;
 	}
 
 	if (argc <= 1) {
-#ifdef PERS_IS_UID
+	    if(sysopt.pers_is_uid){
 		uid = getuid();
 		playerct = 0;
 		players = (const char **)0;
-#else
+	    } else {
 		player0 = plname;
 		if (!*player0)
 # ifdef AMIGA
@@ -842,7 +831,7 @@ char **argv;
 # endif
 		playerct = 1;
 		players = &player0;
-#endif
+	    }
 	} else {
 		playerct = --argc;
 		players = (const char **)++argv;
@@ -871,7 +860,7 @@ char **argv;
 	    t1 = tt_head;
 	    for (rank = 1; t1->points != 0; rank++, t1 = t1->tt_next) {
 		if (score_wanted(current_ver, rank, t1, playerct, players, uid))
-		    (void) outentry(rank, t1, 0);
+		    (void) outentry(rank, t1, FALSE);
 	    }
 	} else {
 	    Sprintf(pbuf, "Cannot find any %sentries for ",

@@ -1,0 +1,37 @@
+#
+# NetHack 3.5 sysconf $Date$ $Revision$
+#
+# Sample sysconf file.
+# The sysconf file is only used if NetHack is compiled with SYSCF defined.
+# This file uses the same syntax as nethack.cf.
+
+# Which users can use WIZARD (debugging) mode (the -D flag).
+# A value of * allows anyone to enter debugging mode.
+WIZARDS=root,games
+
+# Users allowed to use the ! (shell escape) command.  Uses the same syntax
+# as the WIZARDS option above.
+#SHELLERS=
+
+# Limit the number of simultaneous games (see also and nethack.sh).
+MAXPLAYERS=10
+
+# If not null, added to string "To get local support, " in the support
+# information help.
+#SUPPORT=call Izchak at extension 42.
+
+# If not null, displayed at the end of a panic-save sequence.
+#RECOVER=Run the recover program.
+
+# Record (high score) file options.
+# CAUTION: changing these after people have started playing games can
+#  lead to lost high scores!
+# Maximum entries for one persion.
+#PERSMAX=10
+# Maximum entries in the record file.
+#ENTRYMAX=100
+# Minimum points to get an entry.
+#POINTSMIN=1
+# Determine identity of "person" in the score file with name (0) or
+# numeric (1) user id.
+#PERS_IS_UID=1

@@ -31,6 +31,9 @@ If you are using the traditional configuration system, see Install.unx.
 4. Install:
    Depending on your configuration, this step may or may not need to be done
    as root; check the hints file.
+   NB: "make install" deletes nethackdir and recreates it from scratch - so
+   if you want the record, logfile, or sysconf files, you must save and
+   restore them manually.
 	cd $Top
 	make install
 

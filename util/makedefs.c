@@ -1289,6 +1289,9 @@ static const char *build_opts[] = {
 #ifdef RLECOMP
 		"run-length compression of map in save files",
 #endif
+#ifdef SYSCF
+		"system configuration",
+#endif
 		save_bones_compat_buf,
 		"basic NetHack features"
 	};

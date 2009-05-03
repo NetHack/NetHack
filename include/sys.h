@@ -15,6 +15,11 @@ struct sysopt {
 	char *wizards;
 	char *shellers;	/* like wizards, for ! command (-DSHELL) */
 	int   maxplayers;
+		/* record file */
+	int persmax;
+	int pers_is_uid;
+	int entrymax;
+	int pointsmin;
 };
 E struct sysopt sysopt;
 

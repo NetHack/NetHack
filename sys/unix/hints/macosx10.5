@@ -46,7 +46,7 @@ endif
 #	   Consider a non-shared install (WANT_SHARE_INSTALL=0) instead.
 #	- 'make install' must be run as "sudo make install"    
 #WANT_SHARE_INSTALL=1
-GAMEUID  = keni
+GAMEUID  = $(USER)
 GAMEGRP  = games
 
 #CC=gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
@@ -128,9 +128,10 @@ endif
 VARFILEPERM = 0664
 VARDIRPERM = 0775
 ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
+# XXX it's nice we don't write over sysconf, but we've already erased it
 # make sure we have group GAMEUID and group GAMEGRP
 PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); . sys/unix/hints/macosx.sh group2 $(GAMEGRP); mkdir $(SHELLDIR); chown $(GAMEUID) $(SHELLDIR)
-POSTINSTALL= touch $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf
+POSTINSTALL= cp -n sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 else
 PREFIX:=$(wildcard ~)
@@ -142,7 +143,8 @@ GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
 ifdef WANT_WIN_X11
-# XXX install nethack.rc as ~/.nethackrc if no ~/.nethackrc exists
+# install nethack.rc as ~/.nethackrc if no ~/.nethackrc exists
+PREINSTALL= cp -n win/X11/nethack.rc ~/.nethackrc
 endif
 endif
 

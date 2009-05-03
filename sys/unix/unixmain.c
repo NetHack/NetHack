@@ -549,7 +549,7 @@ authorize_wizard_mode()
 #ifdef WIZARD
 	struct passwd *pw = get_unix_pw();
 #ifdef SYSCF
-	if (pw && sysopt.wizards[0]) {
+	if (pw && sysopt.wizards && sysopt.wizards[0]) {
 	    if(check_user_string(sysopt.wizards)) return TRUE;
 	} else
 #endif

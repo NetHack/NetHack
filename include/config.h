@@ -155,6 +155,11 @@
  *		SUPPORT		(how to get local support)(no default)
  *		RECOVER		(how to recover a game at your site)(no default)
  *		SHELLERS	(who can use !, syntax as WIZARDS)
+ *		  for the record file (see topten.c):
+ *		PERSMAX		(max entries for one person)
+ *		ENTRYMAX	(max entries in the record file)
+ *		POINTSMIN	(min points to get an entry)
+ *		PERS_IS_UID	(0 or 1 - person is name or (numeric) userid)
  *
  *		The following options select how the config space is stored:
  *		SYSCF_FILE	in the named file
@@ -174,6 +179,27 @@
 #define LOGFILE "logfile"	/* larger file for debugging purposes */
 #define NEWS "news"		/* the file containing the latest hack news */
 #define PANICLOG "paniclog"	/* log of panic and impossible events */
+
+#ifndef PERSMAX
+# define PERSMAX        3       /* entries per name/uid per char. allowed */
+#endif
+#ifndef POINTSMIN
+# define POINTSMIN      1       /* must be > 0 */
+#endif
+#ifndef ENTRYMAX
+# define ENTRYMAX       100     /* must be >= 10 */
+#endif
+#ifndef PERS_IS_UID
+# define PERS_IS_UID    1        /* delete for PERSMAX per name; now per uid */
+#endif
+#ifndef PERS_IS_UID
+# if !defined(MICRO) && !defined(MAC) && !defined(WIN32)
+#  define PERS_IS_UID   1         /* delete for PERSMAX per name; now per uid */
+# else
+#  define PERS_IS_UID   0
+# endif
+#endif
+
 
 /*
  *	If COMPRESS is defined, it should contain the full path name of your

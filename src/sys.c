@@ -16,5 +16,18 @@ sys_early_init(){
 	sysopt.wizards = NULL;
 	sysopt.shellers = NULL;
 	sysopt.maxplayers = 0;	/* XXX eventually replace MAX_NR_OF_PLAYERS */
+
+		/* record file */
+	sysopt.persmax = PERSMAX;
+	sysopt.entrymax = ENTRYMAX;
+	sysopt.pointsmin = POINTSMIN;
+	sysopt.pers_is_uid = PERS_IS_UID;
+
+			/* sanity checks */
+	if(PERSMAX<1) sysopt.persmax = 1;
+	if(ENTRYMAX<10) sysopt.entrymax = 10;
+	if(POINTSMIN<1) sysopt.pointsmin = 1;
+	if(PERS_IS_UID != 0 && PERS_IS_UID != 1)
+		die("config error: PERS_IS_UID must be either 0 or 1");
 }
 

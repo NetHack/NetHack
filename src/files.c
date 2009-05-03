@@ -2068,19 +2068,19 @@ int		src;
 #ifdef SYSCF
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "WIZARDS", 7)) {
 	    if(sysopt.wizards) free(sysopt.wizards);
-	    sysopt.wizards = alloc(strlen(bufp)+1);
+	    sysopt.wizards = (char*)alloc(strlen(bufp)+1);
 	    Strcpy(sysopt.wizards, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "SHELLERS", 8)) {
 	    if(sysopt.shellers) free(sysopt.shellers);
-	    sysopt.shellers = alloc(strlen(bufp)+1);
+	    sysopt.shellers = (char*)alloc(strlen(bufp)+1);
 	    Strcpy(sysopt.shellers, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "SUPPORT", 7)) {
 	    if(sysopt.support) free(sysopt.support);
-	    sysopt.support = alloc(strlen(bufp)+1);
+	    sysopt.support = (char*)alloc(strlen(bufp)+1);
 	    Strcpy(sysopt.support, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "RECOVER", 7)) {
 	    if(sysopt.recover) free(sysopt.recover);
-	    sysopt.recover = alloc(strlen(bufp)+1);
+	    sysopt.recover = (char*)alloc(strlen(bufp)+1);
 	    Strcpy(sysopt.recover, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "MAXPLAYERS", 10)) {
 	    int temp = atoi(bufp);
@@ -2091,6 +2091,34 @@ int		src;
 		raw_printf("Illegal value in MAXPLAYERS.");
 		return 0;
 	    }
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "PERSMAX", 7)) {
+	    int temp = atoi(bufp);
+	    if(temp < 1){
+		raw_printf("Illegal value in PERSMAX (minimum is 1).");
+		return 0;
+	    }
+	    sysopt.persmax = temp;
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "PERS_IS_UID", 11)) {
+	    int temp = atoi(bufp);
+	    if(temp != 0 && temp != 1){
+		raw_printf("Illegal value in PERS_IS_UID (must be 0 or 1).");
+		return 0;
+	    }
+	    sysopt.pers_is_uid = temp;
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "ENTRYMAX", 8)) {
+	    int temp = atoi(bufp);
+	    if(temp < 10){
+		raw_printf("Illegal value in ENTRYMAX (minimum is 10).");
+		return 0;
+	    }
+	    sysopt.entrymax = temp;
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "POINTSMIN", 9)) {
+	    int temp = atoi(bufp);
+	    if(temp < 1){
+		raw_printf("Illegal value in POINTSMIN (minimum is 1).");
+		return 0;
+	    }
+	    sysopt.pointsmin = temp;
 #endif
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
