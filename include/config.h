@@ -190,9 +190,6 @@
 # define ENTRYMAX       100     /* must be >= 10 */
 #endif
 #ifndef PERS_IS_UID
-# define PERS_IS_UID    1        /* delete for PERSMAX per name; now per uid */
-#endif
-#ifndef PERS_IS_UID
 # if !defined(MICRO) && !defined(MAC) && !defined(WIN32)
 #  define PERS_IS_UID   1         /* delete for PERSMAX per name; now per uid */
 # else
