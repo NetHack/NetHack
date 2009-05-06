@@ -1,3 +1,4 @@
+/* NetHack 3.5	were.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)were.c	3.5	2007/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

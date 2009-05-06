@@ -1,3 +1,4 @@
+/* NetHack 3.5	amirip.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)amirip.c	3.5	1996/02/04	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland 1991,1992,1993,1995,1996. */
 /* NetHack may be freely redistributed.  See license for details. */

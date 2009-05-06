@@ -1,3 +1,4 @@
+/* NetHack 3.5	macwin.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)macwin.c	3.5	2005/11/19	*/
 /* Copyright (c) Jon W{tte, Hao-Yang Wang, Jonathan Handler 1992. */
 /* NetHack may be freely redistributed.  See license for details. */

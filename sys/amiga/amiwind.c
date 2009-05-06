@@ -1,3 +1,4 @@
+/* NetHack 3.5	amiwind.c	$Date$  $Revision$ */
 /*    SCCS Id: @(#)amiwind.c     3.5    2000/01/12
 /*    Copyright (c) Olaf Seibert (KosmoSoft), 1989, 1992	  */
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland 1993,1996  */

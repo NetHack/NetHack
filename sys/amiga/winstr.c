@@ -1,3 +1,4 @@
+/* NetHack 3.5	winstr.c	$Date$  $Revision$ */
 /*    SCCS Id: @(#)winstr.c    3.5    1993/04/02 */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */

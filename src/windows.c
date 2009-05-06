@@ -1,3 +1,4 @@
+/* NetHack 3.5	windows.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)windows.c	3.5	2007/02/01	*/
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */

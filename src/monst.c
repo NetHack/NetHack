@@ -1,3 +1,4 @@
+/* NetHack 3.5	monst.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)monst.c	3.5	2007/12/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

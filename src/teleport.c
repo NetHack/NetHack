@@ -1,3 +1,4 @@
+/* NetHack 3.5	teleport.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)teleport.c	3.5	2006/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

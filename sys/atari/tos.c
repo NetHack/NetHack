@@ -1,3 +1,4 @@
+/* NetHack 3.5	tos.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)tos.c	3.5	1990/14/08
 /* NetHack may be freely redistributed.  See license for details. */
 

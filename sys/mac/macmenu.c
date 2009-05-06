@@ -1,3 +1,4 @@
+/* NetHack 3.5	macmenu.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)macmenu.c	3.5	1999/11/24	*/
 /*      Copyright (c) Macintosh NetHack Port Team, 1993.          */
 /* NetHack may be freely redistributed.  See license for details. */

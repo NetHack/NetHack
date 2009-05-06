@@ -1,3 +1,4 @@
+/* NetHack 3.5	dbridge.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)dbridge.c	3.5	2007/02/19	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet		  */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,3 +1,4 @@
+/* NetHack 3.5	exper.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)exper.c	3.5	2005/09/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

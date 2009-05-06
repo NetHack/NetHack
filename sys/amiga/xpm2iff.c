@@ -1,3 +1,4 @@
+/* NetHack 3.5	xpm2iff.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)xpm2iff.c	3.5	1995/08/04	*/
 /* 	Copyright (c) 1995 by Gregg Wonderly, Naperville, Illinois */
 /* NetHack may be freely redistributed.  See license for details. */

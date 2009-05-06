@@ -1,3 +1,4 @@
+/* NetHack 3.5	pckeys.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)pckeys.c	 3.5	 1996/05/11		  */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */

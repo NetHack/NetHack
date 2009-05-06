@@ -1,3 +1,4 @@
+/* NetHack 3.5	dlb.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)dlb.c	3.5	2006/06/25	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */

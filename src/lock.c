@@ -1,3 +1,4 @@
+/* NetHack 3.5	lock.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)lock.c	3.5	2008/03/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

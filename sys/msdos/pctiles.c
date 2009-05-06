@@ -1,3 +1,4 @@
+/* NetHack 3.5	pctiles.c	$Date$  $Revision$ */
 /*   SCCS Id: @(#)pctiles.c   3.5     1995/07/31		     */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994           */
 /*   NetHack may be freely redistributed.  See license for details. */

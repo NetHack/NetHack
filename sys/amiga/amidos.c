@@ -1,3 +1,4 @@
+/* NetHack 3.5	amidos.c	$Date$  $Revision$ */
 /*    SCCS Id: @(#)amidos.c     3.5    2000/01/12
 /* Copyright (c) Olaf Seibert, Nijmegen, The Netherlands, 1988,1990.    */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.  */

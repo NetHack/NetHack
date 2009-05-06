@@ -1,3 +1,4 @@
+/* NetHack 3.5	os2.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)os2.c	3.5	1996/02/29 */
 /*	Copyright (c) Timo Hakulinen, 1990, 1991, 1992, 1993, 1996. */
 /*	NetHack may be freely redistributed.  See license for details. */

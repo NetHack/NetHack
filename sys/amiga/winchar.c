@@ -1,3 +1,4 @@
+/* NetHack 3.5	winchar.c	$Date$  $Revision$ */
 /*    SCCS Id: @(#)winchar.c     3.5    1993/07/22			*/
 /*    Copyright (c) Olaf Seibert (KosmoSoft), 1989, 1992	  */
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland 1993	  */

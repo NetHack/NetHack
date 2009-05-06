@@ -1,3 +1,4 @@
+/* NetHack 3.5	mkmap.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)mkmap.c	3.5	2008/02/29	*/
 /* Copyright (c) J. C. Collet, M. Stephenson and D. Cohrs, 1992   */
 /* NetHack may be freely redistributed.  See license for details. */

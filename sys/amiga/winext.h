@@ -1,3 +1,4 @@
+/* NetHack 3.5	winext.h	$Date$  $Revision$ */
 /*    SCCS Id: @(#)winext.h    3.5    2000/01/12 */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */

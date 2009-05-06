@@ -1,3 +1,4 @@
+/* NetHack 3.5	extralev.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)extralev.c	3.5	2001/09/06	*/
 /*	Copyright 1988, 1989 by Ken Arromdee				*/
 /* NetHack may be freely redistributed.  See license for details. */

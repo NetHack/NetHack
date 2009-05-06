@@ -1,3 +1,4 @@
+/* NetHack 3.5	cvtsnd.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)cvtsnd.c	3.5	1995/09/10                  */
 /* 	Copyright (c) 1995, Andrew Church, Olney, Maryland        */
 /* NetHack may be freely redistributed.  See license for details. */

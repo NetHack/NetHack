@@ -1,3 +1,4 @@
+/* NetHack 3.5	msdos.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)msdos.c	 3.5	 2000/07/30		          */
 /* Copyright (c) NetHack PC Development Team 1990, 1991, 1992, 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details.         */

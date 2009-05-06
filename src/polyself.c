@@ -1,3 +1,4 @@
+/* NetHack 3.5	polyself.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)polyself.c	3.5	2007/04/07	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */

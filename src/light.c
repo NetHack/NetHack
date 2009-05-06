@@ -1,3 +1,4 @@
+/* NetHack 3.5	light.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)light.c	3.5	2009/01/20	*/
 /* Copyright (c) Dean Luick, 1994					*/
 /* NetHack may be freely redistributed.  See license for details.	*/

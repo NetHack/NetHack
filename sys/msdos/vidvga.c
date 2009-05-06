@@ -1,3 +1,4 @@
+/* NetHack 3.5	vidvga.c	$Date$  $Revision$ */
 /*   SCCS Id: @(#)vidvga.c   3.5     2006/07/08			  */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */

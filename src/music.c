@@ -1,3 +1,4 @@
+/* NetHack 3.5	music.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)music.c	3.5	2007/07/08	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */

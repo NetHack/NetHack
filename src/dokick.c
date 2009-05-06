@@ -1,3 +1,4 @@
+/* NetHack 3.5	dokick.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)dokick.c	3.5	2008/09/04	*/
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */

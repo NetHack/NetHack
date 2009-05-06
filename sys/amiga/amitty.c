@@ -1,3 +1,4 @@
+/* NetHack 3.5	amitty.c	$Date$  $Revision$ */
 /*    SCCS Id: @(#)amitty.c     3.5    2000/01/12
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland 1993,1996  */
 /* NetHack may be freely redistributed.  See license for details. */

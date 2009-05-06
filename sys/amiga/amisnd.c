@@ -1,3 +1,4 @@
+/* NetHack 3.5	amisnd.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)amisnd.c	3.5	2000/01/12*/
 /* 	Copyright (c) 1992, 1993, 1995 by Gregg Wonderly */
 /* NetHack may be freely redistributed.  See license for details. */

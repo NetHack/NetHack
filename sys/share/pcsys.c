@@ -1,3 +1,4 @@
+/* NetHack 3.5	pcsys.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)pcsys.c	3.5	2002/01/22		  */
 /* NetHack may be freely redistributed.  See license for details. */
 

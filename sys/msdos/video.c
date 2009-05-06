@@ -1,3 +1,4 @@
+/* NetHack 3.5	video.c	$Date$  $Revision$ */
 /*   SCCS Id: @(#)video.c   3.5     2001/04/07			    */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 2001	    */
 /*   NetHack may be freely redistributed.  See license for details. */

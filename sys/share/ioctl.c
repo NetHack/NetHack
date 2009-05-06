@@ -1,3 +1,4 @@
+/* NetHack 3.5	ioctl.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)ioctl.c	3.5	1990/22/02 */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,3 +1,4 @@
+/* NetHack 3.5	drawing.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)drawing.c	3.5	2007/07/30	*/
 /* Copyright (c) NetHack Development Team 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */

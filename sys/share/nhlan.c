@@ -1,3 +1,4 @@
+/* NetHack 3.5	nhlan.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)nhlan.c	3.5	1999/11/21	*/
 /* Copyright (c) Michael Allison, 1997                  */
 /* NetHack may be freely redistributed.  See license for details. */

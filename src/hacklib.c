@@ -1,3 +1,4 @@
+/* NetHack 3.5	hacklib.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)hacklib.c	3.5	2007/04/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991		  */

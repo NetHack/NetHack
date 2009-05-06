@@ -1,3 +1,4 @@
+/* NetHack 3.5	write.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)write.c	3.5	2001/11/29	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

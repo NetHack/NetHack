@@ -1,3 +1,4 @@
+/* NetHack 3.5	mklev.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)mklev.c	3.5	2009/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,3 +1,4 @@
+/* NetHack 3.5	mrecover.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)mrecover.c	3.5		1996/07/24	  */
 /*      Copyright (c) David Hairston, 1993.                       */
 /* NetHack may be freely redistributed.  See license for details. */

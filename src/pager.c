@@ -1,3 +1,4 @@
+/* NetHack 3.5	pager.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)pager.c	3.5	2009/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

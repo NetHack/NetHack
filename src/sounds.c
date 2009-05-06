@@ -1,3 +1,4 @@
+/* NetHack 3.5	sounds.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)sounds.c	3.5	2007/05/05	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */

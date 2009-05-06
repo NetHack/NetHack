@@ -1,3 +1,4 @@
+/* NetHack 3.5	dog.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)dog.c	3.5	2008/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
