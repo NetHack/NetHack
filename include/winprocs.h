@@ -1,3 +1,4 @@
+/* NetHack 3.5	winprocs.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)winprocs.h 3.5	2007/01/17	*/
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */

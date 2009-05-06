@@ -1,3 +1,4 @@
+/* NetHack 3.5	wintype.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)wintype.h	3.5	2006/07/08	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */

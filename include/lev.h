@@ -1,3 +1,4 @@
+/* NetHack 3.5	lev.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)lev.h	3.5	2006/07/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,3 +1,4 @@
+/* NetHack 3.5	unixconf.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)unixconf.h 3.5	2007/12/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

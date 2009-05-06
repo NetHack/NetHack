@@ -1,3 +1,4 @@
+/* NetHack 3.5	trampoli.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)trampoli.h 3.5	1995/06/01	*/
 /* Copyright (c) 1989, by Norm Meluch and Stephen Spackman	  */
 /* NetHack may be freely redistributed.  See license for details. */

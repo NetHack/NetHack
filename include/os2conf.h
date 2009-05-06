@@ -1,3 +1,4 @@
+/* NetHack 3.5	os2conf.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)os2conf.h	3.5	2007/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Timo Hakulinen, 1990, 1991, 1992, 1993, 1996. */

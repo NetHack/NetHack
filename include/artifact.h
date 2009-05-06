@@ -1,3 +1,4 @@
+/* NetHack 3.5	artifact.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)artifact.h 3.5	1995/05/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

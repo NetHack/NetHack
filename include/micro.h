@@ -1,3 +1,4 @@
+/* NetHack 3.5	micro.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)micro.h	3.5	1990/02/22	*/
 /* micro.h - function declarations for various microcomputers */
 /* NetHack may be freely redistributed.  See license for details. */

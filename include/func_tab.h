@@ -1,3 +1,4 @@
+/* NetHack 3.5	func_tab.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)func_tab.h 3.5	1992/04/03	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

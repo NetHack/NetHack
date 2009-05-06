@@ -1,3 +1,4 @@
+/* NetHack 3.5	tcap.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)tcap.h	3.5	1992/10/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */

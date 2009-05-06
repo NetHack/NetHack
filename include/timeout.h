@@ -1,3 +1,4 @@
+/* NetHack 3.5	timeout.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)timeout.h	3.5	1999/02/13	*/
 /* Copyright 1994, Dean Luick					  */
 /* NetHack may be freely redistributed.  See license for details. */

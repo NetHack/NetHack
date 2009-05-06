@@ -1,3 +1,4 @@
+/* NetHack 3.5	dgn_file.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)dgn_file.h 3.5	1993/01/17	*/
 /* Copyright (c) 1989 by M. Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */

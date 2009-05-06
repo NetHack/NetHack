@@ -1,3 +1,4 @@
+/* NetHack 3.5	permonst.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)permonst.h 3.5	2006/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

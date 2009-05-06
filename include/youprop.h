@@ -1,3 +1,4 @@
+/* NetHack 3.5	youprop.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)youprop.h	3.5	2007/03/16	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */

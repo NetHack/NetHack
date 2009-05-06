@@ -1,3 +1,4 @@
+/* NetHack 3.5	mactty.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)mactty.h	3.5	1993/03/01	*/
 /* Copyright (c) Jon W{tte 1993.					*/
 /* NetHack may be freely redistributed.  See license for details.	*/

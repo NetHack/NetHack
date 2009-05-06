@@ -1,3 +1,4 @@
+/* NetHack 3.5	color.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)color.h	3.5	1992/02/02	*/
 /* Copyright (c) Steve Linhart, Eric Raymond, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */

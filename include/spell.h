@@ -1,3 +1,4 @@
+/* NetHack 3.5	spell.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)spell.h	3.5	2006/02/11	*/
 /* Copyright 1986, M. Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,3 +1,4 @@
+/* NetHack 3.5	winami.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)winami.h	3.5	1993/01/17	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991. */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois, 1992, 1993. */

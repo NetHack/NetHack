@@ -1,3 +1,4 @@
+/* NetHack 3.5	attrib.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)attrib.c	3.5	2008/02/02	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */

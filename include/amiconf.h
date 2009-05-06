@@ -1,3 +1,4 @@
+/* NetHack 3.5	amiconf.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)amiconf.h	3.5	2000/01/12	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1990, 1991, 1992, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */

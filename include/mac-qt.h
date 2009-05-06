@@ -1,3 +1,4 @@
+/* NetHack 3.5	mac-qt.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)mac-qt.h	3.5	2003/06/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 2003. */
 /* NetHack may be freely redistributed.  See license for details. */

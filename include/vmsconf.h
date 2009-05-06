@@ -1,3 +1,4 @@
+/* NetHack 3.5	vmsconf.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)vmsconf.h	3.5	2007/10/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

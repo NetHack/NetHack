@@ -1,3 +1,4 @@
+/* NetHack 3.5	xwindow.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)xwindow.h	3.5	1992/03/07	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */

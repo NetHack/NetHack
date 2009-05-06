@@ -1,3 +1,4 @@
+/* NetHack 3.5	mail.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)mail.h	3.5	1991/10/11	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

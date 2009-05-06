@@ -1,3 +1,4 @@
+/* NetHack 3.5	mondata.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)mondata.h	3.5	2007/04/27	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */

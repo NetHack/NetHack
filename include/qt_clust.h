@@ -1,3 +1,4 @@
+/* NetHack 3.5	qt_clust.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)qt_clust.h	3.5	1999/11/19	*/
 /* Copyright (c) Warwick Allison, 1999. */
 /* NetHack may be freely redistributed.  See license for details. */

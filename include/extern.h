@@ -1,3 +1,4 @@
+/* NetHack 3.5	extern.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)extern.h	3.5	2009/01/20	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */

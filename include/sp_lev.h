@@ -1,3 +1,4 @@
+/* NetHack 3.5	sp_lev.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)sp_lev.h	3.5	2007/08/01	*/
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */

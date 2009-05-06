@@ -1,3 +1,4 @@
+/* NetHack 3.5	display.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)display.h	3.5	2005/06/21	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */

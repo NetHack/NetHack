@@ -1,3 +1,4 @@
+/* NetHack 3.5	winGnome.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)winGnome.h	3.4.	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* Copyright (C) 1998 by Anthony Taylor <tonyt@ptialaska.net> */

@@ -1,3 +1,4 @@
+/* NetHack 3.5	quest.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)quest.h	3.5	1992/11/15	*/
 /* Copyright (c) Mike Stephenson 1991.				  */
 /* NetHack may be freely redistributed.  See license for details. */

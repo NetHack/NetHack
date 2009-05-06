@@ -1,3 +1,4 @@
+/* NetHack 3.5	macwin.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)macwin.h	3.5	1996/01/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

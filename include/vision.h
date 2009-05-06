@@ -1,3 +1,4 @@
+/* NetHack 3.5	vision.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)vision.h	3.5	2007/05/11	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.	*/

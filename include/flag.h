@@ -1,3 +1,4 @@
+/* NetHack 3.5	flag.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)flag.h	3.5	2009/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

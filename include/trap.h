@@ -1,3 +1,4 @@
+/* NetHack 3.5	trap.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)trap.h	3.5	2000/08/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
