@@ -1,7 +1,7 @@
 /* NetHack 3.5  tile.h       $Date$  $Revision$ */
 typedef unsigned char pixval;
 
-typedef struct pixel_t {
+typedef struct pixel_s {
     pixval r, g, b;
 } pixel;
 

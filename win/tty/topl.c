@@ -592,7 +592,6 @@ msghistory_snapshot(purge)
 boolean purge;		/* clear message history buffer as we copy it */
 {
     nhwchar *mesg;
-    unsigned ln;
     int i, inidx, outidx;
     struct WinDesc *cw;
 
