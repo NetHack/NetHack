@@ -1,3 +1,4 @@
+/* NetHack 3.5	tile2bmp.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)tile2bmp.c	3.5	2002/03/14	*/
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */

@@ -1,3 +1,4 @@
+/* NetHack 3.5	winmap.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)winmap.c	3.5	2005/11/12	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */

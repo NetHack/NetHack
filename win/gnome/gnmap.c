@@ -1,3 +1,4 @@
+/* NetHack 3.5	gnmap.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)gnmap.c	3.5	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* Copyright (C) 1998 by Anthony Taylor <tonyt@ptialaska.net> */

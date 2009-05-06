@@ -1,3 +1,5 @@
+NetHack 3.5  tile.doc	$Date$  $Revision$
+
 Window ports can optionally make use of the tiles (pictures for NetHack
 symbols) found in this directory.  They are distributed in a text format
 with routines to help in converting them to a system's preferred format

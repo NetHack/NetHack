@@ -1,3 +1,4 @@
+/* NetHack 3.5	gr_rect.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)gr_rect.c	3.5	2001/12/10				*/
 /* Copyright (c) Christian Bressler, 2001					*/
 /* NetHack may be freely redistributed.  See license for details. */

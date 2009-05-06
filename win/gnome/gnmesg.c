@@ -1,3 +1,4 @@
+/* NetHack 3.5	gnmesg.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)gnmesg.c	3.5	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */

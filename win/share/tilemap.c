@@ -1,3 +1,4 @@
+/* NetHack 3.5	tilemap.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)tilemap.c	3.5	2000/06/04	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

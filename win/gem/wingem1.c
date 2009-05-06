@@ -1,3 +1,4 @@
+/* NetHack 3.5	wingem1.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)wingem1.c	3.5	1999/12/10	*/
 /* Copyright (c) Christian Bressler 1999 	  */
 /* NetHack may be freely redistributed.  See license for details. */

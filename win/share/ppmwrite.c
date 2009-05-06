@@ -1,3 +1,4 @@
+/* NetHack 3.5  ppmwrite.c	$Date$  $Revision$ */
 /* this produces a raw ppm file, with a 15-character header of
  * "P6 3-digit-width 3-digit-height 255\n"
  */

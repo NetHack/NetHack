@@ -1,3 +1,4 @@
+/* NetHack 3.5	tiletext.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)tiletext.c	3.5	1999/10/24	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

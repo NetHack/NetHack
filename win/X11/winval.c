@@ -1,3 +1,4 @@
+/* NetHack 3.5	winval.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)winval.c	3.5	1992/3/7	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */

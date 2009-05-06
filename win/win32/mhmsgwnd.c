@@ -1,3 +1,4 @@
+/* NetHack 3.5	mhmsgwnd.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)mhmsgwnd.c	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */

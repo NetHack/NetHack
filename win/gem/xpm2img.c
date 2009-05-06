@@ -1,3 +1,4 @@
+/* NetHack 3.5	xpm2img.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)xpm2img.c	3.5	2002/03/17	*/
 /*   Copyright (c) Christian Bressler 2002                 */
 /*   NetHack may be freely redistributed.  See license for details. */

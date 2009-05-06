@@ -1,3 +1,4 @@
+/* NetHack 3.5	gnsignal.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)gnsignal.h	3.5	2000/07/16	*/
 /* Copyright (C) 1998 by Anthony Taylor <tonyt@ptialaska.net> */
 /* NetHack may be freely redistributed.  See license for details. */
