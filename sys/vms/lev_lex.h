@@ -1,3 +1,4 @@
+/* NetHack 3.5	lev_lex.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)lev_lex.h	3.5	1999/08/08	*/
 /* "vms/lev_lex.h" copied into "util/stdio.h" for use in *_lex.c only!
  * This is an awful kludge to allow util/*_lex.c made by SunOS's `lex'

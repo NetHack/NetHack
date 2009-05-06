@@ -1,3 +1,4 @@
+/* NetHack 3.5	oldcrtl.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)oldcrtl.c	3.5	1995/06/01	*/
 /*	 Pat Rankin  May'90					  */
 /* VMS NetHack support, not needed for vms 4.6,4.7,5.x,or later   */

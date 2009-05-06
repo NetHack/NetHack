@@ -1,3 +1,4 @@
+/* NetHack 3.5	vmsmail.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)vmsmail.c	3.5	2006/04/14	*/
 /* Copyright (c) Robert Patrick Rankin, 1991.			  */
 /* NetHack may be freely redistributed.  See license for details. */

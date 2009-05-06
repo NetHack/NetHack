@@ -1,3 +1,4 @@
+/* NetHack 3.5	win32api.h	$Date$  $Revision$ */
 /*	SCCS Id: @(#)win32api.h	 3.5	 $Date$		  */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */

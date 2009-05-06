@@ -1,4 +1,5 @@
 #!/bin/sh
+# NetHack 3.5  mkmkfile.sh	$Date$  $Revision$
 #      SCCS Id: @(#)macosx 3.5     2007/12/12
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.

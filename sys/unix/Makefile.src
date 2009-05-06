@@ -1,4 +1,5 @@
 #	NetHack Makefile.
+# NetHack 3.5  Makefile.src	$Date$  $Revision$
 #	SCCS Id: @(#)Makefile.src	3.5	2008/01/30
 
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of

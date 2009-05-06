@@ -1,3 +1,4 @@
+/* NetHack 3.5	ntsound.c	$Date$  $Revision$ */
 /*   SCCS Id: @(#)ntsound.c   3.5     $Date$                        */
 /*   Copyright (c) NetHack PC Development Team 1993                 */
 /*   NetHack may be freely redistributed.  See license for details. */

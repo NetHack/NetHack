@@ -1,3 +1,4 @@
+/* NetHack 3.5	winhack.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)winhack.c	3.5	2008/01/30	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 // winhack.cpp : Defines the entry point for the application.

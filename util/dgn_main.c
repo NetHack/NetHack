@@ -1,3 +1,4 @@
+/* NetHack 3.5	dgn_main.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)dgn_main.c 3.5	1994/09/23	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet	*/
 /*	Copyright (c) 1990 by M. Stephenson		*/

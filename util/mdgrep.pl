@@ -1,6 +1,6 @@
 #!perl
 # NetHack 3.5  mdgrep.pl  $Date$  $Revision$
-# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
+# Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
 # MAKEDEFS:

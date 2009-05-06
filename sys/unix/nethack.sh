@@ -1,4 +1,5 @@
 #!/bin/sh
+# NetHack 3.5  nethack.sh	$Date$  $Revision$
 #	SCCS Id: @(#)nethack.sh	3.5	2007/12/12
 
 HACKDIR=/usr/games/lib/nethackdir

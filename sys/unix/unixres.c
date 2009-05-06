@@ -1,3 +1,4 @@
+/* NetHack 3.5	unixres.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)unixres.c	3.5	2001/07/08	*/
 /* Copyright (c) Slash'EM development team, 2001. */
 /* NetHack may be freely redistributed.  See license for details. */

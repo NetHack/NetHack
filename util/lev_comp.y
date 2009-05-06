@@ -1,4 +1,5 @@
 %{
+/* NetHack 3.5  lev_comp.y	$Date$  $Revision$ */
 /*	SCCS Id: @(#)lev_yacc.c	3.5	2007/08/01	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,3 +1,4 @@
+/* NetHack 3.5	recover.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)recover.c	3.5	1999/10/23	*/
 /*	Copyright (c) Janet Walz, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,3 +1,4 @@
+/* NetHack 3.5	mhtxtbuf.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)mhtxtbuf.c	3.5	2005/01/23	*/
 /* Copyright (C) 2003 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */

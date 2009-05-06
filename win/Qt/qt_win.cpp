@@ -1,3 +1,4 @@
+// NetHack 3.5	qt_win.cpp	$Date$  $Revision$
 //	SCCS Id: @(#)qt_win.cpp	3.5	2005/11/19
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.

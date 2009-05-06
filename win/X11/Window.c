@@ -1,3 +1,4 @@
+/* NetHack 3.5	Window.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)Window.c	3.5	1993/02/02	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */

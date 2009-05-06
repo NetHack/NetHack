@@ -1,3 +1,4 @@
+/* NetHack 3.5	vmsmisc.c	$Date$  $Revision$ */
 /*	SCCS Id: @(#)vmsmisc.c	3.5	1996/03/02	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
