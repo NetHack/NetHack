@@ -29,6 +29,6 @@ sys_early_init(){
 	if(ENTRYMAX<10) sysopt.entrymax = 10;
 	if(POINTSMIN<1) sysopt.pointsmin = 1;
 	if(PERS_IS_UID != 0 && PERS_IS_UID != 1)
-		die("config error: PERS_IS_UID must be either 0 or 1");
+		panic("config error: PERS_IS_UID must be either 0 or 1");
 }
 
