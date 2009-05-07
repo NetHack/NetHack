@@ -687,6 +687,7 @@ static char *yy_last_accepting_cpos;
 #define YY_MORE_ADJ 0
 char *yytext;
 #define INITIAL 0
+/* NetHack 3.5  lev_comp.l	$Date: 2009/05/07 00:58:21 $  $Revision: 1.11 $ */
 /*	SCCS Id: @(#)lev_lex.c	3.5	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
