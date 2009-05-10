@@ -877,7 +877,37 @@ ring:
 		else
 			Strcat(bp, " (alternate weapon; not wielded)");
 	}
-	if(obj->owornmask & W_QUIVER) Strcat(bp, " (in quiver)");
+	if(obj->owornmask & W_QUIVER){
+		switch(obj->oclass){
+		case WEAPON_CLASS:
+			if(is_ammo(obj)){
+				if(objects[obj->otyp].oc_skill == -P_BOW){
+						/* Ammo for a bow */
+					Strcat(bp, " (in quiver)");
+					break;
+				} else {
+						/* Ammo not for a bow */
+					Strcat(bp, " (in quiver pouch)");
+					break;
+				}
+			} else {
+					/* Weapons not considered ammo */
+				Strcat(bp, " (at the ready)");
+				break;
+			}
+
+				/* Small things and ammo not for a bow */
+		case RING_CLASS:
+		case AMULET_CLASS:
+		case WAND_CLASS:
+		case COIN_CLASS:
+		case GEM_CLASS:
+			Strcat(bp, " (in quiver pouch)");
+			break;
+		default:	/* odd things */
+			Strcat(bp, " (at the ready)");
+		}
+	}
 	if (!iflags.suppress_price && is_unpaid(obj)) {
 		long quotedprice = unpaid_cost(obj, TRUE);
 

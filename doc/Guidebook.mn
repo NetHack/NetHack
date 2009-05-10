@@ -540,7 +540,8 @@ E- - write in the dust with your fingers.
 .ei
 .ed
 .lp f
-Fire one of the objects placed in your quiver.  You may select
+Fire one of the objects placed in your quiver (or quiver sack, or that you
+have at the ready).  You may select
 ammunition with a previous `Q' command, or let the computer pick
 something appropriate if
 .op autoquiver
@@ -578,7 +579,9 @@ The behavior can be varied via the msg_window option.
 .lp q
 Quaff (drink) something (potion, water, etc).
 .lp Q
-Select an object for your quiver.  You can then throw this using
+Select an object for your quiver, quiver sack, or just generally at
+the ready (only one of these is available at a time).  You can then throw
+this (or one of these) using
 the `f' command.  (In versions prior to 3.3 this was the command to quit
 the game, which has now been moved to `#quit'.)
 .lp r
@@ -1179,7 +1182,8 @@ have to specify which item to throw each time you use `f'.  There is
 also an option,
 .op autoquiver,
 which has NetHack choose another item to automatically fill your
-quiver when the inventory slot used for `Q' runs out.
+quiver (or quiver sack, or have at the ready) when the inventory slot used
+for `Q' runs out.
 .pg
 Some characters have the ability to fire a volley of multiple items in a
 single turn.  Knowing how to load several rounds of ammunition at
@@ -1709,11 +1713,14 @@ See
 to refine the behavior.
 .lp "autoquiver  "
 This option controls what happens when you attempt the `f' (fire)
-command with an empty quiver.  When true, the computer will fill
-your quiver with some suitable weapon.  Note that it will not take
+command with an empty quiver (or quiver sack or have nothing at the ready).
+When true, the computer will fill
+your quiver or quiver sack or make ready some suitable weapon.  Note that it
+will not take
 into account the blessed/cursed status, enchantment, damage, or
-quality of the weapon; you are free to manually fill your quiver with
-the `Q' command instead.  If no weapon is found or the option is
+quality of the weapon; you are free to manually fill your quiver or quiver sack
+or make ready
+with the `Q' command instead.  If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  (default false)
 .lp boulder
 Set the character used to display boulders (default is rock class symbol).
