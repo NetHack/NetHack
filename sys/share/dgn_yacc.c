@@ -8,7 +8,7 @@ static char yysccsid[] = "@(#)yaccpar	1.9 (Berkeley) 02/21/93";
 #define yyerrok (yyerrflag=0)
 #define YYRECOVERING (yyerrflag!=0)
 #define YYPREFIX "yy"
-/* NetHack 3.5  dgn_comp.y	$Date: 2009/05/07 00:58:21 $  $Revision: 1.6 $ */
+/* NetHack 3.5  dgn_comp.y	$Date: 2009/05/11 22:53:51 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)dgn_comp.c	3.5	1996/06/22	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson				  */
