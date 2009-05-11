@@ -1,5 +1,4 @@
 /* NetHack 3.5	objnam.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)objnam.c	3.5	2008/08/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
