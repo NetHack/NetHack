@@ -1,5 +1,4 @@
 /* NetHack 3.5	zap.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)zap.c	3.5	2008/10/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -177,7 +176,7 @@ struct obj *otmp;
 			dmg = d(2,12);
 			if(dbldam) dmg *= 2;
 			if (otyp == SPE_FORCE_BOLT)
-			    dmg += spell_damage_bonus();
+			    dmg = spell_damage_bonus(dmg);
 			hit(zap_type_text, mtmp, exclam(dmg));
 			(void) resist(mtmp, otmp->oclass, dmg, TELL);
 		} else miss(zap_type_text, mtmp);
@@ -212,7 +211,7 @@ struct obj *otmp;
 			dmg = rnd(8);
 			if(dbldam) dmg *= 2;
 			if (otyp == SPE_TURN_UNDEAD)
-				dmg += spell_damage_bonus();
+				dmg = spell_damage_bonus(dmg);
 			context.bypasses = TRUE;	/* for make_corpse() */
 			if (!resist(mtmp, otmp->oclass, dmg, NOTELL)) {
 			    if (mtmp->mhp > 0) monflee(mtmp, 0, FALSE, TRUE);
@@ -382,7 +381,7 @@ struct obj *otmp;
 		dmg = monhp_per_lvl(mtmp);
 		if(dbldam) dmg *= 2;
 		if (otyp == SPE_DRAIN_LIFE)
-			dmg += spell_damage_bonus();
+			dmg = spell_damage_bonus(dmg);
 		if (resists_drli(mtmp))
 		    shieldeff(mtmp->mx, mtmp->my);
 		else if (!resist(mtmp, otmp->oclass, dmg, NOTELL) &&
@@ -2773,28 +2772,29 @@ struct	obj	*obj;
 	return;
 }
 
-/*
- * Generate the to damage bonus for a spell. Based on the hero's intelligence
- */
+/* augment damage for a spell dased on the hero's intelligence (and level) */
 int
-spell_damage_bonus()
+spell_damage_bonus(dmg)
+int dmg;	/* base amount to be adjusted by bonus or penalty */
 {
-    int tmp, intell = ACURR(A_INT);
+    int intell = ACURR(A_INT);
 
     /* Punish low intellegence before low level else low intellegence
        gets punished only when high level */
-    if (intell < 10)
-	tmp = -3;
-    else if (u.ulevel < 5)
-	tmp = 0;
-    else if (intell < 14)
-	tmp = 0;
+    if (intell <= 9) {
+	/* -3 penalty, but never reduce combined amount below 1
+	   (if dmg is 0 for some reason, we're careful to leave it there) */
+	if (dmg > 1) dmg = (dmg <= 3) ? 1 : dmg - 3;
+    } else if (intell <= 13 || u.ulevel < 5)
+	;		/* no bonus or penalty; dmg remains same */
     else if (intell <= 18)
-	tmp = 1;
-    else		/* helm of brilliance */
-	tmp = 2;
+	dmg += 1;
+    else if (intell <= 24 || u.ulevel < 14)
+	dmg += 2;
+    else
+	dmg += 3;		/* Int 25 */
 
-    return tmp;
+    return dmg;
 }
 
 /*
@@ -3270,12 +3270,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		}
 		tmp = d(nd,6);
 		if (spellcaster)
-		    tmp += spell_damage_bonus();
-#ifdef WIZ_PATCH_DEBUG
-		if (spellcaster)
-		    pline("Damage = %d + %d", tmp-spell_damage_bonus(),
-			spell_damage_bonus());
-#endif
+		    tmp = spell_damage_bonus(tmp);
 		break;
 	case ZT_FIRE:
 		if (resists_fire(mon)) {
@@ -3285,12 +3280,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		tmp = d(nd,6);
 		if (resists_cold(mon)) tmp += 7;
 		if (spellcaster)
-		    tmp += spell_damage_bonus();
-#ifdef WIZ_PATCH_DEBUG
-		if (spellcaster)
-		    pline("Damage = %d + %d",tmp-spell_damage_bonus(),
-			spell_damage_bonus());
-#endif
+		    tmp = spell_damage_bonus(tmp);
 		if (burnarmor(mon)) {
 		    if (!rn2(3)) (void)destroy_mitem(mon, POTION_CLASS, AD_FIRE);
 		    if (!rn2(3)) (void)destroy_mitem(mon, SCROLL_CLASS, AD_FIRE);
@@ -3305,12 +3295,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		tmp = d(nd,6);
 		if (resists_fire(mon)) tmp += d(nd, 3);
 		if (spellcaster)
-		    tmp += spell_damage_bonus();
-#ifdef WIZ_PATCH_DEBUG
-		if (spellcaster)
-		    pline("Damage = %d + %d", tmp-spell_damage_bonus(),
-			spell_damage_bonus());
-#endif
+		    tmp = spell_damage_bonus(tmp);
 		if (!rn2(3)) (void)destroy_mitem(mon, POTION_CLASS, AD_COLD);
 		break;
 	case ZT_SLEEP:
@@ -3372,12 +3357,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		} else
 		    tmp = d(nd,6);
 		if (spellcaster)
-		    tmp += spell_damage_bonus();
-#ifdef WIZ_PATCH_DEBUG
-		if (spellcaster)
-		    pline("Damage = %d + %d", tmp-spell_damage_bonus(),
-			spell_damage_bonus());
-#endif
+		    tmp = spell_damage_bonus(tmp);
 		if (!resists_blnd(mon) &&
 				!(type > 0 && u.uswallow && mon == u.ustuck)) {
 			register unsigned rnd_tmp = rnd(50);

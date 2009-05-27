@@ -1,5 +1,4 @@
 /* NetHack 3.5	extern.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)extern.h	3.5	2009/01/20	*/
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2664,7 +2663,7 @@ E boolean FDECL(cancel_monst, (struct monst *,struct obj *,
 E void NDECL(zapsetup);
 E void NDECL(zapwrapup);
 E void FDECL(weffects, (struct obj *));
-E int NDECL(spell_damage_bonus);
+E int FDECL(spell_damage_bonus, (int));
 E const char *FDECL(exclam, (int force));
 E void FDECL(hit, (const char *,struct monst *,const char *));
 E void FDECL(miss, (const char *,struct monst *));

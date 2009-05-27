@@ -1,5 +1,4 @@
 /* NetHack 3.5	spell.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)spell.c	3.5	2007/05/29	*/
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -922,7 +921,7 @@ boolean atme;
 			} else {
 			    explode(u.dx, u.dy,
 				    pseudo->otyp - SPE_MAGIC_MISSILE + 10,
-				    u.ulevel/2 + 1 + spell_damage_bonus(), 0,
+				    spell_damage_bonus(u.ulevel / 2 + 1), 0,
 					(pseudo->otyp == SPE_CONE_OF_COLD) ?
 						EXPL_FROSTY : EXPL_FIERY);
 			}
