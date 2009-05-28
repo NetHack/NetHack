@@ -321,6 +321,8 @@ pearl rings shouldn't rust
 shouldn't be able to read a worn T-shirt when it's covered by a worn suit
 simplify hero placement on Castle level when climbing up stairs from Valley
 spell attack by low-Int hero could inflict negative damage
+some wand/spell/breath zaps that hit a secret door failed to reveal it
+wand explosion feedback about adjacent door was phrased as if for a wand zap
 
 
 Platform- and/or Interface-Specific Fixes

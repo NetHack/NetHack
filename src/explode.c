@@ -1,5 +1,4 @@
 /* NetHack 3.5	explode.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)explode.c	3.5	2009/01/04	*/
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -51,9 +50,21 @@ int expltype;
 	short exploding_wand_typ = 0;
 
 	if (olet == WAND_CLASS)	{	/* retributive strike */
-		/*  If 'type' < 0 it indicates (wand type * -1) */
+		/*  'type' is passed as (wand's object type * -1); save
+		    object type and convert 'type' itself to zap-type */
 		if (type < 0) {
-			exploding_wand_typ = (short)(type * -1);
+		    type = -type;
+		    exploding_wand_typ = (short)type;
+		    /* most attack wands produce specific explosions;
+		       other types produce a generic magical explosion */
+		    if (objects[type].oc_dir == RAY && type != WAN_DIGGING) {
+			type -= WAN_MAGIC_MISSILE;
+			if (type < 0 || type > 9) {
+			    impossible("explode: wand has bad zap type (%d).",
+				       type);
+			    type = 0;
+			}
+		    } else
 			type = 0;
 		}
 		switch (Role_switch) {

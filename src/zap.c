@@ -3975,10 +3975,11 @@ int type;
 boolean *shopdamage;
 short exploding_wand_typ;
 {
+	const char *zapverb;
 	struct monst *mon;
 	struct trap *t;
 	struct rm *lev = &levl[x][y];
-	boolean see_it = cansee(x, y);
+	boolean see_it = cansee(x, y), yourzap;
 	int rangemod = 0, abstype = abs(type) % 10;
 
 	switch (abstype) {
@@ -4122,6 +4123,31 @@ short exploding_wand_typ;
 	    break;
 	}
 
+	/* set up zap text for possible door feedback; for exploding wand, we
+	   want "the blast" rather than "your blast" even if hero caused it */
+	yourzap = (type >= 0 && !exploding_wand_typ);
+	zapverb = "blast";	/* breath attack or wand explosion */
+	if (!exploding_wand_typ) {
+	    if (abs(type) < ZT_SPELL(0)) zapverb = "bolt";  /* wand zap */
+	    else if (abs(type) < ZT_BREATH(0)) zapverb = "spell";
+	}
+
+	/* secret door gets revealed, converted into regular door */
+	if (levl[x][y].typ == SDOOR) {
+		cvt_sdoor_to_door(&levl[x][y]);	/* .typ = DOOR */
+		/* target spot will now pass closed_door() test below
+		   (except on rogue level) */
+		newsym(x, y);
+		if (see_it)
+		    pline("%s %s reveals a secret door.",
+			  yourzap ? "Your" : "The", zapverb);
+#ifdef REINCARNATION
+		else if (Is_rogue_level(&u.uz))
+		    You_feel("a draft.");	/* new open doorway */
+#endif
+	}
+
+	/* regular door absorbs remaining zap range, possibly gets destroyed */
 	if(closed_door(x, y)) {
 		int new_doormask = -1;
 		const char *see_txt = 0, *sense_txt = 0, *hear_txt = 0;
@@ -4162,12 +4188,16 @@ short exploding_wand_typ;
 			}
 		    }
 		    if (see_it) {
-			pline_The("door absorbs %s %s!",
-			      (type < 0) ? "the" : "your",
-			      abs(type) < ZT_SPELL(0) ? "bolt" :
-			      abs(type) < ZT_BREATH(0) ? "spell" :
-			      "blast");
-		    } else You_feel("vibrations.");
+			/* "the door absorbs the blast" would be
+			   inaccurate for an exploding wand since
+			   other adjacent locations still get hit */
+			if (exploding_wand_typ)
+			    pline_The("door remains intact.");
+			else
+			    pline_The("door absorbs %s %s!",
+				      yourzap ? "your" : "the", zapverb);
+		    } else
+			You_feel("vibrations.");
 		    break;
 		}
 		if (new_doormask >= 0) {	/* door gets broken */

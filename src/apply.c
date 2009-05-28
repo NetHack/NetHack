@@ -1,5 +1,4 @@
 /* NetHack 3.5	apply.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)apply.c	3.5	2009/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2939,9 +2938,8 @@ do_break_wand(obj)
 	dmg *= 2;
     case WAN_MAGIC_MISSILE:
     wanexpl:
-	explode(u.ux, u.uy,
-		(obj->otyp - WAN_MAGIC_MISSILE), dmg, WAND_CLASS, expltype);
-	makeknown(obj->otyp);	/* explode described the effect */
+	explode(u.ux, u.uy, -(obj->otyp), dmg, WAND_CLASS, expltype);
+	makeknown(obj->otyp);	/* explode describes the effect */
 	goto discard_broken_wand;
     case WAN_STRIKING:
 	/* we want this before the explosion instead of at the very end */
