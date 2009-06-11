@@ -1,5 +1,4 @@
 /* NetHack 3.5	topl.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)topl.c	3.5	2003/10/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,6 +14,42 @@
 #define C(c)	(0x1f & (c))
 #endif
 
+/* use caution with this stuff; it's very easy to get things mixed up...
+ */
+#ifdef UNICODE_WIDEWINPORT
+    /* nhwchar is wchar; data from core needs narrow-to-wide conversion;
+       data going back to core needs wide-to-narrow conversion; data
+       used within tty routines typically needs wide-to-wide awareness */
+STATIC_VAR nhwchar	topl_wbuf[BUFSZ];
+STATIC_VAR char		topl_nbuf[BUFSZ];
+#define T(x) L##x
+#define DoGputch(x) ((x) >= 0x80)
+#define Waddtopl(str)		addtopl(nhwstrcpy(topl_wbuf,str))
+#define Wputstr(win,atr,wstr)	putstr(win,atr,strnhwcpy(topl_nbuf,wstr))
+#define Windex(wstr,wchr)	nhwindex(wstr,wchr)
+#define Wstrlen(wstr)		(int)nhwlen(wstr)
+#define NWstrcpy(wdst,src)	nhwstrcpy(wdst,src)	/* narrow-to-wide */
+#define WNstrcpy(dst,wsrc)	strnhwcpy(dst,wsrc)	/* wide-to-narrow */
+#define WWstrcpy(wdst,wsrc)	nhwcpy(wdst,wsrc)	/* wide-to-wide */
+#define WWstrcat(wdst,wsrc)	nhwcat(wdst,wsrc)
+#define WWstrncpy(wdst,wsrc,ln	nhwncpy(wdst,wsrc,ln)
+#define WWstrncmp(wst1,wst2,ln)	nhwncmp(wst1,wst2,ln)
+#else	/*!UNICODE_WIDEWINPORT*/
+    /* nhwchar is char; no conversions needed */
+#define T(x) x
+#define DoGputch(x) ((x) & 0x80)
+#define Waddtopl(str)		addtopl(str)
+#define Wputstr(win,atr,str)	putstr(win,atr,str)
+#define Windex(wstr,wchr)	index(wstr,wchr)
+#define Wstrlen(wstr)		(int)strlen(wstr)
+#define NWstrcpy(wdst,src)	strcpy(wdst,src)
+#define WNstrcpy(dst,wsrc)	strcpy(dst,wsrc)
+#define WWstrcpy(wdst,wsrc)	strcpy(wdst,wsrc)
+#define WWstrcat(wdst,wsrc)	strcat(wdst,wsrc)
+#define WWstrncpy(wdst,wsrc,ln)	strncpy(wdst,wsrc,ln)
+#define WWstrncmp(wst1,wst2,ln)	strncmp(wst1,wst2,ln)
+#endif	/*?UNICODE_WIDEWINPORT*/
+
 STATIC_DCL void FDECL(redotoplin, (const nhwchar*));
 STATIC_DCL void FDECL(topl_putsym, (NHWCHAR_P));
 STATIC_DCL void NDECL(remember_topl);
@@ -22,18 +57,13 @@ STATIC_DCL void FDECL(removetopl, (int));
 STATIC_DCL void FDECL(msghistory_snapshot, (BOOLEAN_P));
 STATIC_DCL void FDECL(free_msghistory_snapshot, (BOOLEAN_P));
 
-extern nhwchar emptysym[];
-
 int
 tty_doprev_message()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
-
     winid prevmsg_win;
     int i;
-#ifdef UNICODE_WIDEWINPORT
-    char buf[BUFSZ];
-#endif
+
     if ((iflags.prevmsg_window != 's') && !ttyDisplay->inread) { /* not single */
         if(iflags.prevmsg_window == 'f') { /* full */
             prevmsg_win = create_nhwindow(NHW_MENU);
@@ -42,23 +72,11 @@ tty_doprev_message()
             cw->maxcol = cw->maxrow;
             i = cw->maxcol;
             do {
-#ifdef UNICODE_WIDEWINPORT
-                if(cw->data[i] && nhwstrcmp(cw->data[i], "") ) {
-		    strnhwcpy(buf, cw->data[i]);
-                    putstr(prevmsg_win, 0, buf);
-#else
-                if(cw->data[i] && strcmp(cw->data[i], "") ) {
-                    putstr(prevmsg_win, 0, cw->data[i]);
-#endif
-                }
+		if (cw->data[i] && *cw->data[i])
+		    Wputstr(prevmsg_win, 0, cw->data[i]);
                 i = (i + 1) % cw->rows;
             } while (i != cw->maxcol);
-#ifdef UNICODE_WIDEWINPORT
-	    strnhwcpy(buf, toplines);
-            putstr(prevmsg_win, 0, buf);
-#else
-            putstr(prevmsg_win, 0, toplines);
-#endif
+	    Wputstr(prevmsg_win, 0, toplines);
             display_nhwindow(prevmsg_win, TRUE);
             destroy_nhwindow(prevmsg_win);
         } else if (iflags.prevmsg_window == 'c') {		/* combination */
@@ -85,24 +103,12 @@ tty_doprev_message()
                     cw->maxcol = cw->maxrow;
                     i = cw->maxcol;
                     do {
-#ifdef UNICODE_WIDEWINPORT
-                        if(cw->data[i] && nhwstrcmp(cw->data[i], "") ) {
-			    strnhwcpy(buf, cw->data[i]);
-                            putstr(prevmsg_win, 0, buf);
-#else
-                        if(cw->data[i] && strcmp(cw->data[i], "") ) {
-                            putstr(prevmsg_win, 0, cw->data[i]);
-#endif
-			}
+			if (cw->data[i] && *cw->data[i])
+			    Wputstr(prevmsg_win, 0, cw->data[i]);
                         i = (i + 1) % cw->rows;
                     } while (i != cw->maxcol);
 
-#ifdef UNICODE_WIDEWINPORT
-		    strnhwcpy(buf, toplines);
-                    putstr(prevmsg_win, 0, buf);
-#else
-                    putstr(prevmsg_win, 0, toplines);
-#endif
+		    Wputstr(prevmsg_win, 0, toplines);
                     display_nhwindow(prevmsg_win, TRUE);
                     destroy_nhwindow(prevmsg_win);
                 }
@@ -114,22 +120,11 @@ tty_doprev_message()
             prevmsg_win = create_nhwindow(NHW_MENU);
             putstr(prevmsg_win, 0, "Message History");
             putstr(prevmsg_win, 0, "");
-#ifdef UNICODE_WIDEWINPORT
-            strnhwcpy(buf, toplines);
-            putstr(prevmsg_win, 0, buf);
-#else
-            putstr(prevmsg_win, 0, toplines);
-#endif
+	    Wputstr(prevmsg_win, 0, toplines);
             cw->maxcol=cw->maxrow-1;
             if(cw->maxcol < 0) cw->maxcol = cw->rows-1;
             do {
-#ifdef UNICODE_WIDEWINPORT
-            	strnhwcpy(buf, cw->data[cw->maxcol]);
-                putstr(prevmsg_win, 0, buf);
-#else
-		putstr(prevmsg_win, 0, cw->data[cw->maxcol]);
-
-#endif
+		Wputstr(prevmsg_win, 0, cw->data[cw->maxcol]);
                 cw->maxcol--;
                 if (cw->maxcol < 0) cw->maxcol = cw->rows-1;
                 if (!cw->data[cw->maxcol])
@@ -165,11 +160,7 @@ redotoplin(symstr)
 {
 	int otoplin = ttyDisplay->toplin;
 	home();
-#ifdef UNICODE_WIDEWINPORT
-	if(*symstr >= 0x80) {
-#else
-	if(*symstr & 0x80) {
-#endif
+	if (DoGputch(*symstr)) {
 		/* kludge for the / command, the only time we ever want a */
 		/* graphics character on the top line */
 		g_putch((int)*symstr++);
@@ -192,22 +183,14 @@ remember_topl()
 
     if ((cw->flags & WIN_LOCKHISTORY) || !*toplines) return;
 
-#ifdef UNICODE_WIDEWINPORT
-    len = nhwlen(toplines) + 1;
-#else
-    len = strlen(toplines) + 1;
-#endif
+    len = Wstrlen(toplines) + 1;
     if (len > (unsigned)cw->datlen[idx]) {
 	if (cw->data[idx]) free(cw->data[idx]);
 	len += (8 - (len & 7));		/* pad up to next multiple of 8 */
 	cw->data[idx] = (nhwchar *)alloc(sizeof(nhwchar) * len);
 	cw->datlen[idx] = (short)len;
     }
-#ifdef UNICODE_WIDEWINPORT
-    (void)nhwcpy(cw->data[idx], toplines);
-#else
-    Strcpy(cw->data[idx], toplines);
-#endif
+    (void)WWstrcpy(cw->data[idx], toplines);
     *toplines = '\0';
     cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
 }
@@ -236,11 +219,7 @@ more()
     if(ttyDisplay->toplin) {
 	tty_curs(BASE_WINDOW, cw->curx+1, cw->cury);
 	if(cw->curx >= CO - 8)
-#ifdef UNICODE_WIDEWINPORT
-		topl_putsym(L'\n');
-#else
-		topl_putsym('\n');
-#endif
+		topl_putsym(T('\n'));
     }
 
     if(flags.standout)
@@ -278,24 +257,13 @@ update_topl(bp)
 
 	/* If there is room on the line, print message on same line */
 	/* But messages like "You die..." deserve their own line */
-#ifdef UNICODE_WIDEWINPORT
-	n0 = nhwlen(bp);
-#else
-	n0 = strlen(bp);
-#endif
+	n0 = Wstrlen(bp);
 	if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP)) &&
 	    cw->cury == 0 &&
-#ifdef UNICODE_WIDEWINPORT
-	    n0 + (int)nhwlen(toplines) + 3 < CO-8 &&  /* room for --More-- */
-	    (notdied = nhwncmp(bp, L"You die", 7))) {
-		(void)nhwcat(toplines, L"  ");
-		(void)nhwcat(toplines, bp);
-#else
-	    n0 + (int)strlen(toplines) + 3 < CO-8 &&  /* room for --More-- */
-	    (notdied = strncmp(bp, "You die", 7))) {
-		Strcat(toplines, "  ");
-		Strcat(toplines, bp);
-#endif
+	    n0 + Wstrlen(toplines) + 3 < CO-8 &&  /* room for --More-- */
+	    (notdied = WWstrncmp(bp, T("You die"), 7))) {
+		(void)WWstrcat(toplines, T("  "));
+		(void)WWstrcat(toplines, bp);
 		cw->curx += 2;
 		if(!(cw->flags & WIN_STOP))
 		    addtopl(bp);
@@ -308,11 +276,7 @@ update_topl(bp)
 	    }
 	}
 	remember_topl();
-#ifdef UNICODE_WIDEWINPORT
-	(void) nhwncpy(toplines, bp, TBUFSZ);
-#else
-	(void) strncpy(toplines, bp, TBUFSZ);
-#endif
+	(void)WWstrncpy(toplines, bp, TBUFSZ);
 	toplines[TBUFSZ - 1] = 0;
 
 	for(tl = toplines; n0 >= CO; ){
@@ -320,30 +284,15 @@ update_topl(bp)
 	    for(tl+=CO-1; tl != otl && !isspace(*tl); --tl) ;
 	    if(tl == otl) {
 		/* Eek!  A huge token.  Try splitting after it. */
-#ifdef UNICODE_WIDEWINPORT
-		tl = nhwindex(otl, ' ');
-#else
-		tl = index(otl, ' ');
-#endif
+		tl = Windex(otl, T(' '));
 		if (!tl) break;    /* No choice but to spit it out whole. */
 	    }
-#ifdef UNICODE_WIDEWINPORT
-	    *tl++ = (nhwchar)'\n';
-	    n0 = nhwlen(tl);
-#else
-	    *tl++ = '\n';
-	    n0 = strlen(tl);
-#endif
+	    *tl++ = T('\n');
+	    n0 = Wstrlen(tl);
 	}
 	if(!notdied) cw->flags &= ~WIN_STOP;
 	if(!(cw->flags & WIN_STOP)) redotoplin(toplines);
 }
-
-#ifdef UNICODE_WIDEWINPORT
-#define T(x) L##x
-#else
-#define T(x) x
-#endif
 
 STATIC_OVL
 void
@@ -386,8 +335,6 @@ topl_putsym(c)
 #endif
 }
 
-#undef T
-
 void
 putsyms(symstr)
     const nhwchar *symstr;
@@ -402,11 +349,7 @@ register int n;
 {
     /* assume addtopl() has been done, so ttyDisplay->toplin is already set */
     while (n-- > 0)
-#ifdef UNICODE_WIDEWINPORT
-	putsyms(L"\b \b");
-#else
-	putsyms("\b \b");
-#endif
+	putsyms(T("\b \b"));
 }
 
 extern char erase_char;		/* from xxxtty.c; don't need kill_char */
@@ -433,9 +376,6 @@ char def;
 	struct WinDesc *cw = wins[WIN_MESSAGE];
 	boolean doprev = 0;
 	char prompt[BUFSZ];
-#ifdef UNICODE_WIDEWINPORT
-	nhwchar wprompt[BUFSZ];
-#endif
 
 	if(ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP)) more();
 	cw->flags &= ~WIN_STOP;
@@ -472,12 +412,7 @@ char def;
 		    ttyDisplay->inread = sav;
 		    tty_clear_nhwindow(WIN_MESSAGE);
 		    cw->maxcol = cw->maxrow;
-#ifdef UNICODE_WIDEWINPORT
-		    nhwstrcpy(wprompt, prompt);
-		    addtopl(wprompt);
-#else
-		    addtopl(prompt);
-#endif
+		    Waddtopl(prompt);
 		} else {
 		    if(!doprev)
 			(void) tty_doprev_message(); /* need two initially */
@@ -493,12 +428,7 @@ char def;
 		tty_clear_nhwindow(WIN_MESSAGE);
 		cw->maxcol = cw->maxrow;
 		doprev = 0;
-#ifdef UNICODE_WIDEWINPORT
-		nhwstrcpy(wprompt, prompt);
-		addtopl(wprompt);
-#else
-		addtopl(prompt);
-#endif
+		Waddtopl(prompt);
 		q = '\0';	/* force another loop iteration */
 		continue;
 	    }
@@ -523,11 +453,7 @@ char def;
 		nhwchar digit_string[2];
 		int n_len = 0;
 		long value = 0;
-#ifdef UNICODE_WIDEWINPORT
-		addtopl(L"#"),  n_len++;
-#else
-		addtopl("#"),  n_len++;
-#endif
+		addtopl(T("#")),  n_len++;
 		digit_string[1] = (nhwchar)0;
 		if (q != '#') {
 		    digit_string[0] = (nhwchar)q;
@@ -565,12 +491,7 @@ char def;
 
 	if (q != '#') {
 		Sprintf(rtmp, "%c", q);
-#ifdef UNICODE_WIDEWINPORT
-		nhwstrcpy(wprompt, rtmp);   /* rtmp[40] -> wprompt[256] ok */
-		addtopl(wprompt);
-#else
-		addtopl(rtmp);
-#endif
+		Waddtopl(rtmp);
 	}
     clean_up:
 	ttyDisplay->inread--;
@@ -592,6 +513,7 @@ msghistory_snapshot(purge)
 boolean purge;		/* clear message history buffer as we copy it */
 {
     nhwchar *mesg;
+    unsigned ln;
     int i, inidx, outidx;
     struct WinDesc *cw;
 
@@ -677,9 +599,7 @@ boolean init;
 	nextmesg = snapshot_mesgs[nxtidx++];
 	if (nextmesg) {
 #ifdef UNICODE_WIDEWINPORT
-	    static char histbuf[BUFSZ];
-
-	    result = strnhwcpy(histbuf, nextmesg);
+	    result = WNstrcpy(topl_nbuf, nextmesg);	/* wide-to-narrow */
 #else
 	    result = (char *)nextmesg;
 #endif
@@ -728,20 +648,12 @@ boolean restoring;
     if (msg) {
 	/* move most recent message to history, make this become most recent */
 	remember_topl();
-#ifdef UNICODE_WIDEWINPORT
-	(void)nhwstrcpy(toplines, msg);
-#else
-	Strcpy(toplines, msg);
-#endif
+	(void)NWstrcpy(toplines, msg);			/* narrow-to-wide */
     } else if (snapshot_mesgs) {
 	/* done putting arbitrary messages in; put the snapshot ones back */
 	for (idx = 0; snapshot_mesgs[idx]; ++idx) {
 	    remember_topl();
-#ifdef UNICODE_WIDEWINPORT
-	    (void)nhwcpy(toplines, snapshot_mesgs[idx]);
-#else
-	    Strcpy(toplines, snapshot_mesgs[idx]);
-#endif
+	    (void)WWstrcpy(toplines, snapshot_mesgs[idx]);  /* wide-to-wide */
 	}
 	/* now release the snapshot */
 	free_msghistory_snapshot(TRUE);
