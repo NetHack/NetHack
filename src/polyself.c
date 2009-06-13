@@ -1,5 +1,4 @@
 /* NetHack 3.5	polyself.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)polyself.c	3.5	2007/04/07	*/
 /*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -460,10 +459,12 @@ int	mntmp;
 		flags.female = u.mfemale;
 	}
 
-	if (youmonst.m_ap_type) {
-	    /* stop mimicking immediately */
-	    if (multi < 0) unmul("");
-	} else if (mons[mntmp].mlet != S_MIMIC) {
+	/* if stuck mimicking gold, stop immediately */
+	if (multi < 0 && youmonst.m_ap_type == M_AP_OBJECT &&
+		youmonst.data->mlet != S_MIMIC)
+	    unmul("");
+	/* if becoming a non-mimic, stop mimicking anything */
+	if (mons[mntmp].mlet != S_MIMIC) {
 	    /* as in polyman() */
 	    youmonst.m_ap_type = M_AP_NOTHING;
 	}
