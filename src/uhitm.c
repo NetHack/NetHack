@@ -1,5 +1,4 @@
 /* NetHack 3.5	uhitm.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)uhitm.c	3.5	2009/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -551,7 +550,8 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 	 */
 	boolean hittxt = FALSE, destroyed = FALSE, already_killed = FALSE;
 	boolean get_dmg_bonus = TRUE;
-	boolean ispoisoned = FALSE, needpoismsg = FALSE, poiskilled = FALSE;
+	boolean ispoisoned = FALSE, needpoismsg = FALSE, poiskilled = FALSE,
+		unpoisonmsg = FALSE;
 	boolean silvermsg = FALSE, silverobj = FALSE;
 	boolean valid_weapon_attack = FALSE;
 	boolean unarmed = !uwep && !uarm && !uarms;
@@ -963,8 +963,10 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 		adjalign(-1);
 	    }
 	    if (obj && !rn2(nopoison)) {
+		/* remove poison now in case obj ends up in a bones file */
 		obj->opoisoned = FALSE;
-		pline("%s no longer poisoned.", Yobjnam2(obj, "are"));
+		/* defer "obj is no longer poisoned" until after hit message */
+		unpoisonmsg = TRUE;
 	    }
 	    if (resists_poison(mon))
 		needpoismsg = TRUE;
@@ -1093,6 +1095,12 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 		    whom = strcat(s_suffix(whom), " flesh");
 		pline(fmt, whom);
 	}
+	/* if a "no longer poisoned" message is coming, it will be last;
+	   obj->opoisoned was cleared above and any message referring to
+	   "poisoned <obj>" has now been given; we want just "<obj>" for
+	   last message, so reformat while obj is still accessible */
+	if (unpoisonmsg)
+	    Strcpy(saved_oname, cxname(obj));
 
 	/* [note: thrown obj might go away during killed/xkilled call] */
 
@@ -1101,7 +1109,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 	if (poiskilled) {
 		pline_The("poison was deadly...");
 		if (!already_killed) xkilled(mon, 0);
-		return FALSE;
+		destroyed = TRUE;	/* return FALSE; */
 	} else if (destroyed) {
 		if (!already_killed)
 		    killed(mon);	/* takes care of most messages */
@@ -1114,8 +1122,11 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 			    pline("%s appears confused.", Monnam(mon));
 		}
 	}
+	if (unpoisonmsg)
+		Your("%s %s no longer poisoned.", saved_oname,
+		     vtense(saved_oname, "are"));
 
-	return((boolean)(destroyed ? FALSE : TRUE));
+	return destroyed ? FALSE : TRUE;
 }
 
 STATIC_OVL boolean

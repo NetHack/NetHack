@@ -324,6 +324,7 @@ simplify hero placement on Castle level when climbing up stairs from Valley
 spell attack by low-Int hero could inflict negative damage
 some wand/spell/breath zaps that hit a secret door failed to reveal it
 wand explosion feedback about adjacent door was phrased as if for a wand zap
+improve the message sequencing when a thrown poisoned weapon loses is poison
 
 
 Platform- and/or Interface-Specific Fixes
