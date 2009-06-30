@@ -161,6 +161,7 @@ pushing a boulder onto a level teleporter trap could issue repeat messages
 if shopkeeper or priest gets teleported while inside his shop or temple,
 	give locations inside that room preference when choosing destination
 tame/peaceful grabber/engulfer will release hero after conflict ends
+any grabber will release hero if it moves away while confused/stunned/afraid
 make changes in hallucination be reflected by changes in mimickery feedback
 add Unaware pseudo-property to suppress various messages while unconscious
 missile which kills engulfer will now be placed prior to hero's return to map

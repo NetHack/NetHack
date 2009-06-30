@@ -1,5 +1,4 @@
 /* NetHack 3.5	monmove.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)monmove.c	3.5	2007/08/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -295,9 +294,6 @@ register struct monst *mtmp;
 	register struct permonst *mdat;
 	register int tmp=0;
 	int inrange, nearby, scared;
-#ifdef GOLDOBJ
-        struct obj *ygold = 0, *lepgold = 0;
-#endif
 
 /*	Pre-movement adjustments	*/
 
@@ -479,19 +475,14 @@ toofar:
 
 /*	Now the actual movement phase	*/
 
+	if(!nearby || mtmp->mflee || scared ||
+	   mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
 #ifndef GOLDOBJ
-	if(!nearby || mtmp->mflee || scared ||
-	   mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
-	   (mdat->mlet == S_LEPRECHAUN && !u.ugold && (mtmp->mgold || rn2(2))) ||
+	   (mdat->mlet == S_LEPRECHAUN &&
+		   !u.ugold && (mtmp->mgold || rn2(2))) ||
 #else
-        if (mdat->mlet == S_LEPRECHAUN) {
-	    ygold = findgold(invent);
-	    lepgold = findgold(mtmp->minvent);
-	}
-
-	if(!nearby || mtmp->mflee || scared ||
-	   mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
-	   (mdat->mlet == S_LEPRECHAUN && !ygold && (lepgold || rn2(2))) ||
+	   (mdat->mlet == S_LEPRECHAUN &&
+		   !findgold(invent) && (findgold(mtmp->minvent) || rn2(2))) ||
 #endif
 	   (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz) ||
 	   (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
@@ -534,18 +525,21 @@ toofar:
 		    case 1:	/* monster moved */
 			/* Maybe it stepped on a trap and fell asleep... */
 			if (mtmp->msleeping || !mtmp->mcanmove) return(0);
-			if(!nearby &&
-			  (ranged_attk(mdat) || find_offensive(mtmp)))
+			/* Monsters can move and then shoot on same turn;
+			   our hero can't.  Is that fair? */
+			if (!nearby &&
+				(ranged_attk(mdat) || find_offensive(mtmp)))
 			    break;
- 			else if(u.uswallow && mtmp == u.ustuck) {
+			/* engulfer/grabber checks */
+			if (mtmp == u.ustuck) {
 			    /* a monster that's digesting you can move at the
 			     * same time -dlc
 			     */
-			    return(mattacku(mtmp));
-			} else
-				return(0);
-			/*NOTREACHED*/
-			break;
+			    if (u.uswallow) return mattacku(mtmp);
+			    /* if confused grabber has wandered off, let go */
+			    if (distu(mtmp->mx, mtmp->my) > 2) unstuck(mtmp);
+			}
+			return(0);
 		    case 2:	/* monster died */
 			return(1);
 		}
