@@ -1,5 +1,4 @@
 /* NetHack 3.5	dothrow.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)dothrow.c	3.5	2009/01/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1416,6 +1415,11 @@ register struct obj *obj;	/* thrownobj or kickobj or uwep */
 		    cutworm(mon, bhitpos.x, bhitpos.y, obj);
 		}
 		exercise(A_DEX, TRUE);
+		/* if hero is swallowed and projectile kills the engulfer,
+		   obj gets added to engulfer's inventory and then dropped,
+		   so we can't safely use that pointer anymore; it escapes
+		   the chance to be used up here... */
+		if (!thrownobj) return 1;
 		/* projectiles other than magic stones
 		   sometimes disappear when thrown */
 		if (objects[otyp].oc_skill < P_NONE &&
