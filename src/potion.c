@@ -1,5 +1,4 @@
 /* NetHack 3.5	potion.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)potion.c	3.5	2009/01/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -423,6 +422,21 @@ dodrink()
 
 	otmp = getobj(beverages, "drink");
 	if(!otmp) return(0);
+
+	/* quan > 1 used to be left to useup(), but we need to force
+	   the current potion to be unworn, and don't want to do
+	   that for the entire stack when starting with more than 1.
+	   [Drinking a wielded potion of polymorph can trigger a shape
+	   change which causes hero's weapon to be dropped.  In 3.4.x,
+	   that led to an "object lost" panic since subsequent useup()
+	   was no longer dealing with an inventory item.  Unwearing
+	   the current potion is intended to keep it in inventory.] */
+	if (otmp->quan > 1L) {
+	    otmp = splitobj(otmp, 1L);
+	    otmp->owornmask = 0L;	/* rest of original stuck unaffected */
+	} else if (otmp->owornmask) {
+	    remove_worn_item(otmp, FALSE);
+	}
 	otmp->in_use = TRUE;		/* you've opened the stopper */
 
 	potion_descr = OBJ_DESCR(objects[otmp->otyp]);
