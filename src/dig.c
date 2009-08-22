@@ -1,5 +1,4 @@
 /* NetHack 3.5	dig.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)dig.c	3.5	2009/01/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -456,8 +455,10 @@ cleanup:
 			      IS_DOOR(lev->typ) ? "door" : "wall", verb);
 			return(0);
 		    }
-		} else if (!IS_ROCK(lev->typ) && dig_target == DIGTYP_ROCK)
+		} else if (dig_target == DIGTYP_UNDIGGABLE ||
+			(dig_target == DIGTYP_ROCK && !IS_ROCK(lev->typ)))
 		    return(0); /* statue or boulder got taken */
+
 		if(!did_dig_msg) {
 		    You("hit the %s with all your might.",
 			d_target[dig_target]);
