@@ -401,6 +401,19 @@ vms: the DLB configuration could fail to build if a file without a dot
 	in its name happened to match a logical name
 winCE: disable processing of double-click messages if the first click
 	causes map to scroll
+winCE: help text windows close immediately after open (unhandled WM_KEYDOWN in mhtext.c)
+winCE: correct coordinates used by action button
+winCE: wrap/unwrap text option for text windows
+winCE: hardware keyboard detection
+winCE: hide keypad when hardware keyboard is present
+winCE: backport message window highlighting from winnt port
+winCE: new icon with recommended image sizes
+pocketpc: menu window closes on up/down keys from first/last position
+smartphone: do not translate input when command helper is hidden (fixes 
+	Motorola Q keyboard bug)
+smartphone: new keypad layouts
+smartphone: wizard mode command layout
+smartphone: option to feed arbitrary text as a command to nethack core
 Windows, probably MSDOS and OS/2: attempting to use very first false rumor
 	for cookie fortune or random engraving could produce garbled text
 	when rumors.tru had CR+LF line ends instead of Unix-style LF lines
