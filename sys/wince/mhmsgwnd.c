@@ -46,6 +46,7 @@ static void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 #ifndef MSG_WRAP_TEXT
 static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 #endif
+static COLORREF setMsgTextColor(HDC hdc, int gray);
 static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
@@ -457,6 +458,24 @@ void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 #endif // MSG_WRAP_TEXT
 
+COLORREF setMsgTextColor(HDC hdc, int gray)
+{
+    COLORREF fg, color1, color2;
+    if (gray) {
+	    color1 = mswin_get_color(NHW_MESSAGE, MSWIN_COLOR_BG);
+	    color2 = mswin_get_color(NHW_MESSAGE, MSWIN_COLOR_FG);
+		/* Make a "gray" color by taking the average of the individual R,G,B 
+		   components of two colors. Thanks to Jonathan del Strother */
+		fg = RGB((GetRValue(color1)+GetRValue(color2))/2,
+			(GetGValue(color1)+GetGValue(color2))/2,
+			(GetBValue(color1)+GetBValue(color2))/2);
+    } else {
+		fg = mswin_get_color(NHW_MESSAGE, MSWIN_COLOR_FG);
+    }
+
+    return SetTextColor(hdc, fg);
+}
+
 void onPaint(HWND hWnd)
 {
 	PAINTSTRUCT ps;
@@ -473,7 +492,7 @@ void onPaint(HWND hWnd)
 	hdc = BeginPaint(hWnd, &ps);
 
 	OldBg = SetBkColor(hdc, mswin_get_color(NHW_MESSAGE, MSWIN_COLOR_BG));
-	OldFg = SetTextColor(hdc, mswin_get_color(NHW_MESSAGE, MSWIN_COLOR_FG)); 
+	OldFg = setMsgTextColor(hdc, 0);
 
 	data = (PNHMessageWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
@@ -504,6 +523,7 @@ void onPaint(HWND hWnd)
 
 				oldFont = SelectObject(hdc, mswin_get_font(NHW_MESSAGE, data->window_text[i].attr, hdc, FALSE));
 
+				setMsgTextColor(hdc, i < (MSG_LINES - data->lines_last_turn));
 #ifdef MSG_WRAP_TEXT				
 				DrawText(hdc, wbuf, wlen, &draw_rt, DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
 				draw_rt.top = y - (draw_rt.bottom - draw_rt.top);
@@ -517,21 +537,6 @@ void onPaint(HWND hWnd)
 				y -= draw_rt.bottom - draw_rt.top;
 			} else {
 				y -= data->yChar;
-			}
-
-			/* highligh the last line */
-			if( i==MSG_LINES-1 ) {
-				draw_rt.left = client_rt.left;
-				draw_rt.right = draw_rt.left + 2*data->xChar;
-				DrawText(hdc, TEXT("> "), 2, &draw_rt, DT_NOPREFIX );
-
-				y -= 2;
-				draw_rt.left = client_rt.left;
-				draw_rt.right = client_rt.right;
-				draw_rt.top -= 2;
-				draw_rt.bottom = client_rt.bottom;
-				DrawEdge(hdc, &draw_rt, EDGE_SUNKEN, BF_TOP );
-				DrawEdge(hdc, &draw_rt, EDGE_SUNKEN, BF_BOTTOM );
 			}
 		}
 	}
@@ -569,6 +574,10 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
     /* Free the device context.  */
 	SelectObject(hdc, saveFont);
     ReleaseDC (hWnd, hdc); 
+
+	/* create command pad (keyboard emulator) */
+	if( !GetNHApp()->hCmdWnd )
+		GetNHApp()->hCmdWnd = mswin_init_command_window();
 }
 
 void mswin_message_window_size (HWND hWnd, LPSIZE sz)

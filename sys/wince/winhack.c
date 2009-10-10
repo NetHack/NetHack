@@ -67,11 +67,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	_nethack_app.bNoHScroll = FALSE;
 	_nethack_app.bNoVScroll = FALSE;
 
-#if  defined(WIN_CE_PS2xx) || defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
-	_nethack_app.bCmdPad = TRUE;
-#else
-	_nethack_app.bCmdPad = FALSE;
-#endif
+	_nethack_app.bCmdPad = !mswin_has_keyboard();
 
 	_nethack_app.bWrapText = TRUE;
 	_nethack_app.bFullScreen = TRUE;

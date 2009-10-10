@@ -1891,7 +1891,7 @@ void mswin_set_fullscreen(BOOL is_fullscreen)
 }
 
 #if defined(WIN_CE_SMARTPHONE)
-void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit, BOOL is_fullscreen)
+void NHSPhoneDialogSetup(HWND hDlg, UINT nToolBarId, BOOL is_edit, BOOL is_fullscreen)
 {
     SHMENUBARINFO mbi;
 	HWND hOK, hCancel;
@@ -1901,7 +1901,7 @@ void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit, BOOL is_fullscreen)
     ZeroMemory(&mbi, sizeof(SHMENUBARINFO));
     mbi.cbSize = sizeof(mbi);
     mbi.hwndParent = hDlg;
-    mbi.nToolBarId = IDC_SPHONE_DIALOGBAR;
+    mbi.nToolBarId = nToolBarId;
     mbi.hInstRes = GetNHApp()->hApp;
     if(!SHCreateMenuBar(&mbi)) {
 		error("cannot create dialog menu");
@@ -1959,6 +1959,25 @@ void mswin_destroy_reg(void)
 
 void mswin_write_reg(void)
 {
+}
+
+/* check HKCU\Software\\Microsoft\\Shell\HasKeyboard for keyboard presence, 
+  if the key is not there assume older device and no keyboard */
+BOOL mswin_has_keyboard(void)
+{
+	DWORD dwHasKB = 0;
+#if defined(WIN_CE_POCKETPC) || defined(WIN_CE_SMARTPHONE)
+	HKEY hKey;
+	DWORD dwType;
+	DWORD dwSize = sizeof(dwHasKB);
+	if( RegOpenKeyEx(HKEY_CURRENT_USER , _T("Software\\Microsoft\\Shell"), 0, 0, &hKey)==ERROR_SUCCESS) {
+		if( RegQueryValueEx(hKey, _T("HasKeyboard"), NULL, &dwType, (LPBYTE)&dwHasKB, &dwSize)!=ERROR_SUCCESS) {
+			dwHasKB = 0;
+		}
+		RegCloseKey(hKey);
+	}
+#endif
+	return (dwHasKB==1);  
 }
 
 #ifdef _DEBUG

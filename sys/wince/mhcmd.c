@@ -155,6 +155,8 @@ static	PNHCmdSet nhcmdset_default = 0;
 #define NH_LAYOUT_ITEM_HANDLING	3
 #define NH_LAYOUT_CONTROLS		4
 #define NH_LAYOUT_ADV_MOVEMENT	5
+#define NH_LAYOUT_ITEM_LOOKUP	6
+#define NH_LAYOUT_WIZARD		7
 
 /* template menu layout */
 NHCmdPadCell cells_layout_menu[NH_CMDPAD_CELLNUM] = 
@@ -218,7 +220,7 @@ NHCmdPadCell cells_layout_item_handling[NH_CMDPAD_CELLNUM] =
 	{ -1, "D", "D", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "Q", "Q", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "i", "i", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
-	{ -1, "[", "[", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "Q", "Q", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "A", "A", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "I", "I", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "X", "X", 13, NH_CELL_LAYOUT_MENU, 1 , 0 }
@@ -232,7 +234,7 @@ NHCmdPadCell cells_layout_general[NH_CMDPAD_CELLNUM] =
 	{ -1, "l", "l", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "s", "s", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "E", "E", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
-	{ -1, "\x04", "^D", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "\x01", "^A", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "c", "c", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "o", "o", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "p", "p", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
@@ -268,12 +270,48 @@ NHCmdPadCell cells_layout_adv_movement[NH_CMDPAD_CELLNUM] =
 	{ -1, "_", "_", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "\x14", "^T", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "j", "j", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "<", "<", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, ">", ">", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "^", "^", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "", "", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "X", "X", 13, NH_CELL_LAYOUT_MENU, 1 , 0 }
+};
+
+/* item lookup layout */
+NHCmdPadCell cells_layout_lookup[NH_CMDPAD_CELLNUM] = 
+{ 
+	{ -1, ";", ";", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "^", "^", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "]", "]", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, ")", ")", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "=", "=", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "*", "*", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "(", "(", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "\"", "\"", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "$", "$", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "+", "+", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "", "", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "X", "X", 13, NH_CELL_LAYOUT_MENU, 1 , 0 }
+};
+
+#ifdef WIZARD
+/* wizard mode layout */
+NHCmdPadCell cells_layout_wizard[NH_CMDPAD_CELLNUM] = 
+{ 
+	{ -1, "\x05", "^e", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "\x06", "^f", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "\x07", "^g", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "\x09", "^i", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "\x0f", "^o", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "\x16", "^v", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "\x17", "^w", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "\x14", "^T", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
+	{ -1, "#", "#", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "", "", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "", "", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "X", "X", 13, NH_CELL_LAYOUT_MENU, 1 , 0 }
 };
+#endif
 
 #else /* !WIN_CE_SMARTPHONE */
 
@@ -512,6 +550,19 @@ void register_command_window_class()
 	plt = nhcmdlayout_create("Advanced Movement", NH_CMDPAD_ROWS, NH_CMDPAD_COLS);
 	nhcmdlayout_init(plt, cells_layout_adv_movement);
 	nhcmdset_add(nhcmdset_current, plt);
+
+    plt = nhcmdlayout_create("Item Lookup", NH_CMDPAD_ROWS, NH_CMDPAD_COLS);
+	nhcmdlayout_init(plt, cells_layout_lookup);
+	nhcmdset_add(nhcmdset_current, plt);
+
+#ifdef WIZARD
+	if( wizard ) {
+		plt = nhcmdlayout_create("Wizard Mode", NH_CMDPAD_ROWS, NH_CMDPAD_COLS);
+		nhcmdlayout_init(plt, cells_layout_wizard);
+		nhcmdset_add(nhcmdset_current, plt);
+	}
+#endif
+
 #else /* ! WIN_CE_SMARTPHONE */
 	plt = nhcmdlayout_create("lowercase", NH_CMDPAD_ROWS, NH_CMDPAD_COLS);
 	nhcmdlayout_init(plt, cells_layout_mod1);

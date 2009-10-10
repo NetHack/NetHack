@@ -200,8 +200,6 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				(GetNHApp()->bCmdPad? MF_CHECKED : MF_UNCHECKED)
 			);
 
-			/* create command pad (keyboard emulator) */
-			GetNHApp()->hCmdWnd = mswin_init_command_window();
 		} break;
 
 		/*-----------------------------------------------------------------------*/
@@ -397,13 +395,21 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				}
 			return 0;
 
-			case VK_RETURN:
-				NHEVENT_MS( CLICK_1, u.ux, u.uy);
+			case VK_RETURN: {
+					int x, y;
+					if( WIN_MAP!=WIN_ERR ) {
+						mswin_map_get_cursor(mswin_hwnd_from_winid(WIN_MAP), &x, &y);
+					} else {
+						x = u.ux;
+						y = u.uy;
+					}
+					NHEVENT_MS(CLICK_1, x, y);
+				}
 			return 0;
 			} 
 
 #if defined(WIN_CE_SMARTPHONE)
-			if( NHSPhoneTranslateKbdMessage(wParam, lParam, TRUE) ) return 0;
+			if( GetNHApp()->bCmdPad && NHSPhoneTranslateKbdMessage(wParam, lParam, TRUE) ) return 0;
 #endif
 		return 1; /* end of WM_KEYDOWN */
 
@@ -411,13 +417,20 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 #if defined(WIN_CE_SMARTPHONE)
 		case WM_KEYUP:
-			if( NHSPhoneTranslateKbdMessage(wParam, lParam, FALSE) ) return 0;
+			if( GetNHApp()->bCmdPad && NHSPhoneTranslateKbdMessage(wParam, lParam, FALSE) ) return 0;
 		return 1; /* end of WM_KEYUP */
 #endif
 		/*-----------------------------------------------------------------------*/
 
-#if !defined(WIN_CE_SMARTPHONE)
 		case WM_CHAR:
+#if defined(WIN_CE_SMARTPHONE)
+			/* if smartphone cmdpad is up then translation happens - disable WM_CHAR processing
+			   to avoid double input */
+			if( GetNHApp()->bCmdPad ) {
+				return 1;
+			}
+#endif
+
 			if( wParam=='\n' || wParam=='\r' || wParam==C('M') ) return 0; /* we already processed VK_RETURN */
 
 			/* all characters go to nethack except Ctrl-P that scrolls message window up */
@@ -427,7 +440,6 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				NHEVENT_KBD( (lParam & 1<<29)? M(tolower(wParam)) : wParam );
 			}
 		return 0;
-#endif
 
 		/*-----------------------------------------------------------------------*/
 
@@ -865,6 +877,21 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		   DialogBox(GetNHApp()->hApp, (LPCTSTR)IDD_ABOUTBOX, hWnd, (DLGPROC)About);
 		   break;
 
+		case IDM_CMD_DLG: {
+			char input[BUFSZ];
+			char* p;
+			boolean ctrl = FALSE;
+			mswin_getlin("Enter command", input);
+			for(p=input; *p; p++) {
+				if( *p == '^' ) {
+					ctrl = TRUE;
+					continue;
+				}
+				NHEVENT_KBD(ctrl? C(*p) : *p);
+				ctrl = FALSE;
+			}
+			} break;
+
 		case IDM_EXIT:
 		   done2();
 		   break;
@@ -1109,10 +1136,8 @@ void mswin_select_map_mode(int mode)
 	** first, check if WIN_MAP has been inialized.
 	** If not - attempt to retrieve it by type, then check it again
 	*/
-	if( map_id==WIN_ERR ) 
-		map_id = mswin_winid_from_type(NHW_MAP);
-	if( map_id!=WIN_ERR )
-		mswin_map_mode(mswin_hwnd_from_winid(map_id), mode);
+	if( WIN_MAP!=WIN_ERR )
+		mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), mode);
 }
 
 static struct t_menu2mapmode {

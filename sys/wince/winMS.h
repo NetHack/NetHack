@@ -173,12 +173,14 @@ void mswin_popup_display(HWND popup, int* done_indicator);
 void mswin_popup_destroy(HWND popup);
 
 #if defined(WIN_CE_SMARTPHONE)
-void NHSPhoneDialogSetup(HWND hDlg, BOOL is_edit, BOOL is_fullscreen);
+void NHSPhoneDialogSetup(HWND hDlg, UINT nToolBarId, BOOL is_edit, BOOL is_fullscreen);
 #endif
 
 void mswin_read_reg(void);
 void mswin_destroy_reg(void);
 void mswin_write_reg(void);
+
+BOOL mswin_has_keyboard(void);
 
 void mswin_set_fullscreen(BOOL is_fullscreen);
 #endif /* WINmswin_H */

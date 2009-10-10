@@ -160,11 +160,12 @@ BEGIN
     PUSHBUTTON      "Quit",IDCANCEL,55,110,50,14
 END
 
-IDD_NHTEXT DIALOG DISCARDABLE  0, 0, 83, 97
+IDD_NHTEXT DIALOG DISCARDABLE  0, 0, 100, 97
 STYLE WS_CHILD | WS_BORDER
 FONT 8, "System"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,15,80,50,14
+    DEFPUSHBUTTON   "OK",IDOK,0,80,50,14
+	PUSHBUTTON      "Wrap",IDC_TEXT_TOGGLE_WRAP,50,80,50,14
     EDITTEXT        IDC_TEXT_CONTROL,5,0,70,75,ES_MULTILINE | ES_READONLY | 
                     WS_VSCROLL | WS_HSCROLL
 END
@@ -283,8 +284,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,4,1,0
- PRODUCTVERSION 3,4,1,0
+ FILEVERSION 3,5,0,0
+ PRODUCTVERSION 3,5,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -304,10 +305,10 @@ BEGIN
             VALUE "FileDescription", "nethackm\0"
             VALUE "FileVersion", "3, 5, 0, 0\0"
             VALUE "InternalName", "nethackm\0"
-            VALUE "LegalCopyright", "Copyright © 2005\0"
+            VALUE "LegalCopyright", "Copyright © 1985-2009\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "nethackm.exe\0"
-            VALUE "PrivateBuild", "050102\0"
+            VALUE "PrivateBuild", "090914\0"
             VALUE "ProductName", "NetHack\0"
             VALUE "ProductVersion", "3, 5, 0, 0\0"
             VALUE "SpecialBuild", "\0"
@@ -345,6 +346,8 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDM_VIEW_KEYPAD         "Show/Hide keypad."
     IDS_CAP_VIEW            "View"
+	IDS_TEXT_WRAP           "Wrap"
+	IDS_TEXT_UNWRAP         "Unwrap"
 END
 
 STRINGTABLE DISCARDABLE 

@@ -12,6 +12,7 @@
 #define IDI_WINHACK                     107
 #define IDC_WINHACK                     109
 #define IDC_SPHONE_DIALOGBAR            111
+#define IDC_SPHONE_TEXTDIALOGBAR        112
 #define IDR_MAINFRAME                   128
 #define IDB_TILES                       129
 #define IDD_TEXT                        130
@@ -110,6 +111,7 @@
 #define IDC_ABOUT_VERSION               1327
 #define IDC_TEXT_CONTROL                1331
 #define IDC_ABOUT_COPYRIGHT             1332
+#define IDC_TEXT_TOGGLE_WRAP            1333
 #define IDM_SAVE                        32771
 #define IDM_HELP_LONG                   32772
 #define IDM_HELP_COMMANDS               32773
@@ -147,6 +149,9 @@
 #define IDM_HELP_MENU                   32828
 #define IDM_VIEW_OPTIONS                32829
 #define IDM_DIRECT_COMMAND              32830
+#define IDM_CMD_DLG                     32832
+#define IDS_TEXT_WRAP                   32833
+#define IDS_TEXT_UNWRAP                 32834
 
 // Next default values for new objects
 // 

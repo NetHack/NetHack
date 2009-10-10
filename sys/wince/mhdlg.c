@@ -130,7 +130,7 @@ LRESULT CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 					TRUE );
 
 #if defined(WIN_CE_SMARTPHONE)
-		NHSPhoneDialogSetup(hWnd, TRUE, FALSE);
+		NHSPhoneDialogSetup(hWnd, IDC_SPHONE_DIALOGBAR, TRUE, FALSE);
 #endif
 
 		/* set focus to the edit control */
@@ -242,7 +242,7 @@ LRESULT CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		}
 
 #if defined(WIN_CE_SMARTPHONE)
-		NHSPhoneDialogSetup(hWnd, FALSE, FALSE);
+		NHSPhoneDialogSetup(hWnd, IDC_SPHONE_DIALOGBAR, FALSE, FALSE);
 
 		GetClientRect(hWnd, &dlg_rt);
 		MoveWindow(GetDlgItem(hWnd, IDC_EXTCMD_LIST),
@@ -364,7 +364,7 @@ BOOL CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		plselInitDialog(hWnd);
 
 #if defined(WIN_CE_SMARTPHONE)
-		NHSPhoneDialogSetup(hWnd, FALSE, FALSE);
+		NHSPhoneDialogSetup(hWnd, IDC_SPHONE_DIALOGBAR, FALSE, FALSE);
 #endif
 		/* set focus on the role checkbox (random) field */
 		SetFocus(GetDlgItem(hWnd, IDC_PLSEL_ROLE_RANDOM));

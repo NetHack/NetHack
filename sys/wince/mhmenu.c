@@ -271,7 +271,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 #if defined(WIN_CE_SMARTPHONE)
 		/* special initialization for SmartPhone dialogs */ 
-		NHSPhoneDialogSetup(hWnd, FALSE, GetNHApp()->bFullScreen);
+		NHSPhoneDialogSetup(hWnd, IDC_SPHONE_DIALOGBAR, FALSE, GetNHApp()->bFullScreen);
 #endif
 	} break;
 
@@ -1441,6 +1441,10 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 			bUpdateFocusItem = TRUE;
 	} break;
 
+	/* tell Windows not to process arrow keys */
+	case WM_GETDLGCODE: 
+		return DLGC_WANTARROWS;
+		
 #else /* defined(WIN_CE_SMARTPHONE) */
 	case WM_KEYDOWN:
 		if( wParam==VK_TACTION ) {

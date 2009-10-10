@@ -299,6 +299,17 @@ int mswin_map_mode(HWND hWnd, int mode)
 	return oldMode;
 }
 
+/* retrieve cursor position */
+void mswin_map_get_cursor(HWND hWnd, int* x, int* y)
+{
+	PNHMapWindow data;
+
+	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	if( !data ) panic("mswin_map_get_cursor: no window data");
+	if( x ) *x = data->xCur;
+	if( y ) *y = data->yCur;
+}
+
 /* register window class for map window */
 void register_map_window_class()
 {

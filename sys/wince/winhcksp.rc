@@ -42,11 +42,11 @@ BEGIN
     BEGIN
         MENUITEM "Options",                     IDM_VIEW_OPTIONS
         MENUITEM "Keypad",                      IDM_VIEW_KEYPAD
-        MENUITEM SEPARATOR
-        MENUITEM "Entire Map",                  IDM_MAP_FIT_TO_SCREEN
+        MENUITEM "Cmd",                         IDM_CMD_DLG
+	MENUITEM SEPARATOR
         MENUITEM "ASCII",                       IDM_MAP_ASCII8X8
-        MENUITEM "Use Tiles",                   IDM_MAP_TILES
-        MENUITEM SEPARATOR
+        MENUITEM "Tiles",						IDM_MAP_TILES
+	MENUITEM SEPARATOR
         MENUITEM "Help",                        IDM_HELP_MENU
         MENUITEM "Save",                        IDM_SAVE
         MENUITEM "Quit",                        IDM_EXIT
@@ -58,7 +58,6 @@ BEGIN
     MENUITEM "Done",                        IDOK
     MENUITEM "Cancel",                      IDCANCEL
 END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -245,6 +244,14 @@ BEGIN
     NOMENU,
 END
 
+IDC_SPHONE_TEXTDIALOGBAR SHMENUBAR DISCARDABLE 
+BEGIN
+    IDC_SPHONE_DIALOGBAR, 2,
+    I_IMAGENONE, IDOK, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, IDOK, 0, NOMENU,
+    I_IMAGENONE, IDC_TEXT_TOGGLE_WRAP, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, IDS_TEXT_WRAP, 0, 
+    NOMENU,
+END
+
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
@@ -274,10 +281,10 @@ BEGIN
             VALUE "FileDescription", "nethackm\0"
             VALUE "FileVersion", "3, 5, 0, 0\0"
             VALUE "InternalName", "nethackm\0"
-            VALUE "LegalCopyright", "Copyright © 2005\0"
+            VALUE "LegalCopyright", "Copyright © 1985-2010\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "nethackm.exe\0"
-            VALUE "PrivateBuild", "050309\0"
+            VALUE "PrivateBuild", "090914\0"
             VALUE "ProductName", "NetHack For Smartphone\0"
             VALUE "ProductVersion", "3, 5, 0, 0\0"
             VALUE "SpecialBuild", "\0"
@@ -329,6 +336,8 @@ BEGIN
     IDS_CAP_ENTIREMAP       "Entire Map"
     IDS_CAP_NORMALMAP       "Normal Map"
     IDM_HELP_MENU           "Help Menu"
+	IDS_TEXT_WRAP           "Wrap"
+	IDS_TEXT_UNWRAP         "Unwrap"
 END
 
 #endif    // English (U.S.) resources

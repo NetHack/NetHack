@@ -96,13 +96,25 @@ void mswin_add_text(PNHTextBuffer pb, int attr, const char* text)
 
 		/* if there are 3 (or more) consecutive spaces inside the string 
 		   consider it formatted */
-		new_line->formatted = (strstr(new_line->text, "   ")!=NULL);
+		new_line->formatted = 
+			(strstr(new_line->text, "   ")!=NULL)
+			|| (new_line->beg_padding>8);
 	} else {
 		new_line->end_padding = 0;
 		new_line->text[0] = 0;
 		new_line->formatted = FALSE;
 	}
 	pb->n_used++;
+}
+/*----------------------------------------------------------------*/
+void mswin_set_text_wrap(PNHTextBuffer pb, BOOL wrap_text)
+{
+	pb->b_wrap_text = wrap_text;
+}
+/*----------------------------------------------------------------*/
+BOOL mswin_get_text_wrap(PNHTextBuffer pb)
+{
+	return pb->b_wrap_text;
 }
 /*----------------------------------------------------------------*/
 static TCHAR* nh_append( TCHAR* s, int* size, const char* ap )

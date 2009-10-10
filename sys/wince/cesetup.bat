@@ -15,7 +15,6 @@ copy ..\..\win\win32\mnsel.uu    ..\..\wince\mnsel.uu
 copy ..\..\win\win32\mnselcnt.uu ..\..\wince\mnselcnt.uu
 copy ..\..\win\win32\mnunsel.uu  ..\..\wince\mnunsel.uu
 copy ..\..\win\win32\petmark.uu  ..\..\wince\petmark.uu
-copy ..\..\sys\winnt\nhico.uu    ..\..\wince\nhico.uu
 copy ..\..\sys\wince\menubar.uu    ..\..\wince\menubar.uu
 copy ..\..\sys\wince\keypad.uu    ..\..\wince\keypad.uu
 REM
