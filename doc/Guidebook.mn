@@ -756,8 +756,12 @@ can be used in this fashion.
 #twoweapon (unless the number_pad option is enabled)
 .lp M-a
 #adjust
+.lp M-A
+#annotate (if supported)
 .lp M-c
 #chat
+.lp M-C
+#conduct
 .lp M-d
 #dip
 .lp M-e
@@ -776,16 +780,22 @@ can be used in this fashion.
 #name
 .lp M-o
 #offer
+.lp M-O
+#overview (if supported)
 .lp M-p
 #pray
 .lp M-q
 #quit
 .lp M-r
 #rub
+.lp M-R
+#ride (if supported)
 .lp M-s
 #sit
 .lp M-t
 #turn
+.lp M-T
+#tip
 .lp M-u
 #untrap
 .lp M-v

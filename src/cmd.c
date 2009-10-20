@@ -1,5 +1,4 @@
 /* NetHack 3.5	cmd.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)cmd.c	3.5	2009/01/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2132,10 +2131,14 @@ static const struct func_tab cmdlist[] = {
 	{'a', FALSE, doapply},
 	{'A', FALSE, doddoremarm},
 	{M('a'), TRUE, doorganize},
+#ifdef DUNGEON_OVERVIEW
+	{M('A'), TRUE, donamelevel},	/* #annotate */
+#endif
 /*	'b', 'B' : go sw */
 	{'c', FALSE, doclose},
 	{'C', TRUE, docallcmd},
 	{M('c'), TRUE, dotalk},
+	{M('C'), TRUE, doconduct},	/* #conduct */
 	{'d', FALSE, dodrop},
 	{'D', FALSE, doddrop},
 	{M('d'), FALSE, dodip},
@@ -2165,6 +2168,9 @@ static const struct func_tab cmdlist[] = {
 	{'o', FALSE, doopen},
 	{'O', TRUE, doset},
 	{M('o'), FALSE, dosacrifice},
+#ifdef DUNGEON_OVERVIEW
+	{M('O'), TRUE, dooverview},	/* #overview */
+#endif
 	{'p', FALSE, dopay},
 	{'P', FALSE, doputon},
 	{M('p'), TRUE, dopray},
@@ -2174,12 +2180,16 @@ static const struct func_tab cmdlist[] = {
 	{'r', FALSE, doread},
 	{'R', FALSE, doremring},
 	{M('r'), FALSE, dorub},
+#ifdef STEED
+	{M('R'), FALSE, doride},	/* #ride */
+#endif
 	{'s', TRUE, dosearch, "searching"},
 	{'S', TRUE, dosave},
 	{M('s'), FALSE, dosit},
 	{'t', FALSE, dothrow},
 	{'T', FALSE, dotakeoff},
 	{M('t'), TRUE, doturn},
+	{M('T'), FALSE, dotip},		/* #tip */
 /*	'u', 'U' : go ne */
 	{'u', FALSE, dountrap}, /* if number_pad is on */
 	{M('u'), FALSE, dountrap},

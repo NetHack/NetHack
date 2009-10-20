@@ -13,7 +13,7 @@
 ^T      Teleport around level
 ^V      Teleport between levels (available in debug mode only)
 ^W      Wish (available in debug mode only)
-^X      Show your attributes (intrinsic ones included in debug or explore mode)
+^X      Show your attributes (shows more in debug or explore mode)
 ^Z      Suspend game (only if defined)
 a       Apply (use) a tool
 A       Remove all armor
@@ -101,7 +101,9 @@ $       Count your gold
 M-?     Display extended command help (if the platform allows this)
 M-2     Toggle two-weapon combat (unless number_pad is enabled)
 M-a     Adjust inventory letters
+M-A     Annotate: supply a name for the current dungeon level (if supported)
 M-c     Talk to someone
+M-C     Conduct: list voluntary challenges you have maintained
 M-d     Dip an object into something
 M-e     Advance or check weapons skills
 M-f     Force a lock
@@ -111,11 +113,14 @@ M-l     Loot a box on the floor
 M-m     Use a monster's special ability
 M-n     Name a monster, an individual object, or a type of object
 M-o     Offer a sacrifice to the gods
+M-O     Overview: show a summary of the explored dungeon (if supported)
 M-p     Pray to the gods for help
 M-q     Quit
 M-r     Rub a lamp
+M-R     Ride: mount or dismount a saddled steed (if supported)
 M-s     Sit down
 M-t     Turn undead
+M-T     Tip: empty a container
 M-u     Untrap something (trap, door, or chest)
 M-v     Print compile time options for this version of NetHack
 M-w     Wipe off your face
