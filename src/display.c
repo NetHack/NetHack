@@ -1,5 +1,4 @@
 /* NetHack 3.5	display.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)display.c	3.5	2009/01/30	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
