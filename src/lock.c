@@ -567,13 +567,13 @@ doopen()		/* try to open a door */
 	if (Blind) {
 	    int oldglyph = door->glyph;
 #ifdef DUNGEON_OVERVIEW
-	    schar oldstyp = door->styp;
+	    schar oldlastseentyp = lastseentyp[cc.x][cc.y];
 #endif
 
 	    feel_location(cc.x, cc.y);
 	    if (door->glyph != oldglyph
 #ifdef DUNGEON_OVERVIEW
-		|| door->styp != oldstyp
+		|| lastseentyp[cc.x][cc.y] != oldlastseentyp
 #endif
 	    ) res = 1;		/* learned something */
 	}
@@ -695,13 +695,13 @@ doclose()		/* try to close a door */
 	if (Blind) {
 	    int oldglyph = door->glyph;
 #ifdef DUNGEON_OVERVIEW
-	    schar oldstyp = door->styp;
+	    schar oldlastseentyp = lastseentyp[x][y];
 #endif
 
 	    feel_location(x, y);
 	    if (door->glyph != oldglyph
 #ifdef DUNGEON_OVERVIEW
-		|| door->styp != oldstyp
+		|| lastseentyp[x][y] != oldlastseentyp
 #endif
 	    ) res = 1;		/* learned something */
 	}

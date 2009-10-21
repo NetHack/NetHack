@@ -573,7 +573,7 @@ forget_map(howmuch)
 		levl[zx][zy].waslit = 0;
 		levl[zx][zy].glyph = cmap_to_glyph(S_stone);
 #ifdef DUNGEON_OVERVIEW
-		levl[zx][zy].styp = STONE;
+		lastseentyp[zx][zy] = STONE;
 #endif
 	    }
 }

@@ -514,7 +514,9 @@ int mode;
 	bwrite(fd,(genericptr_t) &lev,sizeof(lev));
 #endif
 	savelevl(fd, (boolean)((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
-
+#ifdef DUNGEON_OVERVIEW
+	bwrite(fd,(genericptr_t) lastseentyp,sizeof(lastseentyp));
+#endif
 	bwrite(fd,(genericptr_t) &monstermoves,sizeof(monstermoves));
 	bwrite(fd,(genericptr_t) &upstair,sizeof(stairway));
 	bwrite(fd,(genericptr_t) &dnstair,sizeof(stairway));
@@ -579,7 +581,8 @@ boolean rlecomp;
 			&& prm->lit == rgrm->lit
 			&& prm->waslit == rgrm->waslit
 			&& prm->roomno == rgrm->roomno
-			&& prm->edge == rgrm->edge) {
+			&& prm->edge == rgrm->edge
+			&& prm->candig == rgrm->candig) {
 			match++;
 			if (match > 254) {
 			    match = 254;	/* undo this match */

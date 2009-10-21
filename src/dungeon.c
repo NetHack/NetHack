@@ -2144,15 +2144,15 @@ recalc_mapseen()
 	 * (vision-related styp update done in loop below)
 	 */
 	if (!Levitation)
-		levl[u.ux][u.uy].styp = levl[u.ux][u.uy].typ;
+		lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
 
 	for (x = 0; x < COLNO; x++) {
 		for (y = 0; y < ROWNO; y++) {
 			/* update styp from viz_array */
 			if (viz_array[y][x] & IN_SIGHT)
-				levl[x][y].styp = levl[x][y].typ;
+				lastseentyp[x][y] = levl[x][y].typ;
 
-			switch (levl[x][y].styp) {
+			switch (lastseentyp[x][y]) {
 			/*
 			case ICE:
 				mptr->feat.ice = 1;

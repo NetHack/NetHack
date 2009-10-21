@@ -135,7 +135,7 @@ STATIC_DCL void FDECL(t_warn, (struct rm *));
 STATIC_DCL int FDECL(wall_angle, (struct rm *));
 
 #ifdef DUNGEON_OVERVIEW
-# define remember_topology(levp)	((levp)->styp = (levp)->typ)
+# define remember_topology(x,y)		(lastseentyp[x][y] = levl[x][y].typ)
 #else
 # define remember_topology(levp)	/*empty*/
 #endif
@@ -193,7 +193,7 @@ magic_map_background(x, y, show)
 	lev->glyph = glyph;
     if (show) show_glyph(x,y, glyph);
 
-    remember_topology(lev);	/* DUNGEON_OVERVIEW */
+    remember_topology(x,y);	/* DUNGEON_OVERVIEW */
 }
 
 /*
@@ -350,7 +350,7 @@ unmap_object(x, y)
     else								\
 	map_background(x,y,show);					\
 									\
-    remember_topology(&levl[x][y]);	/* DUNGEON_OVERVIEW */		\
+    remember_topology(x,y);	/* DUNGEON_OVERVIEW */			\
 }
 
 void

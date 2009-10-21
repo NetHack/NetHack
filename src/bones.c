@@ -402,7 +402,7 @@ struct obj *corpse;
 	    levl[x][y].waslit = 0;
 	    levl[x][y].glyph = cmap_to_glyph(S_stone);
 #ifdef DUNGEON_OVERVIEW
-	    levl[x][y].styp = 0;
+	    lastseentyp[x][y] = 0;
 #endif
 	}
 

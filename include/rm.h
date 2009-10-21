@@ -376,6 +376,9 @@ extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
  * The structure describing a coordinate position.
  * Before adding fields, remember that this will significantly affect
  * the size of temporary files and save files.
+ *
+ * Also remember that the run-length encoding for some ports in save.c
+ * must be updated to consider the field.
  */
 struct rm {
 	int glyph;		/* what the hero thinks is there */
@@ -389,11 +392,6 @@ struct rm {
 	Bitfield(roomno,6);	/* room # for special rooms */
 	Bitfield(edge,1);	/* marks boundaries for special rooms*/
 	Bitfield(candig,1);	/* Exception to Can_dig_down; was a trapdoor */
-
-#ifdef DUNGEON_OVERVIEW
-	Bitfield(styp, 6);	/* last seen/touched dungeon typ */
-	/* 2 free bits */
-#endif /* DUNGEON_OVERVIEW */
 };
 
 /*
@@ -540,6 +538,10 @@ typedef struct
     struct levelflags	flags;
 }
 dlevel_t;
+
+#ifdef DUNGEON_OVERVIEW
+extern schar lastseentyp[COLNO][ROWNO];	/* last seen/touched dungeon typ */
+#endif /* DUNGEON_OVERVIEW */
 
 extern dlevel_t level;	/* structure describing the current level */
 
