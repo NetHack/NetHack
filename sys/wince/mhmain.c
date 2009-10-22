@@ -876,21 +876,6 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		   DialogBox(GetNHApp()->hApp, (LPCTSTR)IDD_ABOUTBOX, hWnd, (DLGPROC)About);
 		   break;
 
-		case IDM_CMD_DLG: {
-			char input[BUFSZ];
-			char* p;
-			boolean ctrl = FALSE;
-			mswin_getlin("Enter command", input);
-			for(p=input; *p; p++) {
-				if( *p == '^' ) {
-					ctrl = TRUE;
-					continue;
-				}
-				NHEVENT_KBD(ctrl? C(*p) : *p);
-				ctrl = FALSE;
-			}
-			} break;
-
 		case IDM_EXIT:
 		   done2();
 		   break;
@@ -1090,7 +1075,7 @@ void mswin_select_map_mode(int mode)
 	/* update "Fit To Screen" item text */
 	{
 		TCHAR wbuf[BUFSZ];
-		MENUITEMINFO mi;
+		TBBUTTONINFO tbbi;
 
 		ZeroMemory( wbuf, sizeof(wbuf) );
 		if( !LoadString( 
@@ -1101,17 +1086,15 @@ void mswin_select_map_mode(int mode)
 			panic("cannot load main menu strings");
 		}
 
-		ZeroMemory( &mi, sizeof(mi) );
-		mi.cbSize = sizeof(mi);
-		mi.fType = MFT_STRING;
-		mi.fMask = MIIM_TYPE;
-		mi.dwTypeData = wbuf;
-		mi.cch = wcslen(wbuf);
-		if( !SetMenuItemInfo( 
-				hmenuMap, 
+		ZeroMemory( &tbbi, sizeof(tbbi) );
+		tbbi.cbSize = sizeof(tbbi);
+		tbbi.dwMask = TBIF_TEXT;
+		tbbi.pszText = wbuf;
+		if( !SendMessage( 
+				GetNHApp()->hMenuBar, 
+				TB_SETBUTTONINFO, 
 				IDM_MAP_FIT_TO_SCREEN, 
-				FALSE, 
-				&mi) ) {
+				(LPARAM)&tbbi) ) {
 			error( "Cannot update IDM_MAP_FIT_TO_SCREEN menu item." );
 		}
 	}

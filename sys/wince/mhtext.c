@@ -259,6 +259,10 @@ void LayoutText(HWND hWnd)
 LRESULT CALLBACK NHTextControlWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message) {
+	/* tell Windows not to process arrow keys (we want them) */
+	case WM_GETDLGCODE: 
+		return DLGC_WANTARROWS;
+
 	case WM_KEYDOWN:
 		switch( wParam ) {
 		case VK_SPACE:

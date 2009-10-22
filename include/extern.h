@@ -2400,6 +2400,10 @@ E unsigned long FDECL(get_feature_notice_ver, (char *));
 E unsigned long NDECL(get_current_feature_ver);
 E const char *FDECL(copyright_banner_line, (int));
 
+#ifdef RUNTIME_PORT_ID
+E void FDECL(append_port_id, (char *));
+#endif
+
 /* ### video.c ### */
 
 #ifdef MSDOS

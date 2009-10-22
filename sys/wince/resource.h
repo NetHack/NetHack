@@ -149,16 +149,15 @@
 #define IDM_HELP_MENU                   32828
 #define IDM_VIEW_OPTIONS                32829
 #define IDM_DIRECT_COMMAND              32830
-#define IDM_CMD_DLG                     32832
-#define IDS_TEXT_WRAP                   32833
-#define IDS_TEXT_UNWRAP                 32834
+#define IDS_TEXT_WRAP                   32831
+#define IDS_TEXT_UNWRAP                 32832
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        155
-#define _APS_NEXT_COMMAND_VALUE         32831
+#define _APS_NEXT_COMMAND_VALUE         32833
 #define _APS_NEXT_CONTROL_VALUE         1334
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

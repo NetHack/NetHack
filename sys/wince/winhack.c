@@ -24,7 +24,7 @@ static void win_hack_init(int, char **);
 static void __cdecl mswin_moveloop(void *);
 static BOOL setMapTiles(const char* fname);
 
-extern void FDECL(pcmain, (int,char **));
+extern boolean FDECL(pcmain, (int,char **));
 
 #define MAX_CMDLINE_PARAM 255
 
@@ -41,6 +41,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	TCHAR* p;
 	TCHAR wbuf[NHSTR_BUFSIZE];
 	char buf[NHSTR_BUFSIZE];
+    boolean resuming;
 
 	sys_early_init();
 
@@ -122,9 +123,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	GetModuleFileName(NULL, wbuf, BUFSZ);
 	argv[0] = _strdup(NH_W2A(wbuf, buf, BUFSZ));
 
-	pcmain(argc,argv);
+	resuming = pcmain(argc,argv);
 
-	moveloop();
+	moveloop(resuming);
 
 	return 0;
 }

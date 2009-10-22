@@ -182,4 +182,7 @@ void mswin_write_reg(void);
 BOOL mswin_has_keyboard(void);
 
 void mswin_set_fullscreen(BOOL is_fullscreen);
+
+extern winid WIN_STATUS;
+
 #endif /* WINmswin_H */

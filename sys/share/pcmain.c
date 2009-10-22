@@ -1,5 +1,4 @@
 /* NetHack 3.5	pcmain.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)pcmain.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -236,7 +235,7 @@ char *argv[];
 		 */
 		if (!strncmp(argv[1], "-s", 2)) {
 #if defined(MSWIN_GRAPHICS) || defined(WIN32CON)
-			int sfd = _fileno(stdout);
+			int sfd = (int)_fileno(stdout);
 			redirect_stdout = (sfd >= 0) ? !isatty(sfd) : 0;
 
 # ifdef MSWIN_GRAPHICS

@@ -1,5 +1,4 @@
 /* NetHack 3.5	celib.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)celib.c	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,6 +63,21 @@ time_t __cdecl time(time_t * timeptr)
 
 	if( timeptr) 
 		*timeptr = _t_cnv.t_val;
+	return _t_cnv.t_val;
+}
+
+time_t __cdecl mktime(struct tm * tb)
+{
+	if(!tb) return (time_t)-1;
+
+	_t_cnv.tm_val.yr = tb->tm_year; 
+	_t_cnv.tm_val.mo = tb->tm_mon; 
+	_t_cnv.tm_val.dd = tb->tm_mday; 
+	_t_cnv.tm_val.hh = tb->tm_hour; 
+	_t_cnv.tm_val.mm = tb->tm_min; 
+	_t_cnv.tm_val.ss = tb->tm_sec; 
+	_t_cnv.tm_val.wd = tb->tm_wday; 
+
 	return _t_cnv.t_val;
 }
 

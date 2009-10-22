@@ -45,7 +45,7 @@ extern int errno;
 #include <stdlib.h>
 #endif
 
-#if defined(UNIX) || defined(VMS) || defined(_MSC_VER)
+#if defined(UNIX) || defined(VMS) || !defined(NO_SIGNAL)
 #include <signal.h>
 #endif
 
