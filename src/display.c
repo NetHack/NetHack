@@ -136,7 +136,7 @@ STATIC_DCL int FDECL(wall_angle, (struct rm *));
 #ifdef DUNGEON_OVERVIEW
 # define remember_topology(x,y)		(lastseentyp[x][y] = levl[x][y].typ)
 #else
-# define remember_topology(levp)	/*empty*/
+# define remember_topology(x,y)		/*empty*/
 #endif
 
 #ifdef INVISIBLE_OBJECTS
