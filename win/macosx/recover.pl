@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 
-# $Id$
+# NetHack 3.5  recover.pl $Date$  $Revision$
+# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009
+# NetHack may be freely redistributed.  See license for details.
+
 # Wrapper for 3.4.3 recover to be called from Applescript to reset the Qt
 # package after it locks up due to a bug in suspend handling.
 
@@ -37,7 +40,7 @@ if($try_perm){
 # run recover, but only if there is something that looks promising
 $uid = $<;
 foreach ( <$uid*.0> ){
-	system ("./recover -d . $_);
+	system ("./recover -d . $_");
 }
 
 print "Done.\n";

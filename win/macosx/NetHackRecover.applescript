@@ -1,3 +1,10 @@
+#!/usr/bin/osascript
+# NetHack 3.5  NetHackRecover.applescript $Date$  $Revision$
+# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009
+# NetHack may be freely redistributed.  See license for details. 
+
+
+
 set canceled to false
 try
 	display dialog "Welcome to the NetHack recover program.  Please make sure NetHack is not running before continuing.  Ready?" with title "NetHackRecover"
