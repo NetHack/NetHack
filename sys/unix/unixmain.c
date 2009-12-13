@@ -1,5 +1,4 @@
 /* NetHack 3.5	unixmain.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)unixmain.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -194,10 +193,18 @@ char *argv[];
 	/* wizard mode access is deferred until here */
 	set_playmode();	/* sets plname to "wizard" for wizard mode */
 	if (exact_username) {
+		/*
+		 * FIXME: this no longer works, ever since 3.3.0
+		 * when plnamesuffix() was changed to find
+		 * Name-Role-Race-Gender-Alignment.  It removes
+		 * all dashes rather than just the last one,
+		 * regardless of whether whatever follows each
+		 * dash matches role, race, gender, or alignment.
+		 */
 		/* guard against user names with hyphens in them */
 		int len = strlen(plname);
 		/* append the current role, if any, so that last dash is ours */
-		if (++len < sizeof plname)
+		if (++len < (int)sizeof plname)
 			(void)strncat(strcat(plname, "-"),
 				      pl_character, sizeof plname - len - 1);
 	}
@@ -466,8 +473,10 @@ boolean wr;
 }
 #endif /* CHDIR */
 
+/* returns True iff we set plname[] to username which contains a hyphen */
 static boolean
-whoami() {
+whoami()
+{
 	/*
 	 * Who am i? Algorithm: 1. Use name as specified in NETHACKOPTIONS
 	 *			2. Use $USER or $LOGNAME	(if 1. fails)
@@ -479,21 +488,19 @@ whoami() {
 	 * Note that we trust the user here; it is possible to play under
 	 * somebody else's name.
 	 */
-#if defined(__APPLE__)
-	/* Unixisms just confuse the user */
-	(void) strncpy(plname, "player", sizeof(plname)-1);
-#else
-	register char *s;
+    if (!*plname) {
+	register const char *s;
 
-	if (*plname) return FALSE;
-	if(/* !*plname && */ (s = nh_getenv("USER")))
-		(void) strncpy(plname, s, sizeof(plname)-1);
-	if(!*plname && (s = nh_getenv("LOGNAME")))
-		(void) strncpy(plname, s, sizeof(plname)-1);
-	if(!*plname && (s = getlogin()))
-		(void) strncpy(plname, s, sizeof(plname)-1);
-#endif
-	return TRUE;
+	s = nh_getenv("USER");
+	if (!s || !*s) s = nh_getenv("LOGNAME");
+	if (!s || !*s) s = getlogin();
+
+	if (s && *s) {
+	    (void) strncpy(plname, s, sizeof plname - 1);
+	    if (index(plname, '-')) return TRUE;
+	}
+    }
+    return FALSE;
 }
 
 void
@@ -619,23 +626,25 @@ char *optstr;
 }
 
 static struct passwd *
-get_unix_pw(){
+get_unix_pw()
+{
 	char *user;
-	int uid;
+	unsigned uid;
 	static struct passwd *pw = (struct passwd *)0;
+
 	if(pw) return pw;	/* cache answer */
 
-	uid = getuid();
+	uid = (unsigned)getuid();
 	user = getlogin();
 	if (user) {
 	    pw = getpwnam(user);
-	    if (pw && (pw->pw_uid != uid)) pw = 0;
+	    if (pw && ((unsigned)pw->pw_uid != uid)) pw = 0;
 	}
 	if (pw == 0) {
 	    user = nh_getenv("USER");
 	    if (user) {
 		pw = getpwnam(user);
-		if (pw && (pw->pw_uid != uid)) pw = 0;
+		if (pw && ((unsigned)pw->pw_uid != uid)) pw = 0;
 	    }
 	    if (pw == 0) {
 		pw = getpwuid(uid);
