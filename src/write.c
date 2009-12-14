@@ -1,5 +1,4 @@
 /* NetHack 3.5	write.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)write.c	3.5	2001/11/29	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -96,9 +95,16 @@ register struct obj *pen;
 	if(!paper)
 		return(0);
 	typeword = (paper->oclass == SPBOOK_CLASS) ? "spellbook" : "scroll";
-	if(Blind && !paper->dknown) {
-		You("don't know if that %s is blank or not!", typeword);
-		return(1);
+	if (Blind) {
+	    if (!paper->dknown) {
+		You("don't know if that %s is blank or not.", typeword);
+		return 1;
+	    } else if (paper->oclass == SPBOOK_CLASS) {
+		/* can't write a magic book while blind */
+		pline("%s can't create braille text.",
+		      upstart(ysimple_name(pen)));
+		return 1;
+	    }
 	}
 	paper->dknown = 1;
 	if(paper->otyp != SCR_BLANK_PAPER && paper->otyp != SPE_BLANK_PAPER) {
@@ -197,10 +203,10 @@ found:
 	pen->spe -= actualcost;
 
 	/* can't write if we don't know it - unless we're lucky */
-	if(!(objects[new_obj->otyp].oc_name_known) &&
-	   !(objects[new_obj->otyp].oc_uname) &&
-	   (rnl(Role_if(PM_WIZARD) ? 3 : 15))) {
-		You("%s to write that!", by_descr ? "fail" : "don't know how");
+	if (!objects[new_obj->otyp].oc_name_known &&
+	    !objects[new_obj->otyp].oc_uname &&
+	    rnl(Role_if(PM_WIZARD) ? 3 : 15)) {
+		You("%s to write that.", by_descr ? "fail" : "don't know how");
 		/* scrolls disappear, spellbooks don't */
 		if (paper->oclass == SPBOOK_CLASS) {
 			You(
@@ -217,6 +223,19 @@ found:
 		}
 		obfree(new_obj, (struct obj *) 0);
 		return(1);
+	} 
+	/* can write scrolls when blind, but requires luck too;
+	   attempts to write books when blind are caught above */
+	if (Blind && rnl(3)) {
+		/* writing while blind usually fails regardless of
+		   whether the target scroll is known; even if we
+		   have passed the write-an-unknown scroll test
+		   above we can still fail this one, so it's doubly
+		   hard to write an unknown scroll while blind */
+		You("fail to write the scroll correctly and it disappears.");
+		useup(paper);
+		obfree(new_obj, (struct obj *) 0);
+		return 1;
 	}
 
 	/* useup old scroll / spellbook */
