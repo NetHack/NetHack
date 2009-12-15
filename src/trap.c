@@ -1,5 +1,4 @@
 /* NetHack 3.5	trap.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)trap.c	3.5	2007/12/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3087,7 +3086,18 @@ boolean force, here;
 	}
 
 	/* Scrolls, spellbooks, potions, weapons and
-	   pieces of armor may get affected by the water */
+	   pieces of armor may get affected by the water.
+
+	   [FIXME?  The item transformations here lack shop price/billing
+	   handling [costly_alteration()], which is okay as long as shops
+	   don't contain any pools.  However, that's probably not a valid
+	   assumption; a broken fountain might spill new pools far enough
+	   to put one inside a nearby shop, particularly if dug walls in
+	   Minetown haven't been repaired yet.  Note that water_damage()
+	   might be getting called right now because we're in the midst
+	   of creating such a pool, not just because one has already been
+	   created and we've walked into it while carrying unpaid stuff.]
+	 */
 	for (; obj; obj = otmp) {
 		otmp = here ? obj->nexthere : obj->nobj;
 
@@ -3102,24 +3112,25 @@ boolean force, here;
 			water_damage(&obj->cobj, force, FALSE);
 		} else if (!force && (Luck + 5) > rn2(20)) {
 			/*  chance per item of sustaining damage:
-			 *	max luck (full moon):	 5%
-			 *	max luck (elsewhen):	10%
+			 *	max luck:		10%
 			 *	avg luck (Luck==0):	75%
 			 *	awful luck (Luck<-4):  100%
 			 */
 			continue;
 		} else if (obj->oclass == SCROLL_CLASS) {
 #ifdef MAIL
-		    if (obj->otyp != SCR_MAIL)
+			if (obj->otyp == SCR_MAIL) continue;
 #endif
-		    {
 			obj->otyp = SCR_BLANK_PAPER;
+			obj->dknown = 0;
 			obj->spe = 0;
-		    }
 		} else if (obj->oclass == SPBOOK_CLASS) {
-			if (obj->otyp == SPE_BOOK_OF_THE_DEAD)
+			if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
 				pline("Steam rises from %s.", the(xname(obj)));
-			else obj->otyp = SPE_BLANK_PAPER;
+				continue;
+			}
+			obj->otyp = SPE_BLANK_PAPER;
+			obj->dknown = 0;
 		} else if (obj->oclass == POTION_CLASS) {
 			if (obj->otyp == POT_ACID) {
 				char *bufp, buf[BUFSZ];
@@ -3143,6 +3154,7 @@ boolean force, here;
 				continue;
 			} else if (obj->odiluted) {
 				obj->otyp = POT_WATER;
+				obj->dknown = 0;
 				obj->blessed = obj->cursed = 0;
 				obj->odiluted = 0;
 			} else if (obj->otyp != POT_WATER)
