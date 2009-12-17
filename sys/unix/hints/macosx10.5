@@ -172,3 +172,53 @@ endif	# !WANT_SOURCE_INSTALL
 #
 # Install.Qt mentions a patch for macos - it's not there (it seems to be in the Qt binary
 # package under the docs directory).
+
+###
+### Packaging
+###
+# Notes:
+# 1) The Apple developer utilities must be installed in the default location.
+# 2) Do a normal build before trying to package the game.
+# 3) This matches the 3.4.3 Term package, but there are some things that should
+#    be changed.
+
+ifdef WANT_WIN_TTY
+DEVUTIL=/Developer/Applications/Utilities
+PKGR=$(DEVUTIL)/PackageMaker.app/Contents/MacOS/PackageMaker
+SVS=$(shell $(NHSROOT)/util/makedefs --svs)
+
+build_tty_pkg:
+if defined(WANT_WIN_X11) || defined(WANT_WIN_QT)
+$(error "build_tty_pkg only works for a tty-only build)
+else
+        $(MAKE) build_package_root
+	rm -rf RESOURCES
+	mkdir RESOURCES
+	enscript --language=rtf -o - < dat/license >RESOURCES/License.rtf
+	sys/unix/hints/macosx.sh descplist > RESOURCES/Description.plist
+	sys/unix/hints/macosx.sh infoplist > Info.plist
+
+	$(PKGR) --root PKGROOT --info Info.plist -e RESOURCES -v -o NetHack-$(SVS)-mac-Term.pkg
+	hdiutil create -verbose -srcfolder NetHack-$(SVS)-mac-Term.pkg Nethack-$(SVS)-mac-Term.dmg
+
+SVS:=$(shell util/makedefs -svs)
+SVSDOT:=$(shell util/makedefs -svs .)
+
+build_package_root:
+	cd src/..       # make sure we are at TOP
+	rm -rf PKGROOT
+	mkdir -p PKGROOT/lib PKGROOT/bin PKGROOT/man/man6 PKGROOT/doc
+	install -p src/nethack PKGROOT/bin
+	install -p util/recover PKGROOT/bin
+	install -p doc/nethack.6 PKGROOT/man/man6
+	install -p doc/recover.6 PKGROOT/man/man6
+	install -p doc/Guidebook PKGROOT/doc
+	install -p dat/nhdat PKGROOT/lib
+	cd dat; install -p $(DATNODLB) ../PKGROOT/lib
+# XXX these files should be somewhere else for good Mac form
+	touch PKGROOT/perm PKGROOT/record PKGROOT/logfile
+# XXX may need postinstall script to get perms right for sgid, etc.
+	mkdir PKGROOT/save
+
+endif
+endif
