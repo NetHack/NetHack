@@ -27,7 +27,8 @@ new machine.  The basic steps in porting the program are:
 	    If your machine uses a windowing system already supported,
 	    you need the win subdirectory for that system (or the
 	    appropriate sys subdirectory if the windowing system was
-	    previously considered restricted to one OS).
+	    previously considered restricted to one OS) and possibly
+	    win/share.
 
 	2.  Modify the appropriate include files to customize NetHack to
 	    your system.  You may need to add a new OS-specific "*conf.h"

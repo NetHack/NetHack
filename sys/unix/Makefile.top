@@ -2,6 +2,9 @@
 # NetHack 3.5  Makefile.top	$Date$  $Revision$
 #	SCCS Id: @(#)Makefile.top	3.5	2007/12/12
 
+# Root of source tree:
+NHSROOT=.
+
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used
 # these makes allow $(MAKE) to be overridden by the environment if someone
@@ -39,6 +42,7 @@ DIRPERM  = 0755
 # instructions)
 #HACKDIR  = $(PREFIX)/games/lib/$(GAME)dir
 VARDIR  = $(HACKDIR)
+# Where nethack.sh in installed.  If this is not defined, the wrapper is not used.
 #SHELLDIR = $(PREFIX)/games
 
 # per discussion in Install.X11 and Install.Qt
@@ -90,6 +94,7 @@ $(GAME):
 	( cd src ; $(MAKE) )
 
 all:	$(GAME) recover Guidebook $(VARDAT) dungeon spec_levs check-dlb
+	true; $(MOREALL)
 	@echo "Done."
 
 # Note: many of the dependencies below are here to allow parallel make
@@ -188,19 +193,22 @@ dofiles:
 	(cd dat ; cp symbols $(HACKDIR) )
 	cp src/$(GAME) $(HACKDIR)
 	cp util/recover $(HACKDIR)
-	-rm -f $(SHELLDIR)/$(GAME)
-	sed -e 's;/usr/games/lib/nethackdir;$(HACKDIR);' \
+	-if test -n '$(SHELLDIR)'; then rm -f $(SHELLDIR)/$(GAME); fi
+	if test -n '$(SHELLDIR)'; then \
+		sed -e 's;/usr/games/lib/nethackdir;$(HACKDIR);' \
 		-e 's;HACKDIR/nethack;HACKDIR/$(GAME);' \
 		< sys/unix/nethack.sh \
-		> $(SHELLDIR)/$(GAME)
+		> $(SHELLDIR)/$(GAME) ; fi
 # set up their permissions
 	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) $(GAME) recover ; \
 			$(CHGRP) $(GAMEGRP) $(GAME) recover )
 	chmod $(GAMEPERM) $(HACKDIR)/$(GAME)
 	chmod $(EXEPERM) $(HACKDIR)/recover
-	-$(CHOWN) $(GAMEUID) $(SHELLDIR)/$(GAME)
-	$(CHGRP) $(GAMEGRP) $(SHELLDIR)/$(GAME)
-	chmod $(EXEPERM) $(SHELLDIR)/$(GAME)
+	-if test -n '$(SHELLDIR)'; then \
+		$(CHOWN) $(GAMEUID) $(SHELLDIR)/$(GAME); fi
+	if test -n '$(SHELLDIR)'; then \
+		$(CHGRP) $(GAMEGRP) $(SHELLDIR)/$(GAME); \
+		chmod $(EXEPERM) $(SHELLDIR)/$(GAME); fi
 	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) symbols ; \
 			$(CHGRP) $(GAMEGRP) symbols ; \
 			chmod $(FILEPERM) symbols )
@@ -243,8 +251,9 @@ install: rootcheck $(GAME) recover $(VARDAT) dungeon spec_levs
 	true; $(PREINSTALL)
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory
-	-mkdir -p $(SHELLDIR)
-	-rm -rf $(HACKDIR) $(VARDIR)
+	-if test -n '$(SHELLDIR)'; then \
+		mkdir -p $(SHELLDIR); fi
+	rm -rf $(HACKDIR) $(VARDIR)
 	-mkdir -p $(HACKDIR) $(VARDIR) $(VARDIR)/save
 	if test -d ./-p; then rmdir ./-p; fi
 	-$(CHOWN) $(GAMEUID) $(HACKDIR) $(VARDIR) $(VARDIR)/save

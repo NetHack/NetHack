@@ -2,6 +2,9 @@
 # NetHack 3.5  Makefile.src	$Date$  $Revision$
 #	SCCS Id: @(#)Makefile.src	3.5	2008/01/30
 
+# Root of source tree:
+NHSROOT=..
+
 # newer makes predefine $(MAKE) to 'make' and do smarter processing of
 # recursive make calls if $(MAKE) is used
 # these makes allow $(MAKE) to be overridden by the environment if someone

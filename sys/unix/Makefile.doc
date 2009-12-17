@@ -2,6 +2,9 @@
 # NetHack 3.5  Makefile.doc	$Date$  $Revision$
 #	SCCS Id: @(#)Makefile.doc	3.5	2007/05/25
 
+# Root of source tree:
+NHSROOT=..
+
 # for Atari
 # SHELL=E:/GEMINI2/MUPFEL.TTP
 
