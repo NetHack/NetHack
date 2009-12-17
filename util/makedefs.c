@@ -163,7 +163,7 @@ extern void NDECL(monst_init);		/* monst.c */
 extern void NDECL(objects_init);	/* objects.c */
 
 static void NDECL(make_version);
-static char *FDECL(version_string, (char *));
+static char *FDECL(version_string, (char *, const char *));
 static char *FDECL(version_id_string, (char *,const char *));
 static char *FDECL(xcrypt, (const char *));
 static int FDECL(check_control, (char *));
@@ -380,6 +380,17 @@ do_ext_makedefs(int argc, char **argv){
 #define CONSUME \
   argv++, argc--; \
   if(argc==0){Fprintf(stderr, "missing option\n"); exit(EXIT_FAILURE);}
+		IS_OPTION("svs"){
+				/* short version string for packaging - note
+				 * no \n */
+			char buf[100];
+			char delim[10];
+			argv++;		/* not CONSUME */
+			delim[0] = '\0';
+			if(argv[0]) strcpy(delim, argv[0]);
+			Fprintf(stdout, "%s", version_string(buf, delim));
+			exit(EXIT_SUCCESS);
+		}
 		IS_OPTION("input"){
 			CONSUME;
 			if(!strcmp(argv[0], "-")){
@@ -1007,10 +1018,12 @@ make_version()
 }
 
 static char *
-version_string(outbuf)
+version_string(outbuf, delim)
 char *outbuf;
+const char *delim;
 {
-    Sprintf(outbuf, "%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+    Sprintf(outbuf, "%d%s%d%s%d", VERSION_MAJOR, delim, VERSION_MINOR,
+		delim, PATCHLEVEL);
 #ifdef BETA
     Sprintf(eos(outbuf), "-%d", EDITLEVEL);
 #endif
@@ -1034,7 +1047,7 @@ const char *build_date;
 #endif
 
     Sprintf(outbuf, "%s NetHack%s Version %s - last build %s.",
-	    PORT_ID, subbuf, version_string(versbuf), build_date);
+	    PORT_ID, subbuf, version_string(versbuf,"."), build_date);
     return outbuf;
 }
 
@@ -1058,6 +1071,9 @@ do_date()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
+		/* NB: We've moved on from SCCS, but this way this line
+		 * won't get clobbered when downstream projects import
+		 * this file into something more modern. */
 	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.5\t2004/02/01 */\n\n");
 	Fprintf(ofp,Dont_Edit_Code);
 
@@ -1089,7 +1105,7 @@ do_date()
 	Fprintf(ofp,"#define VERSION_SANITY3 0x%08lx%s\n",
 		version.struct_sizes2, ul_sfx);
 	Fprintf(ofp,"\n");
-	Fprintf(ofp,"#define VERSION_STRING \"%s\"\n", version_string(buf));
+	Fprintf(ofp,"#define VERSION_STRING \"%s\"\n", version_string(buf,"."));
 	Fprintf(ofp,"#define VERSION_ID \\\n \"%s\"\n",
 		version_id_string(buf, cbuf));
 	Fprintf(ofp,"\n");
