@@ -446,6 +446,7 @@ make '[' command more precise when poly'd hero has embedded dragon scales/mail
 fainting while wielding a cockatrice corpse will be fatal
 Sunsword's light radius depends on its curse/bless state
 Add M-C and M-R meta-key shortcuts for #conduct and #ride, respectively 
+can now use ESC to cancel out of prompts for playing musical instruments
 
 
 Platform- and/or Interface-Specific New Features
