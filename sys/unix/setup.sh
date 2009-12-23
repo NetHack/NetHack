@@ -1,6 +1,5 @@
 #!/bin/sh
 # NetHack 3.5  setup.sh	$Date$  $Revision$
-#      SCCS Id: @(#)setup.sh 3.5     2007/12/12
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -18,8 +17,8 @@ x)      hints=/dev/null
         ;;
 esac
 
-/bin/sh ./mkmkfile.sh Makefile.top ../../Makefile $hints
-/bin/sh ./mkmkfile.sh Makefile.dat ../../dat/Makefile $hints
-/bin/sh ./mkmkfile.sh Makefile.doc ../../doc/Makefile $hints
-/bin/sh ./mkmkfile.sh Makefile.src ../../src/Makefile $hints
-/bin/sh ./mkmkfile.sh Makefile.utl ../../util/Makefile $hints
+/bin/sh ./mkmkfile.sh Makefile.top TOP ../../Makefile $hints
+/bin/sh ./mkmkfile.sh Makefile.dat DAT ../../dat/Makefile $hints
+/bin/sh ./mkmkfile.sh Makefile.doc DOC ../../doc/Makefile $hints
+/bin/sh ./mkmkfile.sh Makefile.src SRC ../../src/Makefile $hints
+/bin/sh ./mkmkfile.sh Makefile.utl UTL ../../util/Makefile $hints

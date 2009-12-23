@@ -1,5 +1,5 @@
 #!/bin/sh
-#      SCCS Id: @(#)macosx.sh 3.5     2007/12/12
+# NetHack 3.5  macosx.sh $Date$  $Revision$
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -104,6 +104,73 @@ xgroup2)
 # RecordName: wheel
 # RecordType: dsRecTypeStandard:Groups
 # SMBSID: S-1-5-21-100
+
+xdescplist)	SVSDOT=`util/makedefs --svs .`
+	cat <<E_O_M;
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>IFPkgDescriptionDeleteWarning</key>
+        <string></string>
+        <key>IFPkgDescriptionDescription</key>
+        <string>NetHack $SVSDOT for the MacOS X Terminal
+</string>
+        <key>IFPkgDescriptionTitle</key>
+        <string>NetHack</string>
+        <key>IFPkgDescriptionVersion</key>
+        <string>$SVSDOT</string>
+</dict>
+</plist>
+E_O_M
+	;;
+
+xinfoplist)	SVSDOT=`util/makedefs --svs .`
+	cat <<E_O_M;
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleGetInfoString</key>
+	<string>NetHack $SVSDOT for the MacOS X Terminal</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.nethack.term</string>
+	<key>CFBundleName</key>
+	<string>NetHack</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$SVSDOT</string>
+	<key>IFMajorVersion</key>
+	<integer>3</integer>
+	<key>IFMinorVersion</key>
+	<integer>3</integer>
+	<key>IFPkgFlagAllowBackRev</key>
+	<true/>
+	<key>IFPkgFlagAuthorizationAction</key>
+	<string>RootAuthorization</string>
+	<key>IFPkgFlagDefaultLocation</key>
+	<string>/usr/games</string>
+	<key>IFPkgFlagInstallFat</key>
+	<false/>
+	<key>IFPkgFlagIsRequired</key>
+	<false/>
+	<key>IFPkgFlagOverwritePermissions</key>
+	<true/>
+	<key>IFPkgFlagRelocatable</key>
+	<false/>
+	<key>IFPkgFlagRestartAction</key>
+	<string>NoRestart</string>
+	<key>IFPkgFlagRootVolumeOnly</key>
+	<false/>
+	<key>IFPkgFlagUpdateInstalledLanguages</key>
+	<false/>
+	<key>IFPkgFlagUseUserMask</key>
+	<false/>
+	<key>IFPkgFormatVersion</key>
+	<real>0.10000000149011612</real>
+</dict>
+</plist>
+E_O_M
+	;;
 
 *)      echo "Unknown command $cmd"
 	exit 1

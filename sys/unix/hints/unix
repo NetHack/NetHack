@@ -1,8 +1,9 @@
-#      
-#      SCCS Id: @(#)unix 3.5     2007/12/12
+#
+# NetHack 3.5 unix $Date$  $Revision$
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
 #
+#-PRE
 # unix hints file
 # This hints file provides the legacy configuration that NetHack has shipped
 # with historically - this means you will most likely need to hand edit .h

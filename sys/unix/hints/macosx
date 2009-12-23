@@ -1,8 +1,9 @@
 #
-#      SCCS Id: @(#)macosx 3.5     2007/12/12
+# NetHack 3.5  macosx $Date$  $Revision$
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
+#-PRE
 # Mac OS X (Darwin) hints file
 # This is for Mac OS X 10.4.10 (Darwin 8.10).  If this doesn't work for some
 # other version of either Darwin or Mac OS X, make a new file for that OS,

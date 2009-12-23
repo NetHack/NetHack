@@ -1,8 +1,9 @@
 #
-#      SCCS Id: @(#)macosx 3.5     2007/12/12
-# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
+# NetHack 3.5  macosx10.5 $Date$  $Revision$
+# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009.
 # NetHack may be freely redistributed.  See license for details.
 #
+#-PRE
 # Mac OS X (Darwin) hints file
 # This is for Mac OS X 10.5.3 (Darwin 9.3).  If this doesn't work for some
 # other version of either Darwin or Mac OS X, make a new file for that OS,
@@ -173,6 +174,8 @@ endif	# !WANT_SOURCE_INSTALL
 # Install.Qt mentions a patch for macos - it's not there (it seems to be in the Qt binary
 # package under the docs directory).
 
+#-POST
+ifdef MAKEFILE_TOP
 ###
 ### Packaging
 ###
@@ -188,10 +191,11 @@ PKGR=$(DEVUTIL)/PackageMaker.app/Contents/MacOS/PackageMaker
 SVS=$(shell $(NHSROOT)/util/makedefs --svs)
 
 build_tty_pkg:
-if defined(WANT_WIN_X11) || defined(WANT_WIN_QT)
-$(error "build_tty_pkg only works for a tty-only build)
+ifneq (,$(WANT_WIN_X11)$(WANT_WIN_QT))
+	-echo build_tty_pkg only works for a tty-only build
+	exit 1
 else
-        $(MAKE) build_package_root
+	$(MAKE) build_package_root
 	rm -rf RESOURCES
 	mkdir RESOURCES
 	enscript --language=rtf -o - < dat/license >RESOURCES/License.rtf
@@ -201,8 +205,8 @@ else
 	$(PKGR) --root PKGROOT --info Info.plist -e RESOURCES -v -o NetHack-$(SVS)-mac-Term.pkg
 	hdiutil create -verbose -srcfolder NetHack-$(SVS)-mac-Term.pkg Nethack-$(SVS)-mac-Term.dmg
 
-SVS:=$(shell util/makedefs -svs)
-SVSDOT:=$(shell util/makedefs -svs .)
+SVS=$(shell util/makedefs --svs)
+SVSDOT=$(shell util/makedefs --svs .)
 
 build_package_root:
 	cd src/..       # make sure we are at TOP
@@ -219,6 +223,46 @@ build_package_root:
 	touch PKGROOT/perm PKGROOT/record PKGROOT/logfile
 # XXX may need postinstall script to get perms right for sgid, etc.
 	mkdir PKGROOT/save
+# XXX what about a news file?
+endif	# end of build_tty_pkg
+endif	# WANT_WIN_TTY for packaging
 
-endif
-endif
+ifdef WANT_WIN_QT
+# XXX untested and incomplete (see below)
+build_qt_pkg:
+ifneq (,$(WANT_WIN_X11)$(WANT_WIN_TTY))
+	-echo build_qt_pkg only works for a qt-only build
+	exit 1
+else
+	$(MAKE) build_package_root
+	rm -rf NetHackQt
+	mkdir -p NetHackQt/NetHackQt.app/nethackdir/save
+	mkdir NetHackQt/Documentation
+	cp doc/Guidebook.txt doc/nethack.txt doc/recover.txt NetHackQt/Documentation
+
+	osacompile -o NetHackQt/NetHackQt.app/nethackdir/NetHackRecover.app \
+		 win/macosx/NetHackRecover.applescript
+	cp win/macosx/recover.pl NetHackQt/NetHackQt.app/nethackdir
+
+	mkdir -p NetHackQt/NetHackQt.app/Contents/Frameworks
+	cp $(QTDIR)/libqt-mt.3.dylib NetHackQt/NetHackQt.app/Contents/Frameworks
+
+	mkdir NetHackQt/NetHackQt.app/Contents/MacOS
+	mv PKGROOT/nethack NetHackQt/NetHackQt.app/Contents/MacOS
+
+	mv PKGROOT/lib/nethackdir NetHackQt/NetHackQt.app/nethackdir
+
+# XXX still missing:
+#NetHackQt/NetHackQt.app
+# /Contents
+#	Info.plist
+#	Resources/nethack.icns
+#NetHackQt/Documentation
+#NetHackQtRecover.txt
+#NetHack Defaults.txt
+#changes.patch XXX is this still needed?  why isn't it part of the tree?
+#  doesn't go here
+	hdiutil create -verbose -srcfolder NetHackQt NetHack-$(SVS)-macosx-qt.dmg
+endif	# end of build_qt_pkg
+endif	# WANT_WIN_QT for packaging
+endif	# MAKEFILE_TOP

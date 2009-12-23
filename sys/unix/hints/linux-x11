@@ -1,8 +1,9 @@
-#      
-#      SCCS Id: @(#)linux 3.5     2007/12/16
+#
+# NetHack 3.5  linux-x11 $Date$  $Revision$
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
 #
+#-PRE
 # Linux hints file
 # This hints file provides a single-user x11 build for Linux, specifically
 # for Ubuntu dapper.
