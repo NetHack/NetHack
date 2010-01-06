@@ -995,7 +995,7 @@ const char *start, *middle, *end, *ps;
 {
 	char buf[BUFSZ];
 
-	Sprintf(buf, "%s%s%s%s.", start, middle, end, ps);
+	Sprintf(buf, " %s%s%s%s.", start, middle, end, ps);
 	putstr(en_win, 0, buf);
 }
 
@@ -1107,12 +1107,12 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 
     Strcpy(tmpbuf, plname);
     *tmpbuf = highc(*tmpbuf);	/* same adjustment as bottom line */
-    Sprintf(buf, "__ %s the %s __", tmpbuf,
+    Sprintf(buf, "%s the %s's atttributes:", tmpbuf,
 	    (flags.female && urole.name.f) ? urole.name.f : urole.name.m);
 
     en_win = create_nhwindow(NHW_MENU);
     /* title */
-    putstr(en_win, 0, buf);	/* "__ Conan the Archeologist __" */
+    putstr(en_win, 0, buf);	/* "Conan the Archeologist's attributes:" */
     /* background and characteristics; ^X or end-of-game disclosure */
     if (mode & BASICENLIGHTENMENT) {
 	/* role, race, alignment, deities */
@@ -1190,7 +1190,7 @@ int final;
     you_are(buf, "");
 
     /* report alignment (bypass you_are() in order to omit ending period) */
-    Sprintf(buf, "You %s%s, %son a mission for %s",
+    Sprintf(buf, " You %s%s, %son a mission for %s",
 	    !final ? are : were, align_str(u.ualign.type),
 	    /* helm of opposite alignment (might hide conversion) */
 	    (u.ualign.type != u.ualignbase[A_CURRENT]) ? "temporarily " :
@@ -1203,7 +1203,7 @@ int final;
     /* show the rest of this game's pantheon (finishes previous sentence)
        [appending "also Moloch" at the end would allow for straightforward
        trailing "and" on all three aligned entries but looks too verbose] */
-    Sprintf(buf, "who %s opposed by", !final ? "is" : "was");
+    Sprintf(buf, " who %s opposed by", !final ? "is" : "was");
     if (u.ualign.type != A_LAWFUL)
 	Sprintf(eos(buf), " %s (%s) and",
 		align_gname(A_LAWFUL), align_str(A_LAWFUL));
@@ -1230,7 +1230,7 @@ int final;
 	difalgn &= ~1;	/* suppress helm from "started out <foo>" message */
     }
     if (difgend || difalgn) {	/* sex change or perm align change or both */
-	Sprintf(buf, "You started out %s%s%s.",
+	Sprintf(buf, " You started out %s%s%s.",
 		difgend ? genders[flags.initgend].adj : "",
 		(difgend && difalgn) ? " and " : "",
 		difalgn ? align_str(u.ualignbase[A_ORIGINAL]) : "");
@@ -2007,7 +2007,6 @@ int final;
 	/* Create the conduct window */
 	en_win = create_nhwindow(NHW_MENU);
 	putstr(en_win, 0, "Voluntary challenges:");
-	putstr(en_win, 0, "");
 
 	if (!u.uconduct.food)
 	    enl_msg(You_, "have gone", "went", " without food", "");
