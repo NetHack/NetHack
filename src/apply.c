@@ -689,7 +689,7 @@ register xchar x, y;
 			/* life-saving doesn't ordinarily reset this */
 			if (mtmp->mhp > 0) u.uconduct.killer = save_pacifism;
 		    } else {
-			pline("%s chokes on the leash!", Monnam(mtmp));
+			pline("%s is choked by the leash!", Monnam(mtmp));
 			/* tameness eventually drops to 1 here (never 0) */
 			if (mtmp->mtame && rn2(mtmp->mtame)) mtmp->mtame--;
 		    }

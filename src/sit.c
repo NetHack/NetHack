@@ -292,8 +292,11 @@ dosit()
 		struct obj *uegg;
 
 		if (!flags.female) {
+		    if(Hallucination)
+pline("You may think you are a platypus but a male still can't lay eggs!");
+		    else
 			pline("Males can't lay eggs!");
-			return 0;
+		    return 0;
 		}
 
 		if (u.uhunger < (int)objects[EGG].oc_nutrition) {

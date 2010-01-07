@@ -415,7 +415,7 @@ dodrink()
 	/* Or are you surrounded by water? */
 	if (Underwater && !u.uswallow) {
 		if (yn("Drink the water around you?") == 'y') {
-		    pline("Do you know what lives in this water!");
+		    pline("Do you know what lives in this water?");
 			return 1;
 		}
 	}
