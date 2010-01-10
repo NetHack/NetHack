@@ -122,9 +122,12 @@ STATIC_DCL int FDECL(swallow_to_glyph, (int, int));
 STATIC_DCL void FDECL(display_warning,(struct monst *));
 
 STATIC_DCL int FDECL(check_pos, (int, int, int));
+
+/*#define WA_VERBOSE*/	/* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
 STATIC_DCL boolean FDECL(more_than_one, (int, int, int, int, int));
 #endif
+
 STATIC_DCL int FDECL(set_twall, (int,int, int,int, int,int, int,int));
 STATIC_DCL int FDECL(set_wall, (int, int, int));
 STATIC_DCL int FDECL(set_corn, (int,int, int,int, int,int, int,int));
@@ -1588,8 +1591,6 @@ glyph_at(x, y)
 
 /* ------------------------------------------------------------------------- */
 /* Wall Angle -------------------------------------------------------------- */
-
-/*#define WA_VERBOSE*/	/* give (x,y) locations for all "bad" spots */
 
 #ifdef WA_VERBOSE
 
