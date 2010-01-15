@@ -140,6 +140,12 @@ char *argv[];
 		read_config_file(SYSCF_FILE, SET_IN_SYS);
 		initoptions_finish();
 #endif
+#ifdef PANICTRACE
+		ARGV0 = argv[0];	/* save for possible stack trace */
+# ifndef NO_SIGNAL
+		panictrace_setsignals(TRUE);
+# endif
+#endif
 		prscore(argc, argv);
 		exit(EXIT_SUCCESS);
 	    }
@@ -164,6 +170,12 @@ char *argv[];
 	read_config_file(SYSCF_FILE, SET_IN_SYS);
 #endif
 	initoptions_finish();
+#ifdef PANICTRACE
+	ARGV0 = argv[0];	/* save for possible stack trace */
+# ifndef NO_SIGNAL
+	panictrace_setsignals(TRUE);
+# endif
+#endif
 	exact_username = whoami();
 
 	/*

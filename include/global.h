@@ -1,5 +1,4 @@
 /* NetHack 3.5	global.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)global.h	3.5	2007/01/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -365,5 +364,19 @@ struct savefile_info {
 
 #define MAXMONNO	120	/* extinct monst after this number created */
 #define MHPMAX		500	/* maximum monster hp */
+
+#ifdef BETA
+/* see end.c */
+# ifndef PANICTRACE
+#  define PANICTRACE
+# endif
+#endif
+/* The following are meaningless if PANICTRACE is not defined: */
+#if defined(__linux__) && defined(__GLIBC__) && (__GLIBC__ >= 2)
+# define PANICTRACE_GLIBC
+#endif
+#ifdef UNIX
+# define PANICTRACE_GDB
+#endif
 
 #endif /* GLOBAL_H */

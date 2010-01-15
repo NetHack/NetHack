@@ -2119,6 +2119,24 @@ int		src;
 		return 0;
 	    }
 	    sysopt.pointsmin = temp;
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "PANICTRACE_GLIBC", 16)) {
+	    int temp = atoi(bufp);
+	    if(temp < 1 || temp > 2){
+		raw_printf("Illegal value in PANICTRACE_GLIBC (not 0,1,2).");
+		return 0;
+	    }
+	    sysopt.panictrace_glibc = temp;
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "PANICTRACE_GDB", 14)) {
+	    int temp = atoi(bufp);
+	    if(temp < 1 || temp > 2){
+		raw_printf("Illegal value in PANICTRACE_GDB (not 0,1,2).");
+		return 0;
+	    }
+	    sysopt.panictrace_gdb = temp;
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "GDBPATH", 7)) {
+	    if(sysopt.gdbpath) free(sysopt.gdbpath);
+	    sysopt.gdbpath = (char*)alloc(strlen(bufp)+1);
+	    Strcpy(sysopt.gdbpath, bufp);
 #endif
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,

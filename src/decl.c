@@ -326,6 +326,10 @@ NEARDATA struct savefile_info sfrestinfo, sfsaveinfo = {
 #endif
 };
 
+#ifdef PANICTRACE
+char *ARGV0;
+#endif
+
 /* dummy routine used to force linkage */
 void
 decl_init()

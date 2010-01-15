@@ -1,5 +1,4 @@
 /* NetHack 3.5	end.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)end.c	3.5	2008/02/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -61,18 +60,188 @@ extern void FDECL(nethack_exit,(int));
 
 #define done_stopprint program_state.stopprint
 
+#ifndef PANICTRACE
+# define NH_abort NH_abort_
+#endif
+
 #ifdef AMIGA
-# define NH_abort()	Abort(0)
+# define NH_abort_()	Abort(0)
 #else
 # ifdef SYSV
-# define NH_abort()	(void) abort()
+# define NH_abort_()	(void) abort()
 # else
 #  ifdef WIN32
-# define NH_abort()	win32_abort()
+# define NH_abort_()	win32_abort()
 #  else
-# define NH_abort()	abort()
+# define NH_abort_()	abort()
 #  endif
 # endif
+#endif
+
+#ifdef PANICTRACE
+# include <errno.h>
+# ifdef PANICTRACE_GLIBC
+#  include <execinfo.h>
+# endif
+
+/* What do we try and in what order?  Tradeoffs:
+ * glibc: +no external programs required
+ *        -requires newish glibc
+ *        -requires -rdynamic
+ * gdb:   +gives more detailed information
+ *        +works on more OS versions
+ *        -requires -g, which may preclude -O on some compilers
+ */
+# ifdef SYSCF
+#  define SYSOPT_PANICTRACE_GDB sysopt.panictrace_gdb
+#  ifdef PANICTRACE_GLIBC
+#   define SYSOPT_PANICTRACE_GLIBC sysopt.panictrace_glibc
+#  else
+#   define SYSOPT_PANICTRACE_GLIBC 0
+#  endif
+# else
+#  define SYSOPT_PANICTRACE_GDB (nh_getenv("NETHACK_USE_GDB")==0?0:2)
+#  ifdef PANICTRACE_GLIBC
+#   define SYSOPT_PANICTRACE_GLIBC 1
+#  else
+#   define SYSOPT_PANICTRACE_GLIBC 0
+#  endif
+# endif
+
+static void NDECL(NH_abort);
+#ifndef NO_SIGNAL
+static void FDECL(panictrace_handler, (int));
+#endif
+static boolean NDECL(NH_panictrace_glibc);
+static boolean NDECL(NH_panictrace_gdb);
+
+#ifndef NO_SIGNAL
+/*ARGSUSED*/
+void
+panictrace_handler(sig_unused)   /* called as signal() handler, so sent at least one arg */
+int sig_unused;
+{
+# define SIG_MSG "\nSignal received.\n"
+	(void) write(2, SIG_MSG, sizeof(SIG_MSG)-1);
+	NH_abort();
+}
+
+void
+panictrace_setsignals(set)
+boolean set;
+{
+# define SETSIGNAL(sig) (void) signal(sig, set?(SIG_RET_TYPE)panictrace_handler:SIG_DFL);
+#  ifdef SIGILL
+	SETSIGNAL(SIGILL);
+#  endif
+#  ifdef SIGTRAP
+	SETSIGNAL(SIGTRAP);
+#  endif
+#  ifdef SIGIOT
+	SETSIGNAL(SIGIOT);
+#  endif
+#  ifdef SIGBUS
+	SETSIGNAL(SIGBUS);
+#  endif
+#  ifdef SIGFPE
+	SETSIGNAL(SIGFPE);
+#  endif
+#  ifdef SIGSEGV
+	SETSIGNAL(SIGSEGV);
+#  endif
+#  ifdef SIGSTKFLT
+	SETSIGNAL(SIGSTKFLT);
+#  endif
+#  ifdef SIGSYS
+	SETSIGNAL(SIGSYS);
+#  endif
+#  ifdef SIGEMT
+	SETSIGNAL(SIGEMT);
+#  endif
+# undef SETSIGNAL
+}
+#endif
+
+static void
+NH_abort(){
+	int gdb_prio = SYSOPT_PANICTRACE_GDB;
+	int glibc_prio = SYSOPT_PANICTRACE_GLIBC;
+	static boolean aborting = FALSE;
+
+	if(aborting) return;
+	aborting = TRUE;
+
+	if(gdb_prio == glibc_prio && gdb_prio > 0) gdb_prio++;
+
+	if(gdb_prio > glibc_prio){
+		NH_panictrace_gdb() || (glibc_prio && NH_panictrace_glibc());
+	} else {
+		NH_panictrace_glibc() || (gdb_prio && NH_panictrace_gdb());
+	}
+
+	panictrace_setsignals(FALSE);
+	NH_abort_();
+}
+
+static boolean
+NH_panictrace_glibc(){
+# ifdef PANICTRACE_GLIBC
+	void *bt[20];
+	size_t count;
+	char **info;
+	int x;
+
+	raw_print("Generating more information you may report:\n");
+	count = backtrace(bt, SIZE(bt));
+	info = backtrace_symbols(bt, count);
+	for(x=0; x<count; x++){
+		raw_printf("[%d] %s",x,info[x]);
+	}
+	/* free(info);	Don't risk it. */
+	return TRUE;
+# else
+	return FALSE;
+# endif
+}
+
+# ifdef PANICTRACE_GDB
+/* I'm going to assume /bin/grep is the right path for grep. */
+#  ifdef SYSCF
+#   define GDBPATH sysopt.gdbpath
+#  else
+#   ifndef GDBPATH
+#    define GDBPATH "/usr/bin/gdb"
+#   endif
+#  endif
+# endif
+
+static boolean
+NH_panictrace_gdb(){
+# ifdef PANICTRACE_GDB
+	/* A (more) generic method to get a stack trace - invoke
+	 * gdb on ourself. */
+	char *gdbpath = GDBPATH;
+	char buf[BUFSZ];
+
+	if(gdbpath == NULL || gdbpath[0] == 0) return FALSE;
+
+	sprintf(buf, "%s -n -q %s %d 2>&1 | /bin/grep '^#'",
+			GDBPATH, ARGV0, getpid());
+	FILE *gdb = popen(buf, "w");
+	if(gdb){
+		raw_print("Generating more information you may report:\n");
+		fprintf(gdb, "bt\nquit\ny");
+		fflush(gdb);
+		sleep(4);	/* ugly */
+		pclose(gdb);
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+# else
+	return FALSE;
+# endif
+}
 #endif
 
 /*
@@ -295,7 +464,7 @@ int how;
 }
 
 #if defined(WIN32) && !defined(SYSCF)
-#define NOTIFY_NETHACK_BUGS
+# define NOTIFY_NETHACK_BUGS
 #endif
 
 /*VARARGS1*/

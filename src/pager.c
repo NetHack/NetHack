@@ -1,5 +1,4 @@
 /* NetHack 3.5	pager.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)pager.c	3.5	2009/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -897,7 +896,7 @@ docontact()
 		putstr(cwin, 0, "");
 	} else if(sysopt.wizards){
 		char *tmp = build_english_list(sysopt.wizards);
-		Sprintf(buf, "To contact local support, %s", tmp);
+		Sprintf(buf, "To contact local support, contact %s.", tmp);
 		free(tmp);
 		putstr(cwin, 0, buf);
 		putstr(cwin, 0, "");

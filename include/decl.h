@@ -1,5 +1,4 @@
 /* NetHack 3.5	decl.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)decl.h	3.5	2008/07/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -389,6 +388,10 @@ struct autopickup_exception {
 	struct autopickup_exception *next;
 };
 #endif /* AUTOPICKUP_EXCEPTIONS */
+
+#ifdef PANICTRACE
+E char *ARGV0;
+#endif
 
 #undef E
 

@@ -643,6 +643,9 @@ E void FDECL(dealloc_killer, (struct kinfo*));
 E void FDECL(save_killers, (int,int));
 E void FDECL(restore_killers, (int));
 E char *FDECL(build_english_list, (char *));
+#if defined(PANICTRACE) && !defined(NO_SIGNAL)
+E void FDECL(panictrace_setsignals, (boolean));
+#endif
 
 /* ### engrave.c ### */
 

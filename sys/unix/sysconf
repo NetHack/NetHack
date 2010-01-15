@@ -7,7 +7,7 @@
 
 # Which users can use WIZARD (debugging) mode (the -D flag).
 # A value of * allows anyone to enter debugging mode.
-WIZARDS=root,games
+WIZARDS=root games
 
 # Users allowed to use the ! (shell escape) command or to suspend the game.
 # Uses the same syntax as the WIZARDS option above.
@@ -35,3 +35,14 @@ MAXPLAYERS=10
 # Determine identity of "person" in the score file with name (0) or
 # numeric (1) user id.
 #PERS_IS_UID=1
+
+# Try to get more info in case of a program bug or crash.  Using GDB can
+# get more information and works on more systems but requires gdb be available;
+# using GLIBC only works if NetHack is linked with glibc.  Both require
+# certain compilation options.  See src/end.c and sys/unix/hints/* for
+# more information.
+GDBPATH=/usr/bin/gdb
+# Values are priorities: 0 - do not use this method, 1 - low priority,
+# 2 - high priority.  Non-zero priority methods are tried in order.
+PANICTRACE_GDB=1
+PANICTRACE_GLIBC=2

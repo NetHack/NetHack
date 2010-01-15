@@ -682,7 +682,7 @@ STATIC_PTR int
 wiz_panic(VOID_ARGS)
 {
 	if (yn("Do you want to call panic() and end your game?") == 'y')
-		panic("crash test.");
+		panic("Crash test.");
         return 0;
 }
 

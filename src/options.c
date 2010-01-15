@@ -1,5 +1,4 @@
 /* NetHack 3.5	options.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)options.c	3.5	2008/08/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -532,7 +531,7 @@ boolean val_allowed;
 /* most environment variables will eventually be printed in an error
  * message if they don't work, and most error message paths go through
  * BUFSZ buffers, which could be overflowed by a maliciously long
- * environment variable.  if a variable can legitimately be long, or
+ * environment variable.  If a variable can legitimately be long, or
  * if it's put in a smaller buffer, the responsible code will have to
  * bounds-check itself.
  */

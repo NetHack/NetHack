@@ -9,15 +9,19 @@
 # for Ubuntu dapper.
 
 
-HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
-SHELLDIR = $(PREFIX)/games
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
+HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+SHELLDIR = $(PREFIX)/games
 
-CFLAGS=-O -I../include -DNOTPARMDECL $(CFLAGS1) -DDLB
+CFLAGS=-g -O -I../include -DNOTPARMDECL $(CFLAGS1) -DDLB
 CFLAGS1=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
 
 LINK=$(CC)
+# Only needed for GLIBC stack trace:
+LFLAGS=-rdynamic
 
 WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)

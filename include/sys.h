@@ -1,5 +1,4 @@
 /* NetHack 3.5	sys.h	$Date$  $Revision$ */
-/*    SCCS Id: @(#)sys.h      3.5     2008/01/30      */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,6 +20,14 @@ struct sysopt {
 	int pers_is_uid;
 	int entrymax;
 	int pointsmin;
+#ifdef PANICTRACE
+		/* panic options */
+	char *gdbpath;
+	int  panictrace_gdb;
+# ifdef PANICTRACE_GLIBC
+	int panictrace_glibc;
+# endif
+#endif
 };
 E struct sysopt sysopt;
 
