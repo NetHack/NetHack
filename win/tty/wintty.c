@@ -137,6 +137,7 @@ struct window_procs tty_procs = {
     genl_status_threshold,
 # endif
 #endif
+    genl_can_suspend_yes,
 };
 
 static int maxwin = 0;			/* number of windows in use */

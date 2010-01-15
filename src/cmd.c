@@ -109,6 +109,8 @@ extern int NDECL(dozap); /**/
 extern int NDECL(doorganize); /**/
 #endif /* DUMB */
 
+static int NDECL(dosuspend_core); /**/
+
 static int NDECL((*timed_occ_fn));
 
 STATIC_PTR int NDECL(doprev_message);
@@ -2124,9 +2126,7 @@ static const struct func_tab cmdlist[] = {
 	{C('w'), TRUE, wiz_wish},
 #endif
 	{C('x'), TRUE, doattributes},
-#ifdef SUSPEND
-	{C('z'), TRUE, dosuspend},
-#endif
+	{C('z'), TRUE, dosuspend_core},
 	{'a', FALSE, doapply},
 	{'A', FALSE, doddoremarm},
 	{M('a'), TRUE, doorganize},
@@ -3584,6 +3584,18 @@ char def;
 	(void) strncpy(qbuf, query, QBUFSZ-1 - 3);
 	Strcpy(&qbuf[QBUFSZ-1 - 3], "...");
 	return (*windowprocs.win_yn_function)(qbuf, resp, def);
+}
+
+int
+dosuspend_core(){
+#ifdef SUSPEND
+		/* Does current window system support suspend? */
+	if( (*windowprocs.win_can_suspend)()){
+			/* NB: SYSCF SHELLERS handled in port code. */
+		dosuspend();
+	} else
+#endif
+		Norep("Suspend command not available.");
 }
 
 /*cmd.c*/

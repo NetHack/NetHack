@@ -90,6 +90,7 @@ struct window_procs Gnome_procs = {
     genl_status_threshold,
 # endif
 #endif
+    genl_can_suspend_yes,
 };
 
 /*  

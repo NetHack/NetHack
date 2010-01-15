@@ -80,6 +80,7 @@ struct window_procs {
     void FDECL((*win_status_threshold), (int,int,anything,int,int,int));
 # endif
 #endif
+    boolean NDECL((*win_can_suspend));
 };
 
 extern

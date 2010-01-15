@@ -93,6 +93,7 @@ struct window_procs amii_procs =
     genl_status_threshold,
 # endif
 #endif
+    genl_can_suspend_yes,
 };
 
 /* The view window layout uses the same function names so we can use
@@ -164,6 +165,7 @@ struct window_procs amiv_procs =
     genl_status_threshold,
 # endif
 #endif
+    genl_can_suspend_yes,
 };
 
 unsigned short amii_initmap[ AMII_MAXCOLORS ];

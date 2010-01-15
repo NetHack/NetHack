@@ -173,6 +173,7 @@ struct window_procs X11_procs = {
     genl_status_threshold,
 # endif
 #endif
+    genl_can_suspend_no,	/* XXX may not always be correct */
 };
 
 /*

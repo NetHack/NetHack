@@ -9,11 +9,11 @@
 # A value of * allows anyone to enter debugging mode.
 WIZARDS=root,games
 
-# Users allowed to use the ! (shell escape) command.  Uses the same syntax
-# as the WIZARDS option above.
+# Users allowed to use the ! (shell escape) command or to suspend the game.
+# Uses the same syntax as the WIZARDS option above.
 #SHELLERS=
 
-# Limit the number of simultaneous games (see also and nethack.sh).
+# Limit the number of simultaneous games (see also nethack.sh).
 MAXPLAYERS=10
 
 # If not null, added to string "To get local support, " in the support

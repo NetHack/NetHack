@@ -136,6 +136,7 @@ struct window_procs mswin_procs = {
     genl_status_threshold,
 # endif
 #endif
+    genl_can_suspend_yes,
 };
 
 

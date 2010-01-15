@@ -111,6 +111,7 @@ struct window_procs Gem_procs = {
     genl_status_threshold,
 # endif
 #endif
+    genl_can_suspend_no,
 };
 
 #ifdef MAC

@@ -88,6 +88,16 @@ struct win_choices {
     { 0, 0 }		/* must be last */
 };
 
+boolean
+genl_can_suspend_no(){
+    return FALSE;
+}
+
+boolean
+genl_can_suspend_yes(){
+    return TRUE;
+}
+
 STATIC_OVL
 void
 def_raw_print(s)
@@ -316,6 +326,7 @@ static struct window_procs hup_procs = {
     genl_status_threshold,
 #  endif
 # endif /* STATUS_VIA_WINDOWPORT */
+    genl_can_suspend_no,
 };
 
 static void FDECL((*previnterface_exit_nhwindows), (const char *)) = 0;

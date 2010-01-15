@@ -2574,6 +2574,8 @@ E boolean FDECL(mwelded, (struct obj *));
 /* ### windows.c ### */
 
 E void FDECL(choose_windows, (const char *));
+E boolean NDECL(genl_can_suspend_no);
+E boolean NDECL(genl_can_suspend_yes);
 E char FDECL(genl_message_menu, (CHAR_P,int,const char *));
 E void FDECL(genl_preference_update, (const char *));
 E char *FDECL(genl_getmsghistory, (BOOLEAN_P));

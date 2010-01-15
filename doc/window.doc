@@ -488,6 +488,9 @@ suspend_nhwindows(str)
 		-- Prepare the window to be suspended.
 resume_nhwindows()
 		-- Restore the windows after being suspended.
+can_suspend()   -- Tell the core if the window system will allow the game
+                   to be suspended now.  If unconditionally yes or no, use
+		   genl_can_suspend_yes() or genl_can_suspend_no().
 
 start_screen()	-- Only used on Unix tty ports, but must be declared for
 		   completeness.  Sets up the tty to work in full-screen
