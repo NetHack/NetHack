@@ -89,12 +89,12 @@ struct win_choices {
 };
 
 boolean
-genl_can_suspend_no(){
+genl_can_suspend_no(VOID_ARGS){
     return FALSE;
 }
 
 boolean
-genl_can_suspend_yes(){
+genl_can_suspend_yes(VOID_ARGS){
     return TRUE;
 }
 
