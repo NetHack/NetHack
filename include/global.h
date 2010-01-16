@@ -365,10 +365,13 @@ struct savefile_info {
 #define MAXMONNO	120	/* extinct monst after this number created */
 #define MHPMAX		500	/* maximum monster hp */
 
-#ifdef BETA
+/* PANICTRACE: Always defined for BETA but only for supported platforms. */
+#ifdef UNIX
+# ifdef BETA
 /* see end.c */
-# ifndef PANICTRACE
-#  define PANICTRACE
+#  ifndef PANICTRACE
+#   define PANICTRACE
+#  endif
 # endif
 #endif
 /* The following are meaningless if PANICTRACE is not defined: */
