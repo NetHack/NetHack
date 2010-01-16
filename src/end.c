@@ -55,7 +55,7 @@ STATIC_DCL boolean FDECL(should_query_disclose_option, (int,char *));
 #if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
 extern void FDECL(nethack_exit,(int));
 #else
-#define nethack_exit exit
+# define nethack_exit exit
 #endif
 
 #define done_stopprint program_state.stopprint
@@ -68,15 +68,15 @@ extern void FDECL(nethack_exit,(int));
 # define NH_abort_()	Abort(0)
 #else
 # ifdef SYSV
-# define NH_abort_()	(void) abort()
+#  define NH_abort_()	(void) abort()
 # else
 #  ifdef WIN32
-# define NH_abort_()	win32_abort()
+#   define NH_abort_()	win32_abort()
 #  else
-# define NH_abort_()	abort()
+#   define NH_abort_()	abort()
 #  endif
-# endif
-#endif
+# endif  /* !SYSV */
+#endif   /* !AMIGA */
 
 #ifdef PANICTRACE
 # include <errno.h>
@@ -109,19 +109,19 @@ extern void FDECL(nethack_exit,(int));
 # endif
 
 static void NDECL(NH_abort);
-#ifndef NO_SIGNAL
+# ifndef NO_SIGNAL
 static void FDECL(panictrace_handler, (int));
-#endif
+# endif
 static boolean NDECL(NH_panictrace_glibc);
 static boolean NDECL(NH_panictrace_gdb);
 
-#ifndef NO_SIGNAL
+# ifndef NO_SIGNAL
 /*ARGSUSED*/
 void
 panictrace_handler(sig_unused)   /* called as signal() handler, so sent at least one arg */
 int sig_unused;
 {
-# define SIG_MSG "\nSignal received.\n"
+#  define SIG_MSG "\nSignal received.\n"
 	(void) write(2, SIG_MSG, sizeof(SIG_MSG)-1);
 	NH_abort();
 }
@@ -130,7 +130,7 @@ void
 panictrace_setsignals(set)
 boolean set;
 {
-# define SETSIGNAL(sig) (void) signal(sig, set?(SIG_RET_TYPE)panictrace_handler:SIG_DFL);
+#  define SETSIGNAL(sig) (void) signal(sig, set?(SIG_RET_TYPE)panictrace_handler:SIG_DFL);
 #  ifdef SIGILL
 	SETSIGNAL(SIGILL);
 #  endif
@@ -158,9 +158,9 @@ boolean set;
 #  ifdef SIGEMT
 	SETSIGNAL(SIGEMT);
 #  endif
-# undef SETSIGNAL
+#  undef SETSIGNAL
 }
-#endif
+# endif	/* NO_SIGNAL */
 
 static void
 NH_abort(){
@@ -179,7 +179,9 @@ NH_abort(){
 		NH_panictrace_glibc() || (gdb_prio && NH_panictrace_gdb());
 	}
 
+# ifndef NO_SIGNAL
 	panictrace_setsignals(FALSE);
+# endif
 	NH_abort_();
 }
 
@@ -201,7 +203,7 @@ NH_panictrace_glibc(){
 	return TRUE;
 # else
 	return FALSE;
-# endif
+# endif  /* !PANICTRACE_GLIBC */
 }
 
 # ifdef PANICTRACE_GDB
@@ -212,8 +214,8 @@ NH_panictrace_glibc(){
 #   ifndef GDBPATH
 #    define GDBPATH "/usr/bin/gdb"
 #   endif
-#  endif
-# endif
+#  endif /* !SYSCF */
+# endif  /* PANICTRACE_GDB */
 
 static boolean
 NH_panictrace_gdb(){
@@ -240,9 +242,9 @@ NH_panictrace_gdb(){
 	}
 # else
 	return FALSE;
-# endif
+# endif  /* !PANICTRACE_GDB */
 }
-#endif
+#endif  /* PANICTRACE */
 
 /*
  * The order of these needs to match the macros in hack.h.
