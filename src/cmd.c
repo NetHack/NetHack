@@ -3596,6 +3596,7 @@ dosuspend_core(){
 	} else
 #endif
 		Norep("Suspend command not available.");
+	return 0;
 }
 
 /*cmd.c*/

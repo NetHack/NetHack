@@ -644,7 +644,7 @@ E void FDECL(save_killers, (int,int));
 E void FDECL(restore_killers, (int));
 E char *FDECL(build_english_list, (char *));
 #if defined(PANICTRACE) && !defined(NO_SIGNAL)
-E void FDECL(panictrace_setsignals, (boolean));
+E void FDECL(panictrace_setsignals, (BOOLEAN_P));
 #endif
 
 /* ### engrave.c ### */
