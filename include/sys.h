@@ -23,6 +23,7 @@ struct sysopt {
 #ifdef PANICTRACE
 		/* panic options */
 	char *gdbpath;
+	char *greppath;
 	int  panictrace_gdb;
 # ifdef PANICTRACE_GLIBC
 	int panictrace_glibc;

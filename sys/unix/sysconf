@@ -42,6 +42,7 @@ MAXPLAYERS=10
 # certain compilation options.  See src/end.c and sys/unix/hints/* for
 # more information.
 GDBPATH=/usr/bin/gdb
+GREPPATH=/bin/grep
 # Values are priorities: 0 - do not use this method, 1 - low priority,
 # 2 - high priority.  Non-zero priority methods are tried in order.
 PANICTRACE_GDB=1

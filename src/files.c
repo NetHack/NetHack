@@ -2119,6 +2119,7 @@ int		src;
 		return 0;
 	    }
 	    sysopt.pointsmin = temp;
+#ifdef PANICTRACE_GLIBC
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "PANICTRACE_GLIBC", 16)) {
 	    int temp = atoi(bufp);
 	    if(temp < 1 || temp > 2){
@@ -2126,6 +2127,7 @@ int		src;
 		return 0;
 	    }
 	    sysopt.panictrace_glibc = temp;
+#endif
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "PANICTRACE_GDB", 14)) {
 	    int temp = atoi(bufp);
 	    if(temp < 1 || temp > 2){
@@ -2137,6 +2139,10 @@ int		src;
 	    if(sysopt.gdbpath) free(sysopt.gdbpath);
 	    sysopt.gdbpath = (char*)alloc(strlen(bufp)+1);
 	    Strcpy(sysopt.gdbpath, bufp);
+	} else if ( (src==SET_IN_SYS) && match_varname(buf, "GREPPATH", 7)) {
+	    if(sysopt.greppath) free(sysopt.greppath);
+	    sysopt.greppath = (char*)alloc(strlen(bufp)+1);
+	    Strcpy(sysopt.greppath, bufp);
 #endif
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,

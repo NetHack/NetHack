@@ -207,12 +207,15 @@ NH_panictrace_glibc(){
 }
 
 # ifdef PANICTRACE_GDB
-/* I'm going to assume /bin/grep is the right path for grep. */
 #  ifdef SYSCF
 #   define GDBPATH sysopt.gdbpath
+#   define GREPPATH sysopt.greppath
 #  else
 #   ifndef GDBPATH
 #    define GDBPATH "/usr/bin/gdb"
+#   endif
+#   ifndef GREPPATH
+#    define GREPPATH "/bin/grep"
 #   endif
 #  endif /* !SYSCF */
 # endif  /* PANICTRACE_GDB */
@@ -223,12 +226,14 @@ NH_panictrace_gdb(){
 	/* A (more) generic method to get a stack trace - invoke
 	 * gdb on ourself. */
 	char *gdbpath = GDBPATH;
+	char *greppath = GREPPATH;
 	char buf[BUFSZ];
 
 	if(gdbpath == NULL || gdbpath[0] == 0) return FALSE;
+	if(greppath == NULL || greppath[0] == 0) return FALSE;
 
-	sprintf(buf, "%s -n -q %s %d 2>&1 | /bin/grep '^#'",
-			GDBPATH, ARGV0, getpid());
+	sprintf(buf, "%s -n -q %s %d 2>&1 | %s '^#'",
+			gdbpath, ARGV0, getpid(), greppath);
 	FILE *gdb = popen(buf, "w");
 	if(gdb){
 		raw_print("Generating more information you may report:\n");
