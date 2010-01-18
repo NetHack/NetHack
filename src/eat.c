@@ -1768,7 +1768,7 @@ struct obj *otmp;
 		    }
 		} else
 #endif
-#ifdef MAC	/* KMH -- Why should Unix have all the fun? */
+#if defined(MAC) || defined(MACOSX)	/* KMH -- Why should Unix have all the fun? */
 		if (otmp->otyp == APPLE) {
 			pline("Delicious!  Must be a Macintosh!");
 		} else

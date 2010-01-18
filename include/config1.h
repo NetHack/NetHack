@@ -33,7 +33,11 @@
 /*
  * Mac Stuff.
  */
-#ifdef macintosh	/*	Auto-defined symbol for MPW compilers (sc and mrc) */
+#if defined(__APPLE__) && defined(__MACH__)
+# define MACOSX
+#endif
+
+#ifdef macintosh	/* Auto-defined symbol for MPW compilers (sc and mrc) */
 # define MAC
 #endif
 
