@@ -584,8 +584,17 @@ wd_message()
 {
 	if (wiz_error_flag) {
 #ifdef WIZARD
+# ifdef SYSCF
+	    if (sysopt.wizards && sysopt.wizards[0]) {
+		char *tmp = build_english_list(sysopt.wizards);
+		pline("Only user%s %s may access debug (wizard) mode.",
+			index(sysopt.wizards, ' ')?"s":"", tmp);
+		free(tmp);
+	    } else
+# else
 		pline("Only user \"%s\" may access debug (wizard) mode.",
 		      WIZARD_NAME);
+# endif
 #else
 		pline("Debug mode is not available.");
 #endif
