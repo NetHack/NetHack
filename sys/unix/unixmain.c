@@ -575,6 +575,7 @@ authorize_wizard_mode()
 #endif
 	if (pw && !strcmp(pw->pw_name, WIZARD_NAME)) return TRUE;
 #endif	/* WIZARD */
+	wiz_error_flag = TRUE;	/* not being allowed into wizard mode */
 	return FALSE;
 }
 

@@ -1,5 +1,4 @@
 /* NetHack 3.5	vmsmain.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)vmsmain.c	3.5	2008/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* main.c - VMS NetHack */
@@ -454,6 +453,7 @@ authorize_wizard_mode()
 #ifdef WIZARD
 	if (!strcmpi(nh_getenv("USER"), WIZARD_NAME)) return TRUE;
 #endif
+	wiz_error_flag = TRUE;	/* not being allowed into wizard mode */
 	return FALSE;
 }
 
