@@ -1,5 +1,4 @@
 /* NetHack 3.5	pickup.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)pickup.c	3.5	2008/10/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1638,8 +1637,9 @@ lootcont:
      * 3.3.1 introduced directional looting for some things.
      */
     if (c != 'y' && mon_beside(u.ux, u.uy)) {
-	if (!get_adjacent_loc("Loot in what direction?", "Invalid loot location",
-			u.ux, u.uy, &cc)) return 0;
+	if (!get_adjacent_loc("Loot in what direction?",
+			      "Invalid loot location",
+			      u.ux, u.uy, &cc)) return 0;
 	if (cc.x == u.ux && cc.y == u.uy) {
 	    underfoot = TRUE;
 	    if (container_at(cc.x, cc.y, FALSE))
@@ -1654,6 +1654,10 @@ lootcont:
 	}
 	mtmp = m_at(cc.x, cc.y);
 	if (mtmp) timepassed = loot_mon(mtmp, &prev_inquiry, &prev_loot);
+	/* always use a turn when choosing a direction is impaired,
+	   even if you've successfully targetted a saddled creature
+	   and then answered "no" to the "remove its saddle?" prompt */
+	if (Confusion || Stunned) timepassed = 1;
 
 	/* Preserve pre-3.3.1 behaviour for containers.
 	 * Adjust this if-block to allow container looting

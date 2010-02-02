@@ -561,6 +561,10 @@ doopen()		/* try to open a door */
 	    return(1);
 	}
 
+	/* when choosing a direction is impaired, use a turn
+	   regardless of whether a door is successfully targetted */
+	if (Confusion || Stunned) res = 1;
+
 	door = &levl[cc.x][cc.y];
 	portcullis = (is_drawbridge_wall(cc.x, cc.y) >= 0);
 	if (Blind) {
@@ -688,6 +692,10 @@ doclose()		/* try to close a door */
 	    stumble_onto_mimic(mtmp);
 	    return(1);
 	}
+
+	/* when choosing a direction is impaired, use a turn
+	   regardless of whether a door is successfully targetted */
+	if (Confusion || Stunned) res = 1;
 
 	door = &levl[x][y];
 	portcullis = (is_drawbridge_wall(x, y) >= 0);

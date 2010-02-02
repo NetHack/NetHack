@@ -201,9 +201,9 @@ stethoscope applied to hiding mimic will bring it out of hiding
 rephrase "<artifact> evades your grasp" message if artifact is already held
 artifacts which subsequently evade your grasp/control after already being
 	worn or wielded become unworn/unwielded
-hero with lycanthropy is vulnerable to silver in human form as well as beast
+hero with lycanthropy is vulnerable to silver in both human and beast form
 changing alignment or shape triggers a check for equipment evading hero's grasp
-passive fire effects can damage attackers weapons
+passive fire effects can damage attackers' weapons
 wielded bow shouldn't affect outcome of kicked arrows
 ranged polearm hit can divide puddings and can use confuse monster effect
 charge for kicked shop-owned food if it gets used up taming a monster
@@ -283,7 +283,7 @@ wizard mode #monpolycontrol prompting asked about "it" when monster was unseen
 reprompt if player fails to make a menu choice during inventory identification
 seen eels who were stuck in isolated pools would never re-hide
 can no longer get both strength and resistance from eating one giant corpse
-aborting key/lock pick usage via ESC at direction prompt no longer use a move
+aborting key/lock pick usage via ESC at direction prompt no longer uses a move
 when probing from inside an engulfer, "not carrying anything" overlooked hero
 wearing or removing an amulet of restful sleep clobbered permanent sleepiness
 if attempt to select a co-aligned artifact for first divine gift fails because
@@ -325,6 +325,8 @@ spell attack by low-Int hero could inflict negative damage
 some wand/spell/breath zaps that hit a secret door failed to reveal it
 wand explosion feedback about adjacent door was phrased as if for a wand zap
 improve the message sequencing when a thrown poisoned weapon loses is poison
+attempting to open, close, or lock/unlock a door while confused or stunned
+	uses up a move regardless of whether direction choice finds a door
 
 
 Platform- and/or Interface-Specific Fixes
