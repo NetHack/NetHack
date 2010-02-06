@@ -327,6 +327,7 @@ wand explosion feedback about adjacent door was phrased as if for a wand zap
 improve the message sequencing when a thrown poisoned weapon loses is poison
 attempting to open, close, or lock/unlock a door while confused or stunned
 	uses up a move regardless of whether direction choice finds a door
+grammar fixes for vault guard messages given after player assigns guard a name
 
 
 Platform- and/or Interface-Specific Fixes

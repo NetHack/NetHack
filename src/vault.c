@@ -1,14 +1,10 @@
 /* NetHack 3.5	vault.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)vault.c	3.5	2007/08/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
 STATIC_DCL struct monst *NDECL(findgd);
-
-#define g_monnam(mtmp) \
-	x_monnam(mtmp, ARTICLE_NONE, (char *)0, SUPPRESS_IT, FALSE)
 
 STATIC_DCL boolean FDECL(clear_fcorr, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(restfakecorr,(struct monst *));
@@ -270,7 +266,7 @@ fnd:
 	gsensed = !canspotmon(guard);
 	if (!gsensed)
 	    pline("Suddenly one of the Vault's %s enters!",
-		  makeplural(g_monnam(guard)));
+		  makeplural(guard->data->mname));
 	else
 	    pline("Someone else has entered the Vault.");
 	newsym(guard->mx,guard->my);
@@ -463,7 +459,7 @@ struct monst *grd;
 
 	if(movedgold || fixed) {
 	    if(in_fcorridor(grd, grd->mx, grd->my) || cansee(grd->mx, grd->my))
-		pline_The("%s whispers an incantation.", g_monnam(grd));
+		pline("%s whispers an incantation.", noit_Monnam(grd));
 	    else You_hear("a distant chant.");
 	    if(movedgold)
 		pline("A mysterious force moves the gold into the vault.");
@@ -575,9 +571,9 @@ letknow:
 			You_hear("the shrill sound of a guard's whistle.");
 		    else
 			You(um_dist(grd->mx, grd->my, 2) ?
-			    "see an angry %s approaching." :
-			    "are confronted by an angry %s.",
-			    g_monnam(grd));
+			    "see %s approaching." : "are confronted by %s.",
+			    /* "an angry guard" */
+			    x_monnam(grd, ARTICLE_A, "angry", 0, FALSE));
 		    return(-1);
 		} else {
 		    if (!Deaf)
@@ -594,7 +590,7 @@ letknow:
 		  !egrd->gddone && !in_fcorridor(grd, u.ux, u.uy) &&
 		  levl[egrd->fakecorr[0].fx][egrd->fakecorr[0].fy].typ
 				 == egrd->fakecorr[0].ftyp) {
-		pline_The("%s, confused, disappears.", g_monnam(grd));
+		pline("%s, confused, disappears.", noit_Monnam(grd));
 		disappear_msg_seen = TRUE;
 		goto cleanup;
 	    }
@@ -779,7 +775,7 @@ cleanup:
 		if(!semi_dead && (in_fcorridor(grd, u.ux, u.uy) ||
 				     cansee(x, y))) {
 		    if (!disappear_msg_seen && see_guard)
-			pline("Suddenly, the %s disappears.", g_monnam(grd));
+			pline("Suddenly, %s disappears.", noit_mon_nam(grd));
 		    return(1);
 		}
 		return(-2);
