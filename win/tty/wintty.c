@@ -338,7 +338,7 @@ char** argv;
 
     ttyDisplay->lastwin = WIN_ERR;
 
-#if defined(SIGWINCH) && defined(CLIPPING)
+#if defined(SIGWINCH) && defined(CLIPPING) && !defined(NO_SIGNAL)
     (void) signal(SIGWINCH, winch);
 #endif
 

@@ -183,7 +183,9 @@ char *argv[];
 	 */
 	u.uhp = 1;	/* prevent RIP on early quits */
 	program_state.preserve_locks = 1;
+#ifndef NO_SIGNAL
 	sethanguphandler((SIG_RET_TYPE)hangup);
+#endif
 
 	process_options(argc, argv);	/* command line options */
 	init_nhwindows(&argc, argv);	/* now we can set up window system */
@@ -268,7 +270,9 @@ char *argv[];
 		const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
 
 		(void) chmod(fq_save,0);	/* disallow parallel restores */
+#ifndef NO_SIGNAL
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
+#endif
 #ifdef NEWS
 		if(iflags.news) {
 		    display_file(NEWS, FALSE);

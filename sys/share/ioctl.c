@@ -162,10 +162,10 @@ dosuspend()
 	   || !check_user_string(sysopt.shellers)
 	){
 		Norep("Suspend command not available.");
-		return;
+		return 0;
 	}
 #endif
-# ifdef SIGTSTP
+# if defined(SIGTSTP) && !defined(NO_SIGNAL)
 	if(signal(SIGTSTP, SIG_IGN) == SIG_DFL) {
 		suspend_nhwindows((char *)0);
 #  ifdef _M_UNIX

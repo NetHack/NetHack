@@ -298,8 +298,10 @@ int wt;
 		return(0);
 	}
 	/* fork succeeded; wait for child to exit */
+#ifndef NO_SIGNAL
 	(void) signal(SIGINT,SIG_IGN);
 	(void) signal(SIGQUIT,SIG_IGN);
+#endif
 	(void) wait( (int *) 0);
 #ifdef _M_UNIX
 	sco_mapoff();
@@ -307,9 +309,11 @@ int wt;
 #ifdef __linux__
 	linux_mapoff();
 #endif
+#ifndef NO_SIGNAL
 	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
-#ifdef WIZARD
+# ifdef WIZARD
 	if(wizard) (void) signal(SIGQUIT,SIG_DFL);
+# endif
 #endif
 	if(wt) {
 		raw_print("");

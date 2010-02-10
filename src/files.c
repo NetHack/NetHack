@@ -1281,13 +1281,23 @@ boolean uncomp;
 			uncomp ? "un" : "", filename);
 		return;
 	}
+# ifndef NO_SIGNAL
 	(void) signal(SIGINT, SIG_IGN);
 	(void) signal(SIGQUIT, SIG_IGN);
 	(void) wait((int *)&i);
 	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
-# ifdef WIZARD
+#  ifdef WIZARD
 	if (wizard) (void) signal(SIGQUIT, SIG_DFL);
-# endif
+#  endif
+#else
+	/* I don't think we can really cope with external compression
+	 * without signals, so we'll declare that compress failed and
+	 * go on.  (We could do a better job by forcing off external
+	 * compression if there are no signals, but we want this for
+	 * testing with FailSafeC
+	 */
+	i = 1;
+#endif
 	if (i == 0) {
 	    /* (un)compress succeeded: remove file left behind */
 	    if (uncomp)

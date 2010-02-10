@@ -228,13 +228,14 @@ NH_panictrace_gdb(){
 	char *gdbpath = GDBPATH;
 	char *greppath = GREPPATH;
 	char buf[BUFSZ];
+	FILE *gdb;
 
 	if(gdbpath == NULL || gdbpath[0] == 0) return FALSE;
 	if(greppath == NULL || greppath[0] == 0) return FALSE;
 
 	sprintf(buf, "%s -n -q %s %d 2>&1 | %s '^#'",
 			gdbpath, ARGV0, getpid(), greppath);
-	FILE *gdb = popen(buf, "w");
+	gdb = popen(buf, "w");
 	if(gdb){
 		raw_print("Generating more information you may report:\n");
 		fprintf(gdb, "bt\nquit\ny");
@@ -327,7 +328,9 @@ done2()
 #  endif
 # endif
 	    if ((c = ynq(tmp)) == 'y') {
+# ifndef NO_SIGNAL
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
+# endif
 		exit_nhwindows((char *)0);
 		NH_abort();
 	    } else if (c == 'q') done_stopprint++;
