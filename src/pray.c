@@ -1,5 +1,4 @@
 /* NetHack 3.5	pray.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)pray.c	3.5	2009/01/23	*/
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -815,6 +814,10 @@ gcrownu()
 	You_feel("unworthy.");
     }
     update_inventory();
+
+    /* lastly, confer an extra skill slot/credit beyond the
+       up-to-29 you can get from gaining experience levels */
+    add_weapon_skill(1);
     return;
 }
 #endif	/*ELBERETH*/
