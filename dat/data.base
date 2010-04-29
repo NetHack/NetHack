@@ -1,5 +1,4 @@
 # NetHack 3.5	data.base	$Date$  $Revision$
-#	SCCS Id: @(#)data.base	3.5	2007/04/29
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -4532,16 +4531,14 @@ slasher
 	On my grave, as now my bed.
 		[ Religio Medici, by Sir Thomas Browne ]
 slime mold
-	Slime mold or slime fungus, organism usually classified with
-	the fungi, but showing equal affinity to the protozoa.  Slime
-	molds have complex life cycles with an animal-like motile
-	phase, in which feeding and growth occur, and a plant-like
-	immotile reproductive phase.  The motile phase, commonly
-	found under rotting logs and damp leaves, consists of either
-	solitary amoebalike cells or a brightly colored multinucleate
-	mass of protoplasm called a plasmodium, which creeps about
-	and feeds by amoeboid movement.
-		[ The Concise Columbia Encyclopedia ]
+	Science fiction did not invent the slime molds, but it has
+	borrowed from them in using the idea of sheets of liquid, flowing
+	cytoplasm engulfing and dissolving every living thing they touch.
+	What fiction can only imagine, nature has produced, and only their
+	small size and dependence on coolness, moisture, and darkness has
+	kept the slime molds from ordinary observation, for they are common
+	enough.
+		[ Encyclopaedia Britannica, 1977 ]
 sling
 	And it came to pass, when the Philistine arose, and came and
 	drew nigh to meet David, that David hasted, and ran toward
