@@ -667,7 +667,7 @@ struct level_map {
 	{ "asmodeus",	&asmodeus_level },
 	{ "astral",	&astral_level },
 	{ "baalz",	&baalzebub_level },
-	{ "bigroom",	&bigroom_level },
+	{ "bigrm",	&bigroom_level },
 	{ "castle",	&stronghold_level },
 	{ "earth",	&earth_level },
 	{ "fakewiz1",	&portal_level },
