@@ -1,0 +1,235 @@
+.TH MAKEDEFS 6 "29 Apr 2010"
+.\" NetHack 3.5  makedefs.6	$Date$  $Revision$
+.UC 4
+.SH NAME
+makedefs \- NetHack miscellaneous build-time functions
+.SH SYNOPSIS
+.B makedefs
+{
+.B -o
+|
+.B -d
+|
+.B -e
+|
+.B -m
+|
+.B -v
+|
+.B -p
+|
+.B -q
+|
+.B -r
+|
+.B -h
+|
+.B -z
+}
+.P
+.B makedefs --input
+.I file
+.B --output
+.I file
+.BI -- command
+.SH DESCRIPTION
+.PP
+.B Makedefs
+is a build-time tool used for a variety of
+.BR NetHack (6)
+source file creation and modification tasks.  For historical reasons,
+.B makedefs
+takes two types of command lines.  When invoked with a short option, the
+files operated on are determined when
+.B makedefs
+is compiled.  When invoked with a long option, the
+.B --input
+and 
+.B --output
+options are used to specify the files for the
+.BI -- command.
+Each command is only available in one of the two formats.
+.SH SHORT COMMANDS
+Upper and lower case are both accepted for the short commands.
+.TP
+.B -o
+Generate
+.I onames.h.
+.br
+.TP
+.B -d
+Generate
+.I data.base.
+.br
+.TP
+.B -e
+Generate
+.I dungeon.pdf.
+The input file
+.I dungeon.def
+is passed through the
+same logic as that used by the
+.B --grep
+command; see the
+.B MDGREP FUNCTIONS
+section below for details.
+.br
+.TP
+.B -m
+Generate
+.I monster.c.
+.br
+.TP
+.B -v
+Generate
+.I date.h
+and
+.I options
+file.
+.br
+.TP
+.B -p
+Generate
+.I pm.h
+.br
+.TP
+.B -q
+Generate
+.IR quest.dat .
+.br
+.TP
+.B -r
+Generate the
+.I rumors
+file.
+.br
+.TP
+.B -h
+Generate the
+.B oracles
+file.
+.br
+.TP
+.B -z
+Generate
+.I vis_tab.c
+and
+.IR vis_tab.h .
+.SH LONG COMMANDS
+.TP
+.BI --input " file"
+Specify the input
+.I file
+for the command (if needed).  If the file is - standard
+input is read.
+.br
+.TP
+.BI --output " file"
+Specify the output
+.I file
+for the command (if needed).  If the file is - standard
+output is written.
+.br
+.TP
+.B --svs \fR[\fIdelimiter\fR]
+Generate a version string to standard output without a trailing newline.
+If specified, the delimiter is used between each part of the version string.
+.br
+.TP
+.B --grep
+Filter the input
+.I file to the output
+.IR file .
+See the
+.B MDGREP FUNCTIONS
+section below for information on controlling the filtering operation.
+.br
+.TP
+.B --grep-showvars
+Show the name and value for each variable known to the grep option.
+.br
+.TP
+.B --grep-trace
+Turn on debug tracing for the grep function (
+.B --grep
+must be specified as well).
+.br
+.TP
+.BI --grep-define " symbol"
+Force the value of
+.I symbol
+to be "defined."
+.I Symbol
+must already be known to
+.BR makedefs .
+.br
+.TP
+.BI --grep-undef " symbol"
+Force the definition of
+.I symbol
+to be "undefined."
+.I Symbol
+must already be known to
+.BR makedefs .
+.SH MDGREP FUNCTIONS
+The
+.B --grep
+command (and certain other commands) filter their input, on a line-by-line
+basis, according to control lines embedded in the input and on information
+gleaned from the
+.BR NetHack (6)
+configuration.  This allows certain changes such as embedding platform-specific
+documentation into the master documentation files.
+.P
+Rules:
+.RS
+.IP - 4
+The default conditional state is printing enabled.
+.IP - 4
+Any line
+.I NOT
+starting with a caret (^) is either suppressed or passed through unchanged
+depending on the current conditional state.
+.IP - 4
+Any line starting with a caret is a control line; as in C, zero or more spaces
+may be embedded in the line almost anywhere (except immediately after the
+caret); however the caret must be in column 1.
+.IP - 4
+Conditionals may be nested.
+.IP - 4
+.I Makedefs
+will exit with an error code if any errors are detected; processing will
+continue (if it can) to allow as many errors as possible to be detected.
+.IP - 4
+Unknown identifiers are treated as both TRUE and as an error.  Note that
+.BR --undef " or " #undef
+in the
+.BR NetHack (6)
+configuration are different from unknown.
+.RE
+.P
+Control lines:
+.RS
+.IP ^^ 4
+a line starting with a (single) literal caret
+.IP ^#
+a comment
+.IP ^?\fIID
+if the
+.I ID
+is defined set the conditional state to TRUE
+.IP ^!\fIID
+if the
+.I ID
+is not defined set the conditional state to TRUE
+.IP ^:
+else; invert the conditional state
+.IP ^.
+end the most recent conditional
+.RE
+.\".SH EXAMPLES
+.SH AUTHOR
+The NetHack Development Team
+.SH "SEE ALSO"
+.PP
+.BR dgn_comp (6)

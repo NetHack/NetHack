@@ -346,6 +346,41 @@ char	*options;
 
 }
 
+static char namebuf[1000];
+static char *
+name_file(template, tag)
+	char *template;
+	char *tag;
+{
+	Sprintf(namebuf, template, tag);
+	return namebuf;
+}
+
+static void
+delete_file(template, tag)
+	char *template;
+	char *tag;
+{
+	char *name = name_file(template, tag);
+	Unlink(name);
+}
+
+static FILE *
+getfp(template, tag, mode)
+	char *template;
+	char *tag;
+	char *mode;
+{
+	char *name = name_file(template, tag);
+	FILE *rv = fopen(name, mode);
+	if(!rv){
+		Fprintf(stderr, "Can't open '%s'.\n", name);
+		exit(EXIT_FAILURE);
+	}
+	return rv;
+}
+
+
 static FILE *inputfp;
 static FILE *outputfp;
 
@@ -677,10 +712,10 @@ do_grep_rewrite(buf)
 }
 #endif
 
+static void grep0(FILE *, FILE *);
+
 static void
 do_grep(){
-	char buf[16384];	/* looong, just in case */
-
 	if(!inputfp){
 		Fprintf(stderr,"--grep requires --input\n");
 	}
@@ -691,15 +726,25 @@ do_grep(){
 		exit(EXIT_FAILURE);
 	}
 
-	while(!feof(inputfp) && !ferror(inputfp)){
+	grep0(inputfp, outputfp);
+}
+
+static void
+grep0(inputfp0, outputfp0)
+	FILE *inputfp0;
+	FILE *outputfp0;
+{
+	char buf[16384];	/* looong, just in case */
+
+	while(!feof(inputfp0) && !ferror(inputfp0)){
 		char *tmp;
 		char *buf1;
 
-		if(fgets(buf, sizeof(buf), inputfp) == 0) break;
+		if(fgets(buf, sizeof(buf), inputfp0) == 0) break;
 		if( (tmp=strchr(buf,'\n')) ) *tmp = '\0';
 		grep_lineno++;
 		if(grep_trace){
-			Fprintf(outputfp, "%04d %c >%s\n",
+			Fprintf(outputfp0, "%04d %c >%s\n",
 				grep_lineno,
 				grep_writing?' ':'#',
 				buf
@@ -717,18 +762,18 @@ do_grep(){
 			do_grep_rewrite(buf1);
 #endif
 		if(grep_writing)
-			Fprintf(outputfp, "%s\n", buf1);
+			Fprintf(outputfp0, "%s\n", buf1);
 	}
-	if(ferror(inputfp)){
+	if(ferror(inputfp0)){
 		Fprintf(stderr, "read error!\n");
 		exit(EXIT_FAILURE);
 	}
-	if(ferror(outputfp)){
+	if(ferror(outputfp0)){
 		Fprintf(stderr, "write error!\n");
 		exit(EXIT_FAILURE);
 	}
-	fclose(inputfp);
-	fclose(outputfp);
+	fclose(inputfp0);
+	fclose(outputfp0);
 	if(grep_sp){
 		Fprintf(stderr, "%d unterminated conditional level%s\n",
 			grep_sp, grep_sp==1?"":"s");
@@ -1158,6 +1203,9 @@ static const char *build_opts[] = {
 #endif
 #ifdef COM_COMPL
 		"command line completion",
+#endif
+#ifdef LIFE
+		"Conway's Game of Life",
 #endif
 #ifdef COMPRESS
 		"data file compression",
@@ -1765,6 +1813,10 @@ do_dungeon()
 	}
 	Fprintf(ofp,Dont_Edit_Data);
 
+	tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
+	grep0(ifp, tfp);
+	ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
+	
 	while (fgets(in_line, sizeof in_line, ifp) != 0) {
 	    SpinCursor(3);
 
@@ -1790,6 +1842,7 @@ recheck:
 	Fclose(ifp);
 	Fclose(ofp);
 
+	delete_file(DATA_TEMPLATE, "grep.tmp");
 	return;
 }
 

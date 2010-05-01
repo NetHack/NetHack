@@ -1,6 +1,5 @@
 #	NetHack Makefile.
 # NetHack 3.5  Makefile.doc	$Date$  $Revision$
-#	SCCS Id: @(#)Makefile.doc	3.5	2007/05/25
 
 # Root of source tree:
 NHSROOT=..
@@ -68,12 +67,14 @@ LEVMANCREATE = cat lev_comp.6 | $(NHGREP) >
 DGNMANCREATE = cat dgn_comp.6 | $(NHGREP) >
 RCVRMANCREATE = cat recover.6 | $(NHGREP) >
 DLBMANCREATE = cat dlb.6 | $(NHGREP) >
+MDMANCREATE = cat makedefs.6 | $(NHGREP) >
 # manual installation for most SYSV-style systems
 # GAMEMANCREATE = cat nethack.6 | $(NHGREP) | nroff -man - >
 # LEVMANCREATE = cat lev_comp.6 | $(NHGREP) | nroff -man - >
 # DGNMANCREATE = cat dgn_comp.6 | $(NHGREP) | nroff -man - >
 # RCVRMANCREATE = cat recover.6 | $(NHGREP) | nroff -man - >
 # DLBMANCREATE = cat dlb.6 | $(NHGREP) | nroff -man - >
+MDMANCREATE = cat makedefs.6 | $(NHGREP) | nroff -man - >
 
 manpages:
 	-$(GAMEMANCREATE) $(MANDIR)/$(GAME).$(MANEXT)
@@ -81,9 +82,11 @@ manpages:
 	-$(DGNMANCREATE) $(MANDIR)/dgn_comp.$(MANEXT)
 	-$(RCVRMANCREATE) $(MANDIR)/recover.$(MANEXT)
 	-$(DLBMANCREATE) $(MANDIR)/dlb.$(MANEXT)
+	-$(MDMANCREATE) $(MANDIR)/makedefs.$(MANEXT)
 
 # manual creation for distribution
-DISTRIB = Guidebook.txt nethack.txt lev_comp.txt dgn_comp.txt recover.txt dlb.txt
+DISTRIB = Guidebook.txt nethack.txt lev_comp.txt dgn_comp.txt recover.txt \
+	dlb.txt makedefs.txt
 
 distrib: $(DISTRIB)
 	@echo "Plain text documentation is up to date."
@@ -101,6 +104,8 @@ recover.txt	: recover.6
 	cat recover.6 | $(MAN2TXT) > recover.txt
 dlb.txt		: dlb.6
 	cat dlb.6 | $(MAN2TXT) > dlb.txt
+makedefs.txt		: makedefs.6
+	cat makedefs.6 | $(MAN2TXT) > makedefs.txt
 
 clean:
 	-rm -f Guidebook.aux Guidebook.log
