@@ -74,7 +74,7 @@ MDMANCREATE = cat makedefs.6 | $(NHGREP) >
 # DGNMANCREATE = cat dgn_comp.6 | $(NHGREP) | nroff -man - >
 # RCVRMANCREATE = cat recover.6 | $(NHGREP) | nroff -man - >
 # DLBMANCREATE = cat dlb.6 | $(NHGREP) | nroff -man - >
-MDMANCREATE = cat makedefs.6 | $(NHGREP) | nroff -man - >
+# MDMANCREATE = cat makedefs.6 | $(NHGREP) | nroff -man - >
 
 manpages:
 	-$(GAMEMANCREATE) $(MANDIR)/$(GAME).$(MANEXT)

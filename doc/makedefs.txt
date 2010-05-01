@@ -1,0 +1,135 @@
+MAKEDEFS(6)                                                        MAKEDEFS(6)
+
+
+
+NAME
+       makedefs - NetHack miscellaneous build-time functions
+
+SYNOPSIS
+       makedefs { -o | -d | -e | -m | -v | -p | -q | -r | -h | -z }
+
+       makedefs --input file --output file --command
+
+DESCRIPTION
+       Makedefs  is  a build-time tool used for a variety of NetHack(6) source
+       file creation and modification tasks.  For historical reasons, makedefs
+       takes  two  types  of command lines.  When invoked with a short option,
+       the files operated on are determined when makedefs is  compiled.   When
+       invoked  with  a long option, the --input and --output options are used
+       to specify the files for the --command.  Each command is only available
+       in one of the two formats.
+
+SHORT COMMANDS
+       Upper and lower case are both accepted for the short commands.
+
+       -o     Generate onames.h.
+
+       -d     Generate data.base.
+
+       -e     Generate  dungeon.pdf.   The  input  file  dungeon.def is passed
+              through the same logic as that used by the --grep  command;  see
+              the MDGREP FUNCTIONS section below for details.
+
+       -m     Generate monster.c.
+
+       -v     Generate date.h and options file.
+
+       -p     Generate pm.h
+
+       -q     Generate quest.dat.
+
+       -r     Generate the rumors file.
+
+       -h     Generate the oracles file.
+
+       -z     Generate vis_tab.c and vis_tab.h.
+
+LONG COMMANDS
+       --input file
+              Specify the input file for the command (if needed).  If the file
+              is - standard input is read.
+
+       --output file
+              Specify the output file for the command  (if  needed).   If  the
+              file is - standard output is written.
+
+       --svs [delimiter]
+              Generate  a version string to standard output without a trailing
+              newline.  If specified, the delimiter is used between each  part
+              of the version string.
+
+       --grep Filter  the input file to the output file.  See the MDGREP FUNC
+              TIONS section below for information on controlling the filtering
+              operation.
+
+       --grep-showvars
+              Show  the  name  and  value  for each variable known to the grep
+              option.
+
+       --grep-trace
+              Turn on debug tracing for the grep function  (  --grep  must  be
+              specified as well).
+
+       --grep-define symbol
+              Force  the value of symbol to be "defined."  Symbol must already
+              be known to makedefs.
+
+       --grep-undef symbol
+              Force the definition of symbol to be "undefined."   Symbol  must
+              already be known to makedefs.
+
+MDGREP FUNCTIONS
+       The  --grep command (and certain other commands) filter their input, on
+       a line-by-line basis, according to control lines embedded in the  input
+       and  on  information  gleaned  from the NetHack(6) configuration.  This
+       allows certain changes such as embedding  platform-specific  documenta
+       tion into the master documentation files.
+
+       Rules:
+
+              -   The default conditional state is printing enabled.
+
+              -   Any  line NOT starting with a caret (^) is either suppressed
+                  or passed through unchanged depending on the current  condi
+                  tional state.
+
+              -   Any  line  starting with a caret is a control line; as in C,
+                  zero or more spaces may be embedded in the line almost  any
+                  where  (except  immediately  after  the  caret); however the
+                  caret must be in column 1.
+
+              -   Conditionals may be nested.
+
+              -   Makedefs will exit with an error  code  if  any  errors  are
+                  detected;  processing  will continue (if it can) to allow as
+                  many errors as possible to be detected.
+
+              -   Unknown identifiers are treated  as  both  TRUE  and  as  an
+                  error.   Note  that --undef or #undef in the NetHack(6) con
+                  figuration are different from unknown.
+
+       Control lines:
+
+              ^^  a line starting with a (single) literal caret
+
+              ^#  a comment
+
+              ^?ID
+                  if the ID is defined set the conditional state to TRUE
+
+              ^!ID
+                  if the ID is not defined set the conditional state to TRUE
+
+              ^:  else; invert the conditional state
+
+              ^.  end the most recent conditional
+
+AUTHOR
+       The NetHack Development Team
+
+SEE ALSO
+       dgn_comp(6)
+
+
+
+4th Berkeley Distribution         29 Apr 2010                      MAKEDEFS(6)
