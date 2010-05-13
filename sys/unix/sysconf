@@ -23,6 +23,9 @@ MAXPLAYERS=10
 # If not null, displayed at the end of a panic-save sequence.
 #RECOVER=Run the recover program.
 
+# Uncomment the next line to disable the SEDUCE option.
+#SEDUCE=0
+
 # Record (high score) file options.
 # CAUTION: changing these after people have started playing games can
 #  lead to lost high scores!

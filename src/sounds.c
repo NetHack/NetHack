@@ -779,17 +779,20 @@ register struct monst *mtmp;
 	    }
 	    break;
 	case MS_SEDUCE:
+	    {
+	    int swval;
 #ifdef SEDUCE
-	    if (ptr->mlet != S_NYMPH &&
+	    if (SYSOPT_SEDUCE) {
+	      if (ptr->mlet != S_NYMPH &&
 		could_seduce(mtmp, &youmonst, (struct attack *)0) == 1) {
 			(void) doseduce(mtmp);
 			break;
-	    }
-	    switch ((poly_gender() != (int) mtmp->female) ? rn2(3) : 0)
-#else
-	    switch ((poly_gender() == 0) ? rn2(3) : 0)
+	      }
+	      swval = ((poly_gender() != (int) mtmp->female) ? rn2(3) : 0);
+	    } else
 #endif
-	    {
+	      swval = ((poly_gender() == 0) ? rn2(3) : 0);
+	    switch(swval){
 		case 2:
 			verbl_msg = "Hello, sailor.";
 			break;
@@ -798,6 +801,7 @@ register struct monst *mtmp;
 			break;
 		default:
 			pline_msg = "cajoles you.";
+	    }
 	    }
 	    break;
 #ifdef KOPS

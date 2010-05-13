@@ -2092,6 +2092,15 @@ int		src;
 	    if(sysopt.recover) free(sysopt.recover);
 	    sysopt.recover = (char*)alloc(strlen(bufp)+1);
 	    Strcpy(sysopt.recover, bufp);
+	} else if ( match_varname(buf, "SEDUCE", 6)) {
+	    int temp = !!atoi(bufp);	/* XXX this could be tighter */
+		/* allow anyone to turn it off, but only sysconf to turn it on*/
+	    if(src!=SET_IN_SYS && temp!=0){
+		raw_printf("Illegal value in SEDUCE");
+		return 0;
+	    }
+	    sysopt.seduce = temp;
+	    sysopt_seduce_set(temp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "MAXPLAYERS", 10)) {
 	    int temp = atoi(bufp);
 		/* XXX to get more than 25, need to rewrite all lock code */

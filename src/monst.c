@@ -2548,14 +2548,16 @@ struct permonst _mons2[] = {
 	M3_INFRAVISIBLE|M3_INFRAVISION, CLR_BLUE),
 	/* standard demons & devils
 	 */
-#ifdef SEDUCE
-# define SEDUCTION_ATTACKS \
+#define SEDUCTION_ATTACKS_YES \
 	A(ATTK(AT_BITE, AD_SSEX, 0, 0), ATTK(AT_CLAW, AD_PHYS, 1, 3), \
 	  ATTK(AT_CLAW, AD_PHYS, 1, 3), NO_ATTK, NO_ATTK, NO_ATTK)
-#else
-# define SEDUCTION_ATTACKS \
+#define SEDUCTION_ATTACKS_NO \
 	A(ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_CLAW, AD_PHYS, 1, 3), \
 	  ATTK(AT_BITE, AD_DRLI, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK)
+#ifdef SEDUCE
+# define SEDUCTION_ATTACKS SEDUCTION_ATTACKS_YES
+#else
+# define SEDUCTION_ATTACKS SEDUCTION_ATTACKS_NO
 #endif
     MON("succubus", S_DEMON,
 	LVL(6, 12, 0, 70, -9), (G_NOCORPSE|1),
@@ -3479,6 +3481,10 @@ monst_init()
 {
     return;
 }
+
+struct attack sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
+struct attack sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
+
 #endif
 
 /*monst.c*/

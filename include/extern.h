@@ -2118,6 +2118,12 @@ E int FDECL(add_sound_mapping, (const char *));
 E void FDECL(play_sound_for_message, (const char *));
 #endif
 
+/* ### sys.c ### */
+
+#ifdef SYSCF
+E void FDECL(sysopt_seduce_set,(int));
+#endif
+
 /* ### sys/msdos/sound.c ### */
 
 #ifdef MSDOS

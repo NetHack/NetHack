@@ -29,8 +29,15 @@ struct sysopt {
 	int panictrace_glibc;
 # endif
 #endif
+	int seduce;
 };
 E struct sysopt sysopt;
+
+#ifdef SEDUCE
+# define SYSOPT_SEDUCE sysopt.seduce
+#else
+# define SYSOPT_SEDUCE 0
+#endif
 
 #endif /* SYS_H */
 

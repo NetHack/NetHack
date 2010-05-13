@@ -161,6 +161,7 @@
  *		ENTRYMAX	(max entries in the record file)
  *		POINTSMIN	(min points to get an entry)
  *		PERS_IS_UID	(0 or 1 - person is name or (numeric) userid)
+ *		SEDUCE		(0 or 1 - runtime disable/enable SEDUCE option)
  *
  *		The following options select how the config space is stored:
  *		SYSCF_FILE	in the named file

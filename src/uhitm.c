@@ -2075,7 +2075,8 @@ use_weapon:
 			/* succubi/incubi are humanoid, but their _second_
 			 * attack is AT_CLAW, not their first...
 			 */
-			if (i==1 && uwep && (u.umonnum == PM_SUCCUBUS ||
+			if (SYSOPT_SEDUCE && i==1 && uwep &&
+				(u.umonnum == PM_SUCCUBUS ||
 				u.umonnum == PM_INCUBUS)) goto use_weapon;
 #endif
 		case AT_KICK:

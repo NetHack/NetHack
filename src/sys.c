@@ -47,5 +47,25 @@ sys_early_init(){
 #  endif
 # endif
 #endif
+
+#ifdef SEDUCE
+	sysopt.seduce = 1;	/* if it's compiled in, default to on */
+	sysopt_seduce_set(sysopt.seduce);
+#endif
 }
 
+
+extern struct attack sa_yes[NATTK];
+extern struct attack sa_no[NATTK];
+
+void
+sysopt_seduce_set(val)
+	int val;
+{
+	struct attack *setval = val ? sa_yes : sa_no;
+	int x;
+	for(x=0; x<NATTK; x++){
+		mons[PM_INCUBUS].mattk[x] = setval[x];
+		mons[PM_SUCCUBUS].mattk[x] = setval[x];
+	}
+}

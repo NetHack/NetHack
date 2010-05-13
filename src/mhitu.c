@@ -1251,6 +1251,17 @@ dopois:
 		if(!mtmp->mcan) stealgold(mtmp);
 		break;
 
+#ifdef SEDUCE
+	    case AD_SSEX:
+		if(SYSOPT_SEDUCE){
+		if(could_seduce(mtmp, &youmonst, mattk) == 1
+			&& !mtmp->mcan)
+		    if (doseduce(mtmp))
+			return 3;
+		break;
+		}
+		/* else FALLTHRU */
+#endif
 	    case AD_SITM:	/* for now these are the same */
 	    case AD_SEDU:
 		if (is_animal(mtmp->data)) {
@@ -1259,7 +1270,7 @@ dopois:
 			/* Continue below */
 		} else if (dmgtype(youmonst.data, AD_SEDU)
 #ifdef SEDUCE
-			|| dmgtype(youmonst.data, AD_SSEX)
+			|| (SYSOPT_SEDUCE && dmgtype(youmonst.data, AD_SSEX))
 #endif
 						) {
 			pline("%s %s.", Monnam(mtmp), mtmp->minvent ?
@@ -1300,14 +1311,7 @@ dopois:
 			return 3;
 		}
 		break;
-#ifdef SEDUCE
-	    case AD_SSEX:
-		if(could_seduce(mtmp, &youmonst, mattk) == 1
-			&& !mtmp->mcan)
-		    if (doseduce(mtmp))
-			return 3;
-		break;
-#endif
+
 	    case AD_SAMU:
 		hitmsg(mtmp, mattk);
 		/* when the Wiz hits, 1/20 steals the amulet */
@@ -2196,7 +2200,7 @@ struct attack *mattk;
 
 	if(agrinvis && !defperc
 #ifdef SEDUCE
-		&& mattk && mattk->adtyp != AD_SSEX
+		&& (!SYSOPT_SEDUCE || ( mattk && mattk->adtyp != AD_SSEX))
 #endif
 		)
 		return 0;
@@ -2204,7 +2208,7 @@ struct attack *mattk;
 	if(pagr->mlet != S_NYMPH
 		&& ((pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
 #ifdef SEDUCE
-		    || (mattk && mattk->adtyp != AD_SSEX)
+		    || (SYSOPT_SEDUCE && mattk && mattk->adtyp != AD_SSEX)
 #endif
 		   ))
 		return 0;
