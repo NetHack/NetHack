@@ -1,5 +1,4 @@
 /* NetHack 3.5	eat.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)eat.c	3.5	2008/07/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1640,14 +1639,21 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 		(Stone_resistance || Hallucination)) {
 	    pline("This tastes just like chicken!");
 	} else {
+	    /* [is this right?  omnivores end up always disliking the taste] */
+	    boolean yummy = (vegan(&mons[mnum]) ?
+				(!carnivorous(youmonst.data) &&
+					herbivorous(youmonst.data)) :
+				(carnivorous(youmonst.data) &&
+					!herbivorous(youmonst.data)));
+
 	    pline("%s%s %s!",
 		  type_is_pname(&mons[mnum]) ? "" :
 		    the_unique_pm(&mons[mnum]) ? "The " : "This ",
 		  food_xname(otmp, FALSE),
-		  (vegan(&mons[mnum]) ?
-		   (!carnivorous(youmonst.data) && herbivorous(youmonst.data)) :
-		   (carnivorous(youmonst.data) && !herbivorous(youmonst.data)))
-		  ? "is delicious" : "tastes terrible");
+		  Hallucination ?
+		   (yummy ? ((u.umonnum == PM_TIGER) ? "is gr-r-reat" :
+			     "is gnarly") : "is grody") :
+		   (yummy ? "is delicious" : "tastes terrible"));
 	}
 
 	return(retcode);
