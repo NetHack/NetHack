@@ -328,6 +328,9 @@ improve the message sequencing when a thrown poisoned weapon loses is poison
 attempting to open, close, or lock/unlock a door while confused or stunned
 	uses up a move regardless of whether direction choice finds a door
 grammar fixes for vault guard messages given after player assigns guard a name
+wearing cloak of displacement auto-discovered it even when hero couldn't see
+wearing elven cloak auto-discovered it even when already stealthy
+putting on ring of stealth never auto-discovered it
 
 
 Platform- and/or Interface-Specific Fixes

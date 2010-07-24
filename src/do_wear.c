@@ -1,5 +1,4 @@
 /* NetHack 3.5	do_wear.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)do_wear.c	3.5	2008/05/25	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,6 +30,8 @@ static NEARDATA const long takeoff_order[] = { WORN_BLINDF, W_WEP,
 	WORN_BOOTS, W_SWAPWEP, W_QUIVER, 0L };
 
 STATIC_DCL void FDECL(on_msg, (struct obj *));
+STATIC_DCL void FDECL(toggle_stealth, (struct obj *,long,BOOLEAN_P));
+STATIC_DCL void FDECL(toggle_displacement, (struct obj *,long,BOOLEAN_P));
 STATIC_PTR int NDECL(Armor_on);
 STATIC_PTR int NDECL(Boots_on);
 STATIC_PTR int NDECL(Cloak_on);
@@ -79,6 +80,74 @@ struct obj *otmp;
 	}
 }
 
+/* starting equipment gets auto-worn at beginning of new game,
+   and we don't want stealth or displacement feedback then */
+static boolean initial_don = FALSE;	/* manipulated in set_wear() */
+
+/* putting on or taking off an item which confers stealth;
+   give feedback and discover it iff stealth state is changing */
+STATIC_OVL
+void
+toggle_stealth(obj, oldprop, on)
+struct obj *obj;
+long oldprop;	/* prop[].extrinsic, with obj->owornmask stripped by caller */
+boolean on;
+{
+    if (on ? initial_don : context.takeoff.cancelled_don) return;
+
+    if (!oldprop &&		/* extrinsic stealth from something else */
+	!HStealth &&		/* intrinsic stealth */
+	!BStealth) {		/* stealth blocked by something */
+	if (obj->otyp == RIN_STEALTH)
+	    learnring(obj, TRUE);
+	else
+	    makeknown(obj->otyp);
+
+	if (on) {
+	    if (!is_boots(obj))
+		You("move very quietly.");
+	    else if (Levitation || Flying)
+		You("float imperceptibly.");
+	    else
+		You("walk very quietly.");
+	} else {
+	    You("sure are noisy.");
+	}
+    }
+}
+
+/* putting on or taking off an item which confers displacement;
+   give feedback and discover it iff displacement state is changing *and*
+   hero is able to see self (or sense monsters) */
+STATIC_OVL
+void
+toggle_displacement(obj, oldprop, on)
+struct obj *obj;
+long oldprop;	/* prop[].extrinsic, with obj->owornmask stripped by caller */
+boolean on;
+{
+    if (on ? initial_don : context.takeoff.cancelled_don) return;
+
+    if (!oldprop &&		/* extrinsic displacement from something else */
+	!(u.uprops[DISPLACED].intrinsic) &&	/* (theoretical) */
+	!(u.uprops[DISPLACED].blocked) &&	/* (also theoretical) */
+	/* we don't use canseeself() here because it augments vision
+	   with touch, which isn't appropriate for deciding whether
+	   we'll notice that monsters have trouble spotting the hero */
+	((!Blind &&		/* see anything */
+	  !u.uswallow &&	/* see surroundings */
+	  !Invisible) ||	/* see self */
+	/* actively sensing nearby monsters via telepathy or extended
+	   monster detection overrides vision considerations because
+	   hero also senses self in this situation */
+	 (Unblind_telepat || (Blind_telepat && Blind) || Detect_monsters))) {
+	makeknown(obj->otyp);
+
+	You_feel("that monsters%s have difficulty pinpointing your location.",
+		 on ? "" : " no longer");
+    }
+}
+
 /*
  * The Type_on() functions should be called *after* setworn().
  * The Type_off() functions call setworn() themselves.
@@ -114,13 +183,7 @@ Boots_on(VOID_ARGS)
 		}
 		break;
 	case ELVEN_BOOTS:
-		if (!oldprop && !HStealth && !BStealth) {
-			makeknown(uarmf->otyp);
-			if (Levitation || Flying)
-				You("float imperceptibly.");
-			else
-				You("walk very quietly.");
-		}
+		toggle_stealth(uarmf, oldprop, TRUE);
 		break;
 	case FUMBLE_BOOTS:
 		if (!oldprop && !(HFumbling & ~TIMEOUT))
@@ -141,7 +204,8 @@ Boots_on(VOID_ARGS)
 int
 Boots_off(VOID_ARGS)
 {
-    int otyp = uarmf->otyp;
+    struct obj *otmp = uarmf;
+    int otyp = otmp->otyp;
     long oldprop = u.uprops[objects[otyp].oc_oprop].extrinsic & ~WORN_BOOTS;
 
     context.takeoff.mask &= ~W_ARMF;
@@ -170,11 +234,7 @@ Boots_off(VOID_ARGS)
 		}
 		break;
 	case ELVEN_BOOTS:
-		if (!oldprop && !HStealth && !BStealth &&
-				!context.takeoff.cancelled_don) {
-			makeknown(otyp);
-			You("sure are noisy.");
-		}
+		toggle_stealth(otmp, oldprop, FALSE);
 		break;
 	case FUMBLE_BOOTS:
 		if (!oldprop && !(HFumbling & ~TIMEOUT))
@@ -205,16 +265,20 @@ Cloak_on(VOID_ARGS)
 	u.uprops[objects[uarmc->otyp].oc_oprop].extrinsic & ~WORN_CLOAK;
 
     switch(uarmc->otyp) {
-	case ELVEN_CLOAK:
-	case CLOAK_OF_PROTECTION:
-	case CLOAK_OF_DISPLACEMENT:
-		makeknown(uarmc->otyp);
-		break;
 	case ORCISH_CLOAK:
 	case DWARVISH_CLOAK:
 	case CLOAK_OF_MAGIC_RESISTANCE:
 	case ROBE:
 	case LEATHER_CLOAK:
+		break;
+	case CLOAK_OF_PROTECTION:
+		makeknown(uarmc->otyp);
+		break;
+	case ELVEN_CLOAK:
+		toggle_stealth(uarmc, oldprop, TRUE);
+		break;
+	case CLOAK_OF_DISPLACEMENT:
+		toggle_displacement(uarmc, oldprop, TRUE);
 		break;
 	case MUMMY_WRAPPING:
 		/* Note: it's already being worn, so we have to cheat here. */
@@ -250,22 +314,27 @@ Cloak_on(VOID_ARGS)
 int
 Cloak_off(VOID_ARGS)
 {
-    int otyp = uarmc->otyp;
+    struct obj *otmp = uarmc;
+    int otyp = otmp->otyp;
     long oldprop = u.uprops[objects[otyp].oc_oprop].extrinsic & ~WORN_CLOAK;
 
     context.takeoff.mask &= ~W_ARMC;
 	/* For mummy wrapping, taking it off first resets `Invisible'. */
     setworn((struct obj *)0, W_ARMC);
     switch (otyp) {
-	case ELVEN_CLOAK:
 	case ORCISH_CLOAK:
 	case DWARVISH_CLOAK:
 	case CLOAK_OF_PROTECTION:
 	case CLOAK_OF_MAGIC_RESISTANCE:
-	case CLOAK_OF_DISPLACEMENT:
 	case OILSKIN_CLOAK:
 	case ROBE:
 	case LEATHER_CLOAK:
+		break;
+	case ELVEN_CLOAK:
+		toggle_stealth(otmp, oldprop, FALSE);
+		break;
+	case CLOAK_OF_DISPLACEMENT:
+		toggle_displacement(otmp, oldprop, FALSE);
 		break;
 	case MUMMY_WRAPPING:
 		if (Invis && !Blind) {
@@ -763,7 +832,6 @@ register struct obj *obj;
 	case RIN_TELEPORTATION:
 	case RIN_REGENERATION:
 	case RIN_SEARCHING:
-	case RIN_STEALTH:
 	case RIN_HUNGER:
 	case RIN_AGGRAVATE_MONSTER:
 	case RIN_POISON_RESISTANCE:
@@ -778,6 +846,9 @@ register struct obj *obj;
 	case RIN_SLOW_DIGESTION:
 	case RIN_SUSTAIN_ABILITY:
 	case MEAT_RING:
+		break;
+	case RIN_STEALTH:
+		toggle_stealth(obj, oldprop, TRUE);
 		break;
 	case RIN_WARNING:
 		see_monsters();
@@ -871,7 +942,6 @@ boolean gone;
 	case RIN_TELEPORTATION:
 	case RIN_REGENERATION:
 	case RIN_SEARCHING:
-	case RIN_STEALTH:
 	case RIN_HUNGER:
 	case RIN_AGGRAVATE_MONSTER:
 	case RIN_POISON_RESISTANCE:
@@ -886,6 +956,9 @@ boolean gone;
 	case RIN_SLOW_DIGESTION:
 	case RIN_SUSTAIN_ABILITY:
 	case MEAT_RING:
+		break;
+	case RIN_STEALTH:
+		toggle_stealth(obj, (EStealth & ~mask), FALSE);
 		break;
 	case RIN_WARNING:
 		see_monsters();
@@ -1046,6 +1119,8 @@ void
 set_wear(obj)
 struct obj *obj;  /* if null, do all worn items; otherwise just obj itself */
 {
+	initial_don = !obj;
+
 	if (!obj ? ublindf != 0 : (obj == ublindf)) (void) Blindf_on(ublindf);
 	if (!obj ? uright != 0 : (obj == uright)) (void) Ring_on(uright);
 	if (!obj ? uleft != 0 : (obj == uleft)) (void) Ring_on(uleft);
@@ -1060,6 +1135,8 @@ struct obj *obj;  /* if null, do all worn items; otherwise just obj itself */
 	if (!obj ? uarmg != 0 : (obj == uarmg)) (void) Gloves_on();
 	if (!obj ? uarmh != 0 : (obj == uarmh)) (void) Helmet_on();
 	if (!obj ? uarms != 0 : (obj == uarms)) (void) Shield_on();
+
+	initial_don = FALSE;
 }
 
 /* check whether the target object is currently being put on (or taken off) */
