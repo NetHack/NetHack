@@ -331,6 +331,8 @@ grammar fixes for vault guard messages given after player assigns guard a name
 wearing cloak of displacement auto-discovered it even when hero couldn't see
 wearing elven cloak auto-discovered it even when already stealthy
 putting on ring of stealth never auto-discovered it
+forgetting spells due to amnesia now sets memory retention to zero instead
+	of removing them from hero's list of known spells
 
 
 Platform- and/or Interface-Specific Fixes

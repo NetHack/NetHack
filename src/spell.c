@@ -1083,24 +1083,72 @@ throwspell()
 	return 1;
 }
 
+/* forget a random selection of known spells due to amnesia;
+   they used to be lost entirely, as if never learned, but now we
+   just set the memory retention to zero so that they can't be cast */
 void
 losespells()
 {
-	boolean confused = (Confusion != 0);
-	int  n, nzap, i;
+    int n, nzap, i;
 
-	context.spbook.book = 0;
-	context.spbook.o_id = 0;
-	for (n = 0; n < MAXSPELL && spellid(n) != NO_SPELL; n++)
-		continue;
-	if (n) {
-		nzap = rnd(n) + confused ? 1 : 0;
-		if (nzap > n) nzap = n;
-		for (i = n - nzap; i < n; i++) {
-		    spellid(i) = NO_SPELL;
-		    exercise(A_WIS, FALSE);	/* ouch! */
-		}
+    /* in case reading has been interrupted earlier, discard context */
+    context.spbook.book = 0;
+    context.spbook.o_id = 0;
+    /* count the number of known spells */
+    for (n = 0; n < MAXSPELL; ++n)
+	if (spellid(n) == NO_SPELL) break;
+
+    /* lose anywhere from zero to all known spells;
+       if confused, use the worse of two die rolls */
+    nzap = rn2(n + 1);
+    if (Confusion) {
+	i = rn2(n + 1);
+	if (i > nzap) nzap = i;
+    }
+    /* good Luck might ameliorate spell loss */
+    if (nzap > 1 && !rnl(7))
+	nzap = rnd(nzap);
+
+    /*
+     * Forget 'nzap' out of 'n' known spells by setting their memory
+     * retention to zero.  Every spell has the same probability to be
+     * forgotten, even if its retention is already zero.
+     *
+     * Perhaps we should forget the corresponding book too?
+     *
+     * (3.4.3 removed spells entirely from the list, but always did
+     * so from its end, so the 'nzap' most recently learned spells
+     * were the ones lost by default.  Player had sort control over
+     * the list, so could move the most useful spells to front and
+     * only lose them if 'nzap' turned out to be a large value.
+     *
+     * Discarding from the end of the list had the virtue of making
+     * casting letters for lost spells become invalid and retaining
+     * the original letter for the ones which weren't lost, so there
+     * was no risk to the player of accidentally casting the wrong
+     * spell when using a letter that was in use prior to amnesia.
+     * That wouldn't be the case if we implemented spell loss spread
+     * throughout the list of known spells; every spell located past
+     * the first lost spell would end up with new letter assigned.)
+     */
+    for (i = 0; nzap > 0; ++i) {
+	/* when nzap is small relative to the number of spells left,
+	   the chance to lose spell [i] is small; as the number of
+	   remaining candidates shrinks, the chance per candidate
+	   gets bigger; overall, exactly nzap entries are affected */
+	if (rn2(n - i) < nzap) {
+	    /* lose access to spell [i] */
+	    spellknow(i) = 0;
+#if 0
+	    /* also forget its book */
+	    forget_single_object(spellid(i));
+#endif
+	    /* and abuse wisdom */
+	    exercise(A_WIS, FALSE);
+	    /* there's now one less spell slated to be forgotten */
+	    --nzap;
 	}
+    }
 }
 
 /*
