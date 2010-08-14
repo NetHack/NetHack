@@ -4,6 +4,8 @@
 #include "hack.h"
 
 STATIC_DCL int FDECL(cost,(struct obj *));
+STATIC_DCL boolean FDECL(label_known, (int,struct obj *));
+STATIC_DCL char *FDECL(new_book_description, (int,char *));
 
 /*
  * returns basecost of a scroll or a spellbook
@@ -64,6 +66,36 @@ register struct obj *otmp;
 	return(1000);
 }
 
+/* decide whether the hero knowns a particular scroll's label;
+   unfortunately, we can't track things are haven't been added to
+   the discoveries list and aren't present in current inventory,
+   so some scrolls with ought to yield True will end up False */
+STATIC_OVL boolean
+label_known(scrolltype, objlist)
+int scrolltype;
+struct obj *objlist;
+{
+    struct obj *otmp;
+
+    /* only scrolls */
+    if (objects[scrolltype].oc_class != SCROLL_CLASS)
+	return FALSE;
+    /* type known implies full discovery; otherwise,
+       user-assigned name implies partial discovery */
+    if (objects[scrolltype].oc_name_known || objects[scrolltype].oc_uname)
+	return TRUE;
+    /* check inventory, including carried containers with known contents */
+    for (otmp = objlist; otmp; otmp = otmp->nobj) {
+	if (otmp->otyp == scrolltype && otmp->dknown)
+	    return TRUE;
+	if (Has_contents(otmp) && otmp->cknown &&
+		label_known(scrolltype, otmp->cobj))
+	    return TRUE;
+    }
+    /* not found */
+    return FALSE;
+}
+
 static NEARDATA const char write_on[] = { SCROLL_CLASS, SPBOOK_CLASS, 0 };
 
 int
@@ -76,7 +108,7 @@ register struct obj *pen;
 	int basecost, actualcost;
 	int curseval;
 	char qbuf[QBUFSZ];
-	int first, last, i;
+	int first, last, i, deferred, deferralchance;
 	boolean by_descr = FALSE;
 	const char *typeword;
 
@@ -129,6 +161,8 @@ register struct obj *pen;
 		(void)mungspaces(bp + 1);	/* remove the extra space */
 	}
 
+	deferred = 0;	/* not any scroll or book */
+	deferralchance = 0;	/* incremented for each oc_uname match */
 	first = bases[(int)paper->oclass];
 	last = bases[(int)paper->oclass + 1] - 1;
 	for (i = first; i <= last; i++) {
@@ -141,6 +175,29 @@ register struct obj *pen;
 			by_descr = TRUE;
 			goto found;
 		}
+		/* user-assigned name might match real name of a later
+		   entry, so we don't simply use first match with it;  
+		   also, player might assign same name multiple times
+		   and if so, we choose one of those matches randomly */
+		if (objects[i].oc_uname && !strcmpi(objects[i].oc_uname, nm) &&
+			    /* first match: chance incremented to 1,
+			         !rn2(1) is 1, we remember i;
+			       second match: chance incremented to 2,
+			         !rn2(2) has 1/2 chance to replace i;
+			       third match: chance incremented to 3,
+			         !rn2(3) has 1/3 chance to replace i
+			         and 2/3 chance to keep previous 50:50
+			         choice; so on for higher match counts */
+			    !rn2(++deferralchance))
+			deferred = i;
+	}
+	/* writing by user-assigned name is same as by description:
+	   fails for books, works for scrolls (having an assigned
+	   type name guarantees presence on discoveries list) */
+	if (deferred) {
+		i = deferred;
+		by_descr = TRUE;
+		goto found;
 	}
 
 	There("is no such %s!", typeword);
@@ -202,10 +259,35 @@ found:
 	}
 	pen->spe -= actualcost;
 
-	/* can't write if we don't know it - unless we're lucky */
+	/*
+	 * Writing by name requires that the hero knows the scroll or
+	 * book type.  One has previously been read (and its effect
+	 * was evident) or been ID'd via scroll/spell/throne and it
+	 * will be on the discoveries list.
+	 * (Previous versions allowed scrolls and books to be written
+	 * by type name if they were on the discoveries list via being
+	 * given a user-assigned name, even though doing the latter
+	 * doesn't--and shouldn't--make the actual type become known.)
+	 *
+	 * Writing by description requires that the hero knows the
+	 * description (a scroll's label, that is, since books by_descr
+	 * are rejected above).  BUG:  We can only do this for known
+	 * scrolls and for the case where the player has assigned a
+	 * name to put it onto the discoveries list; we lack a way to
+	 * track other scrolls which have been seen closely enough to
+	 * read the label without then being ID'd or named.  The only
+	 * exception is for currently carried inventory, where we can
+	 * check for one [with its dknown bit set] of the same type.
+	 *
+	 * Normal requirements can be overridden if hero is Lucky.
+	 */
+
+	    /* if known, then either by-name or by-descr works */
 	if (!objects[new_obj->otyp].oc_name_known &&
-	    !objects[new_obj->otyp].oc_uname &&
-	    rnl(Role_if(PM_WIZARD) ? 3 : 15)) {
+	    /* else if named, then only by-descr works */
+	    !(by_descr && label_known(new_obj->otyp, invent)) &&
+	    /* and Luck might override after both checks have failed */
+	    rnl(Role_if(PM_WIZARD) ? 5 : 15)) {
 		You("%s to write that.", by_descr ? "fail" : "don't know how");
 		/* scrolls disappear, spellbooks don't */
 		if (paper->oclass == SPBOOK_CLASS) {
@@ -245,7 +327,7 @@ found:
 	if (new_obj->oclass == SPBOOK_CLASS) {
 		/* acknowledge the change in the object's description... */
 		pline_The("spellbook warps strangely, then turns %s.",
-		      OBJ_DESCR(objects[new_obj->otyp]));
+			   new_book_description(new_obj->otyp, namebuf));
 	}
 	new_obj->blessed = (curseval > 0);
 	new_obj->cursed = (curseval < 0);
@@ -256,6 +338,39 @@ found:
 					       The(aobjnam(new_obj, "slip")),
 					       (const char *)0);
 	return(1);
+}
+
+/* most book descriptions refer to cover appearance, so we can issue a
+   message for converting a plain book into one of those with something
+   like "the spellbook turns red" or "the spellbook turns ragged";
+   but some descriptions refer to composition and "the book turns vellum"
+   looks funny, so we want to insert "into " prior to such descriptions;
+   even that's rather iffy, indicating that such descriptions probably
+   ought to be eliminated (especially "cloth"!) */
+STATIC_OVL char *
+new_book_description(booktype, outbuf)
+int booktype;
+char *outbuf;
+{
+    /* subset of description strings from objects.c; if it grows
+       much, we may need to add a new flag field to objects[] instead */
+    static const char *const compositions[] = {
+	"parchment", "vellum", "cloth",
+#if 0
+	"canvas", "hardcover",	/* not used */
+	"papyrus",  /* not applicable--can't be produced via writing */
+#endif /*0*/
+	0
+    };
+    const char *descr, *const *comp_p;
+    int idx;
+
+    descr = OBJ_DESCR(objects[booktype]);
+    for (comp_p = compositions; *comp_p; ++comp_p)
+	if (!strcmpi(descr, *comp_p)) break;
+
+    Sprintf(outbuf, "%s%s", *comp_p ? "into " : "", descr);
+    return outbuf;
 }
 
 /*write.c*/

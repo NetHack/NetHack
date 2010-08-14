@@ -333,6 +333,10 @@ wearing elven cloak auto-discovered it even when already stealthy
 putting on ring of stealth never auto-discovered it
 forgetting spells due to amnesia now sets memory retention to zero instead
 	of removing them from hero's list of known spells
+shouldn't have been able write scrolls by guessing type name when they're
+	only partly known via name assignment
+scrolls given names can be written by assigned name as well as by description
+fix writing feedback "the spellbook warps strangely, then turns parchment"
 
 
 Platform- and/or Interface-Specific Fixes
