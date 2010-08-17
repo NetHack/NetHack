@@ -51,7 +51,7 @@ STATIC_DCL void FDECL(mk_knox_portal, (XCHAR_P,XCHAR_P));
 #define init_vault()	vault_x = -1
 #define do_vault()	(vault_x != -1)
 static xchar		vault_x, vault_y;
-boolean goldseen;
+boolean goldseen;	/* XXX do we need this variable?  It does nothing. */
 static boolean made_branch;	/* used only during level creation */
 
 /* Args must be (const genericptr) so that qsort will always be happy. */
