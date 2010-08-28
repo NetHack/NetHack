@@ -337,6 +337,7 @@ shouldn't have been able write scrolls by guessing type name when they're
 	only partly known via name assignment
 scrolls given names can be written by assigned name as well as by description
 fix writing feedback "the spellbook warps strangely, then turns parchment"
+make stone artifacts usually resist stone-to-flesh
 
 
 Platform- and/or Interface-Specific Fixes

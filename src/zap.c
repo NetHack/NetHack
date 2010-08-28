@@ -1565,6 +1565,8 @@ struct obj *obj;
 
     if (objects[obj->otyp].oc_material != MINERAL &&
 	    objects[obj->otyp].oc_material != GEMSTONE) return 0;
+    /* Heart of Ahriman usually resists; ordinary items rarely do */
+    if (obj_resists(obj, 2, 98)) return 0;
 
     (void) get_obj_location(obj, &oox, &ooy, 0);
     /* add more if stone objects are added.. */
