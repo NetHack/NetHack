@@ -126,24 +126,10 @@ Setting Up
     all the necessary environment variables for the compiler environment
     are set correctly. 
 
-    For Visual Studio 2010 Express Edition, you will need to download 
-    and install the MS Platform SDK as well.  The Platform SDK is 
-    required for building native WIN32 applications, such as NetHack. 
-    The two must be integrated to work together once. 
-    At the time of this writing, there were instructions available from 
-    the manufacturer at the following URL:
-      http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/
-
-    Once you have Visual Studio 2010 Express and the Platform SDK 
-    properly integrated with each other, you need to execute
-        vcvarsall.bat
-    which is probably in the bin directory of your VSINSTALLDIR.
-    Then for the Platform SDK, you may also need to execute
-        SetEnv.cmd
-    from the Platform SDK install directory, especially if you installed
-    Visual Studio 2010 Express Edition to a non-default location. You can 
-    put the execution of those into a single .CMD file to make it easier 
-    if you like.
+    For Visual Studio 2010 Express Edition, the installation will have
+    placed a command prompt option on the menus that is properly configured
+    for building. These instructions assume that you are using that to start
+    your command prompt window for building.
 
     For the GCC Makefile, add <mingw>\bin to your path, where <mingw> 
     is your MinGW root directory.).
@@ -369,7 +355,7 @@ Setting Up
 
     Start the Visual C++ 2010 Express Edition IDE. 
     In the Visual C++ 2010 Express Edition IDE menus, choose:
-        File | Open Project/Solution
+        File | Open | Project/Solution
      
 
 4.  Set up for the build.
@@ -400,8 +386,8 @@ Setting Up
     In Visual C++ 2010 Express Edition, you can just choose "Debug" or
     "Release" right on the menu in the "solutions configuration" box.   
 
-    The first Release build of NetHackW which does not contain all the 
-    debugging information and is smaller, and runs slightly quicker.  
+    The build of NetHackW which does not contain all the 
+    debugging information is smaller, and runs slightly quicker.  
     The Debug build of NetHackW will spend time writing debug information 
     to the disk as the game is played. Unless you are debugging or 
     enhancing NetHack for Windows, you probably will want to choose the 
