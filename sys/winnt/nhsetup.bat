@@ -53,7 +53,6 @@ copy Makefile.gcc ..\..\src\Makefile.gcc >nul
 echo MinGW Makefile copied ok.
 
 :do_win
-if not exist ..\..\win\win32\nethack.dsw goto :err_win
 if not exist ..\..\win\win32\nethack.sln goto :err_win
 
 echo.
@@ -95,7 +94,6 @@ if NOT exist ..\..\win\win32\levcomp.vcxproj goto skipVC2010
 if NOT exist ..\..\win\win32\levstuff.vcxproj goto skipVC2010
 if NOT exist ..\..\win\win32\recover.vcxproj goto skipVC2010
 if NOT exist ..\..\win\win32\tiles.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\NetHack.sln goto skipVC2010
 
 copy ..\..\win\win32\makedefs.vcxproj ..\..\build >nul
 copy ..\..\win\win32\tile2bmp.vcxproj ..\..\build >nul
@@ -109,7 +107,6 @@ copy ..\..\win\win32\levcomp.vcxproj ..\..\build >nul
 copy ..\..\win\win32\levstuff.vcxproj ..\..\build >nul
 copy ..\..\win\win32\recover.vcxproj ..\..\build >nul
 copy ..\..\win\win32\tiles.vcxproj ..\..\build >nul
-copy ..\..\win\win32\NetHack.sln ..\..\build >nul
 :skipVC2010
 
 goto :done
