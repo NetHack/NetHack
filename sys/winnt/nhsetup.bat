@@ -63,12 +63,8 @@ echo Creating ..\..\build directory
 mkdir ..\..\build
 
 :projectcopy
-echo Copying Visual C solution files to top level directory
-@REM Visual Studio 6 workspace
-echo Copying ..\..\win\win32\nethack.dsw  ..\..\nethack.dsw
-copy ..\..\win\win32\nethack.dsw  ..\.. >nul
 
-@REM Visual Studio 2005 Express solution file
+@REM Visual Studio Express solution file
 if NOT exist ..\..\win\win32\nethack.sln goto skipsoln
 echo Copying ..\..\win\win32\nethack.sln  ..\..\nethack.sln
 copy ..\..\win\win32\nethack.sln  ..\.. >nul
@@ -84,38 +80,37 @@ copy ..\..\win\win32\dgnstuff.mak  ..\..\build >nul
 copy ..\..\win\win32\levstuff.mak  ..\..\build >nul
 copy ..\..\win\win32\tiles.mak     ..\..\build >nul
 
-@REM Visual C++ 6 project files
-copy ..\..\win\win32\dgncomp.dsp   ..\..\build >nul
-copy ..\..\win\win32\dgnstuff.dsp  ..\..\build >nul
-copy ..\..\win\win32\dlb_main.dsp  ..\..\build >nul
-copy ..\..\win\win32\levcomp.dsp   ..\..\build >nul
-copy ..\..\win\win32\levstuff.dsp  ..\..\build >nul
-copy ..\..\win\win32\makedefs.dsp  ..\..\build >nul
-copy ..\..\win\win32\recover.dsp   ..\..\build >nul
-copy ..\..\win\win32\tile2bmp.dsp  ..\..\build >nul
-copy ..\..\win\win32\tiles.dsp     ..\..\build >nul
-copy ..\..\win\win32\tilemap.dsp   ..\..\build >nul
-copy ..\..\win\win32\uudecode.dsp   ..\..\build >nul
-copy ..\..\win\win32\nethackw.dsp   ..\..\build >nul
 
-@REM Visual C++ 2005 Express project files
-if NOT exist ..\..\win\win32\makedefs.vcproj goto skipVC2005
-if NOT exist ..\..\win\win32\dgncomp.vcproj goto skipVC2005
-if NOT exist ..\..\win\win32\dlb_main.vcproj goto skipVC2005
-if NOT exist ..\..\win\win32\nethackw.vcproj goto skipVC2005
-copy ..\..\win\win32\dgncomp.vcproj   ..\..\build >nul
-copy ..\..\win\win32\dgnstuff.vcproj  ..\..\build >nul
-copy ..\..\win\win32\dlb_main.vcproj  ..\..\build >nul
-copy ..\..\win\win32\levcomp.vcproj   ..\..\build >nul
-copy ..\..\win\win32\levstuff.vcproj  ..\..\build >nul
-copy ..\..\win\win32\makedefs.vcproj  ..\..\build >nul
-copy ..\..\win\win32\recover.vcproj   ..\..\build >nul
-copy ..\..\win\win32\tile2bmp.vcproj  ..\..\build >nul
-copy ..\..\win\win32\tiles.vcproj     ..\..\build >nul
-copy ..\..\win\win32\tilemap.vcproj   ..\..\build >nul
-copy ..\..\win\win32\uudecode.vcproj   ..\..\build >nul
-copy ..\..\win\win32\nethackw.vcproj   ..\..\build >nul
-:skipVC2005
+@REM Visual C++ 2010 Express project files
+:VC2010
+if NOT exist ..\..\win\win32\makedefs.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\tile2bmp.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\tilemap.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\uudecode.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\NetHackW.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\dgncomp.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\dgnstuff.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\dlb_main.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\levcomp.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\levstuff.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\recover.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\tiles.vcxproj goto skipVC2010
+if NOT exist ..\..\win\win32\NetHack.sln goto skipVC2010
+
+copy ..\..\win\win32\makedefs.vcxproj ..\..\build >nul
+copy ..\..\win\win32\tile2bmp.vcxproj ..\..\build >nul
+copy ..\..\win\win32\tilemap.vcxproj ..\..\build >nul
+copy ..\..\win\win32\uudecode.vcxproj ..\..\build >nul
+copy ..\..\win\win32\NetHackW.vcxproj ..\..\build >nul
+copy ..\..\win\win32\dgncomp.vcxproj ..\..\build >nul
+copy ..\..\win\win32\dgnstuff.vcxproj ..\..\build >nul
+copy ..\..\win\win32\dlb_main.vcxproj ..\..\build >nul
+copy ..\..\win\win32\levcomp.vcxproj ..\..\build >nul
+copy ..\..\win\win32\levstuff.vcxproj ..\..\build >nul
+copy ..\..\win\win32\recover.vcxproj ..\..\build >nul
+copy ..\..\win\win32\tiles.vcxproj ..\..\build >nul
+copy ..\..\win\win32\NetHack.sln ..\..\build >nul
+:skipVC2010
 
 goto :done
 
