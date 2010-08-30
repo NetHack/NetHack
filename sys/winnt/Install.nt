@@ -1,8 +1,8 @@
-         Copyright (c) NetHack Development Team 1990-2006
+         Copyright (c) NetHack Development Team 1990-2010
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
                  Instructions for compiling and installing
-             NetHack 3.5 on a Windows 9x, NT, 2000, or XP system
+           NetHack 3.5 on a Windows 200x, XP, or Windows 7 system
          ==============================================================
                  Last revision: $Date$
 
@@ -21,23 +21,18 @@ You can build either the TTY version of NetHack or the Windows Graphical
 version.  In either case you can use one of the following build
 environments:
 
-  o A copy of Microsoft Visual C V6.0 (SP3, SP4, SP5, or SP6). 
-    The C compiler that can be downloaded as part of the 
-    Visual Studio 2005 Express Edition also works, but you must 
-    also download the MS Platform SDK in order to build native win32 
-    applications such as NetHack. The current NetHack code has not 
-    been tested with other versions of the Microsoft compiler.		
-		
+  o A copy of Microsoft Visual C++ Express 2010
+	
     OR
 
-  o A copy of Borland C 5.5.1 command line tools.  Borland has made a
+  o [UNTESTED FOR 3.5] A copy of Borland C 5.5.1 command line tools.  Borland has made a
     version of its command line tools available for download after
     registration at:
         http://www.borland.com/bcppbuilder/freecompiler/
 
     OR
 
-  o A copy of MinGW 2.0 or later. MinGW is a collection of header 
+  o [UNTESTED FOR 3.5] A copy of MinGW 2.0 or later. MinGW is a collection of header 
     files and import libraries with which native Windows32 programs 
     can be built; the MinGW 2.0 distribution contains the GNU Compiler 
     Collection. You can download MinGW at
@@ -102,8 +97,7 @@ I. Dispelling the Myths:
 
     We have provided a Makefile for each of the following compilers:
 
-        o Microsoft Visual C++ V6.0 (SP3 - SP6) and 
-          Microsoft Visual C++ 2005 Express Edition with the Platform SDK
+        o Microsoft Visual C++ 2010 Express Edition
         o Borland C 5.5.1
         o MinGW 2.0 (with GCC 3.2)
 
@@ -132,11 +126,7 @@ Setting Up
     all the necessary environment variables for the compiler environment
     are set correctly. 
 
-    For Visual C++ 6.x, you need to execute 
-	vcvars32.bat 
-    which is probably in the bin directory of your compilers directory tree.
-  
-    For Visual Studio 2005 Express Edition, you will need to download 
+    For Visual Studio 2010 Express Edition, you will need to download 
     and install the MS Platform SDK as well.  The Platform SDK is 
     required for building native WIN32 applications, such as NetHack. 
     The two must be integrated to work together once. 
@@ -144,14 +134,14 @@ Setting Up
     the manufacturer at the following URL:
       http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/
 
-    Once you have Visual Studio 2005 Express and the Platform SDK 
+    Once you have Visual Studio 2010 Express and the Platform SDK 
     properly integrated with each other, you need to execute
         vcvarsall.bat
     which is probably in the bin directory of your VSINSTALLDIR.
     Then for the Platform SDK, you may also need to execute
         SetEnv.cmd
     from the Platform SDK install directory, especially if you installed
-    Visual Studio 2005 Express Edition to a non-default location. You can 
+    Visual Studio 2010 Express Edition to a non-default location. You can 
     put the execution of those into a single .CMD file to make it easier 
     if you like.
 
@@ -328,17 +318,6 @@ Setting Up
     IDE it should correctly fire up when you choose it in your Start |
     Programs menus.) 
 
-    If you are using Visual C++ 2005 Express Edition, you must install
-    both the Visual C++ 2005 Express Edition, and the Platform SDK.
-    They are both freely downloadable at the time of this writing, but
-    be warned that they are very large downloads. After installing the
-    Visual C++ 2005 Express Edition, you will then need to install the 
-    Platform SDK and integrate it with Visual C++ 2005 Express Edition
-    in order to be able to build native WIN32 applications. At the time 
-    of this writing, there was some assistance on how to integrate the 
-    two products at the following URL:
-    http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/ 
-
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
     dat, doc, include, src, sys\share, sys\winnt, util, win\win32, and
@@ -388,10 +367,8 @@ Setting Up
     as explained above. However, the IDE build has full game
     functionality and is the officially released build.
 
-    Start the Visual C IDE. 
-    In the Visual C++ V6.0 IDE menus, choose:
-        File | Open Workspace
-    In the Visual C++ 2005 Express Edition IDE menus, choose:
+    Start the Visual C++ 2010 Express Edition IDE. 
+    In the Visual C++ 2010 Express Edition IDE menus, choose:
         File | Open Project/Solution
      
 
@@ -400,33 +377,27 @@ Setting Up
     In the Visual C dialog box, navigate to the top of
     your NetHack source directory.
 
-    In there, highlight "nethack.dsw" for Visual C++ 6.0, or
-    "nethack.sln" for Visual C++ Express Edition and click on Open.
+    In there, highlight "nethack.sln" for Visual C++ 2010
+    Express Edition and click on Open.
     Once the workspace or solution has been opened, you should see 
     the following list in the Visual C selection left pane:
+      + makedefs
       + dgncomp
       + dgnstuff
       + dlb_main
       + levcomp
       + levstuff
-      + makedefs
       + nethackw
       + recover
       + tile2bmp
       + tilemap
       + uudecode
 
-    On the Visual C++ 6.0 menus, choose:
-        Project | Set Active Project | NetHackW
-    or for Visual C++ 2005 Express Edition, highlight 'nethackw' and
+    For Visual C++ 2010 Express Edition, highlight 'nethackw' and
     select:
         Project | Set as Startup Project
 
-    On the Visual C 6.0 menus again, choose either:
-        Build | Set Active Configuration | NetHackW - Win32 Release
-    or
-        Build | Set Active Configuration | NetHackW - Win32 Debug
-    In Visual C++ 2005 Express Edition, you can just choose "Debug" or
+    In Visual C++ 2010 Express Edition, you can just choose "Debug" or
     "Release" right on the menu in the "solutions configuration" box.   
 
     The first Release build of NetHackW which does not contain all the 
@@ -440,8 +411,9 @@ Building
     
 5.  Start your build.
 
-    On the Visual C menus once again, choose:
-        Build | Build NetHackW.exe
+    In the Visual C++ 2010 Express Edition menus once again, highlight 
+    NetHackW, right-click and choose:
+        Build
     This starts the build.  It is likely that the IDE message window 
     where you are doing the compiling will be occupied for a while.
 
