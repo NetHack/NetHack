@@ -71,7 +71,6 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>.\..\util/makedefs.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\..\util/makedefs.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -149,7 +148,6 @@ copy ..\win\share\tilemap.c ..\win\share\tiletxt.c
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>.\..\util/makedefs.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\util/makedefs.pdb</ProgramDatabaseFile>

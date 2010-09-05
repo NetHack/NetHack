@@ -71,9 +71,8 @@
       <Culture>0x1009</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\util\dgn_comp.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ProgramDatabaseFile>.\..\util/dgn_comp.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\util/dgncomp.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -89,8 +88,8 @@
       <Command>echo Building dungeon
 echo chdir ..\dat
 chdir ..\dat
-echo ..\util\dgn_comp.exe dungeon.pdf
-..\util\dgn_comp.exe dungeon.pdf
+echo ..\util\dgncomp.exe dungeon.pdf
+..\util\dgncomp.exe dungeon.pdf
 echo chdir ..\build
 chdir ..\build
 </Command>
@@ -122,10 +121,9 @@ chdir ..\build
       <Culture>0x1009</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\util\dgn_comp.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\util/dgn_comp.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\util/dgncomp.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -141,8 +139,8 @@ chdir ..\build
       <Command>echo Building dungeon
 echo chdir ..\dat
 chdir ..\dat
-echo ..\util\dgn_comp.exe dungeon.pdf
-..\util\dgn_comp.exe dungeon.pdf
+echo ..\util\dgncomp.exe dungeon.pdf
+..\util\dgncomp.exe dungeon.pdf
 echo chdir ..\build
 chdir ..\build
 </Command>

@@ -1,5 +1,5 @@
-@REM  SCCS Id: @(#)nhsetup.bat  3.5     $Date$
-@REM  Copyright (c) NetHack PC Development Team 1993-2006
+@REM  NetHack 3.5	nhsetup.bat	$Date$  $Revision$ */
+@REM  Copyright (c) NetHack PC Development Team 1993-2010
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.nt for details
 @REM

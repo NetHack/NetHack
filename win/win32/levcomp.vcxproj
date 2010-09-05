@@ -71,7 +71,6 @@
       <Culture>0x1009</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>.\..\util/levcomp.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\..\util/levcomp.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -168,7 +167,6 @@ chdir ..\build
       <Culture>0x1009</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>.\..\util/levcomp.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\util/levcomp.pdb</ProgramDatabaseFile>

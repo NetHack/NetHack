@@ -2120,9 +2120,7 @@ E void FDECL(play_sound_for_message, (const char *));
 
 /* ### sys.c ### */
 
-#ifdef SYSCF
 E void FDECL(sysopt_seduce_set,(int));
-#endif
 
 /* ### sys/msdos/sound.c ### */
 

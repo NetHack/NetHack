@@ -1,6 +1,5 @@
 # NetHack 3.5	Makefile.gcc	$Date$  $Revision$
-#   SCCS Id: @(#)Makefile.gcc       3.5     $Date$
-#   Copyright (c) NetHack PC Development Team 1993-2006
+#   Copyright (c) NetHack PC Development Team 1993-2010
 #
 #   NetHack 3.5.x Makefile for MinGW
 #
@@ -526,37 +525,37 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/monk.des    $(DAT)/priest.des   $(DAT)/ranger.des \
 	 $(DAT)/rogue.des   $(DAT)/samurai.des  $(DAT)/sokoban.des \
 	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des
-	$(subst /,\,$(U)lev_comp $(DAT)/bigroom.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/castle.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/endgame.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/gehennom.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/knox.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/mines.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/medusa.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/oracle.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/sokoban.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/tower.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/yendor.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/arch.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/barb.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/caveman.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/healer.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/knight.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/monk.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/priest.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/ranger.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/rogue.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/samurai.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/tourist.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/valkyrie.des)
-	$(subst /,\,$(U)lev_comp $(DAT)/wizard.des)
+	$(subst /,\,$(U)levcomp $(DAT)/bigroom.des)
+	$(subst /,\,$(U)levcomp $(DAT)/castle.des)
+	$(subst /,\,$(U)levcomp $(DAT)/endgame.des)
+	$(subst /,\,$(U)levcomp $(DAT)/gehennom.des)
+	$(subst /,\,$(U)levcomp $(DAT)/knox.des)
+	$(subst /,\,$(U)levcomp $(DAT)/mines.des)
+	$(subst /,\,$(U)levcomp $(DAT)/medusa.des)
+	$(subst /,\,$(U)levcomp $(DAT)/oracle.des)
+	$(subst /,\,$(U)levcomp $(DAT)/sokoban.des)
+	$(subst /,\,$(U)levcomp $(DAT)/tower.des)
+	$(subst /,\,$(U)levcomp $(DAT)/yendor.des)
+	$(subst /,\,$(U)levcomp $(DAT)/arch.des)
+	$(subst /,\,$(U)levcomp $(DAT)/barb.des)
+	$(subst /,\,$(U)levcomp $(DAT)/caveman.des)
+	$(subst /,\,$(U)levcomp $(DAT)/healer.des)
+	$(subst /,\,$(U)levcomp $(DAT)/knight.des)
+	$(subst /,\,$(U)levcomp $(DAT)/monk.des)
+	$(subst /,\,$(U)levcomp $(DAT)/priest.des)
+	$(subst /,\,$(U)levcomp $(DAT)/ranger.des)
+	$(subst /,\,$(U)levcomp $(DAT)/rogue.des)
+	$(subst /,\,$(U)levcomp $(DAT)/samurai.des)
+	$(subst /,\,$(U)levcomp $(DAT)/tourist.des)
+	$(subst /,\,$(U)levcomp $(DAT)/valkyrie.des)
+	$(subst /,\,$(U)levcomp $(DAT)/wizard.des)
 	$(subst /,\,copy *.lev $(DAT))
 	$(subst /,\,del *.lev)
 	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
 
 $(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
-	 $(SRC)/monstr.c $(SRC)/vis_tab.c $(U)lev_comp.exe $(INCL)/vis_tab.h \
-	 $(U)dgn_comp.exe $(TILEUTIL16)
+	 $(SRC)/monstr.c $(SRC)/vis_tab.c $(U)levcomp.exe $(INCL)/vis_tab.h \
+	 $(U)dgncomp.exe $(TILEUTIL16)
 	$(subst /,\,@echo utilities made >$@)
 	@echo utilities made.
 
@@ -731,7 +730,7 @@ $(WIN32)/splash.bmp: $(U)uudecode.exe $(WIN32)/splash.uu
 
 LEVCFLAGS=$(cflags) -c -DWIN32 -D_WIN32 -I../include $(cdebug) -DDLB
 
-$(U)lev_comp.exe: $(SPLEVOBJS)
+$(U)levcomp.exe: $(SPLEVOBJS)
 	@echo Linking $@...
 	@$(link) $(LFLAGSU) -o$@ $(SPLEVOBJS)
 
@@ -784,7 +783,7 @@ endif
 # Dungeon Compiler Stuff
 #==========================================
 
-$(U)dgn_comp.exe: $(DGNCOMPOBJS)
+$(U)dgncomp.exe: $(DGNCOMPOBJS)
 	@echo Linking $@...
 	@$(link) $(LFLAGSU) -o$@ $(DGNCOMPOBJS)
 
@@ -1050,8 +1049,8 @@ clean:
 	$(subst /,\,if exist $(O)*.o del $(O)*.o)
 	$(subst /,\,if exist $(O)utility.tag   del $(O)utility.tag)
 	$(subst /,\,if exist $(U)makedefs.exe  del $(U)makedefs.exe)
-	$(subst /,\,if exist $(U)lev_comp.exe  del $(U)lev_comp.exe)
-	$(subst /,\,if exist $(U)dgn_comp.exe  del $(U)dgn_comp.exe)
+	$(subst /,\,if exist $(U)levcomp.exe   del $(U)levcomp.exe)
+	$(subst /,\,if exist $(U)dgncomp.exe   del $(U)dgncomp.exe)
 	$(subst /,\,if exist $(SRC)/*.lnk      del $(SRC)/*.lnk)
 	$(subst /,\,if exist $(SRC)/*.map      del $(SRC)/*.map)
 	$(subst /,\,if exist $(TILEBMP16)      del $(TILEBMP16))
@@ -1079,7 +1078,7 @@ $(DAT)/oracles: $(O)utility.tag    $(DAT)/oracles.txt
 
 $(DAT)/dungeon: $(O)utility.tag  $(DAT)/dungeon.def
 	$(subst /,\,$(U)makedefs -e)
-	$(subst /,\,$(U)dgn_comp $(DAT)/dungeon.pdf)
+	$(subst /,\,$(U)dgncomp $(DAT)/dungeon.pdf)
 
 #
 # NT dependencies
