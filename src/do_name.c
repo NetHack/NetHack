@@ -1,5 +1,4 @@
 /* NetHack 3.5	do_name.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)do_name.c	3.5	2008/11/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -387,7 +386,7 @@ void
 do_oname(obj)
 register struct obj *obj;
 {
-	char buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
+	char *bufp, buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
 	const char *aname;
 	short objtyp;
 
@@ -419,8 +418,10 @@ register struct obj *obj;
 		   (we know that it must eventually target a nonspace
 		   because buf[] matches a valid artifact name) */
 		Strcpy(bufcpy, buf);
+		/* for "the Foo of Bar", only scuff "Foo of Bar" part */
+		bufp = !strncmpi(bufcpy, "the ", 4) ? (buf + 4) : buf;
 		do {
-		    wipeout_text(buf, rnd(2), (unsigned)0);
+		    wipeout_text(bufp, rnd(2), (unsigned)0);
 		} while (!strcmp(buf, bufcpy));
 		pline("While engraving, your %s slips.", body_part(HAND));
 		display_nhwindow(WIN_MESSAGE, FALSE);
