@@ -18,7 +18,6 @@ static NEARDATA const char readable[] =
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 STATIC_DCL boolean FDECL(learnscrolltyp, (SHORT_P));
-STATIC_DCL void FDECL(learnscroll, (struct obj *));
 STATIC_DCL void NDECL(do_class_genocide);
 STATIC_DCL void FDECL(stripspe,(struct obj *));
 STATIC_DCL void FDECL(p_glow1,(struct obj *));
@@ -35,17 +34,20 @@ learnscrolltyp(scrolltyp)
 short scrolltyp;
 {
     if (!objects[scrolltyp].oc_name_known) {
-    	makeknown(scrolltyp);
+	makeknown(scrolltyp);
 	more_experienced(0, 10);
-    	return TRUE;
+	return TRUE;
     } else
 	return FALSE;
 }
 
-STATIC_OVL void
+/* also called from teleport.c for scroll of teleportation */
+void
 learnscroll(sobj)
 struct obj *sobj;
 {
+    /* it's implied that sobj->dknown is set;
+       we couldn't be reading this scroll otherwise */
     if (sobj->oclass != SPBOOK_CLASS)
 	(void) learnscrolltyp(sobj->otyp);
 }
@@ -1178,15 +1180,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		if (confused || scursed) {
 		    level_tele();
 		} else {
-		    if (sblessed && !Teleport_control) {
-			known = TRUE;
-			if (yn("Do you wish to teleport?") == 'n')
-			    break;
-		    }
-		    tele();
-		    if (Teleport_control || !couldsee(u.ux0, u.uy0) ||
-			    distu(u.ux0, u.uy0) >= 16)
-			known = TRUE;
+		    known = scrolltele(sobj);
 		}
 		break;
 	case SCR_GOLD_DETECTION:

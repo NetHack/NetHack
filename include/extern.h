@@ -1870,6 +1870,7 @@ E long NDECL(random);
 
 /* ### read.c ### */
 
+E void FDECL(learnscroll, (struct obj *));
 E int NDECL(doread);
 E boolean FDECL(is_chargeable, (struct obj *));
 E void FDECL(recharge, (struct obj *,int));
@@ -2201,6 +2202,7 @@ E void FDECL(teleds, (int,int,BOOLEAN_P));
 E boolean FDECL(safe_teleds, (BOOLEAN_P));
 E boolean FDECL(teleport_pet, (struct monst *,BOOLEAN_P));
 E void NDECL(tele);
+E boolean FDECL(scrolltele, (struct obj *));
 E int NDECL(dotele);
 E void NDECL(level_tele);
 E void FDECL(domagicportal, (struct trap *));

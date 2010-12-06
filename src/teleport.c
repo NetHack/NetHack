@@ -1,5 +1,4 @@
 /* NetHack 3.5	teleport.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)teleport.c	3.5	2006/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,6 +9,9 @@ STATIC_DCL boolean FDECL(teleok, (int,int,BOOLEAN_P));
 STATIC_DCL void NDECL(vault_tele);
 STATIC_DCL boolean FDECL(rloc_pos_ok, (int,int,struct monst *));
 STATIC_DCL void FDECL(mvault_tele, (struct monst *));
+
+/* non-null when teleporting via having read this scroll */
+STATIC_VAR struct obj *telescroll = 0;
 
 /*
  * Is (x,y) a good position of mtmp?  If mtmp is NULL, then is (x,y) good
@@ -328,6 +330,15 @@ boolean allow_drag;
 	vision_full_recalc = 1;
 	nomul(0);
 	vision_recalc(0);	/* vision before effects */
+	if (telescroll) {
+	    /* when teleporting by scroll, we need to handle discovery
+	       now before getting feedback about any objects at our
+	       destination since we might land on another such scroll */
+	    if (distu(u.ux0, u.uy0) >= 16 || !couldsee(u.ux0, u.uy0))
+		learnscroll(telescroll);
+	    else
+		telescroll = 0; /* no discovery by scrolltele()'s caller */
+	}
 	spoteffects(TRUE);
 	invocation_message();
 }
@@ -394,10 +405,23 @@ boolean force_it;
 	return TRUE;
 }
 
+/* teleport the hero via some method other than scroll of teleport */
 void
 tele()
 {
+	(void)scrolltele((struct obj *)0);
+}
+
+/* teleport the hero; return true if scroll of teleportation should become
+   discovered; teleds() will usually do the actual discovery, since the
+   outcome sometimes depends upon destination and discovery needs to be
+   performed before arrival, in case we land on another teleport scroll */
+boolean
+scrolltele(scroll)
+struct obj *scroll;
+{
 	coord cc;
+	boolean result = FALSE;	/* don't learn scroll */
 
 	/* Disable teleportation in stronghold && Vlad's Tower */
 	if (level.flags.noteleport) {
@@ -405,7 +429,7 @@ tele()
 		if (!wizard) {
 #endif
 		    pline("A mysterious force prevents you from teleporting!");
-		    return;
+		    return TRUE;
 #ifdef WIZARD
 		}
 #endif
@@ -419,7 +443,7 @@ tele()
 #ifdef WIZARD
 	    if (wizard && yn("Override?") != 'y')
 #endif
-	    return;
+	    return FALSE;
 	}
 	if ((Teleport_control && !Stunned)
 #ifdef WIZARD
@@ -429,30 +453,43 @@ tele()
 	    if (unconscious()) {
 		pline("Being unconscious, you cannot control your teleport.");
 	    } else {
+		    char whobuf[BUFSZ];
+
+		    Strcpy(whobuf, "you");
 #ifdef STEED
-		    char buf[BUFSZ];
-		    if (u.usteed) Sprintf(buf," and %s", mon_nam(u.usteed));
+		    if (u.usteed)
+			Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
 #endif
-		    pline("To what position do you%s want to be teleported?",
-#ifdef STEED
-				u.usteed ? buf :
-#endif
-			   "");
+		    pline("To what position do %s want to be teleported?",
+			  whobuf);
 		    cc.x = u.ux;
 		    cc.y = u.uy;
 		    if (getpos(&cc, TRUE, "the desired position") < 0)
-			return;	/* abort */
+			return TRUE;	/* abort */
 		    /* possible extensions: introduce a small error if
 		       magic power is low; allow transfer to solid rock */
 		    if (teleok(cc.x, cc.y, FALSE)) {
+			/* for scroll, discover it regardless of destination */
+			if (scroll) learnscroll(scroll);
 			teleds(cc.x, cc.y, FALSE);
-			return;
+			return TRUE;
 		    }
 		    pline("Sorry...");
+		    result = TRUE;
 		}
+	} else if (scroll && scroll->blessed) {
+		/* (this used to be handled in seffects()) */
+		if (yn("Do you wish to teleport?") == 'n') return TRUE;
+		result = TRUE;
 	}
 
+	telescroll = scroll;
 	(void) safe_teleds(FALSE);
+	/* teleds() will leave telescroll intact iff random destination
+	   is far enough away for scroll discovery to be warranted */
+	if (telescroll) result = TRUE;
+	telescroll = 0;		/* reset */
+	return result;
 }
 
 int
