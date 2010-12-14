@@ -1,5 +1,4 @@
 /* NetHack 3.5	sounds.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)sounds.c	3.5	2007/05/05	*/
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,6 +11,7 @@
 # endif
 #endif
 
+STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));
 STATIC_DCL int FDECL(domonnoise,(struct monst *));
 STATIC_DCL int NDECL(dochat);
 STATIC_DCL int FDECL(mon_in_room, (struct monst *,int));
@@ -464,6 +464,24 @@ register struct monst *mtmp;
     }
 }
 
+/* return True if mon is a gecko or seems to look like one (hallucination) */
+STATIC_OVL boolean
+mon_is_gecko(mon)
+struct monst *mon;
+{
+    int glyph;
+
+    /* return True if it is actually a gecko */
+    if (mon->data == &mons[PM_GECKO]) return TRUE;
+    /* return False if it is a long worm; we might be chatting to its tail
+       (not strictly needed; long worms are MS_SILENT so won't get here) */
+    if (mon->data == &mons[PM_LONG_WORM]) return FALSE;
+    /* result depends upon whether map spot shows a gecko, which will
+       be due to hallucination or to mimickery since mon isn't one */     
+    glyph = glyph_at(mon->mx, mon->my);
+    return (boolean)(glyph_to_mon(glyph) == PM_GECKO);
+}
+
 STATIC_OVL int
 domonnoise(mtmp)
 register struct monst *mtmp;
@@ -490,6 +508,9 @@ register struct monst *mtmp;
 	    (same_race(ptr, youmonst.data) ||		/* current form, */
 	     same_race(ptr, &mons[Race_switch])))	/* unpoly'd form */
 	msound = MS_HUMANOID;
+    /* silliness, with slight chance to interfere with shopping */
+    else if (Hallucination && mon_is_gecko(mtmp))
+	msound = MS_SELL;
 
     /* be sure to do this before talking; the monster might teleport away, in
      * which case we want to check its pre-teleport position
@@ -509,7 +530,15 @@ register struct monst *mtmp;
 	    quest_chat(mtmp);
 	    break;
 	case MS_SELL: /* pitch, pay, total */
-	    shk_chat(mtmp);
+	    if (!Hallucination || (mtmp->isshk && !rn2(2))) {
+		shk_chat(mtmp);
+	    } else {
+		/* approximation of GEICO's advertising slogan (it actually
+		   concludes with "save you 15% or more on car insurance.") */
+		Sprintf(verbuf, "15 minutes could save you 15 %s.",
+			currency(15L));	/* "zorkmids" */
+		verbl_msg = verbuf;
+	    }
 	    break;
 	case MS_VAMPIRE:
 	    {
