@@ -363,7 +363,6 @@ char *outbuf;
 	0
     };
     const char *descr, *const *comp_p;
-    int idx;
 
     descr = OBJ_DESCR(objects[booktype]);
     for (comp_p = compositions; *comp_p; ++comp_p)
