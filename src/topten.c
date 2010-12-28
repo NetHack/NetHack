@@ -681,10 +681,15 @@ boolean so;
 		    !(*bp == ' ' && (bp-linebuf < hppos));
 		    bp--)
 		;
+	    /* special case: word is too long, wrap in the middle */
+	    if (linebuf+15 >= bp) bp = linebuf + hppos - 1;
 	    /* special case: if about to wrap in the middle of maximum
 	       dungeon depth reached, wrap in front of it instead */
 	    if (bp > linebuf + 5 && !strncmp(bp - 5, " [max", 5)) bp -= 5;
-	    Strcpy(linebuf3, bp+1);
+	    if (*bp != ' ')
+		Strcpy(linebuf3, bp);
+	    else
+		Strcpy(linebuf3, bp+1);
 	    *bp = 0;
 	    if (so) {
 		while (bp < linebuf + (COLNO-1)) *bp++ = ' ';
