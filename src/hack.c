@@ -789,7 +789,8 @@ findtravelpath(guess)
 boolean guess;
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
-    if (!guess && context.travel1 && distmin(u.ux, u.uy, u.tx, u.ty) == 1) {
+    if (!guess && context.travel1 && distmin(u.ux, u.uy, u.tx, u.ty) == 1 &&
+	!(u.ux != u.tx && u.uy != u.ty && NODIAG(u.umonnum))) {
 	context.run = 0;
 	if (test_move(u.ux, u.uy, u.tx-u.ux, u.ty-u.uy, TEST_MOVE)) {
 	    u.dx = u.tx-u.ux;
