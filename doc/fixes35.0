@@ -340,6 +340,8 @@ fix writing feedback "the spellbook warps strangely, then turns parchment"
 make stone artifacts usually resist stone-to-flesh
 when reading an unknown scroll and learning it, discovery of teleporation was
 	too late if hero happened to land on another scroll of teleportation
+using an unlocking tool on a closed door which was actually a mimic reported
+	that there was no door to unlock instead of exposing the mimic
 
 
 Platform- and/or Interface-Specific Fixes

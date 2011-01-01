@@ -387,9 +387,10 @@ pick_lock(pick)
 	    }
 
 	    door = &levl[cc.x][cc.y];
-	    if ((mtmp = m_at(cc.x, cc.y)) && canseemon(mtmp)
-			&& mtmp->m_ap_type != M_AP_FURNITURE
-			&& mtmp->m_ap_type != M_AP_OBJECT) {
+	    mtmp = m_at(cc.x, cc.y);
+	    if (mtmp && canseemon(mtmp) &&
+			mtmp->m_ap_type != M_AP_FURNITURE &&
+			mtmp->m_ap_type != M_AP_OBJECT) {
 #ifdef TOURIST
 		if (picktyp == CREDIT_CARD &&
 		    (mtmp->isshk || mtmp->data == &mons[PM_ORACLE]))
@@ -397,6 +398,14 @@ pick_lock(pick)
 		else
 #endif
 		    pline("I don't think %s would appreciate that.", mon_nam(mtmp));
+		return PICKLOCK_LEARNED_SOMETHING;
+	    } else if (mtmp && mtmp->m_ap_type == M_AP_FURNITURE &&
+			/* not IS_DOOR() here; for M_AP_FURNITURE, mappearance
+			   holds a map symbol rather than a topology type */
+			(mtmp->mappearance == S_vcdoor ||
+			 mtmp->mappearance == S_hcdoor)) {
+		/* "The door actually was a <mimic>!" */
+		stumble_onto_mimic(mtmp);
 		return PICKLOCK_LEARNED_SOMETHING;
 	    }
 	    if(!IS_DOOR(door->typ)) {
