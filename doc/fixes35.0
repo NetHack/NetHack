@@ -342,6 +342,8 @@ when reading an unknown scroll and learning it, discovery of teleporation was
 	too late if hero happened to land on another scroll of teleportation
 using an unlocking tool on a closed door which was actually a mimic reported
 	that there was no door to unlock instead of exposing the mimic
+using an unlocking tool on a boulder that was a mimic in a Sokoban doorway
+	successfully unlocked the underlying door without exposing mimic
 
 
 Platform- and/or Interface-Specific Fixes
