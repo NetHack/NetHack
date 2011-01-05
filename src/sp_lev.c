@@ -1,5 +1,4 @@
 /* NetHack 3.5	sp_lev.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)sp_lev.c	3.5	2007/08/01	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,6 +29,7 @@ STATIC_DCL void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
 STATIC_DCL void FDECL(get_free_room_loc, (schar *, schar *, struct mkroom *));
 STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
 STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
+STATIC_DCL boolean FDECL(m_bad_boulder_spot, (int,int));
 STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
 STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
 STATIC_DCL void FDECL(create_engraving, (engraving *,struct mkroom *));
@@ -744,6 +744,26 @@ aligntyp alignment;
 	return(k ? -alignment : 0);
 }
 
+/* attempt to screen out locations where a mimic-as-boulder shouldn't occur */
+STATIC_OVL boolean
+m_bad_boulder_spot(x, y)
+int x, y;
+{
+    struct rm *lev;
+
+    /* avoid trap locations */
+    if (t_at(x, y)) return TRUE;
+    /* try to avoid locations which already have a boulder (this won't
+       actually work; we get called before objects have been placed...) */
+    if (sobj_at(BOULDER, x, y)) return TRUE;
+    /* avoid closed doors */
+    lev = &levl[x][y];
+    if (IS_DOOR(lev->typ) && (lev->doormask & (D_CLOSED | D_LOCKED)) != 0)
+	return TRUE;
+    /* spot is ok */
+    return FALSE;
+}
+
 STATIC_OVL void
 create_monster(m,croom)
 monster	*m;
@@ -817,6 +837,7 @@ struct mkroom	*croom;
 	else mtmp = makemon(pm, x, y, NO_MM_FLAGS);
 
 	if (mtmp) {
+	    x = mtmp->mx,  y = mtmp->my;	/* sanity precaution */
 	    /* handle specific attributes for some special monsters */
 	    if (m->name.str) mtmp = christen_monst(mtmp, m->name.str);
 
@@ -862,21 +883,26 @@ struct mkroom	*croom;
 			    mtmp->m_ap_type = M_AP_OBJECT;
 			    mtmp->mappearance = i;
 			    /* try to avoid placing mimic boulder on a trap */
-			    if (i == BOULDER && m->x < 0 && t_at(x, y)) {
-				int k;
+			    if (i == BOULDER && m->x < 0 &&
+				    m_bad_boulder_spot(x, y)) {
+				int retrylimit = 10;
 
-				for (k = 0; k < 10 && t_at(x, y); ++k) {
+				remove_monster(x, y);
+				do {
 				    x = m->x;
 				    y = m->y;
 				    if (croom)
 					get_room_loc(&x, &y, croom);
-				    else {
+				    else
 					get_location(&x, &y, DRY);
-				    }
 				    if (MON_AT(x,y) && enexto(&cc, x, y, pm))
 					x = cc.x,  y = cc.y;
-				}
+				} while (m_bad_boulder_spot(x, y) &&
+					 --retrylimit > 0);
 				place_monster(mtmp, x, y);
+				/* if we didn't find a good spot
+				   then mimic something else */
+				if (!retrylimit) set_mimic_sym(mtmp);
 			    }
 			}
 			break;

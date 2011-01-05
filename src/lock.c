@@ -407,17 +407,6 @@ pick_lock(pick)
 		/* "The door actually was a <mimic>!" */
 		stumble_onto_mimic(mtmp);
 		return PICKLOCK_LEARNED_SOMETHING;
-	    /* mimic-as-boulder on last Sokoban level */
-	    } else if (mtmp && mtmp->m_ap_type == M_AP_OBJECT &&
-			mtmp->mappearance == BOULDER) {
-		if (Blind)	/* by touch */
-		    /* "Wait!  That's a monster!" */
-		    stumble_onto_mimic(mtmp);
-		else if (IS_DOOR(door->typ))
-		    pline("That door is blocked.");
-		else
-		    You("see no door there.");
-		return PICKLOCK_LEARNED_SOMETHING;
 	    }
 	    if(!IS_DOOR(door->typ)) {
 		if (is_drawbridge_wall(cc.x,cc.y) >= 0)

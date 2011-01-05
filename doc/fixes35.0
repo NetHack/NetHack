@@ -70,7 +70,7 @@ when blind and levitating > shouldn't say "stairs" if player has not seen them
 a slow-moving monster hidden under a rotting corpse was not immediately
 	displayed when the corpse rotted away
 mimic that ends up on the rogue level should not mimic a closed door
-mimic should not mimic a boulder while on a pit or hole location
+mimic should not mimic a boulder while on a pit or hole or closed door
 reviving invisible troll could appear visible until it moves
 adjust some of the shop repair messages
 charge for reviving a shop owned corpse or reanimating a shop owned statue
@@ -342,8 +342,6 @@ when reading an unknown scroll and learning it, discovery of teleporation was
 	too late if hero happened to land on another scroll of teleportation
 using an unlocking tool on a closed door which was actually a mimic reported
 	that there was no door to unlock instead of exposing the mimic
-using an unlocking tool on a boulder that was a mimic in a Sokoban doorway
-	successfully unlocked the underlying door without exposing mimic
 
 
 Platform- and/or Interface-Specific Fixes
