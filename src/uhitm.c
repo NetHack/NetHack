@@ -1832,7 +1832,7 @@ register struct attack *mattk;
 	 * after exactly 1 round of attack otherwise.  -KAA
 	 */
 
-	if (pd->msize >= MZ_HUGE) return 0;
+	if (!engulf_target(&youmonst, mdef)) return 0;
 
 	if(u.uhunger < 1500 && !u.uswallow) {
 	    for (otmp = mdef->minvent; otmp; otmp = otmp->nobj)

@@ -1,5 +1,4 @@
 /* NetHack 3.5	mhitu.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mhitu.c	3.5	2009/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1636,7 +1635,7 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 	if (!u.uswallow) {	/* swallows you */
 		int omx = mtmp->mx, omy = mtmp->my;
 
-		if (youmonst.data->msize >= MZ_HUGE) return(0);
+		if (!engulf_target(mtmp, &youmonst)) return 0;
 		if ((t && ((t->ttyp == PIT) || (t->ttyp == SPIKED_PIT))) &&
 		    sobj_at(BOULDER, u.ux, u.uy))
 			return(0);

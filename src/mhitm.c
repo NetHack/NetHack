@@ -1,5 +1,4 @@
 /* NetHack 3.5	mhitm.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mhitm.c	3.5	2007/12/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -550,6 +549,37 @@ gazemm(magr, mdef, mattk)
 	return(mdamagem(magr, mdef, mattk));
 }
 
+/* return True if magr is allowed to swallow mdef, False otherwise */
+boolean
+engulf_target(magr, mdef)
+struct monst *magr, *mdef;
+{
+	struct rm *lev;
+	int dx, dy;
+
+	/* can't swallow something that's too big */
+	if (mdef->data->msize >= MZ_HUGE)
+	    return FALSE;
+
+	/* (hypothetical) engulfers who can pass through walls aren't
+         limited by rock|trees|bars */
+	if ((magr == &youmonst) ? Passes_walls : passes_walls(magr->data))
+	    return TRUE;
+
+	/* don't swallow something in a spot where attacker wouldn't
+	   otherwise be able to move onto; we don't want to engulf
+	   a wall-phaser and end up with a non-phaser inside a wall */
+	dx = mdef->mx, dy = mdef->my;
+	if (mdef == &youmonst) dx = u.ux, dy = u.uy;
+	lev = &levl[dx][dy];
+	if (IS_ROCK(lev->typ) || closed_door(dx, dy) || IS_TREE(lev->typ) ||
+		/* not passes_bars(); engulfer isn't squeezing through */
+		(lev->typ == IRONBARS && !is_whirly(magr->data)))
+	    return FALSE;
+
+	return TRUE;
+}
+
 /* Returns the same values as mattackm(). */
 STATIC_OVL int
 gulpmm(magr, mdef, mattk)
@@ -561,7 +591,7 @@ gulpmm(magr, mdef, mattk)
 	char buf[BUFSZ];
 	struct obj *obj;
 
-	if (mdef->data->msize >= MZ_HUGE) return MM_MISS;
+	if (!engulf_target(magr, mdef)) return MM_MISS;
 
 	if (vis) {
 		Sprintf(buf,"%s swallows", Monnam(magr));
@@ -777,7 +807,7 @@ mdamagem(magr, mdef, mattk)
 		       worm's bite attack to kill a shrieker because then it
 		       won't swallow the corpse; but if the target survives,
 		       the subsequent engulf attack should accomplish that */
-		    if (tmp >= mdef->mhp) tmp = mdef->mhp - 1;
+		    if (tmp >= mdef->mhp && mdef->mhp > 1) tmp = mdef->mhp - 1;
 		}
 		break;
 	    case AD_FIRE:

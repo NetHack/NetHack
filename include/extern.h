@@ -1106,6 +1106,7 @@ E int FDECL(buzzmu, (struct monst *,struct attack *));
 
 E int FDECL(fightm, (struct monst *));
 E int FDECL(mattackm, (struct monst *,struct monst *));
+E boolean FDECL(engulf_target, (struct monst *,struct monst *));
 #ifdef BARGETHROUGH
 E int FDECL(mdisplacem, (struct monst *,struct monst *,BOOLEAN_P));
 #endif
