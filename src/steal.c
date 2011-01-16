@@ -1,5 +1,4 @@
 /* NetHack 3.5	steal.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)steal.c	3.5	2008/11/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -469,6 +468,8 @@ gotobj:
 	 */
 	mtmp->mavenge = 1;
 
+	if(otmp->unpaid)
+	    subfrombill(otmp, shop_keeper(*u.ushops));
 	freeinv(otmp);
 	pline("%s stole %s.", named ? "She" : Monnam(mtmp), doname(otmp));
 	could_petrify = (otmp->otyp == CORPSE &&
@@ -508,6 +509,9 @@ register struct obj *otmp;
 	    pline("%s out.", Tobjnam(otmp, "go"));
 	snuff_otmp = TRUE;
     }
+    /* for hero owned object on shop floor, mtmp is taking possession
+       and if it's eventually dropped in a shop, shk will claim it */
+    if (!mtmp->mtame) otmp->no_charge = 0;
     /* Must do carrying effects on object prior to add_to_minv() */
     carry_obj_effects(otmp);
     /* add_to_minv() might free otmp [if merged with something else],
@@ -555,6 +559,8 @@ struct monst *mtmp;
     if (otmp) { /* we have something to snatch */
 	if (otmp->owornmask)
 	    remove_worn_item(otmp, TRUE);
+	if(otmp->unpaid)
+	    subfrombill(otmp, shop_keeper(*u.ushops));
 	freeinv(otmp);
 	/* mpickobj wont merge otmp because none of the above things
 	   to steal are mergable */
