@@ -26,9 +26,8 @@ static NEARDATA const char toss_objs[] =
 static NEARDATA const char bullets[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, GEM_CLASS, 0 };
 
-struct obj *thrownobj = 0;	/* tracks an object until it lands */
+/* thrownobj (decl.c) tracks an object until it lands */
 
-extern struct obj *kickobj;	/* from dokick.c */
 extern boolean notonhead;	/* for long worms */
 
 
@@ -1265,7 +1264,7 @@ boolean maybe_wakeup;
 int
 thitmonst(mon, obj)
 register struct monst *mon;
-register struct obj *obj;	/* thrownobj or kickobj or uwep */
+register struct obj *obj;	/* thrownobj or kickedobj or uwep */
 {
 	register int	tmp; /* Base chance to hit */
 	register int	disttmp; /* distance modifier */
@@ -1273,7 +1272,7 @@ register struct obj *obj;	/* thrownobj or kickobj or uwep */
 	boolean guaranteed_hit = (u.uswallow && mon == u.ustuck);
 
 	hmode = (obj == uwep) ? HMON_APPLIED :
-		(obj == kickobj) ? HMON_KICKED : HMON_THROWN;
+		(obj == kickedobj) ? HMON_KICKED : HMON_THROWN;
 
 	/* Differences from melee weapons:
 	 *

@@ -244,7 +244,8 @@ E NEARDATA struct obj *uchain;		/* defined only when punished */
 E NEARDATA struct obj *uball;
 E NEARDATA struct obj *migrating_objs;
 E NEARDATA struct obj *billobjs;
-E NEARDATA struct obj *current_wand;
+E NEARDATA struct obj *current_wand, *thrownobj, *kickedobj;
+
 E NEARDATA struct obj zeroobj;		/* init'd and defined in decl.c */
 E NEARDATA anything zeroany;		/* init'd and defined in decl.c */
 

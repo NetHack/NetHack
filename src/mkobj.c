@@ -1,5 +1,4 @@
 /* NetHack 3.5	mkobj.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mkobj.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,9 +17,6 @@ STATIC_DCL void FDECL(insane_object,
 		      (struct obj *,const char *,const char *,struct monst *));
 STATIC_DCL void FDECL(check_contained, (struct obj *,const char *));
 #endif
-
-extern struct obj *thrownobj;		/* defined in dothrow.c */
-extern struct obj *kickobj;		/* dokick.c */
 
 /*#define DEBUG_EFFECTS*/	/* show some messages for debugging */
 
@@ -1871,7 +1867,7 @@ dealloc_obj(obj)
 	del_light_source(LS_OBJECT, obj_to_any(obj));
 
     if (obj == thrownobj) thrownobj = 0;
-    if (obj == kickobj) kickobj = 0;
+    if (obj == kickedobj) kickedobj = 0;
 
     if (obj->oextra) dealloc_oextra(obj->oextra);
     free((genericptr_t) obj);
@@ -2003,8 +1999,8 @@ obj_sanity_check()
        they should have arrived somewhere by the time we get called */
     if (thrownobj)
 	insane_object(thrownobj, ofmt3, "thrownobj sanity", (struct monst *)0);
-    if (kickobj)
-	insane_object(kickobj, ofmt3, "kickobj sanity", (struct monst *)0);
+    if (kickedobj)
+	insane_object(kickedobj, ofmt3, "kickedobj sanity", (struct monst *)0);
     /* [how about current_wand too?] */
 }
 

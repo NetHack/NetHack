@@ -1,5 +1,4 @@
 /* NetHack 3.5	mon.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mon.c	3.5	2009/01/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,8 +10,6 @@
 #include "hack.h"
 #include "mfndpos.h"
 #include <ctype.h>
-
-extern struct obj *thrownobj;	/* dothrow.c */
 
 STATIC_DCL boolean FDECL(restrap,(struct monst *));
 STATIC_DCL long FDECL(mm_aggression, (struct monst *,struct monst *));

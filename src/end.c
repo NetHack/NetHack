@@ -21,9 +21,6 @@
 #define FIRST_AMULET AMULET_OF_ESP
 #define LAST_AMULET  AMULET_OF_YENDOR
  
-extern struct obj *thrownobj;		/* dothrow.c */
-extern struct obj *kickobj;		/* dokick.c */
-
 struct valuable_data { long count; int typ; };
 
 static struct valuable_data
@@ -893,7 +890,7 @@ die:
 	/* maybe not on object lists; if an active light source, would cause
 	   big trouble (`obj_is_local' panic) for savebones() -> savelev() */
 	if (thrownobj && thrownobj->where == OBJ_FREE) dealloc_obj(thrownobj);
-	if (kickobj && kickobj->where == OBJ_FREE) dealloc_obj(kickobj);
+	if (kickedobj && kickedobj->where == OBJ_FREE) dealloc_obj(kickedobj);
 
 	/* Sometimes you die on the first move.  Life's not fair.
 	 * On those rare occasions you get hosed immediately, go out

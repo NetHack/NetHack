@@ -1,5 +1,4 @@
 /* NetHack 3.5	shk.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)shk.c	3.5	2007/03/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,8 +26,6 @@ STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
 			 (shkp)->data->msound <= MS_ANIMAL)
 
 extern const struct shclass shtypes[];	/* defined in shknam.c */
-extern struct obj *thrownobj;		/* defined in dothrow.c */
-extern struct obj *kickobj;		/* dokick.c */
 
 STATIC_VAR NEARDATA long int followmsg;	/* last time of follow message */
 STATIC_VAR const char and_its_contents[] = " and its contents";
@@ -281,7 +278,7 @@ register struct monst *shkp;
 	clear_unpaid(fobj);
 	clear_unpaid(level.buriedobjlist);
 	if (thrownobj) thrownobj->unpaid = 0;
-	if (kickobj) kickobj->unpaid = 0;
+	if (kickedobj) kickedobj->unpaid = 0;
 	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 		clear_unpaid(mtmp->minvent);
 	for(mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon)

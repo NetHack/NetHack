@@ -162,7 +162,11 @@ NEARDATA struct obj *invent = (struct obj *)0,
 	*ublindf = (struct obj *)0,
 	*uchain = (struct obj *)0,
 	*uball = (struct obj *)0;
-NEARDATA struct obj *current_wand = 0;	/* wand currently zapped/applied */
+/* some objects need special handling during destruction or placement */
+NEARDATA struct obj
+	*current_wand = 0,	/* wand currently zapped/applied */
+	*thrownobj = 0,		/* object in flight due to throwing */
+	*kickedobj = 0;		/* object in flight due to kicking */
 
 #ifdef TEXTCOLOR
 /*
