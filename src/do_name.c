@@ -1129,7 +1129,7 @@ static const char * const coynames[] = {
 	"Evereadii Eatibus","Apetitius Giganticus",
 	"Hungrii Flea-Bagius","Overconfidentii Vulgaris",
 	"Caninus Nervous Rex","Grotesques Appetitus",
-	"Nemesis Riduclii","Canis latrans"
+	"Nemesis Riduculii","Canis latrans"
 };
 	
 char *
