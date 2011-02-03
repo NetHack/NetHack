@@ -394,6 +394,10 @@ blanking items in pools while blind shouldn't reveal new obj description
 avoid infinite loop in topten output when killed by long-named monster
 grid bug could move diagonally 1 step using travel command
 unpaid shop items stolen from hero by a monster remained on hero's shop bill
+some actions taken when blind would yield "Wait!  That's a monster!" (for a
+	mimic posing as a door) but not display the unseen monster glyph
+#untrap toward known trap location containing concealed mimic would yield
+	"{The mimic|It} {is in the way|isn't trapped}." but not reveal mimic
 
 
 Platform- and/or Interface-Specific Fixes

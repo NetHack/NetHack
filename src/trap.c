@@ -3935,6 +3935,12 @@ boolean force;
 				(x == u.ux && y == u.uy) ? " in it" : "");
 			return 1;
 		    }
+		    if ((mtmp = m_at(x, y)) != 0 &&
+			    (mtmp->m_ap_type == M_AP_FURNITURE ||
+			     mtmp->m_ap_type == M_AP_OBJECT)) {
+			stumble_onto_mimic(mtmp);
+			return 1;
+		    }
 		    switch(ttmp->ttyp) {
 			case BEAR_TRAP:
 			case WEB:
@@ -3953,7 +3959,7 @@ boolean force;
 				    You("are already on the edge of the pit.");
 				    return 0;
 				}
-				if (!(mtmp = m_at(x,y))) {
+				if (!mtmp) {
 				    pline("Try filling the pit instead.");
 				    return 0;
 				}

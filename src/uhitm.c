@@ -2560,6 +2560,11 @@ struct monst *mtmp;
 	if (what) pline(fmt, what);
 
 	wakeup(mtmp);	/* clears mimicking */
+	/* if hero is blind, wakeup() won't display the monster even though
+	   it's no longer concealed */
+	if (!canspotmon(mtmp) &&
+		!glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
+	    map_invisible(mtmp->mx, mtmp->my);
 }
 
 STATIC_OVL void
