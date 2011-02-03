@@ -509,6 +509,10 @@ register struct obj *otmp;
 	    pline("%s out.", Tobjnam(otmp, "go"));
 	snuff_otmp = TRUE;
     }
+    /* if monster is acquiring a thrown or kicked object, the throwing
+       or kicking code shouldn't continue to track and place it */
+    if (otmp == thrownobj) thrownobj = 0;
+    else if (otmp == kickedobj) kickedobj = 0;
     /* for hero owned object on shop floor, mtmp is taking possession
        and if it's eventually dropped in a shop, shk will claim it */
     if (!mtmp->mtame) otmp->no_charge = 0;
@@ -569,6 +573,46 @@ struct monst *mtmp;
 	if (can_teleport(mtmp->data) && !tele_restrict(mtmp))
 	    (void) rloc(mtmp, FALSE);
     }
+}
+
+/* when a mimic gets poked with something, it might take that thing
+   (at present, only implemented for when the hero does the poking) */
+void
+maybe_absorb_item(mon, obj, ochance, achance)
+struct monst *mon;
+struct obj *obj;
+int ochance, achance;	/* percent chance for ordinary item, artifact */
+{
+    if (obj == uball || obj == uchain || obj->oclass == ROCK_CLASS ||
+	    obj_resists(obj, 100 - ochance, 100 - achance) ||
+	    !touch_artifact(obj, mon))
+	return;
+
+    if (carried(obj)) {
+	if (obj->owornmask) remove_worn_item(obj, TRUE);
+	if (obj->unpaid) subfrombill(obj, shop_keeper(*u.ushops));
+	if (cansee(mon->mx, mon->my)) {
+	    const char *MonName = Monnam(mon);
+
+	    /* mon might be invisible; avoid "It pulls ... and absorbs it!" */
+	    if (!strcmp(MonName, "It")) MonName = "Something";
+	    pline("%s pulls %s away from you and absorbs %s!",
+		  MonName, yname(obj), (obj->quan > 1L) ? "them" : "it");
+	} else {
+	    const char *hand_s = body_part(HAND);
+
+	    if (bimanual(obj)) hand_s = makeplural(hand_s);
+	    pline("%s %s pulled from your %s!",
+		  upstart(yname(obj)), otense(obj, "are"), hand_s);
+	}
+	freeinv(obj);
+    } else {
+	/* not carried; presumeably thrown or kicked */
+	if (canspotmon(mon))
+	    pline("%s absorbs %s!", Monnam(mon), yname(obj));
+    }
+    /* add to mon's inventory */
+    (void) mpickobj(mon, obj);
 }
 
 /* drop one object taken from a (possibly dead) monster's inventory */

@@ -406,6 +406,8 @@ pick_lock(pick)
 			 mtmp->mappearance == S_hcdoor)) {
 		/* "The door actually was a <mimic>!" */
 		stumble_onto_mimic(mtmp);
+		/* mimic might keep the key (50% chance, 10% for PYEC) */
+		maybe_absorb_item(mtmp, pick, 50, 10);
 		return PICKLOCK_LEARNED_SOMETHING;
 	    }
 	    if(!IS_DOOR(door->typ)) {
