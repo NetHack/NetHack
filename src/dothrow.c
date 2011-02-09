@@ -41,7 +41,7 @@ int shotlimit;
 	int multishot;
 	schar skill;
 	long wep_mask;
-	boolean twoweap;
+	boolean twoweap, weakmultishot;
 
 	/* ask "in what direction?" */
 #ifndef GOLDOBJ
@@ -109,6 +109,7 @@ int shotlimit;
 	}
 
 	/* Multishot calculations
+	 * (potential volley of up to N missiles; default for N is 1)
 	 */
 	multishot = 1;
 	skill = objects[obj->otyp].oc_skill;
@@ -118,35 +119,51 @@ int shotlimit;
 		/* otherwise any stackable (non-ammo) weapon */
 			obj->oclass == WEAPON_CLASS) &&
 		!(Confusion || Stunned)) {
+	    /* some roles don't get a volley bonus until becoming expert */
+	    weakmultishot = (Role_if(PM_WIZARD) || Role_if(PM_PRIEST) ||
+			     (Role_if(PM_HEALER) && skill != P_KNIFE) ||
+			     (Role_if(PM_TOURIST) && skill != -P_DART) ||
+			     /* poor dexterity also inhibits multishot */
+			     Fumbling || ACURR(A_DEX) <= 6);
+
 	    /* Bonus if the player is proficient in this weapon... */
 	    switch (P_SKILL(weapon_type(obj))) {
 	    case P_EXPERT:
-		if (!Role_if(PM_WIZARD)) multishot++;
+		multishot++;
 		/*FALLTHRU*/
 	    case P_SKILLED:
-		multishot++;
+		if (!weakmultishot) multishot++;
 		break;
-	    default:		/* No bonus */
+	    default:	/* basic or unskilled: no bonus */
 		break;
 	    }
 	    /* ...or is using a special weapon for their role... */
 	    switch (Role_switch) {
+	    case PM_CAVEMAN:
+		/* give bonus for low-tech gear */
+		if (skill == -P_SLING || skill == P_SPEAR) multishot++;
+		break;
 	    case PM_MONK:
+		/* allow higher volley count despite skill limitation */
 		if (skill == -P_SHURIKEN) multishot++;
 		break;
 	    case PM_RANGER:
-		multishot++;
+		/* arbitrary; encourage use of other missiles beside daggers */
+		if (skill != P_DAGGER) multishot++;
 		break;
 	    case PM_ROGUE:
+		/* possibly should add knives... */
 		if (skill == P_DAGGER) multishot++;
 		break;
 	    case PM_SAMURAI:
+		/* role-specific launcher and its ammo */
 		if (obj->otyp == YA && uwep && uwep->otyp == YUMI) multishot++;
 		break;
 	    default:
 		break;	/* No bonus */
 	    }
-	    /* ...or using their race's special bow */
+	    /* ...or using their race's special bow; no bonus for spears */
+	    if (!weakmultishot)
 	    switch (Race_switch) {
 	    case PM_ELF:
 		if (obj->otyp == ELVEN_ARROW && uwep &&
@@ -156,17 +173,22 @@ int shotlimit;
 		if (obj->otyp == ORCISH_ARROW && uwep &&
 				uwep->otyp == ORCISH_BOW) multishot++;
 		break;
+	    case PM_GNOME:
+		/* arbitrary; there isn't any gnome-specific gear */
+		if (skill == -P_CROSSBOW) multishot++;
+		break;
+	    case PM_HUMAN:
+	    case PM_DWARF:
 	    default:
 		break;	/* No bonus */
 	    }
 
 	    /* crossbows are slow to load and probably shouldn't allow multiple
 	       shots at all, but that would result in players never using them;
-	       instead, we require high strength to load and shoot quickly */
-	    if (multishot > 1 &&
-		    (int)ACURRSTR < (Race_if(PM_GNOME) ? 16 : 18) &&
+	       instead, high strength is necessary to load and shoot quickly */
+	    if (multishot > 1 && skill == -P_CROSSBOW &&
 		    ammo_and_launcher(obj, uwep) &&
-		    weapon_type(uwep) == P_CROSSBOW)
+		    (int)ACURRSTR < (Race_if(PM_GNOME) ? 16 : 18))
 		multishot = rnd(multishot);
 
 	    multishot = rnd(multishot);
