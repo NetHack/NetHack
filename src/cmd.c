@@ -1571,6 +1571,28 @@ int final;
 	    /* last resort entry, guarantees Status section is non-empty */
 	    you_are("unencumbered", "");
 	}
+	/* report being weaponless; distinguish whether gloves are worn */
+	if (!uwep) you_are(uarmg ? "empty handed" : /* gloves imply hands */
+			   /* no weapon and no gloves */
+			   humanoid(youmonst.data) ? "bare handed" :
+			   /* alternate phrasing for paws or lack of hands */
+			   "not wielding anything", "");
+	/* two-weaponing implies a weapon (not other odd stuff) in each hand */
+	else if (u.twoweap) you_are("wielding two weapons at once", "");
+	/* report most weapons by their skill class (so a katana will be
+	   described as a long sword, for instance; mattock and hook are
+	   exceptions), or wielded non-weapon item by its object class */
+	else {
+	    const char *what = weapon_descr(uwep);
+
+	    if (!strcmpi(what, "armor") || !strcmpi(what, "food") ||
+		    !strcmpi(what, "venom"))
+		Sprintf(buf, "wielding some %s", what);
+	    else
+		Sprintf(buf, "wielding %s",
+			(uwep->quan == 1L) ? an(what) : makeplural(what));
+	    you_are(buf, "");
+	}
 }
 
 /* attributes: intrinsics and the like, other non-obvious capabilities */
@@ -1787,7 +1809,6 @@ int final;
 	if (Fixed_abil) you_have("fixed abilities",from_what(FIXED_ABIL));
 	if (Lifesaved)
 		enl_msg("Your life ", "will be", "would have been", " saved","");
-	if (u.twoweap) you_are("wielding two weapons at once","");
 
 	/*** Miscellany ***/
 	if (Luck) {
