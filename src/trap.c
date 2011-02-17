@@ -686,6 +686,7 @@ unsigned trflags;
 		forcebungle = (trflags & FORCEBUNGLE) != 0,
 		plunged = (trflags & TOOKPLUNGE) != 0,
 		adj_pit = conjoined_pits(trap, t_at(u.ux0,u.uy0), TRUE);
+	int oldumort;
 #ifdef STEED
 	int steed_article = ARTICLE_THE;
 #endif
@@ -779,13 +780,17 @@ unsigned trflags;
 		otmp->quan = 1L;
 		otmp->owt = weight(otmp);
 		if (!rn2(6)) otmp->opoisoned = 1;
+		oldumort = u.umortality;
 #ifdef STEED
 		if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) /* nothing */;
 		else
 #endif
 		if (thitu(7, dmgval(otmp, &youmonst), otmp, "little dart")) {
 		    if (otmp->opoisoned)
-			poisoned("dart", A_CON, "little dart", 10, TRUE);
+			poisoned("dart", A_CON, "little dart",
+				 /* if damage triggered life-saving,
+				    poison is limited to attrib loss */
+				 (u.umortality > oldumort) ? 0 : 10, TRUE);
 		    obfree(otmp, (struct obj *)0);
 		} else {
 		    place_object(otmp, u.ux, u.uy);
@@ -1041,6 +1046,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		if (!steedintrap(trap, (struct obj *)0)) {
 #endif
 		if (ttype == SPIKED_PIT) {
+		    oldumort = u.umortality;
 		    losehp(Maybe_Half_Phys(rnd(adj_pit ? 6 : 10)),
 			plunged ? "deliberately plunged into a pit of iron spikes" :
 			adj_pit ? "stepped into a pit of iron spikes" :
@@ -1048,9 +1054,11 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 			NO_KILLER_PREFIX);
 		    if (!rn2(6))
 			poisoned("spikes", A_STR,
-				adj_pit ? "stepping on poison spikes" :
-					  "fall onto poison spikes",
-				 8, FALSE);
+				 adj_pit ? "stepping on poison spikes" :
+					   "fall onto poison spikes",
+				 /* if damage triggered life-saving,
+				    poison is limited to attrib loss */
+				 (u.umortality > oldumort) ? 0 : 8, FALSE);
 		} else {
 		    if (!adj_pit)
 			losehp(Maybe_Half_Phys(rnd(6)),

@@ -1,5 +1,4 @@
 /* NetHack 3.5	mthrowu.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mthrowu.c	3.5	2009/02/17	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -245,7 +244,7 @@ struct obj *obj;		/* missile (or stack providing it) */
 	struct monst *mtmp;
 	struct obj *singleobj;
 	char sym = obj->oclass;
-	int hitu, blindinc = 0;
+	int hitu, oldumort, blindinc = 0;
 
 	bhitpos.x = x;
 	bhitpos.y = y;
@@ -346,6 +345,7 @@ struct obj *obj;		/* missile (or stack providing it) */
 			potionhit(&youmonst, singleobj, FALSE);
 			break;
 		    }
+		    oldumort = u.umortality;
 		    switch(singleobj->otyp) {
 			int dam, hitv;
 			case EGG:
@@ -383,7 +383,10 @@ struct obj *obj;		/* missile (or stack providing it) */
 
 			Strcpy(onmbuf, xname(singleobj));
 			Strcpy(knmbuf, killer_xname(singleobj));
-			poisoned(onmbuf, A_STR, knmbuf, 10, TRUE);
+			poisoned(onmbuf, A_STR, knmbuf,
+				 /* if damage triggered life-saving,
+				    poison is limited to attrib loss */
+				 (u.umortality > oldumort) ? 0 : 10, TRUE);
 		    }
 		    if(hitu &&
 		       can_blnd((struct monst*)0, &youmonst,

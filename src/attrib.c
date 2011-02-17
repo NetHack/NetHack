@@ -1,5 +1,4 @@
 /* NetHack 3.5	attrib.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)attrib.c	3.5	2008/02/02	*/
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -225,10 +224,10 @@ void
 poisoned(reason, typ, pkiller, fatal, thrown_weapon)
 const char *reason,	/* controls what messages we display */
 	   *pkiller;	/* for score+log file if fatal */
-int  typ, fatal;
+int  typ, fatal;		/* if fatal is 0, limit damage to adjattrib */
 boolean thrown_weapon;	/* thrown weapons are less deadly */
 {
-	int i, kprefix = KILLED_BY_AN;
+	int i, loss, kprefix = KILLED_BY_AN;
 
 	/* inform player about being poisoned unless that's already been done;
 	   "blast" has given a "blast of poison gas" message; "poison arrow",
@@ -259,17 +258,22 @@ boolean thrown_weapon;	/* thrown weapons are less deadly */
 	    kprefix = KILLED_BY;
 	}
 
-	i = rn2(fatal + (thrown_weapon ? 20 : 0));
+	i = !fatal ? 1 : rn2(fatal + (thrown_weapon ? 20 : 0));
 	if (i == 0 && typ != A_CHA) {
+	    /* instant kill */
 	    u.uhp = -1;
 	    pline_The("poison was deadly...");
-	} else if (i <= 5) {
-	    /* check that a stat change was made */
-	    if (adjattrib(typ, thrown_weapon ? -1 : -rn1(3,3), 1))
-		poisontell(typ, TRUE);
+	} else if (i > 5) {
+	    /* HP damage; more likely--but less severe--with missiles */
+	    loss = thrown_weapon ? rnd(6) : rn1(10,6);
+	    losehp(loss, pkiller, kprefix);	/* poison damage */
 	} else {
-	    i = thrown_weapon ? rnd(6) : rn1(10,6);
-	    losehp(i, pkiller, kprefix);	/* poison damage */
+	    /* attribute loss; if typ is A_STR, reduction in current and
+	       maximum HP will occur once strength has dropped down to 3 */
+	    loss = (thrown_weapon || !fatal) ? 1 : d(2, 2); /* was rn1(3,3) */
+	    /* check that a stat change was made */
+	    if (adjattrib(typ, -loss, 1))
+		poisontell(typ, TRUE);
 	}
 
 	if (u.uhp < 1) {

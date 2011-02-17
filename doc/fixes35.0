@@ -343,6 +343,8 @@ when reading an unknown scroll and learning it, discovery of teleporation was
 using an unlocking tool on a closed door which was actually a mimic reported
 	that there was no door to unlock instead of exposing the mimic
 purple worm could end up in wall or solid rock when swallowing ghost or xorn
+enhance life-saving by preventing subsequent poison from being fatal upon
+	rescue from death due to spiked pit, dart trap, or poisoned missile
 
 
 Platform- and/or Interface-Specific Fixes
