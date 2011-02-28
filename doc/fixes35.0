@@ -447,6 +447,8 @@ OPTIONS=playmode:normal|explore|debug to choose mode without command-line
 score bonus for ascending is reduced or denied for changing alignment
 player can give a monster class when asked for type of monster to poly into
 likewise when asked about type for #monpolycontrol
+both controlled self-polymorph and #monpolycontrol accept ESC, "*" or "random"
+	when asking for type of monster; ESC aborts #polyself command
 scroll of taming/spell of charm monster now gives some feedback
 doppelgangers can take on the shape of alternate roles' quest guardians
 pile_limit option to control when to switch to "there are objects here"

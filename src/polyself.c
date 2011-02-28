@@ -310,41 +310,73 @@ int psflags;
 	if (Polymorph_control || forcecontrol) {
 		tryct = 5;
 		do {
+			mntmp = NON_PM;
 			getlin("Become what kind of monster? [type the name]",
 				buf);
+			(void) mungspaces(buf);
+			if (*buf == '\033') {
+			    /* user is cancelling controlled poly */
+			    if (forcecontrol) {	/* wizard mode #polyself */
+				pline(Never_mind);
+				return;
+			    }
+			    Strcpy(buf, "*");	/* resort to random */
+			}
+			if (!strcmp(buf, "*") || !strcmp(buf, "random")) {
+			    /* explicitly requesting random result */
+			    tryct = 0;	/* will skip thats_enough_tries */
+			    continue;	/* end do-while(--tryct > 0) loop */
+			}
 			class = 0;
 			mntmp = name_to_mon(buf);
 			if (mntmp < LOW_PM) {
+ by_class:
 			    class = name_to_monclass(buf, &mntmp);
 			    if (class && mntmp == NON_PM)
 				mntmp = mkclass_poly(class);
 			}
-			if (mntmp < LOW_PM)
+			if (mntmp < LOW_PM) {
 			    if (!class)
 				pline("I've never heard of such monsters.");
 			    else
 				You_cant("polymorph into any of those.");
-			else if (iswere && (were_beastie(mntmp) == u.ulycn ||
+			} else if (iswere && (were_beastie(mntmp) == u.ulycn ||
 				    mntmp == counter_were(u.ulycn) ||
-				    (Upolyd && mntmp == PM_HUMAN)))
-				goto do_shift;
+				    (Upolyd && mntmp == PM_HUMAN))) {
+			    goto do_shift;
 			/* Note:  humans are illegal as monsters, but an
 			 * illegal monster forces newman(), which is what we
 			 * want if they specified a human.... */
-			else if (!polyok(&mons[mntmp]) &&
+			} else if (!polyok(&mons[mntmp]) &&
 				    !(mntmp == PM_HUMAN ||
 				      your_race(&mons[mntmp]) ||
 				      mntmp == urole.malenum ||
-				      mntmp == urole.femalenum))
-				You_cant("polymorph into that.");
-			else break;
+				      mntmp == urole.femalenum)) {
+			    const char *pm_name;
+
+			    /* mkclass_ploy() can pick a !polyok()
+			       candidate; if so, usually try again */
+			    if (class) {
+				if (rn2(3) || --tryct > 0) goto by_class;
+				/* no retries left; put one back on counter
+				   so that end of loop decrement will yield
+				   0 and trigger thats_enough_tries message */
+				++tryct;
+			    }
+			    pm_name = mons[mntmp].mname;
+			    if (the_unique_pm(&mons[mntmp]))
+				pm_name = the(pm_name);
+			    else if (!type_is_pname(&mons[mntmp]))
+				pm_name = an(pm_name);
+			    You_cant("polymorph into %s.", pm_name);
+			} else break;
 		} while (--tryct > 0);
 		if (!tryct) pline(thats_enough_tries);
 		/* allow skin merging, even when polymorph is controlled */
-		if (draconian && (!tryct ||
+		if (draconian && (tryct <= 0 ||
 				  mntmp == armor_to_dragon(uarm->otyp)))
 		    goto do_merge;
-		if (isvamp && (!tryct || mntmp == PM_WOLF ||
+		if (isvamp && (tryct <= 0 || mntmp == PM_WOLF ||
 			       mntmp == PM_FOG_CLOUD || is_bat(&mons[mntmp])))
 		    goto do_vampyr;
 	} else if (draconian || iswere || isvamp) {
