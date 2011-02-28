@@ -245,7 +245,7 @@ newman()
 	if (Sick) make_sick(0L, (char *) 0, FALSE, SICK_ALL);
 	if (Stoned) make_stoned(0L, (char *)0, 0, (char *)0);
 	if (u.uhp <= 0) {
-		if (Polymorph_control) {
+		if (Polymorph_control) {  /* even when Stunned || Unaware */
 		    if (u.uhp <= 0) u.uhp = 1;
 		} else {
 dead: /* we come directly here if their experience level went to 0 or less */
@@ -286,12 +286,14 @@ int psflags;
 		monsterpoly = (psflags == 2),
 		draconian = (uarm && Is_dragon_armor(uarm)),
 		iswere = (u.ulycn >= LOW_PM),
-		isvamp = (youmonst.data->mlet == S_VAMPIRE);
+		isvamp = (youmonst.data->mlet == S_VAMPIRE),
+		controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
 	if (Unchanging) {
 	    pline("You fail to transform!");
 	    return;
 	}
+	/* being Stunned|Unaware doesn't negate this aspect of Poly_control */
 	if (!Polymorph_control && !forcecontrol &&
 		!draconian && !iswere && !isvamp) {
 	    if (rn2(20) > ACURR(A_CON)) {
@@ -307,7 +309,7 @@ int psflags;
 	if (monsterpoly && isvamp)
 	    goto do_vampyr;
 
-	if (Polymorph_control || forcecontrol) {
+	if (controllable_poly || forcecontrol) {
 		tryct = 5;
 		do {
 			mntmp = NON_PM;
@@ -404,7 +406,7 @@ int psflags;
 				mntmp = (youmonst.data != &mons[PM_VAMPIRE] &&
 					 !rn2(10)) ? PM_WOLF :
 					!rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
-			if (Polymorph_control) {
+			if (controllable_poly) {
 				Sprintf(buf, "Become %s?",
 					an(mons[mntmp].mname));
 				if (yn(buf) != 'y') return;

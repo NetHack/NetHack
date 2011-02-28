@@ -1,5 +1,4 @@
 /* NetHack 3.5	were.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)were.c	3.5	2007/06/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -157,9 +156,10 @@ void
 you_were()
 {
 	char qbuf[QBUFSZ];
+	boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
 	if (Unchanging || (u.umonnum == u.ulycn)) return;
-	if (Polymorph_control) {
+	if (controllable_poly) {
 	    /* `+4' => skip "were" prefix to get name of beast */
 	    Sprintf(qbuf, "Do you want to change into %s?",
 		    an(mons[u.ulycn].mname+4));
@@ -172,12 +172,14 @@ void
 you_unwere(purify)
 boolean purify;
 {
+	boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
+
 	if (purify) {
 	    You_feel("purified.");
 	    u.ulycn = NON_PM;	/* cure lycanthropy */
 	}
 	if (!Unchanging && is_were(youmonst.data) &&
-		(!Polymorph_control || yn("Remain in beast form?") == 'n'))
+		(!controllable_poly || yn("Remain in beast form?") == 'n'))
 	    rehumanize();
 }
 

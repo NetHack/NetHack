@@ -346,6 +346,7 @@ purple worm could end up in wall or solid rock when swallowing ghost or xorn
 enhance life-saving by preventing subsequent poison from being fatal upon
 	rescue from death due to spiked pit, dart trap, or poisoned missile
 don't create mail daemons when populating special levels with random demons
+teleport control and polymorph control are ineffective while hero is stunned
 
 
 Platform- and/or Interface-Specific Fixes
