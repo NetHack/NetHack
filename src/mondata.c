@@ -1,5 +1,4 @@
 /* NetHack 3.5	mondata.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mondata.c	3.5	2007/05/16	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -610,6 +609,10 @@ const char *in_str;
 		{ "gray-elf",		PM_GREY_ELF },
 		{ "mindflayer",		PM_MIND_FLAYER },
 		{ "master mindflayer",	PM_MASTER_MIND_FLAYER },
+	    /* More alternates; priest and priestess are separate monster
+	       types but that isn't the case for {aligned,high} priests */
+		{ "aligned priestess",	PM_ALIGNED_PRIEST },
+		{ "high priestess",	PM_HIGH_PRIEST },
 	    /* Inappropriate singularization by -ves check above */
 		{ "master of thief",	PM_MASTER_OF_THIEVES },
 	    /* Potential misspellings where we want to avoid falling back
