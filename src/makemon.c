@@ -1,5 +1,4 @@
 /* NetHack 3.5	makemon.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)makemon.c	3.5	2009/01/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,6 +19,7 @@ STATIC_VAR NEARDATA struct monst zeromonst;
 
 STATIC_DCL boolean FDECL(uncommon, (int));
 STATIC_DCL int FDECL(align_shift, (struct permonst *));
+STATIC_DCL boolean FDECL(mk_gen_ok, (int,int,int));
 STATIC_DCL boolean FDECL(wrong_elem_type, (struct permonst *));
 STATIC_DCL void FDECL(m_initgrp,(struct monst *,int,int,int));
 STATIC_DCL void FDECL(m_initthrow,(struct monst *,int,int));
@@ -1371,6 +1371,23 @@ int mndx;	/* particular species that can no longer be created */
 	} /* note: safe to ignore extinction of unique monsters */
 }
 
+/* decide whether it's ok to generate a candidate monster by mkclass() */
+STATIC_OVL boolean
+mk_gen_ok(mndx, mvflagsmask, genomask)
+int mndx, mvflagsmask, genomask;
+{
+	struct permonst *ptr = &mons[mndx];
+
+	if (mvitals[mndx].mvflags & mvflagsmask) return FALSE;
+	if (ptr->geno & genomask) return FALSE;
+	if (is_placeholder(ptr)) return FALSE;
+#ifdef MAIL
+	/* special levels might ask for random demon type; reject this one */
+	if (ptr == &mons[PM_MAIL_DAEMON]) return FALSE;
+#endif
+	return TRUE;
+}
+
 /*	The routine below is used to make one of the multiple types
  *	of a given monster class.  The second parameter specifies a
  *	special casing bit mask to allow the normal genesis
@@ -1400,8 +1417,7 @@ int	spc;
 
 	for (last = first;
 		last < SPECIAL_PM && mons[last].mlet == class; last++)
-	    if (!(mvitals[last].mvflags & G_GONE) && !(mons[last].geno & mask)
-					&& !is_placeholder(&mons[last])) {
+	    if (mk_gen_ok(last, G_GONE, mask)) {
 		/* consider it */
 		if(num && toostrong(last, maxmlev) &&
 		   monstr[last] != monstr[last-1] && rn2(2)) break;
@@ -1414,8 +1430,7 @@ int	spc;
  *			order of strength.
  */
 	for(num = rnd(num); num > 0; first++)
-	    if (!(mvitals[first].mvflags & G_GONE) && !(mons[first].geno & mask)
-					&& !is_placeholder(&mons[first])) {
+	    if (mk_gen_ok(last, G_GONE, mask)) {
 		/* skew towards lower value monsters at lower exp. levels */
 		num -= mons[first].geno & G_FREQ;
 		if (num && adj_lev(&mons[first]) > (u.ulevel*2)) {
@@ -1431,7 +1446,8 @@ int	spc;
 
 /* like mkclass(), but excludes difficulty considerations; used when
    player with polycontrol picks a class instead of a specific type;
-   genocided types are avoided but extinct ones are acceptable */
+   genocided types are avoided but extinct ones are acceptable; we don't
+   check polyok() here--caller accepts some choices !polyok() would reject */
 int
 mkclass_poly(class)
 int class;
@@ -1444,16 +1460,12 @@ int class;
 
 	for (last = first;
 		last < SPECIAL_PM && mons[last].mlet == class; last++)
-	    if (!(mvitals[last].mvflags & G_GENOD) &&
-		    !(mons[last].geno & (G_NOGEN|G_UNIQ)) &&
-		    !is_placeholder(&mons[last]))
+	    if (mk_gen_ok(last, G_GENOD, (G_NOGEN|G_UNIQ)))
 		num += mons[last].geno & G_FREQ;
 	if (!num) return NON_PM;
 
 	for (num = rnd(num); num > 0; first++)
-	    if (!(mvitals[first].mvflags & G_GENOD) &&
-		    !(mons[first].geno & (G_NOGEN|G_UNIQ)) &&
-		    !is_placeholder(&mons[first]))
+	    if (mk_gen_ok(last, G_GENOD, (G_NOGEN|G_UNIQ)))
 		num -= mons[first].geno & G_FREQ;
 	first--; /* correct an off-by-one error */
 
