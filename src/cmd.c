@@ -1785,8 +1785,9 @@ int final;
 	if (Half_physical_damage) enlght_halfdmg(HALF_PHDAM, final);
 	if (Half_spell_damage) enlght_halfdmg(HALF_SPDAM, final);
 	if (Protection_from_shape_changers)
-		you_are("protected from shape changers","");
-	if (Polymorph) you_are("polymorphing","");
+		you_are("protected from shape changers",
+			from_what(PROT_FROM_SHAPE_CHANGERS));
+	if (Polymorph) you_are("polymorphing", from_what(POLYMORPH));
 	if (Polymorph_control)
 		you_have("polymorph control",from_what(POLYMORPH_CONTROL));
 	if (u.ulycn >= LOW_PM) {
@@ -1801,7 +1802,8 @@ int final;
 #endif
 	    you_are(buf,"");
 	}
-	if (Unchanging) you_can("not change from your current form","");
+	if (Unchanging) you_can("not change from your current form",
+				from_what(UNCHANGING));
 	if (Hate_silver) you_are("harmed by silver","");
 	if (Fast) you_are(Very_fast ? "very fast" : "fast",from_what(FAST));
 	if (Reflecting) you_have("reflection",from_what(REFLECTING));
