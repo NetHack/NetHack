@@ -810,29 +810,20 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 			      (Blind || same_color) ? nul :
 				hcolor(scursed ? NH_BLACK : NH_SILVER),
 			      otense(otmp, "evaporate"));
-			if(is_cloak(otmp)) (void) Cloak_off();
-			if(is_boots(otmp)) (void) Boots_off();
-			if(is_helmet(otmp)) (void) Helmet_off();
-			if(is_gloves(otmp)) (void) Gloves_off();
-			if(is_shield(otmp)) (void) Shield_off();
-			if(otmp == uarm) (void) Armor_gone();
-#ifdef TOURIST
-			if (is_shirt(otmp)) (void) Shirt_off();
-#endif
+			remove_worn_item(otmp, FALSE);
 			useup(otmp);
 			break;
 		}
 		s = scursed ? -1 :
 		    otmp->spe >= 9 ? (rn2(otmp->spe) == 0) :
 		    sblessed ? rnd(3 - otmp->spe / 3) : 1;
-		if (s >= 0 && otmp->otyp >= GRAY_DRAGON_SCALES &&
-					otmp->otyp <= YELLOW_DRAGON_SCALES) {
+		if (s >= 0 && Is_dragon_scales(otmp)) {
 			/* dragon scales get turned into dragon scale mail */
 			pline("%s merges and hardens!", Yname2(otmp));
 			setworn((struct obj *)0, W_ARM);
 			/* assumes same order */
-			otmp->otyp = GRAY_DRAGON_SCALE_MAIL +
-						otmp->otyp - GRAY_DRAGON_SCALES;
+			otmp->otyp += GRAY_DRAGON_SCALE_MAIL
+					- GRAY_DRAGON_SCALES;
 			if (sblessed) {
 			    otmp->spe++;
 			    if (!otmp->blessed) bless(otmp);

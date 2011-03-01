@@ -388,11 +388,36 @@ int psflags;
 			mntmp = armor_to_dragon(uarm->otyp);
 			if (!(mvitals[mntmp].mvflags & G_GENOD)) {
 				/* allow G_EXTINCT */
-				You("merge with your scaly armor.");
+				if (Is_dragon_scales(uarm)) {
+				    /* dragon scales remain intact as uskin */
+				    You("merge with your scaly armor.");
+				} else {	/* dragon scale mail */
+				    /* d.scale mail first reverts to scales */
+				    char *p, *dsmail;
+
+				    /* similar to noarmor(invent.c),
+				       shorten to "<color> scale mail" */
+				    dsmail = strcpy(buf, simpleonames(uarm));
+				    if ((p = strstri(dsmail, " dragon ")) != 0)
+					while ((p[1] = p[8]) != '\0') ++p;
+				    /* tricky phrasing; dragon scale mail
+				       is singular, dragon scales are plural */
+				    Your(
+				"%s reverts to scales as you merge with them.",
+					 dsmail);
+				    /* uarm->spe enchantment remains unchanged;
+				       re-converting scales to mail poses risk
+				       of evaporation due to over enchanting */
+				    uarm->otyp += GRAY_DRAGON_SCALES
+						    - GRAY_DRAGON_SCALE_MAIL;
+				    uarm->dknown = 1;
+				    context.botl = 1;	/* AC is changing */
+				}
 				uskin = uarm;
 				uarm = (struct obj *)0;
 				/* save/restore hack */
 				uskin->owornmask |= I_SPECIAL;
+				update_inventory();
 			}
 		} else if (iswere) {
  do_shift:
