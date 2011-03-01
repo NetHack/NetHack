@@ -347,6 +347,7 @@ enhance life-saving by preventing subsequent poison from being fatal upon
 	rescue from death due to spiked pit, dart trap, or poisoned missile
 don't create mail daemons when populating special levels with random demons
 teleport control and polymorph control are ineffective while hero is stunned
+don't report "fried to a crisp" for disintegration from divine wrath
 
 
 Platform- and/or Interface-Specific Fixes

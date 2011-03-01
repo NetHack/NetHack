@@ -16,7 +16,7 @@ STATIC_DCL void NDECL(gcrownu);
 STATIC_DCL void FDECL(pleased,(ALIGNTYP_P));
 STATIC_DCL void FDECL(godvoice,(ALIGNTYP_P,const char*));
 STATIC_DCL void FDECL(god_zaps_you,(ALIGNTYP_P));
-STATIC_DCL void FDECL(fry_by_god,(ALIGNTYP_P));
+STATIC_DCL void FDECL(fry_by_god,(ALIGNTYP_P,BOOLEAN_P));
 STATIC_DCL void FDECL(gods_angry,(ALIGNTYP_P));
 STATIC_DCL void FDECL(gods_upset,(ALIGNTYP_P));
 STATIC_DCL void FDECL(consume_offering,(struct obj *));
@@ -526,7 +526,7 @@ aligntyp resp_god;
 		shieldeff(u.ux, u.uy);
 		pline("It seems not to affect you.");
 	    } else
-		fry_by_god(resp_god);
+		fry_by_god(resp_god, FALSE);
 	}
 
 	pline("%s is not deterred...", align_gname(resp_god));
@@ -534,7 +534,8 @@ aligntyp resp_god;
 	    pline("A wide-angle disintegration beam aimed at you hits %s!",
 			mon_nam(u.ustuck));
 	    if (!resists_disint(u.ustuck)) {
-		pline("%s fries to a crisp!", Monnam(u.ustuck));
+		pline("%s disintegrates into a pile of dust!",
+		      Monnam(u.ustuck));
 		xkilled(u.ustuck, 2); /* no corpse */
 	    } else
 		pline("%s seems unaffected.", Monnam(u.ustuck));
@@ -557,7 +558,7 @@ aligntyp resp_god;
 	    if (uarmu && !uarm && !uarmc) (void) destroy_arm(uarmu);
 #endif
 	    if (!Disint_resistance)
-		fry_by_god(resp_god);
+		fry_by_god(resp_god, TRUE);
 	    else {
 		You("bask in its %s glow for a minute...", NH_BLACK);
 		godvoice(resp_god, "I believe it not!");
@@ -574,10 +575,12 @@ aligntyp resp_god;
 }
 
 STATIC_OVL void
-fry_by_god(resp_god)
+fry_by_god(resp_god, via_disintegration)
 aligntyp resp_god;
+boolean via_disintegration;
 {
-	You("fry to a crisp.");
+	You("%s!", !via_disintegration ? "fry to a crisp" :
+					 "disintegrate into a pile of dust");
 	killer.format = KILLED_BY;
 	Sprintf(killer.name, "the wrath of %s", align_gname(resp_god));
 	done(DIED);
@@ -1365,7 +1368,7 @@ dosacrifice()
 		done(DIED);
 		/* life-saved (or declined to die in wizard/explore mode) */
 		pline("%s snarls and tries again...", Moloch);
-		fry_by_god(A_NONE);	/* wrath of Moloch */
+		fry_by_god(A_NONE, TRUE);	/* wrath of Moloch */
 		/* declined to die in wizard or explore mode */
 		pline(cloud_of_smoke, hcolor(NH_BLACK));
 		done(ESCAPED);
