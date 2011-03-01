@@ -1109,8 +1109,11 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
 
     Strcpy(tmpbuf, plname);
     *tmpbuf = highc(*tmpbuf);	/* same adjustment as bottom line */
+    /* as in background_enlighenment, when poly'd we need to use the saved
+       gender in u.mfemale rather than the current you-as-monster gender */
     Sprintf(buf, "%s the %s's atttributes:", tmpbuf,
-	    (flags.female && urole.name.f) ? urole.name.f : urole.name.m);
+	    ((Upolyd ? u.mfemale : flags.female) && urole.name.f) ?
+		urole.name.f : urole.name.m);
 
     en_win = create_nhwindow(NHW_MENU);
     /* title */
@@ -1147,11 +1150,14 @@ int unused_mode;	/* not used */
 int final;
 {
     const char *role_titl, *rank_titl;
-    int difgend, difalgn;
+    int innategend, difgend, difalgn;
     char buf[BUFSZ], tmpbuf[BUFSZ];
 
-    role_titl = (flags.female && urole.name.f) ? urole.name.f : urole.name.m;
-    rank_titl = rank_of(u.ulevel, Role_switch, flags.female);
+    /* note that if poly'd, we need to use u.mfemale instead of flags.female
+       to access hero's saved gender-as-human/elf/&c rather than current one */
+    innategend = (Upolyd ? u.mfemale : flags.female) ? 1 : 0;
+    role_titl = (innategend && urole.name.f) ? urole.name.f : urole.name.m;
+    rank_titl = rank_of(u.ulevel, Role_switch, innategend);
 
     putstr(en_win, 0, "");	/* separator after title */
     putstr(en_win, 0, "Background:");
@@ -1166,8 +1172,9 @@ int final;
 	struct permonst *uasmon = youmonst.data;
 
 	tmpbuf[0] = '\0';
+	/* here we always use current gender, not saved role gender */
 	if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon))
-	    Sprintf(tmpbuf, "%s ", genders[u.mfemale ? 1 : 0].adj);
+	    Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
 	Sprintf(buf, "%sin %s%s form",
 		!final ? "currently " : "", tmpbuf, uasmon->mname);
 	you_are(buf, "");
@@ -1177,8 +1184,8 @@ int final;
     tmpbuf[0] = '\0';
     if (!urole.name.f &&
 	    ((urole.allow & ROLE_GENDMASK) == (ROLE_MALE|ROLE_FEMALE) ||
-		flags.female != flags.initgend))
-	Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
+		innategend != flags.initgend))
+	Sprintf(tmpbuf, "%s ", genders[innategend].adj);
     buf[0] = '\0';
     if (Upolyd) Strcpy(buf, "actually ");	/* "You are actually a ..." */
     if (!strcmpi(rank_titl, role_titl)) {
@@ -1192,8 +1199,8 @@ int final;
     you_are(buf, "");
 
     /* report alignment (bypass you_are() in order to omit ending period) */
-    Sprintf(buf, " You %s%s, %son a mission for %s",
-	    !final ? are : were, align_str(u.ualign.type),
+    Sprintf(buf, " %s%s%s, %son a mission for %s",
+	    You_, !final ? are : were, align_str(u.ualign.type),
 	    /* helm of opposite alignment (might hide conversion) */
 	    (u.ualign.type != u.ualignbase[A_CURRENT]) ? "temporarily " :
 	      /* permanent conversion */
@@ -1223,7 +1230,7 @@ int final;
        giving separate message for temporary alignment change bypasses need
        for tricky phrasing otherwise necessitated by possibility of having
        helm of opposite alignment mask a permanent alignment conversion */
-    difgend = (flags.female != flags.initgend);
+    difgend = (innategend != flags.initgend);
     difalgn = ((u.ualign.type != u.ualignbase[A_CURRENT]) ? 1 : 0)
 	    + ((u.ualignbase[A_CURRENT] != u.ualignbase[A_ORIGINAL]) ? 2 : 0);
     if (difalgn & 1) {	/* have temporary alignment so report permanent one */
