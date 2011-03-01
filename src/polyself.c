@@ -260,7 +260,8 @@ dead: /* we come directly here if their experience level went to 0 or less */
 	}
 	newuhs(FALSE);
 	polyman("feel like a new %s!",
-		(flags.female && urace.individual.f) ? urace.individual.f :
+		/* use saved gender we're about to revert to, not current */
+		(u.mfemale && urace.individual.f) ? urace.individual.f :
 		(urace.individual.m) ? urace.individual.m : urace.noun);
 	if (Slimed) {
 		Your("body transforms, but there is still slime on you.");
