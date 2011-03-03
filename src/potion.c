@@ -1744,11 +1744,10 @@ dodip()
 {
 	register struct obj *potion, *obj;
 	struct obj *singlepotion;
-	const char *tmp;
 	uchar here;
 	char allowall[2];
 	short mixture;
-	char qbuf[QBUFSZ];
+	char qbuf[QBUFSZ], qtoo[QBUFSZ];
 
 	allowall[0] = ALL_CLASSES; allowall[1] = '\0';
 	if(!(obj = getobj(allowall, "dip")))
@@ -1759,17 +1758,20 @@ dodip()
 	here = levl[u.ux][u.uy].typ;
 	/* Is there a fountain to dip into here? */
 	if (IS_FOUNTAIN(here)) {
-		Strcat(qbuf, " the fountain?");
-		if (yn(upstart(qbuf)) == 'y') {
+		/* "Dip <the object> into the fountain?" */
+		Sprintf(qtoo, "%s the fountain?", qbuf);
+		if (yn(upstart(qtoo)) == 'y') {
 			dipfountain(obj);
 			return(1);
 		}
 	} else if (is_pool(u.ux,u.uy)) {
-		tmp = waterbody_name(u.ux,u.uy);
-		Sprintf(eos(qbuf), " the %s?", tmp);
-		if (yn(upstart(qbuf)) == 'y') {
+		const char *pooltype = waterbody_name(u.ux,u.uy);
+
+		/* "Dip <the object> into the {pool, moat, &c}?" */
+		Sprintf(qtoo, "%s the %s?", qbuf, pooltype);
+		if (yn(upstart(qtoo)) == 'y') {
 		    if (Levitation) {
-			floating_above(tmp);
+			floating_above(pooltype);
 #ifdef STEED
 		    } else if (u.usteed && !is_swimmer(u.usteed->data) &&
 			    P_SKILL(P_RIDING) < P_BASIC) {
@@ -1784,6 +1786,7 @@ dodip()
 		}
 	}
 
+	/* "What do you want to dip <the object> into?" */
 	potion = getobj(beverages, qbuf);	/* "dip into" */
 	if (!potion) return 0;
 	if (potion == obj && potion->quan == 1L) {
