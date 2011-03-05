@@ -2648,7 +2648,7 @@ struct obj *obj;	/* wand or spell */
 		e = engr_at(u.ux, u.uy);
 		if (!(e && e->engr_type == ENGRAVE)) {
 		    if (is_pool(u.ux, u.uy) || is_ice(u.ux, u.uy))
-			pline(nothing_happens);
+			pline("%s", nothing_happens);
 		    else
 			pline("Blood %ss %s your %s.",
 			      is_lava(u.ux, u.uy) ? "boil" : "pool",
