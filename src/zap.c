@@ -4216,9 +4216,9 @@ short exploding_wand_typ;
 			pline(see_txt);
 			newsym(x, y);
 		    } else if (sense_txt) {
-			You(sense_txt);
+			You("%s", sense_txt);
 		    } else if (hear_txt) {
-			if (!Deaf) You_hear(hear_txt);
+			if (!Deaf) You_hear("%s", hear_txt);
 		    }
 		    if (picking_at(x, y)) {
 			stop_occupation();
