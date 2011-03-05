@@ -4213,7 +4213,7 @@ short exploding_wand_typ;
 		    lev->doormask = new_doormask;
 		    unblock_point(x, y);	/* vision */
 		    if (see_it) {
-			pline(see_txt);
+			pline("%s", see_txt);
 			newsym(x, y);
 		    } else if (sense_txt) {
 			You("%s", sense_txt);
