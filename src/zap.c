@@ -4006,7 +4006,7 @@ short exploding_wand_typ;
 		    if (t) t->tseen = 1;
 		    if (see_it) msgtxt = "The water evaporates.";
 		}
-		Norep(msgtxt);
+		Norep("%s", msgtxt);
 		if (lev->typ == ROOM) newsym(x,y);
 	    } else if(IS_FOUNTAIN(lev->typ)) {
 		    if (see_it)
