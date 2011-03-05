@@ -4670,7 +4670,7 @@ retry:
 	if (!otmp) {
 	    pline("Nothing fitting that description exists in the game.");
 	    if (++tries < MAXWISHTRY) goto retry;
-	    pline(thats_enough_tries);
+	    pline("%s", thats_enough_tries);
 	    otmp = readobjnam((char *)0, (struct obj *)0);
 	    if (!otmp) return;	/* for safety; should never happen */
 	} else if (otmp == &nothing) {
