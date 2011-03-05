@@ -3901,7 +3901,7 @@ const char *msg;
 	unearth_objs(x, y);
 	if (Underwater) vision_recalc(1);
 	newsym(x,y);
-	if (cansee(x,y)) Norep(msg);
+	if (cansee(x,y)) Norep("%s", msg);
 	if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
 	    if (cansee(x,y)) pline("%s settles...", An(xname(otmp)));
 	    do {
