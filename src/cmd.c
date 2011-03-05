@@ -503,19 +503,26 @@ domonability(VOID_ARGS)
 int
 enter_explore_mode(VOID_ARGS)
 {
-	if(!discover && !wizard) {
-		pline("Beware!  From explore mode there will be no return to normal game.");
-		if (yn("Do you want to enter explore mode?") == 'y') {
-			clear_nhwindow(WIN_MESSAGE);
-			You("are now in non-scoring explore mode.");
-			discover = TRUE;
-		}
-		else {
-			clear_nhwindow(WIN_MESSAGE);
-			pline("Resuming normal game.");
-		}
+    if (wizard) {
+#ifdef WIZARD
+	You("are in debug mode.");
+#endif
+    } else if (discover) {
+	You("are already in explore mode.");
+    } else {
+	pline(
+	 "Beware!  From explore mode there will be no return to normal game.");
+	if (paranoid_query(ParanoidQuit,
+			   "Do you want to enter explore mode?")) {
+	    clear_nhwindow(WIN_MESSAGE);
+	    You("are now in non-scoring explore mode.");
+	    discover = TRUE;
+	} else {
+	    clear_nhwindow(WIN_MESSAGE);
+	    pline("Resuming normal game.");
 	}
-	return 0;
+    }
+    return 0;
 }
 
 #ifdef DUNGEON_OVERVIEW
@@ -3614,6 +3621,28 @@ char def;
 	(void) strncpy(qbuf, query, QBUFSZ-1 - 3);
 	Strcpy(&qbuf[QBUFSZ-1 - 3], "...");
 	return (*windowprocs.win_yn_function)(qbuf, resp, def);
+}
+
+/* for paranoid_confirm:quit,die,attack prompting */
+boolean
+paranoid_query(be_paranoid, prompt)
+boolean be_paranoid;
+const char *prompt;
+{
+	char qbuf[QBUFSZ], ans[BUFSZ];
+	boolean confirmed_ok;
+
+	/* when paranoid, player must respond with "yes" rather than just 'y'
+	   to give the go-ahead for this query; default is "no", obviously */
+	if (be_paranoid) {
+	    Sprintf(qbuf, "%s (yes) [no]", prompt);
+	    getlin(qbuf, ans);
+	    (void) mungspaces(ans);
+	    confirmed_ok = !strcmpi(ans, "yes");
+	} else
+	    confirmed_ok = (yn(prompt) == 'y');
+
+	return confirmed_ok;
 }
 
 int

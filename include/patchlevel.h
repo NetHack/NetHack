@@ -13,10 +13,10 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL	44
+#define EDITLEVEL	45
 
 #define COPYRIGHT_BANNER_A \
-"NetHack, Copyright 1985-2009"
+"NetHack, Copyright 1985-2011"
 
 #define COPYRIGHT_BANNER_B \
 "         By Stichting Mathematisch Centrum and M. Stephenson."

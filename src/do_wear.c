@@ -1232,12 +1232,12 @@ dotakeoff()
 			  "  Use 'R' command to remove accessories." : "");
 		return 0;
 	}
-	if (armorpieces > 1)
+	if (armorpieces > 1 || ParanoidRemove)
 		otmp = getobj(clothes, "take off");
-	if (otmp == 0) return(0);
+	if (!otmp) return 0;
 	if (!(otmp->owornmask & W_ARMOR)) {
 		You("are not wearing that.");
-		return(0);
+		return 0;
 	}
 	/* note: the `uskin' case shouldn't be able to happen here; dragons
 	   can't wear any armor so will end up with `armorpieces == 0' above */
@@ -1295,11 +1295,12 @@ doremring()
 		      "  Use 'T' command to take off armor." : "");
 		return(0);
 	}
-	if (Accessories != 1) otmp = getobj(accessories, "remove");
-	if(!otmp) return(0);
-	if(!(otmp->owornmask & (W_RING | W_AMUL | W_TOOL))) {
+	if (Accessories > 1 || ParanoidRemove)
+		otmp = getobj(accessories, "remove");
+	if (!otmp) return 0;
+	if (!(otmp->owornmask & (W_RING | W_AMUL | W_TOOL))) {
 		You("are not wearing that.");
-		return(0);
+		return 0;
 	}
 
 	reset_remarm();		/* clear context.takeoff.mask and context.takeoff.what */

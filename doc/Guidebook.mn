@@ -1973,6 +1973,28 @@ Specify the order to list object types in (default ``")[%?+!=/(*`0_'').
 The value of this option should be a string containing the
 symbols for the various object types.  Any omitted types are filled in
 at the end from the previous order.
+.lp paranoid_confirmation
+A space separated list of specific situations where alternate
+prompting is desired.  The default is paranoid_confirmation:pray.
+.sd
+.si
+quit   - require "yes" rather than 'y' to confirm quitting
+         the game or switching into non-scoring explore mode;
+die    - require "yes" rather than 'y' to confirm dying (not
+         useful in normal play; applies to explore mode);
+attack - require "yes" rather than 'y' to confirm attacking
+         a peaceful monster;
+pray   - require 'y' to confirm an attempt to pray rather
+         than immediately praying; on by default;
+Remove - require selection from inventory for 'R' and 'T'
+         commands even when wearing just one applicable item.
+.ei
+.ed
+By default, the pray choice is enabled, the others disabled.
+To disable it without setting
+any of the other choices, use ``paranoid_confirmation:none''.  To keep
+it enabled while setting any of the others, include it in the list,
+such as ``paranoid_confirmation:attack pray Remove''.
 .lp perm_invent
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
@@ -2021,8 +2043,6 @@ user name (on multi-user systems) or specifying a particular character
 name (on single-user systems) or it might be disabled entirely.  Requesting
 it when not allowed or not possible results in explore mode instead.
 Default is normal play.
-.lp prayconfirm
-Prompt for confirmation before praying (default on).
 .lp pushweapon
 Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).

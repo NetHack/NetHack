@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.109 $ $Date: 2009/10/18 23:52:34 $
+% $Revision: 1.110 $ $Date: 2009/10/20 22:48:30 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2454,6 +2454,37 @@ Specify the order to list object types in (default
 containing the symbols for the various object types.  Any omitted types
 are filled in at the end from the previous order.
 %.lp
+\item[\ib{paranoid_confirmation}]
+A space separated list of specific situations where alternate
+prompting is desired.  The default is ``{\tt paranoid_confirmation:pray}''.
+%.sd
+%.si
+\blist{}	% this might look better as a table
+\item[{\tt quit}]
+require ``{\tt yes}'' rather than `{\tt y}' to confirm quitting
+the game or switching into non-scoring explore mode;
+\item[{\tt die}]
+require ``{\tt yes}'' rather than '{\tt y}' to confirm dying (not
+useful in normal play; applies to explore mode);
+\item[{\tt attack}]
+require ``{\tt yes}'' rather than '{\tt y}' to confirm attacking
+a peaceful monster;
+\item[{\tt pray}]
+require `{\tt y}' to confirm an attempt to pray rather
+than immediately praying; on by default;
+\item[{\tt Remove}] require selection from inventory for `{\tt R}' and `{\tt T}'
+commands even when wearing just one applicable item.
+\elist
+%.ei
+%.ed
+{\relax
+By default, the pray choice is enabled, the others disabled.
+To disable it without setting
+any of the other choices, use ``{\tt paranoid_confirmation:none}''.  To keep
+it enabled while setting others, include it in the list,
+such as ``{\tt paranoid_con\-fir\-ma\-tion:\-attack~pray~Remove}''.
+}%relax
+%.lp
 \item[\ib{perm\_invent}]
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
@@ -2467,7 +2498,7 @@ If the choice is not allowed for the role you are currently playing,
 it will be silently ignored.  For example, ``{\tt horse}'' will only be
 honored when playing a knight.
 Cannot be set with the `{\tt O}' command.
-%.Ip
+%.lp
 \item[\ib{pickup\_burden}]
 When you pick up an item that would exceed this encumbrance
 level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
@@ -2503,9 +2534,6 @@ user name (on multi-user systems) or specifying a particular character
 name (on single-user systems) or it might be disabled entirely.  Requesting
 it when not allowed or not possible results in explore mode instead.
 Default is normal play.
-%.lp
-\item[\ib{prayconfirm}]
-Prompt for confirmation before praying (default on).
 %.lp
 \item[\ib{pushweapon}]
 Using the `w' (wield) command when already wielding

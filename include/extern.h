@@ -216,6 +216,7 @@ E char NDECL(readchar);
 E void NDECL(sanity_check);
 #endif
 E char FDECL(yn_function, (const char *, const char *, CHAR_P));
+E boolean FDECL(paranoid_query, (BOOLEAN_P,const char *));
 
 /* ### dbridge.c ### */
 

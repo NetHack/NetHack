@@ -1648,9 +1648,8 @@ int
 dopray()
 {
     /* Confirm accidental slips of Alt-P */
-    if (flags.prayconfirm)
-	if (yn("Are you sure you want to pray?") == 'n')
-	    return 0;
+    if (ParanoidPray && yn("Are you sure you want to pray?") != 'y')
+	return 0;
 
     u.uconduct.gnostic++;
 

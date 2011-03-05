@@ -298,7 +298,7 @@ int sig_unused;
 int
 done2()
 {
-	if(yn("Really quit?") == 'n') {
+	if (!paranoid_query(ParanoidQuit, "Really quit?")) {
 #ifndef NO_SIGNAL
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
@@ -865,7 +865,7 @@ int how;
 			wizard ||
 #endif
 			discover) && (how <= GENOCIDED)) {
-		if(yn("Die?") == 'y') goto die;
+		if (paranoid_query(ParanoidDie, "Die?")) goto die;
 		pline("OK, so you don't %s.",
 			(how == CHOKING) ? "choke" : "die");
 		savelife(how);

@@ -25,7 +25,6 @@ null           allow nulls to be sent to your terminal            [TRUE]
                delay code) if moving objects seem to teleport across rooms
 perm_invent    keep inventory in a permanent window               [FALSE]
 pickup_thrown  override pickup_types for thrown objects           [TRUE]
-prayconfirm    use confirmation prompt when #pray command issued  [TRUE]
 pushweapon     when wielding a new weapon, put your previously
                wielded weapon into the secondary weapon slot      [FALSE]
 rawio          allow the use of raw I/O                           [FALSE]
@@ -113,6 +112,14 @@ packorder     a list of default symbols for kinds of objects that gives the
               order in which your pack will be displayed  [")[%?+!=/(*`0_]
               (If you specify only some kinds of items, the others from the
               default order will be appended to the end.)
+paranoid_confirmation  space separated list of situations where alternate
+              prompting is desired  [paranoid_confirmation:pray]
+              quit   -- yes vs y to confirm quitting or to enter explore mode
+              die    -- yes vs y to confirm dying (for explore or debug mode)
+              attack -- yes vs y to confirm attacking a peaceful monster
+              pray   -- y to confirm an attempt to pray; on by default
+              Remove -- always pick from inventory for 'R' and 'T' even when
+              wearing just one applicable item to remove or take off
 pickup_burden when you pick up an item that exceeds this encumberance
               level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
               or overLoaded), you will be asked if you want to continue. [S]

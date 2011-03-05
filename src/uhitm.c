@@ -205,7 +205,7 @@ struct obj *wep;	/* uwep for attack(), null for kick_monster() */
 		}
 		if (canspotmon(mtmp)) {
 			Sprintf(qbuf, "Really attack %s?", mon_nam(mtmp));
-			if (yn(qbuf) != 'y') {
+			if (!paranoid_query(ParanoidHit, qbuf)) {
 				context.move = 0;
 				return(TRUE);
 			}
