@@ -1,5 +1,4 @@
 /* NetHack 3.5	flag.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)flag.h	3.5	2009/01/04	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -53,12 +52,17 @@ struct flag {
 	boolean  tombstone;	/* print tombstone */
 	boolean  toptenwin;	/* ending list in window instead of stdout */
 	boolean  verbose;	/* max battle info */
-	boolean  prayconfirm;	/* confirm before praying */
 	int	 end_top, end_around;	/* describe desired score list */
 	unsigned moonphase;
 	unsigned long suppress_alert;
 #define NEW_MOON	0
 #define FULL_MOON	4
+	int	 paranoia_bits;	/* alternate confirmation prompting */
+#define PARANOID_QUIT	0x01
+#define PARANOID_DIE	0x02
+#define PARANOID_HIT	0x04
+#define PARANOID_PRAY	0x08
+#define PARANOID_REMOVE	0x10
 	int	 pickup_burden;		/* maximum burden before prompt */
 	int	 pile_limit; /* controls feedback when walking over objects */
 	char	 inv_order[MAXOCLASSES];
@@ -336,6 +340,20 @@ extern NEARDATA struct instance_flags iflags;
 #define RUN_LEAP	1	/* update display every 7 steps */
 #define RUN_STEP	2	/* update display every single step */
 #define RUN_CRAWL	3	/* walk w/ extra delay after each update */
+
+/* paranoid confirmation prompting */
+/* quit: yes vs y for "Really quit?" and "Enter explore mode?" */
+#define ParanoidQuit	((flags.paranoia_bits & PARANOID_QUIT) != 0)
+/* die: yes vs y for "Die?" (dying in explore mode or wizard mode) */
+#define ParanoidDie	((flags.paranoia_bits & PARANOID_DIE) != 0)
+/* hit: yes vs y for "Really attack <the peaceful monster>?" */
+#define ParanoidHit	((flags.paranoia_bits & PARANOID_HIT) != 0)
+/* pray: ask "Really pray?" (accepts y answer, doesn't require yes),
+   taking over for the old prayconfirm boolean option */
+#define ParanoidPray	((flags.paranoia_bits & PARANOID_PRAY) != 0)
+/* remove: remove ('R') and takeoff ('T') commands prompt for an inventory
+   item even when only one accessory or piece of armor is currently worn */
+#define ParanoidRemove	((flags.paranoia_bits & PARANOID_REMOVE) != 0)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */
