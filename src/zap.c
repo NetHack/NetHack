@@ -2637,7 +2637,7 @@ struct obj *obj;	/* wand or spell */
 	case SPE_STONE_TO_FLESH:
 	    if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ||
 		     Underwater || (Is_qstart(&u.uz) && u.dz < 0)) {
-#if 1
+#if 0
 		pline("%s", nothing_happens);
 #else
 		pline(nothing_happens);
