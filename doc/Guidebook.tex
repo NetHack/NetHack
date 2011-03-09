@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.110 $ $Date: 2009/10/20 22:48:30 $
+% $Revision: 1.111 $ $Date: 2011/03/05 10:09:47 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -46,7 +46,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.5)}
-\date{May 24, 2007}
+\date{March 5, 2011}
 
 \maketitle
 
@@ -644,7 +644,9 @@ Prefix:  Same as `{\tt g}', but forking of corridors is not considered
 interesting.
 %.lp
 \item[\tb{_}]
-Travel to a map location via a shortest-path algorithm.  The shortest path
+Travel to a map location via a shortest-path algorithm.\\
+%.lp ""
+The shortest path
 is computed over map locations the hero knows about (e.g. seen or
 previously traversed).  If there is no known path, a guess is made instead.
 Stops on most of 
@@ -660,7 +662,8 @@ Rest, do nothing for one turn.
 Apply (use) a tool (pick-axe, key, lamp \ldots).
 %.lp
 \item[\tb{A}]
-Remove one or more worn items, such as armor.
+Remove one or more worn items, such as armor.\\
+%.lp ""
 Use `{\tt T}' (take off) to take off only one piece of armor 
 or `{\tt R}' (remove) to take off only one accessory.
 %.lp
@@ -671,7 +674,8 @@ Redo the previous command.
 Close a door.
 %.lp
 \item[\tb{C}]
-Call (name) a monster, an individual object, or an object type.
+Call (name) a monster, an individual object, or an object type.\\
+%.lp ""
 Same as extended command ``{\tt \#name}''.
 %.lp
 \item[\tb{\^{}C}]
@@ -683,12 +687,14 @@ Drop something.\\
 {\it a}.
 %.lp
 \item[\tb{D}]
-Drop several things.  In answer to the question
-``{\tt What kinds of things do you want to drop? [!\%= BUCXaium]}''
+Drop several things.\\
+%.lp ""
+In answer to the question\\
+``{\tt What kinds of things do you want to drop? [!\%= BUCXaium]}''\\
 you should type zero or more object symbols possibly followed by
 `{\tt a}' and/or `{\tt i}' and/or `{\tt u}' and/or `{\tt m}'.
 In addition, one or more of
-the blessed/uncursed/cursed groups may be typed.\\
+the bless\-ed/\-un\-curs\-ed/\-curs\-ed groups may be typed.\\
 %.sd
 %.si
 {\tt DB}  --- drop all objects known to be blessed.\\
@@ -714,17 +720,18 @@ Eat food.
 % prevents automatic hyphenation in TeX and LaTeX.)
 \hyphenation{Elbereth}		%override the deduced syllable breaks
 \item[\tb{E}]
-Engrave a message on the floor.
+Engrave a message on the floor.\\
+%.sd
+%.si
+{\tt E-} --- write in the dust with your fingers.\\
+%.ei
+%.ed
+%.lp ""
 Engraving the word ``{\tt Elbereth}'' will cause most monsters to not attack
 you hand-to-hand (but if you attack, you will rub it out); this is
 often useful to give yourself a breather.  (This feature may be compiled out
-of the game, so your version might not have it.)\\
-%.sd
-%.si
-{\tt E-} --- write in the dust with your fingers.
-%.ei
-%.ed
-%.Ip
+of the game, so your version might not have it.)
+%.lp
 \item[\tb{f}]
 Fire one of the objects placed in your quiver (or quiver sack, or that you
 have at the ready).  You may select
@@ -749,7 +756,9 @@ List selected parts of your inventory.\\
 Open a door.
 %.lp
 \item[\tb{O}]
-Set options.  A menu showing the current option values will be
+Set options.\\
+%.lp ""
+A menu showing the current option values will be
 displayed.  You can change most values simply by selecting the menu
 entry for the given option (ie, by typing its letter or clicking upon
 it, depending on your user interface).  For the non-boolean choices,
@@ -762,11 +771,15 @@ game rather than with the `{\tt O}' command; see the section on options below.
 Pay your shopping bill.
 %.lp
 \item[\tb{P}]
-Put on a ring or other accessory (amulet, blindfold).
+Put on a ring or other accessory (amulet, blindfold).\\
+%.lp ""
+Use the `{\tt W}' command to wear armor.
 %.lp
 \item[\tb{\^{}P}]
-Repeat previous message.  Subsequent {\tt \^{}P}'s repeat earlier messages.
-The behavior can be varied via the msg_window option.
+Repeat previous message.\\
+%.lp ""
+Subsequent {\tt \^{}P}'s repeat earlier messages.
+The behavior can be varied via the {\it msg\_\-win\-dow} option.
 %.lp
 \item[\tb{q}]
 Quaff (drink) something (potion, water, etc).
@@ -782,7 +795,15 @@ the game, which has now been moved to `{\tt \#quit}'.)
 Read a scroll or spellbook.
 %.lp
 \item[\tb{R}]
-Remove an accessory (ring, amulet, etc).
+Remove an accessory (ring, amulet, etc).\\
+%.lp ""
+If you're wearing more than one, you'll be prompted for which one to
+remove.  If you're only wearing one, then by default it will be removed
+without asking, but you can set the
+{\it paranoid\_confirmation\/}
+option to require a prompt.\\
+%.lp ""
+Use the `{\tt T}' command to take off armor.
 %.lp
 \item[\tb{\^{}R}]
 Redraw the screen.
@@ -799,7 +820,15 @@ next time you play.
 Throw an object or shoot a projectile.
 %.lp
 \item[\tb{T}]
-Take off armor.
+Take off armor.\\
+%.lp ""
+If you're wearing more than one piece, you'll be prompted for which
+one to take off.  If you're only wearing one, then by default it will
+be taken off without asking, but you can set the
+{\it paranoid\_confirmation\/}
+option to require a prompt.\\
+%.lp ""
+Use the `{\tt R}' command to remove accessories.
 %.lp
 \item[\tb{\^{}T}]
 Teleport, if you have the ability.
@@ -814,31 +843,58 @@ Display the game history.
 Wield weapon.\\
 %.sd
 %.si
-{\tt w-} --- wield nothing, use your bare hands.
+{\tt w-} --- wield nothing, use your bare hands.\\
 %.ei
 %.ed
+Some characters can wield two weapons and once; use the ``{\tt \#twoweapon}''
+extended command to do so.
 %.lp
 \item[\tb{W}]
-Wear armor.
+Wear armor.\\
+%.lp ""
+Use the `{\tt P}' command to put on accessories.
 %.lp
 \item[\tb{x}]
-Exchange your wielded weapon with the item in your alternate
-weapon slot.  The latter is used as your secondary weapon when engaging in
+Exchange your wielded weapon with the item in your alternate weapon slot.\\
+%.lp ""
+The latter is used as your secondary weapon when engaging in
 two-weapon combat.  Note that if one of these slots is empty,
 the exchange still takes place.
 %.lp
 \item[\tb{X}]
-Enter explore (discovery) mode, explained in its own section later.
+Enter explore (discovery) mode, explained in its own section later.\\
+%.lp ""
+Since using this command by accident would be troublesome, you are asked
+to confirm your intent before switching to explore mode.  By default
+the response `{\tt y}' acknowledges that intent.  You can set the
+{\it paranoid\_confirmation\/}
+option to require a response of ``yes'' instead.
 %.lp
 \item[\tb{\^{}X}]
-Display your name, role, race, gender, and alignment as well as
-the various deities in your game.
+Display basic information about your character.\\
+%.lp ""
+Displays name, role, race, gender (unless role name makes that
+redundant, such as {\tt Caveman} or {\tt Priestess}), and alignment,
+along with your patron deity and his or her opposition.  It also
+shows most of the various items of information from the status line(s)
+in a less terse form, including several additional things which don't
+appear in the normal status display due to space considerations.
 %.lp
 \item[\tb{z}]
-Zap a wand.  To aim at yourself, use `{\tt .}' for the direction.
+Zap a wand.\\
+%.sd
+%.si
+{\tt z.} --- to aim at yourself, use `{\tt .}' for the direction.
+%.ei
+%.ed
 %.lp
 \item[\tb{Z}]
-Zap (cast) a spell.  To cast at yourself, use `{\tt .}' for the direction.
+Zap (cast) a spell.\\
+%.sd
+%.si
+{\tt Z.} --- to aim at yourself, use `{\tt .}' for the direction.
+%.ei
+%.ed
 %.lp
 \item[\tb{\^{}Z}]
 Suspend the game (UNIX versions with job control only).
@@ -850,7 +906,9 @@ Look at what is here.
 Show what type of thing a visible symbol corresponds to.
 %.lp
 \item[\tb{,}]
-Pick up some things. May be preceded by `{\tt m}' to force a selection menu.
+Pick up some things.\\
+%.lp ""
+May be preceded by `{\tt m}' to force a selection menu.
 %.lp
 \item[\tb{@}]
 Toggle the {\it autopickup\/} option on and off.
@@ -874,14 +932,18 @@ Tell what amulet you are wearing.
 Tell what tools you are using.
 %.lp
 \item[\tb{*}]
-Tell what equipment you are using; combines the preceding five type-specific
+Tell what equipment you are using.\\
+%.lp ""
+Combines the preceding five type-specific
 commands into one.
 %.lp
 \item[\tb{\$}]
 Count your gold pieces.
 %.lp
 \item[\tb{+}]
-List the spells you know.  Using this command, you can also rearrange
+List the spells you know.\\
+%.lp ""
+Using this command, you can also rearrange
 the order in which your spells are listed, either by sorting the entire
 list or by picking one spell from the menu then picking another to swap
 places with it.  Swapping pairs of spells changes their casting letters,
@@ -899,7 +961,9 @@ Show what types of objects have been discovered.
 Escape to a shell.
 %.lp
 \item[\tb{\#}]
-Perform an extended command.  As you can see, the authors of {\it NetHack\/}
+Perform an extended command.\\
+%.lp ""
+As you can see, the authors of {\it NetHack\/}
 used up all the letters, so this is a way to introduce the less frequently
 used commands.
 What extended commands are available depends on what features
@@ -908,7 +972,8 @@ the game was compiled with.
 \item[\tb{\#adjust}]
 Adjust inventory letters (most useful when the
 {\it fixinv\/}
-option is ``on'').
+option is ``on'').\\
+%.lp ""
 This command allows you to move an item from one particular inventory
 slot to another so that it has a letter which is more meaningful for you
 or that it will appear in a particular location when inventory listings
@@ -920,8 +985,9 @@ choosing the item to adjust, enter a count prior to its letter.
 Talk to someone.
 %.lp
 \item[\tb{\#conduct}]
-List voluntary challenges you have maintained.  See the section below entitled
-``Conduct'' for details.
+List voluntary challenges you have maintained.\\
+%.lp ""
+See the section below entitled ``Conduct'' for details.
 %.lp
 \item[\tb{\#dip}]
 Dip an object into something.
@@ -940,7 +1006,7 @@ Jump to another location.
 %.lp
 \item[\tb{\#loot}]
 Loot a box or bag on the floor beneath you, or the saddle 
-from a horse standing next to you.
+from a steed standing next to you.
 %.lp
 \item[\tb{\#monster}]
 Use a monster's special ability (when polymorphed into monster form).
@@ -949,13 +1015,31 @@ Use a monster's special ability (when polymorphed into monster form).
 Name a monster, an individual object, or a type of object.  Same as `{\tt C}'.
 %.lp
 \item[\tb{\#offer}]
-Offer a sacrifice to the gods.
+Offer a sacrifice to the gods.\\
+%.lp ""
+You'll need to find an altar to have any chance at success.
+Corpses of recently killed monsters are the fodder of choice.
 %.lp
 \item[\tb{\#pray}]
-Pray to the gods for help.
+Pray to the gods for help.\\
+%.lp ""
+Praying too soon after receiving prior help is a bad idea.
+(Hint: entering the dungeon alive is treated as having received help.
+You probably shouldn't start off a new game by praying right away.)
+Since using this command by accident can cause trouble, there is an
+option to make you confirm your intent before praying.  It is enabled
+by default, and you can reset the
+{\it paranoid\_confirmation\/}
+option to disable it.
 %.lp
 \item[\tb{\#quit}]
-Quit the program without saving your game.
+Quit the program without saving your game.\\
+%.lp ""
+Since using this command by accident would throw away the current game,
+you are asked to confirm your intent before quitting.  By default a
+response of `{\tt y}' acknowledges that intent.  You can set the
+{\it paranoid\_confirmation\/}
+option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#ride}]
 Ride (or stop riding) a monster.
@@ -973,12 +1057,16 @@ Tip over a container to pour out its contents.
 Turn undead.
 %.lp
 \item[\tb{\#twoweapon}]
-Toggle two-weapon combat on or off.  Note that you must
+Toggle two-weapon combat on or off.\\
+%.lp ""
+Note that you must
 use suitable weapons for this type of combat, or it will
 be automatically turned off.
 %.lp
 \item[\tb{\#untrap}]
-Untrap something (trap, door, or chest).
+Untrap something (trap, door, or chest).\\
+%.lp ""
+In some circumstancs it can also be used to rescue trapped monsters.
 %.lp
 \item[\tb{\#version}]
 Print compile time options for this version of {\it NetHack}.
@@ -1097,7 +1185,7 @@ Kick something (usually a door).  Same as `{\tt \^{}D}'.
 %.lp
 \item[\tb{l}]
 Loot a box or bag on the floor beneath you, or the saddle 
-from a horse standing next to you.  Same as ``{\tt \#loot}'' or ``{\tt M-l}''.
+from a steed standing next to you.  Same as ``{\tt \#loot}'' or ``{\tt M-l}''.
 %.lp
 \item[\tb{N}]
 Name an object or type of object.  Same as ``{\tt \#name}'' or ``{\tt M-n}''.
@@ -1309,6 +1397,14 @@ you attack them.  Some of them are very dangerous when angered.
 Remember:  discretion is the better part of valor.
 
 %.pg
+In most circumstances, if you attempt to attack a peaceful monster by
+moving into its location, you'll be asked to confirm your intent.  By 
+default an answer of `{\tt y}' acknowledges that intent,
+which can be error prone if you're using `{\tt y}' to move.  You can set the
+{\it paranoid\_confirmation\/}
+option to require a response of ``{\tt yes}'' instead.
+%.pg
+
 If you can't see a monster (if it is invisible, or if you are blinded),
 the symbol `I' will be shown when you learn of its presence.
 If you attempt to walk into it, you will try to fight it just like
@@ -1615,6 +1711,48 @@ point you can use `{\tt \#enhance}' to increase one or more skills.  Such skills
 are not increased automatically because there is a limit to your total
 overall skills, so you need to actively choose which skills to enhance
 and which to ignore.
+
+%.hn 3
+\subsection*{Two-Weapon combat}
+
+%.pg
+Some characters can use two weapons at once.  Setting things up to
+do so can seem cumbersome but becomes second nature with use.
+To wield two weapons, you need to use the ``{\tt \#twoweapon}'' command.
+But first you need to have a weapon in each hand.
+(Note that your two weapons are not fully equal; the one in the
+hand you normally wield with is considered primary and the other
+one is considered secondary.  The most noticeable difference is   
+after you stop--or before you begin, for that matter--wielding
+two weapons at once.  The primary is your wielded weapon and the
+secondary is just an item in your inventory that's been designated
+as alternate weapon.)
+
+%.pg
+If your primary weapon is wielded but your off hand is empty or has
+the wrong weapon, use the sequence `{\tt x}', `{\tt w}', `{\tt x}' to first swap your
+primary into your off hand, wield whatever you want as secondary
+weapon, then swap them both back into the intended hands.
+If your secondary or alternate weapon is correct but your primary
+one is not, simply use `{\tt w}' to wield the primary.
+Lastly, if neither hand holds the correct weapon, use `{\tt w}', `{\tt x}', `{\tt w}'
+to first wield the intended secondary, swap it to off hand, and then
+wield the primary.
+
+%.pg
+The whole process can be simplified via use of the
+{\it pushweapon\/}
+option.  When it is enabled, then using `{\tt w}' to wield something
+causes the currently wielded weapon to become your alternate weapon.
+So the sequence `{\tt w}', `{\tt w}' can be used to first wield the weapon you
+intend to be secondary, and then wield the one you want as primary
+which will push the first into secondary position.
+
+%.pg
+When in two-weapon combat mode, using the ``{\tt \#twoweapon}'' command
+toggles back to single-weapon mode.  Throwing or dropping either of the
+weapons or having one of them be stolen or destroyed will also make you
+revert to single-weapon combat.
 
 %.hn 2
 \subsection*{Armor (`{\tt [}')}
@@ -2392,10 +2530,10 @@ Allows you to change the way recalled messages are displayed.
 
 %.sd
 %.si
-{\tt s} --- single message (default, this was the behavior before 3.4.0).\\
-{\tt c} --- combination, two messages as {\it single\/}, then as {\it full\/}.\\
-{\tt f} --- full window, oldest message first.\\
-{\tt r} --- full window, newest message first.
+{\tt s} --- single message (default; only choice prior to 3.4.0)\\
+{\tt c} --- combination, two messages as {\it single\/}, then as {\it full\/}\\
+{\tt f} --- full window, oldest message first\\
+{\tt r} --- full window reversed, newest message first
 %.ei
 %.ed
 
@@ -2426,12 +2564,12 @@ Valid settings are:
 
 %.sd
 %.si
-{\tt \ 0} --- move by letters; `{\tt yuhjklbn}'.\\
-{\tt \ 1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix.\\
-{\tt \ 2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'.\\
-{\tt \ 3} --- move by numbers using phone keypad layout; {\tt 123} above, {\tt 789} below.\\
-{\tt \ 4} --- combines {\tt 3} with {\tt 2}; phone layout plus MSDOS compatibility.\\
-{\tt  -1} --- move by letters but use `{\tt z}' to go northwest and `{\tt y}' to zap wands.
+{\tt ~0} --- move by letters; `{\tt yuhjklbn}'\\
+{\tt ~1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix\\
+{\tt ~2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'\\
+{\tt ~3} --- by numbers using phone key layout; {\tt 123} above, {\tt 789} below\\
+{\tt ~4} --- combines {\tt 3} with {\tt 2}; phone layout plus MSDOS compatibility\\
+{\tt -1} --- by letters but use `{\tt z}' to go northwest, `{\tt y}' to zap wands
 %.ei
 %.ed
 
@@ -2454,22 +2592,24 @@ Specify the order to list object types in (default
 containing the symbols for the various object types.  Any omitted types
 are filled in at the end from the previous order.
 %.lp
-\item[\ib{paranoid_confirmation}]
+\item[\ib{paranoid\_confirmation}]
 A space separated list of specific situations where alternate
-prompting is desired.  The default is ``{\tt paranoid_confirmation:pray}''.
+prompting is desired.  The default is ``{\it paranoid\_confirmation:pray}''.
 %.sd
 %.si
-\blist{}	% this might look better as a table
-\item[{\tt quit}]
+%? Setting \itemindent to 0 seems to be what we want but didn't achieve
+%? anything, so hack \leftmargin to approximately suppress indentation.
+\blist{\leftmargin 15mm \topsep 1mm \itemsep 0mm}
+\item[{\tt quit~~}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm quitting
 the game or switching into non-scoring explore mode;
-\item[{\tt die}]
-require ``{\tt yes}'' rather than '{\tt y}' to confirm dying (not
+\item[{\tt die~~~}]
+require ``{\tt yes}'' rather than `{\tt y}' to confirm dying (not
 useful in normal play; applies to explore mode);
 \item[{\tt attack}]
-require ``{\tt yes}'' rather than '{\tt y}' to confirm attacking
+require ``{\tt yes}'' rather than `{\tt y}' to confirm attacking
 a peaceful monster;
-\item[{\tt pray}]
+\item[{\tt pray~~}]
 require `{\tt y}' to confirm an attempt to pray rather
 than immediately praying; on by default;
 \item[{\tt Remove}] require selection from inventory for `{\tt R}' and `{\tt T}'
@@ -2477,13 +2617,11 @@ commands even when wearing just one applicable item.
 \elist
 %.ei
 %.ed
-{\relax
 By default, the pray choice is enabled, the others disabled.
 To disable it without setting
-any of the other choices, use ``{\tt paranoid_confirmation:none}''.  To keep
+any of the other choices, use ``{\it paranoid\_confirmation:none}''.  To keep
 it enabled while setting others, include it in the list,
-such as ``{\tt paranoid_con\-fir\-ma\-tion:\-attack~pray~Remove}''.
-}%relax
+such as ``{\it par\-a\-noid\_con\-fir\-ma\-tion:attack~pray~Remove}''.
 %.lp
 \item[\ib{perm\_invent}]
 If true, always display your current inventory in a window.  This only

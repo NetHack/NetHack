@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.5
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "May 24, 2007
+.ds f2 "March 5, 2011
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -476,7 +476,9 @@ Prefix:  move until something interesting is found.
 .lp "G[yuhjklbn] or <CONTROL->[yuhjklbn]
 Prefix:  same as `g', but forking of corridors is not considered interesting.
 .lp _
-Travel to a map location via a shortest-path algorithm.  The shortest path
+Travel to a map location via a shortest-path algorithm.
+.lp ""
+The shortest path
 is computed over map locations the hero knows about (e.g. seen or
 previously traversed).  If there is no known path, a guess is made instead.
 Stops on most of
@@ -490,6 +492,7 @@ Rest, do nothing for one turn.
 Apply (use) a tool (pick-axe, key, lamp...).
 .lp A
 Remove one or more worn items, such as armor.
+.lp ""
 Use `T' (take off) to take off only one piece of armor 
 or `R' (remove) to take off only one accessory.
 .lp ^A
@@ -498,14 +501,21 @@ Redo the previous command.
 Close a door.
 .lp C
 Call (name) a monster, an individual object, or a type of object.
+.lp ""
 Same as extended command ``#name''.
 .lp ^C
 Panic button.  Quit the game.
 .lp d
-Drop something.  Ex. ``d7a'' means drop seven items of object \fIa\fP.
+Drop something.
+.lp ""
+Ex. ``d7a'' means drop seven items of object \fIa\fP.
 .lp D
-Drop several things.  In answer to the question
+Drop several things.
+.lp ""
+In answer to the question
+.lp ""
 ``What kinds of things do you want to drop? [!%= BUCXaium]''
+.lp ""
 you should type zero or more object symbols possibly followed by 
 `a' and/or `i' and/or `u' and/or `m'.  In addition, one or more of
 the blessed/uncursed/cursed groups may be typed.
@@ -530,15 +540,16 @@ Eat food.
 .hw Elbereth
 .lp E
 Engrave a message on the floor.
-Engraving the word ``Elbereth'' will cause most monsters to not attack
-you hand-to-hand (but if you attack, you will rub it out); this is
-often useful to give yourself a breather.  (This feature may be compiled out
-of the game, so your version might not have it.)
 .sd
 .si
 E- - write in the dust with your fingers.  
 .ei
 .ed
+.lp ""
+Engraving the word ``Elbereth'' will cause most monsters to not attack
+you hand-to-hand (but if you attack, you will rub it out); this is
+often useful to give yourself a breather.  (This feature may be compiled out
+of the game, so your version might not have it.)
 .lp f
 Fire one of the objects placed in your quiver (or quiver sack, or that you
 have at the ready).  You may select
@@ -561,7 +572,9 @@ I$ - count your money.
 .lp o
 Open a door.
 .lp O
-Set options.  A menu showing the current option values will be
+Set options.
+.lp ""
+A menu showing the current option values will be
 displayed.  You can change most values simply by selecting the menu
 entry for the given option (ie, by typing its letter or clicking upon
 it, depending on your user interface).  For the non-boolean choices,
@@ -573,9 +586,15 @@ game rather than with the `O' command; see the section on options below.
 Pay your shopping bill.
 .lp P
 Put on a ring or other accessory (amulet, blindfold).
+.lp ""
+Use the 'W' command to wear armor.
 .lp ^P
-Repeat previous message.  Subsequent ^P's repeat earlier messages.
-The behavior can be varied via the msg_window option.
+Repeat previous message.
+.lp ""
+Subsequent ^P's repeat earlier messages.
+The behavior can be varied via the
+.op msg_window
+option.
 .lp q
 Quaff (drink) something (potion, water, etc).
 .lp Q
@@ -588,6 +607,14 @@ the game, which has now been moved to `#quit'.)
 Read a scroll or spellbook.
 .lp R
 Remove an accessory (ring, amulet, etc).
+.lp ""
+If you're wearing more than one, you'll be prompted for which one to
+remove.  If you're only wearing one, then by default it will be removed
+without asking, but you can set the
+.op paranoid_confirmation
+option to require a prompt.
+.lp ""
+Use the 'T' command to take off armor.
 .lp ^R
 Redraw the screen.
 .lp s
@@ -600,6 +627,14 @@ next time you play.
 Throw an object or shoot a projectile.
 .lp T
 Take off armor.
+.lp ""
+If you're wearing more than one piece, you'll be prompted for which
+one to take off.  If you're only wearing one, then by default it will
+be taken off without asking, but you can set the
+.op paranoid_confirmation
+option to require a prompt.
+.lp ""
+Use the 'R' command to remove accessories.
 .lp ^T
 Teleport, if you have the ability.
 .lp v
@@ -613,22 +648,49 @@ Wield weapon.
 w- - wield nothing, use your bare hands.
 .ei
 .ed
+Some characters can wield two weapons and once; use the ``#twoweapon''
+extended command to do so.
 .lp W
 Wear armor.
+.lp ""
+Use the 'P' command to put on accessories.
 .lp x
-Exchange your wielded weapon with the item in your alternate
-weapon slot.  The latter is used as your secondary weapon when engaging in
+Exchange your wielded weapon with the item in your alternate weapon slot.
+.lp ""
+The latter is used as your secondary weapon when engaging in
 two-weapon combat.  Note that if one of these slots is empty,
 the exchange still takes place.
 .lp X
 Enter explore (discovery) mode, explained in its own section later.
+.lp ""
+Since using this command by accident would be troublesome, you are asked
+to confirm your intent before switching to explore mode.  By default
+the response 'y' acknowledges that intent.  You can set the
+.op paraniod_confirmation
+option to require a response of "yes" instead.
 .lp ^X
-Display your name, role, race, gender, and alignment as well as
-the various deities in your game.
+Display basic information about your character.
+.lp ""
+Displays name, role, race, gender (unless role name makes that
+redundant, such as \fICaveman\fP or \fiPriestess\fP), and alignment,
+along with your patron deity and his or her opposition.  It also
+shows most of the various items of information from the status line(s)
+in a less terse form, including several additional things which don't
+appear in the normal status display due to space considerations.
 .lp z
-Zap a wand.  To aim at yourself, use `.' for the direction.
+Zap a wand.
+.sd
+.si
+z. - to aim at yourself, use `.' for the direction.
+.ei
+.ed
 .lp Z
-Zap (cast) a spell.  To cast at yourself, use `.' for the direction.
+Zap (cast) a spell.
+.sd
+.si
+Z. - to cast at yourself, use `.' for the direction.
+.ei
+.ed
 .lp ^Z
 Suspend the game
 .ux " versions with job control only)." (
@@ -637,7 +699,9 @@ Look at what is here.
 .lp ;
 Show what type of thing a visible symbol corresponds to.
 .lp ,
-Pick up some things. May be preceded by `m' to force a selection menu.
+Pick up some things from the floor beneath you.
+.lp ""
+May be preceded by `m' to force a selection menu.
 .lp @
 Toggle the
 .op autopickup
@@ -655,12 +719,16 @@ Tell what amulet you are wearing.
 .lp (
 Tell what tools you are using.
 .lp *
-Tell what equipment you are using; combines the preceding five type-specific
+Tell what equipment you are using.
+.lp ""
+Combines the preceding five type-specific
 commands into one.
 .lp $
 Count your gold pieces.
 .lp +
-List the spells you know.  Using this command, you can also rearrange
+List the spells you know.
+.lp ""
+Using this command, you can also rearrange
 the order in which your spells are listed, either by sorting the entire
 list or by picking one spell from the menu then picking another to swap
 places with it.  Swapping pairs of spells changes their casting letters,
@@ -675,7 +743,9 @@ Show what types of objects have been discovered.
 .lp !
 Escape to a shell.
 .lp #
-Perform an extended command.  As you can see, the authors of NetHack
+Perform an extended command.
+.lp ""
+As you can see, the authors of NetHack
 used up all the letters, so this is a way to introduce the less frequently
 used commands.
 What extended commands are available depends on what features the game was
@@ -684,6 +754,7 @@ compiled with.
 Adjust inventory letters (most useful when the
 .op fixinv
 option is ``on'').
+.lp ""
 This command allows you to move an item from one particular inventory
 slot to another so that it has a letter which is more meaningful for you
 or that it will appear in a particular location when inventory listings
@@ -693,8 +764,9 @@ choosing the item to adjust, enter a count prior to its letter.
 .lp #chat
 Talk to someone.
 .lp #conduct
-List voluntary challenges you have maintained.  See the section below entitled
-``Conduct'' for details.
+List voluntary challenges you have maintained.
+.lp ""
+See the section below entitled ``Conduct'' for details.
 .lp "#dip "
 Dip an object into something.
 .lp #enhance
@@ -707,17 +779,35 @@ Invoke an object's special powers.
 Jump to another location.
 .lp #loot
 Loot a box or bag on the floor beneath you, or the saddle 
-from a horse standing next to you.
+from a steed standing next to you.
 .lp #monster
 Use a monster's special ability (when polymorphed into monster form).
 .lp #name
 Name a monster, an individual object, or a type of object.  Same as `C'.
 .lp #offer
 Offer a sacrifice to the gods.
+.lp ""
+You'll need to find an altar to have any chance at success.
+Corpses of recently killed monsters are the fodder of choice.
 .lp #pray
 Pray to the gods for help.
+.lp ""
+Praying too soon after receiving prior help is a bad idea.
+(Hint: entering the dungeon alive is treated as having received help.
+You probably shouldn't start off a new game by praying right away.)
+Since using this command by accident can cause trouble, there is an
+option to make you confirm your intent before praying.  It is enabled
+by default, and you can reset the
+.op paraniod_confirmation
+option to disable it.
 .lp #quit
 Quit the program without saving your game.
+.lp ""
+Since using this command by accident would throw away the current game,
+you are asked to confirm your intent before quitting.  By default a
+response of 'y' acknowledges that intent.  You can set the
+.op paraniod_confirmation
+option to require a response of "yes" instead.
 .lp #ride
 Ride (or stop riding) a monster.
 .lp "#rub "
@@ -729,11 +819,15 @@ Tip over a container to pour out its contents.
 .lp #turn
 Turn undead.
 .lp #twoweapon
-Toggle two-weapon combat on or off.  Note that you must
+Toggle two-weapon combat on or off.
+.lp ""
+Note that you must
 use suitable weapons for this type of combat, or it will
 be automatically turned off.
 .lp #untrap
 Untrap something (trap, door, or chest).
+.lp ""
+In some circumstances it can also be used to rescue trapped monsters.
 .lp #version
 Print compile time options for this version of NetHack.
 .lp #wipe
@@ -814,7 +908,7 @@ Jump to another location.  Same as ``#jump'' or ``M-j''.
 Kick something (usually a door).  Same as `^D'.
 .lp l
 Loot a box or bag on the floor beneath you, or the saddle 
-from a horse standing next to you.  Same as ``#loot'' or ``M-l''.
+from a steed standing next to you.  Same as ``#loot'' or ``M-l''.
 .lp N
 Name a monster, an individual object, or a type of object.  Same
 as ``#name'' (or ``M-n'') which is the same as the `C'
@@ -982,6 +1076,13 @@ If you see a monster and you wish to fight it, just attempt to walk
 into it.  Many monsters you find will mind their own business unless
 you attack them.  Some of them are very dangerous when angered.
 Remember:  discretion is the better part of valor.
+.pg
+In most circumstances, if you attempt to attack a peaceful monster by
+moving into its location, you'll be asked to confirm your intent.  By 
+default an answer of 'y' acknowledges that intent,
+which can be error prone if you're using 'y' to move.  You can set the
+.op paraniod_confirmation
+option to require a response of "yes" instead.
 .pg
 If you can't see a monster (if it is invisible, or if you are blinded),
 the symbol `I' will be shown when you learn of its presence.
@@ -1254,6 +1355,43 @@ point you can use `#enhance' to increase one or more skills.  Such skills
 are not increased automatically because there is a limit to your total
 overall skills, so you need to actively choose which skills to enhance
 and which to ignore.
+.hn 3
+Two-Weapon combat
+.pg
+Some characters can use two weapons at once.  Setting things up to
+do so can seem cumbersome but becomes second nature with use.
+To wield two weapons, you need to use the ``#twoweapon'' command.
+But first you need to have a weapon in each hand.
+(Note that your two weapons are not fully equal; the one in the
+hand you normally wield with is considered primary and the other
+one is considered secondary.  The most noticeable difference is   
+after you stop--or before you begin, for that matter--wielding
+two weapons at once.  The primary is your wielded weapon and the
+secondary is just an item in your inventory that's been designated
+as alternate weapon.)
+.pg
+If your primary weapon is wielded but your off hand is empty or has
+the wrong weapon, use the sequence 'x', 'w', 'x' to first swap your
+primary into your off hand, wield whatever you want as secondary
+weapon, then swap them both back into the intended hands.
+If your secondary or alternate weapon is correct but your primary
+one is not, simply use 'w' to wield the primary.
+Lastly, if neither hand holds the correct weapon, use 'w', 'x', 'w'
+to first wield the intended secondary, swap it to off hand, and then
+wield the primary.
+.pg
+The whole process can be simplified via use of the
+.op pushweapon
+option.  When it is enabled, then using 'w' to wield something
+causes the currently wielded weapon to become your alternate weapon.
+So the sequence 'w', 'w' can be used to first wield the weapon you
+intend to be secondary, and then wield the one you want as primary
+which will push the first into secondary position.
+.pg
+When in two-weapon combat mode, using the ``#twoweapon'' command
+toggles back to single-weapon mode.  Throwing or dropping either of the
+weapons or having one of them be stolen or destroyed will also make you
+revert to single-weapon combat.
 .hn 2
 Armor (`[')
 .pg
@@ -1920,10 +2058,10 @@ Allows you to change the way recalled messages are displayed.
 The possible values are:
 .sd
 .si
-s - single message (default, this was the behavior before 3.4.0).
-c - combination, two messages as `single', then as `full'.
-f - full window, oldest message first.
-r - full window, newest message first.
+s - single message (default; only choice prior to 3.4.0)
+c - combination, two messages as `single', then as `full'
+f - full window, oldest message first
+r - full window reversed, newest message first
 .ei
 .ed
 For backward compatibility, no value needs to be specified (which
@@ -1948,12 +2086,12 @@ Use digit keys instead of letters to move (default 0 or off).
 Valid settings are:
 .sd
 .si
-\ 0 - move by letters; `yuhjklbn'.
-\ 1 - move by numbers; digit `5' acts as `G' movement prefix.
-\ 2 - like 1 but `5' works as `g' prefix instead of as `G'.
-\ 3 - move by numbers using phone keypad layout; 123 above, 789 below.
-\ 4 - combines 3 with 2; phone layout plus MSDOS compatibility.
--1 - move by letters but use `z' to go northwest and `y' to zap wands.
+\ 0 - move by letters; `yuhjklbn'
+\ 1 - move by numbers; digit `5' acts as `G' movement prefix
+\ 2 - like 1 but `5' works as `g' prefix instead of as `G'
+\ 3 - by numbers using phone key layout; 123 above, 789 below
+\ 4 - combines 3 with 2; phone layout plus MSDOS compatibility
+-1 - by letters but use `z' to go northwest, `y' to zap wands
 .ei
 .ed
 For backward compatibility, omitting a value is the same as specifying 1
