@@ -1,5 +1,4 @@
 /* NetHack 3.5	mcastu.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mcastu.c	3.5	2005/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -76,7 +75,14 @@ STATIC_OVL int
 choose_magic_spell(spellval)
 int spellval;
 {
+    /* for 3.4.3 and earlier, val greater than 22 selected the default spell */
+    while (spellval > 24 && rn2(25)) spellval = rn2(spellval);
+
     switch (spellval) {
+    case 24:
+    case 23:
+	if (Antimagic || Hallucination) return MGC_PSI_BOLT;
+	/* else FALL THROUGH */
     case 22:
     case 21:
     case 20:
@@ -121,7 +127,14 @@ STATIC_OVL int
 choose_clerical_spell(spellnum)
 int spellnum;
 {
+    /* for 3.4.3 and earlier, num greater than 13 selected the default spell */
+    while (spellnum > 15 && rn2(16)) spellnum = rn2(spellnum);
+
     switch (spellnum) {
+    case 15:
+    case 14:
+	if (rn2(3)) return CLC_OPEN_WOUNDS;
+	/* else FALL THROUGH */
     case 13:
 	return CLC_GEYSER;
     case 12:
