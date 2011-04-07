@@ -1,5 +1,4 @@
 /* NetHack 3.5	artifact.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)artifact.c 3.5	2008/02/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -407,7 +406,7 @@ register struct obj *otmp;
 
 /* used for monsters */
 boolean
-protects(adtyp, otmp)
+defends_when_carried(adtyp, otmp)
 int adtyp;
 struct obj *otmp;
 {
@@ -416,6 +415,22 @@ struct obj *otmp;
 	if ((weap = get_artifact(otmp)) != 0)
 		return (boolean)(weap->cary.adtyp == adtyp);
 	return FALSE;
+}
+
+/* determine whether an item confers Protection */
+boolean
+protects(otmp, is_worn)
+struct obj *otmp;
+boolean is_worn;
+{
+	const struct artifact *arti;
+
+	if (is_worn && objects[otmp->oclass].oc_oprop == PROTECTION)
+	    return TRUE;
+	arti = get_artifact(otmp);
+	if (!arti) return FALSE;
+	return (arti->cspfx & SPFX_PROTECT) != 0 ||
+		(is_worn && (arti->spfx & SPFX_PROTECT) != 0);
 }
 
 /*
@@ -547,6 +562,10 @@ long wp_mask;
 	if ((spfx & SPFX_REFLECT) && (wp_mask & W_WEP)) {
 	    if (on) EReflecting |= wp_mask;
 	    else EReflecting &= ~wp_mask;
+	}
+	if (spfx & SPFX_PROTECT) {
+	    if (on) EProtection |= wp_mask;
+	    else EProtection &= ~wp_mask;
 	}
 
 	if(wp_mask == W_ART && !on && oart->inv_prop) {

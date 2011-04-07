@@ -113,7 +113,7 @@ struct monst *mon;
 	for ( ; o; o = o->nobj)
 	    if (((o->owornmask & slotmask) != 0L &&
 			objects[o->otyp].oc_oprop == ANTIMAGIC) ||
-		    (o->oartifact && protects(AD_MAGM, o)))
+		    (o->oartifact && defends_when_carried(AD_MAGM, o)))
 		return TRUE;
 	return FALSE;
 }
@@ -150,7 +150,7 @@ struct monst *mon;
 	for ( ; o; o = o->nobj)
 	    if (((o->owornmask & slotmask) != 0L &&
 			objects[o->otyp].oc_oprop == BLINDED) ||
-		    (o->oartifact && protects(AD_BLND, o)))
+		    (o->oartifact && defends_when_carried(AD_BLND, o)))
 		return TRUE;
 	return FALSE;
 }

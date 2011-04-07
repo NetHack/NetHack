@@ -1231,7 +1231,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		       also increases the effect */
 		    for (otmp = invent; otmp; otmp = otmp->nobj)
 			if (otmp->oartifact && !is_quest_artifact(otmp) &&
-			    protects(AD_MAGM, otmp)) break;
+			    defends_when_carried(AD_MAGM, otmp)) break;
 		    if (otmp) dmgval2 += rnd(4);
 		    if (Passes_walls) dmgval2 = (dmgval2 + 3) / 4;
 
@@ -2399,7 +2399,8 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				    otmp->oartifact == ART_MAGICBANE)
 				dmgval2 += rnd(4);
 			    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) 
-				if (otmp->oartifact && protects(AD_MAGM, otmp))
+				if (otmp->oartifact &&
+					defends_when_carried(AD_MAGM, otmp))
 				    break;
 			    if (otmp) dmgval2 += rnd(4);
 			    if (passes_walls(mptr)) dmgval2 = (dmgval2 + 3) / 4;

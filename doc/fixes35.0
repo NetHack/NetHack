@@ -350,6 +350,9 @@ teleport control and polymorph control are ineffective while hero is stunned
 don't report "fried to a crisp" for disintegration from divine wrath
 spellcasting monsters' spell selection became less likely to choose harder
 	spells as their level got higher (including Wizard's "double trouble")
+Eye of the Aethiopica, Eyes of the Overworld, and Sceptre of Might must be
+	worn or wielded rather than just carried to convey magic resistance
+Mitre of Holiness and Tsurugi of Muramasa convey Protection when worn/wielded
 
 
 Platform- and/or Interface-Specific Fixes
