@@ -353,6 +353,8 @@ spellcasting monsters' spell selection became less likely to choose harder
 Eye of the Aethiopica, Eyes of the Overworld, and Sceptre of Might must be
 	worn or wielded rather than just carried to convey magic resistance
 Mitre of Holiness and Tsurugi of Muramasa convey Protection when worn/wielded
+effectiveness of magic cancellation by worn armor has been reduced
+Protection improves the effectiveness of magic cancellation
 
 
 Platform- and/or Interface-Specific Fixes

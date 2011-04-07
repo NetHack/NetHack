@@ -1356,7 +1356,7 @@ register struct attack *mattk;
 
 	armpro = magic_negation(mdef);
 	/* since hero can't be cancelled, only defender's armor applies */
-	negated = !((rn2(3) >= armpro) || !rn2(50));
+	negated = !(rn2(10) >= 3 * armpro);
 
 	if (is_demon(youmonst.data) && !rn2(13) && !uwep
 		&& u.umonnum != PM_SUCCUBUS && u.umonnum != PM_INCUBUS

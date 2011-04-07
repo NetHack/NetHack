@@ -719,7 +719,7 @@ mdamagem(magr, mdef, mattk)
 
 	/* cancellation factor is the same as when attacking the hero */
 	armpro = magic_negation(mdef);
-	cancelled = magr->mcan || !((rn2(3) >= armpro) || !rn2(50));
+	cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
 
 	switch(mattk->adtyp) {
 	    case AD_DGST:
