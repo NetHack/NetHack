@@ -425,7 +425,7 @@ boolean is_worn;
 {
 	const struct artifact *arti;
 
-	if (is_worn && objects[otmp->oclass].oc_oprop == PROTECTION)
+	if (is_worn && objects[otmp->otyp].oc_oprop == PROTECTION)
 	    return TRUE;
 	arti = get_artifact(otmp);
 	if (!arti) return FALSE;
