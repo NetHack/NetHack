@@ -822,7 +822,10 @@ struct monst *mon;
 	struct obj *o;
 	long wearmask;
 	int armpro, mc = 0;
-	boolean is_you = (mon == &youmonst), gotprot = FALSE;
+	boolean is_you = (mon == &youmonst),
+		gotprot = is_you ? (EProtection != 0L) :
+				  /* high priests have innate protection */
+				  (mon->data == &mons[PM_HIGH_PRIEST]);
 
 	for (o = is_you ? invent : mon->minvent; o; o = o->nobj) {
 	    /* a_can field is only applicable for armor (which must be worn) */
@@ -831,7 +834,7 @@ struct monst *mon;
 		if (armpro > mc) mc = armpro;
 	    }
 	    /* if we've already confirmed Protection, skip additional checks */
-	    if (gotprot) continue;
+	    if (is_you || gotprot) continue;
 
 	    /* omit W_SWAPWEP+W_QUIVER; W_ART+W_ARTI handled by protects() */
 	    wearmask = W_ARMOR | W_RING | W_AMUL | W_TOOL;
@@ -840,31 +843,17 @@ struct monst *mon;
 		gotprot = TRUE;
 	}
 
-	/* extrinsic Protection increases mc factor */
-	if (!gotprot) {
-	    /* in case hero has extrinsic protection from some other source */
-	    if (is_you && EProtection) gotprot = TRUE;
-	    /* high priests have innate intrinsic protection which is as
-	       strong as extrinsic protection */
-	    if (mon->data == &mons[PM_HIGH_PRIEST]) gotprot = TRUE;
+	if (gotprot) {
+	    /* extrinsic Protection increases mc by 1 */
+	    if (mc < 3) mc += 1;
+	} else if (mc < 1) {
+	    /* intrinsic Protection is weaker (play balance; obtaining divine
+	       protection is too easy); it confers minimum mc 1 instead of 0 */
+	    if ((is_you && ((HProtection && u.ublessed) || u.uspellprot)) ||
+	      /* aligned priests and angels have innate intrinsic Protection */
+	      (mon->data == &mons[PM_ALIGNED_PRIEST] || is_minion(mon->data)))
+		mc = 1;
 	}
-	/* extrinsic Protection increases mc by 1 */
-	if (gotprot && mc < 3)
-	    mc += 1;
-
-	/* intrinsic Protection is weaker than Extrinsic (play balance;
-	   obtaining divine protection is too easy) */
-	if (!gotprot) {
-	    if (is_you && ((HProtection && u.ublessed > 0) || u.uspellprot))
-		gotprot = TRUE;
-	    /* aligned priests and angels have innate intrinsic Protection */
-	    if (mon->data == &mons[PM_ALIGNED_PRIEST] || is_minion(mon->data))
-		gotprot = TRUE;
-	}
-	/* intrinsic Protection confers minimum mc 1 instead of 0 */
-	if (gotprot && mc < 1)
-	    mc = 1;
-
 	return mc;
 }
 
