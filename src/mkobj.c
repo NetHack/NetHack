@@ -1169,20 +1169,16 @@ register struct obj *obj;
 		 *	Bag status	Weight of contents
 		 *	----------	------------------
 		 *	cursed			2x
-		 *	blessed			x/4 + 1
-		 *	otherwise		x/2 + 1
+		 *	blessed			x/4 [rounded up: (x+3)/4]
+		 *	otherwise		x/2 [rounded up: (x+1)/2]
 		 *
 		 *  The macro DELTA_CWT in pickup.c also implements these
 		 *  weight equations.
-		 *
-		 *  Note:  The above checks are performed in the given order.
-		 *	   this means that if an object is both blessed and
-		 *	   cursed (not supposed to happen), it will be treated
-		 *	   as cursed.
 		 */
 		if (obj->otyp == BAG_OF_HOLDING)
 		    cwt = obj->cursed ? (cwt * 2) :
-					(1 + (cwt / (obj->blessed ? 4 : 2)));
+			  obj->blessed ? ((cwt + 3) / 4) :
+					  ((cwt + 1) / 2);
 
 		return wt + cwt;
 	}

@@ -57,7 +57,7 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
  */
 #define DELTA_CWT(cont,obj)		\
     ((cont)->cursed ? (obj)->owt * 2 :	\
-		      1 + ((obj)->owt / ((cont)->blessed ? 4 : 2)))
+     (cont)->blessed ? ((obj)->owt + 3) / 4 : ((obj)->owt + 1) / 2)
 #define GOLD_WT(n)		(((n) + 50L) / 100L)
 /* if you can figure this out, give yourself a hearty pat on the back... */
 #define GOLD_CAPACITY(w,n)	(((w) * -100L) - ((n) + 50L) - 1L)
