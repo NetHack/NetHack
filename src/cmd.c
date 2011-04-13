@@ -2800,18 +2800,6 @@ register char *cmd;
 		context.move = FALSE;
 		return;		/* probably we just had an interrupt */
 	}
-	if (Cmd.pcHack_compat) {
-		/* This handles very old inconsistent DOS/Windows behaviour
-		 * in a new way: earlier, the keyboard handler mapped these,
-		 * which caused counts to be strange when entered from the
-		 * number pad. Now do not map them until here. 
-		 */
-		switch (*cmd) {
-		    case '5':       *cmd = 'g'; break;
-		    case M('5'):    *cmd = 'G'; break;
-		    case M('0'):    *cmd = 'I'; break;
-		}
-	}
 
 	/* handle most movement commands */
 	do_walk = do_rush = prefix_seen = FALSE;
@@ -3412,6 +3400,20 @@ parse()
 	} else {
 	    save_cm = (char *)0;
 	}
+	/* in 3.4.3 this was in rhack(), where it was too late to handle M-5 */
+	if (Cmd.pcHack_compat) {
+	    /* This handles very old inconsistent DOS/Windows behaviour
+	       in a different way: earlier, the keyboard handler mapped
+	       these, which caused counts to be strange when entered
+	       from the number pad. Now do not map them until here. */
+	    switch (foo) {
+	    case '5':	 foo = 'g'; break;
+	    case M('5'): foo = 'G'; break;
+	    case M('0'): foo = 'I'; break;
+	    default:	 break; /* as is */
+	    }
+	}
+
 	in_line[0] = foo;
 	in_line[1] = '\0';
 	if (foo == 'g' || foo == 'G' || foo == 'm' || foo == 'M' ||
