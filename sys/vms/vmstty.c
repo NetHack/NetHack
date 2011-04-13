@@ -1,5 +1,4 @@
 /* NetHack 3.5	vmstty.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)vmstty.c	3.5	2007/01/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* tty.c - (VMS) version */
@@ -102,6 +101,36 @@ static unsigned short tt_chan = 0;
 static unsigned long  tt_char_restore = 0, tt_char_active = 0,
 		      tt2_char_restore = 0, tt2_char_active = 0;
 static unsigned long  ctrl_mask = 0;
+
+#ifdef DEBUG
+extern int NDECL(nh_vms_getchar);
+
+/* rename the real vms_getchar and interpose this one in front of it */
+int
+vms_getchar()
+{
+    static int althack = 0, altprefix;
+    char *nhalthack;
+    int res;
+
+    if (!althack) {
+	/* one-time init */
+	nhalthack = nh_getenv("NH_ALTHACK");
+	althack = nhalthack ? 1 : -1;
+	if (althack > 0)
+	    altprefix = *nhalthack;
+    }
+
+# define vms_getchar nh_vms_getchar
+
+    res = vms_getchar();
+    if (althack > 0 && res == altprefix) {
+	res = vms_getchar();
+	if (res != ESC) res = META(res);
+    }
+    return res;
+}
+#endif /*DEBUG*/
 
 int
 vms_getchar()
