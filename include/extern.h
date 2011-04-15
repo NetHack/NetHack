@@ -2051,6 +2051,7 @@ E void FDECL(delete_contents, (struct obj *));
 E void FDECL(obfree, (struct obj *,struct obj *));
 E void FDECL(home_shk, (struct monst *,BOOLEAN_P));
 E void FDECL(make_happy_shk, (struct monst *,BOOLEAN_P));
+E void FDECL(make_happy_shoppers, (BOOLEAN_P));
 E void FDECL(hot_pursuit, (struct monst *));
 E void FDECL(make_angry_shk, (struct monst *,XCHAR_P,XCHAR_P));
 E int NDECL(dopay);

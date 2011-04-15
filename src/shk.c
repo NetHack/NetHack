@@ -1019,13 +1019,23 @@ register boolean silentkops;
 			/* arrive near shop's door */
 			migrate_to_level(shkp, ledger_no(&eshkp->shoplevel),
 					 MIGR_APPROX_XY, &eshkp->shd);
+			/* dismiss kops on that level when shk arrives */
+			eshkp->dismiss_kops = TRUE;
 		}
 		if (vanished)
 		    pline("Satisfied, %s suddenly disappears!", shk_nam);
 	} else if(wasmad)
 		pline("%s calms down.", Monnam(shkp));
 
-	if(!angry_shk_exists()) {
+	make_happy_shoppers(silentkops);
+}
+
+/* called by make_happy_shk() and also by losedogs() for migrating shk */
+void
+make_happy_shoppers(silentkops)
+boolean silentkops;
+{
+	if (!angry_shk_exists()) {
 #ifdef KOPS
 		kops_gone(silentkops);
 #endif

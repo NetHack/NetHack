@@ -1,5 +1,4 @@
 /* NetHack 3.5	shknam.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)shknam.c	3.5	2007/09/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -458,11 +457,12 @@ void
 neweshk(mtmp)
 struct monst *mtmp;
 {
-	if (!mtmp->mextra) mtmp->mextra = newmextra();
-	if (!ESHK(mtmp)) {
+	if (!mtmp->mextra)
+	    mtmp->mextra = newmextra();
+	if (!ESHK(mtmp))
 	    ESHK(mtmp) = (struct eshk *)alloc(sizeof(struct eshk));
-	    (void) memset((genericptr_t) ESHK(mtmp), 0, sizeof(struct eshk));
-	}
+	(void) memset((genericptr_t)ESHK(mtmp), 0, sizeof (struct eshk));
+	ESHK(mtmp)->bill_p = (struct bill_x *)0;
 }
 
 void
@@ -483,6 +483,7 @@ struct mkroom	*sroom;
 {
 	register int sh, sx, sy;
 	struct monst *shk;
+	struct eshk *eshkp;
 
 	/* place the shopkeeper in the given room */
 	sh = sroom->fdoor;
@@ -535,24 +536,23 @@ struct mkroom	*sroom;
 	/* now initialize the shopkeeper monster structure */
 	if(!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, MM_ESHK)))
 		return(-1);
+	eshkp = ESHK(shk);	/* makemon(...,MM_ESHK) allocates this */
 	shk->isshk = shk->mpeaceful = 1;
 	set_malign(shk);
 	shk->msleeping = 0;
 	shk->mtrapseen = ~0;	/* we know all the traps already */
-	ESHK(shk)->shoproom = (schar)((sroom - rooms) + ROOMOFFSET);
+	eshkp->shoproom = (schar)((sroom - rooms) + ROOMOFFSET);
 	sroom->resident = shk;
-	ESHK(shk)->shoptype = sroom->rtype;
-	assign_level(&(ESHK(shk)->shoplevel), &u.uz);
-	ESHK(shk)->shd = doors[sh];
-	ESHK(shk)->shk.x = sx;
-	ESHK(shk)->shk.y = sy;
-	ESHK(shk)->robbed = 0L;
-	ESHK(shk)->credit = 0L;
-	ESHK(shk)->debit = 0L;
-	ESHK(shk)->loan = 0L;
-	ESHK(shk)->visitct = 0;
-	ESHK(shk)->following = 0;
-	ESHK(shk)->billct = 0;
+	eshkp->shoptype = sroom->rtype;
+	assign_level(&eshkp->shoplevel, &u.uz);
+	eshkp->shd = doors[sh];
+	eshkp->shk.x = sx;
+	eshkp->shk.y = sy;
+	eshkp->robbed = eshkp->credit = eshkp->debit = eshkp->loan = 0L;
+	eshkp->following = eshkp->surcharge = eshkp->dismiss_kops = FALSE;
+	eshkp->billct = eshkp->visitct = 0;
+	eshkp->bill_p = (struct bill_x *)0;
+	eshkp->customer[0] = '\0';
 #ifndef GOLDOBJ
 	shk->mgold = 1000L + 30L*(long)rnd(100);	/* initial capital */
 #else

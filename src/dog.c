@@ -1,5 +1,4 @@
 /* NetHack 3.5	dog.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)dog.c	3.5	2008/10/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -218,12 +217,57 @@ void
 losedogs()
 {
 	register struct monst *mtmp, *mtmp0 = 0, *mtmp2;
+	int dismissKops = 0;
 
+	/*
+	 * First, scan migrating_mons for shopkeepers who want to dismiss Kops,
+	 * and scan mydogs for shopkeepers who want to retain kops.
+	 * Second, dismiss kops if warranted, making more room for arrival.
+	 * Third, place monsters accompanying the hero.
+	 * Last, place migrating monsters coming to this level.
+	 *
+	 * Hero might eventually be displaced (due to the third step, but
+	 * occuring later), which is the main reason to do the second step
+	 * sooner (in turn necessitating the first step, rather than combining
+	 * the list scans with monster placement).
+	 */
+
+	/* check for returning shk(s) */
+	for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+	    if (mtmp->mux != u.uz.dnum || mtmp->muy != u.uz.dlevel) continue;
+	    if (mtmp->isshk) {
+		if (ESHK(mtmp)->dismiss_kops) {
+		    if (dismissKops == 0) dismissKops = 1;
+		    ESHK(mtmp)->dismiss_kops = FALSE;	/* reset */
+		} else if (!mtmp->mpeaceful) {
+		    /* an unpacified shk is returning; don't dismiss kops
+		       even if another pacified one is willing to do so */
+		    dismissKops = -1;
+		    /* [keep looping; later monsters might need ESHK reset] */
+		}
+	    }
+	}
+	/* make the same check for mydogs */
+	for (mtmp = mydogs; mtmp && dismissKops >= 0; mtmp = mtmp->nmon) {
+	    if (mtmp->isshk) {
+		/* hostile shk might accompany hero [ESHK(mtmp)->dismiss_kops
+		   can't be set here; it's only used for migrating_mons] */
+		if (!mtmp->mpeaceful) dismissKops = -1;
+	    }
+	}
+
+	/* when a hostile shopkeeper chases hero to another level
+	   and then gets paid off there, get rid of summoned kops
+	   here now that he has returned to his shop level */
+	if (dismissKops > 0) make_happy_shoppers(TRUE);
+
+	/* place pets and/or any other monsters who accompany hero */
 	while ((mtmp = mydogs) != 0) {
 		mydogs = mtmp->nmon;
 		mon_arrive(mtmp, TRUE);
 	}
 
+	/* time for migrating monsters to arrive */
 	for(mtmp = migrating_mons; mtmp; mtmp = mtmp2) {
 		mtmp2 = mtmp->nmon;
 		if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel) {
