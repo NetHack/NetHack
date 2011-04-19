@@ -1,5 +1,4 @@
 /* NetHack 3.5	vmsconf.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)vmsconf.h	3.5	2007/10/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -136,6 +135,16 @@
  */
 #define SHELL		/* do not delete the '!' command */
 #define SUSPEND		/* don't delete the ^Z command, such as it is */
+
+/*
+ * Some terminals or terminal emulators send two character sequence "ESC c"
+ * when Alt+c is pressed.  The altmeta run-time option allows the user to
+ * request that "ESC c" be treated as M-c, which means that if nethack sees
+ * ESC when it is waiting for a command, it will wait for another character
+ * (even if user intended that ESC to be standalone to cancel a count prefix).
+ */
+#define ALTMETA		/* support altmeta run-time option */
+
 
 #define RANDOM		/* use sys/share/random.c instead of vaxcrtl rand */
 

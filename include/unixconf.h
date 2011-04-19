@@ -1,5 +1,4 @@
 /* NetHack 3.5	unixconf.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)unixconf.h 3.5	2007/12/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -198,6 +197,12 @@
 #define MAILCKFREQ	50
 #endif	/* MAIL */
 
+/*
+ * Some terminals or terminal emulators send two character sequence "ESC c"
+ * when Alt+c is pressed.  The altmeta run-time option allows the user to
+ * request that "ESC c" be treated as M-c.
+ */
+#define ALTMETA		/* support altmeta run-time option */
 
 
 #ifdef COMPRESS

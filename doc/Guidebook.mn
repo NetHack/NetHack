@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.5
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 5, 2011
+.ds f2 "April 17, 2011
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -839,11 +839,16 @@ If your keyboard has a meta key (which, when pressed in combination
 with another key, modifies it by setting the `meta' [8th, or `high']
 bit), you can invoke many extended commands by meta-ing the first
 letter of the command.
-.\" In {\it NT, OS/2, PC\/ {\rm and} ST NetHack},
-.\" the `Alt' key can be used in this fashion;
-.\" on the Amiga set the {\it altmeta\/} option to get this behavior.
-In NT, OS/2, and PC NetHack, the `Alt' key
-can be used in this fashion.
+In \fINT\fP, \fIOS/2\fP, \fIPC\fP and \fIST\fP \fINetHack\fP,
+the `Alt' key can be used in this fashion;
+on the \fIAmiga\fP, set the
+.op altmeta
+option to get this behavior.
+On other systems, if typing `Alt' plus another key transmits a
+two character sequence consisting of an \fBEscape\fP
+followed by the other key, you may set the
+.op altmeta
+option to have nethack combine them into meta+key.
 .lp M-?
 #? (not supported by all platforms)
 .lp M-2
@@ -2398,7 +2403,21 @@ The name of the handler is specified without the .dll extension and without any
 path information.
 Cannot be set with the `O' command.
 .lp altmeta
-(default on, AMIGA NetHack only).
+On Amiga, this option controls whether typing `Alt' plus another key
+functions as a meta-shift for that key (default on).
+.lp altmeta
+On other (non-Amiga) systems where this option is available, it can be
+set to tell nethack to convert a two character sequence beginning with
+ESC into a meta-shifted version of the second character (default off).
+.lp ""
+This conversion is only done for commands, not for other input prompts.
+Note that typing one or more digits as a count prefix prior to a
+command--preceded by \fBn\fP if the
+.op number_pad
+option is set--is also subject to this conversion, so attempting to
+abort the count by typing ESC will leave nethack waiting for another
+character to complete the two character sequence.  Type a second ESC to
+finish cancelling such a count.  At other prompts a single ESC suffices.
 .lp "BIOS    "
 Use BIOS calls to update the screen
 display quickly and to read the keyboard (allowing the use of arrow

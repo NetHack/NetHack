@@ -53,9 +53,22 @@ static struct Bool_Opt
 } boolopt[] = {
 	{"acoustics", &flags.acoustics, TRUE, SET_IN_GAME},
 #if defined(SYSFLAGS) && defined(AMIGA)
+	/* Amiga altmeta causes Alt+key to be converted into Meta+key by
+	   low level nethack code; on by default, can be toggled off if
+	   Alt+key is needed for some ASCII chars on non-ASCII keyboard */
 	{"altmeta", &sysflags.altmeta, TRUE, DISP_IN_GAME},
 #else
+# ifdef ALTMETA
+	/* non-Amiga altmeta causes nethack's top level command loop to treat
+	   two character sequence "ESC c" as M-c, for terminals or emulators
+	   which send "ESC c" when Alt+c is pressed; off by default, enabling
+	   this can potentially make trouble if user types ESC when nethack
+	   is honoring this conversion request (primarily after starting a
+	   count prefix prior to a command and then deciding to cancel it) */
+	{"altmeta", &iflags.altmeta, FALSE, SET_IN_GAME},
+# else
 	{"altmeta", (boolean *)0, TRUE, DISP_IN_GAME},
+# endif
 #endif
 	{"ascii_map",     &iflags.wc_ascii_map, !PREFER_TILED, SET_IN_GAME},	/*WC*/
 #if defined(SYSFLAGS) && defined(MFLOPPY)

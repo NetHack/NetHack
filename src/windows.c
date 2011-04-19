@@ -1,5 +1,4 @@
 /* NetHack 3.5	windows.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)windows.c	3.5	2007/02/01	*/
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -336,6 +335,11 @@ void
 nhwindows_hangup()
 {
     char *FDECL((*previnterface_getmsghistory), (BOOLEAN_P)) = 0;
+
+#ifdef ALTMETA
+    /* command processor shouldn't look for 2nd char after seeing ESC */
+    iflags.altmeta = FALSE;
+#endif
 
     /* don't call exit_nhwindows() directly here; if a hangup occurs
        while interface code is executing, exit_nhwindows could knock

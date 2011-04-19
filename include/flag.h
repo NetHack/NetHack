@@ -180,6 +180,9 @@ struct instance_flags {
 	int	 menu_headings;	/* ATR for menu headings */
 	int *opt_booldup;	/* for duplication of boolean opts in config file */
 	int *opt_compdup;	/* for duplication of compound opts in config file */
+#ifdef ALTMETA
+	boolean  altmeta;	/* Alt-c sends ESC c rather than M-c */
+#endif
 	boolean  cbreak;	/* in cbreak mode, rogue format */
 	boolean  deferred_X;	/* deferred entry into explore mode */
 	boolean  num_pad;	/* use numbers for movement commands */

@@ -6,6 +6,10 @@
 #include "func_tab.h"
 /* #define DEBUG */	/* uncomment for debugging */
 
+#ifdef ALTMETA
+STATIC_VAR boolean alt_esc = FALSE;
+#endif
+
 struct cmd Cmd = { 0 };		/* flag.h */
 
 extern const char *hu_stat[];	/* hunger status from eat.c */
@@ -3364,6 +3368,9 @@ parse()
 	context.move = 1;
 	flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
+#ifdef ALTMETA
+	alt_esc = iflags.altmeta;		/* readchar() hack */
+#endif
 	if (!Cmd.num_pad || (foo = readchar()) == 'n')
 	    for (;;) {
 		foo = readchar();
@@ -3380,6 +3387,9 @@ parse()
 		    if (!multi && foo == '0') prezero = TRUE;
 		} else break;	/* not a digit */
 	    }
+#ifdef ALTMETA
+	alt_esc = FALSE;			/* readchar() reset */
+#endif
 
 	if (foo == '\033') {   /* esc cancels count (TH) */
 	    clear_nhwindow(WIN_MESSAGE);
@@ -3514,6 +3524,15 @@ readchar()
 	    hangup(0); /* call end_of_input() or set program_state.done_hup */
 #endif
 	    sym = '\033';
+#ifdef ALTMETA
+	} else if (sym == '\033' && alt_esc) {
+	    /* iflags.altmeta: treat two character ``ESC c'' as single `M-c' */
+	    sym = *readchar_queue ? *readchar_queue++ : Getchar();
+	    if (sym == EOF || sym == 0)
+		sym = '\033';
+	    else if (sym != '\033')
+		sym |= 0200;		/* force 8th bit on */
+#endif /*ALTMETA*/
 	} else if (sym == 0) {
 	    /* click event */
 	    readchar_queue = click_to_cmd(x, y, mod);
