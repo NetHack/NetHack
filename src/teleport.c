@@ -1231,13 +1231,19 @@ register struct obj *obj;
 	    ty = rn2(ROWNO);
 	    if (!--try_limit) break;
 	} while (!goodpos(tx, ty, (struct monst *)0, 0) ||
-		/* bug: this lacks provision for handling the Wizard's tower */
 		 (restricted_fall &&
 		  (!within_bounded_area(tx, ty, dndest.lx, dndest.ly,
 						dndest.hx, dndest.hy) ||
 		   (dndest.nlx &&
 		    within_bounded_area(tx, ty, dndest.nlx, dndest.nly,
-						dndest.nhx, dndest.nhy)))));
+						dndest.nhx, dndest.nhy)))) ||
+		 /* on the Wizard Tower levels, objects inside should
+		    stay inside and objects outside should stay outside */
+		 (dndest.nlx && On_W_tower_level(&u.uz) &&
+		  within_bounded_area(tx, ty, dndest.nlx, dndest.nly,
+					      dndest.nhx, dndest.nhy) !=
+		  within_bounded_area(otx, oty, dndest.nlx, dndest.nly,
+					        dndest.nhx, dndest.nhy)));
 
 	if (flooreffects(obj, tx, ty, "fall")) {
 	    return FALSE;
