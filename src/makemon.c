@@ -1430,7 +1430,7 @@ int	spc;
  *			order of strength.
  */
 	for(num = rnd(num); num > 0; first++)
-	    if (mk_gen_ok(last, G_GONE, mask)) {
+	    if (mk_gen_ok(first, G_GONE, mask)) {
 		/* skew towards lower value monsters at lower exp. levels */
 		num -= mons[first].geno & G_FREQ;
 		if (num && adj_lev(&mons[first]) > (u.ulevel*2)) {
@@ -1465,7 +1465,7 @@ int class;
 	if (!num) return NON_PM;
 
 	for (num = rnd(num); num > 0; first++)
-	    if (mk_gen_ok(last, G_GENOD, (G_NOGEN|G_UNIQ)))
+	    if (mk_gen_ok(first, G_GENOD, (G_NOGEN|G_UNIQ)))
 		num -= mons[first].geno & G_FREQ;
 	first--; /* correct an off-by-one error */
 
