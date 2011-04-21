@@ -4732,13 +4732,6 @@ lava_effects()
 	return(TRUE);
     }	/* !Fire_resistance */
 
-    if (!Wwalking) {
-	u.utrap = rn1(4, 4) + (rn1(4, 12) << 8);
-	u.utraptype = TT_LAVA;
-	You("sink into the lava, but it only burns slightly!");
-	if (u.uhp > 1)
-	    losehp(1, lava_killer, KILLED_BY);	/* lava damage */
-    }
     /* just want to burn boots, not all armor; destroy_item doesn't work on
        armor anyway */
 burn_stuff:
@@ -4747,8 +4740,23 @@ burn_stuff:
 	/* save uarmf value because Boots_off() sets uarmf to null */
 	obj = uarmf;
 	pline("%s into flame!", Yobjnam2(obj, "burst"));
+	iflags.in_lava_effects++;	/* (see above) */
 	(void) Boots_off();
 	useup(obj);
+	iflags.in_lava_effects--;
+    }
+    if (!Wwalking) {
+	boil_away = !Fire_resistance;
+	/* if not fire resistant, sink_into_lava() will quickly be fatal;
+	   hero needs to escape immediately */
+	u.utrap = rn1(4, 4) + ((boil_away ? 2 : rn1(4, 12)) << 8);
+	u.utraptype = TT_LAVA;
+	You("sink into the lava%s!",
+	    !boil_away ? ", but it only burns slightly" :
+			 " and are about to be immolated");
+	if (u.uhp > 1)
+	    losehp(!boil_away ? 1 : (u.uhp / 2),
+	           lava_killer, KILLED_BY);	/* lava damage */
     }
     destroy_item(SCROLL_CLASS, AD_FIRE);
     destroy_item(SPBOOK_CLASS, AD_FIRE);
@@ -4767,6 +4775,12 @@ sink_into_lava()
     } else if (!is_lava(u.ux, u.uy)) {
 	u.utrap = 0;	/* this shouldn't happen either */
     } else if (!u.uinvulnerable) {
+	/* ordinarily we'd have to be fire resistant to survive long
+	   enough to become stuck in lava, but it can happen without
+	   resistance if water walking boots allow survival and then
+	   get burned up; u.utrap time will be quite short in that case */
+	if (!Fire_resistance) u.uhp = (u.uhp + 2) / 3;
+
 	u.utrap -= (1 << 8);
 	if (u.utrap < (1 << 8)) {
 	    killer.format = KILLED_BY;
