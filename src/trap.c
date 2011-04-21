@@ -4652,15 +4652,28 @@ lava_effects()
     int dmg = d(6, 6);	/* only applicable for water walking */
     boolean usurvive, boil_away;
 
-    usurvive = Fire_resistance || (Wwalking && dmg < u.uhp);
-    /* a timely interrupt might manage to salvage your life
-       but not your gear; do this before messages */
-    if (!usurvive)
-	for (obj = invent; obj; obj = obj->nobj)
-	    if (is_organic(obj) && !obj->oerodeproof) obj->in_use = TRUE;
-
     burn_away_slime();
     if (likes_lava(youmonst.data)) return FALSE;
+
+    usurvive = Fire_resistance || (Wwalking && dmg < u.uhp);
+    /*
+     * A timely interrupt might manage to salvage your life
+     * but not your gear.  For scrolls and potions this
+     * will destroy whole stacks, where fire resistant hero
+     * survivor only loses partial stacks via destroy_item().
+     *
+     * Flag items to be destroyed before any messages so
+     * that player causing hangup at --More-- won't get an
+     * emergency save file created before item destruction.
+     */
+    if (!usurvive)
+	for (obj = invent; obj; obj = obj->nobj)
+	    if ((is_organic(obj) || obj->oclass == POTION_CLASS) &&
+		    !obj->oerodeproof &&
+		    objects[obj->otyp].oc_oprop != FIRE_RES &&
+		    obj->otyp != SCR_FIRE && obj->otyp != SPE_FIREBALL &&
+		    !obj_resists(obj, 0, 0))	/* for invocation items */
+		obj->in_use = TRUE;
 
     if (!Fire_resistance) {
 	if(Wwalking) {
@@ -4677,35 +4690,21 @@ lava_effects()
 	if (wizard) usurvive = TRUE;
 #endif
 
-	/* prevent Boots_off() -> spoteffects() -> lava_effects() recursion
-	   which would successfully delete (via useupall) the no-longer-worn
-	   boots; once recursive call returned, we would try to delete them
-	   again here in the outer call (access stale memory, probably panic) */
+	/* prevent remove_worn_item() -> Boots_off(WATER_WALKING_BOOTS) ->
+	   spoteffects() -> lava_effects() recursion which would
+	   successfully delete (via useupall) the no-longer-worn boots;
+	   once recursive call returned, we would try to delete them again
+	   here in the outer call (and access stale memory, probably panic) */
 	iflags.in_lava_effects++;
 
 	for(obj = invent; obj; obj = obj2) {
 	    obj2 = obj->nobj;
-	    if(is_organic(obj) && !obj->oerodeproof) {
-		if(obj->owornmask) {
+	    /* above, we set in_use for objects which are to be destroyed */
+	    if (obj->in_use) {
+		if (obj->owornmask) {
 		    if (usurvive)
 			pline("%s into flame!", Yobjnam2(obj, "burst"));
-
-		    if(obj == uarm) (void) Armor_gone();
-		    else if(obj == uarmc) (void) Cloak_off();
-		    else if(obj == uarmh) (void) Helmet_off();
-		    else if(obj == uarms) (void) Shield_off();
-		    else if(obj == uarmg) (void) Gloves_off();
-		    else if(obj == uarmf) (void) Boots_off();
-#ifdef TOURIST
-		    else if(obj == uarmu) (void) Shirt_off();
-#endif
-		    else if(obj == uleft) Ring_gone(obj);
-		    else if(obj == uright) Ring_gone(obj);
-		    else if(obj == ublindf) Blindf_off(obj);
-		    else if(obj == uamul) Amulet_off();
-		    else if(obj == uwep) uwepgone();
-		    else if (obj == uquiver) uqwepgone();
-		    else if (obj == uswapwep) uswapwepgone();
+		    remove_worn_item(obj, TRUE);
 		}
 		useupall(obj);
 	    }
@@ -4731,7 +4730,7 @@ lava_effects()
 	}
 	You("find yourself back on solid %s.", surface(u.ux, u.uy));
 	return(TRUE);
-    }
+    }	/* !Fire_resistance */
 
     if (!Wwalking) {
 	u.utrap = rn1(4, 4) + (rn1(4, 12) << 8);
@@ -4743,7 +4742,8 @@ lava_effects()
     /* just want to burn boots, not all armor; destroy_item doesn't work on
        armor anyway */
 burn_stuff:
-    if(uarmf && !uarmf->oerodeproof && is_organic(uarmf)) {
+    if (uarmf && !uarmf->oerodeproof && is_organic(uarmf) &&
+	    objects[uarmf->otyp].oc_oprop != FIRE_RES) {
 	/* save uarmf value because Boots_off() sets uarmf to null */
 	obj = uarmf;
 	pline("%s into flame!", Yobjnam2(obj, "burst"));

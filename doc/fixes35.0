@@ -357,6 +357,11 @@ effectiveness of magic cancellation by worn armor has been reduced
 Protection improves the effectiveness of magic cancellation
 if an angry shopkeeper chased the hero to a different level and then got paid
 	off, he'd dismiss kops on that other level but not on his shop level
+dying in lava and being life-saved or leaving bones would destroy ring of
+	fire resistance if it happened to be made of wood, and also burn up
+	scrolls of fire and spellbook of fireball
+surviving in lava boils away carried potions, but dying in lava and being
+	life-saved or leaving bones would keep them intact
 
 
 Platform- and/or Interface-Specific Fixes
