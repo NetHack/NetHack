@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.112 $ $Date: 2011/03/09 02:30:24 $
+% $Revision: 1.113 $ $Date: 2011/04/19 02:02:04 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2566,12 +2566,15 @@ Valid settings are:
 
 %.sd
 %.si
-{\tt ~0} --- move by letters; `{\tt yuhjklbn}'\\
-{\tt ~1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix\\
-{\tt ~2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'\\
-{\tt ~3} --- by numbers using phone key layout; {\tt 123} above, {\tt 789} below\\
-{\tt ~4} --- combines {\tt 3} with {\tt 2}; phone layout plus MSDOS compatibility\\
-{\tt -1} --- by letters but use `{\tt z}' to go northwest, `{\tt y}' to zap wands
+\newlength{\mwidth}
+\settowidth{\mwidth}{\tt -0}
+\newcommand{\numbox}[1]{\makebox[\mwidth][r]{{\tt #1}}}
+\numbox{0} --- move by letters; `{\tt yuhjklbn}'\\
+\numbox{1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix\\
+\numbox{2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'\\
+\numbox{3} --- by numbers using phone key layout; {\tt 123} above, {\tt 789} below\\
+\numbox{4} --- combines {\tt 3} with {\tt 2}; phone layout plus MSDOS compatibility\\
+\numbox{-1} --- by letters but use `{\tt z}' to go northwest, `{\tt y}' to zap wands
 %.ei
 %.ed
 
