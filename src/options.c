@@ -561,12 +561,17 @@ const char *ev;
 		return (char *)0;
 }
 
-/* Split initoptions into 2 parts for SYSCF but don't break anything not
- * using SYSCF. */
+/* process options, possibly including SYSCF */
 void
 initoptions()
 {
 	initoptions_init();
+#ifdef SYSCF
+	/* someday there may be other SYSCF alternatives besides text file */
+# ifdef SYSCF_FILE
+	read_config_file(SYSCF_FILE, SET_IN_SYS);
+# endif
+#endif
 	initoptions_finish();
 }
 
@@ -660,9 +665,7 @@ initoptions_init()
 	if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
 #ifdef LOADSYMSETS
 		if (!symset[PRIMARY].name) load_symset("IBMGraphics", PRIMARY);
-
 		if (!symset[ROGUESET].name) load_symset("RogueIBM", ROGUESET);
-
 		switch_symbols(TRUE);
 #endif
 # ifdef TEXTCOLOR

@@ -136,9 +136,7 @@ char *argv[];
 		chdirx(dir,0);
 #endif
 #ifdef SYSCF
-		initoptions_init();
-		read_config_file(SYSCF_FILE, SET_IN_SYS);
-		initoptions_finish();
+		initoptions();
 #endif
 #ifdef PANICTRACE
 		ARGV0 = argv[0];	/* save for possible stack trace */
@@ -165,11 +163,7 @@ char *argv[];
 #ifdef __linux__
 	check_linux_console();
 #endif
-	initoptions_init();
-#ifdef SYSCF
-	read_config_file(SYSCF_FILE, SET_IN_SYS);
-#endif
-	initoptions_finish();
+	initoptions();
 #ifdef PANICTRACE
 	ARGV0 = argv[0];	/* save for possible stack trace */
 # ifndef NO_SIGNAL

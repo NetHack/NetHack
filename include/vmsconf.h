@@ -43,12 +43,17 @@
 # define WIZARD 1
 # define WIZARD_NAME Local_WIZARD
 #endif
+#ifndef SYSCF
+# define SYSCF
+#endif
 
 /* filenames require punctuation to avoid redirection via logical names */
 #undef RECORD
 #define RECORD	"record;1"	/* scoreboard file (retains high scores) */
 #undef LOGFILE
 #define LOGFILE "logfile;0"	/* optional file (records all games) */
+#undef SYSCF_FILE
+#define SYSCF_FILE "sysconf;0"
 
 #define HLOCK	"perm;1"	/* an empty file used for locking purposes */
 

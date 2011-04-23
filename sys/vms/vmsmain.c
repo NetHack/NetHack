@@ -92,6 +92,9 @@ char *argv[];
 #ifdef CHDIR
 		chdirx(dir, FALSE);
 #endif
+#ifdef SYSCF
+		initoptions();
+#endif
 		prscore(argc, argv);
 		exit(EXIT_SUCCESS);
 	    }
