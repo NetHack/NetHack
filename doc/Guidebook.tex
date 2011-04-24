@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.113 $ $Date: 2011/04/19 02:02:04 $
+% $Revision: 1.114 $ $Date: 2011/04/23 20:27:05 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2602,9 +2602,10 @@ A space separated list of specific situations where alternate
 prompting is desired.  The default is ``{\it paranoid\_confirmation:pray}''.
 %.sd
 %.si
-%? Setting \itemindent to 0 seems to be what we want but didn't achieve
-%? anything, so hack \leftmargin to approximately suppress indentation.
-\blist{\leftmargin 15mm \topsep 1mm \itemsep 0mm}
+\newlength{\pcwidth}
+\settowidth{\pcwidth}{\tt Remove}
+\addtolength{\pcwidth}{\labelsep}
+\blist{\leftmargin \pcwidth \topsep 1mm \itemsep 0mm}
 \item[{\tt quit~~}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm quitting
 the game or switching into non-scoring explore mode;
