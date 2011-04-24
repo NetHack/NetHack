@@ -1,9 +1,9 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	SCCS Id: @(#)Makefile.src	3.5	2008/01/30
+#	NetHack 3.5	Makefile.src	$Date$	$Revision$
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
-#  If you changed CC or CFLAGS, make similar changes in [.util]Makefile.
+#  If you change CC or CFLAGS, make similar changes in [.util]Makefile.
 #
 #  Note:  modifying this Makefile will cause crtl.opt to be rebuilt,
 #	which will trigger an update of makedefs, which will in turn
@@ -315,7 +315,7 @@ $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \
 vmsmain.obj :	$(VMS)vmsmain.c $(HACK_H) $(INC)dlb.h
 vmstty.obj :	$(VMS)vmstty.c $(HACK_H) $(INC)wintty.h $(INC)tcap.h
 vmsunix.obj :	$(VMS)vmsunix.c $(HACK_H)
-vmsmisc.obj :	$(VMS)vmsmisc.c $(VMS)oldcrtl.c
+vmsmisc.obj :	$(VMS)vmsmisc.c $(VMS)oldcrtl.c $(CONFIG_H)
 vmsfiles.obj :	$(VMS)vmsfiles.c $(CONFIG_H)
 vmsmail.obj :	$(VMS)vmsmail.c $(CONFIG_H) $(INC)mail.h \
 		$(INC)wintype.h $(INC)winprocs.h

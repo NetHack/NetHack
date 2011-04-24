@@ -2486,6 +2486,9 @@ E boolean NDECL(authorize_wizard_mode);
 
 E void NDECL(vms_abort);
 E void FDECL(vms_exit, (int));
+#ifdef PANICTRACE
+E void FDECL(vms_traceback, (int));
+#endif
 
 /* ### vmstty.c ### */
 

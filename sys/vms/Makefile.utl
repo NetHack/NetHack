@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for utility programs.
-#	SCCS Id: @(#)Makefile.utl	3.5	2007/10/27
+#	NetHack 3.5	Makefile.utl	$Date$	$Revision$
 
 #  Copy this file to [.util]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -341,7 +341,7 @@ $(CONFIG_H) : $(INC)config.h
       @ $(CD) $(UTL)
 
 # VMS specific dependencies
-$(SRC)vmsmisc.obj :	$(VMS)vmsmisc.c
+$(SRC)vmsmisc.obj :	$(VMS)vmsmisc.c $(CONFIG_H)
 	$(CD) $(SRC)
 	$(MAKE)$(MAKEFLAGS) vmsmisc.obj
       @ $(CD) $(UTL)

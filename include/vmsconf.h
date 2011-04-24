@@ -74,6 +74,20 @@
 /* #define SECURE */
 
 /*
+ * If you use SECURE you'll need to link /noTraceback, in which case
+ * there's no point trying to get extra PANICTRACE info and this might
+ * as well be commented out.  When enabled, the sysconf file controls
+ * how to handle it (note that we're hijacking the Unix GDB setting):
+PANICTRACE_GDB=0  #behave as if PANICTRACE was disabled
+PANICTRACE_GDB=1  #at conclusion of panic, show a call traceback and exit
+PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
+ *                # remain in the debugger for more interactive debugging
+ *                # (not as useful as it might sound since we're normally
+ *                # linked /noDebug so there's no symbol table accessible)
+ */
+/* #define PANICTRACE */
+
+/*
  * Put the readonly data files into a single container rather than into
  * separate files in the playground directory.
  */

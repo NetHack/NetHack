@@ -160,7 +160,8 @@ boolean set;
 # endif	/* NO_SIGNAL */
 
 static void
-NH_abort(){
+NH_abort()
+{
 	int gdb_prio = SYSOPT_PANICTRACE_GDB;
 	int glibc_prio = SYSOPT_PANICTRACE_GLIBC;
 	static boolean aborting = FALSE;
@@ -168,6 +169,7 @@ NH_abort(){
 	if(aborting) return;
 	aborting = TRUE;
 
+# ifndef VMS
 	if(gdb_prio == glibc_prio && gdb_prio > 0) gdb_prio++;
 
 	if(gdb_prio > glibc_prio){
@@ -176,6 +178,15 @@ NH_abort(){
 		NH_panictrace_glibc() || (gdb_prio && NH_panictrace_gdb());
 	}
 
+# else /* VMS */
+	/* overload otherwise unused priority for debug mode: 1 = show
+	   traceback and exit; 2 = show traceback and stay in debugger */
+     /* if (wizard && gdb_prio == 1) gdb_prio = 2; */
+	vms_traceback(gdb_prio);
+	(void)glibc_prio;	/* half-hearted attempt at lint suppression */
+
+# endif /* ?VMS */
+
 # ifndef NO_SIGNAL
 	panictrace_setsignals(FALSE);
 # endif
@@ -183,7 +194,8 @@ NH_abort(){
 }
 
 static boolean
-NH_panictrace_glibc(){
+NH_panictrace_glibc()
+{
 # ifdef PANICTRACE_GLIBC
 	void *bt[20];
 	size_t count;
@@ -218,7 +230,8 @@ NH_panictrace_glibc(){
 # endif  /* PANICTRACE_GDB */
 
 static boolean
-NH_panictrace_gdb(){
+NH_panictrace_gdb()
+{
 # ifdef PANICTRACE_GDB
 	/* A (more) generic method to get a stack trace - invoke
 	 * gdb on ourself. */
