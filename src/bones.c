@@ -354,22 +354,24 @@ struct obj *corpse;
 			(void) obj_attach_mid(corpse, mtmp->m_id); 
 	} else {
 		/* give your possessions to the monster you become */
-		in_mklev = TRUE;
-		mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MM_FLAGS);
+		in_mklev = TRUE;	/* use <u.ux,u.uy> as-is */
+		mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MINVENT);
 		in_mklev = FALSE;
 		if (!mtmp) {
 			drop_upon_death((struct monst *)0, (struct obj *)0,
 					u.ux, u.uy);
+			u.ugrave_arise = NON_PM; /* in case caller cares */
 			return;
 		}
+		/* give mummy-from-hero a wrapping unless hero already
+		   carries one; don't bother forcing it to become worn */
+		if (mtmp->data->mlet == S_MUMMY && !carrying(MUMMY_WRAPPING))
+			(void)mongets(mtmp, MUMMY_WRAPPING);
 		mtmp = christen_monst(mtmp, plname);
 		newsym(u.ux, u.uy);
-		/* turning into slime isn't rising from the dead
-		   and has already given its own message */
-		if (u.ugrave_arise != PM_GREEN_SLIME)
-		    Your("body rises from the dead as %s...",
-			 an(mons[u.ugrave_arise].mname));
-		display_nhwindow(WIN_MESSAGE, FALSE);
+		/* ["Your body rises from the dead as an <mname>..." used
+		   to be given here, but it has been moved to done() so that
+		   it gets delivered even when savebones() isn't called] */
 		drop_upon_death(mtmp, (struct obj *)0, u.ux, u.uy);
 		m_dowear(mtmp, TRUE);
 	}

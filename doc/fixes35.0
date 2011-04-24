@@ -362,6 +362,8 @@ dying in lava and being life-saved or leaving bones would destroy ring of
 	scrolls of fire and spellbook of fireball
 surviving in lava boils away carried potions, but dying in lava and being
 	life-saved or leaving bones would keep them intact
+when applicable, give "your body rises from the dead as an <undead>..."
+	even when bones data isn't being saved
 
 
 Platform- and/or Interface-Specific Fixes

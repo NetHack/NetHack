@@ -462,6 +462,8 @@ int how;
 		u.ugrave_arise = PM_VAMPIRE;
 	else if (mptr == &mons[PM_GHOUL])
 		u.ugrave_arise = PM_GHOUL;
+	/* this could happen if a high-end vampire kills the hero
+	   when ordinary vampires are genocided; ditto for wraiths */
 	if (u.ugrave_arise >= LOW_PM &&
 				(mvitals[u.ugrave_arise].mvflags & G_GENOD))
 		u.ugrave_arise = NON_PM;
@@ -912,16 +914,16 @@ die:
 
 	if (bones_ok && launch_in_progress()) force_launch_placement();
 
-	if (bones_ok && u.ugrave_arise < LOW_PM) {
-	    /* corpse gets burnt up too */
-	    if (how == BURNING || how == DISSOLVED)
-		u.ugrave_arise = (NON_PM - 2);	/* leave no corpse */
-	    else if (how == STONING)
-		u.ugrave_arise = (NON_PM - 1);	/* statue instead of corpse */
-	    else if (how == TURNED_SLIME)
-		u.ugrave_arise = PM_GREEN_SLIME;
-	    else if (u.ugrave_arise == NON_PM &&
-		     !(mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
+	/* maintain ugrave_arise even for !bones_ok */
+	if (how == BURNING || how == DISSOLVED) /* corpse gets burnt up too */
+	    u.ugrave_arise = (NON_PM - 2);	/* leave no corpse */
+	else if (how == STONING)
+	    u.ugrave_arise = (NON_PM - 1);	/* statue instead of corpse */
+	else if (how == TURNED_SLIME)
+	    u.ugrave_arise = PM_GREEN_SLIME;
+
+	if (bones_ok && u.ugrave_arise == NON_PM &&
+		    !(mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
 		int mnum = u.umonnum;
 
 		if (!Upolyd) {
@@ -940,7 +942,6 @@ die:
 			killer.format == KILLED_BY_AN ? an(killer.name) :
 			killer.name);
 		make_grave(u.ux, u.uy, pbuf);
-	    }
 	}
 	/* if pets will contribute to score, populate mydogs list now
 	   (bones creation isn't a factor, but pline() messaging is) */
@@ -1004,6 +1005,15 @@ die:
 			u.urexp : (u.urexp / 2L);
 		nowrap_add(u.urexp, tmp);
 	    }
+	}
+
+	if (u.ugrave_arise >= LOW_PM && u.ugrave_arise != PM_GREEN_SLIME) {
+	    /* give this feedback even if bones aren't going to be created,
+	       so that its presence or absence doesn't tip off the player to
+	       new bones or their lack; it might be a lie if makemon fails */
+	    Your("body rises from the dead as %s...",
+		 an(mons[u.ugrave_arise].mname));
+	    display_nhwindow(WIN_MESSAGE, FALSE);
 	}
 
 	if (bones_ok) {
