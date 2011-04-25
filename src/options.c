@@ -1082,22 +1082,32 @@ STATIC_VAR const struct paranoia_opts {
 	int synMinLen;
 	const char *explain;	/* for interactive menu */
 } paranoia[] = {
-	/* there are two initial-letter conflicts: "a"ttack vs "a"ll, "attack"
-	   takes precedence and "all" isn't present in the interactive menu;
-	   and "d"ie vs "d"eath, synonyms for each other so doesn't matter */
-	{ PARANOID_QUIT,   "quit",   1, "explore", 1,
+	/* there are some initial-letter conflicts: "a"ttack vs "a"ll, "attack"
+	   takes precedence and "all" isn't present in the interactive menu,
+	   and "d"ie vs "d"eath, synonyms for each other so doesn't matter;
+	   (also "p"ray vs "P"aranoia, "pray" takes precedence since "Paranoia"
+	   is just a synonym for "Confirm") */
+	{ PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
+		"for \"yes\" confirmations, require \"no\" to reject" },
+	{ PARANOID_QUIT,    "quit", 1,    "explore", 1,
 		"yes vs y to quit or to enter explore mode" },
-	{ PARANOID_DIE,    "die",    1, "death",   2,
+	{ PARANOID_DIE,     "die", 1,     "death", 2,
 #ifdef WIZARD
 		"yes vs y to die (explore mode or debug mode)" },
 #else
 		"yes vs y to die (explore mode only)" },
 #endif
-	{ PARANOID_HIT,    "attack", 1, "hit",     1,
+	{ PARANOID_BONES,   "bones", 1,   0, 0,
+#ifdef WIZARD
+		"yes vs y to save bones data when dying in debug mode" },
+#else
+		"(only applicable for debug mode)" },
+#endif
+	{ PARANOID_HIT,     "attack", 1,  "hit", 1,
 		"yes vs y to attack a peaceful monster" },
-	{ PARANOID_PRAY,   "pray",   1, 0, 0,
+	{ PARANOID_PRAY,    "pray", 1,    0, 0,
 		"y to pray (supersedes old \"prayconfirm\" option)" },
-	{ PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
+	{ PARANOID_REMOVE,  "Remove", 1,  "Takeoff", 1,
 		"always pick from inventory for Remove and Takeoff" },
 	/* for config file parsing; interactive menu skips these */
 	{  0, "none", 4, 0, 0, 0 },	/* require full word match */
@@ -3031,6 +3041,7 @@ boolean setinitial,setfromfile;
 	start_menu(tmpwin);
 	any = zeroany;
 	for (i = 0; paranoia[i].flagmask != 0; ++i) {
+	    if (paranoia[i].flagmask == PARANOID_BONES && !wizard) continue;
 	    any.a_int = paranoia[i].flagmask;
 	    add_menu(tmpwin, NO_GLYPH, &any, *paranoia[i].argname, 0,
 		     ATR_NONE, paranoia[i].explain, 
@@ -3748,11 +3759,13 @@ char *buf;
 		char tmpbuf[QBUFSZ];
 
 		tmpbuf[0] = '\0';
-		if (ParanoidQuit)   Strcat(tmpbuf, " quit");
-		if (ParanoidDie)    Strcat(tmpbuf, " die");
-		if (ParanoidHit)    Strcat(tmpbuf, " attack");
-		if (ParanoidPray)   Strcat(tmpbuf, " pray");
-		if (ParanoidRemove) Strcat(tmpbuf, " Remove");
+		if (ParanoidConfirm) Strcat(tmpbuf, " Confirm");
+		if (ParanoidQuit)    Strcat(tmpbuf, " quit");
+		if (ParanoidDie)     Strcat(tmpbuf, " die");
+		if (ParanoidBones)   Strcat(tmpbuf, " bones");
+		if (ParanoidHit)     Strcat(tmpbuf, " attack");
+		if (ParanoidPray)    Strcat(tmpbuf, " pray");
+		if (ParanoidRemove)  Strcat(tmpbuf, " Remove");
 		Strcpy(buf, tmpbuf[0] ? &tmpbuf[1] : "none");
 	} else if (!strcmp(optname, "pettype"))
 		Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :

@@ -120,11 +120,13 @@ packorder     a list of default symbols for kinds of objects that gives the
               default order will be appended to the end.)
 paranoid_confirmation  space separated list of situations where alternate
               prompting is desired  [paranoid_confirmation:pray]
-              quit   -- yes vs y to confirm quitting or to enter explore mode
-              die    -- yes vs y to confirm dying (for explore or debug mode)
-              attack -- yes vs y to confirm attacking a peaceful monster
-              pray   -- y to confirm an attempt to pray; on by default
-              Remove -- always pick from inventory for 'R' and 'T' even when
+              Confirm -- when requiring yes, also require no to reject
+              quit    -- yes vs y to confirm quitting or to enter explore mode
+              die     -- yes vs y to confirm dying (for explore or debug mode)
+              bones   -- yes vs y to confirm saving bones data in debug mode
+              attack  -- yes vs y to confirm attacking a peaceful monster
+              pray    -- y to confirm an attempt to pray; on by default
+              Remove  -- always pick from inventory for 'R' and 'T' even when
               wearing just one applicable item to remove or take off
 pickup_burden when you pick up an item that exceeds this encumberance
               level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,

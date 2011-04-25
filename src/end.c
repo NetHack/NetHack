@@ -1031,7 +1031,7 @@ die:
 
 	if (bones_ok) {
 #ifdef WIZARD
-	    if (!wizard || yn("Save bones?") == 'y')
+	    if (!wizard || paranoid_query(ParanoidBones, "Save bones?"))
 #endif
 		savebones(corpse);
 	    /* corpse may be invalid pointer now so

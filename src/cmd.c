@@ -3651,15 +3651,27 @@ boolean be_paranoid;
 const char *prompt;
 {
 	char qbuf[QBUFSZ], ans[BUFSZ];
+	const char *responsetype, *promptprefix = "";
 	boolean confirmed_ok;
 
 	/* when paranoid, player must respond with "yes" rather than just 'y'
-	   to give the go-ahead for this query; default is "no", obviously */
+	   to give the go-ahead for this query; default is "no" unless the
+	   ParanoidConfirm flag is set in which case there's no default */
 	if (be_paranoid) {
-	    Sprintf(qbuf, "%s (yes) [no]", prompt);
-	    getlin(qbuf, ans);
-	    (void) mungspaces(ans);
-	    confirmed_ok = !strcmpi(ans, "yes");
+	    /* in addition to being paranoid about this particular
+	       query, we might be even more paranoid about all paranoia
+	       responses (ie, ParanoidConfirm is set) in which case we
+	       require "no" to reject in addition to "yes" to confirm
+	       (except we won't loop if respose is ESC; it means no) */
+	    responsetype = ParanoidConfirm ? "(yes|no)" : "(yes) [no]";
+	    do {
+		Sprintf(qbuf, "%s%s %s", promptprefix, prompt, responsetype);
+		getlin(qbuf, ans);
+		(void) mungspaces(ans);
+		confirmed_ok = !strcmpi(ans, "yes");
+		if (confirmed_ok || *ans == '\033') break;
+		promptprefix = "\"Yes\" or \"No\": ";
+	    } while (ParanoidConfirm && strcmpi(ans, "no"));
 	} else
 	    confirmed_ok = (yn(prompt) == 'y');
 

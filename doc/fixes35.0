@@ -494,11 +494,14 @@ mimic posing as door might steal hero's key when [un]locking is attempted
 polymorphing into a dragon while wearing dragon scale mail will cause that
 	mail to revert to dragon scales
 adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
-	paranoid_confirm:quit   yes vs y to quit or to enter explore mode
-	paranoid_confirm:die    yes vs y to die in explore or wizard mode
-	paranoid_confirm:attack yes vs y to attack a peaceful monster
-	paranoid_confirm:pray   y to confirm #pray; supersedes prayconfirm
-	paranoid_confirm:Remove always pick from inventory for 'R' and 'T'
+	paranoid_confirm:Confirm when requiring "yes" instead of y to confirm,
+				 also require explicit "no" to reject
+	paranoid_confirm:quit    yes vs y to quit or to enter explore mode
+	paranoid_confirm:die     yes vs y to die in explore or wizard mode
+	paranoid_confirm:bones   yes vs y to save bones when dying in wizard mode
+	paranoid_confirm:attack  yes vs y to attack a peaceful monster
+	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
+	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
 
 
 Platform- and/or Interface-Specific New Features

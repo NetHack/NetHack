@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.114 $ $Date: 2011/04/23 20:27:05 $
+% $Revision: 1.115 $ $Date: 2011/04/24 21:12:06 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2603,22 +2603,29 @@ prompting is desired.  The default is ``{\it paranoid\_confirmation:pray}''.
 %.sd
 %.si
 \newlength{\pcwidth}
-\settowidth{\pcwidth}{\tt Remove}
+\settowidth{\pcwidth}{\tt Confirm}
 \addtolength{\pcwidth}{\labelsep}
 \blist{\leftmargin \pcwidth \topsep 1mm \itemsep 0mm}
-\item[{\tt quit~~}]
+\item[{\tt Confirm}]
+for any prompts which are set to require ``yes''
+rather than `y', also require ``no'' to reject instead
+of accepting any non-yes response as no;
+\item[{\tt quit~~~}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm quitting
 the game or switching into non-scoring explore mode;
-\item[{\tt die~~~}]
+\item[{\tt die~~~~}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm dying (not
 useful in normal play; applies to explore mode);
-\item[{\tt attack}]
+\item[{\tt bones~~}]
+require ``{\tt yes}'' rather than `{\tt y}' to confirm saving
+bones data when dying in debug mode
+\item[{\tt attack~}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm attacking
 a peaceful monster;
-\item[{\tt pray~~}]
+\item[{\tt pray~~~}]
 require `{\tt y}' to confirm an attempt to pray rather
 than immediately praying; on by default;
-\item[{\tt Remove}] require selection from inventory for `{\tt R}' and `{\tt T}'
+\item[{\tt Remove~}] require selection from inventory for `{\tt R}' and `{\tt T}'
 commands even when wearing just one applicable item.
 \elist
 %.ei

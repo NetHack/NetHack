@@ -2121,16 +2121,21 @@ A space separated list of specific situations where alternate
 prompting is desired.  The default is paranoid_confirmation:pray.
 .sd
 .si
-quit   - require "yes" rather than 'y' to confirm quitting
-         the game or switching into non-scoring explore mode;
-die    - require "yes" rather than 'y' to confirm dying (not
-         useful in normal play; applies to explore mode);
-attack - require "yes" rather than 'y' to confirm attacking
-         a peaceful monster;
-pray   - require 'y' to confirm an attempt to pray rather
-         than immediately praying; on by default;
-Remove - require selection from inventory for 'R' and 'T'
-         commands even when wearing just one applicable item.
+Confirm - for any prompts which are set to require "yes"
+          rather than 'y', also require "no" to reject instead
+          of accepting any non-yes response as no
+quit    - require "yes" rather than 'y' to confirm quitting
+          the game or switching into non-scoring explore mode;
+die     - require "yes" rather than 'y' to confirm dying (not
+          useful in normal play; applies to explore mode);
+bones   - require "yes" rather than 'y' to confirm saving
+          bones data when dying in debug mode;
+attack  - require "yes" rather than 'y' to confirm attacking
+          a peaceful monster;
+pray    - require 'y' to confirm an attempt to pray rather
+          than immediately praying; on by default;
+Remove  - require selection from inventory for 'R' and 'T'
+          commands even when wearing just one applicable item.
 .ei
 .ed
 By default, the pray choice is enabled, the others disabled.

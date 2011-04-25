@@ -58,11 +58,13 @@ struct flag {
 #define NEW_MOON	0
 #define FULL_MOON	4
 	int	 paranoia_bits;	/* alternate confirmation prompting */
-#define PARANOID_QUIT	0x01
-#define PARANOID_DIE	0x02
-#define PARANOID_HIT	0x04
-#define PARANOID_PRAY	0x08
-#define PARANOID_REMOVE	0x10
+#define PARANOID_CONFIRM 0x01
+#define PARANOID_QUIT	 0x02
+#define PARANOID_DIE	 0x04
+#define PARANOID_BONES	 0x08
+#define PARANOID_HIT	 0x10
+#define PARANOID_PRAY	 0x20
+#define PARANOID_REMOVE	 0x40
 	int	 pickup_burden;		/* maximum burden before prompt */
 	int	 pile_limit; /* controls feedback when walking over objects */
 	char	 inv_order[MAXOCLASSES];
@@ -345,10 +347,14 @@ extern NEARDATA struct instance_flags iflags;
 #define RUN_CRAWL	3	/* walk w/ extra delay after each update */
 
 /* paranoid confirmation prompting */
+/* any yes confirmations also require explicit no (or ESC) to reject */
+#define ParanoidConfirm	((flags.paranoia_bits & PARANOID_CONFIRM) != 0)
 /* quit: yes vs y for "Really quit?" and "Enter explore mode?" */
 #define ParanoidQuit	((flags.paranoia_bits & PARANOID_QUIT) != 0)
 /* die: yes vs y for "Die?" (dying in explore mode or wizard mode) */
 #define ParanoidDie	((flags.paranoia_bits & PARANOID_DIE) != 0)
+/* hit: yes vs y for "Save bones?" in wizard mode */
+#define ParanoidBones	((flags.paranoia_bits & PARANOID_BONES) != 0)
 /* hit: yes vs y for "Really attack <the peaceful monster>?" */
 #define ParanoidHit	((flags.paranoia_bits & PARANOID_HIT) != 0)
 /* pray: ask "Really pray?" (accepts y answer, doesn't require yes),
