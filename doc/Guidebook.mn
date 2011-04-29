@@ -672,7 +672,7 @@ option to require a response of "yes" instead.
 Display basic information about your character.
 .lp ""
 Displays name, role, race, gender (unless role name makes that
-redundant, such as \fICaveman\fP or \fiPriestess\fP), and alignment,
+redundant, such as \fICaveman\fP or \fIPriestess\fP), and alignment,
 along with your patron deity and his or her opposition.  It also
 shows most of the various items of information from the status line(s)
 in a less terse form, including several additional things which don't
