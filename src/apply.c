@@ -1040,9 +1040,12 @@ register struct obj *obj;
 		pline("%s's %s burn%s", The(xname(obj)), s,
 			(Blind ? "." : " brightly!"));
 	}
-	if (!invocation_pos(u.ux, u.uy)) {
+	if (!invocation_pos(u.ux, u.uy) || On_stairs(u.ux, u.uy)) {
 		pline_The("%s %s being rapidly consumed!", s, vtense(s, "are"));
-		obj->age /= 2;
+		/* this used to be obj->age /= 2, rounding down; an age of
+		   1 would yield 0, confusing begin_burn() and producing an
+		   unlightable, unrefillable candelabrum; round up instead */
+		obj->age = (obj->age + 1L) / 2L;
 	} else {
 		if(obj->spe == 7) {
 		    if (Blind)
