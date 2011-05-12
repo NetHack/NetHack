@@ -6,6 +6,33 @@
 .ds f0 "\*(vr
 .ds f1
 .ds f2 "April 17, 2011
+.\" labeled paragraph start (should be part of tmac.n, but I don't want to
+.\" make changes to that file)
+.\" .PS word
+.\"	set the width for the label column
+.\" .PL word
+.\"	label for the entry
+.\" .PE
+.\"	clean up
+.de PS
+.nr PX \\w'\\$1'u
+.nr PY \\w'\\$1\ -\ 'u
+.sn \\n(pdu
+.in +\\n(PYu
+.si
+..
+.\" labeled paragraph label (and first line)
+.de PL
+.ti -\\n(PYu
+\\$1\\h'|\\n(PXu'\ -\ \\c
+..
+.\"labeled paragraph end
+.de PE
+.ei
+.in -\\n(PYu
+.sn \\n(pdu
+..
+.\" end of labeled paragrah
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -2089,16 +2116,20 @@ Send padding nulls to the terminal (default on).
 .lp number_pad
 Use digit keys instead of letters to move (default 0 or off).
 Valid settings are:
-.sd
-.si
-\ 0 - move by letters; `yuhjklbn'
-\ 1 - move by numbers; digit `5' acts as `G' movement prefix
-\ 2 - like 1 but `5' works as `g' prefix instead of as `G'
-\ 3 - by numbers using phone key layout; 123 above, 789 below
-\ 4 - combines 3 with 2; phone layout plus MSDOS compatibility
--1 - by letters but use `z' to go northwest, `y' to zap wands
-.ei
-.ed
+.PS -1
+.PL "\ 0"
+move by letters; `yuhjklbn'
+.PL "\ 1"
+move by numbers; digit `5' acts as `G' movement prefix
+.PL "\ 2"
+like 1 but `5' works as `g' prefix instead of as `G'
+.PL "\ 3"
+by numbers using phone key layout; 123 above, 789 below
+.PL "\ 4"
+combines 3 with 2; phone layout plus MSDOS compatibility
+.PL "-1"
+by letters but use `z' to go northwest, `y' to zap wands
+.PE
 For backward compatibility, omitting a value is the same as specifying 1
 and negating
 .op number_pad
@@ -2119,25 +2150,28 @@ at the end from the previous order.
 .lp paranoid_confirmation
 A space separated list of specific situations where alternate
 prompting is desired.  The default is paranoid_confirmation:pray.
-.sd
-.si
-Confirm - for any prompts which are set to require "yes"
-          rather than 'y', also require "no" to reject instead
-          of accepting any non-yes response as no
-quit    - require "yes" rather than 'y' to confirm quitting
-          the game or switching into non-scoring explore mode;
-die     - require "yes" rather than 'y' to confirm dying (not
-          useful in normal play; applies to explore mode);
-bones   - require "yes" rather than 'y' to confirm saving
-          bones data when dying in debug mode;
-attack  - require "yes" rather than 'y' to confirm attacking
-          a peaceful monster;
-pray    - require 'y' to confirm an attempt to pray rather
-          than immediately praying; on by default;
-Remove  - require selection from inventory for 'R' and 'T'
-          commands even when wearing just one applicable item.
-.ei
-.ed
+.PS Confirm
+.PL Confirm
+for any prompts which are set to require "yes" rather than 'y', also
+require "no" to reject instead of accepting any non-yes response as no
+.PL quit
+require "yes" rather than 'y' to confirm quitting
+the game or switching into non-scoring explore mode;
+.PL die
+require "yes" rather than 'y' to confirm dying (not
+useful in normal play; applies to explore mode);
+.PL bones
+require "yes" rather than 'y' to confirm saving
+bones data when dying in debug mode;
+.PL attack
+require "yes" rather than 'y' to confirm attacking a peaceful monster;
+.PL pray
+require 'y' to confirm an attempt to pray rather
+than immediately praying; on by default;
+.PL Remove
+require selection from inventory for 'R' and 'T'
+commands even when wearing just one applicable item.
+.PE
 By default, the pray choice is enabled, the others disabled.
 To disable it without setting
 any of the other choices, use ``paranoid_confirmation:none''.  To keep
