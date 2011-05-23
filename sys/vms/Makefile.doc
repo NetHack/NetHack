@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for the [Unix] documentation.
-#	SCCS Id: @(#)Makefile.doc	3.5	2007/05/25
+#	NetHack 3.5	Makefile.doc	$Date$	$Revision$
 
 #  Copy this file to [.doc]Makefile. and edit it if needed.
 
@@ -17,7 +17,7 @@ Guidebook :	$(GUIDEBOOK)
 
 # the basic guidebook
 #Guidebook. :	Guidebook.mn
-#	#tbl tmac.n Guidebook.mn | nroff | col > Guidebook
+#	#tbl tmac.n Guidebook.mn | nroff | col -bx > Guidebook
 #	write sys$output "Guidebook.mn cannot be processed under VMS."
 Guidebook. :	Guidebook.txt		# distributed version of plain text
 	copy Guidebook.txt Guidebook.

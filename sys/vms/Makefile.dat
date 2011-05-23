@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - data files: special levels and other data.
-#	SCCS Id: @(#)Makefile.dat	3.5	2002/03/02
+#	NetHack 3.5	Makefile.dat	$Date$	$Revision$
 
 #  Copy this file to [.dat]Makefile.; no editing needed.
 

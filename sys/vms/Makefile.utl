@@ -39,7 +39,7 @@ MARKER	= $(UTL)util.timestamp;
 CFLAGS	= /Prefix=All/Incl=$(INC)/noList	# DECC in native mode
 #CFLAGS	= /Include=$(INC)/noList	# VAXC or GNUC
 LFLAGS	= /noMap
-LIBS	= $(SRC)crtl.opt/Options		# run-time library(s) needed
+LIBS	= $(SRC)crtl.opt/Options,$(SRC)ident.opt/Options  # run-time library
 LINK	= link
 
 # If you don't have yacc, byacc, or bison or just don't want to run any of
@@ -76,8 +76,9 @@ LEXOUT	= lexyy		# flex
 
 # Nothing below this line should have to be changed.
 
-# linker options file
+# linker options files
 LIBOPT	= $(SRC)crtl.opt;
+ID_OPT	= $(SRC)ident.opt;
 
 # timestamps for primary header files, matching src/Makefile
 CONFIG_H = $(SRC)config.h-t
@@ -149,9 +150,14 @@ $(LIBOPT) : $(SRC)Makefile.;		# linker options file
 	$(MAKE)$(MAKEFLAGS) $(LIBOPT)
       @ $(CD) $(UTL)
 
+$(ID_OPT) : $(SRC)Makefile.;		# linker options file
+	$(CD) $(SRC)
+	$(MAKE)$(MAKEFLAGS) $(ID_OPT)
+      @ $(CD) $(UTL)
+
 #	dependencies for makedefs
 #
-$(MAKEDEFS) :	$(MAKEOBJS) $(VMSOBJS) $(LIBOPT)
+$(MAKEDEFS) :	$(MAKEOBJS) $(VMSOBJS) $(LIBOPT) $(ID_OPT)
 	$(LINK) $(LFLAGS) $(MAKEOBJS),$(VMSOBJS),$(LIBS)
       @ $(TOUCH) $(MARKER)
 
@@ -181,7 +187,7 @@ $(INC)date.h :	$(MAKEDEFS)
 
 #	dependencies for lev_comp
 #
-$(LEVCOMP) : $(SPLEVOBJS) $(VMSOBJS)	# $(LIBOPT)
+$(LEVCOMP) : $(SPLEVOBJS) $(VMSOBJS) $(LIBOPT) $(ID_OPT)
 	$(LINK)/Exe=$(LEVCOMP) $(LFLAGS) $(SPLEVOBJS),$(VMSOBJS),$(LIBS)
 
 lev_yacc.obj : $(HACK_H) $(INC)sp_lev.h lev_yacc.c
@@ -214,7 +220,7 @@ lev_lex.c : lev_comp.l
 
 #	dependencies for dgn_comp
 #
-$(DGNCOMP) : $(DGNCOMPOBJS) $(VMSOBJS)	# $(LIBOPT)
+$(DGNCOMP) : $(DGNCOMPOBJS) $(VMSOBJS) $(LIBOPT) $(ID_OPT)
 	$(LINK)/Exe=$(DGNCOMP) $(LFLAGS) $(DGNCOMPOBJS),$(VMSOBJS),$(LIBS)
 
 dgn_yacc.obj : $(CONFIG_H) $(INC)dgn_file.h $(INC)date.h dgn_yacc.c
@@ -245,14 +251,14 @@ dgn_lex.c : dgn_comp.l
 
 #	dependencies for recover
 #
-$(RECOVER) : $(RECOVOBJS) $(VMSOBJS)		# $(LIBOPT)
+$(RECOVER) : $(RECOVOBJS) $(VMSOBJS) $(LIBOPT) $(ID_OPT)
 	$(LINK) $(LFLAGS) $(RECOVOBJS),$(VMSOBJS),$(LIBS)
 
 recover.obj : $(CONFIG_H) recover.c
 
 #	dependencies for dlb
 #
-$(DLB) : $(DLBOBJS) $(VMSOBJS)		# $(LIBOPT)
+$(DLB) : $(DLBOBJS) $(VMSOBJS) $(LIBOPT) $(ID_OPT)
 	$(LINK)/Exe=$(DLB) $(LFLAGS) $(DLBOBJS),$(VMSOBJS),$(LIBS)
 
 dlb_main.obj : $(CONFIG_H) $(INC)dlb.h dlb_main.c
@@ -271,13 +277,13 @@ PPMWRITERS = ppmwrite.obj,panic.obj,$(SRC)alloc.obj
 tileutils : $(TILEUTILS)
 	@ $(NOOP)
 
-$(GIF2TXT) : $(GIFREADERS) $(TEXTIO)
+$(GIF2TXT) : $(GIFREADERS) $(TEXTIO) $(LIBOPT) $(ID_OPT)
 	$(LINK)/Exe=$(GIF2TXT) $(LFLAGS) $(GIFREADERS),$(TEXTIO),$(LIBS)
-$(TXT2PPM) : $(PPMWRITERS) $(TEXTIO)
+$(TXT2PPM) : $(PPMWRITERS) $(TEXTIO) $(LIBOPT) $(ID_OPT)
 	$(LINK)/Exe=$(TXT2PPM) $(LFLAGS) $(PPMWRITERS),$(TEXTIO),$(LIBS)
-$(TILE2X11) : tile2x11.obj $(TEXTIO)
+$(TILE2X11) : tile2x11.obj $(TEXTIO) $(LIBOPT) $(ID_OPT)
 	$(LINK) $(LFLAGS) tile2x11.obj,$(TEXTIO),$(LIBS)
-$(TILEMAP) : tilemap.obj $(SRC)vmsmisc.obj
+$(TILEMAP) : tilemap.obj $(SRC)vmsmisc.obj $(LIBOPT) $(ID_OPT)
 	$(LINK) $(LFLAGS) tilemap.obj,$(SRC)vmsmisc.obj,$(LIBS)
 
 $(SRC)tile.c : $(TILEMAP)

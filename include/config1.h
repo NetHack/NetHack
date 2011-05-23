@@ -1,5 +1,4 @@
 /* NetHack 3.5	config1.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)config1.h	3.5	1999/12/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -157,15 +156,18 @@
 #   define _DECC_V4_SOURCE	/* avoid some incompatible V5.x changes */
 #  endif
 #  undef __HIDE_FORBIDDEN_NAMES /* need non-ANSI library support functions */
+#  ifdef VAXC	    /* DEC C in VAX C compatability mode; 'signed' works   */
+#   define signed   /* but causes diagnostic about VAX C not supporting it */
+#  endif
 # else
 #  ifdef VAXC	/* must use CC/DEFINE=ANCIENT_VAXC for vaxc v2.2 or older */
+#   define signed
 #   ifdef ANCIENT_VAXC	/* vaxc v2.2 and earlier [lots of warnings to come] */
 #    define KR1ED	/* simulate defined() */
 #    define USE_VARARGS
 #   else		/* vaxc v2.3,2.4,or 3.x, or decc in vaxc mode */
 #     if defined(USE_PROTOTYPES) /* this breaks 2.2 (*forces* use of ANCIENT)*/
 #      define __STDC__ 0 /* vaxc is not yet ANSI compliant, but close enough */
-#      define signed	/* well, almost close enough */
 #include <stddef.h>
 #      define UNWIDENED_PROTOTYPES
 #     endif

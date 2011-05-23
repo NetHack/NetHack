@@ -40,17 +40,24 @@ CFLAGS	= /Prefix=All/Incl=$(INC)/noList	# DECC in native mode
 LFLAGS	= /noMap
 LINK	= link
 
-LIBS	=					# blank for DECC
-#LIBS	= sys$share:vaxcrtl.exe/Shareable	# VAX C or GNU C
+# DEC C (decc$shr linked by default)
+LIBS	=
 MORELIBS =
-# GCC needs an extra library
+# VAX C or GNU C, using shareable image run-time library
+# (leave MORELIBS blank for VAX C)
+#LIBS	= sys$share:vaxcrtl.exe/Shareable
 #MORELIBS = gnu_cc:[000000]gcclib.olb/Library
+# VAX C or GNU C, using object library run-time library
+# (leave LIBS blank for VAX C)
+#LIBS	= gnu_cc:[000000]gcclib.olb/Library
+#MORELIBS = sys$library:vaxcrtl.olb/Library
 
 # Specific VMS object files
 SYSSRC = $(VMS)vmsmain.c,$(VMS)vmstty.c,$(VMS)vmsunix.c,\
 	$(VMS)vmsmisc.c,$(VMS)vmsfiles.c,$(VMS)vmsmail.c
 SYSOBJ = vmsmain.obj,vmstty.obj,vmsunix.obj,vmsmail.obj #,vmsmisc.obj,vmsfiles.obj
 LIBOPT = $(SRC)crtl.opt;
+ID_OPT = $(SRC)ident.opt;
 
 # termcap library
 TERMCAPSRC = tclib.c
@@ -171,9 +178,9 @@ nethack : $(GAME)
 $(GAME) :	$(SYSTEM)
       @ $(NOOP)
 
-$(SYSTEM) :	$(LIBOPT) $(HOBJ) nethack.opt
+$(SYSTEM) :	$(LIBOPT) $(ID_OPT) $(HOBJ) nethack.opt
       @ $(ECHO) "Linking ..."
-	$(LINK)/Exe=$(GAME) $(LFLAGS) nethack.opt/Opt,$(LIBOPT)/Opt
+	$(LINK)/Exe=$(GAME) $(LFLAGS) nethack.opt/Opt,$(LIBOPT)/Opt,$(ID_OPT)/Opt
 	$(TOUCH) $(SYSTEM)
 
 all :	$(GAME)
@@ -194,7 +201,6 @@ nethack.opt :	$(MAKEFILE)	# this file
       @ write f f$edit("$(HOBJ5)","COLLAPSE")
       @ write f f$edit("$(HOBJ6)","COLLAPSE")
       @ write f "iosegment=128"
-	write f "identification=$(VERSION)"
 	close f
 
 # linker options file for run-time libraries, also used by $(UTL)Makefile
@@ -206,6 +212,16 @@ $(LIBOPT) :	$(MAKEFILE)	# this file
 	close f
 # simplified target name, for interactive convenience
 crtl.opt :	$(LIBOPT)
+      @ $(NOOP)
+
+# linker options file for version number, also used by $(UTL)Makefile
+$(ID_OPT) :	$(MAKEFILE)	# this file
+	open/Write f $(ID_OPT)
+	write f "! ident.opt"
+	write f "identification=""$(VERSION)"""
+	close f
+# simplified target name, for interactive convenience
+ident.opt :	$(ID_OPT)
       @ $(NOOP)
 
 #	dependencies for makedefs and its outputs, which the util
@@ -226,7 +242,8 @@ $(MAKEDEFS) :	$(FIRSTOBJ) $(UTL)makedefs.c \
 		$(CONFIG_H) $(INC)permonst.h $(INC)objclass.h \
 		$(INC)monsym.h $(INC)artilist.h $(INC)dungeon.h \
 		$(INC)obj.h $(INC)monst.h $(INC)you.h $(INC)flag.h \
-		$(INC)dlb.h $(INC)patchlevel.h $(INC)qtext.h  $(LIBOPT)
+		$(INC)dlb.h $(INC)patchlevel.h $(INC)qtext.h \
+		$(LIBOPT) $(ID_OPT)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(MAKEDEFS)
       @ $(CD) $(SRC)
@@ -270,22 +287,23 @@ $(INC)date.h :	$(VERSOURCES) $(HACK_H)
 
 #	special targets
 clean :
-      - if f$search("*.*;-1")	  .nes."" then	purge
-      - if f$search("$(INC)*.*;-1").nes."" then	purge $(INC) /Exclude=*conf*.h
-      - if f$search("*.obj")	  .nes."" then	delete *.obj;
-      - if f$search("*.h-t").nes."" then	delete *.h-t;	!$(HACK_H),$(CONFIG_H)
-      - if f$search("*.opt").nes."" then	delete *.opt;	!nethack.opt,$(LIBOPT)
+      - if f$search("*.*;-2").nes."" then  purge/Keep=2
+      - if f$search("$(INC)*.*;-2").nes."" then  purge/Keep=2 $(INC) /Exclude=*conf*.h
+      - if f$search("*.obj").nes."" then  delete *.obj;*
+      - if f$search("*.h-t").nes."" then  delete *.h-t;* !$(HACK_H),$(CONFIG_H)
 
 spotless :	clean
-      - if f$search("$(LIBOPT)").nes."" then  delete $(LIBOPT)
+      - if f$search("*.*;-1).nes."" then  purge
+      - if f$search("$(INC)*.*;-1").nes."" then  purge $(INC)
       - if f$search("$(SYSTEM)").nes."" then  delete $(SYSTEM)
-      - if f$search("$(GAME)")	.nes."" then  delete $(GAME)
+      - if f$search("$(GAME)").nes."" then  delete $(GAME)
       - delete monstr.c;,vis_tab.c;,$(INC)vis_tab.h;,\
  $(INC)pm.h;,$(INC)onames.h;,$(INC)date.h;
-      - if f$search("tile.c")	.nes."" then  delete tile.c;
-      - if f$search("tclib.c")	.nes."" then  delete tclib.c;
-      - if f$search("random.c")	.nes."" then  delete random.c;
+      - if f$search("tile.c").nes."" then  delete tile.c;
+      - if f$search("tclib.c").nes."" then  delete tclib.c;
+      - if f$search("random.c").nes."" then  delete random.c;
       - if f$search("nethack.olb").nes."" then  delete nethack.olb;
+      - if f$search("*.opt").nes."" then  delete *.opt; !nethack.opt,$(LIBOPT),$(ID_OPT)
 
 #	dependencies (mostly cloned from sys/unix/Makefile.src)
 # config.h timestamp
