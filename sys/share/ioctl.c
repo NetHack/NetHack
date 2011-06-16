@@ -1,5 +1,4 @@
 /* NetHack 3.5	ioctl.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)ioctl.c	3.5	1990/22/02 */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,7 +40,7 @@ struct ltchars ltchars0 = { -1, -1, -1, -1, -1, -1 }; /* turn all off */
 # ifdef POSIX_TYPES
 #include <termios.h>
 struct termios termio;
-#  if defined(BSD) || defined(_AIX32)
+#  if defined(BSD) || defined(_AIX32) || defined(__linux__)
 #   if defined(_AIX32) && !defined(_ALL_SOURCE)
 #    define _ALL_SOURCE
 #   endif
