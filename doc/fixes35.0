@@ -364,6 +364,8 @@ surviving in lava boils away carried potions, but dying in lava and being
 	life-saved or leaving bones would keep them intact
 when applicable, give "your body rises from the dead as an <undead>..."
 	even when bones data isn't being saved
+have shk claim ownership of worn saddle dropped by dying pet if hero is
+	not within the same shop at the time of the drop
 
 
 Platform- and/or Interface-Specific Fixes
