@@ -1,5 +1,4 @@
 /* NetHack 3.5	do.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)do.c	3.5	2008/01/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1678,7 +1677,7 @@ register int timex;
 void
 heal_legs()
 {
-	if(Wounded_legs) {
+	if (Wounded_legs) {
 		if (ATEMP(A_DEX) < 0) {
 			ATEMP(A_DEX)++;
 			context.botl = 1;
@@ -1688,18 +1687,29 @@ heal_legs()
 		if (!u.usteed)
 #endif
 		{
-			/* KMH, intrinsics patch */
-			if((EWounded_legs & BOTH_SIDES) == BOTH_SIDES) {
-			Your("%s feel somewhat better.",
-				makeplural(body_part(LEG)));
-		} else {
-			Your("%s feels somewhat better.",
-				body_part(LEG));
+		    const char *legs = body_part(LEG);
+
+		    if ((EWounded_legs & BOTH_SIDES) == BOTH_SIDES)
+			legs = makeplural(legs);
+		    /* this used to say "somewhat better" but that was
+		       misleading since legs are being fully healed */
+		    Your("%s %s better.", legs, vtense(legs, "feel"));
 		}
-		}
+
 		HWounded_legs = EWounded_legs = 0;
+
+		/* Wounded_legs reduces carrying capacity, so we want
+		   an encumbrance check when they're healed.  However,
+		   while dismounting, first steed's legs get healed,
+		   then hero is dropped to floor and a new encumbrance
+		   check is made [in dismount_steed()].  So don't give
+		   encumbrance feedback during the dismount stage
+		   because it could seem to be shown out of order and
+		   it might be immediately contradicted [able to carry
+		   more when steed becomes healthy, then possible floor
+		   feedback, then able to carry less when back on foot]. */
+		if (!in_steed_dismounting) (void)encumber_msg();
 	}
-	(void)encumber_msg();
 }
 
 /*do.c*/

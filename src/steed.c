@@ -1,5 +1,4 @@
 /* NetHack 3.5	steed.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)steed.c	3.5	2006/12/13	*/
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -221,7 +220,10 @@ mount_steed(mtmp, force)
 	 * healed upon dismount (Wounded_legs context switch).
 	 * By preventing a hero with Wounded_legs from
 	 * mounting a steed, the potential for abuse is
-	 * minimized, if not eliminated altogether.
+	 * reduced.  However, dismounting still immediately
+	 * heals the steed's wounded legs.  [In 3.4.3 and
+	 * earlier, that unintentionally made the hero's
+	 * temporary 1 point Dex loss become permanent.]
 	 */
 	if (Wounded_legs) {
 	    Your("%s are in no shape for riding.", makeplural(body_part(LEG)));
@@ -472,7 +474,7 @@ dismount_steed(reason)
 	struct obj *otmp;
 	coord cc;
 	const char *verb = "fall";
-	boolean repair_leg_damage = TRUE;
+	boolean repair_leg_damage = (Wounded_legs != 0L);
 	unsigned save_utrap = u.utrap;
 	boolean have_spot = landing_spot(&cc,reason,0);
 	
@@ -526,11 +528,14 @@ dismount_steed(reason)
 		} else
 			You("dismount %s.", mon_nam(mtmp));
 	}
-	/* While riding these refer to the steed's legs
-	 * so after dismounting they refer to the player's
-	 * legs once again.
-	 */
-	if (repair_leg_damage) HWounded_legs = EWounded_legs = 0;
+	/* While riding, Wounded_legs refers to the steed's legs;
+	   after dismounting, it reverts to the hero's legs. */
+	if (repair_leg_damage) {
+		/* [TODO: make heal_legs() take a parameter to handle this] */
+		in_steed_dismounting = TRUE;
+		heal_legs();
+		in_steed_dismounting = FALSE;
+	}
 
 	/* Release the steed and saddle */
 	u.usteed = 0;
@@ -546,7 +551,7 @@ dismount_steed(reason)
 		(void) rloc(mtmp, FALSE);
 	    return;
 	}
-	if (!DEADMONSTER(mtmp)) {
+	if (mtmp->mhp > 0) {
 	    place_monster(mtmp, u.ux, u.uy);
 	    if (!u.uswallow && !u.ustuck && have_spot) {
 		struct permonst *mdat = mtmp->data;
@@ -587,7 +592,7 @@ dismount_steed(reason)
 	     * falling into the hole).
 	     */
 		/* [ALI] No need to move the player if the steed died. */
-		if (!DEADMONSTER(mtmp)) {
+		if (mtmp->mhp > 0) {
 		    /* Keep steed here, move the player to cc;
 		     * teleds() clears u.utrap
 		     */
