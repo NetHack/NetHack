@@ -348,29 +348,46 @@ mattacku(mtmp)
 		if (!canspotmon(mtmp)) map_invisible(mtmp->mx, mtmp->my);
 		u.uundetected = 0;
 		if (is_hider(youmonst.data) && u.umonnum != PM_TRAPPER) {
+		    /* ceiling hider */
 		    coord cc; /* maybe we need a unexto() function? */
 		    struct obj *obj;
 
 		    You("fall from the %s!", ceiling(u.ux,u.uy));
-		    if (enexto(&cc, u.ux, u.uy, youmonst.data)) {
-			remove_monster(mtmp->mx, mtmp->my);
-			newsym(mtmp->mx,mtmp->my);
-			place_monster(mtmp, u.ux, u.uy);
-			if(mtmp->wormno) worm_move(mtmp);
-			teleds(cc.x, cc.y, TRUE);
-			set_apparxy(mtmp);
-			newsym(u.ux,u.uy);
-		    } else {
-			const char *verb =
-			    nonliving(mtmp->data) ? "destroyed" : "killed";
-			
-			pline("%s is %s by a falling %s (you)!",
-			      Monnam(mtmp), verb, youmonst.data->mname);
-			xkilled(mtmp, 0);
-			newsym(u.ux,u.uy);
-			if (mtmp->mhp > 0) return 0;
-			else return 1;
+		    /* take monster off map now so that its location
+		       is eligible for placing hero; we assume that a
+		       removed monster remembers its old spot <mx,my> */
+		    remove_monster(mtmp->mx, mtmp->my);
+		    if (!enexto(&cc, u.ux, u.uy, youmonst.data) ||
+			    /* a fish won't voluntarily swap positions
+			       when it's in water and hero is over land */
+			    (mtmp->data->mlet == S_EEL &&
+				is_pool(mtmp->mx, mtmp->my) &&
+				!is_pool(u.ux, u.uy))) {
+			/* couldn't find any spot for hero; this used to
+			   kill off attacker, but now we just give a "miss"
+			   message and keep both mtmp and hero at their
+			   original positions; hero has become unconcealed
+			   so mtmp's next move will be a regular attack */
+			place_monster(mtmp, mtmp->mx, mtmp->my); /* put back */
+			newsym(u.ux, u.uy); /* u.uundetected was toggled */
+			pline("%s draws back as you drop!", Monnam(mtmp));
+			return 0;
 		    }
+
+		    /* put mtmp at hero's spot and move hero to <cc.x,.y> */
+		    newsym(mtmp->mx, mtmp->my); /* finish removal */
+		    place_monster(mtmp, u.ux, u.uy);
+		    if (mtmp->wormno) {
+			worm_move(mtmp);
+			/* tail hasn't grown, so if it now occupies <cc.x,.y>
+			   then one of its original spots must be free */
+			if (m_at(cc.x, cc.y))
+			    (void)enexto(&cc, u.ux, u.uy, youmonst.data);
+		    }
+		    teleds(cc.x, cc.y, TRUE); /* move hero */
+		    set_apparxy(mtmp);
+		    newsym(u.ux, u.uy);
+
 		    if (youmonst.data->mlet != S_PIERCER)
 			return(0);	/* lurkers don't attack */
 
@@ -388,7 +405,9 @@ mattacku(mtmp)
 			  pline("%s is almost hit by a falling piercer (you)!",
 								Monnam(mtmp));
 		    }
+
 		} else {
+		    /* surface hider */
 		    if (!youseeit)
 			pline("It tries to move where you are hiding.");
 		    else {

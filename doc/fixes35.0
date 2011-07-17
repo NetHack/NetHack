@@ -366,6 +366,13 @@ when applicable, give "your body rises from the dead as an <undead>..."
 	even when bones data isn't being saved
 have shk claim ownership of worn saddle dropped by dying pet if hero is
 	not within the same shop at the time of the drop
+for poly'd hero hiding on ceiling who gets attacked, make attacker's position
+	be an eligible location for hero when vacating hero's spot for attacker
+	to prevent ending up far away under crowded conditions
+for poly'd hero hiding on ceiling, attack by sea monsters won't move them
+	into hero's position unless it is over water or they're already on land
+for poly'd hero hiding on ceiling, attack by long worm might fill hero's
+	destination with worm's tail, so double check and maybe choose again
 
 
 Platform- and/or Interface-Specific Fixes
