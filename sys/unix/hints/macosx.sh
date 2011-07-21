@@ -11,8 +11,6 @@
 
 cmd=$1
 
-echo "macosx: $*"
-
 case "x$cmd" in
 xuser)
 		# fail unless user exists (good through 10.4)
