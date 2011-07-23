@@ -2722,11 +2722,16 @@ xchar x, y;
 			eshkp->loan = 0L;
 			Your("debt is paid off.");
 		    }
-		    pline("%ld %s %s added to your credit.",
-				delta, currency(delta), delta > 1L ? "are" : "is");
+		    if (eshkp->credit == delta)
+			You("have established %ld %s credit.",
+			    delta, currency(delta));
+		    else
+			pline("%ld %s added to your credit; total is now %ld %s.",
+			      delta, currency(delta),
+			      eshkp->credit, currency(eshkp->credit));
 		}
-		if(offer) goto move_on;
-		else {
+
+		if (!offer) {
 		    if(!isgold) {
 			if (container)
 			    dropped_container(obj, shkp, FALSE);
@@ -2736,7 +2741,7 @@ xchar x, y;
 		    return;
 		}
 	}
-move_on:
+
 	if((!saleitem && !(container && cltmp > 0L))
 	   || eshkp->billct == BILLSZ
 	   || obj->oclass == BALL_CLASS
