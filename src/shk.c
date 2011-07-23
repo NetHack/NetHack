@@ -1843,7 +1843,10 @@ get_cost(obj, shkp)
 register struct obj *obj;
 register struct monst *shkp;	/* if angry, impose a surcharge */
 {
-	register long tmp = getprice(obj, FALSE);
+	long tmp = getprice(obj, FALSE),
+	     /* used to perform a single calculation even when multiple
+	        adjustments (unID'd, dunce/tourist, charisma) are made */
+	     multiplier = 1L, divisor = 1L;
 
 	if (!tmp) tmp = 5L;
 	/* shopkeeper may notice if the player isn't very knowledgeable -
@@ -1891,27 +1894,44 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
 			    break;
 		    }
 		    tmp = (long) objects[i].oc_cost;
-		} else if (!(obj->o_id % 4)) /* arbitrarily impose surcharge */
-		    tmp += tmp / 3L;
+		} else if (!(obj->o_id % 4)) {
+		    /* unid'd, arbitrarily impose surcharge: tmp *= 4/3 */
+		    multiplier *= 4L;
+		    divisor *= 3L;
+		}
 	}
-#ifdef TOURIST
-	if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2))
-	    || (uarmu && !uarm && !uarmc))	/* touristy shirt visible */
-		tmp += tmp / 3L;
-	else
-#endif
 	if (uarmh && uarmh->otyp == DUNCE_CAP)
-		tmp += tmp / 3L;
+		multiplier *= 4L, divisor *= 3L;
+#ifdef TOURIST
+	else if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2)) ||
+		    (uarmu && !uarm && !uarmc)) /* touristy shirt visible */
+		multiplier *= 4L, divisor *= 3L;
+#endif
 
-	if (ACURR(A_CHA) > 18)		tmp /= 2L;
-	else if (ACURR(A_CHA) > 17)	tmp -= tmp / 3L;
-	else if (ACURR(A_CHA) > 15)	tmp -= tmp / 4L;
-	else if (ACURR(A_CHA) < 6)	tmp *= 2L;
-	else if (ACURR(A_CHA) < 8)	tmp += tmp / 2L;
-	else if (ACURR(A_CHA) < 11)	tmp += tmp / 3L;
+	if	(ACURR(A_CHA) > 18)  divisor *= 2L;
+	else if (ACURR(A_CHA) == 18) multiplier *= 2L, divisor *= 3L;
+	else if (ACURR(A_CHA) >= 16) multiplier *= 3L, divisor *= 4L;
+	else if (ACURR(A_CHA) <= 5)  multiplier *= 2L;
+	else if (ACURR(A_CHA) <= 7)  multiplier *= 3L, divisor *= 2L;
+	else if (ACURR(A_CHA) <= 10) multiplier *= 4L, divisor *= 3L;
+
+	/* tmp = (tmp * multiplier) / divisor [with roundoff tweak] */
+	tmp *= multiplier;
+	if (divisor > 1L) {
+	    /* tmp = (((tmp * 10) / divisor) + 5) / 10 */
+	    tmp *= 10L;
+	    tmp /= divisor;
+	    tmp += 5L;
+	    tmp /= 10L;
+	}
+
 	if (tmp <= 0L) tmp = 1L;
-	else if (obj->oartifact) tmp *= 4L;
-	/* anger surcharge should match rile_shk's */
+	/* the artifact prices in artilist[] are also used as a score bonus;
+	   inflate their shop price here without affecting score calculation */
+	if (obj->oartifact) tmp *= 4L;
+
+	/* anger surcharge should match rile_shk's, so we do it separately
+	   from the multiplier/divisor calculation */
 	if (shkp && ESHK(shkp)->surcharge) tmp += (tmp + 2L) / 3L;
 	return tmp;
 }
@@ -2042,18 +2062,18 @@ set_cost(obj, shkp)
 register struct obj *obj;
 register struct monst *shkp;
 {
-	long tmp = getprice(obj, TRUE) * obj->quan;
+	long tmp = getprice(obj, TRUE) * obj->quan,
+	     multiplier = 1L, divisor = 1L;
 
-#ifdef TOURIST
-	if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2))
-	    || (uarmu && !uarm && !uarmc))	/* touristy shirt visible */
-		tmp /= 3L;
-	else
-#endif
 	if (uarmh && uarmh->otyp == DUNCE_CAP)
-		tmp /= 3L;
+		divisor *= 3L;
+#ifdef TOURIST
+	else if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2)) ||
+		    (uarmu && !uarm && !uarmc)) /* touristy shirt visible */
+		divisor *= 3L;
+#endif
 	else
-		tmp /= 2L;
+		divisor *= 2L;
 
 	/* shopkeeper may notice if the player isn't very knowledgeable -
 	   especially when gem prices are concerned */
@@ -2066,8 +2086,23 @@ register struct monst *shkp;
 				tmp = (tmp + 3) * obj->quan;
 			}
 		} else if (tmp > 1L && !rn2(4))
-			tmp -= tmp / 4L;
+			multiplier *= 3L, divisor *= 4L;
 	}
+
+	if (tmp >= 1L) {
+		/* [see get_cost()] */
+		tmp *= multiplier;
+		if (divisor > 1L) {
+		    tmp *= 10L;
+		    tmp /= divisor;
+		    tmp += 5L;
+		    tmp /= 10L;
+		}
+		/* avoid adjusting nonzero to zero */
+		if (tmp < 1L) tmp = 1L;
+	}
+
+	/* (no adjustment for angry shk here) */
 	return tmp;
 }
 

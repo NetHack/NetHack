@@ -373,6 +373,7 @@ for poly'd hero hiding on ceiling, attack by sea monsters won't move them
 	into hero's position unless it is over water or they're already on land
 for poly'd hero hiding on ceiling, attack by long worm might fill hero's
 	destination with worm's tail, so double check and maybe choose again
+when shop prices are adjusted, handle roundoff (integer truncation) better
 
 
 Platform- and/or Interface-Specific Fixes
