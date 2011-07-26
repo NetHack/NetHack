@@ -374,6 +374,8 @@ for poly'd hero hiding on ceiling, attack by sea monsters won't move them
 for poly'd hero hiding on ceiling, attack by long worm might fill hero's
 	destination with worm's tail, so double check and maybe choose again
 when shop prices are adjusted, handle roundoff (integer truncation) better
+for hero poly'd into a monster form that lacks a weapon attack but has a claw
+	attack, use wielded weapon even when claw attack isn't the very first
 
 
 Platform- and/or Interface-Specific Fixes

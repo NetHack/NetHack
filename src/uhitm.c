@@ -2027,7 +2027,7 @@ register struct monst *mon;
 {
 	struct attack *mattk, alt_attk;
 	struct obj *weapon;
-	boolean altwep = FALSE;
+	boolean altwep = FALSE, weapon_used = FALSE;
 	int i, tmp, armorpenalty, sum[NATTK],
 	    nsum = 0, dhit = 0, attknum = 0;
 
@@ -2041,7 +2041,9 @@ use_weapon:
 	 * but players who polymorph into them have hands or claws and thus
 	 * should be able to use weapons.  This shouldn't prohibit the use
 	 * of most special abilities, either.
+	 * If a monster has multiple claw attacks, only one can use weapon.
 	 */
+			weapon_used = TRUE;
 	/* Potential problem: if the monster gets multiple weapon attacks,
 	 * we currently allow the player to get each of these as a weapon
 	 * attack.  Is this really desirable?
@@ -2069,24 +2071,18 @@ use_weapon:
 				sum[i] = damageum(mon,mattk);
 			break;
 		case AT_CLAW:
-			if (i == 0 && uwep && !cantwield(youmonst.data))
-			    goto use_weapon;
-#ifdef SEDUCE
-			/* succubi/incubi are humanoid, but their _second_
-			 * attack is AT_CLAW, not their first...
-			 */
-			if (SYSOPT_SEDUCE && i==1 && uwep &&
-				(u.umonnum == PM_SUCCUBUS ||
-				u.umonnum == PM_INCUBUS)) goto use_weapon;
-#endif
+			if (uwep && !cantwield(youmonst.data) &&
+			    !weapon_used) goto use_weapon;
+		/*FALLTHRU*/
+		case AT_TUCH:
+			if (uwep && youmonst.data->mlet == S_LICH &&
+			    !weapon_used) goto use_weapon;
+		/*FALLTHRU*/
 		case AT_KICK:
 		case AT_BITE:
 		case AT_STNG:
-		case AT_TUCH:
 		case AT_BUTT:
 		case AT_TENT:
-			if (i == 0 && uwep && youmonst.data->mlet == S_LICH)
-			    goto use_weapon;
 			tmp = find_roll_to_hit(mon, mattk->aatyp,
 					       (struct obj *)0,
 					       &attknum, &armorpenalty);
@@ -2193,10 +2189,10 @@ use_weapon:
 			/* No check for uwep; if wielding nothing we want to
 			 * do the normal 1-2 points bare hand damage...
 			 */
-			if (i==0 && (youmonst.data->mlet==S_KOBOLD
-				|| youmonst.data->mlet==S_ORC
-				|| youmonst.data->mlet==S_GNOME
-				)) goto use_weapon;
+			if ((youmonst.data->mlet == S_KOBOLD ||
+				youmonst.data->mlet == S_ORC ||
+				youmonst.data->mlet == S_GNOME) &&
+			    !weapon_used) goto use_weapon;
 
 		case AT_NONE:
 		case AT_BOOM:
