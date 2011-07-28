@@ -1544,11 +1544,11 @@ int final;
 	    if (magic || cause_known(FUMBLING))
 		enl_msg(You_, "fumble", "fumbled", "", from_what(FUMBLING));
 	}
-	if (Sleeping) {
-	    if (magic || cause_known(SLEEPING)) {
-		Strcpy(buf, from_what(SLEEPING));
+	if (Sleepy) {
+	    if (magic || cause_known(SLEEPY)) {
+		Strcpy(buf, from_what(SLEEPY));
 #ifdef WIZARD
-		if (wizard) Sprintf(eos(buf), " (%ld)", (HSleeping & TIMEOUT));
+		if (wizard) Sprintf(eos(buf), " (%ld)", (HSleepy & TIMEOUT));
 #endif
 		enl_msg("You ", "fall", "fell", " asleep uncontrollably", buf);
 	    }

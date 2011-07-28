@@ -1,5 +1,4 @@
 /* NetHack 3.5	prop.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)prop.h	3.5	1999/07/07	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -36,7 +35,7 @@
 #define HALLUC_RES		24
 #define FUMBLING		25
 #define WOUNDED_LEGS		26
-#define SLEEPING		27
+#define SLEEPY			27
 #define HUNGER			28
 /* Vision and senses */
 #define SEE_INVIS		29

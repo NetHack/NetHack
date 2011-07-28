@@ -1,5 +1,4 @@
 /* NetHack 3.5	youprop.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)youprop.h	3.5	2007/03/16	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -132,9 +131,9 @@
 #define EWounded_legs		u.uprops[WOUNDED_LEGS].extrinsic
 #define Wounded_legs		(HWounded_legs || EWounded_legs)
 
-#define HSleeping		u.uprops[SLEEPING].intrinsic
-#define ESleeping		u.uprops[SLEEPING].extrinsic
-#define Sleeping		(HSleeping || ESleeping)
+#define HSleepy			u.uprops[SLEEPY].intrinsic
+#define ESleepy			u.uprops[SLEEPY].extrinsic
+#define Sleepy			(HSleepy || ESleepy)
 
 #define HHunger			u.uprops[HUNGER].intrinsic
 #define EHunger			u.uprops[HUNGER].extrinsic

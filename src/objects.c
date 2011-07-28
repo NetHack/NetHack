@@ -548,7 +548,7 @@ RING("protection from shape changers", PROT_FROM_SHAPE_CHANGERS, "shiny",
 AMULET("amulet of ESP",           "circular",   TELEPAT,    175),
 AMULET("amulet of life saving",   "spherical",  LIFESAVED,   75),
 AMULET("amulet of strangulation", "oval",       STRANGLED,  135),
-AMULET("amulet of restful sleep", "triangular", SLEEPING,   135),
+AMULET("amulet of restful sleep", "triangular", SLEEPY,     135),
 AMULET("amulet versus poison",    "pyramidal",  POISON_RES, 165),
 AMULET("amulet of change",        "square",     0,          130),
 						/* POLYMORPH */

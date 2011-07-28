@@ -1,5 +1,4 @@
 /* NetHack 3.5	timeout.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)timeout.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -337,14 +336,14 @@ nh_timeout()
 			(void) make_hallucinated(0L, TRUE, 0L);
 			stop_occupation();
 			break;
-		case SLEEPING:
+		case SLEEPY:
 			if (unconscious() || Sleep_resistance)
-				HSleeping += rnd(100);
-			else if (Sleeping) {
+				HSleepy += rnd(100);
+			else if (Sleepy) {
 				You("fall asleep.");
 				sleeptime = rnd(20);
 				fall_asleep(-sleeptime, TRUE);
-				HSleeping += sleeptime + rnd(100);
+				HSleepy += sleeptime + rnd(100);
 			}
 			break;
 		case LEVITATION:

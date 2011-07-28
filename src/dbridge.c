@@ -1,5 +1,4 @@
 /* NetHack 3.5	dbridge.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)dbridge.c	3.5	2007/02/19	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -463,8 +462,8 @@ boolean chunks;
 		return(TRUE);
 
 	if (is_flyer(etmp->edata) &&
-	    (is_u(etmp)? !Sleeping :
-	     (etmp->emon->mcanmove && !etmp->emon->msleeping)))
+	    (is_u(etmp)? !Unaware :
+		(etmp->emon->mcanmove && !etmp->emon->msleeping)))
 						 /* flying requires mobility */
 		misses = 5;	/* out of 8 */
 	else if (is_floater(etmp->edata) ||
@@ -495,9 +494,9 @@ struct entity *etmp;
 {
 	int tmp = 4;		/* out of 10 */
 
-	if (is_u(etmp)? (Sleeping || Fumbling) :
-		        (!etmp->emon->mcanmove || etmp->emon->msleeping ||
-			 !etmp->edata->mmove   || etmp->emon->wormno))
+	if (is_u(etmp) ? (Unaware || Fumbling) :
+		    (!etmp->emon->mcanmove || etmp->emon->msleeping ||
+			!etmp->edata->mmove || etmp->emon->wormno))
 		return(FALSE);
 
 	if (is_u(etmp)? Confusion : etmp->emon->mconf)
