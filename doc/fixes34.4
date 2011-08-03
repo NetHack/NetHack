@@ -410,6 +410,9 @@ unlit candelabrum would become unlightable if its candles had exactly 1 turn
 temporary loss of Dex from wounded legs will become permanent if it occurs
 	while mounted and hero dismounts before steed's legs have healed
 jaberwocks don't have hands
+character escape sequence handling during options processing was vulernable
+	to malformed escapes and could potentially be abused to clobber the
+	stack and launch a buffer overrun attack
 
 
 Platform- and/or Interface-Specific Fixes
