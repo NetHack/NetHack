@@ -2622,12 +2622,8 @@ struct obj *otmp;	/* source of flash */
 		}
 		if (mtmp->mhp > 0) {
 		    if (!context.mon_moving) setmangry(mtmp);
-		    if (tmp < 9 && !mtmp->isshk && rn2(4)) {
-			if (rn2(4))
-			    monflee(mtmp, rnd(100), FALSE, TRUE);
-			else
-			    monflee(mtmp, 0, FALSE, TRUE);
-		    }
+		    if (tmp < 9 && !mtmp->isshk && rn2(4))
+			monflee(mtmp, rn2(4) ? rnd(100) : 0, FALSE, TRUE);
 		    mtmp->mcansee = 0;
 		    mtmp->mblinded = (tmp < 3) ? 0 : rnd(1 + 50/tmp);
 		}

@@ -221,15 +221,22 @@ boolean fleemsg;
 	    if (!fleetime)
 		mtmp->mfleetim = 0;
 	    else if (!mtmp->mflee || mtmp->mfleetim) {
-		fleetime += mtmp->mfleetim;
+		fleetime += (int)mtmp->mfleetim;
 		/* ensure monster flees long enough to visibly stop fighting */
 		if (fleetime == 1) fleetime++;
-		mtmp->mfleetim = min(fleetime, 127);
+		mtmp->mfleetim = (unsigned)min(fleetime, 127);
 	    }
-	    if (!mtmp->mflee && fleemsg && canseemon(mtmp) && !mtmp->mfrozen &&
-		mtmp->m_ap_type != M_AP_FURNITURE &&
-		mtmp->m_ap_type != M_AP_OBJECT)
-		pline("%s turns to flee!", (Monnam(mtmp)));
+	    if (!mtmp->mflee && fleemsg && canseemon(mtmp) &&
+		    mtmp->m_ap_type != M_AP_FURNITURE &&
+		    mtmp->m_ap_type != M_AP_OBJECT) {
+		/* unfortunately we can't distinguish between temporary
+		   sleep and temporary paralysis, so both conditions
+		   receive the same alternate message */
+		if (!mtmp->mcanmove || !mtmp->data->mmove)
+		    pline("%s seems to flinch.", Adjmonnam(mtmp, "immobile"));
+		else
+		    pline("%s turns to flee.", Monnam(mtmp));
+	    }
 	    mtmp->mflee = 1;
 	}
 }
@@ -259,17 +266,13 @@ int *inrange, *nearby, *scared;
 		seescaryx = u.ux;
 		seescaryy = u.uy;
 	}
-	*scared = (*nearby && (onscary(seescaryx, seescaryy, mtmp) ||
-			       (!mtmp->mpeaceful &&
-				    in_your_sanctuary(mtmp, 0, 0))));
-
-	if(*scared) {
-		if (rn2(7))
-		    monflee(mtmp, rnd(10), TRUE, TRUE);
-		else
-		    monflee(mtmp, rnd(100), TRUE, TRUE);
-	}
-
+	if (*nearby &&
+		(onscary(seescaryx, seescaryy, mtmp) ||
+		    (!mtmp->mpeaceful && in_your_sanctuary(mtmp, 0, 0)))) {
+		*scared = 1;
+		monflee(mtmp, rnd(rn2(7) ? 10 : 100), TRUE, TRUE);
+	} else
+		*scared = 0;
 }
 
 /* perform a special one-time action for a monster; returns -1 if nothing

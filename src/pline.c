@@ -1,5 +1,4 @@
 /* NetHack 3.5	pline.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)pline.c	3.5	2009/01/29	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -386,7 +385,7 @@ register struct monst *mtmp;
 				  /* [arbitrary reason why it isn't moving] */
 	else if (mtmp->mstrategy & STRAT_WAITMASK)
 				  Strcat(info, ", meditating");
-	else if (mtmp->mflee)	  Strcat(info, ", scared");
+	if (mtmp->mflee)	  Strcat(info, ", scared");
 	if (mtmp->mtrapped)	  Strcat(info, ", trapped");
 	if (mtmp->mspeed)	  Strcat(info,
 					mtmp->mspeed == MFAST ? ", fast" :

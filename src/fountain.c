@@ -1,5 +1,4 @@
 /* NetHack 3.5	fountain.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)fountain.c	3.5	2009/01/31	*/
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -334,15 +333,17 @@ drinkfountain()
 			dowaternymph();
 			break;
 
-		case 29: /* Scare */ {
+		case 29: /* Scare */
+		    {
 			register struct monst *mtmp;
 
 			pline("This water gives you bad breath!");
-			for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-			    if(!DEADMONSTER(mtmp))
-				monflee(mtmp, 0, FALSE, FALSE);
+			for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+			    if (DEADMONSTER(mtmp)) continue;
+			    monflee(mtmp, 0, FALSE, FALSE);
 			}
 			break;
+		    }
 
 		case 30: /* Gushing forth in this room */
 
