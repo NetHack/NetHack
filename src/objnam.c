@@ -2082,15 +2082,6 @@ const char *u_str;	/* from user, so might be variant spelling */
 const char *o_str;	/* from objects[], so is in canonical form */
 boolean retry_inverted;	/* optional extra "of" handling */
 {
-	/* special case: wizards can wish for traps.  The object is "beartrap"
-	 * and the trap is "bear trap", so to let wizards wish for both we
-	 * must not fuzzymatch.
-	 */
-#ifdef WIZARD
-	if (wizard && !strcmp(o_str, "beartrap"))
-	    return !strncmpi(o_str, u_str, 8);
-#endif
-
 	/* ignore spaces & hyphens and upper/lower case when comparing */
 	if (fuzzymatch(u_str, o_str, " -", TRUE)) return TRUE;
 
@@ -2630,6 +2621,48 @@ struct obj *no_wish;
 		}
 	}
 
+#ifdef WIZARD
+	/* Wishing in wizard mode can create traps and furniture.
+	 * Part I:  distinguish between trap and object for the two
+	 * types of traps which have corresponding objects:  bear trap
+	 * and land mine.  "beartrap" (object) and "bear trap" (trap)
+	 * have a difference in spelling which we used to exploit by
+	 * adding a special case in wishymatch(), but "land mine" is
+	 * spelled the same either way so needs different handing.
+	 * Since we need something else for land mine, we've dropped
+	 * the bear trap hack so that both are handled exactly the
+	 * same.  To get an armed trap instead of a disarmed object,
+	 * the player can prefix either the object name or the trap
+	 * name with "trapped " (which ordinarily applies to chests
+	 * and tins), or append something--anything at all except for
+	 * " object", but " trap" is suggested--to either the trap
+	 * name or the object name.
+	 */
+	if (wizard && (!strncmpi(bp, "bear", 4) || !strncmpi(bp, "land", 4))) {
+	    boolean beartrap = (lowc(*bp) == 'b');
+	    char *zp = bp + 4; /* skip "bear"/"land" */
+
+	    if (*zp == ' ') ++zp;	/* embedded space is optional */
+	    if (!strncmpi(zp, beartrap ? "trap" : "mine", 4)) {
+		zp += 4;
+		if (trapped == 2 || !strcmpi(zp, " object")) {
+		    /* "untrapped <foo>" or "<foo> object" */
+		    typ = beartrap ? BEARTRAP : LAND_MINE;
+		    goto typfnd;
+		} else if (trapped == 1 || *zp != '\0') {
+		    /* "trapped <foo>" or "<foo> trap" (actually "<foo>*") */
+		    int idx = trap_to_defsym(beartrap ? BEAR_TRAP : LANDMINE);
+
+		    /* use canonical trap spelling, skip object matching */
+		    Strcpy(bp, defsyms[idx].explanation);
+		    goto wiztrap;
+		}
+		/* [no prefix or suffix; we're going to end up matching
+		   the object name and getting a disarmed trap object] */
+	    }
+	}
+#endif
+
 retry:
 	/* "grey stone" check must be before general "stone" */
 	for (i = 0; i < SIZE(o_ranges); i++)
@@ -2804,6 +2837,7 @@ srch:
 	 * trap objects like beartraps.
 	 * Disallow such topology tweaks for WIZKIT startup wishes.
 	 */
+wiztrap:
 	if (wizard && !program_state.wizkit_wishing) {
 		struct rm *lev;
 		int trap, x = u.ux, y = u.uy;
