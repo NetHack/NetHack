@@ -619,6 +619,8 @@ boolean artif;
 #ifdef INVISIBLE_OBJECTS
 	otmp->oinvis = !rn2(1250);
 #endif
+	otmp->corpsenm = NON_PM;
+
 	if (init) switch (let) {
 	case WEAPON_CLASS:
 		otmp->quan = is_multigen(otmp) ? (long) rn1(6,6) : 1L;
@@ -683,11 +685,12 @@ boolean artif;
 		otmp->quan = (long) rnd(2);
 		break;
 	    }
-	    if (otmp->otyp == CORPSE || otmp->otyp == MEAT_RING ||
-		otmp->otyp == KELP_FROND) break;
-	    /* fall into next case */
-
+	    if (otmp->otyp != CORPSE && otmp->otyp != MEAT_RING &&
+		    otmp->otyp != KELP_FROND && !rn2(6))
+		otmp->quan = 2L;
+	    break;
 	case GEM_CLASS:
+		otmp->corpsenm = 0;	/* LOADSTONE hack */
 		if (otmp->otyp == LOADSTONE) curse(otmp);
 		else if (otmp->otyp == ROCK) otmp->quan = (long) rn1(6,6);
 		else if (otmp->otyp != LUCKSTONE && !rn2(6)) otmp->quan = 2L;
@@ -721,6 +724,8 @@ boolean artif;
 		case SACK:
 		case OILSKIN_SACK:
 		case BAG_OF_HOLDING:	mkbox_cnts(otmp);
+					break;
+		case LEASH:		otmp->leashmon = 0;
 					break;
 #ifdef TOURIST
 		case EXPENSIVE_CAMERA:
@@ -768,6 +773,7 @@ boolean artif;
 	case BALL_CLASS:
 		break;
 	case POTION_CLASS:
+		otmp->fromsink = 0;
 		if (otmp->otyp == POT_OIL)
 		    otmp->age = MAX_OIL_IN_FLASK;	/* amount of oil */
 		/* fall through */
@@ -778,6 +784,7 @@ boolean artif;
 			blessorcurse(otmp, 4);
 		break;
 	case SPBOOK_CLASS:
+		otmp->spestudied = 0;
 		blessorcurse(otmp, 17);
 		break;
 	case ARMOR_CLASS:
@@ -851,12 +858,22 @@ boolean artif;
 		return (struct obj *)0;
 	}
 
-	/* Some things must get done (timers) even if init = 0 */
+	/* some things must get done (corpsenm, timers) even if init = 0 */
 	switch (otmp->otyp) {
 	    case CORPSE:
-	    case EGG:
+		if (otmp->corpsenm == NON_PM) {
+		    otmp->corpsenm = undead_to_corpse(rndmonnum());
+		    if (mvitals[otmp->corpsenm].mvflags & (G_NOCORPSE|G_GONE))
+			otmp->corpsenm = urole.malenum;
+		}
+		/*FALLTHRU*/
+	    case STATUE:
 	    case FIGURINE:
-	        set_corpsenm(otmp, otmp->corpsenm);
+		if (otmp->corpsenm == NON_PM) otmp->corpsenm = rndmonnum();
+		/*FALLTHRU*/
+	    case EGG:
+	 /* case TIN: */
+		set_corpsenm(otmp, otmp->corpsenm);
 		break;
 	}
 

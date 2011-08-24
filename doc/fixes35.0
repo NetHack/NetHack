@@ -378,6 +378,7 @@ for hero poly'd into a monster form that lacks a weapon attack but has a claw
 	attack, use wielded weapon even when claw attack isn't the very first
 rename the SLEEPING property and Sleeping attribute to SLEEPY and Sleepy, resp.
 give alternate message for "<mon> turns to flee" when mon can't move
+all statues in a cockatrice nest were for giant ant if 'record' was empty
 
 
 Platform- and/or Interface-Specific Fixes
