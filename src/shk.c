@@ -1577,9 +1577,11 @@ boolean
 paybill(croaked)
 int croaked;	/* -1: escaped dungeon; 0: quit; 1: died */
 {
-	register struct monst *mtmp, *mtmp2, *resident= (struct monst *)0;
-	register boolean taken = FALSE;
-	register int numsk = 0;
+	struct monst *mtmp, *mtmp2, *firstshk,
+		     *resident, *creditor, *hostile, *localshk;
+	struct eshk *eshkp;
+	boolean taken = FALSE, local;
+	int numsk = 0;
 
 	/* if we escaped from the dungeon, shopkeepers can't reach us;
 	   shops don't occur on level 1, but this could happen if hero
@@ -1593,27 +1595,63 @@ int croaked;	/* -1: escaped dungeon; 0: quit; 1: died */
 	repo.location.x = repo.location.y = 0;
 	repo.shopkeeper = 0;
 
-	/* give shopkeeper first crack */
-	if ((mtmp = shop_keeper(*u.ushops)) && inhishop(mtmp)) {
-	    numsk++;
-	    resident = mtmp;
-	    taken = inherits(resident, numsk, croaked);
-	}
+	/*
+	 * Scan all shopkeepres on the level, to prioritize them:
+	 * 1) keeper of shop hero is inside and who is owed money,
+	 * 2) keeper of shop hero is inside who isn't owed any money,
+	 * 3) other shk who is owed money, 4) other shk who is angry,
+	 * 5) any shk local to this level, and if none is found,
+	 * 6) first shk on monster list (last resort; unlikely, since
+	 * any nonlocal shk will probably be in the owed category
+	 * and almost certainly be in the angry category).
+	 */
+	resident = creditor = hostile = localshk = (struct monst *)0;
 	for (mtmp = next_shkp(fmon, FALSE);
 		mtmp; mtmp = next_shkp(mtmp2, FALSE)) {
 	    mtmp2 = mtmp->nmon;
-	    if (mtmp != resident) {
-		/* for bones: we don't want a shopless shk around */
-		if(!on_level(&(ESHK(mtmp)->shoplevel), &u.uz))
-			mongone(mtmp);
-		else {
-		    numsk++;
-		    taken |= inherits(mtmp, numsk, croaked);
-		}
+	    eshkp = ESHK(mtmp);
+	    local = on_level(&eshkp->shoplevel, &u.uz);
+	    if (local && index(u.ushops, eshkp->shoproom)) {
+		/* inside this shk's shop [there might be more than one
+		   resident shk if hero is standing in a breech of a shared
+		   wall, so give priority to one who's also owed money] */
+		if (!resident ||
+			eshkp->billct || eshkp->debit || eshkp->robbed)
+		    resident = mtmp;
+	    } else if (eshkp->billct || eshkp->debit || eshkp->robbed) {
+		/* owe this shopkeeper money (might also owe others) */
+		if (!creditor) creditor = mtmp;
+	    } else if (eshkp->following || ANGRY(mtmp)) {
+		/* this shopkeeper is antagonistic (others might be too) */
+		if (!hostile) hostile = mtmp;
+	    } else if (local) {
+		/* this shopkeeper's shop is on current level */
+		if (!localshk) localshk = mtmp;
 	    }
+	} 
+
+	/* give highest priority shopkeeper first crack */
+	firstshk = resident ? resident : creditor ? creditor :
+		    hostile ? hostile : localshk;
+	if (firstshk) {
+	    numsk++;
+	    taken = inherits(firstshk, numsk, croaked);
 	}
-	if(numsk == 0) return(FALSE);
-	return(taken);
+
+	/* now handle the rest */
+	for (mtmp = next_shkp(fmon, FALSE);
+		mtmp; mtmp = next_shkp(mtmp2, FALSE)) {
+	    mtmp2 = mtmp->nmon;
+	    eshkp = ESHK(mtmp);
+	    local = on_level(&eshkp->shoplevel, &u.uz);
+	    if (mtmp != firstshk) {
+		numsk++;
+		taken |= inherits(mtmp, numsk, croaked);
+	    }
+	    /* for bones: we don't want a shopless shk around */
+	    if (!local) mongone(mtmp);
+	}
+	return taken;
 }
 
 STATIC_OVL boolean
