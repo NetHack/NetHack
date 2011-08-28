@@ -519,6 +519,7 @@ adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
 	paranoid_confirm:attack  yes vs y to attack a peaceful monster
 	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
 	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
+flexibility for specifying "detect <foo>" vs "<foo> detection" when wishing
 
 
 Platform- and/or Interface-Specific New Features

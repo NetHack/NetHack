@@ -2082,12 +2082,15 @@ const char *u_str;	/* from user, so might be variant spelling */
 const char *o_str;	/* from objects[], so is in canonical form */
 boolean retry_inverted;	/* optional extra "of" handling */
 {
+	static NEARDATA const char
+		detect_SP[] = "detect ", SP_detection[] = " detection";
+	char *p, buf[BUFSZ];
+
 	/* ignore spaces & hyphens and upper/lower case when comparing */
 	if (fuzzymatch(u_str, o_str, " -", TRUE)) return TRUE;
 
 	if (retry_inverted) {
 	    const char *u_of, *o_of;
-	    char *p, buf[BUFSZ];
 
 	    /* when just one of the strings is in the form "foo of bar",
 	       convert it into "bar foo" and perform another comparison */
@@ -2119,6 +2122,29 @@ boolean retry_inverted;	/* optional extra "of" handling */
 		return fuzzymatch(u_str + 7, o_str + 6, " -", TRUE);
 	    else if (!strncmpi(u_str, "elfin ", 6))
 		return fuzzymatch(u_str + 6, o_str + 6, " -", TRUE);
+	} else if (!strncmp(o_str, detect_SP, sizeof detect_SP - 1)) {
+	    /* check for "detect <foo>" vs "<foo> detection" */
+	    if ((p = strstri(u_str, SP_detection)) != 0 &&
+		    !*(p + sizeof SP_detection - 1)) {
+		/* convert "<foo> detection" into "detect <foo>" */
+		*p = '\0';
+		Strcat(strcpy(buf, detect_SP), u_str);
+		/* "detect monster" -> "detect monsters" */
+		if (!strcmpi(u_str, "monster")) Strcat(buf, "s");
+		*p = ' ';
+		return fuzzymatch(buf, o_str, " -", TRUE);
+	    }
+	} else if (strstri(o_str, SP_detection)) {
+	    /* and the inverse, "<foo> detection" vs "detect <foo>" */
+	    if (!strncmpi(u_str, detect_SP, sizeof detect_SP - 1)) {
+		/* convert "detect <foo>s" into "<foo> detection" */
+		p = makesingular(u_str + sizeof detect_SP - 1);
+		Strcat(strcpy(buf, p), SP_detection);
+		/* caller may be looping through objects[], so avoid
+		   churning through all the obufs */
+		releaseobuf(p);
+		return fuzzymatch(buf, o_str, " -", TRUE);
+	    }
 	} else if (!strcmp(o_str, "aluminum")) {
 		/* this special case doesn't really fit anywhere else... */
 		/* (note that " wand" will have been stripped off by now) */
@@ -2591,6 +2617,7 @@ struct obj *no_wish;
 	/* false hits on, e.g., rings for "ring mail". */
 	if(strncmpi(bp, "enchant ", 8) &&
 	   strncmpi(bp, "destroy ", 8) &&
+	   strncmpi(bp, "detect food", 11) &&
 	   strncmpi(bp, "food detection", 14) &&
 	   strncmpi(bp, "ring mail", 9) &&
 	   strncmpi(bp, "studded leather armor", 21) &&
