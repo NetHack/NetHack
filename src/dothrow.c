@@ -604,8 +604,7 @@ hurtle_step(arg, x, y)
 
     ox = u.ux;
     oy = u.uy;
-    u.ux = x;
-    u.uy = y;
+    u_on_newpos(x, y); /* set u.<ux,uy>, u.usteed-><mx,my>; cliparound(); */
     newsym(ox, oy);		/* update old position */
     vision_recalc(1);		/* update for new position */
     flush_screen(1);

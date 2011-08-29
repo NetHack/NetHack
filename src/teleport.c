@@ -303,8 +303,7 @@ boolean allow_drag;
 	}
 	/* must set u.ux, u.uy after drag_ball(), which may need to know
 	   the old position if allow_drag is true... */
-	u.ux = nux;
-	u.uy = nuy;
+	u_on_newpos(nux, nuy); /* set u.<x,y>, usteed-><mx,my>; cliparound() */
 	fill_pit(u.ux0, u.uy0);
 	if (ball_active) {
 	    if (!ball_still_in_range && !allow_drag)
@@ -312,13 +311,6 @@ boolean allow_drag;
 	}
 	initrack(); /* teleports mess up tracking monsters without this */
 	update_player_regions();
-#ifdef STEED
-	/* Move your steed, too */
-	if (u.usteed) {
-		u.usteed->mx = nux;
-		u.usteed->my = nuy;
-	}
-#endif
 	/*
 	 *  Make sure the hero disappears from the old location.  This will
 	 *  not happen if she is teleported within sight of her previous
