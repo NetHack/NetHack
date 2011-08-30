@@ -30,10 +30,11 @@ STATIC_DCL void FDECL(join_adjacent_pits, (struct trap *));
 #endif
 STATIC_DCL void FDECL(clear_conjoined_pits, (struct trap *));
 #ifdef STEED
-STATIC_OVL int FDECL(steedintrap, (struct trap *, struct obj *));
-STATIC_OVL boolean FDECL(keep_saddle_with_steedcorpse,
+STATIC_DCL int FDECL(steedintrap, (struct trap *, struct obj *));
+STATIC_DCL boolean FDECL(keep_saddle_with_steedcorpse,
 			(unsigned, struct obj *, struct obj *));
 #endif
+STATIC_DCL void NDECL(maybe_finish_sokoban);
 
 /* mintrap() should take a flags argument, but for time being we use this */
 STATIC_VAR int force_mintrap = 0;
@@ -328,8 +329,7 @@ register int x, y, typ;
 		unearth_objs(x, y);
 		break;
 	}
-	if (ttmp->ttyp == HOLE) ttmp->tseen = 1;  /* You can't hide a hole */
-	else ttmp->tseen = 0;
+	ttmp->tseen = (ttmp->ttyp == HOLE);	/* hide non-holes */
 	ttmp->once = 0;
 	ttmp->madeby_u = 0;
 	ttmp->dst.dnum = -1;
@@ -337,6 +337,11 @@ register int x, y, typ;
 	if (!oldplace) {
 	    ttmp->ntrap = ftrap;
 	    ftrap = ttmp;
+	} else {
+	    /* oldplace;
+	       it shouldn't be possible to override a sokoban pit or hole
+	       with some other trap, but we'll check just to be safe */
+	    if (Sokoban) maybe_finish_sokoban();
 	}
 	return(ttmp);
 }
@@ -350,8 +355,9 @@ boolean td;	/* td == TRUE : trap door or hole */
 	const char *dont_fall = 0;
 	int newlevel, bottom;
 
-	/* KMH -- You can't escape the Sokoban level traps */
-	if(Blind && Levitation && !In_sokoban(&u.uz)) return;
+	/* we'll fall even while levitating in Sokoban; otherwise, if we
+	   won't fall and won't be told that we aren't falling, give up now */
+	if (Blind && Levitation && !Sokoban) return;
 
 	bottom = dunlevs_in_dungeon(&u.uz);
 	/* when in the upper half of the quest, don't fall past the
@@ -370,8 +376,9 @@ boolean td;	/* td == TRUE : trap door or hole */
 
 	if(td) {
 	    struct trap *t = t_at(u.ux,u.uy);
+
 	    feeltrap(t);
-	    if (!In_sokoban(&u.uz)) {
+	    if (!Sokoban) {
 		if (t->ttyp == TRAPDOOR)
 			pline("A trap door opens up under you!");
 		else 
@@ -379,7 +386,7 @@ boolean td;	/* td == TRUE : trap door or hole */
 	    }
 	} else pline_The("%s opens up under you!", surface(u.ux,u.uy));
 
-	if (In_sokoban(&u.uz) && Can_fall_thru(&u.uz))
+	if (Sokoban && Can_fall_thru(&u.uz))
 	    ;	/* KMH -- You can't escape the Sokoban level traps */
 	else if(Levitation || u.ustuck
 	   || (!Can_fall_thru(&u.uz) && !levl[u.ux][u.uy].candig)
@@ -694,7 +701,7 @@ unsigned trflags;
 	nomul(0);
 
 	/* KMH -- You can't escape the Sokoban level traps */
-	if (In_sokoban(&u.uz) &&
+	if (Sokoban &&
 			(ttype == PIT || ttype == SPIKED_PIT || ttype == HOLE ||
 			ttype == TRAPDOOR)) {
 	    /* The "air currents" message is still appropriate -- even when
@@ -703,8 +710,8 @@ unsigned trflags;
 	     * check, clinging to the ceiling, etc.
 	     */
 	    pline("Air currents pull you down into %s %s!",
-	    	a_your[trap->madeby_u],
-	    	defsyms[trap_to_defsym(ttype)].explanation);
+		  a_your[trap->madeby_u],
+		  defsyms[trap_to_defsym(ttype)].explanation);
 	    /* then proceed to normal trap effect */
 	} else if (already_seen && !forcetrap) {
 	    if ((Levitation || Flying) &&
@@ -984,9 +991,9 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 	    case PIT:
 	    case SPIKED_PIT:
 		/* KMH -- You can't escape the Sokoban level traps */
-		if (!In_sokoban(&u.uz) && (Levitation || Flying)) break;
+		if (!Sokoban && (Levitation || Flying)) break;
 		feeltrap(trap);
-		if (!In_sokoban(&u.uz) && is_clinger(youmonst.data)) {
+		if (!Sokoban && is_clinger(youmonst.data)) {
 		    if(trap->tseen) {
 			You_see("%s %spit below you.", a_your[trap->madeby_u],
 			    ttype == SPIKED_PIT ? "spiked " : "");
@@ -998,7 +1005,7 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		    }
 		    break;
 		}
-		if (!In_sokoban(&u.uz)) {
+		if (!Sokoban) {
 		    char verbbuf[BUFSZ];
 #ifdef STEED
 		    if (u.usteed) {
@@ -1949,7 +1956,7 @@ register struct monst *mtmp;
 	    boolean in_sight, tear_web, see_it,
 		    inescapable = force_mintrap ||
 				((tt == HOLE || tt == PIT) &&
-				   In_sokoban(&u.uz) && !trap->madeby_u);
+				 Sokoban && !trap->madeby_u);
 	    const char *fallverb;
 
 #ifdef STEED
@@ -2211,7 +2218,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			if (is_flyer(mptr) || is_floater(mptr) ||
 				(mtmp->wormno && count_wsegs(mtmp) > 5) ||
 				is_clinger(mptr)) {
-			    if (force_mintrap && !In_sokoban(&u.uz)) {
+			    if (force_mintrap && !Sokoban) {
 				/* openfallingtrap; not inescapable here */
 				if (in_sight) {
 				    seetrap(trap);
@@ -2251,7 +2258,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 				mptr == &mons[PM_WUMPUS] ||
 				(mtmp->wormno && count_wsegs(mtmp) > 5) ||
 				mptr->msize >= MZ_HUGE) {
-			    if (force_mintrap && !In_sokoban(&u.uz)) {
+			    if (force_mintrap && !Sokoban) {
 				/* openfallingtrap; not inescapable here */
 				if (in_sight) {
 				    seetrap(trap);
@@ -2718,7 +2725,7 @@ long hmask, emask;     /* might cancel timeout */
 		if (!(emask & W_SADDLE))
 #endif
 		{
-		    if (In_sokoban(&u.uz) && trap) {
+		    if (Sokoban && trap) {
 			/* Justification elsewhere for Sokoban traps
 			 * is based on air currents. This is
 			 * consistent with that.
@@ -2793,7 +2800,7 @@ climb_pit()
 	    display_nhwindow(WIN_MESSAGE, FALSE);
 	    clear_nhwindow(WIN_MESSAGE);
 	    You("free your %s.", body_part(LEG));
-	} else if (Flying && !In_sokoban(&u.uz)) {
+	} else if (Flying && !Sokoban) {
 	    /* eg fell in pit, poly'd to a flying monster */
 	    You("fly from the pit.");
 	    u.utrap = 0;
@@ -2801,7 +2808,7 @@ climb_pit()
 	    vision_full_recalc = 1;	/* vision limits change */
 	} else if (!(--u.utrap)) {
 	    You("%s to the edge of the pit.",
-		(In_sokoban(&u.uz) && Levitation) ?
+		(Sokoban && Levitation) ?
 		"struggle against the air currents and float" :
 #ifdef STEED
 		u.usteed ? "ride" :
@@ -4437,6 +4444,8 @@ register struct trap *trap;
 		for(ttmp = ftrap; ttmp->ntrap != trap; ttmp = ttmp->ntrap) ;
 		ttmp->ntrap = trap->ntrap;
 	}
+	if (Sokoban && (trap->ttyp == PIT || trap->ttyp == HOLE))
+		maybe_finish_sokoban();
 	dealloc_trap(trap);
 }
 
@@ -4798,6 +4807,48 @@ sink_into_lava()
 		Norep(sink_deeper);
 	    }
 	    u.utrap += rnd(4);
+	}
+    }
+}
+
+/* called when something has been done (breaking a boulder, for instance)
+   which entails a luck penalty if performed on a sokoban level */
+void
+sokoban_guilt()
+{
+    if (Sokoban) {
+	change_luck(-1);
+	/* TODO: issue some feedback so that player can learn that whatever
+	   he/she just did is a naughty thing to do in sokoban and should
+	   probably be avoided in future....
+	   Caveat: doing this might introduce message sequencing issues,
+	   depending upon feedback during the various actions which trigger
+	   Sokoban luck penalties. */
+    }
+}
+
+/* called when a trap has been deleted or had its ttyp replaced */
+STATIC_OVL void
+maybe_finish_sokoban()
+{
+    struct trap *t;
+
+    if (Sokoban && !in_mklev) {
+	/* scan all remaining traps, ignoring any created by the hero;
+	   if this level has no more pits or holes, the current sokoban
+	   puzzle has been solved */
+	for (t = ftrap; t; t = t->ntrap) {
+	    if (t->madeby_u) continue;
+	    if (t->ttyp == PIT || t->ttyp == HOLE) break;
+	}
+	if (!t) {
+	    /* we've passed the last trap without finding a pit or hole;
+	       clear the sokoban_rules flag so that luck penalties for
+	       things like breaking boulders or jumping will no longer
+	       be given, and restrictions on diagonal moves are lifted */
+	    Sokoban = 0;	/* clear level.flags.sokoban_rules */
+	    /* TODO: give some feedback about solving the sokoban puzzle
+	       (perhaps say "congratulations" in Japanese?) */
 	}
     }
 }

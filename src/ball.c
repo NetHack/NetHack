@@ -1,5 +1,4 @@
 /* NetHack 3.5	ball.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)ball.c	3.5	2007/03/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -740,8 +739,7 @@ xchar x, y;
 	newsym(u.ux0,u.uy0);		/* clean up old position */
 	if (u.ux0 != u.ux || u.uy0 != u.uy) {
 	    spoteffects(TRUE);
-	    if (In_sokoban(&u.uz))
-		change_luck(-1);	/* Sokoban guilt */
+	    sokoban_guilt();
 	}
     }
 }

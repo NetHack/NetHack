@@ -892,6 +892,7 @@ wiz_map_terrain(VOID_ARGS)
 	if (level.flags.is_maze_lev)	Strcat(dsc, " maze");
 	if (level.flags.is_cavernous_lev) Strcat(dsc, " cave");
 	if (level.flags.arboreal)	Strcat(dsc, " tree");
+	if (Sokoban)			Strcat(dsc, " sokoban-rules");
 	/* non-flag info; probably should include dungeon branching
 	   checks (extra stairs and magic portals) here */
 	if (Invocation_lev(&u.uz)) Strcat(dsc, " invoke");

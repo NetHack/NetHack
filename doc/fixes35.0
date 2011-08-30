@@ -520,6 +520,8 @@ adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
 	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
 	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
 flexibility for specifying "detect <foo>" vs "<foo> detection" when wishing
+when a sokoban puzzle has been completed (last pit or hole filled in),
+	stop assessing luck penalties and lift most movement restrictions
 
 
 Platform- and/or Interface-Specific New Features

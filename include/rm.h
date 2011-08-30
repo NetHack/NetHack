@@ -512,8 +512,9 @@ struct levelflags {
 	Bitfield(hero_memory,1);	/* hero has memory */
 	Bitfield(shortsighted,1);	/* monsters are shortsighted */
 	Bitfield(graveyard,1);		/* has_morgue, but remains set */
-	Bitfield(is_maze_lev,1);
+	Bitfield(sokoban_rules,1);	/* fill pits and holes w/ boulders */
 
+	Bitfield(is_maze_lev,1);
 	Bitfield(is_cavernous_lev,1);
 	Bitfield(arboreal, 1);		/* Trees replace rock */
 };
@@ -577,5 +578,8 @@ extern dlevel_t level;	/* structure describing the current level */
 						(struct monst *)0)
 #define m_buried_at(x,y)	(MON_BURIED_AT(x,y) ? level.monsters[x][y] : \
 						       (struct monst *)0)
+
+/* restricted movement, potential luck penalties */
+#define Sokoban level.flags.sokoban_rules
 
 #endif /* RM_H */

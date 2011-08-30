@@ -1,5 +1,4 @@
 /* NetHack 3.5	hack.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)hack.c	3.5	2008/01/22	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -135,7 +134,7 @@ moverock()
 	    mtmp = m_at(rx, ry);
 
 		/* KMH -- Sokoban doesn't let you push boulders diagonally */
-	    if (In_sokoban(&u.uz) && u.dx && u.dy) {
+	    if (Sokoban && u.dx && u.dy) {
 		if (Blind) feel_location(sx,sy);
 		pline("%s won't roll diagonally on this %s.",
 		      The(xname(otmp)), surface(sx, sy));
@@ -319,17 +318,15 @@ moverock()
 #ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
 		    You("aren't skilled enough to %s %s from %s.",
-			(flags.pickup && !In_sokoban(&u.uz))
-			    ? "pick up" : "push aside",
+			(flags.pickup && !Sokoban) ? "pick up" : "push aside",
 			the(xname(otmp)), y_monnam(u.usteed));
 		} else
 #endif
 		{
 		    pline("However, you can easily %s.",
-			(flags.pickup && !In_sokoban(&u.uz))
-			    ? "pick it up" : "push it aside");
-		    if (In_sokoban(&u.uz))
-			change_luck(-1);	/* Sokoban guilt */
+			  (flags.pickup && !Sokoban) ?
+				"pick it up" : "push it aside");
+		    sokoban_guilt();
 		    break;
 		}
 		break;
@@ -344,8 +341,7 @@ moverock()
 				     && IS_ROCK(levl[sx][u.uy].typ))))
 		|| verysmall(youmonst.data))) {
 		pline("However, you can squeeze yourself into a small opening.");
-		if (In_sokoban(&u.uz))
-		    change_luck(-1);	/* Sokoban guilt */
+		sokoban_guilt();
 		break;
 	    } else
 		return (-1);
@@ -571,7 +567,7 @@ bad_rock(mdat,x,y)
 struct permonst *mdat;
 register xchar x,y;
 {
-	return((boolean) ((In_sokoban(&u.uz) && sobj_at(BOULDER,x,y)) ||
+	return((boolean) ((Sokoban && sobj_at(BOULDER,x,y)) ||
 	       (IS_ROCK(levl[x][y].typ)
 		    && (!tunnels(mdat) || needspick(mdat) || !may_dig(x,y))
 		    && !(passes_walls(mdat) && may_passwall(x,y)))));
@@ -598,7 +594,7 @@ struct monst *mon;
     if (amt > 600) return 2;
 
     /* Sokoban restriction applies to hero only */
-    if (mon == &youmonst && In_sokoban(&u.uz)) return 3;
+    if (mon == &youmonst && Sokoban) return 3;
 
     /* can squeeze through */
     return 0;
@@ -647,6 +643,7 @@ int mode;
 	    if (mode == DO_MOVE) {
 		if (Is_stronghold(&u.uz) && is_db_wall(x,y))
 		    pline_The("drawbridge is up!");
+		/* sokoban restriction stays even after puzzle is solved */
 		if (Passes_walls && !may_passwall(x,y) && In_sokoban(&u.uz))
 		    pline_The("Sokoban walls resist your ability.");
 	    }
@@ -737,13 +734,13 @@ int mode;
 	return FALSE;
     }
 
-    if (sobj_at(BOULDER,x,y) && (In_sokoban(&u.uz) || !Passes_walls)) {
+    if (sobj_at(BOULDER,x,y) && (Sokoban || !Passes_walls)) {
 	if (!(Blind || Hallucination) && (context.run >= 2) && mode != TEST_TRAV)
 	    return FALSE;
 	if (mode == DO_MOVE) {
 	    /* tunneling monsters will chew before pushing */
 	    if (tunnels(youmonst.data) && !needspick(youmonst.data) &&
-		!In_sokoban(&u.uz)) {
+		    !Sokoban) {
 		if (still_chewing(x,y)) return FALSE;
 	    } else
 		if (moverock() < 0) return FALSE;
@@ -751,7 +748,7 @@ int mode;
 	    struct obj* obj;
 
 	    /* don't pick two boulders in a row, unless there's a way thru */
-	    if (sobj_at(BOULDER,ux,uy) && !In_sokoban(&u.uz)) {
+	    if (sobj_at(BOULDER,ux,uy) && !Sokoban) {
 		if (!Passes_walls &&
 		    !(tunnels(youmonst.data) && !needspick(youmonst.data)) &&
 		    !carrying(PICK_AXE) && !carrying(DWARVISH_MATTOCK) &&

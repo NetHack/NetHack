@@ -1,5 +1,4 @@
 /* NetHack 3.5	muse.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)muse.c	3.5	2007/04/14	*/
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -448,7 +447,7 @@ struct monst *mtmp;
 		    && !mtmp->isshk && !mtmp->isgd && !mtmp->ispriest
 		    && !is_floater(mtmp->data)
 		    /* monsters digging in Sokoban can ruin things */
-		    && !In_sokoban(&u.uz)
+		    && !Sokoban
 		    /* digging wouldn't be effective; assume they know that */
 		    && !(levl[x][y].wall_info & W_NONDIGGABLE)
 		    && !(Is_botlevel(&u.uz) || In_endgame(&u.uz))

@@ -1,5 +1,4 @@
 /* NetHack 3.5	detect.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)detect.c	3.5	2007/11/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1363,15 +1362,17 @@ sokoban_detect()
 		levl[x][y].seenv = SVALL;
 		levl[x][y].waslit = TRUE;
 		map_background(x, y, 1);
-		for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
-		    if (obj->otyp == BOULDER)
-			map_object(obj, 1);
+		if ((obj = sobj_at(BOULDER, x, y)) != 0)
+		    map_object(obj, 1);
 	    }
 
 	/* Map the traps */
 	for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
 	    ttmp->tseen = 1;
 	    map_trap(ttmp, 1);
+	    /* set sokoban_rules when there is at least one pit or hole */
+	    if (ttmp->ttyp == PIT || ttmp->ttyp == HOLE)
+		Sokoban = 1;
 	}
 }
 

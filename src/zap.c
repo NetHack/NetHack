@@ -1307,8 +1307,8 @@ poly_obj(obj, id)
 	boolean can_merge = (id == STRANGE_OBJECT);
 	int obj_location = obj->where;
 
-	if (obj->otyp == BOULDER && In_sokoban(&u.uz))
-	    change_luck(-1);	/* Sokoban guilt */
+	if (obj->otyp == BOULDER)
+	    sokoban_guilt();
 	if (id == STRANGE_OBJECT) { /* preserve symbol */
 	    int try_limit = 3;
 	    unsigned magic_obj = objects[obj->otyp].oc_magic;
@@ -3152,7 +3152,7 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 			    pline("%s jerks to an abrupt halt.",
 				  The(distant_name(obj, xname))); /* lame */
 			range = 0;
-		    } else if (In_sokoban(&u.uz) && (t = t_at(x, y)) != 0 &&
+		    } else if (Sokoban && (t = t_at(x, y)) != 0 &&
 			       (t->ttyp == PIT || t->ttyp == SPIKED_PIT ||
 				t->ttyp == HOLE || t->ttyp == TRAPDOOR)) {
 			/* hero falls into the trap, so ball stops */
@@ -4270,10 +4270,8 @@ register struct obj *obj;		   /* no texts here! */
 		breakobj(obj, x, y, TRUE, FALSE); /* charges for shop goods */
 	    }
 	}
-
-	/* A little Sokoban guilt... */
-	if (by_you && obj->otyp == BOULDER && In_sokoban(&u.uz))
-	    change_luck(-1);
+	if (by_you && obj->otyp == BOULDER)
+	    sokoban_guilt();
 
 	obj->otyp = ROCK;
 	obj->oclass = GEM_CLASS;

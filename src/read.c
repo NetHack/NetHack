@@ -563,7 +563,7 @@ forget_map(howmuch)
 {
 	register int zx, zy;
 
-	if (In_sokoban(&u.uz))
+	if (Sokoban)
 	    return;
 
 	known = TRUE;
@@ -1329,17 +1329,16 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 #ifdef REINCARNATION
 		!Is_rogue_level(&u.uz) && 
 #endif
-	    	 (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
-	    	register int x, y;
+		 (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
+		register int x, y;
 
-	    	/* Identify the scroll */
-	    	pline_The("%s rumbles %s you!", ceiling(u.ux,u.uy),
-	    		  sblessed ? "around" : "above");
-	    	known = 1;
-	    	if (In_sokoban(&u.uz))
-	    	    change_luck(-1);	/* Sokoban guilt */
+		/* Identify the scroll */
+		pline_The("%s rumbles %s you!", ceiling(u.ux,u.uy),
+			  sblessed ? "around" : "above");
+		known = 1;
+		sokoban_guilt();
 
-	    	/* Loop through the surrounding squares */
+		/* Loop through the surrounding squares */
 		if (!scursed) for (x = u.ux-1; x <= u.ux+1; x++) {
 	    	    for (y = u.uy-1; y <= u.uy+1; y++) {
 

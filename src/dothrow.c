@@ -596,7 +596,7 @@ hurtle_step(arg, x, y)
     if ((u.ux - x) && (u.uy - y) &&
 	bad_rock(youmonst.data,u.ux,y) && bad_rock(youmonst.data,x,u.uy)) {
 	/* Move at a diagonal. */
-	if (In_sokoban(&u.uz)) {
+	if (Sokoban) {
 	    You("come to an abrupt halt!");
 	    return FALSE;
 	}
@@ -624,7 +624,7 @@ hurtle_step(arg, x, y)
     		dotrap(ttmp,0);
 	} else if ((ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT ||
 		    ttmp->ttyp == HOLE || ttmp->ttyp == TRAPDOOR) &&
-		   In_sokoban(&u.uz)) {
+		   Sokoban) {
 		/* Air currents overcome the recoil */
     		dotrap(ttmp,0);
 		*range = 0;
@@ -711,8 +711,7 @@ hurtle(dx, dy, range, verbose)
 	You("%s in the opposite direction.", range > 1 ? "hurtle" : "float");
     /* if we're in the midst of shooting multiple projectiles, stop */
     endmultishot(TRUE);
-    if (In_sokoban(&u.uz))
-	change_luck(-1);	/* Sokoban guilt */
+    sokoban_guilt();
     uc.x = u.ux;
     uc.y = u.uy;
     /* this setting of cc is only correct if dx and dy are [-1,0,1] only */

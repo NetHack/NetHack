@@ -1,5 +1,4 @@
 /* NetHack 3.5	mklev.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mklev.c	3.5	2009/02/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -590,9 +589,10 @@ clear_level_structures()
 	level.flags.nommap = 0;
 	level.flags.hero_memory = 1;
 	level.flags.shortsighted = 0;
-	level.flags.arboreal = 0;
+	level.flags.sokoban_rules = 0;
 	level.flags.is_maze_lev = 0;
 	level.flags.is_cavernous_lev = 0;
+	level.flags.arboreal = 0;
 
 	nroom = 0;
 	rooms[0].hx = -1;
