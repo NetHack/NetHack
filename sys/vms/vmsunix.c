@@ -1,5 +1,4 @@
 /* NetHack 3.5	vmsunix.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)vmsunix.c	3.5	2006/12/09	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,10 +22,18 @@
 #endif
 #include <ctype.h>
 
+extern int debuggable;		/* defined in vmsmisc.c */
+
+extern void VDECL(lib$signal, (unsigned,...));
 extern unsigned long sys$setprv();
 extern unsigned long lib$getdvi(), lib$getjpi(), lib$spawn(), lib$attach();
 extern unsigned long smg$init_term_table_by_type(), smg$del_term_table();
 #define vms_ok(sts) ((sts) & 1) /* odd => success */
+
+/* this could be static; it's only used within this file;
+   it won't be used at all if C_LIB$INTIALIZE gets commented out below,
+   so make it global so that compiler won't complain that it's not used */
+int FDECL(vmsexeini, (const void *,const void *,const unsigned char *));
 
 static int FDECL(veryold, (int));
 static char *NDECL(verify_term);
@@ -548,4 +555,259 @@ char ***outarray;
 }
 #endif  /* SELECTSAVED */
 
+#ifdef PANICTRACE
+/* nethack has detected an internal error; try to give a trace of call stack */
+void
+vms_traceback(how)
+int how;	/* 1: exit after traceback; 2: stay in debugger */
+{
+    /* assumes that a static initializer applies to the first union
+       field and that no padding will be placed between len and str */
+    union dbgcmd {
+	struct ascic {
+	    unsigned char len; /* 8-bit length prefix */
+	    char str[79]; /* could be up to 255, but we don't need that much */
+	} cmd_fields;
+	char cmd[1+79];
+    };
+#define DBGCMD(arg)	{ (unsigned char)(sizeof arg - sizeof ""), arg }
+    static union dbgcmd dbg[3] = {
+	/* prologue for less verbose feedback (when combined with
+	   $ define/User_mode dbg$output _NL: ) */
+	DBGCMD("set Log SYS$OUTPUT: ; set Output Log,noTerminal,noVerify"),
+	/* enable modules with calls present on stack, then show those calls;
+	   limit traceback to 18 stack frames to avoid scrolling off screen
+	   (could check termcap LI and maybe give more, but we're operating
+	   in a last-gasp environment so apply the KISS principle...) */
+	DBGCMD("set Module/Calls ; show Calls 18"),
+	/* epilogue; "exit" ends the sequence it's part of, but it doesn't
+	   seem able to cause program termination end when used separately;
+	   instead of relying on it, we'll redirect debugger input to come
+	   from the null device so that it'll get an end-of-input condition
+	   when it tries to get a command from the user */
+	DBGCMD("exit"),
+    };
+#undef DBGCMD
+    
+    /*
+     * If we've been linked /noTraceback then we can't provide any
+     * trace of the call stack.  Linking that way is required if
+     * nethack.exe is going to be installed with privileges, so the
+     * SECURE configuration usually won't have any trace feedback.
+     */
+    if (!debuggable) {
+	;	/* debugger not available to catch lib$signal(SS$_DEBUG) */
+    } else if (how == 2) {
+	/* omit prologue and epilogue (dbg[0] and dbg[2]) */
+	(void)lib$signal(SS$_DEBUG, 1, dbg[1].cmd);
+    } else if (how == 1) {
+	/*
+	 * Suppress most of debugger's initial feedback to avoid scaring
+	 * users (and scrolling panic message off the screen).  Also control
+	 * debugging environment to try to prevent unexpected complications.
+	 */
+	/* start up with output going to /dev/null instead of stdout;
+	   once started, output is sent to log file that's actually stdout */
+	(void)vms_define("DBG$OUTPUT", "_NL:", 0);
+	/* take input from null device so debugger will see end-on-input
+	   and quit if/when it tries to get a command from the user */
+	(void)vms_define("DBG$INPUT", "_NL:", 0);
+	/* bypass any debugger initialization file the user might have */
+	(void)vms_define("DBG$INIT", "_NL:", 0);
+	/* force tty interface by suppressing DECwindows/Motif interface */
+	(void)vms_define("DBG$DECW$DISPLAY", " ", 0);
+	/* raise an exception for the debugger to catch */
+	(void)lib$signal(SS$_DEBUG, 3, dbg[0].cmd, dbg[1].cmd, dbg[2].cmd);
+    }
+
+    vms_exit(2);	/* don't return to caller (2==arbitrary non-zero) */
+    /* NOT REACHED */
+}
+#endif	/* PANICTRACE */
+
+    /*
+     * Play Hunt the Wumpus to see whether the debugger lurks nearby.
+     * It all takes place before nethack even starts, and sets up
+     * `debuggable' to control possible use of lib$signal(SS$_DEBUG).
+     */
+typedef unsigned FDECL((*condition_handler), (unsigned *,unsigned *));
+extern condition_handler FDECL(lib$establish, (condition_handler));
+extern unsigned FDECL(lib$sig_to_ret, (unsigned *,unsigned *));
+
+/* SYS$IMGSTA() is not documented:  if called at image startup, it controls
+   access to the debugger; fortunately, the linker knows now to find it
+   without needing to link against sys.stb (VAX) or use LINK/System (Alpha).
+   We won't be calling it, but we indirectly check whether it has already
+   been called by checking if nethack.exe has it as a transfer address. */
+extern unsigned FDECL(sys$imgsta, ());
+
+/*
+ * These structures are in header files contained in sys$lib_c.tlb,
+ * but that isn't available on sufficiently old versions of VMS.
+ * Construct our own:  partly stubs, with simpler field names and
+ * without ugly unions.  Contents derived from Bliss32 definitions
+ * in lib.req and/or Macro32 definitions in lib.mlb.
+ */
+struct ihd {		/* (vax) image header, $IHDDEF */
+    unsigned short size, activoff;
+    unsigned char otherstuff[512-4];
+};
+struct eihd {		/* extended image header, $EIHDDEF */
+    unsigned long majorid, minorid, size, isdoff, activoff;
+    unsigned char otherstuff[512-20];
+};
+struct iha {		/* (vax) image header activation block, $IHADEF */
+    unsigned long trnadr1, trnadr2, trnadr3;
+    unsigned long fill_, inishr;
+};
+struct eiha {		/* extended image header activation block, $EIHADEF */
+    unsigned long size, spare;
+    unsigned long trnadr1[2], trnadr2[2], trnadr3[2], trnadr4[2], inishr[2];
+};
+
+    /*
+     *	We're going to use lib$initialize, not because we need or
+     *	want to be called before main(), but because one of the
+     *	arguments passed to a lib$initialize callback is a pointer
+     *	to the image header (somewhat complex data structure which
+     *	includes the memory location(s) of where to start executing)
+     *	of the program being initialized.  It comes in two flavors,
+     *	one used by VAX and the other by Alpha and IA64.
+     *
+     *	An image can have up to three transfer addresses; one of them
+     *	decides whether to run under debugger control (RUN/Debug, or
+     *	LINK/Debug + plain RUN), another handles lib$initialize calls
+     *	if that's used, and the last is to start the program itself
+     *	(a jacket built around main() for code compiled with DEC C).
+     *	They aren't always all present; some might be zero/null.
+     *	A shareable image (pre-linked library) usually won't have any,
+     *	but can have a separate initializer (not of interest here).
+     *
+     *	The transfer targets don't have fixed slots but do occur in a
+     *	particular order:
+     *	              link      link     lib$initialize lib$initialize
+     *	    sharable  /noTrace  /Trace    + /noTrace     + /Traceback
+     *	1:  (none)    main      debugger  init-handler   debugger
+     *	2:                      main      main           init-handler
+     *	3:                                               main
+     *
+     *	We check whether the first transfer address is SYS$IMGSTA().
+     *	If it is, the debugger should be available to catch SS$_DEBUG
+     *	exception even when we don't start up under debugger control.
+     *	One extra complication:  if we *do* start up under debugger
+     *	control, the first address in the in-memory copy of the image
+     *	header will be changed from sys$imgsta() to a value in system
+     *	space.  [I don't know how to reference that one symbolically,
+     *	so I'm going to treat any address in system space as meaning
+     *	that the debugger is available.  pr]
+     */
+
+/* called via lib$initialize during image activation:  before main() and
+   with magic arguments; C run-time library won't be initialized yet */
+/*ARGSUSED*/
+int
+vmsexeini(inirtn_unused, clirtn_unused, imghdr)
+const void *inirtn_unused, *clirtn_unused;
+const unsigned char *imghdr;
+{
+    const struct ihd  *vax_hdr;
+    const struct eihd *axp_hdr;
+    const struct iha  *vax_xfr;
+    const struct eiha *axp_xfr;
+    unsigned long trnadr1;
+
+    (void)lib$establish(lib$sig_to_ret);	/* set up condition handler */
+    /*
+     * Check the first of three transfer addresses to see whether
+     * it is SYS$IMGSTA().  Note that they come from a file,
+     * where they reside as longword or quadword integers rather
+     * than function pointers.  (Basically just a C type issue;
+     * casting back and forth between integer and pointer doesn't
+     * change any bits for the architectures VMS runs on.)
+     */
+    debuggable = 0;
+    /* start with a guess rather than bothering to figure out architecture */
+    vax_hdr = (struct ihd *)imghdr;
+    if (vax_hdr->size >= 512) {
+	/* this is a VAX-specific header; addresses are longwords */
+	vax_xfr = (struct iha *)(imghdr + vax_hdr->activoff);
+	trnadr1 = vax_xfr->trnadr1;
+    } else {
+	/* the guess above was wrong; imghdr's first word is not
+	   the size field, it's a version number component */
+	axp_hdr = (struct eihd *)imghdr;
+	/* this is an Alpha or IA64 header; addresses are quadwords
+	   but we ignore the upper half which will be all 0's or 0xF's
+	   (we hope; if not, assume it still won't matter for this test) */
+	axp_xfr = (struct eiha *)(imghdr + axp_hdr->activoff);
+	trnadr1 = axp_xfr->trnadr1[0];
+    }
+    if ((unsigned (*)())trnadr1 == sys$imgsta ||
+	    /* check whether first transfer address points to system space
+	       [we want (trnadr1 >= 0x80000000UL) but really old compilers
+	       don't support the UL suffix, so do a signed compare instead] */
+	    (long)trnadr1 < 0L) debuggable = 1;
+    return 1;	/* success (return value here doesn't actually matter) */
+}
+
+/*
+ * Setting up lib$initialize transfer block is trivial with Macro32,
+ * but we don't want to introduce use of assembler code.  Doing it
+ * with C requires jiggery-pokery here and again when linking, and
+ * may not work with some compiler versions.  The lib$initialize
+ * transfer block is an open-ended array of 32-bit routine addresses
+ * in a psect named "lib$initialize" with particular attributes (one
+ * being "concatenate" so that multiple instances of lib$initialize
+ * are appended rather than overwriting each other).
+ *
+ * VAX C made global variables become named program sections, to be
+ * compatable with Fortran COMMON blocks, simplifying mixed-language
+ * programs.  GNU C for VAX/VMS did the same, to be compatable with
+ * VAX C.  By default, DEC C makes global variables be global symbols
+ * instead, with its /Extern_Model=Relaxed_Ref_Def mode, but can be
+ * told to be VAX C compatable by using /Extern_Model=Common_Block.
+ *
+ * We don't want to force that for the whole program; occasional use
+ * of /Extern_Model=Strict_Ref_Def to find mistakes is too useful.
+ * Also, using symbols instead of psects is more robust when linking
+ * with an object library if the module defining the symbol contains
+ * only data.  With a psect, any declaration is enough to become a
+ * definition and the linker won't bother hunting through a library
+ * to find another one unless explicitly told to do so.  Bad news
+ * if that other one happens to include the intended initial value
+ * and someone bypasses `make' to link interactively but neglects
+ * to give the linker enough explicit directions.  Linking like that
+ * would work, but the program wouldn't.
+ *
+ * So, we switch modes for this hack only.  Besides, psect attributes
+ * for lib$initialize are different from the ones used for ordinary
+ * variables, so we'd need to resort to some linker magic anyway.
+ * (With assembly language, in addtion to having full control of the
+ * psect attributes in the source code, Macro32 would include enough
+ * information in its object file such that linker wouldn't need any
+ * extra instructions from us to make this work.)  [If anyone links
+ * manually now and neglects the esoteric details, vmsexeini() won't
+ * get called and `debuggable' will stay 0, so lib$signal(SS$_DEBUG)
+ * will be avoided even when its use is viable.  But the program will
+ * still work correctly.]
+ */
+#define C_LIB$INITIALIZE	/* comment out if this won't compile...   */
+				/* (then `debuggable' will always stay 0) */
+#ifdef C_LIB$INITIALIZE
+# ifdef __DECC
+#  pragma extern_model save		/* push current mode */
+#  pragma extern_model common_block	/* set new mode */
+# endif
+/* values are 32-bit function addresses; pointers might be 64 so avoid them */
+extern const unsigned long lib$initialize[1];	/* size is actually variable */
+const unsigned long lib$initialize[] = { (unsigned long)(void *)vmsexeini };
+# ifdef __DECC
+#  pragma extern_model restore		/* pop previous mode */
+# endif
+/*	We also need to link against a linker options file containing:
+sys$library:starlet.olb/Include=(lib$initialize)
+psect_attr=lib$initialize, Con,Usr,noPic,Rel,Gbl,noShr,noExe,Rd,noWrt,Long
+ */
+#endif	/* C_LIB$INITIALIZE */
+    /* End of debugger hackery. */
 /*vmsunix.c*/

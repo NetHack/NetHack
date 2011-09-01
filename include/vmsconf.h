@@ -85,7 +85,7 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
  *                # (not as useful as it might sound since we're normally
  *                # linked /noDebug so there's no symbol table accessible)
  */
-/* #define PANICTRACE */
+#define PANICTRACE
 
 /*
  * Put the readonly data files into a single container rather than into

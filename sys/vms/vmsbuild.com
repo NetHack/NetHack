@@ -175,6 +175,8 @@ $	nethacklib = "[-.src]nethack.olb"
 $	create nethack.opt
 ! nethack.opt
 nethack.olb/Library/Include=(vmsmain)
+sys$library:starlet.olb/Include=(lib$initialize)
+psect_attr=lib$initialize, Con,Usr,noPic,Rel,Gbl,noShr,noExe,Rd,noWrt,Long
 iosegment=128
 $	if f$search("nethack.opt;-2").nes."" then  purge/Keep=2/noLog nethack.opt
 $	milestone = "write sys$output f$fao("" !5%T "",0),"

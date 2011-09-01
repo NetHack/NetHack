@@ -200,6 +200,9 @@ nethack.opt :	$(MAKEFILE)	# this file
       @ write f f$edit("$(HOBJ4)","COLLAPSE")
       @ write f f$edit("$(HOBJ5)","COLLAPSE")
       @ write f f$edit("$(HOBJ6)","COLLAPSE")
+      @ write f "sys$library:starlet.olb/Include=(lib$initialize)
+      @ write f \
+ "psect_attr=lib$initialize, Con,Usr,noPic,Rel,Gbl,noShr,noExe,Rd,noWrt,Long"
       @ write f "iosegment=128"
 	close f
 

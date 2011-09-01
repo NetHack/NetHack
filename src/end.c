@@ -329,15 +329,17 @@ done2()
 	if(wizard) {
 	    int c;
 # ifdef VMS
-	    const char *tmp = "Enter debugger?";
+	    extern int debuggable;	/* sys/vms/vmsmisc.c, vmsunix.c */
+
+	    c = !debuggable ? 'n' : ynq("Enter debugger?");
 # else
 #  ifdef LATTICE
-	    const char *tmp = "Create SnapShot?";
+	    c = ynq("Create SnapShot?");
 #  else
-	    const char *tmp = "Dump core?";
+	    c = ynq("Dump core?");
 #  endif
 # endif
-	    if ((c = ynq(tmp)) == 'y') {
+	    if (c == 'y') {
 # ifndef NO_SIGNAL
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 # endif
