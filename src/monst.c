@@ -1574,13 +1574,15 @@ struct permonst _mons2[] = {
 /*
  * Jabberwock
  */
+	/* the illustration from _Through_the_Looking_Glass_
+	   depicts hands as well as wings */
     MON("jabberwock", S_JABBERWOCK,
 	LVL(15, 12, -2, 50, 0), (G_GENO|1),
 	A(ATTK(AT_BITE, AD_PHYS, 2,10), ATTK(AT_BITE, AD_PHYS, 2,10),
 	  ATTK(AT_CLAW, AD_PHYS, 2,10), ATTK(AT_CLAW, AD_PHYS, 2,10),
 	  NO_ATTK, NO_ATTK),
 	SIZ(1300, 600, MS_BURBLE, MZ_LARGE), 0, 0,
-	M1_ANIMAL|M1_NOHANDS|M1_FLY|M1_CARNIVORE,
+	M1_ANIMAL|M1_FLY|M1_CARNIVORE,
 	M2_HOSTILE|M2_STRONG|M2_NASTY|M2_COLLECT, M3_INFRAVISIBLE, CLR_ORANGE),
 #if 0	/* DEFERRED */
     MON("vorpal jabberwock", S_JABBERWOCK,       
@@ -1589,7 +1591,7 @@ struct permonst _mons2[] = {
 	  ATTK(AT_CLAW, AD_PHYS, 3, 10), ATTK(AT_CLAW, AD_PHYS, 3, 10),
 	  NO_ATTK, NO_ATTK),
 	SIZ(1300, 600, MS_BURBLE, MZ_LARGE), 0, 0,
-	M1_ANIMAL|M1_NOHANDS|M1_FLY|M1_CARNIVORE,
+	M1_ANIMAL|M1_FLY|M1_CARNIVORE,
 	M2_HOSTILE|M2_STRONG|M2_NASTY|M2_COLLECT, M3_INFRAVISIBLE, HI_LORD),
 #endif
 #ifdef KOPS
