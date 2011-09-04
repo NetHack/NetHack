@@ -1759,11 +1759,15 @@ struct obj *otmp;
 		    pline("My, that was a %s %s!",
 			  Hallucination ? "primo" : "yummy",
 			  singular(otmp, xname));
+		else if (otmp->otyp == APPLE && otmp->cursed &&
+			!Sleep_resistance)
+		    ;	/* skip core joke; feedback deferred til fpostfx() */
 		else
 #ifdef UNIX
 		if (otmp->otyp == APPLE || otmp->otyp == PEAR) {
-		    if (!Hallucination) pline("Core dumped.");
-		    else {
+		    if (!Hallucination) {
+			pline("Core dumped.");
+		    } else {
 /* This is based on an old Usenet joke, a fake a.out manual page */
 			int x = rnd(100);
 			if (x <= 75)
@@ -2121,6 +2125,20 @@ register struct obj *otmp;
 		if (Vomiting && !otmp->cursed)
 		    make_vomiting(0L, TRUE);
 		break;
+	    case APPLE:
+		if (otmp->cursed && !Sleep_resistance) {
+		    /* Snow White; 'poisoned' applies to [a subset of] weapons,
+		       not food, so we substitute cursed; fortunately our hero
+		       won't have to wait for a prince to be rescued/revived */
+		    if (Race_if(PM_DWARF) && Hallucination)
+			verbalize("Heigh-ho, ho-hum, I think I'll skip work today.");
+		    else if (Deaf || !flags.acoustics)
+			You("fall asleep.");
+		    else
+			You_hear("sinister laughter as you fall asleep...");
+		    fall_asleep(-rn1(11, 20), TRUE);
+		}
+		break;
 	}
 	return;
 }
@@ -2221,6 +2239,12 @@ struct obj *otmp;
 			foodsmell, it_or_they, eat_it_anyway);
 		if (yn_function(buf,ynchars,'n')=='n') return 1;
 		else return 2;
+	}
+	if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
+		/* causes sleep, for long enough to be dangerous */
+		Sprintf(buf, "%s like %s might have been poisoned. %s",
+			foodsmell, it_or_they, eat_it_anyway);
+		return (yn_function(buf, ynchars, 'n') == 'n') ? 1 : 2;
 	}
 	if (cadaver && !vegetarian(&mons[mnum]) &&
 	    !u.uconduct.unvegetarian && Role_if(PM_MONK)) {
