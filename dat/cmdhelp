@@ -82,6 +82,7 @@ Z       Zap (cast) a spell
 &       Tell what a command does
 !       Do a shell escape (only if defined)
 \       Show what object types have been discovered
+`       Show discovered types for one class of objects
 _       Travel via a shortest-path algorithm to a point on the map 
 .       Rest one move while doing nothing
         Rest one move while doing nothing (if rest_on_space option is on)

@@ -79,6 +79,7 @@ Z       Zap     cast a spell  (use Y instead of Z if number_pad is -1)
 *               ask for combination of ),[,=,",( all at once
 $       gold    count your gold
 +       spells  list the spells you know; also rearrange them if desired
+`       classkn display known items for one class of objects
 _       travel  move via a shortest-path algorithm to a point on the map 
 .       rest    wait a moment
 ,       pickup  pick up all you can carry

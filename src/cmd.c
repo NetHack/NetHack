@@ -78,6 +78,7 @@ extern int NDECL(doopen); /**/
 extern int NDECL(doclose); /**/
 extern int NDECL(dosh); /**/
 extern int NDECL(dodiscovered); /**/
+extern int NDECL(doclassdisco); /**/
 extern int NDECL(doset); /**/
 extern int NDECL(dotogglepickup); /**/
 extern int NDECL(dowhatis); /**/
@@ -2261,6 +2262,7 @@ static const struct func_tab cmdlist[] = {
 	{';', TRUE, doquickwhatis},
 	{'^', TRUE, doidtrap},
 	{'\\', TRUE, dodiscovered},		/* Robert Viduya */
+	{'`', TRUE, doclassdisco},
 	{'@', TRUE, dotogglepickup},
 	{M('2'), FALSE, dotwoweapon},
 	{WEAPON_SYM,  TRUE, doprwep},

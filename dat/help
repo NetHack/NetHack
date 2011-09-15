@@ -166,6 +166,7 @@ Commands:
         $       Count your gold pieces.
         +       List the spells you know; also rearrange them if desired.
         \       Show what types of objects have been discovered.
+        `       Show discovered types for one class of objects.
         !       Escape to a shell, if supported in your version and OS.
         #       Introduces one of the "extended" commands.  To get a list of
                 the commands you can use with "#" type "#?".  The extended

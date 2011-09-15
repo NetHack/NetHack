@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.5
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 17, 2011
+.ds f2 "September 14, 2011
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -767,6 +767,8 @@ be added to the end of the list rather than be inserted into the sorted
 ordering.)
 .lp "\e
 Show what types of objects have been discovered.
+.lp `
+Show discovered types for one class of objects.
 .lp !
 Escape to a shell.
 .lp #

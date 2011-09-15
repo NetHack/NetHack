@@ -522,6 +522,7 @@ adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
 flexibility for specifying "detect <foo>" vs "<foo> detection" when wishing
 when a sokoban puzzle has been completed (last pit or hole filled in),
 	stop assessing luck penalties and lift most movement restrictions
+'`' command to show discoveries for one class of objects
 
 
 Platform- and/or Interface-Specific New Features

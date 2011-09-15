@@ -1,5 +1,4 @@
 /* NetHack 3.5	o_init.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)o_init.c	3.5	2007/05/21	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,7 +9,7 @@ STATIC_DCL void FDECL(setgemprobs, (d_level*));
 STATIC_DCL void FDECL(shuffle,(int,int,BOOLEAN_P));
 STATIC_DCL void NDECL(shuffle_all);
 STATIC_DCL boolean FDECL(interesting_to_discover,(int));
-
+STATIC_DCL char *FDECL(oclass_to_name, (CHAR_P,char *));
 
 static NEARDATA short disco[NUM_OBJECTS] = DUMMY;
 
@@ -404,6 +403,7 @@ static short uniq_objs[] = {
 	BELL_OF_OPENING,
 };
 
+/* the '\' command - show discovered object types */
 int
 dodiscovered()				/* free after Robert Viduya */
 {
@@ -421,7 +421,7 @@ dodiscovered()				/* free after Robert Viduya */
     for (i = dis = 0; i < SIZE(uniq_objs); i++)
 	if (objects[uniq_objs[i]].oc_name_known) {
 	    if (!dis++)
-		putstr(tmpwin, iflags.menu_headings, "Unique Items");
+		putstr(tmpwin, iflags.menu_headings, "Unique items");
 		Sprintf(buf, "  %s", OBJ_NAME(objects[uniq_objs[i]]));
 	    putstr(tmpwin, 0, buf);
 	    ++ct;
@@ -460,6 +460,179 @@ dodiscovered()				/* free after Robert Viduya */
 	display_nhwindow(tmpwin, TRUE);
     destroy_nhwindow(tmpwin);
 
+    return 0;
+}
+
+/* lower case let_to_name() output, which differs from def_oc_syms[].name */
+STATIC_OVL char *
+oclass_to_name(oclass, buf)
+char oclass;
+char *buf;
+{
+    char *s;
+
+    Strcpy(buf, let_to_name(oclass, FALSE));
+    for (s = buf; *s; ++s) *s = lowc(*s);
+    return buf;
+}
+
+/* the '`' command - show discovered object types for one class */
+int
+doclassdisco()
+{
+    static NEARDATA const char
+	prompt[] = "View discoveries for which sort of objects?",
+	havent_discovered_any[] = "haven't discovered any %s yet.",
+	unique_items[] = "unique items", artifact_items[] = "artifacts";
+    char *s, c, oclass, menulet,
+	allclasses[MAXOCLASSES], discosyms[2+MAXOCLASSES+1], buf[BUFSZ];
+    int i, ct, dis, xtras;
+    boolean traditional;
+    winid tmpwin;
+    anything any;
+    menu_item *pick_list = 0;
+
+    discosyms[0] = '\0';
+    traditional = (flags.menu_style == MENU_TRADITIONAL ||
+		   flags.menu_style == MENU_COMBINATION);
+    tmpwin = !traditional ? create_nhwindow(NHW_MENU) : WIN_ERR;
+    any = zeroany;
+    menulet = 'a';
+
+    /* check whether we've discovered any unique objects */
+    for (i = 0; i < SIZE(uniq_objs); i++)
+	if (objects[uniq_objs[i]].oc_name_known) {
+	    Strcat(discosyms, "u");
+	    if (!traditional) {
+		any.a_int = 'u';
+		add_menu(tmpwin, NO_GLYPH, &any, menulet++, 0, ATR_NONE,
+			 unique_items, MENU_UNSELECTED);
+	    }
+	    break;
+	}
+
+    /* check whether we've discovered any artifacts */
+    if (disp_artifact_discoveries(WIN_ERR) > 0) {
+	Strcat(discosyms, "a");
+	if (!traditional) {
+	    any.a_int = 'a';
+	    add_menu(tmpwin, NO_GLYPH, &any, menulet++, 0, ATR_NONE,
+		     artifact_items, MENU_UNSELECTED);
+	}
+    }
+
+    /* collect classes with discoveries, in packorder ordering; several
+       classes are omitted from packorder and one is of interest here */
+    Strcpy(allclasses, flags.inv_order);
+    if (!index(allclasses, VENOM_CLASS))
+	Sprintf(eos(allclasses), "%c", VENOM_CLASS);
+    /* construct discosyms[] */
+    for (s = allclasses; *s; ++s) {
+	oclass = *s;
+	c = def_oc_syms[oclass].sym;
+	for (i = bases[(int)oclass];
+		i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i)
+	    if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
+		if (!index(discosyms, c)) {
+		    Sprintf(eos(discosyms), "%c", c);
+		    if (!traditional) {
+			any.a_int = c;
+			add_menu(tmpwin, NO_GLYPH, &any,
+				 menulet++, c, ATR_NONE,
+				 oclass_to_name(oclass, buf), MENU_UNSELECTED);
+		    }
+		}
+	    }
+    }
+
+    /* there might not be anything for us to do... */
+    if (!discosyms[0]) {
+	You(havent_discovered_any, "items");
+	if (tmpwin != WIN_ERR) destroy_nhwindow(tmpwin);
+	return 0;
+    }
+
+    /* have player choose a class */
+    c = '\0';	/* class not chosen yet */
+    if (traditional) {
+	/* we'll prompt even if there's only one viable class; we add all
+	   nonviable classes as unseen acceptable choices so player can ask
+	   for discoveries of any class whether it has discoveries or not */
+	for (s = allclasses, xtras = 0; *s; ++s) {
+	    c = def_oc_syms[*s].sym;
+	    if (!index(discosyms, c)) {
+		if (!xtras++) Sprintf(eos(discosyms), "%c", '\033');
+		Sprintf(eos(discosyms), "%c", c);
+	    }
+	}
+	/* get the class (via its symbol character) */
+	c = yn_function(prompt, discosyms, '\0');
+#ifdef REDO
+	savech(c);
+#endif
+	if (!c)
+	    clear_nhwindow(WIN_MESSAGE);
+    } else {
+	/* menustyle:full or menustyle:partial */
+	if (!discosyms[1] && flags.menu_style == MENU_PARTIAL) {
+	    /* only one class; menustyle:partial normally jumps past class
+	       filtering straight to final menu so skip class filter here */
+	    c = discosyms[0];
+	} else {
+	    /* more than one choice, or menustyle:full which normally has
+	       an intermediate class selection menu before the final menu */
+	    end_menu(tmpwin, prompt);
+	    i = select_menu(tmpwin, PICK_ONE, &pick_list);
+	    if (i > 0) {
+		c = pick_list[0].item.a_int;
+		free((genericptr_t) pick_list);
+	    } /* else c stays 0 */
+	}
+	destroy_nhwindow(tmpwin);
+    }
+    if (!c) return 0;		/* player declined to make a selection */
+
+    /*
+     * show discoveries for object class c
+     */
+    tmpwin = create_nhwindow(NHW_MENU);
+    ct = 0;
+    switch (c) {
+    case 'u':
+	putstr(tmpwin, iflags.menu_headings,
+	       upstart(strcpy(buf, unique_items)));
+	for (i = 0; i < SIZE(uniq_objs); i++)
+	    if (objects[uniq_objs[i]].oc_name_known) {
+		Sprintf(buf, "  %s", OBJ_NAME(objects[uniq_objs[i]]));
+		putstr(tmpwin, 0, buf);
+		++ct;
+	    }
+	if (!ct) You(havent_discovered_any, unique_items);
+	break;
+    case 'a':
+	/* disp_artifact_discoveries() includes a header */
+	ct = disp_artifact_discoveries(tmpwin);
+	if (!ct) You(havent_discovered_any, artifact_items);
+	break;
+    default:
+	oclass = def_char_to_objclass(c);
+	Sprintf(buf, "Discovered %s", let_to_name(oclass, FALSE));
+	putstr(tmpwin, iflags.menu_headings, buf);
+	for (i = bases[(int)oclass];
+		i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i) {
+	    if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
+		Sprintf(buf, "%s %s",
+			objects[dis].oc_pre_discovered ? "*" : " ",
+			obj_typename(dis));
+		putstr(tmpwin, 0, buf);
+		++ct;
+	    }
+	}
+	if (!ct) You(havent_discovered_any, oclass_to_name(oclass, buf));
+	break;
+    }
+    if (ct) display_nhwindow(tmpwin, TRUE);
+    destroy_nhwindow(tmpwin);
     return 0;
 }
 
