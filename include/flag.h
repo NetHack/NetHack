@@ -50,7 +50,6 @@ struct flag {
 	boolean  standout;	/* use standout for --More-- */
 	boolean  time;		/* display elapsed 'time' */
 	boolean  tombstone;	/* print tombstone */
-	boolean  toptenwin;	/* ending list in window instead of stdout */
 	boolean  verbose;	/* max battle info */
 	int	 end_top, end_around;	/* describe desired score list */
 	unsigned moonphase;
@@ -194,6 +193,7 @@ struct instance_flags {
 				  * on some non-move commands */
 	boolean  renameallowed; /* can change hero name during role selection */
 	boolean  renameinprogress; /* we are changing hero name */
+	boolean  toptenwin;	/* ending list in window instead of stdout */
 	boolean  zerocomp;	/* write zero-compressed save files */
 	boolean  rlecomp;	/* run-length comp of levels when writing savefile */
 	uchar	 num_pad_mode;
