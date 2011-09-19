@@ -1,5 +1,4 @@
 /* NetHack 3.5	wingem.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)wingem.c	3.5	1999/12/10				*/
 /* Copyright (c) Christian Bressler, 1999					*/
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -573,7 +572,7 @@ Gem_exit_nhwindows(str)
 {
 	if(str)	Gem_raw_print(str);
 	mar_exit_nhwindows();
-	if(flags.toptenwin)
+	if(iflags.toptenwin)
 		run_from_desktop=FALSE;
 	iflags.window_inited = 0;
 }

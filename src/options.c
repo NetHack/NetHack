@@ -207,7 +207,7 @@ static struct Bool_Opt
 	{"timed_delay", (boolean *)0, FALSE, SET_IN_GAME},
 #endif
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
-	{"toptenwin",&flags.toptenwin, FALSE, SET_IN_GAME},
+	{"toptenwin",&iflags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &flags.travelcmd, TRUE, SET_IN_GAME},
 #ifdef UNICODE_SUPPORT
 	{"unicode", &iflags.unicodedisp, FALSE, SET_IN_GAME},

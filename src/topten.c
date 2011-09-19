@@ -1,5 +1,4 @@
 /* NetHack 3.5	topten.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)topten.c	3.5	2007/03/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -302,7 +301,7 @@ int how;
 	if (program_state.panicking)
 		return;
 
-	if (flags.toptenwin) {
+	if (iflags.toptenwin) {
 	    toptenwin = create_nhwindow(NHW_TEXT);
 	}
 
@@ -551,10 +550,11 @@ int how;
 	free_ttlist(tt_head);
 
   showwin:
-	if (flags.toptenwin && !done_stopprint) display_nhwindow(toptenwin, 1);
+	if (iflags.toptenwin && !done_stopprint)
+	    display_nhwindow(toptenwin, 1);
   destroywin:
 	if (!t0_used) dealloc_ttentry(t0);
-	if (flags.toptenwin) {
+	if (iflags.toptenwin) {
 	    destroy_nhwindow(toptenwin);
 	    toptenwin=WIN_ERR;
 	}

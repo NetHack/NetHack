@@ -180,7 +180,7 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	 * write output to a window or stdout.  stdout doesn't make sense on Windows
 	 * non-console applications
 	 */
-	flags.toptenwin = 1;
+	iflags.toptenwin = 1;
 	set_option_mod_status("toptenwin", SET_IN_FILE);
 
 	/* initialize map tiles bitmap */

@@ -1,5 +1,4 @@
 /* NetHack 3.5	mswproc.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mswproc.c	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -218,7 +217,7 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	 * write output to a window or stdout.  stdout doesn't make sense on Windows
 	 * non-console applications
 	 */
-	flags.toptenwin = 1;
+	iflags.toptenwin = 1;
 	set_option_mod_status("toptenwin", SET_IN_FILE);
 	set_option_mod_status("perm_invent", SET_IN_FILE);
 

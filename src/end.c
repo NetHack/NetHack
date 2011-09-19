@@ -1220,7 +1220,7 @@ die:
 
 	/* "So when I die, the first thing I will see in Heaven is a
 	 * score list?" */
-	if (flags.toptenwin) {
+	if (iflags.toptenwin) {
 	    topten(how);
 	    if (have_windows)
 		exit_nhwindows((char *)0);
