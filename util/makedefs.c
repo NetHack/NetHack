@@ -174,6 +174,7 @@ static boolean FDECL(ranged_attk,(struct permonst*));
 static int FDECL(mstrength,(struct permonst *));
 static void NDECL(build_savebones_compat_string);
 static void FDECL(do_ext_makedefs,(int , char **));
+static void NDECL(windowing_sanity);
 
 static boolean FDECL(qt_comment, (char *));
 static boolean FDECL(qt_control, (char *));
@@ -1107,6 +1108,10 @@ do_date()
 	char *c, cbuf[60], buf[BUFSZ];
 	const char *ul_sfx;
 
+	/* before creating date.h, make sure that xxx_GRAPHICS and
+	   DEFAULT_WINDOW_SYS have been set up in a viable fashion */
+	windowing_sanity();
+
 	filename[0]='\0';
 #ifdef FILE_PREFIX
 	Strcat(filename,file_prefix);
@@ -1360,42 +1365,84 @@ static const char *build_opts[] = {
 		"basic NetHack features"
 	};
 
-static const char *window_opts[] = {
+struct win_info {
+    const char *id,	/* DEFAULT_WINDOW_SYS string */
+	       *name;	/* description, often same as id */
+};
+static struct win_info window_opts[] = {
 #ifdef TTY_GRAPHICS
-		"traditional tty-based graphics",
+		{ "tty", "traditional tty-based graphics" },
 #endif
 #ifdef X11_GRAPHICS
-		"X11",
+		{ "X11", "X11" },
 #endif
 #ifdef QT_GRAPHICS
-		"Qt",
+		{ "Qt", "Qt" },
 #endif
 #ifdef GNOME_GRAPHICS
-		"Gnome",
+		{ "Gnome", "Gnome" },
 #endif
 #ifdef MAC
-		"Mac",
+		{ "mac", "Mac" },
 #endif
 #ifdef AMIGA_INTUITION
-		"Amiga Intuition",
+		{ "amii", "Amiga Intuition" },
 #endif
 #ifdef GEM_GRAPHICS
-		"Gem",
+		{ "Gem", "Gem" },
 #endif
 #ifdef MSWIN_GRAPHICS
-		"mswin",
+		{ "mswin", "mswin" },
 #endif
 #ifdef BEOS_GRAPHICS
-		"BeOS InterfaceKit",
+		{ "BeOS", "BeOS InterfaceKit" },
 #endif
-		0
+		{ 0, 0 }
 	};
+
+static void
+windowing_sanity()
+{
+#ifndef DEFAULT_WINDOW_SYS
+	Fprintf(stderr,
+ "Configuration error: DEFAULT_WINDOW_SYS is not defined.\n");
+	exit(EXIT_FAILURE);
+	/*NOTREACHED*/
+#else	/*DEFAULT_WINDOW_SYS*/
+
+	if (!window_opts[0].id) {
+		Fprintf(stderr,
+ "Configuration error: no windowing systems (TTY_GRAPHICS, &c) enabled.\n");
+		exit(EXIT_FAILURE);
+	}
+
+    {
+	int i;
+
+	for (i = 0; window_opts[i].id; ++i)
+		if (!strcmp(window_opts[i].id, DEFAULT_WINDOW_SYS)) break;
+	if (!window_opts[i].id) { /* went through whole list without a match */
+		Fprintf(stderr,
+ "Configuration error: DEFAULT_WINDOW_SYS (%s)\n", DEFAULT_WINDOW_SYS);
+		Fprintf(stderr,
+ " does not match any enabled windowing system (%s%s).\n",
+			window_opts[0].id,
+			window_opts[1].id ? ", &c" : "");
+		exit(EXIT_FAILURE);
+	}
+    }
+#endif	/*DEFAULT_WINDOW_SYS*/
+}
 
 void
 do_options()
 {
-	register int i, length;
-	register const char *str, *indent = "    ";
+	boolean multiple_windowing_systems;
+	int i, length;
+	const char *str, *indent = "    ";
+
+	windowing_sanity();
+	multiple_windowing_systems = (window_opts[1].id != 0);
 
 	filename[0]='\0';
 #ifdef FILE_PREFIX
@@ -1417,7 +1464,6 @@ do_options()
 		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
 
 	Fprintf(ofp,"\nOptions compiled into this edition:\n");
-
 	length = COLNO + 1;	/* force 1st item onto new line */
 	for (i = 0; i < SIZE(build_opts); i++) {
 	    str = build_opts[i];
@@ -1429,19 +1475,21 @@ do_options()
 	    Fprintf(ofp,(i < SIZE(build_opts) - 1) ? "," : "."),  length++;
 	}
 
-	Fprintf(ofp,"\n\nSupported windowing systems:\n");
-
+	Fprintf(ofp, "\n\nSupported windowing system%s:\n",
+		multiple_windowing_systems ? "s" : "");
 	length = COLNO + 1;	/* force 1st item onto new line */
 	for (i = 0; i < SIZE(window_opts) - 1; i++) {
-	    str = window_opts[i];
+	    str = window_opts[i].name;
 	    if (length + strlen(str) > COLNO - 5)
 		Fprintf(ofp,"\n%s", indent),  length = strlen(indent);
 	    else
 		Fprintf(ofp," "),  length++;
 	    Fprintf(ofp,"%s", str),  length += strlen(str);
-	    Fprintf(ofp, ","),  length++;
+	    Fprintf(ofp, multiple_windowing_systems ? "," : "."),  length++;
 	}
-	Fprintf(ofp, "\n%swith a default of %s.", indent, DEFAULT_WINDOW_SYS);
+	if (multiple_windowing_systems)
+		Fprintf(ofp, "\n%swith a default of %s.",
+			indent, DEFAULT_WINDOW_SYS);
 	Fprintf(ofp,"\n\n");
 
 	Fclose(ofp);
