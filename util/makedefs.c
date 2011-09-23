@@ -1201,7 +1201,7 @@ static const char *build_opts[] = {
 		"ANSI default terminal",
 #endif
 #ifdef AUTOPICKUP_EXCEPTIONS
-		"autopickup_exceptions",
+		"autopickup exceptions",
 #endif
 #ifdef TEXTCOLOR
 		"color",
@@ -1359,10 +1359,10 @@ static const char *build_opts[] = {
 		"run-length compression of map in save files",
 #endif
 #ifdef SYSCF
-		"system configuration",
+		"system configuration at run-time",
 #endif
 		save_bones_compat_buf,
-		"basic NetHack features"
+		"and basic NetHack features"
 	};
 
 struct win_info {
@@ -1404,10 +1404,15 @@ static void
 windowing_sanity()
 {
 #ifndef DEFAULT_WINDOW_SYS
+	/* pre-standard compilers didn't support #error; wait til run-time */
 	Fprintf(stderr,
  "Configuration error: DEFAULT_WINDOW_SYS is not defined.\n");
 	exit(EXIT_FAILURE);
 	/*NOTREACHED*/
+
+	/* put in a dummy value so that do_options() will compile and makedefs
+	   will build, otherwise the message above won't ever get delivered */
+# define DEFAULT_WINDOW_SYS "<undefined>"
 #else	/*DEFAULT_WINDOW_SYS*/
 
 	if (!window_opts[0].id) {
@@ -1437,12 +1442,12 @@ windowing_sanity()
 void
 do_options()
 {
-	boolean multiple_windowing_systems;
-	int i, length;
-	const char *str, *indent = "    ";
+	static const char indent[] = "    ";
+	const char *str, *sep;
+	char *word, buf[BUFSZ];
+	int i, length, winsyscnt;
 
 	windowing_sanity();
-	multiple_windowing_systems = (window_opts[1].id != 0);
 
 	filename[0]='\0';
 #ifdef FILE_PREFIX
@@ -1466,28 +1471,38 @@ do_options()
 	Fprintf(ofp,"\nOptions compiled into this edition:\n");
 	length = COLNO + 1;	/* force 1st item onto new line */
 	for (i = 0; i < SIZE(build_opts); i++) {
-	    str = build_opts[i];
-	    if (length + strlen(str) > COLNO - 5)
-		Fprintf(ofp,"\n%s", indent),  length = strlen(indent);
-	    else
-		Fprintf(ofp," "),  length++;
-	    Fprintf(ofp,"%s", str),  length += strlen(str);
+	    str = strcpy(buf, build_opts[i]);
+	    while (*str) {
+		word = index(str, ' ');
+		if (word) *word = '\0';
+		if (length + strlen(str) > COLNO - 5)
+		    Fprintf(ofp,"\n%s", indent),  length = strlen(indent);
+		else
+		    Fprintf(ofp," "),  length++;
+		Fprintf(ofp,"%s", str),  length += strlen(str);
+		str += strlen(str) + (word ? 1 : 0);
+	    }
 	    Fprintf(ofp,(i < SIZE(build_opts) - 1) ? "," : "."),  length++;
 	}
 
+	winsyscnt = SIZE(window_opts) - 1;
 	Fprintf(ofp, "\n\nSupported windowing system%s:\n",
-		multiple_windowing_systems ? "s" : "");
+		(winsyscnt > 1) ? "s" : "");
 	length = COLNO + 1;	/* force 1st item onto new line */
-	for (i = 0; i < SIZE(window_opts) - 1; i++) {
+	for (i = 0; i < winsyscnt; i++) {
 	    str = window_opts[i].name;
 	    if (length + strlen(str) > COLNO - 5)
 		Fprintf(ofp,"\n%s", indent),  length = strlen(indent);
 	    else
 		Fprintf(ofp," "),  length++;
 	    Fprintf(ofp,"%s", str),  length += strlen(str);
-	    Fprintf(ofp, multiple_windowing_systems ? "," : "."),  length++;
+	    sep = (winsyscnt == 1) ? "." :
+		    (winsyscnt == 2) ? ((i == 0) ? " and" : "") :
+		      (i < winsyscnt - 2) ? "," :
+			((i == winsyscnt - 2) ? ", and" : "");
+	    Fprintf(ofp, sep),  length += strlen(sep);
 	}
-	if (multiple_windowing_systems)
+	if (winsyscnt > 1)
 		Fprintf(ofp, "\n%swith a default of %s.",
 			indent, DEFAULT_WINDOW_SYS);
 	Fprintf(ofp,"\n\n");
