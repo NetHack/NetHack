@@ -469,7 +469,7 @@ trap.obj :	trap.c $(HACK_H)
 u_init.obj :	u_init.c $(HACK_H)
 uhitm.obj :	uhitm.c $(HACK_H)
 vault.obj :	vault.c $(HACK_H)
-version.obj :	version.c $(HACK_H) $(INC)date.h $(INC)patchlevel.h
+version.obj :	version.c $(HACK_H) $(INC)dlb.h $(INC)date.h $(INC)patchlevel.h
 vision.obj :	vision.c $(HACK_H) $(INC)vis_tab.h
 weapon.obj :	weapon.c $(HACK_H)
 were.obj :	were.c $(HACK_H)

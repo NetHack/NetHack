@@ -1,9 +1,9 @@
 /* NetHack 3.5	version.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)version.c	3.5	2006/12/11	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "dlb.h"
 #include "date.h"
 /*
  * All the references to the contents of patchlevel.h have been moved
@@ -40,6 +40,7 @@ char *buf;
 	return buf;
 }
 
+/* the 'v' command */
 int
 doversion()
 {
@@ -49,10 +50,65 @@ doversion()
 	return 0;
 }
 
+/* the '#version' command; also a choice for '?' */
 int
 doextversion()
 {
-	display_file(OPTIONS_USED, TRUE);
+	dlb *f;
+	char *cr, buf[BUFSZ];
+	winid win = create_nhwindow(NHW_TEXT);
+
+	/* instead of using ``display_file(OPTIONS_USED,TRUE)'' we handle
+	   the file manually so we can include dynamic version info */
+	putstr(win, 0, getversionstring(buf));
+
+	f = dlb_fopen(OPTIONS_USED, "r");
+	if (!f) {
+	    putstr(win, 0, "");
+	    Sprintf(buf, "[Configuration '%s' not available?]", OPTIONS_USED);
+	    putstr(win, 0, buf);
+	} else {
+    /*
+     * already inserted above:
+     * + outdented program name and version plus build date and time
+     * dat/options; display the contents with lines prefixed by '-' deleted:
+     * - blank-line
+     * -     indented program name and version
+     *   blank-line
+     *   outdented feature header
+     * - blank-line
+     *       indented feature list
+     *       spread over multiple lines
+     *   blank-line
+     *   outdented windowing header
+     * - blank-line
+     *       indented windowing choices with
+     *       optional second line for default
+     * - blank-line
+     * - EOF
+     */
+	    boolean prolog = TRUE; /* to skip indented program name */
+
+	    while (dlb_fgets(buf, BUFSZ, f)) {
+		if ((cr = index(buf, '\n')) != 0) *cr = 0;
+		if ((cr = index(buf, '\r')) != 0) *cr = 0;
+		if (index(buf, '\t') != 0) (void) tabexpand(buf);
+
+		if (*buf && *buf != ' ') {
+		    /* found outdented header; insert a separator since we'll
+		       have skipped corresponding blank line inside the file */
+		    putstr(win, 0, "");
+		    prolog = FALSE;
+		}
+		/* skip blank lines and prolog (progame name plus version) */
+		if (prolog || !*buf) continue;
+
+		putstr(win, 0, buf);
+	    }
+	    (void) dlb_fclose(f);
+	    display_nhwindow(win, FALSE);
+	    destroy_nhwindow(win);
+	}
 	return 0;
 }
 

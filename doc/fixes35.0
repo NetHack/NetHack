@@ -523,6 +523,7 @@ flexibility for specifying "detect <foo>" vs "<foo> detection" when wishing
 when a sokoban puzzle has been completed (last pit or hole filled in),
 	stop assessing luck penalties and lift most movement restrictions
 '`' command to show discoveries for one class of objects
+add "about nethack" to '?' menu as an alternate way to view 'v'+'#version'
 
 
 Platform- and/or Interface-Specific New Features

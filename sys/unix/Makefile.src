@@ -1,6 +1,5 @@
 #	NetHack Makefile.
 # NetHack 3.5  Makefile.src	$Date$  $Revision$
-#	SCCS Id: @(#)Makefile.src	3.5	2008/01/30
 
 # Root of source tree:
 NHSROOT=..
@@ -805,7 +804,8 @@ trap.o: trap.c $(HACK_H)
 u_init.o: u_init.c $(HACK_H)
 uhitm.o: uhitm.c $(HACK_H)
 vault.o: vault.c $(HACK_H)
-version.o: version.c $(HACK_H) ../include/date.h ../include/patchlevel.h
+version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h \
+		../include/patchlevel.h
 vision.o: vision.c $(HACK_H) ../include/vis_tab.h
 weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)

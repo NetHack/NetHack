@@ -774,18 +774,21 @@ do_look(mode, click_cc)
     return 0;
 }
 
+/* the '/' command */
 int
 dowhatis()
 {
 	return do_look(0,(coord *)0);
 }
 
+/* the ';' command */
 int
 doquickwhatis()
 {
 	return do_look(1,(coord *)0);
 }
 
+/* the '^' command */
 int
 doidtrap()
 {
@@ -903,7 +906,7 @@ docontact()
 	}
 	putstr(cwin, 0, "To contact the NetHack development team directly,");
 /*XXX overflow possibilities*/
-	Sprintf(buf, " see the Contact form on our website or email %s",
+	Sprintf(buf, "see the Contact form on our website or email %s",
 		DEVTEAM_EMAIL);
 	putstr(cwin, 0, buf);
 	putstr(cwin, 0, "");
@@ -916,22 +919,23 @@ docontact()
 
 /* data for help_menu() */
 static const char *help_menu_items[] = {
-/* 0*/	"Long description of the game and commands.",
-/* 1*/	"List of game commands.",
-/* 2*/	"Concise history of NetHack.",
-/* 3*/	"Info on a character in the game display.",
-/* 4*/	"Info on what a given key does.",
-/* 5*/	"List of game options.",
-/* 6*/	"Longer explanation of game options.",
-/* 7*/	"List of extended commands.",
-/* 8*/	"The NetHack license.",
-/* 9*/	"Support information.",
+/*  0*/	"About NetHack (version information).",
+/*  1*/	"Long description of the game and commands.",
+/*  2*/	"List of game commands.",
+/*  3*/	"Concise history of NetHack.",
+/*  4*/	"Info on a character in the game display.",
+/*  5*/	"Info on what a given key does.",
+/*  6*/	"List of game options.",
+/*  7*/	"Longer explanation of game options.",
+/*  8*/	"List of extended commands.",
+/*  9*/	"The NetHack license.",
+/* 10*/	"Support information.",
 #ifdef PORT_HELP
 	"%s-specific help and commands.",
 #define PORT_HELP_ID 100
-#define WIZHLP_SLOT 11
+#define WIZHLP_SLOT 12
 #else
-#define WIZHLP_SLOT 10
+#define WIZHLP_SLOT 11
 #endif
 #ifdef WIZARD
 	"List of wizard-mode commands.",
@@ -984,6 +988,7 @@ help_menu(sel)
 	return FALSE;
 }
 
+/* the '?' command */
 int
 dohelp()
 {
@@ -991,22 +996,23 @@ dohelp()
 
 	if (help_menu(&sel)) {
 		switch (sel) {
-			case  0:  display_file(HELP, TRUE);  break;
-			case  1:  display_file(SHELP, TRUE);  break;
-			case  2:  (void) dohistory();  break;
-			case  3:  (void) dowhatis();  break;
-			case  4:  (void) dowhatdoes();  break;
-			case  5:  option_help();  break;
-			case  6:  display_file(OPTIONFILE, TRUE);  break;
-			case  7:  (void) doextlist();  break;
-			case  8:  display_file(LICENSE, TRUE);  break;
-			case  9:  (void) docontact(); break;
+			case  0:  (void) doextversion();  break;
+			case  1:  display_file(HELP, TRUE);  break;
+			case  2:  display_file(SHELP, TRUE);  break;
+			case  3:  (void) dohistory();  break;
+			case  4:  (void) dowhatis();  break;
+			case  5:  (void) dowhatdoes();  break;
+			case  6:  option_help();  break;
+			case  7:  display_file(OPTIONFILE, TRUE);  break;
+			case  8:  (void) doextlist();  break;
+			case  9:  display_file(LICENSE, TRUE);  break;
+			case 10:  (void) docontact(); break;
 #ifdef PORT_HELP
 			case PORT_HELP_ID:  port_help();  break;
 #endif
 			default:
 #ifdef WIZARD
-			/* handle slot 10 or 11 */
+			/* handle slot 11 or 12 */
 				display_file(DEBUGHELP, TRUE);
 #endif
 				break;
@@ -1015,6 +1021,7 @@ dohelp()
 	return 0;
 }
 
+/* the 'V' command; also a choice for '?' */
 int
 dohistory()
 {
