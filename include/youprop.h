@@ -17,6 +17,8 @@
  * EXxx refers to extrinsic bitfields from worn objects.
  * BXxx refers to the cause of the property being blocked.
  * Xxx refers to any source, including polymorph forms.
+ * [Post-3.4.3: HXxx now includes a FROMFORM bit to handle
+ * intrinsic conferred by being polymorphed.]
  */
 
 
@@ -27,68 +29,60 @@
 /* With intrinsics and extrinsics */
 #define HFire_resistance	u.uprops[FIRE_RES].intrinsic
 #define EFire_resistance	u.uprops[FIRE_RES].extrinsic
-#define Fire_resistance		(HFire_resistance || EFire_resistance || \
-				 resists_fire(&youmonst))
+#define Fire_resistance		(HFire_resistance || EFire_resistance)
 
 #define HCold_resistance	u.uprops[COLD_RES].intrinsic
 #define ECold_resistance	u.uprops[COLD_RES].extrinsic
-#define Cold_resistance		(HCold_resistance || ECold_resistance || \
-				 resists_cold(&youmonst))
+#define Cold_resistance		(HCold_resistance || ECold_resistance)
 
 #define HSleep_resistance	u.uprops[SLEEP_RES].intrinsic
 #define ESleep_resistance	u.uprops[SLEEP_RES].extrinsic
-#define Sleep_resistance	(HSleep_resistance || ESleep_resistance || \
-				 resists_sleep(&youmonst))
+#define Sleep_resistance	(HSleep_resistance || ESleep_resistance)
 
 #define HDisint_resistance	u.uprops[DISINT_RES].intrinsic
 #define EDisint_resistance	u.uprops[DISINT_RES].extrinsic
-#define Disint_resistance	(HDisint_resistance || EDisint_resistance || \
-				 resists_disint(&youmonst))
+#define Disint_resistance	(HDisint_resistance || EDisint_resistance)
 
 #define HShock_resistance	u.uprops[SHOCK_RES].intrinsic
 #define EShock_resistance	u.uprops[SHOCK_RES].extrinsic
-#define Shock_resistance	(HShock_resistance || EShock_resistance || \
-				 resists_elec(&youmonst))
+#define Shock_resistance	(HShock_resistance || EShock_resistance)
 
 #define HPoison_resistance	u.uprops[POISON_RES].intrinsic
 #define EPoison_resistance	u.uprops[POISON_RES].extrinsic
-#define Poison_resistance	(HPoison_resistance || EPoison_resistance || \
-				 resists_poison(&youmonst))
+#define Poison_resistance	(HPoison_resistance || EPoison_resistance)
 
 #define HDrain_resistance	u.uprops[DRAIN_RES].intrinsic
 #define EDrain_resistance	u.uprops[DRAIN_RES].extrinsic
-#define Drain_resistance	(HDrain_resistance || EDrain_resistance || \
-				 resists_drli(&youmonst))
+#define Drain_resistance	(HDrain_resistance || EDrain_resistance)
+
+/* Hxxx due to FROMFORM only */
+#define HAntimagic		u.uprops[ANTIMAGIC].intrinsic
+#define EAntimagic		u.uprops[ANTIMAGIC].extrinsic
+#define Antimagic		(HAntimagic || EAntimagic)
+
+#define HAcid_resistance	u.uprops[ACID_RES].intrinsic
+#define EAcid_resistance	u.uprops[ACID_RES].extrinsic
+#define Acid_resistance		(HAcid_resistance || EAcid_resistance)
+
+#define HStone_resistance	u.uprops[STONE_RES].intrinsic
+#define EStone_resistance	u.uprops[STONE_RES].extrinsic
+#define Stone_resistance	(HStone_resistance || EStone_resistance)
 
 /* Intrinsics only */
 #define HSick_resistance	u.uprops[SICK_RES].intrinsic
 #define Sick_resistance		(HSick_resistance || \
-				 youmonst.data->mlet == S_FUNGUS || \
-				 youmonst.data == &mons[PM_GHOUL] || \
 				 defends(AD_DISE,uwep))
+
 #define Invulnerable		u.uprops[INVULNERABLE].intrinsic    /* [Tom] */
-
-/* Extrinsics only */
-#define EAntimagic		u.uprops[ANTIMAGIC].extrinsic
-#define Antimagic		(EAntimagic || \
-				 (Upolyd && resists_magm(&youmonst)))
-
-#define EAcid_resistance	u.uprops[ACID_RES].extrinsic
-#define Acid_resistance		(EAcid_resistance || resists_acid(&youmonst))
-
-#define EStone_resistance	u.uprops[STONE_RES].extrinsic
-#define Stone_resistance	(EStone_resistance || resists_ston(&youmonst))
 
 
 /*** Troubles ***/
 /* Pseudo-property */
-#define Punished		(uball)
+#define Punished		(uball != 0)
 
 /* Those implemented solely as timeouts (we use just intrinsic) */
 #define HStun			u.uprops[STUNNED].intrinsic
-#define Stunned			(HStun || u.umonnum == PM_STALKER || \
-				 youmonst.data->mlet == S_BAT)
-		/* Note: birds will also be stunned */
+#define Stunned			HStun
 
 #define HConfusion		u.uprops[CONFUSION].intrinsic
 #define Confusion		HConfusion
@@ -111,11 +105,11 @@
 #define Glib			u.uprops[GLIB].intrinsic
 #define Slimed			u.uprops[SLIMED].intrinsic	/* [Tom] */
 
-/* Hallucination is solely a timeout; its resistance is extrinsic */
+/* Hallucination is solely a timeout */
 #define HHallucination		u.uprops[HALLUC].intrinsic
+#define HHalluc_resistance	u.uprops[HALLUC_RES].intrinsic
 #define EHalluc_resistance	u.uprops[HALLUC_RES].extrinsic
-#define Halluc_resistance	(EHalluc_resistance || \
-				 (Upolyd && dmgtype(youmonst.data, AD_HALU)))
+#define Halluc_resistance	(HHalluc_resistance || EHalluc_resistance)
 #define Hallucination		(HHallucination && !Halluc_resistance)
 
 /* Timeout, plus a worn mask */
@@ -143,13 +137,11 @@
 /*** Vision and senses ***/
 #define HSee_invisible		u.uprops[SEE_INVIS].intrinsic
 #define ESee_invisible		u.uprops[SEE_INVIS].extrinsic
-#define See_invisible		(HSee_invisible || ESee_invisible || \
-				 perceives(youmonst.data))
+#define See_invisible		(HSee_invisible || ESee_invisible)
 
 #define HTelepat		u.uprops[TELEPAT].intrinsic
 #define ETelepat		u.uprops[TELEPAT].extrinsic
-#define Blind_telepat		(HTelepat || ETelepat || \
-				 telepathic(youmonst.data))
+#define Blind_telepat		(HTelepat || ETelepat)
 #define Unblind_telepat		(ETelepat)
 
 #define HWarning		u.uprops[WARNING].intrinsic
@@ -171,13 +163,12 @@
 #define HClairvoyant		u.uprops[CLAIRVOYANT].intrinsic
 #define EClairvoyant		u.uprops[CLAIRVOYANT].extrinsic
 #define BClairvoyant		u.uprops[CLAIRVOYANT].blocked
-#define Clairvoyant		((HClairvoyant || EClairvoyant) &&\
+#define Clairvoyant		((HClairvoyant || EClairvoyant) && \
 				 !BClairvoyant)
 
 #define HInfravision		u.uprops[INFRAVISION].intrinsic
 #define EInfravision		u.uprops[INFRAVISION].extrinsic
-#define Infravision		(HInfravision || EInfravision || \
-				  infravision(youmonst.data))
+#define Infravision		(HInfravision || EInfravision)
 
 #define HDetect_monsters	u.uprops[DETECT_MONSTERS].intrinsic
 #define EDetect_monsters	u.uprops[DETECT_MONSTERS].extrinsic
@@ -190,8 +181,7 @@
 #define HInvis			u.uprops[INVIS].intrinsic
 #define EInvis			u.uprops[INVIS].extrinsic
 #define BInvis			u.uprops[INVIS].blocked
-#define Invis			((HInvis || EInvis || \
-				 pm_invisible(youmonst.data)) && !BInvis)
+#define Invis			((HInvis || EInvis) && !BInvis)
 #define Invisible		(Invis && !See_invisible)
 		/* Note: invisibility also hides inventory and steed */
 
@@ -219,31 +209,28 @@
 
 #define HTeleportation		u.uprops[TELEPORT].intrinsic
 #define ETeleportation		u.uprops[TELEPORT].extrinsic
-#define Teleportation		(HTeleportation || ETeleportation || \
-				 can_teleport(youmonst.data))
+#define Teleportation		(HTeleportation || ETeleportation)
 
 #define HTeleport_control	u.uprops[TELEPORT_CONTROL].intrinsic
 #define ETeleport_control	u.uprops[TELEPORT_CONTROL].extrinsic
-#define Teleport_control	(HTeleport_control || ETeleport_control || \
-				 control_teleport(youmonst.data))
+#define Teleport_control	(HTeleport_control || ETeleport_control)
 
 #define HLevitation		u.uprops[LEVITATION].intrinsic
 #define ELevitation		u.uprops[LEVITATION].extrinsic
-#define Levitation		(HLevitation || ELevitation || \
-				 is_floater(youmonst.data))
+#define Levitation		(HLevitation || ELevitation)
 	/* Can't touch surface, can't go under water; overrides all others */
 #define Lev_at_will		(((HLevitation & I_SPECIAL) != 0L || \
 				 (ELevitation & W_ARTI) != 0L) && \
 				 (HLevitation & ~(I_SPECIAL|TIMEOUT)) == 0L && \
-				 (ELevitation & ~W_ARTI) == 0L && \
-				 !is_floater(youmonst.data))
+				 (ELevitation & ~W_ARTI) == 0L)
 
+#define HFlying			u.uprops[FLYING].intrinsic
 #define EFlying			u.uprops[FLYING].extrinsic
 #ifdef STEED
-# define Flying			(EFlying || is_flyer(youmonst.data) || \
+# define Flying			(HFlying || EFlying || \
 				 (u.usteed && is_flyer(u.usteed->data)))
 #else
-# define Flying			(EFlying || is_flyer(youmonst.data))
+# define Flying			(HFlying || EFlying)
 #endif
 	/* May touch surface; does not override any others */
 
@@ -256,11 +243,9 @@
 #define ESwimming		u.uprops[SWIMMING].extrinsic	/* [Tom] */
 #ifdef STEED
 # define Swimming		(HSwimming || ESwimming || \
-				 is_swimmer(youmonst.data) || \
 				 (u.usteed && is_swimmer(u.usteed->data)))
 #else
-# define Swimming		(HSwimming || ESwimming || \
-				 is_swimmer(youmonst.data))
+# define Swimming		(HSwimming || ESwimming)
 #endif
 	/* Get wet, don't go under water unless if amphibious */
 
@@ -280,8 +265,7 @@
 
 #define HPasses_walls		u.uprops[PASSES_WALLS].intrinsic
 #define EPasses_walls		u.uprops[PASSES_WALLS].extrinsic
-#define Passes_walls		(HPasses_walls || EPasses_walls || \
-				 passes_walls(youmonst.data))
+#define Passes_walls		(HPasses_walls || EPasses_walls)
 
 
 /*** Physical attributes ***/
@@ -313,8 +297,7 @@
 
 #define HRegeneration		u.uprops[REGENERATION].intrinsic
 #define ERegeneration		u.uprops[REGENERATION].extrinsic
-#define Regeneration		(HRegeneration || ERegeneration || \
-				 regenerates(youmonst.data))
+#define Regeneration		(HRegeneration || ERegeneration)
 
 #define HEnergy_regeneration	u.uprops[ENERGY_REGENERATION].intrinsic
 #define EEnergy_regeneration	u.uprops[ENERGY_REGENERATION].extrinsic
@@ -349,9 +332,9 @@
 #define Fast			(HFast || EFast)
 #define Very_fast		((HFast & ~INTRINSIC) || EFast)
 
+#define HReflecting		u.uprops[REFLECTING].intrinsic
 #define EReflecting		u.uprops[REFLECTING].extrinsic
-#define Reflecting		(EReflecting || \
-				 (youmonst.data == &mons[PM_SILVER_DRAGON]))
+#define Reflecting		(HReflecting || EReflecting)
 
 #define Free_action		u.uprops[FREE_ACTION].extrinsic /* [Tom] */
 

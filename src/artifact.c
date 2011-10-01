@@ -1013,7 +1013,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
     /* stun if that was selected and a worse effect didn't occur */
     if (do_stun) {
 	if (youdefend)
-	    make_stunned((HStun + 3), FALSE);
+	    make_stunned(((HStun & TIMEOUT) + 3L), FALSE);
 	else
 	    mdef->mstun = 1;
 	/* avoid extra stun message below if we used mb_verb["stun"] above */
@@ -1023,7 +1023,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
     do_confuse = !rn2(12);
     if (do_confuse) {
 	if (youdefend)
-	    make_confused(HConfusion + 4, FALSE);
+	    make_confused((HConfusion & TIMEOUT) + 4L, FALSE);
 	else
 	    mdef->mconf = 1;
     }

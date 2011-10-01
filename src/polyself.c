@@ -37,11 +37,60 @@ STATIC_VAR const char no_longer_petrify_resistant[] =
    change sex (ought to be an arg to polymon() and newman() instead) */
 STATIC_VAR int sex_change_ok = 0;
 
-/* update the youmonst.data structure pointer */
+/* update the youmonst.data structure pointer and intrinsics */
 void
 set_uasmon()
 {
-	set_mon_data(&youmonst, &mons[u.umonnum], 0);
+	struct permonst *mdat = &mons[u.umonnum];
+
+	set_mon_data(&youmonst, mdat, 0);
+
+#define PROPSET(PropIndx, ON)	do { \
+		if (ON) u.uprops[PropIndx].intrinsic |= FROMFORM; \
+		else    u.uprops[PropIndx].intrinsic &= ~FROMFORM; } while (0)
+
+	PROPSET(FIRE_RES, resists_fire(&youmonst));
+	PROPSET(COLD_RES, resists_cold(&youmonst));
+	PROPSET(SLEEP_RES, resists_sleep(&youmonst));
+	PROPSET(DISINT_RES, resists_disint(&youmonst));
+	PROPSET(SHOCK_RES, resists_elec(&youmonst));
+	PROPSET(POISON_RES, resists_poison(&youmonst));
+	PROPSET(ACID_RES, resists_acid(&youmonst));
+	PROPSET(STONE_RES, resists_ston(&youmonst));
+    {
+	/* resists_drli() takes wielded weapon into account; suppress it */
+	struct obj *save_uwep = uwep;
+
+	uwep = 0;
+	PROPSET(DRAIN_RES, resists_drli(&youmonst));
+	uwep = save_uwep;
+    }
+	/* resists_magm() takes wielded, worn, and carried equipment into
+	   into account; cheat and duplicate its monster-specific part */
+	PROPSET(ANTIMAGIC, (dmgtype(mdat, AD_MAGM) ||
+			    mdat == &mons[PM_BABY_GRAY_DRAGON] ||
+			    dmgtype(mdat, AD_RBRE)));
+	PROPSET(SICK_RES, (mdat->mlet == S_FUNGUS || mdat == &mons[PM_GHOUL]));
+
+	PROPSET(STUNNED, (mdat == &mons[PM_STALKER] || is_bat(mdat)));
+	PROPSET(HALLUC_RES, dmgtype(mdat, AD_HALU));
+	PROPSET(SEE_INVIS, perceives(mdat));
+	PROPSET(TELEPAT, telepathic(mdat));
+	PROPSET(INFRAVISION, infravision(mdat));
+	PROPSET(INVIS, pm_invisible(mdat));
+	PROPSET(TELEPORT, can_teleport(mdat));
+	PROPSET(TELEPORT_CONTROL, control_teleport(mdat));
+	PROPSET(LEVITATION, is_floater(mdat));
+	PROPSET(FLYING, is_flyer(mdat));
+	PROPSET(SWIMMING, is_swimmer(mdat));
+	/* [don't touch MAGICAL_BREATHING here; both Amphibious and Breathless
+	   key off of it but include different monster forms...] */
+	PROPSET(PASSES_WALLS, passes_walls(mdat));
+	PROPSET(REGENERATION, regenerates(mdat));
+	PROPSET(REFLECTING, (mdat == &mons[PM_SILVER_DRAGON]));
+
+#undef PROPSET
+
 #ifdef STATUS_VIA_WINDOWPORT
 	status_initialize(REASSESS_ONLY);
 #endif

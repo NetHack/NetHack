@@ -224,10 +224,10 @@ in_trouble()
 		    && !u.usteed
 #endif
 				) return (TROUBLE_WOUNDED_LEGS);
-	if(u.uhs >= HUNGRY) return(TROUBLE_HUNGRY);
-	if(HStun) return (TROUBLE_STUNNED);
-	if(HConfusion) return (TROUBLE_CONFUSED);
-	if(Hallucination) return(TROUBLE_HALLUCINATION);
+	if (u.uhs >= HUNGRY) return TROUBLE_HUNGRY;
+	if (HStun & TIMEOUT) return TROUBLE_STUNNED;
+	if (HConfusion & TIMEOUT) return TROUBLE_CONFUSED;
+	if (HHallucination & TIMEOUT) return TROUBLE_HALLUCINATION;
 	return(0);
 }
 
@@ -1019,7 +1019,9 @@ pleased(g_align)
 	    break;
 	}
 	case 5: {
-	    const char *msg="\"and thus I grant thee the gift of %s!\"";
+	    static NEARDATA const char
+		msg[] = "\"and thus I grant thee the gift of %s!\"";
+
 	    godvoice(u.ualign.type, "Thou hast pleased me with thy progress,");
 	    if (!(HTelepat & INTRINSIC))  {
 		HTelepat |= FROMOUTSIDE;

@@ -102,7 +102,7 @@ use_towel(obj)
 		switch (rn2(3)) {
 		case 2:
 		    old = Glib;
-		    Glib += rn1(10, 3);
+		    incr_itimeout(&Glib, rn1(10, 3));
 		    Your("%s %s!", makeplural(body_part(HAND)),
 			(old ? "are filthier than ever" : "get slimy"));
 		    return 1;
@@ -1628,21 +1628,23 @@ struct obj *obj;
 	    long lcount = (long) rnd(100);
 
 	    switch (rn2(6)) {
-	    case 0: make_sick(Sick ? Sick/3L + 1L : (long)rn1(ACURR(A_CON),20),
-			xname(obj), TRUE, SICK_NONVOMITABLE);
+	    case 0: make_sick((Sick & TIMEOUT) ? (Sick & TIMEOUT) / 3L + 1L :
+				(long)rn1(ACURR(A_CON),20),
+			      xname(obj), TRUE, SICK_NONVOMITABLE);
 		    break;
-	    case 1: make_blinded(Blinded + lcount, TRUE);
+	    case 1: make_blinded((Blinded & TIMEOUT) + lcount, TRUE);
 		    break;
 	    case 2: if (!Confusion)
 			You("suddenly feel %s.",
 			    Hallucination ? "trippy" : "confused");
-		    make_confused(HConfusion + lcount, TRUE);
+		    make_confused((HConfusion & TIMEOUT) + lcount, TRUE);
 		    break;
-	    case 3: make_stunned(HStun + lcount, TRUE);
+	    case 3: make_stunned((HStun & TIMEOUT) + lcount, TRUE);
 		    break;
 	    case 4: (void) adjattrib(rn2(A_MAX), -1, FALSE);
 		    break;
-	    case 5: (void) make_hallucinated(HHallucination + lcount, TRUE, 0L);
+	    case 5: (void) make_hallucinated((HHallucination & TIMEOUT)
+					     + lcount, TRUE, 0L);
 		    break;
 	    }
 	    return;
@@ -1655,19 +1657,20 @@ struct obj *obj;
 #define attr2trbl(Y)	(Y)
 #define prop_trouble(X) trouble_list[trouble_count++] = prop2trbl(X)
 #define attr_trouble(Y) trouble_list[trouble_count++] = attr2trbl(Y)
+#define TimedTrouble(P) (((P) && !((P) & ~TIMEOUT)) ? ((P) & TIMEOUT) : 0L)
 
 	trouble_count = unfixable_trbl = did_prop = did_attr = 0;
 
 	/* collect property troubles */
-	if (Sick) prop_trouble(SICK);
-	if (Blinded > (long)u.ucreamed &&
+	if (TimedTrouble(Sick)) prop_trouble(SICK);
+	if (TimedTrouble(Blinded) > (long)u.ucreamed &&
 	    !(u.uswallow &&
 	      attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
 	    prop_trouble(BLINDED);
-	if (HHallucination) prop_trouble(HALLUC);
-	if (Vomiting) prop_trouble(VOMITING);
-	if (HConfusion) prop_trouble(CONFUSION);
-	if (HStun) prop_trouble(STUNNED);
+	if (TimedTrouble(HHallucination)) prop_trouble(HALLUC);
+	if (TimedTrouble(Vomiting)) prop_trouble(VOMITING);
+	if (TimedTrouble(HConfusion)) prop_trouble(CONFUSION);
+	if (TimedTrouble(HStun)) prop_trouble(STUNNED);
 
 	unfixable_trbl = unfixable_trouble_count(TRUE);
 
@@ -1768,6 +1771,7 @@ struct obj *obj;
 #undef attr2trbl
 #undef prop_trouble
 #undef attr_trouble
+#undef TimedTrouble
 }
 
 /*
@@ -2001,7 +2005,7 @@ struct obj *obj;
 				makeplural(body_part(HAND)));
 			}
 		} else {
-			Glib += rnd(15);
+			incr_itimeout(&Glib, rnd(15));
 			You("coat your %s with grease.",
 			    makeplural(body_part(FINGER)));
 		}
@@ -3316,15 +3320,12 @@ unfixable_trouble_count(is_horn)
 	/* lycanthropy is not desirable, but it doesn't actually make you feel
 	   bad */
 
-	/* we'll assume that intrinsic stunning from being a bat/stalker
-	   doesn't make you feel bad */
-	if (!is_horn) {
-	    if (Confusion) unfixable_trbl++;
-	    if (Sick) unfixable_trbl++;
-	    if (HHallucination) unfixable_trbl++;
-	    if (Vomiting) unfixable_trbl++;
-	    if (HStun) unfixable_trbl++;
-	}
+	if (!is_horn || (Confusion & ~TIMEOUT)) unfixable_trbl++;
+	if (!is_horn || (Sick & ~TIMEOUT)) unfixable_trbl++;
+	if (!is_horn || (HHallucination & ~TIMEOUT)) unfixable_trbl++;
+	if (!is_horn || (Vomiting & ~TIMEOUT)) unfixable_trbl++;
+	if (!is_horn || (HStun & ~TIMEOUT)) unfixable_trbl++;
+
 	return unfixable_trbl;
 }
 

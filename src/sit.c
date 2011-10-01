@@ -1,5 +1,4 @@
 /* NetHack 3.5	sit.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)sit.c	3.5	2006/03/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -236,13 +235,12 @@ dosit()
 		    case 10:
 			if (Luck < 0 || (HSee_invisible & INTRINSIC))  {
 				if (level.flags.nommap) {
-					pline(
-					"A terrible drone fills your head!");
-					make_confused(HConfusion + rnd(30),
-									FALSE);
+				    pline("A terrible drone fills your head!");
+				    make_confused((HConfusion & TIMEOUT) +
+						    (long)rnd(30), FALSE);
 				} else {
-					pline("An image forms in your mind.");
-					do_mapping();
+				    pline("An image forms in your mind.");
+				    do_mapping();
 				}
 			} else  {
 				Your("vision becomes clear.");
@@ -269,7 +267,8 @@ dosit()
 			break;
 		    case 13:
 			Your("mind turns into a pretzel!");
-			make_confused(HConfusion + rn1(7,16),FALSE);
+			make_confused((HConfusion & TIMEOUT) + (long)rn1(7,16),
+				      FALSE);
 			break;
 		    default:	impossible("throne effect");
 				break;
@@ -292,16 +291,13 @@ dosit()
 		struct obj *uegg;
 
 		if (!flags.female) {
-		    if(Hallucination)
-pline("You may think you are a platypus but a male still can't lay eggs!");
-		    else
-			pline("Males can't lay eggs!");
+		    pline(Hallucination ?
+	"You may think you are a platypus but a male still can't lay eggs!" :
+			    "Males can't lay eggs!");
 		    return 0;
-		}
-
-		if (u.uhunger < (int)objects[EGG].oc_nutrition) {
-			You("don't have enough energy to lay an egg.");
-			return 0;
+		} else if (u.uhunger < (int)objects[EGG].oc_nutrition) {
+		    You("don't have enough energy to lay an egg.");
+		    return 0;
 		}
 
 		uegg = mksobj(EGG, FALSE, FALSE);

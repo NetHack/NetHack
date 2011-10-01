@@ -1748,7 +1748,7 @@ int final;
 	else if (Invis) you_are("invisible to others",from_what(INVIS));
 	/* ordinarily "visible" is redundant; this is a special case for
 	   the situation when invisibility would be an expected attribute */
-	else if ((HInvis || EInvis || pm_invisible(youmonst.data)) && BInvis)
+	else if ((HInvis || EInvis) && BInvis)
 	    you_are("visible", from_what(-INVIS));
 	if (Displaced) you_are("displaced",from_what(DISPLACED));
 	if (Stealth) you_are("stealthy",from_what(STEALTH));
@@ -1821,6 +1821,8 @@ int final;
 	    if (wizard) Sprintf(eos(buf), " (%d)", u.mtimedone);
 #endif
 	    you_are(buf,"");
+	    if (lays_eggs(youmonst.data) && flags.female)
+		you_can("lay eggs", "");
 	}
 	if (Unchanging) you_can("not change from your current form",
 				from_what(UNCHANGING));

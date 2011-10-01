@@ -627,7 +627,7 @@ check_innate_abil(ability, frommask)
 long *ability;
 long frommask;
 {
-	const struct innate *abil;
+	const struct innate *abil = 0;
 
 	if (frommask == FROMEXPER)
 	switch (Role_switch) {
@@ -646,7 +646,7 @@ long frommask;
 #endif
 	case PM_VALKYRIE:       abil = val_abil;	break;
 	case PM_WIZARD:         abil = wiz_abil;	break;
-	default:                abil = 0;		break;
+	default:		break;
 	}
 	else if (frommask == FROMRACE)
 	switch (Race_switch) {
@@ -655,7 +655,7 @@ long frommask;
 	case PM_HUMAN:
 	case PM_DWARF:
 	case PM_GNOME:
-	default:                abil = 0;		break;
+	default:		break;
 	}
 
 	while (abil && abil->ability) {
@@ -676,12 +676,11 @@ innately(ability)
 long *ability;
 {
 	const struct innate *iptr;
-	if ((iptr=check_innate_abil(ability, FROMRACE)))
+
+	if ((iptr = check_innate_abil(ability, FROMRACE)) != 0)
 	    return 1;
-	else if ((iptr=check_innate_abil(ability, FROMEXPER))) {
-	    if (iptr->ulevel == 1) return 1;
-	    return 2;
-	}
+	else if ((iptr = check_innate_abil(ability, FROMEXPER)) != 0)
+	    return (iptr->ulevel == 1) ? 1 : 2;
 	return 0;
 }
 
@@ -759,8 +758,7 @@ adjabil(oldlevel,newlevel)
 int oldlevel, newlevel;
 {
 	register const struct innate *abil, *rabil;
-	long mask = FROMEXPER;
-
+	long prevabil, mask = FROMEXPER;
 
 	switch (Role_switch) {
 	case PM_ARCHEOLOGIST:   abil = arc_abil;	break;
@@ -791,15 +789,14 @@ int oldlevel, newlevel;
 	}
 
 	while (abil || rabil) {
-	    long prevabil;
-	    /* Have we finished with the intrinsics list? */
-	    if (!abil || !abil->ability) {
-	    	/* Try the race intrinsics */
-	    	if (!rabil || !rabil->ability) break;
-	    	abil = rabil;
-	    	rabil = 0;
-	    	mask = FROMRACE;
-	    }
+		/* Have we finished with the intrinsics list? */
+		if (!abil || !abil->ability) {
+			/* Try the race intrinsics */
+			if (!rabil || !rabil->ability) break;
+			abil = rabil;
+			rabil = 0;
+			mask = FROMRACE;
+		}
 		prevabil = *(abil->ability);
 		if(oldlevel < abil->ulevel && newlevel >= abil->ulevel) {
 			/* Abilities gained at level 1 can never be lost

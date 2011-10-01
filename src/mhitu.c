@@ -1446,7 +1446,7 @@ dopois:
 	    case AD_STUN:
 		hitmsg(mtmp, mattk);
 		if(!mtmp->mcan && !rn2(4)) {
-		    make_stunned(HStun + dmg, TRUE);
+		    make_stunned((HStun & TIMEOUT) + (long)dmg, TRUE);
 		    dmg /= 2;
 		}
 		break;
@@ -2053,7 +2053,7 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 
 		    mtmp->mspec_used = mtmp->mspec_used + (stun + rn2(6));
 		    pline("%s stares piercingly at you!", Monnam(mtmp));
-		    make_stunned(HStun + stun, TRUE);
+		    make_stunned((HStun & TIMEOUT) + (long)stun, TRUE);
 		    stop_occupation();
 		}
 	    }

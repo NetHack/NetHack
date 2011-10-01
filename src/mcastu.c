@@ -441,7 +441,7 @@ int spellnum;
 	    You(Stunned ? "struggle to keep your balance." : "reel...");
 	    dmg = d(ACURR(A_DEX) < 12 ? 6 : 4, 4);
 	    if (Half_spell_damage) dmg = (dmg + 1) / 2;
-	    make_stunned(HStun + dmg, FALSE);
+	    make_stunned((HStun & TIMEOUT) + (long)dmg, FALSE);
 	}
 	dmg = 0;
 	break;

@@ -900,7 +900,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 			otmp->spe += -1;
 			adj_abon(otmp, -1);
 		    }
-		    make_stunned(HStun + rn1(10, 10), TRUE);
+		    make_stunned((HStun & TIMEOUT) + (long)rn1(10, 10), TRUE);
 		}
 	    }
 	    break;

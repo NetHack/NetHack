@@ -282,7 +282,7 @@ Cloak_on(VOID_ARGS)
 		break;
 	case MUMMY_WRAPPING:
 		/* Note: it's already being worn, so we have to cheat here. */
-		if ((HInvis || EInvis || pm_invisible(youmonst.data)) && !Blind) {
+		if ((HInvis || EInvis) && !Blind) {
 		    newsym(u.ux,u.uy);
 		    You("can %s!",
 			See_invisible ? "no longer see through yourself"
@@ -861,8 +861,7 @@ register struct obj *obj;
 		see_objects();
 #endif
 
-		if (Invis && !oldprop && !HSee_invisible &&
-				!perceives(youmonst.data) && !Blind) {
+		if (Invis && !oldprop && !HSee_invisible && !Blind) {
 		    newsym(u.ux,u.uy);
 		    pline("Suddenly you are transparent, but there!");
 		    learnring(obj, TRUE);

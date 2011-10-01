@@ -703,7 +703,7 @@ peffects(otmp)
 		    if (Detect_monsters) nothing++;
 		    unkn++;
 		    /* after a while, repeated uses become less effective */
-		    if (HDetect_monsters >= 300L)
+		    if ((HDetect_monsters & TIMEOUT) >= 300L)
 			i = 1;
 		    else
 			i = rn1(40,21);
@@ -906,10 +906,10 @@ peffects(otmp)
 		if (otmp->cursed) HLevitation &= ~I_SPECIAL;
 		if(!Levitation) {
 			/* kludge to ensure proper operation of float_up() */
-			HLevitation = 1;
+			set_itimeout(&HLevitation, 1L);
 			float_up();
 			/* reverse kludge */
-			HLevitation = 0;
+			set_itimeout(&HLevitation, 0L);
 			if (otmp->cursed && !Is_waterlevel(&u.uz)) {
 	if((u.ux != xupstair || u.uy != yupstair)
 	   && (u.ux != sstairs.sx || u.uy != sstairs.sy || !sstairs.up)

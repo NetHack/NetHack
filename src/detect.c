@@ -862,11 +862,11 @@ struct obj *obj;
 	case 1 : pline("%s too much to comprehend!", Tobjnam(obj, "are"));
 	    break;
 	case 2 : pline("%s you!", Tobjnam(obj, "confuse"));
-	    make_confused(HConfusion + rnd(100),FALSE);
+	    make_confused((HConfusion & TIMEOUT) + (long)rnd(100), FALSE);
 	    break;
 	case 3 : if (!resists_blnd(&youmonst)) {
 		pline("%s your vision!", Tobjnam(obj, "damage"));
-		make_blinded(Blinded + rnd(100),FALSE);
+		make_blinded((Blinded & TIMEOUT) + (long)rnd(100), FALSE);
 		if (!Blind) Your(vision_clears);
 	    } else {
 		pline("%s your vision.", Tobjnam(obj, "assault"));
@@ -874,7 +874,8 @@ struct obj *obj;
 	    }
 	    break;
 	case 4 : pline("%s your mind!", Tobjnam(obj, "zap"));
-	    (void) make_hallucinated(HHallucination + rnd(100),FALSE,0L);
+	    (void) make_hallucinated((HHallucination & TIMEOUT) +
+				     (long)rnd(100), FALSE, 0L);
 	    break;
 	case 5 : pline("%s!", Tobjnam(obj, "explode"));
 	    useup(obj);

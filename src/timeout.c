@@ -73,11 +73,11 @@ vomiting_dialogue()
 	case 14: txt = vomiting_texts[0]; break;
 	case 11: txt = vomiting_texts[1]; break;
 	case 6:
-		make_stunned(HStun + d(2,4), FALSE);
+		make_stunned((HStun & TIMEOUT) + (long)d(2,4), FALSE);
 		if (!Popeye(VOMITING)) stop_occupation();
 		/*FALLTHRU*/
 	case 9:
-		make_confused(HConfusion + d(2,4), FALSE);
+		make_confused((HConfusion & TIMEOUT) + (long)d(2,4), FALSE);
 		if (multi > 0) nomul(0);
 		break;
 	case 8: txt = vomiting_texts[2]; break;
@@ -293,24 +293,26 @@ nh_timeout()
 							Fast ? " a bit" : "");
 			break;
 		case CONFUSION:
-			HConfusion = 1; /* So make_confused works properly */
+			/* So make_confused works properly */
+			set_itimeout(&HConfusion, 1L);
 			make_confused(0L, TRUE);
-			stop_occupation();
+			if (!Confusion) stop_occupation();
 			break;
 		case STUNNED:
-			HStun = 1;
+			set_itimeout(&HStun, 1L);
 			make_stunned(0L, TRUE);
-			stop_occupation();
+			if (!Stunned) stop_occupation();
 			break;
 		case BLINDED:
-			Blinded = 1;
+			set_itimeout(&Blinded, 1L);
 			make_blinded(0L, TRUE);
-			stop_occupation();
+			if (!Blind) stop_occupation();
 			break;
 		case DEAF:
-			if (!Deaf)
+			if (!Deaf) {
 			    You("can hear again.");
-			stop_occupation();
+			    stop_occupation();
+			}
 			break;
 		case INVIS:
 			newsym(u.ux,u.uy);
@@ -332,18 +334,18 @@ nh_timeout()
 			stop_occupation();
 			break;
 		case HALLUC:
-			HHallucination = 1;
+			set_itimeout(&HHallucination, 1L);
 			(void) make_hallucinated(0L, TRUE, 0L);
-			stop_occupation();
+			if (!Hallucination) stop_occupation();
 			break;
 		case SLEEPY:
-			if (unconscious() || Sleep_resistance)
-				HSleepy += rnd(100);
-			else if (Sleepy) {
+			if (unconscious() || Sleep_resistance) {
+				incr_itimeout(&HSleepy, rnd(100));
+			} else if (Sleepy) {
 				You("fall asleep.");
 				sleeptime = rnd(20);
 				fall_asleep(-sleeptime, TRUE);
-				HSleepy += sleeptime + rnd(100);
+				incr_itimeout(&HSleepy, sleeptime + rnd(100));
 			}
 			break;
 		case LEVITATION:
@@ -381,7 +383,7 @@ nh_timeout()
 			   counter if that's the only fumble reason */
 			HFumbling &= ~FROMOUTSIDE;
 			if (Fumbling)
-			    HFumbling += rnd(20);
+			    incr_itimeout(&HFumbling, rnd(20));
 			break;
 		case DETECT_MONSTERS:
 			see_monsters();

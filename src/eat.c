@@ -997,10 +997,10 @@ register int pm;
 	    case PM_YELLOW_LIGHT:
 		/* fall into next case */
 	    case PM_GIANT_BAT:
-		make_stunned(HStun + 30,FALSE);
+		make_stunned((HStun & TIMEOUT) + 30L, FALSE);
 		/* fall into next case */
 	    case PM_BAT:
-		make_stunned(HStun + 30,FALSE);
+		make_stunned((HStun & TIMEOUT) + 30L, FALSE);
 		break;
 	    case PM_GIANT_MIMIC:
 		tmp += 10;
@@ -1048,8 +1048,8 @@ register int pm;
 		}
 		break;
 	    case PM_LIZARD:
-		if (HStun > 2)  make_stunned(2L,FALSE);
-		if (HConfusion > 2)  make_confused(2L,FALSE);
+		if ((HStun & TIMEOUT) > 2)  make_stunned(2L, FALSE);
+		if ((HConfusion & TIMEOUT) > 2)  make_confused(2L, FALSE);
 		break;
 	    case PM_CHAMELEON:
 	    case PM_DOPPELGANGER:
@@ -1090,7 +1090,8 @@ register int pm;
 		if (dmgtype(ptr, AD_STUN) || dmgtype(ptr, AD_HALU) ||
 			pm == PM_VIOLET_FUNGUS) {
 		    pline("Oh wow!  Great stuff!");
-		    (void)make_hallucinated(HHallucination + 200L, FALSE, 0L);
+		    (void)make_hallucinated((HHallucination & TIMEOUT) + 200L,
+					    FALSE, 0L);
 		}
 
 		/* Check the monster for all of the intrinsics.  If this
@@ -1785,7 +1786,7 @@ struct obj *otmp;
 #endif
 		if (otmp->otyp == EGG && stale_egg(otmp)) {
 		    pline("Ugh.  Rotten egg.");	/* perhaps others like it */
-		    make_vomiting(Vomiting+d(10,4), TRUE);
+		    make_vomiting((Vomiting & TIMEOUT) + (long)d(10,4), TRUE);
 		} else
  give_feedback:
 		    pline("This %s is %s", singular(otmp, xname),
@@ -2356,7 +2357,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 		pline("Ulch - that %s was rustproofed!", xname(otmp));
 		/* The regurgitated object's rustproofing is gone now */
 		otmp->oerodeproof = 0;
-		make_stunned(HStun + rn2(10), TRUE);
+		make_stunned((HStun & TIMEOUT) + (long)rn2(10), TRUE);
 		You("spit %s out onto the %s.", the(xname(otmp)),
 			surface(u.ux, u.uy));
 		if (carried(otmp)) {
@@ -2587,9 +2588,8 @@ gethungry()	/* as time goes by - called by moveloop() and domove() */
 
 	if (moves % 2) {	/* odd turns */
 	    /* Regeneration uses up food, unless due to an artifact */
-	    if (HRegeneration || ((ERegeneration & (~W_ART)) &&
-				(ERegeneration != W_WEP || !uwep->oartifact)))
-			u.uhunger--;
+	    if ((HRegeneration & ~FROMFORM) ||
+		    (ERegeneration & ~(W_ARTI|W_WEP))) u.uhunger--;
 	    if (near_capacity() > SLT_ENCUMBER) u.uhunger--;
 	} else {		/* even turns */
 	    if (Hunger) u.uhunger--;

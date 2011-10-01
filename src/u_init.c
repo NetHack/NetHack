@@ -1,5 +1,4 @@
 /* NetHack 3.5	u_init.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)u_init.c	3.5	2006/12/13	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -563,6 +562,7 @@ u_init()
 	u.umonnum = u.umonster = (flags.female &&
 			urole.femalenum != NON_PM) ? urole.femalenum :
 			urole.malenum;
+	u.ulycn = NON_PM;
 	set_uasmon();
 
 	u.ulevel = 0;	/* set up some of the initial attributes */
@@ -577,7 +577,6 @@ u_init()
 	u.ublesscnt = 300;			/* no prayers just yet */
 	u.ualignbase[A_CURRENT] = u.ualignbase[A_ORIGINAL] = u.ualign.type =
 			aligns[flags.initalign].value;
-	u.ulycn = NON_PM;
 
 #if defined(BSD) && !defined(POSIX_TYPES)
 	(void) time((long *)&ubirthday);

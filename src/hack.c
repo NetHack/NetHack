@@ -497,7 +497,7 @@ dosinkfall()
 	register struct obj *obj;
 	int dmg;
 
-	if (is_floater(youmonst.data) || (HLevitation & FROMOUTSIDE)) {
+	if (HLevitation & (FROMOUTSIDE|FROMFORM)) {
 	    You("wobble unsteadily for a moment.");
 	} else {
 	    long save_ELev = ELevitation, save_HLev = HLevitation;
@@ -1755,9 +1755,10 @@ boolean pick;
 		   turn, allowing it to do so could give the perception
 		   that a trap here is being triggered twice, so adjust
 		   the timeout to prevent that */
-		if (trap && (HLevitation & TIMEOUT) == 1L) {
+		if (trap && (HLevitation & TIMEOUT) == 1L &&
+			!ELevitation && !(HLevitation & ~TIMEOUT)) {
 		    if (rn2(2)) {	/* defer timeout */
-			HLevitation += 1L;
+			incr_itimeout(&HLevitation, 1L);
 		    } else {		/* timeout early */
 			if (float_down(I_SPECIAL|TIMEOUT, 0L)) {
 			    /* levitation has ended; we've already triggered

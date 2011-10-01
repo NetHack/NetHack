@@ -686,9 +686,9 @@ int how;
 	    newuhs(FALSE);
 	}
 	/* cure impending doom of sickness hero won't have time to fix */
-	if ((Sick & TIMEOUT) == 1) {
+	if ((Sick & TIMEOUT) == 1L) {
 	    u.usick_type = 0;
-	    Sick = 0;
+	    set_itimeout(&Sick, 0L);
 	}
 	if (how == CHOKING) init_uhunger();
 	nomovemsg = "You survived that attempt on your life.";

@@ -4407,8 +4407,10 @@ boolean disarm;
 					Blind ? " and get dizzy" :
 					    " and your vision blurs");
 			}
-			make_stunned(HStun + rn1(7, 16),FALSE);
-			(void) make_hallucinated(HHallucination + rn1(5, 16),FALSE,0L);
+			make_stunned((HStun & TIMEOUT) + (long)rn1(7, 16),
+				     FALSE);
+			(void) make_hallucinated((HHallucination & TIMEOUT)
+						+ (long)rn1(5, 16), FALSE, 0L);
 			break;
 		default: impossible("bad chest trap");
 			break;
@@ -4587,7 +4589,7 @@ register int bodypart;
 	losehp(Maybe_Half_Phys(dmg), "explosion", KILLED_BY_AN);
 	exercise(A_STR, FALSE);
 	if (bodypart) exercise(A_CON, FALSE);
-	make_stunned(HStun + dmg, TRUE);
+	make_stunned((HStun & TIMEOUT) + (long)dmg, TRUE);
 }
 
 /* Monster is hit by trap. */

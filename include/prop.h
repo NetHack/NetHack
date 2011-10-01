@@ -132,7 +132,8 @@ struct prop {
 #	define FROMOUTSIDE  0x04000000L /* By corpses, prayer, thrones, etc. */
 #	define INTRINSIC    (FROMOUTSIDE|FROMRACE|FROMEXPER)
 	/* Control flags */
-#	define I_SPECIAL    0x10000000L /* Property is controllable */
+#	define FROMFORM     0x10000000L /* Polyd; conferred by monster form */
+#	define I_SPECIAL    0x20000000L /* Property is controllable */
 };
 
 /*** Definitions for backwards compatibility ***/
