@@ -1439,7 +1439,7 @@ start_tin(otmp)		/* called when starting to open a tin */
 	if (metallivorous(youmonst.data)) {
 		mesg = "You bite right into the metal tin...";
 		tmp = 0;
-	} else if (nolimbs(youmonst.data)) {
+	} else if (cantwield(youmonst.data)) {	/* nohands || verysmall */
 		You("cannot handle the tin properly to open it.");
 		return;
 	} else if (otmp->blessed) {

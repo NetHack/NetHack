@@ -381,6 +381,7 @@ give alternate message for "<mon> turns to flee" when mon can't move
 all statues in a cockatrice nest were for giant ant if 'record' was empty
 when dying outside all shops on a level with multiple shopkeepers and one takes
 	hero's stuff, choose one who is owed money over first one on fmon list
+hero poly'd into a critter without hands could still open tins
 
 
 Platform- and/or Interface-Specific Fixes
