@@ -2145,6 +2145,16 @@ boolean retry_inverted;	/* optional extra "of" handling */
 		releaseobuf(p);
 		return fuzzymatch(buf, o_str, " -", TRUE);
 	    }
+	} else if (strstri(o_str, "ability")) {
+		/* when presented with "foo of bar", make singular() used to
+		   singularize both foo & bar, but now only does so for foo */
+	    /* catch "{potion(s),ring} of {gain,restore,sustain} abilities" */
+	    if ((p = strstri(u_str, "abilities")) != 0 &&
+		    !*(p + sizeof "abilities" - 1)) {
+		(void)strncpy(buf, u_str, (unsigned)(p - u_str));
+		Strcpy(buf + (p - u_str), "ability");
+		return fuzzymatch(buf, o_str, " -", TRUE);
+	    }
 	} else if (!strcmp(o_str, "aluminum")) {
 		/* this special case doesn't really fit anywhere else... */
 		/* (note that " wand" will have been stripped off by now) */
