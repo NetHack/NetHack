@@ -621,6 +621,8 @@ const char *in_str;
 		{ "master of assassin",	PM_MASTER_ASSASSIN },
 	    /* Outdated names */
 		{ "invisible stalker",	PM_STALKER },
+		{ "high-elf",		PM_ELVENKING }, /* PM_HIGH_ELF is obsolete */
+		{ "halfling",		PM_HOBBIT }, /* potential guess for polyself */
 	    /* Hyphenated names */
 		{ "ki rin",		PM_KI_RIN },
 		{ "uruk hai",		PM_URUK_HAI },
@@ -630,9 +632,6 @@ const char *in_str;
 		{ "grey elf",		PM_GREY_ELF },
 		{ "gray elf",		PM_GREY_ELF },
 		{ "elf lord",		PM_ELF_LORD },
-#if 0	/* OBSOLETE */
-		{ "high elf",		PM_HIGH_ELF },
-#endif
 		{ "olog hai",		PM_OLOG_HAI },
 		{ "arch lich",		PM_ARCH_LICH },
 	    /* Some irregular plurals */
@@ -660,8 +659,9 @@ const char *in_str;
 	for (len = 0, i = LOW_PM; i < NUMMONS; i++) {
 	    register int m_i_len = strlen(mons[i].mname);
 	    if (m_i_len > len && !strncmpi(mons[i].mname, str, m_i_len)) {
-		if (m_i_len == slen) return i;	/* exact match */
-		else if (slen > m_i_len &&
+		if (m_i_len == slen) {
+		   return i;	/* exact match */
+		} else if (slen > m_i_len &&
 			(str[m_i_len] == ' ' ||
 			 !strcmpi(&str[m_i_len], "s") ||
 			 !strncmpi(&str[m_i_len], "s ", 2) ||
