@@ -529,7 +529,7 @@ doclassdisco()
     /* construct discosyms[] */
     for (s = allclasses; *s; ++s) {
 	oclass = *s;
-	c = def_oc_syms[oclass].sym;
+	c = def_oc_syms[(int)oclass].sym;
 	for (i = bases[(int)oclass];
 		i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i)
 	    if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
@@ -559,7 +559,7 @@ doclassdisco()
 	   nonviable classes as unseen acceptable choices so player can ask
 	   for discoveries of any class whether it has discoveries or not */
 	for (s = allclasses, xtras = 0; *s; ++s) {
-	    c = def_oc_syms[*s].sym;
+	    c = def_oc_syms[(int)*s].sym;
 	    if (!index(discosyms, c)) {
 		if (!xtras++) Sprintf(eos(discosyms), "%c", '\033');
 		Sprintf(eos(discosyms), "%c", c);
