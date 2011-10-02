@@ -4606,38 +4606,59 @@ int damage, tell;
 	return(resisted);
 }
 
-#define MAXWISHTRY 5
-
 STATIC_OVL void
-wishcmdassist(tries)
-int tries;
+wishcmdassist(triesleft)
+int triesleft;
 {
+	static NEARDATA const char *wishinfo[] = {
+ "cmdassist: wish mechanics",
+ "",
+ "Enter the name of an object, such as \"potion of monster detection\",",
+ "\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\".",
+ "",
+ "For object types which come in stacks, you may specify a plural name",
+ "such as \"potions of healing\", or specify a count, such as \"1000 gold",
+ "pieces\", although that aspect of your wish might not be granted.",
+ "",
+ "You may also specify various prefix values which might be used to",
+ "modify the item, such as \"uncursed\" or \"rustproof\" or \"+1\".",
+ "Most modifiers shown when viewing your inventory can be specified.",
+ "",
+ "You may specify 'nothing' to explicitly decline this wish.",
+	    0,
+	},
+	preserve_wishless[] = "Doing so will preserve 'wishless' conduct.",
+	retry_info[] =
+ "If you specify an unrecognized object name %s more time%s,",
+	retry_too[] = "a randomly chosen item will be granted.",
+	suppress_cmdassist[] =
+ "(Suppress this assistance with !cmdassist in your config file.)",
+	*cardinals[] = { "zero", "one", "two", "three", "four", "five" },
+	too_many[] = "too many";
+	int i;
 	winid win;
 	char buf[BUFSZ];
 
 	win = create_nhwindow(NHW_TEXT);
 	if (!win) return;
-	Sprintf(buf, "cmdassist: wish mechanics");
-	putstr(win, 0, buf);
+	for (i = 0; i < SIZE(wishinfo) - 1; ++i)
+	    putstr(win, 0, wishinfo[i]);
+	if (!u.uconduct.wishes)
+	    putstr(win, 0, preserve_wishless);
 	putstr(win, 0, "");
-	buf[0] = 0;
-	Sprintf(buf,
-	    "You can enter 'nothing' explicitly to scratch this wish.");
+	Sprintf(buf, retry_info,
+		(triesleft >= 0 && triesleft < SIZE(cardinals)) ?
+			cardinals[triesleft] : too_many,
+		plur(triesleft));
 	putstr(win, 0, buf);
-	if (!u.uconduct.wishes) {
-	    Sprintf(buf,"Entering 'nothing' will not alter your wishless status.");
-	    putstr(win, 0, buf);
-	}
-	Sprintf(buf,
-	    "You will by granted something random after %d more failed attempts.",
-	    MAXWISHTRY - tries);
-	putstr(win, 0, buf);
+	putstr(win, 0, retry_too);
 	putstr(win, 0, "");
-	putstr(win, 0,
-		   "(Suppress this assistance with !cmdassist in config file.)");
+	putstr(win, 0, suppress_cmdassist);
 	display_nhwindow(win, FALSE);
 	destroy_nhwindow(win);
 }
+
+#define MAXWISHTRY 5
 
 void
 makewish()
@@ -4658,7 +4679,7 @@ retry:
 	Strcat(promptbuf,"?");
 	getlin(promptbuf, buf);
 	if(iflags.cmdassist && !strcmpi(buf,"help")) {
-		wishcmdassist(tries);
+		wishcmdassist(MAXWISHTRY - tries);
 		goto retry;
 	}
 	if(buf[0] == '\033') buf[0] = 0;
