@@ -4606,15 +4606,18 @@ int damage, tell;
 	return(resisted);
 }
 
+#define MAXWISHTRY 5
+
 STATIC_OVL void
 wishcmdassist(triesleft)
 int triesleft;
 {
 	static NEARDATA const char *wishinfo[] = {
- "cmdassist: wish mechanics",
+ "Wish details:",
  "",
  "Enter the name of an object, such as \"potion of monster detection\",",
- "\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\".",
+ "\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\"",
+ "(without the quotes).",
  "",
  "For object types which come in stacks, you may specify a plural name",
  "such as \"potions of healing\", or specify a count, such as \"1000 gold",
@@ -4629,7 +4632,7 @@ int triesleft;
 	},
 	preserve_wishless[] = "Doing so will preserve 'wishless' conduct.",
 	retry_info[] =
- "If you specify an unrecognized object name %s more time%s,",
+ "If you specify an unrecognized object name %s%s time%s,",
 	retry_too[] = "a randomly chosen item will be granted.",
 	suppress_cmdassist[] =
  "(Suppress this assistance with !cmdassist in your config file.)",
@@ -4649,16 +4652,16 @@ int triesleft;
 	Sprintf(buf, retry_info,
 		(triesleft >= 0 && triesleft < SIZE(cardinals)) ?
 			cardinals[triesleft] : too_many,
+		(triesleft < MAXWISHTRY) ? " more" : "",
 		plur(triesleft));
 	putstr(win, 0, buf);
 	putstr(win, 0, retry_too);
 	putstr(win, 0, "");
-	putstr(win, 0, suppress_cmdassist);
+	if (iflags.cmdassist)
+	    putstr(win, 0, suppress_cmdassist);
 	display_nhwindow(win, FALSE);
 	destroy_nhwindow(win);
 }
-
-#define MAXWISHTRY 5
 
 void
 makewish()
@@ -4671,18 +4674,18 @@ makewish()
 	nothing = zeroobj;  /* lint suppression; only its address matters */
 	if (flags.verbose) You("may wish for an object.");
 retry:
-	Strcpy(promptbuf,"For what do you wish");
-	if (iflags.cmdassist && tries > 0) {
-		Sprintf(eos(promptbuf),
-			" (enter 'help' for assistance)");
-	}
-	Strcat(promptbuf,"?");
+	Strcpy(promptbuf, "For what do you wish");
+	if (iflags.cmdassist && tries > 0)
+	    Strcat(promptbuf, " (enter 'help' for assistance)");
+	Strcat(promptbuf, "?");
 	getlin(promptbuf, buf);
-	if(iflags.cmdassist && !strcmpi(buf,"help")) {
-		wishcmdassist(MAXWISHTRY - tries);
-		goto retry;
+	(void)mungspaces(buf);
+	if (buf[0] == '\033') {
+	    buf[0] = '\0';
+	} else if (!strcmpi(buf, "help")) {
+	    wishcmdassist(MAXWISHTRY - tries);
+	    goto retry;
 	}
-	if(buf[0] == '\033') buf[0] = 0;
 	/*
 	 *  Note: if they wished for and got a non-object successfully,
 	 *  otmp == &zeroobj.  That includes gold, or an artifact that
