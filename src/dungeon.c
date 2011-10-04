@@ -1271,6 +1271,14 @@ d_level *lev;
 		 sstairs.sx && sstairs.up));
 }
 
+boolean
+has_ceiling(lev)
+d_level *lev;
+{
+	/* [what about level 1 of the quest?] */
+    return (!Is_airlevel(lev) && !Is_waterlevel(lev));
+}
+
 /*
  * It is expected that the second argument of get_level is a depth value,
  * either supplied by the user (teleport control) or randomly generated.

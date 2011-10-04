@@ -792,24 +792,26 @@ toss_up(obj, hitsroof)
 struct obj *obj;
 boolean hitsroof;
 {
-    const char *almost;
+    const char *action;
     boolean petrifier = ((obj->otyp == EGG || obj->otyp == CORPSE) &&
 			 touch_petrifies(&mons[obj->corpsenm]));
     /* note: obj->quan == 1 */
 
-    if (hitsroof) {
+    if (!has_ceiling(&u.uz)) {
+	action = "flies up into"; /* into "the sky" or "the water above" */
+    } else if (hitsroof) {
 	if (breaktest(obj)) {
 		pline("%s hits the %s.", Doname2(obj), ceiling(u.ux, u.uy));
 		breakmsg(obj, !Blind);
 		breakobj(obj, u.ux, u.uy, TRUE, TRUE);
 		return FALSE;
 	}
-	almost = "";
+	action = "hits";
     } else {
-	almost = " almost";
+	action = "almost hits";  
     }
-    pline("%s%s hits the %s, then falls back on top of your %s.",
-	  Doname2(obj), almost, ceiling(u.ux,u.uy), body_part(HEAD));
+    pline("%s %s the %s, then falls back on top of your %s.",
+	  Doname2(obj), action, ceiling(u.ux,u.uy), body_part(HEAD));
 
     /* object now hits you */
 
@@ -998,9 +1000,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		(void) encumber_msg();
 		setuwep(obj);
 		u.twoweap = twoweap;
-	    } else if (u.dz < 0 && !Is_airlevel(&u.uz) &&
-		    !Underwater && !Is_waterlevel(&u.uz)) {
-		(void) toss_up(obj, rn2(5));
+	    } else if (u.dz < 0) {
+		(void) toss_up(obj, rn2(5) && !Underwater);
 #ifdef STEED
 	    } else if (u.dz > 0 && u.usteed &&
 		obj->oclass == POTION_CLASS && rn2(6)) {

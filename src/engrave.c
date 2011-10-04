@@ -214,6 +214,9 @@ register int x, y;
 	    what = "temple's ceiling";
 	else if (*in_rooms(x,y,SHOPBASE))
 	    what = "shop's ceiling";
+	else if (Is_waterlevel(&u.uz))
+	    /* water plane has no surface; its air bubbles aren't below sky */
+	    what = "water above";
 	else if (IS_AIR(lev->typ))
 	    what = "sky";
 	else if (Underwater)
