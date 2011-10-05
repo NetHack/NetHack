@@ -6,6 +6,10 @@
 # Build and install makefiles.
 #
 # Argument is the hints file to use (or no argument for traditional setup).
+# e.g.:
+#  sh setup.sh
+# or
+#  sh setup.sh hints/macosx10.5
 
 # Were we started from the top level?  Cope.
 if [ -f sys/unix/Makefile.top ]; then cd sys/unix; fi
