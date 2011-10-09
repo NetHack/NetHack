@@ -382,6 +382,8 @@ all statues in a cockatrice nest were for giant ant if 'record' was empty
 when dying outside all shops on a level with multiple shopkeepers and one takes
 	hero's stuff, choose one who is owed money over first one on fmon list
 hero poly'd into a critter without hands could still open tins
+if a vault guard was killed, his inventory would be dropped at <0,0>
+throwing gold to/at a vault guard will no longer be treated as an attack
 
 
 Platform- and/or Interface-Specific Fixes

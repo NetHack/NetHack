@@ -1261,17 +1261,17 @@ register int x,y;
 void
 dmonsfree()
 {
-    struct monst **mtmp;
+    struct monst **mtmp, *freetmp;
     int count = 0;
 
     for (mtmp = &fmon; *mtmp;) {
-	if ((*mtmp)->mhp <= 0) {
-	    struct monst *freetmp = *mtmp;
-	    *mtmp = (*mtmp)->nmon;
+	freetmp = *mtmp;
+	if (freetmp->mhp <= 0 && !freetmp->isgd) {
+	    *mtmp = freetmp->nmon;
 	    dealloc_monst(freetmp);
 	    count++;
 	} else
-	    mtmp = &(*mtmp)->nmon;
+	    mtmp = &(freetmp->nmon);
     }
 
     if (count != iflags.purge_monsters)
@@ -1534,11 +1534,6 @@ register struct monst *mtmp;
 	struct permonst *mptr;
 	int tmp;
 
-	if(mtmp->isgd) {
-		/* if we're going to abort the death, it *must* be before
-		 * the m_detach or there will be relmon problems later */
-		if(!grddead(mtmp)) return;
-	}
 	lifesaved_monster(mtmp);
 	if (mtmp->mhp > 0) return;
 
@@ -1587,6 +1582,11 @@ register struct monst *mtmp;
 			return;
 		}
 	}
+
+	/* dead vault guard is actually kept at coordinate <0,0> until
+	   his temporary corridor to/from the vault has been removed;
+	   need to do this after life-saving and before m_detach() */
+	if (mtmp->isgd && !grddead(mtmp)) return;
 
 #ifdef STEED
 	/* Player is thrown from his steed when it dies */

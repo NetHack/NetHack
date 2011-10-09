@@ -92,7 +92,10 @@ restfakecorr(grd)
 register struct monst *grd;
 {
 	/* it seems you left the corridor - let the guard disappear */
-	if(clear_fcorr(grd, FALSE)) mongone(grd);
+	if (clear_fcorr(grd, FALSE)) {
+	    grd->isgd = 0;	/* dmonsfree() should delete this mon */
+	    mongone(grd);
+	}
 }
 
 boolean
@@ -101,7 +104,11 @@ register struct monst *grd;
 {
 	register boolean dispose = clear_fcorr(grd, TRUE);
 
-	if(!dispose) {
+	if (!dispose) {
+		/* destroy guard's gold; drop any other inventory */
+		relobj(grd, 0, FALSE);
+		/* guard is dead; monster traversal loops should skip it */
+		grd->mhp = 0;
 		/* see comment by newpos in gd_move() */
 		remove_monster(grd->mx, grd->my);
 		newsym(grd->mx, grd->my);
@@ -110,7 +117,8 @@ register struct monst *grd;
 		EGD(grd)->ogy = grd->my;
 		dispose = clear_fcorr(grd, TRUE);
 	}
-	return(dispose);
+	if (dispose) grd->isgd = 0; /* for dmonsfree() */
+	return dispose;
 }
 
 STATIC_OVL boolean
@@ -175,9 +183,8 @@ invault()
 	char buf[BUFSZ];
 	register int x, y, dd, gx, gy;
 	int lx = 0, ly = 0;
-#ifdef GOLDOBJ
-        long umoney;
-#endif
+	long umoney;
+
 	/* first find the goal for the guard */
 	for(dd = 2; (dd < ROWNO || dd < COLNO); dd++) {
 	  for(y = u.uy-dd; y <= u.uy+dd; ly = y, y++) {
@@ -331,29 +338,20 @@ fnd:
 	}
 	verbalize("I don't know you.");
 #ifndef GOLDOBJ
-	if (Deaf)
+	umoney = u.ugold;
+#else
+	umoney = money_cnt(invent);
+#endif
+	if (Deaf) {
 	    ;
-	else if (!u.ugold && !hidden_gold())
+	} else if (!umoney && !hidden_gold()) {
 	    verbalize("Please follow me.");
-	else {
-	    if (!u.ugold)
+	} else {
+	    if (!umoney)
 		verbalize("You have hidden gold.");
 	    verbalize("Most likely all your gold was stolen from this vault.");
 	    verbalize("Please drop that gold and follow me.");
 	}
-#else
-        umoney = money_cnt(invent);
-	if (Deaf)
-	    ;
-	else if (!umoney && !hidden_gold())
-	    verbalize("Please follow me.");
-	else {
-	    if (!umoney)
-		verbalize("You have hidden money.");
-	    verbalize("Most likely all your money was stolen from this vault.");
-	    verbalize("Please drop that money and follow me.");
-	}
-#endif
 	EGD(guard)->gdx = gx;
 	EGD(guard)->gdy = gy;
 	EGD(guard)->fcbeg = 0;

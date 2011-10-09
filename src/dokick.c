@@ -252,8 +252,8 @@ register struct obj *gold;
 {
 	boolean msg_given = FALSE;
 
-	if(!likes_gold(mtmp->data) && !mtmp->isshk && !mtmp->ispriest
-			&& !is_mercenary(mtmp->data)) {
+	if (!likes_gold(mtmp->data) && !mtmp->isshk && !mtmp->ispriest &&
+			!mtmp->isgd && !is_mercenary(mtmp->data)) {
 		wakeup(mtmp);
 	} else if (!mtmp->mcanmove) {
 		/* too light to do real damage */
@@ -263,29 +263,23 @@ register struct obj *gold;
 		    msg_given = TRUE;
 		}
 	} else {
-#ifdef GOLDOBJ
-                long value = gold->quan * objects[gold->otyp].oc_cost;
-#endif
+		long umoney, value = gold->quan * objects[gold->otyp].oc_cost;
+
 		mtmp->msleeping = 0;
 		finish_meating(mtmp);
-		if(!rn2(4)) setmangry(mtmp); /* not always pleasing */
-
+		if (!mtmp->isgd && !rn2(4))	/* not always pleasing */
+		    setmangry(mtmp);
 		/* greedy monsters catch gold */
 		if (cansee(mtmp->mx, mtmp->my))
 		    pline("%s catches the gold.", Monnam(mtmp));
-#ifndef GOLDOBJ
-		mtmp->mgold += gold->quan;
-#endif
+		(void)mpickobj(mtmp, gold);
+		gold = (struct obj *)0;	/* obj has been freed */
 		if (mtmp->isshk) {
 			long robbed = ESHK(mtmp)->robbed;
 
 			if (robbed) {
-#ifndef GOLDOBJ
-				robbed -= gold->quan;
-#else
 				robbed -= value;
-#endif
-				if (robbed < 0) robbed = 0;
+				if (robbed < 0L) robbed = 0L;
 				pline_The("amount %scovers %s recent losses.",
 				      !robbed ? "" : "partially ",
 				      mhis(mtmp));
@@ -294,11 +288,7 @@ register struct obj *gold;
 					make_happy_shk(mtmp, FALSE);
 			} else {
 				if(mtmp->mpeaceful) {
-#ifndef GOLDOBJ
-				    ESHK(mtmp)->credit += gold->quan;
-#else
 				    ESHK(mtmp)->credit += value;
-#endif
 				    You("have %ld %s in credit.",
 					ESHK(mtmp)->credit,
 					currency(ESHK(mtmp)->credit));
@@ -308,6 +298,23 @@ register struct obj *gold;
 			if (mtmp->mpeaceful)
 			    verbalize("Thank you for your contribution.");
 			else verbalize("Thanks, scum!");
+		} else if (mtmp->isgd) {
+#ifndef GOLDOBJ
+			umoney = u.ugold;
+#else
+			umoney = money_cnt(invent);
+#endif
+			/* Some of these are iffy, because a hostile guard
+			   won't become peaceful and resume leading hero
+			   out of the vault.  If he did do that, player
+			   could try fighting, then weasle out of being
+			   killed by throwing his/her gold when losing. */
+			verbalize(umoney ? "Drop the rest and follow me." :
+				  hidden_gold() ?
+				"You still have hidden gold.  Drop it now." :
+				  mtmp->mpeaceful ?
+				"I'll take care of that; please move along." :
+				"I'll take that; now get moving.");
 		} else if (is_mercenary(mtmp->data)) {
 		    long goldreqd = 0L;
 
@@ -323,25 +330,19 @@ register struct obj *gold;
 
 			if (goldreqd) {
 #ifndef GOLDOBJ
-			   if (gold->quan > goldreqd +
-				(u.ugold + u.ulevel*rn2(5))/ACURR(A_CHA))
+			    umoney = u.ugold;
 #else
-			   if (value > goldreqd +
-				(money_cnt(invent) + u.ulevel*rn2(5))/ACURR(A_CHA))
+			    umoney = money_cnt(invent);
 #endif
-			    mtmp->mpeaceful = TRUE;
+			    if (value > goldreqd +
+				  (umoney + u.ulevel * rn2(5)) / ACURR(A_CHA))
+				mtmp->mpeaceful = TRUE;
 			}
 		     }
 		     if (mtmp->mpeaceful)
 			    verbalize("That should do.  Now beat it!");
 		     else verbalize("That's not enough, coward!");
 		}
-
-#ifndef GOLDOBJ
-		dealloc_obj(gold);
-#else
-		add_to_minv(mtmp, gold);
-#endif
 		return TRUE;
 	}
 
