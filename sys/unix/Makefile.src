@@ -620,7 +620,7 @@ Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
-		../include/patchlevel.h ../win/X11/nh72icon \
+		../include/date.h ../include/patchlevel.h ../win/X11/nh72icon \
 		../win/X11/nh56icon ../win/X11/nh32icon
 	$(CC) $(CFLAGS) -c ../win/X11/winX.c
 winmap.o: ../win/X11/winmap.c ../include/xwindow.h $(HACK_H) ../include/dlb.h \
