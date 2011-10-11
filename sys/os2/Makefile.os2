@@ -1240,7 +1240,7 @@ $(OBJ)\termcap.o : $(WIN)\$(CB) $(HACK_H) $(INCL)\tcap.h
 	$(WINCC)
 $(OBJ)\topl.o    : $(WIN)\$(CB) $(HACK_H) $(INCL)\tcap.h
 	$(WINCC)
-$(OBJ)\wintty.o  : $(WIN)\$(CB) $(HACK_H) $(INCL)\tcap.h
+$(OBJ)\wintty.o  : $(WIN)\$(CB) $(HACK_H) $(INCL)\tcap.h $(INCL)\date.h
 	$(WINCC)
 
 #

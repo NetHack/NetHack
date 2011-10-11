@@ -7,6 +7,7 @@
 #include "NH:sys/amiga/winext.h"
 #include "NH:sys/amiga/winproto.h"
 #include "patchlevel.h"
+#include "date.h"
 
 extern struct TagItem scrntags[];
 
@@ -1304,6 +1305,7 @@ amii_init_nhwindows(argcp,argv)
     amii_putstr( WIN_BASE, 0, COPYRIGHT_BANNER_A);
     amii_putstr( WIN_BASE, 0, COPYRIGHT_BANNER_B);
     amii_putstr( WIN_BASE, 0, COPYRIGHT_BANNER_C);
+    amii_putstr( WIN_BASE, 0, COPYRIGHT_BANNER_D);
     amii_putstr( WIN_BASE, 0, "");
 
     Initialized = 1;

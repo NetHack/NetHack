@@ -1583,7 +1583,7 @@ $(O)termcap.o:	$(TTY)termcap.c $(HDEP) $(I)wintty.h $(I)tcap.h
 $(O)topl.o:	$(TTY)topl.c $(HDEP) $(I)wintty.h $(I)tcap.h
 
 $(O)wintty.o:	$(TTY)wintty.c $(HDEP) $(I)wintty.h $(I)tcap.h \
-		$(I)patchlevel.h
+		$(I)date.h $(I)patchlevel.h
 
 $(O)amitty.o:	$(AMI)amitty.c $(HDEP)
 

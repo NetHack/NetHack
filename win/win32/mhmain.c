@@ -5,6 +5,7 @@
 
 #include "winMS.h"
 #include <commdlg.h>
+#include "date.h"
 #include "patchlevel.h"
 #include "resource.h"
 #include "mhmsg.h"
@@ -986,7 +987,8 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 							NH_A2W(
 								COPYRIGHT_BANNER_A "\n"
 								COPYRIGHT_BANNER_B "\n"
-								COPYRIGHT_BANNER_C,
+								COPYRIGHT_BANNER_C "\n"
+								COPYRIGHT_BANNER_D,
 								wbuf,
 								BUFSZ
 							) );

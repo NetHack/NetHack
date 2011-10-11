@@ -55,6 +55,7 @@
 #else
 #include "patchlevel.h"
 #endif
+#include "date.h"
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -995,6 +996,7 @@ char** argv;
 	COPYRIGHT_BANNER_A,
 	COPYRIGHT_BANNER_B,
 	COPYRIGHT_BANNER_C,
+	COPYRIGHT_BANNER_D,
 	"",
 	"",
 	0

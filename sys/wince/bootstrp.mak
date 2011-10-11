@@ -679,7 +679,7 @@ $(O)termcap.o: ..\win\tty\termcap.c $(HACK_H) $(INCL)\tcap.h
 $(O)topl.o: ..\win\tty\topl.c $(HACK_H) $(INCL)\tcap.h
 	$(CC) $(CFLAGSU) -Fo$@ ..\win\tty\topl.c
 $(O)wintty.o: ..\win\tty\wintty.c $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h $(INCL)\tcap.h
+		$(INCL)\date.h $(INCL)\patchlevel.h $(INCL)\tcap.h
 	$(CC) $(CFLAGSU) -Fo$@ ..\win\tty\wintty.c
 $(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
 		$(CONFIG_H)

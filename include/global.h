@@ -191,6 +191,9 @@ typedef char nhptext;
 # ifdef MAC
 #  define PORT_ID	"Mac"
 # endif
+# ifdef __APPLE__
+#  define PORT_ID	"MacOSX"
+# endif
 # ifdef MSDOS
 #  ifdef PC9800
 #  define PORT_ID	"PC-9800"
@@ -213,8 +216,11 @@ typedef char nhptext;
 # ifdef TOS
 #  define PORT_ID	"ST"
 # endif
-# ifdef UNIX
-#  define PORT_ID	"Unix"
+	/* Check again in case something more specific has been defined above. */
+# ifndef PORT_ID
+#  ifdef UNIX
+#   define PORT_ID	"Unix"
+#  endif
 # endif
 # ifdef VMS
 #  define PORT_ID	"VMS"

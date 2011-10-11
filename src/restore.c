@@ -1276,8 +1276,8 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
 	if (bannerwin != WIN_ERR) {
 	    /* for tty; erase copyright notice and redo it in the menu */
 	    clear_nhwindow(bannerwin);
-	    /* COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B, COPYRIGHT_BANNER_C */
-	    for (k = 1; k <= 3; ++k)
+	    /* COPYRIGHT_BANNER_[ABCD] */
+	    for (k = 1; k <= 4; ++k)
 		add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
 			 ATR_NONE, copyright_banner_line(k), MENU_UNSELECTED);
 	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0,

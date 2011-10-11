@@ -988,7 +988,7 @@ termcap.o: $(WIN)\termcap.c $(HACK_H) $(INCL)\tcap.h
 topl.o: $(WIN)\topl.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(CFLAGS) $(SPECOPTS) /Fo$@ $(WIN)\topl.c
 wintty.o: $(WIN)\wintty.c $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\patchlev.h $(INCL)\tcap.h
+		$(INCL)\date.h $(INCL)\patchlev.h $(INCL)\tcap.h
 	@$(CC) $(CFLAGS) $(SPECOPTS) /Fo$@ $(WIN)\wintty.c
 
 # src dependencies

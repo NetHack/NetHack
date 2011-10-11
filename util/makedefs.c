@@ -165,6 +165,7 @@ extern void NDECL(objects_init);	/* objects.c */
 static void NDECL(make_version);
 static char *FDECL(version_string, (char *, const char *));
 static char *FDECL(version_id_string, (char *,const char *));
+static char *FDECL(bannerc_string, (char *,const char *));
 static char *FDECL(xcrypt, (const char *));
 static int FDECL(check_control, (char *));
 static char *FDECL(without_control, (char *));
@@ -1097,6 +1098,33 @@ const char *build_date;
     return outbuf;
 }
 
+static char *
+bannerc_string(outbuf, build_date)
+char *outbuf;
+const char *build_date;
+{
+    char subbuf[64], versbuf[64];
+
+    subbuf[0] = '\0';
+#ifdef PORT_SUB_ID
+    subbuf[0] = ' ';
+    Strcpy(&subbuf[1], PORT_SUB_ID);
+#endif
+#ifdef BETA
+    Strcat(subbuf, " Beta");
+#endif
+
+    Sprintf(outbuf, "         Version %s %s%s, built %s.", 
+version_string(versbuf, "."), 
+PORT_ID, subbuf, &build_date[4]);
+#if 0
+    Sprintf(outbuf, "%s NetHack%s %s Copyright 1985-%s (built %s)",
+	    PORT_ID, subbuf, version_string(versbuf,"."), RELEASE_YEAR,
+	    &build_date[4]);
+#endif
+    return outbuf;
+}
+
 void
 do_date()
 {
@@ -1158,6 +1186,8 @@ do_date()
 	Fprintf(ofp,"#define VERSION_STRING \"%s\"\n", version_string(buf,"."));
 	Fprintf(ofp,"#define VERSION_ID \\\n \"%s\"\n",
 		version_id_string(buf, cbuf));
+	Fprintf(ofp,"#define COPYRIGHT_BANNER_C \\\n \"%s\"\n",
+		bannerc_string(buf, cbuf));
 	Fprintf(ofp,"\n");
 #ifdef AMIGA
 	{
