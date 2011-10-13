@@ -7,6 +7,7 @@
 STATIC_DCL struct monst *NDECL(findgd);
 
 STATIC_DCL boolean FDECL(clear_fcorr, (struct monst *,BOOLEAN_P));
+STATIC_DCL void FDECL(blackout, (int,int));
 STATIC_DCL void FDECL(restfakecorr,(struct monst *));
 STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *,int,int));
 STATIC_DCL void FDECL(move_gold,(struct obj *,int));
@@ -43,7 +44,8 @@ boolean forceshow;
 	struct monst *mtmp;
 	boolean sawcorridor = FALSE;
 	struct egd *egrd = EGD(grd);
-	struct trap *trap = (struct trap *)0;
+	struct trap *trap;
+	struct rm *lev;
 
 	if (!on_level(&egrd->gdlevel, &u.uz)) return TRUE;
 
@@ -60,31 +62,60 @@ boolean forceshow;
 			return FALSE;
 
 		if ((mtmp = m_at(fcx,fcy)) != 0) {
-			if(mtmp->isgd) return(FALSE);
-			else if(!in_fcorridor(grd, u.ux, u.uy)) {
-			    if(mtmp->mtame) yelp(mtmp);
-			    (void) rloc(mtmp, FALSE);
-			}
+		    if (mtmp->isgd) {
+			return FALSE;
+		    } else if (!in_fcorridor(grd, u.ux, u.uy)) {
+			if (mtmp->mtame) yelp(mtmp);
+			(void) rloc(mtmp, FALSE);
+		    }
 		}
-		if ((trap = t_at(fcx,fcy)) != 0 &&
-		     trap->ttyp == PIT && trap->madeby_u &&
-		     IS_STWALL(egrd->fakecorr[fcbeg].ftyp)) {
-		     /* you dug a pit while following the guard out,
-			so fill it in when the location reverts to stone */
-			deltrap(trap);
-		}
-		if (levl[fcx][fcy].typ == CORR && cansee(fcx, fcy))
+		lev = &levl[fcx][fcy];
+		if (lev->typ == CORR && cansee(fcx, fcy))
 		    sawcorridor = TRUE;
-		levl[fcx][fcy].typ = egrd->fakecorr[fcbeg].ftyp;
+		lev->typ = egrd->fakecorr[fcbeg].ftyp;
+		if (IS_STWALL(lev->typ)) {
+		    /* destroy any trap here (pit dug by you, hole dug via
+		       wand while levitating or by monster, bear trap or land
+		       mine via object, spun web) when spot reverts to stone */
+		    if ((trap = t_at(fcx, fcy)) != 0) deltrap(trap);
+		    /* undo scroll/wand/spell of light affecting this spot */
+		    if (lev->typ == STONE) blackout(fcx, fcy);
+		}
 		map_location(fcx, fcy, 1);	/* bypass vision */
-		if(!ACCESSIBLE(levl[fcx][fcy].typ)) block_point(fcx,fcy);
+		if (!ACCESSIBLE(lev->typ)) block_point(fcx, fcy);
+		vision_full_recalc = 1;
 		egrd->fcbeg++;
 	}
-	if (sawcorridor) {
+	if (sawcorridor)
 	    pline_The("corridor disappears.");
-	    if(IS_ROCK(levl[u.ux][u.uy].typ)) You("are encased in rock.");
+	if (IS_ROCK(levl[u.ux][u.uy].typ))
+	    You("are encased in rock.");
+	return TRUE;
+}
+
+/* as a temporary corridor is removed, set stone locations and adjacent
+   spots to unlit; if player used scroll/wand/spell of light while inside
+   the corridor, we don't want the light to reappear if/when a new tunnel
+   goes through the same area */
+STATIC_OVL void
+blackout(x, y)
+int x, y;
+{
+    struct rm *lev;
+    int i, j;
+
+    for (i = x - 1; i <= x + 1; ++i)
+	for (j = y - 1; j <= y + 1; ++j) {
+	    if (!isok(i, j)) continue;
+	    lev  = &levl[i][j];
+	    /* [possible bug: when (i != x || j != y), perhaps we ought
+	       to check whether the spot on the far side is lit instead
+	       of doing a blanket blackout of adjacent locations] */
+	    if (lev->typ == STONE)
+		lev->lit = lev->waslit = 0;
+	    /* mark <i,j> as not having been seen from <x,y> */
+	    unset_seenv(lev, x, y, i, j);
 	}
-	return(TRUE);
 }
 
 STATIC_OVL void

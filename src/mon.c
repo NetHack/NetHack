@@ -535,6 +535,9 @@ movemon()
 	}
 #endif
 	nmtmp = mtmp->nmon;
+	/* one dead monster needs to perform a move after death:
+	   vault guard whose temporary corridor is still on the map */
+	if (mtmp->isgd && !mtmp->mx && mtmp->mhp <= 0) (void)gd_move(mtmp);
 	if (DEADMONSTER(mtmp)) continue;
 
 	/* Find a monster that we have not treated yet.	 */

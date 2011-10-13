@@ -1858,7 +1858,20 @@ set_seenv(lev, x0, y0, x, y)
     int x0, y0, x, y;	/* from, to */
 {
     int dx = x-x0, dy = y0-y;
+
     lev->seenv |= seenv_matrix[sign(dy)+1][sign(dx)+1];
+}
+
+/* Called by blackout(vault.c) when vault guard removes temporary corridor,
+   turning spot <x0,y0> back into stone; <x1,y1> is an adjacent spot. */
+void
+unset_seenv(lev, x0, y0, x1, y1)
+    struct rm *lev;		/* &levl[x1][y1] */
+    int x0, y0, x1, y1;	/* from, to; abs(x1-x0)==1 && abs(y0-y1)==1 */
+{
+    int dx = x1 - x0, dy = y0 - y1;
+
+    lev->seenv &= ~seenv_matrix[dy + 1][dx + 1];
 }
 
 /* ------------------------------------------------------------------------- */

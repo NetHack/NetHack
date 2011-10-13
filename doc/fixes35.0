@@ -384,6 +384,14 @@ when dying outside all shops on a level with multiple shopkeepers and one takes
 hero poly'd into a critter without hands could still open tins
 if a vault guard was killed, his inventory would be dropped at <0,0>
 throwing gold to/at a vault guard will no longer be treated as an attack
+non-pit traps created in vault guard's temporary corridor would remain after
+	the location reverted to solid rock
+using magic to light vault guard's temporary corridor would produce lit solid
+	rock after reversion, and then yield lit corridor if dug out again
+if hero was blind, killing the vault guard while in his temporary corridor
+	would leave hero encased in solid rock without informing player
+if hero dragged iron ball into temporary corridor and then killed vault guard,
+	the portion of corridor currently in existence would become permanent
 
 
 Platform- and/or Interface-Specific Fixes
