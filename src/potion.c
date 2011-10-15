@@ -904,33 +904,36 @@ peffects(otmp)
 	case POT_LEVITATION:
 	case SPE_LEVITATION:
 		if (otmp->cursed) HLevitation &= ~I_SPECIAL;
-		if(!Levitation) {
-			/* kludge to ensure proper operation of float_up() */
-			set_itimeout(&HLevitation, 1L);
-			float_up();
-			/* reverse kludge */
-			set_itimeout(&HLevitation, 0L);
-			if (otmp->cursed && !Is_waterlevel(&u.uz)) {
-	if((u.ux != xupstair || u.uy != yupstair)
-	   && (u.ux != sstairs.sx || u.uy != sstairs.sy || !sstairs.up)
-	   && (!xupladder || u.ux != xupladder || u.uy != yupladder)
-	) {
-					int dmg = uarmh ? 1 : rnd(10);
-					You("hit your %s on the %s.",
-						body_part(HEAD),
-						ceiling(u.ux,u.uy));
-					losehp(Maybe_Half_Phys(dmg),
-						"colliding with the ceiling",
-						KILLED_BY);
-				} else (void) doup();
+		if (!Levitation && !BLevitation) {
+		    /* kludge to ensure proper operation of float_up() */
+		    set_itimeout(&HLevitation, 1L);
+		    float_up();
+		    /* reverse kludge */
+		    set_itimeout(&HLevitation, 0L);
+		    if (otmp->cursed) {
+			if ((u.ux == xupstair && u.uy == yupstair) ||
+			    (sstairs.up && u.ux == sstairs.sx &&
+				    u.uy == sstairs.sy) ||
+			    (xupladder && u.ux == xupladder &&
+				    u.uy == yupladder)) {
+			    (void) doup();
+			} else if (has_ceiling(&u.uz)) {
+			    int dmg = uarmh ? 1 : rnd(10);
+
+			    You("hit your %s on the %s.",
+				body_part(HEAD), ceiling(u.ux,u.uy));
+			    losehp(Maybe_Half_Phys(dmg),
+				   "colliding with the ceiling", KILLED_BY);
 			}
+		    } /*cursed*/
 		} else
-			nothing++;
+		    nothing++;
 		if (otmp->blessed) {
 		    incr_itimeout(&HLevitation, rn1(50,250));
 		    HLevitation |= I_SPECIAL;
-		} else incr_itimeout(&HLevitation, rn1(140,10));
-		spoteffects(FALSE);	/* for sinks */
+		} else
+		    incr_itimeout(&HLevitation, rn1(140,10));
+		if (Levitation) spoteffects(FALSE);	/* for sinks */
 		break;
 	case POT_GAIN_ENERGY:			/* M. Stephenson */
 		{	register int num;

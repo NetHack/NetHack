@@ -1415,12 +1415,8 @@ int final;
 		you_are("levitating, at will", "");
 	    else
 		enl_msg(youtoo, are, were, "levitating", from_what(LEVITATION));
-	}
-	if (Flying) {
-	    if (Levitation)
-		you_can("also fly", from_what(FLYING));
-	    else
-		enl_msg(youtoo, are, were, "flying", from_what(FLYING));
+	} else if (Flying) {	/* can only fly when not levitating */
+	    enl_msg(youtoo, are, were, "flying", from_what(FLYING));
 	}
 	if (Underwater) {
 	    you_are("underwater", "");
@@ -1621,6 +1617,8 @@ attributes_enlightenment(mode, final)
 int mode;
 int final;
 {
+	static NEARDATA const char
+	    if_surroundings_permitted[] = " if surroundings permitted";
 	int ltmp, armpro;
 	char buf[BUFSZ];
 
@@ -1762,6 +1760,33 @@ int final;
 	if (Teleportation) you_can("teleport",from_what(TELEPORT));
 	if (Teleport_control)
 		you_have("teleport control",from_what(TELEPORT_CONTROL));
+	/* actively levitating handled earlier as a status condition */
+	if (BLevitation) {	/* levitation is blocked */
+	    long save_BLev = BLevitation;
+
+	    BLevitation = 0L;
+	    if (Levitation)
+		enl_msg(You_, "would levitate", "would have levitated",
+			if_surroundings_permitted, "");
+	    BLevitation = save_BLev;
+	}
+	/* actively flying handled earlier as a status condition */
+	if (BFlying) {		/* flight is blocked */
+	    long save_BFly = BFlying;
+
+	    BFlying = 0L;
+	    if (Flying) {
+		Sprintf(buf, "%s%s%s",
+			(save_BFly & I_SPECIAL) ?
+				" if you weren't levitating" : "",
+			((save_BFly & (FROMOUTSIDE|I_SPECIAL)) ==
+				(FROMOUTSIDE|I_SPECIAL)) ? " and" : "",
+			(save_BFly & FROMOUTSIDE) ?
+				if_surroundings_permitted : (const char *)"");
+		enl_msg(You_, "would fly", "would have flown", buf, "");
+	    }
+	    BFlying = save_BFly;
+	}
 	/* actively walking on water handled earlier as a status condition */
 	if (Wwalking && !walking_on_water())
 	    you_can("walk on water",from_what(WWALKING));

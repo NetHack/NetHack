@@ -88,6 +88,11 @@ set_uasmon()
 	PROPSET(PASSES_WALLS, passes_walls(mdat));
 	PROPSET(REGENERATION, regenerates(mdat));
 	PROPSET(REFLECTING, (mdat == &mons[PM_SILVER_DRAGON]));
+	/* levitation overrides flight */
+	if (HLevitation || ELevitation)
+	    BFlying |= I_SPECIAL;
+	else
+	    BFlying &= ~I_SPECIAL;
 
 #undef PROPSET
 

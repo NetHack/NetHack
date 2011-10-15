@@ -217,7 +217,8 @@
 
 #define HLevitation		u.uprops[LEVITATION].intrinsic
 #define ELevitation		u.uprops[LEVITATION].extrinsic
-#define Levitation		(HLevitation || ELevitation)
+#define BLevitation		u.uprops[LEVITATION].blocked
+#define Levitation		((HLevitation || ELevitation) && !BLevitation)
 	/* Can't touch surface, can't go under water; overrides all others */
 #define Lev_at_will		(((HLevitation & I_SPECIAL) != 0L || \
 				 (ELevitation & W_ARTI) != 0L) && \
@@ -226,11 +227,13 @@
 
 #define HFlying			u.uprops[FLYING].intrinsic
 #define EFlying			u.uprops[FLYING].extrinsic
+#define BFlying			u.uprops[FLYING].blocked
 #ifdef STEED
-# define Flying			(HFlying || EFlying || \
-				 (u.usteed && is_flyer(u.usteed->data)))
+# define Flying			((HFlying || EFlying || \
+				  (u.usteed && is_flyer(u.usteed->data))) && \
+				 !BFlying)
 #else
-# define Flying			(HFlying || EFlying)
+# define Flying			((HFlying || EFlying) && !BFlying)
 #endif
 	/* May touch surface; does not override any others */
 

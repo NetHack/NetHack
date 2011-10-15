@@ -392,6 +392,8 @@ if hero was blind, killing the vault guard while in his temporary corridor
 	would leave hero encased in solid rock without informing player
 if hero dragged iron ball into temporary corridor and then killed vault guard,
 	the portion of corridor currently in existence would become permanent
+on Plane of Water, restrict levitation and flying to air bubbles;
+	elsewhere, restrict them such that they don't work inside solid rock
 
 
 Platform- and/or Interface-Specific Fixes

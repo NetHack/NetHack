@@ -2609,8 +2609,10 @@ float_up()
 				body_part(LEG));
 		}
 	}
+#if 0
 	else if(Is_waterlevel(&u.uz))
 		pline("It feels as though you've lost some weight.");
+#endif
 	else if(u.uinwater)
 		spoteffects(TRUE);
 	else if(u.uswallow)
@@ -2637,6 +2639,8 @@ float_up()
 	    }
 	}
 #endif
+	if (Flying) You("are no longer able to control your flight.");
+	BFlying |= I_SPECIAL;
 	return;
 }
 
@@ -2667,6 +2671,14 @@ long hmask, emask;     /* might cancel timeout */
 	ELevitation &= ~emask;
 	if(Levitation) return(0); /* maybe another ring/potion/boots */
 	nomul(0);	/* stop running or resting */
+	if (BFlying) {
+	    /* controlled flight no longer overridden by levitation */
+	    BFlying &= ~I_SPECIAL;
+	    if (Flying) {
+		You("have stopped levitating and are now flying.");
+		return 1;
+	    }
+	}
 	if(u.uswallow) {
 	    You("float down, but you are still %s.",
 		is_animal(u.ustuck->data) ? "swallowed" : "engulfed");

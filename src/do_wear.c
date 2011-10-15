@@ -190,7 +190,7 @@ Boots_on(VOID_ARGS)
 			incr_itimeout(&HFumbling, rnd(20));
 		break;
 	case LEVITATION_BOOTS:
-		if (!oldprop && !HLevitation) {
+		if (!oldprop && !HLevitation && !BLevitation) {
 			makeknown(uarmf->otyp);
 			float_up();
 			spoteffects(FALSE);
@@ -241,7 +241,8 @@ Boots_off(VOID_ARGS)
 			HFumbling = EFumbling = 0;
 		break;
 	case LEVITATION_BOOTS:
-		if (!oldprop && !HLevitation && !context.takeoff.cancelled_don) {
+		if (!oldprop && !HLevitation && !BLevitation &&
+		    !context.takeoff.cancelled_don) {
 			(void) float_down(0L, 0L);
 			makeknown(otyp);
 		}
@@ -875,7 +876,7 @@ register struct obj *obj;
 		}
 		break;
 	case RIN_LEVITATION:
-		if (!oldprop && !HLevitation) {
+		if (!oldprop && !HLevitation && !BLevitation) {
 		    float_up();
 		    learnring(obj, TRUE);
 		    spoteffects(FALSE);	/* for sinks */
@@ -987,8 +988,10 @@ boolean gone;
 		}
 		break;
 	case RIN_LEVITATION:
-		(void) float_down(0L, 0L);
-		if (!Levitation) learnring(obj, TRUE);
+		if (!BLevitation) {
+		    (void) float_down(0L, 0L);
+		    if (!Levitation) learnring(obj, TRUE);
+		}
 		break;
 	case RIN_GAIN_STRENGTH:
 		which = A_STR;

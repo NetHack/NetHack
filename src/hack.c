@@ -14,6 +14,7 @@ STATIC_DCL void NDECL(dosinkfall);
 #endif
 STATIC_DCL boolean FDECL(findtravelpath, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(trapmove, (int,int,struct trap *));
+STATIC_DCL void NDECL(switch_terrain);
 STATIC_DCL struct monst *FDECL(monstinroom, (struct permonst *,int));
 STATIC_DCL boolean FDECL(doorless_door, (int,int));
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
@@ -1640,6 +1641,40 @@ invocation_message()
 	}
 }
 
+/* moving onto different terrain;
+   might be going into solid rock, inhibiting levitation or flight,
+   or coming back out of such, reinstating levitation/flying */
+STATIC_OVL void
+switch_terrain()
+{
+    struct rm *lev = &levl[u.ux][u.uy];
+    boolean blocklev = (IS_ROCK(lev->typ) || closed_door(u.ux, u.uy) ||
+			(Is_waterlevel(&u.uz) && lev->typ == WATER));
+
+    if (blocklev) {
+	/* called from spoteffects(), skip float_down() */
+	if (Levitation) You_cant("levitate in here.");
+	BLevitation |= FROMOUTSIDE;
+    } else if (BLevitation) {
+	BLevitation &= ~FROMOUTSIDE;
+	if (Levitation) float_up();
+    }
+    /* the same terrain that blocks levitation also blocks flight */
+    if (blocklev) {
+	if (Flying) You_cant("fly in here.");
+	BFlying |= FROMOUTSIDE;
+    } else if (BFlying) {
+	BFlying &= ~FROMOUTSIDE;
+	/* in case BFlying got set due to levitation which then went away
+	   while blocked; there'd be no float_down() with reset of BFlying */
+	if (!HLevitation && !ELevitation) BFlying &= ~I_SPECIAL;
+	/* [minor bug: we don't know whether this is beginning flight or
+	   resuming it; that could be tracked so that this message could
+	   be adjusted to "resume flying", but isn't worth the effort...] */
+	if (Flying) You("start flying.");
+    }
+}
+
 /* extracted from spoteffects; called by spoteffects to check for entering or
    leaving a pool of water/lava, and by moveloop to check for staying on one */
 boolean
@@ -1740,6 +1775,10 @@ boolean pick;
 	++inspoteffects;
 	spotterrain = levl[u.ux][u.uy].typ;
 	spotloc.x = u.ux, spotloc.y = u.uy;
+
+	/* moving onto different terrain might cause Levitation to toggle */
+	if (spotterrain != levl[u.ux0][u.uy0].typ || !on_level(&u.uz, &u.uz0))
+	    switch_terrain();
 
 	if (pooleffects(TRUE)) goto spotdone;
 
