@@ -1158,6 +1158,9 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		if (!confused || rn2(5)) {
 			if(!Blind) known = TRUE;
 			litroom(!confused && !scursed, sobj);
+			if (!confused && !scursed) {
+			    if (lightdamage(sobj, TRUE, 5)) known = TRUE;
+			}
 		} else {
 		   /* could be scroll of create monster, don't set known ...*/
 		    (void) create_critters(1, !scursed ?
@@ -1518,6 +1521,14 @@ int chg;		/* recharging */
     exercise(A_STR, FALSE);
 }
 
+/* used to collect gremlins being hit by light so that they can be processed
+   after vision for the entire lit area has been brought up to date */
+struct litmon {
+    struct monst *mon;
+    struct litmon *nxt;
+};
+STATIC_VAR struct litmon *gremlins = 0;
+
 /*
  * Low-level lit-field update routine.
  */
@@ -1526,9 +1537,18 @@ set_lit(x,y,val)
 int x, y;
 genericptr_t val;
 {
-	if (val)
+	struct monst *mtmp;
+	struct litmon *gremlin;
+
+	if (val) {
 	    levl[x][y].lit = 1;
-	else {
+	    if ((mtmp = m_at(x, y)) != 0 && mtmp->data == &mons[PM_GREMLIN]) {
+		gremlin = (struct litmon *)alloc(sizeof *gremlin);
+		gremlin->mon = mtmp;
+		gremlin->nxt = gremlins;
+		gremlins = gremlin;
+	    }
+	} else {
 	    levl[x][y].lit = 0;
 	    snuff_light_source(x, y);
 	}
@@ -1627,6 +1647,20 @@ do_it:
 	}
 
 	vision_full_recalc = 1;	/* delayed vision recalculation */
+	if (gremlins) {
+	    struct litmon *gremlin;
+
+	    /* can't delay vision recalc after all */
+	    vision_recalc(0);
+	    /* after vision has been updated, monsters who are affected
+	       when hit by light can now be hit by it */
+	    do {
+		gremlin = gremlins;
+		gremlins = gremlin->nxt;
+		light_hits_gremlin(gremlin->mon, rnd(5));
+		free((genericptr_t)gremlin);
+	    } while (gremlins);
+	}
 }
 
 STATIC_OVL void

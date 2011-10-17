@@ -394,6 +394,8 @@ if hero dragged iron ball into temporary corridor and then killed vault guard,
 	the portion of corridor currently in existence would become permanent
 on Plane of Water, restrict levitation and flying to air bubbles;
 	elsewhere, restrict them such that they don't work inside solid rock
+wand/scroll/spell of light now hurts gremlins (lamp/candle light doesn't)
+ditto for hero in gremlin form (camera too)
 
 
 Platform- and/or Interface-Specific Fixes

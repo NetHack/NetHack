@@ -1963,6 +1963,7 @@ register struct obj *obj;
 		case SPE_LIGHT:
 			litroom(TRUE,obj);
 			if (!Blind) known = TRUE;
+			if (lightdamage(obj, TRUE, 5)) known = TRUE;
 			break;
 		case WAN_SECRET_DOOR_DETECTION:
 		case SPE_DETECT_UNSEEN:
@@ -2279,7 +2280,9 @@ boolean ordinary;
 		    damage = d(obj->spe, 25);
 #ifdef TOURIST
 		case EXPENSIVE_CAMERA:
+		    if (!damage) damage = 5;
 #endif
+		    damage = lightdamage(obj, ordinary, damage);
 		    damage += rnd(25);
 		    if (flashburn((long)damage)) learn_it = TRUE;
 		    damage = 0;	/* reset */
@@ -2377,6 +2380,38 @@ struct attack *mattk;
 	zhitu(dtyp, mattk->damn, fltxt, u.ux, u.uy);
 }
 
+/* light damages hero in gremlin form */
+int
+lightdamage(obj, ordinary, amt)
+struct obj *obj;	/* item making light (fake book if spell) */
+boolean ordinary;	/* wand/camera zap vs wand destruction */
+int amt;	/* pseudo-damage used to determine blindness duration */
+{
+    char buf[BUFSZ];
+    const char *how;
+    int dmg = amt;
+
+    if (dmg && youmonst.data == &mons[PM_GREMLIN]) {
+	/* reduce high values (from destruction of wand with many charges) */
+	dmg = rnd(dmg);
+	if (dmg > 10) dmg = 10 + rnd(dmg - 10);
+	if (dmg > 20) dmg = 20;
+	pline("Ow, that light hurts%c", (dmg > 2 || u.mh <= 5) ? '!' : '.');
+	/* [composing killer/reason is superfluous here; if fatal, cause
+	   of death will always be "killed while stuck in creature form"] */
+	if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS)
+	    ordinary = FALSE;	/* say blasted rather than zapped */
+	how = (obj->oclass != SPBOOK_CLASS) ?
+		(const char *)ansimpleoname(obj) : "spell of light";
+	Sprintf(buf, "%s %sself with %s",
+		ordinary ? "zapped" : "blasted", uhim(), how);
+	/* might rehumanize(); could be fatal, but only for Unchanging */
+	losehp(Maybe_Half_Phys(dmg), buf, NO_KILLER_PREFIX);
+    }
+    return dmg;
+}
+
+/* light[ning] causes blindness */
 boolean
 flashburn(duration)
 long duration;

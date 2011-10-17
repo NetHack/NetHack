@@ -2609,16 +2609,7 @@ struct obj *otmp;	/* source of flash */
 		    /* Rule #1: Keep them out of the light. */
 		    amt = otmp->otyp == WAN_LIGHT ? d(1 + otmp->spe, 4) :
 		          rn2(min(mtmp->mhp,4));
-		    pline("%s %s!", Monnam(mtmp), amt > mtmp->mhp / 2 ?
-			  "wails in agony" : "cries out in pain");
-		    if ((mtmp->mhp -= amt) <= 0) {
-			if (context.mon_moving)
-			    monkilled(mtmp, (char *)0, AD_BLND);
-			else
-			    killed(mtmp);
-		    } else if (cansee(mtmp->mx,mtmp->my) && !canspotmon(mtmp)){
-			map_invisible(mtmp->mx, mtmp->my);
-		    }
+		    light_hits_gremlin(mtmp, amt);
 		}
 		if (mtmp->mhp > 0) {
 		    if (!context.mon_moving) setmangry(mtmp);
@@ -2630,6 +2621,23 @@ struct obj *otmp;	/* source of flash */
 	    }
 	}
 	return res;
+}
+
+void
+light_hits_gremlin(mon, dmg)
+struct monst *mon;
+int dmg;
+{
+    pline("%s %s!", Monnam(mon),
+	  (dmg > mon->mhp / 2) ? "wails in agony" : "cries out in pain");
+    if ((mon->mhp -= dmg) <= 0) {
+	if (context.mon_moving)
+	    monkilled(mon, (char *)0, AD_BLND);
+	else
+	    killed(mon);
+    } else if (cansee(mon->mx, mon->my) && !canspotmon(mon)) {
+	map_invisible(mon->mx, mon->my);
+    }
 }
 
 /*uhitm.c*/

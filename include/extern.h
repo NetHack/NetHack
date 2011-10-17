@@ -2341,6 +2341,7 @@ E int FDECL(passive, (struct monst *,BOOLEAN_P,int,UCHAR_P,BOOLEAN_P));
 E void FDECL(passive_obj, (struct monst *,struct obj *,struct attack *));
 E void FDECL(stumble_onto_mimic, (struct monst *));
 E int FDECL(flash_hits_mon, (struct monst *,struct obj *));
+E void FDECL(light_hits_gremlin, (struct monst *,int));
 
 /* ### unixmain.c ### */
 
@@ -2685,6 +2686,8 @@ E void FDECL(zapnodir, (struct obj *));
 E int NDECL(dozap);
 E int FDECL(zapyourself, (struct obj *,BOOLEAN_P));
 E void FDECL(ubreatheu, (struct attack *));
+E int FDECL(lightdamage, (struct obj *,BOOLEAN_P,int));
+E boolean FDECL(flashburn, (long));
 E boolean FDECL(cancel_monst, (struct monst *,struct obj *,
 			       BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void NDECL(zapsetup);
@@ -2710,7 +2713,6 @@ E void FDECL(destroy_item, (int,int));
 E int FDECL(destroy_mitem, (struct monst *,int,int));
 E int FDECL(resist, (struct monst *,CHAR_P,int,int));
 E void NDECL(makewish);
-E boolean FDECL(flashburn, (long));
 
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
 
