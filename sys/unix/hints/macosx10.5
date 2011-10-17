@@ -191,40 +191,61 @@ ifdef WANT_WIN_TTY
 DEVUTIL=/Developer/Applications/Utilities
 PKGR=$(DEVUTIL)/PackageMaker.app/Contents/MacOS/PackageMaker
 SVS=$(shell $(NHSROOT)/util/makedefs --svs)
+SVSDOT=$(shell $(NHSROOT)/util/makedefs --svs .)
 
+PKGROOT_UG	= PKGROOT/usr/games
+PKGROOT_UGLN	= PKGROOT/usr/games/lib/nethackdir
 build_tty_pkg:
 ifneq (,$(WANT_WIN_X11)$(WANT_WIN_QT))
 	-echo build_tty_pkg only works for a tty-only build
 	exit 1
 else
+	rm -rf NetHack-$(SVS)-mac-Term.pkg NetHack-$(SVS)-mac-Term.dmg
 	$(MAKE) build_package_root
 	rm -rf RESOURCES
 	mkdir RESOURCES
-	enscript --language=rtf -o - < dat/license >RESOURCES/License.rtf
+	#enscript --language=rtf -o - < dat/license >RESOURCES/License.rtf
 	sys/unix/hints/macosx.sh descplist > RESOURCES/Description.plist
 	sys/unix/hints/macosx.sh infoplist > Info.plist
 
-	$(PKGR) --root PKGROOT --info Info.plist -e RESOURCES -v -o NetHack-$(SVS)-mac-Term.pkg
-	hdiutil create -verbose -srcfolder NetHack-$(SVS)-mac-Term.pkg Nethack-$(SVS)-mac-Term.dmg
+	mkdir PKGROOT/Applications
+	#osacompile -o NetHackQt/NetHackQt.app/nethackdir/NetHackRecover.app \
+	#	 win/macosx/NetHackRecover.applescript
+	#cp win/macosx/recover.pl NetHackQt/NetHackQt.app/nethackdir
+	osacompile -o PKGROOT/Applications/NetHackRecover.app \
+		 win/macosx/NetHackRecover.applescript
+	cp win/macosx/recover.pl $(PKGROOT_UGLN)
 
-SVS=$(shell util/makedefs --svs)
-SVSDOT=$(shell util/makedefs --svs .)
+	osacompile -o PKGROOT/Applications/NetHackTerm.app \
+		 win/macosx/NetHackTerm.applescript
+
+	# XXX integrate into Makefile.doc
+	(cd doc; cat Guidebook.mn | ../util/makedefs --grep --input - --output - \
+	| tbl tmac.n - | groff |ps2pdf - > Guidebook.pdf)
+	cp doc/Guidebook.pdf $(PKGROOT_UG)/doc/NetHackGuidebook.pdf
+
+	osacompile -o PKGROOT/Applications/NetHackGuidebook.app \
+		 win/macosx/NetHackGuidebook.applescript
+
+	$(PKGR) --root PKGROOT --info Info.plist -e RESOURCES -v -o NetHack-$(SVS)-mac-Term.pkg
+	hdiutil create -verbose -srcfolder NetHack-$(SVS)-mac-Term.pkg NetHack-$(SVS)-mac-Term.dmg
 
 build_package_root:
 	cd src/..       # make sure we are at TOP
 	rm -rf PKGROOT
-	mkdir -p PKGROOT/lib PKGROOT/bin PKGROOT/man/man6 PKGROOT/doc
-	install -p src/nethack PKGROOT/bin
-	install -p util/recover PKGROOT/bin
-	install -p doc/nethack.6 PKGROOT/man/man6
-	install -p doc/recover.6 PKGROOT/man/man6
-	install -p doc/Guidebook PKGROOT/doc
-	install -p dat/nhdat PKGROOT/lib
-	cd dat; install -p $(DATNODLB) ../PKGROOT/lib
+	mkdir -p $(PKGROOT_UG)/lib $(PKGROOT_UG)/bin $(PKGROOT_UG)/man/man6 $(PKGROOT_UG)/doc $(PKGROOT_UGLN)
+	install -p src/nethack $(PKGROOT_UG)/bin
+	# XXX should this be called nethackrecover?
+	install -p util/recover $(PKGROOT_UG)/bin
+	install -p doc/nethack.6 $(PKGROOT_UG)/man/man6
+	install -p doc/recover.6 $(PKGROOT_UG)/man/man6
+	install -p doc/Guidebook $(PKGROOT_UG)/doc
+	install -p dat/nhdat $(PKGROOT_UGLN)
+	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
 # XXX these files should be somewhere else for good Mac form
-	touch PKGROOT/perm PKGROOT/record PKGROOT/logfile
+	touch $(PKGROOT_UGLN)/perm $(PKGROOT_UGLN)/record $(PKGROOT_UGLN)/logfile
 # XXX may need postinstall script to get perms right for sgid, etc.
-	mkdir PKGROOT/save
+	mkdir $(PKGROOT_UGLN)/save
 # XXX what about a news file?
 endif	# end of build_tty_pkg
 endif	# WANT_WIN_TTY for packaging

@@ -13,7 +13,7 @@ if(! -d $playground){
 	print "Cannot find playground $playground.";
 	exit 0
 }
-if(! -f "$playground/castle.lev"){
+if(! -f "$playground/castle.lev" && ! -f "$playground/nhdat"){
 	print "Failed to find playground $playground.";
 	exit 0
 }
@@ -38,9 +38,12 @@ if($try_perm){
 }
 
 # run recover, but only if there is something that looks promising
+$recover = "./recover";
+$recover = "/usr/games/bin/recover" unless(-e $recover);
+
 $uid = $<;
 foreach ( <$uid*.0> ){
-	system ("./recover -d . $_");
+	system ("$recover -d . $_");
 }
 
 print "Done.\n";

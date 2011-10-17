@@ -146,7 +146,7 @@ xinfoplist)	SVSDOT=`util/makedefs --svs .`
 	<key>IFPkgFlagAuthorizationAction</key>
 	<string>RootAuthorization</string>
 	<key>IFPkgFlagDefaultLocation</key>
-	<string>/usr/games</string>
+	<string>/</string>
 	<key>IFPkgFlagInstallFat</key>
 	<false/>
 	<key>IFPkgFlagIsRequired</key>
