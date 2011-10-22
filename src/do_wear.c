@@ -194,6 +194,8 @@ Boots_on(VOID_ARGS)
 			makeknown(uarmf->otyp);
 			float_up();
 			spoteffects(FALSE);
+		} else {
+		    float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
 		}
 		break;
 	default: impossible(unknown_type, c_boots, uarmf->otyp);
@@ -245,6 +247,8 @@ Boots_off(VOID_ARGS)
 		    !context.takeoff.cancelled_don) {
 			(void) float_down(0L, 0L);
 			makeknown(otyp);
+		} else {
+		    float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
 		}
 		break;
 	case LOW_BOOTS:
@@ -880,6 +884,8 @@ register struct obj *obj;
 		    float_up();
 		    learnring(obj, TRUE);
 		    spoteffects(FALSE);	/* for sinks */
+		} else {
+		    float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
 		}
 		break;
 	case RIN_GAIN_STRENGTH:
@@ -991,6 +997,8 @@ boolean gone;
 		if (!BLevitation) {
 		    (void) float_down(0L, 0L);
 		    if (!Levitation) learnring(obj, TRUE);
+		} else {
+		    float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
 		}
 		break;
 	case RIN_GAIN_STRENGTH:

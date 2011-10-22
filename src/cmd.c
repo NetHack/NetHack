@@ -1775,16 +1775,13 @@ int final;
 	    long save_BFly = BFlying;
 
 	    BFlying = 0L;
-	    if (Flying) {
-		Sprintf(buf, "%s%s%s",
-			(save_BFly & I_SPECIAL) ?
-				" if you weren't levitating" : "",
-			((save_BFly & (FROMOUTSIDE|I_SPECIAL)) ==
-				(FROMOUTSIDE|I_SPECIAL)) ? " and" : "",
-			(save_BFly & FROMOUTSIDE) ?
-				if_surroundings_permitted : (const char *)"");
-		enl_msg(You_, "would fly", "would have flown", buf, "");
-	    }
+	    if (Flying)
+		enl_msg(You_, "would fly", "would have flown",
+			Levitation ? "if you weren't levitating" :
+			  (save_BFly == FROMOUTSIDE) ?
+			    if_surroundings_permitted :
+			    /* both surroundings and [latent] levitation */
+			    " if circumstances permitted", "");
 	    BFlying = save_BFly;
 	}
 	/* actively walking on water handled earlier as a status condition */

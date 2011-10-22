@@ -934,6 +934,7 @@ peffects(otmp)
 		} else
 		    incr_itimeout(&HLevitation, rn1(140,10));
 		if (Levitation) spoteffects(FALSE);	/* for sinks */
+		float_vs_flight();
 		break;
 	case POT_GAIN_ENERGY:			/* M. Stephenson */
 		{	register int num;

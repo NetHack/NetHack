@@ -88,17 +88,26 @@ set_uasmon()
 	PROPSET(PASSES_WALLS, passes_walls(mdat));
 	PROPSET(REGENERATION, regenerates(mdat));
 	PROPSET(REFLECTING, (mdat == &mons[PM_SILVER_DRAGON]));
-	/* levitation overrides flight */
-	if (HLevitation || ELevitation)
-	    BFlying |= I_SPECIAL;
-	else
-	    BFlying &= ~I_SPECIAL;
+
+	float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
 
 #undef PROPSET
 
 #ifdef STATUS_VIA_WINDOWPORT
 	status_initialize(REASSESS_ONLY);
 #endif
+}
+
+/* Levitation overrides Flying; set or clear BFlying|I_SPECIAL */
+void
+float_vs_flight()
+{
+	/* floating overrides flight; normally float_up() and float_down()
+	   handle this, but sometimes they're skipped */
+	if (HLevitation || ELevitation)
+	    BFlying |= I_SPECIAL;
+	else
+	    BFlying &= ~I_SPECIAL;
 }
 
 /* for changing into form that's immune to strangulation */

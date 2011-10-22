@@ -543,6 +543,9 @@ dosinkfall()
 	    off_msg(obj);
 	}
 	HLevitation--;
+	/* probably moot; we're either still levitating or went
+	   through float_down(), but make sure BFlying is up to date */
+	float_vs_flight();
 }
 #endif
 
@@ -1665,9 +1668,7 @@ switch_terrain()
 	BFlying |= FROMOUTSIDE;
     } else if (BFlying) {
 	BFlying &= ~FROMOUTSIDE;
-	/* in case BFlying got set due to levitation which then went away
-	   while blocked; there'd be no float_down() with reset of BFlying */
-	if (!HLevitation && !ELevitation) BFlying &= ~I_SPECIAL;
+	float_vs_flight();	/* maybe toggle (BFlying & I_SPECIAL) */
 	/* [minor bug: we don't know whether this is beginning flight or
 	   resuming it; that could be tracked so that this message could
 	   be adjusted to "resume flying", but isn't worth the effort...] */

@@ -1750,6 +1750,7 @@ E void NDECL(self_invis_message);
 /* ### polyself.c ### */
 
 E void NDECL(set_uasmon);
+E void NDECL(float_vs_flight);
 E void NDECL(change_sex);
 E void FDECL(polyself, (int));
 E int FDECL(polymon, (int));
