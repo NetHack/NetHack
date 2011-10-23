@@ -756,7 +756,9 @@ dodown()
 	    return 0;
 	}
 #endif
-	if (Levitation) {
+	/* Levitation might be blocked, but player can still use '>' to
+	   turn off controlled levitaiton */
+	if (HLevitation || ELevitation) {
 	    if ((HLevitation & I_SPECIAL) || (ELevitation & W_ARTI)) {
 		/* end controlled levitation */
 		if (ELevitation & W_ARTI) {
@@ -771,10 +773,16 @@ dodown()
 			}
 		    }
 		}
-		if (float_down(I_SPECIAL|TIMEOUT, W_ARTI))
-		    return (1);   /* came down, so moved */
+		if (float_down(I_SPECIAL|TIMEOUT, W_ARTI)) {
+		    return 1;	/* came down, so moved */
+		} else if (!HLevitation && !ELevitation) {
+		    Your("latent levitation ceases.");
+		    return 1;	/* did something, effectively moved */
+		}
 	    }
-	    if (Blind) {
+	    if (BLevitation) {
+		;	/* weren't actually floating after all */
+	    } else if (Blind) {
 		/* Avoid alerting player to an unknown stair or ladder.
 		 * Changes the message for a covered, known staircase
 		 * too; staircase knowledge is not stored anywhere.

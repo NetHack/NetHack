@@ -2669,7 +2669,13 @@ long hmask, emask;     /* might cancel timeout */
 
 	HLevitation &= ~hmask;
 	ELevitation &= ~emask;
-	if(Levitation) return(0); /* maybe another ring/potion/boots */
+	if (Levitation) return 0; /* maybe another ring/potion/boots */
+	if (BLevitation) {
+	    /* Levitation is blocked, so hero is not actually floating
+	       hence shouldn't have float_down effects and feedback */
+	    float_vs_flight(); /* before nomul() rather than after */
+	    return 0;
+	}
 	nomul(0);	/* stop running or resting */
 	if (BFlying) {
 	    /* controlled flight no longer overridden by levitation */
