@@ -952,6 +952,7 @@ E void NDECL(reassign);
 E int NDECL(doorganize);
 E int FDECL(count_unpaid, (struct obj *));
 E int FDECL(count_buc, (struct obj *,int));
+E long FDECL(count_contents, (struct obj *,BOOLEAN_P,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(carry_obj_effects, (struct obj *));
 E const char *FDECL(currency, (long));
 E void FDECL(silly_thing, (const char *,struct obj *));

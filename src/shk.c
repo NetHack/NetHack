@@ -2876,9 +2876,15 @@ xchar x, y;
 
 		if (short_funds) offer = shkmoney;
 		if (!sell_response) {
-		    only_partially_your_contents = (container &&
-				contained_cost(obj, shkp, 0L, FALSE, FALSE) !=
-				contained_cost(obj, shkp, 0L, FALSE, TRUE));
+		    long yourc = 0L, shksc;
+
+		    if (container) {
+			/* number of items owned by shk */
+			shksc = count_contents(obj, TRUE, TRUE, FALSE);
+			/* number of items owned by you (total - shksc) */
+			yourc = count_contents(obj, TRUE, TRUE, TRUE) - shksc;
+			only_partially_your_contents = shksc && yourc;
+		    }
 		    /*
 		       "<shk> offers * for ..." query formatting.
 		       Normal item(s):
@@ -2895,22 +2901,26 @@ xchar x, y;
 		       Your container:
 			"... your <empty bag>.  Sell it?"
 			"... your <bag> and its contents.  Sell them?"
+			"... your <bag> and item inside.  Sell them?"
 			"... your <bag> and items inside.  Sell them?"
 		       Shk's container:
-		       (empty case won't happen--nothing to sell)
-			"... the contents of the <bag>.  Sell them?"
+			"... your item in the <bag>.  Sell it?"
 			"... your items in the <bag>.  Sell them?"
 		     */
 		    Sprintf(qbuf, "%s offers%s %ld gold piece%s for %s%s ",
 			    shkname(shkp), short_funds ? " only" : "",
 			    offer, plur(offer),
-			    (cltmp && !ltmp) ? (only_partially_your_contents ?
-			      "your items in " : the_contents_of) : "",
+			    (cltmp && !ltmp) ? 
+			      ((yourc == 1L) ? "your item in " :
+					       "your items in ") : "",
 			    obj->unpaid ? "the" : "your");
-		    one = (obj->quan == 1L && !cltmp);
+		    one = obj->unpaid ? (yourc == 1L) :
+				(obj->quan == 1L && !cltmp);
 		    Sprintf(qsfx, "%s.  Sell %s?",
 			    (cltmp && ltmp) ? (only_partially_your_contents ?
-			      " and items inside" : and_its_contents) : "",
+			      ((yourc == 1L) ? " and item inside" :
+					       " and items inside") :
+			      and_its_contents) : "",
 			    one ? "it" : "them");
 		    (void)safe_qbuf(qbuf, qbuf, qsfx,
 				    obj, xname, simpleonames,
@@ -2932,7 +2942,7 @@ xchar x, y;
 			    pay(-offer, shkp);
 			    shk_names_obj(shkp, obj, (sell_how != SELL_NORMAL) ?
 				    (!ltmp && cltmp && only_partially_your_contents) ?
-			    	    "sold some items inside %s for %ld gold pieces%s.%s" :
+				    "sold some items inside %s for %ld gold piece%s.%s" :
 				    "sold %s for %ld gold piece%s.%s" :
 	       "relinquish %s and receive %ld gold piece%s in compensation.%s",
 				    offer, "");

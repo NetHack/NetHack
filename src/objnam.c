@@ -736,14 +736,15 @@ register struct obj *obj;
 	if (obj->greased) Strcat(prefix, "greased ");
 
 	if (cknown && Has_contents(obj)) {
-	    struct obj *curr;
-	    long itemcount = 0L;
+	    /* we count all objects (obj->quantity); perhaps we should
+	       count seperate stacks instead (or even introduce a user
+	       preference option to choose between the two alternatives)
+	       since it's somewhat odd so see "containing 1002 items"
+	       when there are 2 scrolls plus 1000 gold pieces */
+	    long itemcount = count_contents(obj, FALSE, TRUE, TRUE);
 
-	    /* Count the number of contained objects */
-	    for (curr = obj->cobj; curr; curr = curr->nobj)
-		itemcount += curr->quan;
 	    Sprintf(eos(bp), " containing %ld item%s",
-	    		itemcount, plur(itemcount));
+		    itemcount, plur(itemcount));
 	}
 
 	switch(obj->oclass) {

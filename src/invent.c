@@ -2056,6 +2056,9 @@ count_unpaid(list)
 /*
  * Returns the number of items with b/u/c/unknown within the given list.  
  * This does NOT include contained objects.
+ *
+ * Assumes that the hero sees or touches or otherwise senses the objects
+ * at some point:  bknown is forced for priest[ess], like in xname().
  */
 int
 count_buc(list, type)
@@ -2064,31 +2067,37 @@ count_buc(list, type)
 {
     int count = 0;
 
-    while (list) {
-	if (Role_if(PM_PRIEST)) list->bknown = TRUE;
-	switch(type) {
-	    case BUC_BLESSED:
-		if (list->oclass != COIN_CLASS && list->bknown && list->blessed)
-		    count++;
-		break;
-	    case BUC_CURSED:
-		if (list->oclass != COIN_CLASS && list->bknown && list->cursed)
-		    count++;
-		break;
-	    case BUC_UNCURSED:
-		if (list->oclass != COIN_CLASS &&
-			list->bknown && !list->blessed && !list->cursed)
-		    count++;
-		break;
-	    case BUC_UNKNOWN:
-		if (list->oclass != COIN_CLASS && !list->bknown)
-		    count++;
-		break;
-	    default:
-		impossible("need count of curse status %d?", type);
-		return 0;
-	}
-	list = list->nobj;
+    for ( ; list; list = list->nobj) {
+	/* coins are "none of the above" as far as BUCX filtering goes */
+	if (list->oclass == COIN_CLASS) continue;
+	/* priests always know bless/curse state */
+	if (Role_if(PM_PRIEST)) list->bknown = 1;
+
+	/* check whether this object matches the requested type */
+	if (!list->bknown ? (type == BUC_UNKNOWN) :
+	      list->blessed ? (type == BUC_BLESSED) :
+		list->cursed ? (type == BUC_CURSED) :
+		  (type == BUC_UNCURSED))
+	    ++count;
+    }
+    return count;
+}
+
+long
+count_contents(container, nested, quantity, everything)
+struct obj *container;
+boolean nested,		/* include contents of any nested containers */
+	quantity,	/* count all vs count separate stacks */
+	everything;	/* all objects vs only unpaid objects */
+{
+    struct obj *otmp;
+    long count = 0L;
+
+    for (otmp = container->cobj; otmp; otmp = otmp->nobj) {
+	if (nested && Has_contents(otmp))
+	    count += count_contents(otmp, nested, quantity, everything);
+	if (everything || otmp->unpaid)
+	    count += quantity ? otmp->quan : 1L;
     }
     return count;
 }
