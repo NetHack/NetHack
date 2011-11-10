@@ -350,7 +350,7 @@ struct obj {
  *	          newxx(otmp)
  *	          struct obj *otmp;
  *	          {
- *	              if (!otmp->mextra) otmp->oextra = newoextra();
+ *	              if (!otmp->oextra) otmp->oextra = newoextra();
  *	              if (!XX(otmp)) {
  *	                  XX(otmp) = (struct XX *)alloc(sizeof(struct xx));
  *	                  (void) memset((genericptr_t) XX(otmp),
