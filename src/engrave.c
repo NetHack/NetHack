@@ -923,7 +923,7 @@ doengrave()
 		c = yn_function("Do you want to add to the current engraving?",
 				ynqchars, 'y');
 		if (c == 'q') {
-		    pline(Never_mind);
+		    pline("%s", Never_mind);
 		    return(0);
 		}
 	    }
@@ -1016,7 +1016,7 @@ doengrave()
 			  Tobjnam(otmp, "glow"), otense(otmp, "fade"));
 		return(1);
 	    } else {
-		pline(Never_mind);
+		pline("%s", Never_mind);
 		return(0);
 	    }
 	}
