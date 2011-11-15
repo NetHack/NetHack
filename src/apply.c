@@ -61,7 +61,7 @@ use_camera(obj)
 	if(!getdir((char *)0)) return(0);
 
 	if (obj->spe <= 0) {
-		pline(nothing_happens);
+		pline("%s", nothing_happens);
 		return (1);
 	}
 	consume_obj_charge(obj, TRUE);
@@ -944,7 +944,7 @@ struct obj **optr;
 		if (!obj->cursed)
 		    (void) openit();
 		else
-		    pline(nothing_happens);
+		    pline("%s", nothing_happens);
 
 	    } else if (obj->cursed) {
 		coord mm;
@@ -980,7 +980,7 @@ struct obj **optr;
 		}
 		res += openit();
 		switch (res) {
-		  case 0:  pline(nothing_happens); break;
+		  case 0:  pline("%s", nothing_happens); break;
 		  case 1:  pline("%s opens...", Something);
 			   learno = TRUE; break;
 		  default: pline("Things open around you...");
@@ -992,7 +992,7 @@ struct obj **optr;
 		amii_speaker( obj, "AeFeaeFeAefegw", AMII_OKAY_VOLUME );
 #endif
 		if (findit() != 0) learno = TRUE;
-		else pline(nothing_happens);
+		else pline("%s", nothing_happens);
 	    }
 
 	}	/* charged BofO */
@@ -1355,13 +1355,13 @@ dorub()
 	    } else if (rn2(2)) {
 		You("%s smoke.", !Blind ? "see a puff of" : "smell");
 	    } else
-		pline(nothing_happens);
+		pline("%s", nothing_happens);
 	} else if (obj->otyp == BRASS_LANTERN) {
 	    /* message from Adventure */
 	    pline("Rubbing the electric lamp is not particularly rewarding.");
 	    pline("Anyway, nothing exciting happens.");
 	} else
-	    pline(nothing_happens);
+	    pline("%s", nothing_happens);
 	return 1;
 }
 
@@ -1696,7 +1696,7 @@ struct obj *obj;
 	}
 
 	if (trouble_count == 0) {
-	    pline(nothing_happens);
+	    pline("%s", nothing_happens);
 	    return;
 	} else if (trouble_count > 1) {		/* shuffle */
 	    int i, j, k;
@@ -2390,7 +2390,7 @@ struct obj *obj;
 		You("wrap your bullwhip around %s on the %s.",
 		    an(singular(otmp, xname)), surface(u.ux, u.uy));
 		if (rnl(6) || pickup_object(otmp, 1L, TRUE) < 1)
-		    pline(msg_slipsfree);
+		    pline("%s", msg_slipsfree);
 		return 1;
 	    }
 	}
@@ -2431,7 +2431,7 @@ struct obj *obj;
 		wrapped_what = strcpy(buf, mon_nam(mtmp));
 	    } else if (proficient) {
 		if (attack(mtmp)) return 1;
-		else pline(msg_snap);
+		else pline("%s", msg_snap);
 	    }
 	}
 	if (!wrapped_what) {
@@ -2453,10 +2453,10 @@ struct obj *obj;
 		    vision_full_recalc = 1;
 		}
 	    } else {
-		pline(msg_slipsfree);
+		pline("%s", msg_slipsfree);
 	    }
 	    if (mtmp) wakeup(mtmp);
-	} else pline(msg_snap);
+	} else pline("%s", msg_snap);
 
     } else if (mtmp) {
 	if (!canspotmon(mtmp) &&
@@ -2547,7 +2547,7 @@ struct obj *obj;
 		    break;
 		}
 	    } else {
-		pline(msg_slipsfree);
+		pline("%s", msg_slipsfree);
 	    }
 	    wakeup(mtmp);
 	} else {
@@ -2557,7 +2557,7 @@ struct obj *obj;
 	    else You("flick your bullwhip towards %s.", mon_nam(mtmp));
 	    if (proficient) {
 		if (attack(mtmp)) return 1;
-		else pline(msg_snap);
+		else pline("%s", msg_snap);
 	    }
 	}
 
@@ -2566,7 +2566,7 @@ struct obj *obj;
 	    You("snap your whip through thin air.");
 
     } else {
-	pline(msg_snap);
+	pline("%s", msg_snap);
 
     }
     return 1;
@@ -2854,7 +2854,7 @@ use_grapple(obj)
 	    }
 	    break;
 	}
-	pline(nothing_happens);
+	pline("%s", nothing_happens);
 	return (1);
 }
 
