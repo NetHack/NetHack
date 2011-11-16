@@ -1636,6 +1636,15 @@ int retryct;
 		nesting--;
 		return FALSE;
 # endif
+	    case EROFS:
+		/* take a wild guess at the underlying cause */
+		HUP perror(lockname);
+		HUP raw_printf("Cannot lock %s.", filename);
+		HUP raw_printf(
+"(Perhaps you are running NetHack from inside the distribution package?)."
+		);
+		nesting--;
+		return FALSE;
 	    default:
 		HUP perror(lockname);
 		HUP raw_printf(
