@@ -396,6 +396,8 @@ on Plane of Water, restrict levitation and flying to air bubbles;
 	elsewhere, restrict them such that they don't work inside solid rock
 wand/scroll/spell of light now hurts gremlins (lamp/candle light doesn't)
 ditto for hero in gremlin form (camera too)
+autosearch finds and transforms secret doors and corridors even while blind,
+	but it wasn't updating the map to show them unless the hero could see
 
 
 Platform- and/or Interface-Specific Fixes

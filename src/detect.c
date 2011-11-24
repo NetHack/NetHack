@@ -1235,7 +1235,7 @@ struct trap *trap;
 
 int
 dosearch0(aflag)
-register int aflag;
+register int aflag;	/* intrinsic autosearch vs explicit searching */
 {
 #ifdef GCC_BUG
 /* some versions of gcc seriously muck up nested loops. if you get strange
@@ -1270,17 +1270,16 @@ register int aflag;
 			cvt_sdoor_to_door(&levl[x][y]);	/* .typ = DOOR */
 			exercise(A_WIS, TRUE);
 			nomul(0);
-			if (Blind && !aflag)
-			    feel_location(x,y);	/* make sure it shows up */
-			else
-			    newsym(x,y);
+			feel_location(x, y);	/* make sure it shows up */
+			You("find a hidden door.");
 		    } else if(levl[x][y].typ == SCORR) {
 			if(rnl(7-fund)) continue;
 			levl[x][y].typ = CORR;
 			unblock_point(x,y);	/* vision */
 			exercise(A_WIS, TRUE);
 			nomul(0);
-			newsym(x,y);
+			feel_location(x, y);	/* make sure it shows up */
+			You("find a hidden passage.");
 		    } else {
 		/* Be careful not to find anything in an SCORR or SDOOR */
 			if((mtmp = m_at(x, y)) && !aflag) {
@@ -1343,6 +1342,7 @@ register int aflag;
 	return(1);
 }
 
+/* the 's' command -- explicit searching */
 int
 dosearch()
 {
