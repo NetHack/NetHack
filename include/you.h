@@ -1,5 +1,4 @@
 /* NetHack 3.5	you.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)you.h	3.5	2006/03/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -228,6 +227,14 @@ struct Align {
 
 extern const struct Align aligns[];	/* table of available alignments */
 
+/* hangup handling; sometimes u.uinwater is overridden, and we need to
+   be able to reset it in the event of restoring from a hangup save;
+   save/override/restore takes place during normal execution, so this
+   isn't dependent upon current port's signal handling capability */
+struct huphack {
+	Bitfield(hup_uinwater,1);
+	Bitfield(hup_uburied,1);
+};
 
 /*** Information about the player ***/
 struct you {
@@ -361,6 +368,7 @@ struct you {
 	xchar	skill_record[P_SKILL_LIMIT];	/* skill advancements */
 	struct skills weapon_skills[P_NUM_SKILLS];
 	boolean twoweap;		/* KMH -- Using two-weapon combat */
+	struct huphack save;	/* hup_{uinwater,uburied} */
 
 };	/* end of `struct you' */
 

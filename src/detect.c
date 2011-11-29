@@ -166,7 +166,6 @@ register struct obj *sobj;
 {
     register struct obj *obj;
     register struct monst *mtmp;
-    int uw = u.uinwater;
     struct obj *temp;
     boolean stale;
 
@@ -234,7 +233,8 @@ register struct obj *sobj;
 outgoldmap:
     cls();
 
-    u.uinwater = 0;
+    u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+    u.uinwater = u.uburied = 0;
     /* Discover gold locations. */
     for (obj = fobj; obj; obj = obj->nobj) {
     	if (sobj->blessed && (temp = o_material(obj, GOLD))) {
@@ -277,13 +277,12 @@ outgoldmap:
 		break;
 	    }
     }
-    
     newsym(u.ux,u.uy);
+    u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
     You_feel("very greedy, and sense gold!");
     exercise(A_WIS, TRUE);
     display_nhwindow(WIN_MAP, TRUE);
     docrt();
-    u.uinwater = uw;
     if (Underwater) under_water(2);
     if (u.uburied) under_ground(2);
     return(0);
@@ -301,7 +300,6 @@ register struct obj	*sobj;
     boolean confused = (Confusion || (sobj && sobj->cursed)), stale;
     char oclass = confused ? POTION_CLASS : FOOD_CLASS;
     const char *what = confused ? something : "food";
-    int uw = u.uinwater;
 
     stale = clear_stale_map(oclass, 0);
 
@@ -353,7 +351,8 @@ register struct obj	*sobj;
 	struct obj *temp;
 	known = TRUE;
 	cls();
-	u.uinwater = 0;
+	u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+	u.uinwater = u.uburied = 0;
 	for (obj = fobj; obj; obj = obj->nobj)
 	    if ((temp = o_in(obj, oclass)) != 0) {
 		if (temp != obj) {
@@ -372,19 +371,19 @@ register struct obj	*sobj;
 		    break;	/* skip rest of this monster's inventory */
 		}
 	newsym(u.ux,u.uy);
+	u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
 	if (sobj) {
 	    if (sobj->blessed) {
-	    	Your("%s %s to tingle and you smell %s.", body_part(NOSE),
-	    		u.uedibility ? "continues" : "starts", what);
+		Your("%s %s to tingle and you smell %s.", body_part(NOSE),
+		     u.uedibility ? "continues" : "starts", what);
 		u.uedibility = 1;
 	    } else
 		Your("%s tingles and you smell %s.", body_part(NOSE), what);
-	}
-	else You("sense %s.", what);
+	} else
+	    You("sense %s.", what);
 	display_nhwindow(WIN_MAP, TRUE);
 	exercise(A_WIS, TRUE);
 	docrt();
-	u.uinwater = uw;
 	if (Underwater) under_water(2);
 	if (u.uburied) under_ground(2);
     }
@@ -411,7 +410,6 @@ int		class;		/* an object class, 0 for all */
     int ct = 0, ctu = 0;
     register struct obj *obj, *otmp = (struct obj *)0;
     register struct monst *mtmp;
-    int uw = u.uinwater;
     int sym, boulder = 0;
 
     if (class < 0 || class >= MAXOCLASSES) {
@@ -484,7 +482,8 @@ int		class;		/* an object class, 0 for all */
 
     cls();
 
-    u.uinwater = 0;
+    u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+    u.uinwater = u.uburied = 0;
 /*
  *	Map all buried objects first.
  */
@@ -561,6 +560,7 @@ int		class;		/* an object class, 0 for all */
     }
 
     newsym(u.ux,u.uy);
+    u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
     You("detect the %s of %s.", ct ? "presence" : "absence", stuff);
     display_nhwindow(WIN_MAP, TRUE);
     /*
@@ -569,7 +569,6 @@ int		class;		/* an object class, 0 for all */
      */
     docrt();	/* this will correctly reset vision */
 
-    u.uinwater = uw;
     if (Underwater) under_water(2);
     if (u.uburied) under_ground(2);
     return 0;
@@ -717,7 +716,7 @@ register struct obj *sobj;
     register struct trap *ttmp;
     struct monst *mon;
     int door, glyph, tr;
-    int uw = u.uinwater, cursed_src = sobj && sobj->cursed;
+    int cursed_src = sobj && sobj->cursed;
     boolean found = FALSE;
     coord cc;
 
@@ -767,7 +766,8 @@ register struct obj *sobj;
 outtrapmap:
     cls();
 
-    u.uinwater = 0;
+    u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+    u.uinwater = u.uburied = 0;
 
     /* show chest traps first, so that subsequent floor trap display
        will override if both types are present at the same location */
@@ -792,12 +792,12 @@ outtrapmap:
     glyph = glyph_at(u.ux, u.uy);
     if (!(glyph_is_trap(glyph) || glyph_is_object(glyph)))
 	newsym(u.ux, u.uy);
+    u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
 
     You_feel("%s.", cursed_src ? "very greedy" : "entrapped");
     /* wait for user to respond, then reset map display to normal */
     display_nhwindow(WIN_MAP, TRUE);
     docrt();
-    u.uinwater = uw;
     if (Underwater) under_water(2);
     if (u.uburied) under_ground(2);
     return(0);
@@ -1004,19 +1004,19 @@ void
 do_mapping()
 {
     register int zx, zy;
-    int uw = u.uinwater;
 
-    u.uinwater = 0;
+    u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+    u.uinwater = u.uburied = 0;
     for (zx = 1; zx < COLNO; zx++)
 	for (zy = 0; zy < ROWNO; zy++)
 	    show_map_spot(zx, zy);
-    exercise(A_WIS, TRUE);
-    u.uinwater = uw;
+    u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
     if (!level.flags.hero_memory || Underwater) {
 	flush_screen(1);			/* flush temp screen */
 	display_nhwindow(WIN_MAP, TRUE);	/* wait */
 	docrt();
     }
+    exercise(A_WIS, TRUE);
 }
 
 void

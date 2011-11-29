@@ -857,6 +857,11 @@ register int fd;
 	 */
 	reset_restpref();
 
+	/* some fixups in case this was a hangup save */
+	u.uinvulnerable = 0;
+	if (u.save.hup_uinwater) u.uinwater = 1, u.save.hup_uinwater = 0;
+	if (u.save.hup_uburied) u.uburied = 1, u.save.hup_uburied = 0;
+
 	restlevelstate(stuckid, steedid);
 	program_state.something_worth_saving = 1; /* useful data now exists */
 

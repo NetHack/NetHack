@@ -398,6 +398,8 @@ wand/scroll/spell of light now hurts gremlins (lamp/candle light doesn't)
 ditto for hero in gremlin form (camera too)
 autosearch finds and transforms secret doors and corridors even while blind,
 	but it wasn't updating the map to show them unless the hero could see
+panic save made during magic mapping or <foo> detection performed while
+	underwater could put hero on top of the water after restore
 
 
 Platform- and/or Interface-Specific Fixes
