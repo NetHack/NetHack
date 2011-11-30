@@ -139,6 +139,13 @@ dosave0()
 	d_level uz_save;
 	char whynot[BUFSZ];
 
+	/* we may get here via hangup signal, in which case we want to fix up
+	   a few of things before saving so that they won't be restored in
+	   an improper state; these will be no-ops for normal save sequence */
+	u.uinvulnerable = 0;
+	if (iflags.save_uinwater) u.uinwater = 1, iflags.save_uinwater = 0;
+	if (iflags.save_uburied) u.uburied = 1, iflags.save_uburied = 0;
+
 	if (!program_state.something_worth_saving || !SAVEF[0])
 		return 0;
 	fq_save = fqname(SAVEF, SAVEPREFIX, 1);	/* level files take 0 */

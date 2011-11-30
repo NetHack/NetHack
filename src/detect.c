@@ -233,7 +233,7 @@ register struct obj *sobj;
 outgoldmap:
     cls();
 
-    u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+    iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
     u.uinwater = u.uburied = 0;
     /* Discover gold locations. */
     for (obj = fobj; obj; obj = obj->nobj) {
@@ -278,7 +278,7 @@ outgoldmap:
 	    }
     }
     newsym(u.ux,u.uy);
-    u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
+    u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
     You_feel("very greedy, and sense gold!");
     exercise(A_WIS, TRUE);
     display_nhwindow(WIN_MAP, TRUE);
@@ -351,7 +351,7 @@ register struct obj	*sobj;
 	struct obj *temp;
 	known = TRUE;
 	cls();
-	u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+	iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
 	u.uinwater = u.uburied = 0;
 	for (obj = fobj; obj; obj = obj->nobj)
 	    if ((temp = o_in(obj, oclass)) != 0) {
@@ -371,7 +371,7 @@ register struct obj	*sobj;
 		    break;	/* skip rest of this monster's inventory */
 		}
 	newsym(u.ux,u.uy);
-	u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
+	u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
 	if (sobj) {
 	    if (sobj->blessed) {
 		Your("%s %s to tingle and you smell %s.", body_part(NOSE),
@@ -482,7 +482,7 @@ int		class;		/* an object class, 0 for all */
 
     cls();
 
-    u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+    iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
     u.uinwater = u.uburied = 0;
 /*
  *	Map all buried objects first.
@@ -560,7 +560,7 @@ int		class;		/* an object class, 0 for all */
     }
 
     newsym(u.ux,u.uy);
-    u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
+    u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
     You("detect the %s of %s.", ct ? "presence" : "absence", stuff);
     display_nhwindow(WIN_MAP, TRUE);
     /*
@@ -766,7 +766,7 @@ register struct obj *sobj;
 outtrapmap:
     cls();
 
-    u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+    iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
     u.uinwater = u.uburied = 0;
 
     /* show chest traps first, so that subsequent floor trap display
@@ -792,7 +792,7 @@ outtrapmap:
     glyph = glyph_at(u.ux, u.uy);
     if (!(glyph_is_trap(glyph) || glyph_is_object(glyph)))
 	newsym(u.ux, u.uy);
-    u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
+    u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
 
     You_feel("%s.", cursed_src ? "very greedy" : "entrapped");
     /* wait for user to respond, then reset map display to normal */
@@ -1005,12 +1005,12 @@ do_mapping()
 {
     register int zx, zy;
 
-    u.save.hup_uinwater = u.uinwater, u.save.hup_uburied = u.uburied;
+    iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
     u.uinwater = u.uburied = 0;
     for (zx = 1; zx < COLNO; zx++)
 	for (zy = 0; zy < ROWNO; zy++)
 	    show_map_spot(zx, zy);
-    u.uinwater = u.save.hup_uinwater, u.uburied = u.save.hup_uburied;
+    u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
     if (!level.flags.hero_memory || Underwater) {
 	flush_screen(1);			/* flush temp screen */
 	display_nhwindow(WIN_MAP, TRUE);	/* wait */
