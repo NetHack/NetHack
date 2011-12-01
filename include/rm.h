@@ -29,7 +29,10 @@
  * +-		-+-		-+		|
  */
 
-/* Level location types */
+/* Level location types.  [Some debugging code in src/display.c
+   defines array type_names[] which contains an entry for each of
+   these, so needs to be kept in sync if any new types are added
+   or existing ones renumbered.] */
 #define STONE		0
 #define VWALL		1
 #define HWALL		2

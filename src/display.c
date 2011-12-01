@@ -1602,12 +1602,12 @@ static const char *type_names[MAX_TYPE] = {
 	"STONE",	"VWALL",	"HWALL",	"TLCORNER",
 	"TRCORNER",	"BLCORNER",	"BRCORNER",	"CROSSWALL",
 	"TUWALL",	"TDWALL",	"TLWALL",	"TRWALL",
-	"DBWALL",	"SDOOR",	"SCORR",	"POOL",
-	"MOAT",		"WATER",	"DRAWBRIDGE_UP","LAVAPOOL",
-	"DOOR",		"CORR",		"ROOM",		"STAIRS",
-	"LADDER",	"FOUNTAIN",	"THRONE",	"SINK",
-	"ALTAR",	"ICE",		"DRAWBRIDGE_DOWN","AIR",
-	"CLOUD"
+	"DBWALL",	"TREE",		"SDOOR",	"SCORR",
+	"POOL",		"MOAT",		"WATER",	"DRAWBRIDGE_UP",
+	"LAVAPOOL",	"IRON_BARS",	"DOOR",		"CORR",
+	"ROOM",		"STAIRS",	"LADDER",	"FOUNTAIN",
+	"THRONE",	"SINK",		"GRAVE",	"ALTAR",
+	"ICE",		"DRAWBRIDGE_DOWN",  "AIR",	"CLOUD"
 };
 
 
@@ -1615,7 +1615,7 @@ static const char *
 type_to_name(type)
     int type;
 {
-    return (type < 0 || type > MAX_TYPE) ? "unknown" : type_names[type];
+    return (type < 0 || type >= MAX_TYPE) ? "unknown" : type_names[type];
 }
 
 static void
