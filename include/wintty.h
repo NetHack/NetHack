@@ -28,7 +28,7 @@ struct WinDesc {
     int flags;			/* window flags */
     xchar type;			/* type of window */
     boolean active;		/* true if window is active */
-    uchar offx, offy;		/* offset from topleft of display */
+    short offx, offy;		/* offset from topleft of display */
     short rows, cols;		/* dimensions */
     short curx, cury;		/* current cursor position */
     short maxrow, maxcol;	/* the maximum size used -- for MENU wins */
@@ -53,8 +53,8 @@ struct WinDesc {
 
 /* descriptor for tty-based displays -- all the per-display data */
 struct DisplayDesc {
-    uchar rows, cols;		/* width and height of tty display */
-    uchar curx, cury;		/* current cursor position on the screen */
+    short rows, cols;		/* width and height of tty display */
+    short curx, cury;		/* current cursor position on the screen */
 #ifdef TEXTCOLOR
     int color;			/* current color */
 #endif

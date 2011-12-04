@@ -1714,7 +1714,7 @@ struct WinDesc *cw;
 	    n = 0;
 	}
 	tty_curs(window, 1, n++);
-	if (cw->offx) cl_end();
+	cl_end();
 	if (cw->data[i]) {
 	    attr = cw->data[i][0] - 1;
 	    if (cw->offx) {
@@ -1738,6 +1738,10 @@ struct WinDesc *cw;
 	}
     }
     if (i == cw->maxrow) {
+	if(cw->type == NHW_TEXT){
+	    tty_curs(BASE_WINDOW, 0, (int)ttyDisplay->cury+1);
+	    cl_eos();
+	}
 	tty_curs(BASE_WINDOW, (int)cw->offx + 1,
 		 (cw->type == NHW_TEXT) ? (int) ttyDisplay->rows - 1 : n);
 	cl_end();
@@ -1789,14 +1793,14 @@ tty_display_nhwindow(window, blocking)
 	/*FALLTHRU*/
     case NHW_MENU:
 	cw->active = 1;
-	/* avoid converting to uchar before calculations are finished */
-	cw->offx = (uchar) (int)
-	    max((int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
+	cw->offx = (cw->type==NHW_TEXT)
+		? 0
+		: min(10, ttyDisplay->cols - cw->maxcol - 1);
 	if(cw->type == NHW_MENU)
 	    cw->offy = 0;
 	if(ttyDisplay->toplin == 1)
 	    tty_display_nhwindow(WIN_MESSAGE, TRUE);
-	if(cw->offx == 10 || cw->maxrow >= (int) ttyDisplay->rows) {
+	if(cw->maxrow >= (int) ttyDisplay->rows) {
 	    cw->offx = 0;
 	    if(cw->offy) {
 		tty_curs(window, 1, 0);
@@ -2540,7 +2544,7 @@ tty_end_menu(window, prompt)
     }
 
     if (len > (int)ttyDisplay->cols) {
-	/* truncate the prompt if its too long for the screen */
+	/* truncate the prompt if it's too long for the screen */
 	if (cw->npages <= 1)	/* only str in single page case */
 	    cw->morestr[ttyDisplay->cols] = 0;
 	len = ttyDisplay->cols;
