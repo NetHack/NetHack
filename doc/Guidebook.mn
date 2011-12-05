@@ -843,10 +843,8 @@ Ride (or stop riding) a monster.
 Rub a lamp or a stone.
 .lp "#sit "
 Sit down.
-.lp #terrain
-Show bare map without displaying monsters, objects, or traps.
 .lp "#tip "
-Tip over a container (bag or box) to pour out its contents.
+Tip over a container to pour out its contents.
 .lp #turn
 Turn undead.
 .lp #twoweapon

@@ -126,7 +126,6 @@ STATIC_PTR int NDECL(domonability);
 STATIC_PTR int NDECL(dooverview_or_wiz_where);
 #endif /* DUNGEON_OVERVIEW */
 STATIC_PTR int NDECL(dotravel);
-STATIC_PTR int NDECL(doterrain);
 # ifdef WIZARD
 STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
@@ -143,8 +142,7 @@ STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_smell);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
 STATIC_PTR int NDECL(wiz_show_wmodes);
-STATIC_DCL void NDECL(wiz_map_levltyp);
-STATIC_DCL void NDECL(wiz_levltyp_legend);
+STATIC_PTR int NDECL(wiz_map_terrain);
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern void FDECL(show_borlandc_stats, (winid));
 #endif
@@ -822,9 +820,9 @@ wiz_show_wmodes(VOID_ARGS)
 	return 0;
 }
 
-/* wizard mode variant of #terrain; internal levl[][].typ values in base-36 */
-STATIC_OVL void
-wiz_map_levltyp(VOID_ARGS)
+/* #terrain command */
+STATIC_PTR int
+wiz_map_terrain(VOID_ARGS)
 {
 	winid win;
 	int x, y, terrain;
@@ -923,91 +921,10 @@ wiz_map_levltyp(VOID_ARGS)
     }
 
 	display_nhwindow(win, TRUE);
+	/* TODO? create legend of levl[][].typ codes and allow switching
+	   back and forth between it and coded map display */
 	destroy_nhwindow(win);
-	return;
-}
-
-/* temporary? hack, since level type codes aren't the same as screen
-   symbols and only the latter have easily accessible descriptions */
-static const char *levltyp[] = {
-	"stone",
-	"vertical wall",
-	"horizontal wall",
-	"top-left corner wall",
-	"top-right corner wall",
-	"bottom-left corner wall",
-	"bottom-right corner wall",
-	"cross wall",
-	"tee-up wall",
-	"tee-down wall",
-	"tee-left wall",
-	"tee-right wall",
-	"drawbridge wall",
-	"tree",
-	"secret door",
-	"secret corridor",
-	"pool",
-	"moat",
-	"water",
-	"drawbridge up",
-	"lava pool",
-	"iron bars",
-	"door",
-	"corridor",
-	"room",
-	"stairs",
-	"ladder",
-	"fountain",
-	"throne",
-	"sink",
-	"grave",
-	"altar",
-	"ice",
-	"drawbridge down",
-	"air",
-	"cloud",
-	/* not a real terrain type, but used for undiggable stone
-	   by wiz_map_levltyp() */
-	"unreachable/undiggable",
-	/* padding in case the number of entries above is odd */
-	""
-};
-
-/* explanation of base-36 output from wiz_map_levltyp() */
-STATIC_OVL void
-wiz_levltyp_legend(VOID_ARGS)
-{
-	winid win;
-	int i, j, last, c;
-	const char *dsc, *fmt;
-	char buf[BUFSZ];
-
-	win = create_nhwindow(NHW_TEXT);
-	putstr(win, 0, "#terrain encodings:");
-	putstr(win, 0, "");
-	fmt = " %c - %-28s"; /* TODO: include tab-separated variant for win32 */
-	*buf = '\0';
-	/* output in pairs, left hand column holds [0],[1],...,[N/2-1]
-	   and right hand column holds [N/2],[N/2+1],...,[N-1];
-	   N ('last') will always be even, and may or may not include
-	   the empty string entry to pad out the final pair, depending
-	   upon how many other entries are present in levltyp[] */
-	last = SIZE(levltyp) & ~1;
-	for (i = 0; i < last / 2; ++i)
-	    for (j = i; j < last; j += last / 2) {
-		dsc = levltyp[j];
-		c = !*dsc ? ' ' : !strncmp(dsc, "unreachable", 11) ? '*' :
-		  /* same int-to-char conversion as wiz_map_levltyp() */
-		  (j < 10) ? '0' + j : (j < 36) ? 'a' + j - 10 : 'A' + j - 36;
-		Sprintf(eos(buf), fmt, c, dsc);
-		if (j > i) {
-		    putstr(win, 0, buf);
-		    *buf = '\0';
-		}
-	    }
-	display_nhwindow(win, TRUE);
-	destroy_nhwindow(win);
-	return;
+	return 0;
 }
 
 /* #wizsmell command - test usmellmon(). */
@@ -1065,71 +982,6 @@ wiz_rumor_check(VOID_ARGS)
 	return 0;
 }
 #endif /* WIZARD */
-
-/* #terrain command */
-STATIC_PTR int
-doterrain(VOID_ARGS)
-{
-    int which = 1;	/* show known map, ala crawl's '|' command */
-
-    if (discover || wizard) {
-	/* explore mode #terrain: choose between known map and full map;
-	   wizard mode #terrain: choose between known map, full map,
-	   a dump of the internal levl[][].typ codes w/ level flags,
-	   and a legend for the levl[][].typ codes */
-	winid men;
-	menu_item *sel;
-	anything any;
-	int n;
-
-	men = create_nhwindow(NHW_MENU);
-	any = zeroany;
-	any.a_int = 1;
-	add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
-		 "known map without monsters, objects, and traps",
-		 MENU_SELECTED);
-	any.a_int = 2;
-	add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
-		 "full map without monsters, objects, and traps",
-		 MENU_UNSELECTED);
-#ifdef WIZARD
-	if (wizard) {
-	    any.a_int = 3;
-	    add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
-		     "internal levl[][].typ codes in base-36",
-		     MENU_UNSELECTED);
-	    any.a_int = 4;
-	    add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
-		     "legend of base-36 levl[][].typ codes",
-		     MENU_UNSELECTED);
-	}
-#endif
-	end_menu(men, "View which?");
-
-	n = select_menu(men, PICK_ONE, &sel);
-	destroy_nhwindow(men);
-	/*
-	 * n <  0: player used ESC to cancel;
-	 * n == 0: preselected entry was explicitly chosen and got toggled off;
-	 * n == 1: preselected entry was implicitly chosen via <space>|<enter>;
-	 * n == 2: another entry was explicitly chosen, so skip preselected one
-	 */
-	which = (n < 0) ? -1 : (n == 0) ? 1 : sel[0].item.a_int;
-	if (n > 1 && which == 1) which = sel[1].item.a_int;
-	if (n > 0) free((genericptr_t)sel);
-    } /* discover || wizard */
-
-    switch (which) {
-    case 1: reveal_terrain(FALSE); break;		/* known map */
-    case 2: reveal_terrain(TRUE); break;		/* full map */
-#ifdef WIZARD
-    case 3: wiz_map_levltyp(); break;		/* map internals */
-    case 4: wiz_levltyp_legend(); break;	/* internal details */
-#endif
-    default: break;
-    }
-    return 0;	/* no time elapses */
-}
 
 
 /* -enlightenment and conduct- */
@@ -2478,7 +2330,6 @@ struct ext_func_tab extcmdlist[] = {
 #endif
 	{"rub", "rub a lamp or a stone", dorub, FALSE},
 	{"sit", "sit down", dosit, FALSE},
-	{"terrain", "show map without obstructions", doterrain, TRUE},
 	{"tip", "empty a container", dotip, FALSE},
 	{"turn", "turn undead", doturn, TRUE},
 	{"twoweapon", "toggle two-weapon combat", dotwoweapon, FALSE},
@@ -2505,6 +2356,7 @@ struct ext_func_tab extcmdlist[] = {
 #endif
 	{(char *)0, (char *)0, donull, TRUE},	/* seenv */
 	{(char *)0, (char *)0, donull, TRUE},	/* stats */
+	{(char *)0, (char *)0, donull, TRUE},	/* terrain */
 	{(char *)0, (char *)0, donull, TRUE},	/* timeout */
 	{(char *)0, (char *)0, donull, TRUE},	/* vanquished */
 	{(char *)0, (char *)0, donull, TRUE},	/* vision */
@@ -2534,6 +2386,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 #endif
 	{"seenv", "show seen vectors", wiz_show_seenv, TRUE},
 	{"stats", "show memory statistics", wiz_show_stats, TRUE},
+	{"terrain", "show map topology", wiz_map_terrain, TRUE},
 	{"timeout", "look at timeout queue", wiz_timeout_queue, TRUE},
 	{"vanquished", "list vanquished monsters", dovanquished, TRUE},
 	{"vision", "show vision array", wiz_show_vision, TRUE},
