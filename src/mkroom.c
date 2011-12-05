@@ -12,6 +12,7 @@
  *	courtmon() -- generate a court monster
  *	save_rooms() -- save rooms into file fd
  *	rest_rooms() -- restore rooms from file fd
+ *	cmap_to_type() -- convert S_xxx symbol to XXX topology code
  */
 
 #include "hack.h"
@@ -781,6 +782,61 @@ int	fd;
 	}
 	rooms[nroom].hx = -1;		/* restore ending flags */
 	subrooms[nsubroom].hx = -1;
+}
+
+/* convert a display symbol for terrain into topology type;
+   used for remembered terrain when mimics pose as furniture */
+int
+cmap_to_type(sym)
+int sym;
+{
+    int typ = STONE;	/* catchall */
+
+    switch (sym) {
+    case S_stone:	typ = STONE; break;
+    case S_vwall:	typ = VWALL; break;
+    case S_hwall:	typ = HWALL; break;
+    case S_tlcorn:	typ = TLCORNER; break;
+    case S_trcorn:	typ = TRCORNER; break;
+    case S_blcorn:	typ = BLCORNER; break;
+    case S_brcorn:	typ = BRCORNER; break;
+    case S_crwall:	typ = CROSSWALL; break;
+    case S_tuwall:	typ = TUWALL; break;
+    case S_tdwall:	typ = TDWALL; break;
+    case S_tlwall:	typ = TLWALL; break;
+    case S_trwall:	typ = TRWALL; break;
+    case S_ndoor:		/* no door (empty doorway) */
+    case S_vodoor:		/* open door in vertical wall */
+    case S_hodoor:		/* open door in horizontal wall */
+    case S_vcdoor:		/* closed door in vertical wall */
+    case S_hcdoor:	typ = DOOR; break;
+    case S_bars:	typ = IRONBARS; break;
+    case S_tree:	typ = TREE; break;
+    case S_room:	typ = ROOM; break;
+    case S_corr:
+    case S_litcorr:	typ = CORR; break;
+    case S_upstair:
+    case S_dnstair:	typ = STAIRS; break;
+    case S_upladder:
+    case S_dnladder:	typ = LADDER; break;
+    case S_altar:	typ = ALTAR; break;
+    case S_grave:	typ = GRAVE; break;
+    case S_throne:	typ = THRONE; break;
+    case S_sink:	typ = SINK; break;
+    case S_fountain:	typ = FOUNTAIN; break;
+    case S_pool:	typ = POOL; break;
+    case S_ice:		typ = ICE; break;
+    case S_lava:	typ = LAVAPOOL; break;
+    case S_vodbridge:		/* open drawbridge spanning north/south */
+    case S_hodbridge:	typ = DRAWBRIDGE_DOWN; break; /* east/west */
+    case S_vcdbridge:		/* closed drawbridge in vertical wall */
+    case S_hcdbridge:	typ = DBWALL; break;
+    case S_air:		typ = AIR; break;
+    case S_cloud:	typ = CLOUD; break;
+    case S_water:	typ = WATER; break;
+    default: break;	/* not a cmap symbol? */
+    }
+    return typ;
 }
 
 /*mkroom.c*/

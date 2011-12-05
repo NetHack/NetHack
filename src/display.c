@@ -414,9 +414,16 @@ display_monster(x, y, mon, sightflags, worm_tail)
 		 * mappearance is currently set to an S_ index value in
 		 * makemon.c.
 		 */
-		register int glyph = cmap_to_glyph(mon->mappearance);
+		int sym = mon->mappearance, glyph = cmap_to_glyph(sym);
+
 		levl[x][y].glyph = glyph;
-		if (!sensed) show_glyph(x,y, glyph);
+		if (!sensed) {
+		    show_glyph(x,y, glyph);
+#ifdef DUNGEON_OVERVIEW
+		    /* override real topology with mimic's fake one */
+		    lastseentyp[x][y] = cmap_to_type(sym);
+#endif
+		}
 		break;
 	    }
 

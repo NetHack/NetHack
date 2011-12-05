@@ -5,9 +5,6 @@
 #include "hack.h"
 #include "dgn_file.h"
 #include "dlb.h"
-#ifdef DUNGEON_OVERVIEW
-#include "display.h"
-#endif /* DUNGEON_OVERVIEW */
 
 #define DUNGEON_FILE	"dungeon"
 
@@ -2132,7 +2129,7 @@ recalc_mapseen()
 		}
 	}
 
-	/* Update styp with typ if and only if it is in sight or the hero can
+	/* Update lastseentyp with typ if and only if it is in sight or the hero can
 	 * feel it on their current location (i.e. not levitating).  This *should*
 	 * give the "last known typ" for each dungeon location.  (At the very least,
 	 * it's a better assumption than determining what the player knows from
@@ -2147,17 +2144,20 @@ recalc_mapseen()
 	 * Although no current windowing systems (can) do this, this would add the
 	 * ability to have non-dungeon glyphs float above the last known dungeon
 	 * glyph (i.e. items on fountains).
-	 *
-	 * (vision-related styp update done in loop below)
 	 */
 	if (!Levitation)
 		lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
 
 	for (x = 0; x < COLNO; x++) {
 		for (y = 0; y < ROWNO; y++) {
-			/* update styp from viz_array */
-			if (viz_array[y][x] & IN_SIGHT)
-				lastseentyp[x][y] = levl[x][y].typ;
+			if (cansee(x, y)) {
+			    struct monst *mtmp = m_at(x, y);
+
+			    lastseentyp[x][y] =
+	    (mtmp && mtmp->m_ap_type == M_AP_FURNITURE && canseemon(mtmp)) ?
+					cmap_to_type(mtmp->mappearance) :
+					levl[x][y].typ;
+			}
 
 			switch (lastseentyp[x][y]) {
 			/*
