@@ -17,7 +17,6 @@ Debug-Mode Quick Reference:
 #polyself == polymorph self
 #seenv == show seen vectors
 #stats == show memory statistics
-#terrain == show map topology
 #timeout == look at timeout queue
 #vision == show vision array
 #wmode == show wall modes
