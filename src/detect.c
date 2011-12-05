@@ -1377,5 +1377,55 @@ sokoban_detect()
 	}
 }
 
+/* idea from crawl; show known portion of map without any monsters,
+   objects, or traps occluding the view of the underlying terrain */
+void
+reveal_terrain(full)
+boolean full;	/* wizard|explore modes allow player to request full map */
+{
+    int x, y, glyph, S_stone_glyph;
+    uchar seenv;
+    struct monst *mtmp;
+
+    if ((Hallucination || Stunned || Confusion) && !full) {
+	You("are too disoriented for this.");
+    } else {
+	iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
+	u.uinwater = u.uburied = 0;
+	S_stone_glyph = cmap_to_glyph(S_stone);
+	/* rewrite the map, displaying map background for seen spots
+	   (all spots seen if 'full') and stone everywhere else */
+	for (x = 1; x < COLNO; x++)
+	    for (y = 0; y < ROWNO; y++) {
+		seenv = levl[x][y].seenv;
+		if (full) {
+		    levl[x][y].seenv = SVALL;
+		    glyph = back_to_glyph(x, y);
+		    levl[x][y].seenv = seenv;
+		} else {
+		    if (!level.flags.hero_memory && !cansee(x, y))
+			seenv = 0;
+		    glyph = seenv ? back_to_glyph(x, y) : S_stone_glyph;
+		    /* need to show mimic-as-furniture so that #terrain can't
+		       be used to spot mimics, but this is only approximate;
+		       mimic might have moved and hid here after the player
+		       last saw this spot as some other type of terrain */
+		    if (seenv && (mtmp = m_at(x, y)) != 0 &&
+			    mtmp->m_ap_type == M_AP_FURNITURE)
+			glyph = cmap_to_glyph(mtmp->mappearance);
+		}
+		show_glyph(x, y, glyph);
+	    }
+	/* [TODO: highlight hero's location somehow] */
+	u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+	flush_screen(1);
+	pline("Showing underlying terrain only...");
+	display_nhwindow(WIN_MAP, TRUE);	/* give "--More--" prompt */
+	docrt();	/* redraw the screen, restoring regular map */
+	if (Underwater) under_water(2);
+	if (u.uburied) under_ground(2);
+    }
+    return;
+}
 
 /*detect.c*/
