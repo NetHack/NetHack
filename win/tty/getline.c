@@ -1,5 +1,4 @@
 /* NetHack 3.5	getline.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)getline.c	3.5	2007/01/31	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,11 +23,24 @@ extern int NDECL(extcmd_via_menu);	/* cmd.c */
 
 extern char erase_char, kill_char;	/* from appropriate tty.c file */
 
+/* cloned from topl.c, but not identical
+ */
 #ifdef UNICODE_WIDEWINPORT
+    /* nhwchar is wchar; data from core needs narrow-to-wide conversion;
+       data going back to core needs wide-to-narrow conversion; data
+       used within tty routines typically needs wide-to-wide awareness */
+STATIC_VAR nhwchar	getl_wbuf[BUFSZ];
+STATIC_VAR char		getl_nbuf[BUFSZ];
 #define T(x) L##x
-#else
+#define Waddtopl(str)		addtopl(nhwstrcpy(getl_wbuf,str))
+#define Wputsyms(str)		putsyms(nhwstrcpy(getl_wbuf,str))
+#define NWstrcpy(wdst,src)	nhwstrcpy(wdst,src)	/* narrow-to-wide */
+#else	/*!UNICODE_WIDEWINPORT*/
+    /* nhwchar is char; no conversions needed */
 #define T(x) x
-#endif
+#define Waddtopl(str)		addtopl(str)
+#define Wputsyms(str)		putsyms(str)
+#endif	/*?UNICODE_WIDEWINPORT*/
 
 /*
  * Read a line closed with '\n' into the array char bufp[BUFSZ].
@@ -54,9 +66,6 @@ getlin_hook_proc hook;
 	register int c;
 	struct WinDesc *cw = wins[WIN_MESSAGE];
 	boolean doprev = 0;
-#ifdef UNICODE_WIDEWINPORT
-	nhwchar wbuf[BUFSZ];
-#endif
 
 	if(ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP)) more();
 	cw->flags &= ~WIN_STOP;
@@ -65,23 +74,18 @@ getlin_hook_proc hook;
 	pline("%s ", query);
 	*obufp = 0;
 	for(;;) {
+		(void) fflush(stdout);
 #ifdef UNICODE_WIDEWINPORT
-		char buf[BUFSZ];
-		(void) fflush(stdout);
-		Sprintf(buf, "%s ", query);
-		Strcat(buf, obufp);
-		nhwstrcpy(wbuf, buf);
-		(void)nhwcpy(toplines, wbuf);
+		Strcat(strcat(strcpy(getl_nbuf, query), " "), obufp);
+		(void)NWstrcpy(toplines, getl_nbuf);
 #else
-		(void) fflush(stdout);
-		Sprintf(toplines, "%s ", query);
-		Strcat(toplines, obufp);
+		Strcat(strcat(strcpy(toplines, query), " "), obufp);
 #endif
-		if((c = Getchar()) == EOF) c = '\033';
-		if(c == '\033') {
-			*obufp = c;
-			obufp[1] = 0;
-			break;
+		c = Getchar();
+		if (c == '\033' || c == EOF) {
+		    obufp[0] = '\033';
+		    obufp[1] = '\0';
+		    break;
 		}
 		if (ttyDisplay->intr) {
 		    ttyDisplay->intr--;
@@ -95,19 +99,10 @@ getlin_hook_proc hook;
 			ttyDisplay->inread = sav;
 			tty_clear_nhwindow(WIN_MESSAGE);
 			cw->maxcol = cw->maxrow;
-#ifdef UNICODE_WIDEWINPORT
-			nhwstrcpy(wbuf, query);
-			addtopl(wbuf);
-			addtopl(L" ");
+			Waddtopl(query);
+			Waddtopl(T(" "));
 			*bufp = 0;
-			nhwstrcpy(wbuf, obufp);
-			addtopl(wbuf);
-#else
-			addtopl(query);
-			addtopl(" ");
-			*bufp = 0;
-			addtopl(obufp);
-#endif
+			Waddtopl(obufp);
 		    } else {
 			if (!doprev)
 			    (void) tty_doprev_message();/* need two initially */
@@ -119,22 +114,10 @@ getlin_hook_proc hook;
 		    tty_clear_nhwindow(WIN_MESSAGE);
 		    cw->maxcol = cw->maxrow;
 		    doprev = 0;
-#ifdef UNICODE_WIDEWINPORT
-		    nhwstrcpy(wbuf, query);
-		    addtopl(wbuf);
-		    addtopl(L" ");
-#else
-		    addtopl(query);
-		    addtopl(" ");
-#endif
-
+		    Waddtopl(query);
+		    Waddtopl(T(" "));
 		    *bufp = 0;
-#ifdef UNICODE_WIDEWINPORT
-		    nhwstrcpy(wbuf, obufp);
-		    addtopl(wbuf);
-#else
-		    addtopl(obufp);
-#endif
+		    Waddtopl(obufp);
 		}
 		if(c == erase_char || c == '\b') {
 			if(bufp != obufp) {
@@ -171,20 +154,10 @@ getlin_hook_proc hook;
 #endif /* NEWAUTOCOMP */
 			*bufp = c;
 			bufp[1] = 0;
-#ifdef UNICODE_WIDEWINPORT
-			nhwstrcpy(wbuf, bufp);
-			putsyms(wbuf);
-#else
-			putsyms(bufp);
-#endif
+			Wputsyms(bufp);
 			bufp++;
 			if (hook && (*hook)(obufp)) {
-#ifdef UNICODE_WIDEWINPORT
-			    nhwstrcpy(wbuf, bufp);
-			    putsyms(wbuf);
-#else
-			    putsyms(bufp);
-#endif
+			    Wputsyms(bufp);
 #ifndef NEWAUTOCOMP
 			    bufp = eos(bufp);
 #else /* NEWAUTOCOMP */
