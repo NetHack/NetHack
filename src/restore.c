@@ -508,7 +508,7 @@ register struct obj *otmp;
 		if (oldf->fid == otmp->spe) break;
 
 	if (!oldf) impossible("no old fruit?");
-	else otmp->spe = fruitadd(oldf->fname);
+	else otmp->spe = fruitadd(oldf->fname, (struct fruit *)0);
 }
 
 STATIC_OVL

@@ -76,6 +76,7 @@ struct flag {
 	char	 end_disclose[NUM_DISCLOSURE_OPTIONS + 1];  /* disclose various info
 								upon exit */
 	char	 menu_style;	/* User interface style setting */
+	boolean  made_fruit; /* don't easily let the user overflow the number of fruits */
 
 	/* KMH, role patch -- Variables used during startup.
 	 *

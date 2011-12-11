@@ -721,7 +721,7 @@ initoptions_finish()
 #endif
 		read_config_file((char *)0, SET_IN_FILE);
 
-	(void)fruitadd(pl_fruit);
+	(void)fruitadd(pl_fruit, (struct fruit *)0);
 	/* Remove "slime mold" from list of object names; this will	*/
 	/* prevent it from being wished unless it's actually present	*/
 	/* as a named (or default) fruit.  Wishing for "fruit" will	*/
@@ -1673,6 +1673,8 @@ boolean tinitial, tfrom_file;
 #endif /* CHANGE_COLOR */
 
 	if (match_optname(opts, "fruit", 2, TRUE)) {
+		struct fruit *forig = 0;
+
 		char empty_str = '\0';
 		if (duplicate) complain_about_duplicate(opts,1);
 		op = string_for_opt(opts, negated);
@@ -1690,12 +1692,21 @@ boolean tinitial, tfrom_file;
 
 		    num = 0;
 		    for(f=ffruit; f; f=f->nextf) {
-			if (!strcmp(op, f->fname)) goto goodfruit;
+			if (!strcmp(op, f->fname))
+			    break;
 			num++;
 		    }
 		    if (num >= 100) {
 			pline("Doing that so many times isn't very fruitful.");
 			return;
+		    }
+		    if (!flags.made_fruit) {
+			for(forig=ffruit; forig; forig=forig->nextf) {
+			    if (!strcmp(pl_fruit, forig->fname)) {
+				break;
+			    }
+			}
+			
 		    }
 		}
 goodfruit:
@@ -1704,7 +1715,7 @@ goodfruit:
 		if (!*pl_fruit)
 		    nmcpy(pl_fruit, "slime mold", PL_FSIZ);
 		if (!initial) {
-		    (void)fruitadd(pl_fruit);
+		    (void)fruitadd(pl_fruit, forig);
 		    pline("Fruit is now \"%s\".", pl_fruit);
 		}
 		/* If initial, then initoptions is allowed to do it instead
@@ -4218,10 +4229,13 @@ const char *str;
 /* Returns the fid of the fruit type; if that type already exists, it
  * returns the fid of that one; if it does not exist, it adds a new fruit
  * type to the chain and returns the new one.
+ * If replace_fruit is sent in, replace the fruit in the chain rather than
+ * adding a new entry--for user specified fruits only.
  */
 int
-fruitadd(str)
+fruitadd(str, replace_fruit)
 char *str;
+struct fruit *replace_fruit;
 {
 	register int i;
 	register struct fruit *f;
@@ -4282,10 +4296,27 @@ char *str;
 				nmcpy(pl_fruit+8, buf, PL_FSIZ-8);
 		}
 		*altname = '\0';
+		/* This flag indicates that a fruit has been made since the
+		 * last time the user set the fruit.  If it hasn't, we can
+		 * safely overwrite the current fruit, preventing the user from
+		 * setting many fruits in a row and overflowing.
+		 * Possible expansion: check for specific fruit IDs, not for
+		 * any fruit.
+		 */
+		flags.made_fruit = FALSE;
+		if (replace_fruit) {
+		    for(f=ffruit; f; f = f->nextf) {
+			if (f == replace_fruit) {
+			    copynchars(f->fname, str, PL_FSIZ-1);
+			    goto nonew;
+			}
+		    }
+		}
 	} else {
 		/* not user_supplied, so assumed to be from bones */
 		copynchars(altname, str, PL_FSIZ-1);
 		sanitize_name(altname);
+		flags.made_fruit = TRUE; /* for safety.  Any fruit name added from a bones level should exist anyway. */
 	}
 	for(f=ffruit; f; f = f->nextf) {
 		if(f->fid > highest_fruit_id) highest_fruit_id = f->fid;

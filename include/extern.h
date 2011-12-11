@@ -1610,7 +1610,7 @@ E int NDECL(doset);
 E int NDECL(dotogglepickup);
 E void NDECL(option_help);
 E void FDECL(next_opt, (winid,const char *));
-E int FDECL(fruitadd, (char *));
+E int FDECL(fruitadd, (char *,struct fruit *));
 E int FDECL(choose_classes_menu, (const char *,int,BOOLEAN_P,char *,char *));
 E void FDECL(add_menu_cmd_alias, (CHAR_P, CHAR_P));
 E char FDECL(map_menu_cmd, (CHAR_P));
