@@ -1714,7 +1714,11 @@ struct WinDesc *cw;
 	    n = 0;
 	}
 	tty_curs(window, 1, n++);
+#ifdef H2344_BROKEN
 	cl_end();
+#else
+	if (cw->offx) cl_end();
+#endif
 	if (cw->data[i]) {
 	    attr = cw->data[i][0] - 1;
 	    if (cw->offx) {
@@ -1738,10 +1742,12 @@ struct WinDesc *cw;
 	}
     }
     if (i == cw->maxrow) {
+#ifdef H2344_BROKEN
 	if(cw->type == NHW_TEXT){
 	    tty_curs(BASE_WINDOW, 0, (int)ttyDisplay->cury+1);
 	    cl_eos();
 	}
+#endif
 	tty_curs(BASE_WINDOW, (int)cw->offx + 1,
 		 (cw->type == NHW_TEXT) ? (int) ttyDisplay->rows - 1 : n);
 	cl_end();
@@ -1793,14 +1799,29 @@ tty_display_nhwindow(window, blocking)
 	/*FALLTHRU*/
     case NHW_MENU:
 	cw->active = 1;
+#ifdef H2344_BROKEN
+/* XXX this is the block that messes up corner win for player selection
+   (at least when undoing the patch one piece at a time from the start
+   of the file)
+*/
 	cw->offx = (cw->type==NHW_TEXT)
 		? 0
 		: min(10, ttyDisplay->cols - cw->maxcol - 1);
+#else
+	/* avoid converting to uchar before calculations are finished */
+	cw->offx = (uchar) (int)
+	    max((int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
+#endif
 	if(cw->type == NHW_MENU)
 	    cw->offy = 0;
 	if(ttyDisplay->toplin == 1)
 	    tty_display_nhwindow(WIN_MESSAGE, TRUE);
-	if(cw->maxrow >= (int) ttyDisplay->rows) {
+#ifdef H2344_BROKEN
+	if(cw->maxrow >= (int) ttyDisplay->rows)
+#else
+	if(cw->offx == 10 || cw->maxrow >= (int) ttyDisplay->rows)
+#endif
+	{
 	    cw->offx = 0;
 	    if(cw->offy) {
 		tty_curs(window, 1, 0);
