@@ -1696,17 +1696,16 @@ boolean tinitial, tfrom_file;
 			    break;
 			num++;
 		    }
-		    if (num >= 100) {
-			pline("Doing that so many times isn't very fruitful.");
-			return;
-		    }
 		    if (!flags.made_fruit) {
 			for(forig=ffruit; forig; forig=forig->nextf) {
 			    if (!strcmp(pl_fruit, forig->fname)) {
 				break;
 			    }
 			}
-			
+		    }
+		    if (!forig && num >= 100) {
+			pline("Doing that so many times isn't very fruitful.");
+			return;
 		    }
 		}
 goodfruit:
