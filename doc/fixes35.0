@@ -544,6 +544,8 @@ when a sokoban puzzle has been completed (last pit or hole filled in),
 '`' command to show discoveries for one class of objects
 add "about nethack" to '?' menu as an alternate way to view 'v'+'#version'
 display version and build information at startup
+repeatedly setting the fruit option will check to see if fruits have been
+    created, so the user can't easily overflow the maximum this way
 
 
 Platform- and/or Interface-Specific New Features
