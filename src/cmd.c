@@ -2053,20 +2053,20 @@ int final;
 	    if (wizard) Sprintf(eos(buf), " (%d)", u.ublesscnt);
 #endif
 	    you_can(buf,"");
-	    if (wizard) {
-		int fcount = 0;
-		struct fruit *f;
-		char buf2[BUFSZ];
-		for(f=ffruit; f; f = f->nextf)
-		{
-		    Sprintf(buf, "Fruit %d ", ++fcount);
-		    Sprintf(buf2, "%s (id %d)", f->fname, f->fid);
-		    enl_msg(buf, "is ", "was ", buf2, "");
-		}
-		enl_msg("The current fruit ", "is ", "was ", pl_fruit, "");
-		Sprintf(buf, "%d", flags.made_fruit);
-		enl_msg("The made fruit flag ", "is ", "was ", buf, "");
+	}
+	if (wizard) {
+	    int fcount = 0;
+	    struct fruit *f;
+	    char buf2[BUFSZ];
+	    for(f=ffruit; f; f = f->nextf)
+	    {
+		Sprintf(buf, "Fruit %d ", ++fcount);
+		Sprintf(buf2, "%s (id %d)", f->fname, f->fid);
+		enl_msg(buf, "is ", "was ", buf2, "");
 	    }
+	    enl_msg("The current fruit ", "is ", "was ", pl_fruit, "");
+	    Sprintf(buf, "%d", flags.made_fruit);
+	    enl_msg("The made fruit flag ", "is ", "was ", buf, "");
 	}
 
     {
