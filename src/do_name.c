@@ -75,8 +75,8 @@ const char *goal;
 #ifdef CLIPPING
     cliparound(cx, cy);
 #endif
-    flush_screen(0);
     curs(WIN_MAP, cx, cy);
+    flush_screen(0);
 #ifdef MAC
     lock_mouse_cursor(TRUE);
 #endif
