@@ -542,7 +542,7 @@ register struct monst *mtmp;
 	/* big weapon is basically the same as bimanual */
 	/* all monsters can wield the remaining weapons */
 	for (i = 0; i < SIZE(hwep); i++) {
-	    if (hwep[i] == CORPSE && !(mtmp->misc_worn_check & W_ARMG))
+	    if (hwep[i] == CORPSE && !(mtmp->misc_worn_check & W_ARMG) && !resists_ston(mtmp))
 		continue;
 	    if (((strong && !wearing_shield)
 			|| !objects[hwep[i]].oc_bimanual) &&

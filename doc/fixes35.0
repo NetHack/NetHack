@@ -400,6 +400,7 @@ autosearch finds and transforms secret doors and corridors even while blind,
 	but it wasn't updating the map to show them unless the hero could see
 panic save made during magic mapping or <foo> detection performed while
 	underwater could put hero on top of the water after restore
+fix bug preventing stone-resistant monsters w/o gloves from wielding cockatrices
 
 
 Platform- and/or Interface-Specific Fixes
