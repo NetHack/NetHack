@@ -927,7 +927,7 @@ currentlevel_rewrite()
 		 * Another possibility is that the directory was not
 		 * writable.
 		 */
-		pline("%s", whynot);
+		pline1(whynot);
 		return -1;
 	}
 
@@ -1141,7 +1141,7 @@ boolean at_stairs, falling, portal;
 		/* returning to previously visited level; reload it */
 		fd = open_levelfile(new_ledger, whynot);
 		if (fd < 0) {
-			pline("%s", whynot);
+			pline1(whynot);
 			pline("Probably someone removed it.");
 			Strcpy(killer.name, whynot);
 			done(TRICKED);
@@ -1351,7 +1351,7 @@ boolean at_stairs, falling, portal;
 		Sprintf(buf, mesg, !Blind ? "looks" : "seems");
 		mesg = buf;
 	    }
-	    if (mesg) pline(mesg);
+	    if (mesg) pline1(mesg);
 	}
 
 	/* special location arrival messages/events */
@@ -1458,7 +1458,7 @@ deferred_goto()
 	    int typmask = u.utotype; /* save it; goto_level zeroes u.utotype */
 
 	    assign_level(&dest, &u.utolev);
-	    if (dfr_pre_msg) pline(dfr_pre_msg);
+	    if (dfr_pre_msg) pline1(dfr_pre_msg);
 	    goto_level(&dest, !!(typmask&1), !!(typmask&2), !!(typmask&4));
 	    if (typmask & 0200) {	/* remove portal */
 		struct trap *t = t_at(u.ux, u.uy);
@@ -1468,7 +1468,7 @@ deferred_goto()
 		    newsym(u.ux, u.uy);
 		}
 	    }
-	    if (dfr_post_msg) pline(dfr_post_msg);
+	    if (dfr_post_msg) pline1(dfr_post_msg);
 	}
 	u.utotype = 0;		/* our caller keys off of this */
 	if (dfr_pre_msg)
