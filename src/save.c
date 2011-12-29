@@ -271,7 +271,7 @@ dosave0()
 #endif
 		ofd = open_levelfile(ltmp, whynot);
 		if (ofd < 0) {
-		    HUP pline("%s", whynot);
+		    HUP pline1(whynot);
 		    (void) close(fd);
 		    (void) delete_savefile();
 		    HUP Strcpy(killer.name, whynot);
@@ -399,7 +399,7 @@ savestateinlock()
 		 */
 		fd = open_levelfile(0, whynot);
 		if (fd < 0) {
-		    pline("%s", whynot);
+		    pline1(whynot);
 		    pline("Probably someone removed it.");
 		    Strcpy(killer.name, whynot);
 		    done(TRICKED);
@@ -411,7 +411,7 @@ savestateinlock()
 		    Sprintf(whynot,
 			    "Level #0 pid (%d) doesn't match ours (%d)!",
 			    hpid, hackpid);
-		    pline("%s", whynot);
+		    pline1(whynot);
 		    Strcpy(killer.name, whynot);
 		    done(TRICKED);
 		}
@@ -419,7 +419,7 @@ savestateinlock()
 
 		fd = create_levelfile(0, whynot);
 		if (fd < 0) {
-		    pline("%s", whynot);
+		    pline1(whynot);
 		    Strcpy(killer.name, whynot);
 		    done(TRICKED);
 		    return;
