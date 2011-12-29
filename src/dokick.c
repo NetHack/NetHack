@@ -1543,7 +1543,7 @@ long num;
 	    else
 		Sprintf(eos(obuf), " and %s %s.",
 			otense(otmp, "fall"), gate_str);
-	    pline("%s", obuf);
+	    pline1(obuf);
 	} else if(!nodrop)
 	    pline("%s %s %s.", obuf, otense(otmp, "fall"), gate_str);
 }

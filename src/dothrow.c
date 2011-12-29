@@ -848,7 +848,7 @@ boolean hitsroof;
 			pline("It blinds you!");
 		    u.ucreamed += blindinc;
 		    make_blinded(Blinded + (long)blindinc, FALSE);
-		    if (!Blind) Your(vision_clears);
+		    if (!Blind) Your1(vision_clears);
 		}
 		break;
 	default:
@@ -1605,7 +1605,7 @@ register struct obj *obj;
 	ret = 1;
 
 nopick:
-	if(!Blind) pline("%s", buf);
+	if(!Blind) pline1(buf);
 	if (!tele_restrict(mon)) (void) rloc(mon, FALSE);
 	return(ret);
 }
