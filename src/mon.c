@@ -813,7 +813,7 @@ meatobj(mtmp)		/* for gelatinous cubes */
 
 	if (ecount > 0) {
 	    if (cansee(mtmp->mx, mtmp->my) && flags.verbose && buf[0])
-		pline("%s", buf);
+		pline1(buf);
 	    else if (!Deaf && flags.verbose)
 		You_hear("%s slurping sound%s.",
 			ecount == 1 ? "a" : "several",
@@ -2751,7 +2751,7 @@ struct monst *mon;
 
 		pline("It can't become that.");
 	    } while (--tryct > 0);
-	    if (!tryct) pline(thats_enough_tries);
+	    if (!tryct) pline1(thats_enough_tries);
 	    if (is_vampshifter(mon) && !validvamp(mon, &mndx, monclass))
 		mndx = pickvampshape(mon);	/* don't resort to arbitrary */
 	}
