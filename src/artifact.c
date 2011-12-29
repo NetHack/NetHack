@@ -1325,7 +1325,7 @@ arti_invoke(obj)
 	if(obj->otyp == CRYSTAL_BALL)
 	    use_crystal_ball(obj);
 	else
-	    pline(nothing_happens);
+	    pline1(nothing_happens);
 	return 1;
     }
 
@@ -1590,7 +1590,7 @@ arti_speak(obj)
 	if (!*line)
 		line = "NetHack rumors file closed for renovation.";
 	pline("%s:", Tobjnam(obj, "whisper"));
-	verbalize("%s", line);
+	verbalize1(line);
 	return;
 }
 

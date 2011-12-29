@@ -665,7 +665,7 @@ wiz_level_change(VOID_ARGS)
     else ret = sscanf(buf, "%d", &newlevel);
 
     if (ret != 1) {
-	pline(Never_mind);
+	pline1(Never_mind);
 	return 0;
     }
     if (newlevel == u.ulevel) {
@@ -3254,7 +3254,7 @@ coord *cc;
 {
 	xchar new_x, new_y;
 	if (!getdir(prompt)) {
-		pline(Never_mind);
+		pline1(Never_mind);
 		return 0;
 	}
 	new_x = x + u.dx;
@@ -3263,7 +3263,7 @@ coord *cc;
 		cc->x = new_x;
 		cc->y = new_y;
 	} else {
-		if (emsg) pline(emsg);
+		if (emsg) pline1(emsg);
 		return 0;
 	}
 	return 1;
@@ -3568,7 +3568,7 @@ parse()
 		    if (multi > 9) {
 			clear_nhwindow(WIN_MESSAGE);
 			Sprintf(in_line, "Count: %d", multi);
-			pline(in_line);
+			pline1(in_line);
 			mark_synch();
 		    }
 		    last_multi = multi;
