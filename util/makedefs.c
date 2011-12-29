@@ -1153,7 +1153,7 @@ do_date()
 		 * won't get clobbered when downstream projects import
 		 * this file into something more modern. */
 	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.5\t2004/02/01 */\n\n");
-	Fprintf(ofp,Dont_Edit_Code);
+	Fprintf(ofp,"%s",Dont_Edit_Code);
 
 	(void) time(&clocktim);
 	Strcpy(cbuf, ctime(&clocktim));
@@ -1530,7 +1530,7 @@ do_options()
 		    (winsyscnt == 2) ? ((i == 0) ? " and" : "") :
 		      (i < winsyscnt - 2) ? "," :
 			((i == winsyscnt - 2) ? ", and" : "");
-	    Fprintf(ofp, sep),  length += strlen(sep);
+	    Fprintf(ofp, "%s", sep),  length += strlen(sep);
 	}
 	if (winsyscnt > 1)
 		Fprintf(ofp, "\n%swith a default of %s.",
@@ -1587,13 +1587,11 @@ do_data()
 #endif
 	Sprintf(eos(filename), DATA_TEMPLATE, DATA_FILE);
 	Sprintf(infile, DATA_IN_TEMPLATE, DATA_FILE);
-	Strcat(infile,
 #ifdef SHORT_FILENAMES
-		".bas"
+	Strcat(infile, ".bas");
 #else
-		".base"
+	Strcat(infile, ".base");
 #endif
-		);
 	if (!(ifp = fopen(infile, RDTMODE))) {		/* data.base */
 		perror(infile);
 		exit(EXIT_FAILURE);
@@ -1904,7 +1902,7 @@ do_dungeon()
 		perror(filename);
 		exit(EXIT_FAILURE);
 	}
-	Fprintf(ofp,Dont_Edit_Data);
+	Fprintf(ofp,"%s",Dont_Edit_Data);
 
 	tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
 	grep0(ifp, tfp);
@@ -2031,7 +2029,7 @@ do_monstr()
 	perror(filename);
 	exit(EXIT_FAILURE);
     }
-    Fprintf(ofp,Dont_Edit_Code);
+    Fprintf(ofp,"%s",Dont_Edit_Code);
     Fprintf(ofp,"#include \"config.h\"\n");
     Fprintf(ofp,"\nconst int monstr[] = {\n");
     for (ptr = &mons[0], j = 0; ptr->mlet; ptr++) {
@@ -2072,7 +2070,7 @@ do_permonst()
 		exit(EXIT_FAILURE);
 	}
 	Fprintf(ofp,"/*\tSCCS Id: @(#)pm.h\t3.5\t2004/02/01 */\n\n");
-	Fprintf(ofp,Dont_Edit_Code);
+	Fprintf(ofp,"%s",Dont_Edit_Code);
 	Fprintf(ofp,"#ifndef PM_H\n#define PM_H\n");
 
 	if (strcmp(mons[0].mname, "playermon") != 0)
@@ -2457,7 +2455,7 @@ do_objs()
 		exit(EXIT_FAILURE);
 	}
 	Fprintf(ofp,"/*\tSCCS Id: @(#)onames.h\t3.5\t2004/02/01 */\n\n");
-	Fprintf(ofp,Dont_Edit_Code);
+	Fprintf(ofp,"%s",Dont_Edit_Code);
 	Fprintf(ofp,"#ifndef ONAMES_H\n#define ONAMES_H\n\n");
 
 	for(i = 0; !i || objects[i].oc_class != ILLOBJ_CLASS; i++) {
@@ -2612,7 +2610,7 @@ do_vision()
 	perror(filename);
 	exit(EXIT_FAILURE);
     }
-    Fprintf(ofp,Dont_Edit_Code);
+    Fprintf(ofp,"%s",Dont_Edit_Code);
     Fprintf(ofp,"#ifdef VISION_TABLES\n");
 #ifdef VISION_TABLES
     H_close_gen();
@@ -2637,7 +2635,7 @@ do_vision()
 	Unlink(filename);
 	exit(EXIT_FAILURE);
     }
-    Fprintf(ofp,Dont_Edit_Code);
+    Fprintf(ofp,"%s",Dont_Edit_Code);
     Fprintf(ofp,"#include \"config.h\"\n");
     Fprintf(ofp,"#ifdef VISION_TABLES\n");
     Fprintf(ofp,"#include \"vis_tab.h\"\n");

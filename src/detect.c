@@ -867,7 +867,7 @@ struct obj *obj;
 	case 3 : if (!resists_blnd(&youmonst)) {
 		pline("%s your vision!", Tobjnam(obj, "damage"));
 		make_blinded((Blinded & TIMEOUT) + (long)rnd(100), FALSE);
-		if (!Blind) Your(vision_clears);
+		if (!Blind) Your1(vision_clears);
 	    } else {
 		pline("%s your vision.", Tobjnam(obj, "assault"));
 		You("are unaffected!");
@@ -919,7 +919,7 @@ struct obj *obj;
     ch = yn_function("What do you look for?", (char *)0, '\0');
     /* Don't filter out ' ' here; it has a use */
     if ((ch != def_monsyms[S_GHOST].sym) && index(quitchars,ch)) { 
-	if (flags.verbose) pline(Never_mind);
+	if (flags.verbose) pline1(Never_mind);
 	return;
     }
     You("peer into %s...", the(xname(obj)));
