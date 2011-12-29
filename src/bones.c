@@ -411,7 +411,7 @@ struct obj *corpse;
 	if(fd < 0) {
 #ifdef WIZARD
 		if(wizard)
-			pline("%s", whynot);
+			pline1(whynot);
 #endif
 		/* bones file creation problems are silent to the player.
 		 * Keep it that way, but place a clue into the paniclog.
@@ -511,7 +511,7 @@ getbones()
 				oldbonesid, bonesid);
 #ifdef WIZARD
 			if (wizard) {
-				pline("%s", errbuf);
+				pline1(errbuf);
 				ok = FALSE;	/* won't die of trickery */
 			}
 #endif
