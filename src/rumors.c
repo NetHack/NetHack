@@ -293,7 +293,7 @@ int mechanism;
 		pline("True to her word, the Oracle %ssays: ",
 		  (!rn2(4) ? "offhandedly " : (!rn2(3) ? "casually " :
 		  (rn2(2) ? "nonchalantly " : ""))));
-		verbalize("%s", line);
+		verbalize1(line);
 		exercise(A_WIS, TRUE);
 		return;
 	    case BY_COOKIE:
@@ -303,7 +303,7 @@ int mechanism;
 		pline("It reads:");
 		break;
 	}
-	pline("%s", line);
+	pline1(line);
 }
 
 STATIC_OVL void
