@@ -413,7 +413,7 @@ dig(VOID_ARGS)
 		    feel_location(dpx, dpy);
 		else
 		    newsym(dpx, dpy);
-		if(digtxt && !context.digging.quiet) pline(digtxt); /* after newsym */
+		if(digtxt && !context.digging.quiet) pline1(digtxt); /* after newsym */
 		if(dmgtxt)
 		    pay_for_damage(dmgtxt, FALSE);
 
@@ -1374,7 +1374,7 @@ zap_dig()
 			char buf[BUFSZ];
 			cc.x = zx; cc.y = zy;
 			if (!adj_pit_checks(&cc, buf)) {
-				if (buf[0]) pline("%s", buf);
+				if (buf[0]) pline1(buf);
 			} else {
 				/* this can also result in a pool at zx,zy */
 				dighole(TRUE, TRUE, &cc);
