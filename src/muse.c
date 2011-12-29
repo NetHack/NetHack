@@ -82,7 +82,7 @@ struct obj *obj;
 		    m_useup(mon, obj);
 		    mtmp = makemon(&mons[PM_GHOST], cc.x, cc.y, NO_MM_FLAGS);
 		    if (!mtmp) {
-			if (vis) pline(empty);
+			if (vis) pline1(empty);
 		    } else {
 			if (vis) {
 			    pline("As %s opens the bottle, an enormous %s emerges!",
@@ -104,7 +104,7 @@ struct obj *obj;
 		m_useup(mon, obj);
 		mtmp = makemon(&mons[PM_DJINNI], cc.x, cc.y, NO_MM_FLAGS);
 		if (!mtmp) {
-		    if (vis) pline(empty);
+		    if (vis) pline1(empty);
 		} else {
 		    if (vis)
 			pline("In a cloud of smoke, %s emerges!",
