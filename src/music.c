@@ -691,7 +691,7 @@ struct obj *instr;
 	    return do_improvisation(instr);
 
  nevermind:
-    pline(Never_mind);
+    pline1(Never_mind);
     return 0;
 }
 
