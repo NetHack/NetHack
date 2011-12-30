@@ -1918,7 +1918,7 @@ int *seencount;   /* secondary output */
 	impossible("bad bag o' tricks");
     } else if (bag->spe < 1) {
 	/* if tipping known empty bag, give normal empty container message */
-	pline((tipping && bag->cknown) ? "It's empty." : nothing_happens);
+	pline1((tipping && bag->cknown) ? "It's empty." : nothing_happens);
 	/* now known to be empty if sufficiently discovered */
 	if (bag->dknown && objects[bag->otyp].oc_name_known) bag->cknown = 1;
     } else {
@@ -1943,7 +1943,7 @@ int *seencount;   /* secondary output */
 	    if (bag->spe > 0) bag->cknown = 1;
 	    if (bag->dknown) makeknown(BAG_OF_TRICKS);
 	} else if (!tipping) {
-	    pline(!moncount ? nothing_happens : "Nothing seems to happen.");
+	    pline1(!moncount ? nothing_happens : "Nothing seems to happen.");
 	}
     }
     return moncount;
